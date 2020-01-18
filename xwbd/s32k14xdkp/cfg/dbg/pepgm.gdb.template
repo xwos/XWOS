@@ -1,0 +1,40 @@
+#! /usr/bin/arm-none-eabi-gdb -x
+# @file
+# @brief gdb script to program
+# @author
+# + 隐星魂 (Roy.Sun) <www.starsoul.tech>
+# @copyright
+# + (c) 2015 隐星魂 (Roy.Sun) <www.starsoul.tech>
+# > Licensed under the Apache License, Version 2.0 (the "License");
+# > you may not use this file except in compliance with the License.
+# > You may obtain a copy of the License at
+# >
+# >         http://www.apache.org/licenses/LICENSE-2.0
+# >
+# > Unless required by applicable law or agreed to in writing, software
+# > distributed under the License is distributed on an "AS IS" BASIS,
+# > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# > See the License for the specific language governing permissions and
+# > limitations under the License.
+#
+
+echo xwos os gdb script\n
+set breakpoint pending on
+set python print-stack none
+set print object on
+set print sevenbit-strings on
+set mem inaccessible-by-default off
+set auto-xwlib-add on
+target remote localhost:7224
+symbol-file ##DIR##/xwos.elf
+load ##DIR##/xwos.elf
+monitor semihosting 1,51794
+monitor preserve0 0
+monitor preserve1 0
+monitor preserve2 0
+monitor trim 0
+monitor partition 0
+monitor preservepartition 0
+monitor selectcore 0
+break reset_sysisr
+display/i $pc

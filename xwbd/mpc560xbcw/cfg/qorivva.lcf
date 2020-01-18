@@ -1,0 +1,376 @@
+/**
+ * @file
+ * @brief 链接脚本
+ * @author
+ * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
+ * @copyright
+ * + (c) 2015 隐星魂 (Roy.Sun) <www.starsoul.tech>
+ * > Licensed under the Apache License, Version 2.0 (the "License");
+ * > you may not use this file except in compliance with the License.
+ * > You may obtain a copy of the License at
+ * >
+ * >         http://www.apache.org/licenses/LICENSE-2.0
+ * >
+ * > Unless required by applicable law or agreed to in writing, software
+ * > distributed under the License is distributed on an "AS IS" BASIS,
+ * > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * > See the License for the specific language governing permissions and
+ * > limitations under the License.
+ */
+
+MEMORY {
+        flash_mr:                       org=0x00010000, len=0x000B0000
+        sram_mr:                        org=0x40000000, len=0x00010000
+
+        rcw_mr:                         org=0x00000000, len=0x00000008
+        image_header_mr:                org=0x00010000, len=0x00000020
+        init_mr:                        org=0x00010020, len=0x000007E0
+        exception_handlers_mr:          org=0x00011000, len=0x00000400
+        xwos_vctbl_mr:                  org=0x00011800, len=0x00000800
+        rx_mr:                          org=0x00012000, len=0x0006E000
+        stdby_wkup_mr:                  org=0x40000000, len=0x00000080
+        bkup_mr:                        org=0x40000080, len=0x00000080
+        rwx_mr:                         org=0x40000100, len=0x0000F300
+        xwos_stk_mr:                    org=0x4000F400, len=0x00000C00
+}
+
+SECTIONS {
+        GROUP : {
+                .__bam_bootarea LOAD (0x0): {
+                        KEEP(*(.__bam_bootarea))
+                }
+        } > rcw_mr
+
+        GROUP : {
+                .image_header LOAD (ADDR(image_header_mr)): {
+                        KEEP(*(.image_header))
+                }
+        } > image_header_mr
+
+        GROUP : {
+                .init LOAD (ADDR(init_mr)) : {
+                 }
+                .init_vle (VLECODE) LOAD (ADDR(init_mr)) : {
+                        *(.init)
+                        *(.init_vle)
+                }
+        } > init_mr
+
+        GROUP : {
+                .exec_vect_vle (VLECODE) LOAD (ADDR(exception_handlers_mr)) : {
+                }
+        } > exception_handlers_mr
+
+        GROUP : {
+                .xwos.vctbl LOAD (ADDR(xwos_vctbl_mr)) : {
+                }
+                xwos_vctbl_vma_end = .;
+                xwos_vctbl_vma_base = ADDR(.xwos.vctbl);
+                xwos_vctbl_lma_base = ROMADDR(.xwos.vctbl);
+        } > xwos_vctbl_mr
+
+        /* section must be aligned to 8 */
+        GROUP : {
+                . = ALIGN(8);
+                .xwos.init.text (VLECODE) : {
+                        *(.xwos.init.text)
+                }
+                xwos_init_code_vma_end = .;
+                xwos_init_code_vma_base = ADDR(.xwos.init.text);
+                xwos_init_code_lma_base = ROMADDR(.xwos.init.text);
+
+                . = ALIGN(8);
+                .xwos.init.rodata (CONST) : {
+                        *(.xwos.init.rodata)
+                }
+                xwos_init_rodata_vma_end = .;
+                xwos_init_rodata_vma_base = ADDR(.xwos.init.rodata);
+                xwos_init_rodata_lma_base = ROMADDR(.xwos.init.rodata);
+
+                . = ALIGN(8);
+                .xwos.exit.text (VLECODE) : {
+                        *(.xwos.exit.text)
+                }
+                xwos_exit_code_vma_end = .;
+                xwos_exit_code_vma_base = ADDR(.xwos.exit.text);
+                xwos_exit_code_lma_base = ROMADDR(.xwos.exit.text);
+
+                . = ALIGN(8);
+                .xwos.exit.rodata (CONST) : {
+                        *(.xwos.exit.rodata)
+                }
+                xwos_exit_rodata_vma_end = .;
+                xwos_exit_rodata_vma_base = ADDR(.xwos.exit.rodata);
+                xwos_exit_rodata_lma_base = ROMADDR(.xwos.exit.rodata);
+
+                . = ALIGN(8);
+                .xwos.isr.text (VLECODE) : {
+                        *(.xwos.isr.text)
+                }
+                xwos_isr_vma_end = .;
+                xwos_isr_vma_base = ADDR(.xwos.isr.text);
+                xwos_isr_lma_base = ROMADDR(.xwos.isr.text);
+
+                . = ALIGN(8);
+                .xwos.text (VLECODE) : {
+                        *(.xwos.text)
+                }
+                xwos_code_vma_end = .;
+                xwos_code_vma_base = ADDR(.xwos.text);
+                xwos_code_lma_base = ROMADDR(.xwos.text);
+
+                . = ALIGN(8);
+                .xwos.rodata (CONST) : {
+                        *(.xwos.rodata)
+                }
+                xwos_rodata_vma_end = .;
+                xwos_rodata_vma_base = ADDR(.xwos.rodata);
+                xwos_rodata_lma_base = ROMADDR(.xwos.rodata);
+
+                . = ALIGN(8);
+                .xwmd.isr.text (VLECODE) : {
+                        *(.xwmd.isr.text)
+                }
+                xwmd_isr_vma_end = .;
+                xwmd_isr_vma_base = ADDR(.xwmd.isr.text);
+                xwmd_isr_lma_base = ROMADDR(.xwmd.isr.text);
+
+                . = ALIGN(8);
+                .xwmd.text (VLECODE) : {
+                        *(.xwmd.text)
+                }
+                xwmd_code_vma_end = .;
+                xwmd_code_vma_base = ADDR(.xwmd.text);
+                xwmd_code_lma_base = ROMADDR(.xwmd.text);
+
+                . = ALIGN(8);
+                .xwmd.rodata (CONST) : {
+                        *(.xwmd.rodata)
+                }
+                xwmd_rodata_vma_end = .;
+                xwmd_rodata_vma_base = ADDR(.xwmd.rodata);
+                xwmd_rodata_lma_base = ROMADDR(.xwmd.rodata);
+
+                . = ALIGN(8);
+                .text : {
+                }
+                text_vma_end = .;
+                text_vma_base = ADDR(.text);
+                text_lma_base = ROMADDR(.text);
+
+                . = ALIGN(8);
+                .text_vle (VLECODE) : {
+                        *(.text_vle)
+                        *(.text)
+                }
+                text_vle_vma_end = .;
+                text_vle_vma_base = ADDR(.text_vle);
+                text_vle_lma_base = ROMADDR(.text_vle);
+
+                . = ALIGN(8);
+                .rodata (CONST) : {
+                        *(.rdata)
+                        *(.rodata)
+                }
+                rodata_vma_end = .;
+                rodata_vma_base = ADDR(.rodata);
+                rodata_lma_base = ROMADDR(.rodata);
+
+                . = ALIGN(8);
+                .ctors  ALIGN (0x4) : {
+                        *(.ctors)
+                }
+                ctors_vma_end = .;
+                ctors_vma_base = ADDR(.ctors);
+                ctors_lma_base = ROMADDR(.ctors);
+
+                . = ALIGN(8);
+                .dtors  ALIGN (0x4) : {
+                        *(.dtors)
+                }
+                dtors_vma_end = .;
+                dtors_vma_base = ADDR(.dtors);
+                dtors_lma_base = ROMADDR(.dtors);
+
+                . = ALIGN(8);
+                extab : {
+                }
+
+                . = ALIGN(8);
+                extabindex : {
+                }
+        } > rx_mr
+
+        GROUP : {
+                . = ALIGN(8);
+                .stdby_wkup : {
+                        KEEP(*(.stdby_wkup))
+                }
+                stdby_wkup_vma_end = .;
+                stdby_wkup_vma_base = ADDR(.stdby_wkup);
+                stdby_wkup_lma_base = ROMADDR(.stdby_wkup);
+        } > stdby_wkup_mr
+
+        GROUP : {
+                . = ALIGN(8);
+                .bkup : {
+                        KEEP(*(.bkup))
+                }
+                bkup_vma_end = .;
+                bkup_vma_base = ADDR(.bkup);
+                bkup_lma_base = ROMADDR(.bkup);
+        } > bkup_mr
+
+        GROUP : {
+                /* data section must be aligned to 8 */
+                . = ALIGN(8);
+                .xwos.data : {
+                        *(.xwos.data)
+                }
+                xwos_data_vma_end = .;
+                xwos_data_vma_base = ADDR(.xwos.data);
+                xwos_data_lma_base = ROMADDR(.xwos.data);
+
+                . = ALIGN(8);
+                .xwmd.data : {
+                        *(.xwmd.data)
+                }
+                xwmd_data_vma_end = .;
+                xwmd_data_vma_base = ADDR(.xwmd.data);
+                xwmd_data_lma_base = ROMADDR(.xwmd.data);
+
+                . = ALIGN(8);
+                .flsopc (VLECODE): {
+                        *(.flsopc)
+                }
+                flsopc_vma_end = .;
+                flsopc_vma_base = ADDR(.flsopc);
+                flsopc_lma_base = ROMADDR(.flsopc);
+
+                . = ALIGN(8);
+                .data : {
+                        *(.data)
+                }
+                data_vma_end = .;
+                data_vma_base = ADDR(.data);
+                data_lma_base = ROMADDR(.data);
+
+                . = ALIGN(8);
+                .j_pdata : {
+                        *(.j_pdata)
+                }
+                j_pdata_vma_end = .;
+                j_pdata_vma_base = ADDR(.j_pdata);
+                j_pdata_lma_base = ROMADDR(.j_pdata);
+
+                . = ALIGN(8);
+                .sdata : {
+                        *(.sdata)
+                }
+                sdata_vma_end = .;
+                sdata_vma_base = ADDR(.sdata);
+                sdata_lma_base = ROMADDR(.sdata);
+
+                . = ALIGN(8);
+                .sbss : {
+                        *(.sbss)
+                }
+                sbss_vma_end = .;
+                sbss_vma_base = ADDR(.sbss);
+                sbss_lma_base = ROMADDR(.sbss);
+
+                . = ALIGN(8);
+                .sdata2 : {
+                        *(.sdata2)
+                }
+                sdata2_vma_end = .;
+                sdata2_vma_base = ADDR(.sdata2);
+                sdata2_lma_base = ROMADDR(.sdata2);
+
+                . = ALIGN(8);
+                .sbss2 : {
+                        *(.sbss2)
+                }
+                sbss2_vma_end = .;
+                sbss2_vma_base = ADDR(.sbss2);
+                sbss2_lma_base = ROMADDR(.sbss2);
+
+                . = ALIGN(8);
+                .bss : {
+                        *(.bss)
+                }
+                bss_vma_end = .;
+                bss_vma_base = ADDR(.bss);
+                bss_lma_base = ROMADDR(.bss);
+
+                . = ALIGN(8);
+                .PPC.EMB.sdata0 : {
+                        *(.PPC.EMB.sdata0)
+                }
+                ppc_emb_sdata0_vma_end = .;
+                ppc_emb_sdata0_vma_base = ADDR(.PPC.EMB.sdata0);
+                ppc_emb_sdata0_lma_base = ROMADDR(.PPC.EMB.sdata0);
+
+                . = ALIGN(8);
+                .PPC.EMB.sbss0 : {
+                        *(.PPC.EMB.sbss0)
+                }
+                ppc_emb_sbss0_vma_end = .;
+                ppc_emb_sbss0_vma_base = ADDR(.PPC.EMB.sbss0);
+                ppc_emb_sbss0_lma_base = ROMADDR(.PPC.EMB.sbss0);
+
+                . = ALIGN(8);
+                .tidata : {
+                        *(.tidata)
+                }
+                tidata_vma_end = .;
+                tidata_vma_base = ADDR(.tidata);
+                tidata_lma_base = ROMADDR(.tidata);
+
+                . = ALIGN(8);
+                .tibss : {
+                        *(.tibss)
+                }
+                tibss_vma_end = .;
+                tibss_vma_base = ADDR(.tibss);
+                tibss_lma_base = ROMADDR(.tibss);
+
+                /* To generate rom address of image tail.
+                   The rom address is used by linker to put the image tail infomation */
+                . = ALIGN(16);
+                .rwx_tail : {
+                }
+                rwx_tail_vma_end = .;
+                rwx_tail_vma_base = ADDR(.rwx_tail);
+                rwx_tail_lma_base = ROMADDR(.rwx_tail);
+        } > rwx_mr
+
+        GROUP : {
+                .image_tail LOAD (rwx_tail_lma_base) : {
+                        KEEP(*(.image_tail))
+                        image_tail_vma_end = .;
+                        image_tail_vma_base = ADDR(.image_tail);
+                        image_tail_size = image_tail_vma_end - image_tail_vma_base;
+                        image_tail_lma_base = ROMADDR(.image_tail);
+                        image_tail_lma_end = image_tail_lma_base + image_tail_size;
+                } /* Don't care the virtual address. We only need the ROM address. */
+        } > xwos_stk_mr
+}
+
+xwos_stk_mr_origin = ADDR(xwos_stk_mr);
+xwos_stk_mr_size = SIZEOF(xwos_stk_mr);
+xwos_stk_top = xwos_stk_mr_origin + xwos_stk_mr_size;
+xwos_stk_end = xwos_stk_mr_origin;
+
+rwx_mr_origin = ADDR(rwx_mr);
+rwx_mr_size = SIZEOF(rwx_mr);
+
+xwmm_dkma_mmz_origin = rwx_mr_origin;
+xwmm_dkma_mmz_size = rwx_mr_size;
+xwmm_dkma_mmz_pos = rwx_tail_vma_end - rwx_mr_origin;
+
+bkup_mr_origin = ADDR(bkup_mr);
+bkup_mr_size = SIZEOF(bkup_mr);
+
+stdby_wkup_mr_origin = ADDR(stdby_wkup_mr);
+stdby_wkup_mr_size = SIZEOF(stdby_wkup_mr);

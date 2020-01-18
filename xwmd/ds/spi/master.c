@@ -1,0 +1,428 @@
+/**
+ * @file
+ * @brief xwmd设备栈：SPI主机模式控制器
+ * @author
+ * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
+ * @copyright
+ * + (c) 2015 隐星魂 (Roy.Sun) <www.starsoul.tech>
+ * > This Source Code Form is subject to the terms of the Mozilla Public
+ * > License, v. 2.0. If a copy of the MPL was not distributed with this
+ * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********      include      ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#include <xwos/standard.h>
+#include <xwos/lib/xwlog.h>
+#include <xwos/osal/scheduler.h>
+#include <xwos/osal/thread.h>
+#include <xwos/osal/lock/mutex.h>
+#include <xwmd/ds/spi/master.h>
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       macros      ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********     static function prototypes      ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+static __xwds_vop
+xwer_t xwds_spim_cvop_probe(struct xwds_spim * spim);
+
+static __xwds_vop
+xwer_t xwds_spim_cvop_remove(struct xwds_spim * spim);
+
+static __xwds_vop
+xwer_t xwds_spim_cvop_start(struct xwds_spim * spim);
+
+static __xwds_vop
+xwer_t xwds_spim_cvop_stop(struct xwds_spim * spim);
+
+#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+static __xwds_vop
+xwer_t xwds_spim_cvop_suspend(struct xwds_spim * spim);
+
+static __xwds_vop
+xwer_t xwds_spim_cvop_resume(struct xwds_spim * spim);
+#endif /* XWMDCFG_ds_LPM */
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       .data       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
+__xwds_rodata const struct xwds_base_virtual_operations xwds_spim_cvops = {
+        .probe = (void *)xwds_spim_cvop_probe,
+        .remove = (void *)xwds_spim_cvop_remove,
+        .start = (void *)xwds_spim_cvop_start,
+        .stop = (void *)xwds_spim_cvop_stop,
+#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+        .suspend = (void *)xwds_spim_cvop_suspend,
+        .resume = (void *)xwds_spim_cvop_resume,
+#endif /* XWMDCFG_ds_LPM */
+};
+#endif /* !XWMDCFG_ds_NANO */
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********      function implementations       ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
+/******** ******** ******** constructor & destructor ******** ******** ********/
+/**
+ * @brief 构造函数
+ * @param spim: (I) SPI主机模式控制器对象指针
+ */
+__xwds_code
+void xwds_spim_construct(struct xwds_spim * spim)
+{
+        xwds_device_construct(&spim->dev);
+        spim->dev.cvops = &xwds_spim_cvops;
+}
+
+/**
+ * @brief 析构函数
+ * @param spim: (I) SPI主机模式控制器对象指针
+ */
+__xwds_code
+void xwds_spim_destruct(struct xwds_spim * spim)
+{
+        struct xwds_device * dev;
+
+        dev = xwds_static_cast(struct xwds_device *, spim);
+        xwds_device_destruct(dev);
+}
+#endif /* !XWMDCFG_ds_NANO */
+
+/******** ******** base virtual operations ******** ********/
+/**
+ * @brief SODS VOP：探测设备
+ * @param spim: (I) SPI主机模式控制器对象指针
+ * @return 错误码
+ */
+static __xwds_vop
+xwer_t xwds_spim_cvop_probe(struct xwds_spim * spim)
+{
+        xwer_t rc;
+
+        rc = xwosal_mtx_init(&spim->xfermtx, XWOSAL_SD_PRIORITY_RT_MIN);
+        if (__unlikely(rc < 0)) {
+                goto err_xfermtx_init;
+        }
+        rc = xwds_device_cvop_probe(&spim->dev);
+        if (__unlikely(rc < 0)) {
+                goto err_dev_probe;
+        }
+        return OK;
+
+err_dev_probe:
+        xwosal_mtx_destroy(&spim->xfermtx);
+err_xfermtx_init:
+        return rc;
+}
+
+/**
+ * @brief SODS VOP：删除设备
+ * @param spim: (I) SPI主机模式控制器对象指针
+ * @return 错误码
+ */
+static __xwds_vop
+xwer_t xwds_spim_cvop_remove(struct xwds_spim * spim)
+{
+        xwer_t rc;
+
+        rc = xwds_device_cvop_remove(&spim->dev);
+        if (__unlikely(rc < 0)) {
+                goto err_dev_cvop_remove;
+        }
+
+        xwosal_mtx_destroy(&spim->xfermtx);
+        return OK;
+
+err_dev_cvop_remove:
+        return rc;
+}
+
+/**
+ * @brief SODS VOP：启动设备
+ * @param spim: (I) SPI主机模式控制器对象指针
+ * @return 错误码
+ */
+static __xwds_vop
+xwer_t xwds_spim_cvop_start(struct xwds_spim * spim)
+{
+        xwer_t rc;
+
+        rc = xwds_device_cvop_start(&spim->dev);
+        return rc;
+}
+
+/**
+ * @brief SODS VOP：停止设备
+ * @param spim: (I) SPI主机模式控制器对象指针
+ * @return 错误码
+ */
+static __xwds_vop
+xwer_t xwds_spim_cvop_stop(struct xwds_spim * spim)
+{
+        xwer_t rc;
+
+        rc = xwds_device_cvop_stop(&spim->dev);
+        return rc;
+}
+
+#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+/******** ******** pm ******** ********/
+/**
+ * @brief SODS VOP：暂停设备
+ * @param spim: (I) SPI主机模式控制器对象指针
+ * @return 错误码
+ */
+static __xwds_vop
+xwer_t xwds_spim_cvop_suspend(struct xwds_spim * spim)
+{
+        xwer_t rc;
+
+        rc = xwds_device_cvop_suspend(&spim->dev);
+        return rc;
+}
+
+/**
+ * @brief SODS VOP：继续设备
+ * @param spim: (I) SPI主机模式控制器对象指针
+ * @return 错误码
+ */
+static __xwds_vop
+xwer_t xwds_spim_cvop_resume(struct xwds_spim * spim)
+{
+        xwer_t rc;
+
+        rc = xwds_device_cvop_resume(&spim->dev);
+        return rc;
+}
+#endif /* XWMDCFG_ds_LPM */
+
+/******** ******** ******** SPI Master Device APIs ******** ******** ********/
+#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
+/**
+ * @brief SODS API：探测设备
+ * @param spim: (I) SPI主机模式控制器对象指针
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @note
+ * - 同步/异步：同步
+ * - 中断上下文：可以使用
+ * - 中断底半部：可以使用
+ * - 线程上下文：可以使用
+ * - 重入性：对于同一个设备不可重入；对于不同设备可重入
+ */
+__xwds_api
+xwer_t xwds_spim_probe(struct xwds_spim * spim)
+{
+        xwer_t rc;
+
+        SODS_VALIDATE(spim, "nullptr", -EFAULT);
+
+        rc = xwds_spim_cvop_probe(spim);
+        return rc;
+}
+
+/**
+ * @brief SODS API：删除设备
+ * @param spim: (I) SPI主机模式控制器对象指针
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @note
+ * - 同步/异步：同步
+ * - 中断上下文：可以使用
+ * - 中断底半部：可以使用
+ * - 线程上下文：可以使用
+ * - 重入性：对于同一个设备不可重入；对于不同设备可重入
+ */
+__xwds_api
+xwer_t xwds_spim_remove(struct xwds_spim * spim)
+{
+        xwer_t rc;
+
+        SODS_VALIDATE(spim, "nullptr", -EFAULT);
+
+        rc = xwds_spim_cvop_remove(spim);
+        return rc;
+}
+
+/**
+ * @brief SODS API：启动设备
+ * @param spim: (I) SPI主机模式控制器对象指针
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @note
+ * - 同步/异步：同步
+ * - 中断上下文：可以使用
+ * - 中断底半部：可以使用
+ * - 线程上下文：可以使用
+ * - 重入性：对于同一个设备不可重入；对于不同设备可重入
+ */
+__xwds_api
+xwer_t xwds_spim_start(struct xwds_spim * spim)
+{
+        xwer_t rc;
+
+        SODS_VALIDATE(spim, "nullptr", -EFAULT);
+
+        rc = xwds_spim_cvop_start(spim);
+        return rc;
+}
+
+/**
+ * @brief SODS API：停止设备
+ * @param spim: (I) SPI主机模式控制器对象指针
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @note
+ * - 同步/异步：同步
+ * - 中断上下文：可以使用
+ * - 中断底半部：可以使用
+ * - 线程上下文：可以使用
+ * - 重入性：对于同一个设备不可重入；对于不同设备可重入
+ */
+__xwds_api
+xwer_t xwds_spim_stop(struct xwds_spim * spim)
+{
+        xwer_t rc;
+
+        SODS_VALIDATE(spim, "nullptr", -EFAULT);
+
+        rc = xwds_spim_cvop_stop(spim);
+        return rc;
+}
+
+#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+/******** ******** pm ******** ********/
+/**
+ * @brief SODS API：暂停设备
+ * @param spim: (I) SPI主机模式控制器对象指针
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @note
+ * - 同步/异步：同步
+ * - 中断上下文：可以使用
+ * - 中断底半部：可以使用
+ * - 线程上下文：可以使用
+ * - 重入性：对于同一个设备不可重入；对于不同设备可重入
+ */
+__xwds_api
+xwer_t xwds_spim_suspend(struct xwds_spim * spim)
+{
+        xwer_t rc;
+
+        SODS_VALIDATE(spim, "nullptr", -EFAULT);
+
+        rc = xwds_spim_cvop_suspend(spim);
+        return rc;
+}
+
+/**
+ * @brief SODS API：继续设备
+ * @param spim: (I) SPI主机模式控制器对象指针
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @note
+ * - 同步/异步：同步
+ * - 中断上下文：可以使用
+ * - 中断底半部：可以使用
+ * - 线程上下文：可以使用
+ * - 重入性：对于同一个设备不可重入；对于不同设备可重入
+ */
+__xwds_api
+xwer_t xwds_spim_resume(struct xwds_spim * spim)
+{
+        xwer_t rc;
+
+        SODS_VALIDATE(spim, "nullptr", -EFAULT);
+
+        rc = xwds_spim_cvop_resume(spim);
+        return rc;
+}
+#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_NANO */
+
+/**
+ * @brief SODS API：启动传输
+ * @param spim: (I) SPI主机模式控制器对象指针
+ * @param msg: (I) 消息
+ * @param xwtm: 指向缓冲区的指针，此缓冲区：
+ *              (I) 作为输入时，表示期望的阻塞等待时间
+ *              (O) 作为输出时，返回剩余的期望时间
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @retval -ENOSYS: 不支持主机模式传输
+ * @note
+ * - 同步/异步：同步
+ * - 中断上下文：不可以使用
+ * - 中断底半部：不可以使用
+ * - 线程上下文：可以使用
+ * - 重入性：可重入
+ */
+__xwds_api
+xwer_t xwds_spim_xfer(struct xwds_spim * spim,
+                      struct xwds_spim_msg * msg,
+                      xwtm_t * xwtm)
+{
+        const struct xwds_spim_driver * drv;
+        xwer_t rc;
+
+        SODS_VALIDATE(spim, "nullptr", -EFAULT);
+        SODS_VALIDATE(msg, "nullptr", -EFAULT);
+        SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
+
+#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
+        rc = xwds_spim_grab(spim);
+        if (__unlikely(rc < 0)) {
+                goto err_spim_grab;
+        }
+        rc = xwds_spim_request(spim);
+        if (__unlikely(rc < 0)) {
+                goto err_spim_request;
+        }
+#endif /* !XWMDCFG_ds_NANO */
+
+        rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&spim->xfermtx), xwtm);
+        if (__unlikely(rc < 0)) {
+                goto err_spim_lock;
+        }
+
+        drv = xwds_static_cast(const struct xwds_spim_driver *, spim->dev.drv);
+        if (__likely((drv) && (drv->xfer))) {
+                rc = drv->xfer(spim, msg, xwtm);
+        } else {
+                rc = -ENOSYS;
+        }
+        if (__unlikely(rc < 0)) {
+                goto err_drv_xfer;
+        }
+        xwosal_mtx_unlock(xwosal_mtx_get_id(&spim->xfermtx));
+
+#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
+        xwds_spim_release(spim);
+        xwds_spim_put(spim);
+#endif /* !XWMDCFG_ds_NANO */
+
+        return OK;
+
+err_drv_xfer:
+        xwosal_mtx_unlock(xwosal_mtx_get_id(&spim->xfermtx));
+err_spim_lock:
+#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
+        xwds_spim_release(spim);
+err_spim_request:
+        xwds_spim_put(spim);
+err_spim_grab:
+#endif /* !XWMDCFG_ds_NANO */
+        return rc;
+}

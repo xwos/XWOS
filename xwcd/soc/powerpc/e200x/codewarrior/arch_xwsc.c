@@ -1,0 +1,96 @@
+/**
+ * @file
+ * @brief xwos supervisor calls
+ * @author
+ * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
+ * @copyright
+ * + (c) 2015 隐星魂 (Roy.Sun) <www.starsoul.tech>
+ * > Licensed under the Apache License, Version 2.0 (the "License");
+ * > you may not use this file except in compliance with the License.
+ * > You may obtain a copy of the License at
+ * >
+ * >         http://www.apache.org/licenses/LICENSE-2.0
+ * >
+ * > Unless required by applicable law or agreed to in writing, software
+ * > distributed under the License is distributed on an "AS IS" BASIS,
+ * > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * > See the License for the specific language governing permissions and
+ * > limitations under the License.
+ */
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********      include      ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#include <xwos/standard.h>
+#include <e200x_core.h>
+#include <arch_sc_trap.h>
+#include <arch_xwsc.h>
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       macros      ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       types       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********      static function prototypes     ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********      function implementations       ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief Real entry to start supervisor call
+ */
+__xwbsp_isr
+void arch_privilege_start_entry(__maybe_unused xwreg_t arg1,
+                                __maybe_unused xwreg_t arg2,
+                                __maybe_unused xwreg_t * srr0,
+                                xwreg_t * srr1)
+{
+        union msr_reg msr;
+
+        msr.w = *srr1;
+        msr.b.pr = 0;
+        *srr1 = msr.w;
+}
+
+/**
+ * @brief Real entry to end supervisor call
+ */
+__xwbsp_isr
+void arch_privilege_end_entry(__maybe_unused xwreg_t arg1,
+                              __maybe_unused xwreg_t arg2,
+                              __maybe_unused xwreg_t * srr0,
+                              xwreg_t * srr1)
+{
+        union msr_reg msr;
+
+        msr.w = *srr1;
+        msr.b.pr = 1;
+        *srr1 = msr.w;
+}
+
+/**
+ * @brief Start supervisor call (change to privileged access temporarily)
+ */
+__xwbsp_code
+void arch_privilege_start(void)
+{
+        arch_systemcall(ARCH_SC_PRIVILEGE_START,
+                        XWOS_UNUSED_ARGUMENT,
+                        XWOS_UNUSED_ARGUMENT);
+}
+
+/**
+ * @brief End supervisor call (close the privileged access)
+ */
+__xwbsp_code
+void arch_privilege_end(void)
+{
+        arch_systemcall(ARCH_SC_PRIVILEGE_END,
+                        XWOS_UNUSED_ARGUMENT,
+                        XWOS_UNUSED_ARGUMENT);
+}

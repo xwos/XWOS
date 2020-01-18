@@ -1,0 +1,145 @@
+/**
+ * @file
+ * @brief XWOS通用库：键值对容器
+ * @author
+ * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
+ * @copyright
+ * + (c) 2015 隐星魂 (Roy.Sun) <www.starsoul.tech>
+ * > This Source Code Form is subject to the terms of the Mozilla Public
+ * > License, v. 2.0. If a copy of the MPL was not distributed with this
+ * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********      include      ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#include <xwos/standard.h>
+#include <xwos/lib/map.h>
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********      function implementations       ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief 插入键值对容器
+ * @param m: (I) map的指针
+ * @param newmc: (I) 键值对容器的指针
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EEXIST: 键值对已经存在
+ */
+__xwlib_code
+xwer_t xwlib_map_insert(struct xwlib_map * m, struct xwlib_map_container * newmc)
+{
+        struct xwlib_rbtree_node ** pos;
+        struct xwlib_rbtree_node * rbn;
+        struct xwlib_map_container * mc;
+        struct xwlib_map_container * parent;
+        xwptr_t lpc;
+        xwssq_t cmprc;
+        xwer_t rc;
+
+        pos = &m->rbtree.root;
+        lpc = (xwptr_t)pos;
+
+        rbn = *pos;
+        while (rbn) {
+                mc = xwlib_rbtree_entry(rbn, struct xwlib_map_container, rbn);
+                cmprc = m->cmp(newmc->key, mc->key);
+                if (cmprc < 0) {
+                        pos = &rbn->left;
+                        lpc = (xwptr_t)pos;
+                        rbn = rbn->left;
+                } else if (cmprc > 0) {
+                        pos = &rbn->right;
+                        lpc = (xwptr_t)pos | XWLIB_RBTREE_POS_RIGHT;
+                        rbn = rbn->right;
+                } else {
+                        lpc = (xwptr_t)0;
+                        break;
+                }
+        }
+        if (lpc) {
+                xwlib_rbtree_link(&newmc->rbn, lpc);
+                xwlib_rbtree_insert_color(&m->rbtree, &newmc->rbn);
+                rbn = xwlib_rbtree_get_parent(&newmc->rbn);
+                if (rbn == m->rbtree.root) {
+                        xwlib_bclst_add_head(&m->bclh, &newmc->bcln);
+                } else {
+                        parent = xwlib_rbtree_entry(rbn,
+                                                    struct xwlib_map_container, rbn);
+                        if (xwlib_rbtree_tst_left(newmc->rbn.lpc.v)) {
+                                xwlib_bclst_add_front(&newmc->bcln, &parent->bcln);
+                        } else {
+                                xwlib_bclst_add_behind(&newmc->bcln, &parent->bcln);
+                        }
+                }
+                rc = OK;
+        } else {
+                rc = -EEXIST;
+        }
+        return rc;
+}
+
+/**
+ * @brief 删除键值对容器
+ * @param m: (I) map的指针
+ * @param mc: (I) 键值对容器的指针
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -ESRCH: 此键值对容器不在键值对集合中
+ */
+__xwlib_code
+xwer_t xwlib_map_erase(struct xwlib_map * m, struct xwlib_map_container * mc)
+{
+        xwer_t rc;
+
+        if (xwlib_rbtree_tst_node_unlinked(&mc->rbn)) {
+                rc = -ESRCH;
+        } else {
+                xwlib_rbtree_remove(&m->rbtree, &mc->rbn);
+                xwlib_rbtree_init_node(&mc->rbn);
+                xwlib_bclst_del_init(&mc->bcln);
+                rc = OK;
+        }
+        return rc;
+}
+
+/**
+ * @brief 根据“键”查找键值对容器
+ * @param m: (I) map的指针
+ * @param key: (I) 键值对容器的指针
+ * @param mc: (O) 指向指针缓存的指针，此指针缓存用于返回查找到的键值对容器的指针
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -ESRCH: 目标不存在
+ */
+__xwlib_code
+xwer_t xwlib_map_find(struct xwlib_map * m, void * key,
+                      struct xwlib_map_container ** mcbuf)
+{
+        struct xwlib_rbtree_node * rbn;
+        struct xwlib_map_container * mc;
+        xwssq_t cmprc;
+        xwer_t rc;
+
+        rbn = m->rbtree.root;
+        while (rbn) {
+                mc = xwlib_rbtree_entry(rbn, struct xwlib_map_container, rbn);
+                cmprc = m->cmp(key, mc->key);
+                if (cmprc < 0) {
+                        rbn = rbn->left;
+                } else if (cmprc > 0) {
+                        rbn = rbn->right;
+                } else {
+                        break;
+                }
+        }
+        if (rbn) {
+                *mcbuf = xwlib_rbtree_entry(rbn, struct xwlib_map_container, rbn);
+                rc = OK;
+        } else {
+                *mcbuf = NULL;
+                rc = -ESRCH;
+        }
+        return rc;
+}
