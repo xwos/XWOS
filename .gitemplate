@@ -1,16 +1,21 @@
 
 #
 # [页眉] <type>(<scope>): :emoji: <subject>
-# - type: feat, fix, perf, refactor, style, build, revert, docs, test, chore, milestone, release, patch
+# - type: feat, fix, perf, refactor, style, build, revert, docs, test,
+#         chore, milestone, release, developing, patch
 # - scope: 可为空
-# - subject: 以动词开始的短语，结尾无句号，50个字符一行（中文字符算2个字符）
+# - subject: 以动词开始的短语，结尾无句号
+# - 页眉只占一行
+# - 每行总长度不超过72个字符（中文字符算2个字符）
 #
-# [正文] 描述：
+# [正文] 描述
 # - 为什么需要修改？
 # - 如何定位问题？
 # - 修改有什么副作用？
+# - 每行总长度不超过72个字符（中文字符算2个字符）
 #
 # [页脚]
 # - 问题的ID或链接
-# - BREAKING CHANGE (破坏API原型的修改)
+# - BREAKING CHANGE（破坏API原型的修改）
+# - 每行总长度不超过72个字符（中文字符算2个字符）
 #

@@ -40,31 +40,36 @@
 
 ** MPL-2.0
 玄武OS核心代码采用Mozilla Public License, version 2.0（简称MPL-2.0）进行发布：
-- 链接：[[https://www.mozilla.org/en-US/MPL/2.0/][https://www.mozilla.org/en-US/MPL/2.0/]]
-- 这些代码位于xwos与xwmd文件夹中。
++ 链接：[[https://www.mozilla.org/en-US/MPL/2.0/][https://www.mozilla.org/en-US/MPL/2.0/]]
++ 这些代码位于xwos与xwmd文件夹中。
 
 ** apache-2.0
 为了更好的商业利用，玄武OS的外围代码（BSP、应用、编译脚本）
 采用apache license, version 2.0（简称apache-2.0）进行发布：
-- 链接：[[http://www.apache.org/licenses/LICENSE-2.0][http://www.apache.org/licenses/LICENSE-2.0]]
-- 这些代码位于xwcd、xwbd与xwbs中。
++ 链接：[[http://www.apache.org/licenses/LICENSE-2.0][http://www.apache.org/licenses/LICENSE-2.0]]
++ 这些代码位于xwcd、xwbd与xwbs中。
 
 * git commit规范
 
 #+BEGIN_SRC shell
 # [页眉] <type>(<scope>): :emoji: <subject>
-# - type: feat, fix, perf, refactor, style, build, revert, docs, test, chore, milestone, release, patch
+# - type: feat, fix, perf, refactor, style, build, revert, docs, test,
+#         chore, milestone, release, developing, patch
 # - scope: 可为空
-# - subject: 以动词开始的短语，结尾无句号，50个字符一行（中文字符算2个字符）
+# - subject: 以动词开始的短语，结尾无句号
+# - 页眉只占一行
+# - 每行总长度不超过72个字符（中文字符算2个字符）
 #
-# [正文] 描述：
+# [正文] 描述
 # - 为什么需要修改？
 # - 如何定位问题？
 # - 修改有什么副作用？
+# - 每行总长度不超过72个字符（中文字符算2个字符）
 #
 # [页脚]
 # - 问题的ID或链接
-# - BREAKING CHANGE (破坏API原型的修改)
+# - BREAKING CHANGE（破坏API原型的修改）
+# - 每行总长度不超过72个字符（中文字符算2个字符）
 #+END_SRC
 
 参考：[[https://www.conventionalcommits.org/][https://www.conventionalcommits.org/]]
@@ -81,5 +86,6 @@
 - test: 测试
 - chore: 依赖、工具
 - milestone: 更新大版本号
-- release: 更新小版本号
+- release: 更新稳定版的小版本号（偶数）
+- developing: 切换到下一个开发版的小版本号（奇数）
 - patch: 更新修订号
