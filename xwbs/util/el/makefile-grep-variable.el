@@ -24,7 +24,7 @@
 (require 'errno)
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; config ;;;;;;;; ;;;;;;;; ;;;;;;;;
-(defconst cfg-log-lv 4)
+(defconst cfg-log-lv 2)
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; log function ;;;;;;;; ;;;;;;;; ;;;;;;;;
 (defconst DBG "[DBG]")
@@ -47,7 +47,7 @@
       (princ (apply 'format (concat WRN " " fmtstr "\n") arglist))))
 (defun loge (fmtstr &rest arglist)
   (if (<= cfg-log-lv ERR-LV)
-      (apply 'message (concat ERR " " fmtstr) arglist)))
+      (princ (apply 'format (concat ERR " " fmtstr "\n") arglist))))
 (defmacro logtag (tag)
   (list 'car (list 'read-from-string (list 'concat "log" (list 'format "%s" tag)))))
 
