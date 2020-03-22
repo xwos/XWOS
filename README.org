@@ -49,6 +49,46 @@
 + 链接：[[http://www.apache.org/licenses/LICENSE-2.0][http://www.apache.org/licenses/LICENSE-2.0]]
 + 这些代码位于xwcd、xwbd与xwbs中。
 
+* 分支与版本号
+
+** 分支
++ stable: 稳定版
++ developing: 开发版
+
+** 版本号形式：Major.minor.revision (M.m.r)
++ Major: 大版本号
+  - 包含重大更新的里程碑版本
++ minor: 小版本号
+  - 奇数：表示当前版本是开发版
+  - 偶数：表示当前版本是稳定版
++ revision: 修订号
+  - 对于开发版分支：修订号的每次递增，都包含了数次提交，这些修改可以是bug的修复、
+    增加新功能以及其他任何修改；
+  - 对于稳定版分支：修订号的每次递增，表示从开发版分支中合并了部分提交，
+    这些提交只是修复Bug及其他错误。
+
+** 版本变化规则
++ Major在以下情况下增加1：
+  - 重要新功能引入后；
+  - 破坏性修改(BREAK CHANGE)，例如，修改API的原型，删除API等后；
+  - 累积了多次小版本号更新后。
++ minor：
+  - 发布一个新的稳定版本，开发版分支的minor+1变成偶数，
+    并合并到稳定版分支；
+  - 新的稳定版发布完成后，开发版分支的minor再加1，变成奇数，
+    开启下一个开发周期；
+  - Major+1后，minor回到0。
++ revision：
+  - 对于开发版分支，多次提交后，revision+1；
+  - 对于稳定版分支，从开发版分支中合并了1～n个修复Bug及其他错误的提交后，
+    revision+1；
+  - minor+1后，revision回到0；
+  - Major+1后，revision回到0。
+
+** 稳定版发布条件
++ 开发版分支中增加了1～n个新功能；
++ 开发版分支中修复了重大Bug。
+
 * git commit规范
 
 #+BEGIN_SRC shell
