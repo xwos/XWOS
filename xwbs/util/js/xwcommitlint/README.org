@@ -1,0 +1,74 @@
+#+STARTUP: showall
+#+STARTUP: hidestars
+#+TITLE: xwcommitlint-README
+#+AUTHOR: 隐星魂(Roy.Sun)
+#+EMAIL: roy.sun@starsoul.tech
+#+DATE:
+#+LANGUAGE: zh-CN
+#+OPTIONS: ^:{}
+#+OPTIONS: title:nil
+#+OPTIONS: toc:t
+
+* 简介
+
++ 用途：每次git commit时检查commit log是否符合规范。
+
+* 部署
+
+此工具依赖node.js的两个开源工具 *commitlint* 和 *husky* ，这两个工具会有大量
+依赖，因此这两个工具不提交到XuanWuOS的git仓库中，只提交配置与部署方法。
+
++ 安装node.js
+
+系统软件仓库自带的node.js版本可能比较低， *husky* 要求 *node* 的版本 >= 10。
+如果 *node* 的版本符号要求，可跳过此步骤。
+
+可卸载系统自带的版本，到官网下载一个合适的版本：
+
+[[https://nodejs.org/zh-cn/download/][https://nodejs.org/zh-cn/download/]]
+
+解压压缩包，合并到 */usr/local/* ，并将 */usr/local/bin* 加入到
+环境变量 *PATH* 中（大部分Linux发行版的 *PATH* 中已经包含此路径）。
+
+安装完成后可使用下面命令测试一下版本号。
+
+#+BEGIN_SRC shell
+node -v
+npm -v
+#+END_SRC
+
++ 修改npm的仓库源
+
+打开文件 *~/.npmrc* ，增加下列配置，使用国内的镜像。
+
+#+BEGIN_SRC shell
+registry = https://registry.npm.taobao.org
+#+END_SRC
+
++ 安装commitlint与husky
+
+#+BEGIN_SRC shell
+cd xwbs/util/js/xwcommitlint
+npm install --save-dev @commitlint/cli \
+                       @commitlint/config-conventional \
+                       husky
+#+END_SRC
+
+* 测试
+
+#+BEGIN_SRC shell
+git commit --allow-empty -m "badtype: badsubject"
+#+END_SRC
+
+因commit log不符合规范，提交会被 *husky* 中止。
+
+#+BEGIN_SRC shell
+husky > commit-msg (node vX.Y.Z)
+⧗   input: badtype: badsubject
+✖   type must be one of [feat, fix, perf, refactor, style, build, revert, docs, test, chore, milestone, release, developing, patch] [type-enum]
+
+✖   found 1 problems, 0 warnings
+ⓘ   Get help: https://github.com/conventional-changelog/commitlint/#what-is-commitlint
+
+husky > commit-msg hook failed (add --no-verify to bypass)
+#+END_SRC

@@ -18,3 +18,5 @@ doxygen
 GTAGS
 GRTAGS
 GPATH
+xwbs/util/js/xwcommitlint/node_modules
+xwbs/util/js/xwcommitlint/package-lock.json
