@@ -212,6 +212,10 @@ __xwos_code
 void xwsync_smr_construct(struct xwsync_smr * smr)
 {
         xwos_object_construct(&smr->xwobj);
+#if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
+        smr->selector.evt = NULL;
+        smr->selector.pos = 0;
+#endif /* XWSMPCFG_SYNC_EVT */
 }
 
 /**
@@ -221,6 +225,10 @@ void xwsync_smr_construct(struct xwsync_smr * smr)
 __xwos_code
 void xwsync_smr_destruct(struct xwsync_smr * smr)
 {
+#if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
+        smr->selector.evt = NULL;
+        smr->selector.pos = 0;
+#endif /* XWSMPCFG_SYNC_EVT */
         xwos_object_destruct(&smr->xwobj);
 }
 
