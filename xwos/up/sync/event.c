@@ -20,8 +20,6 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #include <xwos/up/irq.h>
-#include <xwos/up/scheduler.h>
-#include <xwos/up/tt.h>
 #include <xwos/up/thread.h>
 #include <xwos/up/lock/fakespinlock.h>
 #include <xwos/up/sync/condition.h>

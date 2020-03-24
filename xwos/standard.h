@@ -48,7 +48,7 @@
  * @brief 得到结构体数组中结构体的个数
  * @param ay: (I) 数组名
  */
-#define xw_array_size(ay) (sizeof(ay) / sizeof((ay)[0]))
+  #define xw_array_size(ay) (sizeof(ay) / sizeof((ay)[0]))
 #endif
 
 #ifndef __XWOS_COMPILER__
@@ -68,10 +68,10 @@
 #define XWOS_UNUSED(x)          ((void)(x))     /**< 去除未使用变量的警告 */
 
 #if defined(XWKNCFG_CHECK_PARAMETERS) && (1 == XWKNCFG_CHECK_PARAMETERS)
-#define XWOS_VALIDATE(exp, errstr, ...) \
-        if (__unlikely((!(exp)))) {     \
-            return __VA_ARGS__; \
-        }
+  #define XWOS_VALIDATE(exp, errstr, ...) \
+          if (__unlikely((!(exp)))) {     \
+              return __VA_ARGS__; \
+          }
 #else /* XWKNCFG_CHECK_PARAMETERS */
   #define XWOS_VALIDATE(exp, errstr, ...)
 #endif /* !XWKNCFG_CHECK_PARAMETERS */

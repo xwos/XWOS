@@ -327,7 +327,7 @@
 /**
  * @brief 定义stringify的辅助宏
  */
-#define __stringify(m)                  #m
+  #define __stringify(m)                  #m
 
 /**
  * @brief 字符串化
@@ -352,7 +352,7 @@
  * ```
  * 因为NAME在stringify(m)中展开，此时没有遇到#或##。
  */
-#define stringify(m)                    __stringify(m)
+  #define stringify(m)                    __stringify(m)
 #endif /* stringify */
 
 /**
@@ -368,7 +368,7 @@
  * @param type: (I) 结构体类型
  * @param member: (I) 成员在结构体中符号名
  */
-#define offsetof(type, member)  ((xwptr_t)&(((type *)0)->member))
+  #define offsetof(type, member)  ((xwptr_t)&(((type *)0)->member))
 #endif
 
 #ifndef container_of
@@ -378,8 +378,8 @@
  * @param type: (I) 结构体类型
  * @param member: (I) 成员在结构体中符号名
  */
-#define container_of(ptr, type, member) \
-        ((type *)(((xwptr_t)(ptr)) - offsetof(type, member)))
+  #define container_of(ptr, type, member) \
+          ((type *)(((xwptr_t)(ptr)) - offsetof(type, member)))
 #endif
 
 #endif /* xwos/compiler.h */
