@@ -23,8 +23,6 @@
   #include <xwos/mm/memslice.h>
 #endif /* XWSMPCFG_SYNC_EVT_MEMSLICE */
 #include <xwos/smp/irq.h>
-#include <xwos/smp/scheduler.h>
-#include <xwos/smp/tt.h>
 #include <xwos/smp/thread.h>
 #include <xwos/smp/lock/spinlock.h>
 #include <xwos/smp/sync/condition.h>
