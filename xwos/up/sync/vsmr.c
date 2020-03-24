@@ -32,6 +32,19 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief 激活信号量对象。
+ * @param smr: (I) 信号量对象的指针
+ */
+__xwos_code
+void xwsync_vsmr_activate(struct xwsync_vsmr * smr)
+{
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+        smr->selector.evt = NULL;
+        smr->selector.pos = 0;
+#endif /* XWUPCFG_SYNC_EVT */
+}
+
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
 /**
  * @brief 绑定信号量到事件对象，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。

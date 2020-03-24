@@ -49,6 +49,9 @@ struct xwsync_evt;
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwos_code
+void xwsync_vsmr_activate(struct xwsync_vsmr * smr);
+
+__xwos_code
 xwer_t xwsync_vsmr_bind(struct xwsync_vsmr * smr, struct xwsync_evt * evt,
                         xwsq_t pos);
 

@@ -107,6 +107,7 @@ void xwsync_plsmr_free(struct xwsync_plsmr * smr)
 static __xwos_code
 void xwsync_plsmr_activate(struct xwsync_plsmr * smr, xwssq_t val, xwssq_t max)
 {
+        xwsync_vsmr_activate(&smr->vsmr);
         xwos_plwq_init(&smr->plwq);
         smr->vsmr.count = val;
         smr->vsmr.max = max;
