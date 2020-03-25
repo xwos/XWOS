@@ -174,7 +174,7 @@ xwer_t bm_xwtst_sync_selector_wthrd_func(void * arg)
         xwid_t sltid;
         xwid_t smrid0, smrid1, smrid2;
         xwtm_t sleep;
-        xwer_t rc;
+        xwer_t rc = OK;
 
         XWOS_UNUSED(arg);
 
@@ -208,7 +208,7 @@ xwer_t bm_xwtst_sync_selector_ithrd_func(void * arg)
 {
         xwid_t smrid0, smrid1, smrid2;
         xwtm_t sleep;
-        xwer_t rc;
+        xwer_t rc = OK;
 
         XWOS_UNUSED(arg);
 

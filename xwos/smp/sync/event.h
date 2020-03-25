@@ -18,6 +18,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/object.h>
+#include <xwos/lib/xwbop.h>
 #include <xwos/smp/lock/spinlock.h>
 #include <xwos/smp/sync/condition.h>
 

@@ -25,7 +25,7 @@
 #include <xwos/osal/scheduler.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/init.h>
-#include <bm/xwtst/sync/barrier/demo.h>
+#include <bm/xwtst/sync/selector/demo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -52,9 +52,9 @@ xwer_t xwos_main(void)
                 goto bm_stm32cube_start;
         }
 
-        rc = bm_xwtst_sync_barrier_start();
+        rc = bm_xwtst_sync_selector_start();
         if (rc < 0) {
-                goto err_bm_xwtst_sync_barrier_start;
+                goto err_bm_xwtst_sync_selector_start;
         }
 
         rc = xwosal_scheduler_start_lc();
@@ -63,7 +63,7 @@ xwer_t xwos_main(void)
         }
         return OK;
 
-err_bm_xwtst_sync_barrier_start:
+err_bm_xwtst_sync_selector_start:
         BDL_BUG();
 err_scheduler_start_lc:
         BDL_BUG();

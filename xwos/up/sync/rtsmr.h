@@ -71,7 +71,7 @@ xwer_t xwsync_rtsmr_wait_unintr(struct xwsync_rtsmr * smr);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
 /**
  * @brief XWOS API：绑定实时信号量到事件对象，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
  * @param smr: (I) 实时信号量对象的指针
@@ -116,7 +116,7 @@ xwer_t xwsync_rtsmr_unbind(struct xwsync_rtsmr * smr, struct xwsync_evt * evt)
 
         return xwsync_vsmr_unbind(&smr->vsmr, evt);
 }
-#endif /* XWSMPCFG_SYNC_EVT */
+#endif /* XWUPCFG_SYNC_EVT */
 
 /**
  * @brief XWOS API：冻结实时信号量（值设置为负）。
