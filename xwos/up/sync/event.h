@@ -18,6 +18,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/object.h>
+#include <xwos/lib/xwbop.h>
 #include <xwos/up/lock/fakespinlock.h>
 #include <xwos/up/sync/vsmr.h>
 #include <xwos/up/sync/condition.h>

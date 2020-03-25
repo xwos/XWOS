@@ -22,6 +22,9 @@
 #include <xwos/up/thread.h>
 #include <xwos/up/rtwq.h>
 #include <xwos/mm/kma.h>
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+  #include <xwos/up/sync/event.h>
+#endif /* XWUPCFG_SYNC_EVT */
 #include <xwos/up/sync/rtsmr.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -311,16 +314,16 @@ xwer_t xwsync_rtsmr_post(struct xwsync_rtsmr * smr)
                         } else {
                                 rc = -ERANGE;
                         }
-#if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
-                        if (smr->count > 0) {
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+                        if (smr->vsmr.count > 0) {
                                 struct xwsync_evt * evt;
 
-                                evt = &smr->selector.evt;
+                                evt = smr->vsmr.selector.evt;
                                 if (NULL != evt) {
-                                        xwsync_evt_smr_s1i(evt, smr);
+                                        xwsync_evt_smr_s1i(evt, &smr->vsmr);
                                 }
                         }
-#endif /* XWSMPCFG_SYNC_EVT */
+#endif /* XWUPCFG_SYNC_EVT */
                         xwos_cpuirq_restore_lc(flag);
                 }
         }
@@ -352,16 +355,16 @@ xwer_t xwsync_rtsmr_trywait(struct xwsync_rtsmr * smr)
         xwos_cpuirq_save_lc(&flag);
         if (smr->vsmr.count > 0) {
                 smr->vsmr.count--;
-#if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
-                if (0 == smr->count) {
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+                if (0 == smr->vsmr.count) {
                         struct xwsync_evt * evt;
 
-                        evt = smr->selector.evt;
+                        evt = smr->vsmr.selector.evt;
                         if (NULL != evt) {
-                                xwsync_evt_smr_c0i(evt, smr);
+                                xwsync_evt_smr_c0i(evt, &smr->vsmr);
                         }
                 }
-#endif /* XWSMPCFG_SYNC_EVT */
+#endif /* XWUPCFG_SYNC_EVT */
         } else {
                 rc = -ENODATA;
         }
@@ -511,6 +514,16 @@ xwer_t xwsync_rtsmr_do_timedwait(struct xwsync_rtsmr * smr, struct xwos_tcb * tc
 #endif /* XWUPCFG_SD_LPM */
         } else {
                 smr->vsmr.count--;
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+                if (0 == smr->vsmr.count) {
+                        struct xwsync_evt * evt;
+
+                        evt = smr->vsmr.selector.evt;
+                        if (NULL != evt) {
+                                xwsync_evt_smr_c0i(evt, &smr->vsmr);
+                        }
+                }
+#endif /* XWUPCFG_SYNC_EVT */
                 xwos_cpuirq_restore_lc(flag);
                 rc = OK;
         }
@@ -609,6 +622,16 @@ xwer_t xwsync_rtsmr_do_wait_unintr(struct xwsync_rtsmr * smr, struct xwos_tcb * 
                 rc = xwsync_rtsmr_do_blkthrd_unlkwq_cpuirqrs(smr, tcb, flag);
         } else {
                 smr->vsmr.count--;
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+                if (0 == smr->vsmr.count) {
+                        struct xwsync_evt * evt;
+
+                        evt = smr->vsmr.selector.evt;
+                        if (NULL != evt) {
+                                xwsync_evt_smr_c0i(evt, &smr->vsmr);
+                        }
+                }
+#endif /* XWUPCFG_SYNC_EVT */
                 xwos_cpuirq_restore_lc(flag);
                 rc = OK;
         }

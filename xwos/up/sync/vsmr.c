@@ -15,6 +15,9 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/up/irq.h>
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+  #include <xwos/up/sync/event.h>
+#endif /* XWUPCFG_SYNC_EVT */
 #include <xwos/up/sync/vsmr.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -45,7 +48,7 @@ void xwsync_vsmr_activate(struct xwsync_vsmr * smr)
 #endif /* XWUPCFG_SYNC_EVT */
 }
 
-#if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
 /**
  * @brief 绑定信号量到事件对象，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
  * @param smr: (I) 信号量对象的指针
@@ -65,12 +68,12 @@ xwer_t xwsync_vsmr_bind(struct xwsync_vsmr * smr, struct xwsync_evt * evt,
         xwreg_t cpuirq;
         xwer_t rc;
 
-        xwos_cpuirq_save_lc(&flag);
+        xwos_cpuirq_save_lc(&cpuirq);
         rc = xwsync_evt_smr_bind(evt, smr, pos);
         if ((OK == rc) && (smr->count > 0)) {
                 rc = xwsync_evt_smr_s1i(evt, smr);
         }
-        xwos_cpuirq_restore_lc(flag);
+        xwos_cpuirq_restore_lc(cpuirq);
 
         return rc;
 }
@@ -92,16 +95,16 @@ xwer_t xwsync_vsmr_unbind(struct xwsync_vsmr * smr, struct xwsync_evt * evt)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        xwos_cpuirq_save_lc(&flag);
+        xwos_cpuirq_save_lc(&cpuirq);
         rc = xwsync_evt_smr_unbind(evt, smr);
         if (OK == rc) {
                 rc = xwsync_evt_smr_c0i(evt, smr);
         }
-        xwos_cpuirq_restore_lc(flag);
+        xwos_cpuirq_restore_lc(cpuirq);
 
         return rc;
 }
-#endif /* XWSMPCFG_SYNC_EVT */
+#endif /* XWUPCFG_SYNC_EVT */
 
 /**
  * @brief 冻结信号量（值设置为负）。
@@ -121,24 +124,24 @@ __xwos_code
 xwer_t xwsync_vsmr_freeze(struct xwsync_vsmr * smr)
 {
         xwer_t rc;
-        xwreg_t flag;
+        xwreg_t cpuirq;
 
         rc = OK;
-        xwos_cpuirq_save_lc(&flag);
+        xwos_cpuirq_save_lc(&cpuirq);
         if (__unlikely(smr->count < 0)) {
                 rc = -EALREADY;
         } else {
                 smr->count = XWSDYNC_VSMR_NEGTIVE;
-#if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
                 struct xwsync_evt * evt;
 
                 evt = smr->selector.evt;
                 if (NULL != evt) {
                         xwsync_evt_smr_c0i(evt, smr);
                 }
-#endif /* XWSMPCFG_SYNC_EVT */
+#endif /* XWUPCFG_SYNC_EVT */
         }
-        xwos_cpuirq_restore_lc(flag);
+        xwos_cpuirq_restore_lc(cpuirq);
 
         return rc;
 }
@@ -163,19 +166,19 @@ __xwos_code
 xwer_t xwsync_vsmr_thaw(struct xwsync_vsmr * smr, xwssq_t val, xwssq_t max)
 {
         xwer_t rc;
-        xwreg_t flag;
+        xwreg_t cpuirq;
 
         XWOS_VALIDATE(((val >= 0) && (max > 0) && (val <= max)),
                       "invalid-value", -EINVAL);
 
         rc = OK;
-        xwos_cpuirq_save_lc(&flag);
+        xwos_cpuirq_save_lc(&cpuirq);
         if (__unlikely(smr->count >= 0)) {
                 rc = -EALREADY;
         } else {
                 smr->max = max;
                 smr->count = val;
-#if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
                 if (smr->count > 0) {
                         struct xwsync_evt * evt;
 
@@ -184,9 +187,9 @@ xwer_t xwsync_vsmr_thaw(struct xwsync_vsmr * smr, xwssq_t val, xwssq_t max)
                                 xwsync_evt_smr_s1i(evt, smr);
                         }
                 }
-#endif /* XWSMPCFG_SYNC_EVT */
+#endif /* XWUPCFG_SYNC_EVT */
         }
-        xwos_cpuirq_restore_lc(flag);
+        xwos_cpuirq_restore_lc(cpuirq);
         return rc;
 }
 
