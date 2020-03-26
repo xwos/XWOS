@@ -36,10 +36,10 @@
 #include <xwos/smp/lock/spinlock.h>
 #include <xwos/smp/lock/seqlock.h>
 #include <xwos/smp/lock/mutex.h>
-#include <xwos/smp/sync/semaphore.h>
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
   #include <xwos/smp/sync/event.h>
 #endif /* XWSMPCFG_SYNC_EVT */
+#include <xwos/smp/sync/semaphore.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
