@@ -119,17 +119,17 @@
 参考：[[https://www.conventionalcommits.org/][https://www.conventionalcommits.org/]]
 
 ** type说明
-- feat: 新功能
-- fix: 修复BUG
-- perf: 性能优化，不影响功能
-- refactor: 重构代码，不影响功能
-- style: 格式调整（删除行尾空格等）
-- build: 编译系统
-- revert: 回退提交
-- docs: 文档
-- test: 测试
-- chore: 依赖、工具
-- milestone: 更新大版本号
-- release: 更新稳定版的小版本号（偶数）
-- developing: 切换到下一个开发版的小版本号（奇数）
-- patch: 更新修订号
++ feat: 新功能
++ fix: 修复BUG
++ perf: 性能优化，不影响功能
++ refactor: 重构代码，不影响功能
++ style: 格式调整（删除行尾空格等）
++ build: 编译系统
++ revert: 回退提交
++ docs: 文档
++ test: 测试
++ chore: 依赖、工具
++ milestone: 更新大版本号
++ release: 更新稳定版的小版本号（偶数）
++ developing: 切换到下一个开发版的小版本号（奇数）
++ patch: 更新修订号
