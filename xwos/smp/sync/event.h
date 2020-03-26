@@ -64,6 +64,8 @@ enum xwsync_evt_action_em {
         XWSYNC_EVT_ACTION_NUM,
 };
 
+struct xwsync_smr;
+
 /**
  * @brief 事件对象
  */

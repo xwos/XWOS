@@ -20,7 +20,6 @@
 #include <xwos/object.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/up/lock/fakespinlock.h>
-#include <xwos/up/sync/vsmr.h>
 #include <xwos/up/sync/condition.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -64,6 +63,8 @@ enum xwsync_evt_action_em {
         XWSYNC_EVT_ACTION_CONSUMPTION, /**< 消费事件 */
         XWSYNC_EVT_ACTION_NUM,
 };
+
+struct xwsync_vsmr;
 
 /**
  * @brief 事件对象
