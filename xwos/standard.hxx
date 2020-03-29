@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS标准C++头文件
+ * @brief 玄武OS的标准C++头文件
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

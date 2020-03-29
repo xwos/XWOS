@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 编译器的宏定义
+ * @brief 玄武OS的编译器宏定义
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
