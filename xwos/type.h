@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS的基本类型定义
+ * @brief 玄武OS的基本类型定义
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

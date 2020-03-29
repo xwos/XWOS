@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS的配置规则
+ * @brief XuanWuOS内核：编译规则
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

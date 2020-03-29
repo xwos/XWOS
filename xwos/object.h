@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS对象
+ * @brief 玄武OS的对象
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

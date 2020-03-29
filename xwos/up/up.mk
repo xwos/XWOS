@@ -1,6 +1,6 @@
 #! /bin/make -f
 # @file
-# @brief XWOS内核的的编译规则
+# @brief XuanWuOS内核：编译规则
 # @author
 # + 隐星魂 (Roy.Sun) <www.starsoul.tech>
 # @copyright
