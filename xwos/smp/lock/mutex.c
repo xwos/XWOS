@@ -240,6 +240,7 @@ xwer_t xwlk_mtx_activate(struct xwlk_mtx * mtx, xwpr_t sprio,
                 mtx->dprio = sprio;
                 xwos_rtwq_init(&mtx->rtwq);
                 mtx->ownertree = NULL;
+                mtx->reentrant = 0;
                 xwlib_rbtree_init_node(&mtx->rbnode);
                 xwlib_bclst_init_node(&mtx->rbbuddy);
         } /* else {} */
@@ -534,16 +535,22 @@ xwer_t xwlk_mtx_unlock(struct xwlk_mtx * mtx)
         XWOS_VALIDATE((-EINTHRD == xwos_irq_get_id(NULL)),
                       "not-in-thrd", -ENOTINTHRD);
 
+        rc = OK;
         local = xwos_scheduler_dspmpt_lc();
         ctcb = xwos_scheduler_get_ctcb(local);
         mt = &ctcb->mtxtree;
-
         xwos_rtwq_lock_cpuirqsv(&mtx->rtwq, &cpuirq);
-        rc = xwos_mtxtree_remove(mtx, mt);
-        if (__unlikely(rc < 0)) {
+        if (mtx->ownertree != mt) {
+                rc = -EOWNER;
                 xwos_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                 xwos_scheduler_enpmpt(local);
+        } else if (mtx->reentrant > 0) {
+                mtx->reentrant--;
+                xwos_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
+                xwlk_mtx_put(mtx);
+                xwos_scheduler_enpmpt(local);
         } else {
+                xwos_mtxtree_remove(mtx, mt);
                 wqn = xwos_rtwq_choose_locked(&mtx->rtwq);
                 if (wqn) {
                         /* Case 1: 等待队列中有线程正在等待互斥锁 */
@@ -606,7 +613,6 @@ xwer_t xwlk_mtx_unlock(struct xwlk_mtx * mtx)
                            xwos_scheduler_chkpmpt()不起作用。*/
                         xwos_scheduler_chkpmpt(local);
                 }
-                rc = OK;
         }
         return rc;
 }
@@ -641,24 +647,32 @@ xwer_t xwlk_mtx_trylock(struct xwlk_mtx * mtx)
                       "not-in-thrd", -ENOTINTHRD);
 
         rc = xwlk_mtx_grab(mtx);
-        if (__likely(OK == rc)) {
-                xwsd = xwos_scheduler_dspmpt_lc();
-                ctcb = xwos_scheduler_get_ctcb(xwsd);
-                mt = &ctcb->mtxtree;
-                xwos_rtwq_lock_cpuirq(&mtx->rtwq);
-                rc = xwos_mtxtree_add(mtx, mt);
-                if (rc < 0) {
-                        xwos_rtwq_unlock_cpuirq(&mtx->rtwq);
-                        xwlk_mtx_put(mtx);
-                        rc = -ENODATA;
-                        xwos_scheduler_enpmpt(xwsd);
-                } else {
-                        xwos_rtwq_unlock_cpuirq(&mtx->rtwq);
-                        xwos_thrd_chprio(ctcb);
-                        xwos_scheduler_enpmpt(xwsd);
-                        xwos_scheduler_chkpmpt(xwsd);
-                }
-        }/* else {} */
+        if (__unlikely(rc < 0)) {
+                goto err_mtx_grab;
+        }
+        rc = OK;
+        xwsd = xwos_scheduler_dspmpt_lc();
+        ctcb = xwos_scheduler_get_ctcb(xwsd);
+        mt = &ctcb->mtxtree;
+        xwos_rtwq_lock_cpuirq(&mtx->rtwq);
+        if (mtx->ownertree == mt) {
+                mtx->reentrant++;
+                xwos_rtwq_unlock_cpuirq(&mtx->rtwq);
+                xwos_scheduler_enpmpt(xwsd);
+        } else if (mtx->ownertree) {
+                xwos_rtwq_unlock_cpuirq(&mtx->rtwq);
+                xwlk_mtx_put(mtx);
+                rc = -ENODATA;
+                xwos_scheduler_enpmpt(xwsd);
+        } else {
+                xwos_mtxtree_add(mtx, mt);
+                xwos_rtwq_unlock_cpuirq(&mtx->rtwq);
+                xwos_thrd_chprio(ctcb);
+                xwos_scheduler_enpmpt(xwsd);
+                xwos_scheduler_chkpmpt(xwsd);
+        }
+
+err_mtx_grab:
         return rc;
 }
 
@@ -820,18 +834,22 @@ xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx,
         xwreg_t cpuirq;
         xwer_t rc;
 
+        rc = OK;
+        /* 当线程执行此处代码时，不可能拥有状态XWSDOBJ_DST_MIGRATING，
+           因为，迁移永远发生在线程处于冻结点时。也因此可在锁xwsd->tcblistlock外
+           读取tcb->xwsd。*/
         xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
         xwos_scheduler_dspmpt(xwsd);
         mt = &tcb->mtxtree;
         xwos_rtwq_lock_cpuirqsv(&mtx->rtwq, &cpuirq);
-        rc = xwos_mtxtree_add(mtx, mt);
-        if (-EDEADLOCK == rc) {
+        if (mtx->ownertree == mt) {
+                mtx->reentrant++;
                 xwos_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                 xwos_scheduler_enpmpt(xwsd);
-        } else if (-EEXIST == rc) {
+        } else if (mtx->ownertree) {
                 rc = xwos_scheduler_wakelock_lock(xwsd);
                 if (__unlikely(rc < 0)) {
-                        /* 当前CPU调度器处于休眠态，线程需被冻结，返回-EINTR。*/
+                        /* 当前调度器正准备休眠，线程需被冻结，返回-EINTR。*/
                         xwos_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                         xwos_scheduler_enpmpt(xwsd);
                         rc = -EINTR;
@@ -841,9 +859,11 @@ xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx,
                         xwos_scheduler_wakelock_unlock(xwsd);
                 }
         } else {
+                xwos_mtxtree_add(mtx, mt);
                 xwos_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                 xwos_thrd_chprio(tcb);
                 xwos_scheduler_enpmpt(xwsd);
+                xwos_scheduler_chkpmpt(xwsd);
         }
         return rc;
 }
@@ -858,7 +878,6 @@ xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx,
  * @retval OK: OK
  * @retval -EFAULT: 空指针
  * @retval -ETIMEDOUT: 超时
- * @retval -EDEADLOCK: 死锁
  * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
@@ -955,20 +974,23 @@ xwer_t xwlk_mtx_do_lock_unintr(struct xwlk_mtx * mtx, struct xwos_tcb * tcb)
         xwreg_t cpuirq;
         xwer_t rc;
 
+        rc = OK;
         xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
         xwos_scheduler_dspmpt(xwsd);
         mt = &tcb->mtxtree;
         xwos_rtwq_lock_cpuirqsv(&mtx->rtwq, &cpuirq);
-        rc = xwos_mtxtree_add(mtx, mt);
-        if (-EDEADLOCK == rc) {
+        if (mtx->ownertree == mt) {
+                mtx->reentrant++;
                 xwos_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                 xwos_scheduler_enpmpt(xwsd);
-        } else if (-EEXIST == rc) {
+        } else if (mtx->ownertree) {
                 rc = xwlk_mtx_do_blkthrd_unlkwq_cpuirqrs(mtx, tcb, cpuirq);
         } else {
+                xwos_mtxtree_add(mtx, mt);
                 xwos_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                 xwos_thrd_chprio(tcb);
                 xwos_scheduler_enpmpt(xwsd);
+                xwos_scheduler_chkpmpt(xwsd);
         }
         return rc;
 }
@@ -980,7 +1002,6 @@ xwer_t xwlk_mtx_do_lock_unintr(struct xwlk_mtx * mtx, struct xwos_tcb * tcb)
  * @return 错误码
  * @retval OK: OK
  * @retval -EFAULT: 空指针
- * @retval -EDEADLOCK: 死锁
  * @note
  * - 同步/异步：同步
  * - 上下文：线程

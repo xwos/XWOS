@@ -36,8 +36,15 @@ void xwos_mtxtree_init(struct xwos_mtxtree * mt)
         mt->maxprio = XWOS_SD_PRIORITY_INVALID;
 }
 
+/**
+ * @brief 将互斥锁加入到互斥锁树
+ * @param mtx: (I) 互斥锁
+ * @param mt: (I) 互斥锁树
+ * @note
+ * - 此函数只能在临界区中调用。
+ */
 __xwos_code
-void xwos_mtxtree_do_add(struct xwos_mtxtree * mt, struct xwlk_mtx * mtx)
+void xwos_mtxtree_add(struct xwos_mtxtree * mt, struct xwlk_mtx * mtx)
 {
         struct xwlib_rbtree_node ** pos;
         struct xwlib_rbtree_node * rbn;
@@ -46,6 +53,7 @@ void xwos_mtxtree_do_add(struct xwos_mtxtree * mt, struct xwlk_mtx * mtx)
         xwptr_t lpc;
         xwpr_t prio;
 
+        mtx->ownertree = mt;
         tree = &mt->rbtree;
         prio = mtx->dprio;
         pos = &tree->root;
@@ -90,31 +98,14 @@ void xwos_mtxtree_do_add(struct xwos_mtxtree * mt, struct xwlk_mtx * mtx)
 }
 
 /**
- * @brief 将互斥锁加入到互斥锁树
+ * @brief 将互斥锁从互斥锁树中删除
  * @param mtx: (I) 互斥锁
  * @param mt: (I) 互斥锁树
- * @retval OK: OK
- * @retval -EEXIST: 互斥锁已经被其他线程获取
  * @note
- * - 这个函数只能在临界区中调用。
+ * - 此函数只能在临界区中调用。
  */
 __xwos_code
-xwer_t xwos_mtxtree_add(struct xwos_mtxtree * mt, struct xwlk_mtx * mtx)
-{
-        xwer_t rc;
-
-        if (mtx->ownertree) {
-                rc = -EEXIST;
-        } else {
-                mtx->ownertree = mt;
-                xwos_mtxtree_do_add(mt, mtx);
-                rc = OK;
-        }
-        return rc;
-}
-
-__xwos_code
-void xwos_mtxtree_do_remove(struct xwos_mtxtree * mt, struct xwlk_mtx * mtx)
+void xwos_mtxtree_remove(struct xwos_mtxtree * mt, struct xwlk_mtx * mtx)
 {
         struct xwlk_mtx * n;
         struct xwlib_rbtree_node * p;
@@ -155,28 +146,5 @@ void xwos_mtxtree_do_remove(struct xwos_mtxtree * mt, struct xwlk_mtx * mtx)
                 xwlib_rbtree_remove(tree, &mtx->rbnode);
                 xwlib_rbtree_init_node(&mtx->rbnode);
         }
-}
-
-/**
- * @brief 将互斥锁从互斥锁树中删除
- * @param mtx: (I) 互斥锁
- * @param mt: (I) 互斥锁树
- * @retval OK: OK
- * @retval -EOWNER: 互斥锁不在互斥锁树中
- * @note
- * - 这个函数只能在临界区中调用。
- */
-__xwos_code
-xwer_t xwos_mtxtree_remove(struct xwos_mtxtree * mt, struct xwlk_mtx * mtx)
-{
-        xwer_t rc;
-
-        if (mtx->ownertree != mt) {
-                rc = -EOWNER;
-        } else {
-                xwos_mtxtree_do_remove(mt, mtx);
-                mtx->ownertree = NULL;
-                rc = OK;
-        }
-        return rc;
+        mtx->ownertree = NULL;
 }

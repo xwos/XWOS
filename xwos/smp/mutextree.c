@@ -105,28 +105,16 @@ void xwos_mtxtree_add_locked(struct xwlk_mtx * mtx, struct xwos_mtxtree * mt)
  * @brief 将互斥锁加入到互斥锁树
  * @param mtx: (I) 互斥锁
  * @param mt: (I) 互斥锁树
- * @retval OK: OK
- * @retval -EEXIST: 互斥锁已经被其他线程获取
  * @note
  * - 这个函数只能在获得锁mtx->rtwq.lock时调用。
  */
 __xwos_code
-xwer_t xwos_mtxtree_add(struct xwlk_mtx * mtx, struct xwos_mtxtree * mt)
+void xwos_mtxtree_add(struct xwlk_mtx * mtx, struct xwos_mtxtree * mt)
 {
-        xwer_t rc;
-
-        if (mtx->ownertree == mt) {
-                rc = -EDEADLOCK;
-        } else if (mtx->ownertree) {
-                rc = -EEXIST;
-        } else {
-                mtx->ownertree = mt;
-                xwlk_sqlk_wr_lock(&mt->lock);
-                xwos_mtxtree_add_locked(mtx, mt);
-                xwlk_sqlk_wr_unlock(&mt->lock);
-                rc = OK;
-        }
-        return rc;
+        mtx->ownertree = mt;
+        xwlk_sqlk_wr_lock(&mt->lock);
+        xwos_mtxtree_add_locked(mtx, mt);
+        xwlk_sqlk_wr_unlock(&mt->lock);
 }
 
 /**
@@ -183,24 +171,14 @@ void xwos_mtxtree_remove_locked(struct xwlk_mtx * mtx, struct xwos_mtxtree * mt)
  * @brief 将互斥锁从互斥锁树中删除
  * @param mtx: (I) 互斥锁
  * @param mt: (I) 互斥锁树
- * @retval OK: OK
- * @retval -EOWNER: 互斥锁不在互斥锁树中
  * @note
  * - 这个函数只能在获得锁mtx->rtwq.lock时调用。
  */
 __xwos_code
-xwer_t xwos_mtxtree_remove(struct xwlk_mtx * mtx, struct xwos_mtxtree * mt)
+void xwos_mtxtree_remove(struct xwlk_mtx * mtx, struct xwos_mtxtree * mt)
 {
-        xwer_t rc;
-
-        if (mtx->ownertree != mt) {
-                rc = -EOWNER;
-        } else {
-                xwlk_sqlk_wr_lock(&mt->lock);
-                xwos_mtxtree_remove_locked(mtx, mt);
-                xwlk_sqlk_wr_unlock(&mt->lock);
-                mtx->ownertree = NULL;
-                rc = OK;
-        }
-        return rc;
+        xwlk_sqlk_wr_lock(&mt->lock);
+        xwos_mtxtree_remove_locked(mtx, mt);
+        xwlk_sqlk_wr_unlock(&mt->lock);
+        mtx->ownertree = NULL;
 }

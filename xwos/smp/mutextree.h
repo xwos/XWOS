@@ -45,13 +45,13 @@ __xwos_code
 void xwos_mtxtree_add_locked(struct xwlk_mtx * mtx, struct xwos_mtxtree * mt);
 
 __xwos_code
-xwer_t xwos_mtxtree_add(struct xwlk_mtx * mtx, struct xwos_mtxtree * mt);
+void xwos_mtxtree_add(struct xwlk_mtx * mtx, struct xwos_mtxtree * mt);
 
 __xwos_code
 void xwos_mtxtree_remove_locked(struct xwlk_mtx * mtx, struct xwos_mtxtree * mt);
 
 __xwos_code
-xwer_t xwos_mtxtree_remove(struct xwlk_mtx * mtx, struct xwos_mtxtree * mt);
+void xwos_mtxtree_remove(struct xwlk_mtx * mtx, struct xwos_mtxtree * mt);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********  inline functions implementations   ******** ********

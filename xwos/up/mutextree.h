@@ -40,15 +40,9 @@ __xwos_code
 void xwos_mtxtree_init(struct xwos_mtxtree * mt);
 
 __xwos_code
-void xwos_mtxtree_do_add(struct xwos_mtxtree * mt, struct xwlk_mtx * mtx);
+void xwos_mtxtree_add(struct xwos_mtxtree * mt, struct xwlk_mtx * mtx);
 
 __xwos_code
-xwer_t xwos_mtxtree_add(struct xwos_mtxtree * mt, struct xwlk_mtx * mtx);
-
-__xwos_code
-void xwos_mtxtree_do_remove(struct xwos_mtxtree * mt, struct xwlk_mtx * mtx);
-
-__xwos_code
-xwer_t xwos_mtxtree_remove(struct xwos_mtxtree * mt, struct xwlk_mtx * mtx);
+void xwos_mtxtree_remove(struct xwos_mtxtree * mt, struct xwlk_mtx * mtx);
 
 #endif /* xwos/up/mutextree.h */

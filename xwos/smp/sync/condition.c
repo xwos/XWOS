@@ -789,7 +789,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt, struct xwos_tcb * tcb,
         xwos_plwq_lock_cpuirqsv(&cdt->wq.pl, &cpuirq);
         rc = xwos_scheduler_wakelock_lock(xwsd);
         if (__unlikely(rc < 0)) {
-                /* 当前CPU调度器处于休眠态，线程需被冻结，返回-EINTR。*/
+                /* 当前调度器正准备休眠，线程需被冻结，返回-EINTR。*/
                 xwos_plwq_unlock_cpuirqrs(&cdt->wq.pl, cpuirq);
                 rc = -EINTR;
         } else {

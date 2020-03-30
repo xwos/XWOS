@@ -118,6 +118,7 @@ void xwlk_mtx_activate(struct xwlk_mtx * mtx, xwpr_t sprio)
         mtx->dprio = sprio;
         xwos_rtwq_init(&mtx->rtwq);
         mtx->ownertree = NULL;
+        mtx->reentrant = 0;
         xwlib_rbtree_init_node(&mtx->rbnode);
         xwlib_bclst_init_node(&mtx->rbbuddy);
 }
@@ -260,8 +261,8 @@ void xwlk_mtx_chprio_once(struct xwlk_mtx * mtx, struct xwos_tcb ** ptcb)
                         if (mt) {
                                 owner = container_of(mt, struct xwos_tcb,
                                                      mtxtree);
-                                xwos_mtxtree_do_remove(mt, mtx);
-                                xwos_mtxtree_do_add(mt, mtx);
+                                xwos_mtxtree_remove(mt, mtx);
+                                xwos_mtxtree_add(mt, mtx);
                                 xwos_cpuirq_restore_lc(flag);
                                 *ptcb = owner;
                         } else {
@@ -273,8 +274,8 @@ void xwlk_mtx_chprio_once(struct xwlk_mtx * mtx, struct xwos_tcb ** ptcb)
                 mt = mtx->ownertree;
                 if (mt) {
                         owner = container_of(mt, struct xwos_tcb, mtxtree);
-                        xwos_mtxtree_do_remove(mt, mtx);
-                        xwos_mtxtree_do_add(mt, mtx);
+                        xwos_mtxtree_remove(mt, mtx);
+                        xwos_mtxtree_add(mt, mtx);
                         xwos_cpuirq_restore_lc(flag);
                         *ptcb = owner;
                 } else {
@@ -370,16 +371,21 @@ xwer_t xwlk_mtx_unlock(struct xwlk_mtx * mtx)
         XWOS_VALIDATE((-EINTHRD == xwos_irq_get_id(NULL)),
                       "not-in-thrd", -ENOTINTHRD);
 
+        rc = OK;
         xwos_scheduler_dspmpt_lc();
         ctcb = xwos_scheduler_get_ctcb_lc();
         mt = &ctcb->mtxtree;
-
         xwos_cpuirq_save_lc(&flag);
-        rc = xwos_mtxtree_remove(mt, mtx);
-        if (__unlikely(rc < 0)) {
+        if (mtx->ownertree != mt) {
+                rc = -EOWNER;
+                xwos_cpuirq_restore_lc(flag);
+                xwos_scheduler_enpmpt_lc();
+        } else if (mtx->reentrant > 0) {
+                mtx->reentrant--;
                 xwos_cpuirq_restore_lc(flag);
                 xwos_scheduler_enpmpt_lc();
         } else {
+                xwos_mtxtree_remove(mt, mtx);
                 wqn = xwos_rtwq_choose(&mtx->rtwq);
                 if (wqn) {
                         /* Case 1: 等待队列中有线程正在等待互斥锁 */
@@ -452,16 +458,21 @@ xwer_t xwlk_mtx_trylock(struct xwlk_mtx * mtx)
         XWOS_VALIDATE((-EINTHRD == xwos_irq_get_id(NULL)),
                       "not-in-thrd", -ENOTINTHRD);
 
+        rc = OK;
         xwos_scheduler_dspmpt_lc();
         ctcb = xwos_scheduler_get_ctcb_lc();
         mt = &ctcb->mtxtree;
         xwos_cpuirq_save_lc(&flag);
-        rc = xwos_mtxtree_add(mt, mtx);
-        if (rc < 0) {
+        if (mtx->ownertree == mt) {
+                mtx->reentrant++;
                 xwos_cpuirq_restore_lc(flag);
                 xwos_scheduler_enpmpt_lc();
+        } else if (mtx->ownertree) {
+                xwos_cpuirq_restore_lc(flag);
                 rc = -ENODATA;
+                xwos_scheduler_enpmpt_lc();
         } else {
+                xwos_mtxtree_add(mt, mtx);
                 xwos_thrd_chprio(ctcb);
                 xwos_cpuirq_restore_lc(flag);
                 xwos_scheduler_enpmpt_lc();
@@ -594,11 +605,15 @@ xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx,
         xwreg_t flag;
         xwer_t rc;
 
+        rc = OK;
         xwsd = xwos_scheduler_dspmpt_lc();
         mt = &tcb->mtxtree;
         xwos_cpuirq_save_lc(&flag);
-        rc = xwos_mtxtree_add(mt, mtx);
-        if (rc < 0) {
+        if (mtx->ownertree == mt) {
+                mtx->reentrant++;
+                xwos_cpuirq_restore_lc(flag);
+                xwos_scheduler_enpmpt_lc();
+        } else if (mtx->ownertree) {
 #if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
                 rc = xwos_scheduler_wakelock_lock();
                 if (__unlikely(rc < 0)) {
@@ -615,9 +630,11 @@ xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx,
                 }
 #endif /* XWUPCFG_SD_LPM */
         } else {
+                xwos_mtxtree_add(mt, mtx);
                 xwos_thrd_chprio(tcb);
                 xwos_cpuirq_restore_lc(flag);
                 xwos_scheduler_enpmpt_lc();
+                xwos_scheduler_chkpmpt();
         }
         return rc;
 }
@@ -632,7 +649,6 @@ xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx,
  * @retval OK: OK
  * @retval -EFAULT: 空指针
  * @retval -ETIMEDOUT: 超时
- * @retval -EDEADLOCK: 死锁
  * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
@@ -657,23 +673,18 @@ xwer_t xwlk_mtx_timedlock(struct xwlk_mtx * mtx, xwtm_t * xwtm)
         XWOS_VALIDATE((-EINTHRD == xwos_irq_get_id(NULL)),
                       "not-in-thrd", -ENOTINTHRD);
 
-        if (__unlikely(xwtm_cmp(* xwtm, 0) < 0)) {
+        if (__unlikely(xwtm_cmp(*xwtm, 0) < 0)) {
                 rc = -ETIMEDOUT;
         } else if (__unlikely(0 == xwtm_cmp(* xwtm, 0))) {
                 rc = xwlk_mtx_trylock(mtx);
                 if (__unlikely(rc < 0)) {
-                        if (__likely(-ENODATA == rc))
+                        if (__likely(-ENODATA == rc)) {
                                 rc = -ETIMEDOUT;
-                        /* else {} */
+                        }/* else {} */
                 }/* else {} */
         } else {
                 ctcb = xwos_scheduler_get_ctcb_lc();
-                /* check deadlock */
-                if (mtx->ownertree == &ctcb->mtxtree) {
-                        rc = -EDEADLOCK;
-                } else {
-                        rc = xwlk_mtx_do_timedlock(mtx, ctcb, xwtm);
-                }
+                rc = xwlk_mtx_do_timedlock(mtx, ctcb, xwtm);
         }
         return rc;
 }
@@ -717,16 +728,22 @@ xwer_t xwlk_mtx_do_lock_unintr(struct xwlk_mtx * mtx,
         xwreg_t flag;
         xwer_t rc;
 
+        rc = OK;
         xwos_scheduler_dspmpt_lc();
         mt = &tcb->mtxtree;
         xwos_cpuirq_save_lc(&flag);
-        rc = xwos_mtxtree_add(mt, mtx);
-        if (rc < 0) {
+        if (mtx->ownertree == mt) {
+                mtx->reentrant++;
+                xwos_cpuirq_restore_lc(flag);
+                xwos_scheduler_enpmpt_lc();
+        } else if (mtx->ownertree) {
                 rc = xwlk_mtx_do_blkthrd_unlkwq_cpuirqrs(mtx, tcb, flag);
         } else {
+                xwos_mtxtree_add(mt, mtx);
                 xwos_thrd_chprio(tcb);
                 xwos_cpuirq_restore_lc(flag);
                 xwos_scheduler_enpmpt_lc();
+                xwos_scheduler_chkpmpt();
         }
         return rc;
 }
@@ -738,7 +755,6 @@ xwer_t xwlk_mtx_do_lock_unintr(struct xwlk_mtx * mtx,
  * @return 错误码
  * @retval OK: OK
  * @retval -EFAULT: 空指针
- * @retval -EDEADLOCK: 死锁
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -754,10 +770,6 @@ xwer_t xwlk_mtx_lock_unintr(struct xwlk_mtx * mtx)
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
 
         ctcb = xwos_scheduler_get_ctcb_lc();
-        if (mtx->ownertree == &ctcb->mtxtree) {
-                rc = -EDEADLOCK;
-        } else {
-                rc = xwlk_mtx_do_lock_unintr(mtx, ctcb);
-        }
+        rc = xwlk_mtx_do_lock_unintr(mtx, ctcb);
         return rc;
 }

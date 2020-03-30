@@ -37,15 +37,17 @@ struct xwos_mtxtree;
 struct xwlk_mtx {
         struct xwos_mtxtree * ownertree; /**< 获得此互斥锁的线程的互斥锁树：
                                               如果为空(NULL)，互斥锁处于未加锁状态。
-                                              该成员被锁rtwq.lock保护。*/
+                                              此成员被锁rtwq.lock保护。*/
+        xwsq_t reentrant; /**< 同一线程重复获得此互斥锁的计数器，
+                               此成员被锁rtwq.lock保护。*/
         struct xwlib_rbtree_node rbnode; /**< 互斥锁树的链表节点：
-                                              该成员被锁ownertree->lock保护。*/
+                                              此成员被锁ownertree->lock保护。*/
         struct xwlib_bclst_node rbbuddy; /**< 互斥锁树的红黑树节点：
-                                              该成员被锁ownertree->lock保护。*/
+                                              此成员被锁ownertree->lock保护。*/
 
         struct xwos_rtwq rtwq; /**< 实时等待队列：所有节点按优先级在队列中排队。*/
         xwpr_t sprio; /**< 静态优先级 */
-        xwpr_t dprio; /**< 动态优先级：该成员被锁rtwq.lock保护。*/
+        xwpr_t dprio; /**< 动态优先级：此成员被锁rtwq.lock保护。*/
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********

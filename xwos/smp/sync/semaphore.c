@@ -916,7 +916,7 @@ xwer_t xwsync_plsmr_do_timedwait(struct xwsync_smr * smr, struct xwos_tcb * tcb,
         if (smr->count <= 0) {
                 rc = xwos_scheduler_wakelock_lock(xwsd);
                 if (__unlikely(rc < 0)) {
-                        /* 当前CPU调度器处于休眠态，线程需被冻结，返回-EINTR。*/
+                        /* 当前调度器正准备休眠，线程需被冻结，返回-EINTR。*/
                         xwos_plwq_unlock_cpuirqrs(&smr->wq.pl, cpuirq);
                         rc = -EINTR;
                 } else {
@@ -1573,7 +1573,7 @@ xwer_t xwsync_rtsmr_do_timedwait(struct xwsync_smr * smr, struct xwos_tcb * tcb,
         if (smr->count <= 0) {
                 rc = xwos_scheduler_wakelock_lock(xwsd);
                 if (__unlikely(rc < 0)) {
-                        /* 当前CPU调度器处于休眠态，线程需被冻结，返回-EINTR。*/
+                        /* 当前调度器正准备休眠，线程需被冻结，返回-EINTR。*/
                         xwos_rtwq_unlock_cpuirqrs(&smr->wq.rt, cpuirq);
                         rc = -EINTR;
                 } else {
