@@ -62,7 +62,7 @@ enum xwos_wqn_rsmrs_em {
 /**
  * @brief 等待队列节点回调函数指针类型
  */
-typedef void (*xwos_wqn_f)(void *);
+typedef void (* xwos_wqn_f)(void *);
 
 /**
  * @brief 等待队列节点

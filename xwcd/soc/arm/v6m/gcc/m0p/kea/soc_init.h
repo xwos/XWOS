@@ -29,7 +29,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__packed struct soc_flash_cfgs {
+struct soc_flash_cfgs {
         xwu8_t backdoor_key[8]; /**< Backdoor Comparison Key 0 ~ 7, offset: 0x0 */
         xwu8_t reserved0[4];
         xwu8_t reserved1[1];

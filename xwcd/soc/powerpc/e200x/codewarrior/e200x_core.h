@@ -40,7 +40,7 @@
  * @brief program status register
  * @note little-endian
  */
-__packed union msr_reg {
+union msr_reg {
         struct {
                 xwreg_t:5;
                 xwreg_t ucle:1;
