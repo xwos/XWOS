@@ -412,7 +412,8 @@ xwer_t xwsync_cdt_intr(struct xwsync_cdt * cdt, struct xwos_wqn * wqn)
                 if (OK == rc) {
                         wqn->wq = NULL;
                         wqn->type = XWOS_WQTYPE_UNKNOWN;
-                        wqn->rsmrs = XWOS_WQN_RSMRS_INTR;
+                        xwaop_store(xwsq_t, &wqn->rsmrs,
+                                    xwmb_modr_release, XWOS_WQN_RSMRS_INTR);
                         cb = wqn->cb;
                         wqn->cb = NULL;
                         xwlk_splk_unlock(&wqn->lock);
@@ -490,7 +491,8 @@ xwer_t xwsync_cdt_broadcast_once(struct xwsync_cdt * cdt, bool * retry)
                 if (wqn) {
                         wqn->wq = NULL;
                         wqn->type = XWOS_WQTYPE_UNKNOWN;
-                        wqn->rsmrs = XWOS_WQN_RSMRS_UP;
+                        xwaop_store(xwsq_t, &wqn->rsmrs,
+                                    xwmb_modr_release, XWOS_WQN_RSMRS_UP);
                         cb = wqn->cb;
                         wqn->cb = NULL;
                         xwlk_splk_unlock(&wqn->lock);
@@ -556,7 +558,8 @@ xwer_t xwsync_cdt_do_unicast(struct xwsync_cdt * cdt)
                 if (wqn) {
                         wqn->wq = NULL;
                         wqn->type = XWOS_WQTYPE_UNKNOWN;
-                        wqn->rsmrs = XWOS_WQN_RSMRS_UP;
+                        xwaop_store(xwsq_t, &wqn->rsmrs,
+                                    xwmb_modr_release, XWOS_WQN_RSMRS_UP);
                         cb = wqn->cb;
                         wqn->cb = NULL;
                         xwlk_splk_unlock(&wqn->lock);
@@ -609,6 +612,8 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
 {
         xwer_t rc;
         xwpr_t dprio;
+        xwsq_t wkuprs;
+        xwsq_t rsmrs;
         xwtm_t expected, currtick;
         struct xwos_scheduler * xwsd;
         struct xwos_tt * xwtt;
@@ -663,7 +668,9 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
         xwos_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
-        if (XWOS_WQN_RSMRS_INTR == tcb->wqn.rsmrs) {
+        rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_consume);
+        wkuprs = xwaop_load(xwsq_t, &tcb->ttn.wkuprs, xwmb_modr_consume);
+        if (XWOS_WQN_RSMRS_INTR == rsmrs) {
                 xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 rc = xwos_tt_remove_locked(xwtt, &tcb->ttn);
                 if (OK == rc) {
@@ -673,7 +680,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                 }/* else {} */
                 xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 rc = -EINTR;
-        } else if (XWOS_WQN_RSMRS_UP == tcb->wqn.rsmrs) {
+        } else if (XWOS_WQN_RSMRS_UP == rsmrs) {
                 xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 rc = xwos_tt_remove_locked(xwtt, &tcb->ttn);
                 if (OK == rc) {
@@ -691,14 +698,15 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                         }/* else {} */
                 }/* else {} */
                 rc = OK;
-        } else if (XWOS_TTN_WKUPRS_TIMEDOUT == tcb->ttn.wkuprs) {
+        } else if (XWOS_TTN_WKUPRS_TIMEDOUT == wkuprs) {
                 xwos_plwq_lock_cpuirq(&cdt->wq.pl);
                 xwlk_splk_lock(&tcb->wqn.lock);
                 rc = xwos_plwq_remove_locked(&cdt->wq.pl, &tcb->wqn);
                 if (OK == rc) {
                         tcb->wqn.wq = NULL;
                         tcb->wqn.type = XWOS_WQTYPE_UNKNOWN;
-                        tcb->wqn.rsmrs = XWOS_WQN_RSMRS_INTR;
+                        xwaop_store(xwsq_t, &tcb->wqn.rsmrs,
+                                    xwmb_modr_release, XWOS_WQN_RSMRS_INTR);
                         tcb->wqn.cb = NULL;
                         xwlk_splk_unlock(&tcb->wqn.lock);
                         xwlk_splk_lock(&tcb->stlock);
@@ -710,9 +718,10 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                 } else {
                         xwlk_splk_unlock(&tcb->wqn.lock);
                         xwos_plwq_unlock_cpuirqrs(&cdt->wq.pl, cpuirq);
-                        if (XWOS_WQN_RSMRS_INTR == tcb->wqn.rsmrs) {
+                        rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_consume);
+                        if (XWOS_WQN_RSMRS_INTR == rsmrs) {
                                 rc = -EINTR;
-                        } else if (XWOS_WQN_RSMRS_UP == tcb->wqn.rsmrs) {
+                        } else if (XWOS_WQN_RSMRS_UP == rsmrs) {
                                 if (__likely(XWLK_STATE_UNLOCKED == *lkst)) {
                                         currtick = xwos_syshwt_get_timetick(hwt);
                                         *xwtm = xwtm_sub(expected, currtick);
@@ -728,14 +737,15 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                                 rc = -EBUG;
                         }
                 }
-        } else if (XWOS_TTN_WKUPRS_INTR == tcb->ttn.wkuprs) {
+        } else if (XWOS_TTN_WKUPRS_INTR == wkuprs) {
                 xwos_plwq_lock_cpuirq(&cdt->wq.pl);
                 xwlk_splk_lock(&tcb->wqn.lock);
                 rc = xwos_plwq_remove_locked(&cdt->wq.pl, &tcb->wqn);
                 if (OK == rc) {
                         tcb->wqn.wq = NULL;
                         tcb->wqn.type = XWOS_WQTYPE_UNKNOWN;
-                        tcb->wqn.rsmrs = XWOS_WQN_RSMRS_INTR;
+                        xwaop_store(xwsq_t, &tcb->wqn.rsmrs,
+                                    xwmb_modr_release, XWOS_WQN_RSMRS_INTR);
                         tcb->wqn.cb = NULL;
                         xwlk_splk_unlock(&tcb->wqn.lock);
                         xwlk_splk_lock(&tcb->stlock);
@@ -747,9 +757,9 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                 } else {
                         xwlk_splk_unlock(&tcb->wqn.lock);
                         xwos_plwq_unlock_cpuirqrs(&cdt->wq.pl, cpuirq);
-                        if (XWOS_WQN_RSMRS_INTR == tcb->wqn.rsmrs) {
+                        if (XWOS_WQN_RSMRS_INTR == rsmrs) {
                                 rc = -EINTR;
-                        } else if (XWOS_WQN_RSMRS_UP == tcb->wqn.rsmrs) {
+                        } else if (XWOS_WQN_RSMRS_UP == rsmrs) {
                                 if (__likely(XWLK_STATE_UNLOCKED == *lkst)) {
                                         currtick = xwos_syshwt_get_timetick(hwt);
                                         *xwtm = xwtm_sub(expected, currtick);

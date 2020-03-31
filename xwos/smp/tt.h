@@ -94,7 +94,7 @@ struct xwos_ttn {
                                           组成双循环链表，此为链表节点 */
         struct xwlib_rbtree_node rbn; /**< 红黑树节点 */
         xwtm_t wkup_xwtm; /**< 唤醒时间 */
-        xwsq_t wkuprs; /**< 唤醒原因 */
+        __atomic xwsq_t wkuprs; /**< 唤醒原因 */
         xwos_tt_cb_f cb; /**< 回调函数：NULL表示节点不在时间树上 */
         struct xwos_tt * xwtt; /**< 时间树 */
         union {

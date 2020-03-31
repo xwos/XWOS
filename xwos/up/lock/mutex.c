@@ -55,7 +55,7 @@ xwer_t xwlk_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
                                                 struct xwos_scheduler * xwsd,
                                                 struct xwos_tcb * tcb,
                                                 xwtm_t * xwtm,
-                                                xwreg_t flag);
+                                                xwreg_t cpuirq);
 
 static __xwos_code
 xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx, struct xwos_tcb * tcb,
@@ -64,7 +64,7 @@ xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx, struct xwos_tcb * tcb,
 static __xwos_code
 xwer_t xwlk_mtx_do_blkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
                                            struct xwos_tcb * tcb,
-                                           xwreg_t flag);
+                                           xwreg_t cpuirq);
 
 static __xwos_code
 xwer_t xwlk_mtx_do_lock_unintr(struct xwlk_mtx * mtx, struct xwos_tcb * tcb);
@@ -246,15 +246,15 @@ void xwlk_mtx_chprio_once(struct xwlk_mtx * mtx, struct xwos_tcb ** ptcb)
 {
         struct xwos_tcb * owner;
         struct xwos_mtxtree * mt;
-        xwreg_t flag;
+        xwreg_t cpuirq;
 
         *ptcb = NULL;
-        xwos_cpuirq_save_lc(&flag);
+        xwos_cpuirq_save_lc(&cpuirq);
         if (mtx->dprio == mtx->rtwq.max_prio) {
-                xwos_cpuirq_restore_lc(flag);
+                xwos_cpuirq_restore_lc(cpuirq);
         } else if (mtx->rtwq.max_prio <= mtx->sprio) {
                 if (mtx->dprio == mtx->sprio) {
-                        xwos_cpuirq_restore_lc(flag);
+                        xwos_cpuirq_restore_lc(cpuirq);
                 } else {
                         mtx->dprio = mtx->sprio;
                         mt = mtx->ownertree;
@@ -263,10 +263,10 @@ void xwlk_mtx_chprio_once(struct xwlk_mtx * mtx, struct xwos_tcb ** ptcb)
                                                      mtxtree);
                                 xwos_mtxtree_remove(mt, mtx);
                                 xwos_mtxtree_add(mt, mtx);
-                                xwos_cpuirq_restore_lc(flag);
+                                xwos_cpuirq_restore_lc(cpuirq);
                                 *ptcb = owner;
                         } else {
-                                xwos_cpuirq_restore_lc(flag);
+                                xwos_cpuirq_restore_lc(cpuirq);
                         }
                 }
         } else {
@@ -276,10 +276,10 @@ void xwlk_mtx_chprio_once(struct xwlk_mtx * mtx, struct xwos_tcb ** ptcb)
                         owner = container_of(mt, struct xwos_tcb, mtxtree);
                         xwos_mtxtree_remove(mt, mtx);
                         xwos_mtxtree_add(mt, mtx);
-                        xwos_cpuirq_restore_lc(flag);
+                        xwos_cpuirq_restore_lc(cpuirq);
                         *ptcb = owner;
                 } else {
-                        xwos_cpuirq_restore_lc(flag);
+                        xwos_cpuirq_restore_lc(cpuirq);
                 }
         }
 }
@@ -295,7 +295,7 @@ void xwlk_mtx_chprio(struct xwlk_mtx * mtx)
         struct xwos_tcb * tcb;
         struct xwos_mtxtree * mt;
         xwpr_t dprio;
-        xwreg_t flag;
+        xwreg_t cpuirq;
 
         while (mtx) {
                 xwlk_mtx_chprio_once(mtx, &tcb);
@@ -304,10 +304,10 @@ void xwlk_mtx_chprio(struct xwlk_mtx * mtx)
                 }/* else {} */
                 mtx = NULL;
                 mt = &tcb->mtxtree;
-                xwos_cpuirq_save_lc(&flag);
+                xwos_cpuirq_save_lc(&cpuirq);
                 dprio = tcb->prio.s > mt->maxprio ? tcb->prio.s : mt->maxprio;
                 xwos_thrd_chprio_once(tcb, dprio, &mtx);
-                xwos_cpuirq_restore_lc(flag);
+                xwos_cpuirq_restore_lc(cpuirq);
         }
 }
 
@@ -324,10 +324,10 @@ void xwlk_mtx_chprio(struct xwlk_mtx * mtx)
 __xwos_code
 xwer_t xwlk_mtx_intr(struct xwlk_mtx * mtx, struct xwos_tcb * tcb)
 {
-        xwreg_t flag;
+        xwreg_t cpuirq;
         xwer_t rc;
 
-        xwos_cpuirq_save_lc(&flag);
+        xwos_cpuirq_save_lc(&cpuirq);
         rc = xwos_rtwq_remove(&mtx->rtwq, &tcb->wqn);
         if (OK == rc) {
                 tcb->wqn.wq = NULL;
@@ -336,11 +336,11 @@ xwer_t xwlk_mtx_intr(struct xwlk_mtx * mtx, struct xwos_tcb * tcb)
                 tcb->wqn.cb = NULL;
                 xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_BLOCKING);
                 xwos_thrd_wakeup(tcb);
-                xwos_cpuirq_restore_lc(flag);
+                xwos_cpuirq_restore_lc(cpuirq);
                 xwlk_mtx_chprio(mtx);
                 xwos_scheduler_chkpmpt();
         } else {
-                xwos_cpuirq_restore_lc(flag);
+                xwos_cpuirq_restore_lc(cpuirq);
         }
         return rc;
 }
@@ -365,7 +365,7 @@ xwer_t xwlk_mtx_unlock(struct xwlk_mtx * mtx)
         struct xwos_wqn * wqn;
         struct xwos_tcb * t, * ctcb;
         struct xwos_mtxtree * mt;
-        xwreg_t flag;
+        xwreg_t cpuirq;
 
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
         XWOS_VALIDATE((-EINTHRD == xwos_irq_get_id(NULL)),
@@ -375,14 +375,14 @@ xwer_t xwlk_mtx_unlock(struct xwlk_mtx * mtx)
         xwos_scheduler_dspmpt_lc();
         ctcb = xwos_scheduler_get_ctcb_lc();
         mt = &ctcb->mtxtree;
-        xwos_cpuirq_save_lc(&flag);
+        xwos_cpuirq_save_lc(&cpuirq);
         if (mtx->ownertree != mt) {
                 rc = -EOWNER;
-                xwos_cpuirq_restore_lc(flag);
+                xwos_cpuirq_restore_lc(cpuirq);
                 xwos_scheduler_enpmpt_lc();
         } else if (mtx->reentrant > 0) {
                 mtx->reentrant--;
-                xwos_cpuirq_restore_lc(flag);
+                xwos_cpuirq_restore_lc(cpuirq);
                 xwos_scheduler_enpmpt_lc();
         } else {
                 xwos_mtxtree_remove(mt, mtx);
@@ -407,7 +407,7 @@ xwer_t xwlk_mtx_unlock(struct xwlk_mtx * mtx)
                         t->prio.d = t->prio.s > mt->maxprio ? t->prio.s : mt->maxprio;
                         xwos_thrd_wakeup(t);
                         xwos_thrd_chprio(ctcb);
-                        xwos_cpuirq_restore_lc(flag);
+                        xwos_cpuirq_restore_lc(cpuirq);
                         xwos_scheduler_enpmpt_lc();
                         /* 如果函数在xwsync_cdt_timedwait() 或
                            xwos_cthrd_timedpause()中被调用，
@@ -417,7 +417,7 @@ xwer_t xwlk_mtx_unlock(struct xwlk_mtx * mtx)
                 } else {
                         /* Case 2: 没有线程在等待互斥锁 */
                         xwos_thrd_chprio(ctcb);
-                        xwos_cpuirq_restore_lc(flag);
+                        xwos_cpuirq_restore_lc(cpuirq);
                         xwos_scheduler_enpmpt_lc();
                         /* 如果函数在xwsync_cdt_timedwait() 或
                            xwos_cthrd_timedpause()中被调用，
@@ -451,7 +451,7 @@ xwer_t xwlk_mtx_trylock(struct xwlk_mtx * mtx)
 {
         struct xwos_tcb * ctcb;
         struct xwos_mtxtree * mt;
-        xwreg_t flag;
+        xwreg_t cpuirq;
         xwer_t rc;
 
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
@@ -462,19 +462,19 @@ xwer_t xwlk_mtx_trylock(struct xwlk_mtx * mtx)
         xwos_scheduler_dspmpt_lc();
         ctcb = xwos_scheduler_get_ctcb_lc();
         mt = &ctcb->mtxtree;
-        xwos_cpuirq_save_lc(&flag);
+        xwos_cpuirq_save_lc(&cpuirq);
         if (mtx->ownertree == mt) {
                 mtx->reentrant++;
-                xwos_cpuirq_restore_lc(flag);
+                xwos_cpuirq_restore_lc(cpuirq);
                 xwos_scheduler_enpmpt_lc();
         } else if (mtx->ownertree) {
-                xwos_cpuirq_restore_lc(flag);
+                xwos_cpuirq_restore_lc(cpuirq);
                 rc = -ENODATA;
                 xwos_scheduler_enpmpt_lc();
         } else {
                 xwos_mtxtree_add(mt, mtx);
                 xwos_thrd_chprio(ctcb);
-                xwos_cpuirq_restore_lc(flag);
+                xwos_cpuirq_restore_lc(cpuirq);
                 xwos_scheduler_enpmpt_lc();
                 xwos_scheduler_chkpmpt();
         }
@@ -486,7 +486,7 @@ xwer_t xwlk_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
                                                 struct xwos_scheduler * xwsd,
                                                 struct xwos_tcb * tcb,
                                                 xwtm_t * xwtm,
-                                                xwreg_t flag)
+                                                xwreg_t cpuirq)
 {
         xwer_t rc;
         struct xwos_tt * xwtt;
@@ -502,14 +502,14 @@ xwer_t xwlk_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
         xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_RUNNING);
         xwbop_s1m(xwsq_t, &tcb->state, XWSDOBJ_DST_BLOCKING);
         xwos_thrd_eq_rtwq(tcb, &mtx->rtwq, XWOS_WQTYPE_MTX);
-        xwos_cpuirq_restore_lc(flag);
+        xwos_cpuirq_restore_lc(cpuirq);
         xwlk_mtx_chprio(mtx);
 
         /* 加入到时间树 */
         xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
         xwbop_s1m(xwsq_t, &tcb->state, XWSDOBJ_DST_SLEEPING);
-        xwos_thrd_tt_add_locked(tcb, xwtt, expected, flag);
-        xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, flag);
+        xwos_thrd_tt_add_locked(tcb, xwtt, expected, cpuirq);
+        xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
 
         /* 调度 */
         xwos_cpuirq_enable_lc();
@@ -521,7 +521,7 @@ xwer_t xwlk_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
 #if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
         xwos_scheduler_wakelock_lock();
 #endif /* XWUPCFG_SD_LPM */
-        xwos_cpuirq_restore_lc(flag);
+        xwos_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
         if (XWOS_WQN_RSMRS_INTR == tcb->wqn.rsmrs) {
@@ -530,7 +530,7 @@ xwer_t xwlk_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
                 if (OK == rc) {
                         xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_SLEEPING);
                 }/* else {} */
-                xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, flag);
+                xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 rc = -EINTR;
         } else if (XWOS_WQN_RSMRS_UP == tcb->wqn.rsmrs) {
                 xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
@@ -538,7 +538,7 @@ xwer_t xwlk_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
                 if (OK == rc) {
                         xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_SLEEPING);
                 }/* else {} */
-                xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, flag);
+                xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 rc = OK;
         } else if (XWOS_TTN_WKUPRS_TIMEDOUT == tcb->ttn.wkuprs) {
                 xwos_cpuirq_disable_lc();
@@ -549,11 +549,11 @@ xwer_t xwlk_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
                         tcb->wqn.rsmrs = XWOS_WQN_RSMRS_INTR;
                         tcb->wqn.cb = NULL;
                         xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_BLOCKING);
-                        xwos_cpuirq_restore_lc(flag);
+                        xwos_cpuirq_restore_lc(cpuirq);
                         xwlk_mtx_chprio(mtx);
                         rc = -ETIMEDOUT;
                 } else {
-                        xwos_cpuirq_restore_lc(flag);
+                        xwos_cpuirq_restore_lc(cpuirq);
                         if (XWOS_WQN_RSMRS_INTR == tcb->wqn.rsmrs) {
                                 rc = -EINTR;
                         } else if (XWOS_WQN_RSMRS_UP == tcb->wqn.rsmrs) {
@@ -572,11 +572,11 @@ xwer_t xwlk_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
                         tcb->wqn.rsmrs = XWOS_WQN_RSMRS_INTR;
                         tcb->wqn.cb = NULL;
                         xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_BLOCKING);
-                        xwos_cpuirq_restore_lc(flag);
+                        xwos_cpuirq_restore_lc(cpuirq);
                         xwlk_mtx_chprio(mtx);
                         rc = -EINTR;
                 } else {
-                        xwos_cpuirq_restore_lc(flag);
+                        xwos_cpuirq_restore_lc(cpuirq);
                         if (XWOS_WQN_RSMRS_INTR == tcb->wqn.rsmrs) {
                                 rc = -EINTR;
                         } else if (XWOS_WQN_RSMRS_UP == tcb->wqn.rsmrs) {
@@ -602,29 +602,29 @@ xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx,
 {
         struct xwos_scheduler * xwsd;
         struct xwos_mtxtree * mt;
-        xwreg_t flag;
+        xwreg_t cpuirq;
         xwer_t rc;
 
         rc = OK;
         xwsd = xwos_scheduler_dspmpt_lc();
         mt = &tcb->mtxtree;
-        xwos_cpuirq_save_lc(&flag);
+        xwos_cpuirq_save_lc(&cpuirq);
         if (mtx->ownertree == mt) {
                 mtx->reentrant++;
-                xwos_cpuirq_restore_lc(flag);
+                xwos_cpuirq_restore_lc(cpuirq);
                 xwos_scheduler_enpmpt_lc();
         } else if (mtx->ownertree) {
 #if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
                 rc = xwos_scheduler_wakelock_lock();
                 if (__unlikely(rc < 0)) {
                         /* 系统准备进入低功耗模式，线程需被冻结，返回-EINTR。*/
-                        xwos_cpuirq_restore_lc(flag);
+                        xwos_cpuirq_restore_lc(cpuirq);
                         xwos_scheduler_enpmpt_lc();
                         rc = -EINTR;
                 } else {
 #endif /* XWUPCFG_SD_LPM */
                         rc = xwlk_mtx_do_timedblkthrd_unlkwq_cpuirqrs(mtx, xwsd, tcb,
-                                                                      xwtm, flag);
+                                                                      xwtm, cpuirq);
 #if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
                         xwos_scheduler_wakelock_unlock();
                 }
@@ -632,7 +632,7 @@ xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx,
         } else {
                 xwos_mtxtree_add(mt, mtx);
                 xwos_thrd_chprio(tcb);
-                xwos_cpuirq_restore_lc(flag);
+                xwos_cpuirq_restore_lc(cpuirq);
                 xwos_scheduler_enpmpt_lc();
                 xwos_scheduler_chkpmpt();
         }
@@ -692,7 +692,7 @@ xwer_t xwlk_mtx_timedlock(struct xwlk_mtx * mtx, xwtm_t * xwtm)
 static __xwos_code
 xwer_t xwlk_mtx_do_blkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
                                            struct xwos_tcb * tcb,
-                                           xwreg_t flag)
+                                           xwreg_t cpuirq)
 {
         xwer_t rc;
 
@@ -701,14 +701,14 @@ xwer_t xwlk_mtx_do_blkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
         xwbop_s1m(xwsq_t, &tcb->state,
                   XWSDOBJ_DST_BLOCKING | XWSDOBJ_DST_UNINTERRUPTED);
         xwos_thrd_eq_rtwq(tcb, &mtx->rtwq, XWOS_WQTYPE_MTX);
-        xwos_cpuirq_restore_lc(flag);
+        xwos_cpuirq_restore_lc(cpuirq);
         xwlk_mtx_chprio(mtx);
 
         /* 调度 */
         xwos_cpuirq_enable_lc();
         xwos_scheduler_enpmpt_lc();
         xwos_scheduler_req_swcx();
-        xwos_cpuirq_restore_lc(flag);
+        xwos_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
         if (XWOS_WQN_RSMRS_UP == tcb->wqn.rsmrs) {
@@ -725,23 +725,23 @@ xwer_t xwlk_mtx_do_lock_unintr(struct xwlk_mtx * mtx,
                                struct xwos_tcb * tcb)
 {
         struct xwos_mtxtree * mt;
-        xwreg_t flag;
+        xwreg_t cpuirq;
         xwer_t rc;
 
         rc = OK;
         xwos_scheduler_dspmpt_lc();
         mt = &tcb->mtxtree;
-        xwos_cpuirq_save_lc(&flag);
+        xwos_cpuirq_save_lc(&cpuirq);
         if (mtx->ownertree == mt) {
                 mtx->reentrant++;
-                xwos_cpuirq_restore_lc(flag);
+                xwos_cpuirq_restore_lc(cpuirq);
                 xwos_scheduler_enpmpt_lc();
         } else if (mtx->ownertree) {
-                rc = xwlk_mtx_do_blkthrd_unlkwq_cpuirqrs(mtx, tcb, flag);
+                rc = xwlk_mtx_do_blkthrd_unlkwq_cpuirqrs(mtx, tcb, cpuirq);
         } else {
                 xwos_mtxtree_add(mt, mtx);
                 xwos_thrd_chprio(tcb);
-                xwos_cpuirq_restore_lc(flag);
+                xwos_cpuirq_restore_lc(cpuirq);
                 xwos_scheduler_enpmpt_lc();
                 xwos_scheduler_chkpmpt();
         }

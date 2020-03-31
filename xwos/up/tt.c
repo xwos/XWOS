@@ -58,7 +58,7 @@ void xwos_ttn_init(struct xwos_ttn * ttn, xwptr_t entry, xwptr_t type)
         xwlib_bclst_init_node(&ttn->rbb);
         xwlib_rbtree_init_node(&ttn->rbn);
         ttn->wkup_xwtm = 0;
-        ttn->wkuprs = XWOS_TTN_WKUPRS_UNKNOWN,
+        ttn->wkuprs = XWOS_TTN_WKUPRS_UNKNOWN;
         ttn->cb = NULL;
         ttn->xwtt = NULL;
         ttn->entry.addr = entry & (~XWOS_TTN_TYPE_MASK);

@@ -216,10 +216,15 @@ __xwos_code
 struct xwos_scheduler * xwos_scheduler_get_lc(void)
 {
         struct xwos_scheduler * xwsd;
+        xwid_t cpuid;
 
+        cpuid = xwos_cpu_get_id();
+        xwmb_smp_ddb();
         do {
-                xwsd = &xwos_scheduler[xwos_cpu_get_id()];
-        } while (xwsd->id != xwos_cpu_get_id());
+                xwsd = &xwos_scheduler[cpuid];
+                cpuid = xwos_cpu_get_id();
+                xwmb_smp_ddb();
+        } while (xwsd->id != cpuid);
         return xwsd;
 }
 
@@ -265,11 +270,16 @@ struct xwos_tcb * xwos_scheduler_get_ctcb_lc(void)
 {
         struct xwos_scheduler * xwsd;
         struct xwos_tcb * ctcb;
+        xwid_t cpuid;
 
+        cpuid = xwos_cpu_get_id();
+        xwmb_smp_ddb();
         do {
-                xwsd = &xwos_scheduler[xwos_cpu_get_id()];
+                xwsd = &xwos_scheduler[cpuid];
                 ctcb = container_of(xwsd->cstk, struct xwos_tcb, stack);
-        } while (xwsd->id != xwos_cpu_get_id());
+                cpuid = xwos_cpu_get_id();
+                xwmb_smp_ddb();
+        } while (xwsd->id != cpuid);
         return ctcb;
 }
 

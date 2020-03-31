@@ -68,8 +68,8 @@ typedef void (* xwos_wqn_f)(void *);
  * @brief 等待队列节点
  */
 struct xwos_wqn {
-        xwu16_t type; /**< 等待队列类型（信号量、互斥锁） */
-        volatile xwu16_t rsmrs; /**< 唤醒原因 */
+        xwsq_t type; /**< 等待队列类型（信号量、互斥锁） */
+        __atomic xwsq_t rsmrs; /**< 唤醒原因 */
         void * wq; /**< 指向所属的等待队列的指针 */
         xwos_wqn_f cb; /**< 被唤醒时的回调函数 */
         struct xwlk_splk lock; /**< 保护此结构体的锁 */
