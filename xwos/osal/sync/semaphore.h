@@ -131,6 +131,43 @@ struct xwosal_smr * xwosal_smr_get_obj(xwid_t smrid)
 }
 
 /**
+ * @brief 操作系统抽象层API：绑定信号量到信号选择器。
+ * @param smrid: (I) 信号量的ID
+ * @param sltid: (I) 信号选择器的ID
+ * @param pos: (I) 信号量对象映射到位图中的位置
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -ETYPE: 信号选择器或信号量类型错误
+ * @note
+ * - 同步/异步：异步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：对于同一个 *smrid* ，不可重入
+ */
+static __xwos_inline_api
+xwer_t xwosal_smr_bind(xwid_t smrid, xwid_t sltid, xwsq_t pos)
+{
+        return xwosdl_smr_bind(smrid, sltid, pos);
+}
+
+/**
+ * @brief 操作系统抽象层API：从信号选择器上解绑信号量。
+ * @param smrid: (I) 信号量的ID
+ * @param sltid: (I) 信号选择器的ID
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -ETYPE: 信号选择器类型错误
+ * @note
+ * - 同步/异步：异步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：对于同一个 *smrid* ，不可重入
+ */
+static __xwos_inline_api
+xwer_t xwosal_smr_unbind(xwid_t smrid, xwid_t sltid)
+{
+        return xwosdl_smr_unbind(smrid, sltid);
+}
+
+/**
  * @brief 操作系统抽象层API：冻结信号量。
  * @param smrid: (I) 信号量ID
  * @return 错误码

@@ -157,6 +157,43 @@ struct xwosal_flg * xwosal_flg_get_obj(xwid_t flgid)
 }
 
 /**
+ * @brief 操作系统抽象层API：绑定事件信号旗到信号选择器。
+ * @param flgid: (I) 事件信号旗的ID
+ * @param sltid: (I) 信号选择器的ID
+ * @param pos: (I) 事件信号旗对象映射到位图中的位置
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -ETYPE: 信号选择器或事件信号旗类型错误
+ * @note
+ * - 同步/异步：异步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：对于同一个 *flgid* ，不可重入
+ */
+static __xwos_inline_api
+xwer_t xwosal_flg_bind(xwid_t flgid, xwid_t sltid, xwsq_t pos)
+{
+        return xwosdl_flg_bind(flgid, sltid, pos);
+}
+
+/**
+ * @brief 操作系统抽象层API：从信号选择器上解绑事件信号旗。
+ * @param flgid: (I) 事件信号旗的ID
+ * @param sltid: (I) 信号选择器的ID
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -ETYPE: 信号选择器类型错误
+ * @note
+ * - 同步/异步：异步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：对于同一个 *flgid* ，不可重入
+ */
+static __xwos_inline_api
+xwer_t xwosal_flg_unbind(xwid_t flgid, xwid_t sltid)
+{
+        return xwosdl_flg_unbind(flgid, sltid);
+}
+
+/**
  * @brief 操作系统抽象层API：中断事件信号旗等待队列中的所有节点。
  * @param flgid: (I) 事件信号旗ID
  * @return 错误码

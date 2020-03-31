@@ -128,6 +128,45 @@ struct xwosal_cdt * xwosal_cdt_get_obj(xwid_t cdtid)
 }
 
 /**
+ * @brief 操作系统抽象层API：绑定条件量到信号选择器。
+ * @param cdtid: (I) 条件量的ID
+ * @param sltid: (I) 信号选择器的ID
+ * @param pos: (I) 条件量对象映射到位图中的位置
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -ETYPE: 信号选择器或条件量类型错误
+ * @note
+ * - 同步/异步：异步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：对于同一个 *cdtid* ，不可重入
+ * @note
+ * - 绑定了信号选择器的条件量，只有广播时才会向信号选择器传递一个信号。
+ */
+static __xwos_inline_api
+xwer_t xwosal_cdt_bind(xwid_t cdtid, xwid_t sltid, xwsq_t pos)
+{
+        return xwosdl_cdt_bind(cdtid, sltid, pos);
+}
+
+/**
+ * @brief 操作系统抽象层API：从信号选择器上解绑条件量。
+ * @param cdtid: (I) 条件量的ID
+ * @param sltid: (I) 信号选择器的ID
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -ETYPE: 信号选择器类型错误
+ * @note
+ * - 同步/异步：异步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：对于同一个 *cdtid* ，不可重入
+ */
+static __xwos_inline_api
+xwer_t xwosal_cdt_unbind(xwid_t cdtid, xwid_t sltid)
+{
+        return xwosdl_cdt_unbind(cdtid, sltid);
+}
+
+/**
  * @brief 操作系统抽象层API：冻结条件量。
  * @param cdtid: (I) 条件量ID
  * @return 错误码
@@ -192,7 +231,7 @@ xwer_t xwosal_cdt_intr_all(xwid_t cdtid)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  * @note
- * - 此函数只对未冻结的条件量起作用，已冻结的信号量将得到错误码-ENEGATIVE。
+ * - 此函数只对未冻结的条件量起作用，已冻结的条件量将得到错误码-ENEGATIVE。
  */
 static __xwos_inline_api
 xwer_t xwosal_cdt_broadcast(xwid_t cdtid)

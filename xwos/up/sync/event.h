@@ -20,6 +20,7 @@
 #include <xwos/object.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/up/lock/fakespinlock.h>
+#include <xwos/up/sync/object.h>
 #include <xwos/up/sync/condition.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -64,8 +65,6 @@ enum xwsync_evt_action_em {
         XWSYNC_EVT_ACTION_NUM,
 };
 
-struct xwsync_vsmr;
-
 /**
  * @brief 事件对象
  */
@@ -85,17 +84,21 @@ struct xwsync_evt {
  ******** ********     internal function prototypes    ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwos_code
-xwer_t xwsync_evt_smr_bind(struct xwsync_evt * evt, struct xwsync_vsmr * smr,
-                           xwsq_t pos);
+xwer_t xwsync_evt_obj_bind(struct xwsync_evt * evt,
+                           struct xwsync_object * obj,
+                           xwsq_t pos,
+                           bool exclusive);
 
 __xwos_code
-xwer_t xwsync_evt_smr_unbind(struct xwsync_evt * evt, struct xwsync_vsmr * smr);
+xwer_t xwsync_evt_obj_unbind(struct xwsync_evt * evt,
+                             struct xwsync_object * obj,
+                             bool exclusive);
 
 __xwos_code
-xwer_t xwsync_evt_smr_s1i(struct xwsync_evt * evt, struct xwsync_vsmr * smr);
+xwer_t xwsync_evt_obj_s1i(struct xwsync_evt * evt, struct xwsync_object * obj);
 
 __xwos_code
-xwer_t xwsync_evt_smr_c0i(struct xwsync_evt * evt, struct xwsync_vsmr * smr);
+xwer_t xwsync_evt_obj_c0i(struct xwsync_evt * evt, struct xwsync_object * obj);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
@@ -111,6 +114,12 @@ xwer_t xwsync_evt_create(struct xwsync_evt ** ptrbuf, xwbmp_t initval[], xwsq_t 
 
 __xwos_api
 xwer_t xwsync_evt_delete(struct xwsync_evt * evt);
+
+__xwos_api
+xwer_t xwsync_evt_bind(struct xwsync_evt * evt, struct xwsync_evt * slt, xwsq_t pos);
+
+__xwos_api
+xwer_t xwsync_evt_unbind(struct xwsync_evt * evt, struct xwsync_evt * slt);
 
 __xwos_api
 xwer_t xwsync_evt_intr_all(struct xwsync_evt * evt);
@@ -143,6 +152,9 @@ xwer_t xwsync_evt_timedwait(struct xwsync_evt * evt,
                             xwtm_t * xwtm);
 
 __xwos_api
+xwer_t xwsync_evt_tryselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t trg[]);
+
+__xwos_api
 xwer_t xwsync_evt_timedselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
                               xwtm_t * xwtm);
 
@@ -158,7 +170,7 @@ xwer_t xwsync_evt_timedsync(struct xwsync_evt * evt, xwsq_t pos, xwbmp_t sync[],
  * @param evt: (I) 事件对象的指针
  * @param trigger: (I) 事件触发条件，取值 @ref xwsync_evt_trigger_em
  * @param action: (I) 事件触发后的动作，取值 @ref xwsync_evt_action_em，
- *                    仅trigger当取值
+ *                    仅当trigger取值
  *                    @ref XWSYNC_EVT_TRIGGER_SET_ALL
  *                    @ref XWSYNC_EVT_TRIGGER_SET_ANY
  *                    @ref XWSYNC_EVT_TRIGGER_CLR_ALL
@@ -194,11 +206,11 @@ xwer_t xwsync_evt_wait(struct xwsync_evt * evt,
 }
 
 /**
- * @brief XWOS API：等待事件对象中绑定的信号量，任何信号量的V操作都可唤醒线程，
+ * @brief XWOS API：等待事件对象中绑定的同步对象，
  *                  事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
  * @param evt: (I) 事件对象的指针
- * @param msk: (I) 待触发的信号量的位图掩码，表示只关注掩码部分的信号量。
- * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的信号量的位图
+ * @param msk: (I) 待触发的同步对象的位图掩码（表示只关注掩码部分的同步对象）
+ * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象的位图
  * @return 错误码
  * @retval OK: OK
  * @retval -EFAULT: 空指针

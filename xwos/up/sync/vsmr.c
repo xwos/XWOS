@@ -16,6 +16,7 @@
 #include <xwos/standard.h>
 #include <xwos/up/irq.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+  #include <xwos/up/sync/object.h>
   #include <xwos/up/sync/event.h>
 #endif /* XWUPCFG_SYNC_EVT */
 #include <xwos/up/sync/vsmr.h>
@@ -37,21 +38,20 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 激活信号量对象。
- * @param smr: (I) 信号量对象的指针
+ * @param vsmr: (I) 信号量对象的指针
  */
 __xwos_code
-void xwsync_vsmr_activate(struct xwsync_vsmr * smr)
+void xwsync_vsmr_activate(struct xwsync_vsmr * vsmr)
 {
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-        smr->selector.evt = NULL;
-        smr->selector.pos = 0;
+        xwsync_object_activate(&vsmr->xwsyncobj);
 #endif /* XWUPCFG_SYNC_EVT */
 }
 
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
 /**
  * @brief 绑定信号量到事件对象，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
- * @param smr: (I) 信号量对象的指针
+ * @param vsmr: (I) 信号量对象的指针
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 信号量对象映射到位图中的位置
  * @return 错误码
@@ -59,19 +59,19 @@ void xwsync_vsmr_activate(struct xwsync_vsmr * smr)
  * @note
  * - 同步/异步：异步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *smr* ，不可重入
+ * - 重入性：对于同一个 *vsmr* ，不可重入
  */
 __xwos_code
-xwer_t xwsync_vsmr_bind(struct xwsync_vsmr * smr, struct xwsync_evt * evt,
+xwer_t xwsync_vsmr_bind(struct xwsync_vsmr * vsmr, struct xwsync_evt * evt,
                         xwsq_t pos)
 {
         xwreg_t cpuirq;
         xwer_t rc;
 
         xwos_cpuirq_save_lc(&cpuirq);
-        rc = xwsync_evt_smr_bind(evt, smr, pos);
-        if ((OK == rc) && (smr->count > 0)) {
-                rc = xwsync_evt_smr_s1i(evt, smr);
+        rc = xwsync_evt_obj_bind(evt, &vsmr->xwsyncobj, pos, true);
+        if ((OK == rc) && (vsmr->count > 0)) {
+                rc = xwsync_evt_obj_s1i(evt, &vsmr->xwsyncobj);
         }
         xwos_cpuirq_restore_lc(cpuirq);
 
@@ -87,18 +87,18 @@ xwer_t xwsync_vsmr_bind(struct xwsync_vsmr * smr, struct xwsync_evt * evt,
  * @note
  * - 同步/异步：异步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *smr* ，不可重入
+ * - 重入性：对于同一个 *vsmr* ，不可重入
  */
 __xwos_code
-xwer_t xwsync_vsmr_unbind(struct xwsync_vsmr * smr, struct xwsync_evt * evt)
+xwer_t xwsync_vsmr_unbind(struct xwsync_vsmr * vsmr, struct xwsync_evt * evt)
 {
         xwreg_t cpuirq;
         xwer_t rc;
 
         xwos_cpuirq_save_lc(&cpuirq);
-        rc = xwsync_evt_smr_unbind(evt, smr);
+        rc = xwsync_evt_obj_unbind(evt, &vsmr->xwsyncobj, true);
         if (OK == rc) {
-                rc = xwsync_evt_smr_c0i(evt, smr);
+                rc = xwsync_evt_obj_c0i(evt, &vsmr->xwsyncobj);
         }
         xwos_cpuirq_restore_lc(cpuirq);
 
@@ -108,7 +108,7 @@ xwer_t xwsync_vsmr_unbind(struct xwsync_vsmr * smr, struct xwsync_evt * evt)
 
 /**
  * @brief 冻结信号量（值设置为负）。
- * @param smr: (I) 信号量对象的基类指针
+ * @param vsmr: (I) 信号量对象的基类指针
  * @return 错误码
  * @retval OK: OK
  * @retval -EALREADY: 信号量已为负
@@ -121,23 +121,25 @@ xwer_t xwsync_vsmr_unbind(struct xwsync_vsmr * smr, struct xwsync_evt * evt)
  *   测试的线程会被加入到信号量的等待队列。
  */
 __xwos_code
-xwer_t xwsync_vsmr_freeze(struct xwsync_vsmr * smr)
+xwer_t xwsync_vsmr_freeze(struct xwsync_vsmr * vsmr)
 {
         xwer_t rc;
         xwreg_t cpuirq;
 
         rc = OK;
         xwos_cpuirq_save_lc(&cpuirq);
-        if (__unlikely(smr->count < 0)) {
+        if (__unlikely(vsmr->count < 0)) {
                 rc = -EALREADY;
         } else {
-                smr->count = XWSDYNC_VSMR_NEGTIVE;
+                vsmr->count = XWSDYNC_VSMR_NEGTIVE;
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
                 struct xwsync_evt * evt;
+                struct xwsync_object * xwsyncobj;
 
-                evt = smr->selector.evt;
+                xwsyncobj = &vsmr->xwsyncobj;
+                evt = xwsyncobj->selector.evt;
                 if (NULL != evt) {
-                        xwsync_evt_smr_c0i(evt, smr);
+                        xwsync_evt_obj_c0i(evt, xwsyncobj);
                 }
 #endif /* XWUPCFG_SYNC_EVT */
         }
@@ -148,7 +150,7 @@ xwer_t xwsync_vsmr_freeze(struct xwsync_vsmr * smr)
 
 /**
  * @brief 解冻信号量，并重新初始化。
- * @param smr: (I) 信号量对象的基类指针
+ * @param vsmr: (I) 信号量对象的基类指针
  * @param val: (I) 信号量的初始值
  * @param max: (I) 信号量的最大值
  * @return 错误码
@@ -163,7 +165,7 @@ xwer_t xwsync_vsmr_freeze(struct xwsync_vsmr * smr)
  * - 此函数只对已冻结的信号量起作用。
  */
 __xwos_code
-xwer_t xwsync_vsmr_thaw(struct xwsync_vsmr * smr, xwssq_t val, xwssq_t max)
+xwer_t xwsync_vsmr_thaw(struct xwsync_vsmr * vsmr, xwssq_t val, xwssq_t max)
 {
         xwer_t rc;
         xwreg_t cpuirq;
@@ -173,18 +175,20 @@ xwer_t xwsync_vsmr_thaw(struct xwsync_vsmr * smr, xwssq_t val, xwssq_t max)
 
         rc = OK;
         xwos_cpuirq_save_lc(&cpuirq);
-        if (__unlikely(smr->count >= 0)) {
+        if (__unlikely(vsmr->count >= 0)) {
                 rc = -EALREADY;
         } else {
-                smr->max = max;
-                smr->count = val;
+                vsmr->max = max;
+                vsmr->count = val;
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-                if (smr->count > 0) {
+                if (vsmr->count > 0) {
                         struct xwsync_evt * evt;
+                        struct xwsync_object * xwsyncobj;
 
-                        evt = smr->selector.evt;
+                        xwsyncobj = &vsmr->xwsyncobj;
+                        evt = xwsyncobj->selector.evt;
                         if (NULL != evt) {
-                                xwsync_evt_smr_s1i(evt, smr);
+                                xwsync_evt_obj_s1i(evt, xwsyncobj);
                         }
                 }
 #endif /* XWUPCFG_SYNC_EVT */
@@ -195,7 +199,7 @@ xwer_t xwsync_vsmr_thaw(struct xwsync_vsmr * smr, xwssq_t val, xwssq_t max)
 
 /**
  * @brief 获取信号量计数器的值。
- * @param smr: (I) 信号量对象的基类指针
+ * @param vsmr: (I) 信号量对象的基类指针
  * @param sval: (O) 指向缓冲区的指针，通过此缓冲区返回信号量计数器的值
  * @return 错误码
  * @retval OK: OK
@@ -205,8 +209,8 @@ xwer_t xwsync_vsmr_thaw(struct xwsync_vsmr * smr, xwssq_t val, xwssq_t max)
  * - 重入性：可重入
  */
 __xwos_code
-xwer_t xwsync_vsmr_getvalue(struct xwsync_vsmr * smr, xwssq_t * sval)
+xwer_t xwsync_vsmr_getvalue(struct xwsync_vsmr * vsmr, xwssq_t * sval)
 {
-        *sval = smr->count;
+        *sval = vsmr->count;
         return OK;
 }

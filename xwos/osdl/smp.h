@@ -400,6 +400,12 @@ xwer_t xwosdl_swt_stop(xwid_t swtid)
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       sync        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/******** definitions ********/
+#define xwosdl_selector xwsync_evt
+
+static __xw_inline
+struct xwosdl_selector * xwosdl_selector_get_obj(xwid_t sltid);
+
 /******** semaphore ********/
 #include <xwos/smp/sync/semaphore.h>
 
@@ -427,6 +433,32 @@ xwer_t xwosdl_smr_getvalue(xwid_t smrid, xwssq_t * sval)
 
         smr = xwosdl_smr_get_obj(smrid);
         rc = xwsync_smr_getvalue(smr, sval);
+        return rc;
+}
+
+static __xw_inline
+xwer_t xwosdl_smr_bind(xwid_t smrid, xwid_t sltid, xwsq_t pos)
+{
+        struct xwosdl_selector * slt;
+        struct xwosdl_smr * smr;
+        xwer_t rc;
+
+        slt = xwosdl_selector_get_obj(sltid);
+        smr = xwosdl_smr_get_obj(smrid);
+        rc = xwsync_smr_bind(smr, slt, pos);
+        return rc;
+}
+
+static __xw_inline
+xwer_t xwosdl_smr_unbind(xwid_t smrid, xwid_t sltid)
+{
+        struct xwosdl_selector * slt;
+        struct xwosdl_smr * smr;
+        xwer_t rc;
+
+        slt = xwosdl_selector_get_obj(sltid);
+        smr = xwosdl_smr_get_obj(smrid);
+        rc = xwsync_smr_unbind(smr, slt);
         return rc;
 }
 
@@ -739,6 +771,32 @@ xwer_t xwosdl_cdt_delete(xwid_t cdtid)
 }
 
 static __xw_inline
+xwer_t xwosdl_cdt_bind(xwid_t cdtid, xwid_t sltid, xwsq_t pos)
+{
+        struct xwosdl_selector * slt;
+        struct xwosdl_cdt * cdt;
+        xwer_t rc;
+
+        slt = xwosdl_selector_get_obj(sltid);
+        cdt = xwosdl_cdt_get_obj(cdtid);
+        rc = xwsync_cdt_bind(cdt, slt, pos);
+        return rc;
+}
+
+static __xw_inline
+xwer_t xwosdl_cdt_unbind(xwid_t cdtid, xwid_t sltid)
+{
+        struct xwosdl_selector * slt;
+        struct xwosdl_cdt * cdt;
+        xwer_t rc;
+
+        slt = xwosdl_selector_get_obj(sltid);
+        cdt = xwosdl_cdt_get_obj(cdtid);
+        rc = xwsync_cdt_unbind(cdt, slt);
+        return rc;
+}
+
+static __xw_inline
 xwer_t xwosdl_cdt_thaw(xwid_t cdtid)
 {
         struct xwosdl_cdt * cdt;
@@ -913,6 +971,32 @@ xwer_t xwosdl_flg_delete(xwid_t flgid)
 }
 
 static __xw_inline
+xwer_t xwosdl_flg_bind(xwid_t flgid, xwid_t sltid, xwsq_t pos)
+{
+        struct xwosdl_selector * slt;
+        struct xwosdl_flg * flg;
+        xwer_t rc;
+
+        slt = xwosdl_selector_get_obj(sltid);
+        flg = xwosdl_flg_get_obj(flgid);
+        rc = xwsync_evt_bind(flg, slt, pos);
+        return rc;
+}
+
+static __xw_inline
+xwer_t xwosdl_flg_unbind(xwid_t flgid, xwid_t sltid)
+{
+        struct xwosdl_selector * slt;
+        struct xwosdl_flg * flg;
+        xwer_t rc;
+
+        slt = xwosdl_selector_get_obj(sltid);
+        flg = xwosdl_flg_get_obj(flgid);
+        rc = xwsync_evt_unbind(flg, slt);
+        return rc;
+}
+
+static __xw_inline
 xwer_t xwosdl_flg_intr_all(xwid_t flgid)
 {
         struct xwosdl_flg * flg;
@@ -1028,7 +1112,6 @@ xwer_t xwosdl_flg_timedwait(xwid_t flgid, xwsq_t trigger, xwsq_t action,
 /******** selector ********/
 #include <xwos/smp/sync/event.h>
 
-#define xwosdl_selector xwsync_evt
 #define XWOSDL_SELECTOR_MAXNUM          XWSYNC_EVT_MAXNUM
 
 static __xw_inline
@@ -1089,6 +1172,32 @@ xwer_t xwosdl_selector_delete(xwid_t sltid)
 }
 
 static __xw_inline
+xwer_t xwosdl_selector_bind(xwid_t srcid, xwid_t dstid, xwsq_t pos)
+{
+        struct xwosdl_selector * src;
+        struct xwosdl_selector * dst;
+        xwer_t rc;
+
+        src = xwosdl_selector_get_obj(srcid);
+        dst = xwosdl_selector_get_obj(dstid);
+        rc = xwsync_evt_bind(src, dst, pos);
+        return rc;
+}
+
+static __xw_inline
+xwer_t xwosdl_selector_unbind(xwid_t srcid, xwid_t dstid)
+{
+        struct xwosdl_selector * src;
+        struct xwosdl_selector * dst;
+        xwer_t rc;
+
+        src = xwosdl_selector_get_obj(srcid);
+        dst = xwosdl_selector_get_obj(dstid);
+        rc = xwsync_evt_unbind(src, dst);
+        return rc;
+}
+
+static __xw_inline
 xwer_t xwosdl_selector_intr_all(xwid_t sltid)
 {
         struct xwosdl_selector * slt;
@@ -1100,28 +1209,13 @@ xwer_t xwosdl_selector_intr_all(xwid_t sltid)
 }
 
 static __xw_inline
-xwer_t xwosdl_selector_bind(xwid_t sltid, xwid_t smrid, xwsq_t pos)
+xwer_t xwosdl_selector_tryselect(xwid_t sltid, xwbmp_t msk[], xwbmp_t trg[])
 {
         struct xwosdl_selector * slt;
-        struct xwosdl_smr * smr;
         xwer_t rc;
 
         slt = xwosdl_selector_get_obj(sltid);
-        smr = xwosdl_smr_get_obj(smrid);
-        rc = xwsync_smr_bind(smr, slt, pos);
-        return rc;
-}
-
-static __xw_inline
-xwer_t xwosdl_selector_unbind(xwid_t sltid, xwid_t smrid)
-{
-        struct xwosdl_selector * slt;
-        struct xwosdl_smr * smr;
-        xwer_t rc;
-
-        slt = xwosdl_selector_get_obj(sltid);
-        smr = xwosdl_smr_get_obj(smrid);
-        rc = xwsync_smr_unbind(smr, slt);
+        rc = xwsync_evt_tryselect(slt, msk, trg);
         return rc;
 }
 
@@ -1208,6 +1302,32 @@ xwer_t xwosdl_barrier_delete(xwid_t barid)
         if (OK == rc) {
                 /* FIXME: Del from ID table */
         }
+        return rc;
+}
+
+static __xw_inline
+xwer_t xwosdl_barrier_bind(xwid_t barid, xwid_t sltid, xwsq_t pos)
+{
+        struct xwosdl_barrier * bar;
+        struct xwosdl_selector * slt;
+        xwer_t rc;
+
+        bar = xwosdl_barrier_get_obj(barid);
+        slt = xwosdl_selector_get_obj(sltid);
+        rc = xwsync_evt_bind(bar, slt, pos);
+        return rc;
+}
+
+static __xw_inline
+xwer_t xwosdl_barrier_unbind(xwid_t barid, xwid_t sltid)
+{
+        struct xwosdl_barrier * bar;
+        struct xwosdl_selector * slt;
+        xwer_t rc;
+
+        bar = xwosdl_barrier_get_obj(barid);
+        slt = xwosdl_selector_get_obj(sltid);
+        rc = xwsync_evt_unbind(bar, slt);
         return rc;
 }
 

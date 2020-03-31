@@ -130,9 +130,9 @@ struct xwosal_selector * xwosal_selector_get_obj(xwid_t sltid)
 }
 
 /**
- * @brief 操作系统抽象层API：绑定信号量到信号选择器。
- * @param sltid: (I) 信号选择器ID
- * @param smrid: (I) 信号量的ID
+ * @brief 操作系统抽象层API：绑定源信号选择器到目的信号选择器，产生级联效果。
+ * @param srcid: (I) 源信号选择器的ID
+ * @param dstid: (I) 目的信号选择器的ID
  * @param pos: (I) 信号量对象映射到位图中的位置
  * @return 错误码
  * @retval OK: OK
@@ -140,31 +140,34 @@ struct xwosal_selector * xwosal_selector_get_obj(xwid_t sltid)
  * @note
  * - 同步/异步：异步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *smrid* ，不可重入
+ * - 重入性：对于同一个 *srcid* ，不可重入
+ * @note
+ * - 源信号选择器选择到的信号，将依次往目的信号选择器链上传递。
  */
 static __xwos_inline_api
-xwer_t xwosal_selector_bind(xwid_t sltid, xwid_t smrid, xwsq_t pos)
+xwer_t xwosal_selector_bind(xwid_t srcid, xwid_t dstid, xwsq_t pos)
 {
-        return xwosdl_selector_bind(sltid, smrid, pos);
+        return xwosdl_selector_bind(srcid, dstid, pos);
 }
 
-
 /**
- * @brief 操作系统抽象层API：从信号选择器上解绑信号量。
- * @param sltid: (I) 信号选择器ID
- * @param smrid: (I) 信号量的ID
+ * @brief 操作系统抽象层API：从目的信号选择器上解绑源信号选择器。
+ * @param srcid: (I) 源信号选择器的ID
+ * @param dstid: (I) 信号选择器的ID
  * @return 错误码
  * @retval OK: OK
  * @retval -ETYPE: 信号选择器类型错误
  * @note
  * - 同步/异步：异步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *smrid* ，不可重入
+ * - 重入性：对于同一个 *srcid* ，不可重入
+ * @note
+ * - 源信号选择器选择到的信号，将依次往目的信号选择器链上传递。
  */
 static __xwos_inline_api
-xwer_t xwosal_selector_unbind(xwid_t sltid, xwid_t smrid)
+xwer_t xwosal_selector_unbind(xwid_t srcid, xwid_t dstid)
 {
-        return xwosdl_selector_unbind(sltid, smrid);
+        return xwosdl_selector_unbind(srcid, dstid);
 }
 
 /**
@@ -183,6 +186,26 @@ static __xwos_inline_api
 xwer_t xwosal_selector_intr_all(xwid_t sltid)
 {
         return xwosdl_selector_intr_all(sltid);
+}
+
+/**
+ * @brief 操作系统抽象层API：测试一下事件对象中绑定的同步对象，不进行阻塞等待
+ * @param sltid: (I) 信号选择器ID
+ * @param msk: (I) 待触发的信号量的位图掩码
+ * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的信号量的位图
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 空指针
+ * @retval -ENODATA: 没有任何信号或事件
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwosal_selector_tryselect(xwid_t sltid, xwbmp_t msk[], xwbmp_t trg[])
+{
+        return xwosdl_selector_select(sltid, msk, trg);
 }
 
 /**

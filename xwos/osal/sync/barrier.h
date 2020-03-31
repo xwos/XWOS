@@ -130,6 +130,45 @@ struct xwosal_barrier * xwosal_barrier_get_obj(xwid_t barid)
 }
 
 /**
+ * @brief 操作系统抽象层API：绑定线程屏障到信号选择器。
+ * @param barid: (I) 线程屏障的ID
+ * @param sltid: (I) 信号选择器的ID
+ * @param pos: (I) 线程屏障对象映射到位图中的位置
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -ETYPE: 信号选择器或线程屏障类型错误
+ * @note
+ * - 同步/异步：异步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：对于同一个 *barid* ，不可重入
+ * @note
+ * - 当所有线程到达线程屏障时，绑定了信号选择器的线程屏障将向信号选择器传递一个信号。
+ */
+static __xwos_inline_api
+xwer_t xwosal_barrier_bind(xwid_t barid, xwid_t sltid, xwsq_t pos)
+{
+        return xwosdl_barrier_bind(barid, sltid, pos);
+}
+
+/**
+ * @brief 操作系统抽象层API：从信号选择器上解绑线程屏障。
+ * @param barid: (I) 线程屏障的ID
+ * @param sltid: (I) 信号选择器的ID
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -ETYPE: 信号选择器类型错误
+ * @note
+ * - 同步/异步：异步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：对于同一个 *barid* ，不可重入
+ */
+static __xwos_inline_api
+xwer_t xwosal_barrier_unbind(xwid_t barid, xwid_t sltid)
+{
+        return xwosdl_barrier_unbind(barid, sltid);
+}
+
+/**
  * @brief 操作系统抽象层API：中断线程屏障等待队列中的所有节点。
  * @param barid: (I) 线程屏障ID
  * @return 错误码

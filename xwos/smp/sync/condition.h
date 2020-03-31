@@ -17,19 +17,20 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/object.h>
+#include <xwos/smp/sync/object.h>
 #include <xwos/smp/plwq.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwos_tcb;
+struct xwsync_evt;
 
 /**
  * @brief 条件量对象
  */
 struct xwsync_cdt {
-        struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
+        struct xwsync_object xwsyncobj; /**< C语言面向对象：继承struct xwsync_object */
         xwssq_t count; /**< 计数器：<0，条件量处于负状态；*/
         union {
                 struct xwos_plwq pl; /**< 管道的等待队列 */
@@ -51,7 +52,7 @@ struct xwsync_cdt {
 static __xw_inline
 xwer_t xwsync_cdt_grab(struct xwsync_cdt * cdt)
 {
-        return xwos_object_grab(&cdt->xwobj);
+        return xwsync_object_grab(&cdt->xwsyncobj);
 }
 
 /**
@@ -62,7 +63,7 @@ xwer_t xwsync_cdt_grab(struct xwsync_cdt * cdt)
 static __xw_inline
 xwer_t xwsync_cdt_put(struct xwsync_cdt * cdt)
 {
-        return xwos_object_put(&cdt->xwobj);
+        return xwsync_object_put(&cdt->xwsyncobj);
 }
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -90,7 +91,11 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt, struct xwos_tcb * tcb,
                                xwtm_t * xwtm, xwsq_t * lkst);
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
+ ********       internal inline function implementations        ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********       API function prototypes       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWSMPCFG_SYNC_CDT_MEMSLICE) && (1 == XWSMPCFG_SYNC_CDT_MEMSLICE)
 __xwos_init_code
@@ -104,10 +109,18 @@ __xwos_api
 xwer_t xwsync_cdt_delete(struct xwsync_cdt * cdt);
 
 __xwos_api
-xwer_t xwsync_cdt_destroy(struct xwsync_cdt * cdt);
+xwer_t xwsync_cdt_init(struct xwsync_cdt * cdt);
 
 __xwos_api
-xwer_t xwsync_cdt_init(struct xwsync_cdt * cdt);
+xwer_t xwsync_cdt_destroy(struct xwsync_cdt * cdt);
+
+#if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
+__xwos_api
+xwer_t xwsync_cdt_bind(struct xwsync_cdt * cdt, struct xwsync_evt * evt, xwsq_t pos);
+
+__xwos_api
+xwer_t xwsync_cdt_unbind(struct xwsync_cdt * cdt, struct xwsync_evt * evt);
+#endif /* XWSMPCFG_SYNC_EVT */
 
 __xwos_api
 xwer_t xwsync_cdt_freeze(struct xwsync_cdt * cdt);
@@ -151,12 +164,6 @@ xwer_t xwsync_cdt_timedwait(struct xwsync_cdt * cdt,
  * - 中断上下文：不可以使用
  * - 中断底半部：不可以使用
  * - 线程上下文：可以使用
- * @note
- * - 调用的线程会加入到条件量的等待队列中等待。在这个过程中，线程还可以解锁
- *   已经取得的锁。注意整个过程是原子的（不可打断的）。此函数支持的“锁”的类型
- *   有很多种，因此，传递锁的指针的参数指定为类型void * ，具体的类型由参数
- *   lktype决定。有些“锁”可能还需要额外的参数，由lkdata指明首地址，datanum
- *   指明数据的数量或大小。这个函数返回时，会在lkst中返回锁的状态。
  */
 static __xwos_inline_api
 xwer_t xwsync_cdt_wait(struct xwsync_cdt * cdt,

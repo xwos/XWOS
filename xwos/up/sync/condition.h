@@ -10,14 +10,17 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __xwos_up_sync_cdt_h__
-#define __xwos_up_sync_cdt_h__
+#ifndef __xwos_up_sync_condition_h__
+#define __xwos_up_sync_condition_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/up/plwq.h>
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+  #include <xwos/up/sync/object.h>
+#endif /* XWUPCFG_SYNC_EVT */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      macros       ******** ******** ********
@@ -29,9 +32,12 @@
 struct xwos_tcb;
 
 /**
- * @brief 事件条件量对象
+ * @brief 条件量对象
  */
 struct xwsync_cdt {
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+        struct xwsync_object xwsyncobj; /**< C语言面向对象：继承struct xwsync_object */
+#endif /* XWUPCFG_SYNC_EVT */
         bool neg; /**< 是否为负 */
         struct xwos_plwq wq; /**< 等待队列 */
 };
@@ -56,7 +62,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
                                struct xwos_tcb * tcb,
                                void * lock, xwsq_t lktype,
                                void * lkdata, xwsz_t datanum,
-                               xwtm_t * xwtm, xwsq_t * lkst);;
+                               xwtm_t * xwtm, xwsq_t * lkst);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ********       internal inline function implementations        ********
@@ -77,11 +83,19 @@ xwer_t xwsync_cdt_create(struct xwsync_cdt ** ptrbuf);
 __xwos_api
 xwer_t xwsync_cdt_delete(struct xwsync_cdt * cdt);
 
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
 __xwos_api
-xwer_t xwsync_cdt_thaw(struct xwsync_cdt * cdt);
+xwer_t xwsync_cdt_bind(struct xwsync_cdt * cdt, struct xwsync_evt * evt, xwsq_t pos);
+
+__xwos_api
+xwer_t xwsync_cdt_unbind(struct xwsync_cdt * cdt, struct xwsync_evt * evt);
+#endif /* XWUPCFG_SYNC_EVT */
 
 __xwos_api
 xwer_t xwsync_cdt_freeze(struct xwsync_cdt * cdt);
+
+__xwos_api
+xwer_t xwsync_cdt_thaw(struct xwsync_cdt * cdt);
 
 __xwos_api
 xwer_t xwsync_cdt_intr_all(struct xwsync_cdt * cdt);
@@ -126,11 +140,9 @@ xwer_t xwsync_cdt_wait(struct xwsync_cdt * cdt,
                        void * lkdata, xwsz_t datanum,
                        xwsq_t * lkst)
 {
-        xwtm_t expected;
-
-        expected = XWTM_MAX;
+        xwtm_t expected = XWTM_MAX;
         return xwsync_cdt_timedwait(cdt, lock, lktype, lkdata, datanum,
                                     &expected, lkst);
 }
 
-#endif /* xwos/up/sync/cdt.h */
+#endif /* xwos/up/sync/condition.h */

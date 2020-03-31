@@ -313,9 +313,9 @@ xwer_t xwsync_plsmr_post(struct xwsync_plsmr * smr)
                         if (smr->vsmr.count > 0) {
                                 struct xwsync_evt * evt;
 
-                                evt = smr->vsmr.selector.evt;
+                                evt = smr->vsmr.xwsyncobj.selector.evt;
                                 if (NULL != evt) {
-                                        xwsync_evt_smr_s1i(evt, &smr->vsmr);
+                                        xwsync_evt_obj_s1i(evt, &smr->vsmr.xwsyncobj);
                                 }
                         }
 #endif /* XWUPCFG_SYNC_EVT */
@@ -354,9 +354,9 @@ xwer_t xwsync_plsmr_trywait(struct xwsync_plsmr * smr)
                 if (0 == smr->vsmr.count) {
                         struct xwsync_evt * evt;
 
-                        evt = smr->vsmr.selector.evt;
+                        evt = smr->vsmr.xwsyncobj.selector.evt;
                         if (NULL != evt) {
-                                xwsync_evt_smr_c0i(evt, &smr->vsmr);
+                                xwsync_evt_obj_c0i(evt, &smr->vsmr.xwsyncobj);
                         }
                 }
 #endif /* XWUPCFG_SYNC_EVT */
@@ -511,9 +511,9 @@ xwer_t xwsync_plsmr_do_timedwait(struct xwsync_plsmr * smr, struct xwos_tcb * tc
                 if (0 == smr->vsmr.count) {
                         struct xwsync_evt * evt;
 
-                        evt = smr->vsmr.selector.evt;
+                        evt = smr->vsmr.xwsyncobj.selector.evt;
                         if (NULL != evt) {
-                                xwsync_evt_smr_c0i(evt, &smr->vsmr);
+                                xwsync_evt_obj_c0i(evt, &smr->vsmr.xwsyncobj);
                         }
                 }
 #endif /* XWUPCFG_SYNC_EVT */
@@ -617,9 +617,9 @@ xwer_t xwsync_plsmr_do_wait_unintr(struct xwsync_plsmr * smr, struct xwos_tcb * 
                 if (0 == smr->vsmr.count) {
                         struct xwsync_evt * evt;
 
-                        evt = smr->vsmr.selector.evt;
+                        evt = smr->vsmr.xwsyncobj.selector.evt;
                         if (NULL != evt) {
-                                xwsync_evt_smr_c0i(evt, &smr->vsmr);
+                                xwsync_evt_obj_c0i(evt, &smr->vsmr.xwsyncobj);
                         }
                 }
 #endif /* XWUPCFG_SYNC_EVT */

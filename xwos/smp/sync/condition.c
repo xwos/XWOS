@@ -34,6 +34,8 @@
 #include <xwos/smp/lock/spinlock.h>
 #include <xwos/smp/lock/seqlock.h>
 #include <xwos/smp/lock/mutex.h>
+#include <xwos/smp/sync/object.h>
+#include <xwos/smp/sync/event.h>
 #include <xwos/smp/sync/condition.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -171,7 +173,7 @@ void xwsync_cdt_free(struct xwsync_cdt * cdt)
 __xwos_code
 void xwsync_cdt_construct(struct xwsync_cdt * cdt)
 {
-        xwos_object_construct(&cdt->xwobj);
+        xwsync_object_construct(&cdt->xwsyncobj);
 }
 
 /**
@@ -181,7 +183,7 @@ void xwsync_cdt_construct(struct xwsync_cdt * cdt)
 __xwos_code
 void xwsync_cdt_destruct(struct xwsync_cdt * cdt)
 {
-        xwos_object_destruct(&cdt->xwobj);
+        xwsync_object_destruct(&cdt->xwsyncobj);
 }
 
 /**
@@ -210,7 +212,7 @@ xwer_t xwsync_cdt_activate(struct xwsync_cdt * cdt, xwobj_gc_f gcfunc)
 {
         xwer_t rc;
 
-        rc = xwos_object_activate(&cdt->xwobj, gcfunc);
+        rc = xwsync_object_activate(&cdt->xwsyncobj, gcfunc);
         if (__likely(OK == rc)) {
                 xwos_plwq_init(&cdt->wq.pl);
                 cdt->count = XWSYNC_CDT_POSITIVE;
@@ -219,7 +221,7 @@ xwer_t xwsync_cdt_activate(struct xwsync_cdt * cdt, xwobj_gc_f gcfunc)
 }
 
 /**
- * @brief XWOS API：静态始化成条件量。
+ * @brief XWOS API：静态始化成条件量
  * @param cdt: (I) 条件量对象的指针
  * @return 错误码
  * @retval OK: OK
@@ -245,7 +247,7 @@ xwer_t xwsync_cdt_init(struct xwsync_cdt * cdt)
  * @retval OK: OK
  * @retval -EFAULT: 空指针
  * @note
- * - 同步/异步：异步
+ * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *cdt* ，不可重入
  */
@@ -310,6 +312,71 @@ xwer_t xwsync_cdt_delete(struct xwsync_cdt * cdt)
         return xwsync_cdt_put(cdt);
 }
 
+#if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
+/**
+ * @brief XWOS API：绑定条件量到事件对象，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ * @param cdt: (I) 条件量对象的指针
+ * @param evt: (I) 事件对象的指针
+ * @param pos: (I) 条件量对象映射到位图中的位置
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -ETYPE: 事件对象或条件量类型错误
+ * @retval -EFAULT: 空指针
+ * @note
+ * - 同步/异步：异步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：对于同一个 *cdt* ，不可重入
+ */
+__xwos_api
+xwer_t xwsync_cdt_bind(struct xwsync_cdt * cdt, struct xwsync_evt * evt, xwsq_t pos)
+{
+        xwreg_t cpuirq;
+        xwer_t rc;
+
+        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
+        XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
+
+        rc = xwsync_cdt_grab(cdt);
+        if (__likely(OK == rc)) {
+                xwos_plwq_lock_cpuirqsv(&cdt->wq.pl, &cpuirq);
+                rc = xwsync_evt_obj_bind(evt, &cdt->xwsyncobj, pos, false);
+                xwos_plwq_unlock_cpuirqrs(&cdt->wq.pl, cpuirq);
+        }
+        return rc;
+}
+
+/**
+ * @brief XWOS API：从事件对象上解绑条件量，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ * @param cdt: (I) 条件量对象的指针
+ * @param evt: (I) 事件对象的指针
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -ETYPE: 事件对象或条件量类型错误
+ * @retval -EFAULT: 空指针
+ * @note
+ * - 同步/异步：异步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：对于同一个 *cdt* ，不可重入
+ */
+__xwos_api
+xwer_t xwsync_cdt_unbind(struct xwsync_cdt * cdt, struct xwsync_evt * evt)
+{
+        xwreg_t cpuirq;
+        xwer_t rc;
+
+        XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
+        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
+
+        xwos_plwq_lock_cpuirqsv(&cdt->wq.pl, &cpuirq);
+        rc = xwsync_evt_obj_unbind(evt, &cdt->xwsyncobj, false);
+        xwos_plwq_unlock_cpuirqrs(&cdt->wq.pl, cpuirq);
+        if (OK == rc) {
+                xwsync_cdt_put(cdt);
+        }
+        return rc;
+}
+#endif /* XWSMPCFG_SYNC_EVT */
+
 /**
  * @brief XWOS API：冻结条件量（值设置为负）。
  * @param cdt: (I) 条件量对象的指针
@@ -322,7 +389,7 @@ xwer_t xwsync_cdt_delete(struct xwsync_cdt * cdt)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  * @note
- * - 的条件量不允许单播或广播，但可以被等待，
+ * - 已冻结的条件量不允许单播或广播，但可以被等待，
  *   测试条件量的线程会加入到条件量等待队列中阻塞等待。
  */
 __xwos_api
@@ -361,7 +428,7 @@ xwer_t xwsync_cdt_freeze(struct xwsync_cdt * cdt)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  * @note
- * - 此函数只对已冻结的条件量起作用。对未冻结的条件量调用此函数将返回错误码。
+ * - 此函数只对已冻结的条件量起作用。
  */
 __xwos_api
 xwer_t xwsync_cdt_thaw(struct xwsync_cdt * cdt)
@@ -508,7 +575,7 @@ xwer_t xwsync_cdt_broadcast_once(struct xwsync_cdt * cdt, bool * retry)
 }
 
 /**
- * @brief XWOS API：广播条件量，将等待队列中的所有线程唤醒。
+ * @brief XWOS API：广播条件量，将等待队列中的所有线程唤醒
  * @param cdt: (I) 条件量对象的指针
  * @return 错误码
  * @retval OK: OK
@@ -535,6 +602,18 @@ xwer_t xwsync_cdt_broadcast(struct xwsync_cdt * cdt)
                 do {
                         rc = xwsync_cdt_broadcast_once(cdt, &retry);
                 } while (retry);
+#if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
+                if (__likely(OK == rc)) {
+                        struct xwsync_evt * evt;
+                        struct xwsync_object * xwsyncobj;
+
+                        xwsyncobj = &cdt->xwsyncobj;
+                        xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
+                        if (NULL != evt) {
+                                xwsync_evt_obj_s1i(evt, xwsyncobj);
+                        }
+                }
+#endif /* XWSMPCFG_SYNC_EVT */
                 xwsync_cdt_put(cdt);
         }/* else {} */
         return rc;
@@ -575,7 +654,7 @@ xwer_t xwsync_cdt_do_unicast(struct xwsync_cdt * cdt)
 }
 
 /**
- * @brief XWOS API：单播条件量，只会唤醒等待队列最前面的一个线程。
+ * @brief XWOS API：单播条件量，只会唤醒等待队列最前面的一个线程
  * @param cdt: (I) 条件量对象的指针
  * @return 错误码
  * @retval OK: OK

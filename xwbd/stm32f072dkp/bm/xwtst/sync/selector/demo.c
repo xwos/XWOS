@@ -108,15 +108,15 @@ xwer_t bm_xwtst_sync_selector_start(void)
         smrid1 = xwosal_smr_get_id(&xwtst_sync_smr1);
         smrid2 = xwosal_smr_get_id(&xwtst_sync_smr2);
 
-        rc = xwosal_selector_bind(sltid, smrid0, 0);
+        rc = xwosal_smr_bind(smrid0, sltid, 0);
         if (rc < 0) {
                 goto err_smr0_bind;
         }
-        rc = xwosal_selector_bind(sltid, smrid1, 1);
+        rc = xwosal_smr_bind(smrid1, sltid, 1);
         if (rc < 0) {
                 goto err_smr1_bind;
         }
-        rc = xwosal_selector_bind(sltid, smrid2, 2);
+        rc = xwosal_smr_bind(smrid2, sltid, 2);
         if (rc < 0) {
                 goto err_smr2_bind;
         }
@@ -150,11 +150,11 @@ err_ithrd_create:
         xwosal_thrd_terminate(bm_xwtst_sync_selector_wthrd, NULL);
         xwosal_thrd_delete(bm_xwtst_sync_selector_wthrd);
 err_wthrd_create:
-        xwosal_selector_unbind(sltid, smrid2);
+        xwosal_smr_unbind(smrid2, sltid);
 err_smr2_bind:
-        xwosal_selector_unbind(sltid, smrid1);
+        xwosal_smr_unbind(smrid1, sltid);
 err_smr1_bind:
-        xwosal_selector_unbind(sltid, smrid0);
+        xwosal_smr_unbind(smrid0, sltid);
 err_smr0_bind:
         xwosal_smr_destroy(&xwtst_sync_smr2);
 err_smr2_init:

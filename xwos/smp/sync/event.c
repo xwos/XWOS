@@ -25,8 +25,8 @@
 #include <xwos/smp/irq.h>
 #include <xwos/smp/thread.h>
 #include <xwos/smp/lock/spinlock.h>
+#include <xwos/smp/sync/object.h>
 #include <xwos/smp/sync/condition.h>
-#include <xwos/smp/sync/semaphore.h>
 #include <xwos/smp/sync/event.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -347,6 +347,47 @@ xwer_t xwsync_evt_destroy(struct xwsync_evt * evt)
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
 
         return xwsync_evt_put(evt);
+}
+
+/**
+ * @brief XWOS API：绑定事件对象(evt)到另一个事件对象(slt)，
+ *                  另一个事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ * @param evt: (I) 事件对象的指针
+ * @param slt: (I) 类型为XWSYNC_EVT_TYPE_SELECTOR的事件对象的指针
+ * @param pos: (I) 事件对象对象映射到位图中的位置
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -ETYPE: 事件对象或事件对象类型错误
+ * @retval -EFAULT: 空指针
+ * @note
+ * - 同步/异步：异步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：对于同一个 *evt* ，不可重入
+ */
+__xwos_api
+xwer_t xwsync_evt_bind(struct xwsync_evt * evt, struct xwsync_evt * slt, xwsq_t pos)
+{
+        return xwsync_cdt_bind(&evt->cdt, slt, pos);
+}
+
+/**
+ * @brief XWOS API：从另一个事件对象(slt)上解绑事件对象(evt)，
+ *                  另一个事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ * @param evt: (I) 事件对象的指针
+ * @param slt: (I) 类型为XWSYNC_EVT_TYPE_SELECTOR的事件对象的指针
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -ETYPE: 事件对象或条件量类型错误
+ * @retval -EFAULT: 空指针
+ * @note
+ * - 同步/异步：异步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：对于同一个 *evt* ，不可重入
+ */
+__xwos_api
+xwer_t xwsync_evt_unbind(struct xwsync_evt * evt, struct xwsync_evt * slt)
+{
+        return xwsync_cdt_unbind(&evt->cdt, slt);
 }
 
 /**
@@ -801,7 +842,7 @@ xwer_t xwsync_evt_timedwait_edge(struct xwsync_evt * evt, xwsq_t trigger,
  * @param evt: (I) 事件对象的指针
  * @param trigger: (I) 事件触发条件，取值 @ref xwsync_evt_trigger_em
  * @param action: (I) 事件触发后的动作，取值 @ref xwsync_evt_action_em
- *                    仅trigger当取值
+ *                    仅当trigger取值
  *                    @ref XWSYNC_EVT_TRIGGER_SET_ALL
  *                    @ref XWSYNC_EVT_TRIGGER_SET_ANY
  *                    @ref XWSYNC_EVT_TRIGGER_CLR_ALL
@@ -866,20 +907,23 @@ err_evt_grab:
 
 /******** type:XWSYNC_EVT_TYPE_SELECTOR ********/
 /**
- * @brief 绑定信号量到事件对象，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ * @brief 绑定同步对象到事件对象，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
  * @param evt: (I) 事件对象的指针
- * @param smr: (I) 信号量对象的指针
- * @param pos: (I) 信号量对象映射到位图中的位置
+ * @param obj: (I) 同步对象的指针
+ * @param pos: (I) 同步对象映射到位图中的位置
+ * @param exclusive: (I) 是否为独占绑定
  * @return 错误码
  * @retval OK: OK
- * @retval -ETYPE: 事件对象或信号量类型错误
+ * @retval -ETYPE: 事件对象类型错误
  * @retval -ECHRNG: 位置超出范围
- * @retval -EALREADY: 信号量已经绑定到事件对象
- * @retval -EBUSY: 通道已经被其他信号量占用
+ * @retval -EALREADY: 同步对象已经绑定到事件对象
+ * @retval -EBUSY: 通道已经被其他同步对象独占
  */
 __xwos_code
-xwer_t xwsync_evt_smr_bind(struct xwsync_evt * evt, struct xwsync_smr * smr,
-                           xwsq_t pos)
+xwer_t xwsync_evt_obj_bind(struct xwsync_evt * evt,
+                           struct xwsync_object * obj,
+                           xwsq_t pos,
+                           bool exclusive)
 {
         struct xwsync_evt * owner;
         xwreg_t cpuirq;
@@ -896,7 +940,7 @@ xwer_t xwsync_evt_smr_bind(struct xwsync_evt * evt, struct xwsync_smr * smr,
         }
 
         xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        owner = smr->selector.evt;
+        owner = obj->selector.evt;
         if (NULL != owner) {
                 rc = -EALREADY;
                 goto err_already;
@@ -906,9 +950,11 @@ xwer_t xwsync_evt_smr_bind(struct xwsync_evt * evt, struct xwsync_smr * smr,
                 rc = -EBUSY;
                 goto err_busy;
         }
-        xwbmpop_s1i(evt->msk, pos);
-        smr->selector.evt = evt;
-        smr->selector.pos = pos;
+        if (exclusive) {
+                xwbmpop_s1i(evt->msk, pos);
+        }
+        obj->selector.evt = evt;
+        obj->selector.pos = pos;
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         return OK;
 
@@ -921,16 +967,19 @@ err_evt_grab:
 }
 
 /**
- * @brief XWOS API：从事件对象上解绑信号量，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ * @brief XWOS API：从事件对象上解绑同步对象，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
  * @param evt: (I) 事件对象的指针
- * @param smr: (I) 信号量对象的指针
+ * @param obj: (I) 同步对象的指针
+ * @param exclusive: (I) 是否为独占绑定
  * @return 错误码
  * @retval OK: OK
  * @retval -ETYPE: 事件对象类型错误
- * @retval -ENOTCONN: 信号量没有绑定到事件对象上
+ * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  */
 __xwos_code
-xwer_t xwsync_evt_smr_unbind(struct xwsync_evt * evt, struct xwsync_smr * smr)
+xwer_t xwsync_evt_obj_unbind(struct xwsync_evt * evt,
+                             struct xwsync_object * obj,
+                             bool exclusive)
 {
         struct xwsync_evt * owner;
         xwreg_t cpuirq;
@@ -940,14 +989,16 @@ xwer_t xwsync_evt_smr_unbind(struct xwsync_evt * evt, struct xwsync_smr * smr)
                       "type-error", -ETYPE);
 
         xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        owner = smr->selector.evt;
+        owner = obj->selector.evt;
         if (evt != owner) {
                 rc = -ENOTCONN;
                 goto err_notconn;
         }
-        xwbmpop_c0i(evt->msk, smr->selector.pos);
-        smr->selector.evt = NULL;
-        smr->selector.pos = XWSYNC_EVT_MAXNUM;
+        if (exclusive) {
+                xwbmpop_c0i(evt->msk, obj->selector.pos);
+        }
+        obj->selector.evt = NULL;
+        obj->selector.pos = XWSYNC_EVT_MAXNUM;
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_evt_put(evt);
         return OK;
@@ -958,15 +1009,15 @@ err_notconn:
 }
 
 /**
- * @brief 在事件对象上设置信号量标志，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ * @brief 在事件对象上设置同步对象的标志位，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
  * @param evt: (I) 事件对象的指针
- * @param smr: (I) 信号量对象的指针
+ * @param obj: (I) 同步对象的指针
  * @return 错误码
  * @retval OK: OK
- * @retval -ENOTCONN: 信号量没有绑定到事件对象上
+ * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  */
 __xwos_code
-xwer_t xwsync_evt_smr_s1i(struct xwsync_evt * evt, struct xwsync_smr * smr)
+xwer_t xwsync_evt_obj_s1i(struct xwsync_evt * evt, struct xwsync_object * obj)
 {
         struct xwsync_evt * owner;
         xwreg_t cpuirq;
@@ -978,12 +1029,12 @@ xwer_t xwsync_evt_smr_s1i(struct xwsync_evt * evt, struct xwsync_smr * smr)
         }
 
         xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        owner = smr->selector.evt;
+        owner = obj->selector.evt;
         if (evt != owner) {
                 rc = -ENOTCONN;
                 goto err_notconn;
         }
-        xwbmpop_s1i(evt->bmp, smr->selector.pos);
+        xwbmpop_s1i(evt->bmp, obj->selector.pos);
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_cdt_broadcast(&evt->cdt);
         xwsync_evt_put(evt);
@@ -997,15 +1048,15 @@ err_evt_grab:
 }
 
 /**
- * @brief 在事件对象上清除信号量标志，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ * @brief 在事件对象上清除同步对象的标志位，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
  * @param evt: (I) 事件对象的指针
- * @param smr: (I) 信号量对象的指针
+ * @param obj: (I) 同步对象的指针
  * @return 错误码
  * @retval OK: OK
- * @retval -ENOTCONN: 信号量没有绑定到事件对象上
+ * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  */
 __xwos_code
-xwer_t xwsync_evt_smr_c0i(struct xwsync_evt * evt, struct xwsync_smr * smr)
+xwer_t xwsync_evt_obj_c0i(struct xwsync_evt * evt, struct xwsync_object * obj)
 {
         struct xwsync_evt * owner;
         xwreg_t cpuirq;
@@ -1017,12 +1068,12 @@ xwer_t xwsync_evt_smr_c0i(struct xwsync_evt * evt, struct xwsync_smr * smr)
         }
 
         xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        owner = smr->selector.evt;
+        owner = obj->selector.evt;
         if (evt != owner) {
                 rc = -ENOTCONN;
                 goto err_notconn;
         }
-        xwbmpop_c0i(evt->bmp, smr->selector.pos);
+        xwbmpop_c0i(evt->bmp, obj->selector.pos);
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_evt_put(evt);
         return OK;
@@ -1035,11 +1086,67 @@ err_evt_grab:
 }
 
 /**
- * @brief XWOS API：限时等待事件对象中绑定的信号量，任何信号量的V操作都可唤醒线程，
+ * @brief XWOS API：测试一下事件对象中绑定的同步对象，不进行阻塞等待。
+ * @param evt: (I) 事件对象的指针
+ * @param msk: (I) 待触发的同步对象的位图掩码，表示只关注掩码部分的信号旗。
+ * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象的位图
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 空指针
+ * @retval -ETYPE: 事件对象类型错误
+ * @retval -ENODATA: 没有任何信号或事件
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwos_api
+xwer_t xwsync_evt_tryselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
+{
+        xwer_t rc;
+        xwreg_t cpuirq;
+        bool triggered;
+
+        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
+        XWOS_VALIDATE(((evt->attr & XWSYNC_EVT_TYPE_MASK) == XWSYNC_EVT_TYPE_SELECTOR),
+                      "type-error", -ETYPE);
+
+        rc = xwsync_evt_grab(evt);
+        if (rc < 0) {
+                goto err_evt_grab;
+        }
+
+        xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        triggered = xwbmpop_t1mo(evt->bmp, msk, XWSYNC_EVT_MAXNUM);
+        if (triggered) {
+                if (NULL != trg) {
+                        xwbmpop_assign(trg, evt->bmp, XWSYNC_EVT_MAXNUM);
+                        /* Clear non-exclusive bits */
+                        xwbmpop_and(evt->bmp, evt->msk, XWSYNC_EVT_MAXNUM);
+                        xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                        xwbmpop_and(trg, msk, XWSYNC_EVT_MAXNUM);
+                } else {
+                        /* Clear non-exclusive bits */
+                        xwbmpop_and(evt->bmp, evt->msk, XWSYNC_EVT_MAXNUM);
+                        xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                }
+        } else {
+                rc = -ENODATA;
+                xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+        }
+        xwsync_evt_put(evt);
+
+err_evt_grab:
+        return rc;
+}
+
+/**
+ * @brief XWOS API：限时等待事件对象中绑定的同步对象，
  *                  事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
  * @param evt: (I) 事件对象的指针
- * @param msk: (I) 待触发的信号量的位图掩码，表示只关注掩码部分的信号旗。
- * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的信号量的位图
+ * @param msk: (I) 待触发的同步对象的位图掩码（表示只关注掩码部分的同步对象）
+ * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象的位图
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -1085,11 +1192,19 @@ xwer_t xwsync_evt_timedselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t tr
                 if (triggered) {
                         if (NULL != trg) {
                                 xwbmpop_assign(trg, evt->bmp, XWSYNC_EVT_MAXNUM);
+                                /* Clear non-exclusive bits */
+                                xwbmpop_and(evt->bmp, evt->msk, XWSYNC_EVT_MAXNUM);
+                                xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                                xwbmpop_and(trg, msk, XWSYNC_EVT_MAXNUM);
+                        } else {
+                                /* Clear non-exclusive bits */
+                                xwbmpop_and(evt->bmp, evt->msk, XWSYNC_EVT_MAXNUM);
+                                xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                         }
-                        xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
-                        xwbmpop_and(trg, msk, XWSYNC_EVT_MAXNUM);
                         break;
                 } else {
+                        /* Clear non-exclusive bits */
+                        xwbmpop_and(evt->bmp, evt->msk, XWSYNC_EVT_MAXNUM);
                         rc = xwsync_cdt_timedwait(&evt->cdt,
                                                   &evt->lock, XWLK_TYPE_SPLK_CPUIRQ,
                                                   NULL, XWOS_UNUSED_ARGUMENT,

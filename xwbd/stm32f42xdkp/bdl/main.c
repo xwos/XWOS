@@ -29,7 +29,7 @@
 #include <bm/lua/init.h>
 #include <bm/cxx/init.h>
 #include <bm/xwpcp/init.h>
-#include <bm/xwtst/sync/flag/demo.h>
+#include <bm/xwtst/sync/selector/demo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -114,15 +114,15 @@ xwer_t bdl_init_thrd(void * arg)
                 goto err_bm_xwpcp_start;
         }
 
-        rc = bm_xwtst_sync_flag_start();
+        rc = bm_xwtst_sync_selector_start();
         if (rc < 0) {
-                goto err_bm_xwtst_sync_flag_start;
+                goto err_bm_xwtst_sync_selector_start;
         }
 
         xwosal_thrd_delete(bdl_init_thrd_id);
         return OK;
 
-err_bm_xwtst_sync_flag_start:
+err_bm_xwtst_sync_selector_start:
         BDL_BUG();
 err_bm_xwpcp_start:
         BDL_BUG();

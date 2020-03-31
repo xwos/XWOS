@@ -17,6 +17,9 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+  #include <xwos/up/sync/object.h>
+#endif /* XWUPCFG_SYNC_EVT */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -27,14 +30,11 @@ struct xwsync_evt;
  * @brief 信号量的虚基类
  */
 /* abstract */ struct xwsync_vsmr {
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+        struct xwsync_object xwsyncobj; /**< C语言面向对象：继承struct xwsync_object */
+#endif /* XWUPCFG_SYNC_EVT */
         xwssq_t count; /**< 信号量计数器：如果这个成员的值<0，信号量处于负状态。*/
         xwssq_t max; /**< 信号量计数器的最大值 */
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-        struct {
-                struct xwsync_evt * evt; /**< 事件对象 */
-                xwsq_t pos; /**< 事件对象中的位图位置 */
-        } selector; /**< 选择器 */
-#endif /* XWUPCFG_SYNC_EVT */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********

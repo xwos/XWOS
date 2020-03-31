@@ -39,6 +39,7 @@
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
   #include <xwos/smp/sync/event.h>
 #endif /* XWSMPCFG_SYNC_EVT */
+#include <xwos/smp/sync/object.h>
 #include <xwos/smp/sync/semaphore.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -211,11 +212,7 @@ void xwsync_smr_free(struct xwsync_smr * smr)
 __xwos_code
 void xwsync_smr_construct(struct xwsync_smr * smr)
 {
-        xwos_object_construct(&smr->xwobj);
-#if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
-        smr->selector.evt = NULL;
-        smr->selector.pos = 0;
-#endif /* XWSMPCFG_SYNC_EVT */
+        xwsync_object_construct(&smr->xwsyncobj);
 }
 
 /**
@@ -225,11 +222,7 @@ void xwsync_smr_construct(struct xwsync_smr * smr)
 __xwos_code
 void xwsync_smr_destruct(struct xwsync_smr * smr)
 {
-#if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
-        smr->selector.evt = NULL;
-        smr->selector.pos = 0;
-#endif /* XWSMPCFG_SYNC_EVT */
-        xwos_object_destruct(&smr->xwobj);
+        xwsync_object_destruct(&smr->xwsyncobj);
 }
 
 /**
@@ -364,9 +357,9 @@ xwer_t xwsync_smr_bind(struct xwsync_smr * smr, struct xwsync_evt * evt, xwsq_t 
 #if defined(XWSMPCFG_SYNC_PLSMR) && (1 == XWSMPCFG_SYNC_PLSMR)
         case XWSYNC_SMR_TYPE_PIPELINE:
                 xwos_plwq_lock_cpuirqsv(&smr->wq.pl, &cpuirq);
-                rc = xwsync_evt_smr_bind(evt, smr, pos);
+                rc = xwsync_evt_obj_bind(evt, &smr->xwsyncobj, pos, true);
                 if ((OK == rc) && (smr->count > 0)) {
-                        rc = xwsync_evt_smr_s1i(evt, smr);
+                        rc = xwsync_evt_obj_s1i(evt, &smr->xwsyncobj);
                 }
                 xwos_plwq_unlock_cpuirqrs(&smr->wq.pl, cpuirq);
                 break;
@@ -374,9 +367,9 @@ xwer_t xwsync_smr_bind(struct xwsync_smr * smr, struct xwsync_evt * evt, xwsq_t 
 #if defined(XWSMPCFG_SYNC_RTSMR) && (1 == XWSMPCFG_SYNC_RTSMR)
         case XWSYNC_SMR_TYPE_RT:
                 xwos_rtwq_lock_cpuirqsv(&smr->wq.rt, &cpuirq);
-                rc = xwsync_evt_smr_bind(evt, smr, pos);
+                rc = xwsync_evt_obj_bind(evt, &smr->xwsyncobj, pos, true);
                 if ((OK == rc) && (smr->count > 0)) {
-                        rc = xwsync_evt_smr_s1i(evt, smr);
+                        rc = xwsync_evt_obj_s1i(evt, &smr->xwsyncobj);
                 }
                 xwos_rtwq_unlock_cpuirqrs(&smr->wq.rt, cpuirq);
                 break;
@@ -414,9 +407,9 @@ xwer_t xwsync_smr_unbind(struct xwsync_smr * smr, struct xwsync_evt * evt)
 #if defined(XWSMPCFG_SYNC_PLSMR) && (1 == XWSMPCFG_SYNC_PLSMR)
         case XWSYNC_SMR_TYPE_PIPELINE:
                 xwos_plwq_lock_cpuirqsv(&smr->wq.pl, &cpuirq);
-                rc = xwsync_evt_smr_unbind(evt, smr);
+                rc = xwsync_evt_obj_unbind(evt, &smr->xwsyncobj, true);
                 if (OK == rc) {
-                        rc = xwsync_evt_smr_c0i(evt, smr);
+                        rc = xwsync_evt_obj_c0i(evt, &smr->xwsyncobj);
                 }
                 xwos_plwq_unlock_cpuirqrs(&smr->wq.pl, cpuirq);
                 break;
@@ -424,9 +417,9 @@ xwer_t xwsync_smr_unbind(struct xwsync_smr * smr, struct xwsync_evt * evt)
 #if defined(XWSMPCFG_SYNC_RTSMR) && (1 == XWSMPCFG_SYNC_RTSMR)
         case XWSYNC_SMR_TYPE_RT:
                 xwos_rtwq_lock_cpuirqsv(&smr->wq.rt, &cpuirq);
-                rc = xwsync_evt_smr_unbind(evt, smr);
+                rc = xwsync_evt_obj_unbind(evt, &smr->xwsyncobj, true);
                 if (OK == rc) {
-                        rc = xwsync_evt_smr_c0i(evt, smr);
+                        rc = xwsync_evt_obj_c0i(evt, &smr->xwsyncobj);
                 }
                 xwos_rtwq_unlock_cpuirqrs(&smr->wq.rt, cpuirq);
                 break;
@@ -465,7 +458,7 @@ xwer_t xwsync_plsmr_activate(struct xwsync_smr * smr, xwssq_t val, xwssq_t max,
         XWOS_VALIDATE(((val >= 0) && (max > 0) && (val <= max)),
                       "invalid-value", -EINVAL);
 
-        rc = xwos_object_activate(&smr->xwobj, gcfunc);
+        rc = xwsync_object_activate(&smr->xwsyncobj, gcfunc);
         if (__likely(OK == rc)) {
                 smr->max = max;
                 xwos_plwq_init(&smr->wq.pl);
@@ -532,10 +525,12 @@ xwer_t xwsync_plsmr_freeze(struct xwsync_smr * smr)
                         smr->count = XWSYNC_SMR_NEGTIVE;
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
                         struct xwsync_evt * evt;
+                        struct xwsync_object * xwsyncobj;
 
-                        xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                        xwsyncobj = &smr->xwsyncobj;
+                        xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                         if (NULL != evt) {
-                                xwsync_evt_smr_c0i(evt, smr);
+                                xwsync_evt_obj_c0i(evt, xwsyncobj);
                         }
 #endif /* XWSMPCFG_SYNC_EVT */
                 }
@@ -587,10 +582,13 @@ xwer_t xwsync_plsmr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
                         if (smr->count > 0) {
                                 struct xwsync_evt * evt;
+                                struct xwsync_object * xwsyncobj;
 
-                                xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                                xwsyncobj = &smr->xwsyncobj;
+                                xwmb_smp_load_acquire(evt,
+                                                      &xwsyncobj->selector.evt);
                                 if (NULL != evt) {
-                                        xwsync_evt_smr_s1i(evt, smr);
+                                        xwsync_evt_obj_s1i(evt, xwsyncobj);
                                 }
                         }
 #endif /* XWSMPCFG_SYNC_EVT */
@@ -701,10 +699,14 @@ xwer_t xwsync_plsmr_post(struct xwsync_smr * smr)
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
                                 if (smr->count > 0) {
                                         struct xwsync_evt * evt;
+                                        struct xwsync_object * xwsyncobj;
 
-                                        xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                                        xwsyncobj = &smr->xwsyncobj;
+                                        xwmb_smp_load_acquire(evt,
+                                                              &xwsyncobj->selector.evt);
                                         if (NULL != evt) {
-                                                xwsync_evt_smr_s1i(evt, smr);
+                                                xwsync_evt_obj_s1i(evt,
+                                                                   xwsyncobj);
                                         }
                                 }
 #endif /* XWSMPCFG_SYNC_EVT */
@@ -747,10 +749,13 @@ xwer_t xwsync_plsmr_trywait(struct xwsync_smr * smr)
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
                         if (0 == smr->count) {
                                 struct xwsync_evt * evt;
+                                struct xwsync_object * xwsyncobj;
 
-                                xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                                xwsyncobj = &smr->xwsyncobj;
+                                xwmb_smp_load_acquire(evt,
+                                                      &xwsyncobj->selector.evt);
                                 if (NULL != evt) {
-                                        xwsync_evt_smr_c0i(evt, smr);
+                                        xwsync_evt_obj_c0i(evt, xwsyncobj);
                                 }
                         }
 #endif /* XWSMPCFG_SYNC_EVT */
@@ -941,10 +946,12 @@ xwer_t xwsync_plsmr_do_timedwait(struct xwsync_smr * smr, struct xwos_tcb * tcb,
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
                 if (0 == smr->count) {
                         struct xwsync_evt * evt;
+                        struct xwsync_object * xwsyncobj;
 
-                        xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                        xwsyncobj = &smr->xwsyncobj;
+                        xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                         if (NULL != evt) {
-                                xwsync_evt_smr_c0i(evt, smr);
+                                xwsync_evt_obj_c0i(evt, xwsyncobj);
                         }
                 }
 #endif /* XWSMPCFG_SYNC_EVT */
@@ -1062,10 +1069,12 @@ xwer_t xwsync_plsmr_do_wait_unintr(struct xwsync_smr * smr, struct xwos_tcb * tc
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
                 if (0 == smr->count) {
                         struct xwsync_evt * evt;
+                        struct xwsync_object * xwsyncobj;
 
-                        xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                        xwsyncobj = &smr->xwsyncobj;
+                        xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                         if (NULL != evt) {
-                                xwsync_evt_smr_c0i(evt, smr);
+                                xwsync_evt_obj_c0i(evt, xwsyncobj);
                         }
                 }
 #endif /* XWSMPCFG_SYNC_EVT */
@@ -1132,7 +1141,7 @@ xwer_t xwsync_rtsmr_activate(struct xwsync_smr * smr, xwssq_t val, xwssq_t max,
         XWOS_VALIDATE(((val >= 0) && (max > 0) && (val <= max)),
                       "invalid-value", -EINVAL);
 
-        rc = xwos_object_activate(&smr->xwobj, gcfunc);
+        rc = xwsync_object_activate(&smr->xwsyncobj, gcfunc);
         if (__likely(OK == rc)) {
                 smr->max = max;
                 xwos_rtwq_init(&smr->wq.rt);
@@ -1201,10 +1210,12 @@ xwer_t xwsync_rtsmr_freeze(struct xwsync_smr * smr)
                         smr->count = XWSYNC_SMR_NEGTIVE;
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
                         struct xwsync_evt * evt;
+                        struct xwsync_object * xwsyncobj;
 
-                        xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                        xwsyncobj = &smr->xwsyncobj;
+                        xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                         if (NULL != evt) {
-                                xwsync_evt_smr_c0i(evt, smr);
+                                xwsync_evt_obj_c0i(evt, xwsyncobj);
                         }
 #endif /* XWSMPCFG_SYNC_EVT */
                 }
@@ -1256,10 +1267,13 @@ xwer_t xwsync_rtsmr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
                         if (smr->count > 0) {
                                 struct xwsync_evt * evt;
+                                struct xwsync_object * xwsyncobj;
 
-                                xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                                xwsyncobj = &smr->xwsyncobj;
+                                xwmb_smp_load_acquire(evt,
+                                                      &xwsyncobj->selector.evt);
                                 if (NULL != evt) {
-                                        xwsync_evt_smr_s1i(evt, smr);
+                                        xwsync_evt_obj_s1i(evt, xwsyncobj);
                                 }
                         }
 #endif /* XWSMPCFG_SYNC_EVT */
@@ -1370,10 +1384,14 @@ xwer_t xwsync_rtsmr_post(struct xwsync_smr * smr)
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
                                 if (smr->count > 0) {
                                         struct xwsync_evt * evt;
+                                        struct xwsync_object * xwsyncobj;
 
-                                        xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                                        xwsyncobj = &smr->xwsyncobj;
+                                        xwmb_smp_load_acquire(evt,
+                                                              &xwsyncobj->selector.evt);
                                         if (NULL != evt) {
-                                                xwsync_evt_smr_s1i(evt, smr);
+                                                xwsync_evt_obj_s1i(evt,
+                                                                   xwsyncobj);
                                         }
                                 }
 #endif /* XWSMPCFG_SYNC_EVT */
@@ -1416,10 +1434,13 @@ xwer_t xwsync_rtsmr_trywait(struct xwsync_smr * smr)
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
                         if (0 == smr->count) {
                                 struct xwsync_evt * evt;
+                                struct xwsync_object * xwsyncobj;
 
-                                xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                                xwsyncobj = &smr->xwsyncobj;
+                                xwmb_smp_load_acquire(evt,
+                                                      &xwsyncobj->selector.evt);
                                 if (NULL != evt) {
-                                        xwsync_evt_smr_c0i(evt, smr);
+                                        xwsync_evt_obj_c0i(evt, xwsyncobj);
                                 }
                         }
 #endif /* XWSMPCFG_SYNC_EVT */
@@ -1610,10 +1631,12 @@ xwer_t xwsync_rtsmr_do_timedwait(struct xwsync_smr * smr, struct xwos_tcb * tcb,
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
                 if (0 == smr->count) {
                         struct xwsync_evt * evt;
+                        struct xwsync_object * xwsyncobj;
 
-                        xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                        xwsyncobj = &smr->xwsyncobj;
+                        xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                         if (NULL != evt) {
-                                xwsync_evt_smr_c0i(evt, smr);
+                                xwsync_evt_obj_c0i(evt, xwsyncobj);
                         }
                 }
 #endif /* XWSMPCFG_SYNC_EVT */
@@ -1731,10 +1754,12 @@ xwer_t xwsync_rtsmr_do_wait_unintr(struct xwsync_smr * smr, struct xwos_tcb * tc
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
                 if (0 == smr->count) {
                         struct xwsync_evt * evt;
+                        struct xwsync_object * xwsyncobj;
 
-                        xwmb_smp_load_acquire(evt, &smr->selector.evt);
+                        xwsyncobj = &smr->xwsyncobj;
+                        xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                         if (NULL != evt) {
-                                xwsync_evt_smr_c0i(evt, smr);
+                                xwsync_evt_obj_c0i(evt, xwsyncobj);
                         }
                 }
 #endif /* XWSMPCFG_SYNC_EVT */

@@ -17,9 +17,9 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/object.h>
 #include <xwos/smp/rtwq.h>
 #include <xwos/smp/plwq.h>
+#include <xwos/smp/sync/object.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -45,7 +45,7 @@ enum xwsync_smr_type_em {
  * @brief 信号量对象
  */
 struct xwsync_smr {
-        struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
+        struct xwsync_object xwsyncobj; /**< C语言面向对象：继承struct xwsync_object */
         xwid_t type; /**< 类型 */
         xwssq_t count; /**< 信号量计数器：<0，信号量处于负状态。*/
         xwssq_t max; /**< 信号量计数器的最大值 */
@@ -57,12 +57,6 @@ struct xwsync_smr {
                 struct xwos_plwq pl; /**< 管道信号量的等待队列 */
 #endif /* XWSMPCFG_SYNC_PLSMR */
         } wq; /**< 等待队列 */
-#if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
-        struct {
-                struct xwsync_evt * evt; /**< 事件对象 */
-                xwsq_t pos; /**< 事件对象中的位图位置 */
-        } selector; /**< 选择器 */
-#endif /* XWSMPCFG_SYNC_EVT */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -90,7 +84,7 @@ struct xwsync_smr {
 static __xw_inline
 xwer_t xwsync_smr_grab(struct xwsync_smr * smr)
 {
-        return xwos_object_grab(&smr->xwobj);
+        return xwsync_object_grab(&smr->xwsyncobj);
 }
 
 /**
@@ -101,7 +95,7 @@ xwer_t xwsync_smr_grab(struct xwsync_smr * smr)
 static __xw_inline
 xwer_t xwsync_smr_put(struct xwsync_smr * smr)
 {
-        return xwos_object_put(&smr->xwobj);
+        return xwsync_object_put(&smr->xwsyncobj);
 }
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -141,11 +135,13 @@ xwer_t xwsync_smr_delete(struct xwsync_smr * smr);
 __xwos_api
 xwer_t xwsync_smr_destroy(struct xwsync_smr * smr);
 
+#if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
 __xwos_api
 xwer_t xwsync_smr_bind(struct xwsync_smr * smr, struct xwsync_evt * evt, xwsq_t pos);
 
 __xwos_api
 xwer_t xwsync_smr_unbind(struct xwsync_smr * smr, struct xwsync_evt * evt);
+#endif /* XWSMPCFG_SYNC_EVT */
 
 #if defined(XWSMPCFG_SYNC_PLSMR) && (1 == XWSMPCFG_SYNC_PLSMR)
 __xwos_api
