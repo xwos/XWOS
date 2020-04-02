@@ -81,7 +81,7 @@ __xwos_rodata const char xwos_swt_cache_name[] = "cache.swt.xwos";
  * @param zone_size: (I) 内存区域大小
  * @return 错误码
  * @note
- * - 只可在系统初始化时使用一次。
+ * - 重入性：只可在系统初始化时使用一次
  */
 __xwos_init_code
 xwer_t xwos_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)

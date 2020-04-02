@@ -87,12 +87,12 @@ xwer_t xwsync_evt_timedwait_edge(struct xwsync_evt * evt, xwsq_t trigger,
 /******** ******** memslice ******** ********/
 #if defined(XWSMPCFG_SYNC_EVT_MEMSLICE) && (1 == XWSMPCFG_SYNC_EVT_MEMSLICE)
 /**
- * @brief XWOS INIT CODE：初始化结构体xwsync_evt的对象缓存。
+ * @brief XWOS INIT CODE：初始化结构体xwsync_evt的对象缓存
  * @param zone_origin: (I) 内存区域的首地址
  * @param zone_size: (I) 内存区域的大小
  * @return 错误码
  * @note
- * - 重入性：只可在系统初始化时使用一次。
+ * - 重入性：只可在系统初始化时使用一次
  */
 __xwos_init_code
 xwer_t xwsync_evt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
@@ -115,7 +115,7 @@ xwer_t xwsync_evt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 #endif /* XWSMPCFG_SYNC_EVT_MEMSLICE */
 
 /**
- * @brief 从事件对象缓存中申请对象。
+ * @brief 从事件对象缓存中申请对象
  * @return 事件对象的指针
  */
 static __xwos_code
@@ -151,7 +151,7 @@ struct xwsync_evt * xwsync_evt_alloc(void)
 }
 
 /**
- * @brief 释放事件对象。
+ * @brief 释放事件对象
  * @param evt: (I) 事件对象的指针
  */
 static __xwos_code
@@ -166,7 +166,7 @@ void xwsync_evt_free(struct xwsync_evt * evt)
 }
 
 /**
- * @brief 事件对象的构造函数。
+ * @brief 事件对象的构造函数
  * @param evt: (I) 事件对象的指针
  */
 static __xwos_code
@@ -176,7 +176,7 @@ void xwsync_evt_construct(struct xwsync_evt * evt)
 }
 
 /**
- * @brief 事件对象的析构函数。
+ * @brief 事件对象的析构函数
  * @param evt: (I) 事件对象的指针
  */
 static __xwos_code
@@ -186,7 +186,7 @@ void xwsync_evt_destruct(struct xwsync_evt * evt)
 }
 
 /**
- * @brief 事件对象的垃圾回收函数。
+ * @brief 事件对象的垃圾回收函数
  * @param evt: (I) 事件对象的指针
  * @return 错误码
  */
@@ -198,19 +198,20 @@ xwer_t xwsync_evt_gc(void * evt)
 }
 
 /**
- * @brief XWOS API：激活并初始化事件对象。
+ * @brief XWOS API：激活并初始化事件对象
  * @param evt: (I) 事件对象的指针
  * @param initval: (I) 事件的数组的初始态
  * @param attr: (I) 事件的属性，取值 @ref xwsync_evt_attr_em
- * @param gcfunc: (I) 垃圾回收函数的指针，由于静态初始化的线程所有资源都是由
- *                    用户自己提供的，因此当事件不使用时，回收资源的函数也
- *                    需要用户自己提供。
+ * @param gcfunc: (I) 垃圾回收函数的指针
  * @return 错误码
  * @retval OK: OK
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *evt* ，不可重入。
+ * - 重入性：对于同一个 *evt* ，不可重入
+ * @note
+ * - 由于静态初始化的对象所有资源都是由用户自己提供的，
+ *   因此当信号量不使用时，回收资源的函数也需要用户自己提供。
  */
 static __xwos_code
 xwer_t xwsync_evt_activate(struct xwsync_evt * evt, xwbmp_t initval[],
@@ -248,7 +249,7 @@ xwer_t xwsync_evt_activate(struct xwsync_evt * evt, xwbmp_t initval[],
 }
 
 /**
- * @brief XWOS API：动态创建事件对象。
+ * @brief XWOS API：动态创建事件对象
  * @param ptrbuf: (O) 指向缓冲区的指针，通过此缓冲区返回对象的指针
  * @param initval: (I) 事件的数组的初始态，如果为NULL，初始值全部为0
  * @param attr: (I) 事件的属性，取值范围 @ref xwsync_evt_attr_em
@@ -287,7 +288,7 @@ xwer_t xwsync_evt_create(struct xwsync_evt ** ptrbuf, xwbmp_t initval[], xwsq_t 
 }
 
 /**
- * @brief XWOS API：删除动态创建的事件对象。
+ * @brief XWOS API：删除动态创建的事件对象
  * @param evt: (I) 事件对象的指针
  * @return 错误码
  * @retval OK: OK
@@ -306,7 +307,7 @@ xwer_t xwsync_evt_delete(struct xwsync_evt * evt)
 }
 
 /**
- * @brief XWOS API：静态初始化事件对象。
+ * @brief XWOS API：静态初始化事件对象
  * @param evt: (I) 事件对象的指针
  * @param initval: (I) 事件的数组的初始态，如果为NULL，初始值全部为0
  * @param attr: (I) 事件的属性，取值范围 @ref xwsync_evt_attr_em
@@ -331,7 +332,7 @@ xwer_t xwsync_evt_init(struct xwsync_evt * evt, xwbmp_t initval[], xwsq_t attr)
 }
 
 /**
- * @brief XWOS API：销毁静态方式初始化的事件对象。
+ * @brief XWOS API：销毁静态方式初始化的事件对象
  * @param evt: (I) 事件对象的指针
  * @return 错误码
  * @retval OK: OK
@@ -351,7 +352,7 @@ xwer_t xwsync_evt_destroy(struct xwsync_evt * evt)
 
 /**
  * @brief XWOS API：绑定事件对象(evt)到另一个事件对象(slt)，
- *                  另一个事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ *                  另一个事件对象类型为XWSYNC_EVT_TYPE_SELECTOR
  * @param evt: (I) 事件对象的指针
  * @param slt: (I) 类型为XWSYNC_EVT_TYPE_SELECTOR的事件对象的指针
  * @param pos: (I) 事件对象对象映射到位图中的位置
@@ -372,7 +373,7 @@ xwer_t xwsync_evt_bind(struct xwsync_evt * evt, struct xwsync_evt * slt, xwsq_t 
 
 /**
  * @brief XWOS API：从另一个事件对象(slt)上解绑事件对象(evt)，
- *                  另一个事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ *                  另一个事件对象类型为XWSYNC_EVT_TYPE_SELECTOR
  * @param evt: (I) 事件对象的指针
  * @param slt: (I) 类型为XWSYNC_EVT_TYPE_SELECTOR的事件对象的指针
  * @return 错误码
@@ -391,7 +392,7 @@ xwer_t xwsync_evt_unbind(struct xwsync_evt * evt, struct xwsync_evt * slt)
 }
 
 /**
- * @brief XWOS API：中断事件等待队列中的所有节点。
+ * @brief XWOS API：中断事件等待队列中的所有节点
  * @param evt: (I) 事件对象的指针
  * @return 错误码
  * @retval OK: OK
@@ -412,7 +413,7 @@ xwer_t xwsync_evt_intr_all(struct xwsync_evt * evt)
 
 /******** type:XWSYNC_EVT_TYPE_FLAG ********/
 /**
- * @brief XWOS API：同时设置多个事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG。
+ * @brief XWOS API：同时设置多个事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
  * @param msk: (I) 事件信号旗的位图掩码
  * @return 错误码
@@ -451,7 +452,7 @@ err_evt_grab:
 }
 
 /**
- * @brief XWOS API：设置单个事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG。
+ * @brief XWOS API：设置单个事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 事件信号旗的序号
  * @return 错误码
@@ -489,7 +490,7 @@ err_evt_grab:
 }
 
 /**
- * @brief XWOS API：同时清除多个事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG。
+ * @brief XWOS API：同时清除多个事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
  * @param msk: (I) 事件信号旗的位图掩码
  * @return 错误码
@@ -528,7 +529,7 @@ err_evt_grab:
 }
 
 /**
- * @brief XWOS API：清除单个事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG。
+ * @brief XWOS API：清除单个事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 事件信号旗的序号
  * @return 错误码
@@ -568,7 +569,7 @@ err_evt_grab:
 }
 
 /**
- * @brief XWOS API：同时翻转多个事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG。
+ * @brief XWOS API：同时翻转多个事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
  * @param msk: (I) 事件信号旗的位图掩码
  * @return 错误码
@@ -607,7 +608,7 @@ err_evt_grab:
 }
 
 /**
- * @brief XWOS API：翻转单个事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG。
+ * @brief XWOS API：翻转单个事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 事件信号旗的序号
  * @return 错误码
@@ -838,7 +839,7 @@ xwer_t xwsync_evt_timedwait_edge(struct xwsync_evt * evt, xwsq_t trigger,
 }
 
 /**
- * @brief XWOS API：限时等待事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG。
+ * @brief XWOS API：限时等待事件对象中的信号，事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
  * @param trigger: (I) 事件触发条件，取值 @ref xwsync_evt_trigger_em
  * @param action: (I) 事件触发后的动作，取值 @ref xwsync_evt_action_em
@@ -852,13 +853,13 @@ xwer_t xwsync_evt_timedwait_edge(struct xwsync_evt * evt, xwsq_t trigger,
  *                @ref XWSYNC_EVT_TRIGGER_TGL_ALL 以及
  *                @ref XWSYNC_EVT_TRIGGER_TGL_ANY
  *                时有效，其他情况不使用此参数，可填NULL：
- *                (I) 作为输入时，作为事件信号旗的初始值；
+ *                (I) 作为输入时，作为事件信号旗的初始值
  *                (O) 作为输出时，返回线程被唤醒时的事件对象中信号旗位图状态
- *                    （可作为下一次调用的初始值）。
- * @param msk: (I) 事件信号旗的位图掩码，表示只关注掩码部分的信号旗。
+ *                    （可作为下一次调用的初始值）
+ * @param msk: (I) 事件信号旗的位图掩码，表示只关注掩码部分的信号旗
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间；
- *              (O) 作为输出时，返回剩余的期望时间。
+ *              (I) 作为输入时，表示期望的阻塞等待时间
+ *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval OK: OK
  * @retval -EFAULT: 空指针
@@ -907,7 +908,7 @@ err_evt_grab:
 
 /******** type:XWSYNC_EVT_TYPE_SELECTOR ********/
 /**
- * @brief 绑定同步对象到事件对象，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ * @brief 绑定同步对象到事件对象，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR
  * @param evt: (I) 事件对象的指针
  * @param obj: (I) 同步对象的指针
  * @param pos: (I) 同步对象映射到位图中的位置
@@ -967,7 +968,7 @@ err_evt_grab:
 }
 
 /**
- * @brief XWOS API：从事件对象上解绑同步对象，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ * @brief XWOS API：从事件对象上解绑同步对象，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR
  * @param evt: (I) 事件对象的指针
  * @param obj: (I) 同步对象的指针
  * @param exclusive: (I) 是否为独占绑定
@@ -1009,7 +1010,7 @@ err_notconn:
 }
 
 /**
- * @brief 在事件对象上设置同步对象的标志位，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ * @brief 在事件对象上设置同步对象的标志位，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR
  * @param evt: (I) 事件对象的指针
  * @param obj: (I) 同步对象的指针
  * @return 错误码
@@ -1048,7 +1049,7 @@ err_evt_grab:
 }
 
 /**
- * @brief 在事件对象上清除同步对象的标志位，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ * @brief 在事件对象上清除同步对象的标志位，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR
  * @param evt: (I) 事件对象的指针
  * @param obj: (I) 同步对象的指针
  * @return 错误码
@@ -1086,9 +1087,9 @@ err_evt_grab:
 }
 
 /**
- * @brief XWOS API：测试一下事件对象中绑定的同步对象，不进行阻塞等待。
+ * @brief XWOS API：测试一下事件对象中绑定的同步对象，不进行阻塞等待
  * @param evt: (I) 事件对象的指针
- * @param msk: (I) 待触发的同步对象的位图掩码，表示只关注掩码部分的信号旗。
+ * @param msk: (I) 待触发的同步对象的位图掩码，表示只关注掩码部分的信号旗
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象的位图
  * @return 错误码
  * @retval OK: OK
@@ -1143,7 +1144,7 @@ err_evt_grab:
 
 /**
  * @brief XWOS API：限时等待事件对象中绑定的同步对象，
- *                  事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ *                  事件对象类型为XWSYNC_EVT_TYPE_SELECTOR
  * @param evt: (I) 事件对象的指针
  * @param msk: (I) 待触发的同步对象的位图掩码（表示只关注掩码部分的同步对象）
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象的位图
@@ -1232,7 +1233,7 @@ err_evt_grab:
 
 /******** type:XWSYNC_EVT_TYPE_BARRIER ********/
 /**
- * @brief XWOS API：限时等待与其他线程同步，事件对象类型为XWSYNC_EVT_TYPE_BARRIER。
+ * @brief XWOS API：等待所有线程到达屏障，事件对象类型为XWSYNC_EVT_TYPE_BARRIER
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 当前线程的位图位置
  * @param sync: (I) 当前线程需要同步的线程掩码

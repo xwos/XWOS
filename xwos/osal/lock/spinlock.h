@@ -37,7 +37,7 @@ struct xwosal_splk {
  ******** ******** ********       APIs        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 操作系统抽象层API：初始化自旋锁。
+ * @brief 操作系统抽象层API：初始化自旋锁
  * @param spl: (I) 自旋锁的指针
  * @note
  * - 同步/异步：同步
@@ -51,7 +51,7 @@ void xwosal_splk_init(struct xwosal_splk * spl)
 }
 
 /**
- * @brief 操作系统抽象层API：上锁自旋锁。若自旋锁已开启临界区，就自旋等待。
+ * @brief 操作系统抽象层API：上锁自旋锁，若自旋锁已开启临界区，就自旋等待
  * @param spl: (I) 自旋锁的指针
  * @note
  * - 同步/异步：同步
@@ -67,8 +67,7 @@ void xwosal_splk_lock(struct xwosal_splk * spl)
 }
 
 /**
- * @brief 操作系统抽象层API：尝试上锁自旋锁。若自旋锁已开启临界区。
- *                           若自旋锁已开启临界区，不会自旋等待。
+ * @brief 操作系统抽象层API：尝试上锁自旋锁
  * @param spl: (I) 自旋锁的指针
  * @return 错误码
  * @retval OK: OK
@@ -78,6 +77,7 @@ void xwosal_splk_lock(struct xwosal_splk * spl)
  * - 上下文：线程
  * - 重入性：不可重入
  * @note
+ * - 若自旋锁已开启临界区，立即返回，不会自旋等待。
  * - 此函数只会关闭本地CPU的抢占，因此只能保证其临界区在线程中是安全的。
  */
 static __xwos_inline_api
@@ -87,7 +87,7 @@ xwer_t xwosal_splk_trylock(struct xwosal_splk * spl)
 }
 
 /**
- * @brief 操作系统抽象层API：解锁自旋锁。
+ * @brief 操作系统抽象层API：解锁自旋锁
  * @param spl: (I) 自旋锁的指针
  * @note
  * - 同步/异步：同步
@@ -101,8 +101,7 @@ void xwosal_splk_unlock(struct xwosal_splk * spl)
 }
 
 /**
- * @brief 操作系统抽象层API：上锁自旋锁，并关闭本地CPU的中断。
- *                           若自旋锁已开启临界区，就自旋等待。
+ * @brief 操作系统抽象层API：上锁自旋锁，并关闭本地CPU的中断
  * @param spl: (I) 自旋锁的指针
  * @note
  * - 同步/异步：同步
@@ -118,8 +117,7 @@ void xwosal_splk_lock_cpuirq(struct xwosal_splk * spl)
 }
 
 /**
- * @brief 操作系统抽象层API：尝试上锁自旋锁，并关闭本地CPU的中断。
- *                           若自旋锁已开启临界区，不会自旋等待。
+ * @brief 操作系统抽象层API：尝试上锁自旋锁，并关闭本地CPU的中断
  * @param spl: (I) 自旋锁的指针
  * @return 错误码
  * @retval OK: OK
@@ -129,6 +127,7 @@ void xwosal_splk_lock_cpuirq(struct xwosal_splk * spl)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：不可重入
  * @note
+ * - 若自旋锁已开启临界区，立即返回，不会自旋等待。
  * - 此函数会关闭本地CPU的抢占与中断，因此可保证其临界区在所有上下文中都是安全的。
  */
 static __xwos_inline_api
@@ -138,7 +137,7 @@ xwer_t xwosal_splk_trylock_cpuirq(struct xwosal_splk * spl)
 }
 
 /**
- * @brief 操作系统抽象层API：解锁自旋锁，并开启本地CPU的中断。
+ * @brief 操作系统抽象层API：解锁自旋锁，并开启本地CPU的中断
  * @param spl: (I) 自旋锁的指针
  * @note
  * - 同步/异步：同步
@@ -152,8 +151,7 @@ void xwosal_splk_unlock_cpuirq(struct xwosal_splk * spl)
 }
 
 /**
- * @brief 操作系统抽象层API：上锁自旋锁，保存本地CPU的中断标志并关闭。
- *                           若自旋锁已开启临界区，就自旋等待。
+ * @brief 操作系统抽象层API：上锁自旋锁，保存本地CPU的中断标志并关闭
  * @param spl: (I) 自旋锁的指针
  * @param cpuirq: (O) 缓冲区指针，用于返回本地CPU的中断标志
  * @note
@@ -170,8 +168,7 @@ void xwosal_splk_lock_cpuirqsv(struct xwosal_splk * spl, xwreg_t * cpuirq)
 }
 
 /**
- * @brief 操作系统抽象层API：尝试上锁自旋锁，保存本地CPU的中断标志并关闭。
- *                           若自旋锁已开启临界区，不会自旋等待。
+ * @brief 操作系统抽象层API：尝试上锁自旋锁，保存本地CPU的中断标志并关闭
  * @param spl: (I) 自旋锁的指针
  * @param cpuirq: (O) 缓冲区指针，用于返回本地CPU的中断标志
  * @return 错误码
@@ -182,6 +179,7 @@ void xwosal_splk_lock_cpuirqsv(struct xwosal_splk * spl, xwreg_t * cpuirq)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：不可重入
  * @note
+ * - 若自旋锁已开启临界区，立即返回，不会自旋等待。
  * - 此函数会关闭本地CPU的抢占与中断，因此可保证其临界区在所有上下文中都是安全的。
  */
 static __xwos_inline_api
@@ -191,7 +189,7 @@ xwer_t xwosal_splk_trylock_cpuirqsv(struct xwosal_splk * spl, xwreg_t * cpuirq)
 }
 
 /**
- * @brief 操作系统抽象层API：解锁自旋锁，并恢复本地CPU的中断标志。
+ * @brief 操作系统抽象层API：解锁自旋锁，并恢复本地CPU的中断标志
  * @param spl: (I) 自旋锁的指针
  * @param cpuirq: (I) 本地CPU的中断标志
  * @note
@@ -206,8 +204,7 @@ void xwosal_splk_unlock_cpuirqrs(struct xwosal_splk * spl, xwreg_t cpuirq)
 }
 
 /**
- * @brief 操作系统抽象层API：上锁自旋锁，并关闭部分外部中断。
- *                           若自旋锁已开启临界区，就自旋等待。
+ * @brief 操作系统抽象层API：上锁自旋锁，并关闭部分外部中断
  * @param spl: (I) 自旋锁的指针
  * @param irqs: (I) 外部中断资源数组指针
  * @param num: (I) 数组中元素数量
@@ -228,8 +225,7 @@ void xwosal_splk_lock_irqs(struct xwosal_splk * spl,
 }
 
 /**
- * @brief 操作系统抽象层API：尝试上锁自旋锁，并关闭部分外部中断。
- *                           若自旋锁已开启临界区，不会自旋等待。
+ * @brief 操作系统抽象层API：尝试上锁自旋锁，并关闭部分外部中断
  * @param spl: (I) 自旋锁的指针
  * @param irqs: (I) 外部中断资源数组指针
  * @param num: (I) 数组中元素数量
@@ -241,6 +237,7 @@ void xwosal_splk_lock_irqs(struct xwosal_splk * spl,
  * - 上下文：中断资源数组中描述的中断、线程
  * - 重入性：不可重入
  * @note
+ * - 若自旋锁已开启临界区，立即返回，不会自旋等待。
  * - 此函数只会关闭本地CPU的抢占和部分外部中断，因此只能保证其临界区在这些中断
  *   与线程上下文是安全的。
  */
@@ -253,7 +250,7 @@ xwer_t xwosal_splk_trylock_irqs(struct xwosal_splk * spl,
 }
 
 /**
- * @brief 操作系统抽象层API：解锁自旋锁，并开启部分外部中断。
+ * @brief 操作系统抽象层API：解锁自旋锁，并开启部分外部中断
  * @param spl: (I) 自旋锁的指针
  * @param irqs: (I) 外部中断资源数组指针
  * @param num: (I) 数组中元素数量
@@ -271,8 +268,7 @@ void xwosal_splk_unlock_irqs(struct xwosal_splk * spl,
 }
 
 /**
- * @brief 操作系统抽象层API：上锁自旋锁，保存部分外部中断的中断标志并关闭。
- *                           若自旋锁已开启临界区，就自旋等待。
+ * @brief 操作系统抽象层API：上锁自旋锁，保存部分外部中断的中断标志并关闭
  * @param spl: (I) 自旋锁的指针
  * @param irqs: (I) 外部中断资源数组指针
  * @param flags: (O) 缓冲区指针，用于返回部分外部中断的中断标志
@@ -294,8 +290,7 @@ void xwosal_splk_lock_irqssv(struct xwosal_splk * spl,
 }
 
 /**
- * @brief 操作系统抽象层API：尝试上锁自旋锁，保存部分外部中断的中断标志并关闭。
- *                           若自旋锁已开启临界区，不会自旋等待。
+ * @brief 操作系统抽象层API：尝试上锁自旋锁，保存部分外部中断的中断标志并关闭
  * @param spl: (I) 自旋锁的指针
  * @param irqs: (I) 外部中断资源数组指针
  * @param flags: (O) 缓冲区指针，用于返回部分外部中断的中断标志
@@ -308,6 +303,7 @@ void xwosal_splk_lock_irqssv(struct xwosal_splk * spl,
  * - 上下文：中断资源数组中描述的中断、线程
  * - 重入性：不可重入
  * @note
+ * - 若自旋锁已开启临界区，立即返回，不会自旋等待。
  * - 此函数只会关闭本地CPU的抢占和部分外部中断，因此只能保证其临界区在这些中断
  *   与线程上下文是安全的。
  */
@@ -320,7 +316,7 @@ xwer_t xwosal_splk_trylock_irqssv(struct xwosal_splk * spl,
 }
 
 /**
- * @brief 操作系统抽象层API：解锁自旋锁，并恢复部分外部中断的中断标志。
+ * @brief 操作系统抽象层API：解锁自旋锁，并恢复部分外部中断的中断标志
  * @param spl: (I) 自旋锁的指针
  * @param irqs: (I) 外部中断资源数组指针
  * @param flags: (I) 部分外部中断的中断标志数组
@@ -339,8 +335,7 @@ void xwosal_splk_unlock_irqsrs(struct xwosal_splk * spl,
 }
 
 /**
- * @brief 操作系统抽象层API：上锁自旋锁，关闭本地CPU的中断底半部。
- *                           若自旋锁已开启临界区，就自旋等待。
+ * @brief 操作系统抽象层API：上锁自旋锁，关闭本地CPU的中断底半部
  * @param spl: (I) 自旋锁的指针
  * @note
  * - 同步/异步：同步
@@ -357,8 +352,7 @@ void xwosal_splk_lock_bh(struct xwosal_splk * spl)
 }
 
 /**
- * @brief 操作系统抽象层API：尝试上锁自旋锁，关闭本地CPU的中断底半部。
- *                           若自旋锁已开启临界区，不会自旋等待。
+ * @brief 操作系统抽象层API：尝试上锁自旋锁，关闭本地CPU的中断底半部
  * @param spl: (I) 自旋锁的指针
  * @return 错误码
  * @retval OK: OK
@@ -368,6 +362,7 @@ void xwosal_splk_lock_bh(struct xwosal_splk * spl)
  * - 上下文：中断底半部、线程
  * - 重入性：不可重入
  * @note
+ * - 若自旋锁已开启临界区，立即返回，不会自旋等待。
  * - 此函数只会关闭本地CPU的抢占和中断底半部，因此只能保证其临界区在线程上下文与
  *   中断底半部中是安全的。
  */
@@ -378,7 +373,7 @@ xwer_t xwosal_splk_trylock_bh(struct xwosal_splk * spl)
 }
 
 /**
- * @brief 操作系统抽象层API：解锁自旋锁，开启本地CPU的中断底半部。
+ * @brief 操作系统抽象层API：解锁自旋锁，开启本地CPU的中断底半部
  * @param spl: (I) 自旋锁的指针
  * @note
  * - 同步/异步：同步

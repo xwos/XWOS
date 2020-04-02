@@ -72,7 +72,7 @@ xwer_t xwsync_rtsmr_do_wait_unintr(struct xwsync_rtsmr * smr, struct xwos_tcb * 
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 申请实时信号量对象。
+ * @brief 申请实时信号量对象
  * @return 信号量对象的指针
  */
 static __xwos_code
@@ -92,7 +92,7 @@ struct xwsync_rtsmr * xwsync_rtsmr_alloc(void)
 }
 
 /**
- * @brief 释放实时信号量对象。
+ * @brief 释放实时信号量对象
  * @param smr: (I) 信号量对象的指针
  */
 static __xwos_code
@@ -102,7 +102,7 @@ void xwsync_rtsmr_free(struct xwsync_rtsmr * smr)
 }
 
 /**
- * @brief 激活实时信号量。
+ * @brief 激活实时信号量
  * @param smr: (I) 信号量对象的指针
  * @param val: (I) 信号量的初始值
  * @param max: (I) 信号量的最大值
@@ -123,7 +123,7 @@ void xwsync_rtsmr_activate(struct xwsync_rtsmr * smr, xwssq_t val, xwssq_t max)
 }
 
 /**
- * @brief 使得实时信号量对象无效。
+ * @brief 使得实时信号量对象无效
  * @param smr: (I) 信号量对象的指针
  */
 static __xwos_code
@@ -133,7 +133,7 @@ void xwsync_rtsmr_deactivate(struct xwsync_rtsmr * smr)
 }
 
 /**
- * @brief XWOS API：初始化实时信号量。
+ * @brief XWOS API：初始化实时信号量
  * @param smr: (I) 信号量对象的指针
  * @param val: (I) 信号量的初始值
  * @param max: (I) 信号量的最大值
@@ -158,7 +158,7 @@ xwer_t xwsync_rtsmr_init(struct xwsync_rtsmr * smr, xwssq_t val, xwssq_t max)
 }
 
 /**
- * @brief XWOS API：销毁实时信号量对象。
+ * @brief XWOS API：销毁实时信号量对象
  * @param smr: (I) 信号量对象的指针
  * @return 错误码
  * @retval OK: OK
@@ -177,7 +177,7 @@ xwer_t xwsync_rtsmr_destroy(struct xwsync_rtsmr * smr)
 }
 
 /**
- * @brief XWOS API：动态创建实时信号量。
+ * @brief XWOS API：动态创建实时信号量
  * @param ptrbuf: (O) 指向缓冲区的指针，通过此缓冲区返回对象的指针
  * @param type: (I) 信号量的类型
  * @param val: (I) 信号量的初始值
@@ -214,7 +214,7 @@ xwer_t xwsync_rtsmr_create(struct xwsync_rtsmr ** ptrbuf, xwssq_t val, xwssq_t m
 }
 
 /**
- * @brief XWOS API：删除动态创建的实时信号量。
+ * @brief XWOS API：删除动态创建的实时信号量
  * @param smr: (I) 信号量对象的指针
  * @return 错误码
  * @retval OK: OK
@@ -235,7 +235,7 @@ xwer_t xwsync_rtsmr_delete(struct xwsync_rtsmr * smr)
 }
 
 /**
- * @brief 中断实时信号量等待队列中的一个节点。
+ * @brief 中断实时信号量等待队列中的一个节点
  * @param smr: (I) 信号量对象的指针
  * @param wqn: (I) 等待队列节点
  * @return 错误码
@@ -268,12 +268,12 @@ xwer_t xwsync_rtsmr_intr(struct xwsync_rtsmr * smr, struct xwos_wqn * wqn)
 }
 
 /**
- * @brief XWOS API：发布实时信号量。
+ * @brief XWOS API：发布实时信号量
  * @param smr: (I) 实时信号量对象的指针
  * @return 错误码
  * @retval OK: OK
  * @retval -EFAULT: 空指针
- * @retval -ENEGATIVE: 信号量为负
+ * @retval -ENEGATIVE: 信号量已被冻结
  * @retval -ERANGE: 信号量的值已经最大
  * @note
  * - 同步/异步：同步
@@ -331,7 +331,7 @@ xwer_t xwsync_rtsmr_post(struct xwsync_rtsmr * smr)
 }
 
 /**
- * @brief XWOS API：尝试获取实时信号量，不会阻塞调用者。
+ * @brief XWOS API：尝试获取实时信号量
  * @param smr: (I) 信号量对象的指针
  * @retval OK: OK
  * @retval -EFAULT: 空指针
@@ -341,7 +341,7 @@ xwer_t xwsync_rtsmr_post(struct xwsync_rtsmr * smr)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  * @note
- * - 此函数可在中断上下文中使用。
+ * - 此函数不会阻塞调用者，此函数可在中断上下文中使用。
  */
 __xwos_api
 xwer_t xwsync_rtsmr_trywait(struct xwsync_rtsmr * smr)
@@ -499,7 +499,7 @@ xwer_t xwsync_rtsmr_do_timedwait(struct xwsync_rtsmr * smr, struct xwos_tcb * tc
 #if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
                 rc = xwos_scheduler_wakelock_lock();
                 if (__unlikely(rc < 0)) {
-                        /* 系统准备进入低功耗模式，线程需被冻结，返回-EINTR。*/
+                        /* 系统准备进入低功耗模式，线程需被冻结，返回-EINTR*/
                         xwos_cpuirq_restore_lc(flag);
                         rc = -EINTR;
                 } else {
@@ -532,7 +532,7 @@ xwer_t xwsync_rtsmr_do_timedwait(struct xwsync_rtsmr * smr, struct xwos_tcb * tc
 }
 
 /**
- * @brief XWOS API：获取实时信号量，若不能获取，就限时阻塞等待。
+ * @brief XWOS API：限时等待获取管道信号量
  * @param smr: (I) 信号量对象的指针
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
@@ -639,7 +639,7 @@ xwer_t xwsync_rtsmr_do_wait_unintr(struct xwsync_rtsmr * smr, struct xwos_tcb * 
 }
 
 /**
- * @brief XWOS API：获取实时信号量，若不能获取，就阻塞等待，且不可被中断。
+ * @brief XWOS API：等待并获取实时信号量，且等待不可被中断
  * @param smr: (I) 信号量对象的指针
  * @return 错误码
  * @retval OK: OK

@@ -134,10 +134,10 @@ struct xwos_scheduler_lpm {
 struct __aligned_l1cacheline xwos_scheduler {
         struct xwos_sdobj_stack_info * cstk; /**< 当前正在运行的线程的栈信息的指针
                                                   偏移：0，
-                                                  汇编代码中会使用这个成员。*/
+                                                  汇编代码中会使用这个成员 */
         struct xwos_sdobj_stack_info * pstk; /**< 前一个线程的栈信息的指针
                                                   偏移：sizeof(long)，
-                                                  汇编代码中会使用这个成员。*/
+                                                  汇编代码中会使用这个成员 */
         xwid_t id; /**< CPU ID */
         struct {
                 struct xwos_rtrq rt; /**< 实时就绪队列 */

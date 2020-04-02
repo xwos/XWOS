@@ -123,17 +123,17 @@ xwer_t xwlk_mtx_lock_unintr(struct xwlk_mtx * mtx);
  ******** ********      inline API implementations     ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief XWOS API：锁定互斥锁
+ * @brief XWOS API：等待并上锁互斥锁
  * @param mtx: (I) 互斥锁对象指针
+ * @return 错误码
  * @retval OK: OK
  * @retval -EINVAL: 无效参数
  * @retval -EDEADLOCK: 死锁
  * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
+ * - 上下文：线程
+ * - 重入性：不可重入
  */
 static __xwos_inline_api
 xwer_t xwlk_mtx_lock(struct xwlk_mtx * mtx)

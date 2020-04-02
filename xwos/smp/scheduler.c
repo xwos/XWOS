@@ -128,7 +128,7 @@ xwer_t xwos_scheduler_thaw_allfrz_lic(struct xwos_scheduler * xwsd);
  * @param xwpmdm: (I) 电源管理区域的指针
  * @return 错误码
  * @note
- * - 本函数只可在系统初始化时调用一次。
+ * - 重入性：本函数只可在系统初始化时调用一次
  */
 __xwos_init_code
 xwer_t xwos_scheduler_init_lc(struct xwos_pmdm * xwpmdm)
@@ -190,7 +190,7 @@ err_tt_init:
  * @return 错误码
  * @note
  * - 重入性：只可调用一次
- * - 此函数不会返回。
+ * - 此函数不会返回
  */
 __xwos_init_code
 xwer_t xwos_scheduler_start_lc(void)
@@ -1050,8 +1050,6 @@ xwer_t xwos_scheduler_dec_wklkcnt(struct xwos_scheduler * xwsd)
 /**
  * @brief 中断本地CPU中所有线程的阻塞或睡眠状态，并准备冻结
  * @param xwsd: (I) 调度器对象的指针
- * @note
- * - 此函数只能在本地CPU中执行。
  */
 static __xwos_code
 void xwos_scheduler_reqfrz_intr_all_lic(struct xwos_scheduler * xwsd)
@@ -1096,8 +1094,6 @@ xwer_t xwos_scheduler_notify_allfrz(struct xwos_scheduler * xwsd)
  * @brief 解冻本地CPU中的所有线程
  * @param xwsd: (I) 本地CPU调度器对象的指针
  * @return 错误码
- * @note
- * - 此函数只能在本地CPU中执行。
  */
 static __xwos_code
 xwer_t xwos_scheduler_thaw_allfrz_lic(struct xwos_scheduler * xwsd)
@@ -1213,9 +1209,9 @@ xwer_t xwos_scheduler_resume_lic(struct xwos_scheduler * xwsd)
  * - 中断底半部：不可以使用
  * - 线程上下文：不可以使用
  * - 说明：SMP系统中：
- *         1. 执行唤醒系统代码的CPU需直接在唤醒中断中执行xwos_scheduler_resume_lic()，
- *            不可触发软中断再调用。
- *         2. 其他CPU的唤醒需要通过触发软中断执行xwos_scheduler_resume_lic()。
+ *   1. 执行唤醒系统代码的CPU需直接在唤醒中断中执行xwos_scheduler_resume_lic()，
+ *      不可触发软中断再调用。
+ *   2. 其他CPU的唤醒需要通过触发软中断执行xwos_scheduler_resume_lic()。
  */
 __xwos_api
 xwer_t xwos_scheduler_resume(xwid_t cpuid)

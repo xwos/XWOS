@@ -60,7 +60,7 @@ struct xwosal_thrd_desc {
  ******** ******** ********       APIs        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 操作系统抽象层API：静态方式初始化线程。
+ * @brief 操作系统抽象层API：静态方式初始化线程
  * @param tcb: (I) 线程控制块对象的指针
  * @param name: (I) 线程的名字
  * @param mainfunc: (I) 线程函数的指针
@@ -99,7 +99,7 @@ xwer_t xwosal_thrd_init(struct xwosal_tcb * tcb,
 }
 
 /**
- * @brief 操作系统抽象层API：销毁静态方式初始化的线程。
+ * @brief 操作系统抽象层API：销毁静态方式初始化的线程
  * @param tcb: (I) 线程控制块的指针
  * @return 错误码
  * @note
@@ -114,7 +114,7 @@ xwer_t xwosal_thrd_destroy(struct xwosal_tcb * tcb)
 }
 
 /**
- * @brief 操作系统抽象层API：动态方式创建并初始化线程。
+ * @brief 操作系统抽象层API：动态方式创建并初始化线程
  * @param tidbuf: (O) 指向缓冲区的指针，通过此缓冲区返回线程ID
  * @param name: (I) 线程的名字
  * @param mainfunc: (I) 线程函数的指针
@@ -149,7 +149,7 @@ xwer_t xwosal_thrd_create(xwid_t * tidbuf,
 }
 
 /**
- * @brief 操作系统抽象层API：删除动态方式创建的线程。
+ * @brief 操作系统抽象层API：删除动态方式创建的线程
  * @param tid: (I) 线程ID
  * @return 错误码
  * @note
@@ -164,7 +164,7 @@ xwer_t xwosal_thrd_delete(xwid_t tid)
 }
 
 /**
- * @brief 操作系统抽象层API：让出当前线程的CPU，调度器重新选择线程。
+ * @brief 操作系统抽象层API：让出当前线程的CPU，调度器重新选择线程
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -177,7 +177,7 @@ void xwosal_cthrd_yield(void)
 }
 
 /**
- * @brief 操作系统抽象层API：退出当前线程。
+ * @brief 操作系统抽象层API：退出当前线程
  * @param rc: (I) 线程退出时的返回值
  * @note
  * - 同步/异步：同步
@@ -194,7 +194,7 @@ void xwosal_cthrd_exit(xwer_t rc)
 }
 
 /**
- * @brief 操作系统抽象层API：终止线程并等待它的返回值。
+ * @brief 操作系统抽象层API：终止线程并等待它的返回值
  * @param tid: (I) 线程ID
  * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回被终止线程的返回值，
  *                 可为NULL，表示不需要返回
@@ -221,7 +221,7 @@ xwer_t xwosal_thrd_terminate(xwid_t tid, xwer_t * trc)
 
 /**
  * @brief 操作系统抽象层API：判断当前线程是否可退出，
- *                           如果不是，当前线程就一直等待，直到它被终止。
+ *                           如果不是，当前线程就一直等待，直到它被终止
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -240,7 +240,7 @@ void xwosal_cthrd_wait_exit(void)
 }
 
 /**
- * @brief 操作系统抽象层API：判断当前线程是否可被冻结。
+ * @brief 操作系统抽象层API：判断当前线程是否可被冻结
  * @return 布尔值
  * @retval true: 是
  * @retval false: 否
@@ -256,7 +256,7 @@ bool xwosal_cthrd_shld_frz(void)
 }
 
 /**
- * @brief 操作系统抽象层API：判断当前线程是否可以退出。
+ * @brief 操作系统抽象层API：判断当前线程是否可以退出
  * @return 布尔值
  * @retval true: 是
  * @retval false: 否
@@ -284,7 +284,7 @@ bool xwosal_cthrd_shld_stop(void)
 
 /**
  * @brief 操作系统抽象层API：判断当前线程是否可被冻结，如果是，就冻结线程，
- *                           之后再判断线程是否可以退出。
+ *                           之后再判断线程是否可以退出
  * @param frozen (O) 指向缓冲区的指针，通过此缓冲区返回线程是否被冻结过
  * @return 布尔值
  * @retval true: 是
@@ -312,7 +312,7 @@ bool xwosal_cthrd_frz_shld_stop(bool * frozen)
 }
 
 /**
- * @brief 操作系统抽象层API：获取当前线程的线程ID。
+ * @brief 操作系统抽象层API：获取当前线程的线程ID
  * @return 线程ID
  * @note
  * - 同步/异步：同步
@@ -341,7 +341,7 @@ xwid_t xwosal_thrd_get_id(struct xwosal_tcb * tcb)
 }
 
 /**
- * @brief 操作系统抽象层API：继续已经暂停的线程。
+ * @brief 操作系统抽象层API：继续已经暂停的线程
  * @param tid: (I) 线程ID
  * @return 错误码
  * @retval OK: OK
@@ -361,7 +361,7 @@ xwer_t xwosal_thrd_continue(xwid_t tid)
 }
 
 /**
- * @brief 操作系统抽象层API：暂停当前线程。
+ * @brief 操作系统抽象层API：暂停当前线程
  * @param lock: (I) 锁
  * @param lktype: (I) 锁的类型
  * @param lkdata: (I) 锁的数据
@@ -390,14 +390,14 @@ xwer_t xwosal_cthrd_pause(union xwlk_ulock lock, xwsq_t lktype,
 }
 
 /**
- * @brief 操作系统抽象层API：限时暂停当前线程。
+ * @brief 操作系统抽象层API：限时暂停当前线程
  * @param lock: (I) 锁
  * @param lktype: (I) 锁的类型
  * @param lkdata: (I) 锁的数据
  * @param datanum: (I) 锁的数据数量
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间；
- *              (O) 作为输出时，返回剩余的期望时间。
+ *              (I) 作为输入时，表示期望的阻塞等待时间
+ *              (O) 作为输出时，返回剩余的期望时间
  * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码
  * @retval OK: OK
@@ -424,7 +424,7 @@ xwer_t xwosal_cthrd_timedpause(union xwlk_ulock lock, xwsq_t lktype,
 }
 
 /**
- * @brief 操作系统抽象层API：调用的线程睡眠一段时间。
+ * @brief 操作系统抽象层API：调用的线程睡眠一段时间
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -444,7 +444,7 @@ xwer_t xwosal_cthrd_sleep(xwtm_t * xwtm)
 }
 
 /**
- * @brief 操作系统抽象层API：调用的线程睡眠到精准的系统时间。
+ * @brief 操作系统抽象层API：调用的线程睡眠到精准的系统时间
  * @param origin: 指向缓冲区的指针，此缓冲区：
  *                (I) 作为输入时，作为时间起点
  *                (O) 作为输出时，返回线程被唤醒的时间
@@ -465,7 +465,7 @@ xwer_t xwosal_cthrd_sleep_from(xwtm_t * origin, xwtm_t inc)
 }
 
 /**
- * @brief 操作系统抽象层API：中断线程的睡眠或阻塞状态。
+ * @brief 操作系统抽象层API：中断线程的睡眠或阻塞状态
  * @param tid: (I) 线程ID
  * @return 错误码
  * @note
@@ -480,7 +480,7 @@ xwer_t xwosal_thrd_intr(xwid_t tid)
 }
 
 /**
- * @brief 操作系统抽象层API：冻结当前线程。
+ * @brief 操作系统抽象层API：冻结当前线程
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -494,7 +494,7 @@ xwer_t xwosal_cthrd_freeze(void)
 }
 
 /**
- * @brief 操作系统抽象层API：将线程迁移到其他CPU。
+ * @brief 操作系统抽象层API：将线程迁移到其他CPU
  * @param tid: (I) 线程ID
  * @param dstcpu: (I) 目标CPU的ID
  * @return 错误码

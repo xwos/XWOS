@@ -108,7 +108,7 @@ __xwos_rodata const char xwlk_mtx_cache_name[] = "cache.mtx.xwlk";
  * @param zone_size: (I) 内存区域的大小
  * @return 错误码
  * @note
- * - 只可在系统初始化时使用一次。
+ * - 只可在系统初始化时使用一次
  */
 __xwos_init_code
 xwer_t xwlk_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
@@ -217,16 +217,14 @@ xwer_t xwlk_mtx_gc(void * mtx)
  * @brief 激活互斥锁对象，并初始化
  * @param mtx: (I) 互斥锁对象的指针
  * @param sprio: (I) 互斥锁的静态优先级
- * @param gcfunc: (I) 垃圾回收函数的指针，由于静态初始化的线程所有资源都是由
- *                    用户自己提供的，因此当互斥锁不使用时，回收资源的函数也
- *                    需要用户自己提供。
+ * @param gcfunc: (I) 垃圾回收函数的指针
  * @return 错误码
  * @retval OK: OK
  * @retval -EINVAL: 无效参数
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *mtx* ，不可重入。
+ * - 重入性：对于同一个 *mtx* ，不可重入
  */
 static __xwos_code
 xwer_t xwlk_mtx_activate(struct xwlk_mtx * mtx, xwpr_t sprio,
@@ -258,7 +256,7 @@ xwer_t xwlk_mtx_activate(struct xwlk_mtx * mtx, xwpr_t sprio,
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *mtx* ，不可重入。
+ * - 重入性：对于同一个 *mtx* ，不可重入
  */
 __xwos_api
 xwer_t xwlk_mtx_init(struct xwlk_mtx * mtx, xwpr_t sprio)
@@ -282,7 +280,7 @@ xwer_t xwlk_mtx_init(struct xwlk_mtx * mtx, xwpr_t sprio)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *mtx* ，不可重入。
+ * - 重入性：对于同一个 *mtx* ，不可重入
  */
 __xwos_api
 xwer_t xwlk_mtx_destroy(struct xwlk_mtx * mtx)
@@ -304,7 +302,7 @@ xwer_t xwlk_mtx_destroy(struct xwlk_mtx * mtx)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *mtx* ，不可重入。
+ * - 重入性：对于同一个 *mtx* ，不可重入
  */
 __xwos_api
 xwer_t xwlk_mtx_create(struct xwlk_mtx ** ptrbuf, xwpr_t sprio)
@@ -343,7 +341,7 @@ xwer_t xwlk_mtx_create(struct xwlk_mtx ** ptrbuf, xwpr_t sprio)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *mtx* ，不可重入。
+ * - 重入性：对于同一个 *mtx* ，不可重入
  */
 __xwos_api
 xwer_t xwlk_mtx_delete(struct xwlk_mtx * mtx)
@@ -422,7 +420,7 @@ xwer_t xwlk_mtx_chprio_once(struct xwlk_mtx * mtx,
 }
 
 /**
- * @brief 从互斥锁开始，修改互斥锁-线程链的动态优先级
+ * @brief 从互斥锁开始，修改互斥锁——线程链的动态优先级
  * @param mtx: (I) 互斥锁对象的指针
  * @return 错误码
  */
@@ -620,7 +618,7 @@ xwer_t xwlk_mtx_unlock(struct xwlk_mtx * mtx)
 }
 
 /**
- * @brief XWOS API：尝试获取互斥锁
+ * @brief XWOS API：尝试上锁互斥锁
  * @param mtx: (I) 互斥锁对象的指针
  * @return 错误码
  * @retval OK: OK
@@ -879,7 +877,7 @@ xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx,
 }
 
 /**
- * @brief XWOS API：获取互斥锁，若互斥锁已被其他线程获取，就限时阻塞等待
+ * @brief XWOS API：限时等待并上锁互斥锁
  * @param mtx: (I) 互斥锁对象的指针
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
@@ -1008,8 +1006,7 @@ xwer_t xwlk_mtx_do_lock_unintr(struct xwlk_mtx * mtx, struct xwos_tcb * tcb)
 }
 
 /**
- * @brief XWOS API：获取互斥锁，若互斥锁已被其他线程获取，
- *                  就阻塞等待，且不可被中断
+ * @brief XWOS API：等待并上锁互斥锁，且等待不可被中断
  * @param mtx: (I) 互斥锁对象的指针
  * @return 错误码
  * @retval OK: OK

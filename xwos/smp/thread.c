@@ -118,7 +118,7 @@ __xwos_rodata const char xwos_tcb_cache_name[] = "cache.tcb.xwos";
  * @param zone_size: (I) 内存区域的大小
  * @return 错误码
  * @note
- * - 只可在系统初始化时使用一次。
+ * - 重入性：只可在系统初始化时使用一次
  */
 __xwos_init_code
 xwer_t xwos_tcb_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
@@ -286,16 +286,14 @@ xwer_t xwos_tcb_gc(void * tcb)
  * @param stack_size: (I) 线程栈的大小，以字节(byte)为单位
  * @param priority: (I) 线程的优先级
  * @param attr: (I) 线程属性，@ref xwos_sdobj_attr_em
- * @param gcfunc: (I) 垃圾回收函数的指针：因为静态初始化的线程所有资源都是由
- *                    用户自己提供的，所以当线程结束时回收资源的GC函数也需要用户
- *                    自己提供。
+ * @param gcfunc: (I) 垃圾回收函数的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：不可重入，除非tcb对象的引用计数重新为0
  * @note
- * - 在简单应用中，任务线程不会退出，也不会使用动态内存管理。
+ * - 在简单应用中，任务线程不会退出，也不会使用动态内存管理，
  *   因此设置gcfunc为NULL，不做垃圾回收处理。
  */
 static __xwos_code
@@ -443,10 +441,9 @@ void xwos_thrd_launch(struct xwos_tcb * tcb, xwos_thrd_f mainfunc, void * arg)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：不可重入，除非tcb对象的引用计数重新为0
  * @note
- * - 静态初始化线程需预先定义线程控制块对象和线程栈数组。通常定义为全局变量；
- * - 栈数组的首地址与大小，必须要满足CPU的ABI规则,
- *   例如ARM，就需要8字节对齐。因此在定义栈数组时需要__aligned(8)来修饰，
- *   且大小是8的倍数。
+ * - 静态初始化线程需预先定义线程控制块对象和线程栈数组，通常定义为全局变量；
+ * - 栈数组的首地址与大小，必须要满足CPU的ABI规则，例如ARM，就需要8字节对齐，
+ *   因此在定义栈数组时需要__aligned(8)来修饰，且大小是8的倍数。
  */
 __xwos_api
 xwer_t xwos_thrd_init(struct xwos_tcb * tcb,
@@ -509,7 +506,7 @@ xwer_t xwos_thrd_destroy(struct xwos_tcb * tcb)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  * @note
- * - 动态创建线程采用@ref xwos_tcb_gc()作为其对象的垃圾回收函数。当线程
+ * - 动态创建线程采用@ref xwos_tcb_gc()作为其对象的垃圾回收函数，当线程
  *   控制块对象引用计数为0时，系统会自动调用垃圾回收函数回收其资源。
  */
 __xwos_api
@@ -582,8 +579,6 @@ xwer_t xwos_thrd_delete(struct xwos_tcb * tcb)
  * @brief 执行退出线程的函数
  * @param tcb: (I) 线程控制块对象的指针
  * @param rc: (I) 线程的返回值
- * @note
- * - 此函数只能在本地CPU的中断上下文中执行。
  */
 __xwos_code
 xwer_t xwos_thrd_exit_lic(struct xwos_tcb * tcb, xwer_t rc)
@@ -664,8 +659,8 @@ xwer_t xwos_thrd_terminate_unlock_cb(struct xwos_tcb * tcb)
  * - 上下文：线程
  * - 重入性：可重入
  * @note
- * - 此函数通常由父线程调用，用于终止子线程。父线程会一直阻塞等待子线程退出，
- *   并获取子线程的返回值。此函数类似于POSIX线程库中的pthread_join()函数。
+ * - 此函数通常由父线程调用，用于终止子线程：父线程会一直阻塞等待子线程退出，
+ *   并获取子线程的返回值，此函数类似于POSIX线程库中的pthread_join()函数。
  * - 注意：与其他操作系统不同（POSIX的pthread_join()和Linux的kthread_stop()），
  *   XuanWuOS的线程在此函数调用之前就返回并不会引起错误，此函数的返回值是
  *   小于0的错误码，指针trc指向的缓冲区依然可以获取线程之前的返回值。
@@ -709,13 +704,13 @@ xwer_t xwos_thrd_terminate(struct xwos_tcb * tcb, xwer_t * trc)
 }
 
 /**
- * @brief XWOS API：线程判断是否可以退出，若不是，线程就阻塞直到它被终止
+ * @brief XWOS API：判断线程是否可以退出，若不是，线程就阻塞直到它被终止
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
  * @note
- * - 此函数由子线程调用，用于等待父线程发出退出信号。
+ * - 此函数由子线程调用，等待父线程发出退出信号。
  * - 在父线程需要同步获取子线程运行结果的应用场景，子线程不可在父线程
  *   调用@ref xwos_thrd_terminate()前退出。但有时子线程运行得很快，
  *   即将退出，父线程此时还没来得及调用xwos_thrd_terminate()。子线程通过调用
@@ -761,7 +756,7 @@ void xwos_cthrd_wait_exit(void)
  * @param pmtx: (O) 指向缓冲区的指针，通过此缓冲区返回互斥锁对象的指针
  * @return 错误码
  * @retval OK: OK
- * @retval -ESTALE: 状态已经被其他CPU改变。
+ * @retval -ESTALE: 状态已经被其他CPU改变
  * @note
  * - 此函数将线程(tcb)的优先级改成(dprio)，并返回接下来需要修改的互斥锁(*pmtx)
  *   的优先级。
@@ -920,7 +915,7 @@ void xwos_thrd_chprio(struct xwos_tcb * tcb)
  * @return 错误码
  * @retval OK: OK
  * @retval -EEXIST: 线程已经存在
- * @retval -ESTALE: 状态已经发生改变。(当前线程的状态可能已经被其他CPU修改)
+ * @retval -ESTALE: 状态已经发生改变(当前线程的状态可能已经被其他CPU修改)
  */
 __xwos_code
 xwer_t xwos_thrd_rq_add_head(struct xwos_tcb * tcb, xwpr_t prio)
@@ -959,7 +954,7 @@ xwer_t xwos_thrd_rq_add_head(struct xwos_tcb * tcb, xwpr_t prio)
  * @return 错误码
  * @retval OK: OK
  * @retval -EEXIST: 线程已经存在
- * @retval -ESTALE: 状态已经发生改变。(当前线程的状态可能已经被其他CPU修改)
+ * @retval -ESTALE: 状态已经发生改变(当前线程的状态可能已经被其他CPU修改)
  */
 __xwos_code
 xwer_t xwos_thrd_rq_add_tail(struct xwos_tcb * tcb, xwpr_t prio)
@@ -1259,7 +1254,7 @@ void xwos_thrd_eq_plwq_locked(struct xwos_tcb * tcb,
  * - 上下文：线程
  * - 重入性：可重入
  * @note
- * - 此函数只能将CPU让给优先级大于等于当前线程，且已经就绪的其他线程。
+ * - 此函数只能将CPU让给优先级与当前线程相同且已经就绪的其他线程。
  *   如果当前线程已经是系统中唯一的最高优先级线程，此函数无效。
  */
 __xwos_api
@@ -1845,8 +1840,8 @@ bool xwos_cthrd_shld_frz(void)
  * - 上下文：线程
  * - 重入性：可重入
  * @note
- * 此函数类似于@ref xwos_cthrd_wait_exit()，但不会阻塞，只会立即返回
- * true或false，通常用在线程主循环的循环条件中。例如：
+ * - 此函数类似于@ref xwos_cthrd_wait_exit()，但不会阻塞，只会立即返回
+ *   true或false，通常用在线程主循环的循环条件中。例如：
  * ```C
  * xwer_t thread_main(void * arg)
  * {
@@ -1878,9 +1873,9 @@ bool xwos_cthrd_shld_stop(void)
  * - 重入性：可重入
  * @note
  * - 此函数在@ref xwos_cthrd_shld_stop()的基础上增加了对冻结条件是否满足
- *   的判断，如果可以冻结，就在函数中将线程冻结。通常线程冻结用于处理系统的
- *   低功耗事件或将线程在不同的CPU中进行迁移。需要考虑线程的冻结，通常将
- *   线程的主循环写成：
+ *   的判断，如果可以冻结，就在函数中将线程冻结。
+ * - 通常线程冻结用于处理系统的低功耗事件或将线程在不同的CPU中进行迁移。
+ * - 需要考虑线程的冻结，通常将线程的主循环写成：
  * ```C
  * xwer_t thread_main(void * arg)
  * {

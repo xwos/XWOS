@@ -88,12 +88,12 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
 /******** ******** memslice ******** ********/
 #if defined(XWSMPCFG_SYNC_CDT_MEMSLICE) && (1 == XWSMPCFG_SYNC_CDT_MEMSLICE)
 /**
- * @brief XWOS INIT CODE：初始化结构体xwsync_cdt的对象缓存。
+ * @brief XWOS INIT CODE：初始化结构体xwsync_cdt的对象缓存
  * @param zone_origin: (I) 内存区域的首地址
  * @param zone_size: (I) 内存区域的大小
  * @return 错误码
  * @note
- * - 重入性：只可在系统初始化时使用一次。
+ * - 重入性：只可在系统初始化时使用一次
  */
 __xwos_init_code
 xwer_t xwsync_cdt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
@@ -116,7 +116,7 @@ xwer_t xwsync_cdt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 #endif /* XWSMPCFG_SYNC_CDT_MEMSLICE */
 
 /**
- * @brief 从条件量对象缓存中申请对象。
+ * @brief 从条件量对象缓存中申请对象
  * @return 条件量对象的指针
  */
 static __xwos_code
@@ -152,7 +152,7 @@ struct xwsync_cdt * xwsync_cdt_alloc(void)
 }
 
 /**
- * @brief 释放条件量对象。
+ * @brief 释放条件量对象
  * @param cdt: (I) 条件量对象的指针
  */
 static __xwos_code
@@ -167,7 +167,7 @@ void xwsync_cdt_free(struct xwsync_cdt * cdt)
 }
 
 /**
- * @brief 条件量对象的构造函数。
+ * @brief 条件量对象的构造函数
  * @param cdt: (I) 条件量对象的指针
  */
 __xwos_code
@@ -177,7 +177,7 @@ void xwsync_cdt_construct(struct xwsync_cdt * cdt)
 }
 
 /**
- * @brief 条件量对象的析构函数。
+ * @brief 条件量对象的析构函数
  * @param cdt: (I) 条件量对象的指针
  */
 __xwos_code
@@ -187,7 +187,7 @@ void xwsync_cdt_destruct(struct xwsync_cdt * cdt)
 }
 
 /**
- * @brief 条件量对象的垃圾回收函数。
+ * @brief 条件量对象的垃圾回收函数
  * @param cdt: (I) 条件量对象的指针
  * @return 错误码
  */
@@ -199,13 +199,14 @@ xwer_t xwsync_cdt_gc(void * cdt)
 }
 
 /**
- * @brief 激活条件量。
+ * @brief 激活条件量
  * @param cdt: (I) 条件量对象的指针
- * @param gcfunc: (I) 垃圾回收函数的指针，由于静态初始化的线程所有资源都是由
- *                    用户自己提供的，因此当条件量不使用时，回收资源的函数也
- *                    需要用户自己提供。
+ * @param gcfunc: (I) 垃圾回收函数的指针
  * @return 错误码
  * @retval OK: OK
+ * @note
+ * - 由于静态初始化的对象所有资源都是由用户自己提供的，
+ *   因此当信号量不使用时，回收资源的函数也需要用户自己提供。
  */
 __xwos_code
 xwer_t xwsync_cdt_activate(struct xwsync_cdt * cdt, xwobj_gc_f gcfunc)
@@ -241,7 +242,7 @@ xwer_t xwsync_cdt_init(struct xwsync_cdt * cdt)
 }
 
 /**
- * @brief XWOS API：销毁静态方式初始化的条件量对象。
+ * @brief XWOS API：销毁静态方式初始化的条件量对象
  * @param cdt: (I) 条件量对象的指针
  * @return 错误码
  * @retval OK: OK
@@ -260,7 +261,7 @@ xwer_t xwsync_cdt_destroy(struct xwsync_cdt * cdt)
 }
 
 /**
- * @brief XWOS API：动态创建条件量。
+ * @brief XWOS API：动态创建条件量
  * @param ptrbuf: (O) 指向缓冲区的指针，此缓冲区用于返回对象的指针
  * @return 错误码
  * @retval OK: OK
@@ -294,7 +295,7 @@ xwer_t xwsync_cdt_create(struct xwsync_cdt ** ptrbuf)
 }
 
 /**
- * @brief XWOS API：删除动态创建的条件量。
+ * @brief XWOS API：删除动态创建的条件量
  * @param cdt: (I) 条件量对象的指针
  * @return 错误码
  * @retval OK: OK
@@ -314,7 +315,7 @@ xwer_t xwsync_cdt_delete(struct xwsync_cdt * cdt)
 
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
 /**
- * @brief XWOS API：绑定条件量到事件对象，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ * @brief XWOS API：绑定条件量到事件对象，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR
  * @param cdt: (I) 条件量对象的指针
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 条件量对象映射到位图中的位置
@@ -346,7 +347,7 @@ xwer_t xwsync_cdt_bind(struct xwsync_cdt * cdt, struct xwsync_evt * evt, xwsq_t 
 }
 
 /**
- * @brief XWOS API：从事件对象上解绑条件量，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ * @brief XWOS API：从事件对象上解绑条件量，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR
  * @param cdt: (I) 条件量对象的指针
  * @param evt: (I) 事件对象的指针
  * @return 错误码
@@ -378,7 +379,7 @@ xwer_t xwsync_cdt_unbind(struct xwsync_cdt * cdt, struct xwsync_evt * evt)
 #endif /* XWSMPCFG_SYNC_EVT */
 
 /**
- * @brief XWOS API：冻结条件量（值设置为负）。
+ * @brief XWOS API：冻结条件量（值设置为负）
  * @param cdt: (I) 条件量对象的指针
  * @return 错误码
  * @retval OK: OK
@@ -415,7 +416,7 @@ xwer_t xwsync_cdt_freeze(struct xwsync_cdt * cdt)
 }
 
 /**
- * @brief XWOS API：解冻条件量，并重新初始化。
+ * @brief XWOS API：解冻条件量，并重新初始化
  * @param cdt: (I) 条件量对象的指针
  * @param val: (I) 条件量的初始值
  * @param max: (I) 条件量的最大值
@@ -454,7 +455,7 @@ xwer_t xwsync_cdt_thaw(struct xwsync_cdt * cdt)
 }
 
 /**
- * @brief 中断条件量等待队列中的一个节点。
+ * @brief 中断条件量等待队列中的一个节点
  * @param cdt: (I) 条件量对象的指针
  * @param wqn: (I) 等待队列节点
  * @return 错误码
@@ -497,7 +498,7 @@ xwer_t xwsync_cdt_intr(struct xwsync_cdt * cdt, struct xwos_wqn * wqn)
 }
 
 /**
- * @brief XWOS API：中断条件量等待队列中的所有节点。
+ * @brief XWOS API：中断条件量等待队列中的所有节点
  * @param cdt: (I) 条件量对象的指针
  * @return 错误码
  * @retval OK: OK
@@ -892,7 +893,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt, struct xwos_tcb * tcb,
 }
 
 /**
- * @brief XWOS API：限时等待条件量。
+ * @brief XWOS API：限时等待条件量
  * @param cdt: (I) 条件量对象的指针
  * @param lock: (I) 锁的地址
  * @param lktype: (I) 锁的类型

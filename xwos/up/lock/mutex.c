@@ -144,7 +144,7 @@ void xwlk_mtx_deactivate(struct xwlk_mtx * mtx)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *mtx* ，不可重入。
+ * - 重入性：对于同一个 *mtx* ，不可重入
  */
 __xwos_api
 xwer_t xwlk_mtx_init(struct xwlk_mtx * mtx, xwpr_t sprio)
@@ -166,7 +166,7 @@ xwer_t xwlk_mtx_init(struct xwlk_mtx * mtx, xwpr_t sprio)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *mtx* ，不可重入。
+ * - 重入性：对于同一个 *mtx* ，不可重入
  */
 __xwos_api
 xwer_t xwlk_mtx_destroy(struct xwlk_mtx * mtx)
@@ -222,7 +222,7 @@ xwer_t xwlk_mtx_create(struct xwlk_mtx ** ptrbuf, xwpr_t sprio)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *mtx* ，不可重入。
+ * - 重入性：对于同一个 *mtx* ，不可重入
  */
 __xwos_api
 xwer_t xwlk_mtx_delete(struct xwlk_mtx * mtx)
@@ -640,7 +640,7 @@ xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx,
 }
 
 /**
- * @brief XWOS API：获取互斥锁，若互斥锁已经被其他线程获取，就限时阻塞等待
+ * @brief XWOS API：限时等待并上锁互斥锁
  * @param mtx: (I) 互斥锁对象的指针
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
@@ -749,8 +749,7 @@ xwer_t xwlk_mtx_do_lock_unintr(struct xwlk_mtx * mtx,
 }
 
 /**
- * @brief XWOS API：获取互斥锁，若互斥锁已被其他线程获取，
- *                  就阻塞等待，且不可被中断
+ * @brief XWOS API：等待并上锁互斥锁，且等待不可被中断
  * @param mtx: (I) 互斥锁对象的指针
  * @return 错误码
  * @retval OK: OK

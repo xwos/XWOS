@@ -317,11 +317,10 @@ xwer_t xwos_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
 }
 
 /**
- * @brief XWOS API：判断当前的上下文是否为中断上下文，
- *                  如果是，就取得当前中断的中断号。
+ * @brief XWOS API：判断当前的上下文是否为中断上下文，并取得当前中断的中断号
  * @param irqnbuf: (O) 指向缓冲区的指针，通过此缓冲区返回当前中断号：
- *                     - 返回结果仅当返回值为OK时有效；
- *                     - 此指针可为NULL，表示不需要返回中断号。
+ *                     - 返回结果仅当返回值为OK时有效
+ *                     - 此指针可为NULL，表示不需要返回中断号
  * @return 错误码
  * @retval OK: 当前上下文为中断
  * @retval -EINTHRD: 当前上下文为线程

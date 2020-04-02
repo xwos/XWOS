@@ -166,7 +166,7 @@ xwer_t xwsync_evt_timedsync(struct xwsync_evt * evt, xwsq_t pos, xwbmp_t sync[],
  ******** ********      inline API implementations     ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief XWOS API：等待事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG。
+ * @brief XWOS API：等待事件对象中的信号，事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
  * @param trigger: (I) 事件触发条件，取值 @ref xwsync_evt_trigger_em
  * @param action: (I) 事件触发后的动作，取值 @ref xwsync_evt_action_em，
@@ -180,9 +180,9 @@ xwer_t xwsync_evt_timedsync(struct xwsync_evt * evt, xwsq_t pos, xwbmp_t sync[],
  *                @ref XWSYNC_EVT_TRIGGER_TGL_ALL 以及
  *                @ref XWSYNC_EVT_TRIGGER_TGL_ANY
  *                时有效，其他情况不使用此参数，可填NULL：
- *                (I) 作为输入时，作为事件信号旗的初始值；
+ *                (I) 作为输入时，作为事件信号旗的初始值
  *                (O) 作为输出时，返回线程被唤醒时的事件对象中信号旗位图状态
- *                    （可作为下一次调用的初始值）。
+ *                    （可作为下一次调用的初始值）
  * @param msk: (I) 事件信号旗的位图掩码，表示只关注掩码部分的信号旗。
  * @return 错误码
  * @retval OK: OK
@@ -207,7 +207,7 @@ xwer_t xwsync_evt_wait(struct xwsync_evt * evt,
 
 /**
  * @brief XWOS API：等待事件对象中绑定的同步对象，
- *                  事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ *                  事件对象类型为XWSYNC_EVT_TYPE_SELECTOR
  * @param evt: (I) 事件对象的指针
  * @param msk: (I) 待触发的同步对象的位图掩码（表示只关注掩码部分的同步对象）
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象的位图
@@ -230,7 +230,7 @@ xwer_t xwsync_evt_select(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
 }
 
 /**
- * @brief XWOS API：等待与其他线程同步，事件对象类型为XWSYNC_EVT_TYPE_BARRIER。
+ * @brief XWOS API：等待所有线程到达屏障，事件对象类型为XWSYNC_EVT_TYPE_BARRIER
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 当前线程的位图位置
  * @param sync: (I) 当前线程需要同步的线程掩码

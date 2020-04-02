@@ -257,13 +257,14 @@ void xwlk_rawly_unlock_irqsrs(struct xwlk_splk * spl,
 }
 
 /**
- * @brief XWOS API：上锁自旋锁。若自旋锁已开启临界区，就自旋等待。
+ * @brief XWOS API：上锁自旋锁
  * @param spl: (I) 自旋锁的指针
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：不可重入
  * @note
+ * - 若自旋锁已开启临界区，就自旋等待。
  * - 此函数只会关闭本地CPU的抢占，因此只能保证其临界区在线程中是安全的。
  */
 __xwos_api
@@ -278,8 +279,7 @@ void xwlk_splk_lock(struct xwlk_splk * spl)
 }
 
 /**
- * @brief XWOS API：尝试上锁自旋锁。若自旋锁已开启临界区。
- *                  若自旋锁已开启临界区，不会自旋等待。
+ * @brief XWOS API：尝试上锁自旋锁
  * @param spl: (I) 自旋锁的指针
  * @return 错误码
  * @retval OK: OK
@@ -289,6 +289,7 @@ void xwlk_splk_lock(struct xwlk_splk * spl)
  * - 上下文：线程
  * - 重入性：不可重入
  * @note
+ * - 若自旋锁已开启临界区，立即返回，不会自旋等待。
  * - 此函数只会关闭本地CPU的抢占，因此只能保证其临界区在线程中是安全的。
  */
 __xwos_api
@@ -310,7 +311,7 @@ xwer_t xwlk_splk_trylock(struct xwlk_splk * spl)
 }
 
 /**
- * @brief XWOS API：解锁自旋锁。
+ * @brief XWOS API：解锁自旋锁
  * @param spl: (I) 自旋锁的指针
  * @note
  * - 同步/异步：同步
@@ -329,14 +330,14 @@ void xwlk_splk_unlock(struct xwlk_splk * spl)
 }
 
 /**
- * @brief XWOS API：上锁自旋锁，并关闭本地CPU的中断。
- *                  若自旋锁已开启临界区，就自旋等待。
+ * @brief XWOS API：上锁自旋锁，并关闭本地CPU的中断
  * @param spl: (I) 自旋锁的指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：不可重入
  * @note
+ * - 若自旋锁已开启临界区，就自旋等待。
  * - 此函数会关闭本地CPU的抢占与中断，因此可保证其临界区在所有上下文中都是安全的。
  */
 __xwos_api
@@ -352,8 +353,7 @@ void xwlk_splk_lock_cpuirq(struct xwlk_splk * spl)
 }
 
 /**
- * @brief XWOS API：尝试上锁自旋锁，并关闭本地CPU的中断。
- *                  若自旋锁已开启临界区，不会自旋等待。
+ * @brief XWOS API：尝试上锁自旋锁，并关闭本地CPU的中断
  * @param spl: (I) 自旋锁的指针
  * @return 错误码
  * @retval OK: OK
@@ -363,6 +363,7 @@ void xwlk_splk_lock_cpuirq(struct xwlk_splk * spl)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：不可重入
  * @note
+ * - 若自旋锁已开启临界区，立即返回，不会自旋等待。
  * - 此函数会关闭本地CPU的抢占与中断，因此可保证其临界区在所有上下文中都是安全的。
  */
 __xwos_api
@@ -386,7 +387,7 @@ xwer_t xwlk_splk_trylock_cpuirq(struct xwlk_splk * spl)
 }
 
 /**
- * @brief XWOS API：解锁自旋锁，并开启本地CPU的中断。
+ * @brief XWOS API：解锁自旋锁，并开启本地CPU的中断
  * @param spl: (I) 自旋锁的指针
  * @note
  * - 同步/异步：同步
@@ -406,8 +407,7 @@ void xwlk_splk_unlock_cpuirq(struct xwlk_splk * spl)
 }
 
 /**
- * @brief XWOS API：上锁自旋锁，保存本地CPU的中断标志并关闭。
- *                  若自旋锁已开启临界区，就自旋等待。
+ * @brief XWOS API：上锁自旋锁，保存本地CPU的中断标志并关闭
  * @param spl: (I) 自旋锁的指针
  * @param cpuirq: (O) 缓冲区指针，用于返回本地CPU的中断标志
  * @note
@@ -415,6 +415,7 @@ void xwlk_splk_unlock_cpuirq(struct xwlk_splk * spl)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：不可重入
  * @note
+ * - 若自旋锁已开启临界区，就自旋等待。
  * - 此函数会关闭本地CPU的抢占与中断，因此可保证其临界区在所有上下文中都是安全的。
  */
 __xwos_api
@@ -430,8 +431,7 @@ void xwlk_splk_lock_cpuirqsv(struct xwlk_splk * spl, xwreg_t * cpuirq)
 }
 
 /**
- * @brief XWOS API：尝试上锁自旋锁，保存本地CPU的中断标志并关闭。
- *                  若自旋锁已开启临界区，不会自旋等待。
+ * @brief XWOS API：尝试上锁自旋锁，保存本地CPU的中断标志并关闭
  * @param spl: (I) 自旋锁的指针
  * @param cpuirq: (O) 缓冲区指针，用于返回本地CPU的中断标志
  * @return 错误码
@@ -442,6 +442,7 @@ void xwlk_splk_lock_cpuirqsv(struct xwlk_splk * spl, xwreg_t * cpuirq)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：不可重入
  * @note
+ * - 若自旋锁已开启临界区，立即返回，不会自旋等待。
  * - 此函数会关闭本地CPU的抢占与中断，因此可保证其临界区在所有上下文中都是安全的。
  */
 __xwos_api
@@ -465,7 +466,7 @@ xwer_t xwlk_splk_trylock_cpuirqsv(struct xwlk_splk * spl, xwreg_t * cpuirq)
 }
 
 /**
- * @brief XWOS API：解锁自旋锁，并恢复本地CPU的中断标志。
+ * @brief XWOS API：解锁自旋锁，并恢复本地CPU的中断标志
  * @param spl: (I) 自旋锁的指针
  * @param cpuirq: (I) 本地CPU的中断标志
  * @note
@@ -486,8 +487,7 @@ void xwlk_splk_unlock_cpuirqrs(struct xwlk_splk * spl, xwreg_t cpuirq)
 }
 
 /**
- * @brief XWOS API：上锁自旋锁，并关闭部分外部中断。
- *                  若自旋锁已开启临界区，就自旋等待。
+ * @brief XWOS API：上锁自旋锁，并关闭部分外部中断
  * @param spl: (I) 自旋锁的指针
  * @param irqs: (I) 外部中断资源数组指针
  * @param num: (I) 数组中元素数量
@@ -496,8 +496,9 @@ void xwlk_splk_unlock_cpuirqrs(struct xwlk_splk * spl, xwreg_t cpuirq)
  * - 上下文：中断资源数组中描述的中断、线程
  * - 重入性：不可重入
  * @note
+ * - 若自旋锁已开启临界区，就自旋等待。
  * - 此函数只会关闭本地CPU的抢占和部分外部中断，因此只能保证其临界区在这些中断
- *   与线程上下文是安全的。。
+ *   与线程上下文是安全的。
  */
 __xwos_api
 void xwlk_splk_lock_irqs(struct xwlk_splk * spl,
@@ -517,8 +518,7 @@ void xwlk_splk_lock_irqs(struct xwlk_splk * spl,
 }
 
 /**
- * @brief XWOS API：尝试上锁自旋锁，并关闭部分外部中断。
- *                  若自旋锁已开启临界区，不会自旋等待。
+ * @brief XWOS API：尝试上锁自旋锁，并关闭部分外部中断
  * @param spl: (I) 自旋锁的指针
  * @param irqs: (I) 外部中断资源数组指针
  * @param num: (I) 数组中元素数量
@@ -530,6 +530,7 @@ void xwlk_splk_lock_irqs(struct xwlk_splk * spl,
  * - 上下文：中断资源数组中描述的中断、线程
  * - 重入性：不可重入
  * @note
+ * - 若自旋锁已开启临界区，立即返回，不会自旋等待。
  * - 此函数只会关闭本地CPU的抢占和部分外部中断，因此只能保证其临界区在这些中断
  *   与线程上下文是安全的。
  */
@@ -560,7 +561,7 @@ xwer_t xwlk_splk_trylock_irqs(struct xwlk_splk * spl,
 }
 
 /**
- * @brief XWOS API：解锁自旋锁，并开启部分外部中断。
+ * @brief XWOS API：解锁自旋锁，并开启部分外部中断
  * @param spl: (I) 自旋锁的指针
  * @param irqs: (I) 外部中断资源数组指针
  * @param num: (I) 数组中元素数量
@@ -587,8 +588,7 @@ void xwlk_splk_unlock_irqs(struct xwlk_splk * spl,
 }
 
 /**
- * @brief XWOS API：上锁自旋锁，保存部分外部中断的中断标志并关闭。
- *                  若自旋锁已开启临界区，就自旋等待。
+ * @brief XWOS API：上锁自旋锁，保存部分外部中断的中断标志并关闭
  * @param spl: (I) 自旋锁的指针
  * @param irqs: (I) 外部中断资源数组指针
  * @param flags: (O) 缓冲区指针，用于返回部分外部中断的中断标志
@@ -598,6 +598,7 @@ void xwlk_splk_unlock_irqs(struct xwlk_splk * spl,
  * - 上下文：中断资源数组中描述的中断、线程
  * - 重入性：不可重入
  * @note
+ * - 若自旋锁已开启临界区，就自旋等待。
  * - 此函数只会关闭本地CPU的抢占和部分外部中断，因此只能保证其临界区在这些中断
  *   与线程上下文是安全的。
  */
@@ -620,8 +621,7 @@ void xwlk_splk_lock_irqssv(struct xwlk_splk * spl,
 }
 
 /**
- * @brief XWOS API：尝试上锁自旋锁，保存部分外部中断的中断标志并关闭。
- *                  若自旋锁已开启临界区，不会自旋等待。
+ * @brief XWOS API：尝试上锁自旋锁，保存部分外部中断的中断标志并关闭
  * @param spl: (I) 自旋锁的指针
  * @param irqs: (I) 外部中断资源数组指针
  * @param flags: (O) 缓冲区指针，用于返回部分外部中断的中断标志
@@ -634,6 +634,7 @@ void xwlk_splk_lock_irqssv(struct xwlk_splk * spl,
  * - 上下文：中断资源数组中描述的中断、线程
  * - 重入性：不可重入
  * @note
+ * - 若自旋锁已开启临界区，立即返回，不会自旋等待。
  * - 此函数只会关闭本地CPU的抢占和部分外部中断，因此只能保证其临界区在这些中断
  *   与线程上下文是安全的。
  */
@@ -665,7 +666,7 @@ xwer_t xwlk_splk_trylock_irqssv(struct xwlk_splk * spl,
 }
 
 /**
- * @brief XWOS API：解锁自旋锁，并恢复部分外部中断的中断标志。
+ * @brief XWOS API：解锁自旋锁，并恢复部分外部中断的中断标志
  * @param spl: (I) 自旋锁的指针
  * @param irqs: (I) 外部中断资源数组指针
  * @param flags: (I) 部分外部中断的中断标志数组
@@ -695,14 +696,14 @@ void xwlk_splk_unlock_irqsrs(struct xwlk_splk * spl,
 
 #if defined(XWSMPCFG_SD_BH) && (1 == XWSMPCFG_SD_BH)
 /**
- * @brief XWOS API：上锁自旋锁，关闭本地CPU的中断底半部。
- *                  若自旋锁已开启临界区，就自旋等待。
+ * @brief XWOS API：上锁自旋锁，关闭本地CPU的中断底半部
  * @param spl: (I) 自旋锁的指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断底半部、线程
  * - 重入性：不可重入
  * @note
+ * - 若自旋锁已开启临界区，就自旋等待。
  * - 此函数只会关闭本地CPU的抢占和中断底半部，因此只能保证其临界区在线程上下文与
  *   中断底半部中是安全的。
  */
@@ -721,8 +722,7 @@ void xwlk_splk_lock_bh(struct xwlk_splk * spl)
 }
 
 /**
- * @brief XWOS API：尝试上锁自旋锁，关闭本地CPU的中断底半部。
- *                  若自旋锁已开启临界区，不会自旋等待。
+ * @brief XWOS API：尝试上锁自旋锁，关闭本地CPU的中断底半部
  * @param spl: (I) 自旋锁的指针
  * @return 错误码
  * @retval OK: OK
@@ -732,6 +732,7 @@ void xwlk_splk_lock_bh(struct xwlk_splk * spl)
  * - 上下文：中断底半部、线程
  * - 重入性：不可重入
  * @note
+ * - 若自旋锁已开启临界区，立即返回，不会自旋等待。
  * - 此函数只会关闭本地CPU的抢占和中断底半部，因此只能保证其临界区在线程上下文与
  *   中断底半部中是安全的。
  */
@@ -757,7 +758,7 @@ xwer_t xwlk_splk_trylock_bh(struct xwlk_splk * spl)
 }
 
 /**
- * @brief XWOS API：解锁自旋锁，开启本地CPU的中断底半部。
+ * @brief XWOS API：解锁自旋锁，开启本地CPU的中断底半部
  * @param spl: (I) 自旋锁的指针
  * @note
  * - 同步/异步：同步

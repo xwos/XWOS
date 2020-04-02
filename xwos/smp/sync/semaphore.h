@@ -47,7 +47,7 @@ enum xwsync_smr_type_em {
 struct xwsync_smr {
         struct xwsync_object xwsyncobj; /**< C语言面向对象：继承struct xwsync_object */
         xwid_t type; /**< 类型 */
-        xwssq_t count; /**< 信号量计数器：<0，信号量处于负状态。*/
+        xwssq_t count; /**< 信号量计数器：<0，信号量处于负状态 */
         xwssq_t max; /**< 信号量计数器的最大值 */
         union {
 #if defined(XWSMPCFG_SYNC_RTSMR) && (1 == XWSMPCFG_SYNC_RTSMR)

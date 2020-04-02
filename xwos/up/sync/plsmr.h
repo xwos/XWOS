@@ -73,7 +73,8 @@ xwer_t xwsync_plsmr_wait_unintr(struct xwsync_plsmr * smr);
  ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
 /**
- * @brief XWOS API：绑定管道信号量到事件对象，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ * @brief XWOS API：绑定管道信号量到事件对象，
+ *                  事件对象类型为XWSYNC_EVT_TYPE_SELECTOR
  * @param smr: (I) 管道信号量对象的指针
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 管道信号量对象映射到位图中的位置
@@ -97,7 +98,7 @@ xwer_t xwsync_plsmr_bind(struct xwsync_plsmr * smr, struct xwsync_evt * evt,
 
 /**
  * @brief XWOS API：从事件对象上解绑管道信号量，
- *                  事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ *                  事件对象类型为XWSYNC_EVT_TYPE_SELECTOR
  * @param smr: (I) 管道信号量对象的指针
  * @param evt: (I) 事件对象的指针
  * @return 错误码
@@ -119,7 +120,7 @@ xwer_t xwsync_plsmr_unbind(struct xwsync_plsmr * smr, struct xwsync_evt * evt)
 #endif /* XWUPCFG_SYNC_EVT */
 
 /**
- * @brief XWOS API：冻结管道信号量（值设置为负）。
+ * @brief XWOS API：冻结管道信号量（值设置为负）
  * @param smr: (I) 信号量对象的指针
  * @return 错误码
  * @retval OK: OK
@@ -142,7 +143,7 @@ xwer_t xwsync_plsmr_freeze(struct xwsync_plsmr * smr)
 }
 
 /**
- * @brief XWOS API：解冻管道信号量，并重新初始化。
+ * @brief XWOS API：解冻管道信号量，并重新初始化
  * @param smr: (I) 信号量对象的指针
  * @param val: (I) 信号量的初始值
  * @param max: (I) 信号量的最大值
@@ -169,7 +170,7 @@ xwer_t xwsync_plsmr_thaw(struct xwsync_plsmr * smr, xwssq_t val, xwssq_t max)
 }
 
 /**
- * @brief XWOS API：获取管道信号量，若不能获取，就阻塞等待
+ * @brief XWOS API：等待并获取管道信号量
  * @param smr: (I) 信号量对象指针
  * @return 错误码
  * @retval OK: OK
@@ -189,7 +190,7 @@ xwer_t xwsync_plsmr_wait(struct xwsync_plsmr * smr)
 }
 
 /**
- * @brief XWOS API：获取管道信号量计数器的值。
+ * @brief XWOS API：获取管道信号量计数器的值
  * @param smr: (I) 信号量对象的指针
  * @param sval: (O) 指向缓冲区的指针，通过此缓冲区返回信号量计数器的值
  * @return 错误码

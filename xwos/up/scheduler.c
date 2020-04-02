@@ -103,7 +103,7 @@ xwer_t xwos_scheduler_thaw_allfrz_lic(void);
  * @brief XWOS INIT API：初始化本地CPU的调度器
  * @return 错误码
  * @note
- * - 本函数只可在系统初始化时调用一次。
+ * - 重入性：本函数只可在系统初始化时调用一次
  */
 __xwos_init_code
 xwer_t xwos_scheduler_init(void)
@@ -148,7 +148,7 @@ err_tt_init:
  * @return 错误码
  * @note
  * - 重入性：只可调用一次
- * - 此函数不会返回。
+ * - 此函数不会返回
  */
 __xwos_init_code
 xwer_t xwos_scheduler_start_lc(void)
@@ -956,7 +956,7 @@ xwer_t xwos_scheduler_dec_wklkcnt(void)
  * @param xwsd: (I) 调度器对象的指针
  * @return 错误码
  * @note
- * - 此函数只能在CPU自身的中断中执行，因此可通过@ref soc_scheduler_suspend()触发
+ * - 此函数只能在CPU自身的中断中执行，可通过@ref soc_scheduler_suspend()触发
  *   一个软中断，执行此函数。
  */
 __xwos_code
@@ -1047,7 +1047,7 @@ xwer_t xwos_scheduler_suspend(void)
  * @note
  * - 此函数只可由xwos_scheduler_resume()调用。
  *   在SMP架构中，SOC层soc_scheduler_resume会通过软中断在CPU自身的中断上下文中运行此
- *   函数，而UP架构中复用了SOC层的部分代码。因此，此函数仅仅是为了保证编译顺利。
+ *   函数，而UP架构中复用了这部分代码。因此，此函数仅仅是为了保证编译顺利。
  */
 __xwos_code
 xwer_t xwos_scheduler_resume_lic(struct xwos_scheduler * xwsd)
@@ -1077,11 +1077,12 @@ xwer_t xwos_scheduler_resume_lic(struct xwos_scheduler * xwsd)
  * @note
  * - 同步/异步：同步
  * - 中断上下文：此函数在系统唤醒时执行，此时系统只可能处于中断上下文，
- *               因此，此函数只能在中断上下文中执行。
+ *               此函数也只能在中断上下文中执行
  * - 中断底半部：不可以使用
  * - 线程上下文：不可以使用
  * - 重入性：不可重入
- * - 说明：单核系统中，CPU唯一，此函数不需通过软中断调用xwos_scheduler_resume_lic()。
+ * @note
+ * - 单核系统中，CPU唯一，此函数不需通过软中断调用xwos_scheduler_resume_lic()。
  */
 __xwos_api
 xwer_t xwos_scheduler_resume(void)

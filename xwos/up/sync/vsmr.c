@@ -37,7 +37,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 激活信号量对象。
+ * @brief 激活信号量对象
  * @param vsmr: (I) 信号量对象的指针
  */
 __xwos_code
@@ -50,7 +50,7 @@ void xwsync_vsmr_activate(struct xwsync_vsmr * vsmr)
 
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
 /**
- * @brief 绑定信号量到事件对象，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ * @brief 绑定信号量到事件对象，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR
  * @param vsmr: (I) 信号量对象的指针
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 信号量对象映射到位图中的位置
@@ -79,7 +79,7 @@ xwer_t xwsync_vsmr_bind(struct xwsync_vsmr * vsmr, struct xwsync_evt * evt,
 }
 
 /**
- * @brief 从事件对象上解绑信号量，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR。
+ * @brief 从事件对象上解绑信号量，事件对象类型为XWSYNC_EVT_TYPE_SELECTOR
  * @param smr: (I) 信号量对象的指针
  * @param evt: (I) 事件对象的指针
  * @return 错误码
@@ -107,7 +107,7 @@ xwer_t xwsync_vsmr_unbind(struct xwsync_vsmr * vsmr, struct xwsync_evt * evt)
 #endif /* XWUPCFG_SYNC_EVT */
 
 /**
- * @brief 冻结信号量（值设置为负）。
+ * @brief 冻结信号量（值设置为负）
  * @param vsmr: (I) 信号量对象的基类指针
  * @return 错误码
  * @retval OK: OK
@@ -117,7 +117,7 @@ xwer_t xwsync_vsmr_unbind(struct xwsync_vsmr * vsmr, struct xwsync_evt * evt)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  * @note
- * - 已冻结的信号量不允许增加(V操作)，但可以被测试(P操作)。
+ * - 已冻结的信号量不允许增加(V操作)，但可以被测试(P操作)，
  *   测试的线程会被加入到信号量的等待队列。
  */
 __xwos_code
@@ -149,7 +149,7 @@ xwer_t xwsync_vsmr_freeze(struct xwsync_vsmr * vsmr)
 }
 
 /**
- * @brief 解冻信号量，并重新初始化。
+ * @brief 解冻信号量，并重新初始化
  * @param vsmr: (I) 信号量对象的基类指针
  * @param val: (I) 信号量的初始值
  * @param max: (I) 信号量的最大值
@@ -198,7 +198,7 @@ xwer_t xwsync_vsmr_thaw(struct xwsync_vsmr * vsmr, xwssq_t val, xwssq_t max)
 }
 
 /**
- * @brief 获取信号量计数器的值。
+ * @brief 获取信号量计数器的值
  * @param vsmr: (I) 信号量对象的基类指针
  * @param sval: (O) 指向缓冲区的指针，通过此缓冲区返回信号量计数器的值
  * @return 错误码
