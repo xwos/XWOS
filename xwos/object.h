@@ -164,7 +164,7 @@ xwer_t xwos_object_put(struct xwos_object * obj)
 static __xw_inline
 xwsq_t xwos_object_get_refcnt(struct xwos_object * obj)
 {
-        return xwaop_load(xwsq_t, &obj->refcnt, xwmb_modr_consume);
+        return xwaop_load(xwsq_t, &obj->refcnt, xwmb_modr_relaxed);
 }
 
 #endif /* xwos/object.h */

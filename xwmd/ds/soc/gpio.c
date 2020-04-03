@@ -120,7 +120,7 @@ xwer_t xwds_gpio_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         SODS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
 
         pinmask &= SODS_GPIO_PIN_MASK(soc->gpio.pin_num);
-        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_consume);
+        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
         if (__unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
                 goto err_pinsts;
@@ -245,7 +245,7 @@ xwer_t xwds_gpio_set(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         }
 #endif /* !XWMDCFG_ds_NANO */
 
-        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_consume);
+        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
         if (__unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
                 goto err_pinsts;
@@ -312,7 +312,7 @@ xwer_t xwds_gpio_reset(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         }
 #endif /* !XWMDCFG_ds_NANO */
 
-        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_consume);
+        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
         if (__unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
                 goto err_pinsts;
@@ -379,7 +379,7 @@ xwer_t xwds_gpio_toggle(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         }
 #endif /* !XWMDCFG_ds_NANO */
 
-        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_consume);
+        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
         if (__unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
                 goto err_pinsts;
@@ -450,7 +450,7 @@ xwer_t xwds_gpio_output(struct xwds_soc * soc,
         }
 #endif /* !XWMDCFG_ds_NANO */
 
-        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_consume);
+        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
         if (__unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
                 goto err_pinsts;
@@ -520,7 +520,7 @@ xwer_t xwds_gpio_input(struct xwds_soc * soc,
         }
 #endif /* !XWMDCFG_ds_NANO */
 
-        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_consume);
+        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
         if (__unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
                 goto err_pinsts;

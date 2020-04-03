@@ -428,16 +428,21 @@ __xwos_api
 struct xwos_scheduler * xwos_scheduler_dsbh_lc(void)
 {
         struct xwos_scheduler * xwsd;
+        xwid_t cpuid;
         bool retry;
 
+        cpuid = xwos_cpu_get_id();
+        xwmb_smp_ddb();
         do {
-                xwsd = &xwos_scheduler[xwos_cpu_get_id()];
+                xwsd = &xwos_scheduler[cpuid];
                 xwaop_add(xwsq_t, &xwsd->dis_bh_cnt, 1, NULL, NULL);
-                if (__unlikely(xwsd->id != xwos_cpu_get_id())) {
+                cpuid = xwos_cpu_get_id();
+                xwmb_smp_ddb();
+                if (__unlikely(xwsd->id != cpuid)) {
                         xwaop_sub(xwsq_t, &xwsd->dis_bh_cnt, 1, NULL, NULL);
                         if ((!xwos_scheduler_tst_in_bh(xwsd)) &&
                             (0 != xwaop_load(xwsq_t, &xwsd->req_bh_cnt,
-                                             xwmb_modr_consume))) {
+                                             xwmb_modr_acquire))) {
                                 xwos_scheduler_sw_bh(xwsd);
                         }/* else {} */
                         retry = true;
@@ -461,7 +466,7 @@ struct xwos_scheduler * xwos_scheduler_enbh_lc(void)
         xwsd = xwos_scheduler_get_lc();
         xwaop_sub(xwsq_t, &xwsd->dis_bh_cnt, 1, &nv, NULL);
         if (0 == nv) {
-                if (0 != xwaop_load(xwsq_t, &xwsd->req_bh_cnt, xwmb_modr_consume)) {
+                if (0 != xwaop_load(xwsq_t, &xwsd->req_bh_cnt, xwmb_modr_acquire)) {
                         xwos_scheduler_sw_bh(xwsd);
                 }/* else {} */
         }
@@ -492,7 +497,7 @@ struct xwos_scheduler * xwos_scheduler_enbh(struct xwos_scheduler * xwsd)
 
         xwaop_sub(xwsq_t, &xwsd->dis_bh_cnt, 1, &nv, NULL);
         if (0 == nv) {
-                if (0 != xwaop_load(xwsq_t, &xwsd->req_bh_cnt, xwmb_modr_consume)) {
+                if (0 != xwaop_load(xwsq_t, &xwsd->req_bh_cnt, xwmb_modr_acquire)) {
                         xwos_scheduler_sw_bh(xwsd);
                 }/* else {} */
         }
@@ -514,7 +519,7 @@ xwer_t xwos_scheduler_sw_bh(struct xwos_scheduler * xwsd)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        if (0 == xwaop_load(xwsq_t, &xwsd->dis_bh_cnt, xwmb_modr_consume)) {
+        if (0 == xwaop_load(xwsq_t, &xwsd->dis_bh_cnt, xwmb_modr_relaxed)) {
                 xwlk_rawly_lock_cpuirqsv(&xwsd->cxlock, &cpuirq);
                 if (__unlikely(NULL != xwsd->pstk)) {
                         xwlk_rawly_unlock_cpuirqrs(&xwsd->cxlock, cpuirq);
@@ -576,15 +581,20 @@ __xwos_api
 struct xwos_scheduler * xwos_scheduler_dspmpt_lc(void)
 {
         struct xwos_scheduler * xwsd;
+        xwid_t cpuid;
         bool retry;
 
+        cpuid = xwos_cpu_get_id();
+        xwmb_smp_ddb();
         do {
-                xwsd = &xwos_scheduler[xwos_cpu_get_id()];
+                xwsd = &xwos_scheduler[cpuid];
                 xwaop_add(xwsq_t, &xwsd->dis_pmpt_cnt, 1, NULL, NULL);
-                if (__unlikely(xwsd->id != xwos_cpu_get_id())) {
+                cpuid = xwos_cpu_get_id();
+                xwmb_smp_ddb();
+                if (__unlikely(xwsd->id != cpuid)) {
                         xwaop_sub(xwsq_t, &xwsd->dis_pmpt_cnt, 1, NULL, NULL);
                         if (0 != xwaop_load(xwsq_t, &xwsd->req_chkpmpt_cnt,
-                                            xwmb_modr_consume)) {
+                                            xwmb_modr_acquire)) {
                                 xwos_scheduler_chkpmpt(xwsd);
                         }/* else {} */
                         retry = true;
@@ -613,7 +623,7 @@ struct xwos_scheduler * xwos_scheduler_enpmpt_lc(void)
         xwaop_sub(xwsq_t, &xwsd->dis_pmpt_cnt, 1, &nv, NULL);
         if (0 == nv) {
                 if (0 != xwaop_load(xwsq_t, &xwsd->req_chkpmpt_cnt,
-                                    xwmb_modr_consume)) {
+                                    xwmb_modr_acquire)) {
                         xwos_scheduler_chkpmpt(xwsd);
                 }/* else {} */
         }
@@ -645,7 +655,7 @@ struct xwos_scheduler * xwos_scheduler_enpmpt(struct xwos_scheduler * xwsd)
         xwaop_sub(xwsq_t, &xwsd->dis_pmpt_cnt, 1, &nv, NULL);
         if (0 == nv) {
                 if (0 != xwaop_load(xwsq_t, &xwsd->req_chkpmpt_cnt,
-                                    xwmb_modr_consume)) {
+                                    xwmb_modr_acquire)) {
                         xwos_scheduler_chkpmpt(xwsd);
                 }/* else {} */
         }
@@ -703,7 +713,7 @@ void xwos_scheduler_chkpmpt(struct xwos_scheduler * xwsd)
         xwreg_t cpuirq;
         bool sched;
 
-        if (0 != xwaop_load(xwsq_t, &xwsd->dis_pmpt_cnt, xwmb_modr_consume)) {
+        if (0 != xwaop_load(xwsq_t, &xwsd->dis_pmpt_cnt, xwmb_modr_acquire)) {
                 xwaop_add(xwsq_t, &xwsd->req_chkpmpt_cnt, 1, NULL, NULL);
         } else {
                 xwlk_rawly_lock_cpuirqsv(&xwsd->cxlock, &cpuirq);
@@ -904,7 +914,7 @@ void xwos_scheduler_finish_swcx(struct xwos_scheduler * xwsd)
         } else if (XWOS_SCHEDULER_BH_STK(xwsd) == xwsd->pstk) {
                 /* Finish switching context from BH to thread */
                 xwsd->pstk = NULL;
-                rbc = xwaop_load(xwsq_t, &xwsd->req_bh_cnt, xwmb_modr_consume);
+                rbc = xwaop_load(xwsq_t, &xwsd->req_bh_cnt, xwmb_modr_relaxed);
                 if (rbc >= 1) {
                         xwlk_rawly_unlock_cpuirqrs(&xwsd->cxlock, cpuirq);
                         xwos_scheduler_sw_bh(xwsd);
@@ -919,7 +929,7 @@ void xwos_scheduler_finish_swcx(struct xwos_scheduler * xwsd)
                 /* Finish switching context from thread to thread */
                 xwsd->pstk = NULL;
                 xwsd->req_schedule_cnt--;
-                rbc = xwaop_load(xwsq_t, &xwsd->req_bh_cnt, xwmb_modr_consume);
+                rbc = xwaop_load(xwsq_t, &xwsd->req_bh_cnt, xwmb_modr_relaxed);
                 if (rbc >= 1) {
                         xwlk_rawly_unlock_cpuirqrs(&xwsd->cxlock, cpuirq);
                         xwos_scheduler_sw_bh(xwsd);
@@ -1252,6 +1262,6 @@ bool xwos_scheduler_tst_lpm(struct xwos_scheduler * xwsd)
 {
         xwsq_t wklkcnt;
 
-        wklkcnt = xwaop_load(xwsq_t, &xwsd->lpm.wklkcnt, xwmb_modr_consume);
+        wklkcnt = xwaop_load(xwsq_t, &xwsd->lpm.wklkcnt, xwmb_modr_acquire);
         return !!(XWOS_SCHEDULER_WKLKCNT_LPM == wklkcnt);
 }

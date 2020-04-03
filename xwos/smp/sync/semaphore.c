@@ -824,8 +824,10 @@ xwer_t xwsync_plsmr_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
         xwos_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
-        rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_consume);
-        wkuprs = xwaop_load(xwsq_t, &tcb->ttn.wkuprs, xwmb_modr_consume);
+        xwmb_smp_rmb();
+        /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
+        rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_relaxed);
+        wkuprs = xwaop_load(xwsq_t, &tcb->ttn.wkuprs, xwmb_modr_relaxed);
         if (XWOS_WQN_RSMRS_INTR == rsmrs) {
                 xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 rc = xwos_tt_remove_locked(xwtt, &tcb->ttn);
@@ -866,7 +868,7 @@ xwer_t xwsync_plsmr_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
                 } else {
                         xwlk_splk_unlock(&tcb->wqn.lock);
                         xwos_plwq_unlock_cpuirqrs(&smr->wq.pl, cpuirq);
-                        rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_consume);
+                        rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_relaxed);
                         if (XWOS_WQN_RSMRS_INTR == rsmrs) {
                                 rc = -EINTR;
                         } else if (XWOS_WQN_RSMRS_UP == rsmrs) {
@@ -896,7 +898,7 @@ xwer_t xwsync_plsmr_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
                 } else {
                         xwlk_splk_unlock(&tcb->wqn.lock);
                         xwos_plwq_unlock_cpuirqrs(&smr->wq.pl, cpuirq);
-                        rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_consume);
+                        rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_relaxed);
                         if (XWOS_WQN_RSMRS_INTR == rsmrs) {
                                 rc = -EINTR;
                         } else if (XWOS_WQN_RSMRS_UP == rsmrs) {
@@ -1043,7 +1045,9 @@ xwer_t xwsync_plsmr_do_blkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
         xwos_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
-        rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_consume);
+        xwmb_smp_rmb();
+        /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
+        rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_relaxed);
         if (XWOS_WQN_RSMRS_UP == rsmrs) {
                 rc = OK;
         } else {
@@ -1507,8 +1511,8 @@ xwer_t xwsync_rtsmr_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
         xwos_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
-        rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_consume);
-        wkuprs = xwaop_load(xwsq_t, &tcb->ttn.wkuprs, xwmb_modr_consume);
+        rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_relaxed);
+        wkuprs = xwaop_load(xwsq_t, &tcb->ttn.wkuprs, xwmb_modr_relaxed);
         if (XWOS_WQN_RSMRS_INTR == rsmrs) {
                 xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 rc = xwos_tt_remove_locked(xwtt, &tcb->ttn);
@@ -1549,7 +1553,7 @@ xwer_t xwsync_rtsmr_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
                 } else {
                         xwlk_splk_unlock(&tcb->wqn.lock);
                         xwos_rtwq_unlock_cpuirqrs(&smr->wq.rt, cpuirq);
-                        rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_consume);
+                        rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_relaxed);
                         if (XWOS_WQN_RSMRS_INTR == rsmrs) {
                                 rc = -EINTR;
                         } else if (XWOS_WQN_RSMRS_UP == rsmrs) {
@@ -1579,7 +1583,7 @@ xwer_t xwsync_rtsmr_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
                 } else {
                         xwlk_splk_unlock(&tcb->wqn.lock);
                         xwos_rtwq_unlock_cpuirqrs(&smr->wq.rt, cpuirq);
-                        rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_consume);
+                        rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_relaxed);
                         if (XWOS_WQN_RSMRS_INTR == rsmrs) {
                                 rc = -EINTR;
                         } else if (XWOS_WQN_RSMRS_UP == rsmrs) {
@@ -1726,7 +1730,9 @@ xwer_t xwsync_rtsmr_do_blkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
         xwos_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
-        rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_consume);
+        xwmb_smp_rmb();
+        /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
+        rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_relaxed);
         if (XWOS_WQN_RSMRS_UP == rsmrs) {
                 rc = OK;
         } else {

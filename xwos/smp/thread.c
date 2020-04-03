@@ -1565,7 +1565,11 @@ xwer_t xwos_cthrd_sleep(xwtm_t * xwtm)
         xwos_scheduler_wakelock_unlock(xwsd);
         xwos_scheduler_req_swcx(xwsd);
         xwos_cpuirq_restore_lc(cpuirq);
-        wkuprs = xwaop_load(xwsq_t, &ctcb->ttn.wkuprs, xwmb_modr_consume);
+
+        /* 判断唤醒原因 */
+        xwmb_smp_rmb();
+        /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
+        wkuprs = xwaop_load(xwsq_t, &ctcb->ttn.wkuprs, xwmb_modr_relaxed);
         if (XWOS_TTN_WKUPRS_TIMEDOUT == wkuprs) {
                 rc = OK;
         } else if (XWOS_TTN_WKUPRS_INTR == wkuprs) {
@@ -1647,7 +1651,11 @@ xwer_t xwos_cthrd_sleep_from(xwtm_t * origin, xwtm_t inc)
         xwos_scheduler_wakelock_unlock(xwsd);
         xwos_scheduler_req_swcx(xwsd);
         xwos_cpuirq_restore_lc(cpuirq);
-        wkuprs = xwaop_load(xwsq_t, &ctcb->ttn.wkuprs, xwmb_modr_consume);
+
+        /* 判断唤醒原因 */
+        xwmb_smp_rmb();
+        /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
+        wkuprs = xwaop_load(xwsq_t, &ctcb->ttn.wkuprs, xwmb_modr_relaxed);
         if (XWOS_TTN_WKUPRS_TIMEDOUT == wkuprs) {
                 rc = OK;
         } else if (XWOS_TTN_WKUPRS_INTR == wkuprs) {

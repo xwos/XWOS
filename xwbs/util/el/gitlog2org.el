@@ -192,11 +192,11 @@
              "^    " ""
              (substring
               (buffer-substring commit-log-beginning commit-end) 1 -1)))
-      (setq commit-type-match (string-match "^[[:alpha:]]+:" commit-log))
+      (setq commit-type-match (string-match "^[[:alpha:]]+!*:" commit-log))
       (if commit-type-match
         (setq commit-type
               (substring commit-log commit-type-match (- (match-end 0) 1)))
-        (setq commit-type-match (string-match "^[[:alpha:]]+([[:alpha:]]+):"
+        (setq commit-type-match (string-match "^[[:alpha:]]+([[:alpha:]]+)!*:"
                                               commit-log)))
       (if commit-type-match
         (setq commit-type

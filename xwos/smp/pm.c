@@ -165,7 +165,7 @@ bool xwos_pmdm_tst_lpm(struct xwos_pmdm * pmdm)
 {
         xwsz_t lpmxwsd_cnt;
 
-        lpmxwsd_cnt = xwaop_load(xwsz_t, &pmdm->lpmxwsd_cnt, xwmb_modr_consume);
+        lpmxwsd_cnt = xwaop_load(xwsz_t, &pmdm->lpmxwsd_cnt, xwmb_modr_relaxed);
         return (lpmxwsd_cnt == pmdm->xwsd_num);
 }
 

@@ -447,7 +447,7 @@ xwer_t xwmm_mempool_objcache_free(struct xwmm_mempool_objcache * oc, void * obj)
 
         xwmm_mempool_objcache_page_put(oc, pg);
         xwaop_add(xwsz_t, &oc->idleness, 1, &idleness, NULL);
-        reserved = xwaop_load(xwsz_t, &oc->reserved, xwmb_modr_consume);
+        reserved = xwaop_load(xwsz_t, &oc->reserved, xwmb_modr_relaxed);
 
         if (reserved + oc->pg_objnr <= idleness) {
                 xwsz_t nr;
@@ -485,8 +485,8 @@ xwer_t xwmm_mempool_objcache_reserve(struct xwmm_mempool_objcache * oc,
 
         reserved = DIV_ROUND_UP(reserved, oc->pg_objnr);
         xwaop_write(xwsz_t, &oc->reserved, reserved, NULL);
-        capacity = xwaop_load(xwsz_t, &oc->capacity, xwmb_modr_consume);
-        idleness = xwaop_load(xwsz_t, &oc->idleness, xwmb_modr_consume);
+        capacity = xwaop_load(xwsz_t, &oc->capacity, xwmb_modr_relaxed);
+        idleness = xwaop_load(xwsz_t, &oc->idleness, xwmb_modr_relaxed);
         if (capacity < reserved) {
                 rc = xwmm_mempool_page_allocate(oc->pa, oc->pg_order, &pg);
                 if (rc < 0) {
@@ -525,7 +525,7 @@ xwer_t xwmm_mempool_objcache_get_capacity(struct xwmm_mempool_objcache * oc,
         XWOS_VALIDATE((oc), "nullptr", -EFAULT);
         XWOS_VALIDATE((capacity), "nullptr", -EFAULT);
 
-        *capacity = xwaop_load(xwsz_t, &oc->capacity, xwmb_modr_consume);
+        *capacity = xwaop_load(xwsz_t, &oc->capacity, xwmb_modr_relaxed);
         return OK;
 }
 
