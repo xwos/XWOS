@@ -25,6 +25,7 @@
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <xwos/osal/sync/semaphore.h>
+#include <xwos/osal/sync/condition.h>
 #include <xwos/osal/sync/selector.h>
 #include <bm/xwtst/sync/selector/demo.h>
 
@@ -50,10 +51,13 @@ xwer_t bm_xwtst_sync_selector_ithrd_func(void * arg);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-struct xwosal_selector xwtst_sync_selector;
-struct xwosal_smr xwtst_sync_smr0;
+struct xwosal_selector xwtst_sync_slt0;
 struct xwosal_smr xwtst_sync_smr1;
 struct xwosal_smr xwtst_sync_smr2;
+struct xwosal_smr xwtst_sync_smr3;
+struct xwosal_selector xwtst_sync_slt4;
+struct xwosal_cdt xwtst_sync_cdt5;
+struct xwosal_cdt xwtst_sync_cdt6;
 
 const struct xwosal_thrd_desc bm_xwtst_sync_selector_wthrd_td = {
         .name = "bm.xwtst.sync.selector.wthrd",
@@ -82,17 +86,14 @@ xwid_t bm_xwtst_sync_selector_ithrd;
  ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t bm_xwtst_sync_selector_start(void)
 {
-        xwid_t sltid;
-        xwid_t smrid0, smrid1, smrid2;
+        xwid_t slt0id, slt4id;
+        xwid_t smr1id, smr2id, smr3id;
+        xwid_t cdt5id, cdt6id;
         xwer_t rc;
 
-        rc = xwosal_selector_init(&xwtst_sync_selector);
+        rc = xwosal_selector_init(&xwtst_sync_slt0);
         if (rc < 0) {
-                goto err_selector_init;
-        }
-        rc = xwosal_smr_init(&xwtst_sync_smr0, 0, XWSSQ_MAX);
-        if (rc < 0) {
-                goto err_smr0_init;
+                goto err_slt0_init;
         }
         rc = xwosal_smr_init(&xwtst_sync_smr1, 0, XWSSQ_MAX);
         if (rc < 0) {
@@ -102,23 +103,56 @@ xwer_t bm_xwtst_sync_selector_start(void)
         if (rc < 0) {
                 goto err_smr2_init;
         }
-
-        sltid = xwosal_selector_get_id(&xwtst_sync_selector);
-        smrid0 = xwosal_smr_get_id(&xwtst_sync_smr0);
-        smrid1 = xwosal_smr_get_id(&xwtst_sync_smr1);
-        smrid2 = xwosal_smr_get_id(&xwtst_sync_smr2);
-
-        rc = xwosal_smr_bind(smrid0, sltid, 0);
+        rc = xwosal_smr_init(&xwtst_sync_smr3, 0, XWSSQ_MAX);
         if (rc < 0) {
-                goto err_smr0_bind;
+                goto err_smr3_init;
         }
-        rc = xwosal_smr_bind(smrid1, sltid, 1);
+        rc = xwosal_selector_init(&xwtst_sync_slt4);
+        if (rc < 0) {
+                goto err_slt4_init;
+        }
+        rc = xwosal_cdt_init(&xwtst_sync_cdt5);
+        if (rc < 0) {
+                goto err_cdt5_init;
+        }
+        rc = xwosal_cdt_init(&xwtst_sync_cdt6);
+        if (rc < 0) {
+                goto err_cdt6_init;
+        }
+
+        slt0id = xwosal_selector_get_id(&xwtst_sync_slt0);
+        smr1id = xwosal_smr_get_id(&xwtst_sync_smr1);
+        smr2id = xwosal_smr_get_id(&xwtst_sync_smr2);
+        smr3id = xwosal_smr_get_id(&xwtst_sync_smr3);
+        slt4id = xwosal_selector_get_id(&xwtst_sync_slt4);
+        cdt5id = xwosal_cdt_get_id(&xwtst_sync_cdt5);
+        cdt6id = xwosal_cdt_get_id(&xwtst_sync_cdt6);
+
+        rc = xwosal_smr_bind(smr1id, slt0id, 1);
         if (rc < 0) {
                 goto err_smr1_bind;
         }
-        rc = xwosal_smr_bind(smrid2, sltid, 2);
+        rc = xwosal_smr_bind(smr2id, slt0id, 2);
         if (rc < 0) {
                 goto err_smr2_bind;
+        }
+        rc = xwosal_smr_bind(smr3id, slt0id, 3);
+        if (rc < 0) {
+                goto err_smr3_bind;
+        }
+
+        rc = xwosal_selector_bind(slt4id, slt0id, 4);
+        if (rc < 0) {
+                goto err_slt4_bind;
+        }
+
+        rc = xwosal_cdt_bind(cdt5id, slt4id, 5);
+        if (rc < 0) {
+                goto err_cdt5_bind;
+        }
+        rc = xwosal_cdt_bind(cdt6id, slt4id, 6);
+        if (rc < 0) {
+                goto err_cdt6_bind;
         }
 
         rc = xwosal_thrd_create(&bm_xwtst_sync_selector_wthrd,
@@ -150,20 +184,32 @@ err_ithrd_create:
         xwosal_thrd_terminate(bm_xwtst_sync_selector_wthrd, NULL);
         xwosal_thrd_delete(bm_xwtst_sync_selector_wthrd);
 err_wthrd_create:
-        xwosal_smr_unbind(smrid2, sltid);
+        xwosal_cdt_unbind(cdt6id, slt4id);
+err_cdt6_bind:
+        xwosal_cdt_unbind(cdt5id, slt4id);
+err_cdt5_bind:
+        xwosal_selector_unbind(slt4id, slt0id);
+err_slt4_bind:
+        xwosal_smr_unbind(smr3id, slt0id);
+err_smr3_bind:
+        xwosal_smr_unbind(smr2id, slt0id);
 err_smr2_bind:
-        xwosal_smr_unbind(smrid1, sltid);
+        xwosal_smr_unbind(smr1id, slt0id);
 err_smr1_bind:
-        xwosal_smr_unbind(smrid0, sltid);
-err_smr0_bind:
+        xwosal_cdt_destroy(&xwtst_sync_cdt6);
+err_cdt6_init:
+        xwosal_cdt_destroy(&xwtst_sync_cdt5);
+err_cdt5_init:
+        xwosal_selector_destroy(&xwtst_sync_slt4);
+err_slt4_init:
+        xwosal_smr_destroy(&xwtst_sync_smr3);
+err_smr3_init:
         xwosal_smr_destroy(&xwtst_sync_smr2);
 err_smr2_init:
         xwosal_smr_destroy(&xwtst_sync_smr1);
 err_smr1_init:
-        xwosal_smr_destroy(&xwtst_sync_smr0);
-err_smr0_init:
-        xwosal_selector_destroy(&xwtst_sync_selector);
-err_selector_init:
+        xwosal_selector_destroy(&xwtst_sync_slt0);
+err_slt0_init:
         return rc;
 }
 
@@ -171,31 +217,41 @@ xwer_t bm_xwtst_sync_selector_wthrd_func(void * arg)
 {
         DECLARE_BITMAP(msk, XWOSAL_SELECTOR_MAXNUM);
         DECLARE_BITMAP(trg, XWOSAL_SELECTOR_MAXNUM);
-        xwid_t sltid;
-        xwid_t smrid0, smrid1, smrid2;
+        xwid_t slt0id, slt4id;
+        xwid_t smr1id, smr2id, smr3id;
         xwtm_t sleep;
         xwer_t rc = OK;
 
         XWOS_UNUSED(arg);
 
-        smrid0 = xwosal_smr_get_id(&xwtst_sync_smr0);
-        smrid1 = xwosal_smr_get_id(&xwtst_sync_smr1);
-        smrid2 = xwosal_smr_get_id(&xwtst_sync_smr2);
+        slt0id = xwosal_selector_get_id(&xwtst_sync_slt0);
+        smr1id = xwosal_smr_get_id(&xwtst_sync_smr1);
+        smr2id = xwosal_smr_get_id(&xwtst_sync_smr2);
+        smr3id = xwosal_smr_get_id(&xwtst_sync_smr3);
+        slt4id = xwosal_selector_get_id(&xwtst_sync_slt4);
 
-        sltid = xwosal_selector_get_id(&xwtst_sync_selector);
         while (!xwosal_cthrd_shld_stop()) {
-                msk[0] = BIT(0) | BIT(1) | BIT(2);
+                msk[0] = BIT(1) | BIT(2) | BIT(3) | BIT(4) | BIT(5) | BIT(6);
                 xwbmpop_c0all(trg, XWOSAL_SELECTOR_MAXNUM);
-                rc = xwosal_selector_select(sltid, msk, trg);
+                rc = xwosal_selector_select(slt0id, msk, trg);
                 if (OK == rc) {
-                        if (xwbmpop_t1i(trg, 0)) {
-                                rc = xwosal_smr_trywait(smrid0);
-                        }
                         if (xwbmpop_t1i(trg, 1)) {
-                                rc = xwosal_smr_trywait(smrid1);
+                                rc = xwosal_smr_trywait(smr1id);
                         }
                         if (xwbmpop_t1i(trg, 2)) {
-                                rc = xwosal_smr_trywait(smrid2);
+                                rc = xwosal_smr_trywait(smr2id);
+                        }
+                        if (xwbmpop_t1i(trg, 3)) {
+                                rc = xwosal_smr_trywait(smr3id);
+                        }
+                        if (xwbmpop_t1i(trg, 4)) {
+                                rc = xwosal_selector_tryselect(slt4id, msk, trg);
+                                if (OK == rc) {
+                                        if (xwbmpop_t1i(trg, 5)) {
+                                        }
+                                        if (xwbmpop_t1i(trg, 6)) {
+                                        }
+                                }
                         }
                 }
                 sleep = 100 * XWTM_MS;
@@ -206,39 +262,58 @@ xwer_t bm_xwtst_sync_selector_wthrd_func(void * arg)
 
 xwer_t bm_xwtst_sync_selector_ithrd_func(void * arg)
 {
-        xwid_t smrid0, smrid1, smrid2;
+        xwid_t smr1id, smr2id, smr3id;
+        xwid_t cdt5id, cdt6id;
         xwtm_t sleep;
         xwer_t rc = OK;
 
         XWOS_UNUSED(arg);
 
-        smrid0 = xwosal_smr_get_id(&xwtst_sync_smr0);
-        smrid1 = xwosal_smr_get_id(&xwtst_sync_smr1);
-        smrid2 = xwosal_smr_get_id(&xwtst_sync_smr2);
+        smr1id = xwosal_smr_get_id(&xwtst_sync_smr1);
+        smr2id = xwosal_smr_get_id(&xwtst_sync_smr2);
+        smr3id = xwosal_smr_get_id(&xwtst_sync_smr3);
+        cdt5id = xwosal_cdt_get_id(&xwtst_sync_cdt5);
+        cdt6id = xwosal_cdt_get_id(&xwtst_sync_cdt6);
 
-        rc = xwosal_smr_post(smrid0);
-        if (rc < 0) {
-                goto err_post_smr0;
-        }
-        sleep = 1000 * XWTM_MS;
-        xwosal_cthrd_sleep(&sleep);
-
-        rc = xwosal_smr_post(smrid1);
+        rc = xwosal_smr_post(smr1id);
         if (rc < 0) {
                 goto err_post_smr1;
         }
         sleep = 1000 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
 
-        rc = xwosal_smr_post(smrid2);
+        rc = xwosal_smr_post(smr2id);
         if (rc < 0) {
                 goto err_post_smr2;
         }
         sleep = 1000 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
 
+        rc = xwosal_smr_post(smr3id);
+        if (rc < 0) {
+                goto err_post_smr3;
+        }
+        sleep = 1000 * XWTM_MS;
+        xwosal_cthrd_sleep(&sleep);
+
+        rc = xwosal_cdt_broadcast(cdt5id);
+        if (rc < 0) {
+                goto err_bdc_cdt5id;
+        }
+        sleep = 1000 * XWTM_MS;
+        xwosal_cthrd_sleep(&sleep);
+
+        rc = xwosal_cdt_broadcast(cdt6id);
+        if (rc < 0) {
+                goto err_bdc_cdt6id;
+        }
+        sleep = 1000 * XWTM_MS;
+        xwosal_cthrd_sleep(&sleep);
+
+err_bdc_cdt6id:
+err_bdc_cdt5id:
+err_post_smr3:
 err_post_smr2:
 err_post_smr1:
-err_post_smr0:
         return rc;
 }
