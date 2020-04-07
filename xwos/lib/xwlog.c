@@ -14,7 +14,6 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/lib/xwvspf.h>
 #include <xwos/lib/xwlog.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -44,7 +43,7 @@ int xwpf(const char * fmt, ...)
         char buf[XWLIBCFG_XWLOG_BUFSIZE];
 
         va_start(args, fmt);
-        i = xwvsnpf(buf, sizeof(buf), fmt, args);
+        i = snprintf(buf, sizeof(buf), fmt, args);
         va_end(args);
 
         /* Print the string */
@@ -74,7 +73,7 @@ int xwisrpf(const char * fmt, ...)
         char buf[XWLIBCFG_XWLOG_BUFSIZE];
 
         va_start(args, fmt);
-        i = xwvsnpf(buf, sizeof(buf), fmt, args);
+        i = snprintf(buf, sizeof(buf), fmt, args);
         va_end(args);
 
         /* Print the string */

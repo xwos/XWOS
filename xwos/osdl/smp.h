@@ -861,8 +861,6 @@ xwer_t xwosdl_cdt_wait(xwid_t cdtid,
         union xwlk_ulock oslk;
         xwer_t rc;
 
-
-
         cdt = xwosdl_cdt_get_obj(cdtid);
         /* FIXME: find lock from ID table */
         oslk.anon = lock.anon;
