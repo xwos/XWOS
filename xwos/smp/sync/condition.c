@@ -607,12 +607,15 @@ xwer_t xwsync_cdt_broadcast(struct xwsync_cdt * cdt)
                 if (__likely(OK == rc)) {
                         struct xwsync_evt * evt;
                         struct xwsync_object * xwsyncobj;
+                        xwreg_t cpuirq;
 
                         xwsyncobj = &cdt->xwsyncobj;
+                        xwos_plwq_lock_cpuirqsv(&cdt->wq.pl, &cpuirq);
                         xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
                         if (NULL != evt) {
                                 xwsync_evt_obj_s1i(evt, xwsyncobj);
                         }
+                        xwos_plwq_unlock_cpuirqrs(&cdt->wq.pl, cpuirq);
                 }
 #endif /* XWSMPCFG_SYNC_EVT */
                 xwsync_cdt_put(cdt);

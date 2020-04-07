@@ -454,6 +454,7 @@ xwer_t xwsync_cdt_broadcast_once(struct xwsync_cdt * cdt, bool * retry)
 __xwos_api
 xwer_t xwsync_cdt_broadcast(struct xwsync_cdt * cdt)
 {
+        xwreg_t cpuirq;
         bool retry;
         xwer_t rc;
 
@@ -469,10 +470,12 @@ xwer_t xwsync_cdt_broadcast(struct xwsync_cdt * cdt)
                         struct xwsync_object * xwsyncobj;
 
                         xwsyncobj = &cdt->xwsyncobj;
+                        xwos_cpuirq_save_lc(&cpuirq);
                         evt = xwsyncobj->selector.evt;
                         if (NULL != evt) {
                                 xwsync_evt_obj_s1i(evt, xwsyncobj);
                         }
+                        xwos_cpuirq_restore_lc(cpuirq);
                 }
 #endif /* XWUPCFG_SYNC_EVT */
         return rc;
