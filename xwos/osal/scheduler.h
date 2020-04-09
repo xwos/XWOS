@@ -55,7 +55,7 @@
  ******** ******** ********       APIs        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 操作系统抽象层API：检查优先级是否有效
+ * @brief XWOSAL API：检查优先级是否有效
  * @param prio: (I) 优先级
  * @retval true: 是
  * @retval false: 否
@@ -71,7 +71,7 @@ bool xwosal_scheduler_prio_tst_valid(xwpr_t prio)
 }
 
 /**
- * @brief 操作系统抽象层API：启动当前CPU的调度器
+ * @brief XWOSAL API：启动当前CPU的调度器
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -85,7 +85,7 @@ xwer_t xwosal_scheduler_start_lc(void)
 }
 
 /**
- * @brief 操作系统抽象层API：获取当前CPU调度器的系统滴答时间
+ * @brief XWOSAL API：获取当前CPU调度器的系统滴答时间
  * @return 系统时间
  * @note
  * - 同步/异步：同步
@@ -99,7 +99,7 @@ xwtm_t xwosal_scheduler_get_timetick_lc(void)
 }
 
 /**
- * @brief 操作系统抽象层API：获取当前CPU调度器的系统滴答计数
+ * @brief XWOSAL API：获取当前CPU调度器的系统滴答计数
  * @return 滴答计数
  * @note
  * - 同步/异步：同步
@@ -113,7 +113,7 @@ xwu64_t xwosal_scheduler_get_tickcount_lc(void)
 }
 
 /**
- * @brief 操作系统抽象层API：获取当前CPU调度器的系统时间戳
+ * @brief XWOSAL API：获取当前CPU调度器的系统时间戳
  * @return 系统时间
  * @note
  * - 同步/异步：同步
@@ -127,7 +127,7 @@ xwtm_t xwosal_scheduler_get_timestamp_lc(void)
 }
 
 /**
- * @brief 操作系统抽象层API：关闭本地CPU调度器的抢占
+ * @brief XWOSAL API：关闭本地CPU调度器的抢占
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -140,7 +140,7 @@ void xwosal_scheduler_dspmpt_lc(void)
 }
 
 /**
- * @brief 操作系统抽象层API：开启本地CPU调度器的抢占
+ * @brief XWOSAL API：开启本地CPU调度器的抢占
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程

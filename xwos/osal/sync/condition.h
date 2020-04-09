@@ -38,7 +38,7 @@ struct xwosal_cdt {
  ******** ******** ********       APIs        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 操作系统抽象层API：静态方式初始化条件量
+ * @brief XWOSAL API：静态方式初始化条件量
  * @param cdt: (I) 条件量的指针
  * @return 错误码
  * @note
@@ -53,7 +53,7 @@ xwer_t xwosal_cdt_init(struct xwosal_cdt * cdt)
 }
 
 /**
- * @brief 操作系统抽象层API：销毁静态方式初始化的条件量
+ * @brief XWOSAL API：销毁静态方式初始化的条件量
  * @param cdt: (I) 条件量的指针
  * @return 错误码
  * @note
@@ -68,7 +68,7 @@ xwer_t xwosal_cdt_destroy(struct xwosal_cdt * cdt)
 }
 
 /**
- * @brief 操作系统抽象层API：动态方式创建条件量
+ * @brief XWOSAL API：动态方式创建条件量
  * @param cdtidbuf: (O) 指向缓冲区的指针，通过此缓冲区返回ID
  * @return 错误码
  * @note
@@ -83,7 +83,7 @@ xwer_t xwosal_cdt_create(xwid_t * cdtidbuf)
 }
 
 /**
- * @brief 操作系统抽象层API：删除动态方式创建的条件量
+ * @brief XWOSAL API：删除动态方式创建的条件量
  * @param cdtid: (I) 条件量ID
  * @return 错误码
  * @note
@@ -98,7 +98,7 @@ xwer_t xwosal_cdt_delete(xwid_t cdtid)
 }
 
 /**
- * @brief 操作系统抽象层API：从条件量对象指针获取其ID
+ * @brief XWOSAL API：从条件量对象指针获取其ID
  * @param cdt: (I) 条件量对象的指针
  * @return 条件量ID
  * @note
@@ -113,7 +113,7 @@ xwid_t xwosal_cdt_get_id(struct xwosal_cdt * cdt)
 }
 
 /**
- * @brief 操作系统抽象层API：从条件量ID获取对象的指针
+ * @brief XWOSAL API：从条件量ID获取对象的指针
  * @param cdtid: (I) 条件量ID
  * @return 条件量对象的指针
  * @note
@@ -128,7 +128,7 @@ struct xwosal_cdt * xwosal_cdt_get_obj(xwid_t cdtid)
 }
 
 /**
- * @brief 操作系统抽象层API：绑定条件量到信号选择器
+ * @brief XWOSAL API：绑定条件量到信号选择器
  * @param cdtid: (I) 条件量的ID
  * @param sltid: (I) 信号选择器的ID
  * @param pos: (I) 条件量对象映射到位图中的位置
@@ -149,7 +149,7 @@ xwer_t xwosal_cdt_bind(xwid_t cdtid, xwid_t sltid, xwsq_t pos)
 }
 
 /**
- * @brief 操作系统抽象层API：从信号选择器上解绑条件量
+ * @brief XWOSAL API：从信号选择器上解绑条件量
  * @param cdtid: (I) 条件量的ID
  * @param sltid: (I) 信号选择器的ID
  * @return 错误码
@@ -167,7 +167,7 @@ xwer_t xwosal_cdt_unbind(xwid_t cdtid, xwid_t sltid)
 }
 
 /**
- * @brief 操作系统抽象层API：冻结条件量
+ * @brief XWOSAL API：冻结条件量
  * @param cdtid: (I) 条件量ID
  * @return 错误码
  * @retval OK: OK
@@ -187,7 +187,7 @@ xwer_t xwosal_cdt_freeze(xwid_t cdtid)
 }
 
 /**
- * @brief 操作系统抽象层API：解冻条件量，并重新初始化
+ * @brief XWOSAL API：解冻条件量，并重新初始化
  * @param cdtid: (I) 条件量ID
  * @return 错误码
  * @retval OK: OK
@@ -206,7 +206,7 @@ xwer_t xwosal_cdt_thaw(xwid_t cdtid)
 }
 
 /**
- * @brief 操作系统抽象层API：中断条件量等待队列中所有线程
+ * @brief XWOSAL API：中断条件量等待队列中所有线程
  * @param cdtid: (I) 条件量ID
  * @return 错误码
  * @note
@@ -223,7 +223,7 @@ xwer_t xwosal_cdt_intr_all(xwid_t cdtid)
 }
 
 /**
- * @brief 操作系统抽象层API：广播条件量，等待队列中的所有线程都会被唤醒
+ * @brief XWOSAL API：广播条件量，等待队列中的所有线程都会被唤醒
  * @param cdtid: (I) 条件量ID
  * @return 错误码
  * @note
@@ -240,7 +240,7 @@ xwer_t xwosal_cdt_broadcast(xwid_t cdtid)
 }
 
 /**
- * @brief 操作系统抽象层API：单播条件量，只会唤醒第一个线程
+ * @brief XWOSAL API：单播条件量，只会唤醒第一个线程
  * @param cdtid: (I) 条件量ID
  * @return 错误码
  * @note
@@ -257,7 +257,7 @@ xwer_t xwosal_cdt_unicast(xwid_t cdtid)
 }
 
 /**
- * @brief 操作系统抽象层API：等待条件量
+ * @brief XWOSAL API：等待条件量
  * @param cdtid: (I) 条件量ID
  * @param lock: (I) 锁
  * @param lktype: (I) 锁的类型
@@ -280,7 +280,7 @@ xwer_t xwosal_cdt_wait(xwid_t cdtid,
 }
 
 /**
- * @brief 操作系统抽象层API：限时等待条件量
+ * @brief XWOSAL API：限时等待条件量
  * @param cdtid: (I) 条件量ID
  * @param lock: (I) 锁
  * @param lktype: (I) 锁的类型

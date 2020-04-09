@@ -38,7 +38,7 @@ struct xwosal_selector {
  ******** ******** ********       APIs        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 操作系统抽象层API：静态方式初始化信号选择器
+ * @brief XWOSAL API：静态方式初始化信号选择器
  * @param selector: (I) 信号选择器的指针
  * @return 错误码
  * @note
@@ -53,7 +53,7 @@ xwer_t xwosal_selector_init(struct xwosal_selector * slt)
 }
 
 /**
- * @brief 操作系统抽象层API：销毁静态方式初始化的信号选择器
+ * @brief XWOSAL API：销毁静态方式初始化的信号选择器
  * @param selector: (I) 信号选择器的指针
  * @return 错误码
  * @note
@@ -68,7 +68,7 @@ xwer_t xwosal_selector_destroy(struct xwosal_selector * slt)
 }
 
 /**
- * @brief 操作系统抽象层API：动态方式创建信号选择器
+ * @brief XWOSAL API：动态方式创建信号选择器
  * @param sltbuf: (O) 指向缓冲区的指针，通过此缓冲区返回ID
  * @param val: (I) 信号选择器的初始值
  * @param max: (I) 信号选择器的最大值
@@ -85,7 +85,7 @@ xwer_t xwosal_selector_create(xwid_t * sltbuf)
 }
 
 /**
- * @brief 操作系统抽象层API：删除动态方式创建的信号选择器
+ * @brief XWOSAL API：删除动态方式创建的信号选择器
  * @param sltid: (I) 信号选择器ID
  * @return 错误码
  * @note
@@ -100,7 +100,7 @@ xwer_t xwosal_selector_delete(xwid_t sltid)
 }
 
 /**
- * @brief 操作系统抽象层API：从软件信号选择器对象指针获取其ID
+ * @brief XWOSAL API：从软件信号选择器对象指针获取其ID
  * @param selector: (I) 信号选择器对象的指针
  * @return 信号选择器ID
  * @note
@@ -115,7 +115,7 @@ xwid_t xwosal_selector_get_id(struct xwosal_selector * slt)
 }
 
 /**
- * @brief 操作系统抽象层API：从信号选择器ID获取对象的指针
+ * @brief XWOSAL API：从信号选择器ID获取对象的指针
  * @param sltid: (I) 信号选择器ID
  * @return 信号选择器对象的指针
  * @note
@@ -130,7 +130,7 @@ struct xwosal_selector * xwosal_selector_get_obj(xwid_t sltid)
 }
 
 /**
- * @brief 操作系统抽象层API：绑定源信号选择器到目的信号选择器
+ * @brief XWOSAL API：绑定源信号选择器到目的信号选择器
  * @param srcid: (I) 源信号选择器的ID
  * @param dstid: (I) 目的信号选择器的ID
  * @param pos: (I) 信号量对象映射到位图中的位置
@@ -152,7 +152,7 @@ xwer_t xwosal_selector_bind(xwid_t srcid, xwid_t dstid, xwsq_t pos)
 }
 
 /**
- * @brief 操作系统抽象层API：从目的信号选择器上解绑源信号选择器
+ * @brief XWOSAL API：从目的信号选择器上解绑源信号选择器
  * @param srcid: (I) 源信号选择器的ID
  * @param dstid: (I) 信号选择器的ID
  * @return 错误码
@@ -172,7 +172,7 @@ xwer_t xwosal_selector_unbind(xwid_t srcid, xwid_t dstid)
 }
 
 /**
- * @brief 操作系统抽象层API：中断信号选择器等待队列中的所有节点
+ * @brief XWOSAL API：中断信号选择器等待队列中的所有节点
  * @param sltid: (I) 信号选择器ID
  * @return 错误码
  * @retval OK: OK
@@ -190,7 +190,7 @@ xwer_t xwosal_selector_intr_all(xwid_t sltid)
 }
 
 /**
- * @brief 操作系统抽象层API：测试一下事件对象中绑定的同步对象，立即返回
+ * @brief XWOSAL API：测试一下事件对象中绑定的同步对象，立即返回
  * @param sltid: (I) 信号选择器ID
  * @param msk: (I) 待触发的信号量的位图掩码
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的信号量的位图
@@ -210,7 +210,7 @@ xwer_t xwosal_selector_tryselect(xwid_t sltid, xwbmp_t msk[], xwbmp_t trg[])
 }
 
 /**
- * @brief 操作系统抽象层API：等待信号选择器中的信号
+ * @brief XWOSAL API：等待信号选择器中的信号
  * @param sltid: (I) 信号选择器ID
  * @param msk: (I) 待触发的信号量的位图掩码
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的信号量的位图
@@ -231,7 +231,7 @@ xwer_t xwosal_selector_select(xwid_t sltid, xwbmp_t msk[], xwbmp_t trg[])
 }
 
 /**
- * @brief 操作系统抽象层API：限时等待信号选择器中的信号
+ * @brief XWOSAL API：限时等待信号选择器中的信号
  * @param sltid: (I) 信号选择器ID
  * @param msk: (I) 待触发的信号量的位图掩码
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的信号量的位图
