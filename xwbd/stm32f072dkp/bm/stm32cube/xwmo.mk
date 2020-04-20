@@ -22,6 +22,7 @@ include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
 CUBEMX_CSRCS := $(shell xwbs/util/el/makefile-grep-variable.el --variable=C_SOURCES $(call getXwmoDir)/cubemx/Makefile)
+CUBEMX_CSRCS += Core/Src/sys.c
 CUBEMX_CFLAGS := $(shell xwbs/util/el/makefile-grep-variable.el --variable=C_DEFS $(call getXwmoDir)/cubemx/Makefile)
 CUBEMX_INCDIRS := $(shell xwbs/util/el/makefile-grep-variable.el --variable=C_INCLUDES $(call getXwmoDir)/cubemx/Makefile)
 

@@ -2,7 +2,7 @@
 /**
   ******************************************************************************
   * File Name          : stm32f4xx_hal_msp.c
-  * Description        : This file provides code for the MSP Initialization 
+  * Description        : This file provides code for the MSP Initialization
   *                      and de-Initialization codes.
   ******************************************************************************
   * @attention
@@ -32,7 +32,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN Define */
- 
+
 /* USER CODE END Define */
 
 /* Private macro -------------------------------------------------------------*/
@@ -70,6 +70,8 @@ void HAL_MspInit(void)
   __HAL_RCC_SYSCFG_CLK_ENABLE();
   __HAL_RCC_PWR_CLK_ENABLE();
 
+  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_3);
+
   /* System interrupt init*/
   /* SVCall_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SVCall_IRQn, 1, 1);
@@ -77,6 +79,10 @@ void HAL_MspInit(void)
   HAL_NVIC_SetPriority(PendSV_IRQn, 7, 1);
 
   /* USER CODE BEGIN MspInit 1 */
+  LL_PWR_EnableBkUpAccess();
+  LL_DBGMCU_EnableDBGSleepMode();
+  LL_DBGMCU_EnableDBGStopMode();
+  LL_DBGMCU_EnableDBGStandbyMode();
 
   /* USER CODE END MspInit 1 */
 }

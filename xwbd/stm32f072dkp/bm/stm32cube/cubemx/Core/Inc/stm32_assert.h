@@ -3,9 +3,9 @@
   * @file    stm32_assert.h
   * @brief   STM32 assert file.
   ******************************************************************************
-   * @attention
+  * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2018 STMicroelectronics. 
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,
@@ -37,9 +37,9 @@
   *         If expr is true, it returns no value.
   * @retval None
   */
- #define assert_param(expr) ((expr) ? (void)0U : assert_failed((char *)__FILE__, __LINE__))
+ #define assert_param(expr) ((expr) ? (void)0U : assert_failed((uint8_t *)__FILE__, __LINE__))
 /* Exported functions ------------------------------------------------------- */
-  void assert_failed(char* file, uint32_t line);
+  void assert_failed(uint8_t* file, uint32_t line);
 #else
   #define assert_param(expr) ((void)0U)
 #endif /* USE_FULL_ASSERT */
