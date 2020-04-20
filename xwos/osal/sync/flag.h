@@ -218,7 +218,6 @@ xwer_t xwosal_flg_intr_all(xwid_t flgid)
  * @return 错误码
  * @retval OK: OK
  * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -237,7 +236,6 @@ xwer_t xwosal_flg_s1m(xwid_t flgid, xwbmp_t msk[])
  * @return 错误码
  * @retval OK: OK
  * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -256,7 +254,6 @@ xwer_t xwosal_flg_s1i(xwid_t flgid, xwsq_t pos)
  * @return 错误码
  * @retval OK: OK
  * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -276,7 +273,6 @@ xwer_t xwosal_flg_c0m(xwid_t flgid, xwbmp_t msk[])
  * @retval OK: OK
  * @retval -EFAULT: 空指针
  * @retval -ECHRNG: 位置超出范围
- * @retval -ETYPE: 事件对象类型错误
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -295,7 +291,6 @@ xwer_t xwosal_flg_c0i(xwid_t flgid, xwsq_t pos)
  * @return 错误码
  * @retval OK: OK
  * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -315,7 +310,6 @@ xwer_t xwosal_flg_x1m(xwid_t flgid, xwbmp_t msk[])
  * @retval OK: OK
  * @retval -EFAULT: 空指针
  * @retval -ECHRNG: 位置超出范围
- * @retval -ETYPE: 事件对象类型错误
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -346,6 +340,41 @@ xwer_t xwosal_flg_read(xwid_t flgid, xwbmp_t out[])
 }
 
 /**
+ * @brief XWOSAL API：测试一下事件信号旗
+ * @param flgid: (I) 事件信号旗ID
+ * @param trigger: (I) 事件触发条件，取值 @ref xwosal_flg_trigger_em
+ * @param action: (I) 事件触发后的动作，取值 @ref xwosal_evt_action_em，
+ *                    仅trigger当取值
+ *                    @ref XWOSAL_EVT_TRIGGER_SET_ALL
+ *                    @ref XWOSAL_EVT_TRIGGER_SET_ANY
+ *                    @ref XWOSAL_EVT_TRIGGER_CLR_ALL
+ *                    @ref XWOSAL_EVT_TRIGGER_CLR_ALL
+ *                    时有效，其他情况不使用此参数，可填 @ref XWOS_UNUSED_ARGUMENT
+ * @param origin: 指向缓冲区的指针，此缓冲区仅当trigger取值
+ *                @ref XWOSAL_EVT_TRIGGER_TGL_ALL 以及
+ *                @ref XWOSAL_EVT_TRIGGER_TGL_ANY
+ *                时有效，其他情况不使用此参数，可填NULL：
+ *                (I) 作为输入时，作为用于比较的初始值
+ *                (O) 作为输出时，返回事件信号旗位图状态
+ *                    （可作为下一次调用的初始值）
+ * @param msk: (I) 事件信号旗的位图掩码，表示只关注掩码部分的信号旗
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 空指针
+ * @retval -EINVAL: 参数无效
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwosal_flg_trywait(xwid_t flgid, xwsq_t trigger, xwsq_t action,
+                          xwbmp_t origin[], xwbmp_t msk[])
+{
+        return xwosdl_flg_trywait(flgid, trigger, action, origin, msk);
+}
+
+/**
  * @brief XWOSAL API：等待事件信号旗
  * @param flgid: (I) 事件信号旗ID
  * @param trigger: (I) 事件触发条件，取值 @ref xwosal_flg_trigger_em
@@ -360,14 +389,13 @@ xwer_t xwosal_flg_read(xwid_t flgid, xwbmp_t out[])
  *                @ref XWOSAL_EVT_TRIGGER_TGL_ALL 以及
  *                @ref XWOSAL_EVT_TRIGGER_TGL_ANY
  *                时有效，其他情况不使用此参数，可填NULL：
- *                (I) 作为输入时，作为事件信号旗的初始值
- *                (O) 作为输出时，返回线程被唤醒时的事件对象中信号旗位图状态
+ *                (I) 作为输入时，作为用于比较的初始值
+ *                (O) 作为输出时，返回事件信号旗位图状态
  *                    （可作为下一次调用的初始值）
  * @param msk: (I) 事件信号旗的位图掩码，表示只关注掩码部分的信号旗
  * @return 错误码
  * @retval OK: OK
  * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
  * @retval -EINVAL: 参数无效
  * @retval -EINTR: 等待被中断
  * @note
@@ -397,8 +425,8 @@ xwer_t xwosal_flg_wait(xwid_t flgid, xwsq_t trigger, xwsq_t action,
  *                @ref XWOSAL_EVT_TRIGGER_TGL_ALL 以及
  *                @ref XWOSAL_EVT_TRIGGER_TGL_ANY
  *                时有效，其他情况不使用此参数，可填NULL
- *                (I) 作为输入时，作为事件信号旗的初始值
- *                (O) 作为输出时，返回线程被唤醒时的事件对象中信号旗位图状态
+ *                (I) 作为输入时，作为用于比较的初始值
+ *                (O) 作为输出时，返回事件信号旗位图状态
  *                    （可作为下一次调用的初始值）
  * @param msk: (I) 事件信号旗的位图掩码（表示只关注掩码部分的信号旗）
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
@@ -407,7 +435,6 @@ xwer_t xwosal_flg_wait(xwid_t flgid, xwsq_t trigger, xwsq_t action,
  * @return 错误码
  * @retval OK: OK
  * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
  * @retval -EINVAL: 参数无效
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断

@@ -146,6 +146,11 @@ __xwos_api
 xwer_t xwsync_evt_read(struct xwsync_evt * evt, xwbmp_t out[]);
 
 __xwos_api
+xwer_t xwsync_evt_trywait(struct xwsync_evt * evt,
+                          xwsq_t trigger, xwsq_t action,
+                          xwbmp_t origin[], xwbmp_t msk[]);
+
+__xwos_api
 xwer_t xwsync_evt_timedwait(struct xwsync_evt * evt,
                             xwsq_t trigger, xwsq_t action,
                             xwbmp_t origin[], xwbmp_t msk[],
@@ -180,10 +185,10 @@ xwer_t xwsync_evt_timedsync(struct xwsync_evt * evt, xwsq_t pos, xwbmp_t sync[],
  *                @ref XWSYNC_EVT_TRIGGER_TGL_ALL 以及
  *                @ref XWSYNC_EVT_TRIGGER_TGL_ANY
  *                时有效，其他情况不使用此参数，可填NULL：
- *                (I) 作为输入时，作为事件信号旗的初始值
- *                (O) 作为输出时，返回线程被唤醒时的事件对象中信号旗位图状态
+ *                (I) 作为输入时，作为用于比较的初始值
+ *                (O) 作为输出时，返回事件对象中位图状态
  *                    （可作为下一次调用的初始值）
- * @param msk: (I) 事件信号旗的位图掩码，表示只关注掩码部分的信号旗。
+ * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的位
  * @return 错误码
  * @retval OK: OK
  * @retval -EFAULT: 空指针

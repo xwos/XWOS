@@ -76,6 +76,15 @@ xwer_t xwsync_evt_activate(struct xwsync_evt * evt, xwbmp_t initval[],
                            xwsq_t attr, xwobj_gc_f gcfunc);
 
 static __xwos_code
+xwer_t xwsync_evt_trywait_level(struct xwsync_evt * evt,
+                                xwsq_t trigger, xwsq_t action,
+                                xwbmp_t msk[]);
+
+static __xwos_code
+xwer_t xwsync_evt_trywait_edge(struct xwsync_evt * evt, xwsq_t trigger,
+                               xwbmp_t origin[], xwbmp_t msk[]);
+
+static __xwos_code
 xwer_t xwsync_evt_timedwait_level(struct xwsync_evt * evt,
                                   xwsq_t trigger, xwsq_t action,
                                   xwbmp_t msk[],
@@ -323,7 +332,7 @@ xwer_t xwsync_evt_delete(struct xwsync_evt * evt)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *evt* ，不可重入。
+ * - 重入性：对于同一个 *evt* ，不可重入
  */
 __xwos_api
 xwer_t xwsync_evt_init(struct xwsync_evt * evt, xwbmp_t initval[], xwsq_t attr)
@@ -397,7 +406,7 @@ xwer_t xwsync_evt_unbind(struct xwsync_evt * evt, struct xwsync_evt * slt)
 }
 
 /**
- * @brief XWOS API：中断事件等待队列中的所有节点
+ * @brief XWOS API：中断事件对象等待队列中的所有节点
  * @param evt: (I) 事件对象的指针
  * @return 错误码
  * @retval OK: OK
@@ -418,9 +427,10 @@ xwer_t xwsync_evt_intr_all(struct xwsync_evt * evt)
 
 /******** type:XWSYNC_EVT_TYPE_FLAG ********/
 /**
- * @brief XWOS API：同时设置多个事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG
+ * @brief XWOS API：在事件对象中同时设置多个位图的位，
+ *                  事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
- * @param msk: (I) 事件信号旗的位图掩码
+ * @param msk: (I) 事件对象的位图掩码
  * @return 错误码
  * @retval OK: OK
  * @retval -EFAULT: 空指针
@@ -457,9 +467,10 @@ err_evt_grab:
 }
 
 /**
- * @brief XWOS API：设置单个事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG
+ * @brief XWOS API：在事件对象中设置单个位图的位，
+ *                  事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
- * @param pos: (I) 事件信号旗的序号
+ * @param pos: (I) 位的序号
  * @return 错误码
  * @retval OK: OK
  * @retval -EFAULT: 空指针
@@ -495,9 +506,10 @@ err_evt_grab:
 }
 
 /**
- * @brief XWOS API：同时清除多个事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG
+ * @brief XWOS API：在事件对象中同时清除多个位图的位，
+ *                  事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
- * @param msk: (I) 事件信号旗的位图掩码
+ * @param msk: (I) 事件对象的位图掩码
  * @return 错误码
  * @retval OK: OK
  * @retval -EFAULT: 空指针
@@ -534,9 +546,10 @@ err_evt_grab:
 }
 
 /**
- * @brief XWOS API：清除单个事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG
+ * @brief XWOS API：在事件对象中清除单个位图的位，
+ *                  事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
- * @param pos: (I) 事件信号旗的序号
+ * @param pos: (I) 位的序号
  * @return 错误码
  * @retval OK: OK
  * @retval -EFAULT: 空指针
@@ -574,9 +587,10 @@ err_evt_grab:
 }
 
 /**
- * @brief XWOS API：同时翻转多个事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG
+ * @brief XWOS API：在事件对象中同时翻转多个位图的位，
+ *                  事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
- * @param msk: (I) 事件信号旗的位图掩码
+ * @param msk: (I) 事件对象的位图掩码
  * @return 错误码
  * @retval OK: OK
  * @retval -EFAULT: 空指针
@@ -613,9 +627,10 @@ err_evt_grab:
 }
 
 /**
- * @brief XWOS API：翻转单个事件信号旗，事件对象类型为XWSYNC_EVT_TYPE_FLAG
+ * @brief XWOS API：在事件对象中翻转单个位图的位，
+ *                  事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
- * @param pos: (I) 事件信号旗的序号
+ * @param pos: (I) 位的序号
  * @return 错误码
  * @retval OK: OK
  * @retval -EFAULT: 空指针
@@ -688,6 +703,182 @@ err_evt_grab:
 }
 
 static __xwos_code
+xwer_t xwsync_evt_trywait_level(struct xwsync_evt * evt,
+                                xwsq_t trigger, xwsq_t action,
+                                xwbmp_t msk[])
+{
+        xwreg_t cpuirq;
+        bool triggered;
+        xwer_t rc;
+
+        XWOS_VALIDATE((trigger <= XWSYNC_EVT_TRIGGER_CLR_ANY),
+                      "illegal-trigger", -EINVAL);
+        XWOS_VALIDATE((action < XWSYNC_EVT_ACTION_NUM),
+                      "illegal-action", -EINVAL);
+
+        rc = OK;
+        xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        if (XWSYNC_EVT_ACTION_CONSUMPTION == action) {
+                switch (trigger) {
+                case XWSYNC_EVT_TRIGGER_SET_ALL:
+                        triggered = xwbmpop_t1ma_then_c0m(evt->bmp, msk,
+                                                          XWSYNC_EVT_MAXNUM);
+                        break;
+                case XWSYNC_EVT_TRIGGER_SET_ANY:
+                        triggered = xwbmpop_t1mo_then_c0m(evt->bmp, msk,
+                                                          XWSYNC_EVT_MAXNUM);
+                        break;
+                case XWSYNC_EVT_TRIGGER_CLR_ALL:
+                        triggered = xwbmpop_t0ma_then_s1m(evt->bmp, msk,
+                                                          XWSYNC_EVT_MAXNUM);
+                        break;
+                case XWSYNC_EVT_TRIGGER_CLR_ANY:
+                        triggered = xwbmpop_t0mo_then_s1m(evt->bmp, msk,
+                                                          XWSYNC_EVT_MAXNUM);
+                        break;
+                default:
+                        triggered = true;
+                        rc = -EINVAL;
+                        break;
+                }
+        } else {
+                switch (trigger) {
+                case XWSYNC_EVT_TRIGGER_SET_ALL:
+                        triggered = xwbmpop_t1ma(evt->bmp, msk,
+                                                 XWSYNC_EVT_MAXNUM);
+                        break;
+                case XWSYNC_EVT_TRIGGER_SET_ANY:
+                        triggered = xwbmpop_t1mo(evt->bmp, msk,
+                                                 XWSYNC_EVT_MAXNUM);
+                        break;
+                case XWSYNC_EVT_TRIGGER_CLR_ALL:
+                        triggered = xwbmpop_t0ma(evt->bmp, msk,
+                                                 XWSYNC_EVT_MAXNUM);
+                        break;
+                case XWSYNC_EVT_TRIGGER_CLR_ANY:
+                        triggered = xwbmpop_t0mo(evt->bmp, msk,
+                                                 XWSYNC_EVT_MAXNUM);
+                        break;
+                default:
+                        triggered = true;
+                        rc = -EINVAL;
+                        break;
+                }
+        }
+        xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+        if (!triggered) {
+                rc = -ENODATA;
+        }
+        return rc;
+}
+
+static __xwos_code
+xwer_t xwsync_evt_trywait_edge(struct xwsync_evt * evt, xwsq_t trigger,
+                               xwbmp_t origin[], xwbmp_t msk[])
+{
+        xwreg_t cpuirq;
+        xwssq_t cmprc;
+        bool triggered;
+        xwer_t rc;
+        XWSYNC_EVT_DECLARE_BITMAP(cur);
+        XWSYNC_EVT_DECLARE_BITMAP(tmp);
+
+        XWOS_VALIDATE((origin), "nullptr", -EFAULT);
+
+        xwbmpop_and(origin, msk, XWSYNC_EVT_MAXNUM);
+        xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        xwbmpop_assign(cur, evt->bmp, XWSYNC_EVT_MAXNUM);
+        xwbmpop_and(cur, msk, XWSYNC_EVT_MAXNUM);
+        if (XWSYNC_EVT_TRIGGER_TGL_ALL == trigger) {
+                xwbmpop_assign(tmp, cur, XWSYNC_EVT_MAXNUM);
+                xwbmpop_xor(tmp, origin, XWSYNC_EVT_MAXNUM);
+                cmprc = xwbmpop_cmp(tmp, msk, XWSYNC_EVT_MAXNUM);
+                if (0 == cmprc) {
+                        triggered = true;
+                        rc = OK;
+                } else {
+                        triggered = false;
+                        rc = -ENODATA;
+                }
+        } else if (XWSYNC_EVT_TRIGGER_TGL_ANY == trigger) {
+                cmprc = xwbmpop_cmp(origin, cur, XWSYNC_EVT_MAXNUM);
+                if (0 == cmprc) {
+                        triggered = false;
+                        rc = -ENODATA;
+                } else {
+                        triggered = true;
+                        rc = OK;
+                }
+        } else {
+                triggered = true;
+                rc = -EINVAL;
+        }
+        if (triggered) {
+                xwbmpop_assign(origin, cur, XWSYNC_EVT_MAXNUM);
+                xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+        } else {
+                xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+        }
+        return rc;
+}
+
+/**
+ * @brief XWOS API：测试事件对象中的位，事件对象类型为XWSYNC_EVT_TYPE_FLAG
+ * @param evt: (I) 事件对象的指针
+ * @param trigger: (I) 事件触发条件，取值 @ref xwsync_evt_trigger_em
+ * @param action: (I) 事件触发后的动作，取值 @ref xwsync_evt_action_em
+ *                    仅当trigger取值
+ *                    @ref XWSYNC_EVT_TRIGGER_SET_ALL
+ *                    @ref XWSYNC_EVT_TRIGGER_SET_ANY
+ *                    @ref XWSYNC_EVT_TRIGGER_CLR_ALL
+ *                    @ref XWSYNC_EVT_TRIGGER_CLR_ALL
+ *                    时有效，其他情况不使用此参数，可填 @ref XWOS_UNUSED_ARGUMENT
+ * @param origin: 指向缓冲区的指针，此缓冲区仅当trigger取值
+ *                @ref XWSYNC_EVT_TRIGGER_TGL_ALL 以及
+ *                @ref XWSYNC_EVT_TRIGGER_TGL_ANY
+ *                时有效，其他情况不使用此参数，可填NULL：
+ *                (I) 作为输入时，作为用于比较的初始值
+ *                (O) 作为输出时，返回事件对象中位图状态
+ *                    （可作为下一次调用的初始值）
+ * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的位
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 空指针
+ * @retval -ETYPE: 事件对象类型错误
+ * @retval -EINVAL: 参数无效
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwos_api
+xwer_t xwsync_evt_trywait(struct xwsync_evt * evt,
+                          xwsq_t trigger, xwsq_t action,
+                          xwbmp_t origin[], xwbmp_t msk[])
+{
+        xwer_t rc;
+
+        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
+        XWOS_VALIDATE(((evt->attr & XWSYNC_EVT_TYPE_MASK) == XWSYNC_EVT_TYPE_FLAG),
+                      "type-error", -ETYPE);
+
+        rc = xwsync_evt_grab(evt);
+        if (rc < 0) {
+                goto err_evt_grab;
+        }
+        if (trigger <= XWSYNC_EVT_TRIGGER_CLR_ANY) {
+                rc = xwsync_evt_trywait_level(evt, trigger, action, msk);
+        } else {
+                rc = xwsync_evt_trywait_edge(evt, trigger, origin, msk);
+        }
+        xwsync_evt_put(evt);
+
+err_evt_grab:
+        return rc;
+}
+
+static __xwos_code
 xwer_t xwsync_evt_timedwait_level(struct xwsync_evt * evt,
                                   xwsq_t trigger, xwsq_t action,
                                   xwbmp_t msk[],
@@ -703,6 +894,7 @@ xwer_t xwsync_evt_timedwait_level(struct xwsync_evt * evt,
         XWOS_VALIDATE((action < XWSYNC_EVT_ACTION_NUM),
                       "illegal-action", -EINVAL);
 
+        rc = OK;
         xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         while (true) {
                 if (XWSYNC_EVT_ACTION_CONSUMPTION == action) {
@@ -844,7 +1036,7 @@ xwer_t xwsync_evt_timedwait_edge(struct xwsync_evt * evt, xwsq_t trigger,
 }
 
 /**
- * @brief XWOS API：限时等待事件对象中的信号，事件对象类型为XWSYNC_EVT_TYPE_FLAG
+ * @brief XWOS API：限时等待事件对象中的位，事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
  * @param trigger: (I) 事件触发条件，取值 @ref xwsync_evt_trigger_em
  * @param action: (I) 事件触发后的动作，取值 @ref xwsync_evt_action_em
@@ -858,10 +1050,10 @@ xwer_t xwsync_evt_timedwait_edge(struct xwsync_evt * evt, xwsq_t trigger,
  *                @ref XWSYNC_EVT_TRIGGER_TGL_ALL 以及
  *                @ref XWSYNC_EVT_TRIGGER_TGL_ANY
  *                时有效，其他情况不使用此参数，可填NULL：
- *                (I) 作为输入时，作为事件信号旗的初始值
- *                (O) 作为输出时，返回线程被唤醒时的事件对象中信号旗位图状态
+ *                (I) 作为输入时，作为用于比较的初始值
+ *                (O) 作为输出时，返回事件对象中位图状态
  *                    （可作为下一次调用的初始值）
- * @param msk: (I) 事件信号旗的位图掩码，表示只关注掩码部分的信号旗
+ * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的位
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -1094,7 +1286,7 @@ err_evt_grab:
 /**
  * @brief XWOS API：测试一下事件对象中绑定的同步对象，不进行阻塞等待
  * @param evt: (I) 事件对象的指针
- * @param msk: (I) 待触发的同步对象的位图掩码，表示只关注掩码部分的信号旗
+ * @param msk: (I) 待触发的同步对象的位图掩码，表示只关注掩码部分的位
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象的位图
  * @return 错误码
  * @retval OK: OK
@@ -1137,6 +1329,7 @@ xwer_t xwsync_evt_tryselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t trg[
                         xwbmpop_and(evt->bmp, evt->msk, XWSYNC_EVT_MAXNUM);
                         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                 }
+                rc = OK;
         } else {
                 rc = -ENODATA;
                 xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
@@ -1207,6 +1400,7 @@ xwer_t xwsync_evt_timedselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t tr
                                 xwbmpop_and(evt->bmp, evt->msk, XWSYNC_EVT_MAXNUM);
                                 xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                         }
+                        rc = OK;
                         break;
                 } else {
                         /* Clear non-exclusive bits */

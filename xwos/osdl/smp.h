@@ -1083,6 +1083,18 @@ xwer_t xwosdl_flg_read(xwid_t flgid, xwbmp_t out[])
 }
 
 static __xw_inline
+xwer_t xwosdl_flg_trywait(xwid_t flgid, xwsq_t trigger, xwsq_t action,
+                          xwbmp_t origin[], xwbmp_t msk[])
+{
+        struct xwosdl_flg * flg;
+        xwer_t rc;
+
+        flg = xwosdl_flg_get_obj(flgid);
+        rc = xwsync_evt_trywait(flg, trigger, action, origin, msk);
+        return rc;
+}
+
+static __xw_inline
 xwer_t xwosdl_flg_wait(xwid_t flgid, xwsq_t trigger, xwsq_t action,
                        xwbmp_t origin[], xwbmp_t msk[])
 {
