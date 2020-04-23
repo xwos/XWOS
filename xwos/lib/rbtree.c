@@ -23,8 +23,6 @@
  * @brief 插入一个红色节点后修正红黑树的颜色
  * @param tree: (I) 红黑树的指针
  * @param node: (I) 待修正颜色的节点的指针
- * @note
- * - 节点在插入时的初始颜色为红色。
  */
 __xwlib_code __hot
 void xwlib_rbtree_insert_color(struct xwlib_rbtree * tree,
@@ -41,16 +39,16 @@ void xwlib_rbtree_insert_color(struct xwlib_rbtree * tree,
 recursively_fix:
         if (node == tree->root) {
                 /*
-                 * case 1: rbtree is empty.
-                 *
-                 *               n(R)
+                 * 情况 1：红黑树为空
+                 * ==================
+                 *               n(r)
                  *               /  \
                  *        NULL(B)    NULL(B)
                  *
-                 *  flip_color (n)
+                 *  flip_color(n)
                  * --------------->
                  *
-                 *               N(B)
+                 *               n(B)
                  *               /  \
                  *        NULL(B)    NULL(B)
                  *
@@ -60,50 +58,51 @@ recursively_fix:
         }
 
         parent = xwlib_rbtree_get_parent(node);
-        if (xwlib_rbtree_color_tst_black(parent->lpc.v)) {
+        if (xwlib_rbtree_tst_black(parent->lpc.v)) {
                 /*
-                 * case 2: Parent is black, and do nothing.
+                 * 情况 2：父节点为黑色
+                 * ====================
                  */
                 return;
         }
 
-        /* case 3: Parent is red. */
+        /* 情况 3： 父节点为红色 */
         gparent = xwlib_rbtree_get_parent(parent);
         if (xwlib_rbtree_tst_right(parent->lpc.v)) {
                 tmp.uncle = gparent->left;
-                /* `rotation' is used in case 3.2.2 to right-rotate parent */
-                rotation = xwlib_rbtree_get_rr(node);
+                rotation = xwlib_rbtree_gen_rr(node); /* `rotation' 用于右旋 */
         } else {
                 tmp.uncle = gparent->right;
-                /* `rotation' is used in case 3.2.1 to left-rotate parent */
-                rotation = xwlib_rbtree_get_lr(node);
+                rotation = xwlib_rbtree_gen_lr(node); /* `rotation' 用于左旋 */
         }
 
-        if ((tmp.uncle) && xwlib_rbtree_color_tst_red(tmp.uncle->lpc.v)) {
+        if ((tmp.uncle) && xwlib_rbtree_tst_red(tmp.uncle->lpc.v)) {
                 /*
-                 * case 3.1: Uncle is red.
+                 * 情况 3.1：叔节点(u)是红色
+                 * =========================
+                 *
                  *                   |
-                 *                  G(B)
+                 *                  g(B)
                  *                __/  \__
                  *               /        \
-                 *           p(R)          u(R)
+                 *           p(r)          u(r)
                  *           /  \          /  \
-                 *       n(R)
+                 *       n(r)
                  *       /  \
                  *
-                 *  flip_color(p); flip_color(u); flip_color(G);
+                 *  flip_color(p); flip_color(u); flip_color(g);
                  * ---------------------------------------------->
                  *
                  *                   |
-                 *                  g(R)
+                 *                  g(r)
                  *                __/  \__
                  *               /        \
-                 *           P(B)          U(B)
+                 *           p(B)          u(B)
                  *           /  \          /  \
-                 *       n(R)
+                 *       n(r)
                  *       /  \
                  *
-                 *  recursively fix_color(G);
+                 *  recursively fix_color(g);
                  * --------------------------->
                  *
                  * ******** ******** ******** ******** ******** ********
@@ -111,28 +110,28 @@ recursively_fix:
                  * ******** ******** ******** ******** ******** ********
                  *
                  *                   |
-                 *                  G(B)
+                 *                  g(B)
                  *                __/  \__
                  *               /        \
-                 *           u(R)          p(R)
+                 *           u(r)          p(r)
                  *           /  \          /  \
-                 *                             n(R)
+                 *                             n(r)
                  *                             /  \
                  *
-                 *  flip_color(p); flip_color(u); flip_color(G);
+                 *  flip_color(p); flip_color(u); flip_color(g);
                  * ---------------------------------------------->
                  *
                  *                   |
-                 *                  g(R)
+                 *                  g(r)
                  *                __/  \__
                  *               /        \
-                 *           U(B)          P(B)
+                 *           u(B)          p(B)
                  *           /  \          /  \
-                 *                             n(R)
+                 *                             n(r)
                  *                             /  \
                  *
-                 *  recursively fix_color(G);
-                 * --------------------------->
+                 *  递归地修正颜色，节点g为待修正颜色的节点
+                 * ----------------------------------------->
                  *
                  */
                 xwlib_rbtree_flip_color(parent);
@@ -142,36 +141,37 @@ recursively_fix:
                 goto recursively_fix;
         }
 
-        /* Case 3.2: Uncle is leaf or black-child */
+        /* 情况 3.2: 叔节点(U)是叶子或黑色 */
         if (xwlib_rbtree_get_pos(parent->lpc.v) != xwlib_rbtree_get_pos(node->lpc.v)) {
                 /*
-                 * Case 3.2.1: node->lpc.pos != parent->lpc.pos.
+                 * Case 3.2.1: node->lpc.pos != parent->lpc.pos
+                 * ============================================
                  *
                  *                      |
-                 *                     G(B)
+                 *                     g(B)
                  *                   __/  \__
                  *                  /        \
-                 *               p(R)         U(B)
+                 *               p(r)         u(B)
                  *             __/  \__       /  \
                  *            /        \
-                 *        S(B)          n(R)
+                 *        s(B)          n(r)
                  *        /  \          /  \
-                 *                  L(B)    R(B)
+                 *                  l(B)    r(B)
                  *                  /  \    /  \
                  *
                  *  left_rotate(p);
                  * ----------------->
                  *
                  *                           |
-                 *                          G(B)
+                 *                          g(B)
                  *                        __/  \__
                  *                       /        \
-                 *                   n(R)          U(B)
+                 *                   n(r)          u(B)
                  *                 __/  \__        /  \
                  *                /        \
-                 *            p(R)          R(B)
+                 *            p(r)          r(B)
                  *            /  \          /  \
-                 *        S(B)    L(B)
+                 *        s(B)    l(B)
                  *        /  \    /  \
                  *
                  * ******** ******** ******** ******** ******** ********
@@ -179,33 +179,33 @@ recursively_fix:
                  * ******** ******** ******** ******** ******** ********
                  *
                  *               |
-                 *              G(B)
+                 *              g(B)
                  *            __/  \__
                  *           /        \
-                 *        U(B)         p(R)
+                 *        u(B)         p(r)
                  *        /  \       __/  \__
                  *                  /        \
-                 *              n(R)          S(B)
+                 *              n(r)          s(B)
                  *              /  \          /  \
-                 *          L(B)    R(B)
+                 *          l(B)    r(B)
                  *          /  \    /  \
                  *
                  *  right_rotate(p);
                  * ----------------->
                  *
                  *               |
-                 *              G(B)
+                 *              g(B)
                  *            __/  \__
                  *           /        \
-                 *       U(B)          n(R)
+                 *       u(B)          n(r)
                  *       /  \        __/  \__
                  *                  /        \
-                 *              L(B)          p(R)
+                 *              l(B)          p(r)
                  *                            /  \
-                 *                        R(B)    S(B)
+                 *                        r(B)    s(B)
                  *                        /  \    /  \
                  *
-                 * Transform into case 3.3: parent is new node.
+                 * 转换为情况 3.2.2，原来的父节点变为待修正颜色的节点(n)。
                  */
                 tmp.child = *xwlib_rbtree_get_link(rotation);
                 lpc = parent->lpc.v;
@@ -221,7 +221,7 @@ recursively_fix:
                 /* *xwlib_rbtree_get_link(lpc) = node; */ /* omitted */
                 node->lpc.v = lpc; /* color: red */
 
-                /* Transform into case 3.2.2 */
+                /* 转换为情况 3.2.2 */
                 tmp.child = parent;
                 parent = node;
                 node = tmp.child;
@@ -229,42 +229,43 @@ recursively_fix:
         }
 
         /*
-         * case 3.2.2: node->lpc.pos == parent->lpc.pos.
+         * 情况 3.2.2: node->lpc.pos == parent->lpc.pos
+         * ============================================
          *
          *                           |
-         *                          G(B)
+         *                          g(B)
          *                        __/  \__
          *                       /        \
-         *                   p(R)          U(B)
+         *                   p(r)          u(B)
          *                 __/  \__        /  \
          *                /        \
-         *            n(R)          S(B)
+         *            n(r)          s(B)
          *            /  \          /  \
-         *        L(B)    R(B)
+         *        l(B)    r(B)
          *        /  \    /  \
          *
-         *  right_rotate(G);
+         *  right_rotate(g);
          * ------------------>
          *
          *                     |
-         *                    p(R)
+         *                    p(r)
          *                 ___/  \___
          *                /          \
-         *            n(R)            G(B)
+         *            n(r)            g(B)
          *            /  \            /  \
-         *        L(B)    R(B)    S(B)    U(B)
+         *        l(B)    r(B)    s(B)    u(B)
          *        /  \    /  \    /  \    /  \
          *
-         *  flip_color(p); flip_color(G);
+         *  flip_color(p); flip_color(g);
          * ------------------------------->
          *
          *                     |
          *                    P(B)
          *                 ___/  \___
          *                /          \
-         *            n(R)            g(R)
+         *            n(r)            g(r)
          *            /  \            /  \
-         *        L(B)    R(B)    S(B)    U(B)
+         *        l(B)    r(B)    s(B)    u(B)
          *        /  \    /  \    /  \    /  \
          *
          * ******** ******** ******** ******** ******** ********
@@ -272,53 +273,53 @@ recursively_fix:
          * ******** ******** ******** ******** ******** ********
          *
          *               |
-         *              G(B)
+         *              g(B)
          *            __/  \__
          *           /        \
-         *       U(B)          p(R)
+         *       u(B)          p(r)
          *       /  \        __/  \__
          *                  /        \
-         *              S(B)          n(R)
+         *              s(B)          n(r)
          *                            /  \
-         *                        L(B)    R(B)
+         *                        l(B)    r(B)
          *                        /  \    /  \
          *
-         *  left_rotate(G);
+         *  left_rotate(g);
          * ------------------>
          *
          *                     |
-         *                    p(R)
+         *                    p(r)
          *                 ___/  \___
          *                /          \
-         *            G(B)            n(R)
+         *            g(B)            n(r)
          *            /  \            /  \
-         *        U(B)    S(B)    L(B)    R(B)
+         *        u(B)    s(B)    l(B)    r(B)
          *        /  \    /  \    /  \    /  \
          *
-         *  flip_color(p); flip_color(G);
+         *  flip_color(p); flip_color(g);
          * ------------------------------->
          *
          *                     |
-         *                    P(B)
+         *                    p(B)
          *                 ___/  \___
          *                /          \
-         *            G(R)            n(R)
+         *            g(r)            n(r)
          *            /  \            /  \
-         *        U(B)    S(B)    L(B)    R(B)
+         *        u(B)    s(B)    l(B)    r(B)
          *        /  \    /  \    /  \    /  \
          *
          */
         if (xwlib_rbtree_tst_right(node->lpc.v)) {
                 tmp.sibling = parent->left;
-                rotation = xwlib_rbtree_get_lr(parent); /* left_rotate gparent */
+                rotation = xwlib_rbtree_gen_lr(parent); /* 左旋g */
         } else {
                 tmp.sibling = parent->right;
-                rotation = xwlib_rbtree_get_rr(parent); /* right_rotate gparent */
+                rotation = xwlib_rbtree_gen_rr(parent); /* 右旋g */
         }
         lpc = parent->lpc.v;
 
         *xwlib_rbtree_get_link(gparent->lpc.v) = parent;
-        parent->lpc.v = gparent->lpc.v; /* flip_color(p): black */
+        parent->lpc.v = gparent->lpc.v; /* flip_color(p): 黑 */
 
         *xwlib_rbtree_get_link(lpc) = tmp.sibling;
         if (tmp.sibling) {
@@ -326,7 +327,7 @@ recursively_fix:
         }/* else {} */
 
         *xwlib_rbtree_get_link(rotation) = gparent;
-        gparent->lpc.v = rotation; /* flip_color(G): red */
+        gparent->lpc.v = rotation; /* flip_color(g): 红 */
 }
 
 /**
@@ -334,7 +335,7 @@ recursively_fix:
  * @param tree: (I) 红黑树的指针
  * @param node: (I) 待删除的节点的指针
  * @note
- * - 这个函数假设不存在节点没有链接到红黑树的情形。
+ * - 此函数假设不存在节点没有链接到红黑树的情形。
  */
 __xwlib_code __hot
 void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
@@ -356,7 +357,7 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
         xwptr_t lpc;
         xwptr_t rotation;
 
-        /* Stage 1: remove node */
+        /* 步骤 1：删除节点 */
         rr.right =  node->right;
         sl.left =  node->left;
         if (!sl.left) {
@@ -364,96 +365,113 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                 *xwlib_rbtree_get_link(node->lpc.v) = rr.right;
                 if (!rr.right) {
                         /*
-                         * Case 1: Node has no child.
+                         * 情况 1：待删除的节点(n)没有子节点
+                         * =================================
                          *
-                         *        |
-                         *      p(Cp)
-                         *      /   \
-                         * s(Cs)     n(Cn)
+                         *                  |
+                         *                p(*)
+                         *                /   \
+                         * s(r) or NULL(B)     n(r)
                          *
                          *  transplant_nil(n)
                          * -------------------->
                          *
-                         *       |                            |
-                         *     p(Cp)                        p(Cp)
-                         *     /   \         or             /   \          or
-                         * s(R)     NULL(B)             S(B)     NULL(BB)
-                         *                              /  \
-                         *                       NULL(B)    NULL(B)
+                         *                  |
+                         *                p(*)
+                         *                /   \
+                         * s(r) or NULL(B)     NULL(B)
                          *
-                         *           |
-                         *         p(Cp)
-                         *         /   \
-                         *      s(R)    NULL(BB)
-                         *      /  \
-                         *  L(B)    R(B)
+                         * =====================================================
+                         *
+                         *               |
+                         *             p(*)
+                         *             /   \
+                         * s(B) or s(r)     n(B)
+                         *
+                         *  transplant_nil(n)
+                         * -------------------->
+                         *
+                         *               |                              |
+                         *             p(*)                           p(*)
+                         *             /   \            or            /   \
+                         *         s(B)     NULL(BB)              s(r)     NULL(BB)
+                         *         /  \                           /  \
+                         *  NULL(B)    NULL(B)                l(B)    r(B)
                          *
                          * ******** ******** ******** ******** ******** ********
                          *  OR
                          * ******** ******** ******** ******** ******** ********
-                         *
                          *        |
-                         *      p(Cp)
+                         *      p(*)
                          *      /   \
-                         * n(Cn)     s(Cn)
+                         *  n(r)     NULL(B) or s(r)
                          *
                          *  transplant_nil(n)
                          * -------------------->
                          *
-                         *          |                      |
-                         *        p(Cp)                  p(Cp)
-                         *        /   \      or          /   \              or
-                         * NULL(B)     s(R)      NULL(BB)     S(B)
-                         *                                    /  \
-                         *                             NULL(B)    NULL(B)
+                         *          |
+                         *        p(*)
+                         *        /   \
+                         * NULL(B)     NULL(B) or s(r)
                          *
-                         *           |
-                         *         p(Cp)
-                         *         /   \
-                         * NULL(BB)     s(R)
-                         *              /  \
-                         *          L(B)    R(B)
+                         * =====================================================
                          *
-                         * * If node is red, the sibling is NULL or red due to 5).
-                         * * If node is black, the sibling is not NULL
-                         *   due to 5). And if sibling is red, it has two
-                         *   black children. If sibling is black, it has
-                         *   no child.
+                         *        |
+                         *      p(*)
+                         *      /   \
+                         *  n(B)     s(B) or s(r)
+                         *
+                         *  transplant_nil(n)
+                         * -------------------->
+                         *
+                         *            |                                 |
+                         *          p(*)                              p(*)
+                         *          /   \                             /   \
+                         *  NULL(BB)     s(B)           or    NULL(BB)     s(r)
+                         *               /  \                              /  \
+                         *        NULL(B)    NULL(B)                   l(B)    r(B)
+                         *
+                         * + 如果待删除的节点(n)是红色，根据性质5，
+                         *   它的兄弟节点(s)不是叶子，就是红色节点，且没有子节点；
+                         * + 如果待删除的节点(n)是黑色，根据性质5，
+                         *   它的兄弟节点(s)一定不是叶子：
+                         *   - 如果兄弟节点(s)是红色，那么兄弟节点(s)有两个黑色子节点；
+                         *   - 如果兄弟节点(s)是黑色，那么兄弟节点(s)没子节点。
                          */
                         if (NULL == tree->root) {
                                 return;
                         }
 
                         lpc = node->lpc.v;
-                        if (xwlib_rbtree_color_tst_black(lpc)) {
-                                /*
-                                 * `rotation' is Used to right-rotate parent
-                                 * in stage 2.
-                                 */
+                        if (xwlib_rbtree_tst_black(lpc)) {
                                 if (xwlib_rbtree_tst_right(lpc)) {
                                         sibling = parent->left;
-                                        rotation = xwlib_rbtree_get_rr(sibling);
+                                        rotation = xwlib_rbtree_gen_rr(sibling);
                                 } else {
                                         sibling = parent->right;
-                                        rotation = xwlib_rbtree_get_lr(sibling);
+                                        rotation = xwlib_rbtree_gen_lr(sibling);
                                 }
                         } else {
                                 sibling = NULL;
                         }
                 } else {
                         /*
-                         * Case 2.1: Node has no left child.
-                         *
+                         * 情况 2：待删除的节点(n)只有一个子节点
+                         * =====================================
+                         */
+                        /*
+                         * 情况 2.1：待删除的节点(n)没有左子节点
+                         * =====================================
                          *    |
                          *   n(B)
                          *      \
-                         *       r(R)
+                         *       r(r)
                          *
                          *  transplant(n->right, n)
                          * ------------------------->
                          *
                          *    |
-                         *  r(RB)
+                         *  r(rB)
                          *
                          *  set_black(r)
                          * ---------------->
@@ -461,26 +479,27 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                          *    |
                          *   r(B)
                          *
-                         * If there is one child, it must be red due to 5),
-                         * and the node is black due to 4).
+                         * + 根据性质5，右子节点(r)一定是红色；
+                         * + 根据性质4，待删除的节点(n)一定是黑色；
                          */
                         rr.right->lpc.v = node->lpc.v; /* Inherit color */
                         sibling = NULL;
                 }
         } else if (!rr.right) {
                 /*
-                 * Case 2.2: Node has no right child.
+                 * 情况 2.2：待删除的节点(n)没有右子节点
+                 * =====================================
                  *
                  *       |
                  *      n(B)
                  *      /
-                 *  r(R)
+                 *  r(r)
                  *
                  *  transplant(n->left, n)
                  * ------------------------->
                  *
                  *    |
-                 *  r(RB)
+                 *  r(rB)
                  *
                  *  set_black(r)
                  * ---------------->
@@ -488,66 +507,62 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                  *    |
                  *   r(B)
                  *
-                 * If there is one child it must be red due to 5),
-                 * and the node is black due to 4).
+                 * + 根据性质5，左子节点(r)一定是红色；
+                 * + 根据性质4，待删除的节点(n)一定是黑色；
                  */
                 xwlib_rbtree_link(sl.left, node->lpc.v); /* Inherit color */
                 sibling = NULL;
         } else {
                 /*
-                 * Case 3: the left child & right child are existing.
+                 * 情况 3：待删除的节点(n)同时存在左右子节点
                  */
                 struct xwlib_rbtree_node * successor;
 
                 successor = xwlib_rbtree_get_successor(node);
                 if (successor == rr.right) {
                         /*
-                         * Case 3.1: Node(n)'s successor is its right child(r).
+                         * 情况 3.1：待删除的节点(n)的后继节点(s)是它的右节点
+                         * ==================================================
                          *
                          *        |
-                         *       n(Cn)
+                         *       n(*)
                          *      /   \
-                         * l(Cl)     s(Cs)
+                         *  l(*)     s(*)
                          *               \
-                         *                c(R)_or_NULL(B)
+                         *                c(r)_or_NULL(B)
                          *
                          *   transplant(s, n)
                          *  -------------------------------------------->
-                         *   (s inherits color of n and leaves Cr to c)
+                         *  s把自己的颜色留给了c，n把自己的颜色留给了s
                          *
                          *      |
-                         *     s(Cn)                         n()
-                         *         \                         /
-                         *          c(RB)_or_NULL(BB)   l(Cl)
+                         *    s(*)                          n()
+                         *        \                         /
+                         *         c(rB)_or_NULL(BB)    l(*)
                          *
                          *   link(l, ((&s->left) | (RBTREE_LEFT) | color(l)))
                          *  -------------------------------------------------->
                          *
                          *         |
-                         *       s(Cn)
+                         *       s(*)                       n()
                          *       /   \
-                         *  l(Cl)     c(B)_or_NULL(BB)
+                         *   l(*)     c(B)_or_NULL(BB)
                          *
-                         * - Right child of successor must be red if existing
-                         *   due to 5), and the successor is black due to 4).
-                         * - If successor is red, it has no child due to 5).
-                         * - If successor has no right child and successor is
-                         *   black, left must be not NIL due to 5).
-                         *
+                         * + 如果后继节点(s)有右子节点，根据性质5，(s)的右子节点
+                         *   必然为红色，再根据性质4，(s)必然不可能为红色（即为黑色）；
+                         * + 如果后继节点(s)为红色，其不可能存在子节点；
+                         * + 如果后继节点(s)没有右子节点且(s)为黑色，根据性质5，
+                         *   (s)的兄弟节点也即是(n)的左子节点(l)必然存在。
                          */
 
                         if (successor->right) {
                                 xwlib_rbtree_set_black(successor->right);
                                 sibling = NULL;
                         } else {
-                                /*
-                                 * `rotation' is Used to right-rotate parent
-                                 * in stage 2.
-                                 */
-                                if (xwlib_rbtree_color_tst_black(successor->lpc.v)) {
+                                if (xwlib_rbtree_tst_black(successor->lpc.v)) {
                                         sibling = sl.left;
                                         parent = successor;
-                                        rotation = xwlib_rbtree_get_rr(sibling);
+                                        rotation = xwlib_rbtree_gen_rr(sibling);
                                 } else {
                                         sibling = NULL;
                                 }
@@ -555,75 +570,77 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                         xwlib_rbtree_transplant(successor, node);
                         cc.color = xwlib_rbtree_get_color(sl.left->lpc.v);
                         xwlib_rbtree_link(sl.left,
-                                          xwlib_rbtree_get_lc(successor, cc.color));
+                                          xwlib_rbtree_gen_lc(successor, cc.color));
                 } else {
                         /*
-                         * Case 3.2: Node(n)'s successor(s) is leftmost under
-                         *           node(n)'s right child subtree.
+                         * 情况 3.2：(n)的后继节点(s)是(n)的右子树上最左端的节点
+                         * =====================================================
                          *
                          *        |
-                         *      n(Cn)
+                         *      n(*)
                          *      /   \
                          *     l     r
                          *          / \
                          *         p
                          *        / \
-                         *   s(Cs)
+                         *    s(*)
                          *       \
-                         *        c(R)_or_NIL(B)
+                         *        c(r)_or_NULL(B)
                          *
                          *   transplant(s->right, s)
                          *  ------------------------->
+                         *   s把自己的颜色留给了c
                          *
                          *                  |
-                         *                n(Cn)            s()
+                         *                n(*)             s()
                          *                /   \
                          *               l     r
                          *                    / \
                          *                   p
                          *                  / \
-                         *  c(RB)_or_NIL(BB)
+                         * c(rB)_or_NULL(BB)
                          *
                          *   link(r, ((&s->right) | (RBTREE_RIGHT) | color(r)))
                          *  ---------------------------------------------------->
                          *
                          *      |
-                         *    n(Cn)              s()
+                         *    n(*)               s()
                          *    /                    \
                          *   l                      r
                          *                         / \
                          *                        p
                          *                       / \
-                         *        C(B)_or_NIL(BB)
+                         *       c(B)_or_NULL(BB)
                          *
                          *   link(l, ((&s->left) | (RBTREE_LEFT) | color(l)))
                          *  -------------------------------------------------->
                          *
                          *       |
-                         *     n(Cn)            s()
+                         *     n(*)             s()
                          *                      / \
                          *                     l   r
                          *                        / \
                          *                       p
                          *                      / \
-                         *       C(B)_or_NIL(BB)
+                         *      c(B)_or_NULL(BB)
                          *
                          *   transplant(s, n)
-                         *  ------------------>
+                         *  --------------------->
+                         *   n把自己的颜色留给了s
                          *
                          *                    |
-                         *                  s(Cn)
+                         *                  s(*)
                          *                  /   \
                          *                 l     r
                          *                      / \
                          *                     p
                          *                    / \
-                         *     C(B)_or_NIL(BB)
+                         *    C(B)_or_NULL(BB)
                          *
-                         * - Right child of successor must be red if existing due to 5),
-                         *   and the successor is black due to 4).
-                         * - If successor has no right child and successor is black,
-                         *   left must be not NULL due to 5).
+                         * + 如果后继节点(s)的右子节点(r)存在，根据性质5，
+                         *   (r)一定是红色，再根据性质4，(s)一定为黑色；
+                         * + 根据性质5，如果后继节点(s)没有右子节点且(s)为黑色，
+                         *   (n)的左子节点(l)必然存在。
                          */
                         parent = xwlib_rbtree_get_parent(successor);
                         lpc = successor->lpc.v; /* cache */
@@ -634,12 +651,9 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                                 cc.child->lpc.v = lpc; /* Inherit color */
                                 sibling = NULL;
                         } else {
-                                /*
-                                 * `rotation' is Used to left-rotate parent in stage 2.
-                                 */
-                                if (xwlib_rbtree_color_tst_black(successor->lpc.v)) {
+                                if (xwlib_rbtree_tst_black(successor->lpc.v)) {
                                         sibling = parent->right;
-                                        rotation = xwlib_rbtree_get_lr(sibling);
+                                        rotation = xwlib_rbtree_gen_lr(sibling);
                                 } else {
                                         sibling = NULL;
                                 }
@@ -648,73 +662,75 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                         /* link(r, ((&s->right) | (RBTREE_RIGHT) | color(r))) */
                         cc.color = xwlib_rbtree_get_color(rr.right->lpc.v);
                         xwlib_rbtree_link(rr.right,
-                                          xwlib_rbtree_get_rc(successor, cc.color));
+                                          xwlib_rbtree_gen_rc(successor, cc.color));
 
                         /* link(r, ((&s->right) | (RBTREE_RIGHT) | color(r))) */
                         cc.color = xwlib_rbtree_get_color(sl.left->lpc.v);
                         xwlib_rbtree_link(sl.left,
-                                          xwlib_rbtree_get_lc(successor, cc.color));
+                                          xwlib_rbtree_gen_lc(successor, cc.color));
 
                         /* transplant(s, n) */
                         xwlib_rbtree_transplant(successor, node);
                 }
         }
 
-        /* Stage 2: fix color */
+        /* 步骤 2：修复颜色 */
+        /* X有可能是NULL或节点(n) */
         if (!sibling) {
                 return;
         }
 
 recursively_fix:
-        if (xwlib_rbtree_color_tst_red(sibling->lpc.v)) {
+        if (xwlib_rbtree_tst_red(sibling->lpc.v)) {
                 /*
-                 * Case 1: Sibling is red.
+                 * Case 1: 兄弟节点(s)是红色
+                 * ===================================================
                  *                          *
                  *         |                *           |
-                 *        P(B)              *          P(B)
+                 *        p(B)              *          p(B)
                  *        /  \              *          /  \
-                 *   X(BB)    s(R)          *      s(R)    X(BB)
+                 *   X(BB)    s(r)          *      s(r)    X(BB)
                  *            /  \          *      /  \
-                 *        L(B)    R(B)      *  L(B)    R(B)
+                 *        l(B)    r(B)      *  l(B)    r(B)
                  *                          *
-                 *  left_rotate(P)          *  right_rotate(P)
+                 *  left_rotate(p)          *  right_rotate(p)
                  * ---------------->        * ----------------->
                  *                          *
                  *            |             *           |
-                 *           s(R)           *          s(R)
+                 *           s(r)           *          s(r)
                  *           /  \           *          /  \
-                 *       P(B)    R(B)       *      L(B)    P(B)
+                 *       P(B)    r(B)       *      l(B)    P(B)
                  *       /  \               *              /  \
-                 *  X(BB)    L(B)           *          R(B)    X(BB)
+                 *  X(BB)    l(B)           *          r(B)    X(BB)
                  *                          *
                  *  flip_color(s);          *  flip_color(s);
                  * ---------------->        * ---------------->
                  *  flip_color(P);          *  flip_color(P);
                  *                          *
                  *            |             *           |
-                 *           S(B)           *          S(B)
+                 *           s(B)           *          s(B)
                  *           /  \           *          /  \
-                 *       p(R)    R(B)       *      L(B)    p(R)
+                 *       p(r)    r(B)       *      l(B)    p(r)
                  *       /  \               *              /  \
-                 *  X(BB)    L(B)           *          R(B)    X(BB)
+                 *  X(BB)    l(B)           *          r(B)    X(BB)
                  *                          *
-                 * L is new sibling.        * R is new sibling.
+                 * l是新的兄弟节点          * r是新的兄弟节点
                  *                          *
-                 * - Parent must be black due to 4).
-                 * - Sibling has two black children due to 5).
+                 * + 根据性质4，父节点(p)一定为黑色；
+                 * + 根据性质5，兄弟节点(s)有两个黑色的子节点。
                  */
                 lpc = sibling->lpc.v;
                 cc.child = *xwlib_rbtree_get_link(rotation);
 
                 *xwlib_rbtree_get_link(parent->lpc.v) = sibling;
-                sibling->lpc.v = parent->lpc.v; /* flip_color: black */
+                sibling->lpc.v = parent->lpc.v; /* flip_color: 黑色 */
 
                 *xwlib_rbtree_get_link(lpc) = cc.child;
                 cc.child->lpc.v = lpc | XWLIB_RBTREE_COLOR_BLACK;
 
                 /* xwlib_rbtree_link(parent, rotation); */
                 *xwlib_rbtree_get_link(rotation) = parent;
-                parent->lpc.v = rotation; /* flip_color: red */
+                parent->lpc.v = rotation; /* flip_color: 红色 */
 
                 /* parent = parent; */ /* omitted */
                 sibling = cc.child;
@@ -722,91 +738,87 @@ recursively_fix:
 
 black_sibling:
         /*
-         * Case 2: Sibling is black.
+         * 情况 2：兄弟节点(s)是黑色
          */
         if (xwlib_rbtree_tst_right(sibling->lpc.v)) {
-                /* `rotation' is used to left rotate parent in case 2.3. */
-                rotation = xwlib_rbtree_get_lr(sibling);
+                rotation = xwlib_rbtree_gen_lr(sibling); /* 左旋 */
                 rr.reverse = sibling->left;
                 sl.same = sibling->right;
-                /* `lpc' is used to right rotate reverse in case 2.2. */
                 if (rr.reverse) {
-                        lpc = xwlib_rbtree_get_rr(rr.reverse);
+                        lpc = xwlib_rbtree_gen_rr(rr.reverse); /* 右旋 */
                 }/* else {} */
         } else {
-                /* `rotation' is used to right rotate parent in case 2.3. */
-                rotation = xwlib_rbtree_get_rr(sibling);
+                rotation = xwlib_rbtree_gen_rr(sibling); /* 右旋 */
                 rr.reverse = sibling->right;
                 sl.same = sibling->left;
-                /* `lpc' is used to left rotate reverse in case 2.2. */
                 if (rr.reverse) {
-                        lpc = xwlib_rbtree_get_lr(rr.reverse);
+                        lpc = xwlib_rbtree_gen_lr(rr.reverse); /* 左旋 */
                 }/* else {} */
         }
 
-        if (!sl.same || xwlib_rbtree_color_tst_black(sl.same->lpc.v)) {
-                if (!rr.reverse || xwlib_rbtree_color_tst_black(rr.reverse->lpc.v)) {
+        if (!sl.same || xwlib_rbtree_tst_black(sl.same->lpc.v)) {
+                if (!rr.reverse || xwlib_rbtree_tst_black(rr.reverse->lpc.v)) {
                         /*
-                         * Case 2.1: Sibling has no red child.
+                         * 情况 2.1：兄弟节点(s)没有红色的子节点
+                         * =====================================
                          *
-                         *             |
-                         *           p(Cp)
-                         *           /   \
-                         *       S(B)     X(BB)
-                         *       /  \
-                         *  Cs(B)    Cr(B)
+                         *               |
+                         *             p(*)
+                         *             /   \
+                         *         s(B)     x(BB)
+                         *         /  \
+                         *  same(B)    reverse(B)
                          *
-                         *  flip_color(p); flip_color(S); flip_color(X);
+                         *  flip_color(p); flip_color(s); flip_color(x);
                          * ---------------------------------------------->
                          *
-                         *             |
-                         *           p(RB_or_BB)
-                         *           /    \
-                         *       s(R)      X(B)
-                         *       /  \
-                         *  Cs(B)    Cr(B)
+                         *                |
+                         *             p(rB_or_BB)
+                         *             /    \
+                         *         s(r)      X(B)
+                         *         /  \
+                         *  same(B)    reverse(B)
                          *
-                         *  If p is red, set_black(p)
-                         * --------------------------->
-                         *  If p is black, p is new X.
+                         *  如果p是红色，就把p设置为黑色
+                         * --------------------------------------->
+                         *  如果p是黑色，p就作为新的X递归调整颜色
                          *
                          * ******** ******** ******** ******** ******** ********
                          *  OR
                          * ******** ******** ******** ******** ******** ********
                          *
                          *            |
-                         *          p(Cp)
+                         *          p(*)
                          *          /   \
-                         *     X(BB)     S(B)
+                         *     X(BB)     s(B)
                          *               /  \
-                         *          Cr(B)    Cs(B)
+                         *     reverse(B)    same(B)
                          *
                          *  flip_color(p); flip_color(S); flip_color(X);
                          * ---------------------------------------------->
                          *
                          *            |
-                         *          p(RB_or_BB)
+                         *          p(rB_or_BB)
                          *          /    \
-                         *      X(B)      s(R)
+                         *      X(B)      s(r)
                          *                /  \
-                         *           Cr(B)    Cs(B)
+                         *      reverse(B)    same(B)
                          *
-                         *  If p is red, set_black(p)
-                         * --------------------------->
-                         *  If p is black, p is new X.
-                         *
+                         *  如果p是红色，就把p设置为黑色
+                         * --------------------------------------->
+                         *  如果p是黑色，p就作为新的X递归调整颜色
                          */
                         xwlib_rbtree_flip_color(sibling);
-                        if (xwlib_rbtree_color_tst_black(parent->lpc.v)) {
+                        if (xwlib_rbtree_tst_black(parent->lpc.v)) {
                                 if (parent != tree->root) {
                                         cc.child = parent;
                                         parent = xwlib_rbtree_get_parent(cc.child);
                                         if (xwlib_rbtree_tst_right(cc.child->lpc.v)) {
                                                 sibling = parent->left;
-                                                rotation = xwlib_rbtree_get_rr(sibling);
+                                                rotation = xwlib_rbtree_gen_rr(sibling);
                                         } else {
                                                 sibling = parent->right;
-                                                rotation = xwlib_rbtree_get_lr(sibling);
+                                                rotation = xwlib_rbtree_gen_lr(sibling);
                                         }
                                         goto recursively_fix;
                                 }
@@ -817,80 +829,80 @@ black_sibling:
                 }
 
                 /*
-                 * Case 2.2: Child in reverse side is red and child in same side
-                 *           is black.
+                 * 情况 2.2：与兄弟节点(s)位置相同的子节点为黑色，
+                 *           位置相反的子节点为红色
                  *
-                 *             |
-                 *           p(Cp)
-                 *           /   \
-                 *       S(B)     X(BB)
-                 *       /  \
-                 *  Cs(B)    cr(R)
-                 *           /
-                 *      Gc(B)
+                 *               |
+                 *             p(*)
+                 *             /   \
+                 *         s(B)     X(BB)
+                 *         /  \
+                 *  same(B)    reverse(r)
+                 *            /
+                 *        z(B)
                  *
-                 *  left_rotate(S);
+                 *  left_rotate(s);
                  * ----------------->
                  *
                  *                  |
-                 *                p(Cp)
+                 *                p(*)
                  *                /   \
-                 *           cr(R)     X(BB)
-                 *           /
-                 *       S(B)
-                 *       /  \
-                 *  Cs(B)    Gc(B)
+                 *      reverse(r)     X(BB)
+                 *             /
+                 *         s(B)
+                 *         /  \
+                 *  same(B)    z(B)
                  *
-                 *  flip_color(cr); flip_color(S)
-                 * ------------------------------->
+                 *  flip_color(reverse); flip_color(s)
+                 * ----------------------------------->
                  *
                  *                  |
-                 *                p(Cp)
+                 *                p(*)
                  *                /   \
-                 *           Cr(B)     X(BB)
-                 *           /
-                 *       s(R)
-                 *       /  \
-                 *  Cs(B)    Gc(B)
+                 *      reverse(B)     X(BB)
+                 *             /
+                 *         s(r)
+                 *         /  \
+                 *  same(B)    z(B)
                  *
                  * ******** ******** ******** ******** ******** ********
                  *  OR
                  * ******** ******** ******** ******** ******** ********
                  *
                  *            |
-                 *          p(Cp)
+                 *          p(*)
                  *          /   \
-                 *     X(BB)     S(B)
+                 *     X(BB)     s(B)
                  *               /  \
-                 *          cr(R)    Cs(B)
+                 *     reverse(r)    same(B)
                  *              \
-                 *               Gs(B)
+                 *               z(B)
                  *
-                 *  right_rotate(S);
+                 *  right_rotate(s);
                  * ------------------>
                  *
                  *            |
-                 *          p(Cp)
+                 *          p(*)
                  *          /  \
-                 *     X(BB)    cr(R)
+                 *     X(BB)    reverse(r)
                  *                  \
-                 *                   S(B)
+                 *                   s(B)
                  *                   /  \
-                 *              Gc(B)    Cs(B)
+                 *               z(B)    same(B)
                  *
-                 *  flip_color(cr); flip_color(S)
-                 * ------------------------------->
+                 *  flip_color(reverse); flip_color(s)
+                 * ----------------------------------->
                  *
                  *            |
-                 *          p(Cp)
+                 *          p(*)
                  *          /   \
-                 *     X(BB)     Cr(B)
+                 *     X(BB)     reverse(B)
                  *                   \
-                 *                    s(R)
+                 *                    s(r)
                  *                    /  \
-                 *               Gc(B)    Cs(B)
+                 *                z(B)    same(B)
                  *
-                 * Transform into case 2.3.
+                 * 转换为情况 2.3
                  */
                 rotation = sibling->lpc.v;
                 cc.child = *xwlib_rbtree_get_link(lpc);
@@ -918,57 +930,56 @@ black_sibling:
                 /* flip_color(cr) */
                 rr.reverse->lpc.v = rotation | XWLIB_RBTREE_COLOR_BLACK;
 
-                /* Transform into case 2.3. */
+                /* 转换为情况 2.3 */
                 sibling = rr.reverse;
                 goto black_sibling;
         }
 
         /*
-         * Case 2.3: Child in same side is red.
+         * 情况 2.3：与兄弟节点(s)位置相同的子节点为红色
          *
-         *             |
-         *           p(Cp)
-         *           /   \
-         *       S(B)     X(BB)
-         *       /  \
-         *  cs(R)    cr(Ccr)
+         *               |
+         *             p(*)
+         *             /   \
+         *         s(B)     X(BB)
+         *         /  \
+         *  same(r)    reverse(*)
          *
          *  right_rotate(p);
          * ------------------>
-         *  leave color
+         *  s, p, X留下颜色
          *
-         *             |
-         *           S(Cp)
-         *           /   \
-         *     Cs(RB)     P(B)
-         *                /  \
-         *         cr(Ccr)    X(B)
+         *               |
+         *             s(*)
+         *             /   \
+         *     same(rB)     p(B)
+         *                  /  \
+         *        reverse(*)    X(B)
          *
          * ******** ******** ******** ******** ******** ********
          *  OR
          * ******** ******** ******** ******** ******** ********
          *
          *             |
-         *           p(Cp)
+         *           p(*)
          *           /   \
-         *      X(BB)     S(B)
+         *      X(BB)     s(B)
          *                /  \
-         *         cr(Ccr)    cs(R)
+         *      reverse(*)    same(r)
          *
          *  left_rotate(p);
          * ------------------>
-         *  leave color
+         *  s, p, X留下颜色
          *
          *               |
-         *             S(Cp)
+         *             s(*)
          *             /   \
-         *         P(B)     cs(RB)
+         *         p(B)     same(rB)
          *         /  \
-         *     X(B)    cr(Ccr)
+         *     X(B)    reverse(*)
          *
-         *  S leaves color 'B' to cs and inherits color 'Cp' from p.
-         *  p leaves color 'Cp' and inherits one color 'B' from X.
-         *  X leaves one color 'B'.
+         * + s把黑色留给same，然后继承p的颜色；
+         * + p留下颜色然后继承X的一份黑色，X带走另一份；
          *
          */
         lpc = parent->lpc.v;

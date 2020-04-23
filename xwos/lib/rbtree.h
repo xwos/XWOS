@@ -10,11 +10,11 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * @note
  * > 红黑树性质:
- * > + 节点不是红色就是黑色；
- * > + 根节点是黑色；
- * > + 所有的叶子都是黑色；
- * > + 每个红色的节点，如果有子节点，必须是黑色；
- * > + 从任意节点到其任意子孙叶子的路径上，所包含的黑色节点数量相同。
+ * > 1. 节点不是红色就是黑色；
+ * > 2. 根节点是黑色；
+ * > 3. 所有的叶子都是黑色；
+ * > 4. 每个红色的节点，如果有子节点，必须是黑色；
+ * > 5. 从任意节点到其任意子树的叶子的路径上，所包含的黑色节点数量相同。
  */
 
 #ifndef __xwos_lib_rbtree_h__
@@ -47,7 +47,7 @@ enum xwlib_rbtree_color_em {
 /**
  * @brief 红黑树节点
  * @note
- * > - 不使用位定义，因为在大端机器（PowerPC）和小端机器(ARM/X86)中，位的编号方式不同。
+ * > - 别使用位定义，因为在大端机器（PowerPC）和小端机器(ARM/X86)中，位的编号方式不同。
  * > - 此结构体的内存地址必须按4字节对齐，其地址信息的低两位必须为0。
  * >   这份代码实现的红黑树算法使用这两位分别存放位置(pos)和颜色(color)信息。
  * - 当位置为XWLIB_RBTREE_POS_RIGHT，当前节点为右孩子，其link指针指向父节点的right。
@@ -97,7 +97,7 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
 }
 
 /**
- * @brief 获得lpc信息中的link指针
+ * @brief 获取lpc信息中的link指针
  * @param lpc: (I) 链指针，位置，颜色的合并值
  * @return 链指针
  */
@@ -105,14 +105,14 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
         ((struct xwlib_rbtree_node **)(((xwptr_t)(lpc)) & (~((xwptr_t)3UL))))
 
 /**
- * @brief 获得lpc信息中的link指针和位置信息（屏蔽颜色信息）
+ * @brief 获取lpc信息中的link指针和位置信息（屏蔽颜色信息）
  * @param lpc: (I) 链指针，位置，颜色的合并值
  * @return 链指针和位置信息
  */
 #define xwlib_rbtree_get_lnpos(lpc)     ((xwptr_t)lpc & (~((xwptr_t)2UL)))
 
 /**
- * @brief 获得lpc信息中的位置信息
+ * @brief 获取lpc信息中的位置信息
  * @param lpc: (I) 链指针，位置，颜色的合并值
  * @return 位置信息
  */
@@ -140,7 +140,7 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
  * @param color: (I) 颜色
  * @return 指向父节点左边的链指针、位置和颜色信息
  */
-#define xwlib_rbtree_get_lc(parent, color)      \
+#define xwlib_rbtree_gen_lc(parent, color)      \
         ((xwptr_t)(&((parent)->left)) | (xwptr_t)(color))
 
 /**
@@ -149,7 +149,7 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
  * @param color: (I) 颜色
  * @return 指向父节点右边的链指针、位置和颜色信息
  */
-#define xwlib_rbtree_get_rc(parent, color)      \
+#define xwlib_rbtree_gen_rc(parent, color)      \
         ((xwptr_t)(&((parent)->right)) | (xwptr_t)(color) | XWLIB_RBTREE_POS_RIGHT)
 
 /**
@@ -157,31 +157,31 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
  * @param parent: (I) 父节点指针
  * @return 指向父节点左边的链指针、位置和红色信息
  */
-#define xwlib_rbtree_get_lr(parent) xwlib_rbtree_get_lc(parent, XWLIB_RBTREE_COLOR_RED)
+#define xwlib_rbtree_gen_lr(parent) xwlib_rbtree_gen_lc(parent, XWLIB_RBTREE_COLOR_RED)
 
 /**
  * @brief 生成父节点左边的链指针、位置和红色信息
  * @param parent: (I) 父节点指针
  * @return 指向父节点左边的链指针、位置和黑色信息
  */
-#define xwlib_rbtree_get_lb(node) xwlib_rbtree_get_lc(node, XWLIB_RBTREE_COLOR_BLACK)
+#define xwlib_rbtree_gen_lb(node) xwlib_rbtree_gen_lc(node, XWLIB_RBTREE_COLOR_BLACK)
 
 /**
  * @brief 生成父节点右边的链指针、位置和红色信息
  * @param parent: (I) 父节点指针
  * @return 指向父节点右边的链指针、位置和红色信息
  */
-#define xwlib_rbtree_get_rr(node) xwlib_rbtree_get_rc(node, XWLIB_RBTREE_COLOR_RED)
+#define xwlib_rbtree_gen_rr(node) xwlib_rbtree_gen_rc(node, XWLIB_RBTREE_COLOR_RED)
 
 /**
  * @brief 生成父节点右边的链指针、位置和红色信息
  * @param parent: (I) 父节点指针
  * @return 指向父节点右边的链指针、位置和黑色信息
  */
-#define xwlib_rbtree_get_rb(node) xwlib_rbtree_get_rc(node, XWLIB_RBTREE_COLOR_BLACK)
+#define xwlib_rbtree_gen_rb(node) xwlib_rbtree_gen_rc(node, XWLIB_RBTREE_COLOR_BLACK)
 
 /**
- * @brief 获得lpc信息中的颜色信息
+ * @brief 获取lpc信息中的颜色信息
  * @param lpc: (I) 链指针，位置，颜色的合并值
  * @return 颜色信息
  */
@@ -193,7 +193,7 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
  * @retval true: 是
  * @retval false: 否
  */
-#define xwlib_rbtree_color_tst_black(lpc)       (!!xwlib_rbtree_get_color(lpc))
+#define xwlib_rbtree_tst_black(lpc)             (!!xwlib_rbtree_get_color(lpc))
 
 /**
  * @brief 测试当前lpc中的颜色信息是否为红色
@@ -201,7 +201,7 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
  * @retval true: 是
  * @retval false: 否
  */
-#define xwlib_rbtree_color_tst_red(lpc)         (!xwlib_rbtree_get_color(lpc))
+#define xwlib_rbtree_tst_red(lpc)               (!xwlib_rbtree_get_color(lpc))
 
 /**
  * @brief 从红黑树节点指针值计算出包含该节点成员的外层结构体的指针值
@@ -217,9 +217,9 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
  * @return 父节点指针
  * @note
  * - left是struct @ref xwlib_rbtree_node的第一个成员。
- * - &parent->left与&parent在数值上是相等的（指针的实质就是一个整数）。因此
- *   当link指向parent->left时，其数值也等于parent的地址；
- *   当link指向parent->right时，其数值减去sizeof(void *)后可获得parent地址。
+ * - &parent->left与&parent在数值上是相等的（指针就是一个位数等于CPU位宽的无符号整数）。
+ *   因此当link指向parent->left时，其数值也等于parent的地址；
+ *   当link指向parent->right时，其数值减去sizeof(指针)后可获取parent地址。
  * - 当父节点不存在（红黑树第一个节点），其link指针指向root，此函数返回root的指针。
  */
 static __xwlib_inline
@@ -239,7 +239,7 @@ struct xwlib_rbtree_node * xwlib_rbtree_get_parent(struct xwlib_rbtree_node * no
  * @return 父节点指针
  */
 static __xwlib_inline
-struct xwlib_rbtree_node * xwlib_rbtree_lpc_to_parent(xwptr_t lpc)
+struct xwlib_rbtree_node * xwlib_rbtree_get_parent_from_lpc(xwptr_t lpc)
 {
         xwptr_t pos = xwlib_rbtree_get_pos(lpc);
         struct xwlib_rbtree_node ** link = xwlib_rbtree_get_link(lpc) - pos;
