@@ -59,20 +59,21 @@ xwer_t xwlib_map_insert(struct xwlib_map * m, struct xwlib_map_container * newmc
                 }
         }
         if (lpc) {
-                xwlib_rbtree_link(&newmc->rbn, lpc);
-                xwlib_rbtree_insert_color(&m->rbtree, &newmc->rbn);
-                rbn = xwlib_rbtree_get_parent(&newmc->rbn);
-                if (rbn == m->rbtree.root) {
+                if (xwlib_rbtree_tst_link_root(&m->rbtree,
+                                               xwlib_rbtree_get_link(lpc))) {
                         xwlib_bclst_add_head(&m->bclh, &newmc->bcln);
                 } else {
-                        parent = xwlib_rbtree_entry(rbn,
-                                                    struct xwlib_map_container, rbn);
-                        if (xwlib_rbtree_tst_left(newmc->rbn.lpc.v)) {
+                        rbn = xwlib_rbtree_get_parent_from_lpc(lpc);
+                        parent = xwlib_rbtree_entry(rbn, struct xwlib_map_container,
+                                                    rbn);
+                        if (xwlib_rbtree_tst_left(lpc)) {
                                 xwlib_bclst_add_front(&newmc->bcln, &parent->bcln);
                         } else {
                                 xwlib_bclst_add_behind(&newmc->bcln, &parent->bcln);
                         }
                 }
+                xwlib_rbtree_link(&newmc->rbn, lpc);
+                xwlib_rbtree_insert_color(&m->rbtree, &newmc->rbn);
                 rc = OK;
         } else {
                 rc = -EEXIST;

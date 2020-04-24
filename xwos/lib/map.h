@@ -85,7 +85,9 @@ void xwlib_map_init_container(struct xwlib_map_container * mc,
  * @param c: (I) 光标指针，指向当前遍历到的键值对容器
  */
 #define xwlib_map_itr_forward(map, c) \
-        xwlib_bclst_itr_next_entry(c, &map->bclh, struct xwlib_map_container, bcln)
+        xwlib_bclst_itr_next_entry((c), \
+                                   &(map)->bclh, \
+                                   struct xwlib_map_container, bcln)
 
 /**
  * @brief 向后遍历(从大到小)键值对容器
@@ -93,7 +95,9 @@ void xwlib_map_init_container(struct xwlib_map_container * mc,
  * @param c: (I) 光标指针，指向当前遍历到的键值对容器
  */
 #define xwlib_map_itr_backward(map, c) \
-        xwlib_bclst_itr_next_entry(c, &map->bclh, struct xwlib_map_container, bcln)
+        xwlib_bclst_itr_next_entry((c), \
+                                   &(map)->bclh, \
+                                   struct xwlib_map_container, bcln)
 
 /**
  * @brief 向前遍历(从小到大)键值对容器，并防止因遍历到的容器被删除而造成的错误
@@ -102,8 +106,8 @@ void xwlib_map_init_container(struct xwlib_map_container * mc,
  * @param n: (I) 键值对容器的指针，用于宏内部暂存数据
  */
 #define xwlib_map_itr_forward_safe(map, c, n) \
-        xwlib_bclst_itr_next_entry_safe(c, \
-                                        &map->bclh, \
+        xwlib_bclst_itr_next_entry_safe((c), \
+                                        &(map)->bclh, \
                                         struct xwlib_map_container, bcln)
 
 /**
@@ -113,8 +117,8 @@ void xwlib_map_init_container(struct xwlib_map_container * mc,
  * @param n: (I) 键值对容器的指针，用于宏内部暂存数据
  */
 #define xwlib_map_itr_backward_safe(map, c, n) \
-        xwlib_bclst_itr_prev_entry_safe(c, n, \
-                                        &map->bclh, \
+        xwlib_bclst_itr_prev_entry_safe((c), (n), \
+                                        &(map)->bclh, \
                                         struct xwlib_map_container, bcln)
 
 /******** ******** ******** ******** ******** ******** ******** ********

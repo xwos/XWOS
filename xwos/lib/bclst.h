@@ -47,7 +47,7 @@ struct xwlib_bclst_node {
  * @param member: (I) 节点在外层结构体中的成员符号名(symbol)
  * @return 外层结构体的指针
  */
-#define xwlib_bclst_entry(ptr, type, member) container_of(ptr, type, member)
+#define xwlib_bclst_entry(ptr, type, member) container_of((ptr), type, member)
 
 /**
  * @brief 获得包含链表第一个节点的外层结构体的指针。
@@ -56,7 +56,7 @@ struct xwlib_bclst_node {
  * @param member: (I) 节点在外层结构体中的成员符号名(symbol)
  * @return 外层结构体的指针
  */
-#define xwlib_bclst_first_entry(head, type, member)                             \
+#define xwlib_bclst_first_entry(head, type, member) \
         xwlib_bclst_entry((head)->next, type, member)
 
 /**
@@ -66,27 +66,27 @@ struct xwlib_bclst_node {
  * @param member: (I) 节点在外层结构体中的成员符号名(symbol)
  * @return 外层结构体的指针
  */
-#define xwlib_bclst_last_entry(head, type, member)                              \
+#define xwlib_bclst_last_entry(head, type, member) \
         xwlib_bclst_entry((head)->prev, type, member)
 
 /**
- * @brief 从一个包含节点的外层结构体指针得到下一个外层结构体的指针
- * @param p: (I) 一个包含链表节点的外层结构体指针
+ * @brief 从一个包含链表节点的外层结构体指针得到下一个外层结构体的指针
+ * @param p: (I) 包含链表节点的外层结构体指针
  * @param type: (I) 外层结构体类型
  * @param member: (I) 节点在外层结构体中的成员符号名(symbol)
  * @return 下一个外层结构体的指针
  */
-#define xwlib_bclst_next_entry(p, type, member)                                 \
+#define xwlib_bclst_next_entry(p, type, member) \
         xwlib_bclst_entry((p)->member.next, type, member)
 
 /**
- * @brief 从一个包含节点的外层结构体指针得到上一个外层结构体的指针
- * @param p: (I) 一个包含链表节点的外层结构体指针
+ * @brief 从一个包含链表节点的外层结构体指针得到上一个外层结构体的指针
+ * @param p: (I) 包含链表节点的外层结构体指针
  * @param type: (I) 外层结构体类型
  * @param member: (I) 节点在外层结构体中的成员符号名(symbol)
  * @return 上一个外层结构体的指针
  */
-#define xwlib_bclst_prev_entry(p, type, member)                                 \
+#define xwlib_bclst_prev_entry(p, type, member) \
         xwlib_bclst_entry((p)->member.prev, type, member)
 
 /**
@@ -94,26 +94,28 @@ struct xwlib_bclst_node {
  * @param p: (I) 光标指针，指向当前遍历到的节点
  * @param head: (I) 链表头指针
  */
-#define xwlib_bclst_itr_next(p, head)                                           \
-        for (p = (head)->next; p != (head); p = p->next)
+#define xwlib_bclst_itr_next(p, head) \
+        for ((p) = (head)->next; (p) != (head); (p) = (p)->next)
 
 /**
  * @brief 向后遍历(iterate over)整个链表
  * @param p: (I) 光标指针，指向当前遍历到的节点
  * @param head: (I) 链表头指针
  */
-#define xwlib_bclst_itr_prev(p, head)                                           \
-        for (p = (head)->prev; p != (head); p = p->prev)
+#define xwlib_bclst_itr_prev(p, head) \
+        for ((p) = (head)->prev; (p) != (head); (p) = (p)->prev)
 
 /**
  * @brief 向前遍历(iterate over)整个链表，并防止因遍历到的节点被删除而造成的错误。
  * @param p: (I) 光标指针，指向当前遍历到的节点
  * @param n: (I) 暂存光标指针所指向的节点的next指针，
- *               防止该节点被删除后取到错误的next指针。
+ *               防止此节点被删除后取到错误的next指针。
  * @param head: (I) 链表头指针
  */
-#define xwlib_bclst_itr_next_safe(p, n, head)                                   \
-        for (p = (head)->next, n = p->next; p != (head); p = n, n = p->next)
+#define xwlib_bclst_itr_next_safe(p, n, head) \
+        for ((p) = (head)->next, (n) = (p)->next; \
+             (p) != (head); \
+             (p) = (n), (n) = (p)->next)
 
 /**
  * @brief 向后遍历(iterate over)整个链表，并防止因遍历到的节点被删除而造成的错误。
@@ -122,8 +124,10 @@ struct xwlib_bclst_node {
  *               防止该节点被删除后取到错误的prev指针。
  * @param head: (I) 链表头指针
  */
-#define xwlib_bclst_itr_prev_safe(p, n, head)                                   \
-        for (p = (head)->prev, n = p->prev; p != (head); p = n, n = p->prev)
+#define xwlib_bclst_itr_prev_safe(p, n, head) \
+        for ((p) = (head)->prev, (n) = (p)->prev; \
+             (p) != (head); \
+             (p) = (n), (n) = (p)->prev)
 
 /**
  * @brief 向前遍历(iterate over)整个链表，并将节点指针转化为包含它们的外层结构体指针。
@@ -132,10 +136,10 @@ struct xwlib_bclst_node {
  * @param type: (I) 外层结构体类型
  * @param member: (I) 节点在外层结构体中的成员符号名(symbol)
  */
-#define xwlib_bclst_itr_next_entry(p, head, type, member)                       \
-        for (p = xwlib_bclst_first_entry(head, type, member);                   \
-             &p->member != (head);                                              \
-             p = xwlib_bclst_next_entry(p, type, member))
+#define xwlib_bclst_itr_next_entry(p, head, type, member) \
+        for ((p) = xwlib_bclst_first_entry(head, type, member); \
+             &(p)->member != (head); \
+             (p) = xwlib_bclst_next_entry((p), type, member))
 
 /**
  * @brief 向后遍历(iterate over)整个链表，并将节点指针转化为包含它们的外层结构体指针。
@@ -144,26 +148,26 @@ struct xwlib_bclst_node {
  * @param type: (I) 外层结构体类型
  * @param member: (I) 节点在外层结构体中的成员符号名(symbol)
  */
-#define xwlib_bclst_itr_prev_entry(p, head, type, member)                       \
-        for (p = xwlib_bclst_last_entry(head, type, member);                    \
-             &p->member != (head);                                              \
-             p = xwlib_bclst_prev_entry(p, type, member))
+#define xwlib_bclst_itr_prev_entry(p, head, type, member) \
+        for ((p) = xwlib_bclst_last_entry(head, type, member); \
+             &(p)->member != (head); \
+             (p) = xwlib_bclst_prev_entry((p), type, member))
 
 /**
  * @brief 向前遍历(iterate over)整个链表，并防止因遍历到的节点被删除而造成的错误。
  *        同时将节点指针转化为包含它们的外层结构体指针。
  * @param p: (I) 光标指针，指向当前遍历到的节点所对应的外层结构体
  * @param n: (I) 暂存光标指针所指向的节点的next指针所对应的外层结构体指针，
- *               防止该节点被删除后取到错误的next指针
+ *               防止此节点被删除后取到错误的next指针
  * @param head: (I) 链表头指针
  * @param type: (I) 外层结构体类型
  * @param member: (I) 节点在外层结构体中的成员符号名(symbol)
  */
-#define xwlib_bclst_itr_next_entry_safe(p, n, head, type, member)               \
-        for (p = xwlib_bclst_first_entry(head, type, member),                   \
-                     n = xwlib_bclst_next_entry(p, type, member);               \
-             &p->member != (head);                                              \
-             p = n, n = xwlib_bclst_next_entry(n, type, member))
+#define xwlib_bclst_itr_next_entry_safe(p, n, head, type, member) \
+        for ((p) = xwlib_bclst_first_entry(head, type, member), \
+             (n) = xwlib_bclst_next_entry((p), type, member); \
+             &(p)->member != (head); \
+             (p) = (n), (n) = xwlib_bclst_next_entry((n), type, member))
 
 /**
  * @brief 以删除节点为目的，向前遍历(iterate over)整个链表，
@@ -176,10 +180,10 @@ struct xwlib_bclst_node {
  * > 这个宏仅用于在退出操作中清理链表中剩余节点。在迭代操作的循环体中，
  * > 必须将节点所对应的结构体释放掉，并将节点从链表中删除。
  */
-#define xwlib_bclst_itr_next_entry_del(p, head, type, member)                   \
-        for (p = xwlib_bclst_first_entry(head, type, member);                   \
-             &p->member != (head);                                              \
-             p = xwlib_bclst_first_entry(head, type, member))
+#define xwlib_bclst_itr_next_entry_del(p, head, type, member) \
+        for ((p) = xwlib_bclst_first_entry(head, type, member); \
+             &(p)->member != (head); \
+             (p) = xwlib_bclst_first_entry(head, type, member))
 
 /**
  * @brief 向后遍历(iterate over)整个链表，并防止因遍历到的节点被删除而造成的错误。
@@ -191,11 +195,11 @@ struct xwlib_bclst_node {
  * @param type: (I) 外层结构体类型
  * @param member: (I) 节点在外层结构体中的成员符号名(symbol)
  */
-#define xwlib_bclst_itr_prev_entry_safe(p, n, head, type, member)               \
-        for (p = xwlib_bclst_last_entry(head, type, member),                    \
-                     n = xwlib_bclst_prev_entry(p, type, member);               \
-             &p->member != (head);                                              \
-             p = n, n = xwlib_bclst_prev_entry(n, type, member))
+#define xwlib_bclst_itr_prev_entry_safe(p, n, head, type, member) \
+        for ((p) = xwlib_bclst_last_entry(head, type, member), \
+             (n) = xwlib_bclst_prev_entry((p), type, member); \
+             &(p)->member != (head); \
+             (p) = (n), (n) = xwlib_bclst_prev_entry((n), type, member))
 
 /**
  * @brief 以删除节点为目的，向后遍历(iterate over)整个链表，
@@ -208,10 +212,10 @@ struct xwlib_bclst_node {
  * > 这个宏通仅用于在退出操作中清理链表中剩余节点。在迭代操作的循环体中，
  * > 必须将节点所对应的结构体释放掉，并将节点从链表中删除。
  */
-#define xwlib_bclst_itr_prev_entry_del(p, head, type, member)                   \
-        for (p = xwlib_bclst_last_entry(head, type, member);                    \
-             &p->member != (head);                                              \
-             p = xwlib_bclst_last_entry(head, type, member))
+#define xwlib_bclst_itr_prev_entry_del(p, head, type, member) \
+        for ((p) = xwlib_bclst_last_entry(head, type, member); \
+             &(p)->member != (head); \
+             (p) = xwlib_bclst_last_entry(head, type, member))
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********              functions              ******** ********
