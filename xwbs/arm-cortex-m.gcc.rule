@@ -48,7 +48,7 @@ INCDIRS = -I. \
           -I$(XWOS_SOC_DIR) \
           -I$(XWOS_BRD_DIR)
 
-PERDEF =
+PERDEF = -D__XuanWuOS__
 
 AFLAGS = -mabi=aapcs -mno-thumb-interwork -m$(ENDIAN) -mthumb \
          -nostdinc -nostdlib -mno-unaligned-access \
