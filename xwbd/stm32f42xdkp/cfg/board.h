@@ -53,6 +53,8 @@
 #define BMCFG_lua                               1
 #define BMCFG_cxx                               1
 #define BMCFG_xwpcp                             1
+#define BMCFG_xwtst_sync_semaphore              1
+#define BMCFG_xwtst_sync_condition              1
 #define BMCFG_xwtst_sync_flag                   1
 #define BMCFG_xwtst_sync_selector               1
 #define BMCFG_xwtst_sync_barrier                1
