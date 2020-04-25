@@ -42,6 +42,12 @@ void xwosdl_cpuirq_save_lc(xwreg_t * flag)
         xwos_cpuirq_save_lc(flag);
 }
 
+static __xw_inline
+xwer_t xwosdl_irq_get_id(xwirq_t * irqnbuf)
+{
+        return xwos_irq_get_id(irqnbuf);
+}
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********     scheduler     ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
