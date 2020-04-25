@@ -35,7 +35,7 @@
   #error "XWMDCFG_isc_xwpcp_MEMBLK_NUM must be the order of 2!"
 #endif
 #if (XWMDCFG_isc_xwpcp_PORT_NUM > 128)
-  #error "XWPCP Only supports 128 ports!"
+  #error "XWPCP Only supports 128 ports (0 ~ 127)!"
 #endif
 #if (XWMDCFG_isc_xwpcp_PRIORITY_NUM > 64)
   #error "XWPCP Only supports 64 priorities!"
@@ -59,14 +59,17 @@
 #define XWPCP_PORT_MSK          (0x7FU)
 #define XWPCP_PORT(port)        ((port) & XWPCP_PORT_MSK)
 #define XWPCP_PORT_CMD          XWPCP_PORT(0)
-#define XWPCP_PORT_QOS(port)    ((xwu8_t)((xwu8_t)(port) & XWPCP_QOS(1)))
+#define XWPCP_PORT_QOS(p)       ((xwu8_t)((xwu8_t)(p) & XWPCP_QOS_MSK))
 
 #define XWPCP_ID_MSK            (0x7FU)
 #define XWPCP_ID(id)            ((xwu8_t)((xwu8_t)(id) & XWPCP_ID_MSK))
 #define XWPCP_ID_SYNC           XWPCP_ID(0)
 #define XWPCP_ID_ACK            BIT(7)
 
-#define XWPCP_VERSION           ("1.0")
+#define XWPCP_VERSION           ("2.0.0")
+#define XWPCP_VERSION_MAJOR     2U
+#define XWPCP_VERSION_MINOR     0U
+#define XWPCP_VERSION_REVISION  0U
 
 #define XWPCP_MEMPOOL_SIZE      (XWPCP_MEMBLK_SIZE * XWPCP_MEMBLK_NUM)
 #define XWPCP_SDU_MAX_SIZE      (XWPCP_MEMPOOL_SIZE / 8)
@@ -114,8 +117,8 @@ struct __packed xwpcp_frmhead {
         xwu8_t frmlen; /**< 帧的长度：信息头+消息帧+CRC32校验码的总长度 */
         xwu8_t mirror; /**< 帧的长度的镜像反转（xwbop_rbit8(frmlen)）：
                             作为frmlen的检验 */
-        xwu8_t port; /**< bit7: QoS，1:可靠消息；0:不可靠消息
-                          bit6 ~ bit0: 端口，端口0为协议的内部使用的端口 */
+        xwu8_t port; /**< bit7 QoS: 1:可靠消息；0:不可靠消息
+                          bit6:0 端口，端口0为协议的内部使用的端口 */
         xwu8_t id; /**< bit6 ~ bit0:消息的ID；
                         bit7: 应答标志
                         ID0: 作为同步消息ID */
