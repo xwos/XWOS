@@ -493,7 +493,8 @@ xwer_t xwlk_mtx_intr(struct xwlk_mtx * mtx, struct xwos_tcb * tcb)
                         xwlk_mtx_chprio(mtx);
                         xwlk_mtx_put(mtx);
                         xwos_thrd_wakeup(tcb);
-                        xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
+                        xwmb_smp_load_acquire(struct xwos_scheduler *,
+                                              xwsd, &tcb->xwsd);
                         xwos_scheduler_chkpmpt(xwsd);
                 } else {
                         xwlk_splk_unlock(&tcb->wqn.lock);
@@ -599,7 +600,8 @@ xwer_t xwlk_mtx_unlock(struct xwlk_mtx * mtx)
                         xwos_scheduler_chkpmpt(local);
 
                         /* t可能运行在不同CPU上，因此也需要检查此CPU的抢占 */
-                        xwmb_smp_load_acquire(xwsd, &t->xwsd);
+                        xwmb_smp_load_acquire(struct xwos_scheduler *,
+                                              xwsd, &t->xwsd);
                         xwos_scheduler_chkpmpt(xwsd);
                 } else {
                         /* Case 2: 没有线程正在等待互斥锁 */
@@ -691,7 +693,7 @@ xwer_t xwlk_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
         xwsq_t rsmrs;
         xwsq_t wkuprs;
 
-        xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
+        xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
         xwtt = &xwsd->tt;
         hwt = &xwtt->hwt;
         currtick = xwos_syshwt_get_timetick(hwt);
@@ -848,7 +850,7 @@ xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx,
         /* 当线程执行此处代码时，不可能拥有状态XWSDOBJ_DST_MIGRATING，
            因为，迁移永远发生在线程处于冻结点时。也因此可在锁xwsd->tcblistlock外
            读取tcb->xwsd。*/
-        xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
+        xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
         xwos_scheduler_dspmpt(xwsd);
         mt = &tcb->mtxtree;
         xwos_rtwq_lock_cpuirqsv(&mtx->rtwq, &cpuirq);
@@ -944,7 +946,7 @@ xwer_t xwlk_mtx_do_blkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
         xwpr_t dprio;
         xwer_t rc;
 
-        xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
+        xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
         /* 加入等待队列 */
         xwlk_splk_lock(&tcb->stlock);
         dprio = tcb->dprio.r;
@@ -989,7 +991,7 @@ xwer_t xwlk_mtx_do_lock_unintr(struct xwlk_mtx * mtx, struct xwos_tcb * tcb)
         xwer_t rc;
 
         rc = OK;
-        xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
+        xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
         xwos_scheduler_dspmpt(xwsd);
         mt = &tcb->mtxtree;
         xwos_rtwq_lock_cpuirqsv(&mtx->rtwq, &cpuirq);

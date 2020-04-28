@@ -689,6 +689,7 @@ void mpc560xb_spim_isr_rfdf(void)
         const struct xwds_resources * resources;
         volatile struct DSPI_tag * reg;
         struct xwds_spim_msg * msg;
+        __maybe_unused xwu32_t rxdata;
 
         xwos_irq_get_id(&irqn);
         xwos_irq_get_data(irqn, &irqdata);
@@ -719,7 +720,7 @@ void mpc560xb_spim_isr_rfdf(void)
         } else {
                 reg->MCR.B.HALT = 1;
                 reg->RSER.B.RFDFRE = 0;
-                xwmb_fcrd(reg->POPR.R);
+                xwmb_read(xwu32_t, rxdata, &reg->POPR.R);
                 reg->SR.B.RFDF = 1;
         }
         xwosal_splk_unlock_cpuirqrs(&drvdata->lock, cpuirq);

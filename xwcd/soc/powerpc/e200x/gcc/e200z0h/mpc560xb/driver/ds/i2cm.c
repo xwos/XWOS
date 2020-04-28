@@ -527,6 +527,7 @@ void mpc560xb_i2cm_rxfsm_7bitaddr(struct xwds_i2cm * i2cm)
         struct mpc560xb_i2cm_drvdata * drvdata;
         struct xwds_i2c_msg * msg;
         xwsz_t rest;
+        __maybe_unused xwu8_t ibdr;
 
         drvdata = i2cm->dev.data;
         msg = drvdata->xmsg.ptr;
@@ -539,7 +540,7 @@ void mpc560xb_i2cm_rxfsm_7bitaddr(struct xwds_i2cm * i2cm)
                                 xwosal_thrd_continue(drvdata->tid);
                         } else {
                                 I2C.IBCR.B.TX = 0;
-                                xwmb_fcrd(I2C.IBDR.R);
+                                xwmb_read(xwu8_t, ibdr, &I2C.IBDR.R);
                         }
                 } else {
                         rest = msg->size - drvdata->dpos;

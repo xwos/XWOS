@@ -43,18 +43,14 @@
 #define xwmb_smp_wmb()          armv7m_dmb()
 #define xwmb_smp_ddb()          xwccmb()
 
-#define xwmb_access(x)          (*((volatile typeof(x) *)&(x)))
-#define xwmb_fcrd(x)            ({volatile typeof(x) __x = xwmb_access(x); __x;})
-#define xwmb_fcwr(x, v)         (xwmb_access(x) = (v))
+#define xwmb_read8(a)           (*(volatile xwu8_t *)(a))
+#define xwmb_read16(a)          (*(volatile xwu16_t *)(a))
+#define xwmb_read32(a)          (*(volatile xwu32_t *)(a))
+#define xwmb_read64(a)          (*(volatile xwu64_t *)(a))
 
-#define __raw_read8(a)          (*(volatile xwu8_t *)(a))
-#define __raw_read16(a)         (*(volatile xwu16_t *)(a))
-#define __raw_read32(a)         (*(volatile xwu32_t *)(a))
-#define __raw_read64(a)         (*(volatile xwu64_t *)(a))
-
-#define __raw_write8(a, v)      (*(volatile unsigned char *)(a) = (v))
-#define __raw_write16(a, v)     (*(volatile unsigned short *)(a) = (v))
-#define __raw_write32(a, v)     (*(volatile unsigned int *)(a) = (v))
-#define __raw_write64(a, v)     (*(volatile unsigned long long *)(a) = (v))
+#define xwmb_write8(a, v)       (*(volatile unsigned char *)(a) = (v))
+#define xwmb_write16(a, v)      (*(volatile unsigned short *)(a) = (v))
+#define xwmb_write32(a, v)      (*(volatile unsigned int *)(a) = (v))
+#define xwmb_write64(a, v)      (*(volatile unsigned long long *)(a) = (v))
 
 #endif /* barrier.h */

@@ -60,7 +60,7 @@ xwsq_t xwlk_sqlk_rd_begin(struct xwlk_sqlk * sql)
         xwsq_t ret;
 
 retry:
-        ret = xwmb_fcrd(sql->seq);
+        xwmb_read(xwsq_t, ret, &sql->seq);
 #if (XWLK_SQLK_GRANULARITY > 1)
         ret &= ((~XWLK_SQLK_GRANULARITY) + 1U);
 #endif
@@ -108,7 +108,7 @@ xwsq_t xwlk_sqlk_get_seq(struct xwlk_sqlk * sql)
 {
         xwsq_t ret;
 
-        ret = xwmb_fcrd(sql->seq);
+        xwmb_read(xwsq_t, ret, &sql->seq);
         xwmb_smp_rmb();
 #if (XWLK_SQLK_GRANULARITY > 1)
         return ret & ((~XWLK_SQLK_GRANULARITY) + 1U);

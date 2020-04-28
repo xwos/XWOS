@@ -387,11 +387,12 @@ xwer_t mpc560xb_adc_convert(struct xwds_misc * misc, xwbmp_t * chmask, xws16_t *
         struct mpc560xb_misc_drvdata * drvdata;
         xwid_t mtxid;
         union xwlk_ulock ulk;
-        xwsq_t lockstate;
+        xwsq_t lkst;
         xwu32_t ceocfr[3];
         xwreg_t flag;
         xwssq_t ch;
         xwer_t rc;
+        __maybe_unused xwu32_t cdr;
 
         drvdata = misc->dev.data;
         ulk.osal.splk = &drvdata->adc.lock;
@@ -407,7 +408,7 @@ xwer_t mpc560xb_adc_convert(struct xwds_misc * misc, xwbmp_t * chmask, xws16_t *
         ADC_0.MCR.B.NSTART = 1; /* start ADC */
         rc = xwosal_cthrd_timedpause(ulk,
                                      XWLK_TYPE_SPLK_CPUIRQ,
-                                     NULL, 0, xwtm, &lockstate);
+                                     NULL, 0, xwtm, &lkst);
         if (OK == rc) {
                 xwosal_splk_unlock_cpuirqrs(&drvdata->adc.lock, flag);
                 ceocfr[0] = ADC_0.CEOCFR[0].R;
@@ -426,14 +427,14 @@ xwer_t mpc560xb_adc_convert(struct xwds_misc * misc, xwbmp_t * chmask, xws16_t *
                                                 buf[ch] = (xws16_t)-EINVAL;
                                         }
                                 } else {
-                                        xwmb_fcrd(ADC_0.CDR[ch].R);
+                                        xwmb_read(xwu32_t, cdr, &ADC_0.CDR[ch].R);
                                 }
                         } else {
                                 break;
                         }
                 }
         } else {
-                if (XWLK_STATE_LOCKED == lockstate) {
+                if (XWLK_STATE_LOCKED == lkst) {
                         xwosal_splk_unlock_cpuirqrs(&drvdata->adc.lock, flag);
                 } else {
                         xwos_cpuirq_restore_lc(flag);

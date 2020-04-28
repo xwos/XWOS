@@ -39,8 +39,4 @@
 #define xwmb_smp_rmb()          xwmb_smp_mb()
 #define xwmb_smp_wmb()          asm volatile("mbar      0" : : : "memory")
 
-#define xwmb_access(x)          (*((volatile typeof(x) *)&(x)))
-#define xwmb_fcrd(x)            ({ volatile typeof(x) __x = xwmb_access(x); __x;})
-#define xwmb_fcwr(x, val)       (xwmb_access(x) = val)
-
 #endif /* barrier.h */

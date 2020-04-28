@@ -194,7 +194,7 @@ void arch_splk_lock(struct arch_splk * asl)
 
         while (tmp.v.tickets.next != tmp.v.tickets.curr) {
                 wfe();
-                tmp.v.tickets.curr = xwmb_access(asl->v.tickets.curr);
+                tmp.v.tickets.curr = xwmb_access(xwu16_t, asl->v.tickets.curr);
         }
         xwmb_smp_mb();
 #endif /* !(1 == ARCH_SPLK_USING_BITSPLK) */

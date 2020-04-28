@@ -40,10 +40,6 @@
 #define xwmb_smp_rmb()          xwmb_smp_mb()
 #define xwmb_smp_wmb()          __asm__ volatile("mbar      0" : : : "memory")
 
-#define xwmb_access(x)          (*((volatile typeof(x) *)&(x)))
-#define xwmb_fcrd(x)            ({ volatile typeof(x) __x = xwmb_access(x); __x;})
-#define xwmb_fcwr(x, val)       (xwmb_access(x) = val)
-
 #define __raw_read8(a)          (*(volatile xwu8_t *)(a))
 #define __raw_read16(a)         (*(volatile xwu16_t *)(a))
 #define __raw_read32(a)         (*(volatile xwu32_t *)(a))

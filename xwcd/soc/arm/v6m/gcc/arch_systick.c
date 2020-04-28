@@ -110,8 +110,9 @@ __xwbsp_isr
 void arch_systick_isr(void)
 {
         struct xwos_scheduler * xwsd;
-        xwmb_fcrd(cm_scs.systick.csr.u32); /* read to clear COUNTFLAG */
+        __maybe_unused xwu32_t csr;
 
+        xwmb_read(xwu32_t, csr, &cm_scs.systick.csr.u32); /* read to clear COUNTFLAG */
         xwsd = xwos_scheduler_get_lc();
         xwos_syshwt_task(&xwsd->tt.hwt);
 }

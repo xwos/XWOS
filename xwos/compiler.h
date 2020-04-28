@@ -202,47 +202,67 @@
   #error "Unknown compiler!"
 #endif
 
+/**
+ * @brief: 强制从内存中访问指定类型的变量
+ * @param t: (I) 类型，只能为基本类型及其typedef后的类型
+ * @param v: (O) 类型为t左值，读取的值放在这个左值中
+ * @note
+ * + 类型t的位宽只能是8位、16位、32位、64位。
+ */
+#define xwmb_access(t, v)       (*((volatile t *)&(v)))
+
+/**
+ * @brief: 读取地址中的指定类型的值
+ * @param t: (I) 类型，只能为基本类型及其typedef后的类型
+ * @param v: (O) 类型为t左值，读取的值放在这个左值中
+ * @param p: (I) 类型为t *的指针，指向需要读取的地址
+ * @note
+ * + 类型t的位宽只能是8位、16位、32位、64位。
+ */
+#define xwmb_read(t, v, p)      xwmb_access(t, v) = (*(volatile t * )(p))
+
+/**
+ * @brief 存储指定类型的值到地址中
+ * @param t: (I) 类型，只能为基本类型及其typedef后的类型
+ * @param p: (I) 类型为t *的指针，指向需要存储的地址
+ * @param v: (I) 待存储的类型为t右值
+ * @note
+ * + 类型t的位宽只能是8位、16位、32位、64位。
+ */
+#define xwmb_write(t, p, v)     (*(volatile t * )(p)) = (v)
+
 /******** ******** SMP primitives ******** ********/
 #ifndef xwmb_smp_load_acquire
 /**
- * @brief: macro to load a pointer safely for later dereference
- * @param v: (I) lvalue
- * @param p: (I) the address to load
+ * @brief: 读取地址中的指定类型的值，并保证此处的“读”操作
+ *         一定发生在之后的“读写”操作之前
+ * @param t: (I) 类型，只能为基本类型及其typedef后的类型
+ * @param v: (O) 类型为t左值，读取的值放在这个左值中
+ * @param p: (I) 类型为t *的指针，指向需要读取的地址
+ * @note
+ * + 类型t的位宽只能是8位、16位、32位、64位。
  */
-#define xwmb_smp_load_acquire(v, p)             \
+#define xwmb_smp_load_acquire(t, v, p)          \
         do {                                    \
-                v = xwmb_fcrd(*p);              \
+                xwmb_read(t, (v), (p));         \
                 xwmb_smp_mb();                  \
         } while (0)
 #endif
 
 #ifndef xwmb_smp_store_release
 /**
- * @brief Store a value to a pointer and prevents the compiler/HW from
- *        reordering the code that initializes the structure after the pointer
- *        assignment.
- * @param p: (O) pointer to the address that is assigned to
- * @param v: (I) value to assign (publish)
+ * @brief 存储指定类型的值到地址中，并保证此处的“写”操作
+ *        一定发生在之前的“读写”操作之后
+ * @param t: (I) 类型，只能为基本类型及其typedef后的类型
+ * @param p: (I) 类型为t *的指针，指向需要存储的地址
+ * @param v: (I) 待存储的类型为t右值
+ * @note
+ * + 类型t的位宽只能是8位、16位、32位、64位。
  */
-#define xwmb_smp_store_release(p, v)            \
+#define xwmb_smp_store_release(t, p, v)         \
         do {                                    \
                 xwmb_smp_mb();                  \
-                xwmb_fcwr(*(p), v);             \
-        } while (0)
-#endif
-
-#ifndef xwmb_smp_store_mb
-/**
- * @brief Store a value to a pointer and prevents the compiler/HW from
- *        reordering the code that initializes the structure before the pointer
- *        assignment.
- * @param p: (O) pointer to the address that is assigned to
- * @param v: (I) value to assign
- */
-#define xwmb_smp_store_mb(p, v)                 \
-        do {                                    \
-                xwmb_fcwr((*(p)), v);           \
-                xwmb_smp_mb();                  \
+                xwmb_write(t, (p), (v));        \
         } while (0)
 #endif
 
@@ -251,7 +271,7 @@
  * @brief Flush all pending reads that subsequents reads depend on.
  * @detail
  * - same as smp_read_barrier_depends() in Linux.
- * - (From Linux kernel):
+ *   (From Linux kernel):
  *   No data-dependent reads from memory-like regions are ever reordered
  *   over this barrier.  All reads preceding this primitive are guaranteed
  *   to access memory (but not necessarily other CPUs' caches) before any
@@ -299,9 +319,9 @@
  *   as Alpha, "y" could be set to 3 and "x" to 0.  Use rmb()
  *   in cases like this where there are no data dependencies.
  * - C/C++中的内存顺序 —— 消费序(memory_order_consume)所表达的意思也即是读依赖屏障。
- *   + X86/X86_64这种强内存模型的CPU，自带数据依赖(Data dependency)，
+ *   + X86/X86_64这种强内存模型的CPU，带有数据依赖(Data dependency)，
  *     不需要任何读依赖屏障
- *   + ARM/PowerPC这种弱内存模型的CPU，也带有数据依赖(Data dependency)，
+ *   + ARM/PowerPC这种弱内存模型的CPU，带有数据依赖(Data dependency)，
  *     不需要任何读依赖屏障
  *   + DEC Alpha这种弱内存模型的CPU，不带有数据依赖(Data dependency)，
  *     需要使用读依赖屏障
@@ -316,10 +336,10 @@
  * @param t: something to be checked
  */
   #define xwcc_native_word(t)                   \
-          (sizeof(t) == sizeof(char) ||         \
-           sizeof(t) == sizeof(short) ||        \
-           sizeof(t) == sizeof(int) ||          \
-           sizeof(t) == sizeof(long))
+          (sizeof(t) == sizeof(xwu8_t) ||       \
+           sizeof(t) == sizeof(xwu16_t) ||      \
+           sizeof(t) == sizeof(xwu32_t) ||      \
+           sizeof(t) == sizeof(xwu64_t))
 #endif
 
 /******** ******** macros to string ******** ********/

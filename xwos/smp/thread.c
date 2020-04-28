@@ -409,7 +409,7 @@ void xwos_thrd_launch(struct xwos_tcb * tcb, xwos_thrd_f mainfunc, void * arg)
         xwlk_splk_lock_cpuirqsv(&xwsd->tcblistlock, &cpuirq);
         xwsd->thrd_num++;
         xwlib_bclst_add_tail(&xwsd->tcblist, &tcb->tcbnode);
-        xwmb_smp_store_release(&tcb->xwsd, xwsd);
+        xwmb_smp_store_release(struct xwos_scheduler *, &tcb->xwsd, xwsd);
         xwlk_splk_unlock_cpuirqrs(&xwsd->tcblistlock, cpuirq);
         tcb->stack.main = mainfunc;
         tcb->stack.arg = arg;
@@ -586,7 +586,7 @@ xwer_t xwos_thrd_exit_lic(struct xwos_tcb * tcb, xwer_t rc)
         struct xwos_scheduler * xwsd;
         xwreg_t cpuirq;
 
-        xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
+        xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
         xwlk_splk_lock_cpuirqsv(&tcb->stlock, &cpuirq);
         xwbop_c0m(xwsq_t, &tcb->state,
                   (XWSDOBJ_DST_RUNNING | XWSDOBJ_DST_EXITING));
@@ -925,7 +925,7 @@ xwer_t xwos_thrd_rq_add_head(struct xwos_tcb * tcb, xwpr_t prio)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
+        xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
         xwrtrq = &xwsd->rq.rt;
         xwlk_splk_lock_cpuirqsv(&xwrtrq->lock, &cpuirq);
         xwlk_splk_lock(&tcb->stlock);
@@ -964,7 +964,7 @@ xwer_t xwos_thrd_rq_add_tail(struct xwos_tcb * tcb, xwpr_t prio)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
+        xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
         xwrtrq = &xwsd->rq.rt;
         xwlk_splk_lock_cpuirqsv(&xwrtrq->lock, &cpuirq);
         xwlk_splk_lock(&tcb->stlock);
@@ -1001,7 +1001,7 @@ xwer_t xwos_thrd_rq_remove(struct xwos_tcb * tcb)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
+        xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
         xwrtrq = &xwsd->rq.rt;
         xwlk_splk_lock_cpuirqsv(&xwrtrq->lock, &cpuirq);
         rc = xwos_rtrq_remove_locked(xwrtrq, tcb);
@@ -1099,7 +1099,7 @@ xwer_t xwos_thrd_intr(struct xwos_tcb * tcb)
                 struct xwos_scheduler * xwsd;
                 struct xwos_tt * xwtt;
 
-                xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
+                xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
                 xwtt = &xwsd->tt;
                 xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 rc = xwos_tt_remove_locked(xwtt, &tcb->ttn);
@@ -1527,7 +1527,7 @@ xwer_t xwos_cthrd_sleep(xwtm_t * xwtm)
         }
 
         ctcb = xwos_scheduler_get_ctcb_lc();
-        xwmb_smp_load_acquire(xwsd, &ctcb->xwsd);
+        xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &ctcb->xwsd);
         xwtt = &xwsd->tt;
         hwt = &xwtt->hwt;
         currtick = xwos_syshwt_get_timetick(hwt);
@@ -1614,7 +1614,7 @@ xwer_t xwos_cthrd_sleep_from(xwtm_t * origin, xwtm_t inc)
         xwer_t rc;
 
         ctcb = xwos_scheduler_get_ctcb_lc();
-        xwmb_smp_load_acquire(xwsd, &ctcb->xwsd);
+        xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &ctcb->xwsd);
         xwtt = &xwsd->tt;
         hwt = &xwtt->hwt;
         expected = xwtm_add_safely(*origin, inc);
@@ -1687,7 +1687,7 @@ xwer_t xwos_thrd_reqfrz_lic(struct xwos_tcb * tcb)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
+        xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
         xwlk_splk_lock_cpuirqsv(&xwsd->lpm.lock, &cpuirq);
         xwlk_splk_lock(&tcb->stlock);
         if (XWSDOBJ_DST_FROZEN & tcb->state) {
@@ -1720,7 +1720,7 @@ xwer_t xwos_thrd_freeze_lic(struct xwos_tcb * tcb)
         XWOS_BUG_ON(!(XWSDOBJ_DST_FREEZABLE & tcb->state));
         XWOS_BUG_ON(!(XWSDOBJ_DST_RUNNING & tcb->state));
 
-        xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
+        xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
         xwlk_splk_lock_cpuirqsv(&xwsd->lpm.lock, &cpuirq);
         xwlk_splk_lock(&tcb->stlock);
         xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_RUNNING | XWSDOBJ_DST_FREEZABLE);
@@ -1799,7 +1799,7 @@ xwer_t xwos_thrd_thaw_lic(struct xwos_tcb * tcb)
         xwpr_t prio;
         xwer_t rc;
 
-        xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
+        xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
         XWOS_BUG_ON(xwsd != xwos_scheduler_get_lc());
 
         xwlk_splk_lock_cpuirqsv(&xwsd->lpm.lock, &cpuirq);
@@ -1938,7 +1938,7 @@ void xwos_thrd_immigrate_lic(struct xwos_tcb * tcb)
         tcb->migration.dst = 0;
         xwlib_bclst_add_tail(&new->tcblist, &tcb->tcbnode);
         new->thrd_num++;
-        xwmb_smp_store_release(&tcb->xwsd, new);
+        xwmb_smp_store_release(struct xwos_scheduler *, &tcb->xwsd, new);
         xwlk_splk_unlock(&new->tcblistlock);
         if (xwos_scheduler_tst_lpm(new)) {
                 xwlk_splk_lock(&tcb->stlock);
@@ -1977,12 +1977,12 @@ void xwos_thrd_outmigrate_frozen_lic(struct xwos_tcb * tcb)
         XWOS_BUG_ON(!(XWSDOBJ_DST_FROZEN & tcb->state));
         XWOS_BUG_ON(!(XWSDOBJ_DST_MIGRATING & tcb->state));
 
-        xwmb_smp_load_acquire(old, &tcb->xwsd);
+        xwmb_smp_load_acquire(struct xwos_scheduler *, old, &tcb->xwsd);
         XWOS_BUG_ON(old != xwos_scheduler_get_lc());
         xwlk_splk_lock(&old->tcblistlock);
         xwlib_bclst_del_init(&tcb->tcbnode);
         old->thrd_num--;
-        xwmb_smp_store_release(&tcb->xwsd, NULL);
+        xwmb_smp_store_release(struct xwos_scheduler *, &tcb->xwsd, NULL);
         xwlk_splk_unlock(&old->tcblistlock);
 }
 
@@ -2005,7 +2005,7 @@ xwer_t xwos_thrd_outmigrate_reqfrz_lic(struct xwos_tcb * tcb, xwid_t dstcpu)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
+        xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
         xwlk_splk_lock_cpuirqsv(&xwsd->lpm.lock, &cpuirq);
         xwlk_splk_lock(&tcb->stlock);
         if (XWSDOBJ_DST_MIGRATING & tcb->state) {
@@ -2046,7 +2046,7 @@ xwer_t xwos_thrd_outmigrate_lic(struct xwos_tcb * tcb, xwid_t dstcpu)
         struct xwos_scheduler * xwsd, * local;
         xwer_t rc;
 
-        xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
+        xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
         local = xwos_scheduler_get_lc();
         XWOS_BUG_ON(xwsd != local);
         rc = xwos_thrd_outmigrate_reqfrz_lic(tcb, dstcpu);

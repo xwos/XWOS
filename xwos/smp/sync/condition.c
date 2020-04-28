@@ -611,7 +611,8 @@ xwer_t xwsync_cdt_broadcast(struct xwsync_cdt * cdt)
 
                         xwsyncobj = &cdt->xwsyncobj;
                         xwos_plwq_lock_cpuirqsv(&cdt->wq.pl, &cpuirq);
-                        xwmb_smp_load_acquire(evt, &xwsyncobj->selector.evt);
+                        xwmb_smp_load_acquire(struct xwsync_evt *,
+                                              evt, &xwsyncobj->selector.evt);
                         if (NULL != evt) {
                                 xwsync_evt_obj_s1i(evt, xwsyncobj);
                         }
@@ -702,7 +703,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
         struct xwos_tt * xwtt;
         struct xwos_syshwt * hwt;
 
-        xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
+        xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
         xwtt = &xwsd->tt;
         hwt = &xwtt->hwt;
         currtick = xwos_syshwt_get_timetick(hwt);
@@ -880,7 +881,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt, struct xwos_tcb * tcb,
         xwreg_t cpuirq;
         xwer_t rc;
 
-        xwmb_smp_load_acquire(xwsd, &tcb->xwsd);
+        xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
         xwos_plwq_lock_cpuirqsv(&cdt->wq.pl, &cpuirq);
         rc = xwos_scheduler_wakelock_lock(xwsd);
         if (__unlikely(rc < 0)) {
