@@ -34,7 +34,7 @@ ifeq ($(ARCHCFG_LITTLE_ENDIAN),y)
 else
     ENDIAN := big
 endif
-**D ?= 1
+~D ?= 1
 WARN := -Wall -Wextra -Wundef -Wsign-conversion -Werror
 INCDIRS = -I. \
           -I$(XWOS_ARCH_DIR) \
@@ -54,7 +54,7 @@ CFLAGS = -mvle -mcpu=e200z0 -m$(ENDIAN) -mregnames -std=gnu11 \
          -g3 -fverbose-asm \
          -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
-ifeq ($(**D),0)
+ifeq ($(~D),0)
     CFLAGS += -O2
 else
     CFLAGS += -O0
@@ -79,7 +79,7 @@ include $(XWOS_KN_DIR)/xwos.mk
 include $(XWBS_UTIL_MK_XWMO)
 
 # colorfully build
-ifneq ($(**V),1)
+ifneq ($(~V),1)
     SHOW_CPP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cc -E] "$<" -> "$@" \e[0m";
     SHOW_CC = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cc] "$<" -> "$@" \e[0m";
     SHOW_CXX = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[c++] "$<" -> "$@" \e[0m";

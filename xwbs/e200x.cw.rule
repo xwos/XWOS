@@ -46,7 +46,7 @@ ifeq ($(ARCHCFG_BIG_ENDIAN),y)
 else
     ENDIAN := little
 endif
-**D ?= 1
+~D ?= 1
 WARN := -warn illpragmas -warn unwanted -warn hidevirtual -warn implicitconv \
         -warn impl_int2float -warn impl_float2int -warn impl_signedunsigned \
         -warn ptrintconv -warn unusedarg -warn unusedvar -warn missingreturn \
@@ -69,7 +69,7 @@ CFLAGS = -sym dwarf-2 -sym full -msgstyle gcc -proc zen -$(ENDIAN) -fp soft \
          -Cpp_Exceptions off -bool on -requireprotos -lang c99 -gccext on \
          -char unsigned -str nopool -str reuse -ipa off -prefix $(PREFIX) $(WARN) \
          -MD -gccdep
-ifeq ($(**D),0)
+ifeq ($(~D),0)
     CFLAGS += -opt level=2 -opt speed
 else
     CFLAGS += -opt level=0 -opt speed
@@ -96,7 +96,7 @@ include $(XWOS_KN_DIR)/xwos.mk
 include $(XWBS_UTIL_MK_XWMO)
 
 # colorfully build
-ifneq ($(**V),1)
+ifneq ($(~V),1)
     SHOW_CPP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cc -E] "$<" -> "$@" \e[0m";
     SHOW_CC = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cc] "$<" -> "$@" \e[0m";
     SHOW_APP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[as -E] "$<" -> "$@" \e[0m";
