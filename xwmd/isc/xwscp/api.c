@@ -32,7 +32,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern __xwmd_rodata const xwer_t xwscp_callback_rc[SOSCP_ACK_NUM];
+extern __xwmd_rodata const xwer_t xwscp_callback_rc[XWSCP_ACK_NUM];
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      static function prototypes     ******** ********
@@ -48,24 +48,24 @@ xwer_t xwscp_tx_once(struct xwscp * xwscp, const xwu8_t msg[], xwsz_t * size,
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief SOSCP API: 初始化SOSCP
- * @param xwscp: (I) SOSCP对象的指针
+ * @brief XWSCP API: 初始化XWSCP
+ * @param xwscp: (I) XWSCP对象的指针
  */
 __xwmd_api
 void xwscp_init(struct xwscp * xwscp)
 {
-        SOSCP_VALIDATE((xwscp), "nullptr");
+        XWSCP_VALIDATE((xwscp), "nullptr");
 
         xwscp->name = NULL;
-        xwscp->hwifst = SOSCP_HWIFST_CLOSED;
+        xwscp->hwifst = XWSCP_HWIFST_CLOSED;
         xwscp->hwifops = NULL;
         xwscp->hwifcb = NULL;
 }
 
 /**
- * @brief SOSCP API: 启动SOSCP
- * @param xwscp: (I) SOSCP对象的指针
- * @param name: (I) SOSCP实例的名字
+ * @brief XWSCP API: 启动XWSCP
+ * @param xwscp: (I) XWSCP对象的指针
+ * @param name: (I) XWSCP实例的名字
  * @param hwifops: (I) 数据链路层操作函数集合
  * @return 错误码
  * @retval OK: OK
@@ -77,15 +77,15 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
         xwsq_t i;
         xwer_t rc;
 
-        SOSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
-        SOSCP_VALIDATE((hwifops), "nullptr", -EFAULT);
-        SOSCP_VALIDATE((hwifops->tx), "nullptr", -EFAULT);
-        SOSCP_VALIDATE((hwifops->rx), "nullptr", -EFAULT);
+        XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
+        XWSCP_VALIDATE((hwifops), "nullptr", -EFAULT);
+        XWSCP_VALIDATE((hwifops->tx), "nullptr", -EFAULT);
+        XWSCP_VALIDATE((hwifops->rx), "nullptr", -EFAULT);
 
-        xwscplogf(DEBUG, "Starting SOSCP-%s ...\n", SOSCP_VERSION);
+        xwscplogf(DEBUG, "Starting XWSCP-%s ...\n", XWSCP_VERSION);
 
         /* 初始化发送状态机 */
-        xwscp->txi.cnt = SOSCP_ID_SYNC;
+        xwscp->txi.cnt = XWSCP_ID_SYNC;
         rc = xwosal_mtx_init(&xwscp->txmtx, XWOSAL_SD_PRIORITY_RT_MIN);
         if (__unlikely(rc < 0)) {
                 xwscplogf(ERR, "Init txmtx ... [rc:%d]\n", rc);
@@ -104,24 +104,24 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
         xwscp->txi.frm = NULL;
 
         /* 初始化接收状态机 */
-        xwscp->rxq.cnt = SOSCP_ID_SYNC;
+        xwscp->rxq.cnt = XWSCP_ID_SYNC;
         xwlib_bclst_init_head(&xwscp->rxq.head);
         xwosal_splk_init(&xwscp->rxq.lock);
-        rc = xwosal_smr_init(&xwscp->slot.smr, SOSCP_FRMSLOT_NUM, SOSCP_FRMSLOT_NUM);
+        rc = xwosal_smr_init(&xwscp->slot.smr, XWSCP_FRMSLOT_NUM, XWSCP_FRMSLOT_NUM);
         if (__unlikely(rc < 0)) {
                 xwscplogf(ERR, "Init slotsmr ... [rc:%d]\n", rc);
                 goto err_slotsmr_init;
         }
 
         /* 初始化帧槽 */
-        rc = xwosal_smr_init(&xwscp->rxq.smr, 0, SOSCP_FRMSLOT_NUM);
+        rc = xwosal_smr_init(&xwscp->rxq.smr, 0, XWSCP_FRMSLOT_NUM);
         if (__unlikely(rc < 0)) {
                 xwscplogf(ERR, "Init rxqsmr ... [rc:%d]\n", rc);
                 goto err_rxqsmr_init;
         }
         memset(xwscp->slot.frm, 0, sizeof(xwscp->slot.frm));
         xwlib_bclst_init_head(&xwscp->slot.q);
-        for (i = 0; i < SOSCP_FRMSLOT_NUM; i ++) {
+        for (i = 0; i < XWSCP_FRMSLOT_NUM; i ++) {
                 xwlib_bclst_init_node(&xwscp->slot.frm[i].node);
                 xwlib_bclst_add_tail(&xwscp->slot.q, &xwscp->slot.frm[i].node);
         }
@@ -144,15 +144,15 @@ err_txmtx_init:
 }
 
 /**
- * @brief SOSCP API: 停止SOSCP
- * @param xwscp: (I) SOSCP对象的指针
+ * @brief XWSCP API: 停止XWSCP
+ * @param xwscp: (I) XWSCP对象的指针
  * @return 错误码
  * @retval OK: OK
  */
 __xwmd_api
 xwer_t xwscp_stop(struct xwscp * xwscp)
 {
-        SOSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
+        XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
 
         xwosal_smr_destroy(&xwscp->rxq.smr);
         xwosal_smr_destroy(&xwscp->slot.smr);
@@ -164,7 +164,7 @@ xwer_t xwscp_stop(struct xwscp * xwscp)
 
 /**
  * @brief 内部函数：链接远程端，并重置本地发送计数器与远程端的接收计数器
- * @param xwscp: (I) SOSCP对象的指针
+ * @param xwscp: (I) XWSCP对象的指针
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -176,7 +176,7 @@ xwer_t xwscp_connect_once(struct xwscp * xwscp, xwtm_t * xwtm, xwsq_t * cnt)
 {
         union xwlk_ulock ulk;
         xwsq_t lockstate;
-        xwtm_t wtime;
+        xwtm_t time;
         xwer_t rc;
 
         ulk.osal.id = xwosal_mtx_get_id(&xwscp->csmtx);
@@ -189,10 +189,10 @@ xwer_t xwscp_connect_once(struct xwscp * xwscp, xwtm_t * xwtm, xwsq_t * cnt)
         if (__unlikely(rc < 0)) {
                 goto err_tx;
         }
-        wtime = *xwtm > SOSCP_PERIOD ? SOSCP_PERIOD : *xwtm;
+        time = *xwtm > XWSCP_PERIOD ? XWSCP_PERIOD : *xwtm;
         rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&xwscp->cscdt),
                                   ulk, XWLK_TYPE_MTX,
-                                  NULL, 0, &wtime, &lockstate);
+                                  NULL, 0, &time, &lockstate);
         if (__likely(OK == rc)) {
                 xwosal_mtx_unlock(ulk.osal.id);
                 xwaop_add(xwu32_t, &xwscp->txi.cnt, 1, NULL, NULL);
@@ -201,7 +201,7 @@ xwer_t xwscp_connect_once(struct xwscp * xwscp, xwtm_t * xwtm, xwsq_t * cnt)
                         xwosal_mtx_unlock(ulk.osal.id);
                 }/* else {} */
                 if (-ETIMEDOUT == rc) {
-                        *xwtm -= SOSCP_PERIOD;
+                        *xwtm -= XWSCP_PERIOD;
                         if (__likely(*xwtm > 0)) {
                                 *cnt = *cnt + 1;
                                 rc = -EAGAIN;
@@ -217,8 +217,8 @@ err_mtx_lock:
 }
 
 /**
- * @brief SOSCP API: 连接远程端
- * @param xwscp: (I) SOSCP对象的指针
+ * @brief XWSCP API: 连接远程端
+ * @param xwscp: (I) XWSCP对象的指针
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -239,8 +239,8 @@ xwer_t xwscp_connect(struct xwscp * xwscp, xwtm_t * xwtm)
         xwsq_t cnt;
         xwer_t rc;
 
-        SOSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
-        SOSCP_VALIDATE((xwtm), "nullptr", -EFAULT);
+        XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
+        XWSCP_VALIDATE((xwtm), "nullptr", -EFAULT);
 
         txmtxid = xwosal_mtx_get_id(&xwscp->txmtx);
         rc = xwosal_mtx_timedlock(txmtxid, xwtm);
@@ -250,11 +250,11 @@ xwer_t xwscp_connect(struct xwscp * xwscp, xwtm_t * xwtm)
         cnt = 0;
         do {
                 if ((XWMDCFG_isc_xwscp_RETRY_NUM / 2) == cnt) {
-                        xwscp_hwifal_notify(xwscp, SOSCP_HWIFNTF_NETUNREACH, xwtm);
+                        xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_NETUNREACH, xwtm);
                 }/* else {} */
                 rc = xwscp_connect_once(xwscp, xwtm, &cnt);
-        } while ((-EAGAIN == rc) && (cnt < SOSCP_RETRY_NUM));
-        if (((-EAGAIN == rc)) && (SOSCP_RETRY_NUM == cnt)) {
+        } while ((-EAGAIN == rc) && (cnt < XWSCP_RETRY_NUM));
+        if (((-EAGAIN == rc)) && (XWSCP_RETRY_NUM == cnt)) {
                 rc = -ENOTCONN;
         }/* else {} */
         xwosal_mtx_unlock(txmtxid);
@@ -266,7 +266,7 @@ err_txmtx_timedlock:
 
 /**
  * @brief 内部函数：发送一条报文，并在限定的时间等待回应
- * @param xwscp: (I) SOSCP对象的指针
+ * @param xwscp: (I) XWSCP对象的指针
  * @param msg: (I) 报文
  * @param size: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示报文的字节数
@@ -302,7 +302,7 @@ xwer_t xwscp_tx_once(struct xwscp * xwscp, const xwu8_t msg[], xwsz_t * size,
         if (__unlikely(rc < 0)) {
                 goto err_iftx;
         }
-        expected = *xwtm > SOSCP_PERIOD ? SOSCP_PERIOD : *xwtm;
+        expected = *xwtm > XWSCP_PERIOD ? XWSCP_PERIOD : *xwtm;
         rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&xwscp->cscdt),
                                   ulk, XWLK_TYPE_MTX,
                                   NULL, 0, &expected, &lockstate);
@@ -311,21 +311,21 @@ xwer_t xwscp_tx_once(struct xwscp * xwscp, const xwu8_t msg[], xwsz_t * size,
                 xwscp->txi.frm = NULL;
                 xwosal_mtx_unlock(ulk.osal.id);
                 switch (ack) {
-                case SOSCP_ACK_OK:
+                case XWSCP_ACK_OK:
                         rc = xwscp_callback_rc[ack];
                         xwaop_add(xwu32_t, &xwscp->txi.cnt, 1, NULL, NULL);
                         break;
-                case SOSCP_ACK_ESIZE:
+                case XWSCP_ACK_ESIZE:
                         rc = xwscp_callback_rc[ack];
-                        xwaop_c0m(xwu32_t, &xwscp->txi.cnt, SOSCP_ID_MSK,
+                        xwaop_c0m(xwu32_t, &xwscp->txi.cnt, XWSCP_ID_MSK,
                                   NULL, NULL);
                         break;
-                case SOSCP_ACK_EALREADY:
-                        rc = xwscp_callback_rc[SOSCP_ACK_OK];
+                case XWSCP_ACK_EALREADY:
+                        rc = xwscp_callback_rc[XWSCP_ACK_OK];
                         xwaop_add(xwu32_t, &xwscp->txi.cnt, 1, NULL, NULL);
                         break;
-                case SOSCP_ACK_ECONNRESET:
-                        xwaop_c0m(xwu32_t, &xwscp->txi.cnt, SOSCP_ID_MSK,
+                case XWSCP_ACK_ECONNRESET:
+                        xwaop_c0m(xwu32_t, &xwscp->txi.cnt, XWSCP_ID_MSK,
                                   NULL, NULL);
                         break;
                 }
@@ -335,7 +335,7 @@ xwer_t xwscp_tx_once(struct xwscp * xwscp, const xwu8_t msg[], xwsz_t * size,
                         xwosal_mtx_unlock(ulk.osal.id);
                 }/* else {} */
                 if (-ETIMEDOUT == rc) {
-                        *xwtm -= SOSCP_PERIOD;
+                        *xwtm -= XWSCP_PERIOD;
                         if (__likely(*xwtm > 0)) {
                                 *cnt = *cnt + 1;
                                 rc = -EAGAIN;
@@ -353,8 +353,8 @@ err_fmt_msg:
 }
 
 /**
- * @brief SOSCP API: 发送一条报文，并在限定的时间等待回应
- * @param xwscp: (I) SOSCP对象的指针
+ * @brief XWSCP API: 发送一条报文，并在限定的时间等待回应
+ * @param xwscp: (I) XWSCP对象的指针
  * @param msg: (I) 报文
  * @param size: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示报文的字节数
@@ -381,10 +381,10 @@ xwer_t xwscp_tx(struct xwscp * xwscp, const xwu8_t msg[], xwsz_t * size,
         xwsq_t cnt;
         xwer_t rc;
 
-        SOSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
-        SOSCP_VALIDATE((size), "nullptr", -EFAULT);
-        SOSCP_VALIDATE((xwtm), "nullptr", -EFAULT);
-        SOSCP_VALIDATE((*size <= SOSCP_SDU_MAX_SIZE), "msg2long", -E2BIG);
+        XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
+        XWSCP_VALIDATE((size), "nullptr", -EFAULT);
+        XWSCP_VALIDATE((xwtm), "nullptr", -EFAULT);
+        XWSCP_VALIDATE((*size <= XWSCP_SDU_MAX_SIZE), "msg2long", -E2BIG);
 
         txmtxid = xwosal_mtx_get_id(&xwscp->txmtx);
         rc = xwosal_mtx_timedlock(txmtxid, xwtm);
@@ -394,7 +394,7 @@ xwer_t xwscp_tx(struct xwscp * xwscp, const xwu8_t msg[], xwsz_t * size,
         cnt = 0;
         do {
                 if ((XWMDCFG_isc_xwscp_RETRY_NUM / 2) == cnt) {
-                        xwscp_hwifal_notify(xwscp, SOSCP_HWIFNTF_NETUNREACH, xwtm);
+                        xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_NETUNREACH, xwtm);
                 }/* else {} */
                 rc = xwscp_tx_once(xwscp, msg, size, xwtm, &cnt);
                 if (-ENOLINK == rc) {
@@ -403,9 +403,9 @@ xwer_t xwscp_tx(struct xwscp * xwscp, const xwu8_t msg[], xwsz_t * size,
                                 rc = -EAGAIN;
                         }/* else {} */
                 }/* else {} */
-        } while ((-EAGAIN == rc) && (cnt < SOSCP_RETRY_NUM));
-        if (((-EAGAIN == rc)) && (SOSCP_RETRY_NUM == cnt)) {
-                xwaop_c0m(xwu32_t, &xwscp->txi.cnt, SOSCP_ID_MSK, NULL, NULL);
+        } while ((-EAGAIN == rc) && (cnt < XWSCP_RETRY_NUM));
+        if (((-EAGAIN == rc)) && (XWSCP_RETRY_NUM == cnt)) {
+                xwaop_c0m(xwu32_t, &xwscp->txi.cnt, XWSCP_ID_MSK, NULL, NULL);
                 rc = -ENOTCONN;
         }/* else {} */
         xwosal_mtx_unlock(txmtxid);
@@ -416,8 +416,8 @@ err_txmtx_timedlock:
 }
 
 /**
- * @brief SOSCP API: 接收一条报文，若接收队列为空，就限时等待
- * @param xwscp: (I) SOSCP对象的指针
+ * @brief XWSCP API: 接收一条报文，若接收队列为空，就限时等待
+ * @param xwscp: (I) XWSCP对象的指针
  * @param buf: (I) 接收报文数据的缓冲区指针
  * @param size: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示报文的字节数
@@ -441,16 +441,16 @@ xwer_t xwscp_rx(struct xwscp * xwscp, xwu8_t buf[], xwsz_t * size, xwtm_t * xwtm
         struct xwscp_frmslot * pubfrm;
         xwsz_t realsize;
 
-        SOSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
-        SOSCP_VALIDATE((size), "nullptr", -EFAULT);
-        SOSCP_VALIDATE((xwtm), "nullptr", -EFAULT);
+        XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
+        XWSCP_VALIDATE((size), "nullptr", -EFAULT);
+        XWSCP_VALIDATE((xwtm), "nullptr", -EFAULT);
 
         rc = xwscp_rxq_choose(xwscp, &pubfrm, xwtm);
         if (__unlikely(rc < 0)) {
                 goto err_rxq_choose;
         }
         realsize = pubfrm->frm.head.frmlen - sizeof(struct xwscp_frmhead) -
-                   SOSCP_CHKSUM_SIZE;
+                   XWSCP_CHKSUM_SIZE;
         realsize = realsize > *size ? *size : realsize;
         memcpy(buf, pubfrm->frm.sdu, realsize);
         xwscp_free_frmslot(xwscp, pubfrm);

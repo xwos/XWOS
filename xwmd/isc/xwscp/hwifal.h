@@ -22,10 +22,10 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      macros       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define SOSCP_HWIFAL_SOF                        ((xwu8_t)'S')
-#define SOSCP_HWIFAL_EOF                        ((xwu8_t)(SOSCP_HWIFAL_SOF ^ 0xFF))
-#define SOSCP_HWIFAL_SOF_SIZE                   (1U)
-#define SOSCP_HWIFAL_EOF_SIZE                   (1U)
+#define XWSCP_HWIFAL_SOF                        ((xwu8_t)'S')
+#define XWSCP_HWIFAL_EOF                        ((xwu8_t)(XWSCP_HWIFAL_SOF ^ 0xFF))
+#define XWSCP_HWIFAL_SOF_SIZE                   (1U)
+#define XWSCP_HWIFAL_EOF_SIZE                   (1U)
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -46,13 +46,13 @@ struct xwscp_hwifal_operations {
 };
 
 enum xwscp_hwifal_state_em {
-        SOSCP_HWIFST_CLOSED, /**< 硬件接口已经关闭 */
-        SOSCP_HWIFST_OPENED, /**< 硬件接口已经打开 */
+        XWSCP_HWIFST_CLOSED, /**< 硬件接口已经关闭 */
+        XWSCP_HWIFST_OPENED, /**< 硬件接口已经打开 */
 };
 
 enum xwscp_hwifal_notification_em {
-        SOSCP_HWIFNTF_CONNECT = 0, /**< 与远程端链接 */
-        SOSCP_HWIFNTF_NETUNREACH = 1, /**< 远程端无响应 */
+        XWSCP_HWIFNTF_CONNECT = 0, /**< 与远程端链接 */
+        XWSCP_HWIFNTF_NETUNREACH = 1, /**< 远程端无响应 */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********

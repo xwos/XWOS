@@ -71,7 +71,7 @@ __xwmd_rodata const xwu8_t xwpcp_cfrm_sync[] = {
 /**
  * @brief 控制帧模板：同步应答帧
  */
-__xwmd_rodata const xwu8_t xwpcp_cfrm_syncack[] = {
+__xwmd_rodata const xwu8_t xwpcp_cfrm_sync_ack[] = {
         (xwu8_t)XWPCP_HWIFAL_SOF,
         (xwu8_t)0x15, /* 帧长度 */
         (xwu8_t)0xEA, /* 帧长度的镜像反转 */
@@ -138,7 +138,7 @@ static __xwmd_code
 xwer_t xwpcp_tx_cfrm_sync(struct xwpcp * xwpcp);
 
 static __xwmd_code
-xwer_t xwpcp_tx_cfrm_syncack(struct xwpcp * xwpcp, xwu32_t rxcnt);
+xwer_t xwpcp_tx_cfrm_sync_ack(struct xwpcp * xwpcp, xwu32_t rxcnt);
 
 static __xwmd_code
 xwer_t xwpcp_tx_frm_sdu_ack(struct xwpcp * xwpcp, xwu8_t port, xwu8_t id, xwu8_t ack);
@@ -158,7 +158,7 @@ static __xwmd_code
 xwer_t xwpcp_rx_cfrm_sync(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot);
 
 static __xwmd_code
-xwer_t xwpcp_rx_cfrm_syncack(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot);
+xwer_t xwpcp_rx_cfrm_sync_ack(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot);
 
 static __xwmd_code
 xwer_t xwpcp_rx_frm_sdu(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot);
@@ -335,9 +335,9 @@ xwer_t xwpcp_tx_cfrm_sync(struct xwpcp * xwpcp)
  * @return 错误码
  */
 static __xwmd_code
-xwer_t xwpcp_tx_cfrm_syncack(struct xwpcp * xwpcp, xwu32_t rxcnt)
+xwer_t xwpcp_tx_cfrm_sync_ack(struct xwpcp * xwpcp, xwu32_t rxcnt)
 {
-        xwu8_t stream[sizeof(xwpcp_cfrm_syncack)];
+        xwu8_t stream[sizeof(xwpcp_cfrm_sync_ack)];
         struct xwpcp_frame * frm;
         xwid_t csmtxid;
         xwsz_t infolen;
@@ -346,7 +346,7 @@ xwer_t xwpcp_tx_cfrm_syncack(struct xwpcp * xwpcp, xwu32_t rxcnt)
 
         xwpcplogf(DEBUG, "TX SYNC-ACK frame.\n");
         frm = (struct xwpcp_frame *)stream;
-        memcpy(frm, xwpcp_cfrm_syncack, sizeof(xwpcp_cfrm_syncack));
+        memcpy(frm, xwpcp_cfrm_sync_ack, sizeof(xwpcp_cfrm_sync_ack));
         frm->sdu[9] = (xwu8_t)((rxcnt >> 24U) & 0xFFU);
         frm->sdu[10] = (xwu8_t)((rxcnt >> 16U) & 0xFFU);
         frm->sdu[11] = (xwu8_t)((rxcnt >> 8U) & 0xFFU);
@@ -654,7 +654,7 @@ xwer_t xwpcp_rx_cfrm_sync(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
                 rmttxcnt |= ((xwu32_t)frmslot->frm.sdu[10]) << 16U;
                 rmttxcnt |= ((xwu32_t)frmslot->frm.sdu[11]) << 8U;
                 rmttxcnt |= ((xwu32_t)frmslot->frm.sdu[12]) << 0U;
-                rc = xwpcp_tx_cfrm_syncack(xwpcp, rmttxcnt);
+                rc = xwpcp_tx_cfrm_sync_ack(xwpcp, rmttxcnt);
                 if (OK == rc) {
                         xwaop_write(xwu32_t, &xwpcp->rxq.cnt, rmttxcnt + 1, NULL);
                 }/* else {} */
@@ -672,7 +672,7 @@ xwer_t xwpcp_rx_cfrm_sync(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
  * @return 错误码
  */
 static __xwmd_code
-xwer_t xwpcp_rx_cfrm_syncack(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
+xwer_t xwpcp_rx_cfrm_sync_ack(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
 {
         xwu32_t txcnt;
         xwu32_t rmtrxcnt;
@@ -837,7 +837,7 @@ xwer_t xwpcp_rx_frm(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
                 rc = xwpcp_rx_cfrm_sync(xwpcp, frmslot);
                 break;
         case (XWPCP_ID_SYNC | XWPCP_ID_ACK):
-                rc = xwpcp_rx_cfrm_syncack(xwpcp, frmslot);
+                rc = xwpcp_rx_cfrm_sync_ack(xwpcp, frmslot);
                 break;
         default:
                 if (XWPCP_ID_ACK & id) {
