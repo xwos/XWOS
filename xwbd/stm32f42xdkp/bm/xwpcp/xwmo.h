@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwos/osal/sync/barrier test
+ * @brief Board Module: xwpcp
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_xwtst_sync_barrier_demo_h__
-#define __bm_xwtst_sync_barrier_demo_h__
+#ifndef __bm_xwpcp_xwmo_h__
+#define __bm_xwpcp_xwmo_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
@@ -29,6 +29,8 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t bm_xwtst_sync_barrier_start(void);
+xwer_t bm_xwpcp_start(void);
 
-#endif /* bm/xwtst/sync/barrier/demo.h */
+xwer_t bm_xwpcp_stop(void);
+
+#endif /* bm/xwpcp/xwmo.h */

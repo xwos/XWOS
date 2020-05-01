@@ -34,7 +34,7 @@ XWMO_CSRCS += xwac/override.c
 XWMO_CSRCS += xwac/crc32.c
 XWMO_CSRCS += xwac/vector.c
 
-XWMO_CSRCS += init.c
+XWMO_CSRCS += xwmo.c
 
 XWMO_CFLAGS := -include standard.h
 XWMO_CFLAGS += -Wno-undef -Wno-unused-parameter

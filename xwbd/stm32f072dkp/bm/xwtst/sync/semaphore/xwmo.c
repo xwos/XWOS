@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwos/osal/sync/semaphore test
+ * @brief Board Module: xwos/osal/sync/semaphore test
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -26,7 +26,7 @@
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <xwos/osal/sync/semaphore.h>
-#include <bm/xwtst/sync/semaphore/demo.h>
+#include <bm/xwtst/sync/semaphore/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********

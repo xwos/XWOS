@@ -340,7 +340,7 @@ xwer_t xwsync_smr_destroy(struct xwsync_smr * smr)
  * @retval -ETYPE: 事件对象或信号量类型错误
  * @retval -EFAULT: 空指针
  * @note
- * - 同步/异步：异步
+ * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *smr* ，不可重入
  */
@@ -390,7 +390,7 @@ xwer_t xwsync_smr_bind(struct xwsync_smr * smr, struct xwsync_evt * evt, xwsq_t 
  * @retval -ETYPE: 事件对象或信号量类型错误
  * @retval -EFAULT: 空指针
  * @note
- * - 同步/异步：异步
+ * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *smr* ，不可重入
  */

@@ -38,7 +38,7 @@ XWMO_CSRCS += xwds/init.c
 XWMO_CSRCS += xwds/pm.c
 XWMO_CSRCS += xwds/stm32cube.c
 
-XWMO_CSRCS += init.c
+XWMO_CSRCS += xwmo.c
 
 XWMO_CFLAGS := -include standard.h
 XWMO_CFLAGS += -Wno-undef -Wno-unused-parameter

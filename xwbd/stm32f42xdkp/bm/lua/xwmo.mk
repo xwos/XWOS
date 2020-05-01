@@ -21,7 +21,7 @@
 include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
-XWMO_CSRCS := task.c mm.c init.c
+XWMO_CSRCS := task.c mm.c xwmo.c
 XWMO_CFLAGS := -Wno-unused-value
 XWMO_INCDIRS := xwem/vm/lua xwem/vm/lua/src $(XWOS_BM_DIR)/lua
 

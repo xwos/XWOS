@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwos/osal/sync/selector test
+ * @brief Board Module: xwos/osal/sync/flag test
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_xwtst_sync_selector_demo_h__
-#define __bm_xwtst_sync_selector_demo_h__
+#ifndef __bm_xwtst_sync_flag_xwmo_h__
+#define __bm_xwtst_sync_flag_xwmo_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
@@ -29,6 +29,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t bm_xwtst_sync_selector_start(void);
+xwer_t bm_xwtst_sync_flag_start(void);
 
-#endif /* bm/xwtst/sync/selector/demo.h */
+#endif /* bm/xwtst/sync/flag/xwmo.h */

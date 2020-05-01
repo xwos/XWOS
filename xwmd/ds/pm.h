@@ -32,11 +32,11 @@
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwds_api
-xwer_t xwds_pm_init(struct xwds *ds, struct xwos_pmdm * xwpmdm,
+xwer_t xwds_pm_init(struct xwds * ds, struct xwos_pmdm * xwpmdm,
                     xwds_suspend_f suspend, xwds_resume_f resume);
 
 __xwds_api
-xwer_t xwds_pm_suspend(struct xwds *ds);
+xwer_t xwds_pm_suspend(struct xwds * ds);
 
 __xwds_api
 xwer_t xwds_pm_resume(struct xwds * ds);

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 应用程序入口
+ * @brief Board Module: STM32CUBE
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -23,51 +23,79 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/osal/scheduler.h>
-#include <bdl/standard.h>
+#include <xwos/osal/thread.h>
+#include <xwos/osal/sync/semaphore.h>
 #include <bm/stm32cube/xwmo.h>
-#include <bm/xwtst/sync/selector/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+#define LED_TASK_PRIORITY \
+        (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 1))
+
+#define LED_GPIO_PORT SODS_GPIO_PORT_C
+#define LED_GPIO_PIN SODS_GPIO_PIN_12
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+xwer_t led_task(void * arg);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+const struct xwosal_thrd_desc stm32cube_tbd[] = {
+        [0] = {
+                .name = "task.led",
+                .prio = LED_TASK_PRIORITY,
+                .stack = NULL,
+                .stack_size = 2048,
+                .func = led_task,
+                .arg = NULL,
+                .attr = XWSDOBJ_ATTR_PRIVILEGED,
+        },
+};
+
+xwid_t stm32cube_tid[xw_array_size(stm32cube_tbd)];
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t xwos_main(void)
+xwer_t bm_stm32cube_start(void)
 {
         xwer_t rc;
+        xwsz_t i;
 
-        /* stm32cube init */
-        rc = bm_stm32cube_start();
-        if (rc < 0) {
-                goto bm_stm32cube_start;
+        for (i = 0; i < xw_array_size(stm32cube_tbd); i++) {
+                rc = xwosal_thrd_create(&stm32cube_tid[i], stm32cube_tbd[i].name,
+                                        stm32cube_tbd[i].func,
+                                        stm32cube_tbd[i].arg,
+                                        stm32cube_tbd[i].stack_size,
+                                        stm32cube_tbd[i].prio,
+                                        stm32cube_tbd[i].attr);
+                if (rc < 0) {
+                        goto err_thrd_create;
+                }
         }
 
-        rc = bm_xwtst_sync_selector_start();
-        if (rc < 0) {
-                goto err_bm_xwtst_sync_selector_start;
-        }
-
-        rc = xwosal_scheduler_start_lc();
-        if (rc < 0) {
-                goto err_scheduler_start_lc;
-        }
         return OK;
 
-err_bm_xwtst_sync_selector_start:
-        BDL_BUG();
-err_scheduler_start_lc:
-        BDL_BUG();
-bm_stm32cube_start:
-        BDL_BUG();
+err_thrd_create:
         return rc;
+}
+
+xwer_t led_task(void * arg)
+{
+        xwtm_t xwtm;
+
+        XWOS_UNUSED(arg);
+
+        while (!xwosal_cthrd_frz_shld_stop(NULL)) {
+                xwtm = 1 * XWTM_S;
+                xwosal_cthrd_sleep(&xwtm);
+
+                xwtm = 1 * XWTM_S;
+                xwosal_cthrd_sleep(&xwtm);
+        }
+        return OK;
 }

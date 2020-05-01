@@ -139,7 +139,7 @@ struct xwosal_smr * xwosal_smr_get_obj(xwid_t smrid)
  * @retval OK: OK
  * @retval -ETYPE: 信号选择器或信号量类型错误
  * @note
- * - 同步/异步：异步
+ * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *smrid* ，不可重入
  */
@@ -157,7 +157,7 @@ xwer_t xwosal_smr_bind(xwid_t smrid, xwid_t sltid, xwsq_t pos)
  * @retval OK: OK
  * @retval -ETYPE: 信号选择器类型错误
  * @note
- * - 同步/异步：异步
+ * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *smrid* ，不可重入
  */

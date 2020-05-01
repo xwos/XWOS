@@ -165,7 +165,7 @@ struct xwosal_flg * xwosal_flg_get_obj(xwid_t flgid)
  * @retval OK: OK
  * @retval -ETYPE: 信号选择器或事件信号旗类型错误
  * @note
- * - 同步/异步：异步
+ * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *flgid* ，不可重入
  */
@@ -183,7 +183,7 @@ xwer_t xwosal_flg_bind(xwid_t flgid, xwid_t sltid, xwsq_t pos)
  * @retval OK: OK
  * @retval -ETYPE: 信号选择器类型错误
  * @note
- * - 同步/异步：异步
+ * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *flgid* ，不可重入
  */

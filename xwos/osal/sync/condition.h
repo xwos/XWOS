@@ -136,11 +136,11 @@ struct xwosal_cdt * xwosal_cdt_get_obj(xwid_t cdtid)
  * @retval OK: OK
  * @retval -ETYPE: 信号选择器或条件量类型错误
  * @note
- * - 同步/异步：异步
+ * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *cdtid* ，不可重入
  * @note
- * - 绑定了信号选择器的条件量，只有广播时才会向信号选择器传递选择信号。
+ * - 绑定了信号选择器的条件量，只有广播才会向信号选择器发送信号。
  */
 static __xwos_inline_api
 xwer_t xwosal_cdt_bind(xwid_t cdtid, xwid_t sltid, xwsq_t pos)
@@ -156,7 +156,7 @@ xwer_t xwosal_cdt_bind(xwid_t cdtid, xwid_t sltid, xwsq_t pos)
  * @retval OK: OK
  * @retval -ETYPE: 信号选择器类型错误
  * @note
- * - 同步/异步：异步
+ * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *cdtid* ，不可重入
  */

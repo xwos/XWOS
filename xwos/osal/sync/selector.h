@@ -138,12 +138,12 @@ struct xwosal_selector * xwosal_selector_get_obj(xwid_t sltid)
  * @retval OK: OK
  * @retval -ETYPE: 信号选择器或信号量类型错误
  * @note
- * - 同步/异步：异步
+ * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *srcid* ，不可重入
  * @note
- * - 源信号选择器选择到的信号，将依次往目的信号选择器链上传递。
- * - 多个信号选择器可以依次绑定，形成信号传递链。
+ * - 多个信号选择器可以依次绑定，形成信号传递链。源信号选择器选择到的信号，
+ *   将依次往目的信号选择器链上传递
  */
 static __xwos_inline_api
 xwer_t xwosal_selector_bind(xwid_t srcid, xwid_t dstid, xwsq_t pos)
@@ -159,11 +159,9 @@ xwer_t xwosal_selector_bind(xwid_t srcid, xwid_t dstid, xwsq_t pos)
  * @retval OK: OK
  * @retval -ETYPE: 信号选择器类型错误
  * @note
- * - 同步/异步：异步
+ * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *srcid* ，不可重入
- * @note
- * - 源信号选择器选择到的信号，将依次往目的信号选择器链上传递。
  */
 static __xwos_inline_api
 xwer_t xwosal_selector_unbind(xwid_t srcid, xwid_t dstid)

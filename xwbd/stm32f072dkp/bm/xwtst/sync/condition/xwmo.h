@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Lua Board Module Init
+ * @brief Board Module: xwos/osal/sync/semaphore test
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_lua_init_h__
-#define __bm_lua_init_h__
+#ifndef __bm_xwtst_sync_condition_xwmo_h__
+#define __bm_xwtst_sync_condition_xwmo_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
@@ -29,6 +29,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t bm_xwlua_start(void);
+xwer_t bm_xwtst_sync_condition_start(void);
 
-#endif /* bm/lua/init.h */
+#endif /* bm/xwtst/sync/condition/xwmo.h */

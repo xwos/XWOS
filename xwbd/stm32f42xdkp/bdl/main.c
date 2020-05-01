@@ -25,11 +25,11 @@
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <bdl/standard.h>
-#include <bm/stm32cube/init.h>
-#include <bm/lua/init.h>
-#include <bm/cxx/init.h>
-#include <bm/xwpcp/init.h>
-#include <bm/xwtst/sync/selector/demo.h>
+#include <bm/stm32cube/xwmo.h>
+#include <bm/lua/xwmo.h>
+#include <bm/cxx/xwmo.h>
+#include <bm/xwpcp/xwmo.h>
+#include <bm/xwtst/sync/selector/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -45,7 +45,7 @@ xwer_t bdl_init_thrd(void * arg);
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 const struct xwosal_thrd_desc bdl_init_thrd_td = {
-        .name = "bdl.init.thread",
+        .name = "bdl.init.thrd",
         .prio = BDL_INIT_THRD_PRIORITY,
         .stack = XWOSAL_THRD_STACK_DYNAMIC,
         .stack_size = 2048,

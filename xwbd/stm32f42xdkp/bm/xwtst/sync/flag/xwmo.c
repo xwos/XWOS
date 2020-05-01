@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwos/osal/sync/flag test
+ * @brief Board Module: xwos/osal/sync/flag test
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -25,7 +25,7 @@
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <xwos/osal/sync/flag.h>
-#include <bm/xwtst/sync/flag/demo.h>
+#include <bm/xwtst/sync/flag/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwpcp Board Module Init
+ * @brief Board Module: xwpcp
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -28,7 +28,7 @@
 #include <xwmd/isc/xwpcp/api.h>
 #include <xwmd/ds/uart/dma.h>
 #include <bm/stm32cube/xwds/stm32cube.h>
-#include <bm/xwpcp/init.h>
+#include <bm/xwpcp/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********

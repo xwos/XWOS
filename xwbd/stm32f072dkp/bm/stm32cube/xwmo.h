@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief C++ Board Module Init
+ * @brief Board Module: STM32CUBE
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -18,61 +18,30 @@
  * > limitations under the License.
  */
 
+#ifndef __bm_stm32cube_xwmo_h__
+#define __bm_stm32cube_xwmo_h__
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/osal/scheduler.h>
-#include <xwos/osal/thread.h>
-#include <bm/cxx/init.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
+ ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define CXX_TASK_PRIORITY \
-        (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 1))
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-extern xwer_t cxx_thrd(void * arg);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-const struct xwosal_thrd_desc cxx_tbd[] = {
-        [0] = {
-                .name = "task.lua",
-                .prio = CXX_TASK_PRIORITY,
-                .stack = NULL,
-                .stack_size = 4096,
-                .func = cxx_thrd,
-                .arg = NULL,
-                .attr = XWSDOBJ_ATTR_PRIVILEGED,
-        },
-};
-
-xwid_t cxx_tid[xw_array_size(cxx_tbd)];
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
+ ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t bm_cxx_start(void)
-{
-        xwer_t rc;
-        xwsq_t i;
+extern
+xwer_t bm_stm32cube_start(void);
 
-        for (i = 0; i < xw_array_size(cxx_tbd); i++) {
-                rc = xwosal_thrd_create(&cxx_tid[i],
-                                        cxx_tbd[i].name,
-                                        cxx_tbd[i].func,
-                                        cxx_tbd[i].arg,
-                                        cxx_tbd[i].stack_size,
-                                        cxx_tbd[i].prio,
-                                        cxx_tbd[i].attr);
-                if (rc < 0) {
-                        break;
-                }
-        }
-        return rc;
-}
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********  inline functions implementations   ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+#endif /* bm/stm32cube/xwmo.h */

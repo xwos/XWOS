@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 应用程序入口
+ * @brief Board Module: STM32CUBE
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -30,6 +30,7 @@
 #include <xwmd/ds/soc/eirq.h>
 #include <bm/stm32cube/xwds/stm32cube.h>
 #include <bm/stm32cube/xwds/init.h>
+#include <bm/stm32cube/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********

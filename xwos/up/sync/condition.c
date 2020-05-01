@@ -217,7 +217,7 @@ xwer_t xwsync_cdt_delete(struct xwsync_cdt * cdt)
  * @retval -ETYPE: 事件对象或条件量类型错误
  * @retval -EFAULT: 空指针
  * @note
- * - 同步/异步：异步
+ * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *cdt* ，不可重入
  */
@@ -245,7 +245,7 @@ xwer_t xwsync_cdt_bind(struct xwsync_cdt * cdt, struct xwsync_evt * evt, xwsq_t 
  * @retval -ETYPE: 事件对象或条件量类型错误
  * @retval -EFAULT: 空指针
  * @note
- * - 同步/异步：异步
+ * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *cdt* ，不可重入
  */

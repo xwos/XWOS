@@ -55,7 +55,7 @@ void xwds_pm_report_devices_resuming(struct xwds * ds, xwer_t rc);
  * - 线程上下文：可以使用
  */
 __xwds_api
-xwer_t xwds_pm_init(struct xwds *ds, struct xwos_pmdm * xwpmdm,
+xwer_t xwds_pm_init(struct xwds * ds, struct xwos_pmdm * xwpmdm,
                     xwds_suspend_f suspend, xwds_resume_f resume)
 {
         SODS_VALIDATE(ds, "nullptr", -EFAULT);

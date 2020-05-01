@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwos/osal/sync/selector test
+ * @brief Board Module: xwos/osal/sync/selector test
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -27,7 +27,7 @@
 #include <xwos/osal/sync/semaphore.h>
 #include <xwos/osal/sync/condition.h>
 #include <xwos/osal/sync/selector.h>
-#include <bm/xwtst/sync/selector/demo.h>
+#include <bm/xwtst/sync/selector/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********

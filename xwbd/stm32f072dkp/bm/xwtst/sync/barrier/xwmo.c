@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwos/osal/sync/barrier test
+ * @brief Board Module: xwos/osal/sync/barrier test
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -25,7 +25,7 @@
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <xwos/osal/sync/barrier.h>
-#include <bm/xwtst/sync/barrier/demo.h>
+#include <bm/xwtst/sync/barrier/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -73,24 +73,6 @@ const struct xwosal_thrd_desc bm_xwtst_sync_barrier_thrd_td[] = {
                 .stack_size = 2048,
                 .func = (xwosal_thrd_f)bm_xwtst_sync_barrier_thrd_func,
                 .arg = (void *)2,
-                .attr = XWSDOBJ_ATTR_PRIVILEGED,
-        },
-        [3] = {
-                .name = "bm.xwtst.sync.barrier.thrd",
-                .prio = BM_XWTST_SYNC_BARRIER_THRD_PRIORITY,
-                .stack = XWOSAL_THRD_STACK_DYNAMIC,
-                .stack_size = 2048,
-                .func = (xwosal_thrd_f)bm_xwtst_sync_barrier_thrd_func,
-                .arg = (void *)3,
-                .attr = XWSDOBJ_ATTR_PRIVILEGED,
-        },
-        [4] = {
-                .name = "bm.xwtst.sync.barrier.thrd",
-                .prio = BM_XWTST_SYNC_BARRIER_THRD_PRIORITY,
-                .stack = XWOSAL_THRD_STACK_DYNAMIC,
-                .stack_size = 2048,
-                .func = (xwosal_thrd_f)bm_xwtst_sync_barrier_thrd_func,
-                .arg = (void *)4,
                 .attr = XWSDOBJ_ATTR_PRIVILEGED,
         },
 };

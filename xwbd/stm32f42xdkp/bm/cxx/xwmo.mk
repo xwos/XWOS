@@ -21,7 +21,7 @@
 include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
-XWMO_CSRCS := init.c
+XWMO_CSRCS := xwmo.c
 XWMO_CFLAGS :=
 
 XWMO_CXXSRCS := task.cxx

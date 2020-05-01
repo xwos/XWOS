@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwos/osal/sync/condition test
+ * @brief Board Module: xwos/osal/sync/condition test
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -27,7 +27,7 @@
 #include <xwos/osal/thread.h>
 #include <xwos/osal/sync/condition.h>
 #include <xwos/osal/lock/spinlock.h>
-#include <bm/xwtst/sync/condition/demo.h>
+#include <bm/xwtst/sync/condition/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********

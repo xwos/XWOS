@@ -138,11 +138,11 @@ struct xwosal_barrier * xwosal_barrier_get_obj(xwid_t barid)
  * @retval OK: OK
  * @retval -ETYPE: 信号选择器或线程屏障类型错误
  * @note
- * - 同步/异步：异步
+ * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *barid* ，不可重入
  * @note
- * - 当所有线程到达线程屏障时，绑定了信号选择器的线程屏障将向信号选择器传递一个信号。
+ * - 当所有线程到达线程屏障时，绑定了信号选择器的线程屏障将向信号选择器发送信号。
  */
 static __xwos_inline_api
 xwer_t xwosal_barrier_bind(xwid_t barid, xwid_t sltid, xwsq_t pos)
@@ -158,7 +158,7 @@ xwer_t xwosal_barrier_bind(xwid_t barid, xwid_t sltid, xwsq_t pos)
  * @retval OK: OK
  * @retval -ETYPE: 信号选择器类型错误
  * @note
- * - 同步/异步：异步
+ * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *barid* ，不可重入
  */

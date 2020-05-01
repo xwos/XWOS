@@ -57,7 +57,7 @@ void xwsync_vsmr_activate(struct xwsync_vsmr * vsmr)
  * @return 错误码
  * @retval OK: OK
  * @note
- * - 同步/异步：异步
+ * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *vsmr* ，不可重入
  */
@@ -85,7 +85,7 @@ xwer_t xwsync_vsmr_bind(struct xwsync_vsmr * vsmr, struct xwsync_evt * evt,
  * @return 错误码
  * @retval OK: OK
  * @note
- * - 同步/异步：异步
+ * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *vsmr* ，不可重入
  */
