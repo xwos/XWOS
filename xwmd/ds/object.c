@@ -13,11 +13,12 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/object.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/osal/lock/seqlock.h>
+#include <xwmd/ds/xwds.h>
 #include <xwmd/ds/object.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -35,17 +36,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief 初始化设备栈
- * @param ds: (I) 设备栈指针
- */
-__xwds_code
-void xwds_init(struct xwds * ds)
-{
-        xwlib_bclst_init_node(&ds->devhead);
-        xwosal_sqlk_init(&ds->devlistlock);
-}
-
 /**
  * @brief 设备栈对象的构造函数
  * @param obj: (I) 对象的指针

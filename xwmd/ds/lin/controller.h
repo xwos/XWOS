@@ -16,7 +16,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/osal/lock/mutex.h>
 #include <xwmd/ds/device.h>
@@ -121,37 +121,13 @@ struct xwds_linc {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
-__xwds_code
+__xwds_api
 void xwds_linc_construct(struct xwds_linc * linc);
 
-__xwds_code
+__xwds_api
 void xwds_linc_destruct(struct xwds_linc * linc);
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** APIs ******** ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-__xwds_api
-xwer_t xwds_linc_probe(struct xwds_linc * linc);
-
-__xwds_api
-xwer_t xwds_linc_remove(struct xwds_linc * linc);
-
-__xwds_api
-xwer_t xwds_linc_start(struct xwds_linc * linc);
-
-__xwds_api
-xwer_t xwds_linc_stop(struct xwds_linc * linc);
-
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
-__xwds_api
-xwer_t xwds_linc_suspend(struct xwds_linc * linc);
-
-__xwds_api
-xwer_t xwds_linc_resume(struct xwds_linc * linc);
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
-
 __xwds_api
 xwer_t xwds_linc_msttx(struct xwds_linc * linc,
                        xwu8_t id, struct xwds_lin_msg * msg,
@@ -175,7 +151,6 @@ xwer_t xwds_linc_get_msg_size(struct xwds_linc * linc,
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   inline function implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /**
  * @brief 增加对象的引用计数
  * @param linc: (I) LIN控制器对象指针
@@ -223,6 +198,5 @@ xwer_t xwds_linc_release(struct xwds_linc * linc)
 {
         return xwds_device_release(&linc->dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 #endif /* xwmd/ds/lin/controller.h */

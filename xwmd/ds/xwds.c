@@ -13,11 +13,10 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
-#include <xwos/smp/pm.h>
+#include <xwmd/ds/standard.h>
 #include <xwmd/ds/object.h>
 #include <xwmd/ds/device.h>
-#include <xwmd/ds/pm.h>
+#include <xwmd/ds/xwds.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -30,79 +29,42 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********     static function prototypes      ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static __xwds_code
-void xwds_pm_lpmntf(struct xwos_pmdm * pmdm, void * data);
-
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 static __xwds_code
 void xwds_pm_report_devices_suspending(struct xwds * ds, xwer_t rc);
 
 static __xwds_code
 void xwds_pm_report_devices_resuming(struct xwds * ds, xwer_t rc);
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief SODS API：初始化电源管理控制块
- * @param ds: (I) 设备栈控制块指针
- * @param xwpmdm: (I) XWOS电源管理领域控制块指针
- * @param suspend: (I) 进入低功耗的回调函数
- * @param resume: (I) 退出低功耗的回调函数
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
+ * @brief SODS API：初始化设备栈
+ * @param ds: (I) 设备栈指针
  */
-__xwds_api
-xwer_t xwds_pm_init(struct xwds * ds, struct xwos_pmdm * xwpmdm,
-                    xwds_suspend_f suspend, xwds_resume_f resume)
+__xwds_code
+void xwds_init(struct xwds * ds)
 {
-        SODS_VALIDATE(ds, "nullptr", -EFAULT);
-        SODS_VALIDATE(xwpmdm, "nullptr", -EFAULT);
-
-        ds->xwpmdm = xwpmdm;
-        ds->lpm.suspend = suspend;
-        ds->lpm.resume = resume;
-        xwos_pmdm_set_lpmntf_cb(ds->xwpmdm,
-                                xwds_pm_lpmntf,
-                                ds);
-        return OK;
+        xwlib_bclst_init_node(&ds->devhead);
+        xwosal_sqlk_init(&ds->devlistlock);
 }
 
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 /**
- * @brief SODS API：进入低功耗模式
+ * @brief SODS API：暂停设备栈
  * @param ds: (I) 设备栈控制块指针
  * @return 错误码
  */
 __xwds_api
 xwer_t xwds_pm_suspend(struct xwds * ds)
 {
-        return xwos_pmdm_suspend(ds->xwpmdm);
-}
-
-/**
- * @brief XWOS电源管理领域中的所有调度器进入暂停模式时的回调函数
- * @param xwpmdm: (I) XWOS电源管理领域控制块指针
- * @param arg: (I) 回调函数参数（设备栈控制块指针）
- */
-static __xwds_code
-void xwds_pm_lpmntf(struct xwos_pmdm * xwpmdm, void * arg)
-{
-        struct xwds * ds;
         xwer_t rc;
 
-        ds = arg;
-        if (xwpmdm == ds->xwpmdm) {
-                rc = xwds_device_suspend_all(ds, false);
-                if (OK == rc) {
-                        if (!is_err_or_null(ds->lpm.suspend)) {
-                                ds->lpm.suspend(ds);
-                        }/* else {} */
-                } else {
-                        xwds_pm_report_devices_suspending(ds, rc);
-                }
-        }/* else {} */
+        rc = xwds_device_suspend_all(ds, false);
+        xwds_pm_report_devices_suspending(ds, rc);
+        return rc;
 }
 
 /**
@@ -119,7 +81,7 @@ void xwds_pm_report_devices_suspending(struct xwds * ds, xwer_t rc)
 }
 
 /**
- * @brief SODS API：退出低功耗模式
+ * @brief SODS API：继续设备栈
  * @param ds: (I) 设备栈控制块指针
  * @return 错误码
  * @note
@@ -133,26 +95,10 @@ xwer_t xwds_pm_resume(struct xwds * ds)
 {
         xwer_t rc;
 
-
-        if (!is_err_or_null(ds->lpm.resume)) {
-                ds->lpm.resume(ds);
-        }
         rc = xwds_device_resume_all(ds, false);
-        if (__unlikely(rc < 0)) {
-                xwds_pm_report_devices_resuming(ds, rc);
-                goto err_xwds_device_resume_all;
-        }
-        rc = xwos_pmdm_resume(ds->xwpmdm);
-        if (__unlikely(rc < 0)) {
-                goto err_xwos_pmdm_resume;
-        }
-        return OK;
-
-err_xwos_pmdm_resume:
-err_xwds_device_resume_all:
+        xwds_pm_report_devices_resuming(ds, rc);
         return rc;
 }
-
 
 /**
  * @brief 报告设备继续操作异常
@@ -166,3 +112,4 @@ void xwds_pm_report_devices_resuming(struct xwds * ds, xwer_t rc)
         XWOS_UNUSED(ds);
         SODS_BUG_ON(rc < 0);
 }
+#endif /* XWMDCFG_ds_PM */

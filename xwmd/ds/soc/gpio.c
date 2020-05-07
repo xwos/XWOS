@@ -13,7 +13,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/string.h>
 #include <xwos/lib/xwaop.h>
 #include <xwmd/ds/soc/gpio.h>
@@ -61,12 +61,10 @@ xwer_t xwds_gpio_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
 
         pinmask &= SODS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         rc = xwaop_t0ma_then_s1m(xwsq_t, &soc->gpio.pins[port], pinmask, NULL, NULL);
         if (__unlikely(rc < 0)) {
@@ -85,10 +83,8 @@ xwer_t xwds_gpio_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
 err_drv_gpio_req:
         xwaop_c0m(xwsq_t, &soc->gpio.pins[port], pinmask, NULL, NULL);
 err_set_pin:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
 err_soc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -134,10 +130,7 @@ xwer_t xwds_gpio_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         }
         xwaop_c0m(xwsq_t, &soc->gpio.pins[port], pinmask, NULL, NULL);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_gpio_rls:
@@ -177,12 +170,10 @@ xwer_t xwds_gpio_cfg(struct xwds_soc * soc,
 
         pinmask &= SODS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
                goto err_soc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         drv = xwds_static_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->gpio_cfg)) {
@@ -194,17 +185,12 @@ xwer_t xwds_gpio_cfg(struct xwds_soc * soc,
                 goto err_drv_gpio_cfg;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_gpio_cfg:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
 err_soc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -238,12 +224,10 @@ xwer_t xwds_gpio_set(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
 
         pinmask &= SODS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
         if (__unlikely(pinmask & (~pinsts))) {
@@ -260,18 +244,13 @@ xwer_t xwds_gpio_set(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
                 goto err_drv_set;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_set:
 err_pinsts:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
 err_soc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -305,12 +284,10 @@ xwer_t xwds_gpio_reset(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
 
         pinmask &= SODS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
         if (__unlikely(pinmask & (~pinsts))) {
@@ -327,18 +304,13 @@ xwer_t xwds_gpio_reset(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
                 goto err_drv_reset;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_reset:
 err_pinsts:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
 err_soc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -372,12 +344,10 @@ xwer_t xwds_gpio_toggle(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
 
         pinmask &= SODS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
         if (__unlikely(pinmask & (~pinsts))) {
@@ -394,18 +364,13 @@ xwer_t xwds_gpio_toggle(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
                 goto err_drv_toggle;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_toggle:
 err_pinsts:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
 err_soc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -443,12 +408,10 @@ xwer_t xwds_gpio_output(struct xwds_soc * soc,
 
         pinmask &= SODS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
         if (__unlikely(pinmask & (~pinsts))) {
@@ -465,18 +428,13 @@ xwer_t xwds_gpio_output(struct xwds_soc * soc,
                 goto err_drv_out;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_out:
 err_pinsts:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
 err_soc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -513,12 +471,10 @@ xwer_t xwds_gpio_input(struct xwds_soc * soc,
 
         pinmask &= SODS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
         if (__unlikely(pinmask & (~pinsts))) {
@@ -535,18 +491,13 @@ xwer_t xwds_gpio_input(struct xwds_soc * soc,
                 goto err_drv_in;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_in:
 err_pinsts:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
 err_soc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 

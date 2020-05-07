@@ -30,8 +30,7 @@
  ******** ******** ********   device stack    ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWMDCFG_ds                                              1
-#define XWMDCFG_ds_NANO                                         1
-#define XWMDCFG_ds_LPM                                          1
+#define XWMDCFG_ds_PM                                           1
 
 /******** ******** SOC ******** ********/
 #define XWMDCFG_ds_SOC                                          1

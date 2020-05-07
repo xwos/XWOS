@@ -16,7 +16,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/semaphore.h>
@@ -70,37 +70,13 @@ struct xwds_dmauartc {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
-__xwds_code
+__xwds_api
 void xwds_dmauartc_construct(struct xwds_dmauartc * dmauartc);
 
-__xwds_code
+__xwds_api
 void xwds_dmauartc_destruct(struct xwds_dmauartc * dmauartc);
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** APIs ******** ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-__xwds_api
-xwer_t xwds_dmauartc_probe(struct xwds_dmauartc * dmauartc);
-
-__xwds_api
-xwer_t xwds_dmauartc_remove(struct xwds_dmauartc * dmauartc);
-
-__xwds_api
-xwer_t xwds_dmauartc_start(struct xwds_dmauartc * dmauartc);
-
-__xwds_api
-xwer_t xwds_dmauartc_stop(struct xwds_dmauartc * dmauartc);
-
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
-__xwds_api
-xwer_t xwds_dmauartc_suspend(struct xwds_dmauartc * dmauartc);
-
-__xwds_api
-xwer_t xwds_dmauartc_resume(struct xwds_dmauartc * dmauartc);
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
-
 __xwds_api
 xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
                         xwu8_t * buf, xwsz_t * size,
@@ -126,7 +102,6 @@ void xwds_dmauartc_lib_rxq_pub(struct xwds_dmauartc * dmauartc, xwsq_t tail);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   inline function implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /**
  * @brief 增加对象的引用计数
  * @param dmauartc: (I) DMA UART控制器对象指针
@@ -174,6 +149,5 @@ xwer_t xwds_dmauartc_release(struct xwds_dmauartc * dmauartc)
 {
         return xwds_device_release(&dmauartc->dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 #endif /* xwmd/ds/uart/dma.h */

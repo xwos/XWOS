@@ -40,13 +40,13 @@ xwer_t stm32cube_soc_drv_start(struct xwds_device * dev);
 static
 xwer_t stm32cube_soc_drv_stop(struct xwds_device * dev);
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 static
 xwer_t stm32cube_soc_drv_suspend(struct xwds_device * dev);
 
 static
 xwer_t stm32cube_soc_drv_resume(struct xwds_device * dev);
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 #if defined(XWMDCFG_ds_SOC_GPIO) && (1 == XWMDCFG_ds_SOC_GPIO)
 static
@@ -116,10 +116,10 @@ const struct xwds_soc_driver stm32cube_soc_drv = {
                 .remove = NULL,
                 .start = stm32cube_soc_drv_start,
                 .stop = stm32cube_soc_drv_stop,
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
                 .suspend = stm32cube_soc_drv_suspend,
                 .resume = stm32cube_soc_drv_resume,
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
         },
 #if defined(XWMDCFG_ds_SOC_CLK) && (1 == XWMDCFG_ds_SOC_CLK)
         .clk_req = stm32cube_soc_drv_clk_req,
@@ -442,7 +442,7 @@ xwer_t stm32cube_soc_drv_stop(struct xwds_device * dev)
   return OK;
 }
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 static
 xwer_t stm32cube_soc_drv_suspend(struct xwds_device * dev)
 {
@@ -456,7 +456,7 @@ xwer_t stm32cube_soc_drv_resume(struct xwds_device * dev)
   XWOS_UNUSED(dev);
   return OK;
 }
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 #if defined(XWMDCFG_ds_SOC_GPIO) && (1 == XWMDCFG_ds_SOC_GPIO)
 /******** ******** gpio operation driver ******** ********/

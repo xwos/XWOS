@@ -16,7 +16,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/osal/lock/mutex.h>
 #include <xwmd/ds/device.h>
@@ -67,37 +67,13 @@ struct xwds_i2cm {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
-__xwds_code
+__xwds_api
 void xwds_i2cm_construct(struct xwds_i2cm * i2cm);
 
-__xwds_code
+__xwds_api
 void xwds_i2cm_destruct(struct xwds_i2cm * i2cm);
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** APIs ******** ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-__xwds_api
-xwer_t xwds_i2cm_probe(struct xwds_i2cm * i2cm);
-
-__xwds_api
-xwer_t xwds_i2cm_remove(struct xwds_i2cm * i2cm);
-
-__xwds_api
-xwer_t xwds_i2cm_start(struct xwds_i2cm * i2cm);
-
-__xwds_api
-xwer_t xwds_i2cm_stop(struct xwds_i2cm * i2cm);
-
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
-__xwds_api
-xwer_t xwds_i2cm_suspend(struct xwds_i2cm * i2cm);
-
-__xwds_api
-xwer_t xwds_i2cm_resume(struct xwds_i2cm * i2cm);
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
-
 __xwds_api
 xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
                       xwtm_t * xwtm);
@@ -108,7 +84,6 @@ xwer_t xwds_i2cm_reset(struct xwds_i2cm * i2cm, xwtm_t * xwtm);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   inline function implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /**
  * @brief 增加对象的引用计数
  * @param i2cm: (I) I2C主机控制器对象指针
@@ -156,6 +131,5 @@ xwer_t xwds_i2cm_release(struct xwds_i2cm * i2cm)
 {
         return xwds_device_release(&i2cm->dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 #endif /* xwmd/ds/i2c/master.h */

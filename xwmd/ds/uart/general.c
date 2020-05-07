@@ -13,7 +13,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/string.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/scheduler.h>
@@ -40,13 +40,13 @@ xwer_t xwds_uartc_cvop_start(struct xwds_uartc * uartc);
 static __xwds_vop
 xwer_t xwds_uartc_cvop_stop(struct xwds_uartc * uartc);
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 static __xwds_vop
 xwer_t xwds_uartc_cvop_suspend(struct xwds_uartc * uartc);
 
 static __xwds_vop
 xwer_t xwds_uartc_cvop_resume(struct xwds_uartc * uartc);
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 static __xwds_code
 xwer_t xwds_uartc_tx_1byte(struct xwds_uartc * uartc, const xwu8_t byte);
@@ -54,29 +54,26 @@ xwer_t xwds_uartc_tx_1byte(struct xwds_uartc * uartc, const xwu8_t byte);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 __xwds_rodata const struct xwds_base_virtual_operations xwds_uartc_cvops = {
         .probe = (void *)xwds_uartc_cvop_probe,
         .remove = (void *)xwds_uartc_cvop_remove,
         .start = (void *)xwds_uartc_cvop_start,
         .stop = (void *)xwds_uartc_cvop_stop,
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
         .suspend = (void *)xwds_uartc_cvop_suspend,
         .resume = (void *)xwds_uartc_cvop_resume,
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 };
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
- * @brief UART控制器的构造函数
+ * @brief SODS API：UART控制器的构造函数
  * @param uartc: (I) UART控制器对象指针
  */
-__xwds_code
+__xwds_api
 void xwds_uartc_construct(struct xwds_uartc * uartc)
 {
         xwds_device_construct(&uartc->dev);
@@ -84,15 +81,14 @@ void xwds_uartc_construct(struct xwds_uartc * uartc)
 }
 
 /**
- * @brief UART控制器对象的析构函数
+ * @brief SODS API：UART控制器对象的析构函数
  * @param uartc: (I) UART控制器对象指针
  */
-__xwds_code
+__xwds_api
 void xwds_uartc_destruct(struct xwds_uartc * uartc)
 {
         xwds_device_destruct(&uartc->dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** base virtual operations ******** ********/
 /**
@@ -263,7 +259,7 @@ err_rxsmr_freeze:
         return rc;
 }
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 /******** ******** pm ******** ********/
 /**
  * @brief SODS VOP：暂停UART控制器
@@ -324,154 +320,9 @@ xwer_t xwds_uartc_cvop_resume(struct xwds_uartc * uartc)
 err_dev_resume:
         return rc;
 }
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** UART APIs ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-/**
- * @brief SODS API：探测UART控制器
- * @param uartc: (I) UART控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_uartc_probe(struct xwds_uartc * uartc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(uartc, "nullptr", -EFAULT);
-
-        rc = xwds_uartc_cvop_probe(uartc);
-        return rc;
-}
-
-/**
- * @brief SODS API：移除UART控制器
- * @param uartc: (I) UART控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_uartc_remove(struct xwds_uartc * uartc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(uartc, "nullptr", -EFAULT);
-
-        rc = xwds_uartc_cvop_remove(uartc);
-        return rc;
-}
-
-/**
- * @brief SODS API：启动UART控制器
- * @param uartc: (I) UART控制器对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_uartc_start(struct xwds_uartc * uartc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(uartc, "nullptr", -EFAULT);
-
-        rc = xwds_uartc_cvop_start(uartc);
-        return rc;
-}
-
-/**
- * @brief SODS API：停止UART控制器
- * @param uartc: (I) UART控制器对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_uartc_stop(struct xwds_uartc * uartc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(uartc, "nullptr", -EFAULT);
-
-        rc = xwds_uartc_cvop_stop(uartc);
-        return rc;
-}
-
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
-/******** ******** pm ******** ********/
-/**
- * @brief SODS API：暂停UART控制器
- * @param uartc: (I) UART控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_uartc_suspend(struct xwds_uartc * uartc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(uartc, "nullptr", -EFAULT);
-
-        rc = xwds_uartc_cvop_suspend(uartc);
-        return rc;
-}
-
-/**
- * @brief SODS API：继续UART控制器
- * @param uartc: (I) UART控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_uartc_resume(struct xwds_uartc * uartc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(uartc, "nullptr", -EFAULT);
-
-        rc = xwds_uartc_cvop_resume(uartc);
-        return rc;
-}
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
-
 /**
  * @brief SODS API：清空接收队列
  * @param uartc: (I) UART控制器对象指针
@@ -493,12 +344,10 @@ xwer_t xwds_uartc_clear_rxq(struct xwds_uartc * uartc)
 
         SODS_VALIDATE(uartc, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         rc = xwosal_smr_freeze(xwosal_smr_get_id(&uartc->rxsmr));
         if (__unlikely(rc < 0)) {
@@ -514,18 +363,13 @@ xwer_t xwds_uartc_clear_rxq(struct xwds_uartc * uartc)
                 goto err_smr_thaw;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_uartc_put(uartc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_smr_thaw:
 err_smr_freeze:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_uartc_put(uartc);
 err_uartc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -548,17 +392,15 @@ xwer_t xwds_uartc_get_rxq_datasize(struct xwds_uartc * uartc, xwsz_t *ret)
 {
         xwssz_t size;
         xwsq_t seq;
-        xwer_t rc = OK;
+        xwer_t rc;
 
         SODS_VALIDATE(uartc, "nullptr", -EFAULT);
         SODS_VALIDATE(ret, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         do {
                 seq = xwosal_sqlk_rd_begin(&uartc->rxseqlock);
@@ -570,17 +412,12 @@ xwer_t xwds_uartc_get_rxq_datasize(struct xwds_uartc * uartc, xwsz_t *ret)
                 }
         } while (xwosal_sqlk_rd_retry(&uartc->rxseqlock, seq));
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_uartc_put(uartc);
-#endif /* !XWMDCFG_ds_NANO */
-
         *ret = (xwsz_t)size;
-        return rc;
+        return OK;
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 err_uartc_grab:
         return rc;
-#endif /* !XWMDCFG_ds_NANO */
 }
 
 /**
@@ -610,12 +447,10 @@ xwer_t xwds_uartc_getc(struct xwds_uartc * uartc, xwu8_t * buf, xwtm_t * xwtm)
         SODS_VALIDATE(buf, "nullptr", -EFAULT);
         SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         rc = xwosal_smr_timedwait(xwosal_smr_get_id(&uartc->rxsmr), xwtm);
         if (__unlikely(rc < 0)) {
@@ -629,17 +464,12 @@ xwer_t xwds_uartc_getc(struct xwds_uartc * uartc, xwu8_t * buf, xwtm_t * xwtm)
         }/* else {} */
         xwosal_sqlk_wr_unlock_cpuirqrs(&uartc->rxseqlock, cpuirq);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_uartc_put(uartc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_smr_timedwait:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_uartc_put(uartc);
 err_uartc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -677,13 +507,11 @@ xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
         SODS_VALIDATE(size, "nullptr", -EFAULT);
         SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
                 *size = 0;
                 goto err_uartc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         for (i = 0; i < *size; i++) {
                 rc = xwosal_smr_timedwait(xwosal_smr_get_id(&uartc->rxsmr), xwtm);
@@ -700,18 +528,13 @@ xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
                 xwosal_sqlk_wr_unlock_cpuirqrs(&uartc->rxseqlock, cpuirq);
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_uartc_put(uartc);
-#endif /* !XWMDCFG_ds_NANO */
-
         *size = i;
         return OK;
 
 err_smr_timedwait:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_uartc_put(uartc);
 err_uartc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -738,12 +561,10 @@ xwer_t xwds_uartc_try_getc(struct xwds_uartc * uartc, xwu8_t * buf)
         SODS_VALIDATE(uartc, "nullptr", -EFAULT);
         SODS_VALIDATE(buf, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         rc = xwosal_smr_trywait(xwosal_smr_get_id(&uartc->rxsmr));
         if (__unlikely(rc < 0)) {
@@ -757,17 +578,12 @@ xwer_t xwds_uartc_try_getc(struct xwds_uartc * uartc, xwu8_t * buf)
         }/* else {} */
         xwosal_sqlk_wr_unlock_cpuirqrs(&uartc->rxseqlock, cpuirq);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_uartc_put(uartc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_smr_trywait:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_uartc_put(uartc);
 err_uartc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -799,13 +615,11 @@ xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc, void * buf, xwsz_t * size)
         SODS_VALIDATE(buf, "nullptr", -EFAULT);
         SODS_VALIDATE(size, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
                 *size = 0;
                 goto err_uartc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         for (i = 0; i < *size; i++) {
                 rc = xwosal_smr_trywait(xwosal_smr_get_id(&uartc->rxsmr));
@@ -822,18 +636,13 @@ xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc, void * buf, xwsz_t * size)
                 xwosal_sqlk_wr_unlock_cpuirqrs(&uartc->rxseqlock, cpuirq);
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_uartc_put(uartc);
-#endif /* !XWMDCFG_ds_NANO */
-
         *size = i;
         return OK;
 
 err_smr_trywait:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_uartc_put(uartc);
 err_uartc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -858,28 +667,21 @@ xwer_t xwds_uartc_clear_txq(struct xwds_uartc * uartc)
 
         SODS_VALIDATE(uartc, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         xwosal_sqlk_wr_lock_cpuirqsv(&uartc->txseqlock, &cpuirq);
         uartc->txnum = 0;
         uartc->txpos = 0;
         xwosal_sqlk_wr_unlock_cpuirqrs(&uartc->txseqlock, cpuirq);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_uartc_put(uartc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return rc;
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 err_uartc_grab:
         return rc;
-#endif /* !XWMDCFG_ds_NANO */
 }
 
 static __xwds_code
@@ -948,12 +750,10 @@ xwer_t xwds_uartc_putc(struct xwds_uartc * uartc,
         SODS_VALIDATE(uartc, "nullptr", -EFAULT);
         SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&uartc->txmtx), xwtm);
         if (__unlikely(rc < 0)) {
@@ -965,19 +765,14 @@ xwer_t xwds_uartc_putc(struct xwds_uartc * uartc,
         }
         xwosal_mtx_unlock(xwosal_mtx_get_id(&uartc->txmtx));
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_uartc_put(uartc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_tx_1byte:
         xwosal_mtx_unlock(xwosal_mtx_get_id(&uartc->txmtx));
 err_uartc_lock:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_uartc_put(uartc);
 err_uartc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -1014,13 +809,11 @@ xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
         SODS_VALIDATE(size, "nullptr", -EFAULT);
         SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
                 *size = 0;
                 goto err_uartc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&uartc->txmtx), xwtm);
         if (__unlikely(rc < 0)) {
@@ -1037,20 +830,15 @@ xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
         }
         xwosal_mtx_unlock(xwosal_mtx_get_id(&uartc->txmtx));
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_uartc_put(uartc);
-#endif /* !XWMDCFG_ds_NANO */
-
         *size = i;
         return OK;
 
 err_tx_1byte:
         xwosal_mtx_unlock(xwosal_mtx_get_id(&uartc->txmtx));
 err_uartc_lock:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_uartc_put(uartc);
 err_uartc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -1078,12 +866,10 @@ xwer_t xwds_uartc_cfg(struct xwds_uartc * uartc,
         SODS_VALIDATE(uartc, "nullptr", -EFAULT);
         SODS_VALIDATE(cfg, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         drv = xwds_static_cast(const struct xwds_uartc_driver *, uartc->dev.drv);
         if ((drv) && (drv->cfg)) {
@@ -1095,17 +881,12 @@ xwer_t xwds_uartc_cfg(struct xwds_uartc * uartc,
                 goto err_drv_cfg;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_uartc_put(uartc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_cfg:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_uartc_put(uartc);
 err_uartc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 

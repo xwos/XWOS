@@ -13,7 +13,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwmd/ds/soc/gpio.h>
 #include <xwmd/ds/soc/eirq.h>
 
@@ -65,12 +65,10 @@ xwer_t xwds_eirq_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask,
         SODS_VALIDATE(soc, "nullptr", -EFAULT);
         SODS_VALIDATE((eiid < soc->eirq.num), "out-of-range", -ERANGE);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
 #if defined(XWMDCFG_ds_SOC_EIRQ_ROISRT) && (1 == XWMDCFG_ds_SOC_EIRQ_ROISRT)
         XWOS_UNUSED(isr);
@@ -105,10 +103,8 @@ err_drv_eirq_req:
         soc->eirq.isrargs[eiid] = NULL;
 #endif
 err_perm:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
 err_soc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -156,10 +152,7 @@ xwer_t xwds_eirq_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask, xwid_t 
         soc->eirq.isrargs[eiid] = NULL;
 #endif
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_rlsei:

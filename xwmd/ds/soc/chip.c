@@ -13,7 +13,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/string.h>
 #include <xwmd/ds/soc/chip.h>
 
@@ -36,40 +36,37 @@ xwer_t xwds_soc_cvop_start(struct xwds_soc * soc);
 static __xwds_vop
 xwer_t xwds_soc_cvop_stop(struct xwds_soc * soc);
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 static __xwds_vop
 xwer_t xwds_soc_cvop_suspend(struct xwds_soc * soc);
 
 static __xwds_vop
 xwer_t xwds_soc_cvop_resume(struct xwds_soc * soc);
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 __xwds_rodata const struct xwds_base_virtual_operations xwds_soc_cvops = {
         .probe = (void *)xwds_soc_cvop_probe,
         .remove = (void *)xwds_soc_cvop_remove,
         .start = (void *)xwds_soc_cvop_start,
         .stop = (void *)xwds_soc_cvop_stop,
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
         .suspend = (void *)xwds_soc_cvop_suspend,
         .resume = (void *)xwds_soc_cvop_resume,
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 };
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
- * @brief SOC构造函数
+ * @brief SODS API：SOC构造函数
  * @param soc: (I) SOC对象指针
  */
-__xwds_code
+__xwds_api
 void xwds_soc_construct(struct xwds_soc * soc)
 {
         xwds_device_construct(&soc->dev);
@@ -77,15 +74,14 @@ void xwds_soc_construct(struct xwds_soc * soc)
 }
 
 /**
- * @brief SOC对象的析构函数
+ * @brief SODS API：SOC对象的析构函数
  * @param soc: (I) SOC对象指针
  */
-__xwds_code
+__xwds_api
 void xwds_soc_destruct(struct xwds_soc * soc)
 {
         xwds_device_destruct(&soc->dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** base virtual operations ******** ********/
 /**
@@ -170,7 +166,7 @@ xwer_t xwds_soc_cvop_stop(struct xwds_soc * soc)
         return rc;
 }
 
-#if (defined(XWMDCFG_ds_LPM)) && (1 == XWMDCFG_ds_LPM)
+#if (defined(XWMDCFG_ds_PM)) && (1 == XWMDCFG_ds_PM)
 /******** ******** pm ******** ********/
 /**
  * @brief SODS VOP：暂停SOC
@@ -211,146 +207,9 @@ xwer_t xwds_soc_cvop_resume(struct xwds_soc * soc)
         rc = xwds_device_cvop_resume(&soc->dev);
         return rc;
 }
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** APIs ******** ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-/**
- * @brief SODS API：探测SOC
- * @param soc: (I) SOC对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_soc_probe(struct xwds_soc * soc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-
-        rc = xwds_soc_cvop_probe(soc);
-        return rc;
-}
-
-/**
- * @brief SODS API：移除SOC
- * @param soc: (I) SOC对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_soc_remove(struct xwds_soc * soc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-
-        rc = xwds_soc_cvop_remove(soc);
-        return rc;
-}
-
-/**
- * @brief SODS API：启动SOC
- * @param soc: (I) SOC对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_soc_start(struct xwds_soc * soc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-
-        rc = xwds_soc_cvop_start(soc);
-        return rc;
-}
-
-/**
- * @brief SODS API：停止SOC
- * @param soc: (I) SOC对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_soc_stop(struct xwds_soc * soc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-
-        rc = xwds_soc_cvop_stop(soc);
-        return rc;
-}
-
-#if (defined(XWMDCFG_ds_LPM)) && (1 == XWMDCFG_ds_LPM)
-/******** ******** pm ******** ********/
-/**
- * @brief SODS API：暂停SOC
- * @param soc: (I) SOC对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_soc_suspend(struct xwds_soc * soc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-
-        rc = xwds_soc_cvop_suspend(soc);
-        return rc;
-}
-
-/**
- * @brief SODS API：继续SOC
- * @param soc: (I) SOC对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_soc_resume(struct xwds_soc * soc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-
-        rc = xwds_soc_cvop_resume(soc);
-        return rc;
-}
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
-
 /**
  * @brief SODS API：SOC输入、输出、控制
  * @param soc: (I) SOC对象指针
@@ -373,12 +232,10 @@ xwer_t xwds_soc_ioctl(struct xwds_soc * soc, xwsq_t cmd, ...)
 
         SODS_VALIDATE(soc, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         va_start(args, cmd);
         drv = xwds_static_cast(const struct xwds_soc_driver *, soc->dev.drv);
@@ -392,16 +249,11 @@ xwer_t xwds_soc_ioctl(struct xwds_soc * soc, xwsq_t cmd, ...)
                 goto err_drv_ioctl;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_ioctl:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
 err_soc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }

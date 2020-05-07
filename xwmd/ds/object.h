@@ -16,11 +16,9 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/object.h>
 #include <xwos/lib/bclst.h>
-#include <xwos/osal/lock/seqlock.h>
-#include <xwmd/ds/standard.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -30,29 +28,6 @@
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwds;
-
-/**
- * @brief 设备栈进入低功耗后的回调函数
- */
-typedef void (* xwds_suspend_f)(struct xwds *);
-
-/**
- * @brief 设备栈退出低功耗前的回调函数
- */
-typedef void (* xwds_resume_f)(struct xwds *);
-
-/**
- * @brief 设备栈
- */
-struct xwds {
-        struct xwlib_bclst_head devhead; /**< 链表头 */
-        struct xwosal_sqlk devlistlock; /**< 保护设备栈链表的锁 */
-        struct xwos_pmdm * xwpmdm; /**< 电源管理区域 */
-        struct {
-                xwds_suspend_f suspend; /**< 进入低功耗的回调函数 */
-                xwds_resume_f resume; /**< 退出低功耗的回调函数  */
-        } lpm; /**< 低功耗回调 */
-};
 
 /**
  * @brief 设备栈对象
@@ -68,9 +43,6 @@ struct xwds_object {
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwds_code
-void xwds_init(struct xwds * ds);
-
 __xwds_code
 void xwds_obj_construct(struct xwds_object * obj);
 

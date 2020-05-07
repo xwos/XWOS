@@ -13,7 +13,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/string.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/lib/xwbmpaop.h>
@@ -38,40 +38,37 @@ xwer_t xwds_cantrcv_cvop_start(struct xwds_cantrcv * cantrcv);
 static __xwds_vop
 xwer_t xwds_cantrcv_cvop_stop(struct xwds_cantrcv * cantrcv);
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 static __xwds_vop
 xwer_t xwds_cantrcv_cvop_suspend(struct xwds_cantrcv * cantrcv);
 
 static __xwds_vop
 xwer_t xwds_cantrcv_cvop_resume(struct xwds_cantrcv * cantrcv);
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 __xwds_rodata const struct xwds_base_virtual_operations xwds_cantrcv_cvops = {
         .probe = (void *)xwds_cantrcv_cvop_probe,
         .remove = (void *)xwds_cantrcv_cvop_remove,
         .start = (void *)xwds_cantrcv_cvop_start,
         .stop = (void *)xwds_cantrcv_cvop_stop,
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
         .suspend = (void *)xwds_cantrcv_cvop_suspend,
         .resume = (void *)xwds_cantrcv_cvop_resume,
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 };
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
- * @brief CAN接收器的构造函数
+ * @brief SODS API：CAN接收器的构造函数
  * @param cantrcv: (I) CAN接收器对象指针
  */
-__xwds_code
+__xwds_api
 void xwds_cantrcv_construct(struct xwds_cantrcv * cantrcv)
 {
         xwds_device_construct(&cantrcv->bc.dev);
@@ -79,15 +76,14 @@ void xwds_cantrcv_construct(struct xwds_cantrcv * cantrcv)
 }
 
 /**
- * @brief CAN接收器对象的析构函数
+ * @brief SODS API：CAN接收器对象的析构函数
  * @param cantrcv: (I) CAN接收器对象指针
  */
-__xwds_code
+__xwds_api
 void xwds_cantrcv_destruct(struct xwds_cantrcv * cantrcv)
 {
         xwds_device_destruct(&cantrcv->bc.dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** base virtual operations ******** ********/
 /**
@@ -170,7 +166,7 @@ xwer_t xwds_cantrcv_cvop_stop(struct xwds_cantrcv * cantrcv)
         return rc;
 }
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 /******** ******** pm ******** ********/
 /**
  * @brief SODS VOP：暂停CAN接收器
@@ -203,137 +199,7 @@ xwer_t xwds_cantrcv_cvop_resume(struct xwds_cantrcv * cantrcv)
         rc = xwds_device_cvop_resume(&cantrcv->bc.dev);
         return rc;
 }
-#endif /* XWMDCFG_ds_LPM */
-
-/******** ******** ******** APIs ******** ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-/**
- * @brief SODS API：探测CAN接收器
- * @param cantrcv: (I) CAN接收器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入
- */
-__xwds_api
-xwer_t xwds_cantrcv_probe(struct xwds_cantrcv * cantrcv)
-{
-        xwer_t rc;
-
-        rc = xwds_cantrcv_cvop_probe(cantrcv);
-        return rc;
-}
-
-/**
- * @brief SODS API：移除CAN接收器
- * @param cantrcv: (I) CAN接收器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入
- */
-__xwds_api
-xwer_t xwds_cantrcv_remove(struct xwds_cantrcv * cantrcv)
-{
-        xwer_t rc;
-
-        rc = xwds_cantrcv_cvop_remove(cantrcv);
-        return rc;
-}
-
-/**
- * @brief SODS API：启动CAN接收器
- * @param cantrcv: (I) CAN接收器对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_cantrcv_start(struct xwds_cantrcv * cantrcv)
-{
-        xwer_t rc;
-
-        rc = xwds_cantrcv_cvop_start(cantrcv);
-        return rc;
-}
-
-/**
- * @brief SODS API：停止CAN接收器
- * @param cantrcv: (I) CAN接收器对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_cantrcv_stop(struct xwds_cantrcv * cantrcv)
-{
-        xwer_t rc;
-
-        rc = xwds_cantrcv_cvop_stop(cantrcv);
-        return rc;
-}
-
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
-/******** ******** pm ******** ********/
-/**
- * @brief SODS API：暂停CAN接收器
- * @param cantrcv: (I) CAN接收器对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入
- */
-__xwds_api
-xwer_t xwds_cantrcv_suspend(struct xwds_cantrcv * cantrcv)
-{
-        xwer_t rc;
-
-        rc = xwds_cantrcv_cvop_suspend(cantrcv);
-        return rc;
-}
-
-/**
- * @brief SODS API：继续CAN接收器
- * @param cantrcv: (I) CAN接收器对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入
- */
-__xwds_api
-xwer_t xwds_cantrcv_resume(struct xwds_cantrcv * cantrcv)
-{
-        xwer_t rc;
-
-        rc = xwds_cantrcv_cvop_resume(cantrcv);
-        return rc;
-}
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** CAN operations ******** ******** ********/
 /**

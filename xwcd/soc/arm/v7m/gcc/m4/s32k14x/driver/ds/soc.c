@@ -88,13 +88,13 @@ xwer_t s32k14x_soc_drv_start(struct xwds_device * dev);
 static __xwds_code
 xwer_t s32k14x_soc_drv_stop(struct xwds_device * dev);
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 static __xwds_code
 xwer_t s32k14x_soc_drv_suspend(struct xwds_device * dev);
 
 static __xwds_code
 xwer_t s32k14x_soc_drv_resume(struct xwds_device * dev);
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 static __xwds_code
 xwer_t s32k14x_soc_drv_clk_req(struct xwds_soc * soc, xwid_t id);
@@ -185,10 +185,10 @@ __xwds_rodata const struct xwds_soc_driver s32k14x_soc_drv = {
                 .remove = NULL,
                 .start = s32k14x_soc_drv_start,
                 .stop = s32k14x_soc_drv_stop,
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
                 .suspend = s32k14x_soc_drv_suspend,
                 .resume = s32k14x_soc_drv_resume,
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
         },
         .clk_req = s32k14x_soc_drv_clk_req,
         .clk_rls = s32k14x_soc_drv_clk_rls,
@@ -460,7 +460,7 @@ err_irq_disable:
         return rc;
 }
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 static __xwds_code
 xwer_t s32k14x_soc_drv_suspend(struct xwds_device * dev)
 {
@@ -474,7 +474,7 @@ xwer_t s32k14x_soc_drv_resume(struct xwds_device * dev)
         XWOS_UNUSED(dev);
         return OK;
 }
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** clock operations ******** ********/
 static __xwds_code

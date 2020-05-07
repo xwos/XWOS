@@ -13,7 +13,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/lock/mutex.h>
 #include <xwmd/ds/lin/controller.h>
@@ -37,37 +37,34 @@ xwer_t xwds_linc_cvop_start(struct xwds_linc * linc);
 static __xwds_vop
 xwer_t xwds_linc_cvop_stop(struct xwds_linc * linc);
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 static __xwds_vop
 xwer_t xwds_linc_cvop_suspend(struct xwds_linc * linc);
 
 static __xwds_vop
 xwer_t xwds_linc_cvop_resume(struct xwds_linc * linc);
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 __xwds_rodata const struct xwds_base_virtual_operations xwds_linc_cvops = {
         .probe = (void *)xwds_linc_cvop_probe,
         .remove = (void *)xwds_linc_cvop_remove,
         .start = (void *)xwds_linc_cvop_start,
         .stop = (void *)xwds_linc_cvop_stop,
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
         .suspend = (void *)xwds_linc_cvop_suspend,
         .resume = (void *)xwds_linc_cvop_resume,
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 };
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
- * @brief LIN控制器的构造函数
+ * @brief SODS API：LIN控制器的构造函数
  * @param linc: (I) LIN控制器对象指针
  */
 __xwds_code
@@ -78,7 +75,7 @@ void xwds_linc_construct(struct xwds_linc * linc)
 }
 
 /**
- * @brief LIN控制器对象的析构函数
+ * @brief SODS API：LIN控制器对象的析构函数
  * @param linc: (I) LIN控制器对象指针
  */
 __xwds_code
@@ -86,7 +83,6 @@ void xwds_linc_destruct(struct xwds_linc * linc)
 {
         xwds_device_destruct(&linc->dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** base virtual operations ******** ********/
 /**
@@ -199,7 +195,7 @@ xwer_t xwds_linc_cvop_stop(struct xwds_linc * linc)
         return rc;
 }
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 /******** ******** pm ******** ********/
 /**
  * @brief SODS VOP：暂停LIN控制器
@@ -244,160 +240,9 @@ xwer_t xwds_linc_cvop_resume(struct xwds_linc * linc)
         rc = xwds_device_cvop_resume(&linc->dev);
         return rc;
 }
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** APIs ******** ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-/**
- * @brief SODS API：探测LIN控制器
- * @param linc: (I) LIN控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_linc_probe(struct xwds_linc * linc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(linc, "nullptr", -EFAULT);
-
-        rc = xwds_linc_cvop_probe(linc);
-        return rc;
-}
-
-/**
- * @brief SODS API：移除LIN控制器
- * @param ds: (I) 设备栈控制块指针
- * @param linc: (I) LIN控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_linc_remove(struct xwds_linc * linc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(linc, "nullptr", -EFAULT);
-
-        rc = xwds_linc_cvop_remove(linc);
-        return rc;
-}
-
-/**
- * @brief SODS API：启动LIN控制器
- * @param linc: (I) LIN控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_linc_start(struct xwds_linc * linc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(linc, "nullptr", -EFAULT);
-
-        rc = xwds_linc_cvop_start(linc);
-        return rc;
-}
-
-/**
- * @brief SODS API：停止LIN控制器
- * @param linc: (I) LIN控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_linc_stop(struct xwds_linc * linc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(linc, "nullptr", -EFAULT);
-
-        rc = xwds_linc_cvop_stop(linc);
-        return rc;
-}
-
-#if (defined(XWMDCFG_ds_LPM)) && (1 == XWMDCFG_ds_LPM)
-/******** ******** pm ******** ********/
-/**
- * @brief SODS API：暂停LIN控制器
- * @param linc: (I) LIN控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_linc_suspend(struct xwds_linc * linc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(linc, "nullptr", -EFAULT);
-
-        rc = xwds_linc_cvop_suspend(linc);
-        return rc;
-}
-
-/**
- * @brief SODS API：继续LIN控制器
- * @param linc: (I) LIN控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_linc_resume(struct xwds_linc * linc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(linc, "nullptr", -EFAULT);
-
-        rc = xwds_linc_cvop_resume(linc);
-        return rc;
-}
-
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
-
 /**
  * @brief SODS API：主机节点发送一条LIN消息
  * @param linc: (I) LIN控制器对象指针
@@ -429,7 +274,6 @@ xwer_t xwds_linc_msttx(struct xwds_linc * linc,
         SODS_VALIDATE(msg, "nullptr", -EFAULT);
         SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_linc_grab(linc);
         if (__unlikely(rc < 0)) {
                 goto err_linc_grab;
@@ -439,7 +283,6 @@ xwer_t xwds_linc_msttx(struct xwds_linc * linc,
         if (__unlikely(rc < 0)) {
                 goto err_linc_request;
         }
-#endif
 
         rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&linc->txlock), xwtm);
         if (__unlikely(rc < 0)) {
@@ -456,22 +299,17 @@ xwer_t xwds_linc_msttx(struct xwds_linc * linc,
         }
         xwosal_mtx_unlock(xwosal_mtx_get_id(&linc->txlock));
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_linc_release(linc);
         xwds_linc_put(linc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_msttx:
         xwosal_mtx_unlock(xwosal_mtx_get_id(&linc->txlock));
 err_linc_txlock:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_linc_release(linc);
 err_linc_request:
         xwds_linc_put(linc);
 err_linc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -505,7 +343,6 @@ xwer_t xwds_linc_slvtx(struct xwds_linc * linc,
         SODS_VALIDATE(msg, "nullptr", -EFAULT);
         SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_linc_grab(linc);
         if (__unlikely(rc < 0)) {
                 goto err_linc_grab;
@@ -514,7 +351,6 @@ xwer_t xwds_linc_slvtx(struct xwds_linc * linc,
         if (__unlikely(rc < 0)) {
                 goto err_linc_request;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&linc->txlock), xwtm);
         if (__unlikely(rc < 0)) {
@@ -531,22 +367,17 @@ xwer_t xwds_linc_slvtx(struct xwds_linc * linc,
         }
         xwosal_mtx_unlock(xwosal_mtx_get_id(&linc->txlock));
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_linc_release(linc);
         xwds_linc_put(linc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_slvtx:
         xwosal_mtx_unlock(xwosal_mtx_get_id(&linc->txlock));
 err_linc_txlock:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_linc_release(linc);
 err_linc_request:
         xwds_linc_put(linc);
 err_linc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -580,7 +411,6 @@ xwer_t xwds_linc_rx(struct xwds_linc * linc,
         SODS_VALIDATE(msgbuf, "nullptr", -EFAULT);
         SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_linc_grab(linc);
         if (__unlikely(rc < 0)) {
                 goto err_linc_grab;
@@ -589,7 +419,6 @@ xwer_t xwds_linc_rx(struct xwds_linc * linc,
         if (__unlikely(rc < 0)) {
                 goto err_linc_request;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         drv = xwds_static_cast(const struct xwds_linc_driver *, linc->dev.drv);
         if (__likely((drv) && (drv->rx))) {
@@ -601,20 +430,15 @@ xwer_t xwds_linc_rx(struct xwds_linc * linc,
                 goto err_drv_rx;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_linc_release(linc);
         xwds_linc_put(linc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_rx:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_linc_release(linc);
 err_linc_request:
         xwds_linc_put(linc);
 err_linc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 

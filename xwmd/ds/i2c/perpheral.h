@@ -16,7 +16,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwmd/ds/device.h>
 #include <xwmd/ds/i2c/common.h>
@@ -54,44 +54,19 @@ struct xwds_i2cp {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
-__xwds_code
+__xwds_api
 void xwds_i2cp_construct(struct xwds_i2cp * i2cp);
 
-__xwds_code
+__xwds_api
 void xwds_i2cp_destruct(struct xwds_i2cp * i2cp);
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** APIs ******** ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-__xwds_api
-xwer_t xwds_i2cp_probe(struct xwds_i2cp * i2cp);
-
-__xwds_api
-xwer_t xwds_i2cp_remove(struct xwds_i2cp * i2cp);
-
-__xwds_api
-xwer_t xwds_i2cp_start(struct xwds_i2cp * i2cp);
-
-__xwds_api
-xwer_t xwds_i2cp_stop(struct xwds_i2cp * i2cp);
-
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
-__xwds_api
-xwer_t xwds_i2cp_suspend(struct xwds_i2cp * i2cp);
-
-__xwds_api
-xwer_t xwds_i2cp_resume(struct xwds_i2cp * i2cp);
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
-
 __xwds_api
 xwer_t xwds_i2cp_ioctl(struct xwds_i2cp * i2cp, xwsq_t cmd, ...);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   inline function implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /**
  * @brief 增加对象的引用计数
  * @param i2cp: (I) I2C外设对象指针
@@ -139,6 +114,5 @@ xwer_t xwds_i2cp_release(struct xwds_i2cp * i2cp)
 {
         return xwds_device_release(&i2cp->dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 #endif /* xwmd/ds/i2c/perpheral.h */

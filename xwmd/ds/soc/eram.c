@@ -13,7 +13,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwmd/ds/soc/eram.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -54,7 +54,6 @@ xwer_t xwds_eram_test(struct xwds_soc * soc, xwptr_t * erraddr)
         SODS_VALIDATE(soc, "nullptr", -EFAULT);
         SODS_VALIDATE(erraddr, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
                 goto err_soc_grab;
@@ -63,7 +62,6 @@ xwer_t xwds_eram_test(struct xwds_soc * soc, xwptr_t * erraddr)
         if (__unlikely(rc < 0)) {
                 goto err_soc_request;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         drv = xwds_static_cast(struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->eram_tst)) {
@@ -78,19 +76,14 @@ xwer_t xwds_eram_test(struct xwds_soc * soc, xwptr_t * erraddr)
                 goto err_drv_tst;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_release(soc);
         xwds_soc_put(soc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_tst:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_release(soc);
 err_soc_request:
         xwds_soc_put(soc);
 err_soc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }

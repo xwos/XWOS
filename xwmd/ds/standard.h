@@ -18,10 +18,6 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 
-#if defined(XuanWuOS_CFG_CORE__up) && (!defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO))
-  #error "UP system is only support nano device stack (XWMDCFG_ds_NANO == 1)"
-#endif
-
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/

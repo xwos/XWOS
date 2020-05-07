@@ -13,7 +13,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/string.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/lib/xwbmpaop.h>
@@ -40,40 +40,37 @@ xwer_t xwds_canc_cvop_start(struct xwds_canc * canc);
 static __xwds_vop
 xwer_t xwds_canc_cvop_stop(struct xwds_canc * canc);
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 static __xwds_vop
 xwer_t xwds_canc_cvop_suspend(struct xwds_canc * canc);
 
 static __xwds_vop
 xwer_t xwds_canc_cvop_resume(struct xwds_canc * canc);
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 __xwds_rodata const struct xwds_base_virtual_operations xwds_canc_cvops = {
         .probe = (void *)xwds_canc_cvop_probe,
         .remove = (void *)xwds_canc_cvop_remove,
         .start = (void *)xwds_canc_cvop_start,
         .stop = (void *)xwds_canc_cvop_stop,
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
         .suspend = (void *)xwds_canc_cvop_suspend,
         .resume = (void *)xwds_canc_cvop_resume,
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 };
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
- * @brief CAN控制器的构造函数
+ * @brief SODS API：CAN控制器的构造函数
  * @param canc: (I) CAN控制器对象指针
  */
-__xwds_code
+__xwds_api
 void xwds_canc_construct(struct xwds_canc * canc)
 {
         xwds_device_construct(&canc->bc.dev);
@@ -81,15 +78,14 @@ void xwds_canc_construct(struct xwds_canc * canc)
 }
 
 /**
- * @brief CAN控制器对象的析构函数
+ * @brief SODS API：CAN控制器对象的析构函数
  * @param canc: (I) CAN控制器对象指针
  */
-__xwds_code
+__xwds_api
 void xwds_canc_destruct(struct xwds_canc * canc)
 {
         xwds_device_destruct(&canc->bc.dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** base virtual operations ******** ********/
 /**
@@ -151,7 +147,7 @@ xwer_t xwds_canc_cvop_stop(struct xwds_canc * canc)
         return rc;
 }
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 /******** ******** pm ******** ********/
 /**
  * @brief SODS VOP：暂停CAN控制器
@@ -180,10 +176,9 @@ xwer_t xwds_canc_cvop_resume(struct xwds_canc * canc)
         rc = xwds_device_cvop_resume(&canc->bc.dev);
         return rc;
 }
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** APIs ******** ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
 /**
  * @brief SODS API：探测CAN控制器
  * @param canc: (I) CAN控制器对象指针
@@ -280,7 +275,7 @@ xwer_t xwds_canc_stop(struct xwds_canc *canc)
         return rc;
 }
 
-#if (defined(XWMDCFG_ds_LPM)) && (1 == XWMDCFG_ds_LPM)
+#if (defined(XWMDCFG_ds_PM)) && (1 == XWMDCFG_ds_PM)
 /******** ******** pm ******** ********/
 /**
  * @brief SODS API：暂停CAN控制器
@@ -329,8 +324,7 @@ xwer_t xwds_canc_resume(struct xwds_canc *canc)
         rc = xwds_canc_cvop_resume(canc);
         return rc;
 }
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
+#endif /* XWMDCFG_ds_PM */
 
 /**
  * @brief SODS API：将一条CAN消息写入发送邮箱
@@ -361,24 +355,20 @@ xwer_t xwds_canc_write(struct xwds_canc * canc, xwid_t txobjid,
         SODS_VALIDATE(canc, "nullptr", -EFAULT);
         SODS_VALIDATE(msg, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_canc_grab(canc);
         if (__unlikely(rc < 0)) {
                 goto err_canc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         if (txobjid >= canc->cfg->txobjs_num) {
                 rc = -ERANGE;
                 goto err_txobjid;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_canc_request(canc);
         if (__unlikely(rc < 0)) {
                 goto err_canc_request;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         txobjcfg = &canc->cfg->txobjs[txobjid];
         if (SODS_CAN_MSG_F_EXID & msg->flag) {
@@ -402,24 +392,18 @@ xwer_t xwds_canc_write(struct xwds_canc * canc, xwid_t txobjid,
                 goto err_drv_write;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_canc_release(canc);
         xwds_canc_put(canc);
-#endif /* !XWMDCFG_ds_NANO */
 
         return OK;
 
 err_drv_write:
 err_badtxobj:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_canc_release(canc);
 err_canc_request:
-#endif /* !XWMDCFG_ds_NANO */
 err_txobjid:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_canc_put(canc);
 err_canc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -448,7 +432,6 @@ xwer_t xwds_canc_set_mode(struct xwds_canc * canc, xwsq_t mode)
         SODS_VALIDATE(canc, "nullptr", -EFAULT);
         SODS_VALIDATE((mode < SODS_CANC_MODE_NUM), "out-of-range", -ERANGE);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_canc_grab(canc);
         if (__unlikely(rc < 0)) {
                 goto err_canc_grab;
@@ -457,7 +440,6 @@ xwer_t xwds_canc_set_mode(struct xwds_canc * canc, xwsq_t mode)
         if (__unlikely(rc < 0)) {
                 goto err_canc_request;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         if (canc->mode == mode) {
                 rc = -EALREADY;
@@ -474,22 +456,18 @@ xwer_t xwds_canc_set_mode(struct xwds_canc * canc, xwsq_t mode)
         }
         canc->mode = mode;
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_canc_release(canc);
         xwds_canc_put(canc);
-#endif /* !XWMDCFG_ds_NANO */
 
         xwds_canc_lib_mode_indication(canc, mode);
         return OK;
 
 err_drv_set_mode:
 err_same_mode:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_canc_release(canc);
 err_canc_request:
         xwds_canc_put(canc);
 err_canc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -517,7 +495,6 @@ xwer_t xwds_canc_set_bd(struct xwds_canc * canc, xwid_t bdcfgid)
 
         SODS_VALIDATE(canc, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_canc_grab(canc);
         if (__unlikely(rc < 0)) {
                 goto err_canc_grab;
@@ -526,7 +503,6 @@ xwer_t xwds_canc_set_bd(struct xwds_canc * canc, xwid_t bdcfgid)
         if (__unlikely(rc < 0)) {
                 goto err_canc_request;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         if (bdcfgid >= canc->cfg->bdcfgs_num) {
                 rc = -ERANGE;
@@ -544,21 +520,16 @@ xwer_t xwds_canc_set_bd(struct xwds_canc * canc, xwid_t bdcfgid)
                 goto err_drv_set_bd;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_canc_release(canc);
         xwds_canc_put(canc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_set_bd:
 err_nobd:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_canc_release(canc);
 err_canc_request:
         xwds_canc_put(canc);
 err_canc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -583,7 +554,6 @@ xwer_t xwds_canc_enable_irqs(struct xwds_canc * canc)
 
         SODS_VALIDATE(canc, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_canc_grab(canc);
         if (__unlikely(rc < 0)) {
                 goto err_canc_grab;
@@ -592,7 +562,6 @@ xwer_t xwds_canc_enable_irqs(struct xwds_canc * canc)
         if (__unlikely(rc < 0)) {
                 goto err_canc_request;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         drv = xwds_static_cast(const struct xwds_canc_driver *, canc->bc.dev.drv);
         if ((drv) && (drv->enable_irqs)) {
@@ -607,12 +576,10 @@ xwer_t xwds_canc_enable_irqs(struct xwds_canc * canc)
         return OK;
 
 err_canc_drv_enable_irqs:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_canc_release(canc);
 err_canc_request:
         xwds_canc_put(canc);
 err_canc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -647,11 +614,8 @@ xwer_t xwds_canc_disable_irqs(struct xwds_canc * canc)
                 goto err_canc_drv_disable_irqs;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_canc_release(canc);
         xwds_canc_put(canc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_canc_drv_disable_irqs:

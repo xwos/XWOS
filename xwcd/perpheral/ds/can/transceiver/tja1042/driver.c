@@ -52,13 +52,13 @@ xwer_t tja1042_drv_start(struct xwds_device * dev);
 static __xwbsp_code
 xwer_t tja1042_drv_stop(struct xwds_device * dev);
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 static __xwbsp_code
 xwer_t tja1042_drv_suspend(struct xwds_device * dev);
 
 static __xwbsp_code
 xwer_t tja1042_drv_resume(struct xwds_device * dev);
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 static __xwbsp_code
 xwer_t tja1042_cantrcv_drv_set_opmode(struct xwds_cantrcv * cantrcv,
@@ -80,10 +80,10 @@ __xwbsp_rodata const struct xwds_cantrcv_driver tja1042_cantrcv_drv = {
                 .remove = NULL,
                 .start = tja1042_drv_start,
                 .stop = tja1042_drv_stop,
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
                 .suspend = tja1042_drv_suspend,
                 .resume =  tja1042_drv_resume,
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
         },
         .set_opmode = tja1042_cantrcv_drv_set_opmode,
         .enable_wkup = tja1042_cantrcv_drv_enable_wkup,
@@ -193,7 +193,7 @@ err_gpio_rls:
         return rc;
 }
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 static __xwbsp_code
 xwer_t tja1042_drv_suspend(struct xwds_device * dev)
 {
@@ -241,7 +241,7 @@ xwer_t tja1042_drv_resume(struct xwds_device * dev)
 err_gpio_req:
         return rc;
 }
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 static __xwbsp_code
 xwer_t tja1042_cantrcv_drv_set_opmode(struct xwds_cantrcv * cantrcv,

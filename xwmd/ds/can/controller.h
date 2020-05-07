@@ -16,7 +16,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwmd/ds/device.h>
 #include <xwos/osal/lock/spinlock.h>
@@ -225,37 +225,13 @@ struct xwds_canc {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
-__xwds_code
+__xwds_api
 void xwds_canc_construct(struct xwds_canc * canc);
 
-__xwds_code
+__xwds_api
 void xwds_canc_destruct(struct xwds_canc * canc);
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** APIs ******** ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-__xwds_api
-xwer_t xwds_canc_probe(struct xwds_canc * canc);
-
-__xwds_api
-xwer_t xwds_canc_remove(struct xwds_canc * canc);
-
-__xwds_api
-xwer_t xwds_canc_start(struct xwds_canc * canc);
-
-__xwds_api
-xwer_t xwds_canc_stop(struct xwds_canc * canc);
-
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
-__xwds_api
-xwer_t xwds_canc_suspend(struct xwds_canc * canc);
-
-__xwds_api
-xwer_t xwds_canc_resume(struct xwds_canc * canc);
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
-
 __xwds_api
 xwer_t xwds_canc_write(struct xwds_canc * canc, xwid_t txobjid,
                        struct xwds_can_msg * msg);
@@ -345,7 +321,6 @@ xwer_t xwds_canc_lib_rxq_acquire(struct xwds_canc_rxqueue * rxq,
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   inline function implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /**
  * @brief 增加对象的引用计数
  * @param canc: (I) CAN控制器对象指针
@@ -389,6 +364,5 @@ xwer_t xwds_canc_release(struct xwds_canc * canc)
 {
         return xwds_device_release(&canc->bc.dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 #endif /* xwmd/ds/can/controller.h */

@@ -22,7 +22,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/core/irq.h>
 #include <xwos/osal/lock/spinlock.h>
@@ -186,38 +186,14 @@ struct xwds_ispi8d {
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /******** ******** ******** constructor & destructor ******** ******** ********/
-__xwds_code
+__xwds_api
 void xwds_ispi8d_construct(struct xwds_ispi8d * ispi8d);
 
-__xwds_code
+__xwds_api
 void xwds_ispi8d_destruct(struct xwds_ispi8d * ispi8d);
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** APIs ******** ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-__xwds_api
-xwer_t xwds_ispi8d_probe(struct xwds_ispi8d * ispi8d);
-
-__xwds_api
-xwer_t xwds_ispi8d_remove(struct xwds_ispi8d * ispi8d);
-
-__xwds_api
-xwer_t xwds_ispi8d_start(struct xwds_ispi8d * ispi8d);
-
-__xwds_api
-xwer_t xwds_ispi8d_stop(struct xwds_ispi8d * ispi8d);
-
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
-__xwds_api
-xwer_t xwds_ispi8d_suspend(struct xwds_ispi8d * ispi8d);
-
-__xwds_api
-xwer_t xwds_ispi8d_resume(struct xwds_ispi8d * ispi8d);
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
-
 __xwds_api
 xwer_t xwds_ispi8d_clear_rxq(struct xwds_ispi8d * ispi8d);
 
@@ -253,7 +229,6 @@ xwer_t xwds_ispi8d_lib_swapdata(struct xwds_ispi8d * ispi8d,
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   inline function implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /**
  * @brief 增加对象的引用计数
  * @param ispi8d: (I) iSPI8设备对象指针
@@ -301,6 +276,5 @@ xwer_t xwds_ispi8d_release(struct xwds_ispi8d * ispi8d)
 {
         return xwds_device_release(&ispi8d->dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 #endif /* xwmd/ds/spi/ispi8d.h */

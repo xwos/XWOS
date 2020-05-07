@@ -16,7 +16,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwmd/ds/device.h>
 #include <xwmd/ds/can/controller.h>
@@ -126,37 +126,13 @@ struct xwds_cantrcv {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
-__xwds_code
+__xwds_api
 void xwds_cantrcv_construct(struct xwds_cantrcv * cantrcv);
 
-__xwds_code
+__xwds_api
 void xwds_cantrcv_destruct(struct xwds_cantrcv * cantrcv);
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** APIs ******** ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-__xwds_api
-xwer_t xwds_cantrcv_probe(struct xwds_cantrcv * cantrcv);
-
-__xwds_api
-xwer_t xwds_cantrcv_remove(struct xwds_cantrcv * cantrcv);
-
-__xwds_api
-xwer_t xwds_cantrcv_start(struct xwds_cantrcv * cantrcv);
-
-__xwds_api
-xwer_t xwds_cantrcv_stop(struct xwds_cantrcv * cantrcv);
-
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
-__xwds_api
-xwer_t xwds_cantrcv_suspend(struct xwds_cantrcv * cantrcv);
-
-__xwds_api
-xwer_t xwds_cantrcv_resume(struct xwds_cantrcv * cantrcv);
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
-
 __xwds_api
 xwer_t xwds_cantrcv_set_opmode(struct xwds_cantrcv * cantrcv, xwsq_t opmode);
 
@@ -186,7 +162,6 @@ void xwds_cantrcv_lib_wakeup_notification(struct xwds_cantrcv * cantrcv);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   inline function implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /**
  * @brief 增加对象的引用计数
  * @param cantrcv: (I) CAN接收器对象指针
@@ -230,6 +205,5 @@ xwer_t xwds_cantrcv_release(struct xwds_cantrcv * cantrcv)
 {
         return xwds_device_release(&cantrcv->bc.dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 #endif /* xwmd/ds/can/transceiver.h */

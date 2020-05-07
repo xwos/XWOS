@@ -13,7 +13,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/xwaop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/string.h>
@@ -21,6 +21,7 @@
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/lock/seqlock.h>
 #include <xwos/osal/lock/mutex.h>
+#include <xwmd/ds/xwds.h>
 #include <xwmd/ds/object.h>
 #include <xwmd/ds/device.h>
 
@@ -35,7 +36,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /**
  * @brief 实现面向对象“多态”的函数表
  */
@@ -44,12 +44,11 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_dev_cvops = {
         .remove = xwds_device_cvop_remove,
         .start = xwds_device_cvop_start,
         .stop = xwds_device_cvop_stop,
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
         .suspend = xwds_device_cvop_suspend,
         .resume = xwds_device_cvop_resume,
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 };
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -95,7 +94,6 @@ xwer_t xwds_get_regrsc(const struct xwds_resource_reg base[], xwsz_t num,
 }
 
 /******** ******** ******** constructor & destructor ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /**
  * @brief 设备的构造函数
  * @param dev: (I) 设备对象的指针
@@ -119,7 +117,6 @@ void xwds_device_destruct(struct xwds_device * dev)
 {
         xwds_obj_destruct(&dev->obj);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** base virtual operations ******** ********/
 /**
@@ -202,7 +199,7 @@ xwer_t xwds_device_cvop_stop(struct xwds_device * dev)
         return rc;
 }
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 /**
  * @brief 设备基本操作函数：暂停设备
  * @param dev: (I) 设备对象的指针
@@ -242,10 +239,9 @@ xwer_t xwds_device_cvop_resume(struct xwds_device * dev)
         }
         return rc;
 }
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** APIs ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /**
  * @brief SODS API：探测设备
  * @param ds: (I) 设备栈控制块指针
@@ -474,7 +470,7 @@ err_dev_set_state:
         return rc;
 }
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 /**
  * @brief SODS API：暂停设备
  * @param dev: (I) 设备对象的指针
@@ -630,5 +626,4 @@ xwer_t xwds_device_resume_all(struct xwds * ds, bool ign_err)
         xwosal_sqlk_wr_unlock_cpuirqrs(&ds->devlistlock, cpuirq);
         return rc;
 }
-#endif /* XWMDCFG_ds_LPM */
-#endif /* !XWMDCFG_ds_NANO */
+#endif /* XWMDCFG_ds_PM */

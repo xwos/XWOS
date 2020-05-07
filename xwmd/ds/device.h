@@ -21,20 +21,15 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/xwaop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/osal/lock/mutex.h>
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-  #include <xwmd/ds/standard.h>
-#else
-  #include <xwmd/ds/object.h>
-#endif
+#include <xwmd/ds/object.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /**
  * @brief Iterate over all devices forward in a device stack
  */
@@ -62,7 +57,6 @@
 #define xwds_itr_prev_device_safe(ds, p, n) \
         xwlib_bclst_itr_prev_entry_safe(p, n, &(ds)->devhead,  \
                                         struct xwds_device, obj.node)
-#endif /* !XWMDCFG_ds_NANO */
 
 #define __IOC_NRBITS            8
 #define __IOC_TYPEBITS          8
@@ -92,7 +86,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /**
  * @brief 设备状态枚举
  */
@@ -108,11 +101,9 @@ enum xwds_device_state_em {
         SODS_DEVICE_STATE_STARTING,
         SODS_DEVICE_STATE_RUNNING,
 };
-#endif /* !XWMDCFG_ds_NANO */
 
 struct xwds_device;
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /**
  * @brief 基本操作的虚函数表（类似C++的虚函数表）
  */
@@ -121,12 +112,11 @@ struct xwds_base_virtual_operations {
         xwer_t (* remove)(struct xwds_device *); /**< 删除 */
         xwer_t (* start)(struct xwds_device *); /**< 启动 */
         xwer_t (* stop)(struct xwds_device *); /**< 停止 */
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
         xwer_t (* suspend)(struct xwds_device *); /**< 暂停 */
         xwer_t (* resume)(struct xwds_device *); /**< 继续 */
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 };
-#endif /* !XWMDCFG_ds_NANO */
 
 /**
  * @brief 基本驱动函数表（所有设备驱动的基类）
@@ -146,9 +136,7 @@ struct xwds_driver {
  * @brief 设备（所有设备的基类）
  */
 struct xwds_device {
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         struct xwds_object obj; /**< C语言面向对象：继承struct xwds_object */
-#endif /* !XWMDCFG_ds_NANO */
         /* attribute */
         const char * name; /**< 名字 */
         xwid_t id; /**< ID */
@@ -157,11 +145,9 @@ struct xwds_device {
         void * data; /**< 私有数据 */
 
         /* private */
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         __atomic xwsq_t state; /**< 设备状态 */
         struct xwds * ds; /**< 设备所属的设备栈的指针 */
         const struct xwds_base_virtual_operations * cvops; /**< 通用操作的虚函数表 */
-#endif /* !XWMDCFG_ds_NANO */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -173,13 +159,11 @@ xwer_t xwds_get_regrsc(const struct xwds_resource_reg base[], xwsz_t num,
                        const struct xwds_resource_reg ** ret);
 
 /******** ******** ******** constructor & destructor ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 __xwds_code
 void xwds_device_construct(struct xwds_device * dev);
 
 __xwds_code
 void xwds_device_destruct(struct xwds_device * dev);
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** base virtual operations ******** ********/
 __xwds_vop
@@ -194,16 +178,15 @@ xwer_t xwds_device_cvop_start(struct xwds_device * dev);
 __xwds_vop
 xwer_t xwds_device_cvop_stop(struct xwds_device * dev);
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 __xwds_vop
 xwer_t xwds_device_cvop_suspend(struct xwds_device * dev);
 
 __xwds_vop
 xwer_t xwds_device_cvop_resume(struct xwds_device * dev);
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** APIs ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 __xwds_api
 xwer_t xwds_device_probe(struct xwds * ds, struct xwds_device * dev,
                          xwobj_gc_f gcfunc);
@@ -217,7 +200,7 @@ xwer_t xwds_device_start(struct xwds_device * dev);
 __xwds_api
 xwer_t xwds_device_stop(struct xwds_device * dev);
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 __xwds_api
 xwer_t xwds_device_suspend(struct xwds_device * dev);
 
@@ -229,13 +212,11 @@ xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err);
 
 __xwds_api
 xwer_t xwds_device_resume_all(struct xwds * ds, bool ign_err);
-#endif /* XWMDCFG_ds_LPM */
-#endif /* !XWMDCFG_ds_NANO */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   inline function implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /**
  * @brief 增加对象的引用计数
  * @param dev: (I) 设备对象的指针
@@ -312,6 +293,5 @@ xwer_t xwds_device_release(struct xwds_device * dev)
         }
         return rc;
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 #endif /* xwmd/ds/device.h */

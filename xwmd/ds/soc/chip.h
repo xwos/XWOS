@@ -16,7 +16,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwmd/ds/device.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -216,44 +216,19 @@ struct xwds_soc {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
-__xwds_code
+__xwds_api
 void xwds_soc_construct(struct xwds_soc * soc);
 
-__xwds_code
+__xwds_api
 void xwds_soc_destruct(struct xwds_soc * soc);
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** APIs ******** ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-__xwds_api
-xwer_t xwds_soc_probe(struct xwds_soc * soc);
-
-__xwds_api
-xwer_t xwds_soc_remove(struct xwds_soc * soc);
-
-__xwds_api
-xwer_t xwds_soc_start(struct xwds_soc * soc);
-
-__xwds_api
-xwer_t xwds_soc_stop(struct xwds_soc * soc);
-
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
-__xwds_api
-xwer_t xwds_soc_suspend(struct xwds_soc * soc);
-
-__xwds_api
-xwer_t xwds_soc_resume(struct xwds_soc * soc);
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
-
 __xwds_api
 xwer_t xwds_soc_ioctl(struct xwds_soc * soc, xwsq_t cmd, ...);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   inline function implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /**
  * @brief 增加对象的引用计数
  * @param soc: (I) SOC对象指针
@@ -301,6 +276,5 @@ xwer_t xwds_soc_release(struct xwds_soc * soc)
 {
         return xwds_device_release(&soc->dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 #endif /* xwmd/ds/soc/chip.h */

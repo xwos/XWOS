@@ -16,7 +16,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/string.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/lock/spinlock.h>
@@ -42,40 +42,37 @@ xwer_t xwds_dmauartc_cvop_start(struct xwds_dmauartc * dmauartc);
 static __xwds_vop
 xwer_t xwds_dmauartc_cvop_stop(struct xwds_dmauartc * dmauartc);
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 static __xwds_vop
 xwer_t xwds_dmauartc_cvop_suspend(struct xwds_dmauartc * dmauartc);
 
 static __xwds_vop
 xwer_t xwds_dmauartc_cvop_resume(struct xwds_dmauartc * dmauartc);
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 __xwds_rodata const struct xwds_base_virtual_operations xwds_dmauartc_cvops = {
         .probe = (void *)xwds_dmauartc_cvop_probe,
         .remove = (void *)xwds_dmauartc_cvop_remove,
         .start = (void *)xwds_dmauartc_cvop_start,
         .stop = (void *)xwds_dmauartc_cvop_stop,
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
         .suspend = (void *)xwds_dmauartc_cvop_suspend,
         .resume = (void *)xwds_dmauartc_cvop_resume,
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 };
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
- * @brief DMA UART控制器的构造函数
+ * @brief SODS API：DMA UART控制器的构造函数
  * @param dmauartc: (I) DMA UART控制器对象指针
  */
-__xwds_code
+__xwds_api
 void xwds_dmauartc_construct(struct xwds_dmauartc * dmauartc)
 {
         xwds_device_construct(&dmauartc->dev);
@@ -83,15 +80,14 @@ void xwds_dmauartc_construct(struct xwds_dmauartc * dmauartc)
 }
 
 /**
- * @brief DMA UART控制器对象的析构函数
+ * @brief SODS API：DMA UART控制器对象的析构函数
  * @param dmauartc: (I) DMA UART控制器对象指针
  */
-__xwds_code
+__xwds_api
 void xwds_dmauartc_destruct(struct xwds_dmauartc * dmauartc)
 {
         xwds_device_destruct(&dmauartc->dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** base virtual operations ******** ********/
 /**
@@ -175,7 +171,7 @@ xwer_t xwds_dmauartc_cvop_stop(struct xwds_dmauartc * dmauartc)
         return rc;
 }
 
-#if (defined(XWMDCFG_ds_LPM)) && (1 == XWMDCFG_ds_LPM)
+#if (defined(XWMDCFG_ds_PM)) && (1 == XWMDCFG_ds_PM)
 /******** ******** pm ******** ********/
 /**
  * @brief SODS VOP：暂停DMA UART控制器
@@ -208,154 +204,9 @@ xwer_t xwds_dmauartc_cvop_resume(struct xwds_dmauartc * dmauartc)
         rc = xwds_device_cvop_resume(&dmauartc->dev);
         return rc;
 }
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** DMA UART APIs ******** ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-/**
- * @brief SODS API：探测DMA UART控制器
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_dmauartc_probe(struct xwds_dmauartc * dmauartc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(dmauartc, "nullptr", -EFAULT);
-
-        rc = xwds_dmauartc_cvop_probe(dmauartc);
-        return rc;
-}
-
-/**
- * @brief SODS API：移除DMA UART控制器
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_dmauartc_remove(struct xwds_dmauartc * dmauartc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(dmauartc, "nullptr", -EFAULT);
-
-        rc = xwds_dmauartc_cvop_remove(dmauartc);
-        return rc;
-}
-
-/**
- * @brief SODS API：启动DMA UART控制器
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_dmauartc_start(struct xwds_dmauartc * dmauartc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(dmauartc, "nullptr", -EFAULT);
-
-        rc = xwds_dmauartc_cvop_start(dmauartc);
-        return rc;
-}
-
-/**
- * @brief SODS API：停止DMA UART控制器
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_dmauartc_stop(struct xwds_dmauartc * dmauartc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(dmauartc, "nullptr", -EFAULT);
-
-        rc = xwds_dmauartc_cvop_stop(dmauartc);
-        return rc;
-}
-
-#if (defined(XWMDCFG_ds_LPM)) && (1 == XWMDCFG_ds_LPM)
-/******** ******** pm ******** ********/
-/**
- * @brief SODS API：暂停DMA UART控制器
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_dmauartc_suspend(struct xwds_dmauartc * dmauartc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(dmauartc, "nullptr", -EFAULT);
-
-        rc = xwds_dmauartc_cvop_suspend(dmauartc);
-        return rc;
-}
-
-/**
- * @brief SODS API：继续DMA UART控制器
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_dmauartc_resume(struct xwds_dmauartc * dmauartc)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(dmauartc, "nullptr", -EFAULT);
-
-        rc = xwds_dmauartc_cvop_resume(dmauartc);
-        return rc;
-}
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
-
 /**
  * @brief SODS API：从接收队列中获取数据
  * @param dmauartc: (I) DMA UART控制器对象指针
@@ -393,12 +244,10 @@ xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
 
         pos = 0;
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_dmauartc_grab(dmauartc);
         if (__unlikely(rc < 0)) {
                 goto err_dmauartc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         rest_buffer_size = *size;
         while (rest_buffer_size) {
@@ -431,18 +280,13 @@ xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
                 }
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_dmauartc_put(dmauartc);
-#endif /* !XWMDCFG_ds_NANO */
-
         *size = pos;
         return OK;
 
 err_smr_timedwait:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_dmauartc_put(dmauartc);
 err_dmauartc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         *size = pos;
         return rc;
 }
@@ -479,12 +323,10 @@ xwer_t xwds_dmauartc_try_rx(struct xwds_dmauartc * dmauartc,
 
         pos = 0;
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_dmauartc_grab(dmauartc);
         if (__unlikely(rc < 0)) {
                 goto err_dmauartc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         rest_buffer_size = *size;
         while (rest_buffer_size) {
@@ -517,18 +359,13 @@ xwer_t xwds_dmauartc_try_rx(struct xwds_dmauartc * dmauartc,
                 }/* else {} */
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_dmauartc_put(dmauartc);
-#endif /* !XWMDCFG_ds_NANO */
-
         *size = pos;
         return OK;
 
 err_smr_trywait:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_dmauartc_put(dmauartc);
 err_dmauartc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         *size = pos;
         return rc;
 }
@@ -562,12 +399,10 @@ xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
         SODS_VALIDATE(dmauartc, "nullptr", -EFAULT);
         SODS_VALIDATE(data, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_dmauartc_grab(dmauartc);
         if (__unlikely(rc < 0)) {
                 goto err_dmauartc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         drv = xwds_static_cast(const struct xwds_dmauartc_driver *,
                                dmauartc->dev.drv);
@@ -580,17 +415,12 @@ xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
                 goto err_txdma_cfg;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_dmauartc_put(dmauartc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_txdma_cfg:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_dmauartc_put(dmauartc);
 err_dmauartc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -618,12 +448,10 @@ xwer_t xwds_dmauartc_cfg(struct xwds_dmauartc * dmauartc,
         SODS_VALIDATE(dmauartc, "nullptr", -EFAULT);
         SODS_VALIDATE(cfg, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_dmauartc_grab(dmauartc);
         if (__unlikely(rc < 0)) {
                 goto err_dmauartc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         drv = xwds_static_cast(const struct xwds_dmauartc_driver *, dmauartc->dev.drv);
         if ((drv) && (drv->cfg)) {
@@ -635,17 +463,12 @@ xwer_t xwds_dmauartc_cfg(struct xwds_dmauartc * dmauartc,
                 goto err_drv_cfg;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_dmauartc_put(dmauartc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_cfg:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_dmauartc_put(dmauartc);
 err_dmauartc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 

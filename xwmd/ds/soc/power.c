@@ -13,7 +13,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/string.h>
 #include <xwmd/ds/soc/power.h>
 
@@ -56,12 +56,10 @@ xwer_t xwds_pwr_req(struct xwds_soc * soc, xwid_t id)
         SODS_VALIDATE(soc, "nullptr", -EFAULT);
         SODS_VALIDATE((id < soc->pwr.num), "out-of-range", -ERANGE);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         drv = xwds_static_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->pwr_req)) {
@@ -75,10 +73,8 @@ xwer_t xwds_pwr_req(struct xwds_soc * soc, xwid_t id)
         return OK;
 
 err_drv_pwr_req:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
 err_soc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -116,10 +112,7 @@ xwer_t xwds_pwr_rls(struct xwds_soc * soc, xwid_t id)
                 goto err_drv_pwr_rls;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_pwr_rls:
@@ -157,12 +150,10 @@ xwer_t xwds_pwr_getvltg(struct xwds_soc * soc, xwid_t id,
         SODS_VALIDATE(buf, "nullptr", -EFAULT);
         SODS_VALIDATE(num, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         drv = xwds_static_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->pwr_getvltg)) {
@@ -174,17 +165,12 @@ xwer_t xwds_pwr_getvltg(struct xwds_soc * soc, xwid_t id,
                 goto err_drv_getvltg;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_getvltg:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
 err_soc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 

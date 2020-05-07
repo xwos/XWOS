@@ -13,7 +13,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/lock/mutex.h>
 #include <xwmd/ds/i2c/master.h>
@@ -37,40 +37,37 @@ xwer_t xwds_i2cm_cvop_start(struct xwds_i2cm * i2cm);
 static __xwds_vop
 xwer_t xwds_i2cm_cvop_stop(struct xwds_i2cm * i2cm);
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 static __xwds_vop
 xwer_t xwds_i2cm_cvop_suspend(struct xwds_i2cm * i2cm);
 
 static __xwds_vop
 xwer_t xwds_i2cm_cvop_resume(struct xwds_i2cm * i2cm);
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 __xwds_rodata const struct xwds_base_virtual_operations xwds_i2cm_cvops = {
         .probe = (void *)xwds_i2cm_cvop_probe,
         .remove = (void *)xwds_i2cm_cvop_remove,
         .start = (void *)xwds_i2cm_cvop_start,
         .stop = (void *)xwds_i2cm_cvop_stop,
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
         .suspend = (void *)xwds_i2cm_cvop_suspend,
         .resume = (void *)xwds_i2cm_cvop_resume,
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 };
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
- * @brief I2C主机控制器的构造函数
+ * @brief SODS API：I2C主机控制器的构造函数
  * @param i2cm: (I) I2C主机控制器对象指针
  */
-__xwds_code
+__xwds_api
 void xwds_i2cm_construct(struct xwds_i2cm * i2cm)
 {
         xwds_device_construct(&i2cm->dev);
@@ -78,15 +75,14 @@ void xwds_i2cm_construct(struct xwds_i2cm * i2cm)
 }
 
 /**
- * @brief I2C主机控制器对象的析构函数
+ * @brief SODS API：I2C主机控制器对象的析构函数
  * @param i2cm: (I) I2C主机控制器对象指针
  */
-__xwds_code
+__xwds_api
 void xwds_i2cm_destruct(struct xwds_i2cm * i2cm)
 {
         xwds_device_destruct(&i2cm->dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** base virtual operations ******** ********/
 /**
@@ -168,7 +164,7 @@ xwer_t xwds_i2cm_cvop_stop(struct xwds_i2cm * i2cm)
 }
 
 /******** ******** pm ******** ********/
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 /**
  * @brief SODS VOP：暂停I2C主机控制器
  * @param i2cm: (I) I2C主机控制器对象指针
@@ -196,158 +192,9 @@ xwer_t xwds_i2cm_cvop_resume(struct xwds_i2cm * i2cm)
         rc = xwds_device_cvop_resume(&i2cm->dev);
         return rc;
 }
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** APIs ******** ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-/**
- * @brief SODS VOP：探测I2C主机控制器
- * @param i2cm: (I) I2C主机控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_i2cm_probe(struct xwds_i2cm * i2cm)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(i2cm, "nullptr", -EFAULT);
-
-        rc = xwds_i2cm_cvop_probe(i2cm);
-        return rc;
-}
-
-/**
- * @brief SODS API：移除I2C主机控制器
- * @param i2cm: (I) I2C主机控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_i2cm_remove(struct xwds_i2cm * i2cm)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(i2cm, "nullptr", -EFAULT);
-
-        rc = xwds_i2cm_cvop_remove(i2cm);
-        return rc;
-}
-
-/**
- * @brief SODS API：启动I2C主机控制器
- * @param i2cm: (I) I2C主机控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_i2cm_start(struct xwds_i2cm *i2cm)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(i2cm, "nullptr", -EFAULT);
-
-        rc = xwds_i2cm_cvop_start(i2cm);
-        return rc;
-}
-
-/**
- * @brief SODS API：停止I2C主机控制器
- * @param i2cm: (I) I2C主机控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_i2cm_stop(struct xwds_i2cm *i2cm)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(i2cm, "nullptr", -EFAULT);
-
-        rc = xwds_i2cm_cvop_stop(i2cm);
-        return rc;
-}
-
-#if (defined(XWMDCFG_ds_LPM)) && (1 == XWMDCFG_ds_LPM)
-/******** ******** pm ******** ********/
-/**
- * @brief SODS API：暂停I2C主机控制器
- * @param i2cm: (I) I2C主机控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_i2cm_suspend(struct xwds_i2cm *i2cm)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(i2cm, "nullptr", -EFAULT);
-
-        rc = xwds_i2cm_cvop_suspend(i2cm);
-        return rc;
-}
-
-/**
- * @brief SODS API：继续I2C主机控制器
- * @param i2cm: (I) I2C主机控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_i2cm_resume(struct xwds_i2cm *i2cm)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(i2cm, "nullptr", -EFAULT);
-
-        rc = xwds_i2cm_cvop_resume(i2cm);
-        return rc;
-}
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
-
 /**
  * @brief SODS API：发送I2C消息
  * @param i2cm: (I) I2C主机控制器对象指针
@@ -377,7 +224,6 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
         SODS_VALIDATE(msg, "nullptr", -EFAULT);
         SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_i2cm_grab(i2cm);
         if (__unlikely(rc < 0)) {
                 goto err_i2cm_grab;
@@ -386,7 +232,6 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
         if (__unlikely(rc < 0)) {
                 goto err_i2cm_request;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&i2cm->xferlock), xwtm);
         if (__unlikely(rc < 0)) {
@@ -403,22 +248,17 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
         }
         xwosal_mtx_unlock(xwosal_mtx_get_id(&i2cm->xferlock));
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_i2cm_release(i2cm);
         xwds_i2cm_put(i2cm);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_xfer:
         xwosal_mtx_unlock(xwosal_mtx_get_id(&i2cm->xferlock));
 err_i2cm_lock:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_i2cm_release(i2cm);
 err_i2cm_request:
         xwds_i2cm_put(i2cm);
 err_i2cm_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -448,7 +288,6 @@ xwer_t xwds_i2cm_reset(struct xwds_i2cm * i2cm, xwtm_t * xwtm)
         SODS_VALIDATE(i2cm, "nullptr", -EFAULT);
         SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_i2cm_grab(i2cm);
         if (__unlikely(rc < 0)) {
                 goto err_i2cm_grab;
@@ -457,7 +296,6 @@ xwer_t xwds_i2cm_reset(struct xwds_i2cm * i2cm, xwtm_t * xwtm)
         if (__unlikely(rc < 0)) {
                 goto err_i2cm_request;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&i2cm->xferlock), xwtm);
         if (__unlikely(rc < 0)) {
@@ -474,21 +312,16 @@ xwer_t xwds_i2cm_reset(struct xwds_i2cm * i2cm, xwtm_t * xwtm)
         }
         xwosal_mtx_unlock(xwosal_mtx_get_id(&i2cm->xferlock));
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_i2cm_release(i2cm);
         xwds_i2cm_put(i2cm);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_reset:
         xwosal_mtx_unlock(xwosal_mtx_get_id(&i2cm->xferlock));
 err_i2cm_lock:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_i2cm_release(i2cm);
 err_i2cm_request:
         xwds_i2cm_put(i2cm);
 err_i2cm_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }

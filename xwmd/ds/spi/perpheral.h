@@ -16,7 +16,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwmd/ds/device.h>
 #include <xwmd/ds/spi/common.h>
@@ -55,44 +55,19 @@ struct xwds_spip {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
-__xwds_code
+__xwds_api
 void xwds_spip_construct(struct xwds_spip * spip);
 
-__xwds_code
+__xwds_api
 void xwds_spip_destruct(struct xwds_spip * spip);
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** APIs ******** ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-__xwds_api
-xwer_t xwds_spip_probe(struct xwds_spip * spip);
-
-__xwds_api
-xwer_t xwds_spip_remove(struct xwds_spip * spip);
-
-__xwds_api
-xwer_t xwds_spip_start(struct xwds_spip * spip);
-
-__xwds_api
-xwer_t xwds_spip_stop(struct xwds_spip * spip);
-
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
-__xwds_api
-xwer_t xwds_spip_suspend(struct xwds_spip * spip);
-
-__xwds_api
-xwer_t xwds_spip_resume(struct xwds_spip * spip);
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
-
 __xwds_api
 xwer_t xwds_spip_ioctl(struct xwds_spip * spip, xwsq_t cmd, ...);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   inline function implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /**
  * @brief 增加对象的引用计数
  * @param spip: (I) SPI外设控制器对象指针
@@ -140,6 +115,5 @@ xwer_t xwds_spip_release(struct xwds_spip * spip)
 {
         return xwds_device_release(&spip->dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 #endif /* xwmd/ds/spi/perpheral.h */

@@ -16,7 +16,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/irq.h>
 #include <xwos/osal/lock/mutex.h>
@@ -133,37 +133,13 @@ struct xwds_spim {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
-__xwds_code
+__xwds_api
 void xwds_spim_construct(struct xwds_spim * spim);
 
-__xwds_code
+__xwds_api
 void xwds_spim_destruct(struct xwds_spim * spim);
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** APIs ******** ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-__xwds_api
-xwer_t xwds_spim_probe(struct xwds_spim * spim);
-
-__xwds_api
-xwer_t xwds_spim_remove(struct xwds_spim * spim);
-
-__xwds_api
-xwer_t xwds_spim_start(struct xwds_spim * spim);
-
-__xwds_api
-xwer_t xwds_spim_stop(struct xwds_spim * spim);
-
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
-__xwds_api
-xwer_t xwds_spim_suspend(struct xwds_spim * spim);
-
-__xwds_api
-xwer_t xwds_spim_resume(struct xwds_spim * spim);
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
-
 __xwds_api
 xwer_t xwds_spim_xfer(struct xwds_spim * spim,
                       struct xwds_spim_msg * msg,
@@ -172,7 +148,6 @@ xwer_t xwds_spim_xfer(struct xwds_spim * spim,
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   inline function implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /**
  * @brief 增加对象的引用计数
  * @param spim: (I) SPI主机模式控制器对象指针
@@ -220,6 +195,5 @@ xwer_t xwds_spim_release(struct xwds_spim * spim)
 {
         return xwds_device_release(&spim->dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 #endif /* xwmd/ds/spi/master.h */

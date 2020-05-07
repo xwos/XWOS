@@ -16,7 +16,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/osal/lock/seqlock.h>
 #include <xwos/osal/lock/mutex.h>
@@ -74,37 +74,13 @@ struct xwds_uartc {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
-__xwds_code
+__xwds_api
 void xwds_uartc_construct(struct xwds_uartc * uartc);
 
-__xwds_code
+__xwds_api
 void xwds_uartc_destruct(struct xwds_uartc * uartc);
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** APIs ******** ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-__xwds_api
-xwer_t xwds_uartc_probe(struct xwds_uartc * uartc);
-
-__xwds_api
-xwer_t xwds_uartc_remove(struct xwds_uartc * uartc);
-
-__xwds_api
-xwer_t xwds_uartc_start(struct xwds_uartc * uartc);
-
-__xwds_api
-xwer_t xwds_uartc_stop(struct xwds_uartc * uartc);
-
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
-__xwds_api
-xwer_t xwds_uartc_suspend(struct xwds_uartc * uartc);
-
-__xwds_api
-xwer_t xwds_uartc_resume(struct xwds_uartc * uartc);
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
-
 __xwds_api
 xwer_t xwds_uartc_clear_rxq(struct xwds_uartc * uartc);
 
@@ -153,7 +129,6 @@ void xwds_uartc_lib_tx_isr(struct xwds_uartc * uartc);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   inline function implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /**
  * @brief 增加对象的引用计数
  * @param uartc: (I) UART控制器对象指针
@@ -201,6 +176,5 @@ xwer_t xwds_uartc_release(struct xwds_uartc * uartc)
 {
         return xwds_device_release(&uartc->dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 #endif /* xwmd/ds/uart/general.h */

@@ -13,7 +13,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/string.h>
 #include <xwos/lib/xwbmpaop.h>
 #include <xwmd/ds/soc/dma.h>
@@ -58,12 +58,10 @@ xwer_t xwds_dma_req(struct xwds_soc * soc, xwid_t ch)
         SODS_VALIDATE(soc, "nullptr", -EFAULT);
         SODS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         rc = xwbmpaop_t0i_then_s1i(soc->dma.chstatus, ch);
         if (__unlikely(rc < 0)) {
@@ -82,10 +80,8 @@ xwer_t xwds_dma_req(struct xwds_soc * soc, xwid_t ch)
 err_drv_dma_req:
         xwbmpaop_s1i(soc->dma.chstatus, ch);
 err_busy:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
 err_soc_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -126,11 +122,7 @@ xwer_t xwds_dma_rls(struct xwds_soc * soc, xwid_t ch)
                 }
         }
         xwbmpaop_c0i(soc->dma.chstatus, ch);
-
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_soc_put(soc);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_dma_rls:

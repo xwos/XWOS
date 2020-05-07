@@ -52,13 +52,13 @@ xwer_t at24sdd_drv_start(struct xwds_device * dev);
 static __xwbsp_code
 xwer_t at24sdd_drv_stop(struct xwds_device * dev);
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 static __xwbsp_code
 xwer_t at24sdd_drv_suspend(struct xwds_device * dev);
 
 static __xwbsp_code
 xwer_t at24sdd_drv_resume(struct xwds_device * dev);
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 static __xwbsp_code
 xwer_t at24sdd_putc(struct xwds_i2cp_eeprom * eeprom, xwu8_t data, xwptr_t addr,
@@ -93,10 +93,10 @@ __xwbsp_rodata const struct xwds_i2cp_driver at24sdd_drv = {
                 .remove = NULL,
                 .start = at24sdd_drv_start,
                 .stop = at24sdd_drv_stop,
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
                 .suspend = at24sdd_drv_suspend,
                 .resume =  at24sdd_drv_resume,
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
         },
         .ioctl = at24sdd_drv_ioctl,
 };
@@ -205,7 +205,7 @@ err_gpio_release:
         return rc;
 }
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 static __xwbsp_code
 xwer_t at24sdd_drv_suspend(struct xwds_device * dev)
 {
@@ -217,7 +217,7 @@ xwer_t at24sdd_drv_resume(struct xwds_device * dev)
 {
         return at24sdd_drv_start(dev);
 }
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** AT24SDD driver ******** ********/
 static __xwbsp_code

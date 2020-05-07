@@ -22,16 +22,7 @@ include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
 XWMO_CSRCS :=
-ifneq ($(XWMDCFG_ds_NANO),y)
-    XWMO_CSRCS += object.c
-endif
-XWMO_CSRCS += device.c
-
-ifneq ($(XWMDCFG_ds_NANO),y)
-    ifeq ($(XWMDCFG_ds_LPM),y)
-        XWMO_CSRCS += pm.c
-    endif
-endif
+XWMO_CSRCS += xwds.c object.c device.c
 
 ifeq ($(XWMDCFG_ds_SOC),y)
     XWMO_CSRCS += soc/chip.c

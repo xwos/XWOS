@@ -13,7 +13,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <xwmd/ds/standard.h>
 #include <xwos/lib/string.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/scheduler.h>
@@ -41,13 +41,13 @@ xwer_t xwds_ispi8d_cvop_start(struct xwds_ispi8d * ispi8d);
 static __xwds_vop
 xwer_t xwds_ispi8d_cvop_stop(struct xwds_ispi8d * ispi8d);
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 static __xwds_vop
 xwer_t xwds_ispi8d_cvop_suspend(struct xwds_ispi8d * ispi8d);
 
 static __xwds_vop
 xwer_t xwds_ispi8d_cvop_resume(struct xwds_ispi8d * ispi8d);
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 static __xwds_code
 xwer_t xwds_ispi8d_get_rxslot(struct xwds_ispi8d * ispi8d,
@@ -71,29 +71,26 @@ xwer_t xwds_ispi8d_cb_unlock(void * arg);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 __xwds_rodata const struct xwds_base_virtual_operations xwds_ispi8d_cvops = {
         .probe = (void *)xwds_ispi8d_cvop_probe,
         .remove = (void *)xwds_ispi8d_cvop_remove,
         .start = (void *)xwds_ispi8d_cvop_start,
         .stop = (void *)xwds_ispi8d_cvop_stop,
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
         .suspend = (void *)xwds_ispi8d_cvop_suspend,
         .resume = (void *)xwds_ispi8d_cvop_resume,
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 };
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
- * @brief iSPI8设备的构造函数
+ * @brief SODS API：iSPI8设备的构造函数
  * @param ispi8d: (I) iSPI8设备对象指针
  */
-static __xwds_code
+__xwds_api
 void xwds_ispi8d_construct(struct xwds_ispi8d * ispi8d)
 {
         xwds_device_construct(&ispi8d->dev);
@@ -101,10 +98,10 @@ void xwds_ispi8d_construct(struct xwds_ispi8d * ispi8d)
 }
 
 /**
- * @brief iSPI8设备对象的析构函数
+ * @brief SODS API：iSPI8设备对象的析构函数
  * @param ispi8d: (I) iSPI8设备对象指针
  */
-static __xwds_code
+__xwds_api
 void xwds_ispi8d_destruct(struct xwds_ispi8d * ispi8d)
 {
         struct xwds_device * dev;
@@ -112,7 +109,6 @@ void xwds_ispi8d_destruct(struct xwds_ispi8d * ispi8d)
         dev = xwds_static_cast(struct xwds_device *, ispi8d);
         xwds_device_destruct(dev);
 }
-#endif /* !XWMDCFG_ds_NANO */
 
 /******** ******** base virtual operations ******** ********/
 /**
@@ -248,7 +244,7 @@ err_rxsmr_freeze:
         return rc;
 }
 
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 /******** ******** pm ******** ********/
 /**
  * @brief SODS VOP：暂停iSPI8设备
@@ -277,158 +273,9 @@ xwer_t xwds_ispi8d_cvop_resume(struct xwds_ispi8d * ispi8d)
         rc = xwds_device_cvop_resume(&ispi8d->dev);
         return rc;
 }
-#endif /* XWMDCFG_ds_LPM */
+#endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** APIs ******** ******** ********/
-#if defined(XWMDCFG_ds_NANO) && (1 == XWMDCFG_ds_NANO)
-/**
- * @brief SODS API：探测iSPI8设备
- * @param ispi8d: (I) iSPI8设备对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_ispi8d_probe(struct xwds_ispi8d * ispi8d)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(ispi8d, "nullptr", -EFAULT);
-
-        rc = xwds_ispi8d_cvop_probe(ispi8d);
-        return rc;
-}
-
-/**
- * @brief SODS API：移除iSPI8设备
- * @param ispi8d: (I) iSPI8设备对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_ispi8d_remove(struct xwds_ispi8d * ispi8d)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(ispi8d, "nullptr", -EFAULT);
-
-        rc = xwds_ispi8d_cvop_remove(ispi8d);
-        return rc;
-}
-
-/**
- * @brief SODS API：启动iSPI8设备
- * @param ispi8d: (I) iSPI8设备对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_ispi8d_start(struct xwds_ispi8d * ispi8d)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(ispi8d, "nullptr", -EFAULT);
-
-        rc = xwds_ispi8d_cvop_start(ispi8d);
-        return rc;
-}
-
-/**
- * @brief SODS API：停止iSPI8设备
- * @param ispi8d: (I) iSPI8设备对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_ispi8d_stop(struct xwds_ispi8d * ispi8d)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(ispi8d, "nullptr", -EFAULT);
-
-        rc = xwds_ispi8d_cvop_stop(ispi8d);
-        return rc;
-}
-
-#if defined(XWMDCFG_ds_LPM) && (1 == XWMDCFG_ds_LPM)
-/******** ******** pm ******** ********/
-/**
- * @brief SODS API：暂停iSPI8设备
- * @param ispi8d: (I) iSPI8设备对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_ispi8d_suspend(struct xwds_ispi8d * ispi8d)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(ispi8d, "nullptr", -EFAULT);
-
-        rc = xwds_ispi8d_cvop_suspend(ispi8d);
-        return rc;
-}
-
-/**
- * @brief SODS API：继续iSPI8设备
- * @param ispi8d: (I) iSPI8设备对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_ispi8d_resume(struct xwds_ispi8d * ispi8d)
-{
-        xwer_t rc;
-
-        SODS_VALIDATE(ispi8d, "nullptr", -EFAULT);
-
-        rc = xwds_ispi8d_cvop_resume(ispi8d);
-        return rc;
-}
-#endif /* XWMDCFG_ds_LPM */
-#endif /* XWMDCFG_ds_NANO */
-
 static __xwds_code
 xwer_t xwds_ispi8d_get_rxslot(struct xwds_ispi8d * ispi8d,
                               struct xwds_ispi8d_rxslot ** rxslotbuf)
@@ -486,12 +333,10 @@ xwer_t xwds_ispi8d_clear_rxq(struct xwds_ispi8d * ispi8d)
 
         SODS_VALIDATE(ispi8d, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_ispi8d_grab(ispi8d);
         if (__unlikely(rc < 0)) {
                 goto err_ispi8d_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         rc = xwosal_smr_freeze(xwosal_smr_get_id(&ispi8d->rxq.smr));
         if (__unlikely(rc < 0)) {
@@ -507,18 +352,13 @@ xwer_t xwds_ispi8d_clear_rxq(struct xwds_ispi8d * ispi8d)
                 goto err_smr_thaw;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_ispi8d_put(ispi8d);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_smr_thaw:
 err_smr_freeze:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_ispi8d_put(ispi8d);
 err_ispi8d_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -570,12 +410,10 @@ xwer_t xwds_ispi8d_rx(struct xwds_ispi8d * ispi8d, xwu8_t * buf, xwsz_t * size,
         SODS_VALIDATE(size, "nullptr", -EFAULT);
         SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_ispi8d_grab(ispi8d);
         if (__unlikely(rc < 0)) {
                 goto err_ispi8d_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         rc = xwosal_smr_timedwait(xwosal_smr_get_id(&ispi8d->rxq.smr), xwtm);
         if (__unlikely(rc < 0)) {
@@ -583,17 +421,12 @@ xwer_t xwds_ispi8d_rx(struct xwds_ispi8d * ispi8d, xwu8_t * buf, xwsz_t * size,
         }
         xwds_ispi8d_getdata(ispi8d, buf, size);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_ispi8d_put(ispi8d);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_smr_timedwait:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_ispi8d_put(ispi8d);
 err_ispi8d_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -621,12 +454,10 @@ xwer_t xwds_ispi8d_try_rx(struct xwds_ispi8d * ispi8d, xwu8_t * buf, xwsz_t * si
         SODS_VALIDATE(buf, "nullptr", -EFAULT);
         SODS_VALIDATE(size, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_ispi8d_grab(ispi8d);
         if (__unlikely(rc < 0)) {
                 goto err_ispi8d_grab;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         rc = xwosal_smr_trywait(xwosal_smr_get_id(&ispi8d->rxq.smr));
         if (__unlikely(rc < 0)) {
@@ -634,17 +465,12 @@ xwer_t xwds_ispi8d_try_rx(struct xwds_ispi8d * ispi8d, xwu8_t * buf, xwsz_t * si
         }
         xwds_ispi8d_getdata(ispi8d, buf, size);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_ispi8d_put(ispi8d);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_smr_trywait:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_ispi8d_put(ispi8d);
 err_ispi8d_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
@@ -725,7 +551,6 @@ xwer_t xwds_ispi8d_tx(struct xwds_ispi8d * ispi8d,
                 goto err_msgsize;
         }
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_ispi8d_grab(ispi8d);
         if (__unlikely(rc < 0)) {
                 goto err_ispi8d_grab;
@@ -734,7 +559,6 @@ xwer_t xwds_ispi8d_tx(struct xwds_ispi8d * ispi8d,
         if (__unlikely(rc < 0)) {
                 goto err_ispi8d_request;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&ispi8d->txmtx), xwtm);
         if (__unlikely(rc < 0)) {
@@ -774,12 +598,10 @@ xwer_t xwds_ispi8d_tx(struct xwds_ispi8d * ispi8d,
         xwosal_mtx_unlock(xwosal_mtx_get_id(&ispi8d->txmtx));
 
 err_ispi8d_lock:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_ispi8d_release(ispi8d);
 err_ispi8d_request:
         xwds_ispi8d_put(ispi8d);
 err_ispi8d_grab:
-#endif /* !XWMDCFG_ds_NANO */
 err_msgsize:
         return rc;
 }
@@ -808,7 +630,6 @@ xwer_t xwds_ispi8d_swcs(struct xwds_ispi8d * ispi8d, xwu8_t cs, xwtm_t * xwtm)
         SODS_VALIDATE(ispi8d, "nullptr", -EFAULT);
         SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         rc = xwds_ispi8d_grab(ispi8d);
         if (__unlikely(rc < 0)) {
                 goto err_ispi8d_grab;
@@ -817,7 +638,6 @@ xwer_t xwds_ispi8d_swcs(struct xwds_ispi8d * ispi8d, xwu8_t cs, xwtm_t * xwtm)
         if (__unlikely(rc < 0)) {
                 goto err_ispi8d_request;
         }
-#endif /* !XWMDCFG_ds_NANO */
 
         rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&ispi8d->txmtx), xwtm);
         if (__unlikely(rc < 0)) {
@@ -834,22 +654,17 @@ xwer_t xwds_ispi8d_swcs(struct xwds_ispi8d * ispi8d, xwu8_t cs, xwtm_t * xwtm)
         }
         xwosal_mtx_unlock(xwosal_mtx_get_id(&ispi8d->txmtx));
 
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_ispi8d_release(ispi8d);
         xwds_ispi8d_put(ispi8d);
-#endif /* !XWMDCFG_ds_NANO */
-
         return OK;
 
 err_drv_swcs:
         xwosal_mtx_unlock(xwosal_mtx_get_id(&ispi8d->txmtx));
 err_ispi8d_lock:
-#if !defined(XWMDCFG_ds_NANO) || (1 != XWMDCFG_ds_NANO)
         xwds_ispi8d_release(ispi8d);
 err_ispi8d_request:
         xwds_ispi8d_put(ispi8d);
 err_ispi8d_grab:
-#endif /* !XWMDCFG_ds_NANO */
         return rc;
 }
 
