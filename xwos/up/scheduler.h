@@ -103,7 +103,7 @@ struct xwos_sdobj_stack_info {
         const char * name; /**< 名字字符串 */
 };
 
-#if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
+#if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
 /**
  * @brief wakelock counter enumerations
  */
@@ -125,7 +125,7 @@ struct xwos_scheduler_lpm {
         void (* lpmntf_cb)(void *); /**< 所有线程都冻结后的通知回调函数 */
         void * arg; /**< 回调函数的参数 */
 };
-#endif /* XWUPCFG_SD_LPM */
+#endif /* XWUPCFG_SD_PM */
 
 /**
  * @brief xwos scheduler
@@ -151,9 +151,9 @@ struct xwos_scheduler {
         struct xwos_sdobj_stack_info bh; /**< 中断底半部任务的栈信息 */
 #endif /* XWUPCFG_SD_BH */
         struct xwos_tt tt; /**< 时间树 */
-#if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
+#if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
         struct xwos_scheduler_lpm lpm; /**< 调度器低功耗控制块 */
-#endif /* XWUPCFG_SD_LPM */
+#endif /* XWUPCFG_SD_PM */
         struct xwlib_bclst_head tcblist; /**< 链接本调度器中所有线程的链表头 */
         xwsz_t thrd_num; /**< 本调度器中的线程数量 */
 };

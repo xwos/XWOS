@@ -478,7 +478,7 @@ xwer_t xwos_thrd_exit_lic(struct xwos_tcb * tcb, xwer_t rc)
         xwos_cpuirq_disable_lc();
         xwlib_bclst_del_init(&tcb->tcbnode);
         xwsd->thrd_num--;
-#if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
+#if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
         if (xwsd->lpm.frz_thrd_cnt == xwsd->thrd_num) {
                 xwos_cpuirq_restore_lc(cpuirq);
                 xwos_scheduler_notify_lpm();
@@ -486,10 +486,10 @@ xwer_t xwos_thrd_exit_lic(struct xwos_tcb * tcb, xwer_t rc)
                 xwos_cpuirq_restore_lc(cpuirq);
                 xwos_scheduler_req_swcx();
         }
-#else /* XWUPCFG_SD_LPM */
+#else /* XWUPCFG_SD_PM */
         xwos_cpuirq_restore_lc(cpuirq);
         xwos_scheduler_req_swcx();
-#endif /* !XWUPCFG_SD_LPM */
+#endif /* !XWUPCFG_SD_PM */
 #else /* XWUPCFG_SD_THRD_EXIT */
         XWOS_UNUSED(tcb);
         XWOS_UNUSED(rc);
@@ -1280,7 +1280,7 @@ xwer_t xwos_cthrd_sleep(xwtm_t * xwtm)
                 currtick = xwos_syshwt_get_timetick(hwt);
                 expected = xwtm_add_safely(currtick, *xwtm);
                 xwlk_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
-#if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
+#if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
                 rc = xwos_scheduler_wakelock_lock();
                 if (__unlikely(rc < 0)) {
                         xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
@@ -1288,7 +1288,7 @@ xwer_t xwos_cthrd_sleep(xwtm_t * xwtm)
                            be frozen. So the blocking state needs to be interrupted. */
                         rc = -EINTR;
                 } else
-#endif /* XWUPCFG_SD_LPM */
+#endif /* XWUPCFG_SD_PM */
                 {
                         XWOS_BUG_ON((XWSDOBJ_DST_SLEEPING | XWSDOBJ_DST_READY |
                                      XWSDOBJ_DST_STANDBY | XWSDOBJ_DST_FROZEN)
@@ -1300,9 +1300,9 @@ xwer_t xwos_cthrd_sleep(xwtm_t * xwtm)
                         xwos_thrd_tt_add_locked(ctcb, xwtt, expected, cpuirq);
                         /* enable local CPU IRQ to enable schedule */
                         xwlk_sqlk_wr_unlock_cpuirq(&xwtt->lock);
-#if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
+#if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
                         xwos_scheduler_wakelock_unlock();
-#endif /* XWUPCFG_SD_LPM */
+#endif /* XWUPCFG_SD_PM */
                         xwos_scheduler_req_swcx();
                         xwos_cpuirq_restore_lc(cpuirq);
                         if (XWOS_TTN_WKUPRS_TIMEDOUT == ctcb->ttn.wkuprs) {
@@ -1354,7 +1354,7 @@ xwer_t xwos_cthrd_sleep_from(xwtm_t * origin, xwtm_t inc)
         hwt = &xwtt->hwt;
         expected = xwtm_add_safely(*origin, inc);
         xwlk_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
-#if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
+#if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
         rc = xwos_scheduler_wakelock_lock();
         if (__unlikely(rc < 0)) {
                 xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
@@ -1362,7 +1362,7 @@ xwer_t xwos_cthrd_sleep_from(xwtm_t * origin, xwtm_t inc)
                    be frozen. So the blocking state needs to be interrupted. */
                 rc = -EINTR;
         } else
-#endif /* XWUPCFG_SD_LPM */
+#endif /* XWUPCFG_SD_PM */
         {
                 XWOS_BUG_ON((XWSDOBJ_DST_SLEEPING | XWSDOBJ_DST_READY |
                              XWSDOBJ_DST_STANDBY | XWSDOBJ_DST_FROZEN)
@@ -1374,9 +1374,9 @@ xwer_t xwos_cthrd_sleep_from(xwtm_t * origin, xwtm_t inc)
                 xwos_thrd_tt_add_locked(ctcb, xwtt, expected, cpuirq);
                 /* enable local CPU IRQ to enable schedule */
                 xwlk_sqlk_wr_unlock_cpuirq(&xwtt->lock);
-#if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
+#if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
                 xwos_scheduler_wakelock_unlock();
-#endif /* XWUPCFG_SD_LPM */
+#endif /* XWUPCFG_SD_PM */
                 xwos_scheduler_req_swcx();
                 xwos_cpuirq_restore_lc(cpuirq);
                 if (XWOS_TTN_WKUPRS_TIMEDOUT == ctcb->ttn.wkuprs) {

@@ -91,10 +91,10 @@ xwer_t xwos_scheduler_check_swcx(struct xwos_tcb * t,
 static __xwos_code
 xwer_t xwos_scheduler_do_swcx(void);
 
-#if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
+#if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
 static __xwos_code
 xwer_t xwos_scheduler_thaw_allfrz_lic(void);
-#endif /* XWUPCFG_SD_LPM */
+#endif /* XWUPCFG_SD_PM */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -131,13 +131,13 @@ xwer_t xwos_scheduler_init(void)
         }
         xwos_rtrq_init(&xwsd->rq.rt);
         xwos_scheduler_init_idled();
-#if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
+#if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
         xwsd->lpm.wklkcnt = XWOS_SCHEDULER_WKLKCNT_UNLOCKED;
         xwsd->lpm.frz_thrd_cnt = 0;
         xwlib_bclst_init_head(&xwsd->lpm.frzlist);
         xwsd->lpm.lpmntf_cb = NULL;
         xwsd->lpm.arg = NULL;
-#endif /* XWUPCFG_SD_LPM */
+#endif /* XWUPCFG_SD_PM */
         rc = soc_scheduler_init(xwsd);
 err_tt_init:
         return rc;
@@ -858,7 +858,7 @@ void xwos_scheduler_intr_all(void)
         xwos_cpuirq_restore_lc(flag);
 }
 
-#if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
+#if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
 /**
  * @brief 设置低功耗回调函数
  * @param lpmntf_cb: (I) 回调函数的指针
@@ -1120,7 +1120,7 @@ bool xwos_scheduler_tst_lpm(void)
         return (XWOS_SCHEDULER_WKLKCNT_LPM == xwsd->lpm.wklkcnt);
 }
 
-#else /* XWUPCFG_SD_LPM */
+#else /* XWUPCFG_SD_PM */
 __xwos_code
 xwer_t xwos_scheduler_suspend_lic(struct xwos_scheduler * xwsd)
 {
@@ -1134,4 +1134,4 @@ xwer_t xwos_scheduler_resume_lic(struct xwos_scheduler * xwsd)
         XWOS_UNUSED(xwsd);
         return -ENOSYS;
 }
-#endif /* !XWUPCFG_SD_LPM */
+#endif /* !XWUPCFG_SD_PM */

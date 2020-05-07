@@ -403,13 +403,13 @@ xwer_t xwsync_plsmr_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_plsmr * smr,
 
         /* 调度 */
         xwos_cpuirq_enable_lc();
-#if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
+#if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
         xwos_scheduler_wakelock_unlock();
-#endif /* XWUPCFG_SD_LPM */
+#endif /* XWUPCFG_SD_PM */
         xwos_scheduler_req_swcx();
-#if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
+#if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
         xwos_scheduler_wakelock_lock();
-#endif /* XWUPCFG_SD_LPM */
+#endif /* XWUPCFG_SD_PM */
         xwos_cpuirq_restore_lc(flag);
 
         /* 判断唤醒原因 */
@@ -491,20 +491,20 @@ xwer_t xwsync_plsmr_do_timedwait(struct xwsync_plsmr * smr, struct xwos_tcb * tc
 
         xwos_cpuirq_save_lc(&flag);
         if (smr->vsmr.count <= 0) {
-#if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
+#if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
                 rc = xwos_scheduler_wakelock_lock();
                 if (__unlikely(rc < 0)) {
                         /* 系统准备进入低功耗模式，线程需被冻结，返回-EINTR*/
                         xwos_cpuirq_restore_lc(flag);
                         rc = -EINTR;
                 } else {
-#endif /* XWUPCFG_SD_LPM */
+#endif /* XWUPCFG_SD_PM */
                         rc = xwsync_plsmr_do_timedblkthrd_unlkwq_cpuirqrs(smr, tcb,
                                                                           xwtm, flag);
-#if defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM)
+#if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
                         xwos_scheduler_wakelock_unlock();
                 }
-#endif /* XWUPCFG_SD_LPM */
+#endif /* XWUPCFG_SD_PM */
         } else {
                 smr->vsmr.count--;
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)

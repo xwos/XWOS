@@ -57,7 +57,7 @@
   #define SOUPRULE_SD_WQ_RT                     0
 #endif
 
-#if (defined(XWUPCFG_SD_LPM) && (1 == XWUPCFG_SD_LPM))
+#if (defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM))
   #define SOUPRULE_SD_THRD_FREEZE               1
 #else
   #define SOUPRULE_SD_THRD_FREEZE               0
