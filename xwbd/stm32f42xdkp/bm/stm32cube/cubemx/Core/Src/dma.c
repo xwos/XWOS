@@ -62,6 +62,14 @@ void MX_DMA_Deinit(void)
   LL_AHB1_GRP1_DisableClock(LL_AHB1_GRP1_PERIPH_DMA2);
 }
 
+void MX_DMA_Suspend(void)
+{
+}
+
+void MX_DMA_Resume(void)
+{
+}
+
 /* USER CODE END 2 */
 
 /**

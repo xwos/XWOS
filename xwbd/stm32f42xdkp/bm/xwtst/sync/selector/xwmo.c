@@ -230,7 +230,7 @@ xwer_t bm_xwtst_sync_selector_wthrd_func(void * arg)
         smr3id = xwosal_smr_get_id(&xwtst_sync_smr3);
         slt4id = xwosal_selector_get_id(&xwtst_sync_slt4);
 
-        while (!xwosal_cthrd_shld_stop()) {
+        while (!xwosal_cthrd_frz_shld_stop(NULL)) {
                 msk[0] = BIT(1) | BIT(2) | BIT(3) | BIT(4) | BIT(5) | BIT(6);
                 xwbmpop_c0all(trg, XWOSAL_SELECTOR_MAXNUM);
                 rc = xwosal_selector_select(slt0id, msk, trg);

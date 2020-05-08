@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：设备栈
+ * @brief Board Module: Power Management
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -18,14 +18,19 @@
  * > limitations under the License.
  */
 
+#ifndef __bm_xwpm_xwmo_h__
+#define __bm_xwpm_xwmo_h__
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwmd/ds/xwds.h>
-#include <bm/stm32cube/xwds/stm32cube.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
+ ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-struct xwds stm32cube_ds;
+xwer_t bm_pm_start(void);
+
+xwer_t bm_pm_stop(void);
+
+#endif /* bm/xwpm/xwmo.h */

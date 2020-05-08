@@ -52,6 +52,7 @@
 #define BMCFG_stm32cube                         1
 #define BMCFG_lua                               1
 #define BMCFG_cxx                               1
+#define BMCFG_pm                                1
 #define BMCFG_xwpcp                             1
 #define BMCFG_xwtst_sync_semaphore              1
 #define BMCFG_xwtst_sync_condition              1

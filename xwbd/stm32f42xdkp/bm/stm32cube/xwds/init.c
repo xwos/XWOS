@@ -24,14 +24,11 @@
 #include <xwos/standard.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/bma.h>
-#include <xwos/smp/pm.h>
-#include <soc_xwpmdm.h>
-#include <xwmd/ds/pm.h>
+#include <xwmd/ds/xwds.h>
 #include <xwmd/ds/device.h>
 #include <xwmd/ds/soc/chip.h>
 #include <xwmd/ds/uart/dma.h>
 #include <bm/stm32cube/xwds/stm32cube.h>
-#include <bm/stm32cube/xwds/pm.h>
 #include <bm/stm32cube/xwds/init.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -64,8 +61,6 @@ xwer_t stm32cube_xwds_ll_init(void)
 
         /* Init device stack */
         xwds_init(&stm32cube_ds);
-        xwds_pm_init(&stm32cube_ds, &soc_xwpm_domain,
-                     stm32cube_suspend, stm32cube_resume);
 
         /* Start SOC device */
         rc = stm32cube_xwds_soc_start();

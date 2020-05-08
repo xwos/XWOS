@@ -332,7 +332,7 @@ xwer_t stm32cube_dmauartc1_drv_resume(struct xwds_device * dev)
 static
 xwer_t stm32cube_dmauartc1_drv_suspend(struct xwds_device * dev)
 {
-  return stm32cube_dmauartc1_drv_suspend(dev);
+  return stm32cube_dmauartc1_drv_stop(dev);
 }
 #endif /* XWMDCFG_ds_PM */
 

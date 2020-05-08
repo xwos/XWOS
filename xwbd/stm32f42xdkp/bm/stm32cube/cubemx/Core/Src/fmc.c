@@ -36,10 +36,10 @@
 static
 void MX_SDRAM_Delay(uint32_t n)
 {
-        uint32_t i = 0;
+  uint32_t i = 0;
 
-        for(i = (100000 * n); i != 0; i--) {
-        }
+  for(i = (100000 * n); i != 0; i--) {
+  }
 }
 
 static
@@ -48,56 +48,86 @@ xwer_t MX_SDRAM_Send_Cmd(uint32_t cmd,
                          uint32_t refresh_num,
                          uint32_t modreg)
 {
-        FMC_SDRAM_CommandTypeDef sdram_cmd;
-        xwer_t rc;
+  FMC_SDRAM_CommandTypeDef sdram_cmd;
+  xwer_t rc;
 
-        sdram_cmd.CommandMode = cmd;
-        sdram_cmd.CommandTarget = bank;
-        sdram_cmd.AutoRefreshNumber = refresh_num;
-        sdram_cmd.ModeRegisterDefinition = modreg;
+  sdram_cmd.CommandMode = cmd;
+  sdram_cmd.CommandTarget = bank;
+  sdram_cmd.AutoRefreshNumber = refresh_num;
+  sdram_cmd.ModeRegisterDefinition = modreg;
 
-        if (HAL_SDRAM_SendCommand(&hsdram2, &sdram_cmd, 0x1000) == HAL_OK) {
-                rc = OK;
-        } else {
-                rc = -EIO;
-        }
-        return rc;
+  if (HAL_SDRAM_SendCommand(&hsdram2, &sdram_cmd, 0x1000) == HAL_OK) {
+          rc = OK;
+  } else {
+          rc = -EIO;
+  }
+  return rc;
 }
 
 void MX_SDRAM_Init(void)
 {
-        MX_FMC_Init();
+  MX_FMC_Init();
 
-        MX_SDRAM_Send_Cmd(FMC_SDRAM_CMD_CLK_ENABLE,
-                          FMC_SDRAM_CMD_TARGET_BANK2,
-                          1,
-                          XWOS_UNUSED_ARGUMENT);
-        MX_SDRAM_Delay(1);
-        MX_SDRAM_Send_Cmd(FMC_SDRAM_CMD_PALL,
-                          FMC_SDRAM_CMD_TARGET_BANK2,
-                          1,
-                          XWOS_UNUSED_ARGUMENT);
-        MX_SDRAM_Send_Cmd(FMC_SDRAM_CMD_AUTOREFRESH_MODE,
-                          FMC_SDRAM_CMD_TARGET_BANK2,
-                          8,
-                          XWOS_UNUSED_ARGUMENT);
+  MX_SDRAM_Send_Cmd(FMC_SDRAM_CMD_CLK_ENABLE,
+                    FMC_SDRAM_CMD_TARGET_BANK2,
+                    1,
+                    XWOS_UNUSED_ARGUMENT);
+  MX_SDRAM_Delay(1);
 
-        xwu32_t modreg = SDRAM_MODEREG_BURST_LENGTH_2 |
-                         SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL |
-                         SDRAM_MODEREG_CAS_LATENCY_3 |
-                         SDRAM_MODEREG_OPERATING_MODE_STANDARD |
-                         SDRAM_MODEREG_WRITEBURST_MODE_SINGLE;
+  MX_SDRAM_Send_Cmd(FMC_SDRAM_CMD_PALL,
+                    FMC_SDRAM_CMD_TARGET_BANK2,
+                    1,
+                    XWOS_UNUSED_ARGUMENT);
+  MX_SDRAM_Delay(1);
 
-        MX_SDRAM_Send_Cmd(FMC_SDRAM_CMD_LOAD_MODE,
-                          FMC_SDRAM_CMD_TARGET_BANK2,
-                          1, modreg);
+  MX_SDRAM_Send_Cmd(FMC_SDRAM_CMD_AUTOREFRESH_MODE,
+                    FMC_SDRAM_CMD_TARGET_BANK2,
+                    8,
+                    XWOS_UNUSED_ARGUMENT);
 
-        HAL_SDRAM_ProgramRefreshRate(&hsdram2, 1292);
+  xwu32_t modreg = SDRAM_MODEREG_BURST_LENGTH_2 |
+                   SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL |
+                   SDRAM_MODEREG_CAS_LATENCY_3 |
+                   SDRAM_MODEREG_OPERATING_MODE_STANDARD |
+                   SDRAM_MODEREG_WRITEBURST_MODE_SINGLE;
+
+  MX_SDRAM_Send_Cmd(FMC_SDRAM_CMD_LOAD_MODE,
+                    FMC_SDRAM_CMD_TARGET_BANK2,
+                    1, modreg);
+
+  HAL_SDRAM_ProgramRefreshRate(&hsdram2, 1292);
 }
 
 void MX_SDRAM_Deinit(void)
 {
-        HAL_SDRAM_DeInit(&hsdram2);
+  HAL_SDRAM_DeInit(&hsdram2);
+}
+
+void MX_SDRAM_Suspend(void)
+{
+  MX_SDRAM_Send_Cmd(FMC_SDRAM_CMD_SELFREFRESH_MODE,
+                    FMC_SDRAM_CMD_TARGET_BANK2,
+                    1,
+                    XWOS_UNUSED_ARGUMENT);
+  MX_SDRAM_Delay(1);
+
+  HAL_SDRAM_ProgramRefreshRate(&hsdram2, 0);
+}
+
+void MX_SDRAM_Resume(void)
+{
+  MX_SDRAM_Send_Cmd(FMC_SDRAM_CMD_NORMAL_MODE,
+                    FMC_SDRAM_CMD_TARGET_BANK2,
+                    1,
+                    XWOS_UNUSED_ARGUMENT);
+  MX_SDRAM_Delay(1);
+
+  MX_SDRAM_Send_Cmd(FMC_SDRAM_CMD_AUTOREFRESH_MODE,
+                    FMC_SDRAM_CMD_TARGET_BANK2,
+                    8,
+                    XWOS_UNUSED_ARGUMENT);
+
+  HAL_SDRAM_ProgramRefreshRate(&hsdram2, 1292);
 }
 
 /* USER CODE END 0 */

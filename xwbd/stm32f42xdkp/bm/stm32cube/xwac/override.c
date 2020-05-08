@@ -46,14 +46,15 @@ void stm32cube_override_placeholder_stub(void)
 {
         /* Placeholder */
         /* LD连接静态库(.a)时，GC是以.c文件为单位，若文件中全是override
-           的函数，会被GCC认为.c文件中所有符号都没有被使用而被GC掉，因此
+           的函数，会被gcc认为.c文件中所有符号都没有被使用而被GC掉，因此
            写一个占位函数，并在init中调用。 */
 }
 
 void HAL_MspInit(void)
 {
         /* bm/stm32cube/cubemx/Core/Src/stm32f4xx_hal_msp.c中只有一个override函数，
-           静态连接时整个文件会被GC掉，因此需要重新在此文件中定义一次。*/
+           当以.a静态库连接时，整个.c文件会被GC掉，因此需要重新在此文件中定义一次。
+           顺便删除一些不必要的语句。 */
         __HAL_RCC_SYSCFG_CLK_ENABLE();
         __HAL_RCC_PWR_CLK_ENABLE();
 
@@ -81,6 +82,9 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 
 uint32_t HAL_GetTick(void)
 {
+        /* 玄武OS在ARMv7m架构中使用systick作为系统的滴答定时器，与STM32Cube HAL
+           中冲突。但HAL中关于Systick的函数都是override属性的，可以基于玄武OS
+           的系统接口重新实现。 */
         return (uint32_t)xwosal_scheduler_get_tickcount_lc();
 }
 

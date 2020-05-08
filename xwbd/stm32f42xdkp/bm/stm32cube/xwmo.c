@@ -25,9 +25,7 @@
 #include <xwos/mm/mempool/allocator.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
-#include <xwos/osal/sync/semaphore.h>
 #include <xwmd/ds/soc/gpio.h>
-#include <xwmd/ds/soc/eirq.h>
 #include <bm/stm32cube/xwds/stm32cube.h>
 #include <bm/stm32cube/xwds/init.h>
 #include <bm/stm32cube/xwmo.h>
@@ -37,32 +35,19 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define LED_TASK_PRIORITY \
         (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 1))
-#define BUTTON_TASK_PRIORITY \
-        (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 2))
 
 #define MEMTST_TASK_PRIORITY \
         (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 3))
 
-#define BUTTON_GPIO_PORT SODS_GPIO_PORT_I
-#define BUTTON_GPIO_PIN SODS_GPIO_PIN_8
-#define BUTTON_DEBOUNCING_DELAY (20 * XWTM_MS)
-
 #define BLUE_LED_GPIO_PORT SODS_GPIO_PORT_D
 #define BLUE_LED_GPIO_PIN SODS_GPIO_PIN_12
-
-#define GREEN_LED_GPIO_PORT SODS_GPIO_PORT_G
-#define GREEN_LED_GPIO_PIN SODS_GPIO_PIN_7
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t led_task(void * arg);
 
-xwer_t button_task(void * arg);
-
 xwer_t memtst_task(void * arg);
-
-void eirq_button_isr(struct xwds_soc * soc, xwid_t id, xwds_eirq_arg_t arg);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
@@ -78,15 +63,6 @@ const struct xwosal_thrd_desc stm32cube_tbd[] = {
                 .attr = XWSDOBJ_ATTR_PRIVILEGED,
         },
         [1] = {
-                .name = "task.button",
-                .prio = BUTTON_TASK_PRIORITY,
-                .stack = NULL,
-                .stack_size = 2048,
-                .func = button_task,
-                .arg = NULL,
-                .attr = XWSDOBJ_ATTR_PRIVILEGED,
-        },
-        [2] = {
                 .name = "task.memtst",
                 .prio = MEMTST_TASK_PRIORITY,
                 .stack = NULL,
@@ -98,8 +74,6 @@ const struct xwosal_thrd_desc stm32cube_tbd[] = {
 };
 
 xwid_t stm32cube_tid[xw_array_size(stm32cube_tbd)];
-
-struct xwosal_smr button_smr;
 
 extern struct xwmm_mempool * eram_mempool;
 
@@ -115,11 +89,6 @@ xwer_t bm_stm32cube_start(void)
         rc = stm32cube_xwds_uart_start();
         if (rc < 0) {
                 goto err_xwds_uart_start;
-        }
-
-        rc = xwosal_smr_init(&button_smr, 0, XWSSQ_MAX);
-        if (rc < 0) {
-                goto err_button_smr_init;
         }
 
         /* start thread */
@@ -138,7 +107,6 @@ xwer_t bm_stm32cube_start(void)
         return OK;
 
 err_thrd_create:
-err_button_smr_init:
         stm32cube_xwds_uart_stop();
 err_xwds_uart_start:
         return rc;
@@ -151,12 +119,20 @@ xwer_t led_task(void * arg)
 
         XWOS_UNUSED(arg);
 
-        rc = xwds_gpio_req(&stm32cube_soc_cb, BLUE_LED_GPIO_PORT, BLUE_LED_GPIO_PIN);
+        rc = xwds_gpio_req(&stm32cube_soc_cb,
+                           BLUE_LED_GPIO_PORT, BLUE_LED_GPIO_PIN);
         if (rc < 0) {
                 goto err_gpio_req;
         }
 
-        while (!xwosal_cthrd_frz_shld_stop(NULL)) {
+        while (!xwosal_cthrd_shld_stop()) {
+                if (xwosal_cthrd_shld_frz()) {
+                        rc = xwds_gpio_rls(&stm32cube_soc_cb,
+                                           BLUE_LED_GPIO_PORT, BLUE_LED_GPIO_PIN);
+                        rc = xwosal_cthrd_freeze();
+                        rc = xwds_gpio_req(&stm32cube_soc_cb,
+                                           BLUE_LED_GPIO_PORT, BLUE_LED_GPIO_PIN);
+                }
                 xwds_gpio_set(&stm32cube_soc_cb,
                               BLUE_LED_GPIO_PORT, BLUE_LED_GPIO_PIN);
                 xwtm = 1 * XWTM_S;
@@ -170,104 +146,6 @@ xwer_t led_task(void * arg)
 
 err_gpio_req:
         return rc;
-}
-
-static
-xwer_t button_task_fsm(void)
-{
-        xwer_t rc;
-        xwsq_t in;
-        xwtm_t sleep;
-        xwsq_t cnt;
-
-        sleep = BUTTON_DEBOUNCING_DELAY;
-        rc = xwosal_cthrd_sleep(&sleep);
-        if (__unlikely(rc < 0)) {
-                goto err_sleep;
-        }
-
-        xwds_gpio_input(&stm32cube_soc_cb,
-                        BUTTON_GPIO_PORT,
-                        BUTTON_GPIO_PIN,
-                        &in);
-
-        if (0 == in) {
-                cnt = 0;
-                while (true) {
-                        sleep = BUTTON_DEBOUNCING_DELAY;
-                        rc = xwosal_cthrd_sleep(&sleep);
-                        if (__unlikely(rc < 0)) {
-                                goto err_sleep;
-                        }
-
-                        xwds_gpio_input(&stm32cube_soc_cb,
-                                        BUTTON_GPIO_PORT,
-                                        BUTTON_GPIO_PIN,
-                                        &in);
-
-                        if (in) {
-                                break;
-                        }
-                        cnt++;
-                }
-                xwds_gpio_toggle(&stm32cube_soc_cb,
-                                 GREEN_LED_GPIO_PORT, GREEN_LED_GPIO_PIN);
-        } else {
-        }
-
-err_sleep:
-        return rc;
-}
-
-xwer_t button_task(void * arg)
-{
-        xwer_t rc;
-        xwid_t smrid;
-
-        XWOS_UNUSED(arg);
-        smrid = xwosal_smr_get_id(&button_smr);
-
-        rc = xwds_gpio_req(&stm32cube_soc_cb,
-                           GREEN_LED_GPIO_PORT, GREEN_LED_GPIO_PIN);
-        if (rc < 0) {
-                goto err_led_gpio_req;
-        }
-        rc = xwds_gpio_req(&stm32cube_soc_cb,
-                           BUTTON_GPIO_PORT, BUTTON_GPIO_PIN);
-        if (rc < 0) {
-                goto err_button_gpio_req;
-        }
-
-        rc = xwds_eirq_req(&stm32cube_soc_cb, BUTTON_GPIO_PORT, BUTTON_GPIO_PIN,
-                           8, SODS_SOC_EIF_TM_FALLING,
-                           eirq_button_isr, &button_smr);
-        if (__unlikely(rc < 0)) {
-                goto err_eirq_req;
-        }
-
-        while (!xwosal_cthrd_frz_shld_stop(NULL)) {
-                rc = xwosal_smr_wait(smrid);
-                if (OK == rc) {
-                        button_task_fsm();
-                }
-        }
-        return OK;
-
-err_eirq_req:
-err_button_gpio_req:
-err_led_gpio_req:
-        return rc;
-}
-
-void eirq_button_isr(struct xwds_soc * soc, xwid_t id, xwds_eirq_arg_t arg)
-{
-        xwid_t smrid;
-
-        XWOS_UNUSED(soc);
-        XWOS_UNUSED(id);
-
-        smrid = xwosal_smr_get_id(&button_smr);
-        xwosal_smr_post(smrid);
 }
 
 xwer_t memtst_task(void * arg)

@@ -26,6 +26,7 @@
 #include <xwos/osal/thread.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/xwmo.h>
+#include <bm/pm/xwmo.h>
 #include <bm/lua/xwmo.h>
 #include <bm/cxx/xwmo.h>
 #include <bm/xwpcp/xwmo.h>
@@ -93,10 +94,14 @@ xwer_t bdl_init_thrd(void * arg)
 
         XWOS_UNUSED(arg);
 
-        /* stm32cube init */
         rc = bm_stm32cube_start();
         if (rc < 0) {
                 goto bm_stm32cube_start;
+        }
+
+        rc = bm_pm_start();
+        if (rc < 0) {
+                goto bm_pm_start;
         }
 
         rc = bm_xwlua_start();
@@ -113,22 +118,27 @@ xwer_t bdl_init_thrd(void * arg)
         if (rc < 0) {
                 goto err_bm_xwpcp_start;
         }
-
+/*
         rc = bm_xwtst_sync_selector_start();
         if (rc < 0) {
                 goto err_bm_xwtst_sync_selector_start;
         }
+*/
 
         xwosal_thrd_delete(bdl_init_thrd_id);
         return OK;
 
+/*
 err_bm_xwtst_sync_selector_start:
         BDL_BUG();
+*/
 err_bm_xwpcp_start:
         BDL_BUG();
 err_bm_cxx_start:
         BDL_BUG();
 err_bm_xwlua_start:
+        BDL_BUG();
+bm_pm_start:
         BDL_BUG();
 bm_stm32cube_start:
         BDL_BUG();

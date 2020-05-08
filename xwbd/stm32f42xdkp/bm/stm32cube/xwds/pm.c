@@ -22,8 +22,11 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
+#include <xwmd/ds/xwds.h>
 #include <stm32f4xx_ll_cortex.h>
 #include <stm32f4xx_ll_pwr.h>
+#include <bm/stm32cube/cubemx/Core/Inc/main.h>
+#include <bm/stm32cube/xwds/stm32cube.h>
 #include <bm/stm32cube/xwac/init.h>
 #include <bm/stm32cube/xwds/pm.h>
 
@@ -32,8 +35,10 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      static function prototypes     ******** ********
+ ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+extern
+void SystemClock_Config(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
@@ -42,18 +47,27 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-void stm32cube_suspend(struct xwds * ds)
+void stm32cube_suspend(void)
 {
-        XWOS_UNUSED(ds);
+        xwirq_t irq;
+        __maybe_unused xwer_t rc;
+
+        rc = xwos_irq_get_id(&irq);
+        xwds_pm_suspend(&stm32cube_ds);
         LL_PWR_SetPowerMode(LL_PWR_MODE_STOP_LPREGU);
         LL_LPM_EnableDeepSleep();
         wfi();
 }
 
-void stm32cube_resume(struct xwds * ds)
+void stm32cube_resume(void)
 {
-        XWOS_UNUSED(ds);
-        stm32cube_lowlevel_init();
+        xwirq_t irq;
+        __maybe_unused xwer_t rc;
+
+        /* 从STOP模式恢复后，需要重新配置时钟 */
+        SystemClock_Config();
+        rc = xwos_irq_get_id(&irq);
         LL_LPM_EnableSleep();
         LL_PWR_SetPowerMode(LL_PWR_MODE_STOP_MAINREGU);
+        xwds_pm_resume(&stm32cube_ds);
 }
