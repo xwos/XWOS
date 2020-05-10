@@ -41,9 +41,13 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-void stm32cube_suspend(void);
+void stm32cube_pm_resume(void);
 
-void stm32cube_resume(void);
+void stm32cube_pm_suspend(void);
+
+void stm32cube_pm_wakeup(void);
+
+void stm32cube_pm_sleep(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********  inline functions implementations   ******** ********

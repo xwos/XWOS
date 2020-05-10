@@ -41,6 +41,10 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macro       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+#define __xw_i  volatile const /**< 'read only' structure member permissions */
+#define __xw_o  volatile       /**< 'write only' structure member permissions */
+#define __xw_io volatile       /**< 'read/write' structure member permissions */
+
 #define GCC_VERSION             (__GNUC__ * 10000  +            \
                                  __GNUC_MINOR__ * 100 +         \
                                  __GNUC_PATCHLEVEL__)

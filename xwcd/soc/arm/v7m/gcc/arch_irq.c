@@ -39,8 +39,8 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      macros       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define ARCH_IRQ_FAULT_PRIO     (ARCH_IRQ_PRIO_7 | ARCH_IRQ_SUBPRIO_LOW)
-#define ARCH_IRQ_SVC_PRIO       (ARCH_IRQ_PRIO_6 | ARCH_IRQ_SUBPRIO_LOW)
+#define ARCH_IRQ_FAULT_PRIO     (ARCH_IRQ_PRIO_7 | ARCH_IRQ_SUBPRIO_HIGH)
+#define ARCH_IRQ_SVC_PRIO       (ARCH_IRQ_PRIO_7 | ARCH_IRQ_SUBPRIO_LOW)
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -250,13 +250,7 @@ void arch_isr_svc(void)
         __asm__ volatile("      pop     {r0, lr}");
         __asm__ volatile("      str     r1, [r0, #0]"); /* save the return value */
         __asm__ volatile("      bx      lr");
-        __asm__ volatile("svc_6:"); /* case 6: thaw thread */
-        __asm__ volatile("      push    {r0, lr}");
-        __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 value: ctcb */
-        __asm__ volatile("      bl      xwos_thrd_thaw_lic");
-        __asm__ volatile("      mov     r1, r0");
-        __asm__ volatile("      pop     {r0, lr}");
-        __asm__ volatile("      str     r1, [r0, #0]"); /* save the return value */
+        __asm__ volatile("svc_6:"); /* case 6: */
         __asm__ volatile("      bx      lr");
         __asm__ volatile("svc_7:"); /* case 7: thread exits */
         __asm__ volatile("      push    {r0, lr}");

@@ -103,27 +103,45 @@ struct xwos_sdobj_stack_info {
         const char * name; /**< 名字字符串 */
 };
 
-#if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
 /**
  * @brief wakelock counter enumerations
  */
 enum xwos_scheduler_wakelock_cnt_em {
-        XWOS_SCHEDULER_WKLKCNT_LPM = 0, /**< 调度器正在暂停 */
-        XWOS_SCHEDULER_WKLKCNT_UNLOCKED, /**< 唤醒锁：未加锁 */
+        XWOS_SCHEDULER_WKLKCNT_SUSPENDED = 0, /**< 调度器已暂停 */
+        XWOS_SCHEDULER_WKLKCNT_SUSPENDING, /**< 调度器正在暂停 */
+        XWOS_SCHEDULER_WKLKCNT_RESUMING = XWOS_SCHEDULER_WKLKCNT_SUSPENDING,
+        XWOS_SCHEDULER_WKLKCNT_ALLFRZ, /**< 调度器所有线程已冻结 */
+        XWOS_SCHEDULER_WKLKCNT_FREEZING, /**< 正在冻结线程 */
+        XWOS_SCHEDULER_WKLKCNT_THAWING = XWOS_SCHEDULER_WKLKCNT_FREEZING,
+        XWOS_SCHEDULER_WKLKCNT_RUNNING, /**< 正常运行 */
+        XWOS_SCHEDULER_WKLKCNT_UNLOCKED = XWOS_SCHEDULER_WKLKCNT_RUNNING,
+                                        /**< 唤醒锁：未加锁 */
         XWOS_SCHEDULER_WKLKCNT_LOCKED, /**< 唤醒锁：已加锁 */
 };
 
+#if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
+typedef void (* xwos_scheduler_pm_cb_f)(void *); /**< 电源管理领域回调函数 */
+
 /**
- * @brief 调度器低功耗控制块
+ * @brief 电源管理回调函数集合
  */
-struct xwos_scheduler_lpm {
-        xwsq_t wklkcnt; /**< - == 0: 进入休眠
-                             - == 1: 可申请进入休眠
-                             - > 1: 不可休眠   */
+struct xwos_scheduler_pm_callback {
+        xwos_scheduler_pm_cb_f resume; /**< 电源管理领域从暂停模式恢复的回调函数 */
+        xwos_scheduler_pm_cb_f suspend; /**< 电源管理领域进入暂停模式的回调函数 */
+        xwos_scheduler_pm_cb_f wakeup; /**< 唤醒电源管理领域的回调函数 */
+        xwos_scheduler_pm_cb_f sleep; /**< 电源管理领域休眠的回调函数 */
+        void * arg; /**< 各回调函数的参数 */
+};
+
+/**
+ * @brief 调度器电源管理控制块
+ */
+struct xwos_scheduler_pm {
+        __xw_io xwsq_t wklkcnt; /**< 唤醒锁，
+                                     取值@ref xwos_scheduler_wakelock_cnt_em */
         xwsz_t frz_thrd_cnt; /**< 已冻结的线程计数器 */
         struct xwlib_bclst_head frzlist; /**< 已冻结的线程链表 */
-        void (* lpmntf_cb)(void *); /**< 所有线程都冻结后的通知回调函数 */
-        void * arg; /**< 回调函数的参数 */
+        struct xwos_scheduler_pm_callback cb; /**< 电源管理回调函数集合 */
 };
 #endif /* XWUPCFG_SD_PM */
 
@@ -152,7 +170,7 @@ struct xwos_scheduler {
 #endif /* XWUPCFG_SD_BH */
         struct xwos_tt tt; /**< 时间树 */
 #if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
-        struct xwos_scheduler_lpm lpm; /**< 调度器低功耗控制块 */
+        struct xwos_scheduler_pm pm; /**< 调度器低功耗控制块 */
 #endif /* XWUPCFG_SD_PM */
         struct xwlib_bclst_head tcblist; /**< 链接本调度器中所有线程的链表头 */
         xwsz_t thrd_num; /**< 本调度器中的线程数量 */
@@ -192,7 +210,7 @@ __xwos_code
 void xwos_scheduler_intr_all(void);
 
 __xwos_code
-xwer_t xwos_scheduler_notify_lpm(void);
+xwer_t xwos_scheduler_notify_allfrz_lic(void);
 
 /******** XWOS Lib for BSP Adaptation Code ********/
 __xwos_code
@@ -209,9 +227,6 @@ xwer_t xwos_scheduler_suspend_lic(struct xwos_scheduler * xwsd);
 
 __xwos_code
 xwer_t xwos_scheduler_resume_lic(struct xwos_scheduler * xwsd);
-
-__xwos_code
-void xwos_scheduler_set_lpmntf_cb(void (* lpmntf_cb)(void *), void * arg);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ********       internal inline function implementations        ********
@@ -260,13 +275,20 @@ __xwos_api
 struct xwos_scheduler * xwos_scheduler_enpmpt_lc(void);
 
 __xwos_api
+void xwos_scheduler_set_pm_cb(xwos_scheduler_pm_cb_f resume_cb,
+                              xwos_scheduler_pm_cb_f suspend_cb,
+                              xwos_scheduler_pm_cb_f wakeup_cb,
+                              xwos_scheduler_pm_cb_f sleep_cb,
+                              void * arg);
+
+__xwos_api
 xwer_t xwos_scheduler_suspend(void);
 
 __xwos_api
 xwer_t xwos_scheduler_resume(void);
 
 __xwos_api
-bool xwos_scheduler_tst_lpm(void);
+xwsq_t xwos_scheduler_get_pm_state(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      inline API implementations     ******** ********

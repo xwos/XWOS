@@ -46,6 +46,10 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macro       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+#define __xw_i  volatile const /**< 'read only' structure member permissions */
+#define __xw_o  volatile       /**< 'write only' structure member permissions */
+#define __xw_io volatile       /**< 'read/write' structure member permissions */
+
 #define CWCC_VERSION            __VERSION__
 
 #define __section(s)            __declspec(section #s)

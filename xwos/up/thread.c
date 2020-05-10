@@ -479,9 +479,9 @@ xwer_t xwos_thrd_exit_lic(struct xwos_tcb * tcb, xwer_t rc)
         xwlib_bclst_del_init(&tcb->tcbnode);
         xwsd->thrd_num--;
 #if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
-        if (xwsd->lpm.frz_thrd_cnt == xwsd->thrd_num) {
+        if (xwsd->pm.frz_thrd_cnt == xwsd->thrd_num) {
                 xwos_cpuirq_restore_lc(cpuirq);
-                xwos_scheduler_notify_lpm();
+                xwos_scheduler_notify_allfrz_lic();
         } else {
                 xwos_cpuirq_restore_lc(cpuirq);
                 xwos_scheduler_req_swcx();
@@ -1435,12 +1435,12 @@ xwer_t xwos_thrd_freeze_lic(struct xwos_tcb * tcb)
         xwos_cpuirq_save_lc(&cpuirq);
         xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_RUNNING);
         xwbop_s1m(xwsq_t, &tcb->state, XWSDOBJ_DST_FROZEN);
-        xwsd->lpm.frz_thrd_cnt++;
-        xwlib_bclst_add_tail(&xwsd->lpm.frzlist, &tcb->frznode);
+        xwsd->pm.frz_thrd_cnt++;
+        xwlib_bclst_add_tail(&xwsd->pm.frzlist, &tcb->frznode);
         xwos_scheduler_enpmpt_lc();
-        if (xwsd->lpm.frz_thrd_cnt == xwsd->thrd_num) {
+        if (xwsd->pm.frz_thrd_cnt == xwsd->thrd_num) {
                 xwos_cpuirq_restore_lc(cpuirq);
-                xwos_scheduler_notify_lpm();
+                xwos_scheduler_notify_allfrz_lic();
         } else {
                 xwos_cpuirq_restore_lc(cpuirq);
                 xwos_scheduler_req_swcx();
@@ -1469,7 +1469,7 @@ xwer_t xwos_thrd_thaw_lic(struct xwos_tcb * tcb)
         xwos_cpuirq_save_lc(&cpuirq);
         XWOS_BUG_ON(!(XWSDOBJ_DST_FROZEN & tcb->state));
         xwlib_bclst_del_init(&tcb->frznode);
-        xwsd->lpm.frz_thrd_cnt--;
+        xwsd->pm.frz_thrd_cnt--;
         xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_FROZEN);
         rc = xwos_thrd_rq_add_tail(tcb);
         xwos_cpuirq_restore_lc(cpuirq);
@@ -1494,7 +1494,7 @@ __xwos_api
 bool xwos_cthrd_shld_frz(void)
 {
 #if (1 == SOUPRULE_SD_THRD_FREEZE)
-        return xwos_scheduler_tst_lpm();
+        return !!(xwos_scheduler_get_pm_state() < XWOS_SCHEDULER_WKLKCNT_RUNNING);
 #else /* (1 == SOUPRULE_SD_THRD_FREEZE) */
         return false;
 #endif /* !(1 == SOUPRULE_SD_THRD_FREEZE) */

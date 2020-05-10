@@ -261,14 +261,7 @@ void arch_isr_svc(void)
         __asm__ volatile("      str     r2, [r0, #0]"); /* save the return value */
         __asm__ volatile("      mov     lr, r1");
         __asm__ volatile("      bx      lr");
-        __asm__ volatile("svc_6:"); /* case 6: thaw thread */
-        __asm__ volatile("      push    {r0, lr}");
-        __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 value */
-        __asm__ volatile("      bl      xwos_thrd_thaw_lic");
-        __asm__ volatile("      mov     r2, r0");
-        __asm__ volatile("      pop     {r0, r1}");
-        __asm__ volatile("      str     r2, [r0, #0]"); /* save the return value */
-        __asm__ volatile("      mov     lr, r1");
+        __asm__ volatile("svc_6:"); /* case 6: */
         __asm__ volatile("      bx      lr");
         __asm__ volatile("svc_7:"); /* case 7: thread exits */
         __asm__ volatile("      push    {r0, lr}");

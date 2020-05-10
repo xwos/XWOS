@@ -158,18 +158,6 @@ xwer_t soc_thrd_freeze_lc(__maybe_unused struct xwos_tcb * tcb)
         "       bx      lr\n");
 }
 
-/**
- * @brief SOC Adapter Function：解冻线程
- * @param tcb: (I) 线程控制块对象的指针
- */
-__xwbsp_code __naked
-xwer_t soc_thrd_thaw(__maybe_unused struct xwos_tcb * tcb)
-{
-        __asm__ volatile(
-        "       svc     6\n"
-        "       bx      lr\n");
-}
-
 #if defined(XuanWuOS_CFG_CORE__smp)
 /**
  * @brief SOC Adapter Function：将线程迁出其他CPU，并准备迁入其他CPU

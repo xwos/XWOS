@@ -110,18 +110,21 @@ struct xwos_sdobj_stack_info {
  * @brief 调度器唤醒锁状态枚举
  */
 enum xwos_scheduler_wakelock_cnt_em {
-        XWOS_SCHEDULER_WKLKCNT_LPM = 0, /**< 调度器正在暂停 */
+        XWOS_SCHEDULER_WKLKCNT_SUSPENDED = 0, /**< 调度器已暂停 */
+        XWOS_SCHEDULER_WKLKCNT_ALLFRZ, /**< 调度器所有线程已冻结 */
+        XWOS_SCHEDULER_WKLKCNT_FREEZING, /**< 调度器正在暂停 */
+        XWOS_SCHEDULER_WKLKCNT_THAWING = XWOS_SCHEDULER_WKLKCNT_FREEZING,
+                                           /**< 调度器正在恢复 */
         XWOS_SCHEDULER_WKLKCNT_UNLOCKED, /**< 唤醒锁：未加锁 */
-        XWOS_SCHEDULER_WKLKCNT_ULOCKED, /**< 唤醒锁：已加锁 */
+        XWOS_SCHEDULER_WKLKCNT_LOCKED, /**< 唤醒锁：已加锁 */
 };
 
 /**
- * @brief 调度器低功耗控制块
+ * @brief 调度器电源管理控制块
  */
-struct xwos_scheduler_lpm {
-        __atomic xwsq_t wklkcnt; /**< - == 0: 进入休眠
-                                      - == 1: 可申请进入休眠
-                                      - > 1: 不可休眠   */
+struct xwos_scheduler_pm {
+        __atomic xwsq_t wklkcnt; /**< 唤醒锁，
+                                      取值@ref xwos_scheduler_wakelock_cnt_em */
         xwsz_t frz_thrd_cnt; /**< 已冻结的线程计数器 */
         struct xwlib_bclst_head frzlist; /**< 已冻结的线程链表 */
         struct xwlk_splk lock; /**< 保护链表和计数器的锁 */
@@ -154,7 +157,7 @@ struct __aligned_l1cacheline xwos_scheduler {
 #endif /* XWSMPCFG_SD_BH */
         struct xwos_tt tt; /**< 时间树 */
         struct xwlk_splk cxlock; /**< 上下文切换的锁 */
-        struct xwos_scheduler_lpm lpm; /**< 调度器低功耗控制块 */
+        struct xwos_scheduler_pm pm; /**< 调度器电源管理控制块 */
 
         struct xwlib_bclst_head tcblist; /**< 链接本调度器中所有线程的链表头 */
         xwsz_t thrd_num; /**< 本调度器中的线程数量 */
@@ -215,7 +218,7 @@ __xwos_code
 xwer_t xwos_scheduler_dec_wklkcnt(struct xwos_scheduler * xwsd);
 
 __xwos_code
-xwer_t xwos_scheduler_notify_allfrz(struct xwos_scheduler * xwsd);
+xwer_t xwos_scheduler_notify_allfrz_lic(struct xwos_scheduler * xwsd);
 
 /******** XWOS Lib for BSP Adaptation Code ********/
 __xwos_code
@@ -282,7 +285,7 @@ __xwos_api
 xwer_t xwos_scheduler_resume(xwid_t cpuid);
 
 __xwos_api
-bool xwos_scheduler_tst_lpm(struct xwos_scheduler * xwsd);
+xwsq_t xwos_scheduler_get_pm_state(struct xwos_scheduler * xwsd);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      inline API implementations     ******** ********

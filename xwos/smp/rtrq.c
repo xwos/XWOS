@@ -10,8 +10,10 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * @note
  * - 锁的顺序：同级的锁不可同时获得
- *   + ① xwos_rtrq.lock
- *     + ② xwos_tcb.stlock
+ *   + ① xwos_mtxtree.lock
+ *   + ① xwos_scheduler.pm.lock
+ *     + ② xwos_rtrq.lock
+ *       + ③ xwos_tcb.stlock
  */
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -71,7 +73,7 @@ xwer_t xwos_rtrq_init(struct xwos_rtrq * xwrtrq)
  *   XWSDOBJ_DST_RUNNING | XWSDOBJ_DST_FROZEN | XWSDOBJ_DST_STANDBY
  * - 当线程加入到就绪队列时, 它不应该*同时*拥有下面的状态：
  *   XWSDOBJ_DST_BLOCKING & XWSDOBJ_DST_SLEEPING
- * - 这个函数必须在获得锁xwrtrq->lock时才可调用。
+ * - 此函数必须在持有锁xwrtrq->lock时才可调用。
  */
 __xwos_code
 xwer_t xwos_rtrq_add_head_locked(struct xwos_rtrq * xwrtrq, struct xwos_tcb * tcb)
@@ -106,7 +108,7 @@ xwer_t xwos_rtrq_add_head_locked(struct xwos_rtrq * xwrtrq, struct xwos_tcb * tc
  *   XWSDOBJ_DST_RUNNING | XWSDOBJ_DST_FROZEN | XWSDOBJ_DST_STANDBY
  * - 当线程加入到就绪队列时, 它不应该*同时*拥有下面的状态：
  *   XWSDOBJ_DST_BLOCKING & XWSDOBJ_DST_SLEEPING
- * - 这个函数必须在获得锁xwrtrq->lock时才可调用。
+ * - 此函数必须在持有锁xwrtrq->lock时才可调用。
  */
 __xwos_code
 xwer_t xwos_rtrq_add_tail_locked(struct xwos_rtrq * xwrtrq, struct xwos_tcb * tcb)
@@ -137,7 +139,7 @@ xwer_t xwos_rtrq_add_tail_locked(struct xwos_rtrq * xwrtrq, struct xwos_tcb * tc
  * @retval OK: OK
  * @retval -ESRCH: 就绪队列中没有这个线程
  * @note
- * - 这个函数必须在获得锁xwrtrq->lock时才可调用。
+ * - 此函数必须在持有锁xwrtrq->lock时才可调用。
  */
 __xwos_code
 xwer_t xwos_rtrq_remove_locked(struct xwos_rtrq * xwrtrq, struct xwos_tcb * tcb)
@@ -169,7 +171,7 @@ xwer_t xwos_rtrq_remove_locked(struct xwos_rtrq * xwrtrq, struct xwos_tcb * tcb)
  * @param xwrtrq: (I) XWOS的实时就绪队列
  * @return 被选择的线程控制块的指针
  * @note
- * - 这个函数必须在获得锁xwrtrq->lock时才可调用。
+ * - 此函数必须在持有锁xwrtrq->lock时才可调用。
  */
 __xwos_code
 struct xwos_tcb * xwos_rtrq_choose_locked(struct xwos_rtrq * xwrtrq)

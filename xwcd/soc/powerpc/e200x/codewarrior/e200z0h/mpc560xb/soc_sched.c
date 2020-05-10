@@ -392,20 +392,6 @@ xwer_t soc_thrd_freeze_lc(struct xwos_tcb * tcb)
         return rc;
 }
 
-/**
- * @brief SOC Adaptation Function：解冻线程
- * @param tcb: (I) 线程控制块对象的指针
- */
-__xwbsp_code
-xwer_t soc_thrd_thaw(struct xwos_tcb * tcb)
-{
-        xwer_t rc;
-
-        rc = soc_scheduler_swi((xwer_t(*)(void *, void *))xwos_thrd_thaw_lic,
-                               (void *)tcb, (void *)XWOS_UNUSED_ARGUMENT);
-        return rc;
-}
-
 #if defined(XuanWuOS_CFG_CORE__smp)
 /**
  * @brief SOC Adaptation Function：将线程迁出本地CPU，并准备迁入其他CPU

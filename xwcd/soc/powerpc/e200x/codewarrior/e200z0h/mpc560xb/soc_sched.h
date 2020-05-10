@@ -85,9 +85,6 @@ void soc_thrd_exit_lc(struct xwos_tcb * tcb, xwer_t rc);
 __xwbsp_code
 xwer_t soc_thrd_freeze_lc(struct xwos_tcb * tcb);
 
-__xwbsp_code
-xwer_t soc_thrd_thaw(struct xwos_tcb * tcb);
-
 #if defined(XuanWuOS_CFG_CORE__smp)
 __xwbsp_code
 xwer_t soc_thrd_outmigrate(struct xwos_tcb * tcb, xwid_t cpuid);

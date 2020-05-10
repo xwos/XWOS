@@ -55,8 +55,5 @@ void bdl_eirq0_isr(void)
 __xwos_isr
 void bdl_wkup4_isr(void)
 {
-        if (xwos_scheduler_tst_lpm()) {
-                xwos_scheduler_resume();
-        }
         xwosal_smr_post(xwosal_smr_get_id(&key_smr));
 }

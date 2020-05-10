@@ -10,18 +10,33 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * @note
  * - XWOS的调度器是一个每CPU变量，为了提高程序的效率，减少cache miss，
- *   通常只由CPU才可访问自己的调度器控制块结构体。
+ *   通常只由CPU才可访问自己的调度器控制块结构体。其他CPU需要操作当前
+ *   CPU的调度器时，需要挂起当前CPU的调度器软中断，由当前CPU自身在ISR
+ *   中进行操作。
+ * - 调度器软中断处理以下操作：
+ *   + 调度器暂停：xwos_scheduler_suspend_lic()
+ *                   |--> xwos_scheduler_notify_allfrz_lic()
+ *   + 线程退出：xwos_thrd_exit_lic()
+ *                 |--> xwos_scheduler_notify_allfrz_lic()
+ *   + 线程冻结：xwos_thrd_freeze_lic()
+ *                 |--> xwos_scheduler_notify_allfrz_lic()
+ *   + 线程解冻：xwos_thrd_thaw_lic()
+ *   + 线程迁出：xwos_thrd_outmigrate_lic()
+ *   + 线程迁入：xwos_thrd_immigrate_lic()
+ * - 调度器软中断的中断优先级必须为系统最高优先级。
  * - 调度时锁的顺序：同级的锁不可同时获得
  *   + ① xwos_scheduler.cxlock
  *     + ② xwos_scheduler.rq.rt.lock
  *       + ③ xwos_tcb.stlock
  * - 休眠时锁的顺序：同级的锁不可同时获得
- *   + ① xwos_scheduler.lpm.lock
+ *   + ① xwos_scheduler.pm.lock
  *     + ② xwos_tcb.stlock
  *     + ② xwos_scheduler.tcblistlock
  * - 函数suffix意义：
- *   1. _lc: Local Context，是指只能在“本地”CPU的中执行的代码；
+ *   1. _lc: Local Context，是指只能在“本地”CPU的中执行的代码。
  *   2. _lic: Local ISR Context，是指只能在“本地”CPU的中断上下文中执行的代码。
+ *   3. _pmlk: 是只持有锁xwos_scheduler.pm.lock才可调用的函数。
+ *   3. _tllk: 是只持有锁xwos_scheduler.tcblistlock才可调用的函数。
  */
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -118,7 +133,10 @@ static __xwos_code
 void xwos_scheduler_reqfrz_intr_all_lic(struct xwos_scheduler * xwsd);
 
 static __xwos_code
-xwer_t xwos_scheduler_thaw_allfrz_lic(struct xwos_scheduler * xwsd);
+void xwos_scheduler_notify_allfrz_lc(void);
+
+static __xwos_code
+void xwos_scheduler_thaw_allfrz_lic(struct xwos_scheduler * xwsd);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -165,11 +183,11 @@ xwer_t xwos_scheduler_init_lc(struct xwos_pmdm * xwpmdm)
                 goto err_rtrq_init;
         }
         xwos_scheduler_init_idled(xwsd);
-        xwsd->lpm.wklkcnt = XWOS_SCHEDULER_WKLKCNT_UNLOCKED;
-        xwsd->lpm.frz_thrd_cnt = 0;
-        xwlk_splk_init(&xwsd->lpm.lock);
-        xwlib_bclst_init_head(&xwsd->lpm.frzlist);
-        xwsd->lpm.xwpmdm = xwpmdm;
+        xwsd->pm.wklkcnt = XWOS_SCHEDULER_WKLKCNT_UNLOCKED;
+        xwsd->pm.frz_thrd_cnt = 0;
+        xwlk_splk_init(&xwsd->pm.lock);
+        xwlib_bclst_init_head(&xwsd->pm.frzlist);
+        xwsd->pm.xwpmdm = xwpmdm;
         rc = soc_scheduler_init(xwsd);
         if (__unlikely(rc < 0)) {
                 goto err_sd_init;
@@ -329,6 +347,7 @@ xwer_t xwos_scheduler_idled(struct xwos_scheduler * xwsd)
         XWOS_UNUSED(xwsd);
 
         while (true) {
+                xwos_scheduler_notify_allfrz_lc();
 #if defined(BRDCFG_XWSD_IDLE_HOOK) && (1 == BRDCFG_XWSD_IDLE_HOOK)
                 bdl_xwsd_idle_hook(xwsd);
 #endif /* BRDCFG_XWSD_IDLE_HOOK */
@@ -1011,7 +1030,7 @@ void xwos_scheduler_finish_swcx(struct xwos_scheduler * xwsd)
  * @param xwsd: (I) 调度器对象的指针
  * @return 错误码
  * @retval OK: OK
- * @retval <0: 当前调度器正在进入低功耗
+ * @retval <0: 当前调度器正在进入低功耗模式
  * @note
  * - 同步/异步：同步
  * - 中断上下文：可以使用
@@ -1023,7 +1042,7 @@ xwer_t xwos_scheduler_inc_wklkcnt(struct xwos_scheduler * xwsd)
 {
         xwer_t rc;
 
-        rc = xwaop_tge_then_add(xwsq_t, &xwsd->lpm.wklkcnt,
+        rc = xwaop_tge_then_add(xwsq_t, &xwsd->pm.wklkcnt,
                                 XWOS_SCHEDULER_WKLKCNT_UNLOCKED, 1,
                                 NULL, NULL);
         return rc;
@@ -1047,11 +1066,11 @@ xwer_t xwos_scheduler_dec_wklkcnt(struct xwos_scheduler * xwsd)
         xwer_t rc;
         xwsq_t nv;
 
-        rc = xwaop_tge_then_sub(xwsq_t, &xwsd->lpm.wklkcnt,
+        rc = xwaop_tge_then_sub(xwsq_t, &xwsd->pm.wklkcnt,
                                 XWOS_SCHEDULER_WKLKCNT_UNLOCKED,
                                 1,
                                 &nv, NULL);
-        if ((OK == rc) && (XWOS_SCHEDULER_WKLKCNT_LPM == nv)) {
+        if ((OK == rc) && (XWOS_SCHEDULER_WKLKCNT_FREEZING == nv)) {
                 soc_scheduler_suspend(xwsd);
         }/* else {} */
         return rc;
@@ -1081,23 +1100,49 @@ void xwos_scheduler_reqfrz_intr_all_lic(struct xwos_scheduler * xwsd)
 }
 
 /**
- * @brief 通知所有线程已经冻结
+ * @brief 通知所有线程已经冻结（中断上下文中执行的部分）
  * @param xwsd: (I) 调度器对象的指针
  * @return 错误码
  */
 __xwos_code
-xwer_t xwos_scheduler_notify_allfrz(struct xwos_scheduler * xwsd)
+xwer_t xwos_scheduler_notify_allfrz_lic(struct xwos_scheduler * xwsd)
 {
         xwer_t rc;
+        xwsq_t nv;
 
-        if (xwos_scheduler_tst_lpm(xwsd)) {
+        rc = xwaop_teq_then_sub(xwsq_t, &xwsd->pm.wklkcnt,
+                                XWOS_SCHEDULER_WKLKCNT_FREEZING,
+                                1,
+                                &nv, NULL);
+        if ((OK == rc) && (XWOS_SCHEDULER_WKLKCNT_ALLFRZ == nv)) {
                 xwos_syshwt_stop(&xwsd->tt.hwt);
-                if (xwsd->lpm.xwpmdm) {
-                        xwos_pmdm_inc_lpmxwsd_cnt(xwsd->lpm.xwpmdm);
+        } else {
+                rc = -EINTR;
+        }
+        xwos_scheduler_req_swcx(xwsd);
+        return rc;
+}
+
+/**
+ * @brief 通知所有线程已经冻结（空闲任务中执行的部分）
+ */
+static __xwos_code
+void xwos_scheduler_notify_allfrz_lc(void)
+{
+        struct xwos_scheduler * xwsd;
+        xwsq_t nv;
+        xwer_t rc;
+
+        xwsd = xwos_scheduler_get_lc();
+        rc = xwaop_teq_then_sub(xwsq_t, &xwsd->pm.wklkcnt,
+                                XWOS_SCHEDULER_WKLKCNT_ALLFRZ,
+                                1,
+                                &nv, NULL);
+        if ((OK == rc) && (XWOS_SCHEDULER_WKLKCNT_SUSPENDED == nv)) {
+                if (xwsd->pm.xwpmdm) {
+                        xwos_pmdm_report_xwsd_suspended(xwsd->pm.xwpmdm);
                 }/* else {} */
         }
-        rc = xwos_scheduler_req_swcx(xwsd);
-        return rc;
 }
 
 /**
@@ -1106,29 +1151,25 @@ xwer_t xwos_scheduler_notify_allfrz(struct xwos_scheduler * xwsd)
  * @return 错误码
  */
 static __xwos_code
-xwer_t xwos_scheduler_thaw_allfrz_lic(struct xwos_scheduler * xwsd)
+void xwos_scheduler_thaw_allfrz_lic(struct xwos_scheduler * xwsd)
 {
         struct xwos_tcb * c, * n;
         xwreg_t cpuirq;
-        xwer_t rc;
 
-        xwlk_splk_lock_cpuirqsv(&xwsd->lpm.lock, &cpuirq);
-        xwlib_bclst_itr_next_entry_safe(c, n, &xwsd->lpm.frzlist,
-                                        struct xwos_tcb, frznode) {
+        xwlk_splk_lock_cpuirqsv(&xwsd->pm.lock, &cpuirq);
+        xwlk_splk_lock(&xwsd->tcblistlock);
+        xwlib_bclst_itr_next_entry_safe(c, n, &xwsd->tcblist,
+                                        struct xwos_tcb, tcbnode) {
                 xwos_thrd_grab(c);
-                xwlk_splk_unlock_cpuirqrs(&xwsd->lpm.lock, cpuirq);
-                xwos_thrd_thaw_lic(c);
+                xwlk_splk_unlock(&xwsd->tcblistlock);
+                xwos_thrd_thaw_lic_pmlk(c);
                 xwos_thrd_put(c);
-                xwlk_splk_lock_cpuirqsv(&xwsd->lpm.lock, &cpuirq);
+                xwlk_splk_lock(&xwsd->tcblistlock);
         }
-        if (0 == xwsd->lpm.frz_thrd_cnt) {
-                rc = OK;
-        } else {
-                rc = -EBUG;
-        }
-        xwlk_splk_unlock_cpuirqrs(&xwsd->lpm.lock, cpuirq);
+        xwlk_splk_unlock(&xwsd->tcblistlock);
+        xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
         xwos_scheduler_req_swcx(xwsd);
-        return rc;
+        XWOS_BUG_ON(xwsd->pm.frz_thrd_cnt != 0);
 }
 
 /**
@@ -1136,7 +1177,7 @@ xwer_t xwos_scheduler_thaw_allfrz_lic(struct xwos_scheduler * xwsd)
  * @param xwsd: (I) 调度器对象的指针
  * @return 错误码
  * @note
- * - 此函数只能在CPU自身的中断中执行，因此当电源管理的代码运行于其他CPU上时，
+ * - 此函数只能在CPU自身的中断中执行，当电源管理的代码运行于其他CPU上时，
  *   可通过@ref xwos_scheduler_suspend(cpuid)发射一个软中断到对应CPU上，
  *   让它自己执行此函数。
  */
@@ -1146,15 +1187,15 @@ xwer_t xwos_scheduler_suspend_lic(struct xwos_scheduler * xwsd)
         xwreg_t cpuirq;
 
         xwos_scheduler_reqfrz_intr_all_lic(xwsd);
-        xwlk_splk_lock_cpuirqsv(&xwsd->lpm.lock, &cpuirq);
+        xwlk_splk_lock_cpuirqsv(&xwsd->pm.lock, &cpuirq);
         xwlk_splk_lock(&xwsd->tcblistlock);
-        if (xwsd->thrd_num == xwsd->lpm.frz_thrd_cnt) {
+        if (xwsd->thrd_num == xwsd->pm.frz_thrd_cnt) {
                 xwlk_splk_unlock(&xwsd->tcblistlock);
-                xwlk_splk_unlock_cpuirqrs(&xwsd->lpm.lock, cpuirq);
-                xwos_scheduler_notify_allfrz(xwsd);
+                xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
+                xwos_scheduler_notify_allfrz_lic(xwsd);
         } else {
                 xwlk_splk_unlock(&xwsd->tcblistlock);
-                xwlk_splk_unlock_cpuirqrs(&xwsd->lpm.lock, cpuirq);
+                xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
         }
         return OK;
 }
@@ -1195,17 +1236,39 @@ __xwos_code
 xwer_t xwos_scheduler_resume_lic(struct xwos_scheduler * xwsd)
 {
         xwer_t rc;
+        xwsq_t nv, ov;
 
-        rc = xwaop_teq_then_write(xwsq_t, &xwsd->lpm.wklkcnt,
-                                  XWOS_SCHEDULER_WKLKCNT_LPM,
-                                  XWOS_SCHEDULER_WKLKCNT_UNLOCKED,
-                                  NULL);
-        if (OK == rc) {
-                rc = xwos_scheduler_thaw_allfrz_lic(xwsd);
-                XWOS_BUG_ON(rc < 0);
-                xwos_pmdm_dec_lpmxwsd_cnt(xwsd->lpm.xwpmdm);
-                xwos_syshwt_start(&xwsd->tt.hwt);
-        }/* else {} */
+        do {
+                rc = xwaop_teq_then_add(xwsq_t, &xwsd->pm.wklkcnt,
+                                        XWOS_SCHEDULER_WKLKCNT_SUSPENDED,
+                                        1,
+                                        &nv, &ov);
+                if ((OK == rc) && (XWOS_SCHEDULER_WKLKCNT_ALLFRZ == nv)) {
+                        xwos_pmdm_report_xwsd_resuming(xwsd->pm.xwpmdm);
+                }
+
+                rc = xwaop_teq_then_add(xwsq_t, &xwsd->pm.wklkcnt,
+                                        XWOS_SCHEDULER_WKLKCNT_ALLFRZ,
+                                        1,
+                                        &nv, &ov);
+                if ((OK == rc) && (XWOS_SCHEDULER_WKLKCNT_THAWING == nv)) {
+                        xwos_syshwt_start(&xwsd->tt.hwt);
+                }
+
+                rc = xwaop_teq_then_add(xwsq_t, &xwsd->pm.wklkcnt,
+                                        XWOS_SCHEDULER_WKLKCNT_THAWING,
+                                        1,
+                                        &nv, &ov);
+                if ((OK == rc) && (XWOS_SCHEDULER_WKLKCNT_UNLOCKED == nv)) {
+                        xwos_scheduler_thaw_allfrz_lic(xwsd);
+                        rc = OK;
+                        break;
+                } else if (ov >= XWOS_SCHEDULER_WKLKCNT_UNLOCKED) {
+                        rc = -EALREADY;
+                        break;
+                } else {
+                }
+        } while (true);
         return rc;
 }
 
@@ -1246,11 +1309,9 @@ xwer_t xwos_scheduler_resume(xwid_t cpuid)
 }
 
 /**
- * @brief XWOS API：测试调度器是否处于暂停状态
+ * @brief XWOS API：获取调度器电源管理状态
  * @param xwsd: (I) 调度器对象的指针
- * @return 布尔值
- * @retval true: 是
- * @retval false: 否
+ * @return 状态值 @ref xwos_scheduler_wakelock_cnt_em
  * @note
  * - 同步/异步：同步
  * - 中断上下文：可以使用
@@ -1258,10 +1319,10 @@ xwer_t xwos_scheduler_resume(xwid_t cpuid)
  * - 线程上下文：可以使用
  */
 __xwos_api
-bool xwos_scheduler_tst_lpm(struct xwos_scheduler * xwsd)
+xwsq_t xwos_scheduler_get_pm_state(struct xwos_scheduler * xwsd)
 {
         xwsq_t wklkcnt;
 
-        wklkcnt = xwaop_load(xwsq_t, &xwsd->lpm.wklkcnt, xwmb_modr_acquire);
-        return !!(XWOS_SCHEDULER_WKLKCNT_LPM == wklkcnt);
+        wklkcnt = xwaop_load(xwsq_t, &xwsd->pm.wklkcnt, xwmb_modr_acquire);
+        return wklkcnt;
 }

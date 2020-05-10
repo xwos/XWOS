@@ -47,27 +47,35 @@ void SystemClock_Config(void);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-void stm32cube_suspend(void)
+void stm32cube_pm_resume(void)
 {
-        xwirq_t irq;
         __maybe_unused xwer_t rc;
+        xwirq_t irq;
+
+        /* 从STOP模式恢复后，需要重新配置时钟 */
+        rc = xwos_irq_get_id(&irq);
+        LL_PWR_SetPowerMode(LL_PWR_MODE_STOP_MAINREGU);
+        xwds_pm_resume(&stm32cube_ds);
+}
+
+void stm32cube_pm_suspend(void)
+{
+        __maybe_unused xwer_t rc;
+        xwirq_t irq;
 
         rc = xwos_irq_get_id(&irq);
         xwds_pm_suspend(&stm32cube_ds);
         LL_PWR_SetPowerMode(LL_PWR_MODE_STOP_LPREGU);
         LL_LPM_EnableDeepSleep();
-        wfi();
 }
 
-void stm32cube_resume(void)
+void stm32cube_pm_wakeup(void)
 {
-        xwirq_t irq;
-        __maybe_unused xwer_t rc;
-
-        /* 从STOP模式恢复后，需要重新配置时钟 */
-        SystemClock_Config();
-        rc = xwos_irq_get_id(&irq);
         LL_LPM_EnableSleep();
-        LL_PWR_SetPowerMode(LL_PWR_MODE_STOP_MAINREGU);
-        xwds_pm_resume(&stm32cube_ds);
+        SystemClock_Config();
+}
+
+void stm32cube_pm_sleep(void)
+{
+        wfi();
 }

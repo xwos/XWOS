@@ -151,7 +151,7 @@ __xwos_code
 xwer_t xwos_thrd_freeze_lic(struct xwos_tcb * tcb);
 
 __xwos_code
-xwer_t xwos_thrd_thaw_lic(struct xwos_tcb * tcb);
+xwer_t xwos_thrd_thaw_lic_pmlk(struct xwos_tcb * tcb);
 
 __xwos_code
 void xwos_thrd_immigrate_lic(struct xwos_tcb * tcb);

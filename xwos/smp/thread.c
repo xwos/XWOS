@@ -595,18 +595,18 @@ xwer_t xwos_thrd_exit_lic(struct xwos_tcb * tcb, xwer_t rc)
         tcb->stack.arg = err_ptr(rc);
         xwlk_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);
         xwsync_cdt_broadcast(&tcb->completion);
-        xwlk_splk_lock_cpuirq(&xwsd->lpm.lock);
+        xwlk_splk_lock_cpuirq(&xwsd->pm.lock);
         xwlk_splk_lock(&xwsd->tcblistlock);
         xwlib_bclst_del_init(&tcb->tcbnode);
         xwsd->thrd_num--;
-        if (xwsd->lpm.frz_thrd_cnt == xwsd->thrd_num) {
+        if (xwsd->pm.frz_thrd_cnt == xwsd->thrd_num) {
                 xwlk_splk_unlock(&xwsd->tcblistlock);
-                xwlk_splk_unlock_cpuirqrs(&xwsd->lpm.lock, cpuirq);
+                xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
                 xwos_thrd_put(tcb);
-                xwos_scheduler_notify_allfrz(xwsd);
+                xwos_scheduler_notify_allfrz_lic(xwsd);
         } else {
                 xwlk_splk_unlock(&xwsd->tcblistlock);
-                xwlk_splk_unlock_cpuirqrs(&xwsd->lpm.lock, cpuirq);
+                xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
                 xwos_thrd_put(tcb);
                 xwos_scheduler_req_swcx(xwsd);
         }
@@ -1688,7 +1688,7 @@ xwer_t xwos_thrd_reqfrz_lic(struct xwos_tcb * tcb)
         xwer_t rc;
 
         xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
-        xwlk_splk_lock_cpuirqsv(&xwsd->lpm.lock, &cpuirq);
+        xwlk_splk_lock_cpuirqsv(&xwsd->pm.lock, &cpuirq);
         xwlk_splk_lock(&tcb->stlock);
         if (XWSDOBJ_DST_FROZEN & tcb->state) {
                 xwlk_splk_unlock(&tcb->stlock);
@@ -1698,7 +1698,7 @@ xwer_t xwos_thrd_reqfrz_lic(struct xwos_tcb * tcb)
                 xwlk_splk_unlock(&tcb->stlock);
                 rc = OK;
         }
-        xwlk_splk_unlock_cpuirqrs(&xwsd->lpm.lock, cpuirq);
+        xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
         return rc;
 }
 
@@ -1716,45 +1716,56 @@ xwer_t xwos_thrd_freeze_lic(struct xwos_tcb * tcb)
         struct xwos_scheduler * xwsd;
         xwreg_t cpuirq;
         xwid_t dstcpu;
+        xwer_t rc;
 
-        XWOS_BUG_ON(!(XWSDOBJ_DST_FREEZABLE & tcb->state));
         XWOS_BUG_ON(!(XWSDOBJ_DST_RUNNING & tcb->state));
 
         xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
-        xwlk_splk_lock_cpuirqsv(&xwsd->lpm.lock, &cpuirq);
+        xwlk_splk_lock_cpuirqsv(&xwsd->pm.lock, &cpuirq);
         xwlk_splk_lock(&tcb->stlock);
-        xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_RUNNING | XWSDOBJ_DST_FREEZABLE);
-        xwbop_s1m(xwsq_t, &tcb->state, XWSDOBJ_DST_FROZEN);
-        if (XWSDOBJ_DST_MIGRATING & tcb->state) {
-                xwlk_splk_unlock(&tcb->stlock);
-                xwos_thrd_outmigrate_frozen_lic(tcb);
-                dstcpu = tcb->migration.dst;
-                xwlk_splk_unlock_cpuirqrs(&xwsd->lpm.lock, cpuirq);
-                soc_thrd_immigrate(tcb, dstcpu);
-                xwlk_splk_lock_cpuirqsv(&xwsd->lpm.lock, &cpuirq);
+        if (XWSDOBJ_DST_FREEZABLE & tcb->state) {
+                xwbop_c0m(xwsq_t, &tcb->state,
+                          XWSDOBJ_DST_RUNNING | XWSDOBJ_DST_FREEZABLE);
+                xwbop_s1m(xwsq_t, &tcb->state, XWSDOBJ_DST_FROZEN);
+                if (XWSDOBJ_DST_MIGRATING & tcb->state) {
+                        xwlk_splk_unlock(&tcb->stlock);
+                        xwos_thrd_outmigrate_frozen_lic(tcb);
+                        dstcpu = tcb->migration.dst;
+                        xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
+                        soc_thrd_immigrate(tcb, dstcpu);
+                        xwlk_splk_lock_cpuirqsv(&xwsd->pm.lock, &cpuirq);
+                } else {
+                        xwlk_splk_unlock(&tcb->stlock);
+                        xwsd->pm.frz_thrd_cnt++;
+                        xwlib_bclst_add_tail(&xwsd->pm.frzlist, &tcb->frznode);
+                }
+                xwlk_splk_lock(&xwsd->tcblistlock);
+                if (xwsd->pm.frz_thrd_cnt == xwsd->thrd_num) {
+                        xwlk_splk_unlock(&xwsd->tcblistlock);
+                        xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
+                        xwos_scheduler_enpmpt(xwsd);
+                        xwos_scheduler_notify_allfrz_lic(xwsd);
+                } else {
+                        xwlk_splk_unlock(&xwsd->tcblistlock);
+                        xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
+                        xwos_scheduler_enpmpt(xwsd);
+                        xwos_scheduler_req_swcx(xwsd);
+                }
+                rc = OK;
         } else {
                 xwlk_splk_unlock(&tcb->stlock);
-                xwsd->lpm.frz_thrd_cnt++;
-                xwlib_bclst_add_tail(&xwsd->lpm.frzlist, &tcb->frznode);
+                xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
+                rc = -ECANCELED;
         }
-        xwlk_splk_lock(&xwsd->tcblistlock);
-        if (xwsd->lpm.frz_thrd_cnt == xwsd->thrd_num) {
-                xwlk_splk_unlock(&xwsd->tcblistlock);
-                xwlk_splk_unlock_cpuirqrs(&xwsd->lpm.lock, cpuirq);
-                xwos_scheduler_enpmpt(xwsd);
-                xwos_scheduler_notify_allfrz(xwsd);
-        } else {
-                xwlk_splk_unlock(&xwsd->tcblistlock);
-                xwlk_splk_unlock_cpuirqrs(&xwsd->lpm.lock, cpuirq);
-                xwos_scheduler_enpmpt(xwsd);
-                xwos_scheduler_req_swcx(xwsd);
-        }
-        return OK;
+        return rc;
 }
 
 /**
- * @brief XWOS API：线程冻结自身
+ * @brief XWOS API：线程自我冻结
  * @return 错误码
+ * @retval OK: OK
+ * @retval -EPERM: 不允许冻结
+ * @retval -ECANCELED: 冻结被取消
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -1790,31 +1801,36 @@ xwer_t xwos_cthrd_freeze(void)
  * @return 错误码
  * @note
  * - 此函数只能在线程所属的CPU的中断中执行。
+ * - 此函数只能在持有锁xwsd->pm.lock时调用。
  */
 __xwos_code
-xwer_t xwos_thrd_thaw_lic(struct xwos_tcb * tcb)
+xwer_t xwos_thrd_thaw_lic_pmlk(struct xwos_tcb * tcb)
 {
         struct xwos_scheduler * xwsd;
-        xwreg_t cpuirq;
         xwpr_t prio;
         xwer_t rc;
 
         xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
         XWOS_BUG_ON(xwsd != xwos_scheduler_get_lc());
 
-        xwlk_splk_lock_cpuirqsv(&xwsd->lpm.lock, &cpuirq);
-        xwlib_bclst_del_init(&tcb->frznode);
-        xwsd->lpm.frz_thrd_cnt--;
         xwlk_splk_lock(&tcb->stlock);
-        prio = tcb->dprio.r;
-        xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_FROZEN);
-        tcb->dprio.r = XWOS_SD_PRIORITY_INVALID;
-        xwlk_splk_unlock(&tcb->stlock);
-        xwlk_splk_unlock_cpuirqrs(&xwsd->lpm.lock, cpuirq);
-        rc = xwos_thrd_rq_add_tail(tcb, prio);
-        XWOS_BUG_ON(rc < 0);
-        xwos_scheduler_chkpmpt(xwsd);
-        return OK;
+        if (XWSDOBJ_DST_FREEZABLE & tcb->state) {
+                xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_FREEZABLE);
+                xwlk_splk_unlock(&tcb->stlock);
+                rc = -ECANCELED;
+        } else if (XWSDOBJ_DST_FROZEN & tcb->state) {
+                prio = tcb->dprio.r;
+                xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_FROZEN);
+                tcb->dprio.r = XWOS_SD_PRIORITY_INVALID;
+                xwlk_splk_unlock(&tcb->stlock);
+                xwlib_bclst_del_init(&tcb->frznode);
+                xwsd->pm.frz_thrd_cnt--;
+                rc = xwos_thrd_rq_add_tail(tcb, prio);
+        } else {
+                xwlk_splk_unlock(&tcb->stlock);
+                rc = -EPERM;
+        }
+        return rc;
 }
 
 /**
@@ -1933,20 +1949,20 @@ void xwos_thrd_immigrate_lic(struct xwos_tcb * tcb)
         XWOS_BUG_ON(!(XWSDOBJ_DST_MIGRATING & tcb->state));
 
         new = xwos_scheduler_get_lc();
-        xwlk_splk_lock_cpuirqsv(&new->lpm.lock, &cpuirq);
+        xwlk_splk_lock_cpuirqsv(&new->pm.lock, &cpuirq);
         xwlk_splk_lock(&new->tcblistlock);
         tcb->migration.dst = 0;
         xwlib_bclst_add_tail(&new->tcblist, &tcb->tcbnode);
         new->thrd_num++;
         xwmb_smp_store_release(struct xwos_scheduler *, &tcb->xwsd, new);
         xwlk_splk_unlock(&new->tcblistlock);
-        if (xwos_scheduler_tst_lpm(new)) {
+        if (xwos_scheduler_get_pm_state(new) <= XWOS_SCHEDULER_WKLKCNT_SUSPENDING) {
                 xwlk_splk_lock(&tcb->stlock);
                 xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_MIGRATING);
                 xwlk_splk_unlock(&tcb->stlock);
-                xwlib_bclst_add_tail(&new->lpm.frzlist, &tcb->frznode);
-                new->lpm.frz_thrd_cnt++;
-                xwlk_splk_unlock_cpuirqrs(&new->lpm.lock, cpuirq);
+                xwlib_bclst_add_tail(&new->pm.frzlist, &tcb->frznode);
+                new->pm.frz_thrd_cnt++;
+                xwlk_splk_unlock_cpuirqrs(&new->pm.lock, cpuirq);
         } else {
                 xwlk_splk_lock(&tcb->stlock);
                 prio = tcb->dprio.r;
@@ -1954,7 +1970,7 @@ void xwos_thrd_immigrate_lic(struct xwos_tcb * tcb)
                           XWSDOBJ_DST_FROZEN | XWSDOBJ_DST_MIGRATING);
                 tcb->dprio.r = XWOS_SD_PRIORITY_INVALID;
                 xwlk_splk_unlock(&tcb->stlock);
-                xwlk_splk_unlock_cpuirqrs(&new->lpm.lock, cpuirq);
+                xwlk_splk_unlock_cpuirqrs(&new->pm.lock, cpuirq);
                 rc = xwos_thrd_rq_add_tail(tcb, prio);
                 XWOS_BUG_ON(rc < 0);
                 xwos_scheduler_chkpmpt(new);
@@ -1966,7 +1982,7 @@ void xwos_thrd_immigrate_lic(struct xwos_tcb * tcb)
  * @param tcb: (I) 线程控制块对象的指针
  * @note
  * - 此函数只能在线程所属的CPU的中断上下文中执行；
- * - 此函数被调用时需要获得当前CPU调度器的锁lpm.lock并且关闭本地CPU的中断；
+ * - 此函数被调用时需要获得当前CPU调度器的锁pm.lock并且关闭本地CPU的中断；
  * - 此函数假设线程控制块对象已经被引用，执行过程中不会成为野指针；
  */
 static __xwos_code
@@ -2006,11 +2022,11 @@ xwer_t xwos_thrd_outmigrate_reqfrz_lic(struct xwos_tcb * tcb, xwid_t dstcpu)
         xwer_t rc;
 
         xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
-        xwlk_splk_lock_cpuirqsv(&xwsd->lpm.lock, &cpuirq);
+        xwlk_splk_lock_cpuirqsv(&xwsd->pm.lock, &cpuirq);
         xwlk_splk_lock(&tcb->stlock);
         if (XWSDOBJ_DST_MIGRATING & tcb->state) {
                 xwlk_splk_unlock(&tcb->stlock);
-                xwlk_splk_unlock_cpuirqrs(&xwsd->lpm.lock, cpuirq);
+                xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
                 rc = -EINPROGRESS;
         } else {
                 xwbop_s1m(xwsq_t, &tcb->state, XWSDOBJ_DST_MIGRATING);
@@ -2018,13 +2034,13 @@ xwer_t xwos_thrd_outmigrate_reqfrz_lic(struct xwos_tcb * tcb, xwid_t dstcpu)
                         xwlk_splk_unlock(&tcb->stlock);
                         tcb->migration.dst = dstcpu;
                         xwos_thrd_outmigrate_frozen_lic(tcb);
-                        xwlk_splk_unlock_cpuirqrs(&xwsd->lpm.lock, cpuirq);
+                        xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
                         soc_thrd_immigrate(tcb, dstcpu);
                 } else {
                         xwbop_s1m(xwsq_t, &tcb->state, XWSDOBJ_DST_FREEZABLE);
                         xwlk_splk_unlock(&tcb->stlock);
                         tcb->migration.dst = dstcpu;
-                        xwlk_splk_unlock_cpuirqrs(&xwsd->lpm.lock, cpuirq);
+                        xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
                 }
                 rc = OK;
         }

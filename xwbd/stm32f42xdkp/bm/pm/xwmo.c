@@ -57,7 +57,16 @@ enum bm_pm_btn_event_em {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 static
-void bm_pm_lpmntf(struct xwos_pmdm * pmdm, void * arg);
+void bm_pmdm_resume(struct xwos_pmdm * pmdm, void * arg);
+
+static
+void bm_pmdm_suspend(struct xwos_pmdm * pmdm, void * arg);
+
+static
+void bm_pmdm_wakeup(struct xwos_pmdm * pmdm, void * arg);
+
+static
+void bm_pmdm_sleep(struct xwos_pmdm * pmdm, void * arg);
 
 static
 void bm_pm_suspend(void);
@@ -115,7 +124,13 @@ xwer_t bm_pm_start(void)
 {
         xwer_t rc;
 
-        xwos_pmdm_set_lpmntf_cb(&soc_xwpm_domain, bm_pm_lpmntf, NULL);
+        xwos_pmdm_set_cb(&soc_xwpm_domain,
+                         bm_pmdm_resume,
+                         bm_pmdm_suspend,
+                         bm_pmdm_wakeup,
+                         bm_pmdm_sleep,
+                         NULL);
+
         rc = xwosal_smr_init(&bm_pm_smr, 0, 1);
         if (__unlikely(rc < 0)) {
                 goto err_smr_init;
@@ -169,11 +184,34 @@ void bm_pm_resume(void)
 }
 
 static
-void bm_pm_lpmntf(struct xwos_pmdm * pmdm, void * arg)
+void bm_pmdm_resume(struct xwos_pmdm * pmdm, void * arg)
 {
         XWOS_UNUSED(pmdm);
         XWOS_UNUSED(arg);
-        stm32cube_suspend();
+        stm32cube_pm_resume();
+}
+
+static
+void bm_pmdm_suspend(struct xwos_pmdm * pmdm, void * arg)
+{
+        XWOS_UNUSED(pmdm);
+        XWOS_UNUSED(arg);
+        stm32cube_pm_suspend();
+}
+static
+void bm_pmdm_wakeup(struct xwos_pmdm * pmdm, void * arg)
+{
+        XWOS_UNUSED(pmdm);
+        XWOS_UNUSED(arg);
+        stm32cube_pm_wakeup();
+}
+
+static
+void bm_pmdm_sleep(struct xwos_pmdm * pmdm, void * arg)
+{
+        XWOS_UNUSED(pmdm);
+        XWOS_UNUSED(arg);
+        stm32cube_pm_sleep();
 }
 
 static
@@ -380,8 +418,7 @@ void bm_pm_eirq_btn_isr(struct xwds_soc * soc, xwid_t id, xwds_eirq_arg_t arg)
         XWOS_UNUSED(id);
 
         pmdm = xwos_pmdm_get_lc();
-        if (xwos_pmdm_tst_lpm(pmdm)) {
-                stm32cube_resume();
+        if (xwos_pmdm_get_stage(pmdm) < XWOS_PMDM_STAGE_RUNNING) {
                 xwos_pmdm_resume(pmdm);
         }
         bm_pm_rls_btn_irq();
