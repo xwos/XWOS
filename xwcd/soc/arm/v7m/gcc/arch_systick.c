@@ -39,8 +39,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define ARCH_IRQ_TICK_PRIO      (ARCH_IRQ_PRIO_0 | ARCH_IRQ_SUBPRIO_HIGH)
-
 #ifdef BRDCFG_SYSHWT_SRCCLK
   #define ARCH_SYSHWT_SRCCLK    BRDCFG_SYSHWT_SRCCLK
 #else
@@ -66,7 +64,7 @@ __xwbsp_rodata const struct xwos_irq_resource cortex_m_systick_irqrsc = {
         .irqn = ARCH_IRQ_SYSTICK,
         .isr = arch_systick_isr,
         .cfg = &cortex_m_systick_irqcfg,
-        .description = "cortex_m_systick_irq",
+        .description = "irq.armv7m.systick",
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********

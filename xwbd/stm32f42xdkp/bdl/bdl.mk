@@ -32,6 +32,4 @@ BDL_CSRCS += board_init.c main.c
 ifeq ($(BRDCFG_XWSD_THRD_STACK_POOL),y)
     BDL_CSRCS += xwkac/thrd_stack_mempool.c
 endif
-ifeq ($(BRDCFG_XWSD_IDLE_HOOK),y)
-    BDL_CSRCS += xwkac/idle_hook.c
-endif
+BDL_CSRCS += xwkac/xwsd_hook.c

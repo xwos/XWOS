@@ -36,6 +36,9 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      static function prototypes     ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+extern
+void bdl_xwsd_syshwt_hook(struct xwos_scheduler * xwsd);
+
 static __xwos_code
 void xwos_tt_rmrbb_locked(struct xwos_tt * xwtt, struct xwos_ttn * ttn);
 
@@ -467,6 +470,9 @@ void xwos_syshwt_task(struct xwos_syshwt * hwt)
 #endif /* !XWUPCFG_SD_BH */
         }
         xwos_scheduler_chkpmpt();
+#if defined(BRDCFG_XWSD_SYSHWT_HOOK) && (1 == BRDCFG_XWSD_SYSHWT_HOOK)
+        bdl_xwsd_syshwt_hook(xwsd);
+#endif /* BRDCFG_XWSD_SYSHWT_HOOK */
 }
 
 /**

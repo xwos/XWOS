@@ -850,7 +850,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                                         currtick = xwos_syshwt_get_timetick(hwt);
                                         *xwtm = xwtm_sub(expected, currtick);
                                         rc = xwos_thrd_do_lock(lock, lktype, xwtm,
-                                                                 lkdata, datanum);
+                                                               lkdata, datanum);
                                         if (OK == rc) {
                                                 *lkst = XWLK_STATE_LOCKED;
                                         }

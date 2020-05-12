@@ -21,6 +21,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+#include <arch_systick.h>
 #include <bm/stm32cube/standard.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
@@ -70,9 +71,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 
         /* Configure the SysTick IRQ priority */
         if (TickPriority < (1UL << __NVIC_PRIO_BITS)) {
-                HAL_NVIC_SetPriority(SysTick_IRQn, TickPriority,
-                                     ARCH_IRQ_SUBPRIO_HIGH);
-                uwTickPrio = TickPriority;
+                uwTickPrio = ARCH_IRQ_TICK_PRIO;
                 ret = HAL_OK;
         } else {
                 ret = HAL_ERROR;
@@ -80,18 +79,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
         return ret;
 }
 
-uint32_t HAL_GetTick(void)
+void stm32cube_systick_hook(void)
 {
-        /* 玄武OS在ARMv7m架构中使用systick作为系统的滴答定时器，与STM32Cube HAL
-           中冲突。但HAL中关于Systick的函数都是override属性的，可以基于玄武OS
-           的系统接口重新实现。 */
-        return (uint32_t)xwosal_scheduler_get_tickcount_lc();
-}
-
-void HAL_Delay(uint32_t Delay)
-{
-        xwtm_t xwtm;
-
-        xwtm = Delay * XWTM_MS;
-        xwosal_cthrd_sleep(&xwtm);
+        HAL_IncTick();
 }

@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __bdl_xwkac_idle_hook_h__
-#define __bdl_xwkac_idle_hook_h__
+#ifndef __bdl_xwkac_xwsd_hook_h__
+#define __bdl_xwkac_xwsd_hook_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
@@ -38,11 +38,12 @@ struct xwos_scheduler;
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwos_code
 void bdl_xwsd_idle_hook(struct xwos_scheduler * xwsd);
+
+void bdl_xwsd_syshwt_hook(struct xwos_scheduler * xwsd);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
-#endif /* bdl/xwkac/idle_hook.h */
+#endif /* bdl/xwkac/xwsd_hook.h */

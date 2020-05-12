@@ -21,6 +21,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+#include <arch_systick.h>
 #include <bm/stm32cube/standard.h>
 #include <xwos/osal/scheduler.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
@@ -67,8 +68,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 
         /* Configure the SysTick IRQ priority */
         if (TickPriority < (1UL << __NVIC_PRIO_BITS)) {
-                HAL_NVIC_SetPriority(SysTick_IRQn, TickPriority, 0U);
-                uwTickPrio = TickPriority;
+                uwTickPrio = ARCH_IRQ_TICK_PRIO;
                 ret = HAL_OK;
         } else {
                 ret = HAL_ERROR;
@@ -76,7 +76,7 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
         return ret;
 }
 
-uint32_t HAL_GetTick(void)
+void stm32cube_systick_hook(void)
 {
-        return (uint32_t)xwosal_scheduler_get_tickcount_lc();
+        HAL_IncTick();
 }

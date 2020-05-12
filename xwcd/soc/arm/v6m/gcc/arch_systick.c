@@ -40,8 +40,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define ARCH_IRQ_TICK_PRIO      (ARCH_IRQ_PRIO_LOWEST)
-
 #ifdef BRDCFG_SYSHWT_SRCCLK
   #define ARCH_SYSHWT_SRCCLK    BRDCFG_SYSHWT_SRCCLK
 #else

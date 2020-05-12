@@ -1956,7 +1956,7 @@ void xwos_thrd_immigrate_lic(struct xwos_tcb * tcb)
         new->thrd_num++;
         xwmb_smp_store_release(struct xwos_scheduler *, &tcb->xwsd, new);
         xwlk_splk_unlock(&new->tcblistlock);
-        if (xwos_scheduler_get_pm_state(new) <= XWOS_SCHEDULER_WKLKCNT_SUSPENDING) {
+        if (xwos_scheduler_get_pm_state(new) < XWOS_SCHEDULER_WKLKCNT_RUNNING) {
                 xwlk_splk_lock(&tcb->stlock);
                 xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_MIGRATING);
                 xwlk_splk_unlock(&tcb->stlock);

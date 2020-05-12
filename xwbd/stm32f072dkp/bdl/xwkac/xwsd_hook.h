@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS Kernel Adapter Code in BDL：操作系统空闲线程钩子函数
+ * @brief XWOS Kernel Adaptation Code in BDL：操作系统空闲线程钩子函数
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -18,12 +18,18 @@
  * > limitations under the License.
  */
 
+#ifndef __bdl_xwkac_xwsd_hook_h__
+#define __bdl_xwkac_xwsd_hook_h__
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <armv6m_core.h>
-#include <bdl/xwkac/idle_hook.h>
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       types       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+struct xwos_scheduler;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -32,17 +38,12 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+void bdl_xwsd_idle_hook(struct xwos_scheduler * xwsd);
+
+void bdl_xwsd_syshwt_hook(struct xwos_scheduler * xwsd);
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
+ ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-__xwos_code
-void bdl_xwsd_idle_hook(struct xwos_scheduler * xwsd)
-{
-        XWOS_UNUSED(xwsd);
-        wfi();
-}
+#endif /* bdl/xwkac/xwsd_hook.h */

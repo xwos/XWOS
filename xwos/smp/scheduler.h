@@ -115,7 +115,9 @@ enum xwos_scheduler_wakelock_cnt_em {
         XWOS_SCHEDULER_WKLKCNT_FREEZING, /**< 调度器正在暂停 */
         XWOS_SCHEDULER_WKLKCNT_THAWING = XWOS_SCHEDULER_WKLKCNT_FREEZING,
                                            /**< 调度器正在恢复 */
-        XWOS_SCHEDULER_WKLKCNT_UNLOCKED, /**< 唤醒锁：未加锁 */
+        XWOS_SCHEDULER_WKLKCNT_RUNNING, /**< 正常运行 */
+        XWOS_SCHEDULER_WKLKCNT_UNLOCKED = XWOS_SCHEDULER_WKLKCNT_RUNNING,
+                                        /**< 唤醒锁：未加锁 */
         XWOS_SCHEDULER_WKLKCNT_LOCKED, /**< 唤醒锁：已加锁 */
 };
 

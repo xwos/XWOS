@@ -92,7 +92,7 @@ xwu8_t xwos_scheduler_bhd_stack[CPUCFG_CPU_NUM][XWSMPCFG_SD_BH_STACK_SIZE];
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern __xwos_code
+extern
 void bdl_xwsd_idle_hook(struct xwos_scheduler * xwsd);
 
 static __xwos_code
@@ -183,7 +183,7 @@ xwer_t xwos_scheduler_init_lc(struct xwos_pmdm * xwpmdm)
                 goto err_rtrq_init;
         }
         xwos_scheduler_init_idled(xwsd);
-        xwsd->pm.wklkcnt = XWOS_SCHEDULER_WKLKCNT_UNLOCKED;
+        xwsd->pm.wklkcnt = XWOS_SCHEDULER_WKLKCNT_RUNNING;
         xwsd->pm.frz_thrd_cnt = 0;
         xwlk_splk_init(&xwsd->pm.lock);
         xwlib_bclst_init_head(&xwsd->pm.frzlist);

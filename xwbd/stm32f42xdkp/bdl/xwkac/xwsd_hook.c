@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS Kernel Adaptation Code in BDL：操作系统空闲线程钩子函数
+ * @brief XWOS Kernel Adapter Code in BDL：操作系统空闲线程钩子函数
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -18,18 +18,12 @@
  * > limitations under the License.
  */
 
-#ifndef __bdl_xwkac_idle_hook_h__
-#define __bdl_xwkac_idle_hook_h__
-
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-struct xwos_scheduler;
+#include <armv7m_core.h>
+#include <bdl/xwkac/xwsd_hook.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -38,11 +32,23 @@ struct xwos_scheduler;
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwos_code
-void bdl_xwsd_idle_hook(struct xwos_scheduler * xwsd);
+extern void stm32cube_systick_hook(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
+ ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
-#endif /* bdl/xwkac/idle_hook.h */
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********      function implementations       ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+void bdl_xwsd_idle_hook(struct xwos_scheduler * xwsd)
+{
+        XWOS_UNUSED(xwsd);
+        wfi();
+}
+
+void bdl_xwsd_syshwt_hook(struct xwos_scheduler * xwsd)
+{
+        XWOS_UNUSED(xwsd);
+        stm32cube_systick_hook();
+}
