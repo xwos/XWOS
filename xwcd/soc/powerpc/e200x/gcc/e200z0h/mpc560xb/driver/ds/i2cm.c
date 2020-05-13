@@ -475,14 +475,13 @@ xwer_t mpc560xb_i2cm_drv_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg
                         I2C.IBDR.R = (xwu8_t)(msg->addr & 0xFF) & ((xwu8_t)~1);
                 }
                 I2C.IBCR.B.IBIE = 1; /* enable irq */
-                rc = xwosal_cthrd_timedpause(ulk,
-                                             XWLK_TYPE_SPLK_CPUIRQ,
-                                             NULL, 0, xwtm, &lockstate);
+                rc = xwosal_cthrd_timedpause(ulk, XWLK_TYPE_SPLK, NULL,
+                                             xwtm, &lockstate);
                 if (OK == rc) {
                         rc = drvdata->xmsg.rc;
                 } else {
                         if (XWLK_STATE_UNLOCKED == lockstate) {
-                                xwosal_splk_lock_cpuirq(&drvdata->lock);
+                                xwosal_splk_lock(&drvdata->lock);
                         }
                 }
         }

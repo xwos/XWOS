@@ -240,21 +240,17 @@ xwer_t xwosdl_thrd_continue(xwid_t tid)
 }
 
 static __xw_inline
-xwer_t xwosdl_cthrd_pause(union xwlk_ulock lock, xwsq_t lktype,
-                          void * lkdata, xwsz_t datanum,
+xwer_t xwosdl_cthrd_pause(union xwlk_ulock lock, xwsq_t lktype, void * lkdata,
                           xwsq_t * lkst)
 {
-        return xwos_cthrd_pause(lock.anon, lktype, lkdata, datanum, lkst);
+        return xwos_cthrd_pause(lock.anon, lktype, lkdata, lkst);
 }
 
 static __xw_inline
-xwer_t xwosdl_cthrd_timedpause(union xwlk_ulock lock, xwsq_t lktype,
-                               void * lkdata, xwsz_t datanum,
+xwer_t xwosdl_cthrd_timedpause(union xwlk_ulock lock, xwsq_t lktype, void * lkdata,
                                xwtm_t * xwtm, xwsq_t * lkst)
 {
-        return xwos_cthrd_timedpause(lock.anon, lktype,
-                                     lkdata, datanum,
-                                     xwtm, lkst);
+        return xwos_cthrd_timedpause(lock.anon, lktype, lkdata, xwtm, lkst);
 }
 
 static __xw_inline
@@ -744,26 +740,22 @@ xwer_t xwosdl_cdt_unicast(xwid_t cdtid)
 
 static __xw_inline
 xwer_t xwosdl_cdt_wait(xwid_t cdtid,
-                       union xwlk_ulock lock, xwsq_t lktype,
-                       void * lkdata, xwsz_t datanum,
+                       union xwlk_ulock lock, xwsq_t lktype, void * lkdata,
                        xwsq_t * lkst)
 {
         return xwsync_cdt_wait(xwosdl_cdt_get_obj(cdtid),
-                               lock.anon,
-                               lktype, lkdata,
-                               datanum, lkst);
+                               lock.anon, lktype, lkdata,
+                               lkst);
 }
 
 static __xw_inline
 xwer_t xwosdl_cdt_timedwait(xwid_t cdtid,
-                            union xwlk_ulock lock, xwsq_t lktype,
-                            void * lkdata, xwsz_t datanum,
+                            union xwlk_ulock lock, xwsq_t lktype, void * lkdata,
                             xwtm_t * xwtm,
                             xwsq_t * lkst)
 {
         return xwsync_cdt_timedwait(xwosdl_cdt_get_obj(cdtid),
-                                    lock.anon, lktype,
-                                    lkdata, datanum,
+                                    lock.anon, lktype, lkdata,
                                     xwtm, lkst);
 }
 

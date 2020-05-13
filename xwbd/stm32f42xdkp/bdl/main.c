@@ -118,20 +118,17 @@ xwer_t bdl_init_thrd(void * arg)
         if (rc < 0) {
                 goto err_bm_xwpcp_start;
         }
-/*
+
         rc = bm_xwtst_sync_selector_start();
         if (rc < 0) {
                 goto err_bm_xwtst_sync_selector_start;
         }
-*/
 
         xwosal_thrd_delete(bdl_init_thrd_id);
         return OK;
 
-/*
 err_bm_xwtst_sync_selector_start:
         BDL_BUG();
-*/
 err_bm_xwpcp_start:
         BDL_BUG();
 err_bm_cxx_start:

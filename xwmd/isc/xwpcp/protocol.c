@@ -1004,8 +1004,8 @@ xwer_t xwpcp_tx_frm(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
                                 goto err_if_tx;
                         }
                         xwtm = XWPCP_RETRY_PERIOD;
-                        rc = xwosal_cdt_timedwait(cscdtid, ulk,
-                                                  XWLK_TYPE_MTX, NULL, 0,
+                        rc = xwosal_cdt_timedwait(cscdtid,
+                                                  ulk, XWLK_TYPE_MTX, NULL,
                                                   &xwtm, &lockstate);
                         if (OK == rc) {
                                 xwosal_mtx_unlock(ulk.osal.id);

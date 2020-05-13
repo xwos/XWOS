@@ -60,8 +60,7 @@ xwer_t xwsync_cdt_do_unicast(struct xwsync_cdt * cdt);
 __xwos_code
 xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
                                struct xwos_tcb * tcb,
-                               void * lock, xwsq_t lktype,
-                               void * lkdata, xwsz_t datanum,
+                               void * lock, xwsq_t lktype, void * lkdata,
                                xwtm_t * xwtm, xwsq_t * lkst);
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -108,8 +107,7 @@ xwer_t xwsync_cdt_unicast(struct xwsync_cdt * cdt);
 
 __xwos_api
 xwer_t xwsync_cdt_timedwait(struct xwsync_cdt * cdt,
-                            void * lock, xwsq_t lktype,
-                            void * lkdata, xwsz_t datanum,
+                            void * lock, xwsq_t lktype, void * lkdata,
                             xwtm_t * xwtm, xwsq_t * lkst);
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -121,7 +119,6 @@ xwer_t xwsync_cdt_timedwait(struct xwsync_cdt * cdt,
  * @param lock: (I) (I) 锁的地址
  * @param lktype: (I) 锁的类型
  * @param lkdata: (I) 锁的数据
- * @param datanum: (I) 锁的数据数量
  * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码
  * @retval OK: OK
@@ -136,13 +133,11 @@ xwer_t xwsync_cdt_timedwait(struct xwsync_cdt * cdt,
  */
 static __xwos_inline_api
 xwer_t xwsync_cdt_wait(struct xwsync_cdt * cdt,
-                       void * lock, xwsq_t lktype,
-                       void * lkdata, xwsz_t datanum,
+                       void * lock, xwsq_t lktype, void * lkdata,
                        xwsq_t * lkst)
 {
         xwtm_t expected = XWTM_MAX;
-        return xwsync_cdt_timedwait(cdt, lock, lktype, lkdata, datanum,
-                                    &expected, lkst);
+        return xwsync_cdt_timedwait(cdt, lock, lktype, lkdata, &expected, lkst);
 }
 
 #endif /* xwos/up/sync/condition.h */

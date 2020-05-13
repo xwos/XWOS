@@ -78,7 +78,7 @@ static __xwos_code
 xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                                                   struct xwos_tcb * tcb,
                                                   void * lock, xwsq_t lktype,
-                                                  void * lkdata, xwsz_t datanum,
+                                                  void * lkdata,
                                                   xwtm_t * xwtm, xwsq_t * lkst,
                                                   xwreg_t cpuirq);
 
@@ -669,7 +669,7 @@ xwer_t xwsync_cdt_do_unicast(struct xwsync_cdt * cdt)
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
- * @note；
+ * @note
  * - 此函数只对未冻结的条件量起作用，已冻结的条件量将得到错误码-ENEGATIVE。
  */
 __xwos_api
@@ -690,7 +690,7 @@ static __xwos_code
 xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                                                   struct xwos_tcb * tcb,
                                                   void * lock, xwsq_t lktype,
-                                                  void * lkdata, xwsz_t datanum,
+                                                  void * lkdata,
                                                   xwtm_t * xwtm, xwsq_t * lkst,
                                                   xwreg_t cpuirq)
 {
@@ -731,7 +731,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
         xwos_plwq_unlock_cpuirqrs(&cdt->wq.pl, cpuirq);
 
         /* 同步解锁 */
-        rc = xwos_thrd_do_unlock(lock, lktype, lkdata, datanum);
+        rc = xwos_thrd_do_unlock(lock, lktype, lkdata);
         if (OK == rc){
                 *lkst = XWLK_STATE_UNLOCKED;
         }/* else {} */
@@ -778,7 +778,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                 if (__likely(XWLK_STATE_UNLOCKED == *lkst)) {
                         currtick = xwos_syshwt_get_timetick(hwt);
                         *xwtm = xwtm_sub(expected, currtick);
-                        rc = xwos_thrd_do_lock(lock, lktype, xwtm, lkdata, datanum);
+                        rc = xwos_thrd_do_lock(lock, lktype, xwtm, lkdata);
                         if (OK == rc) {
                                 *lkst = XWLK_STATE_LOCKED;
                         }/* else {} */
@@ -812,7 +812,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                                         currtick = xwos_syshwt_get_timetick(hwt);
                                         *xwtm = xwtm_sub(expected, currtick);
                                         rc = xwos_thrd_do_lock(lock, lktype, xwtm,
-                                                                 lkdata, datanum);
+                                                               lkdata);
                                         if (OK == rc) {
                                                 *lkst = XWLK_STATE_LOCKED;
                                         }/* else {} */
@@ -850,7 +850,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                                         currtick = xwos_syshwt_get_timetick(hwt);
                                         *xwtm = xwtm_sub(expected, currtick);
                                         rc = xwos_thrd_do_lock(lock, lktype, xwtm,
-                                                               lkdata, datanum);
+                                                               lkdata);
                                         if (OK == rc) {
                                                 *lkst = XWLK_STATE_LOCKED;
                                         }
@@ -873,8 +873,7 @@ err_needfrz:
 
 __xwos_code
 xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt, struct xwos_tcb * tcb,
-                               void * lock, xwsq_t lktype,
-                               void * lkdata, xwsz_t datanum,
+                               void * lock, xwsq_t lktype, void * lkdata,
                                xwtm_t * xwtm, xwsq_t * lkst)
 {
         struct xwos_scheduler * xwsd;
@@ -890,8 +889,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt, struct xwos_tcb * tcb,
                 rc = -EINTR;
         } else {
                 rc = xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(cdt, tcb,
-                                                                lock, lktype,
-                                                                lkdata, datanum,
+                                                                lock, lktype, lkdata,
                                                                 xwtm, lkst, cpuirq);
                 xwos_scheduler_wakelock_unlock(xwsd);
         }
@@ -902,9 +900,8 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt, struct xwos_tcb * tcb,
  * @brief XWOS API：限时等待条件量
  * @param cdt: (I) 条件量对象的指针
  * @param lock: (I) 锁的地址
- * @param lktype: (I) 锁的类型
+ * @param lktype: (I) 锁的类型，取值：@ref xwos_lock_type_em
  * @param lkdata: (I) 锁的数据
- * @param datanum: (I) 锁的数据数量
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -925,8 +922,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt, struct xwos_tcb * tcb,
  */
 __xwos_api
 xwer_t xwsync_cdt_timedwait(struct xwsync_cdt * cdt,
-                            void * lock, xwsq_t lktype,
-                            void * lkdata, xwsz_t datanum,
+                            void * lock, xwsq_t lktype, void * lkdata,
                             xwtm_t * xwtm, xwsq_t * lkst)
 {
         struct xwos_tcb * ctcb;
@@ -944,7 +940,7 @@ xwer_t xwsync_cdt_timedwait(struct xwsync_cdt * cdt,
         *lkst = XWLK_STATE_LOCKED;
         ctcb = xwos_scheduler_get_ctcb_lc();
         if (__unlikely(0 == xwtm_cmp(*xwtm, 0))) {
-                rc = xwos_thrd_do_unlock(lock, lktype, lkdata, datanum);
+                rc = xwos_thrd_do_unlock(lock, lktype, lkdata);
                 if (OK == rc) {
                         *lkst = XWLK_STATE_UNLOCKED;
                 }/* else {} */
@@ -952,8 +948,7 @@ xwer_t xwsync_cdt_timedwait(struct xwsync_cdt * cdt,
         } else {
                 rc = xwsync_cdt_grab(cdt);
                 if (__likely(OK == rc)) {
-                        rc = xwsync_cdt_do_timedwait(cdt, ctcb, lock, lktype,
-                                                     lkdata, datanum,
+                        rc = xwsync_cdt_do_timedwait(cdt, ctcb, lock, lktype, lkdata,
                                                      xwtm, lkst);
                         xwsync_cdt_put(cdt);
                 }/* else {} */

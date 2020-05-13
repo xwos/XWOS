@@ -576,11 +576,8 @@ xwer_t xwds_ispi8d_tx(struct xwds_ispi8d * ispi8d,
 
         xwosal_splk_lock_cpuirqsv(&ispi8d->comi.lock, &cpuirq);
         ispi8d->comi.ntxslot = &txslot;
-        rc = xwosal_cthrd_timedpause(&lockcb,
-                                     XWLK_TYPE_CALLBACK,
-                                     ispi8d, 1,
-                                     xwtm,
-                                     &lkst);
+        rc = xwosal_cthrd_timedpause(&lockcb, XWLK_TYPE_CALLBACK, ispi8d,
+                                     xwtm, &lkst);
         if (OK == rc) {
                 xwosal_splk_unlock_cpuirqrs(&ispi8d->comi.lock, cpuirq);
                 rc = txslot.rc;
@@ -593,6 +590,8 @@ xwer_t xwds_ispi8d_tx(struct xwds_ispi8d * ispi8d,
                                 rc = drv->notify(ispi8d,
                                                  SODS_ISPI8D_DATA_NON_AVAILABLE);
                         }
+                } else {
+                        xwosal_cpuirq_restore_lc(cpuirq);
                 }
         }
         xwosal_mtx_unlock(xwosal_mtx_get_id(&ispi8d->txmtx));

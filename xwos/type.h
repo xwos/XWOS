@@ -166,14 +166,8 @@ enum xwos_lock_type_em {
         XWLK_TYPE_MTX, /**< 互斥锁 */
         XWLK_TYPE_MTX_UNINTR, /**< 不可中断的互斥锁 */
         XWLK_TYPE_SPLK, /**< 自旋锁 */
-        XWLK_TYPE_SPLK_IRQS, /**< 屏蔽某些中断的自旋锁 */
-        XWLK_TYPE_SPLK_CPUIRQ, /**< 屏蔽本地CPU所有中断的自旋锁 */
         XWLK_TYPE_SQLK_WR, /**< 顺序写锁 */
-        XWLK_TYPE_SQLK_WR_IRQS, /**< 屏蔽某些中断的顺序写锁 */
-        XWLK_TYPE_SQLK_WR_CPUIRQ, /**< 屏蔽本地CPU所有中断的顺序写锁 */
         XWLK_TYPE_SQLK_RDEX, /**< 顺序读锁 */
-        XWLK_TYPE_SQLK_RDEX_IRQS, /**< 屏蔽某些中断的顺序读锁 */
-        XWLK_TYPE_SQLK_RDEX_CPUIRQ, /**< 屏蔽本地CPU所有中断的顺序读锁 */
         XWLK_TYPE_CALLBACK, /**< 抽象回调锁 */
         XWLK_TYPE_NUM, /**< 锁类型的数量 */
 };

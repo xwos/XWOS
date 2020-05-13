@@ -132,11 +132,11 @@ void MX_USART1_UART_Init(void)
 
   /* Peripheral clock enable */
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_USART1);
-  
+
   LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOA);
-  /**USART1 GPIO Configuration  
+  /**USART1 GPIO Configuration
   PA9   ------> USART1_TX
-  PA10   ------> USART1_RX 
+  PA10   ------> USART1_RX
   */
   GPIO_InitStruct.Pin = LL_GPIO_PIN_9|LL_GPIO_PIN_10;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
@@ -147,7 +147,7 @@ void MX_USART1_UART_Init(void)
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /* USART1 DMA Init */
-  
+
   /* USART1_TX Init */
   LL_DMA_SetChannelSelection(DMA2, LL_DMA_STREAM_7, LL_DMA_CHANNEL_4);
 
@@ -400,18 +400,16 @@ xwer_t stm32cube_dmauartc1_drv_tx(struct xwds_dmauartc * dmauartc,
   rc = xwds_dma_enable(txdmarsc->soc, txdmarsc->ch);
   if (OK == rc) {
     rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&drvdata->tx.cdt),
-                              ulk,
-                              XWLK_TYPE_SPLK_CPUIRQ,
-                              NULL, XWOS_UNUSED_ARGUMENT,
+                              ulk, XWLK_TYPE_SPLK, NULL,
                               xwtm, &lkst);
     if (OK == rc) {
       if (XWLK_STATE_UNLOCKED == lkst) {
-        xwosal_splk_lock_cpuirq(&drvdata->tx.splk);
+        xwosal_splk_lock(&drvdata->tx.splk);
       }
       rc = drvdata->tx.rc;
     } else {
       if (XWLK_STATE_UNLOCKED == lkst) {
-        xwosal_splk_lock_cpuirq(&drvdata->tx.splk);
+        xwosal_splk_lock(&drvdata->tx.splk);
       }
       drvdata->tx.rc = -ECANCELED;
     }

@@ -145,15 +145,15 @@ xwer_t bm_xwtst_sync_condition_wthrd_func(void * arg)
                         bm_xwtst_sync_flag = false;
                 } else {
                         time = 10 * XWTM_S;
-                        rc = xwosal_cdt_timedwait(cdtid, ulk,
-                                                  XWLK_TYPE_SPLK, NULL, 0,
+                        rc = xwosal_cdt_timedwait(cdtid,
+                                                  ulk, XWLK_TYPE_SPLK, NULL,
                                                   &time, &lkst);
                         if (OK == rc) {
                                 xwlogf(INFO, "Acquired!");
                                 bm_xwtst_sync_flag = false;
                         } else {
                                 if (XWLK_STATE_UNLOCKED == lkst) {
-                                        xwosal_splk_lock_cpuirq(&bm_xwtst_sync_lock);
+                                        xwosal_splk_lock(&bm_xwtst_sync_lock);
                                 }
                                 if (bm_xwtst_sync_flag) {
                                         xwlogf(INFO, "Acquired!");

@@ -365,7 +365,6 @@ xwer_t xwosal_thrd_continue(xwid_t tid)
  * @param lock: (I) 锁
  * @param lktype: (I) 锁的类型
  * @param lkdata: (I) 锁的数据
- * @param datanum: (I) 锁的数据数量
  * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码
  * @retval OK: OK
@@ -382,11 +381,10 @@ xwer_t xwosal_thrd_continue(xwid_t tid)
  *   此函数返回时，会在lkst中返回锁的状态。
  */
 static __xwos_inline_api
-xwer_t xwosal_cthrd_pause(union xwlk_ulock lock, xwsq_t lktype,
-                          void * lockdata, xwsz_t datanum,
+xwer_t xwosal_cthrd_pause(union xwlk_ulock lock, xwsq_t lktype, void * lkdata,
                           xwsq_t * lkst)
 {
-        return xwosdl_cthrd_pause(lock, lktype, lockdata, datanum, lkst);
+        return xwosdl_cthrd_pause(lock, lktype, lkdata, lkst);
 }
 
 /**
@@ -394,7 +392,6 @@ xwer_t xwosal_cthrd_pause(union xwlk_ulock lock, xwsq_t lktype,
  * @param lock: (I) 锁
  * @param lktype: (I) 锁的类型
  * @param lkdata: (I) 锁的数据
- * @param datanum: (I) 锁的数据数量
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -416,11 +413,10 @@ xwer_t xwosal_cthrd_pause(union xwlk_ulock lock, xwsq_t lktype,
  * - 函数返回 *-ETIMEDOUT* 时， *xwtm* 指向的缓冲区内的值减为0。
  */
 static __xwos_inline_api
-xwer_t xwosal_cthrd_timedpause(union xwlk_ulock lock, xwsq_t lktype,
-                               void * lockdata, xwsz_t datanum,
+xwer_t xwosal_cthrd_timedpause(union xwlk_ulock lock, xwsq_t lktype, void * lkdata,
                                xwtm_t * xwtm, xwsq_t * lkst)
 {
-        return xwosdl_cthrd_timedpause(lock, lktype, lockdata, datanum, xwtm, lkst);
+        return xwosdl_cthrd_timedpause(lock, lktype, lkdata, xwtm, lkst);
 }
 
 /**

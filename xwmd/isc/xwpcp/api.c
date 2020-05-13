@@ -363,8 +363,8 @@ xwer_t xwpcp_tx(struct xwpcp * xwpcp,
         ulk.osal.splk = &cbarg.splk;
         xwosal_splk_lock(&cbarg.splk);
         if (-EINPROGRESS == cbarg.rc) {
-                rc = xwosal_cdt_timedwait(cdtid, ulk, XWLK_TYPE_SPLK,
-                                          NULL, 0, xwtm, &lkst);
+                rc = xwosal_cdt_timedwait(cdtid, ulk, XWLK_TYPE_SPLK, NULL,
+                                          xwtm, &lkst);
                 if (OK == rc) {
                         rc = cbarg.rc;
                         xwosal_splk_unlock(&cbarg.splk);

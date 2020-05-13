@@ -601,18 +601,16 @@ xwer_t mpc560xb_dmauart0_drv_tx(struct xwds_dmauartc * dmauartc,
         rc = xwds_dma_enable(txdmarsc->soc, txdmarsc->ch);
         if (OK == rc) {
                 rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&drvdata->tx.cdt),
-                                          ulk,
-                                          XWLK_TYPE_SPLK_CPUIRQ,
-                                          NULL, XWOS_UNUSED_ARGUMENT,
+                                          ulk, XWLK_TYPE_SPLK, NULL,
                                           xwtm, &lkst);
                 if (OK == rc) {
                         if (XWLK_STATE_UNLOCKED == lkst) {
-                                xwosal_splk_lock_cpuirq(&drvdata->tx.splk);
+                                xwosal_splk_lock(&drvdata->tx.splk);
                         }
                         rc = drvdata->tx.rc;
                 } else {
                         if (XWLK_STATE_UNLOCKED == lkst) {
-                                xwosal_splk_lock_cpuirq(&drvdata->tx.splk);
+                                xwosal_splk_lock(&drvdata->tx.splk);
                         }
                         drvdata->tx.rc = -ECANCELED;
                 }

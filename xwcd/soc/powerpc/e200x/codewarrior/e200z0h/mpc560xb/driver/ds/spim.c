@@ -582,8 +582,8 @@ xwer_t mpc560xb_spim_drv_xfer(struct xwds_spim * spim,
                 }
                 drvdata->txpos++;
                 reg->MCR.B.HALT = 0;
-                rc = xwosal_cthrd_timedpause(ulk, XWLK_TYPE_SPLK,
-                                             NULL, 0, xwtm, &lockstate);
+                rc = xwosal_cthrd_timedpause(ulk, XWLK_TYPE_SPLK, NULL,
+                                             xwtm, &lockstate);
                 if (XWLK_STATE_UNLOCKED == lockstate) {
                         xwosal_splk_lock(&drvdata->lock);
                 }

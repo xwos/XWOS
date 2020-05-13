@@ -552,8 +552,8 @@ xwer_t xwos_thrd_terminate(struct xwos_tcb * tcb, xwer_t * trc)
         } else {
                 xwbop_s1m(xwsq_t, &tcb->state, XWSDOBJ_DST_EXITING);
                 rc = xwsync_cdt_wait(&tcb->completion,
-                                     &lockcb, XWLK_TYPE_CALLBACK,
-                                     tcb, XWOS_UNUSED_ARGUMENT, &lkst);
+                                     &lockcb, XWLK_TYPE_CALLBACK, tcb,
+                                     &lkst);
                 if (OK == rc) {
                         if (!is_err_or_null(trc)) {
                                 *trc = (xwer_t)tcb->stack.arg;
@@ -1014,7 +1014,6 @@ void xwos_cthrd_yield(void)
  * @param lock: (I) 锁的地址
  * @param lktype: (I) 锁的类型
  * @param lkdata: (I) 锁的数据
- * @param datanum: (I) 锁的数据数量
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -1022,15 +1021,12 @@ void xwos_cthrd_yield(void)
  * @return 错误码
  */
 __xwos_code
-xwer_t xwos_thrd_do_unlock(void * lock, xwsq_t lktype,
-                           void * lkdata, xwsz_t datanum)
+xwer_t xwos_thrd_do_unlock(void * lock, xwsq_t lktype, void * lkdata)
 {
         xwer_t rc;
         union xwlk_ulock ulk;
-        struct xwos_irq_resource * irqrsc;
 
         ulk.anon = lock;
-        irqrsc = lkdata;
 
         rc = OK;
         switch (lktype) {
@@ -1044,29 +1040,11 @@ xwer_t xwos_thrd_do_unlock(void * lock, xwsq_t lktype,
         case XWLK_TYPE_SPLK:
                 xwlk_splk_unlock(ulk.xwos.splk);
                 break;
-        case XWLK_TYPE_SPLK_IRQS:
-                xwlk_splk_unlock_irqs(ulk.xwos.splk, irqrsc, datanum);
-                break;
-        case XWLK_TYPE_SPLK_CPUIRQ:
-                xwlk_splk_unlock_cpuirq(ulk.xwos.splk);
-                break;
         case XWLK_TYPE_SQLK_WR:
                 xwlk_sqlk_wr_unlock(ulk.xwos.sqlk);
                 break;
-        case XWLK_TYPE_SQLK_WR_IRQS:
-                xwlk_sqlk_wr_unlock_irqs(ulk.xwos.sqlk, irqrsc, datanum);
-                break;
-        case XWLK_TYPE_SQLK_WR_CPUIRQ:
-                xwlk_sqlk_wr_unlock_cpuirq(ulk.xwos.sqlk);
-                break;
         case XWLK_TYPE_SQLK_RDEX:
                 xwlk_sqlk_rdex_unlock(ulk.xwos.sqlk);
-                break;
-        case XWLK_TYPE_SQLK_RDEX_IRQS:
-                xwlk_sqlk_rdex_unlock_irqs(ulk.xwos.sqlk, irqrsc, datanum);
-                break;
-        case XWLK_TYPE_SQLK_RDEX_CPUIRQ:
-                xwlk_sqlk_rdex_unlock_cpuirq(ulk.xwos.sqlk);
                 break;
         case XWLK_TYPE_CALLBACK:
                 if (ulk.cb->unlock) {
@@ -1086,7 +1064,6 @@ xwer_t xwos_thrd_do_unlock(void * lock, xwsq_t lktype,
  * @param lock: (I) 锁的地址
  * @param lktype: (I) 锁的类型
  * @param lkdata: (I) 锁的数据
- * @param datanum: (I) 锁的数据数量
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -1095,14 +1072,12 @@ xwer_t xwos_thrd_do_unlock(void * lock, xwsq_t lktype,
  */
 __xwos_code
 xwer_t xwos_thrd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm,
-                         void * lkdata, xwsz_t datanum)
+                         void * lkdata)
 {
         xwer_t rc;
         union xwlk_ulock ulk;
-        struct xwos_irq_resource * irqrsc;
 
         ulk.anon = lock;
-        irqrsc = lkdata;
 
         rc = OK;
         switch (lktype) {
@@ -1125,29 +1100,11 @@ xwer_t xwos_thrd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm,
         case XWLK_TYPE_SPLK:
                 xwlk_splk_lock(ulk.xwos.splk);
                 break;
-        case XWLK_TYPE_SPLK_IRQS:
-                xwlk_splk_lock_irqs(ulk.xwos.splk, irqrsc, datanum);
-                break;
-        case XWLK_TYPE_SPLK_CPUIRQ:
-                xwlk_splk_lock_cpuirq(ulk.xwos.splk);
-                break;
         case XWLK_TYPE_SQLK_WR:
                 xwlk_sqlk_wr_lock(ulk.xwos.sqlk);
                 break;
-        case XWLK_TYPE_SQLK_WR_IRQS:
-                xwlk_sqlk_wr_lock_irqs(ulk.xwos.sqlk, irqrsc, datanum);
-                break;
-        case XWLK_TYPE_SQLK_WR_CPUIRQ:
-                xwlk_sqlk_wr_lock_cpuirq(ulk.xwos.sqlk);
-                break;
         case XWLK_TYPE_SQLK_RDEX:
                 xwlk_sqlk_rdex_lock(ulk.xwos.sqlk);
-                break;
-        case XWLK_TYPE_SQLK_RDEX_IRQS:
-                xwlk_sqlk_wr_lock_irqs(ulk.xwos.sqlk, irqrsc, datanum);
-                break;
-        case XWLK_TYPE_SQLK_RDEX_CPUIRQ:
-                xwlk_sqlk_rdex_lock_cpuirq(ulk.xwos.sqlk);
                 break;
         case XWLK_TYPE_CALLBACK:
                 if (ulk.cb->lock) {
@@ -1193,7 +1150,6 @@ xwer_t xwos_thrd_continue(struct xwos_tcb * tcb)
  * @param lock: (I) 锁的地址
  * @param lktype: (I) 锁的类型
  * @param lkdata: (I) 锁的数据
- * @param datanum: (I) 锁的数据数量
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -1210,8 +1166,7 @@ xwer_t xwos_thrd_continue(struct xwos_tcb * tcb)
  * - 等待超时后将以返回值-ETIMEDOUT返回，并且 *xwtm* 指向缓冲区返回0。
  */
 __xwos_api
-xwer_t xwos_cthrd_timedpause(void * lock, xwsq_t lktype,
-                             void * lkdata, xwsz_t datanum,
+xwer_t xwos_cthrd_timedpause(void * lock, xwsq_t lktype, void * lkdata,
                              xwtm_t * xwtm, xwsq_t * lkst)
 {
         struct xwos_tcb * ctcb;
@@ -1228,14 +1183,14 @@ xwer_t xwos_cthrd_timedpause(void * lock, xwsq_t lktype,
         *lkst = XWLK_STATE_LOCKED;
         ctcb = xwos_scheduler_get_ctcb_lc();
         if (__unlikely(0 == xwtm_cmp(*xwtm, 0))) {
-                rc = xwos_thrd_do_unlock(lock, lktype, lkdata, datanum);
+                rc = xwos_thrd_do_unlock(lock, lktype, lkdata);
                 if (OK == rc) {
                         *lkst = XWLK_STATE_UNLOCKED;
                 }
                 rc = -ETIMEDOUT;
         } else {
                 rc = xwsync_cdt_do_timedwait(&ctcb->self, ctcb,
-                                             lock, lktype, lkdata, datanum,
+                                             lock, lktype, lkdata,
                                              xwtm, lkst);
         }
         return rc;

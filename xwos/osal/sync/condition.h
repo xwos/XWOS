@@ -134,7 +134,7 @@ struct xwosal_cdt * xwosal_cdt_get_obj(xwid_t cdtid)
  * @param pos: (I) 条件量对象映射到位图中的位置
  * @return 错误码
  * @retval OK: OK
- * @retval -ETYPE: 信号选择器或条件量类型错误
+ * @retval -ETYPE: 信号选择器类型错误
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -260,9 +260,8 @@ xwer_t xwosal_cdt_unicast(xwid_t cdtid)
  * @brief XWOSAL API：等待条件量
  * @param cdtid: (I) 条件量ID
  * @param lock: (I) 锁
- * @param lktype: (I) 锁的类型
+ * @param lktype: (I) 锁的类型，取值：@ref xwos_lock_type_em
  * @param lkdata: (I) 锁的数据
- * @param datanum: (I) 锁的数据数量
  * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码
  * @note
@@ -272,20 +271,18 @@ xwer_t xwosal_cdt_unicast(xwid_t cdtid)
  */
 static __xwos_inline_api
 xwer_t xwosal_cdt_wait(xwid_t cdtid,
-                       union xwlk_ulock lock, xwsq_t lktype,
-                       void * lkdata, xwsz_t datanum,
+                       union xwlk_ulock lock, xwsq_t lktype, void * lkdata,
                        xwsq_t * lkst)
 {
-        return xwosdl_cdt_wait(cdtid, lock, lktype, lkdata, datanum, lkst);
+        return xwosdl_cdt_wait(cdtid, lock, lktype, lkdata, lkst);
 }
 
 /**
  * @brief XWOSAL API：限时等待条件量
  * @param cdtid: (I) 条件量ID
  * @param lock: (I) 锁
- * @param lktype: (I) 锁的类型
+ * @param lktype: (I) 锁的类型，取值：@ref xwos_lock_type_em
  * @param lkdata: (I) 锁的数据
- * @param datanum: (I) 锁的数据数量
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -302,12 +299,10 @@ xwer_t xwosal_cdt_wait(xwid_t cdtid,
  */
 static __xwos_inline_api
 xwer_t xwosal_cdt_timedwait(xwid_t cdtid,
-                            union xwlk_ulock lock, xwsq_t lktype,
-                            void * lkdata, xwsz_t datanum,
+                            union xwlk_ulock lock, xwsq_t lktype, void * lkdata,
                             xwtm_t * xwtm, xwsq_t * lkst)
 {
-        return xwosdl_cdt_timedwait(cdtid, lock, lktype, lkdata, datanum,
-                                    xwtm, lkst);
+        return xwosdl_cdt_timedwait(cdtid, lock, lktype, lkdata, xwtm, lkst);
 }
 
 #endif /* xwos/osal/sync/condition.h */

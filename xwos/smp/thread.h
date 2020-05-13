@@ -133,12 +133,10 @@ void xwos_thrd_eq_plwq_locked(struct xwos_tcb * tcb,
                               xwu16_t type);
 
 __xwos_code
-xwer_t xwos_thrd_do_unlock(void * lock, xwsq_t lktype,
-                           void * lkdata, xwsz_t datanum);
+xwer_t xwos_thrd_do_unlock(void * lock, xwsq_t lktype, void * lkdata);
 
 __xwos_code
-xwer_t xwos_thrd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm,
-                         void * lkdata, xwsz_t datanum);
+xwer_t xwos_thrd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm, void * lkdata);
 
 __xwos_code
 xwer_t xwos_thrd_reqfrz_lic(struct xwos_tcb * tcb);
@@ -209,8 +207,7 @@ __xwos_api
 xwer_t xwos_thrd_continue(struct xwos_tcb * tcb);
 
 __xwos_api
-xwer_t xwos_cthrd_timedpause(void * lock, xwsq_t lktype,
-                             void * lkdata, xwsz_t datanum,
+xwer_t xwos_cthrd_timedpause(void * lock, xwsq_t lktype, void * lkdata,
                              xwtm_t * xwtm, xwsq_t * lkst);
 
 __xwos_api
@@ -264,7 +261,6 @@ xwer_t xwos_thrd_put(struct xwos_tcb * tcb)
  * @param lock: (I) 锁的地址
  * @param lktype: (I) 锁的类型
  * @param lkdata: (I) 锁的数据
- * @param datanum: (I) 锁的数据数量
  * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码
  * @retval OK: OK
@@ -277,15 +273,12 @@ xwer_t xwos_thrd_put(struct xwos_tcb * tcb)
  * - 线程上下文：可以使用
  */
 static __xwos_inline_api
-xwer_t xwos_cthrd_pause(void * lock, xwsq_t lktype,
-                        void * lkdata, xwsz_t datanum,
-                        xwsq_t * lkst)
+xwer_t xwos_cthrd_pause(void * lock, xwsq_t lktype, void * lkdata, xwsq_t * lkst)
 {
         xwtm_t expected;
+
         expected = XWTM_MAX;
-        return xwos_cthrd_timedpause(lock, lktype,
-                                     lkdata, datanum,
-                                     &expected, lkst);
+        return xwos_cthrd_timedpause(lock, lktype, lkdata, &expected, lkst);
 }
 
 #endif /* xwos/smp/thread.h */

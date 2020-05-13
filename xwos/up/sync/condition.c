@@ -52,7 +52,7 @@ static __xwos_code
 xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                                                   struct xwos_tcb * tcb,
                                                   void * lock, xwsq_t lktype,
-                                                  void * lkdata, xwsz_t datanum,
+                                                  void * lkdata,
                                                   xwtm_t * xwtm, xwsq_t * lkst,
                                                   xwreg_t cpuirq);
 
@@ -541,7 +541,7 @@ static __xwos_code
 xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                                                   struct xwos_tcb * tcb,
                                                   void * lock, xwsq_t lktype,
-                                                  void * lkdata, xwsz_t datanum,
+                                                  void * lkdata,
                                                   xwtm_t * xwtm, xwsq_t * lkst,
                                                   xwreg_t cpuirq)
 {
@@ -568,7 +568,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
         xwos_cpuirq_restore_lc(cpuirq);
 
         /* 同步解锁 */
-        rc = xwos_thrd_do_unlock(lock, lktype, lkdata, datanum);
+        rc = xwos_thrd_do_unlock(lock, lktype, lkdata);
         if (OK == rc) {
                 *lkst = XWLK_STATE_UNLOCKED;
         }/* else {} */
@@ -609,7 +609,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                 if (__likely(XWLK_STATE_UNLOCKED == *lkst)) {
                         currtick = xwos_syshwt_get_timetick(hwt);
                         *xwtm = xwtm_sub(expected, currtick);
-                        rc = xwos_thrd_do_lock(lock, lktype, xwtm, lkdata, datanum);
+                        rc = xwos_thrd_do_lock(lock, lktype, xwtm, lkdata);
                         if (OK == rc) {
                                 *lkst = XWLK_STATE_LOCKED;
                         }/* else {} */
@@ -635,7 +635,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                                         currtick = xwos_syshwt_get_timetick(hwt);
                                         *xwtm = xwtm_sub(expected, currtick);
                                         rc = xwos_thrd_do_lock(lock, lktype, xwtm,
-                                                               lkdata, datanum);
+                                                               lkdata);
                                         if (OK == rc)
                                                 *lkst = XWLK_STATE_LOCKED;
                                 }
@@ -665,7 +665,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                                         currtick = xwos_syshwt_get_timetick(hwt);
                                         *xwtm = xwtm_sub(expected, currtick);
                                         rc = xwos_thrd_do_lock(lock, lktype, xwtm,
-                                                               lkdata, datanum);
+                                                               lkdata);
                                         if (OK == rc) {
                                                 *lkst = XWLK_STATE_LOCKED;
                                         }/* else {} */
@@ -688,8 +688,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
 __xwos_code
 xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
                                struct xwos_tcb * tcb,
-                               void * lock, xwsq_t lktype,
-                               void * lkdata, xwsz_t datanum,
+                               void * lock, xwsq_t lktype, void * lkdata,
                                xwtm_t * xwtm, xwsq_t * lkst)
 {
         xwreg_t cpuirq;
@@ -705,8 +704,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
         } else {
 #endif /* XWUPCFG_SD_PM */
                 rc = xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(cdt, tcb,
-                                                                lock, lktype,
-                                                                lkdata, datanum,
+                                                                lock, lktype, lkdata,
                                                                 xwtm, lkst,
                                                                 cpuirq);
 #if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
@@ -722,7 +720,6 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
  * @param lock: (I) 锁的地址
  * @param lktype: (I) 锁的类型
  * @param lkdata: (I) 锁的数据
- * @param datanum: (I) 锁的数据数量
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -743,8 +740,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
  */
 __xwos_api
 xwer_t xwsync_cdt_timedwait(struct xwsync_cdt * cdt,
-                            void * lock, xwsq_t lktype,
-                            void * lkdata, xwsz_t datanum,
+                            void * lock, xwsq_t lktype, void * lkdata,
                             xwtm_t * xwtm, xwsq_t * lkst)
 {
         struct xwos_tcb * ctcb;
@@ -762,14 +758,13 @@ xwer_t xwsync_cdt_timedwait(struct xwsync_cdt * cdt,
         *lkst = XWLK_STATE_LOCKED;
         ctcb = xwos_scheduler_get_ctcb_lc();
         if (__unlikely(0 == xwtm_cmp(*xwtm, 0))) {
-                rc = xwos_thrd_do_unlock(lock, lktype, lkdata, datanum);
+                rc = xwos_thrd_do_unlock(lock, lktype, lkdata);
                 if (OK == rc) {
                         *lkst = XWLK_STATE_UNLOCKED;
                 }/* else {} */
                 rc = -ETIMEDOUT;
         } else {
-                rc = xwsync_cdt_do_timedwait(cdt, ctcb, lock, lktype,
-                                             lkdata, datanum,
+                rc = xwsync_cdt_do_timedwait(cdt, ctcb, lock, lktype, lkdata,
                                              xwtm, lkst);
         }
         return rc;
