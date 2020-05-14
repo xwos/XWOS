@@ -58,10 +58,6 @@
 /******** ******** SPI device ******** ********/
 #define XWMDCFG_ds_SPI_MASTER                                   0
 #define XWMDCFG_ds_SPI_PERPHERAL                                0
-#define XWMDCFG_ds_SPI_ISPI8C                                   0
-#define XWMDCFG_ds_SPI_ISPI8C_SYNC_CHAR                         0xAA
-#define XWMDCFG_ds_SPI_ISPI8C_RXQ_SIZE                          8
-#define XWMDCFG_ds_SPI_ISPI8C_MAX_COMM_BYTES                    (64U)
 
 /******** ******** LIN Bus ******** ********/
 #define XWMDCFG_ds_LIN                                          0

@@ -23,6 +23,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
+#include <xwmd/ds/xwds.h>
 #include <xwmd/ds/device.h>
 #include <xwmd/ds/soc/chip.h>
 #include <bdl/standard.h>

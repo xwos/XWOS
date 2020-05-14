@@ -24,7 +24,7 @@
 #include <xwos/standard.h>
 #include <smp_nvic.h>
 #include <soc_irq.h>
-#include <xwmd/ds/object.h>
+#include <xwmd/ds/xwds.h>
 #include <bdl/ds/description/s32k14xdkp.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********

@@ -120,16 +120,16 @@ enum xwos_scheduler_wakelock_cnt_em {
 };
 
 #if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
-typedef void (* xwos_scheduler_pm_cb_f)(void *); /**< 电源管理领域回调函数 */
+typedef void (* xwos_scheduler_pm_cb_f)(void *); /**< 电源管理回调函数 */
 
 /**
  * @brief 电源管理回调函数集合
  */
 struct xwos_scheduler_pm_callback {
-        xwos_scheduler_pm_cb_f resume; /**< 电源管理领域从暂停模式恢复的回调函数 */
-        xwos_scheduler_pm_cb_f suspend; /**< 电源管理领域进入暂停模式的回调函数 */
-        xwos_scheduler_pm_cb_f wakeup; /**< 唤醒电源管理领域的回调函数 */
-        xwos_scheduler_pm_cb_f sleep; /**< 电源管理领域休眠的回调函数 */
+        xwos_scheduler_pm_cb_f resume; /**< 电源管理从暂停模式恢复的回调函数 */
+        xwos_scheduler_pm_cb_f suspend; /**< 电源管理进入暂停模式的回调函数 */
+        xwos_scheduler_pm_cb_f wakeup; /**< 唤醒电源管理的回调函数 */
+        xwos_scheduler_pm_cb_f sleep; /**< 电源管理休眠的回调函数 */
         void * arg; /**< 各回调函数的参数 */
 };
 
@@ -274,6 +274,8 @@ struct xwos_scheduler * xwos_scheduler_dspmpt_lc(void);
 __xwos_api
 struct xwos_scheduler * xwos_scheduler_enpmpt_lc(void);
 
+
+#if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
 __xwos_api
 void xwos_scheduler_set_pm_cb(xwos_scheduler_pm_cb_f resume_cb,
                               xwos_scheduler_pm_cb_f suspend_cb,
@@ -289,6 +291,7 @@ xwer_t xwos_scheduler_resume(void);
 
 __xwos_api
 xwsq_t xwos_scheduler_get_pm_state(void);
+#endif /* XWUPCFG_SD_PM */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      inline API implementations     ******** ********

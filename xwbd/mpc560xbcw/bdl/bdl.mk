@@ -47,9 +47,6 @@ ifeq ($(XuanWuOS_CFG_XWMD),y)
         ifeq ($(XWMDCFG_ds_SPI_MASTER),y)
             BDL_CSRCS += ds/description/spim_cfg.c
         endif
-        ifeq ($(XWMDCFG_ds_SPI_ISPI8C),y)
-            BDL_CSRCS += ds/description/ispi8d_cfg.c
-        endif
         ifeq ($(XWMDCFG_ds_I2C_MASTER),y)
             BDL_CSRCS += ds/description/i2cm_cfg.c
         endif

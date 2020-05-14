@@ -59,9 +59,6 @@ endif
 ifeq ($(XWMDCFG_ds_SPI_PERPHERAL),y)
     XWMO_CSRCS += spi/perpheral.c
 endif
-ifeq ($(XWMDCFG_ds_SPI_ISPI8C),y)
-    XWMO_CSRCS += spi/ispi8d.c
-endif
 ifeq ($(XWMDCFG_ds_I2C_MASTER),y)
     XWMO_CSRCS += i2c/master.c
 endif

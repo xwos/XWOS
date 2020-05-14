@@ -73,8 +73,5 @@ ifeq ($(XuanWuOS_CFG_XWMD),y)
         ifeq ($(XWMDCFG_ds_SPI_MASTER),y)
             SOC_CSRCS += driver/ds/spim.c
         endif
-        ifeq ($(XWMDCFG_ds_SPI_ISPI8C),y)
-            SOC_CSRCS += driver/ds/ispi8d.c
-        endif
     endif
 endif
