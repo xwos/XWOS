@@ -87,7 +87,7 @@ static int pushglobalfuncname (lua_State *L, lua_Debug *ar) {
       lua_remove(L, -2);  /* remove original name */
     }
     lua_copy(L, -1, top + 1);  /* copy name to proper place */
-    lua_settop(L, top + 1);  /* remove table "loaded" an name copy */
+    lua_settop(L, top + 1);  /* remove table "loaded" and name copy */
     return 1;
   }
   else {
@@ -902,10 +902,10 @@ LUALIB_API const char *luaL_tolstring (lua_State *L, int idx, size_t *len) {
 LUALIB_API void luaL_setfuncs (lua_State *L, const luaL_Reg *l, int nup) {
   luaL_checkstack(L, nup, "too many upvalues");
   for (; l->name != NULL; l++) {  /* fill the table with given functions */
-    int i;
     if (l->func == NULL)  /* place holder? */
       lua_pushboolean(L, 0);
     else {
+      int i;
       for (i = 0; i < nup; i++)  /* copy upvalues to the top */
         lua_pushvalue(L, -nup);
       lua_pushcclosure(L, l->func, nup);  /* closure with those upvalues */
