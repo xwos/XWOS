@@ -23,6 +23,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
+#include <xwmd/ds/xwds.h>
 #include <xwmd/ds/device.h>
 #include <xwmd/ds/soc/chip.h>
 #include <xwmd/ds/uart/general.h>
@@ -66,6 +67,7 @@ xwer_t bdl_xwds_i2cm_stop(void);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+struct xwds bdl_xwds;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -76,6 +78,9 @@ xwer_t bdl_xwds_i2cm_stop(void);
 xwer_t bdl_xwds_start(void)
 {
         xwer_t rc;
+
+
+        xwds_init(&bdl_xwds);
 
         rc = bdl_xwds_soc_start();
         if (__unlikely(rc < 0)) {
@@ -137,11 +142,16 @@ xwer_t bdl_xwds_soc_start(void)
 {
         xwer_t rc;
 
-        rc = xwds_soc_probe(&mpc560xb_soc_cb);
+        xwds_soc_construct(&mpc560xb_soc_cb);
+        rc = xwds_device_probe(&bdl_xwds,
+                               xwds_static_cast(struct xwds_device *,
+                                                &mpc560xb_soc_cb),
+                               NULL);
         if (__unlikely(rc < 0)) {
                 goto err_soc_probe;
         }
-        rc = xwds_soc_start(&mpc560xb_soc_cb);
+        rc = xwds_device_start(xwds_static_cast(struct xwds_device *,
+                                                &mpc560xb_soc_cb));
         if (__unlikely(rc < 0)) {
                 goto err_soc_start;
         }
@@ -150,7 +160,8 @@ xwer_t bdl_xwds_soc_start(void)
 
 err_soc_start:
         BDL_BUG();
-        /* xwds_soc_remove(&mpc560xb_soc_cb); */
+        /* xwds_device_remove(xwds_static_cast(struct xwds_device *,
+                                               &mpc560xb_soc_cb)); */
 err_soc_probe:
         BDL_BUG();
         return rc;
@@ -173,11 +184,16 @@ xwer_t bdl_xwds_uart_start(void)
 {
         xwer_t rc;
 
-        rc = xwds_dmauartc_probe(&mpc560xb_uart0_cb);
+        xwds_dmauartc_construct(&mpc560xb_uart0_cb);
+        rc = xwds_device_probe(&bdl_xwds,
+                               xwds_static_cast(struct xwds_device *,
+                                                &mpc560xb_uart0_cb),
+                                 NULL);
         if (__unlikely(rc < 0)) {
                 goto err_uart0_probe;
         }
-        rc = xwds_dmauartc_start(&mpc560xb_uart0_cb);
+        rc = xwds_device_start(xwds_static_cast(struct xwds_device *,
+                                                &mpc560xb_uart0_cb));
         if (__unlikely(rc < 0)) {
                 goto err_uart0_start;
         }
@@ -185,7 +201,8 @@ xwer_t bdl_xwds_uart_start(void)
 
 err_uart0_start:
         BDL_BUG();
-        /* xwds_dmauartc_remove(&mpc560xb_uart0_cb); */
+        /* xwds_device_remove(xwds_static_cast(struct xwds_device *,
+                                               &mpc560xb_uart0_cb)); */
 err_uart0_probe:
         BDL_BUG();
         return rc;
@@ -208,11 +225,16 @@ xwer_t bdl_xwds_i2cm_start(void)
 {
         xwer_t rc;
 
-        rc = xwds_i2cm_probe(&mpc560xb_i2cm_cb);
+        xwds_i2cm_construct(&mpc560xb_i2cm_cb);
+        rc = xwds_device_probe(&bdl_xwds,
+                               xwds_static_cast(struct xwds_device *,
+                                                &mpc560xb_i2cm_cb),
+                               NULL);
         if (__unlikely(rc < 0)) {
                 goto err_i2cm_probe;
         }
-        rc = xwds_i2cm_start(&mpc560xb_i2cm_cb);
+        rc = xwds_device_start(xwds_static_cast(struct xwds_device *,
+                                                &mpc560xb_i2cm_cb));
         if (__unlikely(rc < 0)) {
                 goto err_i2cm_start;
         }
@@ -221,7 +243,8 @@ xwer_t bdl_xwds_i2cm_start(void)
 
 err_i2cm_start:
         BDL_BUG();
-        /* xwds_i2cm_remove(&mpc560xb_i2cm_cb); */
+        /* xwds_device_remove(xwds_static_cast(struct xwds_device *,
+                                               &mpc560xb_i2cm_cb)); */
 err_i2cm_probe:
         BDL_BUG();
         return rc;
@@ -243,18 +266,24 @@ xwer_t bdl_xwds_eeprom_start(void)
 {
         xwer_t rc;
 
-        rc = xwds_i2cp_probe(&at24cxx_cb.i2cp);
+        xwds_i2cp_construct(&at24cxx_cb.i2cp);
+        rc = xwds_device_probe(&bdl_xwds,
+                               xwds_static_cast(struct xwds_device *,
+                                                &at24cxx_cb.i2cp),
+                               NULL);
         if (__unlikely(rc < 0)) {
                 goto err_eeprom_probe;
         }
-        rc = xwds_i2cp_start(&at24cxx_cb.i2cp);
+        rc = xwds_device_start(xwds_static_cast(struct xwds_device *,
+                                                &at24cxx_cb.i2cp));
         if (__unlikely(rc < 0)) {
                 goto err_eeprom_start;
         }
 
 err_eeprom_start:
         BDL_BUG();
-        /* xwds_i2cp_remove(&at24cxx_cb.i2cp); */
+        /* xwds_device_remove(xwds_static_cast(struct xwds_device *,
+                              &at24cxx_cb.i2cp)); */
 err_eeprom_probe:
         BDL_BUG();
         return rc;
@@ -276,11 +305,16 @@ xwer_t bdl_xwds_misc_start(void)
 {
         xwer_t rc;
 
-        rc = xwds_misc_probe(&mpc560xb_misc_cb);
+        xwds_misc_construct(&mpc560xb_misc_cb);
+        rc = xwds_device_probe(&bdl_xwds,
+                               xwds_static_cast(struct xwds_device *,
+                                                &mpc560xb_misc_cb),
+                               NULL);
         if (__unlikely(rc < 0)) {
                 goto err_misc_probe;
         }
-        rc = xwds_misc_start(&mpc560xb_misc_cb);
+        rc = xwds_device_start(xwds_static_cast(struct xwds_device *,
+                                                &mpc560xb_misc_cb));
         if (__unlikely(rc < 0)) {
                 goto err_misc_start;
         }
@@ -289,7 +323,8 @@ xwer_t bdl_xwds_misc_start(void)
 
 err_misc_start:
         BDL_BUG();
-        /* xwds_misc_remove(&mpc560xb_misc_cb); */
+        /* xwds_device_remove(xwds_static_cast(struct xwds_device *,
+                                               &mpc560xb_misc_cb)); */
 err_misc_probe:
         BDL_BUG();
         return rc;
@@ -311,11 +346,16 @@ xwer_t bdl_xwds_rtc_start(void)
 {
         xwer_t rc;
 
-        rc = xwds_misc_probe(&mpc560xb_rtc_cb);
+        xwds_misc_construct(&mpc560xb_rtc_cb);
+        rc = xwds_device_probe(&bdl_xwds,
+                               xwds_static_cast(struct xwds_device *,
+                                                &mpc560xb_rtc_cb),
+                               NULL);
         if (__unlikely(rc < 0)) {
                 goto err_rtc_probe;
         }
-        rc = xwds_misc_start(&mpc560xb_rtc_cb);
+        rc = xwds_device_start(xwds_static_cast(struct xwds_device *,
+                                                &mpc560xb_rtc_cb));
         if (__unlikely(rc < 0)) {
                 goto err_rtc_start;
         }
@@ -324,7 +364,8 @@ xwer_t bdl_xwds_rtc_start(void)
 
 err_rtc_start:
         BDL_BUG();
-        /* xwds_rtc_remove(&mpc560xb_rtc_cb); */
+        /* xwds_device_remove(xwds_static_cast(struct xwds_device *,
+                                               &mpc560xb_rtc_cb)); */
 err_rtc_probe:
         BDL_BUG();
         return rc;

@@ -23,9 +23,9 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/irq.h>
 #include <soc_up_irqc.h>
 #include <soc_adc.h>
+#include <xwos/osal/irq.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <xwos/osal/lock/spinlock.h>
