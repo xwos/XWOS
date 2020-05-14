@@ -45,6 +45,12 @@ struct pb_istream_s
 #endif
 };
 
+#ifndef PB_NO_ERRMSG
+#define PB_ISTREAM_EMPTY {0,0,0,0}
+#else
+#define PB_ISTREAM_EMPTY {0,0,0}
+#endif
+
 /***************************
  * Main decoding functions *
  ***************************/
@@ -65,44 +71,48 @@ struct pb_istream_s
  *    stream = pb_istream_from_buffer(buffer, count);
  *    pb_decode(&stream, MyMessage_fields, &msg);
  */
-bool pb_decode(pb_istream_t *stream, const pb_field_t fields[], void *dest_struct);
+bool pb_decode(pb_istream_t *stream, const pb_msgdesc_t *fields, void *dest_struct);
 
-/* Same as pb_decode, except does not initialize the destination structure
- * to default values. This is slightly faster if you need no default values
- * and just do memset(struct, 0, sizeof(struct)) yourself.
+/* Extended version of pb_decode, with several options to control
+ * the decoding process:
  *
- * This can also be used for 'merging' two messages, i.e. update only the
- * fields that exist in the new message.
+ * PB_DECODE_NOINIT:         Do not initialize the fields to default values.
+ *                           This is slightly faster if you do not need the default
+ *                           values and instead initialize the structure to 0 using
+ *                           e.g. memset(). This can also be used for merging two
+ *                           messages, i.e. combine already existing data with new
+ *                           values.
  *
- * Note: If this function returns with an error, it will not release any
- * dynamically allocated fields. You will need to call pb_release() yourself.
+ * PB_DECODE_DELIMITED:      Input message starts with the message size as varint.
+ *                           Corresponds to parseDelimitedFrom() in Google's
+ *                           protobuf API.
+ *
+ * PB_DECODE_NULLTERMINATED: Stop reading when field tag is read as 0. This allows
+ *                           reading null terminated messages.
+ *                           NOTE: Until nanopb-0.4.0, pb_decode() also allows
+ *                           null-termination. This behaviour is not supported in
+ *                           most other protobuf implementations, so PB_DECODE_DELIMITED
+ *                           is a better option for compatibility.
+ *
+ * Multiple flags can be combined with bitwise or (| operator)
  */
-bool pb_decode_noinit(pb_istream_t *stream, const pb_field_t fields[], void *dest_struct);
+#define PB_DECODE_NOINIT          0x01U
+#define PB_DECODE_DELIMITED       0x02U
+#define PB_DECODE_NULLTERMINATED  0x04U
+bool pb_decode_ex(pb_istream_t *stream, const pb_msgdesc_t *fields, void *dest_struct, unsigned int flags);
 
-/* Same as pb_decode, except expects the stream to start with the message size
- * encoded as varint. Corresponds to parseDelimitedFrom() in Google's
- * protobuf API.
- */
-bool pb_decode_delimited(pb_istream_t *stream, const pb_field_t fields[], void *dest_struct);
-
-/* Same as pb_decode_delimited, except that it does not initialize the destination structure.
- * See pb_decode_noinit
- */
-bool pb_decode_delimited_noinit(pb_istream_t *stream, const pb_field_t fields[], void *dest_struct);
-
-/* Same as pb_decode, except allows the message to be terminated with a null byte.
- * NOTE: Until nanopb-0.4.0, pb_decode() also allows null-termination. This behaviour
- * is not supported in most other protobuf implementations, so pb_decode_delimited()
- * is a better option for compatibility.
- */
-bool pb_decode_nullterminated(pb_istream_t *stream, const pb_field_t fields[], void *dest_struct);
+/* Defines for backwards compatibility with code written before nanopb-0.4.0 */
+#define pb_decode_noinit(s,f,d) pb_decode_ex(s,f,d, PB_DECODE_NOINIT)
+#define pb_decode_delimited(s,f,d) pb_decode_ex(s,f,d, PB_DECODE_DELIMITED)
+#define pb_decode_delimited_noinit(s,f,d) pb_decode_ex(s,f,d, PB_DECODE_DELIMITED | PB_DECODE_NOINIT)
+#define pb_decode_nullterminated(s,f,d) pb_decode_ex(s,f,d, PB_DECODE_NULLTERMINATED)
 
 #ifdef PB_ENABLE_MALLOC
 /* Release any allocated pointer fields. If you use dynamic allocation, you should
  * call this for any successfully decoded message when you are done with it. If
  * pb_decode() returns with an error, the message is already released.
  */
-void pb_release(const pb_field_t fields[], void *dest_struct);
+void pb_release(const pb_msgdesc_t *fields, void *dest_struct);
 #endif
 
 
@@ -165,6 +175,11 @@ bool pb_decode_fixed32(pb_istream_t *stream, void *dest);
 /* Decode a fixed64, sfixed64 or double value. You need to pass a pointer to
  * a 8-byte wide C variable. */
 bool pb_decode_fixed64(pb_istream_t *stream, void *dest);
+#endif
+
+#ifdef PB_CONVERT_DOUBLE_FLOAT
+/* Decode a double value into float variable. */
+bool pb_decode_double_as_float(pb_istream_t *stream, float *dest);
 #endif
 
 /* Make a limited-length substream for reading a PB_WT_STRING field. */

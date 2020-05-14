@@ -36,4 +36,28 @@ Alice Wang <aw@squareup.com>
 Kevin Fitch <kfitch42@gmail.com>
 Kamal Marhubi <kamal@marhubi.com>
 Elco Jacobs <elco@brewpi.com>
+Sébastien Morin <sebastien.morin@primerogames.com>
+Dave Flogeras <dflogeras2@gmail.com>
+Edward Z. Yang <ezyang@mit.edu>
+Robbie Shade <rjshade@google.com>
+Andrew Ballinger <andrewballinger@stratisopt.com>
+Hamina, Juha-Pekka <Juha-Pekka.Hamina@nordicsemi.no>
+Jason Bishop <jason.bishop@bigassfans.com>
+matejcik <ja@matejcik.cz>
+Tobias Müller <Tobias_Mueller@twam.info>
+Jari Vetoniemi <mailroxas@gmail.com>
+Gabriel Staples <ercaguy@gmail.com>
+Amarnath <amarnath.h.96@gmail.com>
+Michal Rostecki <mrostecki@suse.de>
+Pei Wang <wangpei10@baidu.com>
+Noah Pendleton <2538614+noahp@users.noreply.github.com>
+Pavol Rusnak <pavol@rusnak.io>
+der-imp <falkjan@msn.com>
+Mark Hill <markleehill@gmail.com>
+Torfinn Berset <torfinn@bloom-life.com>
+Bo Langgaard Lind <bo.langgaard.lind@gmail.com>
+Stephane Dorre <stephane.dorre@cobi.bike>
+Phillip Cao <Phillip.Cao@fphcare.co.nz>
+Melvin Wang <melvin.mc.wang@gmail.com>
+Joshua Salzedo <thHunkn0WNd@gmail.com>
 
