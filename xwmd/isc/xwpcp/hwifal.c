@@ -218,6 +218,10 @@ xwer_t xwpcp_hwifal_rx(struct xwpcp * xwpcp, struct xwpcp_frmslot ** frmslotbuf)
                 rc = -EAGAIN;
                 goto err_head_ifrx;
         }
+        if (stream.head.frmlen < (sizeof(struct xwpcp_frmhead) + XWPCP_CHKSUM_SIZE)) {
+                rc = -EAGAIN;
+                goto err_head_ifrx;
+        }
 
         /* 申请接收帧槽 */
         need = stream.head.frmlen + sizeof(struct xwpcp_frmslot) -
