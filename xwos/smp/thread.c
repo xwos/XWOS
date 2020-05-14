@@ -1704,6 +1704,9 @@ xwer_t xwos_thrd_thaw_lic_pmlk(struct xwos_tcb * tcb)
                 xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_FREEZABLE);
                 xwlk_splk_unlock(&tcb->stlock);
                 rc = -ECANCELED;
+        } else if (XWSDOBJ_DST_MIGRATING & tcb->state) {
+                xwlk_splk_unlock(&tcb->stlock);
+                rc = -EPERM;
         } else if (XWSDOBJ_DST_FROZEN & tcb->state) {
                 prio = tcb->dprio.r;
                 xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_FROZEN);
