@@ -619,6 +619,9 @@ void xwos_cthrd_wait_exit(void)
                 ctcb->wqn.cb = xwos_thrd_wqn_callback;
                 xwos_cpuirq_enable_lc();
                 xwos_scheduler_req_swcx();
+                if (xwos_cthrd_shld_frz()) {
+                        xwos_cthrd_freeze();
+                }
                 xwos_cpuirq_disable_lc();
         }
 #else /* XWUPCFG_SD_THRD_EXIT */
@@ -631,6 +634,9 @@ void xwos_cthrd_wait_exit(void)
                 ctcb->wqn.cb = xwos_thrd_wqn_callback;
                 xwos_cpuirq_enable_lc();
                 xwos_scheduler_req_swcx();
+                if (xwos_cthrd_shld_frz()) {
+                        xwos_cthrd_freeze();
+                }
                 xwos_cpuirq_disable_lc();
         }
 #endif /* !XWUPCFG_SD_THRD_EXIT */

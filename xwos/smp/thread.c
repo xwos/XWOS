@@ -742,6 +742,9 @@ void xwos_cthrd_wait_exit(void)
                 ctcb->wqn.cb = xwos_thrd_wqn_callback;
                 xwlk_splk_unlock_cpuirq(&ctcb->wqn.lock);
                 xwos_scheduler_req_swcx(ctcb->xwsd);
+                if (xwos_cthrd_shld_frz()) {
+                        xwos_cthrd_freeze();
+                }
                 xwlk_splk_lock_cpuirq(&ctcb->wqn.lock);
                 xwlk_splk_lock(&ctcb->stlock);
         }
