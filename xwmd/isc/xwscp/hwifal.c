@@ -183,6 +183,10 @@ xwer_t xwscp_hwifal_rx(struct xwscp * xwscp, struct xwscp_frmslot ** frmslotbuf)
                 rc = -EAGAIN;
                 goto err_head_ifrx;
         }
+        if (stream.head.frmlen < (sizeof(struct xwscp_frmhead) + XWSCP_CHKSUM_SIZE)) {
+                rc = -EAGAIN;
+                goto err_head_ifrx;
+        }
 
         /* 申请接收帧槽 */
         rc = xwscp_alloc_frmslot(xwscp, &frmslot);

@@ -41,7 +41,7 @@
 __xwmd_rodata const xwu8_t xwscp_cfrm_sync[] = {
         (xwu8_t)XWSCP_HWIFAL_SOF,
         (xwu8_t)0x15, /* 帧长度 */
-        (xwu8_t)0xEA, /* 帧长度的镜像反转 */
+        (xwu8_t)0xA8, /* 帧长度的镜像反转 */
         (xwu8_t)XWSCP_PORT_CMD | XWSCP_QOS(1), /* 端口:0，QoS:1 */
         (xwu8_t)XWSCP_ID_SYNC, /* 同步帧的id */
         (xwu8_t)'X', /* sdu[0]: protocol head 0 */
@@ -71,7 +71,7 @@ __xwmd_rodata const xwu8_t xwscp_cfrm_sync[] = {
 __xwmd_rodata const xwu8_t xwscp_cfrm_sync_ack[] = {
         (xwu8_t)XWSCP_HWIFAL_SOF,
         (xwu8_t)0x15, /* 帧长度 */
-        (xwu8_t)0xEA, /* 帧长度的镜像反转 */
+        (xwu8_t)0xA8, /* 帧长度的镜像反转 */
         (xwu8_t)XWSCP_PORT_CMD | XWSCP_QOS(1), /* 端口:0，QoS:1 */
         (xwu8_t)(XWSCP_ID_SYNC | XWSCP_ID_ACK), /* 同步应答帧的id */
         (xwu8_t)'X', /* sdu[0]: protocol head 0 */
