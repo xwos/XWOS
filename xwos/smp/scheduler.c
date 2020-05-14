@@ -1273,31 +1273,29 @@ xwer_t xwos_scheduler_resume_lic(struct xwos_scheduler * xwsd)
 }
 
 /**
- * @brief XWOS API：请求继续调度器
+ * @brief XWOS API：继续调度器
  * @param cpuid: (I) CPU的ID
  * @return 错误码
  * @note
  * - 同步/异步：异步
  * - 中断上下文：可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：不可以使用
- * - 说明：SMP系统中：
- *   1. 执行唤醒系统代码的CPU需直接在唤醒中断中执行xwos_scheduler_resume_lic()，
- *      不可触发软中断再调用。
- *   2. 其他CPU的唤醒需要通过触发软中断执行xwos_scheduler_resume_lic()。
+ * - 中断底半部：可以使用
+ * - 线程上下文：可以使用
  */
 __xwos_api
 xwer_t xwos_scheduler_resume(xwid_t cpuid)
 {
         struct xwos_scheduler * xwsd;
+        xwid_t localid;
         xwer_t rc;
 
-        if (xwos_cpu_get_id() == cpuid) {
-                if (OK != xwos_irq_get_id(NULL)) {
-                        rc = -ENOTINISR;
-                } else {
+        localid = xwos_cpu_get_id();
+        if (localid == cpuid) {
+                if (OK == xwos_irq_get_id(NULL)) {
                         xwsd = xwos_scheduler_get_lc();
                         rc = xwos_scheduler_resume_lic(xwsd);
+                } else {
+                        rc = soc_scheduler_resume(xwsd);
                 }
         } else {
                 rc = xwos_scheduler_get_by_cpuid(cpuid, &xwsd);

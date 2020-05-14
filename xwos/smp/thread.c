@@ -1668,12 +1668,14 @@ xwer_t xwos_thrd_freeze_lic(struct xwos_tcb * tcb)
 {
         struct xwos_scheduler * xwsd;
         xwreg_t cpuirq;
+        xwid_t srccpu;
         xwid_t dstcpu;
         xwer_t rc;
 
         XWOS_BUG_ON(!(XWSDOBJ_DST_RUNNING & tcb->state));
 
         xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
+        srccpu = xwsd->id;
         xwlk_splk_lock_cpuirqsv(&xwsd->pm.lock, &cpuirq);
         xwlk_splk_lock(&tcb->stlock);
         if (XWSDOBJ_DST_FREEZABLE & tcb->state) {
@@ -1685,7 +1687,11 @@ xwer_t xwos_thrd_freeze_lic(struct xwos_tcb * tcb)
                         xwos_thrd_outmigrate_frozen_lic(tcb);
                         dstcpu = tcb->migration.dst;
                         xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
-                        soc_thrd_immigrate(tcb, dstcpu);
+                        if (srccpu == dstcpu) {
+                                xwos_thrd_immigrate_lic(tcb);
+                        } else {
+                                soc_thrd_immigrate(tcb, dstcpu);
+                        }
                         xwlk_splk_lock_cpuirqsv(&xwsd->pm.lock, &cpuirq);
                 } else {
                         xwlk_splk_unlock(&tcb->stlock);
@@ -1971,10 +1977,12 @@ static __xwos_code
 xwer_t xwos_thrd_outmigrate_reqfrz_lic(struct xwos_tcb * tcb, xwid_t dstcpu)
 {
         struct xwos_scheduler * xwsd;
+        xwid_t srccpu;
         xwreg_t cpuirq;
         xwer_t rc;
 
         xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
+        srccpu = xwsd->id;
         xwlk_splk_lock_cpuirqsv(&xwsd->pm.lock, &cpuirq);
         xwlk_splk_lock(&tcb->stlock);
         if (XWSDOBJ_DST_MIGRATING & tcb->state) {
@@ -1988,7 +1996,11 @@ xwer_t xwos_thrd_outmigrate_reqfrz_lic(struct xwos_tcb * tcb, xwid_t dstcpu)
                         tcb->migration.dst = dstcpu;
                         xwos_thrd_outmigrate_frozen_lic(tcb);
                         xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
-                        soc_thrd_immigrate(tcb, dstcpu);
+                        if (srccpu == dstcpu) {
+                                xwos_thrd_immigrate_lic(tcb);
+                        } else {
+                                soc_thrd_immigrate(tcb, dstcpu);
+                        }
                 } else {
                         xwbop_s1m(xwsq_t, &tcb->state, XWSDOBJ_DST_FREEZABLE);
                         xwlk_splk_unlock(&tcb->stlock);
@@ -2035,19 +2047,29 @@ xwer_t xwos_thrd_outmigrate_lic(struct xwos_tcb * tcb, xwid_t dstcpu)
 __xwos_api
 xwer_t xwos_thrd_migrate(struct xwos_tcb * tcb, xwid_t dstcpu)
 {
+        struct xwos_scheduler * xwsd;
+        xwid_t srccpu;
+        xwid_t localcpu;
         xwer_t rc;
 
         if (__unlikely(dstcpu >= CPUCFG_CPU_NUM)) {
                 rc = -ENODEV;
                 goto err_badcpuid;
         }
-        rc = soc_thrd_outmigrate(tcb, dstcpu);
-        if (__unlikely(rc < 0)) {
-                goto err_soc_thrd_outmigrate;
-        }
-        return OK;
 
-err_soc_thrd_outmigrate:
+        localcpu = xwos_cpu_get_id();
+        xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
+        srccpu = xwsd->id;
+        if (localcpu == srccpu) {
+                if (OK == xwos_irq_get_id(NULL)) {
+                        rc = xwos_thrd_outmigrate_lic(tcb, dstcpu);
+                } else {
+                        rc = soc_thrd_outmigrate(tcb, dstcpu);
+                }
+        } else {
+                rc = soc_thrd_outmigrate(tcb, dstcpu);
+        }
+
 err_badcpuid:
         return rc;
 }
