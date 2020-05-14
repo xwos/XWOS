@@ -549,7 +549,7 @@ void mpc560xb_ispi8d_isr_rfdf(void)
                 reg->SR.B.TFUF = 1;
                 data = (xwu8_t)(reg->POPR.R & 0xFF);
                 reg->SR.B.RFDF = 1;
-                rc = xwds_ispi8d_com_sync(ispi8d, data, &txslot);
+                rc = xwds_ispi8d_lib_sync(ispi8d, data, &txslot);
                 if (OK == rc) {
                         reg->PUSHR.R = txslot->size;
                 }
@@ -557,7 +557,7 @@ void mpc560xb_ispi8d_isr_rfdf(void)
         case SODS_ISPI8D_STATE_SYNC:
                 data = (xwu8_t)(reg->POPR.R & 0xFF);
                 reg->SR.B.RFDF = 1;
-                rc = xwds_ispi8d_com_swapsize(ispi8d, data, &txslot);
+                rc = xwds_ispi8d_lib_swapsize(ispi8d, data, &txslot);
                 if ((OK == rc) && (txslot)) {
                         while (reg->SR.B.TFFF) {
                                 reg->PUSHR.R = txslot->data[txslot->pos];
@@ -572,7 +572,7 @@ void mpc560xb_ispi8d_isr_rfdf(void)
         case SODS_ISPI8D_STATE_XDATA:
                 data = (xwu8_t)(reg->POPR.R & 0xFF);
                 reg->SR.B.RFDF = 1;
-                rc = xwds_ispi8d_com_swapdata(ispi8d, &data, 1, &txslot);
+                rc = xwds_ispi8d_lib_swapdata(ispi8d, &data, 1, &txslot);
                 if ((-EINPROGRESS == rc) && (txslot)) {
                         while (reg->SR.B.TFFF) {
                                 reg->PUSHR.R = txslot->data[txslot->pos];

@@ -593,8 +593,7 @@ xwer_t xwlk_mtx_unlock(struct xwlk_mtx * mtx)
                         /* change the priority of old owner */
                         xwos_thrd_chprio(ctcb);
                         xwos_scheduler_enpmpt(local);
-                        /* 如果函数在xwsync_cdt_timedwait() 或
-                           xwos_cthrd_timedpause()中被调用，
+                        /* 如果函数在xwsync_cdt_timedwait()中被调用，
                            当前线程已经不是`XWSDOBJ_DST_RUNNING'状态，
                            xwos_scheduler_chkpmpt()不起作用。*/
                         xwos_scheduler_chkpmpt(local);
@@ -609,8 +608,7 @@ xwer_t xwlk_mtx_unlock(struct xwlk_mtx * mtx)
                         xwlk_mtx_put(mtx);
                         xwos_thrd_chprio(ctcb);
                         xwos_scheduler_enpmpt(local);
-                        /* 如果函数在xwsync_cdt_timedwait() 或
-                           xwos_cthrd_timedpause()中被调用，
+                        /* 如果函数在xwsync_cdt_timedwait()中被调用，
                            当前线程已经不是`XWSDOBJ_DST_RUNNING'状态，
                            xwos_scheduler_chkpmpt()不起作用。*/
                         xwos_scheduler_chkpmpt(local);

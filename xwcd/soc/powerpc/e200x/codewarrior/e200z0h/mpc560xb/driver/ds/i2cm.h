@@ -26,6 +26,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/osal/lock/spinlock.h>
+#include <xwos/osal/sync/condition.h>
 #include <xwmd/ds/device.h>
 #include <xwmd/ds/i2c/master.h>
 
@@ -42,7 +43,7 @@ struct mpc560xb_i2cm_drvdata {
                 xwer_t rc; /**< result */
         } xmsg; /**< transfering message */
         xwsq_t dpos; /**< data position */
-        xwid_t tid; /**< transfering thread ID */
+        struct xwosal_cdt cdt; /**< condition */
         struct xwosal_splk lock; /**< lock to protect this structure */
 };
 

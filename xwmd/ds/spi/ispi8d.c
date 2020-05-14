@@ -16,10 +16,12 @@
 #include <xwmd/ds/standard.h>
 #include <xwos/lib/string.h>
 #include <xwos/lib/xwlog.h>
+#include <xwos/osal/irq.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/semaphore.h>
+#include <xwos/osal/sync/condition.h>
 #include <xwmd/ds/spi/ispi8d.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -477,7 +479,7 @@ err_ispi8d_grab:
 static __xwds_code
 void xwds_ispi8d_tx_complete(struct xwds_ispi8d_txslot * txslot)
 {
-        xwosal_thrd_continue((xwid_t)txslot->context);
+        xwosal_cdt_unicast(xwosal_cdt_get_id(&txslot->cdt));
 }
 
 static __xwds_code
@@ -537,7 +539,8 @@ xwer_t xwds_ispi8d_tx(struct xwds_ispi8d * ispi8d,
 {
         struct xwds_ispi8d_txslot txslot;
         const struct xwds_ispi8d_driver * drv;
-        struct xwos_lockcb lockcb;
+        union xwlk_ulock ulk;
+        struct xwlk_cblk cblk;
         xwsq_t lkst;
         xwreg_t cpuirq;
         xwer_t rc;
@@ -569,15 +572,16 @@ xwer_t xwds_ispi8d_tx(struct xwds_ispi8d * ispi8d,
         txslot.pos = 0;
         txslot.rc = -EINPROGRESS;
         txslot.complete = xwds_ispi8d_tx_complete;
-        txslot.context = (void *)xwosal_cthrd_get_tid();
-
-        lockcb.lock = xwds_ispi8d_cb_lock;
-        lockcb.unlock = xwds_ispi8d_cb_unlock;
+        xwosal_cdt_init(&txslot.cdt);
+        cblk.lock = xwds_ispi8d_cb_lock;
+        cblk.unlock = xwds_ispi8d_cb_unlock;
+        ulk.cb = &cblk;
 
         xwosal_splk_lock_cpuirqsv(&ispi8d->comi.lock, &cpuirq);
         ispi8d->comi.ntxslot = &txslot;
-        rc = xwosal_cthrd_timedpause(&lockcb, XWLK_TYPE_CALLBACK, ispi8d,
-                                     xwtm, &lkst);
+        rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&txslot.cdt),
+                                  ulk, XWLK_TYPE_CALLBACK, ispi8d,
+                                  xwtm, &lkst);
         if (OK == rc) {
                 xwosal_splk_unlock_cpuirqrs(&ispi8d->comi.lock, cpuirq);
                 rc = txslot.rc;

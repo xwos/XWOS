@@ -27,8 +27,8 @@
 #include <soc_i2c.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/irq.h>
-#include <xwos/osal/thread.h>
 #include <xwos/osal/lock/spinlock.h>
+#include <xwos/osal/sync/condition.h>
 #include <xwmd/ds/device.h>
 #include <xwmd/ds/soc/clock.h>
 #include <xwmd/ds/soc/gpio.h>
@@ -52,6 +52,9 @@ xwer_t mpc560xb_i2cm_check_desc(struct xwds_i2cm * i2cm);
 
 static __xwbsp_code
 xwer_t mpc560xb_i2cm_drv_probe(struct xwds_device * dev);
+
+static __xwbsp_code
+xwer_t mpc560xb_i2cm_drv_remove(struct xwds_device * dev);
 
 static __xwbsp_code
 xwer_t mpc560xb_i2cm_drv_start(struct xwds_device * dev);
@@ -85,7 +88,7 @@ __xwbsp_rodata const struct xwds_i2cm_driver mpc560xb_i2cm_drv = {
         .base = {
                 .name = "mpc560xb.i2c.m",
                 .probe = mpc560xb_i2cm_drv_probe,
-                .remove = NULL,
+                .remove = mpc560xb_i2cm_drv_remove,
                 .start = mpc560xb_i2cm_drv_start,
                 .stop = mpc560xb_i2cm_drv_stop,
                 .suspend = mpc560xb_i2cm_drv_suspend,
@@ -141,12 +144,22 @@ xwer_t mpc560xb_i2cm_drv_probe(struct xwds_device * dev)
                 drvdata = dev->data;
 
                 xwosal_splk_init(&drvdata->lock);
+                xwosal_cdt_init(&drvdata->cdt);
                 drvdata->xmsg.ptr = NULL;
                 drvdata->dpos = 0;
-                drvdata->tid = (xwid_t)0;
                 I2C.IBCR.B.MDIS = 1;
         }
         return rc;
+}
+
+static __xwbsp_code
+xwer_t mpc560xb_i2cm_drv_remove(struct xwds_device * dev)
+{
+        struct mpc560xb_i2cm_drvdata * drvdata;
+
+        drvdata = dev->data;
+        xwosal_cdt_destroy(&drvdata->cdt);
+        return OK;
 }
 
 static __xwbsp_code
@@ -417,15 +430,12 @@ xwer_t mpc560xb_i2cm_drv_reset(struct xwds_i2cm * i2cm, xwtm_t * xwtm)
         xwosal_splk_lock_cpuirqsv(&drvdata->lock, &cpuirq);
         I2C.IBCR.R = 0x80;
         I2C.IBSR.R = 0x12;
-        if (drvdata->tid) {
-                drvdata->xmsg.rc = -EAGAIN;
-                xwosal_thrd_continue(drvdata->tid);
-                drvdata->xmsg.ptr = NULL;
-                drvdata->dpos = 0;
-                drvdata->tid = (xwid_t)0;
-        }
+        drvdata->xmsg.rc = -EAGAIN;
+        drvdata->xmsg.ptr = NULL;
+        drvdata->dpos = 0;
         I2C.IBCR.B.MDIS = 0;
         xwosal_splk_unlock_cpuirqrs(&drvdata->lock, cpuirq);
+        xwosal_cdt_unicast(xwosal_cdt_get_id(&drvdata->cdt));
         return OK;
 }
 
@@ -436,7 +446,7 @@ xwer_t mpc560xb_i2cm_drv_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg
         struct mpc560xb_i2cm_drvdata * drvdata;
         xwreg_t cpuirq;
         union xwlk_ulock ulk;
-        xwsq_t lockstate;
+        xwsq_t lkstate;
         __maybe_unused xwu8_t ibsr;
         xwer_t rc;
 
@@ -444,7 +454,6 @@ xwer_t mpc560xb_i2cm_drv_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg
         ulk.osal.splk = &drvdata->lock;
         xwosal_splk_lock_cpuirqsv(&drvdata->lock, &cpuirq);
         drvdata->xmsg.ptr = msg;
-        drvdata->tid = xwosal_cthrd_get_id();
         /* Generate START */
         if (I2C.IBCR.B.MS) {
                 I2C.IBCR.R |= (SOC_I2C_IBCR_RSTA_MASK | SOC_I2C_IBCR_TXRX_MASK);
@@ -475,17 +484,17 @@ xwer_t mpc560xb_i2cm_drv_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg
                         I2C.IBDR.R = (xwu8_t)(msg->addr & 0xFF) & ((xwu8_t)~1);
                 }
                 I2C.IBCR.B.IBIE = 1; /* enable irq */
-                rc = xwosal_cthrd_timedpause(ulk, XWLK_TYPE_SPLK, NULL,
-                                             xwtm, &lockstate);
+                rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&drvdata->cdt),
+                                          ulk, XWLK_TYPE_SPLK, NULL,
+                                          xwtm, &lkstate);
                 if (OK == rc) {
                         rc = drvdata->xmsg.rc;
                 } else {
-                        if (XWLK_STATE_UNLOCKED == lockstate) {
+                        if (XWLK_STATE_UNLOCKED == lkstate) {
                                 xwosal_splk_lock(&drvdata->lock);
                         }
                 }
         }
-        drvdata->tid = (xwid_t)0;
         drvdata->xmsg.ptr = NULL;
         xwosal_splk_unlock_cpuirqrs(&drvdata->lock, cpuirq);
         return rc;
@@ -507,7 +516,7 @@ void mpc560xb_i2cm_txfsm_7bitaddr(struct xwds_i2cm * i2cm)
                         }
                         drvdata->xmsg.rc = OK;
                         I2C.IBCR.B.IBIE = 0;
-                        xwosal_thrd_continue(drvdata->tid);
+                        xwosal_cdt_unicast(xwosal_cdt_get_id(&drvdata->cdt));
                 } else {
                         I2C.IBDR.R = msg->buf[drvdata->dpos];
                         drvdata->dpos++;
@@ -516,7 +525,7 @@ void mpc560xb_i2cm_txfsm_7bitaddr(struct xwds_i2cm * i2cm)
                 /* Rx NO ACK */
                 drvdata->xmsg.rc = -EIO;
                 I2C.IBCR.B.IBIE = 0;
-                xwosal_thrd_continue(drvdata->tid);
+                xwosal_cdt_unicast(xwosal_cdt_get_id(&drvdata->cdt));
         }
 }
 
@@ -536,7 +545,7 @@ void mpc560xb_i2cm_rxfsm_7bitaddr(struct xwds_i2cm * i2cm)
                         if (1 == I2C.IBSR.B.RXAK) {
                                 drvdata->xmsg.rc = -EIO;
                                 I2C.IBCR.B.IBIE = 0;
-                                xwosal_thrd_continue(drvdata->tid);
+                                xwosal_cdt_unicast(xwosal_cdt_get_id(&drvdata->cdt));
                         } else {
                                 I2C.IBCR.B.TX = 0;
                                 xwmb_read(xwu8_t, ibdr, &I2C.IBDR.R);
@@ -553,7 +562,7 @@ void mpc560xb_i2cm_rxfsm_7bitaddr(struct xwds_i2cm * i2cm)
                         drvdata->dpos++;
                         if (drvdata->dpos == msg->size) {
                                 drvdata->xmsg.rc = OK;
-                                xwosal_thrd_continue(drvdata->tid);
+                                xwosal_cdt_unicast(xwosal_cdt_get_id(&drvdata->cdt));
                         }
                 }
         }

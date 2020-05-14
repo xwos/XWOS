@@ -27,8 +27,8 @@
 #include <soc_adc.h>
 #include <xwos/osal/irq.h>
 #include <xwos/osal/scheduler.h>
-#include <xwos/osal/thread.h>
 #include <xwos/osal/lock/spinlock.h>
+#include <xwos/osal/sync/condition.h>
 #include <xwmd/ds/soc/gpio.h>
 #include <xwmd/ds/soc/clock.h>
 #include <xwmd/ds/misc/chip.h>
@@ -46,44 +46,44 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********     static function prototypes      ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_misc_check_desc(struct xwds_misc * adc);
 
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_misc_drv_probe(struct xwds_device * dev);
 
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_misc_drv_remove(struct xwds_device * dev);
 
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_misc_drv_start(struct xwds_device * dev);
 
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_misc_drv_stop(struct xwds_device * dev);
 
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_misc_drv_suspend(struct xwds_device * dev);
 
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_misc_drv_resume(struct xwds_device * dev);
 
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_misc_drv_ioctl(struct xwds_misc * adc, xwsq_t cmd, va_list args);
 
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_adc_setup(struct xwds_misc * misc);
 
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_adc_clean(struct xwds_misc * misc);
 
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_adc_convert(struct xwds_misc * misc, xwbmp_t * chmask, xws16_t * buf,
                             xwtm_t * xwtm);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwmd_rodata const struct xwds_misc_driver mpc560xb_misc_drv = {
+__xwbsp_rodata const struct xwds_misc_driver mpc560xb_misc_drv = {
         .base = {
                 .name = "mpc560xb_misc_drv",
                 .probe = mpc560xb_misc_drv_probe,
@@ -99,7 +99,7 @@ __xwmd_rodata const struct xwds_misc_driver mpc560xb_misc_drv = {
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_misc_check_desc(struct xwds_misc * misc)
 {
         const struct xwds_resources * resources;
@@ -122,7 +122,7 @@ xwer_t mpc560xb_misc_check_desc(struct xwds_misc * misc)
 }
 
 /******** ******** base driver ******** ********/
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_misc_drv_probe(struct xwds_device * dev)
 {
         struct xwds_misc * misc;
@@ -137,7 +137,7 @@ xwer_t mpc560xb_misc_drv_probe(struct xwds_device * dev)
 
         drvdata = misc->dev.data;
         xwosal_splk_init(&drvdata->adc.lock);
-        drvdata->adc.tid = (xwid_t)0;
+        xwosal_cdt_init(&drvdata->adc.cdt);
         xwosal_mtx_init(&drvdata->adc.mtx, XWOSAL_SD_PRIORITY_RT_MIN);
 
         return OK;
@@ -146,7 +146,7 @@ err_chkdesc:
         return rc;
 }
 
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_misc_drv_remove(struct xwds_device * dev)
 {
         struct xwds_misc * misc;
@@ -154,12 +154,13 @@ xwer_t mpc560xb_misc_drv_remove(struct xwds_device * dev)
 
         misc = xwds_static_cast(struct xwds_misc *, dev);
         drvdata = misc->dev.data;
+        xwosal_cdt_destroy(&drvdata->adc.cdt);
         xwosal_mtx_destroy(&drvdata->adc.mtx);
 
         return OK;
 }
 
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_misc_drv_start(struct xwds_device * dev)
 {
         struct xwds_misc * misc;
@@ -252,7 +253,7 @@ err_req_irqs:
 }
 
 
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_misc_drv_stop(struct xwds_device * dev)
 {
         struct xwds_misc * misc;
@@ -287,20 +288,20 @@ xwer_t mpc560xb_misc_drv_stop(struct xwds_device * dev)
         return OK;
 }
 
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_misc_drv_suspend(struct xwds_device * dev)
 {
         return mpc560xb_misc_drv_stop(dev);
 }
 
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_misc_drv_resume(struct xwds_device * dev)
 {
         return mpc560xb_misc_drv_start(dev);
 }
 
 /******** ******** adc driver ******** ********/
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_misc_drv_ioctl(struct xwds_misc * misc, xwsq_t cmd, va_list args)
 {
         xwer_t rc;
@@ -329,7 +330,7 @@ xwer_t mpc560xb_misc_drv_ioctl(struct xwds_misc * misc, xwsq_t cmd, va_list args
         return rc;
 }
 
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_adc_setup(struct xwds_misc * misc)
 {
         const struct mpc560xb_misc_private_cfg * misccfg;
@@ -369,7 +370,7 @@ xwer_t mpc560xb_adc_setup(struct xwds_misc * misc)
         return OK;
 }
 
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_adc_clean(struct xwds_misc * misc)
 {
         XWOS_UNUSED(misc);
@@ -380,7 +381,7 @@ xwer_t mpc560xb_adc_clean(struct xwds_misc * misc)
         return OK;
 }
 
-static __xwmd_code
+static __xwbsp_code
 xwer_t mpc560xb_adc_convert(struct xwds_misc * misc, xwbmp_t * chmask, xws16_t * buf,
                             xwtm_t * xwtm)
 {
@@ -402,12 +403,12 @@ xwer_t mpc560xb_adc_convert(struct xwds_misc * misc, xwbmp_t * chmask, xws16_t *
                 goto err_mtxlock;
         }
 
-        drvdata->adc.tid = xwosal_cthrd_get_id();
         ADC_0.MCR.B.PWDN = 0;
         xwosal_splk_lock_cpuirqsv(&drvdata->adc.lock, &flag);
         ADC_0.MCR.B.NSTART = 1; /* start ADC */
-        rc = xwosal_cthrd_timedpause(ulk, XWLK_TYPE_SPLK, NULL,
-                                     xwtm, &lkst);
+        rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&drvdata->adc.cdt),
+                                  ulk, XWLK_TYPE_SPLK, NULL,
+                                  xwtm, &lkst);
         if (OK == rc) {
                 xwosal_splk_unlock_cpuirqrs(&drvdata->adc.lock, flag);
                 ceocfr[0] = ADC_0.CEOCFR[0].R;
@@ -440,7 +441,6 @@ xwer_t mpc560xb_adc_convert(struct xwds_misc * misc, xwbmp_t * chmask, xws16_t *
                 }
         }
         ADC_0.MCR.B.PWDN = 1;
-        drvdata->adc.tid = (xwid_t)0;
         xwosal_mtx_unlock(mtxid);
 err_mtxlock:
         return rc;
@@ -461,11 +461,11 @@ void mpc560xb_adc_eoc_isr(void)
         if(ADC_0.ISR.B.ECH) {
                 /* End of chain */
                 ADC_0.ISR.B.ECH = 1;
-                xwosal_thrd_continue(drvdata->adc.tid);
+                xwosal_cdt_unicast(xwosal_cdt_get_id(&drvdata->adc.cdt));
         } else if (ADC_0.ISR.B.JECH) {
                 /* End of injected chain */
                 ADC_0.ISR.B.JECH = 1;
-                xwosal_thrd_continue(drvdata->adc.tid);
+                xwosal_cdt_unicast(xwosal_cdt_get_id(&drvdata->adc.cdt));
         } else {
                 /* do_nothing(); */
         }

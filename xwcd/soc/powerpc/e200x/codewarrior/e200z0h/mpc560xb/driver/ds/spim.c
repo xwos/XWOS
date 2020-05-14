@@ -29,7 +29,7 @@
 #include <soc_irq.h>
 #include <soc_spi.h>
 #include <xwos/osal/lock/spinlock.h>
-#include <xwos/osal/thread.h>
+#include <xwos/osal/sync/condition.h>
 #include <xwmd/ds/device.h>
 #include <xwmd/ds/lin/id.h>
 #include <xwmd/ds/soc/clock.h>
@@ -49,6 +49,9 @@ xwer_t mpc560xb_spim_check_desc(struct xwds_spim * spim);
 
 static __xwbsp_code
 xwer_t mpc560xb_spim_drv_probe(struct xwds_device * dev);
+
+static __xwbsp_code
+xwer_t mpc560xb_spim_drv_remove(struct xwds_device * dev);
 
 static __xwbsp_code
 xwer_t mpc560xb_spim_drv_start(struct xwds_device * dev);
@@ -73,7 +76,7 @@ __xwbsp_rodata const struct xwds_spim_driver mpc560xb_spim_drv = {
         .base = {
                 .name = "mpc560xb.dspi.m",
                 .probe = mpc560xb_spim_drv_probe,
-                .remove = NULL,
+                .remove = mpc560xb_spim_drv_remove,
                 .start = mpc560xb_spim_drv_start,
                 .stop = mpc560xb_spim_drv_stop,
                 .suspend = mpc560xb_spim_drv_suspend,
@@ -118,10 +121,21 @@ xwer_t mpc560xb_spim_drv_probe(struct xwds_device * dev)
         spim = xwds_static_cast(struct xwds_spim *, dev);
         rc = mpc560xb_spim_check_desc(spim);
         if (__likely(OK == rc)) {
-                drvdata = spim->dev.data;
+                drvdata = dev->data;
+                xwosal_cdt_init(&drvdata->cdt);
                 xwosal_splk_init(&drvdata->lock);
         }
         return rc;
+}
+
+static __xwbsp_code
+xwer_t mpc560xb_spim_drv_remove(struct xwds_device * dev)
+{
+        struct mpc560xb_spim_drvdata * drvdata;
+
+        drvdata = dev->data;
+        xwosal_cdt_destroy(&drvdata->cdt);
+        return OK;
 }
 
 static __xwbsp_code
@@ -287,7 +301,6 @@ xwer_t mpc560xb_spim_drv_start(struct xwds_device * dev)
         }
 
         /* clear driver data */
-        drvdata->msttid = (xwid_t)0;
         drvdata->msg = NULL;
         drvdata->txpos = 0;
         drvdata->rxpos = 0;
@@ -554,7 +567,6 @@ xwer_t mpc560xb_spim_drv_xfer(struct xwds_spim * spim,
         /* start */
         ulk.osal.splk = &drvdata->lock;
         xwosal_splk_lock_cpuirqsv(&drvdata->lock, &cpuirq);
-        drvdata->msttid = xwosal_cthrd_get_id();
         drvdata->txpos = 0;
         drvdata->rxpos = 0;
         drvdata->msg = msg;
@@ -582,12 +594,12 @@ xwer_t mpc560xb_spim_drv_xfer(struct xwds_spim * spim,
                 }
                 drvdata->txpos++;
                 reg->MCR.B.HALT = 0;
-                rc = xwosal_cthrd_timedpause(ulk, XWLK_TYPE_SPLK, NULL,
-                                             xwtm, &lockstate);
+                rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&drvdata->cdt),
+                                          ulk, XWLK_TYPE_SPLK, NULL,
+                                          xwtm, &lockstate);
                 if (XWLK_STATE_UNLOCKED == lockstate) {
                         xwosal_splk_lock(&drvdata->lock);
                 }
-                drvdata->msttid = (xwid_t)0;
                 drvdata->msg = NULL;
                 drvdata->txpos = 0;
                 drvdata->rxpos = 0;
@@ -713,7 +725,7 @@ void mpc560xb_spim_isr_rfdf(void)
                         if (reg->SR.B.EOQF) {
                                 reg->MCR.B.HALT = 1;
                                 reg->SR.B.EOQF = 1;
-                                xwosal_thrd_continue(drvdata->msttid);
+                                xwosal_cdt_unicast(xwosal_cdt_get_id(&drvdata->cdt));
                         }
                 }
                 reg->SR.B.RFDF = 1;

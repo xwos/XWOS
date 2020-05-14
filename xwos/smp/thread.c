@@ -330,7 +330,6 @@ xwer_t xwos_thrd_activate(struct xwos_tcb * tcb,
 
         /* blocking state info */
         xwos_wqn_init(&tcb->wqn, tcb);
-        xwsync_cdt_init(&tcb->self);
 
         /* mutex tree */
         xwos_mtxtree_init(&tcb->mtxtree);
@@ -1372,81 +1371,6 @@ xwer_t xwos_thrd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm, void * lkdat
                 break;
         default:
                 break;
-        }
-        return rc;
-}
-
-/**
- * @brief XWOS API: 继续已经暂停的线程
- * @param tcb: (I) 线程控制块对象的指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EPERM: 线程未被暂停
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 线程通过调用@ref xwos_cthrd_pause()或@ref xwos_cthrd_timedpause()暂停自己
- * - 中断或其他线程可以调用此函数使已暂停的线程继续运行。
- */
-__xwos_api
-xwer_t xwos_thrd_continue(struct xwos_tcb * tcb)
-{
-        xwer_t rc;
-
-        XWOS_VALIDATE((tcb), "nullptr", -EFAULT);
-
-        rc = xwsync_cdt_do_unicast(&tcb->self);
-        return rc;
-}
-
-/**
- * @brief XWOS API：限时暂停当前线程
- * @param lock: (I) 锁的地址
- * @param lktype: (I) 锁的类型
- * @param lkdata: (I) 锁的数据
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
- * @retuan 错误码
- * @retval OK: OK
- * @retval -EINTR: 暂停过程被中断
- * @retval -ETIMEDOUT: 超时
- * @retval -ENOTINTHRD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- * - 等待超时后将以返回值-ETIMEDOUT返回，并且 *xwtm* 指向缓冲区返回0。
- */
-__xwos_api
-xwer_t xwos_cthrd_timedpause(void * lock, xwsq_t lktype, void * lkdata,
-                             xwtm_t * xwtm, xwsq_t * lkst)
-{
-        struct xwos_tcb * ctcb;
-        xwer_t rc;
-
-        XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
-        XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
-        XWOS_VALIDATE((xwtm_cmp(*xwtm, 0) >= 0), "out-of-time", -ETIMEDOUT);
-        XWOS_VALIDATE(((NULL == lock) || (lktype < XWLK_TYPE_NUM)),
-                      "invalid-type", -EINVAL);
-        XWOS_VALIDATE((-EINTHRD == xwos_irq_get_id(NULL)),
-                      "not-in-thrd", -ENOTINTHRD);
-
-        *lkst = XWLK_STATE_LOCKED;
-        ctcb = xwos_scheduler_get_ctcb_lc();
-        if (__unlikely(0 == xwtm_cmp(*xwtm, 0))) {
-                rc = xwos_thrd_do_unlock(lock, lktype, lkdata);
-                if (OK == rc) {
-                        *lkst = XWLK_STATE_UNLOCKED;
-                }/* else {} */
-                rc = -ETIMEDOUT;
-        } else {
-                rc = xwsync_cdt_do_timedwait(&ctcb->self, ctcb, lock, lktype, lkdata,
-                                             xwtm, lkst);
         }
         return rc;
 }

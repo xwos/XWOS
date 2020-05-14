@@ -26,6 +26,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/osal/lock/spinlock.h>
+#include <xwos/osal/sync/condition.h>
 #include <xwmd/ds/device.h>
 #include <xwmd/ds/spi/master.h>
 
@@ -33,7 +34,7 @@
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 struct mpc560xb_spim_drvdata {
-        xwid_t msttid; /**< Master thread id */
+        struct xwosal_cdt cdt; /**< condition */
         struct xwds_spim_msg * msg; /**< current message */
         xwsq_t txpos; /**< position of TX queue */
         xwsq_t rxpos; /**< position of RX queue */

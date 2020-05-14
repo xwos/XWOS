@@ -27,6 +27,7 @@
 #include <xwos/standard.h>
 #include <soc_adc.h>
 #include <xwos/osal/lock/spinlock.h>
+#include <xwos/osal/sync/condition.h>
 #include <xwos/osal/lock/mutex.h>
 #include <xwmd/ds/misc/chip.h>
 
@@ -39,7 +40,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 struct mpc560xb_misc_drvdata {
         struct mpc560xb_adc_drvdata {
-                xwid_t tid; /**< 线程ID */
+                struct xwosal_cdt cdt; /**< condition */
                 struct xwosal_splk lock; /**< 自旋锁 */
                 struct xwosal_mtx mtx; /**< 互斥锁 */
         } adc;

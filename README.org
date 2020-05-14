@@ -90,7 +90,7 @@
 ** 版本变化规则
 + Major在以下情况下增加1：
   - 重要新功能引入后；
-  - 破坏性修改(BREAK CHANGE)，例如，修改API的原型，删除API等后；
+  - 破坏性修改(BREAKING CHANGE)，例如，修改API的原型，删除API等后；
   - 累积了多次小版本号更新后。
 + minor：
   - 发布一个新的稳定版本，开发版分支的minor+1变成偶数，
@@ -137,8 +137,8 @@
 ** type说明
 + feat: 新功能
 + fix: 修复BUG
-+ perf: 性能优化，不影响功能
-+ refactor: 重构代码，不影响功能
++ perf: 性能优化
++ refactor: 重构代码
 + style: 格式调整（删除行尾空格等）
 + build: 编译系统
 + revert: 回退提交

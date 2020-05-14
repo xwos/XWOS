@@ -73,7 +73,6 @@ struct xwos_tcb {
 
         /* 阻塞状态 */
         struct xwos_wqn wqn; /**< 等待队列 */
-        struct xwsync_cdt self; /**< 用于实现线程自身的pause与continue */
 
         /* 退出状态 */
         struct xwsync_cdt completion; /**< 线程退出时的事件信号量 */
@@ -204,13 +203,6 @@ __xwos_api
 xwer_t xwos_thrd_intr(struct xwos_tcb * tcb);
 
 __xwos_api
-xwer_t xwos_thrd_continue(struct xwos_tcb * tcb);
-
-__xwos_api
-xwer_t xwos_cthrd_timedpause(void * lock, xwsq_t lktype, void * lkdata,
-                             xwtm_t * xwtm, xwsq_t * lkst);
-
-__xwos_api
 xwer_t xwos_cthrd_sleep(xwtm_t * xwtm);
 
 __xwos_api
@@ -254,31 +246,6 @@ static __xwos_inline_api
 xwer_t xwos_thrd_put(struct xwos_tcb * tcb)
 {
         return xwos_object_put(&tcb->xwobj);
-}
-
-/**
- * @brief XWOS API：暂停当前线程
- * @param lock: (I) 锁的地址
- * @param lktype: (I) 锁的类型
- * @param lkdata: (I) 锁的数据
- * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
- * @return 错误码
- * @retval OK: OK
- * @retval -EINTR: 暂停过程被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
- */
-static __xwos_inline_api
-xwer_t xwos_cthrd_pause(void * lock, xwsq_t lktype, void * lkdata, xwsq_t * lkst)
-{
-        xwtm_t expected;
-
-        expected = XWTM_MAX;
-        return xwos_cthrd_timedpause(lock, lktype, lkdata, &expected, lkst);
 }
 
 #endif /* xwos/smp/thread.h */

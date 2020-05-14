@@ -24,9 +24,10 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwmd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
-#include <xwos/core/irq.h>
+#include <xwos/osal/irq.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/semaphore.h>
+#include <xwos/osal/sync/condition.h>
 #include <xwmd/ds/device.h>
 #include <xwmd/ds/spi/common.h>
 
@@ -144,7 +145,7 @@ struct xwds_ispi8d_txslot {
         xwu8_t * data; /**< 数据缓冲区的指针 */
         volatile xwer_t rc; /**< 发送结果 */
         void (*complete)(struct xwds_ispi8d_txslot *); /**< 完成回调函数 */
-        void * context; /**< 回调函数的参数 */
+        struct xwosal_cdt cdt; /**< 条件量 */
 };
 
 /**

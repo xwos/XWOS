@@ -231,29 +231,6 @@ bool xwosdl_cthrd_frz_shld_stop(bool * frozen)
 }
 
 static __xw_inline
-xwer_t xwosdl_thrd_continue(xwid_t tid)
-{
-        struct xwos_tcb * tcb;
-
-        tcb = (struct xwos_tcb *)tid;
-        return xwos_thrd_continue(tcb);
-}
-
-static __xw_inline
-xwer_t xwosdl_cthrd_pause(union xwlk_ulock lock, xwsq_t lktype, void * lkdata,
-                          xwsq_t * lkst)
-{
-        return xwos_cthrd_pause(lock.anon, lktype, lkdata, lkst);
-}
-
-static __xw_inline
-xwer_t xwosdl_cthrd_timedpause(union xwlk_ulock lock, xwsq_t lktype, void * lkdata,
-                               xwtm_t * xwtm, xwsq_t * lkst)
-{
-        return xwos_cthrd_timedpause(lock.anon, lktype, lkdata, xwtm, lkst);
-}
-
-static __xw_inline
 xwer_t xwosdl_cthrd_sleep(xwtm_t * xwtm)
 {
         return xwos_cthrd_sleep(xwtm);
