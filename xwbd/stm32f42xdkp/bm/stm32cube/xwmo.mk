@@ -22,21 +22,23 @@ include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
 CUBEMX_CSRCS := $(shell xwbs/util/el/makefile-grep-variable.el --variable=C_SOURCES $(call getXwmoDir)/cubemx/Makefile)
-CUBEMX_CSRCS += Core/Src/sys.c
 CUBEMX_CFLAGS := $(shell xwbs/util/el/makefile-grep-variable.el --variable=C_DEFS $(call getXwmoDir)/cubemx/Makefile)
 CUBEMX_INCDIRS := $(shell xwbs/util/el/makefile-grep-variable.el --variable=C_INCLUDES $(call getXwmoDir)/cubemx/Makefile)
+CUBEMX_CSRCS += override.c
 
 XWMO_CSRCS :=
 XWMO_CSRCS += $(addprefix cubemx/,$(CUBEMX_CSRCS))
 
 XWMO_CSRCS += xwac/init.c
-XWMO_CSRCS += xwac/override.c
-XWMO_CSRCS += xwac/crc32.c
-XWMO_CSRCS += xwac/vector.c
+XWMO_CSRCS += xwac/xwlib/crc32.c
+XWMO_CSRCS += xwac/xwos/vector.c
+XWMO_CSRCS += xwac/xwos/hook.c
 
 XWMO_CSRCS += xwds/init.c
 XWMO_CSRCS += xwds/pm.c
 XWMO_CSRCS += xwds/stm32cube.c
+XWMO_CSRCS += xwds/soc.c
+XWMO_CSRCS += xwds/usart.c
 
 XWMO_CSRCS += xwmo.c
 

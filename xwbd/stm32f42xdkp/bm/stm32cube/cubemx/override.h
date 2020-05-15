@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBEMX：覆盖STM32CUBE一些函数
+ * @brief STM32CUBEMX：重写某些override属性的函数
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_xwac_override_h__
-#define __bm_stm32cube_xwac_override_h__
+#ifndef __bm_stm32cube_cubemx_override_h__
+#define __bm_stm32cube_cubemx_override_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
@@ -29,6 +29,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-void stm32cube_override_placeholder_stub(void);
+void stm32cube_override_holder_stub(void);
 
-#endif /* bm/stm32cube/xwac/override.h */
+#endif /* bm/stm32cube/cubemx/override.h */

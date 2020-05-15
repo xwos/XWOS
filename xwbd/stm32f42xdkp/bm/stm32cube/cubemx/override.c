@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：电源管理
+ * @brief STM32CUBEMX：重写某些override属性的函数
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -22,59 +22,56 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
-#include <xwmd/ds/xwds.h>
-#include <stm32f4xx_ll_cortex.h>
-#include <stm32f4xx_ll_pwr.h>
+#include <arch_systick.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
-#include <bm/stm32cube/xwds/stm32cube.h>
-#include <bm/stm32cube/xwds/pm.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
+ ******** ******** ********      macros       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-extern
-void SystemClock_Config(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+extern uint32_t uwTickPrio;
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-void stm32cube_pm_resume(void)
+void stm32cube_override_holder_stub(void)
 {
-        __maybe_unused xwer_t rc;
-        xwirq_t irq;
-
-        /* 从STOP模式恢复后，需要重新配置时钟 */
-        rc = xwos_irq_get_id(&irq);
-        LL_PWR_SetPowerMode(LL_PWR_MODE_STOP_MAINREGU);
-        xwds_pm_resume(&stm32cube_ds);
+        /* LD连接静态库(.a)时，GC是以.c文件为单位，若文件中全是override
+           的函数，会被gcc认为.c文件中所有符号都没有被使用而被GC掉，因此
+           写一个占位函数，并在一个不会被GC的.c文件中引用。 */
 }
 
-void stm32cube_pm_suspend(void)
+void HAL_MspInit(void)
 {
-        __maybe_unused xwer_t rc;
-        xwirq_t irq;
+        /* bm/stm32cube/cubemx/Core/Src/stm32f4xx_hal_msp.c中只有一个override函数，
+           当以.a静态库连接时，整个.c文件会被GC掉，因此需要重新在此文件中定义一次。
+           顺便删除一些不必要的语句。 */
+        __HAL_RCC_SYSCFG_CLK_ENABLE();
+        __HAL_RCC_PWR_CLK_ENABLE();
 
-        rc = xwos_irq_get_id(&irq);
-        xwds_pm_suspend(&stm32cube_ds);
-        LL_PWR_SetPowerMode(LL_PWR_MODE_STOP_LPREGU);
-        LL_LPM_EnableDeepSleep();
+        LL_PWR_EnableBkUpAccess();
+        LL_DBGMCU_EnableDBGSleepMode();
+        LL_DBGMCU_EnableDBGStopMode();
+        LL_DBGMCU_EnableDBGStandbyMode();
 }
 
-void stm32cube_pm_wakeup(void)
+HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 {
-        LL_LPM_EnableSleep();
-        SystemClock_Config();
-}
+        HAL_StatusTypeDef ret;
 
-void stm32cube_pm_sleep(void)
-{
-        wfi();
+        /* Configure the SysTick IRQ priority */
+        if (TickPriority < (1UL << __NVIC_PRIO_BITS)) {
+                uwTickPrio = ARCH_IRQ_TICK_PRIO;
+                ret = HAL_OK;
+        } else {
+                ret = HAL_ERROR;
+        }
+        return ret;
 }

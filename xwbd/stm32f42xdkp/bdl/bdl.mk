@@ -28,7 +28,8 @@ BDL_LDFLAGS :=
 BDL_CSRCS :=
 BDL_ASRCS :=
 
-BDL_CSRCS += board_init.c main.c
+BDL_CSRCS += board_init.c
+BDL_CSRCS += main.c
 ifeq ($(BRDCFG_XWSD_THRD_STACK_POOL),y)
     BDL_CSRCS += xwkac/thrd_stack_mempool.c
 endif

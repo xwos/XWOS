@@ -38,8 +38,11 @@
 void MX_USART1_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void stm32cube_dmauartc1_timer_isr(void);
-void stm32cube_dmauartc1_isr(void);
+void MX_USART1_UART_Deinit(void);
+
+void MX_USART1_UART_Setup_RXDMA(xwu8_t * mem, size_t size);
+
+void MX_USART1_UART_Setup_TXDMA(const xwu8_t * mem, size_t size);
 
 /* USER CODE END Prototypes */
 

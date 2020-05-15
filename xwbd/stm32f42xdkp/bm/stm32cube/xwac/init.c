@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBEMX：初始化
+ * @brief 初始化
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -23,12 +23,9 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
 #include <xwos/mm/mempool/allocator.h>
-#include <xwos/osal/scheduler.h>
-#include <arch_irq.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
 #include <bm/stm32cube/xwds/init.h>
 #include <bm/stm32cube/xwds/stm32cube.h>
-#include <bm/stm32cube/xwac/override.h>
 #include <bm/stm32cube/xwac/init.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -40,8 +37,6 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 extern xwsz_t eram_mr_origin[];
 extern xwsz_t eram_mr_size[];
-
-void (* stm32cube_override_placeholder)(void) = stm32cube_override_placeholder_stub;
 
 /**
  * @brief External SDRAM zone

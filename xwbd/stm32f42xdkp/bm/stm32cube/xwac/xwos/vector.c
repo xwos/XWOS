@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：中断向量表
+ * @brief 中断向量表
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -21,16 +21,15 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <bm/stm32cube/standard.h>
 #include <xwos/irq.h>
 #include <soc_irq.h>
 #include <soc_sched.h>
 #include <soc_syshwt.h>
 #include <stm32f4xx.h>
-#include <bm/stm32cube/cubemx/Core/Inc/stm32f4xx_it.h>
-#include <bm/stm32cube/cubemx/Core/Inc/sys.h>
-#include <bm/stm32cube/cubemx/Core/Inc/usart.h>
 #include <bm/stm32cube/xwds/stm32cube.h>
+#include <bm/stm32cube/xwds/soc.h>
+#include <bm/stm32cube/xwds/usart.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********

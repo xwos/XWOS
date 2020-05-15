@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBEMX：初始化
+ * @brief STM32CUBE XWDS 设备：SOC
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -18,68 +18,73 @@
  * > limitations under the License.
  */
 
+#ifndef __bm_stm32cube_xwds_soc_h__
+#define __bm_stm32cube_xwds_soc_h__
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <arch_systick.h>
 #include <bm/stm32cube/standard.h>
-#include <xwos/osal/scheduler.h>
-#include <xwos/osal/thread.h>
-#include <bm/stm32cube/cubemx/Core/Inc/main.h>
+#include <xwos/lib/xwbop.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
+ ******** ******** ********       types       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+enum stm32cube_soc_dma_rc {
+        STM32CUBE_SOC_DMA_RC_FE = BIT(0), /**< FIFO error */
+        STM32CUBE_SOC_DMA_RC_DME = BIT(2), /**< Direct Mode error */
+        STM32CUBE_SOC_DMA_RC_TE = BIT(3), /**< Transfer error */
+        STM32CUBE_SOC_DMA_RC_HT = BIT(4), /**< Half transfer */
+        STM32CUBE_SOC_DMA_RC_TC = BIT(5), /**< Transfer complete */
+};
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern uint32_t uwTickPrio;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+void stm32cube_exti_isr(void);
+
+void stm32cube_dma1_stream0_isr(void);
+
+void stm32cube_dma1_stream1_isr(void);
+
+void stm32cube_dma1_stream2_isr(void);
+
+void stm32cube_dma1_stream3_isr(void);
+
+void stm32cube_dma1_stream4_isr(void);
+
+void stm32cube_dma1_stream5_isr(void);
+
+void stm32cube_dma1_stream6_isr(void);
+
+void stm32cube_dma1_stream7_isr(void);
+
+void stm32cube_dma2_stream0_isr(void);
+
+void stm32cube_dma2_stream1_isr(void);
+
+void stm32cube_dma2_stream2_isr(void);
+
+void stm32cube_dma2_stream3_isr(void);
+
+void stm32cube_dma2_stream4_isr(void);
+
+void stm32cube_dma2_stream5_isr(void);
+
+void stm32cube_dma2_stream6_isr(void);
+
+void stm32cube_dma2_stream7_isr(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
+ ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-void stm32cube_override_placeholder_stub(void)
-{
-        /* Placeholder */
-        /* LD连接静态库(.a)时，GC是以.c文件为单位，若文件中全是override
-           的函数，会被gcc认为.c文件中所有符号都没有被使用而被GC掉，因此
-           写一个占位函数，并在init中调用。 */
-}
 
-void HAL_MspInit(void)
-{
-        /* bm/stm32cube/cubemx/Core/Src/stm32f4xx_hal_msp.c中只有一个override函数，
-           当以.a静态库连接时，整个.c文件会被GC掉，因此需要重新在此文件中定义一次。
-           顺便删除一些不必要的语句。 */
-        __HAL_RCC_SYSCFG_CLK_ENABLE();
-        __HAL_RCC_PWR_CLK_ENABLE();
-
-        LL_PWR_EnableBkUpAccess();
-        LL_DBGMCU_EnableDBGSleepMode();
-        LL_DBGMCU_EnableDBGStopMode();
-        LL_DBGMCU_EnableDBGStandbyMode();
-}
-
-HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
-{
-        HAL_StatusTypeDef ret;
-
-        /* Configure the SysTick IRQ priority */
-        if (TickPriority < (1UL << __NVIC_PRIO_BITS)) {
-                uwTickPrio = ARCH_IRQ_TICK_PRIO;
-                ret = HAL_OK;
-        } else {
-                ret = HAL_ERROR;
-        }
-        return ret;
-}
-
-void stm32cube_systick_hook(void)
-{
-        HAL_IncTick();
-}
+#endif /* bm/stm32cube/xwds/soc.h */

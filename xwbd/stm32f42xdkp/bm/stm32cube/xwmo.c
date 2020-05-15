@@ -21,14 +21,20 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <bm/stm32cube/standard.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <xwmd/ds/soc/gpio.h>
+#include <bm/stm32cube/cubemx/override.h>
 #include <bm/stm32cube/xwds/stm32cube.h>
 #include <bm/stm32cube/xwds/init.h>
 #include <bm/stm32cube/xwmo.h>
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       types       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+typedef void (* stm32cube_override_holder_f)(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -52,6 +58,9 @@ xwer_t memtst_task(void * arg);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+const
+stm32cube_override_holder_f stm32cube_override_holder = stm32cube_override_holder_stub;
+
 const struct xwosal_thrd_desc stm32cube_tbd[] = {
         [0] = {
                 .name = "task.led",

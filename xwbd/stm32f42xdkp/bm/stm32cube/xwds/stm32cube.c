@@ -21,7 +21,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <bm/stm32cube/standard.h>
 #include <xwmd/ds/xwds.h>
 #include <bm/stm32cube/xwds/stm32cube.h>
 

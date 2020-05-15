@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBEMX：初始化
+ * @brief STM32CUBEMX：重写某些override属性的函数
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -21,9 +21,8 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <arch_systick.h>
 #include <bm/stm32cube/standard.h>
-#include <xwos/osal/scheduler.h>
+#include <arch_systick.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -74,9 +73,4 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
                 ret = HAL_ERROR;
         }
         return ret;
-}
-
-void stm32cube_systick_hook(void)
-{
-        HAL_IncTick();
 }

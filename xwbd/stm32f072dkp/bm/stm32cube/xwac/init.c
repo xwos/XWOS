@@ -22,10 +22,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
-#include <xwos/osal/scheduler.h>
-#include <arch_irq.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
-#include <bm/stm32cube/xwac/override.h>
 #include <bm/stm32cube/xwac/init.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -35,10 +32,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern xwsz_t eram_mr_origin[];
-extern xwsz_t eram_mr_size[];
-
-void (*stm32cube_override_placeholder)(void) = stm32cube_override_placeholder_stub;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********

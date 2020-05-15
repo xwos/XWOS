@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS Kernel Adaptation Code in BDL：中断向量表
+ * @brief 中断向量表
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
