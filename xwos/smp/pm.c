@@ -34,15 +34,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief XWOS PM API：初始化电源管理领域
- * @param pmdm: (I) 电源管理领域控制块指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- */
 __xwos_api
 void xwos_pmdm_init(struct xwos_pmdm * pmdm)
 {
@@ -50,15 +41,6 @@ void xwos_pmdm_init(struct xwos_pmdm * pmdm)
         pmdm->suspended_xwsd_cnt = 0;
 }
 
-/**
- * @brief XWOS PM API：得到当前CPU所属的电源管理领域控制块的指针
- * @param pmdm: (I) 电源管理领域控制块的指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- */
 __xwos_api
 struct xwos_pmdm * xwos_pmdm_get_lc(void)
 {
@@ -68,20 +50,6 @@ struct xwos_pmdm * xwos_pmdm_get_lc(void)
         return xwsd->pm.xwpmdm;
 }
 
-/**
- * @brief XWOS PM API：设置电源管理领域的回调函数
- * @param pmdm: (I) 电源管理领域控制块指针
- * @param resume_cb: (I) 电源管理领域从暂停模式恢复的回调函数
- * @param suspend_cb: (I) 电源管理领域进入暂停模式的回调函数
- * @param wakeup_cb: (I) 唤醒电源管理领域的回调函数
- * @param sleep_cb: (I) 电源管理领域休眠的回调函数
- * @param arg: (I) 回调函数调用时的参数
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- */
 __xwos_api
 void xwos_pmdm_set_cb(struct xwos_pmdm * pmdm,
                       xwos_pmdm_cb_f resume_cb,
@@ -97,16 +65,6 @@ void xwos_pmdm_set_cb(struct xwos_pmdm * pmdm,
         pmdm->cb.arg = arg;
 }
 
-/**
- * @brief XWOS PM API：暂停电源管理领域中所有调度器
- * @param pmdm: (I) 电源管理领域控制块指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
- */
 __xwos_api
 xwer_t xwos_pmdm_suspend(struct xwos_pmdm * pmdm)
 {
@@ -129,16 +87,6 @@ xwer_t xwos_pmdm_suspend(struct xwos_pmdm * pmdm)
         return rc;
 }
 
-/**
- * @brief XWOS PM API：继续电源管理领域中所有调度器
- * @param pmdm: (I) 电源管理领域控制块指针
- * @return 错误码
- * @note
- * - 同步/异步：异步
- * - 中断上下文：可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：不可以使用
- */
 __xwos_api
 xwer_t xwos_pmdm_resume(struct xwos_pmdm * pmdm)
 {
@@ -190,16 +138,6 @@ xwer_t xwos_pmdm_resume(struct xwos_pmdm * pmdm)
         return rc;
 }
 
-/**
- * @brief XWOS PM API：获取电源管理步骤
- * @param pmdm: (I) 电源管理领域控制块指针
- * @return 电源管理步骤 @ref xwos_pmdm_stage_em
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- */
 __xwos_api
 xwsq_t xwos_pmdm_get_stage(struct xwos_pmdm * pmdm)
 {

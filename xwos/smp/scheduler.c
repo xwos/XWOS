@@ -11,9 +11,9 @@
  * @note
  * - XWOS的调度器是一个每CPU变量，为了提高程序的效率，减少cache miss，
  *   通常只由CPU才可访问自己的调度器控制块结构体。其他CPU需要操作当前
- *   CPU的调度器时，需要挂起当前CPU的调度器软中断，由当前CPU自身在ISR
+ *   CPU的调度器时，需要挂起当前CPU的调度器服务中断，由当前CPU在ISR
  *   中进行操作。
- * - 调度器软中断处理以下操作：
+ * - 调度器服务中断处理以下操作：
  *   + 调度器暂停：xwos_scheduler_suspend_lic()
  *                   |--> xwos_scheduler_notify_allfrz_lic()
  *   + 线程退出：xwos_thrd_exit_lic()
@@ -23,7 +23,7 @@
  *   + 线程解冻：xwos_thrd_thaw_lic()
  *   + 线程迁出：xwos_thrd_outmigrate_lic()
  *   + 线程迁入：xwos_thrd_immigrate_lic()
- * - 调度器软中断的中断优先级必须为系统最高优先级。
+ * - 调度器服务中断的中断优先级必须为系统最高优先级。
  * - 调度时锁的顺序：同级的锁不可同时获得
  *   + ① xwos_scheduler.cxlock
  *     + ② xwos_scheduler.rq.rt.lock
@@ -94,6 +94,12 @@ xwu8_t xwos_scheduler_bhd_stack[CPUCFG_CPU_NUM][XWSMPCFG_SD_BH_STACK_SIZE];
  ******** ******** ******** ******** ******** ******** ******** ********/
 extern
 void bdl_xwsd_idle_hook(struct xwos_scheduler * xwsd);
+
+extern __xwos_code
+void xwos_pmdm_report_xwsd_suspended(struct xwos_pmdm * pmdm);
+
+extern __xwos_code
+void xwos_pmdm_report_xwsd_resuming(struct xwos_pmdm * pmdm);
 
 static __xwos_code
 struct xwos_tcb * xwos_scheduler_rtrq_choose(struct xwos_scheduler * xwsd);
@@ -442,6 +448,10 @@ void xwos_scheduler_init_bhd(struct xwos_scheduler * xwsd)
 /**
  * @brief XWOS API：禁止本地CPU调度器进入中断底半部
  * @return XWOS调度器的指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
 __xwos_api
 struct xwos_scheduler * xwos_scheduler_dsbh_lc(void)
@@ -475,6 +485,10 @@ struct xwos_scheduler * xwos_scheduler_dsbh_lc(void)
 /**
  * @brief XWOS API：允许本地CPU调度器进入中断底半部
  * @return XWOS调度器的指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
 __xwos_api
 struct xwos_scheduler * xwos_scheduler_enbh_lc(void)
@@ -531,6 +545,10 @@ struct xwos_scheduler * xwos_scheduler_enbh(struct xwos_scheduler * xwsd)
  * @retval -EPERM: 中断底半部已被禁止
  * @retval -EINPROGRESS: 切换上下文的过程正在进行中
  * @retval -EALREADY: 当前上下文已经是中断底半部上下文
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
 static __xwos_code
 xwer_t xwos_scheduler_sw_bh(struct xwos_scheduler * xwsd)
@@ -876,16 +894,15 @@ xwer_t xwos_scheduler_do_swcx(struct xwos_scheduler * xwsd)
  * @brief 请求切换上下文
  * @param xwsd: (I) XWOS调度器的指针
  * @return 错误码
- * @retval OK: 需要触发一个软中断执行切换上下文的过程
+ * @retval OK: 需要触发切换上下文的中断执行切换上下文的过程
  * @retval -EBUSY: 当前上下文为中断底半部上下文
  * @retval -EINVAL: 当前正在运行的线程状态错误
  * @retval -EAGAIN: 不需要切换上下文
  * @retval -EEINPROGRESS: 切换上下文的过程正在进行
- * note
+ * @note
  * - 同步/异步：异步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
 __xwos_code
 xwer_t xwos_scheduler_req_swcx(struct xwos_scheduler * xwsd)
@@ -966,15 +983,14 @@ void xwos_scheduler_finish_swcx(struct xwos_scheduler * xwsd)
  * @brief 请求切换上下文
  * @param xwsd: (I) XWOS调度器的指针
  * @return 错误码
- * @retval OK: 需要触发一个软中断执行切换上下文的过程
+ * @retval OK: 需要触发切换上下文的中断执行切换上下文的过程
  * @retval -EINVAL: 当前正在运行的线程状态错误
  * @retval -EAGAIN: 不需要切换上下文
  * @retval -EEINPROGRESS: 切换上下文的过程正在进行
  * @note
  * - 同步/异步：异步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
 __xwos_code
 xwer_t xwos_scheduler_req_swcx(struct xwos_scheduler * xwsd)
@@ -1033,9 +1049,8 @@ void xwos_scheduler_finish_swcx(struct xwos_scheduler * xwsd)
  * @retval <0: 当前调度器正在进入低功耗模式
  * @note
  * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
 __xwos_code
 xwer_t xwos_scheduler_inc_wklkcnt(struct xwos_scheduler * xwsd)
@@ -1056,9 +1071,8 @@ xwer_t xwos_scheduler_inc_wklkcnt(struct xwos_scheduler * xwsd)
  * @retval <0: 当前调度器正在进入低功耗
  * @note
  * - 同步/异步：同步
- * - 中断上下文：在本地CPU的中断上下文中执行此函数时，xwsd不可指定为本地CPU的调度器
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
 __xwos_code
 xwer_t xwos_scheduler_dec_wklkcnt(struct xwos_scheduler * xwsd)
@@ -1177,9 +1191,9 @@ void xwos_scheduler_thaw_allfrz_lic(struct xwos_scheduler * xwsd)
  * @param xwsd: (I) 调度器对象的指针
  * @return 错误码
  * @note
- * - 此函数只能在CPU自身的中断中执行，当电源管理的代码运行于其他CPU上时，
- *   可通过@ref xwos_scheduler_suspend(cpuid)发射一个软中断到对应CPU上，
- *   让它自己执行此函数。
+ * - 此函数只能在CPU自身的调度器服务中断中执行，当电源管理的代码运行于
+ *   其他CPU上时，可通过@ref xwos_scheduler_suspend(cpuid)向对应CPU申请
+ *   调度器服务中断并执行此函数。
  */
 __xwos_code
 xwer_t xwos_scheduler_suspend_lic(struct xwos_scheduler * xwsd)
@@ -1206,9 +1220,8 @@ xwer_t xwos_scheduler_suspend_lic(struct xwos_scheduler * xwsd)
  * @return 错误码
  * @note
  * - 同步/异步：异步
- * - 中断上下文：在本地CPU的中断上下文中执行此函数时，cpuid不可指定为本地CPU
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
  */
 __xwos_api
 xwer_t xwos_scheduler_suspend(xwid_t cpuid)
@@ -1228,9 +1241,9 @@ xwer_t xwos_scheduler_suspend(xwid_t cpuid)
  * @param xwsd: (I) 调度器对象的指针
  * @return 错误码
  * @note
- * - 此函数只能在CPU自身的中断中执行，因此当电源管理的代码运行于其他CPU上时，
- *   可通过@ref xwos_scheduler_resume(cpuid)发射一个软中断到对应CPU，
- *   让其进入中断，并执行此函数。
+ * - 此函数只能在CPU自身的调度器服务中断中执行，因此当电源管理的代码运行在
+ *   其他CPU上时，可通过@ref xwos_scheduler_resume(cpuid)向对应CPU申请
+ *   调度器服务中断执行此函数。
  */
 __xwos_code
 xwer_t xwos_scheduler_resume_lic(struct xwos_scheduler * xwsd)
@@ -1278,9 +1291,8 @@ xwer_t xwos_scheduler_resume_lic(struct xwos_scheduler * xwsd)
  * @return 错误码
  * @note
  * - 同步/异步：异步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
  */
 __xwos_api
 xwer_t xwos_scheduler_resume(xwid_t cpuid)
@@ -1312,9 +1324,8 @@ xwer_t xwos_scheduler_resume(xwid_t cpuid)
  * @return 状态值 @ref xwos_scheduler_wakelock_cnt_em
  * @note
  * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
 __xwos_api
 xwsq_t xwos_scheduler_get_pm_state(struct xwos_scheduler * xwsd)

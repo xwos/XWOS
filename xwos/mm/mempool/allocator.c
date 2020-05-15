@@ -44,6 +44,19 @@ xwer_t xwmm_mempool_destruct(struct xwmm_mempool * mp);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief XWMM API：内存池的构造函数
+ * @param mp: (I) 内存池的指针
+ * @param name: (I) 名字
+ * @param origin: (I) 内存区域的起始地址
+ * @param size: (I) 内存区域的总大小
+ * @param odrbtree: (I) 阶红黑树数组的指针
+ * @param pgarray: (I) 页控制块数组的指针
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -E2SMALL: 内存区域太小
+ * @retval -EALIGN: 内存区域没有对齐
+ */
 static __xwos_code
 xwer_t xwmm_mempool_construct(struct xwmm_mempool * mp, const char * name,
                               xwptr_t origin, xwsz_t size,
@@ -197,11 +210,15 @@ err_pa_init:
         return rc;
 }
 
+/**
+ * @brief XWMM API：内存池的析构函数
+ * @param mp: (I) 内存池的指针
+ * @return 错误码
+ * @retval OK: OK
+ */
 static __xwos_code
 xwer_t xwmm_mempool_destruct(struct xwmm_mempool * mp)
 {
-        XWOS_VALIDATE((mp), "nullptr", -EFAULT);
-
         xwmm_mempool_objcache_destroy(&mp->oc_2048);
         xwmm_mempool_objcache_destroy(&mp->oc_1024);
         xwmm_mempool_objcache_destroy(&mp->oc_768);
@@ -220,23 +237,6 @@ xwer_t xwmm_mempool_destruct(struct xwmm_mempool * mp)
         return OK;
 }
 
-/**
- * @brief XWMM API：静态方式初始化内存池。
- * @param mp: (I) 内存池的指针
- * @param name: (I) 名字
- * @param origin: (I) 内存区域的起始地址
- * @param size: (I) 内存区域的总大小
- * @param odrbtree: (I) 阶红黑树数组的指针
- * @param pgarray: (I) 页控制块数组的指针
- * @return 错误码
- * @retval OK: OK
- * @retval -E2SMALL: 内存区域太小
- * @retval -EALIGN: 内存区域没有对齐
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwos_api
 xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
                          xwptr_t origin, xwsz_t size)
@@ -290,38 +290,14 @@ err_aligned:
         return rc;
 }
 
-/**
- * @brief XWMM API：销毁静态方式初始化的内存池。
- * @param mp: (I) 内存池的指针
- * @return 错误码
- * @retval OK: OK
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwos_api
 xwer_t xwmm_mempool_destroy(struct xwmm_mempool * mp)
 {
+        XWOS_VALIDATE((mp), "nullptr", -EFAULT);
+
         return xwmm_mempool_destruct(mp);
 }
 
-/**
- * @brief XWMM API：动态创建内存池。
- * @param ptrbuf: (O) 指向缓冲区的指针，通过此缓冲区返回新的内存池的指针
- * @param name: (I) 名字
- * @param origin: (I) 内存区域的起始地址
- * @param size: (I) 内存区域的总大小
- * @return 错误码
- * @retval OK: OK
- * @retval -E2SMALL: 内存区域太小
- * @retval -EALIGN: 内存区域没有对齐
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwos_api
 xwer_t xwmm_mempool_create(struct xwmm_mempool ** ptrbuf, const char * name,
                            xwptr_t origin, xwsz_t size)
@@ -377,16 +353,6 @@ err_mem2small:
         return rc;
 }
 
-/**
- * @brief XWMM API：删除动态创建的内存池。
- * @param mp: (I) 内存池的指针
- * @return 错误码
- * @retval OK: OK
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwos_api
 xwer_t xwmm_mempool_delete(struct xwmm_mempool * mp)
 {
@@ -398,19 +364,6 @@ xwer_t xwmm_mempool_delete(struct xwmm_mempool * mp)
         return OK;
 }
 
-/**
- * @brief XWMM API：从内存池中申请内存。
- * @param mp: (I) 内存池的指针
- * @param size: (I) 申请的大小
- * @param membuf: (O) 指向缓冲区的指针，通过此缓冲区返回申请到的内存的首地址
- * @return 错误码
- * @retval OK: OK
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwos_api
 xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf)
 {
@@ -485,18 +438,6 @@ xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf
         return rc;
 }
 
-/**
- * @brief XWMM API：释放内存。
- * @param mp: (I) 内存池的指针
- * @param mem: (I) 内存的首地址
- * @return 错误码
- * @retval OK: OK
- * @retval -EALREADY: 页内存已释放
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwos_api
 xwer_t xwmm_mempool_free(struct xwmm_mempool * mp, void * mem)
 {
@@ -567,21 +508,6 @@ do_nothing:
         return rc;
 }
 
-/**
- * @brief XWMM API：调整内存大小。
- * @param mp: (I) 内存池的指针
- * @param size: (I) 申请的大小，当size == 0，realloc等价于free
- * @param membuf: 指向缓冲区的指针，此缓冲区
- *                (I) 作为输入时，当*membuf == NULL，realloc等价于malloc
- *                (O) 作为输出时，通过此缓冲区返回申请到的内存的首地址
- * @return 错误码
- * @retval OK: OK
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwos_api
 xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf)
 {

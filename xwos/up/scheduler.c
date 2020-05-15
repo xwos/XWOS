@@ -688,17 +688,15 @@ xwer_t xwos_scheduler_do_swcx(void)
 /**
  * @brief 请求切换上下文
  * @return 错误码
- * @retval OK: OK，需要触发一个软中断执行切换上下文的过程
+ * @retval OK: OK，需要触发切换上下文中断执行切换上下文的过程
  * @retval -EBUSY: 当前上下文为中断底半部上下文
  * @retval -EINVAL: 正在运行的线程状态错误
  * @retval -EAGAIN: 不需要切换上下文
  * @retval -EEINPROGRESS: 切换上下文的过程正在进行
  * @note
  * - 同步/异步：异步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：不可重入
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
 __xwos_code
 xwer_t xwos_scheduler_req_swcx(void)
@@ -782,17 +780,15 @@ void xwos_scheduler_finish_swcx(void)
 /**
  * @brief 请求切换上下文
  * @return 错误码
- * @retval OK: OK，需要触发一个软中断执行切换上下文的过程
+ * @retval OK: OK，需要触发上下文切换中断执行切换上下文的过程
  * @retval -EBUSY: 当前上下文为中断底半部上下文
  * @retval -EINVAL: 当前正在运行的线程状态错误
  * @retval -EAGAIN: 不需要切换上下文
  * @retval -EEINPROGRESS: 切换上下文的过程正在进行
  * @note
  * - 同步/异步：异步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：不可重入
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
 __xwos_code
 xwer_t xwos_scheduler_req_swcx(void)
@@ -868,20 +864,6 @@ void xwos_scheduler_intr_all(void)
 }
 
 #if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
-/**
- * @brief XWOS API：设置电源管理回调函数
- * @param resume_cb: (I) 电源管理领域从暂停模式恢复的回调函数
- * @param suspend_cb: (I) 电源管理领域进入暂停模式的回调函数
- * @param wakeup_cb: (I) 唤醒电源管理领域的回调函数
- * @param sleep_cb: (I) 电源管理领域休眠的回调函数
- * @param arg: (I) 回调函数调用时的参数
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：不可重入
- */
 __xwos_api
 void xwos_scheduler_set_pm_cb(xwos_scheduler_pm_cb_f resume_cb,
                               xwos_scheduler_pm_cb_f suspend_cb,
@@ -905,10 +887,8 @@ void xwos_scheduler_set_pm_cb(xwos_scheduler_pm_cb_f resume_cb,
  * @retval <0: 当前调度器正在进入低功耗
  * @note
  * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：不可重入
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
 __xwos_code
 xwer_t xwos_scheduler_inc_wklkcnt(void)
@@ -936,10 +916,8 @@ xwer_t xwos_scheduler_inc_wklkcnt(void)
  * @retval <0: 当前调度器正在进入低功耗
  * @note
  * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：不可重入
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
 __xwos_code
 xwer_t xwos_scheduler_dec_wklkcnt(void)
@@ -969,12 +947,12 @@ xwer_t xwos_scheduler_dec_wklkcnt(void)
 }
 
 /**
- * @brief 暂停本地CPU的调度器
+ * @brief 暂停调度器（中断中执行）
  * @param xwsd: (I) 调度器对象的指针
  * @return 错误码
  * @note
- * - 此函数只能在CPU自身的中断中执行，可通过@ref soc_scheduler_suspend()触发
- *   一个软中断，执行此函数。
+ * - 此函数只能在CPU自身的调度器服务中断中执行，可通过@ref soc_scheduler_suspend()
+ *   触发并执行此函数。
  */
 __xwos_code
 xwer_t xwos_scheduler_suspend_lic(struct xwos_scheduler * xwsd)
@@ -1078,16 +1056,6 @@ xwer_t xwos_scheduler_thaw_allfrz_lic(void)
         return rc;
 }
 
-/**
- * @brief XWOS API：申请暂停调度器
- * @return 错误码
- * @note
- * - 同步/异步：异步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：不可重入
- */
 __xwos_api
 xwer_t xwos_scheduler_suspend(void)
 {
@@ -1095,13 +1063,13 @@ xwer_t xwos_scheduler_suspend(void)
 }
 
 /**
- * @brief 继续已经暂停的调度器
+ * @brief 继续已经暂停的调度器（在中断中执行）
  * @param xwsd: (I) 调度器对象的指针
  * @return 错误码
  * @note
  * - 此函数只可由xwos_scheduler_resume()调用。
- *   在SMP架构中，SOC层soc_scheduler_resume会通过软中断在CPU自身的中断上下文中运行此
- *   函数，UP架构中复用了这部分代码。因此，此函数仅仅是为了保证编译顺利。
+ *   在SMP架构中，SOC层soc_scheduler_resume会触发CPU自身的调度器服务中断来运行此
+ *   函数，UP架构中复用了同一份BSP的适配代码。因此，此函数仅仅是为了保证编译顺利。
  */
 __xwos_code
 xwer_t xwos_scheduler_resume_lic(struct xwos_scheduler * xwsd)
@@ -1148,41 +1116,21 @@ xwer_t xwos_scheduler_resume_lic(struct xwos_scheduler * xwsd)
         return rc;
 }
 
-/**
- * @brief XWOS API：继续已经暂停的调度器
- * @param xwsd: (I) 调度器对象的指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：此函数在系统唤醒中断中执行
- * - 中断底半部：不可以使用
- * - 线程上下文：不可以使用
- * - 重入性：不可重入
- */
 __xwos_api
 xwer_t xwos_scheduler_resume(void)
 {
         struct xwos_scheduler * xwsd;
         xwer_t rc;
 
+        xwsd = &xwos_scheduler;
         if (OK != xwos_irq_get_id(NULL)) {
-                rc = -ENOTINISR;
+                rc = soc_scheduler_resume(xwsd);
         } else {
-                xwsd = &xwos_scheduler;
                 rc = xwos_scheduler_resume_lic(xwsd);
         }
         return rc;
 }
 
-/**
- * @brief XWOS API：获取调度器电源管理状态
- * @return 状态值 @ref xwos_scheduler_wakelock_cnt_em
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- */
 __xwos_api
 xwsq_t xwos_scheduler_get_pm_state(void)
 {
@@ -1207,15 +1155,6 @@ xwer_t xwos_scheduler_resume_lic(struct xwos_scheduler * xwsd)
         return -ENOSYS;
 }
 
-/**
- * @brief XWOS API：获取调度器电源管理状态
- * @return 状态值 @ref xwos_scheduler_wakelock_cnt_em
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- */
 __xwos_api
 xwsq_t xwos_scheduler_get_pm_state(void)
 {

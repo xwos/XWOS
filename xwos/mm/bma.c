@@ -68,21 +68,6 @@ void xwmm_bma_combine(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief XWMM API：静态方式初始化伙伴算法内存块分配器。
- * @param bma: (I) 伙伴算法内存块分配器对象的指针
- * @param name: (I) 名字
- * @param origin: (I) 内存区域的起始地址
- * @param total: (I) 内存区域的总大小
- * @param blksize: (I) 单位内存块的大小
- * @param orderlists: (I) 阶链表数组的指针
- * @param bcbs: (I) 块控制块数组的指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwos_api
 xwer_t xwmm_bma_init(struct xwmm_bma * bma, const char * name,
                      xwptr_t origin, xwsz_t total, xwsz_t blksize,
@@ -141,15 +126,6 @@ err_mem2small:
         return rc;
 }
 
-/**
- * @brief XWMM API：销毁静态方式初始化的伙伴算法内存块分配器。
- * @param bma: (I) 伙伴算法内存块分配器对象的指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwos_api
 xwer_t xwmm_bma_destroy(struct xwmm_bma * bma)
 {
@@ -159,19 +135,6 @@ xwer_t xwmm_bma_destroy(struct xwmm_bma * bma)
         return OK;
 }
 
-/**
- * @brief XWMM API：动态方式创建伙伴算法内存块分配器。
- * @param ptrbuf: (O) 用于返回新的伙伴算法内存块分配器对象指针的缓存
- * @param name: (I) 名字
- * @param origin: (I) 内存区域的起始地址
- * @param total: (I) 内存区域的总大小
- * @param blksize: (I) 单位内存块的大小
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwos_api
 xwer_t xwmm_bma_create(struct xwmm_bma ** ptrbuf, const char * name,
                        xwptr_t origin, xwsz_t total, xwsz_t blksize)
@@ -236,15 +199,6 @@ err_mem2small:
         return rc;
 }
 
-/**
- * @brief XWMM API：删除动态方式创建的伙伴算法内存块分配器。
- * @param bma: (I) 伙伴算法内存块分配器对象的指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwos_api
 xwer_t xwmm_bma_delete(struct xwmm_bma * bma)
 {
@@ -258,7 +212,7 @@ xwer_t xwmm_bma_delete(struct xwmm_bma * bma)
 }
 
 /**
- * @brief 从内存块首地址获得其控制块的指针。
+ * @brief 从内存块首地址获得其控制块的指针
  * @param bma: (I) 伙伴算法内存块分配器对象的指针
  * @param mem: (I) 内存块的首地址
  * @return 内存块的控制块指针或类型为指针的错误码
@@ -281,7 +235,7 @@ struct xwmm_bma_bcb * xwmm_bma_mem_to_bcb(struct xwmm_bma * bma, void * mem)
 }
 
 /**
- * @brief 从内存块的控制块指针获得内存块的首地址。
+ * @brief 从内存块的控制块指针获得内存块的首地址
  * @param bma: (I) 伙伴算法内存块分配器对象的指针
  * @param bcb: (I) 内存块的控制块指针
  * @return 内存块的首地址
@@ -298,7 +252,7 @@ void * xwmm_bma_bcb_to_mem(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb)
 }
 
 /**
- * @brief 找到内存块的伙伴。
+ * @brief 寻找内存块的伙伴
  * @param bma: (I) 伙伴算法内存块分配器对象的指针
  * @param bcb: (I) 内存块的控制块指针
  * @return 伙伴内存块的控制块指针
@@ -317,7 +271,7 @@ struct xwmm_bma_bcb * xwmm_bma_find_buddy(struct xwmm_bma * bma,
 }
 
 /**
- * @brief 将一块内存加入到阶链表。
+ * @brief 将一块内存加入到阶链表
  * @param bma: (I) 伙伴算法内存块分配器对象的指针
  * @param ol: (I) 阶链表的指针
  * @param bcb: (I) 内存块的控制块指针
@@ -338,7 +292,7 @@ void xwmm_bma_orderlist_add(struct xwmm_bma * bma,
 }
 
 /**
- * @brief 从阶链表中删除一块内存。
+ * @brief 从阶链表中删除一块内存
  * @param bma: (I) 伙伴算法内存块分配器对象的指针
  * @param ol: (I) 阶链表的指针
  * @param odr: (I) 阶链表的阶
@@ -368,7 +322,7 @@ xwer_t xwmm_bma_orderlist_remove(struct xwmm_bma * bma,
 }
 
 /**
- * @brief 从阶链表中选择一块内存，并返回其块控制块。
+ * @brief 从阶链表中选择一块内存，并返回其块控制块
  * @param bma: (I) 伙伴算法内存块分配器对象的指针
  * @param ol: (I) 阶链表的指针
  * @return 块控制块指针或类型为指针的错误码
@@ -397,7 +351,7 @@ struct xwmm_bma_bcb * xwmm_bma_orderlist_choose(struct xwmm_bma * bma,
 }
 
 /**
- * @brief 将一个大块分割成小块。
+ * @brief 将一个大块分割成小块
  * @param bma: (I) 伙伴算法内存块分配器对象的指针
  * @param bcb: (I) 大块的内存块的控制块的指针
  * @param target_odr: (I) 目标块数量的阶
@@ -432,20 +386,6 @@ void xwmm_bma_divide_block(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb,
         }
 }
 
-/**
- * @brief XWMM API：申请一块连续的内存。
- * @param bma: (I) 伙伴算法内存块分配器对象的指针
- * @param order: (I) 块数量的阶，内存块大小：((1 << order) * bma->blksize)
- * @param membuf: (O) 指向指针缓存的指针，此指针缓存用于返回申请到的内存的首地址
- * @return 错误码
- * @retval -EFAULT: 空指针
- * @retval -ERANGE: order无效
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwos_api
 xwer_t xwmm_bma_alloc(struct xwmm_bma * bma, xwsq_t order, void ** membuf)
 {
@@ -485,7 +425,7 @@ err_nomem:
 }
 
 /**
- * @brief 找到内存块的伙伴。
+ * @brief 找到内存块的伙伴
  * @param bma: (I) 伙伴算法内存块分配器对象的指针
  * @param bcb: (I) 内存块的控制块的指针
  * @return 错误码
@@ -530,19 +470,6 @@ void xwmm_bma_combine(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb)
         xwmm_bma_orderlist_add(bma, &bma->orderlists[odr], bcb);
 }
 
-/**
- * @brief XWMM API：释放内存块。
- * @param bma: (I) 伙伴算法内存块分配器对象的指针
- * @param mem: (I) 内存块的首地址指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EINVAL: 参数错误
- * @retval -ERANGE: 内存块不属于指定的伙伴算法内存块分配器对象
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwos_api
 xwer_t xwmm_bma_free(struct xwmm_bma * bma, void * mem)
 {

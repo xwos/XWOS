@@ -20,6 +20,7 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/up/rtrq.h>
+#include <xwos/up/pm.h>
 #if defined(XWUPCFG_SD_BH) && (1 == XWUPCFG_SD_BH)
   #include <xwos/up/bh.h>
 #endif /* XWUPCFG_SD_BH */
@@ -103,25 +104,7 @@ struct xwos_sdobj_stack_info {
         const char * name; /**< 名字字符串 */
 };
 
-/**
- * @brief wakelock counter enumerations
- */
-enum xwos_scheduler_wakelock_cnt_em {
-        XWOS_SCHEDULER_WKLKCNT_SUSPENDED = 0, /**< 调度器已暂停 */
-        XWOS_SCHEDULER_WKLKCNT_SUSPENDING, /**< 调度器正在暂停 */
-        XWOS_SCHEDULER_WKLKCNT_RESUMING = XWOS_SCHEDULER_WKLKCNT_SUSPENDING,
-        XWOS_SCHEDULER_WKLKCNT_ALLFRZ, /**< 调度器所有线程已冻结 */
-        XWOS_SCHEDULER_WKLKCNT_FREEZING, /**< 正在冻结线程 */
-        XWOS_SCHEDULER_WKLKCNT_THAWING = XWOS_SCHEDULER_WKLKCNT_FREEZING,
-        XWOS_SCHEDULER_WKLKCNT_RUNNING, /**< 正常运行 */
-        XWOS_SCHEDULER_WKLKCNT_UNLOCKED = XWOS_SCHEDULER_WKLKCNT_RUNNING,
-                                        /**< 唤醒锁：未加锁 */
-        XWOS_SCHEDULER_WKLKCNT_LOCKED, /**< 唤醒锁：已加锁 */
-};
-
 #if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
-typedef void (* xwos_scheduler_pm_cb_f)(void *); /**< 电源管理回调函数 */
-
 /**
  * @brief 电源管理回调函数集合
  */
@@ -273,25 +256,6 @@ struct xwos_scheduler * xwos_scheduler_dspmpt_lc(void);
 
 __xwos_api
 struct xwos_scheduler * xwos_scheduler_enpmpt_lc(void);
-
-
-#if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
-__xwos_api
-void xwos_scheduler_set_pm_cb(xwos_scheduler_pm_cb_f resume_cb,
-                              xwos_scheduler_pm_cb_f suspend_cb,
-                              xwos_scheduler_pm_cb_f wakeup_cb,
-                              xwos_scheduler_pm_cb_f sleep_cb,
-                              void * arg);
-
-__xwos_api
-xwer_t xwos_scheduler_suspend(void);
-
-__xwos_api
-xwer_t xwos_scheduler_resume(void);
-
-__xwos_api
-xwsq_t xwos_scheduler_get_pm_state(void);
-#endif /* XWUPCFG_SD_PM */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      inline API implementations     ******** ********

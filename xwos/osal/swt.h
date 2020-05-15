@@ -23,14 +23,14 @@
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 操作系统抽象层：软件定时器
+ * @brief [XWOSAL] 软件定时器
  */
 struct xwosal_swt {
         struct xwosdl_swt osswt; /**< 操作系统的软件定时器 */
 };
 
 /**
- * @brief 操作系统抽象层：软件定时器回调函数指针类型
+ * @brief [XWOSAL] 软件定时器回调函数指针类型
  */
 typedef void (* xwosal_swt_f)(struct xwosal_swt * /*swt*/, void * /*arg*/);
 
@@ -38,17 +38,17 @@ typedef void (* xwosal_swt_f)(struct xwosal_swt * /*swt*/, void * /*arg*/);
  ******** ******** ********      macros       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 操作系统抽象层：软件定时器标志 —— 无
+ * @brief [XWOSAL] 软件定时器标志 —— 无
  */
 #define XWOSAL_SWT_FLAG_NULL            XWOSDL_SWT_FLAG_NULL
 
 /**
- * @brief 操作系统抽象层：软件定时器标志 —— 自动重启
+ * @brief [XWOSAL] 软件定时器标志 —— 自动重启
  */
 #define XWOSAL_SWT_FLAG_RESTART         XWOSDL_SWT_FLAG_RESTART
 
 /**
- * @brief 操作系统抽象层：软件定时器标志 —— 自动销毁
+ * @brief [XWOSAL] 软件定时器标志 —— 自动销毁
  */
 #define XWOSAL_SWT_FLAG_AUTORM          XWOSDL_SWT_FLAG_AUTORM
 

@@ -51,7 +51,6 @@ void stm32cube_pm_resume(void)
         __maybe_unused xwer_t rc;
         xwirq_t irq;
 
-        /* 从STOP模式恢复后，需要重新配置时钟 */
         rc = xwos_irq_get_id(&irq);
         LL_PWR_SetPowerMode(LL_PWR_MODE_STOP_MAINREGU);
         xwds_pm_resume(&stm32cube_ds);
@@ -71,6 +70,7 @@ void stm32cube_pm_suspend(void)
 void stm32cube_pm_wakeup(void)
 {
         LL_LPM_EnableSleep();
+        /* 从STOP模式恢复后，需要重新配置时钟 */
         SystemClock_Config();
 }
 

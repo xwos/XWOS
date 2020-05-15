@@ -1587,7 +1587,7 @@ xwer_t xwos_thrd_reqfrz_lic(struct xwos_tcb * tcb)
  * @param tcb: (I) 线程控制块对象的指针
  * @return 错误码
  * @note
- * - 此函数只能在线程所在的CPU的本地软中断执行；
+ * - 此函数只能在线程所属的CPU的调度器服务中断中执行；
  * - 此中断只可从函数@ref xwos_cthrd_freeze()中进入。
  */
 __xwos_code

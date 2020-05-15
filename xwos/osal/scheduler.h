@@ -27,27 +27,27 @@
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 操作系统抽象层：最小实时优先级
+ * @brief [XWOSAL] 最小实时优先级
  */
 #define XWOSAL_SD_PRIORITY_RT_MIN               XWOSDL_SD_PRIORITY_RT_MIN
 
 /**
- * @brief 操作系统抽象层：最大实时优先级
+ * @brief [XWOSAL] 最大实时优先级
  */
 #define XWOSAL_SD_PRIORITY_RT_MAX               XWOSDL_SD_PRIORITY_RT_MAX
 
 /**
- * @brief 操作系统抽象层：无效优先级
+ * @brief [XWOSAL] 无效优先级
  */
 #define XWOSAL_SD_PRIORITY_INVALID              XWOSDL_SD_PRIORITY_INVALID
 
 /**
- * @brief 操作系统抽象层：把优先级在 *base* 基础上提高 *inc*
+ * @brief [XWOSAL] 优先级在 *base* 基础上提高 *inc*
  */
 #define XWOSAL_SD_PRIORITY_RAISE(base, inc)     XWOSDL_SD_PRIORITY_RAISE(base, inc)
 
 /**
- * @brief 操作系统抽象层：把优先级在 *base* 基础上降低 *dec*
+ * @brief [XWOSAL] 优先级在 *base* 基础上降低 *dec*
  */
 #define XWOSAL_SD_PRIORITY_DROP(base, dec)      XWOSDL_SD_PRIORITY_DROP(base, dec)
 
@@ -57,6 +57,7 @@
 /**
  * @brief XWOSAL API：检查优先级是否有效
  * @param prio: (I) 优先级
+ * @return 布尔值
  * @retval true: 是
  * @retval false: 否
  * @note
@@ -72,10 +73,10 @@ bool xwosal_scheduler_prio_tst_valid(xwpr_t prio)
 
 /**
  * @brief XWOSAL API：启动当前CPU的调度器
- * @return 错误码
+ * @return 此函数不会返回
  * @note
  * - 同步/异步：同步
- * - 上下文：只可在xwos_main()中调用
+ * - 上下文：只可在系统复位后初始化流程中调用
  * - 重入性：只可调用一次
  */
 static __xwos_inline_api

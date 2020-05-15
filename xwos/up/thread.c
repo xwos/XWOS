@@ -457,7 +457,7 @@ void xwos_cthrd_exit(xwer_t rc)
 }
 
 /**
- * @brief XWOS软中断：退出线程
+ * @brief 执行退出线程
  * @param tcb: (I) 线程控制块对象的指针
  * @param rc: (I) 线程的返回值
  */
