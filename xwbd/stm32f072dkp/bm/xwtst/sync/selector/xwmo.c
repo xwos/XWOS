@@ -215,8 +215,8 @@ err_slt0_init:
 
 xwer_t bm_xwtst_sync_selector_wthrd_func(void * arg)
 {
-        DECLARE_BITMAP(msk, XWOSAL_SELECTOR_MAXNUM);
-        DECLARE_BITMAP(trg, XWOSAL_SELECTOR_MAXNUM);
+        xwosal_selector_declare_bitmap(msk);
+        xwosal_selector_declare_bitmap(trg);
         xwid_t slt0id, slt4id;
         xwid_t smr1id, smr2id, smr3id;
         xwtm_t sleep;

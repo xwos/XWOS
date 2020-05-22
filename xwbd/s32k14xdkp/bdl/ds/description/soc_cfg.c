@@ -3441,7 +3441,7 @@ const struct soc_dmac_private_cfg s32k14x_dmac_cfg = {
         },
 };
 
-__atomic DECLARE_BITMAP(s32k14x_dma_channel_status, SOC_DMAC_CHANNEL_NUM) = {
+__atomic xwbmpop_declare(s32k14x_dma_channel_status, SOC_DMAC_CHANNEL_NUM) = {
         0,
 };
 

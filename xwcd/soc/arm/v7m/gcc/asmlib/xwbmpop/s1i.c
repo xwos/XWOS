@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 位图操作汇编库：arch_xwbmpop_s1i
+ * @brief 位图操作汇编库：xwbmpop_s1i
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -28,7 +28,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_code __naked
-void arch_xwbmpop_s1i(__maybe_unused xwbmp_t * addr, __maybe_unused xwsq_t n)
+void xwbmpop_s1i(__maybe_unused xwbmp_t * addr, __maybe_unused xwsq_t n)
 {
         __asm__ volatile("      lsr     r2, r1, #5"); /* r2 = nr / 32; */
         __asm__ volatile("      and     r3, r1, #31"); /* r3 = nr % 32; */

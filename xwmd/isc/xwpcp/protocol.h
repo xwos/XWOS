@@ -175,7 +175,7 @@ struct xwpcp {
         struct {
                 __atomic xwu32_t cnt; /**< 发送计数器 */
                 struct xwlib_bclst_head q[XWPCP_PRIORITY_NUM]; /**< 队列 */
-                DECLARE_BITMAP(nebmp, XWPCP_PRIORITY_NUM); /**< 非空的索引位图 */
+                xwbmpop_declare(nebmp, XWPCP_PRIORITY_NUM); /**< 非空的索引位图 */
                 struct xwosal_splk lock; /**< 保护发送队列的自旋锁 */
                 struct xwosal_smr smr; /**< 指示待发送帧的数量的信号量 */
                 struct xwosal_mtx csmtx; /**< 保护发送和接收线程的共享数据的锁 */

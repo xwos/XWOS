@@ -27,7 +27,11 @@
  ******** ******** ********      macros       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWSYNC_EVT_MAXNUM (XWUPCFG_SYNC_EVT_MAXNUM) /**< 事件最大数量 */
-#define XWSYNC_EVT_DECLARE_BITMAP(name) xwbmp_t name[BITS_TO_BMPS(XWSYNC_EVT_MAXNUM)]
+
+/**
+ * @brief 声明事件位图
+ */
+#define xwsync_evt_declare_bitmap(name) xwbmpop_declare(name, XWSYNC_EVT_MAXNUM)
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -71,8 +75,8 @@ enum xwsync_evt_action_em {
 struct xwsync_evt {
         struct xwsync_cdt cdt; /**< C语言面向对象：继承struct xwsync_cdt */
         xwsq_t attr; /**< 属性 */
-        DECLARE_BITMAP(bmp, XWSYNC_EVT_MAXNUM); /**< 事件位图 */
-        DECLARE_BITMAP(msk, XWSYNC_EVT_MAXNUM); /**< 掩码位图 */
+        xwsync_evt_declare_bitmap(bmp); /**< 事件位图 */
+        xwsync_evt_declare_bitmap(msk); /**< 掩码位图 */
         struct xwlk_splk lock; /**< 保护位图的锁 */
 };
 

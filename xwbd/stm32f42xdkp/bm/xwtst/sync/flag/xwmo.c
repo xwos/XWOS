@@ -121,8 +121,8 @@ err_flg_init:
 
 xwer_t bm_xwtst_sync_flag_wthrd_func(void * arg)
 {
-        XWOSAL_FLG_DECLARE_BITMAP(msk);
-        XWOSAL_FLG_DECLARE_BITMAP(org);
+        xwosal_flg_declare_bitmap(msk);
+        xwosal_flg_declare_bitmap(org);
         xwid_t flgid;
         xwtm_t sleep;
         xwer_t rc;
@@ -214,7 +214,7 @@ err_w_set_all:
 
 xwer_t bm_xwtst_sync_flag_ithrd_func(void * arg)
 {
-        XWOSAL_FLG_DECLARE_BITMAP(msk);
+        xwosal_flg_declare_bitmap(msk);
         xwid_t flgid;
         xwtm_t sleep;
         xwer_t rc;

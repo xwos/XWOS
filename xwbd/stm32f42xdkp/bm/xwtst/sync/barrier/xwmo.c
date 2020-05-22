@@ -132,7 +132,7 @@ err_barrier_init:
 
 xwer_t bm_xwtst_sync_barrier_thrd_func(void * arg)
 {
-        DECLARE_BITMAP(msk, XWOSAL_BARRIER_MAXNUM);
+        xwosal_barrier_declare_bitmap(msk);
         xwid_t barid;
         xwer_t rc;
 

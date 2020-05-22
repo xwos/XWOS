@@ -116,7 +116,7 @@ xwu64_t arch_xwbop_re64(xwu64_t x)
 /* #if (defined(ARCHCFG_LIB_XWBOP_RE64)) && (1 == ARCHCFG_LIB_XWBOP_RE64) */
 
 #if (defined(ARCHCFG_LIB_XWBMPOP_FFS) && (1 == ARCHCFG_LIB_XWBMPOP_FFS))
-xwssq_t arch_xwbmpop_ffs(xwbmp_t * bmp, xwsz_t len)
+xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t len)
 {
         xwsz_t m;
         xwsz_t i;
@@ -154,7 +154,7 @@ xwssq_t arch_xwbmpop_ffs(xwbmp_t * bmp, xwsz_t len)
 /* #if (defined(ARCHCFG_LIB_XWBMPOP_FFS) && (1 == ARCHCFG_LIB_XWBMPOP_FFS)) */
 
 #if (defined(ARCHCFG_LIB_XWBMPOP_FFZ) && (1 == ARCHCFG_LIB_XWBMPOP_FFZ))
-xwssq_t arch_xwbmpop_ffz(xwbmp_t * bmp, xwsz_t len)
+xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t len)
 {
         xwsz_t m;
         xwsz_t i;
@@ -193,7 +193,7 @@ xwssq_t arch_xwbmpop_ffz(xwbmp_t * bmp, xwsz_t len)
 /* #if (defined(ARCHCFG_LIB_XWBMPOP_FFZ) && (1 == ARCHCFG_LIB_XWBMPOP_FFZ)) */
 
 #if (defined(ARCHCFG_LIB_XWBMPOP_FLS) && (1 == ARCHCFG_LIB_XWBMPOP_FLS))
-xwssq_t arch_xwbmpop_fls(xwbmp_t * bmp, xwsz_t len)
+xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t len)
 {
         xwsz_t i;
         xwbmp_t msk, tmp;
@@ -227,7 +227,7 @@ xwssq_t arch_xwbmpop_fls(xwbmp_t * bmp, xwsz_t len)
 /* #if (defined(ARCHCFG_LIB_XWBMPOP_FLS) && (1 == ARCHCFG_LIB_XWBMPOP_FLS)) */
 
 #if (defined(ARCHCFG_LIB_XWBMPOP_FLZ) && (1 == ARCHCFG_LIB_XWBMPOP_FLZ))
-xwssq_t arch_xwbmpop_flz(xwbmp_t * bmp, xwsz_t len)
+xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t len)
 {
         xwsz_t i;
         xwbmp_t msk;

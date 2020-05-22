@@ -34,6 +34,11 @@ struct xwosal_barrier {
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWOSAL_BARRIER_MAXNUM XWOSDL_BARRIER_MAXNUM /**< 线程屏障可同步的最大线程数 */
 
+/**
+ * @brief 声明线程屏障位图
+ */
+#define xwosal_barrier_declare_bitmap(name) xwosdl_barrier_declare_bitmap(name)
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       APIs        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/

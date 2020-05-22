@@ -69,30 +69,6 @@ __xwlib_code
 void arch_xwbop_c0m64(xwu64_t * a, xwu64_t mask);
 
 __xwlib_code
-xwssq_t arch_xwbmpop_ffs(xwbmp_t * bmp, xwsz_t len);
-
-__xwlib_code
-xwssq_t arch_xwbmpop_ffz(xwbmp_t * bmp, xwsz_t len);
-
-__xwlib_code
-xwssq_t arch_xwbmpop_fls(xwbmp_t * bmp, xwsz_t len);
-
-__xwlib_code
-xwssq_t arch_xwbmpop_flz(xwbmp_t * bmp, xwsz_t len);
-
-__xwlib_code
-void arch_xwbmpop_s1i(xwbmp_t * addr, xwsq_t n);
-
-__xwlib_code
-void arch_xwbmpop_c0i(xwbmp_t * addr, xwsq_t n);
-
-__xwlib_code
-bool arch_xwbmpop_t1i(xwbmp_t * addr, xwsq_t n);
-
-__xwlib_code
-void arch_xwbmpop_x1i(xwbmp_t * addr, xwsq_t n);
-
-__xwlib_code
 xwu8_t arch_xwbop_rbit8(xwu8_t x);
 
 __xwlib_code

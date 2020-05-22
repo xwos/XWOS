@@ -37,7 +37,7 @@ struct xwos_tcb;
  */
 struct xwos_rtrq {
         struct xwlib_bclst_head q[XWOS_RTRQ_QNUM];
-        DECLARE_BITMAP(bmp, XWOS_RTRQ_QNUM);
+        xwbmpop_declare(bmp, XWOS_RTRQ_QNUM);
         xwpr_t top;
         struct xwlk_splk lock;
 };

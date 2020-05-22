@@ -17,79 +17,12 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <asmlib/xwbop.h>
+#include <xwos/lib/xwbop_internal.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         macros & functions          ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define BIT(n)                  (1UL << (n))
-#define BIT_ULL(n)              (1ULL << (n))
-#define BIT_MASK(n)             (1UL << ((n) % BITS_PER_LONG))
-#define BIT_WORD(n)             ((n) / BITS_PER_LONG)
-#define BIT_ULL_MASK(n)         (1ULL << ((n) % BITS_PER_LONGLONG))
-#define BIT_ULL_WORD(n)         ((n) / BITS_PER_LONGLONG)
-#define BIT_BMP_MASK(n)         ((xwbmp_t)1 << (xwbmp_t)((n) % BITS_PER_XWBMP_T))
-#define BIT_BMP(n)              ((n) / BITS_PER_XWBMP_T)
-#define BITS_PER_BYTE           8
-#define DIV_ROUND(n, d)         ((n) / (d))
-#define DIV_ROUND_UP(n, d)      (((n) + (d) - 1U) / (d))
-#define SHIFT_ROUND(n, s)       ((n) >> (s))
-#define SHIFT_ROUND_UP(n, s)    (((n) + (1U << (s)) - 1U) >> (s))
-#define BITS_TO_BYTES(n)        DIV_ROUND_UP(n, BITS_PER_BYTE)
-#define BITS_TO_LONGS(n)        DIV_ROUND_UP(n, BITS_PER_BYTE * sizeof(long))
-#define BITS_TO_BMPS(n)         DIV_ROUND_UP(n, BITS_PER_BYTE * sizeof(xwbmp_t))
-#define ROUND(x, n)             ((x) & (~((n) - 1U)))
-#define ALIGN(x, n)             (((x) + ((n) - 1U)) & (~((n) - 1U)))
-
-/**
- * @brief 声明一个位图
- * @param name: (I) 符号名
- * @param bits: (I) 位图中的位数
- */
-#define DECLARE_BITMAP(name, bits)  xwbmp_t name[BITS_TO_BMPS(bits)]
-
-/**
- * @brief 得到一条位带掩码
- * @param s: (I) 起始位
- * @param bitwidth: (I) 位带宽度
- */
-#define BITSTRIP_MASK(s, bitwidth)              \
-        (((1UL << (bitwidth)) - 1U) << ((unsigned long)s))
-
-/**
- * @brief 取得数值中的位带部分
- * @param s: (I) 起始位
- * @param v: (I) 位带数值
- * @param bitwidth: (I) 位带宽度
- */
-#define BITSTRIP(s, v, bitwidth)                \
-        ((((unsigned long)v) & ((1UL << (bitwidth)) - 1U)) << (s))
-
-/**
- * @brief 得到一条unsigned long long类型的位带掩码
- * @param s: (I) 起始位
- * @param bitwidth: (I) 位带宽度
- */
-#define BITSTRIP_MASK_ULL(s, bitwidth)          \
-        (((1ULL << (bitwidth)) - 1) << ((unsigned long long)s))
-
-/**
- * @brief 取得unsigned long long类型的数值中的位带部分
- * @param s: (I) 起始位
- * @param v: (I) 位带数值
- * @param bitwidth: (I) 位带宽度
- */
-#define BITSTRIP_ULL(s, v, bitwidth)            \
-        ((((unsigned long long)(v)) & ((1ULL << (bitwidth)) - 1U)) << (s))
-
-/**
- * @brief 取得数据中的位
- * @param x: (I) 数据
- * @param bit: (I) 位的序号
- */
-#define GETBIT(x, bit)      (((x) >> (bit)) & 1U)
-
-/******** ******** bit-operations APIs ******** ********/
+/******** ******** 位操作 ******** ********/
 /**
  * @brief XWOS BOPLIB：调用位操作函数
  * @param type: (I) 数据类型
@@ -182,274 +115,7 @@
  */
 #define xwbop_flz(type, data)           xwbop(type, flz, (data))
 
-/******** ******** 8-bit data bit-operations ******** ********/
-#if (defined(ARCHCFG_LIB_XWBOP_S1M8) && (1 == ARCHCFG_LIB_XWBOP_S1M8))
-#define xwbop_s1m8(a, mask)     arch_xwbop_s1m8(a, mask)
-#else
-#define xwbop_s1m8(a, mask)     *(a) |= (mask)
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_C0M8) && (1 == ARCHCFG_LIB_XWBOP_C0M8))
-#define xwbop_c0m8(a, mask)     arch_xwbop_c0m8(a, mask)
-#else
-#define xwbop_c0m8(a, mask)     *(a) &= (~(mask))
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_X1M8) && (1 == ARCHCFG_LIB_XWBOP_X1M8))
-#define xwbop_x1m8(a, mask)     arch_xwbop_x1m8(a, mask)
-#else
-#define xwbop_x1m8(a, mask)     *(a) ^= (mask)
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_FFS8) && (1 == ARCHCFG_LIB_XWBOP_FFS8))
-#define xwbop_ffs8(x)           arch_xwbop_ffs8(x)
-#else
-__xwlib_code
-xwssq_t xwbop_ffs8(xwu8_t x);
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_FLS8) && (1 == ARCHCFG_LIB_XWBOP_FLS8))
-#define xwbop_fls8(x)           arch_xwbop_fls8(x)
-#else
-__xwlib_code
-xwssq_t xwbop_fls8(xwu8_t x);
-#endif
-
-static __xwlib_inline
-xwssq_t xwbop_ffz8(xwu8_t x)
-{
-        return xwbop_ffs8((xwu8_t)(~x));
-}
-
-static __xwlib_inline
-xwssq_t xwbop_flz8(xwu8_t x)
-{
-        return xwbop_fls8((xwu8_t)(~x));
-}
-
-#if (defined(ARCHCFG_LIB_XWBOP_RBIT8) && (1 == ARCHCFG_LIB_XWBOP_RBIT8))
-  #define xwbop_rbit8(x)        arch_xwbop_rbit8(x)
-#else
-__xwlib_code
-xwu8_t xwbop_rbit8(xwu8_t x);
-#endif
-
-/**
- * @brief 翻转8位数据的大小端
- * @param x: (I) 8位数据
- * @return 结果
- * @note
- * - 这个函数不做任何操作，是为了位操作模板的统一接口而实现的dummy函数。
- *   因为大小端是以字节为单位的。
- */
-static __xwlib_inline
-xwu8_t xwbop_re8(xwu8_t x)
-{
-        return x;
-}
-
-/******** ******** 16-bit data bit operations ******** ********/
-#if (defined(ARCHCFG_LIB_XWBOP_S1M16) && (1 == ARCHCFG_LIB_XWBOP_S1M16))
-#define xwbop_s1m16(a, mask)    arch_s1m16(a, mask)
-#else
-#define xwbop_s1m16(a, mask)    *(a) |= (mask)
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_C0M16) && (1 == ARCHCFG_LIB_XWBOP_C0M16))
-#define xwbop_c0m16(a, mask)    arch_xwbop_c0m16(a, mask)
-#else
-#define xwbop_c0m16(a, mask)    *(a) &= (~(mask))
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_X1M16) && (1 == ARCHCFG_LIB_XWBOP_X1M16))
-#define xwbop_x1m16(a, mask)    arch_xwbop_x1m16(a, mask)
-#else
-#define xwbop_x1m16(a, mask)    *(a) ^= (mask)
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_FFS16) && (1 == ARCHCFG_LIB_XWBOP_FFS16))
-#define xwbop_ffs16(x)          arch_xwbop_ffs16(x)
-#else
-__xwlib_code
-xwssq_t xwbop_ffs16(xwu16_t x);
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_FLS16) && (1 == ARCHCFG_LIB_XWBOP_FLS16))
-#define xwbop_fls16(x)          arch_xwbop_fls16(x)
-#else
-__xwlib_code
-xwssq_t xwbop_fls16(xwu16_t x);
-#endif
-
-static __xwlib_inline
-xwssq_t xwbop_ffz16(xwu16_t x)
-{
-        return xwbop_ffs16((xwu16_t)(~x));
-}
-
-static __xwlib_inline
-xwssq_t xwbop_flz16(xwu16_t x)
-{
-        return xwbop_fls16((xwu16_t)(~x));
-}
-
-#if (defined(ARCHCFG_LIB_XWBOP_RBIT16) && (1 == ARCHCFG_LIB_XWBOP_RBIT16))
-#define xwbop_rbit16(x)         arch_xwbop_rbit16(x)
-#else
-__xwlib_code
-xwu16_t xwbop_rbit16(xwu16_t x);
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_RE16) && (1 == ARCHCFG_LIB_XWBOP_RE16))
-#define xwbop_re16(x)           arch_xwbop_re16(x)
-#else
-__xwlib_code
-xwu16_t xwbop_re16(xwu16_t a);
-#endif
-
-/**
- * @brief 将16位数据的大小端翻转，并将符号位扩展到32位
- * @param x: (I) 数据（注：非指针）
- * @return 结果
- */
-#if (defined(ARCHCFG_LIB_XWBOP_RE16S32) && (1 == ARCHCFG_LIB_XWBOP_RE16S32))
-#define xwbop_re16s32(x)        arch_xwbop_re16s32(x)
-#else
-__xwlib_code
-xws32_t xwbop_re16s32(xwu16_t x);
-#endif
-
-/******** ******** 32-bit data bit operations ******** ********/
-#if (defined(ARCHCFG_LIB_XWBOP_S1M32) && (1 == ARCHCFG_LIB_XWBOP_S1M32))
-#define xwbop_s1m32(a, mask)    arch_xwbop_s1m32(a, mask)
-#else
-#define xwbop_s1m32(a, mask)    *(a) |= (mask)
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_C0M32) && (1 == ARCHCFG_LIB_XWBOP_C0M32))
-#define xwbop_c0m32(a, mask)    arch_xwbop_c0m32(a, mask)
-#else
-#define xwbop_c0m32(a, mask)    *(a) &= (~(mask))
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_X1M32) && (1 == ARCHCFG_LIB_XWBOP_X1M32))
-#define xwbop_x1m32(a, mask)    arch_xwbop_x1m32(a, mask)
-#else
-#define xwbop_x1m32(a, mask)    *(a) ^= (mask)
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_FFS32) && (1 == ARCHCFG_LIB_XWBOP_FFS32))
-#define xwbop_ffs32(x)                  arch_xwbop_ffs32(x)
-#else
-__xwlib_code
-xwssq_t xwbop_ffs32(xwu32_t x);
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_FLS32) && (1 == ARCHCFG_LIB_XWBOP_FLS32))
-#define xwbop_fls32(x)                  arch_xwbop_fls32(x)
-#else
-__xwlib_code
-xwssq_t xwbop_fls32(xwu32_t x);
-#endif
-
-static __xwlib_inline
-xwssq_t xwbop_ffz32(xwu32_t x)
-{
-        return xwbop_ffs32(~x);
-}
-
-static __xwlib_inline
-xwssq_t xwbop_flz32(xwu32_t x)
-{
-        return xwbop_fls32(~x);
-}
-
-#if (defined(ARCHCFG_LIB_XWBOP_RBIT32) && (1 == ARCHCFG_LIB_XWBOP_RBIT32))
-#define xwbop_rbit32(x)         arch_xwbop_rbit32(x)
-#else
-__xwlib_code
-xwu32_t xwbop_rbit32(xwu32_t x);
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_RE32) && (1 == ARCHCFG_LIB_XWBOP_RE32))
-#define xwbop_re32(x)           arch_xwbop_re32(x)
-#else
-__xwlib_code
-xwu32_t xwbop_re32(xwu32_t x);
-#endif
-
-/**
- * @brief 将32位数据的大小端翻转，并将符号位扩展到64位
- * @param x: (I) 数据（注：非指针）
- * @return 结果
- */
-#if (defined(ARCHCFG_LIB_XWBOP_RE32S64) && (1 == ARCHCFG_LIB_XWBOP_RE32S64))
-#define xwbop_re32s64(x)        arch_xwbop_re32s64(x)
-#else
-__xwlib_code
-xws64_t xwbop_re32s64(xwu32_t x);
-#endif
-
-/******** ******** 64-bit data bit operations ******** ********/
-#if (defined(ARCHCFG_LIB_XWBOP_S1M64) && (1 == ARCHCFG_LIB_XWBOP_S1M64))
-#define xwbop_s1m64(a64, mask64)        arch_xwbop_s1m64(a64, mask64)
-#else
-#define xwbop_s1m64(a64, mask64)        *((xwu64_t *)a64) |= (mask64)
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_C0M64) && (1 == ARCHCFG_LIB_XWBOP_C0M64))
-#define xwbop_c0m64(a64, mask64)        arch_xwbop_c0m64(a64, mask64)
-#else
-#define xwbop_c0m64(a64, mask64)        *((xwu64_t *)a64) &= (~(mask64))
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_X1M64) && (1 == ARCHCFG_LIB_XWBOP_X1M64))
-#define xwbop_x1m64(a64, mask64)        arch_xwbop_x1m64(a64, mask64)
-#else
-#define xwbop_x1m64(a64, mask64)        *((xwu64_t *)a64) ^= (mask64)
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_FFS64) && (1 == ARCHCFG_LIB_XWBOP_FFS64))
-#define xwbop_ffs64(x)                  arch_xwbop_ffs64(x)
-#else
-__xwlib_code
-xwssq_t xwbop_ffs64(xwu64_t x);
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_FLS64) && (1 == ARCHCFG_LIB_XWBOP_FLS64))
-#define xwbop_fls64(x)                  arch_xwbop_fls64(x)
-#else
-__xwlib_code
-xwssq_t xwbop_fls64(xwu64_t x);
-#endif
-
-static __xwlib_inline
-xwssq_t xwbop_ffz64(xwu64_t x)
-{
-        return xwbop_ffs64(~x);
-}
-
-static __xwlib_inline
-xwssq_t xwbop_flz64(xwu64_t x)
-{
-        return xwbop_ffs64(~x);
-}
-
-#if (defined(ARCHCFG_LIB_XWBOP_RE64) && (1 == ARCHCFG_LIB_XWBOP_RE64))
-#define xwbop_re64(x)           arch_xwbop_re64(x)
-#else
-__xwlib_code
-xwu64_t xwbop_re64(xwu64_t x);
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBOP_RBIT64) && (1 == ARCHCFG_LIB_XWBOP_RBIT64))
-#define xwbop_rbit64(x)         arch_xwbop_rbit64(x)
-#else
-__xwlib_code
-xwu64_t xwbop_rbit64(xwu64_t x);
-#endif
-
-/******** ******** type bit operation template ******** ********/
+/******** ******** 位操作模板 ******** ********/
 /**
  * @brief 定义位操作模板：s1m
  * @param type: (I) 类型
@@ -640,115 +306,287 @@ DEFINE_XWBOP(xwbmp_t, 32)
 DEFINE_XWBOP(xwbmp_t, 64)
 #endif
 
-/******** ******** bitmap operations ******** ********/
+/******** ******** 位图操作 ******** ********/
+/**
+ * @brief 声明位图
+ * @param name: (I) 符号名
+ * @param bits: (I) 位图中的位数
+ */
+#define xwbmpop_declare(name, bits)  xwbmp_t name[BITS_TO_BMPS(bits)]
+
+/**
+ * @brief 赋值操作数到位图
+ * @param bmp: (I) 位图的起始地址指针
+ * @param opd: (I) 操作数
+ * @param num: (I) 位图中总的位数
+ */
 __xwlib_code
 void xwbmpop_assign(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 
+/**
+ * @brief 从最高字节开始比较位图的数值大小
+ * @param bmp: (I) 位图的起始地址指针
+ * @param opd: (I) 操作数
+ * @param num: (I) 位图中总的位数
+ * @return 比较结果
+ * @retval 0: 相等
+ * @retval <0: 小于
+ * @retval >0: 大于
+ */
 __xwlib_code
 xwssq_t xwbmpop_cmp(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 
+/**
+ * @brief 将位图所有位设为1
+ * @param bmp: (I) 位图的起始地址指针
+ * @param num: (I) 位图中总的位数
+ */
 __xwlib_code
 void xwbmpop_s1all(xwbmp_t * bmp, xwsq_t num);
 
+/**
+ * @brief 清除位图中所有位
+ * @param bmp: (I) 位图的起始地址指针
+ * @param num: (I) 位图中总的位数
+ */
 __xwlib_code
 void xwbmpop_c0all(xwbmp_t * bmp, xwsq_t num);
 
-#if (defined(ARCHCFG_LIB_XWBMPOP_S1I) && (1 == ARCHCFG_LIB_XWBMPOP_S1I))
-  #define xwbmpop_s1i(bmp, n)           arch_xwbmpop_s1i(bmp, n)
-#else
+/**
+ * @brief 将位图中某位置1
+ * @param bmp: (I) 位图的起始地址指针
+ * @param n: (I) 位的序号
+ */
 __xwlib_code
 void xwbmpop_s1i(xwbmp_t * bmp, xwsq_t n);
-#endif
 
+/**
+ * @brief 将位图中掩码部分全部置1
+ * @param bmp: (I) 位图的起始地址指针
+ * @param msk: (I) 掩码
+ * @param num: (I) 掩码的有效位数
+ */
 __xwlib_code
 void xwbmpop_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
-#if (defined(ARCHCFG_LIB_XWBMPOP_C0I) && (1 == ARCHCFG_LIB_XWBMPOP_C0I))
-  #define xwbmpop_c0i(bmp, n)           arch_xwbmpop_c0i(bmp, n)
-#else
+/**
+ * @brief 将位图中某位清0
+ * @param bmp: (I) 位图的起始地址指针
+ * @param n: (I) 被清0的位的序号
+ */
 __xwlib_code
 void xwbmpop_c0i(xwbmp_t * bmp, xwsq_t n);
-#endif
 
+/**
+ * @brief 将位图中掩码位全部清0
+ * @param bmp: (I) 位图的起始地址指针
+ * @param msk: (I) 掩码
+ * @param num: (I) 掩码的有效位数
+ */
 __xwlib_code
 void xwbmpop_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
-#if (defined(ARCHCFG_LIB_XWBMPOP_X1I) && (1 == ARCHCFG_LIB_XWBMPOP_X1I))
-#define xwbmpop_x1i(bmp, n)             arch_xwbmpop_x1i(bmp, n)
-#else
+/**
+ * @brief 将位图中某位翻转
+ * @param bmp: (I) 位图的起始地址指针
+ * @param n: (I) 被翻转的位的序号
+ */
 __xwlib_code
 void xwbmpop_x1i(xwbmp_t * bmp, xwsq_t n);
-#endif
 
+/**
+ * @brief 将位图中掩码位全部翻转
+ * @param bmp: (I) 位图的起始地址指针
+ * @param msk: (I) 掩码
+ * @param num: (I) 掩码的有效位数
+ */
 __xwlib_code
 void xwbmpop_x1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
-#if (defined(ARCHCFG_LIB_XWBMPOP_T1I) && (1 == ARCHCFG_LIB_XWBMPOP_T1I))
-#define xwbmpop_t1i(bmp, n)             arch_xwbmpop_t1i(bmp, n)
-#else
+/**
+ * @brief 测试位图中的某位是否为1
+ * @param bmp: (I) 位图的起始地址指针
+ * @param n: (I) 被测试的位的序号
+ * @return 布尔值
+ * @retval true: 置位
+ * @retval false: 复位
+ */
 __xwlib_code
 bool xwbmpop_t1i(xwbmp_t * bmp, xwsq_t n);
-#endif
 
+/**
+ * @brief 测试位图中掩码位是否全部为1
+ * @param bmp: (I) 位图的起始地址指针
+ * @param msk: (I) 掩码
+ * @param num: (I) 掩码的有效位数
+ * @return 布尔值
+ * @retval true: 全部为1
+ * @retval false: 至少一位为0
+ */
 __xwlib_code
 bool xwbmpop_t1ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
+/**
+ * @brief 测试位图中掩码位是否全部为1，如果是，就将掩码位全部清0。
+ * @param bmp: (I) 位图的起始地址指针
+ * @param msk: (I) 掩码
+ * @param num: (I) 掩码的有效位数
+ * @return 布尔值
+ * @retval true: 全部为1
+ * @retval false: 至少一位为0
+ */
 __xwlib_code
 bool xwbmpop_t1ma_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
+/**
+ * @brief 测试位图中掩码位是否至少有一位为1
+ * @param bmp: (I) 位图的起始地址指针
+ * @param msk: (I) 掩码
+ * @param num: (I) 掩码的有效位数
+ * @return 布尔值
+ * @retval true: 至少一位为1
+ * @retval false: 全部为0
+ */
 __xwlib_code
 bool xwbmpop_t1mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
+/**
+ * @brief 测试位图中掩码位是否至少有一位为1，如果是，就将掩码位全部清0。
+ * @param bmp: (I) 位图的起始地址指针
+ * @param msk: (I) 掩码
+ * @param num: (I) 掩码的有效位数
+ * @return 布尔值
+ * @retval true: 至少一位为1
+ * @retval false: 全部为0
+ */
 __xwlib_code
 bool xwbmpop_t1mo_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
+/**
+ * @brief 测试位图中掩码位是否全部为0
+ * @param bmp: (I) 位图的起始地址指针
+ * @param msk: (I) 掩码
+ * @param num: (I) 掩码的有效位数
+ * @return 布尔值
+ * @retval true: 全部为0
+ * @retval false: 至少一位为1
+ */
 __xwlib_code
 bool xwbmpop_t0ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
+/**
+ * @brief 测试位图中掩码位是否全部为0，如果是，就将掩码位全部置1。
+ * @param bmp: (I) 位图的起始地址指针
+ * @param msk: (I) 掩码
+ * @param num: (I) 掩码的有效位数
+ * @return 布尔值
+ * @retval true: 全部为0
+ * @retval false: 至少一位为1
+ */
 __xwlib_code
 bool xwbmpop_t0ma_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
+/**
+ * @brief 测试位图中掩码位是否至少有一位为0
+ * @param bmp: (I) 位图的起始地址指针
+ * @param msk: (I) 掩码
+ * @param num: (I) 掩码的有效位数
+ * @return 布尔值
+ * @retval true: 至少一位为0
+ * @retval false: 全部为1
+ */
 __xwlib_code
 bool xwbmpop_t0mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
+/**
+ * @brief 测试位图中掩码位是否至少有一位为0，如果是，就将掩码位全部置1。
+ * @param bmp: (I) 位图的起始地址指针
+ * @param msk: (I) 掩码
+ * @param num: (I) 掩码的有效位数
+ * @return 布尔值
+ * @retval true: 至少一位为0
+ * @retval false: 全部为1
+ */
 __xwlib_code
 bool xwbmpop_t0mo_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
+/**
+ * @brief 将位图与操作数进行逐位“与”操作
+ * @param bmp: (I) 位图的起始地址指针
+ * @param opd: (I) 操作数
+ * @param num: (I) 掩码的有效位数
+ */
 __xwlib_code
 void xwbmpop_and(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 
+/**
+ * @brief 将位图与操作数进行逐位“或”操作
+ * @param bmp: (I) 位图的起始地址指针
+ * @param opd: (I) 操作数
+ * @param num: (I) 掩码的有效位数
+ */
 __xwlib_code
 void xwbmpop_or(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 
+/**
+ * @brief 将位图与操作数进行逐位“异或”操作
+ * @param bmp: (I) 位图的起始地址指针
+ * @param opd: (I) 操作数
+ * @param num: (I) 掩码的有效位数
+ */
 __xwlib_code
 void xwbmpop_xor(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 
-#if (defined(ARCHCFG_LIB_XWBMPOP_FFS) && (1 == ARCHCFG_LIB_XWBMPOP_FFS))
-#define xwbmpop_ffs(bmp, num)           arch_xwbmpop_ffs(bmp, num)
-#else
+/**
+ * @brief 在位图中从最低位起查找第一个被置1的位
+ * @param bmp: (I) 位图的起始地址指针
+ * @param num: (I) 位图中总的位数
+ * @return 位的序号
+ * @retval >=0: 位的序号
+ * @retval -1: 没有任何一个位为1
+ * @note
+ * - 返回的序号是从0开始编号的，与C标准库中ffs()函数返回值不同。
+ */
 __xwlib_code
 xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t num);
-#endif
 
-#if (defined(ARCHCFG_LIB_XWBMPOP_FLS) && (1 == ARCHCFG_LIB_XWBMPOP_FLS))
-#define xwbmpop_fls(bmp, num)           arch_xwbmpop_fls(bmp, num)
-#else
-__xwlib_code
-xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num);
-#endif
-
-#if (defined(ARCHCFG_LIB_XWBMPOP_FFZ) && (1 == ARCHCFG_LIB_XWBMPOP_FFZ))
-#define xwbmpop_ffz(bmp, num)           arch_xwbmpop_ffz(bmp, num)
-#else
+/**
+ * @brief 在位图中从最低位起查找第一个被清0的位
+ * @param bmp: (I) 位图的起始地址指针
+ * @param num: (I) 位图中总的位数
+ * @return 位的序号
+ * @retval >=0: 位的序号
+ * @retval -1: 没有任何一个位被清0
+ * @note
+ * - 返回的序号是从0开始编号的，与C标准库中ffs()函数返回值不同。
+ */
 __xwlib_code
 xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t num);
-#endif
 
-#if (defined(ARCHCFG_LIB_XWBMPOP_FLZ) && (1 == ARCHCFG_LIB_XWBMPOP_FLZ))
-#define xwbmpop_flz(bmp, num)           arch_xwbmpop_flz(bmp, num)
-#else
+/**
+ * @brief 在位图中从最高位起查找第一个被置1的位
+ * @param bmp: (I) 位图的起始地址指针
+ * @param num: (I) 位图中总的位数
+ * @return 位的序号
+ * @retval >=0: 位的序号
+ * @retval -1: 没有任何一个位为1
+ * @note
+ * - 返回的序号是从0开始编号的，与C标准库中ffs()函数返回值不同。
+ */
+__xwlib_code
+xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num);
+
+/**
+ * @brief 在位图中从最高位起查找第一个被清0的位
+ * @param bmp: (I) 位图的起始地址指针
+ * @param num: (I) 位图中总的位数
+ * @return 位的序号
+ * @retval >=0: 位的序号
+ * @retval -1: 没有任何一个位为0
+ * @note
+ * - 返回的序号是从0开始编号的，与C标准库中ffs()函数返回值不同。
+ */
 __xwlib_code
 xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t num);
-#endif
 
 #endif /* xwos/lib/xwbop.h */

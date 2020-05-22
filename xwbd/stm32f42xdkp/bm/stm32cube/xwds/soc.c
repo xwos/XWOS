@@ -355,7 +355,7 @@ __xwds_soc_eirq_tbl_qualifier xwds_eirq_arg_t stm32cube_eirq_israrg[] = {
         [SODS_EIRQ(22)] = NULL,
 };
 
-__atomic DECLARE_BITMAP(stm32cube_dma_channel_state_map, 16) = {0,};
+__atomic xwbmpop_declare(stm32cube_dma_channel_state_map, 16) = {0,};
 
 __xwds_soc_dma_tbl_qualifier
 xwds_dma_f stm32cube_dma_cbcb_array[16] = {

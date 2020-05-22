@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 位图操作汇编库：arch_xwbmpop_ffs
+ * @brief 位图操作汇编库：xwbmpop_ffs
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_code
-xwssq_t arch_xwbmpop_ffs(xwbmp_t * bmp, xwsz_t num)
+xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t num)
 {
         xwsz_t m;
         xwsz_t i;

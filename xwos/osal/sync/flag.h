@@ -58,8 +58,10 @@ struct xwosal_flg {
 
 #define XWOSAL_FLG_MAXNUM               XWOSDL_FLG_MAXNUM /**< 事件信号旗最大数量 */
 
-
-#define XWOSAL_FLG_DECLARE_BITMAP(name) XWOSDL_FLG_DECLARE_BITMAP(name)
+/**
+ * @brief 声明事件信号旗位图
+ */
+#define xwosal_flg_declare_bitmap(name) xwosdl_flg_declare_bitmap(name)
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       APIs        ******** ******** ********

@@ -34,6 +34,11 @@ struct xwosal_selector {
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWOSAL_SELECTOR_MAXNUM XWOSDL_SELECTOR_MAXNUM /**< 信号选择器的最大信号数量 */
 
+/**
+ * @brief 声明信号选择器位图
+ */
+#define xwosal_selector_declare_bitmap(name) xwosdl_selector_declare_bitmap(name)
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       APIs        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/

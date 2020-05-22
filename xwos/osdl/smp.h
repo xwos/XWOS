@@ -874,7 +874,7 @@ xwer_t xwosdl_cdt_timedwait(xwid_t cdtid,
 
 #define XWOSDL_FLG_MAXNUM               XWSYNC_EVT_MAXNUM
 
-#define XWOSDL_FLG_DECLARE_BITMAP(name) XWSYNC_EVT_DECLARE_BITMAP(name)
+#define xwosdl_flg_declare_bitmap(name) xwsync_evt_declare_bitmap(name)
 
 static __xw_inline
 xwid_t xwosdl_flg_get_id(struct xwosdl_flg * flg)
@@ -1088,6 +1088,7 @@ xwer_t xwosdl_flg_timedwait(xwid_t flgid, xwsq_t trigger, xwsq_t action,
 #include <xwos/smp/sync/event.h>
 
 #define XWOSDL_SELECTOR_MAXNUM          XWSYNC_EVT_MAXNUM
+#define xwosdl_selector_declare_bitmap(name) xwsync_evt_declare_bitmap(name)
 
 static __xw_inline
 xwid_t xwosdl_selector_get_id(struct xwosdl_selector * slt)
@@ -1222,6 +1223,7 @@ xwer_t xwosdl_selector_timedselect(xwid_t sltid, xwbmp_t msk[], xwbmp_t trg[],
 
 #define xwosdl_barrier xwsync_evt
 #define XWOSDL_BARRIER_MAXNUM           XWSYNC_EVT_MAXNUM
+#define xwosdl_barrier_declare_bitmap(name) xwsync_evt_declare_bitmap(name)
 
 static __xw_inline
 xwid_t xwosdl_barrier_get_id(struct xwosdl_barrier * bar)

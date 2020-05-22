@@ -361,12 +361,6 @@ xwssq_t xwbop_fls64(xwu64_t x)
 #endif /* !ARCHCFG_LIB_XWBOP_FLS64 */
 #endif /* XWLIBCFG_XWBOP_FLS64 */
 
-/**
- * @brief 赋值操作数到位图
- * @param bmp: (I) 位图的起始地址指针
- * @param opd: (I) 操作数
- * @param num: (I) 位图中总的位数
- */
 __xwlib_code
 void xwbmpop_assign(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
 {
@@ -378,25 +372,16 @@ void xwbmpop_assign(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
         }
 }
 
-/**
- * @brief 赋值操作数到位图
- * @param bmp: (I) 位图的起始地址指针
- * @param opd: (I) 操作数
- * @param num: (I) 位图中总的位数
- * @return 比较结果
- * @retval 0: 相等
- * @retval <0: 小于
- * @retval >0: 大于
- */
 __xwlib_code
 xwssq_t xwbmpop_cmp(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
 {
         xwsz_t n = BITS_TO_BMPS(num);
-        xwsz_t i;
+        xwsz_t i, j;
         xwssq_t ret;
 
         ret = 0;
-        for (i = 0; i < n; i++) {
+        for (j = n; j > 0; j--) {
+                i = j - 1;
                 if (bmp[i] < opd[i]) {
                         ret = -1;
                         break;
@@ -408,11 +393,6 @@ xwssq_t xwbmpop_cmp(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
         return ret;
 }
 
-/**
- * @brief 将位图所有位设为1
- * @param bmp: (I) 位图的起始地址指针
- * @param num: (I) 位图中总的位数
- */
 __xwlib_code
 void xwbmpop_s1all(xwbmp_t * bmp, xwsq_t num)
 {
@@ -424,11 +404,6 @@ void xwbmpop_s1all(xwbmp_t * bmp, xwsq_t num)
         }
 }
 
-/**
- * @brief 清除位图中所有位
- * @param bmp: (I) 位图的起始地址指针
- * @param num: (I) 位图中总的位数
- */
 __xwlib_code
 void xwbmpop_c0all(xwbmp_t * bmp, xwsq_t num)
 {
@@ -441,11 +416,6 @@ void xwbmpop_c0all(xwbmp_t * bmp, xwsq_t num)
 }
 
 #if (!defined(ARCHCFG_LIB_XWBMPOP_S1I)) || (1 != ARCHCFG_LIB_XWBMPOP_S1I)
-/**
- * @brief 将位图中某位置1
- * @param bmp: (I) 位图的起始地址指针
- * @param n: (I) 位的序号
- */
 __xwlib_code
 void xwbmpop_s1i(xwbmp_t * bmp, xwsq_t n)
 {
@@ -454,12 +424,6 @@ void xwbmpop_s1i(xwbmp_t * bmp, xwsq_t n)
 }
 #endif /* !ARCHCFG_LIB_XWBMPOP_S1I */
 
-/**
- * @brief 将位图中掩码位全部置1
- * @param bmp: (I) 位图的起始地址指针
- * @param msk: (I) 掩码
- * @param num: (I) 掩码的有效位数
- */
 __xwlib_code
 void xwbmpop_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 {
@@ -473,11 +437,6 @@ void xwbmpop_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 }
 
 #if (!defined(ARCHCFG_LIB_XWBMPOP_C0I)) || (1 != ARCHCFG_LIB_XWBMPOP_C0I)
-/**
- * @brief 将位图中某位清0
- * @param bmp: (I) 位图的起始地址指针
- * @param n: (I) 被清0的位的序号
- */
 __xwlib_code
 void xwbmpop_c0i(xwbmp_t * bmp, xwsq_t n)
 {
@@ -486,12 +445,6 @@ void xwbmpop_c0i(xwbmp_t * bmp, xwsq_t n)
 }
 #endif /* !ARCHCFG_LIB_XWBMPOP_C0I */
 
-/**
- * @brief 将位图中掩码位全部清0
- * @param bmp: (I) 位图的起始地址指针
- * @param msk: (I) 掩码
- * @param num: (I) 掩码的有效位数
- */
 __xwlib_code
 void xwbmpop_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 {
@@ -505,11 +458,6 @@ void xwbmpop_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 }
 
 #if (!defined(ARCHCFG_LIB_XWBMPOP_X1I)) || (1 != ARCHCFG_LIB_XWBMPOP_X1I)
-/**
- * @brief 将位图中某位翻转
- * @param bmp: (I) 位图的起始地址指针
- * @param n: (I) 被翻转的位的序号
- */
 __xwlib_code
 void xwbmpop_x1i(xwbmp_t * bmp, xwsq_t n)
 {
@@ -518,12 +466,6 @@ void xwbmpop_x1i(xwbmp_t * bmp, xwsq_t n)
 }
 #endif /* !ARCHCFG_LIB_XWBMPOP_X1I */
 
-/**
- * @brief 将位图中掩码位全部翻转
- * @param bmp: (I) 位图的起始地址指针
- * @param msk: (I) 掩码
- * @param num: (I) 掩码的有效位数
- */
 __xwlib_code
 void xwbmpop_x1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 {
@@ -537,14 +479,6 @@ void xwbmpop_x1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 }
 
 #if (!defined(ARCHCFG_LIB_XWBMPOP_T1I)) || (1 != ARCHCFG_LIB_XWBMPOP_T1I)
-/**
- * @brief 测试位图中的某位是否为1
- * @param bmp: (I) 位图的起始地址指针
- * @param n: (I) 被测试的位的序号
- * @return 布尔型结果
- * @retval true: 置位
- * @retval false: 复位
- */
 __xwlib_code
 bool xwbmpop_t1i(xwbmp_t * bmp, xwsq_t n)
 {
@@ -553,15 +487,6 @@ bool xwbmpop_t1i(xwbmp_t * bmp, xwsq_t n)
 }
 #endif /* !ARCHCFG_LIB_XWBMPOP_T1I */
 
-/**
- * @brief 测试位图中掩码位是否全部为1
- * @param bmp: (I) 位图的起始地址指针
- * @param msk: (I) 掩码
- * @param num: (I) 掩码的有效位数
- * @return 布尔型结果
- * @retval true: 全部为1
- * @retval false: 至少一位为0
- */
 __xwlib_code
 bool xwbmpop_t1ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 {
@@ -580,15 +505,6 @@ bool xwbmpop_t1ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         return ret;
 }
 
-/**
- * @brief 测试位图中掩码位是否全部为1，如果是，就将掩码位全部清0。
- * @param bmp: (I) 位图的起始地址指针
- * @param msk: (I) 掩码
- * @param num: (I) 掩码的有效位数
- * @return 布尔型结果
- * @retval true: 全部为1
- * @retval false: 至少一位为0
- */
 __xwlib_code
 bool xwbmpop_t1ma_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 {
@@ -612,15 +528,6 @@ bool xwbmpop_t1ma_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         return ret;
 }
 
-/**
- * @brief 测试位图中掩码位是否至少有一位为1
- * @param bmp: (I) 位图的起始地址指针
- * @param msk: (I) 掩码
- * @param num: (I) 掩码的有效位数
- * @return 布尔型结果
- * @retval true: 至少一位为1
- * @retval false: 全部为0
- */
 __xwlib_code
 bool xwbmpop_t1mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 {
@@ -639,15 +546,6 @@ bool xwbmpop_t1mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         return ret;
 }
 
-/**
- * @brief 测试位图中掩码位是否至少有一位为1，如果是，就将掩码位全部清0。
- * @param bmp: (I) 位图的起始地址指针
- * @param msk: (I) 掩码
- * @param num: (I) 掩码的有效位数
- * @return 布尔型结果
- * @retval true: 至少一位为1
- * @retval false: 全部为0
- */
 __xwlib_code
 bool xwbmpop_t1mo_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 {
@@ -671,15 +569,6 @@ bool xwbmpop_t1mo_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         return ret;
 }
 
-/**
- * @brief 测试位图中掩码位是否全部为0
- * @param bmp: (I) 位图的起始地址指针
- * @param msk: (I) 掩码
- * @param num: (I) 掩码的有效位数
- * @return 布尔型结果
- * @retval true: 全部为0
- * @retval false: 至少一位为1
- */
 __xwlib_code
 bool xwbmpop_t0ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 {
@@ -698,15 +587,6 @@ bool xwbmpop_t0ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         return ret;
 }
 
-/**
- * @brief 测试位图中掩码位是否全部为0，如果是，就将掩码位全部置1。
- * @param bmp: (I) 位图的起始地址指针
- * @param msk: (I) 掩码
- * @param num: (I) 掩码的有效位数
- * @return 布尔型结果
- * @retval true: 全部为0
- * @retval false: 至少一位为1
- */
 __xwlib_code
 bool xwbmpop_t0ma_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 {
@@ -730,15 +610,6 @@ bool xwbmpop_t0ma_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         return ret;
 }
 
-/**
- * @brief 测试位图中掩码位是否至少有一位为0
- * @param bmp: (I) 位图的起始地址指针
- * @param msk: (I) 掩码
- * @param num: (I) 掩码的有效位数
- * @return 布尔型结果
- * @retval true: 至少一位为0
- * @retval false: 全部为1
- */
 __xwlib_code
 bool xwbmpop_t0mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 {
@@ -757,15 +628,6 @@ bool xwbmpop_t0mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         return ret;
 }
 
-/**
- * @brief 测试位图中掩码位是否至少有一位为0，如果是，就将掩码位全部置1。
- * @param bmp: (I) 位图的起始地址指针
- * @param msk: (I) 掩码
- * @param num: (I) 掩码的有效位数
- * @return 布尔型结果
- * @retval true: 至少一位为0
- * @retval false: 全部为1
- */
 __xwlib_code
 bool xwbmpop_t0mo_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
 {
@@ -789,12 +651,6 @@ bool xwbmpop_t0mo_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num)
         return ret;
 }
 
-/**
- * @brief 将位图与操作数进行逐位“与”操作
- * @param bmp: (I) 位图的起始地址指针
- * @param opd: (I) 操作数
- * @param num: (I) 掩码的有效位数
- */
 __xwlib_code
 void xwbmpop_and(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
 {
@@ -807,12 +663,6 @@ void xwbmpop_and(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
         }
 }
 
-/**
- * @brief 将位图与操作数进行逐位“或”操作
- * @param bmp: (I) 位图的起始地址指针
- * @param opd: (I) 操作数
- * @param num: (I) 掩码的有效位数
- */
 __xwlib_code
 void xwbmpop_or(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
 {
@@ -825,12 +675,6 @@ void xwbmpop_or(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
         }
 }
 
-/**
- * @brief 将位图与操作数进行逐位“异或”操作
- * @param bmp: (I) 位图的起始地址指针
- * @param opd: (I) 操作数
- * @param num: (I) 掩码的有效位数
- */
 __xwlib_code
 void xwbmpop_xor(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
 {
@@ -844,15 +688,6 @@ void xwbmpop_xor(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
 }
 
 #if (!defined(ARCHCFG_LIB_XWBMPOP_FFS)) || (1 != ARCHCFG_LIB_XWBMPOP_FFS)
-/**
- * @brief 在位图中从最低位起查找第一个置1的位
- * @param bmp: (I) 位图的起始地址指针
- * @param num: (I) 位图中总的位数
- * @retval >=0: 位的序号
- * @retval -1: 没有任何一个位为1
- * @note
- * - 返回的序号是从0开始编号的，与C标准库中ffs()函数返回值不同。
- */
 __xwlib_code
 xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t num)
 {
@@ -883,15 +718,6 @@ xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t num)
 #endif /* !ARCHCFG_LIB_XWBMPOP_FFS */
 
 #if (!defined(ARCHCFG_LIB_XWBMPOP_FFZ)) || (1 != ARCHCFG_LIB_XWBMPOP_FFZ)
-/**
- * @brief 在位图中从最低位起查找第一个清0的位
- * @param bmp: (I) 位图的起始地址指针
- * @param num: (I) 位图中总的位数
- * @retval >=0: 位的序号
- * @retval -1: 没有任何一个位被清0
- * @note
- * - 返回的序号是从0开始编号的，与C标准库中ffs()函数返回值不同。
- */
 __xwlib_code
 xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t num)
 {
@@ -922,15 +748,6 @@ xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t num)
 #endif /* !ARCHCFG_LIB_XWBMPOP_FFZ */
 
 #if (!defined(ARCHCFG_LIB_XWBMPOP_FLS)) || (1 != ARCHCFG_LIB_XWBMPOP_FLS)
-/**
- * @brief 在位图中从最高位起查找第一个为1的位
- * @param bmp: (I) 位图的起始地址指针
- * @param num: (I) 位图中总的位数
- * @retval >=0: 位的序号
- * @retval -1: 没有任何一个位为1
- * @note
- * - 返回的序号是从0开始编号的，与C标准库中ffs()函数返回值不同。
- */
 __xwlib_code
 xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num)
 {
@@ -956,15 +773,6 @@ xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num)
 #endif /* !ARCHCFG_LIB_XWBMPOP_FLS */
 
 #if (!defined(ARCHCFG_LIB_XWBMPOP_FLZ)) || (1 != ARCHCFG_LIB_XWBMPOP_FLZ)
-/**
- * @brief 在位图中从最高位起查找第一个为0的位
- * @param bmp: (I) 位图的起始地址指针
- * @param num: (I) 位图中总的位数
- * @retval >=0: 位的序号
- * @retval -1: 没有任何一个位为0
- * @note
- * - 返回的序号是从0开始编号的，与C标准库中ffs()函数返回值不同。
- */
 __xwlib_code
 xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t num)
 {
