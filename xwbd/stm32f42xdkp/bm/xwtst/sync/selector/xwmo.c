@@ -84,6 +84,9 @@ xwid_t bm_xwtst_sync_selector_ithrd;
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief 测试模块的启动函数
+ */
 xwer_t bm_xwtst_sync_selector_start(void)
 {
         xwid_t slt0id, slt4id;
@@ -91,35 +94,43 @@ xwer_t bm_xwtst_sync_selector_start(void)
         xwid_t cdt5id, cdt6id;
         xwer_t rc;
 
+        /* 初始化信号选择器0 */
         rc = xwosal_selector_init(&xwtst_sync_slt0);
         if (rc < 0) {
                 goto err_slt0_init;
         }
+        /* 初始化信号量1 */
         rc = xwosal_smr_init(&xwtst_sync_smr1, 0, XWSSQ_MAX);
         if (rc < 0) {
                 goto err_smr1_init;
         }
+        /* 初始化信号量2 */
         rc = xwosal_smr_init(&xwtst_sync_smr2, 0, XWSSQ_MAX);
         if (rc < 0) {
                 goto err_smr2_init;
         }
+        /* 初始化信号量3 */
         rc = xwosal_smr_init(&xwtst_sync_smr3, 0, XWSSQ_MAX);
         if (rc < 0) {
                 goto err_smr3_init;
         }
+        /* 初始化信号选择器4 */
         rc = xwosal_selector_init(&xwtst_sync_slt4);
         if (rc < 0) {
                 goto err_slt4_init;
         }
+        /* 初始化条件量5 */
         rc = xwosal_cdt_init(&xwtst_sync_cdt5);
         if (rc < 0) {
                 goto err_cdt5_init;
         }
+        /* 初始化条件量6 */
         rc = xwosal_cdt_init(&xwtst_sync_cdt6);
         if (rc < 0) {
                 goto err_cdt6_init;
         }
 
+        /* 获取各同步对象的ID */
         slt0id = xwosal_selector_get_id(&xwtst_sync_slt0);
         smr1id = xwosal_smr_get_id(&xwtst_sync_smr1);
         smr2id = xwosal_smr_get_id(&xwtst_sync_smr2);
@@ -128,33 +139,40 @@ xwer_t bm_xwtst_sync_selector_start(void)
         cdt5id = xwosal_cdt_get_id(&xwtst_sync_cdt5);
         cdt6id = xwosal_cdt_get_id(&xwtst_sync_cdt6);
 
+        /* 将信号量1绑定到信号选择器0上，位图中的位置为1 */
         rc = xwosal_smr_bind(smr1id, slt0id, 1);
         if (rc < 0) {
                 goto err_smr1_bind;
         }
+        /* 将信号量2绑定到信号选择器0上，位图中的位置为2 */
         rc = xwosal_smr_bind(smr2id, slt0id, 2);
         if (rc < 0) {
                 goto err_smr2_bind;
         }
+        /* 将信号量3绑定到信号选择器0上，位图中的位置为3 */
         rc = xwosal_smr_bind(smr3id, slt0id, 3);
         if (rc < 0) {
                 goto err_smr3_bind;
         }
 
+        /* 将信号选择器4绑定到信号选择器0上，位图中的位置为4 */
         rc = xwosal_selector_bind(slt4id, slt0id, 4);
         if (rc < 0) {
                 goto err_slt4_bind;
         }
 
+        /* 将条件量5绑定到信号选择器4上，位图中的位置为5 */
         rc = xwosal_cdt_bind(cdt5id, slt4id, 5);
         if (rc < 0) {
                 goto err_cdt5_bind;
         }
+        /* 将条件量6绑定到信号选择器4上，位图中的位置为6 */
         rc = xwosal_cdt_bind(cdt6id, slt4id, 6);
         if (rc < 0) {
                 goto err_cdt6_bind;
         }
 
+        /* 创建等待同步对象的线程 */
         rc = xwosal_thrd_create(&bm_xwtst_sync_selector_wthrd,
                                 bm_xwtst_sync_selector_wthrd_td.name,
                                 bm_xwtst_sync_selector_wthrd_td.func,
@@ -166,6 +184,7 @@ xwer_t bm_xwtst_sync_selector_start(void)
                 goto err_wthrd_create;
         }
 
+        /* 建立发布同步对象的线程 */
         rc = xwosal_thrd_create(&bm_xwtst_sync_selector_ithrd,
                                 bm_xwtst_sync_selector_ithrd_td.name,
                                 bm_xwtst_sync_selector_ithrd_td.func,
@@ -213,6 +232,9 @@ err_slt0_init:
         return rc;
 }
 
+/**
+ * @brief 等待同步对象的线程
+ */
 xwer_t bm_xwtst_sync_selector_wthrd_func(void * arg)
 {
         xwosal_selector_declare_bitmap(msk);
@@ -224,6 +246,7 @@ xwer_t bm_xwtst_sync_selector_wthrd_func(void * arg)
 
         XWOS_UNUSED(arg);
 
+        /* 获取各同步对象的ID */
         slt0id = xwosal_selector_get_id(&xwtst_sync_slt0);
         smr1id = xwosal_smr_get_id(&xwtst_sync_smr1);
         smr2id = xwosal_smr_get_id(&xwtst_sync_smr2);
@@ -231,25 +254,44 @@ xwer_t bm_xwtst_sync_selector_wthrd_func(void * arg)
         slt4id = xwosal_selector_get_id(&xwtst_sync_slt4);
 
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
+                /* 设置掩码位为bit1 ~ bit6共6位 */
                 msk[0] = BIT(1) | BIT(2) | BIT(3) | BIT(4) | BIT(5) | BIT(6);
+                /* 清0触发状态位图，trg用于返回触发结果 */
                 xwbmpop_c0all(trg, XWOSAL_SELECTOR_MAXNUM);
+
+                /* 通过信号选择器同时等待bit1 ~ bit6共6个同步对象 */
                 rc = xwosal_selector_select(slt0id, msk, trg);
                 if (OK == rc) {
+                        /* 等待成功 */
+
+                        /* 测试第1位是否被置1 */
                         if (xwbmpop_t1i(trg, 1)) {
                                 rc = xwosal_smr_trywait(smr1id);
                         }
+
+                        /* 测试第2位是否被置1 */
                         if (xwbmpop_t1i(trg, 2)) {
                                 rc = xwosal_smr_trywait(smr2id);
                         }
+
+                        /* 测试第3位是否被置1 */
                         if (xwbmpop_t1i(trg, 3)) {
                                 rc = xwosal_smr_trywait(smr3id);
                         }
+
+                        /* 测试第4位是否被置1 */
                         if (xwbmpop_t1i(trg, 4)) {
+                                /* 第4位为子信号选择器4，再次测试（不等待） */
                                 rc = xwosal_selector_tryselect(slt4id, msk, trg);
                                 if (OK == rc) {
+                                        /* 测试成功 */
+                                        /* 测试第5位是否触发 */
                                         if (xwbmpop_t1i(trg, 5)) {
+                                                /* 条件量5被广播 */
                                         }
+                                        /* 测试第6位是否触发 */
                                         if (xwbmpop_t1i(trg, 6)) {
+                                                /* 条件量6被广播 */
                                         }
                                 }
                         }
@@ -260,6 +302,9 @@ xwer_t bm_xwtst_sync_selector_wthrd_func(void * arg)
         return rc;
 }
 
+/**
+ * @brief 发布同步对象的线程
+ */
 xwer_t bm_xwtst_sync_selector_ithrd_func(void * arg)
 {
         xwid_t smr1id, smr2id, smr3id;
@@ -269,12 +314,14 @@ xwer_t bm_xwtst_sync_selector_ithrd_func(void * arg)
 
         XWOS_UNUSED(arg);
 
+        /* 获取各同步对象的ID */
         smr1id = xwosal_smr_get_id(&xwtst_sync_smr1);
         smr2id = xwosal_smr_get_id(&xwtst_sync_smr2);
         smr3id = xwosal_smr_get_id(&xwtst_sync_smr3);
         cdt5id = xwosal_cdt_get_id(&xwtst_sync_cdt5);
         cdt6id = xwosal_cdt_get_id(&xwtst_sync_cdt6);
 
+        /* 发布信号量1，将信号选择器0的位1被置1 */
         rc = xwosal_smr_post(smr1id);
         if (rc < 0) {
                 goto err_post_smr1;
@@ -282,6 +329,7 @@ xwer_t bm_xwtst_sync_selector_ithrd_func(void * arg)
         sleep = 1000 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
 
+        /* 发布信号量2，将信号选择器0的位2被置1 */
         rc = xwosal_smr_post(smr2id);
         if (rc < 0) {
                 goto err_post_smr2;
@@ -289,6 +337,7 @@ xwer_t bm_xwtst_sync_selector_ithrd_func(void * arg)
         sleep = 1000 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
 
+        /* 发布信号量3，将信号选择器0的位3被置1 */
         rc = xwosal_smr_post(smr3id);
         if (rc < 0) {
                 goto err_post_smr3;
@@ -296,6 +345,8 @@ xwer_t bm_xwtst_sync_selector_ithrd_func(void * arg)
         sleep = 1000 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
 
+        /* 广播条件量5，将信号选择器4的位5被置1 */
+        /* 由于信号选择器4又绑定到信号选择器0的第4位，又会将信号选择器0的位4置1 */
         rc = xwosal_cdt_broadcast(cdt5id);
         if (rc < 0) {
                 goto err_bdc_cdt5id;
@@ -303,6 +354,8 @@ xwer_t bm_xwtst_sync_selector_ithrd_func(void * arg)
         sleep = 1000 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
 
+        /* 广播条件量6，将信号选择器4的位6被置1 */
+        /* 由于信号选择器4又绑定到信号选择器0的第4位，又会将信号选择器0的位4置1 */
         rc = xwosal_cdt_broadcast(cdt6id);
         if (rc < 0) {
                 goto err_bdc_cdt6id;

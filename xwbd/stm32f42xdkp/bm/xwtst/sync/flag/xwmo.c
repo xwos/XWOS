@@ -76,15 +76,20 @@ xwid_t bm_xwtst_sync_flag_ithrd;
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief 测试模块的启动函数
+ */
 xwer_t bm_xwtst_sync_flag_start(void)
 {
         xwer_t rc;
 
+        /* 初始化事件信号旗 */
         rc = xwosal_flg_init(&xwtst_sync_flag, NULL);
         if (rc < 0) {
                 goto err_flg_init;
         }
 
+        /* 创建等待事件信号旗的线程 */
         rc = xwosal_thrd_create(&bm_xwtst_sync_flag_wthrd,
                                 bm_xwtst_sync_flag_wthrd_td.name,
                                 bm_xwtst_sync_flag_wthrd_td.func,
@@ -96,6 +101,7 @@ xwer_t bm_xwtst_sync_flag_start(void)
                 goto err_wthrd_create;
         }
 
+        /* 创建发布事件信号旗的线程 */
         rc = xwosal_thrd_create(&bm_xwtst_sync_flag_ithrd,
                                 bm_xwtst_sync_flag_ithrd_td.name,
                                 bm_xwtst_sync_flag_ithrd_td.func,
@@ -119,6 +125,9 @@ err_flg_init:
         return rc;
 }
 
+/**
+ * @brief 等待事件信号旗的线程
+ */
 xwer_t bm_xwtst_sync_flag_wthrd_func(void * arg)
 {
         xwosal_flg_declare_bitmap(msk);
@@ -129,8 +138,10 @@ xwer_t bm_xwtst_sync_flag_wthrd_func(void * arg)
 
         XWOS_UNUSED(arg);
 
-        flgid = xwosal_flg_get_id(&xwtst_sync_flag);
-        msk[0] = 0xFF;
+        flgid = xwosal_flg_get_id(&xwtst_sync_flag); /**< 获取事件信号旗的ID */
+
+        msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
+        /* 等待8个事件位全部被置1，并“消费”事件(函数返回OK时会把8位事件位清0) */
         rc = xwosal_flg_wait(flgid,
                              XWOSAL_FLG_TRIGGER_SET_ALL,
                              XWOSAL_FLG_ACTION_CONSUMPTION,
@@ -139,10 +150,12 @@ xwer_t bm_xwtst_sync_flag_wthrd_func(void * arg)
                 goto err_w_set_all;
         }
 
+        /* 休眠100ms，让出CPU使用权 */
         sleep = 100 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
 
-        msk[0] = 0xFF;
+        msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
+        /* 等待8个事件位任意一位被置1，不“消费”事件 */
         rc = xwosal_flg_wait(flgid,
                              XWOSAL_FLG_TRIGGER_SET_ANY,
                              XWOSAL_FLG_ACTION_NONE,
@@ -151,10 +164,12 @@ xwer_t bm_xwtst_sync_flag_wthrd_func(void * arg)
                 goto err_w_set_any;
         }
 
+        /* 休眠100ms，让出CPU使用权 */
         sleep = 100 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
 
-        msk[0] = 0xFF;
+        msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
+        /* 等待8个事件位全部被清0，并“消费”事件(函数返回OK时会把8位事件位置1) */
         rc = xwosal_flg_wait(flgid,
                              XWOSAL_FLG_TRIGGER_CLR_ALL,
                              XWOSAL_FLG_ACTION_CONSUMPTION,
@@ -163,10 +178,12 @@ xwer_t bm_xwtst_sync_flag_wthrd_func(void * arg)
                 goto err_w_clr_all;
         }
 
+        /* 休眠100ms，让出CPU使用权 */
         sleep = 100 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
 
-        msk[0] = 0xFF;
+        msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
+        /* 等待8个事件位任意位被清0，不“消费”事件 */
         rc = xwosal_flg_wait(flgid,
                              XWOSAL_FLG_TRIGGER_CLR_ANY,
                              XWOSAL_FLG_ACTION_NONE,
@@ -175,11 +192,13 @@ xwer_t bm_xwtst_sync_flag_wthrd_func(void * arg)
                 goto err_w_clr_any;
         }
 
+        /* 休眠100ms，让出CPU使用权 */
         sleep = 100 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
 
-        rc = xwosal_flg_read(flgid, org);
-        msk[0] = 0xFF;
+        rc = xwosal_flg_read(flgid, org); /* 读取初始值 */
+        msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
+        /* 等待8个事件位全部发生翻转 */
         rc = xwosal_flg_wait(flgid,
                              XWOSAL_FLG_TRIGGER_TGL_ALL,
                              XWOS_UNUSED_ARGUMENT,
@@ -188,10 +207,12 @@ xwer_t bm_xwtst_sync_flag_wthrd_func(void * arg)
                 goto err_w_tgl_all;
         }
 
+        /* 休眠100ms，让出CPU使用权 */
         sleep = 100 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
 
-        msk[0] = 0xFF;
+        msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
+        /* 等待8个事件位任意一位发生翻转 */
         rc = xwosal_flg_wait(flgid,
                              XWOSAL_FLG_TRIGGER_TGL_ANY,
                              XWOS_UNUSED_ARGUMENT,
@@ -200,8 +221,11 @@ xwer_t bm_xwtst_sync_flag_wthrd_func(void * arg)
                 goto err_w_tgl_any;
         }
 
+        /* 休眠100ms，让出CPU使用权 */
         sleep = 100 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
+
+        return OK;
 
 err_w_tgl_any:
 err_w_tgl_all:
@@ -212,6 +236,9 @@ err_w_set_all:
         return rc;
 }
 
+/**
+ * @brief 触发事件的线程
+ */
 xwer_t bm_xwtst_sync_flag_ithrd_func(void * arg)
 {
         xwosal_flg_declare_bitmap(msk);
@@ -221,61 +248,72 @@ xwer_t bm_xwtst_sync_flag_ithrd_func(void * arg)
 
         XWOS_UNUSED(arg);
 
-        flgid = xwosal_flg_get_id(&xwtst_sync_flag);
+        flgid = xwosal_flg_get_id(&xwtst_sync_flag); /**< 获取事件信号旗的ID */
 
-        msk[0] = 0xFF;
+        msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
+        /* 将事件位图掩码部分全部置1 */
         rc = xwosal_flg_s1m(flgid, msk);
         if (rc < 0) {
                 goto err_s1m;
         }
 
+        /* 休眠1000ms，让出CPU使用权 */
         sleep = 1000 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
 
-        msk[0] = 0xFF;
+        /* 将事件位图的第3位置1 */
         rc = xwosal_flg_s1i(flgid, 3);
         if (rc < 0) {
                 goto err_s1i;
         }
 
+        /* 休眠1000ms，让出CPU使用权 */
         sleep = 1000 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
 
-        msk[0] = 0xFF;
+        msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
+        /* 将事件位图掩码部分全部清0 */
         rc = xwosal_flg_c0m(flgid, msk);
         if (rc < 0) {
                 goto err_c0m;
         }
 
+        /* 休眠1000ms，让出CPU使用权 */
         sleep = 1000 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
 
-        msk[0] = 0xFF;
+        /* 将事件位图的第7位清0 */
         rc = xwosal_flg_c0i(flgid, 7);
         if (rc < 0) {
                 goto err_c0i;
         }
 
+        /* 休眠1000ms，让出CPU使用权 */
         sleep = 1000 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
 
-        msk[0] = 0xFF;
+        msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
+        /* 将事件位图掩码部分全部翻转 */
         rc = xwosal_flg_x1m(flgid, msk);
         if (rc < 0) {
                 goto err_x1m;
         }
 
+        /* 休眠1000ms，让出CPU使用权 */
         sleep = 1000 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
 
-        msk[0] = 0xFF;
+         /* 将事件位图的第5位翻转 */
         rc = xwosal_flg_x1i(flgid, 5);
         if (rc < 0) {
                 goto err_x1i;
         }
 
+        /* 休眠1000ms，让出CPU使用权 */
         sleep = 1000 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
+
+        return OK;
 
 err_x1i:
 err_x1m:

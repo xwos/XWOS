@@ -99,16 +99,21 @@ xwid_t bm_xwtst_sync_barrier_thrd[xw_array_size(bm_xwtst_sync_barrier_thrd_td)];
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief 测试模块的启动函数
+ */
 xwer_t bm_xwtst_sync_barrier_start(void)
 {
         xwsq_t i;
         xwer_t rc;
 
+        /* 初始化线程屏障 */
         rc = xwosal_barrier_init(&xwtst_sync_barrier);
         if (rc < 0) {
                 goto err_barrier_init;
         }
 
+        /* 创建5个线程 */
         for (i = 0; i < xw_array_size(bm_xwtst_sync_barrier_thrd_td); i++) {
                 rc = xwosal_thrd_create(&bm_xwtst_sync_barrier_thrd[i],
                                         bm_xwtst_sync_barrier_thrd_td[i].name,
@@ -130,18 +135,26 @@ err_barrier_init:
         return rc;
 }
 
+/**
+ * @brief 线程函数
+ */
 xwer_t bm_xwtst_sync_barrier_thrd_func(void * arg)
 {
         xwosal_barrier_declare_bitmap(msk);
         xwid_t barid;
         xwer_t rc;
 
-        xwsq_t pos = (xwsq_t)arg;
+        xwsq_t pos = (xwsq_t)arg; /* 获取线程的各自的位置 */
         xwbmpop_c0all(msk, XWOSAL_BARRIER_MAXNUM);
+
+        /* 设置位图掩码 */
         for (xwsq_t i = 0; i < xw_array_size(bm_xwtst_sync_barrier_thrd_td); i++) {
                 xwbmpop_s1i(msk, i);
         }
-        barid = xwosal_barrier_get_id(&xwtst_sync_barrier);
+
+        barid = xwosal_barrier_get_id(&xwtst_sync_barrier); /* 获取线程屏障的ID */
+
+        /* 同步线程 */
         rc = xwosal_barrier_sync(barid, pos, msk);
         return rc;
 }
