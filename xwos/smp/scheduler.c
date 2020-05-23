@@ -1303,8 +1303,8 @@ xwer_t xwos_scheduler_resume(xwid_t cpuid)
 
         localid = xwos_cpu_get_id();
         if (localid == cpuid) {
+                xwsd = xwos_scheduler_get_lc();
                 if (OK == xwos_irq_get_id(NULL)) {
-                        xwsd = xwos_scheduler_get_lc();
                         rc = xwos_scheduler_resume_lic(xwsd);
                 } else {
                         rc = soc_scheduler_resume(xwsd);
