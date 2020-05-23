@@ -24,10 +24,10 @@ AS := $(CROSS_COMPILE)gcc -x assembler-with-cpp
 CP := $(CROSS_COMPILE)objcopy
 OD := $(CROSS_COMPILE)objdump
 AR := $(CROSS_COMPILE)ar
-MM := $(CC) -MM -MP
 LD := $(CROSS_COMPILE)gcc
 SIZE := $(CROSS_COMPILE)size
-LUA2HEX := xwbs/util/py/lua2hex.py
+LUA2HEX := python3 xwbs/util/py/lua2hex.py
+RM := -rm
 
 ifeq ($(ARCHCFG_LITTLE_ENDIAN),y)
     ENDIAN := little
@@ -53,6 +53,8 @@ CFLAGS = -mvle -mcpu=e200z0 -m$(ENDIAN) -mregnames -std=gnu11 \
          -ffunction-sections -fdata-sections \
          -g3 -fverbose-asm \
          -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
+
+MMFLAGS = -MM -MP
 
 ifeq ($(~D),0)
     CFLAGS += -O2
@@ -92,7 +94,6 @@ ifneq ($(~V),1)
     SHOW_LD = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[ld] "$@" \e[0m";
     SHOW_SIZE = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[size] "$@" \e[0m";
     SHOW_LUA2HEX = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[lua2hex] "$@" \e[0m";
-    SHOW_RM = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[rm] "$@" \e[0m";
 else
     SHOW_CPP =
     SHOW_CC =
@@ -106,5 +107,4 @@ else
     SHOW_LD =
     SHOW_SIZE =
     SHOW_LUA2HEX =
-    SHOW_RM =
 endif

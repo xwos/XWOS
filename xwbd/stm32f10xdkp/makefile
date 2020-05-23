@@ -51,7 +51,6 @@ dbgcfg: cfg/dbg/debug.gdb cfg/dbg/program.gdb cfg/dbg/erase.gdb
 
 %.gdb: %.gdb.template
 	@sed "s/##DIR##/$(subst /,\\/,$(shell pwd)/$(WKSPC))/g" $< > $@
-	@chmod +x $@
 
 jlink:
 	@openocd -f cfg/dbg/openocd/jlink-swd.cfg

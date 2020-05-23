@@ -51,16 +51,12 @@ $(OBJ_DIR)%.o: %.c
 dsm: $(XWMO_DSMS)
 
 clean:
-	$(SHOW_RM)-rm -f $(XWMO_COBJS:.o=.lst)
-	$(SHOW_RM)-rm -f $(XWMO_COBJS:.o=.dsm)
-	$(SHOW_RM)-rm -f $(XWMO_COBJS)
-	$(SHOW_RM)-rm -f $(OBJ_DIR)$(XWMO_DIR)/$(XWMO_NAME)
+	@$(RM) -f $(XWMO_COBJS:.o=.lst)
+	@$(RM) -f $(XWMO_COBJS:.o=.dsm)
+	@$(RM) -f $(XWMO_COBJS)
+	@$(RM) -f $(OBJ_DIR)$(XWMO_DIR)/$(XWMO_NAME)
 
 distclean:
-	$(SHOW_RM)-rm -f $(XWMO_COBJS:.o=.lst)
-	$(SHOW_RM)-rm -f $(XWMO_COBJS:.o=.d)
-	$(SHOW_RM)-rm -f $(XWMO_COBJS:.o=.dsm)
-	$(SHOW_RM)-rm -f $(XWMO_COBJS)
-	$(SHOW_RM)-rm -f $(OBJ_DIR)$(XWMO_DIR)/$(XWMO_NAME)
+	@$(RM) -rf $(OBJ_DIR)$(XWMO_DIR)
 
 .PHONY : dsm clean distclean

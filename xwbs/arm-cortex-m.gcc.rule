@@ -27,7 +27,8 @@ OD := $(CROSS_COMPILE)objdump
 AR := $(CROSS_COMPILE)ar
 LD := $(CROSS_COMPILE)gcc
 SIZE := $(CROSS_COMPILE)size
-LUA2HEX := xwbs/util/py/lua2hex.py
+LUA2HEX := python3 xwbs/util/py/lua2hex.py
+RM := -rm
 
 ifeq ($(ARCHCFG_LITTLE_ENDIAN),y)
     ENDIAN := little-endian
@@ -91,32 +92,66 @@ include $(XWOS_KN_DIR)/xwos.mk
 include $(XWBS_UTIL_MK_XWMO)
 
 # colorfully build
-ifneq ($(~V),1)
-    SHOW_CPP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cc -E] "$<" -> "$@" \e[0m";
-    SHOW_CC = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cc] "$<" -> "$@" \e[0m";
-    SHOW_CXX = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[c++] "$<" -> "$@" \e[0m";
-    SHOW_APP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[as -E] "$<" -> "$@" \e[0m";
-    SHOW_AS = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[as] "$<" -> "$@" \e[0m";
-    SHOW_OD = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[od] "$<" -> "$@" \e[0m";
-    SHOW_CP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cp] "$<" -> "$@" \e[0m";
-    SHOW_MM = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[mm] "$<" -> "$@" \e[0m";
-    SHOW_AR = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[ar] "$@" \e[0m";
-    SHOW_LD = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[ld] "$@" \e[0m";
-    SHOW_SIZE = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[size] "$@" \e[0m";
-    SHOW_LUA2HEX = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[lua2hex] "$@" \e[0m";
-    SHOW_RM = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[rm] "$@" \e[0m";
-else
-    SHOW_CPP =
-    SHOW_CC =
-    SHOW_CXX =
-    SHOW_APP =
-    SHOW_AS =
-    SHOW_OD =
-    SHOW_CP =
-    SHOW_MM =
-    SHOW_AR =
-    SHOW_LD =
-    SHOW_SIZE =
-    SHOW_LUA2HEX =
-    SHOW_RM =
+SHOW_CPP =
+SHOW_CC =
+SHOW_CXX =
+SHOW_APP =
+SHOW_AS =
+SHOW_OD =
+SHOW_CP =
+SHOW_MM =
+SHOW_AR =
+SHOW_LD =
+SHOW_SIZE =
+SHOW_LUA2HEX =
+
+ifeq ($(XuanWuOS_CFG_HOSTOS),gnu/linux)
+    ifneq ($(~V),1)
+        SHOW_CPP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cc -E] "$<" -> "$@" \e[0m";
+        SHOW_CC = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cc] "$<" -> "$@" \e[0m";
+        SHOW_CXX = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[c++] "$<" -> "$@" \e[0m";
+        SHOW_APP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[as -E] "$<" -> "$@" \e[0m";
+        SHOW_AS = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[as] "$<" -> "$@" \e[0m";
+        SHOW_OD = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[od] "$<" -> "$@" \e[0m";
+        SHOW_CP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cp] "$<" -> "$@" \e[0m";
+        SHOW_MM = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[mm] "$<" -> "$@" \e[0m";
+        SHOW_AR = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[ar] "$@" \e[0m";
+        SHOW_LD = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[ld] "$@" \e[0m";
+        SHOW_SIZE = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[size] "$@" \e[0m";
+        SHOW_LUA2HEX = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[lua2hex] "$@" \e[0m";
+    endif
+endif
+
+ifeq ($(XuanWuOS_CFG_HOSTOS),darwin)
+    ifneq ($(~V),1)
+        SHOW_CPP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cc -E] "$<" -> "$@" \e[0m";
+        SHOW_CC = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cc] "$<" -> "$@" \e[0m";
+        SHOW_CXX = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[c++] "$<" -> "$@" \e[0m";
+        SHOW_APP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[as -E] "$<" -> "$@" \e[0m";
+        SHOW_AS = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[as] "$<" -> "$@" \e[0m";
+        SHOW_OD = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[od] "$<" -> "$@" \e[0m";
+        SHOW_CP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cp] "$<" -> "$@" \e[0m";
+        SHOW_MM = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[mm] "$<" -> "$@" \e[0m";
+        SHOW_AR = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[ar] "$@" \e[0m";
+        SHOW_LD = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[ld] "$@" \e[0m";
+        SHOW_SIZE = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[size] "$@" \e[0m";
+        SHOW_LUA2HEX = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[lua2hex] "$@" \e[0m";
+    endif
+endif
+
+ifeq ($(XuanWuOS_CFG_HOSTOS),windows-nt)
+    ifneq ($(~V),1)
+        SHOW_CPP = @echo -e "[cc -E] "$<" -> "$@" \e[0m";
+        SHOW_CC = @echo -e "[cc] "$<" -> "$@" \e[0m";
+        SHOW_CXX = @echo -e "[c++] "$<" -> "$@" \e[0m";
+        SHOW_APP = @echo -e "[as -E] "$<" -> "$@" \e[0m";
+        SHOW_AS = @echo -e "[as] "$<" -> "$@" \e[0m";
+        SHOW_OD = @echo -e "[od] "$<" -> "$@" \e[0m";
+        SHOW_CP = @echo -e "[cp] "$<" -> "$@" \e[0m";
+        SHOW_MM = @echo -e "[mm] "$<" -> "$@" \e[0m";
+        SHOW_AR = @echo -e "[ar] "$@" \e[0m";
+        SHOW_LD = @echo -e "[ld] "$@" \e[0m";
+        SHOW_SIZE = @echo -e "[size] "$@" \e[0m";
+        SHOW_LUA2HEX = @echo -e "[lua2hex] "$@" \e[0m";
+    endif
 endif

@@ -192,39 +192,34 @@ $(XWOS_WKSPC_DIR)/$(TARGET).dsm: $(XWOS_WKSPC_DIR)/$(TARGET).elf
 
 clean: $(XWMD_CLEAN) $(XWPP_CLEAN) $(XWBM_CLEAN) $(XWEM_CLEAN)
 	@echo "clean ..."
-	$(SHOW_RM)-rm -f $(OBJS)
-	$(SHOW_RM)-rm -f $(OBJS:.o=.lst)
-	$(SHOW_RM)-rm -f $(OBJS:.o=.dsm)
-	$(SHOW_RM)-rm -f $(XWOS_LIB)
-	$(SHOW_RM)-rm -f $(BDL_LIB)
-	$(SHOW_RM)-rm -f $(SOC_LIB)
-	$(SHOW_RM)-rm -f $(CPU_LIB)
-	$(SHOW_RM)-rm -f $(ARCH_LIB)
-	$(SHOW_RM)-rm -f $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
-	$(SHOW_RM)-rm -f $(XWOS_WKSPC_DIR)/$(TARGET).elf
-	$(SHOW_RM)-rm -f $(XWOS_WKSPC_DIR)/$(TARGET).dsm
-	$(SHOW_RM)-rm -f $(XWOS_WKSPC_DIR)/$(TARGET).mot
-	$(SHOW_RM)-rm -f $(XWOS_WKSPC_DIR)/$(TARGET).MAP
-	$(SHOW_RM)-rm -f $(XWOS_WKSPC_DIR)/$(TARGET).bin
+	@$(RM) -f $(OBJS)
+	@$(RM) -f $(OBJS:.o=.lst)
+	@$(RM) -f $(OBJS:.o=.dsm)
+	@$(RM) -f $(XWOS_LIB)
+	@$(RM) -f $(BDL_LIB)
+	@$(RM) -f $(SOC_LIB)
+	@$(RM) -f $(CPU_LIB)
+	@$(RM) -f $(ARCH_LIB)
+	@$(RM) -f $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
+	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).elf
+	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).dsm
+	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).mot
+	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).MAP
+	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).bin
 
 distclean: $(XWMD_DISTCLEAN) $(XWPP_DISTCLEAN) $(XWBM_DISTCLEAN) $(XWEM_DISTCLEAN)
 	@echo "distclean ..."
-	$(SHOW_RM)-rm -f $(OBJS)
-	$(SHOW_RM)-rm -f $(OBJS:.o=.lst)
-	$(SHOW_RM)-rm -f $(OBJS:.o=.d)
-	$(SHOW_RM)-rm -f $(OBJS:.o=.dsm)
-	$(SHOW_RM)-rm -f *.dep
-	$(SHOW_RM)-rm -f $(XWOS_LIB)
-	$(SHOW_RM)-rm -f $(BDL_LIB)
-	$(SHOW_RM)-rm -f $(SOC_LIB)
-	$(SHOW_RM)-rm -f $(CPU_LIB)
-	$(SHOW_RM)-rm -f $(ARCH_LIB)
-	$(SHOW_RM)-rm -f $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
-	$(SHOW_RM)-rm -f $(XWOS_WKSPC_DIR)/$(TARGET).elf
-	$(SHOW_RM)-rm -f $(XWOS_WKSPC_DIR)/$(TARGET).dsm
-	$(SHOW_RM)-rm -f $(XWOS_WKSPC_DIR)/$(TARGET).mot
-	$(SHOW_RM)-rm -f $(XWOS_WKSPC_DIR)/$(TARGET).MAP
-	$(SHOW_RM)-rm -f $(XWOS_WKSPC_DIR)/$(TARGET).bin
+	@$(RM) -rf $(OBJ_DIR)$(XWOS_KN_DIR)
+	@$(RM) -rf $(OBJ_DIR)$(XWOS_BDL_DIR)
+	@$(RM) -rf $(OBJ_DIR)$(XWOS_SOC_DIR)
+	@$(RM) -rf $(OBJ_DIR)$(XWOS_CPU_DIR)
+	@$(RM) -rf $(OBJ_DIR)$(XWOS_ARCH_DIR)
+	@$(RM) -f $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
+	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).elf
+	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).dsm
+	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).mot
+	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).MAP
+	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).bin
 
 .PHONY: clean distclean all
 .PHONY: $(XWMD) $(XWMD_DSM) $(XWMD_CLEAN) $(XWMD_DISTCLEAN)

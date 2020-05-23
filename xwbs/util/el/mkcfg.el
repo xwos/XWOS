@@ -277,10 +277,6 @@
 (logi "xwos-bm-dir:%s" xwos-bm-dir)
 (setq xwos-wkspc-dir (concat xwos-brd-dir "/" wkspc))
 (logi "xwos-wkspc-dir:%s" xwos-wkspc-dir)
-(setq xwos-tmp-dir (cond
-                    ((string= (symbol-name system-type) "gnu/linux") "/tmp")
-                    ((string= (symbol-name system-type) "windows-nt") "/tmp")))
-(logi "xwos-tmp-dir:%s" xwos-tmp-dir)
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; generate XuanWuOS.cfg ;;;;;;;; ;;;;;;;; ;;;;;;;;
 (set-buffer XuanWuOS-cfg-buffer)
@@ -317,7 +313,6 @@
 (insert (concat "XWOS_BDL_DIR := " xwos-bdl-dir "\n"))
 (insert (concat "XWOS_BM_DIR := " xwos-bm-dir "\n"))
 (insert (concat "XWOS_WKSPC_DIR := " xwos-wkspc-dir "\n"))
-(insert (concat "XWOS_TMP_DIR := " xwos-tmp-dir "\n"))
 (insert "## ******** ******** ******** ******** ARCH ******** ******** ******** ******** ##\n")
 (let (item cfg (loopflg t) (iterpoint 1))
   (set-buffer arch-cfg-h-buffer)
@@ -564,7 +559,6 @@ distclean:
 (insert (concat "export XWOS_BDL_DIR=" xwos-bdl-dir "\n"))
 (insert (concat "export XWOS_BM_DIR=" xwos-bm-dir "\n"))
 (insert (concat "export XWOS_WKSPC_DIR=" xwos-wkspc-dir "\n"))
-(insert (concat "export XWOS_TMP_DIR=" xwos-tmp-dir "\n"))
 (insert "## ******** ******** ******** ******** includes ******** ******** ******** ******** ##\n")
 (insert "source ${XWOS_PATH}/xwbs/util/sh/xwenv.sh\n")
 

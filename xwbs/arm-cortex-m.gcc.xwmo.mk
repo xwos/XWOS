@@ -42,11 +42,14 @@ CC_ARGS = $(strip -c $(CFLAGS) $(ARCH_CFLAGS) $(CPU_CFLAGS) $(XWMO_CFLAGS) \
 CXX_ARGS = $(strip -c $(CXXFLAGS) $(ARCH_CXXFLAGS) $(CPU_CXXFLAGS) $(XWMO_CXXFLAGS) \
                   $(INCDIRS) $(XWMO_INCDIRS))
 
+XWMO_OBJS_LST := $(OBJ_DIR)$(XWMO_DIR)/objs.txt
+
 #$(info "building $(XWMO_DIR) ---> $(OBJ_DIR)$(XWMO_DIR)/$(XWMO_NAME)")
 
 $(OBJ_DIR)$(XWMO_DIR)/$(XWMO_NAME): $(XWMO_COBJS) $(XWMO_LUA2HEXCOBJS) $(XWMO_CXXOBJS) $(OBJ_DIR)$(XWMO_DIR)
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
-	$(SHOW_AR) $(AR) rcs $@ $(XWMO_COBJS) $(XWMO_LUA2HEXCOBJS) $(XWMO_CXXOBJS)
+	$(file > $(XWMO_OBJS_LST),$(XWMO_COBJS) $(XWMO_LUA2HEXCOBJS) $(XWMO_CXXOBJS))
+	$(SHOW_AR) $(AR) rcs $@ @$(XWMO_OBJS_LST)
 
 $(OBJ_DIR)$(XWMO_DIR):
 	@[ ! -d $@ ] && mkdir -p $@ || true
@@ -106,55 +109,23 @@ $(OBJ_DIR)%.o: %.cxx
 dsm: $(XWMO_DSMS)
 
 clean:
-ifeq ($(NEAR),y)
-	$(SHOW_RM)-rm -f $(XWMO_COBJS:.o=.o.lst)
-	$(SHOW_RM)-rm -f $(XWMO_COBJS:.o=.dsm)
-	$(SHOW_RM)-rm -f $(XWMO_COBJS:.o=.i)
-	$(SHOW_RM)-rm -f $(XWMO_COBJS)
-	$(SHOW_RM)-rm -f $(XWMO_LUA2HEXCOBJS:.o=.o.lst)
-	$(SHOW_RM)-rm -f $(XWMO_LUA2HEXCOBJS:.o=.dsm)
-	$(SHOW_RM)-rm -f $(XWMO_LUA2HEXCOBJS:.o=.i)
-	$(SHOW_RM)-rm -f $(XWMO_LUA2HEXCOBJS)
-	$(SHOW_RM)-rm -f $(XWMO_CXXOBJS:.o=.o.lst)
-	$(SHOW_RM)-rm -f $(XWMO_CXXOBJS:.o=.dsm)
-	$(SHOW_RM)-rm -f $(XWMO_CXXOBJS:.o=.i)
-	$(SHOW_RM)-rm -f $(XWMO_CXXOBJS)
-else
-	$(SHOW_RM)-[ -d "$(OBJ_DIR)/$(XWMO_DIR)" ] && \
-                   find $(OBJ_DIR)/$(XWMO_DIR) -type f -name "*.o" -exec rm -f {} \; || true
-	$(SHOW_RM)-[ -d "$(OBJ_DIR)/$(XWMO_DIR)" ] && \
-                   find $(OBJ_DIR)/$(XWMO_DIR) -type f -name "*.o.lst" -exec rm -f {} \; || true
-	$(SHOW_RM)-[ -d "$(OBJ_DIR)/$(XWMO_DIR)" ] && \
-                   find $(OBJ_DIR)/$(XWMO_DIR) -type f -name "*.dsm" -exec rm -f {} \; || true
-	$(SHOW_RM)-[ -d "$(OBJ_DIR)/$(XWMO_DIR)" ] && \
-                   find $(OBJ_DIR)/$(XWMO_DIR) -type f -name "*.i" -exec rm -f {} \; || true
-endif
-	$(SHOW_RM)-rm -f $(OBJ_DIR)$(XWMO_DIR)/$(XWMO_NAME)
+	@$(RM) -f $(XWMO_COBJS:.o=.o.lst)
+	@$(RM) -f $(XWMO_COBJS:.o=.dsm)
+	@$(RM) -f $(XWMO_COBJS:.o=.i)
+	@$(RM) -f $(XWMO_COBJS)
+	@$(RM) -f $(XWMO_LUA2HEXCOBJS:.o=.o.lst)
+	@$(RM) -f $(XWMO_LUA2HEXCOBJS:.o=.dsm)
+	@$(RM) -f $(XWMO_LUA2HEXCOBJS:.o=.i)
+	@$(RM) -f $(XWMO_LUA2HEXCOBJS)
+	@$(RM) -f $(XWMO_LUA2HEXCSRCS)
+	@$(RM) -f $(XWMO_CXXOBJS:.o=.o.lst)
+	@$(RM) -f $(XWMO_CXXOBJS:.o=.dsm)
+	@$(RM) -f $(XWMO_CXXOBJS:.o=.i)
+	@$(RM) -f $(XWMO_CXXOBJS)
+	@$(RM) -f $(OBJ_DIR)$(XWMO_DIR)/$(XWMO_NAME)
+	@$(RM) -f $(XWMO_OBJS_LST)
 
 distclean:
-ifeq ($(NEAR),y)
-	$(SHOW_RM)-rm -f $(XWMO_COBJS:.o=.o.lst)
-	$(SHOW_RM)-rm -f $(XWMO_COBJS:.o=.o.d)
-	$(SHOW_RM)-rm -f $(XWMO_COBJS:.o=.dsm)
-	$(SHOW_RM)-rm -f $(XWMO_COBJS:.o=.i)
-	$(SHOW_RM)-rm -f $(XWMO_COBJS)
-	$(SHOW_RM)-rm -f $(XWMO_CXXOBJS:.o=.o.lst)
-	$(SHOW_RM)-rm -f $(XWMO_CXXOBJS:.o=.o.d)
-	$(SHOW_RM)-rm -f $(XWMO_CXXOBJS:.o=.dsm)
-	$(SHOW_RM)-rm -f $(XWMO_CXXOBJS:.o=.i)
-	$(SHOW_RM)-rm -f $(XWMO_CXXOBJS)
-else
-	$(SHOW_RM)-[ -d "$(OBJ_DIR)/$(XWMO_DIR)" ] && \
-                   find $(OBJ_DIR)/$(XWMO_DIR) -type f -name "*.o" -exec rm -f {} \; || true
-	$(SHOW_RM)-[ -d "$(OBJ_DIR)/$(XWMO_DIR)" ] && \
-                   find $(OBJ_DIR)/$(XWMO_DIR) -type f -name "*.o.d" -exec rm -f {} \; || true
-	$(SHOW_RM)-[ -d "$(OBJ_DIR)/$(XWMO_DIR)" ] && \
-                   find $(OBJ_DIR)/$(XWMO_DIR) -type f -name "*.o.lst" -exec rm -f {} \; || true
-	$(SHOW_RM)-[ -d "$(OBJ_DIR)/$(XWMO_DIR)" ] && \
-                   find $(OBJ_DIR)/$(XWMO_DIR) -type f -name "*.dsm" -exec rm -f {} \; || true
-	$(SHOW_RM)-[ -d "$(OBJ_DIR)/$(XWMO_DIR)" ] && \
-                   find $(OBJ_DIR)/$(XWMO_DIR) -type f -name "*.i" -exec rm -f {} \; || true
-endif
-	$(SHOW_RM)-rm -f $(OBJ_DIR)$(XWMO_DIR)/$(XWMO_NAME)
+	$(RM) -rf $(OBJ_DIR)$(XWMO_DIR)
 
 .PHONY: dsm clean distclean
