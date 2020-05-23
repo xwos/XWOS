@@ -17,65 +17,117 @@
 + 英文简称：XWOS
 
 玄武OS不只是一个操作系统内核，其实是关于系统内核、中间件、应用的一整套集成开发环境。
-开发玄武OS的最初目地是在GNU/Linux系统（如Ubuntu）下建立一套完整的MCU系统开发环境，
 包括以下特性：
-+ 提供类似Android的便于扩展的编译系统，可快速集成各种组件；
++ 便于扩展的编译系统，可快速集成各种组件；
 + 提供单核CPU与多核CPU两种内核；
 + 高度模块化；
 + 高可移植性，支持各种架构的MCU；
 + 支持C/C++混合开发；
 + 集成Lua虚拟机；
 + 自身的命名前缀与命名空间，防止集成第三方组件时发生命名冲突；
-+ 提供电源管理机制。
++ 电源管理框架。
 
-在工作实践中，发现许多朋友更习惯于基于Windows的开发环境，因此玄武OS的编译系统
-也会通过Python语言等提供一些工具，用于生成Windows下的各种常见集成开发环境的
-项目工程。玄武OS的开发环境情况如下：
-+ PC操作系统：Ubuntu/Windows
+开发玄武OS的最初目地是在GNU/Linux系统（如Ubuntu）下建立一套完整的MCU系统开发环境，
+但现在玄武OS的编译系统也能在Windows下运行，理论上MacOS上也能运行。
+玄武OS的开发环境基本情况如下：
++ PC操作系统：Ubuntu(16.04 ~ 20.04)~64位 / Windows 10 ~ 64位
 + 开发语言：ASM、C、C++、Lua
-+ 开发工具：GCC、CodeWarrior、GNU Make、Bash、Emacs、Python、Wine
++ 开发工具：GCC、CodeWarrior、GNU Make、Shell、Emacs、Python、Wine
 + 硬件平台：STM32、NXP Qorivva MCU、NXP S32K MCU
 
-玄武OS的代码，大部分符合MISRA-C:2012规范的，具有高安全性和高稳定性。
+玄武OS的代码，大部分符合MISRA-C:2012规范，具有高安全性和高稳定性。
 但是作为一款操作系统，玄武OS的部分代码也需要追求代码的执行效率，因此会使用一些
 非ANSI-C的语法来充分发挥芯片的性能，并不能严格遵守MISRA-C:2012规范的所有条例。
 
+--------
+
+* 编译过程
+
+#+CAPTION:玄武OS编译过程
+#+ATTR_LATEX: :float nil :width \textwidth :options scale=1
+#+ATTR_ODT: :scale 1
+#+ATTR_HTML: :width 70%
+[[file:xwrs/figure/xwos-build-proc.gif]]
+
+--------
+
 * 源码结构
+
+#+CAPTION:玄武OS架构图
+#+ATTR_LATEX: :float nil :width \textwidth :options scale=1
+#+ATTR_ODT: :scale 1
+#+ATTR_HTML: :width 70%
+[[file:xwrs/figure/xwos-arch.png]]
+
 + Build
-  - xwbs: 编译系统；(License:Apache-2.0)
+  - xwbs: 编译系统 (License:Apache-2.0)
 + BSP & Project
-  - xwcd: 架构、CPU、SOC、外设驱动相关的代码；(License:Apache-2.0)
-  - xwbd: 工程配置、工程驱动与工程应用程序；(License:Apache-2.0)
+  - xwcd: 架构、CPU、SOC、外设驱动相关的代码 (License:Apache-2.0)
+  - xwbd: 工程配置、工程驱动与工程应用程序 (License:Apache-2.0)
 + OS
-  - xwos: 内核；(License:MPL-2.0)
+  - xwos: 内核 (License:MPL-2.0)
 + Middleware
-  - xwmd: 驱动框架与中间件；(License:MPL-2.0)
-  - xwem: 第三方开源软件。(License请到项目的首页查询)
+  - xwmd: 驱动框架与中间件 (License:MPL-2.0)
+  - xwem: 第三方开源软件
+
+--------
 
 * 开源协议
 
 ** MPL-2.0
+
 玄武OS核心代码采用Mozilla Public License, version 2.0（简称MPL-2.0）进行发布：
 + 链接：[[http://mozilla.org/MPL/2.0/][http://mozilla.org/MPL/2.0/]]
 + 这些代码位于xwos与xwmd文件夹中。
-+ 所有这些源文件都 *不* 属于"Incompatible With Secondary Licenses"形式的
-  "Covered Software"，即这些源文件的文件头中都只包含了MPL-2.0中的"Exhibit A"
-  中的"Notice"。这有助于将玄武OS集成到各种应用场景中（按照MPL-2.0中的定义，
-  这被称为"Larger Work"）。
++ 按照MPL-2.0中的描述，所有这些源文件都 *不* 属于
+  *"Incompatible With Secondary Licenses"* 形式的 *"Covered Software"* ，
+  即这些源文件的文件头中只包含了MPL-2.0中的
+  *"Exhibit A - Source Code Form License Notice"* 。
+  这有助于将玄武OS作为组件之一集成到各种商业应用场景中（按照MPL-2.0中的定义，
+  这被称为 *"Larger Work"* ）。
 
 ** Apache-2.0
+
 为了更好的商业利用，玄武OS的外围代码（BSP、应用、编译脚本）
 采用Apache License, version 2.0（简称Apache-2.0）进行发布：
 + 链接：[[http://www.apache.org/licenses/LICENSE-2.0][http://www.apache.org/licenses/LICENSE-2.0]]
 + 这些代码位于xwcd、xwbd与xwbs中。
 
+--------
+
+* 文档
+
+** 搭建开发环境
+
+*** STM32
+
+你可以参考这一份指南，搭建STM32的玄武OS开发环境：
+
++ Ubuntu
+
+[[!!链接待编辑!!][链接待编辑]]
+
++ Windows 10
+
+[[!!链接待编辑!!][链接待编辑]]
+
+** 参考手册
+
+你可以从这里获取完整的参考手册：
+
+[[!!链接待编辑!!][链接待编辑]]
+
+--------
+
 * 分支与版本号
 
 ** 分支
+
 + stable: 稳定版
 + developing: 开发版
 
 ** 版本号形式：Major.minor.revision (M.m.r)
+
 + Major: 大版本号
   - 包含重大更新的里程碑版本
 + minor: 小版本号
@@ -88,9 +140,9 @@
     这些提交只是修复Bug及其他错误。
 
 ** 版本变化规则
+
 + Major在以下情况下增加1：
   - 重要新功能引入后；
-  - 破坏性修改(BREAKING CHANGE)，例如，修改API的原型，删除API等后；
   - 累积了多次小版本号更新后。
 + minor：
   - 发布一个新的稳定版本，开发版分支的minor+1变成偶数，
@@ -106,46 +158,7 @@
   - Major+1后，revision回到0。
 
 ** 稳定版发布条件
-+ 开发版分支中增加了1～n个新功能；
-+ 开发版分支中修复了重大Bug。
 
-* git commit规范
-
-#+BEGIN_SRC shell
-# [页眉] <type>(<scope>): :emoji: <subject>
-# - type: feat, fix, perf, refactor, style, build, revert, docs, test,
-#         chore, milestone, release, developing, patch
-# - scope: 可为空
-# - subject: 以动词开始的短语，结尾无句号
-# - 页眉只占一行
-# - 每行总长度不超过72个字符（中文字符算2个字符）
-#
-# [正文] 描述
-# - 为什么需要修改？
-# - 如何定位问题？
-# - 修改有什么副作用？
-# - 每行总长度不超过72个字符（中文字符算2个字符）
-#
-# [页脚]
-# - 问题的ID或链接
-# - BREAKING CHANGE（破坏API原型的修改）
-# - 每行总长度不超过72个字符（中文字符算2个字符）
-#+END_SRC
-
-参考：[[https://www.conventionalcommits.org/][https://www.conventionalcommits.org/]]
-
-** type说明
-+ feat: 新功能
-+ fix: 修复BUG
-+ perf: 性能优化
-+ refactor: 重构代码
-+ style: 格式调整（删除行尾空格等）
-+ build: 编译系统
-+ revert: 回退提交
-+ docs: 文档
-+ test: 测试
-+ chore: 依赖、工具
-+ milestone: 更新大版本号
-+ release: 更新稳定版的小版本号（偶数）
-+ developing: 切换到下一个开发版的小版本号（奇数）
-+ patch: 更新修订号
++ 破坏性修改(BREAKING CHANGE)，例如，修改API的原型，删除API等；
++ 增加了新功能；
++ 修复了Bug。
