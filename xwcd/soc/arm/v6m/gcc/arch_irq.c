@@ -40,7 +40,7 @@
  ******** ******** ********      macros       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define ARCH_IRQ_FAULT_PRIO     (ARCH_IRQ_PRIO_HIGHEST)
-#define ARCH_IRQ_SVC_PRIO       (ARCH_IRQ_PRIO_LOWEST)
+#define ARCH_IRQ_SVC_PRIO       (ARCH_IRQ_PRIO_HIGHEST)
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********

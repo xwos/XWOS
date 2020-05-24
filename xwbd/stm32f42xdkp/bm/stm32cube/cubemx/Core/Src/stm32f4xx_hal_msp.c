@@ -74,7 +74,7 @@ void HAL_MspInit(void)
 
   /* System interrupt init*/
   /* SVCall_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SVCall_IRQn, 1, 1);
+  HAL_NVIC_SetPriority(SVCall_IRQn, 0, 1);
   /* PendSV_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(PendSV_IRQn, 7, 1);
 
