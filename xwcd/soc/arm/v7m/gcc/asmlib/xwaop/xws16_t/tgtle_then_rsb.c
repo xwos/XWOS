@@ -40,7 +40,6 @@ xwer_t xwaop__xws16_t__tgtle_then_rsb(__atomic xws16_t * a,
 
         do {
                 o = (xws16_t)ldrexh(a);
-                xwmb_smp_ddb();
                 if ((o > l) && (o <= r)) {
                         n = v - o;
                         xwmb_smp_mb();

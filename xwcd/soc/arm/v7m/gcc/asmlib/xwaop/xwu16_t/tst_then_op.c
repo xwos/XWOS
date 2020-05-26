@@ -40,7 +40,6 @@ xwer_t xwaop__xwu16_t__tst_then_op(__atomic xwu16_t * a,
 
         do {
                 o = (xwu16_t)ldrexh(a);
-                xwmb_smp_ddb();
                 if (tst) {
                         if (tst((const void *)&o, tst_args)) {
                                 if (op) {
@@ -50,7 +49,7 @@ xwer_t xwaop__xwu16_t__tst_then_op(__atomic xwu16_t * a,
                                 } else {
                                         rc = OK;
                                         n = o;
-                                        xwmb_smp_ddb();
+                                        xwmb_smp_mb();
                                         break;
                                 }
                         } else {
@@ -67,7 +66,7 @@ xwer_t xwaop__xwu16_t__tst_then_op(__atomic xwu16_t * a,
                         } else {
                                 rc = OK;
                                 n = o;
-                                xwmb_smp_ddb();
+                                xwmb_smp_mb();
                                 break;
                         }
                 }

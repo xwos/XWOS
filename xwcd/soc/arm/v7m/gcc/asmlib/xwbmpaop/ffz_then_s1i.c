@@ -52,7 +52,6 @@ xwssq_t xwbmpaop_ffz_then_s1i(__atomic xwbmp_t * bmp, xwsz_t num)
                                 msk = ~(xwbmp_t)0;
                         }
                         ov = ldrex((xwu32_t *)&bmp[i]);
-                        xwmb_smp_ddb();
                         tmp = (~ov) & msk;
                         if (tmp) {
                                 pos = xwbop_ffs(xwbmp_t, tmp);
@@ -62,6 +61,7 @@ xwssq_t xwbmpaop_ffz_then_s1i(__atomic xwbmp_t * bmp, xwsz_t num)
                 } while (i < total);
                 if (pos < 0) {
                         pos = -ENODATA;
+                        xwmb_smp_ddb();
                         break;
                 } else {
                         m = (1U << (xwsq_t)pos);

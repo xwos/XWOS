@@ -40,7 +40,6 @@ xwer_t xwaop__xws16_t__tle_then_add(__atomic xws16_t * a,
 
         do {
                 o = (xws16_t)ldrexh(a);
-                xwmb_smp_ddb();
                 if (o <= t) {
                         n = o + v;
                         xwmb_smp_mb();

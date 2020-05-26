@@ -40,7 +40,6 @@ xwer_t xwaop__xws8_t__tgele_then_rsb(__atomic xws8_t * a,
 
         do {
                 o = (xws8_t)ldrexb(a);
-                xwmb_smp_ddb();
                 if ((o >= l) && (o <= r)) {
                         n = v - o;
                         xwmb_smp_mb();

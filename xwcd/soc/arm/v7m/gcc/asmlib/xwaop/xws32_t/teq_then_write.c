@@ -39,12 +39,12 @@ xwer_t xwaop__xws32_t__teq_then_write(__atomic xws32_t * a,
 
         do {
                 o = (xws32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o == t) {
                         xwmb_smp_mb();
                         rc = strex(a, (xwu32_t)v);
                 } else {
                         rc = -EACCES;
+                        xwmb_smp_ddb();
                         break;
                 }
         } while (rc);

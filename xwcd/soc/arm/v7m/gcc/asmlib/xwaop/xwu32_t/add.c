@@ -38,7 +38,6 @@ void xwaop__xwu32_t__add(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 n = o + v;
                 xwmb_smp_mb();
         } while (strex(a, (xwu32_t)n));

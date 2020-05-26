@@ -40,7 +40,6 @@ xwer_t xwaop__xwu32_t__tge_then_rsb(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (o != t) {
                         n = v - o;
                         xwmb_smp_mb();

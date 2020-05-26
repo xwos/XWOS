@@ -39,7 +39,6 @@ xwer_t xwaop__xwu16_t__t1mo_then_c0m(__atomic xwu16_t * a,
 
         do {
                 o = (xwu16_t)ldrexh(a);
-                xwmb_smp_ddb();
                 if (o & m) {
                         n = o & (~m);
                         xwmb_smp_mb();

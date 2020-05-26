@@ -40,7 +40,6 @@ xwer_t xwaop__xwu32_t__tst_then_op(__atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)ldrex(a);
-                xwmb_smp_ddb();
                 if (tst) {
                         if (tst((const void *)&o, tst_args)) {
                                 if (op) {
@@ -50,7 +49,7 @@ xwer_t xwaop__xwu32_t__tst_then_op(__atomic xwu32_t * a,
                                 } else {
                                         rc = OK;
                                         n = o;
-                                        xwmb_smp_ddb();
+                                        xwmb_smp_mb();
                                         break;
                                 }
                         } else {
@@ -67,7 +66,7 @@ xwer_t xwaop__xwu32_t__tst_then_op(__atomic xwu32_t * a,
                         } else {
                                 rc = OK;
                                 n = o;
-                                xwmb_smp_ddb();
+                                xwmb_smp_mb();
                                 break;
                         }
                 }

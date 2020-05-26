@@ -73,7 +73,6 @@ xwssq_t xwbmpaop_ffs_then_c0i(__atomic xwbmp_t * bmp, xwsz_t num)
                                 msk = ~(xwbmp_t)0;
                         }
                         ov = lwarx((xwu32_t *)&bmp[i]) & msk;
-                        xwmb_smp_ddb();
                         if (ov) {
                                 pos = xwbop_ffs(xwbmp_t, ov);
                                 break;
@@ -82,6 +81,7 @@ xwssq_t xwbmpaop_ffs_then_c0i(__atomic xwbmp_t * bmp, xwsz_t num)
                 } while (i < total);
                 if (pos < 0) {
                         pos = -ENODATA;
+                        xwmb_smp_ddb();
                         break;
                 } else {
                         m = (1U << (xwsq_t)pos);
@@ -118,7 +118,6 @@ xwssq_t xwbmpaop_ffz_then_s1i(__atomic xwbmp_t * bmp, xwsz_t num)
                                 msk = ~(xwbmp_t)0;
                         }
                         ov = lwarx((xwu32_t *)&bmp[i]);
-                        xwmb_smp_ddb();
                         tmp = (~ov) & msk;
                         if (tmp) {
                                 pos = xwbop_ffs(xwbmp_t, tmp);
@@ -128,6 +127,7 @@ xwssq_t xwbmpaop_ffz_then_s1i(__atomic xwbmp_t * bmp, xwsz_t num)
                 } while (i < total);
                 if (pos < 0) {
                         pos = -ENODATA;
+                        xwmb_smp_ddb();
                         break;
                 } else {
                         m = (1U << (xwsq_t)pos);
@@ -160,7 +160,6 @@ xwssq_t xwbmpaop_fls_then_c0i(__atomic xwbmp_t * bmp, xwsz_t num)
                 do {
                         i--;
                         ov = lwarx((xwu32_t *)&bmp[i]) & msk;
-                        xwmb_smp_ddb();
                         if (ov) {
                                 pos = xwbop_fls(xwbmp_t, ov);
                                 break;
@@ -169,6 +168,7 @@ xwssq_t xwbmpaop_fls_then_c0i(__atomic xwbmp_t * bmp, xwsz_t num)
                 } while (i > 0);
                 if (pos < 0) {
                         pos = -ENODATA;
+                        xwmb_smp_ddb();
                         break;
                 } else {
                         m = (1U << (xwsq_t)pos);
@@ -201,7 +201,6 @@ xwssq_t xwbmpaop_flz_then_s1i(__atomic xwbmp_t * bmp, xwsz_t num)
                 do {
                         i--;
                         ov = lwarx((xwu32_t *)&bmp[i]);
-                        xwmb_smp_ddb();
                         tmp = (xwbmp_t)(~ov) & msk;
                         if (tmp) {
                                 pos = xwbop_flz(xwbmp_t, tmp);
@@ -211,6 +210,7 @@ xwssq_t xwbmpaop_flz_then_s1i(__atomic xwbmp_t * bmp, xwsz_t num)
                 } while (i > 0);
                 if (pos < 0) {
                         pos = -ENODATA;
+                        xwmb_smp_ddb();
                         break;
                 } else {
                         m = (1U << (xwsq_t)pos);

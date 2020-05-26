@@ -27,14 +27,13 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#ifdef __GNUC__
 __xwlib_code
 xws8_t xwaop__xws8_t__load(__atomic xws8_t * a,
                            const enum xwmb_memory_order_em mo)
 {
         xws8_t v;
 
-        v = __atomic_load_n(a, (int)mo);
+        v = atomic_load_explicit(a, (int)mo);
         return v;
 }
 
@@ -43,7 +42,7 @@ xws8_t xwaop__xws8_t__store(__atomic xws8_t * a,
                             const enum xwmb_memory_order_em mo,
                             xws8_t v)
 {
-        __atomic_store_n(a, v, (int)mo);
+        atomic_store_explicit(a, v, (int)mo);
         return v;
 }
 
@@ -53,7 +52,7 @@ void xwaop__xws8_t__read(__atomic xws8_t * a,
 {
         xws8_t o;
 
-        o = xwaop__xws8_t__load(a, xwmb_modr_acquire);
+        o = atomic_load_explicit(a, memory_order_acquire);
         if (ov) {
                 *ov = o;
         }
@@ -66,7 +65,7 @@ void xwaop__xws8_t__write(__atomic xws8_t * a,
 {
         xws8_t o;
 
-        o = __atomic_exchange_n(a, v, __ATOMIC_ACQ_REL);
+        o = atomic_exchange_explicit(a, v, memory_order_acq_rel);
         if (ov) {
                 *ov = o;
         }
@@ -82,10 +81,9 @@ xwer_t xwaop__xws8_t__teq_then_write(__atomic xws8_t * a,
         xwer_t rc;
 
         o = t;
-        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, v,
-                                                 false,
-                                                 __ATOMIC_ACQ_REL,
-                                                 __ATOMIC_CONSUME);
+        rc = (xwer_t)atomic_compare_exchange_strong_explicit(a, &o, v,
+                                                             memory_order_acq_rel,
+                                                             memory_order_consume);
         if ((bool)rc) {
                 rc = OK;
         } else {
@@ -107,12 +105,12 @@ xwer_t xwaop__xws8_t__tne_then_write(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o != t) {
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, v,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, v,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -137,12 +135,12 @@ xwer_t xwaop__xws8_t__tgt_then_write(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o > t) {
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, v,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, v,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -167,12 +165,12 @@ xwer_t xwaop__xws8_t__tge_then_write(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o >= t) {
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, v,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, v,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -197,12 +195,12 @@ xwer_t xwaop__xws8_t__tlt_then_write(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o < t) {
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, v,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, v,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -227,12 +225,12 @@ xwer_t xwaop__xws8_t__tle_then_write(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o <= t) {
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, v,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, v,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -257,12 +255,12 @@ xwer_t xwaop__xws8_t__tgtlt_then_write(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if ((o > l) && (o < r)) {
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, v,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, v,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -287,12 +285,12 @@ xwer_t xwaop__xws8_t__tgelt_then_write(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if ((o >= l) && (o < r)) {
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, v,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, v,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -317,12 +315,12 @@ xwer_t xwaop__xws8_t__tgtle_then_write(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if ((o > l) && (o <= r)) {
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, v,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, v,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -347,12 +345,12 @@ xwer_t xwaop__xws8_t__tgele_then_write(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if ((o >= l) && (o <= r)) {
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, v,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, v,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -375,7 +373,7 @@ void xwaop__xws8_t__add(__atomic xws8_t * a,
 {
         xws8_t o;
 
-        o = __atomic_fetch_add(a, v, __ATOMIC_ACQ_REL);
+        o = atomic_fetch_add_explicit(a, v, memory_order_acq_rel);
         if (nv) {
                 *nv = o + v;
         }
@@ -396,10 +394,9 @@ xwer_t xwaop__xws8_t__teq_then_add(__atomic xws8_t * a,
 
         o = t;
         n = o + v;
-        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                 false,
-                                                 __ATOMIC_ACQ_REL,
-                                                 __ATOMIC_CONSUME);
+        rc = (xwer_t)atomic_compare_exchange_strong_explicit(a, &o, n,
+                                                             memory_order_acq_rel,
+                                                             memory_order_consume);
         if ((bool)rc) {
                 rc = OK;
         } else {
@@ -426,13 +423,13 @@ xwer_t xwaop__xws8_t__tne_then_add(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o != t) {
                         n = o + v;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -462,13 +459,13 @@ xwer_t xwaop__xws8_t__tgt_then_add(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o > t) {
                         n = o + v;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -498,13 +495,13 @@ xwer_t xwaop__xws8_t__tge_then_add(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o >= t) {
                         n = o + v;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -534,13 +531,13 @@ xwer_t xwaop__xws8_t__tlt_then_add(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o < t) {
                         n = o + v;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -570,13 +567,13 @@ xwer_t xwaop__xws8_t__tle_then_add(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o <= t) {
                         n = o + v;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -606,13 +603,13 @@ xwer_t xwaop__xws8_t__tgtlt_then_add(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if ((o > l) && (o < r)) {
                         n = o + v;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -642,13 +639,13 @@ xwer_t xwaop__xws8_t__tgelt_then_add(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if ((o >= l) && (o < r)) {
                         n = o + v;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -678,13 +675,13 @@ xwer_t xwaop__xws8_t__tgtle_then_add(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if ((o > l) && (o <= r)) {
                         n = o + v;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -714,13 +711,13 @@ xwer_t xwaop__xws8_t__tgele_then_add(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if ((o >= l) && (o <= r)) {
                         n = o + v;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -747,7 +744,7 @@ void xwaop__xws8_t__sub(__atomic xws8_t * a,
 {
         xws8_t o;
 
-        o = __atomic_fetch_sub(a, v, __ATOMIC_ACQ_REL);
+        o = atomic_fetch_sub_explicit(a, v, memory_order_acq_rel);
         if (nv) {
                 *nv = o - v;
         }
@@ -768,10 +765,10 @@ xwer_t xwaop__xws8_t__teq_then_sub(__atomic xws8_t * a,
 
         o = t;
         n = o - v;
-        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                 false,
-                                                 __ATOMIC_ACQ_REL,
-                                                 __ATOMIC_CONSUME);
+        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                a, &o, n,
+                memory_order_acq_rel,
+                memory_order_consume);
         if ((bool)rc) {
                 rc = OK;
         } else {
@@ -798,13 +795,13 @@ xwer_t xwaop__xws8_t__tne_then_sub(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o != t) {
                         n = o - v;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -834,13 +831,13 @@ xwer_t xwaop__xws8_t__tgt_then_sub(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o > t) {
                         n = o - v;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -870,13 +867,13 @@ xwer_t xwaop__xws8_t__tge_then_sub(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o >= t) {
                         n = o - v;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -906,13 +903,13 @@ xwer_t xwaop__xws8_t__tlt_then_sub(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o < t) {
                         n = o - v;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -942,13 +939,13 @@ xwer_t xwaop__xws8_t__tle_then_sub(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o <= t) {
                         n = o - v;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -978,13 +975,13 @@ xwer_t xwaop__xws8_t__tgtlt_then_sub(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if ((o > l) && (o < r)) {
                         n = o - v;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -1014,13 +1011,13 @@ xwer_t xwaop__xws8_t__tgelt_then_sub(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if ((o >= l) && (o < r)) {
                         n = o - v;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -1050,13 +1047,13 @@ xwer_t xwaop__xws8_t__tgtle_then_sub(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if ((o > l) && (o <= r)) {
                         n = o - v;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -1086,13 +1083,13 @@ xwer_t xwaop__xws8_t__tgele_then_sub(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if ((o >= l) && (o <= r)) {
                         n = o - v;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -1122,12 +1119,12 @@ void xwaop__xws8_t__rsb(__atomic xws8_t * a,
         bool r;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_relaxed);
                 n = v - o;
-                r = __atomic_compare_exchange_n(a, &o, n,
-                                                false,
-                                                __ATOMIC_ACQ_REL,
-                                                __ATOMIC_CONSUME);
+                r = atomic_compare_exchange_strong_explicit(
+                        a, &o, n,
+                        memory_order_acq_rel,
+                        memory_order_relaxed);
         } while (!r);
         if (nv) {
                 *nv = n;
@@ -1148,13 +1145,13 @@ xwer_t xwaop__xws8_t__teq_then_rsb(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o == t) {
                         n = v - o;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -1184,13 +1181,13 @@ xwer_t xwaop__xws8_t__tne_then_rsb(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o != t) {
                         n = v - o;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -1220,13 +1217,13 @@ xwer_t xwaop__xws8_t__tgt_then_rsb(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o > t) {
                         n = v - o;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -1256,13 +1253,13 @@ xwer_t xwaop__xws8_t__tge_then_rsb(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o >= t) {
                         n = v - o;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -1292,13 +1289,13 @@ xwer_t xwaop__xws8_t__tlt_then_rsb(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o < t) {
                         n = v - o;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -1328,13 +1325,13 @@ xwer_t xwaop__xws8_t__tle_then_rsb(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (o <= t) {
                         n = v - o;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -1364,13 +1361,13 @@ xwer_t xwaop__xws8_t__tgtlt_then_rsb(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if ((o > l) && (o < r)) {
                         n = v - o;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -1400,13 +1397,13 @@ xwer_t xwaop__xws8_t__tgelt_then_rsb(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if ((o >= l) && (o < r)) {
                         n = v - o;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -1436,13 +1433,13 @@ xwer_t xwaop__xws8_t__tgtle_then_rsb(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if ((o > l) && (o <= r)) {
                         n = v - o;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -1472,13 +1469,13 @@ xwer_t xwaop__xws8_t__tgele_then_rsb(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if ((o >= l) && (o <= r)) {
                         n = v - o;
-                        rc = (xwer_t)__atomic_compare_exchange_n(a, &o, n,
-                                                                 false,
-                                                                 __ATOMIC_ACQ_REL,
-                                                                 __ATOMIC_CONSUME);
+                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
+                                a, &o, n,
+                                memory_order_acq_rel,
+                                memory_order_consume);
                         if ((bool)rc) {
                                 rc = OK;
                         }
@@ -1505,7 +1502,7 @@ void xwaop__xws8_t__or(__atomic xws8_t * a,
 {
         xws8_t o;
 
-        o = __atomic_fetch_or(a, v, __ATOMIC_ACQ_REL);
+        o = atomic_fetch_or_explicit(a, v, memory_order_acq_rel);
         if (nv) {
                 *nv = o | v;
         }
@@ -1521,7 +1518,7 @@ void xwaop__xws8_t__and(__atomic xws8_t * a,
 {
         xws8_t o;
 
-        o = __atomic_fetch_and(a, v, __ATOMIC_ACQ_REL);
+        o = atomic_fetch_and_explicit(a, v, memory_order_acq_rel);
         if (nv) {
                 *nv = o & v;
         }
@@ -1537,7 +1534,7 @@ void xwaop__xws8_t__xor(__atomic xws8_t * a,
 {
         xws8_t o;
 
-        o = __atomic_fetch_xor(a, v, __ATOMIC_ACQ_REL);
+        o = atomic_fetch_xor_explicit(a, v, memory_order_acq_rel);
         if (nv) {
                 *nv = o ^ v;
         }
@@ -1558,16 +1555,15 @@ xwer_t xwaop__xws8_t__tst_then_op(__atomic xws8_t * a,
         xwer_t rc;
 
         do {
-                o = __atomic_load_n(a, __ATOMIC_CONSUME);
+                o = atomic_load_explicit(a, memory_order_consume);
                 if (tst) {
                         if (tst((const void *)&o, tst_args)) {
                                 if (op) {
                                         op(&n, (const void *)&o, op_args);
-                                        rc = (xwer_t)__atomic_compare_exchange_n(
+                                        rc = (xwer_t)atomic_compare_exchange_strong_explicit(
                                                 a, &o, n,
-                                                false,
-                                                __ATOMIC_ACQ_REL,
-                                                __ATOMIC_CONSUME);
+                                                memory_order_acq_rel,
+                                                memory_order_consume);
                                 } else {
                                         rc = OK;
                                         n = o;
@@ -1581,11 +1577,10 @@ xwer_t xwaop__xws8_t__tst_then_op(__atomic xws8_t * a,
                 } else {
                         if (op) {
                                 op(&n, (const void *)&o, op_args);
-                                rc = (xwer_t)__atomic_compare_exchange_n(
+                                rc = (xwer_t)atomic_compare_exchange_strong_explicit(
                                         a, &o, n,
-                                        false,
-                                        __ATOMIC_ACQ_REL,
-                                        __ATOMIC_CONSUME);
+                                        memory_order_acq_rel,
+                                        memory_order_consume);
                         } else {
                                 rc = OK;
                                 n = o;
@@ -1601,5 +1596,3 @@ xwer_t xwaop__xws8_t__tst_then_op(__atomic xws8_t * a,
         }
         return rc;
 }
-
-#endif /* #ifdef __GNUC__ */

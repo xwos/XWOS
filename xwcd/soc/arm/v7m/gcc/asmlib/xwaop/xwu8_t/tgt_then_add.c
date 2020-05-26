@@ -40,7 +40,6 @@ xwer_t xwaop__xwu8_t__tgt_then_add(__atomic xwu8_t * a,
 
         do {
                 o = (xwu8_t)ldrexb(a);
-                xwmb_smp_ddb();
                 if (o > t) {
                         n = o + v;
                         xwmb_smp_mb();
