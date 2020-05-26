@@ -28,7 +28,7 @@
 + 电源管理框架。
 
 开发玄武OS的最初目地是在GNU/Linux系统（如Ubuntu）下建立一套完整的MCU系统开发环境，
-但现在玄武OS的编译系统也能在Windows下运行，理论上MacOS上也能运行。
+但现在玄武OS的编译系统也能在Windows下正常运行，理论上MacOS上也能运行。
 玄武OS的开发环境基本情况如下：
 + PC操作系统：Ubuntu(16.04 ~ 20.04)~64位 / Windows 10 ~ 64位
 + 开发语言：ASM、C、C++、Lua
