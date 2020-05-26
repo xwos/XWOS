@@ -33,7 +33,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief SODS API：申请时钟
+ * @brief XWDS API：申请时钟
  * @param soc: (I) SOC对象指针
  * @param id: (I) 时钟ID
  * @return 错误码
@@ -53,8 +53,8 @@ xwer_t xwds_clk_req(struct xwds_soc * soc, xwid_t id)
         const struct xwds_soc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE((id < soc->clk.num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE((id < soc->clk.num), "out-of-range", -ERANGE);
 
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
@@ -79,7 +79,7 @@ err_soc_grab:
 }
 
 /**
- * @brief SODS API：释放时钟
+ * @brief XWDS API：释放时钟
  * @param soc: (I) SOC对象指针
  * @param id: (I) 时钟ID
  * @return 错误码
@@ -99,8 +99,8 @@ xwer_t xwds_clk_rls(struct xwds_soc * soc, xwid_t id)
         const struct xwds_soc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE((id < soc->clk.num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE((id < soc->clk.num), "out-of-range", -ERANGE);
 
         drv = xwds_static_cast(struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->clk_rls)) {
@@ -120,7 +120,7 @@ err_drv_clk_rls:
 }
 
 /**
- * @brief SODS API：得到时钟频率
+ * @brief XWDS API：得到时钟频率
  * @param soc: (I) SOC对象指针
  * @param id: (I) 时钟ID
  * @param buf: (O) 返回时钟频率的缓冲区的指针
@@ -145,10 +145,10 @@ xwer_t xwds_clk_getfqcy(struct xwds_soc * soc, xwid_t id,
         const struct xwds_soc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE((id < soc->clk.num), "out-of-range", -ERANGE);
-        SODS_VALIDATE(buf, "nullptr", -EFAULT);
-        SODS_VALIDATE(num, "nullptr", -EFAULT);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE((id < soc->clk.num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(buf, "nullptr", -EFAULT);
+        XWDS_VALIDATE(num, "nullptr", -EFAULT);
 
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {

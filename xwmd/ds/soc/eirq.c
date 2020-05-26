@@ -33,7 +33,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief SODS API：申请外部中断
+ * @brief XWDS API：申请外部中断
  * @param soc: (I) SOC对象指针
  * @param port: (I) GPIO端口
  * @param pinmask: (I) GPIO PIN
@@ -62,8 +62,8 @@ xwer_t xwds_eirq_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask,
         const struct xwds_soc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE((eiid < soc->eirq.num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE((eiid < soc->eirq.num), "out-of-range", -ERANGE);
 
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
@@ -109,7 +109,7 @@ err_soc_grab:
 }
 
 /**
- * @brief SODS API：释放外部中断
+ * @brief XWDS API：释放外部中断
  * @param soc: (I) SOC对象指针
  * @param port: (I) GPIO端口
  * @param pinmask: (I) GPIO PIN
@@ -131,8 +131,8 @@ xwer_t xwds_eirq_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask, xwid_t 
         const struct xwds_soc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE((eiid < soc->eirq.num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE((eiid < soc->eirq.num), "out-of-range", -ERANGE);
 
         if (__unlikely(NULL == soc->eirq.isrs[eiid])) {
                 rc = -EPERM;

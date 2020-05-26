@@ -185,22 +185,22 @@ xwer_t mpc560xb_uartc_drv_start(struct xwds_device * dev)
         /* word length */
         linflex_reg->UARTCR.B.WL = cfg->bus.bit.bits;
 
-        if (SODS_UART_PARITY_NONE == cfg->bus.bit.parity) {
+        if (XWDS_UART_PARITY_NONE == cfg->bus.bit.parity) {
                 linflex_reg->UARTCR.B.PCE = 0;
         } else {
                 linflex_reg->UARTCR.B.PCE = 1; /* enable parity */
-                if (SODS_UART_PARITY_ODD == cfg->bus.bit.parity) {
+                if (XWDS_UART_PARITY_ODD == cfg->bus.bit.parity) {
                         linflex_reg->UARTCR.B.OP = 1;
                 } else {
                         linflex_reg->UARTCR.B.OP = 0;
                 }
         }
 
-        if (SODS_UART_MODE_TX & cfg->bus.bit.mode) {
+        if (XWDS_UART_MODE_TX & cfg->bus.bit.mode) {
                 linflex_reg->UARTCR.B.TDFL = 0;
                 linflex_reg->UARTCR.B.TXEN = 1;
         }
-        if (SODS_UART_MODE_RX & cfg->bus.bit.mode) {
+        if (XWDS_UART_MODE_RX & cfg->bus.bit.mode) {
                 linflex_reg->UARTCR.B.RDFL = 0;
                 linflex_reg->UARTCR.B.RXEN = 1;
         }
@@ -525,6 +525,7 @@ void mpc560xb_uartc_err_isr(void)
         resources = uartc->dev.resources;
         linflex_reg = resources->regrsc_array[0].base;
         sr = linflex_reg->UARTSR.R;
-        xwisrlogf(ERR, "<%s:%d> error! sr: 0x%x", uartc->dev.name, uartc->dev.id, sr);
+        xwisrlogf(ERR, "uartc",
+                  "<%s:%d> error! sr: 0x%x", uartc->dev.name, uartc->dev.id, sr);
         linflex_reg->UARTSR.R = 0x0000FFE1;
 }

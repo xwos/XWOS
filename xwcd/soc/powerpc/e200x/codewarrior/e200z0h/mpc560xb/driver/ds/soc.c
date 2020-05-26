@@ -1047,31 +1047,31 @@ xwer_t mpc560xb_soc_drv_eirq_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinm
         XWOS_UNUSED(pinmask);
 
         if (eiid <= SOC_WKUP_MAX) {
-                if (SODS_SOC_EIF_TM_RISING & eiflag) {
+                if (XWDS_SOC_EIF_TM_RISING & eiflag) {
                         WKUP.WIREER.R |= BIT(eiid);
                 } else {
                         WKUP.WIREER.R &= ~BIT(eiid);
                 }
-                if (SODS_SOC_EIF_TM_FALLING & eiflag) {
+                if (XWDS_SOC_EIF_TM_FALLING & eiflag) {
                         WKUP.WIFEER.R |= BIT(eiid);
                 } else {
                         WKUP.WIFEER.R &= ~BIT(eiid);
                 }
                 WKUP.IRER.R |= BIT(eiid);
                 WKUP.WIFER.R |= BIT(eiid);
-                if (SODS_SOC_EIF_WKUP & eiflag) {
+                if (XWDS_SOC_EIF_WKUP & eiflag) {
                         WKUP.WRER.R |= BIT(eiid);
                 } else {
                         WKUP.WRER.R &= ~BIT(eiid);
                 }
         } else {
                 eiid -= SOC_EIRQ_MIN;
-                if (SODS_SOC_EIF_TM_RISING & eiflag) {
+                if (XWDS_SOC_EIF_TM_RISING & eiflag) {
                         SIU.IREER.R |= BIT(eiid);
                 } else {
                         SIU.IREER.R &= ~BIT(eiid);
                 }
-                if (SODS_SOC_EIF_TM_FALLING & eiflag) {
+                if (XWDS_SOC_EIF_TM_FALLING & eiflag) {
                         SIU.IFEER.R |= BIT(eiid);
                 } else {
                         SIU.IFEER.R &= ~BIT(eiid);

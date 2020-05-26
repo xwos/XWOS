@@ -203,198 +203,198 @@ struct stm32cube_soc_cfg {
 struct stm32cube_soc_cfg stm32cube_soc_cfg = {
         .gpio = {
                 .register_map = {
-                        [SODS_GPIO_PORT_A] = (GPIO_TypeDef *)GPIOA_BASE,
-                        [SODS_GPIO_PORT_B] = (GPIO_TypeDef *)GPIOB_BASE,
-                        [SODS_GPIO_PORT_C] = (GPIO_TypeDef *)GPIOC_BASE,
-                        [SODS_GPIO_PORT_D] = (GPIO_TypeDef *)GPIOD_BASE,
-                        [SODS_GPIO_PORT_E] = (GPIO_TypeDef *)GPIOE_BASE,
-                        [SODS_GPIO_PORT_F] = (GPIO_TypeDef *)GPIOF_BASE,
-                        [SODS_GPIO_PORT_G] = (GPIO_TypeDef *)GPIOG_BASE,
-                        [SODS_GPIO_PORT_H] = (GPIO_TypeDef *)GPIOH_BASE,
-                        [SODS_GPIO_PORT_I] = (GPIO_TypeDef *)GPIOI_BASE,
-                        [SODS_GPIO_PORT_J] = (GPIO_TypeDef *)GPIOJ_BASE,
-                        [SODS_GPIO_PORT_K] = (GPIO_TypeDef *)GPIOK_BASE,
+                        [XWDS_GPIO_PORT_A] = (GPIO_TypeDef *)GPIOA_BASE,
+                        [XWDS_GPIO_PORT_B] = (GPIO_TypeDef *)GPIOB_BASE,
+                        [XWDS_GPIO_PORT_C] = (GPIO_TypeDef *)GPIOC_BASE,
+                        [XWDS_GPIO_PORT_D] = (GPIO_TypeDef *)GPIOD_BASE,
+                        [XWDS_GPIO_PORT_E] = (GPIO_TypeDef *)GPIOE_BASE,
+                        [XWDS_GPIO_PORT_F] = (GPIO_TypeDef *)GPIOF_BASE,
+                        [XWDS_GPIO_PORT_G] = (GPIO_TypeDef *)GPIOG_BASE,
+                        [XWDS_GPIO_PORT_H] = (GPIO_TypeDef *)GPIOH_BASE,
+                        [XWDS_GPIO_PORT_I] = (GPIO_TypeDef *)GPIOI_BASE,
+                        [XWDS_GPIO_PORT_J] = (GPIO_TypeDef *)GPIOJ_BASE,
+                        [XWDS_GPIO_PORT_K] = (GPIO_TypeDef *)GPIOK_BASE,
                 },
         },
         .eirq = {
                 .exti_port_map = {
-                        [SODS_GPIO_PORT_A] = LL_SYSCFG_EXTI_PORTA,
-                        [SODS_GPIO_PORT_B] = LL_SYSCFG_EXTI_PORTB,
-                        [SODS_GPIO_PORT_C] = LL_SYSCFG_EXTI_PORTC,
-                        [SODS_GPIO_PORT_D] = LL_SYSCFG_EXTI_PORTD,
-                        [SODS_GPIO_PORT_E] = LL_SYSCFG_EXTI_PORTE,
-                        [SODS_GPIO_PORT_F] = LL_SYSCFG_EXTI_PORTF,
-                        [SODS_GPIO_PORT_G] = LL_SYSCFG_EXTI_PORTG,
-                        [SODS_GPIO_PORT_H] = LL_SYSCFG_EXTI_PORTH,
-                        [SODS_GPIO_PORT_I] = LL_SYSCFG_EXTI_PORTI,
-                        [SODS_GPIO_PORT_J] = LL_SYSCFG_EXTI_PORTJ,
-                        [SODS_GPIO_PORT_K] = LL_SYSCFG_EXTI_PORTK,
+                        [XWDS_GPIO_PORT_A] = LL_SYSCFG_EXTI_PORTA,
+                        [XWDS_GPIO_PORT_B] = LL_SYSCFG_EXTI_PORTB,
+                        [XWDS_GPIO_PORT_C] = LL_SYSCFG_EXTI_PORTC,
+                        [XWDS_GPIO_PORT_D] = LL_SYSCFG_EXTI_PORTD,
+                        [XWDS_GPIO_PORT_E] = LL_SYSCFG_EXTI_PORTE,
+                        [XWDS_GPIO_PORT_F] = LL_SYSCFG_EXTI_PORTF,
+                        [XWDS_GPIO_PORT_G] = LL_SYSCFG_EXTI_PORTG,
+                        [XWDS_GPIO_PORT_H] = LL_SYSCFG_EXTI_PORTH,
+                        [XWDS_GPIO_PORT_I] = LL_SYSCFG_EXTI_PORTI,
+                        [XWDS_GPIO_PORT_J] = LL_SYSCFG_EXTI_PORTJ,
+                        [XWDS_GPIO_PORT_K] = LL_SYSCFG_EXTI_PORTK,
                 },
                 .exti_line_map = {
-                        [SODS_EIRQ(0)] = LL_SYSCFG_EXTI_LINE0,
-                        [SODS_EIRQ(1)] = LL_SYSCFG_EXTI_LINE1,
-                        [SODS_EIRQ(2)] = LL_SYSCFG_EXTI_LINE2,
-                        [SODS_EIRQ(3)] = LL_SYSCFG_EXTI_LINE3,
-                        [SODS_EIRQ(4)] = LL_SYSCFG_EXTI_LINE4,
-                        [SODS_EIRQ(5)] = LL_SYSCFG_EXTI_LINE5,
-                        [SODS_EIRQ(6)] = LL_SYSCFG_EXTI_LINE6,
-                        [SODS_EIRQ(7)] = LL_SYSCFG_EXTI_LINE7,
-                        [SODS_EIRQ(8)] = LL_SYSCFG_EXTI_LINE8,
-                        [SODS_EIRQ(9)] = LL_SYSCFG_EXTI_LINE9,
-                        [SODS_EIRQ(10)] = LL_SYSCFG_EXTI_LINE10,
-                        [SODS_EIRQ(11)] = LL_SYSCFG_EXTI_LINE11,
-                        [SODS_EIRQ(12)] = LL_SYSCFG_EXTI_LINE12,
-                        [SODS_EIRQ(13)] = LL_SYSCFG_EXTI_LINE13,
-                        [SODS_EIRQ(14)] = LL_SYSCFG_EXTI_LINE14,
-                        [SODS_EIRQ(15)] = LL_SYSCFG_EXTI_LINE15,
+                        [XWDS_EIRQ(0)] = LL_SYSCFG_EXTI_LINE0,
+                        [XWDS_EIRQ(1)] = LL_SYSCFG_EXTI_LINE1,
+                        [XWDS_EIRQ(2)] = LL_SYSCFG_EXTI_LINE2,
+                        [XWDS_EIRQ(3)] = LL_SYSCFG_EXTI_LINE3,
+                        [XWDS_EIRQ(4)] = LL_SYSCFG_EXTI_LINE4,
+                        [XWDS_EIRQ(5)] = LL_SYSCFG_EXTI_LINE5,
+                        [XWDS_EIRQ(6)] = LL_SYSCFG_EXTI_LINE6,
+                        [XWDS_EIRQ(7)] = LL_SYSCFG_EXTI_LINE7,
+                        [XWDS_EIRQ(8)] = LL_SYSCFG_EXTI_LINE8,
+                        [XWDS_EIRQ(9)] = LL_SYSCFG_EXTI_LINE9,
+                        [XWDS_EIRQ(10)] = LL_SYSCFG_EXTI_LINE10,
+                        [XWDS_EIRQ(11)] = LL_SYSCFG_EXTI_LINE11,
+                        [XWDS_EIRQ(12)] = LL_SYSCFG_EXTI_LINE12,
+                        [XWDS_EIRQ(13)] = LL_SYSCFG_EXTI_LINE13,
+                        [XWDS_EIRQ(14)] = LL_SYSCFG_EXTI_LINE14,
+                        [XWDS_EIRQ(15)] = LL_SYSCFG_EXTI_LINE15,
                 },
         },
         .dma = {
                 .ch2dma_map = {
-                        [SODS_DMA_CH(0)] = DMA1,
-                        [SODS_DMA_CH(1)] = DMA1,
-                        [SODS_DMA_CH(2)] = DMA1,
-                        [SODS_DMA_CH(3)] = DMA1,
-                        [SODS_DMA_CH(4)] = DMA1,
-                        [SODS_DMA_CH(5)] = DMA1,
-                        [SODS_DMA_CH(6)] = DMA1,
-                        [SODS_DMA_CH(7)] = DMA1,
-                        [SODS_DMA_CH(8)] = DMA2,
-                        [SODS_DMA_CH(9)] = DMA2,
-                        [SODS_DMA_CH(10)] = DMA2,
-                        [SODS_DMA_CH(11)] = DMA2,
-                        [SODS_DMA_CH(12)] = DMA2,
-                        [SODS_DMA_CH(13)] = DMA2,
-                        [SODS_DMA_CH(14)] = DMA2,
-                        [SODS_DMA_CH(15)] = DMA2,
+                        [XWDS_DMA_CH(0)] = DMA1,
+                        [XWDS_DMA_CH(1)] = DMA1,
+                        [XWDS_DMA_CH(2)] = DMA1,
+                        [XWDS_DMA_CH(3)] = DMA1,
+                        [XWDS_DMA_CH(4)] = DMA1,
+                        [XWDS_DMA_CH(5)] = DMA1,
+                        [XWDS_DMA_CH(6)] = DMA1,
+                        [XWDS_DMA_CH(7)] = DMA1,
+                        [XWDS_DMA_CH(8)] = DMA2,
+                        [XWDS_DMA_CH(9)] = DMA2,
+                        [XWDS_DMA_CH(10)] = DMA2,
+                        [XWDS_DMA_CH(11)] = DMA2,
+                        [XWDS_DMA_CH(12)] = DMA2,
+                        [XWDS_DMA_CH(13)] = DMA2,
+                        [XWDS_DMA_CH(14)] = DMA2,
+                        [XWDS_DMA_CH(15)] = DMA2,
                 },
                 .ch2stream_map = {
-                        [SODS_DMA_CH(0)] = LL_DMA_STREAM_0,
-                        [SODS_DMA_CH(1)] = LL_DMA_STREAM_1,
-                        [SODS_DMA_CH(2)] = LL_DMA_STREAM_2,
-                        [SODS_DMA_CH(3)] = LL_DMA_STREAM_3,
-                        [SODS_DMA_CH(4)] = LL_DMA_STREAM_4,
-                        [SODS_DMA_CH(5)] = LL_DMA_STREAM_5,
-                        [SODS_DMA_CH(6)] = LL_DMA_STREAM_6,
-                        [SODS_DMA_CH(7)] = LL_DMA_STREAM_7,
-                        [SODS_DMA_CH(8)] = LL_DMA_STREAM_0,
-                        [SODS_DMA_CH(9)] = LL_DMA_STREAM_1,
-                        [SODS_DMA_CH(10)] = LL_DMA_STREAM_2,
-                        [SODS_DMA_CH(11)] = LL_DMA_STREAM_3,
-                        [SODS_DMA_CH(12)] = LL_DMA_STREAM_4,
-                        [SODS_DMA_CH(13)] = LL_DMA_STREAM_5,
-                        [SODS_DMA_CH(14)] = LL_DMA_STREAM_6,
-                        [SODS_DMA_CH(15)] = LL_DMA_STREAM_7,
+                        [XWDS_DMA_CH(0)] = LL_DMA_STREAM_0,
+                        [XWDS_DMA_CH(1)] = LL_DMA_STREAM_1,
+                        [XWDS_DMA_CH(2)] = LL_DMA_STREAM_2,
+                        [XWDS_DMA_CH(3)] = LL_DMA_STREAM_3,
+                        [XWDS_DMA_CH(4)] = LL_DMA_STREAM_4,
+                        [XWDS_DMA_CH(5)] = LL_DMA_STREAM_5,
+                        [XWDS_DMA_CH(6)] = LL_DMA_STREAM_6,
+                        [XWDS_DMA_CH(7)] = LL_DMA_STREAM_7,
+                        [XWDS_DMA_CH(8)] = LL_DMA_STREAM_0,
+                        [XWDS_DMA_CH(9)] = LL_DMA_STREAM_1,
+                        [XWDS_DMA_CH(10)] = LL_DMA_STREAM_2,
+                        [XWDS_DMA_CH(11)] = LL_DMA_STREAM_3,
+                        [XWDS_DMA_CH(12)] = LL_DMA_STREAM_4,
+                        [XWDS_DMA_CH(13)] = LL_DMA_STREAM_5,
+                        [XWDS_DMA_CH(14)] = LL_DMA_STREAM_6,
+                        [XWDS_DMA_CH(15)] = LL_DMA_STREAM_7,
                 },
         },
 };
 
 __atomic xwsq_t stm32cube_gpio_pin_state[] = {
-        [SODS_GPIO_PORT_A] = 0,
-        [SODS_GPIO_PORT_B] = 0,
-        [SODS_GPIO_PORT_C] = 0,
-        [SODS_GPIO_PORT_D] = 0,
-        [SODS_GPIO_PORT_E] = 0,
-        [SODS_GPIO_PORT_F] = 0,
-        [SODS_GPIO_PORT_G] = 0,
-        [SODS_GPIO_PORT_H] = 0,
-        [SODS_GPIO_PORT_I] = 0,
-        [SODS_GPIO_PORT_J] = 0,
-        [SODS_GPIO_PORT_K] = 0,
+        [XWDS_GPIO_PORT_A] = 0,
+        [XWDS_GPIO_PORT_B] = 0,
+        [XWDS_GPIO_PORT_C] = 0,
+        [XWDS_GPIO_PORT_D] = 0,
+        [XWDS_GPIO_PORT_E] = 0,
+        [XWDS_GPIO_PORT_F] = 0,
+        [XWDS_GPIO_PORT_G] = 0,
+        [XWDS_GPIO_PORT_H] = 0,
+        [XWDS_GPIO_PORT_I] = 0,
+        [XWDS_GPIO_PORT_J] = 0,
+        [XWDS_GPIO_PORT_K] = 0,
 };
 
 __xwds_soc_eirq_tbl_qualifier xwds_eirq_f stm32cube_eirq_isr[] = {
-        [SODS_EIRQ(0)] = NULL,
-        [SODS_EIRQ(1)] = NULL,
-        [SODS_EIRQ(2)] = NULL,
-        [SODS_EIRQ(3)] = NULL,
-        [SODS_EIRQ(4)] = NULL,
-        [SODS_EIRQ(5)] = NULL,
-        [SODS_EIRQ(6)] = NULL,
-        [SODS_EIRQ(7)] = NULL,
-        [SODS_EIRQ(8)] = NULL,
-        [SODS_EIRQ(9)] = NULL,
-        [SODS_EIRQ(10)] = NULL,
-        [SODS_EIRQ(11)] = NULL,
-        [SODS_EIRQ(12)] = NULL,
-        [SODS_EIRQ(13)] = NULL,
-        [SODS_EIRQ(14)] = NULL,
-        [SODS_EIRQ(15)] = NULL,
-        [SODS_EIRQ(16)] = NULL,
-        [SODS_EIRQ(17)] = NULL,
-        [SODS_EIRQ(18)] = NULL,
-        [SODS_EIRQ(19)] = NULL,
-        [SODS_EIRQ(20)] = NULL,
-        [SODS_EIRQ(21)] = NULL,
-        [SODS_EIRQ(22)] = NULL,
+        [XWDS_EIRQ(0)] = NULL,
+        [XWDS_EIRQ(1)] = NULL,
+        [XWDS_EIRQ(2)] = NULL,
+        [XWDS_EIRQ(3)] = NULL,
+        [XWDS_EIRQ(4)] = NULL,
+        [XWDS_EIRQ(5)] = NULL,
+        [XWDS_EIRQ(6)] = NULL,
+        [XWDS_EIRQ(7)] = NULL,
+        [XWDS_EIRQ(8)] = NULL,
+        [XWDS_EIRQ(9)] = NULL,
+        [XWDS_EIRQ(10)] = NULL,
+        [XWDS_EIRQ(11)] = NULL,
+        [XWDS_EIRQ(12)] = NULL,
+        [XWDS_EIRQ(13)] = NULL,
+        [XWDS_EIRQ(14)] = NULL,
+        [XWDS_EIRQ(15)] = NULL,
+        [XWDS_EIRQ(16)] = NULL,
+        [XWDS_EIRQ(17)] = NULL,
+        [XWDS_EIRQ(18)] = NULL,
+        [XWDS_EIRQ(19)] = NULL,
+        [XWDS_EIRQ(20)] = NULL,
+        [XWDS_EIRQ(21)] = NULL,
+        [XWDS_EIRQ(22)] = NULL,
 };
 
 __xwds_soc_eirq_tbl_qualifier xwds_eirq_arg_t stm32cube_eirq_israrg[] = {
-        [SODS_EIRQ(0)] = NULL,
-        [SODS_EIRQ(1)] = NULL,
-        [SODS_EIRQ(2)] = NULL,
-        [SODS_EIRQ(3)] = NULL,
-        [SODS_EIRQ(4)] = NULL,
-        [SODS_EIRQ(5)] = NULL,
-        [SODS_EIRQ(6)] = NULL,
-        [SODS_EIRQ(7)] = NULL,
-        [SODS_EIRQ(8)] = NULL,
-        [SODS_EIRQ(9)] = NULL,
-        [SODS_EIRQ(10)] = NULL,
-        [SODS_EIRQ(11)] = NULL,
-        [SODS_EIRQ(12)] = NULL,
-        [SODS_EIRQ(13)] = NULL,
-        [SODS_EIRQ(14)] = NULL,
-        [SODS_EIRQ(15)] = NULL,
-        [SODS_EIRQ(16)] = NULL,
-        [SODS_EIRQ(17)] = NULL,
-        [SODS_EIRQ(18)] = NULL,
-        [SODS_EIRQ(19)] = NULL,
-        [SODS_EIRQ(20)] = NULL,
-        [SODS_EIRQ(21)] = NULL,
-        [SODS_EIRQ(22)] = NULL,
+        [XWDS_EIRQ(0)] = NULL,
+        [XWDS_EIRQ(1)] = NULL,
+        [XWDS_EIRQ(2)] = NULL,
+        [XWDS_EIRQ(3)] = NULL,
+        [XWDS_EIRQ(4)] = NULL,
+        [XWDS_EIRQ(5)] = NULL,
+        [XWDS_EIRQ(6)] = NULL,
+        [XWDS_EIRQ(7)] = NULL,
+        [XWDS_EIRQ(8)] = NULL,
+        [XWDS_EIRQ(9)] = NULL,
+        [XWDS_EIRQ(10)] = NULL,
+        [XWDS_EIRQ(11)] = NULL,
+        [XWDS_EIRQ(12)] = NULL,
+        [XWDS_EIRQ(13)] = NULL,
+        [XWDS_EIRQ(14)] = NULL,
+        [XWDS_EIRQ(15)] = NULL,
+        [XWDS_EIRQ(16)] = NULL,
+        [XWDS_EIRQ(17)] = NULL,
+        [XWDS_EIRQ(18)] = NULL,
+        [XWDS_EIRQ(19)] = NULL,
+        [XWDS_EIRQ(20)] = NULL,
+        [XWDS_EIRQ(21)] = NULL,
+        [XWDS_EIRQ(22)] = NULL,
 };
 
 __atomic xwbmpop_declare(stm32cube_dma_channel_state_map, 16) = {0,};
 
 __xwds_soc_dma_tbl_qualifier
 xwds_dma_f stm32cube_dma_cbcb_array[16] = {
-        [SODS_DMA_CH(0)] = NULL,
-        [SODS_DMA_CH(1)] = NULL,
-        [SODS_DMA_CH(2)] = NULL,
-        [SODS_DMA_CH(3)] = NULL,
-        [SODS_DMA_CH(4)] = NULL,
-        [SODS_DMA_CH(5)] = NULL,
-        [SODS_DMA_CH(6)] = NULL,
-        [SODS_DMA_CH(7)] = NULL,
-        [SODS_DMA_CH(8)] = NULL,
-        [SODS_DMA_CH(9)] = NULL,
-        [SODS_DMA_CH(10)] = NULL,
-        [SODS_DMA_CH(11)] = NULL,
-        [SODS_DMA_CH(12)] = NULL,
-        [SODS_DMA_CH(13)] = NULL,
-        [SODS_DMA_CH(14)] = NULL,
-        [SODS_DMA_CH(15)] = NULL,
+        [XWDS_DMA_CH(0)] = NULL,
+        [XWDS_DMA_CH(1)] = NULL,
+        [XWDS_DMA_CH(2)] = NULL,
+        [XWDS_DMA_CH(3)] = NULL,
+        [XWDS_DMA_CH(4)] = NULL,
+        [XWDS_DMA_CH(5)] = NULL,
+        [XWDS_DMA_CH(6)] = NULL,
+        [XWDS_DMA_CH(7)] = NULL,
+        [XWDS_DMA_CH(8)] = NULL,
+        [XWDS_DMA_CH(9)] = NULL,
+        [XWDS_DMA_CH(10)] = NULL,
+        [XWDS_DMA_CH(11)] = NULL,
+        [XWDS_DMA_CH(12)] = NULL,
+        [XWDS_DMA_CH(13)] = NULL,
+        [XWDS_DMA_CH(14)] = NULL,
+        [XWDS_DMA_CH(15)] = NULL,
 };
 
 __xwds_soc_dma_tbl_qualifier
 xwds_dma_cbarg_t stm32cube_dma_chcbarg_array[16] = {
-        [SODS_DMA_CH(0)] = NULL,
-        [SODS_DMA_CH(1)] = NULL,
-        [SODS_DMA_CH(2)] = NULL,
-        [SODS_DMA_CH(3)] = NULL,
-        [SODS_DMA_CH(4)] = NULL,
-        [SODS_DMA_CH(5)] = NULL,
-        [SODS_DMA_CH(6)] = NULL,
-        [SODS_DMA_CH(7)] = NULL,
-        [SODS_DMA_CH(8)] = NULL,
-        [SODS_DMA_CH(9)] = NULL,
-        [SODS_DMA_CH(10)] = NULL,
-        [SODS_DMA_CH(11)] = NULL,
-        [SODS_DMA_CH(12)] = NULL,
-        [SODS_DMA_CH(13)] = NULL,
-        [SODS_DMA_CH(14)] = NULL,
-        [SODS_DMA_CH(15)] = NULL,
+        [XWDS_DMA_CH(0)] = NULL,
+        [XWDS_DMA_CH(1)] = NULL,
+        [XWDS_DMA_CH(2)] = NULL,
+        [XWDS_DMA_CH(3)] = NULL,
+        [XWDS_DMA_CH(4)] = NULL,
+        [XWDS_DMA_CH(5)] = NULL,
+        [XWDS_DMA_CH(6)] = NULL,
+        [XWDS_DMA_CH(7)] = NULL,
+        [XWDS_DMA_CH(8)] = NULL,
+        [XWDS_DMA_CH(9)] = NULL,
+        [XWDS_DMA_CH(10)] = NULL,
+        [XWDS_DMA_CH(11)] = NULL,
+        [XWDS_DMA_CH(12)] = NULL,
+        [XWDS_DMA_CH(13)] = NULL,
+        [XWDS_DMA_CH(14)] = NULL,
+        [XWDS_DMA_CH(15)] = NULL,
 };
 
 struct xwds_soc stm32cube_soc_cb = {
@@ -643,12 +643,12 @@ xwer_t stm32cube_soc_drv_eirq_req(struct xwds_soc * soc,
                 eicfg.LineCommand = ENABLE;
                 eicfg.Mode = LL_EXTI_MODE_IT;
                 eicfg.Trigger = LL_EXTI_TRIGGER_NONE;
-                if (SODS_SOC_EIF_TM_RISING & eiflag) {
+                if (XWDS_SOC_EIF_TM_RISING & eiflag) {
                         eicfg.Trigger |= LL_EXTI_TRIGGER_RISING;
                 } else {
                         eicfg.Trigger &= ~(LL_EXTI_TRIGGER_RISING);
                 }
-                if (SODS_SOC_EIF_TM_FALLING & eiflag) {
+                if (XWDS_SOC_EIF_TM_FALLING & eiflag) {
                         eicfg.Trigger |= LL_EXTI_TRIGGER_FALLING;
                 } else {
                         eicfg.Trigger &= ~(LL_EXTI_TRIGGER_FALLING);
@@ -982,10 +982,10 @@ void stm32cube_dma1_stream0_isr(void)
 
         if ((soc->dma.chcbs) && (soc->dma.chcbs[0])) {
                 if (soc->dma.chcbargs) {
-                        soc->dma.chcbs[0](soc, SODS_DMA_CH(0), dmarc,
+                        soc->dma.chcbs[0](soc, XWDS_DMA_CH(0), dmarc,
                                           soc->dma.chcbargs[0]);
                 } else {
-                        soc->dma.chcbs[0](soc, SODS_DMA_CH(0), dmarc, NULL);
+                        soc->dma.chcbs[0](soc, XWDS_DMA_CH(0), dmarc, NULL);
                 }
         }
 }
@@ -1025,10 +1025,10 @@ void stm32cube_dma1_stream1_isr(void)
 
         if ((soc->dma.chcbs) && (soc->dma.chcbs[1])) {
                 if (soc->dma.chcbargs) {
-                        soc->dma.chcbs[1](soc, SODS_DMA_CH(1), dmarc,
+                        soc->dma.chcbs[1](soc, XWDS_DMA_CH(1), dmarc,
                                           soc->dma.chcbargs[1]);
                 } else {
-                        soc->dma.chcbs[1](soc, SODS_DMA_CH(1), dmarc, NULL);
+                        soc->dma.chcbs[1](soc, XWDS_DMA_CH(1), dmarc, NULL);
                 }
         }
 }
@@ -1068,10 +1068,10 @@ void stm32cube_dma1_stream2_isr(void)
 
         if ((soc->dma.chcbs) && (soc->dma.chcbs[2])) {
                 if (soc->dma.chcbargs) {
-                        soc->dma.chcbs[2](soc, SODS_DMA_CH(2), dmarc,
+                        soc->dma.chcbs[2](soc, XWDS_DMA_CH(2), dmarc,
                                           soc->dma.chcbargs[2]);
                 } else {
-                        soc->dma.chcbs[2](soc, SODS_DMA_CH(2), dmarc, NULL);
+                        soc->dma.chcbs[2](soc, XWDS_DMA_CH(2), dmarc, NULL);
                 }
         }
 }
@@ -1111,10 +1111,10 @@ void stm32cube_dma1_stream3_isr(void)
 
         if ((soc->dma.chcbs) && (soc->dma.chcbs[3])) {
                 if (soc->dma.chcbargs) {
-                        soc->dma.chcbs[3](soc, SODS_DMA_CH(3), dmarc,
+                        soc->dma.chcbs[3](soc, XWDS_DMA_CH(3), dmarc,
                                           soc->dma.chcbargs[3]);
                 } else {
-                        soc->dma.chcbs[3](soc, SODS_DMA_CH(3), dmarc, NULL);
+                        soc->dma.chcbs[3](soc, XWDS_DMA_CH(3), dmarc, NULL);
                 }
         }
 }
@@ -1154,10 +1154,10 @@ void stm32cube_dma1_stream4_isr(void)
 
         if ((soc->dma.chcbs) && (soc->dma.chcbs[4])) {
                 if (soc->dma.chcbargs) {
-                        soc->dma.chcbs[4](soc, SODS_DMA_CH(4), dmarc,
+                        soc->dma.chcbs[4](soc, XWDS_DMA_CH(4), dmarc,
                                           soc->dma.chcbargs[4]);
                 } else {
-                        soc->dma.chcbs[4](soc, SODS_DMA_CH(4), dmarc, NULL);
+                        soc->dma.chcbs[4](soc, XWDS_DMA_CH(4), dmarc, NULL);
                 }
         }
 }
@@ -1197,10 +1197,10 @@ void stm32cube_dma1_stream5_isr(void)
 
         if ((soc->dma.chcbs) && (soc->dma.chcbs[5])) {
                 if (soc->dma.chcbargs) {
-                        soc->dma.chcbs[5](soc, SODS_DMA_CH(5), dmarc,
+                        soc->dma.chcbs[5](soc, XWDS_DMA_CH(5), dmarc,
                                           soc->dma.chcbargs[5]);
                 } else {
-                        soc->dma.chcbs[5](soc, SODS_DMA_CH(5), dmarc, NULL);
+                        soc->dma.chcbs[5](soc, XWDS_DMA_CH(5), dmarc, NULL);
                 }
         }
 }
@@ -1240,10 +1240,10 @@ void stm32cube_dma1_stream6_isr(void)
 
         if ((soc->dma.chcbs) && (soc->dma.chcbs[6])) {
                 if (soc->dma.chcbargs) {
-                        soc->dma.chcbs[6](soc, SODS_DMA_CH(6), dmarc,
+                        soc->dma.chcbs[6](soc, XWDS_DMA_CH(6), dmarc,
                                           soc->dma.chcbargs[6]);
                 } else {
-                        soc->dma.chcbs[6](soc, SODS_DMA_CH(6), dmarc, NULL);
+                        soc->dma.chcbs[6](soc, XWDS_DMA_CH(6), dmarc, NULL);
                 }
         }
 }
@@ -1283,10 +1283,10 @@ void stm32cube_dma1_stream7_isr(void)
 
         if ((soc->dma.chcbs) && (soc->dma.chcbs[7])) {
                 if (soc->dma.chcbargs) {
-                        soc->dma.chcbs[7](soc, SODS_DMA_CH(7), dmarc,
+                        soc->dma.chcbs[7](soc, XWDS_DMA_CH(7), dmarc,
                                           soc->dma.chcbargs[7]);
                 } else {
-                        soc->dma.chcbs[7](soc, SODS_DMA_CH(7), dmarc, NULL);
+                        soc->dma.chcbs[7](soc, XWDS_DMA_CH(7), dmarc, NULL);
                 }
         }
 }
@@ -1326,10 +1326,10 @@ void stm32cube_dma2_stream0_isr(void)
 
         if ((soc->dma.chcbs) && (soc->dma.chcbs[8])) {
                 if (soc->dma.chcbargs) {
-                        soc->dma.chcbs[0](soc, SODS_DMA_CH(8), dmarc,
+                        soc->dma.chcbs[0](soc, XWDS_DMA_CH(8), dmarc,
                                           soc->dma.chcbargs[8]);
                 } else {
-                        soc->dma.chcbs[0](soc, SODS_DMA_CH(8), dmarc, NULL);
+                        soc->dma.chcbs[0](soc, XWDS_DMA_CH(8), dmarc, NULL);
                 }
         }
 }
@@ -1369,10 +1369,10 @@ void stm32cube_dma2_stream1_isr(void)
 
         if ((soc->dma.chcbs) && (soc->dma.chcbs[9])) {
                 if (soc->dma.chcbargs) {
-                        soc->dma.chcbs[9](soc, SODS_DMA_CH(9), dmarc,
+                        soc->dma.chcbs[9](soc, XWDS_DMA_CH(9), dmarc,
                                           soc->dma.chcbargs[9]);
                 } else {
-                        soc->dma.chcbs[9](soc, SODS_DMA_CH(9), dmarc, NULL);
+                        soc->dma.chcbs[9](soc, XWDS_DMA_CH(9), dmarc, NULL);
                 }
         }
 }
@@ -1412,10 +1412,10 @@ void stm32cube_dma2_stream2_isr(void)
 
         if ((soc->dma.chcbs) && (soc->dma.chcbs[10])) {
                 if (soc->dma.chcbargs) {
-                        soc->dma.chcbs[10](soc, SODS_DMA_CH(10), dmarc,
+                        soc->dma.chcbs[10](soc, XWDS_DMA_CH(10), dmarc,
                                            soc->dma.chcbargs[10]);
                 } else {
-                        soc->dma.chcbs[10](soc, SODS_DMA_CH(10), dmarc, NULL);
+                        soc->dma.chcbs[10](soc, XWDS_DMA_CH(10), dmarc, NULL);
                 }
         }
 }
@@ -1455,10 +1455,10 @@ void stm32cube_dma2_stream3_isr(void)
 
         if ((soc->dma.chcbs) && (soc->dma.chcbs[11])) {
                 if (soc->dma.chcbargs) {
-                        soc->dma.chcbs[11](soc, SODS_DMA_CH(11), dmarc,
+                        soc->dma.chcbs[11](soc, XWDS_DMA_CH(11), dmarc,
                                            soc->dma.chcbargs[11]);
                 } else {
-                        soc->dma.chcbs[11](soc, SODS_DMA_CH(11), dmarc, NULL);
+                        soc->dma.chcbs[11](soc, XWDS_DMA_CH(11), dmarc, NULL);
                 }
         }
 }
@@ -1498,10 +1498,10 @@ void stm32cube_dma2_stream4_isr(void)
 
         if ((soc->dma.chcbs) && (soc->dma.chcbs[12])) {
                 if (soc->dma.chcbargs) {
-                        soc->dma.chcbs[12](soc, SODS_DMA_CH(12), dmarc,
+                        soc->dma.chcbs[12](soc, XWDS_DMA_CH(12), dmarc,
                                            soc->dma.chcbargs[12]);
                 } else {
-                        soc->dma.chcbs[12](soc, SODS_DMA_CH(12), dmarc, NULL);
+                        soc->dma.chcbs[12](soc, XWDS_DMA_CH(12), dmarc, NULL);
                 }
         }
 }
@@ -1541,10 +1541,10 @@ void stm32cube_dma2_stream5_isr(void)
 
         if ((soc->dma.chcbs) && (soc->dma.chcbs[13])) {
                 if (soc->dma.chcbargs) {
-                        soc->dma.chcbs[13](soc, SODS_DMA_CH(13), dmarc,
+                        soc->dma.chcbs[13](soc, XWDS_DMA_CH(13), dmarc,
                                            soc->dma.chcbargs[13]);
                 } else {
-                        soc->dma.chcbs[13](soc, SODS_DMA_CH(13), dmarc, NULL);
+                        soc->dma.chcbs[13](soc, XWDS_DMA_CH(13), dmarc, NULL);
                 }
         }
 }
@@ -1584,10 +1584,10 @@ void stm32cube_dma2_stream6_isr(void)
 
         if ((soc->dma.chcbs) && (soc->dma.chcbs[14])) {
                 if (soc->dma.chcbargs) {
-                        soc->dma.chcbs[14](soc, SODS_DMA_CH(14), dmarc,
+                        soc->dma.chcbs[14](soc, XWDS_DMA_CH(14), dmarc,
                                            soc->dma.chcbargs[14]);
                 } else {
-                        soc->dma.chcbs[14](soc, SODS_DMA_CH(14), dmarc, NULL);
+                        soc->dma.chcbs[14](soc, XWDS_DMA_CH(14), dmarc, NULL);
                 }
         }
 }
@@ -1627,10 +1627,10 @@ void stm32cube_dma2_stream7_isr(void)
 
         if ((soc->dma.chcbs) && (soc->dma.chcbs[15])) {
                 if (soc->dma.chcbargs) {
-                        soc->dma.chcbs[15](soc, SODS_DMA_CH(15), dmarc,
+                        soc->dma.chcbs[15](soc, XWDS_DMA_CH(15), dmarc,
                                            soc->dma.chcbargs[15]);
                 } else {
-                        soc->dma.chcbs[15](soc, SODS_DMA_CH(15), dmarc, NULL);
+                        soc->dma.chcbs[15](soc, XWDS_DMA_CH(15), dmarc, NULL);
                 }
         }
 }

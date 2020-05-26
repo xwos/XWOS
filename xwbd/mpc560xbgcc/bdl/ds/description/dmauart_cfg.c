@@ -189,11 +189,11 @@ const struct soc_dmauart_private_cfg mpc560xb_uart0_xwccfg = {
 const struct xwds_uart_cfg mpc560xb_uart0_cfg = {
         .baudrate = B2000000,
         .bus.bit = {
-                .bits = SODS_UART_BITS_9,
-                .stopbits = SODS_UART_STOPBITS_1_0,
-                .parity = SODS_UART_PARITY_NONE,
-                .hfc = SODS_UART_HFC_NONE,
-                .mode = SODS_UART_MODE_RX | SODS_UART_MODE_TX,
+                .bits = XWDS_UART_BITS_9,
+                .stopbits = XWDS_UART_STOPBITS_1_0,
+                .parity = XWDS_UART_PARITY_NONE,
+                .hfc = XWDS_UART_HFC_NONE,
+                .mode = XWDS_UART_MODE_RX | XWDS_UART_MODE_TX,
         },
         .xwccfg = (void *)&mpc560xb_uart0_xwccfg,
 };

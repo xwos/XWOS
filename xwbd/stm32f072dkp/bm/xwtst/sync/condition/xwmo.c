@@ -141,7 +141,7 @@ xwer_t bm_xwtst_sync_condition_wthrd_func(void * arg)
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
                 xwosal_splk_lock_cpuirqsv(&bm_xwtst_sync_lock, &cpuirq);
                 if (bm_xwtst_sync_flag) {
-                        xwlogf(INFO, "Acquired!");
+                        xwlogf(INFO, "cdttst", "Acquired!");
                         bm_xwtst_sync_flag = false;
                 } else {
                         time = 10 * XWTM_S;
@@ -149,17 +149,17 @@ xwer_t bm_xwtst_sync_condition_wthrd_func(void * arg)
                                                   ulk, XWLK_TYPE_SPLK, NULL,
                                                   &time, &lkst);
                         if (OK == rc) {
-                                xwlogf(INFO, "Acquired!");
+                                xwlogf(INFO, "cdttst", "Acquired!");
                                 bm_xwtst_sync_flag = false;
                         } else {
                                 if (XWLK_STATE_UNLOCKED == lkst) {
                                         xwosal_splk_lock(&bm_xwtst_sync_lock);
                                 }
                                 if (bm_xwtst_sync_flag) {
-                                        xwlogf(INFO, "Acquired!");
+                                        xwlogf(INFO, "cdttst", "Acquired!");
                                         bm_xwtst_sync_flag = false;
                                 } else {
-                                        xwlogf(INFO, "Error:%d\n", rc);
+                                        xwlogf(INFO, "cdttst", "Error:%d\n", rc);
                                 }
                         }
                 }

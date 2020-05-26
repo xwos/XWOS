@@ -47,22 +47,12 @@ __xwbsp_code
 void soc_log_init(void);
 
 __xwbsp_code
-void soc_log_putc(const char c);
-
-__xwbsp_code
-xwssz_t soc_log_puts(const char * s);
-
-__xwbsp_code
-xwssz_t soc_log_putns(const char * s, xwsz_t n);
+xwssz_t soc_log_write(const char * s, xwsz_t n);
 #else /* #if (defined(SOCCFG_LOG) && (1 == SOCCFG_LOG)) */
-#define soc_log_init()
-#define soc_log_putc(c)
-#define soc_log_puts(s)
-#define soc_log_putns(s, n)
+  #define soc_log_init()
+  #define soc_log_write(s, n)
 #endif /* #if (defined(SOCCFG_LOG) && (1 == SOCCFG_LOG)) #else */
 
-#define soc_log_isr_putc(c)             soc_log_putc(c)
-#define soc_log_isr_puts(s)             soc_log_puts(s)
-#define soc_log_isr_putns(s, n)         soc_log_putns(s, n)
+#define soc_log_isr_write(s, n)         soc_log_write(s, n)
 
 #endif /* soc_log.h */

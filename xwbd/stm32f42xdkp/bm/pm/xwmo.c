@@ -37,13 +37,13 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define BM_PM_THRD_PRIORITY XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
 
-#define BM_PM_BTN_GPIO_PORT SODS_GPIO_PORT_I
-#define BM_PM_BTN_GPIO_PIN SODS_GPIO_PIN_8
+#define BM_PM_BTN_GPIO_PORT XWDS_GPIO_PORT_I
+#define BM_PM_BTN_GPIO_PIN XWDS_GPIO_PIN_8
 #define BM_PM_BTN_DEBOUNCING_DELAY (20 * XWTM_MS)
 #define BM_PM_BTN_LONGPRESS_CNT (100)
 
-#define BM_PM_LED_GPIO_PORT SODS_GPIO_PORT_G
-#define BM_PM_LED_GPIO_PIN SODS_GPIO_PIN_7
+#define BM_PM_LED_GPIO_PORT XWDS_GPIO_PORT_G
+#define BM_PM_LED_GPIO_PIN XWDS_GPIO_PIN_7
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -282,7 +282,7 @@ xwer_t bm_pm_thrd_init(void)
         }
         rc = xwds_eirq_req(&stm32cube_soc_cb,
                            BM_PM_BTN_GPIO_PORT, BM_PM_BTN_GPIO_PIN,
-                           8, SODS_SOC_EIF_TM_FALLING | SODS_SOC_EIF_WKUP,
+                           8, XWDS_SOC_EIF_TM_FALLING | XWDS_SOC_EIF_WKUP,
                            bm_pm_eirq_btn_isr, &bm_pm_smr);
         if (__unlikely(rc < 0)) {
                 goto err_eirq_req;
@@ -309,7 +309,7 @@ void bm_pm_req_btn_irq(void)
 {
         xwds_eirq_req(&stm32cube_soc_cb,
                       BM_PM_BTN_GPIO_PORT, BM_PM_BTN_GPIO_PIN,
-                      8, SODS_SOC_EIF_TM_FALLING | SODS_SOC_EIF_WKUP,
+                      8, XWDS_SOC_EIF_TM_FALLING | XWDS_SOC_EIF_WKUP,
                       bm_pm_eirq_btn_isr, &bm_pm_smr);
 }
 

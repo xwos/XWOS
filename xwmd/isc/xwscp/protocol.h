@@ -59,7 +59,8 @@
  * @brief 调试XWSCP的日志函数
  */
 #if defined(XWMDCFG_isc_xwscp_LOG) && (1 == XWMDCFG_isc_xwscp_LOG)
-  #define xwscplogf(lv, fmt, ...)        xwlogf(lv, fmt, ##__VA_ARGS__)
+  #define XWSCP_LOG_TAG                 "xwscp"
+  #define xwscplogf(lv, fmt, ...)        xwlogf(lv, XWSCP_LOG_TAG, fmt, ##__VA_ARGS__)
 #else /* XWMDCFG_isc_xwscp_LOG */
   #define xwscplogf(lv, fmt, ...)
 #endif /* !XWMDCFG_isc_xwscp_LOG */

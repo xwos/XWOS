@@ -527,27 +527,27 @@ xwer_t mpc560xb_spim_drv_xfer(struct xwds_spim * spim,
         reg = resources->regrsc_array[0].base;
 
         /* setup format */
-        if (msg->flags & SODS_SPIM_FF_FO_LSB) {
+        if (msg->flags & XWDS_SPIM_FF_FO_LSB) {
                 reg->CTAR[0].B.LSBFE = 1;
         } else {
                 reg->CTAR[0].B.LSBFE = 0;
         }
 
-        if (msg->flags & SODS_SPIM_FF_CPHA_LSTC) {
+        if (msg->flags & XWDS_SPIM_FF_CPHA_LSTC) {
                 reg->CTAR[0].B.CPHA = 1;
         } else {
                 reg->CTAR[0].B.CPHA = 0;
         }
 
-        if (msg->flags & SODS_SPIM_FF_CPOL_HIGH) {
+        if (msg->flags & XWDS_SPIM_FF_CPOL_HIGH) {
                 reg->CTAR[0].B.CPOL = 1;
         } else {
                 reg->CTAR[0].B.CPOL = 0;
         }
 
-        if (SODS_SPIM_FF_WL_8 == (msg->flags & SODS_SPIM_FF_WL_MSK)) {
+        if (XWDS_SPIM_FF_WL_8 == (msg->flags & XWDS_SPIM_FF_WL_MSK)) {
                 reg->CTAR[0].B.FMSZ = 7;
-        } else if (SODS_SPIM_FF_WL_16 == (msg->flags & SODS_SPIM_FF_WL_MSK)) {
+        } else if (XWDS_SPIM_FF_WL_16 == (msg->flags & XWDS_SPIM_FF_WL_MSK)) {
                 reg->CTAR[0].B.FMSZ = 15;
         } else {
                 rc = -ENOSYS;
@@ -572,7 +572,7 @@ xwer_t mpc560xb_spim_drv_xfer(struct xwds_spim * spim,
         drvdata->msg = msg;
         if (msg->size > 0) {
                 reg->RSER.R |= 0x02020000; /* enable TFFF_RE & RFDF_RE IRQs */
-                if (msg->flags & SODS_SPIM_FF_CS_CONTINUOUS) {
+                if (msg->flags & XWDS_SPIM_FF_CS_CONTINUOUS) {
                         pushr |= 0x80000000; /* CONT flag */
                 }
                 if (msg->cs_pin_msk) {
@@ -585,7 +585,7 @@ xwer_t mpc560xb_spim_drv_xfer(struct xwds_spim * spim,
                         pushr |= 0x08000000; /* EOQ flag */
                         reg->RSER.B.TFFFRE = 0;
                 }
-                if (SODS_SPIM_FF_WL_8 == (msg->flags & SODS_SPIM_FF_WL_MSK)) {
+                if (XWDS_SPIM_FF_WL_8 == (msg->flags & XWDS_SPIM_FF_WL_MSK)) {
                         pushr |= msg->txq.d8[0];
                         reg->PUSHR.R = pushr;
                 } else {
@@ -630,11 +630,11 @@ void mpc560xb_spim_isr_tfuf_rfof(void)
 
         if (reg->SR.B.TFUF) {
                 reg->SR.B.TFUF = 1;
-                xwisrlogf(ERR, "TX queue underflow!");
+                xwisrlogf(ERR, "spim", "TX queue underflow!");
         }
         if (reg->SR.B.RFOF) {
                 reg->SR.B.RFOF = 1;
-                xwisrlogf(ERR, "RX queue overflow!");
+                xwisrlogf(ERR, "spim", "RX queue overflow!");
         }
 }
 
@@ -662,7 +662,7 @@ void mpc560xb_spim_isr_tfff(void)
         xwosal_splk_lock_cpuirqsv(&drvdata->lock, &cpuirq);
         msg = drvdata->msg;
         if (msg) {
-                if (msg->flags & SODS_SPIM_FF_CS_CONTINUOUS) {
+                if (msg->flags & XWDS_SPIM_FF_CS_CONTINUOUS) {
                         pushr |= 0x80000000; /* CONT flag */
                 }
                 if (msg->cs_pin_msk) {
@@ -675,7 +675,7 @@ void mpc560xb_spim_isr_tfff(void)
                         pushr |= 0x08000000; /* EOQ flag */
                         reg->RSER.B.TFFFRE = 0;
                 }
-                if (SODS_SPIM_FF_WL_8 == (msg->flags & SODS_SPIM_FF_WL_MSK)) {
+                if (XWDS_SPIM_FF_WL_8 == (msg->flags & XWDS_SPIM_FF_WL_MSK)) {
                         pushr |= msg->txq.d8[drvdata->txpos];
                         reg->PUSHR.R = pushr;
                 } else {
@@ -713,7 +713,7 @@ void mpc560xb_spim_isr_rfdf(void)
         xwosal_splk_lock_cpuirqsv(&drvdata->lock, &cpuirq);
         msg = drvdata->msg;
         if (msg) {
-                if (SODS_SPIM_FF_WL_8 == (msg->flags & SODS_SPIM_FF_WL_MSK)) {
+                if (XWDS_SPIM_FF_WL_8 == (msg->flags & XWDS_SPIM_FF_WL_MSK)) {
                         msg->rxq.d8[drvdata->rxpos] = (xwu8_t)reg->POPR.R;
                         drvdata->rxpos++;
                 } else {

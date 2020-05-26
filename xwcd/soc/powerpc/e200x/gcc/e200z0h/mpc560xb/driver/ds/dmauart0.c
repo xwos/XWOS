@@ -235,23 +235,23 @@ xwer_t mpc560xb_dmauart0_drv_start(struct xwds_device * dev)
         /* stop bit */
         LINFLEX_0.GCR.B.STOP = cfg->bus.bit.stopbits? 1 : 0;
 
-        if (SODS_UART_PARITY_NONE == cfg->bus.bit.parity) {
+        if (XWDS_UART_PARITY_NONE == cfg->bus.bit.parity) {
                 LINFLEX_0.UARTCR.B.PCE = 0;
         } else {
                 LINFLEX_0.UARTCR.B.PCE = 1; /* enable parity */
-                if (SODS_UART_PARITY_ODD == cfg->bus.bit.parity)
+                if (XWDS_UART_PARITY_ODD == cfg->bus.bit.parity)
                         LINFLEX_0.UARTCR.B.PC0 = 1;
                 else
                         LINFLEX_0.UARTCR.B.PC0 = 0;
         }
 
-        if (SODS_UART_MODE_TX & cfg->bus.bit.mode) {
+        if (XWDS_UART_MODE_TX & cfg->bus.bit.mode) {
                 LINFLEX_0.UARTCR.B.TFBM = 1;
                 LINFLEX_0.UARTCR.B.TXEN = 1;
                 txdmarsc = dmauartc->txdmarsc;
                 LINFLEX_0.DMATXE.B.DTE0 = 1;
         }
-        if (SODS_UART_MODE_RX & cfg->bus.bit.mode) {
+        if (XWDS_UART_MODE_RX & cfg->bus.bit.mode) {
                 LINFLEX_0.UARTCR.B.RFBM = 1;
                 LINFLEX_0.UARTCR.B.RXEN = 1;
                 rxdmarsc = dmauartc->rxdmarsc;
@@ -642,10 +642,10 @@ void mpc560xb_dmauart0_rxdma_cb(struct xwds_soc * soc, xwid_t ch, xwu32_t res,
                                 rc = xwds_dma_enable(rxdmarsc->soc, rxdmarsc->ch);
                         } while (rc < 0);
                 } else {
-                        xwds_dmauartc_lib_rxq_pub(dmauartc, SODS_DMAUART_RXQ_SIZE);
+                        xwds_dmauartc_lib_rxq_pub(dmauartc, XWDS_DMAUART_RXQ_SIZE);
                 }
         } else {
-                SODS_BUG();
+                XWDS_BUG();
         }
 }
 

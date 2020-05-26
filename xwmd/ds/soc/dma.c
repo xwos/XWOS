@@ -34,7 +34,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief SODS API：申请DMA的通道
+ * @brief XWDS API：申请DMA的通道
  * @param soc: (I) SOC对象指针
  * @param ch: (I) DMA通道
  * @return 错误码
@@ -55,8 +55,8 @@ xwer_t xwds_dma_req(struct xwds_soc * soc, xwid_t ch)
         const struct xwds_soc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
@@ -86,7 +86,7 @@ err_soc_grab:
 }
 
 /**
- * @brief SODS API：释放DMA的通道
+ * @brief XWDS API：释放DMA的通道
  * @param soc: (I) SOC对象指针
  * @param ch: (I) DMA通道
  * @return 错误码
@@ -107,8 +107,8 @@ xwer_t xwds_dma_rls(struct xwds_soc * soc, xwid_t ch)
         const struct xwds_soc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
         if (__unlikely(!xwbmpaop_t1i(soc->dma.chstatus, ch))) {
                 rc = -EPERM;
@@ -131,7 +131,7 @@ err_notreq:
 }
 
 /**
- * @brief SODS API：配置DMA的通道
+ * @brief XWDS API：配置DMA的通道
  * @param soc: (I) SOC对象指针
  * @param ch: (I) DMA通道
  * @param cfg: (I) SOC DMA通道配置
@@ -156,8 +156,8 @@ xwer_t xwds_dma_cfg(struct xwds_soc * soc, xwid_t ch, void * cfg,
         const struct xwds_soc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
         if (__unlikely(!xwbmpaop_t1i(soc->dma.chstatus, ch))) {
                 rc = -EPERM;
@@ -199,7 +199,7 @@ err_notreq:
 }
 
 /**
- * @brief SODS API：打开DMA的通道
+ * @brief XWDS API：打开DMA的通道
  * @param soc: (I) SOC对象指针
  * @param ch: (I) DMA通道
  * @return 错误码
@@ -220,8 +220,8 @@ xwer_t xwds_dma_enable(struct xwds_soc * soc, xwid_t ch)
         const struct xwds_soc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
         if (__unlikely(!xwbmpaop_t1i(soc->dma.chstatus, ch))) {
                 rc = -EPERM;
@@ -242,7 +242,7 @@ err_notreq:
 }
 
 /**
- * @brief SODS API：关闭DMA的通道
+ * @brief XWDS API：关闭DMA的通道
  * @param soc: (I) SOC对象指针
  * @param ch: (I) DMA通道
  * @return 错误码
@@ -263,8 +263,8 @@ xwer_t xwds_dma_disable(struct xwds_soc * soc, xwid_t ch)
         const struct xwds_soc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
         if (__unlikely(!xwbmpaop_t1i(soc->dma.chstatus, ch))) {
                 rc = -EPERM;
@@ -285,7 +285,7 @@ err_notreq:
 }
 
 /**
- * @brief SODS API：启动DMA的通道
+ * @brief XWDS API：启动DMA的通道
  * @param soc: (I) SOC对象指针
  * @param ch: (I) DMA通道
  * @return 错误码
@@ -306,8 +306,8 @@ xwer_t xwds_dma_start(struct xwds_soc * soc, xwid_t ch)
         const struct xwds_soc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
         if (__unlikely(!xwbmpaop_t1i(soc->dma.chstatus, ch))) {
                 rc = -EPERM;
@@ -328,7 +328,7 @@ err_notreq:
 }
 
 /**
- * @brief SODS API：停止DMA的通道
+ * @brief XWDS API：停止DMA的通道
  * @param soc: (I) SOC对象指针
  * @param ch: (I) DMA通道
  * @return 错误码
@@ -349,8 +349,8 @@ xwer_t xwds_dma_stop(struct xwds_soc * soc, xwid_t ch)
         const struct xwds_soc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
         if (__unlikely(!xwbmpaop_t1i(soc->dma.chstatus, ch))) {
                 rc = -EPERM;
@@ -371,7 +371,7 @@ err_notreq:
 }
 
 /**
- * @brief SODS LIB：通过描述得到DMA资源
+ * @brief XWDS LIB：通过描述得到DMA资源
  * @param base: (I) DMA资源数组的基地址
  * @param num: (I) DMA资源数量
  * @param descay: (I) 寄存器描述数组

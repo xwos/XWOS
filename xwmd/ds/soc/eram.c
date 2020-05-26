@@ -32,7 +32,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief SODS API：测试RAM
+ * @brief XWDS API：测试RAM
  * @param soc: (I) SOC对象指针
  * @param erraddr: (I) 返回错误地址的缓冲区的指针
  * @return 错误码
@@ -51,8 +51,8 @@ xwer_t xwds_eram_test(struct xwds_soc * soc, xwptr_t * erraddr)
         const struct xwds_soc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE(erraddr, "nullptr", -EFAULT);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(erraddr, "nullptr", -EFAULT);
 
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {

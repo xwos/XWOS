@@ -19,10 +19,10 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern xwssz_t soc_log_putns(const char * s, xwsz_t n);
-extern xwssz_t brd_log_putns(const char * s, xwsz_t n);
-extern xwssz_t soc_log_isr_putns(const char * s, xwsz_t n);
-extern xwssz_t brd_log_isr_putns(const char * s, xwsz_t n);
+extern xwssz_t soc_log_write(const char * s, xwsz_t n);
+extern xwssz_t board_log_write(const char * s, xwsz_t n);
+extern xwssz_t soc_log_isr_write(const char * s, xwsz_t n);
+extern xwssz_t board_log_isr_write(const char * s, xwsz_t n);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -32,7 +32,7 @@ extern xwssz_t brd_log_isr_putns(const char * s, xwsz_t n);
  * @param fmt: (I) 格式的字符串
  * @param ...: (I) 需要转换位字符串的其他参数
  * @note
- * - 同步/异步：同@ref soc_log_putns()的实现
+ * - 同步/异步：同@ref soc_log_write()的实现
  * - 上下文：线程
  */
 __xwlib_code
@@ -48,9 +48,9 @@ int xwpf(const char * fmt, ...)
 
         /* Print the string */
 #if defined(SOCCFG_LOG) && (1 == SOCCFG_LOG)
-        soc_log_putns(buf, (xwsz_t)i);
+        soc_log_write(buf, (xwsz_t)i);
 #elif defined(BRDCFG_LOG) && (1 == BRDCFG_LOG)
-        brd_log_putns(buf, (xwsz_t)i);
+        board_log_write(buf, (xwsz_t)i);
 #else
   #warning "Can't find the log configurations!"
 #endif
@@ -62,7 +62,7 @@ int xwpf(const char * fmt, ...)
  * @param fmt: (I) 格式的字符串
  * @param ...: (I) 需要转换位字符串的其他参数
  * @note
- * - 同步/异步：同@ref soc_log_putns()的实现
+ * - 同步/异步：同@ref soc_log_write()的实现
  * - 上下文：中断、中断底半部、线程
  */
 __xwlib_code
@@ -78,9 +78,9 @@ int xwisrpf(const char * fmt, ...)
 
         /* Print the string */
 #if defined(SOCCFG_LOG) && (1 == SOCCFG_LOG)
-        soc_log_isr_putns(buf, (xwsz_t)i);
+        soc_log_isr_write(buf, (xwsz_t)i);
 #elif defined(BRDCFG_LOG) && (1 == BRDCFG_LOG)
-        brd_log_isr_putns(buf, (xwsz_t)i);
+        board_log_isr_write(buf, (xwsz_t)i);
 #else
   #warning "Can't find the log configurations!"
 #endif

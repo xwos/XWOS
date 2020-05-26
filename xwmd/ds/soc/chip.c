@@ -63,7 +63,7 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_soc_cvops = {
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
- * @brief SODS API：SOC构造函数
+ * @brief XWDS API：SOC构造函数
  * @param soc: (I) SOC对象指针
  */
 __xwds_api
@@ -74,7 +74,7 @@ void xwds_soc_construct(struct xwds_soc * soc)
 }
 
 /**
- * @brief SODS API：SOC对象的析构函数
+ * @brief XWDS API：SOC对象的析构函数
  * @param soc: (I) SOC对象指针
  */
 __xwds_api
@@ -85,7 +85,7 @@ void xwds_soc_destruct(struct xwds_soc * soc)
 
 /******** ******** base virtual operations ******** ********/
 /**
- * @brief SODS VOP：探测SOC
+ * @brief XWDS VOP：探测SOC
  * @param soc: (I) SOC对象指针
  * @return 错误码
  * @note
@@ -100,14 +100,14 @@ xwer_t xwds_soc_cvop_probe(struct xwds_soc * soc)
 {
         xwer_t rc;
 
-        SODS_VALIDATE(soc->xwccfg, "nullptr", -EFAULT);
+        XWDS_VALIDATE(soc->xwccfg, "nullptr", -EFAULT);
 
         rc = xwds_device_cvop_probe(&soc->dev);
         return rc;
 }
 
 /**
- * @brief SODS VOP：移除SOC
+ * @brief XWDS VOP：移除SOC
  * @param soc: (I) SOC对象指针
  * @return 错误码
  * @note
@@ -127,7 +127,7 @@ xwer_t xwds_soc_cvop_remove(struct xwds_soc * soc)
 }
 
 /**
- * @brief SODS VOP：启动SOC
+ * @brief XWDS VOP：启动SOC
  * @param soc: (I) SOC对象指针
  * @return 错误码
  * @note
@@ -147,7 +147,7 @@ xwer_t xwds_soc_cvop_start(struct xwds_soc * soc)
 }
 
 /**
- * @brief SODS VOP：停止SOC
+ * @brief XWDS VOP：停止SOC
  * @param soc: (I) SOC对象指针
  * @return 错误码
  * @note
@@ -169,7 +169,7 @@ xwer_t xwds_soc_cvop_stop(struct xwds_soc * soc)
 #if (defined(XWMDCFG_ds_PM)) && (1 == XWMDCFG_ds_PM)
 /******** ******** pm ******** ********/
 /**
- * @brief SODS VOP：暂停SOC
+ * @brief XWDS VOP：暂停SOC
  * @param soc: (I) SOC对象指针
  * @return 错误码
  * @note
@@ -189,7 +189,7 @@ xwer_t xwds_soc_cvop_suspend(struct xwds_soc * soc)
 }
 
 /**
- * @brief SODS VOP：继续SOC
+ * @brief XWDS VOP：继续SOC
  * @param soc: (I) SOC对象指针
  * @return 错误码
  * @note
@@ -211,7 +211,7 @@ xwer_t xwds_soc_cvop_resume(struct xwds_soc * soc)
 
 /******** ******** ******** APIs ******** ******** ********/
 /**
- * @brief SODS API：SOC输入、输出、控制
+ * @brief XWDS API：SOC输入、输出、控制
  * @param soc: (I) SOC对象指针
  * @param cmd: (I) 命令
  * @param ...: (I) 参数表
@@ -230,7 +230,7 @@ xwer_t xwds_soc_ioctl(struct xwds_soc * soc, xwsq_t cmd, ...)
         va_list args;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
 
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {

@@ -34,38 +34,38 @@
  * @brief CAN接收器模式枚举
  */
 enum xwds_cantrcv_opmode_em {
-        SODS_CANTRCV_OPMODE_NORMAL = 0, /**< Transceiver mode NORMAL */
-        SODS_CANTRCV_OPMODE_SLEEP, /**< Transceiver mode SLEEP */
-        SODS_CANTRCV_OPMODE_STANDBY, /**< Transceiver mode STANDBY */
-        SODS_CANTRCV_OPMODE_NUM, /**< number of operation mode */
+        XWDS_CANTRCV_OPMODE_NORMAL = 0, /**< Transceiver mode NORMAL */
+        XWDS_CANTRCV_OPMODE_SLEEP, /**< Transceiver mode SLEEP */
+        XWDS_CANTRCV_OPMODE_STANDBY, /**< Transceiver mode STANDBY */
+        XWDS_CANTRCV_OPMODE_NUM, /**< number of operation mode */
 };
 
 /**
  * @brief CAN接收器唤醒原因枚举
  */
 enum xwds_cantrcv_wkuprs_em {
-        SODS_CANTRCV_WKUPRS_NONE = 0, /**< No reason */
-        SODS_CANTRCV_WKUPRS_BY_BUS, /** The transceiver has detected, that
+        XWDS_CANTRCV_WKUPRS_NONE = 0, /**< No reason */
+        XWDS_CANTRCV_WKUPRS_BY_BUS, /** The transceiver has detected, that
                                         the network has caused the wake up of
                                         the ECU. */
-        SODS_CANTRCV_WKUPRS_BY_PIN, /** The transceiver has detected a wake-up
+        XWDS_CANTRCV_WKUPRS_BY_PIN, /** The transceiver has detected a wake-up
                                         event at one of the transceiver's
                                         pins (not at the CAN bus). */
-        SODS_CANTRCV_WKUPRS_INTERNALLY, /** The transceiver has detected, that
+        XWDS_CANTRCV_WKUPRS_INTERNALLY, /** The transceiver has detected, that
                                             the network has woken up by the ECU
                                             via a request to NORMAL mode. */
-        SODS_CANTRCV_WKUPRS_NOT_SUPPORTED, /** The transceiver does not support
+        XWDS_CANTRCV_WKUPRS_NOT_SUPPORTED, /** The transceiver does not support
                                                any information for the wake up
                                                reason. */
-        SODS_CANTRCV_WKUPRS_POWER_ON, /** The transceiver has detected, that the
+        XWDS_CANTRCV_WKUPRS_POWER_ON, /** The transceiver has detected, that the
                                           "wake up" is due to an ECU reset
                                           after power on. */
-        SODS_CANTRCV_WKUPRS_RESET, /** The transceiver has detected, that the
+        XWDS_CANTRCV_WKUPRS_RESET, /** The transceiver has detected, that the
                                        "wake up" is due to an ECU reset. */
-        SODS_CANTRCV_WKUPRS_BY_SYSERR, /** The transceiver has detected, that
+        XWDS_CANTRCV_WKUPRS_BY_SYSERR, /** The transceiver has detected, that
                                            the "wake up" of the ECU was caused by
                                            a HW related device failure. */
-        SODS_CANTRCV_WKUPRS_NUM, /**< number of wakeup reason */
+        XWDS_CANTRCV_WKUPRS_NUM, /**< number of wakeup reason */
 };
 
 struct xwds_cantrcv;

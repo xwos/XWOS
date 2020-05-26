@@ -23,9 +23,9 @@
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief SODS External IRQ Number
+ * @brief XWDS External IRQ Number
  */
-#define SODS_EIRQ(x)    ((xwid_t)x)
+#define XWDS_EIRQ(x)    ((xwid_t)x)
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -34,16 +34,16 @@
  * @brief 外部中断标志
  */
 enum xwds_soc_ei_flag_em {
-        SODS_SOC_EIF_TM_RISING = BIT(0), /**< 上升沿触发 */
-        SODS_SOC_EIF_TM_FALLING = BIT(1), /**< 下降沿触发 */
-        SODS_SOC_EIF_TM_EITHER = SODS_SOC_EIF_TM_RISING |
-                                 SODS_SOC_EIF_TM_FALLING, /**< 任意边沿触发 */
-        SODS_SOC_EIF_TM_LOW = BIT(2), /**< 低电平触发*/
-        SODS_SOC_EIF_TM_HIGH = BIT(3), /**< 高电平触发 */
-        SODS_SOC_EIF_TM_MASK = SODS_SOC_EIF_TM_RISING | SODS_SOC_EIF_TM_FALLING |
-                               SODS_SOC_EIF_TM_LOW | SODS_SOC_EIF_TM_HIGH,
-        SODS_SOC_EIF_WKUP = BIT(4), /**< 唤醒 */
-        SODS_SOC_EIF_DMA = BIT(5), /**< 触发DMA */
+        XWDS_SOC_EIF_TM_RISING = BIT(0), /**< 上升沿触发 */
+        XWDS_SOC_EIF_TM_FALLING = BIT(1), /**< 下降沿触发 */
+        XWDS_SOC_EIF_TM_EITHER = XWDS_SOC_EIF_TM_RISING |
+                                 XWDS_SOC_EIF_TM_FALLING, /**< 任意边沿触发 */
+        XWDS_SOC_EIF_TM_LOW = BIT(2), /**< 低电平触发*/
+        XWDS_SOC_EIF_TM_HIGH = BIT(3), /**< 高电平触发 */
+        XWDS_SOC_EIF_TM_MASK = XWDS_SOC_EIF_TM_RISING | XWDS_SOC_EIF_TM_FALLING |
+                               XWDS_SOC_EIF_TM_LOW | XWDS_SOC_EIF_TM_HIGH,
+        XWDS_SOC_EIF_WKUP = BIT(4), /**< 唤醒 */
+        XWDS_SOC_EIF_DMA = BIT(5), /**< 触发DMA */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********

@@ -39,8 +39,8 @@ typedef void (* stm32cube_override_holder_f)(void);
 #define LED_TASK_PRIORITY \
         (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 1))
 
-#define LED_GPIO_PORT SODS_GPIO_PORT_C
-#define LED_GPIO_PIN SODS_GPIO_PIN_12
+#define LED_GPIO_PORT XWDS_GPIO_PORT_C
+#define LED_GPIO_PIN XWDS_GPIO_PIN_12
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********

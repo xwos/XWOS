@@ -34,33 +34,33 @@
 #endif /* XWUPCFG_SYNC_EVT */
 
 #if defined(XWUPCFG_SYNC_CDT) && (1 == XWUPCFG_SYNC_CDT)
-  #define SOUPRULE_SD_THRD_DO_LOCK              1
-  #define SOUPRULE_SD_THRD_DO_UNLOCK            1
+  #define XWUPRULE_SD_THRD_DO_LOCK              1
+  #define XWUPRULE_SD_THRD_DO_UNLOCK            1
 #else
-  #define SOUPRULE_SD_THRD_DO_LOCK              0
-  #define SOUPRULE_SD_THRD_DO_UNLOCK            0
+  #define XWUPRULE_SD_THRD_DO_LOCK              0
+  #define XWUPRULE_SD_THRD_DO_UNLOCK            0
 #endif
 
 #if (defined(XWUPCFG_SYNC_PLSMR) && (1 == XWUPCFG_SYNC_PLSMR))
-  #define SOUPRULE_SD_WQ_PL                     1
+  #define XWUPRULE_SD_WQ_PL                     1
 #elif (defined(XWUPCFG_SYNC_CDT) && (1 == XWUPCFG_SYNC_CDT))
-  #define SOUPRULE_SD_WQ_PL                     1
+  #define XWUPRULE_SD_WQ_PL                     1
 #else
-  #define SOUPRULE_SD_WQ_PL                     0
+  #define XWUPRULE_SD_WQ_PL                     0
 #endif
 
 #if (defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX))
-  #define SOUPRULE_SD_WQ_RT                     1
+  #define XWUPRULE_SD_WQ_RT                     1
 #elif (defined(XWUPCFG_SYNC_RTSMR) && (1 == XWUPCFG_SYNC_RTSMR))
-  #define SOUPRULE_SD_WQ_RT                     1
+  #define XWUPRULE_SD_WQ_RT                     1
 #else
-  #define SOUPRULE_SD_WQ_RT                     0
+  #define XWUPRULE_SD_WQ_RT                     0
 #endif
 
 #if (defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM))
-  #define SOUPRULE_SD_THRD_FREEZE               1
+  #define XWUPRULE_SD_THRD_FREEZE               1
 #else
-  #define SOUPRULE_SD_THRD_FREEZE               0
+  #define XWUPRULE_SD_THRD_FREEZE               0
 #endif
 
 #endif /* xwos/up/rule.h */

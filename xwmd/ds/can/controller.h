@@ -31,8 +31,8 @@
   #define __xwds_canc_cbtbl_qualifier
 #endif
 
-#define SODS_CANC_RXQNUM        (XWMDCFG_ds_CAN_CONTROLLER_RXQNUM)
-#define SODS_CANC_SDU_MAXSIZE   (XWMDCFG_ds_CAN_CONTROLLER_SDU_MAXSIZE)
+#define XWDS_CANC_RXQNUM        (XWMDCFG_ds_CAN_CONTROLLER_RXQNUM)
+#define XWDS_CANC_SDU_MAXSIZE   (XWMDCFG_ds_CAN_CONTROLLER_SDU_MAXSIZE)
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -41,8 +41,8 @@
  * @brief CAN消息标志枚举
  */
 enum xwds_can_msgflag_em {
-        SODS_CAN_MSG_F_EXID = BIT(0), /**< 扩展ID */
-        SODS_CAN_MSG_F_REMOTE = BIT(1), /**< 远程帧 */
+        XWDS_CAN_MSG_F_EXID = BIT(0), /**< 扩展ID */
+        XWDS_CAN_MSG_F_REMOTE = BIT(1), /**< 远程帧 */
 };
 
 /**
@@ -52,7 +52,7 @@ struct xwds_can_msg {
         xwu32_t id; /**< ID */
         xwsq_t flag; /**< 标志 */
         xwsz_t dlc; /** 数据长度 */
-        xwu8_t sdu[SODS_CANC_SDU_MAXSIZE]; /**< 数据缓存 */
+        xwu8_t sdu[XWDS_CANC_SDU_MAXSIZE]; /**< 数据缓存 */
 };
 
 /**
@@ -75,9 +75,9 @@ struct xwds_canc_bd_cfg {
  * @brief CAN对象（消息）类型
  */
 enum xwds_canc_hwobj_type_em {
-        SODS_CANC_HWOBJ_T_ID_STD = BIT(0), /**<  标准帧 */
-        SODS_CANC_HWOBJ_T_ID_EXT = BIT(1), /**<  扩展帧 */
-        SODS_CANC_HWOBJ_T_ID_MIXED = BIT(0) | BIT(1), /**<  混合帧 */
+        XWDS_CANC_HWOBJ_T_ID_STD = BIT(0), /**<  标准帧 */
+        XWDS_CANC_HWOBJ_T_ID_EXT = BIT(1), /**<  扩展帧 */
+        XWDS_CANC_HWOBJ_T_ID_MIXED = BIT(0) | BIT(1), /**<  混合帧 */
 };
 
 /**
@@ -116,24 +116,24 @@ struct xwds_canc_cfg {
  * @brief CAN控制器的模式
  */
 enum xwds_canc_mode_em {
-        SODS_CANC_MODE_MIN = 0,
-        SODS_CANC_MODE_UNINIT = SODS_CANC_MODE_MIN, /**< UNINIT mode. Default mode
+        XWDS_CANC_MODE_MIN = 0,
+        XWDS_CANC_MODE_UNINIT = XWDS_CANC_MODE_MIN, /**< UNINIT mode. Default mode
                                                          of the CAN driver and all
                                                          CAN controllers connected
                                                          to one CAN network after
                                                          power on. */
-        SODS_CANC_MODE_STOPPED, /**< STOPPED mode. At least one of all CAN controllers
+        XWDS_CANC_MODE_STOPPED, /**< STOPPED mode. At least one of all CAN controllers
                                      connected to one CAN network are halted and
                                      does not operate on the bus. */
-        SODS_CANC_MODE_STARTED, /**< STARTED mode. All CAN controllers connected to
+        XWDS_CANC_MODE_STARTED, /**< STARTED mode. All CAN controllers connected to
                                      one CAN network are started by the CAN driver
                                      and in full-operational mode. */
-        SODS_CANC_MODE_SLEEP, /**< SLEEP mode. At least one of all CAN controllers
+        XWDS_CANC_MODE_SLEEP, /**< SLEEP mode. At least one of all CAN controllers
                                    connected to one CAN network are set into the
                                    SLEEP mode and can be woken up by request of the
                                    CAN driver or by a network event (must be
                                    supported by CAN hardware) */
-        SODS_CANC_MODE_NUM, /**< number of CAN controller modes */
+        XWDS_CANC_MODE_NUM, /**< number of CAN controller modes */
 };
 
 /**
@@ -188,7 +188,7 @@ struct xwds_canc_cbtbl {
  * @brief CAN控制器接收队列
  */
 struct xwds_canc_rxqueue {
-        struct xwds_can_msg q[SODS_CANC_RXQNUM]; /**< 接收队列（循环数组）*/
+        struct xwds_can_msg q[XWDS_CANC_RXQNUM]; /**< 接收队列（循环数组）*/
         struct xwosal_smr smr; /**< 接收队列的数据信号量 */
         struct xwosal_splk lock; /**< 保护接收队列的锁 */
         xwssq_t pos; /**< 当前可以接收数据的位置 */

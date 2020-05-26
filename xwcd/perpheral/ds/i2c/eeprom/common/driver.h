@@ -30,17 +30,17 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define SODS_I2CP_EEPROM_MAGIC          'e'
+#define XWDS_I2CP_EEPROM_MAGIC          'e'
 
-#define SODS_I2CP_EEPROM_IOC_PWR_ON     __IOC(__IOC_CTRL, SODS_I2CP_EEPROM_MAGIC, 3, 0)
-#define SODS_I2CP_EEPROM_IOC_PWR_OFF    __IOC(__IOC_CTRL, SODS_I2CP_EEPROM_MAGIC, 4, 0)
-#define SODS_I2CP_EEPROM_IOC_WP_EN      __IOC(__IOC_CTRL, SODS_I2CP_EEPROM_MAGIC, 5, 0)
-#define SODS_I2CP_EEPROM_IOC_WP_DS      __IOC(__IOC_CTRL, SODS_I2CP_EEPROM_MAGIC, 6, 0)
-#define SODS_I2CP_EEPROM_IOC_PUTC       __IOC(__IOC_WRITE, SODS_I2CP_EEPROM_MAGIC, 0, 1)
-#define SODS_I2CP_EEPROM_IOC_GETC       __IOC(__IOC_READ, SODS_I2CP_EEPROM_MAGIC, 0, 1)
-#define SODS_I2CP_EEPROM_IOC_PGWR       __IOC(__IOC_WRITE, SODS_I2CP_EEPROM_MAGIC, 1, 0)
-#define SODS_I2CP_EEPROM_IOC_PGRD       __IOC(__IOC_READ, SODS_I2CP_EEPROM_MAGIC, 1, 0)
-#define SODS_I2CP_EEPROM_IOC_RESET      __IOC(__IOC_CTRL, SODS_I2CP_EEPROM_MAGIC, 2, 0)
+#define XWDS_I2CP_EEPROM_IOC_PWR_ON     __IOC(__IOC_CTRL, XWDS_I2CP_EEPROM_MAGIC, 3, 0)
+#define XWDS_I2CP_EEPROM_IOC_PWR_OFF    __IOC(__IOC_CTRL, XWDS_I2CP_EEPROM_MAGIC, 4, 0)
+#define XWDS_I2CP_EEPROM_IOC_WP_EN      __IOC(__IOC_CTRL, XWDS_I2CP_EEPROM_MAGIC, 5, 0)
+#define XWDS_I2CP_EEPROM_IOC_WP_DS      __IOC(__IOC_CTRL, XWDS_I2CP_EEPROM_MAGIC, 6, 0)
+#define XWDS_I2CP_EEPROM_IOC_PUTC       __IOC(__IOC_WRITE, XWDS_I2CP_EEPROM_MAGIC, 0, 1)
+#define XWDS_I2CP_EEPROM_IOC_GETC       __IOC(__IOC_READ, XWDS_I2CP_EEPROM_MAGIC, 0, 1)
+#define XWDS_I2CP_EEPROM_IOC_PGWR       __IOC(__IOC_WRITE, XWDS_I2CP_EEPROM_MAGIC, 1, 0)
+#define XWDS_I2CP_EEPROM_IOC_PGRD       __IOC(__IOC_READ, XWDS_I2CP_EEPROM_MAGIC, 1, 0)
+#define XWDS_I2CP_EEPROM_IOC_RESET      __IOC(__IOC_CTRL, XWDS_I2CP_EEPROM_MAGIC, 2, 0)
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -49,8 +49,8 @@
  * @brief EEPROM GPIO resource enumeration
  */
 enum xwds_i2cp_eeprom_rsc_gpio_idx_em {
-        SODS_I2CP_EEPROM_RSC_GPIO_IDX_PWR = 0,
-        SODS_I2CP_EEPROM_RSC_GPIO_IDX_WP
+        XWDS_I2CP_EEPROM_RSC_GPIO_IDX_PWR = 0,
+        XWDS_I2CP_EEPROM_RSC_GPIO_IDX_WP
 };
 
 struct xwds_i2cp_eeprom_cfg {

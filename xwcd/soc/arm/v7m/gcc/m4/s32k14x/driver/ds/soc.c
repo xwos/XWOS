@@ -2456,29 +2456,29 @@ xwer_t s32k14x_soc_drv_eirq_req(struct xwds_soc * soc,
                                               (SOC_GPIO_PORT_REG_OFFSET * port));
         rc = OK;
 
-        switch (SODS_SOC_EIF_TM_MASK & eiflag) {
-        case SODS_SOC_EIF_TM_RISING:
+        switch (XWDS_SOC_EIF_TM_MASK & eiflag) {
+        case XWDS_SOC_EIF_TM_RISING:
                 irqc = PORT_PCR_IRQC(SOC_EIRQC_IRQ_RISING);
                 break;
-        case SODS_SOC_EIF_TM_FALLING:
+        case XWDS_SOC_EIF_TM_FALLING:
                 irqc = PORT_PCR_IRQC(SOC_EIRQC_IRQ_FALLING);
                 break;
-        case SODS_SOC_EIF_TM_EITHER:
+        case XWDS_SOC_EIF_TM_EITHER:
                 irqc = PORT_PCR_IRQC(SOC_EIRQC_IRQ_EITHER);
                 break;
-        case SODS_SOC_EIF_TM_LOW:
+        case XWDS_SOC_EIF_TM_LOW:
                 irqc = PORT_PCR_IRQC(SOC_EIRQC_IRQ_LOW);
                 break;
-        case SODS_SOC_EIF_TM_HIGH:
+        case XWDS_SOC_EIF_TM_HIGH:
                 irqc = PORT_PCR_IRQC(SOC_EIRQC_IRQ_HIGH);
                 break;
-        case SODS_SOC_EIF_TM_RISING | SODS_SOC_EIF_DMA:
+        case XWDS_SOC_EIF_TM_RISING | XWDS_SOC_EIF_DMA:
                 irqc = PORT_PCR_IRQC(SOC_EIRQC_DMA_RISING);
                 break;
-        case SODS_SOC_EIF_TM_FALLING | SODS_SOC_EIF_DMA:
+        case XWDS_SOC_EIF_TM_FALLING | XWDS_SOC_EIF_DMA:
                 irqc = PORT_PCR_IRQC(SOC_EIRQC_DMA_FALLING);
                 break;
-        case SODS_SOC_EIF_TM_EITHER | SODS_SOC_EIF_DMA:
+        case XWDS_SOC_EIF_TM_EITHER | XWDS_SOC_EIF_DMA:
                 irqc = PORT_PCR_IRQC(SOC_EIRQC_DMA_EITHER);
                 break;
         default:

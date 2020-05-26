@@ -70,7 +70,7 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_uartc_cvops = {
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
- * @brief SODS API：UART控制器的构造函数
+ * @brief XWDS API：UART控制器的构造函数
  * @param uartc: (I) UART控制器对象指针
  */
 __xwds_api
@@ -81,7 +81,7 @@ void xwds_uartc_construct(struct xwds_uartc * uartc)
 }
 
 /**
- * @brief SODS API：UART控制器对象的析构函数
+ * @brief XWDS API：UART控制器对象的析构函数
  * @param uartc: (I) UART控制器对象指针
  */
 __xwds_api
@@ -92,7 +92,7 @@ void xwds_uartc_destruct(struct xwds_uartc * uartc)
 
 /******** ******** base virtual operations ******** ********/
 /**
- * @brief SODS VOP：探测UART控制器
+ * @brief XWDS VOP：探测UART控制器
  * @param uartc: (I) UART控制器对象指针
  * @return 错误码
  * @retval OK: OK
@@ -152,7 +152,7 @@ err_rxsmr_init:
 }
 
 /**
- * @brief SODS VOP：移除UART控制器
+ * @brief XWDS VOP：移除UART控制器
  * @param uartc: (I) UART控制器对象指针
  * @return 错误码
  * @retval OK: OK
@@ -182,7 +182,7 @@ err_dev_cvop_remove:
 }
 
 /**
- * @brief SODS VOP：启动UART控制器
+ * @brief XWDS VOP：启动UART控制器
  * @param uartc: (I) UART控制器对象指针
  * @return 错误码
  */
@@ -228,7 +228,7 @@ err_dev_start:
 }
 
 /**
- * @brief SODS VOP：停止UART控制器
+ * @brief XWDS VOP：停止UART控制器
  * @param uartc: (I) UART控制器对象指针
  * @return 错误码
  */
@@ -262,7 +262,7 @@ err_rxsmr_freeze:
 #if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 /******** ******** pm ******** ********/
 /**
- * @brief SODS VOP：暂停UART控制器
+ * @brief XWDS VOP：暂停UART控制器
  * @param uartc: (I) UART控制器对象指针
  * @return 错误码
  */
@@ -286,7 +286,7 @@ err_dev_suspend:
 }
 
 /**
- * @brief SODS VOP：继续UART控制器
+ * @brief XWDS VOP：继续UART控制器
  * @param uartc: (I) UART控制器对象指针
  * @return 错误码
  */
@@ -324,7 +324,7 @@ err_dev_resume:
 
 /******** ******** UART APIs ******** ********/
 /**
- * @brief SODS API：清空接收队列
+ * @brief XWDS API：清空接收队列
  * @param uartc: (I) UART控制器对象指针
  * @return 错误码
  * @retval OK: OK
@@ -342,7 +342,7 @@ xwer_t xwds_uartc_clear_rxq(struct xwds_uartc * uartc)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        SODS_VALIDATE(uartc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
@@ -374,7 +374,7 @@ err_uartc_grab:
 }
 
 /**
- * @brief SODS API：得到接收队列有效数据的大小
+ * @brief XWDS API：得到接收队列有效数据的大小
  * @param uartc: (I) UART控制器对象指针
  * @param ret: (O) 指向缓冲区的指针，通过此缓冲区返回接收队列中有效数据的大小
  * @return 错误码
@@ -394,8 +394,8 @@ xwer_t xwds_uartc_get_rxq_datasize(struct xwds_uartc * uartc, xwsz_t *ret)
         xwsq_t seq;
         xwer_t rc;
 
-        SODS_VALIDATE(uartc, "nullptr", -EFAULT);
-        SODS_VALIDATE(ret, "nullptr", -EFAULT);
+        XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(ret, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
@@ -421,7 +421,7 @@ err_uartc_grab:
 }
 
 /**
- * @brief SODS API：从接收队列中获取一个字节的数据
+ * @brief XWDS API：从接收队列中获取一个字节的数据
  * @param uartc: (I) UART控制器对象指针
  * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
@@ -443,9 +443,9 @@ xwer_t xwds_uartc_getc(struct xwds_uartc * uartc, xwu8_t * buf, xwtm_t * xwtm)
         xwer_t rc;
         xwreg_t cpuirq;
 
-        SODS_VALIDATE(uartc, "nullptr", -EFAULT);
-        SODS_VALIDATE(buf, "nullptr", -EFAULT);
-        SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
+        XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(buf, "nullptr", -EFAULT);
+        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
@@ -474,7 +474,7 @@ err_uartc_grab:
 }
 
 /**
- * @brief SODS API：从接收队列中获取多个数据
+ * @brief XWDS API：从接收队列中获取多个数据
  * @param uartc: (I) UART控制器对象指针
  * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
  * @param size: 指向缓冲区的指针，此缓冲区：
@@ -502,10 +502,10 @@ xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
         xwer_t rc;
         xwreg_t cpuirq;
 
-        SODS_VALIDATE(uartc, "nullptr", -EFAULT);
-        SODS_VALIDATE(buf, "nullptr", -EFAULT);
-        SODS_VALIDATE(size, "nullptr", -EFAULT);
-        SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
+        XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(buf, "nullptr", -EFAULT);
+        XWDS_VALIDATE(size, "nullptr", -EFAULT);
+        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
@@ -539,7 +539,7 @@ err_uartc_grab:
 }
 
 /**
- * @brief SODS API：尝试从接收队列中获取一个字节的数据
+ * @brief XWDS API：尝试从接收队列中获取一个字节的数据
  * @param uartc: (I) UART控制器对象指针
  * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
  * @return 错误码
@@ -558,8 +558,8 @@ xwer_t xwds_uartc_try_getc(struct xwds_uartc * uartc, xwu8_t * buf)
         xwer_t rc;
         xwreg_t cpuirq;
 
-        SODS_VALIDATE(uartc, "nullptr", -EFAULT);
-        SODS_VALIDATE(buf, "nullptr", -EFAULT);
+        XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(buf, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
@@ -588,7 +588,7 @@ err_uartc_grab:
 }
 
 /**
- * @brief SODS API：尝试从接收队列中获取多个字节的数据
+ * @brief XWDS API：尝试从接收队列中获取多个字节的数据
  * @param uartc: (I) UART控制器对象指针
  * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
  * @param size: 指向缓冲区的指针，此缓冲区：
@@ -611,9 +611,9 @@ xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc, void * buf, xwsz_t * size)
         xwer_t rc;
         xwreg_t cpuirq;
 
-        SODS_VALIDATE(uartc, "nullptr", -EFAULT);
-        SODS_VALIDATE(buf, "nullptr", -EFAULT);
-        SODS_VALIDATE(size, "nullptr", -EFAULT);
+        XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(buf, "nullptr", -EFAULT);
+        XWDS_VALIDATE(size, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
@@ -647,7 +647,7 @@ err_uartc_grab:
 }
 
 /**
- * @brief SODS API：清空发送队列
+ * @brief XWDS API：清空发送队列
  * @param uartc: (I) UART控制器对象指针
  * @return 错误码
  * @retval OK: OK
@@ -665,7 +665,7 @@ xwer_t xwds_uartc_clear_txq(struct xwds_uartc * uartc)
         xwer_t rc = OK;
         xwreg_t cpuirq;
 
-        SODS_VALIDATE(uartc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
@@ -723,7 +723,7 @@ xwer_t xwds_uartc_tx_1byte(struct xwds_uartc * uartc, const xwu8_t byte)
 }
 
 /**
- * @brief SODS API：发送一个字节
+ * @brief XWDS API：发送一个字节
  * @param uartc: (I) UART控制器对象指针
  * @param byte: (I) 待发送的数据
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
@@ -747,8 +747,8 @@ xwer_t xwds_uartc_putc(struct xwds_uartc * uartc,
 {
         xwer_t rc;
 
-        SODS_VALIDATE(uartc, "nullptr", -EFAULT);
-        SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
+        XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
@@ -777,7 +777,7 @@ err_uartc_grab:
 }
 
 /**
- * @brief SODS API：发送一些数据
+ * @brief XWDS API：发送一些数据
  * @param uartc: (I) UART控制器对象指针
  * @param data: (I) 待发送的数据的缓冲区
  * @param size: 指向缓冲区的指针，此缓冲区：
@@ -804,10 +804,10 @@ xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
         xwsz_t i;
         xwer_t rc;
 
-        SODS_VALIDATE(uartc, "nullptr", -EFAULT);
-        SODS_VALIDATE(data, "nullptr", -EFAULT);
-        SODS_VALIDATE(size, "nullptr", -EFAULT);
-        SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
+        XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(data, "nullptr", -EFAULT);
+        XWDS_VALIDATE(size, "nullptr", -EFAULT);
+        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
@@ -843,7 +843,7 @@ err_uartc_grab:
 }
 
 /**
- * @brief SODS API：配置UART
+ * @brief XWDS API：配置UART
  * @param uartc: (I) UART控制器对象指针
  * @param cfg: (I) 新的配置
  * @return 错误码
@@ -863,8 +863,8 @@ xwer_t xwds_uartc_cfg(struct xwds_uartc * uartc,
         const struct xwds_uartc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(uartc, "nullptr", -EFAULT);
-        SODS_VALIDATE(cfg, "nullptr", -EFAULT);
+        XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(cfg, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
         if (__unlikely(rc < 0)) {
@@ -892,7 +892,7 @@ err_uartc_grab:
 
 /******** ******** Libraries for BSP driver ******** ********/
 /**
- * @brief SODS LIB：UART接收中断响应函数
+ * @brief XWDS LIB：UART接收中断响应函数
  * @param uartc: (I) UART控制器对象指针
  */
 __xwds_lib_code
@@ -931,7 +931,7 @@ err_drv_rx:
 }
 
 /**
- * @brief SODS LIB：UART发送中断响应函数
+ * @brief XWDS LIB：UART发送中断响应函数
  * @param uartc: (I) UART控制器对象指针
  */
 __xwds_lib_code

@@ -7,7 +7,7 @@
 #+LANGUAGE: zh-CN
 #+OPTIONS: ^:{}
 #+OPTIONS: title:nil
-#+OPTIONS: toc:t
+#+OPTIONS: toc:nil
 
 * 简介
 

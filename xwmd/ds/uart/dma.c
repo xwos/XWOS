@@ -69,7 +69,7 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_dmauartc_cvops = {
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
- * @brief SODS API：DMA UART控制器的构造函数
+ * @brief XWDS API：DMA UART控制器的构造函数
  * @param dmauartc: (I) DMA UART控制器对象指针
  */
 __xwds_api
@@ -80,7 +80,7 @@ void xwds_dmauartc_construct(struct xwds_dmauartc * dmauartc)
 }
 
 /**
- * @brief SODS API：DMA UART控制器对象的析构函数
+ * @brief XWDS API：DMA UART控制器对象的析构函数
  * @param dmauartc: (I) DMA UART控制器对象指针
  */
 __xwds_api
@@ -91,7 +91,7 @@ void xwds_dmauartc_destruct(struct xwds_dmauartc * dmauartc)
 
 /******** ******** base virtual operations ******** ********/
 /**
- * @brief SODS VOP：探测DMA UART控制器
+ * @brief XWDS VOP：探测DMA UART控制器
  * @param dmauartc: (I) DMA UART控制器对象指针
  * @return 错误码
  */
@@ -118,7 +118,7 @@ err_smr_init:
 }
 
 /**
- * @brief SODS VOP：移除DMA UART控制器
+ * @brief XWDS VOP：移除DMA UART控制器
  * @param dmauartc: (I) DMA UART控制器对象指针
  * @return 错误码
  */
@@ -140,7 +140,7 @@ err_dev_cvop_remove:
 }
 
 /**
- * @brief SODS VOP：启动DMA UART控制器
+ * @brief XWDS VOP：启动DMA UART控制器
  * @param dmauartc: (I) DMA UART控制器对象指针
  * @return 错误码
  */
@@ -158,7 +158,7 @@ xwer_t xwds_dmauartc_cvop_start(struct xwds_dmauartc * dmauartc)
 }
 
 /**
- * @brief SODS VOP：停止DMA UART控制器
+ * @brief XWDS VOP：停止DMA UART控制器
  * @param dmauartc: (I) DMA UART控制器对象指针
  * @return 错误码
  */
@@ -174,7 +174,7 @@ xwer_t xwds_dmauartc_cvop_stop(struct xwds_dmauartc * dmauartc)
 #if (defined(XWMDCFG_ds_PM)) && (1 == XWMDCFG_ds_PM)
 /******** ******** pm ******** ********/
 /**
- * @brief SODS VOP：暂停DMA UART控制器
+ * @brief XWDS VOP：暂停DMA UART控制器
  * @param dmauartc: (I) DMA UART控制器对象指针
  * @return 错误码
  */
@@ -188,7 +188,7 @@ xwer_t xwds_dmauartc_cvop_suspend(struct xwds_dmauartc * dmauartc)
 }
 
 /**
- * @brief SODS VOP：继续DMA UART控制器
+ * @brief XWDS VOP：继续DMA UART控制器
  * @param dmauartc: (I) DMA UART控制器对象指针
  * @return 错误码
  */
@@ -208,7 +208,7 @@ xwer_t xwds_dmauartc_cvop_resume(struct xwds_dmauartc * dmauartc)
 
 /******** ******** ******** DMA UART APIs ******** ******** ********/
 /**
- * @brief SODS API：从接收队列中获取数据
+ * @brief XWDS API：从接收队列中获取数据
  * @param dmauartc: (I) DMA UART控制器对象指针
  * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
  * @param size: 指向缓冲区的指针，此缓冲区：
@@ -237,10 +237,10 @@ xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
         xwreg_t cpuirq;
         xwer_t rc;
 
-        SODS_VALIDATE(dmauartc, "nullptr", -EFAULT);
-        SODS_VALIDATE(buf, "nullptr", -EFAULT);
-        SODS_VALIDATE(size, "nullptr", -EFAULT);
-        SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
+        XWDS_VALIDATE(dmauartc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(buf, "nullptr", -EFAULT);
+        XWDS_VALIDATE(size, "nullptr", -EFAULT);
+        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         pos = 0;
 
@@ -259,12 +259,12 @@ xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
                 if (dmauartc->rxq.tail >= dmauartc->rxq.pos) {
                         available = dmauartc->rxq.tail - dmauartc->rxq.pos;
                 } else {
-                        available = (2 * SODS_DMAUART_RXQ_SIZE) - dmauartc->rxq.pos;
+                        available = (2 * XWDS_DMAUART_RXQ_SIZE) - dmauartc->rxq.pos;
                         available += dmauartc->rxq.tail;
                 }
                 real = available > rest_buffer_size ? rest_buffer_size : available;
-                if ((real + dmauartc->rxq.pos) >= (2 * SODS_DMAUART_RXQ_SIZE)) {
-                        cp = (2 * SODS_DMAUART_RXQ_SIZE) - dmauartc->rxq.pos;
+                if ((real + dmauartc->rxq.pos) >= (2 * XWDS_DMAUART_RXQ_SIZE)) {
+                        cp = (2 * XWDS_DMAUART_RXQ_SIZE) - dmauartc->rxq.pos;
                         memcpy(&buf[pos], &dmauartc->rxq.mem[dmauartc->rxq.pos], cp);
                         memcpy(&buf[cp + pos], &dmauartc->rxq.mem[0], real - cp);
                         dmauartc->rxq.pos = real - cp;
@@ -292,7 +292,7 @@ err_dmauartc_grab:
 }
 
 /**
- * @brief SODS API：尝试从接收队列中获取数据
+ * @brief XWDS API：尝试从接收队列中获取数据
  * @param dmauartc: (I) DMA UART控制器对象指针
  * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
  * @param size: 指向缓冲区的指针，此缓冲区：
@@ -317,9 +317,9 @@ xwer_t xwds_dmauartc_try_rx(struct xwds_dmauartc * dmauartc,
         xwreg_t cpuirq;
         xwer_t rc;
 
-        SODS_VALIDATE(dmauartc, "nullptr", -EFAULT);
-        SODS_VALIDATE(buf, "nullptr", -EFAULT);
-        SODS_VALIDATE(size, "nullptr", -EFAULT);
+        XWDS_VALIDATE(dmauartc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(buf, "nullptr", -EFAULT);
+        XWDS_VALIDATE(size, "nullptr", -EFAULT);
 
         pos = 0;
 
@@ -338,12 +338,12 @@ xwer_t xwds_dmauartc_try_rx(struct xwds_dmauartc * dmauartc,
                 if (dmauartc->rxq.tail >= dmauartc->rxq.pos) {
                         available = dmauartc->rxq.tail - dmauartc->rxq.pos;
                 } else {
-                        available = (2 * SODS_DMAUART_RXQ_SIZE) - dmauartc->rxq.pos;
+                        available = (2 * XWDS_DMAUART_RXQ_SIZE) - dmauartc->rxq.pos;
                         available += dmauartc->rxq.tail;
                 }
                 real = available > rest_buffer_size ? rest_buffer_size : available;
-                if ((real + dmauartc->rxq.pos) >= (2 * SODS_DMAUART_RXQ_SIZE)) {
-                        cp = (2 * SODS_DMAUART_RXQ_SIZE) - dmauartc->rxq.pos;
+                if ((real + dmauartc->rxq.pos) >= (2 * XWDS_DMAUART_RXQ_SIZE)) {
+                        cp = (2 * XWDS_DMAUART_RXQ_SIZE) - dmauartc->rxq.pos;
                         memcpy(&buf[pos], &dmauartc->rxq.mem[dmauartc->rxq.pos], cp);
                         memcpy(&buf[cp + pos], &dmauartc->rxq.mem[0], real - cp);
                         dmauartc->rxq.pos = real - cp;
@@ -371,7 +371,7 @@ err_dmauartc_grab:
 }
 
 /**
- * @brief SODS API：配置DMA通道发送数据
+ * @brief XWDS API：配置DMA通道发送数据
  * @param dmauartc: (I) DMA UART控制器对象指针
  * @param data: (I) 待发送的数据的缓冲区
  * @param size: (I) 待发送的数据的大小
@@ -396,8 +396,8 @@ xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
         xwer_t rc;
         const struct xwds_dmauartc_driver * drv;
 
-        SODS_VALIDATE(dmauartc, "nullptr", -EFAULT);
-        SODS_VALIDATE(data, "nullptr", -EFAULT);
+        XWDS_VALIDATE(dmauartc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(data, "nullptr", -EFAULT);
 
         rc = xwds_dmauartc_grab(dmauartc);
         if (__unlikely(rc < 0)) {
@@ -425,7 +425,7 @@ err_dmauartc_grab:
 }
 
 /**
- * @brief SODS API：配置UART
+ * @brief XWDS API：配置UART
  * @param dmauartc: (I) DMA UART控制器对象指针
  * @param cfg: (I) 新的配置
  * @return 错误码
@@ -445,8 +445,8 @@ xwer_t xwds_dmauartc_cfg(struct xwds_dmauartc * dmauartc,
         const struct xwds_dmauartc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(dmauartc, "nullptr", -EFAULT);
-        SODS_VALIDATE(cfg, "nullptr", -EFAULT);
+        XWDS_VALIDATE(dmauartc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(cfg, "nullptr", -EFAULT);
 
         rc = xwds_dmauartc_grab(dmauartc);
         if (__unlikely(rc < 0)) {
@@ -474,7 +474,7 @@ err_dmauartc_grab:
 
 /******** ******** Libraries for BSP driver ******** ********/
 /**
- * @brief SODS LIB：发布数据到接收队列
+ * @brief XWDS LIB：发布数据到接收队列
  * @param dmauartc: (I) DMA UART控制器对象指针
  * @param tail: (I) 新的数据接收位置（有效数据结尾 + 1）
  */
@@ -489,19 +489,19 @@ void xwds_dmauartc_lib_rxq_pub(struct xwds_dmauartc * dmauartc, xwsq_t tail)
         if (tail == dmauartc->rxq.tail) {
                 pubsz = 0;
         } else if (0 == dmauartc->rxq.tail) {
-                if (tail > SODS_DMAUART_RXQ_SIZE) {
+                if (tail > XWDS_DMAUART_RXQ_SIZE) {
                         /* Low buffer is overflow. Discard the oldest data. */
-                        /* SODS_BUG(); */
-                        pubsz = tail - SODS_DMAUART_RXQ_SIZE;
+                        /* XWDS_BUG(); */
+                        pubsz = tail - XWDS_DMAUART_RXQ_SIZE;
                         dmauartc->rxq.tail = tail;
-                        dmauartc->rxq.pos = SODS_DMAUART_RXQ_SIZE;
+                        dmauartc->rxq.pos = XWDS_DMAUART_RXQ_SIZE;
                 } else {
                         if (0 == dmauartc->rxq.pos) {
                                 pubsz = tail;
                                 dmauartc->rxq.tail = tail;
                         } else {
-                                SODS_BUG_ON(dmauartc->rxq.pos < SODS_DMAUART_RXQ_SIZE);
-                                if (SODS_DMAUART_RXQ_SIZE == tail) {
+                                XWDS_BUG_ON(dmauartc->rxq.pos < XWDS_DMAUART_RXQ_SIZE);
+                                if (XWDS_DMAUART_RXQ_SIZE == tail) {
                                         /* Low buffer is overflow.
                                            Discard the oldest data */
                                         pubsz = dmauartc->rxq.pos - tail;
@@ -510,64 +510,64 @@ void xwds_dmauartc_lib_rxq_pub(struct xwds_dmauartc * dmauartc, xwsq_t tail)
                                 }/* else {} */
                         }
                 }
-        } else if (dmauartc->rxq.tail < SODS_DMAUART_RXQ_SIZE) {
-                SODS_BUG_ON((tail < dmauartc->rxq.tail) ||
-                            (tail > SODS_DMAUART_RXQ_SIZE));
-                SODS_BUG_ON(dmauartc->rxq.pos > dmauartc->rxq.tail);
-                if (tail > SODS_DMAUART_RXQ_SIZE) {
+        } else if (dmauartc->rxq.tail < XWDS_DMAUART_RXQ_SIZE) {
+                XWDS_BUG_ON((tail < dmauartc->rxq.tail) ||
+                            (tail > XWDS_DMAUART_RXQ_SIZE));
+                XWDS_BUG_ON(dmauartc->rxq.pos > dmauartc->rxq.tail);
+                if (tail > XWDS_DMAUART_RXQ_SIZE) {
                         /* Low buffer is overflow. Discard the oldest data. */
-                        /* SODS_BUG(); */
+                        /* XWDS_BUG(); */
                         dmauartc->rxq.tail = tail;
-                        dmauartc->rxq.pos = SODS_DMAUART_RXQ_SIZE;
-                        pubsz = tail - SODS_DMAUART_RXQ_SIZE;
+                        dmauartc->rxq.pos = XWDS_DMAUART_RXQ_SIZE;
+                        pubsz = tail - XWDS_DMAUART_RXQ_SIZE;
                 } else if (tail < dmauartc->rxq.tail) {
-                        SODS_BUG();
+                        XWDS_BUG();
                 } else {
                         pubsz = tail - dmauartc->rxq.tail;
                         dmauartc->rxq.tail = tail;
                 }
-        } else if (SODS_DMAUART_RXQ_SIZE == dmauartc->rxq.tail) {
-                if ((tail < SODS_DMAUART_RXQ_SIZE) && (0 != tail)) {
+        } else if (XWDS_DMAUART_RXQ_SIZE == dmauartc->rxq.tail) {
+                if ((tail < XWDS_DMAUART_RXQ_SIZE) && (0 != tail)) {
                         /* High buffer is overflow. Discard the oldest data. */
-                        /* SODS_BUG(); */
+                        /* XWDS_BUG(); */
                         pubsz = tail;
                         dmauartc->rxq.tail = tail;
                         dmauartc->rxq.pos = 0;
                 } else {
-                        if (SODS_DMAUART_RXQ_SIZE == dmauartc->rxq.pos) {
+                        if (XWDS_DMAUART_RXQ_SIZE == dmauartc->rxq.pos) {
                                 if (0 == tail) {
-                                        pubsz = SODS_DMAUART_RXQ_SIZE;
+                                        pubsz = XWDS_DMAUART_RXQ_SIZE;
                                 } else {
-                                        pubsz = tail - SODS_DMAUART_RXQ_SIZE;
+                                        pubsz = tail - XWDS_DMAUART_RXQ_SIZE;
                                 }
                                 dmauartc->rxq.tail = tail;
                         } else {
-                                SODS_BUG_ON(dmauartc->rxq.pos > SODS_DMAUART_RXQ_SIZE);
+                                XWDS_BUG_ON(dmauartc->rxq.pos > XWDS_DMAUART_RXQ_SIZE);
                                 if (0 == tail) {
                                         /* High buffer is overflow.
                                            Discard the oldest data */
                                         pubsz = dmauartc->rxq.pos;
                                         dmauartc->rxq.tail = 0;
-                                        dmauartc->rxq.pos = SODS_DMAUART_RXQ_SIZE;
+                                        dmauartc->rxq.pos = XWDS_DMAUART_RXQ_SIZE;
                                 }/* else {} */
                         }
                 }
         } else {
-                SODS_BUG_ON(dmauartc->rxq.pos < SODS_DMAUART_RXQ_SIZE);
-                SODS_BUG_ON(dmauartc->rxq.pos > dmauartc->rxq.tail);
+                XWDS_BUG_ON(dmauartc->rxq.pos < XWDS_DMAUART_RXQ_SIZE);
+                XWDS_BUG_ON(dmauartc->rxq.pos > dmauartc->rxq.tail);
                 if ((tail < dmauartc->rxq.tail) && (0 != tail)) {
                         /* High buffer is overflow. Discard the oldest data. */
-                        /* SODS_BUG(); */
-                        if (tail <= SODS_DMAUART_RXQ_SIZE) {
+                        /* XWDS_BUG(); */
+                        if (tail <= XWDS_DMAUART_RXQ_SIZE) {
                                 pubsz = tail;
                                 dmauartc->rxq.tail = tail;
                                 dmauartc->rxq.pos = 0;
                         } else {
-                                SODS_BUG();
+                                XWDS_BUG();
                         }
                 } else {
                         if (0 == tail) {
-                                pubsz = (2 * SODS_DMAUART_RXQ_SIZE) -
+                                pubsz = (2 * XWDS_DMAUART_RXQ_SIZE) -
                                         dmauartc->rxq.tail;
                         } else {
                                 pubsz = tail - dmauartc->rxq.tail;

@@ -90,16 +90,16 @@
  * @brief 设备状态枚举
  */
 enum xwds_device_state_em {
-        SODS_DEVICE_STATE_INVALID = 0,
-        SODS_DEVICE_STATE_REMOVING,
-        SODS_DEVICE_STATE_PROBING,
-        SODS_DEVICE_STATE_STOPING,
-        SODS_DEVICE_STATE_STOPED,
-        SODS_DEVICE_STATE_SUSPENDING,
-        SODS_DEVICE_STATE_SUSPENDED,
-        SODS_DEVICE_STATE_RESUMING,
-        SODS_DEVICE_STATE_STARTING,
-        SODS_DEVICE_STATE_RUNNING,
+        XWDS_DEVICE_STATE_INVALID = 0,
+        XWDS_DEVICE_STATE_REMOVING,
+        XWDS_DEVICE_STATE_PROBING,
+        XWDS_DEVICE_STATE_STOPING,
+        XWDS_DEVICE_STATE_STOPED,
+        XWDS_DEVICE_STATE_SUSPENDING,
+        XWDS_DEVICE_STATE_SUSPENDED,
+        XWDS_DEVICE_STATE_RESUMING,
+        XWDS_DEVICE_STATE_STARTING,
+        XWDS_DEVICE_STATE_RUNNING,
 };
 
 struct xwds_device;
@@ -265,7 +265,7 @@ xwer_t xwds_device_request(struct xwds_device * dev)
         xwer_t rc;
 
         rc = xwaop_tge_then_add(xwsq_t, &dev->state,
-                                SODS_DEVICE_STATE_RUNNING, 1,
+                                XWDS_DEVICE_STATE_RUNNING, 1,
                                 NULL, NULL);
         if (__unlikely(rc < 0)) {
                 rc = -ESHUTDOWN;
@@ -286,7 +286,7 @@ xwer_t xwds_device_release(struct xwds_device * dev)
         xwer_t rc;
 
         rc = xwaop_tgt_then_sub(xwsq_t, &dev->state,
-                                SODS_DEVICE_STATE_RUNNING, 1,
+                                XWDS_DEVICE_STATE_RUNNING, 1,
                                 NULL, NULL);
         if (__unlikely(rc < 0)) {
                 rc = -EALREADY;

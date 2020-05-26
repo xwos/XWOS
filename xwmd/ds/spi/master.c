@@ -66,7 +66,7 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_spim_cvops = {
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
- * @brief SODS API：SPI主机模式控制器对象的构造函数
+ * @brief XWDS API：SPI主机模式控制器对象的构造函数
  * @param spim: (I) SPI主机模式控制器对象指针
  */
 __xwds_api
@@ -77,7 +77,7 @@ void xwds_spim_construct(struct xwds_spim * spim)
 }
 
 /**
- * @brief SODS API：SPI主机模式控制器对象的析构函数
+ * @brief XWDS API：SPI主机模式控制器对象的析构函数
  * @param spim: (I) SPI主机模式控制器对象指针
  */
 __xwds_api
@@ -91,7 +91,7 @@ void xwds_spim_destruct(struct xwds_spim * spim)
 
 /******** ******** base virtual operations ******** ********/
 /**
- * @brief SODS VOP：探测设备
+ * @brief XWDS VOP：探测设备
  * @param spim: (I) SPI主机模式控制器对象指针
  * @return 错误码
  */
@@ -117,7 +117,7 @@ err_xfermtx_init:
 }
 
 /**
- * @brief SODS VOP：删除设备
+ * @brief XWDS VOP：删除设备
  * @param spim: (I) SPI主机模式控制器对象指针
  * @return 错误码
  */
@@ -139,7 +139,7 @@ err_dev_cvop_remove:
 }
 
 /**
- * @brief SODS VOP：启动设备
+ * @brief XWDS VOP：启动设备
  * @param spim: (I) SPI主机模式控制器对象指针
  * @return 错误码
  */
@@ -153,7 +153,7 @@ xwer_t xwds_spim_cvop_start(struct xwds_spim * spim)
 }
 
 /**
- * @brief SODS VOP：停止设备
+ * @brief XWDS VOP：停止设备
  * @param spim: (I) SPI主机模式控制器对象指针
  * @return 错误码
  */
@@ -169,7 +169,7 @@ xwer_t xwds_spim_cvop_stop(struct xwds_spim * spim)
 #if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 /******** ******** pm ******** ********/
 /**
- * @brief SODS VOP：暂停设备
+ * @brief XWDS VOP：暂停设备
  * @param spim: (I) SPI主机模式控制器对象指针
  * @return 错误码
  */
@@ -183,7 +183,7 @@ xwer_t xwds_spim_cvop_suspend(struct xwds_spim * spim)
 }
 
 /**
- * @brief SODS VOP：继续设备
+ * @brief XWDS VOP：继续设备
  * @param spim: (I) SPI主机模式控制器对象指针
  * @return 错误码
  */
@@ -199,7 +199,7 @@ xwer_t xwds_spim_cvop_resume(struct xwds_spim * spim)
 
 /******** ******** ******** SPI Master Device APIs ******** ******** ********/
 /**
- * @brief SODS API：启动传输
+ * @brief XWDS API：启动传输
  * @param spim: (I) SPI主机模式控制器对象指针
  * @param msg: (I) 消息
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
@@ -224,9 +224,9 @@ xwer_t xwds_spim_xfer(struct xwds_spim * spim,
         const struct xwds_spim_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(spim, "nullptr", -EFAULT);
-        SODS_VALIDATE(msg, "nullptr", -EFAULT);
-        SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
+        XWDS_VALIDATE(spim, "nullptr", -EFAULT);
+        XWDS_VALIDATE(msg, "nullptr", -EFAULT);
+        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_spim_grab(spim);
         if (__unlikely(rc < 0)) {

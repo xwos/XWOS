@@ -85,7 +85,7 @@ void xwds_i2cp_destruct(struct xwds_i2cp * i2cp)
 
 /******** ******** base virtual operations ******** ********/
 /**
- * @brief SODS VOP：探测I2C外设
+ * @brief XWDS VOP：探测I2C外设
  * @param i2cp: (I) I2C外设对象指针
  * @return 错误码
  */
@@ -116,7 +116,7 @@ err_i2cm_grab:
 }
 
 /**
- * @brief SODS VOP：移除I2C外设
+ * @brief XWDS VOP：移除I2C外设
  * @param i2cp: (I) I2C外设对象指针
  * @return 错误码
  */
@@ -125,7 +125,7 @@ xwer_t xwds_i2cp_cvop_remove(struct xwds_i2cp * i2cp)
 {
         xwer_t rc;
 
-        SODS_VALIDATE(i2cp->bus, "nullptr", -EHOSTUNREACH);
+        XWDS_VALIDATE(i2cp->bus, "nullptr", -EHOSTUNREACH);
 
         rc = xwds_device_cvop_remove(&i2cp->dev);
         if (__unlikely(rc < 0)) {
@@ -140,7 +140,7 @@ err_dev_cvop_remove:
 }
 
 /**
- * @brief SODS VOP：启动I2C外设
+ * @brief XWDS VOP：启动I2C外设
  * @param i2cp: (I) I2C外设对象指针
  * @return 错误码
  */
@@ -171,7 +171,7 @@ err_i2cm_request:
 }
 
 /**
- * @brief SODS VOP：停止I2C外设
+ * @brief XWDS VOP：停止I2C外设
  * @param i2cp: (I) I2C外设对象指针
  * @return 错误码
  */
@@ -180,7 +180,7 @@ xwer_t xwds_i2cp_cvop_stop(struct xwds_i2cp * i2cp)
 {
         xwer_t rc;
 
-        SODS_VALIDATE(i2cp->bus, "nullptr", -EHOSTUNREACH);
+        XWDS_VALIDATE(i2cp->bus, "nullptr", -EHOSTUNREACH);
 
         rc = xwds_device_cvop_stop(&i2cp->dev);
         if (__unlikely(rc < 0)) {
@@ -197,7 +197,7 @@ err_dev_cvop_stop:
 #if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 /******** ******** pm ******** ********/
 /**
- * @brief SODS VOP：暂停I2C外设
+ * @brief XWDS VOP：暂停I2C外设
  * @param i2cp: (I) I2C外设对象指针
  * @return 错误码
  */
@@ -206,7 +206,7 @@ xwer_t xwds_i2cp_cvop_suspend(struct xwds_i2cp * i2cp)
 {
         xwer_t rc;
 
-        SODS_VALIDATE(i2cp->bus, "nullptr", -EHOSTUNREACH);
+        XWDS_VALIDATE(i2cp->bus, "nullptr", -EHOSTUNREACH);
 
         rc = xwds_device_cvop_suspend(&i2cp->dev);
         if (__unlikely(rc < 0)) {
@@ -221,7 +221,7 @@ err_dev_cvop_suspend:
 }
 
 /**
- * @brief SODS VOP：继续I2C外设
+ * @brief XWDS VOP：继续I2C外设
  * @param i2cp: (I) I2C外设对象指针
  * @return 错误码
  */
@@ -254,7 +254,7 @@ err_i2cm_request:
 
 /******** ******** ******** APIs ******** ******** ********/
 /**
- * @brief SODS API：I2C外设输入、输出、控制
+ * @brief XWDS API：I2C外设输入、输出、控制
  * @param i2cp: (I) I2C外设对象指针
  * @param cmd: (I) 命令
  * @param ...: (I) 参数表
@@ -276,7 +276,7 @@ xwer_t xwds_i2cp_ioctl(struct xwds_i2cp * i2cp, xwsq_t cmd, ...)
         va_list args;
         xwer_t rc;
 
-        SODS_VALIDATE(i2cp, "nullptr", -EFAULT);
+        XWDS_VALIDATE(i2cp, "nullptr", -EFAULT);
 
         rc = xwds_i2cp_grab(i2cp);
         if (__unlikely(rc < 0)) {

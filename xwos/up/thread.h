@@ -46,13 +46,13 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwos_scheduler;
 
-#if (1 == SOUPRULE_SD_WQ_RT)
+#if (1 == XWUPRULE_SD_WQ_RT)
 struct xwos_rtwq;
-#endif /* (1 == SOUPRULE_SD_WQ_RT) */
+#endif /* (1 == XWUPRULE_SD_WQ_RT) */
 
-#if (1 == SOUPRULE_SD_WQ_PL)
+#if (1 == XWUPRULE_SD_WQ_PL)
 struct xwos_plwq;
-#endif /* (1 == SOUPRULE_SD_WQ_PL) */
+#endif /* (1 == XWUPRULE_SD_WQ_PL) */
 
 /**
  * @brief XWOS线程控制块
@@ -65,10 +65,10 @@ struct xwos_tcb {
         xwsq_t state; /**< 线程状态 */
         xwsq_t attribute; /**< 线程属性 */
 
-#if (1 == SOUPRULE_SD_THRD_FREEZE)
+#if (1 == XWUPRULE_SD_THRD_FREEZE)
         /* 冻结状态信息 */
         struct xwlib_bclst_node frznode; /**< 冻结链表节点 */
-#endif /* (1 == SOUPRULE_SD_THRD_FREEZE) */
+#endif /* (1 == XWUPRULE_SD_THRD_FREEZE) */
 
         /* 就绪态信息 */
         struct xwlib_bclst_node rqnode; /**< 就绪队列节点，
@@ -135,28 +135,28 @@ xwer_t xwos_thrd_tt_add_locked(struct xwos_tcb * tcb, struct xwos_tt * xwtt,
 __xwos_code
 void xwos_thrd_wqn_callback(void * entry);
 
-#if (1 == SOUPRULE_SD_WQ_RT)
+#if (1 == XWUPRULE_SD_WQ_RT)
 __xwos_code
 void xwos_thrd_eq_rtwq(struct xwos_tcb * tcb, struct xwos_rtwq * xwrtwq,
                        xwu16_t type);
-#endif /* (1 == SOUPRULE_SD_WQ_RT) */
+#endif /* (1 == XWUPRULE_SD_WQ_RT) */
 
-#if (1 == SOUPRULE_SD_WQ_PL)
+#if (1 == XWUPRULE_SD_WQ_PL)
 __xwos_code
 void xwos_thrd_eq_plwq(struct xwos_tcb * tcb, struct xwos_plwq * xwplwq,
                        xwu16_t type);
-#endif /* (1 == SOUPRULE_SD_WQ_PL) */
+#endif /* (1 == XWUPRULE_SD_WQ_PL) */
 
-#if (1 == SOUPRULE_SD_THRD_DO_UNLOCK)
+#if (1 == XWUPRULE_SD_THRD_DO_UNLOCK)
 __xwos_code
 xwer_t xwos_thrd_do_unlock(void * lock, xwsq_t lktype, void * lkdata);
-#endif /* (1 == SOUPRULE_SD_THRD_DO_UNLOCK) */
+#endif /* (1 == XWUPRULE_SD_THRD_DO_UNLOCK) */
 
-#if (1 == SOUPRULE_SD_THRD_DO_LOCK)
+#if (1 == XWUPRULE_SD_THRD_DO_LOCK)
 __xwos_code
 xwer_t xwos_thrd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm,
                          void * lkdata);
-#endif /* (1 == SOUPRULE_SD_THRD_DO_LOCK) */
+#endif /* (1 == XWUPRULE_SD_THRD_DO_LOCK) */
 
 __xwos_code
 xwer_t xwos_thrd_freeze_lic(struct xwos_tcb * tcb);

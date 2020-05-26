@@ -33,7 +33,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief SODS API：申请电源
+ * @brief XWDS API：申请电源
  * @param soc: (I) SOC对象指针
  * @param id: (I) 电源ID
  * @return 错误码
@@ -53,8 +53,8 @@ xwer_t xwds_pwr_req(struct xwds_soc * soc, xwid_t id)
         const struct xwds_soc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE((id < soc->pwr.num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE((id < soc->pwr.num), "out-of-range", -ERANGE);
 
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
@@ -79,7 +79,7 @@ err_soc_grab:
 }
 
 /**
- * @brief SODS API：释放电源
+ * @brief XWDS API：释放电源
  * @param soc: (I) SOC对象指针
  * @param id: (I) 电源ID
  * @return 错误码
@@ -99,8 +99,8 @@ xwer_t xwds_pwr_rls(struct xwds_soc * soc, xwid_t id)
         const struct xwds_soc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE((id < soc->pwr.num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE((id < soc->pwr.num), "out-of-range", -ERANGE);
 
         drv = xwds_static_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->pwr_rls)) {
@@ -120,7 +120,7 @@ err_drv_pwr_rls:
 }
 
 /**
- * @brief SODS API：得到电源电压
+ * @brief XWDS API：得到电源电压
  * @param soc: (I) SOC对象指针
  * @param id: (I) 电源ID
  * @param buf: (O) 返回电源电压的缓冲区的指针
@@ -145,10 +145,10 @@ xwer_t xwds_pwr_getvltg(struct xwds_soc * soc, xwid_t id,
         const struct xwds_soc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE((id < soc->pwr.num), "out-of-range", -ERANGE);
-        SODS_VALIDATE(buf, "nullptr", -EFAULT);
-        SODS_VALIDATE(num, "nullptr", -EFAULT);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE((id < soc->pwr.num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(buf, "nullptr", -EFAULT);
+        XWDS_VALIDATE(num, "nullptr", -EFAULT);
 
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
@@ -175,7 +175,7 @@ err_soc_grab:
 }
 
 /**
- * @brief SODS LIB：通过描述得到电源资源
+ * @brief XWDS LIB：通过描述得到电源资源
  * @param base: (I) 电源资源数组的基地址
  * @param num: (I) 电源资源数量
  * @param descay: (I) 寄存器描述数组

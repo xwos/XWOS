@@ -133,9 +133,9 @@ xwer_t bm_xwtst_sync_semaphore_wthrd_func(void * arg)
                 time = 10 * XWTM_S;
                 rc = xwosal_smr_timedwait(smrid, &time);
                 if (OK == rc) {
-                        xwlogf(INFO, "Acquired!\n");
+                        xwlogf(INFO, "smrtst", "Acquired!\n");
                 } else {
-                        xwlogf(INFO, "Error:%d\n", rc);
+                        xwlogf(INFO, "smrtst", "Error:%d\n", rc);
                 }
         }
         return rc;

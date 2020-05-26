@@ -64,7 +64,7 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_linc_cvops = {
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
- * @brief SODS API：LIN控制器的构造函数
+ * @brief XWDS API：LIN控制器的构造函数
  * @param linc: (I) LIN控制器对象指针
  */
 __xwds_code
@@ -75,7 +75,7 @@ void xwds_linc_construct(struct xwds_linc * linc)
 }
 
 /**
- * @brief SODS API：LIN控制器对象的析构函数
+ * @brief XWDS API：LIN控制器对象的析构函数
  * @param linc: (I) LIN控制器对象指针
  */
 __xwds_code
@@ -86,7 +86,7 @@ void xwds_linc_destruct(struct xwds_linc * linc)
 
 /******** ******** base virtual operations ******** ********/
 /**
- * @brief SODS VOP：探测LIN控制器
+ * @brief XWDS VOP：探测LIN控制器
  * @param linc: (I) LIN控制器对象指针
  * @return 错误码
  * @retval OK: OK
@@ -123,7 +123,7 @@ err_mtx_init:
 }
 
 /**
- * @brief SODS VOP：移除LIN控制器
+ * @brief XWDS VOP：移除LIN控制器
  * @param linc: (I) LIN控制器对象指针
  * @return 错误码
  * @retval OK: OK
@@ -152,7 +152,7 @@ err_dev_cvop_remove:
 }
 
 /**
- * @brief SODS VOP：启动LIN控制器
+ * @brief XWDS VOP：启动LIN控制器
  * @param linc: (I) LIN控制器对象指针
  * @return 错误码
  * @retval OK: OK
@@ -174,7 +174,7 @@ xwer_t xwds_linc_cvop_start(struct xwds_linc * linc)
 }
 
 /**
- * @brief SODS VOP：停止LIN控制器
+ * @brief XWDS VOP：停止LIN控制器
  * @param linc: (I) LIN控制器对象指针
  * @return 错误码
  * @retval OK: OK
@@ -198,7 +198,7 @@ xwer_t xwds_linc_cvop_stop(struct xwds_linc * linc)
 #if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 /******** ******** pm ******** ********/
 /**
- * @brief SODS VOP：暂停LIN控制器
+ * @brief XWDS VOP：暂停LIN控制器
  * @param linc: (I) LIN控制器对象指针
  * @return 错误码
  * @retval OK: OK
@@ -220,7 +220,7 @@ xwer_t xwds_linc_cvop_suspend(struct xwds_linc * linc)
 }
 
 /**
- * @brief SODS VOP：继续LIN控制器
+ * @brief XWDS VOP：继续LIN控制器
  * @param linc: (I) LIN控制器对象指针
  * @return 错误码
  * @retval OK: OK
@@ -244,7 +244,7 @@ xwer_t xwds_linc_cvop_resume(struct xwds_linc * linc)
 
 /******** ******** ******** APIs ******** ******** ********/
 /**
- * @brief SODS API：主机节点发送一条LIN消息
+ * @brief XWDS API：主机节点发送一条LIN消息
  * @param linc: (I) LIN控制器对象指针
  * @param id: (I) 主机节点调度消息的ID
  * @param msg: (I) LIN消息结构体指针
@@ -270,9 +270,9 @@ xwer_t xwds_linc_msttx(struct xwds_linc * linc,
         xwer_t rc;
         const struct xwds_linc_driver * drv;
 
-        SODS_VALIDATE(linc, "nullptr", -EFAULT);
-        SODS_VALIDATE(msg, "nullptr", -EFAULT);
-        SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
+        XWDS_VALIDATE(linc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(msg, "nullptr", -EFAULT);
+        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_linc_grab(linc);
         if (__unlikely(rc < 0)) {
@@ -314,7 +314,7 @@ err_linc_grab:
 }
 
 /**
- * @brief SODS API：从机节点发送一条LIN消息
+ * @brief XWDS API：从机节点发送一条LIN消息
  * @param linc: (I) LIN控制器对象指针
  * @param msg: (I) LIN消息结构体指针
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
@@ -339,9 +339,9 @@ xwer_t xwds_linc_slvtx(struct xwds_linc * linc,
         xwer_t rc;
         const struct xwds_linc_driver * drv;
 
-        SODS_VALIDATE(linc, "nullptr", -EFAULT);
-        SODS_VALIDATE(msg, "nullptr", -EFAULT);
-        SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
+        XWDS_VALIDATE(linc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(msg, "nullptr", -EFAULT);
+        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_linc_grab(linc);
         if (__unlikely(rc < 0)) {
@@ -382,7 +382,7 @@ err_linc_grab:
 }
 
 /**
- * @brief SODS API：接收一条LIN消息
+ * @brief XWDS API：接收一条LIN消息
  * @param linc: (I) LIN控制器对象指针
  * @param msgbuf: 接收消息的缓冲区的指针
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
@@ -407,9 +407,9 @@ xwer_t xwds_linc_rx(struct xwds_linc * linc,
         xwer_t rc;
         const struct xwds_linc_driver * drv;
 
-        SODS_VALIDATE(linc, "nullptr", -EFAULT);
-        SODS_VALIDATE(msgbuf, "nullptr", -EFAULT);
-        SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
+        XWDS_VALIDATE(linc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(msgbuf, "nullptr", -EFAULT);
+        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_linc_grab(linc);
         if (__unlikely(rc < 0)) {
@@ -443,7 +443,7 @@ err_linc_grab:
 }
 
 /**
- * @brief SODS API：通过LIN保护ID查询消息大小
+ * @brief XWDS API：通过LIN保护ID查询消息大小
  * @param linc: (I) LIN控制器对象指针
  * @param protected_id: (I) 消息的LIN保护ID
  * @param ret: (O) 指向缓冲区的指针，通过此缓冲区返回消息大小
@@ -468,8 +468,8 @@ xwer_t xwds_linc_get_msg_size(struct xwds_linc * linc,
         xwer_t rc;
         xwsq_t i;
 
-        SODS_VALIDATE(linc, "nullptr", -EFAULT);
-        SODS_VALIDATE(ret, "nullptr", -EFAULT);
+        XWDS_VALIDATE(linc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(ret, "nullptr", -EFAULT);
 
         msgitbl = linc->msgitable;
         itemnum = linc->msgitable_itemnum;
@@ -483,11 +483,11 @@ xwer_t xwds_linc_get_msg_size(struct xwds_linc * linc,
                         }
                 }
                 if (-ENODEV == rc) {
-                        *ret = SODS_LIN_DEFAULT_DATA_SIZE;
+                        *ret = XWDS_LIN_DEFAULT_DATA_SIZE;
                 }
         } else {
                 rc = OK;
-                *ret = SODS_LIN_DEFAULT_DATA_SIZE;
+                *ret = XWDS_LIN_DEFAULT_DATA_SIZE;
         }
         return rc;
 }

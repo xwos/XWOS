@@ -41,7 +41,7 @@ void xwds_pm_report_devices_resuming(struct xwds * ds, xwer_t rc);
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief SODS API：初始化设备栈
+ * @brief XWDS API：初始化设备栈
  * @param ds: (I) 设备栈指针
  */
 __xwds_code
@@ -53,7 +53,7 @@ void xwds_init(struct xwds * ds)
 
 #if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 /**
- * @brief SODS API：暂停设备栈
+ * @brief XWDS API：暂停设备栈
  * @param ds: (I) 设备栈控制块指针
  * @return 错误码
  */
@@ -77,11 +77,11 @@ void xwds_pm_report_devices_suspending(struct xwds * ds, xwer_t rc)
 {
         /* TODO:FIXME */
         XWOS_UNUSED(ds);
-        SODS_BUG_ON(rc < 0);
+        XWDS_BUG_ON(rc < 0);
 }
 
 /**
- * @brief SODS API：继续设备栈
+ * @brief XWDS API：继续设备栈
  * @param ds: (I) 设备栈控制块指针
  * @return 错误码
  * @note
@@ -110,6 +110,6 @@ void xwds_pm_report_devices_resuming(struct xwds * ds, xwer_t rc)
 {
         /* TODO:FIXME */
         XWOS_UNUSED(ds);
-        SODS_BUG_ON(rc < 0);
+        XWDS_BUG_ON(rc < 0);
 }
 #endif /* XWMDCFG_ds_PM */

@@ -29,16 +29,16 @@
  * @brief SPI接口枚举
  */
 enum xwds_spi_wire_em {
-        SODS_SPI_WIRE_4 = 0,
-        SODS_SPI_WIRE_3,
+        XWDS_SPI_WIRE_4 = 0,
+        XWDS_SPI_WIRE_3,
 };
 
 /**
  * @brief SPI interface direction enumerations
  */
 enum xwds_spi_direction_em {
-        SODS_SPI_DIR_RX = BIT(0),
-        SODS_SPI_DIR_TX = BIT(1),
+        XWDS_SPI_DIR_RX = BIT(0),
+        XWDS_SPI_DIR_TX = BIT(1),
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********

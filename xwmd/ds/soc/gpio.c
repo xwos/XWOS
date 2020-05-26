@@ -34,7 +34,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief SODS API：申请GPIO
+ * @brief XWDS API：申请GPIO
  * @param soc: (I) SOC对象指针
  * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
  * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
@@ -56,10 +56,10 @@ xwer_t xwds_gpio_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         const struct xwds_soc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
 
-        pinmask &= SODS_GPIO_PIN_MASK(soc->gpio.pin_num);
+        pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
@@ -89,7 +89,7 @@ err_soc_grab:
 }
 
 /**
- * @brief SODS API：释放GPIO
+ * @brief XWDS API：释放GPIO
  * @param soc: (I) SOC对象指针
  * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
  * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
@@ -112,10 +112,10 @@ xwer_t xwds_gpio_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         xwsq_t pinsts;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
 
-        pinmask &= SODS_GPIO_PIN_MASK(soc->gpio.pin_num);
+        pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
         pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
         if (__unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
@@ -139,7 +139,7 @@ err_pinsts:
 }
 
 /**
- * @brief SODS API：配置GPIO
+ * @brief XWDS API：配置GPIO
  * @param soc: (I) SOC对象指针
  * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
  * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
@@ -164,11 +164,11 @@ xwer_t xwds_gpio_cfg(struct xwds_soc * soc,
         const struct xwds_soc_driver * drv;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
-        SODS_VALIDATE(cfg, "nullptr", -EFAULT);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(cfg, "nullptr", -EFAULT);
 
-        pinmask &= SODS_GPIO_PIN_MASK(soc->gpio.pin_num);
+        pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
@@ -195,7 +195,7 @@ err_soc_grab:
 }
 
 /**
- * @brief SODS API：将GPIO的PIN置为高电平
+ * @brief XWDS API：将GPIO的PIN置为高电平
  * @param soc: (I) SOC对象指针
  * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
  * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
@@ -219,10 +219,10 @@ xwer_t xwds_gpio_set(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         xwsq_t pinsts;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
 
-        pinmask &= SODS_GPIO_PIN_MASK(soc->gpio.pin_num);
+        pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
@@ -255,7 +255,7 @@ err_soc_grab:
 }
 
 /**
- * @brief SODS API：将GPIO的PIN置为低电平
+ * @brief XWDS API：将GPIO的PIN置为低电平
  * @param soc: (I) SOC对象指针
  * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
  * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
@@ -279,10 +279,10 @@ xwer_t xwds_gpio_reset(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         xwsq_t pinsts;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
 
-        pinmask &= SODS_GPIO_PIN_MASK(soc->gpio.pin_num);
+        pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
@@ -315,7 +315,7 @@ err_soc_grab:
 }
 
 /**
- * @brief SODS API：反转GPIO电平
+ * @brief XWDS API：反转GPIO电平
  * @param soc: (I) SOC对象指针
  * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
  * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
@@ -339,10 +339,10 @@ xwer_t xwds_gpio_toggle(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         xwsq_t pinsts;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
 
-        pinmask &= SODS_GPIO_PIN_MASK(soc->gpio.pin_num);
+        pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
@@ -375,7 +375,7 @@ err_soc_grab:
 }
 
 /**
- * @brief SODS API：输出GPIO
+ * @brief XWDS API：输出GPIO
  * @param soc: (I) SOC对象指针
  * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
  * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
@@ -403,10 +403,10 @@ xwer_t xwds_gpio_output(struct xwds_soc * soc,
         xwsq_t pinsts;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
 
-        pinmask &= SODS_GPIO_PIN_MASK(soc->gpio.pin_num);
+        pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
@@ -439,7 +439,7 @@ err_soc_grab:
 }
 
 /**
- * @brief SODS API：从GPIO端口读取输入值
+ * @brief XWDS API：从GPIO端口读取输入值
  * @param soc: (I) SOC对象指针
  * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
  * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
@@ -466,10 +466,10 @@ xwer_t xwds_gpio_input(struct xwds_soc * soc,
         xwsq_t pinsts;
         xwer_t rc;
 
-        SODS_VALIDATE(soc, "nullptr", -EFAULT);
-        SODS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(soc, "nullptr", -EFAULT);
+        XWDS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
 
-        pinmask &= SODS_GPIO_PIN_MASK(soc->gpio.pin_num);
+        pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
         rc = xwds_soc_grab(soc);
         if (__unlikely(rc < 0)) {
@@ -502,7 +502,7 @@ err_soc_grab:
 }
 
 /**
- * @brief SODS LIB：通过描述得到GPIO资源
+ * @brief XWDS LIB：通过描述得到GPIO资源
  * @param base: (I) GPIO资源数组的基地址
  * @param num: (I) GPIO资源数量
  * @param descay: (I) 寄存器描述数组

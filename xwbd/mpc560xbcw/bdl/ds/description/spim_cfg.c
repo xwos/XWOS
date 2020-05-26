@@ -136,8 +136,8 @@ const struct soc_spi_private_cfg mpc560xb_spim1_xwccfg = {
 
 const struct xwds_spim_cfg mpc560xb_spim1_cfg = {
         .bus.bit = {
-                .wire = SODS_SPI_WIRE_4,
-                .direction = SODS_SPI_DIR_TX | SODS_SPI_DIR_RX,
+                .wire = XWDS_SPI_WIRE_4,
+                .direction = XWDS_SPI_DIR_TX | XWDS_SPI_DIR_RX,
         },
         .cspins = mpc560xb_spim1_cspins,
         .cspins_num = xw_array_size(mpc560xb_spim1_cspins),

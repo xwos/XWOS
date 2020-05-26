@@ -27,7 +27,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define SODS_DMAUART_RXQ_SIZE   XWMDCFG_ds_UART_DMA_RXQ_SIZE
+#define XWDS_DMAUART_RXQ_SIZE   XWMDCFG_ds_UART_DMA_RXQ_SIZE
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -60,7 +60,7 @@ struct xwds_dmauartc {
         struct {
                 struct xwosal_smr smr; /**< 接收队列中数据可用的信号量 */
                 struct xwosal_splk lock; /**< 保护接收队列的锁 */
-                xwu8_t mem[2 * SODS_DMAUART_RXQ_SIZE]; /**< double-queue */
+                xwu8_t mem[2 * XWDS_DMAUART_RXQ_SIZE]; /**< double-queue */
                 xwsq_t pos; /**< 当前有效数据的起始位置 */
                 xwsz_t tail; /**< 当前有效数据的结束位置 + 1 */
         } rxq; /**< 循环接收队列 */

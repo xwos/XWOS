@@ -60,16 +60,43 @@ enum xwlib_crc32_plynml_em {
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief 计算一段数据的CRC32校验值
+ * @param crc32: (I) 初始值
+ *               (O) 计算结果
+ * @param xorout: (I) 与结果异或的值
+ * @param refin: (I) 是否按位镜像翻转输入的每个字节(xwbop_rbit8)
+ * @param refout: (I) 是否按位镜像翻转输出(xwbop_rbit32)
+ * @param plynml: (I) 多项式
+ * @param direction: (I) 数据移位的方向
+ * @param stream: (I) 指向数据的指针
+ * @param len: (I) 数据长度
+ */
 __xwlib_code
 void xwlib_crc32_cal(xwu32_t * crc32, xwu32_t xorout,
                      bool refin, bool refout,
                      int plynml, int direction,
                      const xwu8_t stream[], xwsz_t len);
 
+/**
+ * @brief 用主流CRC32参数模型计算一段数据的CRC32校验值
+ * @param stream: (I) 指向数据的指针
+ * @param len: (I) 数据长度
+ * @return CRC32
+ * @note
+ * > 主流CRC32参数模型：
+ * > - 多项式：0xEDB88320
+ * > - 初始值：0xFFFFFFFF
+ * > - 数据移位方向：右移
+ * > - 是否按位镜像翻转输入：否
+ * > - 是否按位镜像翻转输出：否
+ * > - 与结果进行异或计算：0xFFFFFFFF
+ */
 __xwlib_code
 xwu32_t xwlib_crc32_calms(const xwu8_t stream[], xwsz_t len);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+
 #endif /* xwos/lib/crc32.h */

@@ -63,7 +63,7 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_spip_cvops = {
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
- * @brief SODS API：SPI外设控制器对象的构造函数
+ * @brief XWDS API：SPI外设控制器对象的构造函数
  * @param spip: (I) SPI外设控制器对象指针
  */
 __xwds_api
@@ -74,7 +74,7 @@ void xwds_spip_construct(struct xwds_spip * spip)
 }
 
 /**
- * @brief SODS API：SPI外设控制器对象的析构函数
+ * @brief XWDS API：SPI外设控制器对象的析构函数
  * @param spip: (I) SPI外设控制器对象指针
  */
 __xwds_api
@@ -85,7 +85,7 @@ void xwds_spip_destruct(struct xwds_spip * spip)
 
 /******** ******** base virtual operations ******** ********/
 /**
- * @brief SODS VOP：探测设备
+ * @brief XWDS VOP：探测设备
  * @param spip: (I) SPI外设控制器对象指针
  * @return 错误码
  * @retval OK: OK
@@ -125,7 +125,7 @@ err_spim_grab:
 }
 
 /**
- * @brief SODS VOP：删除设备
+ * @brief XWDS VOP：删除设备
  * @param spip: (I) SPI外设控制器对象指针
  * @return 错误码
  * @retval OK: OK
@@ -143,7 +143,7 @@ xwer_t xwds_spip_cvop_remove(struct xwds_spip * spip)
 {
         xwer_t rc;
 
-        SODS_VALIDATE(spip->bus, "nullptr", -EHOSTUNREACH);
+        XWDS_VALIDATE(spip->bus, "nullptr", -EHOSTUNREACH);
 
         rc = xwds_device_cvop_remove(&spip->dev);
         if (__unlikely(rc < 0)) {
@@ -158,7 +158,7 @@ err_dev_cvop_remove:
 }
 
 /**
- * @brief SODS VOP：启动设备
+ * @brief XWDS VOP：启动设备
  * @param spip: (I) SPI外设控制器对象指针
  * @return 错误码
  * @retval OK: OK
@@ -198,7 +198,7 @@ err_spim_request:
 }
 
 /**
- * @brief SODS VOP：停止设备
+ * @brief XWDS VOP：停止设备
  * @param spip: (I) SPI外设控制器对象指针
  * @return 错误码
  * @retval OK: OK
@@ -216,7 +216,7 @@ xwer_t xwds_spip_cvop_stop(struct xwds_spip * spip)
 {
         xwer_t rc;
 
-        SODS_VALIDATE(spip->bus, "nullptr", -EHOSTUNREACH);
+        XWDS_VALIDATE(spip->bus, "nullptr", -EHOSTUNREACH);
 
         rc = xwds_device_cvop_stop(&spip->dev);
         if (__unlikely(rc < 0)) {
@@ -233,7 +233,7 @@ err_dev_cvop_stop:
 #if (defined(XWMDCFG_ds_PM)) && (1 == XWMDCFG_ds_PM)
 /******** ******** pm ******** ********/
 /**
- * @brief SODS VOP：暂停设备
+ * @brief XWDS VOP：暂停设备
  * @param spip: (I) SPI外设控制器对象指针
  * @return 错误码
  * @retval OK: OK
@@ -251,7 +251,7 @@ xwer_t xwds_spip_cvop_suspend(struct xwds_spip * spip)
 {
         xwer_t rc;
 
-        SODS_VALIDATE(spip->bus, "nullptr", -EHOSTUNREACH);
+        XWDS_VALIDATE(spip->bus, "nullptr", -EHOSTUNREACH);
 
         rc = xwds_device_cvop_suspend(&spip->dev);
         if (__unlikely(rc < 0)) {
@@ -266,7 +266,7 @@ err_dev_cvop_suspend:
 }
 
 /**
- * @brief SODS VOP：继续设备
+ * @brief XWDS VOP：继续设备
  * @param spip: (I) SPI外设控制器对象指针
  * @return 错误码
  * @retval OK: OK
@@ -308,7 +308,7 @@ err_spim_request:
 
 /******** ******** ******** SPI Perpheral APIs ******** ******** ********/
 /**
- * @brief SODS API：SPI外设输入、输出、控制
+ * @brief XWDS API：SPI外设输入、输出、控制
  * @param spip: (I) SPI外设
  * @param cmd: (I) 命令
  * @param ...: (I) 参数
@@ -330,7 +330,7 @@ xwer_t xwds_spip_ioctl(struct xwds_spip * spip, xwsq_t cmd, ...)
         va_list args;
         const struct xwds_spip_driver * drv;
 
-        SODS_VALIDATE(spip, "nullptr", -EFAULT);
+        XWDS_VALIDATE(spip, "nullptr", -EFAULT);
 
         rc = xwds_spip_grab(spip);
         if (__unlikely(rc < 0)) {

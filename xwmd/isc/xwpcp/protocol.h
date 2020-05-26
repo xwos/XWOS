@@ -77,10 +77,8 @@
 #define XWPCP_FRM_MINSIZE       (sizeof(struct xwpcp_frmhead) + XWPCP_CHKSUM_SIZE)
 
 #if defined(XWMDCFG_isc_xwpcp_LOG) && (1 == XWMDCFG_isc_xwpcp_LOG)
-/**
- * @brief XWPCP的日志函数
- */
-  #define xwpcplogf(lv, fmt, ...) xwlogf(lv, fmt, ##__VA_ARGS__)
+  #define XWPCP_LOG_TAG                 "xwpcp"
+  #define xwpcplogf(lv, fmt, ...)       xwlogf(lv, XWPCP_LOG_TAG, fmt, ##__VA_ARGS__)
 #else /* XWMDCFG_isc_xwpcp_LOG */
   #define xwpcplogf(lv, fmt, ...)
 #endif /* !XWMDCFG_isc_xwpcp_LOG */

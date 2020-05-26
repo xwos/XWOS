@@ -468,12 +468,12 @@ xwer_t mpc560xb_i2cm_drv_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg
         } else if (0 == msg->size) {
                 I2C.IBCR.B.MS = 0;
                 rc = OK;
-        } else if (SODS_I2C_F_10BITADDR & msg->flags) {
+        } else if (XWDS_I2C_F_10BITADDR & msg->flags) {
                 I2C.IBCR.B.MS = 0;
                 rc = -ENOSYS;
         } else {
                 drvdata->dpos = 0;
-                if (SODS_I2C_F_RD & msg->flags) {
+                if (XWDS_I2C_F_RD & msg->flags) {
                         if (msg->size > 1) {
                                 I2C.IBCR.B.NOACK = 0;
                         } else {
@@ -511,7 +511,7 @@ void mpc560xb_i2cm_txfsm_7bitaddr(struct xwds_i2cm * i2cm)
         msg = drvdata->xmsg.ptr;
         if ((1 == I2C.IBSR.B.TCF) && (0 == I2C.IBSR.B.RXAK)) {
                 if (drvdata->dpos == msg->size) {
-                        if (SODS_I2C_F_STOP & msg->flags) {
+                        if (XWDS_I2C_F_STOP & msg->flags) {
                                 I2C.IBCR.B.MS = 0;
                         }
                         drvdata->xmsg.rc = OK;
@@ -600,7 +600,7 @@ void mpc560xb_i2cm_isr(void)
                         I2C.IBSR.R = 0x12;
                         I2C.IBCR.B.MS = 0;
                 } else {
-                        if (SODS_I2C_F_RD & msg->flags) {
+                        if (XWDS_I2C_F_RD & msg->flags) {
                                 mpc560xb_i2cm_rxfsm_7bitaddr(i2cm);
                         } else {
                                 mpc560xb_i2cm_txfsm_7bitaddr(i2cm);

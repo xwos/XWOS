@@ -34,29 +34,29 @@
  * @brief SPI帧格式标志
  */
 enum xwds_spim_frame_flag_em {
-        SODS_SPIM_FF_WL_MSK = BIT(0) | BIT(1), /**< 字长 */
-        SODS_SPIM_FF_WL_8 = 0, /**< 字长：8位 */
-        SODS_SPIM_FF_WL_16 = 1, /**< 字长：16位 */
-        SODS_SPIM_FF_WL_32 = 2, /**< 字长：32位 */
+        XWDS_SPIM_FF_WL_MSK = BIT(0) | BIT(1), /**< 字长 */
+        XWDS_SPIM_FF_WL_8 = 0, /**< 字长：8位 */
+        XWDS_SPIM_FF_WL_16 = 1, /**< 字长：16位 */
+        XWDS_SPIM_FF_WL_32 = 2, /**< 字长：32位 */
 
-        SODS_SPIM_FF_CPOL_MSK = BIT(2), /**< 时钟极性 */
-        SODS_SPIM_FF_CPOL_LOW = 0, /**< 时钟极性：低 */
-        SODS_SPIM_FF_CPOL_HIGH = BIT(2), /**< 时钟极性：高 */
-        SODS_SPIM_FF_CPHA_MSK = BIT(3), /**< 时钟相位 */
-        SODS_SPIM_FF_CPHA_LCTS = 0, /**< 起始沿采集，结束沿设置 */
-        SODS_SPIM_FF_CPHA_LSTC = BIT(3), /**< 起始沿设置，结束沿采集 */
-        SODS_SPIM_FF_MODE_1 = SODS_SPIM_FF_CPOL_LOW | SODS_SPIM_FF_CPHA_LCTS,
-        SODS_SPIM_FF_MODE_2 = SODS_SPIM_FF_CPOL_LOW | SODS_SPIM_FF_CPHA_LSTC,
-        SODS_SPIM_FF_MODE_3 = SODS_SPIM_FF_CPOL_HIGH | SODS_SPIM_FF_CPHA_LCTS,
-        SODS_SPIM_FF_MODE_4 = SODS_SPIM_FF_CPOL_HIGH | SODS_SPIM_FF_CPHA_LSTC,
+        XWDS_SPIM_FF_CPOL_MSK = BIT(2), /**< 时钟极性 */
+        XWDS_SPIM_FF_CPOL_LOW = 0, /**< 时钟极性：低 */
+        XWDS_SPIM_FF_CPOL_HIGH = BIT(2), /**< 时钟极性：高 */
+        XWDS_SPIM_FF_CPHA_MSK = BIT(3), /**< 时钟相位 */
+        XWDS_SPIM_FF_CPHA_LCTS = 0, /**< 起始沿采集，结束沿设置 */
+        XWDS_SPIM_FF_CPHA_LSTC = BIT(3), /**< 起始沿设置，结束沿采集 */
+        XWDS_SPIM_FF_MODE_1 = XWDS_SPIM_FF_CPOL_LOW | XWDS_SPIM_FF_CPHA_LCTS,
+        XWDS_SPIM_FF_MODE_2 = XWDS_SPIM_FF_CPOL_LOW | XWDS_SPIM_FF_CPHA_LSTC,
+        XWDS_SPIM_FF_MODE_3 = XWDS_SPIM_FF_CPOL_HIGH | XWDS_SPIM_FF_CPHA_LCTS,
+        XWDS_SPIM_FF_MODE_4 = XWDS_SPIM_FF_CPOL_HIGH | XWDS_SPIM_FF_CPHA_LSTC,
 
-        SODS_SPIM_FF_FO_MSK = BIT(4), /**< 帧顺序 */
-        SODS_SPIM_FF_FO_MSB = 0, /**< MSB优先 */
-        SODS_SPIM_FF_FO_LSB = BIT(4), /**< LSB优先 */
+        XWDS_SPIM_FF_FO_MSK = BIT(4), /**< 帧顺序 */
+        XWDS_SPIM_FF_FO_MSB = 0, /**< MSB优先 */
+        XWDS_SPIM_FF_FO_LSB = BIT(4), /**< LSB优先 */
 
-        SODS_SPIM_FF_CS_MSK = BIT(5), /**< 片选 */
-        SODS_SPIM_FF_CS_NONCONTINUOUS = 0, /**< 非连续 */
-        SODS_SPIM_FF_CS_CONTINUOUS = BIT(5), /**< 连续 */
+        XWDS_SPIM_FF_CS_MSK = BIT(5), /**< 片选 */
+        XWDS_SPIM_FF_CS_NONCONTINUOUS = 0, /**< 非连续 */
+        XWDS_SPIM_FF_CS_CONTINUOUS = BIT(5), /**< 连续 */
 };
 
 /**

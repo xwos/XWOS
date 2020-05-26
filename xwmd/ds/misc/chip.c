@@ -62,7 +62,7 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_misc_cvops = {
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
- * @brief SODS API：MISC设备的构造函数
+ * @brief XWDS API：MISC设备的构造函数
  * @param misc: (I) MISC设备对象指针
  */
 __xwds_api
@@ -73,7 +73,7 @@ void xwds_misc_construct(struct xwds_misc * misc)
 }
 
 /**
- * @brief SODS API：MISC设备对象的析构函数
+ * @brief XWDS API：MISC设备对象的析构函数
  * @param misc: (I) MISC设备对象指针
  */
 __xwds_api
@@ -84,7 +84,7 @@ void xwds_misc_destruct(struct xwds_misc * misc)
 
 /******** ******** base virtual operations ******** ********/
 /**
- * @brief SODS VOP：探测MISC设备
+ * @brief XWDS VOP：探测MISC设备
  * @param misc: (I) MISC设备对象指针
  * @return 错误码
  */
@@ -98,7 +98,7 @@ xwer_t xwds_misc_cvop_probe(struct xwds_misc * misc)
 }
 
 /**
- * @brief SODS VOP：移除MISC设备
+ * @brief XWDS VOP：移除MISC设备
  * @param ds: (I) 设备栈控制块指针
  * @param misc: (I) MISC设备对象指针
  * @return 错误码
@@ -113,7 +113,7 @@ xwer_t xwds_misc_cvop_remove(struct xwds_misc * misc)
 }
 
 /**
- * @brief SODS VOP：启动MISC设备
+ * @brief XWDS VOP：启动MISC设备
  * @param misc: (I) MISC设备对象指针
  * @return 错误码
  */
@@ -127,7 +127,7 @@ xwer_t xwds_misc_cvop_start(struct xwds_misc * misc)
 }
 
 /**
- * @brief SODS VOP：停止MISC设备
+ * @brief XWDS VOP：停止MISC设备
  * @param misc: (I) MISC设备对象指针
  * @return 错误码
  */
@@ -143,7 +143,7 @@ xwer_t xwds_misc_cvop_stop(struct xwds_misc * misc)
 #if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 /******** ******** pm ******** ********/
 /**
- * @brief SODS VOP：暂停MISC设备
+ * @brief XWDS VOP：暂停MISC设备
  * @param misc: (I) MISC设备对象指针
  * @return 错误码
  */
@@ -157,7 +157,7 @@ xwer_t xwds_misc_cvop_suspend(struct xwds_misc * misc)
 }
 
 /**
- * @brief SODS VOP：继续MISC设备
+ * @brief XWDS VOP：继续MISC设备
  * @param misc: (I) MISC设备对象指针
  * @return 错误码
  */
@@ -173,7 +173,7 @@ xwer_t xwds_misc_cvop_resume(struct xwds_misc * misc)
 
 /******** ******** ******** APIs ******** ******** ********/
 /**
- * @brief SODS API：MISC设备输入、输出、控制
+ * @brief XWDS API：MISC设备输入、输出、控制
  * @param misc: (I) MISC设备对象指针
  * @param cmd: (I) 命令
  * @param ...: (I) 参数
@@ -194,7 +194,7 @@ xwer_t xwds_misc_ioctl(struct xwds_misc * misc, xwsq_t cmd, ...)
         va_list args;
         xwer_t rc;
 
-        SODS_VALIDATE(misc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(misc, "nullptr", -EFAULT);
 
         rc = xwds_misc_grab(misc);
         if (__unlikely(rc < 0)) {

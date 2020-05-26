@@ -23,30 +23,30 @@ XWOS_EOBJS :=
 ######## ######## ######## ########   rules  ######## ######## ######## ########
 ######## ######## ######## ######## ******** ######## ######## ######## ########
 ifeq ($(XWUPCFG_SYNC_CDT),y)
-        SOUPRULE_SD_THRD_DO_LOCK := y
-        SOUPRULE_SD_THRD_DO_UNLOCK := y
+        XWUPRULE_SD_THRD_DO_LOCK := y
+        XWUPRULE_SD_THRD_DO_UNLOCK := y
 else
-        SOUPRULE_SD_THRD_DO_LOCK := n
-        SOUPRULE_SD_THRD_DO_UNLOCK := n
+        XWUPRULE_SD_THRD_DO_LOCK := n
+        XWUPRULE_SD_THRD_DO_UNLOCK := n
 endif
 
 ifeq ($(XWUPCFG_SYNC_PLSMR),y)
-    SOUPRULE_SD_WQ_PL := y
+    XWUPRULE_SD_WQ_PL := y
 else
     ifeq ($(XWUPCFG_SYNC_CDT),y)
-        SOUPRULE_SD_WQ_PL := y
+        XWUPRULE_SD_WQ_PL := y
     else
-        SOUPRULE_SD_WQ_PL := n
+        XWUPRULE_SD_WQ_PL := n
     endif
 endif
 
 ifeq ($(XWUPCFG_LOCK_MTX),y)
-    SOUPRULE_SD_WQ_RT := y
+    XWUPRULE_SD_WQ_RT := y
 else
     ifeq ($(XWUPCFG_SYNC_RTSMR),y)
-        SOUPRULE_SD_WQ_RT := y
+        XWUPRULE_SD_WQ_RT := y
     else
-        SOUPRULE_SD_WQ_RT := n
+        XWUPRULE_SD_WQ_RT := n
     endif
 endif
 
@@ -65,11 +65,11 @@ endif
 XWOS_CSRCS += up/tt.c
 XWOS_CSRCS += up/thread.c
 
-ifeq ($(SOUPRULE_SD_WQ_PL),y)
+ifeq ($(XWUPRULE_SD_WQ_PL),y)
     XWOS_CSRCS += up/plwq.c
 endif
 
-ifeq ($(SOUPRULE_SD_WQ_RT),y)
+ifeq ($(XWUPRULE_SD_WQ_RT),y)
     XWOS_CSRCS += up/rtwq.c
 endif
 

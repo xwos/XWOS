@@ -103,7 +103,7 @@ __xwds_code
 void xwds_device_construct(struct xwds_device * dev)
 {
         xwds_obj_construct(&dev->obj);
-        dev->state = SODS_DEVICE_STATE_INVALID;
+        dev->state = XWDS_DEVICE_STATE_INVALID;
         dev->cvops = &xwds_dev_cvops;
         dev->ds = NULL;
 }
@@ -243,7 +243,7 @@ xwer_t xwds_device_cvop_resume(struct xwds_device * dev)
 
 /******** ******** ******** APIs ******** ******** ********/
 /**
- * @brief SODS API：探测设备
+ * @brief XWDS API：探测设备
  * @param ds: (I) 设备栈控制块指针
  * @param dev: (I) 设备对象的指针
  * @param gcfunc: (I) 垃圾回收函数
@@ -256,8 +256,8 @@ xwer_t xwds_device_probe(struct xwds * ds, struct xwds_device * dev,
         const struct xwds_base_virtual_operations * cvops;
         xwer_t rc;
 
-        SODS_VALIDATE(ds, "nullptr", -EFAULT);
-        SODS_VALIDATE(dev, "nullptr", -EFAULT);
+        XWDS_VALIDATE(ds, "nullptr", -EFAULT);
+        XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
         rc = xwds_obj_activate(&dev->obj, gcfunc);
         if (__unlikely(rc < 0)) {
@@ -265,8 +265,8 @@ xwer_t xwds_device_probe(struct xwds * ds, struct xwds_device * dev,
         }
 
         rc = xwaop_teq_then_write(xwsq_t, &dev->state,
-                                  SODS_DEVICE_STATE_INVALID,
-                                  SODS_DEVICE_STATE_PROBING,
+                                  XWDS_DEVICE_STATE_INVALID,
+                                  XWDS_DEVICE_STATE_PROBING,
                                   NULL);
         if (__unlikely(rc < 0)) {
                 rc = -EPERM;
@@ -292,7 +292,7 @@ xwer_t xwds_device_probe(struct xwds * ds, struct xwds_device * dev,
         dev->ds = ds;
 
         /* set device state */
-        xwaop_write(xwsq_t, &dev->state, SODS_DEVICE_STATE_STOPED, NULL);
+        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
         return OK;
 
 err_xwds_obj_add:
@@ -302,7 +302,7 @@ err_xwds_obj_add:
                 xwds_device_cvop_probe(dev);
         }
 err_dev_cvops_probe:
-        xwaop_write(xwsq_t, &dev->state, SODS_DEVICE_STATE_INVALID, NULL);
+        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_INVALID, NULL);
 err_dev_set_state:
         xwds_device_put(dev);
 err_dev_activate:
@@ -310,7 +310,7 @@ err_dev_activate:
 }
 
 /**
- * @brief SODS API：删除设备
+ * @brief XWDS API：删除设备
  * @param dev: (I) 设备对象的指针
  * @return 错误码
  */
@@ -321,11 +321,11 @@ xwer_t xwds_device_remove(struct xwds_device * dev)
         const struct xwds_base_virtual_operations * cvops;
         xwer_t rc;
 
-        SODS_VALIDATE(dev, "nullptr", -EFAULT);
+        XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
         rc = xwaop_teq_then_write(xwsq_t, &dev->state,
-                                  SODS_DEVICE_STATE_STOPED,
-                                  SODS_DEVICE_STATE_REMOVING,
+                                  XWDS_DEVICE_STATE_STOPED,
+                                  XWDS_DEVICE_STATE_REMOVING,
                                   NULL);
         if (__unlikely(rc < 0)) {
                 rc = -EPERM;
@@ -355,7 +355,7 @@ xwer_t xwds_device_remove(struct xwds_device * dev)
         }
 
         /* set device state */
-        xwaop_write(xwsq_t, &dev->state, SODS_DEVICE_STATE_INVALID, NULL);
+        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_INVALID, NULL);
         xwds_device_put(dev);
         return OK;
 
@@ -363,13 +363,13 @@ err_dev_cvops_remove:
         xwds_obj_add(ds, &dev->obj);
         dev->ds = ds;
 err_xwds_obj_remove:
-        xwaop_write(xwsq_t, &dev->state, SODS_DEVICE_STATE_STOPED, NULL);
+        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
 err_dev_set_state:
         return rc;
 }
 
 /**
- * @brief SODS API：启动设备
+ * @brief XWDS API：启动设备
  * @param dev: (I) 设备对象的指针
  * @return 错误码
  */
@@ -379,7 +379,7 @@ xwer_t xwds_device_start(struct xwds_device * dev)
         const struct xwds_base_virtual_operations * cvops;
         xwer_t rc;
 
-        SODS_VALIDATE(dev, "nullptr", -EFAULT);
+        XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
         rc = xwds_device_grab(dev);
         if (__unlikely(rc < 0)) {
@@ -387,8 +387,8 @@ xwer_t xwds_device_start(struct xwds_device * dev)
                 goto err_dev_grab;
         }
         rc = xwaop_teq_then_write(xwsq_t, &dev->state,
-                                  SODS_DEVICE_STATE_STOPED,
-                                  SODS_DEVICE_STATE_STARTING,
+                                  XWDS_DEVICE_STATE_STOPED,
+                                  XWDS_DEVICE_STATE_STARTING,
                                   NULL);
         if (__unlikely(rc < 0)) {
                 rc = -EPERM;
@@ -407,11 +407,11 @@ xwer_t xwds_device_start(struct xwds_device * dev)
         }
 
         /* set device state */
-        xwaop_write(xwsq_t, &dev->state, SODS_DEVICE_STATE_RUNNING, NULL);
+        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
         return OK;
 
 err_dev_cvops_start:
-        xwaop_write(xwsq_t, &dev->state, SODS_DEVICE_STATE_STOPED, NULL);
+        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
 err_dev_set_state:
         xwds_device_put(dev);
 err_dev_grab:
@@ -419,7 +419,7 @@ err_dev_grab:
 }
 
 /**
- * @brief SODS API：停止设备
+ * @brief XWDS API：停止设备
  * @param dev: (I) 设备对象的指针
  * @return 错误码
  */
@@ -429,11 +429,11 @@ xwer_t xwds_device_stop(struct xwds_device * dev)
         const struct xwds_base_virtual_operations * cvops;
         xwer_t rc;
 
-        SODS_VALIDATE(dev, "nullptr", -EFAULT);
+        XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
         rc = xwaop_teq_then_write(xwsq_t, &dev->state,
-                                  SODS_DEVICE_STATE_RUNNING,
-                                  SODS_DEVICE_STATE_STOPING,
+                                  XWDS_DEVICE_STATE_RUNNING,
+                                  XWDS_DEVICE_STATE_STOPING,
                                   NULL);
         if (__unlikely(rc < 0)) {
                 rc = -EPERM;
@@ -460,19 +460,19 @@ xwer_t xwds_device_stop(struct xwds_device * dev)
 
         /* set device state */
         xwds_device_put(dev);
-        xwaop_write(xwsq_t, &dev->state, SODS_DEVICE_STATE_STOPED, NULL);
+        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
         return OK;
 
 err_dev_cvops_stop:
 err_dev_refcnt:
-        xwaop_write(xwsq_t, &dev->state, SODS_DEVICE_STATE_RUNNING, NULL);
+        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
 err_dev_set_state:
         return rc;
 }
 
 #if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 /**
- * @brief SODS API：暂停设备
+ * @brief XWDS API：暂停设备
  * @param dev: (I) 设备对象的指针
  * @return 错误码
  */
@@ -482,11 +482,11 @@ xwer_t xwds_device_suspend(struct xwds_device * dev)
         const struct xwds_base_virtual_operations * cvops;
         xwer_t rc;
 
-        SODS_VALIDATE(dev, "nullptr", -EFAULT);
+        XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
         rc = xwaop_teq_then_write(xwsq_t, &dev->state,
-                                  SODS_DEVICE_STATE_RUNNING,
-                                  SODS_DEVICE_STATE_SUSPENDING,
+                                  XWDS_DEVICE_STATE_RUNNING,
+                                  XWDS_DEVICE_STATE_SUSPENDING,
                                   NULL);
         if (__unlikely(rc < 0)) {
                 rc = -EPERM;
@@ -505,17 +505,17 @@ xwer_t xwds_device_suspend(struct xwds_device * dev)
         }
 
         /* set device state */
-        xwaop_write(xwsq_t, &dev->state, SODS_DEVICE_STATE_SUSPENDED, NULL);
+        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_SUSPENDED, NULL);
         return OK;
 
 err_cvops_suspend:
-        xwaop_write(xwsq_t, &dev->state, SODS_DEVICE_STATE_RUNNING, NULL);
+        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
 err_dev_set_state:
         return rc;
 }
 
 /**
- * @brief SODS API：继续设备
+ * @brief XWDS API：继续设备
  * @param dev: (I) 设备对象的指针
  * @return 错误码
  */
@@ -526,11 +526,11 @@ xwer_t xwds_device_resume(struct xwds_device * dev)
         const struct xwds_base_virtual_operations * cvops;
         xwer_t rc;
 
-        SODS_VALIDATE(dev, "nullptr", -EFAULT);
+        XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
         rc = xwaop_teq_then_write(xwsq_t, &dev->state,
-                                  SODS_DEVICE_STATE_SUSPENDED,
-                                  SODS_DEVICE_STATE_RESUMING,
+                                  XWDS_DEVICE_STATE_SUSPENDED,
+                                  XWDS_DEVICE_STATE_RESUMING,
                                   NULL);
         if (__unlikely(rc < 0)) {
                 rc = -EPERM;
@@ -548,17 +548,17 @@ xwer_t xwds_device_resume(struct xwds_device * dev)
                 goto err_cvops_resume;
         }
 
-        xwaop_write(xwsq_t, &dev->state, SODS_DEVICE_STATE_RUNNING, NULL);
+        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
         return OK;
 
 err_cvops_resume:
-        xwaop_write(xwsq_t, &dev->state, SODS_DEVICE_STATE_SUSPENDED, NULL);
+        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_SUSPENDED, NULL);
 err_set_state:
         return rc;
 }
 
 /**
- * @brief SODS API：暂停所有设备
+ * @brief XWDS API：暂停所有设备
  * @param ds: (I) 设备栈控制块指针
  * @param ign_err: (I) 是否忽略错误：若为假，发生错误时，函数会中止并返回
  * @return 错误码
@@ -570,7 +570,7 @@ xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        SODS_VALIDATE(ds, "nullptr", -EFAULT);
+        XWDS_VALIDATE(ds, "nullptr", -EFAULT);
 
         rc = OK;
         xwosal_sqlk_wr_lock_cpuirqsv(&ds->devlistlock, &cpuirq);
@@ -579,7 +579,8 @@ xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err)
                 rc = xwds_device_suspend(c);
                 xwosal_sqlk_wr_lock_cpuirqsv(&ds->devlistlock, &cpuirq);
                 if (__unlikely(rc < 0)) {
-                        xwisrlogf(ERR, "Failed to suspend device: <%s:%d>, rc: %d",
+                        xwisrlogf(ERR, XWDS_LOG_TAG,
+                                  "Failed to suspend device: <%s:%d>, rc: %d",
                                   c->name, c->id, rc);
                         if (ign_err) {
                                 rc = OK;
@@ -593,7 +594,7 @@ xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err)
 }
 
 /**
- * @brief SODS API：继续所有设备
+ * @brief XWDS API：继续所有设备
  * @param ds: (I) 设备栈控制块指针
  * @param ign_err: (I) 是否忽略错误：若为假，发生错误时，函数会中止并返回
  * @return 错误码
@@ -605,7 +606,7 @@ xwer_t xwds_device_resume_all(struct xwds * ds, bool ign_err)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        SODS_VALIDATE(ds, "nullptr", -EFAULT);
+        XWDS_VALIDATE(ds, "nullptr", -EFAULT);
 
         rc = OK;
         xwosal_sqlk_wr_lock_cpuirqsv(&ds->devlistlock, &cpuirq);
@@ -614,7 +615,8 @@ xwer_t xwds_device_resume_all(struct xwds * ds, bool ign_err)
                 rc = xwds_device_resume(c);
                 xwosal_sqlk_wr_lock_cpuirqsv(&ds->devlistlock, &cpuirq);
                 if (__unlikely(rc < 0)) {
-                        xwisrlogf(ERR, "Failed to resume device: <%s:%d>, rc: %d",
+                        xwisrlogf(ERR, XWDS_LOG_TAG,
+                                  "Failed to resume device: <%s:%d>, rc: %d",
                                   c->name, c->id, rc);
                         if (ign_err) {
                                 rc = OK;

@@ -297,7 +297,7 @@ xwer_t at24mdd_putc(struct xwds_i2cp_eeprom * eeprom, xwu8_t data, xwptr_t addr,
         txdata[1] = (xwu8_t)(addr & 0xFF);
         txdata[2] = data;
         msg.addr = (xwu16_t)(i2cpaddr & 0x00FE);
-        msg.flags = SODS_I2C_F_STOP;
+        msg.flags = XWDS_I2C_F_STOP;
         msg.buf = txdata;
         msg.size = sizeof(txdata);
         rc = xwds_i2cm_xfer(bus, &msg, xwtm);
@@ -319,13 +319,13 @@ xwer_t at24mdd_getc(struct xwds_i2cp_eeprom * eeprom, xwu8_t * buf, xwptr_t addr
         txdata[0] = (xwu8_t)((addr >> 8) & 0x1F);
         txdata[1] = (xwu8_t)(addr & 0xFF);
         msg.addr = (xwu16_t)(i2cpaddr & 0x00FE);
-        msg.flags = SODS_I2C_F_NONE;
+        msg.flags = XWDS_I2C_F_NONE;
         msg.buf = txdata;
         msg.size = 2;
         rc = xwds_i2cm_xfer(bus, &msg, xwtm);
         if (OK == rc) {
                 msg.addr = (xwu16_t)(i2cpaddr & 0x00FE);
-                msg.flags = SODS_I2C_F_RD | SODS_I2C_F_STOP;
+                msg.flags = XWDS_I2C_F_RD | XWDS_I2C_F_STOP;
                 msg.buf = buf;
                 msg.size = 1;
                 rc = xwds_i2cm_xfer(bus, &msg, xwtm);
@@ -355,7 +355,7 @@ xwer_t at24mdd_pgwrite(struct xwds_i2cp_eeprom * eeprom,
         txdata[1] = (xwu8_t)(addr & 0xFF);
         memcpy(&txdata[2], data, size);
         msg.addr = (xwu16_t)(i2cpaddr & 0x00FE);
-        msg.flags = SODS_I2C_F_STOP;
+        msg.flags = XWDS_I2C_F_STOP;
         msg.buf = txdata;
         msg.size = size + 2;
         rc = xwds_i2cm_xfer(bus, &msg, xwtm);
@@ -384,13 +384,13 @@ xwer_t at24mdd_pgread(struct xwds_i2cp_eeprom * eeprom,
         txdata[0] = (xwu8_t)(addr >> 8);
         txdata[1] = (xwu8_t)(addr & 0xFF);
         msg.addr = (xwu16_t)(i2cpaddr & 0x00FE);
-        msg.flags = SODS_I2C_F_NONE;
+        msg.flags = XWDS_I2C_F_NONE;
         msg.buf = txdata;
         msg.size = 2;
         rc = xwds_i2cm_xfer(bus, &msg, xwtm);
         if (OK == rc) {
                 msg.addr = (xwu16_t)(i2cpaddr & 0x00FE);
-                msg.flags = SODS_I2C_F_RD | SODS_I2C_F_STOP;
+                msg.flags = XWDS_I2C_F_RD | XWDS_I2C_F_STOP;
                 msg.buf = buf;
                 msg.size = *size;
                 rc = xwds_i2cm_xfer(bus, &msg, xwtm);
@@ -427,45 +427,45 @@ xwer_t at24mdd_drv_ioctl(struct xwds_i2cp * i2cp, xwsq_t cmd, va_list args)
 
         eeprom = xwds_static_cast(struct xwds_i2cp_eeprom *, i2cp);
         switch (cmd) {
-        case SODS_I2CP_EEPROM_IOC_PWR_ON:
+        case XWDS_I2CP_EEPROM_IOC_PWR_ON:
                 rc = at24mdd_power_on(eeprom);
                 break;
-        case SODS_I2CP_EEPROM_IOC_PWR_OFF:
+        case XWDS_I2CP_EEPROM_IOC_PWR_OFF:
                 rc = at24mdd_power_off(eeprom);
                 break;
-        case SODS_I2CP_EEPROM_IOC_WP_EN:
+        case XWDS_I2CP_EEPROM_IOC_WP_EN:
                 rc = at24mdd_wp_enable(eeprom);
                 break;
-        case SODS_I2CP_EEPROM_IOC_WP_DS:
+        case XWDS_I2CP_EEPROM_IOC_WP_DS:
                 rc = at24mdd_wp_disable(eeprom);
                 break;
-        case SODS_I2CP_EEPROM_IOC_PUTC:
+        case XWDS_I2CP_EEPROM_IOC_PUTC:
                 byte = (xwu8_t)va_arg(args, int);
                 addr = va_arg(args, xwptr_t);
                 xwtm = va_arg(args, xwtm_t *);
                 rc = at24mdd_putc(eeprom, byte, addr, xwtm);
                 break;
-        case SODS_I2CP_EEPROM_IOC_GETC:
+        case XWDS_I2CP_EEPROM_IOC_GETC:
                 databuf = va_arg(args, xwu8_t *);
                 addr = va_arg(args, xwptr_t);
                 xwtm = va_arg(args, xwtm_t *);
                 rc = at24mdd_getc(eeprom, databuf, addr, xwtm);
                 break;
-        case SODS_I2CP_EEPROM_IOC_PGWR:
+        case XWDS_I2CP_EEPROM_IOC_PGWR:
                 databuf = va_arg(args, xwu8_t *);
                 wrsz = va_arg(args, xwsz_t);
                 seq = va_arg(args, xwsq_t);
                 xwtm = va_arg(args, xwtm_t *);
                 rc = at24mdd_pgwrite(eeprom, databuf, wrsz, seq, xwtm);
                 break;
-        case SODS_I2CP_EEPROM_IOC_PGRD:
+        case XWDS_I2CP_EEPROM_IOC_PGRD:
                 databuf = va_arg(args, xwu8_t *);
                 rdsz = va_arg(args, xwsz_t *);
                 seq = va_arg(args, xwsq_t);
                 xwtm = va_arg(args, xwtm_t *);
                 rc = at24mdd_pgread(eeprom, databuf, rdsz, seq, xwtm);
                 break;
-        case SODS_I2CP_EEPROM_IOC_RESET:
+        case XWDS_I2CP_EEPROM_IOC_RESET:
                 xwtm = va_arg(args, xwtm_t *);
                 rc = at24mdd_reset(eeprom, xwtm);
                 break;

@@ -60,33 +60,12 @@ void soc_log_init(void)
 }
 
 /**
- * @brief Send a byte to debug port
- * @param s: c
- */
-__xwbsp_code
-void soc_log_putc(const char c)
-{
-        if (soc_dbg.cr.b.traceio_en)
-                cm_itm_putc(0, c);
-}
-
-/**
- * @brief Send a string to debug port
- * @param s: string
- */
-__xwbsp_code
-xwssz_t soc_log_puts(const char * s)
-{
-        return cm_itm_puts(0, s);
-}
-
-/**
  * @brief Send a string to debug port
  * @param s: string
  * @param n: max length of string
  */
 __xwbsp_code
-xwssz_t soc_log_putns(const char * s, xwsz_t n)
+xwssz_t soc_log_write(const char * s, xwsz_t n)
 {
-        return cm_itm_putns(0, s, n);
+        return cm_itm_write(0, s, n);
 }

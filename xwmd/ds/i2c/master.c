@@ -64,7 +64,7 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_i2cm_cvops = {
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
- * @brief SODS API：I2C主机控制器的构造函数
+ * @brief XWDS API：I2C主机控制器的构造函数
  * @param i2cm: (I) I2C主机控制器对象指针
  */
 __xwds_api
@@ -75,7 +75,7 @@ void xwds_i2cm_construct(struct xwds_i2cm * i2cm)
 }
 
 /**
- * @brief SODS API：I2C主机控制器对象的析构函数
+ * @brief XWDS API：I2C主机控制器对象的析构函数
  * @param i2cm: (I) I2C主机控制器对象指针
  */
 __xwds_api
@@ -86,7 +86,7 @@ void xwds_i2cm_destruct(struct xwds_i2cm * i2cm)
 
 /******** ******** base virtual operations ******** ********/
 /**
- * @brief SODS VOP：探测I2C主机控制器
+ * @brief XWDS VOP：探测I2C主机控制器
  * @param i2cm: (I) I2C主机控制器对象指针
  * @return 错误码
  */
@@ -95,7 +95,7 @@ xwer_t xwds_i2cm_cvop_probe(struct xwds_i2cm * i2cm)
 {
         xwer_t rc;
 
-        SODS_VALIDATE(i2cm->cfg, "nullptr", -EFAULT);
+        XWDS_VALIDATE(i2cm->cfg, "nullptr", -EFAULT);
 
         rc = xwosal_mtx_init(&i2cm->xferlock, XWOSAL_SD_PRIORITY_RT_MIN);
         if (__unlikely(rc < 0)) {
@@ -114,7 +114,7 @@ err_mtx_init:
 }
 
 /**
- * @brief SODS VOP：移除I2C主机控制器
+ * @brief XWDS VOP：移除I2C主机控制器
  * @param ds: (I) 设备栈控制块指针
  * @param i2cm: (I) I2C主机控制器对象指针
  * @return 错误码
@@ -136,7 +136,7 @@ err_dev_cvop_remove:
 }
 
 /**
- * @brief SODS VOP：启动I2C主机控制器
+ * @brief XWDS VOP：启动I2C主机控制器
  * @param i2cm: (I) I2C主机控制器对象指针
  * @return 错误码
  */
@@ -150,7 +150,7 @@ xwer_t xwds_i2cm_cvop_start(struct xwds_i2cm * i2cm)
 }
 
 /**
- * @brief SODS VOP：停止I2C主机控制器
+ * @brief XWDS VOP：停止I2C主机控制器
  * @param i2cm: (I) I2C主机控制器对象指针
  * @return 错误码
  */
@@ -166,7 +166,7 @@ xwer_t xwds_i2cm_cvop_stop(struct xwds_i2cm * i2cm)
 /******** ******** pm ******** ********/
 #if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 /**
- * @brief SODS VOP：暂停I2C主机控制器
+ * @brief XWDS VOP：暂停I2C主机控制器
  * @param i2cm: (I) I2C主机控制器对象指针
  * @return 错误码
  */
@@ -180,7 +180,7 @@ xwer_t xwds_i2cm_cvop_suspend(struct xwds_i2cm * i2cm)
 }
 
 /**
- * @brief SODS VOP：继续I2C主机控制器
+ * @brief XWDS VOP：继续I2C主机控制器
  * @param i2cm: (I) I2C主机控制器对象指针
  * @return 错误码
  */
@@ -196,7 +196,7 @@ xwer_t xwds_i2cm_cvop_resume(struct xwds_i2cm * i2cm)
 
 /******** ******** ******** APIs ******** ******** ********/
 /**
- * @brief SODS API：发送I2C消息
+ * @brief XWDS API：发送I2C消息
  * @param i2cm: (I) I2C主机控制器对象指针
  * @param msg: (I) I2C消息结构体的指针
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
@@ -220,9 +220,9 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
         xwer_t rc;
         const struct xwds_i2cm_driver * drv;
 
-        SODS_VALIDATE(i2cm, "nullptr", -EFAULT);
-        SODS_VALIDATE(msg, "nullptr", -EFAULT);
-        SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
+        XWDS_VALIDATE(i2cm, "nullptr", -EFAULT);
+        XWDS_VALIDATE(msg, "nullptr", -EFAULT);
+        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_i2cm_grab(i2cm);
         if (__unlikely(rc < 0)) {
@@ -263,7 +263,7 @@ err_i2cm_grab:
 }
 
 /**
- * @brief SODS API：复位I2C主机
+ * @brief XWDS API：复位I2C主机
  * @param i2cm: (I) I2C主机控制器对象指针
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
@@ -285,8 +285,8 @@ xwer_t xwds_i2cm_reset(struct xwds_i2cm * i2cm, xwtm_t * xwtm)
         xwer_t rc;
         const struct xwds_i2cm_driver * drv;
 
-        SODS_VALIDATE(i2cm, "nullptr", -EFAULT);
-        SODS_VALIDATE(xwtm, "nullptr", -EFAULT);
+        XWDS_VALIDATE(i2cm, "nullptr", -EFAULT);
+        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_i2cm_grab(i2cm);
         if (__unlikely(rc < 0)) {

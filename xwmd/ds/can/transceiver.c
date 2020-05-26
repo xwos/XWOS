@@ -65,7 +65,7 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_cantrcv_cvops = {
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
- * @brief SODS API：CAN接收器的构造函数
+ * @brief XWDS API：CAN接收器的构造函数
  * @param cantrcv: (I) CAN接收器对象指针
  */
 __xwds_api
@@ -76,7 +76,7 @@ void xwds_cantrcv_construct(struct xwds_cantrcv * cantrcv)
 }
 
 /**
- * @brief SODS API：CAN接收器对象的析构函数
+ * @brief XWDS API：CAN接收器对象的析构函数
  * @param cantrcv: (I) CAN接收器对象指针
  */
 __xwds_api
@@ -87,7 +87,7 @@ void xwds_cantrcv_destruct(struct xwds_cantrcv * cantrcv)
 
 /******** ******** base virtual operations ******** ********/
 /**
- * @brief SODS VOP：探测CAN接收器
+ * @brief XWDS VOP：探测CAN接收器
  * @param cantrcv: (I) CAN接收器对象指针
  * @return 错误码
  */
@@ -96,15 +96,15 @@ xwer_t xwds_cantrcv_cvop_probe(struct xwds_cantrcv * cantrcv)
 {
         xwer_t rc;
 
-        SODS_VALIDATE(cantrcv, "nullptr", -EFAULT);
-        SODS_VALIDATE(cantrcv->cfg, "nullptr", -EFAULT);
+        XWDS_VALIDATE(cantrcv, "nullptr", -EFAULT);
+        XWDS_VALIDATE(cantrcv->cfg, "nullptr", -EFAULT);
 
         rc = xwds_device_cvop_probe(&cantrcv->bc.dev);
         return rc;
 }
 
 /**
- * @brief SODS VOP：移除CAN接收器
+ * @brief XWDS VOP：移除CAN接收器
  * @param cantrcv: (I) CAN接收器对象指针
  * @return 错误码
  */
@@ -113,15 +113,15 @@ xwer_t xwds_cantrcv_cvop_remove(struct xwds_cantrcv * cantrcv)
 {
         xwer_t rc;
 
-        SODS_VALIDATE(cantrcv, "nullptr", -EFAULT);
-        SODS_VALIDATE(cantrcv->cfg, "nullptr", -EFAULT);
+        XWDS_VALIDATE(cantrcv, "nullptr", -EFAULT);
+        XWDS_VALIDATE(cantrcv->cfg, "nullptr", -EFAULT);
 
         rc = xwds_device_cvop_remove(&cantrcv->bc.dev);
         return rc;
 }
 
 /**
- * @brief SODS VOP：启动CAN接收器
+ * @brief XWDS VOP：启动CAN接收器
  * @param cantrcv: (I) CAN接收器对象指针
  * @return 错误码
  */
@@ -130,14 +130,14 @@ xwer_t xwds_cantrcv_cvop_start(struct xwds_cantrcv * cantrcv)
 {
         xwer_t rc;
 
-        SODS_VALIDATE(cantrcv, "nullptr", -EFAULT);
-        SODS_VALIDATE(cantrcv->cfg, "nullptr", -EFAULT);
+        XWDS_VALIDATE(cantrcv, "nullptr", -EFAULT);
+        XWDS_VALIDATE(cantrcv->cfg, "nullptr", -EFAULT);
 
         rc = xwds_device_cvop_start(&cantrcv->bc.dev);
         if (__unlikely(rc < 0)) {
                 goto err_dev_cvop_start;
         }
-        cantrcv->wkuprs = SODS_CANTRCV_WKUPRS_NONE;
+        cantrcv->wkuprs = XWDS_CANTRCV_WKUPRS_NONE;
         rc = xwds_cantrcv_set_opmode(cantrcv, cantrcv->cfg->init_opmode);
         if (__unlikely(rc < 0)) {
                 goto err_set_opmode;
@@ -151,7 +151,7 @@ err_dev_cvop_start:
 }
 
 /**
- * @brief SODS VOP：停止CAN接收器
+ * @brief XWDS VOP：停止CAN接收器
  * @param cantrcv: (I) CAN接收器对象指针
  * @return 错误码
  */
@@ -160,7 +160,7 @@ xwer_t xwds_cantrcv_cvop_stop(struct xwds_cantrcv * cantrcv)
 {
         xwer_t rc;
 
-        SODS_VALIDATE(cantrcv, "nullptr", -EFAULT);
+        XWDS_VALIDATE(cantrcv, "nullptr", -EFAULT);
 
         rc = xwds_device_cvop_stop(&cantrcv->bc.dev);
         return rc;
@@ -169,7 +169,7 @@ xwer_t xwds_cantrcv_cvop_stop(struct xwds_cantrcv * cantrcv)
 #if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
 /******** ******** pm ******** ********/
 /**
- * @brief SODS VOP：暂停CAN接收器
+ * @brief XWDS VOP：暂停CAN接收器
  * @param cantrcv: (I) CAN接收器对象指针
  * @return 错误码
  */
@@ -178,14 +178,14 @@ xwer_t xwds_cantrcv_cvop_suspend(struct xwds_cantrcv * cantrcv)
 {
         xwer_t rc;
 
-        SODS_VALIDATE(cantrcv, "nullptr", -EFAULT);
+        XWDS_VALIDATE(cantrcv, "nullptr", -EFAULT);
 
         rc = xwds_device_cvop_suspend(&cantrcv->bc.dev);
         return rc;
 }
 
 /**
- * @brief SODS VOP：继续CAN接收器
+ * @brief XWDS VOP：继续CAN接收器
  * @param cantrcv: (I) CAN接收器对象指针
  * @return 错误码
  */
@@ -194,7 +194,7 @@ xwer_t xwds_cantrcv_cvop_resume(struct xwds_cantrcv * cantrcv)
 {
         xwer_t rc;
 
-        SODS_VALIDATE(cantrcv, "nullptr", -EFAULT);
+        XWDS_VALIDATE(cantrcv, "nullptr", -EFAULT);
 
         rc = xwds_device_cvop_resume(&cantrcv->bc.dev);
         return rc;
@@ -203,7 +203,7 @@ xwer_t xwds_cantrcv_cvop_resume(struct xwds_cantrcv * cantrcv)
 
 /******** ******** ******** CAN operations ******** ******** ********/
 /**
- * @brief SODS API：设置CAN接收器的运行模式
+ * @brief XWDS API：设置CAN接收器的运行模式
  * @param cantrcv: (I) CAN接收器对象指针
  * @param opmode: (I) 唤醒模式
  * @return 错误码
@@ -223,8 +223,8 @@ xwer_t xwds_cantrcv_set_opmode(struct xwds_cantrcv * cantrcv, xwsq_t opmode)
         xwer_t rc;
         const struct xwds_cantrcv_driver * drv;
 
-        SODS_VALIDATE(cantrcv, "nullptr", -EFAULT);
-        SODS_VALIDATE((opmode < SODS_CANTRCV_OPMODE_NUM), "out-of-range", -ERANGE);
+        XWDS_VALIDATE(cantrcv, "nullptr", -EFAULT);
+        XWDS_VALIDATE((opmode < XWDS_CANTRCV_OPMODE_NUM), "out-of-range", -ERANGE);
 
         drv = xwds_static_cast(const struct xwds_cantrcv_driver *,
                                cantrcv->bc.dev.drv);
@@ -244,7 +244,7 @@ err_ops_set_opmode:
 }
 
 /**
- * @brief SODS API：设置CAN接收器的模式
+ * @brief XWDS API：设置CAN接收器的模式
  * @param cantrcv: (I) CAN接收器对象指针
  * @param opmode: (O) 指向缓冲区的指针，通过次缓冲区返回模式
  * @note
@@ -257,14 +257,14 @@ err_ops_set_opmode:
 __xwds_api
 void xwds_cantrcv_get_opmode(struct xwds_cantrcv * cantrcv, xwsq_t * opmode)
 {
-        SODS_VALIDATE(cantrcv, "nullptr");
-        SODS_VALIDATE(opmode, "nullptr");
+        XWDS_VALIDATE(cantrcv, "nullptr");
+        XWDS_VALIDATE(opmode, "nullptr");
 
         *opmode = cantrcv->opmode;
 }
 
 /**
- * @brief SODS API：开启CAN接收器的唤醒
+ * @brief XWDS API：开启CAN接收器的唤醒
  * @param cantrcv: (I) CAN接收器对象指针
  * @return 错误码
  * @retval OK: OK
@@ -284,7 +284,7 @@ xwer_t xwds_cantrcv_enable_wkup(struct xwds_cantrcv * cantrcv)
         const struct xwds_cantrcv_driver * drv;
         const struct xwds_cantrcv_cfg * cfg;
 
-        SODS_VALIDATE(cantrcv, "nullptr", -EFAULT);
+        XWDS_VALIDATE(cantrcv, "nullptr", -EFAULT);
 
         cfg = cantrcv->cfg;
         if (cfg->wkup_supported) {
@@ -302,7 +302,7 @@ xwer_t xwds_cantrcv_enable_wkup(struct xwds_cantrcv * cantrcv)
 }
 
 /**
- * @brief SODS API：关闭CAN接收器的唤醒
+ * @brief XWDS API：关闭CAN接收器的唤醒
  * @param cantrcv: (I) CAN接收器对象指针
  * @return 错误码
  * @retval OK: OK
@@ -322,7 +322,7 @@ xwer_t xwds_cantrcv_disable_wkup(struct xwds_cantrcv * cantrcv)
         const struct xwds_cantrcv_driver * drv;
         const struct xwds_cantrcv_cfg * cfg;
 
-        SODS_VALIDATE(cantrcv, "nullptr", -EFAULT);
+        XWDS_VALIDATE(cantrcv, "nullptr", -EFAULT);
 
         cfg = cantrcv->cfg;
         if (cfg->wkup_supported) {
@@ -358,7 +358,7 @@ void xwds_cantrcv_set_wkup_isr(struct xwds_cantrcv * cantrcv,
 }
 
 /**
- * @brief SODS API：获取CAN接收器的唤醒原因
+ * @brief XWDS API：获取CAN接收器的唤醒原因
  * @param cantrcv: (I) CAN接收器对象指针
  * @param wkuprs: (O) 指向缓冲区的指针，通过次缓冲区返回唤醒原因
  * @note
@@ -373,19 +373,19 @@ void xwds_cantrcv_get_wkuprs(struct xwds_cantrcv * cantrcv, xwsq_t * wkuprs)
 {
         const struct xwds_cantrcv_cfg * cfg;
 
-        SODS_VALIDATE(cantrcv, "nullptr");
-        SODS_VALIDATE(wkuprs, "nullptr");
+        XWDS_VALIDATE(cantrcv, "nullptr");
+        XWDS_VALIDATE(wkuprs, "nullptr");
 
         cfg = cantrcv->cfg;
         if (cfg->wkup_supported) {
                 *wkuprs = cantrcv->wkuprs;
         } else {
-                *wkuprs = SODS_CANTRCV_WKUPRS_NOT_SUPPORTED;
+                *wkuprs = XWDS_CANTRCV_WKUPRS_NOT_SUPPORTED;
         }
 }
 
 /**
- * @brief SODS API：清除CAN接收器的唤醒原因
+ * @brief XWDS API：清除CAN接收器的唤醒原因
  * @param cantrcv: (I) CAN接收器对象指针
  * @note
  * - 同步/异步：同步
@@ -397,9 +397,9 @@ void xwds_cantrcv_get_wkuprs(struct xwds_cantrcv * cantrcv, xwsq_t * wkuprs)
 __xwds_api
 void xwds_cantrcv_clear_wkuprs(struct xwds_cantrcv * cantrcv)
 {
-        SODS_VALIDATE(cantrcv, "nullptr");
+        XWDS_VALIDATE(cantrcv, "nullptr");
 
-        cantrcv->wkuprs = SODS_CANTRCV_WKUPRS_NONE;
+        cantrcv->wkuprs = XWDS_CANTRCV_WKUPRS_NONE;
 }
 
 /**

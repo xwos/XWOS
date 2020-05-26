@@ -106,11 +106,11 @@ const struct xwds_resources mpc560xb_uart0_resources = {
 const struct xwds_uart_cfg mpc560xb_uart0_cfg = {
         .baudrate = BRDCFG_AMQ_UART_BAUDRATE,
         .bus.bit = {
-                .bits = SODS_UART_BITS_9,
-                .stopbits = SODS_UART_STOPBITS_1_0,
-                .parity = SODS_UART_PARITY_NONE,
-                .hfc = SODS_UART_HFC_NONE,
-                .mode = SODS_UART_MODE_TX | SODS_UART_MODE_RX,
+                .bits = XWDS_UART_BITS_9,
+                .stopbits = XWDS_UART_STOPBITS_1_0,
+                .parity = XWDS_UART_PARITY_NONE,
+                .hfc = XWDS_UART_HFC_NONE,
+                .mode = XWDS_UART_MODE_TX | XWDS_UART_MODE_RX,
         },
         .xwccfg = NULL,
 };

@@ -110,7 +110,7 @@ xwer_t tja1042_check_desc(struct xwds_cantrcv * cantrcv)
                 rc = -EINVAL;
         } else if (__unlikely(is_err_or_null(chipcfg))) {
                 rc = -EINVAL;
-        } else if (cfg->init_opmode >= SODS_CANTRCV_OPMODE_NUM) {
+        } else if (cfg->init_opmode >= XWDS_CANTRCV_OPMODE_NUM) {
                 rc = -EINVAL;
         } else {
                 rc = OK;
@@ -257,16 +257,16 @@ xwer_t tja1042_cantrcv_drv_set_opmode(struct xwds_cantrcv * cantrcv,
         gpiorsc_stb = chipcfg->gpiorsc_stb;
 
         switch (opmode) {
-        case SODS_CANTRCV_OPMODE_NORMAL:
+        case XWDS_CANTRCV_OPMODE_NORMAL:
                 rc = xwds_gpio_reset(gpiorsc_stb->soc,
                                      gpiorsc_stb->port,
                                      gpiorsc_stb->pinmask);
                 if (OK == rc) {
-                        cantrcv->wkuprs = SODS_CANTRCV_WKUPRS_BY_PIN;
+                        cantrcv->wkuprs = XWDS_CANTRCV_WKUPRS_BY_PIN;
                 }
                 break;
-        case SODS_CANTRCV_OPMODE_SLEEP:
-        case SODS_CANTRCV_OPMODE_STANDBY:
+        case XWDS_CANTRCV_OPMODE_SLEEP:
+        case XWDS_CANTRCV_OPMODE_STANDBY:
                 rc = xwds_gpio_set(gpiorsc_stb->soc,
                                    gpiorsc_stb->port,
                                    gpiorsc_stb->pinmask);
@@ -295,7 +295,7 @@ xwer_t tja1042_cantrcv_drv_enable_wkup(struct xwds_cantrcv * cantrcv)
         if (gpiorsc_eirq) {
                 rc = xwds_eirq_req(gpiorsc_eirq->soc,
                                    gpiorsc_eirq->port, gpiorsc_eirq->pinmask,
-                                   eirq, SODS_SOC_EIF_TM_FALLING | SODS_SOC_EIF_WKUP,
+                                   eirq, XWDS_SOC_EIF_TM_FALLING | XWDS_SOC_EIF_WKUP,
                                    tja1042_cantrcv_eirq_wkup, cantrcv);
         } else {
                 rc = -EOPNOTSUPP;
@@ -342,7 +342,7 @@ void tja1042_cantrcv_eirq_wkup(struct xwds_soc * soc, xwid_t eiid,
         chipcfg = cfg->chipcfg;
 
         if (eiid == chipcfg->eirq) {
-                cantrcv->wkuprs = SODS_CANTRCV_WKUPRS_BY_BUS;
+                cantrcv->wkuprs = XWDS_CANTRCV_WKUPRS_BY_BUS;
                 xwds_cantrcv_lib_wakeup_notification(cantrcv);
         }
 }

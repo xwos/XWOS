@@ -105,13 +105,13 @@ const struct xwds_dmauartc_driver stm32cube_dmauartc1_drv = {
 struct xwds_resource_dma stm32cube_dmauartc1_rsc_dma[2] = {
         [MX_USART1_RSC_DMA_IDX_RX] = {
                 .soc = &stm32cube_soc_cb,
-                .ch = SODS_DMA_CH(10),
+                .ch = XWDS_DMA_CH(10),
                 .xwccfg = NULL,
                 .description = "rsc.dma.rx.usart.1",
         },
         [MX_USART1_RSC_DMA_IDX_TX] = {
                 .soc = &stm32cube_soc_cb,
-                .ch = SODS_DMA_CH(15),
+                .ch = XWDS_DMA_CH(15),
                 .xwccfg = NULL,
                 .description = "rsc.dma.tx.usart.1",
         },
@@ -330,7 +330,7 @@ void stm32cube_dmauartc1_rxdma_cb(struct xwds_soc * soc, xwid_t ch, xwu32_t rc,
         if (STM32CUBE_SOC_DMA_RC_TC & rc) {
                 xwds_dmauartc_lib_rxq_pub(dmauartc, 0);
         } else if (STM32CUBE_SOC_DMA_RC_HT & rc) {
-                xwds_dmauartc_lib_rxq_pub(dmauartc, SODS_DMAUART_RXQ_SIZE);
+                xwds_dmauartc_lib_rxq_pub(dmauartc, XWDS_DMAUART_RXQ_SIZE);
         } else {
         }
         MX_TIM9_Start();

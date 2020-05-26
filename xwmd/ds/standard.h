@@ -33,17 +33,19 @@
 
 #define xwds_static_cast(type, dev)     ((type)(dev))
 
-#define SODS_BUG()                      XWOS_BUG()
-#define SODS_BUG_ON(x)                  XWOS_BUG_ON(x)
+#define XWDS_BUG()                      XWOS_BUG()
+#define XWDS_BUG_ON(x)                  XWOS_BUG_ON(x)
 
 #if (defined(XWMDCFG_CHECK_PARAMETERS) && (1 == XWMDCFG_CHECK_PARAMETERS))
-#define SODS_VALIDATE(exp, errstr, ...) \
+  #define XWDS_VALIDATE(exp, errstr, ...) \
         if (__unlikely(!(exp))) {       \
             return __VA_ARGS__; \
         }
 #else
-#define SODS_VALIDATE(exp, errstr, ...)
+  #define XWDS_VALIDATE(exp, errstr, ...)
 #endif
+
+#define XWDS_LOG_TAG "xwds"
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********

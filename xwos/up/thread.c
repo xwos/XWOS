@@ -25,12 +25,12 @@
 #include <xwos/up/lock/seqlock.h>
 #include <xwos/up/lock/fakespinlock.h>
 #include <xwos/up/rtrq.h>
-#if (1 == SOUPRULE_SD_WQ_RT)
+#if (1 == XWUPRULE_SD_WQ_RT)
   #include <xwos/up/rtwq.h>
-#endif /* SOUPRULE_SD_WQ_RT */
-#if (1 == SOUPRULE_SD_WQ_PL)
+#endif /* XWUPRULE_SD_WQ_RT */
+#if (1 == XWUPRULE_SD_WQ_PL)
   #include <xwos/up/plwq.h>
-#endif /* SOUPRULE_SD_WQ_PL */
+#endif /* XWUPRULE_SD_WQ_PL */
 #include <xwos/up/tt.h>
 #include <xwos/up/thread.h>
 #if defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)
@@ -198,10 +198,10 @@ void xwos_thrd_activate(struct xwos_tcb * tcb,
         tcb->state = XWSDOBJ_DST_UNKNOWN;
         tcb->attribute = attr;
 
-#if (1 == SOUPRULE_SD_THRD_FREEZE)
+#if (1 == XWUPRULE_SD_THRD_FREEZE)
         /* frozen state info */
         xwlib_bclst_init_node(&tcb->frznode);
-#endif /* (1 == SOUPRULE_SD_THRD_FREEZE) */
+#endif /* (1 == XWUPRULE_SD_THRD_FREEZE) */
 
         /* ready state info */
         xwlib_bclst_init_node(&tcb->rqnode);
@@ -951,7 +951,7 @@ void xwos_thrd_wqn_callback(void * entry)
         xwos_scheduler_chkpmpt();
 }
 
-#if (1 == SOUPRULE_SD_WQ_RT)
+#if (1 == XWUPRULE_SD_WQ_RT)
 /**
  * @brief 将线程加入到实时（红黑树）等待队列中
  * @param tcb: (I) 线程控制块对象的指针
@@ -968,9 +968,9 @@ void xwos_thrd_eq_rtwq(struct xwos_tcb * tcb, struct xwos_rtwq * xwrtwq,
         tcb->wqn.cb = xwos_thrd_wqn_callback;
         xwos_rtwq_add(xwrtwq, &tcb->wqn, tcb->prio.d);
 }
-#endif /* (1 == SOUPRULE_SD_WQ_RT) */
+#endif /* (1 == XWUPRULE_SD_WQ_RT) */
 
-#if (1 == SOUPRULE_SD_WQ_PL)
+#if (1 == XWUPRULE_SD_WQ_PL)
 /**
  * @brief 将线程加入到管道（双循环链表）等待队列中
  * @param tcb: (I) 线程控制块对象的指针
@@ -987,7 +987,7 @@ void xwos_thrd_eq_plwq(struct xwos_tcb * tcb, struct xwos_plwq * xwplwq,
         tcb->wqn.cb = xwos_thrd_wqn_callback;
         xwos_plwq_add_tail(xwplwq, &tcb->wqn);
 }
-#endif /* (1 == SOUPRULE_SD_WQ_PL) */
+#endif /* (1 == XWUPRULE_SD_WQ_PL) */
 
 /**
  * @brief XWOS API：让出当前线程的CPU，调度器重新选择同优先级的其他线程运行
@@ -1014,7 +1014,7 @@ void xwos_cthrd_yield(void)
         xwos_cpuirq_restore_lc(cpuirq);
 }
 
-#if (1 == SOUPRULE_SD_THRD_DO_UNLOCK)
+#if (1 == XWUPRULE_SD_THRD_DO_UNLOCK)
 /**
  * @brief 解锁给定类型的锁
  * @param lock: (I) 锁的地址
@@ -1062,9 +1062,9 @@ xwer_t xwos_thrd_do_unlock(void * lock, xwsq_t lktype, void * lkdata)
         }
         return rc;
 }
-#endif /* (1 == SOUPRULE_SD_THRD_DO_UNLOCK) */
+#endif /* (1 == XWUPRULE_SD_THRD_DO_UNLOCK) */
 
-#if (1 == SOUPRULE_SD_THRD_DO_LOCK)
+#if (1 == XWUPRULE_SD_THRD_DO_LOCK)
 /**
  * @brief 锁定给定类型的锁
  * @param lock: (I) 锁的地址
@@ -1123,7 +1123,7 @@ xwer_t xwos_thrd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm,
         }
         return rc;
 }
-#endif /* (1 == SOUPRULE_SD_THRD_DO_LOCK) */
+#endif /* (1 == XWUPRULE_SD_THRD_DO_LOCK) */
 
 /**
  * @brief XWOS API：线程睡眠一段时间
@@ -1286,7 +1286,7 @@ xwer_t xwos_cthrd_sleep_from(xwtm_t * origin, xwtm_t inc)
 __xwos_api
 xwer_t xwos_cthrd_freeze(void)
 {
-#if (1 == SOUPRULE_SD_THRD_FREEZE)
+#if (1 == XWUPRULE_SD_THRD_FREEZE)
         struct xwos_tcb * ctcb;
         xwer_t rc;
 
@@ -1294,9 +1294,9 @@ xwer_t xwos_cthrd_freeze(void)
         ctcb = xwos_scheduler_get_ctcb_lc();
         rc = soc_thrd_freeze_lc(ctcb);
         return rc;
-#else /* (1 == SOUPRULE_SD_THRD_FREEZE) */
+#else /* (1 == XWUPRULE_SD_THRD_FREEZE) */
         return -ENOSYS;
-#endif /* !(1 == SOUPRULE_SD_THRD_FREEZE) */
+#endif /* !(1 == XWUPRULE_SD_THRD_FREEZE) */
 }
 
 /**
@@ -1309,7 +1309,7 @@ xwer_t xwos_cthrd_freeze(void)
 __xwos_code
 xwer_t xwos_thrd_freeze_lic(struct xwos_tcb * tcb)
 {
-#if (1 == SOUPRULE_SD_THRD_FREEZE)
+#if (1 == XWUPRULE_SD_THRD_FREEZE)
         struct xwos_scheduler * xwsd;
         xwreg_t cpuirq;
 
@@ -1329,10 +1329,10 @@ xwer_t xwos_thrd_freeze_lic(struct xwos_tcb * tcb)
                 xwos_scheduler_req_swcx();
         }
         return OK;
-#else /* (1 == SOUPRULE_SD_THRD_FREEZE) */
+#else /* (1 == XWUPRULE_SD_THRD_FREEZE) */
         XWOS_UNUSED(tcb);
         return -ENOSYS;
-#endif /* (1 != SOUPRULE_SD_THRD_FREEZE) */
+#endif /* (1 != XWUPRULE_SD_THRD_FREEZE) */
 }
 
 /**
@@ -1343,7 +1343,7 @@ xwer_t xwos_thrd_freeze_lic(struct xwos_tcb * tcb)
 __xwos_code
 xwer_t xwos_thrd_thaw_lic(struct xwos_tcb * tcb)
 {
-#if (1 == SOUPRULE_SD_THRD_FREEZE)
+#if (1 == XWUPRULE_SD_THRD_FREEZE)
         struct xwos_scheduler * xwsd;
         xwreg_t cpuirq;
         xwer_t rc;
@@ -1357,10 +1357,10 @@ xwer_t xwos_thrd_thaw_lic(struct xwos_tcb * tcb)
         rc = xwos_thrd_rq_add_tail(tcb);
         xwos_cpuirq_restore_lc(cpuirq);
         return rc;
-#else /* (1 == SOUPRULE_SD_THRD_FREEZE) */
+#else /* (1 == XWUPRULE_SD_THRD_FREEZE) */
         XWOS_UNUSED(tcb);
         return -ENOSYS;
-#endif /* !(1 == SOUPRULE_SD_THRD_FREEZE) */
+#endif /* !(1 == XWUPRULE_SD_THRD_FREEZE) */
 }
 
 /**
@@ -1376,11 +1376,11 @@ xwer_t xwos_thrd_thaw_lic(struct xwos_tcb * tcb)
 __xwos_api
 bool xwos_cthrd_shld_frz(void)
 {
-#if (1 == SOUPRULE_SD_THRD_FREEZE)
+#if (1 == XWUPRULE_SD_THRD_FREEZE)
         return !!(xwos_scheduler_get_pm_state() < XWOS_SCHEDULER_WKLKCNT_RUNNING);
-#else /* (1 == SOUPRULE_SD_THRD_FREEZE) */
+#else /* (1 == XWUPRULE_SD_THRD_FREEZE) */
         return false;
-#endif /* !(1 == SOUPRULE_SD_THRD_FREEZE) */
+#endif /* !(1 == XWUPRULE_SD_THRD_FREEZE) */
 }
 
 /**
@@ -1446,7 +1446,7 @@ bool xwos_cthrd_shld_stop(void)
 __xwos_api
 bool xwos_cthrd_frz_shld_stop(bool * frozen)
 {
-#if (1 == SOUPRULE_SD_THRD_FREEZE)
+#if (1 == XWUPRULE_SD_THRD_FREEZE)
         bool frz;
         xwer_t rc;
 
@@ -1461,10 +1461,10 @@ bool xwos_cthrd_frz_shld_stop(bool * frozen)
         if (!(is_err_or_null(frozen))) {
                 *frozen = frz;
         }/* else {} */
-#else /* (1 == SOUPRULE_SD_THRD_FREEZE) */
+#else /* (1 == XWUPRULE_SD_THRD_FREEZE) */
         if (!(is_err_or_null(frozen))) {
                 *frozen = false;
         }/* else {} */
-#endif /* !(1 == SOUPRULE_SD_THRD_FREEZE) */
+#endif /* !(1 == XWUPRULE_SD_THRD_FREEZE) */
         return xwos_cthrd_shld_stop();
 }

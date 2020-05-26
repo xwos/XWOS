@@ -24,9 +24,9 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define SODS_LIN_DIAG_MSTREQ_MSG        0x3C
-#define SODS_LIN_DIAG_SLCREP_MSG        0x3D
-#define SODS_LIN_DEFAULT_DATA_SIZE      8
+#define XWDS_LIN_DIAG_MSTREQ_MSG        0x3C
+#define XWDS_LIN_DIAG_SLCREP_MSG        0x3D
+#define XWDS_LIN_DEFAULT_DATA_SIZE      8
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -35,17 +35,17 @@
  * @brief LIN接口模式枚举
  */
 enum xwds_lin_mode_em {
-        SODS_LIN_MODE_CLOSE = 0,
-        SODS_LIN_MODE_TX = BIT(0),
-        SODS_LIN_MODE_RX = BIT(1),
+        XWDS_LIN_MODE_CLOSE = 0,
+        XWDS_LIN_MODE_TX = BIT(0),
+        XWDS_LIN_MODE_RX = BIT(1),
 };
 
 /**
  * @brief LIN协议类型
  */
 enum xwds_lin_chksum_type_em {
-        SODS_LIN_CHKSUM_CLASSIC = 0,
-        SODS_LIN_CHKSUM_ENHANCED,
+        XWDS_LIN_CHKSUM_CLASSIC = 0,
+        XWDS_LIN_CHKSUM_ENHANCED,
 };
 
 /**
@@ -53,7 +53,7 @@ enum xwds_lin_chksum_type_em {
  */
 struct xwds_lin_msg {
         xwu8_t id;
-        xwu8_t data[SODS_LIN_DEFAULT_DATA_SIZE];
+        xwu8_t data[XWDS_LIN_DEFAULT_DATA_SIZE];
         xwu8_t size;
 };
 

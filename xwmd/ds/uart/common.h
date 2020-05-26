@@ -66,46 +66,46 @@ enum xwds_uart_baudrate_em {
  * @brief UART字长枚举
  */
 enum xwds_uart_bits_em {
-        SODS_UART_BITS_8 = 0,
-        SODS_UART_BITS_9,
-        SODS_UART_BITS_7,
+        XWDS_UART_BITS_8 = 0,
+        XWDS_UART_BITS_9,
+        XWDS_UART_BITS_7,
 };
 
 /**
  * @brief UART停止位枚举
  */
 enum xwds_uart_stopbits_em {
-        SODS_UART_STOPBITS_1_0 = 0,
-        SODS_UART_STOPBITS_0_5,
-        SODS_UART_STOPBITS_2_0,
-        SODS_UART_STOPBITS_1_5,
+        XWDS_UART_STOPBITS_1_0 = 0,
+        XWDS_UART_STOPBITS_0_5,
+        XWDS_UART_STOPBITS_2_0,
+        XWDS_UART_STOPBITS_1_5,
 };
 
 /**
  * @brief UART奇偶校验枚举
  */
 enum xwds_uart_parity_em {
-        SODS_UART_PARITY_NONE = 0,
-        SODS_UART_PARITY_EVEN,
-        SODS_UART_PARITY_ODD,
+        XWDS_UART_PARITY_NONE = 0,
+        XWDS_UART_PARITY_EVEN,
+        XWDS_UART_PARITY_ODD,
 };
 
 /**
  * @brief UART模式枚举
  */
 enum xwds_uart_mode_em {
-        SODS_UART_MODE_CLOSE = 0,
-        SODS_UART_MODE_TX = BIT(0),
-        SODS_UART_MODE_RX = BIT(1),
+        XWDS_UART_MODE_CLOSE = 0,
+        XWDS_UART_MODE_TX = BIT(0),
+        XWDS_UART_MODE_RX = BIT(1),
 };
 
 /**
  * @brief UART硬件流控枚举
  */
 enum xwds_uart_hardwareflowcontrol_em {
-        SODS_UART_HFC_NONE = 0,
-        SODS_UART_HFC_RTS = BIT(0),
-        SODS_UART_HFC_CTS = BIT(1),
+        XWDS_UART_HFC_NONE = 0,
+        XWDS_UART_HFC_RTS = BIT(0),
+        XWDS_UART_HFC_CTS = BIT(1),
 };
 
 /**
