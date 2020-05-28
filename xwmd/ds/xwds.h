@@ -38,13 +38,35 @@ struct xwds {
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief XWDS API：初始化设备栈
+ * @param ds: (I) 设备栈指针
+ */
 __xwds_api
 void xwds_init(struct xwds * ds);
 
 #if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+/**
+ * @brief XWDS API：暂停设备栈
+ * @param ds: (I) 设备栈控制块指针
+ * @return 错误码
+ * @note
+ * - 同步/异步：异步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ */
 __xwds_api
 xwer_t xwds_pm_suspend(struct xwds * ds);
 
+/**
+ * @brief XWDS API：继续设备栈
+ * @param ds: (I) 设备栈控制块指针
+ * @return 错误码
+ * @note
+ * - 同步/异步：异步
+ * - 上下文：中断
+ * - 重入性：不可重入
+ */
 __xwds_api
 xwer_t xwds_pm_resume(struct xwds * ds);
 #endif /* XWMDCFG_ds_PM */

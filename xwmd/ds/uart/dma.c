@@ -207,26 +207,6 @@ xwer_t xwds_dmauartc_cvop_resume(struct xwds_dmauartc * dmauartc)
 #endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** DMA UART APIs ******** ******** ********/
-/**
- * @brief XWDS API：从接收队列中获取数据
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示缓冲区大小（单位：字节）
- *              (O) 作为输出时，返回实际读取的数据大小
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
- * - 重入性：可重入
- */
 __xwds_api
 xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
                         xwu8_t * buf, xwsz_t * size,
@@ -291,23 +271,6 @@ err_dmauartc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：尝试从接收队列中获取数据
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示缓冲区大小（单位：字节）
- *              (O) 作为输出时，返回实际读取的数据大小
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：可重入
- */
 __xwds_api
 xwer_t xwds_dmauartc_try_rx(struct xwds_dmauartc * dmauartc,
                             xwu8_t * buf, xwsz_t * size)
@@ -370,24 +333,6 @@ err_dmauartc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：配置DMA通道发送数据
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @param data: (I) 待发送的数据的缓冲区
- * @param size: (I) 待发送的数据的大小
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
 __xwds_api
 xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
                         const xwu8_t * data, xwsz_t size,
@@ -424,20 +369,6 @@ err_dmauartc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：配置UART
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @param cfg: (I) 新的配置
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
 __xwds_api
 xwer_t xwds_dmauartc_cfg(struct xwds_dmauartc * dmauartc,
                          const struct xwds_uart_cfg * cfg)

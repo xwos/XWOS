@@ -242,13 +242,6 @@ xwer_t xwds_device_cvop_resume(struct xwds_device * dev)
 #endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** APIs ******** ******** ********/
-/**
- * @brief XWDS API：探测设备
- * @param ds: (I) 设备栈控制块指针
- * @param dev: (I) 设备对象的指针
- * @param gcfunc: (I) 垃圾回收函数
- * @return 错误码
- */
 __xwds_api
 xwer_t xwds_device_probe(struct xwds * ds, struct xwds_device * dev,
                          xwobj_gc_f gcfunc)
@@ -309,11 +302,6 @@ err_dev_activate:
         return rc;
 }
 
-/**
- * @brief XWDS API：删除设备
- * @param dev: (I) 设备对象的指针
- * @return 错误码
- */
 __xwds_api
 xwer_t xwds_device_remove(struct xwds_device * dev)
 {
@@ -368,11 +356,6 @@ err_dev_set_state:
         return rc;
 }
 
-/**
- * @brief XWDS API：启动设备
- * @param dev: (I) 设备对象的指针
- * @return 错误码
- */
 __xwds_api
 xwer_t xwds_device_start(struct xwds_device * dev)
 {
@@ -418,11 +401,6 @@ err_dev_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：停止设备
- * @param dev: (I) 设备对象的指针
- * @return 错误码
- */
 __xwds_api
 xwer_t xwds_device_stop(struct xwds_device * dev)
 {
@@ -471,11 +449,6 @@ err_dev_set_state:
 }
 
 #if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
-/**
- * @brief XWDS API：暂停设备
- * @param dev: (I) 设备对象的指针
- * @return 错误码
- */
 __xwds_api
 xwer_t xwds_device_suspend(struct xwds_device * dev)
 {
@@ -514,11 +487,6 @@ err_dev_set_state:
         return rc;
 }
 
-/**
- * @brief XWDS API：继续设备
- * @param dev: (I) 设备对象的指针
- * @return 错误码
- */
 __xwds_api
 xwer_t xwds_device_resume(struct xwds_device * dev)
 {
@@ -557,12 +525,6 @@ err_set_state:
         return rc;
 }
 
-/**
- * @brief XWDS API：暂停所有设备
- * @param ds: (I) 设备栈控制块指针
- * @param ign_err: (I) 是否忽略错误：若为假，发生错误时，函数会中止并返回
- * @return 错误码
- */
 __xwds_api
 xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err)
 {
@@ -593,12 +555,6 @@ xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err)
         return rc;
 }
 
-/**
- * @brief XWDS API：继续所有设备
- * @param ds: (I) 设备栈控制块指针
- * @param ign_err: (I) 是否忽略错误：若为假，发生错误时，函数会中止并返回
- * @return 错误码
- */
 __xwds_api
 xwer_t xwds_device_resume_all(struct xwds * ds, bool ign_err)
 {

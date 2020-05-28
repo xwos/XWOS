@@ -62,6 +62,20 @@ __xwds_api
 void xwds_spip_destruct(struct xwds_spip * spip);
 
 /******** ******** ******** APIs ******** ******** ********/
+/**
+ * @brief XWDS API：SPI外设输入、输出、控制
+ * @param spip: (I) SPI外设
+ * @param cmd: (I) 命令
+ * @param ...: (I) 参数
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @retval -ENOSYS: 不支持的API
+ * @note
+ * - 同步/异步：依赖于CMD的实现
+ * - 上下文：依赖于CMD的实现
+ * - 重入性：依赖于CMD的实现
+ */
 __xwds_api
 xwer_t xwds_spip_ioctl(struct xwds_spip * spip, xwsq_t cmd, ...);
 

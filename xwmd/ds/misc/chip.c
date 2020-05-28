@@ -172,21 +172,6 @@ xwer_t xwds_misc_cvop_resume(struct xwds_misc * misc)
 #endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** APIs ******** ******** ********/
-/**
- * @brief XWDS API：MISC设备输入、输出、控制
- * @param misc: (I) MISC设备对象指针
- * @param cmd: (I) 命令
- * @param ...: (I) 参数
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：依赖于CMD的实现
- * - 中断上下文：依赖于CMD的实现
- * - 中断底半部：依赖于CMD的实现
- * - 线程上下文：依赖于CMD的实现
- * - 重入性：依赖于CMD的实现
- */
 __xwds_api
 xwer_t xwds_misc_ioctl(struct xwds_misc * misc, xwsq_t cmd, ...)
 {

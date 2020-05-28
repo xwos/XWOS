@@ -34,12 +34,55 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief XWDS API：申请时钟
+ * @param soc: (I) SOC对象指针
+ * @param id: (I) 时钟ID
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -ERANGE: 时钟ID错误
+ * @retval -ENOSYS: 不支持的API
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ */
 __xwds_api
 xwer_t xwds_clk_req(struct xwds_soc * soc, xwid_t id);
 
+/**
+ * @brief XWDS API：释放时钟
+ * @param soc: (I) SOC对象指针
+ * @param id: (I) 时钟ID
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -ERANGE: 时钟ID错误
+ * @retval -ENOSYS: 不支持的API
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ */
 __xwds_api
 xwer_t xwds_clk_rls(struct xwds_soc * soc, xwid_t id);
 
+/**
+ * @brief XWDS API：获取时钟频率
+ * @param soc: (I) SOC对象指针
+ * @param id: (I) 时钟ID
+ * @param buf: (O) 返回时钟频率的缓冲区的指针
+ * @param num: (I) 缓冲区数组的数量
+ *             (O) 返回的数组的数量
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @retval -ERANGE: 时钟ID错误
+ * @retval -ENOSYS: 不支持的API
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
 __xwds_api
 xwer_t xwds_clk_getfqcy(struct xwds_soc * soc, xwid_t id,
                         xwu32_t * buf, xwsz_t * num);

@@ -88,15 +88,6 @@ void xwds_spip_destruct(struct xwds_spip * spip)
  * @brief XWDS VOP：探测设备
  * @param spip: (I) SPI外设控制器对象指针
  * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -EHOSTUNREACH: SPI总线控制器错误
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
  */
 static __xwds_vop
 xwer_t xwds_spip_cvop_probe(struct xwds_spip * spip)
@@ -128,15 +119,6 @@ err_spim_grab:
  * @brief XWDS VOP：删除设备
  * @param spip: (I) SPI外设控制器对象指针
  * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -EHOSTUNREACH: SPI总线控制器错误
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
  */
 static __xwds_vop
 xwer_t xwds_spip_cvop_remove(struct xwds_spip * spip)
@@ -161,15 +143,6 @@ err_dev_cvop_remove:
  * @brief XWDS VOP：启动设备
  * @param spip: (I) SPI外设控制器对象指针
  * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -EHOSTUNREACH: SPI总线控制器错误
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
  */
 static __xwds_vop
 xwer_t xwds_spip_cvop_start(struct xwds_spip * spip)
@@ -201,15 +174,6 @@ err_spim_request:
  * @brief XWDS VOP：停止设备
  * @param spip: (I) SPI外设控制器对象指针
  * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -EHOSTUNREACH: SPI总线控制器错误
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
  */
 static __xwds_vop
 xwer_t xwds_spip_cvop_stop(struct xwds_spip * spip)
@@ -236,15 +200,6 @@ err_dev_cvop_stop:
  * @brief XWDS VOP：暂停设备
  * @param spip: (I) SPI外设控制器对象指针
  * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -EHOSTUNREACH: SPI总线控制器错误
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
  */
 static __xwds_vop
 xwer_t xwds_spip_cvop_suspend(struct xwds_spip * spip)
@@ -269,15 +224,6 @@ err_dev_cvop_suspend:
  * @brief XWDS VOP：继续设备
  * @param spip: (I) SPI外设控制器对象指针
  * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -EHOSTUNREACH: SPI总线控制器错误
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
  */
 static __xwds_vop
 xwer_t xwds_spip_cvop_resume(struct xwds_spip * spip)
@@ -307,22 +253,6 @@ err_spim_request:
 #endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** SPI Perpheral APIs ******** ******** ********/
-/**
- * @brief XWDS API：SPI外设输入、输出、控制
- * @param spip: (I) SPI外设
- * @param cmd: (I) 命令
- * @param ...: (I) 参数
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -ENOSYS: 不支持的API
- * @note
- * - 同步/异步：依赖于CMD的实现
- * - 中断上下文：依赖于CMD的实现
- * - 中断底半部：依赖于CMD的实现
- * - 线程上下文：依赖于CMD的实现
- * - 重入性：依赖于CMD的实现
- */
 __xwds_api
 xwer_t xwds_spip_ioctl(struct xwds_spip * spip, xwsq_t cmd, ...)
 {

@@ -101,29 +101,158 @@ enum xwds_gpio_pin_em {
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief XWDS API：申请GPIO
+ * @param soc: (I) SOC对象指针
+ * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
+ * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @retval -ERANGE: GPIO PORT错误
+ * @retval -EBUSY: GPIO PIN已被使用
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ */
 __xwds_api
 xwer_t xwds_gpio_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask);
 
+/**
+ * @brief XWDS API：释放GPIO
+ * @param soc: (I) SOC对象指针
+ * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
+ * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @retval -ERANGE: GPIO PORT错误
+ * @retval -EPERM: GPIO PIN未被使用
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ */
 __xwds_api
 xwer_t xwds_gpio_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask);
 
+/**
+ * @brief XWDS API：配置GPIO
+ * @param soc: (I) SOC对象指针
+ * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
+ * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
+ * @param cfg: (I) GPIO配置，取值：依据不同SOC
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @retval -ERANGE: GPIO PORT错误
+ * @retval -ENOSYS: 不支持的API
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ */
 __xwds_api
 xwer_t xwds_gpio_cfg(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask, void * cfg);
 
+/**
+ * @brief XWDS API：将GPIO的PIN置为高电平
+ * @param soc: (I) SOC对象指针
+ * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
+ * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @retval -ERANGE: GPIO PORT错误
+ * @retval -EPERM: GPIO PIN未被使用
+ * @retval -ENOSYS: 不支持的API
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ */
 __xwds_api
 xwer_t xwds_gpio_set(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask);
 
+/**
+ * @brief XWDS API：将GPIO的PIN置为低电平
+ * @param soc: (I) SOC对象指针
+ * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
+ * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @retval -ERANGE: GPIO PORT错误
+ * @retval -EPERM: GPIO PIN未被使用
+ * @retval -ENOSYS: 不支持的API
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ */
 __xwds_api
 xwer_t xwds_gpio_reset(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask);
 
+/**
+ * @brief XWDS API：反转GPIO电平
+ * @param soc: (I) SOC对象指针
+ * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
+ * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @retval -ERANGE: GPIO PORT错误
+ * @retval -EPERM: GPIO PIN未被使用
+ * @retval -ENOSYS: 不支持的API
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ */
 __xwds_api
 xwer_t xwds_gpio_toggle(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask);
 
+/**
+ * @brief XWDS API：输出GPIO
+ * @param soc: (I) SOC对象指针
+ * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
+ * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
+ * @param out: (I) 输出值，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算），
+ *                 只有被pinmask掩码覆盖的部分有效，未覆盖的pin输出不会发生改变。
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @retval -ERANGE: GPIO PORT错误
+ * @retval -EPERM: GPIO PIN未被使用
+ * @retval -ENOSYS: 不支持的API
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ */
 __xwds_api
 xwer_t xwds_gpio_output(struct xwds_soc * soc,
                         xwid_t port, xwsq_t pinmask,
                         xwsq_t out);
 
+/**
+ * @brief XWDS API：从GPIO端口读取输入值
+ * @param soc: (I) SOC对象指针
+ * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
+ * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
+ * @param inbuf: (O) 输入缓冲区
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @retval -ERANGE: GPIO PORT错误
+ * @retval -EPERM: GPIO PIN未被使用
+ * @retval -ENOSYS: 不支持的API
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ */
 __xwds_api
 xwer_t xwds_gpio_input(struct xwds_soc * soc,
                        xwid_t port, xwsq_t pinmask,

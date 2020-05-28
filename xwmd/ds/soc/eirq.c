@@ -32,28 +32,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief XWDS API：申请外部中断
- * @param soc: (I) SOC对象指针
- * @param port: (I) GPIO端口
- * @param pinmask: (I) GPIO PIN
- * @param eiid: (I) 外部中断ID
- * @param eiflag: (I) 触发标志
- * @param isr: (I) 中断响应函数
- * @param arg: (I) 中断响应函数参数
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: 外部中断ID错误
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个外部中断不可重入；对于不同外部中断可重入
- * - 移植：SOC的EIRQ ISR需要判断(!is_err_or_null(soc->eirq.isrs[x]))才可调用
- *   soc->eirq.isrs[x]
- */
 __xwds_api
 xwer_t xwds_eirq_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask,
                      xwid_t eiid, xwsq_t eiflag,
@@ -108,23 +86,6 @@ err_soc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：释放外部中断
- * @param soc: (I) SOC对象指针
- * @param port: (I) GPIO端口
- * @param pinmask: (I) GPIO PIN
- * @param eiid: (I) 外部中断ID
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: 外部中断ID错误
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个外部中断不可重入；对于不同外部中断可重入
- */
 __xwds_api
 xwer_t xwds_eirq_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask, xwid_t eiid)
 {

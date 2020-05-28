@@ -42,12 +42,12 @@
 #define XWOSAL_SD_PRIORITY_INVALID              XWOSDL_SD_PRIORITY_INVALID
 
 /**
- * @brief [XWOSAL] 优先级在 *base* 基础上提高 *inc*
+ * @brief [XWOSAL] 优先级在base基础上提高inc
  */
 #define XWOSAL_SD_PRIORITY_RAISE(base, inc)     XWOSDL_SD_PRIORITY_RAISE(base, inc)
 
 /**
- * @brief [XWOSAL] 优先级在 *base* 基础上降低 *dec*
+ * @brief [XWOSAL] 优先级在base基础上降低dec
  */
 #define XWOSAL_SD_PRIORITY_DROP(base, dec)      XWOSDL_SD_PRIORITY_DROP(base, dec)
 

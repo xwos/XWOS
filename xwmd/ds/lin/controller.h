@@ -128,21 +128,84 @@ __xwds_api
 void xwds_linc_destruct(struct xwds_linc * linc);
 
 /******** ******** ******** APIs ******** ******** ********/
+/**
+ * @brief XWDS API：主机节点发送一条LIN消息
+ * @param linc: (I) LIN控制器对象指针
+ * @param id: (I) 主机节点调度消息的ID
+ * @param msg: (I) LIN消息结构体指针
+ * @param xwtm: 指向缓冲区的指针，此缓冲区：
+ *              (I) 作为输入时，表示期望的阻塞等待时间
+ *              (O) 作为输出时，返回剩余的期望时间
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @retval -ENOSYS: 控制器不支持主机模式发送
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：可重入
+ */
 __xwds_api
 xwer_t xwds_linc_msttx(struct xwds_linc * linc,
                        xwu8_t id, struct xwds_lin_msg * msg,
                        xwtm_t * xwtm);
 
+/**
+ * @brief XWDS API：从机节点发送一条LIN消息
+ * @param linc: (I) LIN控制器对象指针
+ * @param msg: (I) LIN消息结构体指针
+ * @param xwtm: 指向缓冲区的指针，此缓冲区：
+ *              (I) 作为输入时，表示期望的阻塞等待时间
+ *              (O) 作为输出时，返回剩余的期望时间
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @retval -ENOSYS: 控制器不支持从机模式发送
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：可重入
+ */
 __xwds_api
 xwer_t xwds_linc_slvtx(struct xwds_linc * linc,
                        struct xwds_lin_msg * msg,
                        xwtm_t * xwtm);
 
+/**
+ * @brief XWDS API：接收一条LIN消息
+ * @param linc: (I) LIN控制器对象指针
+ * @param msgbuf: 接收消息的缓冲区的指针
+ * @param xwtm: 指向缓冲区的指针，此缓冲区：
+ *              (I) 作为输入时，表示期望的阻塞等待时间
+ *              (O) 作为输出时，返回剩余的期望时间
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @retval -ENOSYS: 控制器不支持接收
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：可重入
+ */
 __xwds_api
 xwer_t xwds_linc_rx(struct xwds_linc * linc,
                     struct xwds_lin_msg * msgbuf,
                     xwtm_t * xwtm);
 
+/**
+ * @brief XWDS API：通过LIN保护ID查询消息大小
+ * @param linc: (I) LIN控制器对象指针
+ * @param protected_id: (I) 消息的LIN保护ID
+ * @param ret: (O) 指向缓冲区的指针，通过此缓冲区返回消息大小
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @retval -ENODEV: 找不到ID
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
 __xwds_api
 xwer_t xwds_linc_get_msg_size(struct xwds_linc * linc,
                               xwu8_t protected_id,

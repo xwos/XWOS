@@ -61,6 +61,20 @@ __xwds_api
 void xwds_i2cp_destruct(struct xwds_i2cp * i2cp);
 
 /******** ******** ******** APIs ******** ******** ********/
+/**
+ * @brief XWDS API：I2C外设输入、输出、控制
+ * @param i2cp: (I) I2C外设对象指针
+ * @param cmd: (I) 命令
+ * @param ...: (I) 参数表
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -ENOSYS: 无效CMD
+ * @retval -EFAULT: 无效指针
+ * @note
+ * - 同步/异步：依赖于CMD的实现
+ * - 上下文：依赖于CMD的实现
+ * - 重入性：依赖于CMD的实现
+ */
 __xwds_api
 xwer_t xwds_i2cp_ioctl(struct xwds_i2cp * i2cp, xwsq_t cmd, ...);
 

@@ -88,12 +88,6 @@ void xwds_soc_destruct(struct xwds_soc * soc)
  * @brief XWDS VOP：探测SOC
  * @param soc: (I) SOC对象指针
  * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
  */
 static __xwds_vop
 xwer_t xwds_soc_cvop_probe(struct xwds_soc * soc)
@@ -110,12 +104,6 @@ xwer_t xwds_soc_cvop_probe(struct xwds_soc * soc)
  * @brief XWDS VOP：移除SOC
  * @param soc: (I) SOC对象指针
  * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
  */
 static __xwds_vop
 xwer_t xwds_soc_cvop_remove(struct xwds_soc * soc)
@@ -130,12 +118,6 @@ xwer_t xwds_soc_cvop_remove(struct xwds_soc * soc)
  * @brief XWDS VOP：启动SOC
  * @param soc: (I) SOC对象指针
  * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
  */
 static __xwds_vop
 xwer_t xwds_soc_cvop_start(struct xwds_soc * soc)
@@ -150,12 +132,6 @@ xwer_t xwds_soc_cvop_start(struct xwds_soc * soc)
  * @brief XWDS VOP：停止SOC
  * @param soc: (I) SOC对象指针
  * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
  */
 static __xwds_vop
 xwer_t xwds_soc_cvop_stop(struct xwds_soc * soc)
@@ -172,12 +148,6 @@ xwer_t xwds_soc_cvop_stop(struct xwds_soc * soc)
  * @brief XWDS VOP：暂停SOC
  * @param soc: (I) SOC对象指针
  * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
  */
 static __xwds_vop
 xwer_t xwds_soc_cvop_suspend(struct xwds_soc * soc)
@@ -192,12 +162,6 @@ xwer_t xwds_soc_cvop_suspend(struct xwds_soc * soc)
  * @brief XWDS VOP：继续SOC
  * @param soc: (I) SOC对象指针
  * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
  */
 static __xwds_vop
 xwer_t xwds_soc_cvop_resume(struct xwds_soc * soc)
@@ -210,19 +174,6 @@ xwer_t xwds_soc_cvop_resume(struct xwds_soc * soc)
 #endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** APIs ******** ******** ********/
-/**
- * @brief XWDS API：SOC输入、输出、控制
- * @param soc: (I) SOC对象指针
- * @param cmd: (I) 命令
- * @param ...: (I) 参数表
- * @return 错误码
- * @note
- * - 同步/异步：依赖于CMD的实现
- * - 中断上下文：依赖于CMD的实现
- * - 中断底半部：依赖于CMD的实现
- * - 线程上下文：依赖于CMD的实现
- * - 重入性：依赖于CMD的实现
- */
 __xwds_api
 xwer_t xwds_soc_ioctl(struct xwds_soc * soc, xwsq_t cmd, ...)
 {

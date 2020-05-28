@@ -232,19 +232,84 @@ __xwds_api
 void xwds_canc_destruct(struct xwds_canc * canc);
 
 /******** ******** ******** APIs ******** ******** ********/
+/**
+ * @brief XWDS API：将一条CAN消息写入发送邮箱
+ * @param canc: (I) CAN控制器对象指针
+ * @param txobjid: (I) 发送邮箱的ID
+ * @param msg: (I) CAN消息结构体的指针
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @retval -ERANGE: 找不到邮箱
+ * @retval -EBADSLT: 邮箱配置与消息类型不匹配
+ * @retval -ETIMEDOUT: 超时
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：可重入
+ */
 __xwds_api
 xwer_t xwds_canc_write(struct xwds_canc * canc, xwid_t txobjid,
                        struct xwds_can_msg * msg);
 
+/**
+ * @brief XWDS API：开启CAN控制器的中断
+ * @param canc: (I) CAN控制器对象指针
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ */
 __xwds_api
 xwer_t xwds_canc_enable_irqs(struct xwds_canc * canc);
 
+/**
+ * @brief XWDS API：关闭CAN控制器的中断
+ * @param canc: (I) CAN控制器对象指针
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ */
 __xwds_api
 xwer_t xwds_canc_disable_irqs(struct xwds_canc * canc);
 
+/**
+ * @brief XWDS API：设置CAN控制器的模式
+ * @param canc: (I) CAN控制器对象指针
+ * @param mode: (I) 模式
+ * @return 错误码
+ * @retval OK: 模式切换完成
+ * @retval -EFAULT: 无效指针
+ * @retval -EALREADY: 控制器已经处于此模式
+ * @retval -ERANGE: 无效的模式
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ */
 __xwds_api
 xwer_t xwds_canc_set_mode(struct xwds_canc * canc, xwsq_t mode);
 
+/**
+ * @brief XWDS API：设置CAN控制器的波特率
+ * @param canc: (I) CAN控制器对象指针
+ * @param id: (I) 波特率的ID
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @retval -ERANGE: 错误的波特率ID
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ */
 __xwds_api
 xwer_t xwds_canc_set_bd(struct xwds_canc * canc, xwid_t bdcfgid);
 

@@ -195,24 +195,6 @@ xwer_t xwds_i2cm_cvop_resume(struct xwds_i2cm * i2cm)
 #endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** APIs ******** ******** ********/
-/**
- * @brief XWDS API：发送I2C消息
- * @param i2cm: (I) I2C主机控制器对象指针
- * @param msg: (I) I2C消息结构体的指针
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval OK: OK
- * @retval -EINVAL: 设备对象不可引用
- * @retval -ESHUTDOWN: 设备没有运行
- * @retval -ETIMEDOUT: 超时
- * @note
- * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
- */
 __xwds_api
 xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
                       xwtm_t * xwtm)
@@ -262,23 +244,6 @@ err_i2cm_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：复位I2C主机
- * @param i2cm: (I) I2C主机控制器对象指针
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval OK: OK
- * @retval -EINVAL: 设备对象不可引用
- * @retval -ESHUTDOWN: 设备没有运行
- * @retval -ETIMEDOUT: 超时
- * @note
- * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
- */
 __xwds_api
 xwer_t xwds_i2cm_reset(struct xwds_i2cm * i2cm, xwtm_t * xwtm)
 {

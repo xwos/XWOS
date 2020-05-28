@@ -30,6 +30,18 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief XWDS API：测试RAM
+ * @param soc: (I) SOC对象指针
+ * @param erraddr: (I) 返回错误地址的缓冲区的指针
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 测试错误
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ */
 __xwds_api
 xwer_t xwds_eram_test(struct xwds_soc * soc, xwptr_t * erraddr);
 

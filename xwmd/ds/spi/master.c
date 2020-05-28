@@ -198,24 +198,6 @@ xwer_t xwds_spim_cvop_resume(struct xwds_spim * spim)
 #endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** SPI Master Device APIs ******** ******** ********/
-/**
- * @brief XWDS API：启动传输
- * @param spim: (I) SPI主机模式控制器对象指针
- * @param msg: (I) 消息
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -ENOSYS: 不支持主机模式传输
- * @note
- * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
- * - 重入性：可重入
- */
 __xwds_api
 xwer_t xwds_spim_xfer(struct xwds_spim * spim,
                       struct xwds_spim_msg * msg,

@@ -223,6 +223,17 @@ __xwds_api
 void xwds_soc_destruct(struct xwds_soc * soc);
 
 /******** ******** ******** APIs ******** ******** ********/
+/**
+ * @brief XWDS API：SOC输入、输出、控制
+ * @param soc: (I) SOC对象指针
+ * @param cmd: (I) 命令
+ * @param ...: (I) 参数表
+ * @return 错误码
+ * @note
+ * - 同步/异步：依赖于CMD的实现
+ * - 上下文：依赖于CMD的实现
+ * - 重入性：依赖于CMD的实现
+ */
 __xwds_api
 xwer_t xwds_soc_ioctl(struct xwds_soc * soc, xwsq_t cmd, ...);
 

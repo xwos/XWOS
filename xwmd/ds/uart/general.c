@@ -95,14 +95,6 @@ void xwds_uartc_destruct(struct xwds_uartc * uartc)
  * @brief XWDS VOP：探测UART控制器
  * @param uartc: (I) UART控制器对象指针
  * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一设备不可重入；对于不同设备可重入
  */
 static __xwds_vop
 xwer_t xwds_uartc_cvop_probe(struct xwds_uartc * uartc)
@@ -155,14 +147,6 @@ err_rxsmr_init:
  * @brief XWDS VOP：移除UART控制器
  * @param uartc: (I) UART控制器对象指针
  * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
  */
 static __xwds_vop
 xwer_t xwds_uartc_cvop_remove(struct xwds_uartc * uartc)
@@ -323,19 +307,6 @@ err_dev_resume:
 #endif /* XWMDCFG_ds_PM */
 
 /******** ******** UART APIs ******** ********/
-/**
- * @brief XWDS API：清空接收队列
- * @param uartc: (I) UART控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
 __xwds_api
 xwer_t xwds_uartc_clear_rxq(struct xwds_uartc * uartc)
 {
@@ -373,20 +344,6 @@ err_uartc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：得到接收队列有效数据的大小
- * @param uartc: (I) UART控制器对象指针
- * @param ret: (O) 指向缓冲区的指针，通过此缓冲区返回接收队列中有效数据的大小
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：可重入
- */
 __xwds_api
 xwer_t xwds_uartc_get_rxq_datasize(struct xwds_uartc * uartc, xwsz_t *ret)
 {
@@ -420,23 +377,6 @@ err_uartc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：从接收队列中获取一个字节的数据
- * @param uartc: (I) UART控制器对象指针
- * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
- * - 重入性：可重入
- */
 __xwds_api
 xwer_t xwds_uartc_getc(struct xwds_uartc * uartc, xwu8_t * buf, xwtm_t * xwtm)
 {
@@ -473,26 +413,6 @@ err_uartc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：从接收队列中获取多个数据
- * @param uartc: (I) UART控制器对象指针
- * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示缓冲区大小（单位：字节）
- *              (O) 作为输出时，返回实际读取的数据大小
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
- * - 重入性：可重入
- */
 __xwds_api
 xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
                      void * buf, xwsz_t * size,
@@ -538,20 +458,6 @@ err_uartc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：尝试从接收队列中获取一个字节的数据
- * @param uartc: (I) UART控制器对象指针
- * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：可重入
- */
 __xwds_api
 xwer_t xwds_uartc_try_getc(struct xwds_uartc * uartc, xwu8_t * buf)
 {
@@ -587,23 +493,6 @@ err_uartc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：尝试从接收队列中获取多个字节的数据
- * @param uartc: (I) UART控制器对象指针
- * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示缓冲区大小（单位：字节）
- *              (O) 作为输出时，返回实际读取的数据大小
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：可重入
- */
 __xwds_api
 xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc, void * buf, xwsz_t * size)
 {
@@ -646,19 +535,6 @@ err_uartc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：清空发送队列
- * @param uartc: (I) UART控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
 __xwds_api
 xwer_t xwds_uartc_clear_txq(struct xwds_uartc * uartc)
 {
@@ -722,24 +598,6 @@ xwer_t xwds_uartc_tx_1byte(struct xwds_uartc * uartc, const xwu8_t byte)
         return rc;
 }
 
-/**
- * @brief XWDS API：发送一个字节
- * @param uartc: (I) UART控制器对象指针
- * @param byte: (I) 待发送的数据
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -EOVERFLOW: 发送队列已满
- * @note
- * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
 __xwds_api
 xwer_t xwds_uartc_putc(struct xwds_uartc * uartc,
                        const xwu8_t byte,
@@ -776,26 +634,6 @@ err_uartc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：发送一些数据
- * @param uartc: (I) UART控制器对象指针
- * @param data: (I) 待发送的数据的缓冲区
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示待发送的数据的大小
- *              (O) 作为输出时，返回实际放入发送队列的数据的大小
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
 __xwds_api
 xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
                      const xwu8_t * data, xwsz_t * size,
@@ -842,20 +680,6 @@ err_uartc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：配置UART
- * @param uartc: (I) UART控制器对象指针
- * @param cfg: (I) 新的配置
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
 __xwds_api
 xwer_t xwds_uartc_cfg(struct xwds_uartc * uartc,
                       const struct xwds_uart_cfg * cfg)

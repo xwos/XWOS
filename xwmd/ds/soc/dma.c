@@ -33,22 +33,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief XWDS API：申请DMA的通道
- * @param soc: (I) SOC对象指针
- * @param ch: (I) DMA通道
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: 无效的DMA通道
- * @retval -EBUSY: DMA通道繁忙
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个DMA通道不可重入；对于不同DMA通道可重入
- */
 __xwds_api
 xwer_t xwds_dma_req(struct xwds_soc * soc, xwid_t ch)
 {
@@ -85,22 +69,6 @@ err_soc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：释放DMA的通道
- * @param soc: (I) SOC对象指针
- * @param ch: (I) DMA通道
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: 无效的DMA通道
- * @retval -EPERM: DMA通道未被使用
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个DMA通道不可重入；对于不同DMA通道可重入
- */
 __xwds_api
 xwer_t xwds_dma_rls(struct xwds_soc * soc, xwid_t ch)
 {
@@ -130,25 +98,6 @@ err_notreq:
         return rc;
 }
 
-/**
- * @brief XWDS API：配置DMA的通道
- * @param soc: (I) SOC对象指针
- * @param ch: (I) DMA通道
- * @param cfg: (I) SOC DMA通道配置
- * @param cb: (I) 传输结束回调函数
- * @param cfg: (I) 回调函数参数
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: 无效的DMA通道
- * @retval -EPERM: DMA通道未被使用
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个DMA通道不可重入；对于不同DMA通道可重入
- */
 __xwds_api
 xwer_t xwds_dma_cfg(struct xwds_soc * soc, xwid_t ch, void * cfg,
                     xwds_dma_f cb, xwds_dma_cbarg_t arg)
@@ -198,22 +147,6 @@ err_notreq:
         return rc;
 }
 
-/**
- * @brief XWDS API：打开DMA的通道
- * @param soc: (I) SOC对象指针
- * @param ch: (I) DMA通道
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: 无效的DMA通道
- * @retval -EPERM: DMA通道未被使用
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个DMA通道不可重入；对于不同DMA通道可重入
- */
 __xwds_api
 xwer_t xwds_dma_enable(struct xwds_soc * soc, xwid_t ch)
 {
@@ -241,22 +174,6 @@ err_notreq:
         return rc;
 }
 
-/**
- * @brief XWDS API：关闭DMA的通道
- * @param soc: (I) SOC对象指针
- * @param ch: (I) DMA通道
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: 无效的DMA通道
- * @retval -EPERM: DMA通道未被使用
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个DMA通道不可重入；对于不同DMA通道可重入
- */
 __xwds_api
 xwer_t xwds_dma_disable(struct xwds_soc * soc, xwid_t ch)
 {
@@ -284,22 +201,6 @@ err_notreq:
         return rc;
 }
 
-/**
- * @brief XWDS API：启动DMA的通道
- * @param soc: (I) SOC对象指针
- * @param ch: (I) DMA通道
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: 无效的DMA通道
- * @retval -EPERM: DMA通道未被使用
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个DMA通道不可重入；对于不同DMA通道可重入
- */
 __xwds_api
 xwer_t xwds_dma_start(struct xwds_soc * soc, xwid_t ch)
 {
@@ -327,22 +228,6 @@ err_notreq:
         return rc;
 }
 
-/**
- * @brief XWDS API：停止DMA的通道
- * @param soc: (I) SOC对象指针
- * @param ch: (I) DMA通道
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: 无效的DMA通道
- * @retval -EPERM: DMA通道未被使用
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个DMA通道不可重入；对于不同DMA通道可重入
- */
 __xwds_api
 xwer_t xwds_dma_stop(struct xwds_soc * soc, xwid_t ch)
 {

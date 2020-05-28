@@ -179,171 +179,6 @@ xwer_t xwds_canc_cvop_resume(struct xwds_canc * canc)
 #endif /* XWMDCFG_ds_PM */
 
 /******** ******** ******** APIs ******** ******** ********/
-/**
- * @brief XWDS API：探测CAN控制器
- * @param canc: (I) CAN控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_canc_probe(struct xwds_canc * canc)
-{
-        xwer_t rc;
-
-        XWDS_VALIDATE(canc, "nullptr", -EFAULT);
-
-        rc = xwds_canc_cvop_probe(canc);
-        return rc;
-}
-
-/**
- * @brief XWDS API：移除CAN控制器
- * @param canc: (I) CAN控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_canc_remove(struct xwds_canc * canc)
-{
-        xwer_t rc;
-
-        XWDS_VALIDATE(canc, "nullptr", -EFAULT);
-
-        rc = xwds_canc_cvop_remove(canc);
-        return rc;
-}
-
-/**
- * @brief XWDS API：启动CAN控制器
- * @param canc: (I) CAN控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_canc_start(struct xwds_canc *canc)
-{
-        xwer_t rc;
-
-        XWDS_VALIDATE(canc, "nullptr", -EFAULT);
-
-        rc = xwds_canc_cvop_start(canc);
-        return rc;
-}
-
-/**
- * @brief XWDS API：停止CAN控制器
- * @param canc: (I) CAN控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_canc_stop(struct xwds_canc *canc)
-{
-        xwer_t rc;
-
-        XWDS_VALIDATE(canc, "nullptr", -EFAULT);
-
-        rc = xwds_canc_cvop_stop(canc);
-        return rc;
-}
-
-#if (defined(XWMDCFG_ds_PM)) && (1 == XWMDCFG_ds_PM)
-/******** ******** pm ******** ********/
-/**
- * @brief XWDS API：暂停CAN控制器
- * @param canc: (I) CAN控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_canc_suspend(struct xwds_canc *canc)
-{
-        xwer_t rc;
-
-        XWDS_VALIDATE(canc, "nullptr", -EFAULT);
-
-        rc = xwds_canc_cvop_suspend(canc);
-        return rc;
-}
-
-/**
- * @brief XWDS API：继续CAN控制器
- * @param canc: (I) CAN控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于同一个设备不可重入；对于不同设备可重入
- */
-__xwds_api
-xwer_t xwds_canc_resume(struct xwds_canc *canc)
-{
-        xwer_t rc;
-
-        XWDS_VALIDATE(canc, "nullptr", -EFAULT);
-
-        rc = xwds_canc_cvop_resume(canc);
-        return rc;
-}
-#endif /* XWMDCFG_ds_PM */
-
-/**
- * @brief XWDS API：将一条CAN消息写入发送邮箱
- * @param canc: (I) CAN控制器对象指针
- * @param txobjid: (I) 发送邮箱的ID
- * @param msg: (I) CAN消息结构体的指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: 找不到邮箱
- * @retval -EBADSLT: 邮箱配置与消息类型不匹配
- * @retval -ETIMEDOUT: 超时
- * @note
- * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
- * - 重入性：可重入
- */
 __xwds_api
 xwer_t xwds_canc_write(struct xwds_canc * canc, xwid_t txobjid,
                        struct xwds_can_msg * msg)
@@ -407,22 +242,6 @@ err_canc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：设置CAN控制器的模式
- * @param canc: (I) CAN控制器对象指针
- * @param mode: (I) 模式
- * @return 错误码
- * @retval OK: 模式切换完成
- * @retval -EFAULT: 无效指针
- * @retval -EALREADY: 控制器已经处于此模式
- * @retval -ERANGE: 无效的模式
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于任意设备都不可重入
- */
 __xwds_api
 xwer_t xwds_canc_set_mode(struct xwds_canc * canc, xwsq_t mode)
 {
@@ -471,21 +290,6 @@ err_canc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：设置CAN控制器的波特率
- * @param canc: (I) CAN控制器对象指针
- * @param id: (I) 波特率的ID
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @retval -ERANGE: 错误的波特率ID
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于任意设备都不可重入
- */
 __xwds_api
 xwer_t xwds_canc_set_bd(struct xwds_canc * canc, xwid_t bdcfgid)
 {
@@ -533,19 +337,6 @@ err_canc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：开启CAN控制器的中断
- * @param canc: (I) CAN控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于任意设备都不可重入
- */
 __xwds_api
 xwer_t xwds_canc_enable_irqs(struct xwds_canc * canc)
 {
@@ -583,19 +374,6 @@ err_canc_grab:
         return rc;
 }
 
-/**
- * @brief XWDS API：关闭CAN控制器的中断
- * @param canc: (I) CAN控制器对象指针
- * @return 错误码
- * @retval OK: OK
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：对于任意设备都不可重入
- */
 __xwds_api
 xwer_t xwds_canc_disable_irqs(struct xwds_canc * canc)
 {
@@ -785,7 +563,7 @@ void xwds_canc_lib_tx_indication(struct xwds_canc * canc, xwid_t txobjid,
  * @param rxobjid: (I) 接收邮箱的ID
  * @param rxmsg: (O) 指向缓冲区的指针，通过此缓冲区返回接收到的CAN消息
  * @note
- * - 此回调函数在中断上下文中被调用，用于通知接收结果；
+ * - 此回调函数在中断上下文中调用，用于通知接收结果；
  * - rxmsg的生命周期只在这个函数内有效，若要保存CAN数据，应在函数内部进行拷贝。
  */
 __xwds_lib_code
