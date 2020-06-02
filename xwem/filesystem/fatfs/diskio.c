@@ -1,5 +1,5 @@
 /*-----------------------------------------------------------------------*/
-/* Low level disk I/O module skeleton for FatFs     (C)ChaN, 2016        */
+/* Low level disk I/O module skeleton for FatFs     (C)ChaN, 2019        */
 /*-----------------------------------------------------------------------*/
 /* If a working storage control module is available, it should be        */
 /* attached to the FatFs via a glue function rather than modifying it.   */
@@ -26,7 +26,7 @@ DSTATUS disk_status (
 {
 	DSTATUS stat;
 	int result;
-/*
+        /*
 	switch (pdrv) {
 	case DEV_RAM :
 		result = RAM_disk_status();
@@ -49,7 +49,7 @@ DSTATUS disk_status (
 
 		return stat;
 	}
-*/
+        */
 	return STA_NOINIT;
 }
 
@@ -65,7 +65,8 @@ DSTATUS disk_initialize (
 {
 	DSTATUS stat;
 	int result;
-/*
+
+        /*
 	switch (pdrv) {
 	case DEV_RAM :
 		result = RAM_disk_initialize();
@@ -88,7 +89,7 @@ DSTATUS disk_initialize (
 
 		return stat;
 	}
-*/
+        */
 	return STA_NOINIT;
 }
 
@@ -101,13 +102,14 @@ DSTATUS disk_initialize (
 DRESULT disk_read (
 	BYTE pdrv,		/* Physical drive nmuber to identify the drive */
 	BYTE *buff,		/* Data buffer to store read data */
-	DWORD sector,	/* Start sector in LBA */
+	LBA_t sector,	/* Start sector in LBA */
 	UINT count		/* Number of sectors to read */
 )
 {
 	DRESULT res;
 	int result;
-/*
+
+        /*
 	switch (pdrv) {
 	case DEV_RAM :
 		// translate the arguments here
@@ -136,7 +138,7 @@ DRESULT disk_read (
 
 		return res;
 	}
-*/
+        */
 	return RES_PARERR;
 }
 
@@ -151,13 +153,13 @@ DRESULT disk_read (
 DRESULT disk_write (
 	BYTE pdrv,			/* Physical drive nmuber to identify the drive */
 	const BYTE *buff,	/* Data to be written */
-	DWORD sector,		/* Start sector in LBA */
+	LBA_t sector,		/* Start sector in LBA */
 	UINT count			/* Number of sectors to write */
 )
 {
 	DRESULT res;
 	int result;
-/*
+        /*
 	switch (pdrv) {
 	case DEV_RAM :
 		// translate the arguments here
@@ -186,7 +188,7 @@ DRESULT disk_write (
 
 		return res;
 	}
-*/
+        */
 	return RES_PARERR;
 }
 
@@ -205,7 +207,7 @@ DRESULT disk_ioctl (
 {
 	DRESULT res;
 	int result;
-/*
+        /*
 	switch (pdrv) {
 	case DEV_RAM :
 
@@ -225,7 +227,6 @@ DRESULT disk_ioctl (
 
 		return res;
 	}
-*/
+        */
 	return RES_PARERR;
 }
-
