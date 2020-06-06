@@ -18,7 +18,7 @@
 # > limitations under the License.
 #
 
-echo xwos os gdb script\n
+echo XuanWuOS gdb script\n
 set breakpoint pending on
 set python print-stack none
 set print object on
@@ -26,8 +26,8 @@ set print sevenbit-strings on
 set mem inaccessible-by-default off
 set auto-xwlib-add on
 target remote localhost:7224
-symbol-file ##DIR##/xwos.elf
-load ##DIR##/xwos.elf
+symbol-file ##DIR##/XuanWuOS.elf
+load ##DIR##/XuanWuOS.elf
 monitor semihosting 1,51794
 monitor preserve0 0
 monitor preserve1 0

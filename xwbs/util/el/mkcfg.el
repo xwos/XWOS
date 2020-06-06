@@ -144,6 +144,7 @@
 (defvar sokn-cfg-h (concat cfgdir "/" "xwos.h") "Path of cfg/xwos.h")
 (defvar xwmd-cfg-h (concat cfgdir "/" "xwmd.h") "Path of cfg/xwmd.h")
 (defvar xwem-cfg-h (concat cfgdir "/" "xwem.h") "Path of cfg/xwem.h")
+(defvar oem-cfg-h (concat cfgdir "/" "oem.h") "Path of cfg/oem.h")
 (setq XuanWuOS-cfg-h-buffer (find-file-noselect XuanWuOS-cfg-h))
 (setq arch-cfg-h-buffer (find-file-noselect arch-cfg-h))
 (setq cpu-cfg-h-buffer (find-file-noselect cpu-cfg-h))
@@ -153,6 +154,7 @@
 (setq sokn-cfg-h-buffer (find-file-noselect sokn-cfg-h))
 (setq xwmd-cfg-h-buffer (find-file-noselect xwmd-cfg-h))
 (setq xwem-cfg-h-buffer (find-file-noselect xwem-cfg-h))
+(setq oem-cfg-h-buffer (find-file-noselect oem-cfg-h))
 
 ;; Get base Info
 (set-buffer XuanWuOS-cfg-h-buffer)
@@ -253,6 +255,15 @@
        (t "n")))
 (logi "external:%s" XuanWuOS-cfg-xwem)
 
+(goto-char (point-min))
+(let (rc)
+  (setq rc (re-search-forward
+            "^#define[ \t]+XuanWuOS_CFG_OEMPATH[ \t]+\\(.+\\)" nil t))
+  (if (null rc)
+      (setq XuanWuOS-cfg-oempath "")
+      (setq XuanWuOS-cfg-oempath (match-string 1))))
+(logi "XuanWuOS-cfg-oempath:%s" XuanWuOS-cfg-oempath)
+
 ;; Get directories Info
 (setq xwos-kr-dir (concat "xwos"))
 (logi "xwos-kr-dir:%s" xwos-kr-dir)
@@ -312,6 +323,7 @@
 (insert (concat "XWOS_BRD_DIR := " xwos-brd-dir "\n"))
 (insert (concat "XWOS_BDL_DIR := " xwos-bdl-dir "\n"))
 (insert (concat "XWOS_BM_DIR := " xwos-bm-dir "\n"))
+(insert (concat "XWOS_OEM_DIR := " XuanWuOS-cfg-oempath "\n"))
 (insert (concat "XWOS_WKSPC_DIR := " xwos-wkspc-dir "\n"))
 (insert "## ******** ******** ******** ******** ARCH ******** ******** ******** ******** ##\n")
 (let (item cfg (loopflg t) (iterpoint 1))
@@ -457,6 +469,25 @@
               (set-buffer XuanWuOS-cfg-buffer)
               (insert (concat item " := " cfg "\n"))
               (set-buffer xwem-cfg-h-buffer))
+          (setq loopflg nil)))))
+(set-buffer XuanWuOS-cfg-buffer)
+(insert "## ******** ******** ******** ******** OEM Module ******** ******** ******** ******** ##\n")
+(if (string> XuanWuOS-cfg-oempath "")
+    (let (item cfg (loopflg t) (iterpoint 1))
+      (set-buffer oem-cfg-h-buffer)
+      (while loopflg
+        (goto-char iterpoint)
+        (setq iterpoint (re-search-forward
+                         "^#define[ \t]+\\([A-Za-z0-9_]+\\)[\t ]+\\([10]\\)" nil t))
+        (if (null iterpoint)
+            (setq iterpoint (point-max)))
+        (if (< iterpoint (point-max))
+            (progn
+              (setq item (match-string 1))
+              (setq cfg (if (string= (match-string 2) "1") "y" "n"))
+              (set-buffer XuanWuOS-cfg-buffer)
+              (insert (concat item " := " cfg "\n"))
+              (set-buffer oem-cfg-h-buffer))
           (setq loopflg nil)))))
 (set-buffer XuanWuOS-cfg-buffer)
 

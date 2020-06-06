@@ -39,7 +39,7 @@ pegdbserver:
 		-serverport=7224 -gdbmiport=6224 -interface=OPENSDA -speed=5000 -port=USB1 \
 		-configfile=cfg/dbg/config.ini
 
-openocd:
+cmdap:
 	openocd -f cfg/dbg/openocd/cmsis-dap.cfg
 
 
@@ -51,10 +51,10 @@ dbgcfg: cfg/dbg/pepgm.gdb cfg/dbg/openocd-dbg.gdb cfg/dbg/openocd-pgm.gdb
 
 
 pgm:
-	@cfg/dbg/openocd-pgm.gdb
+	@arm-none-eabi-gdb -x cfg/dbg/openocd-pgm.gdb
 
 dbg:
-	@cfg/dbg/openocd-dbg.gdb
+	@arm-none-eabi-gdb -x cfg/dbg/openocd-dbg.gdb
 
 c clean: cfg
 	$(MAKE) -C $(WKSPC) TARGET=$(TARGET) NODEP=y clean

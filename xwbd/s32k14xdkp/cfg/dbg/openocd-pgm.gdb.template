@@ -18,14 +18,14 @@
 # > limitations under the License.
 #
 
-echo xwos os gdb script\n
+echo XuanWuOS gdb script\n
 target remote localhost:3333
 set remote hardware-breakpoint-limit 6
 set remote hardware-watchpoint-limit 4
-mon adapter_khz 500
-file ##DIR##/xwos.elf
+mon adapter speed 500
+file ##DIR##/XuanWuOS.elf
 mon reset init
-mon program ##DIR##/xwos.bin 0x0
+mon program ##DIR##/XuanWuOS.bin 0x0
 mon reset init
-mon adapter_khz 1000
+mon adapter speed 1000
 display/i $pc

@@ -23,5 +23,5 @@ include $(XWBS_UTIL_MK_XWMO)
 
 XWMO_CSRCS := ff.c diskio.c ffunicode.c
 XWMO_CFLAGS := -Wno-sign-conversion -Wno-unused-variable -Wno-unused-parameter
-XWMO_INCDIRS :=
+XWMO_INCDIRS := $(call getXwmoDir)
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)

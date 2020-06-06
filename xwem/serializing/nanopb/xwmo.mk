@@ -23,5 +23,5 @@ include $(XWBS_UTIL_MK_XWMO)
 
 XWMO_CSRCS = pb_common.c pb_decode.c pb_encode.c
 XWMO_CFLAGS =
-XWMO_INCDIRS = .
+XWMO_INCDIRS = $(call getXwmoDir)
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)

@@ -31,6 +31,8 @@ getXwppName = xwpp$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_L
 
 getXwbmName = xwbm$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_BM_DIR)).a
 
+getXwoemName = xwoem$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_OEM_DIR)).a
+
 define getXwmoName
 $(strip
   $(if $(findstring $(XWOS_MD_DIR),$(call getXwmoDir)),\
@@ -41,5 +43,7 @@ $(strip
               $(call getXwppName),\
               $(if $(findstring $(XWOS_BM_DIR),$(call getXwmoDir)),\
 	          $(call getXwbmName),\
-	          "")))))
+		      $(if $(findstring $(XWOS_OEM_DIR),$(call getXwmoDir)),\
+			  $(call getXwoemName),\
+			  ""))))))
 endef

@@ -22,9 +22,9 @@ include xwbs/$(XuanWuOS_CFG_MK_RULE)
 
 XWMO_NAME := $(call getXwmoName)
 XWMO_DIR := $(call getXwmoDir)
-XWMO_CSRCS := $(addprefix $(XWMO_DIR)/,$(XWMO_CSRCS))
-XWMO_COBJS := $(addprefix $(OBJ_DIR),$(addsuffix .o,$(basename $(XWMO_CSRCS))))
-XWMO_DSMS := $(addprefix $(OBJ_DIR),$(addsuffix .dsm,$(basename $(XWMO_CSRCS))))
+XWMO_OBJ_DIR ?= $(XWMO_DIR)
+XWMO_COBJS := $(addprefix $(OBJ_DIR)$(XWMO_OBJ_DIR)/,$(addsuffix .o,$(basename $(XWMO_CSRCS))))
+XWMO_DSMS += $(addprefix $(OBJ_DIR)$(XWMO_OBJ_DIR)/,$(addsuffix .dsm,$(basename $(XWMO_CXXSRCS))))
 XWMO_INCDIRS := $(if $(strip $(XWMO_INCDIRS)),$(addprefix -I,$(strip $(XWMO_INCDIRS))))
 
 MM_ARGS = $(strip $(MMFLAGS))
@@ -32,14 +32,16 @@ MM_ARGS = $(strip $(MMFLAGS))
 CC_ARGS = $(strip -c $(CFLAGS) $(ARCH_CFLAGS) $(CPU_CFLAGS) $(XWMO_CFLAGS) \
                   $(INCDIRS) $(XWMO_INCDIRS))
 
-XWMO_OBJS_LST := $(OBJ_DIR)$(XWMO_DIR)/objs.txt
+XWMO_OBJS_LST := $(OBJ_DIR)$(XWMO_OBJ_DIR)/objs.txt
 
-$(OBJ_DIR)$(XWMO_DIR)/$(XWMO_NAME): $(XWMO_COBJS) $(OBJ_DIR)$(XWMO_DIR)
+#$(info "building $(XWMO_DIR) ---> $(OBJ_DIR)$(XWMO_OBJ_DIR)/$(XWMO_NAME)")
+
+$(OBJ_DIR)$(XWMO_OBJ_DIR)/$(XWMO_NAME): $(XWMO_COBJS) $(OBJ_DIR)$(XWMO_OBJ_DIR)
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	@echo $(XWMO_COBJS) $(XWMO_LUA2HEXCOBJS) $(XWMO_CXXOBJS) > $(XWMO_OBJS_LST)
 	$(SHOW_AR) $(AR) rcs $@ @$(XWMO_OBJS_LST)
 
-$(OBJ_DIR)$(XWMO_DIR):
+$(OBJ_DIR)$(XWMO_OBJ_DIR):
 	@[ ! -d $@ ] && mkdir -p $@ || true
 
 ifneq ($(XWMO_COBJS),)
@@ -48,12 +50,12 @@ ifneq ($(XWMO_COBJS),)
     endif
 endif
 
-$(OBJ_DIR)%.o.d: %.c
+$(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o.d: $(XWMO_DIR)/%.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_MM) $(CC) $(MM_ARGS) $(CC_ARGS) $< > $@;
 	@sed -i 's,\(^.*\)\.o[ :]*,$*.o $@ : ,g' $@
 
-$(OBJ_DIR)%.o: %.c
+$(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o: $(XWMO_DIR)/%.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_CC) $(CC) $(CC_ARGS) $< -o $@
 
@@ -67,10 +69,10 @@ clean:
 	@$(RM) -f $(XWMO_COBJS:.o=.dsm)
 	@$(RM) -f $(XWMO_COBJS:.o=.i)
 	@$(RM) -f $(XWMO_COBJS)
-	@$(RM) -f $(OBJ_DIR)$(XWMO_DIR)/$(XWMO_NAME)
+	@$(RM) -f $(OBJ_DIR)$(XWMO_OBJ_DIR)/$(XWMO_NAME)
 	@$(RM) -f $(XWMO_OBJS_LST)
 
 distclean:
-	$(RM) -rf $(OBJ_DIR)$(XWMO_DIR)
+	$(RM) -rf $(OBJ_DIR)$(XWMO_OBJ_DIR)
 
 .PHONY: dsm clean distclean

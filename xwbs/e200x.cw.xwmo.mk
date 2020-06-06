@@ -22,26 +22,31 @@ include xwbs/$(XuanWuOS_CFG_MK_RULE)
 
 XWMO_NAME := $(call getXwmoName)
 XWMO_DIR := $(call getXwmoDir)
-XWMO_CSRCS := $(addprefix $(XWMO_DIR)/,$(XWMO_CSRCS))
-XWMO_COBJS := $(addprefix $(OBJ_DIR),$(addsuffix .o,$(basename $(XWMO_CSRCS))))
-XWMO_DSMS := $(addprefix $(OBJ_DIR),$(addsuffix .dsm,$(basename $(XWMO_CSRCS))))
-XWMO_INCDIRS := $(if $(strip $(XWMO_INCDIRS)),$(addprefix -I$(XWMO_DIR)/,$(strip $(XWMO_INCDIRS))))
+XWMO_OBJ_DIR ?= $(XWMO_DIR)
+XWMO_COBJS := $(addprefix $(OBJ_DIR)$(XWMO_OBJ_DIR)/,$(addsuffix .o,$(basename $(XWMO_CSRCS))))
+XWMO_DSMS := $(addprefix $(OBJ_DIR)$(XWMO_OBJ_DIR)/,$(addsuffix .dsm,$(basename $(XWMO_CSRCS))))
+XWMO_INCDIRS := $(if $(strip $(XWMO_INCDIRS)),$(addprefix -I,$(strip $(XWMO_INCDIRS))))
 
 CC_ARGS = $(strip -c $(CFLAGS) $(ARCH_CFLAGS) $(CPU_CFLAGS) $(XWMO_CFLAGS) \
                   $(INCDIRS) $(XWMO_INCDIRS))
 
-$(OBJ_DIR)$(XWMO_DIR)/$(XWMO_NAME): $(XWMO_COBJS)
+#$(info "building $(XWMO_DIR) ---> $(OBJ_DIR)$(XWMO_OBJ_DIR)/$(XWMO_NAME)")
+
+$(OBJ_DIR)$(XWMO_OBJ_DIR)/$(XWMO_NAME): $(XWMO_COBJS) $(OBJ_DIR)$(XWMO_OBJ_DIR)
 ifeq ($(CWMCUEPPC_LICENSE),)
 	$(SHOW_AR) echo -n $(XWMO_COBJS) > $@
 else
 	$(SHOW_AR) $(AR) -o $@ $(XWMO_COBJS)
 endif
 
+$(OBJ_DIR)$(XWMO_OBJ_DIR):
+	@[ ! -d $@ ] && mkdir -p $@ || true
+
 ifneq ($(NODEP),y)
 #   -include $(XWMO_COBJS:.o=.d)
 endif
 
-$(OBJ_DIR)%.o: %.c
+$(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o: $(XWMO_DIR)/%.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_CC) $(CC) $(CC_ARGS) $< -o $@
 
@@ -54,9 +59,9 @@ clean:
 	@$(RM) -f $(XWMO_COBJS:.o=.lst)
 	@$(RM) -f $(XWMO_COBJS:.o=.dsm)
 	@$(RM) -f $(XWMO_COBJS)
-	@$(RM) -f $(OBJ_DIR)$(XWMO_DIR)/$(XWMO_NAME)
+	@$(RM) -f $(OBJ_DIR)$(XWMO_OBJ_DIR)/$(XWMO_NAME)
 
 distclean:
-	@$(RM) -rf $(OBJ_DIR)$(XWMO_DIR)
+	@$(RM) -rf $(OBJ_DIR)$(XWMO_OBJ_DIR)
 
 .PHONY : dsm clean distclean

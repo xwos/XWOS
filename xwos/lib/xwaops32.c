@@ -14,6 +14,9 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
+
+#if __STDC_VERSION__ >= 201112L
+
 #include <stdatomic.h>
 #include <xwos/lib/xwaop.h>
 
@@ -1598,3 +1601,5 @@ xwer_t xwaop__xws32_t__tst_then_op(__atomic xws32_t * a,
         }
         return rc;
 }
+
+#endif

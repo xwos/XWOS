@@ -88,11 +88,11 @@ DSMS += $(addsuffix .dsm,$(basename $(OBJS)))
 
 AS_ARGS = $(strip -c $(AFLAGS) $(ARCH_AFLAGS) $(CPU_AFLAGS) $(BDL_AFLAGS) $(INCDIRS))
 CC_ARGS = $(strip -c $(CFLAGS) $(ARCH_CFLAGS) $(CPU_CFLAGS) $(BDL_CFLAGS) $(INCDIRS))
-LD_ARGS = $(strip $(XWEM_LIBS) $(XWBM_LIBS) $(XWPP_LIBS) $(XWMD_LIBS) $(LIBS) \
+LD_ARGS = $(strip $(XWOEM_LIBS) $(XWEM_LIBS) $(XWBM_LIBS) $(XWPP_LIBS) $(XWMD_LIBS) $(LIBS) \
                   $(EOBJS) $(ELIBS) \
                   $(LDFLAGS) $(ARCH_LDFLAGS) $(CPU_LDFLAGS) $(BDL_LDFLAGS))
 
-all: $(OBJS) libs $(XWMD) $(XWPP) $(XWBM) $(XWEM) $(XWOS_WKSPC_DIR)/$(TARGET).elf \
+all: $(OBJS) libs $(XWMD) $(XWPP) $(XWBM) $(XWEM) $(XWOEM) $(XWOS_WKSPC_DIR)/$(TARGET).elf \
      $(XWOS_WKSPC_DIR)/$(TARGET).mot $(XWOS_WKSPC_DIR)/$(TARGET).bin
 
 ifeq ($(XuanWuOS_CFG_XWMD),y)
@@ -124,6 +124,15 @@ ifeq ($(XuanWuOS_CFG_XWEM),y)
         XWEM_LIBS = $(addprefix @@,$(XWEM))
     else
         XWEM_LIBS = $(XWEM)
+    endif
+endif
+
+ifneq ($(XWOS_OEM_DIR),)
+    include xwbs/xwoem.mk
+    ifeq ($(CWMCUEPPC_LICENSE),)
+        XWOEM_LIBS = $(addprefix @@,$(XWOEM))
+    else
+        XWOEM_LIBS = $(XWOEM)
     endif
 endif
 
@@ -176,7 +185,7 @@ $(OBJ_DIR)%.o: %.s
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_AS) $(AS) $(AS_ARGS) $< -o $@
 
-dsm: $(DSMS) $(XWMD_DSM) $(XWPP_DSM) $(XWBM_DSM) $(XWEM_DSM) $(XWOS_WKSPC_DIR)/$(TARGET).dsm
+dsm: $(DSMS) $(XWMD_DSM) $(XWPP_DSM) $(XWBM_DSM) $(XWEM_DSM) $(XWOEM_DSM) $(XWOS_WKSPC_DIR)/$(TARGET).dsm
 
 $(XWOS_WKSPC_DIR)/$(TARGET).dsm: $(XWOS_WKSPC_DIR)/$(TARGET).elf
 	$(SHOW_OD) $(OD) $(CFLAGS) $< > $@
@@ -184,13 +193,13 @@ $(XWOS_WKSPC_DIR)/$(TARGET).dsm: $(XWOS_WKSPC_DIR)/$(TARGET).elf
 %.dsm: %.o
 	$(SHOW_OD) $(OD) $(CFLAGS) $< > $@
 
-%.elf %.mot: libs $(XWMD) $(XWPP) $(XWBM) $(XWEM)
+%.elf %.mot: libs $(XWMD) $(XWPP) $(XWBM) $(XWEM) $(XWOEM)
 	$(SHOW_LD) $(LD) $(LD_ARGS) -o $@
 
 %.bin: %.mot
 	$(SHOW_MOT2BIN) mot2bin $<
 
-clean: $(XWMD_CLEAN) $(XWPP_CLEAN) $(XWBM_CLEAN) $(XWEM_CLEAN)
+clean: $(XWMD_CLEAN) $(XWPP_CLEAN) $(XWBM_CLEAN) $(XWEM_CLEAN) $(XWOEM_CLEAN)
 	@echo "clean ..."
 	@$(RM) -f $(OBJS)
 	@$(RM) -f $(OBJS:.o=.lst)
@@ -207,7 +216,7 @@ clean: $(XWMD_CLEAN) $(XWPP_CLEAN) $(XWBM_CLEAN) $(XWEM_CLEAN)
 	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).MAP
 	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).bin
 
-distclean: $(XWMD_DISTCLEAN) $(XWPP_DISTCLEAN) $(XWBM_DISTCLEAN) $(XWEM_DISTCLEAN)
+distclean: $(XWMD_DISTCLEAN) $(XWPP_DISTCLEAN) $(XWBM_DISTCLEAN) $(XWEM_DISTCLEAN) $(XWOEM_DISTCLEAN)
 	@echo "distclean ..."
 	@$(RM) -rf $(OBJ_DIR)$(XWOS_KN_DIR)
 	@$(RM) -rf $(OBJ_DIR)$(XWOS_BDL_DIR)
@@ -226,3 +235,4 @@ distclean: $(XWMD_DISTCLEAN) $(XWPP_DISTCLEAN) $(XWBM_DISTCLEAN) $(XWEM_DISTCLEA
 .PHONY: $(XWPP) $(XWPP_DSM) $(XWPP_CLEAN) $(XWPP_DISTCLEAN)
 .PHONY: $(XWBM) $(XWBM_DSM) $(XWBM_CLEAN) $(XWBM_DISTCLEAN)
 .PHONY: $(XWEM) $(XWEM_DSM) $(XWEM_CLEAN) $(XWEM_DISTCLEAN)
+.PHONY: $(XWOEM) $(XWOEM_DSM) $(XWOEM_CLEAN) $(XWOEM_DISTCLEAN)

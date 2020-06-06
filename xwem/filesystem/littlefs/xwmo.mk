@@ -23,5 +23,5 @@ include $(XWBS_UTIL_MK_XWMO)
 
 XWMO_CSRCS := lfs.c lfs_util.c
 XWMO_CFLAGS := -Wno-sign-conversion -Wno-undef
-XWMO_INCDIRS :=
+XWMO_INCDIRS := $(call getXwmoDir)
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)
