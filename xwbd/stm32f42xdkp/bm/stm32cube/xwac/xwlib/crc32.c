@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32F4x CRC
+ * @brief STM32CUBE：CRC32
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

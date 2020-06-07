@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 中断向量表
+ * @brief STM32CUBE：中断向量表
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

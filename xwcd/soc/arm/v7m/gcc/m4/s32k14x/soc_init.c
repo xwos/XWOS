@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief S32K14x initializations
+ * @brief S32K14x Initialization
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -23,12 +23,12 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #if defined(XuanWuOS_CFG_CORE__smp)
-  #include <xwos/smp/irq.h>
   #include <xwos/smp/cpu.h>
+  #include <xwos/smp/irq.h>
+  #include <smp_nvic.h>
   #include <xwos/smp/scheduler.h>
   #include <xwos/smp/pm.h>
   #include <soc_xwpmdm.h>
-  #include <smp_nvic.h>
 #elif defined(XuanWuOS_CFG_CORE__up)
   #include <xwos/up/irq.h>
   #include <up_nvic.h>
@@ -36,8 +36,7 @@
 #else
   #error "Can't find the configuration of XuanWuOS_CFG_CORE!"
 #endif
-#include <soc_clk.h>
-#include <soc_wdg.h>
+#include <soc.h>
 #include <soc_init.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -78,11 +77,6 @@ __flscfg struct soc_flash_cfgs soc_flash_cfgs = {
 __xwbsp_init_code
 void soc_lowlevel_init(void)
 {
-        soc_clk_lpo_init();
-        soc_wdg_disable();
-        soc_clk_xwsc_init_8mhz();
-        soc_clk_spll_init_160mhz();
-        soc_clk_nrun_init_80mhz();
 }
 
 __xwbsp_init_code
@@ -110,6 +104,8 @@ void soc_init(void)
         /* Init interrupt controller */
         rc = xwos_irqc_init("cortex-m.nvic",
                             (SOCCFG_IRQ_NUM + ARCHCFG_IRQ_NUM),
+                            &soc_isr_table,
+                            &soc_irq_data_table,
                             &armv7_nvic_cfg);
         XWOS_BUG_ON(rc < 0);
 

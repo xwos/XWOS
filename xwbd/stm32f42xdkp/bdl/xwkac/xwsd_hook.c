@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS Kernel Adapter Code in BDL：操作系统空闲线程钩子函数
+ * @brief 玄武OS内核适配代码：内核HOOK
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

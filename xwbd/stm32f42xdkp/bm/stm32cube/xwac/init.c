@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 初始化
+ * @brief STM32CUBE：初始化
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

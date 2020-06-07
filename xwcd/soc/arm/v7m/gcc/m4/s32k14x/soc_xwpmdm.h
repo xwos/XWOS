@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC Adapter Code：Power Management Domain
+ * @brief SOC Adapter Code: Power Management Domain
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

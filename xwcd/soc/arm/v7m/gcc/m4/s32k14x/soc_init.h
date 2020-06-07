@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief S32K14x initialization
+ * @brief S32K14x Initialization
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -42,10 +42,9 @@ struct soc_flash_cfgs {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_init_code
-void soc_lowlevel_init(void);
-
-__xwbsp_init_code
 void soc_init(void);
 
+__xwbsp_init_code
+void soc_lowlevel_init(void);
 
 #endif /* soc_init.h */

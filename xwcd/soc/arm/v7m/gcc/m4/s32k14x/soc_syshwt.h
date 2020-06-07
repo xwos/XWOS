@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC Adapter Code：硬件定时器
+ * @brief SOC Adapter Code: System Hardware Timer
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -33,7 +33,7 @@
 struct xwos_syshwt;
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ********            XWOS HW Timer Adapter Functions            ********
+ ******** ********   XWOS HW Timer Adapter Functions   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwbsp_inline
 xwer_t soc_syshwt_init(struct xwos_syshwt * hwt)

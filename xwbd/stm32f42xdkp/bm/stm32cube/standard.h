@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：标准头文件
+ * @brief STM32CUBE：顶级头文件
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

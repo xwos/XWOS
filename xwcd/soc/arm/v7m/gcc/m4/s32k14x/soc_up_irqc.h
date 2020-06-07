@@ -45,71 +45,71 @@
 static __xwbsp_inline
 xwer_t soc_irqc_init(void)
 {
-        cortexm_nvic_drv_init();
+        return cortexm_nvic_drv_init();
 }
 
 static __xwbsp_inline
-xwer_t soc_irqc_request(xwirq_t irqn, xwisr_f isrfunc)
+xwer_t soc_irqc_request_irq(xwirq_t irqn, xwisr_f isrfunc, xwsq_t flag, void * data)
 {
-        return cortexm_nvic_drv_request(irqn, isrfunc);
+        return cortexm_nvic_drv_request(irqn, isrfunc, flag, data);
 }
 
 static __xwbsp_inline
-xwer_t soc_irqc_release(xwirq_t irqn)
+xwer_t soc_irqc_release_irq(xwirq_t irqn)
 {
         return cortexm_nvic_drv_release(irqn);
 }
 
 static __xwbsp_inline
-xwer_t soc_irqc_enable(xwirq_t irqn)
+xwer_t soc_irqc_enable_irq(xwirq_t irqn)
 {
         return cortexm_nvic_drv_enable(irqn);
 }
 
 static __xwbsp_inline
-xwer_t soc_irqc_disable(xwirq_t irqn)
+xwer_t soc_irqc_disable_irq(xwirq_t irqn)
 {
         return cortexm_nvic_drv_disable(irqn);
 }
 
 static __xwbsp_inline
-xwer_t soc_irqc_save(xwirq_t irqn, xwreg_t * flag)
+xwer_t soc_irqc_save_irq(xwirq_t irqn, xwreg_t * flag)
 {
         return cortexm_nvic_drv_save(irqn, flag);
 }
 
 static __xwbsp_inline
-xwer_t soc_irqc_restore(xwirq_t irqn, xwreg_t flag)
+xwer_t soc_irqc_restore_irq(xwirq_t irqn, xwreg_t flag)
 {
         return cortexm_nvic_drv_restore(irqn, flag);
 }
 
 static __xwbsp_inline
-xwer_t soc_irqc_pend(xwirq_t irqn)
+xwer_t soc_irqc_pend_irq(xwirq_t irqn)
 {
         return cortexm_nvic_drv_pend(irqn);
 }
 
 static __xwbsp_inline
-xwer_t soc_irqc_clear(xwirq_t irqn)
+xwer_t soc_irqc_clear_irq(xwirq_t irqn)
 {
         return cortexm_nvic_drv_clear(irqn);
 }
 
 static __xwbsp_inline
-xwer_t soc_irqc_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg)
+xwer_t soc_irqc_cfg_irq(xwirq_t irqn, const struct soc_irq_cfg * cfg)
 {
         return cortexm_nvic_drv_cfg(irqn, cfg);
 }
 
 static __xwbsp_inline
-xwer_t soc_irqc_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
+xwer_t soc_irqc_get_cfg_irq(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
 {
         return cortexm_nvic_drv_get_cfg(irqn, cfgbuf);
 }
 
 static __xwbsp_inline
-xwer_t soc_irqc_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
+xwer_t soc_irqc_get_data_irq(xwirq_t irqn, struct soc_irq_data * databuf)
 {
         return cortexm_nvic_drv_get_data(irqn, databuf);
 }

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC Adapter Code：Scheduler
+ * @brief SOC Adapter Code: Scheduler
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -80,9 +80,8 @@ void soc_scheduler_init_sdobj_stack(struct xwos_sdobj_stack_info * stk,
  * @param xwsd: (I) XWOS调度器的指针
  */
 __xwbsp_code __naked
-xwer_t soc_scheduler_start_lc(struct xwos_scheduler * xwsd)
+xwer_t soc_scheduler_start_lc(__maybe_unused struct xwos_scheduler * xwsd)
 {
-        XWOS_UNUSED(xwsd);
         xwos_cpuirq_enable_lc();
         __asm__ volatile("      svc     0");
         return OK;

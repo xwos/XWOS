@@ -25,17 +25,7 @@ SOC_CSRCS :=
 SOC_ASRCS :=
 
 SOC_CSRCS += soc_init.c
-SOC_CSRCS += soc_wdg.c
-SOC_CSRCS += soc_clk.c
 SOC_CSRCS += soc_sched.c
 ifeq ($(XuanWuOS_CFG_CORE),smp)
     SOC_CSRCS += soc_xwpmdm.c
-endif
-
-ifeq ($(XuanWuOS_CFG_XWMD),y)
-    ifeq ($(XWMDCFG_ds),y)
-        ifeq ($(SOCCFG_ds_SOC),y)
-            SOC_CSRCS += driver/ds/soc.c
-        endif
-    endif
 endif

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC Adapter Code：Scheduler
+ * @brief SOC Adapter Code: Scheduler
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -35,7 +35,7 @@ struct xwos_sdobj_stack_info;
 struct xwos_tcb;
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ********            XWOS Scheduler Adapter Functions           ********
+ ******** ********   XWOS Scheduler Adapter Functions  ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_init_code
 xwer_t soc_scheduler_init(struct xwos_scheduler * xwsd);

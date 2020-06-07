@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS Kernel HOOK
+ * @brief STM32CUBE：玄武OS内核HOOK
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

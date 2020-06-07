@@ -47,3 +47,9 @@ $(strip
 			  $(call getXwoemName),\
 			  ""))))))
 endef
+
+getAllFileUnderXwmoDir = $(subst $(call getXwmoDir)/,,$(wildcard $(call getXwmoDir)/$(2)/$(1)))
+
+define getAllFileUnderXwmoDirRecursively
+$(subst $(call getXwmoDir)/,,$(shell find $(call getXwmoDir)/$(2) -name $(1)))
+endef
