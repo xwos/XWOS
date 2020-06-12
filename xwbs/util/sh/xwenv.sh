@@ -21,6 +21,7 @@
 function xwmc()
 {
   local cpath=$(pwd)
+  echo ${XWOS_OEM_DIR}
   local rpath=
   local prefix=
   if [[ ${cpath} =~ ${XWOS_MD_DIR} ]] ; then
@@ -35,6 +36,9 @@ function xwmc()
   elif [[ ${cpath} =~ ${XWOS_EM_DIR} ]] ; then
     rpath=${cpath#*${XWOS_EM_DIR}}
     prefix=XWEMCFG
+  elif [[ ${cpath} =~ ${XWOS_OEM_DIR} ]] ; then
+    rpath=${cpath#*${XWOS_OEM_DIR}}
+    prefix=OEMCFG
   fi
   local cfg=${rpath//_/__}
   local cfg=${cfg//./_}
@@ -60,6 +64,9 @@ function xwmn()
   elif [[ ${cpath} =~ ${XWOS_EM_DIR} ]] ; then
     rpath=${cpath#*${XWOS_EM_DIR}}
     prefix=xwem
+  elif [[ ${cpath} =~ ${XWOS_OEM_DIR} ]] ; then
+    rpath=${cpath#*${XWOS_OEM_DIR}}
+    prefix=xwoem
   fi
   local name=${rpath//_/__}
   local name=${rpath//./_}

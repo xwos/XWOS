@@ -589,6 +589,7 @@ distclean:
 (insert (concat "export XWOS_BRD_DIR=" xwos-brd-dir "\n"))
 (insert (concat "export XWOS_BDL_DIR=" xwos-bdl-dir "\n"))
 (insert (concat "export XWOS_BM_DIR=" xwos-bm-dir "\n"))
+(insert (concat "export XWOS_OEM_DIR=" XuanWuOS-cfg-oempath "\n"))
 (insert (concat "export XWOS_WKSPC_DIR=" xwos-wkspc-dir "\n"))
 (insert "## ******** ******** ******** ******** includes ******** ******** ******** ******** ##\n")
 (insert "source ${XWOS_PATH}/xwbs/util/sh/xwenv.sh\n")
