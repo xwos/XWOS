@@ -49,7 +49,7 @@
 
 * 文档
 
-[[https://xwos.gitee.io/][https://xwos.gitee.io/]]
+[[https://xwos.tech/][https://xwos.tech/]]
 
 --------
 
