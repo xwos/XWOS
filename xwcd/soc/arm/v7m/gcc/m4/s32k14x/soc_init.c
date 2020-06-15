@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief S32K14x Initialization
+ * @brief SOC初始化
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC IRQC Driver for Unique-Processing Core
+ * @brief 玄武OS内核适配代码：单核中断控制器
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

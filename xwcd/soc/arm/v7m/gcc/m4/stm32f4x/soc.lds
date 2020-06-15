@@ -181,7 +181,6 @@ SECTIONS {
         } > rwx_mr
         bss_vma_base = ADDR(.bss);
 
-        /* User heap section, used to check that there is enough RAM left */
         .heap : ALIGN(8) {
                 PROVIDE(end = .);
                 . = . + heap_mr_size;

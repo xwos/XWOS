@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32F0x SOC
+ * @brief SOC
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

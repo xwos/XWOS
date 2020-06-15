@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC Adapter Code: Scheduler
+ * @brief 玄武OS内核适配代码：调度器
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -53,7 +53,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief SOC Adapter Function：初始化调度调度器
+ * @brief 玄武OS内核调度器适配函数：初始化调度调度器
  * @param xwsd: (I) 调度器的指针
  * @return 错误码
  */
@@ -64,7 +64,7 @@ xwer_t soc_scheduler_init(struct xwos_scheduler * xwsd)
 }
 
 /**
- * @brief SOC Adapter Function：初始化调度对象的栈
+ * @brief 玄武OS内核调度器适配函数：初始化调度对象的栈
  * @param stk: (I) 栈信息结构体指针
  * @param attr: (I) 标志
  */
@@ -76,7 +76,7 @@ void soc_scheduler_init_sdobj_stack(struct xwos_sdobj_stack_info * stk,
 }
 
 /**
- * @brief SOC Adapter Function：启动调度器
+ * @brief 玄武OS内核调度器适配函数：启动调度器
  * @param xwsd: (I) XWOS调度器的指针
  */
 __xwbsp_code __naked
@@ -88,7 +88,7 @@ xwer_t soc_scheduler_start_lc(__maybe_unused struct xwos_scheduler * xwsd)
 }
 
 /**
- * @brief SOC Adapter Function：发起切换上下文的软中断
+ * @brief 玄武OS内核调度器适配函数：发起切换上下文的软中断
  * @param xwsd: (I) XWOS调度器的指针
  * @note
  * - XWOS的线程上下文切换过程中是开中断的，在切换的过程中（处理器正在执行
@@ -104,7 +104,7 @@ void soc_scheduler_req_swcx(struct xwos_scheduler * xwsd)
 }
 
 /**
- * @brief SOC Adapter Function：暂停调度器
+ * @brief 玄武OS内核调度器适配函数：暂停调度器
  * @param xwsd: (I) XWOS调度器的指针
  * @return 错误码
  */
@@ -117,7 +117,7 @@ xwer_t soc_scheduler_suspend(__maybe_unused struct xwos_scheduler * xwsd)
 }
 
 /**
- * @brief SOC Adapter Function：继续调度器
+ * @brief 玄武OS内核调度器适配函数：继续调度器
  * @param xwsd: (I) XWOS调度器的指针
  * @return 错误码
  */
@@ -130,7 +130,7 @@ xwer_t soc_scheduler_resume(__maybe_unused struct xwos_scheduler * xwsd)
 }
 
 /**
- * @brief SOC Adapter Function：本地CPU上的线程退出
+ * @brief 玄武OS内核调度器适配函数：本地CPU上的线程退出
  * @param tcb: (I) 线程控制块对象的指针
  * @param rc: (I) 线程退出抛出的返回值
  */
@@ -147,7 +147,7 @@ void soc_thrd_exit_lc(__maybe_unused struct xwos_tcb * tcb,
 }
 
 /**
- * @brief SOC Adapter Function：冻结本地CPU中正在运行的线程
+ * @brief 玄武OS内核调度器适配函数：冻结本地CPU中正在运行的线程
  * @param tcb: (I) 线程控制块对象的指针
  */
 __xwbsp_code __naked
@@ -160,7 +160,7 @@ xwer_t soc_thrd_freeze_lc(__maybe_unused struct xwos_tcb * tcb)
 
 #if defined(XuanWuOS_CFG_CORE__smp)
 /**
- * @brief SOC Adapter Function：将线程迁出其他CPU，并准备迁入其他CPU
+ * @brief 玄武OS内核调度器适配函数：将线程迁出其他CPU，并准备迁入其他CPU
  * @param tcb: (I) 线程控制块对象的指针
  * @param cpuid: (I) 目的地CPU的ID
  * @return 错误码
@@ -175,7 +175,7 @@ xwer_t soc_thrd_outmigrate(__maybe_unused struct xwos_tcb * tcb,
 }
 
 /**
- * @brief SOC Adapter Function：迁移线程至目标CPU
+ * @brief 玄武OS内核调度器适配函数：迁移线程至目标CPU
  * @param tcb: (I) 线程控制块对象的指针
  * @param cpuid: (I) 目的地CPU的ID
  */

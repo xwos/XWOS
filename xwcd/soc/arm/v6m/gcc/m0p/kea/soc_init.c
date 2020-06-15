@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief soc initialization
+ * @brief SOC初始化
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief S32K14x SOC
+ * @brief SOC
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC Adapter Code: IRQ
+ * @brief 玄武OS内核适配代码：中断
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -73,7 +73,7 @@ struct soc_irq_data_table {
  ********               XWOS IRQ Adapter Functions              ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief SOC Adapter Function：Get Current IRQ Number
+ * @brief 玄武OS内核中断适配函数：获取当前中断上下文的中断号
  */
 static __xwbsp_inline
 xwer_t soc_irq_get_id(xwirq_t * irqnbuf)
@@ -82,7 +82,7 @@ xwer_t soc_irq_get_id(xwirq_t * irqnbuf)
 }
 
 /**
- * @brief SOC Adapter Function：Enable local CPU IRQ
+ * @brief 玄武OS内核中断适配函数：开启本地CPU中断
  */
 static __xwbsp_inline
 void soc_cpuirq_enable_lc(void)
@@ -91,7 +91,7 @@ void soc_cpuirq_enable_lc(void)
 }
 
 /**
- * @brief SOC Adapter Function：Disable local CPU IRQ
+ * @brief 玄武OS内核中断适配函数：关闭本地CPU中断
  */
 static __xwbsp_inline
 void soc_cpuirq_disable_lc(void)
@@ -100,7 +100,7 @@ void soc_cpuirq_disable_lc(void)
 }
 
 /**
- * @brief SOC Adapter Function：Restore local CPU IRQ flag
+ * @brief 玄武OS内核中断适配函数：恢复本地CPU中断
  */
 static __xwbsp_inline
 void soc_cpuirq_restore_lc(xwreg_t cpuirq)
@@ -109,7 +109,7 @@ void soc_cpuirq_restore_lc(xwreg_t cpuirq)
 }
 
 /**
- * @brief SOC Adapter Function：Save local CPU IRQ flag and disable local IRQ
+ * @brief 玄武OS内核中断适配函数：保存并关闭本地CPU中断
  */
 static __xwbsp_inline
 void soc_cpuirq_save_lc(xwreg_t * cpuirq)

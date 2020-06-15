@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32F0x Initialization
+ * @brief SOC初始化
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：初始化
+ * @brief 板级描述层：应用程序入口
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

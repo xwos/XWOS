@@ -24,20 +24,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********          soc specification          ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** chip ******** ********/
-#define SOCCFG_CHIP_S32K144                     1
-
-/******** ******** ******** clock ******** ******** ********/
-#define SOCCFG_CLK_SOSC_VALUE                   (8000000U)
-#define SOCCFG_CLK_RTCOSC_VALUE                 (0U)
-#define SOCCFG_CLK_SIRC_VALUE                   (8000000U)
-#define SOCCFG_CLK_FIRC_VALUE                   (48000000U)
-#define SOCCFG_CLK_LPO128K_VALUE                (128000U)
-#define SOCCFG_CLK_LPO32K_VALUE                 (32000U)
-#define SOCCFG_CLK_LPO1K_VALUE                  (1000U)
-#define SOCCFG_CLK_LPOCLK_VALUE                 (SOCCFG_CLK_LPO32K_VALUE)
-#define SOCCFG_CLK_RCTCLK_VALUE                 (SOCCFG_CLK_LPO32K_VALUE)
-
 /******** ******** ******** interrupt ******** ******** ********/
 #define SOCCFG_IRQ_NUM                          240U
 #define SOCCFG_RO_ISRTABLE                      1
