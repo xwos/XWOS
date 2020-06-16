@@ -40,7 +40,8 @@ INCDIRS = -I. \
           -I$(XWOS_ARCH_DIR) \
           -I$(XWOS_CPU_DIR) \
           -I$(XWOS_SOC_DIR) \
-          -I$(XWOS_BRD_DIR)
+          -I$(XWOS_BRD_DIR) \
+          -I$(XWOS_WKSPC_DIR)
 
 PERDEF =
 
@@ -69,7 +70,7 @@ endif
 LDFLAGS = -mcpu=e200z0 -mhard-float \
           -L$(XWOS_SOC_DIR) -T$(XWOS_BRD_DIR)/$(XuanWuOS_CFG_LDSCRIPT) \
           -Wl,--gc-sections \
-          -Wl,-Map=$(XWOS_BRD_DIR)/wkspc/$(TARGET).map,--cref
+          -Wl,-Map=$(XWOS_WKSPC_DIR)/$(TARGET).map,--cref
 
 OBJ_DIR := $(XWOS_WKSPC_DIR)/obj/
 

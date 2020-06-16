@@ -58,6 +58,7 @@ INCDIRS := -I. \
            -I$(XWOS_CPU_DIR) \
            -I$(XWOS_SOC_DIR) \
            -I$(XWOS_BRD_DIR) \
+           -I$(XWOS_WKSPC_DIR) \
            -i $(CWMCUEPPC_PATH)/PA_Support/ewl/EWL_C/include
 
 PREFIX = $(XWOS_BRD_DIR)/cfg/board.prefix

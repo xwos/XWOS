@@ -286,7 +286,9 @@
 (logi "xwos-bdl-dir:%s" xwos-bdl-dir)
 (setq xwos-bm-dir (concat xwos-brd-dir "/bm"))
 (logi "xwos-bm-dir:%s" xwos-bm-dir)
-(setq xwos-wkspc-dir (concat xwos-brd-dir "/" wkspc))
+(setq xwos-wkspc-dir (if (file-name-absolute-p wkspc)
+                         wkspc
+                         (concat xwos-brd-dir "/" wkspc)))
 (logi "xwos-wkspc-dir:%s" xwos-wkspc-dir)
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; generate XuanWuOS.cfg ;;;;;;;; ;;;;;;;; ;;;;;;;;
