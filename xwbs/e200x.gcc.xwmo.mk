@@ -53,7 +53,7 @@ endif
 $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o.d: $(XWMO_DIR)/%.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_MM) $(CC) $(MM_ARGS) $(CC_ARGS) $< > $@;
-	@sed -i 's,\(^.*\)\.o[ :]*,$*.o $@ : ,g' $@
+	@sed -i 's|\(^.*\)\.o[ :]*|$(OBJ_DIR)$(XWMO_OBJ_DIR)/$*.o $@: \\\n |g' $@
 
 $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o: $(XWMO_DIR)/%.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true

@@ -154,7 +154,7 @@ $(OBJ_DIR)%.s: %.S
 $(OBJ_DIR)%.o.d: %.S
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_MM) $(CC) $(MM_ARGS) $(AS_ARGS) $< > $@;
-	@sed -i 's,\(^.*\)\.o[ :]*,$*.o $@ : ,g' $@
+	@sed -i 's|\(^.*\)\.o[ :]*|$(OBJ_DIR)$*.o $@: \\\n |g' $@
 
 $(OBJ_DIR)%.o: %.S
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
@@ -167,7 +167,7 @@ $(OBJ_DIR)%.i: %.c
 $(OBJ_DIR)%.o.d: %.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_MM) $(CC) $(MM_ARGS) $(CC_ARGS) $< > $@;
-	@sed -i 's,\(^.*\)\.o[ :]*,$*.o $@ : ,g' $@
+	@sed -i 's|\(^.*\)\.o[ :]*|$(OBJ_DIR)$*.o $@: \\\n |g' $@
 
 $(OBJ_DIR)%.o: %.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
@@ -180,7 +180,7 @@ $(OBJ_DIR)%.i: %.cpp
 $(OBJ_DIR)%.o.d: %.cpp
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_MM) $(CXX) $(MM_ARGS) $(CXX_ARGS) $< > $@;
-	@sed -i 's,\(^.*\)\.o[ :]*,$*.o $@ : ,g' $@
+	@sed -i 's|\(^.*\)\.o[ :]*|$(OBJ_DIR)$*.o $@: \\\n |g' $@
 
 $(OBJ_DIR)%.o: %.cpp
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
@@ -193,7 +193,7 @@ $(OBJ_DIR)%.i: %.cxx
 $(OBJ_DIR)%.o.d: %.cxx
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_MM) $(CXX) $(MM_ARGS) $(CXX_ARGS) $< > $@;
-	@sed -i 's,\(^.*\)\.o[ :]*,$*.o $@ : ,g' $@
+	@sed -i 's|\(^.*\)\.o[ :]*|$(OBJ_DIR)$*.o $@: \\\n |g' $@
 
 $(OBJ_DIR)%.o: %.cxx
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true

@@ -69,7 +69,7 @@ endif
 $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o.d: $(XWMO_DIR)/%.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_MM) $(CC) $(MM_ARGS) $(CC_ARGS) $< > $@;
-	@sed -i 's,\(^.*\)\.o[ :]*,$*.o $@ : ,g' $@
+	@sed -i 's|\(^.*\)\.o[ :]*|$(OBJ_DIR)$(XWMO_OBJ_DIR)/$*.o $@: \\\n |g' $@
 
 $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.lua.c: $(XWMO_DIR)/%.lua
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
@@ -86,7 +86,7 @@ $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o: $(XWMO_DIR)/%.c
 $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o.d: $(XWMO_DIR)/%.cpp
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_MM) $(CXX) $(MM_ARGS) $(CXX_ARGS) $< > $@;
-	@sed -i 's,\(^.*\)\.o[ :]*,$*.o $@ : ,g' $@
+	@sed -i 's|\(^.*\)\.o[ :]*|$(OBJ_DIR)$(XWMO_OBJ_DIR)/$*.o $@: \\\n |g' $@
 
 $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o: $(XWMO_DIR)/%.cpp
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
@@ -95,7 +95,7 @@ $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o: $(XWMO_DIR)/%.cpp
 $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o.d: $(XWMO_DIR)/%.cxx
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_MM) $(CXX) $(MM_ARGS) $(CXX_ARGS) $< > $@;
-	@sed -i 's,\(^.*\)\.o[ :]*,$*.o $@ : ,g' $@
+	@sed -i 's|\(^.*\)\.o[ :]*|$(OBJ_DIR)$(XWMO_OBJ_DIR)/$*.o $@: \\\n |g' $@
 
 $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o: $(XWMO_DIR)/%.cxx
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
