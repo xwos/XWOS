@@ -35,7 +35,6 @@ void arch_lfq_push(__atomic xwlfq_t * h, __atomic xwlfq_t * n)
 
         do {
                 next = (xwlfq_t *)lwarx(h);
-                xwmb_smp_ddb();
                 *n = (xwlfq_t)next;
                 xwmb_smp_mb();
         } while (stwcx(h, (xwu32_t)n));
@@ -50,7 +49,6 @@ xwlfq_t * arch_lfq_pop(__atomic xwlfq_t * h)
 
         do {
                 top = (xwlfq_t *)lwarx(h);
-                xwmb_smp_ddb();
                 if (top) {
                         next = (xwlfq_t *)(*top);
                         xwmb_smp_mb();

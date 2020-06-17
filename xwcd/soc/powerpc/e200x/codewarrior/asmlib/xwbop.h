@@ -62,6 +62,18 @@ xwssq_t arch_xwbop_ffs64(xwu64_t x);
 __xwbsp_code
 xwssq_t arch_xwbop_fls64(xwu64_t x);
 
+__xwbsp_code
+xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t len);
+
+__xwbsp_code
+xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t len);
+
+__xwbsp_code
+xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t len);
+
+__xwbsp_code
+xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t len);
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/

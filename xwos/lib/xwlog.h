@@ -194,8 +194,7 @@ int xwisrpf(const char * fmt, ...)
  *                - WARNING，等级5
  *                - ERR，等级6
  *                - CRIT，等级7
- *                - ALERT，等级8
- *                - EMERG，等级9
+ *                - EMERG，等级8
  * @param tag: (I) 日至标签
  * @param fmt: (I) 格式的字符串
  * @param ...: (I) 需要格式化的参数

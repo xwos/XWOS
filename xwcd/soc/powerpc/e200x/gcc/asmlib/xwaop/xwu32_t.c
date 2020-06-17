@@ -58,6 +58,9 @@ xwu32_t xwaop__xwu32_t__load(__atomic xwu32_t * a,
                 v = *a;
                 xwmb_smp_mb();
                 break;
+        default:
+                v = *a;
+                break;
         }
         return v;
 }
@@ -89,6 +92,9 @@ xwu32_t xwaop__xwu32_t__store(__atomic xwu32_t * a,
                 xwmb_smp_mb();
                 *a = v;
                 xwmb_smp_mb();
+                break;
+        default:
+                *a = v;
                 break;
         }
         return v;
@@ -1633,7 +1639,7 @@ xwer_t xwaop__xwu32_t__tst_then_op(__atomic xwu32_t * a,
                                 } else {
                                         rc = OK;
                                         n = o;
-                                        xwmb_smp_ddb();
+                                        xwmb_smp_mb();
                                         break;
                                 }
                         } else {
@@ -1650,7 +1656,7 @@ xwer_t xwaop__xwu32_t__tst_then_op(__atomic xwu32_t * a,
                         } else {
                                 rc = OK;
                                 n = o;
-                                xwmb_smp_ddb();
+                                xwmb_smp_mb();
                                 break;
                         }
                 }

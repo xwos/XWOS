@@ -56,6 +56,9 @@ xws64_t xwaop__xws64_t__store(__atomic xws64_t * a,
                 *a = v;
                 xwmb_smp_mb();
                 break;
+        default:
+                *a = v;
+                break;
         }
         return v;
 }

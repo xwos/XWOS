@@ -56,6 +56,9 @@ xwu8_t xwaop__xwu8_t__store(__atomic xwu8_t * a,
                 *a = v;
                 xwmb_smp_mb();
                 break;
+        default:
+                *a = v;
+                break;
         }
         return v;
 }

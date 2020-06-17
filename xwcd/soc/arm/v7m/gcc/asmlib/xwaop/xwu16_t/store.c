@@ -56,6 +56,9 @@ xwu16_t xwaop__xwu16_t__store(__atomic xwu16_t * a,
                 *a = v;
                 xwmb_smp_mb();
                 break;
+        default:
+                *a = v;
+                break;
         }
         return v;
 }
