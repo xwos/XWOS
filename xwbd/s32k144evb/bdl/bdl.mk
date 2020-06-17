@@ -26,7 +26,7 @@ BDL_ASRCS :=
 BDL_CSRCS += board_init.c
 BDL_CSRCS += vector.c
 ifeq ($(BRDCFG_XWSD_THRD_STACK_POOL),y)
-    BDL_CSRCS += xwkac/thrd_stack_mempool.c
+    BDL_CSRCS += xwac/thrd_stack_mempool.c
 endif
-BDL_CSRCS += xwkac/xwsd_hook.c
+BDL_CSRCS += xwac/xwsd_hook.c
 BDL_CSRCS += main.c

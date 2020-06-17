@@ -23,6 +23,6 @@ BDL_CSRCS :=
 BDL_ASRCS :=
 
 BDL_CSRCS += board_init.c
-BDL_CSRCS += xwkac/idle_hook.c
+BDL_CSRCS += xwac/xwsd_hook.c
 BDL_CSRCS += vector.c
 BDL_CSRCS += main.c

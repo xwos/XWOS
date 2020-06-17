@@ -32,21 +32,18 @@ CUBEMX_CSRCS += override.c # 增加源文件 override.c
 XWMO_CSRCS :=
 XWMO_CSRCS += $(addprefix cubemx/,$(CUBEMX_CSRCS))
 
-# 增加xwac中的源文件
-XWMO_CSRCS += xwac/init.c
+XWMO_CSRCS += init.c
+XWMO_CSRCS += xwmo.c
+
 XWMO_CSRCS += xwac/xwlib/crc32.c
 XWMO_CSRCS += xwac/xwos/vector.c
 XWMO_CSRCS += xwac/xwos/hook.c
 
-# 增加xwds中的源文件
 XWMO_CSRCS += xwds/init.c
 XWMO_CSRCS += xwds/pm.c
 XWMO_CSRCS += xwds/stm32cube.c
 XWMO_CSRCS += xwds/soc.c
 XWMO_CSRCS += xwds/usart.c
-
-# 增加xwds中的源文件
-XWMO_CSRCS += xwmo.c
 
 # 定义编译选项
 XWMO_CFLAGS := -include standard.h

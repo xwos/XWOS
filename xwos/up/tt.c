@@ -471,7 +471,7 @@ void xwos_syshwt_task(struct xwos_syshwt * hwt)
         }
         xwos_scheduler_chkpmpt();
 #if defined(BRDCFG_XWSD_SYSHWT_HOOK) && (1 == BRDCFG_XWSD_SYSHWT_HOOK)
-        bdl_xwsd_syshwt_hook(xwsd);
+        bdl_xwsd_syshwt_hook(xwos_scheduler_get_lc());
 #endif /* BRDCFG_XWSD_SYSHWT_HOOK */
 }
 

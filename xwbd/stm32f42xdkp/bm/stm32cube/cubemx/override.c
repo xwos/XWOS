@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBEMX：重写某些override属性的函数
+ * @brief STM32CUBE：重写某些override属性的函数
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -41,11 +41,11 @@ extern uint32_t uwTickPrio;
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-void stm32cube_override_holder_stub(void)
+void stm32cube_override_placeholder(void)
 {
-        /* LD连接静态库(.a)时，GC是以.c文件为单位，若文件中全是override
-           的函数，会被gcc认为.c文件中所有符号都没有被使用而被GC掉，因此
-           写一个占位函数，并在一个不会被GC的.c文件中引用。 */
+        /* ld连接静态库(.a)时，--gc-sections是以.c文件为单位，若文件中
+           全是override的函数，会被ld认为.c文件中所有符号都没有被使用而被删掉，
+           因此写一个占位函数，并在init中调用。 */
 }
 
 void HAL_MspInit(void)

@@ -30,7 +30,7 @@
   #include <xwos/smp/sync/semaphore.h>
   #include <xwos/smp/lock/mutex.h>
 #endif /* XuanWuOS_CFG_CORE__smp */
-#include <bm/stm32cube/xwac/init.h>
+#include <bm/stm32cube/init.h>
 #include <bdl/standard.h>
 #include <bdl/board_init.h>
 

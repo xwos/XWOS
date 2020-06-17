@@ -26,11 +26,9 @@ BDL_ASRCS :=
 BDL_CSRCS += board_init.c
 BDL_CSRCS += vector.c
 ifeq ($(BRDCFG_XWSD_THRD_STACK_POOL),y)
-    BDL_CSRCS += xwkac/thread_stack_pool.c
+    BDL_CSRCS += xwac/thread_stack_pool.c
 endif
-ifeq ($(BRDCFG_XWSD_IDLE_HOOK),y)
-    BDL_CSRCS += xwkac/idle_hook.c
-endif
+BDL_CSRCS += xwac/xwsd_hook.c
 BDL_CSRCS += eirq.c
 BDL_CSRCS += bkup.c
 BDL_CSRCS += test/dmauarttest.c
