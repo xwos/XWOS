@@ -59,37 +59,7 @@ __soc_isr_table_qualifier struct soc_isr_table soc_isr_table __xwos_vctbl = {
                 arch_systick_isr,
         },
         .soc = {
-                arch_isr_nop, /* ISR0 */
-                arch_isr_nop, /* ISR1 */
-                arch_isr_nop, /* ISR2 */
-                arch_isr_nop, /* ISR3 */
-                arch_isr_nop, /* ISR4 */
-                arch_isr_nop, /* ISR5 */
-                arch_isr_nop, /* ISR6 */
-                arch_isr_nop, /* ISR7 */
-                arch_isr_nop, /* ISR8 */
-
-                arch_isr_nop, /* ISR9 */
-                arch_isr_nop, /* ISR10 */
-                arch_isr_nop, /* ISR11 */
-                arch_isr_nop, /* ISR12 */
-                arch_isr_nop, /* ISR13 */
-                arch_isr_nop, /* ISR14 */
-                arch_isr_nop, /* ISR15 */
-                arch_isr_nop, /* ISR16 */
-
-                arch_isr_nop, /* ISR17 */
-                arch_isr_nop, /* ISR18 */
-                arch_isr_nop, /* ISR19 */
-                arch_isr_nop, /* ISR20 */
-                arch_isr_nop, /* ISR21 */
-                arch_isr_nop, /* ISR22 */
-                arch_isr_nop, /* ISR23 */
-                arch_isr_nop, /* ISR24 */
-
-                arch_isr_nop, /* ISR25 */
-                arch_isr_nop, /* ISR26 */
-                arch_isr_nop, /* ISR27 */
+                [0 ... (SOCCFG_IRQ_NUM - 1)] = arch_isr_nop,
         },
 };
 

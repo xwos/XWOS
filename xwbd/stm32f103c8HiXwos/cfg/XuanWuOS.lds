@@ -36,12 +36,12 @@ MEMORY {
         /* 中断向量表的加载地址(LMA)区域 */
         vctbl_lmr (rx):
                 org = code_mr_origin,
-                len = 512
+                len = 1024
 
         /* 中断向量表的运行地址(VMA)区域 */
         vctbl_vmr (rw):
                 org = code_mr_origin,
-                len = 512
+                len = 1024
 
         /* 镜像文件的信息 */
         image_description_mr (rx):
