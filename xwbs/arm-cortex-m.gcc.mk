@@ -88,8 +88,8 @@ LD_OBJS = $(strip -Wl,--start-group \
                   $(SOC_LIB) $(SOC_EOBJS) \
                   $(CPU_LIB) $(CPU_EOBJS) \
                   $(ARCH_LIB) $(ARCH_EOBJS) \
-                  $(ELIBS) \
-                  -Wl,--end-group)
+                  -Wl,--end-group \
+                  $(ELIBS))
 LD_OBJS_LST := $(OBJ_DIR)$(TARGET)-objs.txt
 
 MM_ARGS = $(strip $(MMFLAGS))
@@ -102,8 +102,10 @@ CXX_ARGS = $(strip $(INCDIRS) $(CXXFLAGS) $(ARCH_CXXFLAGS) $(CPU_CXXFLAGS) $(BDL
 
 LD_ARGS = $(strip $(LDFLAGS) $(ARCH_LDFLAGS) $(CPU_LDFLAGS) $(BDL_LDFLAGS))
 
-all: $(LIB_OBJS) $(LIBS) $(XWMD) $(XWPP) $(XWBM) $(XWEM) $(XWOEM) $(XWOS_WKSPC_DIR)/$(TARGET).elf \
-     $(XWOS_WKSPC_DIR)/$(TARGET).hex $(XWOS_WKSPC_DIR)/$(TARGET).bin
+all: $(LIB_OBJS) $(LIBS) $(XWMD) $(XWPP) $(XWBM) $(XWEM) $(XWOEM) \
+     $(XWOS_WKSPC_DIR)/$(TARGET).elf \
+     $(XWOS_WKSPC_DIR)/$(TARGET).hex \
+     $(XWOS_WKSPC_DIR)/$(TARGET).bin
 
 ifeq ($(XuanWuOS_CFG_XWMD),y)
     include xwbs/xwmd.mk

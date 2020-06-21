@@ -51,6 +51,7 @@
  ******** ******** ********   board modules   ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define BMCFG_stm32cube                         1
+#define BMCFG_newlibac                          1
 #define BMCFG_lua                               1
 #define BMCFG_cxx                               1
 #define BMCFG_pm                                1

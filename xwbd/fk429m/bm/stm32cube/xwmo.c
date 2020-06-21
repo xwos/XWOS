@@ -21,15 +21,18 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+#include <stdlib.h>
 #include <bm/stm32cube/standard.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <xwmd/ds/soc/gpio.h>
-#include <bm/stm32cube/cubemx/override.h>
-#include <bm/stm32cube/xwds/stm32cube.h>
-#include <bm/stm32cube/xwds/init.h>
-#include <bm/stm32cube/xwmo.h>
+#include <xwem/filesystem/fatfs/ff.h>
+#include "cubemx/Core/Inc/sdio.h"
+#include "cubemx/override.h"
+#include "xwds/stm32cube.h"
+#include "xwds/init.h"
+#include "xwmo.h"
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -44,6 +47,8 @@
 #define MEMTST_TASK_PRIORITY \
         (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 3))
 
+#define FATFS_TASK_PRIORITY XWOSAL_SD_PRIORITY_RT_MAX
+
 #define BLUE_LED_GPIO_PORT XWDS_GPIO_PORT_D
 #define BLUE_LED_GPIO_PIN XWDS_GPIO_PIN_12
 
@@ -54,11 +59,18 @@ xwer_t led_task(void * arg);
 
 xwer_t memtst_task(void * arg);
 
+xwer_t fatfs_task(void * arg);
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-const void * stm32cube_placeholder[] = {
-        stm32cube_override_placeholder,
+/**
+ * @brief 连接占位符
+ * @note
+ * + 连接时，若符号存在多重定义，优先选择包含占位符的文件里面的符号。
+ */
+void * const stm32cube_linkage_placeholder[] = {
+        stm32cube_override_linkage_placeholder,
 };
 
 const struct xwosal_thrd_desc stm32cube_tbd[] = {
@@ -66,7 +78,7 @@ const struct xwosal_thrd_desc stm32cube_tbd[] = {
                 .name = "task.led",
                 .prio = LED_TASK_PRIORITY,
                 .stack = NULL,
-                .stack_size = 2048,
+                .stack_size = 4096,
                 .func = led_task,
                 .arg = NULL,
                 .attr = XWSDOBJ_ATTR_PRIVILEGED,
@@ -80,11 +92,22 @@ const struct xwosal_thrd_desc stm32cube_tbd[] = {
                 .arg = NULL,
                 .attr = XWSDOBJ_ATTR_PRIVILEGED,
         },
+        [2] = {
+                .name = "task.fatfs",
+                .prio = FATFS_TASK_PRIORITY,
+                .stack = NULL,
+                .stack_size = 4096,
+                .func = fatfs_task,
+                .arg = NULL,
+                .attr = XWSDOBJ_ATTR_PRIVILEGED,
+        },
 };
 
 xwid_t stm32cube_tid[xw_array_size(stm32cube_tbd)];
 
 extern struct xwmm_mempool * eram_mempool;
+
+FATFS sdcard;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -92,7 +115,14 @@ extern struct xwmm_mempool * eram_mempool;
 xwer_t bm_stm32cube_start(void)
 {
         xwer_t rc;
-        xwsz_t i;
+        xwsq_t i;
+
+        MX_SDIO_SD_Construct();
+        MX_SDIO_SD_Init();
+        rc = MX_SDIO_SD_TrimClk(100);
+        if (rc < 0) {
+                goto err_sd;
+        }
 
         /* start devices */
         rc = stm32cube_xwds_uart_start();
@@ -117,7 +147,11 @@ xwer_t bm_stm32cube_start(void)
 
 err_thrd_create:
         stm32cube_xwds_uart_stop();
+        BDL_BUG();
 err_xwds_uart_start:
+        BDL_BUG();
+err_sd:
+        BDL_BUG();
         return rc;
 }
 
@@ -127,7 +161,6 @@ xwer_t led_task(void * arg)
         xwer_t rc;
 
         XWOS_UNUSED(arg);
-
         rc = xwds_gpio_req(&stm32cube_soc_cb,
                            BLUE_LED_GPIO_PORT, BLUE_LED_GPIO_PIN);
         if (rc < 0) {
@@ -157,15 +190,47 @@ err_gpio_req:
         return rc;
 }
 
+xwer_t fatfs_task(void * arg)
+{
+        xwsq_t i;
+        UINT rdnum;
+        FRESULT frc;
+        FIL f;
+        xwu8_t * filedata;
+
+        filedata = malloc(2048);
+        frc = f_mount(&sdcard, "sd:", 1);
+        if (FR_OK == frc) {
+                for (i = 0; i < 10; i++) {
+                        frc = f_open(&f, "sd:/xw.lua", FA_READ);
+                        if (FR_OK == frc) {
+                                frc = f_read(&f, filedata, 2048, &rdnum);
+                                f_close(&f);
+                        }
+                }
+        }
+        if (FR_OK == frc) {
+                for (i = 0; i < 10; i++) {
+                        frc = f_open(&f, "sd:/xw.lua", FA_READ);
+                        if (FR_OK == frc) {
+                                frc = f_read(&f, filedata, sizeof(filedata), &rdnum);
+                                f_close(&f);
+                        }
+                }
+        }
+        free(filedata);
+        return OK;
+}
+
 xwer_t memtst_task(void * arg)
 {
-        xwer_t rc = OK;
+        xwer_t rc;
         void * mem;
         xwtm_t xwtm;
         __xw_io bool running = true;
 
         XWOS_UNUSED(arg);
-
+        rc = OK;
         while ((!xwosal_cthrd_frz_shld_stop(NULL)) && (running)) {
                 xwtm = 2 * XWTM_MS;
                 xwosal_cthrd_sleep(&xwtm);

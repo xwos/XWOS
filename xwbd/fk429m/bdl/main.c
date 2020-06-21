@@ -26,6 +26,7 @@
 #include <xwos/osal/thread.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/xwmo.h>
+#include <bm/newlibac/xwmo.h>
 #include <bm/pm/xwmo.h>
 #include <bm/lua/xwmo.h>
 #include <bm/cxx/xwmo.h>
@@ -99,6 +100,11 @@ xwer_t bdl_init_thrd(void * arg)
                 goto bm_stm32cube_start;
         }
 
+        rc = bm_newlibac_start();
+        if (rc < 0) {
+                goto bm_newlibac_start;
+        }
+
         rc = bm_pm_start();
         if (rc < 0) {
                 goto bm_pm_start;
@@ -136,6 +142,8 @@ err_bm_cxx_start:
 err_bm_xwlua_start:
         BDL_BUG();
 bm_pm_start:
+        BDL_BUG();
+bm_newlibac_start:
         BDL_BUG();
 bm_stm32cube_start:
         BDL_BUG();

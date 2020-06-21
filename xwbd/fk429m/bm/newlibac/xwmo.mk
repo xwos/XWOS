@@ -21,7 +21,7 @@
 include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
-XWMO_CSRCS := ff.c ffunicode.c port/xwfatfs.c
-XWMO_CFLAGS := -Wno-sign-conversion -Wno-unused-variable -Wno-unused-parameter
-XWMO_INCDIRS := $(call getXwmoDir) $(call getXwmoDir)/port
+XWMO_CSRCS := xwmo.c mem.c
+XWMO_CFLAGS := -Wno-unused-value
+XWMO_INCDIRS :=
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)

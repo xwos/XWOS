@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：重写某些override属性的函数
+ * @brief STM32CUBE：FatFS的SD卡驱动
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -22,17 +22,20 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
-#include <arch_systick.h>
-#include <bm/stm32cube/cubemx/Core/Inc/main.h>
+#include <xwem/filesystem/fatfs/ff.h>
+#include "cubemx/Core/Inc/sdio.h"
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      macros       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       types       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+/******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern uint32_t uwTickPrio;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
@@ -41,32 +44,65 @@ extern uint32_t uwTickPrio;
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-void stm32cube_override_linkage_placeholder(void)
+int MMC_disk_status(void)
 {
-        /* 链接时，优先使用此文件中的符号 */
+        return (int)MX_SDIO_SD_GetState();
 }
 
-void HAL_MspInit(void)
+int MMC_disk_initialize(void)
 {
-        __HAL_RCC_SYSCFG_CLK_ENABLE();
-        __HAL_RCC_PWR_CLK_ENABLE();
+        int rc;
 
-        LL_PWR_EnableBkUpAccess();
-        LL_DBGMCU_EnableDBGSleepMode();
-        LL_DBGMCU_EnableDBGStopMode();
-        LL_DBGMCU_EnableDBGStandbyMode();
-}
-
-HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
-{
-        HAL_StatusTypeDef ret;
-
-        /* Configure the SysTick IRQ priority */
-        if (TickPriority < (1UL << __NVIC_PRIO_BITS)) {
-                uwTickPrio = ARCH_IRQ_TICK_PRIO;
-                ret = HAL_OK;
+        if (HAL_SD_STATE_READY == hsd.State) {
+                rc = OK;
         } else {
-                ret = HAL_ERROR;
+                rc = MX_SDIO_SD_TrimClk(10);
         }
-        return ret;
+        return (int)rc;
+}
+
+int MMC_disk_read(uint8_t * buff, uint64_t sector, uint32_t count)
+{
+        xwer_t rc;
+
+        rc = MX_SDIO_SD_Read(buff, (uint32_t)sector, count);
+        return (int)rc;
+}
+
+int MMC_disk_write(uint8_t * buff, uint64_t sector, uint32_t count)
+{
+        xwer_t rc;
+
+        rc = MX_SDIO_SD_Write(buff, (uint32_t)sector, count);
+        return (int)rc;
+}
+
+int MMC_disk_ioctl(uint8_t cmd, void * buff)
+{
+        int rc;
+
+        switch (cmd) {
+        case CTRL_SYNC:
+                rc = OK;
+                break;
+        case GET_SECTOR_COUNT:
+                *(uint32_t *)buff = (hsd.SdCard.BlockSize * hsd.SdCard.BlockNbr) / MX_SD_SECTOR_SIZE;
+                rc = OK;
+                break;
+        case GET_SECTOR_SIZE:
+                *(uint16_t *)buff = MX_SD_SECTOR_SIZE;
+                rc = OK;
+                break;
+        case GET_BLOCK_SIZE:
+                *(uint32_t *)buff = hsd.SdCard.BlockSize;
+                rc = OK;
+                break;
+        case CTRL_TRIM:
+                rc = OK;
+                break;
+        default:
+                rc = -EINVAL;
+                break;
+        }
+        return (int)rc;
 }

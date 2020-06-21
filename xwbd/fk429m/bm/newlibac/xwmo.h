@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：重写某些override属性的函数
+ * @brief Board Module: newlib适配代码
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -18,55 +18,29 @@
  * > limitations under the License.
  */
 
+#ifndef __bm_newlibac_init_h__
+#define __bm_newlibac_init_h__
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <bm/stm32cube/standard.h>
-#include <arch_systick.h>
-#include <bm/stm32cube/cubemx/Core/Inc/main.h>
+#include <xwos/standard.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
+ ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern uint32_t uwTickPrio;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+xwer_t bm_newlibac_start(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
+ ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-void stm32cube_override_linkage_placeholder(void)
-{
-        /* 链接时，优先使用此文件中的符号 */
-}
 
-void HAL_MspInit(void)
-{
-        __HAL_RCC_SYSCFG_CLK_ENABLE();
-        __HAL_RCC_PWR_CLK_ENABLE();
-
-        LL_PWR_EnableBkUpAccess();
-        LL_DBGMCU_EnableDBGSleepMode();
-        LL_DBGMCU_EnableDBGStopMode();
-        LL_DBGMCU_EnableDBGStandbyMode();
-}
-
-HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
-{
-        HAL_StatusTypeDef ret;
-
-        /* Configure the SysTick IRQ priority */
-        if (TickPriority < (1UL << __NVIC_PRIO_BITS)) {
-                uwTickPrio = ARCH_IRQ_TICK_PRIO;
-                ret = HAL_OK;
-        } else {
-                ret = HAL_ERROR;
-        }
-        return ret;
-}
+#endif /* bm/newlibac/init.h */

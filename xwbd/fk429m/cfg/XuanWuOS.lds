@@ -41,10 +41,9 @@ MEMORY {
                                                          .xwmd.isr.text &
                                                          .xwmd.text &
                                                          .xwmd.rodata */
-        rx_mr (rx): org = 0x08020000, len = 384k /* .text & .rodata */
+        rx_mr (rx): org = 0x08020000, len = 1920k /* .text & .rodata */
         stkmempool_mr (arw): org = 0x20000000, len = 128k /* .stkmempool */
-        rwx_mr (arw): org = 0x20020000, len = 32k /* .data and .bss */
-        heap_mr (arw): org = 0x20028000, len = 32k /* .heap */
+        rwx_mr (arw): org = 0x20020000, len = 64k /* .data, .bss & .heap */
         xwos_rwx_mr (arw): org = 0x10000000, len = 24k /* .xwos.data */
         ccmheap_mr (arw): org = 0x10006000, len = 32k /* .ccmheap */
         xwos_stk_mr (rw): org = 0x1000E000, len = 8k /* xwos stack */
@@ -58,8 +57,5 @@ ccmheap_mr_size = LENGTH(ccmheap_mr);
 
 eram_mr_origin = ORIGIN(eram_mr);
 eram_mr_size = LENGTH(eram_mr);
-
-heap_mr_origin = ORIGIN(heap_mr);
-heap_mr_size = LENGTH(heap_mr);
 
 INCLUDE soc.lds

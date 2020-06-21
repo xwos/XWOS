@@ -26,10 +26,11 @@
 #include <soc_irq.h>
 #include <soc_sched.h>
 #include <soc_syshwt.h>
-#include <stm32f4xx.h>
-#include <bm/stm32cube/xwds/stm32cube.h>
-#include <bm/stm32cube/xwds/soc.h>
-#include <bm/stm32cube/xwds/usart.h>
+#include "xwds/stm32cube.h"
+#include "xwds/soc.h"
+#include "xwds/usart.h"
+#include "cubemx/Core/Inc/stm32f4xx_it.h"
+#include "cubemx/Core/Inc/main.h"
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
@@ -112,7 +113,7 @@ __soc_isr_table_qualifier struct soc_isr_table soc_isr_table __xwos_vctbl = {
                 [TIM8_CC_IRQn] = arch_isr_nop, /* isr46 */
                 [DMA1_Stream7_IRQn] = stm32cube_dma1_stream7_isr, /* isr47 */
                 [FMC_IRQn] = arch_isr_nop, /* isr48 */
-                [SDIO_IRQn] = arch_isr_nop, /* isr49 */
+                [SDIO_IRQn] = SDIO_IRQHandler, /* isr49 */
                 [TIM5_IRQn] = arch_isr_nop, /* isr50 */
                 [SPI3_IRQn] = arch_isr_nop, /* isr51 */
                 [UART4_IRQn] = arch_isr_nop, /* isr52 */
@@ -122,7 +123,7 @@ __soc_isr_table_qualifier struct soc_isr_table soc_isr_table __xwos_vctbl = {
                 [DMA2_Stream0_IRQn] = stm32cube_dma2_stream0_isr, /* isr56 */
                 [DMA2_Stream1_IRQn] = stm32cube_dma2_stream1_isr, /* isr57 */
                 [DMA2_Stream2_IRQn] = stm32cube_dma2_stream2_isr, /* isr58 */
-                [DMA2_Stream3_IRQn] = stm32cube_dma2_stream3_isr, /* isr59 */
+                [DMA2_Stream3_IRQn] = DMA2_Stream3_IRQHandler, /* isr59 */
                 [DMA2_Stream4_IRQn] = stm32cube_dma2_stream4_isr, /* isr60 */
                 [ETH_IRQn] = arch_isr_nop, /* isr61 */
                 [ETH_WKUP_IRQn] = stm32cube_exti_isr, /* isr62 */
@@ -132,7 +133,7 @@ __soc_isr_table_qualifier struct soc_isr_table soc_isr_table __xwos_vctbl = {
                 [CAN2_SCE_IRQn] = arch_isr_nop, /* isr66 */
                 [OTG_FS_IRQn] = arch_isr_nop, /* isr67 */
                 [DMA2_Stream5_IRQn] = stm32cube_dma2_stream5_isr, /* isr68 */
-                [DMA2_Stream6_IRQn] = stm32cube_dma2_stream6_isr, /* isr69 */
+                [DMA2_Stream6_IRQn] = DMA2_Stream6_IRQHandler, /* isr69 */
                 [DMA2_Stream7_IRQn] = stm32cube_dma2_stream7_isr, /* isr70 */
                 [USART6_IRQn] = arch_isr_nop, /* isr71 */
                 [I2C3_EV_IRQn] = arch_isr_nop, /* isr72 */

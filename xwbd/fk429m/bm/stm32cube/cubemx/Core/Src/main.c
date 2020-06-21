@@ -23,6 +23,7 @@
 #include "crc.h"
 #include "dma.h"
 #include "rng.h"
+#include "sdio.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -99,6 +100,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_CRC_Init();
   MX_TIM9_Init();
+  MX_SDIO_SD_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */

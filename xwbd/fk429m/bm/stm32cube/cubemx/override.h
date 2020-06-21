@@ -29,6 +29,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-void stm32cube_override_placeholder(void);
+void stm32cube_override_linkage_placeholder(void);
 
 #endif /* bm/stm32cube/cubemx/override.h */

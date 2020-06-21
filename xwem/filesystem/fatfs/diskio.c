@@ -26,7 +26,7 @@ DSTATUS disk_status (
 {
 	DSTATUS stat;
 	int result;
-        /*
+
 	switch (pdrv) {
 	case DEV_RAM :
 		result = RAM_disk_status();
@@ -49,7 +49,6 @@ DSTATUS disk_status (
 
 		return stat;
 	}
-        */
 	return STA_NOINIT;
 }
 
@@ -66,7 +65,6 @@ DSTATUS disk_initialize (
 	DSTATUS stat;
 	int result;
 
-        /*
 	switch (pdrv) {
 	case DEV_RAM :
 		result = RAM_disk_initialize();
@@ -89,7 +87,6 @@ DSTATUS disk_initialize (
 
 		return stat;
 	}
-        */
 	return STA_NOINIT;
 }
 
@@ -109,7 +106,6 @@ DRESULT disk_read (
 	DRESULT res;
 	int result;
 
-        /*
 	switch (pdrv) {
 	case DEV_RAM :
 		// translate the arguments here
@@ -138,7 +134,7 @@ DRESULT disk_read (
 
 		return res;
 	}
-        */
+
 	return RES_PARERR;
 }
 
@@ -159,7 +155,7 @@ DRESULT disk_write (
 {
 	DRESULT res;
 	int result;
-        /*
+
 	switch (pdrv) {
 	case DEV_RAM :
 		// translate the arguments here
@@ -188,7 +184,7 @@ DRESULT disk_write (
 
 		return res;
 	}
-        */
+
 	return RES_PARERR;
 }
 
@@ -207,7 +203,7 @@ DRESULT disk_ioctl (
 {
 	DRESULT res;
 	int result;
-        /*
+
 	switch (pdrv) {
 	case DEV_RAM :
 
@@ -227,6 +223,7 @@ DRESULT disk_ioctl (
 
 		return res;
 	}
-        */
+
 	return RES_PARERR;
 }
+

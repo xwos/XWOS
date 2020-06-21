@@ -50,8 +50,13 @@ xwer_t led_task(void * arg);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-const void * stm32cube_placeholder[] = {
-        stm32cube_override_placeholder,
+/**
+ * @brief 连接占位符
+ * @note
+ * + 连接时，若符号存在多重定义，优先选择包含占位符的文件里面的符号。
+ */
+void * const stm32cube_linkage_placeholder[] = {
+        stm32cube_override_linkage_placeholder,
 };
 
 const struct xwosal_thrd_desc stm32cube_tbd[] = {
