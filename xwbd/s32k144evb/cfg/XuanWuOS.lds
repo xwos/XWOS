@@ -40,12 +40,8 @@ MEMORY {
                                                         .text &
                                                         .rodata */
         xwos_rwx_mr (arw): org = 0x1FFF8000, len = 16k /* .xwos.data */
-        rwx_mr (arw): org = 0x1FFFC000, len = 24k /* .data and .bss */
-        heap_mr (arw): org = 0x20002000, len = 16k /* .heap */
+        rwx_mr (arw): org = 0x1FFFC000, len = 40k /* .data, .bss & .heap */
         xwos_stk_mr (rw): org = 0x20006000, len = 4k /* xwos stack */
 }
-
-heap_mr_origin = ORIGIN(heap_mr);
-heap_mr_size = LENGTH(heap_mr);
 
 INCLUDE soc.lds

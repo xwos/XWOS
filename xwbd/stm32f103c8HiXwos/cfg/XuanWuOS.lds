@@ -56,20 +56,12 @@ MEMORY {
         /* 数据段(.data)与未初始化的数据段(.bss) */
         rwx_mr (arw):
                 org = data_mr_origin,
-                len = 17k
-
-        /* 堆内存(.heap) */
-        heap_mr (arw):
-                org = ORIGIN(rwx_mr) + LENGTH(rwx_mr),
-                len = 1k
+                len = 18k
 
         /* 玄武OS的内核栈 */
         xwos_stk_mr (rw):
                 org = ORIGIN(rwx_mr) + LENGTH(rwx_mr),
-                len = ocram_mr_size - LENGTH(rwx_mr) - LENGTH(heap_mr)
+                len = ocram_mr_size - LENGTH(rwx_mr)
 }
-
-heap_mr_origin = ORIGIN(heap_mr);
-heap_mr_size = LENGTH(heap_mr);
 
 INCLUDE soc.lds

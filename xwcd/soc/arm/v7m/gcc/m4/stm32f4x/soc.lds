@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief S32K14xSTM32F4x的链接脚本
+ * @brief STM32F4x的链接脚本
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright

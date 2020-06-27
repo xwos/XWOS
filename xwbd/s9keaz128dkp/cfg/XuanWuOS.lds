@@ -28,12 +28,8 @@ MEMORY {
         flash_cfg_mr (rx): org = 0x00000400, len = 16 /* flash config */
         image_description_mr (rx): org = 0x00000410, len = 240 /* image description */
 	rx_mr (rx): org = 0x00000500, len = 129792 /* .text & .rodata */
-	rwx_mr (arw): org = 0x1FFFF000, len = 11k /* .data and .bss */
-	heap_mr (arw): org = 0x20001C00, len = 4k /* .heap */
-	xwos_stk_mr (rw): org = 0x20002C00, len = 1k /* xwos stack */
+	rwx_mr (arw): org = 0x1FFFF000, len = 14k /* .data and .bss */
+	xwos_stk_mr (rw): org = 0x20002800, len = 1k /* xwos stack */
 }
-
-heap_mr_origin = ORIGIN(heap_mr);
-heap_mr_size = LENGTH(heap_mr);
 
 INCLUDE soc.lds

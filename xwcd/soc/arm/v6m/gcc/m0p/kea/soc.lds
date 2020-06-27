@@ -185,8 +185,7 @@ SECTIONS {
 
         .heap : ALIGN(8) {
                 PROVIDE(end = .);
-                . = . + heap_mr_size;
-        } > heap_mr
+        } > xwos_stk_mr
 
         .ARM.attributes 0 : { /* architecture infomations @ref aaelf.pdf */
                 *(.ARM.attributes)

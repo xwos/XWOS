@@ -25,7 +25,7 @@ ENTRY(arch_isr_reset)
 SECTIONS {
         . = 0x0;
         .xwos.vctbl : ALIGN(4) {
-                *(.xwos.vctbl)
+                KEEP(*(.xwos.vctbl))
                 xwos_vctbl_vma_end = .;
         } > vctbl_vmr AT> vctbl_lmr
         xwos_vctbl_vma_base = ADDR(.xwos.vctbl);
@@ -186,9 +186,9 @@ SECTIONS {
         bss_vma_base = ADDR(.bss);
 
         .heap : ALIGN(8) {
+                . = ALIGN(0x100);
                 PROVIDE(end = .);
-                . = . + heap_mr_size;
-        } > heap_mr
+        } > rwx_mr
 
         .ARM.attributes 0 : { /* architecture infomations @ref aaelf.pdf */
                 *(.ARM.attributes)
