@@ -40,9 +40,15 @@ void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN Prototypes */
 void MX_USART1_UART_Deinit(void);
 
-void MX_USART1_UART_Setup_RXDMA(xwu8_t * mem, size_t size);
+void MX_USART1_UART_Setup_RXDMA(xwu8_t * mem, xwsz_t size);
 
-void MX_USART1_UART_Setup_TXDMA(const xwu8_t * mem, size_t size);
+void MX_USART1_UART_Setup_TXDMA(const xwu8_t * mem, xwsz_t size);
+
+void MX_USART1_UART_Finish_TXDMA(void);
+
+void MX_USART1_UART_Putc(xwu8_t byte);
+
+void MX_USART1_UART_Isr(void);
 
 /* USER CODE END Prototypes */
 

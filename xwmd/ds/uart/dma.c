@@ -20,6 +20,7 @@
 #include <xwos/lib/string.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/lock/spinlock.h>
+#include <xwos/osal/lock/mutex.h>
 #include <xwos/osal/sync/semaphore.h>
 #include <xwmd/ds/uart/dma.h>
 
@@ -105,6 +106,10 @@ xwer_t xwds_dmauartc_cvop_probe(struct xwds_dmauartc * dmauartc)
         if (__unlikely(rc < 0)) {
                 goto err_smr_init;
         }
+        rc = xwosal_mtx_init(&dmauartc->txmtx, XWOSAL_SD_PRIORITY_RT_MIN);
+        if (__unlikely(rc < 0)) {
+                goto err_txmtx_init;
+        }
         rc = xwds_device_cvop_probe(&dmauartc->dev);
         if (__unlikely(rc < 0)) {
                 goto err_dev_probe;
@@ -112,6 +117,8 @@ xwer_t xwds_dmauartc_cvop_probe(struct xwds_dmauartc * dmauartc)
         return OK;
 
 err_dev_probe:
+        xwosal_mtx_destroy(&dmauartc->txmtx);
+err_txmtx_init:
         xwosal_smr_destroy(&dmauartc->rxq.smr);
 err_smr_init:
         return rc;
@@ -132,6 +139,7 @@ xwer_t xwds_dmauartc_cvop_remove(struct xwds_dmauartc * dmauartc)
                 goto err_dev_cvop_remove;
         }
 
+        xwosal_mtx_destroy(&dmauartc->txmtx);
         xwosal_smr_destroy(&dmauartc->rxq.smr);
         return OK;
 
@@ -339,6 +347,7 @@ xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
                         xwtm_t * xwtm)
 {
         xwer_t rc;
+        xwid_t mtxid;
         const struct xwds_dmauartc_driver * drv;
 
         XWDS_VALIDATE(dmauartc, "nullptr", -EFAULT);
@@ -349,6 +358,12 @@ xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
                 goto err_dmauartc_grab;
         }
 
+        mtxid = xwosal_mtx_get_id(&dmauartc->txmtx);
+        rc = xwosal_mtx_timedlock(mtxid, xwtm);
+        if (__unlikely(rc < 0)) {
+                goto err_dmauartc_lock;
+        }
+
         drv = xwds_static_cast(const struct xwds_dmauartc_driver *,
                                dmauartc->dev.drv);
         if ((drv) && (drv->tx)) {
@@ -357,13 +372,62 @@ xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
                 rc = -ENOSYS;
         }
         if (__unlikely(rc < 0)) {
-                goto err_txdma_cfg;
+                goto err_tx;
         }
 
+        xwosal_mtx_unlock(mtxid);
         xwds_dmauartc_put(dmauartc);
         return OK;
 
-err_txdma_cfg:
+err_tx:
+        xwosal_mtx_unlock(mtxid);
+err_dmauartc_lock:
+        xwds_dmauartc_put(dmauartc);
+err_dmauartc_grab:
+        return rc;
+}
+
+__xwds_api
+xwer_t xwds_dmauartc_putc(struct xwds_dmauartc * dmauartc,
+                          const xwu8_t byte,
+                          xwtm_t * xwtm)
+{
+        xwer_t rc;
+        xwid_t mtxid;
+        const struct xwds_dmauartc_driver * drv;
+
+        XWDS_VALIDATE(dmauartc, "nullptr", -EFAULT);
+        XWDS_VALIDATE(data, "nullptr", -EFAULT);
+
+        rc = xwds_dmauartc_grab(dmauartc);
+        if (__unlikely(rc < 0)) {
+                goto err_dmauartc_grab;
+        }
+
+        mtxid = xwosal_mtx_get_id(&dmauartc->txmtx);
+        rc = xwosal_mtx_timedlock(mtxid, xwtm);
+        if (__unlikely(rc < 0)) {
+                goto err_dmauartc_lock;
+        }
+
+        drv = xwds_static_cast(const struct xwds_dmauartc_driver *,
+                               dmauartc->dev.drv);
+        if ((drv) && (drv->putc)) {
+                rc = drv->putc(dmauartc, byte);
+        } else {
+                rc = -ENOSYS;
+        }
+        if (__unlikely(rc < 0)) {
+                goto err_putc;
+        }
+
+        xwosal_mtx_unlock(mtxid);
+        xwds_dmauartc_put(dmauartc);
+        return OK;
+
+err_putc:
+        xwosal_mtx_unlock(mtxid);
+err_dmauartc_lock:
         xwds_dmauartc_put(dmauartc);
 err_dmauartc_grab:
         return rc;

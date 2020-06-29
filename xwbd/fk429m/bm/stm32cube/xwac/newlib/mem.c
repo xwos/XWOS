@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 外部模块配置
+ * @brief STM32CUBE：定义内存池
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -18,15 +18,9 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_xwem_h__
-#define __cfg_xwem_h__
+#include <xwos/standard.h>
+#include <xwos/mm/mempool/allocator.h>
 
-#define XWEMCFG_libc_newlibac                           1
-#define XWEMCFG_serializing_nanopb                      1
-#define XWEMCFG_filesystem_fatfs                        1
-#define XWEMCFG_filesystem_littlefs                     1
-#define XWEMCFG_filesystem_spiffs                       1
-#define XWEMCFG_filesystem_dhara                        1
-#define XWEMCFG_vm_lua                                  1
+extern xwsz_t eram_mr_origin[];
 
-#endif /* cfg/xwem.h */
+struct xwmm_mempool * newlibac_mempool = (void *)eram_mr_origin;

@@ -20,6 +20,7 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/semaphore.h>
+#include <xwos/osal/lock/mutex.h>
 #include <xwmd/ds/device.h>
 #include <xwmd/ds/soc/dma.h>
 #include <xwmd/ds/uart/common.h>
@@ -43,6 +44,7 @@ struct xwds_dmauartc_driver {
                        const struct xwds_uart_cfg *); /**< 配置UART控制器 */
         xwer_t (* tx)(struct xwds_dmauartc *, const xwu8_t *, xwsz_t,
                       xwtm_t *); /**< 配置DMA通道并发送 */
+        xwer_t (* putc)(struct xwds_dmauartc *, const xwu8_t); /**< 发送一个字节 */
 };
 
 /**
@@ -55,6 +57,9 @@ struct xwds_dmauartc {
         const struct xwds_uart_cfg * cfg; /**< 配置 */
         const struct xwds_resource_dma * rxdmarsc; /**< 用于接收UART数据的DMA资源 */
         const struct xwds_resource_dma * txdmarsc; /**< 用于发送UART数据的DMA资源 */
+
+        /* TX FSM */
+        struct xwosal_mtx txmtx; /**< 发送互斥锁 */
 
         /* RX FSM */
         struct {
@@ -139,6 +144,26 @@ __xwds_api
 xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
                         const xwu8_t * data, xwsz_t size,
                         xwtm_t * xwtm);
+
+/**
+ * @brief XWDS API：直接发送一个字节（非DMA模式）
+ * @param dmauartc: (I) DMA UART控制器对象指针
+ * @param byte: (I) 待发送的字节
+ * @param xwtm: 指向缓冲区的指针，此缓冲区：
+ *              (I) 作为输入时，表示期望的阻塞等待时间
+ *              (O) 作为输出时，返回剩余的期望时间
+ * @return 错误码
+ * @retval OK: OK
+ * @retval -EFAULT: 无效指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：可重入
+ */
+__xwds_api
+xwer_t xwds_dmauartc_putc(struct xwds_dmauartc * dmauartc,
+                          const xwu8_t byte,
+                          xwtm_t * xwtm);
 
 /**
  * @brief XWDS API：配置UART

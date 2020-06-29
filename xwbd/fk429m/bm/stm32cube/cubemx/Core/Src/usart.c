@@ -34,11 +34,11 @@ void MX_USART1_UART_Init(void)
 
   /* Peripheral clock enable */
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_USART1);
-  
+
   LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOA);
-  /**USART1 GPIO Configuration  
+  /**USART1 GPIO Configuration
   PA9   ------> USART1_TX
-  PA10   ------> USART1_RX 
+  PA10   ------> USART1_RX
   */
   GPIO_InitStruct.Pin = LL_GPIO_PIN_9|LL_GPIO_PIN_10;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
@@ -49,7 +49,7 @@ void MX_USART1_UART_Init(void)
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /* USART1 DMA Init */
-  
+
   /* USART1_TX Init */
   LL_DMA_SetChannelSelection(DMA2, LL_DMA_STREAM_7, LL_DMA_CHANNEL_4);
 
@@ -113,7 +113,7 @@ void MX_USART1_UART_Deinit(void)
   LL_APB2_GRP1_DisableClock(LL_APB2_GRP1_PERIPH_USART1);
 }
 
-void MX_USART1_UART_Setup_RXDMA(xwu8_t * mem, size_t size)
+void MX_USART1_UART_Setup_RXDMA(xwu8_t * mem, xwsz_t size)
 {
   LL_DMA_EnableIT_HT(DMA2, LL_DMA_STREAM_2);
   LL_DMA_EnableIT_TE(DMA2, LL_DMA_STREAM_2);
@@ -128,7 +128,7 @@ void MX_USART1_UART_Setup_RXDMA(xwu8_t * mem, size_t size)
   LL_USART_EnableDMAReq_RX(USART1);
 }
 
-void MX_USART1_UART_Setup_TXDMA(const xwu8_t * mem, size_t size)
+void MX_USART1_UART_Setup_TXDMA(const xwu8_t * mem, xwsz_t size)
 {
   LL_DMA_EnableIT_TE(DMA2, LL_DMA_STREAM_7);
   LL_DMA_EnableIT_TC(DMA2, LL_DMA_STREAM_7);
@@ -140,6 +140,34 @@ void MX_USART1_UART_Setup_TXDMA(const xwu8_t * mem, size_t size)
                          LL_DMA_GetDataTransferDirection(DMA2, LL_DMA_STREAM_7));
   LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_7, size);
   LL_USART_EnableDMAReq_TX(USART1);
+}
+
+void MX_USART1_UART_Finish_TXDMA(void)
+{
+  LL_USART_DisableDMAReq_TX(USART1);
+}
+
+void MX_USART1_UART_Putc(xwu8_t byte)
+{
+  while (!LL_USART_IsActiveFlag_TXE(USART1)) {
+  }
+  LL_USART_TransmitData8(USART1, (uint8_t)byte);
+}
+
+void MX_USART1_UART_Isr(void)
+{
+  if (LL_USART_IsActiveFlag_PE(USART1)) {
+    LL_USART_ClearFlag_PE(USART1);
+  }
+  if (LL_USART_IsActiveFlag_FE(USART1)) {
+    LL_USART_ClearFlag_FE(USART1);
+  }
+  if (LL_USART_IsActiveFlag_NE(USART1)) {
+    LL_USART_ClearFlag_NE(USART1);
+  }
+  if (LL_USART_IsActiveFlag_ORE(USART1)) {
+    LL_USART_ClearFlag_ORE(USART1);
+  }
 }
 
 /* USER CODE END 1 */

@@ -17,7 +17,6 @@
 #include <xwos/lib/xwaop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/string.h>
-#include <xwos/lib/xwlog.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/lock/seqlock.h>
 #include <xwos/osal/lock/mutex.h>
@@ -541,9 +540,6 @@ xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err)
                 rc = xwds_device_suspend(c);
                 xwosal_sqlk_wr_lock_cpuirqsv(&ds->devlistlock, &cpuirq);
                 if (__unlikely(rc < 0)) {
-                        xwisrlogf(ERR, XWDS_LOG_TAG,
-                                  "Failed to suspend device: <%s:%d>, rc: %d",
-                                  c->name, c->id, rc);
                         if (ign_err) {
                                 rc = OK;
                         } else {
@@ -571,9 +567,6 @@ xwer_t xwds_device_resume_all(struct xwds * ds, bool ign_err)
                 rc = xwds_device_resume(c);
                 xwosal_sqlk_wr_lock_cpuirqsv(&ds->devlistlock, &cpuirq);
                 if (__unlikely(rc < 0)) {
-                        xwisrlogf(ERR, XWDS_LOG_TAG,
-                                  "Failed to resume device: <%s:%d>, rc: %d",
-                                  c->name, c->id, rc);
                         if (ign_err) {
                                 rc = OK;
                         } else {

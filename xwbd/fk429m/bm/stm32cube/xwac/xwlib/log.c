@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Board Module: newlib适配代码
+ * @brief STM32CUBE：Log
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -18,29 +18,29 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_newlibac_init_h__
-#define __bm_newlibac_init_h__
-
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
+#include <bm/stm32cube/xwds/stm32cube.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
+ ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+xwssz_t board_log_write(const char * s, xwsz_t n)
+{
+        xwtm_t desired;
+        xwssz_t wrsz;
+        xwer_t rc;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t bm_newlibac_start(void);
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-#endif /* bm/newlibac/init.h */
+        desired = XWTM_MAX;
+        rc = xwds_dmauartc_tx(&stm32cube_dmauartc1_cb,
+                              (const xwu8_t *)s, n,
+                              &desired);
+        if (rc < 0) {
+                wrsz = -1;
+        } else {
+                wrsz = (xwssz_t)n;
+        }
+        return wrsz;
+}

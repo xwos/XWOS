@@ -27,7 +27,7 @@
 #define BRDCFG_XWSD_IDLE_HOOK                   1
 #define BRDCFG_XWSD_SYSHWT_HOOK                 1
 #define BRDCFG_XWSD_THRD_STACK_POOL             1
-#define BRDCFG_LOG                              0
+#define BRDCFG_LOG                              1
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********    board clock    ******** ******** ********
@@ -51,7 +51,6 @@
  ******** ******** ********   board modules   ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define BMCFG_stm32cube                         1
-#define BMCFG_newlibac                          1
 #define BMCFG_lua                               1
 #define BMCFG_cxx                               1
 #define BMCFG_pm                                1

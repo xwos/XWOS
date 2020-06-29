@@ -24,13 +24,12 @@
 #include <xwos/standard.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
+#include <xwem/libc/newlibac/xwmo.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/xwmo.h>
-#include <bm/newlibac/xwmo.h>
 #include <bm/pm/xwmo.h>
 #include <bm/lua/xwmo.h>
 #include <bm/cxx/xwmo.h>
-#include <bm/xwpcp/xwmo.h>
 #include <bm/xwtst/sync/selector/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -100,9 +99,9 @@ xwer_t bdl_init_thrd(void * arg)
                 goto bm_stm32cube_start;
         }
 
-        rc = bm_newlibac_start();
+        rc = newlibac_start();
         if (rc < 0) {
-                goto bm_newlibac_start;
+                goto newlibac_start;
         }
 
         rc = bm_pm_start();
@@ -120,11 +119,6 @@ xwer_t bdl_init_thrd(void * arg)
                 goto err_bm_cxx_start;
         }
 
-        rc = bm_xwpcp_start();
-        if (rc < 0) {
-                goto err_bm_xwpcp_start;
-        }
-
         rc = bm_xwtst_sync_selector_start();
         if (rc < 0) {
                 goto err_bm_xwtst_sync_selector_start;
@@ -135,15 +129,13 @@ xwer_t bdl_init_thrd(void * arg)
 
 err_bm_xwtst_sync_selector_start:
         BDL_BUG();
-err_bm_xwpcp_start:
-        BDL_BUG();
 err_bm_cxx_start:
         BDL_BUG();
 err_bm_xwlua_start:
         BDL_BUG();
 bm_pm_start:
         BDL_BUG();
-bm_newlibac_start:
+newlibac_start:
         BDL_BUG();
 bm_stm32cube_start:
         BDL_BUG();

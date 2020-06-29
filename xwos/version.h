@@ -58,8 +58,11 @@
  * @brief XWOS的版本号（字符串形式）
  */
 #define XWOS_VER_STR \
-        (stringify(XWOS_VERSION_MAJOR) "." \
-         stringify(XWOS_VERSION_MINOR) "." \
-         stringify(XWOS_VERSION_REVISION))
+        stringify(XWOS_VERSION_MAJOR) "." \
+        stringify(XWOS_VERSION_MINOR) "." \
+        stringify(XWOS_VERSION_REVISION)
+
+#define XWOS_COPYRIGHT "XuanWuOS " XWOS_VER_STR \
+        "  Copyright (C) 2015-2020 https://xwos.tech, Roy.Sun"
 
 #endif /* xwos/version.h */

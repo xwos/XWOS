@@ -21,8 +21,6 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 extern xwssz_t soc_log_write(const char * s, xwsz_t n);
 extern xwssz_t board_log_write(const char * s, xwsz_t n);
-extern xwssz_t soc_log_isr_write(const char * s, xwsz_t n);
-extern xwssz_t board_log_isr_write(const char * s, xwsz_t n);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -43,7 +41,7 @@ int xwpf(const char * fmt, ...)
         char buf[XWLIBCFG_XWLOG_BUFSIZE];
 
         va_start(args, fmt);
-        i = snprintf(buf, sizeof(buf), fmt, args);
+        i = vsnprintf(buf, sizeof(buf), fmt, args);
         va_end(args);
 
         /* Print the string */
@@ -51,36 +49,6 @@ int xwpf(const char * fmt, ...)
         soc_log_write(buf, (xwsz_t)i);
 #elif defined(BRDCFG_LOG) && (1 == BRDCFG_LOG)
         board_log_write(buf, (xwsz_t)i);
-#else
-  #warning "Can't find the log configurations!"
-#endif
-        return i;
-}
-
-/**
- * @brief 格式化字符串并输出到日志，同printf()函数
- * @param fmt: (I) 格式的字符串
- * @param ...: (I) 需要转换位字符串的其他参数
- * @note
- * - 同步/异步：同@ref soc_log_write()的实现
- * - 上下文：中断、中断底半部、线程
- */
-__xwlib_code
-int xwisrpf(const char * fmt, ...)
-{
-        va_list args;
-        int i;
-        char buf[XWLIBCFG_XWLOG_BUFSIZE];
-
-        va_start(args, fmt);
-        i = snprintf(buf, sizeof(buf), fmt, args);
-        va_end(args);
-
-        /* Print the string */
-#if defined(SOCCFG_LOG) && (1 == SOCCFG_LOG)
-        soc_log_isr_write(buf, (xwsz_t)i);
-#elif defined(BRDCFG_LOG) && (1 == BRDCFG_LOG)
-        board_log_isr_write(buf, (xwsz_t)i);
 #else
   #warning "Can't find the log configurations!"
 #endif

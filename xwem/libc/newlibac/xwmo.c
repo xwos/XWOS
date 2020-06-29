@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief newlib适配代码：动态内存申请与释放
+ * @brief Board Module: newlib适配代码
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -22,92 +22,38 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/mm/mempool/allocator.h>
-#include <string.h>
-#include <reent.h>
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       macros      ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+/******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static
-void * newlibac_malloc(xwsz_t size);
-
-static
-void newlibac_mfree(void * mem);
-
-static
-void * newlibac_mrealloc(void * mem, xwsz_t size);
+extern void newlibac_mem_linkage_placeholder(void);
+extern void newlibac_fops_linkage_placeholder(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern struct xwmm_mempool * eram_mempool;
+/**
+ * @brief 连接占位符
+ * @note
+ * + 静态连接时，若符号存在多重定义，优先选择包含占位符的文件里面的符号。
+ */
+void * const newlibac_linkage_placeholder[] = {
+        newlibac_mem_linkage_placeholder,
+        newlibac_fops_linkage_placeholder,
+};
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-void newlibac_mem_linkage_placeholder(void)
+xwer_t newlibac_start(void)
 {
-}
-
-static
-void * newlibac_malloc(xwsz_t size)
-{
-        void * mem;
-
-        xwmm_mempool_malloc(eram_mempool, size, &mem);
-        return mem;
-}
-
-static
-void newlibac_mfree(void * mem)
-{
-        xwmm_mempool_free(eram_mempool, mem);
-}
-
-static
-void * newlibac_mrealloc(void * mem, xwsz_t size)
-{
-        xwmm_mempool_realloc(eram_mempool, size, &mem);
-        return mem;
-}
-
-void * _malloc_r(struct _reent * r, size_t n)
-{
-        XWOS_UNUSED(r);
-        return newlibac_malloc(n);
-}
-
-void * _realloc_r(struct _reent * r, void * p, size_t n)
-{
-        XWOS_UNUSED(r);
-        return newlibac_mrealloc(p, n);
-}
-
-void * _calloc_r(struct _reent * r, size_t elem_nr, size_t elem_sz)
-{
-        xwsz_t total;
-        void * mem;
-
-        XWOS_UNUSED(r);
-        total = elem_nr * elem_sz;
-        mem = newlibac_malloc(total);
-        if (NULL != mem) {
-                memset(mem, 0, total);
-        }
-        return mem;
-}
-
-void _free_r(struct _reent * r, void * p)
-{
-        XWOS_UNUSED(r);
-        newlibac_mfree(p);
+        return OK;
 }

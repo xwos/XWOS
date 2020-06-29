@@ -21,7 +21,9 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+#include <stdio.h>
 #include <stdlib.h>
+#include <xwos/lib/xwlog.h>
 #include <bm/stm32cube/standard.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <xwos/osal/scheduler.h>
@@ -47,8 +49,6 @@
 #define MEMTST_TASK_PRIORITY \
         (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 3))
 
-#define FATFS_TASK_PRIORITY XWOSAL_SD_PRIORITY_RT_MAX
-
 #define BLUE_LED_GPIO_PORT XWDS_GPIO_PORT_D
 #define BLUE_LED_GPIO_PIN XWDS_GPIO_PIN_12
 
@@ -58,8 +58,6 @@
 xwer_t led_task(void * arg);
 
 xwer_t memtst_task(void * arg);
-
-xwer_t fatfs_task(void * arg);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
@@ -92,28 +90,20 @@ const struct xwosal_thrd_desc stm32cube_tbd[] = {
                 .arg = NULL,
                 .attr = XWSDOBJ_ATTR_PRIVILEGED,
         },
-        [2] = {
-                .name = "task.fatfs",
-                .prio = FATFS_TASK_PRIORITY,
-                .stack = NULL,
-                .stack_size = 4096,
-                .func = fatfs_task,
-                .arg = NULL,
-                .attr = XWSDOBJ_ATTR_PRIVILEGED,
-        },
 };
 
 xwid_t stm32cube_tid[xw_array_size(stm32cube_tbd)];
 
 extern struct xwmm_mempool * eram_mempool;
 
-FATFS sdcard;
+FATFS fatfs_sdcard;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t bm_stm32cube_start(void)
 {
+        FRESULT frc;
         xwer_t rc;
         xwsq_t i;
 
@@ -121,6 +111,10 @@ xwer_t bm_stm32cube_start(void)
         MX_SDIO_SD_Init();
         rc = MX_SDIO_SD_TrimClk(100);
         if (rc < 0) {
+                goto err_sd;
+        }
+        frc = f_mount(&fatfs_sdcard, "sd:", 1);
+        if (FR_OK != frc) {
                 goto err_sd;
         }
 
@@ -188,38 +182,6 @@ xwer_t led_task(void * arg)
 
 err_gpio_req:
         return rc;
-}
-
-xwer_t fatfs_task(void * arg)
-{
-        xwsq_t i;
-        UINT rdnum;
-        FRESULT frc;
-        FIL f;
-        xwu8_t * filedata;
-
-        filedata = malloc(2048);
-        frc = f_mount(&sdcard, "sd:", 1);
-        if (FR_OK == frc) {
-                for (i = 0; i < 10; i++) {
-                        frc = f_open(&f, "sd:/xw.lua", FA_READ);
-                        if (FR_OK == frc) {
-                                frc = f_read(&f, filedata, 2048, &rdnum);
-                                f_close(&f);
-                        }
-                }
-        }
-        if (FR_OK == frc) {
-                for (i = 0; i < 10; i++) {
-                        frc = f_open(&f, "sd:/xw.lua", FA_READ);
-                        if (FR_OK == frc) {
-                                frc = f_read(&f, filedata, sizeof(filedata), &rdnum);
-                                f_close(&f);
-                        }
-                }
-        }
-        free(filedata);
-        return OK;
 }
 
 xwer_t memtst_task(void * arg)

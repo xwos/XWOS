@@ -20,7 +20,7 @@
 
 include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include xwbs/$(XuanWuOS_CFG_MK_RULE)
-include $(XWOS_BRD_DIR)/cfg/elibs.list
+include $(XWOS_BRD_DIR)/cfg/lib.mk
 
 ARCH_CSRCS := $(addprefix $(XWOS_ARCH_DIR)/,$(ARCH_CSRCS))
 ARCH_ASRCS := $(addprefix $(XWOS_ARCH_DIR)/,$(ARCH_ASRCS))

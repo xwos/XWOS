@@ -29,19 +29,9 @@
 __xwlib_code
 int xwpf(const char * fmt, ...);
 
-__xwlib_code
-int xwisrpf(const char * fmt, ...);
-
 #else /* XWLIBCFG_LOG */
 static __xwlib_inline
 int xwpf(const char * fmt, ...)
-{
-        XWOS_UNUSED(fmt);
-        return 0;
-}
-
-static __xwlib_inline
-int xwisrpf(const char * fmt, ...)
 {
         XWOS_UNUSED(fmt);
         return 0;
@@ -107,62 +97,6 @@ int xwisrpf(const char * fmt, ...)
   #define XWLOGF_EMERG(tag, fmt, ...)
 #endif
 
-#if (XWLIBCFG_XWLOG_LEVEL <= 1)
-  #define XWISRLOGF_VERBOSE(tag, fmt, ...)        \
-          xwisrpf("[V.%s] " fmt, tag, ##__VA_ARGS__)
-#else
-  #define XWISRLOGF_VERBOSE(tag, fmt, ...)
-#endif
-
-#if (XWLIBCFG_XWLOG_LEVEL <= 2)
-  #define XWISRLOGF_DEBUG(tag, fmt, ...)     \
-          xwisrpf("[D.%s] " fmt, tag, ##__VA_ARGS__)
-#else
-  #define XWISRLOGF_DEBUG(tag, fmt, ...)
-#endif
-
-#if (XWLIBCFG_XWLOG_LEVEL <= 3)
-  #define XWISRLOGF_INFO(tag, fmt, ...)      \
-          xwisrpf("[I.%s] " fmt, tag, ##__VA_ARGS__)
-#else
-  #define XWISRLOGF_INFO(tag, fmt, ...)
-#endif
-
-#if (XWLIBCFG_XWLOG_LEVEL <= 4)
-  #define XWISRLOGF_NOTICE(tag, fmt, ...)    \
-          xwisrpf("[N.%s] " fmt, tag, ##__VA_ARGS__)
-#else
-  #define XWISRLOGF_NOTICE(tag, fmt, ...)
-#endif
-
-#if (XWLIBCFG_XWLOG_LEVEL <= 5)
-  #define XWISRLOGF_WARNING(tag, fmt, ...)   \
-          xwisrpf("[W.%s] " fmt, tag, ##__VA_ARGS__)
-#else
-  #define XWISRLOGF_WARNING(tag, fmt, ...)
-#endif
-
-#if (XWLIBCFG_XWLOG_LEVEL <= 6)
-  #define XWISRLOGF_ERR(tag, fmt, ...)       \
-          xwisrpf("[E.%s] " fmt, tag, ##__VA_ARGS__)
-#else
-  #define XWISRLOGF_ERR(tag, fmt, ...)
-#endif
-
-#if (XWLIBCFG_XWLOG_LEVEL <= 7)
-  #define XWISRLOGF_CRIT(tag, fmt, ...)      \
-          xwisrpf("[C.%s] " fmt, tag, ##__VA_ARGS__)
-#else
-  #define XWISRLOGF_CRIT(tag, fmt, ...)
-#endif
-
-#if (XWLIBCFG_XWLOG_LEVEL <= 8)
-  #define XWISRLOGF_EMERG(tag, fmt, ...)     \
-          xwisrpf("[G.%s] " fmt, tag, ##__VA_ARGS__)
-#else
-  #define XWISRLOGF_EMERG(tag, fmt, ...)
-#endif
-
 /**
  * @brief 格式化日志，并输出（线程安全）
  * @param lv: (I) 等级，取值
@@ -183,26 +117,5 @@ int xwisrpf(const char * fmt, ...)
  * - 重入性：依据BSP中soc_log_write()或board_log_write()的实现是否具有可重入性
  */
 #define xwlogf(lv, tag, fmt, ...)    XWLOGF_##lv(tag, fmt, ##__VA_ARGS__)
-
-/**
- * @brief 格式化日志，并输出（中断安全）
- * @param lv: (I) 等级，取值
- *                - VERBOSE，等级1
- *                - DEBUG，等级2
- *                - INFO，等级3
- *                - NOTICE，等级4
- *                - WARNING，等级5
- *                - ERR，等级6
- *                - CRIT，等级7
- *                - EMERG，等级8
- * @param tag: (I) 日至标签
- * @param fmt: (I) 格式的字符串
- * @param ...: (I) 需要格式化的参数
- * @note
- * - 同步/异步：同soc_log_isr_write()或board_log_isr_write()的实现
- * - 上下文：线程、中断、中断底半部
- * - 重入性：同soc_log_isr_write()或board_log_isr_write()的实现
- */
-#define xwisrlogf(lv, tag, fmt, ...)  XWISRLOGF_##lv(tag, fmt, ##__VA_ARGS__)
 
 #endif /* xwos/lib/xwlog.h */

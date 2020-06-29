@@ -80,6 +80,10 @@ xwer_t stm32cube_dmauartc1_drv_tx(struct xwds_dmauartc * dmauartc,
                                   xwtm_t * xwtm);
 
 static
+xwer_t stm32cube_dmauartc1_drv_putc(struct xwds_dmauartc * dmauartc,
+                                    const xwu8_t byte);
+
+static
 void stm32cube_dmauartc1_rxdma_cb(struct xwds_soc * soc, xwid_t ch, xwu32_t rc,
                                   xwds_dma_cbarg_t arg);
 
@@ -100,6 +104,7 @@ const struct xwds_dmauartc_driver stm32cube_dmauartc1_drv = {
         },
         .cfg = stm32cube_dmauartc1_drv_cfg,
         .tx = stm32cube_dmauartc1_drv_tx,
+        .putc = stm32cube_dmauartc1_drv_putc,
 };
 
 struct xwds_resource_dma stm32cube_dmauartc1_rsc_dma[2] = {
@@ -234,8 +239,8 @@ static
 xwer_t stm32cube_dmauartc1_drv_cfg(struct xwds_dmauartc * dmauartc,
                                    const struct xwds_uart_cfg * cfg)
 {
-        UNUSED(dmauartc);
-        UNUSED(cfg);
+        XWOS_UNUSED(dmauartc);
+        XWOS_UNUSED(cfg);
         return -ENOSYS;
 }
 
@@ -248,8 +253,8 @@ void stm32cube_dmauartc1_tx_cb(struct xwds_soc * soc,
         struct stm32cube_dmauartc_driver_data * drvdata;
         xwreg_t flag;
 
-        UNUSED(soc);
-        UNUSED(ch);
+        XWOS_UNUSED(soc);
+        XWOS_UNUSED(ch);
 
         dmauartc = xwds_static_cast(struct xwds_dmauartc *, arg);
         drvdata = dmauartc->dev.data;
@@ -311,9 +316,19 @@ xwer_t stm32cube_dmauartc1_drv_tx(struct xwds_dmauartc * dmauartc,
                 drvdata->tx.rc = -ECANCELED;
         }
         xwosal_splk_unlock_cpuirqrs(&drvdata->tx.splk, flag);
+        MX_USART1_UART_Finish_TXDMA();
 
 err_dma_cfg:
         return rc;
+}
+
+static
+xwer_t stm32cube_dmauartc1_drv_putc(struct xwds_dmauartc * dmauartc,
+                                    const xwu8_t byte)
+{
+        XWOS_UNUSED(dmauartc);
+        MX_USART1_UART_Putc(byte);
+        return OK;
 }
 
 static
@@ -359,4 +374,5 @@ void stm32cube_dmauartc1_timer_isr(void)
 
 void stm32cube_dmauartc1_isr(void)
 {
+        MX_USART1_UART_Isr();
 }

@@ -48,12 +48,12 @@ extern __xwlib_rodata const unsigned char xwlib_ctype[];
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 查询一个字符的标签
+ * @brief 查询字符的标签
  */
 #define xwlib_ctype_flag(x)             (xwlib_ctype[(int)(unsigned char)(x)])
 
 /**
- * @brief 查询一个字符是否为字母或数字
+ * @brief 查询字符是否为字母或数字
  */
 #define isalnum(c)                      \
         ((xwlib_ctype_flag(c) &         \
@@ -62,7 +62,7 @@ extern __xwlib_rodata const unsigned char xwlib_ctype[];
            XWLIB_CTYPE_FLAG_DIGIT)) != 0)
 
 /**
- * @brief 查询一个字符是否为字母
+ * @brief 查询字符是否为字母
  */
 #define isalpha(c)                      \
         ((xwlib_ctype_flag(c) &         \
@@ -70,19 +70,19 @@ extern __xwlib_rodata const unsigned char xwlib_ctype[];
            XWLIB_CTYPE_FLAG_LOWER)) != 0)
 
 /**
- * @brief 查询一个字符是否为控制字符
+ * @brief 查询字符是否为控制字符
  */
 #define iscntrl(c)                      \
         ((xwlib_ctype_flag(c) & (XWLIB_CTYPE_FLAG_CTRL)) != 0)
 
 /**
- * @brief 查询一个字符是否为数字
+ * @brief 查询字符是否为数字
  */
 #define isdigit(c)                      \
         ((xwlib_ctype_flag(c) & (XWLIB_CTYPE_FLAG_DIGIT)) != 0)
 
 /**
- * @brief 查询一个字符是否为可显示字符（不包括空白字符）
+ * @brief 查询字符是否为可显示字符（不包括空白字符）
  */
 #define isgraph(c)                      \
         ((xwlib_ctype_flag(c) &         \
@@ -92,19 +92,19 @@ extern __xwlib_rodata const unsigned char xwlib_ctype[];
            XWLIB_CTYPE_FLAG_DIGIT)) != 0)
 
 /**
- * @brief 查询一个字符是否为小写字母
+ * @brief 查询字符是否为小写字母
  */
 #define islower(c)                      \
         ((xwlib_ctype_flag(c) & (XWLIB_CTYPE_FLAG_LOWER)) != 0)
 
 /**
- * @brief 查询一个字符是否为大写字母
+ * @brief 查询字符是否为大写字母
  */
 #define isupper(c)                      \
         ((xwlib_ctype_flag(c) & (XWLIB_CTYPE_FLAG_UPPER)) != 0)
 
 /**
- * @brief 查询一个字符是否为可显示字符（包括空白字符）
+ * @brief 查询字符是否为可显示字符（包括空白字符）
  */
 #define isprint(c)                      \
         ((xwlib_ctype_flag(c) &         \
@@ -115,19 +115,19 @@ extern __xwlib_rodata const unsigned char xwlib_ctype[];
            XWLIB_CTYPE_FLAG_SPC)) != 0)
 
 /**
- * @brief 查询一个字符是否为标点
+ * @brief 查询字符是否为标点
  */
 #define ispunct(c)                      \
         ((xwlib_ctype_flag(c) & (XWLIB_CTYPE_FLAG_PUNCT)) != 0)
 
 /**
- * @brief 查询一个字符是否为空白字符
+ * @brief 查询字符是否为空白字符
  */
 #define isspace(c)                      \
         ((xwlib_ctype_flag(c) & (XWLIB_CTYPE_FLAG_WSPC)) != 0)
 
 /**
- * @brief 查询一个字符是否为十六进制数字字符
+ * @brief 查询字符是否为十六进制数字字符
  */
 #define isxdigit(c)                     \
         ((xwlib_ctype_flag(c) &         \
@@ -135,17 +135,17 @@ extern __xwlib_rodata const unsigned char xwlib_ctype[];
            XWLIB_CTYPE_FLAG_HEX)) != 0)
 
 /**
- * @brief 查询一个字符是否为十六进制数字字符
+ * @brief 查询字符是否为八进制数字字符
  */
 #define isodigit(c)     (((c) >= '0') && ((c) <= '7'))
 
 /**
- * @brief 查询一个字符是否为ASCII表内字符
+ * @brief 查询字符是否为ASCII表内字符
  */
 #define isascii(c)      (((unsigned char)(c)) <= (unsigned char)0x7f)
 
 /**
- * @brief 将一个字符转换为ASCII表内字符
+ * @brief 将字符转换为ASCII表内字符
  */
 #define toascii(c)      (((unsigned char)(c)) & (unsigned char)0x7f)
 
