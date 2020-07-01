@@ -2,9 +2,9 @@
  * @file
  * @brief 链接脚本
  * @author
- * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
+ * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
- * + (c) 2015 隐星魂 (Roy.Sun) <www.starsoul.tech>
+ * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
  * > This file is a free software and is licensed under
  * > the Apache License, Version 2.0 (the "License").
  * > You may not use this file except in compliance with the License.

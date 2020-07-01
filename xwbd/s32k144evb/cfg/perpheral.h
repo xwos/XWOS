@@ -2,9 +2,9 @@
  * @file
  * @brief 外设驱动配置
  * @author
- * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
+ * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
- * + (c) 2015 隐星魂 (Roy.Sun) <www.starsoul.tech>
+ * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
  * > Licensed under the Apache License, Version 2.0 (the "License");
  * > you may not use this file except in compliance with the License.
  * > You may obtain a copy of the License at

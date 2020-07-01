@@ -2,9 +2,9 @@
  * @file
  * @brief Port Lua for XuanWuOS
  * @author
- * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
+ * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
- * + (c) 2015 隐星魂 (Roy.Sun) <www.starsoul.tech>
+ * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
  * + http://www.lua.org/license.html
  */
 

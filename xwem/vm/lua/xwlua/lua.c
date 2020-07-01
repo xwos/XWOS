@@ -3,7 +3,7 @@
  * @brief Lua stand-alone interpreter
  * @author
  * + R. Ierusalimschy, L. H. de Figueiredo, W. Celes
- * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
+ * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
  * + http://www.lua.org/license.html
  */
