@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwlua init
+ * @brief Port Lua for XuanWuOS
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -15,10 +15,17 @@
 #include "lua.h"
 #include "lauxlib.h"
 
+struct xwlua_arg {
+        int argc;
+        char ** argv;
+};
+
+extern struct xwmm_mempool * xwlua_mempool;
+
+int xwlua_readline(lua_State * L, char buffer[], const char * prompt);
+void * xwlua_alloc(void * ud, void * ptr, size_t osize, size_t nsize);
 void xwlua_openlibs(lua_State * L);
-int xwlua_panic(lua_State * L);
 lua_State * xwlua_newstate(lua_Alloc f);
-int xwlua_writestring(const char * s, xwsz_t l);
-int xwlua_writestringerror(const char * s, const char * p);
+xwer_t xwlua_thrd(void * arg);
 
 #endif /* xwem/vm/lua/port.h */

@@ -46,6 +46,7 @@ void newlibac_fops_linkage_placeholder(void)
 {
 }
 
+#ifdef O_DIRECTORY
 static
 int newlibac_fops_opendir(const char * path, int flag, int mode)
 {
@@ -140,6 +141,7 @@ err_nomem:
 err_mdir:
         return fd;
 }
+#endif /* O_DIRECTORY */
 
 int newlibac_fops_openfile(const char * path, int flag, int mode)
 {
@@ -268,14 +270,19 @@ int _open(const char * path, int flag, int mode)
 {
         int rc;
 
+#ifdef O_DIRECTORY
         if (mode & O_DIRECTORY) {
                 rc = newlibac_fops_opendir(path, flag, mode);
         } else {
                 rc = newlibac_fops_openfile(path, flag, mode);
         }
+#else /* O_DIRECTORY */
+        rc = newlibac_fops_openfile(path, flag, mode);
+#endif /* !O_DIRECTORY */
         return rc;
 }
 
+#ifdef O_DIRECTORY
 static
 int newlibac_fops_closedir(xwsq_t idx)
 {
@@ -310,6 +317,7 @@ int newlibac_fops_closedir(xwsq_t idx)
         }
         return rc;
 }
+#endif /* O_DIRECTORY */
 
 static
 int newlibac_fops_closefile(xwsq_t idx)
@@ -350,12 +358,14 @@ int _close(int fd)
 {
         int rc;
         xwssq_t idx;
-        bool dir;
 
         if ((fd <= 2) || (fd >= NEWLIBAC_FOPS_FD_NUM)) {
                 errno = ENFILE;
                 rc = -1;
         } else {
+#ifdef O_DIRECTORY
+                bool dir;
+
                 idx = fd - NEWLIBAC_FOPS_FD_OFFSET;
                 dir = xwbmpop_t1i(newlibac_fops_nodetype_bmp, (xwsq_t)idx);
                 if (dir) {
@@ -363,6 +373,10 @@ int _close(int fd)
                 } else {
                         rc = newlibac_fops_closefile((xwsq_t)idx);
                 }
+#else /* O_DIRECTORY */
+                idx = fd - NEWLIBAC_FOPS_FD_OFFSET;
+                rc = newlibac_fops_closefile((xwsq_t)idx);
+#endif /* !O_DIRECTORY */
         }
         return rc;
 }

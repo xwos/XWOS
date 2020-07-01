@@ -25,7 +25,7 @@ CORE_O := $(shell xwbs/util/el/makefile-grep-variable.el -a CORE_O $(call getXwm
 LUA_CORE := $(addprefix src/,$(addsuffix .c,$(basename $(CORE_O))))
 LIB_O := $(shell xwbs/util/el/makefile-grep-variable.el -a LIB_O $(call getXwmoDir)/src/Makefile)
 LUA_LIB := $(addprefix src/,$(addsuffix .c,$(basename $(LIB_O))))
-LUA_PORT := xwlua/port.c
+LUA_PORT := xwlua/port.c xwlua/readline.c xwlua/lua.c
 
 XWMO_CSRCS = $(LUA_CORE) $(LUA_LIB) $(LUA_PORT)
 XWMO_CFLAGS = -include xwlua/prefix.h -Wno-sign-conversion -DLUA_32BITS

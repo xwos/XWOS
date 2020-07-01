@@ -22,15 +22,16 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
+#include <xwos/mm/mempool/allocator.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
-#include <bm/lua/task.h>
+#include <xwem/vm/lua/xwlua/port.h>
 #include <bm/lua/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define SOLUA_TASK_PRIORITY \
+#define XWLUA_TASK_PRIORITY \
         (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 2))
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -40,14 +41,30 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+extern xwsz_t eram_mr_origin[];
+
+/**
+ * @brief Lua的内存池
+ */
+struct xwmm_mempool * xwlua_mempool = (void *)eram_mr_origin;
+
+char * xwlua_argv[] = {
+        "xwlua",
+};
+
+struct xwlua_arg xwlua_arg = {
+        .argc = xw_array_size(xwlua_argv),
+        .argv = xwlua_argv,
+};
+
 const struct xwosal_thrd_desc xwlua_tbd[] = {
         [0] = {
                 .name = "task.lua",
-                .prio = SOLUA_TASK_PRIORITY,
+                .prio = XWLUA_TASK_PRIORITY,
                 .stack = NULL,
                 .stack_size = 8192,
                 .func = xwlua_thrd,
-                .arg = NULL,
+                .arg = &xwlua_arg,
                 .attr = XWSDOBJ_ATTR_PRIVILEGED,
         },
 };
