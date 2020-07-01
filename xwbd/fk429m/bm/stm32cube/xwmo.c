@@ -32,8 +32,8 @@
 #include <xwem/filesystem/fatfs/ff.h>
 #include "cubemx/Core/Inc/sdio.h"
 #include "cubemx/override.h"
-#include "xwds/stm32cube.h"
-#include "xwds/init.h"
+#include "xwac/xwds/stm32cube.h"
+#include "xwac/xwds/init.h"
 #include "xwmo.h"
 
 /******** ******** ******** ******** ******** ******** ******** ********

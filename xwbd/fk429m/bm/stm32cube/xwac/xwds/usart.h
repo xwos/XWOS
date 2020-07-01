@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：设备栈
+ * @brief STM32CUBE XWDS 设备：DMA-UART
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -18,27 +18,35 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_xwds_stm32cube_h__
-#define __bm_stm32cube_xwds_stm32cube_h__
+#ifndef __bm_stm32cube_xwac_xwds_usart_h__
+#define __bm_stm32cube_xwac_xwds_usart_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
-#include <xwmd/ds/device.h>
-#include <xwmd/ds/soc/chip.h>
-#include <xwmd/ds/uart/dma.h>
+#include <xwos/lib/xwbop.h>
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       types       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       macros      ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** ds ******** ********/
-extern struct xwds stm32cube_ds;
 
-/******** ******** soc ******** ********/
-extern struct xwds_soc stm32cube_soc_cb;
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********         function prototypes         ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+void stm32cube_dmauartc1_timer_isr(void);
+void stm32cube_dmauartc1_isr(void);
 
-/******** ******** uart ******** ********/
-extern struct xwds_dmauartc stm32cube_dmauartc1_cb;
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********  inline functions implementations   ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
 
-#endif /* bm/stm32cube/xwds/stm32cube.h */
+#endif /* bm/stm32cube/xwac/xwds/usart.h */

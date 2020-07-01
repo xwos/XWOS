@@ -28,8 +28,8 @@
 #include <xwmd/ds/device.h>
 #include <xwmd/ds/soc/chip.h>
 #include <xwmd/ds/uart/dma.h>
-#include <bm/stm32cube/xwds/stm32cube.h>
-#include <bm/stm32cube/xwds/init.h>
+#include <bm/stm32cube/xwac/xwds/stm32cube.h>
+#include <bm/stm32cube/xwac/xwds/init.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********

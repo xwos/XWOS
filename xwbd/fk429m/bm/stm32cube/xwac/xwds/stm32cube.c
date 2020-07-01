@@ -23,7 +23,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
 #include <xwmd/ds/xwds.h>
-#include <bm/stm32cube/xwds/stm32cube.h>
+#include <bm/stm32cube/xwac/xwds/stm32cube.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********

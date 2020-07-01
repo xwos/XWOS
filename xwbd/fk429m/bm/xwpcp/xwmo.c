@@ -27,7 +27,7 @@
 #include <xwmd/isc/xwpcp/protocol.h>
 #include <xwmd/isc/xwpcp/api.h>
 #include <xwmd/ds/uart/dma.h>
-#include <bm/stm32cube/xwds/stm32cube.h>
+#include <bm/stm32cube/xwac/xwds/stm32cube.h>
 #include <bm/xwpcp/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********

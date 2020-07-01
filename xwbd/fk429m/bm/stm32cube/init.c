@@ -24,8 +24,8 @@
 #include <bm/stm32cube/standard.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
-#include <bm/stm32cube/xwds/init.h>
-#include <bm/stm32cube/xwds/stm32cube.h>
+#include <bm/stm32cube/xwac/xwds/init.h>
+#include <bm/stm32cube/xwac/xwds/stm32cube.h>
 #include <bm/stm32cube/init.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********

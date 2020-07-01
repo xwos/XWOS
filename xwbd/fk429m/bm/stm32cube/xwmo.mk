@@ -43,11 +43,11 @@ XWMO_CSRCS += xwac/fatfs/sdcard.c
 XWMO_CSRCS += xwac/newlib/mem.c
 XWMO_CSRCS += xwac/newlib/stdio.c
 
-XWMO_CSRCS += xwds/init.c
-XWMO_CSRCS += xwds/pm.c
-XWMO_CSRCS += xwds/stm32cube.c
-XWMO_CSRCS += xwds/soc.c
-XWMO_CSRCS += xwds/usart.c
+XWMO_CSRCS += xwac/xwds/init.c
+XWMO_CSRCS += xwac/xwds/pm.c
+XWMO_CSRCS += xwac/xwds/stm32cube.c
+XWMO_CSRCS += xwac/xwds/soc.c
+XWMO_CSRCS += xwac/xwds/usart.c
 
 # 定义编译选项
 XWMO_CFLAGS := -include standard.h

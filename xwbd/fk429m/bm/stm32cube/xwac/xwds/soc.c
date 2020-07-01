@@ -28,8 +28,8 @@
 #include <xwmd/ds/soc/gpio.h>
 #include <xwmd/ds/soc/eirq.h>
 #include <xwmd/ds/soc/dma.h>
-#include <bm/stm32cube/xwds/stm32cube.h>
-#include <bm/stm32cube/xwds/soc.h>
+#include <bm/stm32cube/xwac/xwds/stm32cube.h>
+#include <bm/stm32cube/xwac/xwds/soc.h>
 #include <bm/stm32cube/cubemx/Core/Inc/dma.h>
 #include <bm/stm32cube/cubemx/Core/Inc/gpio.h>
 #include <bm/stm32cube/cubemx/Core/Inc/fmc.h>

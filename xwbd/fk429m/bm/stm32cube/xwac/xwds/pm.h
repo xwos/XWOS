@@ -18,63 +18,39 @@
  * > limitations under the License.
  */
 
+#ifndef __bm_stm32cube_xwac_xwds_pm_h__
+#define __bm_stm32cube_xwac_xwds_pm_h__
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
-#include <xwmd/ds/xwds.h>
-#include <stm32f4xx_ll_cortex.h>
-#include <stm32f4xx_ll_pwr.h>
-#include <bm/stm32cube/cubemx/Core/Inc/main.h>
-#include <bm/stm32cube/xwds/stm32cube.h>
-#include <bm/stm32cube/xwds/pm.h>
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       types       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-extern
-void SystemClock_Config(void);
-
-/******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
+ ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-void stm32cube_pm_resume(void)
-{
-        __maybe_unused xwer_t rc;
-        xwirq_t irq;
+void stm32cube_pm_resume(void);
 
-        rc = xwos_irq_get_id(&irq);
-        LL_PWR_SetPowerMode(LL_PWR_MODE_STOP_MAINREGU);
-        xwds_pm_resume(&stm32cube_ds);
-}
+void stm32cube_pm_suspend(void);
 
-void stm32cube_pm_suspend(void)
-{
-        __maybe_unused xwer_t rc;
-        xwirq_t irq;
+void stm32cube_pm_wakeup(void);
 
-        rc = xwos_irq_get_id(&irq);
-        xwds_pm_suspend(&stm32cube_ds);
-        LL_PWR_SetPowerMode(LL_PWR_MODE_STOP_LPREGU);
-        LL_LPM_EnableDeepSleep();
-}
+void stm32cube_pm_sleep(void);
 
-void stm32cube_pm_wakeup(void)
-{
-        LL_LPM_EnableSleep();
-        /* 从STOP模式恢复后，需要重新配置时钟 */
-        SystemClock_Config();
-}
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********  inline functions implementations   ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
 
-void stm32cube_pm_sleep(void)
-{
-        wfi();
-}
+#endif /* bm/stm32cube/xwac/xwds/pm.h */

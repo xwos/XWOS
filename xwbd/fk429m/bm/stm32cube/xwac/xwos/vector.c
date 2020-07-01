@@ -26,9 +26,9 @@
 #include <soc_irq.h>
 #include <soc_sched.h>
 #include <soc_syshwt.h>
-#include "xwds/stm32cube.h"
-#include "xwds/soc.h"
-#include "xwds/usart.h"
+#include "xwac/xwds/stm32cube.h"
+#include "xwac/xwds/soc.h"
+#include "xwac/xwds/usart.h"
 #include "cubemx/Core/Inc/stm32f4xx_it.h"
 #include "cubemx/Core/Inc/main.h"
 

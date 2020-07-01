@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：设备栈初始化
+ * @brief STM32CUBE XWDS 设备：SOC
  * @author
  * + 隐星魂 (Roy.Sun) <www.starsoul.tech>
  * @copyright
@@ -18,16 +18,28 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_xwds_init_h__
-#define __bm_stm32cube_xwds_init_h__
+#ifndef __bm_stm32cube_xwac_xwds_soc_h__
+#define __bm_stm32cube_xwac_xwds_soc_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
+#include <xwos/lib/xwbop.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+enum stm32cube_soc_dma_rc {
+        STM32CUBE_SOC_DMA_RC_FE = BIT(0), /**< FIFO error */
+        STM32CUBE_SOC_DMA_RC_DME = BIT(2), /**< Direct Mode error */
+        STM32CUBE_SOC_DMA_RC_TE = BIT(3), /**< Transfer error */
+        STM32CUBE_SOC_DMA_RC_HT = BIT(4), /**< Half transfer */
+        STM32CUBE_SOC_DMA_RC_TC = BIT(5), /**< Transfer complete */
+};
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -37,16 +49,42 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t stm32cube_xwds_ll_init(void);
+void stm32cube_exti_isr(void);
 
-xwer_t stm32cube_xwds_ll_deinit(void);
+void stm32cube_dma1_stream0_isr(void);
 
-xwer_t stm32cube_xwds_uart_start(void);
+void stm32cube_dma1_stream1_isr(void);
 
-xwer_t stm32cube_xwds_uart_stop(void);
+void stm32cube_dma1_stream2_isr(void);
+
+void stm32cube_dma1_stream3_isr(void);
+
+void stm32cube_dma1_stream4_isr(void);
+
+void stm32cube_dma1_stream5_isr(void);
+
+void stm32cube_dma1_stream6_isr(void);
+
+void stm32cube_dma1_stream7_isr(void);
+
+void stm32cube_dma2_stream0_isr(void);
+
+void stm32cube_dma2_stream1_isr(void);
+
+void stm32cube_dma2_stream2_isr(void);
+
+void stm32cube_dma2_stream3_isr(void);
+
+void stm32cube_dma2_stream4_isr(void);
+
+void stm32cube_dma2_stream5_isr(void);
+
+void stm32cube_dma2_stream6_isr(void);
+
+void stm32cube_dma2_stream7_isr(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
-#endif /* bm/stm32cube/xwac/init.h */
+#endif /* bm/stm32cube/xwac/xwds/soc.h */

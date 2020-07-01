@@ -28,8 +28,8 @@
 #include <xwos/osal/sync/semaphore.h>
 #include <xwmd/ds/soc/gpio.h>
 #include <xwmd/ds/soc/eirq.h>
-#include <bm/stm32cube/xwds/stm32cube.h>
-#include <bm/stm32cube/xwds/pm.h>
+#include <bm/stm32cube/xwac/xwds/stm32cube.h>
+#include <bm/stm32cube/xwac/xwds/pm.h>
 #include <bm/pm/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********

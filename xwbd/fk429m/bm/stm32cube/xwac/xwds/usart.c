@@ -28,9 +28,9 @@
 #include <xwmd/ds/uart/dma.h>
 #include <bm/stm32cube/cubemx/Core/Inc/tim.h>
 #include <bm/stm32cube/cubemx/Core/Inc/usart.h>
-#include <bm/stm32cube/xwds/stm32cube.h>
-#include <bm/stm32cube/xwds/soc.h>
-#include <bm/stm32cube/xwds/usart.h>
+#include <bm/stm32cube/xwac/xwds/stm32cube.h>
+#include <bm/stm32cube/xwac/xwds/soc.h>
+#include <bm/stm32cube/xwac/xwds/usart.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
