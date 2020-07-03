@@ -25,7 +25,6 @@
 #include <xwos/osal/scheduler.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/xwmo.h>
-#include <bm/xwtst/sync/selector/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -52,11 +51,6 @@ xwer_t xwos_main(void)
                 goto bm_stm32cube_start;
         }
 
-        rc = bm_xwtst_sync_selector_start();
-        if (rc < 0) {
-                goto err_bm_xwtst_sync_selector_start;
-        }
-
         rc = xwosal_scheduler_start_lc();
         if (rc < 0) {
                 goto err_scheduler_start_lc;
@@ -64,8 +58,6 @@ xwer_t xwos_main(void)
         return OK;
 
 err_scheduler_start_lc:
-        BDL_BUG();
-err_bm_xwtst_sync_selector_start:
         BDL_BUG();
 bm_stm32cube_start:
         BDL_BUG();

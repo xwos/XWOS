@@ -1,0 +1,18 @@
+#+STARTUP: overview
+#+STARTUP: content
+#+STARTUP: showall
+#+STARTUP: showeverything
+#+STARTUP: hidestars
+#+TITLE: xwem-LICENSE
+#+AUTHOR: 隐星魂(Roy.Sun)
+#+EMAIL: roy.sun@starsoul.tech
+#+DATE:
+#+LANGUAGE: zh-CN
+#+OPTIONS: ^:{}
+#+OPTIONS: title:nil
+#+OPTIONS: toc:nil
+
+* 第三方软件许可证说明
+
+第三方软件的许可证可在各个第三方软件的模块目录下找到，通常它们是名字为“LICENSE”、
+“COPYING”或”COPYRIGHT“的文件。若没有找到也可访问这些软件的主页获取。

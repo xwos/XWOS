@@ -525,7 +525,5 @@ void mpc560xb_uartc_err_isr(void)
         resources = uartc->dev.resources;
         linflex_reg = resources->regrsc_array[0].base;
         sr = linflex_reg->UARTSR.R;
-        xwisrlogf(ERR, "uartc",
-                  "<%s:%d> error! sr: 0x%x", uartc->dev.name, uartc->dev.id, sr);
         linflex_reg->UARTSR.R = 0x0000FFE1;
 }

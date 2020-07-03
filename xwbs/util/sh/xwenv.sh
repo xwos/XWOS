@@ -36,6 +36,9 @@ function xwmc()
   elif [[ ${cpath} =~ ${XWOS_EM_DIR} ]] ; then
     rpath=${cpath#*${XWOS_EM_DIR}}
     prefix=XWEMCFG
+  elif [[ ${cpath} =~ ${XWOS_AM_DIR} ]] ; then
+    rpath=${cpath#*${XWOS_AM_DIR}}
+    prefix=XWAMCFG
   elif [[ ${cpath} =~ ${XWOS_OEM_DIR} ]] ; then
     rpath=${cpath#*${XWOS_OEM_DIR}}
     prefix=OEMCFG
@@ -64,6 +67,9 @@ function xwmn()
   elif [[ ${cpath} =~ ${XWOS_EM_DIR} ]] ; then
     rpath=${cpath#*${XWOS_EM_DIR}}
     prefix=xwem
+  elif [[ ${cpath} =~ ${XWOS_AM_DIR} ]] ; then
+    rpath=${cpath#*${XWOS_AM_DIR}}
+    prefix=xwam
   elif [[ ${cpath} =~ ${XWOS_OEM_DIR} ]] ; then
     rpath=${cpath#*${XWOS_OEM_DIR}}
     prefix=xwoem

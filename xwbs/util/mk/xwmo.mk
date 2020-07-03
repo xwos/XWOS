@@ -25,11 +25,13 @@ xwmoPathToName = $(subst -,_,$(subst .,_,$(subst /,_,$(subst _,__,$(subst $(2),,
 
 getXwmdName = xwmd$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_MD_DIR)).a
 
-getXwemName = xwem$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_EM_DIR)).a
-
 getXwppName = xwpp$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_PP_DIR)).a
 
 getXwbmName = xwbm$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_BM_DIR)).a
+
+getXwemName = xwem$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_EM_DIR)).a
+
+getXwamName = xwam$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_AM_DIR)).a
 
 getXwoemName = xwoem$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_OEM_DIR)).a
 
@@ -37,15 +39,17 @@ define getXwmoName
 $(strip
   $(if $(findstring $(XWOS_MD_DIR),$(call getXwmoDir)),\
       $(call getXwmdName),\
-      $(if $(findstring $(XWOS_EM_DIR),$(call getXwmoDir)),\
-          $(call getXwemName),\
-          $(if $(findstring $(XWOS_PP_DIR),$(call getXwmoDir)),\
-              $(call getXwppName),\
-              $(if $(findstring $(XWOS_BM_DIR),$(call getXwmoDir)),\
-	          $(call getXwbmName),\
+      $(if $(findstring $(XWOS_PP_DIR),$(call getXwmoDir)),\
+          $(call getXwppName),\
+          $(if $(findstring $(XWOS_BM_DIR),$(call getXwmoDir)),\
+	      $(call getXwbmName),\
+              $(if $(findstring $(XWOS_EM_DIR),$(call getXwmoDir)),\
+                  $(call getXwemName),\
+                  $(if $(findstring $(XWOS_AM_DIR),$(call getXwmoDir)),\
+                      $(call getXwamName),\
 		      $(if $(findstring $(XWOS_OEM_DIR),$(call getXwmoDir)),\
 			  $(call getXwoemName),\
-			  ""))))))
+			  "")))))))
 endef
 
 getAllFileUnderXwmoDir = $(subst $(call getXwmoDir)/,,$(wildcard $(call getXwmoDir)/$(2)/$(1)))

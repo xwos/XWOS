@@ -18,7 +18,7 @@
 
 玄武OS核心代码采用Mozilla Public License, version 2.0（简称MPL-2.0）进行发布：
 + 链接：[[http://mozilla.org/MPL/2.0/][http://mozilla.org/MPL/2.0/]]
-+ 这些代码位于xwos与xwmd文件夹中。
++ MPL-2.0适用于xwos、xwmd文件夹下的源码。
 + 所有这些源文件都 *不* 属于 *Incompatible With Secondary Licenses*
   形式的 *Covered Software* ，这些源文件的文件头中只包含了MPL-2.0中的
   *Exhibit A - Source Code Form License Notice* 。
@@ -30,7 +30,7 @@
 玄武OS的外围代码（BSP、应用、编译脚本）
 采用Apache License, version 2.0（简称Apache-2.0）进行发布：
 + 链接：[[http://www.apache.org/licenses/LICENSE-2.0][http://www.apache.org/licenses/LICENSE-2.0]]
-+ 这些代码位于xwcd、xwbd与xwbs中。
++ Apache-2.0适用于xwcd、xwbd、xwam、xwbs文件夹下的源码。
 
 ** 第三方软件
 

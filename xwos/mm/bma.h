@@ -38,7 +38,7 @@
  * @brief log function of bma
  */
 #if defined(XWMM_BMA_LOG)
-  #define xwmm_bmalogf(lv, fmt, ...) xwisrlogf(lv, fmt, ##__VA_ARGS__)
+  #define xwmm_bmalogf(lv, fmt, ...) xwlogf(lv, fmt, ##__VA_ARGS__)
 #else /* XWMM_BMA_LOG */
   #define xwmm_bmalogf(lv, fmt, ...)
 #endif /* !XWMM_BMA_LOG */

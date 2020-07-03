@@ -30,7 +30,7 @@
 #include <bm/stm32cube/xwmo.h>
 #include <bm/pm/xwmo.h>
 #include <bm/cxx/xwmo.h>
-#include <bm/xwtst/sync/selector/xwmo.h>
+#include <xwam/example/sync/selector/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -121,15 +121,15 @@ xwer_t bdl_init_thrd(void * arg)
                 goto err_bm_cxx_start;
         }
 
-        rc = bm_xwtst_sync_selector_start();
+        rc = example_selector_start();
         if (rc < 0) {
-                goto err_bm_xwtst_sync_selector_start;
+                goto err_example_selector_start;
         }
 
         xwosal_thrd_delete(bdl_init_thrd_id);
         return OK;
 
-err_bm_xwtst_sync_selector_start:
+err_example_selector_start:
         BDL_BUG();
 err_bm_cxx_start:
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)

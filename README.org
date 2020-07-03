@@ -34,16 +34,18 @@
 
 * 源码结构
 
-+ Build
++ 编译
   - xwbs: 编译系统 (License:Apache-2.0)
-+ BSP & Project
++ BSP与配置
   - xwcd: 架构、CPU、SOC、外设驱动相关的代码 (License:Apache-2.0)
   - xwbd: 工程配置、工程驱动与工程应用程序 (License:Apache-2.0)
-+ OS
++ 操作系统内核
   - xwos: 内核 (License:MPL-2.0)
-+ Middleware
++ 中间件
   - xwmd: 驱动框架与中间件 (License:MPL-2.0)
   - xwem: 第三方开源软件
++ 应用
+  - xwam: 示例代码、应用代码 (License:Apache-2.0)
 
 --------
 

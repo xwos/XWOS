@@ -630,11 +630,9 @@ void mpc560xb_spim_isr_tfuf_rfof(void)
 
         if (reg->SR.B.TFUF) {
                 reg->SR.B.TFUF = 1;
-                xwisrlogf(ERR, "spim", "TX queue underflow!");
         }
         if (reg->SR.B.RFOF) {
                 reg->SR.B.RFOF = 1;
-                xwisrlogf(ERR, "spim", "RX queue overflow!");
         }
 }
 
