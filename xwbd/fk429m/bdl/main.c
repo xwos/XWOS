@@ -25,10 +25,10 @@
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <xwem/libc/newlibac/xwmo.h>
+#include <xwem/vm/lua/xwmo.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/xwmo.h>
 #include <bm/pm/xwmo.h>
-#include <bm/lua/xwmo.h>
 #include <bm/cxx/xwmo.h>
 #include <bm/xwtst/sync/selector/xwmo.h>
 
@@ -109,10 +109,12 @@ xwer_t bdl_init_thrd(void * arg)
                 goto bm_pm_start;
         }
 
-        rc = bm_xwlua_start();
+#if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
+        rc = xwlua_start();
         if (rc < 0) {
-                goto err_bm_xwlua_start;
+                goto err_xwlua_start;
         }
+#endif /* XWEMCFG_vm_lua */
 
         rc = bm_cxx_start();
         if (rc < 0) {
@@ -130,8 +132,10 @@ xwer_t bdl_init_thrd(void * arg)
 err_bm_xwtst_sync_selector_start:
         BDL_BUG();
 err_bm_cxx_start:
+#if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
         BDL_BUG();
-err_bm_xwlua_start:
+err_xwlua_start:
+#endif /* XWEMCFG_vm_lua */
         BDL_BUG();
 bm_pm_start:
         BDL_BUG();

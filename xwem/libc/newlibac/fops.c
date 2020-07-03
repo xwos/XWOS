@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
-#include <xwem/filesystem/fatfs/ff.h>
+#include <xwem/fs/fatfs/ff.h>
 #include <stdlib.h>
 #include <fcntl.h>
 

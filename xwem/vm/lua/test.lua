@@ -3,18 +3,8 @@
 _G.null = false
 
 print("Hello, I'm XuanWuOS!\n")
-function foo()
-  local i = 0
-  local sum = 1
-  while i <= 10 do
-    sum = sum * 2
-    i = i + 1
-  end
-  return sum
-end
 print("pi =", math.pi)
-print("sum =", foo())
-print("and sum = 2^11 =", 2 ^ 11)
+print("2^11 =", 2 ^ 11)
 print("exp(10) =", math.exp(10))
 
 t1 = {1, 2, null, 4, 5}

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Board Module: Lua
+ * @brief 外部模块：Lua
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -26,7 +26,7 @@
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <xwem/vm/lua/xwlua/port.h>
-#include <bm/lua/xwmo.h>
+#include <xwem/vm/lua/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -41,13 +41,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern xwsz_t eram_mr_origin[];
-
-/**
- * @brief Lua的内存池
- */
-struct xwmm_mempool * xwlua_mempool = (void *)eram_mr_origin;
-
 char * xwlua_argv[] = {
         "xwlua",
 };
@@ -74,7 +67,7 @@ xwid_t xwlua_tid[xw_array_size(xwlua_tbd)];
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t bm_xwlua_start(void)
+xwer_t xwlua_start(void)
 {
         xwer_t rc;
         xwsq_t i;

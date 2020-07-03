@@ -22,10 +22,10 @@
 #define __cfg_xwem_h__
 
 #define XWEMCFG_serializing_nanopb                      1
-#define XWEMCFG_filesystem_fatfs                        0
-#define XWEMCFG_filesystem_littlefs                     0
-#define XWEMCFG_filesystem_spiffs                       0
-#define XWEMCFG_filesystem_dhara                        0
+#define XWEMCFG_fs_fatfs                                0
+#define XWEMCFG_fs_littlefs                             0
+#define XWEMCFG_fs_spiffs                               0
+#define XWEMCFG_fs_dhara                                0
 #define XWEMCFG_vm_lua                                  0
 
 #endif /* cfg/xwem.h */

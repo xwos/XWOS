@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Board Module: Lua
+ * @brief STM32CUBE：定义Lua虚拟机内存池
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,17 +18,9 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_lua_xwmo_h__
-#define __bm_lua_xwmo_h__
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
+#include <xwos/mm/mempool/allocator.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t bm_xwlua_start(void);
+extern xwsz_t eram_mr_origin[];
 
-#endif /* bm/lua/xwmo.h */
+struct xwmm_mempool * xwlua_mempool = (void *)eram_mr_origin;

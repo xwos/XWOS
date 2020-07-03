@@ -22,7 +22,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
-#include <xwem/filesystem/fatfs/ff.h>
+#include <xwem/fs/fatfs/ff.h>
 #include "cubemx/Core/Inc/sdio.h"
 
 /******** ******** ******** ******** ******** ******** ******** ********

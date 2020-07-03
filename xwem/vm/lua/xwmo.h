@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 外部模块配置
+ * @brief 外部模块：Lua
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,14 +18,17 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_xwem_h__
-#define __cfg_xwem_h__
+#ifndef __xwem_vm_lua_xwmo_h__
+#define __xwem_vm_lua_xwmo_h__
 
-#define XWEMCFG_serializing_nanopb                      0
-#define XWEMCFG_fs_fatfs                                0
-#define XWEMCFG_fs_littlefs                             0
-#define XWEMCFG_fs_spiffs                               0
-#define XWEMCFG_fs_dhara                                0
-#define XWEMCFG_vm_lua                                  0
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********      include      ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#include <xwos/standard.h>
 
-#endif /* cfg/xwem.h */
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********         function prototypes         ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+xwer_t xwlua_start(void);
+
+#endif /* xwem/vm/lua/xwmo.h */
