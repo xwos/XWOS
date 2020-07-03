@@ -21,6 +21,10 @@
 include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
+$(eval $(call XwmoReqCfg,XWMDCFG_ds_SOC_GPIO))
+$(eval $(call XwmoReqCfg,XWMDCFG_ds_SOC_EIRQ))
+$(eval $(call XwmoReqCfg,XWMDCFG_ds_CAN_TRANSCEIVER))
+
 XWMO_CSRCS := driver.c
 XWMO_CFLAGS :=
 XWMO_INCDIRS :=

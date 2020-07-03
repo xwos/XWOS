@@ -53,3 +53,10 @@ getAllFileUnderXwmoDir = $(subst $(call getXwmoDir)/,,$(wildcard $(call getXwmoD
 define getAllFileUnderXwmoDirRecursively
 $(subst $(call getXwmoDir)/,,$(shell find $(call getXwmoDir)/$(2) -name $(1)))
 endef
+
+define XwmoReqCfg
+ifneq ($$($(1)),y)
+    $$(info $(1))
+    $$(error "$(1) is not configured!")
+endif
+endef

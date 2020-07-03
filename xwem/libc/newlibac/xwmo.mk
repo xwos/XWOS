@@ -21,6 +21,9 @@
 include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
+$(eval $(call XwmoReqCfg,XWEMCFG_fs_fatfs))
+$(eval $(call XwmoReqCfg,XWMMCFG_MEMPOOL))
+
 XWMO_CSRCS := xwmo.c mem.c fops.c
 XWMO_CFLAGS := -Wno-unused-value
 XWMO_INCDIRS :=
