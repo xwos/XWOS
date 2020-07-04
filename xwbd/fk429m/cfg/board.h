@@ -51,7 +51,6 @@
  ******** ******** ********   board modules   ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define BMCFG_stm32cube                         1
-#define BMCFG_cxx                               1
 #define BMCFG_pm                                1
 #define BMCFG_xwpcp                             1
 

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Board Module: C++
+ * @brief 示例：C++测试线程
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,17 +18,27 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_cxx_xwmo_h__
-#define __bm_cxx_xwmo_h__
+#include <xwos/standard.hxx>
+#include <xwos/osal/thread.hxx>
+#include <vector>
+#include "test/literal.hxx"
+#include "test/vector.hxx"
+#include "task.hxx"
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+xwer_t cxx_thrd(void * arg)
+{
+  xwtm_t xwtm;
+  xwer_t rc;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t bm_cxx_start(void);
+  XWOS_UNUSED(arg);
 
-#endif /* bm/cxx/xwmo.h */
+  testLiteralOperator();
+  testStdVector();
+
+  rc = OK;
+  while (!xwosal_cthrd_frz_shld_stop(NULL)) {
+    xwtm = 2000 * XWTM_MS;
+    xwosal_cthrd_sleep(&xwtm);
+  }
+  return rc;
+}

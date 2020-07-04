@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Board Module: C++
+ * @brief 示例：C++
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -24,7 +24,7 @@
 #include <xwos/standard.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
-#include <bm/cxx/xwmo.h>
+#include <xwam/example/cxx/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -57,7 +57,7 @@ xwid_t cxx_tid[xw_array_size(cxx_tbd)];
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t bm_cxx_start(void)
+xwer_t example_cxx_start(void)
 {
         xwer_t rc;
         xwsq_t i;

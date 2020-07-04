@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief lua task
+ * @brief 示例：C++
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,21 +18,17 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_cxx_task_hxx__
-#define __bm_cxx_task_hxx__
+#ifndef __example_cxx_xwmo_h__
+#define __example_cxx_xwmo_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern "C" {
 #include <xwos/standard.h>
-}
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern "C" {
-xwer_t cxx_thrd(void * arg);
-}
+xwer_t example_cxx_start(void);
 
-#endif /* bm/cxx/task.hxx */
+#endif /* example/cxx/xwmo.h */

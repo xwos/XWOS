@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief C++ Testing Task
+ * @brief 示例：C++测试线程
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,27 +18,21 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.hxx>
-#include <xwos/osal/thread.hxx>
-#include <vector>
-#include "test/literal.hxx"
-#include "test/vector.hxx"
-#include "task.hxx"
+#ifndef __example_cxx_task_hxx__
+#define __example_cxx_task_hxx__
 
-xwer_t cxx_thrd(void * arg)
-{
-  xwtm_t xwtm;
-  xwer_t rc;
-
-  XWOS_UNUSED(arg);
-
-  testLiteralOperator();
-  testStdVector();
-
-  rc = OK;
-  while (!xwosal_cthrd_frz_shld_stop(NULL)) {
-    xwtm = 2000 * XWTM_MS;
-    xwosal_cthrd_sleep(&xwtm);
-  }
-  return rc;
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********      include      ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+extern "C" {
+#include <xwos/standard.h>
 }
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********         function prototypes         ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+extern "C" {
+xwer_t cxx_thrd(void * arg);
+}
+
+#endif /* example/cxx/task.hxx */

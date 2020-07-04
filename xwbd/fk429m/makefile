@@ -29,8 +29,7 @@ $(WKSPC):
 
 cfg: $(WKSPC) $(WKSPC)/XuanWuOS.cfg
 
-$(WKSPC)/XuanWuOS.cfg: cfg/XuanWuOS.h cfg/arch.h cfg/cpu.h cfg/soc.h \
- cfg/perpheral.h cfg/board.h cfg/xwos.h cfg/xwmd.h cfg/xwem.h
+$(WKSPC)/XuanWuOS.cfg: cfg/*.h
 	@../../xwbs/util/el/mkcfg.el --cfgdir=cfg --topdir=../.. --wkspc=$(WKSPC) -- $(@F)
 
 dbgcfg: cfg/dbg/debug.gdb cfg/dbg/program.gdb cfg/dbg/erase.gdb

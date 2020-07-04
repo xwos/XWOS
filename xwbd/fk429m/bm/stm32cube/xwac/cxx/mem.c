@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 应用模块配置
+ * @brief STM32CUBE：定义C++内存池
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,14 +18,9 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_xwam_h__
-#define __cfg_xwam_h__
+#include <xwos/standard.h>
+#include <xwos/mm/mempool/allocator.h>
 
-#define XWAMCFG_example_sync_semaphore          1
-#define XWAMCFG_example_sync_condition          1
-#define XWAMCFG_example_sync_flag               1
-#define XWAMCFG_example_sync_selector           1
-#define XWAMCFG_example_sync_barrier            1
-#define XWAMCFG_example_cxx                     1
+extern xwsz_t eram_mr_origin[];
 
-#endif /* cfg/xwam.h */
+struct xwmm_mempool * cxx_mempool = (void *)eram_mr_origin;

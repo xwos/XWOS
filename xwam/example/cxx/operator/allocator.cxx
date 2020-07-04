@@ -25,42 +25,42 @@ extern "C" {
   #include <xwos/mm/mempool/allocator.h>
 }
 
-extern struct xwmm_mempool * eram_mempool;
+extern struct xwmm_mempool * cxx_mempool;
 
 void * operator new(size_t size)
 {
   void * mem;
 
-  xwmm_mempool_malloc(eram_mempool, size, &mem);
+  xwmm_mempool_malloc(cxx_mempool, size, &mem);
   return mem;
 }
 
 void operator delete(void * mem)
 {
-  xwmm_mempool_free(eram_mempool, mem);
+  xwmm_mempool_free(cxx_mempool, mem);
 }
 
 void operator delete(void * mem, size_t size)
 {
   XWOS_UNUSED(size);
-  xwmm_mempool_free(eram_mempool, mem);
+  xwmm_mempool_free(cxx_mempool, mem);
 }
 
 void * operator new[](size_t size)
 {
   void * mem;
 
-  xwmm_mempool_malloc(eram_mempool, size, &mem);
+  xwmm_mempool_malloc(cxx_mempool, size, &mem);
   return mem;
 }
 
 void operator delete[](void * mem)
 {
-  xwmm_mempool_free(eram_mempool, mem);
+  xwmm_mempool_free(cxx_mempool, mem);
 }
 
 void operator delete[](void * mem, size_t size)
 {
   XWOS_UNUSED(size);
-  xwmm_mempool_free(eram_mempool, mem);
+  xwmm_mempool_free(cxx_mempool, mem);
 }

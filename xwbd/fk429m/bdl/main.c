@@ -29,7 +29,7 @@
 #include <bdl/standard.h>
 #include <bm/stm32cube/xwmo.h>
 #include <bm/pm/xwmo.h>
-#include <bm/cxx/xwmo.h>
+#include <xwam/example/cxx/xwmo.h>
 #include <xwam/example/sync/selector/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -116,9 +116,9 @@ xwer_t bdl_init_thrd(void * arg)
         }
 #endif /* XWEMCFG_vm_lua */
 
-        rc = bm_cxx_start();
+        rc = example_cxx_start();
         if (rc < 0) {
-                goto err_bm_cxx_start;
+                goto err_example_cxx_start;
         }
 
         rc = example_selector_start();
@@ -131,7 +131,7 @@ xwer_t bdl_init_thrd(void * arg)
 
 err_example_selector_start:
         BDL_BUG();
-err_bm_cxx_start:
+err_example_cxx_start:
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
         BDL_BUG();
 err_xwlua_start:
