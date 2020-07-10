@@ -71,7 +71,7 @@
 #endif
 #define __likely(x)             __builtin_expect(!!(x), 1)
 #define __unlikely(x)           __builtin_expect(!!(x), 0)
-#if defined(CPUCFG_L1_CACHELINE_SIZE) && (1 == CPUCFG_L1_CACHELINE_SIZE)
+#if defined(CPUCFG_L1_CACHELINE_SIZE)
   #define __aligned_l1cacheline \
           __aligned(CPUCFG_L1_CACHELINE_SIZE)
 #else

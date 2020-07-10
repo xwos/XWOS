@@ -58,16 +58,17 @@ struct xwds_dmauartc {
         const struct xwds_resource_dma * rxdmarsc; /**< 用于接收UART数据的DMA资源 */
         const struct xwds_resource_dma * txdmarsc; /**< 用于发送UART数据的DMA资源 */
 
-        /* TX FSM */
+        /* TX */
         struct xwosal_mtx txmtx; /**< 发送互斥锁 */
 
-        /* RX FSM */
+        /* RX */
         struct {
                 struct xwosal_smr smr; /**< 接收队列中数据可用的信号量 */
                 struct xwosal_splk lock; /**< 保护接收队列的锁 */
-                xwu8_t mem[2 * XWDS_DMAUART_RXQ_SIZE]; /**< double-queue */
                 xwsq_t pos; /**< 当前有效数据的起始位置 */
                 xwsz_t tail; /**< 当前有效数据的结束位置 + 1 */
+                xwu8_t mem[2 * XWDS_DMAUART_RXQ_SIZE] __aligned_l1cacheline;
+                                /**< 双缓冲区 */
         } rxq; /**< 循环接收队列 */
 };
 

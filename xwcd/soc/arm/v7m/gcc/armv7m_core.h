@@ -122,6 +122,23 @@ struct cm_scs_reg {
                 union {
                         __xw_io xwu32_t u32;
                         struct {
+#ifdef XuanWuOS_CFG_CPU__m7
+                                __xw_io xwu32_t reserved0:2;
+                                __xw_io xwu32_t disfold:1;
+                                __xw_io xwu32_t reserved1:7;
+                                __xw_io xwu32_t fpexcodis:1;
+                                __xw_io xwu32_t disramode:1;
+                                __xw_io xwu32_t disitmatbflush:1;
+                                __xw_io xwu32_t disbtacread:1;
+                                __xw_io xwu32_t disbtacalloc:1;
+                                __xw_io xwu32_t discritaxirur:1;
+                                __xw_io xwu32_t disdi:5;
+                                __xw_io xwu32_t disissch1:5;
+                                __xw_io xwu32_t disdynadd:1;
+                                __xw_io xwu32_t discritaxiruw:1;
+                                __xw_io xwu32_t disfpuissopt:1;
+                                __xw_io xwu32_t reserved2:3;
+#else
                                 __xw_io xwu32_t dismcycint:1;
                                 __xw_io xwu32_t disdefwbuf:1;
                                 __xw_io xwu32_t disfold:1;
@@ -129,6 +146,7 @@ struct cm_scs_reg {
                                 __xw_io xwu32_t disfpca:1;
                                 __xw_io xwu32_t disoofp:1;
                                 __xw_io xwu32_t reserved1:22;
+#endif
                         } bit;
                 } actlr; /**< offset:0x008(r/w) auxiliary control register */
         } scnscb;

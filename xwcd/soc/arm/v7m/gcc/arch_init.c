@@ -73,8 +73,6 @@ const struct arch_image_tail arch_image_tail = {
 __xwbsp_init_code
 void arch_lowlevel_init(void)
 {
-        cm_scs.scb.ccr.bit.dc = 1; /* enable dcache */
-        cm_scs.scb.ccr.bit.ic = 1; /* enable icache */
         cm_scs.scb.ccr.bit.bp = 1; /* enable branch prediction */
         cm_scs.scb.ccr.bit.div_0_trp = 1; /* enable divide by 0 trap */
 #if (ARCHCFG_FPU == 1)

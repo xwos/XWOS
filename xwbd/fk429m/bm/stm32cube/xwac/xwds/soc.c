@@ -129,6 +129,9 @@ xwer_t stm32cube_soc_drv_eram_tst(struct xwds_soc * soc, xwptr_t * erraddr);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+extern xwsz_t eram_mr_origin[];
+extern xwsz_t eram_mr_size[];
+
 const struct xwds_soc_driver stm32cube_soc_drv = {
         .base = {
                 .name = "stm32cube.soc",
@@ -424,6 +427,10 @@ struct xwds_soc stm32cube_soc_cb = {
                 .ch_num = 16,
                 .chcbs = stm32cube_dma_cbcb_array,
                 .chcbargs = stm32cube_dma_chcbarg_array,
+        },
+        .eram = {
+                .origin = (xwsz_t *)eram_mr_origin;,
+                .size = (xwsz_t)eram_mr_size,
         },
 };
 

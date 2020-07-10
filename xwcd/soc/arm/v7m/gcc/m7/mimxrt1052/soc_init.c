@@ -85,7 +85,6 @@ extern xwu8_t ncache_bss_vma_end[];
 __xwbsp_init_code
 void soc_lowlevel_init(void)
 {
-        soc_relocate();
 }
 
 __xwbsp_init_code
@@ -96,6 +95,7 @@ void soc_init(void)
 #if (!defined(SOCCFG_RO_ISRTABLE)) || (1 != SOCCFG_RO_ISRTABLE)
         soc_relocate_isrtable();
 #endif /* !SOCCFG_RO_ISRTABLE */
+        soc_relocate();
 
 #if defined(XuanWuOS_CFG_CORE__smp)
         /* PM domain */

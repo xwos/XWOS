@@ -36,9 +36,10 @@
 #define armv7m_isb()            __asm__ volatile("isb" : : : "memory")
 #define armv7m_dsb()            __asm__ volatile("dsb" : : : "memory")
 #define armv7m_dmb()            __asm__ volatile("dmb" : : : "memory")
+#define armv7m_dsbisb()         __asm__ volatile("dsb\n isb" : : : "memory")
 
 #define xwmb_smp_isb()          armv7m_isb()
-#define xwmb_smp_mb()           armv7m_dmb()
+#define xwmb_smp_mb()           armv7m_dsb()
 #define xwmb_smp_rmb()          xwmb_smp_mb()
 #define xwmb_smp_wmb()          armv7m_dmb()
 #define xwmb_smp_ddb()          xwccmb()

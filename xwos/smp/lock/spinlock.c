@@ -33,6 +33,7 @@ void xwlk_rawly_lock(struct xwlk_splk * spl)
         arch_splk_lock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
@@ -46,6 +47,7 @@ xwer_t xwlk_rawly_trylock(struct xwlk_splk * spl)
         rc = arch_splk_trylock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
@@ -57,6 +59,7 @@ void xwlk_rawly_unlock(struct xwlk_splk * spl)
         arch_splk_unlock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
@@ -68,6 +71,7 @@ void xwlk_rawly_lock_cpuirq(struct xwlk_splk * spl)
         arch_splk_lock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
@@ -85,6 +89,7 @@ xwer_t xwlk_rawly_trylock_cpuirq(struct xwlk_splk * spl)
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
@@ -96,6 +101,7 @@ void xwlk_rawly_unlock_cpuirq(struct xwlk_splk * spl)
         arch_splk_unlock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwos_cpuirq_enable_lc();
 }
@@ -108,6 +114,7 @@ void xwlk_rawly_lock_cpuirqsv(struct xwlk_splk * spl, xwreg_t * cpuirq)
         arch_splk_lock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
@@ -126,6 +133,7 @@ xwer_t xwlk_rawly_trylock_cpuirqsv(struct xwlk_splk * spl, xwreg_t * cpuirq)
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
@@ -137,6 +145,7 @@ void xwlk_rawly_unlock_cpuirqrs(struct xwlk_splk * spl, xwreg_t cpuirq)
         arch_splk_unlock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwos_cpuirq_restore_lc(cpuirq);
 }
@@ -154,6 +163,7 @@ void xwlk_rawly_lock_irqs(struct xwlk_splk * spl,
         arch_splk_lock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
@@ -177,6 +187,7 @@ xwer_t xwlk_rawly_trylock_irqs(struct xwlk_splk * spl,
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
@@ -191,6 +202,7 @@ void xwlk_rawly_unlock_irqs(struct xwlk_splk * spl,
         arch_splk_unlock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
                 xwos_irq_enable(irqs[i].irqn);
@@ -211,6 +223,7 @@ void xwlk_rawly_lock_irqssv(struct xwlk_splk * spl,
         arch_splk_lock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
@@ -236,6 +249,7 @@ xwer_t xwlk_rawly_trylock_irqssv(struct xwlk_splk * spl,
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
@@ -250,6 +264,7 @@ void xwlk_rawly_unlock_irqsrs(struct xwlk_splk * spl,
         arch_splk_unlock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
                 xwos_irq_restore(irqs[i].irqn, flags[i]);
@@ -275,6 +290,7 @@ void xwlk_splk_lock(struct xwlk_splk * spl)
         arch_splk_lock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
@@ -306,6 +322,7 @@ xwer_t xwlk_splk_trylock(struct xwlk_splk * spl)
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
@@ -325,6 +342,7 @@ void xwlk_splk_unlock(struct xwlk_splk * spl)
         arch_splk_unlock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwos_scheduler_enpmpt_lc();
 }
@@ -349,6 +367,7 @@ void xwlk_splk_lock_cpuirq(struct xwlk_splk * spl)
         arch_splk_lock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
@@ -382,6 +401,7 @@ xwer_t xwlk_splk_trylock_cpuirq(struct xwlk_splk * spl)
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
@@ -401,6 +421,7 @@ void xwlk_splk_unlock_cpuirq(struct xwlk_splk * spl)
         arch_splk_unlock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwos_scheduler_enpmpt_lc();
         xwos_cpuirq_enable_lc();
@@ -427,6 +448,7 @@ void xwlk_splk_lock_cpuirqsv(struct xwlk_splk * spl, xwreg_t * cpuirq)
         arch_splk_lock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
@@ -461,6 +483,7 @@ xwer_t xwlk_splk_trylock_cpuirqsv(struct xwlk_splk * spl, xwreg_t * cpuirq)
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
@@ -481,6 +504,7 @@ void xwlk_splk_unlock_cpuirqrs(struct xwlk_splk * spl, xwreg_t cpuirq)
         arch_splk_unlock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwos_scheduler_enpmpt_lc();
         xwos_cpuirq_restore_lc(cpuirq);
@@ -514,6 +538,7 @@ void xwlk_splk_lock_irqs(struct xwlk_splk * spl,
         arch_splk_lock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
@@ -556,6 +581,7 @@ xwer_t xwlk_splk_trylock_irqs(struct xwlk_splk * spl,
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
@@ -580,6 +606,7 @@ void xwlk_splk_unlock_irqs(struct xwlk_splk * spl,
         arch_splk_unlock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwos_scheduler_enpmpt_lc();
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
@@ -617,6 +644,7 @@ void xwlk_splk_lock_irqssv(struct xwlk_splk * spl,
         arch_splk_lock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
@@ -661,6 +689,7 @@ xwer_t xwlk_splk_trylock_irqssv(struct xwlk_splk * spl,
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
@@ -687,6 +716,7 @@ void xwlk_splk_unlock_irqsrs(struct xwlk_splk * spl,
         arch_splk_unlock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwos_scheduler_enpmpt_lc();
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
@@ -718,6 +748,7 @@ void xwlk_splk_lock_bh(struct xwlk_splk * spl)
         arch_splk_lock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
@@ -753,6 +784,7 @@ xwer_t xwlk_splk_trylock_bh(struct xwlk_splk * spl)
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
@@ -774,6 +806,7 @@ void xwlk_splk_unlock_bh(struct xwlk_splk * spl)
         arch_splk_unlock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(spl);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwsd = xwos_scheduler_enbh_lc();
         xwos_scheduler_enpmpt(xwsd);
@@ -788,6 +821,7 @@ void xwlk_bitsplk_lock(xwptr_t * ptr)
         arch_bitsplk_lock(ptr);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(ptr);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
@@ -805,6 +839,7 @@ xwer_t xwlk_bitsplk_trylock(xwptr_t * ptr)
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(ptr);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
@@ -816,6 +851,7 @@ void xwlk_bitsplk_unlock(xwptr_t * ptr)
         arch_bitsplk_unlock(ptr);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(ptr);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwos_scheduler_enpmpt_lc();
 }
@@ -829,6 +865,7 @@ void xwlk_bitsplk_lock_cpuirq(xwptr_t * ptr)
         arch_bitsplk_lock(ptr);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(ptr);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
@@ -848,6 +885,7 @@ xwer_t xwlk_bitsplk_trylock_cpuirq(xwptr_t * ptr)
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(ptr);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
@@ -859,6 +897,7 @@ void xwlk_bitsplk_unlock_cpuirq(xwptr_t * ptr)
         arch_bitsplk_unlock(ptr);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(ptr);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwos_scheduler_enpmpt_lc();
         xwos_cpuirq_enable_lc();
@@ -873,6 +912,7 @@ void xwlk_bitsplk_lock_cpuirqsv(xwptr_t * ptr, xwreg_t * cpuirq)
         arch_bitsplk_lock(ptr);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(ptr);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
@@ -892,6 +932,7 @@ xwer_t xwlk_bitsplk_trylock_cpuirqsv(xwptr_t * ptr, xwreg_t * cpuirq)
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(ptr);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
@@ -903,6 +944,7 @@ void xwlk_bitsplk_unlock_cpuirqrs(xwptr_t * ptr, xwreg_t cpuirq)
         arch_bitsplk_unlock(ptr);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(ptr);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwos_scheduler_enpmpt_lc();
         xwos_cpuirq_restore_lc(cpuirq);
@@ -923,6 +965,7 @@ void xwlk_bitsplk_lock_irqs(xwptr_t * ptr,
         arch_bitsplk_lock(ptr);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(ptr);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
@@ -949,6 +992,7 @@ xwer_t xwlk_bitsplk_trylock_irqs(xwptr_t * ptr,
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(ptr);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
@@ -964,6 +1008,7 @@ void xwlk_bitsplk_unlock_irqs(xwptr_t * ptr,
         arch_bitsplk_unlock(ptr);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(ptr);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwos_scheduler_enpmpt_lc();
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
@@ -986,6 +1031,7 @@ void xwlk_bitsplk_lock_irqssv(xwptr_t * ptr,
         arch_bitsplk_lock(ptr);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(ptr);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
@@ -1012,6 +1058,7 @@ xwer_t xwlk_bitsplk_trylock_irqssv(xwptr_t * ptr,
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(ptr);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
@@ -1027,6 +1074,7 @@ void xwlk_bitsplk_unlock_irqsrs(xwptr_t * ptr,
         arch_bitsplk_unlock(ptr);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(ptr);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwos_scheduler_enpmpt_lc();
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
@@ -1046,6 +1094,7 @@ void xwlk_bitsplk_lock_bh(xwptr_t * ptr)
         arch_bitsplk_lock(ptr);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(ptr);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
@@ -1066,6 +1115,7 @@ xwer_t xwlk_bitsplk_trylock_bh(xwptr_t * ptr)
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(ptr);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
@@ -1079,6 +1129,7 @@ void xwlk_bitsplk_unlock_bh(xwptr_t * ptr)
         arch_bitsplk_unlock(ptr);
 #else /* (CPUCFG_CPU_NUM > 1) */
         XWOS_UNUSED(ptr);
+        xwmb_smp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwsd = xwos_scheduler_enbh_lc();
         xwos_scheduler_enpmpt(xwsd);
