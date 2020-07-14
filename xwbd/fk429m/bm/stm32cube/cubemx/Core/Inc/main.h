@@ -7,7 +7,11 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+  * All rights reserved.</center></h2>
+  *
+  * <h2><center>&copy; Copyright (c) 2020
+  * 隐星魂 (Roy.Sun) https://xwos.tech
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,
@@ -30,20 +34,18 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_ll_crc.h"
-#include "stm32f4xx_ll_dma.h"
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_ll_rng.h"
-#include "stm32f4xx_ll_tim.h"
-#include "stm32f4xx_ll_usart.h"
-#include "stm32f4xx_ll_rcc.h"
 #include "stm32f4xx.h"
 #include "stm32f4xx_ll_system.h"
 #include "stm32f4xx_ll_gpio.h"
 #include "stm32f4xx_ll_exti.h"
 #include "stm32f4xx_ll_bus.h"
 #include "stm32f4xx_ll_cortex.h"
+#include "stm32f4xx_ll_rcc.h"
 #include "stm32f4xx_ll_utils.h"
 #include "stm32f4xx_ll_pwr.h"
+#include "stm32f4xx_ll_dma.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */

@@ -30,13 +30,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-enum stm32cube_soc_dma_rc {
-        STM32CUBE_SOC_DMA_RC_FE = BIT(0), /**< FIFO error */
-        STM32CUBE_SOC_DMA_RC_DME = BIT(2), /**< Direct Mode error */
-        STM32CUBE_SOC_DMA_RC_TE = BIT(3), /**< Transfer error */
-        STM32CUBE_SOC_DMA_RC_HT = BIT(4), /**< Half transfer */
-        STM32CUBE_SOC_DMA_RC_TC = BIT(5), /**< Transfer complete */
-};
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -50,38 +43,6 @@ enum stm32cube_soc_dma_rc {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 void stm32cube_exti_isr(void);
-
-void stm32cube_dma1_stream0_isr(void);
-
-void stm32cube_dma1_stream1_isr(void);
-
-void stm32cube_dma1_stream2_isr(void);
-
-void stm32cube_dma1_stream3_isr(void);
-
-void stm32cube_dma1_stream4_isr(void);
-
-void stm32cube_dma1_stream5_isr(void);
-
-void stm32cube_dma1_stream6_isr(void);
-
-void stm32cube_dma1_stream7_isr(void);
-
-void stm32cube_dma2_stream0_isr(void);
-
-void stm32cube_dma2_stream1_isr(void);
-
-void stm32cube_dma2_stream2_isr(void);
-
-void stm32cube_dma2_stream3_isr(void);
-
-void stm32cube_dma2_stream4_isr(void);
-
-void stm32cube_dma2_stream5_isr(void);
-
-void stm32cube_dma2_stream6_isr(void);
-
-void stm32cube_dma2_stream7_isr(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********  inline functions implementations   ******** ********

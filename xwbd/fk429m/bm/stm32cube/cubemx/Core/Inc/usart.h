@@ -9,6 +9,10 @@
   * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
+  * <h2><center>&copy; Copyright (c) 2020
+  * 隐星魂 (Roy.Sun) https://xwos.tech
+  * All rights reserved.</center></h2>
+  *
   * This software component is licensed by ST under BSD 3-Clause license,
   * the "License"; You may not use this file except in compliance with the
   * License. You may obtain a copy of the License at:
@@ -27,28 +31,43 @@
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
+#include <bm/stm32cube/standard.h>
+#include <xwos/osal/lock/spinlock.h>
+#include <xwos/osal/sync/condition.h>
 #include <xwmd/ds/uart/dma.h>
 
 /* USER CODE END Includes */
 
+extern UART_HandleTypeDef huart1;
+
 /* USER CODE BEGIN Private defines */
+struct HAL_UART_Xwds_driver_data {
+  UART_HandleTypeDef * halhdl;
+  struct xwds_dmauartc * dmauartc;
+  struct {
+    struct xwosal_cdt cdt; /**< 条件量 */
+    struct xwosal_splk splk; /**< 保证发送状态只被单一上下文访问的锁 */
+    xwer_t rc;
+  } tx;
+};
 
 /* USER CODE END Private defines */
 
 void MX_USART1_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void MX_USART1_UART_Deinit(void);
+extern struct HAL_UART_Xwds_driver_data husart1_xwds_drvdata;
 
-void MX_USART1_UART_Setup_RXDMA(xwu8_t * mem, xwsz_t size);
-
-void MX_USART1_UART_Setup_TXDMA(const xwu8_t * mem, xwsz_t size);
-
-void MX_USART1_UART_Finish_TXDMA(void);
-
-void MX_USART1_UART_Putc(xwu8_t byte);
-
-void MX_USART1_UART_Isr(void);
+void MX_USART1_UART_DeInit(void);
+void MX_USART1_Timer_Init(void);
+void MX_USART1_Timer_DeInit(void);
+void MX_USART1_Timer_Start(void);
+void MX_USART1_Timer_Stop(void);
+void MX_USART1_Timer_Callback(void);
+xwer_t MX_USART1_RXDMA_Start(xwu8_t * mem, xwsz_t size);
+xwsq_t MX_USART1_RXDMA_GetCounter(void);
+xwer_t MX_USART1_TXDMA_Start(xwu8_t * mem, xwsz_t size);
+xwer_t MX_USART1_Putc(xwu8_t byte);
 
 /* USER CODE END Prototypes */
 

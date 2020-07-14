@@ -39,6 +39,6 @@ extern struct xwds stm32cube_ds;
 extern struct xwds_soc stm32cube_soc_cb;
 
 /******** ******** uart ******** ********/
-extern struct xwds_dmauartc stm32cube_dmauartc1_cb;
+extern struct xwds_dmauartc stm32cube_usart1_cb;
 
 #endif /* bm/stm32cube/xwac/xwds/stm32cube.h */

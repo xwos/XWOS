@@ -9,6 +9,10 @@
   * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
+  * <h2><center>&copy; Copyright (c) 2020
+  * 隐星魂 (Roy.Sun) https://xwos.tech
+  * All rights reserved.</center></h2>
+  *
   * This software component is licensed by ST under BSD 3-Clause license,
   * the "License"; You may not use this file except in compliance with the
   * License. You may obtain a copy of the License at:
@@ -21,46 +25,95 @@
 #include "tim.h"
 
 /* USER CODE BEGIN 0 */
+#include "cubemx/Core/Inc/usart.h"
 
 /* USER CODE END 0 */
+
+TIM_HandleTypeDef htim9;
 
 /* TIM9 init function */
 void MX_TIM9_Init(void)
 {
-  LL_TIM_InitTypeDef TIM_InitStruct = {0};
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
 
-  /* Peripheral clock enable */
-  LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_TIM9);
-
-  /* TIM9 interrupt Init */
-  NVIC_SetPriority(TIM1_BRK_TIM9_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),2, 1));
-  NVIC_EnableIRQ(TIM1_BRK_TIM9_IRQn);
-
-  TIM_InitStruct.Prescaler = 16799;
-  TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
-  TIM_InitStruct.Autoreload = 100;
-  TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
-  LL_TIM_Init(TIM9, &TIM_InitStruct);
-  LL_TIM_EnableARRPreload(TIM9);
-  LL_TIM_SetClockSource(TIM9, LL_TIM_CLOCKSOURCE_INTERNAL);
+  htim9.Instance = TIM9;
+  htim9.Init.Prescaler = 16799;
+  htim9.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim9.Init.Period = 100;
+  htim9.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim9.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+  if (HAL_TIM_Base_Init(&htim9) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim9, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
 
 }
 
+void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
+{
+
+  if(tim_baseHandle->Instance==TIM9)
+  {
+  /* USER CODE BEGIN TIM9_MspInit 0 */
+
+  /* USER CODE END TIM9_MspInit 0 */
+    /* TIM9 clock enable */
+    __HAL_RCC_TIM9_CLK_ENABLE();
+
+    /* TIM9 interrupt Init */
+    HAL_NVIC_SetPriority(TIM1_BRK_TIM9_IRQn, 2, 1);
+    HAL_NVIC_EnableIRQ(TIM1_BRK_TIM9_IRQn);
+  /* USER CODE BEGIN TIM9_MspInit 1 */
+
+  /* USER CODE END TIM9_MspInit 1 */
+  }
+}
+
+void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
+{
+
+  if(tim_baseHandle->Instance==TIM9)
+  {
+  /* USER CODE BEGIN TIM9_MspDeInit 0 */
+
+  /* USER CODE END TIM9_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_TIM9_CLK_DISABLE();
+
+    /* TIM9 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(TIM1_BRK_TIM9_IRQn);
+  /* USER CODE BEGIN TIM9_MspDeInit 1 */
+
+  /* USER CODE END TIM9_MspDeInit 1 */
+  }
+}
+
 /* USER CODE BEGIN 1 */
+void MX_TIM9_DeInit(void)
+{
+  HAL_TIM_Base_DeInit(&htim9);
+}
+
 void MX_TIM9_Start(void)
 {
-  MX_TIM9_Init();
-  LL_TIM_ClearFlag_UPDATE(TIM9);
-  LL_TIM_EnableIT_UPDATE(TIM9);
-  LL_TIM_EnableCounter(TIM9);
+  HAL_TIM_Base_Start_IT(&htim9);
 }
 
 void MX_TIM9_Stop(void)
 {
-  LL_TIM_DisableCounter(TIM9);
-  LL_TIM_DisableIT_UPDATE(TIM9);
-  NVIC_DisableIRQ(TIM1_BRK_TIM9_IRQn);
-  LL_APB2_GRP1_DisableClock(LL_APB2_GRP1_PERIPH_TIM9);
+  HAL_TIM_Base_Stop_IT(&htim9);
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim)
+{
+  if (&htim9 == htim) {
+    MX_USART1_Timer_Callback();
+  }
 }
 
 /* USER CODE END 1 */

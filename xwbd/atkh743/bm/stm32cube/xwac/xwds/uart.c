@@ -247,7 +247,7 @@ void stm32cube_usart1_cb_rxdma_timer(struct xwds_dmauartc * dmauartc)
 {
         xwsq_t tail;
 
-        tail = sizeof(dmauartc->rxq.mem) - HAL_USART1_RXDMA_GetCounter();
+        tail = sizeof(dmauartc->rxq.mem) - MX_USART1_RXDMA_GetCounter();
         if (sizeof(dmauartc->rxq.mem) == tail) {
                 xwds_dmauartc_lib_rxq_pub(dmauartc, 0);
         } else {

@@ -178,7 +178,7 @@ xwer_t bm_xwpcp_stop(void)
 static
 xwer_t bm_xwpcpif_open(struct xwpcp * xwpcp)
 {
-        xwpcp->hwifcb = &stm32cube_dmauartc1_cb;
+        xwpcp->hwifcb = &stm32cube_usart1_cb;
         return OK;
 }
 

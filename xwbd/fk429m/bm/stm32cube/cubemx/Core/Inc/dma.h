@@ -9,6 +9,10 @@
   * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
+  * <h2><center>&copy; Copyright (c) 2020
+  * 隐星魂 (Roy.Sun) https://xwos.tech
+  * All rights reserved.</center></h2>
+  *
   * This software component is licensed by ST under BSD 3-Clause license,
   * the "License"; You may not use this file except in compliance with the
   * License. You may obtain a copy of the License at:
@@ -41,9 +45,7 @@ void MX_DMA_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 void MX_DMA_Deinit(void);
-
 void MX_DMA_Suspend(void);
-
 void MX_DMA_Resume(void);
 
 /* USER CODE END Prototypes */

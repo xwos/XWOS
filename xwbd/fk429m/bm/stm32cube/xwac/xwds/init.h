@@ -38,11 +38,8 @@
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t stm32cube_xwds_ll_init(void);
-
 xwer_t stm32cube_xwds_ll_deinit(void);
-
 xwer_t stm32cube_xwds_uart_start(void);
-
 xwer_t stm32cube_xwds_uart_stop(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********

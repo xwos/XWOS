@@ -68,7 +68,7 @@ void MX_USART1_Timer_DeInit(void);
 void MX_USART1_Timer_Start(void);
 void MX_USART1_Timer_Stop(void);
 xwer_t MX_USART1_RXDMA_Start(xwu8_t * mem, xwsz_t size);
-xwsq_t HAL_USART1_RXDMA_GetCounter(void);
+xwsq_t MX_USART1_RXDMA_GetCounter(void);
 void MX_USART1_TXDMA_Prepare(const xwu8_t * mem, xwsz_t size);
 xwer_t MX_USART1_TXDMA_Start(void);
 xwer_t MX_USART1_Putc(xwu8_t byte);

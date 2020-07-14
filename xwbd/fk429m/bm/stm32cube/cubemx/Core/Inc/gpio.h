@@ -1,12 +1,16 @@
 /**
   ******************************************************************************
   * File Name          : gpio.h
-  * Description        : This file contains all the functions prototypes for 
-  *                      the gpio  
+  * Description        : This file contains all the functions prototypes for
+  *                      the gpio
   ******************************************************************************
   * @attention
   *
   * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+  * All rights reserved.</center></h2>
+  *
+  * <h2><center>&copy; Copyright (c) 2020
+  * 隐星魂 (Roy.Sun) https://xwos.tech
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under BSD 3-Clause license,
@@ -39,9 +43,7 @@ void MX_GPIO_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 void MX_GPIO_Deinit(void);
-
 void MX_GPIO_Suspend(void);
-
 void MX_GPIO_Resume(void);
 
 /* USER CODE END Prototypes */

@@ -9,6 +9,10 @@
   * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
+  * <h2><center>&copy; Copyright (c) 2020
+  * 隐星魂 (Roy.Sun) https://xwos.tech
+  * All rights reserved.</center></h2>
+  *
   * This software component is licensed by ST under BSD 3-Clause license,
   * the "License"; You may not use this file except in compliance with the
   * License. You may obtain a copy of the License at:
@@ -21,152 +25,315 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
+#include <xwos/lib/string.h>
+#include "cubemx/Core/Inc/tim.h"
+#include "xwac/xwds/usart.h"
+
+struct HAL_UART_Xwds_driver_data husart1_xwds_drvdata;
 
 /* USER CODE END 0 */
+
+UART_HandleTypeDef husart1;
+DMA_HandleTypeDef hdma_usart1_tx;
+DMA_HandleTypeDef hdma_usart1_rx;
 
 /* USART1 init function */
 
 void MX_USART1_UART_Init(void)
 {
-  LL_USART_InitTypeDef USART_InitStruct = {0};
 
-  LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+  husart1.Instance = USART1;
+  husart1.Init.BaudRate = 1000000;
+  husart1.Init.WordLength = UART_WORDLENGTH_8B;
+  husart1.Init.StopBits = UART_STOPBITS_1;
+  husart1.Init.Parity = UART_PARITY_NONE;
+  husart1.Init.Mode = UART_MODE_TX_RX;
+  husart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  husart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&husart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
 
-  /* Peripheral clock enable */
-  LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_USART1);
+}
 
-  LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOA);
-  /**USART1 GPIO Configuration
-  PA9   ------> USART1_TX
-  PA10   ------> USART1_RX
-  */
-  GPIO_InitStruct.Pin = LL_GPIO_PIN_9|LL_GPIO_PIN_10;
-  GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_VERY_HIGH;
-  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-  GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-  GPIO_InitStruct.Alternate = LL_GPIO_AF_7;
-  LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
+{
 
-  /* USART1 DMA Init */
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  if(uartHandle->Instance==USART1)
+  {
+  /* USER CODE BEGIN USART1_MspInit 0 */
 
-  /* USART1_TX Init */
-  LL_DMA_SetChannelSelection(DMA2, LL_DMA_STREAM_7, LL_DMA_CHANNEL_4);
+  /* USER CODE END USART1_MspInit 0 */
+    /* USART1 clock enable */
+    __HAL_RCC_USART1_CLK_ENABLE();
 
-  LL_DMA_SetDataTransferDirection(DMA2, LL_DMA_STREAM_7, LL_DMA_DIRECTION_MEMORY_TO_PERIPH);
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    /**USART1 GPIO Configuration
+    PA9     ------> USART1_TX
+    PA10     ------> USART1_RX
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_9|GPIO_PIN_10;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  LL_DMA_SetStreamPriorityLevel(DMA2, LL_DMA_STREAM_7, LL_DMA_PRIORITY_LOW);
+    /* USART1 DMA Init */
+    /* USART1_TX Init */
+    hdma_usart1_tx.Instance = DMA2_Stream7;
+    hdma_usart1_tx.Init.Channel = DMA_CHANNEL_4;
+    hdma_usart1_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    hdma_usart1_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_usart1_tx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_usart1_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_usart1_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_usart1_tx.Init.Mode = DMA_NORMAL;
+    hdma_usart1_tx.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_usart1_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&hdma_usart1_tx) != HAL_OK)
+    {
+      Error_Handler();
+    }
 
-  LL_DMA_SetMode(DMA2, LL_DMA_STREAM_7, LL_DMA_MODE_NORMAL);
+    __HAL_LINKDMA(uartHandle,hdmatx,hdma_usart1_tx);
 
-  LL_DMA_SetPeriphIncMode(DMA2, LL_DMA_STREAM_7, LL_DMA_PERIPH_NOINCREMENT);
+    /* USART1_RX Init */
+    hdma_usart1_rx.Instance = DMA2_Stream2;
+    hdma_usart1_rx.Init.Channel = DMA_CHANNEL_4;
+    hdma_usart1_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_usart1_rx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_usart1_rx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_usart1_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_usart1_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_usart1_rx.Init.Mode = DMA_CIRCULAR;
+    hdma_usart1_rx.Init.Priority = DMA_PRIORITY_VERY_HIGH;
+    hdma_usart1_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&hdma_usart1_rx) != HAL_OK)
+    {
+      Error_Handler();
+    }
 
-  LL_DMA_SetMemoryIncMode(DMA2, LL_DMA_STREAM_7, LL_DMA_MEMORY_INCREMENT);
+    __HAL_LINKDMA(uartHandle,hdmarx,hdma_usart1_rx);
 
-  LL_DMA_SetPeriphSize(DMA2, LL_DMA_STREAM_7, LL_DMA_PDATAALIGN_BYTE);
+    /* USART1 interrupt Init */
+    HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(USART1_IRQn);
+  /* USER CODE BEGIN USART1_MspInit 1 */
+    husart1_xwds_drvdata.halhdl = &husart1;
+    xwosal_splk_init(&husart1_xwds_drvdata.tx.splk);
+    xwosal_cdt_init(&husart1_xwds_drvdata.tx.cdt);
+    husart1_xwds_drvdata.tx.rc = -ECANCELED;
 
-  LL_DMA_SetMemorySize(DMA2, LL_DMA_STREAM_7, LL_DMA_MDATAALIGN_BYTE);
+  /* USER CODE END USART1_MspInit 1 */
+  }
+}
 
-  LL_DMA_DisableFifoMode(DMA2, LL_DMA_STREAM_7);
+void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
+{
 
-  /* USART1_RX Init */
-  LL_DMA_SetChannelSelection(DMA2, LL_DMA_STREAM_2, LL_DMA_CHANNEL_4);
+  if(uartHandle->Instance==USART1)
+  {
+  /* USER CODE BEGIN USART1_MspDeInit 0 */
+    xwosal_cdt_destroy(&husart1_xwds_drvdata.tx.cdt);
 
-  LL_DMA_SetDataTransferDirection(DMA2, LL_DMA_STREAM_2, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+  /* USER CODE END USART1_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_USART1_CLK_DISABLE();
 
-  LL_DMA_SetStreamPriorityLevel(DMA2, LL_DMA_STREAM_2, LL_DMA_PRIORITY_HIGH);
+    /**USART1 GPIO Configuration
+    PA9     ------> USART1_TX
+    PA10     ------> USART1_RX
+    */
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9|GPIO_PIN_10);
 
-  LL_DMA_SetMode(DMA2, LL_DMA_STREAM_2, LL_DMA_MODE_CIRCULAR);
+    /* USART1 DMA DeInit */
+    HAL_DMA_DeInit(uartHandle->hdmatx);
+    HAL_DMA_DeInit(uartHandle->hdmarx);
 
-  LL_DMA_SetPeriphIncMode(DMA2, LL_DMA_STREAM_2, LL_DMA_PERIPH_NOINCREMENT);
+    /* USART1 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(USART1_IRQn);
+  /* USER CODE BEGIN USART1_MspDeInit 1 */
 
-  LL_DMA_SetMemoryIncMode(DMA2, LL_DMA_STREAM_2, LL_DMA_MEMORY_INCREMENT);
-
-  LL_DMA_SetPeriphSize(DMA2, LL_DMA_STREAM_2, LL_DMA_PDATAALIGN_BYTE);
-
-  LL_DMA_SetMemorySize(DMA2, LL_DMA_STREAM_2, LL_DMA_MDATAALIGN_BYTE);
-
-  LL_DMA_DisableFifoMode(DMA2, LL_DMA_STREAM_2);
-
-  /* USART1 interrupt Init */
-  NVIC_SetPriority(USART1_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),0, 0));
-  NVIC_EnableIRQ(USART1_IRQn);
-
-  USART_InitStruct.BaudRate = 115200;
-  USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
-  USART_InitStruct.StopBits = LL_USART_STOPBITS_1;
-  USART_InitStruct.Parity = LL_USART_PARITY_NONE;
-  USART_InitStruct.TransferDirection = LL_USART_DIRECTION_TX_RX;
-  USART_InitStruct.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
-  USART_InitStruct.OverSampling = LL_USART_OVERSAMPLING_16;
-  LL_USART_Init(USART1, &USART_InitStruct);
-  LL_USART_ConfigAsyncMode(USART1);
-  LL_USART_Enable(USART1);
-
+  /* USER CODE END USART1_MspDeInit 1 */
+  }
 }
 
 /* USER CODE BEGIN 1 */
-void MX_USART1_UART_Deinit(void)
+void MX_USART1_UART_DeInit(void)
 {
-  LL_USART_Disable(USART1);
-  NVIC_DisableIRQ(USART1_IRQn);
-  LL_APB2_GRP1_DisableClock(LL_APB2_GRP1_PERIPH_USART1);
+  HAL_UART_DMAStop(&husart1);
+  HAL_UART_DeInit(&husart1);
 }
 
-void MX_USART1_UART_Setup_RXDMA(xwu8_t * mem, xwsz_t size)
+void MX_USART1_Timer_Init(void)
 {
-  LL_DMA_EnableIT_HT(DMA2, LL_DMA_STREAM_2);
-  LL_DMA_EnableIT_TE(DMA2, LL_DMA_STREAM_2);
-  LL_DMA_EnableIT_TC(DMA2, LL_DMA_STREAM_2);
-  LL_DMA_DisableDoubleBufferMode(DMA2, LL_DMA_STREAM_2);
-  LL_DMA_SetCurrentTargetMem(DMA2, LL_DMA_STREAM_2, LL_DMA_CURRENTTARGETMEM0);
-  LL_DMA_ConfigAddresses(DMA2, LL_DMA_STREAM_2,
-                         LL_USART_DMA_GetRegAddr(USART1),
-                         (uint32_t)mem,
-                         LL_DMA_GetDataTransferDirection(DMA2, LL_DMA_STREAM_2));
-  LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_2, size);
-  LL_USART_EnableDMAReq_RX(USART1);
+  MX_TIM9_Init();
 }
 
-void MX_USART1_UART_Setup_TXDMA(const xwu8_t * mem, xwsz_t size)
+void MX_USART1_Timer_DeInit(void)
 {
-  LL_DMA_EnableIT_TE(DMA2, LL_DMA_STREAM_7);
-  LL_DMA_EnableIT_TC(DMA2, LL_DMA_STREAM_7);
-  LL_DMA_DisableDoubleBufferMode(DMA2, LL_DMA_STREAM_7);
-  LL_DMA_SetCurrentTargetMem(DMA2, LL_DMA_STREAM_7, LL_DMA_CURRENTTARGETMEM0);
-  LL_DMA_ConfigAddresses(DMA2, LL_DMA_STREAM_7,
-                         (uint32_t)mem,
-                         LL_USART_DMA_GetRegAddr(USART1),
-                         LL_DMA_GetDataTransferDirection(DMA2, LL_DMA_STREAM_7));
-  LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_7, size);
-  LL_USART_EnableDMAReq_TX(USART1);
+  MX_TIM9_DeInit();
 }
 
-void MX_USART1_UART_Finish_TXDMA(void)
+void MX_USART1_Timer_Start(void)
 {
-  LL_USART_DisableDMAReq_TX(USART1);
+  MX_TIM9_Start();
 }
 
-void MX_USART1_UART_Putc(xwu8_t byte)
+void MX_USART1_Timer_Stop(void)
 {
-  while (!LL_USART_IsActiveFlag_TXE(USART1)) {
+  MX_TIM9_Stop();
+}
+
+void MX_USART1_Timer_Callback(void)
+{
+  stm32cube_usart1_cb_rxdma_timer(husart1_xwds_drvdata.dmauartc);
+}
+
+xwer_t MX_USART1_RXDMA_Start(xwu8_t * mem, xwsz_t size)
+{
+  xwer_t rc;
+  HAL_StatusTypeDef ret;
+
+  ret = HAL_UART_Receive_DMA(&husart1, (uint8_t *)mem, (uint16_t)size);
+  if (HAL_OK == ret) {
+    rc = OK;
+  } else {
+    rc = -EIO;
   }
-  LL_USART_TransmitData8(USART1, (uint8_t)byte);
+  return rc;
 }
 
-void MX_USART1_UART_Isr(void)
+void MX_USART1_RxHalfCpltCallback(UART_HandleTypeDef * huart)
 {
-  if (LL_USART_IsActiveFlag_PE(USART1)) {
-    LL_USART_ClearFlag_PE(USART1);
+  DMA_HandleTypeDef * hdma;
+
+  hdma = huart->hdmarx;
+  if (HAL_DMA_ERROR_NONE == hdma->ErrorCode) {
+    stm32cube_usart1_cb_rxdma_halfcplt(husart1_xwds_drvdata.dmauartc);
+  } else {
   }
-  if (LL_USART_IsActiveFlag_FE(USART1)) {
-    LL_USART_ClearFlag_FE(USART1);
+}
+
+void MX_USART1_RxCpltCallback(UART_HandleTypeDef * huart)
+{
+  DMA_HandleTypeDef * hdma;
+
+  hdma = huart->hdmarx;
+  if (HAL_DMA_ERROR_NONE == hdma->ErrorCode) {
+    stm32cube_usart1_cb_rxdma_cplt(husart1_xwds_drvdata.dmauartc);
+  } else {
   }
-  if (LL_USART_IsActiveFlag_NE(USART1)) {
-    LL_USART_ClearFlag_NE(USART1);
+}
+
+xwsq_t MX_USART1_RXDMA_GetCounter(void)
+{
+  xwsq_t cnt;
+
+  cnt = (xwsq_t)__HAL_DMA_GET_COUNTER(&hdma_usart1_rx);
+  return cnt;
+}
+
+xwer_t MX_USART1_TXDMA_Start(xwu8_t * mem, xwsz_t size)
+{
+  xwer_t rc;
+  HAL_StatusTypeDef ret;
+
+  ret = HAL_UART_Transmit_DMA(&husart1, (uint8_t *)mem, (uint16_t)size);
+  if (HAL_OK == ret) {
+    rc = OK;
+  } else {
+    rc = -EIO;
   }
-  if (LL_USART_IsActiveFlag_ORE(USART1)) {
-    LL_USART_ClearFlag_ORE(USART1);
+  return rc;
+}
+
+void MX_USART1_TxCpltCallback(UART_HandleTypeDef * huart)
+{
+  DMA_HandleTypeDef * hdma;
+  xwer_t rc;
+
+  hdma = huart->hdmatx;
+  if (HAL_DMA_ERROR_NONE == hdma->ErrorCode) {
+    rc = OK;
+  } else {
+    rc = -EIO;
+  }
+  stm32cube_usart1_cb_txdma_cplt(husart1_xwds_drvdata.dmauartc, rc);
+}
+
+xwer_t MX_USART1_Putc(xwu8_t byte)
+{
+  HAL_StatusTypeDef ret;
+  xwer_t rc;
+
+  ret = HAL_UART_Transmit(&husart1, &byte, 1, 10000);
+  if (HAL_OK == ret) {
+    rc = OK;
+  } else if (HAL_TIMEOUT == ret) {
+    rc = -ETIMEDOUT;
+  } else if (HAL_BUSY == ret) {
+    rc = -EBUSY;
+  } else {
+    rc = -EIO;
+  }
+  return rc;
+}
+
+void MX_USART1_ErrorCallback(UART_HandleTypeDef * huart)
+{
+  if (0 != (huart->ErrorCode & HAL_UART_ERROR_DMA)) {
+    huart->ErrorCode &= ~(HAL_UART_ERROR_DMA);
+    if (HAL_UART_STATE_READY == huart->RxState) {
+      stm32cube_usart1_cb_rxdma_restart(husart1_xwds_drvdata.dmauartc);
+    }
+  }
+  if (0 != (huart->ErrorCode & HAL_UART_ERROR_ORE)) {
+    huart->ErrorCode &= ~(HAL_UART_ERROR_ORE);
+    if (HAL_UART_STATE_READY == huart->RxState) {
+      stm32cube_usart1_cb_rxdma_restart(husart1_xwds_drvdata.dmauartc);
+    }
+  }
+  if (0 != (huart->ErrorCode & HAL_UART_ERROR_FE)) {
+    huart->ErrorCode &= ~(HAL_UART_ERROR_FE);
+  }
+  if (0 != (huart->ErrorCode & HAL_UART_ERROR_NE)) {
+    huart->ErrorCode &= ~(HAL_UART_ERROR_NE);
+  }
+  if (0 != (huart->ErrorCode & HAL_UART_ERROR_PE)) {
+    huart->ErrorCode &= ~(HAL_UART_ERROR_PE);
+  }
+}
+
+/* Redefine HAL weak callback */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef * huart)
+{
+  if (huart == &husart1) {
+    MX_USART1_RxCpltCallback(huart);
+  }
+}
+
+void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef * huart)
+{
+  if (huart == &husart1) {
+    MX_USART1_RxHalfCpltCallback(huart);
+  }
+}
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef * huart)
+{
+  if (huart == &husart1) {
+    MX_USART1_TxCpltCallback(huart);
+  }
+}
+
+void HAL_UART_ErrorCallback(UART_HandleTypeDef * huart)
+{
+  if (huart == &husart1) {
+    MX_USART1_ErrorCallback(huart);
   }
 }
 
