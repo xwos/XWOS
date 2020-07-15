@@ -35,13 +35,13 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern xwsz_t eram_mr_origin[];
-extern xwsz_t eram_mr_size[];
+extern xwsz_t sdram_mr_origin[];
+extern xwsz_t sdram_mr_size[];
 
 /**
  * @brief External SDRAM zone
  */
-struct xwmm_mempool * eram_mempool = (void *)eram_mr_origin;
+struct xwmm_mempool * sdram_mempool = (void *)sdram_mr_origin;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
@@ -79,11 +79,11 @@ void stm32cube_init(void)
         HAL_Init();
         SystemClock_Config();
 
-        rc = stm32cube_xwds_ll_init();
+        rc = stm32cube_xwds_ll_start();
         BDL_BUG_ON(rc < 0);
 
-        rc = xwmm_mempool_init(eram_mempool, "ERAM",
-                               (xwptr_t)eram_mr_origin,
-                               (xwsz_t)eram_mr_size);
+        rc = xwmm_mempool_init(sdram_mempool, "SDRAM",
+                               (xwptr_t)sdram_mr_origin,
+                               (xwsz_t)sdram_mr_size);
         BDL_BUG_ON(rc < 0);
 }

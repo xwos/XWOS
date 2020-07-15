@@ -397,7 +397,7 @@ xwer_t xwds_dmauartc_putc(struct xwds_dmauartc * dmauartc,
         const struct xwds_dmauartc_driver * drv;
 
         XWDS_VALIDATE(dmauartc, "nullptr", -EFAULT);
-        XWDS_VALIDATE(data, "nullptr", -EFAULT);
+        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_dmauartc_grab(dmauartc);
         if (__unlikely(rc < 0)) {

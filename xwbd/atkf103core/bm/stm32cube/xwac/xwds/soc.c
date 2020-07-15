@@ -263,7 +263,6 @@ xwer_t stm32cube_soc_drv_gpio_cfg(struct xwds_soc * soc,
         xwer_t rc;
 
         xwccfg = soc->xwccfg;
-
         llcfg = cfg;
         gpio = xwccfg->gpio.register_map[port];
         soc_cpuirq_save_lc(&cpuirq);
@@ -286,7 +285,7 @@ xwer_t stm32cube_soc_drv_gpio_set(struct xwds_soc * soc,
         xwreg_t cpuirq;
 
         xwccfg = soc->xwccfg;
-
+        pinmask = (pinmask << GPIO_PIN_MASK_POS) | GPIO_PIN_MASK_POS;
         gpio = xwccfg->gpio.register_map[port];
         soc_cpuirq_save_lc(&cpuirq);
         LL_GPIO_SetOutputPin(gpio, pinmask);
@@ -303,7 +302,7 @@ xwer_t stm32cube_soc_drv_gpio_reset(struct xwds_soc * soc,
         xwreg_t cpuirq;
 
         xwccfg = soc->xwccfg;
-
+        pinmask = (pinmask << GPIO_PIN_MASK_POS) | GPIO_PIN_MASK_POS;
         gpio = xwccfg->gpio.register_map[port];
         soc_cpuirq_save_lc(&cpuirq);
         LL_GPIO_ResetOutputPin(gpio, pinmask);
@@ -320,7 +319,7 @@ xwer_t stm32cube_soc_drv_gpio_toggle(struct xwds_soc * soc,
         xwreg_t cpuirq;
 
         xwccfg = soc->xwccfg;
-
+        pinmask = (pinmask << GPIO_PIN_MASK_POS) | GPIO_PIN_MASK_POS;
         gpio = xwccfg->gpio.register_map[port];
         soc_cpuirq_save_lc(&cpuirq);
         LL_GPIO_TogglePin(gpio, pinmask);
@@ -339,7 +338,6 @@ xwer_t stm32cube_soc_drv_gpio_output(struct xwds_soc * soc,
         xwu32_t regval;
 
         xwccfg = soc->xwccfg;
-
         gpio = xwccfg->gpio.register_map[port];
         out &= pinmask;
         soc_cpuirq_save_lc(&cpuirq);

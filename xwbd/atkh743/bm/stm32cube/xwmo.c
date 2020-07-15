@@ -21,19 +21,15 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <stdio.h>
-#include <stdlib.h>
 #include <bm/stm32cube/standard.h>
-#include <xwos/lib/string.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
+#include <xwmd/ds/soc/gpio.h>
 #include <xwmd/ds/uart/dma.h>
-#include "cubemx/override.h"
-#include "cubemx/Core/Inc/gpio.h"
-#include "cubemx/Core/Inc/main.h"
-#include "xwac/xwds/stm32cube.h"
-#include "xwmo.h"
+#include <bm/stm32cube/cubemx/override.h>
+#include <bm/stm32cube/xwac/xwds/stm32cube.h>
+#include <bm/stm32cube/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -44,6 +40,9 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define LED_TASK_PRIORITY \
         (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 1))
+
+#define UARTST_TASK_PRIORITY \
+        (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 2))
 
 #define MEMTST_TASK_PRIORITY \
         (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 3))
@@ -81,7 +80,7 @@ const struct xwosal_thrd_desc stm32cube_tbd[] = {
         },
         [1] = {
                 .name = "task.memtst",
-                .prio = MEMTST_TASK_PRIORITY,
+                .prio = UARTST_TASK_PRIORITY,
                 .stack = NULL,
                 .stack_size = 2048,
                 .func = memtst_task,
@@ -131,10 +130,31 @@ err_thrd_create:
         return rc;
 }
 
+xwer_t led_task(void * arg)
+{
+        xwtm_t xwtm;
+
+        XWOS_UNUSED(arg);
+
+        xwds_gpio_req(&stm32cube_soc_cb,
+                      XWDS_GPIO_PORT_B,
+                      XWDS_GPIO_PIN_0 | XWDS_GPIO_PIN_1);
+        while (!xwosal_cthrd_shld_stop()) {
+                if (xwosal_cthrd_shld_frz()) {
+                        xwosal_cthrd_freeze();
+                }
+                xwtm = 1 * XWTM_S;
+                xwosal_cthrd_sleep(&xwtm);
+                xwds_gpio_toggle(&stm32cube_soc_cb,
+                                 XWDS_GPIO_PORT_B,
+                                 XWDS_GPIO_PIN_0 | XWDS_GPIO_PIN_1);
+        }
+        return OK;
+}
+
 xwer_t uartst_task(void * arg)
 {
         xwtm_t xwtm;
-        xwer_t rc;
         xwu8_t buffer[8];
         xwsz_t size;
 
@@ -143,40 +163,15 @@ xwer_t uartst_task(void * arg)
                 if (xwosal_cthrd_shld_frz()) {
                         xwosal_cthrd_freeze();
                 }
-
-                memcpy(buffer, "octagram", sizeof(buffer));
-                xwtm = XWTM_MAX;
                 size = sizeof(buffer);
-                rc = xwds_dmauartc_tx(&stm32cube_usart1_cb,
-                                      buffer, size,
-                                      &xwtm);
-                size = sizeof(buffer);
-                xwtm = XWTM_MAX;
-                rc = xwds_dmauartc_rx(&stm32cube_usart1_cb, buffer, &size, &xwtm);
-                if (OK == rc) {
+                xwtm = 20 * XWTM_MS;
+                xwds_dmauartc_rx(&stm32cube_usart1_cb, buffer, &size, &xwtm);
+                if (size > 0) {
                         xwtm = XWTM_MAX;
-                        rc = xwds_dmauartc_tx(&stm32cube_usart1_cb,
-                                              buffer, size,
-                                              &xwtm);
+                        xwds_dmauartc_tx(&stm32cube_usart1_cb,
+                                         buffer, size,
+                                         &xwtm);
                 }
-        }
-        return OK;
-}
-
-xwer_t led_task(void * arg)
-{
-        xwtm_t xwtm;
-
-        XWOS_UNUSED(arg);
-
-        while (!xwosal_cthrd_shld_stop()) {
-                if (xwosal_cthrd_shld_frz()) {
-                        xwosal_cthrd_freeze();
-                }
-                xwtm = 1 * XWTM_S;
-                xwosal_cthrd_sleep(&xwtm);
-                HAL_GPIO_TogglePin(LED0_GPIO_Port, LED0_Pin);
-                HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
         }
         return OK;
 }

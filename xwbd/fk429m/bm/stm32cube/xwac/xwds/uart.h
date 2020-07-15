@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE XWDS 设备：DMA-UART
+ * @brief STM32CUBE XWDS 设备：UART
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_xwac_xwds_usart_h__
-#define __bm_stm32cube_xwac_xwds_usart_h__
+#ifndef __bm_stm32cube_xwac_xwds_uart_h__
+#define __bm_stm32cube_xwac_xwds_uart_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
@@ -51,4 +51,4 @@ void stm32cube_usart1_cb_rxdma_timer(struct xwds_dmauartc * dmauartc);
  ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
-#endif /* bm/stm32cube/xwac/xwds/usart.h */
+#endif /* bm/stm32cube/xwac/xwds/uart.h */

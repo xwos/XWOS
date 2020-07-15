@@ -49,7 +49,7 @@ XWMO_CSRCS += xwac/xwds/init.c
 XWMO_CSRCS += xwac/xwds/pm.c
 XWMO_CSRCS += xwac/xwds/stm32cube.c
 XWMO_CSRCS += xwac/xwds/soc.c
-XWMO_CSRCS += xwac/xwds/usart.c
+XWMO_CSRCS += xwac/xwds/uart.c
 
 # 定义编译选项
 XWMO_CFLAGS := -include standard.h

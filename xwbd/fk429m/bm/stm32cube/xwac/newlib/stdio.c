@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include "xwac/xwds/stm32cube.h"
+#include <bm/stm32cube/xwac/xwds/stm32cube.h>
 
 extern int errno;
 

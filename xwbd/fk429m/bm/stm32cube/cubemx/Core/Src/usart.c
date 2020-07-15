@@ -27,9 +27,8 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-#include <xwos/lib/string.h>
 #include "cubemx/Core/Inc/tim.h"
-#include "xwac/xwds/usart.h"
+#include "xwac/xwds/uart.h"
 
 struct HAL_UART_Xwds_driver_data husart1_xwds_drvdata;
 
@@ -289,15 +288,9 @@ void MX_USART1_ErrorCallback(UART_HandleTypeDef * huart)
 {
   if (0 != (huart->ErrorCode & HAL_UART_ERROR_DMA)) {
     huart->ErrorCode &= ~(HAL_UART_ERROR_DMA);
-    if (HAL_UART_STATE_READY == huart->RxState) {
-      stm32cube_usart1_cb_rxdma_restart(husart1_xwds_drvdata.dmauartc);
-    }
   }
   if (0 != (huart->ErrorCode & HAL_UART_ERROR_ORE)) {
     huart->ErrorCode &= ~(HAL_UART_ERROR_ORE);
-    if (HAL_UART_STATE_READY == huart->RxState) {
-      stm32cube_usart1_cb_rxdma_restart(husart1_xwds_drvdata.dmauartc);
-    }
   }
   if (0 != (huart->ErrorCode & HAL_UART_ERROR_FE)) {
     huart->ErrorCode &= ~(HAL_UART_ERROR_FE);
@@ -307,6 +300,9 @@ void MX_USART1_ErrorCallback(UART_HandleTypeDef * huart)
   }
   if (0 != (huart->ErrorCode & HAL_UART_ERROR_PE)) {
     huart->ErrorCode &= ~(HAL_UART_ERROR_PE);
+  }
+  if (HAL_UART_STATE_READY == huart->RxState) {
+    stm32cube_usart1_cb_rxdma_restart(husart1_xwds_drvdata.dmauartc);
   }
 }
 

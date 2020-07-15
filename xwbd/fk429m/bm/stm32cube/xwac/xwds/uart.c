@@ -29,7 +29,7 @@
 #include <bm/stm32cube/cubemx/Core/Inc/usart.h>
 #include <bm/stm32cube/xwac/xwds/stm32cube.h>
 #include <bm/stm32cube/xwac/xwds/soc.h>
-#include <bm/stm32cube/xwac/xwds/usart.h>
+#include <bm/stm32cube/xwac/xwds/uart.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -74,7 +74,7 @@ xwer_t stm32cube_usart1_drv_putc(struct xwds_dmauartc * dmauartc,
  ******** ******** ******** ******** ******** ******** ******** ********/
 const struct xwds_dmauartc_driver stm32cube_usart1_drv = {
         .base = {
-                .name = "stm32cube.dmauart.1",
+                .name = "stm32cube.usart.1",
                 .probe = NULL,
                 .remove = NULL,
                 .start = stm32cube_usart1_drv_start,
@@ -92,7 +92,7 @@ const struct xwds_dmauartc_driver stm32cube_usart1_drv = {
 struct xwds_dmauartc stm32cube_usart1_cb = {
         /* attributes */
         .dev = {
-                .name = "stm32cube.usart.dmauart",
+                .name = "stm32cube.usart.1",
                 .id = 1,
                 .resources = NULL,
                 .drv = xwds_static_cast(struct xwds_driver *, &stm32cube_usart1_drv),

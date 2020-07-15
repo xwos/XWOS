@@ -55,28 +55,38 @@ xwer_t stm32cube_xwds_soc_stop(void);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t stm32cube_xwds_ll_init(void)
+xwer_t stm32cube_xwds_ll_start(void)
 {
         xwer_t rc;
 
-        /* Init device stack */
         xwds_init(&stm32cube_ds);
 
-        /* Start SOC device */
         rc = stm32cube_xwds_soc_start();
         if (__unlikely(rc < 0)) {
                 goto err_soc_start;
         }
+
+        rc = stm32cube_xwds_uart_start();
+        if (rc < 0) {
+                goto err_xwds_uart_start;
+        }
         return OK;
 
+err_xwds_uart_start:
+        BDL_BUG();
 err_soc_start:
         BDL_BUG();
         return rc;
 }
 
-xwer_t stm32cube_xwds_ll_deinit(void)
+xwer_t stm32cube_xwds_ll_stop(void)
 {
         xwer_t rc;
+
+        rc = stm32cube_xwds_uart_stop();
+        if (rc < 0) {
+                goto err_xwds_uart_stop;
+        }
 
         rc = stm32cube_xwds_soc_stop();
         if (__unlikely(rc < 0)) {
@@ -84,6 +94,8 @@ xwer_t stm32cube_xwds_ll_deinit(void)
         }
         return OK;
 
+err_xwds_uart_stop:
+        BDL_BUG();
 err_soc_stop:
         BDL_BUG();
         return rc;

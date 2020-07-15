@@ -25,7 +25,7 @@ MEMORY {
         isramb2_mr (rwx): org = 0x2001C000, len = 16k /* internal SRAM bank2 */
         ccmram_mr (rw): org = 0x10000000, len = 64k /* CCM SRAM */
         bkram_mr (rw): org = 0x40024000, len = 4k /* BACKUP SRAM */
-        eram_mr (rw): org = 0xD0000000, len = 16M /* external RAM */
+        sdram_mr (rw): org = 0xD0000000, len = 16M /* external RAM */
 
 	vctbl_lmr (rx): org = 0x08000000, len = 2048 /* vectors table lma region */
 	vctbl_vmr (rw): org = 0x08000000, len = 2048 /* vectors table vma region */
@@ -55,7 +55,7 @@ stkmempool_mr_size = LENGTH(stkmempool_mr);
 ccmheap_mr_origin = ORIGIN(ccmheap_mr);
 ccmheap_mr_size = LENGTH(ccmheap_mr);
 
-eram_mr_origin = ORIGIN(eram_mr);
-eram_mr_size = LENGTH(eram_mr);
+sdram_mr_origin = ORIGIN(sdram_mr);
+sdram_mr_size = LENGTH(sdram_mr);
 
 INCLUDE soc.lds

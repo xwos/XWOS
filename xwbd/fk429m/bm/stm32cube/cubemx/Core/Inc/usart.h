@@ -40,7 +40,7 @@
 
 /* USER CODE END Includes */
 
-extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef husart1;
 
 /* USER CODE BEGIN Private defines */
 struct HAL_UART_Xwds_driver_data {

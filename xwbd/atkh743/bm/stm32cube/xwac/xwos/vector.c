@@ -27,8 +27,8 @@
 #include <soc_sched.h>
 #include <soc_syshwt.h>
 #include "stm32h743xx.h"
-#include "cubemx/Core/Inc/stm32h7xx_it.h"
-#include "cubemx/Core/Inc/main.h"
+#include <bm/stm32cube/cubemx/Core/Inc/stm32h7xx_it.h>
+#include <bm/stm32cube/cubemx/Core/Inc/main.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********

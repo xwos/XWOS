@@ -187,7 +187,7 @@ void MX_USART1_UART_DeInit(void)
 
 void MX_USART1_Timer_Init(void)
 {
-  HAL_UART_ReceiverTimeout_Config(&husart1, 30000);
+  HAL_UART_ReceiverTimeout_Config(&husart1, 20000);
   HAL_UART_EnableReceiverTimeout(&husart1);
 }
 

@@ -21,6 +21,6 @@
 #include <xwos/standard.h>
 #include <xwos/mm/mempool/allocator.h>
 
-extern xwsz_t eram_mr_origin[];
+extern xwsz_t sdram_mr_origin[];
 
-struct xwmm_mempool * newlibac_mempool = (void *)eram_mr_origin;
+struct xwmm_mempool * newlibac_mempool = (void *)sdram_mr_origin;
