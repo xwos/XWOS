@@ -171,22 +171,22 @@ void MX_USART1_UART_DeInit(void)
 
 void MX_USART1_Timer_Init(void)
 {
-  MX_TIM9_Init();
+  MX_TIM7_Init();
 }
 
 void MX_USART1_Timer_DeInit(void)
 {
-  MX_TIM9_DeInit();
+  MX_TIM7_DeInit();
 }
 
 void MX_USART1_Timer_Start(void)
 {
-  MX_TIM9_Start();
+  MX_TIM7_Start();
 }
 
 void MX_USART1_Timer_Stop(void)
 {
-  MX_TIM9_Stop();
+  MX_TIM7_Stop();
 }
 
 void MX_USART1_Timer_Callback(void)

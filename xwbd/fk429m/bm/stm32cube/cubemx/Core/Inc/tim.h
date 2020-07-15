@@ -36,18 +36,18 @@
 
 /* USER CODE END Includes */
 
-extern TIM_HandleTypeDef htim9;
+extern TIM_HandleTypeDef htim7;
 
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
 
-void MX_TIM9_Init(void);
+void MX_TIM7_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void MX_TIM9_DeInit(void);
-void MX_TIM9_Start(void);
-void MX_TIM9_Stop(void);
+void MX_TIM7_DeInit(void);
+void MX_TIM7_Start(void);
+void MX_TIM7_Stop(void);
 
 /* USER CODE END Prototypes */
 

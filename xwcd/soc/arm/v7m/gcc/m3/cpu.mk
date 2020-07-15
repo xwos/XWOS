@@ -19,10 +19,10 @@
 #
 
 CPU_INCDIRS :=
-CPU_CFLAGS := -mcpu=cortex-m3
-CPU_CXXFLAGS := -mcpu=cortex-m3
-CPU_AFLAGS := -mcpu=cortex-m3
-CPU_LDFLAGS := -mcpu=cortex-m3 -specs=nano.specs
+CPU_CFLAGS := -mcpu=cortex-m3 -mfloat-abi=soft
+CPU_CXXFLAGS := -mcpu=cortex-m3 -mfloat-abi=soft
+CPU_AFLAGS := -mcpu=cortex-m3 -mfloat-abi=soft
+CPU_LDFLAGS := -mcpu=cortex-m3 -mfloat-abi=soft -specs=nano.specs
 CPU_EOBJS :=
 
 CPU_CSRCS := cpu_init.c

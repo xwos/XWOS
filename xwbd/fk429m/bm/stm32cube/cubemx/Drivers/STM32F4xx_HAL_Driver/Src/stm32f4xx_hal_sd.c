@@ -1633,7 +1633,7 @@ void HAL_SD_IRQHandler(SD_HandleTypeDef *hsd)
 #endif /* USE_HAL_SD_REGISTER_CALLBACKS */
         }
       }
-      if(((context & SD_CONTEXT_WRITE_SINGLE_BLOCK) != 0U) && ((context & SD_CONTEXT_WRITE_MULTIPLE_BLOCK) != 0U))
+      if(((context & SD_CONTEXT_READ_SINGLE_BLOCK) == 0U) && ((context & SD_CONTEXT_READ_MULTIPLE_BLOCK) == 0U))
       {
         /* Disable the DMA transfer for transmit request by setting the DMAEN bit
         in the SD DCTRL register */

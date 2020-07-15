@@ -80,7 +80,7 @@ const struct xwosal_thrd_desc stm32cube_tbd[] = {
         },
         [1] = {
                 .name = "task.memtst",
-                .prio = UARTST_TASK_PRIORITY,
+                .prio = MEMTST_TASK_PRIORITY,
                 .stack = NULL,
                 .stack_size = 2048,
                 .func = memtst_task,
@@ -89,7 +89,7 @@ const struct xwosal_thrd_desc stm32cube_tbd[] = {
         },
         [2] = {
                 .name = "task.uartst",
-                .prio = MEMTST_TASK_PRIORITY,
+                .prio = UARTST_TASK_PRIORITY,
                 .stack = NULL,
                 .stack_size = 2048,
                 .func = uartst_task,
