@@ -4,19 +4,21 @@
   * Description        : This file provides code for the configuration
   *                      of the I2C instances.
   ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * <h2><center>&copy; Copyright (c) 2020
-  * 隐星魂 (Roy.Sun) https://xwos.tech
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * @author
+  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
+  * @copyright
+  * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
+  * > Licensed under the Apache License, Version 2.0 (the "License");
+  * > you may not use this file except in compliance with the License.
+  * > You may obtain a copy of the License at
+  * >
+  * >         http://www.apache.org/licenses/LICENSE-2.0
+  * >
+  * > Unless required by applicable law or agreed to in writing, software
+  * > distributed under the License is distributed on an "AS IS" BASIS,
+  * > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * > See the License for the specific language governing permissions and
+  * > limitations under the License.
   *
   ******************************************************************************
   */
@@ -49,13 +51,13 @@ void MX_I2C2_Init(void)
   {
     Error_Handler();
   }
-  /** Configure Analogue filter 
+  /** Configure Analogue filter
   */
   if (HAL_I2CEx_ConfigAnalogFilter(&hi2c2, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
   {
     Error_Handler();
   }
-  /** Configure Digital filter 
+  /** Configure Digital filter
   */
   if (HAL_I2CEx_ConfigDigitalFilter(&hi2c2, 0) != HAL_OK)
   {
@@ -73,11 +75,11 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
   /* USER CODE BEGIN I2C2_MspInit 0 */
 
   /* USER CODE END I2C2_MspInit 0 */
-  
+
     __HAL_RCC_GPIOH_CLK_ENABLE();
-    /**I2C2 GPIO Configuration    
+    /**I2C2 GPIO Configuration
     PH4     ------> I2C2_SCL
-    PH5     ------> I2C2_SDA 
+    PH5     ------> I2C2_SDA
     */
     GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_5;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
@@ -88,7 +90,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
 
     /* I2C2 clock enable */
     __HAL_RCC_I2C2_CLK_ENABLE();
-  
+
     /* I2C2 DMA Init */
     /* I2C2_RX Init */
     hdma_i2c2_rx.Instance = DMA1_Stream2;
@@ -147,10 +149,10 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
   /* USER CODE END I2C2_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_I2C2_CLK_DISABLE();
-  
-    /**I2C2 GPIO Configuration    
+
+    /**I2C2 GPIO Configuration
     PH4     ------> I2C2_SCL
-    PH5     ------> I2C2_SDA 
+    PH5     ------> I2C2_SDA
     */
     HAL_GPIO_DeInit(GPIOH, GPIO_PIN_4|GPIO_PIN_5);
 
@@ -165,7 +167,7 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
 
   /* USER CODE END I2C2_MspDeInit 1 */
   }
-} 
+}
 
 /* USER CODE BEGIN 1 */
 

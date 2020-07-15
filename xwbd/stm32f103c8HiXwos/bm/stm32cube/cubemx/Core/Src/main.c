@@ -4,15 +4,21 @@
   * @file           : main.c
   * @brief          : Main program body
   ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * @author
+  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
+  * @copyright
+  * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
+  * > Licensed under the Apache License, Version 2.0 (the "License");
+  * > you may not use this file except in compliance with the License.
+  * > You may obtain a copy of the License at
+  * >
+  * >         http://www.apache.org/licenses/LICENSE-2.0
+  * >
+  * > Unless required by applicable law or agreed to in writing, software
+  * > distributed under the License is distributed on an "AS IS" BASIS,
+  * > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * > See the License for the specific language governing permissions and
+  * > limitations under the License.
   *
   ******************************************************************************
   */
@@ -112,7 +118,7 @@ void SystemClock_Config(void)
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
@@ -125,7 +131,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
@@ -165,7 +171,7 @@ void Error_Handler(void)
   * @retval None
   */
 void assert_failed(uint8_t *file, uint32_t line)
-{ 
+{
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
