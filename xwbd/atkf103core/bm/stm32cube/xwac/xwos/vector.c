@@ -110,7 +110,7 @@ __soc_isr_table_qualifier struct soc_isr_table soc_isr_table __xwos_vctbl = {
                 [TIM8_CC_IRQn] = arch_isr_nop,
                 [ADC3_IRQn] = arch_isr_nop,
                 [FSMC_IRQn] = arch_isr_nop,
-                [SDIO_IRQn] = arch_isr_nop,
+                [SDIO_IRQn] = SDIO_IRQHandler,
                 [TIM5_IRQn] = arch_isr_nop,
                 [SPI3_IRQn] = arch_isr_nop,
                 [UART4_IRQn] = arch_isr_nop,
@@ -120,7 +120,7 @@ __soc_isr_table_qualifier struct soc_isr_table soc_isr_table __xwos_vctbl = {
                 [DMA2_Channel1_IRQn] = arch_isr_nop,
                 [DMA2_Channel2_IRQn] = arch_isr_nop,
                 [DMA2_Channel3_IRQn] = arch_isr_nop,
-                [DMA2_Channel4_5_IRQn] = arch_isr_nop,
+                [DMA2_Channel4_5_IRQn] = DMA2_Channel4_5_IRQHandler,
                 [60 ... (SOCCFG_IRQ_NUM - 1)] = arch_isr_nop,
         },
 };

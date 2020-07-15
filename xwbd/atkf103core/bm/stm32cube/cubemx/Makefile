@@ -68,7 +68,10 @@ Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c \
-Core/Src/system_stm32f1xx.c
+Core/Src/system_stm32f1xx.c \
+Core/Src/sdio.c \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_ll_sdmmc.c \
+Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_sd.c
 
 # ASM sources
 ASM_SOURCES =  \

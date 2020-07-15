@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : dma.c
+  * File Name          : SDIO.h
   * Description        : This file provides code for the configuration
-  *                      of all the requested memory to memory DMA transfers.
+  *                      of the SDIO instances.
   ******************************************************************************
   * @author
   * + 隐星魂 (Roy.Sun) <https://xwos.tech>
@@ -22,51 +22,46 @@
   *
   ******************************************************************************
   */
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __sdio_H
+#define __sdio_H
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "dma.h"
+#include "main.h"
 
-/* USER CODE BEGIN 0 */
+/* USER CODE BEGIN Includes */
 
-/* USER CODE END 0 */
+/* USER CODE END Includes */
 
-/*----------------------------------------------------------------------------*/
-/* Configure DMA                                                              */
-/*----------------------------------------------------------------------------*/
+extern SD_HandleTypeDef hsd;
 
-/* USER CODE BEGIN 1 */
+/* USER CODE BEGIN Private defines */
+#define MX_SD_SECTOR_SIZE 512U
 
-/* USER CODE END 1 */
+/* USER CODE END Private defines */
 
-/**
-  * Enable DMA controller clock
-  */
-void MX_DMA_Init(void)
-{
+void MX_SDIO_SD_Init(void);
 
-  /* DMA controller clock enable */
-  __HAL_RCC_DMA1_CLK_ENABLE();
-  __HAL_RCC_DMA2_CLK_ENABLE();
+/* USER CODE BEGIN Prototypes */
+void MX_SDIO_SD_Construct(void);
+void MX_SDIO_SD_Destruct(void);
+void MX_SDIO_SD_Deinit(void);
+xwer_t MX_SDIO_SD_TrimClk(xwsq_t cnt);
+xwer_t MX_SDIO_SD_GetState(void);
+xwer_t MX_SDIO_SD_Read(uint8_t * data, uint32_t blkaddr,
+                       uint32_t nrblk);
+xwer_t MX_SDIO_SD_Write(uint8_t * data, uint32_t blkaddr,
+                        uint32_t nrblk);
 
-  /* DMA interrupt init */
-  /* DMA1_Channel4_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 2, 1);
-  HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
-  /* DMA1_Channel5_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 2, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
-  /* DMA2_Channel4_5_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Channel4_5_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA2_Channel4_5_IRQn);
+/* USER CODE END Prototypes */
 
+#ifdef __cplusplus
 }
-
-/* USER CODE BEGIN 2 */
-void MX_DMA_DeInit(void)
-{
-}
-
-/* USER CODE END 2 */
+#endif
+#endif /*__ sdio_H */
 
 /**
   * @}

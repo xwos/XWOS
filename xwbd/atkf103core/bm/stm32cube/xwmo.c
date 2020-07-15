@@ -28,6 +28,7 @@
 #include <xwmd/ds/soc/gpio.h>
 #include <xwmd/ds/uart/dma.h>
 #include <bm/stm32cube/cubemx/override.h>
+#include <bm/stm32cube/cubemx/Core/Inc/sdio.h>
 #include <bm/stm32cube/xwac/xwds/stm32cube.h>
 #include <bm/stm32cube/xwmo.h>
 
@@ -44,6 +45,9 @@
 #define UARTST_TASK_PRIORITY \
         (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 2))
 
+#define SDTST_TASK_PRIORITY \
+        (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 2))
+
 #define MEMTST_TASK_PRIORITY \
         (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 3))
 
@@ -53,6 +57,8 @@
 xwer_t led_task(void * arg);
 
 xwer_t uartst_task(void * arg);
+
+xwer_t sdtst_task(void * arg);
 
 xwer_t memtst_task(void * arg);
 
@@ -80,7 +86,7 @@ const struct xwosal_thrd_desc stm32cube_tbd[] = {
         },
         [1] = {
                 .name = "task.memtst",
-                .prio = UARTST_TASK_PRIORITY,
+                .prio = MEMTST_TASK_PRIORITY,
                 .stack = NULL,
                 .stack_size = 2048,
                 .func = memtst_task,
@@ -89,10 +95,19 @@ const struct xwosal_thrd_desc stm32cube_tbd[] = {
         },
         [2] = {
                 .name = "task.uartst",
-                .prio = MEMTST_TASK_PRIORITY,
+                .prio = UARTST_TASK_PRIORITY,
                 .stack = NULL,
                 .stack_size = 2048,
                 .func = uartst_task,
+                .arg = NULL,
+                .attr = XWSDOBJ_ATTR_PRIVILEGED,
+        },
+        [3] = {
+                .name = "task.sdtst",
+                .prio = SDTST_TASK_PRIORITY,
+                .stack = NULL,
+                .stack_size = 4096,
+                .func = sdtst_task,
                 .arg = NULL,
                 .attr = XWSDOBJ_ATTR_PRIVILEGED,
         },
@@ -178,6 +193,33 @@ xwer_t uartst_task(void * arg)
                 }
         }
         return OK;
+}
+
+xwer_t sdtst_task(void * arg)
+{
+        xwtm_t xwtm;
+        xwer_t rc;
+
+        XWOS_UNUSED(arg);
+        MX_SDIO_SD_Construct();
+        MX_SDIO_SD_Init();
+        rc = MX_SDIO_SD_TrimClk(10);
+        if (rc < 0) {
+                goto err_sd;
+        }
+
+        while (!xwosal_cthrd_shld_stop()) {
+                if (xwosal_cthrd_shld_frz()) {
+                        xwosal_cthrd_freeze();
+                }
+                xwtm = 8 * XWTM_S;
+                xwosal_cthrd_sleep(&xwtm);
+        }
+        return OK;
+
+err_sd:
+        BDL_BUG();
+        return rc;
 }
 
 xwer_t memtst_task(void * arg)
