@@ -80,6 +80,9 @@ void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 2 */
+void MX_GPIO_DeInit(void)
+{
+}
 
 /* USER CODE END 2 */
 

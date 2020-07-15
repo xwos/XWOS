@@ -27,7 +27,7 @@
 #include <xwos/osal/sync/semaphore.h>
 #include <bm/stm32cube/cubemx/override.h>
 #include <bm/stm32cube/xwmo.h>
-#include "cubemx/Core/Inc/main.h"
+#include <bm/stm32cube/cubemx/Core/Inc/main.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********

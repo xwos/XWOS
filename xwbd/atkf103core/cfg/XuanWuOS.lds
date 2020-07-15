@@ -32,6 +32,7 @@ data_mr_origin = DEFINED(data_origin)? data_origin : ocram_mr_origin;
 MEMORY {
         flash_mr (rx): org = flash_mr_origin, len = flash_mr_size
         ocram_mr (rwx): org = ocram_mr_origin, len = ocram_mr_size
+        sram_mr (rw): org = 0x68000000, len = 1M
 
         /* 中断向量表的加载地址(LMA)区域 */
         vctbl_lmr (rx):
@@ -63,5 +64,8 @@ MEMORY {
                 org = ORIGIN(rwx_mr) + LENGTH(rwx_mr),
                 len = ocram_mr_size - LENGTH(rwx_mr)
 }
+
+sram_mr_origin = ORIGIN(sram_mr);
+sram_mr_size = LENGTH(sram_mr);
 
 INCLUDE soc.lds

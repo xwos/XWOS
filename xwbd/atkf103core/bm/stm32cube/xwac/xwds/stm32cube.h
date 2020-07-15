@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Board Module: STM32CUBE
+ * @brief STM32CUBE：设备栈
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,29 +18,27 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_xwmo_h__
-#define __bm_stm32cube_xwmo_h__
+#ifndef __bm_stm32cube_xwac_xwds_stm32cube_h__
+#define __bm_stm32cube_xwac_xwds_stm32cube_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+#include <bm/stm32cube/standard.h>
+#include <xwmd/ds/device.h>
+#include <xwmd/ds/soc/chip.h>
+#include <xwmd/ds/uart/dma.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/******** ******** ds ******** ********/
+extern struct xwds stm32cube_ds;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t bm_stm32cube_start(void);
+/******** ******** soc ******** ********/
+extern struct xwds_soc stm32cube_soc_cb;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+/******** ******** uart ******** ********/
+extern struct xwds_dmauartc stm32cube_usart1_cb;
 
-#endif /* bm/stm32cube/xwmo.h */
+#endif /* bm/stm32cube/xwac/xwds/stm32cube.h */

@@ -34,22 +34,22 @@
 
 /******** ******** SOC ******** ********/
 #define XWMDCFG_ds_SOC                                          1
-#define XWMDCFG_ds_SOC_CLK                                      1
-#define XWMDCFG_ds_SOC_PWR                                      1
+#define XWMDCFG_ds_SOC_CLK                                      0
+#define XWMDCFG_ds_SOC_PWR                                      0
 #define XWMDCFG_ds_SOC_GPIO                                     1
-#define XWMDCFG_ds_SOC_EIRQ                                     1
-#define XWMDCFG_ds_SOC_EIRQ_ROISRT                              0
-#define XWMDCFG_ds_SOC_DMA                                      1
+#define XWMDCFG_ds_SOC_EIRQ                                     0
+#define XWMDCFG_ds_SOC_EIRQ_ROISRT                              1
+#define XWMDCFG_ds_SOC_DMA                                      0
 #define XWMDCFG_ds_SOC_DMA_ROCBT                                1
-#define XWMDCFG_ds_ERAM                                         0
+#define XWMDCFG_ds_SOC_ERAM                                     1
 
 /******** ******** UART ******** ********/
 #define XWMDCFG_ds_UART                                         1
-#define XWMDCFG_ds_UART_GNR                                     1
+#define XWMDCFG_ds_UART_GNR                                     0
 #define XWMDCFG_ds_UART_GNR_TXQ_SIZE                            (256U)
 #define XWMDCFG_ds_UART_GNR_RXQ_SIZE                            (256U)
-#define XWMDCFG_ds_UART_DMA                                     0
-#define XWMDCFG_ds_UART_DMA_RXQ_SIZE                            (256U)
+#define XWMDCFG_ds_UART_DMA                                     1
+#define XWMDCFG_ds_UART_DMA_RXQ_SIZE                            (128U)
 
 /******** ******** I2C device ******** ********/
 #define XWMDCFG_ds_I2C_MASTER                                   1
@@ -64,7 +64,7 @@
 #define XWMDCFG_ds_LINID                                        1
 
 /******** ******** CAN Bus ******** ********/
-#define XWMDCFG_ds_CAN                                          1
+#define XWMDCFG_ds_CAN                                          0
 #define XWMDCFG_ds_CAN_CONTROLLER                               1
 #define XWMDCFG_ds_CAN_CONTROLLER_ROCBT                         0
 #define XWMDCFG_ds_CAN_CONTROLLER_SDU_MAXSIZE                   8U

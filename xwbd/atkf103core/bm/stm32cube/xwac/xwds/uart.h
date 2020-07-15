@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Board Module: STM32CUBE
+ * @brief STM32CUBE XWDS 设备：UART
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,16 +18,20 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_xwmo_h__
-#define __bm_stm32cube_xwmo_h__
+#ifndef __bm_stm32cube_xwac_xwds_uart_h__
+#define __bm_stm32cube_xwac_xwds_uart_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <bm/stm32cube/standard.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -37,10 +41,14 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t bm_stm32cube_start(void);
+void stm32cube_usart1_cb_txdma_cplt(struct xwds_dmauartc * dmauartc, xwer_t dmarc);
+void stm32cube_usart1_cb_rxdma_restart(struct xwds_dmauartc * dmauartc);
+void stm32cube_usart1_cb_rxdma_halfcplt(struct xwds_dmauartc * dmauartc);
+void stm32cube_usart1_cb_rxdma_cplt(struct xwds_dmauartc * dmauartc);
+void stm32cube_usart1_cb_rxdma_timer(struct xwds_dmauartc * dmauartc);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
-#endif /* bm/stm32cube/xwmo.h */
+#endif /* bm/stm32cube/xwac/xwds/uart.h */

@@ -21,27 +21,27 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/mm/mempool/allocator.h>
 #include <bm/stm32cube/standard.h>
+#include <xwos/mm/mempool/allocator.h>
+#include <bm/stm32cube/cubemx/Core/Inc/main.h>
+#include <bm/stm32cube/xwac/xwds/init.h>
+#include <bm/stm32cube/xwac/xwds/stm32cube.h>
 #include <bm/stm32cube/init.h>
-#include "cubemx/Core/Inc/gpio.h"
-#include "cubemx/Core/Inc/fsmc.h"
-#include "cubemx/Core/Inc/main.h"
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      macros       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define SRAM_ORIGIN     0x68000000UL
-#define SRAM_SIZE       0x100000UL
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+extern xwu8_t sram_mr_origin[];
+extern xwu8_t sram_mr_size[];
 
 /**
  * @brief External SRAM
  */
-struct xwmm_mempool * sram_mempool = (void *)SRAM_ORIGIN;
+struct xwmm_mempool * sram_mempool = (void *)sram_mr_origin;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
@@ -79,11 +79,11 @@ void stm32cube_init(void)
         HAL_Init();
         SystemClock_Config();
 
-        MX_GPIO_Init();
-        MX_FSMC_Init();
+        rc = stm32cube_xwds_ll_start();
+        BDL_BUG_ON(rc < 0);
 
         rc = xwmm_mempool_init(sram_mempool, "SRAM",
-                               (xwptr_t)SRAM_ORIGIN,
-                               (xwsz_t)SRAM_SIZE);
+                               (xwptr_t)sram_mr_origin,
+                               (xwsz_t)sram_mr_size);
         BDL_BUG_ON(rc < 0);
 }

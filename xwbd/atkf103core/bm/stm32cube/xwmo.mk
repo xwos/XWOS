@@ -39,6 +39,10 @@ XWMO_CSRCS += xwmo.c
 XWMO_CSRCS += xwac/xwlib/crc32.c
 XWMO_CSRCS += xwac/xwos/hook.c
 XWMO_CSRCS += xwac/xwos/vector.c
+XWMO_CSRCS += xwac/xwds/stm32cube.c
+XWMO_CSRCS += xwac/xwds/init.c
+XWMO_CSRCS += xwac/xwds/soc.c
+XWMO_CSRCS += xwac/xwds/uart.c
 
 
 # 定义编译选项
