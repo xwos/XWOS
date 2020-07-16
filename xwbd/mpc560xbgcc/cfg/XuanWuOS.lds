@@ -23,11 +23,11 @@ MEMORY {
         sram_mr (rwx):                  org = 0x40000000, len = 0x00010000
 
         rcw_mr (rx):                    org = 0x00000000, len = 0x00000008
-        rx_mr (rx):                     org = 0x00010000, len = 0x00070000
+        code_mr (rx):                   org = 0x00010000, len = 0x00070000
         stdby_wkup_mr (rwx):            org = 0x40000000, len = 0x00000080
-        bkup_mr (rwx):                  org = 0x40000080, len = 0x00000080
-        rwx_mr (rwx):                   org = 0x40000100, len = 0x0000F300
-        xwos_stk_mr (rwx):              org = 0x4000F400, len = 0x00000C00
+        bkup_mr (rw):                   org = 0x40000080, len = 0x00000080
+        data_mr (rw):                   org = 0x40000100, len = 0x0000F300
+        xwos_stk_mr (rw):               org = 0x4000F400, len = 0x00000C00
 }
 
 INCLUDE soc.lds

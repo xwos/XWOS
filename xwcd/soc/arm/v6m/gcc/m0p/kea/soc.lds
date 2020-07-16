@@ -65,26 +65,26 @@ SECTIONS {
                 *(.vfp11_veneer)
                 *(.v4_bx)
                 *(.rodata .rodata.* .gnu.linkonce.r.*)
-        } > rx_mr
+        } > code_mr
 
         .preinit_array : ALIGN(8) {
                 KEEP (*(.preinit_array*))
                 preinit_array_vma_end = .;
-         } > rx_mr
+         } > code_mr
         preinit_array_vma_base = ADDR(.preinit_array);
         preinit_array_lma_base = LOADADDR(.preinit_array);
 
         .init_array : ALIGN(8) {
                 KEEP (*(.init_array*))
                 init_array_vma_end = .;
-        } > rx_mr
+        } > code_mr
         init_array_vma_base = ADDR(.init_array);
         init_array_lma_base = LOADADDR(.init_array);
 
         .fini_array : ALIGN(8) {
                 KEEP (*(.fini_array*))
                 fini_array_vma_end = .;
-        } > rx_mr
+        } > code_mr
         fini_array_vma_base = ADDR(.fini_array);
         fini_array_lma_base = LOADADDR(.fini_array);
 
@@ -146,32 +146,32 @@ SECTIONS {
 
         .ARM.extab : {  /* @ref ehabi.pdf for details */
                 *(.ARM.extab* .gnu.linkonce.armextab.*)
-        } > rx_mr
+        } > code_mr
 
         .ARM.exidx : {  /* @ref ehabi.pdf for details */
                 PROVIDE(__exidx_start = .);
                 *(.ARM.exidx* .gnu.linkonce.armexidx.*)
                 PROVIDE(__exidx_end = .);
-        } > rx_mr
+        } > code_mr
 
         .xwos.data : ALIGN(8) {
                 *(.xwos.data)
                 xwos_data_vma_end = .;
-        } > rwx_mr AT> rx_mr
+        } > data_mr AT> code_mr
         xwos_data_vma_base = ADDR(.xwos.data);
         xwos_data_lma_base = LOADADDR(.xwos.data);
 
         .xwmd.data : ALIGN(8) {
                 *(.xwmd.data)
                 xwmd_data_vma_end = .;
-        } > rwx_mr AT> rx_mr
+        } > data_mr AT> code_mr
         xwmd_data_vma_base = ADDR(.xwmd.data);
         xwmd_data_lma_base = LOADADDR(.xwmd.data);
 
         .data : ALIGN(8) {
                 *(.data .data.* .gnu.linkonce.d.*)
                 data_vma_end = .;
-        } > rwx_mr AT> rx_mr
+        } > data_mr AT> code_mr
         data_vma_base = ADDR(.data);
         data_lma_base = LOADADDR(.data);
 
@@ -180,7 +180,7 @@ SECTIONS {
                 *(.bss .bss.* .gnu.linkonce.b.*)
                 *(COMMON)
                 bss_vma_end = .;
-        } > rwx_mr
+        } > data_mr
         bss_vma_base = ADDR(.bss);
 
         .heap : ALIGN(8) {
@@ -194,19 +194,19 @@ SECTIONS {
         .image.tail : ALIGN(32) {
                 KEEP(*(.image.tail))
                 image_tail_vma_end = .;
-        } > xwos_stk_mr AT> rx_mr
+        } > xwos_stk_mr AT> code_mr
         image_tail_vma_base = ADDR(.image.tail);
         image_tail_size = image_tail_vma_end - image_tail_vma_base;
         image_tail_lma_base = LOADADDR(.image.tail);
         image_tail_lma_end = image_tail_lma_base + image_tail_size;
 }
 
-rwx_mr_origin = ORIGIN(rwx_mr);
-rwx_mr_size = LENGTH(rwx_mr);
+data_mr_origin = ORIGIN(data_mr);
+data_mr_size = LENGTH(data_mr);
 
-xwmm_dkma_mmz_origin = rwx_mr_origin;
-xwmm_dkma_mmz_size = rwx_mr_size;
-xwmm_dkma_mmz_pos = bss_vma_end - rwx_mr_origin;
+xwmm_dkma_mmz_origin = data_mr_origin;
+xwmm_dkma_mmz_size = data_mr_size;
+xwmm_dkma_mmz_pos = bss_vma_end - data_mr_origin;
 
 xwos_stk_mr_origin = ORIGIN(xwos_stk_mr);
 xwos_stk_mr_size = LENGTH(xwos_stk_mr);

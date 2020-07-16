@@ -30,21 +30,21 @@ MEMORY {
 	vctbl_lmr (rx): org = 0x08000000, len = 2048 /* vectors table lma region */
 	vctbl_vmr (rw): org = 0x08000000, len = 2048 /* vectors table vma region */
         image_description_mr (rx): org = 0x08000800, len = 1k /* image description */
-        xwos_rx_mr (rx): org = 0x08000C00, len = 125k /* .xwos.vctbl &
-                                                         .xwos.init.text &
-                                                         .xwos.init.rodata &
-                                                         .xwos.exit.text &
-                                                         .xwos.exit.rodata &
-                                                         .xwos.isr.text &
-                                                         .xwos.text &
-                                                         .xwos.rodata &
-                                                         .xwmd.isr.text &
-                                                         .xwmd.text &
-                                                         .xwmd.rodata */
-        rx_mr (rx): org = 0x08020000, len = 1920k /* .text & .rodata */
+        code_mr (rx): org = 0x08000C00, len = 2045k /* .xwos.vctbl &
+                                                       .xwos.init.text &
+                                                       .xwos.init.rodata &
+                                                       .xwos.exit.text &
+                                                       .xwos.exit.rodata &
+                                                       .xwos.isr.text &
+                                                       .xwos.text &
+                                                       .xwos.rodata &
+                                                       .xwmd.isr.text &
+                                                       .xwmd.text &
+                                                       .xwmd.rodata &
+                                                       .text & .rodata */
         stkmempool_mr (arw): org = 0x20000000, len = 128k /* .stkmempool */
-        rwx_mr (arw): org = 0x20020000, len = 64k /* .data, .bss & .heap */
-        xwos_rwx_mr (arw): org = 0x10000000, len = 24k /* .xwos.data */
+        data_mr (arw): org = 0x20020000, len = 64k /* .data, .bss & .heap */
+        xwos_data_mr (arw): org = 0x10000000, len = 24k /* .xwos.data */
         ccmheap_mr (arw): org = 0x10006000, len = 32k /* .ccmheap */
         xwos_stk_mr (rw): org = 0x1000E000, len = 8k /* xwos stack */
 }

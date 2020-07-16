@@ -50,19 +50,19 @@ MEMORY {
                 len = 64
 
         /* 代码段(.text)与只读数据段(.rodata) */
-        rx_mr (rx):
+        code_mr (rx):
                 org = ORIGIN(image_description_mr) + LENGTH(image_description_mr),
                 len = flash_mr_size - LENGTH(image_description_mr) - LENGTH(vctbl_lmr)
 
         /* 数据段(.data)与未初始化的数据段(.bss) */
-        rwx_mr (arw):
+        data_mr (arw):
                 org = data_mr_origin,
                 len = 61k
 
         /* 玄武OS的内核栈 */
         xwos_stk_mr (rw):
-                org = ORIGIN(rwx_mr) + LENGTH(rwx_mr),
-                len = ocram_mr_size - LENGTH(rwx_mr)
+                org = ORIGIN(data_mr) + LENGTH(data_mr),
+                len = ocram_mr_size - LENGTH(data_mr)
 }
 
 sram_mr_origin = ORIGIN(sram_mr);

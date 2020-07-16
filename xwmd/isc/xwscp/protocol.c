@@ -718,7 +718,7 @@ xwer_t xwscp_thrd(struct xwscp * xwscp)
                         } else if (-EBADMSG == rc) {
                                 xwscplogf(WARNING, "Bad frame! \n");
                         } else {
-                                xwscplogf(ALERT, "xwscp_fsm() ... [rc:%d]\n", rc);
+                                xwscplogf(ERR, "xwscp_fsm() ... [rc:%d]\n", rc);
                                 xwosal_cthrd_wait_exit();
                                 break;
                         }

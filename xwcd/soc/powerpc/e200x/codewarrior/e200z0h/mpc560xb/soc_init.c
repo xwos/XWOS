@@ -66,8 +66,8 @@ extern xwu8_t stdby_wkup_lma_base[];
 extern xwu32_t stdby_wkup_mr_origin[];
 extern xwu32_t stdby_wkup_mr_size[];
 
-extern xwu32_t rwx_mr_origin[];
-extern xwu32_t rwx_mr_size[];
+extern xwu32_t data_mr_origin[];
+extern xwu32_t data_mr_size[];
 
 __xwbsp_data struct soc_reset_flags soc_reset_flags;
 __xwbsp_data struct soc_wkup_flags soc_wkup_flags;
@@ -327,8 +327,8 @@ void soc_ram_init(void)
         }
 
         /* Fill 0 to rwx region */
-        src = (xwu32_t *)rwx_mr_origin;
-        cnt = (xwu32_t)rwx_mr_size;
+        src = (xwu32_t *)data_mr_origin;
+        cnt = (xwu32_t)data_mr_size;
         XWOS_BUG_ON(cnt & 3); /* Zone of memory must be aligned 4. */
         cnt >>= 2;
         for (i = 0; i < cnt; i++) {

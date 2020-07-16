@@ -65,7 +65,7 @@ SECTIONS {
                 *(.xwmd.isr.text)
                 *(.xwmd.text)
                 *(.xwmd.rodata)
-        } > rx_mr
+        } > code_mr
 
         .rx : ALIGN(8) {
                 FILL(0xFF)
@@ -80,13 +80,13 @@ SECTIONS {
                 *(.vfp11_veneer)
                 *(.v4_bx)
                 *(.rodata .rodata.* .gnu.linkonce.r.*)
-        } > rx_mr
+        } > code_mr
 
         .preinit_array : ALIGN(8) {
                 FILL(0xFF)
                 KEEP (*(.preinit_array*))
                 preinit_array_vma_end = .;
-        } > rx_mr
+        } > code_mr
         preinit_array_vma_base = ADDR(.preinit_array);
         preinit_array_lma_base = LOADADDR(.preinit_array);
 
@@ -94,7 +94,7 @@ SECTIONS {
                 FILL(0xFF)
                 KEEP (*(.init_array*))
                 init_array_vma_end = .;
-        } > rx_mr
+        } > code_mr
         init_array_vma_base = ADDR(.init_array);
         init_array_lma_base = LOADADDR(.init_array);
 
@@ -102,7 +102,7 @@ SECTIONS {
                 FILL(0xFF)
                 KEEP (*(.fini_array*))
                 fini_array_vma_end = .;
-        } > rx_mr
+        } > code_mr
         fini_array_vma_base = ADDR(.fini_array);
         fini_array_lma_base = LOADADDR(.fini_array);
 
@@ -164,20 +164,20 @@ SECTIONS {
 
         .ARM.extab : {  /* @ref ehabi.pdf for details */
                 *(.ARM.extab* .gnu.linkonce.armextab.*)
-        } > rx_mr
+        } > code_mr
 
         .ARM.exidx : {  /* @ref ehabi.pdf for details */
                 PROVIDE(__exidx_start = .);
                 *(.ARM.exidx* .gnu.linkonce.armexidx.*)
                 PROVIDE(__exidx_end = .);
-        } > rx_mr
+        } > code_mr
 
         .xwos.data : ALIGN(8) {
                 FILL(0xFF)
                 *(.xwos.data)
                 . = ALIGN(8);
                 xwos_data_vma_end = .;
-        } > rwx_mr AT> rx_mr
+        } > data_mr AT> code_mr
         xwos_data_vma_base = ADDR(.xwos.data);
         xwos_data_lma_base = LOADADDR(.xwos.data);
 
@@ -186,7 +186,7 @@ SECTIONS {
                 *(.xwmd.data)
                 . = ALIGN(8);
                 xwmd_data_vma_end = .;
-        } > rwx_mr AT> rx_mr
+        } > data_mr AT> code_mr
         xwmd_data_vma_base = ADDR(.xwmd.data);
         xwmd_data_lma_base = LOADADDR(.xwmd.data);
 
@@ -197,7 +197,7 @@ SECTIONS {
                 *(.data .data.* .gnu.linkonce.d.*)
                 . = ALIGN(8);
                 data_vma_end = .;
-        } > rwx_mr AT> rx_mr
+        } > data_mr AT> code_mr
         data_vma_base = ADDR(.data);
         data_lma_base = LOADADDR(.data);
 
@@ -213,7 +213,7 @@ SECTIONS {
                 *(.ictm.*)
                 . = ALIGN(8);
                 itcm_vma_end = .;
-        } > itcm_mr AT> rx_mr
+        } > itcm_mr AT> code_mr
         itcm_vma_base = ADDR(.itcm);
         itcm_lma_base = LOADADDR(.itcm);
 
@@ -227,7 +227,7 @@ SECTIONS {
                 *(.data.$OCRAM.*)
                 . = ALIGN(8);
                 ocram_vma_end = .;
-        } > ocram_mr AT> rx_mr
+        } > ocram_mr AT> code_mr
         ocram_vma_base = ADDR(.ocram);
         ocram_lma_base = LOADADDR(.ocram);
 
@@ -241,7 +241,7 @@ SECTIONS {
                 *(.data.$NCACHE.*)
                 . = ALIGN(8);
                 ncache_vma_end = .;
-        } > ncache_mr AT> rx_mr
+        } > ncache_mr AT> code_mr
         ncache_vma_base = ADDR(.ncache);
         ncache_lma_base = LOADADDR(.ncache);
 
@@ -251,7 +251,7 @@ SECTIONS {
                 *(COMMON)
                 . = ALIGN(8);
                 bss_vma_end = .;
-        } > rwx_mr
+        } > data_mr
         bss_vma_base = ADDR(.bss);
 
         .bss.itcm : ALIGN(8) {
@@ -298,19 +298,19 @@ SECTIONS {
         .image.tail : ALIGN(32) {
                 KEEP(*(.image.tail))
                 image_tail_vma_end = .;
-        } > xwos_stk_mr AT> rx_mr
+        } > xwos_stk_mr AT> code_mr
         image_tail_vma_base = ADDR(.image.tail);
         image_tail_size = image_tail_vma_end - image_tail_vma_base;
         image_tail_lma_base = LOADADDR(.image.tail);
         image_tail_lma_end = image_tail_lma_base + image_tail_size;
 }
 
-rwx_mr_origin = ORIGIN(rwx_mr);
-rwx_mr_size = LENGTH(rwx_mr);
+data_mr_origin = ORIGIN(data_mr);
+data_mr_size = LENGTH(data_mr);
 
-xwmm_dkma_mmz_origin = rwx_mr_origin;
-xwmm_dkma_mmz_size = rwx_mr_size;
-xwmm_dkma_mmz_pos = bss_vma_end - rwx_mr_origin;
+xwmm_dkma_mmz_origin = data_mr_origin;
+xwmm_dkma_mmz_size = data_mr_size;
+xwmm_dkma_mmz_pos = bss_vma_end - data_mr_origin;
 
 xwos_stk_mr_origin = ORIGIN(xwos_stk_mr);
 xwos_stk_mr_size = LENGTH(xwos_stk_mr);

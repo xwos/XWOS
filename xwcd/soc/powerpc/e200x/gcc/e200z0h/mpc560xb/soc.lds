@@ -22,7 +22,7 @@ SECTIONS {
         .image_header : {
                 KEEP(*(.image_header))
                 image_header_vma_end = .;
-        } > rx_mr
+        } > code_mr
 
         .xwos.rx : ALIGN(8) {
                 *(.xwos.init.text)
@@ -35,14 +35,14 @@ SECTIONS {
                 *(.xwmd.isr.text)
                 *(.xwmd.text)
                 *(.xwmd.rodata)
-        } > rx_mr
+        } > code_mr
 
         .rx : ALIGN(8) {
                 *(.text)
                 *(.text.*)
                 KEEP (*(.init))
                 KEEP (*(.fini))
-        } > rx_mr
+        } > code_mr
 
         .ctors : ALIGN(8) {
                 __CTOR_LIST__ = .;
@@ -67,7 +67,7 @@ SECTIONS {
                 KEEP (*(.ctors))
                 ctors_vma_end = .;
                 __CTOR_END__ = .;
-        } > rx_mr
+        } > code_mr
 
         .dtors : ALIGN(8) {
                 __DTOR_LIST__ = .;
@@ -79,65 +79,65 @@ SECTIONS {
                 KEEP (*(.dtors))
                 dtors_vma_end = .;
                 __DTOR_END__ = .;
-        } > rx_mr
+        } > code_mr
 
         .preinit_array : ALIGN(8) {
                 PROVIDE_HIDDEN (__preinit_array_start = .);
                 KEEP (*(.preinit_array*))
                 PROVIDE_HIDDEN (__preinit_array_end = .);
-        } > rx_mr
+        } > code_mr
 
         .init_array : ALIGN(8) {
                 PROVIDE_HIDDEN (__init_array_start = .);
                 KEEP (*(SORT(.init_array.*)))
                 KEEP (*(.init_array*))
                 PROVIDE_HIDDEN (__init_array_end = .);
-        } > rx_mr
+        } > code_mr
 
         .fini_array : ALIGN(8) {
                 PROVIDE_HIDDEN (__fini_array_start = .);
                 KEEP (*(SORT(.fini_array.*)))
                 KEEP (*(.fini_array*))
                 PROVIDE_HIDDEN (__fini_array_end = .);
-        } > rx_mr
+        } > code_mr
 
         .rodata : ALIGN(8) {
                 *(.rodata)
                 *(.rodata.*)
-        } > rx_mr
+        } > code_mr
 
         .stdby_wkup : ALIGN(8) {
                 KEEP(*(.stdby_wkup))
                 stdby_wkup_vma_end = .;
-        } > stdby_wkup_mr AT> rx_mr
+        } > stdby_wkup_mr AT> code_mr
         stdby_wkup_vma_base = ADDR(.stdby_wkup);
         stdby_wkup_lma_base = LOADADDR(.stdby_wkup);
 
         .bkup : ALIGN(8) {
                 KEEP(*(.bkup))
                 bkup_vma_end = .;
-        } > bkup_mr AT> rx_mr
+        } > bkup_mr AT> code_mr
         bkup_vma_base = ADDR(.bkup);
         bkup_lma_base = LOADADDR(.bkup);
 
         .xwos.data : ALIGN(8) {
                 *(.xwos.data)
                 xwos_data_vma_end = .;
-        } > rwx_mr AT> rx_mr
+        } > data_mr AT> code_mr
         xwos_data_vma_base = ADDR(.xwos.data);
         xwos_data_lma_base = LOADADDR(.xwos.data);
 
         .xwmd.data : ALIGN(8) {
                 *(.xwmd.data)
                 xwmd_data_vma_end = .;
-        } > rwx_mr AT> rx_mr
+        } > data_mr AT> code_mr
         xwmd_data_vma_base = ADDR(.xwmd.data);
         xwmd_data_lma_base = LOADADDR(.xwmd.data);
 
         .flsopc : ALIGN(8) {
                 *(.flsopc)
                 flsopc_vma_end = .;
-        } > rwx_mr AT> rx_mr
+        } > data_mr AT> code_mr
         flsopc_vma_base = ADDR(.flsopc);
         flsopc_lma_base = LOADADDR(.flsopc);
 
@@ -145,7 +145,7 @@ SECTIONS {
                 *(.data)
                 *(.data.*)
                 data_vma_end = .;
-        } > rwx_mr AT> rx_mr
+        } > data_mr AT> code_mr
         data_vma_base = ADDR(.data);
         data_lma_base = LOADADDR(.data);
 
@@ -154,14 +154,14 @@ SECTIONS {
                 *(.bss.*)
                 *(COMMON)
                 bss_vma_end = .;
-        } > rwx_mr
+        } > data_mr
         bss_vma_base = ADDR(.bss);
 
         .sdata2 : ALIGN(8) {
                 *(.sdata2)
                 *(.sdata2.*)
                 sdata2_vma_end = .;
-        } > rwx_mr AT> rx_mr
+        } > data_mr AT> code_mr
         sdata2_vma_base = ADDR(.sdata2);
         sdata2_lma_base = LOADADDR(.sdata2);
 
@@ -169,14 +169,14 @@ SECTIONS {
                 *(.sbss2)
                 *(.sbss2.*)
                 sbss2_vma_end = .;
-        } > rwx_mr
+        } > data_mr
         sbss2_vma_base = ADDR(.sbss2);
 
         .sdata : ALIGN(8) {
                 *(.sdata)
                 *(.sdata.*)
                 sdata_vma_end = .;
-        } > rwx_mr AT> rx_mr
+        } > data_mr AT> code_mr
         sdata_vma_base = ADDR(.sdata);
         sdata_lma_base = LOADADDR(.sdata);
 
@@ -184,25 +184,25 @@ SECTIONS {
                 *(.sbss)
                 *(.sbss.*)
                 sbss_vma_end = .;
-        } > rwx_mr
+        } > data_mr
         sbss_vma_base = ADDR(.sbss);
         rwx_vma_end = .;
 
         .xwos.vctbl : ALIGN(0x800) {
                 *(.xwos.vctbl)
                 xwos_vctbl_vma_end = .;
-        } > rx_mr
+        } > code_mr
         xwos_vctbl_vma_base = ADDR(.xwos.vctbl);
         xwos_vctbl_lma_base = LOADADDR(.xwos.vctbl);
 
         .arch_isrtable : ALIGN(0x1000) {
                 KEEP(*(.arch_isrtable))
-        } > rx_mr
+        } > code_mr
 
         .image_tail : ALIGN(16) {
                 KEEP(*(.image_tail))
                 image_tail_vma_end = .;
-        } > xwos_stk_mr AT> rx_mr
+        } > xwos_stk_mr AT> code_mr
         image_tail_vma_base = ADDR(.image_tail);
         image_tail_size = image_tail_vma_end - image_tail_vma_base;
         image_tail_lma_base = LOADADDR(.image_tail);
@@ -214,12 +214,12 @@ xwos_stk_mr_size = LENGTH(xwos_stk_mr);
 xwos_stk_top = xwos_stk_mr_origin + xwos_stk_mr_size;
 xwos_stk_end = xwos_stk_mr_origin;
 
-rwx_mr_origin = ORIGIN(rwx_mr);
-rwx_mr_size = LENGTH(rwx_mr);
+data_mr_origin = ORIGIN(data_mr);
+data_mr_size = LENGTH(data_mr);
 
-xwmm_dkma_mmz_origin = rwx_mr_origin;
-xwmm_dkma_mmz_size = rwx_mr_size;
-xwmm_dkma_mmz_pos = rwx_vma_end - rwx_mr_origin;
+xwmm_dkma_mmz_origin = data_mr_origin;
+xwmm_dkma_mmz_size = data_mr_size;
+xwmm_dkma_mmz_pos = rwx_vma_end - data_mr_origin;
 
 bkup_mr_origin = ORIGIN(bkup_mr);
 bkup_mr_size = LENGTH(bkup_mr);

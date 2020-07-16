@@ -47,21 +47,21 @@ MEMORY {
         image_description_mr (rx): o = 0x60002400, l = 64
 
         /* Code */
-        /* rx_mr (rx):
+        /* code_mr (rx):
                 o = ORIGIN(image_description_mr) + LENGTH(image_description_mr),
                 l = LENGTH(FLASH) - LENGTH(image_description_mr)
                                   - LENGTH(vctbl_lmr)
                                   - LENGTH(boot_hdr_mr) */
-        rx_mr (rx): o = 0x60002440, l = 0x1FFDBC0
+        code_mr (rx): o = 0x60002440, l = 0x1FFDBC0
 
         /* Data */
-        /* rwx_mr (rwx): o = ORIGIN(DTCM), l = LENGTH(DTCM) - 16k */
-        rwx_mr (rwx): o = 0x20000000, l = 112k
+        /* data_mr (rwx): o = ORIGIN(DTCM), l = LENGTH(DTCM) - 16k */
+        data_mr (rwx): o = 0x20000000, l = 112k
 
         /* kernel stack */
         /* xwos_stk_mr (rw):
-                o = ORIGIN(rwx_mr) + LENGTH(rwx_mr),
-                l = LENGTH(DTCM) - LENGTH(rwx_mr) */
+                o = ORIGIN(data_mr) + LENGTH(data_mr),
+                l = LENGTH(DTCM) - LENGTH(data_mr) */
         xwos_stk_mr (rw): o = 0x2001C000, l = 16k
 
         /* itcm_mr (rwx): o = ORIGIN(ITCM), l = LENGTH(ITCM) */

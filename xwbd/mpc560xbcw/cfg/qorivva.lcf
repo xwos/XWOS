@@ -27,10 +27,10 @@ MEMORY {
         init_mr:                        org=0x00010020, len=0x000007E0
         exception_handlers_mr:          org=0x00011000, len=0x00000400
         xwos_vctbl_mr:                  org=0x00011800, len=0x00000800
-        rx_mr:                          org=0x00012000, len=0x0006E000
+        code_mr:                        org=0x00012000, len=0x0006E000
         stdby_wkup_mr:                  org=0x40000000, len=0x00000080
         bkup_mr:                        org=0x40000080, len=0x00000080
-        rwx_mr:                         org=0x40000100, len=0x0000F300
+        data_mr:                        org=0x40000100, len=0x0000F300
         xwos_stk_mr:                    org=0x4000F400, len=0x00000C00
 }
 
@@ -199,7 +199,7 @@ SECTIONS {
                 . = ALIGN(8);
                 extabindex : {
                 }
-        } > rx_mr
+        } > code_mr
 
         GROUP : {
                 . = ALIGN(8);
@@ -343,7 +343,7 @@ SECTIONS {
                 rwx_tail_vma_end = .;
                 rwx_tail_vma_base = ADDR(.rwx_tail);
                 rwx_tail_lma_base = ROMADDR(.rwx_tail);
-        } > rwx_mr
+        } > data_mr
 
         GROUP : {
                 .image_tail LOAD (rwx_tail_lma_base) : {
@@ -362,12 +362,12 @@ xwos_stk_mr_size = SIZEOF(xwos_stk_mr);
 xwos_stk_top = xwos_stk_mr_origin + xwos_stk_mr_size;
 xwos_stk_end = xwos_stk_mr_origin;
 
-rwx_mr_origin = ADDR(rwx_mr);
-rwx_mr_size = SIZEOF(rwx_mr);
+data_mr_origin = ADDR(data_mr);
+data_mr_size = SIZEOF(data_mr);
 
-xwmm_dkma_mmz_origin = rwx_mr_origin;
-xwmm_dkma_mmz_size = rwx_mr_size;
-xwmm_dkma_mmz_pos = rwx_tail_vma_end - rwx_mr_origin;
+xwmm_dkma_mmz_origin = data_mr_origin;
+xwmm_dkma_mmz_size = data_mr_size;
+xwmm_dkma_mmz_pos = rwx_tail_vma_end - data_mr_origin;
 
 bkup_mr_origin = ADDR(bkup_mr);
 bkup_mr_size = SIZEOF(bkup_mr);

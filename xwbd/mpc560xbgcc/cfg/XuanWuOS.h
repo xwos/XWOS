@@ -27,7 +27,7 @@
 #define XuanWuOS_CFG_ARCH                             powerpc
 #define XuanWuOS_CFG_SUBARCH                          e200x
 #define XuanWuOS_CFG_COMPILER                         gcc
-#define XuanWuOS_CFG_LDSCRIPT                         cfg/xwos.lds
+#define XuanWuOS_CFG_LDSCRIPT                         cfg/XuanWuOS.lds
 #define XuanWuOS_CFG_MK_RULE                          e200x.gcc.rule
 #define XuanWuOS_CFG_ELF_MK                           e200x.gcc.mk
 #define XuanWuOS_CFG_XWMO_MK                          e200x.gcc.xwmo.mk

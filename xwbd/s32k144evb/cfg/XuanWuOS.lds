@@ -27,20 +27,20 @@ MEMORY {
         vctbl_lmr (rx): org = 0x00000000, len = 1k /* vector table VMA */
         flash_cfg_mr (rx): org = 0x00000400, len = 16 /* flash configurations */
         image_description_mr (rx): org = 0x0000420, len = 32 /* image description */
-        rx_mr (rx): org = 0x00000440, len = 0x7FBC0  /* .xwos.init.text &
-                                                        .xwos.init.rodata &
-                                                        .xwos.exit.text &
-                                                        .xwos.exit.rodata &
-                                                        .xwos.isr.text &
-                                                        .xwos.text &
-                                                        .xwos.rodata &
-                                                        .xwmd.isr.text &
-                                                        .xwmd.text &
-                                                        .xwmd.rodata &
-                                                        .text &
-                                                        .rodata */
-        xwos_rwx_mr (arw): org = 0x1FFF8000, len = 16k /* .xwos.data */
-        rwx_mr (arw): org = 0x1FFFC000, len = 40k /* .data, .bss & .heap */
+        code_mr (rx): org = 0x00000440, len = 0x7FBC0  /* .xwos.init.text &
+                                                         .xwos.init.rodata &
+                                                         .xwos.exit.text &
+                                                         .xwos.exit.rodata &
+                                                         .xwos.isr.text &
+                                                         .xwos.text &
+                                                         .xwos.rodata &
+                                                         .xwmd.isr.text &
+                                                         .xwmd.text &
+                                                         .xwmd.rodata &
+                                                         .text &
+                                                         .rodata */
+        xwos_data_mr (arw): org = 0x1FFF8000, len = 16k /* .xwos.data */
+        data_mr (arw): org = 0x1FFFC000, len = 40k /* .data, .bss & .heap */
         xwos_stk_mr (rw): org = 0x20006000, len = 4k /* xwos stack */
 }
 
