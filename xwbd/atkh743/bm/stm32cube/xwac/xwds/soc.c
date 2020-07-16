@@ -32,6 +32,7 @@
 #include <bm/stm32cube/cubemx/Core/Inc/dma.h>
 #include <bm/stm32cube/cubemx/Core/Inc/gpio.h>
 #include <bm/stm32cube/cubemx/Core/Inc/fmc.h>
+#include <bm/stm32cube/cubemx/Core/Inc/quadspi.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -209,6 +210,7 @@ xwer_t stm32cube_soc_drv_start(struct xwds_device * dev)
         /* MX_BDMA_Init(); */
         MX_FMC_Init();
         MX_SDRAM_Init();
+        MX_W25Q_Init();
 
         return OK;
 }
@@ -218,6 +220,7 @@ xwer_t stm32cube_soc_drv_stop(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
 
+        MX_W25Q_DeInit();
         MX_SDRAM_DeInit();
         /* MX_BDMA_Init(); */
         MX_DMA_DeInit();

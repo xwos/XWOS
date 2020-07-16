@@ -45,6 +45,17 @@ extern QSPI_HandleTypeDef hqspi;
 void MX_QUADSPI_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+void MX_W25Q_Init(void);
+void MX_W25Q_DeInit(void);
+xwer_t MX_W25Q_Write_Enable(void);
+xwer_t MX_W25Q_Write_Disable(void);
+xwer_t MX_W25Q_Read_UID(xwu64_t * uidbuf);
+xwer_t MX_W25Q_Read_MID(xwu16_t * midbuf);
+xwer_t MX_W25Q_Read_JID(xwu32_t * jidbuf);
+xwer_t MX_W25Q_Set_BusMode(xwu32_t busmode);
+xwer_t MX_W25Q_Set_AddrBits(xwu32_t addrbits);
+xwer_t MX_W25Q_Mmap(void);
+xwer_t MX_W25Q_Reset(void);
 
 /* USER CODE END Prototypes */
 
