@@ -148,7 +148,7 @@ void xwds_spim_destruct(struct xwds_spim * spim);
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ENOSYS: 不支持主机模式传输
  * @note

@@ -149,7 +149,7 @@ xwer_t xwosdl_thrd_create(xwid_t * tidbuf, const char * name,
         rc = xwos_thrd_create(&tcb, name,
                               (xwos_thrd_f)mainfunc, arg,
                               stack_size, priority, attr);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 *tidbuf = (xwid_t)tcb;
         } else {
                 *tidbuf = (xwid_t)0;
@@ -262,7 +262,7 @@ xwer_t xwosdl_thrd_migrate(xwid_t tid, xwid_t dstcpu)
 {
         XWOS_UNUSED(tid);
         XWOS_UNUSED(dstcpu);
-        return OK;
+        return XWOK;
 }
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -311,7 +311,7 @@ xwer_t xwosdl_swt_create(xwid_t * swtidbuf, const char * name, xwsq_t flags)
 
         swt = NULL;
         rc = xwos_swt_create(&swt, name, flags);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 *swtidbuf = (xwid_t)swt;
         } else {
                 *swtidbuf = (xwid_t)0;
@@ -388,7 +388,7 @@ xwer_t xwosdl_smr_create(xwid_t * smridbuf, xwssq_t val, xwssq_t max)
 
         smr = NULL;
         rc = xwsync_rtsmr_create(&smr, val, max);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 *smridbuf = xwosdl_smr_get_id(smr);
         } else {
                 *smridbuf = (xwid_t)0;
@@ -514,7 +514,7 @@ xwer_t xwosdl_smr_create(xwid_t * smridbuf, xwssq_t val, xwssq_t max)
 
         smr = NULL;
         rc = xwsync_plsmr_create(&smr, val, max);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 *smridbuf = xwosdl_smr_get_id(smr);
         } else {
                 *smridbuf = (xwid_t)0;
@@ -645,7 +645,7 @@ xwer_t xwosdl_cdt_create(xwid_t * cdtidbuf)
 
         cdt = NULL;
         rc = xwsync_cdt_create(&cdt);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 *cdtidbuf = xwosdl_cdt_get_id(cdt);
         } else {
                 *cdtidbuf = (xwid_t)0;
@@ -789,7 +789,7 @@ xwer_t xwosdl_flg_create(xwid_t * flgidbuf, xwbmp_t initval[])
 
         flg = NULL;
         rc = xwsync_evt_create(&flg, initval, XWSYNC_EVT_TYPE_FLAG);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 /* FIXME: Add to ID table */
                 *flgidbuf = (xwid_t)flg;
         } else {
@@ -806,7 +806,7 @@ xwer_t xwosdl_flg_delete(xwid_t flgid)
 
         flg = xwosdl_flg_get_obj(flgid);
         rc = xwsync_evt_delete(flg);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 /* FIXME: Del from ID table */
         }
         return rc;
@@ -1005,7 +1005,7 @@ xwer_t xwosdl_selector_create(xwid_t * sltidbuf)
 
         slt = NULL;
         rc = xwsync_evt_create(&slt, NULL, XWSYNC_EVT_TYPE_SELECTOR);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 /* FIXME: Add to ID table */
                 *sltidbuf = (xwid_t)slt;
         } else {
@@ -1022,7 +1022,7 @@ xwer_t xwosdl_selector_delete(xwid_t sltid)
 
         slt = xwosdl_selector_get_obj(sltid);
         rc = xwsync_evt_delete(slt);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 /* FIXME: Del from ID table */
         }
         return rc;
@@ -1141,7 +1141,7 @@ xwer_t xwosdl_barrier_create(xwid_t * baridbuf)
 
         bar = NULL;
         rc = xwsync_evt_create(&bar, NULL, XWSYNC_EVT_TYPE_BARRIER);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 /* FIXME: Add to ID table */
                 *baridbuf = (xwid_t)bar;
         } else {
@@ -1158,7 +1158,7 @@ xwer_t xwosdl_barrier_delete(xwid_t barid)
 
         bar = xwosdl_barrier_get_obj(barid);
         rc = xwsync_evt_delete(bar);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 /* FIXME: Del from ID table */
         }
         return rc;
@@ -1672,7 +1672,7 @@ xwer_t xwosdl_mtx_create(xwid_t * mtxidbuf, xwpr_t sprio)
 
         mtx = NULL;
         rc = xwlk_mtx_create(&mtx, sprio);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 *mtxidbuf = (xwid_t)mtx;
         } else {
                 *mtxidbuf = (xwid_t)0;

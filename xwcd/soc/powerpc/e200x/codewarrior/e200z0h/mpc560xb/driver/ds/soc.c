@@ -228,7 +228,7 @@ xwer_t mpc560xb_soc_check_desc(struct xwds_soc * soc)
         } else if (is_err_or_null(pincfgs)) {
                 rc = -EINVAL;
         } else {
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -330,7 +330,7 @@ xwer_t mpc560xb_soc_drv_start(struct xwds_device * dev)
                 irqrsc = &resources->irqrsc_array[i];
                 xwos_irq_clear(irqrsc->irqn);
                 rc = xwos_irq_cfg(irqrsc->irqn, irqrsc->cfg);
-                if (OK == rc)
+                if (XWOK == rc)
                         rc = xwos_irq_enable(irqrsc->irqn);
                 if (__unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
@@ -340,7 +340,7 @@ xwer_t mpc560xb_soc_drv_start(struct xwds_device * dev)
                         goto err_en_irq;
                 }
         }
-        return OK;
+        return XWOK;
 
 err_en_irq:
 err_req_gpios:
@@ -402,7 +402,7 @@ xwer_t mpc560xb_soc_drv_stop(struct xwds_device * dev)
                 if (__unlikely(rc < 0))
                         goto err_irq_release;
         }
-        return OK;
+        return XWOK;
 
 err_irq_release:
 err_clk_rls:
@@ -415,14 +415,14 @@ static __xwbsp_code
 xwer_t mpc560xb_soc_drv_suspend(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
 xwer_t mpc560xb_soc_drv_resume(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
-        return OK;
+        return XWOK;
 }
 
 /******** ******** clock driver ******** ********/
@@ -434,7 +434,7 @@ xwer_t mpc560xb_soc_drv_clk_req(struct xwds_soc * soc, xwid_t id)
         xwu32_t idx;
 
         XWOS_UNUSED(soc);
-        rc = OK;
+        rc = XWOK;
         idx = MPC5_ME_RUNMODE - MPC5_ME_MODE_RUN0;
         soc_cpuirq_save_lc(&cpuirq);
         switch (id) {
@@ -590,7 +590,7 @@ xwer_t mpc560xb_soc_drv_clk_req(struct xwds_soc * soc, xwid_t id)
                 break;
         }
         soc_cpuirq_restore_lc(cpuirq);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 soc_me_enter_mode(MPC5_ME_RUNMODE);
         }
         return rc;
@@ -604,7 +604,7 @@ xwer_t mpc560xb_soc_drv_clk_rls(struct xwds_soc * soc, xwid_t id)
         xwsq_t idx;
 
         XWOS_UNUSED(soc);
-        rc = OK;
+        rc = XWOK;
         idx = MPC5_ME_RUNMODE - MPC5_ME_MODE_RUN0;
         soc_cpuirq_save_lc(&cpuirq);
         switch (id) {
@@ -760,7 +760,7 @@ xwer_t mpc560xb_soc_drv_clk_rls(struct xwds_soc * soc, xwid_t id)
                 break;
         }
         soc_cpuirq_restore_lc(cpuirq);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 soc_me_enter_mode(MPC5_ME_RUNMODE);
         }
         return rc;
@@ -779,7 +779,7 @@ xwer_t mpc560xb_soc_drv_clk_getfqcy(struct xwds_soc * soc, xwid_t id,
                 rc = -EINVAL;
                 goto err_inval;
         }
-        rc = OK;
+        rc = XWOK;
 
         /* system clock */
         soc_cpuirq_save_lc(&cpuirq);
@@ -882,7 +882,7 @@ xwer_t mpc560xb_soc_drv_clk_getfqcy(struct xwds_soc * soc, xwid_t id,
                 break;
         }
         soc_cpuirq_restore_lc(cpuirq);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 *num = 1;
         } else {
         }
@@ -911,7 +911,7 @@ xwer_t mpc560xb_soc_drv_gpio_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinm
                         xwbop_c0m(xwsq_t, &pinmask, (xwsq_t)BIT(pin));
                 }
         } while (pinmask);
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -930,7 +930,7 @@ xwer_t mpc560xb_soc_drv_gpio_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinm
                         xwbop_c0m(xwsq_t, &pinmask, (xwsq_t)BIT(pin));
                 }
         } while (pinmask);
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -951,7 +951,7 @@ xwer_t mpc560xb_soc_drv_gpio_cfg(struct xwds_soc * soc, xwid_t port, xwsq_t pinm
                         xwbop_c0m(xwsq_t, &pinmask, (xwsq_t)BIT(pin));
                 }/* else {} */
         } while (pinmask);
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -969,7 +969,7 @@ xwer_t mpc560xb_soc_drv_gpio_set(struct xwds_soc * soc, xwid_t port, xwsq_t pinm
                         xwbop_c0m(xwsq_t, &pinmask, (xwsq_t)BIT(pin));
                 }/* else {} */
         } while (pinmask);
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -987,7 +987,7 @@ xwer_t mpc560xb_soc_drv_gpio_reset(struct xwds_soc * soc, xwid_t port, xwsq_t pi
                         xwbop_c0m(xwsq_t, &pinmask, (xwsq_t)BIT(pin));
                 }/* else {} */
         } while (pinmask);
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -1004,7 +1004,7 @@ xwer_t mpc560xb_soc_drv_gpio_toggle(struct xwds_soc * soc, xwid_t port, xwsq_t p
                 mask = (mask >> 16U) & 0xFFFF;
         }/* else {} */
         SIU.PGPDO[idx].R ^= mask;
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -1018,7 +1018,7 @@ xwer_t mpc560xb_soc_drv_gpio_output(struct xwds_soc * soc, xwid_t port, xwsq_t p
         mask = (xwbop_rbit(xwu32_t, (xwu32_t)pinmask) >> 16U) & 0x0000FFFFU;
         value = (xwbop_rbit(xwu32_t, (xwu32_t)out) >> 16U) & 0x0000FFFFU;
         SIU.MPGPDO[port].R = (((xwu32_t)mask) << 16) | ((xwu32_t)value);
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -1034,7 +1034,7 @@ xwer_t mpc560xb_soc_drv_gpio_input(struct xwds_soc * soc, xwid_t port, xwsq_t pi
         value = xwbop_rbit(xwu32_t, SIU.PGPDI[idx].R);
         value >>= sft;
         *in = (xwsq_t)value & pinmask;
-        return OK;
+        return XWOK;
 }
 
 /******** ******** EIRQ driver ******** ********/
@@ -1078,7 +1078,7 @@ xwer_t mpc560xb_soc_drv_eirq_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinm
                 }
                 SIU.IRER.R |= BIT(eiid);
         }
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -1103,7 +1103,7 @@ xwer_t mpc560xb_soc_drv_eirq_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinm
                 SIU.IRER.R &= ~BIT(eiid);
                 SIU.ISR.R |= BIT(eiid); /**< clear flag once */
         }
-        return OK;
+        return XWOK;
 }
 
 #if defined(XWMDCFG_ds_SOC_DMA) && (1 == XWMDCFG_ds_SOC_DMA)
@@ -1113,7 +1113,7 @@ xwer_t mpc560xb_soc_drv_dma_req(struct xwds_soc * soc, xwid_t ch)
 {
         XWOS_UNUSED(soc);
         EDMA.SEEIR.R = (xwu8_t)ch;
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -1121,7 +1121,7 @@ xwer_t mpc560xb_soc_drv_dma_rls(struct xwds_soc * soc, xwid_t ch)
 {
         XWOS_UNUSED(soc);
         EDMA.CEEIR.R = (xwu8_t)ch;
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -1136,7 +1136,7 @@ xwer_t mpc560xb_soc_drv_dma_cfg(struct xwds_soc * soc, xwid_t ch,
         memcpy((void *)&EDMA.TCD[ch].COM,
                &chcfg->tcds[0].com,
                sizeof(union soc_dma_tcd));
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -1144,7 +1144,7 @@ xwer_t mpc560xb_soc_drv_dma_enable(struct xwds_soc * soc, xwid_t ch)
 {
         XWOS_UNUSED(soc);
         EDMA.SERQR.R = (xwu8_t)ch;
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -1152,7 +1152,7 @@ xwer_t mpc560xb_soc_drv_dma_disable(struct xwds_soc * soc, xwid_t ch)
 {
         XWOS_UNUSED(soc);
         EDMA.CERQR.R = (xwu8_t)ch;
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -1160,7 +1160,7 @@ xwer_t mpc560xb_soc_drv_dma_start(struct xwds_soc * soc, xwid_t ch)
 {
         XWOS_UNUSED(soc);
         EDMA.SSBR.R = (xwu8_t)ch;
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -1169,7 +1169,7 @@ xwer_t mpc560xb_soc_drv_dma_stop(struct xwds_soc * soc, xwid_t ch)
         XWOS_UNUSED(soc);
         XWOS_UNUSED(ch);
         EDMA.CR.B.CX = 1;
-        return OK;
+        return XWOK;
 }
 #endif /* XWMDCFG_ds_SOC_DMA */
 

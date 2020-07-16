@@ -108,7 +108,7 @@ xwer_t xwds_spim_cvop_probe(struct xwds_spim * spim)
         if (__unlikely(rc < 0)) {
                 goto err_dev_probe;
         }
-        return OK;
+        return XWOK;
 
 err_dev_probe:
         xwosal_mtx_destroy(&spim->xfermtx);
@@ -132,7 +132,7 @@ xwer_t xwds_spim_cvop_remove(struct xwds_spim * spim)
         }
 
         xwosal_mtx_destroy(&spim->xfermtx);
-        return OK;
+        return XWOK;
 
 err_dev_cvop_remove:
         return rc;
@@ -237,7 +237,7 @@ xwer_t xwds_spim_xfer(struct xwds_spim * spim,
 
         xwds_spim_release(spim);
         xwds_spim_put(spim);
-        return OK;
+        return XWOK;
 
 err_drv_xfer:
         xwosal_mtx_unlock(xwosal_mtx_get_id(&spim->xfermtx));

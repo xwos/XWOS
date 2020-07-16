@@ -130,7 +130,7 @@ struct xwos_swt * xwos_swt_alloc(void)
         xwer_t rc;
 
         rc = xwmm_kma_alloc(sizeof(struct xwos_swt), XWMM_ALIGNMENT, &mem.anon);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 xwos_swt_construct(mem.swt);
         } else {
                 mem.swt = err_ptr(-ENOMEM);
@@ -193,7 +193,7 @@ static __xwos_code
 xwer_t xwos_swt_gc(void * swt)
 {
         xwos_swt_free(swt);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -227,7 +227,7 @@ xwer_t xwos_swt_activate(struct xwos_swt * swt,
         swt->xwsd = xwos_scheduler_get_lc();
         swt->name = name;
         swt->flag = flag;
-        return OK;
+        return XWOK;
 
 err_xwobj_activate:
         return rc;
@@ -306,7 +306,7 @@ xwer_t xwos_swt_create(struct xwos_swt ** ptrbuf,
                 goto err_swt_activate;
         }
         *ptrbuf = swt;
-        return OK;
+        return XWOK;
 
 err_swt_activate:
         xwos_swt_free(swt);
@@ -371,7 +371,7 @@ void xwos_swt_ttn_cb(void * entry)
  * @param cb: (I) 定时器回调函数
  * @param arg: (I) 定时器回调函数的参数
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINVAL: 无效参数
  * @retval -EALREADY: 定时器已经开启
  * @note
@@ -421,7 +421,7 @@ err_already:
  * @brief XWOS API：停止软件定时器
  * @param swt: (I) 软件定时器对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ESRCH: 定时器没有被开启
  * @note
  * - 同步/异步：同步

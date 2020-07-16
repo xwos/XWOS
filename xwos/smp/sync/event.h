@@ -220,7 +220,7 @@ xwer_t xwsync_evt_timedsync(struct xwsync_evt * evt, xwsq_t pos, xwbmp_t sync[],
  *                    （可作为下一次调用的初始值）
  * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的位
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 事件对象类型错误
  * @retval -EINVAL: 参数无效
@@ -247,7 +247,7 @@ xwer_t xwsync_evt_wait(struct xwsync_evt * evt,
  * @param msk: (I) 待触发的同步对象的位图掩码（表示只关注掩码部分的同步对象）
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象的位图
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 事件对象类型错误
  * @retval -EINTR: 等待被中断
@@ -270,7 +270,7 @@ xwer_t xwsync_evt_select(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
  * @param pos: (I) 当前线程的位图位置
  * @param sync: (I) 当前线程需要同步的线程掩码
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ECHRNG: 位置超出范围
  * @retval -ETYPE: 事件对象类型错误

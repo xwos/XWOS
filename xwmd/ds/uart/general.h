@@ -85,7 +85,7 @@ void xwds_uartc_destruct(struct xwds_uartc * uartc);
  * @brief XWDS API：清空接收队列
  * @param uartc: (I) UART控制器对象指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步
@@ -100,7 +100,7 @@ xwer_t xwds_uartc_clear_rxq(struct xwds_uartc * uartc);
  * @param uartc: (I) UART控制器对象指针
  * @param ret: (O) 指向缓冲区的指针，通过此缓冲区返回接收队列中有效数据的大小
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步
@@ -118,7 +118,7 @@ xwer_t xwds_uartc_get_rxq_datasize(struct xwds_uartc * uartc, xwsz_t *ret);
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步
@@ -134,7 +134,7 @@ xwer_t xwds_uartc_getc(struct xwds_uartc * uartc,
  * @param uartc: (I) UART控制器对象指针
  * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步
@@ -155,7 +155,7 @@ xwer_t xwds_uartc_try_getc(struct xwds_uartc * uartc, xwu8_t * buf);
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步
@@ -175,7 +175,7 @@ xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
  *              (I) 作为输入时，表示缓冲区大小（单位：字节）
  *              (O) 作为输出时，返回实际读取的数据大小
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步
@@ -189,7 +189,7 @@ xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc, void * buf, xwsz_t * size);
  * @brief XWDS API：清空发送队列
  * @param uartc: (I) UART控制器对象指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步
@@ -207,7 +207,7 @@ xwer_t xwds_uartc_clear_txq(struct xwds_uartc * uartc);
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -EOVERFLOW: 发送队列已满
  * @note
@@ -231,7 +231,7 @@ xwer_t xwds_uartc_putc(struct xwds_uartc * uartc,
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步
@@ -248,7 +248,7 @@ xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
  * @param uartc: (I) UART控制器对象指针
  * @param cfg: (I) 新的配置
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步

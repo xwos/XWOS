@@ -63,7 +63,7 @@ void xwds_misc_destruct(struct xwds_misc * misc);
  * @param cmd: (I) 命令
  * @param ...: (I) 参数
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：依赖于CMD的实现

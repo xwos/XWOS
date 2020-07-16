@@ -95,7 +95,7 @@ xwer_t bm_stm32cube_start(void)
                 }
         }
 
-        return OK;
+        return XWOK;
 
 err_thrd_create:
         return rc;
@@ -112,5 +112,5 @@ xwer_t led_task(void * arg)
                 xwosal_cthrd_sleep(&xwtm);
                 LL_GPIO_TogglePin(LED_GPIO_PORT, LED_GPIO_PIN);
         }
-        return OK;
+        return XWOK;
 }

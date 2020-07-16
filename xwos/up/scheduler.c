@@ -164,7 +164,7 @@ xwer_t xwos_scheduler_start_lc(void)
 
         xwsd = &xwos_scheduler;
         rc = xwos_syshwt_start(&xwsd->tt.hwt);
-        if (__unlikely(OK == rc)) {
+        if (__unlikely(XWOK == rc)) {
                 soc_scheduler_start_lc(xwsd);
         }/* else {} */
         return rc;
@@ -273,7 +273,7 @@ xwer_t xwos_scheduler_idled(struct xwos_scheduler * xwsd)
                 bdl_xwsd_idle_hook(xwsd);
 #endif /* #if (defined(BRDCFG_XWSD_IDLE_HOOK) && (1 == BRDCFG_XWSD_IDLE_HOOK)) */
         }
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -336,7 +336,7 @@ xwer_t xwos_scheduler_bhd(struct xwos_scheduler * xwsd)
                 }/* else {} */
         }
         xwos_cpuirq_enable_lc();
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -418,7 +418,7 @@ struct xwos_scheduler * xwos_scheduler_enbh_lc(void)
 /**
  * @brief 请求切换至中断底半部
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EPERM: 中断底半部已被禁止
  * @retval -EINPROGRESS: 切换上下文的过程正在进行中
  * @retval -EALREADY: 当前上下文已经是中断底半部上下文
@@ -441,13 +441,13 @@ xwer_t xwos_scheduler_req_bh(void)
                 } else {
                         xwsd->pstk = xwsd->cstk;
                         xwsd->cstk = XWOS_SCHEDULER_BH_STK(xwsd);
-                        rc = OK;
+                        rc = XWOK;
                 }
         } else {
                 rc = -EPERM;
         }
         xwos_cpuirq_restore_lc(cpuirq);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 soc_scheduler_req_swcx(xwsd);
         }/* else {} */
         return rc;
@@ -626,11 +626,11 @@ xwer_t xwos_scheduler_check_swcx(struct xwos_tcb * t, struct xwos_tcb ** pmtcb)
                         rc = xwos_thrd_rq_add_head(t);
                         XWOS_BUG_ON(rc < 0);
                         *pmtcb = xwos_scheduler_rtrq_choose();
-                        rc = OK;
+                        rc = XWOK;
                 }
         } else {
                 *pmtcb = xwos_scheduler_rtrq_choose();
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -653,14 +653,14 @@ xwer_t xwos_scheduler_do_swcx(void)
                 if (NULL != swt) {
                         xwsd->pstk = xwsd->cstk;
                         xwsd->cstk = &swt->stack;
-                        rc = OK;
+                        rc = XWOK;
                 } else {
                         rc = -EAGAIN;
                 }
         } else {
                 ctcb = xwos_scheduler_get_ctcb_lc();
                 rc = xwos_scheduler_check_swcx(ctcb, &swt);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         if (ctcb == swt) {
                                 /* 当前线程的状态可能在中断中被改变，
                                    并被加入到就绪队列，然后在这里又被重新选择。
@@ -675,7 +675,7 @@ xwer_t xwos_scheduler_do_swcx(void)
                                         xwsd->cstk = &swt->stack;
                                 }
                                 xwsd->pstk = &ctcb->stack;
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EINVAL;
@@ -688,7 +688,7 @@ xwer_t xwos_scheduler_do_swcx(void)
 /**
  * @brief 请求切换上下文
  * @return 错误码
- * @retval OK: OK，需要触发切换上下文中断执行切换上下文的过程
+ * @retval XWOK: 没有错误，需要触发切换上下文中断执行切换上下文的过程
  * @retval -EBUSY: 当前上下文为中断底半部上下文
  * @retval -EINVAL: 正在运行的线程状态错误
  * @retval -EAGAIN: 不需要切换上下文
@@ -718,7 +718,7 @@ xwer_t xwos_scheduler_req_swcx(void)
                 xwsd->pstk = err_ptr(-EINVAL); /* invalidate other caller. */
                 rc = xwos_scheduler_do_swcx();
                 xwos_cpuirq_restore_lc(cpuirq);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         soc_scheduler_req_swcx(xwsd);
                 } else {
                         xwos_scheduler_finish_swcx();
@@ -780,7 +780,7 @@ void xwos_scheduler_finish_swcx(void)
 /**
  * @brief 请求切换上下文
  * @return 错误码
- * @retval OK: OK，需要触发上下文切换中断执行切换上下文的过程
+ * @retval XWOK: 没有错误，需要触发上下文切换中断执行切换上下文的过程
  * @retval -EBUSY: 当前上下文为中断底半部上下文
  * @retval -EINVAL: 当前正在运行的线程状态错误
  * @retval -EAGAIN: 不需要切换上下文
@@ -807,7 +807,7 @@ xwer_t xwos_scheduler_req_swcx(void)
                 xwsd->pstk = err_ptr(-EINVAL); /* invalidate other caller. */
                 rc = xwos_scheduler_do_swcx();
                 xwos_cpuirq_restore_lc(cpuirq);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         soc_scheduler_req_swcx(xwsd);
                 } else {
                         xwos_scheduler_finish_swcx();
@@ -883,7 +883,7 @@ void xwos_scheduler_set_pm_cb(xwos_scheduler_pm_cb_f resume_cb,
 
 /**
  * @brief 将调度器的唤醒锁计数器加1
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval <0: 当前调度器正在进入低功耗
  * @note
  * - 同步/异步：同步
@@ -901,7 +901,7 @@ xwer_t xwos_scheduler_inc_wklkcnt(void)
         xwos_cpuirq_save_lc(&cpuirq);
         if (xwsd->pm.wklkcnt >= XWOS_SCHEDULER_WKLKCNT_UNLOCKED) {
                 xwsd->pm.wklkcnt++;
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EACCES;
         }
@@ -912,7 +912,7 @@ xwer_t xwos_scheduler_inc_wklkcnt(void)
 /**
  * @brief 将调度器的唤醒锁计数器减1
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval <0: 当前调度器正在进入低功耗
  * @note
  * - 同步/异步：同步
@@ -935,7 +935,7 @@ xwer_t xwos_scheduler_dec_wklkcnt(void)
                 if (XWOS_SCHEDULER_WKLKCNT_FREEZING == xwsd->pm.wklkcnt) {
                         lpm = true;
                 }/* else {} */
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EACCES;
         }
@@ -967,7 +967,7 @@ xwer_t xwos_scheduler_suspend_lic(struct xwos_scheduler * xwsd)
         } else {
                 xwos_cpuirq_restore_lc(cpuirq);
         }
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -987,7 +987,7 @@ xwer_t xwos_scheduler_notify_allfrz_lic(void)
                 xwsd->pm.wklkcnt--;
                 xwos_cpuirq_restore_lc(cpuirq);
                 xwos_syshwt_stop(&xwsd->tt.hwt);
-                rc = OK;
+                rc = XWOK;
         } else {
                 xwos_cpuirq_restore_lc(cpuirq);
                 rc = -EINTR;
@@ -1047,7 +1047,7 @@ xwer_t xwos_scheduler_thaw_allfrz_lic(void)
                 xwos_cpuirq_disable_lc();
         }
         if (0 == xwsd->pm.frz_thrd_cnt) {
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EBUG;
         }
@@ -1104,7 +1104,7 @@ xwer_t xwos_scheduler_resume_lic(struct xwos_scheduler * xwsd)
                         xwos_cpuirq_restore_lc(cpuirq);
                         xwos_scheduler_thaw_allfrz_lic();
                         xwos_cpuirq_save_lc(&cpuirq);
-                        rc = OK;
+                        rc = XWOK;
                         break;
                 }
                 if (xwsd->pm.wklkcnt >= XWOS_SCHEDULER_WKLKCNT_UNLOCKED) {
@@ -1123,7 +1123,7 @@ xwer_t xwos_scheduler_resume(void)
         xwer_t rc;
 
         xwsd = &xwos_scheduler;
-        if (OK != xwos_irq_get_id(NULL)) {
+        if (XWOK != xwos_irq_get_id(NULL)) {
                 rc = soc_scheduler_resume(xwsd);
         } else {
                 rc = xwos_scheduler_resume_lic(xwsd);

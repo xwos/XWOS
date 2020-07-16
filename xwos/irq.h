@@ -70,7 +70,7 @@ struct xwos_irq_resource {
  * @param flag: (I) 中断标志
  * @param data: (I) 中断数据
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
@@ -89,7 +89,7 @@ xwer_t xwos_irq_request(xwirq_t irqn, xwisr_f isr, xwsq_t flag, void * data);
  * @brief XWOS API：释放中断
  * @param irqn: (I) 中断号
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
@@ -104,7 +104,7 @@ xwer_t xwos_irq_release(xwirq_t irqn);
  * @brief XWOS API：开启中断
  * @param irqn: (I) 中断号
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
@@ -119,7 +119,7 @@ xwer_t xwos_irq_enable(xwirq_t irqn);
  * @brief XWOS API：关闭中断
  * @param irqn: (I) 中断号
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
@@ -135,7 +135,7 @@ xwer_t xwos_irq_disable(xwirq_t irqn);
  * @param irqn: (I) 中断号
  * @param flag: (O) 指向用于返回中断的开关标志的缓冲区的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
@@ -151,7 +151,7 @@ xwer_t xwos_irq_save(xwirq_t irqn, xwreg_t * flag);
  * @param irqn: (I) 中断号
  * @param flag: (I) 中断的开关标志
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
@@ -166,7 +166,7 @@ xwer_t xwos_irq_restore(xwirq_t irqn, xwreg_t flag);
  * @brief XWOS API：挂起中断标志
  * @param irqn: (I) 中断号
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
@@ -181,7 +181,7 @@ xwer_t xwos_irq_pend(xwirq_t irqn);
  * @brief XWOS API：清除中断标志
  * @param irqn: (I) 中断号
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
@@ -197,7 +197,7 @@ xwer_t xwos_irq_clear(xwirq_t irqn);
  * @param irqn: (I) 中断号
  * @param cfg: (I) CPU私有的配置结构体指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
@@ -213,7 +213,7 @@ xwer_t xwos_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg);
  * @param irqn: (I) 中断号
  * @param cfgbuf: (I) 指向缓冲区的指针，此缓冲区用于返回SOC中断配置结构体
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
@@ -229,7 +229,7 @@ xwer_t xwos_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf);
  * @param irqn: (I) 中断号
  * @param databuf: (I) 指向缓冲区的指针，此缓冲区用于返回SOC中断数据结构体
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note

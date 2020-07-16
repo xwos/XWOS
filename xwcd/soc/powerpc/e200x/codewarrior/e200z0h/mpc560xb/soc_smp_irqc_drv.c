@@ -129,7 +129,7 @@ xwer_t soc_irqc_drv_probe(struct xwos_irqc * irqc)
         }
 
         INTC.CPR.R = SOC_IRQC_OS_PRIO - 1;
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -138,7 +138,7 @@ xwer_t soc_irqc_drv_remove(struct xwos_irqc * irqc)
         INTC.CPR.R = SOC_IRQC_MAX_PRIO;
         memset(irqc->data, 0, SOCCFG_IRQ_NUM);
 
-        return OK;
+        return XWOK;
 }
 
 /******** ******** irq operations ******** ********/
@@ -164,7 +164,7 @@ xwer_t soc_irqc_drv_request(struct xwos_irqc * irqc, xwirq_t irqn, xwisr_f isrfu
         }
 #endif /* !SOCCFG_RO_ISRTABLE */
 
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -183,7 +183,7 @@ xwer_t soc_irqc_drv_release(struct xwos_irqc * irqc, xwirq_t irqn)
         }
 #endif /* !SOCCFG_RO_ISRTABLE */
 
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -193,7 +193,7 @@ xwer_t soc_irqc_drv_enable(struct xwos_irqc * irqc, xwirq_t irqn)
         if (irqn >= 0) {
                 INTC.PSR[irqn].R |= BIT(SOC_IRQC_ENBIT);
         }
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -203,7 +203,7 @@ xwer_t soc_irqc_drv_disable(struct xwos_irqc * irqc, xwirq_t irqn)
         if (irqn >= 0) {
                 INTC.PSR[irqn].R &= ~BIT(SOC_IRQC_ENBIT);
         }
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -215,7 +215,7 @@ xwer_t soc_irqc_drv_save(struct xwos_irqc * irqc, xwirq_t irqn, xwreg_t * flag)
         if (irqn >= 0) {
                 *flag = (xwreg_t)INTC.PSR[irqn].R;
                 INTC.PSR[irqn].R &= ~BIT(SOC_IRQC_ENBIT);
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EPERM;
         }
@@ -230,7 +230,7 @@ xwer_t soc_irqc_drv_restore(struct xwos_irqc * irqc, xwirq_t irqn, xwreg_t flag)
         XWOS_UNUSED(irqc);
         if (irqn >= 0) {
                 INTC.PSR[irqn].R = (xwu8_t)flag & 0xFF;
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EPERM;
         }
@@ -267,7 +267,7 @@ xwer_t soc_irqc_drv_cfg(struct xwos_irqc * irqc, xwirq_t irqn,
                 prio = INTC.PSR[irqn].R & BIT(SOC_IRQC_ENBIT);
                 prio |= (cfg->priority & (BIT(SOC_IRQC_ENBIT) - 1));
                 INTC.PSR[irqn].R = prio;
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -281,7 +281,7 @@ xwer_t soc_irqc_drv_get_cfg(struct xwos_irqc * irqc, xwirq_t irqn,
         XWOS_UNUSED(irqc);
         if (irqn >= 0) {
                 cfgbuf->priority = INTC.PSR[irqn].R & (BIT(SOC_IRQC_ENBIT) - 1);
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EPERM;
         }
@@ -298,7 +298,7 @@ xwer_t soc_irqc_drv_get_data(struct xwos_irqc * irqc, xwirq_t irqn,
         if (irqn >= 0) {
                 irq_data_table = irqc->irq_data_table;
                 databuf->data = irq_data_table->soc[irqn];
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EPERM;
         }

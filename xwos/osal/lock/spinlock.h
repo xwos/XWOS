@@ -70,7 +70,7 @@ void xwosal_splk_lock(struct xwosal_splk * spl)
  * @brief XWOSAL API：尝试上锁自旋锁
  * @param spl: (I) 自旋锁的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得自旋锁失败
  * @note
  * - 同步/异步：同步
@@ -120,7 +120,7 @@ void xwosal_splk_lock_cpuirq(struct xwosal_splk * spl)
  * @brief XWOSAL API：尝试上锁自旋锁，并关闭本地CPU的中断
  * @param spl: (I) 自旋锁的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得自旋锁失败
  * @note
  * - 同步/异步：同步
@@ -172,7 +172,7 @@ void xwosal_splk_lock_cpuirqsv(struct xwosal_splk * spl, xwreg_t * cpuirq)
  * @param spl: (I) 自旋锁的指针
  * @param cpuirq: (O) 缓冲区指针，用于返回本地CPU的中断标志
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得自旋锁失败
  * @note
  * - 同步/异步：同步
@@ -230,7 +230,7 @@ void xwosal_splk_lock_irqs(struct xwosal_splk * spl,
  * @param irqs: (I) 外部中断资源数组指针
  * @param num: (I) 数组中元素数量
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得自旋锁失败
  * @note
  * - 同步/异步：同步
@@ -296,7 +296,7 @@ void xwosal_splk_lock_irqssv(struct xwosal_splk * spl,
  * @param flags: (O) 缓冲区指针，用于返回部分外部中断的中断标志
  * @param num: (I) 数组中元素数量
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得自旋锁失败
  * @note
  * - 同步/异步：同步
@@ -355,7 +355,7 @@ void xwosal_splk_lock_bh(struct xwosal_splk * spl)
  * @brief XWOSAL API：尝试上锁自旋锁，关闭本地CPU的中断底半部
  * @param spl: (I) 自旋锁的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得自旋锁失败
  * @note
  * - 同步/异步：同步

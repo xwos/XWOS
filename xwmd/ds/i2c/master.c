@@ -105,7 +105,7 @@ xwer_t xwds_i2cm_cvop_probe(struct xwds_i2cm * i2cm)
         if (__unlikely(rc < 0)) {
                 goto err_dev_cvop_probe;
         }
-        return OK;
+        return XWOK;
 
 err_dev_cvop_probe:
         xwosal_mtx_destroy(&i2cm->xferlock);
@@ -129,7 +129,7 @@ xwer_t xwds_i2cm_cvop_remove(struct xwds_i2cm * i2cm)
                 goto err_dev_cvop_remove;
         }
         xwosal_mtx_destroy(&i2cm->xferlock);
-        return OK;
+        return XWOK;
 
 err_dev_cvop_remove:
         return rc;
@@ -232,7 +232,7 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
 
         xwds_i2cm_release(i2cm);
         xwds_i2cm_put(i2cm);
-        return OK;
+        return XWOK;
 
 err_drv_xfer:
         xwosal_mtx_unlock(xwosal_mtx_get_id(&i2cm->xferlock));
@@ -279,7 +279,7 @@ xwer_t xwds_i2cm_reset(struct xwds_i2cm * i2cm, xwtm_t * xwtm)
 
         xwds_i2cm_release(i2cm);
         xwds_i2cm_put(i2cm);
-        return OK;
+        return XWOK;
 
 err_drv_reset:
         xwosal_mtx_unlock(xwosal_mtx_get_id(&i2cm->xferlock));

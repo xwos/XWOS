@@ -79,7 +79,7 @@ xwer_t xwos_main(void)
                 goto err_scheduler_start_lc;
         }
 
-        return OK;
+        return XWOK;
 
 err_init_thrd_create:
         BDL_BUG();
@@ -127,7 +127,7 @@ xwer_t bdl_init_thrd(void * arg)
         }
 
         xwosal_thrd_delete(bdl_init_thrd_id);
-        return OK;
+        return XWOK;
 
 err_example_selector_start:
         BDL_BUG();

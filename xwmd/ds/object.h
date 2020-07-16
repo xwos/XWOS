@@ -65,7 +65,7 @@ xwer_t xwds_obj_remove(struct xwds * ds, struct xwds_object * obj);
  * @brief 增加对象的引用计数
  * @param obj: (I) 对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINVAL: 对象未被激活（引用计数小于1）
  */
 static __xw_inline
@@ -78,7 +78,7 @@ xwer_t xwds_obj_grab(struct xwds_object * obj)
  * @brief 减少对象的引用计数
  * @param obj: (I) 对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINVAL: 对象未被激活（引用计数小于1）
  */
 static __xw_inline

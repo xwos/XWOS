@@ -122,7 +122,7 @@ __xwbsp_code
 xwer_t arch_systick_start(__maybe_unused struct xwos_syshwt * hwt)
 {
         cm_scs.systick.csr.bit.en = 1;
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -132,7 +132,7 @@ __xwbsp_code
 xwer_t arch_systick_stop(__maybe_unused struct xwos_syshwt * hwt)
 {
         cm_scs.systick.csr.bit.en = 0;
-        return OK;
+        return XWOK;
 }
 
 /**

@@ -42,7 +42,7 @@ xwer_t xwaop__xwu8_t__tgt_then_write(__atomic xwu8_t * a,
         o = *a;
         if (o > t) {
                 *a = v;
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EACCES;
         }

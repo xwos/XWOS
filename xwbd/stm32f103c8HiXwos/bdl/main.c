@@ -55,7 +55,7 @@ xwer_t xwos_main(void)
         if (rc < 0) {
                 goto err_scheduler_start_lc;
         }
-        return OK;
+        return XWOK;
 
 err_scheduler_start_lc:
         BDL_BUG();

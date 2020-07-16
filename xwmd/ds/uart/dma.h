@@ -94,7 +94,7 @@ void xwds_dmauartc_destruct(struct xwds_dmauartc * dmauartc);
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步
@@ -114,7 +114,7 @@ xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
  *              (I) 作为输入时，表示缓冲区大小（单位：字节）
  *              (O) 作为输出时，返回实际读取的数据大小
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步
@@ -134,7 +134,7 @@ xwer_t xwds_dmauartc_try_rx(struct xwds_dmauartc * dmauartc,
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步
@@ -154,7 +154,7 @@ xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步
@@ -171,7 +171,7 @@ xwer_t xwds_dmauartc_putc(struct xwds_dmauartc * dmauartc,
  * @param dmauartc: (I) DMA UART控制器对象指针
  * @param cfg: (I) 新的配置
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步

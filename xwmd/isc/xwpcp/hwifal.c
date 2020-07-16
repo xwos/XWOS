@@ -71,7 +71,7 @@ xwer_t xwpcp_hwifal_open(struct xwpcp * xwpcp)
         if (__likely((xwpcp->hwifops) && (xwpcp->hwifops->open))) {
                 rc = xwpcp->hwifops->open(xwpcp);
         } else {
-                rc = OK;
+                rc = XWOK;
         }
         if (__unlikely(rc < 0)) {
                 goto err_hwifops_open;
@@ -107,13 +107,13 @@ xwer_t xwpcp_hwifal_close(struct xwpcp * xwpcp)
         if ((xwpcp->hwifops) && (xwpcp->hwifops->close)) {
                 rc = xwpcp->hwifops->close(xwpcp);
         } else {
-                rc = OK;
+                rc = XWOK;
         }
         if (__unlikely(rc < 0)) {
                 goto err_hwifops_close;
         }
         xwpcplogf(INFO, "close HWIF ... [OK]\n");
-        return OK;
+        return XWOK;
 
 err_hwifops_close:
         xwaop_s1m(xwsq_t, &xwpcp->hwifst, XWPCP_HWIFST_RX, NULL, NULL);
@@ -268,7 +268,7 @@ xwer_t xwpcp_hwifal_rx(struct xwpcp * xwpcp, struct xwpcp_frmslot ** frmslotbuf)
         }
 
         *frmslotbuf = frmslot;
-        return OK;
+        return XWOK;
 
 err_eof_ifrx:
 err_body_ifrx:

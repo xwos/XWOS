@@ -78,7 +78,7 @@ void xwpcp_init(struct xwpcp * xwpcp)
  * @param mempoolbase: (I) 内存池的首地址
  * @param mempoolsize: (I) 内存池的大小
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval --ENOMEM: 内存池台小
  * @retval -EPERM: XWPCP未初始化
@@ -174,7 +174,7 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
                 goto err_hwifal_open;
         }
 
-        return OK;
+        return XWOK;
 
 err_hwifal_open:
 err_rxqsmr_init:
@@ -199,7 +199,7 @@ err_grab_xwpcp:
  * @brief XWPCP API: 停止XWPCP
  * @param xwpcp: (I) XWPCP对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EPERM: XWPCP正在被使用中
  * @note
@@ -262,7 +262,7 @@ xwer_t xwpcp_stop(struct xwpcp * xwpcp)
         xwosal_smr_destroy(&xwpcp->txq.smr);
         xwmm_bma_delete(xwpcp->slot.pool);
         xwpcp->slot.pool = NULL;
-        return OK;
+        return XWOK;
 
 err_hwifal_close:
         xwaop_add(xwsq_t, &xwpcp->refcnt, 1, NULL, NULL);
@@ -303,7 +303,7 @@ void xwpcp_tx_notify(struct xwpcp * xwpcp, xwpcp_fhdl_t fhdl, xwer_t rc, void * 
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -E2BIG: 数据太长
  * @retval -ENXIO: 端口0不允许发送用户数据
@@ -365,7 +365,7 @@ xwer_t xwpcp_tx(struct xwpcp * xwpcp,
         if (-EINPROGRESS == cbarg.rc) {
                 rc = xwosal_cdt_timedwait(cdtid, ulk, XWLK_TYPE_SPLK, NULL,
                                           xwtm, &lkst);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         rc = cbarg.rc;
                         xwosal_splk_unlock(&cbarg.splk);
                 } else {
@@ -408,7 +408,7 @@ err_ifnotrdy:
  * @param cbarg: (I) 调用异步通知回调函数时用户自定义的参数
  * @param fhdlbuf: (O) 指向缓冲区的指针，通过此缓冲区返回帧句柄
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -E2BIG: 数据太长
  * @retval -ENXIO: 端口0不允许发送用户数据
@@ -503,7 +503,7 @@ void xwpcp_unlock_ntflock(struct xwpcp * xwpcp)
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ENXIO: 端口0不允许发送用户数据
  * @retval -ENODEV: 端口号超出范围
@@ -562,7 +562,7 @@ xwer_t xwpcp_rx(struct xwpcp * xwpcp, struct xwpcp_msg * msgbuf, xwtm_t * xwtm)
 
         xwmm_bma_free(xwpcp->slot.pool, frmslot);
         xwpcp_put(xwpcp);
-        return OK;
+        return XWOK;
 
 err_smr_timedwait:
         xwpcp_put(xwpcp);
@@ -575,7 +575,7 @@ err_ifnotrdy:
  * @param xwpcp: (I) XWPCP对象的指针
  * @param msgbuf: (O) 指向缓冲区的指针，此缓冲区被用于接收消息
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ENXIO: 端口0不允许发送用户数据
  * @retval -ENODEV: 端口号超出范围
@@ -631,7 +631,7 @@ xwer_t xwpcp_try_rx(struct xwpcp * xwpcp, struct xwpcp_msg * msgbuf)
 
         xwmm_bma_free(xwpcp->slot.pool, frmslot);
         xwpcp_put(xwpcp);
-        return OK;
+        return XWOK;
 
 err_smr_trywait:
         xwpcp_put(xwpcp);

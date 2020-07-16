@@ -56,7 +56,7 @@ struct xwmm_sma {
  * @param pos: (I) 内存区域的位置
  * @param name: (I) 分配器的名字
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINVAL: 内存的大小无效
  * @note
  * - 同步/异步：同步

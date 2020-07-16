@@ -73,7 +73,7 @@ xwer_t xwds_eirq_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask,
         if (__unlikely(rc < 0)) {
                 goto err_drv_eirq_req;
         }
-        return OK;
+        return XWOK;
 
 err_drv_eirq_req:
 #if !defined(XWMDCFG_ds_SOC_EIRQ_ROISRT) || (1 != XWMDCFG_ds_SOC_EIRQ_ROISRT)
@@ -114,7 +114,7 @@ xwer_t xwds_eirq_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask, xwid_t 
 #endif
 
         xwds_soc_put(soc);
-        return OK;
+        return XWOK;
 
 err_drv_rlsei:
 err_notinused:

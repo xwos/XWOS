@@ -67,7 +67,7 @@ void xwds_i2cp_destruct(struct xwds_i2cp * i2cp);
  * @param cmd: (I) 命令
  * @param ...: (I) 参数表
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENOSYS: 无效CMD
  * @retval -EFAULT: 无效指针
  * @note

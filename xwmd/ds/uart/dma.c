@@ -114,7 +114,7 @@ xwer_t xwds_dmauartc_cvop_probe(struct xwds_dmauartc * dmauartc)
         if (__unlikely(rc < 0)) {
                 goto err_dev_probe;
         }
-        return OK;
+        return XWOK;
 
 err_dev_probe:
         xwosal_mtx_destroy(&dmauartc->txmtx);
@@ -141,7 +141,7 @@ xwer_t xwds_dmauartc_cvop_remove(struct xwds_dmauartc * dmauartc)
 
         xwosal_mtx_destroy(&dmauartc->txmtx);
         xwosal_smr_destroy(&dmauartc->rxq.smr);
-        return OK;
+        return XWOK;
 
 err_dev_cvop_remove:
         return rc;
@@ -270,7 +270,7 @@ xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
 
         xwds_dmauartc_put(dmauartc);
         *size = pos;
-        return OK;
+        return XWOK;
 
 err_smr_timedwait:
         xwds_dmauartc_put(dmauartc);
@@ -332,7 +332,7 @@ xwer_t xwds_dmauartc_try_rx(struct xwds_dmauartc * dmauartc,
 
         xwds_dmauartc_put(dmauartc);
         *size = pos;
-        return OK;
+        return XWOK;
 
 err_smr_trywait:
         xwds_dmauartc_put(dmauartc);
@@ -377,7 +377,7 @@ xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
 
         xwosal_mtx_unlock(mtxid);
         xwds_dmauartc_put(dmauartc);
-        return OK;
+        return XWOK;
 
 err_tx:
         xwosal_mtx_unlock(mtxid);
@@ -423,7 +423,7 @@ xwer_t xwds_dmauartc_putc(struct xwds_dmauartc * dmauartc,
 
         xwosal_mtx_unlock(mtxid);
         xwds_dmauartc_put(dmauartc);
-        return OK;
+        return XWOK;
 
 err_putc:
         xwosal_mtx_unlock(mtxid);
@@ -459,7 +459,7 @@ xwer_t xwds_dmauartc_cfg(struct xwds_dmauartc * dmauartc,
         }
 
         xwds_dmauartc_put(dmauartc);
-        return OK;
+        return XWOK;
 
 err_drv_cfg:
         xwds_dmauartc_put(dmauartc);

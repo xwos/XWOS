@@ -136,7 +136,7 @@ struct xwosal_smr * xwosal_smr_get_obj(xwid_t smrid)
  * @param sltid: (I) 信号选择器的ID
  * @param pos: (I) 信号量对象映射到位图中的位置
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 信号选择器或信号量类型错误
  * @note
  * - 同步/异步：同步
@@ -154,7 +154,7 @@ xwer_t xwosal_smr_bind(xwid_t smrid, xwid_t sltid, xwsq_t pos)
  * @param smrid: (I) 信号量的ID
  * @param sltid: (I) 信号选择器的ID
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 信号选择器类型错误
  * @note
  * - 同步/异步：同步
@@ -171,7 +171,7 @@ xwer_t xwosal_smr_unbind(xwid_t smrid, xwid_t sltid)
  * @brief XWOSAL API：冻结信号量
  * @param smrid: (I) 信号量ID
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EALREADY: 信号量已被冻结
  * @note
  * - 同步/异步：同步
@@ -193,7 +193,7 @@ xwer_t xwosal_smr_freeze(xwid_t smrid)
  * @param val: (I) 信号量的初始值
  * @param max: (I) 信号量的最大值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EALREADY: 信号量未被冻结
  * @note
  * - 同步/异步：同步
@@ -264,7 +264,7 @@ xwer_t xwosal_smr_trywait(xwid_t smrid)
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETIMEDOUT: 超时
  * @note
  * - 同步/异步：同步

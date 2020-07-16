@@ -43,7 +43,7 @@ xwer_t xwaop__xwu64_t__t1mo_then_c0m(__atomic xwu64_t * a,
         if (o & m) {
                 n = o & (xwu64_t)(~m);
                 *a = n;
-                rc = OK;
+                rc = XWOK;
         } else {
                 n = o;
                 rc = -EACCES;

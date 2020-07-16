@@ -53,7 +53,7 @@ xwer_t soc_irq_get_id(xwirq_t * irqnbuf)
                 rc = -ENOTINISR;
                 irq = 0;
         } else {
-                rc = OK;
+                rc = XWOK;
                 irq = soc_context.irqn;
         }
         if (!is_err_or_null(irqnbuf)) {

@@ -167,7 +167,7 @@ struct xwos_tcb * xwos_tcb_alloc(void)
         xwer_t rc;
 
         rc = xwmm_kma_alloc(sizeof(struct xwos_tcb), XWMM_ALIGNMENT, &mem.anon);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 xwos_tcb_construct(mem.tcb);
         } else {
                 mem.tcb = err_ptr(-ENOMEM);
@@ -273,7 +273,7 @@ xwer_t xwos_tcb_gc(void * tcb)
         base = ((struct xwos_tcb *)tcb)->stack.base;
         xwos_thrd_stack_free(base);
         xwos_tcb_free(tcb);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -373,7 +373,7 @@ xwer_t xwos_thrd_activate(struct xwos_tcb * tcb,
                 xwbop_s1m(xwsq_t, &tcb->state, XWSDOBJ_DST_STANDBY);
                 xwlk_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);
         }
-        return OK;
+        return XWOK;
 
 err_obj_activate:
         return rc;
@@ -385,7 +385,7 @@ err_obj_activate:
  * @param mainfunc: (I) 线程主函数
  * @param arg: (I) 线程主函数的参数
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINVAL: 无效的参数
  * @retval -EEXIST: 线程已经被加载
  * @note
@@ -433,7 +433,7 @@ void xwos_thrd_launch(struct xwos_tcb * tcb, xwos_thrd_f mainfunc, void * arg)
  * @param priority: (I) 线程的优先级
  * @param attr: (I) 线程属性，取值：@ref xwos_sdobj_attr_em中的一项
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -470,7 +470,7 @@ xwer_t xwos_thrd_init(struct xwos_tcb * tcb,
  * @brief XWOS API：销毁静态方式初始化的线程
  * @param tcb: (I) 线程控制块对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：异步
@@ -498,7 +498,7 @@ xwer_t xwos_thrd_destroy(struct xwos_tcb * tcb)
  * @param priority: (I) 线程的优先级
  * @param attr: (I) 线程属性，@ref xwos_sdobj_attr_em
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -544,7 +544,7 @@ xwer_t xwos_thrd_create(struct xwos_tcb ** tcbpbuf,
         }
 
         *tcbpbuf = tcb;
-        return OK;
+        return XWOK;
 
 err_thrd_activate:
         xwos_tcb_free(tcb);
@@ -559,7 +559,7 @@ err_stack_alloc:
  * @brief XWOS API：删除动态创建的线程
  * @param tcb: (I) 线程控制块对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -609,7 +609,7 @@ xwer_t xwos_thrd_exit_lic(struct xwos_tcb * tcb, xwer_t rc)
                 xwos_thrd_put(tcb);
                 xwos_scheduler_req_swcx(xwsd);
         }
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -635,14 +635,14 @@ void xwos_cthrd_exit(xwer_t rc)
  * @brief @ref xwos_thrd_terminate()中使用的回调锁的解锁函数
  * @param tcb: (I) 线程控制块对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  */
 static __xwos_code
 xwer_t xwos_thrd_terminate_unlock_cb(struct xwos_tcb * tcb)
 {
         xwlk_splk_unlock(&tcb->stlock);
         xwos_thrd_intr(tcb);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -651,7 +651,7 @@ xwer_t xwos_thrd_terminate_unlock_cb(struct xwos_tcb * tcb)
  * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回被终止线程的返回值，
  *                 可为NULL，表示不需要返回
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EALREADY: 线程在此之前已经退出
  * @note
  * - 同步/异步：同步
@@ -687,7 +687,7 @@ xwer_t xwos_thrd_terminate(struct xwos_tcb * tcb, xwer_t * trc)
                 rc = xwsync_cdt_wait(&tcb->completion,
                                      &lockcb, XWLK_TYPE_CALLBACK, tcb,
                                      &lkst);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         if (!is_err_or_null(trc)) {
                                 *trc = (xwer_t)tcb->stack.arg;
                         }
@@ -757,7 +757,7 @@ void xwos_cthrd_wait_exit(void)
  * @param dprio: (I) 动态优先级
  * @param pmtx: (O) 指向缓冲区的指针，通过此缓冲区返回互斥锁对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ESTALE: 状态已经被其他CPU改变
  * @note
  * - 此函数将线程(tcb)的优先级改成(dprio)，并返回接下来需要修改的互斥锁(*pmtx)
@@ -774,22 +774,22 @@ xwer_t xwos_thrd_chprio_once(struct xwos_tcb * tcb, xwpr_t dprio,
         if ((XWSDOBJ_DST_RUNNING | XWSDOBJ_DST_FROZEN) & tcb->state) {
                 tcb->dprio.r = dprio;
                 xwlk_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);
-                rc = OK;
+                rc = XWOK;
         } else if (XWSDOBJ_DST_READY & tcb->state) {
                 if (tcb->dprio.rq == dprio) {
                         xwlk_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);
-                        rc = OK;
+                        rc = XWOK;
                 } else {
                         xwlk_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);
                         rc = xwos_thrd_rq_remove(tcb);
-                        if (OK == rc) {
+                        if (XWOK == rc) {
                                 rc = xwos_thrd_rq_add_tail(tcb, dprio);
                         }/* else {} */
                 }
         } else if (XWSDOBJ_DST_BLOCKING & tcb->state) {
                 if (tcb->dprio.wq == dprio) {
                         xwlk_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);
-                        rc = OK;
+                        rc = XWOK;
                 } else {
                         xwlk_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);
                         /* because of the lock sequence.
@@ -829,7 +829,7 @@ xwer_t xwos_thrd_chprio_once(struct xwos_tcb * tcb, xwpr_t dprio,
                                         xwlk_splk_unlock(&tcb->wqn.lock);
                                         xwos_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                                         *pmtx = mtx;
-                                        rc = OK;
+                                        rc = XWOK;
                                 }
                                 xwlk_mtx_put(mtx);
 #if defined(XWSMPCFG_SYNC_RTSMR) && (1 == XWSMPCFG_SYNC_RTSMR)
@@ -865,7 +865,7 @@ xwer_t xwos_thrd_chprio_once(struct xwos_tcb * tcb, xwpr_t dprio,
                                                              dprio);
                                         xwlk_splk_unlock(&tcb->wqn.lock);
                                         xwos_rtwq_unlock_cpuirqrs(&smr->wq.rt, cpuirq);
-                                        rc = OK;
+                                        rc = XWOK;
                                 }
                                 xwsync_smr_put(smr);
 #endif /* XWSMPCFG_SYNC_RTSMR */
@@ -874,12 +874,12 @@ xwer_t xwos_thrd_chprio_once(struct xwos_tcb * tcb, xwpr_t dprio,
                                 tcb->dprio.wq = dprio;
                                 xwlk_splk_unlock(&tcb->stlock);
                                 xwlk_splk_unlock_cpuirqrs(&tcb->wqn.lock, cpuirq);
-                                rc = OK;
+                                rc = XWOK;
                         }
                 }
         } else if (XWSDOBJ_DST_SLEEPING & tcb->state) {
                 xwlk_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);
-                rc = OK;
+                rc = XWOK;
         } else {
                 XWOS_BUG_ON(XWSDOBJ_DST_STANDBY & tcb->state);
                 rc = -ESTALE;
@@ -915,7 +915,7 @@ void xwos_thrd_chprio(struct xwos_tcb * tcb)
  * @param tcb: (I) 线程控制块对象的指针
  * @param prio: (I) 动态优先级
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EEXIST: 线程已经存在
  * @retval -ESTALE: 状态已经发生改变(当前线程的状态可能已经被其他CPU修改)
  */
@@ -954,7 +954,7 @@ xwer_t xwos_thrd_rq_add_head(struct xwos_tcb * tcb, xwpr_t prio)
  * @param tcb: (I) 线程控制块对象的指针
  * @param prio: (I) 动态优先级
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EEXIST: 线程已经存在
  * @retval -ESTALE: 状态已经发生改变(当前线程的状态可能已经被其他CPU修改)
  */
@@ -992,7 +992,7 @@ xwer_t xwos_thrd_rq_add_tail(struct xwos_tcb * tcb, xwpr_t prio)
  * @brief 将线程从就绪队列中删除
  * @param tcb: (I) 线程控制块对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ESRCH: 没有这个线程
  */
 __xwos_code
@@ -1007,7 +1007,7 @@ xwer_t xwos_thrd_rq_remove(struct xwos_tcb * tcb)
         xwrtrq = &xwsd->rq.rt;
         xwlk_splk_lock_cpuirqsv(&xwrtrq->lock, &cpuirq);
         rc = xwos_rtrq_remove_locked(xwrtrq, tcb);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 xwlk_splk_lock(&tcb->stlock);
                 xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_READY);
                 tcb->dprio.rq = XWOS_SD_PRIORITY_INVALID;
@@ -1021,7 +1021,7 @@ xwer_t xwos_thrd_rq_remove(struct xwos_tcb * tcb)
  * @brief XWOS API：中断线程的睡眠或阻塞状态
  * @param tcb: (I) 线程控制块对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EPERM: 线程不可被中断
  * @retval -EINVAL: 无效的线程态
  * @note
@@ -1054,7 +1054,7 @@ xwer_t xwos_thrd_intr(struct xwos_tcb * tcb)
                         tcb->wqn.cb = NULL;
                         xwlk_splk_unlock_cpuirqrs(&tcb->wqn.lock, cpuirq);
                         cb(tcb);
-                        rc = OK;
+                        rc = XWOK;
 #if defined(XWSMPCFG_SYNC_PLSMR) && (1 == XWSMPCFG_SYNC_PLSMR)
                 } else if (XWOS_WQTYPE_PLSMR == tcb->wqn.type) {
                         struct xwsync_smr * smr;
@@ -1105,7 +1105,7 @@ xwer_t xwos_thrd_intr(struct xwos_tcb * tcb)
                 xwtt = &xwsd->tt;
                 xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 rc = xwos_tt_remove_locked(xwtt, &tcb->ttn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         xwlk_splk_lock(&tcb->stlock);
                         xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_SLEEPING);
                         xwlk_splk_unlock(&tcb->stlock);
@@ -1298,7 +1298,7 @@ xwer_t xwos_thrd_do_unlock(void * lock, xwsq_t lktype, void * lkdata)
 
         ulk.anon = lock;
 
-        rc = OK;
+        rc = XWOK;
         switch (lktype) {
         case XWLK_TYPE_MTX:
         case XWLK_TYPE_MTX_UNINTR:
@@ -1343,7 +1343,7 @@ xwer_t xwos_thrd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm, void * lkdat
 
         ulk.anon = lock;
 
-        rc = OK;
+        rc = XWOK;
         switch (lktype) {
         case XWLK_TYPE_MTX:
                 if (xwtm) {
@@ -1381,7 +1381,7 @@ xwer_t xwos_thrd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm, void * lkdat
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINTR: 睡眠过程被中断
  * @note
  * - 同步/异步：同步
@@ -1451,7 +1451,7 @@ xwer_t xwos_cthrd_sleep(xwtm_t * xwtm)
         /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
         wkuprs = xwaop_load(xwsq_t, &ctcb->ttn.wkuprs, xwmb_modr_relaxed);
         if (XWOS_TTN_WKUPRS_TIMEDOUT == wkuprs) {
-                rc = OK;
+                rc = XWOK;
         } else if (XWOS_TTN_WKUPRS_INTR == wkuprs) {
                 rc = -EINTR;
         } else {
@@ -1474,7 +1474,7 @@ err_xwtm:
  *                    （可作为下一次时间起点，形成精确的周期）
  * @param inc: (I) 期望被唤醒的时间增量（相对于时间原点）
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINTR: 睡眠过程被中断
  * @note
  * - 同步/异步：同步
@@ -1537,7 +1537,7 @@ xwer_t xwos_cthrd_sleep_from(xwtm_t * origin, xwtm_t inc)
         /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
         wkuprs = xwaop_load(xwsq_t, &ctcb->ttn.wkuprs, xwmb_modr_relaxed);
         if (XWOS_TTN_WKUPRS_TIMEDOUT == wkuprs) {
-                rc = OK;
+                rc = XWOK;
         } else if (XWOS_TTN_WKUPRS_INTR == wkuprs) {
                 rc = -EINTR;
         } else {
@@ -1554,7 +1554,7 @@ err_needfrz:
  * @brief 申请冻结当前CPU中的线程
  * @param tcb: (I) 线程控制块
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EALREADY: 线程已经被冻结
  * @note
  * - 此函数只可在线程所属的CPU的中断上下文中被调用；
@@ -1576,7 +1576,7 @@ xwer_t xwos_thrd_reqfrz_lic(struct xwos_tcb * tcb)
         } else {
                 xwbop_s1m(xwsq_t, &tcb->state, XWSDOBJ_DST_FREEZABLE);
                 xwlk_splk_unlock(&tcb->stlock);
-                rc = OK;
+                rc = XWOK;
         }
         xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
         return rc;
@@ -1637,7 +1637,7 @@ xwer_t xwos_thrd_freeze_lic(struct xwos_tcb * tcb)
                         xwos_scheduler_enpmpt(xwsd);
                         xwos_scheduler_req_swcx(xwsd);
                 }
-                rc = OK;
+                rc = XWOK;
         } else {
                 xwlk_splk_unlock(&tcb->stlock);
                 xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
@@ -1649,7 +1649,7 @@ xwer_t xwos_thrd_freeze_lic(struct xwos_tcb * tcb)
 /**
  * @brief XWOS API：线程自我冻结
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EPERM: 不允许冻结
  * @retval -ECANCELED: 冻结被取消
  * @note
@@ -1808,7 +1808,7 @@ bool xwos_cthrd_frz_shld_stop(bool * frozen)
         frz = false;
         if (xwos_cthrd_shld_frz()) {
                 rc = xwos_cthrd_freeze();
-                if (OK == rc) {
+                if (XWOK == rc) {
                         frz = true;
                 }/* else {} */
         }/* else {} */
@@ -1896,7 +1896,7 @@ void xwos_thrd_outmigrate_frozen_lic(struct xwos_tcb * tcb)
  * @param tcb: (I) 线程控制块
  * @param dstcpu: (I) 目标CPU的ID
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINPROGRESS: 线程处于迁移的过程中
  * @retval -EALREADY: 线程已经被冻结
  * @note
@@ -1937,7 +1937,7 @@ xwer_t xwos_thrd_outmigrate_reqfrz_lic(struct xwos_tcb * tcb, xwid_t dstcpu)
                         tcb->migration.dst = dstcpu;
                         xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
                 }
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -1991,7 +1991,7 @@ xwer_t xwos_thrd_migrate(struct xwos_tcb * tcb, xwid_t dstcpu)
         xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
         srccpu = xwsd->id;
         if (localcpu == srccpu) {
-                if (OK == xwos_irq_get_id(NULL)) {
+                if (XWOK == xwos_irq_get_id(NULL)) {
                         rc = xwos_thrd_outmigrate_lic(tcb, dstcpu);
                 } else {
                         rc = soc_thrd_outmigrate(tcb, dstcpu);

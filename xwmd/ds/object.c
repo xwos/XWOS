@@ -87,7 +87,7 @@ xwer_t xwds_obj_add(struct xwds * ds, struct xwds_object * obj)
         } else {
                 xwlib_bclst_add_tail(&ds->devhead, &obj->node); /* LIFO */
                 obj->ds = ds;
-                rc = OK;
+                rc = XWOK;
         }
         xwosal_sqlk_wr_unlock_cpuirqrs(&ds->devlistlock, cpuirq);
         return rc;

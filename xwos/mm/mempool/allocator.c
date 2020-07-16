@@ -53,7 +53,7 @@ xwer_t xwmm_mempool_destruct(struct xwmm_mempool * mp);
  * @param odrbtree: (I) 阶红黑树数组的指针
  * @param pgarray: (I) 页控制块数组的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -E2SMALL: 内存区域太小
  * @retval -EALIGN: 内存区域没有对齐
  */
@@ -178,7 +178,7 @@ xwer_t xwmm_mempool_construct(struct xwmm_mempool * mp, const char * name,
 
         mp->name = name;
 
-        return OK;
+        return XWOK;
 
 err_oc_2048_init:
         xwmm_mempool_objcache_destroy(&mp->oc_1024);
@@ -214,7 +214,7 @@ err_pa_init:
  * @brief XWMM API：内存池的析构函数
  * @param mp: (I) 内存池的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  */
 static __xwos_code
 xwer_t xwmm_mempool_destruct(struct xwmm_mempool * mp)
@@ -234,7 +234,7 @@ xwer_t xwmm_mempool_destruct(struct xwmm_mempool * mp)
         xwmm_mempool_objcache_destroy(&mp->oc_8);
         xwmm_mempool_page_allocator_destroy(&mp->pa);
 
-        return OK;
+        return XWOK;
 }
 
 __xwos_api
@@ -281,7 +281,7 @@ xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
                 }
         }
 
-        return OK;
+        return XWOK;
 
 err_mempool_alloc:
         xwmm_mempool_destroy(mp);
@@ -343,7 +343,7 @@ xwer_t xwmm_mempool_create(struct xwmm_mempool ** ptrbuf, const char * name,
                 goto err_mempool_construct;
         }
         *ptrbuf = mp;
-        return OK;
+        return XWOK;
 
 err_mempool_construct:
         xwmm_kma_free(mp);
@@ -361,7 +361,7 @@ xwer_t xwmm_mempool_delete(struct xwmm_mempool * mp)
 
         xwmm_mempool_destroy(mp);
         xwmm_kma_free(mp);
-        return OK;
+        return XWOK;
 }
 
 __xwos_api
@@ -376,7 +376,7 @@ xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf
         XWOS_VALIDATE((membuf), "nullptr", -EFAULT);
 
         if (0 == size) {
-                rc = OK;
+                rc = XWOK;
                 *membuf = NULL;
         } else {
                 real = ALIGN(size, 8);
@@ -448,7 +448,7 @@ xwer_t xwmm_mempool_free(struct xwmm_mempool * mp, void * mem)
         XWOS_VALIDATE((mp), "nullptr", -EFAULT);
 
         if (NULL == mem) {
-                rc = OK;
+                rc = XWOK;
                 goto do_nothing;
         }
 
@@ -519,7 +519,7 @@ xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size, void ** membu
                 rc = xwmm_mempool_malloc(mp, size, membuf);
         } else if (0 == size) {
                 rc = xwmm_mempool_free(mp, *membuf);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         *membuf = NULL;
                 }
         } else {
@@ -528,17 +528,17 @@ xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size, void ** membu
 
                 oldmem = *membuf;
                 rc = xwmm_mempool_page_find(&mp->pa, oldmem, &pg);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         if (size <= pg->data.value) {
-                                rc = OK;
+                                rc = XWOK;
                         } else {
                                 void * newmem;
 
                                 rc = xwmm_mempool_malloc(mp, size, &newmem);
-                                if (OK == rc) {
+                                if (XWOK == rc) {
                                         memcpy(newmem, oldmem, pg->data.value);
                                         rc = xwmm_mempool_free(mp, oldmem);
-                                        if (OK == rc) {
+                                        if (XWOK == rc) {
                                                 *membuf = newmem;
                                         } else {
                                                 xwmm_mempool_free(mp, newmem);

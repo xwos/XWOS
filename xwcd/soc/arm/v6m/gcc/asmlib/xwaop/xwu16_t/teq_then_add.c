@@ -43,7 +43,7 @@ xwer_t xwaop__xwu16_t__teq_then_add(__atomic xwu16_t * a,
         o = *a;
         if (o == t) {
                 n = o + v;
-                rc = OK;
+                rc = XWOK;
                 *a = n;
         } else {
                 n = o;

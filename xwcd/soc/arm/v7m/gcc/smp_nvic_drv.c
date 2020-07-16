@@ -116,14 +116,14 @@ xwer_t cortexm_nvic_drv_probe(struct xwos_irqc * irqc)
         cm_set_basepri(irqccfg->basepri);
         cm_nvic_set_prioritygrouping(irqccfg->subprio);
 
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
 xwer_t cortexm_nvic_drv_remove(struct xwos_irqc * irqc)
 {
         (void)irqc;
-        return OK;
+        return XWOK;
 }
 
 /******** ******** irq operations ******** ********/
@@ -146,7 +146,7 @@ xwer_t cortexm_nvic_drv_request(__maybe_unused struct xwos_irqc * irqc,
                 irq_data_table->soc[irqn] = data;
         }
 #endif /* !SOCCFG_RO_ISRTABLE */
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -159,7 +159,7 @@ xwer_t cortexm_nvic_drv_release(__maybe_unused struct xwos_irqc * irqc,
         isr_table = irqc->isr_table;
         isr_table->soc[irqn] = arch_isr_nop;
 #endif /* #if (!defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE)) */
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -175,7 +175,7 @@ xwer_t cortexm_nvic_drv_enable(__maybe_unused struct xwos_irqc * irqc,
         } else if (ARCH_IRQ_USGFAULT == irqn) {
                 cm_nvic_enable_usgfault();
         }/* else {} */
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -191,7 +191,7 @@ xwer_t cortexm_nvic_drv_disable(__maybe_unused struct xwos_irqc * irqc,
         } else if (ARCH_IRQ_USGFAULT == irqn) {
                 cm_nvic_disable_usgfault();
         }/* else {} */
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -200,7 +200,7 @@ xwer_t cortexm_nvic_drv_save(__maybe_unused struct xwos_irqc * irqc,
 {
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         if (irqn >= 0) {
                 cm_nvic_save_irq(irqn, flag);
                 cm_nvic_disable_irq(irqn);
@@ -225,7 +225,7 @@ xwer_t cortexm_nvic_drv_restore(__maybe_unused struct xwos_irqc * irqc,
 {
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         if (irqn >= 0) {
                 cm_nvic_restore_irq(irqn, flag);
         } else if (ARCH_IRQ_MMFAULT == irqn) {
@@ -245,7 +245,7 @@ xwer_t cortexm_nvic_drv_pend(__maybe_unused struct xwos_irqc * irqc, xwirq_t irq
 {
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         if (irqn >= 0) {
                 cm_nvic_software_trigger_irq(irqn);
         } else if (ARCH_IRQ_NMI == irqn) {
@@ -265,7 +265,7 @@ xwer_t cortexm_nvic_drv_clear(__maybe_unused struct xwos_irqc * irqc, xwirq_t ir
 {
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         if (irqn >= 0) {
                 cm_nvic_clear_irq_pending(irqn);
         } else if (ARCH_IRQ_PENDSV == irqn) {
@@ -287,7 +287,7 @@ xwer_t cortexm_nvic_drv_cfg(__maybe_unused struct xwos_irqc * irqc,
         } else {
                 cm_nvic_set_sysirq_priority(irqn, cfg->irqcfg.priority);
         }
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -299,7 +299,7 @@ xwer_t cortexm_nvic_drv_get_cfg(__maybe_unused struct xwos_irqc * irqc,
         } else {
                 cfgbuf->irqcfg.priority = cm_nvic_get_sysirq_priority(irqn);
         }
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -310,5 +310,5 @@ xwer_t cortexm_nvic_drv_get_data(__maybe_unused struct xwos_irqc * irqc,
 
         irq_data_table = irqc->irq_data_table;
         databuf->data = irq_data_table->soc[irqn];
-        return OK;
+        return XWOK;
 }

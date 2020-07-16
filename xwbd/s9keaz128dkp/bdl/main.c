@@ -66,7 +66,7 @@ xwer_t xwos_main(void)
                                 sys_mgr_td.stack_size,
                                 sys_mgr_td.prio,
                                 sys_mgr_td.attr);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 rc = xwosal_scheduler_start_lc();
         }
         BDL_BUG_ON(rc < 0);

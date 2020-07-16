@@ -62,7 +62,7 @@ void xwos_plwq_add_tail(struct xwos_plwq * xwplwq, struct xwos_wqn * wqn)
  * @brief 将等待队列节点从管道等待队列中移除
  * @param xwplwq: (I) 管道等待队列结构体指针
  * @param wqn: (I) 等待队列节点结构体指针
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ESRCH: 没有这个节点
  * @note
  * - 这个函数只能在临界区被调用。
@@ -76,7 +76,7 @@ xwer_t xwos_plwq_remove(struct xwos_plwq * xwplwq, struct xwos_wqn * wqn)
                 rc = -ESRCH;
         } else {
                 xwlib_bclst_del_init(&wqn->cln.pl);
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }

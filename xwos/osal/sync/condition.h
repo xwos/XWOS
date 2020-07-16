@@ -133,7 +133,7 @@ struct xwosal_cdt * xwosal_cdt_get_obj(xwid_t cdtid)
  * @param sltid: (I) 信号选择器的ID
  * @param pos: (I) 条件量对象映射到位图中的位置
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 信号选择器类型错误
  * @note
  * - 同步/异步：同步
@@ -153,7 +153,7 @@ xwer_t xwosal_cdt_bind(xwid_t cdtid, xwid_t sltid, xwsq_t pos)
  * @param cdtid: (I) 条件量的ID
  * @param sltid: (I) 信号选择器的ID
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 信号选择器类型错误
  * @note
  * - 同步/异步：同步
@@ -170,7 +170,7 @@ xwer_t xwosal_cdt_unbind(xwid_t cdtid, xwid_t sltid)
  * @brief XWOSAL API：冻结条件量
  * @param cdtid: (I) 条件量ID
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EALREADY: 条件量已被冻结
  * @note
  * - 同步/异步：同步
@@ -190,7 +190,7 @@ xwer_t xwosal_cdt_freeze(xwid_t cdtid)
  * @brief XWOSAL API：解冻条件量，并重新初始化
  * @param cdtid: (I) 条件量ID
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EALREADY: 条件量未被冻结
  * @note
  * - 同步/异步：同步
@@ -288,7 +288,7 @@ xwer_t xwosal_cdt_wait(xwid_t cdtid,
  *              (O) 作为输出时，返回剩余的期望时间
  * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETIMEDOUT: 超时
  * @note
  * - 同步/异步：同步

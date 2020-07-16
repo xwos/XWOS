@@ -73,7 +73,7 @@ xwer_t xwlk_mtx_create(struct xwlk_mtx ** ptrbuf, xwpr_t sprio)
 
         XWOS_UNUSED(sprio);
         rc = XWSDYNC_SMR_API(create, &smr, 1, 1);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 *ptrbuf = (void *)smr;
         }
         return rc;

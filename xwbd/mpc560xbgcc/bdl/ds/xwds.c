@@ -96,7 +96,7 @@ xwer_t bdl_xwds_start(void)
         if (__unlikely(rc < 0)) {
                 goto err_i2cm_start;
         }
-        return OK;
+        return XWOK;
 
 err_i2cm_start:
         BDL_BUG();
@@ -126,7 +126,7 @@ xwer_t bdl_xwds_stop(void)
         if (__unlikely(rc < 0)) {
                 goto err_soc_stop;
         }
-        return OK;
+        return XWOK;
 
 err_soc_stop:
 err_uart_stop:
@@ -156,7 +156,7 @@ xwer_t bdl_xwds_soc_start(void)
                 goto err_soc_start;
         }
 
-        return OK;
+        return XWOK;
 
 err_soc_start:
         BDL_BUG();
@@ -197,7 +197,7 @@ xwer_t bdl_xwds_uart_start(void)
         if (__unlikely(rc < 0)) {
                 goto err_uart0_start;
         }
-        return OK;
+        return XWOK;
 
 err_uart0_start:
         BDL_BUG();
@@ -239,7 +239,7 @@ xwer_t bdl_xwds_i2cm_start(void)
                 goto err_i2cm_start;
         }
 
-        return OK;
+        return XWOK;
 
 err_i2cm_start:
         BDL_BUG();
@@ -319,7 +319,7 @@ xwer_t bdl_xwds_misc_start(void)
                 goto err_misc_start;
         }
 
-        return OK;
+        return XWOK;
 
 err_misc_start:
         BDL_BUG();
@@ -360,7 +360,7 @@ xwer_t bdl_xwds_rtc_start(void)
                 goto err_rtc_start;
         }
 
-        return OK;
+        return XWOK;
 
 err_rtc_start:
         BDL_BUG();

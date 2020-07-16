@@ -318,15 +318,15 @@ void MX_W25Q_Init(void)
   w25q.bus = W25Q_BUS_MODE_SPI;
   rc = MX_W25Q_Reset();
   rc = MX_W25Q_Read_UID(&uid);
-  if (OK == rc) {
+  if (XWOK == rc) {
     w25q.uid = uid;
   }
   rc = MX_W25Q_Read_MID(&mid);
-  if (OK == rc) {
+  if (XWOK == rc) {
     w25q.mid = mid;
   }
   rc = MX_W25Q_Read_JID(&jid);
-  if (OK == rc) {
+  if (XWOK == rc) {
     w25q.jid = jid;
   }
   switch (w25q.mid) {
@@ -355,7 +355,7 @@ void MX_W25Q_Init(void)
 
   sr3 = 0;
   rc = MX_W25Q_Read_SR(3, &sr3);
-  if (OK == rc) {
+  if (XWOK == rc) {
     if (0 == (sr3 & W25Q_SR3_ADS)) {
       w25q.addrbits = QSPI_ADDRESS_24_BITS;
     } else {
@@ -423,7 +423,7 @@ xwer_t MX_W25Q_Write_Enable(void)
 
   halrc = HAL_QSPI_Command(&hqspi, &cmd, W25Q_CMD_TIMEOUT);
   if (HAL_OK == halrc) {
-    rc = OK;
+    rc = XWOK;
   } else {
     rc = -EIO;
   }
@@ -457,7 +457,7 @@ xwer_t MX_W25Q_Write_Disable(void)
 
   halrc = HAL_QSPI_Command(&hqspi, &cmd, W25Q_CMD_TIMEOUT);
   if (HAL_OK == halrc) {
-    rc = OK;
+    rc = XWOK;
   } else {
     rc = -EIO;
   }
@@ -506,7 +506,7 @@ xwer_t MX_W25Q_Read_SR(xwu32_t sridx, xwu8_t * srbuf)
   if (HAL_OK == halrc) {
     halrc = HAL_QSPI_Receive(&hqspi, srbuf, W25Q_CMD_TIMEOUT);
     if (HAL_OK == halrc) {
-      rc = OK;
+      rc = XWOK;
     } else {
       rc = -EIO;
     }
@@ -558,7 +558,7 @@ xwer_t MX_W25Q_Write_SR(xwu32_t sridx, xwu8_t sr)
   if (HAL_OK == halrc) {
     halrc = HAL_QSPI_Transmit(&hqspi, &sr, W25Q_CMD_TIMEOUT);
     if (HAL_OK == halrc) {
-      rc = OK;
+      rc = XWOK;
     } else {
       rc = -EIO;
     }
@@ -594,7 +594,7 @@ xwer_t MX_W25Q_Read_UID(xwu64_t * uidbuf)
     halrc = HAL_QSPI_Receive(&hqspi, (uint8_t *)uidbuf, W25Q_CMD_TIMEOUT);
     if (HAL_OK == halrc) {
       *uidbuf = xwbop_re(xwu64_t, *uidbuf);
-      rc = OK;
+      rc = XWOK;
     } else {
       rc = -EIO;
     }
@@ -630,7 +630,7 @@ xwer_t MX_W25Q_Read_MID(xwu16_t * midbuf)
     halrc = HAL_QSPI_Receive(&hqspi, (uint8_t *)midbuf, W25Q_CMD_TIMEOUT);
     if (HAL_OK == halrc) {
       *midbuf = xwbop_re(xwu16_t, *midbuf);
-      rc = OK;
+      rc = XWOK;
     } else {
       rc = -EIO;
     }
@@ -671,7 +671,7 @@ xwer_t MX_W25Q_Read_JID(xwu32_t * jidbuf)
     halrc = HAL_QSPI_Receive(&hqspi, (uint8_t *)jidbuf, W25Q_CMD_TIMEOUT);
     if (HAL_OK == halrc) {
       *jidbuf = xwbop_re(xwu32_t, *jidbuf);
-      rc = OK;
+      rc = XWOK;
     } else {
       rc = -EIO;
     }
@@ -705,7 +705,7 @@ xwer_t MX_W25Q_Enable_QPI_Mode(void)
 
   halrc = HAL_QSPI_Command(&hqspi, &cmd, W25Q_CMD_TIMEOUT);
   if (HAL_OK == halrc) {
-    rc = OK;
+    rc = XWOK;
   } else {
     rc = -EIO;
   }
@@ -736,7 +736,7 @@ xwer_t MX_W25Q_Disable_QPI_Mode(void)
 
   halrc = HAL_QSPI_Command(&hqspi, &cmd, W25Q_CMD_TIMEOUT);
   if (HAL_OK == halrc) {
-    rc = OK;
+    rc = XWOK;
   } else {
     rc = -EIO;
   }
@@ -753,24 +753,24 @@ xwer_t MX_W25Q_Set_BusMode(xwu32_t busmode)
   } else if (W25Q_BUS_MODE_QPI == busmode) {
     sr2 = 0;
     rc = MX_W25Q_Read_SR(2, &sr2);
-    if ((OK == rc) && (0 == (sr2 & W25Q_SR2_QE))) {
+    if ((XWOK == rc) && (0 == (sr2 & W25Q_SR2_QE))) {
       rc = MX_W25Q_Write_Enable();
-      if (OK == rc) {
+      if (XWOK == rc) {
         sr2 |= W25Q_SR2_QE;
         rc = MX_W25Q_Write_SR(2, sr2);
       }
     }
-    if (OK == rc) {
+    if (XWOK == rc) {
       rc = MX_W25Q_Enable_QPI_Mode();
-      if (OK == rc) {
+      if (XWOK == rc) {
         w25q.bus = W25Q_BUS_MODE_QPI;
       }
     }
   } else if (W25Q_BUS_MODE_SPI == busmode) {
     rc = MX_W25Q_Disable_QPI_Mode();
-    if (OK == rc) {
+    if (XWOK == rc) {
       rc = MX_W25Q_Read_SR(2, &sr2);
-      if ((OK == rc) && (0 != (sr2 & W25Q_SR2_QE))) {
+      if ((XWOK == rc) && (0 != (sr2 & W25Q_SR2_QE))) {
         sr2 &= ~W25Q_SR2_QE;
         rc = MX_W25Q_Write_SR(2, sr2);
       }
@@ -810,7 +810,7 @@ xwer_t MX_W25Q_Enter_4Byte_Addr_Mode(void)
 
   halrc = HAL_QSPI_Command(&hqspi, &cmd, W25Q_CMD_TIMEOUT);
   if (HAL_OK == halrc) {
-    rc = OK;
+    rc = XWOK;
   } else {
     rc = -EIO;
   }
@@ -845,7 +845,7 @@ xwer_t MX_W25Q_Exit_4Byte_Addr_Mode(void)
 
   halrc = HAL_QSPI_Command(&hqspi, &cmd, W25Q_CMD_TIMEOUT);
   if (HAL_OK == halrc) {
-    rc = OK;
+    rc = XWOK;
   } else {
     rc = -EIO;
   }
@@ -862,25 +862,25 @@ xwer_t MX_W25Q_Set_AddrBits(xwu32_t addrbits)
   } else if (QSPI_ADDRESS_24_BITS == addrbits) {
     sr3 = 0;
     rc = MX_W25Q_Read_SR(3, &sr3);
-    if ((OK == rc) && (0 != (sr3 & W25Q_SR3_ADS))) {
+    if ((XWOK == rc) && (0 != (sr3 & W25Q_SR3_ADS))) {
       rc = MX_W25Q_Write_Enable();
-      if (OK == rc) {
+      if (XWOK == rc) {
         rc = MX_W25Q_Exit_4Byte_Addr_Mode();
       }
     }
-    if (OK == rc) {
+    if (XWOK == rc) {
       w25q.addrbits = QSPI_ADDRESS_24_BITS;
     }
   } else if (QSPI_ADDRESS_32_BITS == addrbits) {
     sr3 = 0;
     rc = MX_W25Q_Read_SR(3, &sr3);
-    if ((OK == rc) && (0 == (sr3 & W25Q_SR3_ADS))) {
+    if ((XWOK == rc) && (0 == (sr3 & W25Q_SR3_ADS))) {
       rc = MX_W25Q_Write_Enable();
-      if (OK == rc) {
+      if (XWOK == rc) {
         rc = MX_W25Q_Enter_4Byte_Addr_Mode();
       }
     }
-    if (OK == rc) {
+    if (XWOK == rc) {
       w25q.addrbits = QSPI_ADDRESS_32_BITS;
     }
   } else {
@@ -918,13 +918,13 @@ xwer_t MX_W25Q_Set_ReadParameters(void)
   cmd.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;
 
   rc = MX_W25Q_Write_Enable();
-  if (OK == rc) {
+  if (XWOK == rc) {
     halrc = HAL_QSPI_Command(&hqspi, &cmd, W25Q_CMD_TIMEOUT);
     if (HAL_OK == halrc) {
       rdpara = 0x30; /* 8 dummy clock @ 100MHz */
       halrc = HAL_QSPI_Transmit(&hqspi, &rdpara, W25Q_CMD_TIMEOUT);
       if (HAL_OK == halrc) {
-        rc = OK;
+        rc = XWOK;
       } else {
         rc = -EIO;
       }
@@ -967,7 +967,7 @@ xwer_t MX_W25Q_Mmap(void)
 
   halrc = HAL_QSPI_MemoryMapped(&hqspi, &cmd, &mapcfg);
   if (HAL_OK == halrc) {
-    rc = OK;
+    rc = XWOK;
   } else {
     rc = -EIO;
   }
@@ -1004,7 +1004,7 @@ xwer_t MX_W25Q_Reset(void)
     cmd.Instruction = W25Q_CMD_RESET;
     halrc = HAL_QSPI_Command(&hqspi, &cmd, W25Q_CMD_TIMEOUT);
     if (HAL_OK == halrc) {
-      rc = OK;
+      rc = XWOK;
     } else {
       rc = -EIO;
     }

@@ -59,7 +59,7 @@ enum xwds_soc_ei_flag_em {
  * @param isr: (I) 中断响应函数
  * @param arg: (I) 中断响应函数参数
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: 外部中断ID错误
  * @note
@@ -79,7 +79,7 @@ xwer_t xwds_eirq_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask,
  * @param pinmask: (I) GPIO PIN
  * @param eiid: (I) 外部中断ID
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: 外部中断ID错误
  * @note

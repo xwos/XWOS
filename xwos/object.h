@@ -92,7 +92,7 @@ void xwos_object_destruct(struct xwos_object * obj)
  * @param obj: (I) 对象指针
  * @param gcfunc: (I) 垃圾回收函数：当对象应用计数为0，调用此函数回收资源。
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EOBJACTIVE: 对象已激活
  */
 static __xw_inline
@@ -101,7 +101,7 @@ xwer_t xwos_object_activate(struct xwos_object * obj, xwobj_gc_f gcfunc)
         xwer_t rc;
 
         rc = xwaop_teq_then_add(xwsq_t, &obj->refcnt, 0, 1, NULL, NULL);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 obj->gcfunc = gcfunc;
         } else {
                 rc = -EOBJACTIVE;
@@ -113,7 +113,7 @@ xwer_t xwos_object_activate(struct xwos_object * obj, xwobj_gc_f gcfunc)
  * @brief 增加对象的引用计数
  * @param obj: (I) 对象指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EOBJDEAD: 对象已销毁
  */
 static __xw_inline
@@ -132,7 +132,7 @@ xwer_t xwos_object_grab(struct xwos_object * obj)
  * @brief 减少对象的引用计数
  * @param obj: (I) 对象指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EOBJDEAD: 对象已销毁
  */
 static __xw_inline
@@ -144,7 +144,7 @@ xwer_t xwos_object_put(struct xwos_object * obj)
         rc = xwaop_tgt_then_sub(xwsq_t, &obj->refcnt,
                                 0, 1,
                                 &nv, NULL);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 if (__unlikely(0 == nv)) {
                         if (obj->gcfunc) {
                                 rc = obj->gcfunc(obj);

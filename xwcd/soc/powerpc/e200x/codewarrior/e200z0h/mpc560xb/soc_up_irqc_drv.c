@@ -69,7 +69,7 @@ xwer_t soc_irqc_drv_init(void)
         }
 
         INTC.CPR.R = SOC_IRQC_OS_PRIO - 1;
-        return OK;
+        return XWOK;
 }
 
 /******** ******** irq operations ******** ********/
@@ -96,7 +96,7 @@ xwer_t soc_irqc_drv_request(xwirq_t irqn, xwisr_f isrfunc, xwsq_t flag, void * d
         }
 #endif /* !SOCCFG_RO_ISRTABLE */
 
-        return OK;
+        return XWOK;
 }
 
 __xwbsp_code
@@ -115,7 +115,7 @@ xwer_t soc_irqc_drv_release(xwirq_t irqn)
         }
 #endif /* !SOCCFG_RO_ISRTABLE */
 
-        return OK;
+        return XWOK;
 }
 
 __xwbsp_code
@@ -124,7 +124,7 @@ xwer_t soc_irqc_drv_enable(xwirq_t irqn)
         if (irqn >= 0) {
                 INTC.PSR[irqn].R |= BIT(SOC_IRQC_ENBIT);
         }
-        return OK;
+        return XWOK;
 }
 
 __xwbsp_code
@@ -133,7 +133,7 @@ xwer_t soc_irqc_drv_disable(xwirq_t irqn)
         if (irqn >= 0) {
                 INTC.PSR[irqn].R &= ~BIT(SOC_IRQC_ENBIT);
         }
-        return OK;
+        return XWOK;
 }
 
 __xwbsp_code
@@ -144,7 +144,7 @@ xwer_t soc_irqc_drv_save(xwirq_t irqn, xwreg_t * flag)
         if (irqn >= 0) {
                 *flag = (xwreg_t)INTC.PSR[irqn].R;
                 INTC.PSR[irqn].R &= ~BIT(SOC_IRQC_ENBIT);
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EPERM;
         }
@@ -158,7 +158,7 @@ xwer_t soc_irqc_drv_restore(xwirq_t irqn, xwreg_t flag)
 
         if (irqn >= 0) {
                 INTC.PSR[irqn].R = (xwu8_t)flag & 0xFF;
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EPERM;
         }
@@ -189,7 +189,7 @@ xwer_t soc_irqc_drv_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg)
                 prio = INTC.PSR[irqn].R & BIT(SOC_IRQC_ENBIT);
                 prio |= (cfg->priority & (BIT(SOC_IRQC_ENBIT) - 1));
                 INTC.PSR[irqn].R = prio;
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -ENOSYS;
         }
@@ -203,7 +203,7 @@ xwer_t soc_irqc_drv_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
 
         if (irqn >= 0) {
                 cfgbuf->priority = INTC.PSR[irqn].R & (BIT(SOC_IRQC_ENBIT) - 1);
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EPERM;
         }
@@ -219,7 +219,7 @@ xwer_t soc_irqc_drv_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
         if (irqn >= 0) {
                 irq_data_table = xwos_irqc.irq_data_table;
                 databuf->data = irq_data_table->soc[irqn];
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EPERM;
         }

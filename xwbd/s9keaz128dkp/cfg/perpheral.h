@@ -24,7 +24,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********   I2C perpheral   ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define PPCFG_ds_i2c_eeprom                             1
+#define PPCFG_ds_i2c_eeprom                             0
 #define PPCFG_ds_i2c_eeprom_AT24SDD                     1
 #define PPCFG_ds_i2c_eeprom_AT24MDD                     1
 

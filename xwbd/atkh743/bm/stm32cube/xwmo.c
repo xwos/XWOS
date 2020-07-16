@@ -123,7 +123,7 @@ xwer_t bm_stm32cube_start(void)
                 }
         }
 
-        return OK;
+        return XWOK;
 
 err_thrd_create:
         BDL_BUG();
@@ -149,7 +149,7 @@ xwer_t led_task(void * arg)
                                  XWDS_GPIO_PORT_B,
                                  XWDS_GPIO_PIN_0 | XWDS_GPIO_PIN_1);
         }
-        return OK;
+        return XWOK;
 }
 
 xwer_t uartst_task(void * arg)
@@ -173,7 +173,7 @@ xwer_t uartst_task(void * arg)
                                          &xwtm);
                 }
         }
-        return OK;
+        return XWOK;
 }
 
 xwer_t memtst_task(void * arg)
@@ -184,7 +184,7 @@ xwer_t memtst_task(void * arg)
         __xw_io bool running = true;
 
         XWOS_UNUSED(arg);
-        rc = OK;
+        rc = XWOK;
         while ((!xwosal_cthrd_frz_shld_stop(NULL)) && (running)) {
                 xwtm = 2 * XWTM_MS;
                 xwosal_cthrd_sleep(&xwtm);

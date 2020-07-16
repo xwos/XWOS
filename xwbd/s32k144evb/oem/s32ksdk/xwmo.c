@@ -82,7 +82,7 @@ xwer_t s32ksdk_start(void)
                 }
         }
 
-        return OK;
+        return XWOK;
 
 err_thrd_create:
         return rc;
@@ -91,7 +91,7 @@ err_thrd_create:
 xwer_t led_task(void * arg)
 {
         xwtm_t time;
-        xwer_t rc = OK;
+        xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {

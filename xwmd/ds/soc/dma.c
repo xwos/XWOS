@@ -59,7 +59,7 @@ xwer_t xwds_dma_req(struct xwds_soc * soc, xwid_t ch)
                         goto err_drv_dma_req;
                 }
         }
-        return OK;
+        return XWOK;
 
 err_drv_dma_req:
         xwbmpaop_s1i(soc->dma.chstatus, ch);
@@ -91,7 +91,7 @@ xwer_t xwds_dma_rls(struct xwds_soc * soc, xwid_t ch)
         }
         xwbmpaop_c0i(soc->dma.chstatus, ch);
         xwds_soc_put(soc);
-        return OK;
+        return XWOK;
 
 err_drv_dma_rls:
 err_notreq:
@@ -132,7 +132,7 @@ xwer_t xwds_dma_cfg(struct xwds_soc * soc, xwid_t ch, void * cfg,
                         goto err_drv_dma_cfg;
                 }
         }
-        return OK;
+        return XWOK;
 
 err_drv_dma_cfg:
 #if !defined(XWMDCFG_ds_SOC_DMA_ROCBT) || (1 != XWMDCFG_ds_SOC_DMA_ROCBT)
@@ -167,7 +167,7 @@ xwer_t xwds_dma_enable(struct xwds_soc * soc, xwid_t ch)
                         goto err_drv_dma_enable;
                 }
         }
-        return OK;
+        return XWOK;
 
 err_drv_dma_enable:
 err_notreq:
@@ -194,7 +194,7 @@ xwer_t xwds_dma_disable(struct xwds_soc * soc, xwid_t ch)
                         goto err_drv_dma_disable;
                 }
         }
-        return OK;
+        return XWOK;
 
 err_drv_dma_disable:
 err_notreq:
@@ -221,7 +221,7 @@ xwer_t xwds_dma_start(struct xwds_soc * soc, xwid_t ch)
                         goto err_drv_dma_start;
                 }
         }
-        return OK;
+        return XWOK;
 
 err_drv_dma_start:
 err_notreq:
@@ -248,7 +248,7 @@ xwer_t xwds_dma_stop(struct xwds_soc * soc, xwid_t ch)
                         goto err_drv_dma_stop;
                 }
         }
-        return OK;
+        return XWOK;
 
 err_drv_dma_stop:
 err_notreq:
@@ -263,9 +263,9 @@ err_notreq:
  * @param descnum: (I) 寄存器描述数组数量
  * @param ret: (O) 返回DMA资源地址的缓存
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
- * @retval -ENOKEY: 找不到描述的资源
+ * @retval -ENOSR: 找不到描述的资源
  */
 __xwds_lib_code
 xwer_t xwds_get_dmarsc(const struct xwds_resource_dma base[], xwsz_t num,
@@ -276,18 +276,18 @@ xwer_t xwds_get_dmarsc(const struct xwds_resource_dma base[], xwsz_t num,
         xwsz_t i, m;
 
         for (i = 0; i < num; i++) {
-                rc = OK;
+                rc = XWOK;
                 for (m = 0; m < descnum; m++) {
                         if (!strstr(base[i].description, descay[m])) {
-                                rc = -ENOKEY;
+                                rc = -ENOSR;
                                 break;
                         }
                 }
-                if (OK == rc) {
+                if (XWOK == rc) {
                         break;
                 }
         }
-        if (OK == rc) {
+        if (XWOK == rc) {
                 *ret = &base[i];
         } else {
                 *ret = NULL;

@@ -201,7 +201,7 @@ xwer_t xwds_soc_ioctl(struct xwds_soc * soc, xwsq_t cmd, ...)
         }
 
         xwds_soc_put(soc);
-        return OK;
+        return XWOK;
 
 err_drv_ioctl:
         xwds_soc_put(soc);

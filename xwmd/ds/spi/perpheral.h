@@ -68,7 +68,7 @@ void xwds_spip_destruct(struct xwds_spip * spip);
  * @param cmd: (I) 命令
  * @param ...: (I) 参数
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ENOSYS: 不支持的API
  * @note

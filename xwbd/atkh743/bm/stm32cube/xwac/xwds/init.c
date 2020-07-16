@@ -70,7 +70,7 @@ xwer_t stm32cube_xwds_ll_start(void)
         if (rc < 0) {
                 goto err_xwds_uart_start;
         }
-        return OK;
+        return XWOK;
 
 err_xwds_uart_start:
         BDL_BUG();
@@ -92,7 +92,7 @@ xwer_t stm32cube_xwds_ll_stop(void)
         if (__unlikely(rc < 0)) {
                 goto err_soc_stop;
         }
-        return OK;
+        return XWOK;
 
 err_xwds_uart_stop:
         BDL_BUG();
@@ -120,7 +120,7 @@ xwer_t stm32cube_xwds_soc_start(void)
                 goto err_dev_start;
         }
 
-        return OK;
+        return XWOK;
 
 err_dev_start:
         xwds_device_remove(xwds_static_cast(struct xwds_device *, &stm32cube_soc_cb));
@@ -137,7 +137,7 @@ xwer_t stm32cube_xwds_soc_stop(void)
         xwds_device_remove(xwds_static_cast(struct xwds_device *,
                                             &stm32cube_soc_cb));
         xwds_soc_destruct(&stm32cube_soc_cb);
-        return OK;
+        return XWOK;
 }
 
 xwer_t stm32cube_xwds_uart_start(void)
@@ -158,7 +158,7 @@ xwer_t stm32cube_xwds_uart_start(void)
                 goto err_dev_start;
         }
 
-        return OK;
+        return XWOK;
 
 err_dev_start:
         xwds_device_remove(xwds_static_cast(struct xwds_device *,
@@ -175,5 +175,5 @@ xwer_t stm32cube_xwds_uart_stop(void)
         xwds_device_remove(xwds_static_cast(struct xwds_device *,
                                             &stm32cube_usart1_cb));
         xwds_dmauartc_destruct(&stm32cube_usart1_cb);
-        return OK;
+        return XWOK;
 }

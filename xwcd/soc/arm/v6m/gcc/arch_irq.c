@@ -324,7 +324,7 @@ xwer_t arch_irq_get_id(xwirq_t * irqnbuf)
                 rc = -ENOTINISR;
         } else {
                 curr -= 16;
-                rc = OK;
+                rc = XWOK;
         }
         if (!is_err_or_null(irqnbuf)) {
                 *irqnbuf = curr;

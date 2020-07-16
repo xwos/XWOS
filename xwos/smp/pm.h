@@ -130,7 +130,7 @@ struct xwos_pmdm * xwos_pmdm_get_lc(void);
  * @brief XWOS PM API：暂停电源管理领域
  * @param pmdm: (I) 电源管理领域控制块指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval <0: 错误
  * @note
  * - 同步/异步：同步
@@ -144,7 +144,7 @@ xwer_t xwos_pmdm_suspend(struct xwos_pmdm * pmdm);
  * @brief XWOS PM API：继续电源管理领域
  * @param pmdm: (I) 电源管理领域控制块指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval <0: 错误
  * @note
  * - 同步/异步：异步

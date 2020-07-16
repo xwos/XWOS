@@ -237,7 +237,7 @@ xwer_t arch_splk_trylock(struct arch_splk * asl)
 
         if (0 == contended) {
                 xwmb_smp_mb();
-                return OK;
+                return XWOK;
         } else {
                 return -EAGAIN;
         }

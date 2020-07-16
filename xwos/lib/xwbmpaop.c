@@ -80,7 +80,7 @@ xwer_t xwbmpaop_t0i_then_s1i(__atomic xwbmp_t * bmp, xwsq_t idx)
                 o = xwaop_load(xwbmp_t, &bmp[i], xwmb_modr_consume);
                 if (!(o & m)) {
                         n = o | m;
-                        rc = OK;
+                        rc = XWOK;
                 } else {
                         rc = -EACCES;
                         break;
@@ -101,7 +101,7 @@ xwer_t xwbmpaop_t1i_then_c0i(__atomic xwbmp_t * bmp, xwsq_t idx)
                 o = xwaop_load(xwbmp_t, &bmp[i], xwmb_modr_consume);
                 if (o & m) {
                         n = o & (xwbmp_t)(~m);
-                        rc = OK;
+                        rc = XWOK;
                 } else {
                         rc = -EACCES;
                         break;

@@ -55,7 +55,7 @@ xwer_t xwds_clk_req(struct xwds_soc * soc, xwid_t id)
         if (__unlikely(rc < 0)) {
                 goto err_drv_clk_req;
         }
-        return OK;
+        return XWOK;
 
 err_drv_clk_req:
         xwds_soc_put(soc);
@@ -83,7 +83,7 @@ xwer_t xwds_clk_rls(struct xwds_soc * soc, xwid_t id)
         }
 
         xwds_soc_put(soc);
-        return OK;
+        return XWOK;
 
 err_drv_clk_rls:
         return rc;
@@ -117,7 +117,7 @@ xwer_t xwds_clk_getfqcy(struct xwds_soc * soc, xwid_t id,
         }
 
         xwds_soc_put(soc);
-        return OK;
+        return XWOK;
 
 err_drv_getfqcy:
         xwds_soc_put(soc);
@@ -133,9 +133,9 @@ err_soc_grab:
  * @param descnum: (I) 寄存器描述数组数量
  * @param ret: (O) 返回时钟资源地址的缓存
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
- * @retval -ENOKEY: 找不到描述的资源
+ * @retval -ENOSR: 找不到描述的资源
  */
 __xwds_lib_code
 xwer_t xwds_get_clkrsc(const struct xwds_resource_clk base[], xwsz_t num,
@@ -146,18 +146,18 @@ xwer_t xwds_get_clkrsc(const struct xwds_resource_clk base[], xwsz_t num,
         xwsz_t i, m;
 
         for (i = 0; i < num; i++) {
-                rc = OK;
+                rc = XWOK;
                 for (m = 0; m < descnum; m++) {
                         if (!strstr(base[i].description, descay[m])) {
-                                rc = -ENOKEY;
+                                rc = -ENOSR;
                                 break;
                         }
                 }
-                if (OK == rc) {
+                if (XWOK == rc) {
                         break;
                 }
         }
-        if (OK == rc) {
+        if (XWOK == rc) {
                 *ret = &base[i];
         } else {
                 *ret = NULL;

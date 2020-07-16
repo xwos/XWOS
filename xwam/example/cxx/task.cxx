@@ -35,7 +35,7 @@ xwer_t cxx_thrd(void * arg)
   testLiteralOperator();
   testStdVector();
 
-  rc = OK;
+  rc = XWOK;
   while (!xwosal_cthrd_frz_shld_stop(NULL)) {
     xwtm = 2000 * XWTM_MS;
     xwosal_cthrd_sleep(&xwtm);

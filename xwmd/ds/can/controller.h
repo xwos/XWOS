@@ -238,7 +238,7 @@ void xwds_canc_destruct(struct xwds_canc * canc);
  * @param txobjid: (I) 发送邮箱的ID
  * @param msg: (I) CAN消息结构体的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: 找不到邮箱
  * @retval -EBADSLT: 邮箱配置与消息类型不匹配
@@ -256,7 +256,7 @@ xwer_t xwds_canc_write(struct xwds_canc * canc, xwid_t txobjid,
  * @brief XWDS API：开启CAN控制器的中断
  * @param canc: (I) CAN控制器对象指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步
@@ -270,7 +270,7 @@ xwer_t xwds_canc_enable_irqs(struct xwds_canc * canc);
  * @brief XWDS API：关闭CAN控制器的中断
  * @param canc: (I) CAN控制器对象指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步
@@ -302,7 +302,7 @@ xwer_t xwds_canc_set_mode(struct xwds_canc * canc, xwsq_t mode);
  * @param canc: (I) CAN控制器对象指针
  * @param id: (I) 波特率的ID
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: 错误的波特率ID
  * @note

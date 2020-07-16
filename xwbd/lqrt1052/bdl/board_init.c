@@ -67,5 +67,5 @@ void board_init(void)
 static __xwos_init_code
 xwer_t sys_mm_init(void)
 {
-        return OK;
+        return XWOK;
 }

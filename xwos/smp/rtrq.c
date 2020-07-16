@@ -59,14 +59,14 @@ xwer_t xwos_rtrq_init(struct xwos_rtrq * xwrtrq)
                 xwlib_bclst_init_head(&xwrtrq->q[i]);
         }
         xwrtrq->top = XWOS_SD_PRIORITY_INVALID;
-        return OK;
+        return XWOK;
 }
 
 /**
  * @brief 将线程加入到实时就绪队列的头部
  * @param xwrtrq: (I) XWOS的实时就绪队列
  * @param tcb: (I) 线程控制块的指针
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EPERM: 线程没有设置状态标志@ref XWSDOBJ_DST_READY
  * @note
  * - 当线程加入到就绪队列时，它不应该拥有下面的状态：
@@ -92,7 +92,7 @@ xwer_t xwos_rtrq_add_head_locked(struct xwos_rtrq * xwrtrq, struct xwos_tcb * tc
                                 xwrtrq->top = prio;
                         }
                 }
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -101,7 +101,7 @@ xwer_t xwos_rtrq_add_head_locked(struct xwos_rtrq * xwrtrq, struct xwos_tcb * tc
  * @brief 将线程加入到实时就绪队列的尾部
  * @param xwrtrq: (I) XWOS的实时就绪队列
  * @param tcb: (I) 线程控制块的指针
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EPERM: 线程没有设置状态标志@ref XWSDOBJ_DST_READY
  * @note
  * - 当线程加入到就绪队列时，它不应该拥有下面的状态：
@@ -127,7 +127,7 @@ xwer_t xwos_rtrq_add_tail_locked(struct xwos_rtrq * xwrtrq, struct xwos_tcb * tc
                                 xwrtrq->top = prio;
                         }
                 }
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -136,7 +136,7 @@ xwer_t xwos_rtrq_add_tail_locked(struct xwos_rtrq * xwrtrq, struct xwos_tcb * tc
  * @brief 将线程从实时就绪队列中删除
  * @param xwrtrq: (I) XWOS的实时就绪队列
  * @param tcb: (I) 线程控制块的指针
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ESRCH: 就绪队列中没有这个线程
  * @note
  * - 此函数必须在持有锁xwrtrq->lock时才可调用。
@@ -161,7 +161,7 @@ xwer_t xwos_rtrq_remove_locked(struct xwos_rtrq * xwrtrq, struct xwos_tcb * tcb)
                                 xwrtrq->top = prio;
                         }
                 }
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }

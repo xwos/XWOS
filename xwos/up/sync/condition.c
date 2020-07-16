@@ -117,7 +117,7 @@ void xwsync_cdt_deactivate(struct xwsync_cdt * cdt)
  * @brief XWOS API：静态始化成条件量
  * @param cdt: (I) 条件量对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -130,14 +130,14 @@ xwer_t xwsync_cdt_init(struct xwsync_cdt * cdt)
         XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
 
         xwsync_cdt_activate(cdt);
-        return OK;
+        return XWOK;
 }
 
 /**
  * @brief XWOS API：销毁条件量对象
  * @param cdt: (I) 条件量的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -150,14 +150,14 @@ xwer_t xwsync_cdt_destroy(struct xwsync_cdt * cdt)
         XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
 
         xwsync_cdt_deactivate(cdt);
-        return OK;
+        return XWOK;
 }
 
 /**
  * @brief XWOS API：动态创建条件量
  * @param ptrbuf: (O) 指向缓冲区的指针，通过此缓冲区返回对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ENOMEM: 内存不足
  * @note
@@ -180,7 +180,7 @@ xwer_t xwsync_cdt_create(struct xwsync_cdt ** ptrbuf)
         } else {
                 xwsync_cdt_activate(cdt);
                 *ptrbuf = cdt;
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -189,7 +189,7 @@ xwer_t xwsync_cdt_create(struct xwsync_cdt ** ptrbuf)
  * @brief XWOS API：删除动态创建的条件量
  * @param cdt: (I) 条件量对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -203,7 +203,7 @@ xwer_t xwsync_cdt_delete(struct xwsync_cdt * cdt)
 
         xwsync_cdt_deactivate(cdt);
         xwsync_cdt_free(cdt);
-        return OK;
+        return XWOK;
 }
 
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
@@ -213,7 +213,7 @@ xwer_t xwsync_cdt_delete(struct xwsync_cdt * cdt)
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 条件量对象映射到位图中的位置
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 事件对象或条件量类型错误
  * @retval -EFAULT: 空指针
  * @note
@@ -241,7 +241,7 @@ xwer_t xwsync_cdt_bind(struct xwsync_cdt * cdt, struct xwsync_evt * evt, xwsq_t 
  * @param cdt: (I) 条件量对象的指针
  * @param evt: (I) 事件对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 事件对象或条件量类型错误
  * @retval -EFAULT: 空指针
  * @note
@@ -269,7 +269,7 @@ xwer_t xwsync_cdt_unbind(struct xwsync_cdt * cdt, struct xwsync_evt * evt)
  * @brief XWOS API：冻结条件量（值设置为负）
  * @param cdt: (I) 条件量对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EALREADY: 条件量已被冻结
  * @note
@@ -288,7 +288,7 @@ xwer_t xwsync_cdt_freeze(struct xwsync_cdt * cdt)
 
         XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
 
-        rc = OK;
+        rc = XWOK;
         xwos_cpuirq_save_lc(&cpuirq);
         if (__unlikely(cdt->neg)) {
                 rc = -EALREADY;
@@ -305,7 +305,7 @@ xwer_t xwsync_cdt_freeze(struct xwsync_cdt * cdt)
  * @param val: (I) 条件量的初始值
  * @param max: (I) 条件量的最大值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EALREADY: 条件量未被冻结
  * @note
@@ -323,7 +323,7 @@ xwer_t xwsync_cdt_thaw(struct xwsync_cdt * cdt)
 
         XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
 
-        rc = OK;
+        rc = XWOK;
         xwos_cpuirq_save_lc(&cpuirq);
         if (__likely(cdt->neg)) {
                 cdt->neg = false;
@@ -339,7 +339,7 @@ xwer_t xwsync_cdt_thaw(struct xwsync_cdt * cdt)
  * @param cdt: (I) 条件量对象的指针
  * @param wqn: (I) 等待队列节点
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -354,7 +354,7 @@ xwer_t xwsync_cdt_intr(struct xwsync_cdt * cdt, struct xwos_wqn * wqn)
 
         xwos_cpuirq_save_lc(&cpuirq);
         rc = xwos_plwq_remove(&cdt->wq, wqn);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 wqn->wq = NULL;
                 wqn->type = XWOS_WQTYPE_UNKNOWN;
                 wqn->rsmrs = XWOS_WQN_RSMRS_INTR;
@@ -372,7 +372,7 @@ xwer_t xwsync_cdt_intr(struct xwsync_cdt * cdt, struct xwos_wqn * wqn)
  * @brief XWOS API：中断条件量等待队列中的所有线程
  * @param cdt: (I) 条件量对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -401,7 +401,7 @@ xwer_t xwsync_cdt_intr_all(struct xwsync_cdt * cdt)
                 xwos_cpuirq_disable_lc();
         }
         xwos_cpuirq_restore_lc(cpuirq);
-        return OK;
+        return XWOK;
 }
 
 static __xwos_code
@@ -412,7 +412,7 @@ xwer_t xwsync_cdt_broadcast_once(struct xwsync_cdt * cdt, bool * retry)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         xwos_cpuirq_save_lc(&cpuirq);
         if (__unlikely(cdt->neg)) {
                 xwos_cpuirq_restore_lc(cpuirq);
@@ -441,7 +441,7 @@ xwer_t xwsync_cdt_broadcast_once(struct xwsync_cdt * cdt, bool * retry)
  * @brief XWOS API：广播条件量，将等待队列中的所有线程唤醒
  * @param cdt: (I) 条件量对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ENEGATIVE: 条件量已被冻结
  * @note
@@ -465,7 +465,7 @@ xwer_t xwsync_cdt_broadcast(struct xwsync_cdt * cdt)
                 rc = xwsync_cdt_broadcast_once(cdt, &retry);
         } while (retry);
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-                if (__likely(OK == rc)) {
+                if (__likely(XWOK == rc)) {
                         struct xwsync_evt * evt;
                         struct xwsync_object * xwsyncobj;
 
@@ -489,7 +489,7 @@ xwer_t xwsync_cdt_do_unicast(struct xwsync_cdt * cdt)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         xwos_cpuirq_save_lc(&cpuirq);
         if (__unlikely(cdt->neg)) {
                 xwos_cpuirq_restore_lc(cpuirq);
@@ -507,7 +507,7 @@ xwer_t xwsync_cdt_do_unicast(struct xwsync_cdt * cdt)
                 } else {
                         xwos_cpuirq_restore_lc(cpuirq);
                 }
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -516,7 +516,7 @@ xwer_t xwsync_cdt_do_unicast(struct xwsync_cdt * cdt)
  * @brief XWOS API：单播条件量，只会唤醒等待队列最前面的一个线程
  * @param cdt: (I) 条件量对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ENEGATIVE: 条件量已被冻结
  * @note
@@ -569,7 +569,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
 
         /* 同步解锁 */
         rc = xwos_thrd_do_unlock(lock, lktype, lkdata);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 *lkst = XWLK_STATE_UNLOCKED;
         }/* else {} */
 
@@ -594,7 +594,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
         if (XWOS_WQN_RSMRS_INTR == tcb->wqn.rsmrs) {
                 xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 rc = xwos_tt_remove_locked(xwtt, &tcb->ttn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_SLEEPING);
                 }/* else {} */
                 xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
@@ -602,7 +602,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
         } else if (XWOS_WQN_RSMRS_UP == tcb->wqn.rsmrs) {
                 xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 rc = xwos_tt_remove_locked(xwtt, &tcb->ttn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_SLEEPING);
                 }/* else {} */
                 xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
@@ -610,15 +610,15 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                         currtick = xwos_syshwt_get_timetick(hwt);
                         *xwtm = xwtm_sub(expected, currtick);
                         rc = xwos_thrd_do_lock(lock, lktype, xwtm, lkdata);
-                        if (OK == rc) {
+                        if (XWOK == rc) {
                                 *lkst = XWLK_STATE_LOCKED;
                         }/* else {} */
                 }/* else {} */
-                rc = OK;
+                rc = XWOK;
         } else if (XWOS_TTN_WKUPRS_TIMEDOUT == tcb->ttn.wkuprs) {
                 xwos_cpuirq_disable_lc();
                 rc = xwos_plwq_remove(&cdt->wq, &tcb->wqn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         tcb->wqn.wq = NULL;
                         tcb->wqn.type = XWOS_WQTYPE_UNKNOWN;
                         tcb->wqn.rsmrs = XWOS_WQN_RSMRS_INTR;
@@ -636,10 +636,10 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                                         *xwtm = xwtm_sub(expected, currtick);
                                         rc = xwos_thrd_do_lock(lock, lktype, xwtm,
                                                                lkdata);
-                                        if (OK == rc)
+                                        if (XWOK == rc)
                                                 *lkst = XWLK_STATE_LOCKED;
                                 }
-                                rc = OK;
+                                rc = XWOK;
                         } else {
                                 XWOS_BUG();
                                 rc = -EBUG;
@@ -648,7 +648,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
         } else if (XWOS_TTN_WKUPRS_INTR == tcb->ttn.wkuprs) {
                 xwos_cpuirq_disable_lc();
                 rc = xwos_plwq_remove(&cdt->wq, &tcb->wqn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         tcb->wqn.wq = NULL;
                         tcb->wqn.type = XWOS_WQTYPE_UNKNOWN;
                         tcb->wqn.rsmrs = XWOS_WQN_RSMRS_INTR;
@@ -666,11 +666,11 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                                         *xwtm = xwtm_sub(expected, currtick);
                                         rc = xwos_thrd_do_lock(lock, lktype, xwtm,
                                                                lkdata);
-                                        if (OK == rc) {
+                                        if (XWOK == rc) {
                                                 *lkst = XWLK_STATE_LOCKED;
                                         }/* else {} */
                                 }/* else {} */
-                                rc = OK;
+                                rc = XWOK;
                         } else {
                                 XWOS_BUG();
                                 rc = -EBUG;
@@ -725,7 +725,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
  *              (O) 作为输出时，返回剩余的期望时间
  * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EINVAL: 参数无效
  * @retval -ETIMEDOUT: 超时
@@ -759,7 +759,7 @@ xwer_t xwsync_cdt_timedwait(struct xwsync_cdt * cdt,
         ctcb = xwos_scheduler_get_ctcb_lc();
         if (__unlikely(0 == xwtm_cmp(*xwtm, 0))) {
                 rc = xwos_thrd_do_unlock(lock, lktype, lkdata);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         *lkst = XWLK_STATE_UNLOCKED;
                 }/* else {} */
                 rc = -ETIMEDOUT;

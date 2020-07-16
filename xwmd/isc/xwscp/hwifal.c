@@ -60,7 +60,7 @@ xwer_t xwscp_hwifal_open(struct xwscp * xwscp)
         if ((xwscp->hwifops) && (xwscp->hwifops->open)) {
                 rc = xwscp->hwifops->open(xwscp);
         } else {
-                rc = OK;
+                rc = XWOK;
         }
         xwscp->hwifst = XWSCP_HWIFST_OPENED;
         return rc;
@@ -79,9 +79,9 @@ xwer_t xwscp_hwifal_close(struct xwscp * xwscp)
         if ((xwscp->hwifops) && (xwscp->hwifops->close)) {
                 rc = xwscp->hwifops->close(xwscp);
         } else {
-                rc = OK;
+                rc = XWOK;
         }
-        if (OK == rc) {
+        if (XWOK == rc) {
                 xwscp->hwifst = XWSCP_HWIFST_CLOSED;
         }
         return rc;
@@ -221,7 +221,7 @@ xwer_t xwscp_hwifal_rx(struct xwscp * xwscp, struct xwscp_frmslot ** frmslotbuf)
                 goto err_eof_ifrx;
         }
         *frmslotbuf = frmslot;
-        return OK;
+        return XWOK;
 
 err_eof_ifrx:
 err_body_ifrx:

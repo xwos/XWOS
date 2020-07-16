@@ -47,6 +47,6 @@ xwssq_t xwbmpaop_t1i_then_c0i(__maybe_unused __atomic xwbmp_t * bmp,
         __asm__ volatile("      bxeq    lr");
         __asm__ volatile("      teq     r3, #0");
         __asm__ volatile("      bne     1b");
-        __asm__ volatile("      mov     r0, %[__rc]"  : : [__rc] "I" (OK) :);
-        __asm__ volatile("      bx      lr");                   /* return OK; */
+        __asm__ volatile("      mov     r0, %[__rc]"  : : [__rc] "I" (XWOK) :);
+        __asm__ volatile("      bx      lr");                   /* return XWOK; */
 }

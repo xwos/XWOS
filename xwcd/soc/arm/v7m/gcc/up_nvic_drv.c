@@ -59,7 +59,7 @@ xwer_t cortexm_nvic_drv_init(void)
         cm_set_basepri(irqccfg->basepri);
         cm_nvic_set_prioritygrouping(irqccfg->subprio);
 
-        return OK;
+        return XWOK;
 }
 
 /******** ******** IRQ Drivers ******** ********/
@@ -81,7 +81,7 @@ xwer_t cortexm_nvic_drv_request(__maybe_unused xwirq_t irqn,
                 isr_data_table->soc[irqn] = data;
         }
 #endif /* !SOCCFG_RO_ISRTABLE */
-        return OK;
+        return XWOK;
 }
 
 __xwbsp_code
@@ -94,7 +94,7 @@ xwer_t cortexm_nvic_drv_release(__maybe_unused xwirq_t irqn)
         isr_table = xwos_irqc.isr_table;
         isr_table->soc[irqn] = arch_isr_nop;
 #endif /* !SOCCFG_RO_ISRTABLE */
-        return OK;
+        return XWOK;
 }
 
 __xwbsp_code
@@ -109,7 +109,7 @@ xwer_t cortexm_nvic_drv_enable(__maybe_unused xwirq_t irqn)
         } else if (ARCH_IRQ_USGFAULT == irqn) {
                 cm_nvic_enable_usgfault();
         }/* else {} */
-        return OK;
+        return XWOK;
 }
 
 __xwbsp_code
@@ -124,13 +124,13 @@ xwer_t cortexm_nvic_drv_disable(__maybe_unused xwirq_t irqn)
         } else if (ARCH_IRQ_USGFAULT == irqn) {
                 cm_nvic_disable_usgfault();
         }/* else {} */
-        return OK;
+        return XWOK;
 }
 
 __xwbsp_code
 xwer_t cortexm_nvic_drv_save(xwirq_t irqn, xwreg_t *flag)
 {
-        xwer_t rc = OK;
+        xwer_t rc = XWOK;
 
         if (irqn >= 0) {
                 cm_nvic_save_irq(irqn, flag);
@@ -155,7 +155,7 @@ xwer_t cortexm_nvic_drv_restore(xwirq_t irqn, xwreg_t flag)
 {
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         if (irqn >= 0) {
                 cm_nvic_restore_irq(irqn, flag);
         } else if (ARCH_IRQ_MMFAULT == irqn) {
@@ -175,7 +175,7 @@ xwer_t cortexm_nvic_drv_pend(xwirq_t irqn)
 {
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         if (irqn >= 0) {
                 cm_nvic_software_trigger_irq(irqn);
         } else if (ARCH_IRQ_NMI == irqn) {
@@ -195,7 +195,7 @@ xwer_t cortexm_nvic_drv_clear(xwirq_t irqn)
 {
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         if (irqn >= 0) {
                 cm_nvic_clear_irq_pending(irqn);
         } else if (ARCH_IRQ_PENDSV == irqn) {
@@ -216,7 +216,7 @@ xwer_t cortexm_nvic_drv_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg)
         } else {
                 cm_nvic_set_sysirq_priority(irqn, cfg->irqcfg.priority);
         }
-        return OK;
+        return XWOK;
 }
 
 __xwbsp_code
@@ -227,7 +227,7 @@ xwer_t cortexm_nvic_drv_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
         } else {
                 cfgbuf->irqcfg.priority = cm_nvic_get_sysirq_priority(irqn);
         }
-        return OK;
+        return XWOK;
 }
 
 __xwbsp_code
@@ -237,5 +237,5 @@ xwer_t cortexm_nvic_drv_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
 
         irq_data_table = xwos_irqc.irq_data_table;
         databuf->data = irq_data_table->soc[irqn];
-        return OK;
+        return XWOK;
 }

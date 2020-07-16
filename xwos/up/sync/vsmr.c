@@ -55,7 +55,7 @@ void xwsync_vsmr_activate(struct xwsync_vsmr * vsmr)
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 信号量对象映射到位图中的位置
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -70,7 +70,7 @@ xwer_t xwsync_vsmr_bind(struct xwsync_vsmr * vsmr, struct xwsync_evt * evt,
 
         xwos_cpuirq_save_lc(&cpuirq);
         rc = xwsync_evt_obj_bind(evt, &vsmr->xwsyncobj, pos, true);
-        if ((OK == rc) && (vsmr->count > 0)) {
+        if ((XWOK == rc) && (vsmr->count > 0)) {
                 rc = xwsync_evt_obj_s1i(evt, &vsmr->xwsyncobj);
         }
         xwos_cpuirq_restore_lc(cpuirq);
@@ -83,7 +83,7 @@ xwer_t xwsync_vsmr_bind(struct xwsync_vsmr * vsmr, struct xwsync_evt * evt,
  * @param smr: (I) 信号量对象的指针
  * @param evt: (I) 事件对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -97,7 +97,7 @@ xwer_t xwsync_vsmr_unbind(struct xwsync_vsmr * vsmr, struct xwsync_evt * evt)
 
         xwos_cpuirq_save_lc(&cpuirq);
         rc = xwsync_evt_obj_unbind(evt, &vsmr->xwsyncobj, true);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 rc = xwsync_evt_obj_c0i(evt, &vsmr->xwsyncobj);
         }
         xwos_cpuirq_restore_lc(cpuirq);
@@ -110,7 +110,7 @@ xwer_t xwsync_vsmr_unbind(struct xwsync_vsmr * vsmr, struct xwsync_evt * evt)
  * @brief 冻结信号量（值设置为负）
  * @param vsmr: (I) 信号量对象的基类指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EALREADY: 信号量已为负
  * @note
  * - 同步/异步：同步
@@ -126,7 +126,7 @@ xwer_t xwsync_vsmr_freeze(struct xwsync_vsmr * vsmr)
         xwer_t rc;
         xwreg_t cpuirq;
 
-        rc = OK;
+        rc = XWOK;
         xwos_cpuirq_save_lc(&cpuirq);
         if (__unlikely(vsmr->count < 0)) {
                 rc = -EALREADY;
@@ -154,7 +154,7 @@ xwer_t xwsync_vsmr_freeze(struct xwsync_vsmr * vsmr)
  * @param val: (I) 信号量的初始值
  * @param max: (I) 信号量的最大值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINVAL: 参数无效
  * @retval -EALREADY: 信号量不为负
  * @note
@@ -173,7 +173,7 @@ xwer_t xwsync_vsmr_thaw(struct xwsync_vsmr * vsmr, xwssq_t val, xwssq_t max)
         XWOS_VALIDATE(((val >= 0) && (max > 0) && (val <= max)),
                       "invalid-value", -EINVAL);
 
-        rc = OK;
+        rc = XWOK;
         xwos_cpuirq_save_lc(&cpuirq);
         if (__unlikely(vsmr->count >= 0)) {
                 rc = -EALREADY;
@@ -202,7 +202,7 @@ xwer_t xwsync_vsmr_thaw(struct xwsync_vsmr * vsmr, xwssq_t val, xwssq_t max)
  * @param vsmr: (I) 信号量对象的基类指针
  * @param sval: (O) 指向缓冲区的指针，通过此缓冲区返回信号量计数器的值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -212,5 +212,5 @@ __xwos_code
 xwer_t xwsync_vsmr_getvalue(struct xwsync_vsmr * vsmr, xwssq_t * sval)
 {
         *sval = vsmr->count;
-        return OK;
+        return XWOK;
 }

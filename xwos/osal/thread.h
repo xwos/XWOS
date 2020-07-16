@@ -346,7 +346,7 @@ xwid_t xwosal_thrd_get_id(struct xwosal_tcb * tcb)
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINTR: 睡眠过程被中断
  * @note
  * - 同步/异步：同步
@@ -368,7 +368,7 @@ xwer_t xwosal_cthrd_sleep(xwtm_t * xwtm)
  *                    （可作为下一次时间起点，形成精确的周期）
  * @param inc: (I) 期望被唤醒的时间增量（相对于时间原点）
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINTR: 睡眠过程被中断
  * @note
  * - 同步/异步：同步

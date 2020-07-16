@@ -92,7 +92,7 @@ xwer_t xwos_scheduler_suspend(void);
 /**
  * @brief XWOS PM API：继续已经暂停的调度器
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENOTINISR: 不在中断中
  * @note
  * - 同步/异步：同步

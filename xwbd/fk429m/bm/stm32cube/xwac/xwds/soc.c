@@ -318,7 +318,7 @@ xwer_t stm32cube_soc_drv_start(struct xwds_device * dev)
         MX_DMA_Init();
         MX_SDRAM_Init();
 
-        return OK;
+        return XWOK;
 }
 
 static
@@ -330,7 +330,7 @@ xwer_t stm32cube_soc_drv_stop(struct xwds_device * dev)
         MX_DMA_Deinit();
         MX_GPIO_Deinit();
 
-        return OK;
+        return XWOK;
 }
 
 #if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
@@ -341,7 +341,7 @@ xwer_t stm32cube_soc_drv_suspend(struct xwds_device * dev)
         MX_SDRAM_Suspend();
         MX_DMA_Suspend();
         MX_GPIO_Suspend();
-        return OK;
+        return XWOK;
 }
 
 static
@@ -351,7 +351,7 @@ xwer_t stm32cube_soc_drv_resume(struct xwds_device * dev)
         MX_GPIO_Resume();
         MX_DMA_Resume();
         MX_SDRAM_Resume();
-        return OK;
+        return XWOK;
 }
 #endif /* XWMDCFG_ds_PM */
 
@@ -364,7 +364,7 @@ xwer_t stm32cube_soc_drv_gpio_req(struct xwds_soc * soc,
         XWOS_UNUSED(soc);
         XWOS_UNUSED(port);
         XWOS_UNUSED(pinmask);
-        return OK;
+        return XWOK;
 }
 
 static
@@ -374,7 +374,7 @@ xwer_t stm32cube_soc_drv_gpio_rls(struct xwds_soc * soc,
         XWOS_UNUSED(soc);
         XWOS_UNUSED(port);
         XWOS_UNUSED(pinmask);
-        return OK;
+        return XWOK;
 }
 
 static
@@ -397,7 +397,7 @@ xwer_t stm32cube_soc_drv_gpio_cfg(struct xwds_soc * soc,
         es = LL_GPIO_Init(gpio, llcfg);
         soc_cpuirq_restore_lc(cpuirq);
         if (SUCCESS == es) {
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EINVAL;
         }
@@ -418,7 +418,7 @@ xwer_t stm32cube_soc_drv_gpio_set(struct xwds_soc * soc,
         soc_cpuirq_save_lc(&cpuirq);
         LL_GPIO_SetOutputPin(gpio, pinmask);
         soc_cpuirq_restore_lc(cpuirq);
-        return OK;
+        return XWOK;
 }
 
 static
@@ -435,7 +435,7 @@ xwer_t stm32cube_soc_drv_gpio_reset(struct xwds_soc * soc,
         soc_cpuirq_save_lc(&cpuirq);
         LL_GPIO_ResetOutputPin(gpio, pinmask);
         soc_cpuirq_restore_lc(cpuirq);
-        return OK;
+        return XWOK;
 }
 
 static
@@ -452,7 +452,7 @@ xwer_t stm32cube_soc_drv_gpio_toggle(struct xwds_soc * soc,
         soc_cpuirq_save_lc(&cpuirq);
         LL_GPIO_TogglePin(gpio, pinmask);
         soc_cpuirq_restore_lc(cpuirq);
-        return OK;
+        return XWOK;
 }
 
 static
@@ -475,7 +475,7 @@ xwer_t stm32cube_soc_drv_gpio_output(struct xwds_soc * soc,
         regval |= (xwu32_t)(out & pinmask);
         LL_GPIO_WriteOutputPort(gpio, regval);
         soc_cpuirq_restore_lc(cpuirq);
-        return OK;
+        return XWOK;
 }
 
 static
@@ -492,7 +492,7 @@ xwer_t stm32cube_soc_drv_gpio_input(struct xwds_soc * soc,
         gpio = xwccfg->gpio.register_map[port];
         regval = LL_GPIO_ReadInputPort(gpio);
         *in = pinmask & (xwsq_t)regval;
-        return OK;
+        return XWOK;
 }
 #endif /* XWMDCFG_ds_SOC_GPIO */
 
@@ -532,7 +532,7 @@ xwer_t stm32cube_soc_drv_eirq_req(struct xwds_soc * soc,
                 }
                 cubelibrc = LL_EXTI_Init(&eicfg);
                 if (SUCCESS == cubelibrc) {
-                        rc = OK;
+                        rc = XWOK;
                 } else {
                         rc = -EINVAL;
                 }
@@ -559,7 +559,7 @@ xwer_t stm32cube_soc_drv_eirq_rls(struct xwds_soc * soc,
         eicfg.Trigger = LL_EXTI_TRIGGER_NONE;
         LL_EXTI_Init(&eicfg);
 
-        return OK;
+        return XWOK;
 }
 
 #endif /* XWMDCFG_ds_SOC_EIRQ */
@@ -574,7 +574,7 @@ xwer_t stm32cube_soc_drv_eram_tst(struct xwds_soc * soc, xwptr_t * erraddr)
         xwsz_t size;
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         origin = (xwsz_t *)soc->eram.origin;
         size = soc->eram.size / sizeof(xwsz_t);
 

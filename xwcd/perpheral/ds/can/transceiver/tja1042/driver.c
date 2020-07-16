@@ -113,7 +113,7 @@ xwer_t tja1042_check_desc(struct xwds_cantrcv * cantrcv)
         } else if (cfg->init_opmode >= XWDS_CANTRCV_OPMODE_NUM) {
                 rc = -EINVAL;
         } else {
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -130,7 +130,7 @@ xwer_t tja1042_drv_probe(struct xwds_device * dev)
         if (__unlikely(rc < 0)) {
                 goto err_chkdesc;
         }
-        return OK;
+        return XWOK;
 
 err_chkdesc:
         return rc;
@@ -161,7 +161,7 @@ xwer_t tja1042_drv_start(struct xwds_device * dev)
                         goto err_req_gpios;
                 }
         }
-        return OK;
+        return XWOK;
 
 err_req_gpios:
         return rc;
@@ -187,7 +187,7 @@ xwer_t tja1042_drv_stop(struct xwds_device * dev)
                         goto err_gpio_rls;
                 }
         }
-        return OK;
+        return XWOK;
 
 err_gpio_rls:
         return rc;
@@ -212,7 +212,7 @@ xwer_t tja1042_drv_suspend(struct xwds_device * dev)
         if (__unlikely(rc < 0)) {
                 goto err_gpio_rls;
         }
-        return OK;
+        return XWOK;
 
 err_gpio_rls:
         return rc;
@@ -236,7 +236,7 @@ xwer_t tja1042_drv_resume(struct xwds_device * dev)
         if (__unlikely(rc < 0)) {
                 goto err_gpio_req;
         }
-        return OK;
+        return XWOK;
 
 err_gpio_req:
         return rc;
@@ -261,7 +261,7 @@ xwer_t tja1042_cantrcv_drv_set_opmode(struct xwds_cantrcv * cantrcv,
                 rc = xwds_gpio_reset(gpiorsc_stb->soc,
                                      gpiorsc_stb->port,
                                      gpiorsc_stb->pinmask);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         cantrcv->wkuprs = XWDS_CANTRCV_WKUPRS_BY_PIN;
                 }
                 break;

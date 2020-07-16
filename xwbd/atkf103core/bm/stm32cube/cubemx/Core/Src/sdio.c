@@ -40,7 +40,7 @@ xwid_t hsd_xfer_mtx_id;
 struct xwosal_splk hsd_lock;
 struct xwosal_cdt hsd_xfer_cdt;
 xwid_t hsd_xfer_cdt_id;
-xwer_t hsd_xfer_rc = OK;
+xwer_t hsd_xfer_rc = XWOK;
 
 void MX_SDIO_SD_Construct(void)
 {
@@ -240,11 +240,11 @@ xwer_t MX_SDIO_SD_TrimClk(xwsq_t cnt)
     time = 1 * XWTM_MS;
     xwosal_cthrd_sleep(&time);
     rc = MX_SDIO_SD_Read(buf, i, 1);
-    if (OK == rc) {
+    if (XWOK == rc) {
     } else if (-EIO == rc) {
       if (hsd.Init.ClockDiv <= 0xFD) {
         MX_SDIO_SD_Reinit(hsd.Init.ClockDiv + 2);
-        rc = OK;
+        rc = XWOK;
       } else {
         break;
       }
@@ -269,7 +269,7 @@ xwer_t MX_SDIO_SD_GetState(void)
       MX_SDIO_SD_Reinit(hsd.Init.ClockDiv);
       cnt++;
     } else if (HAL_SD_CARD_TRANSFER == cardst) {
-      rc = OK;
+      rc = XWOK;
     } else {
       rc = -EBUSY;
     }
@@ -285,7 +285,7 @@ xwer_t MX_SDIO_SD_Read(uint8_t * data, uint32_t blkaddr,
   HAL_SD_CardStateTypeDef cardst;
 
   rc = xwosal_mtx_lock(hsd_xfer_mtx_id);
-  if (OK == rc) {
+  if (XWOK == rc) {
     cnt = 0;
     do {
       if (rc < 0) {
@@ -310,7 +310,7 @@ xwer_t MX_SDIO_SD_Read(uint8_t * data, uint32_t blkaddr,
             rc = xwosal_cdt_wait(hsd_xfer_cdt_id,
                                  ulk, XWLK_TYPE_SPLK,
                                  NULL, &lkst);
-            if (OK == rc) {
+            if (XWOK == rc) {
               rc = hsd_xfer_rc;
             } else {
               if (XWLK_STATE_UNLOCKED == lkst) {
@@ -343,7 +343,7 @@ xwer_t MX_SDIO_SD_Write(uint8_t * data, uint32_t blkaddr,
   HAL_SD_CardStateTypeDef cardst;
 
   rc = xwosal_mtx_lock(hsd_xfer_mtx_id);
-  if (OK == rc) {
+  if (XWOK == rc) {
     cnt = 0;
     do {
       if (rc < 0) {
@@ -368,7 +368,7 @@ xwer_t MX_SDIO_SD_Write(uint8_t * data, uint32_t blkaddr,
             rc = xwosal_cdt_wait(hsd_xfer_cdt_id,
                                  ulk, XWLK_TYPE_SPLK,
                                  NULL, &lkst);
-            if (OK == rc) {
+            if (XWOK == rc) {
               rc = hsd_xfer_rc;
             } else {
               if (XWLK_STATE_UNLOCKED == lkst) {
@@ -408,7 +408,7 @@ void HAL_SD_RxCpltCallback(SD_HandleTypeDef * phsd)
     if (phsd->ErrorCode != HAL_SD_ERROR_NONE) {
       hsd_xfer_rc = -EIO;
     } else {
-      hsd_xfer_rc = OK;
+      hsd_xfer_rc = XWOK;
     }
     xwosal_splk_unlock_cpuirqrs(&hsd_lock, cpuirq);
     xwosal_cdt_broadcast(hsd_xfer_cdt_id);
@@ -429,7 +429,7 @@ void HAL_SD_TxCpltCallback(SD_HandleTypeDef * phsd)
     if (phsd->ErrorCode != HAL_SD_ERROR_NONE) {
       hsd_xfer_rc = -EIO;
     } else {
-      hsd_xfer_rc = OK;
+      hsd_xfer_rc = XWOK;
     }
     xwosal_splk_unlock_cpuirqrs(&hsd_lock, cpuirq);
     xwosal_cdt_broadcast(hsd_xfer_cdt_id);
@@ -444,7 +444,7 @@ void HAL_SD_ErrorCallback(SD_HandleTypeDef * phsd)
     if (phsd->ErrorCode != HAL_SD_ERROR_NONE) {
       hsd_xfer_rc = -EIO;
     } else {
-      hsd_xfer_rc = OK;
+      hsd_xfer_rc = XWOK;
     }
     xwosal_splk_unlock_cpuirqrs(&hsd_lock, cpuirq);
     xwosal_cdt_broadcast(hsd_xfer_cdt_id);

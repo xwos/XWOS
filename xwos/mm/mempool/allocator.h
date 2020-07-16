@@ -93,7 +93,7 @@ struct xwmm_mempool {
  * @param odrbtree: (I) 阶红黑树数组的指针
  * @param pgarray: (I) 页控制块数组的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -E2SMALL: 内存区域太小
  * @retval -EALIGN: 内存区域没有对齐
@@ -110,7 +110,7 @@ xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
  * @brief XWMM API：销毁静态方式初始化的内存池
  * @param mp: (I) 内存池的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -127,7 +127,7 @@ xwer_t xwmm_mempool_destroy(struct xwmm_mempool * mp);
  * @param origin: (I) 内存区域的起始地址
  * @param size: (I) 内存区域的总大小
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -E2SMALL: 内存区域太小
  * @retval -EALIGN: 内存区域没有对齐
@@ -145,7 +145,7 @@ xwer_t xwmm_mempool_create(struct xwmm_mempool ** ptrbuf, const char * name,
  * @brief XWMM API：删除动态创建的内存池
  * @param mp: (I) 内存池的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -161,7 +161,7 @@ xwer_t xwmm_mempool_delete(struct xwmm_mempool * mp);
  * @param size: (I) 申请的大小
  * @param membuf: (O) 指向缓冲区的指针，通过此缓冲区返回申请到的内存的首地址
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ENOMEM: 内存不足
  * @note
@@ -178,7 +178,7 @@ xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size,
  * @param mp: (I) 内存池的指针
  * @param mem: (I) 内存的首地址
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EALREADY: 页内存已释放
  * @note
@@ -197,7 +197,7 @@ xwer_t xwmm_mempool_free(struct xwmm_mempool * mp, void * mem);
  *                (I) 作为输入时，当*membuf == NULL，realloc等价于malloc
  *                (O) 作为输出时，通过此缓冲区返回申请到的内存的首地址
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ENOMEM: 内存不足
  * @note

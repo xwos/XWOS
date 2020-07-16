@@ -49,7 +49,7 @@ xwer_t xwos_rtwq_init(struct xwos_rtwq * xwrtwq)
         xwlib_rbtree_init(&xwrtwq->tree);
         xwrtwq->rightmost = NULL;
         xwlk_splk_init(&xwrtwq->lock);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -172,7 +172,7 @@ void xwos_rtwq_rmrbn_locked(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn)
  * @brief 将等待队列节点从实时等待队列中移除
  * @param xwrtwq: (I) 实时等待队列
  * @param wqn: (I) 等待队列节点结构体指针
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ESRCH: 等待队列中不存在该节点
  * @note
  * - 这个函数只能在获得锁xwrtwq->lock时调用。
@@ -193,7 +193,7 @@ xwer_t xwos_rtwq_remove_locked(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn)
                         xwos_rtwq_rmrbn_locked(xwrtwq, wqn);
                 }
                 wqn->prio = XWOS_SD_PRIORITY_INVALID;
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }

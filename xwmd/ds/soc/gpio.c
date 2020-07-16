@@ -61,7 +61,7 @@ xwer_t xwds_gpio_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
                         goto err_drv_gpio_req;
                 }
         }
-        return OK;
+        return XWOK;
 
 err_drv_gpio_req:
         xwaop_c0m(xwsq_t, &soc->gpio.pins[port], pinmask, NULL, NULL);
@@ -97,7 +97,7 @@ xwer_t xwds_gpio_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         xwaop_c0m(xwsq_t, &soc->gpio.pins[port], pinmask, NULL, NULL);
 
         xwds_soc_put(soc);
-        return OK;
+        return XWOK;
 
 err_drv_gpio_rls:
 err_pinsts:
@@ -134,7 +134,7 @@ xwer_t xwds_gpio_cfg(struct xwds_soc * soc,
         }
 
         xwds_soc_put(soc);
-        return OK;
+        return XWOK;
 
 err_drv_gpio_cfg:
         xwds_soc_put(soc);
@@ -175,7 +175,7 @@ xwer_t xwds_gpio_set(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         }
 
         xwds_soc_put(soc);
-        return OK;
+        return XWOK;
 
 err_drv_set:
 err_pinsts:
@@ -217,7 +217,7 @@ xwer_t xwds_gpio_reset(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         }
 
         xwds_soc_put(soc);
-        return OK;
+        return XWOK;
 
 err_drv_reset:
 err_pinsts:
@@ -259,7 +259,7 @@ xwer_t xwds_gpio_toggle(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         }
 
         xwds_soc_put(soc);
-        return OK;
+        return XWOK;
 
 err_drv_toggle:
 err_pinsts:
@@ -303,7 +303,7 @@ xwer_t xwds_gpio_output(struct xwds_soc * soc,
         }
 
         xwds_soc_put(soc);
-        return OK;
+        return XWOK;
 
 err_drv_out:
 err_pinsts:
@@ -347,7 +347,7 @@ xwer_t xwds_gpio_input(struct xwds_soc * soc,
         }
 
         xwds_soc_put(soc);
-        return OK;
+        return XWOK;
 
 err_drv_in:
 err_pinsts:
@@ -364,9 +364,9 @@ err_soc_grab:
  * @param descnum: (I) 寄存器描述数组数量
  * @param ret: (O) 返回GPIO资源地址的缓存
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
- * @retval -ENOKEY: 找不到描述的资源
+ * @retval -ENOSR: 找不到描述的资源
  */
 __xwds_lib_code
 xwer_t xwds_get_gpiorsc(const struct xwds_resource_gpio base[], xwsz_t num,
@@ -377,18 +377,18 @@ xwer_t xwds_get_gpiorsc(const struct xwds_resource_gpio base[], xwsz_t num,
         xwsz_t i, m;
 
         for (i = 0; i < num; i++) {
-                rc = OK;
+                rc = XWOK;
                 for (m = 0; m < descnum; m++) {
                         if (!strstr(base[i].description, descay[m])) {
-                                rc = -ENOKEY;
+                                rc = -ENOSR;
                                 break;
                         }
                 }
-                if (OK == rc) {
+                if (XWOK == rc) {
                         break;
                 }
         }
-        if (OK == rc) {
+        if (XWOK == rc) {
                 *ret = &base[i];
         } else {
                 *ret = NULL;

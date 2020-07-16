@@ -67,7 +67,7 @@ void xwbmpaop_x1i(__atomic xwbmp_t * bmp, xwsq_t idx);
  * @brief XWOS AOPLIB：测试位图中某位是否为0。如果是，就将它置1。
  * @param bmp: (I) 位图的起始地址指针
  * @param i: (I) 被测试位的序号
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  */
 __xwlib_code
@@ -77,7 +77,7 @@ xwer_t xwbmpaop_t0i_then_s1i(__atomic xwbmp_t * bmp, xwsq_t idx);
  * @brief XWOS AOPLIB：测试位图中某位是否为1。如果是，就将它清0。
  * @param bmp: (I) 位图的起始地址指针
  * @param n: (I) 被测试位的序号
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  */
 __xwlib_code

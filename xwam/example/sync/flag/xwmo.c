@@ -113,7 +113,7 @@ xwer_t example_flag_start(void)
                 goto err_ithrd_create;
         }
 
-        return OK;
+        return XWOK;
 
 
 err_ithrd_create:
@@ -225,7 +225,7 @@ xwer_t example_flag_wthrd_func(void * arg)
         sleep = 100 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
 
-        return OK;
+        return XWOK;
 
 err_w_tgl_any:
 err_w_tgl_all:
@@ -313,7 +313,7 @@ xwer_t example_flag_ithrd_func(void * arg)
         sleep = 1000 * XWTM_MS;
         xwosal_cthrd_sleep(&sleep);
 
-        return OK;
+        return XWOK;
 
 err_x1i:
 err_x1m:

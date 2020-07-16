@@ -72,7 +72,7 @@ struct xwmm_memslice {
  * @param ctor: (I) 切片的构造函数
  * @param dtor: (I) 切片的析构函数
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -E2SMALL: 内存区域太小
  * @note
  * - 同步/异步：同步
@@ -107,7 +107,7 @@ xwer_t xwmm_memslice_destroy(struct xwmm_memslice * msa);
  * @param dtor: (I) 切片的析构函数
  * @param name: (I) 名字
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -E2SMALL: 内存区域太小
  * @note
  * - 同步/异步：同步

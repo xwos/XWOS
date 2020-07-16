@@ -93,7 +93,7 @@ xwer_t xwlk_mtx_lock_unintr(struct xwlk_mtx * mtx);
 /**
  * @brief XWOS API：等待并上锁互斥锁
  * @param mtx: (I) 互斥锁对象指针
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EDEADLOCK: 死锁
  * @retval -ENOTINTHRD: 不在线程上下文中
  * @note

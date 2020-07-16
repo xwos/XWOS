@@ -171,7 +171,7 @@ xwer_t xwmm_bma_alloc(struct xwmm_bma * bma, xwsq_t order, void ** membuf);
  * @param bma: (I) 伙伴算法内存块分配器对象的指针
  * @param mem: (I) 内存块的首地址指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINVAL: 参数错误
  * @retval -ERANGE: 内存块不属于指定的伙伴算法内存块分配器对象
  * @note

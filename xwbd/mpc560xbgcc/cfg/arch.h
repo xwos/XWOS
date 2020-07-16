@@ -39,6 +39,7 @@
 /******** ******** architecture libs ******** ********/
 /******** libc.a ********/
 #define ARCHCFG_COMPILER_CLIB                   1
+#define ARCHCFG_COMPILER_ERRNO                  0
 
 /******** xwbop ********/
 #define ARCHCFG_LIB_XWBOP_S1M8                  0

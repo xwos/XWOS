@@ -103,7 +103,7 @@ xwer_t soc_syshwt_init(struct xwos_syshwt * hwt)
         PIT.CH[SYSHWT_CH].TCTRL.B.TEN = 0;
         /* Enable clock of PIT */
         PIT.PITMCR.B.MDIS = 0;
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -129,7 +129,7 @@ xwer_t soc_syshwt_start(struct xwos_syshwt * hwt)
 {
         XWOS_UNUSED(hwt);
         PIT.CH[SYSHWT_CH].TCTRL.B.TEN = 1;
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -141,7 +141,7 @@ xwer_t soc_syshwt_stop(struct xwos_syshwt * hwt)
 {
         XWOS_UNUSED(hwt);
         PIT.CH[SYSHWT_CH].TCTRL.B.TEN = 0;
-        return OK;
+        return XWOK;
 }
 
 /**

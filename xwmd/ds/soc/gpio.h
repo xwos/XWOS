@@ -107,7 +107,7 @@ enum xwds_gpio_pin_em {
  * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
  * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: GPIO PORT错误
  * @retval -EBUSY: GPIO PIN已被使用
@@ -125,7 +125,7 @@ xwer_t xwds_gpio_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask);
  * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
  * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: GPIO PORT错误
  * @retval -EPERM: GPIO PIN未被使用
@@ -144,7 +144,7 @@ xwer_t xwds_gpio_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask);
  * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
  * @param cfg: (I) GPIO配置，取值：依据不同SOC
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: GPIO PORT错误
  * @retval -ENOSYS: 不支持的API
@@ -162,7 +162,7 @@ xwer_t xwds_gpio_cfg(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask, void * 
  * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
  * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: GPIO PORT错误
  * @retval -EPERM: GPIO PIN未被使用
@@ -181,7 +181,7 @@ xwer_t xwds_gpio_set(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask);
  * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
  * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: GPIO PORT错误
  * @retval -EPERM: GPIO PIN未被使用
@@ -200,7 +200,7 @@ xwer_t xwds_gpio_reset(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask);
  * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
  * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: GPIO PORT错误
  * @retval -EPERM: GPIO PIN未被使用
@@ -221,7 +221,7 @@ xwer_t xwds_gpio_toggle(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask);
  * @param out: (I) 输出值，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算），
  *                 只有被pinmask掩码覆盖的部分有效，未覆盖的pin输出不会发生改变。
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: GPIO PORT错误
  * @retval -EPERM: GPIO PIN未被使用
@@ -243,7 +243,7 @@ xwer_t xwds_gpio_output(struct xwds_soc * soc,
  * @param pinmask: (I) GPIO引脚，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
  * @param inbuf: (O) 输入缓冲区
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: GPIO PORT错误
  * @retval -EPERM: GPIO PIN未被使用

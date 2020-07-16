@@ -86,7 +86,7 @@ xwer_t bdl_iftx(const xwu8_t * str, xwsz_t size)
         if (__unlikely(rc < 0)) {
                 goto err_dmatx;
         }
-        return OK;
+        return XWOK;
 
 err_dmatx:
         return rc;
@@ -96,18 +96,18 @@ xwer_t task_dmauart(void * arg)
 {
         xwsz_t size;
         xwtm_t time;
-        xwer_t rc = OK;
+        xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
                 time = XWTM_MAX;
                 size = sizeof(rxbuffer);
                 rc = xwds_dmauartc_rx(&mpc560xb_uart0_cb, rxbuffer, &size, &time);
-                if ((OK == rc) && (size > 0)) {
+                if ((XWOK == rc) && (size > 0)) {
                         time = 5 * XWTM_S;
                         xwosal_cthrd_sleep(&time);
                         rc = bdl_iftx(rxbuffer, size >> 1);
-                        if (OK == rc) {
+                        if (XWOK == rc) {
                                 rc = bdl_iftx(&rxbuffer[size >> 1], size >> 1);
                         }
                 }
@@ -123,10 +123,10 @@ xwer_t task_led(void * arg)
 
         XWOS_UNUSED(arg);
         pinmask = (BIT(SOC_GPIO_PIN_12) | BIT(SOC_GPIO_PIN_13));
-        rc = OK;
+        rc = XWOK;
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
                 rc = xwds_gpio_req(&mpc560xb_soc_cb, LED_PORT, pinmask);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         while (1) {
                                 pinmask = BIT(SOC_GPIO_PIN_12);
                                 xwds_gpio_set(&mpc560xb_soc_cb, LED_PORT,
@@ -157,7 +157,7 @@ xwer_t task_led(void * arg)
 
 xwer_t xwos_main(void)
 {
-        xwer_t rc = OK;
+        xwer_t rc = XWOK;
         xwsz_t i;
 
         for (i = 0; i < xw_array_size(board_td_tbl); i ++) {

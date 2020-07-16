@@ -639,7 +639,7 @@ xwer_t xwlua_thrd(void * arg)
     result = lua_toboolean(L, -1);  /* get result */
     report(L, status);
     lua_close(L);
-    rc = (result && status == LUA_OK) ? OK : -ESERVERFAULT;
+    rc = (result && status == LUA_OK) ? XWOK : -ESERVERFAULT;
   }
   return rc;
 }

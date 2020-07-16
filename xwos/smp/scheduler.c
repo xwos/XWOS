@@ -198,7 +198,7 @@ xwer_t xwos_scheduler_init_lc(struct xwos_pmdm * xwpmdm)
         if (__unlikely(rc < 0)) {
                 goto err_sd_init;
         }
-        return OK;
+        return XWOK;
 
 err_sd_init:
         XWOS_BUG();
@@ -226,7 +226,7 @@ xwer_t xwos_scheduler_start_lc(void)
         id = xwos_cpu_get_id();
         xwsd = &xwos_scheduler[id];
         rc = xwos_syshwt_start(&xwsd->tt.hwt);
-        if (__unlikely(OK == rc)) {
+        if (__unlikely(XWOK == rc)) {
                 soc_scheduler_start_lc(xwsd);
         }/* else {} */
         return rc;
@@ -265,7 +265,7 @@ xwer_t xwos_scheduler_get_by_cpuid(xwid_t cpuid, struct xwos_scheduler ** ptrbuf
 
         if (cpuid < XWOS_CPU_NUM) {
                 *ptrbuf = &xwos_scheduler[cpuid];
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -ENODEV;
         }
@@ -358,7 +358,7 @@ xwer_t xwos_scheduler_idled(struct xwos_scheduler * xwsd)
                 bdl_xwsd_idle_hook(xwsd);
 #endif /* BRDCFG_XWSD_IDLE_HOOK */
         }
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -416,7 +416,7 @@ xwer_t xwos_scheduler_bhd(struct xwos_scheduler * xwsd)
                         xwos_scheduler_bh_yield(xwsd);
                 }/* else {} */
         }
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -541,7 +541,7 @@ struct xwos_scheduler * xwos_scheduler_enbh(struct xwos_scheduler * xwsd)
  * @brief 切换至中断底半部上下文
  * @param xwsd: (I) XWOS调度器的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EPERM: 中断底半部已被禁止
  * @retval -EINPROGRESS: 切换上下文的过程正在进行中
  * @retval -EALREADY: 当前上下文已经是中断底半部上下文
@@ -569,7 +569,7 @@ xwer_t xwos_scheduler_sw_bh(struct xwos_scheduler * xwsd)
                         xwsd->cstk = XWOS_SCHEDULER_BH_STK(xwsd);
                         xwlk_rawly_unlock_cpuirqrs(&xwsd->cxlock, cpuirq);
                         soc_scheduler_req_swcx(xwsd);
-                        rc = OK;
+                        rc = XWOK;
                 }
         } else {
                 rc = -EPERM;
@@ -829,13 +829,13 @@ xwer_t xwos_scheduler_check_swcx(struct xwos_scheduler * xwsd,
                         rc = xwos_thrd_rq_add_head(t, prio);
                         XWOS_BUG_ON(rc < 0);
                         *pmtcb = xwos_scheduler_rtrq_choose(xwsd);
-                        rc = OK;
+                        rc = XWOK;
                 }
         } else {
                 xwlk_rawly_unlock(&t->stlock);
                 xwlk_rawly_unlock(&xwrtrq->lock);
                 *pmtcb = xwos_scheduler_rtrq_choose(xwsd);
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -858,14 +858,14 @@ xwer_t xwos_scheduler_do_swcx(struct xwos_scheduler * xwsd)
                 if (NULL != swtcb) {
                         xwsd->pstk = xwsd->cstk;
                         xwsd->cstk = &swtcb->stack;
-                        rc = OK;
+                        rc = XWOK;
                 } else {
                         rc = -EAGAIN;
                 }
         } else {
                 ctcb = xwos_scheduler_get_ctcb(xwsd);
                 rc = xwos_scheduler_check_swcx(xwsd, ctcb, &swtcb);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         if (ctcb == swtcb) {
                                 /* 当前线程的状态可能在中断或其他CPU中被改变，
                                    并又被加入到就绪队列中，然后在此处又被重新选择。
@@ -880,7 +880,7 @@ xwer_t xwos_scheduler_do_swcx(struct xwos_scheduler * xwsd)
                                         xwsd->cstk = &swtcb->stack;
                                 }
                                 xwsd->pstk = &ctcb->stack;
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         rc = -EINVAL;
@@ -922,7 +922,7 @@ xwer_t xwos_scheduler_req_swcx(struct xwos_scheduler * xwsd)
                 xwsd->pstk = err_ptr(-EINVAL); /* Invalidate other caller. */
                 rc = xwos_scheduler_do_swcx(xwsd);
                 xwlk_rawly_unlock_cpuirqrs(&xwsd->cxlock, cpuirq);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         soc_scheduler_req_swcx(xwsd);
                 } else {
                         xwos_scheduler_finish_swcx(xwsd);
@@ -1007,7 +1007,7 @@ xwer_t xwos_scheduler_req_swcx(struct xwos_scheduler * xwsd)
                 xwsd->pstk = err_ptr(-EINVAL); /* Invalidate other caller. */
                 rc = xwos_scheduler_do_swcx(xwsd);
                 xwlk_rawly_unlock_cpuirqrs(&xwsd->cxlock, cpuirq);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         soc_scheduler_req_swcx(xwsd);
                 } else {
                         xwos_scheduler_finish_swcx(xwsd);
@@ -1045,7 +1045,7 @@ void xwos_scheduler_finish_swcx(struct xwos_scheduler * xwsd)
  * @brief 将调度器的唤醒锁计数器加1
  * @param xwsd: (I) 调度器对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval <0: 当前调度器正在进入低功耗模式
  * @note
  * - 同步/异步：同步
@@ -1067,7 +1067,7 @@ xwer_t xwos_scheduler_inc_wklkcnt(struct xwos_scheduler * xwsd)
  * @brief 将调度器的唤醒锁计数器减1
  * @param xwsd: (I) 调度器对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval <0: 当前调度器正在进入低功耗
  * @note
  * - 同步/异步：同步
@@ -1084,7 +1084,7 @@ xwer_t xwos_scheduler_dec_wklkcnt(struct xwos_scheduler * xwsd)
                                 XWOS_SCHEDULER_WKLKCNT_UNLOCKED,
                                 1,
                                 &nv, NULL);
-        if ((OK == rc) && (XWOS_SCHEDULER_WKLKCNT_FREEZING == nv)) {
+        if ((XWOK == rc) && (XWOS_SCHEDULER_WKLKCNT_FREEZING == nv)) {
                 soc_scheduler_suspend(xwsd);
         }/* else {} */
         return rc;
@@ -1128,7 +1128,7 @@ xwer_t xwos_scheduler_notify_allfrz_lic(struct xwos_scheduler * xwsd)
                                 XWOS_SCHEDULER_WKLKCNT_FREEZING,
                                 1,
                                 &nv, NULL);
-        if ((OK == rc) && (XWOS_SCHEDULER_WKLKCNT_ALLFRZ == nv)) {
+        if ((XWOK == rc) && (XWOS_SCHEDULER_WKLKCNT_ALLFRZ == nv)) {
                 xwos_syshwt_stop(&xwsd->tt.hwt);
         } else {
                 rc = -EINTR;
@@ -1152,7 +1152,7 @@ void xwos_scheduler_notify_allfrz_lc(void)
                                 XWOS_SCHEDULER_WKLKCNT_ALLFRZ,
                                 1,
                                 &nv, NULL);
-        if ((OK == rc) && (XWOS_SCHEDULER_WKLKCNT_SUSPENDED == nv)) {
+        if ((XWOK == rc) && (XWOS_SCHEDULER_WKLKCNT_SUSPENDED == nv)) {
                 if (xwsd->pm.xwpmdm) {
                         xwos_pmdm_report_xwsd_suspended(xwsd->pm.xwpmdm);
                 }/* else {} */
@@ -1211,7 +1211,7 @@ xwer_t xwos_scheduler_suspend_lic(struct xwos_scheduler * xwsd)
                 xwlk_splk_unlock(&xwsd->tcblistlock);
                 xwlk_splk_unlock_cpuirqrs(&xwsd->pm.lock, cpuirq);
         }
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -1230,7 +1230,7 @@ xwer_t xwos_scheduler_suspend(xwid_t cpuid)
         xwer_t rc;
 
         rc = xwos_scheduler_get_by_cpuid(cpuid, &xwsd);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 rc = xwos_scheduler_dec_wklkcnt(xwsd);
         }/* else {} */
         return rc;
@@ -1256,7 +1256,7 @@ xwer_t xwos_scheduler_resume_lic(struct xwos_scheduler * xwsd)
                                         XWOS_SCHEDULER_WKLKCNT_SUSPENDED,
                                         1,
                                         &nv, &ov);
-                if ((OK == rc) && (XWOS_SCHEDULER_WKLKCNT_ALLFRZ == nv)) {
+                if ((XWOK == rc) && (XWOS_SCHEDULER_WKLKCNT_ALLFRZ == nv)) {
                         xwos_pmdm_report_xwsd_resuming(xwsd->pm.xwpmdm);
                 }
 
@@ -1264,7 +1264,7 @@ xwer_t xwos_scheduler_resume_lic(struct xwos_scheduler * xwsd)
                                         XWOS_SCHEDULER_WKLKCNT_ALLFRZ,
                                         1,
                                         &nv, &ov);
-                if ((OK == rc) && (XWOS_SCHEDULER_WKLKCNT_THAWING == nv)) {
+                if ((XWOK == rc) && (XWOS_SCHEDULER_WKLKCNT_THAWING == nv)) {
                         xwos_syshwt_start(&xwsd->tt.hwt);
                 }
 
@@ -1272,9 +1272,9 @@ xwer_t xwos_scheduler_resume_lic(struct xwos_scheduler * xwsd)
                                         XWOS_SCHEDULER_WKLKCNT_THAWING,
                                         1,
                                         &nv, &ov);
-                if ((OK == rc) && (XWOS_SCHEDULER_WKLKCNT_UNLOCKED == nv)) {
+                if ((XWOK == rc) && (XWOS_SCHEDULER_WKLKCNT_UNLOCKED == nv)) {
                         xwos_scheduler_thaw_allfrz_lic(xwsd);
-                        rc = OK;
+                        rc = XWOK;
                         break;
                 } else if (ov >= XWOS_SCHEDULER_WKLKCNT_UNLOCKED) {
                         rc = -EALREADY;
@@ -1304,14 +1304,14 @@ xwer_t xwos_scheduler_resume(xwid_t cpuid)
         localid = xwos_cpu_get_id();
         if (localid == cpuid) {
                 xwsd = xwos_scheduler_get_lc();
-                if (OK == xwos_irq_get_id(NULL)) {
+                if (XWOK == xwos_irq_get_id(NULL)) {
                         rc = xwos_scheduler_resume_lic(xwsd);
                 } else {
                         rc = soc_scheduler_resume(xwsd);
                 }
         } else {
                 rc = xwos_scheduler_get_by_cpuid(cpuid, &xwsd);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         rc = soc_scheduler_resume(xwsd);
                 }/* else {} */
         }

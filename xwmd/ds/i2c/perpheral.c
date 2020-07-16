@@ -107,7 +107,7 @@ xwer_t xwds_i2cp_cvop_probe(struct xwds_i2cp * i2cp)
         if (__unlikely(rc < 0)) {
                 goto err_dev_cvop_probe;
         }
-        return OK;
+        return XWOK;
 
 err_dev_cvop_probe:
         xwds_i2cm_put(i2cp->bus);
@@ -133,7 +133,7 @@ xwer_t xwds_i2cp_cvop_remove(struct xwds_i2cp * i2cp)
         }
 
         xwds_i2cm_put(i2cp->bus);
-        return OK;
+        return XWOK;
 
 err_dev_cvop_remove:
         return rc;
@@ -162,7 +162,7 @@ xwer_t xwds_i2cp_cvop_start(struct xwds_i2cp * i2cp)
         if (__unlikely(rc < 0)) {
                 goto err_dev_cvop_start;
         }
-        return OK;
+        return XWOK;
 
 err_dev_cvop_start:
         xwds_i2cm_release(i2cp->bus);
@@ -188,7 +188,7 @@ xwer_t xwds_i2cp_cvop_stop(struct xwds_i2cp * i2cp)
         }
 
         xwds_i2cm_release(i2cp->bus);
-        return OK;
+        return XWOK;
 
 err_dev_cvop_stop:
         return rc;
@@ -214,7 +214,7 @@ xwer_t xwds_i2cp_cvop_suspend(struct xwds_i2cp * i2cp)
         }
 
         xwds_i2cm_release(i2cp->bus);
-        return OK;
+        return XWOK;
 
 err_dev_cvop_suspend:
         return rc;
@@ -243,7 +243,7 @@ xwer_t xwds_i2cp_cvop_resume(struct xwds_i2cp * i2cp)
         if (__unlikely(rc < 0)) {
                 goto err_dev_cvop_resume;
         }
-        return OK;
+        return XWOK;
 
 err_dev_cvop_resume:
         xwds_i2cm_release(i2cp->bus);
@@ -285,7 +285,7 @@ xwer_t xwds_i2cp_ioctl(struct xwds_i2cp * i2cp, xwsq_t cmd, ...)
 
         xwds_i2cp_release(i2cp);
         xwds_i2cp_put(i2cp);
-        return OK;
+        return XWOK;
 
 err_drv_ioctl:
         xwds_i2cp_release(i2cp);

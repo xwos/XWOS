@@ -111,7 +111,7 @@ xwer_t mpc560xb_rtc_check_desc(struct xwds_misc * rtc)
                 if(__unlikely(is_err_or_null(cfg))) {
                         rc = -EINVAL;
                 } else {
-                        rc = OK;
+                        rc = XWOK;
                 }
         }
 
@@ -134,7 +134,7 @@ xwer_t mpc560xb_rtc_drv_remove(struct xwds_device * dev)
         xwer_t rc;
 
         XWOS_UNUSED(dev);
-        rc = OK;
+        rc = XWOK;
 
         return rc;
 }
@@ -199,7 +199,7 @@ xwer_t mpc560xb_rtc_drv_start(struct xwds_device * dev)
                 irqrsc = &resources->irqrsc_array[i];
                 xwos_irq_clear(irqrsc->irqn);
                 rc = xwos_irq_cfg(irqrsc->irqn, irqrsc->cfg);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         rc = xwos_irq_enable(irqrsc->irqn);
                 }
                 if (__unlikely(rc < 0)) {
@@ -211,7 +211,7 @@ xwer_t mpc560xb_rtc_drv_start(struct xwds_device * dev)
                 }
         }
 
-        return OK;
+        return XWOK;
 
 err_en_irq:
         for (j = (xwssz_t)resources->gpiorsc_num - 1; j >= 0; j--) {
@@ -262,7 +262,7 @@ xwer_t mpc560xb_rtc_drv_stop(struct xwds_device * dev)
                 irqrsc = &resources->irqrsc_array[j];
                 xwos_irq_release(irqrsc->irqn);
         }
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -271,7 +271,7 @@ xwer_t mpc560xb_rtc_drv_suspend(struct xwds_device * dev)
         xwer_t rc;
 
         XWOS_UNUSED(dev);
-        rc = OK;
+        rc = XWOK;
 
         return rc;
 }
@@ -282,7 +282,7 @@ xwer_t mpc560xb_rtc_drv_resume(struct xwds_device * dev)
         xwer_t rc;
 
         XWOS_UNUSED(dev);
-        rc = OK;
+        rc = XWOK;
 
         return rc;
 }
@@ -328,7 +328,7 @@ xwer_t mpc560xb_rtc_enable(struct xwds_misc * rtc)
         rtcreg->RTCC.B.RTCIE = xwccfg->u.bit.rtcie;
         rtcreg->RTCC.B.CNTEN = 1;
 
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -345,7 +345,7 @@ xwer_t mpc560xb_rtc_disable(struct xwds_misc * rtc)
         rtcreg->RTCC.B.APIIE = 0;
         rtcreg->RTCC.B.RTCIE = 0;
 
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -366,7 +366,7 @@ xwer_t mpc560xb_rtc_reset(struct xwds_misc * rtc)
         rtcreg->RTCC.B.APIIE = 0;
         rtcreg->RTCC.B.RTCIE = 0;
 
-        return OK;
+        return XWOK;
 }
 
 /******** ******** rtc isr ******** ********/

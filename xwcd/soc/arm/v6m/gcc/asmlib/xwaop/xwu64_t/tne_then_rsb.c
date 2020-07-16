@@ -43,7 +43,7 @@ xwer_t xwaop__xwu64_t__tne_then_rsb(__atomic xwu64_t * a,
         o = *a;
         if (o != t) {
                 n = v - o;
-                rc = OK;
+                rc = XWOK;
                 *a = n;
         } else {
                 n = o;

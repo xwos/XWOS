@@ -43,7 +43,7 @@ xwer_t xwaop__xwu32_t__tgtlt_then_rsb(__atomic xwu32_t * a,
         o = *a;
         if ((o > l) && (o < r)) {
                 n = v - o;
-                rc = OK;
+                rc = XWOK;
                 *a = n;
         } else {
                 n = o;

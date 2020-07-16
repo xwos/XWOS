@@ -43,7 +43,7 @@ xwer_t xwaop__xws64_t__tlt_then_add(__atomic xws64_t * a,
         o = *a;
         if (o < t) {
                 n = o + v;
-                rc = OK;
+                rc = XWOK;
                 *a = n;
         } else {
                 n = o;

@@ -297,7 +297,7 @@ int newlibac_fops_closedir(xwsq_t idx)
                 free(dp);
                 newlibac_fops_fatfs_node[idx] = NULL;
                 xwbmpop_c0i(newlibac_fops_node_bmp, (xwsq_t)idx);
-                errno = OK;
+                errno = XWOK;
                 rc = 0;
                 break;
         case FR_INVALID_OBJECT:
@@ -333,7 +333,7 @@ int newlibac_fops_closefile(xwsq_t idx)
                 free(fp);
                 newlibac_fops_fatfs_node[idx] = NULL;
                 xwbmpop_c0i(newlibac_fops_node_bmp, idx);
-                errno = OK;
+                errno = XWOK;
                 rc = 0;
                 break;
         case FR_INVALID_OBJECT:

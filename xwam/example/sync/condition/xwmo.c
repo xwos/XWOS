@@ -113,7 +113,7 @@ xwer_t example_condition_start(void)
                 goto err_nthrd_create;
         }
 
-        return OK;
+        return XWOK;
 
 
 err_nthrd_create:
@@ -132,7 +132,7 @@ xwer_t example_condition_wthrd_func(void * arg)
         union xwlk_ulock ulk;
         xwsq_t lkst;
         xwreg_t cpuirq;
-        xwer_t rc = OK;
+        xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
 
@@ -148,7 +148,7 @@ xwer_t example_condition_wthrd_func(void * arg)
                         rc = xwosal_cdt_timedwait(cdtid,
                                                   ulk, XWLK_TYPE_SPLK, NULL,
                                                   &time, &lkst);
-                        if (OK == rc) {
+                        if (XWOK == rc) {
                                 xwlogf(INFO, "cdttst", "Acquired!");
                                 example_flag = false;
                         } else {
@@ -173,7 +173,7 @@ xwer_t example_condition_nthrd_func(void * arg)
         xwid_t cdtid;
         xwtm_t time;
         xwreg_t cpuirq;
-        xwer_t rc = OK;
+        xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
 

@@ -151,7 +151,7 @@ void xwlk_sqlk_rdex_lock(struct xwlk_sqlk * sql)
  * @brief XWOS API：尝试开启独占读临界区
  * @parem sql: (I) 顺序锁的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -202,7 +202,7 @@ void xwlk_sqlk_rdex_lock_cpuirq(struct xwlk_sqlk * sql)
  * @brief XWOS API：尝试开启独占读临界区，并关闭本地CPU的中断
  * @parem sql: (I) 顺序锁的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -255,7 +255,7 @@ void xwlk_sqlk_rdex_lock_cpuirqsv(struct xwlk_sqlk * sql, xwreg_t * cpuirq)
  * @parem sql: (I) 顺序锁的指针
  * @param cpuirq: (O) 缓冲区指针，用于返回本地CPU的中断标志
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -314,7 +314,7 @@ void xwlk_sqlk_rdex_lock_irqs(struct xwlk_sqlk * sql,
  * @param irqs: (I) 外部中断资源数组指针
  * @param num: (I) 数组中元素数量
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -381,7 +381,7 @@ void xwlk_sqlk_rdex_lock_irqssv(struct xwlk_sqlk * sql,
  * @param flags: (O) 缓冲区指针，用于返回部分外部中断的中断标志
  * @param num: (I) 数组中元素数量
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -441,7 +441,7 @@ void xwlk_sqlk_rdex_lock_bh(struct xwlk_sqlk * sql)
  * @brief XWOS API：尝试开启独占读临界区，关闭本地CPU的中断底半部
  * @parem sql: (I) 顺序锁的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -494,7 +494,7 @@ void xwlk_sqlk_wr_lock(struct xwlk_sqlk * sql)
  * @brief XWOS API：尝试开启写临界区
  * @parem sql: (I) 顺序锁的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -509,7 +509,7 @@ xwer_t xwlk_sqlk_wr_trylock(struct xwlk_sqlk * sql)
         xwer_t rc;
 
         rc = xwlk_splk_trylock(&sql->splk);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 sql->seq += XWLK_SQLK_GRANULARITY;
                 xwmb_smp_wmb();
         }
@@ -555,7 +555,7 @@ void xwlk_sqlk_wr_lock_cpuirq(struct xwlk_sqlk * sql)
  * @brief XWOS API：尝试开启写临界区，并关闭本地CPU的中断
  * @parem sql: (I) 顺序锁的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -571,7 +571,7 @@ xwer_t xwlk_sqlk_wr_trylock_cpuirq(struct xwlk_sqlk * sql)
         xwer_t rc;
 
         rc = xwlk_splk_trylock_cpuirq(&sql->splk);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 sql->seq += XWLK_SQLK_GRANULARITY;
                 xwmb_smp_wmb();
         }
@@ -619,7 +619,7 @@ void xwlk_sqlk_wr_lock_cpuirqsv(struct xwlk_sqlk * sql, xwreg_t * cpuirq)
  * @parem sql: (I) 顺序锁的指针
  * @param cpuirq: (O) 缓冲区指针，用于返回本地CPU的中断标志
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -635,7 +635,7 @@ xwer_t xwlk_sqlk_wr_trylock_cpuirqsv(struct xwlk_sqlk * sql, xwreg_t * cpuirq)
         xwer_t rc;
 
         rc = xwlk_splk_trylock_cpuirqsv(&sql->splk, cpuirq);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 sql->seq += XWLK_SQLK_GRANULARITY;
                 xwmb_smp_wmb();
         }
@@ -689,7 +689,7 @@ void xwlk_sqlk_wr_lock_irqs(struct xwlk_sqlk * sql,
  * @param irqs: (I) 外部中断资源数组指针
  * @param num: (I) 数组中元素数量
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -708,7 +708,7 @@ xwer_t xwlk_sqlk_wr_trylock_irqs(struct xwlk_sqlk * sql,
         xwer_t rc;
 
         rc = xwlk_splk_trylock_irqs(&sql->splk, irqs, num);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 sql->seq += XWLK_SQLK_GRANULARITY;
                 xwmb_smp_wmb();
         }
@@ -767,7 +767,7 @@ void xwlk_sqlk_wr_lock_irqssv(struct xwlk_sqlk * sql,
  * @param flags: (O) 缓冲区指针，用于返回部分外部中断的中断标志
  * @param num: (I) 数组中元素数量
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -786,7 +786,7 @@ xwer_t xwlk_sqlk_wr_trylock_irqssv(struct xwlk_sqlk * sql,
         xwer_t rc;
 
         rc = xwlk_splk_trylock_irqssv(&sql->splk, irqs, flags, num);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 sql->seq += XWLK_SQLK_GRANULARITY;
                 xwmb_smp_wmb();
         }
@@ -838,7 +838,7 @@ void xwlk_sqlk_wr_lock_bh(struct xwlk_sqlk * sql)
  * @brief XWOS API：尝试开启写临界区，关闭本地CPU的中断底半部
  * @parem sql: (I) 顺序锁的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -855,7 +855,7 @@ xwer_t xwlk_sqlk_wr_trylock_bh(struct xwlk_sqlk * sql)
         xwer_t rc;
 
         rc = xwlk_splk_trylock_bh(&sql->splk);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 sql->seq += XWLK_SQLK_GRANULARITY;
                 xwmb_smp_wmb();
         }

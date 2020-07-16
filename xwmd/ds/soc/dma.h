@@ -40,7 +40,7 @@
  * @param soc: (I) SOC对象指针
  * @param ch: (I) DMA通道
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: 无效的DMA通道
  * @retval -EBUSY: DMA通道繁忙
@@ -57,7 +57,7 @@ xwer_t xwds_dma_req(struct xwds_soc * soc, xwid_t ch);
  * @param soc: (I) SOC对象指针
  * @param ch: (I) DMA通道
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: 无效的DMA通道
  * @retval -EPERM: DMA通道未被使用
@@ -77,7 +77,7 @@ xwer_t xwds_dma_rls(struct xwds_soc * soc, xwid_t ch);
  * @param cb: (I) 传输结束回调函数
  * @param cfg: (I) 回调函数参数
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: 无效的DMA通道
  * @retval -EPERM: DMA通道未被使用
@@ -95,7 +95,7 @@ xwer_t xwds_dma_cfg(struct xwds_soc * soc, xwid_t ch, void * cfg,
  * @param soc: (I) SOC对象指针
  * @param ch: (I) DMA通道
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: 无效的DMA通道
  * @retval -EPERM: DMA通道未被使用
@@ -112,7 +112,7 @@ xwer_t xwds_dma_enable(struct xwds_soc * soc, xwid_t ch);
  * @param soc: (I) SOC对象指针
  * @param ch: (I) DMA通道
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: 无效的DMA通道
  * @retval -EPERM: DMA通道未被使用
@@ -129,7 +129,7 @@ xwer_t xwds_dma_disable(struct xwds_soc * soc, xwid_t ch);
  * @param soc: (I) SOC对象指针
  * @param ch: (I) DMA通道
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: 无效的DMA通道
  * @retval -EPERM: DMA通道未被使用
@@ -146,7 +146,7 @@ xwer_t xwds_dma_start(struct xwds_soc * soc, xwid_t ch);
  * @param soc: (I) SOC对象指针
  * @param ch: (I) DMA通道
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: 无效的DMA通道
  * @retval -EPERM: DMA通道未被使用

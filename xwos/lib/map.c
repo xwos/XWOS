@@ -24,7 +24,7 @@
  * @param m: (I) map的指针
  * @param newmc: (I) 键值对容器的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EEXIST: 键值对已经存在
  */
 __xwlib_code
@@ -74,7 +74,7 @@ xwer_t xwlib_map_insert(struct xwlib_map * m, struct xwlib_map_container * newmc
                 }
                 xwlib_rbtree_link(&newmc->rbn, lpc);
                 xwlib_rbtree_insert_color(&m->rbtree, &newmc->rbn);
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EEXIST;
         }
@@ -86,7 +86,7 @@ xwer_t xwlib_map_insert(struct xwlib_map * m, struct xwlib_map_container * newmc
  * @param m: (I) map的指针
  * @param mc: (I) 键值对容器的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ESRCH: 此键值对容器不在键值对集合中
  */
 __xwlib_code
@@ -100,7 +100,7 @@ xwer_t xwlib_map_erase(struct xwlib_map * m, struct xwlib_map_container * mc)
                 xwlib_rbtree_remove(&m->rbtree, &mc->rbn);
                 xwlib_rbtree_init_node(&mc->rbn);
                 xwlib_bclst_del_init(&mc->bcln);
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -111,7 +111,7 @@ xwer_t xwlib_map_erase(struct xwlib_map * m, struct xwlib_map_container * mc)
  * @param key: (I) 键值对容器的指针
  * @param mc: (O) 指向指针缓存的指针，此指针缓存用于返回查找到的键值对容器的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ESRCH: 目标不存在
  */
 __xwlib_code
@@ -137,7 +137,7 @@ xwer_t xwlib_map_find(struct xwlib_map * m, void * key,
         }
         if (rbn) {
                 *mcbuf = xwlib_rbtree_entry(rbn, struct xwlib_map_container, rbn);
-                rc = OK;
+                rc = XWOK;
         } else {
                 *mcbuf = NULL;
                 rc = -ESRCH;

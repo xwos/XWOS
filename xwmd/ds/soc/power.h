@@ -39,7 +39,7 @@
  * @param soc: (I) SOC对象指针
  * @param id: (I) 电源ID
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ERANGE: 电源ID错误
  * @retval -ENOSYS: 不支持的API
  * @note
@@ -55,7 +55,7 @@ xwer_t xwds_pwr_req(struct xwds_soc * soc, xwid_t id);
  * @param soc: (I) SOC对象指针
  * @param id: (I) 电源ID
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ERANGE: 电源ID错误
  * @retval -ENOSYS: 不支持的API
  * @note
@@ -74,7 +74,7 @@ xwer_t xwds_pwr_rls(struct xwds_soc * soc, xwid_t id);
  * @param num: (I) 缓冲区数组的数量
  *             (O) 返回的数组的数量
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: 电源ID错误
  * @retval -ENOSYS: 不支持的API

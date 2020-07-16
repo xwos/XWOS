@@ -1492,7 +1492,7 @@ xwer_t xwaop__xws32_t__tst_then_op(__atomic xws32_t * a,
                                         xwmb_smp_mb();
                                         rc = stwcx(a, (xwu32_t)n);
                                 } else {
-                                        rc = OK;
+                                        rc = XWOK;
                                         n = o;
                                         xwmb_smp_mb();
                                         break;
@@ -1509,7 +1509,7 @@ xwer_t xwaop__xws32_t__tst_then_op(__atomic xws32_t * a,
                                 xwmb_smp_mb();
                                 rc = stwcx(a, (xwu32_t)n);
                         } else {
-                                rc = OK;
+                                rc = XWOK;
                                 n = o;
                                 xwmb_smp_mb();
                                 break;

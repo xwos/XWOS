@@ -303,7 +303,7 @@ void xwos_thrd_launch(struct xwos_tcb * tcb, xwos_thrd_f mainfunc, void * arg)
  * @param priority: (I) 线程的优先级
  * @param attr: (I) 线程属性，取值：@ref xwos_sdobj_attr_em中的一项
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -328,14 +328,14 @@ xwer_t xwos_thrd_init(struct xwos_tcb * tcb,
                            mainfunc, arg,
                            stack, stack_size,
                            priority, attr);
-        return OK;
+        return XWOK;
 }
 
 /**
  * @brief XWOS API：销毁线程控制块对象
  * @param tcb: (I) 线程控制块对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -348,7 +348,7 @@ xwer_t xwos_thrd_destroy(struct xwos_tcb * tcb)
         XWOS_VALIDATE((NULL != tcb), "nullptr", -EFAULT);
 
         xwos_thrd_deactivate(tcb);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -361,7 +361,7 @@ xwer_t xwos_thrd_destroy(struct xwos_tcb * tcb)
  * @param priority: (I) 线程的优先级
  * @param attr: (I) 线程属性，@ref xwos_sdobj_attr_em
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -398,7 +398,7 @@ xwer_t xwos_thrd_create(struct xwos_tcb ** tcbpbuf,
                            stk, stack_size,
                            priority, attr);
         *tcbpbuf = tcb;
-        return OK;
+        return XWOK;
 
 err_tcb_alloc:
         xwos_thrd_stack_free(stk);
@@ -411,7 +411,7 @@ err_stack_alloc:
  * @brief XWOS API：删除动态创建线程
  * @param tcb: (I) 线程控制块对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -429,7 +429,7 @@ xwer_t xwos_thrd_delete(struct xwos_tcb * tcb)
         base = ((struct xwos_tcb *)tcb)->stack.base;
         xwos_thrd_stack_free(base);
         xwos_tcb_free(tcb);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -494,7 +494,7 @@ xwer_t xwos_thrd_exit_lic(struct xwos_tcb * tcb, xwer_t rc)
         XWOS_UNUSED(tcb);
         XWOS_UNUSED(rc);
 #endif /* !XWUPCFG_SD_THRD_EXIT */
-        return OK;
+        return XWOK;
 }
 
 #if defined(XWUPCFG_SD_THRD_EXIT) && (1 == XWUPCFG_SD_THRD_EXIT)
@@ -502,13 +502,13 @@ xwer_t xwos_thrd_exit_lic(struct xwos_tcb * tcb, xwer_t rc)
  * @brief @ref xwos_thrd_terminate()中使用的回调锁的解锁函数
  * @param tcb: (I) 线程控制块对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  */
 static __xwos_code
 xwer_t xwos_thrd_terminate_unlock_cb(struct xwos_tcb * tcb)
 {
         xwos_thrd_intr(tcb);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -517,7 +517,7 @@ xwer_t xwos_thrd_terminate_unlock_cb(struct xwos_tcb * tcb)
  * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回被终止线程的返回值，
  *                 可为NULL，表示不需要返回
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EALREADY: 线程在此之前已经退出
  * @note
@@ -554,7 +554,7 @@ xwer_t xwos_thrd_terminate(struct xwos_tcb * tcb, xwer_t * trc)
                 rc = xwsync_cdt_wait(&tcb->completion,
                                      &lockcb, XWLK_TYPE_CALLBACK, tcb,
                                      &lkst);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         if (!is_err_or_null(trc)) {
                                 *trc = (xwer_t)tcb->stack.arg;
                         }
@@ -650,7 +650,7 @@ void xwos_cthrd_wait_exit(void)
  * @param dprio: (I) 动态优先级
  * @param pmtx: (O) 指向缓冲区的指针，通过此缓冲区返回互斥锁对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ESTALE: 状态已经被其他CPU改变
  * @note
  * - 此函数将线程(tcb)的优先级改成(dprio)，并返回接下来需要修改优先级的互斥锁的指针。
@@ -719,7 +719,7 @@ void xwos_thrd_chprio(struct xwos_tcb * tcb)
  * @param tcb: (I) 线程控制块对象的指针
  * @param prio: (I) 动态优先级
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EEXIST: 线程已经存在
  */
 __xwos_code
@@ -736,7 +736,7 @@ xwer_t xwos_thrd_rq_add_head(struct xwos_tcb * tcb)
         } else {
                 xwbop_s1m(xwsq_t, &tcb->state, XWSDOBJ_DST_READY);
                 xwos_rtrq_add_head(xwrtrq, tcb);
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -746,7 +746,7 @@ xwer_t xwos_thrd_rq_add_head(struct xwos_tcb * tcb)
  * @param tcb: (I) 线程控制块对象的指针
  * @param prio: (I) 动态优先级
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EEXIST: 线程已经存在
  */
 __xwos_code
@@ -763,7 +763,7 @@ xwer_t xwos_thrd_rq_add_tail(struct xwos_tcb * tcb)
         } else {
                 xwbop_s1m(xwsq_t, &tcb->state, XWSDOBJ_DST_READY);
                 xwos_rtrq_add_tail(xwrtrq, tcb);
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -772,7 +772,7 @@ xwer_t xwos_thrd_rq_add_tail(struct xwos_tcb * tcb)
  * @brief 将线程从就绪队列中删除
  * @param tcb: (I) 线程控制块对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ESRCH: 没有这个线程
  */
 __xwos_code
@@ -791,7 +791,7 @@ void xwos_thrd_rq_remove(struct xwos_tcb * tcb)
  * @brief XWOS API：中断线程的睡眠或阻塞状态
  * @param tcb: (I) 线程控制块对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EPERM: 线程不可被中断
  * @retval -EINVAL: 无效的线程态
  * @note
@@ -820,7 +820,7 @@ xwer_t xwos_thrd_intr(struct xwos_tcb * tcb)
                         tcb->wqn.cb = NULL;
                         xwos_cpuirq_restore_lc(cpuirq);
                         cb(tcb);
-                        rc = OK;
+                        rc = XWOK;
 #if defined(XWUPCFG_SYNC_PLSMR) && (1 == XWUPCFG_SYNC_PLSMR)
                 } else if (XWOS_WQTYPE_PLSMR == tcb->wqn.type) {
                         struct xwsync_plsmr * smr;
@@ -873,7 +873,7 @@ xwer_t xwos_thrd_intr(struct xwos_tcb * tcb)
                 xwtt = &xwsd->tt;
                 xwlk_sqlk_wr_lock(&xwtt->lock);
                 rc = xwos_tt_remove_locked(xwtt, &tcb->ttn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_SLEEPING);
                         xwlk_sqlk_wr_unlock(&xwtt->lock);
                         xwos_thrd_wakeup(tcb);
@@ -1034,7 +1034,7 @@ xwer_t xwos_thrd_do_unlock(void * lock, xwsq_t lktype, void * lkdata)
 
         ulk.anon = lock;
 
-        rc = OK;
+        rc = XWOK;
         switch (lktype) {
         case XWLK_TYPE_MTX:
         case XWLK_TYPE_MTX_UNINTR:
@@ -1085,7 +1085,7 @@ xwer_t xwos_thrd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm,
 
         ulk.anon = lock;
 
-        rc = OK;
+        rc = XWOK;
         switch (lktype) {
         case XWLK_TYPE_MTX:
 #if (defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)) || \
@@ -1131,7 +1131,7 @@ xwer_t xwos_thrd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm,
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINTR: 睡眠过程被中断
  * @retval -ETIMEDOUT: 时间戳为负数
  * @note
@@ -1189,7 +1189,7 @@ xwer_t xwos_cthrd_sleep(xwtm_t * xwtm)
                         xwos_scheduler_req_swcx();
                         xwos_cpuirq_restore_lc(cpuirq);
                         if (XWOS_TTN_WKUPRS_TIMEDOUT == ctcb->ttn.wkuprs) {
-                                rc = OK;
+                                rc = XWOK;
                         } else if (XWOS_TTN_WKUPRS_INTR == ctcb->ttn.wkuprs) {
                                 rc = -EINTR;
                         } else {
@@ -1211,7 +1211,7 @@ xwer_t xwos_cthrd_sleep(xwtm_t * xwtm)
  *                    （可作为下一次时间起点，形成精确的周期）
  * @param inc: (I) 期望被唤醒的时间增量（相对于时间原点）
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINTR: 睡眠过程被中断
  * @note
  * - 同步/异步：同步
@@ -1263,7 +1263,7 @@ xwer_t xwos_cthrd_sleep_from(xwtm_t * origin, xwtm_t inc)
                 xwos_scheduler_req_swcx();
                 xwos_cpuirq_restore_lc(cpuirq);
                 if (XWOS_TTN_WKUPRS_TIMEDOUT == ctcb->ttn.wkuprs) {
-                        rc = OK;
+                        rc = XWOK;
                 } else if (XWOS_TTN_WKUPRS_INTR == ctcb->ttn.wkuprs) {
                         rc = -EINTR;
                 } else {
@@ -1328,7 +1328,7 @@ xwer_t xwos_thrd_freeze_lic(struct xwos_tcb * tcb)
                 xwos_cpuirq_restore_lc(cpuirq);
                 xwos_scheduler_req_swcx();
         }
-        return OK;
+        return XWOK;
 #else /* (1 == XWUPRULE_SD_THRD_FREEZE) */
         XWOS_UNUSED(tcb);
         return -ENOSYS;
@@ -1453,7 +1453,7 @@ bool xwos_cthrd_frz_shld_stop(bool * frozen)
         frz = false;
         if (xwos_cthrd_shld_frz()) {
                 rc = xwos_cthrd_freeze();
-                if (OK == rc) {
+                if (XWOK == rc) {
                         frz = true;
                 }
                 /* else {} */

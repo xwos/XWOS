@@ -43,5 +43,5 @@ void xwbmpaop_s1i(__maybe_unused __atomic xwbmp_t * bmp,
         __asm__ volatile("      strex   r2, r3, [r0, #0]");     /* *(r0) = r3; r2 = result; */
         __asm__ volatile("      teq     r2, #0");
         __asm__ volatile("      bne     1b");
-        __asm__ volatile("      bx      lr");                   /* return OK; */
+        __asm__ volatile("      bx      lr");                   /* return XWOK; */
 }

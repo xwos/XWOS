@@ -36,5 +36,5 @@ xwer_t xwos_smp_init(void)
 {
         /* 初始化中断管理系统 */
         xwos_irqc_subsys_init();
-        return OK;
+        return XWOK;
 }

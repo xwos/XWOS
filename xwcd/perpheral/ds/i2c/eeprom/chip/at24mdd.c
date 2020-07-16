@@ -125,7 +125,7 @@ xwer_t at24mdd_check_desc(struct xwds_i2cp_eeprom * eeprom)
                 if (__unlikely(total % page_size)) {
                         rc = -EINVAL;
                 } else {
-                        rc = OK;
+                        rc = XWOK;
                 }
         }
         return rc;
@@ -170,7 +170,7 @@ xwer_t at24mdd_drv_start(struct xwds_device * dev)
                         goto err_req_gpios;
                 }
         }
-        return OK;
+        return XWOK;
 
 err_req_gpios:
         return rc;
@@ -196,7 +196,7 @@ xwer_t at24mdd_drv_stop(struct xwds_device * dev)
                         goto err_gpio_release;
                 }
         }
-        return OK;
+        return XWOK;
 
 err_gpio_release:
         return rc;
@@ -323,7 +323,7 @@ xwer_t at24mdd_getc(struct xwds_i2cp_eeprom * eeprom, xwu8_t * buf, xwptr_t addr
         msg.buf = txdata;
         msg.size = 2;
         rc = xwds_i2cm_xfer(bus, &msg, xwtm);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 msg.addr = (xwu16_t)(i2cpaddr & 0x00FE);
                 msg.flags = XWDS_I2C_F_RD | XWDS_I2C_F_STOP;
                 msg.buf = buf;
@@ -388,13 +388,13 @@ xwer_t at24mdd_pgread(struct xwds_i2cp_eeprom * eeprom,
         msg.buf = txdata;
         msg.size = 2;
         rc = xwds_i2cm_xfer(bus, &msg, xwtm);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 msg.addr = (xwu16_t)(i2cpaddr & 0x00FE);
                 msg.flags = XWDS_I2C_F_RD | XWDS_I2C_F_STOP;
                 msg.buf = buf;
                 msg.size = *size;
                 rc = xwds_i2cm_xfer(bus, &msg, xwtm);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         *size = msg.size;
                 }/* else {} */
         }/* else {} */

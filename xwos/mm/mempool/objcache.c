@@ -71,7 +71,7 @@ xwer_t xwmm_mempool_objcache_i_a_free(void * this, void * mem);
  * @param ctor: (I) 构造函数
  * @param dtor: (I) 析构函数
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EALIGN: 内存区域没有对齐
  */
 __xwos_code
@@ -130,20 +130,20 @@ xwer_t xwmm_mempool_objcache_init(struct xwmm_mempool_objcache * oc,
         oc->i_a.malloc = xwmm_mempool_objcache_i_a_malloc;
         oc->i_a.free = xwmm_mempool_objcache_i_a_free;
 
-        return OK;
+        return XWOK;
 }
 
 /**
  * @brief 销毁对象缓存
  * @param oc: (I) 对象缓存的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  */
 __xwos_code
 xwer_t xwmm_mempool_objcache_destroy(struct xwmm_mempool_objcache * oc)
 {
         XWOS_UNUSED(oc);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -157,7 +157,7 @@ xwer_t xwmm_mempool_objcache_destroy(struct xwmm_mempool_objcache * oc)
  * @param ctor: (I) 构造函数
  * @param dtor: (I) 析构函数
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EALIGN: 内存区域没有对齐
  */
 __xwos_code
@@ -189,7 +189,7 @@ xwer_t xwmm_mempool_objcache_create(struct xwmm_mempool_objcache ** ocbuf,
         }
         *ocbuf = oc;
 
-        return OK;
+        return XWOK;
 
 err_oc_init:
         xwmm_kma_free(oc);
@@ -201,7 +201,7 @@ err_kma_alloc:
  * @brief 删除动态创建的对象缓存
  * @param oc: (I) 对象缓存的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  */
 __xwos_code
 xwer_t xwmm_mempool_objcache_delete(struct xwmm_mempool_objcache * oc)
@@ -209,7 +209,7 @@ xwer_t xwmm_mempool_objcache_delete(struct xwmm_mempool_objcache * oc)
         XWOS_VALIDATE((oc), "nullptr", -EFAULT);
 
         xwmm_kma_free(oc);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -292,7 +292,7 @@ xwsz_t xwmm_mempool_objcache_free_idle_page(struct xwmm_mempool_objcache * oc,
  * @param oc: (I) 对象缓存的指针
  * @param pg: (I) 页控制块的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval <0: 失败
  */
 static __xwos_code
@@ -320,7 +320,7 @@ void xwmm_mempool_objcache_page_put(struct xwmm_mempool_objcache * oc,
  * @param oc: (I) 对象缓存的指针
  * @param pgbuf: (O) 指向缓冲区的指针，通过此缓冲区返回页控制块的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足
  */
 static __xwos_code
@@ -355,7 +355,7 @@ xwer_t xwmm_mempool_objcache_page_get(struct xwmm_mempool_objcache * oc,
                 xwmm_mempool_objcache_page_init(oc, pg);
         }
         *pgbuf = pg;
-        return OK;
+        return XWOK;
 
 err_pg_alloc:
         return rc;
@@ -366,7 +366,7 @@ err_pg_alloc:
  * @param oc: (I) 对象缓存的指针
  * @param objbuf: (O) 指向缓冲区的指针，此缓冲区被用于返回对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足
  */
 __xwos_code
@@ -402,7 +402,7 @@ xwer_t xwmm_mempool_objcache_alloc(struct xwmm_mempool_objcache * oc, void ** ob
         }
         xwlk_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
 
-        return OK;
+        return XWOK;
 
 err_page_get:
         return rc;
@@ -413,7 +413,7 @@ err_page_get:
  * @param oc: (I) 对象缓存的指针
  * @param obj: (I) 对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足
  */
 __xwos_code
@@ -456,7 +456,7 @@ xwer_t xwmm_mempool_objcache_free(struct xwmm_mempool_objcache * oc, void * obj)
                 xwmm_mempool_objcache_free_idle_page(oc, nr);
         }
 
-        return OK;
+        return XWOK;
 
 err_not_aligned:
 err_pg_find:
@@ -468,7 +468,7 @@ err_pg_find:
  * @param oc: (I) 对象缓存的指针
  * @param reserved: (I) 预留的数量
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足
  */
 __xwos_code
@@ -505,7 +505,7 @@ xwer_t xwmm_mempool_objcache_reserve(struct xwmm_mempool_objcache * oc,
                 xwmm_mempool_objcache_free_idle_page(oc, nr);
         } else {
         }
-        return OK;
+        return XWOK;
 
 err_pg_alloc:
         return rc;
@@ -516,7 +516,7 @@ err_pg_alloc:
  * @param oc: (I) 对象缓存的指针
  * @param capacity: (O) 指向缓冲区的指针，通过此缓冲区返回对象缓存的容量
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  */
 __xwos_code
 xwer_t xwmm_mempool_objcache_get_capacity(struct xwmm_mempool_objcache * oc,
@@ -526,7 +526,7 @@ xwer_t xwmm_mempool_objcache_get_capacity(struct xwmm_mempool_objcache * oc,
         XWOS_VALIDATE((capacity), "nullptr", -EFAULT);
 
         *capacity = xwaop_load(xwsz_t, &oc->capacity, xwmb_modr_relaxed);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -535,7 +535,7 @@ xwer_t xwmm_mempool_objcache_get_capacity(struct xwmm_mempool_objcache * oc,
  * @param size: (I) 申请的大小
  * @param membuf: (O) 指向缓冲区的指针，通过此缓冲区返回申请到的内存的首地址
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足
  */
 static __xwos_code
@@ -556,7 +556,7 @@ xwer_t xwmm_mempool_objcache_i_a_malloc(void * this, xwsz_t size, void ** membuf
         if (rc < 0) {
                 goto err_alloc;
         }
-        return OK;
+        return XWOK;
 
 err_alloc:
 err_size:
@@ -568,7 +568,7 @@ err_size:
  * @param this: (I) this指针(页分配器)
  * @param mem: (I) 内存的首地址
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足
  */
 static __xwos_code

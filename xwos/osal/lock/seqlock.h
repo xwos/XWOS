@@ -123,7 +123,7 @@ void xwosal_sqlk_rdex_lock(struct xwosal_sqlk * sql)
  * @brief XWOSAL API：尝试开启独占读临界区
  * @param sql: (I) 顺序锁的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -173,7 +173,7 @@ void xwosal_sqlk_rdex_lock_cpuirq(struct xwosal_sqlk * sql)
  * @brief XWOSAL API：尝试开启独占读临界区，并关闭本地CPU的中断
  * @param sql: (I) 顺序锁的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -226,7 +226,7 @@ void xwosal_sqlk_rdex_lock_cpuirqsv(struct xwosal_sqlk * sql,
  * @param sql: (I) 顺序锁的指针
  * @param cpuirq: (O) 缓冲区指针，用于返回本地CPU的中断标志
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -286,7 +286,7 @@ void xwosal_sqlk_rdex_lock_irqs(struct xwosal_sqlk * sql,
  * @param irqs: (I) 外部中断资源数组指针
  * @param num: (I) 数组中元素数量
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -352,7 +352,7 @@ void xwosal_sqlk_rdex_lock_irqssv(struct xwosal_sqlk * sql,
  * @param flags: (O) 缓冲区指针，用于返回部分外部中断的中断标志
  * @param num: (I) 数组中元素数量
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -411,7 +411,7 @@ void xwosal_sqlk_rdex_lock_bh(struct xwosal_sqlk * sql)
  * @brief XWOSAL API：尝试开启独占读临界区，关闭本地CPU的中断底半部
  * @param sql: (I) 顺序锁的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -461,7 +461,7 @@ void xwosal_sqlk_wr_lock(struct xwosal_sqlk * sql)
  * @brief XWOSAL API：尝试开启写临界区
  * @param sql: (I) 顺序锁的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -509,7 +509,7 @@ void xwosal_sqlk_wr_lock_cpuirq(struct xwosal_sqlk * sql)
  * @brief XWOSAL API：尝试开启写临界区，并关闭本地CPU的中断
  * @param sql: (I) 顺序锁的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -562,7 +562,7 @@ void xwosal_sqlk_wr_lock_cpuirqsv(struct xwosal_sqlk * sql,
  * @param sql: (I) 顺序锁的指针
  * @param cpuirq: (O) 缓冲区指针，用于返回本地CPU的中断标志
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -622,7 +622,7 @@ void xwosal_sqlk_wr_lock_irqs(struct xwosal_sqlk * sql,
  * @param irqs: (I) 外部中断资源数组指针
  * @param num: (I) 数组中元素数量
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -689,7 +689,7 @@ void xwosal_sqlk_wr_lock_irqssv(struct xwosal_sqlk * sql,
  * @param flags: (O) 缓冲区指针，用于返回部分外部中断的中断标志
  * @param num: (I) 数组中元素数量
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步
@@ -748,7 +748,7 @@ void xwosal_sqlk_wr_lock_bh(struct xwosal_sqlk * sql)
  * @brief XWOSAL API：尝试开启写临界区，关闭本地CPU的中断底半部
  * @param sql: (I) 顺序锁的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得锁失败
  * @note
  * - 同步/异步：同步

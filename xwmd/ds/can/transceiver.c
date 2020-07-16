@@ -142,7 +142,7 @@ xwer_t xwds_cantrcv_cvop_start(struct xwds_cantrcv * cantrcv)
         if (__unlikely(rc < 0)) {
                 goto err_set_opmode;
         }
-        return OK;
+        return XWOK;
 
 err_set_opmode:
         xwds_device_cvop_stop(&cantrcv->bc.dev);
@@ -222,7 +222,7 @@ xwer_t xwds_cantrcv_set_opmode(struct xwds_cantrcv * cantrcv, xwsq_t opmode)
                 goto err_ops_set_opmode;
         }
         cantrcv->opmode = opmode;
-        return OK;
+        return XWOK;
 
 err_ops_set_opmode:
         return rc;

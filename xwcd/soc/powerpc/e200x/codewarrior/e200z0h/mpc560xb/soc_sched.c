@@ -105,7 +105,7 @@ xwer_t soc_scheduler_swi(xwer_t(*swifunc)(void *, void *), void * arg0, void * a
         xwreg_t value;
         xwptr_t addr;
 
-        rc = OK;
+        rc = XWOK;
         value = 0x2U;
         addr = (xwptr_t)&INTC.SSCIR[1];
         asm volatile(

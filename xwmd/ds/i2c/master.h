@@ -82,7 +82,7 @@ void xwds_i2cm_destruct(struct xwds_i2cm * i2cm);
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINVAL: 设备对象不可引用
  * @retval -ESHUTDOWN: 设备没有运行
  * @retval -ETIMEDOUT: 超时
@@ -102,7 +102,7 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINVAL: 设备对象不可引用
  * @retval -ESHUTDOWN: 设备没有运行
  * @retval -ETIMEDOUT: 超时

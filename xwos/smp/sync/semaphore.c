@@ -181,7 +181,7 @@ struct xwsync_smr * xwsync_smr_alloc(void)
         xwer_t rc;
 
         rc = xwmm_kma_alloc(sizeof(struct xwsync_smr), XWMM_ALIGNMENT, &mem.anon);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 xwsync_smr_construct(mem.smr);
         } else {
                 mem.smr = err_ptr(-ENOMEM);
@@ -234,7 +234,7 @@ static __xwos_code
 xwer_t xwsync_smr_gc(void * smr)
 {
         xwsync_smr_free((struct xwsync_smr *)smr);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -244,7 +244,7 @@ xwer_t xwsync_smr_gc(void * smr)
  * @param val: (I) 信号量的初始值
  * @param max: (I) 信号量的最大值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EINVAL: 无效参数
  * @retval -ETYPE: 类型错误
@@ -294,7 +294,7 @@ xwer_t xwsync_smr_create(struct xwsync_smr ** ptrbuf, xwid_t type,
  * @brief XWOS API：删除动态创建的信号量
  * @param smr: (I) 信号量对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EACCES: 无效的引用计数
  * @note
@@ -314,7 +314,7 @@ xwer_t xwsync_smr_delete(struct xwsync_smr * smr)
  * @brief XWOS API：销毁静态方式初始化的信号量对象
  * @param smr: (I) 信号量对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EACCES: 无效的引用计数
  * @note
  * - 同步/异步：异步
@@ -336,7 +336,7 @@ xwer_t xwsync_smr_destroy(struct xwsync_smr * smr)
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 信号量对象映射到位图中的位置
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 事件对象或信号量类型错误
  * @retval -EFAULT: 空指针
  * @note
@@ -358,7 +358,7 @@ xwer_t xwsync_smr_bind(struct xwsync_smr * smr, struct xwsync_evt * evt, xwsq_t 
         case XWSYNC_SMR_TYPE_PIPELINE:
                 xwos_plwq_lock_cpuirqsv(&smr->wq.pl, &cpuirq);
                 rc = xwsync_evt_obj_bind(evt, &smr->xwsyncobj, pos, true);
-                if ((OK == rc) && (smr->count > 0)) {
+                if ((XWOK == rc) && (smr->count > 0)) {
                         rc = xwsync_evt_obj_s1i(evt, &smr->xwsyncobj);
                 }
                 xwos_plwq_unlock_cpuirqrs(&smr->wq.pl, cpuirq);
@@ -368,7 +368,7 @@ xwer_t xwsync_smr_bind(struct xwsync_smr * smr, struct xwsync_evt * evt, xwsq_t 
         case XWSYNC_SMR_TYPE_RT:
                 xwos_rtwq_lock_cpuirqsv(&smr->wq.rt, &cpuirq);
                 rc = xwsync_evt_obj_bind(evt, &smr->xwsyncobj, pos, true);
-                if ((OK == rc) && (smr->count > 0)) {
+                if ((XWOK == rc) && (smr->count > 0)) {
                         rc = xwsync_evt_obj_s1i(evt, &smr->xwsyncobj);
                 }
                 xwos_rtwq_unlock_cpuirqrs(&smr->wq.rt, cpuirq);
@@ -386,7 +386,7 @@ xwer_t xwsync_smr_bind(struct xwsync_smr * smr, struct xwsync_evt * evt, xwsq_t 
  * @param smr: (I) 信号量对象的指针
  * @param evt: (I) 事件对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 事件对象或信号量类型错误
  * @retval -EFAULT: 空指针
  * @note
@@ -408,7 +408,7 @@ xwer_t xwsync_smr_unbind(struct xwsync_smr * smr, struct xwsync_evt * evt)
         case XWSYNC_SMR_TYPE_PIPELINE:
                 xwos_plwq_lock_cpuirqsv(&smr->wq.pl, &cpuirq);
                 rc = xwsync_evt_obj_unbind(evt, &smr->xwsyncobj, true);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         rc = xwsync_evt_obj_c0i(evt, &smr->xwsyncobj);
                 }
                 xwos_plwq_unlock_cpuirqrs(&smr->wq.pl, cpuirq);
@@ -418,7 +418,7 @@ xwer_t xwsync_smr_unbind(struct xwsync_smr * smr, struct xwsync_evt * evt)
         case XWSYNC_SMR_TYPE_RT:
                 xwos_rtwq_lock_cpuirqsv(&smr->wq.rt, &cpuirq);
                 rc = xwsync_evt_obj_unbind(evt, &smr->xwsyncobj, true);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         rc = xwsync_evt_obj_c0i(evt, &smr->xwsyncobj);
                 }
                 xwos_rtwq_unlock_cpuirqrs(&smr->wq.rt, cpuirq);
@@ -440,7 +440,7 @@ xwer_t xwsync_smr_unbind(struct xwsync_smr * smr, struct xwsync_evt * evt)
  * @param max: (I) 信号量的最大值
  * @param gcfunc: (I) 垃圾回收函数的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINVAL: 无效参数
  * @note
  * - 同步/异步：同步
@@ -457,7 +457,7 @@ xwer_t xwsync_plsmr_activate(struct xwsync_smr * smr, xwssq_t val, xwssq_t max,
                       "invalid-value", -EINVAL);
 
         rc = xwsync_object_activate(&smr->xwsyncobj, gcfunc);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 smr->max = max;
                 xwos_plwq_init(&smr->wq.pl);
                 smr->type = XWSYNC_SMR_TYPE_PIPELINE;
@@ -472,7 +472,7 @@ xwer_t xwsync_plsmr_activate(struct xwsync_smr * smr, xwssq_t val, xwssq_t max,
  * @param val: (I) 信号量的初始值
  * @param max: (I) 信号量的最大值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EINVAL: 无效参数
  * @note
@@ -493,7 +493,7 @@ xwer_t xwsync_plsmr_init(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
  * @brief XWOS API：冻结管道信号量（值设置为负）
  * @param smr: (I) 信号量对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型不匹配
  * @retval -EALREADY: 信号量已为负
@@ -515,7 +515,7 @@ xwer_t xwsync_plsmr_freeze(struct xwsync_smr * smr)
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_PIPELINE == smr->type), "type-error", -ETYPE);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 xwos_plwq_lock_cpuirqsv(&smr->wq.pl, &cpuirq);
                 if (__unlikely(smr->count < 0)) {
                         rc = -EALREADY;
@@ -545,7 +545,7 @@ xwer_t xwsync_plsmr_freeze(struct xwsync_smr * smr)
  * @param val: (I) 信号量的初始值
  * @param max: (I) 信号量的最大值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型不匹配
  * @retval -EINVAL: 参数无效
@@ -569,7 +569,7 @@ xwer_t xwsync_plsmr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
                       "invalid-value", -EINVAL);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 xwos_plwq_lock_cpuirqsv(&smr->wq.pl, &cpuirq);
                 if (__unlikely(smr->count >= 0)) {
                         rc = -EALREADY;
@@ -577,7 +577,7 @@ xwer_t xwsync_plsmr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
                         smr->max = max;
                         smr->type = XWSYNC_SMR_TYPE_PIPELINE;
                         smr->count = val;
-                        rc = OK;
+                        rc = XWOK;
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
                         if (smr->count > 0) {
                                 struct xwsync_evt * evt;
@@ -604,7 +604,7 @@ xwer_t xwsync_plsmr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
  * @param smr: (I) 信号量对象的指针
  * @param wqn: (I) 等待队列节点
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 类型不匹配
  * @note
  * - 同步/异步：同步
@@ -619,11 +619,11 @@ xwer_t xwsync_plsmr_intr(struct xwsync_smr * smr, struct xwos_wqn * wqn)
         xwer_t rc;
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 xwos_plwq_lock_cpuirqsv(&smr->wq.pl, &cpuirq);
                 xwlk_splk_lock(&wqn->lock);
                 rc = xwos_plwq_remove_locked(&smr->wq.pl, wqn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         wqn->wq = NULL;
                         wqn->type = XWOS_WQTYPE_UNKNOWN;
                         xwaop_store(xwsq_t, &wqn->rsmrs,
@@ -647,7 +647,7 @@ xwer_t xwsync_plsmr_intr(struct xwsync_smr * smr, struct xwos_wqn * wqn)
  * @brief XWOS API：发布管道信号量
  * @param smr: (I) 信号量对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型不匹配
  * @retval -ENEGATIVE: 信号量为负
@@ -671,7 +671,7 @@ xwer_t xwsync_plsmr_post(struct xwsync_smr * smr)
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_PIPELINE == smr->type), "type-error", -ETYPE);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 xwos_plwq_lock_cpuirqsv(&smr->wq.pl, &cpuirq);
                 if (smr->count < 0) {
                         xwos_plwq_unlock_cpuirqrs(&smr->wq.pl, cpuirq);
@@ -722,7 +722,7 @@ xwer_t xwsync_plsmr_post(struct xwsync_smr * smr)
 /**
  * @brief XWOS API：尝试获取信号量
  * @param smr: (I) 信号量对象的指针
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型不匹配
  * @retval -ENODATA: 信号量资源不可用（信号量无法被获取）
@@ -743,7 +743,7 @@ xwer_t xwsync_plsmr_trywait(struct xwsync_smr * smr)
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_PIPELINE == smr->type), "type-error", -ETYPE);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 xwos_plwq_lock_cpuirqsv(&smr->wq.pl, &cpuirq);
                 if (smr->count > 0) {
                         smr->count--;
@@ -835,7 +835,7 @@ xwer_t xwsync_plsmr_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
         if (XWOS_WQN_RSMRS_INTR == rsmrs) {
                 xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 rc = xwos_tt_remove_locked(xwtt, &tcb->ttn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         xwlk_splk_lock(&tcb->stlock);
                         xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_SLEEPING);
                         xwlk_splk_unlock(&tcb->stlock);
@@ -845,18 +845,18 @@ xwer_t xwsync_plsmr_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
         } else if (XWOS_WQN_RSMRS_UP == rsmrs) {
                 xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 rc = xwos_tt_remove_locked(xwtt, &tcb->ttn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         xwlk_splk_lock(&tcb->stlock);
                         xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_SLEEPING);
                         xwlk_splk_unlock(&tcb->stlock);
                 }/* else {} */
                 xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                rc = OK;
+                rc = XWOK;
         } else if (XWOS_TTN_WKUPRS_TIMEDOUT == wkuprs) {
                 xwos_plwq_lock_cpuirq(&smr->wq.pl);
                 xwlk_splk_lock(&tcb->wqn.lock);
                 rc = xwos_plwq_remove_locked(&smr->wq.pl, &tcb->wqn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         tcb->wqn.wq = NULL;
                         tcb->wqn.type = XWOS_WQTYPE_UNKNOWN;
                         xwaop_store(xwsq_t, &tcb->wqn.rsmrs,
@@ -876,7 +876,7 @@ xwer_t xwsync_plsmr_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
                         if (XWOS_WQN_RSMRS_INTR == rsmrs) {
                                 rc = -EINTR;
                         } else if (XWOS_WQN_RSMRS_UP == rsmrs) {
-                                rc = OK;
+                                rc = XWOK;
                         } else {
                                 XWOS_BUG();
                                 rc = -EBUG;
@@ -886,7 +886,7 @@ xwer_t xwsync_plsmr_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
                 xwos_plwq_lock_cpuirq(&smr->wq.pl);
                 xwlk_splk_unlock(&tcb->wqn.lock);
                 rc = xwos_plwq_remove_locked(&smr->wq.pl, &tcb->wqn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         tcb->wqn.wq = NULL;
                         tcb->wqn.type = XWOS_WQTYPE_UNKNOWN;
                         xwaop_store(xwsq_t, &tcb->wqn.rsmrs,
@@ -906,7 +906,7 @@ xwer_t xwsync_plsmr_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
                         if (XWOS_WQN_RSMRS_INTR == rsmrs) {
                                 rc = -EINTR;
                         } else if (XWOS_WQN_RSMRS_UP == rsmrs) {
-                                rc = OK;
+                                rc = XWOK;
                         } else {
                                 XWOS_BUG();
                                 rc = -EBUG;
@@ -961,7 +961,7 @@ xwer_t xwsync_plsmr_do_timedwait(struct xwsync_smr * smr, struct xwos_tcb * tcb,
                 }
 #endif /* XWSMPCFG_SYNC_EVT */
                 xwos_plwq_unlock_cpuirqrs(&smr->wq.pl, cpuirq);
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -973,7 +973,7 @@ xwer_t xwsync_plsmr_do_timedwait(struct xwsync_smr * smr, struct xwos_tcb * tcb,
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型错误
  * @retval -ETIMEDOUT: 超时
@@ -1009,7 +1009,7 @@ xwer_t xwsync_plsmr_timedwait(struct xwsync_smr * smr, xwtm_t * xwtm)
         } else {
                 ctcb = xwos_scheduler_get_ctcb_lc();
                 rc = xwsync_smr_grab(smr);
-                if (__likely(OK == rc)) {
+                if (__likely(XWOK == rc)) {
                         rc = xwsync_plsmr_do_timedwait(smr, ctcb, xwtm);
                         xwsync_smr_put(smr);
                 }/* else {} */
@@ -1054,7 +1054,7 @@ xwer_t xwsync_plsmr_do_blkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
         /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
         rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_relaxed);
         if (XWOS_WQN_RSMRS_UP == rsmrs) {
-                rc = OK;
+                rc = XWOK;
         } else {
                 XWOS_BUG();
                 rc = -EBUG;
@@ -1087,7 +1087,7 @@ xwer_t xwsync_plsmr_do_wait_unintr(struct xwsync_smr * smr, struct xwos_tcb * tc
                 }
 #endif /* XWSMPCFG_SYNC_EVT */
                 xwos_plwq_unlock_cpuirqrs(&smr->wq.pl, cpuirq);
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -1096,7 +1096,7 @@ xwer_t xwsync_plsmr_do_wait_unintr(struct xwsync_smr * smr, struct xwos_tcb * tc
  * @brief XWOS API：等待并获取管道信号量，且等待不可被中断
  * @param smr: (I) 信号量对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型错误
  * @note
@@ -1114,7 +1114,7 @@ xwer_t xwsync_plsmr_wait_unintr(struct xwsync_smr * smr)
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_PIPELINE == smr->type), "type-error", -ETYPE);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 ctcb = xwos_scheduler_get_ctcb_lc();
                 rc = xwsync_plsmr_do_wait_unintr(smr, ctcb);
                 xwsync_smr_put(smr);
@@ -1131,7 +1131,7 @@ xwer_t xwsync_plsmr_wait_unintr(struct xwsync_smr * smr)
  * @param max: (I) 信号量的最大值
  * @param gcfunc: (I) 垃圾回收函数的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINVAL: 无效参数
  * @note
  * - 同步/异步：同步
@@ -1148,7 +1148,7 @@ xwer_t xwsync_rtsmr_activate(struct xwsync_smr * smr, xwssq_t val, xwssq_t max,
                       "invalid-value", -EINVAL);
 
         rc = xwsync_object_activate(&smr->xwsyncobj, gcfunc);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 smr->max = max;
                 xwos_rtwq_init(&smr->wq.rt);
                 smr->type = XWSYNC_SMR_TYPE_RT;
@@ -1163,7 +1163,7 @@ xwer_t xwsync_rtsmr_activate(struct xwsync_smr * smr, xwssq_t val, xwssq_t max,
  * @param val: (I) 信号量的初始值
  * @param max: (I) 信号量的最大值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EINVAL: 无效参数
  * @note
@@ -1186,7 +1186,7 @@ xwer_t xwsync_rtsmr_init(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
  * @brief XWOS API：冻结实时信号量（值设置为负）
  * @param smr: (I) 信号量对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型不匹配
  * @retval -EALREADY: 信号量已被冻结
@@ -1208,7 +1208,7 @@ xwer_t xwsync_rtsmr_freeze(struct xwsync_smr * smr)
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_RT == smr->type), "type-error", -ETYPE);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 xwos_rtwq_lock_cpuirqsv(&smr->wq.rt, &cpuirq);
                 if (__unlikely(smr->count < 0)) {
                         rc = -EALREADY;
@@ -1238,7 +1238,7 @@ xwer_t xwsync_rtsmr_freeze(struct xwsync_smr * smr)
  * @param val: (I) 信号量的初始值
  * @param max: (I) 信号量的最大值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型不匹配
  * @retval -EINVAL: 参数无效
@@ -1262,7 +1262,7 @@ xwer_t xwsync_rtsmr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
                       "invalid-value", -EINVAL);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 xwos_rtwq_lock_cpuirqsv(&smr->wq.rt, &cpuirq);
                 if (__unlikely(smr->count >= 0)) {
                         rc = -EALREADY;
@@ -1270,7 +1270,7 @@ xwer_t xwsync_rtsmr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
                         smr->max = max;
                         smr->type = XWSYNC_SMR_TYPE_RT;
                         smr->count = val;
-                        rc = OK;
+                        rc = XWOK;
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
                         if (smr->count > 0) {
                                 struct xwsync_evt * evt;
@@ -1296,7 +1296,7 @@ xwer_t xwsync_rtsmr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
  * @param smr: (I) 信号量对象的指针
  * @param wqn: (I) 等待队列节点
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 类型不匹配
  * @note
  * - 同步/异步：同步
@@ -1311,11 +1311,11 @@ xwer_t xwsync_rtsmr_intr(struct xwsync_smr * smr, struct xwos_wqn * wqn)
         xwer_t rc;
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 xwos_rtwq_lock_cpuirqsv(&smr->wq.rt, &cpuirq);
                 xwlk_splk_lock(&wqn->lock);
                 rc = xwos_rtwq_remove_locked(&smr->wq.rt, wqn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         wqn->wq = NULL;
                         wqn->type = XWOS_WQTYPE_UNKNOWN;
                         xwaop_store(xwsq_t, &wqn->rsmrs,
@@ -1339,7 +1339,7 @@ xwer_t xwsync_rtsmr_intr(struct xwsync_smr * smr, struct xwos_wqn * wqn)
  * @brief XWOS API：发布实时信号量
  * @param smr: (I) 信号量对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型不匹配
  * @retval -ENEGATIVE: 信号量为负
@@ -1363,7 +1363,7 @@ xwer_t xwsync_rtsmr_post(struct xwsync_smr * smr)
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_RT == smr->type), "type-error", -ETYPE);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 xwos_rtwq_lock_cpuirqsv(&smr->wq.rt, &cpuirq);
                 if (__unlikely(smr->count < 0)) {
                         xwos_rtwq_unlock_cpuirqrs(&smr->wq.rt, cpuirq);
@@ -1414,7 +1414,7 @@ xwer_t xwsync_rtsmr_post(struct xwsync_smr * smr)
 /**
  * @brief XWOS API：尝试获取实时信号量
  * @param smr: (I) 信号量对象的指针
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型不匹配
  * @retval -ENODATA: 信号量资源不可用（信号量不可被获取）
@@ -1435,7 +1435,7 @@ xwer_t xwsync_rtsmr_trywait(struct xwsync_smr * smr)
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_RT == smr->type), "type-error", -ETYPE);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 xwos_rtwq_lock_cpuirqsv(&smr->wq.rt, &cpuirq);
                 if (smr->count > 0) {
                         smr->count--;
@@ -1525,7 +1525,7 @@ xwer_t xwsync_rtsmr_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
         if (XWOS_WQN_RSMRS_INTR == rsmrs) {
                 xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 rc = xwos_tt_remove_locked(xwtt, &tcb->ttn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         xwlk_splk_lock(&tcb->stlock);
                         xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_SLEEPING);
                         xwlk_splk_unlock(&tcb->stlock);
@@ -1535,18 +1535,18 @@ xwer_t xwsync_rtsmr_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
         } else if (XWOS_WQN_RSMRS_UP == rsmrs) {
                 xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 rc = xwos_tt_remove_locked(xwtt, &tcb->ttn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         xwlk_splk_lock(&tcb->stlock);
                         xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_SLEEPING);
                         xwlk_splk_unlock(&tcb->stlock);
                 }/* else {} */
                 xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                rc = OK;
+                rc = XWOK;
         } else if (XWOS_TTN_WKUPRS_TIMEDOUT == wkuprs) {
                 xwos_rtwq_lock_cpuirq(&smr->wq.rt);
                 xwlk_splk_lock(&tcb->wqn.lock);
                 rc = xwos_rtwq_remove_locked(&smr->wq.rt, &tcb->wqn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         tcb->wqn.wq = NULL;
                         tcb->wqn.type = XWOS_WQTYPE_UNKNOWN;
                         xwaop_store(xwsq_t, &tcb->wqn.rsmrs,
@@ -1566,7 +1566,7 @@ xwer_t xwsync_rtsmr_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
                         if (XWOS_WQN_RSMRS_INTR == rsmrs) {
                                 rc = -EINTR;
                         } else if (XWOS_WQN_RSMRS_UP == rsmrs) {
-                                rc = OK;
+                                rc = XWOK;
                         } else {
                                 XWOS_BUG();
                                 rc = -EBUG;
@@ -1576,7 +1576,7 @@ xwer_t xwsync_rtsmr_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
                 xwos_rtwq_lock_cpuirq(&smr->wq.rt);
                 xwlk_splk_lock(&tcb->wqn.lock);
                 rc = xwos_rtwq_remove_locked(&smr->wq.rt, &tcb->wqn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         tcb->wqn.wq = NULL;
                         tcb->wqn.type = XWOS_WQTYPE_UNKNOWN;
                         xwaop_store(xwsq_t, &tcb->wqn.rsmrs,
@@ -1596,7 +1596,7 @@ xwer_t xwsync_rtsmr_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
                         if (XWOS_WQN_RSMRS_INTR == rsmrs) {
                                 rc = -EINTR;
                         } else if (XWOS_WQN_RSMRS_UP == rsmrs) {
-                                rc = OK;
+                                rc = XWOK;
                         } else {
                                 XWOS_BUG();
                                 rc = -EBUG;
@@ -1651,7 +1651,7 @@ xwer_t xwsync_rtsmr_do_timedwait(struct xwsync_smr * smr, struct xwos_tcb * tcb,
                 }
 #endif /* XWSMPCFG_SYNC_EVT */
                 xwos_rtwq_unlock_cpuirqrs(&smr->wq.rt, cpuirq);
-                rc = OK;
+                rc = XWOK;
         }
 
         return rc;
@@ -1664,7 +1664,7 @@ xwer_t xwsync_rtsmr_do_timedwait(struct xwsync_smr * smr, struct xwos_tcb * tcb,
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型错误
  * @retval -ETIMEDOUT: 超时
@@ -1699,7 +1699,7 @@ xwer_t xwsync_rtsmr_timedwait(struct xwsync_smr * smr, xwtm_t * xwtm)
         } else {
                 ctcb = xwos_scheduler_get_ctcb_lc();
                 rc = xwsync_smr_grab(smr);
-                if (__likely(OK == rc)) {
+                if (__likely(XWOK == rc)) {
                         rc = xwsync_rtsmr_do_timedwait(smr, ctcb, xwtm);
                         xwsync_smr_put(smr);
                 }/* else {} */
@@ -1744,7 +1744,7 @@ xwer_t xwsync_rtsmr_do_blkthrd_unlkwq_cpuirqrs(struct xwsync_smr * smr,
         /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
         rsmrs = xwaop_load(xwsq_t, &tcb->wqn.rsmrs, xwmb_modr_relaxed);
         if (XWOS_WQN_RSMRS_UP == rsmrs) {
-                rc = OK;
+                rc = XWOK;
         } else {
                 XWOS_BUG();
                 rc = -EBUG;
@@ -1777,7 +1777,7 @@ xwer_t xwsync_rtsmr_do_wait_unintr(struct xwsync_smr * smr, struct xwos_tcb * tc
                 }
 #endif /* XWSMPCFG_SYNC_EVT */
                 xwos_rtwq_unlock_cpuirqrs(&smr->wq.rt, cpuirq);
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -1786,7 +1786,7 @@ xwer_t xwsync_rtsmr_do_wait_unintr(struct xwsync_smr * smr, struct xwos_tcb * tc
  * @brief XWOS API：等待并获取实时信号量，且等待不可被中断
  * @param smr: (I) 信号量对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型错误
  * @note
@@ -1804,7 +1804,7 @@ xwer_t xwsync_rtsmr_wait_unintr(struct xwsync_smr * smr)
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_RT == smr->type), "type-error", -ETYPE);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 ctcb = xwos_scheduler_get_ctcb_lc();
                 rc = xwsync_rtsmr_do_wait_unintr(smr, ctcb);
                 xwsync_smr_put(smr);
@@ -1818,7 +1818,7 @@ xwer_t xwsync_rtsmr_wait_unintr(struct xwsync_smr * smr)
  * @param smr: (I) 信号量对象的指针
  * @param sval: (O) 指向缓冲区的指针，通过此缓冲区返回信号量计数器的值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -1832,7 +1832,7 @@ xwer_t xwsync_smr_getvalue(struct xwsync_smr * smr, xwssq_t * sval)
         XWOS_VALIDATE((sval), "nullptr", -EFAULT);
 
         *sval = smr->count;
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -1840,7 +1840,7 @@ xwer_t xwsync_smr_getvalue(struct xwsync_smr * smr, xwssq_t * sval)
  * @param smr: (I) 信号量对象的指针
  * @param type: (O) 指向缓冲区的指针，通过此缓冲区返回类型值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -1854,5 +1854,5 @@ xwer_t xwsync_smr_gettype(struct xwsync_smr * smr, xwid_t * type)
         XWOS_VALIDATE((type), "nullptr", -EFAULT);
 
         *type = smr->type;
-        return OK;
+        return XWOK;
 }

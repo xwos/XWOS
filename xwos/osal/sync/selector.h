@@ -140,7 +140,7 @@ struct xwosal_selector * xwosal_selector_get_obj(xwid_t sltid)
  * @param dstid: (I) 目的信号选择器的ID
  * @param pos: (I) 信号量对象映射到位图中的位置
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 信号选择器或信号量类型错误
  * @note
  * - 同步/异步：同步
@@ -161,7 +161,7 @@ xwer_t xwosal_selector_bind(xwid_t srcid, xwid_t dstid, xwsq_t pos)
  * @param srcid: (I) 源信号选择器的ID
  * @param dstid: (I) 信号选择器的ID
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 信号选择器类型错误
  * @note
  * - 同步/异步：同步
@@ -178,7 +178,7 @@ xwer_t xwosal_selector_unbind(xwid_t srcid, xwid_t dstid)
  * @brief XWOSAL API：中断信号选择器等待队列中的所有节点
  * @param sltid: (I) 信号选择器ID
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型不匹配
  * @note
@@ -198,7 +198,7 @@ xwer_t xwosal_selector_intr_all(xwid_t sltid)
  * @param msk: (I) 待触发的信号量的位图掩码
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的信号量的位图
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ENODATA: 没有任何信号或事件
  * @note
@@ -218,7 +218,7 @@ xwer_t xwosal_selector_tryselect(xwid_t sltid, xwbmp_t msk[], xwbmp_t trg[])
  * @param msk: (I) 待触发的信号量的位图掩码
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的信号量的位图
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 信号选择器类型错误
  * @retval -EINTR: 等待被中断
@@ -242,7 +242,7 @@ xwer_t xwosal_selector_select(xwid_t sltid, xwbmp_t msk[], xwbmp_t trg[])
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 信号选择器类型错误
  * @retval -ETIMEDOUT: 超时

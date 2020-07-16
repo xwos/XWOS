@@ -140,7 +140,7 @@ struct xwosal_barrier * xwosal_barrier_get_obj(xwid_t barid)
  * @param sltid: (I) 信号选择器的ID
  * @param pos: (I) 线程屏障对象映射到位图中的位置
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 信号选择器或线程屏障类型错误
  * @note
  * - 同步/异步：同步
@@ -160,7 +160,7 @@ xwer_t xwosal_barrier_bind(xwid_t barid, xwid_t sltid, xwsq_t pos)
  * @param barid: (I) 线程屏障的ID
  * @param sltid: (I) 信号选择器的ID
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 信号选择器类型错误
  * @note
  * - 同步/异步：同步
@@ -177,7 +177,7 @@ xwer_t xwosal_barrier_unbind(xwid_t barid, xwid_t sltid)
  * @brief XWOSAL API：中断线程屏障等待队列中的所有节点
  * @param barid: (I) 线程屏障ID
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型不匹配
  * @note
@@ -197,7 +197,7 @@ xwer_t xwosal_barrier_intr_all(xwid_t barid)
  * @param pos: (I) 当前线程的位图位置
  * @param sync: (I) 当前线程需要同步的线程掩码
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ECHRNG: 位置超出范围
  * @retval -ETYPE: 事件对象类型错误
@@ -222,7 +222,7 @@ xwer_t xwosal_barrier_sync(xwid_t barid, xwsq_t pos, xwbmp_t sync[])
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ECHRNG: 位置超出范围
  * @retval -ETYPE: 事件对象类型错误

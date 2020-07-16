@@ -155,7 +155,7 @@ struct xwsync_evt * xwsync_evt_alloc(void)
         xwer_t rc;
 
         rc = xwmm_kma_alloc(sizeof(struct xwsync_evt), XWMM_ALIGNMENT, &mem.anon);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 xwsync_evt_construct(mem.evt);
         } else {
                 mem.evt = err_ptr(rc);
@@ -208,7 +208,7 @@ static __xwos_code
 xwer_t xwsync_evt_gc(void * evt)
 {
         xwsync_evt_free((struct xwsync_evt *)evt);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -218,7 +218,7 @@ xwer_t xwsync_evt_gc(void * evt)
  * @param attr: (I) 事件的属性，取值 @ref xwsync_evt_attr_em
  * @param gcfunc: (I) 垃圾回收函数的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -236,7 +236,7 @@ xwer_t xwsync_evt_activate(struct xwsync_evt * evt, xwbmp_t initval[],
 
         size = BITS_TO_BMPS(XWSYNC_EVT_MAXNUM);
         rc = xwsync_cdt_activate(&evt->cdt, gcfunc);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 evt->attr = attr;
                 switch (attr & XWSYNC_EVT_TYPE_MASK) {
                 case XWSYNC_EVT_TYPE_FLAG:
@@ -268,7 +268,7 @@ xwer_t xwsync_evt_activate(struct xwsync_evt * evt, xwbmp_t initval[],
  * @param initval: (I) 事件的数组的初始态，如果为NULL，初始值全部为0
  * @param attr: (I) 事件的属性，取值范围 @ref xwsync_evt_attr_em
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EINVAL: 无效参数
  * @note
@@ -305,7 +305,7 @@ xwer_t xwsync_evt_create(struct xwsync_evt ** ptrbuf, xwbmp_t initval[], xwsq_t 
  * @brief XWOS API：删除动态创建的事件对象
  * @param evt: (I) 事件对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -326,7 +326,7 @@ xwer_t xwsync_evt_delete(struct xwsync_evt * evt)
  * @param initval: (I) 事件的数组的初始态，如果为NULL，初始值全部为0
  * @param attr: (I) 事件的属性，取值范围 @ref xwsync_evt_attr_em
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EINVAL: 无效参数
  * @note
@@ -349,7 +349,7 @@ xwer_t xwsync_evt_init(struct xwsync_evt * evt, xwbmp_t initval[], xwsq_t attr)
  * @brief XWOS API：销毁静态方式初始化的事件对象
  * @param evt: (I) 事件对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：异步
@@ -371,7 +371,7 @@ xwer_t xwsync_evt_destroy(struct xwsync_evt * evt)
  * @param slt: (I) 类型为XWSYNC_EVT_TYPE_SELECTOR的事件对象的指针
  * @param pos: (I) 事件对象对象映射到位图中的位置
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 事件对象或事件对象类型错误
  * @retval -EFAULT: 空指针
  * @note
@@ -391,7 +391,7 @@ xwer_t xwsync_evt_bind(struct xwsync_evt * evt, struct xwsync_evt * slt, xwsq_t 
  * @param evt: (I) 事件对象的指针
  * @param slt: (I) 类型为XWSYNC_EVT_TYPE_SELECTOR的事件对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 事件对象或条件量类型错误
  * @retval -EFAULT: 空指针
  * @note
@@ -409,7 +409,7 @@ xwer_t xwsync_evt_unbind(struct xwsync_evt * evt, struct xwsync_evt * slt)
  * @brief XWOS API：中断事件对象等待队列中的所有节点
  * @param evt: (I) 事件对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型不匹配
  * @note
@@ -432,7 +432,7 @@ xwer_t xwsync_evt_intr_all(struct xwsync_evt * evt)
  * @param evt: (I) 事件对象的指针
  * @param msk: (I) 事件对象的位图掩码
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 事件对象类型错误
  * @note
@@ -460,7 +460,7 @@ xwer_t xwsync_evt_s1m(struct xwsync_evt * evt, xwbmp_t msk[])
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_cdt_broadcast(&evt->cdt);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_evt_grab:
         return rc;
@@ -472,7 +472,7 @@ err_evt_grab:
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 位的序号
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 事件对象类型错误
  * @note
@@ -499,7 +499,7 @@ xwer_t xwsync_evt_s1i(struct xwsync_evt * evt, xwsq_t pos)
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_cdt_broadcast(&evt->cdt);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_evt_grab:
         return rc;
@@ -511,7 +511,7 @@ err_evt_grab:
  * @param evt: (I) 事件对象的指针
  * @param msk: (I) 事件对象的位图掩码
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 事件对象类型错误
  * @note
@@ -539,7 +539,7 @@ xwer_t xwsync_evt_c0m(struct xwsync_evt * evt, xwbmp_t msk[])
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_cdt_broadcast(&evt->cdt);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_evt_grab:
         return rc;
@@ -551,7 +551,7 @@ err_evt_grab:
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 位的序号
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ECHRNG: 位置超出范围
  * @retval -ETYPE: 事件对象类型错误
@@ -580,7 +580,7 @@ xwer_t xwsync_evt_c0i(struct xwsync_evt * evt, xwsq_t pos)
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_cdt_broadcast(&evt->cdt);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_evt_grab:
         return rc;
@@ -592,7 +592,7 @@ err_evt_grab:
  * @param evt: (I) 事件对象的指针
  * @param msk: (I) 事件对象的位图掩码
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 事件对象类型错误
  * @note
@@ -620,7 +620,7 @@ xwer_t xwsync_evt_x1m(struct xwsync_evt * evt, xwbmp_t msk[])
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_cdt_broadcast(&evt->cdt);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_evt_grab:
         return rc;
@@ -632,7 +632,7 @@ err_evt_grab:
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 位的序号
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ECHRNG: 位置超出范围
  * @retval -ETYPE: 事件对象类型错误
@@ -661,7 +661,7 @@ xwer_t xwsync_evt_x1i(struct xwsync_evt * evt, xwsq_t pos)
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_cdt_broadcast(&evt->cdt);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_evt_grab:
         return rc;
@@ -672,7 +672,7 @@ err_evt_grab:
  * @param evt: (I) 事件对象的指针
  * @param out: (O) 指向缓冲区的指针，通过此缓冲区返回事件对象位图的值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -696,7 +696,7 @@ xwer_t xwsync_evt_read(struct xwsync_evt * evt, xwbmp_t out[])
         xwbmpop_assign(out, evt->bmp, XWSYNC_EVT_MAXNUM);
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_evt_grab:
         return rc;
@@ -716,7 +716,7 @@ xwer_t xwsync_evt_trywait_level(struct xwsync_evt * evt,
         XWOS_VALIDATE((action < XWSYNC_EVT_ACTION_NUM),
                       "illegal-action", -EINVAL);
 
-        rc = OK;
+        rc = XWOK;
         xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         if (XWSYNC_EVT_ACTION_CONSUMPTION == action) {
                 switch (trigger) {
@@ -795,7 +795,7 @@ xwer_t xwsync_evt_trywait_edge(struct xwsync_evt * evt, xwsq_t trigger,
                 cmprc = xwbmpop_cmp(tmp, msk, XWSYNC_EVT_MAXNUM);
                 if (0 == cmprc) {
                         triggered = true;
-                        rc = OK;
+                        rc = XWOK;
                 } else {
                         triggered = false;
                         rc = -ENODATA;
@@ -807,7 +807,7 @@ xwer_t xwsync_evt_trywait_edge(struct xwsync_evt * evt, xwsq_t trigger,
                         rc = -ENODATA;
                 } else {
                         triggered = true;
-                        rc = OK;
+                        rc = XWOK;
                 }
         } else {
                 triggered = true;
@@ -842,7 +842,7 @@ xwer_t xwsync_evt_trywait_edge(struct xwsync_evt * evt, xwsq_t trigger,
  *                    （可作为下一次调用的初始值）
  * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的位
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 事件对象类型错误
  * @retval -EINVAL: 参数无效
@@ -894,7 +894,7 @@ xwer_t xwsync_evt_timedwait_level(struct xwsync_evt * evt,
         XWOS_VALIDATE((action < XWSYNC_EVT_ACTION_NUM),
                       "illegal-action", -EINVAL);
 
-        rc = OK;
+        rc = XWOK;
         xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         while (true) {
                 if (XWSYNC_EVT_ACTION_CONSUMPTION == action) {
@@ -951,7 +951,7 @@ xwer_t xwsync_evt_timedwait_level(struct xwsync_evt * evt,
                         rc = xwsync_cdt_timedwait(&evt->cdt,
                                                   &evt->lock, XWLK_TYPE_SPLK, NULL,
                                                   xwtm, &lkst);
-                        if (OK == rc) {
+                        if (XWOK == rc) {
                                 if (XWLK_STATE_UNLOCKED == lkst) {
                                         xwlk_splk_lock(&evt->lock);
                                 }
@@ -993,7 +993,7 @@ xwer_t xwsync_evt_timedwait_edge(struct xwsync_evt * evt, xwsq_t trigger,
                         cmprc = xwbmpop_cmp(tmp, msk, XWSYNC_EVT_MAXNUM);
                         if (0 == cmprc) {
                                 triggered = true;
-                                rc = OK;
+                                rc = XWOK;
                         } else {
                                 triggered = false;
                         }
@@ -1003,7 +1003,7 @@ xwer_t xwsync_evt_timedwait_edge(struct xwsync_evt * evt, xwsq_t trigger,
                                 triggered = false;
                         } else {
                                 triggered = true;
-                                rc = OK;
+                                rc = XWOK;
                         }
                 } else {
                         triggered = true;
@@ -1017,7 +1017,7 @@ xwer_t xwsync_evt_timedwait_edge(struct xwsync_evt * evt, xwsq_t trigger,
                         rc = xwsync_cdt_timedwait(&evt->cdt,
                                                   &evt->lock, XWLK_TYPE_SPLK, NULL,
                                                   xwtm, &lkst);
-                        if (OK == rc) {
+                        if (XWOK == rc) {
                                 if (XWLK_STATE_UNLOCKED == lkst) {
                                         xwlk_splk_lock(&evt->lock);
                                 }
@@ -1056,7 +1056,7 @@ xwer_t xwsync_evt_timedwait_edge(struct xwsync_evt * evt, xwsq_t trigger,
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 事件对象类型错误
  * @retval -EINVAL: 参数无效
@@ -1109,7 +1109,7 @@ err_evt_grab:
  * @param pos: (I) 同步对象映射到位图中的位置
  * @param exclusive: (I) 是否为独占绑定
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 事件对象类型错误
  * @retval -ECHRNG: 位置超出范围
  * @retval -EALREADY: 同步对象已经绑定到事件对象
@@ -1152,7 +1152,7 @@ xwer_t xwsync_evt_obj_bind(struct xwsync_evt * evt,
         obj->selector.evt = evt;
         obj->selector.pos = pos;
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
-        return OK;
+        return XWOK;
 
 err_busy:
 err_already:
@@ -1168,7 +1168,7 @@ err_evt_grab:
  * @param obj: (I) 同步对象的指针
  * @param exclusive: (I) 是否为独占绑定
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 事件对象类型错误
  * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  */
@@ -1197,7 +1197,7 @@ xwer_t xwsync_evt_obj_unbind(struct xwsync_evt * evt,
         obj->selector.pos = XWSYNC_EVT_MAXNUM;
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_notconn:
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
@@ -1209,7 +1209,7 @@ err_notconn:
  * @param evt: (I) 事件对象的指针
  * @param obj: (I) 同步对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  */
 __xwos_code
@@ -1234,7 +1234,7 @@ xwer_t xwsync_evt_obj_s1i(struct xwsync_evt * evt, struct xwsync_object * obj)
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_cdt_broadcast(&evt->cdt);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_notconn:
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
@@ -1248,7 +1248,7 @@ err_evt_grab:
  * @param evt: (I) 事件对象的指针
  * @param obj: (I) 同步对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  */
 __xwos_code
@@ -1272,7 +1272,7 @@ xwer_t xwsync_evt_obj_c0i(struct xwsync_evt * evt, struct xwsync_object * obj)
         xwbmpop_c0i(evt->bmp, obj->selector.pos);
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         xwsync_evt_put(evt);
-        return OK;
+        return XWOK;
 
 err_notconn:
         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
@@ -1287,7 +1287,7 @@ err_evt_grab:
  * @param msk: (I) 待触发的同步对象的位图掩码，表示只关注掩码部分的位
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象的位图
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 事件对象类型错误
  * @retval -ENODATA: 没有任何信号或事件
@@ -1327,7 +1327,7 @@ xwer_t xwsync_evt_tryselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t trg[
                         xwbmpop_and(evt->bmp, evt->msk, XWSYNC_EVT_MAXNUM);
                         xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                 }
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -ENODATA;
                 xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
@@ -1348,7 +1348,7 @@ err_evt_grab:
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 事件对象类型错误
  * @retval -ETIMEDOUT: 超时
@@ -1398,7 +1398,7 @@ xwer_t xwsync_evt_timedselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t tr
                                 xwbmpop_and(evt->bmp, evt->msk, XWSYNC_EVT_MAXNUM);
                                 xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                         }
-                        rc = OK;
+                        rc = XWOK;
                         break;
                 } else {
                         /* Clear non-exclusive bits */
@@ -1406,7 +1406,7 @@ xwer_t xwsync_evt_timedselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t tr
                         rc = xwsync_cdt_timedwait(&evt->cdt,
                                                   &evt->lock, XWLK_TYPE_SPLK, NULL,
                                                   xwtm, &lkst);
-                        if (OK == rc) {
+                        if (XWOK == rc) {
                                 if (XWLK_STATE_UNLOCKED == lkst) {
                                         xwlk_splk_lock(&evt->lock);
                                 }
@@ -1438,7 +1438,7 @@ err_evt_grab:
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ECHRNG: 位置超出范围
  * @retval -ETYPE: 事件对象类型错误
@@ -1483,7 +1483,7 @@ xwer_t xwsync_evt_timedsync(struct xwsync_evt * evt, xwsq_t pos, xwbmp_t sync[],
                 xwlk_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                 xwsync_cdt_broadcast(&evt->cdt);
                 xwos_cthrd_yield();
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = xwsync_cdt_timedwait(&evt->cdt,
                                           &evt->lock, XWLK_TYPE_SPLK, NULL,

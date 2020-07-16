@@ -200,7 +200,7 @@ xwer_t MX_USART1_RXDMA_Start(xwu8_t * mem, xwsz_t size)
 
   ret = HAL_UART_Receive_DMA(&husart1, (uint8_t *)mem, (uint16_t)size);
   if (HAL_OK == ret) {
-    rc = OK;
+    rc = XWOK;
   } else {
     rc = -EIO;
   }
@@ -244,7 +244,7 @@ xwer_t MX_USART1_TXDMA_Start(xwu8_t * mem, xwsz_t size)
 
   ret = HAL_UART_Transmit_DMA(&husart1, (uint8_t *)mem, (uint16_t)size);
   if (HAL_OK == ret) {
-    rc = OK;
+    rc = XWOK;
   } else {
     rc = -EIO;
   }
@@ -258,7 +258,7 @@ void MX_USART1_TxCpltCallback(UART_HandleTypeDef * huart)
 
   hdma = huart->hdmatx;
   if (HAL_DMA_ERROR_NONE == hdma->ErrorCode) {
-    rc = OK;
+    rc = XWOK;
   } else {
     rc = -EIO;
   }
@@ -272,7 +272,7 @@ xwer_t MX_USART1_Putc(xwu8_t byte)
 
   ret = HAL_UART_Transmit(&husart1, &byte, 1, 10000);
   if (HAL_OK == ret) {
-    rc = OK;
+    rc = XWOK;
   } else if (HAL_TIMEOUT == ret) {
     rc = -ETIMEDOUT;
   } else if (HAL_BUSY == ret) {

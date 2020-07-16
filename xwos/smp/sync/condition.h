@@ -152,7 +152,7 @@ xwer_t xwsync_cdt_timedwait(struct xwsync_cdt * cdt,
  * @param lkdata: (I) 锁的数据
  * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINVAL: 无效的参数
  * @retval -EINTR: 等待被中断
  * @retval -ENOTINTHRD: 不在线程上下文中

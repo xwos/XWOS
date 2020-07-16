@@ -33,5 +33,5 @@
 __xwos_init_code
 xwer_t xwos_up_init(void)
 {
-        return OK;
+        return XWOK;
 }

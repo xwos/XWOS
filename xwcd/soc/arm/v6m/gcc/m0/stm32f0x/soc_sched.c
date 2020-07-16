@@ -84,7 +84,7 @@ xwer_t soc_scheduler_start_lc(__maybe_unused struct xwos_scheduler * xwsd)
 {
         xwos_cpuirq_enable_lc();
         __asm__ volatile("      svc     0");
-        return OK;
+        return XWOK;
 }
 
 /**

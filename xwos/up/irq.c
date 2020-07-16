@@ -93,7 +93,7 @@ void * xwos_irqc_get_data(void)
  * @param description: (I) 描述
  * @param ptrbuf: (O) 指向用于返回结果的缓冲区的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval <0: 没有找到资源
  */
 __xwos_code
@@ -105,7 +105,7 @@ xwer_t xwos_irqc_get_irqrsc(const struct xwos_irq_resource base[], xwsz_t num,
         for (i = 0; i < num; i++) {
                 if (!strcmp(base[i].description, description)) {
                         *ptrbuf = &base[i];
-                        return OK;
+                        return XWOK;
                 }
         }
         *ptrbuf = NULL;

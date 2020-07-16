@@ -43,7 +43,7 @@ xwer_t xwaop__xws8_t__tgtlt_then_sub(__atomic xws8_t * a,
         o = *a;
         if ((o > l) && (o < r)) {
                 n = o - v;
-                rc = OK;
+                rc = XWOK;
                 *a = n;
         } else {
                 n = o;

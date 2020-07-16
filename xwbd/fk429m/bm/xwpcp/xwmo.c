@@ -132,7 +132,7 @@ xwer_t bm_xwpcp_start(void)
                 goto err_txthrd_create;
         }
 
-        return OK;
+        return XWOK;
 
 err_txthrd_create:
         xwosal_thrd_terminate(bm_xwpcp_rxthrd, &trc);
@@ -148,25 +148,25 @@ xwer_t bm_xwpcp_stop(void)
         xwer_t rc, trc;
 
         rc = xwosal_thrd_terminate(bm_xwpcp_txthrd, &trc);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 rc = xwosal_thrd_delete(bm_xwpcp_txthrd);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         bm_xwpcp_txthrd = 0;
                         xwpcplogf(INFO, "Terminate XWPCP TX thread... [OK]\n");
                 }
         }
 
         rc = xwosal_thrd_terminate(bm_xwpcp_rxthrd, &trc);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 rc = xwosal_thrd_delete(bm_xwpcp_rxthrd);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         bm_xwpcp_rxthrd = 0;
                         xwpcplogf(INFO, "Terminate XWPCP RX thread... [OK]\n");
                 }
         }
 
         rc = xwpcp_stop(&bm_xwpcp);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 xwpcplogf(INFO, "Stop XWPCP ... [OK]\n");
         } else {
                 xwpcplogf(INFO, "Failed to stop XWPCP ... [rc:%d]\n", rc);
@@ -179,14 +179,14 @@ static
 xwer_t bm_xwpcpif_open(struct xwpcp * xwpcp)
 {
         xwpcp->hwifcb = &stm32cube_usart1_cb;
-        return OK;
+        return XWOK;
 }
 
 static
 xwer_t bm_xwpcpif_close(struct xwpcp * xwpcp)
 {
         xwpcp->hwifcb = NULL;
-        return OK;
+        return XWOK;
 }
 
 static

@@ -60,9 +60,9 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_dev_cvops = {
  * @param descnum: (I) 寄存器描述数组数量
  * @param ret: (O) 返回寄存器资源地址的缓存
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
- * @retval -ENOKEY: 找不到描述的资源
+ * @retval -ENOSR: 找不到描述的资源
  */
 __xwds_code
 xwer_t xwds_get_regrsc(const struct xwds_resource_reg base[], xwsz_t num,
@@ -73,18 +73,18 @@ xwer_t xwds_get_regrsc(const struct xwds_resource_reg base[], xwsz_t num,
         xwsz_t i, m;
 
         for (i = 0; i < num; i++) {
-                rc = OK;
+                rc = XWOK;
                 for (m = 0; m < descnum; m++) {
                         if (!strstr(base[i].description, descay[m])) {
-                                rc = -ENOKEY;
+                                rc = -ENOSR;
                                 break;
                         }
                 }
-                if (OK == rc) {
+                if (XWOK == rc) {
                         break;
                 }
         }
-        if (OK == rc) {
+        if (XWOK == rc) {
                 *ret = &base[i];
         } else {
                 *ret = NULL;
@@ -133,7 +133,7 @@ xwer_t xwds_device_cvop_probe(struct xwds_device * dev)
         if ((drv) && (drv->probe)) {
                 rc = drv->probe(dev);
         } else {
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -153,7 +153,7 @@ xwer_t xwds_device_cvop_remove(struct xwds_device * dev)
         if ((drv) && (drv->remove)) {
                 rc = drv->remove(dev);
         } else {
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -173,7 +173,7 @@ xwer_t xwds_device_cvop_start(struct xwds_device * dev)
         if ((drv) && (drv->start)) {
                 rc = drv->start(dev);
         } else {
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -193,7 +193,7 @@ xwer_t xwds_device_cvop_stop(struct xwds_device * dev)
         if ((drv) && (drv->stop)) {
                 rc = drv->stop(dev);
         } else {
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -214,7 +214,7 @@ xwer_t xwds_device_cvop_suspend(struct xwds_device * dev)
         if ((drv) && (drv->suspend)) {
                 rc = drv->suspend(dev);
         } else {
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -234,7 +234,7 @@ xwer_t xwds_device_cvop_resume(struct xwds_device * dev)
         if ((drv) && (drv->resume)) {
                 rc = drv->resume(dev);
         } else {
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -285,7 +285,7 @@ xwer_t xwds_device_probe(struct xwds * ds, struct xwds_device * dev,
 
         /* set device state */
         xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
-        return OK;
+        return XWOK;
 
 err_xwds_obj_add:
         if ((cvops) && (cvops->remove)) {
@@ -344,7 +344,7 @@ xwer_t xwds_device_remove(struct xwds_device * dev)
         /* set device state */
         xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_INVALID, NULL);
         xwds_device_put(dev);
-        return OK;
+        return XWOK;
 
 err_dev_cvops_remove:
         xwds_obj_add(ds, &dev->obj);
@@ -390,7 +390,7 @@ xwer_t xwds_device_start(struct xwds_device * dev)
 
         /* set device state */
         xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
-        return OK;
+        return XWOK;
 
 err_dev_cvops_start:
         xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
@@ -438,7 +438,7 @@ xwer_t xwds_device_stop(struct xwds_device * dev)
         /* set device state */
         xwds_device_put(dev);
         xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
-        return OK;
+        return XWOK;
 
 err_dev_cvops_stop:
 err_dev_refcnt:
@@ -478,7 +478,7 @@ xwer_t xwds_device_suspend(struct xwds_device * dev)
 
         /* set device state */
         xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_SUSPENDED, NULL);
-        return OK;
+        return XWOK;
 
 err_cvops_suspend:
         xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
@@ -516,7 +516,7 @@ xwer_t xwds_device_resume(struct xwds_device * dev)
         }
 
         xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
-        return OK;
+        return XWOK;
 
 err_cvops_resume:
         xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_SUSPENDED, NULL);
@@ -533,7 +533,7 @@ xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err)
 
         XWDS_VALIDATE(ds, "nullptr", -EFAULT);
 
-        rc = OK;
+        rc = XWOK;
         xwosal_sqlk_wr_lock_cpuirqsv(&ds->devlistlock, &cpuirq);
         xwds_itr_prev_device_safe(ds, c, n) {
                 xwosal_sqlk_wr_unlock_cpuirqrs(&ds->devlistlock, cpuirq);
@@ -541,7 +541,7 @@ xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err)
                 xwosal_sqlk_wr_lock_cpuirqsv(&ds->devlistlock, &cpuirq);
                 if (__unlikely(rc < 0)) {
                         if (ign_err) {
-                                rc = OK;
+                                rc = XWOK;
                         } else {
                                 break;
                         }
@@ -560,7 +560,7 @@ xwer_t xwds_device_resume_all(struct xwds * ds, bool ign_err)
 
         XWDS_VALIDATE(ds, "nullptr", -EFAULT);
 
-        rc = OK;
+        rc = XWOK;
         xwosal_sqlk_wr_lock_cpuirqsv(&ds->devlistlock, &cpuirq);
         xwds_itr_next_device_safe(ds, c, n) {
                 xwosal_sqlk_wr_unlock_cpuirqrs(&ds->devlistlock, cpuirq);
@@ -568,7 +568,7 @@ xwer_t xwds_device_resume_all(struct xwds * ds, bool ign_err)
                 xwosal_sqlk_wr_lock_cpuirqsv(&ds->devlistlock, &cpuirq);
                 if (__unlikely(rc < 0)) {
                         if (ign_err) {
-                                rc = OK;
+                                rc = XWOK;
                         } else {
                                 break;
                         }

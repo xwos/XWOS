@@ -3902,7 +3902,7 @@ status_t CLOCK_SYS_Init(clock_manager_user_config_t const **clockConfigsPtr,
  * Function Name : CLOCK_SYS_UpdateConfiguration
  * Description   : Send notification and change system clock configuration.
  * This function sends the notification to all callback functions, if all
- * callbacks return OK or forceful policy is used, this function will change
+ * callbacks return XWOK or forceful policy is used, this function will change
  * system clock configuration. The function should be called only on run mode.
  *
  * Implements CLOCK_SYS_UpdateConfiguration_Activity

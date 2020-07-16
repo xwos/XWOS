@@ -42,7 +42,7 @@ xwer_t xwaop__xws8_t__tgele_then_write(__atomic xws8_t * a,
         o = *a;
         if ((o >= l) && (o <= r)) {
                 *a = v;
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EACCES;
         }

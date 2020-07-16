@@ -138,7 +138,7 @@ void xwlk_mtx_deactivate(struct xwlk_mtx * mtx)
  * @param mtx: (I) 互斥锁对象的指针
  * @param sprio: (I) 互斥锁的静态优先级
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EINVAL: 无效参数
  * @note
@@ -154,14 +154,14 @@ xwer_t xwlk_mtx_init(struct xwlk_mtx * mtx, xwpr_t sprio)
         XWOS_VALIDATE((sprio <= XWOS_SD_PRIORITY_RT_MAX), "invalid-priority", -EINVAL);
 
         xwlk_mtx_activate(mtx, sprio);
-        return OK;
+        return XWOK;
 }
 
 /**
  * @brief XWOS API：销毁互斥锁对象
  * @param mtx: (I) 互斥锁对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -174,7 +174,7 @@ xwer_t xwlk_mtx_destroy(struct xwlk_mtx * mtx)
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
 
         xwlk_mtx_deactivate(mtx);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -182,7 +182,7 @@ xwer_t xwlk_mtx_destroy(struct xwlk_mtx * mtx)
  * @param ptrbuf: (O) 指向缓冲区的指针，通过此缓冲区返回对象指针
  * @param sprio: (I) 互斥锁的静态优先级
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ENOMEM: 内存不足
  * @retval -EINVAL: 无效参数
@@ -208,7 +208,7 @@ xwer_t xwlk_mtx_create(struct xwlk_mtx ** ptrbuf, xwpr_t sprio)
         } else {
                 xwlk_mtx_activate(mtx, sprio);
                 *ptrbuf = mtx;
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -217,7 +217,7 @@ xwer_t xwlk_mtx_create(struct xwlk_mtx ** ptrbuf, xwpr_t sprio)
  * @brief XWOS API：删除动态创建的互斥锁
  * @param mtx: (I) 互斥锁对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -231,7 +231,7 @@ xwer_t xwlk_mtx_delete(struct xwlk_mtx * mtx)
 
         xwlk_mtx_deactivate(mtx);
         xwlk_mtx_free(mtx);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -329,7 +329,7 @@ xwer_t xwlk_mtx_intr(struct xwlk_mtx * mtx, struct xwos_tcb * tcb)
 
         xwos_cpuirq_save_lc(&cpuirq);
         rc = xwos_rtwq_remove(&mtx->rtwq, &tcb->wqn);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 tcb->wqn.wq = NULL;
                 tcb->wqn.type = XWOS_WQTYPE_UNKNOWN;
                 tcb->wqn.rsmrs = XWOS_WQN_RSMRS_INTR;
@@ -349,7 +349,7 @@ xwer_t xwlk_mtx_intr(struct xwlk_mtx * mtx, struct xwos_tcb * tcb)
  * @brief XWOS API：解锁互斥锁
  * @param mtx: (I) 互斥锁对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EOWNER: 线程并没有锁定此互斥锁
  * @retval -ENOTINTHRD: 不在线程上下文中
@@ -371,7 +371,7 @@ xwer_t xwlk_mtx_unlock(struct xwlk_mtx * mtx)
         XWOS_VALIDATE((-EINTHRD == xwos_irq_get_id(NULL)),
                       "not-in-thrd", -ENOTINTHRD);
 
-        rc = OK;
+        rc = XWOK;
         xwos_scheduler_dspmpt_lc();
         ctcb = xwos_scheduler_get_ctcb_lc();
         mt = &ctcb->mtxtree;
@@ -431,7 +431,7 @@ xwer_t xwlk_mtx_unlock(struct xwlk_mtx * mtx)
  * @brief XWOS API：尝试获取互斥锁
  * @param mtx: (I) 互斥锁对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ENODATA: 获取锁失败
  * @retval -ENOTINTHRD: 不在线程上下文中
@@ -456,7 +456,7 @@ xwer_t xwlk_mtx_trylock(struct xwlk_mtx * mtx)
         XWOS_VALIDATE((-EINTHRD == xwos_irq_get_id(NULL)),
                       "not-in-thrd", -ENOTINTHRD);
 
-        rc = OK;
+        rc = XWOK;
         xwos_scheduler_dspmpt_lc();
         ctcb = xwos_scheduler_get_ctcb_lc();
         mt = &ctcb->mtxtree;
@@ -525,7 +525,7 @@ xwer_t xwlk_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
         if (XWOS_WQN_RSMRS_INTR == tcb->wqn.rsmrs) {
                 xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 rc = xwos_tt_remove_locked(xwtt, &tcb->ttn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_SLEEPING);
                 }/* else {} */
                 xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
@@ -533,15 +533,15 @@ xwer_t xwlk_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
         } else if (XWOS_WQN_RSMRS_UP == tcb->wqn.rsmrs) {
                 xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 rc = xwos_tt_remove_locked(xwtt, &tcb->ttn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         xwbop_c0m(xwsq_t, &tcb->state, XWSDOBJ_DST_SLEEPING);
                 }/* else {} */
                 xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                rc = OK;
+                rc = XWOK;
         } else if (XWOS_TTN_WKUPRS_TIMEDOUT == tcb->ttn.wkuprs) {
                 xwos_cpuirq_disable_lc();
                 rc = xwos_rtwq_remove(&mtx->rtwq, &tcb->wqn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         tcb->wqn.wq = NULL;
                         tcb->wqn.type = XWOS_WQTYPE_UNKNOWN;
                         tcb->wqn.rsmrs = XWOS_WQN_RSMRS_INTR;
@@ -555,7 +555,7 @@ xwer_t xwlk_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
                         if (XWOS_WQN_RSMRS_INTR == tcb->wqn.rsmrs) {
                                 rc = -EINTR;
                         } else if (XWOS_WQN_RSMRS_UP == tcb->wqn.rsmrs) {
-                                rc = OK;
+                                rc = XWOK;
                         } else {
                                 XWOS_BUG();
                                 rc = -EBUG;
@@ -564,7 +564,7 @@ xwer_t xwlk_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
         } else if (XWOS_TTN_WKUPRS_INTR == tcb->ttn.wkuprs) {
                 xwos_cpuirq_disable_lc();
                 rc = xwos_rtwq_remove(&mtx->rtwq, &tcb->wqn);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         tcb->wqn.wq = NULL;
                         tcb->wqn.type = XWOS_WQTYPE_UNKNOWN;
                         tcb->wqn.rsmrs = XWOS_WQN_RSMRS_INTR;
@@ -578,7 +578,7 @@ xwer_t xwlk_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
                         if (XWOS_WQN_RSMRS_INTR == tcb->wqn.rsmrs) {
                                 rc = -EINTR;
                         } else if (XWOS_WQN_RSMRS_UP == tcb->wqn.rsmrs) {
-                                rc = OK;
+                                rc = XWOK;
                         } else {
                                 XWOS_BUG();
                                 rc = -EBUG;
@@ -603,7 +603,7 @@ xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx,
         xwreg_t cpuirq;
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         xwsd = xwos_scheduler_dspmpt_lc();
         mt = &tcb->mtxtree;
         xwos_cpuirq_save_lc(&cpuirq);
@@ -644,7 +644,7 @@ xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx,
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETIMEDOUT: 超时
  * @retval -ENOTINTHRD: 不在线程上下文中
@@ -710,7 +710,7 @@ xwer_t xwlk_mtx_do_blkthrd_unlkwq_cpuirqrs(struct xwlk_mtx * mtx,
 
         /* 判断唤醒原因 */
         if (XWOS_WQN_RSMRS_UP == tcb->wqn.rsmrs) {
-                rc = OK;
+                rc = XWOK;
         } else {
                 XWOS_BUG();
                 rc = -EBUG;
@@ -726,7 +726,7 @@ xwer_t xwlk_mtx_do_lock_unintr(struct xwlk_mtx * mtx,
         xwreg_t cpuirq;
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         xwos_scheduler_dspmpt_lc();
         mt = &tcb->mtxtree;
         xwos_cpuirq_save_lc(&cpuirq);
@@ -750,7 +750,7 @@ xwer_t xwlk_mtx_do_lock_unintr(struct xwlk_mtx * mtx,
  * @brief XWOS API：等待并上锁互斥锁，且等待不可被中断
  * @param mtx: (I) 互斥锁对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步

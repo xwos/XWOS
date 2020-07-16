@@ -39,6 +39,7 @@
 /******** ******** architecture libs ******** ********/
 /******** libc.a ********/
 #define ARCHCFG_COMPILER_CLIB                   0
+#define ARCHCFG_COMPILER_ERRNO                  1
 
 /******** C++ ********/
 #define ARCHCFG_CXX                             0

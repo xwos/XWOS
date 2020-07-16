@@ -171,7 +171,7 @@ xwer_t sys_mm_init(void)
         }
 #endif /* XuanWuOS_CFG_CORE__smp */
 
-        return OK;
+        return XWOK;
 
 #if defined(XuanWuOS_CFG_CORE__smp)
 err_mtx_cache_init:

@@ -114,7 +114,7 @@ xwer_t mpc560xb_misc_check_desc(struct xwds_misc * misc)
                 if(__unlikely(is_err_or_null(xwccfg))) {
                         rc = -EINVAL;
                 } else {
-                        rc = OK;
+                        rc = XWOK;
                 }
         }
 
@@ -140,7 +140,7 @@ xwer_t mpc560xb_misc_drv_probe(struct xwds_device * dev)
         xwosal_cdt_init(&drvdata->adc.cdt);
         xwosal_mtx_init(&drvdata->adc.mtx, XWOSAL_SD_PRIORITY_RT_MIN);
 
-        return OK;
+        return XWOK;
 
 err_chkdesc:
         return rc;
@@ -157,7 +157,7 @@ xwer_t mpc560xb_misc_drv_remove(struct xwds_device * dev)
         xwosal_cdt_destroy(&drvdata->adc.cdt);
         xwosal_mtx_destroy(&drvdata->adc.mtx);
 
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -220,7 +220,7 @@ xwer_t mpc560xb_misc_drv_start(struct xwds_device * dev)
                 irqrsc = &resources->irqrsc_array[i];
                 xwos_irq_clear(irqrsc->irqn);
                 rc = xwos_irq_cfg(irqrsc->irqn, irqrsc->cfg);
-                if (OK == rc)
+                if (XWOK == rc)
                         rc = xwos_irq_enable(irqrsc->irqn);
                 if (__unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
@@ -231,7 +231,7 @@ xwer_t mpc560xb_misc_drv_start(struct xwds_device * dev)
                 }
         }
 
-        return OK;
+        return XWOK;
 
 err_en_irq:
         for (j = (xwssz_t)resources->gpiorsc_num - 1; j >= 0; j--) {
@@ -285,7 +285,7 @@ xwer_t mpc560xb_misc_drv_stop(struct xwds_device * dev)
                 irqrsc = &resources->irqrsc_array[j];
                 xwos_irq_release(irqrsc->irqn);
         }
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -309,7 +309,7 @@ xwer_t mpc560xb_misc_drv_ioctl(struct xwds_misc * misc, xwsq_t cmd, va_list args
         xwbmp_t * chmask;
         xwtm_t * xwtm;
 
-        rc = OK;
+        rc = XWOK;
         switch(cmd) {
         case MPC560XB_ADC_IOC_SETUP:
                 rc = mpc560xb_adc_setup(misc);
@@ -367,7 +367,7 @@ xwer_t mpc560xb_adc_setup(struct xwds_misc * misc)
 
         ADC_0.MCR.B.PWDN = 1;
 
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -378,7 +378,7 @@ xwer_t mpc560xb_adc_clean(struct xwds_misc * misc)
         /* clean ADC */
         ADC_0.MCR.B.PWDN = 1;
 
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -409,7 +409,7 @@ xwer_t mpc560xb_adc_convert(struct xwds_misc * misc, xwbmp_t * chmask, xws16_t *
         rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&drvdata->adc.cdt),
                                   ulk, XWLK_TYPE_SPLK, NULL,
                                   xwtm, &lkst);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 xwosal_splk_unlock_cpuirqrs(&drvdata->adc.lock, flag);
                 ceocfr[0] = ADC_0.CEOCFR[0].R;
                 ceocfr[1] = ADC_0.CEOCFR[1].R;

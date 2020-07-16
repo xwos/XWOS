@@ -154,7 +154,7 @@ xwer_t xwos_irqc_register(struct xwos_irqc * irqc, xwid_t cpuid, xwobj_gc_f gcfu
         xwos_irqc_subsystem.percpu_irqc[cpuid] = irqc;
         xwlk_rawly_unlock_cpuirqrs(&xwos_irqc_subsystem.percpu_irqcslot_lock, cpuirq);
 
-        return OK;
+        return XWOK;
 
 err_drv_probe:
 err_inused:
@@ -198,7 +198,7 @@ xwer_t xwos_irqc_deregister(struct xwos_irqc * irqc)
         xwlk_rawly_unlock_cpuirqrs(&xwos_irqc_subsystem.percpu_irqcslot_lock, cpuirq);
         xwos_irqc_put(irqc);
 
-        return OK;
+        return XWOK;
 
 err_drv_remove:
 err_not_reg:
@@ -237,7 +237,7 @@ struct xwos_irqc * xwos_irq_get_irqc(xwirq_t irqn)
  * @param description: (I) 描述
  * @param ptrbuf: (O) 指向用于返回结果的缓冲区的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENODEV: 没有找到资源
  */
 __xwos_code
@@ -249,7 +249,7 @@ xwer_t xwos_irqc_get_irqrsc(const struct xwos_irq_resource base[], xwsz_t num,
         for (i = 0; i < num; i++) {
                 if (!strcmp(base[i].description, description)) {
                         *ptrbuf = &base[i];
-                        return OK;
+                        return XWOK;
                 }
         }
         *ptrbuf = NULL;
@@ -300,7 +300,7 @@ xwer_t xwos_irq_release(xwirq_t irqn)
         } else {
                 rc = -ENOSYS;
         }
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 xwos_irqc_put(irqc);
         }
         return rc;

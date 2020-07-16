@@ -123,7 +123,7 @@ xwer_t stm32cube_usart1_drv_start(struct xwds_device * dev)
         }
         MX_USART1_Timer_Init();
         MX_USART1_Timer_Start();
-        return OK;
+        return XWOK;
 
 err_rxdma_start:
         return rc;
@@ -137,7 +137,7 @@ xwer_t stm32cube_usart1_drv_stop(struct xwds_device * dev)
         MX_USART1_Timer_Stop();
         MX_USART1_Timer_DeInit();
         MX_USART1_UART_DeInit();
-        return OK;
+        return XWOK;
 }
 
 #if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
@@ -179,11 +179,11 @@ xwer_t stm32cube_usart1_drv_tx(struct xwds_dmauartc * dmauartc,
         xwosal_splk_lock_cpuirqsv(&drvdata->tx.splk, &flag);
         drvdata->tx.rc = -EINPROGRESS;
         rc = MX_USART1_TXDMA_Start((xwu8_t *)data, size);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&drvdata->tx.cdt),
                                           ulk, XWLK_TYPE_SPLK, NULL,
                                           xwtm, &lkst);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         if (XWLK_STATE_UNLOCKED == lkst) {
                                 xwosal_splk_lock(&drvdata->tx.splk);
                         }

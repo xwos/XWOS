@@ -55,5 +55,5 @@ void * const newlibac_linkage_placeholder[] = {
  ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t newlibac_start(void)
 {
-        return OK;
+        return XWOK;
 }

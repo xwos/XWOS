@@ -127,7 +127,7 @@ xwer_t example_barrier_start(void)
                 }
         }
 
-        return OK;
+        return XWOK;
 
 err_thrd_create:
         xwosal_barrier_destroy(&xwtst_sync_barrier);

@@ -230,7 +230,7 @@ xwer_t xwds_canc_write(struct xwds_canc * canc, xwid_t txobjid,
         xwds_canc_release(canc);
         xwds_canc_put(canc);
 
-        return OK;
+        return XWOK;
 
 err_drv_write:
 err_badtxobj:
@@ -279,7 +279,7 @@ xwer_t xwds_canc_set_mode(struct xwds_canc * canc, xwsq_t mode)
         xwds_canc_put(canc);
 
         xwds_canc_lib_mode_indication(canc, mode);
-        return OK;
+        return XWOK;
 
 err_drv_set_mode:
 err_same_mode:
@@ -326,7 +326,7 @@ xwer_t xwds_canc_set_bd(struct xwds_canc * canc, xwid_t bdcfgid)
 
         xwds_canc_release(canc);
         xwds_canc_put(canc);
-        return OK;
+        return XWOK;
 
 err_drv_set_bd:
 err_nobd:
@@ -364,7 +364,7 @@ xwer_t xwds_canc_enable_irqs(struct xwds_canc * canc)
                 goto err_canc_drv_enable_irqs;
         }
 
-        return OK;
+        return XWOK;
 
 err_canc_drv_enable_irqs:
         xwds_canc_release(canc);
@@ -394,7 +394,7 @@ xwer_t xwds_canc_disable_irqs(struct xwds_canc * canc)
 
         xwds_canc_release(canc);
         xwds_canc_put(canc);
-        return OK;
+        return XWOK;
 
 err_canc_drv_disable_irqs:
         return rc;
@@ -703,7 +703,7 @@ void xwds_canc_lib_rxq_publish(struct xwds_canc_rxqueue * rxq,
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步
@@ -735,7 +735,7 @@ xwer_t xwds_canc_lib_rxq_acquire(struct xwds_canc_rxqueue * rxq,
                 rxq->pos = 0;
         } /* else {} */
         xwosal_splk_unlock_cpuirqrs(&rxq->lock, cpuirq);
-        return OK;
+        return XWOK;
 
 err_smr_timedwait:
         return rc;

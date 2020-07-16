@@ -164,7 +164,7 @@ struct xwosal_flg * xwosal_flg_get_obj(xwid_t flgid)
  * @param sltid: (I) 信号选择器的ID
  * @param pos: (I) 事件信号旗对象映射到位图中的位置
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 信号选择器或事件信号旗类型错误
  * @note
  * - 同步/异步：同步
@@ -182,7 +182,7 @@ xwer_t xwosal_flg_bind(xwid_t flgid, xwid_t sltid, xwsq_t pos)
  * @param flgid: (I) 事件信号旗的ID
  * @param sltid: (I) 信号选择器的ID
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETYPE: 信号选择器类型错误
  * @note
  * - 同步/异步：同步
@@ -199,7 +199,7 @@ xwer_t xwosal_flg_unbind(xwid_t flgid, xwid_t sltid)
  * @brief XWOSAL API：中断事件信号旗等待队列中的所有节点
  * @param flgid: (I) 事件信号旗ID
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型不匹配
  * @note
@@ -218,7 +218,7 @@ xwer_t xwosal_flg_intr_all(xwid_t flgid)
  * @param flgid: (I) 事件信号旗ID
  * @param msk: (I) 事件信号旗的位图掩码
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -236,7 +236,7 @@ xwer_t xwosal_flg_s1m(xwid_t flgid, xwbmp_t msk[])
  * @param flgid: (I) 事件信号旗ID
  * @param pos: (I) 事件信号旗的序号
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -254,7 +254,7 @@ xwer_t xwosal_flg_s1i(xwid_t flgid, xwsq_t pos)
  * @param flgid: (I) 事件信号旗ID
  * @param msk: (I) 事件信号旗的位图掩码
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -272,7 +272,7 @@ xwer_t xwosal_flg_c0m(xwid_t flgid, xwbmp_t msk[])
  * @param flgid: (I) 事件信号旗ID
  * @param pos: (I) 事件信号旗的序号
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ECHRNG: 位置超出范围
  * @note
@@ -291,7 +291,7 @@ xwer_t xwosal_flg_c0i(xwid_t flgid, xwsq_t pos)
  * @param flgid: (I) 事件信号旗ID
  * @param msk: (I) 事件信号旗的位图掩码
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -309,7 +309,7 @@ xwer_t xwosal_flg_x1m(xwid_t flgid, xwbmp_t msk[])
  * @param flgid: (I) 事件信号旗ID
  * @param pos: (I) 事件信号旗的序号
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ECHRNG: 位置超出范围
  * @note
@@ -328,7 +328,7 @@ xwer_t xwosal_flg_x1i(xwid_t flgid, xwsq_t pos)
  * @param flgid: (I) 事件信号旗ID
  * @param out: (O) 指向缓冲区的指针，通过此缓冲区返回事件信号旗位图的值
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -361,7 +361,7 @@ xwer_t xwosal_flg_read(xwid_t flgid, xwbmp_t out[])
  *                    （可作为下一次调用的初始值）
  * @param msk: (I) 事件信号旗的位图掩码，表示只关注掩码部分的信号旗
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EINVAL: 参数无效
  * @note
@@ -396,7 +396,7 @@ xwer_t xwosal_flg_trywait(xwid_t flgid, xwsq_t trigger, xwsq_t action,
  *                    （可作为下一次调用的初始值）
  * @param msk: (I) 事件信号旗的位图掩码，表示只关注掩码部分的信号旗
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EINVAL: 参数无效
  * @retval -EINTR: 等待被中断
@@ -435,7 +435,7 @@ xwer_t xwosal_flg_wait(xwid_t flgid, xwsq_t trigger, xwsq_t action,
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EINVAL: 参数无效
  * @retval -ETIMEDOUT: 超时

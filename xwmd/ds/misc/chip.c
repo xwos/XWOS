@@ -199,7 +199,7 @@ xwer_t xwds_misc_ioctl(struct xwds_misc * misc, xwsq_t cmd, ...)
         }
 
         xwds_misc_put(misc);
-        return OK;
+        return XWOK;
 
 err_drv_ioctl:
         xwds_misc_put(misc);

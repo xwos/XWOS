@@ -196,7 +196,7 @@ xwer_t example_selector_start(void)
                 goto err_ithrd_create;
         }
 
-        return OK;
+        return XWOK;
 
 
 err_ithrd_create:
@@ -242,7 +242,7 @@ xwer_t example_selector_wthrd_func(void * arg)
         xwid_t slt0id, slt4id;
         xwid_t smr1id, smr2id, smr3id;
         xwtm_t sleep;
-        xwer_t rc = OK;
+        xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
 
@@ -261,7 +261,7 @@ xwer_t example_selector_wthrd_func(void * arg)
 
                 /* 通过信号选择器同时等待bit1 ~ bit6共6个同步对象 */
                 rc = xwosal_selector_select(slt0id, msk, trg);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         /* 等待成功 */
 
                         /* 测试第1位是否被置1 */
@@ -283,7 +283,7 @@ xwer_t example_selector_wthrd_func(void * arg)
                         if (xwbmpop_t1i(trg, 4)) {
                                 /* 第4位为子信号选择器4，再次测试（不等待） */
                                 rc = xwosal_selector_tryselect(slt4id, msk, trg);
-                                if (OK == rc) {
+                                if (XWOK == rc) {
                                         /* 测试成功 */
                                         /* 测试第5位是否触发 */
                                         if (xwbmpop_t1i(trg, 5)) {
@@ -310,7 +310,7 @@ xwer_t example_selector_ithrd_func(void * arg)
         xwid_t smr1id, smr2id, smr3id;
         xwid_t cdt5id, cdt6id;
         xwtm_t sleep;
-        xwer_t rc = OK;
+        xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
 

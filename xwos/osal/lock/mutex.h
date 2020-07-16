@@ -184,7 +184,7 @@ xwer_t xwosal_mtx_trylock(xwid_t mid)
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ETIMEDOUT: 超时
  * @note
  * - 同步/异步：同步

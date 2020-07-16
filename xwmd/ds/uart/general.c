@@ -132,7 +132,7 @@ xwer_t xwds_uartc_cvop_probe(struct xwds_uartc * uartc)
         if (__unlikely(rc < 0)) {
                 goto err_dev_probe;
         }
-        return OK;
+        return XWOK;
 
 err_dev_probe:
         xwosal_mtx_destroy(&uartc->txmtx);
@@ -159,7 +159,7 @@ xwer_t xwds_uartc_cvop_remove(struct xwds_uartc * uartc)
         }
         xwosal_mtx_destroy(&uartc->txmtx);
         xwosal_smr_destroy(&uartc->rxsmr);
-        return OK;
+        return XWOK;
 
 err_dev_cvop_remove:
         return rc;
@@ -192,7 +192,7 @@ xwer_t xwds_uartc_cvop_start(struct xwds_uartc * uartc)
                 drv = xwds_static_cast(const struct xwds_uartc_driver *,
                                        uartc->dev.drv);
                 rc = drv->tx(uartc, uartc->txq[uartc->txpos]);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         uartc->txpos++;
                         if (uartc->txpos >= (xwssq_t)XWMDCFG_ds_UART_GNR_TXQ_SIZE) {
                                 uartc->txpos = 0;
@@ -203,7 +203,7 @@ xwer_t xwds_uartc_cvop_start(struct xwds_uartc * uartc)
         }
         xwosal_sqlk_wr_unlock_cpuirqrs(&uartc->txseqlock, cpuirq);
 
-        return OK;
+        return XWOK;
 
 err_rxsmr_thaw:
         xwds_device_cvop_stop(&uartc->dev);
@@ -234,7 +234,7 @@ xwer_t xwds_uartc_cvop_stop(struct xwds_uartc * uartc)
         uartc->txport_available = 0;
         xwosal_sqlk_wr_unlock_cpuirqrs(&uartc->txseqlock, cpuirq);
 
-        return OK;
+        return XWOK;
 
 err_dev_stop:
         xwosal_smr_thaw(xwosal_smr_get_id(&uartc->rxsmr), 0,
@@ -263,7 +263,7 @@ xwer_t xwds_uartc_cvop_suspend(struct xwds_uartc * uartc)
         xwosal_sqlk_wr_lock_cpuirqsv(&uartc->txseqlock, &cpuirq);
         uartc->txport_available = 0;
         xwosal_sqlk_wr_unlock_cpuirqrs(&uartc->txseqlock, cpuirq);
-        return OK;
+        return XWOK;
 
 err_dev_suspend:
         return rc;
@@ -289,7 +289,7 @@ xwer_t xwds_uartc_cvop_resume(struct xwds_uartc * uartc)
         if (uartc->txnum != uartc->txpos) {
                 drv = xwds_static_cast(const struct xwds_uartc_driver *, uartc->dev.drv);
                 rc = drv->tx(uartc, uartc->txq[uartc->txpos]);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         uartc->txpos++;
                         if (uartc->txpos >= (xwssq_t)XWMDCFG_ds_UART_GNR_TXQ_SIZE) {
                                 uartc->txpos = 0;
@@ -299,7 +299,7 @@ xwer_t xwds_uartc_cvop_resume(struct xwds_uartc * uartc)
                 uartc->txport_available = 1;
         }
         xwosal_sqlk_wr_unlock_cpuirqrs(&uartc->txseqlock, cpuirq);
-        return OK;
+        return XWOK;
 
 err_dev_resume:
         return rc;
@@ -335,7 +335,7 @@ xwer_t xwds_uartc_clear_rxq(struct xwds_uartc * uartc)
         }
 
         xwds_uartc_put(uartc);
-        return OK;
+        return XWOK;
 
 err_smr_thaw:
 err_smr_freeze:
@@ -371,7 +371,7 @@ xwer_t xwds_uartc_get_rxq_datasize(struct xwds_uartc * uartc, xwsz_t *ret)
 
         xwds_uartc_put(uartc);
         *ret = (xwsz_t)size;
-        return OK;
+        return XWOK;
 
 err_uartc_grab:
         return rc;
@@ -405,7 +405,7 @@ xwer_t xwds_uartc_getc(struct xwds_uartc * uartc, xwu8_t * buf, xwtm_t * xwtm)
         xwosal_sqlk_wr_unlock_cpuirqrs(&uartc->rxseqlock, cpuirq);
 
         xwds_uartc_put(uartc);
-        return OK;
+        return XWOK;
 
 err_smr_timedwait:
         xwds_uartc_put(uartc);
@@ -450,7 +450,7 @@ xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
 
         xwds_uartc_put(uartc);
         *size = i;
-        return OK;
+        return XWOK;
 
 err_smr_timedwait:
         xwds_uartc_put(uartc);
@@ -485,7 +485,7 @@ xwer_t xwds_uartc_try_getc(struct xwds_uartc * uartc, xwu8_t * buf)
         xwosal_sqlk_wr_unlock_cpuirqrs(&uartc->rxseqlock, cpuirq);
 
         xwds_uartc_put(uartc);
-        return OK;
+        return XWOK;
 
 err_smr_trywait:
         xwds_uartc_put(uartc);
@@ -527,7 +527,7 @@ xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc, void * buf, xwsz_t * size)
 
         xwds_uartc_put(uartc);
         *size = i;
-        return OK;
+        return XWOK;
 
 err_smr_trywait:
         xwds_uartc_put(uartc);
@@ -538,7 +538,7 @@ err_uartc_grab:
 __xwds_api
 xwer_t xwds_uartc_clear_txq(struct xwds_uartc * uartc)
 {
-        xwer_t rc = OK;
+        xwer_t rc = XWOK;
         xwreg_t cpuirq;
 
         XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
@@ -571,7 +571,7 @@ xwer_t xwds_uartc_tx_1byte(struct xwds_uartc * uartc, const xwu8_t byte)
         if (1 == uartc->txport_available) {
                 drv = xwds_static_cast(const struct xwds_uartc_driver *, uartc->dev.drv);
                 rc = drv->tx(uartc, byte);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         uartc->txport_available = 0;
                 }/* else {} */
         } else {
@@ -591,7 +591,7 @@ xwer_t xwds_uartc_tx_1byte(struct xwds_uartc * uartc, const xwu8_t byte)
                         }/* else {} */
                         rc = -EOVERFLOW;
                 } else {
-                        rc = OK;
+                        rc = XWOK;
                 }
         }
         xwosal_sqlk_wr_unlock_cpuirqrs(&uartc->txseqlock, cpuirq);
@@ -624,7 +624,7 @@ xwer_t xwds_uartc_putc(struct xwds_uartc * uartc,
         xwosal_mtx_unlock(xwosal_mtx_get_id(&uartc->txmtx));
 
         xwds_uartc_put(uartc);
-        return OK;
+        return XWOK;
 
 err_tx_1byte:
         xwosal_mtx_unlock(xwosal_mtx_get_id(&uartc->txmtx));
@@ -670,7 +670,7 @@ xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
 
         xwds_uartc_put(uartc);
         *size = i;
-        return OK;
+        return XWOK;
 
 err_tx_1byte:
         xwosal_mtx_unlock(xwosal_mtx_get_id(&uartc->txmtx));
@@ -706,7 +706,7 @@ xwer_t xwds_uartc_cfg(struct xwds_uartc * uartc,
         }
 
         xwds_uartc_put(uartc);
-        return OK;
+        return XWOK;
 
 err_drv_cfg:
         xwds_uartc_put(uartc);
@@ -771,7 +771,7 @@ void xwds_uartc_lib_tx_isr(struct xwds_uartc * uartc)
                 drv = xwds_static_cast(const struct xwds_uartc_driver *,
                                        uartc->dev.drv);
                 rc = drv->tx(uartc, uartc->txq[uartc->txpos]);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         uartc->txpos++;
                         if (uartc->txpos >= (xwssq_t)XWMDCFG_ds_UART_GNR_TXQ_SIZE) {
                                 uartc->txpos = 0;

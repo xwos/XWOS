@@ -64,7 +64,7 @@ xwer_t xwds_eram_test(struct xwds_soc * soc, xwptr_t * erraddr)
 
         xwds_soc_release(soc);
         xwds_soc_put(soc);
-        return OK;
+        return XWOK;
 
 err_drv_tst:
         xwds_soc_release(soc);

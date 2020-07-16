@@ -137,7 +137,7 @@ void xwds_linc_destruct(struct xwds_linc * linc);
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ENOSYS: 控制器不支持主机模式发送
  * @note
@@ -158,7 +158,7 @@ xwer_t xwds_linc_msttx(struct xwds_linc * linc,
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ENOSYS: 控制器不支持从机模式发送
  * @note
@@ -179,7 +179,7 @@ xwer_t xwds_linc_slvtx(struct xwds_linc * linc,
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ENOSYS: 控制器不支持接收
  * @note
@@ -198,7 +198,7 @@ xwer_t xwds_linc_rx(struct xwds_linc * linc,
  * @param protected_id: (I) 消息的LIN保护ID
  * @param ret: (O) 指向缓冲区的指针，通过此缓冲区返回消息大小
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @retval -ENODEV: 找不到ID
  * @note

@@ -42,7 +42,7 @@ xwer_t xwlk_rawly_trylock(struct xwlk_splk * spl)
 {
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
 #if (CPUCFG_CPU_NUM > 1)
         rc = arch_splk_trylock(&spl->aspl);
 #else /* (CPUCFG_CPU_NUM > 1) */
@@ -80,7 +80,7 @@ xwer_t xwlk_rawly_trylock_cpuirq(struct xwlk_splk * spl)
 {
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         xwos_cpuirq_disable_lc();
 #if (CPUCFG_CPU_NUM > 1)
         rc = arch_splk_trylock(&spl->aspl);
@@ -123,7 +123,7 @@ xwer_t xwlk_rawly_trylock_cpuirqsv(struct xwlk_splk * spl, xwreg_t * cpuirq)
 {
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         xwos_cpuirq_save_lc(cpuirq);
 #if (CPUCFG_CPU_NUM > 1)
         rc = arch_splk_trylock(&spl->aspl);
@@ -174,7 +174,7 @@ xwer_t xwlk_rawly_trylock_irqs(struct xwlk_splk * spl,
         xwer_t rc;
         xwssz_t i;
 
-        rc = OK;
+        rc = XWOK;
         for (i = 0; i < (xwssz_t)num; i++) {
                 xwos_irq_disable(irqs[i].irqn);
         }
@@ -235,7 +235,7 @@ xwer_t xwlk_rawly_trylock_irqssv(struct xwlk_splk * spl,
         xwer_t rc;
         xwssz_t i;
 
-        rc = OK;
+        rc = XWOK;
         for (i = 0; i < (xwssz_t)num; i++) {
                 xwos_irq_save(irqs[i].irqn, &flags[i]);
         }
@@ -298,7 +298,7 @@ void xwlk_splk_lock(struct xwlk_splk * spl)
  * @brief XWOS API：尝试上锁自旋锁
  * @param spl: (I) 自旋锁的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得自旋锁失败
  * @note
  * - 同步/异步：同步
@@ -313,7 +313,7 @@ xwer_t xwlk_splk_trylock(struct xwlk_splk * spl)
 {
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         xwos_scheduler_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
         rc = arch_splk_trylock(&spl->aspl);
@@ -375,7 +375,7 @@ void xwlk_splk_lock_cpuirq(struct xwlk_splk * spl)
  * @brief XWOS API：尝试上锁自旋锁，并关闭本地CPU的中断
  * @param spl: (I) 自旋锁的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得自旋锁失败
  * @note
  * - 同步/异步：同步
@@ -390,7 +390,7 @@ xwer_t xwlk_splk_trylock_cpuirq(struct xwlk_splk * spl)
 {
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         xwos_cpuirq_disable_lc();
         xwos_scheduler_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
@@ -457,7 +457,7 @@ void xwlk_splk_lock_cpuirqsv(struct xwlk_splk * spl, xwreg_t * cpuirq)
  * @param spl: (I) 自旋锁的指针
  * @param cpuirq: (O) 缓冲区指针，用于返回本地CPU的中断标志
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得自旋锁失败
  * @note
  * - 同步/异步：同步
@@ -472,7 +472,7 @@ xwer_t xwlk_splk_trylock_cpuirqsv(struct xwlk_splk * spl, xwreg_t * cpuirq)
 {
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         xwos_cpuirq_save_lc(cpuirq);
         xwos_scheduler_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
@@ -548,7 +548,7 @@ void xwlk_splk_lock_irqs(struct xwlk_splk * spl,
  * @param irqs: (I) 外部中断资源数组指针
  * @param num: (I) 数组中元素数量
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得自旋锁失败
  * @note
  * - 同步/异步：同步
@@ -566,7 +566,7 @@ xwer_t xwlk_splk_trylock_irqs(struct xwlk_splk * spl,
         xwer_t rc;
         xwssz_t i;
 
-        rc = OK;
+        rc = XWOK;
         for (i = 0; i < (xwssz_t)num; i++) {
                 xwos_irq_disable(irqs[i].irqn);
         }
@@ -655,7 +655,7 @@ void xwlk_splk_lock_irqssv(struct xwlk_splk * spl,
  * @param flags: (O) 缓冲区指针，用于返回部分外部中断的中断标志
  * @param num: (I) 数组中元素数量
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得自旋锁失败
  * @note
  * - 同步/异步：同步
@@ -674,7 +674,7 @@ xwer_t xwlk_splk_trylock_irqssv(struct xwlk_splk * spl,
         xwer_t rc;
         xwssz_t i;
 
-        rc = OK;
+        rc = XWOK;
         for (i = 0; i < (xwssz_t)num; i++) {
                 xwos_irq_save(irqs[i].irqn, &flags[i]);
         }
@@ -756,7 +756,7 @@ void xwlk_splk_lock_bh(struct xwlk_splk * spl)
  * @brief XWOS API：尝试上锁自旋锁，关闭本地CPU的中断底半部
  * @param spl: (I) 自旋锁的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得自旋锁失败
  * @note
  * - 同步/异步：同步
@@ -773,7 +773,7 @@ xwer_t xwlk_splk_trylock_bh(struct xwlk_splk * spl)
         struct xwos_scheduler * xwsd;
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         xwsd = xwos_scheduler_dspmpt_lc();
         xwos_scheduler_dsbh(xwsd);
 #if (CPUCFG_CPU_NUM > 1)
@@ -830,7 +830,7 @@ xwer_t xwlk_bitsplk_trylock(xwptr_t * ptr)
 {
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         xwos_scheduler_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
         rc = arch_bitsplk_trylock(ptr);
@@ -874,7 +874,7 @@ xwer_t xwlk_bitsplk_trylock_cpuirq(xwptr_t * ptr)
 {
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         xwos_cpuirq_disable_lc();
         xwos_scheduler_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
@@ -921,7 +921,7 @@ xwer_t xwlk_bitsplk_trylock_cpuirqsv(xwptr_t * ptr, xwreg_t * cpuirq)
 {
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         xwos_cpuirq_save_lc(cpuirq);
         xwos_scheduler_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
@@ -977,7 +977,7 @@ xwer_t xwlk_bitsplk_trylock_irqs(xwptr_t * ptr,
         xwer_t rc;
         xwssz_t i;
 
-        rc = OK;
+        rc = XWOK;
         for (i = 0; i < (xwssz_t)num; i++) {
                 xwos_irq_disable(irqs[i].irqn);
         }
@@ -1043,7 +1043,7 @@ xwer_t xwlk_bitsplk_trylock_irqssv(xwptr_t * ptr,
         xwer_t rc;
         xwssz_t i;
 
-        rc = OK;
+        rc = XWOK;
         for (i = 0; i < (xwssz_t)num; i++) {
                 xwos_irq_save(irqs[i].irqn, &flags[i]);
         }
@@ -1104,7 +1104,7 @@ xwer_t xwlk_bitsplk_trylock_bh(xwptr_t * ptr)
         struct xwos_scheduler * xwsd;
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         xwsd = xwos_scheduler_dspmpt_lc();
         xwos_scheduler_dsbh(xwsd);
 #if (CPUCFG_CPU_NUM > 1)

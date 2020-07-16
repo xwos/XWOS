@@ -128,7 +128,7 @@ __xwmd_rodata const xwu8_t xwscp_frm_sdu_ack[] = {
 };
 
 __xwmd_rodata const xwer_t xwscp_callback_rc[XWSCP_ACK_NUM] = {
-        [XWSCP_ACK_OK] = OK,
+        [XWSCP_ACK_OK] = XWOK,
         [XWSCP_ACK_ESIZE] = -EMSGSIZE,
         [XWSCP_ACK_EALREADY] = -EALREADY,
         [XWSCP_ACK_ECONNRESET] = -ECONNRESET,
@@ -248,7 +248,7 @@ xwer_t xwscp_tx_cfrm_sync(struct xwscp * xwscp, xwtm_t * xwtm)
                 frm->sdu[16] = (xwu8_t)((crc32 >> 0U) & 0xFFU);
                 csmtxid = xwosal_mtx_get_id(&xwscp->csmtx);
                 rc = xwosal_mtx_lock(csmtxid);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         rc = xwscp_hwifal_tx(xwscp, frm, xwtm);
                         xwosal_mtx_unlock(csmtxid);
                 }/* else {} */
@@ -290,7 +290,7 @@ xwer_t xwscp_tx_cfrm_sync_ack(struct xwscp * xwscp, xwu32_t rxcnt)
         frm->sdu[16] = (xwu8_t)((crc32 >> 0U) & 0xFFU);
         csmtxid = xwosal_mtx_get_id(&xwscp->csmtx);
         rc = xwosal_mtx_lock(csmtxid);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 xwtm = XWTM_MAX;
                 rc = xwscp_hwifal_tx(xwscp, frm, &xwtm);
                 xwosal_mtx_unlock(csmtxid);
@@ -328,7 +328,7 @@ xwer_t xwscp_tx_sdu_ack(struct xwscp * xwscp, xwu8_t id, xwu8_t ack)
 
         csmtxid = xwosal_mtx_get_id(&xwscp->csmtx);
         rc = xwosal_mtx_lock(csmtxid);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 xwtm = XWTM_MAX;
                 rc = xwscp_hwifal_tx(xwscp, frm, &xwtm);
                 xwosal_mtx_unlock(csmtxid);
@@ -372,7 +372,7 @@ xwer_t xwscp_fmt_msg(struct xwscp * xwscp, struct xwscp_frame * frm,
         frm->sdu[size + 2] = (xwu8_t)((crc32 >> 8) & 0xFF);
         frm->sdu[size + 3] = (xwu8_t)((crc32 >> 0) & 0xFF);
         frm->eof = XWSCP_HWIFAL_EOF;
-        return OK;
+        return XWOK;
 
 err_notsync:
         return rc;
@@ -382,7 +382,7 @@ err_notsync:
  * @brief 校验帧是否合法
  * @param xwscp: (I) XWSCP对象的指针
  * @param frm: (I) 被校验的帧的指针
- * @retval OK: 合法
+ * @retval XWOK: 没有错误
  * @retval -EBADMSG: 校验错误
  */
 static __xwmd_code
@@ -409,7 +409,7 @@ xwer_t xwscp_chk_frm(struct xwscp_frame * frm)
                     (((crc32 >> 0) & 0xFF) != crc32_pos[3])) {
                         rc = -EBADMSG;
                 } else {
-                        rc = OK;
+                        rc = XWOK;
                 }
         }
         return rc;
@@ -500,7 +500,7 @@ xwer_t xwscp_rx_cfrm_sync(struct xwscp * xwscp, struct xwscp_frmslot * frmslot)
                 rmttxcnt |= ((xwu32_t)frmslot->frm.sdu[11]) << 8U;
                 rmttxcnt |= ((xwu32_t)frmslot->frm.sdu[12]) << 0U;
                 rc = xwscp_tx_cfrm_sync_ack(xwscp, rmttxcnt);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         xwaop_write(xwu32_t, &xwscp->rxq.cnt, rmttxcnt + 1, NULL);
                 }/* else {} */
         } else {
@@ -555,7 +555,7 @@ xwer_t xwscp_rx_cfrm_sync_ack(struct xwscp * xwscp, struct xwscp_frmslot * frmsl
                 xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_CONNECT, &xwtm);
         }/* else {} */
         xwscp_free_frmslot(xwscp, frmslot);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -572,7 +572,7 @@ xwer_t xwscp_rx_frm_sdu_ack(struct xwscp * xwscp, struct xwscp_frmslot * frmslot
         xwu8_t rmtrxsize, txsize;
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         rmtrxsize = frmslot->frm.sdu[0];
         csmtxid = xwosal_mtx_get_id(&xwscp->csmtx);
         rc = xwosal_mtx_lock(csmtxid);
@@ -619,7 +619,7 @@ xwer_t xwscp_rx_frm_sdu(struct xwscp * xwscp, struct xwscp_frmslot * frmslot)
 
         if (rxid == localid) {
                 rc = xwscp_tx_sdu_ack(xwscp, localid, XWSCP_ACK_OK);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         xwaop_add(xwu32_t, &xwscp->rxq.cnt, 1, NULL, NULL);
                         xwscp_rxq_pub(xwscp, frmslot);
                 } else {
@@ -680,11 +680,11 @@ xwer_t xwscp_fsm(struct xwscp * xwscp)
 
         do {
                 rc = xwscp_hwifal_rx(xwscp, &frmslot);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         rc = xwscp_chk_frm(&frmslot->frm);
                 }
         } while ((-EAGAIN == rc) || (-EBADMSG == rc));
-        if (OK == rc) {
+        if (XWOK == rc) {
                 rc = xwscp_rx_frm(xwscp, frmslot);
         }
         return rc;
@@ -698,7 +698,7 @@ xwer_t xwscp_fsm(struct xwscp * xwscp)
 __xwmd_code
 xwer_t xwscp_thrd(struct xwscp * xwscp)
 {
-        xwer_t rc = OK;
+        xwer_t rc = XWOK;
 
         while (!xwosal_cthrd_shld_stop()) {
                 if (xwosal_cthrd_shld_frz()) {
@@ -711,7 +711,7 @@ xwer_t xwscp_thrd(struct xwscp * xwscp)
                         xwscplogf(DEBUG, "Resuming ...\n");
                 } else if (XWSCP_HWIFST_OPENED == xwscp->hwifst) {
                         rc = xwscp_fsm(xwscp);
-                        if (OK == rc) {
+                        if (XWOK == rc) {
                         } else if (-ETIMEDOUT == rc) {
                         } else if ((-EINTR == rc) || (-ERESTARTSYS == rc)) {
                                 xwscplogf(DEBUG, "Interrupted ... [rc:%d]\n", rc);

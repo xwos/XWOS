@@ -106,7 +106,7 @@ xwer_t mpc560xb_spim_check_desc(struct xwds_spim * spim)
         else if (__unlikely(is_err_or_null(drvdata)))
                 rc = -EINVAL;
         else
-                rc = OK;
+                rc = XWOK;
         return rc;
 }
 
@@ -120,7 +120,7 @@ xwer_t mpc560xb_spim_drv_probe(struct xwds_device * dev)
 
         spim = xwds_static_cast(struct xwds_spim *, dev);
         rc = mpc560xb_spim_check_desc(spim);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 drvdata = dev->data;
                 xwosal_cdt_init(&drvdata->cdt);
                 xwosal_splk_init(&drvdata->lock);
@@ -135,7 +135,7 @@ xwer_t mpc560xb_spim_drv_remove(struct xwds_device * dev)
 
         drvdata = dev->data;
         xwosal_cdt_destroy(&drvdata->cdt);
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -289,7 +289,7 @@ xwer_t mpc560xb_spim_drv_start(struct xwds_device * dev)
                 irqrsc = &resources->irqrsc_array[i];
                 xwos_irq_clear(irqrsc->irqn);
                 rc = xwos_irq_cfg(irqrsc->irqn, irqrsc->cfg);
-                if (OK == rc)
+                if (XWOK == rc)
                         rc = xwos_irq_enable(irqrsc->irqn);
                 if (__unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
@@ -304,7 +304,7 @@ xwer_t mpc560xb_spim_drv_start(struct xwds_device * dev)
         drvdata->msg = NULL;
         drvdata->txpos = 0;
         drvdata->rxpos = 0;
-        return OK;
+        return XWOK;
 
 err_en_irq:
         for (j = (xwssz_t)resources->gpiorsc_num - 1; j >= 0; j--) {
@@ -374,7 +374,7 @@ xwer_t mpc560xb_spim_drv_stop(struct xwds_device * dev)
                         goto err_irq_release;
                 }
         }
-        return OK;
+        return XWOK;
 
 err_irq_release:
 err_clk_release:
@@ -424,7 +424,7 @@ xwer_t mpc560xb_spim_drv_suspend(struct xwds_device * dev)
                 }
         }
 
-        return OK;
+        return XWOK;
 
 err_clk_release:
 err_gpio_release:
@@ -478,7 +478,7 @@ xwer_t mpc560xb_spim_drv_resume(struct xwds_device * dev)
                 irqrsc = &resources->irqrsc_array[i];
                 xwos_irq_clear(irqrsc->irqn);
                 rc = xwos_irq_cfg(irqrsc->irqn, irqrsc->cfg);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         rc = xwos_irq_enable(irqrsc->irqn);
                 }
                 if (__unlikely(rc < 0)) {
@@ -490,7 +490,7 @@ xwer_t mpc560xb_spim_drv_resume(struct xwds_device * dev)
                 }
         }
 
-        return OK;
+        return XWOK;
 
 err_en_irq:
         for (j = (xwssz_t)resources->gpiorsc_num - 1; j >= 0; j--) {
@@ -521,7 +521,7 @@ xwer_t mpc560xb_spim_drv_xfer(struct xwds_spim * spim,
         xwreg_t cpuirq;
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         resources = spim->dev.resources;
         drvdata = spim->dev.data;
         reg = resources->regrsc_array[0].base;

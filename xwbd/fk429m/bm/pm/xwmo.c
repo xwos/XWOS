@@ -146,7 +146,7 @@ xwer_t bm_pm_start(void)
         if (rc < 0) {
                 goto err_thrd_create;
         }
-        return OK;
+        return XWOK;
 
 err_thrd_create:
         xwosal_smr_destroy(&bm_pm_smr);
@@ -159,9 +159,9 @@ xwer_t bm_pm_stop(void)
         xwer_t rc, trc;
 
         rc = xwosal_thrd_terminate(bm_pm_thrd_id, &trc);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 rc = xwosal_thrd_delete(bm_pm_thrd_id);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         bm_pm_thrd_id = 0;
                 }
         }
@@ -257,7 +257,7 @@ xwer_t bm_pm_get_btn_evt(xwsq_t * evt)
         } else {
                 *evt = BM_PM_BTNEVT_LONGPRESS;
         }
-        return OK;
+        return XWOK;
 
 err_gpio_input:
 err_sleep:
@@ -287,7 +287,7 @@ xwer_t bm_pm_thrd_init(void)
         if (__unlikely(rc < 0)) {
                 goto err_eirq_req;
         }
-        return OK;
+        return XWOK;
 
 err_eirq_req:
 err_btn_gpio_req:
@@ -387,7 +387,7 @@ xwer_t bm_pm_thrd(void * arg)
                         bm_pm_resume();
                 } else {
                         rc = bm_pm_get_btn_evt(&evt);
-                        if (OK == rc) {
+                        if (XWOK == rc) {
                                 bm_pm_handle_evt(evt);
                                 bm_pm_req_btn_irq();
                         } else if ((-EINTR == rc) || (-ERESTARTSYS == rc)) {

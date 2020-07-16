@@ -54,7 +54,7 @@ int MMC_disk_initialize(void)
         int rc;
 
         if (HAL_SD_STATE_READY == hsd.State) {
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = MX_SDIO_SD_TrimClk(10);
         }
@@ -83,22 +83,22 @@ int MMC_disk_ioctl(uint8_t cmd, void * buff)
 
         switch (cmd) {
         case CTRL_SYNC:
-                rc = OK;
+                rc = XWOK;
                 break;
         case GET_SECTOR_COUNT:
                 *(uint32_t *)buff = (hsd.SdCard.BlockSize * hsd.SdCard.BlockNbr) / MX_SD_SECTOR_SIZE;
-                rc = OK;
+                rc = XWOK;
                 break;
         case GET_SECTOR_SIZE:
                 *(uint16_t *)buff = MX_SD_SECTOR_SIZE;
-                rc = OK;
+                rc = XWOK;
                 break;
         case GET_BLOCK_SIZE:
                 *(uint32_t *)buff = hsd.SdCard.BlockSize;
-                rc = OK;
+                rc = XWOK;
                 break;
         case CTRL_TRIM:
-                rc = OK;
+                rc = XWOK;
                 break;
         default:
                 rc = -EINVAL;

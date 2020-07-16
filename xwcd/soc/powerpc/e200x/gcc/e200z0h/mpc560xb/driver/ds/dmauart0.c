@@ -126,7 +126,7 @@ xwer_t mpc560xb_dmauart0_check_desc(struct xwds_dmauartc * dmauartc)
                 goto err_nodrvdata;
         }
 
-        return OK;
+        return XWOK;
 
 err_nodrvdata:
 err_nocfg:
@@ -286,7 +286,7 @@ xwer_t mpc560xb_dmauart0_drv_start(struct xwds_device * dev)
                 irqrsc = &resources->irqrsc_array[i];
                 xwos_irq_clear(irqrsc->irqn);
                 rc = xwos_irq_cfg(irqrsc->irqn, irqrsc->cfg);
-                if (OK == rc)
+                if (XWOK == rc)
                         rc = xwos_irq_enable(irqrsc->irqn);
                 if (__unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
@@ -306,7 +306,7 @@ xwer_t mpc560xb_dmauart0_drv_start(struct xwds_device * dev)
         if (__unlikely(rc < 0))
                 goto err_rxdma_setup;
 
-        return OK;
+        return XWOK;
 
 err_rxdma_setup:
         for (j = (xwssz_t)resources->irqrsc_num - 1; j >=0; j--) {
@@ -399,7 +399,7 @@ xwer_t mpc560xb_dmauart0_drv_stop(struct xwds_device * dev)
 
         drvdata = dmauartc->dev.data;
         xwosal_cdt_destroy(&drvdata->tx.cdt);
-        return OK;
+        return XWOK;
 
 err_irq_rls:
 err_clk_rls:
@@ -449,7 +449,7 @@ xwer_t mpc560xb_dmauart0_drv_suspend(struct xwds_device * dev)
                 if (__unlikely(rc < 0))
                         goto err_clk_rls;
         }
-        return OK;
+        return XWOK;
 
 err_clk_rls:
 err_gpio_rls:
@@ -515,7 +515,7 @@ xwer_t mpc560xb_dmauart0_drv_resume(struct xwds_device * dev)
         LINFLEX_0.LINCR1.B.INIT = 0;
         LINFLEX_0.GCR.B.SR = 1;
 
-        return OK;
+        return XWOK;
 
 err_req_dmas:
         for (j = (xwssz_t)resources->gpiorsc_num - 1; j >= 0; j--) {
@@ -559,7 +559,7 @@ void mpc560xb_dmauart0_tx_cb(struct xwds_soc * soc, xwid_t ch, xwu32_t rc,
                 if (rc) {
                         drvdata->tx.rc = -EIO;
                 } else {
-                        drvdata->tx.rc = OK;
+                        drvdata->tx.rc = XWOK;
                 }
         } else {
         }
@@ -599,11 +599,11 @@ xwer_t mpc560xb_dmauart0_drv_tx(struct xwds_dmauartc * dmauartc,
         xwosal_splk_lock_cpuirqsv(&drvdata->tx.splk, &flag);
         drvdata->tx.rc = -EINPROGRESS;
         rc = xwds_dma_enable(txdmarsc->soc, txdmarsc->ch);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&drvdata->tx.cdt),
                                           ulk, XWLK_TYPE_SPLK, NULL,
                                           xwtm, &lkst);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         if (XWLK_STATE_UNLOCKED == lkst) {
                                 xwosal_splk_lock(&drvdata->tx.splk);
                         }
@@ -673,7 +673,7 @@ xwer_t mpc560xb_dmauart0_rxdma_setup(struct xwds_dmauartc * dmauartc)
         if (__unlikely(rc < 0)) {
                 goto err_dma_en;
         }
-        return OK;
+        return XWOK;
 
 err_dma_en:
 err_dma_cfg:

@@ -49,7 +49,7 @@ xwer_t xwaop__xwu32_t__tst_then_op(__atomic xwu32_t * a,
                         } else {
                                 n = o;
                         }
-                        rc = OK;
+                        rc = XWOK;
                 } else {
                         rc = -EACCES;
                         n = o;
@@ -61,7 +61,7 @@ xwer_t xwaop__xwu32_t__tst_then_op(__atomic xwu32_t * a,
                 } else {
                         n = o;
                 }
-                rc = OK;
+                rc = XWOK;
         }
         arch_cpuirq_restore_lc(flag);
         if (nv) {

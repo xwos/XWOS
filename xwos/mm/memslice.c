@@ -88,7 +88,7 @@ xwer_t xwmm_memslice_init(struct xwmm_memslice * msa, xwptr_t origin,
                 curr = next;
         }
 
-        return OK;
+        return XWOK;
 
 err_mem2small:
         return rc;
@@ -100,7 +100,7 @@ xwer_t xwmm_memslice_destroy(struct xwmm_memslice * msa)
         XWOS_VALIDATE((msa), "nullptr", -EFAULT);
 
         XWOS_UNUSED(msa);
-        return OK;
+        return XWOK;
 }
 
 __xwos_api
@@ -134,7 +134,7 @@ xwer_t xwmm_memslice_create(struct xwmm_memslice ** ptrbuf,
         }
 
         *ptrbuf = msa;
-        return OK;
+        return XWOK;
 
 err_msa_init:
         xwmm_kma_free(msa);
@@ -148,7 +148,7 @@ xwer_t xwmm_memslice_delete(struct xwmm_memslice * msa)
 {
         XWOS_VALIDATE((msa), "nullptr", -EFAULT);
         xwmm_kma_free(msa);
-        return OK;
+        return XWOK;
 }
 
 __xwos_api
@@ -169,7 +169,7 @@ xwer_t xwmm_memslice_alloc(struct xwmm_memslice * msa, void ** membuf)
         xwaop_sub(xwsz_t, &msa->num_free, 1, NULL, NULL);
         *(xwptr_t *)card = msa->backup; /* restore original data */
         *membuf = card;
-        return OK;
+        return XWOK;
 
 err_lfq_pop:
         return rc;
@@ -194,7 +194,7 @@ xwer_t xwmm_memslice_free(struct xwmm_memslice * msa, void * mem)
                 card = (__atomic xwlfq_t *)mem;
                 xwlib_lfq_push(&msa->free_list, card);
                 xwaop_add(xwsz_t, &msa->num_free, 1, NULL, NULL);
-                rc = OK;
+                rc = XWOK;
         }
 
         return rc;

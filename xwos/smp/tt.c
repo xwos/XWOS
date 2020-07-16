@@ -95,7 +95,7 @@ xwer_t xwos_tt_init(struct xwos_tt * xwtt)
  * @param xwtt: (I) 时间树的指针
  * @param ttn: (I) 时间树节点的指针
  * @param cpuirq: (I) CPU中断开关标志
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINTR: 被中断
  * @retval -ETIMEDOUT: 超时
  * @note
@@ -187,7 +187,7 @@ retry:
                 } else {
                         xwlib_bclst_add_head(&n->rbb, &ttn->rbb);
                 }
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -249,7 +249,7 @@ void xwos_tt_rmrbn_locked(struct xwos_tt * xwtt, struct xwos_ttn * ttn)
  * @brief 从时间树中删除节点
  * @param xwtt: (I) 时间树的指针
  * @param ttn: (I) 时间树节点的指针
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ESRCH: 时间树中不存在该节点
  * @note
  * - 此函数只能在获得写锁xwtt->lock，且CPU中断被关闭时调用。
@@ -273,7 +273,7 @@ xwer_t xwos_tt_remove_locked(struct xwos_tt * xwtt, struct xwos_ttn * ttn)
                 xwaop_store(xwsq_t, &ttn->wkuprs,
                             xwmb_modr_release, XWOS_TTN_WKUPRS_INTR);
                 ttn->cb = NULL;
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }
@@ -289,7 +289,7 @@ xwer_t xwos_tt_check_deadline(struct xwos_tt * xwtt)
         xwtm_t tick;
         xwer_t rc;
 
-        rc = OK;
+        rc = XWOK;
         xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
         for (tick = xwos_syshwt_get_timetick(&xwtt->hwt);
              ((NULL != xwtt->leftmost) && (xwtm_cmp(xwtt->deadline, tick) <= 0));
@@ -356,7 +356,7 @@ xwer_t xwos_syshwt_init(struct xwos_syshwt * hwt)
         xwlk_sqlk_init(&hwt->lock);
         /* Port code of CUP Description Layer must set the irqc & irqrsc */
         rc = soc_syshwt_init(hwt);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 XWOS_BUG_ON(NULL == hwt->irqrsc);
                 XWOS_BUG_ON(0 == hwt->irqs_num);
         }

@@ -68,7 +68,7 @@ xwer_t arch_boot_image(void * addr)
                 imgt = imgd->tail_flag_addr;
                 flag_matched = !strcmp(imgt->flag, ARCHCFG_IMAGE_TAILFLAG);
                 if ((flag_matched) && (imgd->entry)) {
-                        rc = OK;
+                        rc = XWOK;
                         arch_goto_image(*((xwstk_t **)imgd->head), imgd->entry);
                         /* never return to here. */
                 } else {

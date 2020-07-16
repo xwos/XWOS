@@ -103,7 +103,7 @@ xwer_t mpc560xb_uartc_check_desc(struct xwds_uartc * uartc)
                 if (__unlikely(is_err_or_null(cfg)))
                         rc = -EINVAL;
                 else
-                        rc = OK;
+                        rc = XWOK;
         }
         return rc;
 }
@@ -236,7 +236,7 @@ xwer_t mpc560xb_uartc_drv_start(struct xwds_device * dev)
                 irqrsc = &resources->irqrsc_array[i];
                 xwos_irq_clear(irqrsc->irqn);
                 rc = xwos_irq_cfg(irqrsc->irqn, irqrsc->cfg);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         rc = xwos_irq_enable(irqrsc->irqn);
                 }
                 if (__unlikely(rc < 0)) {
@@ -251,7 +251,7 @@ xwer_t mpc560xb_uartc_drv_start(struct xwds_device * dev)
         /* enable uart */
         linflex_reg->LINCR1.B.INIT = 0;
 
-        return OK;
+        return XWOK;
 
 err_en_irq:
 err_setup_bd:
@@ -329,7 +329,7 @@ xwer_t mpc560xb_uartc_drv_stop(struct xwds_device * dev)
                         goto err_irq_release;
                 }
         }
-        return OK;
+        return XWOK;
 
 err_irq_release:
 err_clk_release:
@@ -375,7 +375,7 @@ xwer_t mpc560xb_uartc_drv_suspend(struct xwds_device * dev)
                         goto err_clk_release;
                 }
         }
-        return OK;
+        return XWOK;
 
 err_clk_release:
 err_gpio_release:
@@ -430,7 +430,7 @@ xwer_t mpc560xb_uartc_drv_resume(struct xwds_device * dev)
         linflex_reg->LINIER.B.DRIE = 1; /* enable rx interrupt */
         linflex_reg->LINCR1.B.INIT = 0;
 
-        return OK;
+        return XWOK;
 
 err_req_gpios:
         for (j = (xwssz_t)resources->clkrsc_num - 1; j >= 0; j--) {
@@ -460,7 +460,7 @@ xwer_t mpc560xb_uartc_drv_tx(struct xwds_uartc * uartc, xwu8_t byte)
         resources = uartc->dev.resources;
         linflex_reg = resources->regrsc_array[0].base;
         linflex_reg->BDRL.B.DATA0 = byte;
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -474,7 +474,7 @@ xwer_t mpc560xb_uartc_drv_rx(struct xwds_uartc * uartc, xwu8_t * rxbuf)
         linflex_reg->UARTSR.B.DRF = 1;
         *rxbuf = (xwu8_t)linflex_reg->BDRM.B.DATA4;
         linflex_reg->UARTSR.B.RMB = 1;
-        return OK;
+        return XWOK;
 }
 
 /******** ******** uart isr ******** ********/

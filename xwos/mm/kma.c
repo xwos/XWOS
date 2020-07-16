@@ -105,7 +105,7 @@ xwer_t xwmm_dkma_alloc(xwsz_t size, xwsz_t aligned, void ** membuf)
  * @brief 释放内存到默认的内核内存分配器
  * @param mem: (I) 内存首地址指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -133,7 +133,7 @@ xwer_t xwmm_kma_init(void)
 __xwos_exit_code
 xwer_t xwmm_kma_exit(void)
 {
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -160,7 +160,7 @@ xwer_t xwmm_kma_alloc(xwsz_t size, xwsz_t aligned, void ** membuf)
  * @brief XWMM API：释放内核内存
  * @param mem: (I) 内存首地址指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步

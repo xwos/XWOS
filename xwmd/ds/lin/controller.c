@@ -106,7 +106,7 @@ xwer_t xwds_linc_cvop_probe(struct xwds_linc * linc)
         if (__unlikely(rc < 0)) {
                 goto err_dev_cvop_probe;
         }
-        return OK;
+        return XWOK;
 
 err_dev_cvop_probe:
         xwosal_mtx_destroy(&linc->txlock);
@@ -129,7 +129,7 @@ xwer_t xwds_linc_cvop_remove(struct xwds_linc * linc)
                 goto err_dev_cvop_remove;
         }
         xwosal_mtx_destroy(&linc->txlock);
-        return OK;
+        return XWOK;
 
 err_dev_cvop_remove:
         return rc;
@@ -234,7 +234,7 @@ xwer_t xwds_linc_msttx(struct xwds_linc * linc,
 
         xwds_linc_release(linc);
         xwds_linc_put(linc);
-        return OK;
+        return XWOK;
 
 err_drv_msttx:
         xwosal_mtx_unlock(xwosal_mtx_get_id(&linc->txlock));
@@ -284,7 +284,7 @@ xwer_t xwds_linc_slvtx(struct xwds_linc * linc,
 
         xwds_linc_release(linc);
         xwds_linc_put(linc);
-        return OK;
+        return XWOK;
 
 err_drv_slvtx:
         xwosal_mtx_unlock(xwosal_mtx_get_id(&linc->txlock));
@@ -329,7 +329,7 @@ xwer_t xwds_linc_rx(struct xwds_linc * linc,
 
         xwds_linc_release(linc);
         xwds_linc_put(linc);
-        return OK;
+        return XWOK;
 
 err_drv_rx:
         xwds_linc_release(linc);
@@ -359,7 +359,7 @@ xwer_t xwds_linc_get_msg_size(struct xwds_linc * linc,
                 for (i = 0; i < itemnum; i++) {
                         if (protected_id == msgitbl[i].protected_id) {
                                 *ret = msgitbl[i].size;
-                                rc = OK;
+                                rc = XWOK;
                                 break;
                         }
                 }
@@ -367,7 +367,7 @@ xwer_t xwds_linc_get_msg_size(struct xwds_linc * linc,
                         *ret = XWDS_LIN_DEFAULT_DATA_SIZE;
                 }
         } else {
-                rc = OK;
+                rc = XWOK;
                 *ret = XWDS_LIN_DEFAULT_DATA_SIZE;
         }
         return rc;

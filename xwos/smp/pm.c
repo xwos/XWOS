@@ -76,7 +76,7 @@ xwer_t xwos_pmdm_suspend(struct xwos_pmdm * pmdm)
                                 XWOS_PMDM_STAGE_RUNNING,
                                 1,
                                 &nv, NULL);
-        if ((OK == rc) && (XWOS_PMDM_STAGE_FREEZING == nv)) {
+        if ((XWOK == rc) && (XWOS_PMDM_STAGE_FREEZING == nv)) {
                 for (cpuid = 0; cpuid < pmdm->xwsd_num; cpuid++) {
                         rc = xwos_scheduler_suspend(cpuid);
                         if (__unlikely(rc < 0)) {
@@ -100,7 +100,7 @@ xwer_t xwos_pmdm_resume(struct xwos_pmdm * pmdm)
                                         XWOS_PMDM_STAGE_SUSPENDED,
                                         1,
                                         &nv, &ov);
-                if ((OK == rc) && (XWOS_PMDM_STAGE_RESUMING == nv)) {
+                if ((XWOK == rc) && (XWOS_PMDM_STAGE_RESUMING == nv)) {
                         if (pmdm->cb.wakeup) {
                                 pmdm->cb.wakeup(pmdm, pmdm->cb.arg);
                         }/* else {} */
@@ -110,7 +110,7 @@ xwer_t xwos_pmdm_resume(struct xwos_pmdm * pmdm)
                                         XWOS_PMDM_STAGE_RESUMING,
                                         1,
                                         &nv, &ov);
-                if ((OK == rc) && (XWOS_PMDM_STAGE_THAWING == nv)) {
+                if ((XWOK == rc) && (XWOS_PMDM_STAGE_THAWING == nv)) {
                         xwlk_splk_lock_cpuirqsv(&pmdm->rslock, &cpuirq);
                         if (pmdm->cb.resume) {
                                 pmdm->cb.resume(pmdm, pmdm->cb.arg);
@@ -122,7 +122,7 @@ xwer_t xwos_pmdm_resume(struct xwos_pmdm * pmdm)
                                         XWOS_PMDM_STAGE_THAWING,
                                         1,
                                         &nv, &ov);
-                if ((OK == rc) && (XWOS_PMDM_STAGE_RUNNING == nv)) {
+                if ((XWOK == rc) && (XWOS_PMDM_STAGE_RUNNING == nv)) {
                         for (cpuid = 0; cpuid < pmdm->xwsd_num; cpuid++) {
                                 rc = xwos_scheduler_resume(cpuid);
                                 if (__unlikely(rc < 0)) {
@@ -166,7 +166,7 @@ void xwos_pmdm_report_xwsd_suspended(struct xwos_pmdm * pmdm)
                                         XWOS_PMDM_STAGE_FREEZING,
                                         1,
                                         &nv, NULL);
-                if ((OK == rc) && (XWOS_PMDM_STAGE_SUSPENDING == nv)) {
+                if ((XWOK == rc) && (XWOS_PMDM_STAGE_SUSPENDING == nv)) {
                         if (pmdm->cb.suspend) {
                                 pmdm->cb.suspend(pmdm, pmdm->cb.arg);
                         }/* else {} */

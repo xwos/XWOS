@@ -124,7 +124,7 @@ void xwos_swt_deactivate(struct xwos_swt * swt)
  * @param name: (I) 名字
  * @param flag: (I) 标志
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -138,7 +138,7 @@ xwer_t xwos_swt_init(struct xwos_swt * swt,
 {
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
         xwos_swt_activate(swt, name, flag);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -147,7 +147,7 @@ xwer_t xwos_swt_init(struct xwos_swt * swt,
  * @param name: (I) 名字
  * @param flag: (I) 标志
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -160,7 +160,7 @@ xwer_t xwos_swt_destroy(struct xwos_swt * swt)
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
 
         xwos_swt_deactivate(swt);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -169,7 +169,7 @@ xwer_t xwos_swt_destroy(struct xwos_swt * swt)
  * @param name: (I) 名字
  * @param flag: (I) 标志
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -198,7 +198,7 @@ xwer_t xwos_swt_create(struct xwos_swt ** ptrbuf,
         }
         xwos_swt_activate(swt, name, flag);
         *ptrbuf = swt;
-        return OK;
+        return XWOK;
 
 err_swt_alloc:
         return rc;
@@ -208,7 +208,7 @@ err_swt_alloc:
  * @brief XWOS API：删除动态创建的软件定时器对象
  * @param swt: (I) 软件定时器对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
@@ -222,7 +222,7 @@ xwer_t xwos_swt_delete(struct xwos_swt * swt)
 
         xwos_swt_deactivate(swt);
         xwos_swt_free(swt);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -264,7 +264,7 @@ void xwos_swt_ttn_cb(void * entry)
  * @param cb: (I) 定时器回调函数
  * @param arg: (I) 定时器回调函数的参数
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EINVAL: 无效参数
  * @retval -EALREADY: 定时器已经开启
  * @note
@@ -315,7 +315,7 @@ err_already:
  * @brief XWOS API：停止软件定时器
  * @param swt: (I) 软件定时器对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ESRCH: 定时器没有被开启
  * @note
  * - 同步/异步：同步

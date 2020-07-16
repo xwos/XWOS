@@ -138,7 +138,7 @@ void xwds_cantrcv_destruct(struct xwds_cantrcv * cantrcv);
  * @param cantrcv: (I) CAN接收器对象指针
  * @param opmode: (I) 唤醒模式
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ERANGE: 不支持的模式
  * @note
@@ -165,7 +165,7 @@ void xwds_cantrcv_get_opmode(struct xwds_cantrcv * cantrcv, xwsq_t * opmode);
  * @brief XWDS API：开启CAN接收器的唤醒
  * @param cantrcv: (I) CAN接收器对象指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EOPNOTSUPP: 不支持此API
  * @note
@@ -180,7 +180,7 @@ xwer_t xwds_cantrcv_enable_wkup(struct xwds_cantrcv * cantrcv);
  * @brief XWDS API：关闭CAN接收器的唤醒
  * @param cantrcv: (I) CAN接收器对象指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EOPNOTSUPP: 不支持此API
  * @note

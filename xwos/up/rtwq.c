@@ -165,7 +165,7 @@ void xwos_rtwq_rmrbn(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn)
  * @brief 将等待队列节点从实时等待队列中移除
  * @param xwrtwq: (I) 实时等待队列
  * @param wqn: (I) 等待队列节点结构体指针
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ESRCH: 等待队列中不存在该节点
  * @note
  * - 这个函数只能在临界区中调用。
@@ -185,7 +185,7 @@ xwer_t xwos_rtwq_remove(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn)
                 } else {
                         xwos_rtwq_rmrbn(xwrtwq, wqn);
                 }
-                rc = OK;
+                rc = XWOK;
         }
         return rc;
 }

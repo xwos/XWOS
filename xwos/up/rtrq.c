@@ -56,7 +56,7 @@ void xwos_rtrq_init(struct xwos_rtrq * xwrtrq)
  * @brief 将线程加入到实时就绪队列的头部
  * @param xwrtrq: (I) XWOS的实时就绪队列
  * @param tcb: (I) 线程控制块的指针
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EPERM: 线程没有设置状态标志@ref XWSDOBJ_DST_READY
  * @note
  * - 当线程加入到就绪队列时，它不应该拥有下面的状态：
@@ -85,7 +85,7 @@ void xwos_rtrq_add_head(struct xwos_rtrq * xwrtrq, struct xwos_tcb * tcb)
  * @brief 将线程加入到实时就绪队列的尾部
  * @param xwrtrq: (I) XWOS的实时就绪队列
  * @param tcb: (I) 线程控制块的指针
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EPERM: 线程没有设置状态标志@ref XWSDOBJ_DST_READY
  * @note
  * - 当线程加入到就绪队列时，它不应该拥有下面的状态：

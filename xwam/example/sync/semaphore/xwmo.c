@@ -108,7 +108,7 @@ xwer_t example_semaphore_start(void)
                 goto err_nthrd_create;
         }
 
-        return OK;
+        return XWOK;
 
 
 err_nthrd_create:
@@ -124,7 +124,7 @@ xwer_t example_semaphore_wthrd_func(void * arg)
 {
         xwid_t smrid;
         xwtm_t time;
-        xwer_t rc = OK;
+        xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
 
@@ -132,7 +132,7 @@ xwer_t example_semaphore_wthrd_func(void * arg)
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
                 time = 10 * XWTM_S;
                 rc = xwosal_smr_timedwait(smrid, &time);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         xwlogf(INFO, "smrtst", "Acquired!\n");
                 } else {
                         xwlogf(INFO, "smrtst", "Error:%d\n", rc);
@@ -145,7 +145,7 @@ xwer_t example_semaphore_nthrd_func(void * arg)
 {
         xwid_t smrid;
         xwtm_t time;
-        xwer_t rc = OK;
+        xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
 

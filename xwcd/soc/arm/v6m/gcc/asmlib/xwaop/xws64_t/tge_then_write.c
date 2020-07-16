@@ -42,7 +42,7 @@ xwer_t xwaop__xws64_t__tge_then_write(__atomic xws64_t * a,
         o = *a;
         if (o >= t) {
                 *a = v;
-                rc = OK;
+                rc = XWOK;
         } else {
                 rc = -EACCES;
         }

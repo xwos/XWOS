@@ -332,7 +332,7 @@ xwsq_t xwds_device_get_refcnt(struct xwds_device * dev)
  * @brief 增加设备运行状态计数器
  * @param dev: (I) 设备对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ESHUTDOWN: 设备已经停止运行
  */
 static __xwds_inline
@@ -353,7 +353,7 @@ xwer_t xwds_device_request(struct xwds_device * dev)
  * @brief 减少设备运行状态计数器
  * @param dev: (I) 设备对象的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EALREADY: 设备已经停止运行
  */
 static __xwds_inline

@@ -124,7 +124,7 @@ xwer_t mpc560xb_i2cm_check_desc(struct xwds_i2cm * i2cm)
                 if (__unlikely(is_err_or_null(xwccfg))) {
                         rc = -EINVAL;
                 } else {
-                        rc = OK;
+                        rc = XWOK;
                 }
         }
         return rc;
@@ -140,7 +140,7 @@ xwer_t mpc560xb_i2cm_drv_probe(struct xwds_device * dev)
 
         i2cm = xwds_static_cast(struct xwds_i2cm *, dev);
         rc = mpc560xb_i2cm_check_desc(i2cm);
-        if (__likely(OK == rc)) {
+        if (__likely(XWOK == rc)) {
                 drvdata = dev->data;
 
                 xwosal_splk_init(&drvdata->lock);
@@ -159,7 +159,7 @@ xwer_t mpc560xb_i2cm_drv_remove(struct xwds_device * dev)
 
         drvdata = dev->data;
         xwosal_cdt_destroy(&drvdata->cdt);
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -231,7 +231,7 @@ xwer_t mpc560xb_i2cm_drv_start(struct xwds_device * dev)
                 irqrsc = &resources->irqrsc_array[i];
                 xwos_irq_clear(irqrsc->irqn);
                 rc = xwos_irq_cfg(irqrsc->irqn, irqrsc->cfg);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         rc = xwos_irq_enable(irqrsc->irqn);
                 }
                 if (__unlikely(rc < 0)) {
@@ -244,7 +244,7 @@ xwer_t mpc560xb_i2cm_drv_start(struct xwds_device * dev)
         }
         I2C.IBCR.B.MDIS = 0; /* enable I2C */
 
-        return OK;
+        return XWOK;
 
 err_en_irq:
         for (j = (xwssz_t)resources->gpiorsc_num - 1; j >= 0; j--) {
@@ -318,7 +318,7 @@ xwer_t mpc560xb_i2cm_drv_stop(struct xwds_device * dev)
                 }
         }
 
-        return OK;
+        return XWOK;
 
 err_irq_release:
 err_clk_release:
@@ -358,7 +358,7 @@ xwer_t mpc560xb_i2cm_drv_suspend(struct xwds_device * dev)
                         goto err_clk_release;
                 }
         }
-        return OK;
+        return XWOK;
 
 err_clk_release:
 err_gpio_release:
@@ -406,7 +406,7 @@ xwer_t mpc560xb_i2cm_drv_resume(struct xwds_device * dev)
         }
         I2C.IBCR.B.MDIS = 0; /* enable I2C */
 
-        return OK;
+        return XWOK;
 
 err_req_gpios:
         for (j = (xwssz_t)resources->clkrsc_num - 1; j >= 0; j--) {
@@ -436,7 +436,7 @@ xwer_t mpc560xb_i2cm_drv_reset(struct xwds_i2cm * i2cm, xwtm_t * xwtm)
         I2C.IBCR.B.MDIS = 0;
         xwosal_splk_unlock_cpuirqrs(&drvdata->lock, cpuirq);
         xwosal_cdt_unicast(xwosal_cdt_get_id(&drvdata->cdt));
-        return OK;
+        return XWOK;
 }
 
 static __xwbsp_code
@@ -467,7 +467,7 @@ xwer_t mpc560xb_i2cm_drv_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg
                 rc = drvdata->xmsg.rc;
         } else if (0 == msg->size) {
                 I2C.IBCR.B.MS = 0;
-                rc = OK;
+                rc = XWOK;
         } else if (XWDS_I2C_F_10BITADDR & msg->flags) {
                 I2C.IBCR.B.MS = 0;
                 rc = -ENOSYS;
@@ -487,7 +487,7 @@ xwer_t mpc560xb_i2cm_drv_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg
                 rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&drvdata->cdt),
                                           ulk, XWLK_TYPE_SPLK, NULL,
                                           xwtm, &lkstate);
-                if (OK == rc) {
+                if (XWOK == rc) {
                         rc = drvdata->xmsg.rc;
                 } else {
                         if (XWLK_STATE_UNLOCKED == lkstate) {
@@ -514,7 +514,7 @@ void mpc560xb_i2cm_txfsm_7bitaddr(struct xwds_i2cm * i2cm)
                         if (XWDS_I2C_F_STOP & msg->flags) {
                                 I2C.IBCR.B.MS = 0;
                         }
-                        drvdata->xmsg.rc = OK;
+                        drvdata->xmsg.rc = XWOK;
                         I2C.IBCR.B.IBIE = 0;
                         xwosal_cdt_unicast(xwosal_cdt_get_id(&drvdata->cdt));
                 } else {
@@ -561,7 +561,7 @@ void mpc560xb_i2cm_rxfsm_7bitaddr(struct xwds_i2cm * i2cm)
                         msg->buf[drvdata->dpos] = I2C.IBDR.R;
                         drvdata->dpos++;
                         if (drvdata->dpos == msg->size) {
-                                drvdata->xmsg.rc = OK;
+                                drvdata->xmsg.rc = XWOK;
                                 xwosal_cdt_unicast(xwosal_cdt_get_id(&drvdata->cdt));
                         }
                 }

@@ -88,7 +88,7 @@ xwmm_mempool_page_get_buddy(struct xwmm_mempool_page_allocator * pa,
  * @param odrbtree: (I) 阶红黑树数组的指针
  * @param pgarray: (I) 页控制块数组的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -E2SMALL: 内存区域太小
  * @retval -EALIGN: 内存区域没有对齐
  */
@@ -151,7 +151,7 @@ xwer_t xwmm_mempool_page_allocator_init(struct xwmm_mempool_page_allocator * pa,
         pa->i_a.malloc = xwmm_mempool_page_i_a_malloc;
         pa->i_a.free = xwmm_mempool_page_i_a_free;
 
-        return OK;
+        return XWOK;
 
 err_aligned:
 err_mem2small:
@@ -162,14 +162,14 @@ err_mem2small:
  * @brief XWMM API：销毁页分配器
  * @param pa: (I) 页分配器的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  */
 __xwos_api
 xwer_t xwmm_mempool_page_allocator_destroy(struct xwmm_mempool_page_allocator * pa)
 {
         XWOS_UNUSED(pa);
 
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -180,7 +180,7 @@ xwer_t xwmm_mempool_page_allocator_destroy(struct xwmm_mempool_page_allocator * 
  * @param size: (I) 内存区域的总大小
  * @param pgsize: (I) 单位页的大小
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -E2SMALL: 内存区域太小
  * @retval -EALIGN: 内存区域没有对齐
  * @retval -ENOMEM: 内存不足
@@ -236,7 +236,7 @@ xwer_t xwmm_mempool_page_allocator_create(struct xwmm_mempool_page_allocator ** 
                 goto err_pa_init;
         }
         *ptrbuf = pa;
-        return OK;
+        return XWOK;
 
 err_pa_init:
         xwmm_kma_free(pa);
@@ -250,7 +250,7 @@ err_mem2small:
  * @brief XWMM API：删除动态创建的页分配器
  * @param pa: (I) 页分配器的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  */
 __xwos_api
 xwer_t xwmm_mempool_page_allocator_delete(struct xwmm_mempool_page_allocator * pa)
@@ -260,7 +260,7 @@ xwer_t xwmm_mempool_page_allocator_delete(struct xwmm_mempool_page_allocator * p
 
         xwmm_mempool_page_allocator_destroy(pa);
         xwmm_kma_free(pa);
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -269,7 +269,7 @@ xwer_t xwmm_mempool_page_allocator_delete(struct xwmm_mempool_page_allocator * p
  * @param order: (I) 页数量的阶，页内存大小：((1 << order) * pa->pgsize)
  * @param pgbuf: (O) 指向缓冲区的指针，通过此缓冲区返回申请到的页控制块的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足
  */
 __xwos_api
@@ -297,7 +297,7 @@ xwer_t xwmm_mempool_page_allocate(struct xwmm_mempool_page_allocator * pa,
                 origin = pa->zone.origin + ((xwsq_t)pg->attr.free.seq * pa->pgsize);
                 pg->mapping = origin;
                 *pgbuf = pg;
-                rc = OK;
+                rc = XWOK;
                 break;
         }
         return rc;
@@ -308,7 +308,7 @@ xwer_t xwmm_mempool_page_allocate(struct xwmm_mempool_page_allocator * pa,
  * @param pa: (I) 页分配器的指针
  * @param pg: (I) 页控制块的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EALREADY: 页内存已释放
  */
 __xwos_api
@@ -329,7 +329,7 @@ xwer_t xwmm_mempool_page_free(struct xwmm_mempool_page_allocator * pa,
         xwlib_rbtree_init_node(&pg->attr.free.rbnode);
         pg->data.value = 0;
         xwmm_mempool_page_combine(pa, pg);
-        return OK;
+        return XWOK;
 
 err_already:
         return rc;
@@ -415,7 +415,7 @@ void xwmm_mempool_page_combine(struct xwmm_mempool_page_allocator * pa,
  * @param ot: (I) 阶红黑树的指针
  * @param pg: (I) 页控制块的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -EEXIST: 页已在阶红黑树中
  * @note
  * - 正在加入的页不在阶红黑树中，所以是私有数据，对pg->mapping的读可在锁外；
@@ -474,7 +474,7 @@ xwer_t xwmm_mempool_page_odrbtree_add(struct xwmm_mempool_page_odrbtree * ot,
         xwlib_rbtree_link(&pg->attr.free.rbnode, lpc);
         xwlib_rbtree_insert_color(tree, &pg->attr.free.rbnode);
         xwosal_sqlk_wr_unlock_cpuirqrs(&ot->lock, flag);
-        return OK;
+        return XWOK;
 
 err_exist:
         return rc;
@@ -485,7 +485,7 @@ err_exist:
  * @param ot: (I) 阶红黑树的指针
  * @param pg: (I) 页控制块的指针
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ESRCH: 页不在阶红黑树中
  * @note
  * - 将要删除的页还在阶红黑树中，所以是共享数据，对pg->mapping的读只可在锁内。
@@ -526,7 +526,7 @@ xwer_t xwmm_mempool_page_odrbtree_remove(struct xwmm_mempool_page_odrbtree * ot,
         xwlib_rbtree_remove(tree, &pg->attr.free.rbnode);
         xwosal_sqlk_wr_unlock_cpuirqrs(&ot->lock, flag);
         xwlib_rbtree_init_node(&pg->attr.free.rbnode);
-        return OK;
+        return XWOK;
 
 err_notfree:
         xwosal_sqlk_wr_unlock_cpuirqrs(&ot->lock, flag);
@@ -662,7 +662,7 @@ xwer_t xwmm_mempool_page_find(struct xwmm_mempool_page_allocator * pa, void * me
                 pg--;
         }
         *pgbuf = pg;
-        return OK;
+        return XWOK;
 }
 
 /**
@@ -671,7 +671,7 @@ xwer_t xwmm_mempool_page_find(struct xwmm_mempool_page_allocator * pa, void * me
  * @param size: (I) 申请的大小
  * @param membuf: (O) 指向缓冲区的指针，通过此缓冲区返回申请到的内存的首地址
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足
  */
 static __xwos_code
@@ -693,7 +693,7 @@ xwer_t xwmm_mempool_page_i_a_malloc(void * this, xwsz_t size, void ** membuf)
                 order++;
         }
         rc = xwmm_mempool_page_allocate(pa, (xwsq_t)order, &pg);
-        if (OK == rc) {
+        if (XWOK == rc) {
                 pg->data.value = size;
                 *membuf = (void *)pg->mapping;
         }
@@ -705,7 +705,7 @@ xwer_t xwmm_mempool_page_i_a_malloc(void * this, xwsz_t size, void ** membuf)
  * @param this: (I) this指针(页分配器)
  * @param mem: (I) 内存的首地址
  * @return 错误码
- * @retval OK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足
  */
 static __xwos_code
@@ -731,7 +731,7 @@ xwer_t xwmm_mempool_page_i_a_free(void * this, void * mem)
         if (rc < 0) {
                 goto err_page_free;
         }
-        return OK;
+        return XWOK;
 
 err_page_free:
 err_range:
