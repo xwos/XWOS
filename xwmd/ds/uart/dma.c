@@ -10,7 +10,7 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  * @note
  * + 中断优先级：定时器中断的优先级 < DMA半完成与完成中断的优先级
- * + 在DMA半完成与完成中断中，进入xwds_dmauartc_lib_rxq_pub前，需要关闭定时器
+ * + 在DMA半完成与完成中断中，进入xwds_dmauartc_drvcb_rxq_pub前，需要关闭定时器
  */
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -467,14 +467,14 @@ err_dmauartc_grab:
         return rc;
 }
 
-/******** ******** Libraries for BSP driver ******** ********/
+/******** ******** Callbacks for BSP driver ******** ********/
 /**
- * @brief XWDS LIB：发布数据到接收队列
+ * @brief XWDS Driver Callback：发布数据到接收队列
  * @param dmauartc: (I) DMA UART控制器对象指针
  * @param tail: (I) 新的数据接收位置（有效数据结尾 + 1）
  */
-__xwds_lib_code
-void xwds_dmauartc_lib_rxq_pub(struct xwds_dmauartc * dmauartc, xwsq_t tail)
+__xwds_code
+void xwds_dmauartc_drvcb_rxq_pub(struct xwds_dmauartc * dmauartc, xwsq_t tail)
 {
         xwsz_t pubsz;
         xwreg_t cpuirq;

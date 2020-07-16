@@ -637,12 +637,12 @@ void mpc560xb_dmauart0_rxdma_cb(struct xwds_soc * soc, xwid_t ch, xwu32_t res,
         rxdmarsc = dmauartc->rxdmarsc;
         if (0 == res) {
                 if (EDMA.TCD[ch].COM.DONE) {
-                        xwds_dmauartc_lib_rxq_pub(dmauartc, 0);
+                        xwds_dmauartc_drvcb_rxq_pub(dmauartc, 0);
                         do {
                                 rc = xwds_dma_enable(rxdmarsc->soc, rxdmarsc->ch);
                         } while (rc < 0);
                 } else {
-                        xwds_dmauartc_lib_rxq_pub(dmauartc, XWDS_DMAUART_RXQ_SIZE);
+                        xwds_dmauartc_drvcb_rxq_pub(dmauartc, XWDS_DMAUART_RXQ_SIZE);
                 }
         } else {
                 XWDS_BUG();
@@ -697,7 +697,7 @@ void mpc560xb_dmauart0_err_isr(void)
                 ch = rxdmarsc->ch;
                 tail = (xwsq_t)(EDMA.TCD[ch].COM.DADDR - (xwu32_t)dmauartc->rxq.mem);
                 if (!(EDMA.IRQRL.R & BIT(ch))) {
-                        xwds_dmauartc_lib_rxq_pub(dmauartc, tail);
+                        xwds_dmauartc_drvcb_rxq_pub(dmauartc, tail);
                 }/* else {} */
         }
         LINFLEX_0.UARTSR.R = 0x0000FFEF;

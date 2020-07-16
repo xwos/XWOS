@@ -313,75 +313,76 @@ xwer_t xwds_canc_set_mode(struct xwds_canc * canc, xwsq_t mode);
 __xwds_api
 xwer_t xwds_canc_set_bd(struct xwds_canc * canc, xwid_t bdcfgid);
 
-/******** ******** CAN controller Libraries for BSP driver ******** ********/
-__xwds_lib_code
-void xwds_canc_lib_setcb_tx_indication(struct xwds_canc * canc,
-                                       void (*cb)(struct xwds_canc *, xwid_t, xwer_t));
+/******** ******** Callbacks for BSP driver ******** ********/
+__xwds_code
+void xwds_canc_drvcb_setcb_tx_indication(struct xwds_canc * canc,
+                                         void (*cb)(struct xwds_canc *,
+                                                    xwid_t, xwer_t));
 
-__xwds_lib_code
-void xwds_canc_lib_setcb_rx_indication(struct xwds_canc * canc,
-                                       void (*cb)(struct xwds_canc *,
-                                                  xwid_t,
-                                                  struct xwds_can_msg *));
+__xwds_code
+void xwds_canc_drvcb_setcb_rx_indication(struct xwds_canc * canc,
+                                         void (*cb)(struct xwds_canc *,
+                                                    xwid_t,
+                                                    struct xwds_can_msg *));
 
-__xwds_lib_code
-void xwds_canc_lib_setcb_wakeup_notification(struct xwds_canc * canc,
+__xwds_code
+void xwds_canc_drvcb_setcb_wakeup_notification(struct xwds_canc * canc,
+                                               void (*cb)(struct xwds_canc *));
+
+__xwds_code
+void xwds_canc_drvcb_setcb_mode_indication(struct xwds_canc * canc,
+                                           void (*cb)(struct xwds_canc *, xwsq_t));
+
+__xwds_code
+void xwds_canc_drvcb_setcb_err_indication(struct xwds_canc * canc,
+                                          void (*cb)(struct xwds_canc *,
+                                                     xwsq_t, xwsq_t, xwsq_t));
+
+__xwds_code
+void xwds_canc_drvcb_setcb_busoff_indication(struct xwds_canc * canc,
                                              void (*cb)(struct xwds_canc *));
 
-__xwds_lib_code
-void xwds_canc_lib_setcb_mode_indication(struct xwds_canc * canc,
-                                         void (*cb)(struct xwds_canc *, xwsq_t));
+__xwds_code
+void xwds_canc_drvcb_init_msg(struct xwds_can_msg * msg, xwu32_t canid,
+                              xwsq_t flag, xwsz_t dlc, xwu8_t sdu[]);
 
-__xwds_lib_code
-void xwds_canc_lib_setcb_err_indication(struct xwds_canc * canc,
-                                        void (*cb)(struct xwds_canc *,
-                                                   xwsq_t, xwsq_t, xwsq_t));
+__xwds_code
+void xwds_canc_drvcb_tx_indication(struct xwds_canc * canc,
+                                   xwid_t txobjid,
+                                   xwer_t rc);
 
-__xwds_lib_code
-void xwds_canc_lib_setcb_busoff_indication(struct xwds_canc * canc,
-                                           void (*cb)(struct xwds_canc *));
+__xwds_code
+void xwds_canc_drvcb_rx_indication(struct xwds_canc * canc,
+                                   xwid_t rxobjid,
+                                   struct xwds_can_msg * rxmsg);
 
-__xwds_lib_code
-void xwds_canc_lib_init_msg(struct xwds_can_msg * msg, xwu32_t canid,
-                            xwsq_t flag, xwsz_t dlc, xwu8_t sdu[]);
+__xwds_code
+void xwds_canc_drvcb_wakeup_notification(struct xwds_canc * canc);
 
-__xwds_lib_code
-void xwds_canc_lib_tx_indication(struct xwds_canc * canc,
-                                 xwid_t txobjid,
-                                 xwer_t rc);
+__xwds_code
+void xwds_canc_drvcb_mode_indication(struct xwds_canc * canc,
+                                     xwsq_t mode);
 
-__xwds_lib_code
-void xwds_canc_lib_rx_indication(struct xwds_canc * canc,
-                                 xwid_t rxobjid,
-                                 struct xwds_can_msg * rxmsg);
+__xwds_code
+void xwds_canc_drvcb_err_indication(struct xwds_canc * canc,
+                                    xwsq_t errcode,
+                                    xwsq_t tec,
+                                    xwsq_t rec);
 
-__xwds_lib_code
-void xwds_canc_lib_wakeup_notification(struct xwds_canc * canc);
+__xwds_code
+void xwds_canc_drvcb_busoff_indication(struct xwds_canc * canc);
 
-__xwds_lib_code
-void xwds_canc_lib_mode_indication(struct xwds_canc * canc,
-                                   xwsq_t mode);
+__xwds_code
+void xwds_canc_drvcb_rxq_init(struct xwds_canc_rxqueue * rxq);
 
-__xwds_lib_code
-void xwds_canc_lib_err_indication(struct xwds_canc * canc,
-                                  xwsq_t errcode,
-                                  xwsq_t tec,
-                                  xwsq_t rec);
+__xwds_code
+void xwds_canc_drvcb_rxq_publish(struct xwds_canc_rxqueue * rxq,
+                                 struct xwds_can_msg * msg);
 
-__xwds_lib_code
-void xwds_canc_lib_busoff_indication(struct xwds_canc * canc);
-
-__xwds_lib_code
-void xwds_canc_lib_rxq_init(struct xwds_canc_rxqueue * rxq);
-
-__xwds_lib_code
-void xwds_canc_lib_rxq_publish(struct xwds_canc_rxqueue * rxq,
-                               struct xwds_can_msg * msg);
-
-__xwds_lib_code
-xwer_t xwds_canc_lib_rxq_acquire(struct xwds_canc_rxqueue * rxq,
-                                 struct xwds_can_msg * buf,
-                                 xwtm_t * xwtm);
+__xwds_code
+xwer_t xwds_canc_drvcb_rxq_acquire(struct xwds_canc_rxqueue * rxq,
+                                   struct xwds_can_msg * buf,
+                                   xwtm_t * xwtm);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   inline function implementations   ******** ********

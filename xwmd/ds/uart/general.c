@@ -714,13 +714,13 @@ err_uartc_grab:
         return rc;
 }
 
-/******** ******** Libraries for BSP driver ******** ********/
+/******** ******** Callbacks for BSP driver ******** ********/
 /**
- * @brief XWDS LIB：UART接收中断响应函数
+ * @brief XWDS Driver Callback：UART接收中断响应函数
  * @param uartc: (I) UART控制器对象指针
  */
-__xwds_lib_code
-void xwds_uartc_lib_rx_isr(struct xwds_uartc * uartc)
+__xwds_code
+void xwds_uartc_drvcb_rx_isr(struct xwds_uartc * uartc)
 {
         const struct xwds_uartc_driver * drv;
         xwreg_t cpuirq;
@@ -755,11 +755,11 @@ err_drv_rx:
 }
 
 /**
- * @brief XWDS LIB：UART发送中断响应函数
+ * @brief XWDS Driver Callback：UART发送中断响应函数
  * @param uartc: (I) UART控制器对象指针
  */
-__xwds_lib_code
-void xwds_uartc_lib_tx_isr(struct xwds_uartc * uartc)
+__xwds_code
+void xwds_uartc_drvcb_tx_isr(struct xwds_uartc * uartc)
 {
         const struct xwds_uartc_driver * drv;
         xwreg_t cpuirq;

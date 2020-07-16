@@ -259,12 +259,12 @@ __xwds_api
 xwer_t xwds_uartc_cfg(struct xwds_uartc * uartc,
                       const struct xwds_uart_cfg * cfg);
 
-/******** ******** Libraries for BSP driver ******** ********/
-__xwds_lib_code
-void xwds_uartc_lib_rx_isr(struct xwds_uartc * uartc);
+/******** ******** Callbacks for BSP driver ******** ********/
+__xwds_code
+void xwds_uartc_drvcb_rx_isr(struct xwds_uartc * uartc);
 
-__xwds_lib_code
-void xwds_uartc_lib_tx_isr(struct xwds_uartc * uartc);
+__xwds_code
+void xwds_uartc_drvcb_tx_isr(struct xwds_uartc * uartc);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   inline function implementations   ******** ********

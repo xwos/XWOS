@@ -125,19 +125,7 @@ err_soc_grab:
         return rc;
 }
 
-/**
- * @brief 通过描述得到时钟资源
- * @param base: (I) 时钟资源数组的基地址
- * @param num: (I) 时钟资源数量
- * @param descay: (I) 寄存器描述数组
- * @param descnum: (I) 寄存器描述数组数量
- * @param ret: (O) 返回时钟资源地址的缓存
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @retval -ENOSR: 找不到描述的资源
- */
-__xwds_lib_code
+__xwds_api
 xwer_t xwds_get_clkrsc(const struct xwds_resource_clk base[], xwsz_t num,
                        const char * descay[], xwsz_t descnum,
                        const struct xwds_resource_clk ** ret)

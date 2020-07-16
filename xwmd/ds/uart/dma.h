@@ -182,9 +182,9 @@ __xwds_api
 xwer_t xwds_dmauartc_cfg(struct xwds_dmauartc * dmauartc,
                          const struct xwds_uart_cfg * cfg);
 
-/******** ******** Libraries for BSP driver ******** ********/
-__xwds_lib_code
-void xwds_dmauartc_lib_rxq_pub(struct xwds_dmauartc * dmauartc, xwsq_t tail);
+/******** ******** Callbacks for BSP driver ******** ********/
+__xwds_code
+void xwds_dmauartc_drvcb_rxq_pub(struct xwds_dmauartc * dmauartc, xwsq_t tail);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   inline function implementations   ******** ********

@@ -488,7 +488,7 @@ void mpc560xb_uartc_rx_isr(void)
         xwos_irq_get_id(&irqn);
         xwos_irq_get_data(irqn, &irqdata);
         uartc = irqdata.data;
-        xwds_uartc_lib_rx_isr(uartc);
+        xwds_uartc_drvcb_rx_isr(uartc);
 }
 
 __xwbsp_isr
@@ -506,7 +506,7 @@ void mpc560xb_uartc_tx_isr(void)
         resources = uartc->dev.resources;
         linflex_reg = resources->regrsc_array[0].base;
         linflex_reg->UARTSR.B.DTF = 1;
-        xwds_uartc_lib_tx_isr(uartc);
+        xwds_uartc_drvcb_tx_isr(uartc);
 }
 
 __xwbsp_isr

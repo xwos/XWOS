@@ -29,7 +29,6 @@
 #define __xwds_vop              __xwmd_code
 #define __xwds_data             __xwmd_data
 #define __xwds_rodata           __xwmd_rodata
-#define __xwds_lib_code         __xwmd_code
 
 #define xwds_static_cast(type, dev)     ((type)(dev))
 

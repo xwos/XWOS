@@ -232,14 +232,14 @@ void stm32cube_usart1_cb_rxdma_restart(struct xwds_dmauartc * dmauartc)
 void stm32cube_usart1_cb_rxdma_halfcplt(struct xwds_dmauartc * dmauartc)
 {
         MX_USART1_Timer_Stop();
-        xwds_dmauartc_lib_rxq_pub(dmauartc, XWDS_DMAUART_RXQ_SIZE);
+        xwds_dmauartc_drvcb_rxq_pub(dmauartc, XWDS_DMAUART_RXQ_SIZE);
         MX_USART1_Timer_Start();
 }
 
 void stm32cube_usart1_cb_rxdma_cplt(struct xwds_dmauartc * dmauartc)
 {
         MX_USART1_Timer_Stop();
-        xwds_dmauartc_lib_rxq_pub(dmauartc, 0);
+        xwds_dmauartc_drvcb_rxq_pub(dmauartc, 0);
         MX_USART1_Timer_Start();
 }
 
@@ -249,8 +249,8 @@ void stm32cube_usart1_cb_rxdma_timer(struct xwds_dmauartc * dmauartc)
 
         tail = sizeof(dmauartc->rxq.mem) - MX_USART1_RXDMA_GetCounter();
         if (sizeof(dmauartc->rxq.mem) == tail) {
-                xwds_dmauartc_lib_rxq_pub(dmauartc, 0);
+                xwds_dmauartc_drvcb_rxq_pub(dmauartc, 0);
         } else {
-                xwds_dmauartc_lib_rxq_pub(dmauartc, tail);
+                xwds_dmauartc_drvcb_rxq_pub(dmauartc, tail);
         }
 }
