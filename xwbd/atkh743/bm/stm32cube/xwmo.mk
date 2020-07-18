@@ -35,11 +35,18 @@ XWMO_CSRCS += $(addprefix cubemx/,$(CUBEMX_CSRCS))
 XWMO_CSRCS += init.c
 XWMO_CSRCS += xwmo.c
 
+XWMO_CSRCS += xwac/xwlib/crc32.c
+XWMO_CSRCS += xwac/xwlib/log.c
 XWMO_CSRCS += xwac/xwos/vector.c
 XWMO_CSRCS += xwac/xwos/hook.c
+XWMO_CSRCS += xwac/fatfs/sdcard.c
+XWMO_CSRCS += xwac/newlib/mem.c
+XWMO_CSRCS += xwac/newlib/stdio.c
+XWMO_CSRCS += xwac/lua/mem.c
+XWMO_CSRCS += xwac/cxx/mem.c
 
-XWMO_CSRCS += xwac/xwds/stm32cube.c
 XWMO_CSRCS += xwac/xwds/init.c
+XWMO_CSRCS += xwac/xwds/stm32cube.c
 XWMO_CSRCS += xwac/xwds/soc.c
 XWMO_CSRCS += xwac/xwds/uart.c
 

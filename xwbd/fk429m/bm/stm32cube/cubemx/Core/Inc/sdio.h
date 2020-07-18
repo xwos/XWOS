@@ -39,7 +39,7 @@
 extern SD_HandleTypeDef hsd;
 
 /* USER CODE BEGIN Private defines */
-#define MX_SD_SECTOR_SIZE 512U
+#define MX_SD_SECTOR_SIZE BLOCKSIZE
 
 /* USER CODE END Private defines */
 

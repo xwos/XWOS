@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层(BDL)配置
+ * @brief 玄武OS内核适配代码：线程栈内存池
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,36 +18,33 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_board_h__
-#define __cfg_board_h__
+#ifndef __bdl_axisram_h__
+#define __bdl_axisram_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********     XWOS misc     ******** ******** ********
+ ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define BRDCFG_XWSD_IDLE_HOOK                   1
-#define BRDCFG_XWSD_SYSHWT_HOOK                 1
-#define BRDCFG_XWSD_THRD_STACK_POOL             1
-#define BRDCFG_LOG                              1
+#include <xwos/standard.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********    board clock    ******** ******** ********
+ ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define BRDCFG_SYSCLK                           (400000000U)
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********          memory management          ******** ********
+ ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define BRDCFG_MM_DTCMHEAP_BLKSZ                (512U)
-#define BRDCFG_MM_AXISRAM_BLKSZ                 (1024U)
-#define BRDCFG_XWOS_THRD_CACHE_ODR              3
-#define BRDCFG_XWOS_SMR_CACHE_ODR               0
-#define BRDCFG_XWOS_CDT_CACHE_ODR               0
-#define BRDCFG_XWOS_EVT_CACHE_ODR               0
-#define BRDCFG_XWOS_MTX_CACHE_ODR               0
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********   board modules   ******** ******** ********
+ ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define BMCFG_stm32cube                         1
+__xwos_code
+xwer_t axisram_alloc(xwsz_t memsize, void ** membuf);
 
-#endif /* cfg/board.h */
+__xwos_code
+xwer_t axisram_free(void * mem);
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********  inline functions implementations   ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+#endif /* bdl/axisram.h */

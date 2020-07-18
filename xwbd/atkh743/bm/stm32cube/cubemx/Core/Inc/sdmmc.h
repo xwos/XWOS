@@ -39,12 +39,21 @@
 extern SD_HandleTypeDef hsd1;
 
 /* USER CODE BEGIN Private defines */
+#define MX_SD_SECTOR_SIZE BLOCKSIZE
 
 /* USER CODE END Private defines */
 
 void MX_SDMMC1_SD_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+void MX_SDMMC1_SD_Deinit(void);
+void MX_SDMMC1_SD_Reinit(uint32_t clkdiv);
+xwer_t MX_SDMMC1_SD_TrimClk(xwsq_t cnt);
+xwer_t MX_SDMMC1_SD_GetState(void);
+xwer_t MX_SDMMC1_SD_Read(uint8_t * buf, uint32_t blkaddr,
+                         uint32_t nrblk);
+xwer_t MX_SDMMC1_SD_Write(uint8_t * data, uint32_t blkaddr,
+                          uint32_t nrblk);
 
 /* USER CODE END Prototypes */
 

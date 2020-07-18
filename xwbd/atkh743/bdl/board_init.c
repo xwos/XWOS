@@ -37,14 +37,14 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      macros       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define STKMEMPOOL_BLKSZ        BRDCFG_MM_STKMEMPOOL_BLKSZ
+#define AXISRAM_BLKSZ           BRDCFG_MM_AXISRAM_BLKSZ
 #define DTCMHEAP_BLKSZ          BRDCFG_MM_DTCMHEAP_BLKSZ
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern xwsz_t stkmempool_mr_origin[];
-extern xwsz_t stkmempool_mr_size[];
+extern xwsz_t axisram_mr_origin[];
+extern xwsz_t axisram_mr_size[];
 
 extern xwsz_t dtcmheap_mr_origin[];
 extern xwsz_t dtcmheap_mr_size[];
@@ -52,7 +52,7 @@ extern xwsz_t dtcmheap_mr_size[];
 /**
  * @brief thread stack mempool zone
  */
-__xwbsp_data struct xwmm_bma * stkmempool_bma = NULL;
+__xwbsp_data struct xwmm_bma * axisram_bma = NULL;
 
 /**
  * @brief CCMRAM zone
@@ -99,14 +99,14 @@ xwer_t sys_mm_init(void)
         struct xwmm_bma * bma;
         xwer_t rc;
 
-        rc = xwmm_bma_create(&bma, "stkmempool",
-                             (xwptr_t)stkmempool_mr_origin,
-                             (xwsz_t)stkmempool_mr_size,
-                             STKMEMPOOL_BLKSZ);
+        rc = xwmm_bma_create(&bma, "axisram",
+                             (xwptr_t)axisram_mr_origin,
+                             (xwsz_t)axisram_mr_size,
+                             AXISRAM_BLKSZ);
         if (__unlikely(rc < 0)) {
-                goto err_stkmempool_bma_create;
+                goto err_axisram_bma_create;
         }
-        stkmempool_bma = bma;
+        axisram_bma = bma;
 
         rc = xwmm_bma_create(&bma, "dtcmheap",
                              (xwptr_t)dtcmheap_mr_origin,
@@ -197,7 +197,7 @@ err_tcb_bma_alloc:
 #endif /* XuanWuOS_CFG_CORE__smp */
 err_dtcmheap_bma_create:
         BDL_BUG();
-err_stkmempool_bma_create:
+err_axisram_bma_create:
         BDL_BUG();
         return rc;
 }

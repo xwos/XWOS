@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内核适配代码：线程栈内存池
+ * @brief STM32CUBE：Log
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -22,44 +22,25 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <bdl/axisram.h>
-#include <bdl/xwac/thrd_stack_mempool.h>
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+#include <bm/stm32cube/xwac/xwds/stm32cube.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwos_code
-xwer_t bdl_thrd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf)
+xwssz_t board_log_write(const char * s, xwsz_t n)
 {
-        union {
-                xwstk_t * stk;
-                void * anon;
-        } mem;
+        xwtm_t desired;
+        xwssz_t wrsz;
         xwer_t rc;
 
-        rc = axisram_alloc(stack_size, &mem.anon);
-        if (XWOK == rc) {
-                *membuf = mem.stk;
+        desired = XWTM_MAX;
+        rc = xwds_dmauartc_tx(&stm32cube_usart1_cb,
+                              (const xwu8_t *)s, n,
+                              &desired);
+        if (rc < 0) {
+                wrsz = -1;
         } else {
-                *membuf = NULL;
+                wrsz = (xwssz_t)n;
         }
-        return rc;
-}
-
-__xwos_code
-xwer_t bdl_thrd_stack_pool_free(xwstk_t * stk)
-{
-        return axisram_free(stk);
+        return wrsz;
 }

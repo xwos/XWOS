@@ -28,6 +28,7 @@
 #include <xwmd/ds/soc/gpio.h>
 #include <xwmd/ds/uart/dma.h>
 #include <bm/stm32cube/cubemx/override.h>
+#include <bm/stm32cube/cubemx/Core/Inc/sdmmc.h>
 #include <bm/stm32cube/xwac/xwds/stm32cube.h>
 #include <bm/stm32cube/xwmo.h>
 
@@ -41,18 +42,16 @@
 #define LED_TASK_PRIORITY \
         (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 1))
 
-#define UARTST_TASK_PRIORITY \
-        (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 2))
-
 #define MEMTST_TASK_PRIORITY \
-        (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 3))
+        (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 1))
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t led_task(void * arg);
+extern
+xwer_t sdcard_fatfs_mount(void);
 
-xwer_t uartst_task(void * arg);
+xwer_t led_task(void * arg);
 
 xwer_t memtst_task(void * arg);
 
@@ -87,15 +86,6 @@ const struct xwosal_thrd_desc stm32cube_tbd[] = {
                 .arg = NULL,
                 .attr = XWSDOBJ_ATTR_PRIVILEGED,
         },
-        [2] = {
-                .name = "task.uartst",
-                .prio = UARTST_TASK_PRIORITY,
-                .stack = NULL,
-                .stack_size = 2048,
-                .func = uartst_task,
-                .arg = NULL,
-                .attr = XWSDOBJ_ATTR_PRIVILEGED,
-        },
 };
 
 xwid_t stm32cube_tid[xw_array_size(stm32cube_tbd)];
@@ -110,6 +100,11 @@ xwer_t bm_stm32cube_start(void)
         xwer_t rc;
         xwsq_t i;
 
+        rc = sdcard_fatfs_mount();
+        if (rc < 0) {
+                goto err_fatfs_mount;
+        }
+
         /* start thread */
         for (i = 0; i < xw_array_size(stm32cube_tbd); i++) {
                 rc = xwosal_thrd_create(&stm32cube_tid[i], stm32cube_tbd[i].name,
@@ -122,10 +117,11 @@ xwer_t bm_stm32cube_start(void)
                         goto err_thrd_create;
                 }
         }
-
         return XWOK;
 
 err_thrd_create:
+        BDL_BUG();
+err_fatfs_mount:
         BDL_BUG();
         return rc;
 }
@@ -148,30 +144,6 @@ xwer_t led_task(void * arg)
                 xwds_gpio_toggle(&stm32cube_soc_cb,
                                  XWDS_GPIO_PORT_B,
                                  XWDS_GPIO_PIN_0 | XWDS_GPIO_PIN_1);
-        }
-        return XWOK;
-}
-
-xwer_t uartst_task(void * arg)
-{
-        xwtm_t xwtm;
-        xwu8_t buffer[8];
-        xwsz_t size;
-
-        XWOS_UNUSED(arg);
-        while (!xwosal_cthrd_shld_stop()) {
-                if (xwosal_cthrd_shld_frz()) {
-                        xwosal_cthrd_freeze();
-                }
-                size = sizeof(buffer);
-                xwtm = 20 * XWTM_MS;
-                xwds_dmauartc_rx(&stm32cube_usart1_cb, buffer, &size, &xwtm);
-                if (size > 0) {
-                        xwtm = XWTM_MAX;
-                        xwds_dmauartc_tx(&stm32cube_usart1_cb,
-                                         buffer, size,
-                                         &xwtm);
-                }
         }
         return XWOK;
 }

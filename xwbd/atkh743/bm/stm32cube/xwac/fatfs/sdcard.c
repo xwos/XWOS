@@ -21,9 +21,10 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+#include <stdlib.h>
 #include <bm/stm32cube/standard.h>
 #include <xwem/fs/fatfs/ff.h>
-#include <bm/stm32cube/cubemx/Core/Inc/sdio.h>
+#include <bm/stm32cube/cubemx/Core/Inc/sdmmc.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      macros       ******** ******** ********
@@ -41,6 +42,7 @@ FATFS sdcard_fatfs;
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+void sdcard_fatfs_tst(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -50,36 +52,47 @@ xwer_t sdcard_fatfs_mount(void)
         xwer_t rc;
         FRESULT frc;
 
-        MX_SDIO_SD_Construct();
-        MX_SDIO_SD_Init();
-        rc = MX_SDIO_SD_TrimClk(100);
-        if (rc < 0) {
-                goto err_sd;
-        }
+        MX_SDMMC1_SD_Init();
         frc = f_mount(&sdcard_fatfs, "sd:", 1);
         if (FR_OK != frc) {
+                rc = -EIO;
                 goto err_mount;
         }
         return XWOK;
 
 err_mount:
-err_sd:
         return rc;
+}
+
+void sdcard_fatfs_tst(void)
+{
+        FRESULT fsrc;
+        FIL fp;
+        void * buf;
+        UINT fsrd;
+
+        buf = malloc(4096);
+        fsrc = f_open(&fp, "sd:/xw.lua", FA_READ);
+        if (FR_OK == fsrc) {
+                fsrc = f_read(&fp, buf, 4096, &fsrd);
+                fsrc = f_close(&fp);
+        }
+        free(buf);
 }
 
 int MMC_disk_status(void)
 {
-        return (int)MX_SDIO_SD_GetState();
+        return (int)MX_SDMMC1_SD_GetState();
 }
 
 int MMC_disk_initialize(void)
 {
         int rc;
 
-        if (HAL_SD_STATE_READY == hsd.State) {
+        if (HAL_SD_STATE_READY == hsd1.State) {
                 rc = XWOK;
         } else {
-                rc = MX_SDIO_SD_TrimClk(10);
+                rc = MX_SDMMC1_SD_TrimClk(10);
         }
         return (int)rc;
 }
@@ -88,7 +101,7 @@ int MMC_disk_read(uint8_t * buff, uint64_t sector, uint32_t count)
 {
         xwer_t rc;
 
-        rc = MX_SDIO_SD_Read(buff, (uint32_t)sector, count);
+        rc = MX_SDMMC1_SD_Read(buff, (uint32_t)sector, count);
         return (int)rc;
 }
 
@@ -96,7 +109,7 @@ int MMC_disk_write(uint8_t * buff, uint64_t sector, uint32_t count)
 {
         xwer_t rc;
 
-        rc = MX_SDIO_SD_Write(buff, (uint32_t)sector, count);
+        rc = MX_SDMMC1_SD_Write(buff, (uint32_t)sector, count);
         return (int)rc;
 }
 
@@ -109,7 +122,7 @@ int MMC_disk_ioctl(uint8_t cmd, void * buff)
                 rc = XWOK;
                 break;
         case GET_SECTOR_COUNT:
-                *(uint32_t *)buff = (hsd.SdCard.BlockSize * hsd.SdCard.BlockNbr) /
+                *(uint32_t *)buff = (hsd1.SdCard.BlockSize * hsd1.SdCard.BlockNbr) /
                                     MX_SD_SECTOR_SIZE;
                 rc = XWOK;
                 break;
@@ -118,7 +131,7 @@ int MMC_disk_ioctl(uint8_t cmd, void * buff)
                 rc = XWOK;
                 break;
         case GET_BLOCK_SIZE:
-                *(uint32_t *)buff = hsd.SdCard.BlockSize;
+                *(uint32_t *)buff = hsd1.SdCard.BlockSize;
                 rc = XWOK;
                 break;
         case CTRL_TRIM:

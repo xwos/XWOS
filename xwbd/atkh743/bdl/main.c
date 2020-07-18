@@ -26,6 +26,8 @@
 #include <xwos/osal/thread.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/xwmo.h>
+#include <xwem/libc/newlibac/xwmo.h>
+#include <xwem/vm/lua/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -44,7 +46,7 @@ const struct xwosal_thrd_desc bdl_init_thrd_td = {
         .name = "bdl.init.thrd",
         .prio = BDL_INIT_THRD_PRIORITY,
         .stack = XWOSAL_THRD_STACK_DYNAMIC,
-        .stack_size = 2048,
+        .stack_size = 4096,
         .func = (xwosal_thrd_f)bdl_init_thrd,
         .arg = NULL,
         .attr = XWSDOBJ_ATTR_PRIVILEGED,
@@ -94,9 +96,27 @@ xwer_t bdl_init_thrd(void * arg)
                 goto bm_stm32cube_start;
         }
 
+        rc = newlibac_start();
+        if (rc < 0) {
+                goto newlibac_start;
+        }
+
+#if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
+        rc = xwlua_start();
+        if (rc < 0) {
+                goto err_xwlua_start;
+        }
+#endif /* XWEMCFG_vm_lua */
+
         xwosal_thrd_delete(bdl_init_thrd_id);
         return XWOK;
 
+#if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
+err_xwlua_start:
+#endif /* XWEMCFG_vm_lua */
+        BDL_BUG();
+newlibac_start:
+        BDL_BUG();
 bm_stm32cube_start:
         BDL_BUG();
         return rc;

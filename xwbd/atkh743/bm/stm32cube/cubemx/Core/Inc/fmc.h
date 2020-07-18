@@ -40,8 +40,7 @@ extern NAND_HandleTypeDef hnand1;
 extern SDRAM_HandleTypeDef hsdram1;
 
 /* USER CODE BEGIN Private defines */
-#define MX_SDRAM_ORIGIN  0xC0000000U
-#define MX_SDRAM_LENGTH  0x2000000U
+
 /* USER CODE END Private defines */
 
 void MX_FMC_Init(void);

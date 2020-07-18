@@ -39,4 +39,29 @@ struct xwmm_zone {
         xwsz_t size; /**< unit: byte */
 };
 
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********  inline functions implementations   ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief XWMM API：测试地址是否在内存区域内
+ * @return 布尔值
+ * @retval true: 是
+ * @retval false: 否
+ */
+static __xw_inline
+bool xwmm_in_zone(void * mem, xwptr_t origin, xwsz_t size)
+{
+        xwptr_t memptr = (xwptr_t)mem;
+        bool ret;
+
+        if (memptr < origin) {
+                ret = false;
+        } else if (memptr > (origin + size)) {
+                ret = false;
+        } else {
+                ret = true;
+        }
+        return ret;
+}
+
 #endif /* xwos/mm/common.h */

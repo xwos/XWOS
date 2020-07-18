@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Board Module: newlib适配代码
+ * @brief 玄武OS内核适配代码：线程栈内存池
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -22,10 +22,10 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+#include <xwos/lib/xwbop.h>
+#include <xwos/mm/common.h>
+#include <xwos/mm/bma.h>
+#include <bdl/axisram.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -34,28 +34,37 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern void newlibac_mem_linkage_placeholder(void);
-extern void newlibac_fops_linkage_placeholder(void);
-extern void newlibac_string_linkage_placeholder(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief 连接占位符
- * @note
- * + 静态连接时，若符号存在多重定义，优先选择包含占位符的文件里面的符号。
- */
-void * const newlibac_linkage_placeholder[] = {
-        newlibac_mem_linkage_placeholder,
-        newlibac_fops_linkage_placeholder,
-        newlibac_string_linkage_placeholder,
-};
+extern struct xwmm_bma * axisram_bma;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t newlibac_start(void)
+#if ((BRDCFG_MM_AXISRAM_BLKSZ % XWMMCFG_STACK_ALIGNMENT) != 0)
+  #error BRDCFG_MM_AXISRAM_BLKSZ is not aligned to XWMMCFG_STACK_ALIGNMENT!
+#endif
+
+__xwos_code
+xwer_t axisram_alloc(xwsz_t memsize, void ** membuf)
 {
-        return XWOK;
+        xwsz_t stknum;
+        xwsq_t numodr;
+        xwer_t rc;
+
+        stknum = DIV_ROUND_UP(memsize, BRDCFG_MM_AXISRAM_BLKSZ);
+        numodr = (xwsq_t)xwbop_fls(xwsz_t, stknum);
+        if (stknum & (stknum - 1U)) {
+                numodr++;
+        }
+        rc = xwmm_bma_alloc(axisram_bma, numodr, membuf);
+        return rc;
+}
+
+__xwos_code
+xwer_t axisram_free(void * mem)
+{
+        return xwmm_bma_free(axisram_bma, mem);
 }

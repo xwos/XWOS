@@ -45,16 +45,12 @@ MEMORY {
                                                        .xwmd.text &
                                                        .xwmd.rodata &
                                                        .text & .rodata */
-        stkmempool_mr (arw): org = 0x24000000, len = 512k /* .stkmempool */
         xwos_data_mr (arw): org = 0x800, len = 54k /* .xwos.data */
         data_mr (arw): org = 0x30000000, len = 288k /* .data, .bss & .heap */
         data4_mr (rw): org = 0x38000000, len = 64k /* .data4 for D3 Domain */
         dtcmheap_mr (arw): org = 0x20000000, len = 128k /* .dtcmheap */
         xwos_stk_mr (rw): org = 0x0000E000, len = 8k /* xwos stack */
 }
-
-stkmempool_mr_origin = ORIGIN(stkmempool_mr);
-stkmempool_mr_size = LENGTH(stkmempool_mr);
 
 dtcmheap_mr_origin = ORIGIN(dtcmheap_mr);
 dtcmheap_mr_size = LENGTH(dtcmheap_mr);

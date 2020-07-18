@@ -29,7 +29,6 @@
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <xwmd/ds/soc/gpio.h>
-#include <xwem/fs/fatfs/ff.h>
 #include <bm/stm32cube/cubemx/Core/Inc/sdio.h>
 #include <bm/stm32cube/cubemx/override.h>
 #include <bm/stm32cube/xwac/xwds/stm32cube.h>
@@ -55,6 +54,9 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+extern
+xwer_t sdcard_fatfs_mount(void);
+
 xwer_t led_task(void * arg);
 
 xwer_t memtst_task(void * arg);
@@ -96,26 +98,17 @@ xwid_t stm32cube_tid[xw_array_size(stm32cube_tbd)];
 
 extern struct xwmm_mempool * sdram_mempool;
 
-FATFS fatfs_sdcard;
-
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t bm_stm32cube_start(void)
 {
-        FRESULT frc;
         xwer_t rc;
         xwsq_t i;
 
-        MX_SDIO_SD_Construct();
-        MX_SDIO_SD_Init();
-        rc = MX_SDIO_SD_TrimClk(100);
+        rc = sdcard_fatfs_mount();
         if (rc < 0) {
-                goto err_sd;
-        }
-        frc = f_mount(&fatfs_sdcard, "sd:", 1);
-        if (FR_OK != frc) {
-                goto err_sd;
+                goto err_fatfs_mount;
         }
 
         /* start thread */
@@ -130,12 +123,11 @@ xwer_t bm_stm32cube_start(void)
                         goto err_thrd_create;
                 }
         }
-
         return XWOK;
 
 err_thrd_create:
         BDL_BUG();
-err_sd:
+err_fatfs_mount:
         BDL_BUG();
         return rc;
 }
