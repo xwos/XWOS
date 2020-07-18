@@ -14,10 +14,10 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
+#include <string.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/xwbmpaop.h>
 #include <xwos/lib/xwbop.h>
-#include <xwos/lib/string.h>
 #include <xwos/mm/bma.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>

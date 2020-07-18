@@ -22,7 +22,7 @@ ARCH_INCDIRS :=
 ARCH_CFLAGS :=
 ARCH_CXXFLAGS :=
 ARCH_AFLAGS :=
-ARCH_LDFLAGS := -specs=nano.specs -nostdlib -fno-use-cxa-atexit
+ARCH_LDFLAGS := -specs=nano.specs -fno-use-cxa-atexit
 ARCH_EOBJS :=
 
 ARCH_CSRCS :=

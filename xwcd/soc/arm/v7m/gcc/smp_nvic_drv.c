@@ -22,7 +22,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/lib/string.h>
+#include <string.h>
 #include <xwos/smp/irq.h>
 #include <arch_irq.h>
 #include <soc_irq.h>

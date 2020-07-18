@@ -14,7 +14,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwmd/ds/standard.h>
-#include <xwos/lib/string.h>
+#include <string.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/lock/seqlock.h>

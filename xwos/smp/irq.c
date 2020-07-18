@@ -14,8 +14,8 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
+#include <string.h>
 #include <xwos/object.h>
-#include <xwos/lib/string.h>
 #include <xwos/irq.h>
 #include <xwos/smp/cpu.h>
 #include <xwos/smp/lock/spinlock.h>

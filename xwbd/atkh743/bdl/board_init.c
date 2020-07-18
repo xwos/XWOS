@@ -22,7 +22,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/lib/string.h>
+#include <string.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/bma.h>
 #if defined(XuanWuOS_CFG_CORE__smp)

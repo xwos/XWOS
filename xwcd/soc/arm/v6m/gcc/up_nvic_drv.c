@@ -22,7 +22,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/lib/string.h>
+#include <string.h>
 #include <xwos/up/irq.h>
 #include <armv6m_core.h>
 #include <armv6m_nvic.h>

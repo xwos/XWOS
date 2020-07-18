@@ -14,7 +14,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/lib/string.h>
+#include <string.h>
 #include <xwos/irq.h>
 #include <xwos/up/scheduler.h>
 #include <xwos/up/irq.h>

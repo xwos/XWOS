@@ -24,7 +24,7 @@
 #include <xwos/standard.h>
 #include <xwos/init.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/lib/string.h>
+#include <string.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <soc_gpio.h>

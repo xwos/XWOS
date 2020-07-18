@@ -14,9 +14,9 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwmd/ds/standard.h>
+#include <string.h>
 #include <xwos/lib/xwaop.h>
 #include <xwos/lib/bclst.h>
-#include <xwos/lib/string.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/lock/seqlock.h>
 #include <xwos/osal/lock/mutex.h>

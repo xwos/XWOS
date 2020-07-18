@@ -27,7 +27,7 @@
 #include "sdmmc.h"
 
 /* USER CODE BEGIN 0 */
-#include <xwos/lib/string.h>
+#include <string.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <xwos/osal/lock/mutex.h>

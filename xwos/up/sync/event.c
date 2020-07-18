@@ -14,8 +14,8 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
+#include <string.h>
 #include <xwos/object.h>
-#include <xwos/lib/string.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>

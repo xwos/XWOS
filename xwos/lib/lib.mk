@@ -25,7 +25,6 @@ XWOS_CSRCS += lib/div64.c
 
 ifneq ($(ARCHCFG_COMPILER_CLIB),y)
     XWOS_CSRCS += lib/ctype.c
-    XWOS_CSRCS += lib/string.c
 endif
 
 ifeq ($(XWLIBCFG_XWAOP8),y)

@@ -14,7 +14,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/lib/string.h>
+#include <string.h>
 #include <xwos/lib/xwaop.h>
 #include <xwos/lib/xwbmpaop.h>
 #include <xwos/lib/xwbop.h>

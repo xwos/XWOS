@@ -14,7 +14,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwmd/ds/standard.h>
-#include <xwos/lib/string.h>
+#include <string.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/lib/xwbmpaop.h>
 #include <xwmd/ds/can/transceiver.h>

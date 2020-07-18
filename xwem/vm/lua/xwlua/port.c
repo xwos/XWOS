@@ -9,7 +9,7 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/lib/string.h>
+#include <string.h>
 #include <xwos/mm/mempool/allocator.h>
 #include "lua.h"
 #include "lualib.h"
