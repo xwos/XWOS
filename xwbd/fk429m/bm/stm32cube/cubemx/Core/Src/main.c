@@ -30,6 +30,7 @@
 #include "dma.h"
 #include "rng.h"
 #include "sdio.h"
+#include "spi.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -107,6 +108,7 @@ int main(void)
   MX_CRC_Init();
   MX_SDIO_SD_Init();
   MX_TIM7_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */

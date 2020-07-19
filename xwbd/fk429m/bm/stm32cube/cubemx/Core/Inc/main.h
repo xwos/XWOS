@@ -84,8 +84,6 @@ void Error_Handler(void);
 #define BlueLed_GPIO_Port GPIOD
 #define GreenLed_Pin LL_GPIO_PIN_7
 #define GreenLed_GPIO_Port GPIOG
-#define SWO_Pin LL_GPIO_PIN_3
-#define SWO_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
