@@ -26,8 +26,7 @@ flash_mr_size = 512k;
 ocram_mr_origin = 0x20000000;
 ocram_mr_size = 64k;
 
-code_mr_origin = DEFINED(code_origin)? code_origin : flash_mr_origin;
-data_mr_origin = DEFINED(data_origin)? data_origin : ocram_mr_origin;
+fmw_origin = DEFINED(fmw)? fmw : flash_mr_origin;
 
 MEMORY {
         flash_mr (rx): org = flash_mr_origin, len = flash_mr_size
@@ -36,12 +35,12 @@ MEMORY {
 
         /* 中断向量表的加载地址(LMA)区域 */
         vctbl_lmr (rx):
-                org = code_mr_origin,
+                org = fmw_origin,
                 len = 1024
 
         /* 中断向量表的运行地址(VMA)区域 */
         vctbl_vmr (rw):
-                org = code_mr_origin,
+                org = fmw_origin,
                 len = 1024
 
         /* 镜像文件的信息 */
@@ -56,7 +55,7 @@ MEMORY {
 
         /* 数据段(.data)与未初始化的数据段(.bss) */
         data_mr (arw):
-                org = data_mr_origin,
+                org = ocram_mr_origin,
                 len = 61k
 
         /* 玄武OS的内核栈 */

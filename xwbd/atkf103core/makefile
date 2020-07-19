@@ -22,7 +22,7 @@ WKSPC ?= wkspc
 TARGET ?= XuanWuOS
 
 ifeq ($(FMW),y)
-    BDL_LDFLAGS = -Wl,--defsym=code_origin=0x0800C000
+    BDL_LDFLAGS = -Wl,--defsym=fmw=0x0800C000
     DEBUG = n
     export BDL_LDFLAGS
     export DEBUG
