@@ -25,9 +25,9 @@
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <xwos/osal/sync/semaphore.h>
-#include <bm/stm32cube/cubemx/override.h>
+#include <bm/stm32cube/cubemx/Core/Inc/main.h>
+#include <bm/stm32cube/cubemx/Core/Inc/gpio.h>
 #include <bm/stm32cube/xwmo.h>
-#include "cubemx/Core/Inc/gpio.h"
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -53,7 +53,7 @@ xwer_t led_task(void * arg);
 /**
  * @brief 连接占位符
  * @note
- * + 连接时，若符号存在多重定义，优先选择包含占位符的文件里面的符号。
+ * + 确保链接时使用此符号的文件。
  */
 void * const stm32cube_linkage_placeholder[] = {
         stm32cube_override_linkage_placeholder,

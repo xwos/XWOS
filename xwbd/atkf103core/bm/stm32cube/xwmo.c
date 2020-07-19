@@ -27,7 +27,7 @@
 #include <xwos/osal/thread.h>
 #include <xwmd/ds/soc/gpio.h>
 #include <xwmd/ds/uart/dma.h>
-#include <bm/stm32cube/cubemx/override.h>
+#include <bm/stm32cube/cubemx/Core/Inc/main.h>
 #include <bm/stm32cube/cubemx/Core/Inc/sdio.h>
 #include <bm/stm32cube/xwac/xwds/stm32cube.h>
 #include <bm/stm32cube/xwmo.h>
@@ -68,7 +68,7 @@ xwer_t memtst_task(void * arg);
 /**
  * @brief 连接占位符
  * @note
- * + 连接时，若符号存在多重定义，优先选择包含占位符的文件里面的符号。
+ * + 确保链接时使用此符号的文件。
  */
 void * const stm32cube_linkage_placeholder[] = {
         stm32cube_override_linkage_placeholder,

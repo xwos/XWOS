@@ -28,6 +28,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 /* USER CODE BEGIN Includes */
+#include <arch_systick.h>
 
 /* USER CODE END Includes */
 
@@ -62,6 +63,12 @@
 /* USER CODE END ExternalFunctions */
 
 /* USER CODE BEGIN 0 */
+extern uint32_t uwTickPrio;
+
+void stm32cube_override_linkage_placeholder(void)
+{
+  /* 链接占位符：确保链接时使用此文件中的符号 */
+}
 
 /* USER CODE END 0 */
 /**
@@ -84,16 +91,25 @@ void HAL_MspInit(void)
   /* PendSV_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(PendSV_IRQn, 7, 1);
 
-  /** DISABLE: JTAG-DP Disabled and SW-DP Disabled
+  /** NOJTAG: JTAG-DP Disabled and SW-DP Enabled
   */
-  __HAL_AFIO_REMAP_SWJ_DISABLE();
+  __HAL_AFIO_REMAP_SWJ_NOJTAG();
 
   /* USER CODE BEGIN MspInit 1 */
+  HAL_PWR_EnableBkUpAccess();
+  HAL_DBGMCU_EnableDBGStopMode();
+  HAL_DBGMCU_EnableDBGStandbyMode();
 
   /* USER CODE END MspInit 1 */
 }
 
 /* USER CODE BEGIN 1 */
+HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
+{
+  (void)TickPriority;
+  uwTickPrio = ARCH_IRQ_TICK_PRIO;
+  return HAL_OK;
+}
 
 /* USER CODE END 1 */
 
