@@ -38,16 +38,15 @@ extern "C" {
 #include "stm32h7xx_ll_crc.h"
 #include "stm32h7xx_hal.h"
 #include "stm32h7xx_ll_rng.h"
-#include "stm32h7xx.h"
-#include "stm32h7xx_ll_system.h"
-#include "stm32h7xx_ll_gpio.h"
-#include "stm32h7xx_ll_exti.h"
 #include "stm32h7xx_ll_bus.h"
 #include "stm32h7xx_ll_cortex.h"
 #include "stm32h7xx_ll_rcc.h"
+#include "stm32h7xx_ll_system.h"
 #include "stm32h7xx_ll_utils.h"
 #include "stm32h7xx_ll_pwr.h"
+#include "stm32h7xx_ll_gpio.h"
 #include "stm32h7xx_ll_dma.h"
+#include "stm32h7xx_ll_exti.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -77,19 +76,22 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define KEY2_Pin LL_GPIO_PIN_13
-#define KEY2_GPIO_Port GPIOC
-#define KEY1_Pin LL_GPIO_PIN_2
+#define KEY0_Pin GPIO_PIN_13
+#define KEY0_GPIO_Port GPIOC
+#define KEY0_EXTI_IRQn EXTI15_10_IRQn
+#define KEY1_Pin GPIO_PIN_2
 #define KEY1_GPIO_Port GPIOH
-#define KEY0_Pin LL_GPIO_PIN_3
-#define KEY0_GPIO_Port GPIOH
-#define LED1_Pin LL_GPIO_PIN_0
+#define KEY1_EXTI_IRQn EXTI2_IRQn
+#define KEY2_Pin GPIO_PIN_3
+#define KEY2_GPIO_Port GPIOH
+#define KEY2_EXTI_IRQn EXTI3_IRQn
+#define LED1_Pin GPIO_PIN_0
 #define LED1_GPIO_Port GPIOB
-#define LED0_Pin LL_GPIO_PIN_1
+#define LED0_Pin GPIO_PIN_1
 #define LED0_GPIO_Port GPIOB
-#define TOUCH_SCL_Pin LL_GPIO_PIN_6
+#define TOUCH_SCL_Pin GPIO_PIN_6
 #define TOUCH_SCL_GPIO_Port GPIOH
-#define TOUCH_SDA_Pin LL_GPIO_PIN_3
+#define TOUCH_SDA_Pin GPIO_PIN_3
 #define TOUCH_SDA_GPIO_Port GPIOI
 /* USER CODE BEGIN Private defines */
 

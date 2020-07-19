@@ -26,7 +26,7 @@ flash_mr_size = 64k;
 ocram_mr_origin = 0x20000000;
 ocram_mr_size = 20k;
 
-code_mr_origin = DEFINED(fmw)? fmw : flash_mr_origin;
+fmw_origin = DEFINED(fmw)? fmw : flash_mr_origin;
 
 MEMORY {
         flash_mr (rx): org = flash_mr_origin, len = flash_mr_size
@@ -34,12 +34,12 @@ MEMORY {
 
         /* 中断向量表的加载地址(LMA)区域 */
         vctbl_lmr (rx):
-                org = code_mr_origin,
+                org = fmw_origin,
                 len = 1024
 
         /* 中断向量表的运行地址(VMA)区域 */
         vctbl_vmr (rw):
-                org = code_mr_origin,
+                org = fmw_origin,
                 len = 1024
 
         /* 镜像文件的信息 */

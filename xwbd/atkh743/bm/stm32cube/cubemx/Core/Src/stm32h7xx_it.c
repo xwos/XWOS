@@ -211,6 +211,48 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
+  * @brief This function handles PVD and AVD interrupts through EXTI line 16.
+  */
+void PVD_AVD_IRQHandler(void)
+{
+  /* USER CODE BEGIN PVD_AVD_IRQn 0 */
+
+  /* USER CODE END PVD_AVD_IRQn 0 */
+  HAL_PWREx_PVD_AVD_IRQHandler();
+  /* USER CODE BEGIN PVD_AVD_IRQn 1 */
+
+  /* USER CODE END PVD_AVD_IRQn 1 */
+}
+
+/**
+  * @brief This function handles EXTI line2 interrupt.
+  */
+void EXTI2_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI2_IRQn 0 */
+
+  /* USER CODE END EXTI2_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
+  /* USER CODE BEGIN EXTI2_IRQn 1 */
+
+  /* USER CODE END EXTI2_IRQn 1 */
+}
+
+/**
+  * @brief This function handles EXTI line3 interrupt.
+  */
+void EXTI3_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI3_IRQn 0 */
+
+  /* USER CODE END EXTI3_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
+  /* USER CODE BEGIN EXTI3_IRQn 1 */
+
+  /* USER CODE END EXTI3_IRQn 1 */
+}
+
+/**
   * @brief This function handles DMA1 stream0 global interrupt.
   */
 void DMA1_Stream0_IRQHandler(void)
@@ -309,6 +351,20 @@ void USART1_IRQHandler(void)
 }
 
 /**
+  * @brief This function handles EXTI line[15:10] interrupts.
+  */
+void EXTI15_10_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI15_10_IRQn 0 */
+
+  /* USER CODE END EXTI15_10_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
+  /* USER CODE BEGIN EXTI15_10_IRQn 1 */
+
+  /* USER CODE END EXTI15_10_IRQn 1 */
+}
+
+/**
   * @brief This function handles SDMMC1 global interrupt.
   */
 void SDMMC1_IRQHandler(void)
@@ -334,6 +390,20 @@ void QUADSPI_IRQHandler(void)
   /* USER CODE BEGIN QUADSPI_IRQn 1 */
 
   /* USER CODE END QUADSPI_IRQn 1 */
+}
+
+/**
+  * @brief This function handles Interrupt for all 6 wake-up pins.
+  */
+void WAKEUP_PIN_IRQHandler(void)
+{
+  /* USER CODE BEGIN WAKEUP_PIN_IRQn 0 */
+
+  /* USER CODE END WAKEUP_PIN_IRQn 0 */
+  HAL_PWREx_WAKEUP_PIN_IRQHandler();
+  /* USER CODE BEGIN WAKEUP_PIN_IRQn 1 */
+
+  /* USER CODE END WAKEUP_PIN_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

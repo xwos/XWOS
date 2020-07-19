@@ -83,6 +83,14 @@ void HAL_MspInit(void)
   /* PendSV_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(PendSV_IRQn, 7, 1);
 
+  /* Peripheral interrupt init */
+  /* PVD_AVD_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(PVD_AVD_IRQn, 6, 0);
+  HAL_NVIC_EnableIRQ(PVD_AVD_IRQn);
+  /* WAKEUP_PIN_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(WAKEUP_PIN_IRQn, 0, 1);
+  HAL_NVIC_EnableIRQ(WAKEUP_PIN_IRQn);
+
   /* USER CODE BEGIN MspInit 1 */
   HAL_EnableDBGSleepMode();
   HAL_EnableDBGStopMode();
