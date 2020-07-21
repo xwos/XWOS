@@ -37,7 +37,7 @@
 #define XWMDCFG_ds_SOC_CLK                                      0
 #define XWMDCFG_ds_SOC_PWR                                      0
 #define XWMDCFG_ds_SOC_GPIO                                     1
-#define XWMDCFG_ds_SOC_EIRQ                                     0
+#define XWMDCFG_ds_SOC_EIRQ                                     1
 #define XWMDCFG_ds_SOC_EIRQ_ROISRT                              0
 #define XWMDCFG_ds_SOC_DMA                                      0
 #define XWMDCFG_ds_SOC_DMA_ROCBT                                0

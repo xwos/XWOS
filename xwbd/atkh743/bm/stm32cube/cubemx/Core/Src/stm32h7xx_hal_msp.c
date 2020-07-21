@@ -65,7 +65,7 @@
 /* USER CODE BEGIN 0 */
 extern uint32_t uwTickPrio;
 
-void stm32cube_override_linkage_placeholder(void)
+void stm32cube_override_linkage_msp(void)
 {
   /* 链接占位符：确保链接时使用此文件中的符号 */
 }

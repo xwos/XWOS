@@ -28,6 +28,7 @@
 #include <xwmd/ds/soc/gpio.h>
 #include <xwmd/ds/uart/dma.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
+#include <bm/stm32cube/cubemx/Core/Inc/stm32h7xx_it.h>
 #include <bm/stm32cube/xwac/xwds/stm32cube.h>
 #include <bm/stm32cube/xwmo.h>
 
@@ -63,7 +64,8 @@ xwer_t memtst_task(void * arg);
  * + 确保链接时使用此符号的文件。
  */
 void * const stm32cube_linkage_placeholder[] = {
-        stm32cube_override_linkage_placeholder,
+        stm32cube_override_linkage_msp,
+        stm32cube_override_linkage_it,
 };
 
 const struct xwosal_thrd_desc stm32cube_tbd[] = {
@@ -132,8 +134,7 @@ xwer_t led_task(void * arg)
         XWOS_UNUSED(arg);
 
         xwds_gpio_req(&stm32cube_soc_cb,
-                      XWDS_GPIO_PORT_B,
-                      XWDS_GPIO_PIN_0 | XWDS_GPIO_PIN_1);
+                      XWDS_GPIO_PORT_B, XWDS_GPIO_PIN_0);
         while (!xwosal_cthrd_shld_stop()) {
                 if (xwosal_cthrd_shld_frz()) {
                         xwosal_cthrd_freeze();
@@ -142,7 +143,7 @@ xwer_t led_task(void * arg)
                 xwosal_cthrd_sleep(&xwtm);
                 xwds_gpio_toggle(&stm32cube_soc_cb,
                                  XWDS_GPIO_PORT_B,
-                                 XWDS_GPIO_PIN_0 | XWDS_GPIO_PIN_1);
+                                 XWDS_GPIO_PIN_0);
         }
         return XWOK;
 }

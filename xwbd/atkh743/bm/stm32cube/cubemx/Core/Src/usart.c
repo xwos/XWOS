@@ -29,7 +29,7 @@
 /* USER CODE BEGIN 0 */
 #include <soc.h>
 #include <string.h>
-#include "xwac/xwds/uart.h"
+#include <bm/stm32cube/xwac/xwds/uart.h>
 
 struct HAL_UART_Xwds_driver_data husart1_xwds_drvdata;
 

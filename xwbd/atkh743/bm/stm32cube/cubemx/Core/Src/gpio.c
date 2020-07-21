@@ -26,6 +26,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
 /* USER CODE BEGIN 0 */
+#include <xwos/lib/xwbop.h>
+#include <bm/stm32cube/xwac/xwds/soc.h>
 
 /* USER CODE END 0 */
 
@@ -70,13 +72,13 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = KEY0_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(KEY0_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PHPin PHPin */
   GPIO_InitStruct.Pin = KEY1_Pin|KEY2_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
 
@@ -117,6 +119,15 @@ void MX_GPIO_Init(void)
 void MX_GPIO_DeInit(void)
 {
 }
+
+void HAL_GPIO_EXTI_Callback(uint16_t pin)
+{
+  xwssq_t idx;
+
+  idx = xwbop_ffs(xwu16_t, pin);
+  stm32cube_soc_cb_eirq_isr((xwid_t)idx);
+}
+
 /* USER CODE END 2 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

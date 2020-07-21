@@ -48,6 +48,7 @@ Core/Src/quadspi.c \
 Core/Src/rng.c \
 Core/Src/sdmmc.c \
 Core/Src/usart.c \
+Core/Src/weakisr.c \
 Core/Src/stm32h7xx_it.c \
 Core/Src/stm32h7xx_hal_msp.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_utils.c \
