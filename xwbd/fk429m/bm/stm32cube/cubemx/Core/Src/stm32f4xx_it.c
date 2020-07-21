@@ -29,6 +29,8 @@
 #include "stm32f4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <bm/stm32cube/xwac/xwds/soc.h>
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -58,6 +60,10 @@
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void stm32cube_override_linkage_it(void)
+{
+  /* 链接占位符：确保链接时使用此文件中的符号 */
+}
 
 /* USER CODE END 0 */
 
@@ -223,6 +229,7 @@ void EXTI9_5_IRQHandler(void)
   {
     LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_8);
     /* USER CODE BEGIN LL_EXTI_LINE_8 */
+    stm32cube_soc_cb_eirq_isr(8);
 
     /* USER CODE END LL_EXTI_LINE_8 */
   }

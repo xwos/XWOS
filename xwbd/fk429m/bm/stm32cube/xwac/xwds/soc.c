@@ -54,7 +54,6 @@ static
 xwer_t stm32cube_soc_drv_resume(struct xwds_device * dev);
 #endif /* XWMDCFG_ds_PM */
 
-#if defined(XWMDCFG_ds_SOC_GPIO) && (1 == XWMDCFG_ds_SOC_GPIO)
 static
 xwer_t stm32cube_soc_drv_gpio_req(struct xwds_soc * soc,
                                   xwid_t port, xwsq_t pinmask);
@@ -89,9 +88,7 @@ static
 xwer_t stm32cube_soc_drv_gpio_input(struct xwds_soc * soc,
                                     xwid_t port, xwsq_t pinmask,
                                     xwsq_t * in);
-#endif /* XWMDCFG_ds_SOC_GPIO */
 
-#if defined(XWMDCFG_ds_SOC_EIRQ) && (1 == XWMDCFG_ds_SOC_EIRQ)
 static
 xwer_t stm32cube_soc_drv_eirq_req(struct xwds_soc * soc,
                                   xwid_t port, xwsq_t pinmask,
@@ -101,12 +98,9 @@ static
 xwer_t stm32cube_soc_drv_eirq_rls(struct xwds_soc * soc,
                                   xwid_t port, xwsq_t pinmask,
                                   xwid_t eiid);
-#endif /* XWMDCFG_ds_SOC_EIRQ */
 
-#if defined(XWMDCFG_ds_SOC_ERAM) && (1 == XWMDCFG_ds_SOC_ERAM)
 static
 xwer_t stm32cube_soc_drv_eram_tst(struct xwds_soc * soc, xwptr_t * erraddr);
-#endif /* XWMDCFG_ds_SOC_ERAM */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
@@ -127,7 +121,6 @@ const struct xwds_soc_driver stm32cube_soc_drv = {
 #endif /* XWMDCFG_ds_PM */
         },
 
-#if defined(XWMDCFG_ds_SOC_GPIO) && (1 == XWMDCFG_ds_SOC_GPIO)
         .gpio_req = stm32cube_soc_drv_gpio_req,
         .gpio_rls = stm32cube_soc_drv_gpio_rls,
         .gpio_cfg = stm32cube_soc_drv_gpio_cfg,
@@ -136,16 +129,11 @@ const struct xwds_soc_driver stm32cube_soc_drv = {
         .gpio_toggle = stm32cube_soc_drv_gpio_toggle,
         .gpio_output = stm32cube_soc_drv_gpio_output,
         .gpio_input = stm32cube_soc_drv_gpio_input,
-#endif /* XWMDCFG_ds_SOC_GPIO */
 
-#if defined(XWMDCFG_ds_SOC_EIRQ) && (1 == XWMDCFG_ds_SOC_EIRQ)
         .eirq_req = stm32cube_soc_drv_eirq_req,
         .eirq_rls = stm32cube_soc_drv_eirq_rls,
-#endif /* XWMDCFG_ds_SOC_EIRQ */
 
-#if defined(XWMDCFG_ds_SOC_ERAM) && (1 == XWMDCFG_ds_SOC_ERAM)
         .eram_tst = stm32cube_soc_drv_eram_tst,
-#endif /* XWMDCFG_ds_SOC_ERAM */
 
         .ioctl = NULL,
 };
@@ -355,7 +343,6 @@ xwer_t stm32cube_soc_drv_resume(struct xwds_device * dev)
 }
 #endif /* XWMDCFG_ds_PM */
 
-#if defined(XWMDCFG_ds_SOC_GPIO) && (1 == XWMDCFG_ds_SOC_GPIO)
 /******** ******** gpio operation driver ******** ********/
 static
 xwer_t stm32cube_soc_drv_gpio_req(struct xwds_soc * soc,
@@ -494,9 +481,7 @@ xwer_t stm32cube_soc_drv_gpio_input(struct xwds_soc * soc,
         *in = pinmask & (xwsq_t)regval;
         return XWOK;
 }
-#endif /* XWMDCFG_ds_SOC_GPIO */
 
-#if defined(XWMDCFG_ds_SOC_EIRQ) && (1 == XWMDCFG_ds_SOC_EIRQ)
 /******** ******** EIRQ operation driver ******** ********/
 static
 xwer_t stm32cube_soc_drv_eirq_req(struct xwds_soc * soc,
@@ -562,9 +547,15 @@ xwer_t stm32cube_soc_drv_eirq_rls(struct xwds_soc * soc,
         return XWOK;
 }
 
-#endif /* XWMDCFG_ds_SOC_EIRQ */
+void stm32cube_soc_cb_eirq_isr(xwid_t eiid)
+{
+        struct xwds_soc * soc = &stm32cube_soc_cb;
 
-#if defined(XWMDCFG_ds_SOC_ERAM) && (1 == XWMDCFG_ds_SOC_ERAM)
+        if (!is_err_or_null(soc->eirq.isrs[eiid])) {
+                soc->eirq.isrs[eiid](soc, (xwid_t)eiid, soc->eirq.isrargs[eiid]);
+        }/* else {} */
+}
+
 /******** ******** ERAM ******** ********/
 static
 xwer_t stm32cube_soc_drv_eram_tst(struct xwds_soc * soc, xwptr_t * erraddr)
@@ -589,33 +580,4 @@ xwer_t stm32cube_soc_drv_eram_tst(struct xwds_soc * soc, xwptr_t * erraddr)
                 }
         }
         return rc;
-}
-#endif /* XWMDCFG_ds_SOC_ERAM */
-
-/******** ******** ISR ******** ********/
-void stm32cube_exti_isr(void)
-{
-        xwirq_t irqn;
-        struct soc_irq_data irqdata;
-        struct xwds_soc * soc;
-        xwsid_t eiid;
-        xwu32_t pr;
-
-        xwos_irq_get_id(&irqn);
-        xwos_irq_get_data(irqn, &irqdata);
-        soc = irqdata.data;
-
-        do {
-                pr = LL_EXTI_ReadFlag_0_31(LL_EXTI_LINE_ALL);
-                eiid = (xwsid_t)xwbop_fls(xwu32_t, pr);
-                if (eiid >= 0) {
-                        if (!is_err_or_null(soc->eirq.isrs[eiid])) {
-                                soc->eirq.isrs[eiid](soc, (xwid_t)eiid,
-                                                     soc->eirq.isrargs[eiid]);
-                        }/* else {} */
-                        LL_EXTI_ClearFlag_0_31(BIT(eiid));
-                } else {
-                        break;
-                }
-        } while (true);
 }

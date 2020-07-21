@@ -73,7 +73,7 @@ void DMA2_Stream5_IRQHandler(void);
 void DMA2_Stream6_IRQHandler(void);
 void DMA2_Stream7_IRQHandler(void);
 /* USER CODE BEGIN EFP */
-
+void stm32cube_override_linkage_it(void);
 /* USER CODE END EFP */
 
 #ifdef __cplusplus

@@ -30,6 +30,7 @@
 #include <xwos/osal/thread.h>
 #include <xwmd/ds/soc/gpio.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
+#include <bm/stm32cube/cubemx/Core/Inc/stm32f4xx_it.h>
 #include <bm/stm32cube/xwac/xwds/stm32cube.h>
 #include <bm/stm32cube/xwac/xwds/init.h>
 #include <bm/stm32cube/xwmo.h>
@@ -69,7 +70,8 @@ xwer_t memtst_task(void * arg);
  * + 确保链接时使用此符号的文件。
  */
 void * const stm32cube_linkage_placeholder[] = {
-        stm32cube_override_linkage_placeholder,
+        stm32cube_override_linkage_msp,
+        stm32cube_override_linkage_it,
 };
 
 const struct xwosal_thrd_desc stm32cube_tbd[] = {
