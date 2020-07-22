@@ -28,7 +28,7 @@
 #include <xwmd/ds/soc/gpio.h>
 #include <xwmd/ds/uart/dma.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
-#include <bm/stm32cube/cubemx/Core/Inc/stm32h7xx_it.h>
+#include <bm/stm32cube/cubemx/Core/Inc/isr.h>
 #include <bm/stm32cube/xwac/xwds/stm32cube.h>
 #include <bm/stm32cube/xwmo.h>
 

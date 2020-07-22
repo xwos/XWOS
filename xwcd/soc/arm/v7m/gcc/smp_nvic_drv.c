@@ -157,7 +157,7 @@ xwer_t cortexm_nvic_drv_release(__maybe_unused struct xwos_irqc * irqc,
         struct soc_isr_table * isr_table;
 
         isr_table = irqc->isr_table;
-        isr_table->soc[irqn] = arch_isr_nop;
+        isr_table->soc[irqn] = arch_isr_noop;
 #endif /* #if (!defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE)) */
         return XWOK;
 }

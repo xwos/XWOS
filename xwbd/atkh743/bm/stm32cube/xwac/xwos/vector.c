@@ -26,9 +26,7 @@
 #include <soc_irq.h>
 #include <soc_sched.h>
 #include <soc_syshwt.h>
-#include "stm32h743xx.h"
-#include <bm/stm32cube/cubemx/Core/Inc/weakisr.h>
-#include <bm/stm32cube/cubemx/Core/Inc/stm32h7xx_it.h>
+#include <bm/stm32cube/cubemx/Core/Inc/isr.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -52,13 +50,13 @@ __soc_isr_table_qualifier struct soc_isr_table soc_isr_table __xwos_vctbl = {
                 [ARCH_IRQ_MMFAULT + ARCHCFG_IRQ_NUM] = arch_isr_mm,
                 [ARCH_IRQ_BUSFAULT + ARCHCFG_IRQ_NUM] = arch_isr_busfault,
                 [ARCH_IRQ_USGFAULT + ARCHCFG_IRQ_NUM] = arch_isr_usagefault,
-                [ARCH_IRQ_RSVN9 + ARCHCFG_IRQ_NUM] = arch_isr_nop,
-                [ARCH_IRQ_RSVN8 + ARCHCFG_IRQ_NUM] = arch_isr_nop,
-                [ARCH_IRQ_RSVN7 + ARCHCFG_IRQ_NUM] = arch_isr_nop,
-                [ARCH_IRQ_RSVN6 + ARCHCFG_IRQ_NUM] = arch_isr_nop,
+                [ARCH_IRQ_RSVN9 + ARCHCFG_IRQ_NUM] = arch_isr_noop,
+                [ARCH_IRQ_RSVN8 + ARCHCFG_IRQ_NUM] = arch_isr_noop,
+                [ARCH_IRQ_RSVN7 + ARCHCFG_IRQ_NUM] = arch_isr_noop,
+                [ARCH_IRQ_RSVN6 + ARCHCFG_IRQ_NUM] = arch_isr_noop,
                 [ARCH_IRQ_SVCALL + ARCHCFG_IRQ_NUM] = (xwisr_f)arch_isr_svc,
                 [ARCH_IRQ_DBGMON + ARCHCFG_IRQ_NUM] = arch_isr_dbgmon,
-                [ARCH_IRQ_RSVN3 + ARCHCFG_IRQ_NUM] = arch_isr_nop,
+                [ARCH_IRQ_RSVN3 + ARCHCFG_IRQ_NUM] = arch_isr_noop,
                 [ARCH_IRQ_PENDSV + ARCHCFG_IRQ_NUM] = arch_scheduler_isr_swcx,
                 [ARCH_IRQ_SYSTICK + ARCHCFG_IRQ_NUM] = arch_systick_isr,
         },
@@ -214,7 +212,7 @@ __soc_isr_table_qualifier struct soc_isr_table soc_isr_table __xwos_vctbl = {
                 [148] = NULL,
                 [WAKEUP_PIN_IRQn] = WAKEUP_PIN_IRQHandler,
 
-                [150 ... (SOCCFG_IRQ_NUM - 1)] = arch_isr_nop,
+                [150 ... (SOCCFG_IRQ_NUM - 1)] = arch_isr_noop,
         },
 };
 

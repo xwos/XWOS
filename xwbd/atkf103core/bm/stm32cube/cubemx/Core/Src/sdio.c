@@ -99,6 +99,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef* sdHandle)
   if(sdHandle->Instance==SDIO)
   {
   /* USER CODE BEGIN SDIO_MspInit 0 */
+    MX_SDIO_SD_Construct();
 
   /* USER CODE END SDIO_MspInit 0 */
     /* SDIO clock enable */
@@ -187,7 +188,7 @@ void HAL_SD_MspDeInit(SD_HandleTypeDef* sdHandle)
     /* SDIO interrupt Deinit */
     HAL_NVIC_DisableIRQ(SDIO_IRQn);
   /* USER CODE BEGIN SDIO_MspDeInit 1 */
-
+    MX_SDIO_SD_Destruct();
   /* USER CODE END SDIO_MspDeInit 1 */
   }
 }

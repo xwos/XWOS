@@ -1,7 +1,7 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    weakisr.h
+  * @file    Weak/stm32f429xx_isr.h
   * @brief   Weak Interrupt Service Routines.
   ******************************************************************************
   * @author
@@ -25,8 +25,8 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __WEAKISR_H
-#define __WEAKISR_H
+#ifndef __WEAK_STM32F429XX_ISR_H
+#define __WEAK_STM32F429XX_ISR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,7 +58,7 @@ extern "C" {
 
 /* USER CODE BEGIN EFP */
 void WWDG_IRQHandler(void);
-void PVD_AVD_IRQHandler(void);
+void PVD_IRQHandler(void);
 void TAMP_STAMP_IRQHandler(void);
 void RTC_WKUP_IRQHandler(void);
 void FLASH_IRQHandler(void);
@@ -76,14 +76,14 @@ void DMA1_Stream4_IRQHandler(void);
 void DMA1_Stream5_IRQHandler(void);
 void DMA1_Stream6_IRQHandler(void);
 void ADC_IRQHandler(void);
-void FDCAN1_IT0_IRQHandler(void);
-void FDCAN2_IT0_IRQHandler(void);
-void FDCAN1_IT1_IRQHandler(void);
-void FDCAN2_IT1_IRQHandler(void);
+void CAN1_TX_IRQHandler(void);
+void CAN1_RX0_IRQHandler(void);
+void CAN1_RX1_IRQHandler(void);
+void CAN1_SCE_IRQHandler(void);
 void EXTI9_5_IRQHandler(void);
-void TIM1_BRK_IRQHandler(void);
-void TIM1_UP_IRQHandler(void);
-void TIM1_TRG_COM_IRQHandler(void);
+void TIM1_BRK_TIM9_IRQHandler(void);
+void TIM1_UP_TIM10_IRQHandler(void);
+void TIM1_TRG_COM_TIM11_IRQHandler(void);
 void TIM1_CC_IRQHandler(void);
 void TIM2_IRQHandler(void);
 void TIM3_IRQHandler(void);
@@ -99,13 +99,14 @@ void USART2_IRQHandler(void);
 void USART3_IRQHandler(void);
 void EXTI15_10_IRQHandler(void);
 void RTC_Alarm_IRQHandler(void);
+void OTG_FS_WKUP_IRQHandler(void);
 void TIM8_BRK_TIM12_IRQHandler(void);
 void TIM8_UP_TIM13_IRQHandler(void);
 void TIM8_TRG_COM_TIM14_IRQHandler(void);
 void TIM8_CC_IRQHandler(void);
 void DMA1_Stream7_IRQHandler(void);
 void FMC_IRQHandler(void);
-void SDMMC1_IRQHandler(void);
+void SDIO_IRQHandler(void);
 void TIM5_IRQHandler(void);
 void SPI3_IRQHandler(void);
 void UART4_IRQHandler(void);
@@ -119,7 +120,11 @@ void DMA2_Stream3_IRQHandler(void);
 void DMA2_Stream4_IRQHandler(void);
 void ETH_IRQHandler(void);
 void ETH_WKUP_IRQHandler(void);
-void FDCAN_CAL_IRQHandler(void);
+void CAN2_TX_IRQHandler(void);
+void CAN2_RX0_IRQHandler(void);
+void CAN2_RX1_IRQHandler(void);
+void CAN2_SCE_IRQHandler(void);
+void OTG_FS_IRQHandler(void);
 void DMA2_Stream5_IRQHandler(void);
 void DMA2_Stream6_IRQHandler(void);
 void DMA2_Stream7_IRQHandler(void);
@@ -131,7 +136,7 @@ void OTG_HS_EP1_IN_IRQHandler(void);
 void OTG_HS_WKUP_IRQHandler(void);
 void OTG_HS_IRQHandler(void);
 void DCMI_IRQHandler(void);
-void RNG_IRQHandler(void);
+void HASH_RNG_IRQHandler(void);
 void FPU_IRQHandler(void);
 void UART7_IRQHandler(void);
 void UART8_IRQHandler(void);
@@ -142,60 +147,6 @@ void SAI1_IRQHandler(void);
 void LTDC_IRQHandler(void);
 void LTDC_ER_IRQHandler(void);
 void DMA2D_IRQHandler(void);
-void SAI2_IRQHandler(void);
-void QUADSPI_IRQHandler(void);
-void LPTIM1_IRQHandler(void);
-void CEC_IRQHandler(void);
-void I2C4_EV_IRQHandler(void);
-void I2C4_ER_IRQHandler(void);
-void SPDIF_RX_IRQHandler(void);
-void OTG_FS_EP1_OUT_IRQHandler(void);
-void OTG_FS_EP1_IN_IRQHandler(void);
-void OTG_FS_WKUP_IRQHandler(void);
-void OTG_FS_IRQHandler(void);
-void DMAMUX1_OVR_IRQHandler(void);
-void HRTIM1_Master_IRQHandler(void);
-void HRTIM1_TIMA_IRQHandler(void);
-void HRTIM1_TIMB_IRQHandler(void);
-void HRTIM1_TIMC_IRQHandler(void);
-void HRTIM1_TIMD_IRQHandler(void);
-void HRTIM1_TIME_IRQHandler(void);
-void HRTIM1_FLT_IRQHandler(void);
-void DFSDM1_FLT0_IRQHandler(void);
-void DFSDM1_FLT1_IRQHandler(void);
-void DFSDM1_FLT2_IRQHandler(void);
-void DFSDM1_FLT3_IRQHandler(void);
-void SAI3_IRQHandler(void);
-void SWPMI1_IRQHandler(void);
-void TIM15_IRQHandler(void);
-void TIM16_IRQHandler(void);
-void TIM17_IRQHandler(void);
-void MDIOS_WKUP_IRQHandler(void);
-void MDIOS_IRQHandler(void);
-void JPEG_IRQHandler(void);
-void MDMA_IRQHandler(void);
-void SDMMC2_IRQHandler(void);
-void HSEM1_IRQHandler(void);
-void ADC3_IRQHandler(void);
-void DMAMUX2_OVR_IRQHandler(void);
-void BDMA_Channel0_IRQHandler(void);
-void BDMA_Channel1_IRQHandler(void);
-void BDMA_Channel2_IRQHandler(void);
-void BDMA_Channel3_IRQHandler(void);
-void BDMA_Channel4_IRQHandler(void);
-void BDMA_Channel5_IRQHandler(void);
-void BDMA_Channel6_IRQHandler(void);
-void BDMA_Channel7_IRQHandler(void);
-void COMP1_IRQHandler(void);
-void LPTIM2_IRQHandler(void);
-void LPTIM3_IRQHandler(void);
-void LPTIM4_IRQHandler(void);
-void LPTIM5_IRQHandler(void);
-void LPUART1_IRQHandler(void);
-void CRS_IRQHandler(void);
-void ECC_IRQHandler(void);
-void SAI4_IRQHandler(void);
-void WAKEUP_PIN_IRQHandler(void);
 
 /* USER CODE END EFP */
 
@@ -209,4 +160,4 @@ void WAKEUP_PIN_IRQHandler(void);
 }
 #endif
 
-#endif /* __WEAKISR_H */
+#endif /* __WEAK_STM32F429XX_ISR_H */

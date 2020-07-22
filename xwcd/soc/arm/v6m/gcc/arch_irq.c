@@ -301,7 +301,7 @@ void arch_isr_svc(void)
  * @brief ARCH default ISR
  */
 __xwbsp_isr
-void arch_isr_nop(void)
+void arch_isr_noop(void)
 {
         __maybe_unused volatile struct cm_scs_reg * scs;
         __maybe_unused xwer_t rc;

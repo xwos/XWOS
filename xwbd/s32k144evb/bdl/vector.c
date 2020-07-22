@@ -48,18 +48,18 @@ __soc_isr_table_qualifier struct soc_isr_table soc_isr_table __xwos_vctbl = {
                 arch_isr_mm,
                 arch_isr_busfault,
                 arch_isr_usagefault,
-                arch_isr_nop,
-                arch_isr_nop,
-                arch_isr_nop,
-                arch_isr_nop,
+                arch_isr_noop,
+                arch_isr_noop,
+                arch_isr_noop,
+                arch_isr_noop,
                 (xwisr_f)arch_isr_svc,
                 arch_isr_dbgmon,
-                arch_isr_nop,
+                arch_isr_noop,
                 arch_scheduler_isr_swcx,
                 arch_systick_isr,
         },
         .soc = {
-                [0 ... (SOCCFG_IRQ_NUM - 1)] = arch_isr_nop,
+                [0 ... (SOCCFG_IRQ_NUM - 1)] = arch_isr_noop,
         },
 };
 
@@ -68,6 +68,6 @@ __soc_isr_table_qualifier struct soc_irq_data_table soc_irq_data_table = {
                 [0 ... (ARCHCFG_IRQ_NUM - 1)] = NULL,
         },
         .soc = {
-                [0 ... (SOCCFG_IRQ_NUM - 1)] = arch_isr_nop,
+                [0 ... (SOCCFG_IRQ_NUM - 1)] = arch_isr_noop,
         },
 };

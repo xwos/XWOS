@@ -30,7 +30,7 @@
 #include <xwos/osal/thread.h>
 #include <xwmd/ds/soc/gpio.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
-#include <bm/stm32cube/cubemx/Core/Inc/stm32f4xx_it.h>
+#include <bm/stm32cube/cubemx/Core/Inc/isr.h>
 #include <bm/stm32cube/xwac/xwds/stm32cube.h>
 #include <bm/stm32cube/xwac/xwds/init.h>
 #include <bm/stm32cube/xwmo.h>

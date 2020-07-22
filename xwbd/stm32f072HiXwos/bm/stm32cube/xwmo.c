@@ -26,6 +26,7 @@
 #include <xwos/osal/thread.h>
 #include <xwos/osal/sync/semaphore.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
+#include <bm/stm32cube/cubemx/Core/Inc/isr.h>
 #include <bm/stm32cube/cubemx/Core/Inc/gpio.h>
 #include <bm/stm32cube/xwmo.h>
 
@@ -56,7 +57,8 @@ xwer_t led_task(void * arg);
  * + 确保链接时使用此符号的文件。
  */
 void * const stm32cube_linkage_placeholder[] = {
-        stm32cube_override_linkage_placeholder,
+        stm32cube_override_linkage_msp,
+        stm32cube_override_linkage_it,
 };
 
 const struct xwosal_thrd_desc stm32cube_tbd[] = {

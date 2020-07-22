@@ -59,7 +59,7 @@ void SVC_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
 /* USER CODE BEGIN EFP */
-
+void stm32cube_override_linkage_it(void);
 /* USER CODE END EFP */
 
 #ifdef __cplusplus

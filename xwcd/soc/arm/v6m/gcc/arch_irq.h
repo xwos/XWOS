@@ -90,7 +90,7 @@ __xwbsp_isr
 void arch_isr_svc(void);
 
 __xwbsp_isr
-void arch_isr_nop(void);
+void arch_isr_noop(void);
 
 __xwbsp_code
 xwer_t arch_irq_get_id(xwirq_t * irqnbuf);

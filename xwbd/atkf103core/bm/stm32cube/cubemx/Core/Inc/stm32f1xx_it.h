@@ -71,6 +71,7 @@ void SDIO_IRQHandler(void);
 void TIM7_IRQHandler(void);
 void DMA2_Channel4_5_IRQHandler(void);
 /* USER CODE BEGIN EFP */
+void stm32cube_override_linkage_it(void);
 
 /* USER CODE END EFP */
 

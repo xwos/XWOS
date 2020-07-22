@@ -1,7 +1,7 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    weakisr.h
+  * @file    Weak/stm32f103xb_isr.h
   * @brief   Weak Interrupt Service Routines.
   ******************************************************************************
   * @author
@@ -25,8 +25,8 @@
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __WEAKISR_H
-#define __WEAKISR_H
+#ifndef __WEAK_STM32F103XB_ISR_H
+#define __WEAK_STM32F103XB_ISR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,8 +59,8 @@ extern "C" {
 /* USER CODE BEGIN EFP */
 void WWDG_IRQHandler(void);
 void PVD_IRQHandler(void);
-void TAMP_STAMP_IRQHandler(void);
-void RTC_WKUP_IRQHandler(void);
+void TAMPER_IRQHandler(void);
+void RTC_IRQHandler(void);
 void FLASH_IRQHandler(void);
 void RCC_IRQHandler(void);
 void EXTI0_IRQHandler(void);
@@ -68,22 +68,22 @@ void EXTI1_IRQHandler(void);
 void EXTI2_IRQHandler(void);
 void EXTI3_IRQHandler(void);
 void EXTI4_IRQHandler(void);
-void DMA1_Stream0_IRQHandler(void);
-void DMA1_Stream1_IRQHandler(void);
-void DMA1_Stream2_IRQHandler(void);
-void DMA1_Stream3_IRQHandler(void);
-void DMA1_Stream4_IRQHandler(void);
-void DMA1_Stream5_IRQHandler(void);
-void DMA1_Stream6_IRQHandler(void);
-void ADC_IRQHandler(void);
-void CAN1_TX_IRQHandler(void);
-void CAN1_RX0_IRQHandler(void);
+void DMA1_Channel1_IRQHandler(void);
+void DMA1_Channel2_IRQHandler(void);
+void DMA1_Channel3_IRQHandler(void);
+void DMA1_Channel4_IRQHandler(void);
+void DMA1_Channel5_IRQHandler(void);
+void DMA1_Channel6_IRQHandler(void);
+void DMA1_Channel7_IRQHandler(void);
+void ADC1_2_IRQHandler(void);
+void USB_HP_CAN1_TX_IRQHandler(void);
+void USB_LP_CAN1_RX0_IRQHandler(void);
 void CAN1_RX1_IRQHandler(void);
 void CAN1_SCE_IRQHandler(void);
 void EXTI9_5_IRQHandler(void);
-void TIM1_BRK_TIM9_IRQHandler(void);
-void TIM1_UP_TIM10_IRQHandler(void);
-void TIM1_TRG_COM_TIM11_IRQHandler(void);
+void TIM1_BRK_IRQHandler(void);
+void TIM1_UP_IRQHandler(void);
+void TIM1_TRG_COM_IRQHandler(void);
 void TIM1_CC_IRQHandler(void);
 void TIM2_IRQHandler(void);
 void TIM3_IRQHandler(void);
@@ -99,54 +99,7 @@ void USART2_IRQHandler(void);
 void USART3_IRQHandler(void);
 void EXTI15_10_IRQHandler(void);
 void RTC_Alarm_IRQHandler(void);
-void OTG_FS_WKUP_IRQHandler(void);
-void TIM8_BRK_TIM12_IRQHandler(void);
-void TIM8_UP_TIM13_IRQHandler(void);
-void TIM8_TRG_COM_TIM14_IRQHandler(void);
-void TIM8_CC_IRQHandler(void);
-void DMA1_Stream7_IRQHandler(void);
-void FMC_IRQHandler(void);
-void SDIO_IRQHandler(void);
-void TIM5_IRQHandler(void);
-void SPI3_IRQHandler(void);
-void UART4_IRQHandler(void);
-void UART5_IRQHandler(void);
-void TIM6_DAC_IRQHandler(void);
-void TIM7_IRQHandler(void);
-void DMA2_Stream0_IRQHandler(void);
-void DMA2_Stream1_IRQHandler(void);
-void DMA2_Stream2_IRQHandler(void);
-void DMA2_Stream3_IRQHandler(void);
-void DMA2_Stream4_IRQHandler(void);
-void ETH_IRQHandler(void);
-void ETH_WKUP_IRQHandler(void);
-void CAN2_TX_IRQHandler(void);
-void CAN2_RX0_IRQHandler(void);
-void CAN2_RX1_IRQHandler(void);
-void CAN2_SCE_IRQHandler(void);
-void OTG_FS_IRQHandler(void);
-void DMA2_Stream5_IRQHandler(void);
-void DMA2_Stream6_IRQHandler(void);
-void DMA2_Stream7_IRQHandler(void);
-void USART6_IRQHandler(void);
-void I2C3_EV_IRQHandler(void);
-void I2C3_ER_IRQHandler(void);
-void OTG_HS_EP1_OUT_IRQHandler(void);
-void OTG_HS_EP1_IN_IRQHandler(void);
-void OTG_HS_WKUP_IRQHandler(void);
-void OTG_HS_IRQHandler(void);
-void DCMI_IRQHandler(void);
-void HASH_RNG_IRQHandler(void);
-void FPU_IRQHandler(void);
-void UART7_IRQHandler(void);
-void UART8_IRQHandler(void);
-void SPI4_IRQHandler(void);
-void SPI5_IRQHandler(void);
-void SPI6_IRQHandler(void);
-void SAI1_IRQHandler(void);
-void LTDC_IRQHandler(void);
-void LTDC_ER_IRQHandler(void);
-void DMA2D_IRQHandler(void);
+void USBWakeUp_IRQHandler(void);
 
 /* USER CODE END EFP */
 
@@ -160,4 +113,4 @@ void DMA2D_IRQHandler(void);
 }
 #endif
 
-#endif /* __WEAKISR_H */
+#endif /* __WEAK_STM32F103XB_ISR_H */

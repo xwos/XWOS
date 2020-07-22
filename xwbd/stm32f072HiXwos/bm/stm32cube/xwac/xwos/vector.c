@@ -26,6 +26,8 @@
 #include <soc_irq.h>
 #include <soc_sched.h>
 #include <soc_syshwt.h>
+#include <bm/stm32cube/cubemx/Core/Inc/isr.h>
+#include <bm/stm32cube/cubemx/Core/Inc/main.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
@@ -48,18 +50,51 @@ __soc_isr_table_qualifier struct soc_isr_table soc_isr_table __xwos_vctbl = {
                 arch_isr_mm,
                 arch_isr_busfault,
                 arch_isr_usagefault,
-                arch_isr_nop,
-                arch_isr_nop,
-                arch_isr_nop,
-                arch_isr_nop,
+                arch_isr_noop,
+                arch_isr_noop,
+                arch_isr_noop,
+                arch_isr_noop,
                 (xwisr_f)arch_isr_svc,
                 arch_isr_dbgmon,
-                arch_isr_nop,
+                arch_isr_noop,
                 arch_scheduler_isr_swcx,
                 arch_systick_isr,
         },
         .soc = {
-                [0 ... (SOCCFG_IRQ_NUM - 1)] = arch_isr_nop,
+                [WWDG_IRQn] = WWDG_IRQHandler,
+                [PVD_VDDIO2_IRQn] = PVD_VDDIO2_IRQHandler,
+                [RTC_IRQn] = RTC_IRQHandler,
+                [FLASH_IRQn] = FLASH_IRQHandler,
+                [RCC_CRS_IRQn] = RCC_CRS_IRQHandler,
+                [EXTI0_1_IRQn] = EXTI0_1_IRQHandler,
+                [EXTI2_3_IRQn] = EXTI2_3_IRQHandler,
+                [EXTI4_15_IRQn] = EXTI4_15_IRQHandler,
+                [TSC_IRQn] = TSC_IRQHandler,
+                [DMA1_Channel1_IRQn] = DMA1_Channel1_IRQHandler,
+                [DMA1_Channel2_3_IRQn] = DMA1_Channel2_3_IRQHandler,
+                [DMA1_Channel4_5_6_7_IRQn] = DMA1_Channel4_5_6_7_IRQHandler,
+                [ADC1_COMP_IRQn] = ADC1_COMP_IRQHandler,
+                [TIM1_BRK_UP_TRG_COM_IRQn] = TIM1_BRK_UP_TRG_COM_IRQHandler,
+                [TIM1_CC_IRQn] = TIM1_CC_IRQHandler,
+                [TIM2_IRQn] = TIM2_IRQHandler,
+                [TIM3_IRQn] = TIM3_IRQHandler,
+                [TIM6_DAC_IRQn] = TIM6_DAC_IRQHandler,
+                [TIM7_IRQn] = TIM7_IRQHandler,
+                [TIM14_IRQn] = TIM14_IRQHandler,
+                [TIM15_IRQn] = TIM15_IRQHandler,
+                [TIM16_IRQn] = TIM16_IRQHandler,
+                [TIM17_IRQn] = TIM17_IRQHandler,
+                [I2C1_IRQn] = I2C1_IRQHandler,
+                [I2C2_IRQn] = I2C2_IRQHandler,
+                [SPI1_IRQn] = SPI1_IRQHandler,
+                [SPI2_IRQn] = SPI2_IRQHandler,
+                [USART1_IRQn] = USART1_IRQHandler,
+                [USART2_IRQn] = USART2_IRQHandler,
+                [USART3_4_IRQn] = USART3_4_IRQHandler,
+                [CEC_CAN_IRQn] = CEC_CAN_IRQHandler,
+                [USB_IRQn] = USB_IRQHandler,
+
+                [32 ... (SOCCFG_IRQ_NUM - 1)] = arch_isr_noop,
         },
 };
 
@@ -83,6 +118,6 @@ __soc_isr_table_qualifier struct soc_irq_data_table soc_irq_data_table = {
                 [ARCH_IRQ_SYSTICK + ARCHCFG_IRQ_NUM] = NULL,
         },
         .soc = {
-                NULL,
+                [0 ... (SOCCFG_IRQ_NUM - 1)] = NULL,
         },
 };

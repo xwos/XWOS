@@ -27,6 +27,8 @@ CUBEMX_CSRCS := $(shell xwbs/util/el/makefile-grep-variable.el --variable=C_SOUR
 CUBEMX_CFLAGS := $(shell xwbs/util/el/makefile-grep-variable.el --variable=C_DEFS $(call getXwmoDir)/cubemx/Makefile)
 CUBEMX_INCDIRS := $(shell xwbs/util/el/makefile-grep-variable.el --variable=C_INCLUDES $(call getXwmoDir)/cubemx/Makefile)
 
+CUBEMX_CSRCS += Core/Src/isr.c
+
 # cubemx中的源文件路径统一增加前缀"cubemx/"
 XWMO_CSRCS :=
 XWMO_CSRCS += $(addprefix cubemx/,$(CUBEMX_CSRCS))

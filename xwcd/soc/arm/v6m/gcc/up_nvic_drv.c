@@ -91,7 +91,7 @@ xwer_t cortexm_nvic_drv_release(__maybe_unused xwirq_t irqn)
         struct soc_isr_data_table * isr_data_table;
 
         isr_table = xwos_irqc.isr_table;
-        isr_table->soc[irqn] = arch_isr_nop;
+        isr_table->soc[irqn] = arch_isr_noop;
 #endif /* !SOCCFG_RO_ISRTABLE */
         return XWOK;
 }

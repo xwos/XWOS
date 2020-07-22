@@ -72,7 +72,7 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-void stm32cube_override_linkage_placeholder(void);
+void stm32cube_override_linkage_msp(void);
 
 /* USER CODE END EFP */
 

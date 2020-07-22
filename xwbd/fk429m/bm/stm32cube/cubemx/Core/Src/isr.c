@@ -1,10 +1,8 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * File Name          : stm32f0xx_hal_msp.c
-  * Description        : This file provides code for the MSP Initialization
-  *                      and de-Initialization codes.
-  ******************************************************************************
+  * @file    isr.c
+  * @brief   Weak Interrupt Service Routines.
   * @author
   * + 隐星魂 (Roy.Sun) <https://xwos.tech>
   * @copyright
@@ -26,9 +24,9 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+
+/* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <arch_systick.h>
 
 /* USER CODE END Includes */
 
@@ -38,14 +36,14 @@
 /* USER CODE END TD */
 
 /* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN Define */
+/* USER CODE BEGIN PD */
 
-/* USER CODE END Define */
+/* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN Macro */
+/* USER CODE BEGIN PM */
 
-/* USER CODE END Macro */
+/* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
@@ -57,52 +55,20 @@
 
 /* USER CODE END PFP */
 
-/* External functions --------------------------------------------------------*/
-/* USER CODE BEGIN ExternalFunctions */
-
-/* USER CODE END ExternalFunctions */
-
+/* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-extern uint32_t uwTickPrio;
-
-void stm32cube_override_linkage_msp(void)
-{
-  /* 链接占位符：确保链接时使用此文件中的符号 */
-}
+#ifdef STM32F429xx
+  #include "bm/stm32cube/cubemx/Weak/stm32f429xx_isr.c"
+#endif
 
 /* USER CODE END 0 */
-/**
-  * Initializes the Global MSP.
-  */
-void HAL_MspInit(void)
-{
-  /* USER CODE BEGIN MspInit 0 */
 
-  /* USER CODE END MspInit 0 */
+/* External variables --------------------------------------------------------*/
 
-  __HAL_RCC_SYSCFG_CLK_ENABLE();
-  __HAL_RCC_PWR_CLK_ENABLE();
+/* USER CODE BEGIN EV */
 
-  /* System interrupt init*/
-  /* PendSV_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(PendSV_IRQn, 3, 0);
-
-  /* USER CODE BEGIN MspInit 1 */
-  HAL_PWR_EnableBkUpAccess();
-  HAL_DBGMCU_EnableDBGStopMode();
-  HAL_DBGMCU_EnableDBGStandbyMode();
-
-  /* USER CODE END MspInit 1 */
-}
+/* USER CODE END EV */
 
 /* USER CODE BEGIN 1 */
-HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
-{
-  (void)TickPriority;
-  uwTickPrio = ARCH_IRQ_TICK_PRIO;
-  return HAL_OK;
-}
 
 /* USER CODE END 1 */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
