@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：线程栅栏
+ * @brief STM32CUBE：配置
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,17 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_example_sync_barrier_xwmo_h__
-#define __xwam_example_sync_barrier_xwmo_h__
+#ifndef __bm_stm32cube_cfg_h__
+#define __bm_stm32cube_cfg_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
+ ******** ******** ********        cfg        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t example_barrier_start(void);
-
-#endif /* xwam/example/sync/barrier/xwmo.h */
+#endif /* bm/stm32cube/cfg.h */

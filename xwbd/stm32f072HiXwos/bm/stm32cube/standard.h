@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：标准头文件
+ * @brief STM32CUBE：顶级头文件
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,13 +18,15 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_cubemx_standard_h__
-#define __bm_cubemx_standard_h__
+#ifndef __bm_stm32cube_standard_h__
+#define __bm_stm32cube_standard_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+#include <xwos/standard.h>
 #include <bdl/standard.h>
+#include <bm/stm32cube/cfg.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -34,4 +36,4 @@
  ******** ******** ********       macro       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
-#endif /* bm/cubemx/standard.h */
+#endif /* bm/stm32cube/standard.h */

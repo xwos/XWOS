@@ -27,5 +27,6 @@
 #define XWAMCFG_example_lock_mutex              1
 #define XWAMCFG_example_sync_semaphore          1
 #define XWAMCFG_example_sync_condition          1
+#define XWAMCFG_example_sync_barrier            1
 
 #endif /* cfg/xwam.h */

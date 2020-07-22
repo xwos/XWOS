@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：sync/barrier
+ * @brief 示例：线程栅栏
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -22,6 +22,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
+#include <xwos/lib/xwlog.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <xwos/osal/sync/barrier.h>
@@ -30,8 +31,16 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define EXAMPLE_BARRIER_THRD_PRIORITY         \
+#define EXAMPLE_BARRIER_THRD_PRIORITY \
         XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
+
+#if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
+  #define EXAMPLE_THREAD_SLEEP_LOG_TAG        "barthrd"
+  #define barlogf(lv, fmt, ...) \
+        xwlogf(lv, EXAMPLE_THREAD_SLEEP_LOG_TAG, fmt, ##__VA_ARGS__)
+#else /* XWLIBCFG_LOG */
+  #define barlogf(lv, fmt, ...)
+#endif /* !XWLIBCFG_LOG */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -45,8 +54,6 @@ xwer_t example_barrier_thrd_func(void * arg);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-struct xwosal_barrier xwtst_sync_barrier;
-
 const struct xwosal_thrd_desc example_barrier_thrd_td[] = {
         [0] = {
                 .name = "example.barrier.thrd.0",
@@ -95,6 +102,8 @@ const struct xwosal_thrd_desc example_barrier_thrd_td[] = {
         },
 };
 xwid_t example_barrier_thrd[xw_array_size(example_barrier_thrd_td)];
+
+struct xwosal_barrier xwtst_sync_barrier;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -145,6 +154,9 @@ xwer_t example_barrier_thrd_func(void * arg)
         xwer_t rc;
 
         xwsq_t pos = (xwsq_t)arg; /* 获取线程的各自的位置 */
+
+        barlogf(INFO, "[线程%d] 启动。\n", pos);
+
         xwbmpop_c0all(msk, XWOSAL_BARRIER_MAXNUM);
 
         /* 设置位图掩码 */
@@ -156,5 +168,11 @@ xwer_t example_barrier_thrd_func(void * arg)
 
         /* 同步线程 */
         rc = xwosal_barrier_sync(barid, pos, msk);
+        if (XWOK == rc) {
+                barlogf(INFO, "[线程%d] 同步。\n", pos);
+        }
+
+        barlogf(INFO, "[线程%d] 退出。\n", pos);
+        xwosal_thrd_delete(xwosal_cthrd_get_id());
         return rc;
 }

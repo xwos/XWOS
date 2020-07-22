@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：标准头文件
+ * @brief STM32CUBE：配置
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -19,7 +19,7 @@
  */
 
 #ifndef __bm_stm32cube_cfg_h__
-#define __bm_stm32cube_standard_h__
+#define __bm_stm32cube_cfg_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********        cfg        ******** ******** ********

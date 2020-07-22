@@ -18,15 +18,15 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_cubemx_standard_h__
-#define __bm_cubemx_standard_h__
+#ifndef __bm_stm32cube_standard_h__
+#define __bm_stm32cube_standard_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwmd/ds/standard.h>
 #include <bdl/standard.h>
+#include <bm/stm32cube/cfg.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -36,4 +36,4 @@
  ******** ******** ********       macro       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
-#endif /* bm/cubemx/standard.h */
+#endif /* bm/stm32cube/standard.h */
