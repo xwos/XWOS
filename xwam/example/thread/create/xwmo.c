@@ -38,9 +38,9 @@
         XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 2)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-  #define EXAMPLE_THREAD_CREATES_LOG_TAG        "thrdcrt"
+  #define EXAMPLE_THREAD_CREATE_LOG_TAG         "thrdcrt"
   #define thrdcrtlogf(lv, fmt, ...)     \
-        xwlogf(lv, EXAMPLE_THREAD_CREATES_LOG_TAG, fmt, ##__VA_ARGS__)
+        xwlogf(lv, EXAMPLE_THREAD_CREATE_LOG_TAG, fmt, ##__VA_ARGS__)
 #else /* XWLIBCFG_LOG */
   #define thrdcrtlogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
@@ -138,7 +138,7 @@ xwer_t thrd_1_func(void * arg)
         xwsq_t argv = (xwsq_t)arg; /* 获取创建线程时提供的参数 */
         xwsq_t i;
 
-        thrdcrtlogf(INFO, "Thread-1 start.\n");
+        thrdcrtlogf(INFO, "Thread-1 starts\n");
 
         /* 静态初始化线程2 */
         for (i = 0; i < xw_array_size(static_tbd); i++) {
@@ -158,7 +158,7 @@ xwer_t thrd_1_func(void * arg)
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
                 time = 1 * XWTM_S;
                 xwosal_cthrd_sleep(&time);
-                thrdcrtlogf(INFO, "Thread-1 say: %d.\n", argv);
+                thrdcrtlogf(INFO, "Thread-1 says: %d.\n", argv);
                 argv--;
                 if (0 == argv) {
                         break;
@@ -175,15 +175,15 @@ xwer_t thrd_1_func(void * arg)
                                     static_tbd[i].name, rc);
                 } else {
                         thrdcrtlogf(INFO,
-                                    "%s return: %d (%s).\n",
+                                    "%s returns: %d (%s).\n",
                                     static_tbd[i].name,
                                     childrc,
                                     strerror(-childrc));
                 }
         }
 
-        /*线程1结束，并将自己删除，以便系统回收资源 */
-        thrdcrtlogf(INFO, "Thread-1 exit. argv == %d\n", argv);
+        /* 线程1结束 */
+        thrdcrtlogf(INFO, "Thread-1 exits. argv == %d\n", argv);
         xwosal_thrd_delete(xwosal_cthrd_get_id());
         return rc;
 }
@@ -197,13 +197,13 @@ xwer_t thrd_2_func(void * arg)
         xwtm_t time;
         xwsq_t argv = (xwsq_t)arg; /* 获取初始化线程时提供的参数 */
 
-        thrdcrtlogf(INFO, "Thread-2 start.\n");
+        thrdcrtlogf(INFO, "Thread-2 starts.\n");
 
         /* 循环argv次 */
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
                 time = 1 * XWTM_S;
                 rc = xwosal_cthrd_sleep(&time);
-                thrdcrtlogf(INFO, "Thread-2 say: %d.\n", argv);
+                thrdcrtlogf(INFO, "Thread-2 says: %d.\n", argv);
                 argv--;
                 if (0 == argv) {
                         break;
@@ -215,8 +215,8 @@ xwer_t thrd_2_func(void * arg)
                 rc = XWOK;
         }
 
-        /*线程2结束，并将自己删除，以便系统回收资源 */
-        thrdcrtlogf(INFO, "Thread-2 exit. argv == %d\n", argv);
+        /* 线程2结束 */
+        thrdcrtlogf(INFO, "Thread-2 exits. argv == %d\n", argv);
         xwosal_thrd_destroy(xwosal_cthrd_get_obj());
         return rc; /* 抛出返回值 */
 }

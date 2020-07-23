@@ -1,6 +1,6 @@
 #! /bin/make -f
 # @file
-# @brief CPU描述层的编译规则
+# @brief XWOS模块的编译规则
 # @author
 # + 隐星魂 (Roy.Sun) <https://xwos.tech>
 # @copyright
@@ -18,12 +18,10 @@
 # > limitations under the License.
 #
 
-CPU_INCDIRS :=
-CPU_CFLAGS := -mcpu=cortex-m3 -mfloat-abi=soft
-CPU_CXXFLAGS := -mcpu=cortex-m3 -mfloat-abi=soft
-CPU_AFLAGS := -mcpu=cortex-m3 -mfloat-abi=soft
-CPU_LDFLAGS := -mcpu=cortex-m3 -mfloat-abi=soft
-CPU_EOBJS :=
+include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
+include $(XWBS_UTIL_MK_XWMO)
 
-CPU_CSRCS := cpu_init.c
-CPU_ASRCS :=
+XWMO_CSRCS := xwmo.c
+XWMO_CFLAGS := -Wno-unused-value
+XWMO_INCDIRS :=
+include xwbs/$(XuanWuOS_CFG_XWMO_MK)

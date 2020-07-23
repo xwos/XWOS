@@ -44,11 +44,15 @@ typedef void (* xwosal_swt_f)(struct xwosal_swt * /*swt*/, void * /*arg*/);
 
 /**
  * @brief [XWOSAL] 软件定时器标志 —— 自动重启
+ * @note 不可与XWOSAL_SWT_FLAG_RESTART同时使用
  */
 #define XWOSAL_SWT_FLAG_RESTART         XWOSDL_SWT_FLAG_RESTART
 
 /**
  * @brief [XWOSAL] 软件定时器标志 —— 自动销毁
+ * @note
+ * - 不可与XWOSAL_SWT_FLAG_RESTART同时使用
+ * - 不可用于静态初始化的软件定时器
  */
 #define XWOSAL_SWT_FLAG_AUTORM          XWOSDL_SWT_FLAG_AUTORM
 

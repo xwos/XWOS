@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 应用模块配置
+ * @brief 示例：线程睡眠
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,10 +18,17 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_xwam_h__
-#define __cfg_xwam_h__
+#ifndef __xwam_example_thread_sleep_xwmo_h__
+#define __xwam_example_thread_sleep_xwmo_h__
 
-#define XWAMCFG_example_thread_create   1
-#define XWAMCFG_example_thread_sleep    1
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********      include      ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#include <xwos/standard.h>
 
-#endif /* cfg/xwam.h */
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********         function prototypes         ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+xwer_t example_thread_sleep_start(void);
+
+#endif /* xwam/example/thread/sleep/xwmo.h */
