@@ -126,7 +126,7 @@ xwer_t xwosal_swt_delete(xwid_t swtid)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * - 重入性：可重入
  */
 static __xwos_inline_api
 xwid_t xwosal_swt_get_id(struct xwosal_swt * swt)
@@ -141,7 +141,7 @@ xwid_t xwosal_swt_get_id(struct xwosal_swt * swt)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * - 重入性：可重入
  */
 static __xwos_inline_api
 struct xwosal_swt * xwosal_swt_get_obj(xwid_t swtid)

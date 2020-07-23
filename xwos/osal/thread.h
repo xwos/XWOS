@@ -326,6 +326,20 @@ xwid_t xwosal_cthrd_get_id(void)
 }
 
 /**
+ * @brief XWOSAL API：获取当前线程的对象指针
+ * @return 线程控制块对象的指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+struct xwosal_tcb * xwosal_cthrd_get_obj(void)
+{
+        return (struct xwosal_tcb *)xwosdl_cthrd_get_obj();
+}
+
+/**
  * @brief XWOSAL API：通过线程控制块对象的指针获取线程ID
  * @param tcb: (I) 线程控制块对象的指针
  * @return 线程ID
@@ -338,6 +352,21 @@ static __xwos_inline_api
 xwid_t xwosal_thrd_get_id(struct xwosal_tcb * tcb)
 {
         return xwosdl_thrd_get_id(&tcb->ostcb);
+}
+
+/**
+ * @brief XWOSAL API：从线程ID获取对象指针
+ * @param tid: (I) 线程ID
+ * @return 线程控制块对象的指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+struct xwosal_tcb * xwosal_thrd_get_obj(xwid_t tid)
+{
+        return (struct xwosal_tcb *)xwosdl_thrd_get_obj(tid);
 }
 
 /**

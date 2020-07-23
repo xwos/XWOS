@@ -162,17 +162,9 @@ xwer_t xwosdl_thrd_delete(xwid_t tid)
 {
         struct xwos_tcb * tcb;
 
-        /* FIXME: 暂时使用指针值作为ID */
         tcb = (struct xwos_tcb *)tid;
 
         return xwos_thrd_delete(tcb);
-}
-
-static __xw_inline
-xwid_t xwosdl_thrd_get_id(struct xwosdl_tcb * tcb)
-{
-        /* 单核系统为了简化代码，直接使用指针数值作为ID */
-        return (xwid_t)tcb;
 }
 
 static __xw_inline
@@ -183,6 +175,28 @@ xwid_t xwosdl_cthrd_get_id(void)
         ctcb = xwos_scheduler_get_ctcb_lc();
         /* 单核系统为了简化代码，直接使用指针数值作为ID */
         return (xwid_t)ctcb;
+}
+
+static __xw_inline
+struct xwosdl_thrd * xwosdl_cthrd_get_obj(void)
+{
+        struct xwos_tcb * ctcb;
+
+        ctcb = xwos_scheduler_get_ctcb_lc();
+        return (struct xwosdl_thrd *)ctcb;
+}
+
+static __xw_inline
+xwid_t xwosdl_thrd_get_id(struct xwosdl_tcb * tcb)
+{
+        /* 单核系统为了简化代码，直接使用指针数值作为ID */
+        return (xwid_t)tcb;
+}
+
+static __xw_inline
+struct xwosdl_thrd * xwosdl_thrd_get_obj(xwid_t tid)
+{
+        return (struct xwosdl_thrd *)tid;
 }
 
 static __xw_inline
@@ -758,14 +772,12 @@ xwer_t xwosdl_cdt_timedwait(xwid_t cdtid,
 static __xw_inline
 xwid_t xwosdl_flg_get_id(struct xwosdl_flg * flg)
 {
-        /* FIXME: find ID from obj */
         return (xwid_t)flg;
 }
 
 static __xw_inline
 struct xwosdl_flg * xwosdl_flg_get_obj(xwid_t flgid)
 {
-        /* FIXME: find obj from ID table */
         return (struct xwosdl_flg *)flgid;
 }
 
@@ -790,7 +802,6 @@ xwer_t xwosdl_flg_create(xwid_t * flgidbuf, xwbmp_t initval[])
         flg = NULL;
         rc = xwsync_evt_create(&flg, initval, XWSYNC_EVT_TYPE_FLAG);
         if (XWOK == rc) {
-                /* FIXME: Add to ID table */
                 *flgidbuf = (xwid_t)flg;
         } else {
                 *flgidbuf = (xwid_t)0;
@@ -807,7 +818,6 @@ xwer_t xwosdl_flg_delete(xwid_t flgid)
         flg = xwosdl_flg_get_obj(flgid);
         rc = xwsync_evt_delete(flg);
         if (XWOK == rc) {
-                /* FIXME: Del from ID table */
         }
         return rc;
 }
@@ -974,14 +984,12 @@ xwer_t xwosdl_flg_timedwait(xwid_t flgid, xwsq_t trigger, xwsq_t action,
 static __xw_inline
 xwid_t xwosdl_selector_get_id(struct xwosdl_selector * slt)
 {
-        /* FIXME: find ID from obj */
         return (xwid_t)slt;
 }
 
 static __xw_inline
 struct xwosdl_selector * xwosdl_selector_get_obj(xwid_t sltid)
 {
-        /* FIXME: find obj from ID table */
         return (struct xwosdl_selector *)sltid;
 }
 
@@ -1006,7 +1014,6 @@ xwer_t xwosdl_selector_create(xwid_t * sltidbuf)
         slt = NULL;
         rc = xwsync_evt_create(&slt, NULL, XWSYNC_EVT_TYPE_SELECTOR);
         if (XWOK == rc) {
-                /* FIXME: Add to ID table */
                 *sltidbuf = (xwid_t)slt;
         } else {
                 *sltidbuf = (xwid_t)0;
@@ -1023,7 +1030,6 @@ xwer_t xwosdl_selector_delete(xwid_t sltid)
         slt = xwosdl_selector_get_obj(sltid);
         rc = xwsync_evt_delete(slt);
         if (XWOK == rc) {
-                /* FIXME: Del from ID table */
         }
         return rc;
 }
@@ -1110,14 +1116,12 @@ xwer_t xwosdl_selector_timedselect(xwid_t sltid, xwbmp_t msk[], xwbmp_t trg[],
 static __xw_inline
 xwid_t xwosdl_barrier_get_id(struct xwosdl_barrier * bar)
 {
-        /* FIXME: find ID from obj */
         return (xwid_t)bar;
 }
 
 static __xw_inline
 struct xwosdl_barrier * xwosdl_barrier_get_obj(xwid_t barid)
 {
-        /* FIXME: find obj from ID table */
         return (struct xwosdl_barrier *)barid;
 }
 
@@ -1142,7 +1146,6 @@ xwer_t xwosdl_barrier_create(xwid_t * baridbuf)
         bar = NULL;
         rc = xwsync_evt_create(&bar, NULL, XWSYNC_EVT_TYPE_BARRIER);
         if (XWOK == rc) {
-                /* FIXME: Add to ID table */
                 *baridbuf = (xwid_t)bar;
         } else {
                 *baridbuf = (xwid_t)0;
@@ -1159,7 +1162,6 @@ xwer_t xwosdl_barrier_delete(xwid_t barid)
         bar = xwosdl_barrier_get_obj(barid);
         rc = xwsync_evt_delete(bar);
         if (XWOK == rc) {
-                /* FIXME: Del from ID table */
         }
         return rc;
 }

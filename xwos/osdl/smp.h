@@ -173,13 +173,6 @@ xwer_t xwosdl_thrd_delete(xwid_t tid)
 }
 
 static __xw_inline
-xwid_t xwosdl_thrd_get_id(struct xwosdl_tcb * tcb)
-{
-        /* FIXME: find ID from obj */
-        return (xwid_t)tcb;
-}
-
-static __xw_inline
 xwid_t xwosdl_cthrd_get_id(void)
 {
         struct xwos_tcb * ctcb;
@@ -187,6 +180,29 @@ xwid_t xwosdl_cthrd_get_id(void)
         ctcb = xwos_scheduler_get_ctcb_lc();
         /* FIXME: find ID from obj */
         return (xwid_t)ctcb;
+}
+
+static __xw_inline
+struct xwosdl_thrd * xwosdl_cthrd_get_obj(void)
+{
+        struct xwos_tcb * ctcb;
+
+        ctcb = xwos_scheduler_get_ctcb_lc();
+        return (struct xwosdl_thrd *)ctcb;
+}
+
+static __xw_inline
+xwid_t xwosdl_thrd_get_id(struct xwosdl_tcb * tcb)
+{
+        /* FIXME: find ID from obj */
+        return (xwid_t)tcb;
+}
+
+static __xw_inline
+struct xwosdl_thrd * xwosdl_thrd_get_obj(xwid_t tid)
+{
+        /* FIXME: find obj from ID table */
+        return (struct xwosdl_thrd *)tid;
 }
 
 static __xw_inline
