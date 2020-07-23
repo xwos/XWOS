@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内核适配代码：AXISRAM区域内存池
+ * @brief STM32CUBE：Log
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,33 +18,29 @@
  * > limitations under the License.
  */
 
-#ifndef __bdl_axisram_h__
-#define __bdl_axisram_h__
-
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
+#include <bm/stm32cube/xwac/xwds/stm32cube.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
+ ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+xwssz_t board_log_write(const char * s, xwsz_t n)
+{
+        xwtm_t desired;
+        xwssz_t wrsz;
+        xwer_t rc;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-__xwos_code
-xwer_t axisram_alloc(xwsz_t memsize, void ** membuf);
-
-__xwos_code
-xwer_t axisram_free(void * mem);
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-#endif /* bdl/axisram.h */
+        desired = XWTM_MAX;
+        rc = xwds_dmauartc_tx(&stm32cube_usart1_cb,
+                              (const xwu8_t *)s, n,
+                              &desired);
+        if (rc < 0) {
+                wrsz = -1;
+        } else {
+                wrsz = (xwssz_t)n;
+        }
+        return wrsz;
+}

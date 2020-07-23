@@ -1,6 +1,6 @@
 #! /bin/make -f
 # @file
-# @brief 板级描述层的编译规则
+# @brief XWOS模块的编译规则
 # @author
 # + 隐星魂 (Roy.Sun) <https://xwos.tech>
 # @copyright
@@ -18,19 +18,10 @@
 # > limitations under the License.
 #
 
-BDL_EOBJS :=
+include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
+include $(XWBS_UTIL_MK_XWMO)
 
-BDL_AFLAGS :=
-BDL_CFLAGS :=  -mfloat-abi=soft
-BDL_CXFLAGS :=
-BDL_LDFLAGS :=
-
-BDL_CSRCS :=
-BDL_ASRCS :=
-
-BDL_CSRCS += board_init.c
-BDL_CSRCS += ocheap.c
-BDL_CSRCS += main.c
-
-BDL_CSRCS += xwac/thrd_stack_mempool.c
-BDL_CSRCS += xwac/xwsd_hook.c
+XWMO_CSRCS := xwmo.c
+XWMO_CFLAGS := -Wno-unused-value
+XWMO_INCDIRS :=
+include xwbs/$(XuanWuOS_CFG_XWMO_MK)

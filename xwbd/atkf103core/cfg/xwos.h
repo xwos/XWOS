@@ -30,7 +30,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         xwlib Configuration         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWLIBCFG_LOG                                    0
+#define XWLIBCFG_LOG                                    1
 #define XWLIBCFG_XWLOG_LEVEL                            (0)
 #define XWLIBCFG_XWLOG_BUFSIZE                          (128)
 

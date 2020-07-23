@@ -56,13 +56,21 @@ MEMORY {
         /* 数据段(.data)与未初始化的数据段(.bss) */
         data_mr (arw):
                 org = ocram_mr_origin,
-                len = 61k
+                len = 29k
 
         /* 玄武OS的内核栈 */
         xwos_stk_mr (rw):
                 org = ORIGIN(data_mr) + LENGTH(data_mr),
-                len = ocram_mr_size - LENGTH(data_mr)
+                len = 3k
+
+        /* 内部堆内存 */
+        ocheap_mr (awr):
+                org = ORIGIN(xwos_stk_mr) + LENGTH(xwos_stk_mr),
+                len = 32k
 }
+
+ocheap_mr_origin = ORIGIN(ocheap_mr);
+ocheap_mr_size = LENGTH(ocheap_mr);
 
 sram_mr_origin = ORIGIN(sram_mr);
 sram_mr_size = LENGTH(sram_mr);

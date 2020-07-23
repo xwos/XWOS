@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内核适配代码：AXISRAM区域内存池
+ * @brief 玄武OS内核适配代码：芯片内部内存池
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,17 +18,14 @@
  * > limitations under the License.
  */
 
-#ifndef __bdl_axisram_h__
-#define __bdl_axisram_h__
-
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+#include <xwos/lib/xwbop.h>
+#include <xwos/mm/common.h>
+#include <xwos/mm/bma.h>
+#include <bdl/ocheap.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -37,14 +34,37 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwos_code
-xwer_t axisram_alloc(xwsz_t memsize, void ** membuf);
-
-__xwos_code
-xwer_t axisram_free(void * mem);
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
+ ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+extern struct xwmm_bma * ocheap_bma;
 
-#endif /* bdl/axisram.h */
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********      function implementations       ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#if ((BRDCFG_MM_OCHEAP_BLKSZ % XWMMCFG_STACK_ALIGNMENT) != 0)
+  #error BRDCFG_MM_OCHEAP_BLKSZ is not aligned to XWMMCFG_STACK_ALIGNMENT!
+#endif
+
+__xwos_code
+xwer_t ocheap_alloc(xwsz_t memsize, void ** membuf)
+{
+        xwsz_t stknum;
+        xwsq_t numodr;
+        xwer_t rc;
+
+        stknum = DIV_ROUND_UP(memsize, BRDCFG_MM_OCHEAP_BLKSZ);
+        numodr = (xwsq_t)xwbop_fls(xwsz_t, stknum);
+        if (stknum & (stknum - 1U)) {
+                numodr++;
+        }
+        rc = xwmm_bma_alloc(ocheap_bma, numodr, membuf);
+        return rc;
+}
+
+__xwos_code
+xwer_t ocheap_free(void * mem)
+{
+        return xwmm_bma_free(ocheap_bma, mem);
+}

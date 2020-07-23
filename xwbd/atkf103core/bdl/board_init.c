@@ -22,20 +22,32 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
+#include <xwos/mm/common.h>
+#include <xwos/mm/bma.h>
 #include <bdl/board_init.h>
 #include <bm/stm32cube/init.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      macros       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+#define OCHEAP_BLKSZ    BRDCFG_MM_OCHEAP_BLKSZ
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+extern xwsz_t ocheap_mr_origin[];
+extern xwsz_t ocheap_mr_size[];
+
+/**
+ * @brief thread stack mempool zone
+ */
+__xwbsp_data struct xwmm_bma * ocheap_bma = NULL;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      static function prototypes     ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+static __xwbsp_init_code
+xwer_t sys_mm_init(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********       function implementations      ******** ********
@@ -49,5 +61,35 @@ void board_lowlevel_init(void)
 __xwbsp_init_code
 void board_init(void)
 {
+        xwer_t rc;
+
         stm32cube_init();
+
+        rc = sys_mm_init();
+        BDL_BUG_ON(rc < 0);
+}
+
+/**
+ * @brief 初始化内存管理
+ */
+static __xwbsp_init_code
+xwer_t sys_mm_init(void)
+{
+        struct xwmm_bma * bma;
+        xwer_t rc;
+
+        rc = xwmm_bma_create(&bma, "ocheap",
+                             (xwptr_t)ocheap_mr_origin,
+                             (xwsz_t)ocheap_mr_size,
+                             OCHEAP_BLKSZ);
+        if (__unlikely(rc < 0)) {
+                goto err_ocheap_bma_create;
+        }
+        ocheap_bma = bma;
+
+        return XWOK;
+
+err_ocheap_bma_create:
+        BDL_BUG();
+        return rc;
 }

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内核适配代码：AXISRAM区域内存池
+ * @brief 玄武OS内核适配代码：芯片内部内存池
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __bdl_axisram_h__
-#define __bdl_axisram_h__
+#ifndef __bdl_ocheap_h__
+#define __bdl_ocheap_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
@@ -38,13 +38,13 @@
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwos_code
-xwer_t axisram_alloc(xwsz_t memsize, void ** membuf);
+xwer_t ocheap_alloc(xwsz_t memsize, void ** membuf);
 
 __xwos_code
-xwer_t axisram_free(void * mem);
+xwer_t ocheap_free(void * mem);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
-#endif /* bdl/axisram.h */
+#endif /* bdl/ocheap.h */

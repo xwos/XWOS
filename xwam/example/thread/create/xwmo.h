@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内核适配代码：AXISRAM区域内存池
+ * @brief 示例：线程的创建与退出
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __bdl_axisram_h__
-#define __bdl_axisram_h__
+#ifndef __xwam_example_thread_create_xwmo_h__
+#define __xwam_example_thread_create_xwmo_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
@@ -27,24 +27,8 @@
 #include <xwos/standard.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwos_code
-xwer_t axisram_alloc(xwsz_t memsize, void ** membuf);
+xwer_t example_thread_create_start(void);
 
-__xwos_code
-xwer_t axisram_free(void * mem);
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-#endif /* bdl/axisram.h */
+#endif /* xwam/example/thread/create/xwmo.h */

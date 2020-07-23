@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内核适配代码：AXISRAM区域内存池
+ * @brief 玄武OS内核适配代码：线程栈内存池
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,17 +18,12 @@
  * > limitations under the License.
  */
 
-#ifndef __bdl_axisram_h__
-#define __bdl_axisram_h__
-
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+#include <bdl/ocheap.h>
+#include <bdl/xwac/thrd_stack_mempool.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -37,14 +32,34 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwos_code
-xwer_t axisram_alloc(xwsz_t memsize, void ** membuf);
-
-__xwos_code
-xwer_t axisram_free(void * mem);
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
+ ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
-#endif /* bdl/axisram.h */
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********      function implementations       ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+__xwos_code
+xwer_t bdl_thrd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf)
+{
+        union {
+                xwstk_t * stk;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = ocheap_alloc(stack_size, &mem.anon);
+        if (XWOK == rc) {
+                *membuf = mem.stk;
+        } else {
+                *membuf = NULL;
+        }
+        return rc;
+}
+
+__xwos_code
+xwer_t bdl_thrd_stack_pool_free(xwstk_t * stk)
+{
+        return ocheap_free(stk);
+}

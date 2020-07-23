@@ -21,4 +21,6 @@
 #ifndef __cfg_xwam_h__
 #define __cfg_xwam_h__
 
+#define XWAMCFG_example_thread_create   1
+
 #endif /* cfg/xwam.h */

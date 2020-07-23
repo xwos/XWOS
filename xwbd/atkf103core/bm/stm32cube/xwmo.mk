@@ -38,6 +38,7 @@ XWMO_CSRCS += xwmo.c
 
 # 增加xwac中的源文件
 XWMO_CSRCS += xwac/xwlib/crc32.c
+XWMO_CSRCS += xwac/xwlib/log.c
 XWMO_CSRCS += xwac/xwos/hook.c
 XWMO_CSRCS += xwac/xwos/vector.c
 XWMO_CSRCS += xwac/xwds/stm32cube.c
