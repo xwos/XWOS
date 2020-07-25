@@ -211,13 +211,19 @@ xwer_t xwsync_evt_timedsync(struct xwsync_evt * evt, xwsq_t pos, xwbmp_t sync[],
  *                    @ref XWSYNC_EVT_TRIGGER_CLR_ALL
  *                    @ref XWSYNC_EVT_TRIGGER_CLR_ALL
  *                    时有效，其他情况不使用此参数，可填 @ref XWOS_UNUSED_ARGUMENT
- * @param origin: 指向缓冲区的指针，此缓冲区仅当trigger取值
- *                @ref XWSYNC_EVT_TRIGGER_TGL_ALL 以及
- *                @ref XWSYNC_EVT_TRIGGER_TGL_ANY
- *                时有效，其他情况不使用此参数，可填NULL：
- *                (I) 作为输入时，作为用于比较的初始值
- *                (O) 作为输出时，返回事件对象中位图状态
- *                    （可作为下一次调用的初始值）
+ * @param origin: 指向缓冲区的指针：
+ *                - 当trigger取值
+ *                  @ref XWSYNC_EVT_TRIGGER_SET_ALL
+ *                  @ref XWSYNC_EVT_TRIGGER_SET_ANY
+ *                  @ref XWSYNC_EVT_TRIGGER_CLR_ALL
+ *                  @ref XWSYNC_EVT_TRIGGER_CLR_ANY
+ *                  (O) 返回事件对象中位图状态（action之前）
+ *                - 当trigger取值
+ *                  @ref XWSYNC_EVT_TRIGGER_TGL_ALL
+ *                  @ref XWSYNC_EVT_TRIGGER_TGL_ANY
+ *                  (I) 作为输入时，作为用于比较的初始值
+ *                  (O) 作为输出时，返回事件对象中位图状态
+ *                      （可作为下一次调用的初始值）
  * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的位
  * @return 错误码
  * @retval XWOK: 没有错误

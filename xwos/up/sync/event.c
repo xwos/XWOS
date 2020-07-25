@@ -49,7 +49,7 @@ void xwsync_evt_activate(struct xwsync_evt * evt, xwbmp_t initval[], xwsq_t attr
 static __xwos_code
 xwer_t xwsync_evt_trywait_level(struct xwsync_evt * evt,
                                 xwsq_t trigger, xwsq_t action,
-                                xwbmp_t msk[]);
+                                xwbmp_t origin[], xwbmp_t msk[]);
 
 static __xwos_code
 xwer_t xwsync_evt_trywait_edge(struct xwsync_evt * evt, xwsq_t trigger,
@@ -58,7 +58,7 @@ xwer_t xwsync_evt_trywait_edge(struct xwsync_evt * evt, xwsq_t trigger,
 static __xwos_code
 xwer_t xwsync_evt_timedwait_level(struct xwsync_evt * evt,
                                   xwsq_t trigger, xwsq_t action,
-                                  xwbmp_t msk[],
+                                  xwbmp_t origin[], xwbmp_t msk[],
                                   xwtm_t * xwtm);
 
 static __xwos_code
@@ -525,7 +525,7 @@ xwer_t xwsync_evt_read(struct xwsync_evt * evt, xwbmp_t out[])
 static __xwos_code
 xwer_t xwsync_evt_trywait_level(struct xwsync_evt * evt,
                                 xwsq_t trigger, xwsq_t action,
-                                xwbmp_t msk[])
+                                xwbmp_t origin[], xwbmp_t msk[])
 {
         xwreg_t cpuirq;
         bool triggered;
@@ -538,6 +538,9 @@ xwer_t xwsync_evt_trywait_level(struct xwsync_evt * evt,
 
         rc = XWOK;
         xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        if (origin) {
+                xwbmpop_assign(origin, evt->bmp, XWSYNC_EVT_MAXNUM);
+        }
         if (XWSYNC_EVT_ACTION_CONSUMPTION == action) {
                 switch (trigger) {
                 case XWSYNC_EVT_TRIGGER_SET_ALL:
@@ -653,13 +656,19 @@ xwer_t xwsync_evt_trywait_edge(struct xwsync_evt * evt, xwsq_t trigger,
  *                    @ref XWSYNC_EVT_TRIGGER_CLR_ALL
  *                    @ref XWSYNC_EVT_TRIGGER_CLR_ALL
  *                    时有效，其他情况不使用此参数，可填 @ref XWOS_UNUSED_ARGUMENT
- * @param origin: 指向缓冲区的指针，此缓冲区仅当trigger取值
- *                @ref XWSYNC_EVT_TRIGGER_TGL_ALL 以及
- *                @ref XWSYNC_EVT_TRIGGER_TGL_ANY
- *                时有效，其他情况不使用此参数，可填NULL：
- *                (I) 作为输入时，作为用于比较的初始值
- *                (O) 作为输出时，返回事件对象中位图状态
- *                    （可作为下一次调用的初始值）
+ * @param origin: 指向缓冲区的指针：
+ *                - 当trigger取值
+ *                  @ref XWSYNC_EVT_TRIGGER_SET_ALL
+ *                  @ref XWSYNC_EVT_TRIGGER_SET_ANY
+ *                  @ref XWSYNC_EVT_TRIGGER_CLR_ALL
+ *                  @ref XWSYNC_EVT_TRIGGER_CLR_ANY
+ *                  (O) 返回事件对象中位图状态（action之前）
+ *                - 当trigger取值
+ *                  @ref XWSYNC_EVT_TRIGGER_TGL_ALL
+ *                  @ref XWSYNC_EVT_TRIGGER_TGL_ANY
+ *                  (I) 作为输入时，作为用于比较的初始值
+ *                  (O) 作为输出时，返回事件对象中位图状态
+ *                      （可作为下一次调用的初始值）
  * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的位
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -684,7 +693,8 @@ xwer_t xwsync_evt_trywait(struct xwsync_evt * evt,
                       "type-error", -ETYPE);
 
         if (trigger <= XWSYNC_EVT_TRIGGER_CLR_ANY) {
-                rc = xwsync_evt_trywait_level(evt, trigger, action, msk);
+                rc = xwsync_evt_trywait_level(evt, trigger, action,
+                                              origin, msk);
         } else {
                 rc = xwsync_evt_trywait_edge(evt, trigger, origin, msk);
         }
@@ -694,7 +704,7 @@ xwer_t xwsync_evt_trywait(struct xwsync_evt * evt,
 static __xwos_code
 xwer_t xwsync_evt_timedwait_level(struct xwsync_evt * evt,
                                   xwsq_t trigger, xwsq_t action,
-                                  xwbmp_t msk[],
+                                  xwbmp_t origin[], xwbmp_t msk[],
                                   xwtm_t * xwtm)
 {
         xwreg_t cpuirq;
@@ -710,6 +720,9 @@ xwer_t xwsync_evt_timedwait_level(struct xwsync_evt * evt,
         rc = XWOK;
         xwlk_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         while (true) {
+                if (origin) {
+                        xwbmpop_assign(origin, evt->bmp, XWSYNC_EVT_MAXNUM);
+                }
                 if (XWSYNC_EVT_ACTION_CONSUMPTION == action) {
                         switch (trigger) {
                         case XWSYNC_EVT_TRIGGER_SET_ALL:
@@ -857,13 +870,19 @@ xwer_t xwsync_evt_timedwait_edge(struct xwsync_evt * evt, xwsq_t trigger,
  *                    @ref XWSYNC_EVT_TRIGGER_CLR_ALL
  *                    @ref XWSYNC_EVT_TRIGGER_CLR_ALL
  *                    时有效，其他情况不使用此参数，可填 @ref XWOS_UNUSED_ARGUMENT
- * @param origin: 指向缓冲区的指针，此缓冲区仅当trigger取值
- *                @ref XWSYNC_EVT_TRIGGER_TGL_ALL 以及
- *                @ref XWSYNC_EVT_TRIGGER_TGL_ANY
- *                时有效，其他情况不使用此参数，可填NULL：
- *                (I) 作为输入时，作为用于比较的初始值
- *                (O) 作为输出时，返回事件对象中位图状态
- *                    （可作为下一次调用的初始值）
+ * @param origin: 指向缓冲区的指针：
+ *                - 当trigger取值
+ *                  @ref XWSYNC_EVT_TRIGGER_SET_ALL
+ *                  @ref XWSYNC_EVT_TRIGGER_SET_ANY
+ *                  @ref XWSYNC_EVT_TRIGGER_CLR_ALL
+ *                  @ref XWSYNC_EVT_TRIGGER_CLR_ANY
+ *                  (O) 返回事件对象中位图状态（action之前）
+ *                - 当trigger取值
+ *                  @ref XWSYNC_EVT_TRIGGER_TGL_ALL
+ *                  @ref XWSYNC_EVT_TRIGGER_TGL_ANY
+ *                  (I) 作为输入时，作为用于比较的初始值
+ *                  (O) 作为输出时，返回事件对象中位图状态
+ *                      （可作为下一次调用的初始值）
  * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的位
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
@@ -900,7 +919,8 @@ xwer_t xwsync_evt_timedwait(struct xwsync_evt * evt,
                       "not-in-thrd", -ENOTINTHRD);
 
         if (trigger <= XWSYNC_EVT_TRIGGER_CLR_ANY) {
-                rc = xwsync_evt_timedwait_level(evt, trigger, action, msk, xwtm);
+                rc = xwsync_evt_timedwait_level(evt, trigger, action,
+                                                origin, msk, xwtm);
         } else {
                 rc = xwsync_evt_timedwait_edge(evt, trigger, origin, msk, xwtm);
         }
