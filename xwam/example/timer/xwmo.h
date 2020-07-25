@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 应用模块配置
+ * @brief 示例：软件定时器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,11 +18,17 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_xwam_h__
-#define __cfg_xwam_h__
+#ifndef __xwam_example_timer_xwmo_h__
+#define __xwam_example_timer_xwmo_h__
 
-#define XWAMCFG_example_thread_create   1
-#define XWAMCFG_example_thread_sleep    1
-#define XWAMCFG_example_timer           1
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********      include      ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#include <xwos/standard.h>
 
-#endif /* cfg/xwam.h */
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********         function prototypes         ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+xwer_t example_timer_start(void);
+
+#endif /* xwam/example/timer/xwmo.h */

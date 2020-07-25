@@ -48,8 +48,7 @@ XWMO_CSRCS += xwac/xwds/uart.c
 
 
 # 定义编译选项
-XWMO_CFLAGS := -include standard.h
-XWMO_CFLAGS += -Wno-undef -Wno-unused-parameter
+XWMO_CFLAGS := -Wno-undef -Wno-unused-parameter
 XWMO_CFLAGS += $(CUBEMX_CFLAGS)
 
 # 定义头文件路径

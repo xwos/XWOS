@@ -26,7 +26,7 @@
 #include <xwos/osal/scheduler.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/xwmo.h>
-#include <xwam/example/thread/sleep/xwmo.h>
+#include <xwam/example/timer/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -95,13 +95,13 @@ xwer_t bdl_init_thrd(void * arg)
                 goto bm_stm32cube_start;
         }
 
-        rc = example_thread_sleep_start();
+        rc = example_timer_start();
         if (rc < 0) {
-                goto example_thread_sleep_start;
+                goto example_timer_start;
         }
         return XWOK;
 
-example_thread_sleep_start:
+example_timer_start:
         BDL_BUG();
 bm_stm32cube_start:
         BDL_BUG();

@@ -34,6 +34,7 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include <bm/stm32cube/standard.h>
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx_ll_crc.h"
 #include "stm32f1xx_hal.h"
