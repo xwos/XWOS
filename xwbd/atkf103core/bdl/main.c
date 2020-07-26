@@ -26,7 +26,7 @@
 #include <xwos/osal/scheduler.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/xwmo.h>
-#include <xwam/example/sync/semaphore/xwmo.h>
+#include <xwam/example/sync/condition/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -95,13 +95,13 @@ xwer_t bdl_init_thrd(void * arg)
                 goto bm_stm32cube_start;
         }
 
-        rc = example_semaphore_start();
+        rc = example_condition_start();
         if (rc < 0) {
-                goto example_semaphore_start;
+                goto example_condition_start;
         }
         return XWOK;
 
-example_semaphore_start:
+example_condition_start:
         BDL_BUG();
 bm_stm32cube_start:
         BDL_BUG();

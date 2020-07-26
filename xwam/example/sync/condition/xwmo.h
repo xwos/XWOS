@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：sync/condition
+ * @brief 示例：条件量
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
