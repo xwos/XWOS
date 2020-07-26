@@ -138,7 +138,7 @@ xwer_t thrd_1_func(void * arg)
         xwsq_t argv = (xwsq_t)arg; /* 获取创建线程时提供的参数 */
         xwsq_t i;
 
-        thrdcrtlogf(INFO, "Thread-1 starts\n");
+        thrdcrtlogf(INFO, "Thread-1 starts.\n");
 
         /* 静态初始化线程2 */
         for (i = 0; i < xw_array_size(static_tbd); i++) {
