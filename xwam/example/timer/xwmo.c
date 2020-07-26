@@ -39,10 +39,10 @@
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
   #define EXAMPLE_THREAD_SLEEP_LOG_TAG        "swtthrd"
-  #define swtthrdlogf(lv, fmt, ...) \
+  #define swtlogf(lv, fmt, ...) \
         xwlogf(lv, EXAMPLE_THREAD_SLEEP_LOG_TAG, fmt, ##__VA_ARGS__)
 #else /* XWLIBCFG_LOG */
-  #define swtthrdlogf(lv, fmt, ...)
+  #define swtlogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -133,7 +133,7 @@ err_flg_init:
 }
 
 /**
- * @brief 定时器1的回调函数
+ * @brief 定时器0的回调函数
  * @note
  * - UP系统
  *   - 当配置(XWUPCFG_SD_BH == 1)，此函数运行在中断底半部；
@@ -182,14 +182,14 @@ xwer_t swtthrd_func(void * arg)
 
         XWOS_UNUSED(arg);
 
-        swtthrdlogf(INFO, "Thread starts.\n");
+        swtlogf(INFO, "[线程] 启动。\n");
 
         base = xwosal_scheduler_get_timetick_lc();
 
-        swtthrdlogf(INFO, "Start timer0.\n");
+        swtlogf(INFO, "[线程] 启动定时器0。\n");
         rc = xwosal_swt_start(swtid0, base, 500 * XWTM_MS, swt0_callback, NULL);
 
-        swtthrdlogf(INFO, "Start timer1.\n");
+        swtlogf(INFO, "[线程] 启动定时器1。\n");
         rc = xwosal_swt_start(swtid1, base, 800 * XWTM_MS, swt1_callback, NULL);
 
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
@@ -205,22 +205,22 @@ xwer_t swtthrd_func(void * arg)
                         /* 测试第0位是否被置1 */
                         if (xwbmpop_t1i(trg, 0)) {
                                 ts = xwosal_scheduler_get_timestamp_lc();
-                                swtthrdlogf(INFO,
-                                            "swt0 wkup. timestamp: %lld ns.\n",
-                                            ts);
+                                swtlogf(INFO,
+                                        "[线程] 定时器0唤醒，时间戳：%lld 纳秒。\n",
+                                        ts);
                         }
 
                         /* 测试第1位是否被置1 */
                         if (xwbmpop_t1i(trg, 1)) {
                                 ts = xwosal_scheduler_get_timestamp_lc();
-                                swtthrdlogf(INFO,
-                                            "swt1 wkup. timestamp: %lld ns.\n",
-                                            ts);
+                                swtlogf(INFO,
+                                        "[线程] 定时器1唤醒，时间戳：%lld 纳秒。\n",
+                                        ts);
                         }
                 }
         }
 
-        swtthrdlogf(INFO, "Thread exits.\n");
+        swtlogf(INFO, "[线程] 退出。\n");
         xwosal_thrd_delete(xwosal_cthrd_get_id());
         return rc;
 }

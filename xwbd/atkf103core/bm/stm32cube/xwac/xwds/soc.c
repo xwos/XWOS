@@ -52,7 +52,6 @@ static
 xwer_t stm32cube_soc_drv_resume(struct xwds_device * dev);
 #endif /* XWMDCFG_ds_PM */
 
-#if defined(XWMDCFG_ds_SOC_GPIO) && (1 == XWMDCFG_ds_SOC_GPIO)
 static
 xwer_t stm32cube_soc_drv_gpio_req(struct xwds_soc * soc,
                                   xwid_t port, xwsq_t pinmask);
@@ -87,12 +86,11 @@ static
 xwer_t stm32cube_soc_drv_gpio_input(struct xwds_soc * soc,
                                     xwid_t port, xwsq_t pinmask,
                                     xwsq_t * in);
-#endif /* XWMDCFG_ds_SOC_GPIO */
 
-#if defined(XWMDCFG_ds_SOC_ERAM) && (1 == XWMDCFG_ds_SOC_ERAM)
+#if defined(STM32CUBECFG_SRAM) && (1 == STM32CUBECFG_SRAM)
 static
 xwer_t stm32cube_soc_drv_eram_tst(struct xwds_soc * soc, xwptr_t * erraddr);
-#endif /* XWMDCFG_ds_SOC_ERAM */
+#endif /* STM32CUBECFG_SRAM */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
@@ -113,7 +111,6 @@ const struct xwds_soc_driver stm32cube_soc_drv = {
 #endif /* XWMDCFG_ds_PM */
         },
 
-#if defined(XWMDCFG_ds_SOC_GPIO) && (1 == XWMDCFG_ds_SOC_GPIO)
         .gpio_req = stm32cube_soc_drv_gpio_req,
         .gpio_rls = stm32cube_soc_drv_gpio_rls,
         .gpio_cfg = stm32cube_soc_drv_gpio_cfg,
@@ -122,11 +119,10 @@ const struct xwds_soc_driver stm32cube_soc_drv = {
         .gpio_toggle = stm32cube_soc_drv_gpio_toggle,
         .gpio_output = stm32cube_soc_drv_gpio_output,
         .gpio_input = stm32cube_soc_drv_gpio_input,
-#endif /* XWMDCFG_ds_SOC_GPIO */
 
-#if defined(XWMDCFG_ds_SOC_ERAM) && (1 == XWMDCFG_ds_SOC_ERAM)
+#if defined(STM32CUBECFG_SRAM) && (1 == STM32CUBECFG_SRAM)
         .eram_tst = stm32cube_soc_drv_eram_tst,
-#endif /* XWMDCFG_ds_SOC_ERAM */
+#endif /* STM32CUBECFG_SRAM */
 
         .ioctl = NULL,
 };
@@ -177,10 +173,12 @@ struct xwds_soc stm32cube_soc_cb = {
                 .port_num = xw_array_size(stm32cube_gpio_pin_state),
                 .pin_num = 16,
         },
+#if defined(STM32CUBECFG_SRAM) && (1 == STM32CUBECFG_SRAM)
         .eram = {
                 .origin = (xwptr_t)sram_mr_origin,
                 .size = (xwsz_t)sram_mr_size,
         },
+#endif /* STM32CUBECFG_SRAM */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -195,7 +193,9 @@ xwer_t stm32cube_soc_drv_start(struct xwds_device * dev)
 
         MX_GPIO_Init();
         MX_DMA_Init();
+#if defined(STM32CUBECFG_SRAM) && (1 == STM32CUBECFG_SRAM)
         MX_FSMC_Init();
+#endif /* STM32CUBECFG_SRAM */
 
         return XWOK;
 }
@@ -205,7 +205,9 @@ xwer_t stm32cube_soc_drv_stop(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
 
+#if defined(STM32CUBECFG_SRAM) && (1 == STM32CUBECFG_SRAM)
         MX_FSMC_DeInit();
+#endif /* STM32CUBECFG_SRAM */
         MX_DMA_DeInit();
         MX_GPIO_DeInit();
 
@@ -228,7 +230,6 @@ xwer_t stm32cube_soc_drv_resume(struct xwds_device * dev)
 }
 #endif /* XWMDCFG_ds_PM */
 
-#if defined(XWMDCFG_ds_SOC_GPIO) && (1 == XWMDCFG_ds_SOC_GPIO)
 /******** ******** gpio operation driver ******** ********/
 static
 xwer_t stm32cube_soc_drv_gpio_req(struct xwds_soc * soc,
@@ -365,9 +366,8 @@ xwer_t stm32cube_soc_drv_gpio_input(struct xwds_soc * soc,
         *in = pinmask & (xwsq_t)regval;
         return XWOK;
 }
-#endif /* XWMDCFG_ds_SOC_GPIO */
 
-#if defined(XWMDCFG_ds_SOC_ERAM) && (1 == XWMDCFG_ds_SOC_ERAM)
+#if defined(STM32CUBECFG_SRAM) && (1 == STM32CUBECFG_SRAM)
 /******** ******** ERAM ******** ********/
 static
 xwer_t stm32cube_soc_drv_eram_tst(struct xwds_soc * soc, xwptr_t * erraddr)
@@ -393,4 +393,4 @@ xwer_t stm32cube_soc_drv_eram_tst(struct xwds_soc * soc, xwptr_t * erraddr)
         }
         return rc;
 }
-#endif /* XWMDCFG_ds_SOC_ERAM */
+#endif /* STM32CUBECFG_SRAM */

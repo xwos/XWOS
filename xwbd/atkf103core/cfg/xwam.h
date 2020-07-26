@@ -21,9 +21,10 @@
 #ifndef __cfg_xwam_h__
 #define __cfg_xwam_h__
 
-#define XWAMCFG_example_thread_create   1
-#define XWAMCFG_example_thread_sleep    1
-#define XWAMCFG_example_timer           1
-#define XWAMCFG_example_lock_mutex      1
+#define XWAMCFG_example_thread_create           1
+#define XWAMCFG_example_thread_sleep            1
+#define XWAMCFG_example_timer                   1
+#define XWAMCFG_example_lock_mutex              1
+#define XWAMCFG_example_sync_semaphore          1
 
 #endif /* cfg/xwam.h */

@@ -134,7 +134,7 @@ xwer_t mtxthrd_0_func(void * arg)
         xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
-        mutexlogf(INFO, "[线程0] 开始。\n");
+        mutexlogf(INFO, "[线程0] 启动。\n");
 
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
                 time = 500 * XWTM_MS;

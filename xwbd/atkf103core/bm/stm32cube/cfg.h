@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：信号量
+ * @brief 板级描述层：标准头文件
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,17 +18,12 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_example_sync_semaphore_xwmo_h__
-#define __xwam_example_sync_semaphore_xwmo_h__
+#ifndef __bm_stm32cube_cfg_h__
+#define __bm_stm32cube_standard_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
+ ******** ******** ********        cfg        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#define STM32CUBECFG_SRAM       1
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t example_semaphore_start(void);
-
-#endif /* xwam/example/sync/semaphore/xwmo.h */
+#endif /* bm/stm32cube/cfg.h */

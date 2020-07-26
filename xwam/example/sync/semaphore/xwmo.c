@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：sync/semaphore
+ * @brief 示例：信号量
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -22,20 +22,28 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
+#include <string.h>
+#include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
+#include <xwos/osal/swt.h>
 #include <xwos/osal/sync/semaphore.h>
 #include <xwam/example/sync/semaphore/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define EXAMPLE_SEMAPHORE_WTHRD_PRIORITY \
+#define SMRTHRD_PRIORITY \
         XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
 
-#define EXAMPLE_SEMAPHORE_NTHRD_PRIORITY \
-        XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 2)
+#if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
+  #define EXAMPLE_THREAD_SLEEP_LOG_TAG        "smrthrd"
+  #define smrlogf(lv, fmt, ...) \
+        xwlogf(lv, EXAMPLE_THREAD_SLEEP_LOG_TAG, fmt, ##__VA_ARGS__)
+#else /* XWLIBCFG_LOG */
+  #define smrlogf(lv, fmt, ...)
+#endif /* !XWLIBCFG_LOG */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -44,116 +52,129 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t example_semaphore_wthrd_func(void * arg);
-xwer_t example_semaphore_nthrd_func(void * arg);
+xwer_t smrthrd_func(void * arg);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-struct xwosal_smr example_smr;
-
-const struct xwosal_thrd_desc example_semaphore_wthrd_td = {
-        .name = "example.semaphore.wthrd",
-        .prio = EXAMPLE_SEMAPHORE_WTHRD_PRIORITY,
+/**
+ * @brief 线程描述表
+ */
+const struct xwosal_thrd_desc smrthrd_tbd = {
+        .name = "Thread-1",
+        .prio = SMRTHRD_PRIORITY,
         .stack = XWOSAL_THRD_STACK_DYNAMIC,
         .stack_size = 2048,
-        .func = (xwosal_thrd_f)example_semaphore_wthrd_func,
+        .func = (xwosal_thrd_f)smrthrd_func,
         .arg = NULL,
         .attr = XWSDOBJ_ATTR_PRIVILEGED,
 };
-xwid_t example_semaphore_wthrd;
+xwid_t smrthrd_tid;
 
-const struct xwosal_thrd_desc example_semaphore_nthrd_td = {
-        .name = "example.semaphore.nthrd",
-        .prio = EXAMPLE_SEMAPHORE_NTHRD_PRIORITY,
-        .stack = XWOSAL_THRD_STACK_DYNAMIC,
-        .stack_size = 2048,
-        .func = (xwosal_thrd_f)example_semaphore_nthrd_func,
-        .arg = NULL,
-        .attr = XWSDOBJ_ATTR_PRIVILEGED,
-};
-xwid_t example_semaphore_nthrd;
+struct xwosal_swt smrswt;
+xwid_t smrswtid;
+
+struct xwosal_smr smr;
+xwid_t smrid;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief 模块的加载函数
+ */
 xwer_t example_semaphore_start(void)
 {
         xwer_t rc;
 
-        rc = xwosal_smr_init(&example_smr, 0, XWSSQ_MAX);
+        /* 初始化信号量 */
+        rc = xwosal_smr_init(&smr, 0, XWSSQ_MAX);
         if (rc < 0) {
                 goto err_smr_init;
         }
+        smrid = xwosal_smr_get_id(&smr);
 
-        rc = xwosal_thrd_create(&example_semaphore_wthrd,
-                                example_semaphore_wthrd_td.name,
-                                example_semaphore_wthrd_td.func,
-                                example_semaphore_wthrd_td.arg,
-                                example_semaphore_wthrd_td.stack_size,
-                                example_semaphore_wthrd_td.prio,
-                                example_semaphore_wthrd_td.attr);
+        /* 初始化定时器 */
+        rc = xwosal_swt_init(&smrswt, "smrswt", XWOSAL_SWT_FLAG_RESTART);
         if (rc < 0) {
-                goto err_wthrd_create;
+                goto err_smrswt_init;
         }
+        smrswtid = xwosal_swt_get_id(&smrswt);
 
-        rc = xwosal_thrd_create(&example_semaphore_nthrd,
-                                example_semaphore_nthrd_td.name,
-                                example_semaphore_nthrd_td.func,
-                                example_semaphore_nthrd_td.arg,
-                                example_semaphore_nthrd_td.stack_size,
-                                example_semaphore_nthrd_td.prio,
-                                example_semaphore_nthrd_td.attr);
+        /* 创建线程 */
+        rc = xwosal_thrd_create(&smrthrd_tid,
+                                smrthrd_tbd.name,
+                                smrthrd_tbd.func,
+                                smrthrd_tbd.arg,
+                                smrthrd_tbd.stack_size,
+                                smrthrd_tbd.prio,
+                                smrthrd_tbd.attr);
         if (rc < 0) {
-                goto err_nthrd_create;
+                goto err_thrd_create;
         }
 
         return XWOK;
 
-
-err_nthrd_create:
-        xwosal_thrd_terminate(example_semaphore_wthrd, NULL);
-        xwosal_thrd_delete(example_semaphore_wthrd);
-err_wthrd_create:
-        xwosal_smr_destroy(&example_smr);
+err_thrd_create:
+        xwosal_swt_destroy(&smrswt);
+err_smrswt_init:
+        xwosal_smr_destroy(&smr);
 err_smr_init:
         return rc;
 }
 
-xwer_t example_semaphore_wthrd_func(void * arg)
+/**
+ * @brief 定时器的回调函数
+ * @note
+ * - UP系统
+ *   - 当配置(XWUPCFG_SD_BH == 1)，此函数运行在中断底半部；
+ *   - 当配置(XWUPCFG_SD_BH == 0)，此函数运行在中断上下文；
+ * - SMP系统
+ *   - 当配置(XWSMPCFG_SD_BH == 1)，此函数运行在中断底半部；
+ *   - 当配置(XWSMPCFG_SD_BH == 0)，此函数运行在中断上下文；
+ * - 此函数中不可调用会导致线程睡眠或阻塞的函数。
+ */
+void smrswt_callback(struct xwosal_swt * swt, void * arg)
 {
-        xwid_t smrid;
-        xwtm_t time;
-        xwer_t rc = XWOK;
-
+        XWOS_UNUSED(swt);
         XWOS_UNUSED(arg);
 
-        smrid = xwosal_smr_get_id(&example_smr);
-        while (!xwosal_cthrd_frz_shld_stop(NULL)) {
-                time = 10 * XWTM_S;
-                rc = xwosal_smr_timedwait(smrid, &time);
-                if (XWOK == rc) {
-                        xwlogf(INFO, "smrtst", "Acquired!\n");
-                } else {
-                        xwlogf(INFO, "smrtst", "Error:%d\n", rc);
-                }
-        }
-        return rc;
+        xwosal_smr_post(smrid);
 }
 
-xwer_t example_semaphore_nthrd_func(void * arg)
+/**
+ * @brief 线程1的主函数
+ */
+xwer_t smrthrd_func(void * arg)
 {
-        xwid_t smrid;
-        xwtm_t time;
-        xwer_t rc = XWOK;
+        xwtm_t base, time;
+        xwer_t rc;
 
         XWOS_UNUSED(arg);
 
-        smrid = xwosal_smr_get_id(&example_smr);
+        smrlogf(INFO, "[线程] 启动。\n");
+
+        smrlogf(INFO, "[线程] 启动定时器。\n");
+        base = xwosal_scheduler_get_timetick_lc();
+        rc = xwosal_swt_start(smrswtid, base, 1000 * XWTM_MS, smrswt_callback, NULL);
+
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
-                xwosal_smr_post(smrid);
-                time = 1000 * XWTM_MS;
-                xwosal_cthrd_sleep(&time);
+                time = 500 * XWTM_MS;
+                rc = xwosal_smr_timedwait(smrid, &time);
+                if (XWOK == rc) {
+                        time = xwosal_scheduler_get_timestamp_lc();
+                        smrlogf(INFO,
+                                "[线程] 定时器唤醒，时间戳：%lld 纳秒。\n",
+                                time);
+                } else if (-ETIMEDOUT == rc) {
+                        time = xwosal_scheduler_get_timestamp_lc();
+                        smrlogf(INFO,
+                                "[线程] 等待超时，时间戳：%lld 纳秒。\n",
+                                time);
+                }
         }
+
+        smrlogf(INFO, "[线程] 退出。\n");
+        xwosal_thrd_delete(xwosal_cthrd_get_id());
         return rc;
 }

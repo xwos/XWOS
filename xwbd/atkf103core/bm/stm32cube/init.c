@@ -82,8 +82,10 @@ void stm32cube_init(void)
         rc = stm32cube_xwds_ll_start();
         BDL_BUG_ON(rc < 0);
 
+#if defined(STM32CUBECFG_SRAM) && (1 == STM32CUBECFG_SRAM)
         rc = xwmm_mempool_init(sram_mempool, "SRAM",
                                (xwptr_t)sram_mr_origin,
                                (xwsz_t)sram_mr_size);
         BDL_BUG_ON(rc < 0);
+#endif /* STM32CUBECFG_SRAM */
 }
