@@ -38,9 +38,9 @@
         XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-  #define EXAMPLE_THREAD_SLEEP_LOG_TAG        "swtthrd"
+  #define EXAMPLE_TIMER_LOG_TAG         "swt"
   #define swtlogf(lv, fmt, ...) \
-        xwlogf(lv, EXAMPLE_THREAD_SLEEP_LOG_TAG, fmt, ##__VA_ARGS__)
+        xwlogf(lv, EXAMPLE_TIMER_LOG_TAG, fmt, ##__VA_ARGS__)
 #else /* XWLIBCFG_LOG */
   #define swtlogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
@@ -192,10 +192,10 @@ xwer_t swtthrd_func(void * arg)
         swtlogf(INFO, "[线程] 启动定时器1。\n");
         rc = xwosal_swt_start(swtid1, base, 800 * XWTM_MS, swt1_callback, NULL);
 
+        /* 设置掩码位为bit0:1共2位 */
+        memset(msk, 0, sizeof(msk));
+        msk[0] = BIT(0) | BIT(1);
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
-                /* 设置掩码位为bit0:1共2位 */
-                msk[0] = BIT(0) | BIT(1);
-
                 /* 等待事件 */
                 rc = xwosal_flg_wait(swtflgid,
                                      XWOSAL_FLG_TRIGGER_SET_ANY,
@@ -217,6 +217,10 @@ xwer_t swtthrd_func(void * arg)
                                         "[线程] 定时器1唤醒，时间戳：%lld 纳秒。\n",
                                         ts);
                         }
+                } else {
+                        swtlogf(ERR,
+                                "[等待线程] 错误，时间戳：%lld 纳秒，错误码：%d。\n",
+                                ts, rc);
                 }
         }
 

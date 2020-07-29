@@ -26,7 +26,7 @@
 #include <xwos/osal/scheduler.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/xwmo.h>
-#include <xwam/example/sync/condition/xwmo.h>
+#include <xwam/example/sync/flag/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -95,13 +95,13 @@ xwer_t bdl_init_thrd(void * arg)
                 goto bm_stm32cube_start;
         }
 
-        rc = example_condition_start();
+        rc = example_flag_start();
         if (rc < 0) {
-                goto example_condition_start;
+                goto example_flag_start;
         }
         return XWOK;
 
-example_condition_start:
+example_flag_start:
         BDL_BUG();
 bm_stm32cube_start:
         BDL_BUG();

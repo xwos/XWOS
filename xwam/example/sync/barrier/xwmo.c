@@ -35,9 +35,9 @@
         XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-  #define EXAMPLE_THREAD_SLEEP_LOG_TAG        "barthrd"
+  #define EXAMPLE_BARRIER_LOG_TAG       "barrier"
   #define barlogf(lv, fmt, ...) \
-        xwlogf(lv, EXAMPLE_THREAD_SLEEP_LOG_TAG, fmt, ##__VA_ARGS__)
+        xwlogf(lv, EXAMPLE_BARRIER_LOG_TAG, fmt, ##__VA_ARGS__)
 #else /* XWLIBCFG_LOG */
   #define barlogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
