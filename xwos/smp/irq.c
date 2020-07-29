@@ -487,14 +487,16 @@ xwer_t xwos_irq_get_id(xwirq_t * irqnbuf)
         xwer_t rc;
 
         rc = soc_irq_get_id(irqnbuf);
-#if defined(XWSMPCFG_SD_BH) && (1 == XWSMPCFG_SD_BH)
         if (rc < 0) {
+#if defined(XWSMPCFG_SD_BH) && (1 == XWSMPCFG_SD_BH)
                 if (xwos_scheduler_tst_in_bh_lc()) {
                         rc = -EINBH;
                 } else {
                         rc = -EINTHRD;
                 }
-        }
+#else
+                rc = -EINTHRD;
 #endif /* XWSMPCFG_SD_BH */
+        }
         return rc;
 }
