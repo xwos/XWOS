@@ -23,32 +23,39 @@ include xwbs/$(XuanWuOS_CFG_MK_RULE)
 XWMO_NAME := $(call getXwmoName)
 XWMO_DIR := $(call getXwmoDir)
 XWMO_OBJ_DIR ?= $(XWMO_DIR)
+XWMO_AOBJS := $(addprefix $(OBJ_DIR)$(XWMO_OBJ_DIR)/,$(addsuffix .o,$(basename $(XWMO_ASRCS))))
 XWMO_COBJS := $(addprefix $(OBJ_DIR)$(XWMO_OBJ_DIR)/,$(addsuffix .o,$(basename $(XWMO_CSRCS))))
 XWMO_DSMS := $(addprefix $(OBJ_DIR)$(XWMO_OBJ_DIR)/,$(addsuffix .dsm,$(basename $(XWMO_CSRCS))))
 XWMO_INCDIRS := $(if $(strip $(XWMO_INCDIRS)),$(addprefix -I,$(strip $(XWMO_INCDIRS))))
 
-CC_ARGS = $(strip -c $(CFLAGS) $(ARCH_CFLAGS) $(CPU_CFLAGS) $(XWMO_CFLAGS) \
+AS_ARGS = $(strip $(AFLAGS) $(ARCH_AFLAGS) $(CPU_AFLAGS) $(XWMO_AFLAGS) \
                   $(INCDIRS) $(XWMO_INCDIRS))
 
-#$(info "building $(XWMO_DIR) ---> $(OBJ_DIR)$(XWMO_OBJ_DIR)/$(XWMO_NAME)")
+CC_ARGS = $(strip $(CFLAGS) $(ARCH_CFLAGS) $(CPU_CFLAGS) $(XWMO_CFLAGS) \
+                  $(INCDIRS) $(XWMO_INCDIRS))
 
-$(OBJ_DIR)$(XWMO_OBJ_DIR)/$(XWMO_NAME): $(XWMO_COBJS) $(OBJ_DIR)$(XWMO_OBJ_DIR)
+$(OBJ_DIR)$(XWMO_OBJ_DIR)/$(XWMO_NAME): $(XWMO_AOBJS) $(XWMO_COBJS) $(OBJ_DIR)$(XWMO_OBJ_DIR)
 ifeq ($(CWMCUEPPC_LICENSE),)
-	$(SHOW_AR) echo -n $(XWMO_COBJS) > $@
+	$(SHOW_AR) echo -n $(XWMO_AOBJS) $(XWMO_COBJS) > $@
 else
-	$(SHOW_AR) $(AR) -o $@ $(XWMO_COBJS)
+	$(SHOW_AR) $(AR) -o $@ $(XWMO_AOBJS) $(XWMO_COBJS)
 endif
 
 $(OBJ_DIR)$(XWMO_OBJ_DIR):
 	@[ ! -d $@ ] && mkdir -p $@ || true
 
 ifneq ($(NODEP),y)
+#   -include $(XWMO_AOBJS:.o=.d)
 #   -include $(XWMO_COBJS:.o=.d)
 endif
 
+$(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o: $(XWMO_DIR)/%.s
+	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
+	$(SHOW_AS) $(AS) -c $(AS_ARGS) $< -o $@
+
 $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o: $(XWMO_DIR)/%.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
-	$(SHOW_CC) $(CC) $(CC_ARGS) $< -o $@
+	$(SHOW_CC) $(CC) -c $(CC_ARGS) $< -o $@
 
 %.dsm: %.o
 	$(SHOW_OD) $(OD) $(CFLAGS) $< > $@
@@ -56,6 +63,9 @@ $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o: $(XWMO_DIR)/%.c
 dsm: $(XWMO_DSMS)
 
 clean:
+	@$(RM) -f $(XWMO_AOBJS:.o=.lst)
+	@$(RM) -f $(XWMO_AOBJS:.o=.dsm)
+	@$(RM) -f $(XWMO_AOBJS)
 	@$(RM) -f $(XWMO_COBJS:.o=.lst)
 	@$(RM) -f $(XWMO_COBJS:.o=.dsm)
 	@$(RM) -f $(XWMO_COBJS)

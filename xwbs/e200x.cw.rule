@@ -53,6 +53,8 @@ WARN := -warn illpragmas -warn unwanted -warn hidevirtual -warn implicitconv \
         -warn ptrintconv -warn unusedarg -warn unusedvar -warn missingreturn \
         -warn unusedexpr -warn extracomma -warn structclass
 
+PERDEF = -D__XuanWuOS__
+
 INCDIRS := -I. \
            -I$(XWOS_ARCH_DIR) \
            -I$(XWOS_CPU_DIR) \
@@ -76,9 +78,10 @@ ifeq ($(~D),0)
 else
     CFLAGS += -opt level=0 -opt speed
 endif
+CFLAGS += $(PERDEF)
 
 AFLAGS = -sym dwarf-2 -sym full -msgstyle gcc -proc zen -$(ENDIAN) -vle -nosyspath \
-         -D__ASM__=1
+         -D__ASM__=1 $(PERDEF)
 
 LDFLAGS = -sym dwarf-2 -sym full -msgstyle gcc -proc zen -$(ENDIAN) -fp soft \
           -model absolute -abi eabi -sdata 8 -sdata2 8 \

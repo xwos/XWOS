@@ -23,32 +23,57 @@ include xwbs/$(XuanWuOS_CFG_MK_RULE)
 XWMO_NAME := $(call getXwmoName)
 XWMO_DIR := $(call getXwmoDir)
 XWMO_OBJ_DIR ?= $(XWMO_DIR)
+XWMO_AOBJS := $(addprefix $(OBJ_DIR)$(XWMO_OBJ_DIR)/,$(addsuffix .o,$(basename $(XWMO_ASRCS))))
 XWMO_COBJS := $(addprefix $(OBJ_DIR)$(XWMO_OBJ_DIR)/,$(addsuffix .o,$(basename $(XWMO_CSRCS))))
 XWMO_DSMS += $(addprefix $(OBJ_DIR)$(XWMO_OBJ_DIR)/,$(addsuffix .dsm,$(basename $(XWMO_CXXSRCS))))
 XWMO_INCDIRS := $(if $(strip $(XWMO_INCDIRS)),$(addprefix -I,$(strip $(XWMO_INCDIRS))))
 
 MM_ARGS = $(strip $(MMFLAGS))
 
-CC_ARGS = $(strip -c $(CFLAGS) $(ARCH_CFLAGS) $(CPU_CFLAGS) $(XWMO_CFLAGS) \
+AS_ARGS = $(strip $(AFLAGS) $(ARCH_AFLAGS) $(CPU_AFLAGS) $(XWMO_AFLAGS) \
+                  $(INCDIRS) $(XWMO_INCDIRS))
+
+CC_ARGS = $(strip $(CFLAGS) $(ARCH_CFLAGS) $(CPU_CFLAGS) $(XWMO_CFLAGS) \
                   $(INCDIRS) $(XWMO_INCDIRS))
 
 XWMO_OBJS_LST := $(OBJ_DIR)$(XWMO_OBJ_DIR)/objs.txt
 
-#$(info "building $(XWMO_DIR) ---> $(OBJ_DIR)$(XWMO_OBJ_DIR)/$(XWMO_NAME)")
-
-$(OBJ_DIR)$(XWMO_OBJ_DIR)/$(XWMO_NAME): $(XWMO_COBJS) $(OBJ_DIR)$(XWMO_OBJ_DIR)
+$(OBJ_DIR)$(XWMO_OBJ_DIR)/$(XWMO_NAME): $(XWMO_AOBJS) $(XWMO_COBJS) $(OBJ_DIR)$(XWMO_OBJ_DIR)
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
-	@echo $(XWMO_COBJS) $(XWMO_LUA2HEXCOBJS) $(XWMO_CXXOBJS) > $(XWMO_OBJS_LST)
+	@echo $(XWMO_AOBJS) $(XWMO_COBJS) $(XWMO_LUA2HEXCOBJS) $(XWMO_CXXOBJS) > $(XWMO_OBJS_LST)
 	$(SHOW_AR) $(AR) rcs $@ @$(XWMO_OBJS_LST)
 
 $(OBJ_DIR)$(XWMO_OBJ_DIR):
 	@[ ! -d $@ ] && mkdir -p $@ || true
+
+ifneq ($(XWMO_AOBJS),)
+    ifneq ($(NODEP),y)
+        -include $(XWMO_AOBJS:.o=.o.d)
+    endif
+endif
 
 ifneq ($(XWMO_COBJS),)
     ifneq ($(NODEP),y)
         -include $(XWMO_COBJS:.o=.o.d)
     endif
 endif
+
+$(OBJ_DIR)$(XWMO_OBJ_DIR)/%.s: %.S
+	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
+	$(SHOW_AS) $(AS) -E $(AS_ARGS) $< -o $@
+
+$(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o.d: %.S
+	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
+	$(SHOW_MM) $(CC) $(MM_ARGS) $(AS_ARGS) $< > $@;
+	@sed -i 's|\(^.*\)\.o[ :]*|$(OBJ_DIR)$(XWMO_OBJ_DIR)/$*.o $@: \\\n |g' $@
+
+$(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o: %.S
+	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
+	$(SHOW_AS) $(AS) -c $(AS_ARGS) $< -o $@
+
+$(OBJ_DIR)$(XWMO_OBJ_DIR)/%.i: %.c
+	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
+	$(SHOW_CC) $(CC) -E $(CC_ARGS) $< -o $@
 
 $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o.d: $(XWMO_DIR)/%.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
@@ -57,7 +82,7 @@ $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o.d: $(XWMO_DIR)/%.c
 
 $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o: $(XWMO_DIR)/%.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
-	$(SHOW_CC) $(CC) $(CC_ARGS) $< -o $@
+	$(SHOW_CC) $(CC) -c $(CC_ARGS) $< -o $@
 
 %.dsm: %.o
 	$(SHOW_OD) $(OD) -D $< > $@
@@ -65,6 +90,10 @@ $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o: $(XWMO_DIR)/%.c
 dsm: $(XWMO_DSMS)
 
 clean:
+	@$(RM) -f $(XWMO_AOBJS:.o=.o.lst)
+	@$(RM) -f $(XWMO_AOBJS:.o=.dsm)
+	@$(RM) -f $(XWMO_AOBJS:.o=.i)
+	@$(RM) -f $(XWMO_AOBJS)
 	@$(RM) -f $(XWMO_COBJS:.o=.o.lst)
 	@$(RM) -f $(XWMO_COBJS:.o=.dsm)
 	@$(RM) -f $(XWMO_COBJS:.o=.i)

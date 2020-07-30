@@ -19,10 +19,10 @@
 #
 
 CPU_INCDIRS :=
-CPU_CFLAGS := -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16
-CPU_CXXFLAGS := -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16
-CPU_AFLAGS := -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16
-CPU_LDFLAGS := -mcpu=cortex-m7 -mfloat-abi=hard -mfpu=fpv5-d16
+CPU_CFLAGS := -mcpu=cortex-m7 -mfloat-abi=hard
+CPU_CXXFLAGS := -mcpu=cortex-m7 -mfloat-abi=hard
+CPU_AFLAGS := -mcpu=cortex-m7 -mfloat-abi=hard
+CPU_LDFLAGS := -mcpu=cortex-m7 -mfloat-abi=hard
 CPU_EOBJS :=
 
 CPU_CSRCS := cpu_init.c

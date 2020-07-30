@@ -94,13 +94,17 @@ LD_OBJS_LST := $(OBJ_DIR)$(TARGET)-objs.txt
 
 MM_ARGS = $(strip $(MMFLAGS))
 
-AS_ARGS = $(strip $(INCDIRS) $(AFLAGS) $(ARCH_AFLAGS) $(CPU_AFLAGS) $(BDL_AFLAGS))
+AS_ARGS = $(strip $(INCDIRS) $(AFLAGS) $(ARCH_AFLAGS) $(CPU_AFLAGS) \
+                  $(SOC_AFLAGS) $(BDL_AFLAGS))
 
-CC_ARGS = $(strip $(INCDIRS) $(CFLAGS) $(ARCH_CFLAGS) $(CPU_CFLAGS) $(BDL_CFLAGS))
+CC_ARGS = $(strip $(INCDIRS) $(CFLAGS) $(ARCH_CFLAGS) $(CPU_CFLAGS) \
+                  $(SOC_CFLAGS) $(BDL_CFLAGS))
 
-CXX_ARGS = $(strip $(INCDIRS) $(CXXFLAGS) $(ARCH_CXXFLAGS) $(CPU_CXXFLAGS) $(BDL_CXXFLAGS))
+CXX_ARGS = $(strip $(INCDIRS) $(CXXFLAGS) $(ARCH_CXXFLAGS) $(CPU_CXXFLAGS) \
+                   $(SOC_CXXFLAGS) $(BDL_CXXFLAGS))
 
-LD_ARGS = $(strip $(LDFLAGS) $(ARCH_LDFLAGS) $(CPU_LDFLAGS) $(BDL_LDFLAGS))
+LD_ARGS = $(strip $(LDFLAGS) $(ARCH_LDFLAGS) $(CPU_LDFLAGS) \
+                  $(SOC_LDFLAGS) $(BDL_LDFLAGS))
 
 all: $(LIB_OBJS) $(LIBS) $(XWMD) $(XWPP) $(XWBM) $(XWEM) $(XWAM) $(XWOEM) \
     $(XWOS_WKSPC_DIR)/$(TARGET).elf \
@@ -205,7 +209,6 @@ $(OBJ_DIR)%.o.d: %.cxx
 $(OBJ_DIR)%.o: %.cxx
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_CXX) $(CXX) -c $(CXX_ARGS) $< -o $@
-
 
 $(XWOS_WKSPC_DIR)/$(TARGET).elf: $(LIB_OBJS) $(LIBS) \
     $(XWMD) $(XWPP) $(XWBM) $(XWEM) $(XWAM) $(XWOEM)

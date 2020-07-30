@@ -43,7 +43,7 @@ INCDIRS = -I. \
           -I$(XWOS_BRD_DIR) \
           -I$(XWOS_WKSPC_DIR)
 
-PERDEF =
+PERDEF = -D__XuanWuOS__
 
 AFLAGS = -mvle -mcpu=e200z0 -m$(ENDIAN) -mregnames -nostdinc -nostdlib \
          -ffunction-sections -fdata-sections \

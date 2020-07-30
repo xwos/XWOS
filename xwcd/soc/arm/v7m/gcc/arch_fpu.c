@@ -41,7 +41,7 @@ void arch_fpu_init(void)
         /* Hardware automatically preserves FP context on exception entry and restores
            it on exception return */
         cm_scs.scb.fpu.fpccr.bit.aspen = 1;
-        /* cm_scs.fpccr.bit.lspen = 1; */
+        /* cm_scs.scb.fpu.fpccr.bit.lspen = 1; */
 
         /* FPU can pend fault */
         cm_scs.scb.fpu.fpccr.bit.monrdy = 1;

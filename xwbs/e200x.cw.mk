@@ -86,11 +86,13 @@ INCDIRS += $(if $(strip $(EINCDIRS)),$(addprefix -I,$(strip $(EINCDIRS))))
 
 DSMS += $(addsuffix .dsm,$(basename $(OBJS)))
 
-AS_ARGS = $(strip -c $(AFLAGS) $(ARCH_AFLAGS) $(CPU_AFLAGS) $(BDL_AFLAGS) $(INCDIRS))
-CC_ARGS = $(strip -c $(CFLAGS) $(ARCH_CFLAGS) $(CPU_CFLAGS) $(BDL_CFLAGS) $(INCDIRS))
+AS_ARGS = $(strip $(AFLAGS) $(ARCH_AFLAGS) $(CPU_AFLAGS) \
+                  $(SOC_AFLAGS) $(BDL_AFLAGS) $(INCDIRS))
+CC_ARGS = $(strip $(CFLAGS) $(ARCH_CFLAGS) $(CPU_CFLAGS) \
+                  $(SOC_CFLAGS) $(BDL_CFLAGS) $(INCDIRS))
 LD_ARGS = $(strip $(XWOEM_LIBS) $(XWAM_LIBS) $(XWEM_LIBS) $(XWBM_LIBS) $(XWPP_LIBS) \
-                  $(XWMD_LIBS) $(LIBS) $(EOBJS) $(ELIBS) \
-                  $(LDFLAGS) $(ARCH_LDFLAGS) $(CPU_LDFLAGS) $(BDL_LDFLAGS))
+                  $(XWMD_LIBS) $(LIBS) $(EOBJS) $(ELIBS) $(LDFLAGS) \
+                  $(ARCH_LDFLAGS) $(CPU_LDFLAGS) $(SOC_LDFLAGS) $(BDL_LDFLAGS))
 
 all: $(OBJS) libs $(XWMD) $(XWPP) $(XWBM) $(XWEM) $(XWAM) $(XWOEM) \
     $(XWOS_WKSPC_DIR)/$(TARGET).elf $(XWOS_WKSPC_DIR)/$(TARGET).mot \
@@ -189,11 +191,11 @@ endif
 
 $(OBJ_DIR)%.o: %.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
-	$(SHOW_CC) $(CC) $(CC_ARGS) $< -o $@
+	$(SHOW_CC) $(CC) -c $(CC_ARGS) $< -o $@
 
 $(OBJ_DIR)%.o: %.s
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
-	$(SHOW_AS) $(AS) $(AS_ARGS) $< -o $@
+	$(SHOW_AS) $(AS) -c $(AS_ARGS) $< -o $@
 
 dsm: $(DSMS) $(XWMD_DSM) $(XWPP_DSM) $(XWBM_DSM) $(XWEM_DSM) $(XWAM_DSM) $(XWOEM_DSM) \
     $(XWOS_WKSPC_DIR)/$(TARGET).dsm

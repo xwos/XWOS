@@ -23,6 +23,7 @@ include xwbs/$(XuanWuOS_CFG_MK_RULE)
 XWMO_NAME := $(call getXwmoName)
 XWMO_DIR := $(call getXwmoDir)
 XWMO_OBJ_DIR ?= $(XWMO_DIR)
+XWMO_AOBJS := $(addprefix $(OBJ_DIR)$(XWMO_OBJ_DIR)/,$(addsuffix .o,$(basename $(XWMO_ASRCS))))
 XWMO_COBJS := $(addprefix $(OBJ_DIR)$(XWMO_OBJ_DIR)/,$(addsuffix .o,$(basename $(XWMO_CSRCS))))
 XWMO_CXXOBJS := $(addprefix $(OBJ_DIR)$(XWMO_OBJ_DIR)/,$(addsuffix .o,$(basename $(XWMO_CXXSRCS))))
 XWMO_DSMS := $(addprefix $(OBJ_DIR)$(XWMO_OBJ_DIR)/,$(addsuffix .dsm,$(basename $(XWMO_CSRCS))))
@@ -34,25 +35,33 @@ XWMO_LUA2HEXCOBJS := $(addprefix $(OBJ_DIR)$(XWMO_OBJ_DIR)/,$(addsuffix .o,$(XWM
 
 MM_ARGS = $(strip $(MMFLAGS))
 
-CC_ARGS = $(strip -c $(CFLAGS) $(ARCH_CFLAGS) $(CPU_CFLAGS) $(XWMO_CFLAGS) \
-                  $(INCDIRS) $(XWMO_INCDIRS))
+AS_ARGS = $(strip $(AFLAGS) $(ARCH_AFLAGS) $(CPU_AFLAGS) $(SOC_AFLAGS) \
+                  $(BDL_AFLAGS) $(XWMO_AFLAGS) $(INCDIRS) $(XWMO_INCDIRS))
 
-CXX_ARGS = $(strip -c $(CXXFLAGS) $(ARCH_CXXFLAGS) $(CPU_CXXFLAGS) $(XWMO_CXXFLAGS) \
-                  $(INCDIRS) $(XWMO_INCDIRS))
+CC_ARGS = $(strip $(CFLAGS) $(ARCH_CFLAGS) $(CPU_CFLAGS) $(SOC_CFLAGS) \
+                  $(BDL_CFLAGS) $(XWMO_CFLAGS) $(INCDIRS) $(XWMO_INCDIRS))
+
+CXX_ARGS = $(strip $(CXXFLAGS) $(ARCH_CXXFLAGS) $(CPU_CXXFLAGS) $(SOC_CXXFLAGS) \
+                   $(BDL_CXXFLAGS) $(XWMO_CXXFLAGS) $(INCDIRS) $(XWMO_INCDIRS))
 
 XWMO_OBJS_LST := $(OBJ_DIR)$(XWMO_OBJ_DIR)/objs.txt
 
-#$(info "building $(XWMO_DIR) ---> $(OBJ_DIR)$(XWMO_OBJ_DIR)/$(XWMO_NAME)")
-
-$(OBJ_DIR)$(XWMO_OBJ_DIR)/$(XWMO_NAME): $(XWMO_COBJS) $(XWMO_LUA2HEXCOBJS) $(XWMO_CXXOBJS) $(OBJ_DIR)$(XWMO_OBJ_DIR)
+$(OBJ_DIR)$(XWMO_OBJ_DIR)/$(XWMO_NAME): $(XWMO_AOBJS) $(XWMO_COBJS) \
+    $(XWMO_LUA2HEXCOBJS) $(XWMO_CXXOBJS) $(OBJ_DIR)$(XWMO_OBJ_DIR)
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
-	$(file > $(XWMO_OBJS_LST),$(XWMO_COBJS) $(XWMO_LUA2HEXCOBJS) $(XWMO_CXXOBJS))
+	$(file > $(XWMO_OBJS_LST),$(XWMO_AOBJS) $(XWMO_COBJS) $(XWMO_LUA2HEXCOBJS) $(XWMO_CXXOBJS))
 	$(SHOW_AR) $(AR) rcs $@ @$(XWMO_OBJS_LST)
 
 $(OBJ_DIR)$(XWMO_OBJ_DIR):
 	@[ ! -d $@ ] && mkdir -p $@ || true
 
 $(XWMO_LUA2HEXCOBJS): $(XWMO_LUA2HEXCSRCS)
+
+ifneq ($(XWMO_AOBJS),)
+    ifneq ($(NODEP),y)
+        -include $(XWMO_AOBJS:.o=.o.d)
+    endif
+endif
 
 ifneq ($(XWMO_COBJS),)
     ifneq ($(NODEP),y)
@@ -66,6 +75,19 @@ ifneq ($(XWMO_CXXOBJS),)
     endif
 endif
 
+$(OBJ_DIR)$(XWMO_OBJ_DIR)/%.s: %.S
+	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
+	$(SHOW_AS) $(AS) -E $(AS_ARGS) $< -o $@
+
+$(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o.d: %.S
+	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
+	$(SHOW_MM) $(CC) $(MM_ARGS) $(AS_ARGS) $< > $@;
+	@sed -i 's|\(^.*\)\.o[ :]*|$(OBJ_DIR)$(XWMO_OBJ_DIR)/$*.o $@: \\\n |g' $@
+
+$(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o: %.S
+	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
+	$(SHOW_AS) $(AS) -c $(AS_ARGS) $< -o $@
+
 $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o.d: $(XWMO_DIR)/%.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_MM) $(CC) $(MM_ARGS) $(CC_ARGS) $< > $@;
@@ -77,11 +99,11 @@ $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.lua.c: $(XWMO_DIR)/%.lua
 
 $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.lua.o: $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.lua.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
-	$(SHOW_CC) $(CC) $(CC_ARGS) $< -o $@
+	$(SHOW_CC) $(CC) -c $(CC_ARGS) $< -o $@
 
 $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o: $(XWMO_DIR)/%.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
-	$(SHOW_CC) $(CC) $(CC_ARGS) $< -o $@
+	$(SHOW_CC) $(CC) -c $(CC_ARGS) $< -o $@
 
 $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o.d: $(XWMO_DIR)/%.cpp
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
@@ -90,7 +112,7 @@ $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o.d: $(XWMO_DIR)/%.cpp
 
 $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o: $(XWMO_DIR)/%.cpp
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
-	$(SHOW_CXX) $(CXX) $(CXX_ARGS) $< -o $@
+	$(SHOW_CXX) $(CXX) -c $(CXX_ARGS) $< -o $@
 
 $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o.d: $(XWMO_DIR)/%.cxx
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
@@ -99,7 +121,7 @@ $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o.d: $(XWMO_DIR)/%.cxx
 
 $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o: $(XWMO_DIR)/%.cxx
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
-	$(SHOW_CXX) $(CXX) $(CXX_ARGS) $< -o $@
+	$(SHOW_CXX) $(CXX) -c $(CXX_ARGS) $< -o $@
 
 %.dsm: %.o
 	$(SHOW_OD) $(OD) -D $< > $@
@@ -107,6 +129,10 @@ $(OBJ_DIR)$(XWMO_OBJ_DIR)/%.o: $(XWMO_DIR)/%.cxx
 dsm: $(XWMO_DSMS)
 
 clean:
+	@$(RM) -f $(XWMO_AOBJS:.o=.o.lst)
+	@$(RM) -f $(XWMO_AOBJS:.o=.dsm)
+	@$(RM) -f $(XWMO_AOBJS:.o=.i)
+	@$(RM) -f $(XWMO_AOBJS)
 	@$(RM) -f $(XWMO_COBJS:.o=.o.lst)
 	@$(RM) -f $(XWMO_COBJS:.o=.dsm)
 	@$(RM) -f $(XWMO_COBJS:.o=.i)
