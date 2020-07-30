@@ -31,7 +31,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define SLEEPTHRD_PRIORITY \
+#define XWSLPDEMO_THRD_PRIORITY \
         XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
@@ -49,7 +49,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t sleepthrd_func(void * arg);
+xwer_t xwslpdemo_thrd_func(void * arg);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
@@ -57,18 +57,18 @@ xwer_t sleepthrd_func(void * arg);
 /**
  * @brief 动态创建的线程描述表
  */
-const struct xwosal_thrd_desc sleepthrd_tbd[] = {
+const struct xwosal_thrd_desc xwslpdemo_tbd[] = {
         [0] = {
-                .name = "Thread-1",
-                .prio = SLEEPTHRD_PRIORITY,
+                .name = "xwslpdemo.thrd",
+                .prio = XWSLPDEMO_THRD_PRIORITY,
                 .stack = XWOSAL_THRD_STACK_DYNAMIC,
                 .stack_size = 2048,
-                .func = (xwosal_thrd_f)sleepthrd_func,
+                .func = (xwosal_thrd_f)xwslpdemo_thrd_func,
                 .arg = NULL,
                 .attr = XWSDOBJ_ATTR_PRIVILEGED,
         },
 };
-xwid_t sleepthrd_tid[xw_array_size(sleepthrd_tbd)];
+xwid_t xwslpdemo_tid[xw_array_size(xwslpdemo_tbd)];
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -82,49 +82,49 @@ xwer_t example_thread_sleep_start(void)
         xwsq_t i;
 
 
-        for (i = 0; i < xw_array_size(sleepthrd_tbd); i++) {
-                rc = xwosal_thrd_create(&sleepthrd_tid[i],
-                                        sleepthrd_tbd[i].name,
-                                        sleepthrd_tbd[i].func,
-                                        sleepthrd_tbd[i].arg,
-                                        sleepthrd_tbd[i].stack_size,
-                                        sleepthrd_tbd[i].prio,
-                                        sleepthrd_tbd[i].attr);
+        for (i = 0; i < xw_array_size(xwslpdemo_tbd); i++) {
+                rc = xwosal_thrd_create(&xwslpdemo_tid[i],
+                                        xwslpdemo_tbd[i].name,
+                                        xwslpdemo_tbd[i].func,
+                                        xwslpdemo_tbd[i].arg,
+                                        xwslpdemo_tbd[i].stack_size,
+                                        xwslpdemo_tbd[i].prio,
+                                        xwslpdemo_tbd[i].attr);
                 if (rc < 0) {
-                        goto err_thrd_sleep;
+                        goto err_thrd_create;
                 }
         }
 
         return XWOK;
 
-err_thrd_sleep:
+err_thrd_create:
         return rc;
 }
 
 /**
  * @brief 线程的主函数
  */
-xwer_t sleepthrd_func(void * arg)
+xwer_t xwslpdemo_thrd_func(void * arg)
 {
-        xwtm_t timetick, timestamp;
+        xwtm_t tk, ts;
         xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
 
-        thrdslplogf(INFO, "Thread starts.\n");
+        thrdslplogf(INFO, "[线程] 启动。\n");
 
-        thrdslplogf(INFO, "Thread sleeps 1s ...\n");
-        timetick = 1 * XWTM_S;
-        xwosal_cthrd_sleep(&timetick);
+        thrdslplogf(INFO, "[线程] 睡眠1秒 ...\n");
+        tk = 1 * XWTM_S;
+        xwosal_cthrd_sleep(&tk);
 
-        timetick = xwosal_scheduler_get_timetick_lc();
+        tk = xwosal_scheduler_get_timetick_lc();
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
-                xwosal_cthrd_sleep_from(&timetick, 500 * XWTM_MS);
-                timestamp = xwosal_scheduler_get_timestamp_lc();
-                thrdslplogf(INFO, "current timestamp: %lld ns.\n", timestamp);
+                xwosal_cthrd_sleep_from(&tk, 500 * XWTM_MS);
+                ts = xwosal_scheduler_get_timestamp_lc();
+                thrdslplogf(INFO, "[线程] 时间戳：%lld 纳米。\n", ts);
         }
 
-        thrdslplogf(INFO, "Thread exits.\n");
+        thrdslplogf(INFO, "[线程] 退出。\n");
         xwosal_thrd_delete(xwosal_cthrd_get_id());
         return rc;
 }

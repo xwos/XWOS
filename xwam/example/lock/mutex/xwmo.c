@@ -32,16 +32,16 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define MTXTHRD_0_PRIORITY \
+#define XWMTXDEMO_THRD_0_PRIORITY \
         XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 0)
 
-#define MTXTHRD_1_PRIORITY \
+#define XWMTXDEMO_THRD_1_PRIORITY \
         XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-  #define EXAMPLE_MUTEX_LOG_TAG         "mutex"
+  #define XWMTXDEMO_LOG_TAG             "mutex"
   #define mutexlogf(lv, fmt, ...)     \
-        xwlogf(lv, EXAMPLE_MUTEX_LOG_TAG, fmt, ##__VA_ARGS__)
+        xwlogf(lv, XWMTXDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
 #else /* XWLIBCFG_LOG */
   #define mutexlogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
@@ -53,9 +53,9 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t mtxthrd_0_func(void * arg);
+xwer_t xwmtxdemo_thrd_0_func(void * arg);
 
-xwer_t mtxthrd_1_func(void * arg);
+xwer_t xwmtxdemo_thrd_1_func(void * arg);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
@@ -63,29 +63,29 @@ xwer_t mtxthrd_1_func(void * arg);
 /**
  * @brief 动态创建的线程描述表
  */
-const struct xwosal_thrd_desc example_mutex_tbd[] = {
+const struct xwosal_thrd_desc xwmtxdemo_tbd[] = {
         [0] = {
-                .name = "Thread-0",
-                .prio = MTXTHRD_0_PRIORITY,
+                .name = "xwmtxdemo.thrd.0",
+                .prio = XWMTXDEMO_THRD_0_PRIORITY,
                 .stack = XWOSAL_THRD_STACK_DYNAMIC,
                 .stack_size = 2048,
-                .func = (xwosal_thrd_f)mtxthrd_0_func,
+                .func = (xwosal_thrd_f)xwmtxdemo_thrd_0_func,
                 .arg = NULL,
                 .attr = XWSDOBJ_ATTR_PRIVILEGED,
         },
         [1] = {
-                .name = "Thread-1",
-                .prio = MTXTHRD_1_PRIORITY,
+                .name = "xwmtxdemo.thrd.1",
+                .prio = XWMTXDEMO_THRD_1_PRIORITY,
                 .stack = XWOSAL_THRD_STACK_DYNAMIC,
                 .stack_size = 2048,
-                .func = (xwosal_thrd_f)mtxthrd_1_func,
+                .func = (xwosal_thrd_f)xwmtxdemo_thrd_1_func,
                 .arg = (void *)3,
                 .attr = XWSDOBJ_ATTR_PRIVILEGED,
         },
 };
-xwid_t example_mutex_tid[xw_array_size(example_mutex_tbd)];
+xwid_t xwmtxdemo_tid[xw_array_size(xwmtxdemo_tbd)];
 
-xwid_t mtxid; /* 互斥锁ID */
+xwid_t xwmtxdemo_mtxid;
 xwsq_t shared_count = 0;
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -99,19 +99,19 @@ xwer_t example_mutex_start(void)
         xwer_t rc;
         xwsq_t i;
 
-        rc = xwosal_mtx_create(&mtxid, XWOSAL_SD_PRIORITY_RT_MAX);
+        rc = xwosal_mtx_create(&xwmtxdemo_mtxid, XWOSAL_SD_PRIORITY_RT_MAX);
         if (rc < 0) {
                 goto err_mtx_create;
         }
 
-        for (i = 0; i < xw_array_size(example_mutex_tbd); i++) {
-                rc = xwosal_thrd_create(&example_mutex_tid[i],
-                                        example_mutex_tbd[i].name,
-                                        example_mutex_tbd[i].func,
-                                        example_mutex_tbd[i].arg,
-                                        example_mutex_tbd[i].stack_size,
-                                        example_mutex_tbd[i].prio,
-                                        example_mutex_tbd[i].attr);
+        for (i = 0; i < xw_array_size(xwmtxdemo_tbd); i++) {
+                rc = xwosal_thrd_create(&xwmtxdemo_tid[i],
+                                        xwmtxdemo_tbd[i].name,
+                                        xwmtxdemo_tbd[i].func,
+                                        xwmtxdemo_tbd[i].arg,
+                                        xwmtxdemo_tbd[i].stack_size,
+                                        xwmtxdemo_tbd[i].prio,
+                                        xwmtxdemo_tbd[i].attr);
                 if (rc < 0) {
                         goto err_thrd_create;
                 }
@@ -120,7 +120,7 @@ xwer_t example_mutex_start(void)
         return XWOK;
 
 err_thrd_create:
-        xwosal_mtx_delete(mtxid);
+        xwosal_mtx_delete(xwmtxdemo_mtxid);
 err_mtx_create:
         return rc;
 }
@@ -128,7 +128,7 @@ err_mtx_create:
 /**
  * @brief 线程0的主函数
  */
-xwer_t mtxthrd_0_func(void * arg)
+xwer_t xwmtxdemo_thrd_0_func(void * arg)
 {
         xwtm_t time;
         xwer_t rc = XWOK;
@@ -139,14 +139,14 @@ xwer_t mtxthrd_0_func(void * arg)
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
                 time = 500 * XWTM_MS;
                 xwosal_cthrd_sleep(&time);
-                rc = xwosal_mtx_lock(mtxid);
+                rc = xwosal_mtx_lock(xwmtxdemo_mtxid);
                 if (XWOK == rc) {
                         time = xwosal_scheduler_get_timestamp_lc();
                         mutexlogf(INFO,
                                   "[线程0] 计数器：%d, 时间戳：%lld 纳秒。\n",
                                   shared_count, time);
                         shared_count++;
-                        xwosal_mtx_unlock(mtxid);
+                        xwosal_mtx_unlock(xwmtxdemo_mtxid);
                 }
         }
         mutexlogf(INFO, "[线程0] 退出。\n");
@@ -157,7 +157,7 @@ xwer_t mtxthrd_0_func(void * arg)
 /**
  * @brief 线程1的主函数
  */
-xwer_t mtxthrd_1_func(void * arg)
+xwer_t xwmtxdemo_thrd_1_func(void * arg)
 {
         xwtm_t time;
         xwer_t rc = XWOK;
@@ -168,14 +168,14 @@ xwer_t mtxthrd_1_func(void * arg)
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
                 time = 500 * XWTM_MS;
                 xwosal_cthrd_sleep(&time);
-                rc = xwosal_mtx_lock(mtxid);
+                rc = xwosal_mtx_lock(xwmtxdemo_mtxid);
                 if (XWOK == rc) {
                         time = xwosal_scheduler_get_timestamp_lc();
                         mutexlogf(INFO,
                                   "[线程1] 计数器：%d, 时间戳：%lld 纳秒。\n",
                                   shared_count, time);
                         shared_count++;
-                        xwosal_mtx_unlock(mtxid);
+                        xwosal_mtx_unlock(xwmtxdemo_mtxid);
                 }
         }
         mutexlogf(INFO, "[线程1] 退出。\n");

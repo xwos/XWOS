@@ -35,13 +35,13 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define CDTTHRD_PRIORITY \
+#define XWCDTDEMO_THRD_PRIORITY \
         XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-  #define EXAMPLE_CONDITION_LOG_TAG     "cdt"
+  #define XWCDTDEMO_LOG_TAG     "cdt"
   #define cdtlogf(lv, fmt, ...) \
-        xwlogf(lv, EXAMPLE_CONDITION_LOG_TAG, fmt, ##__VA_ARGS__)
+        xwlogf(lv, XWCDTDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
 #else /* XWLIBCFG_LOG */
   #define cdtlogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
@@ -53,7 +53,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t cdtthrd_func(void * arg);
+xwer_t xwcdtdemo_thrd_func(void * arg);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
@@ -61,24 +61,24 @@ xwer_t cdtthrd_func(void * arg);
 /**
  * @brief 线程描述表
  */
-const struct xwosal_thrd_desc cdtthrd_tbd = {
-        .name = "Thread-1",
-        .prio = CDTTHRD_PRIORITY,
+const struct xwosal_thrd_desc xwcdtdemo_tbd = {
+        .name = "xwcdtdemo.thrd",
+        .prio = XWCDTDEMO_THRD_PRIORITY,
         .stack = XWOSAL_THRD_STACK_DYNAMIC,
         .stack_size = 2048,
-        .func = (xwosal_thrd_f)cdtthrd_func,
+        .func = (xwosal_thrd_f)xwcdtdemo_thrd_func,
         .arg = NULL,
         .attr = XWSDOBJ_ATTR_PRIVILEGED,
 };
-xwid_t cdtthrd_tid;
+xwid_t xwcdtdemo_tid;
 
-struct xwosal_swt cdtswt;
-xwid_t cdtswtid;
+struct xwosal_swt xwcdtdemo_swt;
+xwid_t xwcdtdemo_swtid;
 
-struct xwosal_cdt cdt;
-xwid_t cdtid;
+struct xwosal_cdt xwcdtdemo_cdt;
+xwid_t xwcdtdemo_cdtid;
 
-struct xwosal_splk cdtlock;
+struct xwosal_splk xwcdtdemo_lock;
 xwsq_t shared_count = 0;
 bool is_updated = false;
 
@@ -93,30 +93,31 @@ xwer_t example_condition_start(void)
         xwer_t rc;
 
         /* 初始化自旋锁 */
-        xwosal_splk_init(&cdtlock);
+        xwosal_splk_init(&xwcdtdemo_lock);
 
         /* 初始化条件量 */
-        rc = xwosal_cdt_init(&cdt);
+        rc = xwosal_cdt_init(&xwcdtdemo_cdt);
         if (rc < 0) {
                 goto err_cdt_init;
         }
-        cdtid = xwosal_cdt_get_id(&cdt);
+        xwcdtdemo_cdtid = xwosal_cdt_get_id(&xwcdtdemo_cdt);
 
         /* 初始化定时器 */
-        rc = xwosal_swt_init(&cdtswt, "cdtswt", XWOSAL_SWT_FLAG_RESTART);
+        rc = xwosal_swt_init(&xwcdtdemo_swt, "xwcdtdemo_swt",
+                             XWOSAL_SWT_FLAG_RESTART);
         if (rc < 0) {
-                goto err_cdtswt_init;
+                goto err_swt_init;
         }
-        cdtswtid = xwosal_swt_get_id(&cdtswt);
+        xwcdtdemo_swtid = xwosal_swt_get_id(&xwcdtdemo_swt);
 
         /* 创建线程 */
-        rc = xwosal_thrd_create(&cdtthrd_tid,
-                                cdtthrd_tbd.name,
-                                cdtthrd_tbd.func,
-                                cdtthrd_tbd.arg,
-                                cdtthrd_tbd.stack_size,
-                                cdtthrd_tbd.prio,
-                                cdtthrd_tbd.attr);
+        rc = xwosal_thrd_create(&xwcdtdemo_tid,
+                                xwcdtdemo_tbd.name,
+                                xwcdtdemo_tbd.func,
+                                xwcdtdemo_tbd.arg,
+                                xwcdtdemo_tbd.stack_size,
+                                xwcdtdemo_tbd.prio,
+                                xwcdtdemo_tbd.attr);
         if (rc < 0) {
                 goto err_thrd_create;
         }
@@ -124,9 +125,9 @@ xwer_t example_condition_start(void)
         return XWOK;
 
 err_thrd_create:
-        xwosal_swt_destroy(&cdtswt);
-err_cdtswt_init:
-        xwosal_cdt_destroy(&cdt);
+        xwosal_swt_destroy(&xwcdtdemo_swt);
+err_swt_init:
+        xwosal_cdt_destroy(&xwcdtdemo_cdt);
 err_cdt_init:
         return rc;
 }
@@ -146,7 +147,7 @@ err_cdt_init:
  *   此处的定时器回调运行在CPU0，而下文中的线程运行在CPU1，传统的关闭中断做法
  *   无法保证共享数据的安全性，此时只能使用自旋锁已经其派生锁。
  */
-void cdtswt_callback(struct xwosal_swt * swt, void * arg)
+void xwcdtdemo_swt_callback(struct xwosal_swt * swt, void * arg)
 {
         xwreg_t cpuirq;
         bool ntf;
@@ -155,7 +156,7 @@ void cdtswt_callback(struct xwosal_swt * swt, void * arg)
         XWOS_UNUSED(arg);
 
         /* xwosal_cpuirq_save_lc(&cpuirq); */ /* 传统RTOS方法，不推荐 */
-        xwosal_splk_lock_cpuirqsv(&cdtlock, &cpuirq); /* 多核OS的方法，推荐 */
+        xwosal_splk_lock_cpuirqsv(&xwcdtdemo_lock, &cpuirq); /* 多核OS的方法，推荐 */
         if (false == is_updated) {
                 shared_count++;
                 is_updated = true;
@@ -163,20 +164,20 @@ void cdtswt_callback(struct xwosal_swt * swt, void * arg)
         } else {
                 ntf = is_updated;
         }
-        xwosal_splk_unlock_cpuirqrs(&cdtlock, cpuirq); /* 多核OS的方法，推荐 */
+        xwosal_splk_unlock_cpuirqrs(&xwcdtdemo_lock, cpuirq); /* 多核OS的方法，推荐 */
         /* xwosal_cpuirq_restore_lc(cpuirq); */ /* 传统RTOS做法，不推荐 */
         if (ntf) {
-                xwosal_cdt_broadcast(cdtid);
+                xwosal_cdt_broadcast(xwcdtdemo_cdtid);
         }
 }
 
 /**
  * @brief 线程1的主函数
  */
-xwer_t cdtthrd_func(void * arg)
+xwer_t xwcdtdemo_thrd_func(void * arg)
 {
         xwer_t rc;
-        xwtm_t base, time;
+        xwtm_t base, ts;
         xwreg_t cpuirq;
         xwsq_t lkst;
         union xwlk_ulock ulk;
@@ -188,45 +189,47 @@ xwer_t cdtthrd_func(void * arg)
 
         cdtlogf(INFO, "[线程] 启动定时器。\n");
         base = xwosal_scheduler_get_timetick_lc();
-        rc = xwosal_swt_start(cdtswtid, base, 1000 * XWTM_MS, cdtswt_callback, NULL);
+        rc = xwosal_swt_start(xwcdtdemo_swtid, base, 1000 * XWTM_MS,
+                              xwcdtdemo_swt_callback, NULL);
 
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
-                xwosal_splk_lock_cpuirqsv(&cdtlock, &cpuirq);
+                xwosal_splk_lock_cpuirqsv(&xwcdtdemo_lock, &cpuirq);
                 if (is_updated) {
                         rc = XWOK;
                         is_updated = false;
                         cnt = shared_count;
                 } else {
-                        time = 500 * XWTM_MS;
-                        ulk.osal.splk = &cdtlock;
+                        ts = 500 * XWTM_MS;
+                        ulk.osal.splk = &xwcdtdemo_lock;
                         /* 等待条件量，同时解锁自旋锁 */
-                        rc = xwosal_cdt_timedwait(cdtid, ulk, XWLK_TYPE_SPLK,
-                                                  NULL, &time, &lkst);
+                        rc = xwosal_cdt_timedwait(xwcdtdemo_cdtid,
+                                                  ulk, XWLK_TYPE_SPLK,
+                                                  NULL, &ts, &lkst);
                         if (XWOK == rc) {
                                 /* 等待到条件量，自旋锁自动上锁 */
                                 is_updated = false;
                         } else {
                                 /* 错误返回，自旋锁不会自动上锁 */
                                 if (XWLK_STATE_UNLOCKED == lkst) {
-                                        xwosal_splk_lock(&cdtlock);
+                                        xwosal_splk_lock(&xwcdtdemo_lock);
                                 }
                         }
                         cnt = shared_count;
                 }
-                xwosal_splk_unlock_cpuirqrs(&cdtlock, cpuirq);
+                xwosal_splk_unlock_cpuirqrs(&xwcdtdemo_lock, cpuirq);
 
                 if (XWOK == rc) {
-                        time = xwosal_scheduler_get_timestamp_lc();
+                        ts = xwosal_scheduler_get_timestamp_lc();
                         cdtlogf(INFO,
                                 "[线程] 定时器唤醒，时间戳：%lld 纳秒，"
                                 "计数器：%d。\n",
-                                time, cnt);
+                                ts, cnt);
                 } else if (-ETIMEDOUT == rc) {
-                        time = xwosal_scheduler_get_timestamp_lc();
+                        ts = xwosal_scheduler_get_timestamp_lc();
                         cdtlogf(INFO,
                                 "[线程] 等待超时，时间戳：%lld 纳秒，"
                                 "计数器：%d，错误码：%d。\n",
-                                time, cnt, rc);
+                                ts, cnt, rc);
                 }
         }
 

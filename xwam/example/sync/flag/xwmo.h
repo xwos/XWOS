@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：sync/flag
+ * @brief 示例：事件信号旗
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

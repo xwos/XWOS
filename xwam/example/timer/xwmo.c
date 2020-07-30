@@ -34,13 +34,13 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define SWTTHRD_PRIORITY \
+#define XWSWTDEMO_THRD_PRIORITY \
         XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-  #define EXAMPLE_TIMER_LOG_TAG         "swt"
+  #define XWSWTDEMO_LOG_TAG     "swt"
   #define swtlogf(lv, fmt, ...) \
-        xwlogf(lv, EXAMPLE_TIMER_LOG_TAG, fmt, ##__VA_ARGS__)
+        xwlogf(lv, XWSWTDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
 #else /* XWLIBCFG_LOG */
   #define swtlogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
@@ -52,7 +52,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t swtthrd_func(void * arg);
+xwer_t xwswtdemo_thrd_func(void * arg);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
@@ -60,20 +60,20 @@ xwer_t swtthrd_func(void * arg);
 /**
  * @brief 线程描述表
  */
-const struct xwosal_thrd_desc swtthrd_tbd = {
-        .name = "Thread-1",
-        .prio = SWTTHRD_PRIORITY,
+const struct xwosal_thrd_desc xwswtdemo_tbd = {
+        .name = "xwswtdemo.thrd",
+        .prio = XWSWTDEMO_THRD_PRIORITY,
         .stack = XWOSAL_THRD_STACK_DYNAMIC,
         .stack_size = 2048,
-        .func = (xwosal_thrd_f)swtthrd_func,
+        .func = (xwosal_thrd_f)xwswtdemo_thrd_func,
         .arg = NULL,
         .attr = XWSDOBJ_ATTR_PRIVILEGED,
 };
-xwid_t swtthrd_tid;
+xwid_t xwswtdemo_tid;
 
-struct xwosal_swt swt0;
-xwid_t swtid0;
-xwid_t swtid1;
+struct xwosal_swt xwswtdemo_swt0;
+xwid_t xwswtdemo_swt0id;
+xwid_t xwswtdemo_swt1id;
 
 struct xwosal_flg swtflg;
 xwid_t swtflgid;
@@ -96,36 +96,38 @@ xwer_t example_timer_start(void)
         swtflgid = xwosal_flg_get_id(&swtflg);
 
         /* 初始化定时器0 */
-        rc = xwosal_swt_init(&swt0, "swt0", XWOSAL_SWT_FLAG_RESTART);
+        rc = xwosal_swt_init(&xwswtdemo_swt0, "xwswtdemo_swt0",
+                             XWOSAL_SWT_FLAG_RESTART);
         if (rc < 0) {
                 goto err_swt0_init;
         }
-        swtid0 = xwosal_swt_get_id(&swt0);
+        xwswtdemo_swt0id = xwosal_swt_get_id(&xwswtdemo_swt0);
 
         /* 创建定时器1 */
-        rc = xwosal_swt_create(&swtid1, "swt1", XWOSAL_SWT_FLAG_RESTART);
+        rc = xwosal_swt_create(&xwswtdemo_swt1id, "xwswtdemo_swt1",
+                               XWOSAL_SWT_FLAG_RESTART);
         if (rc < 0) {
                 goto err_swt1_create;
         }
 
         /* 创建线程 */
-        rc = xwosal_thrd_create(&swtthrd_tid,
-                                swtthrd_tbd.name,
-                                swtthrd_tbd.func,
-                                swtthrd_tbd.arg,
-                                swtthrd_tbd.stack_size,
-                                swtthrd_tbd.prio,
-                                swtthrd_tbd.attr);
+        rc = xwosal_thrd_create(&xwswtdemo_tid,
+                                xwswtdemo_tbd.name,
+                                xwswtdemo_tbd.func,
+                                xwswtdemo_tbd.arg,
+                                xwswtdemo_tbd.stack_size,
+                                xwswtdemo_tbd.prio,
+                                xwswtdemo_tbd.attr);
         if (rc < 0) {
-                goto err_thrd_sleep;
+                goto err_thrd_create;
         }
 
         return XWOK;
 
-err_thrd_sleep:
-        xwosal_swt_delete(swtid1);
+err_thrd_create:
+        xwosal_swt_delete(xwswtdemo_swt1id);
 err_swt1_create:
-        xwosal_swt_destroy(&swt0);
+        xwosal_swt_destroy(&xwswtdemo_swt0);
 err_swt0_init:
         xwosal_flg_destroy(&swtflg);
 err_flg_init:
@@ -143,7 +145,7 @@ err_flg_init:
  *   - 当配置(XWSMPCFG_SD_BH == 0)，此函数运行在中断上下文；
  * - 此函数中不可调用会导致线程睡眠或阻塞的函数。
  */
-void swt0_callback(struct xwosal_swt * swt, void * arg)
+void xwswtdemo_swt0_callback(struct xwosal_swt * swt, void * arg)
 {
         XWOS_UNUSED(swt);
         XWOS_UNUSED(arg);
@@ -162,7 +164,7 @@ void swt0_callback(struct xwosal_swt * swt, void * arg)
  *   - 当配置(XWSMPCFG_SD_BH == 0)，此函数运行在中断上下文；
  * - 此函数中不可调用会导致线程睡眠或阻塞的函数。
  */
-void swt1_callback(struct xwosal_swt * swt, void * arg)
+void xwswtdemo_swt1_callback(struct xwosal_swt * swt, void * arg)
 {
         XWOS_UNUSED(swt);
         XWOS_UNUSED(arg);
@@ -173,7 +175,7 @@ void swt1_callback(struct xwosal_swt * swt, void * arg)
 /**
  * @brief 线程1的主函数
  */
-xwer_t swtthrd_func(void * arg)
+xwer_t xwswtdemo_thrd_func(void * arg)
 {
         xwtm_t base, ts;
         xwer_t rc;
@@ -187,10 +189,14 @@ xwer_t swtthrd_func(void * arg)
         base = xwosal_scheduler_get_timetick_lc();
 
         swtlogf(INFO, "[线程] 启动定时器0。\n");
-        rc = xwosal_swt_start(swtid0, base, 500 * XWTM_MS, swt0_callback, NULL);
+        rc = xwosal_swt_start(xwswtdemo_swt0id,
+                              base, 500 * XWTM_MS,
+                              xwswtdemo_swt0_callback, NULL);
 
         swtlogf(INFO, "[线程] 启动定时器1。\n");
-        rc = xwosal_swt_start(swtid1, base, 800 * XWTM_MS, swt1_callback, NULL);
+        rc = xwosal_swt_start(xwswtdemo_swt1id,
+                              base, 800 * XWTM_MS,
+                              xwswtdemo_swt1_callback, NULL);
 
         /* 设置掩码位为bit0:1共2位 */
         memset(msk, 0, sizeof(msk));
@@ -218,8 +224,9 @@ xwer_t swtthrd_func(void * arg)
                                         ts);
                         }
                 } else {
+                        ts = xwosal_scheduler_get_timestamp_lc();
                         swtlogf(ERR,
-                                "[等待线程] 错误，时间戳：%lld 纳秒，错误码：%d。\n",
+                                "[线程] 错误，时间戳：%lld 纳秒，错误码：%d。\n",
                                 ts, rc);
                 }
         }

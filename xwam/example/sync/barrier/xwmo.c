@@ -31,13 +31,13 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define EXAMPLE_BARRIER_THRD_PRIORITY \
+#define XWBRDEMO_THRD_PRIORITY \
         XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-  #define EXAMPLE_BARRIER_LOG_TAG       "barrier"
+  #define XWBRDEMO_LOG_TAG      "barrier"
   #define barlogf(lv, fmt, ...) \
-        xwlogf(lv, EXAMPLE_BARRIER_LOG_TAG, fmt, ##__VA_ARGS__)
+        xwlogf(lv, XWBRDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
 #else /* XWLIBCFG_LOG */
   #define barlogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
@@ -49,61 +49,62 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t example_barrier_thrd_func(void * arg);
+xwer_t xwbrdemo_thrd_func(void * arg);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-const struct xwosal_thrd_desc example_barrier_thrd_td[] = {
+const struct xwosal_thrd_desc xwbrdemo_td[] = {
         [0] = {
                 .name = "example.barrier.thrd.0",
-                .prio = EXAMPLE_BARRIER_THRD_PRIORITY,
+                .prio = XWBRDEMO_THRD_PRIORITY,
                 .stack = XWOSAL_THRD_STACK_DYNAMIC,
                 .stack_size = 2048,
-                .func = (xwosal_thrd_f)example_barrier_thrd_func,
+                .func = (xwosal_thrd_f)xwbrdemo_thrd_func,
                 .arg = (void *)0,
                 .attr = XWSDOBJ_ATTR_PRIVILEGED,
         },
         [1] = {
                 .name = "example.barrier.thrd.1",
-                .prio = EXAMPLE_BARRIER_THRD_PRIORITY,
+                .prio = XWBRDEMO_THRD_PRIORITY,
                 .stack = XWOSAL_THRD_STACK_DYNAMIC,
                 .stack_size = 2048,
-                .func = (xwosal_thrd_f)example_barrier_thrd_func,
+                .func = (xwosal_thrd_f)xwbrdemo_thrd_func,
                 .arg = (void *)1,
                 .attr = XWSDOBJ_ATTR_PRIVILEGED,
         },
         [2] = {
                 .name = "example.barrier.thrd.2",
-                .prio = EXAMPLE_BARRIER_THRD_PRIORITY,
+                .prio = XWBRDEMO_THRD_PRIORITY,
                 .stack = XWOSAL_THRD_STACK_DYNAMIC,
                 .stack_size = 2048,
-                .func = (xwosal_thrd_f)example_barrier_thrd_func,
+                .func = (xwosal_thrd_f)xwbrdemo_thrd_func,
                 .arg = (void *)2,
                 .attr = XWSDOBJ_ATTR_PRIVILEGED,
         },
         [3] = {
                 .name = "example.barrier.thrd.3",
-                .prio = EXAMPLE_BARRIER_THRD_PRIORITY,
+                .prio = XWBRDEMO_THRD_PRIORITY,
                 .stack = XWOSAL_THRD_STACK_DYNAMIC,
                 .stack_size = 2048,
-                .func = (xwosal_thrd_f)example_barrier_thrd_func,
+                .func = (xwosal_thrd_f)xwbrdemo_thrd_func,
                 .arg = (void *)3,
                 .attr = XWSDOBJ_ATTR_PRIVILEGED,
         },
         [4] = {
                 .name = "example.barrier.thrd.4",
-                .prio = EXAMPLE_BARRIER_THRD_PRIORITY,
+                .prio = XWBRDEMO_THRD_PRIORITY,
                 .stack = XWOSAL_THRD_STACK_DYNAMIC,
                 .stack_size = 2048,
-                .func = (xwosal_thrd_f)example_barrier_thrd_func,
+                .func = (xwosal_thrd_f)xwbrdemo_thrd_func,
                 .arg = (void *)4,
                 .attr = XWSDOBJ_ATTR_PRIVILEGED,
         },
 };
-xwid_t example_barrier_thrd[xw_array_size(example_barrier_thrd_td)];
+xwid_t xwbrdemo_tid[xw_array_size(xwbrdemo_td)];
 
-struct xwosal_barrier xwtst_sync_barrier;
+struct xwosal_barrier xwbrdemo_br;
+xwid_t xwbrdemo_brid;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -117,20 +118,21 @@ xwer_t example_barrier_start(void)
         xwer_t rc;
 
         /* 初始化线程屏障 */
-        rc = xwosal_barrier_init(&xwtst_sync_barrier);
+        rc = xwosal_barrier_init(&xwbrdemo_br);
         if (rc < 0) {
                 goto err_barrier_init;
         }
+        xwbrdemo_brid = xwosal_barrier_get_id(&xwbrdemo_br);
 
         /* 创建5个线程 */
-        for (i = 0; i < xw_array_size(example_barrier_thrd_td); i++) {
-                rc = xwosal_thrd_create(&example_barrier_thrd[i],
-                                        example_barrier_thrd_td[i].name,
-                                        example_barrier_thrd_td[i].func,
-                                        example_barrier_thrd_td[i].arg,
-                                        example_barrier_thrd_td[i].stack_size,
-                                        example_barrier_thrd_td[i].prio,
-                                        example_barrier_thrd_td[i].attr);
+        for (i = 0; i < xw_array_size(xwbrdemo_td); i++) {
+                rc = xwosal_thrd_create(&xwbrdemo_tid[i],
+                                        xwbrdemo_td[i].name,
+                                        xwbrdemo_td[i].func,
+                                        xwbrdemo_td[i].arg,
+                                        xwbrdemo_td[i].stack_size,
+                                        xwbrdemo_td[i].prio,
+                                        xwbrdemo_td[i].attr);
                 if (rc < 0) {
                         goto err_thrd_create;
                 }
@@ -139,7 +141,7 @@ xwer_t example_barrier_start(void)
         return XWOK;
 
 err_thrd_create:
-        xwosal_barrier_destroy(&xwtst_sync_barrier);
+        xwosal_barrier_destroy(&xwbrdemo_br);
 err_barrier_init:
         return rc;
 }
@@ -147,10 +149,9 @@ err_barrier_init:
 /**
  * @brief 线程函数
  */
-xwer_t example_barrier_thrd_func(void * arg)
+xwer_t xwbrdemo_thrd_func(void * arg)
 {
         xwosal_barrier_declare_bitmap(msk);
-        xwid_t barid;
         xwer_t rc;
 
         xwsq_t pos = (xwsq_t)arg; /* 获取线程的各自的位置 */
@@ -160,14 +161,12 @@ xwer_t example_barrier_thrd_func(void * arg)
         xwbmpop_c0all(msk, XWOSAL_BARRIER_MAXNUM);
 
         /* 设置位图掩码 */
-        for (xwsq_t i = 0; i < xw_array_size(example_barrier_thrd_td); i++) {
+        for (xwsq_t i = 0; i < xw_array_size(xwbrdemo_td); i++) {
                 xwbmpop_s1i(msk, i);
         }
 
-        barid = xwosal_barrier_get_id(&xwtst_sync_barrier); /* 获取线程屏障的ID */
-
         /* 同步线程 */
-        rc = xwosal_barrier_sync(barid, pos, msk);
+        rc = xwosal_barrier_sync(xwbrdemo_brid, pos, msk);
         if (XWOK == rc) {
                 barlogf(INFO, "[线程%d] 同步。\n", pos);
         }

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：sync/selector
+ * @brief 示例：信号选择器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
