@@ -28,6 +28,8 @@
 #if defined(XuanWuOS_CFG_CORE__smp)
   #include <xwos/smp/thread.h>
   #include <xwos/smp/sync/semaphore.h>
+  #include <xwos/smp/sync/condition.h>
+  #include <xwos/smp/sync/event.h>
   #include <xwos/smp/lock/mutex.h>
 #endif /* XuanWuOS_CFG_CORE__smp */
 #include <bm/stm32cube/init.h>
