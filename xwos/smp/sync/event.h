@@ -201,7 +201,7 @@ xwer_t xwsync_evt_timedsync(struct xwsync_evt * evt, xwsq_t pos, xwbmp_t sync[],
  ******** ********      inline API implementations     ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief XWOS API：等待事件对象中的信号，事件对象类型为XWSYNC_EVT_TYPE_FLAG
+ * @brief XWOS API：等待事件对象中的触发信号，事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
  * @param trigger: (I) 事件触发条件，取值 @ref xwsync_evt_trigger_em
  * @param action: (I) 事件触发后的动作，取值 @ref xwsync_evt_action_em，
@@ -271,7 +271,7 @@ xwer_t xwsync_evt_select(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
 }
 
 /**
- * @brief XWOS API：等待所有线程到达屏障，事件对象类型为XWSYNC_EVT_TYPE_BARRIER
+ * @brief XWOS API：等待所有线程到达栅栏，事件对象类型为XWSYNC_EVT_TYPE_BARRIER
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 当前线程的位图位置
  * @param sync: (I) 当前线程需要同步的线程掩码

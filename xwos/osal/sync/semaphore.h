@@ -23,7 +23,7 @@
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief [XWOSAL] 信号量
+ * @brief XWOSAL：信号量
  */
 struct xwosal_smr {
         struct xwosdl_smr ossmr; /**< 操作系统的信号量 */
@@ -178,7 +178,7 @@ xwer_t xwosal_smr_unbind(xwid_t smrid, xwid_t sltid)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  * @note
- * - 已冻结的信号量不允许增加(V操作)，但可以被测试(P操作)，
+ * - 被冻结的信号量不允许增加(V操作)，但可以被测试(P操作)，
  *   测试信号量的线程会被加入到信号量的等待队列。
  */
 static __xwos_inline_api
@@ -229,6 +229,8 @@ xwer_t xwosal_smr_post(xwid_t smrid)
  * @brief XWOSAL API：等待并获取信号量
  * @param smrid: (I) 信号量ID
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EINTR: 等待被中断
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -244,6 +246,8 @@ xwer_t xwosal_smr_wait(xwid_t smrid)
  * @brief XWOSAL API：尝试获取信号量
  * @param smrid: (I) 信号量ID
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -ENODATA: 信号量资源不可用（信号量无法被获取）
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -266,6 +270,7 @@ xwer_t xwosal_smr_trywait(xwid_t smrid)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ETIMEDOUT: 超时
+ * @retval -EINTR: 等待被中断
  * @note
  * - 同步/异步：同步
  * - 上下文：线程

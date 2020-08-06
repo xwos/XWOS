@@ -826,7 +826,8 @@ xwer_t xwsync_evt_trywait_edge(struct xwsync_evt * evt, xwsq_t trigger,
 }
 
 /**
- * @brief XWOS API：测试事件对象中的位，事件对象类型为XWSYNC_EVT_TYPE_FLAG
+ * @brief XWOS API：尝试等待一下事件对象中的触发信号，
+ *                  事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
  * @param trigger: (I) 事件触发条件，取值 @ref xwsync_evt_trigger_em
  * @param action: (I) 事件触发后的动作，取值 @ref xwsync_evt_action_em
@@ -1047,7 +1048,7 @@ xwer_t xwsync_evt_timedwait_edge(struct xwsync_evt * evt, xwsq_t trigger,
 }
 
 /**
- * @brief XWOS API：限时等待事件对象中的位，事件对象类型为XWSYNC_EVT_TYPE_FLAG
+ * @brief XWOS API：限时等待事件对象中的触发信号，事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
  * @param trigger: (I) 事件触发条件，取值 @ref xwsync_evt_trigger_em
  * @param action: (I) 事件触发后的动作，取值 @ref xwsync_evt_action_em
@@ -1302,7 +1303,7 @@ err_evt_grab:
 }
 
 /**
- * @brief XWOS API：测试一下事件对象中绑定的同步对象，不进行阻塞等待
+ * @brief XWOS API：尝试等待一下事件对象中绑定的同步对象，不进行阻塞等待
  * @param evt: (I) 事件对象的指针
  * @param msk: (I) 待触发的同步对象的位图掩码，表示只关注掩码部分的位
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象的位图
@@ -1450,7 +1451,7 @@ err_evt_grab:
 
 /******** type:XWSYNC_EVT_TYPE_BARRIER ********/
 /**
- * @brief XWOS API：等待所有线程到达屏障，事件对象类型为XWSYNC_EVT_TYPE_BARRIER
+ * @brief XWOS API：等待所有线程到达栅栏，事件对象类型为XWSYNC_EVT_TYPE_BARRIER
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 当前线程的位图位置
  * @param sync: (I) 当前线程需要同步的线程掩码

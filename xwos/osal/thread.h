@@ -23,19 +23,19 @@
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 操作系统抽象层：线程控制块
+ * @brief XWOSAL：线程控制块
  */
 struct xwosal_tcb {
         struct xwosdl_tcb ostcb; /**< 操作系统的线程控制块 */
 };
 
 /**
- * @brief 操作系统抽象层：线程函数指针类型
+ * @brief XWOSAL：线程函数指针类型
  */
 typedef xwosdl_thrd_f xwosal_thrd_f;
 
 /**
- * @brief 操作系统抽象层：线程描述结构
+ * @brief XWOSAL：线程描述结构
  */
 struct xwosal_thrd_desc {
         const char * name; /**< 线程的名字 */

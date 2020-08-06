@@ -245,7 +245,7 @@ xwer_t xwsync_evt_select(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
 }
 
 /**
- * @brief XWOS API：等待所有线程到达屏障，事件对象类型为XWSYNC_EVT_TYPE_BARRIER
+ * @brief XWOS API：等待所有线程到达栅栏，事件对象类型为XWSYNC_EVT_TYPE_BARRIER
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 当前线程的位图位置
  * @param sync: (I) 当前线程需要同步的线程掩码

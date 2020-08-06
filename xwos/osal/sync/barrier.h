@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 操作系统抽象层：线程屏障
+ * @brief 操作系统抽象层：线程栅栏
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -23,19 +23,19 @@
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief [XWOSAL] 线程屏障
+ * @brief XWOSAL：线程栅栏
  */
 struct xwosal_barrier {
-        struct xwosdl_barrier osbar; /**< 操作系统的线程屏障 */
+        struct xwosdl_barrier osbar; /**< 操作系统的线程栅栏 */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      macros       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWOSAL_BARRIER_MAXNUM XWOSDL_BARRIER_MAXNUM /**< 线程屏障可同步的最大线程数 */
+#define XWOSAL_BARRIER_MAXNUM XWOSDL_BARRIER_MAXNUM /**< 线程栅栏可同步的最大线程数 */
 
 /**
- * @brief 声明线程屏障位图
+ * @brief 声明线程栅栏位图
  */
 #define xwosal_barrier_declare_bitmap(name) xwosdl_barrier_declare_bitmap(name)
 
@@ -43,8 +43,8 @@ struct xwosal_barrier {
  ******** ******** ********       APIs        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief XWOSAL API：静态方式初始化线程屏障
- * @param barrier: (I) 线程屏障的指针
+ * @brief XWOSAL API：静态方式初始化线程栅栏
+ * @param barrier: (I) 线程栅栏的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -58,8 +58,8 @@ xwer_t xwosal_barrier_init(struct xwosal_barrier * bar)
 }
 
 /**
- * @brief XWOSAL API：销毁静态方式初始化的线程屏障
- * @param barrier: (I) 线程屏障的指针
+ * @brief XWOSAL API：销毁静态方式初始化的线程栅栏
+ * @param barrier: (I) 线程栅栏的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -73,10 +73,10 @@ xwer_t xwosal_barrier_destroy(struct xwosal_barrier * bar)
 }
 
 /**
- * @brief XWOSAL API：动态方式创建线程屏障
+ * @brief XWOSAL API：动态方式创建线程栅栏
  * @param barbuf: (O) 指向缓冲区的指针，通过此缓冲区返回ID
- * @param val: (I) 线程屏障的初始值
- * @param max: (I) 线程屏障的最大值
+ * @param val: (I) 线程栅栏的初始值
+ * @param max: (I) 线程栅栏的最大值
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -90,8 +90,8 @@ xwer_t xwosal_barrier_create(xwid_t * barbuf)
 }
 
 /**
- * @brief XWOSAL API：删除动态方式创建的线程屏障
- * @param barid: (I) 线程屏障ID
+ * @brief XWOSAL API：删除动态方式创建的线程栅栏
+ * @param barid: (I) 线程栅栏ID
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -105,9 +105,9 @@ xwer_t xwosal_barrier_delete(xwid_t barid)
 }
 
 /**
- * @brief XWOSAL API：从线程屏障对象指针获取其ID
- * @param barrier: (I) 线程屏障对象的指针
- * @return 线程屏障ID
+ * @brief XWOSAL API：从线程栅栏对象指针获取其ID
+ * @param barrier: (I) 线程栅栏对象的指针
+ * @return 线程栅栏ID
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -120,9 +120,9 @@ xwid_t xwosal_barrier_get_id(struct xwosal_barrier * bar)
 }
 
 /**
- * @brief XWOSAL API：从线程屏障ID获取对象的指针
- * @param barid: (I) 线程屏障ID
- * @return 线程屏障对象的指针
+ * @brief XWOSAL API：从线程栅栏ID获取对象的指针
+ * @param barid: (I) 线程栅栏ID
+ * @return 线程栅栏对象的指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -135,19 +135,19 @@ struct xwosal_barrier * xwosal_barrier_get_obj(xwid_t barid)
 }
 
 /**
- * @brief XWOSAL API：绑定线程屏障到信号选择器
- * @param barid: (I) 线程屏障的ID
+ * @brief XWOSAL API：绑定线程栅栏到信号选择器
+ * @param barid: (I) 线程栅栏的ID
  * @param sltid: (I) 信号选择器的ID
- * @param pos: (I) 线程屏障对象映射到位图中的位置
+ * @param pos: (I) 线程栅栏对象映射到位图中的位置
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ETYPE: 信号选择器或线程屏障类型错误
+ * @retval -ETYPE: 信号选择器或线程栅栏类型错误
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *barid* ，不可重入
  * @note
- * - 当所有线程到达线程屏障时，绑定了信号选择器的线程屏障将向信号选择器发送信号。
+ * - 当所有线程到达线程栅栏时，绑定了信号选择器的线程栅栏将向信号选择器发送信号。
  */
 static __xwos_inline_api
 xwer_t xwosal_barrier_bind(xwid_t barid, xwid_t sltid, xwsq_t pos)
@@ -156,8 +156,8 @@ xwer_t xwosal_barrier_bind(xwid_t barid, xwid_t sltid, xwsq_t pos)
 }
 
 /**
- * @brief XWOSAL API：从信号选择器上解绑线程屏障
- * @param barid: (I) 线程屏障的ID
+ * @brief XWOSAL API：从信号选择器上解绑线程栅栏
+ * @param barid: (I) 线程栅栏的ID
  * @param sltid: (I) 信号选择器的ID
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -174,8 +174,8 @@ xwer_t xwosal_barrier_unbind(xwid_t barid, xwid_t sltid)
 }
 
 /**
- * @brief XWOSAL API：中断线程屏障等待队列中的所有节点
- * @param barid: (I) 线程屏障ID
+ * @brief XWOSAL API：中断线程栅栏等待队列中的所有节点
+ * @param barid: (I) 线程栅栏ID
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -192,8 +192,8 @@ xwer_t xwosal_barrier_intr_all(xwid_t barid)
 }
 
 /**
- * @brief XWOSAL API：等待所有线程到达屏障
- * @param barid: (I) 线程屏障ID
+ * @brief XWOSAL API：等待所有线程到达栅栏
+ * @param barid: (I) 线程栅栏ID
  * @param pos: (I) 当前线程的位图位置
  * @param sync: (I) 当前线程需要同步的线程掩码
  * @return 错误码
@@ -214,8 +214,8 @@ xwer_t xwosal_barrier_sync(xwid_t barid, xwsq_t pos, xwbmp_t sync[])
 }
 
 /**
- * @brief XWOSAL API：限时等待所有线程到达屏障
- * @param barid: (I) 线程屏障ID
+ * @brief XWOSAL API：限时等待所有线程到达栅栏
+ * @param barid: (I) 线程栅栏ID
  * @param pos: (I) 当前线程的位图位置
  * @param sync: (I) 当前线程需要同步的线程掩码
  * @param xwtm: 指向缓冲区的指针，此缓冲区：

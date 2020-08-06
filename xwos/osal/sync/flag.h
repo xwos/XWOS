@@ -23,7 +23,7 @@
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief [XWOSAL] 事件信号旗
+ * @brief XWOSAL：事件信号旗
  */
 struct xwosal_flg {
         struct xwosdl_flg osflg; /**< 操作系统的事件信号旗 */
@@ -36,11 +36,31 @@ struct xwosal_flg {
  * @defgroup xwosal_flg_trigger_em
  * @{
  */
+
+/**
+ * @brief 触发条件：所有事件位被置1
+ */
 #define XWOSAL_FLG_TRIGGER_SET_ALL      XWOSDL_FLG_TRIGGER_SET_ALL
+/**
+ * @brief 触发条件：任意事件位被置1
+ */
 #define XWOSAL_FLG_TRIGGER_SET_ANY      XWOSDL_FLG_TRIGGER_SET_ANY
+/**
+ * @brief 触发条件：所有事件位被清0
+ */
 #define XWOSAL_FLG_TRIGGER_CLR_ALL      XWOSDL_FLG_TRIGGER_CLR_ALL
+/**
+ * @brief 触发条件：任意事件位被清0
+ */
 #define XWOSAL_FLG_TRIGGER_CLR_ANY      XWOSDL_FLG_TRIGGER_CLR_ANY
+
+/**
+ * @brief 触发条件：所有事件位发生翻转
+ */
 #define XWOSAL_FLG_TRIGGER_TGL_ALL      XWOSDL_FLG_TRIGGER_TGL_ALL
+/**
+ * @brief 触发条件：任意事件位发生翻转
+ */
 #define XWOSAL_FLG_TRIGGER_TGL_ANY      XWOSDL_FLG_TRIGGER_TGL_ANY
 /**
  * @}
@@ -50,13 +70,29 @@ struct xwosal_flg {
  * @defgroup xwosal_flg_action_em
  * @{
  */
+/**
+ * @brief 事件触发后不做任何操作
+ */
 #define XWOSAL_FLG_ACTION_NONE          XWOSDL_FLG_ACTION_NONE
+
+/**
+ * @brief 事件触发后清除触发条件
+ * @note
+ * + 仅当触发条件为下面时有效：
+ *   - XWOSAL_FLG_TRIGGER_SET_ALL
+ *   - XWOSAL_FLG_TRIGGER_SET_ANY
+ *   - XWOSAL_FLG_TRIGGER_CLR_ALL
+ *   - XWOSAL_FLG_TRIGGER_CLR_ANY
+ */
 #define XWOSAL_FLG_ACTION_CONSUMPTION   XWOSDL_FLG_ACTION_CONSUMPTION
 /**
  * @}
  */
 
-#define XWOSAL_FLG_MAXNUM               XWOSDL_FLG_MAXNUM /**< 事件信号旗最大数量 */
+/**
+ * @brief 事件信号旗中事件的最大数量
+ */
+#define XWOSAL_FLG_MAXNUM               XWOSDL_FLG_MAXNUM
 
 /**
  * @brief 声明事件信号旗位图
@@ -214,7 +250,7 @@ xwer_t xwosal_flg_intr_all(xwid_t flgid)
 }
 
 /**
- * @brief XWOSAL API：同时设置多个事件信号旗
+ * @brief XWOSAL API：同时设置多个事件标志位
  * @param flgid: (I) 事件信号旗ID
  * @param msk: (I) 事件信号旗的位图掩码
  * @return 错误码
@@ -232,7 +268,7 @@ xwer_t xwosal_flg_s1m(xwid_t flgid, xwbmp_t msk[])
 }
 
 /**
- * @brief XWOSAL API：设置单个事件信号旗
+ * @brief XWOSAL API：设置单个事件标志位
  * @param flgid: (I) 事件信号旗ID
  * @param pos: (I) 事件信号旗的序号
  * @return 错误码
@@ -250,7 +286,7 @@ xwer_t xwosal_flg_s1i(xwid_t flgid, xwsq_t pos)
 }
 
 /**
- * @brief XWOSAL API：同时清除多个事件信号旗
+ * @brief XWOSAL API：同时清除多个事件标志位
  * @param flgid: (I) 事件信号旗ID
  * @param msk: (I) 事件信号旗的位图掩码
  * @return 错误码
@@ -268,7 +304,7 @@ xwer_t xwosal_flg_c0m(xwid_t flgid, xwbmp_t msk[])
 }
 
 /**
- * @brief XWOSAL API：清除单个事件信号旗
+ * @brief XWOSAL API：清除单个事件标志位
  * @param flgid: (I) 事件信号旗ID
  * @param pos: (I) 事件信号旗的序号
  * @return 错误码
@@ -287,7 +323,7 @@ xwer_t xwosal_flg_c0i(xwid_t flgid, xwsq_t pos)
 }
 
 /**
- * @brief XWOSAL API：同时翻转多个事件信号旗
+ * @brief XWOSAL API：同时翻转多个事件标志位
  * @param flgid: (I) 事件信号旗ID
  * @param msk: (I) 事件信号旗的位图掩码
  * @return 错误码
@@ -305,7 +341,7 @@ xwer_t xwosal_flg_x1m(xwid_t flgid, xwbmp_t msk[])
 }
 
 /**
- * @brief XWOSAL API：翻转单个事件信号旗
+ * @brief XWOSAL API：翻转单个事件标志位
  * @param flgid: (I) 事件信号旗ID
  * @param pos: (I) 事件信号旗的序号
  * @return 错误码
@@ -324,7 +360,7 @@ xwer_t xwosal_flg_x1i(xwid_t flgid, xwsq_t pos)
 }
 
 /**
- * @brief XWOSAL API：读取事件信号旗位图的值
+ * @brief XWOSAL API：读取事件信号旗中事件标志位图的值
  * @param flgid: (I) 事件信号旗ID
  * @param out: (O) 指向缓冲区的指针，通过此缓冲区返回事件信号旗位图的值
  * @return 错误码
@@ -342,7 +378,7 @@ xwer_t xwosal_flg_read(xwid_t flgid, xwbmp_t out[])
 }
 
 /**
- * @brief XWOSAL API：测试一下事件信号旗
+ * @brief XWOSAL API：尝试等一下事件信号旗的触发事件
  * @param flgid: (I) 事件信号旗ID
  * @param trigger: (I) 事件触发条件，取值 @ref xwosal_flg_trigger_em
  * @param action: (I) 事件触发后的动作，取值 @ref xwosal_flg_action_em，
@@ -383,7 +419,7 @@ xwer_t xwosal_flg_trywait(xwid_t flgid, xwsq_t trigger, xwsq_t action,
 }
 
 /**
- * @brief XWOSAL API：等待事件信号旗
+ * @brief XWOSAL API：等待事件信号旗的触发事件
  * @param flgid: (I) 事件信号旗ID
  * @param trigger: (I) 事件触发条件，取值 @ref xwosal_flg_trigger_em
  * @param action: (I) 事件触发后的动作，取值 @ref xwosal_flg_action_em，
@@ -425,7 +461,7 @@ xwer_t xwosal_flg_wait(xwid_t flgid, xwsq_t trigger, xwsq_t action,
 }
 
 /**
- * @brief XWOSAL API：限时等待事件信号旗
+ * @brief XWOSAL API：限时等待事件信号旗的触发事件
  * @param flgid: (I) 事件信号旗ID
  * @param trigger: (I) 事件触发条件，取值 @ref xwosal_flg_trigger_em
  * @param action: (I) 事件触发后的动作，取值 @ref xwosal_flg_action_em，

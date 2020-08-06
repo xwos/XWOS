@@ -27,27 +27,27 @@
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief [XWOSAL] 最小实时优先级
+ * @brief XWOSAL：最小实时优先级
  */
 #define XWOSAL_SD_PRIORITY_RT_MIN               XWOSDL_SD_PRIORITY_RT_MIN
 
 /**
- * @brief [XWOSAL] 最大实时优先级
+ * @brief XWOSAL：最大实时优先级
  */
 #define XWOSAL_SD_PRIORITY_RT_MAX               XWOSDL_SD_PRIORITY_RT_MAX
 
 /**
- * @brief [XWOSAL] 无效优先级
+ * @brief XWOSAL：无效优先级
  */
 #define XWOSAL_SD_PRIORITY_INVALID              XWOSDL_SD_PRIORITY_INVALID
 
 /**
- * @brief [XWOSAL] 优先级在base基础上提高inc
+ * @brief XWOSAL：优先级在base基础上提高inc
  */
 #define XWOSAL_SD_PRIORITY_RAISE(base, inc)     XWOSDL_SD_PRIORITY_RAISE(base, inc)
 
 /**
- * @brief [XWOSAL] 优先级在base基础上降低dec
+ * @brief XWOSAL：优先级在base基础上降低dec
  */
 #define XWOSAL_SD_PRIORITY_DROP(base, dec)      XWOSDL_SD_PRIORITY_DROP(base, dec)
 
