@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC Adaptation Code：IRQ
+ * @brief 玄武OS内核适配代码：中断
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

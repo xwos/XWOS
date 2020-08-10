@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief macros of mwcceppc
+ * @brief 架构描述层：mwcceppc的宏定义
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

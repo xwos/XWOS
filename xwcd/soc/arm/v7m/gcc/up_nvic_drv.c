@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief ARMv7-m NVIC Driver for Unique-Processing Core
+ * @brief 架构描述层：单核系统的中断控制器驱动
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief ARMv7 cortex-m core
+ * @brief 架构描述层：ARMv7 Cortex-M
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

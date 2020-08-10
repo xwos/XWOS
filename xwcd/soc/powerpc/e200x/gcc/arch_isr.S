@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief e200z0 core exception handlers
+ * @brief 架构描述层：e200x core exception handlers
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

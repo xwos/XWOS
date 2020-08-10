@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief soc difinitions
+ * @brief SOC描述层：SOC
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

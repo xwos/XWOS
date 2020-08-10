@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief architecture types
+ * @brief 架构描述层：基本类型
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

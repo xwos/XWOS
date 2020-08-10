@@ -1,7 +1,6 @@
 /**
  * @file
- * @brief IRQ Controller Description of cortex-m NVIC
- *        for Symmetrical Multi-Processing Cores
+ * @brief 架构描述层：对称多核系统的中断控制器配置
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC 初始化
+ * @brief SOC描述层：初始化
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

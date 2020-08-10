@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC Adaptation Code：Scheduler
+ * @brief 玄武OS内核适配代码：调度器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

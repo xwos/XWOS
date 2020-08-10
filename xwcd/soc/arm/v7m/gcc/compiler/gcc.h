@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 编译器相关的宏定义
+ * @brief 架构描述层：编译器相关的宏定义
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

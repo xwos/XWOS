@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief system calls of cortex-m
+ * @brief 架构描述层：SVC
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

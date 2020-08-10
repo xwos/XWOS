@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief switch context
+ * @brief 玄武OS内核适配代码：调度器汇编代码
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

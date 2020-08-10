@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief architecture cpu id
+ * @brief 架构描述层：CPU ID
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

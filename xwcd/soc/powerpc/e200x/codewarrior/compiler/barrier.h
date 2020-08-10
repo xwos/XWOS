@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief barrier of cwcc
+ * @brief 架构描述层：内存屏障
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

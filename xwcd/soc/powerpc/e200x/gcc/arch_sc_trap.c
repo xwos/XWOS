@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief system call and trap
+ * @brief 架构描述层：System Call & Trap
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

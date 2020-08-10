@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief architecture fpu
+ * @brief 架构描述层：FPU
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

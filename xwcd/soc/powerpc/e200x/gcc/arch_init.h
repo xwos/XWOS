@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief arch initializations
+ * @brief 架构描述层：初始化
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 架构描述层：Scheduler Adapter LIB
+ * @brief 架构描述层：调度器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief architecture atomic operations
+ * @brief 架构描述层：自旋锁
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

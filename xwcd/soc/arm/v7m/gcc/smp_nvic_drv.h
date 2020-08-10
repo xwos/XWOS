@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief ARMv7-m NVIC Driver for Symmetrical Multi-Processing Cores
+ * @brief 架构描述层：对称多核系统的中断控制器配驱动
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

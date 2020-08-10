@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief architecture image
+ * @brief 架构描述层：image标记
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

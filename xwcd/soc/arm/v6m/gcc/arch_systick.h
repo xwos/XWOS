@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Cortex-M Systick Timer
+ * @brief 架构描述层：Cortex-M Systick Timer
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

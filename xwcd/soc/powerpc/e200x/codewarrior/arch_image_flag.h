@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：二进制镜像文件标记
+ * @brief 架构描述层：image标记
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

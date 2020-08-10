@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief macros of gcc
+ * @brief 架构描述层：gcc的宏定义
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

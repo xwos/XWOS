@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief interrupt controller
+ * @brief 架构描述层：中断
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

@@ -1,7 +1,6 @@
 /**
  * @file
- * @brief IRQ Controller Description of cortex-m NVIC
- *        for Unique-Processing Core
+ * @brief 架构描述层：单核系统中断控制器配置
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

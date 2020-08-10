@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief e00z0x core startup
+ * @brief 架构描述层：e00z0x core startup
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

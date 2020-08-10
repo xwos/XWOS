@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC Adaptation Code：Power Management Domain
+ * @brief 玄武OS内核适配代码：电源管理领域
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
