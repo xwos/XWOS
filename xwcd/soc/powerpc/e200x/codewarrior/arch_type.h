@@ -106,9 +106,6 @@ typedef signed int xwirq_t; /**< 中断号 (有符号) */
 #define ARCH_HAVE_XWPR_T        1
 typedef signed int xwpr_t; /**< 优先级 (有符号) */
 
-#define ARCH_HAVE_XWBMP_T       1
-typedef unsigned long xwbmp_t; /**< 位图 (无符号) */
-
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/

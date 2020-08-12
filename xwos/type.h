@@ -117,11 +117,11 @@ typedef signed int xwpr_t; /**< 优先级 (有符号) */
 #endif
 
 #if !defined(ARCH_HAVE_XWBMP_T)
-typedef unsigned long xwbmp_t; /**< 位图 (无符号) */
+typedef xwu32_t xwbmp_t; /**< 位图 (无符号) */
 #endif
 
 #if !defined(ARCH_HAVE_XWTM_T)
-typedef signed long long xwtm_t; /**< XWOS系统时间 (有符号) */
+typedef xws64_t xwtm_t; /**< XWOS系统时间 (有符号) */
 #endif
 
 #if !defined(ARCH_HAVE_XWLFQ_T)
