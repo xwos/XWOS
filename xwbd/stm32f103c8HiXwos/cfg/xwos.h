@@ -31,8 +31,8 @@
  ******** ********         xwlib Configuration         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWLIBCFG_LOG                                    0
-#define XWLIBCFG_XWLOG_LEVEL                            (0)
-#define XWLIBCFG_XWLOG_BUFSIZE                          (128)
+#define XWLIBCFG_XWLOG_LEVEL                            (0U)
+#define XWLIBCFG_XWLOG_BUFSIZE                          (256U)
 
 #define XWLIBCFG_XWBOP_FFS8                             0
 #define XWLIBCFG_XWBOP_FLS8                             0
@@ -131,7 +131,7 @@
 #define XWUPCFG_SD_PRIORITY_RT_NUM                      (4U)
 #define XWUPCFG_SD_IDLE_STACK_SIZE                      (1024U)
 #define XWUPCFG_SD_BH                                   0
-#define XWUPCFG_SD_BH_STACK_SIZE                        (1024U)
+#define XWUPCFG_SD_BH_STACK_SIZE                        (2048U)
 #define XWUPCFG_SD_PM                                   1
 #define XWUPCFG_SD_THRD_EXIT                            1
 #define XWUPCFG_SD_SWT                                  1

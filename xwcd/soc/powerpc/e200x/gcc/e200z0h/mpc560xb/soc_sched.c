@@ -164,6 +164,8 @@ void soc_scheduler_init_sdobj_stack(struct xwos_sdobj_stack_info * stk,
 {
         bool privileged;
         union msr_reg msr;
+        xwu32_t * stkbtn;
+        xwsq_t i;
 
         privileged = !!(attr & XWSDOBJ_ATTR_PRIVILEGED);
         asm volatile(
@@ -264,6 +266,11 @@ void soc_scheduler_init_sdobj_stack(struct xwos_sdobj_stack_info * stk,
         *(stk->sp) = (xwstk_t)_SDA_BASE_; /* r13 */
         stk->sp--;
         *(stk->sp) = (xwstk_t)_SDA2_BASE_; /* r2 */
+
+        stkbtn = (xwu32_t *)stk->base;
+        for (i = 0; i < 16; i++) {
+                stkbtn[i] = 0xFFFFFFFFU;
+        }
 }
 
 /**

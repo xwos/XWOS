@@ -111,6 +111,8 @@ void arch_scheduler_lib_init_sdobj_stack(struct xwos_sdobj_stack_info * stk,
                                          xwsq_t attr)
 {
         bool privileged;
+        xwu32_t * stkbtn;
+        xwsq_t i;
 
         privileged = !!(attr & XWSDOBJ_ATTR_PRIVILEGED);
 
@@ -157,6 +159,11 @@ void arch_scheduler_lib_init_sdobj_stack(struct xwos_sdobj_stack_info * stk,
         } else {
                 stk->sp--;
                 *(stk->sp) = (xwstk_t)0x3; /* CONTROL: unprivileged access, psp */
+        }
+
+        stkbtn = (xwu32_t *)stk->base;
+        for (i = 0; i < 16; i++) {
+                stkbtn[i] = 0xFFFFFFFFU;
         }
 }
 

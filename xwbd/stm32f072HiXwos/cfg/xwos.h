@@ -131,7 +131,7 @@
 #define XWUPCFG_SD_PRIORITY_RT_NUM                      (4U)
 #define XWUPCFG_SD_IDLE_STACK_SIZE                      (512U)
 #define XWUPCFG_SD_BH                                   0
-#define XWUPCFG_SD_BH_STACK_SIZE                        (512U)
+#define XWUPCFG_SD_BH_STACK_SIZE                        (2048U)
 #define XWUPCFG_SD_PM                                   1
 #define XWUPCFG_SD_THRD_EXIT                            1
 #define XWUPCFG_SD_SWT                                  1
