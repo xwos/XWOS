@@ -36,6 +36,7 @@
 #else
   #error "Can't find the configuration of XuanWuOS_CFG_CORE!"
 #endif
+#include <armv7m_core.h>
 #include <soc.h>
 #include <soc_init.h>
 
@@ -64,6 +65,8 @@ extern xwu8_t xwos_vctbl_vma_end[];
 __xwbsp_init_code
 void soc_lowlevel_init(void)
 {
+        /* cm_scs.scb.cacr.bit.siwt = 1; */
+        cm_scs.scb.cacr.bit.forcewt = 1;
 }
 
 __xwbsp_init_code

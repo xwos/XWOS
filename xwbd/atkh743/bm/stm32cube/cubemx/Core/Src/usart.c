@@ -29,6 +29,7 @@
 /* USER CODE BEGIN 0 */
 #include <soc.h>
 #include <string.h>
+#include <xwos/lib/xwbop.h>
 #include <bm/stm32cube/xwac/xwds/uart.h>
 
 struct HAL_UART_Xwds_driver_data husart1_xwds_drvdata;
@@ -228,7 +229,8 @@ void MX_USART1_RxHalfCpltCallback(UART_HandleTypeDef * huart)
   hdma = huart->hdmarx;
   if (HAL_DMA_ERROR_NONE == hdma->ErrorCode) {
     SCB_InvalidateDCache_by_Addr((uint32_t *)husart1_xwds_drvdata.dmauartc->rxq.mem,
-                                 sizeof(husart1_xwds_drvdata.dmauartc->rxq.mem));
+                                 ALIGN(sizeof(husart1_xwds_drvdata.dmauartc->rxq.mem),
+                                       CPUCFG_L1_CACHELINE_SIZE));
     stm32cube_usart1_cb_rxdma_halfcplt(husart1_xwds_drvdata.dmauartc);
   } else {
   }
@@ -241,7 +243,8 @@ void MX_USART1_RxCpltCallback(UART_HandleTypeDef * huart)
   hdma = huart->hdmarx;
   if (HAL_DMA_ERROR_NONE == hdma->ErrorCode) {
     SCB_InvalidateDCache_by_Addr((uint32_t *)husart1_xwds_drvdata.dmauartc->rxq.mem,
-                                 sizeof(husart1_xwds_drvdata.dmauartc->rxq.mem));
+                                 ALIGN(sizeof(husart1_xwds_drvdata.dmauartc->rxq.mem),
+                                       CPUCFG_L1_CACHELINE_SIZE));
     stm32cube_usart1_cb_rxdma_cplt(husart1_xwds_drvdata.dmauartc);
   } else {
   }
@@ -262,7 +265,8 @@ void MX_USART1_TXDMA_Prepare(const xwu8_t * mem, xwsz_t size)
   cpsz = size > HAL_UART_TXMEM_MAXSIZE ? HAL_UART_TXMEM_MAXSIZE : size;
   memcpy(husart1_xwds_drvdata.tx.mem, mem, cpsz);
   husart1_xwds_drvdata.tx.size = cpsz;
-  SCB_CleanDCache_by_Addr((uint32_t *)husart1_xwds_drvdata.tx.mem, (int32_t)cpsz);
+  SCB_CleanDCache_by_Addr((uint32_t *)husart1_xwds_drvdata.tx.mem,
+                          (int32_t)ALIGN(cpsz, CPUCFG_L1_CACHELINE_SIZE));
 }
 
 xwer_t MX_USART1_TXDMA_Start(void)
@@ -338,7 +342,8 @@ void MX_USART1_ErrorCallback(UART_HandleTypeDef * huart)
   if (0 != (huart->ErrorCode & HAL_UART_ERROR_RTO)) {
     huart->ErrorCode &= ~(HAL_UART_ERROR_RTO);
     SCB_InvalidateDCache_by_Addr((uint32_t *)husart1_xwds_drvdata.dmauartc->rxq.mem,
-                                 sizeof(husart1_xwds_drvdata.dmauartc->rxq.mem));
+                                 ALIGN(sizeof(husart1_xwds_drvdata.dmauartc->rxq.mem),
+                                       CPUCFG_L1_CACHELINE_SIZE));
     stm32cube_usart1_cb_rxdma_timer(husart1_xwds_drvdata.dmauartc);
   }
 }

@@ -28,6 +28,7 @@
 
 /* USER CODE BEGIN 0 */
 #include <string.h>
+#include <xwos/lib/xwbop.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <xwos/osal/lock/mutex.h>
@@ -340,7 +341,9 @@ xwer_t MX_SDMMC1_SD_Read(uint8_t * buf, uint32_t blkaddr,
   } while ((-EIO == rc) && (cnt < MX_SDMMC1_SD_MAX_RETRY_TIMES));
   xwosal_mtx_unlock(hsd1_xfer_mtx_id);
   if (XWOK == rc) {
-    SCB_InvalidateDCache_by_Addr((uint32_t *)mem, (int32_t)(nrblk * BLOCKSIZE));
+    SCB_InvalidateDCache_by_Addr((uint32_t *)mem,
+                                 (int32_t)ALIGN((nrblk * BLOCKSIZE),
+                                                CPUCFG_L1_CACHELINE_SIZE));
     if (mem != buf) {
       memcpy(buf, mem, nrblk * BLOCKSIZE);
     }
@@ -382,7 +385,9 @@ xwer_t MX_SDMMC1_SD_Write(uint8_t * data, uint32_t blkaddr,
     mem = data;
   }
 
-  SCB_CleanDCache_by_Addr((uint32_t *)mem, (int32_t)(nrblk * BLOCKSIZE));
+  SCB_CleanDCache_by_Addr((uint32_t *)mem,
+                          (int32_t)ALIGN((nrblk * BLOCKSIZE),
+                                         CPUCFG_L1_CACHELINE_SIZE));
   rc = xwosal_mtx_lock(hsd1_xfer_mtx_id);
   if (rc < 0) {
     goto err_mtx_lock;
