@@ -40,7 +40,7 @@
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
   #define XWFLGDEMO_LOG_TAG             "flag"
-  #define flglogf(lv, fmt, ...) \
+  #define flglogf(lv, fmt, ...)                               \
         xwlogf(lv, XWFLGDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
 #else /* XWLIBCFG_LOG */
   #define flglogf(lv, fmt, ...)
@@ -156,7 +156,7 @@ xwer_t xwflgdemo_consumer_func(void * arg)
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
                 msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
                 flglogf(INFO,
-                        "[等待线程] 等待事件：0x%X，"
+                        "[等待线程] 事件掩码：0x%X，"
                         "触发条件：SET_ALL，是否消费事件：是...\n",
                         msk[0]);
                 rc = xwosal_flg_wait(xwsltdemo_flgid,
@@ -177,13 +177,9 @@ xwer_t xwflgdemo_consumer_func(void * arg)
                                 ts, rc);
                 }
 
-                /* 休眠100ms，让出CPU使用权 */
-                ts = 100 * XWTM_MS;
-                xwosal_cthrd_sleep(&ts);
-
                 msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
                 flglogf(INFO,
-                        "[等待线程] 等待事件：0x%X，"
+                        "[等待线程] 事件掩码：0x%X，"
                         "触发条件：SET_ANY，是否消费事件：否...\n",
                         msk[0]);
                 rc = xwosal_flg_wait(xwsltdemo_flgid,
@@ -204,13 +200,9 @@ xwer_t xwflgdemo_consumer_func(void * arg)
                                 ts, rc);
                 }
 
-                /* 休眠100ms，让出CPU使用权 */
-                ts = 100 * XWTM_MS;
-                xwosal_cthrd_sleep(&ts);
-
                 msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
                 flglogf(INFO,
-                        "[等待线程] 等待事件：0x%X，"
+                        "[等待线程] 事件掩码：0x%X，"
                         "触发条件：CLR_ALL，是否消费事件：是...\n",
                         msk[0]);
                 rc = xwosal_flg_wait(xwsltdemo_flgid,
@@ -231,13 +223,9 @@ xwer_t xwflgdemo_consumer_func(void * arg)
                                 ts, rc);
                 }
 
-                /* 休眠100ms，让出CPU使用权 */
-                ts = 100 * XWTM_MS;
-                xwosal_cthrd_sleep(&ts);
-
                 msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
                 flglogf(INFO,
-                        "[等待线程] 等待事件：0x%X，"
+                        "[等待线程] 事件掩码：0x%X，"
                         "触发条件：CLR_ANY，是否消费事件：否...\n",
                         msk[0]);
                 rc = xwosal_flg_wait(xwsltdemo_flgid,
@@ -258,14 +246,10 @@ xwer_t xwflgdemo_consumer_func(void * arg)
                                 ts, rc);
                 }
 
-                /* 休眠100ms，让出CPU使用权 */
-                ts = 100 * XWTM_MS;
-                xwosal_cthrd_sleep(&ts);
-
                 rc = xwosal_flg_read(xwsltdemo_flgid, org); /* 读取初始值 */
                 msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
                 flglogf(INFO,
-                        "[等待线程] 等待事件：0x%X，"
+                        "[等待线程] 事件掩码：0x%X，"
                         "触发条件：TGL_ALL，初始值：0x%X...\n",
                         msk[0], org[0]);
                 rc = xwosal_flg_wait(xwsltdemo_flgid,
@@ -284,13 +268,9 @@ xwer_t xwflgdemo_consumer_func(void * arg)
                                 ts, rc);
                 }
 
-                /* 休眠100ms，让出CPU使用权 */
-                ts = 100 * XWTM_MS;
-                xwosal_cthrd_sleep(&ts);
-
                 msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
                 flglogf(INFO,
-                        "[等待线程] 等待事件：0x%X，"
+                        "[等待线程] 事件掩码：0x%X，"
                         "触发条件：TGL_ANY，初始值：0x%X...\n",
                         msk[0], org[0]);
                 rc = xwosal_flg_wait(xwsltdemo_flgid,
@@ -308,10 +288,6 @@ xwer_t xwflgdemo_consumer_func(void * arg)
                                 "[等待线程] 错误，时间戳：%lld 纳秒，错误码：%d。\n\n",
                                 ts, rc);
                 }
-
-                /* 休眠100ms，让出CPU使用权 */
-                ts = 100 * XWTM_MS;
-                xwosal_cthrd_sleep(&ts);
         }
 
         flglogf(INFO, "[等待线程] 退出。\n");
@@ -335,6 +311,10 @@ xwer_t xwflgdemo_producer_func(void * arg)
         memset(msk, 0, sizeof(msk));
 
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
+                /* 休眠1000ms，让出CPU使用权 */
+                ts = 1000 * XWTM_MS;
+                xwosal_cthrd_sleep(&ts);
+
                 msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
                 /* 将事件位图掩码部分全部置1 */
                 rc = xwosal_flg_s1m(xwsltdemo_flgid, msk);
@@ -453,10 +433,6 @@ xwer_t xwflgdemo_producer_func(void * arg)
                                 "[触发线程] 错误，时间戳：%lld 纳秒，错误码：%d。\n",
                                 ts, rc);
                 }
-
-                /* 休眠1000ms，让出CPU使用权 */
-                ts = 1000 * XWTM_MS;
-                xwosal_cthrd_sleep(&ts);
         }
 
         flglogf(INFO, "[触发线程] 退出。\n");

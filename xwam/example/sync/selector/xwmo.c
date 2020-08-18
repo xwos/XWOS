@@ -97,7 +97,7 @@ const struct xwosal_thrd_desc xwsltdemo_consumer_td = {
         .name = "xwsltdemo.consumer",
         .prio = XWSLTDEMO_CONSUMER_PRIORITY,
         .stack = XWOSAL_THRD_STACK_DYNAMIC,
-        .stack_size = 2048,
+        .stack_size = 4096,
         .func = (xwosal_thrd_f)xwsltdemo_consumer_func,
         .arg = NULL,
         .attr = XWSDOBJ_ATTR_PRIVILEGED,
@@ -381,7 +381,7 @@ xwer_t xwsltdemo_consumer_func(void * arg)
                 if (XWOK == rc) {
                         ts = xwosal_scheduler_get_timestamp_lc();
                         sltlogf(INFO,
-                                "[消费者] 唤醒，时间戳：%lld 纳秒，触发信号：0x%X。\n",
+                                "[消费者] 唤醒，触发信号：0x%X，时间戳：%lld 纳秒。\n",
                                 trg[0], ts);
 
                         if (xwbmpop_t1i(trg, 1)) {
@@ -441,17 +441,14 @@ xwer_t xwsltdemo_consumer_func(void * arg)
                                                         "[消费者] 条件量6触发，"
                                                         "时间戳：%lld 纳秒，。\n", ts);
                                         }
+                                        if (xwbmpop_t1i(trg, 7)) {
+                                                sltlogf(INFO,
+                                                        "[消费者] 线程栅栏7触发，"
+                                                        "时间戳：%lld 纳秒，。\n", ts);
+                                        }
                                 }
                         }
 
-                        if (xwbmpop_t1i(trg, 7)) {
-                                if (XWOK == rc) {
-                                        ts = xwosal_scheduler_get_timestamp_lc();
-                                        sltlogf(INFO,
-                                                "[消费者] 线程栅栏7触发，"
-                                                "时间戳：%lld 纳秒，。\n", ts);
-                                }
-                        }
                         sltlogf(INFO, "\n");
                 } else {
                         ts = xwosal_scheduler_get_timestamp_lc();

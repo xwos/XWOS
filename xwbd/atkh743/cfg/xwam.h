@@ -21,11 +21,17 @@
 #ifndef __cfg_xwam_h__
 #define __cfg_xwam_h__
 
+#define XWAMCFG_example_thread_create           1
+#define XWAMCFG_example_thread_sleep            1
+#define XWAMCFG_example_timer                   1
+#define XWAMCFG_example_lock_cpuirq             1
+#define XWAMCFG_example_lock_mutex              1
+#define XWAMCFG_example_lock_spinlock           1
+#define XWAMCFG_example_lock_seqlock            1
 #define XWAMCFG_example_sync_semaphore          1
 #define XWAMCFG_example_sync_condition          1
+#define XWAMCFG_example_sync_barrier            1
 #define XWAMCFG_example_sync_flag               1
 #define XWAMCFG_example_sync_selector           1
-#define XWAMCFG_example_sync_barrier            1
-#define XWAMCFG_example_cxx                     1
 
 #endif /* cfg/xwam.h */
