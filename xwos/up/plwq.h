@@ -82,7 +82,7 @@ struct xwos_wqn * xwos_plwq_choose(struct xwos_plwq * xwplwq);
  * @retval true: 空
  * @retval false: 非空
  */
-static __xw_inline
+static __xwcc_inline
 bool xwos_plwq_check_empty(struct xwos_plwq * xwplwq)
 {
         return xwlib_bclst_tst_empty_carefully(&xwplwq->head);

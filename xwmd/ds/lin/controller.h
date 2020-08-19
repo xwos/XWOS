@@ -220,7 +220,7 @@ xwer_t xwds_linc_get_msg_size(struct xwds_linc * linc,
  * @return 错误码
  * @retval @ref xwds_device_grab()
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwds_linc_grab(struct xwds_linc * linc)
 {
         return xwds_device_grab(&linc->dev);
@@ -232,7 +232,7 @@ xwer_t xwds_linc_grab(struct xwds_linc * linc)
  * @return 错误码
  * @retval @ref xwds_device_put()
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwds_linc_put(struct xwds_linc * linc)
 {
         return xwds_device_put(&linc->dev);
@@ -244,7 +244,7 @@ xwer_t xwds_linc_put(struct xwds_linc * linc)
  * @return 错误码
  * @retval @ref xwds_device_request()
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwds_linc_request(struct xwds_linc * linc)
 {
         return xwds_device_request(&linc->dev);
@@ -256,7 +256,7 @@ xwer_t xwds_linc_request(struct xwds_linc * linc)
  * @return 错误码
  * @retval @ref xwds_device_release()
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwds_linc_release(struct xwds_linc * linc)
 {
         return xwds_device_release(&linc->dev);

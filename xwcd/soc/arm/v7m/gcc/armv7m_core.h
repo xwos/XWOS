@@ -1407,7 +1407,7 @@ void cm_set_control(xwu32_t control)
 static __xwbsp_inline
 void cm_itm_putc(xwu32_t port, const char c)
 {
-        if (__likely((cm_itm.tcr.bit.itmena) &&
+        if (__xwcc_likely((cm_itm.tcr.bit.itmena) &&
                      (cm_itm.ter[port >> 5].u32 & (1U << (port & 0x1FU))))) {
                 while (0 == cm_itm.port[port].u32) {
                 }

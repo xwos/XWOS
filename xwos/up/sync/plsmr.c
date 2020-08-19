@@ -198,7 +198,7 @@ xwer_t xwsync_plsmr_create(struct xwsync_plsmr ** ptrbuf, xwssq_t val, xwssq_t m
 
         *ptrbuf = NULL;
         smr = xwsync_plsmr_alloc();
-        if (__unlikely(is_err(smr))) {
+        if (__xwcc_unlikely(is_err(smr))) {
                 rc = ptr_err(smr);
         } else {
                 xwsync_plsmr_activate(smr, val, max);
@@ -493,7 +493,7 @@ xwer_t xwsync_plsmr_do_timedwait(struct xwsync_plsmr * smr, struct xwos_tcb * tc
         if (smr->vsmr.count <= 0) {
 #if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
                 rc = xwos_scheduler_wakelock_lock();
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         /* 系统准备进入低功耗模式，线程需被冻结，返回-EINTR*/
                         xwos_cpuirq_restore_lc(flag);
                         rc = -EINTR;
@@ -554,10 +554,10 @@ xwer_t xwsync_plsmr_timedwait(struct xwsync_plsmr * smr, xwtm_t * xwtm)
         XWOS_VALIDATE((-EINTHRD == xwos_irq_get_id(NULL)),
                       "not-in-thrd", -ENOTINTHRD);
 
-        if (__unlikely(0 == xwtm_cmp(*xwtm, 0))) {
+        if (__xwcc_unlikely(0 == xwtm_cmp(*xwtm, 0))) {
                 rc = xwsync_plsmr_trywait(smr);
-                if (__unlikely(rc < 0)) {
-                        if (__likely(-ENODATA == rc)) {
+                if (__xwcc_unlikely(rc < 0)) {
+                        if (__xwcc_likely(-ENODATA == rc)) {
                                 rc = -ETIMEDOUT;
                         }/* else {} */
                 }/* else {} */

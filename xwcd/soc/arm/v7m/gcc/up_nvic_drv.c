@@ -64,10 +64,10 @@ xwer_t cortexm_nvic_drv_init(void)
 
 /******** ******** IRQ Drivers ******** ********/
 __xwbsp_code
-xwer_t cortexm_nvic_drv_request(__maybe_unused xwirq_t irqn,
-                                __maybe_unused xwisr_f isrfunc,
-                                __maybe_unused xwsq_t flag,
-                                __maybe_unused void * data)
+xwer_t cortexm_nvic_drv_request(__xwcc_unused xwirq_t irqn,
+                                __xwcc_unused xwisr_f isrfunc,
+                                __xwcc_unused xwsq_t flag,
+                                __xwcc_unused void * data)
 {
 #if (!defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE))
         struct soc_isr_table * isr_table;
@@ -85,7 +85,7 @@ xwer_t cortexm_nvic_drv_request(__maybe_unused xwirq_t irqn,
 }
 
 __xwbsp_code
-xwer_t cortexm_nvic_drv_release(__maybe_unused xwirq_t irqn)
+xwer_t cortexm_nvic_drv_release(__xwcc_unused xwirq_t irqn)
 {
 #if (!defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE))
         struct soc_isr_table * isr_table;
@@ -98,7 +98,7 @@ xwer_t cortexm_nvic_drv_release(__maybe_unused xwirq_t irqn)
 }
 
 __xwbsp_code
-xwer_t cortexm_nvic_drv_enable(__maybe_unused xwirq_t irqn)
+xwer_t cortexm_nvic_drv_enable(__xwcc_unused xwirq_t irqn)
 {
         if (irqn >= 0) {
                 cm_nvic_enable_irq(irqn);
@@ -113,7 +113,7 @@ xwer_t cortexm_nvic_drv_enable(__maybe_unused xwirq_t irqn)
 }
 
 __xwbsp_code
-xwer_t cortexm_nvic_drv_disable(__maybe_unused xwirq_t irqn)
+xwer_t cortexm_nvic_drv_disable(__xwcc_unused xwirq_t irqn)
 {
         if (irqn >= 0) {
                 cm_nvic_disable_irq(irqn);

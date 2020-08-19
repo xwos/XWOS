@@ -81,7 +81,7 @@ struct xwos_irqc {
 };
 
 struct xwos_irq {
-        __atomic xwid_t cpuid;
+        __xwcc_atomic xwid_t cpuid;
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -100,7 +100,7 @@ struct xwos_irq {
  * @param irqc: (I) 中断控制器对象的指针
  * @return 错误码
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwos_irqc_grab(struct xwos_irqc * irqc)
 {
         return xwos_object_grab(&irqc->xwobj);
@@ -111,7 +111,7 @@ xwer_t xwos_irqc_grab(struct xwos_irqc * irqc)
  * @param irqc: (I) 中断控制器对象的指针
  * @return 错误码
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwos_irqc_put(struct xwos_irqc * irqc)
 {
         return xwos_object_put(&irqc->xwobj);

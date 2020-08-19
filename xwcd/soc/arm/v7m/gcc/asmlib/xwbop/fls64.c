@@ -27,8 +27,8 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwbsp_code __naked
-xwssq_t arch_xwbop_fls64(__maybe_unused xwu64_t x)
+__xwbsp_code __xwcc_naked
+xwssq_t arch_xwbop_fls64(__xwcc_unused xwu64_t x)
 {
         __asm__ volatile("      cmp     r1, #0");       /* if (high_word(x) != 0) */
         __asm__ volatile("      ittt    ne");           /* {                      */

@@ -40,7 +40,7 @@ struct arch_image_description {
         void (*entry)(void);
 };
 
-struct __aligned(32) arch_image_tail {
+struct __xwcc_aligned(32) arch_image_tail {
         char flag[32];
 };
 

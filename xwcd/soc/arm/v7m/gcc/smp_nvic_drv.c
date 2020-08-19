@@ -45,11 +45,11 @@ static __xwbsp_code
 xwer_t cortexm_nvic_drv_remove(struct xwos_irqc * irqc);
 
 static __xwbsp_code
-xwer_t cortexm_nvic_drv_request(__maybe_unused struct xwos_irqc * irqc,
-                                __maybe_unused xwirq_t irqn,
-                                __maybe_unused xwisr_f isrfunc,
-                                __maybe_unused xwsq_t flag,
-                                __maybe_unused void * data);
+xwer_t cortexm_nvic_drv_request(__xwcc_unused struct xwos_irqc * irqc,
+                                __xwcc_unused xwirq_t irqn,
+                                __xwcc_unused xwisr_f isrfunc,
+                                __xwcc_unused xwsq_t flag,
+                                __xwcc_unused void * data);
 
 static __xwbsp_code
 xwer_t cortexm_nvic_drv_release(struct xwos_irqc * irqc, xwirq_t irqn);
@@ -81,7 +81,7 @@ xwer_t cortexm_nvic_drv_get_cfg(struct xwos_irqc * irqc, xwirq_t irqn,
                                 struct soc_irq_cfg * cfgbuf);
 
 static __xwbsp_code
-xwer_t cortexm_nvic_drv_get_data(__maybe_unused struct xwos_irqc * irqc,
+xwer_t cortexm_nvic_drv_get_data(__xwcc_unused struct xwos_irqc * irqc,
                                  xwirq_t irqn, struct soc_irq_data * cfgbuf);
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -128,11 +128,11 @@ xwer_t cortexm_nvic_drv_remove(struct xwos_irqc * irqc)
 
 /******** ******** irq operations ******** ********/
 static __xwbsp_code
-xwer_t cortexm_nvic_drv_request(__maybe_unused struct xwos_irqc * irqc,
-                                __maybe_unused xwirq_t irqn,
-                                __maybe_unused xwisr_f isrfunc,
-                                __maybe_unused xwsq_t flag,
-                                __maybe_unused void * data)
+xwer_t cortexm_nvic_drv_request(__xwcc_unused struct xwos_irqc * irqc,
+                                __xwcc_unused xwirq_t irqn,
+                                __xwcc_unused xwisr_f isrfunc,
+                                __xwcc_unused xwsq_t flag,
+                                __xwcc_unused void * data)
 {
 #if (!defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE))
         struct soc_isr_table * isr_table;
@@ -150,8 +150,8 @@ xwer_t cortexm_nvic_drv_request(__maybe_unused struct xwos_irqc * irqc,
 }
 
 static __xwbsp_code
-xwer_t cortexm_nvic_drv_release(__maybe_unused struct xwos_irqc * irqc,
-                                __maybe_unused xwirq_t irqn)
+xwer_t cortexm_nvic_drv_release(__xwcc_unused struct xwos_irqc * irqc,
+                                __xwcc_unused xwirq_t irqn)
 {
 #if (!defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE))
         struct soc_isr_table * isr_table;
@@ -163,8 +163,8 @@ xwer_t cortexm_nvic_drv_release(__maybe_unused struct xwos_irqc * irqc,
 }
 
 static __xwbsp_code
-xwer_t cortexm_nvic_drv_enable(__maybe_unused struct xwos_irqc * irqc,
-                               __maybe_unused xwirq_t irqn)
+xwer_t cortexm_nvic_drv_enable(__xwcc_unused struct xwos_irqc * irqc,
+                               __xwcc_unused xwirq_t irqn)
 {
         if (irqn >= 0) {
                 cm_nvic_enable_irq(irqn);
@@ -179,8 +179,8 @@ xwer_t cortexm_nvic_drv_enable(__maybe_unused struct xwos_irqc * irqc,
 }
 
 static __xwbsp_code
-xwer_t cortexm_nvic_drv_disable(__maybe_unused struct xwos_irqc * irqc,
-                                __maybe_unused xwirq_t irqn)
+xwer_t cortexm_nvic_drv_disable(__xwcc_unused struct xwos_irqc * irqc,
+                                __xwcc_unused xwirq_t irqn)
 {
         if (irqn >= 0) {
                 cm_nvic_disable_irq(irqn);
@@ -195,7 +195,7 @@ xwer_t cortexm_nvic_drv_disable(__maybe_unused struct xwos_irqc * irqc,
 }
 
 static __xwbsp_code
-xwer_t cortexm_nvic_drv_save(__maybe_unused struct xwos_irqc * irqc,
+xwer_t cortexm_nvic_drv_save(__xwcc_unused struct xwos_irqc * irqc,
                              xwirq_t irqn, xwreg_t * flag)
 {
         xwer_t rc;
@@ -220,7 +220,7 @@ xwer_t cortexm_nvic_drv_save(__maybe_unused struct xwos_irqc * irqc,
 }
 
 static __xwbsp_code
-xwer_t cortexm_nvic_drv_restore(__maybe_unused struct xwos_irqc * irqc,
+xwer_t cortexm_nvic_drv_restore(__xwcc_unused struct xwos_irqc * irqc,
                                 xwirq_t irqn, xwreg_t flag)
 {
         xwer_t rc;
@@ -241,7 +241,7 @@ xwer_t cortexm_nvic_drv_restore(__maybe_unused struct xwos_irqc * irqc,
 }
 
 static __xwbsp_code
-xwer_t cortexm_nvic_drv_pend(__maybe_unused struct xwos_irqc * irqc, xwirq_t irqn)
+xwer_t cortexm_nvic_drv_pend(__xwcc_unused struct xwos_irqc * irqc, xwirq_t irqn)
 {
         xwer_t rc;
 
@@ -261,7 +261,7 @@ xwer_t cortexm_nvic_drv_pend(__maybe_unused struct xwos_irqc * irqc, xwirq_t irq
 }
 
 static __xwbsp_code
-xwer_t cortexm_nvic_drv_clear(__maybe_unused struct xwos_irqc * irqc, xwirq_t irqn)
+xwer_t cortexm_nvic_drv_clear(__xwcc_unused struct xwos_irqc * irqc, xwirq_t irqn)
 {
         xwer_t rc;
 
@@ -279,7 +279,7 @@ xwer_t cortexm_nvic_drv_clear(__maybe_unused struct xwos_irqc * irqc, xwirq_t ir
 }
 
 static __xwbsp_code
-xwer_t cortexm_nvic_drv_cfg(__maybe_unused struct xwos_irqc * irqc,
+xwer_t cortexm_nvic_drv_cfg(__xwcc_unused struct xwos_irqc * irqc,
                             xwirq_t irqn, const struct soc_irq_cfg * cfg)
 {
         if (irqn >= 0) {
@@ -291,7 +291,7 @@ xwer_t cortexm_nvic_drv_cfg(__maybe_unused struct xwos_irqc * irqc,
 }
 
 static __xwbsp_code
-xwer_t cortexm_nvic_drv_get_cfg(__maybe_unused struct xwos_irqc * irqc,
+xwer_t cortexm_nvic_drv_get_cfg(__xwcc_unused struct xwos_irqc * irqc,
                                 xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
 {
         if (irqn >= 0) {
@@ -303,7 +303,7 @@ xwer_t cortexm_nvic_drv_get_cfg(__maybe_unused struct xwos_irqc * irqc,
 }
 
 static __xwbsp_code
-xwer_t cortexm_nvic_drv_get_data(__maybe_unused struct xwos_irqc * irqc,
+xwer_t cortexm_nvic_drv_get_data(__xwcc_unused struct xwos_irqc * irqc,
                                  xwirq_t irqn, struct soc_irq_data * databuf)
 {
         __soc_isr_table_qualifier struct soc_irq_data_table * irq_data_table;

@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-void xwaop__xwu64_t__sub(__atomic xwu64_t * a,
+void xwaop__xwu64_t__sub(__xwcc_atomic xwu64_t * a,
                          xwu64_t v,
                          xwu64_t * nv, xwu64_t * ov)
 {

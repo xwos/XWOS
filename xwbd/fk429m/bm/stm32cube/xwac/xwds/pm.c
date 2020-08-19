@@ -48,7 +48,7 @@ void SystemClock_Config(void);
  ******** ******** ******** ******** ******** ******** ******** ********/
 void stm32cube_pm_resume(void)
 {
-        __maybe_unused xwer_t rc;
+        __xwcc_unused xwer_t rc;
         xwirq_t irq;
 
         rc = xwos_irq_get_id(&irq);
@@ -58,7 +58,7 @@ void stm32cube_pm_resume(void)
 
 void stm32cube_pm_suspend(void)
 {
-        __maybe_unused xwer_t rc;
+        __xwcc_unused xwer_t rc;
         xwirq_t irq;
 
         rc = xwos_irq_get_id(&irq);

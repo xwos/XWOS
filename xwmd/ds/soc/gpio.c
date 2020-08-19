@@ -45,19 +45,19 @@ xwer_t xwds_gpio_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
         rc = xwds_soc_grab(soc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
 
         rc = xwaop_t0ma_then_s1m(xwsq_t, &soc->gpio.pins[port], pinmask, NULL, NULL);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EBUSY;
                 goto err_set_pin;
         }
         drv = xwds_static_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->gpio_req)) {
                 rc = drv->gpio_req(soc, port, pinmask);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_drv_gpio_req;
                 }
         }
@@ -83,14 +83,14 @@ xwer_t xwds_gpio_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
 
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
         pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
-        if (__unlikely(pinmask & (~pinsts))) {
+        if (__xwcc_unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
                 goto err_pinsts;
         }
         drv = xwds_static_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->gpio_rls)) {
                 rc = drv->gpio_rls(soc, port, pinmask);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_drv_gpio_rls;
                 }
         }
@@ -119,7 +119,7 @@ xwer_t xwds_gpio_cfg(struct xwds_soc * soc,
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
         rc = xwds_soc_grab(soc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                goto err_soc_grab;
         }
 
@@ -129,7 +129,7 @@ xwer_t xwds_gpio_cfg(struct xwds_soc * soc,
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_gpio_cfg;
         }
 
@@ -155,12 +155,12 @@ xwer_t xwds_gpio_set(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
         rc = xwds_soc_grab(soc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
 
         pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
-        if (__unlikely(pinmask & (~pinsts))) {
+        if (__xwcc_unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
                 goto err_pinsts;
         }
@@ -170,7 +170,7 @@ xwer_t xwds_gpio_set(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_set;
         }
 
@@ -197,12 +197,12 @@ xwer_t xwds_gpio_reset(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
         rc = xwds_soc_grab(soc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
 
         pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
-        if (__unlikely(pinmask & (~pinsts))) {
+        if (__xwcc_unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
                 goto err_pinsts;
         }
@@ -212,7 +212,7 @@ xwer_t xwds_gpio_reset(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_reset;
         }
 
@@ -239,12 +239,12 @@ xwer_t xwds_gpio_toggle(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
         rc = xwds_soc_grab(soc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
 
         pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
-        if (__unlikely(pinmask & (~pinsts))) {
+        if (__xwcc_unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
                 goto err_pinsts;
         }
@@ -254,7 +254,7 @@ xwer_t xwds_gpio_toggle(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_toggle;
         }
 
@@ -283,12 +283,12 @@ xwer_t xwds_gpio_output(struct xwds_soc * soc,
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
         rc = xwds_soc_grab(soc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
 
         pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
-        if (__unlikely(pinmask & (~pinsts))) {
+        if (__xwcc_unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
                 goto err_pinsts;
         }
@@ -298,7 +298,7 @@ xwer_t xwds_gpio_output(struct xwds_soc * soc,
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_out;
         }
 
@@ -327,12 +327,12 @@ xwer_t xwds_gpio_input(struct xwds_soc * soc,
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
 
         rc = xwds_soc_grab(soc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
 
         pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
-        if (__unlikely(pinmask & (~pinsts))) {
+        if (__xwcc_unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
                 goto err_pinsts;
         }
@@ -342,7 +342,7 @@ xwer_t xwds_gpio_input(struct xwds_soc * soc,
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_in;
         }
 

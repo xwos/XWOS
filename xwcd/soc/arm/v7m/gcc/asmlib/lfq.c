@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_code
-void arch_lfq_push(__atomic xwlfq_t * h, __atomic xwlfq_t * n)
+void arch_lfq_push(__xwcc_atomic xwlfq_t * h, __xwcc_atomic xwlfq_t * n)
 {
         xwlfq_t * next;
 
@@ -41,7 +41,7 @@ void arch_lfq_push(__atomic xwlfq_t * h, __atomic xwlfq_t * n)
 }
 
 __xwbsp_code
-xwlfq_t * arch_lfq_pop(__atomic xwlfq_t * h)
+xwlfq_t * arch_lfq_pop(__xwcc_atomic xwlfq_t * h)
 {
         xwlfq_t * top;
         xwlfq_t * next;

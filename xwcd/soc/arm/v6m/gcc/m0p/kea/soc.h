@@ -38,7 +38,7 @@
   #error "unsupport SOC!"
 #endif
 
-#define __flscfg __section(".flash.cfg")
+#define __flscfg        __xwcc_section(".flash.cfg")
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********     registers     ******** ******** ********

@@ -77,7 +77,7 @@ struct xwosal_thrd_desc {
  * @note
  * - 静态初始化线程需预先定义线程控制块对象和线程栈数组，通常定义为全局变量。
  * - 栈数组的首地址与大小，必须要满足CPU的ABI规则，
- *   例如ARM，就需要8字节对齐。因此在定义栈数组时需要使用__aligned(8)来修饰，
+ *   例如ARM，就需要8字节对齐。因此在定义栈数组时需要使用__xwcc_aligned(8)来修饰，
  *   且大小是8的倍数。
  * - attr参数的作用由OS而决定，在XWOS中，它的作用是设置线程的一些属性，取值为
  *   @ref xwos_sdobj_attr_em中的一项。
@@ -449,7 +449,7 @@ xwer_t xwosal_cthrd_freeze(void)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个tid，不可重入
  */
-static __xw_inline
+static __xwos_inline_api
 xwer_t xwosal_thrd_migrate(xwid_t tid, xwid_t dstcpu)
 {
         return xwosdl_thrd_migrate(tid, dstcpu);

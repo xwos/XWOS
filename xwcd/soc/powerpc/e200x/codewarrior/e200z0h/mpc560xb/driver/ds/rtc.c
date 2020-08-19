@@ -105,10 +105,10 @@ xwer_t mpc560xb_rtc_check_desc(struct xwds_misc * rtc)
 
         resources = rtc->dev.resources;
         cfg = rtc->misccfg;
-        if (__unlikely(is_err_or_null(resources))) {
+        if (__xwcc_unlikely(is_err_or_null(resources))) {
                 rc = -EINVAL;
         } else {
-                if(__unlikely(is_err_or_null(cfg))) {
+                if(__xwcc_unlikely(is_err_or_null(cfg))) {
                         rc = -EINVAL;
                 } else {
                         rc = XWOK;
@@ -158,7 +158,7 @@ xwer_t mpc560xb_rtc_drv_start(struct xwds_device * dev)
                 irqrsc = &resources->irqrsc_array[i];
                 rc = xwos_irq_request(irqrsc->irqn, irqrsc->isr,
                                       XWOS_UNUSED_ARGUMENT, dev);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 irqrsc = &resources->irqrsc_array[j];
                                 xwos_irq_release(irqrsc->irqn);
@@ -171,7 +171,7 @@ xwer_t mpc560xb_rtc_drv_start(struct xwds_device * dev)
         for (i = 0; i < (xwssz_t)resources->clkrsc_num; i++) {
                 clkrsc = &resources->clkrsc_array[i];
                 rc = xwds_clk_req(clkrsc->soc, clkrsc->clkid);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 clkrsc = &resources->clkrsc_array[j];
                                 xwds_clk_rls(clkrsc->soc, clkrsc->clkid);
@@ -184,7 +184,7 @@ xwer_t mpc560xb_rtc_drv_start(struct xwds_device * dev)
         for (i = 0; i < (xwssz_t)resources->gpiorsc_num; i++) {
                 gpiorsc = &resources->gpiorsc_array[i];
                 rc = xwds_gpio_req(gpiorsc->soc, gpiorsc->port, gpiorsc->pinmask);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 gpiorsc = &resources->gpiorsc_array[j];
                                 xwds_gpio_rls(gpiorsc->soc, gpiorsc->port,
@@ -202,7 +202,7 @@ xwer_t mpc560xb_rtc_drv_start(struct xwds_device * dev)
                 if (XWOK == rc) {
                         rc = xwos_irq_enable(irqrsc->irqn);
                 }
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 irqrsc = &resources->irqrsc_array[j];
                                 xwos_irq_disable(irqrsc->irqn);

@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-xwu16_t xwaop__xwu16_t__store(__atomic xwu16_t * a,
+xwu16_t xwaop__xwu16_t__store(__xwcc_atomic xwu16_t * a,
                               const enum xwmb_memory_order_em mo,
                               xwu16_t v)
 {

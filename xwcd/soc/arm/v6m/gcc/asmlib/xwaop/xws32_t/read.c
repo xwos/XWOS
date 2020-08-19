@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-void xwaop__xws32_t__read(__atomic xws32_t * a,
+void xwaop__xws32_t__read(__xwcc_atomic xws32_t * a,
                           xws32_t * ov)
 {
         xws32_t o;

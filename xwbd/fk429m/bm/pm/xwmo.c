@@ -132,7 +132,7 @@ xwer_t bm_pm_start(void)
                          NULL);
 
         rc = xwosal_smr_init(&bm_pm_smr, 0, 1);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_smr_init;
         }
 
@@ -225,13 +225,13 @@ xwer_t bm_pm_get_btn_evt(xwsq_t * evt)
 
         smrid = xwosal_smr_get_id(&bm_pm_smr);
         rc = xwosal_smr_wait(smrid);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_smr_wait;
         }
 
         time = BM_PM_BTN_DEBOUNCING_DELAY;
         rc = xwosal_cthrd_sleep(&time);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_sleep;
         }
 
@@ -241,13 +241,13 @@ xwer_t bm_pm_get_btn_evt(xwsq_t * evt)
                                      BM_PM_BTN_GPIO_PORT,
                                      BM_PM_BTN_GPIO_PIN,
                                      &in);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_gpio_input;
                 }
                 cnt++;
                 time = BM_PM_BTN_DEBOUNCING_DELAY;
                 rc = xwosal_cthrd_sleep(&time);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_sleep;
                 }
         } while (0 == in);
@@ -284,7 +284,7 @@ xwer_t bm_pm_thrd_init(void)
                            BM_PM_BTN_GPIO_PORT, BM_PM_BTN_GPIO_PIN,
                            8, XWDS_SOC_EIF_TM_FALLING | XWDS_SOC_EIF_WKUP,
                            bm_pm_eirq_btn_isr, &bm_pm_smr);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_eirq_req;
         }
         return XWOK;
@@ -376,7 +376,7 @@ xwer_t bm_pm_thrd(void * arg)
         XWOS_UNUSED(arg);
 
         rc = bm_pm_thrd_init();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_init;
         }
 

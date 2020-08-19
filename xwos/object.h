@@ -45,11 +45,11 @@ typedef xwer_t (*xwobj_gc_f)(void *);
 /**
  * @brief XWOS对象
  */
-struct __aligned(XWMMCFG_ALIGNMENT) xwos_object {
-        __atomic xwsq_t refcnt; /**< + 引用计数:
-                                       - 0: 对象可以被销毁；
-                                       - 1: 对象就绪；
-                                       - >1: 对象正在被引用。
+struct __xwcc_aligned(XWMMCFG_ALIGNMENT) xwos_object {
+        __xwcc_atomic xwsq_t refcnt; /**< + 引用计数:
+                                            - 0: 对象可以被销毁；
+                                            - 1: 对象就绪；
+                                            - >1: 对象正在被引用。
                                      + 内存算法memslice使用结构体的第一块内存字
                                        作为单链表节点，因此每个对象在定义时必须
                                        保证其第一个成员的大小等于系统指针大小，
@@ -70,7 +70,7 @@ struct __aligned(XWMMCFG_ALIGNMENT) xwos_object {
  * @brief XWOS对象的构造函数
  * @param obj: (I) 对象指针
  */
-static __xw_inline
+static __xwcc_inline
 void xwos_object_construct(struct xwos_object * obj)
 {
         obj->refcnt = 0;
@@ -81,7 +81,7 @@ void xwos_object_construct(struct xwos_object * obj)
  * @brief XWOS对象的析构函数
  * @param obj: (I) 对象指针
  */
-static __xw_inline
+static __xwcc_inline
 void xwos_object_destruct(struct xwos_object * obj)
 {
         obj->gcfunc = NULL;
@@ -95,13 +95,13 @@ void xwos_object_destruct(struct xwos_object * obj)
  * @retval XWOK: 没有错误
  * @retval -EOBJACTIVE: 对象已激活
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwos_object_activate(struct xwos_object * obj, xwobj_gc_f gcfunc)
 {
         xwer_t rc;
 
         rc = xwaop_teq_then_add(xwsq_t, &obj->refcnt, 0, 1, NULL, NULL);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 obj->gcfunc = gcfunc;
         } else {
                 rc = -EOBJACTIVE;
@@ -116,13 +116,13 @@ xwer_t xwos_object_activate(struct xwos_object * obj, xwobj_gc_f gcfunc)
  * @retval XWOK: 没有错误
  * @retval -EOBJDEAD: 对象已销毁
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwos_object_grab(struct xwos_object * obj)
 {
         xwer_t rc;
 
         rc = xwaop_tge_then_add(xwsq_t, &obj->refcnt, 1, 1, NULL, NULL);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EOBJDEAD;
         }/* else {} */
         return rc;
@@ -135,7 +135,7 @@ xwer_t xwos_object_grab(struct xwos_object * obj)
  * @retval XWOK: 没有错误
  * @retval -EOBJDEAD: 对象已销毁
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwos_object_put(struct xwos_object * obj)
 {
         xwer_t rc;
@@ -144,8 +144,8 @@ xwer_t xwos_object_put(struct xwos_object * obj)
         rc = xwaop_tgt_then_sub(xwsq_t, &obj->refcnt,
                                 0, 1,
                                 &nv, NULL);
-        if (__likely(XWOK == rc)) {
-                if (__unlikely(0 == nv)) {
+        if (__xwcc_likely(XWOK == rc)) {
+                if (__xwcc_unlikely(0 == nv)) {
                         if (obj->gcfunc) {
                                 rc = obj->gcfunc(obj);
                         }/* else {} */
@@ -161,7 +161,7 @@ xwer_t xwos_object_put(struct xwos_object * obj)
  * @param obj: (I) 对象指针
  * @return 引用计数
  */
-static __xw_inline
+static __xwcc_inline
 xwsq_t xwos_object_get_refcnt(struct xwos_object * obj)
 {
         return xwaop_load(xwsq_t, &obj->refcnt, xwmb_modr_relaxed);

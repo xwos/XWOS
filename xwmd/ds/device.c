@@ -252,7 +252,7 @@ xwer_t xwds_device_probe(struct xwds * ds, struct xwds_device * dev,
         XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
         rc = xwds_obj_activate(&dev->obj, gcfunc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_activate;
         }
 
@@ -260,7 +260,7 @@ xwer_t xwds_device_probe(struct xwds * ds, struct xwds_device * dev,
                                   XWDS_DEVICE_STATE_INVALID,
                                   XWDS_DEVICE_STATE_PROBING,
                                   NULL);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_dev_set_state;
         }
@@ -272,13 +272,13 @@ xwer_t xwds_device_probe(struct xwds * ds, struct xwds_device * dev,
         } else {
                 rc = xwds_device_cvop_probe(dev);
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvops_probe;
         }
 
         /* add to device stack */
         rc = xwds_obj_add(ds, &dev->obj);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwds_obj_add;
         }
         dev->ds = ds;
@@ -314,7 +314,7 @@ xwer_t xwds_device_remove(struct xwds_device * dev)
                                   XWDS_DEVICE_STATE_STOPED,
                                   XWDS_DEVICE_STATE_REMOVING,
                                   NULL);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_dev_set_state;
         }
@@ -325,7 +325,7 @@ xwer_t xwds_device_remove(struct xwds_device * dev)
         } else {
                 rc = -EOWNER;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwds_obj_remove;
         }
         dev->ds = NULL;
@@ -337,7 +337,7 @@ xwer_t xwds_device_remove(struct xwds_device * dev)
         } else {
                 rc = xwds_device_cvop_remove(dev);
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvops_remove;
         }
 
@@ -364,7 +364,7 @@ xwer_t xwds_device_start(struct xwds_device * dev)
         XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
         rc = xwds_device_grab(dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EOWNERDEAD;
                 goto err_dev_grab;
         }
@@ -372,7 +372,7 @@ xwer_t xwds_device_start(struct xwds_device * dev)
                                   XWDS_DEVICE_STATE_STOPED,
                                   XWDS_DEVICE_STATE_STARTING,
                                   NULL);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_dev_set_state;
         }
@@ -384,7 +384,7 @@ xwer_t xwds_device_start(struct xwds_device * dev)
         } else {
                 rc = xwds_device_cvop_start(dev);
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvops_start;
         }
 
@@ -412,7 +412,7 @@ xwer_t xwds_device_stop(struct xwds_device * dev)
                                   XWDS_DEVICE_STATE_RUNNING,
                                   XWDS_DEVICE_STATE_STOPING,
                                   NULL);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_dev_set_state;
         }
@@ -431,7 +431,7 @@ xwer_t xwds_device_stop(struct xwds_device * dev)
         } else {
                 rc = xwds_device_cvop_stop(dev);
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvops_stop;
         }
 
@@ -460,7 +460,7 @@ xwer_t xwds_device_suspend(struct xwds_device * dev)
                                   XWDS_DEVICE_STATE_RUNNING,
                                   XWDS_DEVICE_STATE_SUSPENDING,
                                   NULL);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_dev_set_state;
         }
@@ -472,7 +472,7 @@ xwer_t xwds_device_suspend(struct xwds_device * dev)
         } else {
                 rc = xwds_device_cvop_suspend(dev);
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_cvops_suspend;
         }
 
@@ -499,7 +499,7 @@ xwer_t xwds_device_resume(struct xwds_device * dev)
                                   XWDS_DEVICE_STATE_SUSPENDED,
                                   XWDS_DEVICE_STATE_RESUMING,
                                   NULL);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_set_state;
         }
@@ -511,7 +511,7 @@ xwer_t xwds_device_resume(struct xwds_device * dev)
         } else {
                 rc = xwds_device_cvop_resume(dev);
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_cvops_resume;
         }
 
@@ -539,7 +539,7 @@ xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err)
                 xwosal_sqlk_wr_unlock_cpuirqrs(&ds->devlistlock, cpuirq);
                 rc = xwds_device_suspend(c);
                 xwosal_sqlk_wr_lock_cpuirqsv(&ds->devlistlock, &cpuirq);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         if (ign_err) {
                                 rc = XWOK;
                         } else {
@@ -566,7 +566,7 @@ xwer_t xwds_device_resume_all(struct xwds * ds, bool ign_err)
                 xwosal_sqlk_wr_unlock_cpuirqrs(&ds->devlistlock, cpuirq);
                 rc = xwds_device_resume(c);
                 xwosal_sqlk_wr_lock_cpuirqsv(&ds->devlistlock, &cpuirq);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         if (ign_err) {
                                 rc = XWOK;
                         } else {

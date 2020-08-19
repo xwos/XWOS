@@ -106,7 +106,7 @@ xwer_t sys_mm_init(void)
                              (xwptr_t)stkmempool_mr_origin,
                              (xwsz_t)stkmempool_mr_size,
                              STKMEMPOOL_BLKSZ);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_stkmempool_bma_create;
         }
         stkmempool_bma = bma;
@@ -115,7 +115,7 @@ xwer_t sys_mm_init(void)
                              (xwptr_t)ccmheap_mr_origin,
                              (xwsz_t)ccmheap_mr_size,
                              CCMHEAP_BLKSZ);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_ccmheap_bma_create;
         }
         ccmheap_bma = bma;
@@ -124,52 +124,52 @@ xwer_t sys_mm_init(void)
         void * mem;
 
         rc = xwmm_bma_alloc(ccmheap_bma, BRDCFG_XWOS_THRD_CACHE_ODR, &mem);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_tcb_bma_alloc;
         }
         rc = xwos_tcb_cache_init((xwptr_t)mem,
                                  (CCMHEAP_BLKSZ << BRDCFG_XWOS_THRD_CACHE_ODR));
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_tcb_cache_init;
         }
 
         rc = xwmm_bma_alloc(ccmheap_bma, BRDCFG_XWOS_SMR_CACHE_ODR, &mem);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_smr_bma_alloc;
         }
         rc = xwsync_smr_cache_init((xwptr_t)mem,
                                    (CCMHEAP_BLKSZ << BRDCFG_XWOS_SMR_CACHE_ODR));
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_smr_cache_init;
         }
 
         rc = xwmm_bma_alloc(ccmheap_bma, BRDCFG_XWOS_CDT_CACHE_ODR, &mem);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_cdt_bma_alloc;
         }
         rc = xwsync_cdt_cache_init((xwptr_t)mem,
                                    (CCMHEAP_BLKSZ << BRDCFG_XWOS_CDT_CACHE_ODR));
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_cdt_cache_init;
         }
 
         rc = xwmm_bma_alloc(ccmheap_bma, BRDCFG_XWOS_EVT_CACHE_ODR, &mem);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_evt_bma_alloc;
         }
         rc = xwsync_evt_cache_init((xwptr_t)mem,
                                    (CCMHEAP_BLKSZ << BRDCFG_XWOS_EVT_CACHE_ODR));
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_evt_cache_init;
         }
 
         rc = xwmm_bma_alloc(ccmheap_bma, BRDCFG_XWOS_MTX_CACHE_ODR, &mem);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_bma_alloc;
         }
         rc = xwlk_mtx_cache_init((xwptr_t)mem,
                                  (CCMHEAP_BLKSZ << BRDCFG_XWOS_MTX_CACHE_ODR));
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_cache_init;
         }
 #endif /* XuanWuOS_CFG_CORE__smp */

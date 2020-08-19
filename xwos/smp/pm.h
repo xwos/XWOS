@@ -63,8 +63,8 @@ struct xwos_pmdm {
         struct xwos_pmdm_callback cb; /**< 回调函数集合 */
 
         /* 私有成员 */
-        __atomic xwsq_t stage; /**< 电源管理阶段，取值@ref xwos_pmdm_stage_em */
-        __atomic xwsz_t suspended_xwsd_cnt; /**< 已进入暂停模式的调度器的计数器 */
+        __xwcc_atomic xwsq_t stage; /**< 电源管理阶段，取值@ref xwos_pmdm_stage_em */
+        __xwcc_atomic xwsz_t suspended_xwsd_cnt; /**< 已进入暂停模式的调度器的计数器 */
         struct xwlk_splk rslock; /**< 防止cb.resume与cb.suspend被同时调用的锁 */
 };
 

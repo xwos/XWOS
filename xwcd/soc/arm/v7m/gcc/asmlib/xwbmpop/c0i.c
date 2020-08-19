@@ -27,8 +27,8 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwbsp_code __naked
-void xwbmpop_c0i(__maybe_unused xwbmp_t * bmp, __maybe_unused xwsq_t n)
+__xwbsp_code __xwcc_naked
+void xwbmpop_c0i(__xwcc_unused xwbmp_t * bmp, __xwcc_unused xwsq_t n)
 {
         __asm__ volatile("      lsr     r2, r1, #5"); /* r2 = nr / 32; */
         __asm__ volatile("      and     r3, r1, #31");/* r3 = nr % 32; */

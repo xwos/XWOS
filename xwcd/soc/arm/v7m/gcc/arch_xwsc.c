@@ -42,7 +42,7 @@
 /**
  * @brief Start supervisor call (change to privileged access temporarily)
  */
-__xwbsp_code __naked
+__xwbsp_code __xwcc_naked
 void arch_privilege_start(void)
 {
         __asm__ volatile("      svc     1");
@@ -52,7 +52,7 @@ void arch_privilege_start(void)
 /**
  * @brief End supervisor call (close the privileged access)
  */
-__xwbsp_code __naked
+__xwbsp_code __xwcc_naked
 void arch_privilege_end(void)
 {
         __asm__ volatile("      svc     2");
@@ -114,9 +114,9 @@ xws64_t arch_xwsc(xwsc_f func, xwptr_t argnum, ...)
  * - 对于系统调用，XWOS会使用xwsc()直接给出参数具体化的封装，不建议直接使用xwsc()，
  *   除非用户对编译器产生的汇编代码十分了解。
  */
-__xwbsp_code __naked
-xws64_t arch_xwsc_entry(__maybe_unused xwsc_f func, __maybe_unused xwptr_t argnum,
-                        __maybe_unused xwptr_t * args, __maybe_unused xwreg_t old_lr)
+__xwbsp_code __xwcc_naked
+xws64_t arch_xwsc_entry(__xwcc_unused xwsc_f func, __xwcc_unused xwptr_t argnum,
+                        __xwcc_unused xwptr_t * args, __xwcc_unused xwreg_t old_lr)
 {
         __asm__ volatile("      push    {r3, r4, r5, r6, r7, r8, r9, sl, ip, lr}");
         __asm__ volatile("      mov     r4, r0");                       /* r4 = func;           */

@@ -96,14 +96,14 @@ xwer_t xwds_linc_cvop_probe(struct xwds_linc * linc)
         xwer_t rc;
 
         rc = xwosal_mtx_init(&linc->txlock, XWOSAL_SD_PRIORITY_RT_MIN);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_init;
         }
         if (is_err_or_null(linc->get_msg_size)) {
                 linc->get_msg_size = xwds_linc_get_msg_size;
         }
         rc = xwds_device_cvop_probe(&linc->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_probe;
         }
         return XWOK;
@@ -125,7 +125,7 @@ xwer_t xwds_linc_cvop_remove(struct xwds_linc * linc)
         xwer_t rc;
 
         rc = xwds_device_cvop_remove(&linc->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_remove;
         }
         xwosal_mtx_destroy(&linc->txlock);
@@ -208,17 +208,17 @@ xwer_t xwds_linc_msttx(struct xwds_linc * linc,
         XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_linc_grab(linc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_linc_grab;
         }
 
         rc = xwds_linc_request(linc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_linc_request;
         }
 
         rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&linc->txlock), xwtm);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_linc_txlock;
         }
         drv = xwds_static_cast(const struct xwds_linc_driver *, linc->dev.drv);
@@ -227,7 +227,7 @@ xwer_t xwds_linc_msttx(struct xwds_linc * linc,
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_msttx;
         }
         xwosal_mtx_unlock(xwosal_mtx_get_id(&linc->txlock));
@@ -259,25 +259,25 @@ xwer_t xwds_linc_slvtx(struct xwds_linc * linc,
         XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_linc_grab(linc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_linc_grab;
         }
         rc = xwds_linc_request(linc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_linc_request;
         }
 
         rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&linc->txlock), xwtm);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_linc_txlock;
         }
         drv = xwds_static_cast(const struct xwds_linc_driver *, linc->dev.drv);
-        if (__likely((drv) && (drv->slvtx))) {
+        if (__xwcc_likely((drv) && (drv->slvtx))) {
                 rc = drv->slvtx(linc, msg, xwtm);
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_slvtx;
         }
         xwosal_mtx_unlock(xwosal_mtx_get_id(&linc->txlock));
@@ -309,21 +309,21 @@ xwer_t xwds_linc_rx(struct xwds_linc * linc,
         XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_linc_grab(linc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_linc_grab;
         }
         rc = xwds_linc_request(linc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_linc_request;
         }
 
         drv = xwds_static_cast(const struct xwds_linc_driver *, linc->dev.drv);
-        if (__likely((drv) && (drv->rx))) {
+        if (__xwcc_likely((drv) && (drv->rx))) {
                 rc = drv->rx(linc, msgbuf, xwtm);
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_rx;
         }
 

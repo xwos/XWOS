@@ -78,7 +78,7 @@ xwid_t dynamic_tid[xw_array_size(dynamic_tbd)];
 /**
  * @brief 静态初始化的线程的栈内存
  */
-__aligned(8) xwstk_t static_thrd_stack[1][512]; /* 大小 == sizeof(xwstk_t) * 256 */
+xwstk_t __xwcc_aligned(8) static_thrd_stack[1][512]; /* 大小 == sizeof(xwstk_t) * 256 */
 
 /**
  * @brief 静态初始化的线程描述表

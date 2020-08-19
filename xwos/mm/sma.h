@@ -34,7 +34,7 @@
 struct xwmm_sma {
         struct xwmm_zone zone; /**< 内存区域 */
         const char * name; /**< 名字 */
-        __atomic xwsq_t pos; /**< 当前位置指针 */
+        __xwcc_atomic xwsq_t pos; /**< 当前位置指针 */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********

@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-xwer_t xwaop__xwu64_t__tgelt_then_sub(__atomic xwu64_t * a,
+xwer_t xwaop__xwu64_t__tgelt_then_sub(__xwcc_atomic xwu64_t * a,
                                       xwu64_t l, xwu64_t r,
                                       xwu64_t v,
                                       xwu64_t * nv, xwu64_t * ov)

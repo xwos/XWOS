@@ -145,7 +145,7 @@ struct xwds_device {
         void * data; /**< 私有数据 */
 
         /* private */
-        __atomic xwsq_t state; /**< 设备状态 */
+        __xwcc_atomic xwsq_t state; /**< 设备状态 */
         struct xwds * ds; /**< 设备所属的设备栈的指针 */
         const struct xwds_base_virtual_operations * cvops; /**< 通用操作的虚函数表 */
 };
@@ -343,7 +343,7 @@ xwer_t xwds_device_request(struct xwds_device * dev)
         rc = xwaop_tge_then_add(xwsq_t, &dev->state,
                                 XWDS_DEVICE_STATE_RUNNING, 1,
                                 NULL, NULL);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -ESHUTDOWN;
         }
         return rc;
@@ -364,7 +364,7 @@ xwer_t xwds_device_release(struct xwds_device * dev)
         rc = xwaop_tgt_then_sub(xwsq_t, &dev->state,
                                 XWDS_DEVICE_STATE_RUNNING, 1,
                                 NULL, NULL);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EALREADY;
         }
         return rc;

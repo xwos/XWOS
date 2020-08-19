@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-xwssq_t xwbmpaop_flz_then_s1i(__atomic xwbmp_t * bmp, xwsz_t num)
+xwssq_t xwbmpaop_flz_then_s1i(__xwcc_atomic xwbmp_t * bmp, xwsz_t num)
 {
         xwsz_t total = BITS_TO_BMPS(num);
         xwsq_t i;

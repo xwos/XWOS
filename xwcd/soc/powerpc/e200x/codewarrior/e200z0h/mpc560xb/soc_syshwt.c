@@ -150,7 +150,7 @@ xwer_t soc_syshwt_stop(struct xwos_syshwt * hwt)
  * @return time confetti
  */
 __xwbsp_code
-xwtm_t soc_syshwt_get_timeconfetti(__maybe_unused struct xwos_syshwt * hwt)
+xwtm_t soc_syshwt_get_timeconfetti(__xwcc_unused struct xwos_syshwt * hwt)
 {
         xwu32_t cnt;
         xwu32_t confetti;

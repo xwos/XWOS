@@ -27,8 +27,8 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwbsp_code __naked
-xwssq_t arch_xwbop_fls32(__maybe_unused xwu32_t x)
+__xwbsp_code __xwcc_naked
+xwssq_t arch_xwbop_fls32(__xwcc_unused xwu32_t x)
 {
         __asm__ volatile("      clz     r0, r0");
         __asm__ volatile("      rsb     r0, r0, #31");

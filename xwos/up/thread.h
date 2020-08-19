@@ -172,7 +172,7 @@ xwer_t xwos_thrd_thaw_lic(struct xwos_tcb * tcb);
  * @param tcb: (I) 线程控制块对象的指针
  * @return 错误码
  */
-static __xw_inline
+static __xwcc_inline
 void xwos_thrd_wakeup(struct xwos_tcb * tcb)
 {
         xwos_thrd_rq_add_tail(tcb);

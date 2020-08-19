@@ -116,20 +116,20 @@ xwer_t xwds_uartc_cvop_probe(struct xwds_uartc * uartc)
 
         /* create RX semaphore */
         rc = xwosal_smr_init(&uartc->rxsmr, 0, XWMDCFG_ds_UART_GNR_RXQ_SIZE);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_rxsmr_init;
         }
         rc = xwosal_smr_freeze(xwosal_smr_get_id(&uartc->rxsmr));
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_rxsmr_freeze;
         }
         rc = xwosal_mtx_init(&uartc->txmtx, XWOSAL_SD_PRIORITY_RT_MIN);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_txmtx_init;
         }
 
         rc = xwds_device_cvop_probe(&uartc->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_probe;
         }
         return XWOK;
@@ -154,7 +154,7 @@ xwer_t xwds_uartc_cvop_remove(struct xwds_uartc * uartc)
         xwer_t rc;
 
         rc = xwds_device_cvop_remove(&uartc->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_remove;
         }
         xwosal_mtx_destroy(&uartc->txmtx);
@@ -178,12 +178,12 @@ xwer_t xwds_uartc_cvop_start(struct xwds_uartc * uartc)
         xwer_t rc;
 
         rc = xwds_device_cvop_start(&uartc->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_start;
         }
         rc = xwosal_smr_thaw(xwosal_smr_get_id(&uartc->rxsmr),
                              0, XWMDCFG_ds_UART_GNR_RXQ_SIZE);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_rxsmr_thaw;
         }
 
@@ -223,11 +223,11 @@ xwer_t xwds_uartc_cvop_stop(struct xwds_uartc * uartc)
         xwer_t rc;
 
         rc = xwosal_smr_freeze(xwosal_smr_get_id(&uartc->rxsmr));
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_rxsmr_freeze;
         }
         rc = xwds_device_cvop_stop(&uartc->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_stop;
         }
         xwosal_sqlk_wr_lock_cpuirqsv(&uartc->txseqlock, &cpuirq);
@@ -257,7 +257,7 @@ xwer_t xwds_uartc_cvop_suspend(struct xwds_uartc * uartc)
         xwer_t rc;
 
         rc = xwds_device_cvop_suspend(&uartc->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_suspend;
         }
         xwosal_sqlk_wr_lock_cpuirqsv(&uartc->txseqlock, &cpuirq);
@@ -282,7 +282,7 @@ xwer_t xwds_uartc_cvop_resume(struct xwds_uartc * uartc)
         xwer_t rc;
 
         rc = xwds_device_cvop_resume(&uartc->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_resume;
         }
         xwosal_sqlk_wr_lock_cpuirqsv(&uartc->txseqlock, &cpuirq);
@@ -316,12 +316,12 @@ xwer_t xwds_uartc_clear_rxq(struct xwds_uartc * uartc)
         XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
 
         rc = xwosal_smr_freeze(xwosal_smr_get_id(&uartc->rxsmr));
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_smr_freeze;
         }
         xwosal_sqlk_wr_lock_cpuirqsv(&uartc->rxseqlock, &cpuirq);
@@ -330,7 +330,7 @@ xwer_t xwds_uartc_clear_rxq(struct xwds_uartc * uartc)
         xwosal_sqlk_wr_unlock_cpuirqrs(&uartc->rxseqlock, cpuirq);
         rc = xwosal_smr_thaw(xwosal_smr_get_id(&uartc->rxsmr), 0,
                              XWMDCFG_ds_UART_GNR_RXQ_SIZE);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_smr_thaw;
         }
 
@@ -355,7 +355,7 @@ xwer_t xwds_uartc_get_rxq_datasize(struct xwds_uartc * uartc, xwsz_t *ret)
         XWDS_VALIDATE(ret, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
 
@@ -388,12 +388,12 @@ xwer_t xwds_uartc_getc(struct xwds_uartc * uartc, xwu8_t * buf, xwtm_t * xwtm)
         XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
 
         rc = xwosal_smr_timedwait(xwosal_smr_get_id(&uartc->rxsmr), xwtm);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_smr_timedwait;
         }
         xwosal_sqlk_wr_lock_cpuirqsv(&uartc->rxseqlock, &cpuirq);
@@ -428,14 +428,14 @@ xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
         XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 *size = 0;
                 goto err_uartc_grab;
         }
 
         for (i = 0; i < *size; i++) {
                 rc = xwosal_smr_timedwait(xwosal_smr_get_id(&uartc->rxsmr), xwtm);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         *size = i;
                         goto err_smr_timedwait;
                 }
@@ -468,12 +468,12 @@ xwer_t xwds_uartc_try_getc(struct xwds_uartc * uartc, xwu8_t * buf)
         XWDS_VALIDATE(buf, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
 
         rc = xwosal_smr_trywait(xwosal_smr_get_id(&uartc->rxsmr));
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_smr_trywait;
         }
         xwosal_sqlk_wr_lock_cpuirqsv(&uartc->rxseqlock, &cpuirq);
@@ -505,14 +505,14 @@ xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc, void * buf, xwsz_t * size)
         XWDS_VALIDATE(size, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 *size = 0;
                 goto err_uartc_grab;
         }
 
         for (i = 0; i < *size; i++) {
                 rc = xwosal_smr_trywait(xwosal_smr_get_id(&uartc->rxsmr));
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         *size = i;
                         goto err_smr_trywait;
                 }
@@ -544,7 +544,7 @@ xwer_t xwds_uartc_clear_txq(struct xwds_uartc * uartc)
         XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
 
@@ -609,16 +609,16 @@ xwer_t xwds_uartc_putc(struct xwds_uartc * uartc,
         XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
 
         rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&uartc->txmtx), xwtm);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_lock;
         }
         rc = xwds_uartc_tx_1byte(uartc, byte);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_tx_1byte;
         }
         xwosal_mtx_unlock(xwosal_mtx_get_id(&uartc->txmtx));
@@ -648,20 +648,20 @@ xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
         XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 *size = 0;
                 goto err_uartc_grab;
         }
 
         rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&uartc->txmtx), xwtm);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 *size = 0;
                 goto err_uartc_lock;
         }
         rc = -EINVAL;
         for (i = 0; i < *size; i++) {
                 rc = xwds_uartc_tx_1byte(uartc, data[i]);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         *size = i;
                         goto err_tx_1byte;
                 }
@@ -691,7 +691,7 @@ xwer_t xwds_uartc_cfg(struct xwds_uartc * uartc,
         XWDS_VALIDATE(cfg, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
 
@@ -701,7 +701,7 @@ xwer_t xwds_uartc_cfg(struct xwds_uartc * uartc,
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_cfg;
         }
 
@@ -729,7 +729,7 @@ void xwds_uartc_drvcb_rx_isr(struct xwds_uartc * uartc)
 
         drv = xwds_static_cast(const struct xwds_uartc_driver *, uartc->dev.drv);
         rc = drv->rx(uartc, &data);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_rx;
         }
         xwosal_sqlk_wr_lock_cpuirqsv(&uartc->rxseqlock, &cpuirq);

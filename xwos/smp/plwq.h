@@ -83,7 +83,7 @@ struct xwos_wqn * xwos_plwq_choose_locked(struct xwos_plwq * xwplwq);
  * @brief 锁住管道等待队列
  * @param xwplwq: (I) 管道等待队列结构体指针
  */
-static __xw_inline
+static __xwcc_inline
 void xwos_plwq_lock(struct xwos_plwq * xwplwq)
 {
         xwlk_splk_lock(&xwplwq->lock);
@@ -93,7 +93,7 @@ void xwos_plwq_lock(struct xwos_plwq * xwplwq)
  * @brief 解锁管道等待队列
  * @param xwplwq: (I) 管道等待队列结构体指针
  */
-static __xw_inline
+static __xwcc_inline
 void xwos_plwq_unlock(struct xwos_plwq * xwplwq)
 {
         xwlk_splk_unlock(&xwplwq->lock);
@@ -103,7 +103,7 @@ void xwos_plwq_unlock(struct xwos_plwq * xwplwq)
  * @brief 锁住管道等待队列，并关闭本地CPU的中断
  * @param xwplwq: (I) 管道等待队列结构体指针
  */
-static __xw_inline
+static __xwcc_inline
 void xwos_plwq_lock_cpuirq(struct xwos_plwq * xwplwq)
 {
         xwlk_splk_lock_cpuirq(&xwplwq->lock);
@@ -113,7 +113,7 @@ void xwos_plwq_lock_cpuirq(struct xwos_plwq * xwplwq)
  * @brief 解锁管道等待队列，并开启本地CPU的中断
  * @param xwplwq: (I) 管道等待队列结构体指针
  */
-static __xw_inline
+static __xwcc_inline
 void xwos_plwq_unlock_cpuirq(struct xwos_plwq * xwplwq)
 {
         xwlk_splk_unlock_cpuirq(&xwplwq->lock);
@@ -124,7 +124,7 @@ void xwos_plwq_unlock_cpuirq(struct xwos_plwq * xwplwq)
  * @param xwplwq: (I) 管道等待队列结构体指针
  * @param cpuirq: (O) 保存本地CPU的中断标志的缓冲区的指针
  */
-static __xw_inline
+static __xwcc_inline
 void xwos_plwq_lock_cpuirqsv(struct xwos_plwq * xwplwq, xwreg_t * cpuirq)
 {
         xwlk_splk_lock_cpuirqsv(&xwplwq->lock, cpuirq);
@@ -135,7 +135,7 @@ void xwos_plwq_lock_cpuirqsv(struct xwos_plwq * xwplwq, xwreg_t * cpuirq)
  * @param xwplwq: (I) 管道等待队列结构体指针
  * @param cpuirq: (I) 本地CPU的中断标志
  */
-static __xw_inline
+static __xwcc_inline
 void xwos_plwq_unlock_cpuirqrs(struct xwos_plwq * xwplwq, xwreg_t cpuirq)
 {
         xwlk_splk_unlock_cpuirqrs(&xwplwq->lock, cpuirq);
@@ -147,7 +147,7 @@ void xwos_plwq_unlock_cpuirqrs(struct xwos_plwq * xwplwq, xwreg_t cpuirq)
  * @retval true: 空
  * @retval false: 非空
  */
-static __xw_inline
+static __xwcc_inline
 bool xwos_plwq_check_empty(struct xwos_plwq * xwplwq)
 {
         return xwlib_bclst_tst_empty_carefully(&xwplwq->head);

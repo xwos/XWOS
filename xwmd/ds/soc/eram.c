@@ -41,24 +41,24 @@ xwer_t xwds_eram_test(struct xwds_soc * soc, xwptr_t * erraddr)
         XWDS_VALIDATE(erraddr, "nullptr", -EFAULT);
 
         rc = xwds_soc_grab(soc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
         rc = xwds_soc_request(soc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_request;
         }
 
         drv = xwds_static_cast(struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->eram_tst)) {
                 rc = drv->eram_tst(soc, erraddr);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         rc = EFAULT;
                 }
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_tst;
         }
 

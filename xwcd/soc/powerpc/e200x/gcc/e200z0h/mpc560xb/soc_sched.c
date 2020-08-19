@@ -407,8 +407,8 @@ xwer_t soc_thrd_freeze_lc(struct xwos_tcb * tcb)
  * @return 错误码
  */
 __xwbsp_code
-xwer_t soc_thrd_outmigrate(__maybe_unused struct xwos_tcb * tcb,
-                           __maybe_unused xwid_t cpuid)
+xwer_t soc_thrd_outmigrate(__xwcc_unused struct xwos_tcb * tcb,
+                           __xwcc_unused xwid_t cpuid)
 {
         xwer_t rc;
 

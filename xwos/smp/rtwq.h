@@ -68,7 +68,7 @@ struct xwos_wqn * xwos_rtwq_choose_locked(struct xwos_rtwq * xwrtwq);
  * @brief 上锁等待队列
  * @param xwrtwq: (I) 实时等待队列
  */
-static __xw_inline
+static __xwcc_inline
 void xwos_rtwq_lock(struct xwos_rtwq * xwrtwq)
 {
         xwlk_splk_lock(&xwrtwq->lock);
@@ -78,7 +78,7 @@ void xwos_rtwq_lock(struct xwos_rtwq * xwrtwq)
  * @brief 解锁等待队列
  * @param xwrtwq: (I) 实时等待队列
  */
-static __xw_inline
+static __xwcc_inline
 void xwos_rtwq_unlock(struct xwos_rtwq * xwrtwq)
 {
         xwlk_splk_unlock(&xwrtwq->lock);
@@ -88,7 +88,7 @@ void xwos_rtwq_unlock(struct xwos_rtwq * xwrtwq)
  * @brief 上锁等待队列，并关闭本地CPU的中断
  * @param xwrtwq: (I) 实时等待队列
  */
-static __xw_inline
+static __xwcc_inline
 void xwos_rtwq_lock_cpuirq(struct xwos_rtwq * xwrtwq)
 {
         xwlk_splk_lock_cpuirq(&xwrtwq->lock);
@@ -98,7 +98,7 @@ void xwos_rtwq_lock_cpuirq(struct xwos_rtwq * xwrtwq)
  * @brief 解锁等待队列，并开启本地CPU的中断
  * @param xwrtwq: (I) 实时等待队列
  */
-static __xw_inline
+static __xwcc_inline
 void xwos_rtwq_unlock_cpuirq(struct xwos_rtwq * xwrtwq)
 {
         xwlk_splk_unlock_cpuirq(&xwrtwq->lock);
@@ -108,7 +108,7 @@ void xwos_rtwq_unlock_cpuirq(struct xwos_rtwq * xwrtwq)
  * @brief 上锁等待队列，保存本地CPU的中断标志并关闭
  * @param xwrtwq: (I) 实时等待队列
  */
-static __xw_inline
+static __xwcc_inline
 void xwos_rtwq_lock_cpuirqsv(struct xwos_rtwq * xwrtwq, xwreg_t * cpuirq)
 {
         xwlk_splk_lock_cpuirqsv(&xwrtwq->lock, cpuirq);
@@ -118,7 +118,7 @@ void xwos_rtwq_lock_cpuirqsv(struct xwos_rtwq * xwrtwq, xwreg_t * cpuirq)
  * @brief 解锁等待队列，恢复本地CPU的中断标志
  * @param xwrtwq: (I) 实时等待队列
  */
-static __xw_inline
+static __xwcc_inline
 void xwos_rtwq_unlock_cpuirqrs(struct xwos_rtwq * xwrtwq, xwreg_t cpuirq)
 {
         xwlk_splk_unlock_cpuirqrs(&xwrtwq->lock, cpuirq);
@@ -131,7 +131,7 @@ void xwos_rtwq_unlock_cpuirqrs(struct xwos_rtwq * xwrtwq, xwreg_t cpuirq)
  * @retval true: 空
  * @retval false: 非空
  */
-static __xw_inline
+static __xwcc_inline
 bool xwos_rtwq_check_empty(struct xwos_rtwq * xwrtwq)
 {
         return (!xwrtwq->rightmost);

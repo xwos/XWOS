@@ -128,7 +128,7 @@ xwer_t xwsync_vsmr_freeze(struct xwsync_vsmr * vsmr)
 
         rc = XWOK;
         xwos_cpuirq_save_lc(&cpuirq);
-        if (__unlikely(vsmr->count < 0)) {
+        if (__xwcc_unlikely(vsmr->count < 0)) {
                 rc = -EALREADY;
         } else {
                 vsmr->count = XWSDYNC_VSMR_NEGTIVE;
@@ -175,7 +175,7 @@ xwer_t xwsync_vsmr_thaw(struct xwsync_vsmr * vsmr, xwssq_t val, xwssq_t max)
 
         rc = XWOK;
         xwos_cpuirq_save_lc(&cpuirq);
-        if (__unlikely(vsmr->count >= 0)) {
+        if (__xwcc_unlikely(vsmr->count >= 0)) {
                 rc = -EALREADY;
         } else {
                 vsmr->max = max;

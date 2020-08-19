@@ -220,7 +220,7 @@ void MX_SDMMC1_SD_Reinit(uint32_t clkdiv)
 
 xwer_t MX_SDMMC1_SD_TrimClk(xwsq_t cnt)
 {
-  __aligned_l1cacheline xwu8_t buf[512];
+  xwu8_t __xwcc_aligned_l1cacheline buf[512];
   xwer_t rc;
   xwsq_t i;
   xwtm_t time;

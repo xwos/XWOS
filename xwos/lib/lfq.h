@@ -35,7 +35,7 @@
  * @param n: (I) 队列节点指针
  */
 static __xwlib_inline
-void xwlib_lfq_init(__atomic xwlfq_t * n)
+void xwlib_lfq_init(__xwcc_atomic xwlfq_t * n)
 {
         *n = (xwlfq_t)0;
 }
@@ -46,7 +46,7 @@ void xwlib_lfq_init(__atomic xwlfq_t * n)
  * @param n: (I) 入队节点的指针
  */
 static __xwlib_inline
-void xwlib_lfq_push(__atomic xwlfq_t * h, __atomic xwlfq_t * n)
+void xwlib_lfq_push(__xwcc_atomic xwlfq_t * h, __xwcc_atomic xwlfq_t * n)
 {
         arch_lfq_push(h, n);
 }
@@ -57,7 +57,7 @@ void xwlib_lfq_push(__atomic xwlfq_t * h, __atomic xwlfq_t * n)
  * @return 被弹出的节点
  */
 static __xwlib_inline
-xwlfq_t * xwlib_lfq_pop(__atomic xwlfq_t * h)
+xwlfq_t * xwlib_lfq_pop(__xwcc_atomic xwlfq_t * h)
 {
         return arch_lfq_pop(h);
 }

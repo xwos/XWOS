@@ -53,7 +53,7 @@ enum xwlib_rbtree_color_em {
  * - 当位置为XWLIB_RBTREE_POS_RIGHT，当前节点为右孩子，其link指针指向父节点的right。
  * - 当位置为XWLIB_RBTREE_POS_LEFT，当前节点为左孩子，其link指针指向父节点的left。
  */
-struct __alignptr xwlib_rbtree_node {
+struct __xwcc_alignptr xwlib_rbtree_node {
         struct xwlib_rbtree_node * left; /**< 指向左孩子 */
         struct xwlib_rbtree_node * right; /**< 指向右孩子 */
         union {
@@ -67,7 +67,7 @@ struct __alignptr xwlib_rbtree_node {
 /**
  * @brief 红黑树
  */
-struct __alignptr xwlib_rbtree {
+struct __xwcc_alignptr xwlib_rbtree {
         struct xwlib_rbtree_node * root; /**< 根节点 */
 };
 
@@ -211,7 +211,7 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
  * @param type: (I) 外层结构体类型
  * @member: (I) 红黑树节点在外层结构体中的成员符号名(symbol)
  */
-#define xwlib_rbtree_entry(ptr, type, member)   container_of((ptr), type, member)
+#define xwlib_rbtree_entry(ptr, type, member)   xwcc_baseof((ptr), type, member)
 
 /**
  * @brief 返回节点的父节点指针

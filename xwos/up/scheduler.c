@@ -47,14 +47,14 @@ __xwos_data struct xwos_scheduler xwos_scheduler;
 /**
  * @brief 调度器的空闲线程栈
  */
-__xwos_data __aligned_l1cacheline
+__xwos_data __xwcc_aligned_l1cacheline
 xwu8_t xwos_scheduler_idled_stack[XWUPCFG_SD_IDLE_STACK_SIZE];
 
 #if defined(XWUPCFG_SD_BH) && (1 == XWUPCFG_SD_BH)
 /**
  * @brief 调度器的中断底半部栈
  */
-__xwos_data __aligned_l1cacheline
+__xwos_data __xwcc_aligned_l1cacheline
 xwu8_t xwos_scheduler_bhd_stack[XWUPCFG_SD_BH_STACK_SIZE];
 #endif /* XWUPCFG_SD_BH */
 
@@ -129,7 +129,7 @@ xwer_t xwos_scheduler_init(void)
         xwlib_bclst_init_head(&xwsd->tcblist);
         xwsd->thrd_num = 0;
         rc = xwos_tt_init(&xwsd->tt);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_tt_init;
         }
         xwos_rtrq_init(&xwsd->rq.rt);
@@ -164,7 +164,7 @@ xwer_t xwos_scheduler_start_lc(void)
 
         xwsd = &xwos_scheduler;
         rc = xwos_syshwt_start(&xwsd->tt.hwt);
-        if (__unlikely(XWOK == rc)) {
+        if (__xwcc_unlikely(XWOK == rc)) {
                 soc_scheduler_start_lc(xwsd);
         }/* else {} */
         return rc;
@@ -227,7 +227,7 @@ struct xwos_tcb * xwos_scheduler_get_ctcb_lc(void)
 {
         struct xwos_tcb * ctcb;
 
-        ctcb = container_of(xwos_scheduler.cstk, struct xwos_tcb, stack);
+        ctcb = xwcc_baseof(xwos_scheduler.cstk, struct xwos_tcb, stack);
         return ctcb;
 }
 
@@ -248,7 +248,7 @@ struct xwos_tcb * xwos_scheduler_rtrq_choose(void)
         xwsd = &xwos_scheduler;
         xwrtrq = &xwsd->rq.rt;
         t = xwos_rtrq_choose(xwrtrq);
-        if (__likely(NULL != t)) {
+        if (__xwcc_likely(NULL != t)) {
                 xwos_rtrq_remove(xwrtrq, t);
                 xwbop(xwsq_t, c0m, &t->state, XWSDOBJ_DST_READY);
                 xwbop(xwsq_t, s1m, &t->state, XWSDOBJ_DST_RUNNING);
@@ -434,9 +434,9 @@ xwer_t xwos_scheduler_req_bh(void)
         xwos_cpuirq_save_lc(&cpuirq);
         xwsd->req_bh_cnt++;
         if (0 == xwsd->dis_bh_cnt) {
-                if (__unlikely(NULL != xwsd->pstk)) {
+                if (__xwcc_unlikely(NULL != xwsd->pstk)) {
                         rc = -EINPROGRESS;
-                } else if (__unlikely(XWOS_SCHEDULER_BH_STK(xwsd) == xwsd->cstk)) {
+                } else if (__xwcc_unlikely(XWOS_SCHEDULER_BH_STK(xwsd) == xwsd->cstk)) {
                         rc = -EALREADY;
                 } else {
                         xwsd->pstk = xwsd->cstk;
@@ -509,7 +509,7 @@ struct xwos_scheduler * xwos_scheduler_enpmpt_lc(void)
                         cstk = xwsd->cstk;
 #endif /* !XWUPCFG_SD_BH */
                         if (XWOS_SCHEDULER_IDLE_STK(xwsd) != cstk) {
-                                t = container_of(cstk, struct xwos_tcb, stack);
+                                t = xwcc_baseof(cstk, struct xwos_tcb, stack);
                                 sched = xwos_scheduler_do_chkpmpt(t);
                         } else {
                                 sched = true;
@@ -585,7 +585,7 @@ void xwos_scheduler_chkpmpt(void)
                 cstk = xwsd->cstk;
 #endif /* !XWUPCFG_SD_BH */
                 if (XWOS_SCHEDULER_IDLE_STK(xwsd) != cstk) {
-                        t = container_of(cstk, struct xwos_tcb, stack);
+                        t = xwcc_baseof(cstk, struct xwos_tcb, stack);
                         sched = xwos_scheduler_do_chkpmpt(t);
                 } else {
                         sched = true;
@@ -708,10 +708,10 @@ xwer_t xwos_scheduler_req_swcx(void)
         xwsd = &xwos_scheduler;
         xwos_cpuirq_save_lc(&cpuirq);
         xwsd->req_schedule_cnt++;
-        if (__unlikely(NULL != xwsd->pstk)) {
+        if (__xwcc_unlikely(NULL != xwsd->pstk)) {
                 xwos_cpuirq_restore_lc(cpuirq);
                 rc = -EINPROGRESS;
-        } else if (__unlikely(XWOS_SCHEDULER_BH_STK(xwsd) == xwsd->cstk)) {
+        } else if (__xwcc_unlikely(XWOS_SCHEDULER_BH_STK(xwsd) == xwsd->cstk)) {
                 xwos_cpuirq_restore_lc(cpuirq);
                 rc = -EBUSY;
         } else {
@@ -800,7 +800,7 @@ xwer_t xwos_scheduler_req_swcx(void)
         xwsd = &xwos_scheduler;
         xwos_cpuirq_save_lc(&cpuirq);
         xwsd->req_schedule_cnt++;
-        if (__unlikely(NULL != xwsd->pstk)) {
+        if (__xwcc_unlikely(NULL != xwsd->pstk)) {
                 xwos_cpuirq_restore_lc(cpuirq);
                 rc = -EINPROGRESS;
         } else {

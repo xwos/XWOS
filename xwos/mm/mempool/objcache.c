@@ -176,15 +176,16 @@ xwer_t xwmm_mempool_objcache_create(struct xwmm_mempool_objcache ** ocbuf,
         XWOS_VALIDATE(((alignment & XWMM_ALIGNMENT_MASK) == 0),
                       "not-aligned", -EALIGN);
 
-        rc = xwmm_kma_alloc(sizeof(struct xwmm_mempool_objcache), XWMM_ALIGNMENT, &mem);
-        if (__unlikely(rc < 0)) {
+        rc = xwmm_kma_alloc(sizeof(struct xwmm_mempool_objcache), XWMM_ALIGNMENT,
+                            &mem);
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_kma_alloc;
         }
         oc = mem;
 
         rc = xwmm_mempool_objcache_init(oc, pa, name, objsize, alignment, pg_order,
                                         ctor, dtor);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_oc_init;
         }
         *ocbuf = oc;
@@ -247,8 +248,9 @@ void xwmm_mempool_objcache_page_init(struct xwmm_mempool_objcache * oc,
         loop = oc->pg_objnr;
         for (i = 0; i < loop; i++) {
                 next += oc->objsize;
-                xwlib_lfq_init((__atomic xwlfq_t *)curr);
-                xwlib_lfq_push(&pg->attr.objcache.objhead, (__atomic xwlfq_t *)curr);
+                xwlib_lfq_init((__xwcc_atomic xwlfq_t *)curr);
+                xwlib_lfq_push(&pg->attr.objcache.objhead,
+                               (__xwcc_atomic xwlfq_t *)curr);
                 curr = next;
         }
 }
@@ -381,7 +383,7 @@ xwer_t xwmm_mempool_objcache_alloc(struct xwmm_mempool_objcache * oc, void ** ob
         XWOS_VALIDATE((objbuf), "nullptr", -EFAULT);
 
         rc = xwmm_mempool_objcache_page_get(oc, &pg);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_page_get;
         }
 
@@ -419,7 +421,7 @@ err_page_get:
 __xwos_code
 xwer_t xwmm_mempool_objcache_free(struct xwmm_mempool_objcache * oc, void * obj)
 {
-        __atomic xwlfq_t * lfq;
+        __xwcc_atomic xwlfq_t * lfq;
         struct xwmm_mempool_page * pg;
         xwsz_t reserved;
         xwsz_t idleness;
@@ -442,7 +444,7 @@ xwer_t xwmm_mempool_objcache_free(struct xwmm_mempool_objcache * oc, void * obj)
                 oc->dtor(obj);
         }
 
-        lfq = (__atomic xwlfq_t *)obj;
+        lfq = (__xwcc_atomic xwlfq_t *)obj;
         xwlib_lfq_push(&pg->attr.objcache.objhead, lfq);
 
         xwmm_mempool_objcache_page_put(oc, pg);

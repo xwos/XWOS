@@ -84,17 +84,17 @@ xwer_t xwmm_bma_init(struct xwmm_bma * bma, const char * name,
         XWOS_VALIDATE((orderlists), "nullptr", -EFAULT);
         XWOS_VALIDATE((bcbs), "nullptr", -EFAULT);
 
-        if (__unlikely(total < blksize)) {
+        if (__xwcc_unlikely(total < blksize)) {
                 rc = -E2SMALL;
                 goto err_mem2small;
         }
         num = total / blksize;
         odr = (xwsq_t)xwbop_fls(xwsz_t, num);
-        if (__unlikely(odr > XWMM_BMA_MAX_ORDER)) {
+        if (__xwcc_unlikely(odr > XWMM_BMA_MAX_ORDER)) {
                 rc = -ERANGE;
                 goto err_odr2large;
         }
-        if (__unlikely((1U << odr) != num)) {
+        if (__xwcc_unlikely((1U << odr) != num)) {
                 xwmm_bmalogf(WARNING,
                              "The number of blocks is not power(2, order)!\n");
         }
@@ -149,39 +149,39 @@ xwer_t xwmm_bma_create(struct xwmm_bma ** ptrbuf, const char * name,
 
         XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
 
-        if (__unlikely(total < blksize)) {
+        if (__xwcc_unlikely(total < blksize)) {
                 rc = -E2SMALL;
                 goto err_mem2small;
         }
         num = total / blksize;
         odr = (xwsq_t)xwbop_fls(xwsz_t, num);
-        if (__unlikely(odr > XWMM_BMA_MAX_ORDER)) {
+        if (__xwcc_unlikely(odr > XWMM_BMA_MAX_ORDER)) {
                 rc = -ERANGE;
                 goto err_odr2large;
         }
 
         rc = xwmm_kma_alloc(sizeof(struct xwmm_bma), XWMM_ALIGNMENT, &mem);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_bma_alloc;
         }
         bma = mem;
 
         rc = xwmm_kma_alloc((odr + 1) * sizeof(struct xwmm_bma_orderlist),
                             XWMM_ALIGNMENT, &mem);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_orderlists_alloc;
         }
         orderlists = mem;
 
         rc = xwmm_kma_alloc(num * sizeof(struct xwmm_bma_bcb),
                             XWMM_ALIGNMENT, &mem);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_bcbs_alloc;
         }
         bcbs = mem;
 
         rc = xwmm_bma_init(bma, name, origin, total, blksize, orderlists, bcbs);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_bma_init;
         }
         *ptrbuf = bma;
@@ -479,13 +479,13 @@ xwer_t xwmm_bma_free(struct xwmm_bma * bma, void * mem)
         XWOS_VALIDATE((bma), "nullptr", -EFAULT);
         XWOS_VALIDATE((mem), "nullptr", -EFAULT);
 
-        if (__unlikely((((xwptr_t)mem < bma->zone.origin) ||
-                        ((xwptr_t)mem >= (bma->zone.origin + bma->zone.size))))) {
+        if (__xwcc_unlikely((((xwptr_t)mem < bma->zone.origin) ||
+                             ((xwptr_t)mem >= (bma->zone.origin + bma->zone.size))))) {
                 rc = -ERANGE;
                 goto err_range;
         }
         bcb = xwmm_bma_mem_to_bcb(bma, mem);
-        if (__unlikely(is_err(bcb))) {
+        if (__xwcc_unlikely(is_err(bcb))) {
                 rc = ptr_err(bcb);
                 goto err_invalmem;
         }

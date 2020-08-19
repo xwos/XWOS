@@ -72,7 +72,7 @@ struct xwos_swt {
  * @param swt: (I) 软件定时器控制块对象指针
  * @return 错误码
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwos_swt_grab(struct xwos_swt * swt)
 {
         return xwos_object_grab(&swt->xwobj);
@@ -83,7 +83,7 @@ xwer_t xwos_swt_grab(struct xwos_swt * swt)
  * @param swt: (I) 软件定时器控制块对象指针
  * @return 错误码
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwos_swt_put(struct xwos_swt * swt)
 {
         return xwos_object_put(&swt->xwobj);

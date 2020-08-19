@@ -184,7 +184,7 @@ xwer_t xwds_soc_ioctl(struct xwds_soc * soc, xwsq_t cmd, ...)
         XWDS_VALIDATE(soc, "nullptr", -EFAULT);
 
         rc = xwds_soc_grab(soc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
 
@@ -196,7 +196,7 @@ xwer_t xwds_soc_ioctl(struct xwds_soc * soc, xwsq_t cmd, ...)
                 rc = -ENOSYS;
         }
         va_end(args);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_ioctl;
         }
 

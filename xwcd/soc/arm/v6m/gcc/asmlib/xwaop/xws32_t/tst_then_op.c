@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-xwer_t xwaop__xws32_t__tst_then_op(__atomic xws32_t * a,
+xwer_t xwaop__xws32_t__tst_then_op(__xwcc_atomic xws32_t * a,
                                    xwaop_tst_f tst, void * tst_args,
                                    xwaop_op_f op, void * op_args,
                                    xws32_t * nv, xws32_t * ov)

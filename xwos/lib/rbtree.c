@@ -24,7 +24,7 @@
  * @param tree: (I) 红黑树的指针
  * @param node: (I) 待修正颜色的节点的指针
  */
-__xwlib_code __hot
+__xwlib_code __xwcc_hot
 void xwlib_rbtree_insert_color(struct xwlib_rbtree * tree,
                                struct xwlib_rbtree_node * node)
 {
@@ -337,7 +337,7 @@ recursively_fix:
  * @note
  * - 此函数假设不存在节点没有链接到红黑树的情形。
  */
-__xwlib_code __hot
+__xwlib_code __xwcc_hot
 void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                          struct xwlib_rbtree_node * node)
 {
@@ -1008,7 +1008,7 @@ black_sibling:
  * @param newd: (I) 新节点的指针
  * @param oldn: (I) 旧节点的指针
  */
-__xwlib_code __hot
+__xwlib_code __xwcc_hot
 void xwlib_rbtree_replace(struct xwlib_rbtree_node * newn,
                           struct xwlib_rbtree_node * oldn)
 {

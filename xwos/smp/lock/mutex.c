@@ -121,7 +121,7 @@ xwer_t xwlk_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                   xwlk_mtx_cache_name,
                                   (ctor_f)xwlk_mtx_construct,
                                   (dtor_f)xwlk_mtx_destruct);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwlk_mtx_cache = NULL;
         } else {
                 xwlk_mtx_cache = msa;
@@ -233,7 +233,7 @@ xwer_t xwlk_mtx_activate(struct xwlk_mtx * mtx, xwpr_t sprio,
         xwer_t rc;
 
         rc = xwos_object_activate(&mtx->xwobj, gcfunc);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 mtx->sprio = sprio;
                 mtx->dprio = sprio;
                 xwos_rtwq_init(&mtx->rtwq);
@@ -318,11 +318,11 @@ xwer_t xwlk_mtx_create(struct xwlk_mtx ** ptrbuf, xwpr_t sprio)
 
         *ptrbuf = NULL;
         mtx = xwlk_mtx_alloc();
-        if (__unlikely(is_err(mtx))) {
+        if (__xwcc_unlikely(is_err(mtx))) {
                 rc = ptr_err(mtx);
         } else {
                 rc = xwlk_mtx_activate(mtx, sprio, xwlk_mtx_gc);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         xwlk_mtx_free(mtx);
                         mtx = err_ptr(rc);
                 } else {
@@ -372,7 +372,7 @@ xwer_t xwlk_mtx_chprio_once(struct xwlk_mtx * mtx,
 
         *ptcb = NULL;
         rc = xwlk_mtx_grab(mtx);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_rtwq_lock_cpuirqsv(&mtx->rtwq, &cpuirq);
                 if (mtx->dprio == mtx->rtwq.max_prio) {
                         xwos_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
@@ -383,8 +383,8 @@ xwer_t xwlk_mtx_chprio_once(struct xwlk_mtx * mtx,
                                 mtx->dprio = mtx->sprio;
                                 mt = mtx->ownertree;
                                 if (mt) {
-                                        owner = container_of(mt, struct xwos_tcb,
-                                                             mtxtree);
+                                        owner = xwcc_baseof(mt, struct xwos_tcb,
+                                                            mtxtree);
                                         xwlk_sqlk_wr_lock(&mt->lock);
                                         *seq = xwlk_sqlk_get_seq(&mt->lock);
                                         xwos_mtxtree_remove_locked(mtx, mt);
@@ -401,7 +401,7 @@ xwer_t xwlk_mtx_chprio_once(struct xwlk_mtx * mtx,
                         mtx->dprio = mtx->rtwq.max_prio;
                         mt = mtx->ownertree;
                         if (mt) {
-                                owner = container_of(mt, struct xwos_tcb, mtxtree);
+                                owner = xwcc_baseof(mt, struct xwos_tcb, mtxtree);
                                 xwlk_sqlk_wr_lock(&mt->lock);
                                 *seq = xwlk_sqlk_get_seq(&mt->lock);
                                 xwos_mtxtree_remove_locked(mtx, mt);
@@ -435,10 +435,10 @@ void xwlk_mtx_chprio(struct xwlk_mtx * mtx)
 
         while (mtx) {
                 rc = xwlk_mtx_chprio_once(mtx, &tcb, &pseq);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         break;
                 }/* else {} */
-                if (__likely(NULL == tcb)) {
+                if (__xwcc_likely(NULL == tcb)) {
                         break;
                 }/* else {} */
                 mt = &tcb->mtxtree;
@@ -474,7 +474,7 @@ xwer_t xwlk_mtx_intr(struct xwlk_mtx * mtx, struct xwos_tcb * tcb)
         xwer_t rc;
 
         rc = xwlk_mtx_grab(mtx);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_rtwq_lock_cpuirqsv(&mtx->rtwq, &cpuirq);
                 xwlk_splk_lock(&tcb->wqn.lock);
                 rc = xwos_rtwq_remove_locked(&mtx->rtwq, &tcb->wqn);
@@ -576,7 +576,7 @@ xwer_t xwlk_mtx_unlock(struct xwlk_mtx * mtx)
                         xwos_mtxtree_add(mtx, mt);
                         xwos_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                         rc = xwos_thrd_wakeup(t);
-                        if (__unlikely(rc < 0)) {
+                        if (__xwcc_unlikely(rc < 0)) {
                                 /* 如果t已经在其他CPU开始运行，
                                    它的动态优先级需要被修改。*/
                                 seq = xwlk_sqlk_rd_begin(&mt->lock);
@@ -647,7 +647,7 @@ xwer_t xwlk_mtx_trylock(struct xwlk_mtx * mtx)
                       "not-in-thrd", -ENOTINTHRD);
 
         rc = xwlk_mtx_grab(mtx);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_grab;
         }
         rc = XWOK;
@@ -858,7 +858,7 @@ xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx,
                 xwos_scheduler_enpmpt(xwsd);
         } else if (mtx->ownertree) {
                 rc = xwos_scheduler_wakelock_lock(xwsd);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         /* 当前调度器正准备休眠，线程需被冻结，返回-EINTR。*/
                         xwos_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                         xwos_scheduler_enpmpt(xwsd);
@@ -912,21 +912,21 @@ xwer_t xwlk_mtx_timedlock(struct xwlk_mtx * mtx, xwtm_t * xwtm)
         XWOS_VALIDATE((-EINTHRD == xwos_irq_get_id(NULL)),
                       "not-in-thrd", -ENOTINTHRD);
 
-        if (__unlikely(xwtm_cmp(*xwtm, 0) < 0)) {
+        if (__xwcc_unlikely(xwtm_cmp(*xwtm, 0) < 0)) {
                 rc = -ETIMEDOUT;
-        } else if (__unlikely(0 == xwtm_cmp(*xwtm, 0))) {
+        } else if (__xwcc_unlikely(0 == xwtm_cmp(*xwtm, 0))) {
                 rc = xwlk_mtx_trylock(mtx);
-                if (__unlikely(rc < 0)) {
-                        if (__likely(-ENODATA == rc)) {
+                if (__xwcc_unlikely(rc < 0)) {
+                        if (__xwcc_likely(-ENODATA == rc)) {
                                 rc = -ETIMEDOUT;
                         } /* else {} */
                 }/* else {} */
         } else {
                 rc = xwlk_mtx_grab(mtx);
-                if (__likely(XWOK == rc)) {
+                if (__xwcc_likely(XWOK == rc)) {
                         ctcb = xwos_scheduler_get_ctcb_lc();
                         rc = xwlk_mtx_do_timedlock(mtx, ctcb, xwtm);
-                        if (__unlikely(rc < 0)) {
+                        if (__xwcc_unlikely(rc < 0)) {
                                 xwlk_mtx_put(mtx);
                         } /* else {} */
                 }/* else {} */
@@ -1029,12 +1029,12 @@ xwer_t xwlk_mtx_lock_unintr(struct xwlk_mtx * mtx)
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
 
         rc = xwlk_mtx_grab(mtx);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_grab;
         }
         ctcb = xwos_scheduler_get_ctcb_lc();
         rc = xwlk_mtx_do_lock_unintr(mtx, ctcb);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_do_lock_unintr;
         }
         return XWOK;

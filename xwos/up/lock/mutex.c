@@ -203,7 +203,7 @@ xwer_t xwlk_mtx_create(struct xwlk_mtx ** ptrbuf, xwpr_t sprio)
 
         *ptrbuf = NULL;
         mtx = xwlk_mtx_alloc();
-        if (__unlikely(is_err(mtx))) {
+        if (__xwcc_unlikely(is_err(mtx))) {
                 rc = ptr_err(mtx);
         } else {
                 xwlk_mtx_activate(mtx, sprio);
@@ -259,8 +259,7 @@ void xwlk_mtx_chprio_once(struct xwlk_mtx * mtx, struct xwos_tcb ** ptcb)
                         mtx->dprio = mtx->sprio;
                         mt = mtx->ownertree;
                         if (mt) {
-                                owner = container_of(mt, struct xwos_tcb,
-                                                     mtxtree);
+                                owner = xwcc_baseof(mt, struct xwos_tcb, mtxtree);
                                 xwos_mtxtree_remove(mt, mtx);
                                 xwos_mtxtree_add(mt, mtx);
                                 xwos_cpuirq_restore_lc(cpuirq);
@@ -273,7 +272,7 @@ void xwlk_mtx_chprio_once(struct xwlk_mtx * mtx, struct xwos_tcb ** ptcb)
                 mtx->dprio = mtx->rtwq.max_prio;
                 mt = mtx->ownertree;
                 if (mt) {
-                        owner = container_of(mt, struct xwos_tcb, mtxtree);
+                        owner = xwcc_baseof(mt, struct xwos_tcb, mtxtree);
                         xwos_mtxtree_remove(mt, mtx);
                         xwos_mtxtree_add(mt, mtx);
                         xwos_cpuirq_restore_lc(cpuirq);
@@ -299,7 +298,7 @@ void xwlk_mtx_chprio(struct xwlk_mtx * mtx)
 
         while (mtx) {
                 xwlk_mtx_chprio_once(mtx, &tcb);
-                if (__likely(NULL == tcb)) {
+                if (__xwcc_likely(NULL == tcb)) {
                         break;
                 }/* else {} */
                 mtx = NULL;
@@ -614,7 +613,7 @@ xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx,
         } else if (mtx->ownertree) {
 #if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
                 rc = xwos_scheduler_wakelock_lock();
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         /* 系统准备进入低功耗模式，线程需被冻结，返回-EINTR。*/
                         xwos_cpuirq_restore_lc(cpuirq);
                         xwos_scheduler_enpmpt_lc();
@@ -671,12 +670,12 @@ xwer_t xwlk_mtx_timedlock(struct xwlk_mtx * mtx, xwtm_t * xwtm)
         XWOS_VALIDATE((-EINTHRD == xwos_irq_get_id(NULL)),
                       "not-in-thrd", -ENOTINTHRD);
 
-        if (__unlikely(xwtm_cmp(*xwtm, 0) < 0)) {
+        if (__xwcc_unlikely(xwtm_cmp(*xwtm, 0) < 0)) {
                 rc = -ETIMEDOUT;
-        } else if (__unlikely(0 == xwtm_cmp(* xwtm, 0))) {
+        } else if (__xwcc_unlikely(0 == xwtm_cmp(* xwtm, 0))) {
                 rc = xwlk_mtx_trylock(mtx);
-                if (__unlikely(rc < 0)) {
-                        if (__likely(-ENODATA == rc)) {
+                if (__xwcc_unlikely(rc < 0)) {
+                        if (__xwcc_likely(-ENODATA == rc)) {
                                 rc = -ETIMEDOUT;
                         }/* else {} */
                 }/* else {} */

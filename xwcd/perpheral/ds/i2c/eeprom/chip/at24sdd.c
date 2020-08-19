@@ -115,14 +115,14 @@ xwer_t at24sdd_check_desc(struct xwds_i2cp_eeprom * eeprom)
 
         resources = eeprom->i2cp.dev.resources;
         cfg = eeprom->cfg;
-        if (__unlikely(is_err_or_null(resources))) {
+        if (__xwcc_unlikely(is_err_or_null(resources))) {
                 rc = -EINVAL;
-        } else if (__unlikely(is_err_or_null(cfg))) {
+        } else if (__xwcc_unlikely(is_err_or_null(cfg))) {
                 rc = -EINVAL;
         } else {
                 page_size = cfg->page_size;
                 total = cfg->total;
-                if (__unlikely(total % page_size)) {
+                if (__xwcc_unlikely(total % page_size)) {
                         rc = -EINVAL;
                 } else {
                         rc = XWOK;
@@ -161,7 +161,7 @@ xwer_t at24sdd_drv_start(struct xwds_device * dev)
         for (i = 0; i < (xwssz_t)resources->gpiorsc_num; i++) {
                 gpiorsc = &resources->gpiorsc_array[i];
                 rc = xwds_gpio_req(gpiorsc->soc, gpiorsc->port, gpiorsc->pinmask);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 gpiorsc = &resources->gpiorsc_array[j];
                                 xwds_gpio_rls(gpiorsc->soc, gpiorsc->port,
@@ -194,7 +194,7 @@ xwer_t at24sdd_drv_stop(struct xwds_device * dev)
         for (j = (xwssz_t)resources->gpiorsc_num - 1; j >= 0; j--) {
                 gpiorsc = &resources->gpiorsc_array[j];
                 rc = xwds_gpio_rls(gpiorsc->soc, gpiorsc->port, gpiorsc->pinmask);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_gpio_release;
                 }
         }

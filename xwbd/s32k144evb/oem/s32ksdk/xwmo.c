@@ -100,7 +100,7 @@ xwer_t led_task(void * arg)
                 PINS_DRV_WritePin(PTB, 4, 0);
                 time = 1000 * XWTM_MS;
                 rc = xwosal_cthrd_sleep(&time);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         break;
                 }
 
@@ -109,7 +109,7 @@ xwer_t led_task(void * arg)
                 PINS_DRV_WritePin(PTB, 4, 0);
                 time = 1000 * XWTM_MS;
                 rc = xwosal_cthrd_sleep(&time);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         break;
                 }
 
@@ -118,7 +118,7 @@ xwer_t led_task(void * arg)
                 PINS_DRV_WritePin(PTB, 4, 1);
                 time = 1000 * XWTM_MS;
                 rc = xwosal_cthrd_sleep(&time);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         break;
                 }
         }

@@ -50,6 +50,6 @@ __xwbsp_code
 xwer_t soc_syshwt_stop(struct xwos_syshwt * hwt);
 
 __xwbsp_code
-xwtm_t soc_syshwt_get_timeconfetti(__maybe_unused struct xwos_syshwt * hwt);
+xwtm_t soc_syshwt_get_timeconfetti(struct xwos_syshwt * hwt);
 
 #endif /* soc_syshwt.h */

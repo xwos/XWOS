@@ -546,13 +546,13 @@ union xwlk_ulock {
  * @note
  * - 如果结果已经溢出，返回xwtm_t的最大值。
  */
-static __xw_inline
+static __xwcc_inline
 xwtm_t xwtm_add_safely(const xwtm_t a, const xwtm_t b)
 {
         xwtm_t res;
 
         res = a + b;
-        if (__unlikely(res < 0)) {
+        if (__xwcc_unlikely(res < 0)) {
                 res = XWTM_MAX;
         }/* else {} */
         return res;
@@ -564,7 +564,7 @@ xwtm_t xwtm_add_safely(const xwtm_t a, const xwtm_t b)
  * @param b: (I) 加数b
  * @retval 结果
  */
-static __xw_inline
+static __xwcc_inline
 xwtm_t xwtm_add(const xwtm_t a, const xwtm_t b)
 {
         return a + b;
@@ -576,7 +576,7 @@ xwtm_t xwtm_add(const xwtm_t a, const xwtm_t b)
  * @param b: (I) 减数
  * @retval 结果
  */
-static __xw_inline
+static __xwcc_inline
 xwtm_t xwtm_sub(const xwtm_t a, const xwtm_t b)
 {
         return a - b;
@@ -590,7 +590,7 @@ xwtm_t xwtm_sub(const xwtm_t a, const xwtm_t b)
  * @retval ==0: a == b
  * @retval >0: a > b
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwtm_cmp(const xwtm_t a, const xwtm_t b)
 {
         xwer_t rc;

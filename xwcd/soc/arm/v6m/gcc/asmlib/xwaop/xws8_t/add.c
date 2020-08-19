@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-void xwaop__xws8_t__add(__atomic xws8_t * a,
+void xwaop__xws8_t__add(__xwcc_atomic xws8_t * a,
                         xws8_t v,
                         xws8_t * nv, xws8_t * ov)
 {

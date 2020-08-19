@@ -64,7 +64,7 @@ retry:
 #if (XWLK_SQLK_GRANULARITY > 1)
         ret &= ((~XWLK_SQLK_GRANULARITY) + 1U);
 #endif
-        if (__unlikely(ret & XWLK_SQLK_GRANULARITY)) {
+        if (__xwcc_unlikely(ret & XWLK_SQLK_GRANULARITY)) {
                 goto retry;
         }
         xwmb_smp_rmb();

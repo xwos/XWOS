@@ -255,7 +255,7 @@ void xwlk_splk_init(struct xwlk_splk * spl)
  * - 重入性：不可重入
  */
 static __xwos_inline_api
-void xwlk_bitsplk_init(__maybe_unused xwptr_t * ptr)
+void xwlk_bitsplk_init(xwptr_t * ptr)
 {
         arch_bitsplk_init(ptr);
 }

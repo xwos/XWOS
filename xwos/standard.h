@@ -57,7 +57,7 @@
 
 #if defined(XWKNCFG_BUG) && (1 == XWKNCFG_BUG)
   #define XWOS_BUG()            do {} while (1)
-  #define XWOS_BUG_ON(x)        if (__unlikely(x)) XWOS_BUG()
+  #define XWOS_BUG_ON(x)        if (__xwcc_unlikely(x)) XWOS_BUG()
 #else
   #define XWOS_BUG()
   #define XWOS_BUG_ON(x)
@@ -69,7 +69,7 @@
 
 #if defined(XWKNCFG_CHECK_PARAMETERS) && (1 == XWKNCFG_CHECK_PARAMETERS)
   #define XWOS_VALIDATE(exp, errstr, ...) \
-          if (__unlikely((!(exp)))) {     \
+          if (__xwcc_unlikely((!(exp)))) {     \
               return __VA_ARGS__; \
           }
 #else /* XWKNCFG_CHECK_PARAMETERS */

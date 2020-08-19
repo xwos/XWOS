@@ -27,9 +27,9 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwlib_code __naked
-bool xwbmpaop_t1i(__maybe_unused __atomic xwbmp_t * bmp,
-                  __maybe_unused xwsq_t idx)
+__xwlib_code __xwcc_naked
+bool xwbmpaop_t1i(__xwcc_unused __xwcc_atomic xwbmp_t * bmp,
+                  __xwcc_unused xwsq_t idx)
 {
         __asm__ volatile("      lsr     r2, r1, #5"); /* r2 = n / 32; */
         __asm__ volatile("      and     r3, r1, #31"); /* r3 = n % 32; */

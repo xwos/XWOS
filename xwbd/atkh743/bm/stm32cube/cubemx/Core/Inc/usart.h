@@ -52,7 +52,7 @@ struct HAL_UART_Xwds_driver_data {
     struct xwosal_cdt cdt; /**< 条件量 */
     struct xwosal_splk splk; /**< 保证发送状态只被单一上下文访问的锁 */
     xwer_t rc;
-    xwu8_t mem[HAL_UART_TXMEM_MAXSIZE] __aligned_l1cacheline; /**< 发送缓冲区 */
+    xwu8_t mem[HAL_UART_TXMEM_MAXSIZE] __xwcc_aligned_l1cacheline; /**< 发送缓冲区 */
     xwu32_t size; /**< 待发送的数据大小 */
   } tx;
 };

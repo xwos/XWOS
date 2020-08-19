@@ -119,7 +119,7 @@ xwer_t xwsync_evt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                   xwsync_evt_cache_name,
                                   (ctor_f)xwsync_evt_construct,
                                   (dtor_f)xwsync_evt_destruct);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwsync_evt_cache = NULL;
         } else {
                 xwsync_evt_cache = msa;
@@ -236,7 +236,7 @@ xwer_t xwsync_evt_activate(struct xwsync_evt * evt, xwbmp_t initval[],
 
         size = BITS_TO_BMPS(XWSYNC_EVT_MAXNUM);
         rc = xwsync_cdt_activate(&evt->cdt, gcfunc);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 evt->attr = attr;
                 switch (attr & XWSYNC_EVT_TYPE_MASK) {
                 case XWSYNC_EVT_TYPE_FLAG:
@@ -288,11 +288,11 @@ xwer_t xwsync_evt_create(struct xwsync_evt ** ptrbuf, xwbmp_t initval[], xwsq_t 
 
         *ptrbuf = NULL;
         evt = xwsync_evt_alloc();
-        if (__unlikely(is_err(evt))) {
+        if (__xwcc_unlikely(is_err(evt))) {
                 rc = ptr_err(evt);
         } else {
                 rc = xwsync_evt_activate(evt, initval, attr, xwsync_evt_gc);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         xwsync_evt_free(evt);
                 } else {
                         *ptrbuf = evt;
@@ -1492,7 +1492,7 @@ xwer_t xwsync_evt_timedsync(struct xwsync_evt * evt, xwsq_t pos, xwbmp_t sync[],
                       "not-in-thrd", -ENOTINTHRD);
 
         rc = xwsync_evt_grab(evt);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_evt_grab;
         }
 

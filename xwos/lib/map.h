@@ -29,7 +29,7 @@
 /**
  * @brief 键值对容器
  */
-struct __alignptr xwlib_map_container {
+struct __xwcc_alignptr xwlib_map_container {
         struct xwlib_rbtree_node rbn; /**< 红黑树节点 */
         struct xwlib_bclst_node bcln; /**< 链表节点 */
         void * key; /**< 键 */
@@ -44,7 +44,7 @@ typedef xwssq_t (*xwlib_map_cmp_f)(void *, void *);
 /**
  * @brief 键值对集合
  */
-struct __alignptr xwlib_map {
+struct __xwcc_alignptr xwlib_map {
         struct xwlib_rbtree rbtree; /**< 红黑树 */
         struct xwlib_bclst_head bclh; /**< 链表头 */
         xwlib_map_cmp_f cmp; /**< 键比较函数 */

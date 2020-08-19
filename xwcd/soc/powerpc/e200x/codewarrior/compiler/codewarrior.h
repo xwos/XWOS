@@ -52,32 +52,29 @@
 
 #define CWCC_VERSION            __VERSION__
 
-#define __section(s)            __declspec(section #s)
-#define __aligned(x)            __attribute__((aligned(x)))
-#define __weak                  __declspec((weak)
-#define __alias(s)              __attribute__((alias(#s)))
-#define __xw_inline             inline
-#define __never_inline          __attribute__((never_inline))
-#define __packed                __attribute__((packed))
-#define __must_check
-#define __force
-#define __maybe_unused          __attribute__((unused))
-#define __always_unused         __attribute__((unused))
-#define __used                  __attribute__((used))
-#define __maybe_unused          __attribute__((unused))
-#define __noreturn              __attribute__((noreturn))
-#define __hot
-#define __atomic                volatile
-#define __likely(x)             __builtin_expect(!!(x), 1)
-#define __unlikely(x)           __builtin_expect(!!(x), 0)
+#define __xwcc_section(s)       __declspec(section #s)
+#define __xwcc_aligned(x)       __attribute__((aligned(x)))
+#define __xwcc_weak             __declspec((weak)
+#define __xwcc_alias(s)         __attribute__((alias(#s)))
+#define __xwcc_inline           inline
+#define __xwcc_pure
+#define __xwcc_packed           __attribute__((packed))
+#define __xwcc_must_check
+#define __xwcc_unused           __attribute__((unused))
+#define __xwcc_used             __attribute__((used))
+#define __xwcc_noreturn         __attribute__((noreturn))
+#define __xwcc_hot
+#define __xwcc_atomic           volatile
+#define __xwcc_likely(x)        __builtin_expect(!!(x), 1)
+#define __xwcc_unlikely(x)      __builtin_expect(!!(x), 0)
 #if defined(CPUCFG_L1_CACHELINE_SIZE) && (1 == CPUCFG_L1_CACHELINE_SIZE)
-  #define __aligned_l1cacheline \
-          __aligned(CPUCFG_L1_CACHELINE_SIZE)
+  #define __xwcc_aligned_l1cacheline \
+          __xwcc_aligned(CPUCFG_L1_CACHELINE_SIZE)
 #else
-  #define __aligned_l1cacheline         __aligned(sizeof(long))
+  #define __xwcc_aligned_l1cacheline    __xwcc_aligned(sizeof(long))
 #endif
 
-#define __alignptr                      __aligned(sizeof(void *))
+#define __xwcc_alignptr         __xwcc_aligned(sizeof(void *))
 
 #define __xwcc_warning(message) __attribute__((warning(message)))
 #define __xwcc_error(message) __attribute__((error(message)))
@@ -106,29 +103,29 @@
 
 #pragma section RXW ".flsopc" data_mode=far_abs code_mode=far_abs
 
-#define __xwos_init_code        __section(.xwos.init.text)
-#define __xwos_init_rodata      __section(.xwos.init.rodata)
-#define __xwos_exit_code        __section(.xwos.exit.text)
-#define __xwos_exit_rodata      __section(.xwos.exit.rodata)
+#define __xwos_init_code        __xwcc_section(.xwos.init.text)
+#define __xwos_init_rodata      __xwcc_section(.xwos.init.rodata)
+#define __xwos_exit_code        __xwcc_section(.xwos.exit.text)
+#define __xwos_exit_rodata      __xwcc_section(.xwos.exit.rodata)
 
-#define __xwos_vctbl            __section(.xwos.vctbl)
-#define __xwos_isr              __section(.xwos.isr.text)
+#define __xwos_vctbl            __xwcc_section(.xwos.vctbl)
+#define __xwos_isr              __xwcc_section(.xwos.isr.text)
 #define __xwos_bh               __xwos_isr
-#define __xwos_code             __section(.xwos.text)
+#define __xwos_code             __xwcc_section(.xwos.text)
 #define __xwos_api              __xwos_code
-#define __xwos_rodata           __section(.xwos.rodata)
-#define __xwos_data             __section(.xwos.data)
+#define __xwos_rodata           __xwcc_section(.xwos.rodata)
+#define __xwos_data             __xwcc_section(.xwos.data)
 
-#define __xwmd_isr              __section(.xwmd.isr.text)
+#define __xwmd_isr              __xwcc_section(.xwmd.isr.text)
 #define __xwmd_bh               __xwmd_isr
-#define __xwmd_code             __section(.xwmd.text)
+#define __xwmd_code             __xwcc_section(.xwmd.text)
 #define __xwmd_api              __xwmd_code
-#define __xwmd_rodata           __section(.xwmd.rodata)
-#define __xwmd_data             __section(.xwmd.data)
+#define __xwmd_rodata           __xwcc_section(.xwmd.rodata)
+#define __xwmd_data             __xwcc_section(.xwmd.data)
 
-#define __bkup                  __section(.bkup)
-#define __image_header          __section(.image_header)
-#define __image_tail            __section(.image_tail)
-#define __flsopc                __section(.flsopc)
+#define __bkup                  __xwcc_section(.bkup)
+#define __image_header          __xwcc_section(.image_header)
+#define __image_tail            __xwcc_section(.image_tail)
+#define __flsopc                __xwcc_section(.flsopc)
 
 #endif /* codewarrior.h */

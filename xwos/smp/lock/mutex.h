@@ -70,7 +70,7 @@ xwer_t xwlk_mtx_intr(struct xwlk_mtx * mtx, struct xwos_tcb * tcb);
  * @param mtx: (I) 互斥锁对象指针
  * @return 错误码
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwlk_mtx_grab(struct xwlk_mtx * mtx)
 {
         return xwos_object_grab(&mtx->xwobj);
@@ -81,7 +81,7 @@ xwer_t xwlk_mtx_grab(struct xwlk_mtx * mtx)
  * @param mtx: (I) 互斥锁对象指针
  * @return 错误码
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwlk_mtx_put(struct xwlk_mtx * mtx)
 {
         return xwos_object_put(&mtx->xwobj);

@@ -103,15 +103,15 @@ xwer_t xwds_dmauartc_cvop_probe(struct xwds_dmauartc * dmauartc)
 
         xwosal_splk_init(&dmauartc->rxq.lock);
         rc = xwosal_smr_init(&dmauartc->rxq.smr, 0, 1);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_smr_init;
         }
         rc = xwosal_mtx_init(&dmauartc->txmtx, XWOSAL_SD_PRIORITY_RT_MIN);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_txmtx_init;
         }
         rc = xwds_device_cvop_probe(&dmauartc->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_probe;
         }
         return XWOK;
@@ -135,7 +135,7 @@ xwer_t xwds_dmauartc_cvop_remove(struct xwds_dmauartc * dmauartc)
         xwer_t rc;
 
         rc = xwds_device_cvop_remove(&dmauartc->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_remove;
         }
 
@@ -233,14 +233,14 @@ xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
         pos = 0;
 
         rc = xwds_dmauartc_grab(dmauartc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmauartc_grab;
         }
 
         rest_buffer_size = *size;
         while (rest_buffer_size) {
                 rc = xwosal_smr_timedwait(xwosal_smr_get_id(&dmauartc->rxq.smr), xwtm);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_smr_timedwait;
                 }
                 xwosal_splk_lock_cpuirqsv(&dmauartc->rxq.lock, &cpuirq);
@@ -295,14 +295,14 @@ xwer_t xwds_dmauartc_try_rx(struct xwds_dmauartc * dmauartc,
         pos = 0;
 
         rc = xwds_dmauartc_grab(dmauartc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmauartc_grab;
         }
 
         rest_buffer_size = *size;
         while (rest_buffer_size) {
                 rc = xwosal_smr_trywait(xwosal_smr_get_id(&dmauartc->rxq.smr));
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_smr_trywait;
                 }
                 xwosal_splk_lock_cpuirqsv(&dmauartc->rxq.lock, &cpuirq);
@@ -354,13 +354,13 @@ xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
         XWDS_VALIDATE(data, "nullptr", -EFAULT);
 
         rc = xwds_dmauartc_grab(dmauartc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmauartc_grab;
         }
 
         mtxid = xwosal_mtx_get_id(&dmauartc->txmtx);
         rc = xwosal_mtx_timedlock(mtxid, xwtm);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmauartc_lock;
         }
 
@@ -371,7 +371,7 @@ xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_tx;
         }
 
@@ -400,13 +400,13 @@ xwer_t xwds_dmauartc_putc(struct xwds_dmauartc * dmauartc,
         XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_dmauartc_grab(dmauartc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmauartc_grab;
         }
 
         mtxid = xwosal_mtx_get_id(&dmauartc->txmtx);
         rc = xwosal_mtx_timedlock(mtxid, xwtm);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmauartc_lock;
         }
 
@@ -417,7 +417,7 @@ xwer_t xwds_dmauartc_putc(struct xwds_dmauartc * dmauartc,
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_putc;
         }
 
@@ -444,17 +444,18 @@ xwer_t xwds_dmauartc_cfg(struct xwds_dmauartc * dmauartc,
         XWDS_VALIDATE(cfg, "nullptr", -EFAULT);
 
         rc = xwds_dmauartc_grab(dmauartc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmauartc_grab;
         }
 
-        drv = xwds_static_cast(const struct xwds_dmauartc_driver *, dmauartc->dev.drv);
+        drv = xwds_static_cast(const struct xwds_dmauartc_driver *,
+                               dmauartc->dev.drv);
         if ((drv) && (drv->cfg)) {
                 rc = drv->cfg(dmauartc, cfg);
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_cfg;
         }
 

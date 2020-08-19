@@ -49,7 +49,7 @@ struct xwsync_cdt {
  * @param cdt: (I) 条件量对象指针
  * @return 错误码
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwsync_cdt_grab(struct xwsync_cdt * cdt)
 {
         return xwsync_object_grab(&cdt->xwsyncobj);
@@ -60,7 +60,7 @@ xwer_t xwsync_cdt_grab(struct xwsync_cdt * cdt)
  * @param cdt: (I) 条件量对象指针
  * @return 错误码
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwsync_cdt_put(struct xwsync_cdt * cdt)
 {
         return xwsync_object_put(&cdt->xwsyncobj);

@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-void xwaop__xws64_t__rsb(__atomic xws64_t * a,
+void xwaop__xws64_t__rsb(__xwcc_atomic xws64_t * a,
                          xws64_t v,
                          xws64_t * nv, xws64_t * ov)
 {

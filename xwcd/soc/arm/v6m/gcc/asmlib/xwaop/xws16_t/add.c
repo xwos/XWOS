@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-void xwaop__xws16_t__add(__atomic xws16_t * a,
+void xwaop__xws16_t__add(__xwcc_atomic xws16_t * a,
                          xws16_t v,
                          xws16_t * nv, xws16_t * ov)
 {

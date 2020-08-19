@@ -114,7 +114,7 @@ xwer_t xwos_tt_add_locked(struct xwos_tt * xwtt, struct xwos_ttn * ttn,
 
 retry:
         /* the state of thread may be change in IRQ */
-        if (__unlikely((NULL == ttn->cb) || (xwtt != ttn->xwtt))) {
+        if (__xwcc_unlikely((NULL == ttn->cb) || (xwtt != ttn->xwtt))) {
                 rc = -EINTR;
         } else {
                 pos = &xwtt->rbtree.root;
@@ -258,7 +258,7 @@ xwer_t xwos_tt_remove_locked(struct xwos_tt * xwtt, struct xwos_ttn * ttn)
 {
         xwer_t rc;
 
-        if (__unlikely((NULL == ttn->cb) || (xwtt != ttn->xwtt))) {
+        if (__xwcc_unlikely((NULL == ttn->cb) || (xwtt != ttn->xwtt))) {
                 rc = -ESRCH;
         } else {
                 if (xwlib_rbtree_tst_node_unlinked(&ttn->rbn)) {
@@ -333,7 +333,7 @@ void xwos_tt_bh(struct xwos_tt * xwtt)
 __xwos_code
 struct xwos_scheduler * xwos_tt_get_scheduler(struct xwos_tt * xwtt)
 {
-        return container_of(xwtt, struct xwos_scheduler, tt);
+        return xwcc_baseof(xwtt, struct xwos_scheduler, tt);
 }
 
 /**
@@ -352,7 +352,7 @@ xwer_t xwos_syshwt_init(struct xwos_syshwt * hwt)
         xwlk_sqlk_init(&hwt->lock);
         /* port code of CPU must set the irqc & irqrsc */
         rc = soc_syshwt_init(hwt);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 XWOS_BUG_ON(NULL == hwt->irqrsc);
                 XWOS_BUG_ON(0 == hwt->irqs_num);
         }/* else {} */
@@ -483,5 +483,5 @@ void xwos_syshwt_task(struct xwos_syshwt * hwt)
 __xwos_code
 struct xwos_tt * xwos_syshwt_get_tt(struct xwos_syshwt * hwt)
 {
-        return container_of(hwt, struct xwos_tt, hwt);
+        return xwcc_baseof(hwt, struct xwos_tt, hwt);
 }

@@ -87,17 +87,17 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
         /* 初始化发送状态机 */
         xwscp->txi.cnt = XWSCP_ID_SYNC;
         rc = xwosal_mtx_init(&xwscp->txmtx, XWOSAL_SD_PRIORITY_RT_MIN);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR, "Init txmtx ... [rc:%d]\n", rc);
                 goto err_txmtx_init;
         }
         rc = xwosal_mtx_init(&xwscp->csmtx, XWOSAL_SD_PRIORITY_RT_MIN);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR, "Init csmtx ... [rc:%d]\n", rc);
                 goto err_csmtx_init;
         }
         rc = xwosal_cdt_init(&xwscp->cscdt);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR, "Init ACK condition ... [rc:%d]\n", rc);
                 goto err_cscdt_init;
         }
@@ -108,14 +108,14 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
         xwlib_bclst_init_head(&xwscp->rxq.head);
         xwosal_splk_init(&xwscp->rxq.lock);
         rc = xwosal_smr_init(&xwscp->slot.smr, XWSCP_FRMSLOT_NUM, XWSCP_FRMSLOT_NUM);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR, "Init slotsmr ... [rc:%d]\n", rc);
                 goto err_slotsmr_init;
         }
 
         /* 初始化帧槽 */
         rc = xwosal_smr_init(&xwscp->rxq.smr, 0, XWSCP_FRMSLOT_NUM);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR, "Init rxqsmr ... [rc:%d]\n", rc);
                 goto err_rxqsmr_init;
         }
@@ -181,19 +181,19 @@ xwer_t xwscp_connect_once(struct xwscp * xwscp, xwtm_t * xwtm, xwsq_t * cnt)
 
         ulk.osal.id = xwosal_mtx_get_id(&xwscp->csmtx);
         rc = xwosal_mtx_lock(ulk.osal.id);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_lock;
         }
         xwscp->txi.frm = NULL;
         rc = xwscp_tx_cfrm_sync(xwscp, xwtm);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_tx;
         }
         time = *xwtm > XWSCP_PERIOD ? XWSCP_PERIOD : *xwtm;
         rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&xwscp->cscdt),
                                   ulk, XWLK_TYPE_MTX, NULL,
                                   &time, &lockstate);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwosal_mtx_unlock(ulk.osal.id);
                 xwaop_add(xwu32_t, &xwscp->txi.cnt, 1, NULL, NULL);
         } else {
@@ -202,7 +202,7 @@ xwer_t xwscp_connect_once(struct xwscp * xwscp, xwtm_t * xwtm, xwsq_t * cnt)
                 }/* else {} */
                 if (-ETIMEDOUT == rc) {
                         *xwtm -= XWSCP_PERIOD;
-                        if (__likely(*xwtm > 0)) {
+                        if (__xwcc_likely(*xwtm > 0)) {
                                 *cnt = *cnt + 1;
                                 rc = -EAGAIN;
                         }/* else {} */
@@ -244,7 +244,7 @@ xwer_t xwscp_connect(struct xwscp * xwscp, xwtm_t * xwtm)
 
         txmtxid = xwosal_mtx_get_id(&xwscp->txmtx);
         rc = xwosal_mtx_timedlock(txmtxid, xwtm);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_txmtx_timedlock;
         }
         cnt = 0;
@@ -289,24 +289,24 @@ xwer_t xwscp_tx_once(struct xwscp * xwscp, const xwu8_t msg[], xwsz_t * size,
         xwer_t ack;
 
         rc = xwscp_fmt_msg(xwscp, &frm, msg, (xwu8_t)*size);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_fmt_msg;
         }
         ulk.osal.id = xwosal_mtx_get_id(&xwscp->csmtx);
         rc = xwosal_mtx_lock(ulk.osal.id);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_lock;
         }
         xwscp->txi.frm = &frm;
         rc = xwscp_hwifal_tx(xwscp, &frm, xwtm);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_iftx;
         }
         time = *xwtm > XWSCP_PERIOD ? XWSCP_PERIOD : *xwtm;
         rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&xwscp->cscdt),
                                   ulk, XWLK_TYPE_MTX, NULL,
                                   &time, &lockstate);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 ack = xwscp->txi.ack;
                 xwscp->txi.frm = NULL;
                 xwosal_mtx_unlock(ulk.osal.id);
@@ -336,7 +336,7 @@ xwer_t xwscp_tx_once(struct xwscp * xwscp, const xwu8_t msg[], xwsz_t * size,
                 }/* else {} */
                 if (-ETIMEDOUT == rc) {
                         *xwtm -= XWSCP_PERIOD;
-                        if (__likely(*xwtm > 0)) {
+                        if (__xwcc_likely(*xwtm > 0)) {
                                 *cnt = *cnt + 1;
                                 rc = -EAGAIN;
                         }/* else {} */
@@ -388,7 +388,7 @@ xwer_t xwscp_tx(struct xwscp * xwscp, const xwu8_t msg[], xwsz_t * size,
 
         txmtxid = xwosal_mtx_get_id(&xwscp->txmtx);
         rc = xwosal_mtx_timedlock(txmtxid, xwtm);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_txmtx_timedlock;
         }
         cnt = 0;
@@ -446,7 +446,7 @@ xwer_t xwscp_rx(struct xwscp * xwscp, xwu8_t buf[], xwsz_t * size, xwtm_t * xwtm
         XWSCP_VALIDATE((xwtm), "nullptr", -EFAULT);
 
         rc = xwscp_rxq_choose(xwscp, &pubfrm, xwtm);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_rxq_choose;
         }
         realsize = pubfrm->frm.head.frmlen - sizeof(struct xwscp_frmhead) -

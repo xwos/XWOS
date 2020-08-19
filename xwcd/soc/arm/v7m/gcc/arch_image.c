@@ -38,8 +38,8 @@ void arch_goto_image(xwstk_t * sp, void (*entry)(void));
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static __xwbsp_code __naked
-void arch_goto_image(__maybe_unused xwstk_t * sp, __maybe_unused void (*entry)(void))
+static __xwbsp_code __xwcc_naked
+void arch_goto_image(__xwcc_unused xwstk_t * sp, __xwcc_unused void (*entry)(void))
 {
         __asm__ volatile("      cpsid   i");
         __asm__ volatile("      mov     r2, #0");

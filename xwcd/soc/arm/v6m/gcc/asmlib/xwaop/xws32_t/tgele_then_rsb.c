@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-xwer_t xwaop__xws32_t__tgele_then_rsb(__atomic xws32_t * a,
+xwer_t xwaop__xws32_t__tgele_then_rsb(__xwcc_atomic xws32_t * a,
                                       xws32_t l, xws32_t r,
                                       xws32_t v,
                                       xws32_t * nv, xws32_t * ov)

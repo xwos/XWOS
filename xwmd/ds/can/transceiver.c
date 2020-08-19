@@ -134,12 +134,12 @@ xwer_t xwds_cantrcv_cvop_start(struct xwds_cantrcv * cantrcv)
         XWDS_VALIDATE(cantrcv->cfg, "nullptr", -EFAULT);
 
         rc = xwds_device_cvop_start(&cantrcv->bc.dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_start;
         }
         cantrcv->wkuprs = XWDS_CANTRCV_WKUPRS_NONE;
         rc = xwds_cantrcv_set_opmode(cantrcv, cantrcv->cfg->init_opmode);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_set_opmode;
         }
         return XWOK;
@@ -218,7 +218,7 @@ xwer_t xwds_cantrcv_set_opmode(struct xwds_cantrcv * cantrcv, xwsq_t opmode)
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_ops_set_opmode;
         }
         cantrcv->opmode = opmode;

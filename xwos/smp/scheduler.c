@@ -78,14 +78,14 @@ struct xwos_scheduler xwos_scheduler[CPUCFG_CPU_NUM];
 /**
  * @brief 每CPU的调度器的空闲线程栈
  */
-__xwos_data __aligned_l1cacheline
+__xwos_data __xwcc_aligned_l1cacheline
 xwu8_t xwos_scheduler_idled_stack[CPUCFG_CPU_NUM][XWSMPCFG_SD_IDLE_STACK_SIZE];
 
 #if defined(XWSMPCFG_SD_BH) && (1 == XWSMPCFG_SD_BH)
 /**
  * @brief 每CPU的调度器的中断底半部栈
  */
-__xwos_data __aligned_l1cacheline
+__xwos_data __xwcc_aligned_l1cacheline
 xwu8_t xwos_scheduler_bhd_stack[CPUCFG_CPU_NUM][XWSMPCFG_SD_BH_STACK_SIZE];
 #endif /* XWSMPCFG_SD_BH */
 
@@ -181,11 +181,11 @@ xwer_t xwos_scheduler_init_lc(struct xwos_pmdm * xwpmdm)
         xwlib_bclst_init_head(&xwsd->tcblist);
         xwsd->thrd_num = 0;
         rc = xwos_tt_init(&xwsd->tt);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_tt_init;
         }
         rc = xwos_rtrq_init(&xwsd->rq.rt);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_rtrq_init;
         }
         xwos_scheduler_init_idled(xwsd);
@@ -195,7 +195,7 @@ xwer_t xwos_scheduler_init_lc(struct xwos_pmdm * xwpmdm)
         xwlib_bclst_init_head(&xwsd->pm.frzlist);
         xwsd->pm.xwpmdm = xwpmdm;
         rc = soc_scheduler_init(xwsd);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_sd_init;
         }
         return XWOK;
@@ -226,7 +226,7 @@ xwer_t xwos_scheduler_start_lc(void)
         id = xwos_cpu_get_id();
         xwsd = &xwos_scheduler[id];
         rc = xwos_syshwt_start(&xwsd->tt.hwt);
-        if (__unlikely(XWOK == rc)) {
+        if (__xwcc_unlikely(XWOK == rc)) {
                 soc_scheduler_start_lc(xwsd);
         }/* else {} */
         return rc;
@@ -281,7 +281,7 @@ __xwos_code
 struct xwos_tcb * xwos_scheduler_get_ctcb(struct xwos_scheduler * xwsd)
 {
         struct xwos_tcb * ctcb;
-        ctcb = container_of(xwsd->cstk, struct xwos_tcb, stack);
+        ctcb = xwcc_baseof(xwsd->cstk, struct xwos_tcb, stack);
         return ctcb;
 }
 
@@ -300,7 +300,7 @@ struct xwos_tcb * xwos_scheduler_get_ctcb_lc(void)
         xwmb_smp_ddb();
         do {
                 xwsd = &xwos_scheduler[cpuid];
-                ctcb = container_of(xwsd->cstk, struct xwos_tcb, stack);
+                ctcb = xwcc_baseof(xwsd->cstk, struct xwos_tcb, stack);
                 cpuid = xwos_cpu_get_id();
                 xwmb_smp_ddb();
         } while (xwsd->id != cpuid);
@@ -325,7 +325,7 @@ struct xwos_tcb * xwos_scheduler_rtrq_choose(struct xwos_scheduler * xwsd)
         xwrtrq = &xwsd->rq.rt;
         xwlk_rawly_lock(&xwrtrq->lock);
         t = xwos_rtrq_choose_locked(xwrtrq);
-        if (__likely(NULL != t)) {
+        if (__xwcc_likely(NULL != t)) {
                 rc = xwos_rtrq_remove_locked(xwrtrq, t);
                 XWOS_BUG_ON(rc);
                 xwlk_rawly_lock(&t->stlock);
@@ -467,7 +467,7 @@ struct xwos_scheduler * xwos_scheduler_dsbh_lc(void)
                 xwaop_add(xwsq_t, &xwsd->dis_bh_cnt, 1, NULL, NULL);
                 cpuid = xwos_cpu_get_id();
                 xwmb_smp_ddb();
-                if (__unlikely(xwsd->id != cpuid)) {
+                if (__xwcc_unlikely(xwsd->id != cpuid)) {
                         xwaop_sub(xwsq_t, &xwsd->dis_bh_cnt, 1, NULL, NULL);
                         if ((!xwos_scheduler_tst_in_bh(xwsd)) &&
                             (0 != xwaop_load(xwsq_t, &xwsd->req_bh_cnt,
@@ -558,10 +558,10 @@ xwer_t xwos_scheduler_sw_bh(struct xwos_scheduler * xwsd)
 
         if (0 == xwaop_load(xwsq_t, &xwsd->dis_bh_cnt, xwmb_modr_relaxed)) {
                 xwlk_rawly_lock_cpuirqsv(&xwsd->cxlock, &cpuirq);
-                if (__unlikely(NULL != xwsd->pstk)) {
+                if (__xwcc_unlikely(NULL != xwsd->pstk)) {
                         xwlk_rawly_unlock_cpuirqrs(&xwsd->cxlock, cpuirq);
                         rc = -EINPROGRESS;
-                } else if (__unlikely(XWOS_SCHEDULER_BH_STK(xwsd) == xwsd->cstk)) {
+                } else if (__xwcc_unlikely(XWOS_SCHEDULER_BH_STK(xwsd) == xwsd->cstk)) {
                         xwlk_rawly_unlock_cpuirqrs(&xwsd->cxlock, cpuirq);
                         rc = -EALREADY;
                 } else {
@@ -628,7 +628,7 @@ struct xwos_scheduler * xwos_scheduler_dspmpt_lc(void)
                 xwaop_add(xwsq_t, &xwsd->dis_pmpt_cnt, 1, NULL, NULL);
                 cpuid = xwos_cpu_get_id();
                 xwmb_smp_ddb();
-                if (__unlikely(xwsd->id != cpuid)) {
+                if (__xwcc_unlikely(xwsd->id != cpuid)) {
                         xwaop_sub(xwsq_t, &xwsd->dis_pmpt_cnt, 1, NULL, NULL);
                         if (0 != xwaop_load(xwsq_t, &xwsd->req_chkpmpt_cnt,
                                             xwmb_modr_acquire)) {
@@ -764,7 +764,7 @@ void xwos_scheduler_chkpmpt(struct xwos_scheduler * xwsd)
                 cstk = xwsd->cstk;
 #endif /* !XWSMPCFG_SD_BH */
                 if (XWOS_SCHEDULER_IDLE_STK(xwsd) != cstk) {
-                        t = container_of(cstk, struct xwos_tcb, stack);
+                        t = xwcc_baseof(cstk, struct xwos_tcb, stack);
                         sched = xwos_scheduler_do_chkpmpt(xwsd, t);
                 } else {
                         sched = true;
@@ -912,10 +912,10 @@ xwer_t xwos_scheduler_req_swcx(struct xwos_scheduler * xwsd)
 
         xwlk_rawly_lock_cpuirqsv(&xwsd->cxlock, &cpuirq);
         xwsd->req_schedule_cnt++;
-        if (__unlikely(NULL != xwsd->pstk)) {
+        if (__xwcc_unlikely(NULL != xwsd->pstk)) {
                 xwlk_rawly_unlock_cpuirqrs(&xwsd->cxlock, cpuirq);
                 rc = -EINPROGRESS;
-        } else if (__unlikely(XWOS_SCHEDULER_BH_STK(xwsd) == xwsd->cstk)) {
+        } else if (__xwcc_unlikely(XWOS_SCHEDULER_BH_STK(xwsd) == xwsd->cstk)) {
                 xwlk_rawly_unlock_cpuirqrs(&xwsd->cxlock, cpuirq);
                 rc = -EBUSY;
         } else {
@@ -1000,7 +1000,7 @@ xwer_t xwos_scheduler_req_swcx(struct xwos_scheduler * xwsd)
 
         xwlk_rawly_lock_cpuirqsv(&xwsd->cxlock, &cpuirq);
         xwsd->req_schedule_cnt++;
-        if (__unlikely(NULL != xwsd->pstk)) {
+        if (__xwcc_unlikely(NULL != xwsd->pstk)) {
                 xwlk_rawly_unlock_cpuirqrs(&xwsd->cxlock, cpuirq);
                 rc = -EINPROGRESS;
         } else {

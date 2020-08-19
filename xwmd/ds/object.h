@@ -68,7 +68,7 @@ xwer_t xwds_obj_remove(struct xwds * ds, struct xwds_object * obj);
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 对象未被激活（引用计数小于1）
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwds_obj_grab(struct xwds_object * obj)
 {
         return xwos_object_grab(&obj->xwobj);
@@ -81,7 +81,7 @@ xwer_t xwds_obj_grab(struct xwds_object * obj)
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 对象未被激活（引用计数小于1）
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwds_obj_put(struct xwds_object * obj)
 {
         return xwos_object_put(&obj->xwobj);
@@ -92,7 +92,7 @@ xwer_t xwds_obj_put(struct xwds_object * obj)
  * @param obj: (I) 对象的指针
  * @return 引用计数
  */
-static __xw_inline
+static __xwcc_inline
 xwsq_t xwds_obj_get_refcnt(struct xwds_object * obj)
 {
         return xwos_object_get_refcnt(&obj->xwobj);

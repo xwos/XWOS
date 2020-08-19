@@ -40,7 +40,7 @@ struct xwsync_object {
 /******** ******** ******** ******** ******** ******** ******** ********
  ********       internal inline function implementations        ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static __xw_inline
+static __xwcc_inline
 void xwsync_object_activate(struct xwsync_object * xwsyncobj)
 {
         xwsyncobj->selector.evt = NULL;

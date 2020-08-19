@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-xwer_t xwaop__xwu32_t__t0mo_then_s1m(__atomic xwu32_t * a,
+xwer_t xwaop__xwu32_t__t0mo_then_s1m(__xwcc_atomic xwu32_t * a,
                                      xwu32_t m,
                                      xwu32_t * nv, xwu32_t * ov)
 {

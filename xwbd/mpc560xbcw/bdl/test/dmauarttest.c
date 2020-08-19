@@ -83,7 +83,7 @@ xwer_t bdl_iftx(const xwu8_t * str, xwsz_t size)
 
         time = XWTM_MAX;
         rc = xwds_dmauartc_tx(&mpc560xb_uart0_cb, str, size, &time);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmatx;
         }
         return XWOK;
@@ -136,8 +136,9 @@ xwer_t task_led(void * arg)
                                                 pinmask);
                                 time = 500*XWTM_MS;
                                 rc = xwosal_cthrd_sleep(&time);
-                                if (__unlikely(rc < 0))
+                                if (__xwcc_unlikely(rc < 0)) {
                                         break;
+                                }
                                 pinmask = BIT(SOC_GPIO_PIN_12);
                                 xwds_gpio_reset(&mpc560xb_soc_cb, LED_PORT,
                                                 pinmask);
@@ -146,8 +147,9 @@ xwer_t task_led(void * arg)
                                               pinmask);
                                 time = 500*XWTM_MS;
                                 rc = xwosal_cthrd_sleep(&time);
-                                if (__unlikely(rc < 0))
+                                if (__xwcc_unlikely(rc < 0)) {
                                         break;
+                                }
                         }
                         xwds_gpio_rls(&mpc560xb_soc_cb, LED_PORT, pinmask);
                 }

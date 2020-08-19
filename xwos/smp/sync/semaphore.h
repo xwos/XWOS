@@ -81,7 +81,7 @@ struct xwsync_smr {
  * @param smr: (I) 信号量对象指针
  * @return 错误码
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwsync_smr_grab(struct xwsync_smr * smr)
 {
         return xwsync_object_grab(&smr->xwsyncobj);
@@ -92,7 +92,7 @@ xwer_t xwsync_smr_grab(struct xwsync_smr * smr)
  * @param smr: (I) 信号量对象指针
  * @return 错误码
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwsync_smr_put(struct xwsync_smr * smr)
 {
         return xwsync_object_put(&smr->xwsyncobj);

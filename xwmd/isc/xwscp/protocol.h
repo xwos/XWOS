@@ -67,8 +67,8 @@
 
 #if defined(XWMDCFG_CHECK_PARAMETERS) && (1 == XWMDCFG_CHECK_PARAMETERS)
 #define XWSCP_VALIDATE(exp, errstr, ...)         \
-        if (__unlikely(!(exp))) {               \
-            return __VA_ARGS__;                 \
+        if (__xwcc_unlikely(!(exp))) {           \
+            return __VA_ARGS__;                  \
         }
 #else /* XWMDCFG_CHECK_PARAMETERS */
 #define XWSCP_VALIDATE(exp, errstr, ...)
@@ -94,7 +94,7 @@ enum xwscp_ack_em {
 /**
  * @brief XWSCP帧的信息头
  */
-struct __packed xwscp_frmhead {
+struct __xwcc_packed xwscp_frmhead {
         xwu8_t frmlen; /**< 帧的长度：信息头+消息帧+CRC32校验码的总长度 */
         xwu8_t mirror; /**< 帧的长度的镜像反转（xwbop_rbit8(frmlen)）：
                             作为frmlen的检验 */
@@ -110,7 +110,7 @@ struct __packed xwscp_frmhead {
 /**
  * @brief XWSCP的帧
  */
-struct __packed xwscp_frame {
+struct __xwcc_packed xwscp_frame {
         xwu8_t sof; /* 帧首定界符（SOF:Start-of-Frame Delimiter） */
         struct xwscp_frmhead head; /**< 信息头 */
         xwu8_t sdu[XWSCP_SDU_MAX_SIZE]; /**< 报文 */
@@ -121,7 +121,7 @@ struct __packed xwscp_frame {
 /**
  * @brief XWSCP帧槽
  */
-struct __aligned(XWMMCFG_ALIGNMENT) xwscp_frmslot {
+struct __xwcc_aligned(XWMMCFG_ALIGNMENT) xwscp_frmslot {
         struct xwlib_bclst_node node; /**< 链表节点 */
         struct xwscp_frame frm; /**< 帧 */
 };
@@ -132,7 +132,7 @@ struct __aligned(XWMMCFG_ALIGNMENT) xwscp_frmslot {
 struct xwscp {
         /* 基本信息 */
         const char * name; /**< 名字 */
-        __atomic xwsq_t hwifst; /**< 硬件接口抽象层状态 */
+        __xwcc_atomic xwsq_t hwifst; /**< 硬件接口抽象层状态 */
         const struct xwscp_hwifal_operations * hwifops; /**< 硬件接口抽象层操作函数 */
         void * hwifcb; /**< 物理层端口 */
 
@@ -141,14 +141,14 @@ struct xwscp {
         struct xwosal_mtx csmtx; /**< 保护发送和接收线程的共享数据的锁 */
         struct xwosal_cdt cscdt; /**< 同步发送和接收线程的条件量 */
         struct {
-                __atomic xwu32_t cnt; /**< 发送计数器 */
+                __xwcc_atomic xwu32_t cnt; /**< 发送计数器 */
                 struct xwscp_frame * frm; /**< 正在发送的帧 */
                 xwer_t ack; /**< 应答代码 */
         } txi; /**< 正在发送的帧信息 */
 
         /* 接收状态机 */
         struct {
-                __atomic xwu32_t cnt; /**< 接收计数器 */
+                __xwcc_atomic xwu32_t cnt; /**< 接收计数器 */
                 struct xwlib_bclst_head head; /**< 链表头 */
                 struct xwosal_splk lock; /**< 保护接收队列的自旋锁 */
                 struct xwosal_smr smr; /**< 接收队列的信号量 */

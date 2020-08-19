@@ -182,7 +182,7 @@ xwer_t xwscp_alloc_frmslot(struct xwscp * xwscp, struct xwscp_frmslot ** slotbuf
 
         smrid = xwosal_smr_get_id(&xwscp->slot.smr);
         rc = xwosal_smr_wait(smrid);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_slotsmr_wait;
         }
         xwosal_splk_lock(&xwscp->slot.lock);
@@ -451,7 +451,7 @@ xwer_t xwscp_rxq_choose(struct xwscp * xwscp, struct xwscp_frmslot ** slotbuf,
 
         smrid = xwosal_smr_get_id(&xwscp->rxq.smr);
         rc = xwosal_smr_timedwait(smrid, xwtm);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_rxqsmr_timedwait;
         }
         xwosal_splk_lock(&xwscp->rxq.lock);
@@ -576,7 +576,7 @@ xwer_t xwscp_rx_frm_sdu_ack(struct xwscp * xwscp, struct xwscp_frmslot * frmslot
         rmtrxsize = frmslot->frm.sdu[0];
         csmtxid = xwosal_mtx_get_id(&xwscp->csmtx);
         rc = xwosal_mtx_lock(csmtxid);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_lock;
         }
         frm = xwscp->txi.frm;
@@ -704,7 +704,7 @@ xwer_t xwscp_thrd(struct xwscp * xwscp)
                 if (xwosal_cthrd_shld_frz()) {
                         xwscplogf(DEBUG, "Start freezing ...\n");
                         rc = xwosal_cthrd_freeze();
-                        if (__unlikely(rc < 0)) {
+                        if (__xwcc_unlikely(rc < 0)) {
                                 xwscplogf(ERR, "Failed to freeze ... [rc:%d]\n", rc);
                                 xwosal_cthrd_yield();
                         }/* else {} */

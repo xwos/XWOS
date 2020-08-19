@@ -113,15 +113,15 @@ xwer_t mpc560xb_i2cm_check_desc(struct xwds_i2cm * i2cm)
         resources = i2cm->dev.resources;
         drvdata = i2cm->dev.data;
         cfg = i2cm->cfg;
-        if (__unlikely(is_err_or_null(resources))) {
+        if (__xwcc_unlikely(is_err_or_null(resources))) {
                 rc = -EINVAL;
-        } else if (__unlikely(is_err_or_null(drvdata))) {
+        } else if (__xwcc_unlikely(is_err_or_null(drvdata))) {
                 rc = -EINVAL;
-        } else if (__unlikely(is_err_or_null(cfg))) {
+        } else if (__xwcc_unlikely(is_err_or_null(cfg))) {
                 rc = -EINVAL;
         } else {
                 xwccfg = cfg->xwccfg;
-                if (__unlikely(is_err_or_null(xwccfg))) {
+                if (__xwcc_unlikely(is_err_or_null(xwccfg))) {
                         rc = -EINVAL;
                 } else {
                         rc = XWOK;
@@ -140,7 +140,7 @@ xwer_t mpc560xb_i2cm_drv_probe(struct xwds_device * dev)
 
         i2cm = xwds_static_cast(struct xwds_i2cm *, dev);
         rc = mpc560xb_i2cm_check_desc(i2cm);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 drvdata = dev->data;
 
                 xwosal_splk_init(&drvdata->lock);
@@ -185,7 +185,7 @@ xwer_t mpc560xb_i2cm_drv_start(struct xwds_device * dev)
                 irqrsc = &resources->irqrsc_array[i];
                 rc = xwos_irq_request(irqrsc->irqn, irqrsc->isr,
                                       XWOS_UNUSED_ARGUMENT, dev);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 irqrsc = &resources->irqrsc_array[j];
                                 xwos_irq_release(irqrsc->irqn);
@@ -198,7 +198,7 @@ xwer_t mpc560xb_i2cm_drv_start(struct xwds_device * dev)
         for (i = 0; i < (xwssz_t)resources->clkrsc_num; i++) {
                 clkrsc = &resources->clkrsc_array[i];
                 rc = xwds_clk_req(clkrsc->soc, clkrsc->clkid);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 clkrsc = &resources->clkrsc_array[j];
                                 xwds_clk_rls(clkrsc->soc, clkrsc->clkid);
@@ -211,7 +211,7 @@ xwer_t mpc560xb_i2cm_drv_start(struct xwds_device * dev)
         for (i = 0; i < (xwssz_t)resources->gpiorsc_num; i++) {
                 gpiorsc = &resources->gpiorsc_array[i];
                 rc = xwds_gpio_req(gpiorsc->soc, gpiorsc->port, gpiorsc->pinmask);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 gpiorsc = &resources->gpiorsc_array[j];
                                 xwds_gpio_rls(gpiorsc->soc, gpiorsc->port,
@@ -234,7 +234,7 @@ xwer_t mpc560xb_i2cm_drv_start(struct xwds_device * dev)
                 if (XWOK == rc) {
                         rc = xwos_irq_enable(irqrsc->irqn);
                 }
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 irqrsc = &resources->irqrsc_array[j];
                                 xwos_irq_disable(irqrsc->irqn);
@@ -286,7 +286,7 @@ xwer_t mpc560xb_i2cm_drv_stop(struct xwds_device * dev)
         for (j = (xwssz_t)resources->irqrsc_num - 1; j >=0; j--) {
                 irqrsc = &resources->irqrsc_array[j];
                 rc = xwos_irq_disable(irqrsc->irqn);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_irqc_disalbe;
                 }
         }
@@ -295,7 +295,7 @@ xwer_t mpc560xb_i2cm_drv_stop(struct xwds_device * dev)
         for (j = (xwssz_t)resources->gpiorsc_num - 1; j >= 0; j--) {
                 gpiorsc = &resources->gpiorsc_array[j];
                 rc = xwds_gpio_rls(gpiorsc->soc, gpiorsc->port, gpiorsc->pinmask);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_gpio_release;
                 }
         }
@@ -304,7 +304,7 @@ xwer_t mpc560xb_i2cm_drv_stop(struct xwds_device * dev)
         for (j = (xwssz_t)resources->clkrsc_num - 1; j >= 0; j--) {
                 clkrsc = &resources->clkrsc_array[j];
                 rc = xwds_clk_rls(clkrsc->soc, clkrsc->clkid);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_clk_release;
                 }
         }
@@ -313,7 +313,7 @@ xwer_t mpc560xb_i2cm_drv_stop(struct xwds_device * dev)
         for (j = (xwssz_t)resources->irqrsc_num - 1; j >=0; j--) {
                 irqrsc = &resources->irqrsc_array[j];
                 rc = xwos_irq_release(irqrsc->irqn);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_irq_release;
                 }
         }
@@ -345,7 +345,7 @@ xwer_t mpc560xb_i2cm_drv_suspend(struct xwds_device * dev)
         for (j = (xwssz_t)resources->gpiorsc_num - 1; j >= 0; j--) {
                 gpiorsc = &resources->gpiorsc_array[j];
                 rc = xwds_gpio_rls(gpiorsc->soc, gpiorsc->port, gpiorsc->pinmask);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_gpio_release;
                 }
         }
@@ -354,7 +354,7 @@ xwer_t mpc560xb_i2cm_drv_suspend(struct xwds_device * dev)
         for (j = (xwssz_t)resources->clkrsc_num - 1; j >= 0; j--) {
                 clkrsc = &resources->clkrsc_array[j];
                 rc = xwds_clk_rls(clkrsc->soc, clkrsc->clkid);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_clk_release;
                 }
         }
@@ -382,7 +382,7 @@ xwer_t mpc560xb_i2cm_drv_resume(struct xwds_device * dev)
         for (i = 0; i < (xwssz_t)resources->clkrsc_num; i++) {
                 clkrsc = &resources->clkrsc_array[i];
                 rc = xwds_clk_req(clkrsc->soc, clkrsc->clkid);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 clkrsc = &resources->clkrsc_array[j];
                                 xwds_clk_rls(clkrsc->soc, clkrsc->clkid);
@@ -395,7 +395,7 @@ xwer_t mpc560xb_i2cm_drv_resume(struct xwds_device * dev)
         for (i = 0; i < (xwssz_t)resources->gpiorsc_num; i++) {
                 gpiorsc = &resources->gpiorsc_array[i];
                 rc = xwds_gpio_req(gpiorsc->soc, gpiorsc->port, gpiorsc->pinmask);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 gpiorsc = &resources->gpiorsc_array[j];
                                 xwds_gpio_rls(gpiorsc->soc, gpiorsc->port,
@@ -447,7 +447,7 @@ xwer_t mpc560xb_i2cm_drv_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg
         xwreg_t cpuirq;
         union xwlk_ulock ulk;
         xwsq_t lkstate;
-        __maybe_unused xwu8_t ibsr;
+        __xwcc_unused xwu8_t ibsr;
         xwer_t rc;
 
         drvdata = i2cm->dev.data;
@@ -535,7 +535,7 @@ void mpc560xb_i2cm_rxfsm_7bitaddr(struct xwds_i2cm * i2cm)
         struct mpc560xb_i2cm_drvdata * drvdata;
         struct xwds_i2c_msg * msg;
         xwsz_t rest;
-        __maybe_unused xwu8_t ibdr;
+        __xwcc_unused xwu8_t ibdr;
 
         drvdata = i2cm->dev.data;
         msg = drvdata->xmsg.ptr;

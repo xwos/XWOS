@@ -27,8 +27,8 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwbsp_code __naked
-xwu16_t arch_xwbop_re16(__maybe_unused xwu16_t x)
+__xwbsp_code __xwcc_naked
+xwu16_t arch_xwbop_re16(__xwcc_unused xwu16_t x)
 {
         __asm__ volatile("      rev16   r0, r0");
         __asm__ volatile("      bx      lr");

@@ -108,7 +108,7 @@ xwer_t xwmm_mempool_page_allocator_init(struct xwmm_mempool_page_allocator * pa,
         XWOS_VALIDATE((odrbtree), "nullptr", -EFAULT);
         XWOS_VALIDATE((pgarray), "nullptr", -EFAULT);
 
-        if (__unlikely(size < pgsize)) {
+        if (__xwcc_unlikely(size < pgsize)) {
                 rc = -E2SMALL;
                 goto err_mem2small;
         }
@@ -202,7 +202,7 @@ xwer_t xwmm_mempool_page_allocator_create(struct xwmm_mempool_page_allocator ** 
 
         XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
 
-        if (__unlikely(size < pgsize)) {
+        if (__xwcc_unlikely(size < pgsize)) {
                 rc = -E2SMALL;
                 goto err_mem2small;
         }
@@ -217,12 +217,13 @@ xwer_t xwmm_mempool_page_allocator_create(struct xwmm_mempool_page_allocator ** 
                 goto err_aligned;
         }
 
-        odrbtree_size = sizeof(struct xwmm_mempool_page_odrbtree) * (xwsz_t)(order + 1);
+        odrbtree_size = sizeof(struct xwmm_mempool_page_odrbtree) *
+                        (xwsz_t)(order + 1);
         array_size = (sizeof(struct xwmm_mempool_page) << order);
         rc = xwmm_kma_alloc(sizeof(struct xwmm_mempool_page_allocator) +
                             odrbtree_size + array_size,
                             XWMM_ALIGNMENT, &mem);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_alloc;
         }
         pa = mem;
@@ -232,7 +233,7 @@ xwer_t xwmm_mempool_page_allocator_create(struct xwmm_mempool_page_allocator ** 
         rc = xwmm_mempool_page_allocator_init(pa, name,
                                               origin, size, pgsize,
                                               odrbtree, pgarray);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_pa_init;
         }
         *ptrbuf = pa;

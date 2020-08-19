@@ -62,7 +62,7 @@ xwer_t stm32cube_xwds_ll_start(void)
         xwds_init(&stm32cube_ds);
 
         rc = stm32cube_xwds_soc_start();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_start;
         }
 
@@ -89,7 +89,7 @@ xwer_t stm32cube_xwds_ll_stop(void)
         }
 
         rc = stm32cube_xwds_soc_stop();
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_stop;
         }
         return XWOK;
@@ -111,12 +111,12 @@ xwer_t stm32cube_xwds_soc_start(void)
                                xwds_static_cast(struct xwds_device *,
                                                 &stm32cube_soc_cb),
                                NULL);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_probe;
         }
         rc = xwds_device_start(xwds_static_cast(struct xwds_device *,
                                                 &stm32cube_soc_cb));
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_start;
         }
 
@@ -149,12 +149,12 @@ xwer_t stm32cube_xwds_uart_start(void)
                                xwds_static_cast(struct xwds_device *,
                                                 &stm32cube_usart1_cb),
                                NULL);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_probe;
         }
         rc = xwds_device_start(xwds_static_cast(struct xwds_device *,
                                                 &stm32cube_usart1_cb));
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_start;
         }
 

@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-xwer_t xwaop__xws8_t__tlt_then_sub(__atomic xws8_t * a,
+xwer_t xwaop__xws8_t__tlt_then_sub(__xwcc_atomic xws8_t * a,
                                    xws8_t t,
                                    xws8_t v,
                                    xws8_t * nv, xws8_t * ov)

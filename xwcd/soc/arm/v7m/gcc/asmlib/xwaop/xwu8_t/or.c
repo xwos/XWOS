@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-void xwaop__xwu8_t__or(__atomic xwu8_t * a,
+void xwaop__xwu8_t__or(__xwcc_atomic xwu8_t * a,
                        xwu8_t v,
                        xwu8_t * nv, xwu8_t * ov)
 {

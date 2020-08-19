@@ -94,7 +94,7 @@ struct xwos_ttn {
                                           组成双循环链表，此为链表节点 */
         struct xwlib_rbtree_node rbn; /**< 红黑树节点 */
         xwtm_t wkup_xwtm; /**< 唤醒时间 */
-        __atomic xwsq_t wkuprs; /**< 唤醒原因 */
+        __xwcc_atomic xwsq_t wkuprs; /**< 唤醒原因 */
         xwos_tt_cb_f cb; /**< 回调函数：NULL表示节点不在时间树上 */
         struct xwos_tt * xwtt; /**< 时间树 */
         union {
@@ -166,7 +166,7 @@ struct xwos_tt * xwos_syshwt_get_tt(struct xwos_syshwt * hwt);
  * @param ttn: (I) 时间树节点的指针
  * @return 时间树节点所属的对象的地址
  */
-static __xw_inline
+static __xwcc_inline
 void * xwos_ttn_get_entry(struct xwos_ttn * ttn)
 {
         return (void *)(ttn->entry.addr & ~XWOS_TTN_TYPE_MASK);
@@ -177,7 +177,7 @@ void * xwos_ttn_get_entry(struct xwos_ttn * ttn)
  * @param ttn: (I) 时间树节点的指针
  * @return 类型
  */
-static __xw_inline
+static __xwcc_inline
 xwptr_t xwos_ttn_get_type(struct xwos_ttn * ttn)
 {
         return ttn->entry.type & XWOS_TTN_TYPE_MASK;
@@ -188,7 +188,7 @@ xwptr_t xwos_ttn_get_type(struct xwos_ttn * ttn)
  * @param ttn: (I) 时间树节点的指针
  * @return 错误码
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwos_ttn_grab(struct xwos_ttn * ttn)
 {
         return xwos_object_grab(xwos_static_cast(struct xwos_object *,
@@ -200,7 +200,7 @@ xwer_t xwos_ttn_grab(struct xwos_ttn * ttn)
  * @param ttn: (I) 时间树节点的指针
  * @return 错误码
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwos_ttn_put(struct xwos_ttn * ttn)
 {
         return xwos_object_put(xwos_static_cast(struct xwos_object *,

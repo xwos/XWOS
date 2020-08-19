@@ -96,7 +96,7 @@
 #endif
 
 #ifndef __xwos_inline_api
-  #define __xwos_inline_api     __xw_inline
+  #define __xwos_inline_api     __xwcc_inline
 #endif
 
 #ifndef __xwos_rodata
@@ -112,7 +112,7 @@
 #endif
 
 #ifndef __xwlib_inline
-  #define __xwlib_inline        __xw_inline
+  #define __xwlib_inline        __xwcc_inline
 #endif
 
 #ifndef __xwlib_data
@@ -152,7 +152,7 @@
 #endif
 
 #ifndef __xwbsp_inline
-  #define __xwbsp_inline        __xw_inline
+  #define __xwbsp_inline        __xwcc_inline
 #endif
 
 #ifndef __xwbsp_data
@@ -172,7 +172,7 @@
 #endif
 
 #ifndef __xwmd_inline
-  #define __xwmd_inline         __xw_inline
+  #define __xwmd_inline         __xwcc_inline
 #endif
 
 #ifndef __xwmd_inline_api
@@ -382,24 +382,24 @@
 #define __show_macro(m)                 #m ":" stringify(m)
 
 /******** ******** struct & member ******** ********/
-#ifndef offsetof
+#ifndef xwcc_offsetof
 /**
  * @brief 计算某个成员在结构体中偏移量
  * @param type: (I) 结构体类型
  * @param member: (I) 成员在结构体中符号名
  */
-  #define offsetof(type, member)  ((xwptr_t)&(((type *)0)->member))
+  #define xwcc_offsetof(type, member)  ((xwptr_t)&(((type *)0)->member))
 #endif
 
-#ifndef container_of
+#ifndef xwcc_baseof
 /**
  * @brief 从结构体的某个成员的地址计算出结构体的首地址
  * @param ptr: (I) 结构体某个成员的地址
  * @param type: (I) 结构体类型
  * @param member: (I) 成员在结构体中符号名
  */
-  #define container_of(ptr, type, member) \
-          ((type *)(((xwptr_t)(ptr)) - offsetof(type, member)))
+  #define xwcc_baseof(ptr, type, member) \
+          ((type *)(((xwptr_t)(ptr)) - xwcc_offsetof(type, member)))
 #endif
 
 #endif /* xwos/compiler.h */

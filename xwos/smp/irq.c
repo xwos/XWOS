@@ -134,7 +134,7 @@ xwer_t xwos_irqc_register(struct xwos_irqc * irqc, xwid_t cpuid, xwobj_gc_f gcfu
         XWOS_VALIDATE((cpuid < CPUCFG_CPU_NUM), "out-of-range", -ERANGE);
 
         rc = xwos_object_activate(&irqc->xwobj, gcfunc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_get_irqc;
         }
 
@@ -147,7 +147,7 @@ xwer_t xwos_irqc_register(struct xwos_irqc * irqc, xwid_t cpuid, xwobj_gc_f gcfu
         drv = irqc->drv;
         if ((drv) && (drv->probe)) {
                 rc = drv->probe(irqc);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_drv_probe;
                 }
         }
@@ -188,7 +188,7 @@ xwer_t xwos_irqc_deregister(struct xwos_irqc * irqc)
         drv = irqc->drv;
         if ((drv) && (drv->remove)) {
                 rc = drv->remove(irqc);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_drv_remove;
                 }
         }
@@ -268,7 +268,7 @@ xwer_t xwos_irq_request(xwirq_t irqn, xwisr_f isr, xwsq_t flag, void * data)
 
         irqc = xwos_irq_get_irqc(irqn);
         rc = xwos_irqc_grab(irqc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
         } else {
                 drv = irqc->drv;
@@ -277,7 +277,7 @@ xwer_t xwos_irq_request(xwirq_t irqn, xwisr_f isr, xwsq_t flag, void * data)
                 } else {
                         rc = -ENOSYS;
                 }
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         xwos_irqc_put(irqc);
                 }
         }
@@ -300,7 +300,7 @@ xwer_t xwos_irq_release(xwirq_t irqn)
         } else {
                 rc = -ENOSYS;
         }
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_irqc_put(irqc);
         }
         return rc;

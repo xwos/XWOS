@@ -27,8 +27,8 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwbsp_code __naked
-void arch_xwbop_c0m64(__maybe_unused xwu64_t * a, __maybe_unused xwu64_t mask)
+__xwbsp_code __xwcc_naked
+void arch_xwbop_c0m64(__xwcc_unused xwu64_t * a, __xwcc_unused xwu64_t mask)
 {
         __asm__ volatile("      ldr     r1, [r0, #0]");
         __asm__ volatile("      bic     r2, r1, r2"); /* r2 is low 32-bit of mask */

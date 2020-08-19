@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-xws16_t xwaop__xws16_t__load(__atomic xws16_t * a,
+xws16_t xwaop__xws16_t__load(__xwcc_atomic xws16_t * a,
                              const enum xwmb_memory_order_em mo)
 {
         xws16_t v;

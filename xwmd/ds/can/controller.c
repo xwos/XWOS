@@ -191,7 +191,7 @@ xwer_t xwds_canc_write(struct xwds_canc * canc, xwid_t txobjid,
         XWDS_VALIDATE(msg, "nullptr", -EFAULT);
 
         rc = xwds_canc_grab(canc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_canc_grab;
         }
 
@@ -201,7 +201,7 @@ xwer_t xwds_canc_write(struct xwds_canc * canc, xwid_t txobjid,
         }
 
         rc = xwds_canc_request(canc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_canc_request;
         }
 
@@ -223,7 +223,7 @@ xwer_t xwds_canc_write(struct xwds_canc * canc, xwid_t txobjid,
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_write;
         }
 
@@ -252,11 +252,11 @@ xwer_t xwds_canc_set_mode(struct xwds_canc * canc, xwsq_t mode)
         XWDS_VALIDATE((mode < XWDS_CANC_MODE_NUM), "out-of-range", -ERANGE);
 
         rc = xwds_canc_grab(canc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_canc_grab;
         }
         rc = xwds_canc_request(canc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_canc_request;
         }
 
@@ -270,7 +270,7 @@ xwer_t xwds_canc_set_mode(struct xwds_canc * canc, xwsq_t mode)
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_set_mode;
         }
         canc->mode = mode;
@@ -300,11 +300,11 @@ xwer_t xwds_canc_set_bd(struct xwds_canc * canc, xwid_t bdcfgid)
         XWDS_VALIDATE(canc, "nullptr", -EFAULT);
 
         rc = xwds_canc_grab(canc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_canc_grab;
         }
         rc = xwds_canc_request(canc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_canc_request;
         }
 
@@ -320,7 +320,7 @@ xwer_t xwds_canc_set_bd(struct xwds_canc * canc, xwid_t bdcfgid)
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_set_bd;
         }
 
@@ -346,11 +346,11 @@ xwer_t xwds_canc_enable_irqs(struct xwds_canc * canc)
         XWDS_VALIDATE(canc, "nullptr", -EFAULT);
 
         rc = xwds_canc_grab(canc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_canc_grab;
         }
         rc = xwds_canc_request(canc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_canc_request;
         }
 
@@ -360,7 +360,7 @@ xwer_t xwds_canc_enable_irqs(struct xwds_canc * canc)
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_canc_drv_enable_irqs;
         }
 
@@ -388,7 +388,7 @@ xwer_t xwds_canc_disable_irqs(struct xwds_canc * canc)
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_canc_drv_disable_irqs;
         }
 
@@ -726,7 +726,7 @@ xwer_t xwds_canc_drvcb_rxq_acquire(struct xwds_canc_rxqueue * rxq,
         XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwosal_smr_timedwait(xwosal_smr_get_id(&rxq->smr), xwtm);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_smr_timedwait;
         }
         xwosal_splk_lock_cpuirqsv(&rxq->lock, &cpuirq);

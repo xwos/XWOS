@@ -99,12 +99,12 @@ xwer_t xwds_spip_cvop_probe(struct xwds_spip * spip)
         } else {
                 rc = -EHOSTUNREACH;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_spim_grab;
         }
 
         rc = xwds_device_cvop_probe(&spip->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_probe;
         }
         return XWOK;
@@ -128,7 +128,7 @@ xwer_t xwds_spip_cvop_remove(struct xwds_spip * spip)
         XWDS_VALIDATE(spip->bus, "nullptr", -EHOSTUNREACH);
 
         rc = xwds_device_cvop_remove(&spip->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_remove;
         }
 
@@ -154,12 +154,12 @@ xwer_t xwds_spip_cvop_start(struct xwds_spip * spip)
         } else {
                 rc = -EHOSTUNREACH;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_spim_request;
         }
 
         rc = xwds_device_cvop_start(&spip->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_start;
         }
         return XWOK;
@@ -183,7 +183,7 @@ xwer_t xwds_spip_cvop_stop(struct xwds_spip * spip)
         XWDS_VALIDATE(spip->bus, "nullptr", -EHOSTUNREACH);
 
         rc = xwds_device_cvop_stop(&spip->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_stop;
         }
 
@@ -209,7 +209,7 @@ xwer_t xwds_spip_cvop_suspend(struct xwds_spip * spip)
         XWDS_VALIDATE(spip->bus, "nullptr", -EHOSTUNREACH);
 
         rc = xwds_device_cvop_suspend(&spip->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_suspend;
         }
 
@@ -235,12 +235,12 @@ xwer_t xwds_spip_cvop_resume(struct xwds_spip * spip)
         } else {
                 rc = -EHOSTUNREACH;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_spim_request;
         }
 
         rc = xwds_device_cvop_resume(&spip->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_resume;
         }
         return XWOK;
@@ -263,11 +263,11 @@ xwer_t xwds_spip_ioctl(struct xwds_spip * spip, xwsq_t cmd, ...)
         XWDS_VALIDATE(spip, "nullptr", -EFAULT);
 
         rc = xwds_spip_grab(spip);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_spip_grab;
         }
         rc = xwds_spip_request(spip);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_spip_request;
         }
 
@@ -279,7 +279,7 @@ xwer_t xwds_spip_ioctl(struct xwds_spip * spip, xwsq_t cmd, ...)
                 rc = -ENOSYS;
         }
         va_end(args);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_ioctl;
         }
 

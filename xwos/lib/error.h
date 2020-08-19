@@ -34,8 +34,8 @@
  * @param err: (I) 错误码
  * @return 值为错误码的指针
  */
-static __xw_inline
-void * __must_check err_ptr(xwer_t err)
+static __xwcc_inline
+void * __xwcc_must_check err_ptr(xwer_t err)
 {
         return (void *)err;
 }
@@ -45,8 +45,8 @@ void * __must_check err_ptr(xwer_t err)
  * @param ptr: (I) 指针
  * @return 错误码
  */
-static __xw_inline
-xwer_t __must_check ptr_err(__force const void * ptr)
+static __xwcc_inline
+xwer_t __xwcc_must_check ptr_err(const void * ptr)
 {
         return (xwer_t)ptr;
 }
@@ -57,8 +57,8 @@ xwer_t __must_check ptr_err(__force const void * ptr)
  * @retval true: 是
  * @retval false: 否
  */
-static __xw_inline
-bool __must_check is_err(__force const void * ptr)
+static __xwcc_inline
+bool __xwcc_must_check is_err(const void * ptr)
 {
         return IS_ERR_VALUE(ptr)? true : false;
 }
@@ -69,8 +69,8 @@ bool __must_check is_err(__force const void * ptr)
  * @retval true: 是
  * @retval false: 否
  */
-static __xw_inline
-bool __must_check is_err_or_null(__force const void * ptr)
+static __xwcc_inline
+bool __xwcc_must_check is_err_or_null(const void * ptr)
 {
         return (!ptr || IS_ERR_VALUE(ptr))? true : false;
 }

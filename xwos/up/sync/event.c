@@ -171,7 +171,7 @@ xwer_t xwsync_evt_create(struct xwsync_evt ** ptrbuf, xwbmp_t initval[], xwsq_t 
 
         *ptrbuf = NULL;
         evt = xwsync_evt_alloc();
-        if (__unlikely(is_err(evt))) {
+        if (__xwcc_unlikely(is_err(evt))) {
                 rc = ptr_err(evt);
         } else {
                 xwsync_evt_activate(evt, initval, attr);

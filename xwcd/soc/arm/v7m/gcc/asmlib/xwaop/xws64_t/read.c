@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-void xwaop__xws64_t__read(__atomic xws64_t * a,
+void xwaop__xws64_t__read(__xwcc_atomic xws64_t * a,
                           xws64_t * ov)
 {
         xws64_t o;

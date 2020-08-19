@@ -108,10 +108,10 @@ xwer_t mpc560xb_misc_check_desc(struct xwds_misc * misc)
 
         resources = misc->dev.resources;
         xwccfg = misc->misccfg;
-        if (__unlikely(is_err_or_null(resources))) {
+        if (__xwcc_unlikely(is_err_or_null(resources))) {
                 rc = -EINVAL;
         } else {
-                if(__unlikely(is_err_or_null(xwccfg))) {
+                if(__xwcc_unlikely(is_err_or_null(xwccfg))) {
                         rc = -EINVAL;
                 } else {
                         rc = XWOK;
@@ -131,7 +131,7 @@ xwer_t mpc560xb_misc_drv_probe(struct xwds_device * dev)
 
         misc = xwds_static_cast(struct xwds_misc *, dev);
         rc = mpc560xb_misc_check_desc(misc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_chkdesc;
         }
 
@@ -179,7 +179,7 @@ xwer_t mpc560xb_misc_drv_start(struct xwds_device * dev)
                 irqrsc = &resources->irqrsc_array[i];
                 rc = xwos_irq_request(irqrsc->irqn, irqrsc->isr,
                                       XWOS_UNUSED_ARGUMENT, dev);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 irqrsc = &resources->irqrsc_array[j];
                                 xwos_irq_release(irqrsc->irqn);
@@ -192,7 +192,7 @@ xwer_t mpc560xb_misc_drv_start(struct xwds_device * dev)
         for (i = 0; i < (xwssz_t)resources->clkrsc_num; i++) {
                 clkrsc = &resources->clkrsc_array[i];
                 rc = xwds_clk_req(clkrsc->soc, clkrsc->clkid);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 clkrsc = &resources->clkrsc_array[j];
                                 xwds_clk_rls(clkrsc->soc, clkrsc->clkid);
@@ -205,7 +205,7 @@ xwer_t mpc560xb_misc_drv_start(struct xwds_device * dev)
         for (i = 0; i < (xwssz_t)resources->gpiorsc_num; i++) {
                 gpiorsc = &resources->gpiorsc_array[i];
                 rc = xwds_gpio_req(gpiorsc->soc, gpiorsc->port, gpiorsc->pinmask);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 gpiorsc = &resources->gpiorsc_array[j];
                                 xwds_gpio_rls(gpiorsc->soc, gpiorsc->port,
@@ -222,7 +222,7 @@ xwer_t mpc560xb_misc_drv_start(struct xwds_device * dev)
                 rc = xwos_irq_cfg(irqrsc->irqn, irqrsc->cfg);
                 if (XWOK == rc)
                         rc = xwos_irq_enable(irqrsc->irqn);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 irqrsc = &resources->irqrsc_array[j];
                                 xwos_irq_disable(irqrsc->irqn);
@@ -393,13 +393,13 @@ xwer_t mpc560xb_adc_convert(struct xwds_misc * misc, xwbmp_t * chmask, xws16_t *
         xwreg_t flag;
         xwssq_t ch;
         xwer_t rc;
-        __maybe_unused xwu32_t cdr;
+        __xwcc_unused xwu32_t cdr;
 
         drvdata = misc->dev.data;
         ulk.osal.splk = &drvdata->adc.lock;
         mtxid = xwosal_mtx_get_id(&drvdata->adc.mtx);
         rc = xwosal_mtx_timedlock(mtxid, xwtm);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtxlock;
         }
 

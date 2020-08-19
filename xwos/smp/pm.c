@@ -79,7 +79,7 @@ xwer_t xwos_pmdm_suspend(struct xwos_pmdm * pmdm)
         if ((XWOK == rc) && (XWOS_PMDM_STAGE_FREEZING == nv)) {
                 for (cpuid = 0; cpuid < pmdm->xwsd_num; cpuid++) {
                         rc = xwos_scheduler_suspend(cpuid);
-                        if (__unlikely(rc < 0)) {
+                        if (__xwcc_unlikely(rc < 0)) {
                                 break;
                         }
                 }
@@ -125,7 +125,7 @@ xwer_t xwos_pmdm_resume(struct xwos_pmdm * pmdm)
                 if ((XWOK == rc) && (XWOS_PMDM_STAGE_RUNNING == nv)) {
                         for (cpuid = 0; cpuid < pmdm->xwsd_num; cpuid++) {
                                 rc = xwos_scheduler_resume(cpuid);
-                                if (__unlikely(rc < 0)) {
+                                if (__xwcc_unlikely(rc < 0)) {
                                         break;
                                 }/* else {} */
                         }

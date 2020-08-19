@@ -45,9 +45,9 @@
  * @brief Real entry to start supervisor call
  */
 __xwbsp_isr
-void arch_privilege_start_entry(__maybe_unused xwreg_t arg1,
-                                __maybe_unused xwreg_t arg2,
-                                __maybe_unused xwreg_t * srr0,
+void arch_privilege_start_entry(__xwcc_unused xwreg_t arg1,
+                                __xwcc_unused xwreg_t arg2,
+                                __xwcc_unused xwreg_t * srr0,
                                 xwreg_t * srr1)
 {
         union msr_reg msr;
@@ -61,9 +61,9 @@ void arch_privilege_start_entry(__maybe_unused xwreg_t arg1,
  * @brief Real entry to end supervisor call
  */
 __xwbsp_isr
-void arch_privilege_end_entry(__maybe_unused xwreg_t arg1,
-                              __maybe_unused xwreg_t arg2,
-                              __maybe_unused xwreg_t * srr0,
+void arch_privilege_end_entry(__xwcc_unused xwreg_t arg1,
+                              __xwcc_unused xwreg_t arg2,
+                              __xwcc_unused xwreg_t * srr0,
                               xwreg_t * srr1)
 {
         union msr_reg msr;

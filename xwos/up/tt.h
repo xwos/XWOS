@@ -165,7 +165,7 @@ struct xwos_tt *xwos_syshwt_get_tt(struct xwos_syshwt * hwt);
  * @param ttn: (I) 时间树节点的指针
  * @return 时间树节点所属的对象的地址
  */
-static __xw_inline
+static __xwcc_inline
 void *xwos_ttn_get_entry(struct xwos_ttn * ttn)
 {
         return (void *)(ttn->entry.addr & ~XWOS_TTN_TYPE_MASK);
@@ -176,7 +176,7 @@ void *xwos_ttn_get_entry(struct xwos_ttn * ttn)
  * @param ttn: (I) 时间树节点的指针
  * @return 类型
  */
-static __xw_inline
+static __xwcc_inline
 xwptr_t xwos_ttn_get_type(struct xwos_ttn * ttn)
 {
         return ttn->entry.type & XWOS_TTN_TYPE_MASK;

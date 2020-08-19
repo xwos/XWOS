@@ -38,7 +38,7 @@ struct arch_image_header {
 struct arch_image_tail {
         xwu64_t flag1;
         xwu64_t flag2;
-        __aligned(16) xwu8_t aligned_bytes[16];
+        __xwcc_aligned(16) xwu8_t aligned_bytes[16];
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********

@@ -88,8 +88,8 @@
 
 #if defined(XWMDCFG_CHECK_PARAMETERS) && (1 == XWMDCFG_CHECK_PARAMETERS)
 #define XWPCP_VALIDATE(exp, errstr, ...)         \
-        if (__unlikely(!(exp))) {               \
-            return __VA_ARGS__;                 \
+        if (__xwcc_unlikely(!(exp))) {           \
+            return __VA_ARGS__;                  \
         }
 #else /* XWMDCFG_CHECK_PARAMETERS */
 #define XWPCP_VALIDATE(exp, errstr, ...)
@@ -111,7 +111,7 @@ enum xwpcp_frame_ack_em {
 /**
  * @brief XWPCP帧的信息头
  */
-struct __packed xwpcp_frmhead {
+struct __xwcc_packed xwpcp_frmhead {
         xwu8_t frmlen; /**< 帧的长度：信息头+消息帧+CRC32校验码的总长度 */
         xwu8_t mirror; /**< 帧的长度的镜像反转（xwbop_rbit8(frmlen)）：
                             作为frmlen的检验 */
@@ -125,7 +125,7 @@ struct __packed xwpcp_frmhead {
 /**
  * @brief XWPCP的帧
  */
-struct __packed xwpcp_frame {
+struct __xwcc_packed xwpcp_frame {
         xwu8_t sof; /* 帧首定界符（SOF:Start-of-Frame Delimiter） */
         struct xwpcp_frmhead head; /**< 信息头 */
         xwu8_t sdu[0]; /**< 报文 */
@@ -159,8 +159,8 @@ enum xwpcp_refcnt_em {
 struct xwpcp {
         /* 基本信息 */
         const char * name; /**< 名字 */
-        __atomic xwsq_t refcnt; /**< 引用计数 */
-        __atomic xwsq_t hwifst; /**< 硬件层状态 */
+        __xwcc_atomic xwsq_t refcnt; /**< 引用计数 */
+        __xwcc_atomic xwsq_t hwifst; /**< 硬件层状态 */
         const struct xwpcp_hwifal_operations * hwifops; /**< 硬件接口抽象层操作函数 */
         void * hwifcb; /**< 接口硬件 */
 
@@ -171,7 +171,7 @@ struct xwpcp {
 
         /* 发送状态机 */
         struct {
-                __atomic xwu32_t cnt; /**< 发送计数器 */
+                __xwcc_atomic xwu32_t cnt; /**< 发送计数器 */
                 struct xwlib_bclst_head q[XWPCP_PRIORITY_NUM]; /**< 队列 */
                 xwbmpop_declare(nebmp, XWPCP_PRIORITY_NUM); /**< 非空的索引位图 */
                 struct xwosal_splk lock; /**< 保护发送队列的自旋锁 */
@@ -191,7 +191,7 @@ struct xwpcp {
 
         /* 接收状态机 */
         struct {
-                __atomic xwu32_t cnt; /**< 接收计数器 */
+                __xwcc_atomic xwu32_t cnt; /**< 接收计数器 */
                 struct xwlib_bclst_head q[XWPCP_PORT_NUM]; /**< 每个端口的接收队列 */
                 struct xwosal_splk lock[XWPCP_PORT_NUM]; /**< 保护每个接收队列的锁 */
                 struct xwosal_smr smr[XWPCP_PORT_NUM]; /**< 每个接收队列的信号量 */

@@ -27,8 +27,8 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwbsp_code __naked
-xwu32_t arch_xwbop_re32(__maybe_unused xwu32_t x)
+__xwbsp_code __xwcc_naked
+xwu32_t arch_xwbop_re32(__xwcc_unused xwu32_t x)
 {
         __asm__ volatile("      rev     r0, r0");
         __asm__ volatile("      bx      lr");

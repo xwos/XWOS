@@ -257,7 +257,7 @@ void MX_SDIO_SD_Reinit(uint32_t clkdiv)
 
 xwer_t MX_SDIO_SD_TrimClk(xwsq_t cnt)
 {
-  __aligned(4) xwu8_t buf[512];
+  xwu8_t __xwcc_aligned(4) buf[512];
   xwer_t rc;
   xwsq_t i;
   xwtm_t time;

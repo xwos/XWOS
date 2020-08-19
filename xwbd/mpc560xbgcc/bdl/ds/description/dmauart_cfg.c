@@ -76,7 +76,7 @@ const struct xwds_resource_gpio mpc560xb_uart0_gpio_resources[] = {
         },
 };
 
-__aligned(32) union soc_dma_tcd mpc560xb_uart0_rxdmatcds[] = {
+union soc_dma_tcd mpc560xb_uart0_rxdmatcds[] __xwcc_aligned(32) = {
         [0].std = {
                 .SADDR = ((volatile xwu32_t)&LINFLEX_0.BDRM) + 3,
                 .SMOD = 0,
@@ -115,7 +115,7 @@ struct soc_dmach_private_cfg mpc560xb_uart0_rxdmach_cfg = {
         .tcds = mpc560xb_uart0_rxdmatcds,
 };
 
-__aligned(32) union soc_dma_tcd mpc560xb_uart0_txdmatcds[] = {
+union soc_dma_tcd mpc560xb_uart0_txdmatcds[] __xwcc_aligned(32) = {
         [0].std = {
                 .SADDR = SOC_DMA_TCD_CFG_NULL,
                 .SMOD = 0,

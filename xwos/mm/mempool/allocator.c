@@ -331,7 +331,7 @@ xwer_t xwmm_mempool_create(struct xwmm_mempool ** ptrbuf, const char * name,
         rc = xwmm_kma_alloc(sizeof(struct xwmm_mempool) +
                             odrbtree_size + array_size,
                             XWMM_ALIGNMENT, &mem);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_alloc;
         }
         mp = mem;
@@ -339,7 +339,7 @@ xwer_t xwmm_mempool_create(struct xwmm_mempool ** ptrbuf, const char * name,
         pgarray = (struct xwmm_mempool_page *)(((xwptr_t)odrbtree) + odrbtree_size);
 
         rc = xwmm_mempool_construct(mp, name, origin, size, odrbtree, pgarray);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mempool_construct;
         }
         *ptrbuf = mp;

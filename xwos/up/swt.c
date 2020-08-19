@@ -251,7 +251,7 @@ void xwos_swt_ttn_cb(void * entry)
                 swt->ttn.cb = xwos_swt_ttn_cb;
                 rc = xwos_tt_add_locked(xwtt, &swt->ttn, cpuirq);
                 xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                 }
         }
 }
@@ -288,7 +288,7 @@ xwer_t xwos_swt_start(struct xwos_swt * swt,
         XWOS_VALIDATE(((xwtm_cmp(base, 0) > 0) && (xwtm_cmp(period, 0) > 0)),
                       "out-of-time", -EINVAL);
 
-        if (__unlikely(swt->ttn.cb)) {
+        if (__xwcc_unlikely(swt->ttn.cb)) {
                 rc = -EALREADY;
                 goto err_already;
         }

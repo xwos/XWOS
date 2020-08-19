@@ -182,7 +182,7 @@ xwer_t xwds_misc_ioctl(struct xwds_misc * misc, xwsq_t cmd, ...)
         XWDS_VALIDATE(misc, "nullptr", -EFAULT);
 
         rc = xwds_misc_grab(misc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_misc_grab;
         }
 
@@ -194,7 +194,7 @@ xwer_t xwds_misc_ioctl(struct xwds_misc * misc, xwsq_t cmd, ...)
                 rc = -ENOSYS;
         }
         va_end(args);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_ioctl;
         }
 

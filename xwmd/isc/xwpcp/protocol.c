@@ -451,7 +451,7 @@ xwer_t xwpcp_eq_msg(struct xwpcp * xwpcp,
                 odr++;
         }
         rc = xwmm_bma_alloc(xwpcp->slot.pool, (xwsq_t)odr, &mem);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_bma_alloc;
         }
         frmslot = mem;
@@ -509,7 +509,7 @@ xwer_t xwpcp_chk_frm(struct xwpcp_frame * frm)
         frmlen = frm->head.frmlen;
         mirror = xwbop_rbit(xwu8_t, frmlen);
 
-        if (__unlikely(frm->head.frmlen < XWPCP_FRM_MINSIZE)) {
+        if (__xwcc_unlikely(frm->head.frmlen < XWPCP_FRM_MINSIZE)) {
                 rc = -EBADMSG;
         } else if (mirror != frm->head.mirror) {
                 rc = -EBADMSG;
@@ -538,7 +538,7 @@ static __xwmd_code
 void xwpcp_finish_tx(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
 {
         xwu8_t rmtack;
-        __maybe_unused xwu8_t rmtid;
+        __xwcc_unused xwu8_t rmtid;
 
         rmtack = xwpcp->txq.txi.remote.ack;
         rmtid = xwpcp->txq.txi.remote.id;
@@ -746,7 +746,7 @@ xwer_t xwpcp_rx_frm_sdu(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
                   "port:0x%X, qos:0x%X, frmlen:0x%X, remote id:0x%X, local id:0x%X\n",
                   port, qos, frmslot->frm.head.frmlen, rmtid, lclid);
         if (XWPCP_QOS(1) == qos) {
-                if (__likely(rmtid == lclid)) {
+                if (__xwcc_likely(rmtid == lclid)) {
                         /* 收到报文 */
                         rc = xwpcp_tx_frm_sdu_ack(xwpcp, port, rmtid, XWPCP_ACK_OK);
                         if (XWOK == rc) {
@@ -794,7 +794,7 @@ xwer_t xwpcp_rx_frm_sdu_ack(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot
         ack = frmslot->frm.sdu[0];
         xwpcplogf(DEBUG, "id:0x%X, ACK:0x%X\n", rmtid, ack);
         rc = xwosal_mtx_lock(csmtxid);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_lock;
         }
         xwaop_read(xwsq_t, &xwpcp->hwifst, &hwifst);
@@ -888,7 +888,7 @@ xwer_t xwpcp_rxthrd(struct xwpcp * xwpcp)
                 if (xwosal_cthrd_shld_frz()) {
                         xwpcplogf(DEBUG, "Start freezing ...\n");
                         rc = xwosal_cthrd_freeze();
-                        if (__unlikely(rc < 0)) {
+                        if (__xwcc_unlikely(rc < 0)) {
                                 xwpcplogf(DEBUG, "Failed to freeze ... rc: %d\n", rc);
                                 xwpcp_thrd_pause();
                         }/* else {} */
@@ -930,7 +930,7 @@ xwer_t xwpcp_connect(struct xwpcp * xwpcp)
                 if (XWOK == rc) {
                         xwtm = XWPCP_RETRY_PERIOD;
                         rc = xwosal_cthrd_sleep(&xwtm);
-                        if (__unlikely(rc < 0)) {
+                        if (__xwcc_unlikely(rc < 0)) {
                                 break;
                         }
                         cnt++;
@@ -985,7 +985,7 @@ xwer_t xwpcp_tx_frm(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
         crc32pos[3] = (xwu8_t)((crc32 >> 0U) & 0xFFU);
         cnt = 0;
         rc = xwosal_mtx_lock(ulk.osal.id);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_lock;
         }
         if (XWPCP_QOS(1) == qos) {
@@ -996,7 +996,7 @@ xwer_t xwpcp_tx_frm(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
                                   "frmslot(%p), local id:0x%X, cnt:0x%X\n",
                                   frmslot, id, cnt);
                         rc = xwpcp_hwifal_tx(xwpcp, &frmslot->frm);
-                        if (__unlikely(rc < 0)) {
+                        if (__xwcc_unlikely(rc < 0)) {
                                 xwpcp->txq.txi.sender = NULL;
                                 xwaop_c0m(xwsq_t, &xwpcp->hwifst, XWPCP_HWIFST_TX,
                                           NULL, NULL);
@@ -1015,7 +1015,7 @@ xwer_t xwpcp_tx_frm(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
                                 break;
                         } else if (-ETIMEDOUT == rc) {
                                 rc = xwosal_mtx_lock(ulk.osal.id);
-                                if (__unlikely(rc < 0)) {
+                                if (__xwcc_unlikely(rc < 0)) {
                                         /* 原子操作带有内存屏障的语义，
                                            下面语句顺序不能调换 */
                                         xwpcp->txq.txi.sender = NULL;
@@ -1057,7 +1057,7 @@ xwer_t xwpcp_tx_frm(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
                 }
         } else {
                 rc = xwpcp_hwifal_tx(xwpcp, &frmslot->frm);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         xwosal_mtx_unlock(ulk.osal.id);
                         goto err_if_tx;
                 }
@@ -1091,7 +1091,7 @@ xwer_t xwpcp_txfsm(struct xwpcp * xwpcp)
                         xwpcp->txq.tmp = NULL;
                 } else {
                         rc = xwosal_smr_wait(xwosal_smr_get_id(&xwpcp->txq.smr));
-                        if (__unlikely(rc < 0)) {
+                        if (__xwcc_unlikely(rc < 0)) {
                                 goto err_txqsmr_wait;
                         }
                         sender = xwpcp_txq_choose(xwpcp);
@@ -1104,7 +1104,7 @@ xwer_t xwpcp_txfsm(struct xwpcp * xwpcp)
                           sender->frm.head.port);
 
                 rc = xwpcp_tx_frm(xwpcp, sender);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_tx_frm;
                 }
         }
@@ -1131,7 +1131,7 @@ xwer_t xwpcp_txthrd(struct xwpcp * xwpcp)
                 if (xwosal_cthrd_shld_frz()) {
                         xwpcplogf(DEBUG, "Start freezing ...\n");
                         rc = xwosal_cthrd_freeze();
-                        if (__unlikely(rc < 0)) {
+                        if (__xwcc_unlikely(rc < 0)) {
                                 xwpcplogf(DEBUG, "Failed to freeze ... rc: %d\n", rc);
                                 xwpcp_thrd_pause();
                         }

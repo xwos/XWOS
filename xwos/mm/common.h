@@ -48,7 +48,7 @@ struct xwmm_zone {
  * @retval true: 是
  * @retval false: 否
  */
-static __xw_inline
+static __xwcc_inline
 bool xwmm_in_zone(void * mem, xwptr_t origin, xwsz_t size)
 {
         xwptr_t memptr = (xwptr_t)mem;

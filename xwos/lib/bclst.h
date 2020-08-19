@@ -47,7 +47,7 @@ struct xwlib_bclst_node {
  * @param member: (I) 节点在外层结构体中的成员符号名(symbol)
  * @return 外层结构体的指针
  */
-#define xwlib_bclst_entry(ptr, type, member) container_of((ptr), type, member)
+#define xwlib_bclst_entry(ptr, type, member) xwcc_baseof((ptr), type, member)
 
 /**
  * @brief 获得包含链表第一个节点的外层结构体的指针。

@@ -99,12 +99,12 @@ xwer_t xwds_i2cp_cvop_probe(struct xwds_i2cp * i2cp)
         } else {
                 rc = -EHOSTUNREACH;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_i2cm_grab;
         }
 
         rc = xwds_device_cvop_probe(&i2cp->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_probe;
         }
         return XWOK;
@@ -128,7 +128,7 @@ xwer_t xwds_i2cp_cvop_remove(struct xwds_i2cp * i2cp)
         XWDS_VALIDATE(i2cp->bus, "nullptr", -EHOSTUNREACH);
 
         rc = xwds_device_cvop_remove(&i2cp->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_remove;
         }
 
@@ -154,12 +154,12 @@ xwer_t xwds_i2cp_cvop_start(struct xwds_i2cp * i2cp)
         } else {
                 rc = -EHOSTUNREACH;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_i2cm_request;
         }
 
         rc = xwds_device_cvop_start(&i2cp->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_start;
         }
         return XWOK;
@@ -183,7 +183,7 @@ xwer_t xwds_i2cp_cvop_stop(struct xwds_i2cp * i2cp)
         XWDS_VALIDATE(i2cp->bus, "nullptr", -EHOSTUNREACH);
 
         rc = xwds_device_cvop_stop(&i2cp->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_stop;
         }
 
@@ -209,7 +209,7 @@ xwer_t xwds_i2cp_cvop_suspend(struct xwds_i2cp * i2cp)
         XWDS_VALIDATE(i2cp->bus, "nullptr", -EHOSTUNREACH);
 
         rc = xwds_device_cvop_suspend(&i2cp->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_suspend;
         }
 
@@ -235,12 +235,12 @@ xwer_t xwds_i2cp_cvop_resume(struct xwds_i2cp * i2cp)
         } else {
                 rc = -EHOSTUNREACH;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_i2cm_request;
         }
 
         rc = xwds_device_cvop_resume(&i2cp->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_resume;
         }
         return XWOK;
@@ -263,11 +263,11 @@ xwer_t xwds_i2cp_ioctl(struct xwds_i2cp * i2cp, xwsq_t cmd, ...)
         XWDS_VALIDATE(i2cp, "nullptr", -EFAULT);
 
         rc = xwds_i2cp_grab(i2cp);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_i2cp_grab;
         }
         rc = xwds_i2cp_request(i2cp);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_i2cp_request;
         }
 
@@ -279,7 +279,7 @@ xwer_t xwds_i2cp_ioctl(struct xwds_i2cp * i2cp, xwsq_t cmd, ...)
                 rc = -ENOSYS;
         }
         va_end(args);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_ioctl;
         }
 

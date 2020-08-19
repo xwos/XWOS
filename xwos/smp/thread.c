@@ -131,7 +131,7 @@ xwer_t xwos_tcb_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                   xwos_tcb_cache_name,
                                   (ctor_f)xwos_tcb_construct,
                                   (dtor_f)xwos_tcb_destruct);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwos_tcb_cache = NULL;
         } else {
                 xwos_tcb_cache = msa;
@@ -308,7 +308,7 @@ xwer_t xwos_thrd_activate(struct xwos_tcb * tcb,
         xwreg_t cpuirq;
 
         rc = xwos_object_activate(&tcb->xwobj, gcfunc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_obj_activate;
         }
         /* base info */
@@ -442,7 +442,7 @@ void xwos_thrd_launch(struct xwos_tcb * tcb, xwos_thrd_f mainfunc, void * arg)
  * @note
  * - 静态初始化线程需预先定义线程控制块对象和线程栈数组，通常定义为全局变量；
  * - 栈数组的首地址与大小，必须要满足CPU的ABI规则，例如ARM，就需要8字节对齐，
- *   因此在定义栈数组时需要__aligned(8)来修饰，且大小是8的倍数。
+ *   因此在定义栈数组时需要__xwcc_aligned(8)来修饰，且大小是8的倍数。
  */
 __xwos_api
 xwer_t xwos_thrd_init(struct xwos_tcb * tcb,
@@ -522,7 +522,7 @@ xwer_t xwos_thrd_create(struct xwos_tcb ** tcbpbuf,
         XWOS_VALIDATE((NULL != tcbpbuf), "nullptr", -EFAULT);
 
         stk = xwos_thrd_stack_alloc(stack_size);
-        if (__unlikely(is_err(stk))) {
+        if (__xwcc_unlikely(is_err(stk))) {
                 rc = ptr_err(stk);
                 goto err_stack_alloc;
         }
@@ -539,7 +539,7 @@ xwer_t xwos_thrd_create(struct xwos_tcb ** tcbpbuf,
                                 stk, stack_size,
                                 priority, attr,
                                 xwos_tcb_gc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_thrd_activate;
         }
 
@@ -799,9 +799,9 @@ xwer_t xwos_thrd_chprio_once(struct xwos_tcb * tcb, xwpr_t dprio,
                         if (XWOS_WQTYPE_MTX == tcb->wqn.type) {
                                 struct xwlk_mtx * mtx;
 
-                                mtx = container_of(tcb->wqn.wq,
-                                                   struct xwlk_mtx,
-                                                   rtwq);
+                                mtx = xwcc_baseof(tcb->wqn.wq,
+                                                  struct xwlk_mtx,
+                                                  rtwq);
                                 xwlk_mtx_grab(mtx);
                                 xwlk_splk_unlock_cpuirqrs(&tcb->wqn.lock, cpuirq);
                                 /* because of the lock sequence.
@@ -836,9 +836,9 @@ xwer_t xwos_thrd_chprio_once(struct xwos_tcb * tcb, xwpr_t dprio,
                         } else if (XWOS_WQTYPE_RTSMR == tcb->wqn.type) {
                                 struct xwsync_smr * smr;
 
-                                smr = container_of(tcb->wqn.wq,
-                                                   struct xwsync_smr,
-                                                   wq.rt);
+                                smr = xwcc_baseof(tcb->wqn.wq,
+                                                  struct xwsync_smr,
+                                                  wq.rt);
                                 xwsync_smr_grab(smr);
                                 xwlk_splk_unlock_cpuirqrs(&tcb->wqn.lock, cpuirq);
                                 /* because of the lock sequence.
@@ -1059,7 +1059,7 @@ xwer_t xwos_thrd_intr(struct xwos_tcb * tcb)
                 } else if (XWOS_WQTYPE_PLSMR == tcb->wqn.type) {
                         struct xwsync_smr * smr;
 
-                        smr = container_of(tcb->wqn.wq, struct xwsync_smr, wq.pl);
+                        smr = xwcc_baseof(tcb->wqn.wq, struct xwsync_smr, wq.pl);
                         xwsync_smr_grab(smr);
                         xwlk_splk_unlock_cpuirqrs(&tcb->wqn.lock, cpuirq);
                         rc = xwsync_plsmr_intr(smr, &tcb->wqn);
@@ -1069,7 +1069,7 @@ xwer_t xwos_thrd_intr(struct xwos_tcb * tcb)
                 } else if (XWOS_WQTYPE_RTSMR == tcb->wqn.type) {
                         struct xwsync_smr * smr;
 
-                        smr = container_of(tcb->wqn.wq, struct xwsync_smr, wq.rt);
+                        smr = xwcc_baseof(tcb->wqn.wq, struct xwsync_smr, wq.rt);
                         xwsync_smr_grab(smr);
                         xwlk_splk_unlock_cpuirqrs(&tcb->wqn.lock, cpuirq);
                         rc = xwsync_rtsmr_intr(smr, &tcb->wqn);
@@ -1078,7 +1078,7 @@ xwer_t xwos_thrd_intr(struct xwos_tcb * tcb)
                 } else if (XWOS_WQTYPE_CDT == tcb->wqn.type) {
                         struct xwsync_cdt * cdt;
 
-                        cdt = container_of(tcb->wqn.wq, struct xwsync_cdt, wq.pl);
+                        cdt = xwcc_baseof(tcb->wqn.wq, struct xwsync_cdt, wq.pl);
                         xwsync_cdt_grab(cdt);
                         xwlk_splk_unlock_cpuirqrs(&tcb->wqn.lock, cpuirq);
                         rc = xwsync_cdt_intr(cdt, &tcb->wqn);
@@ -1086,7 +1086,7 @@ xwer_t xwos_thrd_intr(struct xwos_tcb * tcb)
                 } else if (XWOS_WQTYPE_MTX == tcb->wqn.type) {
                         struct xwlk_mtx * mtx;
 
-                        mtx = container_of(tcb->wqn.wq, struct xwlk_mtx, rtwq);
+                        mtx = xwcc_baseof(tcb->wqn.wq, struct xwlk_mtx, rtwq);
                         xwlk_mtx_grab(mtx);
                         xwlk_splk_unlock_cpuirqrs(&tcb->wqn.lock, cpuirq);
                         rc = xwlk_mtx_intr(mtx, tcb);
@@ -1401,7 +1401,7 @@ xwer_t xwos_cthrd_sleep(xwtm_t * xwtm)
         xwsq_t wkuprs;
         xwreg_t cpuirq;
 
-        if (__unlikely(xwtm_cmp(*xwtm, 0) <= 0)) {
+        if (__xwcc_unlikely(xwtm_cmp(*xwtm, 0) <= 0)) {
                 rc = -ETIMEDOUT;
                 goto err_xwtm;
         }
@@ -1414,7 +1414,7 @@ xwer_t xwos_cthrd_sleep(xwtm_t * xwtm)
         expected = xwtm_add_safely(currtick, *xwtm);
         xwlk_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         rc = xwos_scheduler_wakelock_lock(xwsd);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 /* 当前CPU调度器处于休眠态，线程需要被冻结，
                    阻塞/睡眠函数将返回-EINTR。*/
@@ -1500,7 +1500,7 @@ xwer_t xwos_cthrd_sleep_from(xwtm_t * origin, xwtm_t inc)
         expected = xwtm_add_safely(*origin, inc);
         xwlk_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         rc = xwos_scheduler_wakelock_lock(xwsd);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 /* 当前CPU调度器处于休眠态，线程需要被冻结，
                    阻塞/睡眠函数将返回-EINTR。*/
@@ -1982,7 +1982,7 @@ xwer_t xwos_thrd_migrate(struct xwos_tcb * tcb, xwid_t dstcpu)
         xwid_t localcpu;
         xwer_t rc;
 
-        if (__unlikely(dstcpu >= CPUCFG_CPU_NUM)) {
+        if (__xwcc_unlikely(dstcpu >= CPUCFG_CPU_NUM)) {
                 rc = -ENODEV;
                 goto err_badcpuid;
         }

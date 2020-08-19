@@ -38,7 +38,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-bool xwbmpaop_t1i(__atomic xwbmp_t * bmp, xwsq_t idx)
+bool xwbmpaop_t1i(__xwcc_atomic xwbmp_t * bmp, xwsq_t idx)
 {
         bool ret;
         xwbmp_t value;
@@ -50,7 +50,7 @@ bool xwbmpaop_t1i(__atomic xwbmp_t * bmp, xwsq_t idx)
 }
 
 __xwlib_code
-xwssq_t xwbmpaop_ffs_then_c0i(__atomic xwbmp_t * bmp, xwsz_t num)
+xwssq_t xwbmpaop_ffs_then_c0i(__xwcc_atomic xwbmp_t * bmp, xwsz_t num)
 {
         xwsz_t total = BITS_TO_BMPS(num);
         xwsq_t i;
@@ -95,7 +95,7 @@ xwssq_t xwbmpaop_ffs_then_c0i(__atomic xwbmp_t * bmp, xwsz_t num)
 }
 
 __xwlib_code
-xwssq_t xwbmpaop_ffz_then_s1i(__atomic xwbmp_t * bmp, xwsz_t num)
+xwssq_t xwbmpaop_ffz_then_s1i(__xwcc_atomic xwbmp_t * bmp, xwsz_t num)
 {
         xwsz_t total = BITS_TO_BMPS(num);
         xwsq_t i;
@@ -141,7 +141,7 @@ xwssq_t xwbmpaop_ffz_then_s1i(__atomic xwbmp_t * bmp, xwsz_t num)
 }
 
 __xwlib_code
-xwssq_t xwbmpaop_fls_then_c0i(__atomic xwbmp_t * bmp, xwsz_t num)
+xwssq_t xwbmpaop_fls_then_c0i(__xwcc_atomic xwbmp_t * bmp, xwsz_t num)
 {
         xwsz_t total = BITS_TO_BMPS(num);
         xwsq_t i;
@@ -182,7 +182,7 @@ xwssq_t xwbmpaop_fls_then_c0i(__atomic xwbmp_t * bmp, xwsz_t num)
 }
 
 __xwlib_code
-xwssq_t xwbmpaop_flz_then_s1i(__atomic xwbmp_t * bmp, xwsz_t num)
+xwssq_t xwbmpaop_flz_then_s1i(__xwcc_atomic xwbmp_t * bmp, xwsz_t num)
 {
         xwsz_t total = BITS_TO_BMPS(num);
         xwsq_t i;

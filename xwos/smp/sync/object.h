@@ -44,7 +44,7 @@ struct xwsync_object {
 /******** ******** ******** ******** ******** ******** ******** ********
  ********       internal inline function implementations        ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static __xw_inline
+static __xwcc_inline
 void xwsync_object_construct(struct xwsync_object * xwsyncobj)
 {
         xwos_object_construct(&xwsyncobj->xwobj);
@@ -54,7 +54,7 @@ void xwsync_object_construct(struct xwsync_object * xwsyncobj)
 #endif /* XWSMPCFG_SYNC_EVT */
 }
 
-static __xw_inline
+static __xwcc_inline
 void xwsync_object_destruct(struct xwsync_object * xwsyncobj)
 {
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
@@ -64,19 +64,19 @@ void xwsync_object_destruct(struct xwsync_object * xwsyncobj)
         xwos_object_destruct(&xwsyncobj->xwobj);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwsync_object_activate(struct xwsync_object * xwsyncobj, xwobj_gc_f gcfunc)
 {
         return xwos_object_activate(&xwsyncobj->xwobj, gcfunc);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwsync_object_grab(struct xwsync_object * xwsyncobj)
 {
         return xwos_object_grab(&xwsyncobj->xwobj);
 }
 
-static __xw_inline
+static __xwcc_inline
 xwer_t xwsync_object_put(struct xwsync_object * xwsyncobj)
 {
         return xwos_object_put(&xwsyncobj->xwobj);

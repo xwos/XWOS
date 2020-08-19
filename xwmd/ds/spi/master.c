@@ -101,11 +101,11 @@ xwer_t xwds_spim_cvop_probe(struct xwds_spim * spim)
         xwer_t rc;
 
         rc = xwosal_mtx_init(&spim->xfermtx, XWOSAL_SD_PRIORITY_RT_MIN);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_xfermtx_init;
         }
         rc = xwds_device_cvop_probe(&spim->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_probe;
         }
         return XWOK;
@@ -127,7 +127,7 @@ xwer_t xwds_spim_cvop_remove(struct xwds_spim * spim)
         xwer_t rc;
 
         rc = xwds_device_cvop_remove(&spim->dev);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_remove;
         }
 
@@ -211,26 +211,26 @@ xwer_t xwds_spim_xfer(struct xwds_spim * spim,
         XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_spim_grab(spim);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_spim_grab;
         }
         rc = xwds_spim_request(spim);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_spim_request;
         }
 
         rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&spim->xfermtx), xwtm);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_spim_lock;
         }
 
         drv = xwds_static_cast(const struct xwds_spim_driver *, spim->dev.drv);
-        if (__likely((drv) && (drv->xfer))) {
+        if (__xwcc_likely((drv) && (drv->xfer))) {
                 rc = drv->xfer(spim, msg, xwtm);
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_xfer;
         }
         xwosal_mtx_unlock(xwosal_mtx_get_id(&spim->xfermtx));

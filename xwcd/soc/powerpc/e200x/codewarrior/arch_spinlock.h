@@ -97,7 +97,7 @@ xwer_t arch_splk_trylock(struct arch_splk * asl)
  * @parem asl: arch spin lock
  */
 static __xwbsp_inline
-void arch_splk_unlock(__maybe_unused struct arch_splk * asl)
+void arch_splk_unlock(__xwcc_unused struct arch_splk * asl)
 {
         arch_bitsplk_unlock(asl);
 }

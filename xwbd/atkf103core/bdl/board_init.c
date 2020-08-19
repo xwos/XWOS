@@ -82,7 +82,7 @@ xwer_t sys_mm_init(void)
                              (xwptr_t)ocheap_mr_origin,
                              (xwsz_t)ocheap_mr_size,
                              OCHEAP_BLKSZ);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_ocheap_bma_create;
         }
         ocheap_bma = bma;

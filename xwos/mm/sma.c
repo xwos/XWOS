@@ -63,7 +63,7 @@ xwer_t xwmm_sma_alloc(struct xwmm_sma * sa, xwsz_t size, xwsz_t aligned,
         XWOS_VALIDATE((sa), "nullptr", -EFAULT);
         XWOS_VALIDATE((membuf), "nullptr", -EFAULT);
 
-        if (__unlikely(0 == size)) {
+        if (__xwcc_unlikely(0 == size)) {
                 rc = -EINVAL;
                 *membuf = NULL;
                 goto err_inval;

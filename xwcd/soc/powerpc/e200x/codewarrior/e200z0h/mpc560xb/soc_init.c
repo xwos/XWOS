@@ -263,7 +263,7 @@ void soc_flash_init(void)
 __xwbsp_init_code
 void soc_ram_init(void)
 {
-        __maybe_unused xwu32_t tmp;
+        __xwcc_unused xwu32_t tmp;
         xwu32_t * src;
         xwu32_t cnt;
         xwu32_t i;

@@ -93,7 +93,7 @@ const struct xwpcp_hwifal_operations bm_xwpcpif_ops = {
         .notify = bm_xwpcpif_notify,
 };
 
-xwu8_t __aligned(XWMMCFG_ALIGNMENT) bm_xwpcp_mempool[XWPCP_MEMPOOL_SIZE];
+xwu8_t __xwcc_aligned(XWMMCFG_ALIGNMENT) bm_xwpcp_mempool[XWPCP_MEMPOOL_SIZE];
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********

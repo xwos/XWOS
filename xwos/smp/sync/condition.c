@@ -106,7 +106,7 @@ xwer_t xwsync_cdt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                   xwsync_cdt_cache_name,
                                   (ctor_f)xwsync_cdt_construct,
                                   (dtor_f)xwsync_cdt_destruct);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwsync_cdt_cache = NULL;
         } else {
                 xwsync_cdt_cache = msa;
@@ -214,7 +214,7 @@ xwer_t xwsync_cdt_activate(struct xwsync_cdt * cdt, xwobj_gc_f gcfunc)
         xwer_t rc;
 
         rc = xwsync_object_activate(&cdt->xwsyncobj, gcfunc);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_plwq_init(&cdt->wq.pl);
                 cdt->count = XWSYNC_CDT_POSITIVE;
         }/* else {} */
@@ -281,11 +281,11 @@ xwer_t xwsync_cdt_create(struct xwsync_cdt ** ptrbuf)
 
         *ptrbuf = NULL;
         cdt = xwsync_cdt_alloc();
-        if (__unlikely(is_err(cdt))) {
+        if (__xwcc_unlikely(is_err(cdt))) {
                 rc = ptr_err(cdt);
         } else {
                 rc = xwsync_cdt_activate(cdt, xwsync_cdt_gc);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         xwsync_cdt_free(cdt);
                 } else {
                         *ptrbuf = cdt;
@@ -338,7 +338,7 @@ xwer_t xwsync_cdt_bind(struct xwsync_cdt * cdt, struct xwsync_evt * evt, xwsq_t 
         XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
 
         rc = xwsync_cdt_grab(cdt);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_plwq_lock_cpuirqsv(&cdt->wq.pl, &cpuirq);
                 rc = xwsync_evt_obj_bind(evt, &cdt->xwsyncobj, pos, false);
                 xwos_plwq_unlock_cpuirqrs(&cdt->wq.pl, cpuirq);
@@ -402,9 +402,9 @@ xwer_t xwsync_cdt_freeze(struct xwsync_cdt * cdt)
         XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
 
         rc = xwsync_cdt_grab(cdt);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_plwq_lock_cpuirqsv(&cdt->wq.pl, &cpuirq);
-                if (__unlikely(cdt->count < 0)) {
+                if (__xwcc_unlikely(cdt->count < 0)) {
                         rc = -EALREADY;
                 } else {
                         cdt->count = XWSYNC_CDT_NEGTIVE;
@@ -440,9 +440,9 @@ xwer_t xwsync_cdt_thaw(struct xwsync_cdt * cdt)
         XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
 
         rc = xwsync_cdt_grab(cdt);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_plwq_lock_cpuirqsv(&cdt->wq.pl, &cpuirq);
-                if (__unlikely(cdt->count >= 0)) {
+                if (__xwcc_unlikely(cdt->count >= 0)) {
                         rc = -EALREADY;
                 } else {
                         cdt->count = XWSYNC_CDT_POSITIVE;
@@ -473,7 +473,7 @@ xwer_t xwsync_cdt_intr(struct xwsync_cdt * cdt, struct xwos_wqn * wqn)
         xwer_t rc;
 
         rc = xwsync_cdt_grab(cdt);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_plwq_lock_cpuirqsv(&cdt->wq.pl, &cpuirq);
                 xwlk_splk_lock(&wqn->lock);
                 rc = xwos_plwq_remove_locked(&cdt->wq.pl, wqn);
@@ -519,7 +519,7 @@ xwer_t xwsync_cdt_intr_all(struct xwsync_cdt * cdt)
         XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
 
         rc = xwsync_cdt_grab(cdt);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_plwq_lock_cpuirqsv(&cdt->wq.pl, &cpuirq);
                 xwos_plwq_itr_wqn_rm(c, &cdt->wq.pl) {
                         xwlk_splk_lock(&c->lock);
@@ -550,7 +550,7 @@ xwer_t xwsync_cdt_broadcast_once(struct xwsync_cdt * cdt, bool * retry)
 
         rc = XWOK;
         xwos_plwq_lock_cpuirqsv(&cdt->wq.pl, &cpuirq);
-        if (__unlikely(cdt->count < 0)) {
+        if (__xwcc_unlikely(cdt->count < 0)) {
                 xwos_plwq_unlock_cpuirqrs(&cdt->wq.pl, cpuirq);
                 rc = -ENEGATIVE;
                 *retry = false;
@@ -598,13 +598,13 @@ xwer_t xwsync_cdt_broadcast(struct xwsync_cdt * cdt)
         XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
 
         rc = xwsync_cdt_grab(cdt);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 retry = false;
                 do {
                         rc = xwsync_cdt_broadcast_once(cdt, &retry);
                 } while (retry);
 #if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
-                if (__likely(XWOK == rc)) {
+                if (__xwcc_likely(XWOK == rc)) {
                         struct xwsync_evt * evt;
                         struct xwsync_object * xwsyncobj;
                         xwreg_t cpuirq;
@@ -633,7 +633,7 @@ xwer_t xwsync_cdt_do_unicast(struct xwsync_cdt * cdt)
         xwer_t rc;
 
         xwos_plwq_lock_cpuirqsv(&cdt->wq.pl, &cpuirq);
-        if (__unlikely(cdt->count < 0)) {
+        if (__xwcc_unlikely(cdt->count < 0)) {
                 xwos_plwq_unlock_cpuirqrs(&cdt->wq.pl, cpuirq);
                 xwsync_cdt_put(cdt);
                 rc = -ENEGATIVE;
@@ -680,7 +680,7 @@ xwer_t xwsync_cdt_unicast(struct xwsync_cdt * cdt)
         XWOS_VALIDATE((cdt), "nullptr", -EFAULT);
 
         rc = xwsync_cdt_grab(cdt);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 rc = xwsync_cdt_do_unicast(cdt);
         }/* else {} */
         return rc;
@@ -775,7 +775,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                         xwlk_splk_unlock(&tcb->stlock);
                 }/* else {} */
                 xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                if (__likely(XWLK_STATE_UNLOCKED == *lkst)) {
+                if (__xwcc_likely(XWLK_STATE_UNLOCKED == *lkst)) {
                         currtick = xwos_syshwt_get_timetick(hwt);
                         *xwtm = xwtm_sub(expected, currtick);
                         rc = xwos_thrd_do_lock(lock, lktype, xwtm, lkdata);
@@ -808,7 +808,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                         if (XWOS_WQN_RSMRS_INTR == rsmrs) {
                                 rc = -EINTR;
                         } else if (XWOS_WQN_RSMRS_UP == rsmrs) {
-                                if (__likely(XWLK_STATE_UNLOCKED == *lkst)) {
+                                if (__xwcc_likely(XWLK_STATE_UNLOCKED == *lkst)) {
                                         currtick = xwos_syshwt_get_timetick(hwt);
                                         *xwtm = xwtm_sub(expected, currtick);
                                         rc = xwos_thrd_do_lock(lock, lktype, xwtm,
@@ -846,7 +846,7 @@ xwer_t xwsync_cdt_do_timedblkthrd_unlkwq_cpuirqrs(struct xwsync_cdt * cdt,
                         if (XWOS_WQN_RSMRS_INTR == rsmrs) {
                                 rc = -EINTR;
                         } else if (XWOS_WQN_RSMRS_UP == rsmrs) {
-                                if (__likely(XWLK_STATE_UNLOCKED == *lkst)) {
+                                if (__xwcc_likely(XWLK_STATE_UNLOCKED == *lkst)) {
                                         currtick = xwos_syshwt_get_timetick(hwt);
                                         *xwtm = xwtm_sub(expected, currtick);
                                         rc = xwos_thrd_do_lock(lock, lktype, xwtm,
@@ -883,7 +883,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt, struct xwos_tcb * tcb,
         xwmb_smp_load_acquire(struct xwos_scheduler *, xwsd, &tcb->xwsd);
         xwos_plwq_lock_cpuirqsv(&cdt->wq.pl, &cpuirq);
         rc = xwos_scheduler_wakelock_lock(xwsd);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 /* 当前调度器正准备休眠，线程需被冻结，返回-EINTR。*/
                 xwos_plwq_unlock_cpuirqrs(&cdt->wq.pl, cpuirq);
                 rc = -EINTR;
@@ -939,7 +939,7 @@ xwer_t xwsync_cdt_timedwait(struct xwsync_cdt * cdt,
 
         *lkst = XWLK_STATE_LOCKED;
         ctcb = xwos_scheduler_get_ctcb_lc();
-        if (__unlikely(0 == xwtm_cmp(*xwtm, 0))) {
+        if (__xwcc_unlikely(0 == xwtm_cmp(*xwtm, 0))) {
                 rc = xwos_thrd_do_unlock(lock, lktype, lkdata);
                 if (XWOK == rc) {
                         *lkst = XWLK_STATE_UNLOCKED;
@@ -947,7 +947,7 @@ xwer_t xwsync_cdt_timedwait(struct xwsync_cdt * cdt,
                 rc = -ETIMEDOUT;
         } else {
                 rc = xwsync_cdt_grab(cdt);
-                if (__likely(XWOK == rc)) {
+                if (__xwcc_likely(XWOK == rc)) {
                         rc = xwsync_cdt_do_timedwait(cdt, ctcb, lock, lktype, lkdata,
                                                      xwtm, lkst);
                         xwsync_cdt_put(cdt);

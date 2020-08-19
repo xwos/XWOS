@@ -69,7 +69,7 @@ void arch_init_sysirqs(void)
 /**
  * @brief Reset ISR
  */
-__xwbsp_isr __naked
+__xwbsp_isr __xwcc_naked
 void arch_isr_reset(void)
 {
         __asm__ volatile("      cpsid   i");
@@ -96,7 +96,7 @@ void arch_isr_reset(void)
 __xwbsp_isr
 void arch_isr_nmi(void)
 {
-        __maybe_unused volatile struct cm_scs_reg * scs;
+        __xwcc_unused volatile struct cm_scs_reg * scs;
 
         scs = &cm_scs;
         while (true) {
@@ -109,7 +109,7 @@ void arch_isr_nmi(void)
 __xwbsp_isr
 void arch_isr_hardfault(void)
 {
-        __maybe_unused volatile struct cm_scs_reg * scs;
+        __xwcc_unused volatile struct cm_scs_reg * scs;
 
         scs = &cm_scs;
         arch_scheduler_lib_chkcstk();
@@ -123,7 +123,7 @@ void arch_isr_hardfault(void)
 __xwbsp_isr
 void arch_isr_mm(void)
 {
-        __maybe_unused volatile struct cm_scs_reg * scs;
+        __xwcc_unused volatile struct cm_scs_reg * scs;
 
         scs = &cm_scs;
         arch_scheduler_lib_chkcstk();
@@ -137,7 +137,7 @@ void arch_isr_mm(void)
 __xwbsp_isr
 void arch_isr_busfault(void)
 {
-        __maybe_unused volatile struct cm_scs_reg * scs;
+        __xwcc_unused volatile struct cm_scs_reg * scs;
 
         scs = &cm_scs;
         arch_scheduler_lib_chkcstk();
@@ -151,7 +151,7 @@ void arch_isr_busfault(void)
 __xwbsp_isr
 void arch_isr_usagefault(void)
 {
-        __maybe_unused volatile struct cm_scs_reg * scs;
+        __xwcc_unused volatile struct cm_scs_reg * scs;
 
         scs = &cm_scs;
         arch_scheduler_lib_chkcstk();
@@ -165,7 +165,7 @@ void arch_isr_usagefault(void)
 __xwbsp_isr
 void arch_isr_dbgmon(void)
 {
-        __maybe_unused volatile struct cm_scs_reg * scs;
+        __xwcc_unused volatile struct cm_scs_reg * scs;
 
         scs = &cm_scs;
         while (true) {
@@ -200,7 +200,7 @@ void arch_isr_dbgmon(void)
  *   sp->  | r0         | function      |\n
  *         ------------------------------\n
  */
-__xwbsp_isr __naked
+__xwbsp_isr __xwcc_naked
 void arch_isr_svc(void)
 {
         __asm__ volatile("      clrex");
@@ -311,9 +311,9 @@ void arch_isr_svc(void)
 __xwbsp_isr
 void arch_isr_noop(void)
 {
-        __maybe_unused volatile struct cm_scs_reg * scs;
-        __maybe_unused xwer_t rc;
-        __maybe_unused xwirq_t irqn;
+        __xwcc_unused volatile struct cm_scs_reg * scs;
+        __xwcc_unused xwer_t rc;
+        __xwcc_unused xwirq_t irqn;
 
         rc = arch_irq_get_id(&irqn);
         scs = &cm_scs;

@@ -78,7 +78,7 @@ xwer_t xwos_plwq_remove_locked(struct xwos_plwq * xwplwq, struct xwos_wqn * wqn)
 {
         xwer_t rc;
 
-        if (__unlikely((NULL == wqn->cb) || (xwplwq != wqn->wq))) {
+        if (__xwcc_unlikely((NULL == wqn->cb) || (xwplwq != wqn->wq))) {
                 rc = -ESRCH;
         } else {
                 xwlib_bclst_del_init(&wqn->cln.pl);

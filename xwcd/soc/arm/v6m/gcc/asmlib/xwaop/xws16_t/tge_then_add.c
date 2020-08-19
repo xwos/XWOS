@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-xwer_t xwaop__xws16_t__tge_then_add(__atomic xws16_t * a,
+xwer_t xwaop__xws16_t__tge_then_add(__xwcc_atomic xws16_t * a,
                                     xws16_t t,
                                     xws16_t v,
                                     xws16_t * nv, xws16_t * ov)

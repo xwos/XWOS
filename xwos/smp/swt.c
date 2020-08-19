@@ -94,7 +94,7 @@ xwer_t xwos_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                   xwos_swt_cache_name,
                                   (ctor_f)xwos_swt_construct,
                                   (dtor_f)xwos_swt_destruct);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwos_swt_cache = NULL;
         } else {
                 xwos_swt_cache = msa;
@@ -220,7 +220,7 @@ xwer_t xwos_swt_activate(struct xwos_swt * swt,
                 flag &= (xwsq_t)(~(XWOS_SWT_FLAG_AUTORM));
         }
         rc = xwos_object_activate(&swt->xwobj, gcfunc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwobj_activate;
         }
 
@@ -302,7 +302,7 @@ xwer_t xwos_swt_create(struct xwos_swt ** ptrbuf,
                 goto err_swt_alloc;
         }
         rc = xwos_swt_activate(swt, name, flag, xwos_swt_gc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_swt_activate;
         }
         *ptrbuf = swt;
@@ -397,7 +397,7 @@ xwer_t xwos_swt_start(struct xwos_swt * swt,
         xwtt = &swt->xwsd->tt;
         expected = xwtm_add_safely(base, period);
         xwlk_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
-        if (__unlikely(NULL != swt->ttn.cb)) {
+        if (__xwcc_unlikely(NULL != swt->ttn.cb)) {
                 rc = -EALREADY;
                 goto err_already;
         }

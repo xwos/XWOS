@@ -36,9 +36,9 @@
 #define XWDS_BUG_ON(x)                  XWOS_BUG_ON(x)
 
 #if (defined(XWMDCFG_CHECK_PARAMETERS) && (1 == XWMDCFG_CHECK_PARAMETERS))
-  #define XWDS_VALIDATE(exp, errstr, ...) \
-        if (__unlikely(!(exp))) {       \
-            return __VA_ARGS__; \
+  #define XWDS_VALIDATE(exp, errstr, ...)       \
+        if (__xwcc_unlikely(!(exp))) {          \
+            return __VA_ARGS__;                 \
         }
 #else
   #define XWDS_VALIDATE(exp, errstr, ...)

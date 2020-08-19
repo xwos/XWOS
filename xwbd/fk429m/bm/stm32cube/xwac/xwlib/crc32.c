@@ -60,7 +60,7 @@ xwsz_t stm32_crc32_ls(xwu32_t * crc32, bool refin, const xwu8_t stream[], xwsz_t
         xwu32_t * p;
         xwu32_t tmp;
 
-        if (__unlikely((*crc32 > 0) && (*crc32 < 0xFFFFFFFF))) {
+        if (__xwcc_unlikely((*crc32 > 0) && (*crc32 < 0xFFFFFFFF))) {
                 return 0;
         }
 
@@ -109,7 +109,7 @@ xwsz_t stm32_crc32_rs(xwu32_t * crc32, bool refin,
         xwu32_t * p;
         xwu32_t tmp;
 
-        if (__unlikely((*crc32 > 0) && (*crc32 < 0xFFFFFFFF))) {
+        if (__xwcc_unlikely((*crc32 > 0) && (*crc32 < 0xFFFFFFFF))) {
                 return 0;
         }
 

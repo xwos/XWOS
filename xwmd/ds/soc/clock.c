@@ -42,7 +42,7 @@ xwer_t xwds_clk_req(struct xwds_soc * soc, xwid_t id)
         XWDS_VALIDATE((id < soc->clk.num), "out-of-range", -ERANGE);
 
         rc = xwds_soc_grab(soc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
 
@@ -52,7 +52,7 @@ xwer_t xwds_clk_req(struct xwds_soc * soc, xwid_t id)
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_clk_req;
         }
         return XWOK;
@@ -78,7 +78,7 @@ xwer_t xwds_clk_rls(struct xwds_soc * soc, xwid_t id)
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_clk_rls;
         }
 
@@ -102,7 +102,7 @@ xwer_t xwds_clk_getfqcy(struct xwds_soc * soc, xwid_t id,
         XWDS_VALIDATE(num, "nullptr", -EFAULT);
 
         rc = xwds_soc_grab(soc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
 
@@ -112,7 +112,7 @@ xwer_t xwds_clk_getfqcy(struct xwds_soc * soc, xwid_t id,
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_getfqcy;
         }
 

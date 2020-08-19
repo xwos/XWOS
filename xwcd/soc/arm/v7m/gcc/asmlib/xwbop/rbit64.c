@@ -27,8 +27,8 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwbsp_code __naked
-xwu64_t arch_xwbop_rbit64(__maybe_unused xwu64_t x)
+__xwbsp_code __xwcc_naked
+xwu64_t arch_xwbop_rbit64(__xwcc_unused xwu64_t x)
 {
         __asm__ volatile("      mov     r2, r1");
         __asm__ volatile("      rbit    r1, r0");

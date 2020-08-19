@@ -175,7 +175,7 @@ xwer_t xwos_rtwq_remove(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn)
 {
         xwer_t rc;
 
-        if (__unlikely((NULL == wqn->cb) || (xwrtwq != wqn->wq))) {
+        if (__xwcc_unlikely((NULL == wqn->cb) || (xwrtwq != wqn->wq))) {
                 rc = -ESRCH;
         } else {
                 if (xwlib_rbtree_tst_node_unlinked(&wqn->rbn)) {

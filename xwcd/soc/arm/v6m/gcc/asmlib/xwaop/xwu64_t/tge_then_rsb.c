@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-xwer_t xwaop__xwu64_t__tge_then_rsb(__atomic xwu64_t * a,
+xwer_t xwaop__xwu64_t__tge_then_rsb(__xwcc_atomic xwu64_t * a,
                                     xwu64_t t,
                                     xwu64_t v,
                                     xwu64_t * nv, xwu64_t * ov)

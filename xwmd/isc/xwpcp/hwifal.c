@@ -64,16 +64,16 @@ xwer_t xwpcp_hwifal_open(struct xwpcp * xwpcp)
         rc = xwaop_teq_then_add(xwsq_t, &xwpcp->refcnt,
                                 XWPCP_REFCNT_STARTED, 1,
                                 NULL, NULL);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_grab_xwpcp;
         }
 
-        if (__likely((xwpcp->hwifops) && (xwpcp->hwifops->open))) {
+        if (__xwcc_likely((xwpcp->hwifops) && (xwpcp->hwifops->open))) {
                 rc = xwpcp->hwifops->open(xwpcp);
         } else {
                 rc = XWOK;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_hwifops_open;
         }
 
@@ -100,7 +100,7 @@ xwer_t xwpcp_hwifal_close(struct xwpcp * xwpcp)
 
         rc = xwaop_t1ma_then_c0m(xwsq_t, &xwpcp->hwifst, XWPCP_HWIFST_RX,
                                  NULL, NULL);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwpcp_clear_hwifst;
         }
 
@@ -109,7 +109,7 @@ xwer_t xwpcp_hwifal_close(struct xwpcp * xwpcp)
         } else {
                 rc = XWOK;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_hwifops_close;
         }
         xwpcplogf(INFO, "close HWIF ... [OK]\n");
@@ -166,7 +166,7 @@ xwer_t xwpcp_hwifal_rx(struct xwpcp * xwpcp, struct xwpcp_frmslot ** frmslotbuf)
         do {
                 rxsize = 1;
                 rc = xwpcp->hwifops->rx(xwpcp, &delimiter, &rxsize);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_sof_ifrx;
                 }
         } while (XWPCP_HWIFAL_SOF != delimiter);
@@ -180,7 +180,7 @@ xwer_t xwpcp_hwifal_rx(struct xwpcp * xwpcp, struct xwpcp_frmslot ** frmslotbuf)
                         rc = xwpcp->hwifops->rx(xwpcp,
                                                 &stream.data[total - rxsize],
                                                 &rxsize);
-                        if (__unlikely(rc < 0)) {
+                        if (__xwcc_unlikely(rc < 0)) {
                                 goto err_head_ifrx;
                         }
                         rest -= (xwssz_t)rxsize;
@@ -209,7 +209,7 @@ xwer_t xwpcp_hwifal_rx(struct xwpcp * xwpcp, struct xwpcp_frmslot ** frmslotbuf)
                 rc = xwpcp->hwifops->rx(xwpcp,
                                         &stream.data[total - rxsize],
                                         &rxsize);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_head_ifrx;
                 }
                 rest -= (xwssz_t)rxsize;
@@ -232,7 +232,7 @@ xwer_t xwpcp_hwifal_rx(struct xwpcp * xwpcp, struct xwpcp_frmslot ** frmslotbuf)
                 odr++;
         }
         rc = xwmm_bma_alloc(xwpcp->slot.pool, (xwsq_t)odr, &mem);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_bma_alloc;
         }
         frmslot = mem;
@@ -250,7 +250,7 @@ xwer_t xwpcp_hwifal_rx(struct xwpcp * xwpcp, struct xwpcp_frmslot ** frmslotbuf)
                 rc = xwpcp->hwifops->rx(xwpcp,
                                         &frmslot->frm.sdu[total - rxsize],
                                         &rxsize);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_body_ifrx;
                 }
                 rest -= (xwssz_t)rxsize;
@@ -259,7 +259,7 @@ xwer_t xwpcp_hwifal_rx(struct xwpcp * xwpcp, struct xwpcp_frmslot ** frmslotbuf)
         /* 接收帧尾定界符 */
         rxsize = 1;
         xwpcp->hwifops->rx(xwpcp, &delimiter, &rxsize);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_eof_ifrx;
         }
         if (XWPCP_HWIFAL_EOF != delimiter) {

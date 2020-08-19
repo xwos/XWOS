@@ -270,8 +270,8 @@ void arch_scheduler_lib_init_sdobj_stack(struct xwos_sdobj_stack_info * stk,
  * @brief ADL ISR：启动调度器的SVC(svc 0)的处理函数
  * @param xwsd: (I) XWOS调度器的指针
  */
-__xwbsp_isr __naked
-void arch_scheduler_svcsr_start(__maybe_unused struct xwos_scheduler * xwsd)
+__xwbsp_isr __xwcc_naked
+void arch_scheduler_svcsr_start(__xwcc_unused struct xwos_scheduler * xwsd)
 {
         /* r3 = r0->cstk; */
         __asm__ volatile("      ldr     r3, [r0, #0]");
@@ -307,7 +307,7 @@ void arch_scheduler_svcsr_start(__maybe_unused struct xwos_scheduler * xwsd)
  * @note
  * - 此中断为系统中最低优先级的中断。
  */
-__xwbsp_isr __naked
+__xwbsp_isr __xwcc_naked
 void arch_scheduler_isr_swcx(void)
 {
         /* get xwos_scheduler, */

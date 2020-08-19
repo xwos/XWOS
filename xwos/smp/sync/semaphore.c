@@ -145,7 +145,7 @@ xwer_t xwsync_smr_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                   xwsync_smr_cache_name,
                                   (ctor_f)xwsync_smr_construct,
                                   (dtor_f)xwsync_smr_destruct);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwsync_smr_cache = NULL;
         } else {
                 xwsync_smr_cache = msa;
@@ -265,7 +265,7 @@ xwer_t xwsync_smr_create(struct xwsync_smr ** ptrbuf, xwid_t type,
 
         *ptrbuf = NULL;
         smr = xwsync_smr_alloc();
-        if (__unlikely(is_err(smr))) {
+        if (__xwcc_unlikely(is_err(smr))) {
                 rc = ptr_err(smr);
         } else {
                 rc = -ETYPE;
@@ -281,7 +281,7 @@ xwer_t xwsync_smr_create(struct xwsync_smr ** ptrbuf, xwid_t type,
                         break;
 #endif /* XWSMPCFG_SYNC_RTSMR */
                 }
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         xwsync_smr_free(smr);
                 } else {
                         *ptrbuf = smr;
@@ -457,7 +457,7 @@ xwer_t xwsync_plsmr_activate(struct xwsync_smr * smr, xwssq_t val, xwssq_t max,
                       "invalid-value", -EINVAL);
 
         rc = xwsync_object_activate(&smr->xwsyncobj, gcfunc);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 smr->max = max;
                 xwos_plwq_init(&smr->wq.pl);
                 smr->type = XWSYNC_SMR_TYPE_PIPELINE;
@@ -515,9 +515,9 @@ xwer_t xwsync_plsmr_freeze(struct xwsync_smr * smr)
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_PIPELINE == smr->type), "type-error", -ETYPE);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_plwq_lock_cpuirqsv(&smr->wq.pl, &cpuirq);
-                if (__unlikely(smr->count < 0)) {
+                if (__xwcc_unlikely(smr->count < 0)) {
                         rc = -EALREADY;
                 } else {
                         smr->count = XWSYNC_SMR_NEGTIVE;
@@ -569,9 +569,9 @@ xwer_t xwsync_plsmr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
                       "invalid-value", -EINVAL);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_plwq_lock_cpuirqsv(&smr->wq.pl, &cpuirq);
-                if (__unlikely(smr->count >= 0)) {
+                if (__xwcc_unlikely(smr->count >= 0)) {
                         rc = -EALREADY;
                 } else {
                         smr->max = max;
@@ -619,7 +619,7 @@ xwer_t xwsync_plsmr_intr(struct xwsync_smr * smr, struct xwos_wqn * wqn)
         xwer_t rc;
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_plwq_lock_cpuirqsv(&smr->wq.pl, &cpuirq);
                 xwlk_splk_lock(&wqn->lock);
                 rc = xwos_plwq_remove_locked(&smr->wq.pl, wqn);
@@ -671,7 +671,7 @@ xwer_t xwsync_plsmr_post(struct xwsync_smr * smr)
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_PIPELINE == smr->type), "type-error", -ETYPE);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_plwq_lock_cpuirqsv(&smr->wq.pl, &cpuirq);
                 if (smr->count < 0) {
                         xwos_plwq_unlock_cpuirqrs(&smr->wq.pl, cpuirq);
@@ -743,7 +743,7 @@ xwer_t xwsync_plsmr_trywait(struct xwsync_smr * smr)
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_PIPELINE == smr->type), "type-error", -ETYPE);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_plwq_lock_cpuirqsv(&smr->wq.pl, &cpuirq);
                 if (smr->count > 0) {
                         smr->count--;
@@ -934,7 +934,7 @@ xwer_t xwsync_plsmr_do_timedwait(struct xwsync_smr * smr, struct xwos_tcb * tcb,
         xwos_plwq_lock_cpuirqsv(&smr->wq.pl, &cpuirq);
         if (smr->count <= 0) {
                 rc = xwos_scheduler_wakelock_lock(xwsd);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         /* 当前调度器正准备休眠，线程需被冻结，返回-EINTR。*/
                         xwos_plwq_unlock_cpuirqrs(&smr->wq.pl, cpuirq);
                         rc = -EINTR;
@@ -999,17 +999,17 @@ xwer_t xwsync_plsmr_timedwait(struct xwsync_smr * smr, xwtm_t * xwtm)
         XWOS_VALIDATE((-EINTHRD == xwos_irq_get_id(NULL)),
                       "not-in-thrd", -ENOTINTHRD);
 
-        if (__unlikely(0 == xwtm_cmp(*xwtm, 0))) {
+        if (__xwcc_unlikely(0 == xwtm_cmp(*xwtm, 0))) {
                 rc = xwsync_plsmr_trywait(smr);
-                if (__unlikely(rc < 0)) {
-                        if (__likely(-ENODATA == rc)) {
+                if (__xwcc_unlikely(rc < 0)) {
+                        if (__xwcc_likely(-ENODATA == rc)) {
                                 rc = -ETIMEDOUT;
                         }/* else {} */
                 }/* else {} */
         } else {
                 ctcb = xwos_scheduler_get_ctcb_lc();
                 rc = xwsync_smr_grab(smr);
-                if (__likely(XWOK == rc)) {
+                if (__xwcc_likely(XWOK == rc)) {
                         rc = xwsync_plsmr_do_timedwait(smr, ctcb, xwtm);
                         xwsync_smr_put(smr);
                 }/* else {} */
@@ -1114,7 +1114,7 @@ xwer_t xwsync_plsmr_wait_unintr(struct xwsync_smr * smr)
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_PIPELINE == smr->type), "type-error", -ETYPE);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 ctcb = xwos_scheduler_get_ctcb_lc();
                 rc = xwsync_plsmr_do_wait_unintr(smr, ctcb);
                 xwsync_smr_put(smr);
@@ -1148,7 +1148,7 @@ xwer_t xwsync_rtsmr_activate(struct xwsync_smr * smr, xwssq_t val, xwssq_t max,
                       "invalid-value", -EINVAL);
 
         rc = xwsync_object_activate(&smr->xwsyncobj, gcfunc);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 smr->max = max;
                 xwos_rtwq_init(&smr->wq.rt);
                 smr->type = XWSYNC_SMR_TYPE_RT;
@@ -1208,9 +1208,9 @@ xwer_t xwsync_rtsmr_freeze(struct xwsync_smr * smr)
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_RT == smr->type), "type-error", -ETYPE);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_rtwq_lock_cpuirqsv(&smr->wq.rt, &cpuirq);
-                if (__unlikely(smr->count < 0)) {
+                if (__xwcc_unlikely(smr->count < 0)) {
                         rc = -EALREADY;
                 } else {
                         smr->count = XWSYNC_SMR_NEGTIVE;
@@ -1262,9 +1262,9 @@ xwer_t xwsync_rtsmr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
                       "invalid-value", -EINVAL);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_rtwq_lock_cpuirqsv(&smr->wq.rt, &cpuirq);
-                if (__unlikely(smr->count >= 0)) {
+                if (__xwcc_unlikely(smr->count >= 0)) {
                         rc = -EALREADY;
                 } else {
                         smr->max = max;
@@ -1311,7 +1311,7 @@ xwer_t xwsync_rtsmr_intr(struct xwsync_smr * smr, struct xwos_wqn * wqn)
         xwer_t rc;
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_rtwq_lock_cpuirqsv(&smr->wq.rt, &cpuirq);
                 xwlk_splk_lock(&wqn->lock);
                 rc = xwos_rtwq_remove_locked(&smr->wq.rt, wqn);
@@ -1363,9 +1363,9 @@ xwer_t xwsync_rtsmr_post(struct xwsync_smr * smr)
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_RT == smr->type), "type-error", -ETYPE);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_rtwq_lock_cpuirqsv(&smr->wq.rt, &cpuirq);
-                if (__unlikely(smr->count < 0)) {
+                if (__xwcc_unlikely(smr->count < 0)) {
                         xwos_rtwq_unlock_cpuirqrs(&smr->wq.rt, cpuirq);
                         rc = -ENEGATIVE;
                 } else {
@@ -1435,7 +1435,7 @@ xwer_t xwsync_rtsmr_trywait(struct xwsync_smr * smr)
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_RT == smr->type), "type-error", -ETYPE);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 xwos_rtwq_lock_cpuirqsv(&smr->wq.rt, &cpuirq);
                 if (smr->count > 0) {
                         smr->count--;
@@ -1624,7 +1624,7 @@ xwer_t xwsync_rtsmr_do_timedwait(struct xwsync_smr * smr, struct xwos_tcb * tcb,
         xwos_rtwq_lock_cpuirqsv(&smr->wq.rt, &cpuirq);
         if (smr->count <= 0) {
                 rc = xwos_scheduler_wakelock_lock(xwsd);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         /* 当前调度器正准备休眠，线程需被冻结，返回-EINTR。*/
                         xwos_rtwq_unlock_cpuirqrs(&smr->wq.rt, cpuirq);
                         rc = -EINTR;
@@ -1689,17 +1689,17 @@ xwer_t xwsync_rtsmr_timedwait(struct xwsync_smr * smr, xwtm_t * xwtm)
         XWOS_VALIDATE((-EINTHRD == xwos_irq_get_id(NULL)),
                       "not-in-thrd", -ENOTINTHRD);
 
-        if (__unlikely(0 == xwtm_cmp(*xwtm, 0))) {
+        if (__xwcc_unlikely(0 == xwtm_cmp(*xwtm, 0))) {
                 rc = xwsync_rtsmr_trywait(smr);
-                if (__unlikely(rc < 0)) {
-                        if (__likely(-ENODATA == rc))
+                if (__xwcc_unlikely(rc < 0)) {
+                        if (__xwcc_likely(-ENODATA == rc))
                                 rc = -ETIMEDOUT;
                         /* else {} */
                 }/* else {} */
         } else {
                 ctcb = xwos_scheduler_get_ctcb_lc();
                 rc = xwsync_smr_grab(smr);
-                if (__likely(XWOK == rc)) {
+                if (__xwcc_likely(XWOK == rc)) {
                         rc = xwsync_rtsmr_do_timedwait(smr, ctcb, xwtm);
                         xwsync_smr_put(smr);
                 }/* else {} */
@@ -1804,7 +1804,7 @@ xwer_t xwsync_rtsmr_wait_unintr(struct xwsync_smr * smr)
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_RT == smr->type), "type-error", -ETYPE);
 
         rc = xwsync_smr_grab(smr);
-        if (__likely(XWOK == rc)) {
+        if (__xwcc_likely(XWOK == rc)) {
                 ctcb = xwos_scheduler_get_ctcb_lc();
                 rc = xwsync_rtsmr_do_wait_unintr(smr, ctcb);
                 xwsync_smr_put(smr);

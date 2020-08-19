@@ -29,7 +29,7 @@
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
-xwu64_t xwaop__xwu64_t__load(__atomic xwu64_t * a,
+xwu64_t xwaop__xwu64_t__load(__xwcc_atomic xwu64_t * a,
                              const enum xwmb_memory_order_em mo)
 {
         xwu64_t v;

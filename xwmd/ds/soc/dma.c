@@ -43,19 +43,19 @@ xwer_t xwds_dma_req(struct xwds_soc * soc, xwid_t ch)
         XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
         rc = xwds_soc_grab(soc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
 
         rc = xwbmpaop_t0i_then_s1i(soc->dma.chstatus, ch);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EBUSY;
                 goto err_busy;
         }
         drv = xwds_static_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->dma_req)) {
                 rc = drv->dma_req(soc, ch);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_drv_dma_req;
                 }
         }
@@ -78,14 +78,14 @@ xwer_t xwds_dma_rls(struct xwds_soc * soc, xwid_t ch)
         XWDS_VALIDATE(soc, "nullptr", -EFAULT);
         XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
-        if (__unlikely(!xwbmpaop_t1i(soc->dma.chstatus, ch))) {
+        if (__xwcc_unlikely(!xwbmpaop_t1i(soc->dma.chstatus, ch))) {
                 rc = -EPERM;
                 goto err_notreq;
         }
         drv = xwds_static_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->dma_rls)) {
                 rc = drv->dma_rls(soc, ch);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_drv_dma_rls;
                 }
         }
@@ -108,7 +108,7 @@ xwer_t xwds_dma_cfg(struct xwds_soc * soc, xwid_t ch, void * cfg,
         XWDS_VALIDATE(soc, "nullptr", -EFAULT);
         XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
-        if (__unlikely(!xwbmpaop_t1i(soc->dma.chstatus, ch))) {
+        if (__xwcc_unlikely(!xwbmpaop_t1i(soc->dma.chstatus, ch))) {
                 rc = -EPERM;
                 goto err_notreq;
         }
@@ -128,7 +128,7 @@ xwer_t xwds_dma_cfg(struct xwds_soc * soc, xwid_t ch, void * cfg,
         drv = xwds_static_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->dma_cfg)) {
                 rc = drv->dma_cfg(soc, ch, cfg);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_drv_dma_cfg;
                 }
         }
@@ -156,14 +156,14 @@ xwer_t xwds_dma_enable(struct xwds_soc * soc, xwid_t ch)
         XWDS_VALIDATE(soc, "nullptr", -EFAULT);
         XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
-        if (__unlikely(!xwbmpaop_t1i(soc->dma.chstatus, ch))) {
+        if (__xwcc_unlikely(!xwbmpaop_t1i(soc->dma.chstatus, ch))) {
                 rc = -EPERM;
                 goto err_notreq;
         }
         drv = xwds_static_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->dma_enable)) {
                 rc = drv->dma_enable(soc, ch);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_drv_dma_enable;
                 }
         }
@@ -183,14 +183,14 @@ xwer_t xwds_dma_disable(struct xwds_soc * soc, xwid_t ch)
         XWDS_VALIDATE(soc, "nullptr", -EFAULT);
         XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
-        if (__unlikely(!xwbmpaop_t1i(soc->dma.chstatus, ch))) {
+        if (__xwcc_unlikely(!xwbmpaop_t1i(soc->dma.chstatus, ch))) {
                 rc = -EPERM;
                 goto err_notreq;
         }
         drv = xwds_static_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->dma_disable)) {
                 rc = drv->dma_disable(soc, ch);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_drv_dma_disable;
                 }
         }
@@ -210,14 +210,14 @@ xwer_t xwds_dma_start(struct xwds_soc * soc, xwid_t ch)
         XWDS_VALIDATE(soc, "nullptr", -EFAULT);
         XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
-        if (__unlikely(!xwbmpaop_t1i(soc->dma.chstatus, ch))) {
+        if (__xwcc_unlikely(!xwbmpaop_t1i(soc->dma.chstatus, ch))) {
                 rc = -EPERM;
                 goto err_notreq;
         }
         drv = xwds_static_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->dma_start)) {
                 rc = drv->dma_start(soc, ch);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_drv_dma_start;
                 }
         }
@@ -237,14 +237,14 @@ xwer_t xwds_dma_stop(struct xwds_soc * soc, xwid_t ch)
         XWDS_VALIDATE(soc, "nullptr", -EFAULT);
         XWDS_VALIDATE(((xwid_t)ch < soc->dma.ch_num), "out-of-range", -ERANGE);
 
-        if (__unlikely(!xwbmpaop_t1i(soc->dma.chstatus, ch))) {
+        if (__xwcc_unlikely(!xwbmpaop_t1i(soc->dma.chstatus, ch))) {
                 rc = -EPERM;
                 goto err_notreq;
         }
         drv = xwds_static_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->dma_stop)) {
                 rc = drv->dma_stop(soc, ch);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         goto err_drv_dma_stop;
                 }
         }

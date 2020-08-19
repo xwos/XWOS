@@ -79,8 +79,8 @@ void soc_scheduler_init_sdobj_stack(struct xwos_sdobj_stack_info * stk,
  * @brief 玄武OS内核调度器适配函数：启动调度器
  * @param xwsd: (I) XWOS调度器的指针
  */
-__xwbsp_code __naked
-xwer_t soc_scheduler_start_lc(__maybe_unused struct xwos_scheduler * xwsd)
+__xwbsp_code __xwcc_naked
+xwer_t soc_scheduler_start_lc(__xwcc_unused struct xwos_scheduler * xwsd)
 {
         xwos_cpuirq_enable_lc();
         __asm__ volatile("      svc     0");
@@ -108,8 +108,8 @@ void soc_scheduler_req_swcx(struct xwos_scheduler * xwsd)
  * @param xwsd: (I) XWOS调度器的指针
  * @return 错误码
  */
-__xwbsp_code __naked
-xwer_t soc_scheduler_suspend(__maybe_unused struct xwos_scheduler * xwsd)
+__xwbsp_code __xwcc_naked
+xwer_t soc_scheduler_suspend(__xwcc_unused struct xwos_scheduler * xwsd)
 {
         __asm__ volatile(
         "       svc     9\n"
@@ -121,8 +121,8 @@ xwer_t soc_scheduler_suspend(__maybe_unused struct xwos_scheduler * xwsd)
  * @param xwsd: (I) XWOS调度器的指针
  * @return 错误码
  */
-__xwbsp_code __naked
-xwer_t soc_scheduler_resume(__maybe_unused struct xwos_scheduler * xwsd)
+__xwbsp_code __xwcc_naked
+xwer_t soc_scheduler_resume(__xwcc_unused struct xwos_scheduler * xwsd)
 {
         __asm__ volatile(
         "       svc     10\n"
@@ -134,9 +134,9 @@ xwer_t soc_scheduler_resume(__maybe_unused struct xwos_scheduler * xwsd)
  * @param tcb: (I) 线程控制块对象的指针
  * @param rc: (I) 线程退出抛出的返回值
  */
-__xwbsp_code __naked
-void soc_thrd_exit_lc(__maybe_unused struct xwos_tcb * tcb,
-                      __maybe_unused xwer_t rc)
+__xwbsp_code __xwcc_naked
+void soc_thrd_exit_lc(__xwcc_unused struct xwos_tcb * tcb,
+                      __xwcc_unused xwer_t rc)
 {
         __asm__ volatile(
         "       svc     7\n");
@@ -150,8 +150,8 @@ void soc_thrd_exit_lc(__maybe_unused struct xwos_tcb * tcb,
  * @brief 玄武OS内核调度器适配函数：冻结本地CPU中正在运行的线程
  * @param tcb: (I) 线程控制块对象的指针
  */
-__xwbsp_code __naked
-xwer_t soc_thrd_freeze_lc(__maybe_unused struct xwos_tcb * tcb)
+__xwbsp_code __xwcc_naked
+xwer_t soc_thrd_freeze_lc(__xwcc_unused struct xwos_tcb * tcb)
 {
         __asm__ volatile(
         "       svc     5\n"
@@ -165,9 +165,9 @@ xwer_t soc_thrd_freeze_lc(__maybe_unused struct xwos_tcb * tcb)
  * @param cpuid: (I) 目的地CPU的ID
  * @return 错误码
  */
-__xwbsp_code __naked
-xwer_t soc_thrd_outmigrate(__maybe_unused struct xwos_tcb * tcb,
-                           __maybe_unused xwid_t cpuid)
+__xwbsp_code __xwcc_naked
+xwer_t soc_thrd_outmigrate(__xwcc_unused struct xwos_tcb * tcb,
+                           __xwcc_unused xwid_t cpuid)
 {
         __asm__ volatile(
         "       svc     11\n"

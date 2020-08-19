@@ -111,7 +111,7 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         rc = xwaop_teq_then_add(xwsq_t, &xwpcp->refcnt,
                                 XWPCP_REFCNT_STOPPED, 1,
                                 NULL, NULL);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwpcplogf(ERR, "XWPCP is not constructed! ... [rc:%d]\n", rc);
                 rc = -EPERM;
                 goto err_grab_xwpcp;
@@ -120,7 +120,7 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         /* 创建内存池 */
         rc = xwmm_bma_create(&slotpool, xwpcp_frmslot_mempool_name,
                              mempoolbase, mempoolsize, XWPCP_MEMBLK_SIZE);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwpcplogf(ERR, "Create bma ... [rc:%d]\n", rc);
                 goto err_bma_create;
         }
@@ -135,17 +135,17 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         memset(&xwpcp->txq.nebmp, 0, sizeof(xwpcp->txq.nebmp));
         xwosal_splk_init(&xwpcp->txq.lock);
         rc = xwosal_smr_init(&xwpcp->txq.smr, 0, XWPCP_MEMBLK_NUM);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwpcplogf(ERR, "Init TXQ semaphore ... [rc:%d]\n", rc);
                 goto err_txqsmr_init;
         }
         rc = xwosal_mtx_init(&xwpcp->txq.csmtx, XWOSAL_SD_PRIORITY_RT_MIN);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwpcplogf(ERR, "Init xwpcp->csmtx ... [rc:%d]\n", rc);
                 goto err_csmtx_init;
         }
         rc = xwosal_cdt_init(&xwpcp->txq.cscdt);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwpcplogf(ERR, "Init xwpcp->cscdt ... [rc:%d]\n", rc);
                 goto err_cscdt_init;
         }
@@ -159,7 +159,7 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
                 xwlib_bclst_init_head(&xwpcp->rxq.q[i]);
                 xwosal_splk_init(&xwpcp->rxq.lock[i]);
                 rc = xwosal_smr_init(&xwpcp->rxq.smr[i], 0, XWPCP_MEMBLK_NUM);
-                if (__unlikely(rc < 0)) {
+                if (__xwcc_unlikely(rc < 0)) {
                         xwpcplogf(ERR, "Init RXQ semaphore[%d] ... [rc:%d]\n", i, rc);
                         goto err_rxqsmr_init;
                 }
@@ -221,14 +221,14 @@ xwer_t xwpcp_stop(struct xwpcp * xwpcp)
         rc = xwaop_teq_then_sub(xwsq_t, &xwpcp->refcnt,
                                 XWPCP_REFCNT_STARTED, 1,
                                 NULL, NULL);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 xwpcplogf(ERR, "XWPCP is in used.\n");
                 rc = -EPERM;
                 goto err_ifbusy;
         }
 
         rc = xwpcp_hwifal_close(xwpcp);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_hwifal_close;
         }
 
@@ -342,21 +342,21 @@ xwer_t xwpcp_tx(struct xwpcp * xwpcp,
 
         xwpcplogf(DEBUG, "msg->port:%d, msg->size:0x%X\n", msg->port, msg->size);
         rc = xwpcp_grab(xwpcp);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_ifnotrdy;
         }
 
         xwosal_splk_init(&cbarg.splk);
         rc = xwosal_cdt_init(&cbarg.cdt);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_cdt_init;
         }
         cbarg.rc = -EINPROGRESS;
 
         cdtid = xwosal_cdt_get_id(&cbarg.cdt);
         rc = xwpcp_eq(xwpcp, msg, prio, xwpcp_tx_notify, &cbarg, &fhdl);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwpcp_eq;
         }
 
@@ -446,7 +446,7 @@ xwer_t xwpcp_eq(struct xwpcp * xwpcp,
         XWPCP_VALIDATE((prio < XWPCP_PRIORITY_NUM), "prio-invalid", -E2BIG);
 
         rc = xwpcp_grab(xwpcp);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_ifnotrdy;
         }
@@ -531,7 +531,7 @@ xwer_t xwpcp_rx(struct xwpcp * xwpcp, struct xwpcp_msg * msgbuf, xwtm_t * xwtm)
         XWPCP_VALIDATE((xwtm), "nullptr", -EFAULT);
 
         rc = xwpcp_grab(xwpcp);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_ifnotrdy;
         }
@@ -539,7 +539,7 @@ xwer_t xwpcp_rx(struct xwpcp * xwpcp, struct xwpcp_msg * msgbuf, xwtm_t * xwtm)
         xwpcplogf(DEBUG, "port:%d, buffer size:0x%X\n", msgbuf->port, msgbuf->size);
         rc = xwosal_smr_timedwait(xwosal_smr_get_id(&xwpcp->rxq.smr[msgbuf->port]),
                                   xwtm);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_smr_timedwait;
         }
 
@@ -602,14 +602,14 @@ xwer_t xwpcp_try_rx(struct xwpcp * xwpcp, struct xwpcp_msg * msgbuf)
         XWPCP_VALIDATE((msgbuf->port < XWPCP_PORT_NUM), "no-such-port", -ENODEV);
 
         rc = xwpcp_grab(xwpcp);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_ifnotrdy;
         }
 
         xwpcplogf(DEBUG, "port:%d, buffer size:0x%X\n", msgbuf->port, msgbuf->size);
         rc = xwosal_smr_trywait(xwosal_smr_get_id(&xwpcp->rxq.smr[msgbuf->port]));
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_smr_trywait;
         }
 

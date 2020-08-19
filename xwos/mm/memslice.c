@@ -83,8 +83,8 @@ xwer_t xwmm_memslice_init(struct xwmm_memslice * msa, xwptr_t origin,
         nm = num_max;
         for (n = 0; n < nm; n++) {
                 next += card_size;
-                xwlib_lfq_init((__atomic xwlfq_t *)curr);
-                xwlib_lfq_push(&msa->free_list, (__atomic xwlfq_t *)curr);
+                xwlib_lfq_init((__xwcc_atomic xwlfq_t *)curr);
+                xwlib_lfq_push(&msa->free_list, (__xwcc_atomic xwlfq_t *)curr);
                 curr = next;
         }
 
@@ -117,19 +117,19 @@ xwer_t xwmm_memslice_create(struct xwmm_memslice ** ptrbuf,
 
         card_size = ALIGN(card_size, XWMM_ALIGNMENT);
         num_max = total_size / card_size;
-        if (__unlikely(0 == num_max)) {
+        if (__xwcc_unlikely(0 == num_max)) {
                 rc = -E2SMALL;
                 goto err_mem2small;
         }
 
         rc = xwmm_kma_alloc(sizeof(struct xwmm_memslice), XWMM_ALIGNMENT, &mem);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_msa_alloc;
         }
         msa = mem;
 
         rc = xwmm_memslice_init(msa, origin, total_size, card_size, name, ctor, dtor);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_msa_init;
         }
 
@@ -179,19 +179,19 @@ __xwos_api
 xwer_t xwmm_memslice_free(struct xwmm_memslice * msa, void * mem)
 {
         xwer_t rc;
-        __atomic xwlfq_t * card;
+        __xwcc_atomic xwlfq_t * card;
 
         XWOS_VALIDATE((msa), "nullptr", -EFAULT);
         XWOS_VALIDATE((mem), "nullptr", -EFAULT);
 
-        if (__unlikely((xwptr_t)mem < msa->zone.origin ||
-                       ((xwptr_t)mem - msa->zone.origin) > msa->zone.size)) {
+        if (__xwcc_unlikely((xwptr_t)mem < msa->zone.origin ||
+                            ((xwptr_t)mem - msa->zone.origin) > msa->zone.size)) {
                 rc = -EOWNER;
         } else {
                 if (msa->dtor) {
                         msa->dtor(mem);
                 }/* else {} */
-                card = (__atomic xwlfq_t *)mem;
+                card = (__xwcc_atomic xwlfq_t *)mem;
                 xwlib_lfq_push(&msa->free_list, card);
                 xwaop_add(xwsz_t, &msa->num_free, 1, NULL, NULL);
                 rc = XWOK;

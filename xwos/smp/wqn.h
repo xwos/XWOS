@@ -69,7 +69,7 @@ typedef void (* xwos_wqn_f)(void *);
  */
 struct xwos_wqn {
         xwsq_t type; /**< 等待队列类型（信号量、互斥锁） */
-        __atomic xwsq_t rsmrs; /**< 唤醒原因 */
+        __xwcc_atomic xwsq_t rsmrs; /**< 唤醒原因 */
         void * wq; /**< 指向所属的等待队列的指针 */
         xwos_wqn_f cb; /**< 被唤醒时的回调函数 */
         struct xwlk_splk lock; /**< 保护此结构体的锁 */
@@ -98,7 +98,7 @@ struct xwos_wqn {
  * @param wqn: (I) 等待队列节点指针
  * @param owner: (I) 拥有结构体的对象的指针
  */
-static __xw_inline
+static __xwcc_inline
 void xwos_wqn_init(struct xwos_wqn * wqn, void * owner)
 {
         wqn->owner = owner;

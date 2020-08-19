@@ -44,19 +44,19 @@ xwer_t xwds_eirq_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask,
         XWDS_VALIDATE((eiid < soc->eirq.num), "out-of-range", -ERANGE);
 
         rc = xwds_soc_grab(soc);
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
 
 #if defined(XWMDCFG_ds_SOC_EIRQ_ROISRT) && (1 == XWMDCFG_ds_SOC_EIRQ_ROISRT)
         XWOS_UNUSED(isr);
         XWOS_UNUSED(arg);
-        if (__unlikely(NULL == soc->eirq.isrs[eiid])) {
+        if (__xwcc_unlikely(NULL == soc->eirq.isrs[eiid])) {
                 rc = -EPERM;
                 goto err_perm;
         }
 #else
-        if (__unlikely(soc->eirq.isrs[eiid])) {
+        if (__xwcc_unlikely(soc->eirq.isrs[eiid])) {
                 rc = -EBUSY;
                 goto err_perm;
         }
@@ -70,7 +70,7 @@ xwer_t xwds_eirq_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask,
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_eirq_req;
         }
         return XWOK;
@@ -95,7 +95,7 @@ xwer_t xwds_eirq_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask, xwid_t 
         XWDS_VALIDATE(soc, "nullptr", -EFAULT);
         XWDS_VALIDATE((eiid < soc->eirq.num), "out-of-range", -ERANGE);
 
-        if (__unlikely(NULL == soc->eirq.isrs[eiid])) {
+        if (__xwcc_unlikely(NULL == soc->eirq.isrs[eiid])) {
                 rc = -EPERM;
                 goto err_notinused;
         }
@@ -105,7 +105,7 @@ xwer_t xwds_eirq_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask, xwid_t 
         } else {
                 rc = -ENOSYS;
         }
-        if (__unlikely(rc < 0)) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_rlsei;
         }
 #if !defined(XWMDCFG_ds_SOC_EIRQ_ROISRT) || (1 != XWMDCFG_ds_SOC_EIRQ_ROISRT)

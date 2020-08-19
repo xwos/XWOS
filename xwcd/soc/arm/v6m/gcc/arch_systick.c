@@ -108,7 +108,7 @@ __xwbsp_isr
 void arch_systick_isr(void)
 {
         struct xwos_scheduler * xwsd;
-        __maybe_unused xwu32_t csr;
+        __xwcc_unused xwu32_t csr;
 
         xwmb_read(xwu32_t, csr, &cm_scs.systick.csr.u32); /* read to clear COUNTFLAG */
         xwsd = xwos_scheduler_get_lc();
@@ -119,7 +119,7 @@ void arch_systick_isr(void)
  * @brief Start Systick Timer
  */
 __xwbsp_code
-xwer_t arch_systick_start(__maybe_unused struct xwos_syshwt * hwt)
+xwer_t arch_systick_start(__xwcc_unused struct xwos_syshwt * hwt)
 {
         cm_scs.systick.csr.bit.en = 1;
         return XWOK;
@@ -129,7 +129,7 @@ xwer_t arch_systick_start(__maybe_unused struct xwos_syshwt * hwt)
  * @brief Stop Systick Timer
  */
 __xwbsp_code
-xwer_t arch_systick_stop(__maybe_unused struct xwos_syshwt * hwt)
+xwer_t arch_systick_stop(__xwcc_unused struct xwos_syshwt * hwt)
 {
         cm_scs.systick.csr.bit.en = 0;
         return XWOK;
@@ -141,7 +141,7 @@ xwer_t arch_systick_stop(__maybe_unused struct xwos_syshwt * hwt)
  * @retval time confetti
  */
 __xwbsp_code
-xwtm_t arch_systick_get_timeconfetti(__maybe_unused struct xwos_syshwt * hwt)
+xwtm_t arch_systick_get_timeconfetti(__xwcc_unused struct xwos_syshwt * hwt)
 {
         xwu32_t cnt;
         xwu32_t confetti;

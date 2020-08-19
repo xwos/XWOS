@@ -88,7 +88,7 @@ struct xwsync_evt {
  * @param evt: (I) 事件对象指针
  * @return 错误码
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwsync_evt_grab(struct xwsync_evt * evt)
 {
         return xwsync_cdt_grab(&evt->cdt);
@@ -99,7 +99,7 @@ xwer_t xwsync_evt_grab(struct xwsync_evt * evt)
  * @param evt: (I) 事件对象指针
  * @return 错误码
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwsync_evt_put(struct xwsync_evt * evt)
 {
         return xwsync_cdt_put(&evt->cdt);

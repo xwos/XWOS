@@ -218,7 +218,7 @@ xwer_t xwos_scheduler_resume_lic(struct xwos_scheduler * xwsd);
  * @brief 禁止调度器进入暂停模式
  * @return 错误码
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwos_scheduler_wakelock_lock(void)
 {
         return xwos_scheduler_inc_wklkcnt();
@@ -228,7 +228,7 @@ xwer_t xwos_scheduler_wakelock_lock(void)
  * @brief 允许调度器进入暂停模式
  * @return 错误码
  */
-static __xw_inline
+static __xwcc_inline
 xwer_t xwos_scheduler_wakelock_unlock(void)
 {
         return xwos_scheduler_dec_wklkcnt();

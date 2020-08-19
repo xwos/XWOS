@@ -27,8 +27,8 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwbsp_code __naked
-xwu8_t arch_xwbop_rbit8(__maybe_unused xwu8_t x)
+__xwbsp_code __xwcc_naked
+xwu8_t arch_xwbop_rbit8(__xwcc_unused xwu8_t x)
 {
         __asm__ volatile("      rbit    r0, r0");
         __asm__ volatile("      lsr     r0, #24");
