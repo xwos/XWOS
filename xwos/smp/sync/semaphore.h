@@ -118,7 +118,7 @@ xwer_t xwsync_rtsmr_intr(struct xwsync_smr * smr, struct xwos_wqn * wqn);
 #endif /* XWSMPCFG_SYNC_RTSMR */
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
+ ******** ********       API function prototypes       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWSMPCFG_SYNC_SMR_MEMSLICE) && (1 == XWSMPCFG_SYNC_SMR_MEMSLICE)
 __xwos_init_code

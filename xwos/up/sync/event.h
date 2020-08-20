@@ -105,7 +105,7 @@ __xwos_code
 xwer_t xwsync_evt_obj_c0i(struct xwsync_evt * evt, struct xwsync_object * obj);
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
+ ******** ********       API function prototypes       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwos_api
 xwer_t xwsync_evt_init(struct xwsync_evt * evt, xwbmp_t initval[], xwsq_t attr);

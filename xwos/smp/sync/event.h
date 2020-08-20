@@ -126,7 +126,7 @@ __xwos_code
 xwer_t xwsync_evt_obj_c0i(struct xwsync_evt * evt, struct xwsync_object * obj);
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
+ ******** ********       API function prototypes       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWSMPCFG_SYNC_EVT_MEMSLICE) && (1 == XWSMPCFG_SYNC_EVT_MEMSLICE)
 __xwos_init_code
