@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：初始化
+ * @brief STM32CUBE：玄武OS内核HOOK
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -22,12 +22,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
-#include <xwos/mm/mempool/allocator.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
-#include <bm/stm32cube/xwac/xwds/init.h>
-#include <bm/stm32cube/xwac/xwds/stm32cube.h>
-#include <bm/stm32cube/init.h>
-#include <armv7m_core.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      macros       ******** ******** ********
@@ -36,56 +31,15 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern xwsz_t sdram_mr_origin[];
-extern xwsz_t sdram_mr_size[];
-
-/**
- * @brief External SDRAM zone
- */
-struct xwmm_mempool * sdram_mempool = (void *)sdram_mr_origin;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern
-void SystemInit(void);
-
-extern
-void SystemClock_Config(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief Lowlevel-init stm32cube
- * @note
- * - Called by board_lowlevel_init()
- */
-__xwbsp_init_code
-void stm32cube_lowlevel_init(void)
+void stm32cube_systick_hook(void)
 {
-        SystemInit();
-        /* cm_scs.scnscb.actlr.bit.disdefwbuf = 1; */
-}
-
-/**
- * @brief Init stm32cube
- * @note
- * - Called by board_init()
- */
-__xwbsp_init_code
-void stm32cube_init(void)
-{
-        xwer_t rc;
-
-        HAL_Init();
-        SystemClock_Config();
-
-        rc = stm32cube_xwds_ll_start();
-        BDL_BUG_ON(rc < 0);
-
-        rc = xwmm_mempool_init(sdram_mempool, "SDRAM",
-                               (xwptr_t)sdram_mr_origin,
-                               (xwsz_t)sdram_mr_size);
-        BDL_BUG_ON(rc < 0);
+        HAL_IncTick();
 }

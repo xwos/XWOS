@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：初始化
+ * @brief 玄武OS内核适配代码：芯片内部内存池
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,71 +21,50 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <bm/stm32cube/standard.h>
-#include <xwos/mm/mempool/allocator.h>
-#include <bm/stm32cube/cubemx/Core/Inc/main.h>
-#include <bm/stm32cube/xwac/xwds/init.h>
-#include <bm/stm32cube/xwac/xwds/stm32cube.h>
-#include <bm/stm32cube/init.h>
-#include <armv7m_core.h>
+#include <xwos/standard.h>
+#include <xwos/lib/xwbop.h>
+#include <xwos/mm/common.h>
+#include <xwos/mm/bma.h>
+#include <bdl/ocheap.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
+ ******** ******** ********       macros      ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern xwsz_t sdram_mr_origin[];
-extern xwsz_t sdram_mr_size[];
-
-/**
- * @brief External SDRAM zone
- */
-struct xwmm_mempool * sdram_mempool = (void *)sdram_mr_origin;
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-extern
-void SystemInit(void);
-
-extern
-void SystemClock_Config(void);
+extern struct xwmm_bma * ocheap_bma;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief Lowlevel-init stm32cube
- * @note
- * - Called by board_lowlevel_init()
- */
-__xwbsp_init_code
-void stm32cube_lowlevel_init(void)
-{
-        SystemInit();
-        /* cm_scs.scnscb.actlr.bit.disdefwbuf = 1; */
-}
+#if ((BRDCFG_MM_OCHEAP_BLKSZ % XWMMCFG_STACK_ALIGNMENT) != 0)
+  #error BRDCFG_MM_OCHEAP_BLKSZ is not aligned to XWMMCFG_STACK_ALIGNMENT!
+#endif
 
-/**
- * @brief Init stm32cube
- * @note
- * - Called by board_init()
- */
-__xwbsp_init_code
-void stm32cube_init(void)
+__xwos_code
+xwer_t ocheap_alloc(xwsz_t memsize, void ** membuf)
 {
+        xwsz_t stknum;
+        xwsq_t numodr;
         xwer_t rc;
 
-        HAL_Init();
-        SystemClock_Config();
+        stknum = DIV_ROUND_UP(memsize, BRDCFG_MM_OCHEAP_BLKSZ);
+        numodr = (xwsq_t)xwbop_fls(xwsz_t, stknum);
+        if (stknum & (stknum - 1U)) {
+                numodr++;
+        }
+        rc = xwmm_bma_alloc(ocheap_bma, numodr, membuf);
+        return rc;
+}
 
-        rc = stm32cube_xwds_ll_start();
-        BDL_BUG_ON(rc < 0);
-
-        rc = xwmm_mempool_init(sdram_mempool, "SDRAM",
-                               (xwptr_t)sdram_mr_origin,
-                               (xwsz_t)sdram_mr_size);
-        BDL_BUG_ON(rc < 0);
+__xwos_code
+xwer_t ocheap_free(void * mem)
+{
+        return xwmm_bma_free(ocheap_bma, mem);
 }

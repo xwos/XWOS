@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：初始化
+ * @brief STM32CUBE XWDS 设备：UART
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,74 +18,37 @@
  * > limitations under the License.
  */
 
+#ifndef __bm_stm32cube_xwac_xwds_uart_h__
+#define __bm_stm32cube_xwac_xwds_uart_h__
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
-#include <xwos/mm/mempool/allocator.h>
-#include <bm/stm32cube/cubemx/Core/Inc/main.h>
-#include <bm/stm32cube/xwac/xwds/init.h>
-#include <bm/stm32cube/xwac/xwds/stm32cube.h>
-#include <bm/stm32cube/init.h>
-#include <armv7m_core.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
+ ******** ******** ********       types       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern xwsz_t sdram_mr_origin[];
-extern xwsz_t sdram_mr_size[];
-
-/**
- * @brief External SDRAM zone
- */
-struct xwmm_mempool * sdram_mempool = (void *)sdram_mr_origin;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern
-void SystemInit(void);
-
-extern
-void SystemClock_Config(void);
+void stm32cube_usart1_cb_txdma_cplt(struct xwds_dmauartc * dmauartc, xwer_t dmarc);
+void stm32cube_usart1_cb_rxdma_restart(struct xwds_dmauartc * dmauartc);
+void stm32cube_usart1_cb_rxdma_halfcplt(struct xwds_dmauartc * dmauartc);
+void stm32cube_usart1_cb_rxdma_cplt(struct xwds_dmauartc * dmauartc);
+void stm32cube_usart1_cb_rxdma_timer(struct xwds_dmauartc * dmauartc);
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
+ ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief Lowlevel-init stm32cube
- * @note
- * - Called by board_lowlevel_init()
- */
-__xwbsp_init_code
-void stm32cube_lowlevel_init(void)
-{
-        SystemInit();
-        /* cm_scs.scnscb.actlr.bit.disdefwbuf = 1; */
-}
 
-/**
- * @brief Init stm32cube
- * @note
- * - Called by board_init()
- */
-__xwbsp_init_code
-void stm32cube_init(void)
-{
-        xwer_t rc;
-
-        HAL_Init();
-        SystemClock_Config();
-
-        rc = stm32cube_xwds_ll_start();
-        BDL_BUG_ON(rc < 0);
-
-        rc = xwmm_mempool_init(sdram_mempool, "SDRAM",
-                               (xwptr_t)sdram_mr_origin,
-                               (xwsz_t)sdram_mr_size);
-        BDL_BUG_ON(rc < 0);
-}
+#endif /* bm/stm32cube/xwac/xwds/uart.h */

@@ -36,13 +36,13 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern xwsz_t sdram_mr_origin[];
-extern xwsz_t sdram_mr_size[];
+extern xwu8_t sram_mr_origin[];
+extern xwu8_t sram_mr_size[];
 
 /**
- * @brief External SDRAM zone
+ * @brief External SRAM
  */
-struct xwmm_mempool * sdram_mempool = (void *)sdram_mr_origin;
+struct xwmm_mempool * sram_mempool = (void *)sram_mr_origin;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
@@ -84,8 +84,10 @@ void stm32cube_init(void)
         rc = stm32cube_xwds_ll_start();
         BDL_BUG_ON(rc < 0);
 
-        rc = xwmm_mempool_init(sdram_mempool, "SDRAM",
-                               (xwptr_t)sdram_mr_origin,
-                               (xwsz_t)sdram_mr_size);
+#if defined(STM32CUBECFG_SRAM) && (1 == STM32CUBECFG_SRAM)
+        rc = xwmm_mempool_init(sram_mempool, "SRAM",
+                               (xwptr_t)sram_mr_origin,
+                               (xwsz_t)sram_mr_size);
         BDL_BUG_ON(rc < 0);
+#endif /* STM32CUBECFG_SRAM */
 }
