@@ -30,6 +30,7 @@ $(WKSPC):
 cfg: $(WKSPC) $(WKSPC)/XuanWuOS.cfg
 
 $(WKSPC)/XuanWuOS.cfg: cfg/*.h
+	@[ -x ../../xwbs/util/el/mkcfg.el ] || chmod +x ../../xwbs/util/el/mkcfg.el
 	@../../xwbs/util/el/mkcfg.el --cfgdir=cfg --topdir=../.. --wkspc=$(WKSPC) -- $(@F)
 
 dbgcfg: cfg/dbg/debug.gdb cfg/dbg/program.gdb cfg/dbg/erase.gdb
