@@ -154,6 +154,7 @@ void xwsync_evt_deactivate(struct xwsync_evt * evt)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EINVAL: 无效参数
+ * @retval -ENOMEM: 内存不足
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -255,8 +256,11 @@ xwer_t xwsync_evt_destroy(struct xwsync_evt * evt)
  * @param pos: (I) 事件对象对象映射到位图中的位置
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ETYPE: 事件对象或事件对象类型错误
  * @retval -EFAULT: 空指针
+ * @retval -ETYPE: 事件对象类型错误
+ * @retval -ECHRNG: 位置超出范围
+ * @retval -EALREADY: 同步对象已经绑定到事件对象
+ * @retval -EBUSY: 通道已经被其他同步对象独占
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -275,8 +279,9 @@ xwer_t xwsync_evt_bind(struct xwsync_evt * evt, struct xwsync_evt * slt, xwsq_t 
  * @param slt: (I) 类型为XWSYNC_EVT_TYPE_SELECTOR的事件对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ETYPE: 事件对象或条件量类型错误
+ * @retval -ETYPE: 事件对象类型错误
  * @retval -EFAULT: 空指针
+ * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -348,6 +353,7 @@ xwer_t xwsync_evt_s1m(struct xwsync_evt * evt, xwbmp_t msk[])
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
+ * @retval -ECHRNG: 位置超出范围
  * @retval -ETYPE: 事件对象类型错误
  * @note
  * - 同步/异步：同步
@@ -360,6 +366,7 @@ xwer_t xwsync_evt_s1i(struct xwsync_evt * evt, xwsq_t pos)
         xwreg_t cpuirq;
 
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
+        XWOS_VALIDATE((pos < XWSYNC_EVT_MAXNUM), "out-of-range", -ECHRNG);
         XWOS_VALIDATE(((evt->attr & XWSYNC_EVT_TYPE_MASK) == XWSYNC_EVT_TYPE_FLAG),
                       "type-error", -ETYPE);
 
@@ -646,7 +653,8 @@ xwer_t xwsync_evt_trywait_edge(struct xwsync_evt * evt, xwsq_t trigger,
 }
 
 /**
- * @brief XWOS API：测试事件对象中的位，事件对象类型为XWSYNC_EVT_TYPE_FLAG
+ * @brief XWOS API：检测一下事件对象中的触发信号，不会阻塞调用者，
+ *                  事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
  * @param trigger: (I) 事件触发条件，取值 @ref xwsync_evt_trigger_em
  * @param action: (I) 事件触发后的动作，取值 @ref xwsync_evt_action_em
@@ -675,6 +683,7 @@ xwer_t xwsync_evt_trywait_edge(struct xwsync_evt * evt, xwsq_t trigger,
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 事件对象类型错误
  * @retval -EINVAL: 参数无效
+ * @retval -ENODATA: 没有任何事件触发信号
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -860,7 +869,7 @@ xwer_t xwsync_evt_timedwait_edge(struct xwsync_evt * evt, xwsq_t trigger,
 }
 
 /**
- * @brief XWOS API：限时等待事件对象中的位，事件对象类型为XWSYNC_EVT_TYPE_FLAG
+ * @brief XWOS API：限时等待事件对象中的触发信号，事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
  * @param trigger: (I) 事件触发条件，取值 @ref xwsync_evt_trigger_em
  * @param action: (I) 事件触发后的动作，取值 @ref xwsync_evt_action_em
@@ -1084,7 +1093,7 @@ err_notconn:
 }
 
 /**
- * @brief XWOS API：测试一下事件对象中绑定的同步对象，不进行阻塞等待
+ * @brief XWOS API：检测一下事件对象中绑定的同步对象，不会阻塞调用者
  * @param evt: (I) 事件对象的指针
  * @param msk: (I) 待触发的同步对象的位图掩码，表示只关注掩码部分的位
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象的位图
@@ -1226,8 +1235,8 @@ xwer_t xwsync_evt_timedselect(struct xwsync_evt * evt, xwbmp_t msk[], xwbmp_t tr
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
- * @retval -ECHRNG: 位置超出范围
  * @retval -ETYPE: 事件对象类型错误
+ * @retval -ECHRNG: 位置超出范围
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
  * @retval -ENOTINTHRD: 不在线程上下文中

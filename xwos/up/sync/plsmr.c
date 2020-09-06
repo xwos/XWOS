@@ -180,6 +180,7 @@ xwer_t xwsync_plsmr_destroy(struct xwsync_plsmr * smr)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
+ * @retval -EINVAL: 无效参数
  * @retval -ENOMEM: 内存不足
  * @note
  * - 同步/异步：同步
@@ -326,7 +327,7 @@ xwer_t xwsync_plsmr_post(struct xwsync_plsmr * smr)
 }
 
 /**
- * @brief XWOS API：尝试获取管道信号量
+ * @brief XWOS API：尝试获取管道信号量，不会阻塞调用者
  * @param smr: (I) 信号量对象的指针
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -634,6 +635,8 @@ xwer_t xwsync_plsmr_do_wait_unintr(struct xwsync_plsmr * smr, struct xwos_tcb * 
  * @param smr: (I) 信号量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -646,6 +649,8 @@ xwer_t xwsync_plsmr_wait_unintr(struct xwsync_plsmr * smr)
         xwer_t rc;
 
         XWOS_VALIDATE((smr), "nullptr", -EFAULT);
+        XWOS_VALIDATE((-EINTHRD == xwos_irq_get_id(NULL)),
+                      "not-in-thrd", -ENOTINTHRD);
 
         ctcb = xwos_scheduler_get_ctcb_lc();
         rc = xwsync_plsmr_do_wait_unintr(smr, ctcb);

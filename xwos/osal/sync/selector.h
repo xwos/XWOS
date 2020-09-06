@@ -46,6 +46,8 @@ struct xwosal_selector {
  * @brief XWOSAL API：静态方式初始化信号选择器
  * @param selector: (I) 信号选择器的指针
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -61,6 +63,8 @@ xwer_t xwosal_selector_init(struct xwosal_selector * slt)
  * @brief XWOSAL API：销毁静态方式初始化的信号选择器
  * @param selector: (I) 信号选择器的指针
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -78,6 +82,9 @@ xwer_t xwosal_selector_destroy(struct xwosal_selector * slt)
  * @param val: (I) 信号选择器的初始值
  * @param max: (I) 信号选择器的最大值
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -ENOMEM: 内存不足
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -93,6 +100,8 @@ xwer_t xwosal_selector_create(xwid_t * sltbuf)
  * @brief XWOSAL API：删除动态方式创建的信号选择器
  * @param sltid: (I) 信号选择器ID
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -141,7 +150,10 @@ struct xwosal_selector * xwosal_selector_get_obj(xwid_t sltid)
  * @param pos: (I) 信号量对象映射到位图中的位置
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ETYPE: 信号选择器或信号量类型错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -ECHRNG: 位置超出范围
+ * @retval -EALREADY: 同步对象已经绑定到事件对象
+ * @retval -EBUSY: 通道已经被其他同步对象独占
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -162,7 +174,8 @@ xwer_t xwosal_selector_bind(xwid_t srcid, xwid_t dstid, xwsq_t pos)
  * @param dstid: (I) 信号选择器的ID
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ETYPE: 信号选择器类型错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -179,8 +192,7 @@ xwer_t xwosal_selector_unbind(xwid_t srcid, xwid_t dstid)
  * @param sltid: (I) 信号选择器ID
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 类型不匹配
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -193,14 +205,14 @@ xwer_t xwosal_selector_intr_all(xwid_t sltid)
 }
 
 /**
- * @brief XWOSAL API：测试一下事件对象中绑定的同步对象，立即返回
+ * @brief XWOSAL API：检测一下信号选择器中的触发信号，不会阻塞调用者
  * @param sltid: (I) 信号选择器ID
  * @param msk: (I) 待触发的信号量的位图掩码
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的信号量的位图
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
- * @retval -ENODATA: 没有任何信号或事件
+ * @retval -ENODATA: 没有任何同步对象触发信号选择器
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -213,15 +225,15 @@ xwer_t xwosal_selector_tryselect(xwid_t sltid, xwbmp_t msk[], xwbmp_t trg[])
 }
 
 /**
- * @brief XWOSAL API：等待信号选择器中的信号
+ * @brief XWOSAL API：等待信号选择器中的触发信号
  * @param sltid: (I) 信号选择器ID
  * @param msk: (I) 待触发的信号量的位图掩码
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的信号量的位图
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
- * @retval -ETYPE: 信号选择器类型错误
  * @retval -EINTR: 等待被中断
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -244,9 +256,9 @@ xwer_t xwosal_selector_select(xwid_t sltid, xwbmp_t msk[], xwbmp_t trg[])
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
- * @retval -ETYPE: 信号选择器类型错误
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程

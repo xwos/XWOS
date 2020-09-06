@@ -248,7 +248,7 @@ xwer_t xwsync_smr_gc(void * smr)
  * @retval -EFAULT: 空指针
  * @retval -EINVAL: 无效参数
  * @retval -ETYPE: 类型错误
- * @retval -EACCES: 无效的引用计数
+ * @retval -ENOMEM: 内存不足
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -296,7 +296,6 @@ xwer_t xwsync_smr_create(struct xwsync_smr ** ptrbuf, xwid_t type,
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
- * @retval -EACCES: 无效的引用计数
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -315,7 +314,7 @@ xwer_t xwsync_smr_delete(struct xwsync_smr * smr)
  * @param smr: (I) 信号量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -EACCES: 无效的引用计数
+ * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：异步
  * - 上下文：中断、中断底半部、线程
@@ -337,8 +336,11 @@ xwer_t xwsync_smr_destroy(struct xwsync_smr * smr)
  * @param pos: (I) 信号量对象映射到位图中的位置
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ETYPE: 事件对象或信号量类型错误
+ * @retval -ETYPE: 事件对象类型错误
  * @retval -EFAULT: 空指针
+ * @retval -ECHRNG: 位置超出范围
+ * @retval -EALREADY: 同步对象已经绑定到事件对象
+ * @retval -EBUSY: 通道已经被其他同步对象独占
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -387,8 +389,9 @@ xwer_t xwsync_smr_bind(struct xwsync_smr * smr, struct xwsync_evt * evt, xwsq_t 
  * @param evt: (I) 事件对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ETYPE: 事件对象或信号量类型错误
+ * @retval -ETYPE: 事件对象类型错误
  * @retval -EFAULT: 空指针
+ * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -496,7 +499,7 @@ xwer_t xwsync_plsmr_init(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型不匹配
- * @retval -EALREADY: 信号量已为负
+ * @retval -EALREADY: 信号量已被冻结
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -605,6 +608,7 @@ xwer_t xwsync_plsmr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
  * @param wqn: (I) 等待队列节点
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型不匹配
  * @note
  * - 同步/异步：同步
@@ -650,7 +654,7 @@ xwer_t xwsync_plsmr_intr(struct xwsync_smr * smr, struct xwos_wqn * wqn)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型不匹配
- * @retval -ENEGATIVE: 信号量为负
+ * @retval -ENEGATIVE: 信号量已被冻结
  * @retval -ERANGE: 信号量的值已经最大
  * @note
  * - 同步/异步：同步
@@ -720,7 +724,7 @@ xwer_t xwsync_plsmr_post(struct xwsync_smr * smr)
 }
 
 /**
- * @brief XWOS API：尝试获取信号量
+ * @brief XWOS API：尝试获取管道信号量，不会阻塞调用者
  * @param smr: (I) 信号量对象的指针
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -1099,6 +1103,7 @@ xwer_t xwsync_plsmr_do_wait_unintr(struct xwsync_smr * smr, struct xwos_tcb * tc
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型错误
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -1112,6 +1117,8 @@ xwer_t xwsync_plsmr_wait_unintr(struct xwsync_smr * smr)
 
         XWOS_VALIDATE((smr), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_PIPELINE == smr->type), "type-error", -ETYPE);
+        XWOS_VALIDATE((-EINTHRD == xwos_irq_get_id(NULL)),
+                      "not-in-thrd", -ENOTINTHRD);
 
         rc = xwsync_smr_grab(smr);
         if (__xwcc_likely(XWOK == rc)) {
@@ -1298,6 +1305,7 @@ xwer_t xwsync_rtsmr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ETYPE: 类型不匹配
+ * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -1669,6 +1677,7 @@ xwer_t xwsync_rtsmr_do_timedwait(struct xwsync_smr * smr, struct xwos_tcb * tcb,
  * @retval -ETYPE: 类型错误
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -1789,6 +1798,7 @@ xwer_t xwsync_rtsmr_do_wait_unintr(struct xwsync_smr * smr, struct xwos_tcb * tc
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型错误
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -1802,6 +1812,8 @@ xwer_t xwsync_rtsmr_wait_unintr(struct xwsync_smr * smr)
 
         XWOS_VALIDATE((smr), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_RT == smr->type), "type-error", -ETYPE);
+        XWOS_VALIDATE((-EINTHRD == xwos_irq_get_id(NULL)),
+                      "not-in-thrd", -ENOTINTHRD);
 
         rc = xwsync_smr_grab(smr);
         if (__xwcc_likely(XWOK == rc)) {

@@ -297,8 +297,8 @@ xwer_t xwlk_mtx_destroy(struct xwlk_mtx * mtx)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
- * @retval -ENOMEM: 内存不足
  * @retval -EINVAL: 无效参数
+ * @retval -ENOMEM: 内存不足
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -618,7 +618,7 @@ xwer_t xwlk_mtx_unlock(struct xwlk_mtx * mtx)
 }
 
 /**
- * @brief XWOS API：尝试上锁互斥锁
+ * @brief XWOS API：尝试上锁互斥锁，不会阻塞调用则
  * @param mtx: (I) 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -887,6 +887,7 @@ xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx,
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
+ * @retval -EINTR: 等待被中断
  * @retval -ETIMEDOUT: 超时
  * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
@@ -1015,6 +1016,7 @@ xwer_t xwlk_mtx_do_lock_unintr(struct xwlk_mtx * mtx, struct xwos_tcb * tcb)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -1027,6 +1029,8 @@ xwer_t xwlk_mtx_lock_unintr(struct xwlk_mtx * mtx)
         struct xwos_tcb * ctcb;
 
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+        XWOS_VALIDATE((-EINTHRD == xwos_irq_get_id(NULL)),
+                      "not-in-thrd", -ENOTINTHRD);
 
         rc = xwlk_mtx_grab(mtx);
         if (__xwcc_unlikely(rc < 0)) {

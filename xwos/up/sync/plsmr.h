@@ -81,6 +81,10 @@ xwer_t xwsync_plsmr_wait_unintr(struct xwsync_plsmr * smr);
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
+ * @retval -ETYPE: 事件对象类型错误
+ * @retval -ECHRNG: 位置超出范围
+ * @retval -EALREADY: 同步对象已经绑定到事件对象
+ * @retval -EBUSY: 通道已经被其他同步对象独占
  * @note
  * - 同步/异步：异步
  * - 上下文：中断、中断底半部、线程
@@ -104,6 +108,8 @@ xwer_t xwsync_plsmr_bind(struct xwsync_plsmr * smr, struct xwsync_evt * evt,
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
+ * @retval -ETYPE: 事件对象类型错误
+ * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  * @note
  * - 同步/异步：异步
  * - 上下文：中断、中断底半部、线程
@@ -125,7 +131,7 @@ xwer_t xwsync_plsmr_unbind(struct xwsync_plsmr * smr, struct xwsync_evt * evt)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
- * @retval -EALREADY: 信号量已为负
+ * @retval -EALREADY: 信号量已被冻结
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -151,7 +157,7 @@ xwer_t xwsync_plsmr_freeze(struct xwsync_plsmr * smr)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EINVAL: 参数无效
- * @retval -EALREADY: 信号量不为负
+ * @retval -EALREADY: 信号量未被冻结
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -174,6 +180,7 @@ xwer_t xwsync_plsmr_thaw(struct xwsync_plsmr * smr, xwssq_t val, xwssq_t max)
  * @param smr: (I) 信号量对象指针
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
  * @retval -EINTR: 等待被中断
  * @retval -ENOTINTHRD: 不在线程上下文中
  * @note

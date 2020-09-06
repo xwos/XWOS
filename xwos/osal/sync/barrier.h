@@ -46,6 +46,8 @@ struct xwosal_barrier {
  * @brief XWOSAL API：静态方式初始化线程栅栏
  * @param barrier: (I) 线程栅栏的指针
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -61,6 +63,8 @@ xwer_t xwosal_barrier_init(struct xwosal_barrier * bar)
  * @brief XWOSAL API：销毁静态方式初始化的线程栅栏
  * @param barrier: (I) 线程栅栏的指针
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -78,6 +82,9 @@ xwer_t xwosal_barrier_destroy(struct xwosal_barrier * bar)
  * @param val: (I) 线程栅栏的初始值
  * @param max: (I) 线程栅栏的最大值
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -ENOMEM: 内存不足
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -93,6 +100,8 @@ xwer_t xwosal_barrier_create(xwid_t * barbuf)
  * @brief XWOSAL API：删除动态方式创建的线程栅栏
  * @param barid: (I) 线程栅栏ID
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -141,7 +150,10 @@ struct xwosal_barrier * xwosal_barrier_get_obj(xwid_t barid)
  * @param pos: (I) 线程栅栏对象映射到位图中的位置
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ETYPE: 信号选择器或线程栅栏类型错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -ECHRNG: 位置超出范围
+ * @retval -EALREADY: 同步对象已经绑定到事件对象
+ * @retval -EBUSY: 通道已经被其他同步对象独占
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -161,7 +173,8 @@ xwer_t xwosal_barrier_bind(xwid_t barid, xwid_t sltid, xwsq_t pos)
  * @param sltid: (I) 信号选择器的ID
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ETYPE: 信号选择器类型错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -178,8 +191,7 @@ xwer_t xwosal_barrier_unbind(xwid_t barid, xwid_t sltid)
  * @param barid: (I) 线程栅栏ID
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 类型不匹配
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -198,9 +210,8 @@ xwer_t xwosal_barrier_intr_all(xwid_t barid)
  * @param sync: (I) 当前线程需要同步的线程掩码
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
+ * @retval -EFAULT: 无效的ID或空指针
  * @retval -ECHRNG: 位置超出范围
- * @retval -ETYPE: 事件对象类型错误
  * @retval -EINTR: 等待被中断
  * @note
  * - 同步/异步：同步
@@ -223,9 +234,8 @@ xwer_t xwosal_barrier_sync(xwid_t barid, xwsq_t pos, xwbmp_t sync[])
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
+ * @retval -EFAULT: 无效的ID或空指针
  * @retval -ECHRNG: 位置超出范围
- * @retval -ETYPE: 事件对象类型错误
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
  * @note

@@ -175,7 +175,7 @@ xwer_t xwsync_evt_timedsync(struct xwsync_evt * evt, xwsq_t pos, xwbmp_t sync[],
  ******** ********      inline API implementations     ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief XWOS API：等待事件对象中的信号，事件对象类型为XWSYNC_EVT_TYPE_FLAG
+ * @brief XWOS API：等待事件对象中的触发信号，事件对象类型为XWSYNC_EVT_TYPE_FLAG
  * @param evt: (I) 事件对象的指针
  * @param trigger: (I) 事件触发条件，取值 @ref xwsync_evt_trigger_em
  * @param action: (I) 事件触发后的动作，取值 @ref xwsync_evt_action_em，

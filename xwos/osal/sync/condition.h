@@ -41,6 +41,8 @@ struct xwosal_cdt {
  * @brief XWOSAL API：静态方式初始化条件量
  * @param cdt: (I) 条件量的指针
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -56,6 +58,8 @@ xwer_t xwosal_cdt_init(struct xwosal_cdt * cdt)
  * @brief XWOSAL API：销毁静态方式初始化的条件量
  * @param cdt: (I) 条件量的指针
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -71,6 +75,8 @@ xwer_t xwosal_cdt_destroy(struct xwosal_cdt * cdt)
  * @brief XWOSAL API：动态方式创建条件量
  * @param cdtidbuf: (O) 指向缓冲区的指针，通过此缓冲区返回ID
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -86,6 +92,8 @@ xwer_t xwosal_cdt_create(xwid_t * cdtidbuf)
  * @brief XWOSAL API：删除动态方式创建的条件量
  * @param cdtid: (I) 条件量ID
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -134,7 +142,10 @@ struct xwosal_cdt * xwosal_cdt_get_obj(xwid_t cdtid)
  * @param pos: (I) 条件量对象映射到位图中的位置
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ETYPE: 信号选择器类型错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -ECHRNG: 位置超出范围
+ * @retval -EALREADY: 同步对象已经绑定到事件对象
+ * @retval -EBUSY: 通道已经被其他同步对象独占
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -154,7 +165,8 @@ xwer_t xwosal_cdt_bind(xwid_t cdtid, xwid_t sltid, xwsq_t pos)
  * @param sltid: (I) 信号选择器的ID
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ETYPE: 信号选择器类型错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -171,6 +183,7 @@ xwer_t xwosal_cdt_unbind(xwid_t cdtid, xwid_t sltid)
  * @param cdtid: (I) 条件量ID
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @retval -EALREADY: 条件量已被冻结
  * @note
  * - 同步/异步：同步
@@ -191,6 +204,7 @@ xwer_t xwosal_cdt_freeze(xwid_t cdtid)
  * @param cdtid: (I) 条件量ID
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @retval -EALREADY: 条件量未被冻结
  * @note
  * - 同步/异步：同步
@@ -209,6 +223,8 @@ xwer_t xwosal_cdt_thaw(xwid_t cdtid)
  * @brief XWOSAL API：中断条件量等待队列中所有线程
  * @param cdtid: (I) 条件量ID
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -226,6 +242,9 @@ xwer_t xwosal_cdt_intr_all(xwid_t cdtid)
  * @brief XWOSAL API：广播条件量，等待队列中的所有线程都会被唤醒
  * @param cdtid: (I) 条件量ID
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -ENEGATIVE: 条件量已被冻结
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -243,6 +262,9 @@ xwer_t xwosal_cdt_broadcast(xwid_t cdtid)
  * @brief XWOSAL API：单播条件量，只会唤醒第一个线程
  * @param cdtid: (I) 条件量ID
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -ENEGATIVE: 条件量已被冻结
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -264,6 +286,11 @@ xwer_t xwosal_cdt_unicast(xwid_t cdtid)
  * @param lkdata: (I) 锁的数据
  * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -EINVAL: 参数无效
+ * @retval -EINTR: 等待被中断
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -289,7 +316,11 @@ xwer_t xwosal_cdt_wait(xwid_t cdtid,
  * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -EINVAL: 参数无效
  * @retval -ETIMEDOUT: 超时
+ * @retval -EINTR: 等待被中断
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程

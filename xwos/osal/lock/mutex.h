@@ -41,6 +41,9 @@ struct xwosal_mtx {
  * @param mtx: (I) 互斥锁的指针
  * @param sprio: (I) 互斥锁的静态优先级
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -EINVAL: 无效参数
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -56,6 +59,8 @@ xwer_t xwosal_mtx_init(struct xwosal_mtx * mtx, xwpr_t sprio)
  * @brief XWOSAL API：销毁静态方式初始化的互斥锁
  * @param mtx: (I) 互斥锁的指针
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -72,6 +77,10 @@ xwer_t xwosal_mtx_destroy(struct xwosal_mtx * mtx)
  * @param midbuf: (O) 指向缓冲区的指针，通过此缓冲区返回互斥锁的ID
  * @param sprio: (I) 互斥锁的静态优先级
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -EINVAL: 无效参数
+ * @retval -ENOMEM: 内存不足
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -87,6 +96,8 @@ xwer_t xwosal_mtx_create(xwid_t * midbuf, xwpr_t sprio)
  * @brief XWOSAL API：删除动态方式创建的互斥锁
  * @param mid: (I) 互斥锁ID
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -132,6 +143,10 @@ struct xwosal_mtx * xwosal_mtx_get_obj(xwid_t mid)
  * @brief XWOSAL API：解锁互斥锁
  * @param mid: (I) 互斥锁ID
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -EOWNER: 线程并没有锁定此互斥锁
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -147,6 +162,10 @@ xwer_t xwosal_mtx_unlock(xwid_t mid)
  * @brief XWOSAL API：等待并上锁互斥锁
  * @param mid: (I) 互斥锁ID
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -EINTR: 等待被中断
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -159,9 +178,13 @@ xwer_t xwosal_mtx_lock(xwid_t mid)
 }
 
 /**
- * @brief XWOSAL API：尝试上锁互斥锁
+ * @brief XWOSAL API：尝试上锁互斥锁，不会阻塞调用者
  * @param mid: (I) 互斥锁ID
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -ENODATA: 获取锁失败
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -185,7 +208,10 @@ xwer_t xwosal_mtx_trylock(xwid_t mid)
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -EINTR: 等待被中断
  * @retval -ETIMEDOUT: 超时
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -203,6 +229,9 @@ xwer_t xwosal_mtx_timedlock(xwid_t mid, xwtm_t * xwtm)
  * @brief XWOSAL API：等待并上锁互斥锁，且等待不可被中断
  * @param mid: (I) 互斥锁ID
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的ID或空指针
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程

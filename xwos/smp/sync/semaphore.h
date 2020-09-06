@@ -204,6 +204,7 @@ xwer_t xwsync_smr_gettype(struct xwsync_smr * smr, xwid_t * type);
  * @param smr: (I) 信号量对象指针
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
  * @retval -ETYPE: 信号量类型错误
  * @retval -EINTR: 等待被中断
  * @retval -ENOTINTHRD: 不在线程上下文中
@@ -227,6 +228,7 @@ xwer_t xwsync_plsmr_wait(struct xwsync_smr * smr)
  * @param smr: (I) 信号量对象指针
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
  * @retval -ETYPE: 信号量类型错误
  * @retval -EINTR: 等待被中断
  * @retval -ENOTINTHRD: 不在线程上下文中

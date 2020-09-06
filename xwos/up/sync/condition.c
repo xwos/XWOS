@@ -134,8 +134,8 @@ xwer_t xwsync_cdt_init(struct xwsync_cdt * cdt)
 }
 
 /**
- * @brief XWOS API：销毁条件量对象
- * @param cdt: (I) 条件量的指针
+ * @brief XWOS API：销毁静态方式初始化的条件量对象
+ * @param cdt: (I) 条件量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -214,8 +214,11 @@ xwer_t xwsync_cdt_delete(struct xwsync_cdt * cdt)
  * @param pos: (I) 条件量对象映射到位图中的位置
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ETYPE: 事件对象或条件量类型错误
  * @retval -EFAULT: 空指针
+ * @retval -ETYPE: 事件对象类型错误
+ * @retval -ECHRNG: 位置超出范围
+ * @retval -EALREADY: 同步对象已经绑定到事件对象
+ * @retval -EBUSY: 通道已经被其他同步对象独占
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -242,8 +245,9 @@ xwer_t xwsync_cdt_bind(struct xwsync_cdt * cdt, struct xwsync_evt * evt, xwsq_t 
  * @param evt: (I) 事件对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ETYPE: 事件对象或条件量类型错误
+ * @retval -ETYPE: 事件对象类型错误
  * @retval -EFAULT: 空指针
+ * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -523,7 +527,7 @@ xwer_t xwsync_cdt_do_unicast(struct xwsync_cdt * cdt)
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
- * @note；
+ * @note
  * - 此函数只对未冻结的条件量起作用，已冻结的条件量将得到错误码-ENEGATIVE。
  */
 __xwos_api
@@ -718,7 +722,7 @@ xwer_t xwsync_cdt_do_timedwait(struct xwsync_cdt * cdt,
  * @brief XWOS API：限时等待条件量
  * @param cdt: (I) 条件量对象的指针
  * @param lock: (I) 锁的地址
- * @param lktype: (I) 锁的类型
+ * @param lktype: (I) 锁的类型，取值：@ref xwos_lock_type_em
  * @param lkdata: (I) 锁的数据
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间

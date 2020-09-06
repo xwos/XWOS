@@ -262,10 +262,11 @@ xwer_t xwsync_cdt_destroy(struct xwsync_cdt * cdt)
 
 /**
  * @brief XWOS API：动态创建条件量
- * @param ptrbuf: (O) 指向缓冲区的指针，此缓冲区用于返回对象的指针
+ * @param ptrbuf: (O) 指向缓冲区的指针，通过此缓冲区返回对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
+ * @retval -ENOMEM: 内存不足
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -321,8 +322,11 @@ xwer_t xwsync_cdt_delete(struct xwsync_cdt * cdt)
  * @param pos: (I) 条件量对象映射到位图中的位置
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ETYPE: 事件对象或条件量类型错误
  * @retval -EFAULT: 空指针
+ * @retval -ETYPE: 事件对象类型错误
+ * @retval -ECHRNG: 位置超出范围
+ * @retval -EALREADY: 同步对象已经绑定到事件对象
+ * @retval -EBUSY: 通道已经被其他同步对象独占
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -352,8 +356,9 @@ xwer_t xwsync_cdt_bind(struct xwsync_cdt * cdt, struct xwsync_evt * evt, xwsq_t 
  * @param evt: (I) 事件对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ETYPE: 事件对象或条件量类型错误
+ * @retval -ETYPE: 事件对象类型错误
  * @retval -EFAULT: 空指针
+ * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程

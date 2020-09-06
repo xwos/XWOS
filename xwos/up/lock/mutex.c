@@ -184,8 +184,8 @@ xwer_t xwlk_mtx_destroy(struct xwlk_mtx * mtx)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
- * @retval -ENOMEM: 内存不足
  * @retval -EINVAL: 无效参数
+ * @retval -ENOMEM: 内存不足
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -645,6 +645,7 @@ xwer_t xwlk_mtx_do_timedlock(struct xwlk_mtx * mtx,
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
+ * @retval -EINTR: 等待被中断
  * @retval -ETIMEDOUT: 超时
  * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
@@ -751,6 +752,7 @@ xwer_t xwlk_mtx_do_lock_unintr(struct xwlk_mtx * mtx,
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程

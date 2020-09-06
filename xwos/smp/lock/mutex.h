@@ -127,8 +127,8 @@ xwer_t xwlk_mtx_lock_unintr(struct xwlk_mtx * mtx);
  * @param mtx: (I) 互斥锁对象指针
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -EINVAL: 无效参数
- * @retval -EDEADLOCK: 死锁
+ * @retval -EFAULT: 空指针
+ * @retval -EINTR: 等待被中断
  * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步

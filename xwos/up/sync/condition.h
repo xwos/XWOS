@@ -117,7 +117,7 @@ xwer_t xwsync_cdt_timedwait(struct xwsync_cdt * cdt,
  * @brief XWOS API：等待条件量
  * @param cdt: (I) 条件量对象指针
  * @param lock: (I) (I) 锁的地址
- * @param lktype: (I) 锁的类型
+ * @param lktype: (I) 锁的类型，取值：@ref xwos_lock_type_em
  * @param lkdata: (I) 锁的数据
  * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码

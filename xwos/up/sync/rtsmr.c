@@ -162,6 +162,7 @@ xwer_t xwsync_rtsmr_init(struct xwsync_rtsmr * smr, xwssq_t val, xwssq_t max)
  * @param smr: (I) 信号量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -185,6 +186,7 @@ xwer_t xwsync_rtsmr_destroy(struct xwsync_rtsmr * smr)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
+ * @retval -EINVAL: 无效参数
  * @retval -ENOMEM: 内存不足
  * @note
  * - 同步/异步：同步
@@ -644,6 +646,7 @@ xwer_t xwsync_rtsmr_do_wait_unintr(struct xwsync_rtsmr * smr, struct xwos_tcb * 
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
+ * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -656,6 +659,9 @@ xwer_t xwsync_rtsmr_wait_unintr(struct xwsync_rtsmr * smr)
         xwer_t rc;
 
         XWOS_VALIDATE((smr), "nullptr", -EFAULT);
+        XWOS_VALIDATE((-EINTHRD == xwos_irq_get_id(NULL)),
+                      "not-in-thrd", -ENOTINTHRD);
+
         ctcb = xwos_scheduler_get_ctcb_lc();
         rc = xwsync_rtsmr_do_wait_unintr(smr, ctcb);
         return rc;
