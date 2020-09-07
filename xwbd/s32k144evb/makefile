@@ -39,6 +39,9 @@ pegdbserver:
 		-serverport=7224 -gdbmiport=6224 -interface=OPENSDA -speed=5000 -port=USB1 \
 		-configfile=cfg/dbg/config.ini
 
+jlink:
+	@openocd -f cfg/dbg/openocd/jlink-swd.cfg
+
 cmdap:
 	openocd -f cfg/dbg/openocd/cmsis-dap.cfg
 

@@ -1,6 +1,5 @@
 #! /bin/sh
-":"; exec emacs --quick --script "$0" -- "$@"
-":"; # -*- mode: emacs-lisp; lexical-binding: t; -*-
+":"; exec emacs --quick --script "$0" -- "$@" # -*- mode: emacs-lisp; lexical-binding: t; -*-
 ;; @file
 ;; @brief Emacs-script to generate XuanWuOS configurations and makefile
 ;; @author

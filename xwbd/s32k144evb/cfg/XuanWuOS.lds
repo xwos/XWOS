@@ -45,3 +45,9 @@ MEMORY {
 }
 
 INCLUDE soc.lds
+
+/* For S32K SDK interrupt_manager.c */
+__DATA_ROM = data_lma_base;
+__DATA_END = data_lma_base + (data_vma_end - data_vma_base);
+__VECTOR_RAM = xwos_vctbl_vma_base;
+__VECTOR_TABLE = xwos_vctbl_lma_base;

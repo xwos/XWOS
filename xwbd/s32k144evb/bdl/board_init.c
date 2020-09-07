@@ -25,7 +25,6 @@
 #include <xwos/smp/irq.h>
 #include <smp_nvic.h>
 #include <bdl/standard.h>
-#include <oem/s32ksdk/xwac/init.h>
 #include <bdl/board_init.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -35,8 +34,8 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static __xwos_init_code
-xwer_t sys_mm_init(void);
+extern void s32dslib_lowlevel_init(void);
+extern void s32dslib_init(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
@@ -48,22 +47,11 @@ xwer_t sys_mm_init(void);
 __xwos_init_code
 void board_lowlevel_init(void)
 {
-        s32ksdk_lowlevel_init();
+        s32dslib_lowlevel_init();
 }
 
 __xwos_init_code
 void board_init(void)
 {
-        xwer_t rc;
-
-        rc = sys_mm_init();
-        BDL_BUG_ON(rc < 0);
-
-        s32ksdk_init();
-}
-
-static __xwos_init_code
-xwer_t sys_mm_init(void)
-{
-        return XWOK;
+        s32dslib_init();
 }
