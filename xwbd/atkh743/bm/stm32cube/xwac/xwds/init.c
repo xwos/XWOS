@@ -22,8 +22,6 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
-#include <xwos/mm/common.h>
-#include <xwos/mm/bma.h>
 #include <xwmd/ds/xwds.h>
 #include <xwmd/ds/device.h>
 #include <xwmd/ds/soc/chip.h>

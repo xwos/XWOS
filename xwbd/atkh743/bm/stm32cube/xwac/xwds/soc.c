@@ -36,6 +36,18 @@
 #include <bm/stm32cube/cubemx/Core/Inc/quadspi.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       types       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+struct stm32cube_soc_cfg {
+        struct {
+                GPIO_TypeDef * const register_map[11];
+        } gpio;
+        struct {
+                xwu32_t exti_line_map[16];
+        } eirq;
+};
+
+/******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
@@ -138,15 +150,6 @@ const struct xwds_soc_driver stm32cube_soc_drv = {
         .eram_tst = stm32cube_soc_drv_eram_tst,
 
         .ioctl = NULL,
-};
-
-struct stm32cube_soc_cfg {
-        struct {
-                GPIO_TypeDef * const register_map[11];
-        } gpio;
-        struct {
-                xwu32_t exti_line_map[16];
-        } eirq;
 };
 
 struct stm32cube_soc_cfg stm32cube_soc_cfg = {

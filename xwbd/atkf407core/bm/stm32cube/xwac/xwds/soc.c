@@ -32,6 +32,15 @@
 #include <bm/stm32cube/cubemx/Core/Inc/fsmc.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       types       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+struct stm32cube_soc_cfg {
+        struct {
+                GPIO_TypeDef * const register_map[11];
+        } gpio;
+};
+
+/******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
@@ -125,12 +134,6 @@ const struct xwds_soc_driver stm32cube_soc_drv = {
 #endif /* STM32CUBECFG_SRAM */
 
         .ioctl = NULL,
-};
-
-struct stm32cube_soc_cfg {
-        struct {
-                GPIO_TypeDef * const register_map[11];
-        } gpio;
 };
 
 struct stm32cube_soc_cfg stm32cube_soc_cfg = {
