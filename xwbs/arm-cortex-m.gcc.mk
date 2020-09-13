@@ -81,14 +81,14 @@ INCDIRS += $(if $(strip $(EINCDIRS)),$(addprefix -I,$(strip $(EINCDIRS))))
 DSMS := $(addsuffix .dsm,$(basename $(OBJS)))
 DSMS += $(addsuffix .dsm,$(basename $(LIB_OBJS)))
 
-LD_OBJS = $(strip -Wl,--start-group \
+LD_OBJS = $(strip -Wl,--whole-archive -Wl,--start-group \
                   $(XWOEM) $(XWAM) $(XWEM) $(XWBM) $(XWPP) $(XWMD) \
                   $(XWOS_LIB) $(XWOS_EOBJS) \
                   $(BDL_LIB) $(BDL_EOBJS) \
                   $(SOC_LIB) $(SOC_EOBJS) \
                   $(CPU_LIB) $(CPU_EOBJS) \
                   $(ARCH_LIB) $(ARCH_EOBJS) \
-                  -Wl,--end-group \
+                  -Wl,--end-group -Wl,--no-whole-archive \
                   $(ELIBS))
 LD_OBJS_LST := $(OBJ_DIR)$(TARGET)-objs.txt
 

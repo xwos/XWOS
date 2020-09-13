@@ -79,7 +79,7 @@ struct xwosal_cdt xwcdtdemo_cdt;
 xwid_t xwcdtdemo_cdtid;
 
 struct xwosal_splk xwcdtdemo_lock;
-xwsq_t shared_count = 0;
+xwsq_t xwcdtdemo_shared_count = 0;
 bool is_updated = false;
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -158,7 +158,7 @@ void xwcdtdemo_swt_callback(struct xwosal_swt * swt, void * arg)
         /* xwosal_cpuirq_save_lc(&cpuirq); */ /* 传统RTOS方法，不推荐 */
         xwosal_splk_lock_cpuirqsv(&xwcdtdemo_lock, &cpuirq); /* 多核OS的方法，推荐 */
         if (false == is_updated) {
-                shared_count++;
+                xwcdtdemo_shared_count++;
                 is_updated = true;
                 ntf = is_updated;
         } else {
@@ -197,7 +197,7 @@ xwer_t xwcdtdemo_thrd_func(void * arg)
                 if (is_updated) {
                         rc = XWOK;
                         is_updated = false;
-                        cnt = shared_count;
+                        cnt = xwcdtdemo_shared_count;
                 } else {
                         ts = 500 * XWTM_MS;
                         ulk.osal.splk = &xwcdtdemo_lock;
@@ -214,7 +214,7 @@ xwer_t xwcdtdemo_thrd_func(void * arg)
                                         xwosal_splk_lock(&xwcdtdemo_lock);
                                 }
                         }
-                        cnt = shared_count;
+                        cnt = xwcdtdemo_shared_count;
                 }
                 xwosal_splk_unlock_cpuirqrs(&xwcdtdemo_lock, cpuirq);
 

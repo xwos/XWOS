@@ -86,7 +86,7 @@ const struct xwosal_thrd_desc xwmtxdemo_tbd[] = {
 xwid_t xwmtxdemo_tid[xw_array_size(xwmtxdemo_tbd)];
 
 xwid_t xwmtxdemo_mtxid;
-xwsq_t shared_count = 0;
+xwsq_t xwmtxdemo_shared_count = 0;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -144,8 +144,8 @@ xwer_t xwmtxdemo_thrd_0_func(void * arg)
                         time = xwosal_scheduler_get_timestamp_lc();
                         mutexlogf(INFO,
                                   "[线程0] 计数器：%d, 时间戳：%lld 纳秒。\n",
-                                  shared_count, time);
-                        shared_count++;
+                                  xwmtxdemo_shared_count, time);
+                        xwmtxdemo_shared_count++;
                         xwosal_mtx_unlock(xwmtxdemo_mtxid);
                 }
         }
@@ -173,8 +173,8 @@ xwer_t xwmtxdemo_thrd_1_func(void * arg)
                         time = xwosal_scheduler_get_timestamp_lc();
                         mutexlogf(INFO,
                                   "[线程1] 计数器：%d, 时间戳：%lld 纳秒。\n",
-                                  shared_count, time);
-                        shared_count++;
+                                  xwmtxdemo_shared_count, time);
+                        xwmtxdemo_shared_count++;
                         xwosal_mtx_unlock(xwmtxdemo_mtxid);
                 }
         }
