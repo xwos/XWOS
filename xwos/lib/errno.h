@@ -23,52 +23,52 @@
   #include <errno.h>
 #else
   #ifndef EPERM
-    #define	EPERM 1 /* Not owner */
-    #define	ENOENT 2 /* No such file or directory */
-    #define	ESRCH 3 /* No such process */
-    #define	EINTR 4 /* Interrupted system call */
-    #define	EIO 5 /* I/O error */
-    #define	ENXIO 6 /* No such device or address */
-    #define	E2BIG 7 /* Arg list too long */
-    #define	ENOEXEC 8 /* Exec format error */
-    #define	EBADF 9 /* Bad file number */
-    #define	ECHILD 10 /* No children */
-    #define	EAGAIN 11 /* No more processes */
-    #define	ENOMEM 12 /* Not enough space */
-    #define	EACCES 13 /* Permission denied */
-    #define	EFAULT 14 /* Bad address */
-    #define	ENOTBLK 15 /* Block device required */
-    #define	EBUSY 16 /* Device or resource busy */
-    #define	EEXIST 17 /* File exists */
-    #define	EXDEV 18 /* Cross-device link */
-    #define	ENODEV 19 /* No such device */
-    #define	ENOTDIR 20 /* Not a directory */
-    #define	EISDIR 21 /* Is a directory */
-    #define	EINVAL 22 /* Invalid argument */
-    #define	ENFILE 23 /* Too many open files in system */
-    #define	EMFILE 24 /* File descriptor value too large */
-    #define	ENOTTY 25 /* Not a character device */
-    #define	ETXTBSY 26 /* Text file busy */
-    #define	EFBIG 27 /* File too large */
-    #define	ENOSPC 28 /* No space left on device */
-    #define	ESPIPE 29 /* Illegal seek */
-    #define	EROFS 30 /* Read-only file system */
-    #define	EMLINK 31 /* Too many links */
-    #define	EPIPE 32 /* Broken pipe */
-    #define	EDOM 33 /* Mathematics argument out of domain of function */
-    #define	ERANGE 34 /* Result too large */
-    #define	ENOMSG 35 /* No message of desired type */
-    #define	EIDRM 36 /* Identifier removed */
-    #define	ECHRNG 37 /* Channel number out of range */
-    #define	EL2NSYNC 38 /* Level 2 not synchronized */
-    #define	EL3HLT 39 /* Level 3 halted */
-    #define	EL3RST 40 /* Level 3 reset */
-    #define	ELNRNG 41 /* Link number out of range */
-    #define	EUNATCH 42 /* Protocol driver not attached */
-    #define	ENOCSI 43 /* No CSI structure available */
-    #define	EL2HLT 44 /* Level 2 halted */
-    #define	EDEADLK 45 /* Deadlock */
-    #define	ENOLCK 46 /* No lock */
+    #define EPERM 1 /* Not owner */
+    #define ENOENT 2 /* No such file or directory */
+    #define ESRCH 3 /* No such process */
+    #define EINTR 4 /* Interrupted system call */
+    #define EIO 5 /* I/O error */
+    #define ENXIO 6 /* No such device or address */
+    #define E2BIG 7 /* Arg list too long */
+    #define ENOEXEC 8 /* Exec format error */
+    #define EBADF 9 /* Bad file number */
+    #define ECHILD 10 /* No children */
+    #define EAGAIN 11 /* No more processes */
+    #define ENOMEM 12 /* Not enough space */
+    #define EACCES 13 /* Permission denied */
+    #define EFAULT 14 /* Bad address */
+    #define ENOTBLK 15 /* Block device required */
+    #define EBUSY 16 /* Device or resource busy */
+    #define EEXIST 17 /* File exists */
+    #define EXDEV 18 /* Cross-device link */
+    #define ENODEV 19 /* No such device */
+    #define ENOTDIR 20 /* Not a directory */
+    #define EISDIR 21 /* Is a directory */
+    #define EINVAL 22 /* Invalid argument */
+    #define ENFILE 23 /* Too many open files in system */
+    #define EMFILE 24 /* File descriptor value too large */
+    #define ENOTTY 25 /* Not a character device */
+    #define ETXTBSY 26 /* Text file busy */
+    #define EFBIG 27 /* File too large */
+    #define ENOSPC 28 /* No space left on device */
+    #define ESPIPE 29 /* Illegal seek */
+    #define EROFS 30 /* Read-only file system */
+    #define EMLINK 31 /* Too many links */
+    #define EPIPE 32 /* Broken pipe */
+    #define EDOM 33 /* Mathematics argument out of domain of function */
+    #define ERANGE 34 /* Result too large */
+    #define ENOMSG 35 /* No message of desired type */
+    #define EIDRM 36 /* Identifier removed */
+    #define ECHRNG 37 /* Channel number out of range */
+    #define EL2NSYNC 38 /* Level 2 not synchronized */
+    #define EL3HLT 39 /* Level 3 halted */
+    #define EL3RST 40 /* Level 3 reset */
+    #define ELNRNG 41 /* Link number out of range */
+    #define EUNATCH 42 /* Protocol driver not attached */
+    #define ENOCSI 43 /* No CSI structure available */
+    #define EL2HLT 44 /* Level 2 halted */
+    #define EDEADLK 45 /* Deadlock */
+    #define ENOLCK 46 /* No lock */
     #define EBADE 50 /* Invalid exchange */
     #define EBADR 51 /* Invalid request descriptor */
     #define EXFULL 52 /* Exchange full */
@@ -87,11 +87,11 @@
     #define ENOLINK 67 /* Virtual circuit is gone */
     #define EADV 68 /* Advertise error */
     #define ESRMNT 69 /* Srmount error */
-    #define	ECOMM 70 /* Communication error on send */
+    #define ECOMM 70 /* Communication error on send */
     #define EPROTO 71 /* Protocol error */
-    #define	EMULTIHOP 74 /* Multihop attempted */
-    #define	ELBIN 75 /* Inode is remote (not really error) */
-    #define	EDOTDOT 76 /* Cross mount point (not really error) */
+    #define EMULTIHOP 74 /* Multihop attempted */
+    #define ELBIN 75 /* Inode is remote (not really error) */
+    #define EDOTDOT 76 /* Cross mount point (not really error) */
     #define EBADMSG 77 /* Bad message */
     #define EFTYPE 79 /* Inappropriate file type or format */
     #define ENOTUNIQ 80 /* Given log. name not unique */
@@ -153,24 +153,24 @@
   #endif
 #endif
 
-#define ERESTARTSYS	512
-#define ERESTARTNOINTR	513
-#define ERESTARTNOHAND	514 /* restart if no handler.. */
-#define ENOIOCTLCMD	515 /* No ioctl command */
+#define ERESTARTSYS 512
+#define ERESTARTNOINTR 513
+#define ERESTARTNOHAND 514 /* restart if no handler.. */
+#define ENOIOCTLCMD 515 /* No ioctl command */
 #define ERESTART_RESTARTBLOCK 516 /* restart by calling sys_restart_syscall */
-#define EPROBE_DEFER	517 /* Driver requests probe retry */
-#define EOPENSTALE	518 /* open found a stale dentry */
-#define ENOPARAM	519 /* Parameter not supported */
-#define EBADHANDLE	521 /* Illegal NFS file handle */
-#define ENOTSYNC	522 /* Update synchronization mismatch */
-#define EBADCOOKIE	523 /* Cookie is stale */
-#define ENOTSUPP	524 /* Operation is not supported */
-#define ETOOSMALL	525 /* Buffer or request is too small */
-#define ESERVERFAULT	526 /* An untranslatable error occurred */
-#define EBADTYPE	527 /* Type not supported by server */
-#define EJUKEBOX	528 /* Request initiated, but will not complete before timeout */
-#define EIOCBQUEUED	529 /* iocb queued, will get completion event */
-#define ERECALLCONFLICT	530 /* conflict with recalled state */
+#define EPROBE_DEFER 517 /* Driver requests probe retry */
+#define EOPENSTALE 518 /* open found a stale dentry */
+#define ENOPARAM 519 /* Parameter not supported */
+#define EBADHANDLE 521 /* Illegal NFS file handle */
+#define ENOTSYNC 522 /* Update synchronization mismatch */
+#define EBADCOOKIE 523 /* Cookie is stale */
+#define ENOTSUPP 524 /* Operation is not supported */
+#define ETOOSMALL 525 /* Buffer or request is too small */
+#define ESERVERFAULT 526 /* An untranslatable error occurred */
+#define EBADTYPE 527 /* Type not supported by server */
+#define EJUKEBOX 528 /* Request initiated, but will not complete before timeout */
+#define EIOCBQUEUED 529 /* iocb queued, will get completion event */
+#define ERECALLCONFLICT 530 /* conflict with recalled state */
 
 /* XuanWuOS扩展的错误码 */
 #define XWOK            0 /* no error */
