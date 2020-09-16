@@ -27,7 +27,7 @@
 #include <xwmd/ds/soc/gpio.h>
 #include <xwmd/ds/soc/eirq.h>
 #include <xwmd/ds/can/transceiver.h>
-#include <xwcd/perpheral/ds/can/transceiver/tja1042/driver.h>
+#include <xwcd/perpheral/can/transceiver/tja1042/driver.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types      ******** ******** ********

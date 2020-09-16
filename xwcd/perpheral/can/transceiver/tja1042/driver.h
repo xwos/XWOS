@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __xwcd_perpheral_ds_can_transceiver_tja1042_driver_h__
-#define __xwcd_perpheral_ds_can_transceiver_tja1042_driver_h__
+#ifndef __xwcd_perpheral_can_transceiver_tja1042_driver_h__
+#define __xwcd_perpheral_can_transceiver_tja1042_driver_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
@@ -52,4 +52,4 @@ __xwbsp_code
 void tja1042_cantrcv_eirq_wkup(struct xwds_soc *soc, xwid_t eiid,
                                xwds_eirq_arg_t arg);
 
-#endif /* xwcd/perpheral/ds/can/transceiver/tja1042/driver.h */
+#endif /* xwcd/perpheral/can/transceiver/tja1042/driver.h */
