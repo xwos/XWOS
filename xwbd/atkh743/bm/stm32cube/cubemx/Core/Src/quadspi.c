@@ -133,7 +133,7 @@ struct w25q_flash w25q = {
   .mid = 0,
   .jid = 0,
   .bus = W25Q_BUS_MODE_SPI,
-  .addrbits = QSPI_ALTERNATE_BYTES_24_BITS,
+  .addrbits = QSPI_ADDRESS_24_BITS,
 };
 
 static
@@ -578,11 +578,11 @@ xwer_t MX_W25Q_Read_UID(xwu64_t * uidbuf)
   cmd.Address = 0;
   cmd.AlternateBytes = 0;
   cmd.AddressSize = w25q.addrbits;
-  cmd.AlternateBytesSize = QSPI_ALTERNATE_BYTES_8_BITS;
+  cmd.AlternateBytesSize = QSPI_ALTERNATE_BYTES_32_BITS;
   cmd.DummyCycles = 0;
   cmd.InstructionMode = QSPI_INSTRUCTION_1_LINE;
   cmd.DataMode = QSPI_DATA_1_LINE;
-  cmd.AddressMode = QSPI_ADDRESS_1_LINE;
+  cmd.AddressMode = QSPI_ADDRESS_NONE;
   cmd.AlternateByteMode = QSPI_ALTERNATE_BYTES_1_LINE;
   cmd.NbData = 8;
   cmd.DdrMode = QSPI_DDR_MODE_DISABLE;
