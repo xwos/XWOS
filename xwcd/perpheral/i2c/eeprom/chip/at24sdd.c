@@ -26,8 +26,9 @@
 #include <xwmd/ds/device.h>
 #include <xwmd/ds/soc/gpio.h>
 #include <xwmd/ds/i2c/perpheral.h>
-#include <xwcd/perpheral/ds/i2c/eeprom/common/driver.h>
-#include <xwcd/perpheral/ds/i2c/eeprom/chip/at24sdd.h>
+#include <xwcd/perpheral/i2c/eeprom/device.h>
+#include <xwcd/perpheral/i2c/eeprom/driver.h>
+#include <xwcd/perpheral/i2c/eeprom/chip/at24sdd.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types      ******** ******** ********
@@ -41,7 +42,7 @@
  ******** ********     static function prototypes      ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwbsp_code
-xwer_t at24sdd_check_desc(struct xwds_i2cp_eeprom * eeprom);
+xwer_t at24sdd_check_desc(struct xwds_eeprom * eeprom);
 
 static __xwbsp_code
 xwer_t at24sdd_drv_probe(struct xwds_device * dev);
@@ -61,24 +62,24 @@ xwer_t at24sdd_drv_resume(struct xwds_device * dev);
 #endif /* XWMDCFG_ds_PM */
 
 static __xwbsp_code
-xwer_t at24sdd_putc(struct xwds_i2cp_eeprom * eeprom, xwu8_t data, xwptr_t addr,
+xwer_t at24sdd_putc(struct xwds_eeprom * eeprom, xwu8_t data, xwptr_t addr,
                     xwtm_t * xwtm);
 
 static __xwbsp_code
-xwer_t at24sdd_getc(struct xwds_i2cp_eeprom * eeprom, xwu8_t * buf, xwptr_t addr,
+xwer_t at24sdd_getc(struct xwds_eeprom * eeprom, xwu8_t * buf, xwptr_t addr,
                     xwtm_t * xwtm);
 
 static __xwbsp_code
-xwer_t at24sdd_pgwrite(struct xwds_i2cp_eeprom * eeprom, xwu8_t data[],
+xwer_t at24sdd_pgwrite(struct xwds_eeprom * eeprom, xwu8_t data[],
                        xwsz_t size, xwsq_t seq, xwtm_t * xwtm);
 
 static __xwbsp_code
-xwer_t at24sdd_pgread(struct xwds_i2cp_eeprom * eeprom,
+xwer_t at24sdd_pgread(struct xwds_eeprom * eeprom,
                       xwu8_t buf[], xwsz_t * size, xwsq_t seq,
                       xwtm_t * xwtm);
 
 static __xwbsp_code
-xwer_t at24sdd_reset(struct xwds_i2cp_eeprom * eeprom, xwtm_t * xwtm);
+xwer_t at24sdd_reset(struct xwds_eeprom * eeprom, xwtm_t * xwtm);
 
 static __xwbsp_code
 xwer_t at24sdd_drv_ioctl(struct xwds_i2cp * i2cp, xwsq_t cmd, va_list args);
@@ -105,10 +106,10 @@ __xwbsp_rodata const struct xwds_i2cp_driver at24sdd_drv = {
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwbsp_code
-xwer_t at24sdd_check_desc(struct xwds_i2cp_eeprom * eeprom)
+xwer_t at24sdd_check_desc(struct xwds_eeprom * eeprom)
 {
         const struct xwds_resources * resources;
-        const struct xwds_i2cp_eeprom_cfg * cfg;
+        const struct xwds_eeprom_cfg * cfg;
         xwsz_t page_size;
         xwsz_t total;
         xwer_t rc;
@@ -136,11 +137,11 @@ static __xwbsp_code
 xwer_t at24sdd_drv_probe(struct xwds_device * dev)
 {
         struct xwds_i2cp * i2cp;
-        struct xwds_i2cp_eeprom * eeprom;
+        struct xwds_eeprom * eeprom;
         xwer_t rc;
 
         i2cp = xwds_static_cast(struct xwds_i2cp *, dev);
-        eeprom = xwds_static_cast(struct xwds_i2cp_eeprom *, i2cp);
+        eeprom = xwds_static_cast(struct xwds_eeprom *, i2cp);
         rc = at24sdd_check_desc(eeprom);
         return rc;
 }
@@ -221,7 +222,7 @@ xwer_t at24sdd_drv_resume(struct xwds_device * dev)
 
 /******** ******** AT24SDD driver ******** ********/
 static __xwbsp_code
-xwer_t at24sdd_power_on(struct xwds_i2cp_eeprom * eeprom)
+xwer_t at24sdd_power_on(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
 
@@ -237,7 +238,7 @@ xwer_t at24sdd_power_on(struct xwds_i2cp_eeprom * eeprom)
 }
 
 static __xwbsp_code
-xwer_t at24sdd_power_off(struct xwds_i2cp_eeprom * eeprom)
+xwer_t at24sdd_power_off(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
 
@@ -253,7 +254,7 @@ xwer_t at24sdd_power_off(struct xwds_i2cp_eeprom * eeprom)
 }
 
 static __xwbsp_code
-xwer_t at24sdd_wp_enable(struct xwds_i2cp_eeprom * eeprom)
+xwer_t at24sdd_wp_enable(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
 
@@ -269,7 +270,7 @@ xwer_t at24sdd_wp_enable(struct xwds_i2cp_eeprom * eeprom)
 }
 
 static __xwbsp_code
-xwer_t at24sdd_wp_disable(struct xwds_i2cp_eeprom * eeprom)
+xwer_t at24sdd_wp_disable(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
 
@@ -285,7 +286,7 @@ xwer_t at24sdd_wp_disable(struct xwds_i2cp_eeprom * eeprom)
 }
 
 static __xwbsp_code
-xwer_t at24sdd_putc(struct xwds_i2cp_eeprom * eeprom, xwu8_t data, xwptr_t addr,
+xwer_t at24sdd_putc(struct xwds_eeprom * eeprom, xwu8_t data, xwptr_t addr,
                     xwtm_t * xwtm)
 {
         struct xwds_i2cm * bus;
@@ -307,7 +308,7 @@ xwer_t at24sdd_putc(struct xwds_i2cp_eeprom * eeprom, xwu8_t data, xwptr_t addr,
 }
 
 static __xwbsp_code
-xwer_t at24sdd_getc(struct xwds_i2cp_eeprom * eeprom, xwu8_t * buf, xwptr_t addr,
+xwer_t at24sdd_getc(struct xwds_eeprom * eeprom, xwu8_t * buf, xwptr_t addr,
                     xwtm_t * xwtm)
 {
         struct xwds_i2cm * bus;
@@ -337,11 +338,11 @@ xwer_t at24sdd_getc(struct xwds_i2cp_eeprom * eeprom, xwu8_t * buf, xwptr_t addr
 }
 
 static __xwbsp_code
-xwer_t at24sdd_pgwrite(struct xwds_i2cp_eeprom * eeprom, xwu8_t data[],
+xwer_t at24sdd_pgwrite(struct xwds_eeprom * eeprom, xwu8_t data[],
                        xwsz_t size, xwsq_t seq, xwtm_t * xwtm)
 {
         struct xwds_i2cm * bus;
-        const struct xwds_i2cp_eeprom_cfg * cfg;
+        const struct xwds_eeprom_cfg * cfg;
         struct xwds_i2c_msg msg;
         xwer_t rc;
         xwu16_t i2cpaddr;
@@ -365,12 +366,12 @@ xwer_t at24sdd_pgwrite(struct xwds_i2cp_eeprom * eeprom, xwu8_t data[],
 }
 
 static __xwbsp_code
-xwer_t at24sdd_pgread(struct xwds_i2cp_eeprom * eeprom,
+xwer_t at24sdd_pgread(struct xwds_eeprom * eeprom,
                       xwu8_t buf[], xwsz_t * size, xwsq_t seq,
                       xwtm_t * xwtm)
 {
         struct xwds_i2cm * bus;
-        const struct xwds_i2cp_eeprom_cfg * cfg;
+        const struct xwds_eeprom_cfg * cfg;
         struct xwds_i2c_msg msg;
         xwer_t rc;
         xwu16_t i2cpaddr;
@@ -404,7 +405,7 @@ xwer_t at24sdd_pgread(struct xwds_i2cp_eeprom * eeprom,
 }
 
 static __xwbsp_code
-xwer_t at24sdd_reset(struct xwds_i2cp_eeprom * eeprom, xwtm_t * xwtm)
+xwer_t at24sdd_reset(struct xwds_eeprom * eeprom, xwtm_t * xwtm)
 {
         struct xwds_i2cm * bus;
         xwer_t rc;
@@ -417,7 +418,7 @@ xwer_t at24sdd_reset(struct xwds_i2cp_eeprom * eeprom, xwtm_t * xwtm)
 static __xwbsp_code
 xwer_t at24sdd_drv_ioctl(struct xwds_i2cp * i2cp, xwsq_t cmd, va_list args)
 {
-        struct xwds_i2cp_eeprom * eeprom;
+        struct xwds_eeprom * eeprom;
         xwer_t rc;
         xwu8_t byte;
         xwu8_t * databuf;
@@ -427,47 +428,47 @@ xwer_t at24sdd_drv_ioctl(struct xwds_i2cp * i2cp, xwsq_t cmd, va_list args)
         xwsq_t seq;
         xwtm_t * xwtm;
 
-        eeprom = xwds_static_cast(struct xwds_i2cp_eeprom *, i2cp);
+        eeprom = xwds_static_cast(struct xwds_eeprom *, i2cp);
         switch (cmd) {
-        case XWDS_I2CP_EEPROM_IOC_PWR_ON:
+        case XWDS_EEPROM_IOC_PWR_ON:
                 rc = at24sdd_power_on(eeprom);
                 break;
-        case XWDS_I2CP_EEPROM_IOC_PWR_OFF:
+        case XWDS_EEPROM_IOC_PWR_OFF:
                 rc = at24sdd_power_off(eeprom);
                 break;
-        case XWDS_I2CP_EEPROM_IOC_WP_EN:
+        case XWDS_EEPROM_IOC_WP_EN:
                 rc = at24sdd_wp_enable(eeprom);
                 break;
-        case XWDS_I2CP_EEPROM_IOC_WP_DS:
+        case XWDS_EEPROM_IOC_WP_DS:
                 rc = at24sdd_wp_disable(eeprom);
                 break;
-        case XWDS_I2CP_EEPROM_IOC_PUTC:
+        case XWDS_EEPROM_IOC_PUTC:
                 byte = (xwu8_t)va_arg(args, int);
                 addr = va_arg(args, xwptr_t);
                 xwtm = va_arg(args, xwtm_t *);
                 rc = at24sdd_putc(eeprom, byte, addr, xwtm);
                 break;
-        case XWDS_I2CP_EEPROM_IOC_GETC:
+        case XWDS_EEPROM_IOC_GETC:
                 databuf = va_arg(args, xwu8_t *);
                 addr = va_arg(args, xwptr_t);
                 xwtm = va_arg(args, xwtm_t *);
                 rc = at24sdd_getc(eeprom, databuf, addr, xwtm);
                 break;
-        case XWDS_I2CP_EEPROM_IOC_PGWR:
+        case XWDS_EEPROM_IOC_PGWR:
                 databuf = va_arg(args, xwu8_t *);
                 wrsz = va_arg(args, xwsz_t);
                 seq = va_arg(args, xwsq_t);
                 xwtm = va_arg(args, xwtm_t *);
                 rc = at24sdd_pgwrite(eeprom, databuf, wrsz, seq, xwtm);
                 break;
-        case XWDS_I2CP_EEPROM_IOC_PGRD:
+        case XWDS_EEPROM_IOC_PGRD:
                 databuf = va_arg(args, xwu8_t *);
                 rdsz = va_arg(args, xwsz_t *);
                 seq = va_arg(args, xwsq_t);
                 xwtm = va_arg(args, xwtm_t *);
                 rc = at24sdd_pgread(eeprom, databuf, rdsz, seq, xwtm);
                 break;
-        case XWDS_I2CP_EEPROM_IOC_RESET:
+        case XWDS_EEPROM_IOC_RESET:
                 xwtm = va_arg(args, xwtm_t *);
                 rc = at24sdd_reset(eeprom, xwtm);
                 break;

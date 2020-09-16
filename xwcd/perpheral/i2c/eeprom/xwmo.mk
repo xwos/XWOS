@@ -24,13 +24,11 @@ include $(XWBS_UTIL_MK_XWMO)
 $(eval $(call XwmoReqCfg,XWMDCFG_ds_I2C_MASTER))
 $(eval $(call XwmoReqCfg,XWMDCFG_ds_I2C_PERPHERAL))
 
-XWMO_CSRCS := common/driver.c
-ifeq ($(PPCFG_ds_i2c_eeprom_AT24SDD),y)
-    XWMO_CSRCS += chip/at24sdd.c
-endif
-ifeq ($(PPCFG_ds_i2c_eeprom_AT24MDD),y)
-    XWMO_CSRCS += chip/at24mdd.c
-endif
+XWMO_CSRCS := driver.c
+XWMO_CSRCS += chip/at24sdd.c
+XWMO_CSRCS += chip/at24mdd.c
+
 XWMO_CFLAGS :=
 XWMO_INCDIRS :=
+
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)

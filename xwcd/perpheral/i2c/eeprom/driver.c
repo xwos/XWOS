@@ -22,7 +22,8 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwcd/perpheral/ds/i2c/eeprom/common/driver.h>
+#include <xwcd/perpheral/i2c/eeprom/device.h>
+#include <xwcd/perpheral/i2c/eeprom/driver.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -46,11 +47,11 @@
  * @retrun 错误码
  */
 __xwbsp_api
-xwer_t xwds_i2cp_eeprom_power_on(struct xwds_i2cp_eeprom * eeprom)
+xwer_t xwds_eeprom_power_on(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
 
-        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_I2CP_EEPROM_IOC_PWR_ON);
+        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_EEPROM_IOC_PWR_ON);
         return rc;
 }
 
@@ -60,11 +61,11 @@ xwer_t xwds_i2cp_eeprom_power_on(struct xwds_i2cp_eeprom * eeprom)
  * @retrun 错误码
  */
 __xwbsp_api
-xwer_t xwds_i2cp_eeprom_power_off(struct xwds_i2cp_eeprom * eeprom)
+xwer_t xwds_eeprom_power_off(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
 
-        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_I2CP_EEPROM_IOC_PWR_OFF);
+        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_EEPROM_IOC_PWR_OFF);
         return rc;
 }
 
@@ -74,11 +75,11 @@ xwer_t xwds_i2cp_eeprom_power_off(struct xwds_i2cp_eeprom * eeprom)
  * @retrun 错误码
  */
 __xwbsp_api
-xwer_t xwds_i2cp_eeprom_wp_enable(struct xwds_i2cp_eeprom * eeprom)
+xwer_t xwds_eeprom_wp_enable(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
 
-        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_I2CP_EEPROM_IOC_WP_EN);
+        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_EEPROM_IOC_WP_EN);
         return rc;
 }
 
@@ -88,11 +89,11 @@ xwer_t xwds_i2cp_eeprom_wp_enable(struct xwds_i2cp_eeprom * eeprom)
  * @retrun 错误码
  */
 __xwbsp_api
-xwer_t xwds_i2cp_eeprom_wp_disable(struct xwds_i2cp_eeprom * eeprom)
+xwer_t xwds_eeprom_wp_disable(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
 
-        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_I2CP_EEPROM_IOC_WP_DS);
+        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_EEPROM_IOC_WP_DS);
         return rc;
 }
 
@@ -106,13 +107,13 @@ xwer_t xwds_i2cp_eeprom_wp_disable(struct xwds_i2cp_eeprom * eeprom)
  * @retrun 错误码
  */
 __xwbsp_api
-xwer_t xwds_i2cp_eeprom_putc(struct xwds_i2cp_eeprom * eeprom,
-                             xwu8_t data, xwptr_t addr,
-                             xwtm_t * xwtm)
+xwer_t xwds_eeprom_putc(struct xwds_eeprom * eeprom,
+                        xwu8_t data, xwptr_t addr,
+                        xwtm_t * xwtm)
 {
         xwer_t rc;
 
-        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_I2CP_EEPROM_IOC_PUTC,
+        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_EEPROM_IOC_PUTC,
                              data, addr, xwtm);
         return rc;
 }
@@ -127,13 +128,13 @@ xwer_t xwds_i2cp_eeprom_putc(struct xwds_i2cp_eeprom * eeprom,
  * @retrun 错误码
  */
 __xwbsp_api
-xwer_t xwds_i2cp_eeprom_getc(struct xwds_i2cp_eeprom * eeprom,
-                             xwu8_t * buf, xwptr_t addr,
-                             xwtm_t * xwtm)
+xwer_t xwds_eeprom_getc(struct xwds_eeprom * eeprom,
+                        xwu8_t * buf, xwptr_t addr,
+                        xwtm_t * xwtm)
 {
         xwer_t rc;
 
-        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_I2CP_EEPROM_IOC_GETC,
+        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_EEPROM_IOC_GETC,
                              buf, addr, xwtm);
         return rc;
 }
@@ -149,13 +150,13 @@ xwer_t xwds_i2cp_eeprom_getc(struct xwds_i2cp_eeprom * eeprom,
  * @retrun 错误码
  */
 __xwbsp_api
-xwer_t xwds_i2cp_eeprom_pgwrite(struct xwds_i2cp_eeprom * eeprom,
-                                xwu8_t data[], xwsz_t size, xwsq_t seq,
-                                xwtm_t * xwtm)
+xwer_t xwds_eeprom_pgwrite(struct xwds_eeprom * eeprom,
+                           xwu8_t data[], xwsz_t size, xwsq_t seq,
+                           xwtm_t * xwtm)
 {
         xwer_t rc;
 
-        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_I2CP_EEPROM_IOC_PGWR,
+        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_EEPROM_IOC_PGWR,
                              data, size, seq, xwtm);
         return rc;
 }
@@ -172,13 +173,13 @@ xwer_t xwds_i2cp_eeprom_pgwrite(struct xwds_i2cp_eeprom * eeprom,
  * @retrun 错误码
  */
 __xwbsp_api
-xwer_t xwds_i2cp_eeprom_pgread(struct xwds_i2cp_eeprom * eeprom,
-                               xwu8_t buf[], xwsz_t * size, xwsq_t seq,
-                               xwtm_t * xwtm)
+xwer_t xwds_eeprom_pgread(struct xwds_eeprom * eeprom,
+                          xwu8_t buf[], xwsz_t * size, xwsq_t seq,
+                          xwtm_t * xwtm)
 {
         xwer_t rc;
 
-        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_I2CP_EEPROM_IOC_PGRD,
+        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_EEPROM_IOC_PGRD,
                              buf, size, seq, xwtm);
         return rc;
 }
@@ -191,10 +192,10 @@ xwer_t xwds_i2cp_eeprom_pgread(struct xwds_i2cp_eeprom * eeprom,
  * @retrun 错误码
  */
 __xwbsp_api
-xwer_t xwds_i2cp_eeprom_reset(struct xwds_i2cp_eeprom * eeprom, xwtm_t * xwtm)
+xwer_t xwds_eeprom_reset(struct xwds_eeprom * eeprom, xwtm_t * xwtm)
 {
         xwer_t rc;
 
-        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_I2CP_EEPROM_IOC_RESET, xwtm);
+        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_EEPROM_IOC_RESET, xwtm);
         return rc;
 }

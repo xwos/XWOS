@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __xwcd_perpheral_ds_i2c_eeprom_chip_at24sdd_h__
-#define __xwcd_perpheral_ds_i2c_eeprom_chip_at24sdd_h__
+#ifndef __xwcd_perpheral_i2c_eeprom_chip_at24sdd_h__
+#define __xwcd_perpheral_i2c_eeprom_chip_at24sdd_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
@@ -49,4 +49,4 @@ extern __xwbsp_rodata const struct xwds_i2cp_driver at24sdd_drv;
  ******** ******** ******** inline  functions ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
-#endif /* xwcd/perpheral/ds/i2c/eeprom/chip/at24sdd.h */
+#endif /* xwcd/perpheral/i2c/eeprom/chip/at24sdd.h */
