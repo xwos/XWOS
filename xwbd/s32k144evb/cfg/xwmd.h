@@ -53,11 +53,11 @@
 
 /******** ******** I2C device ******** ********/
 #define XWMDCFG_ds_I2C_MASTER                                   1
-#define XWMDCFG_ds_I2C_PERPHERAL                                0
+#define XWMDCFG_ds_I2C_PERPHERAL                                1
 
 /******** ******** SPI device ******** ********/
-#define XWMDCFG_ds_SPI_MASTER                                   0
-#define XWMDCFG_ds_SPI_PERPHERAL                                0
+#define XWMDCFG_ds_SPI_MASTER                                   1
+#define XWMDCFG_ds_SPI_PERPHERAL                                1
 
 /******** ******** LIN Bus ******** ********/
 #define XWMDCFG_ds_LIN                                          0

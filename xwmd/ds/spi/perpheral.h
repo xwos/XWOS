@@ -19,7 +19,6 @@
 #include <xwmd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwmd/ds/device.h>
-#include <xwmd/ds/spi/common.h>
 #include <xwmd/ds/spi/master.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -47,8 +46,7 @@ struct xwds_spip {
 
         /* attributes */
         struct xwds_spim * bus; /**< SPI主机控制器总线 */
-        xwsq_t cs_pin_msk; /**< 片选信号掩码 */
-        xwsq_t msg_flags; /**< 消息标志 */
+        xwid_t buscfgid; /**< 总线配置 */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********

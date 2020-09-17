@@ -100,9 +100,9 @@ xwer_t xwds_spim_cvop_probe(struct xwds_spim * spim)
 {
         xwer_t rc;
 
-        rc = xwosal_mtx_init(&spim->xfermtx, XWOSAL_SD_PRIORITY_RT_MIN);
+        rc = xwosal_mtx_init(&spim->apilock, XWOSAL_SD_PRIORITY_RT_MIN);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_xfermtx_init;
+                goto err_apilock_init;
         }
         rc = xwds_device_cvop_probe(&spim->dev);
         if (__xwcc_unlikely(rc < 0)) {
@@ -111,8 +111,8 @@ xwer_t xwds_spim_cvop_probe(struct xwds_spim * spim)
         return XWOK;
 
 err_dev_probe:
-        xwosal_mtx_destroy(&spim->xfermtx);
-err_xfermtx_init:
+        xwosal_mtx_destroy(&spim->apilock);
+err_apilock_init:
         return rc;
 }
 
@@ -131,7 +131,7 @@ xwer_t xwds_spim_cvop_remove(struct xwds_spim * spim)
                 goto err_dev_cvop_remove;
         }
 
-        xwosal_mtx_destroy(&spim->xfermtx);
+        xwosal_mtx_destroy(&spim->apilock);
         return XWOK;
 
 err_dev_cvop_remove:
@@ -199,15 +199,14 @@ xwer_t xwds_spim_cvop_resume(struct xwds_spim * spim)
 
 /******** ******** ******** SPI Master Device APIs ******** ******** ********/
 __xwds_api
-xwer_t xwds_spim_xfer(struct xwds_spim * spim,
-                      struct xwds_spim_msg * msg,
-                      xwtm_t * xwtm)
+xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t * xwtm)
 {
         const struct xwds_spim_driver * drv;
         xwer_t rc;
 
         XWDS_VALIDATE(spim, "nullptr", -EFAULT);
-        XWDS_VALIDATE(msg, "nullptr", -EFAULT);
+        XWDS_VALIDATE(spim->buscfg, "nullptr", -EFAULT);
+        XWDS_VALIDATE((cfgid < spim->buscfg_num), "out-of-range", -ECHRNG);
         XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_spim_grab(spim);
@@ -219,28 +218,77 @@ xwer_t xwds_spim_xfer(struct xwds_spim * spim,
                 goto err_spim_request;
         }
 
-        rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&spim->xfermtx), xwtm);
+        rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&spim->apilock), xwtm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spim_lock;
         }
+        drv = xwds_static_cast(const struct xwds_spim_driver *, spim->dev.drv);
+        if (__xwcc_likely((drv) && (drv->buscfg))) {
+                rc = drv->buscfg(spim, cfgid, xwtm);
+        } else {
+                rc = -ENOSYS;
+        }
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_drv_buscfg;
+        }
+        xwosal_mtx_unlock(xwosal_mtx_get_id(&spim->apilock));
 
+        xwds_spim_release(spim);
+        xwds_spim_put(spim);
+        return XWOK;
+
+err_drv_buscfg:
+        xwosal_mtx_unlock(xwosal_mtx_get_id(&spim->apilock));
+err_spim_lock:
+        xwds_spim_release(spim);
+err_spim_request:
+        xwds_spim_put(spim);
+err_spim_grab:
+        return rc;
+}
+
+__xwds_api
+xwer_t xwds_spim_xfer(struct xwds_spim * spim,
+                      const xwu8_t txd[], xwu8_t * rxb,
+                      xwsz_t size, xwtm_t * xwtm)
+{
+        const struct xwds_spim_driver * drv;
+        xwer_t rc;
+
+        XWDS_VALIDATE(spim, "nullptr", -EFAULT);
+        XWDS_VALIDATE(txd, "nullptr", -EFAULT);
+        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
+
+        rc = xwds_spim_grab(spim);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_spim_grab;
+        }
+        rc = xwds_spim_request(spim);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_spim_request;
+        }
+
+        rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&spim->apilock), xwtm);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_spim_lock;
+        }
         drv = xwds_static_cast(const struct xwds_spim_driver *, spim->dev.drv);
         if (__xwcc_likely((drv) && (drv->xfer))) {
-                rc = drv->xfer(spim, msg, xwtm);
+                rc = drv->xfer(spim, txd, rxb, size, xwtm);
         } else {
                 rc = -ENOSYS;
         }
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_xfer;
         }
-        xwosal_mtx_unlock(xwosal_mtx_get_id(&spim->xfermtx));
+        xwosal_mtx_unlock(xwosal_mtx_get_id(&spim->apilock));
 
         xwds_spim_release(spim);
         xwds_spim_put(spim);
         return XWOK;
 
 err_drv_xfer:
-        xwosal_mtx_unlock(xwosal_mtx_get_id(&spim->xfermtx));
+        xwosal_mtx_unlock(xwosal_mtx_get_id(&spim->apilock));
 err_spim_lock:
         xwds_spim_release(spim);
 err_spim_request:
