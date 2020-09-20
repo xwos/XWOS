@@ -971,7 +971,7 @@ xwer_t xwsync_plsmr_do_timedwait(struct xwsync_smr * smr, struct xwos_tcb * tcb,
 }
 
 /**
- * @brief XWOS API：限时等待获取信号量
+ * @brief XWOS API：限时等待并获取信号量
  * @param smr: (I) 信号量对象的指针
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
@@ -1666,7 +1666,7 @@ xwer_t xwsync_rtsmr_do_timedwait(struct xwsync_smr * smr, struct xwos_tcb * tcb,
 }
 
 /**
- * @brief XWOS API：限时等待获取信号量
+ * @brief XWOS API：限时等待并获取信号量
  * @param smr: (I) 信号量对象的指针
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间

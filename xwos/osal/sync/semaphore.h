@@ -280,7 +280,7 @@ xwer_t xwosal_smr_trywait(xwid_t smrid)
 }
 
 /**
- * @brief XWOSAL API：限时等待获取信号量
+ * @brief XWOSAL API：限时等待并获取信号量
  * @param smrid: (I) 信号量ID
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间

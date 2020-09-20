@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层(BDL)配置
+ * @brief Board Module: xwpcp
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,32 +18,49 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_board_h__
-#define __cfg_board_h__
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********      include      ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#include <xwos/standard.h>
+#include <xwmd/isc/xwpcp/protocol.h>
+#include <xwmd/isc/xwpcp/api.h>
+#include <xwmd/isc/xwpcp/hwif/uart.h>
+#include <bm/stm32cube/xwac/xwds/stm32cube.h>
+#include <bm/xwpcp/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********     XWOS misc     ******** ******** ********
+ ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define BRDCFG_XWSD_IDLE_HOOK                   1
-#define BRDCFG_XWSD_SYSHWT_HOOK                 1
-#define BRDCFG_XWSD_THRD_STACK_POOL             1
-#define BRDCFG_LOG                              1
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********    board clock    ******** ******** ********
+ ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define BRDCFG_SYSCLK                           (168000000U)
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********          memory management          ******** ********
+ ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define BRDCFG_MM_OCHEAP_BLKSZ                  (512U)
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********   board modules   ******** ******** ********
+ ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define BMCFG_stm32cube                         1
-#define BMCFG_xwpcp                             1
-#define BMCFG_xwscp                             1
+struct xwpcp bm_xwpcp;
 
-#endif /* cfg/board.h */
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********      function implementations       ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+xwer_t bm_xwpcp_start(void)
+{
+        xwer_t rc;
+
+        rc = xwpcp_start(&bm_xwpcp, "bm.xwpcp",
+                         &xwpcpif_uart_ops, &stm32cube_usart1_cb);
+        return rc;
+}
+
+xwer_t bm_xwpcp_stop(void)
+{
+        xwer_t rc;
+
+        rc = xwpcp_stop(&bm_xwpcp);
+        return rc;
+}

@@ -38,11 +38,11 @@ struct xwpcp_frame;
  * @breif 硬件接口抽象层操作函数集
  */
 struct xwpcp_hwifal_operations {
-        xwer_t (*open)(struct xwpcp *); /**< 打开硬件接口 */
-        xwer_t (*close)(struct xwpcp *); /**< 关闭硬件接口 */
-        xwer_t (*tx)(struct xwpcp *, const xwu8_t *, xwsz_t); /**< 发送数据 */
-        xwer_t (*rx)(struct xwpcp *, xwu8_t *, xwsz_t *); /**< 接收数据 */
-        void (*notify)(struct xwpcp *, xwsq_t); /**< 通知事件 */
+        xwer_t (* open)(struct xwpcp *); /**< 打开硬件接口 */
+        xwer_t (* close)(struct xwpcp *); /**< 关闭硬件接口 */
+        xwer_t (* tx)(struct xwpcp *, const xwu8_t *, xwsz_t); /**< 发送数据 */
+        xwer_t (* rx)(struct xwpcp *, xwu8_t *, xwsz_t *); /**< 接收数据 */
+        void (* notify)(struct xwpcp *, xwsq_t); /**< 通知事件 */
 };
 
 /**
@@ -66,7 +66,7 @@ enum xwpcp_hwifal_notification_em {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwmd_code
-xwer_t xwpcp_hwifal_open(struct xwpcp * xwpcp);
+xwer_t xwpcp_hwifal_open(struct xwpcp * xwpcp, void * hwifcb);
 
 __xwmd_code
 xwer_t xwpcp_hwifal_close(struct xwpcp * xwpcp);

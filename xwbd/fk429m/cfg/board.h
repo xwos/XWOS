@@ -51,6 +51,5 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define BMCFG_stm32cube                         1
 #define BMCFG_pm                                1
-#define BMCFG_xwpcp                             1
 
 #endif /* cfg/board.h */

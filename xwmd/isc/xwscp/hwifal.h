@@ -38,11 +38,11 @@ struct xwscp_frame;
  * @breif 硬件接口抽象层操作函数集
  */
 struct xwscp_hwifal_operations {
-        xwer_t (*open)(struct xwscp *); /**< 打开硬件接口 */
-        xwer_t (*close)(struct xwscp *); /**< 关闭硬件接口 */
-        xwer_t (*tx)(struct xwscp *, const xwu8_t *, xwsz_t, xwtm_t *); /**< 发送数据 */
-        xwer_t (*rx)(struct xwscp *, xwu8_t *, xwsz_t *); /**< 接收数据 */
-        void (*notify)(struct xwscp *, xwsq_t); /**< 通知事件 */
+        xwer_t (* open)(struct xwscp *); /**< 打开硬件接口 */
+        xwer_t (* close)(struct xwscp *); /**< 关闭硬件接口 */
+        xwer_t (* tx)(struct xwscp *, const xwu8_t *, xwsz_t, xwtm_t *); /**< 发送数据 */
+        xwer_t (* rx)(struct xwscp *, xwu8_t *, xwsz_t *); /**< 接收数据 */
+        void (* notify)(struct xwscp *, xwsq_t); /**< 通知事件 */
 };
 
 enum xwscp_hwifal_state_em {
@@ -59,7 +59,7 @@ enum xwscp_hwifal_notification_em {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwmd_code
-xwer_t xwscp_hwifal_open(struct xwscp * xwscp);
+xwer_t xwscp_hwifal_open(struct xwscp * xwscp, void * hwifcb);
 
 __xwmd_code
 xwer_t xwscp_hwifal_close(struct xwscp * xwscp);

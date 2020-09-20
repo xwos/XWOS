@@ -16,11 +16,12 @@
 # > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # > See the License for the specific language governing permissions and
 # > limitations under the License.
+#
 
 include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
-XWMO_CSRCS := protocol.c hwifal.c api.c hwif/uart.c
-XWMO_CFLAGS :=
+XWMO_CSRCS := xwmo.c
+XWMO_CFLAGS := -Wno-unused-value
 XWMO_INCDIRS :=
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)

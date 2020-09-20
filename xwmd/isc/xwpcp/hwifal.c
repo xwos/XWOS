@@ -54,10 +54,11 @@ __xwmd_rodata const xwu8_t xwpcp_frm_blank[] = {
 /**
  * @brief 打开硬件接口
  * @param xwpcp: (I) XWPCP对象的指针
+ * @param hwifcb: (I) 硬件接口控制块指针
  * @return 错误码
  */
 __xwmd_code
-xwer_t xwpcp_hwifal_open(struct xwpcp * xwpcp)
+xwer_t xwpcp_hwifal_open(struct xwpcp * xwpcp, void * hwifcb)
 {
         xwer_t rc;
 
@@ -68,6 +69,7 @@ xwer_t xwpcp_hwifal_open(struct xwpcp * xwpcp)
                 goto err_grab_xwpcp;
         }
 
+        xwpcp->hwifcb = hwifcb;
         if (__xwcc_likely((xwpcp->hwifops) && (xwpcp->hwifops->open))) {
                 rc = xwpcp->hwifops->open(xwpcp);
         } else {
@@ -82,6 +84,7 @@ xwer_t xwpcp_hwifal_open(struct xwpcp * xwpcp)
         return rc;
 
 err_hwifops_open:
+        xwpcp->hwifcb = NULL;
         xwaop_sub(xwsq_t, &xwpcp->refcnt, 1, NULL, NULL);
 err_grab_xwpcp:
         xwpcplogf(INFO, "Failed to open HWIF ... [rc:%d]\n", rc);
@@ -112,6 +115,7 @@ xwer_t xwpcp_hwifal_close(struct xwpcp * xwpcp)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_hwifops_close;
         }
+        xwpcp->hwifcb = NULL;
         xwpcplogf(INFO, "close HWIF ... [OK]\n");
         return XWOK;
 

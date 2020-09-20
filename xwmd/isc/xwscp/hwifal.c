@@ -53,10 +53,11 @@ __xwmd_rodata const xwu8_t xwscp_frm_blank[] = {
  * @return 错误码
  */
 __xwmd_code
-xwer_t xwscp_hwifal_open(struct xwscp * xwscp)
+xwer_t xwscp_hwifal_open(struct xwscp * xwscp, void * hwifcb)
 {
         xwer_t rc;
 
+        xwscp->hwifcb = hwifcb;
         if ((xwscp->hwifops) && (xwscp->hwifops->open)) {
                 rc = xwscp->hwifops->open(xwscp);
         } else {
@@ -84,6 +85,7 @@ xwer_t xwscp_hwifal_close(struct xwscp * xwscp)
         if (XWOK == rc) {
                 xwscp->hwifst = XWSCP_HWIFST_CLOSED;
         }
+        xwscp->hwifcb = NULL;
         return rc;
 }
 

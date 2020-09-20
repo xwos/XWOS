@@ -38,10 +38,56 @@ struct xwpcp_tx_cbarg {
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+#define XWPCP_TXTHRD_PRIORITY XWMDCFG_isc_xwpcp_TXTHRD_PRIORITY
+#define XWPCP_RXTHRD_PRIORITY XWMDCFG_isc_xwpcp_RXTHRD_PRIORITY
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief 发送线程的描述
+ */
+static __xwmd_rodata
+const struct xwosal_thrd_desc xwpcp_rxthrd_td = {
+        .name = "xwmd.isc.xwpcp.rxthrd",
+        .prio = XWPCP_RXTHRD_PRIORITY,
+        .stack = XWOSAL_THRD_STACK_DYNAMIC,
+        .stack_size = 2048,
+        .func = (xwosal_thrd_f)xwpcp_rxthrd,
+        .arg = NULL, /* TBD */
+        .attr = XWSDOBJ_ATTR_PRIVILEGED,
+};
+/**
+ * @brief 接收线程的ID
+ */
+xwid_t xwpcp_rxthrd_tid;
+
+/**
+ * @brief 发送线程的描述
+ */
+static __xwmd_rodata
+const struct xwosal_thrd_desc xwpcp_txthrd_td = {
+        .name = "xwmd.isc.xwpcp.txthrd",
+        .prio = XWPCP_TXTHRD_PRIORITY,
+        .stack = XWOSAL_THRD_STACK_DYNAMIC,
+        .stack_size = 2048,
+        .func = (xwosal_thrd_f)xwpcp_txthrd,
+        .arg = NULL, /* TBD */
+        .attr = XWSDOBJ_ATTR_PRIVILEGED,
+};
+/**
+ * @brief 发送线程的ID
+ */
+xwid_t xwpcp_txthrd_tid;
+
+/**
+ * @brief 内存池
+ */
+xwu8_t __xwcc_aligned_l1cacheline xwpcp_mempool[XWPCP_MEMPOOL_SIZE];
+
+/**
+ * @brief 内存池名字
+ */
 static __xwmd_rodata
 const char xwpcp_frmslot_mempool_name[] = "mempool.frameslot.xwpcp";
 
@@ -49,20 +95,17 @@ const char xwpcp_frmslot_mempool_name[] = "mempool.frameslot.xwpcp";
  ******** ********      static function prototypes     ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwmd_code
+void xwpcp_init(struct xwpcp * xwpcp);
+
+static __xwmd_code
 void xwpcp_tx_notify(struct xwpcp * xwpcp, xwpcp_fhdl_t fhdl, xwer_t rc, void * arg);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief XWPCP API: 初始化XWPCP
- * @param xwpcp: (I) XWPCP对象的指针
- */
-__xwmd_api
+static __xwmd_code
 void xwpcp_init(struct xwpcp * xwpcp)
 {
-        XWPCP_VALIDATE((xwpcp), "nullptr");
-
         xwpcp->name = NULL;
         xwpcp->refcnt = XWPCP_REFCNT_STOPPED;
         xwpcp->hwifst = XWPCP_HWIFST_CLOSED;
@@ -70,31 +113,12 @@ void xwpcp_init(struct xwpcp * xwpcp)
         xwpcp->hwifcb = NULL;
 }
 
-/**
- * @brief XWPCP API: 启动XWPCP
- * @param xwpcp: (I) XWPCP对象的指针
- * @param name: (I) XWPCP实例的名字
- * @param hwifops: (I) 硬件接口抽象层操作函数集合
- * @param mempoolbase: (I) 内存池的首地址
- * @param mempoolsize: (I) 内存池的大小
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval --ENOMEM: 内存池台小
- * @retval -EPERM: XWPCP未初始化
- * @note
- * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
- * - 重入性：不可重入
- */
 __xwmd_api
 xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
                    const struct xwpcp_hwifal_operations * hwifops,
-                   xwptr_t mempoolbase, xwsz_t mempoolsize)
+                   void * hwifcb)
 {
-        xwer_t rc;
+        xwer_t rc, childrc;
         struct xwmm_bma * slotpool;
         xwssq_t i, j;
 
@@ -102,12 +126,10 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         XWPCP_VALIDATE((hwifops), "nullptr", -EFAULT);
         XWPCP_VALIDATE((hwifops->tx), "nullptr", -EFAULT);
         XWPCP_VALIDATE((hwifops->rx), "nullptr", -EFAULT);
-        XWPCP_VALIDATE((mempoolbase), "nullptr", -EFAULT);
-        XWPCP_VALIDATE((mempoolsize >= XWPCP_MEMPOOL_SIZE),
-                       "memsize-too-small", -ENOMEM);
 
         xwpcplogf(DEBUG, "Starting XWPCP-%s ...\n", XWPCP_VERSION);
 
+        xwpcp_init(xwpcp);
         rc = xwaop_teq_then_add(xwsq_t, &xwpcp->refcnt,
                                 XWPCP_REFCNT_STOPPED, 1,
                                 NULL, NULL);
@@ -119,7 +141,8 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
 
         /* 创建内存池 */
         rc = xwmm_bma_create(&slotpool, xwpcp_frmslot_mempool_name,
-                             mempoolbase, mempoolsize, XWPCP_MEMBLK_SIZE);
+                             (xwptr_t)xwpcp_mempool, (xwsz_t)sizeof(xwpcp_mempool),
+                             XWPCP_MEMBLK_SIZE);
         if (__xwcc_unlikely(rc < 0)) {
                 xwpcplogf(ERR, "Create bma ... [rc:%d]\n", rc);
                 goto err_bma_create;
@@ -160,7 +183,8 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
                 xwosal_splk_init(&xwpcp->rxq.lock[i]);
                 rc = xwosal_smr_init(&xwpcp->rxq.smr[i], 0, XWPCP_MEMBLK_NUM);
                 if (__xwcc_unlikely(rc < 0)) {
-                        xwpcplogf(ERR, "Init RXQ semaphore[%d] ... [rc:%d]\n", i, rc);
+                        xwpcplogf(ERR, "Init RXQ semaphore[%d] ... [rc:%d]\n",
+                                  i, rc);
                         goto err_rxqsmr_init;
                 }
         }
@@ -169,13 +193,42 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         xwpcp->hwifops = hwifops;
         xwpcp->hwifst = XWPCP_HWIFST_CLOSED;
 
-        rc = xwpcp_hwifal_open(xwpcp);
+        rc = xwpcp_hwifal_open(xwpcp, hwifcb);
         if (rc < 0) {
                 goto err_hwifal_open;
         }
 
+        /* 创建线程 */
+        rc = xwosal_thrd_create(&xwpcp_rxthrd_tid,
+                                xwpcp_rxthrd_td.name,
+                                xwpcp_rxthrd_td.func,
+                                xwpcp,
+                                xwpcp_rxthrd_td.stack_size,
+                                xwpcp_rxthrd_td.prio,
+                                xwpcp_rxthrd_td.attr);
+        if (rc < 0) {
+                goto err_rxthrd_create;
+        }
+
+        rc = xwosal_thrd_create(&xwpcp_txthrd_tid,
+                                xwpcp_txthrd_td.name,
+                                xwpcp_txthrd_td.func,
+                                xwpcp,
+                                xwpcp_txthrd_td.stack_size,
+                                xwpcp_txthrd_td.prio,
+                                xwpcp_txthrd_td.attr);
+        if (rc < 0) {
+                goto err_txthrd_create;
+        }
+
         return XWOK;
 
+err_txthrd_create:
+        xwosal_thrd_terminate(xwpcp_rxthrd_tid, &childrc);
+        xwosal_thrd_delete(xwpcp_rxthrd_tid);
+        xwpcp_rxthrd_tid = 0;
+err_rxthrd_create:
+        xwpcp_hwifal_close(xwpcp);
 err_hwifal_open:
 err_rxqsmr_init:
         for (j = i - 1; j >= 0; j--) {
@@ -195,28 +248,32 @@ err_grab_xwpcp:
         return rc;
 }
 
-/**
- * @brief XWPCP API: 停止XWPCP
- * @param xwpcp: (I) XWPCP对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EPERM: XWPCP正在被使用中
- * @note
- * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
- * - 重入性：不可重入
- */
 __xwmd_api
 xwer_t xwpcp_stop(struct xwpcp * xwpcp)
 {
         struct xwpcp_frmslot * frmslot;
-        xwer_t rc;
+        xwer_t rc, childrc;
         xwssq_t j;
 
         XWPCP_VALIDATE((xwpcp), "nullptr", -EFAULT);
+
+        rc = xwosal_thrd_terminate(xwpcp_txthrd_tid, &childrc);
+        if (XWOK == rc) {
+                rc = xwosal_thrd_delete(xwpcp_txthrd_tid);
+                if (XWOK == rc) {
+                        xwpcp_txthrd_tid = 0;
+                        xwpcplogf(INFO, "Terminate XWPCP TX thread... [OK]\n");
+                }
+        }
+
+        rc = xwosal_thrd_terminate(xwpcp_rxthrd_tid, &childrc);
+        if (XWOK == rc) {
+                rc = xwosal_thrd_delete(xwpcp_rxthrd_tid);
+                if (XWOK == rc) {
+                        xwpcp_rxthrd_tid = 0;
+                        xwpcplogf(INFO, "Terminate XWPCP RX thread... [OK]\n");
+                }
+        }
 
         rc = xwaop_teq_then_sub(xwsq_t, &xwpcp->refcnt,
                                 XWPCP_REFCNT_STARTED, 1,
@@ -293,31 +350,6 @@ void xwpcp_tx_notify(struct xwpcp * xwpcp, xwpcp_fhdl_t fhdl, xwer_t rc, void * 
         xwosal_cdt_unicast(xwosal_cdt_get_id(&cbarg->cdt));
 }
 
-/**
- * @brief XWPCP API: 在限定的时间内，将一条用户报文加入到XWPCP的发送队列中，
- *                   并等待发送结果。
- * @param xwpcp: (I) XWPCP对象的指针
- * @param msg: (I) 描述用户报文的结构体指针
- * @param prio: (I) 用户报文的优先级
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -E2BIG: 数据太长
- * @retval -ENXIO: 端口0不允许发送用户数据
- * @retval -ENODEV: 端口号超出范围
- * @retval -EINVAL: qos错误
- * @retval -ENOBUFS: 帧槽被使用完
- * @retval -EPERM: XWPCP未启动
- * @note
- * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
- * - 重入性：可重入
- */
 __xwmd_api
 xwer_t xwpcp_tx(struct xwpcp * xwpcp,
                 const struct xwpcp_msg * msg, xwu8_t prio,
@@ -399,35 +431,6 @@ err_ifnotrdy:
         return rc;
 }
 
-/**
- * @brief XWPCP API: 将一条用户报文加入到XWPCP的发送队列中
- * @param xwpcp: (I) XWPCP对象的指针
- * @param msg: (I) 描述用户报文的结构体指针
- * @param prio: (I) 用户报文的优先级
- * @param cbfunc: (I) 异步通知的回调函数
- * @param cbarg: (I) 调用异步通知回调函数时用户自定义的参数
- * @param fhdlbuf: (O) 指向缓冲区的指针，通过此缓冲区返回帧句柄
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -E2BIG: 数据太长
- * @retval -ENXIO: 端口0不允许发送用户数据
- * @retval -ENODEV: 端口号超出范围
- * @retval -EINVAL: qos错误
- * @retval -ENOBUFS: 帧槽被使用完
- * @retval -EPERM: XWPCP未启动
- * @note
- * - 此函数将用户报文加入到XWPCP的发送队列并注册回调函数后就返回。当用户报文被
- *   XWPCP的发送线程成功发送出去（接收到远程端应答）后，注册的回调函数会被调用。
- *   需要注意回调函数是在XWPCP的发送线程的线程上下文中执行，如果在此函数中使用了会
- *   长时间阻塞线程的函数，会导致XWPCP停止发送。
- * @note
- * - 同步/异步：异步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：可重入
- */
 __xwmd_api
 xwer_t xwpcp_eq(struct xwpcp * xwpcp,
                 const struct xwpcp_msg * msg, xwu8_t prio,
@@ -460,62 +463,18 @@ err_ifnotrdy:
         return rc;
 }
 
-/**
- * @brief XWPCP API: 锁定XWPCP的通知锁
- * @param xwpcp: (I) XWPCP对象的指针
- * @note
- * - XWPCP的发送完一帧后是在通知锁内调用异步通知回调函数，锁定通知锁可防止XWPCP的发送
- *   线程调用异步通知回调函数。
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：不可重入
- */
 __xwmd_api
 void xwpcp_lock_ntflock(struct xwpcp * xwpcp)
 {
         xwosal_splk_lock(&xwpcp->txq.ntflock);
 }
 
-/**
- * @brief XWPCP API: 解锁XWPCP的通知锁
- * @param xwpcp: (I) XWPCP对象的指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：不可重入
- */
 __xwmd_api
 void xwpcp_unlock_ntflock(struct xwpcp * xwpcp)
 {
         xwosal_splk_unlock(&xwpcp->txq.ntflock);
 }
 
-/**
- * @brief XWPCP API: 接收消息，若接收队列为空，就限时等待。
- * @param xwpcp: (I) XWPCP对象的指针
- * @param msgbuf: (O) 指向缓冲区的指针，此缓冲区被用于接收消息
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENXIO: 端口0不允许发送用户数据
- * @retval -ENODEV: 端口号超出范围
- * @retval -EPERM: XWPCP未启动
- * @retval -ETIMEDOUT: 超时
- * @note
- * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
- * - 重入性：可重入
- */
 __xwmd_api
 xwer_t xwpcp_rx(struct xwpcp * xwpcp, struct xwpcp_msg * msgbuf, xwtm_t * xwtm)
 {
@@ -570,24 +529,6 @@ err_ifnotrdy:
         return rc;
 }
 
-/**
- * @brief XWPCP API: 尝试接收消息，若接收队列为空，立即返回错误码。
- * @param xwpcp: (I) XWPCP对象的指针
- * @param msgbuf: (O) 指向缓冲区的指针，此缓冲区被用于接收消息
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENXIO: 端口0不允许发送用户数据
- * @retval -ENODEV: 端口号超出范围
- * @retval -ENODATA: 接收队列为空
- * @retval -EPERM: XWPCP未启动
- * @note
- * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
- * - 重入性：可重入
- */
 __xwmd_api
 xwer_t xwpcp_try_rx(struct xwpcp * xwpcp, struct xwpcp_msg * msgbuf)
 {

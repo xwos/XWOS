@@ -79,16 +79,6 @@
 #define XWMDCFG_ds_MISC                                         1
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********            System management        ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** ******** programmer ******** ******** ********/
-#define XWMDCFG_sysm_programmer                                 0
-#define XWMDCFG_sysm_programmer_LOG                             0
-#define XWMDCFG_sysm_programmer_DFRM_TEXTSIZE                   32U
-#define XWMDCFG_sysm_programmer_CLIENT                          1
-#define XWMDCFG_sysm_programmer_SERVER                          0
-
-/******** ******** ******** ******** ******** ******** ******** ********
  ******** ********     Inter-System Communication      ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** point to point communication protocol ******** ********/
@@ -101,14 +91,20 @@
 #define XWMDCFG_isc_xwpcp_MEMBLK_SIZE                           (64U)
 #define XWMDCFG_isc_xwpcp_MEMBLK_NUM                            (64U)
 #define XWMDCFG_isc_xwpcp_SYNC_KEY                              ('P')
+#define XWMDCFG_isc_xwpcp_RXTHRD_PRIORITY                       \
+        XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
+#define XWMDCFG_isc_xwpcp_TXTHRD_PRIORITY                       \
+        XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
 
 /******** ******** simple communication protocol ******** ********/
-#define XWMDCFG_isc_xwscp                                        1
-#define XWMDCFG_isc_xwscp_LOG                                    0
-#define XWMDCFG_isc_xwscp_PERIOD                                 (1 * XWTM_S)
-#define XWMDCFG_isc_xwscp_RETRY_NUM                              (8U)
-#define XWMDCFG_isc_xwscp_SDU_MAX_SIZE                           (40U)
-#define XWMDCFG_isc_xwscp_FRMSLOT_NUM                            (8U)
-#define XWMDCFG_isc_xwscp_SYNC_KEY                               ('S')
+#define XWMDCFG_isc_xwscp                                       1
+#define XWMDCFG_isc_xwscp_LOG                                   0
+#define XWMDCFG_isc_xwscp_PERIOD                                (1 * XWTM_S)
+#define XWMDCFG_isc_xwscp_RETRY_NUM                             (8U)
+#define XWMDCFG_isc_xwscp_SDU_MAX_SIZE                          (40U)
+#define XWMDCFG_isc_xwscp_FRMSLOT_NUM                           (8U)
+#define XWMDCFG_isc_xwscp_SYNC_KEY                              ('S')
+#define XWMDCFG_isc_xwscp_THRD_PRIORITY                         \
+        XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
 
 #endif /* cfg/xwmd.h */
