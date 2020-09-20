@@ -21,12 +21,13 @@
 CROSS_COMPILE ?= powerpc-eabivle-
 CC := $(CROSS_COMPILE)gcc
 AS := $(CROSS_COMPILE)gcc -x assembler-with-cpp
-CP := $(CROSS_COMPILE)objcopy
+OBJCP := $(CROSS_COMPILE)objcopy
 OD := $(CROSS_COMPILE)objdump
 AR := $(CROSS_COMPILE)ar
 LD := $(CROSS_COMPILE)gcc
 SIZE := $(CROSS_COMPILE)size
 LUA2HEX := python3 xwbs/util/py/lua2hex.py
+CP := cp
 RM := -rm
 
 ifeq ($(ARCHCFG_LITTLE_ENDIAN),y)
@@ -89,12 +90,13 @@ ifneq ($(~V),1)
     SHOW_APP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[as -E] "$<" -> "$@" \e[0m";
     SHOW_AS = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[as] "$<" -> "$@" \e[0m";
     SHOW_OD = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[od] "$<" -> "$@" \e[0m";
-    SHOW_CP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cp] "$<" -> "$@" \e[0m";
+    SHOW_OBJCP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[objcp] "$<" -> "$@" \e[0m";
     SHOW_MM = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[mm] "$<" -> "$@" \e[0m";
     SHOW_AR = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[ar] "$@" \e[0m";
     SHOW_LD = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[ld] "$@" \e[0m";
     SHOW_SIZE = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[size] "$@" \e[0m";
     SHOW_LUA2HEX = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[lua2hex] "$@" \e[0m";
+    SHOW_CP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cp] "$@" \e[0m";
 else
     SHOW_CPP =
     SHOW_CC =
@@ -102,10 +104,11 @@ else
     SHOW_APP =
     SHOW_AS =
     SHOW_OD =
-    SHOW_CP =
+    SHOW_OBJCP =
     SHOW_MM =
     SHOW_AR =
     SHOW_LD =
     SHOW_SIZE =
     SHOW_LUA2HEX =
+    SHOW_CP =
 endif

@@ -31,6 +31,7 @@
 #define XuanWuOS_CFG_MK_RULE                          e200x.cw.rule
 #define XuanWuOS_CFG_ELF_MK                           e200x.cw.mk
 #define XuanWuOS_CFG_XWMO_MK                          e200x.cw.xwmo.mk
+#define XuanWuOS_CFG_XWMO_PREBUILT_MK                 asterisk.xwmo.prebuilt.mk
 #include <cfg/arch.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********

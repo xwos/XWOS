@@ -39,6 +39,7 @@ else
     AR := WINEPREFIX=$(WINEPREFIX) LM_LICENSE_FILE=$(CWMCUEPPC_LICENSE) $(WINE) $(CLTDIR)/mwldeppc.exe -library
 endif
 LUA2HEX := python3 xwbs/util/py/lua2hex.py
+CP := cp
 RM := -rm
 
 # build flags
@@ -107,22 +108,24 @@ ifneq ($(~V),1)
     SHOW_APP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[as -E] "$<" -> "$@" \e[0m";
     SHOW_AS = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[as] "$<" -> "$@" \e[0m";
     SHOW_OD = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[od] "$<" -> "$@" \e[0m";
-    SHOW_CP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cp] "$<" -> "$@" \e[0m";
+    SHOW_OBJCP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[objcp] "$<" -> "$@" \e[0m";
     SHOW_MM = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[mm] "$<" -> "$@" \e[0m";
     SHOW_AR = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[ar] "$@" \e[0m";
     SHOW_LD = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[ld] "$@" \e[0m";
     SHOW_MOT2BIN = echo -e "\e[1m\e[4$$[RANDOM & 7];36m[mot2bin] "$@" \e[0m";
     SHOW_LUA2HEX = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[lua2hex] "$@" \e[0m";
+    SHOW_CP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cp] "$@" \e[0m";
 else
     SHOW_CPP =
     SHOW_CC =
     SHOW_APP =
     SHOW_AS =
     SHOW_OD =
-    SHOW_CP =
+    SHOW_OBJCP =
     SHOW_MM =
     SHOW_AR =
     SHOW_LD =
     SHOW_MOT2BIN =
     SHOW_LUA2HEX =
+    SHOW_CP =
 endif

@@ -217,10 +217,10 @@ $(XWOS_WKSPC_DIR)/$(TARGET).elf: $(LIB_OBJS) $(LIBS) \
 	$(SHOW_SIZE) $(SIZE) $@
 
 %.hex: %.elf
-	$(SHOW_CP) $(CP) -O ihex $< $@
+	$(SHOW_OBJCP) $(OBJCP) -O ihex $< $@
 
 %.bin: %.elf
-	$(SHOW_CP) $(CP) -O binary -S $< $@
+	$(SHOW_OBJCP) $(OBJCP) -O binary -S $< $@
 
 $(XWOS_WKSPC_DIR)/$(TARGET).dsm: $(XWOS_WKSPC_DIR)/$(TARGET).elf
 	$(SHOW_OD) $(OD) -D $< > $@

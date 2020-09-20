@@ -31,6 +31,7 @@
 #define XuanWuOS_CFG_MK_RULE                          arm-cortex-m.gcc.rule
 #define XuanWuOS_CFG_ELF_MK                           arm-cortex-m.gcc.mk
 #define XuanWuOS_CFG_XWMO_MK                          arm-cortex-m.gcc.xwmo.mk
+#define XuanWuOS_CFG_XWMO_PREBUILT_MK                 asterisk.xwmo.prebuilt.mk
 #include <cfg/arch.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
