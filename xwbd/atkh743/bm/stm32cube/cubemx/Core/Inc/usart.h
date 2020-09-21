@@ -41,6 +41,7 @@
 /* USER CODE END Includes */
 
 extern UART_HandleTypeDef husart1;
+extern UART_HandleTypeDef husart2;
 
 /* USER CODE BEGIN Private defines */
 #define HAL_UART_TXMEM_MAXSIZE    512U /**< 单次最大发送的字节数 */
@@ -60,6 +61,7 @@ struct HAL_UART_Xwds_driver_data {
 /* USER CODE END Private defines */
 
 void MX_USART1_UART_Init(void);
+void MX_USART2_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 extern struct HAL_UART_Xwds_driver_data husart1_xwds_drvdata;

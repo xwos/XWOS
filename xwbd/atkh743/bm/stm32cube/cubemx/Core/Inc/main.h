@@ -46,6 +46,7 @@ extern "C" {
 #include "stm32h7xx_ll_pwr.h"
 #include "stm32h7xx_ll_gpio.h"
 #include "stm32h7xx_ll_dma.h"
+
 #include "stm32h7xx_ll_exti.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -77,15 +78,15 @@ void stm32cube_override_linkage_msp(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define KEY0_Pin GPIO_PIN_13
-#define KEY0_GPIO_Port GPIOC
-#define KEY0_EXTI_IRQn EXTI15_10_IRQn
+#define KEY2_Pin GPIO_PIN_13
+#define KEY2_GPIO_Port GPIOC
+#define KEY2_EXTI_IRQn EXTI15_10_IRQn
 #define KEY1_Pin GPIO_PIN_2
 #define KEY1_GPIO_Port GPIOH
 #define KEY1_EXTI_IRQn EXTI2_IRQn
-#define KEY2_Pin GPIO_PIN_3
-#define KEY2_GPIO_Port GPIOH
-#define KEY2_EXTI_IRQn EXTI3_IRQn
+#define KEY0_Pin GPIO_PIN_3
+#define KEY0_GPIO_Port GPIOH
+#define KEY0_EXTI_IRQn EXTI3_IRQn
 #define LED1_Pin GPIO_PIN_0
 #define LED1_GPIO_Port GPIOB
 #define LED0_Pin GPIO_PIN_1

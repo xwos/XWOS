@@ -154,7 +154,9 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
     PH4     ------> I2C2_SCL
     PH5     ------> I2C2_SDA
     */
-    HAL_GPIO_DeInit(GPIOH, GPIO_PIN_4|GPIO_PIN_5);
+    HAL_GPIO_DeInit(GPIOH, GPIO_PIN_4);
+
+    HAL_GPIO_DeInit(GPIOH, GPIO_PIN_5);
 
     /* I2C2 DMA DeInit */
     HAL_DMA_DeInit(i2cHandle->hdmarx);

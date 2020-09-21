@@ -256,6 +256,11 @@ void HAL_QSPI_MspInit(QSPI_HandleTypeDef* qspiHandle)
       Error_Handler();
     }
 
+    if (HAL_MDMA_ConfigPostRequestMask(&hmdma_quadspi_fifo_th, 0, 0) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
     __HAL_LINKDMA(qspiHandle,hmdma,hmdma_quadspi_fifo_th);
 
     /* QUADSPI interrupt Init */
