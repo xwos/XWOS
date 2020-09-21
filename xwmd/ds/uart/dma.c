@@ -11,12 +11,11 @@
  * @note
  * + 方案1：
  *   - 中断优先级：定时器中断的优先级 == DMA半完成与完成中断的优先级
+ *   - 定时器中断函数与DMA半完成与完成中断函数运行在同一个CPU上
  * + 方案2：
  *   - 中断优先级：定时器中断的优先级 < DMA半完成与完成中断的优先级
  *   - 定时器中断中，获取DMA剩余计数前关闭DMA中断或总中断开关
- * + 方案3：
- *   - 中断优先级：定时器中断的优先级 > DMA半完成与完成中断的优先级
- *   - DMA半完成与完成中断中关闭定时器
+ *   - 定时器中断函数与DMA半完成与完成中断函数运行在同一个CPU上
  */
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -75,10 +74,6 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_dmauartc_cvops = {
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
-/**
- * @brief XWDS API：DMA UART控制器的构造函数
- * @param dmauartc: (I) DMA UART控制器对象指针
- */
 __xwds_api
 void xwds_dmauartc_construct(struct xwds_dmauartc * dmauartc)
 {
@@ -86,10 +81,6 @@ void xwds_dmauartc_construct(struct xwds_dmauartc * dmauartc)
         dmauartc->dev.cvops = &xwds_dmauartc_cvops;
 }
 
-/**
- * @brief XWDS API：DMA UART控制器对象的析构函数
- * @param dmauartc: (I) DMA UART控制器对象指针
- */
 __xwds_api
 void xwds_dmauartc_destruct(struct xwds_dmauartc * dmauartc)
 {
@@ -475,11 +466,18 @@ err_dmauartc_grab:
 }
 
 /******** ******** Callbacks for BSP driver ******** ********/
-/**
- * @brief XWDS Driver Callback：发布数据到接收队列
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @param tail: (I) 新的数据接收位置（有效数据结尾 + 1）
- */
+__xwds_code
+void xwds_dmauartc_drvcb_rxq_flush(struct xwds_dmauartc * dmauartc)
+{
+        xwreg_t cpuirq;
+
+        xwosal_smr_trywait(xwosal_smr_get_id(&dmauartc->rxq.smr));
+        xwosal_splk_lock_cpuirqsv(&dmauartc->rxq.lock, &cpuirq);
+        dmauartc->rxq.pos = 0;
+        dmauartc->rxq.tail = 0;
+        xwosal_splk_unlock_cpuirqrs(&dmauartc->rxq.lock, cpuirq);
+}
+
 __xwds_code
 void xwds_dmauartc_drvcb_rxq_pub(struct xwds_dmauartc * dmauartc, xwsq_t tail)
 {

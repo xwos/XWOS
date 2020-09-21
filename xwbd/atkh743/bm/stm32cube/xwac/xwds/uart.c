@@ -226,21 +226,18 @@ xwer_t stm32cube_usart1_drv_putc(struct xwds_dmauartc * dmauartc,
 
 void stm32cube_usart1_cb_rxdma_restart(struct xwds_dmauartc * dmauartc)
 {
+        xwds_dmauartc_drvcb_rxq_flush(dmauartc);
         MX_USART1_RXDMA_Start(dmauartc->rxq.mem, sizeof(dmauartc->rxq.mem));
 }
 
 void stm32cube_usart1_cb_rxdma_halfcplt(struct xwds_dmauartc * dmauartc)
 {
-        MX_USART1_Timer_Stop();
         xwds_dmauartc_drvcb_rxq_pub(dmauartc, XWDS_DMAUART_RXQ_SIZE);
-        MX_USART1_Timer_Start();
 }
 
 void stm32cube_usart1_cb_rxdma_cplt(struct xwds_dmauartc * dmauartc)
 {
-        MX_USART1_Timer_Stop();
         xwds_dmauartc_drvcb_rxq_pub(dmauartc, 0);
-        MX_USART1_Timer_Start();
 }
 
 void stm32cube_usart1_cb_rxdma_timer(struct xwds_dmauartc * dmauartc)

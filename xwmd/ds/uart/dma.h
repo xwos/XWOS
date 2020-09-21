@@ -76,9 +76,17 @@ struct xwds_dmauartc {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
+/**
+ * @brief XWDS API：DMA UART控制器的构造函数
+ * @param dmauartc: (I) DMA UART控制器对象指针
+ */
 __xwds_api
 void xwds_dmauartc_construct(struct xwds_dmauartc * dmauartc);
 
+/**
+ * @brief XWDS API：DMA UART控制器对象的析构函数
+ * @param dmauartc: (I) DMA UART控制器对象指针
+ */
 __xwds_api
 void xwds_dmauartc_destruct(struct xwds_dmauartc * dmauartc);
 
@@ -183,6 +191,18 @@ xwer_t xwds_dmauartc_cfg(struct xwds_dmauartc * dmauartc,
                          const struct xwds_uart_cfg * cfg);
 
 /******** ******** Callbacks for BSP driver ******** ********/
+/**
+ * @brief XWDS Driver Callback：清空接收队列
+ * @param dmauartc: (I) DMA UART控制器对象指针
+ */
+__xwds_code
+void xwds_dmauartc_drvcb_rxq_flush(struct xwds_dmauartc * dmauartc);
+
+/**
+ * @brief XWDS Driver Callback：发布数据到接收队列
+ * @param dmauartc: (I) DMA UART控制器对象指针
+ * @param tail: (I) 新的数据接收位置（有效数据结尾 + 1）
+ */
 __xwds_code
 void xwds_dmauartc_drvcb_rxq_pub(struct xwds_dmauartc * dmauartc, xwsq_t tail);
 
