@@ -1640,6 +1640,7 @@ void HAL_SD_IRQHandler(SD_HandleTypeDef *hsd)
         hsd->Instance->DCTRL &= (uint32_t)~((uint32_t)SDIO_DCTRL_DMAEN);
 
         hsd->State = HAL_SD_STATE_READY;
+        hsd->Context = SD_CONTEXT_NONE;
 
 #if defined (USE_HAL_SD_REGISTER_CALLBACKS) && (USE_HAL_SD_REGISTER_CALLBACKS == 1U)
         hsd->TxCpltCallback(hsd);
@@ -2514,9 +2515,38 @@ HAL_StatusTypeDef HAL_SD_Abort_IT(SD_HandleTypeDef *hsd)
 static void SD_DMATransmitCplt(DMA_HandleTypeDef *hdma)
 {
   SD_HandleTypeDef* hsd = (SD_HandleTypeDef* )(hdma->Parent);
+  uint32_t errorstate;
 
-  /* Enable DATAEND Interrupt */
-  __HAL_SD_ENABLE_IT(hsd, (SDIO_IT_DATAEND));
+  /* Send stop command in multiblock write */
+  if(hsd->Context == (SD_CONTEXT_WRITE_MULTIPLE_BLOCK | SD_CONTEXT_DMA))
+  {
+    errorstate = SDMMC_CmdStopTransfer(hsd->Instance);
+    if(errorstate != HAL_SD_ERROR_NONE)
+    {
+      hsd->ErrorCode |= errorstate;
+#if (USE_HAL_SD_REGISTER_CALLBACKS == 1)
+      hsd->ErrorCallback(hsd);
+#else
+      HAL_SD_ErrorCallback(hsd);
+#endif
+    }
+  }
+
+  /* Disable the DMA transfer for transmit request by setting the DMAEN bit
+  in the SD DCTRL register */
+  hsd->Instance->DCTRL &= (uint32_t)~((uint32_t)SDIO_DCTRL_DMAEN);
+
+  /* Clear all the static flags */
+  __HAL_SD_CLEAR_FLAG(hsd, SDIO_STATIC_DATA_FLAGS);
+
+  hsd->State = HAL_SD_STATE_READY;
+  hsd->Context = SD_CONTEXT_NONE;
+
+#if (USE_HAL_SD_REGISTER_CALLBACKS == 1)
+  hsd->TxCpltCallback(hsd);
+#else
+  HAL_SD_TxCpltCallback(hsd);
+#endif
 }
 
 /**
@@ -2529,7 +2559,7 @@ static void SD_DMAReceiveCplt(DMA_HandleTypeDef *hdma)
   SD_HandleTypeDef* hsd = (SD_HandleTypeDef* )(hdma->Parent);
   uint32_t errorstate;
 
-  /* Send stop command in multiblock write */
+  /* Send stop command in multiblock read */
   if(hsd->Context == (SD_CONTEXT_READ_MULTIPLE_BLOCK | SD_CONTEXT_DMA))
   {
     errorstate = SDMMC_CmdStopTransfer(hsd->Instance);
@@ -2785,6 +2815,7 @@ static uint32_t SD_PowerON(SD_HandleTypeDef *hsd)
   __IO uint32_t count = 0U;
   uint32_t response = 0U, validvoltage = 0U;
   uint32_t errorstate;
+  uint32_t sdtype = SDMMC_STD_CAPACITY;
 
   /* CMD0: GO_IDLE_STATE */
   errorstate = SDMMC_CmdGoIdleState(hsd->Instance);
@@ -2798,30 +2829,16 @@ static uint32_t SD_PowerON(SD_HandleTypeDef *hsd)
   if(errorstate != HAL_SD_ERROR_NONE)
   {
     hsd->SdCard.CardVersion = CARD_V1_X;
-    /* CMD0: GO_IDLE_STATE */
-    errorstate = SDMMC_CmdGoIdleState(hsd->Instance);
-    if(errorstate != HAL_SD_ERROR_NONE)
-    {
-      return errorstate;
-    }
-
+    sdtype = SDMMC_STD_CAPACITY;
   }
   else
   {
     hsd->SdCard.CardVersion = CARD_V2_X;
-  }
-
-  if( hsd->SdCard.CardVersion == CARD_V2_X)
-  {
-    /* SEND CMD55 APP_CMD with RCA as 0 */
-    errorstate = SDMMC_CmdAppCommand(hsd->Instance, 0);
-    if(errorstate != HAL_SD_ERROR_NONE)
-    {
-      return HAL_SD_ERROR_UNSUPPORTED_FEATURE;
-    }
+    /* sdtype = SDMMC_VOLTAGE_WINDOW_SD | SDMMC_HIGH_CAPACITY | SD_SWITCH_1_8V_CAPACITY; */
+    sdtype = SDMMC_VOLTAGE_WINDOW_SD | SDMMC_HIGH_CAPACITY;
   }
   /* SD CARD */
-  /* Send ACMD41 SD_APP_OP_COND with Argument 0x80100000 */
+  /* Send ACMD41 SD_APP_OP_COND with Argument sdtype */
   while((count < SDMMC_MAX_VOLT_TRIAL) && (validvoltage == 0U))
   {
     /* SEND CMD55 APP_CMD with RCA as 0 */
@@ -2831,8 +2848,8 @@ static uint32_t SD_PowerON(SD_HandleTypeDef *hsd)
       return errorstate;
     }
 
-    /* Send CMD41 */
-    errorstate = SDMMC_CmdAppOperCommand(hsd->Instance, SDMMC_VOLTAGE_WINDOW_SD | SDMMC_HIGH_CAPACITY | SD_SWITCH_1_8V_CAPACITY);
+    /* Send ACMD41 */
+    errorstate = SDMMC_CmdAppOperCommand(hsd->Instance, sdtype);
     if(errorstate != HAL_SD_ERROR_NONE)
     {
       return HAL_SD_ERROR_UNSUPPORTED_FEATURE;
