@@ -88,7 +88,7 @@ xwer_t xwpcpif_uart_tx(struct xwpcp * xwpcp, const xwu8_t * data, xwsz_t size)
         xwtm_t desired;
 
         desired = XWTM_MAX;
-        return xwds_dmauartc_tx(xwpcp->hwifcb, data, size, &desired);
+        return xwds_dmauartc_tx(xwpcp->hwifcb, data, &size, &desired);
 }
 
 static __xwmd_code

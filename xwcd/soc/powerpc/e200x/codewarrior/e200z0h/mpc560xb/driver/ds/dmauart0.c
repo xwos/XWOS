@@ -72,7 +72,7 @@ void mpc560xb_dmauart0_tx_cb(struct xwds_soc * soc, xwid_t ch, xwu32_t rc,
 
 static __xwbsp_code
 xwer_t mpc560xb_dmauart0_drv_tx(struct xwds_dmauartc * dmauartc,
-                                const xwu8_t * srcmem, xwsz_t size,
+                                const xwu8_t * srcmem, xwsz_t * size,
                                 xwtm_t * xwtm);
 
 static __xwbsp_code
@@ -581,25 +581,27 @@ void mpc560xb_dmauart0_tx_cb(struct xwds_soc * soc, xwid_t ch, xwu32_t rc,
 
 static __xwbsp_code
 xwer_t mpc560xb_dmauart0_drv_tx(struct xwds_dmauartc * dmauartc,
-                                const xwu8_t * srcmem, xwsz_t size,
+                                const xwu8_t * srcmem, xwsz_t * size,
                                 xwtm_t * xwtm)
 {
         union xwlk_ulock ulk;
         struct mpc560xb_dmauart0_drvdata * drvdata;
         const struct xwds_resource_dma * txdmarsc;
         struct soc_dmach_private_cfg * xwcdmacfg;
+        xwsz_t wrsz;
         xwreg_t flag;
         xwsq_t lkst;
         xwer_t rc;
 
+        wrsz = *size;
         drvdata = dmauartc->dev.data;
         txdmarsc = dmauartc->txdmarsc;
         xwcdmacfg = txdmarsc->xwccfg;
         xwcdmacfg->tcds[0].std.SADDR = (volatile xwu32_t)srcmem;
         xwcdmacfg->tcds[0].std.DADDR = ((volatile xwu32_t)&LINFLEX_0.BDRL) + 3;
-        xwcdmacfg->tcds[0].std.SLAST = -((xws32_t)size);
-        xwcdmacfg->tcds[0].std.BITER = ((xwu16_t)size);
-        xwcdmacfg->tcds[0].std.CITER = ((xwu16_t)size);
+        xwcdmacfg->tcds[0].std.SLAST = -((xws32_t)wrsz);
+        xwcdmacfg->tcds[0].std.BITER = ((xwu16_t)wrsz);
+        xwcdmacfg->tcds[0].std.CITER = ((xwu16_t)wrsz);
 
         rc = xwds_dma_cfg(txdmarsc->soc, txdmarsc->ch, (void *)&xwcdmacfg,
                           mpc560xb_dmauart0_tx_cb, dmauartc);
@@ -630,6 +632,9 @@ xwer_t mpc560xb_dmauart0_drv_tx(struct xwds_dmauartc * dmauartc,
                 drvdata->tx.rc = -ECANCELED;
         }
         xwosal_splk_unlock_cpuirqrs(&drvdata->tx.splk, flag);
+        if (rc < 0) {
+                *size = 0;
+        }
         return rc;
 
 err_dma_cfg:

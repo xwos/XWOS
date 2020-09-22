@@ -82,7 +82,7 @@ xwer_t bdl_iftx(const xwu8_t * str, xwsz_t size)
         xwtm_t time;
 
         time = XWTM_MAX;
-        rc = xwds_dmauartc_tx(&mpc560xb_uart0_cb, str, size, &time);
+        rc = xwds_dmauartc_tx(&mpc560xb_uart0_cb, str, &size, &time);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmatx;
         }

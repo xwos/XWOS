@@ -87,7 +87,7 @@ static __xwmd_code
 xwer_t xwscpif_uart_tx(struct xwscp * xwscp, const xwu8_t * data,
                        xwsz_t size, xwtm_t * xwtm)
 {
-        return xwds_dmauartc_tx(xwscp->hwifcb, data, size, xwtm);
+        return xwds_dmauartc_tx(xwscp->hwifcb, data, &size, xwtm);
 }
 
 static __xwmd_code

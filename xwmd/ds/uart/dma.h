@@ -42,7 +42,7 @@ struct xwds_dmauartc_driver {
         struct xwds_driver base; /**< C语言面向对象：继承struct xwds_driver */
         xwer_t (* cfg)(struct xwds_dmauartc *,
                        const struct xwds_uart_cfg *); /**< 配置UART控制器 */
-        xwer_t (* tx)(struct xwds_dmauartc *, const xwu8_t *, xwsz_t,
+        xwer_t (* tx)(struct xwds_dmauartc *, const xwu8_t *, xwsz_t *,
                       xwtm_t *); /**< 配置DMA通道并发送 */
         xwer_t (* putc)(struct xwds_dmauartc *, const xwu8_t); /**< 发送一个字节 */
 };
@@ -134,10 +134,11 @@ xwer_t xwds_dmauartc_try_rx(struct xwds_dmauartc * dmauartc,
                             xwu8_t * buf, xwsz_t * size);
 
 /**
- * @brief XWDS API：配置DMA通道发送数据
+ * @brief XWDS API：配置UART的DMA通道发送数据
  * @param dmauartc: (I) DMA UART控制器对象指针
  * @param data: (I) 待发送的数据的缓冲区
- * @param size: (I) 待发送的数据的大小
+ * @param size: (I) 作为输入时，表示期望发送的数据的大小（单位：字节）
+ *              (O) 作为输出时，返回实际发送的数据大小
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -151,7 +152,7 @@ xwer_t xwds_dmauartc_try_rx(struct xwds_dmauartc * dmauartc,
  */
 __xwds_api
 xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
-                        const xwu8_t * data, xwsz_t size,
+                        const xwu8_t * data, xwsz_t * size,
                         xwtm_t * xwtm);
 
 /**

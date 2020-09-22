@@ -340,7 +340,7 @@ err_dmauartc_grab:
 
 __xwds_api
 xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
-                        const xwu8_t * data, xwsz_t size,
+                        const xwu8_t * data, xwsz_t * size,
                         xwtm_t * xwtm)
 {
         xwer_t rc;
@@ -349,6 +349,7 @@ xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
 
         XWDS_VALIDATE(dmauartc, "nullptr", -EFAULT);
         XWDS_VALIDATE(data, "nullptr", -EFAULT);
+        XWDS_VALIDATE(size, "nullptr", -EFAULT);
 
         rc = xwds_dmauartc_grab(dmauartc);
         if (__xwcc_unlikely(rc < 0)) {

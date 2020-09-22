@@ -27,20 +27,14 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwssz_t board_log_write(const char * s, xwsz_t n)
+xwer_t board_log_write(const char * s, xwsz_t n)
 {
         xwtm_t desired;
-        xwssz_t wrsz;
         xwer_t rc;
 
         desired = XWTM_MAX;
         rc = xwds_dmauartc_tx(&stm32cube_usart1_cb,
                               (const xwu8_t *)s, n,
                               &desired);
-        if (rc < 0) {
-                wrsz = -1;
-        } else {
-                wrsz = (xwssz_t)n;
-        }
-        return wrsz;
+        return rc;
 }
