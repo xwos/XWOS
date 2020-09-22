@@ -23,9 +23,9 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwmd/ds/i2c/perpheral.h>
-#include <xwcd/perpheral/ds/i2c/eeprom/common/driver.h>
-#include <xwcd/perpheral/ds/i2c/eeprom/chip/at24sdd.h>
-#include <xwcd/perpheral/ds/i2c/eeprom/chip/at24mdd.h>
+#include <xwcd/perpheral/i2c/eeprom/driver.h>
+#include <xwcd/perpheral/i2c/eeprom/chip/at24sdd.h>
+#include <xwcd/perpheral/i2c/eeprom/chip/at24mdd.h>
 #include <bdl/ds/description/mpc560xbdkp.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -48,12 +48,12 @@ const struct xwds_resources at24cxx_resources = {
         .dmarsc_num = 0,
 };
 
-const struct xwds_i2cp_eeprom_cfg at24cxx_cfg = {
+const struct xwds_eeprom_cfg at24cxx_cfg = {
         .page_size = 32,
         .total = 8192,
 };
 
-struct xwds_i2cp_eeprom at24cxx_cb = {
+struct xwds_eeprom at24cxx_cb = {
 	.i2cp = {
 	        .dev = {
                         .name = "at24cxx",

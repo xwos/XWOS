@@ -30,7 +30,7 @@
 #include <xwmd/ds/i2c/master.h>
 #include <xwmd/ds/i2c/perpheral.h>
 #include <xwmd/ds/misc/chip.h>
-#include <xwcd/perpheral/ds/i2c/eeprom/common/driver.h>
+#include <xwcd/perpheral/i2c/eeprom/device.h>
 #include <bdl/standard.h>
 #include <bdl/ds/description/mpc560xbdkp.h>
 #include <bdl/ds/xwds.h>

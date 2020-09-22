@@ -636,7 +636,7 @@ xwer_t xwscp_rx_frm_sdu(struct xwscp * xwscp, struct xwscp_frmslot * frmslot)
 }
 
 /**
- * @brief 接收一帧
+ * @brief 接收并处理一帧消息
  * @param xwscp: (I) XWSCP对象的指针
  * @param frmslot: (I) 帧槽指针
  * @return 错误码

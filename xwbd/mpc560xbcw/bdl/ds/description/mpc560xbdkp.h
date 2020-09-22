@@ -29,6 +29,7 @@
 #include <xwmd/ds/soc/chip.h>
 #include <xwmd/ds/uart/dma.h>
 #include <xwmd/ds/i2c/master.h>
+#include <xwcd/perpheral/i2c/eeprom/device.h>
 #include <xwmd/ds/misc/chip.h>
 #include <soc_irqc.h>
 #include <soc_clk.h>
@@ -59,7 +60,7 @@ extern struct xwds_dmauartc mpc560xb_uart0_cb;
 extern struct xwds_i2cm mpc560xb_i2cm_cb;
 
 /******** ******** I2C perpheral ******** ********/
-extern struct xwds_i2cp_eeprom at24cxx_cb;
+extern struct xwds_eeprom at24cxx_cb;
 
 /******** ******** misc device ******** ********/
 extern struct xwds_misc mpc560xb_misc_cb;
