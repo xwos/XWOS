@@ -63,7 +63,9 @@ xwer_t xwscp_hwifal_open(struct xwscp * xwscp, void * hwifcb)
         } else {
                 rc = XWOK;
         }
-        xwscp->hwifst = XWSCP_HWIFST_OPENED;
+        if (XWOK == rc) {
+                xwscp->hwifst = XWSCP_HWIFST_OPENED;
+        }
         return rc;
 }
 

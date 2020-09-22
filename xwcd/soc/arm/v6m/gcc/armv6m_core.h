@@ -1742,4 +1742,13 @@ void sev(void)
         __asm__ volatile("sev");
 }
 
+/**
+ * @brief Set a breakpoint
+ */
+static __xwbsp_inline
+void bkpt(void)
+{
+        __asm__ volatile("bkpt");
+}
+
 #endif /* armv6m_core.h */

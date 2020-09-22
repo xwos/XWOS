@@ -56,7 +56,11 @@
 #endif
 
 #if defined(XWKNCFG_BUG) && (1 == XWKNCFG_BUG)
-  #define XWOS_BUG()            do {} while (1)
+  #if defined(ARCHCFG_BKPT) && (1 == ARCHCFG_BKPT)
+  #define XWOS_BUG()            arch_bkpt()
+  #else
+    #define XWOS_BUG()          do {} while (1)
+  #endif
   #define XWOS_BUG_ON(x)        if (__xwcc_unlikely(x)) XWOS_BUG()
 #else
   #define XWOS_BUG()
