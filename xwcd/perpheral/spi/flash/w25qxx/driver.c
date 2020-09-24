@@ -557,7 +557,7 @@ xwer_t xwds_w25qxx_write(struct xwds_w25qxx * w25qxx, xwu32_t address,
                          xwu8_t * txb, xwsz_t * size, xwtm_t * xwtm)
 {
         struct xwds_w25qxx_cmd cmd;
-        xwtm_t sleep;
+        xwtm_t sleep, delta;
         xwsz_t xfsize;
         xwer_t rc;
         xwu8_t sr1;
@@ -599,11 +599,16 @@ xwer_t xwds_w25qxx_write(struct xwds_w25qxx * w25qxx, xwu32_t address,
         }
 
         rc = xwds_w25qxx_check_idle(w25qxx, xwtm);
-        while ((xwtm_cmp(*xwtm, 1 * XWTM_S) > 0) && (-EBUSY == rc)) {
-                sleep = 1 * XWTM_S;
-                xwosal_cthrd_sleep(&sleep);
-                *xwtm = xwtm_sub(*xwtm, 1 * XWTM_S);
-                rc = xwds_w25qxx_check_idle(w25qxx, xwtm);
+        sleep = (xwtm_cmp(*xwtm, 1 * XWTM_MS) > 0) ? 1 * XWTM_MS : *xwtm;
+        while ((sleep > 0) && (-EBUSY == rc)) {
+                delta = sleep;
+                rc = xwosal_cthrd_sleep(&sleep);
+                if (XWOK == rc) {
+                        *xwtm = xwtm_sub(*xwtm, delta);
+                        rc = xwds_w25qxx_check_idle(w25qxx, xwtm);
+                        sleep = (xwtm_cmp(*xwtm, 1 * XWTM_MS) > 0) ?
+                                1 * XWTM_MS : *xwtm;
+                }
         }
         if (rc < 0) {
                 goto err_chk_idle;
@@ -625,7 +630,7 @@ xwer_t xwds_w25qxx_erase_sector(struct xwds_w25qxx * w25qxx, xwu32_t address,
                                 xwtm_t * xwtm)
 {
         struct xwds_w25qxx_cmd cmd;
-        xwtm_t sleep;
+        xwtm_t sleep, delta;
         xwer_t rc;
         xwu8_t sr1;
 
@@ -663,11 +668,16 @@ xwer_t xwds_w25qxx_erase_sector(struct xwds_w25qxx * w25qxx, xwu32_t address,
         }
 
         rc = xwds_w25qxx_check_idle(w25qxx, xwtm);
-        while ((xwtm_cmp(*xwtm, 1 * XWTM_S) > 0) && (-EBUSY == rc)) {
-                sleep = 1 * XWTM_S;
-                xwosal_cthrd_sleep(&sleep);
-                *xwtm = xwtm_sub(*xwtm, 1 * XWTM_S);
-                rc = xwds_w25qxx_check_idle(w25qxx, xwtm);
+        sleep = (xwtm_cmp(*xwtm, 400 * XWTM_MS) > 0) ? 400 * XWTM_MS : *xwtm;
+        while ((sleep > 0) && (-EBUSY == rc)) {
+                delta = sleep;
+                rc = xwosal_cthrd_sleep(&sleep);
+                if (XWOK == rc) {
+                        *xwtm = xwtm_sub(*xwtm, delta);
+                        rc = xwds_w25qxx_check_idle(w25qxx, xwtm);
+                        sleep = (xwtm_cmp(*xwtm, 400 * XWTM_MS) > 0) ?
+                                400 * XWTM_MS : *xwtm;
+                }
         }
         if (rc < 0) {
                 goto err_chk_idle;
@@ -689,7 +699,7 @@ xwer_t xwds_w25qxx_erase_32kblk(struct xwds_w25qxx * w25qxx, xwu32_t address,
                                 xwtm_t * xwtm)
 {
         struct xwds_w25qxx_cmd cmd;
-        xwtm_t sleep;
+        xwtm_t sleep, delta;
         xwer_t rc;
         xwu8_t sr1;
 
@@ -727,11 +737,16 @@ xwer_t xwds_w25qxx_erase_32kblk(struct xwds_w25qxx * w25qxx, xwu32_t address,
         }
 
         rc = xwds_w25qxx_check_idle(w25qxx, xwtm);
-        while ((xwtm_cmp(*xwtm, 1 * XWTM_S) > 0) && (-EBUSY == rc)) {
-                sleep = 1 * XWTM_S;
-                xwosal_cthrd_sleep(&sleep);
-                *xwtm = xwtm_sub(*xwtm, 1 * XWTM_S);
-                rc = xwds_w25qxx_check_idle(w25qxx, xwtm);
+        sleep = (xwtm_cmp(*xwtm, 1600 * XWTM_MS) > 0) ? 1600 * XWTM_MS : *xwtm;
+        while ((sleep > 0) && (-EBUSY == rc)) {
+                delta = sleep;
+                rc = xwosal_cthrd_sleep(&sleep);
+                if (XWOK == rc) {
+                        *xwtm = xwtm_sub(*xwtm, delta);
+                        rc = xwds_w25qxx_check_idle(w25qxx, xwtm);
+                        sleep = (xwtm_cmp(*xwtm, 1600 * XWTM_MS) > 0) ?
+                                1600 * XWTM_MS : *xwtm;
+                }
         }
         if (rc < 0) {
                 goto err_chk_idle;
@@ -753,7 +768,7 @@ xwer_t xwds_w25qxx_erase_64kblk(struct xwds_w25qxx * w25qxx, xwu32_t address,
                                 xwtm_t * xwtm)
 {
         struct xwds_w25qxx_cmd cmd;
-        xwtm_t sleep;
+        xwtm_t sleep, delta;
         xwer_t rc;
         xwu8_t sr1;
 
@@ -791,11 +806,16 @@ xwer_t xwds_w25qxx_erase_64kblk(struct xwds_w25qxx * w25qxx, xwu32_t address,
         }
 
         rc = xwds_w25qxx_check_idle(w25qxx, xwtm);
-        while ((xwtm_cmp(*xwtm, 1 * XWTM_S) > 0) && (-EBUSY == rc)) {
-                sleep = 1 * XWTM_S;
-                xwosal_cthrd_sleep(&sleep);
-                *xwtm = xwtm_sub(*xwtm, 1 * XWTM_S);
-                rc = xwds_w25qxx_check_idle(w25qxx, xwtm);
+        sleep = (xwtm_cmp(*xwtm, 2000 * XWTM_MS) > 0) ? 2000 * XWTM_MS : *xwtm;
+        while ((sleep > 0) && (-EBUSY == rc)) {
+                delta = sleep;
+                rc = xwosal_cthrd_sleep(&sleep);
+                if (XWOK == rc) {
+                        *xwtm = xwtm_sub(*xwtm, delta);
+                        rc = xwds_w25qxx_check_idle(w25qxx, xwtm);
+                        sleep = (xwtm_cmp(*xwtm, 2000 * XWTM_MS) > 0) ?
+                                2000 * XWTM_MS : *xwtm;
+                }
         }
         if (rc < 0) {
                 goto err_chk_idle;
@@ -816,7 +836,7 @@ err_we:
 xwer_t xwds_w25qxx_erase_chip(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
 {
         struct xwds_w25qxx_cmd cmd;
-        xwtm_t sleep;
+        xwtm_t sleep, delta;
         xwer_t rc;
         xwu8_t sr1;
 
@@ -854,11 +874,16 @@ xwer_t xwds_w25qxx_erase_chip(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
         }
 
         rc = xwds_w25qxx_check_idle(w25qxx, xwtm);
-        while ((xwtm_cmp(*xwtm, 1 * XWTM_S) > 0) && (-EBUSY == rc)) {
-                sleep = 1 * XWTM_S;
-                xwosal_cthrd_sleep(&sleep);
-                *xwtm = xwtm_sub(*xwtm, 1 * XWTM_S);
-                rc = xwds_w25qxx_check_idle(w25qxx, xwtm);
+        sleep = (xwtm_cmp(*xwtm, 2000 * XWTM_MS) > 0) ? 2000 * XWTM_MS : *xwtm;
+        while ((sleep > 0) && (-EBUSY == rc)) {
+                delta = sleep;
+                rc = xwosal_cthrd_sleep(&sleep);
+                if (XWOK == rc) {
+                        *xwtm = xwtm_sub(*xwtm, delta);
+                        rc = xwds_w25qxx_check_idle(w25qxx, xwtm);
+                        sleep = (xwtm_cmp(*xwtm, 2000 * XWTM_MS) > 0) ?
+                                2000 * XWTM_MS : *xwtm;
+                }
         }
         if (rc < 0) {
                 goto err_chk_idle;
