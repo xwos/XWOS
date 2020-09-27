@@ -38,6 +38,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+extern struct xwds_w25qxx_cmd xwds_w25q64jv_cmd[XWDS_W25QXX_CMD_NUM];
 extern struct xwds_w25qxx_cmd xwds_w25q128jv_cmd[XWDS_W25QXX_CMD_NUM];
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -71,6 +72,8 @@ xwer_t xwds_w25qxx_read_sr(struct xwds_w25qxx * w25qxx,
                            xwu32_t sridx, xwu8_t * srbuf,
                            xwtm_t * xwtm);
 xwer_t xwds_w25qxx_check_idle(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm);
+xwer_t xwds_w25qxx_wait_idle(struct xwds_w25qxx * w25qxx, xwtm_t period,
+                             xwtm_t * xwtm);
 xwer_t xwds_w25qxx_read_uid(struct xwds_w25qxx * w25qxx, xwu64_t * uidbuf,
                             xwtm_t * xwtm);
 xwer_t xwds_w25qxx_read_mid(struct xwds_w25qxx * w25qxx, xwu16_t * midbuf,
