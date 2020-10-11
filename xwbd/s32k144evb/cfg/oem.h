@@ -22,5 +22,6 @@
 #define __cfg_oem_h__
 
 #define OEMCFG_s32dslib         1
+#define OEMCFG_app              1
 
 #endif /* cfg/oem.h */
