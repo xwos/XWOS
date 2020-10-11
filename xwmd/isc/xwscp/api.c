@@ -48,10 +48,6 @@ const struct xwosal_thrd_desc xwscp_thrd_td = {
         .arg = NULL, /* TBD */
         .attr = XWSDOBJ_ATTR_PRIVILEGED,
 };
-/**
- * @brief 接收线程的ID
- */
-xwid_t xwscp_thrd_tid;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      static function prototypes     ******** ********
@@ -145,7 +141,7 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
         }
 
         /* 创建线程 */
-        rc = xwosal_thrd_create(&xwscp_thrd_tid,
+        rc = xwosal_thrd_create(&xwscp->tid,
                                 xwscp_thrd_td.name,
                                 xwscp_thrd_td.func,
                                 xwscp,
@@ -180,11 +176,11 @@ xwer_t xwscp_stop(struct xwscp * xwscp)
 
         XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
 
-        rc = xwosal_thrd_terminate(xwscp_thrd_tid, &childrc);
+        rc = xwosal_thrd_terminate(xwscp->tid, &childrc);
         if (XWOK == rc) {
-                rc = xwosal_thrd_delete(xwscp_thrd_tid);
+                rc = xwosal_thrd_delete(xwscp->tid);
                 if (XWOK == rc) {
-                        xwscp_thrd_tid = 0;
+                        xwscp->tid = 0;
                         xwscplogf(INFO, "Terminate XWSCP thread... [OK]\n");
                 }
         }

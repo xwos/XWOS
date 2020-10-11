@@ -57,10 +57,6 @@ const struct xwosal_thrd_desc xwpcp_rxthrd_td = {
         .arg = NULL, /* TBD */
         .attr = XWSDOBJ_ATTR_PRIVILEGED,
 };
-/**
- * @brief 接收线程的ID
- */
-xwid_t xwpcp_rxthrd_tid;
 
 /**
  * @brief 发送线程的描述
@@ -75,21 +71,12 @@ const struct xwosal_thrd_desc xwpcp_txthrd_td = {
         .arg = NULL, /* TBD */
         .attr = XWSDOBJ_ATTR_PRIVILEGED,
 };
-/**
- * @brief 发送线程的ID
- */
-xwid_t xwpcp_txthrd_tid;
-
-/**
- * @brief 内存池
- */
-xwu8_t __xwcc_aligned_l1cacheline xwpcp_mempool[XWPCP_MEMPOOL_SIZE];
 
 /**
  * @brief 内存池名字
  */
 static __xwmd_rodata
-const char xwpcp_frmslot_mempool_name[] = "mempool.frameslot.xwpcp";
+const char xwpcp_slot_mempool_name[] = "xwpcp.slot.mempool";
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      static function prototypes     ******** ********
@@ -140,8 +127,9 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         }
 
         /* 创建内存池 */
-        rc = xwmm_bma_create(&slotpool, xwpcp_frmslot_mempool_name,
-                             (xwptr_t)xwpcp_mempool, (xwsz_t)sizeof(xwpcp_mempool),
+        rc = xwmm_bma_create(&slotpool, xwpcp_slot_mempool_name,
+                             (xwptr_t)xwpcp->slot.mempool,
+                             (xwsz_t)sizeof(xwpcp->slot.mempool),
                              XWPCP_MEMBLK_SIZE);
         if (__xwcc_unlikely(rc < 0)) {
                 xwpcplogf(ERR, "Create bma ... [rc:%d]\n", rc);
@@ -199,7 +187,7 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         }
 
         /* 创建线程 */
-        rc = xwosal_thrd_create(&xwpcp_rxthrd_tid,
+        rc = xwosal_thrd_create(&xwpcp->rxtid,
                                 xwpcp_rxthrd_td.name,
                                 xwpcp_rxthrd_td.func,
                                 xwpcp,
@@ -210,7 +198,7 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
                 goto err_rxthrd_create;
         }
 
-        rc = xwosal_thrd_create(&xwpcp_txthrd_tid,
+        rc = xwosal_thrd_create(&xwpcp->txtid,
                                 xwpcp_txthrd_td.name,
                                 xwpcp_txthrd_td.func,
                                 xwpcp,
@@ -224,9 +212,9 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         return XWOK;
 
 err_txthrd_create:
-        xwosal_thrd_terminate(xwpcp_rxthrd_tid, &childrc);
-        xwosal_thrd_delete(xwpcp_rxthrd_tid);
-        xwpcp_rxthrd_tid = 0;
+        xwosal_thrd_terminate(xwpcp->rxtid, &childrc);
+        xwosal_thrd_delete(xwpcp->rxtid);
+        xwpcp->rxtid = 0;
 err_rxthrd_create:
         xwpcp_hwifal_close(xwpcp);
 err_hwifal_open:
@@ -257,20 +245,20 @@ xwer_t xwpcp_stop(struct xwpcp * xwpcp)
 
         XWPCP_VALIDATE((xwpcp), "nullptr", -EFAULT);
 
-        rc = xwosal_thrd_terminate(xwpcp_txthrd_tid, &childrc);
+        rc = xwosal_thrd_terminate(xwpcp->txtid, &childrc);
         if (XWOK == rc) {
-                rc = xwosal_thrd_delete(xwpcp_txthrd_tid);
+                rc = xwosal_thrd_delete(xwpcp->txtid);
                 if (XWOK == rc) {
-                        xwpcp_txthrd_tid = 0;
+                        xwpcp->txtid = 0;
                         xwpcplogf(INFO, "Terminate XWPCP TX thread... [OK]\n");
                 }
         }
 
-        rc = xwosal_thrd_terminate(xwpcp_rxthrd_tid, &childrc);
+        rc = xwosal_thrd_terminate(xwpcp->rxtid, &childrc);
         if (XWOK == rc) {
-                rc = xwosal_thrd_delete(xwpcp_rxthrd_tid);
+                rc = xwosal_thrd_delete(xwpcp->rxtid);
                 if (XWOK == rc) {
-                        xwpcp_rxthrd_tid = 0;
+                        xwpcp->rxtid = 0;
                         xwpcplogf(INFO, "Terminate XWPCP RX thread... [OK]\n");
                 }
         }

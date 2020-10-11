@@ -167,9 +167,12 @@ struct xwpcp {
         /* 帧槽内存池 */
         struct {
                 struct xwmm_bma * pool; /**< 内存池 */
+                xwu8_t __xwcc_aligned_l1cacheline mempool[XWPCP_MEMPOOL_SIZE];
+                                        /**< 内存池 */
         } slot; /**< 帧槽 */
 
         /* 发送状态机 */
+        xwid_t txtid; /**< 发送线程的ID */
         struct {
                 __xwcc_atomic xwu32_t cnt; /**< 发送计数器 */
                 struct xwlib_bclst_head q[XWPCP_PRIORITY_NUM]; /**< 队列 */
@@ -190,6 +193,7 @@ struct xwpcp {
         } txq; /**< 发送队列 */
 
         /* 接收状态机 */
+        xwid_t rxtid; /**< 接收线程的ID */
         struct {
                 __xwcc_atomic xwu32_t cnt; /**< 接收计数器 */
                 struct xwlib_bclst_head q[XWPCP_PORT_NUM]; /**< 每个端口的接收队列 */

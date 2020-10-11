@@ -147,6 +147,7 @@ struct xwscp {
         } txi; /**< 正在发送的帧信息 */
 
         /* 接收状态机 */
+        xwid_t tid; /**< 接收线程的ID */
         struct {
                 __xwcc_atomic xwu32_t cnt; /**< 接收计数器 */
                 struct xwlib_bclst_head head; /**< 链表头 */
