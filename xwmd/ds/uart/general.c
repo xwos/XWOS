@@ -181,8 +181,7 @@ xwer_t xwds_uartc_cvop_start(struct xwds_uartc * uartc)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_start;
         }
-        rc = xwosal_smr_thaw(xwosal_smr_get_id(&uartc->rxsmr),
-                             0, XWMDCFG_ds_UART_GNR_RXQ_SIZE);
+        rc = xwosal_smr_thaw(xwosal_smr_get_id(&uartc->rxsmr));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_rxsmr_thaw;
         }
@@ -237,8 +236,7 @@ xwer_t xwds_uartc_cvop_stop(struct xwds_uartc * uartc)
         return XWOK;
 
 err_dev_stop:
-        xwosal_smr_thaw(xwosal_smr_get_id(&uartc->rxsmr), 0,
-                        XWMDCFG_ds_UART_GNR_RXQ_SIZE);
+        xwosal_smr_thaw(xwosal_smr_get_id(&uartc->rxsmr));
 err_rxsmr_freeze:
         return rc;
 }
@@ -328,8 +326,7 @@ xwer_t xwds_uartc_clear_rxq(struct xwds_uartc * uartc)
         uartc->rxnum = 0;
         uartc->rxpos = 0;
         xwosal_sqlk_wr_unlock_cpuirqrs(&uartc->rxseqlock, cpuirq);
-        rc = xwosal_smr_thaw(xwosal_smr_get_id(&uartc->rxsmr), 0,
-                             XWMDCFG_ds_UART_GNR_RXQ_SIZE);
+        rc = xwosal_smr_thaw(xwosal_smr_get_id(&uartc->rxsmr));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_smr_thaw;
         }

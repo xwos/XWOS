@@ -148,7 +148,7 @@ __xwos_api
 xwer_t xwsync_plsmr_init(struct xwsync_smr * smr, xwssq_t val, xwssq_t max);
 
 __xwos_api
-xwer_t xwsync_plsmr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max);
+xwer_t xwsync_plsmr_thaw(struct xwsync_smr * smr);
 
 __xwos_api
 xwer_t xwsync_plsmr_freeze(struct xwsync_smr * smr);
@@ -171,7 +171,7 @@ __xwos_api
 xwer_t xwsync_rtsmr_init(struct xwsync_smr * smr, xwssq_t val, xwssq_t max);
 
 __xwos_api
-xwer_t xwsync_rtsmr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max);
+xwer_t xwsync_rtsmr_thaw(struct xwsync_smr * smr);
 
 __xwos_api
 xwer_t xwsync_rtsmr_freeze(struct xwsync_smr * smr);

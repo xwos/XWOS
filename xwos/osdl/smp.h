@@ -504,13 +504,13 @@ xwer_t xwosdl_smr_freeze(xwid_t smrid)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_smr_thaw(xwid_t smrid, xwssq_t val, xwssq_t max)
+xwer_t xwosdl_smr_thaw(xwid_t smrid)
 {
         struct xwsync_smr * smr;
         xwer_t rc;
 
         smr = xwosdl_smr_get_obj(smrid);
-        rc = xwsync_rtsmr_thaw(smr, val, max);
+        rc = xwsync_rtsmr_thaw(smr);
         return rc;
 }
 
@@ -626,13 +626,13 @@ xwer_t xwosdl_smr_freeze(xwid_t smrid)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_smr_thaw(xwid_t smrid, xwssq_t val, xwssq_t max)
+xwer_t xwosdl_smr_thaw(xwid_t smrid)
 {
         struct xwsync_smr * smr;
         xwer_t rc;
 
         smr = xwosdl_smr_get_obj(smrid);
-        rc = xwsync_plsmr_thaw(smr, val, max);
+        rc = xwsync_plsmr_thaw(smr);
         return rc;
 }
 

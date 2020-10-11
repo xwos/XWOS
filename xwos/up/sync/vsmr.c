@@ -149,10 +149,8 @@ xwer_t xwsync_vsmr_freeze(struct xwsync_vsmr * vsmr)
 }
 
 /**
- * @brief 解冻信号量，并重新初始化
+ * @brief 解冻信号量
  * @param vsmr: (I) 信号量对象的基类指针
- * @param val: (I) 信号量的初始值
- * @param max: (I) 信号量的最大值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 参数无效
@@ -162,36 +160,20 @@ xwer_t xwsync_vsmr_freeze(struct xwsync_vsmr * vsmr)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  * @note
- * - 此函数只对已冻结的信号量起作用。
+ * - 此函数只对已冻结的信号量起作用，对未冻结的信号量调用此函数将返回错误码。
  */
 __xwos_code
-xwer_t xwsync_vsmr_thaw(struct xwsync_vsmr * vsmr, xwssq_t val, xwssq_t max)
+xwer_t xwsync_vsmr_thaw(struct xwsync_vsmr * vsmr)
 {
         xwer_t rc;
         xwreg_t cpuirq;
-
-        XWOS_VALIDATE(((val >= 0) && (max > 0) && (val <= max)),
-                      "invalid-value", -EINVAL);
 
         rc = XWOK;
         xwos_cpuirq_save_lc(&cpuirq);
         if (__xwcc_unlikely(vsmr->count >= 0)) {
                 rc = -EALREADY;
         } else {
-                vsmr->max = max;
-                vsmr->count = val;
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-                if (vsmr->count > 0) {
-                        struct xwsync_evt * evt;
-                        struct xwsync_object * xwsyncobj;
-
-                        xwsyncobj = &vsmr->xwsyncobj;
-                        evt = xwsyncobj->selector.evt;
-                        if (NULL != evt) {
-                                xwsync_evt_obj_s1i(evt, xwsyncobj);
-                        }
-                }
-#endif /* XWUPCFG_SYNC_EVT */
+                vsmr->count = 0;
         }
         xwos_cpuirq_restore_lc(cpuirq);
         return rc;

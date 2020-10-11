@@ -304,7 +304,7 @@ xwer_t xwsync_cdt_freeze(struct xwsync_cdt * cdt)
 }
 
 /**
- * @brief XWOS API：解冻条件量，并重新初始化
+ * @brief XWOS API：解冻条件量
  * @param cdt: (I) 条件量对象的指针
  * @param val: (I) 条件量的初始值
  * @param max: (I) 条件量的最大值

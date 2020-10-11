@@ -449,9 +449,9 @@ xwer_t xwosdl_smr_freeze(xwid_t smrid)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_smr_thaw(xwid_t smrid, xwssq_t val, xwssq_t max)
+xwer_t xwosdl_smr_thaw(xwid_t smrid)
 {
-        return xwsync_rtsmr_thaw(xwosdl_smr_get_obj(smrid), val, max);
+        return xwsync_rtsmr_thaw(xwosdl_smr_get_obj(smrid));
 }
 
 static __xwcc_inline
@@ -575,9 +575,9 @@ xwer_t xwosdl_smr_freeze(xwid_t smrid)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_smr_thaw(xwid_t smrid, xwssq_t val, xwssq_t max)
+xwer_t xwosdl_smr_thaw(xwid_t smrid)
 {
-        return xwsync_plsmr_thaw(xwosdl_smr_get_obj(smrid), val, max);
+        return xwsync_plsmr_thaw(xwosdl_smr_get_obj(smrid));
 }
 
 static __xwcc_inline

@@ -148,10 +148,8 @@ xwer_t xwsync_rtsmr_freeze(struct xwsync_rtsmr * smr)
 }
 
 /**
- * @brief XWOS API：解冻实时信号量，并重新初始化
+ * @brief XWOS API：解冻实时信号量
  * @param smr: (I) 信号量对象的指针
- * @param val: (I) 信号量的初始值
- * @param max: (I) 信号量的最大值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -162,16 +160,14 @@ xwer_t xwsync_rtsmr_freeze(struct xwsync_rtsmr * smr)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  * @note
- * - 此函数只对已冻结的信号量起作用。
+ * - 此函数只对已冻结的信号量起作用，对未冻结的信号量调用此函数将返回错误码。
  */
 static __xwos_inline_api
-xwer_t xwsync_rtsmr_thaw(struct xwsync_rtsmr * smr, xwssq_t val, xwssq_t max)
+xwer_t xwsync_rtsmr_thaw(struct xwsync_rtsmr * smr)
 {
         XWOS_VALIDATE((smr), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((val >= 0) && (max > 0) && (val <= max)),
-                      "invalid-value", -EINVAL);
 
-        return xwsync_vsmr_thaw(&smr->vsmr, val, max);
+        return xwsync_vsmr_thaw(&smr->vsmr);
 }
 
 /**

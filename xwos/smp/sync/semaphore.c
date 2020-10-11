@@ -543,15 +543,12 @@ xwer_t xwsync_plsmr_freeze(struct xwsync_smr * smr)
 }
 
 /**
- * @brief XWOS API：解冻信号量，并重新初始化为管道信号量
+ * @brief XWOS API：解冻管道信号量
  * @param smr: (I) 信号量对象的指针
- * @param val: (I) 信号量的初始值
- * @param max: (I) 信号量的最大值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型不匹配
- * @retval -EINVAL: 参数无效
  * @retval -EALREADY: 信号量未被冻结
  * @note
  * - 同步/异步：同步
@@ -561,15 +558,13 @@ xwer_t xwsync_plsmr_freeze(struct xwsync_smr * smr)
  * - 此函数只对已冻结的信号量起作用，对未冻结的信号量调用此函数将返回错误码。
  */
 __xwos_api
-xwer_t xwsync_plsmr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
+xwer_t xwsync_plsmr_thaw(struct xwsync_smr * smr)
 {
         xwer_t rc;
         xwreg_t cpuirq;
 
         XWOS_VALIDATE((smr), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_PIPELINE == smr->type), "type-error", -ETYPE);
-        XWOS_VALIDATE(((val >= 0) && (max > 0) && (val <= max)),
-                      "invalid-value", -EINVAL);
 
         rc = xwsync_smr_grab(smr);
         if (__xwcc_likely(XWOK == rc)) {
@@ -577,24 +572,9 @@ xwer_t xwsync_plsmr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
                 if (__xwcc_unlikely(smr->count >= 0)) {
                         rc = -EALREADY;
                 } else {
-                        smr->max = max;
                         smr->type = XWSYNC_SMR_TYPE_PIPELINE;
-                        smr->count = val;
+                        smr->count = 0;
                         rc = XWOK;
-#if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
-                        if (smr->count > 0) {
-                                struct xwsync_evt * evt;
-                                struct xwsync_object * xwsyncobj;
-
-                                xwsyncobj = &smr->xwsyncobj;
-                                xwmb_smp_load_acquire(struct xwsync_evt *,
-                                                      evt,
-                                                      &xwsyncobj->selector.evt);
-                                if (NULL != evt) {
-                                        xwsync_evt_obj_s1i(evt, xwsyncobj);
-                                }
-                        }
-#endif /* XWSMPCFG_SYNC_EVT */
                 }
                 xwos_plwq_unlock_cpuirqrs(&smr->wq.pl, cpuirq);
                 xwsync_smr_put(smr);
@@ -1240,15 +1220,12 @@ xwer_t xwsync_rtsmr_freeze(struct xwsync_smr * smr)
 }
 
 /**
- * @brief XWOS API：解冻信号量，并重新初始化为实时信号量
+ * @brief XWOS API：解冻信号量
  * @param smr: (I) 信号量对象的指针
- * @param val: (I) 信号量的初始值
- * @param max: (I) 信号量的最大值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型不匹配
- * @retval -EINVAL: 参数无效
  * @retval -EALREADY: 信号量未被冻结
  * @note
  * - 同步/异步：同步
@@ -1258,15 +1235,13 @@ xwer_t xwsync_rtsmr_freeze(struct xwsync_smr * smr)
  * - 此函数只对已冻结的信号量起作用，对未冻结的信号量调用此函数将返回错误码。
  */
 __xwos_api
-xwer_t xwsync_rtsmr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
+xwer_t xwsync_rtsmr_thaw(struct xwsync_smr * smr)
 {
         xwer_t rc;
         xwreg_t cpuirq;
 
         XWOS_VALIDATE((smr), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWSYNC_SMR_TYPE_RT == smr->type), "type-error", -ETYPE);
-        XWOS_VALIDATE(((val >= 0) && (max > 0) && (val <= max)),
-                      "invalid-value", -EINVAL);
 
         rc = xwsync_smr_grab(smr);
         if (__xwcc_likely(XWOK == rc)) {
@@ -1274,23 +1249,9 @@ xwer_t xwsync_rtsmr_thaw(struct xwsync_smr * smr, xwssq_t val, xwssq_t max)
                 if (__xwcc_unlikely(smr->count >= 0)) {
                         rc = -EALREADY;
                 } else {
-                        smr->max = max;
                         smr->type = XWSYNC_SMR_TYPE_RT;
-                        smr->count = val;
+                        smr->count = 0;
                         rc = XWOK;
-#if defined(XWSMPCFG_SYNC_EVT) && (1 == XWSMPCFG_SYNC_EVT)
-                        if (smr->count > 0) {
-                                struct xwsync_evt * evt;
-                                struct xwsync_object * xwsyncobj;
-
-                                xwsyncobj = &smr->xwsyncobj;
-                                xwmb_smp_load_acquire(struct xwsync_evt *,
-                                                      evt, &xwsyncobj->selector.evt);
-                                if (NULL != evt) {
-                                        xwsync_evt_obj_s1i(evt, xwsyncobj);
-                                }
-                        }
-#endif /* XWSMPCFG_SYNC_EVT */
                 }
                 xwos_rtwq_unlock_cpuirqrs(&smr->wq.rt, cpuirq);
                 xwsync_smr_put(smr);

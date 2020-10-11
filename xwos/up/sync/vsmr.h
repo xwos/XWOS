@@ -62,7 +62,7 @@ __xwos_code
 xwer_t xwsync_vsmr_freeze(struct xwsync_vsmr * smr);
 
 __xwos_code
-xwer_t xwsync_vsmr_thaw(struct xwsync_vsmr * smr, xwssq_t val, xwssq_t max);
+xwer_t xwsync_vsmr_thaw(struct xwsync_vsmr * smr);
 
 __xwos_code
 xwer_t xwsync_vsmr_getvalue(struct xwsync_vsmr * smr, xwssq_t * sval);

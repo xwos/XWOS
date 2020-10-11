@@ -200,7 +200,7 @@ xwer_t xwosal_cdt_freeze(xwid_t cdtid)
 }
 
 /**
- * @brief XWOSAL API：解冻条件量，并重新初始化
+ * @brief XWOSAL API：解冻条件量
  * @param cdtid: (I) 条件量ID
  * @return 错误码
  * @retval XWOK: 没有错误
