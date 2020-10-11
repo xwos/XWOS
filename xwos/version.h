@@ -40,7 +40,7 @@
  * @{
  */
 #define XWOS_VERSION_MAJOR              1
-#define XWOS_VERSION_MINOR              6
+#define XWOS_VERSION_MINOR              7
 #define XWOS_VERSION_REVISION           0
 /**
  * @}
