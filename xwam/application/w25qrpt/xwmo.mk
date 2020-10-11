@@ -21,7 +21,7 @@
 include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
-XWMO_CSRCS := xwmo.c hwifal.c hwif/uart.c
+XWMO_CSRCS := w25qrpt.c hwifal.c hwif/uart.c
 XWMO_CFLAGS :=
 XWMO_INCDIRS :=
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)

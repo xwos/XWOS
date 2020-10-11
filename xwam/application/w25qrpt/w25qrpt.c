@@ -34,7 +34,7 @@
 #include <xwam/application/w25qrpt/w25qrpt.h>
 #include <xwam/application/w25qrpt/hwifal.h>
 #include <xwam/application/w25qrpt/protocol.h>
-#include <xwam/application/w25qrpt/xwmo.h>
+#include <xwam/application/w25qrpt/api.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -66,7 +66,6 @@ const struct xwosal_thrd_desc w25qrpt_tbd = {
         .arg = NULL, /* TBD */
         .attr = XWSDOBJ_ATTR_PRIVILEGED,
 };
-xwid_t w25qrpt_tid;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -112,7 +111,7 @@ xwer_t w25qrpt_start(struct w25qrpt * w25qrpt,
                 goto err_hwifal_open;
         }
 
-        rc = xwosal_thrd_create(&w25qrpt_tid,
+        rc = xwosal_thrd_create(&w25qrpt->tid,
                                 w25qrpt_tbd.name,
                                 w25qrpt_tbd.func,
                                 w25qrpt,
@@ -141,11 +140,11 @@ xwer_t w25qrpt_stop(struct w25qrpt * w25qrpt)
 
         XWOS_VALIDATE((w25qrpt), "nullptr", -EFAULT);
 
-        rc = xwosal_thrd_terminate(w25qrpt_tid, &childrc);
+        rc = xwosal_thrd_terminate(w25qrpt->tid, &childrc);
         if (XWOK == rc) {
-                rc = xwosal_thrd_delete(w25qrpt_tid);
+                rc = xwosal_thrd_delete(w25qrpt->tid);
                 if (XWOK == rc) {
-                        w25qrpt_tid = 0;
+                        w25qrpt->tid = 0;
                 }
         }
         w25qrpt_hwifal_close(w25qrpt);

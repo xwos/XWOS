@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_application_w25qrpt_xwmo_h__
-#define __xwam_application_w25qrpt_xwmo_h__
+#ifndef __xwam_application_w25qrpt_api_h__
+#define __xwam_application_w25qrpt_api_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
@@ -28,6 +28,7 @@
 #include <xwcd/perpheral/spi/flash/w25qxx/device.h>
 #include <xwam/application/w25qrpt/w25qrpt.h>
 #include <xwam/application/w25qrpt/hwifal.h>
+#include <xwam/application/w25qrpt/hwif/uart.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -44,4 +45,4 @@ xwer_t w25qrpt_start(struct w25qrpt * w25qrpt,
 
 xwer_t w25qrpt_stop(struct w25qrpt * w25qrpt);
 
-#endif /* xwam/application/w25qrpt/xwmo.h */
+#endif /* xwam/application/w25qrpt/api.h */
