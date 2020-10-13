@@ -27,7 +27,7 @@
 #include <bdl/standard.h>
 #include <bm/stm32cube/xwmo.h>
 #include <bm/pm/xwmo.h>
-#include <xwem/libc/newlibac/xwmo.h>
+#include <xwmd/libc/newlibac/xwmo.h>
 #include <xwem/vm/lua/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -97,9 +97,9 @@ xwer_t bdl_init_thrd(void * arg)
                 goto bm_stm32cube_start;
         }
 
-        rc = newlibac_start();
+        rc = newlibac_init();
         if (rc < 0) {
-                goto newlibac_start;
+                goto newlibac_init;
         }
 
         rc = bm_pm_start();
@@ -123,7 +123,7 @@ err_xwlua_start:
         BDL_BUG();
 bm_pm_start:
         BDL_BUG();
-newlibac_start:
+newlibac_init:
         BDL_BUG();
 bm_stm32cube_start:
         BDL_BUG();

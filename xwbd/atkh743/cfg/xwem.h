@@ -21,7 +21,6 @@
 #ifndef __cfg_xwem_h__
 #define __cfg_xwem_h__
 
-#define XWEMCFG_libc_newlibac                           1
 #define XWEMCFG_serializing_nanopb                      1
 #define XWEMCFG_fs_fatfs                                1
 #define XWEMCFG_fs_littlefs                             1
