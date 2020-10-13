@@ -107,4 +107,9 @@
 #define XWMDCFG_isc_xwscp_THRD_PRIORITY                         \
         XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
 
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********             C++ Runtime             ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#define XWMDCFG_cxx                                             0
+
 #endif /* cfg/xwmd.h */
