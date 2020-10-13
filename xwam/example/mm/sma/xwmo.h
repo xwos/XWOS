@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：Log
+ * @brief 示例：简单内存分配器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,23 +18,17 @@
  * > limitations under the License.
  */
 
+#ifndef __xwam_example_mm_sma_xwmo_h__
+#define __xwam_example_mm_sma_xwmo_h__
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <bm/stm32cube/xwac/xwds/stm32cube.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
+ ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t board_log_write(const char * s, xwsz_t * n)
-{
-        xwtm_t desired;
-        xwer_t rc;
+xwer_t example_sma_start(void);
 
-        desired = XWTM_MAX;
-        rc = xwds_dmauartc_tx(&stm32cube_usart1_cb,
-                              (const xwu8_t *)s, n,
-                              &desired);
-        return rc;
-}
+#endif /* xwam/example/mm/sma/xwmo.h */

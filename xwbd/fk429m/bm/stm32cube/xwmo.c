@@ -97,8 +97,6 @@ const struct xwosal_thrd_desc stm32cube_tbd[] = {
 
 xwid_t stm32cube_tid[xw_array_size(stm32cube_tbd)];
 
-extern struct xwmm_mempool * sdram_mempool;
-
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/

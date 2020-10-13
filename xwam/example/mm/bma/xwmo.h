@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：Log
+ * @brief 示例：伙伴算法内存块分配器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,23 +18,19 @@
  * > limitations under the License.
  */
 
+#ifndef __xwam_example_mm_bma_xwmo_h__
+#define __xwam_example_mm_bma_xwmo_h__
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <bm/stm32cube/xwac/xwds/stm32cube.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
+ ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t board_log_write(const char * s, xwsz_t * n)
-{
-        xwtm_t desired;
-        xwer_t rc;
+xwer_t example_bma_start(void);
+xwer_t xwmmdemo_bma_alloc(xwsz_t memsize, void ** membuf);
+xwer_t xwmmdemo_bma_free(void * mem);
 
-        desired = XWTM_MAX;
-        rc = xwds_dmauartc_tx(&stm32cube_usart1_cb,
-                              (const xwu8_t *)s, n,
-                              &desired);
-        return rc;
-}
+#endif /* xwam/example/mm/bma/xwmo.h */
