@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：线程的创建与退出
+ * @brief 示例：线程睡眠
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -121,7 +121,7 @@ xwer_t xwslpdemo_thrd_func(void * arg)
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
                 xwosal_cthrd_sleep_from(&tk, 500 * XWTM_MS);
                 ts = xwosal_scheduler_get_timestamp_lc();
-                thrdslplogf(INFO, "[线程] 时间戳：%lld 纳米。\n", ts);
+                thrdslplogf(INFO, "[线程] 时间戳：%lld 纳秒。\n", ts);
         }
 
         thrdslplogf(INFO, "[线程] 退出。\n");

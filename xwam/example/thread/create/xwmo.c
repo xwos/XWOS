@@ -107,7 +107,7 @@ xwer_t example_thread_create_start(void)
         xwer_t rc;
         xwsq_t i;
 
-
+        /* 建立dynamic_tbd中的线程 */
         for (i = 0; i < xw_array_size(dynamic_tbd); i++) {
                 rc = xwosal_thrd_create(&dynamic_tid[i],
                                         dynamic_tbd[i].name,
@@ -138,9 +138,9 @@ xwer_t thrd_1_func(void * arg)
         xwsq_t argv = (xwsq_t)arg; /* 获取创建线程时提供的参数 */
         xwsq_t i;
 
-        thrdcrtlogf(INFO, "Thread-1 starts.\n");
+        thrdcrtlogf(INFO, "[线程1] 开始运行。\n");
 
-        /* 静态初始化线程2 */
+        /* 初始化static_tbd中的线程 */
         for (i = 0; i < xw_array_size(static_tbd); i++) {
                 rc = xwosal_thrd_init(&static_tcb[i],
                                       static_tbd[i].name,
@@ -151,6 +151,8 @@ xwer_t thrd_1_func(void * arg)
                                       static_tbd[i].prio,
                                       static_tbd[i].attr);
                 if (rc < 0) {
+                        thrdcrtlogf(INFO, "[线程1] 初始化[%s]失败。\n",
+                                    static_tbd[i].name);
                 }
         }
 
@@ -158,7 +160,7 @@ xwer_t thrd_1_func(void * arg)
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
                 time = 1 * XWTM_S;
                 xwosal_cthrd_sleep(&time);
-                thrdcrtlogf(INFO, "Thread-1 says: %d.\n", argv);
+                thrdcrtlogf(INFO, "[线程1] %d\n", argv);
                 argv--;
                 if (0 == argv) {
                         break;
@@ -171,11 +173,11 @@ xwer_t thrd_1_func(void * arg)
                 rc = xwosal_thrd_terminate(xwosal_thrd_get_id(&static_tcb[i]),
                                            &childrc);
                 if (rc < 0) {
-                        thrdcrtlogf(ERR, "Failed to terminate %s, rc:%d.\n",
+                        thrdcrtlogf(ERR, "[线程1] 终止线程 [%s] 失败，rc:%d。\n",
                                     static_tbd[i].name, rc);
                 } else {
                         thrdcrtlogf(INFO,
-                                    "%s returns: %d (%s).\n",
+                                    "[%s] 返回 %d (%s)。\n",
                                     static_tbd[i].name,
                                     childrc,
                                     strerror(-childrc));
@@ -183,7 +185,7 @@ xwer_t thrd_1_func(void * arg)
         }
 
         /* 线程1结束 */
-        thrdcrtlogf(INFO, "Thread-1 exits. argv == %d\n", argv);
+        thrdcrtlogf(INFO, "[线程1] 退出，argv：%d。\n", argv);
         xwosal_thrd_delete(xwosal_cthrd_get_id());
         return rc;
 }
@@ -197,13 +199,13 @@ xwer_t thrd_2_func(void * arg)
         xwtm_t time;
         xwsq_t argv = (xwsq_t)arg; /* 获取初始化线程时提供的参数 */
 
-        thrdcrtlogf(INFO, "Thread-2 starts.\n");
+        thrdcrtlogf(INFO, "[线程2] 开始运行。\n");
 
         /* 循环argv次 */
         while (!xwosal_cthrd_frz_shld_stop(NULL)) {
                 time = 1 * XWTM_S;
                 rc = xwosal_cthrd_sleep(&time);
-                thrdcrtlogf(INFO, "Thread-2 says: %d.\n", argv);
+                thrdcrtlogf(INFO, "[线程2] %d\n", argv);
                 argv--;
                 if (0 == argv) {
                         break;
@@ -216,7 +218,7 @@ xwer_t thrd_2_func(void * arg)
         }
 
         /* 线程2结束 */
-        thrdcrtlogf(INFO, "Thread-2 exits. argv == %d\n", argv);
+        thrdcrtlogf(INFO, "[线程2] 退出，argv：%d。\n", argv);
         xwosal_thrd_destroy(xwosal_cthrd_get_obj());
         return rc; /* 抛出返回值 */
 }
