@@ -108,8 +108,9 @@
         XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********             C++ Runtime             ******** ********
+ ******** ********            C/C++ Runtime            ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+#define XWMDCFG_libc_newlibac                                   1
 #define XWMDCFG_cxx                                             1
 
 #endif /* cfg/xwmd.h */

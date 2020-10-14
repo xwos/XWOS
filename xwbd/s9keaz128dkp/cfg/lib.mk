@@ -22,5 +22,5 @@ EINCDIRS :=
 
 ELIBS := -lgcc
 ifeq ($(ARCHCFG_COMPILER_CLIB),y)
-    ELIBS += -lc
+    ELIBS += -lc -lnosys
 endif

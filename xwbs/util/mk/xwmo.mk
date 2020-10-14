@@ -60,7 +60,6 @@ endef
 
 define XwmoReqCfg
 ifneq ($$($(1)),y)
-    $$(info $(1))
     $$(error "$(1) is not configured!")
 endif
 endef

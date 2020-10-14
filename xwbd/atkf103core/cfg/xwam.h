@@ -33,6 +33,10 @@
 #define XWAMCFG_example_sync_barrier            1
 #define XWAMCFG_example_sync_flag               1
 #define XWAMCFG_example_sync_selector           1
+#define XWAMCFG_example_mm_sma                  1
+#define XWAMCFG_example_mm_memslice             1
+#define XWAMCFG_example_mm_bma                  1
+#define XWAMCFG_example_cxx                     0
 #define XWAMCFG_application_w25qrpt             1
 
 #endif /* cfg/xwam.h */
