@@ -89,7 +89,7 @@ LD_OBJS = $(strip -Wl,--whole-archive -Wl,--start-group \
                   $(CPU_LIB) $(CPU_EOBJS) \
                   $(ARCH_LIB) $(ARCH_EOBJS) \
                   -Wl,--end-group -Wl,--no-whole-archive \
-                  $(ELIBS))
+                  -Wl,--start-group $(ELIBS)) -Wl,--end-group
 LD_OBJS_LST := $(OBJ_DIR)$(TARGET)-objs.txt
 
 MM_ARGS = $(strip $(MMFLAGS))

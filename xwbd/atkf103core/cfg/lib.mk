@@ -20,8 +20,8 @@
 
 EINCDIRS :=
 
-ELIBS := -lgcc
+ELIBS :=
 ifeq ($(ARCHCFG_COMPILER_CLIB),y)
-    ELIBS += -lc -lnosys
+    ELIBS += -lm -lc -lnosys
 endif
-ELIBS += -lm
+ELIBS += -lgcc
