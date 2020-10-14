@@ -110,37 +110,37 @@ SHOW_CP =
 
 ifeq ($(XuanWuOS_CFG_HOSTOS),gnu/linux)
     ifneq ($(~V),1)
-        SHOW_CPP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cc -E] "$<" -> "$@" \e[0m";
-        SHOW_CC = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cc] "$<" -> "$@" \e[0m";
-        SHOW_CXX = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[c++] "$<" -> "$@" \e[0m";
-        SHOW_APP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[as -E] "$<" -> "$@" \e[0m";
-        SHOW_AS = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[as] "$<" -> "$@" \e[0m";
-        SHOW_OD = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[od] "$<" -> "$@" \e[0m";
-        SHOW_OBJCP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[objcp] "$<" -> "$@" \e[0m";
-        SHOW_MM = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[mm] "$<" -> "$@" \e[0m";
-        SHOW_AR = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[ar] "$@" \e[0m";
-        SHOW_LD = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[ld] "$@" \e[0m";
-        SHOW_SIZE = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[size] "$@" \e[0m";
-        SHOW_LUA2HEX = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[lua2hex] "$@" \e[0m";
-        SHOW_CP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cp] "$<" -> "$@" \e[0m";
+        SHOW_CPP = @echo -e "\e[1m\e[44;38m[cc -E] "$<" -> "$@" \e[0m";
+        SHOW_CC = @echo -e "\e[1m\e[44;38m[cc] "$<" -> "$@" \e[0m";
+        SHOW_CXX = @echo -e "\e[1m\e[44;38m[c++] "$<" -> "$@" \e[0m";
+        SHOW_APP = @echo -e "\e[1m\e[44;38m[as -E] "$<" -> "$@" \e[0m";
+        SHOW_AS = @echo -e "\e[1m\e[44;38m[as] "$<" -> "$@" \e[0m";
+        SHOW_OD = @echo -e "\e[1m\e[40;38m[od] "$<" -> "$@" \e[0m";
+        SHOW_OBJCP = @echo -e "\e[1m\e[47;34m[objcp] "$<" -> "$@" \e[0m";
+        SHOW_MM = @echo -e "\e[1m\e[46;38m[mm] "$<" -> "$@" \e[0m";
+        SHOW_AR = @echo -e "\e[1m\e[42;38m[ar] "$@" \e[0m";
+        SHOW_LD = @echo -e "\e[1m\e[47;34m[ld] "$@" \e[0m";
+        SHOW_SIZE = @echo -e "\e[1m\e[47;34m[size] "$@" \e[0m";
+        SHOW_LUA2HEX = @echo -e "\e[1m\e[47;34m[lua2hex] "$@" \e[0m";
+        SHOW_CP = @echo -e "\e[1m\e[47;34m[cp] "$<" -> "$@" \e[0m";
     endif
 endif
 
 ifeq ($(XuanWuOS_CFG_HOSTOS),darwin)
     ifneq ($(~V),1)
-        SHOW_CPP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cc -E] "$<" -> "$@" \e[0m";
-        SHOW_CC = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cc] "$<" -> "$@" \e[0m";
-        SHOW_CXX = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[c++] "$<" -> "$@" \e[0m";
-        SHOW_APP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[as -E] "$<" -> "$@" \e[0m";
-        SHOW_AS = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[as] "$<" -> "$@" \e[0m";
-        SHOW_OD = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[od] "$<" -> "$@" \e[0m";
-        SHOW_OBJCP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[objcp] "$<" -> "$@" \e[0m";
-        SHOW_MM = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[mm] "$<" -> "$@" \e[0m";
-        SHOW_AR = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[ar] "$@" \e[0m";
-        SHOW_LD = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[ld] "$@" \e[0m";
-        SHOW_SIZE = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[size] "$@" \e[0m";
-        SHOW_LUA2HEX = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[lua2hex] "$@" \e[0m";
-        SHOW_CP = @echo -e "\e[1m\e[4$$[RANDOM & 7];36m[cp] "$<" -> "$@" \e[0m";
+        SHOW_CPP = @echo -e "\e[1m\e[44;38m[cc -E] "$<" -> "$@" \e[0m";
+        SHOW_CC = @echo -e "\e[1m\e[44;38m[cc] "$<" -> "$@" \e[0m";
+        SHOW_CXX = @echo -e "\e[1m\e[44;38m[c++] "$<" -> "$@" \e[0m";
+        SHOW_APP = @echo -e "\e[1m\e[44;38m[as -E] "$<" -> "$@" \e[0m";
+        SHOW_AS = @echo -e "\e[1m\e[44;38m[as] "$<" -> "$@" \e[0m";
+        SHOW_OD = @echo -e "\e[1m\e[40;38m[od] "$<" -> "$@" \e[0m";
+        SHOW_OBJCP = @echo -e "\e[1m\e[47;34m[objcp] "$<" -> "$@" \e[0m";
+        SHOW_MM = @echo -e "\e[1m\e[46;38m[mm] "$<" -> "$@" \e[0m";
+        SHOW_AR = @echo -e "\e[1m\e[42;38m[ar] "$@" \e[0m";
+        SHOW_LD = @echo -e "\e[1m\e[47;34m[ld] "$@" \e[0m";
+        SHOW_SIZE = @echo -e "\e[1m\e[47;34m[size] "$@" \e[0m";
+        SHOW_LUA2HEX = @echo -e "\e[1m\e[47;34m[lua2hex] "$@" \e[0m";
+        SHOW_CP = @echo -e "\e[1m\e[47;34m[cp] "$<" -> "$@" \e[0m";
     endif
 endif
 
