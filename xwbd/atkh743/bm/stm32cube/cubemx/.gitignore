@@ -2,3 +2,5 @@
 .cproject.bak
 .mxproject
 .project.bak
+startup_stm32h743xx.s
+STM32H743IITx_FLASH.ld

@@ -44,6 +44,11 @@
      PH0-OSC_IN (PH0)   ------> RCC_OSC_IN
      PH1-OSC_OUT (PH1)   ------> RCC_OSC_OUT
      PA0   ------> PWR_WKUP0
+     PA13 (JTMS/SWDIO)   ------> DEBUG_JTMS-SWDIO
+     PA14 (JTCK/SWCLK)   ------> DEBUG_JTCK-SWCLK
+     PA15 (JTDI)   ------> DEBUG_JTDI
+     PB3 (JTDO/TRACESWO)   ------> DEBUG_JTDO-SWO
+     PB4 (NJTRST)   ------> DEBUG_JTRST
 */
 void MX_GPIO_Init(void)
 {
