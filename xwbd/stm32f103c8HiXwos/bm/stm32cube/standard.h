@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：顶级头文件
+ * @brief STM32CUBE模块：顶级头文件
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：初始化
+ * @brief STM32CUBE模块：接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_init_h__
-#define __bm_stm32cube_init_h__
+#ifndef __bm_stm32cube_mif_h__
+#define __bm_stm32cube_mif_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
@@ -29,10 +29,50 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief STM32CUBE模块的低级初始化
+ * @retrun 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：低级初始化流程
+ * - 重入性：不可重入
+ */
 __xwbsp_init_code
 void stm32cube_lowlevel_init(void);
 
+/**
+ * @brief STM32CUBE模块的初始化
+ * @retrun 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：初始化流程
+ * - 重入性：不可重入
+ */
 __xwbsp_init_code
 void stm32cube_init(void);
 
-#endif /* bm/stm32cube/init.h */
+/**
+ * @brief 启动STM32CUBE模块
+ * @retrun 错误码
+ * @note
+ * - 此函数会启动所有外设，有些外设启动流程需要延时，因此此函数只能运行在线程中。
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：不可重入
+ */
+xwer_t stm32cube_start(void);
+
+/**
+ * @brief 停止STM32CUBE模块
+ * @retrun 错误码
+ * @note
+ * - 此函数会停止所有外设，有些外设的停止流程需要延时，因此此函数只能运行在线程中。
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：不可重入
+ */
+xwer_t stm32cube_stop(void);
+
+#endif /* bm/stm32cube/mif.h */
