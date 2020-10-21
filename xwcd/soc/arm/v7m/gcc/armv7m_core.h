@@ -1107,7 +1107,7 @@ static __xwbsp_inline
 void cm_get_xpsr(xwu32_t * xpsr)
 {
         __asm__ volatile(
-        "       mrs     %[__xpsr], xpsr"
+        "mrs    %[__xpsr], xpsr"
         : [__xpsr] "=&r" (*xpsr)
         :
         : "memory", "cc"
@@ -1122,7 +1122,7 @@ static __xwbsp_inline
 void cm_set_xpsr(xwu32_t xpsr)
 {
         __asm__ volatile(
-        "       msr xpsr, %[__xpsr]"
+        "msr    xpsr, %[__xpsr]"
         :
         : [__xpsr] "r" (xpsr)
         : "memory", "cc"
@@ -1137,7 +1137,7 @@ static __xwbsp_inline
 void cm_get_apsr(xwu32_t * apsr)
 {
         __asm__ volatile(
-        "       mrs     %[__apsr], apsr"
+        "mrs    %[__apsr], apsr"
         : [__apsr] "=&r" (*apsr)
         :
         : "memory", "cc"
@@ -1152,7 +1152,7 @@ static __xwbsp_inline
 void cm_set_apsr(xwu32_t apsr)
 {
         __asm__ volatile(
-        "       msr     apsr, %[__apsr]"
+        "msr    apsr, %[__apsr]"
         :
         : [__apsr] "r" (apsr)
         : "memory", "cc"
@@ -1167,7 +1167,7 @@ static __xwbsp_inline
 void cm_get_ipsr(xwu32_t * ipsr)
 {
         __asm__ volatile(
-        "       mrs     %[__ipsr], ipsr"
+        "mrs    %[__ipsr], ipsr"
         : [__ipsr] "=&r" (*ipsr)
         :
         : "memory", "cc"
@@ -1182,7 +1182,7 @@ static __xwbsp_inline
 void cm_set_ipsr(xwu32_t ipsr)
 {
         __asm__ volatile(
-        "       msr     ipsr, %[__ipsr]"
+        "msr    ipsr, %[__ipsr]"
         :
         : [__ipsr] "r" (ipsr)
         : "memory", "cc"
@@ -1197,7 +1197,7 @@ static __xwbsp_inline
 void cm_get_epsr(xwu32_t * epsr)
 {
         __asm__ volatile(
-        "       mrs     %[__epsr], epsr"
+        "mrs    %[__epsr], epsr"
         : [__epsr] "=&r" (*epsr)
         :
         : "memory", "cc"
@@ -1212,7 +1212,7 @@ static __xwbsp_inline
 void cm_set_epsr(xwu32_t epsr)
 {
         __asm__ volatile(
-        "       msr     epsr, %[__epsr]"
+        "msr    epsr, %[__epsr]"
         :
         : [__epsr] "r" (epsr)
         : "memory", "cc"
@@ -1227,7 +1227,7 @@ static __xwbsp_inline
 void cm_get_msp(xwptr_t * msp)
 {
         __asm__ volatile(
-        "       mrs     %[__msp], msp"
+        "mrs    %[__msp], msp"
         : [__msp] "=&r" (*msp)
         :
         : "memory", "cc"
@@ -1242,7 +1242,7 @@ static __xwbsp_inline
 void cm_set_msp(xwptr_t msp)
 {
         __asm__ volatile(
-        "       msr msp, %[__msp]"
+        "msr    msp, %[__msp]"
         :
         : [__msp] "r" (msp)
         : "memory", "cc"
@@ -1257,7 +1257,7 @@ static __xwbsp_inline
 void cm_get_psp(xwptr_t * psp)
 {
         __asm__ volatile(
-        "       mrs     %[__psp], psp"
+        "mrs    %[__psp], psp"
         : [__psp] "=&r" (*psp)
         :
         : "memory", "cc"
@@ -1272,7 +1272,7 @@ static __xwbsp_inline
 void cm_set_psp(xwptr_t psp)
 {
         __asm__ volatile(
-        "       msr     psp, %[__psp]"
+        "msr    psp, %[__psp]"
         :
         : [__psp] "r" (psp)
         : "memory", "cc"
@@ -1287,7 +1287,7 @@ static __xwbsp_inline
 void cm_get_primask(xwu32_t * primask)
 {
         __asm__ volatile(
-        "       mrs %[__primask], primask"
+        "mrs    %[__primask], primask"
         : [__primask] "=&r" (*primask)
         :
         : "memory", "cc"
@@ -1302,7 +1302,7 @@ static __xwbsp_inline
 void cm_set_primask(xwu32_t primask)
 {
         __asm__ volatile(
-        "       msr     primask, %[__primask]"
+        "msr    primask, %[__primask]"
         :
         : [__primask] "r" (primask)
         : "memory", "cc"
@@ -1317,7 +1317,7 @@ static __xwbsp_inline
 void cm_get_faultmask(xwu32_t * faultmask)
 {
         __asm__ volatile(
-        "       mrs     %[__faultmask], faultmask"
+        "mrs    %[__faultmask], faultmask"
         : [__faultmask] "=&r" (*faultmask)
         :
         : "memory", "cc"
@@ -1332,7 +1332,7 @@ static __xwbsp_inline
 void cm_set_faultmask(xwu32_t faultmask)
 {
         __asm__ volatile(
-        "       msr     faultmask, %[__faultmask]"
+        "msr    faultmask, %[__faultmask]"
         :
         : [__faultmask] "r" (faultmask)
         : "memory", "cc"
@@ -1347,7 +1347,7 @@ static __xwbsp_inline
 void cm_get_basepri(xwu32_t * basepri)
 {
         __asm__ volatile(
-        "       mrs     %[__basepri], basepri"
+        "mrs    %[__basepri], basepri"
         : [__basepri] "=&r" (*basepri)
         :
         : "memory", "cc"
@@ -1362,7 +1362,7 @@ static __xwbsp_inline
 void cm_set_basepri(xwu32_t basepri)
 {
         __asm__ volatile(
-        "       msr     basepri, %[__basepri]"
+        "msr    basepri, %[__basepri]"
         :
         : [__basepri] "r" (basepri)
         : "memory", "cc"
@@ -1377,7 +1377,7 @@ static __xwbsp_inline
 void cm_get_control(xwu32_t * control)
 {
         __asm__ volatile(
-        "       mrs     %[__control], control"
+        "mrs    %[__control], control"
         : [__control] "=&r" (*control)
         :
         : "memory", "cc"
@@ -1392,7 +1392,7 @@ static __xwbsp_inline
 void cm_set_control(xwu32_t control)
 {
         __asm__ volatile(
-        "       msr     control, %[__control]"
+        "msr    control, %[__control]"
         :
         : [__control] "r" (control)
         : "memory", "cc"
@@ -1479,12 +1479,7 @@ void cm_reset_system(void)
 static __xwbsp_inline
 void clrex(void)
 {
-        __asm__ volatile(
-        "       clrex\n"
-        :
-        :
-        : "memory"
-        );
+        __asm__ volatile("clrex\n" : : : "memory");
 }
 
 /**
@@ -1498,7 +1493,7 @@ xwu32_t ldrex(volatile void * addr)
         xwu32_t tmp;
 
         __asm__ volatile(
-        "       ldrex   %[__tmp], [%[__addr]]\n"
+        "ldrex  %[__tmp], [%[__addr]]\n"
         : [__tmp] "=&r" (tmp)
         : [__addr] "r" (addr)
         : "memory"
@@ -1520,7 +1515,7 @@ xwer_t strex(volatile void * addr, xwu32_t value)
         xwer_t rc;
 
         __asm__ volatile(
-        "       strex   %[__rc], %[__value], [%[__addr]]\n"
+        "strex  %[__rc], %[__value], [%[__addr]]\n"
         : [__rc] "=&r" (rc)
         : [__value] "r" (value),
           [__addr] "r" (addr)
@@ -1540,7 +1535,7 @@ xwu8_t ldrexb(volatile void * addr)
         xwu8_t tmp;
 
         __asm__ volatile(
-        "       ldrexb  %[__tmp], [%[__addr]]\n"
+        "ldrexb %[__tmp], [%[__addr]]\n"
         : [__tmp] "=&r" (tmp)
         : [__addr] "r" (addr)
         : "memory"
@@ -1562,7 +1557,7 @@ xwer_t strexb(volatile void * addr, xwu8_t value)
         xwer_t rc;
 
         __asm__ volatile(
-        "       strexb  %[__rc], %[__value], [%[__addr]]\n"
+        "strexb %[__rc], %[__value], [%[__addr]]\n"
         : [__rc] "=&r" (rc)
         : [__value] "r" (value),
           [__addr] "r" (addr)
@@ -1582,7 +1577,7 @@ xwu16_t ldrexh(volatile void * addr)
         xwu16_t tmp;
 
         __asm__ volatile(
-        "       ldrexh  %[__tmp], [%[__addr]]\n"
+        "ldrexh %[__tmp], [%[__addr]]\n"
         : [__tmp] "=&r" (tmp)
         : [__addr] "r" (addr)
         : "memory"
@@ -1603,7 +1598,7 @@ xwer_t strexh(volatile void * addr, xwu16_t value)
         xwer_t rc;
 
         __asm__ volatile(
-        "       strexh  %[__rc], %[__value], [%[__addr]]\n"
+        "strexh %[__rc], %[__value], [%[__addr]]\n"
         : [__rc] "=&r" (rc)
         : [__value] "r" (value),
           [__addr] "r" (addr)
@@ -1620,7 +1615,7 @@ static __xwbsp_inline
 void prefetch(const volatile void * addr)
 {
         __asm__ volatile(
-        "       pld    [%[__addr], #0]\n"
+        "pld    [%[__addr], #0]\n"
         :
         : [__addr] "r" (addr)
         : "memory"
@@ -1656,11 +1651,8 @@ void sev(void)
 
 /**
  * @brief Set a breakpoint
+ * @param val: an 8-bit value that is stored in the instruction
  */
-static __xwbsp_inline
-void bkpt(void)
-{
-        __asm__ volatile("bkpt");
-}
+#define bkpt(val) __asm__ volatile("bkpt  %[__val]\n" : : [__val] "i" (val))
 
 #endif /* armv7m_core.h */

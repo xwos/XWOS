@@ -47,7 +47,7 @@
 static __xwbsp_inline
 void arch_bkpt(void)
 {
-        bkpt();
+        bkpt(0);
 }
 
 #endif /* arch_bkpt.h */
