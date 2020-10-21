@@ -46,8 +46,8 @@ extern SD_HandleTypeDef hsd1;
 void MX_SDMMC1_SD_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void MX_SDMMC1_SD_Deinit(void);
-void MX_SDMMC1_SD_Reinit(uint32_t clkdiv);
+void MX_SDMMC1_SD_DeInit(void);
+void MX_SDMMC1_SD_ReInit(uint32_t clkdiv);
 xwer_t MX_SDMMC1_SD_TrimClk(xwsq_t cnt);
 xwer_t MX_SDMMC1_SD_GetState(void);
 xwer_t MX_SDMMC1_SD_Read(uint8_t * buf, uint32_t blkaddr,

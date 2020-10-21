@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：CRC32
+ * @brief STM32CUBE模块：CRC32
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

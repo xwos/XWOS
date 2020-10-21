@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：设备栈初始化
+ * @brief 主模块：子线程
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,13 +18,13 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_xwac_xwds_init_h__
-#define __bm_stm32cube_xwac_xwds_init_h__
+#ifndef __bm_main_thrd_h__
+#define __bm_main_thrd_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <bm/stm32cube/standard.h>
+#include <bdl/standard.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -37,13 +37,10 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t stm32cube_xwds_ll_start(void);
-xwer_t stm32cube_xwds_ll_stop(void);
-xwer_t stm32cube_xwds_uart_start(void);
-xwer_t stm32cube_xwds_uart_stop(void);
+xwer_t child_thrd_start(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
-#endif /* bm/stm32cube/xwac/xwds/init.h */
+#endif /* bm/main/thrd.h */

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Board Module: STM32CUBE
+ * @brief 主模块：子线程
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,16 +21,13 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <bm/stm32cube/standard.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <xwmd/ds/soc/gpio.h>
-#include <xwmd/ds/uart/dma.h>
-#include <bm/stm32cube/cubemx/Core/Inc/main.h>
-#include <bm/stm32cube/cubemx/Core/Inc/isr.h>
-#include <bm/stm32cube/xwac/xwds/stm32cube.h>
-#include <bm/stm32cube/xwmo.h>
+#include <bdl/standard.h>
+#include <bm/stm32cube/mif.h>
+#include <bm/main/thrd.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -48,9 +45,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern
-xwer_t sdcard_fatfs_mount(void);
-
 xwer_t led_task(void * arg);
 
 xwer_t memtst_task(void * arg);
@@ -58,17 +52,7 @@ xwer_t memtst_task(void * arg);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief 连接占位符
- * @note
- * + 确保链接时使用此符号的文件。
- */
-void * const stm32cube_linkage_placeholder[] = {
-        stm32cube_override_linkage_msp,
-        stm32cube_override_linkage_it,
-};
-
-const struct xwosal_thrd_desc stm32cube_tbd[] = {
+const struct xwosal_thrd_desc child_tbd[] = {
         [0] = {
                 .name = "task.led",
                 .prio = LED_TASK_PRIORITY,
@@ -89,29 +73,23 @@ const struct xwosal_thrd_desc stm32cube_tbd[] = {
         },
 };
 
-xwid_t stm32cube_tid[xw_array_size(stm32cube_tbd)];
+xwid_t child_tid[xw_array_size(child_tbd)];
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t bm_stm32cube_start(void)
+xwer_t child_thrd_start(void)
 {
         xwer_t rc;
         xwsq_t i;
 
-        rc = sdcard_fatfs_mount();
-        if (rc < 0) {
-                goto err_fatfs_mount;
-        }
-
-        /* start thread */
-        for (i = 0; i < xw_array_size(stm32cube_tbd); i++) {
-                rc = xwosal_thrd_create(&stm32cube_tid[i], stm32cube_tbd[i].name,
-                                        stm32cube_tbd[i].func,
-                                        stm32cube_tbd[i].arg,
-                                        stm32cube_tbd[i].stack_size,
-                                        stm32cube_tbd[i].prio,
-                                        stm32cube_tbd[i].attr);
+        for (i = 0; i < xw_array_size(child_tbd); i++) {
+                rc = xwosal_thrd_create(&child_tid[i], child_tbd[i].name,
+                                        child_tbd[i].func,
+                                        child_tbd[i].arg,
+                                        child_tbd[i].stack_size,
+                                        child_tbd[i].prio,
+                                        child_tbd[i].attr);
                 if (rc < 0) {
                         goto err_thrd_create;
                 }
@@ -119,8 +97,6 @@ xwer_t bm_stm32cube_start(void)
         return XWOK;
 
 err_thrd_create:
-        BDL_BUG();
-err_fatfs_mount:
         BDL_BUG();
         return rc;
 }

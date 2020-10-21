@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：定义内存池
+ * @brief STM32CUBE模块：定义内存池
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

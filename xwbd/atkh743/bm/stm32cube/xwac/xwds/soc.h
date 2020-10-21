@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE XWDS 设备：SOC
+ * @brief STM32CUBE设备栈：SOC
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

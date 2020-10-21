@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：初始化
+ * @brief 电源管理模块：接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,25 +18,19 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_init_h__
-#define __bm_stm32cube_init_h__
+#ifndef __bm_xwpm_mif_h__
+#define __bm_xwpm_mif_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <bm/stm32cube/standard.h>
+#include <xwos/standard.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwbsp_init_code
-void stm32cube_lowlevel_init(void);
+xwer_t brdpm_start(void);
 
-__xwbsp_init_code
-void stm32cube_init(void);
+xwer_t brdpm_stop(void);
 
-void axisram_init(void);
-
-void sram4_init(void);
-
-#endif /* bm/stm32cube/init.h */
+#endif /* bm/xwpm/mif.h */

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：中断向量表
+ * @brief STM32CUBE模块：中断向量表
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

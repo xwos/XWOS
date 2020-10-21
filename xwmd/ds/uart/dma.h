@@ -94,7 +94,7 @@ void xwds_dmauartc_destruct(struct xwds_dmauartc * dmauartc);
 /**
  * @brief XWDS API：从接收队列中获取数据
  * @param dmauartc: (I) DMA UART控制器对象指针
- * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
+ * @param buf: (O) 指向缓冲区的指针，通过此缓冲区返回数据
  * @param size: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示缓冲区大小（单位：字节）
  *              (O) 作为输出时，返回实际读取的数据大小
@@ -117,7 +117,7 @@ xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
 /**
  * @brief XWDS API：尝试从接收队列中获取数据
  * @param dmauartc: (I) DMA UART控制器对象指针
- * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
+ * @param buf: (O) 指向缓冲区的指针，通过此缓冲区返回数据
  * @param size: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示缓冲区大小（单位：字节）
  *              (O) 作为输出时，返回实际读取的数据大小
@@ -137,7 +137,8 @@ xwer_t xwds_dmauartc_try_rx(struct xwds_dmauartc * dmauartc,
  * @brief XWDS API：配置UART的DMA通道发送数据
  * @param dmauartc: (I) DMA UART控制器对象指针
  * @param data: (I) 待发送的数据的缓冲区
- * @param size: (I) 作为输入时，表示期望发送的数据的大小（单位：字节）
+ * @param size: 指向缓冲区的指针，此缓冲区：
+ *              (I) 作为输入时，表示期望发送的数据的大小（单位：字节）
  *              (O) 作为输出时，返回实际发送的数据大小
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间

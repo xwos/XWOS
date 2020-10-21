@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Board Module: Power Management
+ * @brief 电源管理模块：接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -28,8 +28,8 @@
 #include <xwos/osal/sync/semaphore.h>
 #include <xwmd/ds/soc/gpio.h>
 #include <xwmd/ds/soc/eirq.h>
-#include <bm/stm32cube/xwac/xwds/stm32cube.h>
-#include <bm/pm/xwmo.h>
+#include <bm/stm32cube/mif.h>
+#include <bm/pm/mif.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -48,7 +48,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-enum bm_pm_btn_event_em {
+enum brdpm_btn_event_em {
         PM_BTNEVT_CLICK,
         PM_BTNEVT_LONGPRESS,
 };
@@ -57,134 +57,134 @@ enum bm_pm_btn_event_em {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /* static */
-/* void bm_pmdm_resume(struct xwos_pmdm * pmdm, void * arg); */
+/* void brdpmdm_resume(struct xwos_pmdm * pmdm, void * arg); */
 
 /* static */
-/* void bm_pmdm_suspend(struct xwos_pmdm * pmdm, void * arg); */
+/* void brdpmdm_suspend(struct xwos_pmdm * pmdm, void * arg); */
 
 /* static */
-/* void bm_pmdm_wakeup(struct xwos_pmdm * pmdm, void * arg); */
+/* void brdpmdm_wakeup(struct xwos_pmdm * pmdm, void * arg); */
 
 /* static */
-/* void bm_pmdm_sleep(struct xwos_pmdm * pmdm, void * arg); */
+/* void brdpmdm_sleep(struct xwos_pmdm * pmdm, void * arg); */
 
 static
-void bm_pm_suspend(void);
+void brdpm_suspend(void);
 
 static
-void bm_pm_resume(void);
+void brdpm_resume(void);
 
 static
-xwer_t bm_pm_get_btn_evt(xwsq_t * evt);
+xwer_t brdpm_get_btn_evt(xwsq_t * evt);
 
 static
-xwer_t bm_pm_thrd_init(void);
+xwer_t brdpm_thrd_init(void);
 
 static
-void bm_pm_thrd_deinit(void);
+void brdpm_thrd_deinit(void);
 
 static
-void bm_pm_req_btn_irq(void);
+void brdpm_req_btn_irq(void);
 
 static
-void bm_pm_rls_btn_irq(void);
+void brdpm_rls_btn_irq(void);
 
 static
-void bm_pm_handle_evt(xwsq_t evt);
+void brdpm_handle_evt(xwsq_t evt);
 
 static
-void bm_pm_led_blink(void);
+void brdpm_led_blink(void);
 
 static
-void bm_pm_eirq_btn_isr(struct xwds_soc * soc, xwid_t id, xwds_eirq_arg_t arg);
+void brdpm_eirq_btn_isr(struct xwds_soc * soc, xwid_t id, xwds_eirq_arg_t arg);
 
 static
-xwer_t bm_pm_thrd(void * arg);
+xwer_t brdpm_thrd(void * arg);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-const struct xwosal_thrd_desc bm_pm_thrd_td = {
+const struct xwosal_thrd_desc brdpm_thrd_td = {
         .name = "bm.pm.thrd",
         .prio = PM_THRD_PRIORITY,
         .stack = XWOSAL_THRD_STACK_DYNAMIC,
         .stack_size = 2048,
-        .func = (xwosal_thrd_f)bm_pm_thrd,
+        .func = (xwosal_thrd_f)brdpm_thrd,
         .arg = NULL,
         .attr = XWSDOBJ_ATTR_PRIVILEGED,
 };
-xwid_t bm_pm_thrd_id;
+xwid_t brdpm_thrd_id;
 
-struct xwosal_smr bm_pm_smr;
+struct xwosal_smr brdpm_smr;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t bm_pm_start(void)
+xwer_t brdpm_start(void)
 {
         xwer_t rc;
 
         /* xwos_pmdm_set_cb(&soc_xwpm_domain, */
-        /*                  bm_pmdm_resume, */
-        /*                  bm_pmdm_suspend, */
-        /*                  bm_pmdm_wakeup, */
-        /*                  bm_pmdm_sleep, */
+        /*                  brdpmdm_resume, */
+        /*                  brdpmdm_suspend, */
+        /*                  brdpmdm_wakeup, */
+        /*                  brdpmdm_sleep, */
         /*                  NULL); */
 
-        rc = xwosal_smr_init(&bm_pm_smr, 0, 1);
+        rc = xwosal_smr_init(&brdpm_smr, 0, 1);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_smr_init;
         }
 
-        rc = xwosal_thrd_create(&bm_pm_thrd_id,
-                                bm_pm_thrd_td.name,
-                                bm_pm_thrd_td.func,
-                                bm_pm_thrd_td.arg,
-                                bm_pm_thrd_td.stack_size,
-                                bm_pm_thrd_td.prio,
-                                bm_pm_thrd_td.attr);
+        rc = xwosal_thrd_create(&brdpm_thrd_id,
+                                brdpm_thrd_td.name,
+                                brdpm_thrd_td.func,
+                                brdpm_thrd_td.arg,
+                                brdpm_thrd_td.stack_size,
+                                brdpm_thrd_td.prio,
+                                brdpm_thrd_td.attr);
         if (rc < 0) {
                 goto err_thrd_create;
         }
         return XWOK;
 
 err_thrd_create:
-        xwosal_smr_destroy(&bm_pm_smr);
+        xwosal_smr_destroy(&brdpm_smr);
 err_smr_init:
         return rc;
 }
 
-xwer_t bm_pm_stop(void)
+xwer_t brdpm_stop(void)
 {
         xwer_t rc, trc;
 
-        rc = xwosal_thrd_terminate(bm_pm_thrd_id, &trc);
+        rc = xwosal_thrd_terminate(brdpm_thrd_id, &trc);
         if (XWOK == rc) {
-                rc = xwosal_thrd_delete(bm_pm_thrd_id);
+                rc = xwosal_thrd_delete(brdpm_thrd_id);
                 if (XWOK == rc) {
-                        bm_pm_thrd_id = 0;
+                        brdpm_thrd_id = 0;
                 }
         }
-        xwosal_smr_destroy(&bm_pm_smr);
+        xwosal_smr_destroy(&brdpm_smr);
         return rc;
 }
 
 static
-void bm_pm_suspend(void)
+void brdpm_suspend(void)
 {
         xwds_gpio_rls(&stm32cube_soc_cb,
                       PM_LED_GPIO_PORT, PM_LED_GPIO_PIN);
 }
 
 static
-void bm_pm_resume(void)
+void brdpm_resume(void)
 {
         xwds_gpio_req(&stm32cube_soc_cb,
                       PM_LED_GPIO_PORT, PM_LED_GPIO_PIN);
 }
 
 /* static */
-/* void bm_pmdm_resume(struct xwos_pmdm * pmdm, void * arg) */
+/* void brdpmdm_resume(struct xwos_pmdm * pmdm, void * arg) */
 /* { */
 /*         XWOS_UNUSED(pmdm); */
 /*         XWOS_UNUSED(arg); */
@@ -192,14 +192,14 @@ void bm_pm_resume(void)
 /* } */
 
 /* static */
-/* void bm_pmdm_suspend(struct xwos_pmdm * pmdm, void * arg) */
+/* void brdpmdm_suspend(struct xwos_pmdm * pmdm, void * arg) */
 /* { */
 /*         XWOS_UNUSED(pmdm); */
 /*         XWOS_UNUSED(arg); */
 /*         stm32cube_pm_suspend(); */
 /* } */
 /* static */
-/* void bm_pmdm_wakeup(struct xwos_pmdm * pmdm, void * arg) */
+/* void brdpmdm_wakeup(struct xwos_pmdm * pmdm, void * arg) */
 /* { */
 /*         XWOS_UNUSED(pmdm); */
 /*         XWOS_UNUSED(arg); */
@@ -207,7 +207,7 @@ void bm_pm_resume(void)
 /* } */
 
 /* static */
-/* void bm_pmdm_sleep(struct xwos_pmdm * pmdm, void * arg) */
+/* void brdpmdm_sleep(struct xwos_pmdm * pmdm, void * arg) */
 /* { */
 /*         XWOS_UNUSED(pmdm); */
 /*         XWOS_UNUSED(arg); */
@@ -215,7 +215,7 @@ void bm_pm_resume(void)
 /* } */
 
 static
-xwer_t bm_pm_get_btn_evt(xwsq_t * evt)
+xwer_t brdpm_get_btn_evt(xwsq_t * evt)
 {
         xwer_t rc;
         xwid_t smrid;
@@ -223,7 +223,7 @@ xwer_t bm_pm_get_btn_evt(xwsq_t * evt)
         xwsq_t cnt;
         xwtm_t time;
 
-        smrid = xwosal_smr_get_id(&bm_pm_smr);
+        smrid = xwosal_smr_get_id(&brdpm_smr);
         rc = xwosal_smr_wait(smrid);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_smr_wait;
@@ -266,7 +266,7 @@ err_smr_wait:
 }
 
 static
-xwer_t bm_pm_thrd_init(void)
+xwer_t brdpm_thrd_init(void)
 {
         xwer_t rc;
 
@@ -284,7 +284,7 @@ xwer_t bm_pm_thrd_init(void)
                            PM_BTN_GPIO_PORT, PM_BTN_GPIO_PIN,
                            PM_BTN_IRQLINE,
                            XWDS_SOC_EIF_TM_FALLING | XWDS_SOC_EIF_WKUP,
-                           bm_pm_eirq_btn_isr, &bm_pm_smr);
+                           brdpm_eirq_btn_isr, &brdpm_smr);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_eirq_req;
         }
@@ -297,7 +297,7 @@ err_led_gpio_req:
 }
 
 static
-void bm_pm_thrd_deinit(void)
+void brdpm_thrd_deinit(void)
 {
         xwds_eirq_rls(&stm32cube_soc_cb,
                       PM_BTN_GPIO_PORT, PM_BTN_GPIO_PIN,
@@ -308,16 +308,16 @@ void bm_pm_thrd_deinit(void)
 }
 
 static
-void bm_pm_req_btn_irq(void)
+void brdpm_req_btn_irq(void)
 {
         xwds_eirq_req(&stm32cube_soc_cb,
                       PM_BTN_GPIO_PORT, PM_BTN_GPIO_PIN,
                       PM_BTN_IRQLINE, XWDS_SOC_EIF_TM_FALLING | XWDS_SOC_EIF_WKUP,
-                      bm_pm_eirq_btn_isr, &bm_pm_smr);
+                      brdpm_eirq_btn_isr, &brdpm_smr);
 }
 
 static
-void bm_pm_rls_btn_irq(void)
+void brdpm_rls_btn_irq(void)
 {
         xwds_eirq_rls(&stm32cube_soc_cb,
                       PM_BTN_GPIO_PORT, PM_BTN_GPIO_PIN,
@@ -325,7 +325,7 @@ void bm_pm_rls_btn_irq(void)
 }
 
 static
-void bm_pm_led_blink(void)
+void brdpm_led_blink(void)
 {
         xwtm_t time;
 
@@ -355,7 +355,7 @@ void bm_pm_led_blink(void)
 }
 
 static
-void bm_pm_handle_evt(xwsq_t evt)
+void brdpm_handle_evt(xwsq_t evt)
 {
         switch (evt) {
         case PM_BTNEVT_CLICK:
@@ -364,7 +364,7 @@ void bm_pm_handle_evt(xwsq_t evt)
                                  PM_LED_GPIO_PIN);
                 break;
         case PM_BTNEVT_LONGPRESS:
-                bm_pm_led_blink();
+                brdpm_led_blink();
                 /* xwos_pmdm_suspend(xwos_pmdm_get_lc()); */
                 break;
         default:
@@ -373,48 +373,48 @@ void bm_pm_handle_evt(xwsq_t evt)
 }
 
 static
-xwer_t bm_pm_thrd(void * arg)
+xwer_t brdpm_thrd(void * arg)
 {
         xwer_t rc;
         xwsq_t evt;
 
         XWOS_UNUSED(arg);
 
-        rc = bm_pm_thrd_init();
+        rc = brdpm_thrd_init();
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_init;
         }
 
         while (!xwosal_cthrd_shld_stop()) {
                 if (xwosal_cthrd_shld_frz()) {
-                        bm_pm_suspend();
+                        brdpm_suspend();
                         xwosal_cthrd_freeze();
-                        bm_pm_resume();
+                        brdpm_resume();
                 } else {
-                        rc = bm_pm_get_btn_evt(&evt);
+                        rc = brdpm_get_btn_evt(&evt);
                         if (XWOK == rc) {
-                                bm_pm_handle_evt(evt);
-                                bm_pm_req_btn_irq();
+                                brdpm_handle_evt(evt);
+                                brdpm_req_btn_irq();
                         } else if ((-EINTR == rc) || (-ERESTARTSYS == rc)) {
-                                bm_pm_req_btn_irq();
+                                brdpm_req_btn_irq();
                                 /* continue to do freeze */
                         } else if (-ETIMEDOUT == rc) {
-                                bm_pm_req_btn_irq();
+                                brdpm_req_btn_irq();
                         } else {
-                                bm_pm_req_btn_irq();
+                                brdpm_req_btn_irq();
                                 goto err_get_btn_evt;
                         }
                 }
         }
 
 err_get_btn_evt:
-        bm_pm_thrd_deinit();
+        brdpm_thrd_deinit();
 err_init:
         return rc;
 }
 
 static
-void bm_pm_eirq_btn_isr(struct xwds_soc * soc, xwid_t id, xwds_eirq_arg_t arg)
+void brdpm_eirq_btn_isr(struct xwds_soc * soc, xwid_t id, xwds_eirq_arg_t arg)
 {
         xwid_t smrid;
         /* struct xwos_pmdm * pmdm; */
@@ -426,7 +426,7 @@ void bm_pm_eirq_btn_isr(struct xwds_soc * soc, xwid_t id, xwds_eirq_arg_t arg)
         /* if (xwos_pmdm_get_stage(pmdm) < XWOS_PMDM_STAGE_RUNNING) { */
         /*         xwos_pmdm_resume(pmdm); */
         /* } */
-        bm_pm_rls_btn_irq();
+        brdpm_rls_btn_irq();
         smrid = xwosal_smr_get_id((struct xwosal_smr *)arg);
         xwosal_smr_post(smrid);
 }

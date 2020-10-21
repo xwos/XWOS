@@ -22,39 +22,17 @@
 include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
-# 使用脚本makefile-grep-variable.el获取STM32CubeMX生成的Makefile中的配置
-CUBEMX_CSRCS := $(shell xwbs/util/el/makefile-grep-variable.el --variable=C_SOURCES $(call getXwmoDir)/cubemx/Makefile)
-CUBEMX_CFLAGS := $(shell xwbs/util/el/makefile-grep-variable.el --variable=C_DEFS $(call getXwmoDir)/cubemx/Makefile)
-CUBEMX_INCDIRS := $(shell xwbs/util/el/makefile-grep-variable.el --variable=C_INCLUDES $(call getXwmoDir)/cubemx/Makefile)
-
-CUBEMX_CSRCS += Core/Src/isr.c
-
-# cubemx中的源文件路径统一增加前缀"cubemx/"
+# 增加源代码文件
 XWMO_CSRCS :=
-XWMO_CSRCS += $(addprefix cubemx/,$(CUBEMX_CSRCS))
-
-XWMO_CSRCS += mif.c
-
-XWMO_CSRCS += xwac/xwlib/crc32.c
-XWMO_CSRCS += xwac/xwlib/log.c
-XWMO_CSRCS += xwac/xwos/vector.c
-XWMO_CSRCS += xwac/xwos/hook.c
-XWMO_CSRCS += xwac/fatfs/sdcard.c
-XWMO_CSRCS += xwac/newlib/mem.c
-XWMO_CSRCS += xwac/newlib/stdio.c
-XWMO_CSRCS += xwac/lua/mem.c
-XWMO_CSRCS += xwac/cxx/mem.c
-
-XWMO_CSRCS += $(call getAllFileUnderXwmoDir,*.c,xwac/xwds)
+XWMO_CSRCS += main.c thrd.c
 
 # 定义编译选项
-XWMO_CFLAGS := -include standard.h
+XWMO_CFLAGS :=
 XWMO_CFLAGS += -Wno-undef -Wno-unused-parameter
 XWMO_CFLAGS += $(CUBEMX_CFLAGS)
 
 # 定义头文件路径
 XWMO_INCDIRS := $(call getXwmoDir) # getXwmoDir函数可获取当前玄武模块的路径
-XWMO_INCDIRS += $(addprefix $(call getXwmoDir)/cubemx/,$(patsubst -I%,%,$(CUBEMX_INCDIRS)))
 
 # 引入编译规则
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Board Module: Power Management
+ * @brief 外部模块：Lua
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_xwpm_xwmo_h__
-#define __bm_xwpm_xwmo_h__
+#ifndef __xwem_vm_lua_mif_h__
+#define __xwem_vm_lua_mif_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
@@ -29,8 +29,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t bm_pm_start(void);
+xwer_t xwlua_start(void);
 
-xwer_t bm_pm_stop(void);
-
-#endif /* bm/xwpm/xwmo.h */
+#endif /* xwem/vm/lua/mif.h */

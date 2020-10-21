@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Middleware Module: newlib适配代码
+ * @brief newlib适配代码：模块接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -9,6 +9,9 @@
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
+#ifndef __xwmd_libc_newlibac_mif_h__
+#define __xwmd_libc_newlibac_mif_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
@@ -20,34 +23,16 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
+ ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern void newlibac_mem_linkage_placeholder(void);
-extern void newlibac_fops_linkage_placeholder(void);
-extern void newlibac_string_linkage_placeholder(void);
+xwer_t newlibac_init(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
+ ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief 连接占位符
- * @note
- * + 静态连接时，若符号存在多重定义，优先选择包含占位符的文件里面的符号。
- */
-void * const newlibac_linkage_placeholder[] = {
-        newlibac_mem_linkage_placeholder,
-        newlibac_fops_linkage_placeholder,
-        newlibac_string_linkage_placeholder,
-};
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t newlibac_init(void)
-{
-        return XWOK;
-}
+#endif /* xwmd/libc/newlibac/mif.h */

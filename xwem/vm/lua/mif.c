@@ -26,7 +26,7 @@
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <xwem/vm/lua/xwlua/port.h>
-#include <xwem/vm/lua/xwmo.h>
+#include <xwem/vm/lua/mif.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********

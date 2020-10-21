@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 外部模块：Lua
+ * @brief STM32CUBE设备栈：设备
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,17 +18,27 @@
  * > limitations under the License.
  */
 
-#ifndef __xwem_vm_lua_xwmo_h__
-#define __xwem_vm_lua_xwmo_h__
+#ifndef __bm_stm32cube_xwac_xwds_device_h__
+#define __bm_stm32cube_xwac_xwds_device_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
+#include <bm/stm32cube/standard.h>
+#include <xwmd/ds/device.h>
+#include <xwmd/ds/soc/chip.h>
+#include <xwmd/ds/uart/dma.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
+ ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t xwlua_start(void);
+/******** ******** ds ******** ********/
+extern struct xwds stm32cube_ds;
 
-#endif /* xwem/vm/lua/xwmo.h */
+/******** ******** soc ******** ********/
+extern struct xwds_soc stm32cube_soc_cb;
+
+/******** ******** uart ******** ********/
+extern struct xwds_dmauartc stm32cube_usart1_cb;
+
+#endif /* bm/stm32cube/xwac/xwds/device.h */

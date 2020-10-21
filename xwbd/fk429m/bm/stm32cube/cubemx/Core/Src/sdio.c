@@ -219,18 +219,18 @@ void HAL_SD_MspDeInit(SD_HandleTypeDef* sdHandle)
 }
 
 /* USER CODE BEGIN 1 */
-void MX_SDIO_SD_Deinit(void)
+void MX_SDIO_SD_DeInit(void)
 {
   HAL_SD_DeInit(&hsd);
 }
 
-void MX_SDIO_SD_Reinit(uint32_t clkdiv)
+void MX_SDIO_SD_ReInit(uint32_t clkdiv)
 {
   HAL_StatusTypeDef ret;
   uint32_t cnt;
 
   HAL_Delay(1);
-  MX_SDIO_SD_Deinit();
+  MX_SDIO_SD_DeInit();
   HAL_Delay(1);
   hsd.Instance = SDIO;
   hsd.Init.ClockEdge = SDIO_CLOCK_EDGE_RISING;
@@ -269,7 +269,7 @@ xwer_t MX_SDIO_SD_TrimClk(xwsq_t cnt)
     if (XWOK == rc) {
     } else if (-EIO == rc) {
       if (hsd.Init.ClockDiv <= 0xFD) {
-        MX_SDIO_SD_Reinit(hsd.Init.ClockDiv + 2);
+        MX_SDIO_SD_ReInit(hsd.Init.ClockDiv + 2);
         rc = XWOK;
       } else {
         break;
@@ -292,7 +292,7 @@ xwer_t MX_SDIO_SD_GetState(void)
     cardst = HAL_SD_GetCardState(&hsd);
     if ((0 == cardst) && (HAL_SD_ERROR_NONE != hsd.ErrorCode)) {
       rc = -EIO;
-      MX_SDIO_SD_Reinit(hsd.Init.ClockDiv);
+      MX_SDIO_SD_ReInit(hsd.Init.ClockDiv);
       cnt++;
     } else if (HAL_SD_CARD_TRANSFER == cardst) {
       rc = XWOK;
@@ -315,7 +315,7 @@ xwer_t MX_SDIO_SD_Read(uint8_t * data, uint32_t blkaddr,
     cnt = 0;
     do {
       if (rc < 0) {
-        MX_SDIO_SD_Reinit(hsd.Init.ClockDiv);
+        MX_SDIO_SD_ReInit(hsd.Init.ClockDiv);
         cnt++;
       }
       cardst = HAL_SD_GetCardState(&hsd);
@@ -373,7 +373,7 @@ xwer_t MX_SDIO_SD_Write(uint8_t * data, uint32_t blkaddr,
     cnt = 0;
     do {
       if (rc < 0) {
-        MX_SDIO_SD_Reinit(hsd.Init.ClockDiv);
+        MX_SDIO_SD_ReInit(hsd.Init.ClockDiv);
         cnt++;
       }
       cardst = HAL_SD_GetCardState(&hsd);

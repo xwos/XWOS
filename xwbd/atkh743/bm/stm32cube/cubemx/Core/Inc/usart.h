@@ -46,17 +46,19 @@ extern UART_HandleTypeDef husart2;
 /* USER CODE BEGIN Private defines */
 #define HAL_UART_TXMEM_MAXSIZE    512U /**< 单次最大发送的字节数 */
 
-struct HAL_UART_Xwds_driver_data {
+struct MX_UART_DriverData {
   UART_HandleTypeDef * halhdl;
   struct xwds_dmauartc * dmauartc;
   struct {
     struct xwosal_cdt cdt; /**< 条件量 */
     struct xwosal_splk splk; /**< 保证发送状态只被单一上下文访问的锁 */
-    xwer_t rc;
+    xwer_t rc; /**< 返回值 */
     xwu8_t mem[HAL_UART_TXMEM_MAXSIZE] __xwcc_aligned_l1cacheline; /**< 发送缓冲区 */
     xwu32_t size; /**< 待发送的数据大小 */
   } tx;
 };
+
+extern struct MX_UART_DriverData husart1_drvdata;
 
 /* USER CODE END Private defines */
 
@@ -64,8 +66,6 @@ void MX_USART1_UART_Init(void);
 void MX_USART2_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-extern struct HAL_UART_Xwds_driver_data husart1_xwds_drvdata;
-
 void MX_USART1_UART_DeInit(void);
 void MX_USART1_Timer_Init(void);
 void MX_USART1_Timer_DeInit(void);

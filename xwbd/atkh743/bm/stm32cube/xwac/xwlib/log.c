@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：Log
+ * @brief STM32CUBE模块：Log
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -22,7 +22,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <bm/stm32cube/xwac/xwds/stm32cube.h>
+#include <bm/stm32cube/xwac/xwds/cmif.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********

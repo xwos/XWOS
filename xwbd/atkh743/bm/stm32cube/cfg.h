@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：配置
+ * @brief STM32CUBE模块：配置
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

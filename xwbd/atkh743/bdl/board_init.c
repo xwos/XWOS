@@ -33,7 +33,7 @@
   #include <xwos/smp/sync/event.h>
   #include <xwos/smp/lock/mutex.h>
 #endif /* XuanWuOS_CFG_CORE__smp */
-#include <bm/stm32cube/init.h>
+#include <bm/stm32cube/mif.h>
 #include <bdl/standard.h>
 #include <bdl/board_init.h>
 
@@ -85,10 +85,8 @@ void board_init(void)
 {
         xwer_t rc;
 
-        /* cubemx init */
         stm32cube_init();
 
-        /* memory management */
         rc = sys_mm_init();
         BDL_BUG_ON(rc < 0);
 }

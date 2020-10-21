@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Middleware Module: newlib适配代码
+ * @brief newlib适配代码：模块接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -10,29 +10,45 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __xwmd_libc_newlibac_xwmo_h__
-#define __xwmd_libc_newlibac_xwmo_h__
-
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
+#include <xwmd/libc/newlibac/mif.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
+ ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t newlibac_init(void);
+extern void newlibac_mem_linkage_placeholder(void);
+extern void newlibac_fops_linkage_placeholder(void);
+extern void newlibac_string_linkage_placeholder(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
+ ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief 连接占位符
+ * @note
+ * + 静态连接时，若符号存在多重定义，优先选择包含占位符的文件里面的符号。
+ */
+void * const newlibac_linkage_placeholder[] = {
+        newlibac_mem_linkage_placeholder,
+        newlibac_fops_linkage_placeholder,
+        newlibac_string_linkage_placeholder,
+};
 
-#endif /* xwmd/libc/newlibac/xwmo.h */
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********      function implementations       ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+xwer_t newlibac_init(void)
+{
+        return XWOK;
+}

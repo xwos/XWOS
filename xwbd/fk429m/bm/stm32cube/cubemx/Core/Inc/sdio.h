@@ -48,7 +48,8 @@ void MX_SDIO_SD_Init(void);
 /* USER CODE BEGIN Prototypes */
 void MX_SDIO_SD_Construct(void);
 void MX_SDIO_SD_Destruct(void);
-void MX_SDIO_SD_Deinit(void);
+void MX_SDIO_SD_DeInit(void);
+void MX_SDIO_SD_ReInit(void);
 xwer_t MX_SDIO_SD_TrimClk(xwsq_t cnt);
 xwer_t MX_SDIO_SD_GetState(void);
 xwer_t MX_SDIO_SD_Read(uint8_t * data, uint32_t blkaddr,

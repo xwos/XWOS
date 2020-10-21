@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE XWDS 设备：SOC
+ * @brief STM32CUBE设备栈：SOC
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -26,7 +26,7 @@
 #include <xwmd/ds/soc/chip.h>
 #include <xwmd/ds/soc/gpio.h>
 #include <xwmd/ds/soc/eirq.h>
-#include <bm/stm32cube/xwac/xwds/stm32cube.h>
+#include <bm/stm32cube/xwac/xwds/device.h>
 #include <bm/stm32cube/xwac/xwds/soc.h>
 #include <bm/stm32cube/cubemx/Core/Inc/mdma.h>
 /* #include <bm/stm32cube/cubemx/Core/Inc/bdma.h> */
