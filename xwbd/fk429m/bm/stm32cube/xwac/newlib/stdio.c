@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：定义标准输入输出
+ * @brief STM32CUBE模块：定义标准输入输出
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <bm/stm32cube/xwac/xwds/stm32cube.h>
+#include <bm/stm32cube/xwac/xwds/cmif.h>
 
 extern int errno;
 

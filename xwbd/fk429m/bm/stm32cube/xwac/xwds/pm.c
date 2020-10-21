@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：电源管理
+ * @brief STM32CUBE设备栈：电源管理
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -26,7 +26,7 @@
 #include <stm32f4xx_ll_cortex.h>
 #include <stm32f4xx_ll_pwr.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
-#include <bm/stm32cube/xwac/xwds/stm32cube.h>
+#include <bm/stm32cube/xwac/xwds/device.h>
 #include <bm/stm32cube/xwac/xwds/pm.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********

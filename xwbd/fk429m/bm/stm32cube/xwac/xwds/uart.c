@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE XWDS 设备：DMA-UART
+ * @brief STM32CUBE设备栈：DMA-UART
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -27,7 +27,7 @@
 #include <xwmd/ds/uart/dma.h>
 #include <bm/stm32cube/cubemx/Core/Inc/tim.h>
 #include <bm/stm32cube/cubemx/Core/Inc/usart.h>
-#include <bm/stm32cube/xwac/xwds/stm32cube.h>
+#include <bm/stm32cube/xwac/xwds/device.h>
 #include <bm/stm32cube/xwac/xwds/soc.h>
 #include <bm/stm32cube/xwac/xwds/uart.h>
 
@@ -109,7 +109,7 @@ static
 xwer_t stm32cube_usart1_drv_start(struct xwds_device * dev)
 {
         struct xwds_dmauartc * dmauartc;
-        struct HAL_UART_Xwds_driver_data * drvdata;
+        struct MX_UART_Xwds_driver_data * drvdata;
         xwer_t rc;
 
         dmauartc = xwds_static_cast(struct xwds_dmauartc *, dev);
@@ -168,7 +168,7 @@ xwer_t stm32cube_usart1_drv_tx(struct xwds_dmauartc * dmauartc,
                                const xwu8_t * data, xwsz_t * size,
                                xwtm_t * xwtm)
 {
-        struct HAL_UART_Xwds_driver_data * drvdata;
+        struct MX_UART_Xwds_driver_data * drvdata;
         xwreg_t flag;
         union xwlk_ulock ulk;
         xwsz_t wrsz;
@@ -208,7 +208,7 @@ xwer_t stm32cube_usart1_drv_tx(struct xwds_dmauartc * dmauartc,
 
 void stm32cube_usart1_cb_txdma_cplt(struct xwds_dmauartc * dmauartc, xwer_t dmarc)
 {
-        struct HAL_UART_Xwds_driver_data * drvdata;
+        struct MX_UART_Xwds_driver_data * drvdata;
         xwreg_t flag;
 
         drvdata = dmauartc->dev.data;

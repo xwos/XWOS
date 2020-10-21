@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 应用程序入口
+ * @brief 主模块：应用程序入口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,40 +21,40 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
-#include <xwmd/libc/newlibac/xwmo.h>
-#include <xwem/vm/lua/xwmo.h>
+#include <xwmd/libc/newlibac/mif.h>
+#include <xwem/vm/lua/mif.h>
 #include <bdl/standard.h>
-#include <bm/stm32cube/xwmo.h>
-#include <bm/pm/xwmo.h>
+#include <bm/stm32cube/mif.h>
+#include <bm/pm/mif.h>
+#include <bm/main/thrd.h>
 #include <xwam/example/cxx/xwmo.h>
 #include <xwam/example/sync/selector/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define BDL_INIT_THRD_PRIORITY XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 0)
+#define MAIN_THRD_PRIORITY XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 0)
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t bdl_init_thrd(void * arg);
+xwer_t main_thrd(void * arg);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-const struct xwosal_thrd_desc bdl_init_thrd_td = {
+const struct xwosal_thrd_desc main_thrd_td = {
         .name = "bdl.init.thrd",
-        .prio = BDL_INIT_THRD_PRIORITY,
+        .prio = MAIN_THRD_PRIORITY,
         .stack = XWOSAL_THRD_STACK_DYNAMIC,
-        .stack_size = 2048,
-        .func = (xwosal_thrd_f)bdl_init_thrd,
+        .stack_size = 4096,
+        .func = (xwosal_thrd_f)main_thrd,
         .arg = NULL,
         .attr = XWSDOBJ_ATTR_PRIVILEGED,
 };
-xwid_t bdl_init_thrd_id;
+xwid_t main_thrd_id;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -63,13 +63,13 @@ xwer_t xwos_main(void)
 {
         xwer_t rc;
 
-        rc = xwosal_thrd_create(&bdl_init_thrd_id,
-                                bdl_init_thrd_td.name,
-                                bdl_init_thrd_td.func,
-                                bdl_init_thrd_td.arg,
-                                bdl_init_thrd_td.stack_size,
-                                bdl_init_thrd_td.prio,
-                                bdl_init_thrd_td.attr);
+        rc = xwosal_thrd_create(&main_thrd_id,
+                                main_thrd_td.name,
+                                main_thrd_td.func,
+                                main_thrd_td.arg,
+                                main_thrd_td.stack_size,
+                                main_thrd_td.prio,
+                                main_thrd_td.attr);
         if (rc < 0) {
                 goto err_init_thrd_create;
         }
@@ -88,25 +88,30 @@ err_scheduler_start_lc:
         return rc;
 }
 
-xwer_t bdl_init_thrd(void * arg)
+xwer_t main_thrd(void * arg)
 {
         xwer_t rc;
 
         XWOS_UNUSED(arg);
 
-        rc = bm_stm32cube_start();
+        rc = stm32cube_start();
         if (rc < 0) {
-                goto bm_stm32cube_start;
+                goto err_stm32cube_start;
         }
 
         rc = newlibac_init();
         if (rc < 0) {
-                goto newlibac_init;
+                goto err_newlibac_init;
         }
 
-        rc = bm_pm_start();
+        rc = child_thrd_start();
         if (rc < 0) {
-                goto bm_pm_start;
+                goto err_child_thrd_start;
+        }
+
+        rc = brdpm_start();
+        if (rc < 0) {
+                goto err_pm_start;
         }
 
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
@@ -126,7 +131,7 @@ xwer_t bdl_init_thrd(void * arg)
                 goto err_example_selector_start;
         }
 
-        xwosal_thrd_delete(bdl_init_thrd_id);
+        xwosal_thrd_delete(main_thrd_id);
         return XWOK;
 
 err_example_selector_start:
@@ -137,11 +142,13 @@ err_example_cxx_start:
 err_xwlua_start:
 #endif /* XWEMCFG_vm_lua */
         BDL_BUG();
-bm_pm_start:
+err_pm_start:
         BDL_BUG();
-newlibac_init:
+err_child_thrd_start:
         BDL_BUG();
-bm_stm32cube_start:
+err_newlibac_init:
+        BDL_BUG();
+err_stm32cube_start:
         BDL_BUG();
         return rc;
 }

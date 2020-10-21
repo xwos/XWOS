@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：FatFS的SD卡驱动
+ * @brief STM32CUBE FATFS：SD卡驱动
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -64,6 +64,23 @@ xwer_t sdcard_fatfs_mount(void)
 
 err_mount:
 err_sd:
+        return rc;
+}
+
+xwer_t sdcard_fatfs_unmount(void)
+{
+        xwer_t rc;
+        FRESULT frc;
+
+        frc = f_unmount("sd:");
+        if (FR_OK != frc) {
+                rc = -EIO;
+                goto err_unmount;
+        }
+        MX_SDIO_SD_DeInit();
+        return XWOK;
+
+err_unmount:
         return rc;
 }
 

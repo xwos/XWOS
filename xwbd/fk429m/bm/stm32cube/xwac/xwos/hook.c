@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：玄武OS内核HOOK
+ * @brief STM32CUBE模块：玄武OS内核HOOK
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：初始化
+ * @brief STM32CUBE模块：接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,13 +21,14 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+#include <armv7m_core.h>
 #include <bm/stm32cube/standard.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
-#include <bm/stm32cube/xwac/xwds/init.h>
-#include <bm/stm32cube/xwac/xwds/stm32cube.h>
-#include <bm/stm32cube/init.h>
-#include <armv7m_core.h>
+#include <bm/stm32cube/cubemx/Core/Inc/isr.h>
+#include <bm/stm32cube/xwac/xwds/cmif.h>
+#include <bm/stm32cube/xwac/fatfs/cmif.h>
+#include <bm/stm32cube/mif.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      macros       ******** ******** ********
@@ -44,6 +45,16 @@ extern xwsz_t sdram_mr_size[];
  */
 struct xwmm_mempool * sdram_mempool = (void *)sdram_mr_origin;
 
+/**
+ * @brief 连接占位符
+ * @note
+ * + 确保链接时使用此符号的文件。
+ */
+void * const stm32cube_linkage_placeholder[] = {
+        stm32cube_override_linkage_msp,
+        stm32cube_override_linkage_it,
+};
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
@@ -56,11 +67,6 @@ void SystemClock_Config(void);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief Lowlevel-init stm32cube
- * @note
- * - Called by board_lowlevel_init()
- */
 __xwbsp_init_code
 void stm32cube_lowlevel_init(void)
 {
@@ -68,11 +74,6 @@ void stm32cube_lowlevel_init(void)
         /* cm_scs.scnscb.actlr.bit.disdefwbuf = 1; */
 }
 
-/**
- * @brief Init stm32cube
- * @note
- * - Called by board_init()
- */
 __xwbsp_init_code
 void stm32cube_init(void)
 {
@@ -88,4 +89,46 @@ void stm32cube_init(void)
                                (xwptr_t)sdram_mr_origin,
                                (xwsz_t)sdram_mr_size);
         BDL_BUG_ON(rc < 0);
+}
+
+xwer_t stm32cube_start(void)
+{
+        xwer_t rc;
+
+        /* xwds */
+        rc = stm32cube_xwds_start();
+        if (rc < 0) {
+                goto err_xwds_start;
+        }
+
+        /* fatfs */
+        rc = sdcard_fatfs_mount();
+        if (rc < 0) {
+                goto err_fatfs_mount;
+        }
+        return XWOK;
+
+
+err_fatfs_mount:
+        stm32cube_xwds_stop();
+err_xwds_start:
+        return rc;
+}
+
+xwer_t stm32cube_stop(void)
+{
+        xwer_t rc;
+
+        /* fatfs */
+        sdcard_fatfs_unmount();
+
+        /* xwds */
+        rc = stm32cube_xwds_stop();
+        if (rc < 0) {
+                goto err_xwds_stop;
+        }
+        return XWOK;
+
+err_xwds_stop:
+        return rc;
 }

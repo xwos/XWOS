@@ -30,7 +30,7 @@
 #include "cubemx/Core/Inc/tim.h"
 #include "xwac/xwds/uart.h"
 
-struct HAL_UART_Xwds_driver_data husart1_xwds_drvdata;
+struct MX_UART_Xwds_driver_data husart1_xwds_drvdata;
 
 /* USER CODE END 0 */
 

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：设备栈
+ * @brief STM32CUBE设备栈：设备
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,27 +18,14 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_xwac_xwds_stm32cube_h__
-#define __bm_stm32cube_xwac_xwds_stm32cube_h__
-
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
-#include <xwmd/ds/device.h>
-#include <xwmd/ds/soc/chip.h>
-#include <xwmd/ds/uart/dma.h>
+#include <xwmd/ds/xwds.h>
+#include <bm/stm32cube/xwac/xwds/device.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** ds ******** ********/
-extern struct xwds stm32cube_ds;
-
-/******** ******** soc ******** ********/
-extern struct xwds_soc stm32cube_soc_cb;
-
-/******** ******** uart ******** ********/
-extern struct xwds_dmauartc stm32cube_usart1_cb;
-
-#endif /* bm/stm32cube/xwac/xwds/stm32cube.h */
+struct xwds stm32cube_ds;

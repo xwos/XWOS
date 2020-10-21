@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：电源管理
+ * @brief STM32CUBE设备栈：电源管理
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
