@@ -43,7 +43,7 @@
 extern UART_HandleTypeDef husart1;
 
 /* USER CODE BEGIN Private defines */
-struct HAL_UART_Xwds_driver_data {
+struct MX_UART_DriverData {
   UART_HandleTypeDef * halhdl;
   struct xwds_dmauartc * dmauartc;
   struct {
@@ -53,13 +53,13 @@ struct HAL_UART_Xwds_driver_data {
   } tx;
 };
 
+extern struct MX_UART_DriverData husart1_drvdata;
+
 /* USER CODE END Private defines */
 
 void MX_USART1_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-extern struct HAL_UART_Xwds_driver_data husart1_xwds_drvdata;
-
 void MX_USART1_UART_DeInit(void);
 void MX_USART1_Timer_Init(void);
 void MX_USART1_Timer_DeInit(void);

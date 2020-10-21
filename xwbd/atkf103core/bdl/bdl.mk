@@ -30,7 +30,6 @@ BDL_ASRCS :=
 
 BDL_CSRCS += board_init.c
 BDL_CSRCS += ocheap.c
-BDL_CSRCS += main.c
 
 BDL_CSRCS += xwac/thrd_stack_mempool.c
 BDL_CSRCS += xwac/xwsd_hook.c

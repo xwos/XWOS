@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：设备栈
+ * @brief STM32CUBE设备栈：设备
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,9 +21,9 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <bm/stm32cube/standard.h>
 #include <xwmd/ds/xwds.h>
-#include <bm/stm32cube/xwac/xwds/stm32cube.h>
+#include <bm/stm32cube/standard.h>
+#include <bm/stm32cube/xwac/xwds/device.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********

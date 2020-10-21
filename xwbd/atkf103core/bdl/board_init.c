@@ -25,7 +25,7 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/bma.h>
 #include <bdl/board_init.h>
-#include <bm/stm32cube/init.h>
+#include <bm/stm32cube/mif.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      macros       ******** ******** ********
