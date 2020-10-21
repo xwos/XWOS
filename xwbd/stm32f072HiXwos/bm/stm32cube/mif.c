@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：初始化
+ * @brief STM32CUBE模块：接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -23,7 +23,9 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
-#include <bm/stm32cube/init.h>
+#include <bm/stm32cube/cubemx/Core/Inc/gpio.h>
+#include <bm/stm32cube/cubemx/Core/Inc/isr.h>
+#include <bm/stm32cube/mif.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      macros       ******** ******** ********
@@ -32,6 +34,15 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief 连接占位符
+ * @note
+ * + 确保链接时使用此符号的文件。
+ */
+void * const stm32cube_linkage_placeholder[] = {
+        stm32cube_override_linkage_msp,
+        stm32cube_override_linkage_it,
+};
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
@@ -66,4 +77,15 @@ void stm32cube_init(void)
 {
         HAL_Init();
         SystemClock_Config();
+        MX_GPIO_Init();
+}
+
+xwer_t stm32cube_start(void)
+{
+        return XWOK;
+}
+
+xwer_t stm32cube_stop(void)
+{
+        return XWOK;
 }

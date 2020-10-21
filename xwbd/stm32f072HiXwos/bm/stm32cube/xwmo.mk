@@ -33,8 +33,8 @@ CUBEMX_CSRCS += Core/Src/isr.c
 XWMO_CSRCS :=
 XWMO_CSRCS += $(addprefix cubemx/,$(CUBEMX_CSRCS))
 
-XWMO_CSRCS += init.c
-XWMO_CSRCS += xwmo.c
+XWMO_CSRCS += mif.c
+XWMO_CSRCS += main.c
 
 # 增加xwac中的源文件
 XWMO_CSRCS += xwac/xwlib/crc32.c
