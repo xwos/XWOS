@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：设备栈
+ * @brief 主模块：xwscp子模块
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,14 +18,19 @@
  * > limitations under the License.
  */
 
+#ifndef __bm_xwscp_mif_h__
+#define __bm_xwscp_mif_h__
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <bm/stm32cube/standard.h>
-#include <xwmd/ds/xwds.h>
-#include <bm/stm32cube/xwac/xwds/stm32cube.h>
+#include <xwos/standard.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
+ ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-struct xwds stm32cube_ds;
+xwer_t bm_xwscp_start(void);
+
+xwer_t bm_xwscp_stop(void);
+
+#endif /* bm/xwscp/mif.h */

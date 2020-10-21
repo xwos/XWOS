@@ -33,7 +33,7 @@
   #include <xwos/smp/lock/mutex.h>
 #endif /* XuanWuOS_CFG_CORE__smp */
 #include <bdl/board_init.h>
-#include <bm/stm32cube/init.h>
+#include <bm/stm32cube/mif.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      macros       ******** ******** ********

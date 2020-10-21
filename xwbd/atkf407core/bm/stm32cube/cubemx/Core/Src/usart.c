@@ -30,7 +30,7 @@
 #include "cubemx/Core/Inc/tim.h"
 #include "xwac/xwds/uart.h"
 
-struct HAL_UART_Xwds_driver_data husart1_xwds_drvdata;
+struct MX_UART_DriverData husart1_drvdata;
 
 /* USER CODE END 0 */
 
@@ -123,10 +123,10 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     HAL_NVIC_SetPriority(USART1_IRQn, 3, 0);
     HAL_NVIC_EnableIRQ(USART1_IRQn);
   /* USER CODE BEGIN USART1_MspInit 1 */
-    husart1_xwds_drvdata.halhdl = &husart1;
-    xwosal_splk_init(&husart1_xwds_drvdata.tx.splk);
-    xwosal_cdt_init(&husart1_xwds_drvdata.tx.cdt);
-    husart1_xwds_drvdata.tx.rc = -ECANCELED;
+    husart1_drvdata.halhdl = &husart1;
+    xwosal_splk_init(&husart1_drvdata.tx.splk);
+    xwosal_cdt_init(&husart1_drvdata.tx.cdt);
+    husart1_drvdata.tx.rc = -ECANCELED;
 
   /* USER CODE END USART1_MspInit 1 */
   }
@@ -138,7 +138,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
   if(uartHandle->Instance==USART1)
   {
   /* USER CODE BEGIN USART1_MspDeInit 0 */
-    xwosal_cdt_destroy(&husart1_xwds_drvdata.tx.cdt);
+    xwosal_cdt_destroy(&husart1_drvdata.tx.cdt);
 
   /* USER CODE END USART1_MspDeInit 0 */
     /* Peripheral clock disable */
@@ -191,7 +191,7 @@ void MX_USART1_Timer_Stop(void)
 
 void MX_USART1_Timer_Callback(void)
 {
-  stm32cube_usart1_cb_rxdma_timer(husart1_xwds_drvdata.dmauartc);
+  stm32cube_usart1_cb_rxdma_timer(husart1_drvdata.dmauartc);
 }
 
 xwer_t MX_USART1_RXDMA_Start(xwu8_t * mem, xwsz_t size)
@@ -214,7 +214,7 @@ void MX_USART1_RxHalfCpltCallback(UART_HandleTypeDef * huart)
 
   hdma = huart->hdmarx;
   if (HAL_DMA_ERROR_NONE == hdma->ErrorCode) {
-    stm32cube_usart1_cb_rxdma_halfcplt(husart1_xwds_drvdata.dmauartc);
+    stm32cube_usart1_cb_rxdma_halfcplt(husart1_drvdata.dmauartc);
   } else {
   }
 }
@@ -225,7 +225,7 @@ void MX_USART1_RxCpltCallback(UART_HandleTypeDef * huart)
 
   hdma = huart->hdmarx;
   if (HAL_DMA_ERROR_NONE == hdma->ErrorCode) {
-    stm32cube_usart1_cb_rxdma_cplt(husart1_xwds_drvdata.dmauartc);
+    stm32cube_usart1_cb_rxdma_cplt(husart1_drvdata.dmauartc);
   } else {
   }
 }
@@ -263,7 +263,7 @@ void MX_USART1_TxCpltCallback(UART_HandleTypeDef * huart)
   } else {
     rc = -EIO;
   }
-  stm32cube_usart1_cb_txdma_cplt(husart1_xwds_drvdata.dmauartc, rc);
+  stm32cube_usart1_cb_txdma_cplt(husart1_drvdata.dmauartc, rc);
 }
 
 xwer_t MX_USART1_Putc(xwu8_t byte)
@@ -302,7 +302,7 @@ void MX_USART1_ErrorCallback(UART_HandleTypeDef * huart)
     huart->ErrorCode &= ~(HAL_UART_ERROR_PE);
   }
   if (HAL_UART_STATE_READY == huart->RxState) {
-    stm32cube_usart1_cb_rxdma_restart(husart1_xwds_drvdata.dmauartc);
+    stm32cube_usart1_cb_rxdma_restart(husart1_drvdata.dmauartc);
   }
 }
 

@@ -43,7 +43,6 @@
  ******** ******** ********   board modules   ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define BMCFG_stm32cube                         1
-#define BMCFG_xwpcp                             1
-#define BMCFG_xwscp                             1
+#define BMCFG_main                              1
 
 #endif /* cfg/board.h */

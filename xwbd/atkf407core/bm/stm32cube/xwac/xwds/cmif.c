@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：设备栈初始化
+ * @brief STM32CUBE：子模块接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -28,8 +28,8 @@
 #include <xwmd/ds/device.h>
 #include <xwmd/ds/soc/chip.h>
 #include <xwmd/ds/uart/dma.h>
-#include <bm/stm32cube/xwac/xwds/stm32cube.h>
-#include <bm/stm32cube/xwac/xwds/init.h>
+#include <bm/stm32cube/xwac/xwds/device.h>
+#include <bm/stm32cube/xwac/xwds/cmif.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -42,11 +42,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********     static function prototypes      ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static
-xwer_t stm32cube_xwds_soc_start(void);
-
-static
-xwer_t stm32cube_xwds_soc_stop(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
@@ -66,14 +61,8 @@ xwer_t stm32cube_xwds_ll_start(void)
                 goto err_soc_start;
         }
 
-        rc = stm32cube_xwds_uart_start();
-        if (rc < 0) {
-                goto err_xwds_uart_start;
-        }
         return XWOK;
 
-err_xwds_uart_start:
-        BDL_BUG();
 err_soc_start:
         BDL_BUG();
         return rc;
@@ -83,25 +72,48 @@ xwer_t stm32cube_xwds_ll_stop(void)
 {
         xwer_t rc;
 
-        rc = stm32cube_xwds_uart_stop();
-        if (rc < 0) {
-                goto err_xwds_uart_stop;
-        }
-
         rc = stm32cube_xwds_soc_stop();
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_stop;
         }
         return XWOK;
 
-err_xwds_uart_stop:
-        BDL_BUG();
 err_soc_stop:
         BDL_BUG();
         return rc;
 }
 
-static
+xwer_t stm32cube_xwds_start(void)
+{
+        xwer_t rc;
+
+        rc = stm32cube_xwds_uart_start();
+        if (rc < 0) {
+                goto err_uart_start;
+        }
+        return XWOK;
+
+err_uart_start:
+        BDL_BUG();
+        return rc;
+}
+
+xwer_t stm32cube_xwds_stop(void)
+{
+        xwer_t rc;
+
+        rc = stm32cube_xwds_uart_stop();
+        if (rc < 0) {
+                goto err_uart_stop;
+        }
+
+        return XWOK;
+
+err_uart_stop:
+        BDL_BUG();
+        return rc;
+}
+
 xwer_t stm32cube_xwds_soc_start(void)
 {
         xwer_t rc;
@@ -129,7 +141,6 @@ err_dev_probe:
         return rc;
 }
 
-static
 xwer_t stm32cube_xwds_soc_stop(void)
 {
         xwds_device_stop(xwds_static_cast(struct xwds_device *,

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Board Module: xwpcp
+ * @brief 主模块：xwpcp子模块
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -25,8 +25,8 @@
 #include <xwmd/isc/xwpcp/protocol.h>
 #include <xwmd/isc/xwpcp/api.h>
 #include <xwmd/isc/xwpcp/hwif/uart.h>
-#include <bm/stm32cube/xwac/xwds/stm32cube.h>
-#include <bm/xwpcp/xwmo.h>
+#include <bm/stm32cube/mif.h>
+#include <bm/main/xwpcp.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********

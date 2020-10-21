@@ -33,18 +33,15 @@ CUBEMX_CSRCS += Core/Src/isr.c
 XWMO_CSRCS :=
 XWMO_CSRCS += $(addprefix cubemx/,$(CUBEMX_CSRCS))
 
-XWMO_CSRCS += init.c
-XWMO_CSRCS += xwmo.c
+XWMO_CSRCS += mif.c
 
 # 增加xwac中的源文件
 XWMO_CSRCS += xwac/xwlib/crc32.c
 XWMO_CSRCS += xwac/xwlib/log.c
 XWMO_CSRCS += xwac/xwos/hook.c
 XWMO_CSRCS += xwac/xwos/vector.c
-XWMO_CSRCS += xwac/xwds/stm32cube.c
-XWMO_CSRCS += xwac/xwds/init.c
-XWMO_CSRCS += xwac/xwds/soc.c
-XWMO_CSRCS += xwac/xwds/uart.c
+
+XWMO_CSRCS += $(call getAllFileUnderXwmoDir,*.c,xwac/xwds)
 
 # 定义编译选项
 XWMO_CFLAGS := -include standard.h

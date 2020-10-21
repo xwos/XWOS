@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Board Module: STM32CUBE
+ * @brief 主模块：应用程序入口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,88 +21,106 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <bm/stm32cube/standard.h>
-#include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
+#include <xwos/osal/scheduler.h>
 #include <xwmd/ds/soc/gpio.h>
-#include <bm/stm32cube/cubemx/Core/Inc/main.h>
-#include <bm/stm32cube/cubemx/Core/Inc/isr.h>
-#include <bm/stm32cube/xwac/xwds/stm32cube.h>
-#include <bm/stm32cube/xwmo.h>
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+#include <bdl/standard.h>
+#include <bm/stm32cube/mif.h>
+#include <xwam/example/sync/flag/xwmo.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define LED_TASK_PRIORITY \
-        (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 1))
+#define MAIN_THRD_PRIORITY XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 0)
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t led_task(void * arg);
+static
+xwer_t main_thrd(void * arg);
+
+static
+xwer_t led_task(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief 连接占位符
- * @note
- * + 确保链接时使用此符号的文件。
- */
-void * const stm32cube_linkage_placeholder[] = {
-        stm32cube_override_linkage_msp,
-        stm32cube_override_linkage_it,
+const struct xwosal_thrd_desc main_thrd_td = {
+        .name = "bdl.init.thrd",
+        .prio = MAIN_THRD_PRIORITY,
+        .stack = XWOSAL_THRD_STACK_DYNAMIC,
+        .stack_size = 4096,
+        .func = (xwosal_thrd_f)main_thrd,
+        .arg = NULL,
+        .attr = XWSDOBJ_ATTR_PRIVILEGED,
 };
-
-const struct xwosal_thrd_desc stm32cube_tbd[] = {
-        [0] = {
-                .name = "task.led",
-                .prio = LED_TASK_PRIORITY,
-                .stack = NULL,
-                .stack_size = 2048,
-                .func = led_task,
-                .arg = NULL,
-                .attr = XWSDOBJ_ATTR_PRIVILEGED,
-        },
-};
-
-xwid_t stm32cube_tid[xw_array_size(stm32cube_tbd)];
+xwid_t main_thrd_id;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t bm_stm32cube_start(void)
+xwer_t xwos_main(void)
 {
         xwer_t rc;
-        xwsq_t i;
 
-        for (i = 0; i < xw_array_size(stm32cube_tbd); i++) {
-                rc = xwosal_thrd_create(&stm32cube_tid[i], stm32cube_tbd[i].name,
-                                        stm32cube_tbd[i].func,
-                                        stm32cube_tbd[i].arg,
-                                        stm32cube_tbd[i].stack_size,
-                                        stm32cube_tbd[i].prio,
-                                        stm32cube_tbd[i].attr);
-                if (rc < 0) {
-                        goto err_thrd_create;
-                }
+        rc = xwosal_thrd_create(&main_thrd_id,
+                                main_thrd_td.name,
+                                main_thrd_td.func,
+                                main_thrd_td.arg,
+                                main_thrd_td.stack_size,
+                                main_thrd_td.prio,
+                                main_thrd_td.attr);
+        if (rc < 0) {
+                goto err_init_thrd_create;
         }
+
+        rc = xwosal_scheduler_start_lc();
+        if (rc < 0) {
+                goto err_scheduler_start_lc;
+        }
+
         return XWOK;
 
-err_thrd_create:
+err_init_thrd_create:
+        BDL_BUG();
+err_scheduler_start_lc:
         BDL_BUG();
         return rc;
 }
 
-xwer_t led_task(void * arg)
+static
+xwer_t main_thrd(void * arg)
+{
+        xwer_t rc;
+
+        XWOS_UNUSED(arg);
+
+        rc = stm32cube_start();
+        if (rc < 0) {
+                goto err_stm32cube_start;
+        }
+
+        rc = example_flag_start();
+        if (rc < 0) {
+                goto err_example_flag_start;
+        }
+
+        rc = led_task();
+
+        return rc;
+
+err_example_flag_start:
+        BDL_BUG();
+err_stm32cube_start:
+        BDL_BUG();
+        return rc;
+}
+
+static
+xwer_t led_task(void)
 {
         xwtm_t xwtm;
 
-        XWOS_UNUSED(arg);
         xwds_gpio_req(&stm32cube_soc_cb,
                       XWDS_GPIO_PORT_F,
                       XWDS_GPIO_PIN_9);
