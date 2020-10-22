@@ -82,14 +82,15 @@ void axisram_init(void);
 static
 void sram4_init(void);
 
+static
+void sdram_init(void);
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_init_code
 void stm32cube_lowlevel_init(void)
 {
-        SCB_EnableICache();
-        SCB_EnableDCache();
         SystemInit();
         __HAL_RCC_D2SRAM1_CLK_ENABLE();
         __HAL_RCC_D2SRAM2_CLK_ENABLE();
@@ -109,6 +110,16 @@ void stm32cube_init(void)
 
         rc = stm32cube_xwds_ll_start();
         BDL_BUG_ON(rc < 0);
+
+        sdram_init();
+
+        /*
+           若SDRAM、QSPI Flash等可映射到内存地址上的器件未初始化完成，
+           开启Cache可能会因为Cache的预取操作去访问这些器件导致宕机。
+         */
+        SCB_EnableICache();
+        SCB_EnableDCache();
+        SCB_CleanInvalidateDCache();
 
         rc = xwmm_mempool_init(sdram_mempool, "SDRAM",
                                (xwptr_t)sdram_mr_origin,
@@ -186,5 +197,17 @@ void sram4_init(void)
                         dst++;
                         src++;
                 }
+        }
+}
+
+static
+void sdram_init(void)
+{
+        xwsq_t i;
+        xwsz_t * origin = (xwsz_t *)sdram_mr_origin;
+        xwsz_t n = (xwsz_t)sdram_mr_size / sizeof(xwsz_t);
+
+        for (i = 0; i < n; i++) {
+                origin[i] = 0;
         }
 }
