@@ -97,9 +97,13 @@ xwer_t xwds_i2cm_cvop_probe(struct xwds_i2cm * i2cm)
 
         XWDS_VALIDATE(i2cm->cfg, "nullptr", -EFAULT);
 
-        rc = xwosal_mtx_init(&i2cm->xferlock, XWOSAL_SD_PRIORITY_RT_MIN);
+        rc = xwosal_mtx_init(&i2cm->xfer.lock, XWOSAL_SD_PRIORITY_RT_MIN);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_mtx_init;
+                goto err_xfer_mtx_init;
+        }
+        rc = xwosal_mtx_init(&i2cm->abort.lock, XWOSAL_SD_PRIORITY_RT_MIN);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_abort_mtx_init;
         }
         rc = xwds_device_cvop_probe(&i2cm->dev);
         if (__xwcc_unlikely(rc < 0)) {
@@ -108,8 +112,10 @@ xwer_t xwds_i2cm_cvop_probe(struct xwds_i2cm * i2cm)
         return XWOK;
 
 err_dev_cvop_probe:
-        xwosal_mtx_destroy(&i2cm->xferlock);
-err_mtx_init:
+        xwosal_mtx_destroy(&i2cm->abort.lock);
+err_abort_mtx_init:
+        xwosal_mtx_destroy(&i2cm->xfer.lock);
+err_xfer_mtx_init:
         return rc;
 }
 
@@ -128,7 +134,8 @@ xwer_t xwds_i2cm_cvop_remove(struct xwds_i2cm * i2cm)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_cvop_remove;
         }
-        xwosal_mtx_destroy(&i2cm->xferlock);
+        xwosal_mtx_destroy(&i2cm->abort.lock);
+        xwosal_mtx_destroy(&i2cm->xfer.lock);
         return XWOK;
 
 err_dev_cvop_remove:
@@ -204,6 +211,7 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
 
         XWDS_VALIDATE(i2cm, "nullptr", -EFAULT);
         XWDS_VALIDATE(msg, "nullptr", -EFAULT);
+        XWDS_VALIDATE((msg->flag & XWDS_I2C_F_DIRMSK), "no-direction", -EINVAL);
         XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_i2cm_grab(i2cm);
@@ -215,7 +223,7 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
                 goto err_i2cm_request;
         }
 
-        rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&i2cm->xferlock), xwtm);
+        rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&i2cm->xfer.lock), xwtm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_i2cm_lock;
         }
@@ -228,14 +236,13 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_xfer;
         }
-        xwosal_mtx_unlock(xwosal_mtx_get_id(&i2cm->xferlock));
-
+        xwosal_mtx_unlock(xwosal_mtx_get_id(&i2cm->xfer.lock));
         xwds_i2cm_release(i2cm);
         xwds_i2cm_put(i2cm);
         return XWOK;
 
 err_drv_xfer:
-        xwosal_mtx_unlock(xwosal_mtx_get_id(&i2cm->xferlock));
+        xwosal_mtx_unlock(xwosal_mtx_get_id(&i2cm->xfer.lock));
 err_i2cm_lock:
         xwds_i2cm_release(i2cm);
 err_i2cm_request:
@@ -245,7 +252,9 @@ err_i2cm_grab:
 }
 
 __xwds_api
-xwer_t xwds_i2cm_reset(struct xwds_i2cm * i2cm, xwtm_t * xwtm)
+xwer_t xwds_i2cm_abort(struct xwds_i2cm * i2cm,
+                       xwu16_t address, xwu16_t addrmode,
+                       xwtm_t * xwtm)
 {
         xwer_t rc;
         const struct xwds_i2cm_driver * drv;
@@ -262,27 +271,26 @@ xwer_t xwds_i2cm_reset(struct xwds_i2cm * i2cm, xwtm_t * xwtm)
                 goto err_i2cm_request;
         }
 
-        rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&i2cm->xferlock), xwtm);
+        rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&i2cm->abort.lock), xwtm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_i2cm_lock;
         }
         drv = xwds_static_cast(const struct xwds_i2cm_driver *, i2cm->dev.drv);
-        if ((drv) && (drv->reset)) {
-                rc = drv->reset(i2cm, xwtm);
+        if ((drv) && (drv->abort)) {
+                rc = drv->abort(i2cm, address, addrmode, xwtm);
         } else {
                 rc = -ENOSYS;
         }
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_drv_reset;
+                goto err_drv_abort;
         }
-        xwosal_mtx_unlock(xwosal_mtx_get_id(&i2cm->xferlock));
-
+        xwosal_mtx_unlock(xwosal_mtx_get_id(&i2cm->abort.lock));
         xwds_i2cm_release(i2cm);
         xwds_i2cm_put(i2cm);
         return XWOK;
 
-err_drv_reset:
-        xwosal_mtx_unlock(xwosal_mtx_get_id(&i2cm->xferlock));
+err_drv_abort:
+        xwosal_mtx_unlock(xwosal_mtx_get_id(&i2cm->abort.lock));
 err_i2cm_lock:
         xwds_i2cm_release(i2cm);
 err_i2cm_request:

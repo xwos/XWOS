@@ -29,14 +29,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief I2C主机配置
- */
-struct xwds_i2cm_cfg {
-        xwu32_t speed; /**< 总线速度（单位：HZ） */
-        void * xwccfg; /**< SOC芯片私有配置 */
-};
-
 struct xwds_i2cm;
 
 /**
@@ -44,10 +36,12 @@ struct xwds_i2cm;
  */
 struct xwds_i2cm_driver {
         struct xwds_driver base; /**< C语言面向对象：继承struct xwds_driver */
-        xwer_t (* xfer)(struct xwds_i2cm *,
-                        struct xwds_i2c_msg *,
-                        xwtm_t *); /**< 传输 */
-        xwer_t (* reset)(struct xwds_i2cm *, xwtm_t *); /**< 复位 */
+        xwer_t (* xfer)(struct xwds_i2cm * /*i2cm*/,
+                        struct xwds_i2c_msg * /*msg*/,
+                        xwtm_t * /*xwtm*/); /**< 传输 */
+        xwer_t (* abort)(struct xwds_i2cm * /*i2cm*/,
+                         xwu16_t /*address*/, xwu16_t /*addrmode*/,
+                         xwtm_t * /*xwtm*/); /**< 中止传输 */
 };
 
 /**
@@ -57,10 +51,15 @@ struct xwds_i2cm {
         struct xwds_device dev; /**< C语言面向对象：继承struct xwds_device */
 
         /* attributes */
-        const struct xwds_i2cm_cfg * cfg; /**< 配置 */
+        void * xwccfg; /**< SOC芯片私有配置 */
 
         /* private */
-        struct xwosal_mtx xferlock; /**< 多线程安全访问的互斥锁 */
+        struct {
+                struct xwosal_mtx lock; /**< 传输API的互斥锁 */
+        } xfer; /**< 传输API的状态 */
+        struct {
+                struct xwosal_mtx lock; /**< 中止API的互斥锁 */
+        } abort; /**< 中止API的状态 */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -75,7 +74,7 @@ void xwds_i2cm_destruct(struct xwds_i2cm * i2cm);
 
 /******** ******** ******** APIs ******** ******** ********/
 /**
- * @brief XWDS API：发送I2C消息
+ * @brief XWDS API：传输I2C消息
  * @param i2cm: (I) I2C主机控制器对象指针
  * @param msg: (I) I2C消息结构体的指针
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
@@ -85,6 +84,7 @@ void xwds_i2cm_destruct(struct xwds_i2cm * i2cm);
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 设备对象不可引用
  * @retval -ESHUTDOWN: 设备没有运行
+ * @retval -EADDRNOTAVAIL: 地址无响应
  * @retval -ETIMEDOUT: 超时
  * @note
  * - 同步/异步：同步
@@ -96,8 +96,12 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
                       xwtm_t * xwtm);
 
 /**
- * @brief XWDS API：复位I2C主机
+ * @brief XWDS API：中止I2C总线传输
  * @param i2cm: (I) I2C主机控制器对象指针
+ * @param address: (I) I2C地址
+ * @param addrmode: (I) I2C地址模式，取值：
+ *                      @ref XWDS_I2C_F_7BITADDR 7位地址模式
+ *                      @ref XWDS_I2C_F_10BITADDR 10位地址模式
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -105,6 +109,7 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 设备对象不可引用
  * @retval -ESHUTDOWN: 设备没有运行
+ * @retval -EADDRNOTAVAIL: 地址无响应
  * @retval -ETIMEDOUT: 超时
  * @note
  * - 同步/异步：同步
@@ -112,7 +117,9 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
  * - 重入性：可重入
  */
 __xwds_api
-xwer_t xwds_i2cm_reset(struct xwds_i2cm * i2cm, xwtm_t * xwtm);
+xwer_t xwds_i2cm_abort(struct xwds_i2cm * i2cm,
+                       xwu16_t address, xwu16_t addrmode,
+                       xwtm_t * xwtm);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   inline function implementations   ******** ********
