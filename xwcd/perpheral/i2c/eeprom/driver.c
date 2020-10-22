@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 基于设备栈的EEPROM统一的驱动接口
+ * @brief I2C EEPROM 驱动
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -22,6 +22,8 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
+#include <xwmd/ds/soc/gpio.h>
+#include <xwmd/ds/i2c/perpheral.h>
 #include <xwcd/perpheral/i2c/eeprom/device.h>
 #include <xwcd/perpheral/i2c/eeprom/driver.h>
 
@@ -40,162 +42,249 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/******** ******** base driver ******** ********/
+static
+xwer_t xwds_eeprom_check_desc(struct xwds_eeprom * eeprom)
+{
+        const struct xwds_eeprom_parameter * parameter;
+        xwsz_t page_size;
+        xwsz_t total;
+        xwer_t rc;
+
+        parameter = &eeprom->parameter;
+        page_size = parameter->page_size;
+        total = parameter->total;
+        if (__xwcc_unlikely(total % page_size)) {
+                rc = -EINVAL;
+        } else {
+                rc = XWOK;
+        }
+        return rc;
+}
+
+xwer_t xwds_eeprom_drv_start(struct xwds_device * dev)
+{
+        struct xwds_eeprom * eeprom;
+        const struct xwds_resource_gpio * gpiorsc;
+        xwer_t rc;
+
+        eeprom = xwds_static_cast(struct xwds_eeprom *, dev);
+
+        rc = xwds_eeprom_check_desc(eeprom);
+        if (rc < 0) {
+                goto err_chk_desc;
+        }
+
+        /* request GPIO resources */
+        gpiorsc = eeprom->pwr_gpiorsc;
+        if (NULL != gpiorsc) {
+                rc = xwds_gpio_req(gpiorsc->soc, gpiorsc->port, gpiorsc->pinmask);
+                if (rc < 0) {
+                        goto err_pwrgpio_req;
+                }
+        }
+
+        gpiorsc = eeprom->wp_gpiorsc;
+        if (NULL != gpiorsc) {
+                rc = xwds_gpio_req(gpiorsc->soc, gpiorsc->port, gpiorsc->pinmask);
+                if (rc < 0) {
+                        goto err_wpgpio_req;
+                }
+        }
+        return XWOK;
+
+err_wpgpio_req:
+        gpiorsc = eeprom->pwr_gpiorsc;
+        if (NULL != gpiorsc) {
+                xwds_gpio_rls(gpiorsc->soc, gpiorsc->port, gpiorsc->pinmask);
+        }
+err_pwrgpio_req:
+err_chk_desc:
+        return rc;
+}
+
+xwer_t xwds_eeprom_drv_stop(struct xwds_device * dev)
+{
+        struct xwds_eeprom * eeprom;
+        const struct xwds_resource_gpio * gpiorsc;
+
+        eeprom = xwds_static_cast(struct xwds_eeprom *, dev);
+
+        /* release GPIO resources */
+        gpiorsc = eeprom->wp_gpiorsc;
+        if (NULL != gpiorsc) {
+                xwds_gpio_rls(gpiorsc->soc, gpiorsc->port, gpiorsc->pinmask);
+        }
+
+        gpiorsc = eeprom->pwr_gpiorsc;
+        if (NULL != gpiorsc) {
+                xwds_gpio_rls(gpiorsc->soc, gpiorsc->port, gpiorsc->pinmask);
+        }
+
+        return XWOK;
+}
+
+#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+xwer_t xwds_eeprom_drv_suspend(struct xwds_device * dev)
+{
+        return xwds_eeprom_drv_stop(dev);
+}
+
+xwer_t xwds_eeprom_drv_resume(struct xwds_device * dev)
+{
+        return xwds_eeprom_drv_start(dev);
+}
+#endif /* XWMDCFG_ds_PM */
+
 /******** ******** I2C EEPROM operations ******** ********/
-/**
- * @brief XWBSP API：开启EEPROM的电源
- * @param eeprom: (I) I2C EEPROM对象的指针
- * @retrun 错误码
- */
-__xwbsp_api
 xwer_t xwds_eeprom_power_on(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
 
-        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_EEPROM_IOC_PWR_ON);
+        if (eeprom->pwr_gpiorsc) {
+                const struct xwds_resource_gpio * gpiorsc = eeprom->pwr_gpiorsc;
+                rc = xwds_gpio_set(gpiorsc->soc,
+                                   gpiorsc->port,
+                                   gpiorsc->pinmask);
+        } else {
+                rc = -ENOSYS;
+        }
         return rc;
 }
 
-/**
- * @brief XWBSP API：关闭EEPROM的电源
- * @param eeprom: (I) I2C EEPROM对象的指针
- * @retrun 错误码
- */
-__xwbsp_api
 xwer_t xwds_eeprom_power_off(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
 
-        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_EEPROM_IOC_PWR_OFF);
+        if (eeprom->pwr_gpiorsc) {
+                const struct xwds_resource_gpio * gpiorsc = eeprom->pwr_gpiorsc;
+                rc = xwds_gpio_reset(gpiorsc->soc,
+                                     gpiorsc->port,
+                                     gpiorsc->pinmask);
+        } else {
+                rc = -ENOSYS;
+        }
         return rc;
 }
 
-/**
- * @brief XWBSP API：开启EEPROM的写保护
- * @param eeprom: (I) I2C EEPROM对象的指针
- * @retrun 错误码
- */
-__xwbsp_api
 xwer_t xwds_eeprom_wp_enable(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
 
-        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_EEPROM_IOC_WP_EN);
+        if (eeprom->wp_gpiorsc) {
+                const struct xwds_resource_gpio * gpiorsc = eeprom->wp_gpiorsc;
+                rc = xwds_gpio_set(gpiorsc->soc,
+                                   gpiorsc->port,
+                                   gpiorsc->pinmask);
+        } else {
+                rc = -ENOSYS;
+        }
         return rc;
 }
 
-/**
- * @brief XWBSP API：关闭EEPROM的写保护
- * @param eeprom: (I) I2C EEPROM对象的指针
- * @retrun 错误码
- */
-__xwbsp_api
 xwer_t xwds_eeprom_wp_disable(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
 
-        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_EEPROM_IOC_WP_DS);
+        if (eeprom->wp_gpiorsc) {
+                const struct xwds_resource_gpio * gpiorsc = eeprom->wp_gpiorsc;
+                rc = xwds_gpio_reset(gpiorsc->soc,
+                                     gpiorsc->port,
+                                     gpiorsc->pinmask);
+        } else {
+                rc = -ENOSYS;
+        }
         return rc;
 }
 
-/**
- * @brief XWBSP API：写一个字节到EEPROM
- * @param eeprom: (I) I2C EEPROM对象的指针
- * @param data: (I) 数据
- * @param addr: (I) 地址
- * @param xwtm: (I) 期望的阻塞等待时间
- *              (O) 函数返回时，剩余的期望值
- * @retrun 错误码
- */
-__xwbsp_api
 xwer_t xwds_eeprom_putc(struct xwds_eeprom * eeprom,
                         xwu8_t data, xwptr_t addr,
                         xwtm_t * xwtm)
 {
+        const struct xwds_eeprom_driver * drv;
         xwer_t rc;
 
-        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_EEPROM_IOC_PUTC,
-                             data, addr, xwtm);
+        drv = xwds_static_cast(const struct xwds_eeprom_driver *,
+                               eeprom->i2cp.dev.drv);
+        if ((drv) && (drv->putc)) {
+                rc = drv->putc(eeprom, data, addr, xwtm);
+        } else {
+                rc = -ENOSYS;
+        }
         return rc;
 }
 
-/**
- * @brief XWBSP API：从EEPROM中读取一个字节
- * @param eeprom: (I) I2C EEPROM对象的指针
- * @param data: (O) 指向返回数据的缓冲区的指针
- * @param addr: (I) 地址
- * @param xwtm: (I) 期望的阻塞等待时间
- *              (O) 函数返回时，剩余的期望值
- * @retrun 错误码
- */
-__xwbsp_api
 xwer_t xwds_eeprom_getc(struct xwds_eeprom * eeprom,
                         xwu8_t * buf, xwptr_t addr,
                         xwtm_t * xwtm)
 {
+        const struct xwds_eeprom_driver * drv;
         xwer_t rc;
 
-        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_EEPROM_IOC_GETC,
-                             buf, addr, xwtm);
+        drv = xwds_static_cast(const struct xwds_eeprom_driver *,
+                               eeprom->i2cp.dev.drv);
+        if ((drv) && (drv->getc)) {
+                rc = drv->getc(eeprom, buf, addr, xwtm);
+        } else {
+                rc = -ENOSYS;
+        }
         return rc;
 }
 
-/**
- * @brief XWBSP API：写一页数据到EEPROM
- * @param eeprom: (I) I2C EEPROM对象的指针
- * @param data: (I) 数据数组的指针
- * @param size: (I) 数据的大小
- * @param seq: (I) 页的序号
- * @param xwtm: (I) 期望的阻塞等待时间
- *              (O) 函数返回时，剩余的期望值
- * @retrun 错误码
- */
-__xwbsp_api
 xwer_t xwds_eeprom_pgwrite(struct xwds_eeprom * eeprom,
-                           xwu8_t data[], xwsz_t size, xwsq_t seq,
+                           xwu8_t * data, xwsz_t * size, xwsq_t pgidx,
                            xwtm_t * xwtm)
 {
+        const struct xwds_eeprom_driver * drv;
         xwer_t rc;
 
-        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_EEPROM_IOC_PGWR,
-                             data, size, seq, xwtm);
+        drv = xwds_static_cast(const struct xwds_eeprom_driver *,
+                               eeprom->i2cp.dev.drv);
+        if ((drv) && (drv->pgwrite)) {
+                rc = drv->pgwrite(eeprom, data, size, pgidx, xwtm);
+        } else {
+                rc = -ENOSYS;
+        }
         return rc;
 }
 
-/**
- * @brief XWBSP API：从EEPROM读一页数据
- * @param eeprom: (I) I2C EEPROM对象的指针
- * @param buf: (O) 指向数组缓冲区的指针
- * @param size: (I) 缓冲区的大小
- *              (O) 实际读取的数据大小
- * @param seq: (I) 页的序号
- * @param xwtm: (I) 期望的阻塞等待时间
- *              (O) 函数返回时，剩余的期望值
- * @retrun 错误码
- */
-__xwbsp_api
 xwer_t xwds_eeprom_pgread(struct xwds_eeprom * eeprom,
-                          xwu8_t buf[], xwsz_t * size, xwsq_t seq,
+                          xwu8_t * buf, xwsz_t * size, xwsq_t pgidx,
                           xwtm_t * xwtm)
 {
+        const struct xwds_eeprom_driver * drv;
         xwer_t rc;
 
-        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_EEPROM_IOC_PGRD,
-                             buf, size, seq, xwtm);
+        drv = xwds_static_cast(const struct xwds_eeprom_driver *,
+                               eeprom->i2cp.dev.drv);
+        if ((drv) && (drv->pgread)) {
+                rc = drv->pgread(eeprom, buf, size, pgidx, xwtm);
+        } else {
+                rc = -ENOSYS;
+        }
         return rc;
 }
 
-/**
- * @brief XWBSP API：复位I2C EEPROM
- * @param eeprom: (I) I2C EEPROM对象的指针
- * @param xwtm: (I) 期望的阻塞等待时间
- *              (O) 函数返回时，剩余的期望值
- * @retrun 错误码
- */
-__xwbsp_api
 xwer_t xwds_eeprom_reset(struct xwds_eeprom * eeprom, xwtm_t * xwtm)
 {
+        struct xwds_i2c_msg msg;
+        xwu8_t dummy;
         xwer_t rc;
 
-        rc = xwds_i2cp_ioctl(&eeprom->i2cp, XWDS_EEPROM_IOC_RESET, xwtm);
+        dummy = 0xFF;
+        msg.addr = 0xFE;
+        msg.flag = XWDS_I2C_F_START | XWDS_I2C_F_WR;
+        msg.data = &dummy;
+        msg.size = 1;
+        rc = xwds_i2cm_xfer(eeprom->i2cp.bus, &msg, xwtm);
+        if (-EADDRNOTAVAIL == rc) {
+                msg.flag = XWDS_I2C_F_START | XWDS_I2C_F_WR | XWDS_I2C_F_STOP;
+                msg.data = NULL;
+                msg.size = 0;
+                rc = xwds_i2cm_xfer(eeprom->i2cp.bus, &msg, xwtm);
+                if (-EADDRNOTAVAIL == rc) {
+                        rc = XWOK;
+                }
+        }
         return rc;
 }

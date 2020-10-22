@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief ATMEL小密度EEPROM(AT24C01/02/04/08/16)驱动
+ * @brief I2C EEPROM 设备
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,35 +18,35 @@
  * > limitations under the License.
  */
 
-#ifndef __xwcd_perpheral_i2c_eeprom_chip_at24sdd_h__
-#define __xwcd_perpheral_i2c_eeprom_chip_at24sdd_h__
-
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwmd/ds/device.h>
 #include <xwmd/ds/i2c/perpheral.h>
+#include <xwcd/perpheral/i2c/eeprom/device.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern __xwbsp_rodata const struct xwds_i2cp_driver at24sdd_drv;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ******** inline  functions ******** ******** ********
+ ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/******** ******** ******** constructor & destructor ******** ******** ********/
+void xwds_eeprom_construct(struct xwds_eeprom * eeprom)
+{
+        xwds_i2cp_construct(&eeprom->i2cp);
+}
 
-#endif /* xwcd/perpheral/i2c/eeprom/chip/at24sdd.h */
+void xwds_eeprom_destruct(struct xwds_eeprom * eeprom)
+{
+        xwds_i2cp_destruct(&eeprom->i2cp);
+}

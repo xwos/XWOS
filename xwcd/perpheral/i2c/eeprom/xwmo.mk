@@ -24,9 +24,10 @@ include $(XWBS_UTIL_MK_XWMO)
 $(eval $(call XwmoReqCfg,XWMDCFG_ds_I2C_MASTER))
 $(eval $(call XwmoReqCfg,XWMDCFG_ds_I2C_PERPHERAL))
 
-XWMO_CSRCS := driver.c
-XWMO_CSRCS += chip/at24sdd.c
-XWMO_CSRCS += chip/at24mdd.c
+XWMO_CSRCS := device.c
+XWMO_CSRCS += driver.c
+XWMO_CSRCS += chip/at24sd.c
+XWMO_CSRCS += chip/at24md.c
 
 XWMO_CFLAGS :=
 XWMO_INCDIRS :=
