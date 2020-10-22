@@ -46,7 +46,7 @@ xwer_t led_task(void);
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 const struct xwosal_thrd_desc main_thrd_td = {
-        .name = "bdl.init.thrd",
+        .name = "main.thrd",
         .prio = MAIN_THRD_PRIORITY,
         .stack = XWOSAL_THRD_STACK_DYNAMIC,
         .stack_size = 4096,
