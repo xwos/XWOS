@@ -33,18 +33,40 @@
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
+#include <bm/stm32cube/standard.h>
+#include <xwos/osal/lock/spinlock.h>
+#include <xwos/osal/sync/condition.h>
+#include <xwmd/ds/i2c/master.h>
 /* USER CODE END Includes */
 
 extern I2C_HandleTypeDef hi2c2;
 
 /* USER CODE BEGIN Private defines */
+#define MX_I2C_MEM_MAXSIZE     256U /**< 单次最大发送的字节数 */
+
+struct MX_I2C_MasterDriverData {
+  I2C_HandleTypeDef * halhdl;
+  struct xwds_i2cm * i2cm;
+  struct xwosal_cdt cdt; /**< 条件量 */
+  struct xwosal_splk splk; /**< 保证发送状态只被单一上下文访问的锁 */
+  struct xwds_i2c_msg * msg; /**< 正在传输的消息 */
+  xwer_t rc; /**< 返回值 */
+  xwu8_t mem[MX_I2C_MEM_MAXSIZE] __xwcc_aligned_l1cacheline; /**< 发送缓冲区 */
+  xwu32_t size; /**< 待发送的数据大小 */
+};
+
+extern struct MX_I2C_MasterDriverData hi2c2_drvdata;
 
 /* USER CODE END Private defines */
 
 void MX_I2C2_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+void MX_I2C2_DeInit(void);
+void MX_I2C2_ReInit(xwu16_t addm);
+xwu16_t MX_I2C2_GetAddressingMode(void);
+xwer_t MX_I2C2_Xfer(struct xwds_i2c_msg * msg);
+xwer_t MX_I2C2_Abort(xwu16_t addr);
 
 /* USER CODE END Prototypes */
 

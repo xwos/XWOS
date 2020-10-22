@@ -27,6 +27,11 @@
 #include "i2c.h"
 
 /* USER CODE BEGIN 0 */
+#include <string.h>
+#include <xwos/lib/xwbop.h>
+#include <bm/stm32cube/xwac/xwds/i2cm.h>
+
+struct MX_I2C_MasterDriverData hi2c2_drvdata;
 
 /* USER CODE END 0 */
 
@@ -134,7 +139,12 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
     HAL_NVIC_SetPriority(I2C2_ER_IRQn, 3, 0);
     HAL_NVIC_EnableIRQ(I2C2_ER_IRQn);
   /* USER CODE BEGIN I2C2_MspInit 1 */
-
+    hi2c2_drvdata.halhdl = &hi2c2;
+    xwosal_splk_init(&hi2c2_drvdata.splk);
+    xwosal_cdt_init(&hi2c2_drvdata.cdt);
+    hi2c2_drvdata.msg = NULL;
+    hi2c2_drvdata.rc = -ECANCELED;
+    hi2c2_drvdata.size = 0;
   /* USER CODE END I2C2_MspInit 1 */
   }
 }
@@ -145,6 +155,7 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
   if(i2cHandle->Instance==I2C2)
   {
   /* USER CODE BEGIN I2C2_MspDeInit 0 */
+    xwosal_cdt_destroy(&hi2c2_drvdata.cdt);
 
   /* USER CODE END I2C2_MspDeInit 0 */
     /* Peripheral clock disable */
@@ -172,6 +183,207 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
 }
 
 /* USER CODE BEGIN 1 */
+void MX_I2C2_DeInit(void)
+{
+  HAL_I2C_DeInit(&hi2c2);
+}
+
+void MX_I2C2_ReInit(xwu16_t addm)
+{
+  HAL_StatusTypeDef hrc;
+  uint32_t AddressingMode;
+
+  if (XWDS_I2C_F_10BITADDR == addm) {
+    AddressingMode = I2C_ADDRESSINGMODE_10BIT;
+  } else {
+    AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  }
+
+  HAL_I2C_DeInit(&hi2c2);
+
+  hi2c2.Init.AddressingMode = AddressingMode;
+  hrc = HAL_I2C_Init(&hi2c2);
+  if (HAL_OK != hrc) {
+    Error_Handler();
+  }
+
+  hrc = HAL_I2CEx_ConfigAnalogFilter(&hi2c2, I2C_ANALOGFILTER_ENABLE);
+  if (HAL_OK != hrc) {
+    Error_Handler();
+  }
+
+  hrc = HAL_I2CEx_ConfigDigitalFilter(&hi2c2, 0);
+  if (HAL_OK != hrc) {
+    Error_Handler();
+  }
+}
+
+xwu16_t MX_I2C2_GetAddressingMode(void)
+{
+  xwu16_t addm;
+
+  if (hi2c2.Init.AddressingMode) {
+    addm = XWDS_I2C_F_7BITADDR;
+  } else {
+    addm = XWDS_I2C_F_10BITADDR;
+  }
+  return addm;
+}
+
+xwer_t MX_I2C2_Xfer(struct xwds_i2c_msg * msg)
+{
+  HAL_StatusTypeDef hrc;
+  xwer_t rc;
+
+  if (NULL == msg) {
+    hi2c2_drvdata.size = 0;
+    hrc = HAL_I2C_Master_Seq_Receive_DMA(&hi2c2, 0xFF, hi2c2_drvdata.mem, 0,
+                                         I2C_FIRST_AND_LAST_FRAME);
+  } else if ((NULL == msg->data) || (0 == msg->size)) {
+    hi2c2_drvdata.size = 0;
+    if (msg->flag & XWDS_I2C_F_RD) {
+      hrc = HAL_I2C_Master_Seq_Receive_DMA(&hi2c2, msg->addr, hi2c2_drvdata.mem, 0,
+                                           I2C_FIRST_AND_LAST_FRAME);
+    } else {
+      hrc = HAL_I2C_Master_Seq_Transmit_DMA(&hi2c2, msg->addr, hi2c2_drvdata.mem, 0,
+                                            I2C_FIRST_AND_LAST_FRAME);
+    }
+  } else {
+    hi2c2_drvdata.size = msg->size;
+    if (msg->flag & XWDS_I2C_F_RD) {
+      if ((msg->flag & XWDS_I2C_F_START) && (msg->flag & XWDS_I2C_F_STOP)) {
+        hrc = HAL_I2C_Master_Seq_Receive_DMA(&hi2c2, msg->addr,
+                                             hi2c2_drvdata.mem, hi2c2_drvdata.size,
+                                             I2C_FIRST_AND_LAST_FRAME);
+      } else if (msg->flag & XWDS_I2C_F_START) {
+        hrc = HAL_I2C_Master_Seq_Receive_DMA(&hi2c2, msg->addr,
+                                             hi2c2_drvdata.mem, hi2c2_drvdata.size,
+                                             I2C_FIRST_FRAME);
+      } else if (msg->flag & XWDS_I2C_F_STOP) {
+        hrc = HAL_I2C_Master_Seq_Receive_DMA(&hi2c2, msg->addr,
+                                             hi2c2_drvdata.mem, hi2c2_drvdata.size,
+                                             I2C_OTHER_AND_LAST_FRAME);
+      } else {
+        hrc = HAL_I2C_Master_Seq_Receive_DMA(&hi2c2, msg->addr,
+                                             hi2c2_drvdata.mem, hi2c2_drvdata.size,
+                                             I2C_OTHER_FRAME);
+      }
+    } else {
+      memcpy(hi2c2_drvdata.mem, msg->data, msg->size);
+      SCB_CleanDCache_by_Addr((uint32_t *)hi2c2_drvdata.mem,
+                              (int32_t)ALIGN(msg->size, CPUCFG_L1_CACHELINE_SIZE));
+
+      if ((msg->flag & XWDS_I2C_F_START) && (msg->flag & XWDS_I2C_F_STOP)) {
+        hrc = HAL_I2C_Master_Seq_Transmit_DMA(&hi2c2, msg->addr,
+                                              hi2c2_drvdata.mem, hi2c2_drvdata.size,
+                                              I2C_FIRST_AND_LAST_FRAME);
+      } else if (msg->flag & XWDS_I2C_F_START) {
+        hrc = HAL_I2C_Master_Seq_Transmit_DMA(&hi2c2, msg->addr,
+                                              hi2c2_drvdata.mem, hi2c2_drvdata.size,
+                                              I2C_FIRST_FRAME);
+      } else if (msg->flag & XWDS_I2C_F_STOP) {
+        hrc = HAL_I2C_Master_Seq_Transmit_DMA(&hi2c2, msg->addr,
+                                              hi2c2_drvdata.mem, hi2c2_drvdata.size,
+                                              I2C_OTHER_AND_LAST_FRAME);
+      } else {
+        hrc = HAL_I2C_Master_Seq_Transmit_DMA(&hi2c2, msg->addr,
+                                              hi2c2_drvdata.mem, hi2c2_drvdata.size,
+                                              I2C_OTHER_FRAME);
+      }
+    }
+  }
+  if (HAL_OK == hrc) {
+          rc = XWOK;
+  } else if (HAL_BUSY == hrc) {
+          rc = -EBUSY;
+  } else {
+          rc = -EIO;
+  }
+  return rc;
+}
+
+xwer_t MX_I2C2_Abort(xwu16_t addr)
+{
+  HAL_StatusTypeDef hrc;
+  xwer_t rc;
+
+  hrc = HAL_I2C_Master_Abort_IT(&hi2c2, addr);
+  if (HAL_OK == hrc) {
+          rc = XWOK;
+  } else if (HAL_BUSY == hrc) {
+          rc = -EBUSY;
+  } else {
+          rc = -EIO;
+  }
+  return rc;
+}
+
+static
+void MX_I2C2_MasterTxCpltCallback(I2C_HandleTypeDef * hi2c)
+{
+  stm32cube_i2c2m_cb_xfercplt(hi2c2_drvdata.i2cm, XWOK);
+}
+
+static
+void MX_I2C2_MasterRxCpltCallback(I2C_HandleTypeDef * hi2c)
+{
+  SCB_InvalidateDCache_by_Addr((uint32_t *)hi2c2_drvdata.mem,
+                               (int32_t)ALIGN(hi2c2_drvdata.size,
+                                              CPUCFG_L1_CACHELINE_SIZE));
+  memcpy(hi2c2_drvdata.msg->data, hi2c2_drvdata.mem, hi2c2_drvdata.size);
+  stm32cube_i2c2m_cb_xfercplt(hi2c2_drvdata.i2cm, XWOK);
+}
+
+static
+void MX_I2C2_ErrorCallback(I2C_HandleTypeDef * hi2c)
+{
+  if (hi2c->ErrorCode & HAL_I2C_ERROR_AF) {
+        stm32cube_i2c2m_cb_xfercplt(hi2c2_drvdata.i2cm, -EADDRNOTAVAIL);
+  } else if (hi2c->ErrorCode &
+      (HAL_I2C_ERROR_BERR | HAL_I2C_ERROR_ARLO |
+       HAL_I2C_ERROR_OVR | HAL_I2C_ERROR_DMA | HAL_I2C_ERROR_SIZE)) {
+        stm32cube_i2c2m_cb_xfercplt(hi2c2_drvdata.i2cm, -EIO);
+  } else if (hi2c->ErrorCode & HAL_I2C_ERROR_TIMEOUT) {
+        stm32cube_i2c2m_cb_xfercplt(hi2c2_drvdata.i2cm, -ETIMEDOUT);
+  } else {
+        stm32cube_i2c2m_cb_xfercplt(hi2c2_drvdata.i2cm, -EBUG);
+  }
+}
+
+static
+void MX_I2C2_AbortCpltCallback(I2C_HandleTypeDef * hi2c)
+{
+  stm32cube_i2c2m_cb_xfercplt(hi2c2_drvdata.i2cm, -ECONNABORTED);
+}
+
+/* Redefine HAL weak callback */
+void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef * hi2c)
+{
+  if (&hi2c2 == hi2c) {
+    MX_I2C2_MasterTxCpltCallback(hi2c);
+  }
+}
+
+void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef * hi2c)
+{
+  if (&hi2c2 == hi2c) {
+    MX_I2C2_MasterRxCpltCallback(hi2c);
+  }
+}
+
+void HAL_I2C_ErrorCallback(I2C_HandleTypeDef * hi2c)
+{
+  if (&hi2c2 == hi2c) {
+    MX_I2C2_ErrorCallback(hi2c);
+  }
+}
+
+void HAL_I2C_AbortCpltCallback(I2C_HandleTypeDef * hi2c)
+{
+  if (&hi2c2 == hi2c) {
+    MX_I2C2_AbortCpltCallback(hi2c);
+  }
+}
 
 /* USER CODE END 1 */
 
