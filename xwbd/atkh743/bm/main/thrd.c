@@ -25,6 +25,7 @@
 #include <xwos/osal/scheduler.h>
 #include <xwos/osal/thread.h>
 #include <xwmd/ds/soc/gpio.h>
+#include <xwcd/perpheral/i2c/eeprom/driver.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/mif.h>
 #include <bm/main/thrd.h>
@@ -57,7 +58,7 @@ const struct xwosal_thrd_desc child_tbd[] = {
                 .name = "task.led",
                 .prio = LED_TASK_PRIORITY,
                 .stack = NULL,
-                .stack_size = 2048,
+                .stack_size = 4096,
                 .func = led_task,
                 .arg = NULL,
                 .attr = XWSDOBJ_ATTR_PRIVILEGED,
@@ -101,11 +102,51 @@ err_thrd_create:
         return rc;
 }
 
+xwer_t eeprom_task(void)
+{
+        xwer_t rc;
+        xwtm_t xwtm;
+        xwsz_t size;
+        xwu8_t eedata[8] = {0};
+
+        xwtm = 1 * XWTM_S;
+        rc = xwds_eeprom_reset(&stm32cube_at24c02_cb, &xwtm);
+        if (rc < 0) {
+                goto err_eeprom_reset;
+        }
+
+        size = 8;
+        xwtm = 1 * XWTM_S;
+        rc = xwds_eeprom_pgread(&stm32cube_at24c02_cb, eedata, &size, 0, &xwtm);
+        if (rc < 0) {
+                goto err_eeprom_read;
+        }
+
+        size = 8;
+        xwtm = 1 * XWTM_S;
+        rc = xwds_eeprom_pgread(&stm32cube_at24c02_cb, eedata, &size, 1, &xwtm);
+        if (rc < 0) {
+                goto err_eeprom_read;
+        }
+
+        return XWOK;
+
+err_eeprom_read:
+err_eeprom_reset:
+        return rc;
+}
+
 xwer_t led_task(void * arg)
 {
+        xwer_t rc;
         xwtm_t xwtm;
 
         XWOS_UNUSED(arg);
+
+        rc = eeprom_task();
+        if (rc < 0) {
+                BDL_BUG();
+        }
 
         xwds_gpio_req(&stm32cube_soc_cb,
                       XWDS_GPIO_PORT_B, XWDS_GPIO_PIN_0);

@@ -45,5 +45,6 @@ extern struct xwds_dmauartc stm32cube_usart1_cb;
 
 /******** ******** i2c ******** ********/
 extern struct xwds_i2cm stm32cube_i2c2m_cb;
+extern struct xwds_eeprom stm32cube_at24c02_cb;
 
 #endif /* bm/stm32cube/xwac/xwds/device.h */
