@@ -51,7 +51,13 @@
 
 * 文档
 
-[[https://xwos.tech/][https://xwos.tech/]]
++ [[https://xwos.tech/]]
++ [[http://xwos.tech/]]
+
+域名访问过慢或无法打开时，可以尝试：
+
++ [[https://starsoul.gitee.io/xuanwuos/]]
++ [[http://starsoul.gitee.io/xuanwuos/]]
 
 --------
 
