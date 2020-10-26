@@ -100,9 +100,9 @@ xwer_t xwds_spim_cvop_probe(struct xwds_spim * spim)
 {
         xwer_t rc;
 
-        rc = xwosal_mtx_init(&spim->apilock, XWOSAL_SD_PRIORITY_RT_MIN);
+        rc = xwosal_mtx_init(&spim->xfer.apimtx, XWOSAL_SD_PRIORITY_RT_MIN);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_apilock_init;
+                goto err_xfer_apimtx_init;
         }
         rc = xwds_device_cvop_probe(&spim->dev);
         if (__xwcc_unlikely(rc < 0)) {
@@ -111,8 +111,8 @@ xwer_t xwds_spim_cvop_probe(struct xwds_spim * spim)
         return XWOK;
 
 err_dev_probe:
-        xwosal_mtx_destroy(&spim->apilock);
-err_apilock_init:
+        xwosal_mtx_destroy(&spim->xfer.apimtx);
+err_xfer_apimtx_init:
         return rc;
 }
 
@@ -131,7 +131,7 @@ xwer_t xwds_spim_cvop_remove(struct xwds_spim * spim)
                 goto err_dev_cvop_remove;
         }
 
-        xwosal_mtx_destroy(&spim->apilock);
+        xwosal_mtx_destroy(&spim->xfer.apimtx);
         return XWOK;
 
 err_dev_cvop_remove:
@@ -205,8 +205,6 @@ xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t * xwtm)
         xwer_t rc;
 
         XWDS_VALIDATE(spim, "nullptr", -EFAULT);
-        XWDS_VALIDATE(spim->buscfg, "nullptr", -EFAULT);
-        XWDS_VALIDATE((cfgid < spim->buscfg_num), "out-of-range", -ECHRNG);
         XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_spim_grab(spim);
@@ -218,7 +216,16 @@ xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t * xwtm)
                 goto err_spim_request;
         }
 
-        rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&spim->apilock), xwtm);
+        if (NULL == spim->buscfg) {
+                rc = -ENOSYS;
+                goto err_nosys;
+        }
+        if (cfgid >= spim->buscfg_num) {
+                rc = -ECHRNG;
+                goto err_chrng;
+        }
+
+        rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&spim->xfer.apimtx), xwtm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spim_lock;
         }
@@ -231,15 +238,17 @@ xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t * xwtm)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_buscfg;
         }
-        xwosal_mtx_unlock(xwosal_mtx_get_id(&spim->apilock));
+        xwosal_mtx_unlock(xwosal_mtx_get_id(&spim->xfer.apimtx));
 
         xwds_spim_release(spim);
         xwds_spim_put(spim);
         return XWOK;
 
 err_drv_buscfg:
-        xwosal_mtx_unlock(xwosal_mtx_get_id(&spim->apilock));
+        xwosal_mtx_unlock(xwosal_mtx_get_id(&spim->xfer.apimtx));
 err_spim_lock:
+err_chrng:
+err_nosys:
         xwds_spim_release(spim);
 err_spim_request:
         xwds_spim_put(spim);
@@ -256,7 +265,7 @@ xwer_t xwds_spim_xfer(struct xwds_spim * spim,
         xwer_t rc;
 
         XWDS_VALIDATE(spim, "nullptr", -EFAULT);
-        XWDS_VALIDATE(txd, "nullptr", -EFAULT);
+        XWDS_VALIDATE(((txd) || (rxb)), "invalid", -EINVAL);
         XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_spim_grab(spim);
@@ -268,7 +277,7 @@ xwer_t xwds_spim_xfer(struct xwds_spim * spim,
                 goto err_spim_request;
         }
 
-        rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&spim->apilock), xwtm);
+        rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&spim->xfer.apimtx), xwtm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spim_lock;
         }
@@ -281,15 +290,55 @@ xwer_t xwds_spim_xfer(struct xwds_spim * spim,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_xfer;
         }
-        xwosal_mtx_unlock(xwosal_mtx_get_id(&spim->apilock));
+        xwosal_mtx_unlock(xwosal_mtx_get_id(&spim->xfer.apimtx));
 
         xwds_spim_release(spim);
         xwds_spim_put(spim);
         return XWOK;
 
 err_drv_xfer:
-        xwosal_mtx_unlock(xwosal_mtx_get_id(&spim->apilock));
+        xwosal_mtx_unlock(xwosal_mtx_get_id(&spim->xfer.apimtx));
 err_spim_lock:
+        xwds_spim_release(spim);
+err_spim_request:
+        xwds_spim_put(spim);
+err_spim_grab:
+        return rc;
+}
+
+__xwds_api
+xwer_t xwds_spim_abort(struct xwds_spim * spim, xwtm_t * xwtm)
+{
+        const struct xwds_spim_driver * drv;
+        xwer_t rc;
+
+        XWDS_VALIDATE(spim, "nullptr", -EFAULT);
+        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
+
+        rc = xwds_spim_grab(spim);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_spim_grab;
+        }
+        rc = xwds_spim_request(spim);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_spim_request;
+        }
+
+        drv = xwds_static_cast(const struct xwds_spim_driver *, spim->dev.drv);
+        if (__xwcc_likely((drv) && (drv->abort))) {
+                rc = drv->abort(spim, xwtm);
+        } else {
+                rc = -ENOSYS;
+        }
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_drv_abort;
+        }
+
+        xwds_spim_release(spim);
+        xwds_spim_put(spim);
+        return XWOK;
+
+err_drv_abort:
         xwds_spim_release(spim);
 err_spim_request:
         xwds_spim_put(spim);

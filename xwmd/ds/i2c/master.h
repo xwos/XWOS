@@ -55,10 +55,10 @@ struct xwds_i2cm {
 
         /* private */
         struct {
-                struct xwosal_mtx lock; /**< 传输API的互斥锁 */
+                struct xwosal_mtx apimtx; /**< 传输API的互斥锁 */
         } xfer; /**< 传输API的状态 */
         struct {
-                struct xwosal_mtx lock; /**< 中止API的互斥锁 */
+                struct xwosal_mtx apimtx; /**< 中止API的互斥锁 */
         } abort; /**< 中止API的状态 */
 };
 

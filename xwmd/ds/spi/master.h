@@ -41,7 +41,9 @@ struct xwds_spim_driver {
                           xwtm_t * /*xwtm*/); /**< 配置总线参数 */
         xwer_t (* xfer)(struct xwds_spim * /*spim*/,
                         const xwu8_t[] /*txd*/, xwu8_t * /*rxb*/,
-                        xwsz_t /*size*/, xwtm_t * /*xwtm*/); /**< 发送消息 */
+                        xwsz_t /*size*/, xwtm_t * /*xwtm*/); /**< 传输消息 */
+        xwer_t (* abort)(struct xwds_spim * /*spim*/,
+                         xwtm_t * /*xwtm*/); /**< 中止传输 */
 };
 
 /**
@@ -55,7 +57,9 @@ struct xwds_spim {
         xwsz_t buscfg_num; /**< BUS配置数量 */
 
         /* private */
-        struct xwosal_mtx apilock; /**< API互斥锁 */
+        struct {
+                struct xwosal_mtx apimtx; /**< API互斥锁 */
+        } xfer; /**< 传输API的状态 */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -78,6 +82,8 @@ void xwds_spim_destruct(struct xwds_spim * spim);
  *              (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -ENOSYS: 不支持配置总线操作
+ * @retval -ECHRNG: 配置ID不在配置表范围内
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步
@@ -88,9 +94,9 @@ __xwds_api
 xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t * xwtm);
 
 /**
- * @brief XWDS API：启动传输
+ * @brief XWDS API：启动SPI总线传输
  * @param spim: (I) SPI主机模式控制器对象指针
- * @param txd: (I) 发送数据缓冲区，不可为NULL
+ * @param txd: (I) 发送数据缓冲区，可为NULL表示不发送数据
  * @param rxb: (O) 接收数据缓冲区，可为NULL表示不接收数据
  * @param size: (I) 传输数据的大小
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
@@ -109,6 +115,22 @@ __xwds_api
 xwer_t xwds_spim_xfer(struct xwds_spim * spim,
                       const xwu8_t txd[], xwu8_t * rxb,
                       xwsz_t size, xwtm_t * xwtm);
+
+/**
+ * @brief XWDS API：中止SPI总线传输
+ * @param spim: (I) SPI主机控制器对象指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EINVAL: 设备对象不可引用
+ * @retval -ETIMEDOUT: 超时
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：可重入
+ */
+__xwds_api
+xwer_t xwds_spim_abort(struct xwds_spim * spim,
+                       xwtm_t * xwtm);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   inline function implementations   ******** ********
