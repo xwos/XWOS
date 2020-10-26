@@ -1,6 +1,6 @@
 
 #
-# [页眉] <type>(<scope>): :emoji: <subject>
+# [标题] <type>(<scope>): :emoji: <subject>
 # - type: feat, fix, perf, refactor, style, build, revert, docs, test,
 #         chore, milestone, release, developing, patch
 # - scope: 可为空
@@ -14,7 +14,7 @@
 # - 修改有什么副作用？
 # - 每行总长度不超过72个字符（中文字符算2个字符）
 #
-# [页脚]
+# [脚注] <token:> <text>
 # - 问题的ID或链接
 # - BREAKING CHANGE（破坏API原型的修改）
 # - 每行总长度不超过72个字符（中文字符算2个字符）
