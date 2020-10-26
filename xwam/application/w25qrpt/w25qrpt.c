@@ -208,7 +208,7 @@ xwer_t w25qrpt_rpc_read_uid(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
         msg->sdu[7] = (xwu8_t)((w25qxx->parameter.uid >> 0U) & 0xFF);
         infolen = sizeof(msg->rpc) + sizeof(msg->oprc) + sizeof(msg->sdusize) +
                   sizeof(msg->address) + sdusize;
-        crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, infolen);
+        crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, &infolen);
         crc32pos = &msg->sdu[sdusize];
         crc32pos[0] = (xwu8_t)((crc32 >> 24U) & 0xFF);
         crc32pos[1] = (xwu8_t)((crc32 >> 16U) & 0xFF);
@@ -274,7 +274,7 @@ xwer_t w25qrpt_rpc_read_mid(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
         msg->sdu[1] = (xwu8_t)((w25qxx->parameter.mid >> 0U) & 0xFF);
         infolen = sizeof(msg->rpc) + sizeof(msg->oprc) + sizeof(msg->sdusize) +
                   sizeof(msg->address) + sdusize;
-        crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, infolen);
+        crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, &infolen);
         crc32pos = &msg->sdu[sdusize];
         crc32pos[0] = (xwu8_t)((crc32 >> 24U) & 0xFF);
         crc32pos[1] = (xwu8_t)((crc32 >> 16U) & 0xFF);
@@ -342,7 +342,7 @@ xwer_t w25qrpt_rpc_read_jid(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
         msg->sdu[3] = (xwu8_t)((w25qxx->parameter.jid >> 0U) & 0xFF);
         infolen = sizeof(msg->rpc) + sizeof(msg->oprc) + sizeof(msg->sdusize) +
                   sizeof(msg->address) + sdusize;
-        crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, infolen);
+        crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, &infolen);
         crc32pos = &msg->sdu[sdusize];
         crc32pos[0] = (xwu8_t)((crc32 >> 24U) & 0xFF);
         crc32pos[1] = (xwu8_t)((crc32 >> 16U) & 0xFF);
@@ -425,7 +425,7 @@ xwer_t w25qrpt_rpc_erase_chip(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg
         msg->address[3] = 0;
         infolen = sizeof(msg->rpc) + sizeof(msg->oprc) + sizeof(msg->sdusize) +
                   sizeof(msg->address) + sdusize;
-        crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, infolen);
+        crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, &infolen);
         crc32pos = &msg->sdu[sdusize];
         crc32pos[0] = (xwu8_t)((crc32 >> 24U) & 0xFF);
         crc32pos[1] = (xwu8_t)((crc32 >> 16U) & 0xFF);
@@ -510,7 +510,7 @@ xwer_t w25qrpt_rpc_erase_sector(struct w25qrpt * w25qrpt, struct w25qrpt_msg * m
         /* msg->address is unchanged. */
         infolen = sizeof(msg->rpc) + sizeof(msg->oprc) + sizeof(msg->sdusize) +
                   sizeof(msg->address) + sdusize;
-        crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, infolen);
+        crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, &infolen);
         crc32pos = &msg->sdu[sdusize];
         crc32pos[0] = (xwu8_t)((crc32 >> 24U) & 0xFF);
         crc32pos[1] = (xwu8_t)((crc32 >> 16U) & 0xFF);
@@ -595,7 +595,7 @@ xwer_t w25qrpt_rpc_erase_32kblock(struct w25qrpt * w25qrpt, struct w25qrpt_msg *
         /* msg->address is unchanged. */
         infolen = sizeof(msg->rpc) + sizeof(msg->oprc) + sizeof(msg->sdusize) +
                   sizeof(msg->address) + sdusize;
-        crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, infolen);
+        crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, &infolen);
         crc32pos = &msg->sdu[sdusize];
         crc32pos[0] = (xwu8_t)((crc32 >> 24U) & 0xFF);
         crc32pos[1] = (xwu8_t)((crc32 >> 16U) & 0xFF);
@@ -680,7 +680,7 @@ xwer_t w25qrpt_rpc_erase_64kblock(struct w25qrpt * w25qrpt, struct w25qrpt_msg *
         /* msg->address is unchanged. */
         infolen = sizeof(msg->rpc) + sizeof(msg->oprc) + sizeof(msg->sdusize) +
                   sizeof(msg->address) + sdusize;
-        crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, infolen);
+        crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, &infolen);
         crc32pos = &msg->sdu[sdusize];
         crc32pos[0] = (xwu8_t)((crc32 >> 24U) & 0xFF);
         crc32pos[1] = (xwu8_t)((crc32 >> 16U) & 0xFF);
@@ -771,7 +771,7 @@ xwer_t w25qrpt_rpc_write(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
         msg->sdu[3] = (xwu8_t)((wrsz >> 0U) & 0xFF);
         infolen = sizeof(msg->rpc) + sizeof(msg->oprc) + sizeof(msg->sdusize) +
                   sizeof(msg->address) + sdusize;
-        crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, infolen);
+        crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, &infolen);
         crc32pos = &msg->sdu[sdusize];
         crc32pos[0] = (xwu8_t)((crc32 >> 24U) & 0xFF);
         crc32pos[1] = (xwu8_t)((crc32 >> 16U) & 0xFF);
@@ -861,7 +861,7 @@ xwer_t w25qrpt_rpc_read(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
         /* msg->address is unchanged. */
         infolen = sizeof(msg->rpc) + sizeof(msg->oprc) + sizeof(msg->sdusize) +
                   sizeof(msg->address) + sdusize;
-        crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, infolen);
+        crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, &infolen);
         crc32pos = &msg->sdu[sdusize];
         crc32pos[0] = (xwu8_t)((crc32 >> 24U) & 0xFF);
         crc32pos[1] = (xwu8_t)((crc32 >> 16U) & 0xFF);
@@ -938,7 +938,7 @@ xwer_t w25qrpt_chk_msg(struct w25qrpt_msg * msg)
                 infolen = sizeof(msg->rpc) + sizeof(msg->oprc) + sizeof(msg->sdusize) +
                           sizeof(msg->address) + sdusize;
                 crc32pos = &msg->sdu[sdusize];
-                crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, infolen);
+                crc32 = xwlib_crc32_calms((xwu8_t *)&msg->rpc, &infolen);
                 if ((((crc32 >> 24) & 0xFF) != crc32pos[0]) ||
                     (((crc32 >> 16) & 0xFF) != crc32pos[1]) ||
                     (((crc32 >> 8) & 0xFF) != crc32pos[2]) ||

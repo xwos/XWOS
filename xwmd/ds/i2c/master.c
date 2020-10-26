@@ -95,7 +95,7 @@ xwer_t xwds_i2cm_cvop_probe(struct xwds_i2cm * i2cm)
 {
         xwer_t rc;
 
-        XWDS_VALIDATE(i2cm->cfg, "nullptr", -EFAULT);
+        XWDS_VALIDATE(i2cm->xwccfg, "nullptr", -EFAULT);
 
         rc = xwosal_mtx_init(&i2cm->xfer.apimtx, XWOSAL_SD_PRIORITY_RT_MIN);
         if (__xwcc_unlikely(rc < 0)) {

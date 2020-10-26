@@ -311,7 +311,7 @@ xwer_t xwpcp_tx_cfrm_sync(struct xwpcp * xwpcp)
                 frm->sdu[11] = (xwu8_t)((txcnt >> 8U) & 0xFFU);
                 frm->sdu[12] = (xwu8_t)((txcnt >> 0U) & 0xFFU);
                 infolen = frm->head.frmlen - XWPCP_CHKSUM_SIZE;
-                crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, infolen);
+                crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, &infolen);
                 frm->sdu[13] = (xwu8_t)((crc32 >> 24U) & 0xFFU);
                 frm->sdu[14] = (xwu8_t)((crc32 >> 16U) & 0xFFU);
                 frm->sdu[15] = (xwu8_t)((crc32 >> 8U) & 0xFFU);
@@ -352,7 +352,7 @@ xwer_t xwpcp_tx_cfrm_sync_ack(struct xwpcp * xwpcp, xwu32_t rxcnt)
         frm->sdu[11] = (xwu8_t)((rxcnt >> 8U) & 0xFFU);
         frm->sdu[12] = (xwu8_t)((rxcnt >> 0U) & 0xFFU);
         infolen = frm->head.frmlen - XWPCP_CHKSUM_SIZE;
-        crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, infolen);
+        crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, &infolen);
         frm->sdu[13] = (xwu8_t)((crc32 >> 24U) & 0xFFU);
         frm->sdu[14] = (xwu8_t)((crc32 >> 16U) & 0xFFU);
         frm->sdu[15] = (xwu8_t)((crc32 >> 8U) & 0xFFU);
@@ -392,7 +392,7 @@ xwer_t xwpcp_tx_frm_sdu_ack(struct xwpcp * xwpcp, xwu8_t port, xwu8_t id, xwu8_t
         frm->head.id = id | XWPCP_ID_ACK;
         frm->sdu[0] = ack;
         infolen = frm->head.frmlen - XWPCP_CHKSUM_SIZE;
-        crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, infolen);
+        crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, &infolen);
         frm->sdu[1] = (xwu8_t)((crc32 >> 24U) & 0xFFU);
         frm->sdu[2] = (xwu8_t)((crc32 >> 16U) & 0xFFU);
         frm->sdu[3] = (xwu8_t)((crc32 >> 8U) & 0xFFU);
@@ -516,7 +516,7 @@ xwer_t xwpcp_chk_frm(struct xwpcp_frame * frm)
         } else {
                 infolen = (xwsz_t)frmlen - XWPCP_CHKSUM_SIZE;
                 crc32_pos = &frm->sdu[infolen - sizeof(struct xwpcp_frmhead)];
-                crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, infolen);
+                crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, &infolen);
                 if ((((crc32 >> 24U) & 0xFFU) != crc32_pos[0]) ||
                     (((crc32 >> 16U) & 0xFFU) != crc32_pos[1]) ||
                     (((crc32 >> 8U) & 0xFFU) != crc32_pos[2]) ||
@@ -978,7 +978,7 @@ xwer_t xwpcp_tx_frm(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
         qos = XWPCP_PORT_QOS(frmslot->frm.head.port);
         infolen = frmslot->frm.head.frmlen - XWPCP_CHKSUM_SIZE;
         crc32pos = ((xwu8_t *)&frmslot->frm.head) + infolen;
-        crc32 = xwlib_crc32_calms((xwu8_t *)&frmslot->frm.head, infolen);
+        crc32 = xwlib_crc32_calms((xwu8_t *)&frmslot->frm.head, &infolen);
         crc32pos[0] = (xwu8_t)((crc32 >> 24U) & 0xFFU);
         crc32pos[1] = (xwu8_t)((crc32 >> 16U) & 0xFFU);
         crc32pos[2] = (xwu8_t)((crc32 >> 8U) & 0xFFU);

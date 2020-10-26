@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE：CRC32
+ * @brief STM32CUBE模块：CRC32
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -35,146 +35,111 @@
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 static
-xwsz_t stm32_crc32_ls(xwu32_t * crc32, bool refin, const xwu8_t stream[], xwsz_t len);
-
-static
-xwsz_t stm32_crc32_rs(xwu32_t * crc32, bool refin, const xwu8_t stream[], xwsz_t len);
+xwer_t stm32_crc32_ls(xwu32_t * crc32, bool refin, bool refout,
+                      const xwu8_t stream[], xwsz_t * size);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief Computes the 32-bit CRC of a given buffer of data stream (left-shift).
- * @param crc32: (I) buffer to give initial value
- *               (O) buffer to return the result
- * @param refin: (I) reverse bits of every byte (rbit8) if ture
- * @param stream: (I) pointer to the buffer containing the data to be computed
- * @param len: (I) length of the buffer to be computed
- * @return real length of data that be computed. Caller must computed the
- *         remaining data by self
- */
 static
-xwsz_t stm32_crc32_ls(xwu32_t * crc32, bool refin, const xwu8_t stream[], xwsz_t len)
+xwer_t stm32_crc32_ls(xwu32_t * crc32, bool refin, bool refout,
+                      const xwu8_t stream[], xwsz_t * size)
 {
-        xwsz_t i;
+        xwsz_t rest;
+        xwsz_t pos;
+        xwu32_t seg;
         xwu32_t * p;
-        xwu32_t tmp;
+        xwer_t rc;
 
-        if (__xwcc_unlikely((*crc32 > 0) && (*crc32 < 0xFFFFFFFF))) {
-                return 0;
-        }
-
+        seg = *crc32;
         LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_CRC);
+        LL_CRC_SetInitialData(CRC, seg);
+        if (refin) {
+                LL_CRC_SetInputDataReverseMode(CRC, LL_CRC_INDATA_REVERSE_BYTE);
+        } else {
+                LL_CRC_SetInputDataReverseMode(CRC, LL_CRC_INDATA_REVERSE_NONE);
+        }
+        if (refout) {
+                LL_CRC_SetOutputDataReverseMode(CRC, LL_CRC_OUTDATA_REVERSE_BIT);
+        } else {
+                LL_CRC_SetOutputDataReverseMode(CRC, LL_CRC_OUTDATA_REVERSE_NONE);
+        }
         LL_CRC_ResetCRCCalculationUnit(CRC);
-        if (0x00000000 == *crc32) {
-                LL_CRC_FeedData32(CRC, 0xFFFFFFFF);
-        }
-        i = 0;
-        while (len >= sizeof(xwu32_t)) {
-                p = (xwu32_t *)&stream[i];
-                /* The CRC data register of stm32 is a 32-bit little-endian register,
-                   When writing the register, the *(stream+3) is the most significant
-                   byte and the CRC hardware computes the data from the most significant
-                   byte. So it is necessary to reverse endian of the 32-bit data
-                   before writing it to the register. */
-                if (refin) {
-                        tmp = xwbop_rbit(xwu32_t, *p);
-                } else {
-                        tmp = xwbop_re(xwu32_t, *p);
+        rest = *size;
+        pos = 0;
+        if ((xwptr_t)stream & (sizeof(xwu32_t) - 1)) {
+                /* 数据地址没有对齐到4的边界上，不能直接按32位访问数据内存，
+                   否则会出busfault */
+                while (rest >= sizeof(xwu32_t)) {
+                        seg = (xwu32_t)stream[pos] << 24U;
+                        seg |= (xwu32_t)stream[pos + 1] << 16U;
+                        seg |= (xwu32_t)stream[pos + 2] << 8U;
+                        seg |= (xwu32_t)stream[pos + 3];
+                        LL_CRC_FeedData32(CRC, seg);
+                        rest -= sizeof(xwu32_t);
+                        pos += sizeof(xwu32_t);
                 }
-                LL_CRC_FeedData32(CRC, tmp);
-                len -= sizeof(xwu32_t);
-                i += sizeof(xwu32_t);
+        } else {
+                /* 当数据地址对齐到4的边界上时可提高效率 */
+                while (rest >= sizeof(xwu32_t)) {
+                        /* STM32是小端模式处理器，CRC硬件单元是从32位的数据寄存器的
+                           最高有效字节开始处理数据的。stream[pos + 0]在小端模式是最低
+                           有效字节，stream[pos + 3]是最高有效字节，
+                           因此需要做大小端转换。*/
+                        p = (xwu32_t *)&stream[pos];
+                        seg = xwbop_re32(*p);
+                        LL_CRC_FeedData32(CRC, seg);
+                        rest -= sizeof(xwu32_t);
+                        pos += sizeof(xwu32_t);
+                }
         }
-        *crc32 = LL_CRC_ReadData32(CRC);
+        if (pos > 0) {
+                seg = LL_CRC_ReadData32(CRC);
+                rc = XWOK;
+        } else {
+                rc = -EOPNOTSUPP;
+        }
         LL_AHB1_GRP1_DisableClock(LL_AHB1_GRP1_PERIPH_CRC);
-        return i;
+        *crc32 = seg;
+        *size = rest;
+        return rc;
 }
 
 /**
- * @brief Computes the 32-bit CRC of a given buffer of data stream (right-shift).
- * @param crc32: (I) buffer to give initial value
- *               (O) buffer to return the result
- * @param refin: (I) reverse bits of every byte (rbit8) if ture
- * @param stream: (I) pointer to the buffer containing the data to be computed
- * @param len: (I) length of the buffer to be computed
- * @return real length of data that be computed. Caller must computed the
- *         remaining data by self
+ * @brief 使用STM32的CRC硬件单元计算数据的CRC32校验值
+ * @param crc32: 指向缓冲区的指针，此缓冲区：
+ *               (I) 作为输入，表示初始值
+ *               (O) 作为输出，返回计算结果
+ * @param refin: (I) 是否颠倒每个字节中的位的顺序
+ * @param stream: (I) 数据缓冲区
+ * @param polynomial: (I) 多项式
+ * @param direction: (I) 数据移位的方向
+ * @param size: 指向缓冲区的指针，此缓冲区：
+ *              (I) 作为输入，表示数据长度
+ *              (O) 作为输出，返回剩余未计算的数据长度
+ * @return 错误码
+ * @retval XWOK: 计算结果有效
+ * @retval -EOPNOTSUPP: 计算失败
  */
-static
-xwsz_t stm32_crc32_rs(xwu32_t * crc32, bool refin,
-                      const xwu8_t stream[], xwsz_t len)
+xwer_t soc_crc32_cal(xwu32_t * crc32, bool refin,
+                     xwu32_t polynomial, xwu32_t direction,
+                     const xwu8_t stream[], xwsz_t * size)
 {
-        xwsz_t i;
-        xwu32_t * p;
-        xwu32_t tmp;
+        bool refout;
+        xwer_t rc;
 
-        if (__xwcc_unlikely((*crc32 > 0) && (*crc32 < 0xFFFFFFFF))) {
-                return 0;
+        /* STM32的CRC单元是左移模式，右移模式需要对参数进行镜像转换 */
+        if (XWLIB_CRC32_RIGHT_SHIFT == direction) {
+                polynomial = xwbop_rbit32(polynomial);
+                refin = !refin;
+                refout = true;
+        } else {
+                refout = false;
         }
-
-        LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_CRC);
-        LL_CRC_ResetCRCCalculationUnit(CRC);
-        if (0x00000000 == *crc32) {
-                LL_CRC_FeedData32(CRC, 0xFFFFFFFF);
+        if (0x04C11DB7 == polynomial) {
+                rc = stm32_crc32_ls(crc32, refin, refout, stream, size);
+        } else {
+                rc = -EOPNOTSUPP;
         }
-        i = 0;
-        while (len >= sizeof(xwu32_t)) {
-                p = (xwu32_t *)&stream[i];
-                /* The CRC data register of stm32 is a 32-bit little-endian register,
-                   When writing the register, the *(stream+3) is the most significant
-                   byte and the CRC hardware computes the data from the most significant
-                   byte. So it is necessary to reverse endian of the 32-bit data
-                   before writing it to the register. */
-                if (refin) {
-                        tmp = xwbop_re(xwu32_t, *p);
-                } else {
-                        tmp = xwbop_rbit(xwu32_t, *p);
-                }
-                LL_CRC_FeedData32(CRC, tmp);
-                len -= sizeof(xwu32_t);
-                i += sizeof(xwu32_t);
-        }
-        tmp = LL_CRC_ReadData32(CRC);
-        LL_AHB1_GRP1_DisableClock(LL_AHB1_GRP1_PERIPH_CRC);
-        *crc32 = xwbop_rbit(xwu32_t, tmp);
-        return i;
-}
-
-/**
- * @brief Computes the 32-bit CRC of a given buffer of data stream (SOC specific)
- * @param crc32: (I) buffer to give initial value
- *               (O) buffer to return the result
- * @param refin: (I) reverse bits of every byte (rbit8) if ture
- * @param polynomial: (I) polynomial
- * @param direction: (I) data stream shift direction: left or right
- * @param stream: (I) pointer to the data buffer
- * @param len: (I) data length
- * @return crc32 result of giving data to <b><em>crc32</em></b>
- * @retval real length of data that be computed. Caller must computed the
- *         remaining data by self
- */
-xwsz_t soc_crc32_cal(xwu32_t * crc32, bool refin, int polynomial,
-                     int direction, const xwu8_t stream[], xwsz_t len)
-{
-        xwsz_t real = 0;
-        switch (polynomial) {
-#if defined(XWLIBCFG_CRC32_0X04C11DB7) && (1 == XWLIBCFG_CRC32_0X04C11DB7)
-        case XWLIB_CRC32_PLYNML_0X04C11DB7:
-                if (XWLIB_CRC32_LEFT_SHIFT == direction) {
-                        real = stm32_crc32_ls(crc32, refin, stream, len);
-                }
-                break;
-#endif /* XWLIBCFG_CRC32_0X04C11DB7 */
-#if defined(XWLIBCFG_CRC32_0XEDB88320) && (1 == XWLIBCFG_CRC32_0XEDB88320)
-        case XWLIB_CRC32_PLYNML_0XEDB88320:
-                if (XWLIB_CRC32_RIGHT_SHIFT == direction) {
-                        real = stm32_crc32_rs(crc32, refin, stream, len);
-                }
-                break;
-#endif /* XWLIBCFG_CRC32_0XEDB88320 */
-        default:
-                break;
-        }
-        return real;
+        return rc;
 }

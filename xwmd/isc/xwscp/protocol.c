@@ -241,7 +241,7 @@ xwer_t xwscp_tx_cfrm_sync(struct xwscp * xwscp, xwtm_t * xwtm)
                 frm->sdu[11] = (xwu8_t)((txcnt >> 8U) & 0xFFU);
                 frm->sdu[12] = (xwu8_t)((txcnt >> 0U) & 0xFFU);
                 infolen = frm->head.frmlen - XWSCP_CHKSUM_SIZE;
-                crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, infolen);
+                crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, &infolen);
                 frm->sdu[13] = (xwu8_t)((crc32 >> 24U) & 0xFFU);
                 frm->sdu[14] = (xwu8_t)((crc32 >> 16U) & 0xFFU);
                 frm->sdu[15] = (xwu8_t)((crc32 >> 8U) & 0xFFU);
@@ -283,7 +283,7 @@ xwer_t xwscp_tx_cfrm_sync_ack(struct xwscp * xwscp, xwu32_t rxcnt)
         frm->sdu[11] = (xwu8_t)((rxcnt >> 8U) & 0xFFU);
         frm->sdu[12] = (xwu8_t)((rxcnt >> 0U) & 0xFFU);
         infolen = frm->head.frmlen - XWSCP_CHKSUM_SIZE;
-        crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, infolen);
+        crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, &infolen);
         frm->sdu[13] = (xwu8_t)((crc32 >> 24U) & 0xFFU);
         frm->sdu[14] = (xwu8_t)((crc32 >> 16U) & 0xFFU);
         frm->sdu[15] = (xwu8_t)((crc32 >> 8U) & 0xFFU);
@@ -320,7 +320,7 @@ xwer_t xwscp_tx_sdu_ack(struct xwscp * xwscp, xwu8_t id, xwu8_t ack)
         frm->head.id = id | XWSCP_ID_ACK;
         frm->sdu[0] = ack;
         infolen = frm->head.frmlen - XWSCP_CHKSUM_SIZE;
-        crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, infolen);
+        crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, &infolen);
         frm->sdu[1] = (xwu8_t)((crc32 >> 24) & 0xFF);
         frm->sdu[2] = (xwu8_t)((crc32 >> 16) & 0xFF);
         frm->sdu[3] = (xwu8_t)((crc32 >> 8) & 0xFF);
@@ -366,7 +366,7 @@ xwer_t xwscp_fmt_msg(struct xwscp * xwscp, struct xwscp_frame * frm,
         frm->head.port = XWSCP_PORT_DATA | XWSCP_QOS(1);
         frm->head.id = id;
         memcpy(frm->sdu, sdu, size);
-        crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, infolen);
+        crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, &infolen);
         frm->sdu[size + 0] = (xwu8_t)((crc32 >> 24) & 0xFF);
         frm->sdu[size + 1] = (xwu8_t)((crc32 >> 16) & 0xFF);
         frm->sdu[size + 2] = (xwu8_t)((crc32 >> 8) & 0xFF);
@@ -402,7 +402,7 @@ xwer_t xwscp_chk_frm(struct xwscp_frame * frm)
         } else {
                 infolen = (xwsz_t)frmlen - XWSCP_CHKSUM_SIZE;
                 crc32_pos = &frm->sdu[infolen - sizeof(struct xwscp_frmhead)];
-                crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, infolen);
+                crc32 = xwlib_crc32_calms((xwu8_t *)&frm->head, &infolen);
                 if ((((crc32 >> 24) & 0xFF) != crc32_pos[0]) ||
                     (((crc32 >> 16) & 0xFF) != crc32_pos[1]) ||
                     (((crc32 >> 8) & 0xFF) != crc32_pos[2]) ||

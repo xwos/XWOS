@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 片上系统描述层(SDL)配置
+ * @brief 示例：CRC
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,18 +18,17 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_soc_h__
-#define __cfg_soc_h__
+#ifndef __xwam_example_xwlib_crc_mif_h__
+#define __xwam_example_xwlib_crc_mif_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********          soc specification          ******** ********
+ ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** ******** IRQ ******** ******** ********/
-#define SOCCFG_IRQ_NUM                          48U
-#define SOCCFG_RO_ISRTABLE                      1
-#define SOCCFG_NVIC_PRIO_BITNUM                 2U
+#include <xwos/standard.h>
 
-/******** ******** CRC ******** ********/
-#define SOCCFG_CRC32                            1
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********         function prototypes         ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+xwer_t example_crc_start(void);
 
-#endif /* cfg/soc.h */
+#endif /* xwam/example/xwlib/crc/mif.h */

@@ -26,6 +26,7 @@
 #include <bm/stm32cube/standard.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
 #include <bm/stm32cube/cubemx/Core/Inc/gpio.h>
+#include <xwam/example/xwlib/crc/mif.h>
 #include <bm/stm32cube/mif.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -102,6 +103,8 @@ xwer_t main_thrd(void * arg)
         if (rc < 0) {
                 goto err_stm32cube_start;
         }
+
+        example_crc_start();
 
         rc = led_task();
         return rc;

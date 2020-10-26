@@ -36,6 +36,7 @@
 #define XWAMCFG_example_mm_sma                  1
 #define XWAMCFG_example_mm_memslice             1
 #define XWAMCFG_example_mm_bma                  1
+#define XWAMCFG_example_xwlib_crc               1
 #define XWAMCFG_example_cxx                     0
 #define XWAMCFG_application_w25qrpt             0
 
