@@ -45,17 +45,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** ******** constructor & destructor ******** ******** ********/
-void xwds_w25qxx_construct(struct xwds_w25qxx * w25qxx)
-{
-        xwds_spip_construct(&w25qxx->spip);
-}
-
-void xwds_w25qxx_destruct(struct xwds_w25qxx * w25qxx)
-{
-        xwds_spip_destruct(&w25qxx->spip);
-}
-
 /******** ******** base driver ******** ********/
 xwer_t xwds_w25qxx_drv_start(struct xwds_device * dev)
 {

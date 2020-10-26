@@ -178,6 +178,9 @@ struct xwds_w25qxx {
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/******** ******** ******** constructor & destructor ******** ******** ********/
+void xwds_w25qxx_construct(struct xwds_w25qxx * w25qxx);
+void xwds_w25qxx_destruct(struct xwds_w25qxx * w25qxx);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********  inline functions implementations   ******** ********

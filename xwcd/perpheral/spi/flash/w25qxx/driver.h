@@ -44,10 +44,6 @@ extern struct xwds_w25qxx_cmd xwds_w25q128jv_cmd[XWDS_W25QXX_CMD_NUM];
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** ******** constructor & destructor ******** ******** ********/
-void xwds_w25qxx_construct(struct xwds_w25qxx * w25qxx);
-void xwds_w25qxx_destruct(struct xwds_w25qxx * w25qxx);
-
 /******** ******** base driver ******** ********/
 xwer_t xwds_w25qxx_drv_start(struct xwds_device * dev);
 xwer_t xwds_w25qxx_drv_stop(struct xwds_device * dev);

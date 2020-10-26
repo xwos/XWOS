@@ -24,7 +24,7 @@ include $(XWBS_UTIL_MK_XWMO)
 $(eval $(call XwmoReqCfg,XWMDCFG_ds_SPI_MASTER))
 $(eval $(call XwmoReqCfg,XWMDCFG_ds_SPI_PERPHERAL))
 
-XWMO_CSRCS := driver.c
+XWMO_CSRCS := device.c driver.c
 XWMO_CSRCS += chip/w25q64jv.c
 XWMO_CSRCS += chip/w25q128jv.c
 XWMO_CFLAGS :=
