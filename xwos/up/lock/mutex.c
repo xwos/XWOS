@@ -114,6 +114,11 @@ void xwlk_mtx_free(struct xwlk_mtx * mtx)
 static __xwos_code
 void xwlk_mtx_activate(struct xwlk_mtx * mtx, xwpr_t sprio)
 {
+        if (sprio >= XWOS_SD_PRIORITY_RT_NUM) {
+                sprio = XWOS_SD_PRIORITY_RT_MAX;
+        } else if (sprio <= XWOS_SD_PRIORITY_INVALID) {
+                sprio = XWOS_SD_PRIORITY_RT_MIN;
+        }
         mtx->sprio = sprio;
         mtx->dprio = sprio;
         xwos_rtwq_init(&mtx->rtwq);

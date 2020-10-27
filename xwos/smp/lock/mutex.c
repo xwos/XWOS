@@ -234,6 +234,11 @@ xwer_t xwlk_mtx_activate(struct xwlk_mtx * mtx, xwpr_t sprio,
 
         rc = xwos_object_activate(&mtx->xwobj, gcfunc);
         if (__xwcc_likely(XWOK == rc)) {
+                if (sprio >= XWOS_SD_PRIORITY_RT_NUM) {
+                        sprio = XWOS_SD_PRIORITY_RT_MAX;
+                } else if (sprio <= XWOS_SD_PRIORITY_INVALID) {
+                        sprio = XWOS_SD_PRIORITY_RT_MIN;
+                }
                 mtx->sprio = sprio;
                 mtx->dprio = sprio;
                 xwos_rtwq_init(&mtx->rtwq);
