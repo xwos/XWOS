@@ -47,6 +47,12 @@ void stm32cube_usart1_cb_rxdma_halfcplt(struct xwds_dmauartc * dmauartc);
 void stm32cube_usart1_cb_rxdma_cplt(struct xwds_dmauartc * dmauartc);
 void stm32cube_usart1_cb_rxdma_timer(struct xwds_dmauartc * dmauartc);
 
+void stm32cube_usart2_cb_txdma_cplt(struct xwds_dmauartc * dmauartc, xwer_t dmarc);
+void stm32cube_usart2_cb_rxdma_restart(struct xwds_dmauartc * dmauartc);
+void stm32cube_usart2_cb_rxdma_halfcplt(struct xwds_dmauartc * dmauartc);
+void stm32cube_usart2_cb_rxdma_cplt(struct xwds_dmauartc * dmauartc);
+void stm32cube_usart2_cb_rxdma_timer(struct xwds_dmauartc * dmauartc);
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/

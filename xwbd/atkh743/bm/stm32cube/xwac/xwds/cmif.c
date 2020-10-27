@@ -104,7 +104,9 @@ xwer_t stm32cube_xwds_start(void)
         return XWOK;
 
 err_eeprom_start:
+        stm32cube_xwds_i2c_stop();
 err_i2c_start:
+        stm32cube_xwds_uart_stop();
 err_uart_start:
         return rc;
 }
@@ -183,26 +185,54 @@ xwer_t stm32cube_xwds_uart_start(void)
                                                 &stm32cube_usart1_cb),
                                NULL);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_probe;
+                goto err_usart1_probe;
         }
         rc = xwds_device_start(xwds_static_cast(struct xwds_device *,
                                                 &stm32cube_usart1_cb));
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_start;
+                goto err_usart1_start;
+        }
+
+        xwds_dmauartc_construct(&stm32cube_usart2_cb);
+        rc = xwds_device_probe(&stm32cube_ds,
+                               xwds_static_cast(struct xwds_device *,
+                                                &stm32cube_usart2_cb),
+                               NULL);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_usart2_probe;
+        }
+        rc = xwds_device_start(xwds_static_cast(struct xwds_device *,
+                                                &stm32cube_usart2_cb));
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_usart2_start;
         }
 
         return XWOK;
 
-err_dev_start:
+err_usart2_start:
+        xwds_device_remove(xwds_static_cast(struct xwds_device *,
+                                            &stm32cube_usart2_cb));
+err_usart2_probe:
+        xwds_dmauartc_destruct(&stm32cube_usart2_cb);
+
+        xwds_device_stop(xwds_static_cast(struct xwds_device *,
+                                          &stm32cube_usart1_cb));
+err_usart1_start:
         xwds_device_remove(xwds_static_cast(struct xwds_device *,
                                             &stm32cube_usart1_cb));
-err_dev_probe:
+err_usart1_probe:
         xwds_dmauartc_destruct(&stm32cube_usart1_cb);
         return rc;
 }
 
 xwer_t stm32cube_xwds_uart_stop(void)
 {
+        xwds_device_stop(xwds_static_cast(struct xwds_device *,
+                                          &stm32cube_usart2_cb));
+        xwds_device_remove(xwds_static_cast(struct xwds_device *,
+                                            &stm32cube_usart2_cb));
+        xwds_dmauartc_destruct(&stm32cube_usart2_cb);
+
         xwds_device_stop(xwds_static_cast(struct xwds_device *,
                                           &stm32cube_usart1_cb));
         xwds_device_remove(xwds_static_cast(struct xwds_device *,

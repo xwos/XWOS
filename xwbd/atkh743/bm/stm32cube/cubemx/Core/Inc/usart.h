@@ -59,6 +59,7 @@ struct MX_UART_DriverData {
 };
 
 extern struct MX_UART_DriverData husart1_drvdata;
+extern struct MX_UART_DriverData husart2_drvdata;
 
 /* USER CODE END Private defines */
 
@@ -76,6 +77,17 @@ xwsq_t MX_USART1_RXDMA_GetCounter(void);
 void MX_USART1_TXDMA_Prepare(const xwu8_t * mem, xwsz_t size);
 xwer_t MX_USART1_TXDMA_Start(void);
 xwer_t MX_USART1_Putc(xwu8_t byte);
+
+void MX_USART2_UART_DeInit(void);
+void MX_USART2_Timer_Init(void);
+void MX_USART2_Timer_DeInit(void);
+void MX_USART2_Timer_Start(void);
+void MX_USART2_Timer_Stop(void);
+xwer_t MX_USART2_RXDMA_Start(xwu8_t * mem, xwsz_t size);
+xwsq_t MX_USART2_RXDMA_GetCounter(void);
+void MX_USART2_TXDMA_Prepare(const xwu8_t * mem, xwsz_t size);
+xwer_t MX_USART2_TXDMA_Start(void);
+xwer_t MX_USART2_Putc(xwu8_t byte);
 
 /* USER CODE END Prototypes */
 

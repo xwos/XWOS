@@ -293,11 +293,11 @@ xwer_t MX_I2C2_Xfer(struct xwds_i2c_msg * msg)
     }
   }
   if (HAL_OK == hrc) {
-          rc = XWOK;
+    rc = XWOK;
   } else if (HAL_BUSY == hrc) {
-          rc = -EBUSY;
+    rc = -EBUSY;
   } else {
-          rc = -EIO;
+    rc = -EIO;
   }
   return rc;
 }
@@ -309,11 +309,11 @@ xwer_t MX_I2C2_Abort(xwu16_t addr)
 
   hrc = HAL_I2C_Master_Abort_IT(&hi2c2, addr);
   if (HAL_OK == hrc) {
-          rc = XWOK;
+    rc = XWOK;
   } else if (HAL_BUSY == hrc) {
-          rc = -EBUSY;
+    rc = -EBUSY;
   } else {
-          rc = -EIO;
+    rc = -EIO;
   }
   return rc;
 }
@@ -338,15 +338,15 @@ static
 void MX_I2C2_ErrorCallback(I2C_HandleTypeDef * hi2c)
 {
   if (hi2c->ErrorCode & HAL_I2C_ERROR_AF) {
-        stm32cube_i2c2m_cb_xfercplt(hi2c2_drvdata.i2cm, -EADDRNOTAVAIL);
+    stm32cube_i2c2m_cb_xfercplt(hi2c2_drvdata.i2cm, -EADDRNOTAVAIL);
   } else if (hi2c->ErrorCode &
-      (HAL_I2C_ERROR_BERR | HAL_I2C_ERROR_ARLO |
-       HAL_I2C_ERROR_OVR | HAL_I2C_ERROR_DMA | HAL_I2C_ERROR_SIZE)) {
-        stm32cube_i2c2m_cb_xfercplt(hi2c2_drvdata.i2cm, -EIO);
+             (HAL_I2C_ERROR_BERR | HAL_I2C_ERROR_ARLO |
+              HAL_I2C_ERROR_OVR | HAL_I2C_ERROR_DMA | HAL_I2C_ERROR_SIZE)) {
+    stm32cube_i2c2m_cb_xfercplt(hi2c2_drvdata.i2cm, -EIO);
   } else if (hi2c->ErrorCode & HAL_I2C_ERROR_TIMEOUT) {
-        stm32cube_i2c2m_cb_xfercplt(hi2c2_drvdata.i2cm, -ETIMEDOUT);
+    stm32cube_i2c2m_cb_xfercplt(hi2c2_drvdata.i2cm, -ETIMEDOUT);
   } else {
-        stm32cube_i2c2m_cb_xfercplt(hi2c2_drvdata.i2cm, -EBUG);
+    stm32cube_i2c2m_cb_xfercplt(hi2c2_drvdata.i2cm, -EBUG);
   }
 }
 

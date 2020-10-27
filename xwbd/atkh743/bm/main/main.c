@@ -25,6 +25,7 @@
 #include <xwos/osal/thread.h>
 #include <xwmd/libc/newlibac/mif.h>
 #include <xwem/vm/lua/mif.h>
+#include <xwam/example/xwlib/crc/mif.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/mif.h>
 #include <bm/pm/mif.h>
@@ -102,6 +103,8 @@ xwer_t main_thrd(void * arg)
                 goto err_newlibac_init;
         }
 
+        example_crc_start();
+
         rc = child_thrd_start();
         if (rc < 0) {
                 goto err_child_thrd_start;
@@ -124,8 +127,8 @@ xwer_t main_thrd(void * arg)
 
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
 err_xwlua_start:
-#endif /* XWEMCFG_vm_lua */
         BDL_BUG();
+#endif /* XWEMCFG_vm_lua */
 err_brdpm_start:
         BDL_BUG();
 err_child_thrd_start:

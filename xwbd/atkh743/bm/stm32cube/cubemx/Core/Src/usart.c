@@ -32,6 +32,7 @@
 #include <bm/stm32cube/xwac/xwds/uart.h>
 
 struct MX_UART_DriverData husart1_drvdata;
+struct MX_UART_DriverData husart2_drvdata;
 
 /* USER CODE END 0 */
 
@@ -244,7 +245,11 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     HAL_NVIC_SetPriority(USART2_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(USART2_IRQn);
   /* USER CODE BEGIN USART2_MspInit 1 */
-
+    husart2_drvdata.halhdl = &husart2;
+    xwosal_splk_init(&husart2_drvdata.tx.splk);
+    xwosal_cdt_init(&husart2_drvdata.tx.cdt);
+    husart2_drvdata.tx.rc = -ECANCELED;
+    husart2_drvdata.tx.size = 0;
   /* USER CODE END USART2_MspInit 1 */
   }
 }
@@ -280,6 +285,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
   else if(uartHandle->Instance==USART2)
   {
   /* USER CODE BEGIN USART2_MspDeInit 0 */
+    xwosal_cdt_destroy(&husart2_drvdata.tx.cdt);
 
   /* USER CODE END USART2_MspDeInit 0 */
     /* Peripheral clock disable */
@@ -304,6 +310,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 }
 
 /* USER CODE BEGIN 1 */
+/* USART1 */
 void MX_USART1_UART_DeInit(void)
 {
   HAL_UART_DMAStop(&husart1);
@@ -463,11 +470,173 @@ void MX_USART1_ErrorCallback(UART_HandleTypeDef * huart)
   }
 }
 
+/* USART2 */
+void MX_USART2_UART_DeInit(void)
+{
+  HAL_UART_DMAStop(&husart2);
+  HAL_UART_DeInit(&husart2);
+}
+
+void MX_USART2_Timer_Init(void)
+{
+  HAL_UART_ReceiverTimeout_Config(&husart2, 20000);
+  HAL_UART_EnableReceiverTimeout(&husart2);
+}
+
+void MX_USART2_Timer_DeInit(void)
+{
+  HAL_UART_DisableReceiverTimeout(&husart2);
+  HAL_UART_ReceiverTimeout_Config(&husart2, 0);
+}
+
+void MX_USART2_Timer_Start(void)
+{
+  __HAL_UART_ENABLE_IT(&husart2, UART_IT_RTO);
+}
+
+void MX_USART2_Timer_Stop(void)
+{
+  __HAL_UART_DISABLE_IT(&husart2, UART_IT_RTO);
+}
+
+xwer_t MX_USART2_RXDMA_Start(xwu8_t * mem, xwsz_t size)
+{
+  xwer_t rc;
+  HAL_StatusTypeDef ret;
+
+  ret = HAL_UART_Receive_DMA(&husart2, (uint8_t *)mem, (uint16_t)size);
+  if (HAL_OK == ret) {
+    rc = XWOK;
+  } else {
+    rc = -EIO;
+  }
+  return rc;
+}
+
+void MX_USART2_RxHalfCpltCallback(UART_HandleTypeDef * huart)
+{
+  DMA_HandleTypeDef * hdma;
+
+  hdma = huart->hdmarx;
+  if (HAL_DMA_ERROR_NONE == hdma->ErrorCode) {
+    SCB_InvalidateDCache_by_Addr((uint32_t *)husart2_drvdata.dmauartc->rxq.mem,
+                                 ALIGN(sizeof(husart2_drvdata.dmauartc->rxq.mem),
+                                       CPUCFG_L1_CACHELINE_SIZE));
+    stm32cube_usart2_cb_rxdma_halfcplt(husart2_drvdata.dmauartc);
+  } else {
+  }
+}
+
+void MX_USART2_RxCpltCallback(UART_HandleTypeDef * huart)
+{
+  DMA_HandleTypeDef * hdma;
+
+  hdma = huart->hdmarx;
+  if (HAL_DMA_ERROR_NONE == hdma->ErrorCode) {
+    SCB_InvalidateDCache_by_Addr((uint32_t *)husart2_drvdata.dmauartc->rxq.mem,
+                                 ALIGN(sizeof(husart2_drvdata.dmauartc->rxq.mem),
+                                       CPUCFG_L1_CACHELINE_SIZE));
+    stm32cube_usart2_cb_rxdma_cplt(husart2_drvdata.dmauartc);
+  } else {
+  }
+}
+
+xwsq_t MX_USART2_RXDMA_GetCounter(void)
+{
+  xwsq_t cnt;
+
+  cnt = (xwsq_t)__HAL_DMA_GET_COUNTER(&hdma_usart2_rx);
+  return cnt;
+}
+
+void MX_USART2_TXDMA_Prepare(const xwu8_t * mem, xwsz_t size)
+{
+  xwsz_t cpsz;
+
+  cpsz = size > HAL_UART_TXMEM_MAXSIZE ? HAL_UART_TXMEM_MAXSIZE : size;
+  memcpy(husart2_drvdata.tx.mem, mem, cpsz);
+  husart2_drvdata.tx.size = cpsz;
+  SCB_CleanDCache_by_Addr((uint32_t *)husart2_drvdata.tx.mem,
+                          (int32_t)ALIGN(cpsz, CPUCFG_L1_CACHELINE_SIZE));
+}
+
+xwer_t MX_USART2_TXDMA_Start(void)
+{
+  xwer_t rc;
+  HAL_StatusTypeDef ret;
+
+  ret = HAL_UART_Transmit_DMA(&husart2, (uint8_t *)husart2_drvdata.tx.mem,
+                              (uint16_t)husart2_drvdata.tx.size);
+  if (HAL_OK == ret) {
+    rc = XWOK;
+  } else {
+    rc = -EIO;
+  }
+  return rc;
+}
+
+void MX_USART2_TxCpltCallback(UART_HandleTypeDef * huart)
+{
+  stm32cube_usart2_cb_txdma_cplt(husart2_drvdata.dmauartc, XWOK);
+}
+
+xwer_t MX_USART2_Putc(xwu8_t byte)
+{
+  HAL_StatusTypeDef ret;
+  xwer_t rc;
+
+  ret = HAL_UART_Transmit(&husart2, &byte, 1, 10000);
+  if (HAL_OK == ret) {
+    rc = XWOK;
+  } else if (HAL_TIMEOUT == ret) {
+    rc = -ETIMEDOUT;
+  } else if (HAL_BUSY == ret) {
+    rc = -EBUSY;
+  } else {
+    rc = -EIO;
+  }
+  return rc;
+}
+
+void MX_USART2_ErrorCallback(UART_HandleTypeDef * huart)
+{
+  if (0 != (huart->ErrorCode & HAL_UART_ERROR_DMA)) {
+    huart->ErrorCode &= ~(HAL_UART_ERROR_DMA);
+    if (HAL_UART_STATE_READY == huart->RxState) {
+      stm32cube_usart2_cb_rxdma_restart(husart2_drvdata.dmauartc);
+    }
+  }
+  if (0 != (huart->ErrorCode & HAL_UART_ERROR_ORE)) {
+    huart->ErrorCode &= ~(HAL_UART_ERROR_ORE);
+    if (HAL_UART_STATE_READY == huart->RxState) {
+      stm32cube_usart2_cb_rxdma_restart(husart2_drvdata.dmauartc);
+    }
+  }
+  if (0 != (huart->ErrorCode & HAL_UART_ERROR_FE)) {
+    huart->ErrorCode &= ~(HAL_UART_ERROR_FE);
+  }
+  if (0 != (huart->ErrorCode & HAL_UART_ERROR_NE)) {
+    huart->ErrorCode &= ~(HAL_UART_ERROR_NE);
+  }
+  if (0 != (huart->ErrorCode & HAL_UART_ERROR_PE)) {
+    huart->ErrorCode &= ~(HAL_UART_ERROR_PE);
+  }
+  if (0 != (huart->ErrorCode & HAL_UART_ERROR_RTO)) {
+    huart->ErrorCode &= ~(HAL_UART_ERROR_RTO);
+    SCB_InvalidateDCache_by_Addr((uint32_t *)husart2_drvdata.dmauartc->rxq.mem,
+                                 ALIGN(sizeof(husart2_drvdata.dmauartc->rxq.mem),
+                                       CPUCFG_L1_CACHELINE_SIZE));
+    stm32cube_usart2_cb_rxdma_timer(husart2_drvdata.dmauartc);
+  }
+}
+
 /* Redefine HAL weak callback */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef * huart)
 {
   if (huart == &husart1) {
     MX_USART1_RxCpltCallback(huart);
+  } else if (huart == &husart2) {
+    MX_USART2_RxCpltCallback(huart);
   }
 }
 
@@ -475,6 +644,8 @@ void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef * huart)
 {
   if (huart == &husart1) {
     MX_USART1_RxHalfCpltCallback(huart);
+  } else if (huart == &husart2) {
+    MX_USART2_RxHalfCpltCallback(huart);
   }
 }
 
@@ -482,6 +653,8 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef * huart)
 {
   if (huart == &husart1) {
     MX_USART1_TxCpltCallback(huart);
+  } else if (huart == &husart2) {
+    MX_USART2_TxCpltCallback(huart);
   }
 }
 
@@ -489,6 +662,8 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef * huart)
 {
   if (huart == &husart1) {
     MX_USART1_ErrorCallback(huart);
+  } else if (huart == &husart2) {
+    MX_USART2_ErrorCallback(huart);
   }
 }
 

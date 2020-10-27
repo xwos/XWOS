@@ -42,6 +42,7 @@ extern struct xwds_soc stm32cube_soc_cb;
 
 /******** ******** uart ******** ********/
 extern struct xwds_dmauartc stm32cube_usart1_cb;
+extern struct xwds_dmauartc stm32cube_usart2_cb;
 
 /******** ******** i2c ******** ********/
 extern struct xwds_i2cm stm32cube_i2c2m_cb;
