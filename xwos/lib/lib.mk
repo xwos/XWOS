@@ -72,3 +72,6 @@ endif
 ifeq ($(XWLIBCFG_CRC32),y)
     XWOS_CSRCS += lib/crc32.c
 endif
+ifeq ($(XWLIBCFG_CRC8),y)
+    XWOS_CSRCS += lib/crc8.c
+endif

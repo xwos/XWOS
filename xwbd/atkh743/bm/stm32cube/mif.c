@@ -25,6 +25,7 @@
 #include <xwos/mm/mempool/allocator.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
 #include <bm/stm32cube/cubemx/Core/Inc/isr.h>
+#include <bm/stm32cube/xwac/xwlib/crc.h>
 #include <bm/stm32cube/xwac/xwds/cmif.h>
 #include <bm/stm32cube/xwac/fatfs/cmif.h>
 #include <bm/stm32cube/mif.h>
@@ -125,6 +126,8 @@ void stm32cube_init(void)
                                (xwptr_t)sdram_mr_origin,
                                (xwsz_t)sdram_mr_size);
         BDL_BUG_ON(rc < 0);
+
+        stm32cube_crc_init();
 }
 
 xwer_t stm32cube_start(void)

@@ -556,7 +556,7 @@ __xwlib_rodata const xwu32_t xwlib_crc32tbl_0xedb88320[256] = {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(SOCCFG_CRC32) && (1 == SOCCFG_CRC32)
-extern __xwlib_code
+extern
 xwer_t soc_crc32_cal(xwu32_t * crc32,
                      bool refin, xwu32_t plynml, xwu32_t direction,
                      const xwu8_t stream[], xwsz_t * size);

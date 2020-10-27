@@ -23,6 +23,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
+#include <xwos/lib/crc8.h>
 #include <xwos/lib/crc32.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -58,6 +59,7 @@ xwer_t example_crc_start(void)
 {
         xwu8_t data[] = {'X', 'u', 'a', 'n', 'W', 'u', 'O', 'S', '\0',};
         xwu32_t crc32;
+        xwu8_t crc8;
         xwsz_t size;
 
         crclogf(INFO, "Data:%s\n", data);
@@ -86,6 +88,34 @@ xwer_t example_crc_start(void)
                         0x04C11DB7, XWLIB_CRC32_LEFT_SHIFT,
                         data, &size);
         crclogf(INFO, "CRC32(JAMCRC):0x%X\n", crc32);
+
+        size = sizeof(data) - 1;
+        crc8 = xwlib_crc8_calms(data, &size);
+        crclogf(INFO, "CRC8:0x%X\n", crc8);
+
+        crc8 = 0x0;
+        size = sizeof(data) - 1;
+        xwlib_crc8_cal(&crc8, 0x55, false, false, 0x07,
+                       data, &size);
+        crclogf(INFO, "CRC8(ITU):0x%X\n", crc8);
+
+        crc8 = 0xFF;
+        size = sizeof(data) - 1;
+        xwlib_crc8_cal(&crc8, 0x0, true, true, 0x07,
+                       data, &size);
+        crclogf(INFO, "CRC8(ROHC):0x%X\n", crc8);
+
+        crc8 = 0x0;
+        size = sizeof(data) - 1;
+        xwlib_crc8_cal(&crc8, 0x0, true, true, 0x31,
+                       data, &size);
+        crclogf(INFO, "CRC8(MAXIM):0x%X\n", crc8);
+
+        crc8 = 0x0;
+        size = sizeof(data) - 1;
+        xwlib_crc8_cal(&crc8, 0x0, true, true, 0x9B,
+                       data, &size);
+        crclogf(INFO, "CRC8(WCDMA):0x%X\n", crc8);
 
         return XWOK;
 }

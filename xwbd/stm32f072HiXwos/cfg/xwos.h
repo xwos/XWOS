@@ -63,6 +63,10 @@
 #define XWLIBCFG_CRC32                                  1
 #define XWLIBCFG_CRC32_0X04C11DB7                       1
 #define XWLIBCFG_CRC32_0XEDB88320                       1
+#define XWLIBCFG_CRC8                                   0
+#define XWLIBCFG_CRC8_0X07                              1
+#define XWLIBCFG_CRC8_0X31                              0
+#define XWLIBCFG_CRC8_0X9B                              0
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ********        general memory management Configuration        ********
@@ -75,10 +79,10 @@
 #define XWMMCFG_FA_STACK                                0
 #define XWMMCFG_EA_STACK                                0
 
-/******** ******** ******** memslice ******** ******** ********/
+/******** memslice ********/
 #define XWMMCFG_MEMSLICE                                0
 
-/******** ******** buddy algorithm memory allocater ******** ********/
+/******** buddy algorithm memory allocater ********/
 #define XWMMCFG_BMA                                     0
 
 /******** mempool ********/

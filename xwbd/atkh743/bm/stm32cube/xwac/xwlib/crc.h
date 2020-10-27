@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 片上系统描述层(SDL)配置
+ * @brief STM32CUBE模块：CRC32
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,20 +18,17 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_soc_h__
-#define __cfg_soc_h__
+#ifndef __bm_stm32cube_xwac_xwlib_crc_h__
+#define __bm_stm32cube_xwac_xwlib_crc_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********          soc specification          ******** ********
+ ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** IRQ ******** ********/
-#define SOCCFG_IRQ_NUM                          240U
-#define SOCCFG_RO_ISRTABLE                      0
-#define SOCCFG_NVIC_PRIO_BITNUM                 4U
-#define SOCCFG_NVIC_SUBPRIO_BITIDX              4U
+#include <bm/stm32cube/standard.h>
 
-/******** ******** CRC ******** ********/
-#define SOCCFG_CRC32                            1
-#define SOCCFG_CRC8                             1
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********         function prototypes         ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+void stm32cube_crc_init(void);
 
-#endif /* cfg/soc.h */
+#endif /* bm/stm32cube/xwac/xwlib/crc.h */
