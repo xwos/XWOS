@@ -21,6 +21,11 @@
 include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
+$(eval $(call XwmoReqCfg,XWLIBCFG_CRC8))
+$(eval $(call XwmoReqCfg,XWLIBCFG_CRC8_0X07))
+$(eval $(call XwmoReqCfg,XWLIBCFG_CRC8_0X31))
+$(eval $(call XwmoReqCfg,XWLIBCFG_CRC8_0X9B))
+
 XWMO_CSRCS := mif.c
 XWMO_CFLAGS := -Wno-unused-value -Wno-unused-but-set-variable
 XWMO_INCDIRS :=

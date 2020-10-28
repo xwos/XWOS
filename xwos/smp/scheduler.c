@@ -147,13 +147,6 @@ void xwos_scheduler_thaw_allfrz_lic(struct xwos_scheduler * xwsd);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief XWOS INIT API：初始化本地CPU的调度器
- * @param xwpmdm: (I) 电源管理区域的指针
- * @return 错误码
- * @note
- * - 重入性：本函数只可在系统初始化时调用一次
- */
 __xwos_init_code
 xwer_t xwos_scheduler_init_lc(struct xwos_pmdm * xwpmdm)
 {
@@ -167,6 +160,7 @@ xwer_t xwos_scheduler_init_lc(struct xwos_pmdm * xwpmdm)
         xwsd->cstk = XWOS_SCHEDULER_IDLE_STK(xwsd);
         xwsd->pstk = NULL;
         xwsd->id = id;
+        xwsd->state = false;
         xwsd->req_schedule_cnt = 0;
         xwsd->req_chkpmpt_cnt = 0;
         xwsd->dis_pmpt_cnt = 0;
@@ -209,13 +203,6 @@ err_tt_init:
         return rc;
 }
 
-/**
- * @brief XWOS INIT API：启动本地CPU的调度器
- * @return 错误码
- * @note
- * - 重入性：只可调用一次
- * - 此函数不会返回
- */
 __xwos_init_code
 xwer_t xwos_scheduler_start_lc(void)
 {
@@ -227,6 +214,7 @@ xwer_t xwos_scheduler_start_lc(void)
         xwsd = &xwos_scheduler[id];
         rc = xwos_syshwt_start(&xwsd->tt.hwt);
         if (__xwcc_unlikely(XWOK == rc)) {
+                xwsd->state = true;
                 soc_scheduler_start_lc(xwsd);
         }/* else {} */
         return rc;
@@ -445,14 +433,6 @@ void xwos_scheduler_init_bhd(struct xwos_scheduler * xwsd)
         soc_scheduler_init_sdobj_stack(&xwsd->bh, XWSDOBJ_ATTR_PRIVILEGED);
 }
 
-/**
- * @brief XWOS API：禁止本地CPU调度器进入中断底半部
- * @return XWOS调度器的指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwos_api
 struct xwos_scheduler * xwos_scheduler_dsbh_lc(void)
 {
@@ -482,14 +462,6 @@ struct xwos_scheduler * xwos_scheduler_dsbh_lc(void)
         return xwsd;
 }
 
-/**
- * @brief XWOS API：允许本地CPU调度器进入中断底半部
- * @return XWOS调度器的指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwos_api
 struct xwos_scheduler * xwos_scheduler_enbh_lc(void)
 {
@@ -606,14 +578,6 @@ void xwos_scheduler_bh_yield(struct xwos_scheduler * xwsd)
 }
 #endif /* XWSMPCFG_SD_BH */
 
-/**
- * @brief XWOS API：禁止本地CPU调度器的抢占
- * @return XWOS调度器的指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwos_api
 struct xwos_scheduler * xwos_scheduler_dspmpt_lc(void)
 {
@@ -642,14 +606,6 @@ struct xwos_scheduler * xwos_scheduler_dspmpt_lc(void)
         return xwsd;
 }
 
-/**
- * @brief XWOS API：允许本地CPU调度器的抢占
- * @return XWOS调度器的指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwos_api
 struct xwos_scheduler * xwos_scheduler_enpmpt_lc(void)
 {
@@ -1214,15 +1170,6 @@ xwer_t xwos_scheduler_suspend_lic(struct xwos_scheduler * xwsd)
         return XWOK;
 }
 
-/**
- * @brief XWOS API：请求暂停调度器
- * @param cpuid: (I) CPU的ID
- * @return 错误码
- * @note
- * - 同步/异步：异步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwos_api
 xwer_t xwos_scheduler_suspend(xwid_t cpuid)
 {
@@ -1285,15 +1232,6 @@ xwer_t xwos_scheduler_resume_lic(struct xwos_scheduler * xwsd)
         return rc;
 }
 
-/**
- * @brief XWOS API：继续调度器
- * @param cpuid: (I) CPU的ID
- * @return 错误码
- * @note
- * - 同步/异步：异步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwos_api
 xwer_t xwos_scheduler_resume(xwid_t cpuid)
 {
@@ -1318,15 +1256,6 @@ xwer_t xwos_scheduler_resume(xwid_t cpuid)
         return rc;
 }
 
-/**
- * @brief XWOS API：获取调度器电源管理状态
- * @param xwsd: (I) 调度器对象的指针
- * @return 状态值 @ref xwos_scheduler_wakelock_cnt_em
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwos_api
 xwsq_t xwos_scheduler_get_pm_state(struct xwos_scheduler * xwsd)
 {
@@ -1334,4 +1263,35 @@ xwsq_t xwos_scheduler_get_pm_state(struct xwos_scheduler * xwsd)
 
         wklkcnt = xwaop_load(xwsq_t, &xwsd->pm.wklkcnt, xwmb_modr_acquire);
         return wklkcnt;
+}
+
+__xwos_api
+void xwos_scheduler_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
+{
+        struct xwos_scheduler * xwsd;
+        xwirq_t irqn;
+        xwer_t rc;
+        xwsq_t ctx;
+
+        rc = xwos_irq_get_id(&irqn);
+        if (XWOK == rc) {
+                ctx = XWOS_SCHEDULER_CONTEXT_ISR;
+                if (irqnbuf) {
+                        *irqnbuf = irqn;
+                }
+        } else {
+                xwsd = xwos_scheduler_get_lc();
+                if (xwsd->state) {
+                        if (-EINBH == rc) {
+                                ctx = XWOS_SCHEDULER_CONTEXT_BH;
+                        } else {
+                                ctx = XWOS_SCHEDULER_CONTEXT_THRD;
+                        }
+                } else {
+                        ctx = XWOS_SCHEDULER_CONTEXT_INIT_EXIT;
+                }
+        }
+        if (ctxbuf) {
+                *ctxbuf = ctx;
+        }
 }

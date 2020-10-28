@@ -63,10 +63,10 @@
 #define XWLIBCFG_CRC32                                  1
 #define XWLIBCFG_CRC32_0X04C11DB7                       1
 #define XWLIBCFG_CRC32_0XEDB88320                       1
-#define XWLIBCFG_CRC8                                   0
+#define XWLIBCFG_CRC8                                   1
 #define XWLIBCFG_CRC8_0X07                              1
-#define XWLIBCFG_CRC8_0X31                              0
-#define XWLIBCFG_CRC8_0X9B                              0
+#define XWLIBCFG_CRC8_0X31                              1
+#define XWLIBCFG_CRC8_0X9B                              1
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ********        general memory management Configuration        ********

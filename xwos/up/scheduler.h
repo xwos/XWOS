@@ -104,6 +104,16 @@ struct xwos_sdobj_stack_info {
         const char * name; /**< 名字字符串 */
 };
 
+/**
+ * @brief 调度器上下文枚举
+ */
+enum xwos_scheduler_context_em {
+        XWOS_SCHEDULER_CONTEXT_INIT_EXIT = 0, /**< 初始化与反初始化 */
+        XWOS_SCHEDULER_CONTEXT_THRD, /**< 线程 */
+        XWOS_SCHEDULER_CONTEXT_ISR, /**< 中断 */
+        XWOS_SCHEDULER_CONTEXT_BH, /**< 中断底半部 */
+};
+
 #if defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM)
 /**
  * @brief 电源管理回调函数集合
@@ -138,6 +148,7 @@ struct xwos_scheduler {
         struct xwos_sdobj_stack_info * pstk; /**< 前一个线程的栈信息的指针
                                                   偏移：sizeof(long)，
                                                   汇编代码中会使用这个成员。*/
+        bool state; /**< 调度器状态 */
         struct {
                 struct xwos_rtrq rt; /**< 实时就绪队列 */
         } rq; /**< 就绪队列 */
@@ -237,25 +248,83 @@ xwer_t xwos_scheduler_wakelock_unlock(void)
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********       API function prototypes       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief XWOS INIT API：初始化本地CPU的调度器
+ * @return 错误码
+ * @note
+ * - 重入性：本函数只可在系统初始化时调用一次
+ */
 __xwos_init_code
 xwer_t xwos_scheduler_init(void);
 
+/**
+ * @brief XWOS INIT API：启动本地CPU的调度器
+ * @return 错误码
+ * @note
+ * - 重入性：只可调用一次
+ * - 此函数不会返回
+ */
 __xwos_init_code
 xwer_t xwos_scheduler_start_lc(void);
 
 #if defined(XWUPCFG_SD_BH) && (1 == XWUPCFG_SD_BH)
+/**
+ * @brief XWOS API：禁止本地CPU调度器进入中断底半部
+ * @return XWOS调度器的指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
 __xwos_api
 struct xwos_scheduler * xwos_scheduler_dsbh_lc(void);
 
+/**
+ * @brief XWOS API：允许本地CPU调度器进入中断底半部
+ * @return XWOS调度器的指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
 __xwos_api
 struct xwos_scheduler * xwos_scheduler_enbh_lc(void);
 #endif /* XWUPCFG_SD_BH */
 
+/**
+ * @brief XWOS API：禁止抢占
+ * @return XWOS调度器的指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
 __xwos_api
 struct xwos_scheduler * xwos_scheduler_dspmpt_lc(void);
 
+/**
+ * @brief XWOS API：允许抢占
+ * @return XWOS调度器的指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
 __xwos_api
 struct xwos_scheduler * xwos_scheduler_enpmpt_lc(void);
+
+/**
+ * @brief XWOS API：获取调度器当前上下文
+ * @param ctxbuf: (O) 指向缓冲区的指针，通过此缓冲区返回当前上下文，
+ *                    返回值@ref xwos_scheduler_context_em
+ * @param irqnbuf: (O) 指向缓冲区的指针，通过此缓冲区返回中断号
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwos_api
+void xwos_scheduler_get_context_lc(xwsq_t * ctx, xwirq_t * irqn);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      inline API implementations     ******** ********
