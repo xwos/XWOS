@@ -30,6 +30,7 @@
 #include <xwmd/ds/uart/dma.h>
 #include <xwmd/ds/i2c/master.h>
 #include <xwcd/perpheral/i2c/eeprom/device.h>
+#include <xwcd/perpheral/spi/flash/w25qxx/device.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
@@ -47,5 +48,9 @@ extern struct xwds_dmauartc stm32cube_usart2_cb;
 /******** ******** i2c ******** ********/
 extern struct xwds_i2cm stm32cube_i2c2m_cb;
 extern struct xwds_eeprom stm32cube_at24c02_cb;
+
+/******** ******** spi ******** ********/
+extern struct xwds_spim stm32cube_spi1m_cb;
+extern struct xwds_spim stm32cube_spi2m_cb;
 
 #endif /* bm/stm32cube/xwac/xwds/device.h */

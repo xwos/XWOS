@@ -140,7 +140,7 @@ xwer_t xwos_thrd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm, void * lkdat
 __xwos_code
 xwer_t xwos_thrd_reqfrz_lic(struct xwos_tcb * tcb);
 
-/******** XWOS Lib for BSP Adaptation Code ********/
+/******** XWOS Callback for BSP Adaptation Code ********/
 __xwos_code
 xwer_t xwos_thrd_exit_lic(struct xwos_tcb * tcb, xwer_t rc);
 

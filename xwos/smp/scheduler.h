@@ -222,7 +222,7 @@ xwer_t xwos_scheduler_dec_wklkcnt(struct xwos_scheduler * xwsd);
 __xwos_code
 xwer_t xwos_scheduler_notify_allfrz_lic(struct xwos_scheduler * xwsd);
 
-/******** XWOS Lib for BSP Adaptation Code ********/
+/******** XWOS Callback for BSP Adaptation Code ********/
 __xwos_code
 void xwos_scheduler_finish_swcx(struct xwos_scheduler * xwsd);
 

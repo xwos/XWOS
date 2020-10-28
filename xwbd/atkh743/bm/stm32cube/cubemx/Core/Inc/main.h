@@ -81,6 +81,8 @@ void stm32cube_override_linkage_msp(void);
 #define KEY2_Pin GPIO_PIN_13
 #define KEY2_GPIO_Port GPIOC
 #define KEY2_EXTI_IRQn EXTI15_10_IRQn
+#define LCD_RST_Pin GPIO_PIN_11
+#define LCD_RST_GPIO_Port GPIOI
 #define KEY1_Pin GPIO_PIN_2
 #define KEY1_GPIO_Port GPIOH
 #define KEY1_EXTI_IRQn EXTI2_IRQn
@@ -93,8 +95,14 @@ void stm32cube_override_linkage_msp(void);
 #define LED0_GPIO_Port GPIOB
 #define TOUCH_SCL_Pin GPIO_PIN_6
 #define TOUCH_SCL_GPIO_Port GPIOH
+#define LCD_WR_Pin GPIO_PIN_14
+#define LCD_WR_GPIO_Port GPIOB
 #define TOUCH_SDA_Pin GPIO_PIN_3
 #define TOUCH_SDA_GPIO_Port GPIOI
+#define LCD_CS_Pin GPIO_PIN_10
+#define LCD_CS_GPIO_Port GPIOG
+#define LCD_PWR_Pin GPIO_PIN_12
+#define LCD_PWR_GPIO_Port GPIOG
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

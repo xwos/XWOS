@@ -183,6 +183,30 @@ xwer_t stm32cube_xwds_eeprom_start(void);
  */
 xwer_t stm32cube_xwds_eeprom_stop(void);
 
+/**
+ * @brief 启动SPI
+ * @retrun 错误码
+ * @note
+ * - 已经由@ref stm32cube_xwds_start()调用。
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：不可重入
+ */
+xwer_t stm32cube_xwds_spi_start(void);
+
+/**
+ * @brief 停止SPI
+ * @retrun 错误码
+ * @note
+ * - 已经由@ref stm32cube_xwds_stop()调用。
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：不可重入
+ */
+xwer_t stm32cube_xwds_spi_stop(void);
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********  inline functions implementations   ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/

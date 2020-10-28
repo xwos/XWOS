@@ -33,6 +33,7 @@
 #include "quadspi.h"
 #include "rng.h"
 #include "sdmmc.h"
+#include "spi.h"
 #include "usart.h"
 #include "gpio.h"
 #include "fmc.h"
@@ -118,6 +119,8 @@ int main(void)
   MX_RNG_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
+  MX_SPI2_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -193,6 +196,7 @@ void SystemClock_Config(void)
   }
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LTDC|RCC_PERIPHCLK_USART2
                               |RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_RNG
+                              |RCC_PERIPHCLK_SPI1|RCC_PERIPHCLK_SPI2
                               |RCC_PERIPHCLK_SDMMC|RCC_PERIPHCLK_I2C2
                               |RCC_PERIPHCLK_QSPI|RCC_PERIPHCLK_FMC;
   PeriphClkInitStruct.PLL3.PLL3M = 25;
@@ -206,6 +210,7 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.FmcClockSelection = RCC_FMCCLKSOURCE_D1HCLK;
   PeriphClkInitStruct.QspiClockSelection = RCC_QSPICLKSOURCE_D1HCLK;
   PeriphClkInitStruct.SdmmcClockSelection = RCC_SDMMCCLKSOURCE_PLL;
+  PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;
   PeriphClkInitStruct.Usart234578ClockSelection = RCC_USART234578CLKSOURCE_D2PCLK1;
   PeriphClkInitStruct.Usart16ClockSelection = RCC_USART16CLKSOURCE_D2PCLK2;
   PeriphClkInitStruct.RngClockSelection = RCC_RNGCLKSOURCE_HSI48;

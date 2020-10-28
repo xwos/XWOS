@@ -195,7 +195,7 @@ void xwos_scheduler_intr_all(void);
 __xwos_code
 xwer_t xwos_scheduler_notify_allfrz_lic(void);
 
-/******** XWOS Lib for BSP Adaptation Code ********/
+/******** XWOS Callback for BSP Adaptation Code ********/
 __xwos_code
 xwer_t xwos_scheduler_start_syshwt(void);
 
