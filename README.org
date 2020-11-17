@@ -32,20 +32,48 @@
 
 --------
 
+* 开源协议
+
+** MPL-2.0
+
+玄武OS核心代码采用[[http://mozilla.org/MPL/2.0/][ *MPL-2.0* ]]发布：
+
+-   适用范围： *xwos* 、 *xwmd* 文件夹下的源码；
+-   所有这些源码文件只包含了 *附录A* 中的声明，即 *Exhibit A - Source Code Form License Notice* ,
+    它们都 *不* 属于 *Incompatible With Secondary Licenses* 形式的 *Covered Software* ；
+-   可将玄武OS作为组件之一集成到应用场景中，在[[http://mozilla.org/MPL/2.0/][ *MPL-2.0* ]]中
+    被称为 *Larger Work* 。
+
+
+** Apache-2.0
+
+玄武OS的外围代码[[http://www.apache.org/licenses/LICENSE-2.0][ *Apache-2.0* ]]发布：
+
+-   适用范围： *xwcd* 、 *xwbd* 、 *xwam* 、 *xwbs* 文件夹下的源码。
+
+
+--------
+
 * 源码结构
 
+#+CAPTION:玄武OS架构图
+#+ATTR_LATEX: :float nil :width \textwidth :options scale=1
+#+ATTR_ODT: :scale 1
+#+ATTR_HTML: :width 70%
+[[http://xwos.tech/res/figure/xwos-arch.png]]
+
 + 编译
-  - xwbs: 编译系统 (License:Apache-2.0)
+  - xwbs: 编译系统 (License:[[http://www.apache.org/licenses/LICENSE-2.0][ *Apache-2.0* ]])
 + BSP与配置
-  - xwcd: 架构、CPU、SOC、外设驱动相关的代码 (License:Apache-2.0)
-  - xwbd: 工程配置、工程驱动与工程应用程序 (License:Apache-2.0)
+  - xwcd: 架构、CPU、SOC、外设驱动相关的代码 (License:[[http://www.apache.org/licenses/LICENSE-2.0][ *Apache-2.0* ]])
+  - xwbd: 工程配置、工程驱动与工程应用程序 (License:[[http://www.apache.org/licenses/LICENSE-2.0][ *Apache-2.0* ]])
 + 操作系统内核
-  - xwos: 内核 (License:MPL-2.0)
+  - xwos: 内核 (License:[[http://mozilla.org/MPL/2.0/][ *MPL-2.0* ]])
 + 中间件
-  - xwmd: 中间件 (License:MPL-2.0)
+  - xwmd: 中间件 (License:[[http://mozilla.org/MPL/2.0/][ *MPL-2.0* ]])
   - xwem: 第三方开源软件
 + 应用
-  - xwam: 示例代码、应用代码 (License:Apache-2.0)
+  - xwam: 示例代码、应用代码 (License:[[http://www.apache.org/licenses/LICENSE-2.0][ *Apache-2.0* ]])
 
 --------
 
