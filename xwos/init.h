@@ -32,10 +32,7 @@
 __xwos_init_code
 void xwos_init(void);
 
-__xwos_init_code
-void xwos_relocate(void);
-
 __xwos_code
 xwer_t xwos_main(void);
 
-#endif /* xwos/init.h */
+#endif /* xwos/lib/init.h */

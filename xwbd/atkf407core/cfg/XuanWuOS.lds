@@ -38,10 +38,8 @@ MEMORY {
                                                        .xwos.isr.text &
                                                        .xwos.text &
                                                        .xwos.rodata &
-                                                       .xwmd.isr.text &
-                                                       .xwmd.text &
-                                                       .xwmd.rodata &
-                                                       .text & .rodata */
+                                                       .text &
+                                                       .rodata */
         ocheap_mr (arw): org = 0x20000000, len = 64k /* .ocheap */
         data_mr (arw): org = 0x20010000, len = 64k /* .data, .bss & .heap */
         xwos_data_mr (arw): org = 0x10000000, len = 56k /* .xwos.data */

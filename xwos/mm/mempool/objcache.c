@@ -126,7 +126,7 @@ xwer_t xwmm_mempool_objcache_init(struct xwmm_mempool_objcache * oc,
         xwlib_bclst_init_head(&oc->page_list.full);
         xwlib_bclst_init_head(&oc->page_list.available);
         xwlib_bclst_init_head(&oc->page_list.idle);
-        xwlk_sqlk_init(&oc->page_list.lock);
+        xwos_sqlk_init(&oc->page_list.lock);
         oc->i_a.malloc = xwmm_mempool_objcache_i_a_malloc;
         oc->i_a.free = xwmm_mempool_objcache_i_a_free;
 
@@ -271,16 +271,16 @@ xwsz_t xwmm_mempool_objcache_free_idle_page(struct xwmm_mempool_objcache * oc,
 
         real = 0;
         while (real < nr) {
-                xwlk_sqlk_wr_lock_cpuirqsv(&oc->page_list.lock, &flag);
+                xwos_sqlk_wr_lock_cpuirqsv(&oc->page_list.lock, &flag);
                 if (xwlib_bclst_tst_empty(&oc->page_list.idle)) {
-                        xwlk_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
+                        xwos_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
                         break;
                 }
                 pg = xwlib_bclst_last_entry(&oc->page_list.idle,
                                             struct xwmm_mempool_page,
                                             attr.objcache.node);
                 xwlib_bclst_del_init(&pg->attr.objcache.node);
-                xwlk_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
+                xwos_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
                 xwmm_mempool_page_free(oc->pa, pg);
                 xwaop_sub(xwsz_t, &oc->capacity, oc->pg_objnr, NULL, NULL);
                 xwaop_sub(xwsz_t, &oc->idleness, oc->pg_objnr, NULL, NULL);
@@ -303,7 +303,7 @@ void xwmm_mempool_objcache_page_put(struct xwmm_mempool_objcache * oc,
 {
         xwreg_t flag;
 
-        xwlk_sqlk_wr_lock_cpuirqsv(&oc->page_list.lock, &flag);
+        xwos_sqlk_wr_lock_cpuirqsv(&oc->page_list.lock, &flag);
         XWOS_BUG_ON(0 == pg->attr.objcache.refcnt);
         pg->attr.objcache.refcnt--;
         xwlib_bclst_del_init(&pg->attr.objcache.node);
@@ -314,7 +314,7 @@ void xwmm_mempool_objcache_page_put(struct xwmm_mempool_objcache * oc,
                 xwlib_bclst_add_head(&oc->page_list.available,
                                      &pg->attr.objcache.node);
         }
-        xwlk_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
+        xwos_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
 }
 
 /**
@@ -333,21 +333,21 @@ xwer_t xwmm_mempool_objcache_page_get(struct xwmm_mempool_objcache * oc,
         xwreg_t flag;
         xwer_t rc;
 
-        xwlk_sqlk_wr_lock_cpuirqsv(&oc->page_list.lock, &flag);
+        xwos_sqlk_wr_lock_cpuirqsv(&oc->page_list.lock, &flag);
         if (!xwlib_bclst_tst_empty(&oc->page_list.available)) {
                 pg = xwlib_bclst_first_entry(&oc->page_list.available,
                                              struct xwmm_mempool_page,
                                              attr.objcache.node);
                 xwlib_bclst_del_init(&pg->attr.objcache.node);
-                xwlk_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
+                xwos_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
         } else if (!xwlib_bclst_tst_empty(&oc->page_list.idle)) {
                 pg = xwlib_bclst_first_entry(&oc->page_list.idle,
                                              struct xwmm_mempool_page,
                                              attr.objcache.node);
                 xwlib_bclst_del_init(&pg->attr.objcache.node);
-                xwlk_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
+                xwos_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
         } else {
-                xwlk_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
+                xwos_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
                 rc = xwmm_mempool_page_allocate(oc->pa, oc->pg_order, &pg);
                 if (rc < 0) {
                         goto err_pg_alloc;
@@ -393,7 +393,7 @@ xwer_t xwmm_mempool_objcache_alloc(struct xwmm_mempool_objcache * oc, void ** ob
         *obj = oc->backup;
         *objbuf = (void *)obj;
 
-        xwlk_sqlk_wr_lock_cpuirqsv(&oc->page_list.lock, &flag);
+        xwos_sqlk_wr_lock_cpuirqsv(&oc->page_list.lock, &flag);
         XWOS_BUG_ON(pg->attr.objcache.refcnt >= oc->pg_objnr);
         pg->attr.objcache.refcnt++;
         xwlib_bclst_del_init(&pg->attr.objcache.node);
@@ -402,7 +402,7 @@ xwer_t xwmm_mempool_objcache_alloc(struct xwmm_mempool_objcache * oc, void ** ob
         } else {
                 xwlib_bclst_add_head(&oc->page_list.available, &pg->attr.objcache.node);
         }
-        xwlk_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
+        xwos_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
 
         return XWOK;
 
@@ -497,9 +497,9 @@ xwer_t xwmm_mempool_objcache_reserve(struct xwmm_mempool_objcache * oc,
                 xwaop_add(xwsz_t, &oc->capacity, oc->pg_objnr, NULL, NULL);
                 xwaop_add(xwsz_t, &oc->idleness, oc->pg_objnr, NULL, NULL);
                 xwmm_mempool_objcache_page_init(oc, pg);
-                xwlk_sqlk_wr_lock_cpuirqsv(&oc->page_list.lock, &flag);
+                xwos_sqlk_wr_lock_cpuirqsv(&oc->page_list.lock, &flag);
                 xwlib_bclst_add_tail(&oc->page_list.idle, &pg->attr.objcache.node);
-                xwlk_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
+                xwos_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
         } else if (reserved + oc->pg_objnr < idleness) {
                 xwsz_t nr;
 

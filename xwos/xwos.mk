@@ -47,8 +47,8 @@ ifeq ($(XWMMCFG_MEMPOOL),y)
 endif
 
 ######## kernel ########
-ifeq ($(XuanWuOS_CFG_CORE),smp)
-    include xwos/smp/smp.mk
+ifeq ($(XuanWuOS_CFG_CORE),mp)
+    include xwos/mp/mp.mk
 else
     include xwos/up/up.mk
 endif

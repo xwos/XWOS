@@ -40,23 +40,23 @@ xwu32_t xwaop__xwu32_t__load(__xwcc_atomic xwu32_t * a,
                 break;
         case xwmb_modr_consume:
                 v = *a;
-                xwmb_smp_ddb();
+                xwmb_mp_ddb();
                 break;
         case xwmb_modr_acquire:
                 v = *a;
-                xwmb_smp_mb();
+                xwmb_mp_mb();
                 break;
         case xwmb_modr_release:
                 v = *a;
                 break;
         case xwmb_modr_acq_rel:
                 v = *a;
-                xwmb_smp_mb();
+                xwmb_mp_mb();
                 break;
         case xwmb_modr_seq_cst:
-                xwmb_smp_mb();
+                xwmb_mp_mb();
                 v = *a;
-                xwmb_smp_mb();
+                xwmb_mp_mb();
                 break;
         default:
                 v = *a;
@@ -81,17 +81,17 @@ xwu32_t xwaop__xwu32_t__store(__xwcc_atomic xwu32_t * a,
                 *a = v;
                 break;
         case xwmb_modr_release:
-                xwmb_smp_mb();
+                xwmb_mp_mb();
                 *a = v;
                 break;
         case xwmb_modr_acq_rel:
-                xwmb_smp_mb();
+                xwmb_mp_mb();
                 *a = v;
                 break;
         case xwmb_modr_seq_cst:
-                xwmb_smp_mb();
+                xwmb_mp_mb();
                 *a = v;
-                xwmb_smp_mb();
+                xwmb_mp_mb();
                 break;
         default:
                 *a = v;
@@ -120,7 +120,7 @@ void xwaop__xwu32_t__write(__xwcc_atomic xwu32_t * a,
 
         do {
                 o = (xwu32_t)lwarx(a);
-                xwmb_smp_mb();
+                xwmb_mp_mb();
         } while (stwcx(a, (xwu32_t)v));
         if (ov) {
                 *ov = o;
@@ -139,11 +139,11 @@ xwer_t xwaop__xwu32_t__teq_then_write(__xwcc_atomic xwu32_t * a,
         do {
                 o = (xwu32_t)lwarx(a);
                 if (o == t) {
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)v);
                 } else {
                         rc = -EACCES;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -165,11 +165,11 @@ xwer_t xwaop__xwu32_t__tne_then_write(__xwcc_atomic xwu32_t * a,
         do {
                 o = (xwu32_t)lwarx(a);
                 if (o != t) {
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)v);
                 } else {
                         rc = -EACCES;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -191,11 +191,11 @@ xwer_t xwaop__xwu32_t__tgt_then_write(__xwcc_atomic xwu32_t * a,
         do {
                 o = (xwu32_t)lwarx(a);
                 if (o > t) {
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)v);
                 } else {
                         rc = -EACCES;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -217,11 +217,11 @@ xwer_t xwaop__xwu32_t__tge_then_write(__xwcc_atomic xwu32_t * a,
         do {
                 o = (xwu32_t)lwarx(a);
                 if (o >= t) {
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)v);
                 } else {
                         rc = -EACCES;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -243,11 +243,11 @@ xwer_t xwaop__xwu32_t__tlt_then_write(__xwcc_atomic xwu32_t * a,
         do {
                 o = (xwu32_t)lwarx(a);
                 if (o < t) {
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)v);
                 } else {
                         rc = -EACCES;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -269,11 +269,11 @@ xwer_t xwaop__xwu32_t__tle_then_write(__xwcc_atomic xwu32_t * a,
         do {
                 o = (xwu32_t)lwarx(a);
                 if (o <= t) {
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)v);
                 } else {
                         rc = -EACCES;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -295,11 +295,11 @@ xwer_t xwaop__xwu32_t__tgtlt_then_write(__xwcc_atomic xwu32_t * a,
         do {
                 o = (xwu32_t)lwarx(a);
                 if ((o > l) && (o < r)) {
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)v);
                 } else {
                         rc = -EACCES;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -321,11 +321,11 @@ xwer_t xwaop__xwu32_t__tgelt_then_write(__xwcc_atomic xwu32_t * a,
         do {
                 o = (xwu32_t)lwarx(a);
                 if ((o >= l) && (o < r)) {
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)v);
                 } else {
                         rc = -EACCES;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -347,11 +347,11 @@ xwer_t xwaop__xwu32_t__tgtle_then_write(__xwcc_atomic xwu32_t * a,
         do {
                 o = (xwu32_t)lwarx(a);
                 if ((o > l) && (o <= r)) {
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)v);
                 } else {
                         rc = -EACCES;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -373,11 +373,11 @@ xwer_t xwaop__xwu32_t__tgele_then_write(__xwcc_atomic xwu32_t * a,
         do {
                 o = (xwu32_t)lwarx(a);
                 if ((o >= l) && (o <= r)) {
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)v);
                 } else {
                         rc = -EACCES;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -398,7 +398,7 @@ void xwaop__xwu32_t__add(__xwcc_atomic xwu32_t * a,
         do {
                 o = (xwu32_t)lwarx(a);
                 n = o + v;
-                xwmb_smp_mb();
+                xwmb_mp_mb();
         } while (stwcx(a, (xwu32_t)n));
         if (nv) {
                 *nv = n;
@@ -422,12 +422,12 @@ xwer_t xwaop__xwu32_t__teq_then_add(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o == t) {
                         n = o + v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -454,12 +454,12 @@ xwer_t xwaop__xwu32_t__tne_then_add(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o != t) {
                         n = o + v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -486,12 +486,12 @@ xwer_t xwaop__xwu32_t__tgt_then_add(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o > t) {
                         n = o + v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -518,12 +518,12 @@ xwer_t xwaop__xwu32_t__tge_then_add(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o >= t) {
                         n = o + v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -550,12 +550,12 @@ xwer_t xwaop__xwu32_t__tlt_then_add(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o < t) {
                         n = o + v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -582,12 +582,12 @@ xwer_t xwaop__xwu32_t__tle_then_add(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o <= t) {
                         n = o + v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -614,12 +614,12 @@ xwer_t xwaop__xwu32_t__tgtlt_then_add(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if ((o > l) && (o < r)) {
                         n = o + v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -646,12 +646,12 @@ xwer_t xwaop__xwu32_t__tgelt_then_add(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if ((o >= l) && (o < r)) {
                         n = o + v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -678,12 +678,12 @@ xwer_t xwaop__xwu32_t__tgtle_then_add(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if ((o > l) && (o <= r)) {
                         n = o + v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -710,12 +710,12 @@ xwer_t xwaop__xwu32_t__tgele_then_add(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if ((o >= l) && (o <= r)) {
                         n = o + v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -739,7 +739,7 @@ void xwaop__xwu32_t__sub(__xwcc_atomic xwu32_t * a,
         do {
                 o = (xwu32_t)lwarx(a);
                 n = o - v;
-                xwmb_smp_mb();
+                xwmb_mp_mb();
         } while (stwcx(a, (xwu32_t)n));
         if (nv) {
                 *nv = n;
@@ -763,12 +763,12 @@ xwer_t xwaop__xwu32_t__teq_then_sub(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o == t) {
                         n = o - v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -795,12 +795,12 @@ xwer_t xwaop__xwu32_t__tne_then_sub(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o != t) {
                         n = o - v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -827,12 +827,12 @@ xwer_t xwaop__xwu32_t__tgt_then_sub(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o > t) {
                         n = o - v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -859,12 +859,12 @@ xwer_t xwaop__xwu32_t__tge_then_sub(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o >= t) {
                         n = o - v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -891,12 +891,12 @@ xwer_t xwaop__xwu32_t__tlt_then_sub(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o < t) {
                         n = o - v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -923,12 +923,12 @@ xwer_t xwaop__xwu32_t__tle_then_sub(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o <= t) {
                         n = o - v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -955,12 +955,12 @@ xwer_t xwaop__xwu32_t__tgtlt_then_sub(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if ((o > l) && (o < r)) {
                         n = o - v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -987,12 +987,12 @@ xwer_t xwaop__xwu32_t__tgelt_then_sub(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if ((o >= l) && (l < r)) {
                         n = o - v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -1019,12 +1019,12 @@ xwer_t xwaop__xwu32_t__tgtle_then_sub(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if ((o > l) && (o <= r)) {
                         n = o - v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -1051,12 +1051,12 @@ xwer_t xwaop__xwu32_t__tgele_then_sub(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if ((o >= l) && (o <= r)) {
                         n = o - v;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -1080,7 +1080,7 @@ void xwaop__xwu32_t__rsb(__xwcc_atomic xwu32_t * a,
         do {
                 o = (xwu32_t)lwarx(a);
                 n = v - o;
-                xwmb_smp_mb();
+                xwmb_mp_mb();
         } while (stwcx(a, (xwu32_t)n));
         if (nv) {
                 *nv = n;
@@ -1104,12 +1104,12 @@ xwer_t xwaop__xwu32_t__teq_then_rsb(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o == t) {
                         n = v - o;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -1136,12 +1136,12 @@ xwer_t xwaop__xwu32_t__tne_then_rsb(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o != t) {
                         n = v - o;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -1168,12 +1168,12 @@ xwer_t xwaop__xwu32_t__tgt_then_rsb(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o > t) {
                         n = v - o;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -1200,12 +1200,12 @@ xwer_t xwaop__xwu32_t__tge_then_rsb(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o != t) {
                         n = v - o;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -1232,12 +1232,12 @@ xwer_t xwaop__xwu32_t__tlt_then_rsb(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o < t) {
                         n = v - o;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -1264,12 +1264,12 @@ xwer_t xwaop__xwu32_t__tle_then_rsb(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o <= t) {
                         n = v - o;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -1296,12 +1296,12 @@ xwer_t xwaop__xwu32_t__tgtlt_then_rsb(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if ((o > l) && (o < r)) {
                         n = v - o;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -1328,12 +1328,12 @@ xwer_t xwaop__xwu32_t__tgelt_then_rsb(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if ((o >= l) && (o < r)) {
                         n = v - o;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -1360,12 +1360,12 @@ xwer_t xwaop__xwu32_t__tgtle_then_rsb(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if ((o > l) && (o <= r)) {
                         n = v - o;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -1392,12 +1392,12 @@ xwer_t xwaop__xwu32_t__tgele_then_rsb(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if ((o >= l) && (o <= r)) {
                         n = v - o;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -1421,7 +1421,7 @@ void xwaop__xwu32_t__or(__xwcc_atomic xwu32_t * a,
         do {
                 o = (xwu32_t)lwarx(a);
                 n = o | v;
-                xwmb_smp_mb();
+                xwmb_mp_mb();
         } while (stwcx(a, (xwu32_t)n));
         if (nv) {
                 *nv = n;
@@ -1442,7 +1442,7 @@ void xwaop__xwu32_t__and(__xwcc_atomic xwu32_t * a,
         do {
                 o = (xwu32_t)lwarx(a);
                 n = o & v;
-                xwmb_smp_mb();
+                xwmb_mp_mb();
         } while (stwcx(a, (xwu32_t)n));
         if (nv) {
                 *nv = n;
@@ -1463,7 +1463,7 @@ void xwaop__xwu32_t__xor(__xwcc_atomic xwu32_t * a,
         do {
                 o = (xwu32_t)lwarx(a);
                 n = o ^ v;
-                xwmb_smp_mb();
+                xwmb_mp_mb();
         } while (stwcx(a, (xwu32_t)n));
         if (nv) {
                 *nv = n;
@@ -1484,7 +1484,7 @@ void xwaop__xwu32_t__c0m(__xwcc_atomic xwu32_t * a,
         do {
                 o = (xwu32_t)lwarx(a);
                 n = o & (~m);
-                xwmb_smp_mb();
+                xwmb_mp_mb();
         } while (stwcx(a, (xwu32_t)n));
         if (nv) {
                 *nv = n;
@@ -1507,12 +1507,12 @@ xwer_t xwaop__xwu32_t__t1ma_then_c0m(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if ((o & m) == m) {
                         n = o & (~m);
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -1538,12 +1538,12 @@ xwer_t xwaop__xwu32_t__t1mo_then_c0m(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (o & m) {
                         n = o & (~m);
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -1569,12 +1569,12 @@ xwer_t xwaop__xwu32_t__t0ma_then_s1m(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if (!(o & m)) {
                         n = o | m;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -1600,12 +1600,12 @@ xwer_t xwaop__xwu32_t__t0mo_then_s1m(__xwcc_atomic xwu32_t * a,
                 o = (xwu32_t)lwarx(a);
                 if ((o & m) != m) {
                         n = o | m;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = stwcx(a, (xwu32_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);
@@ -1634,29 +1634,29 @@ xwer_t xwaop__xwu32_t__tst_then_op(__xwcc_atomic xwu32_t * a,
                         if (tst((const void *)&o, tst_args)) {
                                 if (op) {
                                         op(&n, (const void *)&o, op_args);
-                                        xwmb_smp_mb();
+                                        xwmb_mp_mb();
                                         rc = stwcx(a, (xwu32_t)n);
                                 } else {
                                         rc = XWOK;
                                         n = o;
-                                        xwmb_smp_mb();
+                                        xwmb_mp_mb();
                                         break;
                                 }
                         } else {
                                 rc = -EACCES;
                                 n = o;
-                                xwmb_smp_ddb();
+                                xwmb_mp_ddb();
                                 break;
                         }
                 } else {
                         if (op) {
                                 op(&n, (const void *)&o, op_args);
-                                xwmb_smp_mb();
+                                xwmb_mp_mb();
                                 rc = stwcx(a, (xwu32_t)n);
                         } else {
                                 rc = XWOK;
                                 n = o;
-                                xwmb_smp_mb();
+                                xwmb_mp_mb();
                                 break;
                         }
                 }

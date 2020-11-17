@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC external input interrupt handler
+ * @brief SOC描述层：External Input Interrupt Handler
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

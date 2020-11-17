@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief mpc560xb mode entry control
+ * @brief SOC描述层：mpc560xb mode entry control
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

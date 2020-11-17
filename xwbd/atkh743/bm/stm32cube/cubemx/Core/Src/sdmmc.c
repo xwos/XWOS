@@ -29,11 +29,10 @@
 /* USER CODE BEGIN 0 */
 #include <string.h>
 #include <xwos/lib/xwbop.h>
-#include <xwos/osal/scheduler.h>
-#include <xwos/osal/thread.h>
-#include <xwos/osal/lock/mutex.h>
+#include <xwos/osal/skd.h>
+#include <xwos/osal/lock/mtx.h>
 #include <xwos/osal/lock/spinlock.h>
-#include <xwos/osal/sync/condition.h>
+#include <xwos/osal/sync/cond.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <bdl/axisram.h>
@@ -48,11 +47,9 @@ extern xwsz_t sdram_mr_size[];
 
 extern struct xwmm_mempool * sdram_mempool;
 
-struct xwosal_mtx hsd1_xfer_mtx;
-xwid_t hsd1_xfer_mtx_id;
-struct xwosal_splk hsd1_lock;
-struct xwosal_cdt hsd1_xfer_cdt;
-xwid_t hsd1_xfer_cdt_id;
+struct xwos_mtx hsd1_xfer_mtx;
+struct xwos_splk hsd1_lock;
+struct xwos_cond hsd1_xfer_cond;
 xwer_t hsd1_xfer_rc = XWOK;
 
 static
@@ -60,30 +57,29 @@ xwer_t MX_SDMMC1_SD_Construct(void)
 {
   xwer_t rc;
 
-  xwosal_splk_init(&hsd1_lock);
-  rc = xwosal_mtx_init(&hsd1_xfer_mtx, XWOSAL_SD_PRIORITY_RT_MAX);
+  xwos_splk_init(&hsd1_lock);
+  rc = xwos_mtx_init(&hsd1_xfer_mtx, XWOS_SKD_PRIORITY_RT_MAX);
   if (rc < 0) {
     goto err_mtx_init;
   }
-  hsd1_xfer_mtx_id = xwosal_mtx_get_id(&hsd1_xfer_mtx);
 
-  rc = xwosal_cdt_init(&hsd1_xfer_cdt);
+  rc = xwos_cond_init(&hsd1_xfer_cond);
   if (rc < 0) {
-    goto err_cdt_init;
+    goto err_cond_init;
   }
-  hsd1_xfer_cdt_id = xwosal_cdt_get_id(&hsd1_xfer_cdt);
+
   return XWOK;
 
-err_cdt_init:
-  xwosal_mtx_destroy(&hsd1_xfer_mtx);
+err_cond_init:
+  xwos_mtx_destroy(&hsd1_xfer_mtx);
 err_mtx_init:
   return rc;
 }
 
 void MX_SDMMC1_SD_Destruct(void)
 {
-  xwosal_cdt_destroy(&hsd1_xfer_cdt);
-  xwosal_mtx_destroy(&hsd1_xfer_mtx);
+  xwos_cond_destroy(&hsd1_xfer_cond);
+  xwos_mtx_destroy(&hsd1_xfer_mtx);
 }
 
 /* USER CODE END 0 */
@@ -228,7 +224,7 @@ xwer_t MX_SDMMC1_SD_TrimClk(xwsq_t cnt)
   memset(buf, 0xFF, 512);
   for (i = 0; i < cnt; i++) {
     time = 1 * XWTM_MS;
-    xwosal_cthrd_sleep(&time);
+    xwos_cthrd_sleep(&time);
     rc = MX_SDMMC1_SD_Read(buf, i, 1);
     if (XWOK == rc) {
     } else if (-EIO == rc) {
@@ -290,7 +286,7 @@ xwer_t MX_SDMMC1_SD_Read(uint8_t * buf, uint32_t blkaddr,
     mem = buf;
   }
 
-  rc = xwosal_mtx_lock(hsd1_xfer_mtx_id);
+  rc = xwos_mtx_lock(&hsd1_xfer_mtx);
   if (rc < 0) {
     goto err_mtx_lock;
   }
@@ -308,28 +304,28 @@ xwer_t MX_SDMMC1_SD_Read(uint8_t * buf, uint32_t blkaddr,
       HAL_StatusTypeDef halrc;
       xwreg_t cpuirq;
       xwsq_t lkst;
-      union xwlk_ulock ulk;
+      union xwos_ulock ulk;
 
       hsd1_xfer_rc = -EINPROGRESS;
       ulk.osal.splk = &hsd1_lock;
       halrc = HAL_SD_ReadBlocks_DMA(&hsd1, mem, blkaddr, nrblk);
       if (HAL_OK == halrc) {
-        xwosal_splk_lock_cpuirqsv(&hsd1_lock, &cpuirq);
+        xwos_splk_lock_cpuirqsv(&hsd1_lock, &cpuirq);
         if (-EINPROGRESS == hsd1_xfer_rc) {
-          rc = xwosal_cdt_wait(hsd1_xfer_cdt_id,
-                               ulk, XWLK_TYPE_SPLK,
-                               NULL, &lkst);
+          rc = xwos_cond_wait(&hsd1_xfer_cond,
+                              ulk, XWOS_LK_SPLK,
+                              NULL, &lkst);
           if (XWOK == rc) {
             rc = hsd1_xfer_rc;
           } else {
-            if (XWLK_STATE_UNLOCKED == lkst) {
-              xwosal_splk_lock(&hsd1_lock);
+            if (XWOS_LKST_UNLOCKED == lkst) {
+              xwos_splk_lock(&hsd1_lock);
             }
           }
         } else {
           rc = hsd1_xfer_rc;
         }
-        xwosal_splk_unlock_cpuirqrs(&hsd1_lock, cpuirq);
+        xwos_splk_unlock_cpuirqrs(&hsd1_lock, cpuirq);
       } else if (HAL_BUSY == halrc) {
         rc = -EBUSY;
       } else {
@@ -339,7 +335,7 @@ xwer_t MX_SDMMC1_SD_Read(uint8_t * buf, uint32_t blkaddr,
       rc = -EBUSY;
     }
   } while ((-EIO == rc) && (cnt < MX_SDMMC1_SD_MAX_RETRY_TIMES));
-  xwosal_mtx_unlock(hsd1_xfer_mtx_id);
+  xwos_mtx_unlock(&hsd1_xfer_mtx);
   if (XWOK == rc) {
     SCB_InvalidateDCache_by_Addr((uint32_t *)mem,
                                  (int32_t)ALIGN((nrblk * BLOCKSIZE),
@@ -388,7 +384,7 @@ xwer_t MX_SDMMC1_SD_Write(uint8_t * data, uint32_t blkaddr,
   SCB_CleanDCache_by_Addr((uint32_t *)mem,
                           (int32_t)ALIGN((nrblk * BLOCKSIZE),
                                          CPUCFG_L1_CACHELINE_SIZE));
-  rc = xwosal_mtx_lock(hsd1_xfer_mtx_id);
+  rc = xwos_mtx_lock(&hsd1_xfer_mtx);
   if (rc < 0) {
     goto err_mtx_lock;
   }
@@ -406,28 +402,28 @@ xwer_t MX_SDMMC1_SD_Write(uint8_t * data, uint32_t blkaddr,
       HAL_StatusTypeDef halrc;
       xwreg_t cpuirq;
       xwsq_t lkst;
-      union xwlk_ulock ulk;
+      union xwos_ulock ulk;
 
       hsd1_xfer_rc = -EINPROGRESS;
       ulk.osal.splk = &hsd1_lock;
       halrc = HAL_SD_WriteBlocks_DMA(&hsd1, mem, blkaddr, nrblk);
       if (HAL_OK == halrc) {
-        xwosal_splk_lock_cpuirqsv(&hsd1_lock, &cpuirq);
+        xwos_splk_lock_cpuirqsv(&hsd1_lock, &cpuirq);
         if (-EINPROGRESS == hsd1_xfer_rc) {
-          rc = xwosal_cdt_wait(hsd1_xfer_cdt_id,
-                               ulk, XWLK_TYPE_SPLK,
-                               NULL, &lkst);
+          rc = xwos_cond_wait(&hsd1_xfer_cond,
+                              ulk, XWOS_LK_SPLK,
+                              NULL, &lkst);
           if (XWOK == rc) {
             rc = hsd1_xfer_rc;
           } else {
-            if (XWLK_STATE_UNLOCKED == lkst) {
-              xwosal_splk_lock(&hsd1_lock);
+            if (XWOS_LKST_UNLOCKED == lkst) {
+              xwos_splk_lock(&hsd1_lock);
             }
           }
         } else {
           rc = hsd1_xfer_rc;
         }
-        xwosal_splk_unlock_cpuirqrs(&hsd1_lock, cpuirq);
+        xwos_splk_unlock_cpuirqrs(&hsd1_lock, cpuirq);
       } else if (HAL_BUSY == halrc) {
         rc = -EBUSY;
       } else {
@@ -437,7 +433,7 @@ xwer_t MX_SDMMC1_SD_Write(uint8_t * data, uint32_t blkaddr,
       rc = -EBUSY;
     }
   } while ((-EIO == rc) && (cnt < MX_SDMMC1_SD_MAX_RETRY_TIMES));
-  xwosal_mtx_unlock(hsd1_xfer_mtx_id);
+  xwos_mtx_unlock(&hsd1_xfer_mtx);
 
 err_mtx_lock:
   if (mem != data) {
@@ -462,14 +458,14 @@ void HAL_SD_RxCpltCallback(SD_HandleTypeDef * phsd)
 
   if ((SD_CONTEXT_NONE == phsd->Context) && (HAL_SD_STATE_READY == phsd->State)) {
     xwreg_t cpuirq;
-    xwosal_splk_lock_cpuirqsv(&hsd1_lock, &cpuirq);
+    xwos_splk_lock_cpuirqsv(&hsd1_lock, &cpuirq);
     if (phsd->ErrorCode != HAL_SD_ERROR_NONE) {
       hsd1_xfer_rc = -EIO;
     } else {
       hsd1_xfer_rc = XWOK;
     }
-    xwosal_splk_unlock_cpuirqrs(&hsd1_lock, cpuirq);
-    xwosal_cdt_broadcast(hsd1_xfer_cdt_id);
+    xwos_splk_unlock_cpuirqrs(&hsd1_lock, cpuirq);
+    xwos_cond_broadcast(&hsd1_xfer_cond);
   }
 }
 
@@ -483,14 +479,14 @@ void HAL_SD_TxCpltCallback(SD_HandleTypeDef * phsd)
   }
   if ((SD_CONTEXT_NONE == phsd->Context) && (HAL_SD_STATE_READY == phsd->State)) {
     xwreg_t cpuirq;
-    xwosal_splk_lock_cpuirqsv(&hsd1_lock, &cpuirq);
+    xwos_splk_lock_cpuirqsv(&hsd1_lock, &cpuirq);
     if (phsd->ErrorCode != HAL_SD_ERROR_NONE) {
       hsd1_xfer_rc = -EIO;
     } else {
       hsd1_xfer_rc = XWOK;
     }
-    xwosal_splk_unlock_cpuirqrs(&hsd1_lock, cpuirq);
-    xwosal_cdt_broadcast(hsd1_xfer_cdt_id);
+    xwos_splk_unlock_cpuirqrs(&hsd1_lock, cpuirq);
+    xwos_cond_broadcast(&hsd1_xfer_cond);
   }
 }
 
@@ -498,14 +494,14 @@ void HAL_SD_ErrorCallback(SD_HandleTypeDef * phsd)
 {
   if ((SD_CONTEXT_NONE == phsd->Context) && (HAL_SD_STATE_READY == phsd->State)) {
     xwreg_t cpuirq;
-    xwosal_splk_lock_cpuirqsv(&hsd1_lock, &cpuirq);
+    xwos_splk_lock_cpuirqsv(&hsd1_lock, &cpuirq);
     if (phsd->ErrorCode != HAL_SD_ERROR_NONE) {
       hsd1_xfer_rc = -EIO;
     } else {
       hsd1_xfer_rc = XWOK;
     }
-    xwosal_splk_unlock_cpuirqrs(&hsd1_lock, cpuirq);
-    xwosal_cdt_broadcast(hsd1_xfer_cdt_id);
+    xwos_splk_unlock_cpuirqrs(&hsd1_lock, cpuirq);
+    xwos_cond_broadcast(&hsd1_xfer_cond);
   }
 }
 
@@ -513,10 +509,10 @@ void HAL_SD_AbortCallback(SD_HandleTypeDef * phsd)
 {
   if ((SD_CONTEXT_NONE == phsd->Context) && (HAL_SD_STATE_READY == phsd->State)) {
     xwreg_t cpuirq;
-    xwosal_splk_lock_cpuirqsv(&hsd1_lock, &cpuirq);
+    xwos_splk_lock_cpuirqsv(&hsd1_lock, &cpuirq);
     hsd1_xfer_rc = -ECANCELED;
-    xwosal_splk_unlock_cpuirqrs(&hsd1_lock, cpuirq);
-    xwosal_cdt_broadcast(hsd1_xfer_cdt_id);
+    xwos_splk_unlock_cpuirqrs(&hsd1_lock, cpuirq);
+    xwos_cond_broadcast(&hsd1_xfer_cond);
   }
 }
 

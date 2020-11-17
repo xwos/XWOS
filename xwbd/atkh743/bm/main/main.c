@@ -21,8 +21,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/osal/scheduler.h>
-#include <xwos/osal/thread.h>
+#include <xwos/osal/skd.h>
 #include <xwmd/libc/newlibac/mif.h>
 #include <xwem/vm/lua/mif.h>
 #include <xwam/example/xwlib/crc/mif.h>
@@ -34,7 +33,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define MAIN_THRD_PRIORITY XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 0)
+#define MAIN_THRD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
@@ -44,14 +43,14 @@ xwer_t main_thrd(void * arg);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-const struct xwosal_thrd_desc main_thrd_td = {
+const struct xwos_thrd_desc main_thrd_td = {
         .name = "main.thrd",
         .prio = MAIN_THRD_PRIORITY,
-        .stack = XWOSAL_THRD_STACK_DYNAMIC,
+        .stack = XWOS_THRD_STACK_DYNAMIC,
         .stack_size = 4096,
-        .func = (xwosal_thrd_f)main_thrd,
+        .func = (xwos_thrd_f)main_thrd,
         .arg = NULL,
-        .attr = XWSDOBJ_ATTR_PRIVILEGED,
+        .attr = XWOS_SKDATTR_PRIVILEGED,
 };
 xwid_t main_thrd_id;
 
@@ -62,27 +61,27 @@ xwer_t xwos_main(void)
 {
         xwer_t rc;
 
-        rc = xwosal_thrd_create(&main_thrd_id,
-                                main_thrd_td.name,
-                                main_thrd_td.func,
-                                main_thrd_td.arg,
-                                main_thrd_td.stack_size,
-                                main_thrd_td.prio,
-                                main_thrd_td.attr);
+        rc = xwos_thrd_create(&main_thrd_id,
+                              main_thrd_td.name,
+                              main_thrd_td.func,
+                              main_thrd_td.arg,
+                              main_thrd_td.stack_size,
+                              main_thrd_td.prio,
+                              main_thrd_td.attr);
         if (rc < 0) {
                 goto err_init_thrd_create;
         }
 
-        rc = xwosal_scheduler_start_lc();
+        rc = xwos_skd_start_lc();
         if (rc < 0) {
-                goto err_scheduler_start_lc;
+                goto err_skd_start_lc;
         }
 
         return XWOK;
 
 err_init_thrd_create:
         BDL_BUG();
-err_scheduler_start_lc:
+err_skd_start_lc:
         BDL_BUG();
         return rc;
 }
@@ -122,7 +121,7 @@ xwer_t main_thrd(void * arg)
         }
 #endif /* XWEMCFG_vm_lua */
 
-        xwosal_thrd_delete(main_thrd_id);
+        xwos_thrd_delete(main_thrd_id);
         return XWOK;
 
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)

@@ -47,10 +47,10 @@ extern struct xwds_w25qxx_cmd xwds_w25q128jv_cmd[XWDS_W25QXX_CMD_NUM];
 /******** ******** base driver ******** ********/
 xwer_t xwds_w25qxx_drv_start(struct xwds_device * dev);
 xwer_t xwds_w25qxx_drv_stop(struct xwds_device * dev);
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 xwer_t xwds_w25qxx_drv_resume(struct xwds_device * dev);
 xwer_t xwds_w25qxx_drv_suspend(struct xwds_device * dev);
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
 
 /******** ******** ******** APIs ******** ******** ********/
 xwer_t xwds_w25qxx_cfgbus(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm);
@@ -87,9 +87,5 @@ xwer_t xwds_w25qxx_erase_32kblk(struct xwds_w25qxx * w25qxx, xwu32_t address,
 xwer_t xwds_w25qxx_erase_64kblk(struct xwds_w25qxx * w25qxx, xwu32_t address,
                                 xwtm_t * xwtm);
 xwer_t xwds_w25qxx_erase_chip(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm);
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 
 #endif /* xwcd/perpheral/spi/flash/w25qxx/driver.h */

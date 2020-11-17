@@ -175,8 +175,8 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* spiHandle)
     HAL_NVIC_EnableIRQ(SPI1_IRQn);
   /* USER CODE BEGIN SPI1_MspInit 1 */
     hspi1_drvdata.halhdl = &hspi1;
-    xwosal_splk_init(&hspi1_drvdata.splk);
-    xwosal_cdt_init(&hspi1_drvdata.cdt);
+    xwos_splk_init(&hspi1_drvdata.splk);
+    xwos_cond_init(&hspi1_drvdata.cond);
     hspi1_drvdata.txd = NULL;
     hspi1_drvdata.rxb = NULL;
     hspi1_drvdata.rc = -ECANCELED;
@@ -246,8 +246,8 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* spiHandle)
     HAL_NVIC_EnableIRQ(SPI2_IRQn);
   /* USER CODE BEGIN SPI2_MspInit 1 */
     hspi2_drvdata.halhdl = &hspi2;
-    xwosal_splk_init(&hspi2_drvdata.splk);
-    xwosal_cdt_init(&hspi2_drvdata.cdt);
+    xwos_splk_init(&hspi2_drvdata.splk);
+    xwos_cond_init(&hspi2_drvdata.cond);
     hspi2_drvdata.txd = NULL;
     hspi2_drvdata.rxb = NULL;
     hspi2_drvdata.rc = -ECANCELED;
@@ -263,7 +263,7 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* spiHandle)
   if(spiHandle->Instance==SPI1)
   {
   /* USER CODE BEGIN SPI1_MspDeInit 0 */
-    xwosal_cdt_destroy(&hspi1_drvdata.cdt);
+    xwos_cond_destroy(&hspi1_drvdata.cond);
 
   /* USER CODE END SPI1_MspDeInit 0 */
     /* Peripheral clock disable */
@@ -290,7 +290,7 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* spiHandle)
   else if(spiHandle->Instance==SPI2)
   {
   /* USER CODE BEGIN SPI2_MspDeInit 0 */
-    xwosal_cdt_destroy(&hspi2_drvdata.cdt);
+    xwos_cond_destroy(&hspi2_drvdata.cond);
 
   /* USER CODE END SPI2_MspDeInit 0 */
     /* Peripheral clock disable */

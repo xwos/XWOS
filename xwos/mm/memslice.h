@@ -19,7 +19,6 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/object.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/lfq.h>
 #include <xwos/mm/common.h>

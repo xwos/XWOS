@@ -25,7 +25,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwmd/ds/i2c/perpheral.h>
+#include <xwcd/ds/i2c/perpheral.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -53,17 +53,13 @@ struct xwds_eeprom {
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
+ ******** ********       API function prototypes       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** ******** constructor & destructor ******** ******** ********/
 void xwds_eeprom_construct(struct xwds_eeprom * eeprom);
 void xwds_eeprom_destruct(struct xwds_eeprom * eeprom);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 增加对象的引用计数
+ * @brief EEPROM API：增加对象的引用计数
  * @param eeprom: (I) I2C EEPROM对象指针
  * @return 错误码
  * @retval @ref xwds_i2cp_grab()
@@ -75,7 +71,7 @@ xwer_t xwds_eeprom_grab(struct xwds_eeprom * eeprom)
 }
 
 /**
- * @brief 减少对象的引用计数
+ * @brief EEPROM API：减少对象的引用计数
  * @param eeprom: (I) I2C EEPROM对象指针
  * @return 错误码
  * @retval @ref xwds_i2cp_put()
@@ -87,7 +83,7 @@ xwer_t xwds_eeprom_put(struct xwds_eeprom * eeprom)
 }
 
 /**
- * @brief 增加设备运行状态计数器
+ * @brief EEPROM API：增加设备运行状态计数器
  * @param eeprom: (I) I2C EEPROM对象指针
  * @return 错误码
  * @retval @ref xwds_i2cp_request()
@@ -99,7 +95,7 @@ xwer_t xwds_eeprom_request(struct xwds_eeprom * eeprom)
 }
 
 /**
- * @brief 减少设备运行状态计数器
+ * @brief EEPROM API：减少设备运行状态计数器
  * @param eeprom: (I) I2C EEPROM对象指针
  * @return 错误码
  * @retval @ref xwds_i2cp_release()

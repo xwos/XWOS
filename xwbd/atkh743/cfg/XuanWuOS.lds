@@ -41,10 +41,8 @@ MEMORY {
                                                        .xwos.isr.text &
                                                        .xwos.text &
                                                        .xwos.rodata &
-                                                       .xwmd.isr.text &
-                                                       .xwmd.text &
-                                                       .xwmd.rodata &
-                                                       .text & .rodata */
+                                                       .text &
+                                                       .rodata */
         xwos_data_mr (arw): org = 0x800, len = 54k /* .xwos.data */
         data_mr (arw): org = 0x30000000, len = 288k /* .data, .bss & .heap */
         data4_mr (rw): org = 0x38000000, len = 64k /* .data4 for D3 Domain */

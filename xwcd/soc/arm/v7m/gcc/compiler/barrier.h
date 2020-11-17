@@ -25,7 +25,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <cfg/XuanWuOS.h>
-#include <xwos/type.h>
+#include <arch_type.h>
 #include <compiler/gcc.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -38,11 +38,11 @@
 #define armv7m_dmb()            __asm__ volatile("dmb" : : : "memory")
 #define armv7m_dsbisb()         __asm__ volatile("dsb\n isb" : : : "memory")
 
-#define xwmb_smp_isb()          armv7m_isb()
-#define xwmb_smp_mb()           armv7m_dsb()
-#define xwmb_smp_rmb()          xwmb_smp_mb()
-#define xwmb_smp_wmb()          armv7m_dmb()
-#define xwmb_smp_ddb()          xwccmb()
+#define xwmb_mp_isb()           armv7m_isb()
+#define xwmb_mp_mb()            armv7m_dsb()
+#define xwmb_mp_rmb()           xwmb_mp_mb()
+#define xwmb_mp_wmb()           armv7m_dmb()
+#define xwmb_mp_ddb()           xwccmb()
 
 #define xwmb_read8(a)           (*(volatile xwu8_t *)(a))
 #define xwmb_read16(a)          (*(volatile xwu16_t *)(a))

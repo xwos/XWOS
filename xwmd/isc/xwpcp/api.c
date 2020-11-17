@@ -13,14 +13,13 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
 #include <string.h>
+#include <xwos/standard.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/xwbmpaop.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/bma.h>
-#include <xwos/osal/scheduler.h>
-#include <xwos/osal/thread.h>
+#include <xwos/osal/skd.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwmd/isc/xwpcp/hwifal.h>
 #include <xwmd/isc/xwpcp/protocol.h>
@@ -30,8 +29,8 @@
  ******** ******** ********        type       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwpcp_tx_cbarg {
-        struct xwosal_splk splk;
-        struct xwosal_cdt cdt;
+        struct xwos_splk splk;
+        struct xwos_cond cond;
         volatile xwer_t rc;
 };
 
@@ -48,28 +47,28 @@ struct xwpcp_tx_cbarg {
  * @brief 发送线程的描述
  */
 static __xwmd_rodata
-const struct xwosal_thrd_desc xwpcp_rxthrd_td = {
+const struct xwos_thrd_desc xwpcp_rxthrd_td = {
         .name = "xwmd.isc.xwpcp.rxthrd",
         .prio = XWPCP_RXTHRD_PRIORITY,
-        .stack = XWOSAL_THRD_STACK_DYNAMIC,
+        .stack = XWOS_THRD_STACK_DYNAMIC,
         .stack_size = 2048,
-        .func = (xwosal_thrd_f)xwpcp_rxthrd,
+        .func = (xwos_thrd_f)xwpcp_rxthrd,
         .arg = NULL, /* TBD */
-        .attr = XWSDOBJ_ATTR_PRIVILEGED,
+        .attr = XWOS_SKDATTR_PRIVILEGED,
 };
 
 /**
  * @brief 发送线程的描述
  */
 static __xwmd_rodata
-const struct xwosal_thrd_desc xwpcp_txthrd_td = {
+const struct xwos_thrd_desc xwpcp_txthrd_td = {
         .name = "xwmd.isc.xwpcp.txthrd",
         .prio = XWPCP_TXTHRD_PRIORITY,
-        .stack = XWOSAL_THRD_STACK_DYNAMIC,
+        .stack = XWOS_THRD_STACK_DYNAMIC,
         .stack_size = 2048,
-        .func = (xwosal_thrd_f)xwpcp_txthrd,
+        .func = (xwos_thrd_f)xwpcp_txthrd,
         .arg = NULL, /* TBD */
-        .attr = XWSDOBJ_ATTR_PRIVILEGED,
+        .attr = XWOS_SKDATTR_PRIVILEGED,
 };
 
 /**
@@ -144,36 +143,36 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
                 xwlib_bclst_init_head(&xwpcp->txq.q[i]);
         }
         memset(&xwpcp->txq.nebmp, 0, sizeof(xwpcp->txq.nebmp));
-        xwosal_splk_init(&xwpcp->txq.lock);
-        rc = xwosal_smr_init(&xwpcp->txq.smr, 0, XWPCP_MEMBLK_NUM);
+        xwos_splk_init(&xwpcp->txq.lock);
+        rc = xwos_sem_init(&xwpcp->txq.sem, 0, XWPCP_MEMBLK_NUM);
         if (__xwcc_unlikely(rc < 0)) {
                 xwpcplogf(ERR, "Init TXQ semaphore ... [rc:%d]\n", rc);
-                goto err_txqsmr_init;
+                goto err_txqsem_init;
         }
-        rc = xwosal_mtx_init(&xwpcp->txq.csmtx, XWOSAL_SD_PRIORITY_RT_MIN);
+        rc = xwos_mtx_init(&xwpcp->txq.csmtx, XWOS_SKD_PRIORITY_RT_MIN);
         if (__xwcc_unlikely(rc < 0)) {
                 xwpcplogf(ERR, "Init xwpcp->csmtx ... [rc:%d]\n", rc);
                 goto err_csmtx_init;
         }
-        rc = xwosal_cdt_init(&xwpcp->txq.cscdt);
+        rc = xwos_cond_init(&xwpcp->txq.cscond);
         if (__xwcc_unlikely(rc < 0)) {
-                xwpcplogf(ERR, "Init xwpcp->cscdt ... [rc:%d]\n", rc);
-                goto err_cscdt_init;
+                xwpcplogf(ERR, "Init xwpcp->cscond ... [rc:%d]\n", rc);
+                goto err_cscond_init;
         }
         xwpcp->txq.txi.sender = NULL;
         xwpcp->txq.tmp = NULL;
-        xwosal_splk_init(&xwpcp->txq.ntflock);
+        xwos_splk_init(&xwpcp->txq.ntflock);
 
         /* 初始化接收状态机 */
         xwpcp->rxq.cnt = XWPCP_ID_SYNC;
         for (i = 0; i < (xwssq_t)XWPCP_PORT_NUM; i++) {
                 xwlib_bclst_init_head(&xwpcp->rxq.q[i]);
-                xwosal_splk_init(&xwpcp->rxq.lock[i]);
-                rc = xwosal_smr_init(&xwpcp->rxq.smr[i], 0, XWPCP_MEMBLK_NUM);
+                xwos_splk_init(&xwpcp->rxq.lock[i]);
+                rc = xwos_sem_init(&xwpcp->rxq.sem[i], 0, XWPCP_MEMBLK_NUM);
                 if (__xwcc_unlikely(rc < 0)) {
                         xwpcplogf(ERR, "Init RXQ semaphore[%d] ... [rc:%d]\n",
                                   i, rc);
-                        goto err_rxqsmr_init;
+                        goto err_rxqsem_init;
                 }
         }
 
@@ -187,24 +186,24 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         }
 
         /* 创建线程 */
-        rc = xwosal_thrd_create(&xwpcp->rxtid,
-                                xwpcp_rxthrd_td.name,
-                                xwpcp_rxthrd_td.func,
-                                xwpcp,
-                                xwpcp_rxthrd_td.stack_size,
-                                xwpcp_rxthrd_td.prio,
-                                xwpcp_rxthrd_td.attr);
+        rc = xwos_thrd_create(&xwpcp->rxtid,
+                              xwpcp_rxthrd_td.name,
+                              xwpcp_rxthrd_td.func,
+                              xwpcp,
+                              xwpcp_rxthrd_td.stack_size,
+                              xwpcp_rxthrd_td.prio,
+                              xwpcp_rxthrd_td.attr);
         if (rc < 0) {
                 goto err_rxthrd_create;
         }
 
-        rc = xwosal_thrd_create(&xwpcp->txtid,
-                                xwpcp_txthrd_td.name,
-                                xwpcp_txthrd_td.func,
-                                xwpcp,
-                                xwpcp_txthrd_td.stack_size,
-                                xwpcp_txthrd_td.prio,
-                                xwpcp_txthrd_td.attr);
+        rc = xwos_thrd_create(&xwpcp->txtid,
+                              xwpcp_txthrd_td.name,
+                              xwpcp_txthrd_td.func,
+                              xwpcp,
+                              xwpcp_txthrd_td.stack_size,
+                              xwpcp_txthrd_td.prio,
+                              xwpcp_txthrd_td.attr);
         if (rc < 0) {
                 goto err_txthrd_create;
         }
@@ -212,22 +211,22 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         return XWOK;
 
 err_txthrd_create:
-        xwosal_thrd_terminate(xwpcp->rxtid, &childrc);
-        xwosal_thrd_delete(xwpcp->rxtid);
+        xwos_thrd_terminate(xwpcp->rxtid, &childrc);
+        xwos_thrd_delete(xwpcp->rxtid);
         xwpcp->rxtid = 0;
 err_rxthrd_create:
         xwpcp_hwifal_close(xwpcp);
 err_hwifal_open:
-err_rxqsmr_init:
+err_rxqsem_init:
         for (j = i - 1; j >= 0; j--) {
-                xwosal_smr_destroy(&xwpcp->rxq.smr[j]);
+                xwos_sem_destroy(&xwpcp->rxq.sem[j]);
         }
-        xwosal_cdt_destroy(&xwpcp->txq.cscdt);
-err_cscdt_init:
-        xwosal_mtx_destroy(&xwpcp->txq.csmtx);
+        xwos_cond_destroy(&xwpcp->txq.cscond);
+err_cscond_init:
+        xwos_mtx_destroy(&xwpcp->txq.csmtx);
 err_csmtx_init:
-        xwosal_smr_destroy(&xwpcp->txq.smr);
-err_txqsmr_init:
+        xwos_sem_destroy(&xwpcp->txq.sem);
+err_txqsem_init:
         xwmm_bma_delete(xwpcp->slot.pool);
         xwpcp->slot.pool = NULL;
 err_bma_create:
@@ -245,18 +244,18 @@ xwer_t xwpcp_stop(struct xwpcp * xwpcp)
 
         XWPCP_VALIDATE((xwpcp), "nullptr", -EFAULT);
 
-        rc = xwosal_thrd_terminate(xwpcp->txtid, &childrc);
+        rc = xwos_thrd_terminate(xwpcp->txtid, &childrc);
         if (XWOK == rc) {
-                rc = xwosal_thrd_delete(xwpcp->txtid);
+                rc = xwos_thrd_delete(xwpcp->txtid);
                 if (XWOK == rc) {
                         xwpcp->txtid = 0;
                         xwpcplogf(INFO, "Terminate XWPCP TX thread... [OK]\n");
                 }
         }
 
-        rc = xwosal_thrd_terminate(xwpcp->rxtid, &childrc);
+        rc = xwos_thrd_terminate(xwpcp->rxtid, &childrc);
         if (XWOK == rc) {
-                rc = xwosal_thrd_delete(xwpcp->rxtid);
+                rc = xwos_thrd_delete(xwpcp->rxtid);
                 if (XWOK == rc) {
                         xwpcp->rxtid = 0;
                         xwpcplogf(INFO, "Terminate XWPCP RX thread... [OK]\n");
@@ -279,7 +278,7 @@ xwer_t xwpcp_stop(struct xwpcp * xwpcp)
 
         /* 释放TXQ中的剩余帧 */
         do {
-                rc = xwosal_smr_trywait(xwosal_smr_get_id(&xwpcp->txq.smr));
+                rc = xwos_sem_trywait(&xwpcp->txq.sem);
                 if (rc < 0) {
                         break;
                 }
@@ -290,7 +289,7 @@ xwer_t xwpcp_stop(struct xwpcp * xwpcp)
         /* 释放RXQ中的剩余帧 */
         for (j = XWPCP_PORT_NUM - 1; j >= 0; j--) {
                 do {
-                        rc = xwosal_smr_trywait(xwosal_smr_get_id(&xwpcp->rxq.smr[j]));
+                        rc = xwos_sem_trywait(&xwpcp->rxq.sem[j]);
                         if (rc < 0) {
                                 break;
                         }
@@ -300,11 +299,11 @@ xwer_t xwpcp_stop(struct xwpcp * xwpcp)
         }
 
         for (j = XWPCP_PORT_NUM - 1; j >= 0; j--) {
-                xwosal_smr_destroy(&xwpcp->rxq.smr[j]);
+                xwos_sem_destroy(&xwpcp->rxq.sem[j]);
         }
-        xwosal_cdt_destroy(&xwpcp->txq.cscdt);
-        xwosal_mtx_destroy(&xwpcp->txq.csmtx);
-        xwosal_smr_destroy(&xwpcp->txq.smr);
+        xwos_cond_destroy(&xwpcp->txq.cscond);
+        xwos_mtx_destroy(&xwpcp->txq.csmtx);
+        xwos_sem_destroy(&xwpcp->txq.sem);
         xwmm_bma_delete(xwpcp->slot.pool);
         xwpcp->slot.pool = NULL;
         return XWOK;
@@ -332,10 +331,10 @@ void xwpcp_tx_notify(struct xwpcp * xwpcp, xwpcp_fhdl_t fhdl, xwer_t rc, void * 
 
         xwpcplogf(DEBUG, "fhdl:%p, rc:%d\n", fhdl, rc);
         cbarg = arg;
-        xwosal_splk_lock(&cbarg->splk);
+        xwos_splk_lock(&cbarg->splk);
         cbarg->rc = rc;
-        xwosal_splk_unlock(&cbarg->splk);
-        xwosal_cdt_unicast(xwosal_cdt_get_id(&cbarg->cdt));
+        xwos_splk_unlock(&cbarg->splk);
+        xwos_cond_unicast(&cbarg->cond);
 }
 
 __xwmd_api
@@ -344,9 +343,8 @@ xwer_t xwpcp_tx(struct xwpcp * xwpcp,
                 xwtm_t * xwtm)
 {
         struct xwpcp_tx_cbarg cbarg;
-        union xwlk_ulock ulk;
+        union xwos_ulock ulk;
         xwpcp_fhdl_t fhdl;
-        xwid_t cdtid;
         xwsq_t lkst;
         xwer_t rc;
 
@@ -367,53 +365,52 @@ xwer_t xwpcp_tx(struct xwpcp * xwpcp,
                 goto err_ifnotrdy;
         }
 
-        xwosal_splk_init(&cbarg.splk);
-        rc = xwosal_cdt_init(&cbarg.cdt);
+        xwos_splk_init(&cbarg.splk);
+        rc = xwos_cond_init(&cbarg.cond);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_cdt_init;
+                goto err_cond_init;
         }
         cbarg.rc = -EINPROGRESS;
 
-        cdtid = xwosal_cdt_get_id(&cbarg.cdt);
         rc = xwpcp_eq(xwpcp, msg, prio, xwpcp_tx_notify, &cbarg, &fhdl);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwpcp_eq;
         }
 
         ulk.osal.splk = &cbarg.splk;
-        xwosal_splk_lock(&cbarg.splk);
+        xwos_splk_lock(&cbarg.splk);
         if (-EINPROGRESS == cbarg.rc) {
-                rc = xwosal_cdt_timedwait(cdtid, ulk, XWLK_TYPE_SPLK, NULL,
-                                          xwtm, &lkst);
+                rc = xwos_cond_timedwait(&cbarg.cond, ulk, XWOS_LK_SPLK, NULL,
+                                         xwtm, &lkst);
                 if (XWOK == rc) {
                         rc = cbarg.rc;
-                        xwosal_splk_unlock(&cbarg.splk);
+                        xwos_splk_unlock(&cbarg.splk);
                 } else {
-                        if (XWLK_STATE_LOCKED == lkst) {
-                                xwosal_splk_unlock(&cbarg.splk);
+                        if (XWOS_LKST_LOCKED == lkst) {
+                                xwos_splk_unlock(&cbarg.splk);
                         }/* else {} */
                         xwpcp_lock_ntflock(xwpcp);
-                        xwosal_splk_lock(&cbarg.splk);
+                        xwos_splk_lock(&cbarg.splk);
                         if (-EINPROGRESS == cbarg.rc) {
                                 fhdl->cbfunc = NULL;
                                 fhdl->cbarg = NULL;
                         } else {
                                 rc = cbarg.rc;
                         }
-                        xwosal_splk_unlock(&cbarg.splk);
+                        xwos_splk_unlock(&cbarg.splk);
                         xwpcp_unlock_ntflock(xwpcp);
                 }
         } else {
                 rc = cbarg.rc;
-                xwosal_splk_unlock(&cbarg.splk);
+                xwos_splk_unlock(&cbarg.splk);
         }
-        xwosal_cdt_destroy(&cbarg.cdt);
+        xwos_cond_destroy(&cbarg.cond);
         xwpcp_put(xwpcp);
         return rc;
 
 err_xwpcp_eq:
-        xwosal_cdt_destroy(&cbarg.cdt);
-err_cdt_init:
+        xwos_cond_destroy(&cbarg.cond);
+err_cond_init:
         xwpcp_put(xwpcp);
 err_ifnotrdy:
         return rc;
@@ -454,13 +451,13 @@ err_ifnotrdy:
 __xwmd_api
 void xwpcp_lock_ntflock(struct xwpcp * xwpcp)
 {
-        xwosal_splk_lock(&xwpcp->txq.ntflock);
+        xwos_splk_lock(&xwpcp->txq.ntflock);
 }
 
 __xwmd_api
 void xwpcp_unlock_ntflock(struct xwpcp * xwpcp)
 {
-        xwosal_splk_unlock(&xwpcp->txq.ntflock);
+        xwos_splk_unlock(&xwpcp->txq.ntflock);
 }
 
 __xwmd_api
@@ -484,10 +481,9 @@ xwer_t xwpcp_rx(struct xwpcp * xwpcp, struct xwpcp_msg * msgbuf, xwtm_t * xwtm)
         }
 
         xwpcplogf(DEBUG, "port:%d, buffer size:0x%X\n", msgbuf->port, msgbuf->size);
-        rc = xwosal_smr_timedwait(xwosal_smr_get_id(&xwpcp->rxq.smr[msgbuf->port]),
-                                  xwtm);
+        rc = xwos_sem_timedwait(&xwpcp->rxq.sem[msgbuf->port], xwtm);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_smr_timedwait;
+                goto err_sem_timedwait;
         }
 
         frmslot = xwpcp_rxq_choose(xwpcp, msgbuf->port);
@@ -498,8 +494,8 @@ xwer_t xwpcp_rx(struct xwpcp * xwpcp, struct xwpcp_msg * msgbuf, xwtm_t * xwtm)
         if (msgbuf->size < sdusize) {
                 realsize = msgbuf->size;
                 xwpcplogf(WARNING,
-                        "buffer size is too small(0x%X)!, expected size is 0x%X\n",
-                        msgbuf->size, sdusize);
+                          "buffer size is too small(0x%X)!, expected size is 0x%X\n",
+                          msgbuf->size, sdusize);
         } else {
                 realsize = sdusize;
         }
@@ -511,7 +507,7 @@ xwer_t xwpcp_rx(struct xwpcp * xwpcp, struct xwpcp_msg * msgbuf, xwtm_t * xwtm)
         xwpcp_put(xwpcp);
         return XWOK;
 
-err_smr_timedwait:
+err_sem_timedwait:
         xwpcp_put(xwpcp);
 err_ifnotrdy:
         return rc;
@@ -537,9 +533,9 @@ xwer_t xwpcp_try_rx(struct xwpcp * xwpcp, struct xwpcp_msg * msgbuf)
         }
 
         xwpcplogf(DEBUG, "port:%d, buffer size:0x%X\n", msgbuf->port, msgbuf->size);
-        rc = xwosal_smr_trywait(xwosal_smr_get_id(&xwpcp->rxq.smr[msgbuf->port]));
+        rc = xwos_sem_trywait(&xwpcp->rxq.sem[msgbuf->port]);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_smr_trywait;
+                goto err_sem_trywait;
         }
 
         frmslot = xwpcp_rxq_choose(xwpcp, msgbuf->port);
@@ -549,8 +545,8 @@ xwer_t xwpcp_try_rx(struct xwpcp * xwpcp, struct xwpcp_msg * msgbuf)
         if (msgbuf->size < sdusize) {
                 realsize = msgbuf->size;
                 xwpcplogf(WARNING,
-                        "buffer size is too small(0x%X)!, expected size is 0x%X\n",
-                        msgbuf->size, sdusize);
+                          "buffer size is too small(0x%X)!, expected size is 0x%X\n",
+                          msgbuf->size, sdusize);
         } else {
                 realsize = sdusize;
         }
@@ -562,7 +558,7 @@ xwer_t xwpcp_try_rx(struct xwpcp * xwpcp, struct xwpcp_msg * msgbuf)
         xwpcp_put(xwpcp);
         return XWOK;
 
-err_smr_trywait:
+err_sem_trywait:
         xwpcp_put(xwpcp);
 err_ifnotrdy:
         return rc;

@@ -25,7 +25,7 @@ xwmoPathToName = $(subst -,_,$(subst .,_,$(subst /,_,$(subst _,__,$(subst $(2),,
 
 getXwmdName = xwmd$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_MD_DIR)).a
 
-getXwppName = xwpp$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_PP_DIR)).a
+getXwcdName = xwcd$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_CD_DIR)).a
 
 getXwbmName = xwbm$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_BM_DIR)).a
 
@@ -39,8 +39,8 @@ define getXwmoName
 $(strip
   $(if $(findstring $(XWOS_MD_DIR),$(call getXwmoDir)),\
       $(call getXwmdName),\
-      $(if $(findstring $(XWOS_PP_DIR),$(call getXwmoDir)),\
-          $(call getXwppName),\
+      $(if $(findstring $(XWOS_CD_DIR),$(call getXwmoDir)),\
+          $(call getXwcdName),\
           $(if $(findstring $(XWOS_BM_DIR),$(call getXwmoDir)),\
 	      $(call getXwbmName),\
               $(if $(findstring $(XWOS_EM_DIR),$(call getXwmoDir)),\

@@ -123,8 +123,8 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     HAL_NVIC_EnableIRQ(USART1_IRQn);
   /* USER CODE BEGIN USART1_MspInit 1 */
     husart1_drvdata.halhdl = &husart1;
-    xwosal_splk_init(&husart1_drvdata.tx.splk);
-    xwosal_cdt_init(&husart1_drvdata.tx.cdt);
+    xwos_splk_init(&husart1_drvdata.tx.splk);
+    xwos_cond_init(&husart1_drvdata.tx.cond);
     husart1_drvdata.tx.rc = -ECANCELED;
 
   /* USER CODE END USART1_MspInit 1 */
@@ -137,7 +137,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
   if(uartHandle->Instance==USART1)
   {
   /* USER CODE BEGIN USART1_MspDeInit 0 */
-    xwosal_cdt_destroy(&husart1_drvdata.tx.cdt);
+    xwos_cond_destroy(&husart1_drvdata.tx.cond);
 
   /* USER CODE END USART1_MspDeInit 0 */
     /* Peripheral clock disable */

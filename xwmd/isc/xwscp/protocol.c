@@ -19,11 +19,10 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/crc32.h>
-#include <xwos/osal/scheduler.h>
-#include <xwos/osal/thread.h>
-#include <xwos/osal/lock/mutex.h>
-#include <xwos/osal/sync/semaphore.h>
-#include <xwos/osal/sync/condition.h>
+#include <xwos/osal/skd.h>
+#include <xwos/osal/lock/mtx.h>
+#include <xwos/osal/sync/sem.h>
+#include <xwos/osal/sync/cond.h>
 #include <xwmd/isc/xwscp/protocol.h>
 #include <xwmd/isc/xwscp/hwifal.h>
 #include <xwmd/isc/xwscp/api.h>
@@ -178,20 +177,18 @@ xwer_t xwscp_alloc_frmslot(struct xwscp * xwscp, struct xwscp_frmslot ** slotbuf
 {
         xwer_t rc;
         struct xwscp_frmslot * frmslot;
-        xwid_t smrid;
 
-        smrid = xwosal_smr_get_id(&xwscp->slot.smr);
-        rc = xwosal_smr_wait(smrid);
+        rc = xwos_sem_wait(&xwscp->slot.sem);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_slotsmr_wait;
+                goto err_slotsem_wait;
         }
-        xwosal_splk_lock(&xwscp->slot.lock);
+        xwos_splk_lock(&xwscp->slot.lock);
         frmslot = xwlib_bclst_first_entry(&xwscp->slot.q, struct xwscp_frmslot, node);
         xwlib_bclst_del_init(&frmslot->node);
-        xwosal_splk_unlock(&xwscp->slot.lock);
+        xwos_splk_unlock(&xwscp->slot.lock);
         *slotbuf = frmslot;
 
-err_slotsmr_wait:
+err_slotsem_wait:
         return rc;
 }
 
@@ -203,13 +200,10 @@ err_slotsmr_wait:
 __xwmd_code
 void xwscp_free_frmslot(struct xwscp * xwscp, struct xwscp_frmslot * frmslot)
 {
-        xwid_t smrid;
-
-        xwosal_splk_lock(&xwscp->slot.lock);
+        xwos_splk_lock(&xwscp->slot.lock);
         xwlib_bclst_add_tail(&xwscp->slot.q, &frmslot->node);
-        xwosal_splk_unlock(&xwscp->slot.lock);
-        smrid = xwosal_smr_get_id(&xwscp->slot.smr);
-        xwosal_smr_post(smrid);
+        xwos_splk_unlock(&xwscp->slot.lock);
+        xwos_sem_post(&xwscp->slot.sem);
 }
 
 /**
@@ -225,7 +219,6 @@ xwer_t xwscp_tx_cfrm_sync(struct xwscp * xwscp, xwtm_t * xwtm)
 {
         xwu8_t stream[sizeof(xwscp_cfrm_sync)];
         struct xwscp_frame * frm;
-        xwid_t csmtxid;
         xwu32_t txcnt;
         xwsz_t infolen;
         xwu32_t crc32;
@@ -246,11 +239,10 @@ xwer_t xwscp_tx_cfrm_sync(struct xwscp * xwscp, xwtm_t * xwtm)
                 frm->sdu[14] = (xwu8_t)((crc32 >> 16U) & 0xFFU);
                 frm->sdu[15] = (xwu8_t)((crc32 >> 8U) & 0xFFU);
                 frm->sdu[16] = (xwu8_t)((crc32 >> 0U) & 0xFFU);
-                csmtxid = xwosal_mtx_get_id(&xwscp->csmtx);
-                rc = xwosal_mtx_lock(csmtxid);
+                rc = xwos_mtx_lock(&xwscp->csmtx);
                 if (XWOK == rc) {
                         rc = xwscp_hwifal_tx(xwscp, frm, xwtm);
-                        xwosal_mtx_unlock(csmtxid);
+                        xwos_mtx_unlock(&xwscp->csmtx);
                 }/* else {} */
         } else {
                 rc = -EALREADY;
@@ -270,7 +262,6 @@ xwer_t xwscp_tx_cfrm_sync_ack(struct xwscp * xwscp, xwu32_t rxcnt)
         xwu8_t stream[sizeof(xwscp_cfrm_sync_ack)];
         struct xwscp_frame * frm;
         xwtm_t xwtm;
-        xwid_t csmtxid;
         xwsz_t infolen;
         xwu32_t crc32;
         xwer_t rc;
@@ -288,12 +279,11 @@ xwer_t xwscp_tx_cfrm_sync_ack(struct xwscp * xwscp, xwu32_t rxcnt)
         frm->sdu[14] = (xwu8_t)((crc32 >> 16U) & 0xFFU);
         frm->sdu[15] = (xwu8_t)((crc32 >> 8U) & 0xFFU);
         frm->sdu[16] = (xwu8_t)((crc32 >> 0U) & 0xFFU);
-        csmtxid = xwosal_mtx_get_id(&xwscp->csmtx);
-        rc = xwosal_mtx_lock(csmtxid);
+        rc = xwos_mtx_lock(&xwscp->csmtx);
         if (XWOK == rc) {
                 xwtm = XWTM_MAX;
                 rc = xwscp_hwifal_tx(xwscp, frm, &xwtm);
-                xwosal_mtx_unlock(csmtxid);
+                xwos_mtx_unlock(&xwscp->csmtx);
         }/* else {} */
         return rc;
 }
@@ -311,7 +301,6 @@ xwer_t xwscp_tx_sdu_ack(struct xwscp * xwscp, xwu8_t id, xwu8_t ack)
         struct xwscp_frame * frm;
         xwsz_t infolen;
         xwu32_t crc32;
-        xwid_t csmtxid;
         xwer_t rc;
         xwtm_t xwtm;
 
@@ -326,12 +315,11 @@ xwer_t xwscp_tx_sdu_ack(struct xwscp * xwscp, xwu8_t id, xwu8_t ack)
         frm->sdu[3] = (xwu8_t)((crc32 >> 8) & 0xFF);
         frm->sdu[4] = (xwu8_t)((crc32 >> 0) & 0xFF);
 
-        csmtxid = xwosal_mtx_get_id(&xwscp->csmtx);
-        rc = xwosal_mtx_lock(csmtxid);
+        rc = xwos_mtx_lock(&xwscp->csmtx);
         if (XWOK == rc) {
                 xwtm = XWTM_MAX;
                 rc = xwscp_hwifal_tx(xwscp, frm, &xwtm);
-                xwosal_mtx_unlock(csmtxid);
+                xwos_mtx_unlock(&xwscp->csmtx);
         }/* else {} */
         return rc;
 }
@@ -423,13 +411,10 @@ xwer_t xwscp_chk_frm(struct xwscp_frame * frm)
 __xwmd_code
 void xwscp_rxq_pub(struct xwscp * xwscp, struct xwscp_frmslot * pubfrm)
 {
-        xwid_t smrid;
-
-        xwosal_splk_lock(&xwscp->rxq.lock);
+        xwos_splk_lock(&xwscp->rxq.lock);
         xwlib_bclst_add_tail(&xwscp->rxq.head, &pubfrm->node);
-        xwosal_splk_unlock(&xwscp->rxq.lock);
-        smrid = xwosal_smr_get_id(&xwscp->rxq.smr);
-        xwosal_smr_post(smrid);
+        xwos_splk_unlock(&xwscp->rxq.lock);
+        xwos_sem_post(&xwscp->rxq.sem);
 }
 
 /**
@@ -446,21 +431,19 @@ xwer_t xwscp_rxq_choose(struct xwscp * xwscp, struct xwscp_frmslot ** slotbuf,
                         xwtm_t * xwtm)
 {
         struct xwscp_frmslot * pubfrm;
-        xwid_t smrid;
         xwer_t rc;
 
-        smrid = xwosal_smr_get_id(&xwscp->rxq.smr);
-        rc = xwosal_smr_timedwait(smrid, xwtm);
+        rc = xwos_sem_timedwait(&xwscp->rxq.sem, xwtm);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_rxqsmr_timedwait;
+                goto err_rxqsem_timedwait;
         }
-        xwosal_splk_lock(&xwscp->rxq.lock);
+        xwos_splk_lock(&xwscp->rxq.lock);
         pubfrm = xwlib_bclst_first_entry(&xwscp->rxq.head, struct xwscp_frmslot, node);
         xwlib_bclst_del_init(&pubfrm->node);
-        xwosal_splk_unlock(&xwscp->rxq.lock);
+        xwos_splk_unlock(&xwscp->rxq.lock);
         *slotbuf = pubfrm;
 
-err_rxqsmr_timedwait:
+err_rxqsem_timedwait:
         return rc;
 }
 
@@ -550,7 +533,7 @@ xwer_t xwscp_rx_cfrm_sync_ack(struct xwscp * xwscp, struct xwscp_frmslot * frmsl
             (XWSCP_VERSION_REVISION == frmslot->frm.sdu[7]) &&
             (XWSCP_SYNC_KEY == frmslot->frm.sdu[8]) &&
             (rmtrxcnt == txcnt)) {
-                xwosal_cdt_unicast(xwosal_cdt_get_id(&xwscp->cscdt));
+                xwos_cond_broadcast(&xwscp->cscond);
                 xwtm = XWTM_MAX;
                 xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_CONNECT, &xwtm);
         }/* else {} */
@@ -567,15 +550,13 @@ xwer_t xwscp_rx_cfrm_sync_ack(struct xwscp * xwscp, struct xwscp_frmslot * frmsl
 static __xwmd_code
 xwer_t xwscp_rx_frm_sdu_ack(struct xwscp * xwscp, struct xwscp_frmslot * frmslot)
 {
-        xwid_t csmtxid;
         struct xwscp_frame * frm;
         xwu8_t rmtrxsize, txsize;
         xwer_t rc;
 
         rc = XWOK;
         rmtrxsize = frmslot->frm.sdu[0];
-        csmtxid = xwosal_mtx_get_id(&xwscp->csmtx);
-        rc = xwosal_mtx_lock(csmtxid);
+        rc = xwos_mtx_lock(&xwscp->csmtx);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_lock;
         }
@@ -588,10 +569,10 @@ xwer_t xwscp_rx_frm_sdu_ack(struct xwscp * xwscp, struct xwscp_frmslot * frmslot
                 } else {
                         xwscp->txi.ack = XWSCP_ACK_ESIZE;
                 }
-                xwosal_mtx_unlock(csmtxid);
-                xwosal_cdt_unicast(xwosal_cdt_get_id(&xwscp->cscdt));
+                xwos_mtx_unlock(&xwscp->csmtx);
+                xwos_cond_broadcast(&xwscp->cscond);
         } else {
-                xwosal_mtx_unlock(csmtxid);
+                xwos_mtx_unlock(&xwscp->csmtx);
         }
 
 err_mtx_lock:
@@ -700,13 +681,13 @@ xwer_t xwscp_thrd(struct xwscp * xwscp)
 {
         xwer_t rc = XWOK;
 
-        while (!xwosal_cthrd_shld_stop()) {
-                if (xwosal_cthrd_shld_frz()) {
+        while (!xwos_cthrd_shld_stop()) {
+                if (xwos_cthrd_shld_frz()) {
                         xwscplogf(DEBUG, "Start freezing ...\n");
-                        rc = xwosal_cthrd_freeze();
+                        rc = xwos_cthrd_freeze();
                         if (__xwcc_unlikely(rc < 0)) {
                                 xwscplogf(ERR, "Failed to freeze ... [rc:%d]\n", rc);
-                                xwosal_cthrd_yield();
+                                xwos_cthrd_yield();
                         }/* else {} */
                         xwscplogf(DEBUG, "Resuming ...\n");
                 } else if (XWSCP_HWIFST_OPENED == xwscp->hwifst) {
@@ -719,11 +700,11 @@ xwer_t xwscp_thrd(struct xwscp * xwscp)
                                 xwscplogf(WARNING, "Bad frame! \n");
                         } else {
                                 xwscplogf(ERR, "xwscp_fsm() ... [rc:%d]\n", rc);
-                                xwosal_cthrd_wait_exit();
+                                xwos_cthrd_wait_exit();
                                 break;
                         }
                 } else {
-                        xwosal_cthrd_wait_exit();
+                        xwos_cthrd_wait_exit();
                         break;
                 }
         }

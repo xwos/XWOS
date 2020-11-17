@@ -571,9 +571,9 @@ ifeq ($(ARCHCFG_LIB_XWBMPOP_FLZ),y)
 endif
 
 ARCH_CSRCS += arch_init.c arch_image.c arch_irq.c arch_xwsc.c
-ARCH_CSRCS += arch_sched.c arch_systick.c
-ifeq ($(XuanWuOS_CFG_CORE),smp)
-    ARCH_CSRCS += smp_nvic.c smp_nvic_drv.c
+ARCH_CSRCS += arch_skd.c arch_systick.c
+ifeq ($(XuanWuOS_CFG_CORE),mp)
+    ARCH_CSRCS += mp_nvic.c mp_nvic_drv.c
 else
     ARCH_CSRCS += up_nvic.c up_nvic_drv.c
 endif

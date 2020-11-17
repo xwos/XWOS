@@ -39,7 +39,7 @@ void xwaop__xwu16_t__c0m(__xwcc_atomic xwu16_t * a,
         do {
                 o = (xwu16_t)ldrexh(a);
                 n = o & (~m);
-                xwmb_smp_mb();
+                xwmb_mp_mb();
         } while (strexh(a, (xwu16_t)n));
         if (nv) {
                 *nv = n;

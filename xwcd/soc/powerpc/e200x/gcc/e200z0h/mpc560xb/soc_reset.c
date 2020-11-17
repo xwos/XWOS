@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief mpc560xb reset
+ * @brief OC描述层：MPC560xB Reset
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

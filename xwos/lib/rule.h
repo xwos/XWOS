@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwlib的配置规则
+ * @brief XWOS通用库：玄武OS内核的编译规则
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,8 +18,12 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <cfg/XuanWuOS.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       rules       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+#if defined(XuanWuOS_CFG_CORE__mp)
+  #include <xwos/mp/rule.h>
+#elif defined(XuanWuOS_CFG_CORE__up)
+  #include <xwos/up/rule.h>
+#else
+  #error "Can't find the configuration XuanWuOS_CFG_CORE!"
+#endif
 
 #endif /* xwos/lib/rule.h */

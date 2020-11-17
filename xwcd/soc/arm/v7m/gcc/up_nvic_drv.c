@@ -23,10 +23,9 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <string.h>
-#include <xwos/up/irq.h>
+#include <xwos/ospl/irq.h>
 #include <armv7m_core.h>
 #include <armv7m_nvic.h>
-#include <soc_irq.h>
 #include <up_nvic.h>
 #include <up_nvic_drv.h>
 
@@ -37,7 +36,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern __xwos_data struct xwos_irqc xwos_irqc;
+extern struct xwup_irqc xwup_irqc;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      static function prototypes     ******** ********
@@ -49,10 +48,10 @@ extern __xwos_data struct xwos_irqc xwos_irqc;
 __xwbsp_code
 xwer_t cortexm_nvic_drv_init(void)
 {
-        struct xwos_irqc * irqc;
+        struct xwup_irqc * irqc;
         const struct cortexm_nvic_cfg * irqccfg;
 
-        irqc = &xwos_irqc;
+        irqc = &xwup_irqc;
         irqccfg = (const struct cortexm_nvic_cfg *)irqc->soc_cfg;
 
         cm_scs.scb.vtor.u32 = (xwu32_t)irqc->isr_table;
@@ -73,10 +72,10 @@ xwer_t cortexm_nvic_drv_request(__xwcc_unused xwirq_t irqn,
         struct soc_isr_table * isr_table;
         struct soc_isr_data_table * isr_data_table;
 
-        isr_table = xwos_irqc.isr_table;
+        isr_table = xwup_irqc.isr_table;
         isr_table->soc[irqn] = isrfunc;
 
-        isr_data_table = xwos_irqc.isr_data_table;
+        isr_data_table = xwup_irqc.isr_data_table;
         if ((NULL != isr_data_table) && (NULL != data)) {
                 isr_data_table->soc[irqn] = data;
         }
@@ -91,7 +90,7 @@ xwer_t cortexm_nvic_drv_release(__xwcc_unused xwirq_t irqn)
         struct soc_isr_table * isr_table;
         struct soc_isr_data_table * isr_data_table;
 
-        isr_table = xwos_irqc.isr_table;
+        isr_table = xwup_irqc.isr_table;
         isr_table->soc[irqn] = arch_isr_noop;
 #endif /* !SOCCFG_RO_ISRTABLE */
         return XWOK;
@@ -233,9 +232,9 @@ xwer_t cortexm_nvic_drv_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
 __xwbsp_code
 xwer_t cortexm_nvic_drv_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
 {
-        __soc_isr_table_qualifier struct soc_irq_data_table * irq_data_table;
+        __soc_isr_table_qualifier struct soc_isr_data_table * irq_data_table;
 
-        irq_data_table = xwos_irqc.irq_data_table;
+        irq_data_table = xwup_irqc.irq_data_table;
         databuf->data = irq_data_table->soc[irqn];
         return XWOK;
 }

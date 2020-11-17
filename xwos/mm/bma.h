@@ -51,7 +51,7 @@
  */
 struct xwmm_bma_orderlist {
         struct xwlib_bclst_head head; /**< 链表头 */
-        struct xwosal_splk lock; /**< 保护list的锁 */
+        struct xwos_splk lock; /**< 保护list的锁 */
 };
 
 /**

@@ -22,8 +22,8 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/smp/irq.h>
-#include <smp_nvic.h>
+#include <xwos/mp/irq.h>
+#include <mp_nvic.h>
 #include <bdl/standard.h>
 #include <bdl/board_init.h>
 
@@ -34,8 +34,8 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern void s32dslib_lowlevel_init(void);
-extern void s32dslib_init(void);
+extern void s32kbsp_lowlevel_init(void);
+extern void s32kbsp_init(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
@@ -47,11 +47,11 @@ extern void s32dslib_init(void);
 __xwos_init_code
 void board_lowlevel_init(void)
 {
-        s32dslib_lowlevel_init();
+        s32kbsp_lowlevel_init();
 }
 
 __xwos_init_code
 void board_init(void)
 {
-        s32dslib_init();
+        s32kbsp_init();
 }

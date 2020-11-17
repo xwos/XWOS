@@ -1,0 +1,580 @@
+/**
+ * @file
+ * @brief 示例：信号选择器
+ * @author
+ * + 隐星魂 (Roy.Sun) <https://xwos.tech>
+ * @copyright
+ * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
+ * > Licensed under the Apache License, Version 2.0 (the "License");
+ * > you may not use this file except in compliance with the License.
+ * > You may obtain a copy of the License at
+ * >
+ * >         http://www.apache.org/licenses/LICENSE-2.0
+ * >
+ * > Unless required by applicable law or agreed to in writing, software
+ * > distributed under the License is distributed on an "AS IS" BASIS,
+ * > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * > See the License for the specific language governing permissions and
+ * > limitations under the License.
+ */
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********      include      ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#include <string.h>
+#include <xwos/standard.h>
+#include <xwos/lib/xwlog.h>
+#include <xwos/osal/skd.h>
+#include <xwos/osal/swt.h>
+#include <xwos/osal/sync/sem.h>
+#include <xwos/osal/sync/cond.h>
+#include <xwos/osal/sync/flg.h>
+#include <xwos/osal/sync/br.h>
+#include <xwos/osal/sync/sel.h>
+#include <xwam/example/sync/sel/mif.h>
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       macros      ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#define XWSELDEMO_CONSUMER_PRIORITY                             \
+        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+
+#define XWSELDEMO_PRODUCER_PRIORITY                             \
+        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 2)
+
+#define XWSELDEMO_BRTHRD_PRIORITY                               \
+        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+
+#if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
+#define XWSELDEMO_LOG_TAG      "sel"
+#define sellogf(lv, fmt, ...) xwlogf(lv, XWSELDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
+#else /* XWLIBCFG_LOG */
+#define sellogf(lv, fmt, ...)
+#endif /* !XWLIBCFG_LOG */
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       types       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********         function prototypes         ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+void xwseldemo_swt0_callback(struct xwos_swt * swt, void * arg);
+void xwseldemo_swt1_callback(struct xwos_swt * swt, void * arg);
+xwer_t xwseldemo_consumer_func(void * arg);
+xwer_t xwseldemo_producer_func(void * arg);
+xwer_t xwseldemo_syncthrd_func(void * arg);
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       .data       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+struct xwos_sel xwseldemo_sel0;
+
+struct xwos_sem xwseldemo_sem1;
+
+struct xwos_sem xwseldemo_sem2;
+
+struct xwos_flg xwseldemo_flg3;
+
+struct xwos_sel xwseldemo_sel4;
+
+struct xwos_cond xwseldemo_cond5;
+
+struct xwos_cond xwseldemo_cond6;
+
+struct xwos_br xwseldemo_br7;
+
+const struct xwos_thrd_desc xwseldemo_consumer_td = {
+        .name = "xwseldemo.consumer",
+        .prio = XWSELDEMO_CONSUMER_PRIORITY,
+        .stack = XWOS_THRD_STACK_DYNAMIC,
+        .stack_size = 4096,
+        .func = (xwos_thrd_f)xwseldemo_consumer_func,
+        .arg = NULL,
+        .attr = XWOS_SKDATTR_PRIVILEGED,
+};
+xwid_t xwseldemo_consumer;
+
+const struct xwos_thrd_desc xwseldemo_producer_td = {
+        .name = "xwseldemo.producer",
+        .prio = XWSELDEMO_PRODUCER_PRIORITY,
+        .stack = XWOS_THRD_STACK_DYNAMIC,
+        .stack_size = 2048,
+        .func = (xwos_thrd_f)xwseldemo_producer_func,
+        .arg = NULL,
+        .attr = XWOS_SKDATTR_PRIVILEGED,
+};
+xwid_t xwseldemo_producer;
+
+struct xwos_swt xwseldemo_swt0;
+
+struct xwos_swt xwseldemo_swt1;
+
+const struct xwos_thrd_desc xwseldemo_syncthrd_td[] = {
+        [0] = {
+                .name = "xwseldemo.syncthrd.0",
+                .prio = XWSELDEMO_BRTHRD_PRIORITY,
+                .stack = XWOS_THRD_STACK_DYNAMIC,
+                .stack_size = 2048,
+                .func = (xwos_thrd_f)xwseldemo_syncthrd_func,
+                .arg = (void *)0,
+                .attr = XWOS_SKDATTR_PRIVILEGED,
+        },
+        [1] = {
+                .name = "xwseldemo.syncthrd.1",
+                .prio = XWSELDEMO_BRTHRD_PRIORITY,
+                .stack = XWOS_THRD_STACK_DYNAMIC,
+                .stack_size = 2048,
+                .func = (xwos_thrd_f)xwseldemo_syncthrd_func,
+                .arg = (void *)1,
+                .attr = XWOS_SKDATTR_PRIVILEGED,
+        },
+};
+xwid_t xwseldemo_syncthrd[xw_array_size(xwseldemo_syncthrd_td)];
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********      function implementations       ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief 测试模块的启动函数
+ */
+xwer_t example_sel_start(void)
+{
+        xwer_t rc;
+        xwsq_t i;
+
+        /* 初始化信号选择器0 */
+        rc = xwos_sel_init(&xwseldemo_sel0);
+        if (rc < 0) {
+                goto err_sel0_init;
+        }
+        /* 初始化信号量1 */
+        rc = xwos_sem_init(&xwseldemo_sem1, 0, XWSSQ_MAX);
+        if (rc < 0) {
+                goto err_sem1_init;
+        }
+        /* 初始化信号量2 */
+        rc = xwos_sem_init(&xwseldemo_sem2, 0, XWSSQ_MAX);
+        if (rc < 0) {
+                goto err_sem2_init;
+        }
+        /* 初始化事件标志3 */
+        rc = xwos_flg_init(&xwseldemo_flg3, NULL);
+        if (rc < 0) {
+                goto err_flg3_init;
+        }
+        /* 初始化信号选择器4 */
+        rc = xwos_sel_init(&xwseldemo_sel4);
+        if (rc < 0) {
+                goto err_sel4_init;
+        }
+        /* 初始化条件量5 */
+        rc = xwos_cond_init(&xwseldemo_cond5);
+        if (rc < 0) {
+                goto err_cond5_init;
+        }
+        /* 初始化条件量6 */
+        rc = xwos_cond_init(&xwseldemo_cond6);
+        if (rc < 0) {
+                goto err_cond6_init;
+        }
+        /* 初始化线程屏障7 */
+        rc = xwos_br_init(&xwseldemo_br7);
+        if (rc < 0) {
+                goto err_br7_init;
+        }
+
+        /* 初始化定时器0 */
+        rc = xwos_swt_init(&xwseldemo_swt0, "xwseldemo_swt0",
+                           XWOS_SWT_FLAG_RESTART);
+        if (rc < 0) {
+                goto err_swt0_init;
+        }
+
+        /* 初始化定时器1 */
+        rc = xwos_swt_init(&xwseldemo_swt1, "xwseldemo_swt1",
+                           XWOS_SWT_FLAG_RESTART);
+        if (rc < 0) {
+                goto err_swt1_init;
+        }
+
+        /* 绑定信号量1到信号选择器0的位置为1 */
+        rc = xwos_sem_bind(&xwseldemo_sem1, &xwseldemo_sel0, 1);
+        if (rc < 0) {
+                goto err_sem1_bind;
+        }
+        /* 绑定信号量2到信号选择器0的位置为2 */
+        rc = xwos_sem_bind(&xwseldemo_sem2, &xwseldemo_sel0, 2);
+        if (rc < 0) {
+                goto err_sem2_bind;
+        }
+        /* 绑定事件标志3到信号选择器0的位置为3 */
+        rc = xwos_flg_bind(&xwseldemo_flg3, &xwseldemo_sel0, 3);
+        if (rc < 0) {
+                goto err_flg3_bind;
+        }
+
+        /* 绑定信号选择器4到信号选择器0的位置为4 */
+        rc = xwos_sel_bind(&xwseldemo_sel4, &xwseldemo_sel0, 4);
+        if (rc < 0) {
+                goto err_sel4_bind;
+        }
+
+        /* 绑定条件量5到信号选择器4的位置为5 */
+        rc = xwos_cond_bind(&xwseldemo_cond5, &xwseldemo_sel4, 5);
+        if (rc < 0) {
+                goto err_cond5_bind;
+        }
+        /* 绑定条件量6到信号选择器4的位置为6 */
+        rc = xwos_cond_bind(&xwseldemo_cond6, &xwseldemo_sel4, 6);
+        if (rc < 0) {
+                goto err_cond6_bind;
+        }
+        /* 绑定线程屏障7到信号选择器4的位置7 */
+        rc = xwos_br_bind(&xwseldemo_br7, &xwseldemo_sel4, 7);
+        if (rc < 0) {
+                goto err_br7_bind;
+        }
+
+        /* 创建等待同步对象的线程 */
+        rc = xwos_thrd_create(&xwseldemo_consumer,
+                              xwseldemo_consumer_td.name,
+                              xwseldemo_consumer_td.func,
+                              xwseldemo_consumer_td.arg,
+                              xwseldemo_consumer_td.stack_size,
+                              xwseldemo_consumer_td.prio,
+                              xwseldemo_consumer_td.attr);
+        if (rc < 0) {
+                goto err_consumer_create;
+        }
+
+        /* 建立发布同步对象的线程 */
+        rc = xwos_thrd_create(&xwseldemo_producer,
+                              xwseldemo_producer_td.name,
+                              xwseldemo_producer_td.func,
+                              xwseldemo_producer_td.arg,
+                              xwseldemo_producer_td.stack_size,
+                              xwseldemo_producer_td.prio,
+                              xwseldemo_producer_td.attr);
+        if (rc < 0) {
+                goto err_producer_create;
+        }
+
+        /* 创建同步线程 */
+        for (i = 0; i < xw_array_size(xwseldemo_syncthrd_td); i++) {
+                rc = xwos_thrd_create(&xwseldemo_syncthrd[i],
+                                      xwseldemo_syncthrd_td[i].name,
+                                      xwseldemo_syncthrd_td[i].func,
+                                      xwseldemo_syncthrd_td[i].arg,
+                                      xwseldemo_syncthrd_td[i].stack_size,
+                                      xwseldemo_syncthrd_td[i].prio,
+                                      xwseldemo_syncthrd_td[i].attr);
+                if (rc < 0) {
+                        goto err_syncthrd_create;
+                }
+        }
+
+        return XWOK;
+
+err_syncthrd_create:
+        xwos_thrd_terminate(xwseldemo_producer, NULL);
+err_producer_create:
+        xwos_thrd_terminate(xwseldemo_consumer, NULL);
+err_consumer_create:
+        xwos_br_unbind(&xwseldemo_br7, &xwseldemo_sel4);
+err_br7_bind:
+        xwos_cond_unbind(&xwseldemo_cond6, &xwseldemo_sel4);
+err_cond6_bind:
+        xwos_cond_unbind(&xwseldemo_cond5, &xwseldemo_sel4);
+err_cond5_bind:
+        xwos_sel_unbind(&xwseldemo_sel4, &xwseldemo_sel0);
+err_sel4_bind:
+        xwos_flg_unbind(&xwseldemo_flg3, &xwseldemo_sel0);
+err_flg3_bind:
+        xwos_sem_unbind(&xwseldemo_sem2, &xwseldemo_sel0);
+err_sem2_bind:
+        xwos_sem_unbind(&xwseldemo_sem1, &xwseldemo_sel0);
+err_sem1_bind:
+        xwos_swt_destroy(&xwseldemo_swt1);
+err_swt1_init:
+        xwos_swt_destroy(&xwseldemo_swt0);
+err_swt0_init:
+        xwos_br_destroy(&xwseldemo_br7);
+err_br7_init:
+        xwos_cond_destroy(&xwseldemo_cond6);
+err_cond6_init:
+        xwos_cond_destroy(&xwseldemo_cond5);
+err_cond5_init:
+        xwos_sel_destroy(&xwseldemo_sel4);
+err_sel4_init:
+        xwos_flg_destroy(&xwseldemo_flg3);
+err_flg3_init:
+        xwos_sem_destroy(&xwseldemo_sem2);
+err_sem2_init:
+        xwos_sem_destroy(&xwseldemo_sem1);
+err_sem1_init:
+        xwos_sel_destroy(&xwseldemo_sel0);
+err_sel0_init:
+        return rc;
+}
+
+/**
+ * @brief 消费者线程
+ */
+xwer_t xwseldemo_consumer_func(void * arg)
+{
+        xwos_sel_declare_bitmap(msk);
+        xwos_sel_declare_bitmap(trg);
+        xwos_flg_declare_bitmap(flgmsk);
+        xwos_flg_declare_bitmap(flgtrg);
+        xwtm_t ts;
+        xwer_t rc = XWOK;
+
+        XWOS_UNUSED(arg);
+
+        sellogf(INFO, "[消费者] 启动。\n");
+
+        sellogf(INFO, "[消费者] 启动定时器0。\n");
+        ts = xwos_skd_get_timetick_lc();
+        rc = xwos_swt_start(&xwseldemo_swt0, ts, 500 * XWTM_MS,
+                            xwseldemo_swt0_callback, NULL);
+
+        sellogf(INFO, "[消费者] 启动定时器1。\n");
+        rc = xwos_swt_start(&xwseldemo_swt1, ts, 800 * XWTM_MS,
+                            xwseldemo_swt1_callback, NULL);
+
+        memset(msk, 0, sizeof(msk));
+        memset(flgmsk, 0, sizeof(msk));
+        while (!xwos_cthrd_frz_shld_stop(NULL)) {
+                /* 设置掩码位为bit1 ~ bit7共7位 */
+                msk[0] = BIT(1) | BIT(2) | BIT(3) | BIT(4) | BIT(5) | BIT(6) | BIT(7);
+
+                ts = xwos_skd_get_timestamp_lc();
+                sellogf(INFO,
+                        "[消费者] 等待信号：0x%X，时间戳：%lld 纳秒...\n",
+                        msk[0], ts);
+                ts = 1 * XWTM_S;
+                rc = xwos_sel_timedselect(&xwseldemo_sel0, msk, trg, &ts);
+                if (XWOK == rc) {
+                        ts = xwos_skd_get_timestamp_lc();
+                        sellogf(INFO,
+                                "[消费者] 唤醒，触发信号：0x%X，时间戳：%lld 纳秒。\n",
+                                trg[0], ts);
+
+                        if (xwbmpop_t1i(trg, 1)) {
+                                rc = xwos_sem_trywait(&xwseldemo_sem1);
+                                if (XWOK == rc) {
+                                        ts = xwos_skd_get_timestamp_lc();
+                                        sellogf(INFO,
+                                                "[消费者] 信号量1触发，"
+                                                "时间戳：%lld 纳秒，。\n", ts);
+                                }
+                        }
+
+                        if (xwbmpop_t1i(trg, 2)) {
+                                rc = xwos_sem_trywait(&xwseldemo_sem2);
+                                if (XWOK == rc) {
+                                        ts = xwos_skd_get_timestamp_lc();
+                                        sellogf(INFO,
+                                                "[消费者] 信号量2触发，"
+                                                "时间戳：%lld 纳秒，。\n", ts);
+                                }
+                        }
+
+                        if (xwbmpop_t1i(trg, 3)) {
+                                flgmsk[0] = BIT(0) | BIT(1);
+                                rc = xwos_flg_trywait(&xwseldemo_flg3,
+                                                      XWOS_FLG_TRIGGER_SET_ANY,
+                                                      XWOS_FLG_ACTION_CONSUMPTION,
+                                                      flgtrg, flgmsk);
+                                if (XWOK == rc) {
+                                        ts = xwos_skd_get_timestamp_lc();
+                                        if (xwbmpop_t1i(flgtrg, 0)) {
+                                                sellogf(INFO,
+                                                        "[消费者] 定时器0触发，"
+                                                        "时间戳：%lld 纳秒，。\n", ts);
+                                        }
+                                        if (xwbmpop_t1i(flgtrg, 1)) {
+                                                sellogf(INFO,
+                                                        "[消费者] 定时器1触发，"
+                                                        "时间戳：%lld 纳秒，。\n", ts);
+                                        }
+                                }
+                        }
+
+                        if (xwbmpop_t1i(trg, 4)) {
+                                /* 第4位为子信号选择器4，再次测试 */
+                                rc = xwos_sel_tryselect(&xwseldemo_sel4, msk, trg);
+                                if (XWOK == rc) {
+                                        ts = xwos_skd_get_timestamp_lc();
+                                        if (xwbmpop_t1i(trg, 5)) {
+                                                sellogf(INFO,
+                                                        "[消费者] 条件量5触发，"
+                                                        "时间戳：%lld 纳秒，。\n", ts);
+                                        }
+                                        if (xwbmpop_t1i(trg, 6)) {
+                                                sellogf(INFO,
+                                                        "[消费者] 条件量6触发，"
+                                                        "时间戳：%lld 纳秒，。\n", ts);
+                                        }
+                                        if (xwbmpop_t1i(trg, 7)) {
+                                                sellogf(INFO,
+                                                        "[消费者] 线程栅栏7触发，"
+                                                        "时间戳：%lld 纳秒，。\n", ts);
+                                        }
+                                }
+                        }
+
+                        sellogf(INFO, "\n");
+                } else {
+                        ts = xwos_skd_get_timestamp_lc();
+                        sellogf(ERR,
+                                "[消费者] 错误，时间戳：%lld 纳秒，错误码：%d。\n\n",
+                                ts, rc);
+                }
+        }
+        return rc;
+}
+
+/**
+ * @brief 定时器0的回调函数
+ * @note
+ * - UP系统
+ *   - 当配置(XWUPCFG_SKD_BH == 1)，此函数运行在中断底半部；
+ *   - 当配置(XWUPCFG_SKD_BH == 0)，此函数运行在中断上下文；
+ * - MP系统
+ *   - 当配置(XWMPCFG_SKD_BH == 1)，此函数运行在中断底半部；
+ *   - 当配置(XWMPCFG_SKD_BH == 0)，此函数运行在中断上下文；
+ * - 此函数中不可调用会导致线程睡眠或阻塞的函数。
+ */
+void xwseldemo_swt0_callback(struct xwos_swt * swt, void * arg)
+{
+        XWOS_UNUSED(swt);
+        XWOS_UNUSED(arg);
+
+        xwos_flg_s1i(&xwseldemo_flg3, 0);
+}
+
+/**
+ * @brief 定时器1的回调函数
+ * @note
+ * - UP系统
+ *   - 当配置(XWUPCFG_SKD_BH == 1)，此函数运行在中断底半部；
+ *   - 当配置(XWUPCFG_SKD_BH == 0)，此函数运行在中断上下文；
+ * - MP系统
+ *   - 当配置(XWMPCFG_SKD_BH == 1)，此函数运行在中断底半部；
+ *   - 当配置(XWMPCFG_SKD_BH == 0)，此函数运行在中断上下文；
+ * - 此函数中不可调用会导致线程睡眠或阻塞的函数。
+ */
+void xwseldemo_swt1_callback(struct xwos_swt * swt, void * arg)
+{
+        XWOS_UNUSED(swt);
+        XWOS_UNUSED(arg);
+
+        xwos_flg_s1i(&xwseldemo_flg3, 1);
+}
+
+/**
+ * @brief 生产者线程
+ */
+xwer_t xwseldemo_producer_func(void * arg)
+{
+        xwtm_t ts;
+        xwer_t rc = XWOK;
+
+        XWOS_UNUSED(arg);
+
+        sellogf(INFO, "[生产者] 启动。\n");
+
+        while (!xwos_cthrd_frz_shld_stop(NULL)) {
+                rc = xwos_sem_post(&xwseldemo_sem1);
+                if (XWOK == rc) {
+                        ts = xwos_skd_get_timestamp_lc();
+                        sellogf(INFO,
+                                "[生产者] 发布信号量1，时间戳：%lld 纳秒\n", ts);
+                } else {
+                        ts = xwos_skd_get_timestamp_lc();
+                        sellogf(ERR,
+                                "[生产者] 错误，时间戳：%lld 纳秒，错误码：%d。\n\n",
+                                ts, rc);
+                }
+
+                ts = 1000 * XWTM_MS;
+                xwos_cthrd_sleep(&ts);
+
+                rc = xwos_sem_post(&xwseldemo_sem2);
+                if (XWOK == rc) {
+                        ts = xwos_skd_get_timestamp_lc();
+                        sellogf(INFO,
+                                "[生产者] 发布信号量2，时间戳：%lld 纳秒\n", ts);
+                } else {
+                        ts = xwos_skd_get_timestamp_lc();
+                        sellogf(ERR,
+                                "[生产者] 错误，时间戳：%lld 纳秒，错误码：%d。\n\n",
+                                ts, rc);
+                }
+                ts = 1000 * XWTM_MS;
+                xwos_cthrd_sleep(&ts);
+
+                rc = xwos_cond_broadcast(&xwseldemo_cond5);
+                if (XWOK == rc) {
+                        ts = xwos_skd_get_timestamp_lc();
+                        sellogf(INFO,
+                                "[生产者] 发布条件量5，时间戳：%lld 纳秒\n", ts);
+                } else {
+                        ts = xwos_skd_get_timestamp_lc();
+                        sellogf(ERR,
+                                "[生产者] 错误，时间戳：%lld 纳秒，错误码：%d。\n\n",
+                                ts, rc);
+                }
+                ts = 1000 * XWTM_MS;
+                xwos_cthrd_sleep(&ts);
+
+                rc = xwos_cond_broadcast(&xwseldemo_cond6);
+                if (XWOK == rc) {
+                        ts = xwos_skd_get_timestamp_lc();
+                        sellogf(INFO,
+                                "[生产者] 发布条件量6，时间戳：%lld 纳秒\n", ts);
+                } else {
+                        ts = xwos_skd_get_timestamp_lc();
+                        sellogf(ERR,
+                                "[生产者] 错误，时间戳：%lld 纳秒，错误码：%d。\n\n",
+                                ts, rc);
+                }
+                ts = 1000 * XWTM_MS;
+                xwos_cthrd_sleep(&ts);
+        }
+
+        sellogf(INFO, "[生产者] 退出。\n");
+        xwos_thrd_delete(xwos_cthrd_id());
+        return rc;
+}
+
+/**
+ * @brief 竞赛线程
+ */
+xwer_t xwseldemo_syncthrd_func(void * arg)
+{
+        xwos_br_declare_bitmap(msk);
+        xwsq_t pos = (xwsq_t)arg; /* 获取线程的各自的位置 */
+        xwer_t rc;
+
+        sellogf(INFO, "[同步线程%d] 启动。\n", pos);
+
+        xwbmpop_c0all(msk, XWOS_BR_MAXNUM);
+
+        /* 设置位图掩码 */
+        for (xwsq_t i = 0; i < xw_array_size(xwseldemo_syncthrd_td); i++) {
+                xwbmpop_s1i(msk, i);
+        }
+
+        /* 同步线程 */
+        rc = xwos_br_sync(&xwseldemo_br7, pos, msk);
+        if (XWOK == rc) {
+                sellogf(INFO, "[同步线程%d] 已就位。\n", pos);
+        }
+
+        sellogf(INFO, "[同步线程%d] 退出。\n", pos);
+        xwos_thrd_delete(xwos_cthrd_id());
+        return rc;
+}

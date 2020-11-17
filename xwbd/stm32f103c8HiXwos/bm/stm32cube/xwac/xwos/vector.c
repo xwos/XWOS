@@ -22,10 +22,9 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/irq.h>
-#include <soc_irq.h>
-#include <soc_sched.h>
-#include <soc_syshwt.h>
+#include <xwos/ospl/irq.h>
+#include <arch_skd.h>
+#include <arch_systick.h>
 #include <bm/stm32cube/cubemx/Core/Inc/isr.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
 
@@ -57,8 +56,8 @@ __soc_isr_table_qualifier struct soc_isr_table soc_isr_table __xwos_vctbl = {
                 (xwisr_f)arch_isr_svc,
                 arch_isr_dbgmon,
                 arch_isr_noop,
-                arch_scheduler_isr_swcx,
-                arch_systick_isr,
+                arch_isr_pendsv,
+                arch_isr_systick,
         },
         .soc = {
                 [WWDG_IRQn] = WWDG_IRQHandler,
@@ -108,7 +107,7 @@ __soc_isr_table_qualifier struct soc_isr_table soc_isr_table __xwos_vctbl = {
         },
 };
 
-__soc_isr_table_qualifier struct soc_irq_data_table soc_irq_data_table = {
+__soc_isr_table_qualifier struct soc_isr_data_table soc_isr_data_table = {
         .arch = {
                 [ARCH_SP_TOP + ARCHCFG_IRQ_NUM] = NULL,
                 [ARCH_IRQ_RESET + ARCHCFG_IRQ_NUM] = NULL,

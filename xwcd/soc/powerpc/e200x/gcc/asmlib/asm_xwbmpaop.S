@@ -104,7 +104,7 @@ xwbmpaop_t0i_then_s1i:
         se_blr                          /*      return r3; */
 3:                                      /* } */
         se_li           r3, 0           /* r3 = OK; */
-        msync                           /* smp_mb(); */
+        msync                           /* mp_mb(); */
         se_blr                          /* return OK; */
         .size           xwbmpaop_t0i_then_s1i, . - xwbmpaop_t0i_then_s1i
 
@@ -133,6 +133,6 @@ xwbmpaop_t1i_then_c0i:
         se_blr                          /*      return r3; */
 3:                                      /* } */
         se_li           r3, 0           /* r3 = OK; */
-        msync                           /* smp_mb(); */
+        msync                           /* mp_mb(); */
         se_blr                          /* return OK; */
         .size           xwbmpaop_t1i_then_c0i, . - xwbmpaop_t1i_then_c0i

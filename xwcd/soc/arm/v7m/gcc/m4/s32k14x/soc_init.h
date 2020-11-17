@@ -27,24 +27,12 @@
 #include <xwos/standard.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-struct soc_flash_cfgs {
-        xwu8_t backdoor_key[8];
-        xwu8_t fprot[4];
-        xwu8_t fsec;
-        xwu8_t fopt;
-        xwu8_t feprot;
-        xwu8_t fdprot;
-};
-
-/******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_init_code
-void soc_init(void);
+void soc_lowlevel_init(void);
 
 __xwbsp_init_code
-void soc_lowlevel_init(void);
+void soc_init(void);
 
 #endif /* soc_init.h */

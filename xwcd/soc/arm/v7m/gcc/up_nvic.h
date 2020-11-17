@@ -25,8 +25,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/up/irq.h>
-#include <soc_irq.h>
+#include <xwos/ospl/irq.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -37,6 +36,6 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 extern __xwbsp_rodata const struct cortexm_nvic_cfg armv7_nvic_cfg;
 extern __soc_isr_table_qualifier struct soc_isr_table soc_isr_table;
-extern __soc_isr_table_qualifier struct soc_irq_data_table soc_irq_data_table;
+extern __soc_isr_table_qualifier struct soc_isr_data_table soc_isr_data_table;
 
 #endif /* up_nvic.h */

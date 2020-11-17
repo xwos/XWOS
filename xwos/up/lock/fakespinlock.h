@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS的锁机制：虚假自旋锁
+ * @brief 玄武OS UP内核锁机制：虚假自旋锁
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -28,8 +28,8 @@
 /**
  * @brief 虚假自旋锁
  */
-struct xwlk_splk {
-        struct xwlk_sqlk fake;
+struct xwup_splk {
+        struct xwup_sqlk fake;
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -39,127 +39,127 @@ struct xwlk_splk {
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      inline API implementations     ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static __xwos_inline_api
-void xwlk_splk_init(struct xwlk_splk * splk)
+static __xwup_inline_api
+void xwup_splk_init(struct xwup_splk * splk)
 {
-        xwlk_sqlk_init(&splk->fake);
+        xwup_sqlk_init(&splk->fake);
 }
 
-static __xwos_inline_api
-void xwlk_splk_lock(struct xwlk_splk * splk)
+static __xwup_inline_api
+void xwup_splk_lock(struct xwup_splk * splk)
 {
-        xwlk_sqlk_wr_lock(&splk->fake);
+        xwup_sqlk_wr_lock(&splk->fake);
 }
 
-static __xwos_inline_api
-xwer_t xwlk_splk_trylock(struct xwlk_splk * splk)
+static __xwup_inline_api
+xwer_t xwup_splk_trylock(struct xwup_splk * splk)
 {
-        return xwlk_sqlk_wr_trylock(&splk->fake);
+        return xwup_sqlk_wr_trylock(&splk->fake);
 }
 
-static __xwos_inline_api
-void xwlk_splk_unlock(struct xwlk_splk * splk)
+static __xwup_inline_api
+void xwup_splk_unlock(struct xwup_splk * splk)
 {
-        xwlk_sqlk_wr_unlock(&splk->fake);
+        xwup_sqlk_wr_unlock(&splk->fake);
 }
 
-static __xwos_inline_api
-void xwlk_splk_lock_cpuirq(struct xwlk_splk * splk)
+static __xwup_inline_api
+void xwup_splk_lock_cpuirq(struct xwup_splk * splk)
 {
-        xwlk_sqlk_wr_lock_cpuirq(&splk->fake);
+        xwup_sqlk_wr_lock_cpuirq(&splk->fake);
 }
 
-static __xwos_inline_api
-xwer_t xwlk_splk_trylock_cpuirq(struct xwlk_splk * splk)
+static __xwup_inline_api
+xwer_t xwup_splk_trylock_cpuirq(struct xwup_splk * splk)
 {
-        return xwlk_sqlk_wr_trylock_cpuirq(&splk->fake);
+        return xwup_sqlk_wr_trylock_cpuirq(&splk->fake);
 }
 
-static __xwos_inline_api
-void xwlk_splk_unlock_cpuirq(struct xwlk_splk * splk)
+static __xwup_inline_api
+void xwup_splk_unlock_cpuirq(struct xwup_splk * splk)
 {
-        xwlk_sqlk_wr_unlock_cpuirq(&splk->fake);
+        xwup_sqlk_wr_unlock_cpuirq(&splk->fake);
 }
 
-static __xwos_inline_api
-void xwlk_splk_lock_cpuirqsv(struct xwlk_splk * splk, xwreg_t * flag)
+static __xwup_inline_api
+void xwup_splk_lock_cpuirqsv(struct xwup_splk * splk, xwreg_t * flag)
 {
-        xwlk_sqlk_wr_lock_cpuirqsv(&splk->fake, flag);
+        xwup_sqlk_wr_lock_cpuirqsv(&splk->fake, flag);
 }
 
-static __xwos_inline_api
-xwer_t xwlk_splk_trylock_cpuirqsv(struct xwlk_splk * splk, xwreg_t * flag)
+static __xwup_inline_api
+xwer_t xwup_splk_trylock_cpuirqsv(struct xwup_splk * splk, xwreg_t * flag)
 {
-        return xwlk_sqlk_wr_trylock_cpuirqsv(&splk->fake, flag);
+        return xwup_sqlk_wr_trylock_cpuirqsv(&splk->fake, flag);
 }
 
-static __xwos_inline_api
-void xwlk_splk_unlock_cpuirqrs(struct xwlk_splk * splk, xwreg_t flag)
+static __xwup_inline_api
+void xwup_splk_unlock_cpuirqrs(struct xwup_splk * splk, xwreg_t flag)
 {
-        xwlk_sqlk_wr_unlock_cpuirqrs(&splk->fake, flag);
+        xwup_sqlk_wr_unlock_cpuirqrs(&splk->fake, flag);
 }
 
-static __xwos_inline_api
-void xwlk_splk_lock_irqs(struct xwlk_splk * splk,
-                         const struct xwos_irq_resource * irqs, xwsz_t num)
+static __xwup_inline_api
+void xwup_splk_lock_irqs(struct xwup_splk * splk,
+                         const struct xwup_irq_resource * irqs, xwsz_t num)
 {
-        xwlk_sqlk_wr_lock_irqs(&splk->fake, irqs, num);
+        xwup_sqlk_wr_lock_irqs(&splk->fake, irqs, num);
 }
 
-static __xwos_inline_api
-xwer_t xwlk_splk_trylock_irqs(struct xwlk_splk * splk,
-                              const struct xwos_irq_resource * irqs, xwsz_t num)
+static __xwup_inline_api
+xwer_t xwup_splk_trylock_irqs(struct xwup_splk * splk,
+                              const struct xwup_irq_resource * irqs, xwsz_t num)
 {
-        return xwlk_sqlk_wr_trylock_irqs(&splk->fake, irqs, num);
+        return xwup_sqlk_wr_trylock_irqs(&splk->fake, irqs, num);
 }
 
-static __xwos_inline_api
-void xwlk_splk_unlock_irqs(struct xwlk_splk * splk,
-                           const struct xwos_irq_resource * irqs, xwsz_t num)
+static __xwup_inline_api
+void xwup_splk_unlock_irqs(struct xwup_splk * splk,
+                           const struct xwup_irq_resource * irqs, xwsz_t num)
 {
-        xwlk_sqlk_wr_unlock_irqs(&splk->fake, irqs, num);
+        xwup_sqlk_wr_unlock_irqs(&splk->fake, irqs, num);
 }
 
-static __xwos_inline_api
-void xwlk_splk_lock_irqssv(struct xwlk_splk * splk,
-                           const struct xwos_irq_resource * irqs,
+static __xwup_inline_api
+void xwup_splk_lock_irqssv(struct xwup_splk * splk,
+                           const struct xwup_irq_resource * irqs,
                            xwreg_t flags[], xwsz_t num)
 {
-        xwlk_sqlk_wr_lock_irqssv(&splk->fake, irqs, flags, num);
+        xwup_sqlk_wr_lock_irqssv(&splk->fake, irqs, flags, num);
 }
 
-static __xwos_inline_api
-xwer_t xwlk_splk_trylock_irqssv(struct xwlk_splk * splk,
-                                const struct xwos_irq_resource * irqs,
+static __xwup_inline_api
+xwer_t xwup_splk_trylock_irqssv(struct xwup_splk * splk,
+                                const struct xwup_irq_resource * irqs,
                                 xwreg_t flags[], xwsz_t num)
 {
-        return xwlk_sqlk_wr_trylock_irqssv(&splk->fake, irqs, flags, num);
+        return xwup_sqlk_wr_trylock_irqssv(&splk->fake, irqs, flags, num);
 }
 
-static __xwos_inline_api
-void xwlk_splk_unlock_irqsrs(struct xwlk_splk * splk,
-                             const struct xwos_irq_resource * irqs,
+static __xwup_inline_api
+void xwup_splk_unlock_irqsrs(struct xwup_splk * splk,
+                             const struct xwup_irq_resource * irqs,
                              xwreg_t flags[], xwsz_t num)
 {
-        xwlk_sqlk_wr_unlock_irqsrs(&splk->fake, irqs, flags, num);
+        xwup_sqlk_wr_unlock_irqsrs(&splk->fake, irqs, flags, num);
 }
 
-static __xwos_inline_api
-void xwlk_splk_lock_bh(struct xwlk_splk * splk)
+static __xwup_inline_api
+void xwup_splk_lock_bh(struct xwup_splk * splk)
 {
-        xwlk_sqlk_wr_lock_bh(&splk->fake);
+        xwup_sqlk_wr_lock_bh(&splk->fake);
 }
 
-static __xwos_inline_api
-xwer_t xwlk_splk_trylock_bh(struct xwlk_splk * splk)
+static __xwup_inline_api
+xwer_t xwup_splk_trylock_bh(struct xwup_splk * splk)
 {
-        return xwlk_sqlk_wr_trylock_bh(&splk->fake);
+        return xwup_sqlk_wr_trylock_bh(&splk->fake);
 }
 
-static __xwos_inline_api
-void xwlk_splk_unlock_bh(struct xwlk_splk * splk)
+static __xwup_inline_api
+void xwup_splk_unlock_bh(struct xwup_splk * splk)
 {
-        xwlk_sqlk_wr_unlock_bh(&splk->fake);
+        xwup_sqlk_wr_unlock_bh(&splk->fake);
 }
 
 #endif /* xwos/up/lock/fakespinlock.h */

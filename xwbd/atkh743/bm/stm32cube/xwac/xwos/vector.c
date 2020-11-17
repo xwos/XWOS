@@ -21,11 +21,10 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <bm/stm32cube/standard.h>
-#include <xwos/irq.h>
-#include <soc_irq.h>
-#include <soc_sched.h>
-#include <soc_syshwt.h>
+#include <xwos/standard.h>
+#include <xwos/ospl/irq.h>
+#include <arch_skd.h>
+#include <arch_systick.h>
 #include <bm/stm32cube/cubemx/Core/Inc/isr.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
 
@@ -57,8 +56,8 @@ __soc_isr_table_qualifier struct soc_isr_table soc_isr_table __xwos_vctbl = {
                 [ARCH_IRQ_SVCALL + ARCHCFG_IRQ_NUM] = (xwisr_f)arch_isr_svc,
                 [ARCH_IRQ_DBGMON + ARCHCFG_IRQ_NUM] = arch_isr_dbgmon,
                 [ARCH_IRQ_RSVN3 + ARCHCFG_IRQ_NUM] = arch_isr_noop,
-                [ARCH_IRQ_PENDSV + ARCHCFG_IRQ_NUM] = arch_scheduler_isr_swcx,
-                [ARCH_IRQ_SYSTICK + ARCHCFG_IRQ_NUM] = arch_systick_isr,
+                [ARCH_IRQ_PENDSV + ARCHCFG_IRQ_NUM] = arch_isr_pendsv,
+                [ARCH_IRQ_SYSTICK + ARCHCFG_IRQ_NUM] = arch_isr_systick,
         },
         .soc = {
                 [WWDG_IRQn] = WWDG_IRQHandler,
@@ -216,7 +215,7 @@ __soc_isr_table_qualifier struct soc_isr_table soc_isr_table __xwos_vctbl = {
         },
 };
 
-__soc_isr_table_qualifier struct soc_irq_data_table soc_irq_data_table = {
+__soc_isr_table_qualifier struct soc_isr_data_table soc_isr_data_table = {
         .arch = {
                 [ARCH_SP_TOP + ARCHCFG_IRQ_NUM] = NULL,
                 [ARCH_IRQ_RESET + ARCHCFG_IRQ_NUM] = NULL,

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS内核：调度器的时间树
+ * @brief 玄武OS UP内核：调度器的时间树
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -16,13 +16,13 @@
 #include <xwos/standard.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
+#include <xwos/ospl/syshwt.h>
 #include <xwos/up/irq.h>
-#include <xwos/up/scheduler.h>
-#if defined(XWUPCFG_SD_BH) && (1 == XWUPCFG_SD_BH)
+#include <xwos/up/skd.h>
+#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
   #include <xwos/up/bh.h>
-#endif /* XWUPCFG_SD_BH */
+#endif /* XWUPCFG_SKD_BH */
 #include <xwos/up/lock/seqlock.h>
-#include <soc_syshwt.h>
 #include <xwos/up/tt.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -37,16 +37,16 @@
  ******** ********      static function prototypes     ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 extern
-void bdl_xwsd_syshwt_hook(struct xwos_scheduler * xwsd);
+void bdl_xwskd_syshwt_hook(struct xwup_skd * xwskd);
 
-static __xwos_code
-void xwos_tt_rmrbb_locked(struct xwos_tt * xwtt, struct xwos_ttn * ttn);
+static __xwup_code
+void xwup_tt_rmrbb_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn);
 
-static __xwos_code
-void xwos_tt_rmrbn_locked(struct xwos_tt * xwtt, struct xwos_ttn * ttn);
+static __xwup_code
+void xwup_tt_rmrbn_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn);
 
-static __xwos_bh
-void xwos_tt_bh(struct xwos_tt * xwtt);
+static __xwup_bh
+void xwup_tt_bh(struct xwup_tt * xwtt);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -55,37 +55,37 @@ void xwos_tt_bh(struct xwos_tt * xwtt);
  * @brief 初始化时间树节点
  * @param ttn: (I) 时间树节点的指针
  */
-__xwos_code
-void xwos_ttn_init(struct xwos_ttn * ttn, xwptr_t entry, xwptr_t type)
+__xwup_code
+void xwup_ttn_init(struct xwup_ttn * ttn, xwptr_t entry, xwptr_t type)
 {
         xwlib_bclst_init_node(&ttn->rbb);
         xwlib_rbtree_init_node(&ttn->rbn);
         ttn->wkup_xwtm = 0;
-        ttn->wkuprs = XWOS_TTN_WKUPRS_UNKNOWN;
+        ttn->wkuprs = XWUP_TTN_WKUPRS_UNKNOWN;
         ttn->cb = NULL;
         ttn->xwtt = NULL;
-        ttn->entry.addr = entry & (~XWOS_TTN_TYPE_MASK);
-        ttn->entry.type |= type & XWOS_TTN_TYPE_MASK;
+        ttn->entry.addr = entry & (~XWUP_TTN_TYPE_MASK);
+        ttn->entry.type |= type & XWUP_TTN_TYPE_MASK;
 }
 
 /**
  * @brief 初始化时间树
  * @param xwtt: (I) 时间树的指针
  */
-__xwos_code
-xwer_t xwos_tt_init(struct xwos_tt * xwtt)
+__xwup_code
+xwer_t xwup_tt_init(struct xwup_tt * xwtt)
 {
         xwer_t rc;
 
-        xwlk_sqlk_init(&xwtt->lock);
+        xwup_sqlk_init(&xwtt->lock);
         xwlib_rbtree_init(&xwtt->rbtree);
         xwtt->deadline = 0;
         xwtt->leftmost = NULL;
         xwlib_bclst_init_head(&xwtt->timeout);
-#if defined(XWUPCFG_SD_BH) && (1 == XWUPCFG_SD_BH)
-        xwos_bh_node_init(&xwtt->bhn, (xwos_bh_f)xwos_tt_bh, xwtt);
-#endif /* XWUPCFG_SD_BH */
-        rc = xwos_syshwt_init(&xwtt->hwt);
+#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+        xwup_bh_node_init(&xwtt->bhn, (xwup_bh_f)xwup_tt_bh, xwtt);
+#endif /* XWUPCFG_SKD_BH */
+        rc = xwup_syshwt_init(&xwtt->hwt);
         return rc;
 }
 
@@ -100,13 +100,13 @@ xwer_t xwos_tt_init(struct xwos_tt * xwtt)
  * @note
  * - 此函数只能在获得写锁xwtt->lock，且CPU中断被关闭时调用。
  */
-__xwos_code
-xwer_t xwos_tt_add_locked(struct xwos_tt * xwtt, struct xwos_ttn * ttn,
+__xwup_code
+xwer_t xwup_tt_add_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn,
                           xwreg_t cpuirq)
 {
         struct xwlib_rbtree_node ** pos;
         struct xwlib_rbtree_node * rbn;
-        struct xwos_ttn * n, * leftmost;
+        struct xwup_ttn * n, * leftmost;
         xwptr_t lpc;
         xwsq_t seq;
         xwer_t rc;
@@ -135,45 +135,45 @@ retry:
                         n = leftmost;
                 } else {
                         rbn = *pos;
-                        seq = xwlk_sqlk_get_seq(&xwtt->lock);
-                        xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                        seq = xwup_sqlk_get_seq(&xwtt->lock);
+                        xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                         /* IRQs may happen */
-                        seq += XWLK_SQLK_GRANULARITY;
-                        xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                        seq += XWLK_SQLK_GRANULARITY;
-                        if (xwlk_sqlk_rd_retry(&xwtt->lock, seq)) {
+                        seq += XWUP_SQLK_GRANULARITY;
+                        xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
+                        seq += XWUP_SQLK_GRANULARITY;
+                        if (xwup_sqlk_rd_retry(&xwtt->lock, seq)) {
                                 goto retry;
                         }
                         while (rbn) {
-                                n = xwlib_rbtree_entry(rbn, struct xwos_ttn, rbn);
+                                n = xwlib_rbtree_entry(rbn, struct xwup_ttn, rbn);
                                 nt = n->wkup_xwtm;
-                                xwlk_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                                xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                                 /* IRQs may happen */
-                                seq += XWLK_SQLK_GRANULARITY;
+                                seq += XWUP_SQLK_GRANULARITY;
                                 rc = xwtm_cmp(ttn->wkup_xwtm, nt);
                                 if (rc < 0) {
                                         pos = &rbn->left;
                                         lpc = (xwptr_t)pos;
-                                        xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                                        seq += XWLK_SQLK_GRANULARITY;
-                                        if (xwlk_sqlk_rd_retry(&xwtt->lock, seq)) {
+                                        xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
+                                        seq += XWUP_SQLK_GRANULARITY;
+                                        if (xwup_sqlk_rd_retry(&xwtt->lock, seq)) {
                                                 goto retry;
                                         }
                                         rbn = rbn->left;
                                 } else if (rc > 0) {
                                         pos = &rbn->right;
                                         lpc = (xwptr_t)pos | XWLIB_RBTREE_POS_RIGHT;
-                                        xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                                        seq += XWLK_SQLK_GRANULARITY;
-                                        if (xwlk_sqlk_rd_retry(&xwtt->lock, seq)) {
+                                        xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
+                                        seq += XWUP_SQLK_GRANULARITY;
+                                        if (xwup_sqlk_rd_retry(&xwtt->lock, seq)) {
                                                 goto retry;
                                         }
                                         rbn = rbn->right;
                                 } else {
                                         lpc = (xwptr_t)0;
-                                        xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                                        seq += XWLK_SQLK_GRANULARITY;
-                                        if (xwlk_sqlk_rd_retry(&xwtt->lock, seq)) {
+                                        xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
+                                        seq += XWUP_SQLK_GRANULARITY;
+                                        if (xwup_sqlk_rd_retry(&xwtt->lock, seq)) {
                                                 goto retry;
                                         }
                                         break;
@@ -198,12 +198,12 @@ retry:
  * @note
  * - 此函数只能在获得写锁xwtt->lock，且CPU中断被关闭时调用。
  */
-static __xwos_code
-void xwos_tt_rmrbb_locked(struct xwos_tt * xwtt, struct xwos_ttn * ttn)
+static __xwup_code
+void xwup_tt_rmrbb_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn)
 {
-        struct xwos_ttn * n;
+        struct xwup_ttn * n;
 
-        n = xwlib_bclst_first_entry(&ttn->rbb, struct xwos_ttn, rbb);
+        n = xwlib_bclst_first_entry(&ttn->rbb, struct xwup_ttn, rbb);
         xwlib_bclst_del_init(&ttn->rbb);
         xwlib_rbtree_replace(&n->rbn, &ttn->rbn);
         xwlib_rbtree_init_node(&ttn->rbn);
@@ -219,8 +219,8 @@ void xwos_tt_rmrbb_locked(struct xwos_tt * xwtt, struct xwos_ttn * ttn)
  * @note
  * - 此函数只能在获得写锁xwtt->lock，且CPU中断被关闭时调用。
  */
-static __xwos_code
-void xwos_tt_rmrbn_locked(struct xwos_tt * xwtt, struct xwos_ttn * ttn)
+static __xwup_code
+void xwup_tt_rmrbn_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn)
 {
         struct xwlib_rbtree_node * s;
 
@@ -234,7 +234,7 @@ void xwos_tt_rmrbn_locked(struct xwos_tt * xwtt, struct xwos_ttn * ttn)
                         s = xwlib_rbtree_get_parent(&ttn->rbn);
                 }/* else {} */
                 if (s != (struct xwlib_rbtree_node *)&xwtt->rbtree.root) {
-                        xwtt->leftmost = xwlib_rbtree_entry(s, struct xwos_ttn, rbn);
+                        xwtt->leftmost = xwlib_rbtree_entry(s, struct xwup_ttn, rbn);
                         xwtt->deadline = xwtt->leftmost->wkup_xwtm;
                 } else {
                         xwtt->leftmost = NULL;
@@ -253,8 +253,8 @@ void xwos_tt_rmrbn_locked(struct xwos_tt * xwtt, struct xwos_ttn * ttn)
  * @note
  * - 此函数只能在获得写锁xwtt->lock，且CPU中断被关闭时调用。
  */
-__xwos_code
-xwer_t xwos_tt_remove_locked(struct xwos_tt * xwtt, struct xwos_ttn * ttn)
+__xwup_code
+xwer_t xwup_tt_remove_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn)
 {
         xwer_t rc;
 
@@ -264,12 +264,12 @@ xwer_t xwos_tt_remove_locked(struct xwos_tt * xwtt, struct xwos_ttn * ttn)
                 if (xwlib_rbtree_tst_node_unlinked(&ttn->rbn)) {
                         xwlib_bclst_del_init(&ttn->rbb);
                 } else if (!xwlib_bclst_tst_empty(&ttn->rbb)) {
-                        xwos_tt_rmrbb_locked(xwtt, ttn);
+                        xwup_tt_rmrbb_locked(xwtt, ttn);
                 } else {
-                        xwos_tt_rmrbn_locked(xwtt, ttn);
+                        xwup_tt_rmrbn_locked(xwtt, ttn);
                 }
                 ttn->xwtt = NULL;
-                ttn->wkuprs = XWOS_TTN_WKUPRS_INTR;
+                ttn->wkuprs = XWUP_TTN_WKUPRS_INTR;
                 ttn->cb = NULL;
                 rc = XWOK;
         }
@@ -280,24 +280,24 @@ xwer_t xwos_tt_remove_locked(struct xwos_tt * xwtt, struct xwos_ttn * ttn)
  * @brief 检查时间树中超时的节点
  * @param xwtt: (I) 时间树的指针
  */
-__xwos_isr
-xwer_t xwos_tt_check_deadline(struct xwos_tt * xwtt)
+__xwup_isr
+xwer_t xwup_tt_check_deadline(struct xwup_tt * xwtt)
 {
-        struct xwos_ttn * leftmost;
+        struct xwup_ttn * leftmost;
         xwtm_t tick;
         xwer_t rc;
 
         rc = XWOK;
-        xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
-        for (tick = xwos_syshwt_get_timetick(&xwtt->hwt);
+        xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
+        for (tick = xwup_syshwt_get_timetick(&xwtt->hwt);
              ((NULL != xwtt->leftmost) && (xwtm_cmp(xwtt->deadline, tick) <= 0));
-             tick = xwos_syshwt_get_timetick(&xwtt->hwt)) {
+             tick = xwup_syshwt_get_timetick(&xwtt->hwt)) {
                 leftmost = xwtt->leftmost;
-                xwos_tt_rmrbn_locked(xwtt, leftmost);
+                xwup_tt_rmrbn_locked(xwtt, leftmost);
                 xwlib_bclst_insseg_tail(&xwtt->timeout, &leftmost->rbb);
                 rc = -ETIMEDOUT;
         }
-        xwlk_sqlk_wr_unlock_cpuirq(&xwtt->lock);
+        xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
         return rc;
 }
 
@@ -305,35 +305,35 @@ xwer_t xwos_tt_check_deadline(struct xwos_tt * xwtt)
  * @brief 时间树的中断底半部
  * @param xwtt: (I) 时间树的指针
  */
-static __xwos_bh
-void xwos_tt_bh(struct xwos_tt * xwtt)
+static __xwup_bh
+void xwup_tt_bh(struct xwup_tt * xwtt)
 {
-        struct xwos_ttn * ttn;
-        xwos_tt_cb_f cb;
+        struct xwup_ttn * ttn;
+        xwup_tt_cb_f cb;
 
-        xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
-        xwlib_bclst_itr_prev_entry_del(ttn, &xwtt->timeout, struct xwos_ttn, rbb) {
+        xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
+        xwlib_bclst_itr_prev_entry_del(ttn, &xwtt->timeout, struct xwup_ttn, rbb) {
                 xwlib_bclst_del_init(&ttn->rbb);
                 cb = ttn->cb;
-                ttn->wkuprs = XWOS_TTN_WKUPRS_TIMEDOUT;
+                ttn->wkuprs = XWUP_TTN_WKUPRS_TIMEDOUT;
                 ttn->cb = NULL;
-                xwlk_sqlk_wr_unlock_cpuirq(&xwtt->lock);
-                cb(xwos_ttn_get_entry(ttn));
-                xwlk_sqlk_wr_lock_cpuirq(&xwtt->lock);
+                xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
+                cb(xwup_ttn_get_entry(ttn));
+                xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
         }
-        xwlk_sqlk_wr_unlock_cpuirq(&xwtt->lock);
-        xwos_scheduler_chkpmpt();
+        xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
+        xwup_skd_chkpmpt();
 }
 
 /**
- * @brief 得到时间树所属的调度器
+ * @brief 获取时间树所属的调度器
  * @param xwtt: (I) 时间树的指针
  * @return 调度器的指针
  */
-__xwos_code
-struct xwos_scheduler * xwos_tt_get_scheduler(struct xwos_tt * xwtt)
+__xwup_code
+struct xwup_skd * xwup_tt_get_skd(struct xwup_tt * xwtt)
 {
-        return xwcc_baseof(xwtt, struct xwos_scheduler, tt);
+        return xwcc_baseof(xwtt, struct xwup_skd, tt);
 }
 
 /**
@@ -341,17 +341,17 @@ struct xwos_scheduler * xwos_tt_get_scheduler(struct xwos_tt * xwtt)
  * @param hwt: (I) 硬件定时器结构体的指针
  * @return 错误码
  */
-__xwos_code
-xwer_t xwos_syshwt_init(struct xwos_syshwt * hwt)
+__xwup_code
+xwer_t xwup_syshwt_init(struct xwup_syshwt * hwt)
 {
         xwer_t rc;
 
         hwt->timetick = (xwtm_t)(-(XWUPCFG_SYSHWT_PERIOD));
         hwt->irqrsc = NULL;
         hwt->irqs_num = 0;
-        xwlk_sqlk_init(&hwt->lock);
+        xwup_sqlk_init(&hwt->lock);
         /* port code of CPU must set the irqc & irqrsc */
-        rc = soc_syshwt_init(hwt);
+        rc = xwospl_syshwt_init(hwt);
         if (__xwcc_likely(XWOK == rc)) {
                 XWOS_BUG_ON(NULL == hwt->irqrsc);
                 XWOS_BUG_ON(0 == hwt->irqs_num);
@@ -364,24 +364,24 @@ xwer_t xwos_syshwt_init(struct xwos_syshwt * hwt)
  * @param hwt: (I) 硬件定时器结构体的指针
  * @return 错误码
  */
-__xwos_code
-xwer_t xwos_syshwt_start(struct xwos_syshwt * hwt)
+__xwup_code
+xwer_t xwup_syshwt_start(struct xwup_syshwt * hwt)
 {
-        return soc_syshwt_start(hwt);
+        return xwospl_syshwt_start(hwt);
 }
 
 /**
  * @brief 关闭硬件定时器
  * @param hwt: (I) 硬件定时器结构体的指针
  */
-__xwos_code
-xwer_t xwos_syshwt_stop(struct xwos_syshwt * hwt)
+__xwup_code
+xwer_t xwup_syshwt_stop(struct xwup_syshwt * hwt)
 {
-        return soc_syshwt_stop(hwt);
+        return xwospl_syshwt_stop(hwt);
 }
 
 /**
- * @brief XWOS API：得到系统滴答时间
+ * @brief 获取系统滴答时间
  * @param hwt: (I) 硬件定时器结构体的指针
  * @return 系统滴答时间
  * @note
@@ -389,21 +389,21 @@ xwer_t xwos_syshwt_stop(struct xwos_syshwt * hwt)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  */
-__xwos_api
-xwtm_t xwos_syshwt_get_timetick(struct xwos_syshwt * hwt)
+__xwup_code
+xwtm_t xwup_syshwt_get_timetick(struct xwup_syshwt * hwt)
 {
         xwsq_t seq;
         xwtm_t timetick;
 
         do {
-                seq = xwlk_sqlk_rd_begin(&hwt->lock);
+                seq = xwup_sqlk_rd_begin(&hwt->lock);
                 timetick = hwt->timetick;
-        } while (xwlk_sqlk_rd_retry(&hwt->lock, seq));
+        } while (xwup_sqlk_rd_retry(&hwt->lock, seq));
         return timetick;
 }
 
 /**
- * @brief XWOS API：得到系统滴答计数
+ * @brief 获取系统滴答计数
  * @param hwt: (I) 硬件定时器结构体的指针
  * @return 系统滴答计数
  * @note
@@ -411,14 +411,14 @@ xwtm_t xwos_syshwt_get_timetick(struct xwos_syshwt * hwt)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  */
-__xwos_api
-xwu64_t xwos_syshwt_get_tickcount(struct xwos_syshwt * hwt)
+__xwup_code
+xwu64_t xwup_syshwt_get_tickcount(struct xwup_syshwt * hwt)
 {
-        return (xwu64_t)xwos_syshwt_get_timetick(hwt) / XWUPCFG_SYSHWT_PERIOD;
+        return (xwu64_t)xwup_syshwt_get_timetick(hwt) / XWUPCFG_SYSHWT_PERIOD;
 }
 
 /**
- * @brief XWOS API：得到系统定时器的时间戳
+ * @brief 获取系统定时器的时间戳
  * @param hwt: (I) 硬件定时器结构体的指针
  * @return 时间戳
  * @note
@@ -426,19 +426,19 @@ xwu64_t xwos_syshwt_get_tickcount(struct xwos_syshwt * hwt)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  */
-__xwos_api
-xwtm_t xwos_syshwt_get_timestamp(struct xwos_syshwt * hwt)
+__xwup_code
+xwtm_t xwup_syshwt_get_timestamp(struct xwup_syshwt * hwt)
 {
         xwsq_t seq;
         xwtm_t ts;
         xwtm_t timeconfetti;
 
         do {
-                seq = xwlk_sqlk_rd_begin(&hwt->lock);
+                seq = xwup_sqlk_rd_begin(&hwt->lock);
                 ts = hwt->timetick;
-                timeconfetti = soc_syshwt_get_timeconfetti(hwt);
+                timeconfetti = xwospl_syshwt_get_timeconfetti(hwt);
                 ts = xwtm_add(ts, timeconfetti);
-        } while (xwlk_sqlk_rd_retry(&hwt->lock, seq));
+        } while (xwup_sqlk_rd_retry(&hwt->lock, seq));
         return ts;
 }
 
@@ -446,42 +446,42 @@ xwtm_t xwos_syshwt_get_timestamp(struct xwos_syshwt * hwt)
  * @brief 系统滴答中断任务
  * @param hwt: (I) 硬件定时器结构体的指针
  */
-__xwos_isr
-void xwos_syshwt_task(struct xwos_syshwt * hwt)
+__xwup_isr
+void xwup_syshwt_task(struct xwup_syshwt * hwt)
 {
-        struct xwos_tt * xwtt;
+        struct xwup_tt * xwtt;
         xwer_t rc;
         xwreg_t flags[hwt->irqs_num];
 
-        xwtt = xwos_syshwt_get_tt(hwt);
-        xwlk_sqlk_wr_lock_irqssv(&hwt->lock, hwt->irqrsc, flags, hwt->irqs_num);
+        xwtt = xwup_syshwt_get_tt(hwt);
+        xwup_sqlk_wr_lock_irqssv(&hwt->lock, hwt->irqrsc, flags, hwt->irqs_num);
         hwt->timetick = xwtm_add(hwt->timetick, XWUPCFG_SYSHWT_PERIOD);
-        xwlk_sqlk_wr_unlock_irqsrs(&hwt->lock, hwt->irqrsc, flags, hwt->irqs_num);
-        rc = xwos_tt_check_deadline(xwtt);
+        xwup_sqlk_wr_unlock_irqsrs(&hwt->lock, hwt->irqrsc, flags, hwt->irqs_num);
+        rc = xwup_tt_check_deadline(xwtt);
         if (-ETIMEDOUT == rc) {
-#if defined(XWUPCFG_SD_BH) && (1 == XWUPCFG_SD_BH)
-                struct xwos_scheduler * xwsd;
+#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+                struct xwup_skd * xwskd;
 
-                xwsd = xwos_tt_get_scheduler(xwtt);
-                xwos_bh_node_eq(&xwsd->bhcb, &xwtt->bhn);
-                xwos_scheduler_req_bh();
-#else /* XWUPCFG_SD_BH */
-                xwos_tt_bh(xwtt);
-#endif /* !XWUPCFG_SD_BH */
+                xwskd = xwup_tt_get_skd(xwtt);
+                xwup_bh_node_eq(&xwskd->bhcb, &xwtt->bhn);
+                xwup_skd_req_bh();
+#else /* XWUPCFG_SKD_BH */
+                xwup_tt_bh(xwtt);
+#endif /* !XWUPCFG_SKD_BH */
         }
-        xwos_scheduler_chkpmpt();
-#if defined(BRDCFG_XWSD_SYSHWT_HOOK) && (1 == BRDCFG_XWSD_SYSHWT_HOOK)
-        bdl_xwsd_syshwt_hook(xwos_scheduler_get_lc());
-#endif /* BRDCFG_XWSD_SYSHWT_HOOK */
+        xwup_skd_chkpmpt();
+#if defined(BRDCFG_XWSKD_SYSHWT_HOOK) && (1 == BRDCFG_XWSKD_SYSHWT_HOOK)
+        bdl_xwskd_syshwt_hook(xwup_skd_get_lc());
+#endif /* BRDCFG_XWSKD_SYSHWT_HOOK */
 }
 
 /**
- * @brief 得到硬件定时器的时间树
+ * @brief 获取硬件定时器的时间树
  * @param hwt: (I) 硬件定时器结构体的指针
  * @return 时间树的指针
  */
-__xwos_code
-struct xwos_tt * xwos_syshwt_get_tt(struct xwos_syshwt * hwt)
+__xwup_code
+struct xwup_tt * xwup_syshwt_get_tt(struct xwup_syshwt * hwt)
 {
-        return xwcc_baseof(hwt, struct xwos_tt, hwt);
+        return xwcc_baseof(hwt, struct xwup_tt, hwt);
 }

@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.hxx>
-#include <xwos/osal/thread.hxx>
+#include <xwos/osal/skd.hxx>
 #include <vector>
 #include "test/literal.hxx"
 #include "test/vector.hxx"
@@ -36,9 +36,9 @@ xwer_t cxx_thrd(void * arg)
   testStdVector();
 
   rc = XWOK;
-  while (!xwosal_cthrd_frz_shld_stop(NULL)) {
+  while (!xwos_cthrd_frz_shld_stop(NULL)) {
     xwtm = 2000 * XWTM_MS;
-    xwosal_cthrd_sleep(&xwtm);
+    xwos_cthrd_sleep(&xwtm);
   }
   return rc;
 }

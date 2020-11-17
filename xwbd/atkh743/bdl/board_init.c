@@ -25,14 +25,14 @@
 #include <string.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/bma.h>
-#if defined(XuanWuOS_CFG_CORE__smp)
-  #include <xwos/smp/thread.h>
-  #include <xwos/smp/swt.h>
-  #include <xwos/smp/sync/semaphore.h>
-  #include <xwos/smp/sync/condition.h>
-  #include <xwos/smp/sync/event.h>
-  #include <xwos/smp/lock/mutex.h>
-#endif /* XuanWuOS_CFG_CORE__smp */
+#if defined(XuanWuOS_CFG_CORE__mp)
+  #include <xwos/mp/thrd.h>
+  #include <xwos/mp/swt.h>
+  #include <xwos/mp/sync/sem.h>
+  #include <xwos/mp/sync/cond.h>
+  #include <xwos/mp/sync/evt.h>
+  #include <xwos/mp/lock/mtx.h>
+#endif /* XuanWuOS_CFG_CORE__mp */
 #include <bm/stm32cube/mif.h>
 #include <bdl/standard.h>
 #include <bdl/board_init.h>
@@ -118,14 +118,14 @@ xwer_t sys_mm_init(void)
         }
         dtcmheap_bma = bma;
 
-#if defined(XuanWuOS_CFG_CORE__smp)
+#if defined(XuanWuOS_CFG_CORE__mp)
         void * mem;
 
         rc = xwmm_bma_alloc(dtcmheap_bma, BRDCFG_XWOS_THRD_CACHE_ODR, &mem);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_tcb_bma_alloc;
         }
-        rc = xwos_tcb_cache_init((xwptr_t)mem,
+        rc = xwmp_tcb_cache_init((xwptr_t)mem,
                                  (DTCMHEAP_BLKSZ << BRDCFG_XWOS_THRD_CACHE_ODR));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_tcb_cache_init;
@@ -135,38 +135,38 @@ xwer_t sys_mm_init(void)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_swt_bma_alloc;
         }
-        rc = xwos_swt_cache_init((xwptr_t)mem,
+        rc = xwmp_swt_cache_init((xwptr_t)mem,
                                  (DTCMHEAP_BLKSZ << BRDCFG_XWOS_SWT_CACHE_ODR));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_swt_cache_init;
         }
 
-        rc = xwmm_bma_alloc(dtcmheap_bma, BRDCFG_XWOS_SMR_CACHE_ODR, &mem);
+        rc = xwmm_bma_alloc(dtcmheap_bma, BRDCFG_XWOS_SEM_CACHE_ODR, &mem);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_smr_bma_alloc;
+                goto err_sem_bma_alloc;
         }
-        rc = xwsync_smr_cache_init((xwptr_t)mem,
-                                   (DTCMHEAP_BLKSZ << BRDCFG_XWOS_SMR_CACHE_ODR));
+        rc = xwmp_sem_cache_init((xwptr_t)mem,
+                                 (DTCMHEAP_BLKSZ << BRDCFG_XWOS_SEM_CACHE_ODR));
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_smr_cache_init;
+                goto err_sem_cache_init;
         }
 
-        rc = xwmm_bma_alloc(dtcmheap_bma, BRDCFG_XWOS_CDT_CACHE_ODR, &mem);
+        rc = xwmm_bma_alloc(dtcmheap_bma, BRDCFG_XWOS_COND_CACHE_ODR, &mem);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_cdt_bma_alloc;
+                goto err_cond_bma_alloc;
         }
-        rc = xwsync_cdt_cache_init((xwptr_t)mem,
-                                   (DTCMHEAP_BLKSZ << BRDCFG_XWOS_CDT_CACHE_ODR));
+        rc = xwmp_cond_cache_init((xwptr_t)mem,
+                                  (DTCMHEAP_BLKSZ << BRDCFG_XWOS_COND_CACHE_ODR));
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_cdt_cache_init;
+                goto err_cond_cache_init;
         }
 
         rc = xwmm_bma_alloc(dtcmheap_bma, BRDCFG_XWOS_EVT_CACHE_ODR, &mem);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_evt_bma_alloc;
         }
-        rc = xwsync_evt_cache_init((xwptr_t)mem,
-                                   (DTCMHEAP_BLKSZ << BRDCFG_XWOS_EVT_CACHE_ODR));
+        rc = xwmp_evt_cache_init((xwptr_t)mem,
+                                 (DTCMHEAP_BLKSZ << BRDCFG_XWOS_EVT_CACHE_ODR));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_evt_cache_init;
         }
@@ -175,16 +175,16 @@ xwer_t sys_mm_init(void)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_bma_alloc;
         }
-        rc = xwlk_mtx_cache_init((xwptr_t)mem,
+        rc = xwmp_mtx_cache_init((xwptr_t)mem,
                                  (DTCMHEAP_BLKSZ << BRDCFG_XWOS_MTX_CACHE_ODR));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_cache_init;
         }
-#endif /* XuanWuOS_CFG_CORE__smp */
+#endif /* XuanWuOS_CFG_CORE__mp */
 
         return XWOK;
 
-#if defined(XuanWuOS_CFG_CORE__smp)
+#if defined(XuanWuOS_CFG_CORE__mp)
 err_mtx_cache_init:
         BDL_BUG();
 err_mtx_bma_alloc:
@@ -193,13 +193,13 @@ err_evt_cache_init:
         BDL_BUG();
 err_evt_bma_alloc:
         BDL_BUG();
-err_cdt_cache_init:
+err_cond_cache_init:
         BDL_BUG();
-err_cdt_bma_alloc:
+err_cond_bma_alloc:
         BDL_BUG();
-err_smr_cache_init:
+err_sem_cache_init:
         BDL_BUG();
-err_smr_bma_alloc:
+err_sem_bma_alloc:
         BDL_BUG();
 err_swt_cache_init:
         BDL_BUG();
@@ -209,7 +209,7 @@ err_tcb_cache_init:
         BDL_BUG();
 err_tcb_bma_alloc:
         BDL_BUG();
-#endif /* XuanWuOS_CFG_CORE__smp */
+#endif /* XuanWuOS_CFG_CORE__mp */
 err_dtcmheap_bma_create:
         BDL_BUG();
 err_axisram_bma_create:

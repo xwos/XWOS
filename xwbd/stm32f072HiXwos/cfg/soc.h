@@ -31,5 +31,6 @@
 
 /******** ******** CRC ******** ********/
 #define SOCCFG_CRC32                            1
+#define SOCCFG_CRC8                             0
 
 #endif /* cfg/soc.h */

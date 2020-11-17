@@ -14,7 +14,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwmd/ds/uart/dma.h>
+#include <xwcd/ds/uart/dma.h>
 #include <xwmd/isc/xwpcp/protocol.h>
 #include <xwmd/isc/xwpcp/hwifal.h>
 #include <xwmd/isc/xwpcp/hwif/uart.h>

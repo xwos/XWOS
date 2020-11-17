@@ -35,8 +35,8 @@
 /* USER CODE BEGIN Includes */
 #include <bm/stm32cube/standard.h>
 #include <xwos/osal/lock/spinlock.h>
-#include <xwos/osal/sync/condition.h>
-#include <xwmd/ds/spi/master.h>
+#include <xwos/osal/sync/cond.h>
+#include <xwcd/ds/spi/master.h>
 
 /* USER CODE END Includes */
 
@@ -49,8 +49,8 @@ extern SPI_HandleTypeDef hspi2;
 struct MX_SPI_MasterDriverData {
   SPI_HandleTypeDef * halhdl;
   struct xwds_spim * spim;
-  struct xwosal_cdt cdt; /**< 条件量 */
-  struct xwosal_splk splk; /**< 保证发送状态只被单一上下文访问的锁 */
+  struct xwos_cond cond; /**< 条件量 */
+  struct xwos_splk splk; /**< 保证发送状态只被单一上下文访问的锁 */
   const xwu8_t * txd; /**< 用户发送数据 */
   xwu8_t * rxb; /**< 用户接受缓冲区 */
   xwu32_t size; /**< 待传输的数据大小 */

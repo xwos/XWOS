@@ -22,7 +22,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwmd/ds/uart/dma.h>
+#include <xwcd/ds/uart/dma.h>
 #include <xwam/application/w25qrpt/w25qrpt.h>
 #include <xwam/application/w25qrpt/hwifal.h>
 #include <xwam/application/w25qrpt/hwif/uart.h>

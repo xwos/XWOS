@@ -19,6 +19,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+typedef void (*newlibac_linkage_f)(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -30,6 +31,7 @@
 extern void newlibac_mem_linkage_placeholder(void);
 extern void newlibac_fops_linkage_placeholder(void);
 extern void newlibac_string_linkage_placeholder(void);
+extern void newlibac_lock_linkage_placeholder(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
@@ -39,10 +41,11 @@ extern void newlibac_string_linkage_placeholder(void);
  * @note
  * + 静态连接时，若符号存在多重定义，优先选择包含占位符的文件里面的符号。
  */
-void * const newlibac_linkage_placeholder[] = {
+const newlibac_linkage_f newlibac_linkage_table[] = {
         newlibac_mem_linkage_placeholder,
         newlibac_fops_linkage_placeholder,
         newlibac_string_linkage_placeholder,
+        newlibac_lock_linkage_placeholder,
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -50,5 +53,12 @@ void * const newlibac_linkage_placeholder[] = {
  ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t newlibac_init(void)
 {
+        const newlibac_linkage_f * f = newlibac_linkage_table;
+        xwsz_t sz = xw_array_size(newlibac_linkage_table);
+        xwsz_t i;
+
+        for (i = 0; i < sz; i++) {
+                f[i]();
+        }
         return XWOK;
 }

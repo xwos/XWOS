@@ -46,9 +46,6 @@ SECTIONS {
                 *(.xwos.isr.text)
                 *(.xwos.text)
                 *(.xwos.rodata)
-                *(.xwmd.isr.text)
-                *(.xwmd.text)
-                *(.xwmd.rodata)
         } > code_mr
 
         .rx : ALIGN(8) {
@@ -159,13 +156,6 @@ SECTIONS {
         xwos_data_vma_base = ADDR(.xwos.data);
         xwos_data_lma_base = LOADADDR(.xwos.data);
 
-        .xwmd.data : ALIGN(8) {
-                *(.xwmd.data)
-                xwmd_data_vma_end = .;
-        } > xwos_data_mr AT> code_mr
-        xwmd_data_vma_base = ADDR(.xwmd.data);
-        xwmd_data_lma_base = LOADADDR(.xwmd.data);
-
         .data : ALIGN(8) {
                 *(.data .data.* .gnu.linkonce.d.*)
                 data_vma_end = .;
@@ -211,7 +201,7 @@ xwos_data_mr_origin = ORIGIN(xwos_data_mr);
 xwos_data_mr_size = LENGTH(xwos_data_mr);
 xwmm_dkma_mmz_origin = xwos_data_mr_origin;
 xwmm_dkma_mmz_size = xwos_data_mr_size;
-xwmm_dkma_mmz_pos = xwmd_data_vma_end - xwos_data_mr_origin;
+xwmm_dkma_mmz_pos = xwos_data_vma_end - xwos_data_mr_origin;
 
 xwos_stk_mr_origin = ORIGIN(xwos_stk_mr);
 xwos_stk_mr_size = LENGTH(xwos_stk_mr);

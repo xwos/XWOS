@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS内核：实时等待队列
+ * @brief 玄武OS UP内核：实时等待队列
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -23,15 +23,15 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-struct xwos_wqn;
+struct xwup_wqn;
 
 /**
  * @brief 实时等待队列
  */
-struct xwos_rtwq {
+struct xwup_rtwq {
         struct xwlib_rbtree tree; /**< 红黑树（关键字：优先级） */
         xwpr_t max_prio; /**< 红黑树中最大关键字 */
-        struct xwos_wqn * rightmost; /**< 拥有最大关键字的节点 */
+        struct xwup_wqn * rightmost; /**< 拥有最大关键字的节点 */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -39,29 +39,18 @@ struct xwos_rtwq {
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 以删除为目的，遍历实时等待队列中所有节点
- * @param c: (I) 作为循环光标的等待队列节点结构体(struct xwos_wqn)指针
+ * @param c: (I) 作为循环光标的等待队列节点结构体(struct xwup_wqn)指针
  * @param xwrtwq: (I) 等待队列的指针
  */
-#define xwos_rtwq_itr_thrd_rm(c, xwrtwq) \
+#define xwup_rtwq_itr_thrd_rm(c, xwrtwq) \
         for (c = (xwrtwq)->rightmost; c; c = (xwrtwq)->rightmost)
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwos_code
-void xwos_rtwq_init(struct xwos_rtwq * xwrtwq);
-
-__xwos_code
-void xwos_rtwq_add(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn, xwpr_t prio);
-
-__xwos_code
-xwer_t xwos_rtwq_remove(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn);
-
-__xwos_code
-struct xwos_wqn * xwos_rtwq_choose(struct xwos_rtwq * xwrtwq);
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+void xwup_rtwq_init(struct xwup_rtwq * xwrtwq);
+void xwup_rtwq_add(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn, xwpr_t prio);
+xwer_t xwup_rtwq_remove(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn);
+struct xwup_wqn * xwup_rtwq_choose(struct xwup_rtwq * xwrtwq);
 
 #endif /* xwos/up/rtwq.h */

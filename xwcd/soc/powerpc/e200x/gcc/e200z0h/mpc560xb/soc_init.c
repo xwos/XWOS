@@ -22,25 +22,24 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#if defined(XuanWuOS_CFG_CORE__smp)
-  #include <xwos/smp/cpu.h>
-  #include <xwos/smp/irq.h>
-  #include <xwos/smp/scheduler.h>
-  #include <xwos/smp/pm.h>
-  #include <soc_xwpmdm.h>
+#if defined(XuanWuOS_CFG_CORE__mp)
+  #include <xwos/mp/irq.h>
+  #include <xwos/mp/skd.h>
 #elif defined(XuanWuOS_CFG_CORE__up)
   #include <xwos/up/irq.h>
-  #include <soc_up_irqc.h>
-  #include <xwos/up/scheduler.h>
+  #include <xwos/up/skd.h>
 #endif
 #include <soc.h>
 #include <soc_clk.h>
 #include <soc_me.h>
-#include <soc_irqc.h>
 #include <soc_init.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      static function prototypes     ******** ********
+ ******** ******** ********      macros       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********     static function prototypes      ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #if (!defined(SOCCFG_RO_ISRTABLE)) || (1 != SOCCFG_RO_ISRTABLE)
 static __xwos_init_code
@@ -72,12 +71,12 @@ extern xwu32_t data_mr_size[];
 __xwbsp_data struct soc_reset_flags soc_reset_flags;
 __xwbsp_data struct soc_wkup_flags soc_wkup_flags;
 
+extern __soc_isr_table_qualifier struct soc_isr_table soc_isr_table;
+extern __soc_isr_table_qualifier struct soc_isr_data_table soc_isr_data_table;
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief Init clock
- */
 __xwbsp_init_code
 void soc_sysclk_init(void)
 {
@@ -883,29 +882,28 @@ void soc_init(void)
                 WKUP.WISR.R = 0x000FFFFF;
         }
 
-#if defined(XuanWuOS_CFG_CORE__smp)
-        /* init xwos PM domain */
-        xwos_pmdm_init(&soc_xwpm_domain);
+#if defined(XuanWuOS_CFG_CORE__mp)
+        xwid_t id = xwmp_skd_get_id();
 
         /* interrupt controller */
-        xwos_irqc_construct(&soc_irqc_cb);
-        rc = xwos_irqc_register(&soc_irqc[xwos_cpu_get_id()], xwos_cpu_get_id(), NULL);
+        xwmp_irqc_construct(&soc_irqc_cb);
+        rc = xwmp_irqc_register(&soc_irqc[id], id, NULL);
         XWOS_BUG_ON(rc < 0);
 
         /* init scheduler of CPU */
-        rc = xwos_scheduler_init_lc(&soc_xwpm_domain);
+        rc = xwmp_skd_init_lc();
         XWOS_BUG_ON(rc < 0);
 #elif defined(XuanWuOS_CFG_CORE__up)
         /* Init interrupt controller */
-        rc = xwos_irqc_init("mpc560xb.irqc",
+        rc = xwup_irqc_init("mpc560xb.irqc",
                             (SOCCFG_IRQ_NUM + ARCHCFG_IRQ_NUM),
                             &soc_isr_table,
-                            &soc_irq_data_table,
+                            &soc_isr_data_table,
                             NULL);
         XWOS_BUG_ON(rc < 0);
 
         /* Init scheduler */
-        rc = xwos_scheduler_init();
+        rc = xwup_skd_init_lc();
         XWOS_BUG_ON(rc);
 #endif
 }

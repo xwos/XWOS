@@ -37,7 +37,7 @@ void xwaop__xwu8_t__write(__xwcc_atomic xwu8_t * a,
 
         do {
                 o = (xwu8_t)ldrexb(a);
-                xwmb_smp_mb();
+                xwmb_mp_mb();
         } while (strexb(a, (xwu8_t)v));
         if (ov) {
                 *ov = o;

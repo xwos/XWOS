@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC初始化
+ * @brief SOC描述层：初始化
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -22,10 +22,14 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#if defined(XuanWuOS_CFG_CORE__up)
+#if defined(XuanWuOS_CFG_CORE__mp)
+  #include <mp_nvic.h>
+  #include <xwos/mp/irq.h>
+  #include <xwos/mp/skd.h>
+#elif defined(XuanWuOS_CFG_CORE__up)
   #include <xwos/up/irq.h>
+  #include <xwos/up/skd.h>
   #include <up_nvic.h>
-  #include <xwos/up/scheduler.h>
 #else
   #error "Can't find the configuration of XuanWuOS_CFG_CORE!"
 #endif
@@ -62,22 +66,34 @@ void soc_lowlevel_init(void)
 __xwbsp_init_code
 void soc_init(void)
 {
+        xwer_t rc;
+
 #if (!defined(SOCCFG_RO_ISRTABLE)) || (1 != SOCCFG_RO_ISRTABLE)
         soc_relocate_isrtable();
 #endif /* !SOCCFG_RO_ISRTABLE */
 
-#if defined(XuanWuOS_CFG_CORE__up)
+#if defined(XuanWuOS_CFG_CORE__mp)
+        xwid_t id = xwmp_skd_get_id();
+
+        /* Interrupt controller of CPU */
+        xwmp_irqc_construct(&cortexm_nvic[id]);
+        rc = xwmp_irqc_register(&cortexm_nvic[id], id, NULL);
+        XWOS_BUG_ON(rc < 0);
+
+        /* Init scheduler of local CPU */
+        rc = xwmp_skd_init_lc();
+        XWOS_BUG_ON(rc);
+#elif defined(XuanWuOS_CFG_CORE__up)
         /* Init interrupt controller */
-        xwer_t rc;
-        rc = xwos_irqc_init("cortex-m.nvic",
+        rc = xwup_irqc_init("cortex-m.nvic",
                             (SOCCFG_IRQ_NUM + ARCHCFG_IRQ_NUM),
                             &soc_isr_table,
-                            &soc_irq_data_table,
+                            &soc_isr_data_table,
                             &armv6_nvic_cfg);
         XWOS_BUG_ON(rc < 0);
 
         /* Init scheduler */
-        rc = xwos_scheduler_init();
+        rc = xwup_skd_init_lc();
         XWOS_BUG_ON(rc);
 #endif
 }

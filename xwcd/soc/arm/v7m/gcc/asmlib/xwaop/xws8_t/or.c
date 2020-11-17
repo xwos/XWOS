@@ -39,7 +39,7 @@ void xwaop__xws8_t__or(__xwcc_atomic xws8_t * a,
         do {
                 o = (xws8_t)ldrexb(a);
                 n = o | v;
-                xwmb_smp_mb();
+                xwmb_mp_mb();
         } while (strexb(a, (xwu8_t)n));
         if (nv) {
                 *nv = n;

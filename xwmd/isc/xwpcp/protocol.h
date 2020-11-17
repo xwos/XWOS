@@ -22,9 +22,9 @@
 #include <xwos/lib/xwlog.h>
 #include <xwos/mm/bma.h>
 #include <xwos/osal/lock/spinlock.h>
-#include <xwos/osal/lock/mutex.h>
-#include <xwos/osal/sync/semaphore.h>
-#include <xwos/osal/sync/condition.h>
+#include <xwos/osal/lock/mtx.h>
+#include <xwos/osal/sync/sem.h>
+#include <xwos/osal/sync/cond.h>
 #include <xwmd/isc/xwpcp/hwifal.h>
 #include <xwmd/isc/xwpcp/api.h>
 
@@ -177,10 +177,10 @@ struct xwpcp {
                 __xwcc_atomic xwu32_t cnt; /**< 发送计数器 */
                 struct xwlib_bclst_head q[XWPCP_PRIORITY_NUM]; /**< 队列 */
                 xwbmpop_declare(nebmp, XWPCP_PRIORITY_NUM); /**< 非空的索引位图 */
-                struct xwosal_splk lock; /**< 保护发送队列的自旋锁 */
-                struct xwosal_smr smr; /**< 指示待发送帧的数量的信号量 */
-                struct xwosal_mtx csmtx; /**< 保护发送和接收线程的共享数据的锁 */
-                struct xwosal_cdt cscdt; /**< 同步发送和接收线程的条件量 */
+                struct xwos_splk lock; /**< 保护发送队列的自旋锁 */
+                struct xwos_sem sem; /**< 指示待发送帧的数量的信号量 */
+                struct xwos_mtx csmtx; /**< 保护发送和接收线程的共享数据的锁 */
+                struct xwos_cond cscond; /**< 同步发送和接收线程的条件量 */
                 union {
                         struct xwpcp_frmslot * sender; /**< 正在发送的帧槽 */
                         struct {
@@ -189,7 +189,7 @@ struct xwpcp {
                         } remote; /** 远端信息 */
                 } txi; /**< 正在发送的帧信息 */
                 struct xwpcp_frmslot * tmp; /**< 缓存正在发送的帧槽 */
-                struct xwosal_splk ntflock; /**< 保证通知回调函数原子性的自旋锁 */
+                struct xwos_splk ntflock; /**< 保证通知回调函数原子性的自旋锁 */
         } txq; /**< 发送队列 */
 
         /* 接收状态机 */
@@ -197,8 +197,8 @@ struct xwpcp {
         struct {
                 __xwcc_atomic xwu32_t cnt; /**< 接收计数器 */
                 struct xwlib_bclst_head q[XWPCP_PORT_NUM]; /**< 每个端口的接收队列 */
-                struct xwosal_splk lock[XWPCP_PORT_NUM]; /**< 保护每个接收队列的锁 */
-                struct xwosal_smr smr[XWPCP_PORT_NUM]; /**< 每个接收队列的信号量 */
+                struct xwos_splk lock[XWPCP_PORT_NUM]; /**< 保护每个接收队列的锁 */
+                struct xwos_sem sem[XWPCP_PORT_NUM]; /**< 每个接收队列的信号量 */
         } rxq; /**< 接收队列 */
 };
 

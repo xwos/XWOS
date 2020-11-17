@@ -27,8 +27,7 @@
 #include <xwos/lib/crc32.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/mm/common.h>
-#include <xwos/osal/scheduler.h>
-#include <xwos/osal/thread.h>
+#include <xwos/osal/skd.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/device.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/driver.h>
 #include <xwam/application/w25qrpt/w25qrpt.h>
@@ -40,7 +39,7 @@
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define W25QRPT_THRD_PRIORITY \
-        XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
+        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
@@ -57,14 +56,14 @@ xwer_t w25qrpt_thrd_func(void * arg);
 /**
  * @brief 线程描述表
  */
-const struct xwosal_thrd_desc w25qrpt_tbd = {
+const struct xwos_thrd_desc w25qrpt_tbd = {
         .name = "w25qrpt.thrd",
         .prio = W25QRPT_THRD_PRIORITY,
-        .stack = XWOSAL_THRD_STACK_DYNAMIC,
+        .stack = XWOS_THRD_STACK_DYNAMIC,
         .stack_size = 4096,
-        .func = (xwosal_thrd_f)w25qrpt_thrd_func,
+        .func = (xwos_thrd_f)w25qrpt_thrd_func,
         .arg = NULL, /* TBD */
-        .attr = XWSDOBJ_ATTR_PRIVILEGED,
+        .attr = XWOS_SKDATTR_PRIVILEGED,
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -111,13 +110,13 @@ xwer_t w25qrpt_start(struct w25qrpt * w25qrpt,
                 goto err_hwifal_open;
         }
 
-        rc = xwosal_thrd_create(&w25qrpt->tid,
-                                w25qrpt_tbd.name,
-                                w25qrpt_tbd.func,
-                                w25qrpt,
-                                w25qrpt_tbd.stack_size,
-                                w25qrpt_tbd.prio,
-                                w25qrpt_tbd.attr);
+        rc = xwos_thrd_create(&w25qrpt->tid,
+                              w25qrpt_tbd.name,
+                              w25qrpt_tbd.func,
+                              w25qrpt,
+                              w25qrpt_tbd.stack_size,
+                              w25qrpt_tbd.prio,
+                              w25qrpt_tbd.attr);
         if (rc < 0) {
                 goto err_thrd_create;
         }
@@ -140,9 +139,9 @@ xwer_t w25qrpt_stop(struct w25qrpt * w25qrpt)
 
         XWOS_VALIDATE((w25qrpt), "nullptr", -EFAULT);
 
-        rc = xwosal_thrd_terminate(w25qrpt->tid, &childrc);
+        rc = xwos_thrd_terminate(w25qrpt->tid, &childrc);
         if (XWOK == rc) {
-                rc = xwosal_thrd_delete(w25qrpt->tid);
+                rc = xwos_thrd_delete(w25qrpt->tid);
                 if (XWOK == rc) {
                         w25qrpt->tid = 0;
                 }
@@ -984,13 +983,13 @@ xwer_t w25qrpt_thrd_func(void * arg)
 
         rc = XWOK;
         w25qrpt = arg;
-        while (!xwosal_cthrd_shld_stop()) {
-                if (xwosal_cthrd_shld_frz()) {
+        while (!xwos_cthrd_shld_stop()) {
+                if (xwos_cthrd_shld_frz()) {
                         w25qrptlogf(DEBUG, "开始冻结 ...\n");
-                        rc = xwosal_cthrd_freeze();
+                        rc = xwos_cthrd_freeze();
                         if (__xwcc_unlikely(rc < 0)) {
                                 w25qrptlogf(ERR, "冻结失败 ... [%d]\n", rc);
-                                xwosal_cthrd_yield();
+                                xwos_cthrd_yield();
                         }/* else {} */
                         w25qrptlogf(DEBUG, "开始复苏 ...\n");
                 } else if (W25QRPT_HWIFST_OPENED == w25qrpt->hwifst) {
@@ -1003,11 +1002,11 @@ xwer_t w25qrpt_thrd_func(void * arg)
                                 w25qrptlogf(WARNING, "错误的消息\n");
                         } else {
                                 w25qrptlogf(ERR, "其他错误 ... [%d]\n", rc);
-                                xwosal_cthrd_wait_exit();
+                                xwos_cthrd_wait_exit();
                                 break;
                         }
                 } else {
-                        xwosal_cthrd_wait_exit();
+                        xwos_cthrd_wait_exit();
                         break;
                 }
         }

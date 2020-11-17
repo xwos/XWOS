@@ -24,8 +24,8 @@ ENTRY(arch_isr_reset)
 
 SECTIONS {
         . = 0x0;
-        .xwos.vctbl : ALIGN(4) {
-                *(.xwos.vctbl)
+        .xwos.vctbl : ALIGN(8) {
+                KEEP(*(.xwos.vctbl))
                 xwos_vctbl_vma_end = .;
         } > vctbl_vmr AT> vctbl_lmr
         xwos_vctbl_vma_base = ADDR(.xwos.vctbl);
@@ -46,9 +46,6 @@ SECTIONS {
                 *(.xwos.isr.text)
                 *(.xwos.text)
                 *(.xwos.rodata)
-                *(.xwmd.isr.text)
-                *(.xwmd.text)
-                *(.xwmd.rodata)
                 *(.text)
                 *(.text.*)
                 *(.glue_7)      /* glue arm to thumb code */
@@ -153,13 +150,6 @@ SECTIONS {
         } > data_mr AT> code_mr
         xwos_data_vma_base = ADDR(.xwos.data);
         xwos_data_lma_base = LOADADDR(.xwos.data);
-
-        .xwmd.data : ALIGN(8) {
-                *(.xwmd.data)
-                xwmd_data_vma_end = .;
-        } > data_mr AT> code_mr
-        xwmd_data_vma_base = ADDR(.xwmd.data);
-        xwmd_data_lma_base = LOADADDR(.xwmd.data);
 
         .data : ALIGN(8) {
                 *(.data .data.* .gnu.linkonce.d.*)

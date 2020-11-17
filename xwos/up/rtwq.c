@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS内核：实时等待队列
+ * @brief 玄武OS UP内核：实时等待队列
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -17,18 +17,18 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
-#include <xwos/up/scheduler.h>
+#include <xwos/up/skd.h>
 #include <xwos/up/wqn.h>
 #include <xwos/up/rtwq.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      static function prototypes     ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-static __xwos_code
-void xwos_rtwq_rmrbb(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn);
+static __xwup_code
+void xwup_rtwq_rmrbb(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn);
 
-static __xwos_code
-void xwos_rtwq_rmrbn(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn);
+static __xwup_code
+void xwup_rtwq_rmrbn(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -37,10 +37,10 @@ void xwos_rtwq_rmrbn(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn);
  * @brief 初始化等待队列
  * @param xwrtwq: (I) 实时等待队列
  */
-__xwos_code
-void xwos_rtwq_init(struct xwos_rtwq * xwrtwq)
+__xwup_code
+void xwup_rtwq_init(struct xwup_rtwq * xwrtwq)
 {
-        xwrtwq->max_prio = XWOS_SD_PRIORITY_INVALID;
+        xwrtwq->max_prio = XWUP_SKD_PRIORITY_INVALID;
         xwlib_rbtree_init(&xwrtwq->tree);
         xwrtwq->rightmost = NULL;
 }
@@ -51,13 +51,13 @@ void xwos_rtwq_init(struct xwos_rtwq * xwrtwq)
  * @param wqn: (I) 等待队列节点结构体指针
  * @param prio: (I) 优先级
  */
-__xwos_code
-void xwos_rtwq_add(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn, xwpr_t prio)
+__xwup_code
+void xwup_rtwq_add(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn, xwpr_t prio)
 {
         struct xwlib_rbtree_node ** new;
         struct xwlib_rbtree_node * rbn;
         xwptr_t lpc;
-        struct xwos_wqn * n, * rightmost;
+        struct xwup_wqn * n, * rightmost;
         struct xwlib_rbtree * tree;
         xwpr_t nprio;
 
@@ -81,7 +81,7 @@ void xwos_rtwq_add(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn, xwpr_t prio
         } else {
                 rbn = *new;
                 while (rbn) {
-                        n = xwlib_rbtree_entry(rbn, struct xwos_wqn, rbn);
+                        n = xwlib_rbtree_entry(rbn, struct xwup_wqn, rbn);
                         nprio = n->prio;
                         if (prio < nprio) {
                                 new = &rbn->left;
@@ -112,12 +112,12 @@ void xwos_rtwq_add(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn, xwpr_t prio
  * @note
  * - 这个函数只能在临界区中调用。
  */
-static __xwos_code
-void xwos_rtwq_rmrbb(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn)
+static __xwup_code
+void xwup_rtwq_rmrbb(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn)
 {
-        struct xwos_wqn * n;
+        struct xwup_wqn * n;
 
-        n = xwlib_bclst_first_entry(&wqn->cln.rbb, struct xwos_wqn, cln.rbb);
+        n = xwlib_bclst_first_entry(&wqn->cln.rbb, struct xwup_wqn, cln.rbb);
         xwlib_bclst_del_init(&wqn->cln.rbb);
         xwlib_rbtree_replace(&n->rbn, &wqn->rbn);
         xwlib_rbtree_init_node(&wqn->rbn);
@@ -133,8 +133,8 @@ void xwos_rtwq_rmrbb(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn)
  * @note
  * - 这个函数只能在临界区中调用。
  */
-static __xwos_code
-void xwos_rtwq_rmrbn(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn)
+static __xwup_code
+void xwup_rtwq_rmrbn(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn)
 {
         struct xwlib_rbtree_node * p;
 
@@ -149,12 +149,12 @@ void xwos_rtwq_rmrbn(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn)
                 }/* else {} */
                 if (p != (struct xwlib_rbtree_node *)&xwrtwq->tree.root) {
                         xwrtwq->rightmost = xwlib_rbtree_entry(p,
-                                                               struct xwos_wqn,
+                                                               struct xwup_wqn,
                                                                rbn);
                         xwrtwq->max_prio = xwrtwq->rightmost->prio;
                 } else {
                         xwrtwq->rightmost = NULL;
-                        xwrtwq->max_prio = XWOS_SD_PRIORITY_INVALID;
+                        xwrtwq->max_prio = XWUP_SKD_PRIORITY_INVALID;
                 }
         }
         xwlib_rbtree_remove(&xwrtwq->tree, &wqn->rbn);
@@ -170,8 +170,8 @@ void xwos_rtwq_rmrbn(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn)
  * @note
  * - 这个函数只能在临界区中调用。
  */
-__xwos_code
-xwer_t xwos_rtwq_remove(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn)
+__xwup_code
+xwer_t xwup_rtwq_remove(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn)
 {
         xwer_t rc;
 
@@ -181,9 +181,9 @@ xwer_t xwos_rtwq_remove(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn)
                 if (xwlib_rbtree_tst_node_unlinked(&wqn->rbn)) {
                         xwlib_bclst_del_init(&wqn->cln.rbb);
                 } else if (!xwlib_bclst_tst_empty(&wqn->cln.rbb)) {
-                        xwos_rtwq_rmrbb(xwrtwq, wqn);
+                        xwup_rtwq_rmrbb(xwrtwq, wqn);
                 } else {
-                        xwos_rtwq_rmrbn(xwrtwq, wqn);
+                        xwup_rtwq_rmrbn(xwrtwq, wqn);
                 }
                 rc = XWOK;
         }
@@ -197,17 +197,17 @@ xwer_t xwos_rtwq_remove(struct xwos_rtwq * xwrtwq, struct xwos_wqn * wqn)
  * @note
  * - 这个函数只能在临界区中调用。
  */
-__xwos_code
-struct xwos_wqn * xwos_rtwq_choose(struct xwos_rtwq * xwrtwq)
+__xwup_code
+struct xwup_wqn * xwup_rtwq_choose(struct xwup_rtwq * xwrtwq)
 {
-        struct xwos_wqn * rightmost;
+        struct xwup_wqn * rightmost;
 
         rightmost = xwrtwq->rightmost;
         if (NULL != rightmost) {
                 if (!xwlib_bclst_tst_empty(&rightmost->cln.rbb)) {
-                        xwos_rtwq_rmrbb(xwrtwq, rightmost);
+                        xwup_rtwq_rmrbb(xwrtwq, rightmost);
                 } else {
-                        xwos_rtwq_rmrbn(xwrtwq, rightmost);
+                        xwup_rtwq_rmrbn(xwrtwq, rightmost);
                 }
         }
         return rightmost;

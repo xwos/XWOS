@@ -30,9 +30,9 @@
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_init_code
-void soc_init(void);
+void soc_lowlevel_init(void);
 
 __xwbsp_init_code
-void soc_lowlevel_init(void);
+void soc_init(void);
 
 #endif /* soc_init.h */

@@ -1,0 +1,92 @@
+/**
+ * @file
+ * @brief 玄武OS MP同步机制：信号量
+ * @author
+ * + 隐星魂 (Roy.Sun) <https://xwos.tech>
+ * @copyright
+ * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
+ * > This Source Code Form is subject to the terms of the Mozilla Public
+ * > License, v. 2.0. If a copy of the MPL was not distributed with this
+ * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * @note
+ * - 锁的顺序：同级的锁不可同时获得
+ *   + ① 等待队列的锁（rtwq->lock & plwq->lock）
+ *     + ② 等待队列节点的锁（wqn->lock）
+ *     + ② 线程控制块的状态锁（tcb->stlock）
+ *     + ② 事件对象的锁（evt->lock）
+ */
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********      include      ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#include <xwos/standard.h>
+#include <xwos/lib/object.h>
+#include <xwos/lib/xwbop.h>
+#include <xwos/mm/common.h>
+#include <xwos/mm/kma.h>
+#if defined(XWMPCFG_SYNC_SEM_MEMSLICE) && (1 == XWMPCFG_SYNC_SEM_MEMSLICE)
+  #include <xwos/mm/memslice.h>
+#endif /* XWMPCFG_SYNC_SEM_MEMSLICE */
+#include <xwos/mp/irq.h>
+#include <xwos/mp/skd.h>
+#include <xwos/mp/tt.h>
+#include <xwos/mp/thrd.h>
+#include <xwos/mp/rtwq.h>
+#include <xwos/mp/plwq.h>
+#include <xwos/mp/lock/spinlock.h>
+#include <xwos/mp/lock/seqlock.h>
+#include <xwos/mp/lock/mtx.h>
+#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+  #include <xwos/mp/sync/evt.h>
+#endif /* XWMPCFG_SYNC_EVT */
+#include <xwos/mp/sync/object.h>
+#include <xwos/mp/sync/sem.h>
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       macros      ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********       .data       ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********      function implementations       ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+__xwcc_inline
+void xwmp_sync_object_construct(struct xwmp_sync_object * synobj, xwid_t type)
+{
+        xwos_object_construct(&synobj->xwobj, type);
+#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+        synobj->sel.evt = NULL;
+        synobj->sel.pos = 0;
+#endif /* XWMPCFG_SYNC_EVT */
+}
+
+__xwcc_inline
+void xwmp_sync_object_destruct(struct xwmp_sync_object * synobj)
+{
+#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+        synobj->sel.evt = NULL;
+        synobj->sel.pos = 0;
+#endif /* XWMPCFG_SYNC_EVT */
+        xwos_object_destruct(&synobj->xwobj);
+}
+
+__xwcc_inline
+xwer_t xwmp_sync_object_activate(struct xwmp_sync_object * synobj, xwobj_gc_f gcfunc)
+{
+        return xwos_object_activate(&synobj->xwobj, gcfunc);
+}
+
+__xwcc_inline
+xwer_t xwmp_sync_object_grab(struct xwmp_sync_object * synobj)
+{
+        return xwos_object_grab(&synobj->xwobj);
+}
+
+__xwcc_inline
+xwer_t xwmp_sync_object_put(struct xwmp_sync_object * synobj)
+{
+        return xwos_object_put(&synobj->xwobj);
+}

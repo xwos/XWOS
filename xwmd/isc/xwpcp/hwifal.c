@@ -13,13 +13,12 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
 #include <string.h>
+#include <xwos/standard.h>
 #include <xwos/lib/xwaop.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/osal/thread.h>
-#include <xwos/osal/lock/mutex.h>
-#include <xwos/osal/sync/semaphore.h>
+#include <xwos/osal/lock/mtx.h>
+#include <xwos/osal/sync/sem.h>
 #include <xwmd/isc/xwpcp/hwifal.h>
 #include <xwmd/isc/xwpcp/protocol.h>
 

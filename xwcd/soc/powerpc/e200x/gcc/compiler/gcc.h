@@ -96,13 +96,6 @@
 #define __xwos_rodata           __xwcc_section(".xwos.rodata")
 #define __xwos_data             __xwcc_section(".xwos.data")
 
-#define __xwmd_code             __xwcc_section(".xwmd.text")
-#define __xwmd_api              __xwmd_code
-#define __xwmd_isr              __xwcc_section(".xwmd.isr.text")
-#define __xwmd_bh               __xwmd_isr
-#define __xwmd_rodata           __xwcc_section(".xwmd.rodata")
-#define __xwmd_data             __xwcc_section(".xwmd.data")
-
 #define __bkup                  __xwcc_section(".bkup")
 #define __image_header          __xwcc_section(".image_header")
 #define __image_tail            __xwcc_section(".image_tail")

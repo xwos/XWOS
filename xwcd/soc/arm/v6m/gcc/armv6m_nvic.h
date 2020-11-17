@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __arch_cm_nvic_h__
-#define __arch_cm_nvic_h__
+#ifndef __arch_armv6m_nvic_h__
+#define __arch_armv6m_nvic_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
@@ -646,4 +646,4 @@ xwpr_t cm_nvic_get_sysirq_priority(xwirq_t irq)
         return (xwpr_t)(cm_scs.scb.shpr[idx].u8 >> (8 - CM_NVIC_PRIO_BITNUM));
 }
 
-#endif /* cm_nvic.h */
+#endif /* armv6m_nvic.h */

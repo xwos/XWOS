@@ -44,29 +44,29 @@ xwer_t xwaop__xwu32_t__tst_then_op(__xwcc_atomic xwu32_t * a,
                         if (tst((const void *)&o, tst_args)) {
                                 if (op) {
                                         op(&n, (const void *)&o, op_args);
-                                        xwmb_smp_mb();
+                                        xwmb_mp_mb();
                                         rc = strex(a, (xwu32_t)n);
                                 } else {
                                         rc = XWOK;
                                         n = o;
-                                        xwmb_smp_mb();
+                                        xwmb_mp_mb();
                                         break;
                                 }
                         } else {
                                 rc = -EACCES;
                                 n = o;
-                                xwmb_smp_ddb();
+                                xwmb_mp_ddb();
                                 break;
                         }
                 } else {
                         if (op) {
                                 op(&n, (const void *)&o, op_args);
-                                xwmb_smp_mb();
+                                xwmb_mp_mb();
                                 rc = strex(a, (xwu32_t)n);
                         } else {
                                 rc = XWOK;
                                 n = o;
-                                xwmb_smp_mb();
+                                xwmb_mp_mb();
                                 break;
                         }
                 }

@@ -22,7 +22,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
-#include <xwmd/ds/xwds.h>
+#include <xwcd/ds/xwds.h>
 #include <bm/stm32cube/xwac/xwds/device.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********

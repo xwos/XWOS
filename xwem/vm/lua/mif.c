@@ -23,8 +23,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/mm/mempool/allocator.h>
-#include <xwos/osal/scheduler.h>
-#include <xwos/osal/thread.h>
+#include <xwos/osal/skd.h>
 #include <xwem/vm/lua/xwlua/port.h>
 #include <xwem/vm/lua/mif.h>
 
@@ -32,7 +31,7 @@
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWLUA_TASK_PRIORITY \
-        (XWOSAL_SD_PRIORITY_RAISE(XWOSAL_SD_PRIORITY_RT_MIN, 1))
+        (XWOS_SKD_PRIORITY_RAISE(XWOS_SKD_PRIORITY_RT_MIN, 1))
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
@@ -50,7 +49,7 @@ struct xwlua_arg xwlua_arg = {
         .argv = xwlua_argv,
 };
 
-const struct xwosal_thrd_desc xwlua_tbd[] = {
+const struct xwos_thrd_desc xwlua_tbd[] = {
         [0] = {
                 .name = "task.lua",
                 .prio = XWLUA_TASK_PRIORITY,
@@ -58,7 +57,7 @@ const struct xwosal_thrd_desc xwlua_tbd[] = {
                 .stack_size = 8192,
                 .func = xwlua_thrd,
                 .arg = &xwlua_arg,
-                .attr = XWSDOBJ_ATTR_PRIVILEGED,
+                .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
 
@@ -73,13 +72,13 @@ xwer_t xwlua_start(void)
         xwsq_t i;
 
         for (i = 0; i < xw_array_size(xwlua_tbd); i++) {
-                rc = xwosal_thrd_create(&xwlua_tid[i],
-                                        xwlua_tbd[i].name,
-                                        xwlua_tbd[i].func,
-                                        xwlua_tbd[i].arg,
-                                        xwlua_tbd[i].stack_size,
-                                        xwlua_tbd[i].prio,
-                                        xwlua_tbd[i].attr);
+                rc = xwos_thrd_create(&xwlua_tid[i],
+                                      xwlua_tbd[i].name,
+                                      xwlua_tbd[i].func,
+                                      xwlua_tbd[i].arg,
+                                      xwlua_tbd[i].stack_size,
+                                      xwlua_tbd[i].prio,
+                                      xwlua_tbd[i].attr);
                 if (rc < 0) {
                         break;
                 }

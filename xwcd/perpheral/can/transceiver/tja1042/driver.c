@@ -22,11 +22,10 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/irq.h>
-#include <soc_irq.h>
-#include <xwmd/ds/soc/gpio.h>
-#include <xwmd/ds/soc/eirq.h>
-#include <xwmd/ds/can/transceiver.h>
+#include <xwos/osal/irq.h>
+#include <xwcd/ds/soc/gpio.h>
+#include <xwcd/ds/soc/eirq.h>
+#include <xwcd/ds/can/transceiver.h>
 #include <xwcd/perpheral/can/transceiver/tja1042/driver.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -52,13 +51,13 @@ xwer_t tja1042_drv_start(struct xwds_device * dev);
 static __xwbsp_code
 xwer_t tja1042_drv_stop(struct xwds_device * dev);
 
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static __xwbsp_code
 xwer_t tja1042_drv_suspend(struct xwds_device * dev);
 
 static __xwbsp_code
 xwer_t tja1042_drv_resume(struct xwds_device * dev);
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
 
 static __xwbsp_code
 xwer_t tja1042_cantrcv_drv_set_opmode(struct xwds_cantrcv * cantrcv,
@@ -80,10 +79,10 @@ __xwbsp_rodata const struct xwds_cantrcv_driver tja1042_cantrcv_drv = {
                 .remove = NULL,
                 .start = tja1042_drv_start,
                 .stop = tja1042_drv_stop,
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
                 .suspend = tja1042_drv_suspend,
                 .resume =  tja1042_drv_resume,
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
         },
         .set_opmode = tja1042_cantrcv_drv_set_opmode,
         .enable_wkup = tja1042_cantrcv_drv_enable_wkup,
@@ -125,7 +124,7 @@ xwer_t tja1042_drv_probe(struct xwds_device * dev)
         struct xwds_cantrcv * cantrcv;
         xwer_t rc;
 
-        cantrcv = xwds_static_cast(struct xwds_cantrcv *, dev);
+        cantrcv = xwds_cast(struct xwds_cantrcv *, dev);
         rc = tja1042_check_desc(cantrcv);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_chkdesc;
@@ -145,7 +144,7 @@ xwer_t tja1042_drv_start(struct xwds_device * dev)
         xwssz_t i, j;
         xwer_t rc;
 
-        cantrcv = xwds_static_cast(struct xwds_cantrcv *, dev);
+        cantrcv = xwds_cast(struct xwds_cantrcv *, dev);
         resources = cantrcv->bc.dev.resources;
 
         /* request GPIO resources */
@@ -176,7 +175,7 @@ xwer_t tja1042_drv_stop(struct xwds_device * dev)
         xwssz_t j;
         xwer_t rc;
 
-        cantrcv = xwds_static_cast(struct xwds_cantrcv *, dev);
+        cantrcv = xwds_cast(struct xwds_cantrcv *, dev);
         resources = cantrcv->bc.dev.resources;
 
         /* release GPIO resources */
@@ -193,7 +192,7 @@ err_gpio_rls:
         return rc;
 }
 
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static __xwbsp_code
 xwer_t tja1042_drv_suspend(struct xwds_device * dev)
 {
@@ -203,7 +202,7 @@ xwer_t tja1042_drv_suspend(struct xwds_device * dev)
         const struct xwds_cantrcv_tja1042_cfg * chipcfg;
         const struct xwds_resource_gpio * gpiorsc;
 
-        cantrcv = xwds_static_cast(struct xwds_cantrcv *, dev);
+        cantrcv = xwds_cast(struct xwds_cantrcv *, dev);
         cfg = cantrcv->cfg;
         chipcfg = cfg->chipcfg;
 
@@ -227,7 +226,7 @@ xwer_t tja1042_drv_resume(struct xwds_device * dev)
         const struct xwds_cantrcv_tja1042_cfg * chipcfg;
         const struct xwds_resource_gpio * gpiorsc;
 
-        cantrcv = xwds_static_cast(struct xwds_cantrcv *, dev);
+        cantrcv = xwds_cast(struct xwds_cantrcv *, dev);
         cfg = cantrcv->cfg;
         chipcfg = cfg->chipcfg;
 
@@ -241,7 +240,7 @@ xwer_t tja1042_drv_resume(struct xwds_device * dev)
 err_gpio_req:
         return rc;
 }
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
 
 static __xwbsp_code
 xwer_t tja1042_cantrcv_drv_set_opmode(struct xwds_cantrcv * cantrcv,
@@ -343,6 +342,6 @@ void tja1042_cantrcv_eirq_wkup(struct xwds_soc * soc, xwid_t eiid,
 
         if (eiid == chipcfg->eirq) {
                 cantrcv->wkuprs = XWDS_CANTRCV_WKUPRS_BY_BUS;
-                xwds_cantrcv_lib_wakeup_notification(cantrcv);
+                xwds_cantrcv_drvcb_wakeup_notification(cantrcv);
         }
 }

@@ -22,8 +22,8 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/smp/irq.h>
-#include <smp_nvic.h>
+#include <xwos/mp/irq.h>
+#include <mp_nvic.h>
 #include <bdl/standard.h>
 #include <bdl/board_init.h>
 

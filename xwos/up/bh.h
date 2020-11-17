@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS内核：中断底半部
+ * @brief 玄武OS UP内核：中断底半部
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -29,21 +29,21 @@
 /**
  * @brief 中断底半部控制块
  */
-struct xwos_bh_cb {
+struct xwup_bh_cb {
         struct xwlib_bclst_head list; /**< 链表头 */
 };
 
 /**
  * @brief 中断底半部任务函数类型
  */
-typedef void (* xwos_bh_f)(void *);
+typedef void (* xwup_bh_f)(void *);
 
 /**
  * @brief 中断底半部链表节点
  */
-struct xwos_bh_node {
+struct xwup_bh_node {
         struct xwlib_bclst_node node; /**< 链表节点 */
-        xwos_bh_f func; /**< 中断底半部任务函数 */
+        xwup_bh_f func; /**< 中断底半部任务函数 */
         void * arg; /**< 中断底半部任务函数的参数 */
 };
 
@@ -62,20 +62,9 @@ struct xwos_bh_node {
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********       API function prototypes       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwos_api
-void xwos_bh_cb_init(struct xwos_bh_cb * bhcb);
-
-__xwos_api
-void xwos_bh_node_init(struct xwos_bh_node * bhn, xwos_bh_f func, void * arg);
-
-__xwos_api
-void xwos_bh_node_eq(struct xwos_bh_cb * bhcb, struct xwos_bh_node * bhn);
-
-__xwos_api
-void xwos_bh_node_dq(struct xwos_bh_cb * bhcb, struct xwos_bh_node * bhn);
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      inline API implementations     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+void xwup_bh_cb_init(struct xwup_bh_cb * bhcb);
+void xwup_bh_node_init(struct xwup_bh_node * bhn, xwup_bh_f func, void * arg);
+void xwup_bh_node_eq(struct xwup_bh_cb * bhcb, struct xwup_bh_node * bhn);
+void xwup_bh_node_dq(struct xwup_bh_cb * bhcb, struct xwup_bh_node * bhn);
 
 #endif /* xwos/up/bh.h */

@@ -1,6 +1,6 @@
 #! /bin/make -f
 # @file
-# @brief XuanWuOS内核：编译规则
+# @brief 玄武OS UP内核：编译规则
 # @author
 # + 隐星魂 (Roy.Sun) <https://xwos.tech>
 # @copyright
@@ -22,31 +22,31 @@ XWOS_EOBJS :=
 ######## ######## ######## ######## ******** ######## ######## ######## ########
 ######## ######## ######## ########   rules  ######## ######## ######## ########
 ######## ######## ######## ######## ******** ######## ######## ######## ########
-ifeq ($(XWUPCFG_SYNC_CDT),y)
-        XWUPRULE_SD_THRD_DO_LOCK := y
-        XWUPRULE_SD_THRD_DO_UNLOCK := y
+ifeq ($(XWUPCFG_SYNC_COND),y)
+        XWUPRULE_SKD_THRD_DO_LOCK := y
+        XWUPRULE_SKD_THRD_DO_UNLOCK := y
 else
-        XWUPRULE_SD_THRD_DO_LOCK := n
-        XWUPRULE_SD_THRD_DO_UNLOCK := n
+        XWUPRULE_SKD_THRD_DO_LOCK := n
+        XWUPRULE_SKD_THRD_DO_UNLOCK := n
 endif
 
-ifeq ($(XWUPCFG_SYNC_PLSMR),y)
-    XWUPRULE_SD_WQ_PL := y
+ifeq ($(XWUPCFG_SYNC_PLSEM),y)
+    XWUPRULE_SKD_WQ_PL := y
 else
-    ifeq ($(XWUPCFG_SYNC_CDT),y)
-        XWUPRULE_SD_WQ_PL := y
+    ifeq ($(XWUPCFG_SYNC_COND),y)
+        XWUPRULE_SKD_WQ_PL := y
     else
-        XWUPRULE_SD_WQ_PL := n
+        XWUPRULE_SKD_WQ_PL := n
     endif
 endif
 
 ifeq ($(XWUPCFG_LOCK_MTX),y)
-    XWUPRULE_SD_WQ_RT := y
+    XWUPRULE_SKD_WQ_RT := y
 else
-    ifeq ($(XWUPCFG_SYNC_RTSMR),y)
-        XWUPRULE_SD_WQ_RT := y
+    ifeq ($(XWUPCFG_SYNC_RTSEM),y)
+        XWUPRULE_SKD_WQ_RT := y
     else
-        XWUPRULE_SD_WQ_RT := n
+        XWUPRULE_SKD_WQ_RT := n
     endif
 endif
 
@@ -57,28 +57,29 @@ XWOS_CSRCS += up/init.c
 XWOS_CSRCS += up/irq.c
 
 ######## ######## ######## ######## scheduler ######## ######## ######## ########
-XWOS_CSRCS += up/scheduler.c
+XWOS_CSRCS += up/skd.c
 XWOS_CSRCS += up/rtrq.c
-ifeq ($(XWUPCFG_SD_BH),y)
+ifeq ($(XWUPCFG_SKD_BH),y)
     XWOS_CSRCS += up/bh.c
 endif
 XWOS_CSRCS += up/tt.c
-XWOS_CSRCS += up/thread.c
+XWOS_CSRCS += up/thrd.c
+XWOS_CSRCS += up/wqn.c
 
-ifeq ($(XWUPRULE_SD_WQ_PL),y)
+ifeq ($(XWUPRULE_SKD_WQ_PL),y)
     XWOS_CSRCS += up/plwq.c
 endif
 
-ifeq ($(XWUPRULE_SD_WQ_RT),y)
+ifeq ($(XWUPRULE_SKD_WQ_RT),y)
     XWOS_CSRCS += up/rtwq.c
 endif
 
 ifeq ($(XWUPCFG_LOCK_MTX),y)
-    XWOS_CSRCS += up/mutextree.c
+    XWOS_CSRCS += up/mtxtree.c
 endif
 
 ######## ######## ######## ######## swt ######## ######## ######## ########
-ifeq ($(XWUPCFG_SD_SWT),y)
+ifeq ($(XWUPCFG_SKD_SWT),y)
     XWOS_CSRCS += up/swt.c
 endif
 
@@ -86,23 +87,23 @@ endif
 XWOS_CSRCS += up/lock/seqlock.c
 
 ifeq ($(XWUPCFG_LOCK_MTX),y)
-    XWOS_CSRCS += up/lock/mutex.c
+    XWOS_CSRCS += up/lock/mtx.c
 endif
 
 ######## ######## ######## ######## sync ######## ######## ######## ########
-XWOS_CSRCS += up/sync/vsmr.c
-ifeq ($(XWUPCFG_SYNC_PLSMR),y)
-    XWOS_CSRCS += up/sync/plsmr.c
+XWOS_CSRCS += up/sync/vsem.c
+ifeq ($(XWUPCFG_SYNC_PLSEM),y)
+    XWOS_CSRCS += up/sync/plsem.c
 endif
 
-ifeq ($(XWUPCFG_SYNC_RTSMR),y)
-    XWOS_CSRCS += up/sync/rtsmr.c
+ifeq ($(XWUPCFG_SYNC_RTSEM),y)
+    XWOS_CSRCS += up/sync/rtsem.c
 endif
 
-ifeq ($(XWUPCFG_SYNC_CDT),y)
-    XWOS_CSRCS += up/sync/condition.c
+ifeq ($(XWUPCFG_SYNC_COND),y)
+    XWOS_CSRCS += up/sync/cond.c
 endif
 
 ifeq ($(XWUPCFG_SYNC_EVT),y)
-    XWOS_CSRCS += up/sync/event.c
+    XWOS_CSRCS += up/sync/evt.c
 endif

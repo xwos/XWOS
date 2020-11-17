@@ -25,7 +25,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <cfg/XuanWuOS.h>
-#include <xwos/type.h>
+#include <xwos/lib/type.h>
 #include <compiler/gcc.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -36,9 +36,9 @@
 #define eppc_isb(option)        __asm__ volatile("se_isync" : : : "memory")
 #define eppc_dmb(option)        __asm__ volatile("msync" : : : "memory")
 
-#define xwmb_smp_mb()           eppc_dmb()
-#define xwmb_smp_rmb()          xwmb_smp_mb()
-#define xwmb_smp_wmb()          __asm__ volatile("mbar      0" : : : "memory")
+#define xwmb_mp_mb()            eppc_dmb()
+#define xwmb_mp_rmb()           xwmb_mp_mb()
+#define xwmb_mp_wmb()           __asm__ volatile("mbar      0" : : : "memory")
 
 #define __raw_read8(a)          (*(volatile xwu8_t *)(a))
 #define __raw_read16(a)         (*(volatile xwu16_t *)(a))

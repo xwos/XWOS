@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS内核：实时就绪队列
+ * @brief 玄武OS UP内核：实时就绪队列
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -23,20 +23,20 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWOS_RTRQ_QNUM          XWUPCFG_SD_PRIORITY_RT_NUM
+#define XWUP_RTRQ_QNUM          XWUPCFG_SKD_PRIORITY_RT_NUM
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-struct xwos_scheduler;
-struct xwos_tcb;
+struct xwup_skd;
+struct xwup_tcb;
 
 /**
  * @brief 实时就绪队列
  */
-struct xwos_rtrq {
-        struct xwlib_bclst_head q[XWOS_RTRQ_QNUM];
-        xwbmpop_declare(bmp, XWOS_RTRQ_QNUM);
+struct xwup_rtrq {
+        struct xwlib_bclst_head q[XWUP_RTRQ_QNUM];
+        xwbmpop_declare(bmp, XWUP_RTRQ_QNUM);
         xwpr_t top;
 };
 
@@ -47,23 +47,10 @@ struct xwos_rtrq {
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwos_code
-void xwos_rtrq_init(struct xwos_rtrq * xwrtrq);
-
-__xwos_code
-void xwos_rtrq_add_head(struct xwos_rtrq * xwrtrq, struct xwos_tcb * tcb);
-
-__xwos_code
-void xwos_rtrq_add_tail(struct xwos_rtrq * xwrtrq, struct xwos_tcb * tcb);
-
-__xwos_code
-void xwos_rtrq_remove(struct xwos_rtrq * xwrtrq, struct xwos_tcb * tcb);
-
-__xwos_code
-struct xwos_tcb *xwos_rtrq_choose(struct xwos_rtrq * xwrtrq);
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+void xwup_rtrq_init(struct xwup_rtrq * xwrtrq);
+void xwup_rtrq_add_head(struct xwup_rtrq * xwrtrq, struct xwup_tcb * tcb);
+void xwup_rtrq_add_tail(struct xwup_rtrq * xwrtrq, struct xwup_tcb * tcb);
+void xwup_rtrq_remove(struct xwup_rtrq * xwrtrq, struct xwup_tcb * tcb);
+struct xwup_tcb * xwup_rtrq_choose(struct xwup_rtrq * xwrtrq);
 
 #endif /* xwos/up/rtrq.h */

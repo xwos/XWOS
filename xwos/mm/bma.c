@@ -116,7 +116,7 @@ xwer_t xwmm_bma_init(struct xwmm_bma * bma, const char * name,
         /* init all order lists */
         for (j = 0; j <= odr; j++) {
                 xwlib_bclst_init_head(&orderlists[j].head);
-                xwosal_splk_init(&orderlists[j].lock);
+                xwos_splk_init(&orderlists[j].lock);
         }
         xwmm_bma_orderlist_add(bma, &orderlists[odr], &bcbs[0]);
         return XWOK;
@@ -286,9 +286,9 @@ void xwmm_bma_orderlist_add(struct xwmm_bma * bma,
 
         n = xwmm_bma_bcb_to_mem(bma, bcb);
         xwlib_bclst_init_node(n);
-        xwosal_splk_lock_cpuirqsv(&ol->lock, &flag);
+        xwos_splk_lock_cpuirqsv(&ol->lock, &flag);
         xwlib_bclst_add_tail(&ol->head, n);
-        xwosal_splk_unlock_cpuirqrs(&ol->lock, flag);
+        xwos_splk_unlock_cpuirqrs(&ol->lock, flag);
 }
 
 /**
@@ -310,14 +310,14 @@ xwer_t xwmm_bma_orderlist_remove(struct xwmm_bma * bma,
 
         n = xwmm_bma_bcb_to_mem(bma, bcb);
 
-        xwosal_splk_lock_cpuirqsv(&ol->lock, &flag);
+        xwos_splk_lock_cpuirqsv(&ol->lock, &flag);
         if (odr != bcb->order) {
                 rc = -ESRCH;
         } else {
                 rc = XWOK;
                 xwlib_bclst_del_init(n);
         }
-        xwosal_splk_unlock_cpuirqrs(&ol->lock, flag);
+        xwos_splk_unlock_cpuirqrs(&ol->lock, flag);
         return rc;
 }
 
@@ -336,14 +336,14 @@ struct xwmm_bma_bcb * xwmm_bma_orderlist_choose(struct xwmm_bma * bma,
         struct xwmm_bma_bcb * bcb;
         xwreg_t flag;
 
-        xwosal_splk_lock_cpuirqsv(&ol->lock, &flag);
+        xwos_splk_lock_cpuirqsv(&ol->lock, &flag);
         if (xwlib_bclst_tst_empty(&ol->head)) {
-                xwosal_splk_unlock_cpuirqrs(&ol->lock, flag);
+                xwos_splk_unlock_cpuirqrs(&ol->lock, flag);
                 bcb = err_ptr(-ENOENT);
         } else {
                 n = ol->head.next;
                 xwlib_bclst_del_init(n);
-                xwosal_splk_unlock_cpuirqrs(&ol->lock, flag);
+                xwos_splk_unlock_cpuirqrs(&ol->lock, flag);
                 bcb = xwmm_bma_mem_to_bcb(bma, n);
                 bcb->order |= XWMM_BMA_INUSED;
         }

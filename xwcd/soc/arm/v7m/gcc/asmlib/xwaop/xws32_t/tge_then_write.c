@@ -40,11 +40,11 @@ xwer_t xwaop__xws32_t__tge_then_write(__xwcc_atomic xws32_t * a,
         do {
                 o = (xws32_t)ldrex(a);
                 if (o >= t) {
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = strex(a, (xwu32_t)v);
                 } else {
                         rc = -EACCES;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);

@@ -22,7 +22,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/up/irq.h>
+#include <xwos/osal/irq.h>
 #include <soc_osc.h>
 #include <soc_sim.h>
 #include <soc_ics.h>
@@ -37,13 +37,13 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
+ ******** ********      static function prototypes     ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwbsp_init_code
 void bdl_clk_init(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
+ ******** ********       function implementations      ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_init_code
 void board_lowlevel_init(void)
@@ -58,7 +58,7 @@ __xwbsp_init_code
 void board_init(void)
 {
         /* IRQC data */
-        xwos_irqc_set_data((void *)NULL);
+        xwup_irqc_set_data((void *)NULL);
 }
 
 static __xwbsp_init_code

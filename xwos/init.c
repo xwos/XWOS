@@ -14,8 +14,8 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#if defined(XuanWuOS_CFG_CORE__smp)
-  #include <xwos/smp/init.h>
+#if defined(XuanWuOS_CFG_CORE__mp)
+  #include <xwos/mp/init.h>
 #elif defined(XuanWuOS_CFG_CORE__up)
   #include <xwos/up/init.h>
 #else
@@ -31,13 +31,11 @@ extern xwu8_t xwos_data_lma_base[];
 extern xwu8_t xwos_data_vma_base[];
 extern xwu8_t xwos_data_vma_end[];
 
-extern xwu8_t xwmd_data_lma_base[];
-extern xwu8_t xwmd_data_vma_base[];
-extern xwu8_t xwmd_data_vma_end[];
-
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********     static function prototypes      ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
+static __xwos_init_code
+void xwos_relocate(void);
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********       function implementations      ******** ********
@@ -45,7 +43,7 @@ extern xwu8_t xwmd_data_vma_end[];
 /**
  * @brief 重定向操作系统数据
  */
-__xwos_init_code
+static __xwos_init_code
 void xwos_relocate(void)
 {
         xwsz_t cnt, i;
@@ -56,15 +54,6 @@ void xwos_relocate(void)
         dst = xwos_data_vma_base;
         if (dst != src) {
                 cnt = (xwsz_t)xwos_data_vma_end - (xwsz_t)xwos_data_vma_base;
-                for (i = 0; i < cnt; i++) {
-                        dst[i] = src[i];
-                }
-        }
-
-        src = xwmd_data_lma_base;
-        dst = xwmd_data_vma_base;
-        if (dst != src) {
-                cnt = (xwsz_t)xwmd_data_vma_end - (xwsz_t)xwmd_data_vma_base;
                 for (i = 0; i < cnt; i++) {
                         dst[i] = src[i];
                 }
@@ -83,9 +72,9 @@ void xwos_init(void)
         /* 初始化KMA */
         xwmm_kma_init();
 
-#if defined(XuanWuOS_CFG_CORE__smp)
-        xwos_smp_init();
+#if defined(XuanWuOS_CFG_CORE__mp)
+        xwmp_init();
 #elif defined(XuanWuOS_CFG_CORE__up)
-        xwos_up_init();
+        xwup_init();
 #endif
 }

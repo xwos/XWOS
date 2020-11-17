@@ -43,7 +43,7 @@ struct xwds_eeprom stm32cube_at24c02_cb = {
                         .name = "stm32cube.at24c02.1",
                         .id = 1,
                         .resources = NULL,
-                        .drv = xwds_static_cast(struct xwds_driver *, &at24sd_drv),
+                        .drv = xwds_cast(struct xwds_driver *, &at24sd_drv),
                         .data = NULL,
                 },
                 .bus = &stm32cube_i2c2m_cb,

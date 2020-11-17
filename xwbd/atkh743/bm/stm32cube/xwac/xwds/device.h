@@ -25,10 +25,10 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
-#include <xwmd/ds/device.h>
-#include <xwmd/ds/soc/chip.h>
-#include <xwmd/ds/uart/dma.h>
-#include <xwmd/ds/i2c/master.h>
+#include <xwcd/ds/device.h>
+#include <xwcd/ds/soc/chip.h>
+#include <xwcd/ds/uart/dma.h>
+#include <xwcd/ds/i2c/master.h>
 #include <xwcd/perpheral/i2c/eeprom/device.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/device.h>
 

@@ -22,9 +22,9 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/lock/spinlock.h>
-#include <xwos/osal/lock/mutex.h>
-#include <xwos/osal/sync/semaphore.h>
-#include <xwos/osal/sync/condition.h>
+#include <xwos/osal/lock/mtx.h>
+#include <xwos/osal/sync/sem.h>
+#include <xwos/osal/sync/cond.h>
 #include <xwmd/isc/xwscp/hwifal.h>
 #include <xwmd/isc/xwscp/api.h>
 
@@ -137,9 +137,9 @@ struct xwscp {
         void * hwifcb; /**< 物理层端口 */
 
         /* 发送状态机 */
-        struct xwosal_mtx txmtx; /**< 发送锁 */
-        struct xwosal_mtx csmtx; /**< 保护发送和接收线程的共享数据的锁 */
-        struct xwosal_cdt cscdt; /**< 同步发送和接收线程的条件量 */
+        struct xwos_mtx txmtx; /**< 发送锁 */
+        struct xwos_mtx csmtx; /**< 保护发送和接收线程的共享数据的锁 */
+        struct xwos_cond cscond; /**< 同步发送和接收线程的条件量 */
         struct {
                 __xwcc_atomic xwu32_t cnt; /**< 发送计数器 */
                 struct xwscp_frame * frm; /**< 正在发送的帧 */
@@ -151,16 +151,16 @@ struct xwscp {
         struct {
                 __xwcc_atomic xwu32_t cnt; /**< 接收计数器 */
                 struct xwlib_bclst_head head; /**< 链表头 */
-                struct xwosal_splk lock; /**< 保护接收队列的自旋锁 */
-                struct xwosal_smr smr; /**< 接收队列的信号量 */
+                struct xwos_splk lock; /**< 保护接收队列的自旋锁 */
+                struct xwos_sem sem; /**< 接收队列的信号量 */
         } rxq; /**< 接收队列 */
 
         /* 帧槽内存池 */
         struct {
-                struct xwosal_smr smr; /**< 空的帧槽计数信号量 */
+                struct xwos_sem sem; /**< 空的帧槽计数信号量 */
                 struct xwlib_bclst_head q; /**< 帧槽链表队列头 */
                 struct xwscp_frmslot frm[XWSCP_FRMSLOT_NUM]; /**< 帧槽数组 */
-                struct xwosal_splk lock; /**< 保护帧槽队列的自旋锁 */
+                struct xwos_splk lock; /**< 保护帧槽队列的自旋锁 */
         } slot;
 };
 

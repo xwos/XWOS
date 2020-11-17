@@ -42,12 +42,12 @@ xwer_t xwaop__xws16_t__tgt_then_rsb(__xwcc_atomic xws16_t * a,
                 o = (xws16_t)ldrexh(a);
                 if (o > t) {
                         n = v - o;
-                        xwmb_smp_mb();
+                        xwmb_mp_mb();
                         rc = strexh(a, (xwu16_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;
-                        xwmb_smp_ddb();
+                        xwmb_mp_ddb();
                         break;
                 }
         } while (rc);

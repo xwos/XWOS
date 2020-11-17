@@ -22,7 +22,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
-#include <xwmd/ds/xwds.h>
+#include <xwcd/ds/xwds.h>
 #include <stm32f4xx_ll_cortex.h>
 #include <stm32f4xx_ll_pwr.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>

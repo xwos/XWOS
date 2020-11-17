@@ -25,4 +25,6 @@ SOC_CSRCS :=
 SOC_ASRCS :=
 
 SOC_CSRCS += soc_init.c
-SOC_CSRCS += soc_sched.c
+SOC_CSRCS += ospl_irq_impl.c
+SOC_CSRCS += ospl_skd_impl.c
+SOC_CSRCS += ospl_syshwt_impl.c

@@ -23,9 +23,10 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
 #include <xwos/lib/xwbop.h>
-#include <xwmd/ds/soc/chip.h>
-#include <xwmd/ds/soc/gpio.h>
-#include <xwmd/ds/soc/eirq.h>
+#include <xwos/osal/irq.h>
+#include <xwcd/ds/soc/chip.h>
+#include <xwcd/ds/soc/gpio.h>
+#include <xwcd/ds/soc/eirq.h>
 #include <bm/stm32cube/xwac/xwds/device.h>
 #include <bm/stm32cube/xwac/xwds/soc.h>
 #include <bm/stm32cube/cubemx/Core/Inc/mdma.h>
@@ -60,13 +61,13 @@ xwer_t stm32cube_soc_drv_start(struct xwds_device * dev);
 static
 xwer_t stm32cube_soc_drv_stop(struct xwds_device * dev);
 
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
 xwer_t stm32cube_soc_drv_suspend(struct xwds_device * dev);
 
 static
 xwer_t stm32cube_soc_drv_resume(struct xwds_device * dev);
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
 
 static
 xwer_t stm32cube_soc_drv_gpio_req(struct xwds_soc * soc,
@@ -129,10 +130,10 @@ const struct xwds_soc_driver stm32cube_soc_drv = {
                 .remove = NULL,
                 .start = stm32cube_soc_drv_start,
                 .stop = stm32cube_soc_drv_stop,
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
                 .suspend = stm32cube_soc_drv_suspend,
                 .resume = stm32cube_soc_drv_resume,
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
         },
 
         .gpio_req = stm32cube_soc_drv_gpio_req,
@@ -248,7 +249,7 @@ struct xwds_soc stm32cube_soc_cb = {
                 .name = "stm32cube.soc",
                 .id = 0,
                 .resources = NULL,
-                .drv = xwds_static_cast(struct xwds_driver *, &stm32cube_soc_drv),
+                .drv = xwds_cast(struct xwds_driver *, &stm32cube_soc_drv),
                 .data = NULL,
         },
         .xwccfg = (void *)&stm32cube_soc_cfg,
@@ -305,7 +306,7 @@ xwer_t stm32cube_soc_drv_stop(struct xwds_device * dev)
         return XWOK;
 }
 
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
 xwer_t stm32cube_soc_drv_suspend(struct xwds_device * dev)
 {
@@ -319,7 +320,7 @@ xwer_t stm32cube_soc_drv_resume(struct xwds_device * dev)
         XWOS_UNUSED(dev);
         return XWOK;
 }
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
 
 /******** ******** gpio operation driver ******** ********/
 static
@@ -358,9 +359,9 @@ xwer_t stm32cube_soc_drv_gpio_cfg(struct xwds_soc * soc,
 
         llcfg = cfg;
         gpio = xwccfg->gpio.register_map[port];
-        soc_cpuirq_save_lc(&cpuirq);
+        xwos_cpuirq_save_lc(&cpuirq);
         es = LL_GPIO_Init(gpio, llcfg);
-        soc_cpuirq_restore_lc(cpuirq);
+        xwos_cpuirq_restore_lc(cpuirq);
         if (SUCCESS == es) {
                 rc = XWOK;
         } else {
@@ -380,9 +381,9 @@ xwer_t stm32cube_soc_drv_gpio_set(struct xwds_soc * soc,
         xwccfg = soc->xwccfg;
 
         gpio = xwccfg->gpio.register_map[port];
-        soc_cpuirq_save_lc(&cpuirq);
+        xwos_cpuirq_save_lc(&cpuirq);
         LL_GPIO_SetOutputPin(gpio, pinmask);
-        soc_cpuirq_restore_lc(cpuirq);
+        xwos_cpuirq_restore_lc(cpuirq);
         return XWOK;
 }
 
@@ -397,9 +398,9 @@ xwer_t stm32cube_soc_drv_gpio_reset(struct xwds_soc * soc,
         xwccfg = soc->xwccfg;
 
         gpio = xwccfg->gpio.register_map[port];
-        soc_cpuirq_save_lc(&cpuirq);
+        xwos_cpuirq_save_lc(&cpuirq);
         LL_GPIO_ResetOutputPin(gpio, pinmask);
-        soc_cpuirq_restore_lc(cpuirq);
+        xwos_cpuirq_restore_lc(cpuirq);
         return XWOK;
 }
 
@@ -414,9 +415,9 @@ xwer_t stm32cube_soc_drv_gpio_toggle(struct xwds_soc * soc,
         xwccfg = soc->xwccfg;
 
         gpio = xwccfg->gpio.register_map[port];
-        soc_cpuirq_save_lc(&cpuirq);
+        xwos_cpuirq_save_lc(&cpuirq);
         LL_GPIO_TogglePin(gpio, pinmask);
-        soc_cpuirq_restore_lc(cpuirq);
+        xwos_cpuirq_restore_lc(cpuirq);
         return XWOK;
 }
 
@@ -434,12 +435,12 @@ xwer_t stm32cube_soc_drv_gpio_output(struct xwds_soc * soc,
 
         gpio = xwccfg->gpio.register_map[port];
         out &= pinmask;
-        soc_cpuirq_save_lc(&cpuirq);
+        xwos_cpuirq_save_lc(&cpuirq);
         regval = LL_GPIO_ReadOutputPort(gpio);
         regval &= (xwu32_t)(~(out ^ pinmask));
         regval |= (xwu32_t)(out & pinmask);
         LL_GPIO_WriteOutputPort(gpio, regval);
-        soc_cpuirq_restore_lc(cpuirq);
+        xwos_cpuirq_restore_lc(cpuirq);
         return XWOK;
 }
 

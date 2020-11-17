@@ -21,10 +21,10 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/osal/scheduler.h>
+#include <xwos/osal/skd.h>
 #include <xwos/osal/lock/spinlock.h>
-#include <xwos/osal/sync/condition.h>
-#include <xwmd/ds/spi/master.h>
+#include <xwos/osal/sync/cond.h>
+#include <xwcd/ds/spi/master.h>
 #include <bm/stm32cube/standard.h>
 #include <bm/stm32cube/cubemx/Core/Inc/spi.h>
 #include <bm/stm32cube/xwac/xwds/spim.h>
@@ -39,13 +39,13 @@ xwer_t stm32cube_spi1m_drv_start(struct xwds_device * dev);
 static
 xwer_t stm32cube_spi1m_drv_stop(struct xwds_device * dev);
 
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
 xwer_t stm32cube_spi1m_drv_suspend(struct xwds_device * dev);
 
 static
 xwer_t stm32cube_spi1m_drv_resume(struct xwds_device * dev);
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
 
 static
 xwer_t stm32cube_spi1m_drv_buscfg(struct xwds_spim * spim,
@@ -65,10 +65,10 @@ const struct xwds_spim_driver stm32cube_spi1m_drv = {
                 .remove = NULL,
                 .start = stm32cube_spi1m_drv_start,
                 .stop = stm32cube_spi1m_drv_stop,
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
                 .suspend = stm32cube_spi1m_drv_suspend,
                 .resume =  stm32cube_spi1m_drv_resume,
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
         },
         .buscfg = stm32cube_spi1m_drv_buscfg,
         .xfer = stm32cube_spi1m_drv_xfer,
@@ -80,7 +80,7 @@ struct xwds_spim stm32cube_spi1m_cb = {
                 .name = "stm32cube.spi.2",
                 .id = 1,
                 .resources = NULL,
-                .drv = xwds_static_cast(struct xwds_driver *, &stm32cube_spi1m_drv),
+                .drv = xwds_cast(struct xwds_driver *, &stm32cube_spi1m_drv),
                 .data = (void *)&hspi1_drvdata,
         },
         .buscfg = NULL,
@@ -94,7 +94,7 @@ xwer_t stm32cube_spi1m_drv_start(struct xwds_device * dev)
         struct xwds_spim * spim;
         struct MX_SPI_MasterDriverData * drvdata;
 
-        spim = xwds_static_cast(struct xwds_spim *, dev);
+        spim = xwds_cast(struct xwds_spim *, dev);
         drvdata = spim->dev.data;
         drvdata->spim = spim;
         MX_SPI1_Init();
@@ -110,7 +110,7 @@ xwer_t stm32cube_spi1m_drv_stop(struct xwds_device * dev)
         return XWOK;
 }
 
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
 xwer_t stm32cube_spi1m_drv_resume(struct xwds_device * dev)
 {
@@ -122,7 +122,7 @@ xwer_t stm32cube_spi1m_drv_suspend(struct xwds_device * dev)
 {
         return stm32cube_spi1m_drv_stop(dev);
 }
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
 
 static
 xwer_t stm32cube_spi1m_drv_buscfg(struct xwds_spim * spim,
@@ -147,35 +147,35 @@ xwer_t stm32cube_spi1m_drv_xfer(struct xwds_spim * spim,
                                 xwsz_t size, xwtm_t * xwtm)
 {
         struct MX_SPI_MasterDriverData * drvdata;
-        union xwlk_ulock ulk;
+        union xwos_ulock ulk;
         xwreg_t cpuirq;
         xwsq_t lkst;
         xwer_t rc;
 
         drvdata = spim->dev.data;
         ulk.osal.splk = &drvdata->splk;
-        xwosal_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+        xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
         drvdata->rc = -EINPROGRESS;
         rc = MX_SPI1_Xfer(txd, rxb, size);
         if (XWOK == rc) {
-                rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&drvdata->cdt),
-                                          ulk, XWLK_TYPE_SPLK, NULL,
-                                          xwtm, &lkst);
+                rc = xwos_cond_timedwait(&drvdata->cond,
+                                         ulk, XWOS_LK_SPLK, NULL,
+                                         xwtm, &lkst);
                 if (XWOK == rc) {
-                        if (XWLK_STATE_UNLOCKED == lkst) {
-                                xwosal_splk_lock(&drvdata->splk);
+                        if (XWOS_LKST_UNLOCKED == lkst) {
+                                xwos_splk_lock(&drvdata->splk);
                         }
                         rc = drvdata->rc;
                 } else {
-                        if (XWLK_STATE_UNLOCKED == lkst) {
-                                xwosal_splk_lock(&drvdata->splk);
+                        if (XWOS_LKST_UNLOCKED == lkst) {
+                                xwos_splk_lock(&drvdata->splk);
                         }
                         drvdata->rc = -ECANCELED;
                 }
         } else {
                 drvdata->rc = -ECANCELED;
         }
-        xwosal_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+        xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
         return rc;
 }
 
@@ -185,13 +185,13 @@ void stm32cube_spi1m_cb_xfercplt(struct xwds_spim * spim, xwer_t xrc)
         xwreg_t cpuirq;
 
         drvdata = spim->dev.data;
-        xwosal_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+        xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
         if (-ECANCELED != drvdata->rc) {
                 drvdata->rc = xrc;
         } else {
         }
-        xwosal_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
-        xwosal_cdt_broadcast(xwosal_cdt_get_id(&drvdata->cdt));
+        xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+        xwos_cond_broadcast(&drvdata->cond);
 }
 
 /******** ******** ******** ******** ******* * ******** ******** ********
@@ -204,13 +204,13 @@ xwer_t stm32cube_spi2m_drv_start(struct xwds_device * dev);
 static
 xwer_t stm32cube_spi2m_drv_stop(struct xwds_device * dev);
 
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
 xwer_t stm32cube_spi2m_drv_suspend(struct xwds_device * dev);
 
 static
 xwer_t stm32cube_spi2m_drv_resume(struct xwds_device * dev);
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
 
 static
 xwer_t stm32cube_spi2m_drv_buscfg(struct xwds_spim * spim,
@@ -230,10 +230,10 @@ const struct xwds_spim_driver stm32cube_spi2m_drv = {
                 .remove = NULL,
                 .start = stm32cube_spi2m_drv_start,
                 .stop = stm32cube_spi2m_drv_stop,
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
                 .suspend = stm32cube_spi2m_drv_suspend,
                 .resume =  stm32cube_spi2m_drv_resume,
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
         },
         .buscfg = stm32cube_spi2m_drv_buscfg,
         .xfer = stm32cube_spi2m_drv_xfer,
@@ -245,7 +245,7 @@ struct xwds_spim stm32cube_spi2m_cb = {
                 .name = "stm32cube.spi.2",
                 .id = 1,
                 .resources = NULL,
-                .drv = xwds_static_cast(struct xwds_driver *, &stm32cube_spi2m_drv),
+                .drv = xwds_cast(struct xwds_driver *, &stm32cube_spi2m_drv),
                 .data = (void *)&hspi2_drvdata,
         },
         .buscfg = NULL,
@@ -259,7 +259,7 @@ xwer_t stm32cube_spi2m_drv_start(struct xwds_device * dev)
         struct xwds_spim * spim;
         struct MX_SPI_MasterDriverData * drvdata;
 
-        spim = xwds_static_cast(struct xwds_spim *, dev);
+        spim = xwds_cast(struct xwds_spim *, dev);
         drvdata = spim->dev.data;
         drvdata->spim = spim;
         MX_SPI2_Init();
@@ -275,7 +275,7 @@ xwer_t stm32cube_spi2m_drv_stop(struct xwds_device * dev)
         return XWOK;
 }
 
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
 xwer_t stm32cube_spi2m_drv_resume(struct xwds_device * dev)
 {
@@ -287,7 +287,7 @@ xwer_t stm32cube_spi2m_drv_suspend(struct xwds_device * dev)
 {
         return stm32cube_spi2m_drv_stop(dev);
 }
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
 
 static
 xwer_t stm32cube_spi2m_drv_buscfg(struct xwds_spim * spim,
@@ -312,35 +312,35 @@ xwer_t stm32cube_spi2m_drv_xfer(struct xwds_spim * spim,
                                 xwsz_t size, xwtm_t * xwtm)
 {
         struct MX_SPI_MasterDriverData * drvdata;
-        union xwlk_ulock ulk;
+        union xwos_ulock ulk;
         xwreg_t cpuirq;
         xwsq_t lkst;
         xwer_t rc;
 
         drvdata = spim->dev.data;
         ulk.osal.splk = &drvdata->splk;
-        xwosal_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+        xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
         drvdata->rc = -EINPROGRESS;
         rc = MX_SPI2_Xfer(txd, rxb, size);
         if (XWOK == rc) {
-                rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&drvdata->cdt),
-                                          ulk, XWLK_TYPE_SPLK, NULL,
-                                          xwtm, &lkst);
+                rc = xwos_cond_timedwait(&drvdata->cond,
+                                         ulk, XWOS_LK_SPLK, NULL,
+                                         xwtm, &lkst);
                 if (XWOK == rc) {
-                        if (XWLK_STATE_UNLOCKED == lkst) {
-                                xwosal_splk_lock(&drvdata->splk);
+                        if (XWOS_LKST_UNLOCKED == lkst) {
+                                xwos_splk_lock(&drvdata->splk);
                         }
                         rc = drvdata->rc;
                 } else {
-                        if (XWLK_STATE_UNLOCKED == lkst) {
-                                xwosal_splk_lock(&drvdata->splk);
+                        if (XWOS_LKST_UNLOCKED == lkst) {
+                                xwos_splk_lock(&drvdata->splk);
                         }
                         drvdata->rc = -ECANCELED;
                 }
         } else {
                 drvdata->rc = -ECANCELED;
         }
-        xwosal_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+        xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
         return rc;
 }
 
@@ -350,11 +350,11 @@ void stm32cube_spi2m_cb_xfercplt(struct xwds_spim * spim, xwer_t xrc)
         xwreg_t cpuirq;
 
         drvdata = spim->dev.data;
-        xwosal_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+        xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
         if (-ECANCELED != drvdata->rc) {
                 drvdata->rc = xrc;
         } else {
         }
-        xwosal_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
-        xwosal_cdt_broadcast(xwosal_cdt_get_id(&drvdata->cdt));
+        xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+        xwos_cond_broadcast(&drvdata->cond);
 }

@@ -140,8 +140,8 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
     HAL_NVIC_EnableIRQ(I2C2_ER_IRQn);
   /* USER CODE BEGIN I2C2_MspInit 1 */
     hi2c2_drvdata.halhdl = &hi2c2;
-    xwosal_splk_init(&hi2c2_drvdata.splk);
-    xwosal_cdt_init(&hi2c2_drvdata.cdt);
+    xwos_splk_init(&hi2c2_drvdata.splk);
+    xwos_cond_init(&hi2c2_drvdata.cond);
     hi2c2_drvdata.msg = NULL;
     hi2c2_drvdata.rc = -ECANCELED;
     hi2c2_drvdata.size = 0;
@@ -155,7 +155,7 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
   if(i2cHandle->Instance==I2C2)
   {
   /* USER CODE BEGIN I2C2_MspDeInit 0 */
-    xwosal_cdt_destroy(&hi2c2_drvdata.cdt);
+    xwos_cond_destroy(&hi2c2_drvdata.cond);
 
   /* USER CODE END I2C2_MspDeInit 0 */
     /* Peripheral clock disable */

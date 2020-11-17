@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC DMAUART
+ * @brief SOC描述层：DMAUART
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

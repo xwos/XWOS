@@ -36,7 +36,7 @@ bool xwbmpaop_t1i(__xwcc_unused __xwcc_atomic xwbmp_t * bmp,
         __asm__ volatile("      mov     r1, #1");
         __asm__ volatile("      lsl     r1, r3"); /* r1 = bitmask; */
         __asm__ volatile("      ldr     r3, [r0, r2, lsl #2]"); /* r3 = *(addr + r2); */
-        xwmb_smp_ddb();
+        xwmb_mp_ddb();
         __asm__ volatile("      tst     r1, r3"); /* r0 = r1 & r3; */
         __asm__ volatile("      ite     ne"); /* if (result is non-zero (Z != 1)) */
         __asm__ volatile("      movne   r0, #1"); /* then r0 = 1; */

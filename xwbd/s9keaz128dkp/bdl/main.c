@@ -22,14 +22,13 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/osal/scheduler.h>
-#include <xwos/osal/thread.h>
+#include <xwos/osal/skd.h>
 #include <bdl/standard.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define SYS_MGR_THRD_PRIORITY   XWOSAL_SD_PRIORITY_RT_MIN
+#define SYS_MGR_THRD_PRIORITY   XWOS_SKD_PRIORITY_RT_MIN
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********     static function prototypes      ******** ********
@@ -40,14 +39,14 @@ xwer_t sys_mgr_thrd(void *arg);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-const struct xwosal_thrd_desc sys_mgr_td = {
+const struct xwos_thrd_desc sys_mgr_td = {
         .name = "sys.mgr",
         .prio = SYS_MGR_THRD_PRIORITY,
         .stack = NULL,
         .stack_size = 1024,
         .func = sys_mgr_thrd,
         .arg = NULL,
-        .attr = XWSDOBJ_ATTR_PRIVILEGED,
+        .attr = XWOS_SKDATTR_PRIVILEGED,
 };
 
 xwid_t sys_mgr_tid;
@@ -59,15 +58,15 @@ xwer_t xwos_main(void)
 {
         xwer_t rc;
 
-        rc = xwosal_thrd_create(&sys_mgr_tid,
-                                sys_mgr_td.name,
-                                sys_mgr_td.func,
-                                sys_mgr_td.arg,
-                                sys_mgr_td.stack_size,
-                                sys_mgr_td.prio,
-                                sys_mgr_td.attr);
+        rc = xwos_thrd_create(&sys_mgr_tid,
+                              sys_mgr_td.name,
+                              sys_mgr_td.func,
+                              sys_mgr_td.arg,
+                              sys_mgr_td.stack_size,
+                              sys_mgr_td.prio,
+                              sys_mgr_td.attr);
         if (XWOK == rc) {
-                rc = xwosal_scheduler_start_lc();
+                rc = xwos_skd_start_lc();
         }
         BDL_BUG_ON(rc < 0);
         return rc;
@@ -81,9 +80,9 @@ xwer_t sys_mgr_thrd(void *arg)
         XWOS_UNUSED(arg);
         while (true) {
                 time = 300 * XWTM_MS;
-                xwosal_cthrd_sleep(&time);
+                xwos_cthrd_sleep(&time);
                 time = 300 * XWTM_MS;
-                xwosal_cthrd_sleep(&time);
+                xwos_cthrd_sleep(&time);
         }
         return rc;
 }

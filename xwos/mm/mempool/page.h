@@ -77,7 +77,7 @@ struct xwmm_mempool_page_odrbtree {
         struct xwmm_mempool_page * leftmost; /**< 最小序号的页 */
         xwsq_t order; /**< 红黑树的阶 */
         struct xwmm_mempool_page_allocator * owner; /**< 包含此阶红黑树的页分配器 */
-        struct xwosal_sqlk lock; /**< 保护此结构体的锁 */
+        struct xwos_sqlk lock; /**< 保护此结构体的锁 */
 };
 
 /**

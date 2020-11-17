@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __board_init_h__
-#define __board_init_h__
+#ifndef __bdl_board_init_h__
+#define __bdl_board_init_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
@@ -35,4 +35,4 @@ void board_lowlevel_init(void);
 __xwbsp_init_code
 void board_init(void);
 
-#endif /* board_init.h */
+#endif /* bdl/board_init.h */

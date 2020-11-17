@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief soc EDMA
+ * @brief SOC描述层：EDMA
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

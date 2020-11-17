@@ -22,20 +22,18 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#if defined(XuanWuOS_CFG_CORE__smp)
-  #include <xwos/smp/cpu.h>
-  #include <xwos/smp/irq.h>
-  #include <smp_nvic.h>
-  #include <xwos/smp/scheduler.h>
-  #include <xwos/smp/pm.h>
-  #include <soc_xwpmdm.h>
+#if defined(XuanWuOS_CFG_CORE__mp)
+  #include <mp_nvic.h>
+  #include <xwos/mp/irq.h>
+  #include <xwos/mp/skd.h>
 #elif defined(XuanWuOS_CFG_CORE__up)
   #include <xwos/up/irq.h>
+  #include <xwos/up/skd.h>
   #include <up_nvic.h>
-  #include <xwos/up/scheduler.h>
 #else
   #error "Can't find the configuration of XuanWuOS_CFG_CORE!"
 #endif
+#include <armv7m_core.h>
 #include <soc.h>
 #include <soc_init.h>
 
@@ -75,29 +73,28 @@ void soc_init(void)
         soc_relocate_isrtable();
 #endif /* !SOCCFG_RO_ISRTABLE */
 
-#if defined(XuanWuOS_CFG_CORE__smp)
-        /* PM domain */
-        xwos_pmdm_init(&soc_xwpm_domain);
+#if defined(XuanWuOS_CFG_CORE__mp)
+        xwid_t id = xwmp_skd_get_id();
 
-        /* Interrupt controller */
-        xwos_irqc_construct(&cortexm_nvic[0]);
-        rc = xwos_irqc_register(&cortexm_nvic[0], xwos_cpu_get_id(), NULL);
+        /* Interrupt controller of CPU */
+        xwmp_irqc_construct(&cortexm_nvic[id]);
+        rc = xwmp_irqc_register(&cortexm_nvic[id], id, NULL);
         XWOS_BUG_ON(rc < 0);
 
-        /* Init scheduler of CPU */
-        rc = xwos_scheduler_init_lc(&soc_xwpm_domain);
+        /* Init scheduler of local CPU */
+        rc = xwmp_skd_init_lc();
         XWOS_BUG_ON(rc);
 #elif defined(XuanWuOS_CFG_CORE__up)
         /* Init interrupt controller */
-        rc = xwos_irqc_init("cortex-m.nvic",
+        rc = xwup_irqc_init("cortex-m.nvic",
                             (SOCCFG_IRQ_NUM + ARCHCFG_IRQ_NUM),
                             &soc_isr_table,
-                            &soc_irq_data_table,
+                            &soc_isr_data_table,
                             &armv7_nvic_cfg);
         XWOS_BUG_ON(rc < 0);
 
         /* Init scheduler */
-        rc = xwos_scheduler_init();
+        rc = xwup_skd_init_lc();
         XWOS_BUG_ON(rc);
 #endif
 }

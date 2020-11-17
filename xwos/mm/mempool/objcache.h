@@ -58,7 +58,7 @@ struct xwmm_mempool_objcache {
                 struct xwlib_bclst_head full; /**< 对象已完全被分配的页链表 */
                 struct xwlib_bclst_head available; /**< 还有剩余对象未分配的页链表 */
                 struct xwlib_bclst_head idle; /**< 未使用的页链表 */
-                struct xwlk_sqlk lock; /**< 页链表锁 */
+                struct xwos_sqlk lock; /**< 页链表锁 */
         } page_list; /**< 页链表 */
 };
 

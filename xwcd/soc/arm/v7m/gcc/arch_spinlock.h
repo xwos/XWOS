@@ -86,7 +86,7 @@ void arch_bitsplk_lock(xwptr_t * ptr)
         : [__lock] "r" (ptr)
         : "r0", "r1", "cc", "memory"
         );
-        xwmb_smp_mb();
+        xwmb_mp_mb();
 }
 
 #endif /* (CPUCFG_CPU_NUM > 1) */
@@ -119,7 +119,7 @@ xwer_t arch_bitsplk_trylock(xwptr_t * ptr)
         : [__lock] "r" (ptr)
         : "r0", "r1", "cc", "memory"
         );
-        xwmb_smp_mb();
+        xwmb_mp_mb();
         return rc;
 }
 #endif /* (CPUCFG_CPU_NUM > 1) */
@@ -132,7 +132,7 @@ xwer_t arch_bitsplk_trylock(xwptr_t * ptr)
 static __xwbsp_inline
 void arch_bitsplk_unlock(xwptr_t * ptr)
 {
-        xwmb_smp_mb();
+        xwmb_mp_mb();
         __asm__ volatile(
         "1:\n"
         "       ldrex   r0, [%[__lock]]\n"
@@ -196,7 +196,7 @@ void arch_splk_lock(struct arch_splk * asl)
                 wfe();
                 tmp.v.tickets.curr = xwmb_access(xwu16_t, asl->v.tickets.curr);
         }
-        xwmb_smp_mb();
+        xwmb_mp_mb();
 #endif /* !(1 == ARCH_SPLK_USING_BITSPLK) */
 }
 
@@ -236,7 +236,7 @@ xwer_t arch_splk_trylock(struct arch_splk * asl)
         } while (rc);
 
         if (0 == contended) {
-                xwmb_smp_mb();
+                xwmb_mp_mb();
                 return XWOK;
         } else {
                 return -EAGAIN;
@@ -254,7 +254,7 @@ void arch_splk_unlock(struct arch_splk * asl)
 #if (1 == ARCH_SPLK_USING_BITSPLK)
         arch_bitsplk_unlock(asl);
 #else /* (1 == ARCH_SPLK_USING_BITSPLK) */
-        xwmb_smp_mb();
+        xwmb_mp_mb();
         asl->v.tickets.curr++;
         armv7m_dsb();
         sev();

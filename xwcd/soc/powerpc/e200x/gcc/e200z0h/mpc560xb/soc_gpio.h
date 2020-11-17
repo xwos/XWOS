@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief soc gpio
+ * @brief SOC描述层：GPIO
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

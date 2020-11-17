@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 中间件/模块/驱动配置
+ * @brief 中间件模块配置
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -22,61 +22,9 @@
 #define __cfg_xwmd_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********    base config    ******** ******** ********
+ ******** ******** ********    Base Config    ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWMDCFG_CHECK_PARAMETERS                                0
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********   device stack    ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWMDCFG_ds                                              1
-#define XWMDCFG_ds_PM                                           1
-
-/******** ******** SOC ******** ********/
-#define XWMDCFG_ds_SOC                                          1
-#define XWMDCFG_ds_SOC_CLK                                      0
-#define XWMDCFG_ds_SOC_PWR                                      0
-#define XWMDCFG_ds_SOC_GPIO                                     1
-#define XWMDCFG_ds_SOC_EIRQ                                     1
-#define XWMDCFG_ds_SOC_EIRQ_ROISRT                              1
-#define XWMDCFG_ds_SOC_DMA                                      0
-#define XWMDCFG_ds_SOC_DMA_ROCBT                                1
-#define XWMDCFG_ds_ERAM                                         0
-
-/******** ******** UART ******** ********/
-#define XWMDCFG_ds_UART                                         0
-#define XWMDCFG_ds_UART_GNR                                     1
-#define XWMDCFG_ds_UART_GNR_TXQ_SIZE                            (64U)
-#define XWMDCFG_ds_UART_GNR_RXQ_SIZE                            (64U)
-#define XWMDCFG_ds_UART_DMA                                     0
-#define XWMDCFG_ds_UART_DMA_RXQ_SIZE                            (64U)
-
-/******** ******** I2C device ******** ********/
-#define XWMDCFG_ds_I2C_MASTER                                   0
-#define XWMDCFG_ds_I2C_PERPHERAL                                0
-
-/******** ******** SPI device ******** ********/
-#define XWMDCFG_ds_SPI_MASTER                                   0
-#define XWMDCFG_ds_SPI_PERPHERAL                                0
-
-/******** ******** LIN Bus ******** ********/
-#define XWMDCFG_ds_LIN                                          0
-#define XWMDCFG_ds_LINID                                        1
-
-/******** ******** CAN Bus ******** ********/
-#define XWMDCFG_ds_CAN                                          0
-#define XWMDCFG_ds_CAN_CONTROLLER                               0
-#define XWMDCFG_ds_CAN_CONTROLLER_ROCBT                         0
-#define XWMDCFG_ds_CAN_CONTROLLER_SDU_MAXSIZE                   8U
-#define XWMDCFG_ds_CAN_CONTROLLER_RXQNUM                        8U
-#define XWMDCFG_ds_CAN_CONTROLLER_I2CP                          0
-#define XWMDCFG_ds_CAN_CONTROLLER_SPIP                          0
-#define XWMDCFG_ds_CAN_TRANSCEIVER                              0
-#define XWMDCFG_ds_CAN_TRANSCEIVER_I2CP                         0
-#define XWMDCFG_ds_CAN_TRANSCEIVER_SPIP                         0
-
-/******** ******** misc device ******** ********/
-#define XWMDCFG_ds_MISC                                         0
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********     Inter-System Communication      ******** ********
@@ -92,9 +40,9 @@
 #define XWMDCFG_isc_xwpcp_MEMBLK_NUM                            (64U)
 #define XWMDCFG_isc_xwpcp_SYNC_KEY                              ('P')
 #define XWMDCFG_isc_xwpcp_RXTHRD_PRIORITY                       \
-        XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
+        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 #define XWMDCFG_isc_xwpcp_TXTHRD_PRIORITY                       \
-        XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
+        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 /******** ******** simple communication protocol ******** ********/
 #define XWMDCFG_isc_xwscp                                       1
@@ -105,7 +53,7 @@
 #define XWMDCFG_isc_xwscp_FRMSLOT_NUM                           (8U)
 #define XWMDCFG_isc_xwscp_SYNC_KEY                              ('S')
 #define XWMDCFG_isc_xwscp_THRD_PRIORITY                         \
-        XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
+        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********            C/C++ Runtime            ******** ********

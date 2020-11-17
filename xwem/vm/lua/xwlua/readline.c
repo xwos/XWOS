@@ -8,9 +8,10 @@
  * + http://www.lua.org/license.html
  */
 
+#include <stdio.h>
 #include <xwos/standard.h>
 #include <xwos/lib/ctype.h>
-#include <stdio.h>
+#include <xwos/osal/skd.h>
 #include "lua.h"
 
 #define LUA_MAXINPUT		512
@@ -25,6 +26,8 @@ int xwlua_readline(lua_State * L, char buffer[], const char * prompt)
         char * line;
         xwsq_t pos;
         int c;
+        xwer_t rc;
+        int ret;
 
         (void)L;
         line = buffer;
@@ -32,7 +35,8 @@ int xwlua_readline(lua_State * L, char buffer[], const char * prompt)
         fflush(stdout);
         lf = false;
         pos = 0;
-        while (!lf) {
+        ret = 1;
+        while ((!lf) && (ret)) {
                 c = fgetc(stdin);
                 switch (c) {
                 case CTRL_BS:
@@ -53,7 +57,16 @@ int xwlua_readline(lua_State * L, char buffer[], const char * prompt)
                         lf = true;
                         break;
                 default:
-                        if (isprint(c)) {
+                        if (c < 0) {
+                                rc = -errno;
+                                if (-EINTR == rc) {
+                                        if (xwos_cthrd_shld_frz()) {
+                                                xwos_cthrd_freeze();
+                                        } else if (xwos_cthrd_shld_stop()) {
+                                                ret = 0;
+                                        }
+                                }
+                        } else if (isprint(c)) {
                                 line[pos] = c;
                                 pos++;
                                 fputc(c, stdout);
@@ -66,5 +79,5 @@ int xwlua_readline(lua_State * L, char buffer[], const char * prompt)
                         break;
                 }
         }
-        return 1;
+        return ret;
 }

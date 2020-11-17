@@ -22,8 +22,8 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwmd/ds/soc/gpio.h>
-#include <xwmd/ds/i2c/perpheral.h>
+#include <xwcd/ds/soc/gpio.h>
+#include <xwcd/ds/i2c/perpheral.h>
 #include <xwcd/perpheral/i2c/eeprom/device.h>
 #include <xwcd/perpheral/i2c/eeprom/driver.h>
 
@@ -68,7 +68,7 @@ xwer_t xwds_eeprom_drv_start(struct xwds_device * dev)
         const struct xwds_resource_gpio * gpiorsc;
         xwer_t rc;
 
-        eeprom = xwds_static_cast(struct xwds_eeprom *, dev);
+        eeprom = xwds_cast(struct xwds_eeprom *, dev);
 
         rc = xwds_eeprom_check_desc(eeprom);
         if (rc < 0) {
@@ -108,7 +108,7 @@ xwer_t xwds_eeprom_drv_stop(struct xwds_device * dev)
         struct xwds_eeprom * eeprom;
         const struct xwds_resource_gpio * gpiorsc;
 
-        eeprom = xwds_static_cast(struct xwds_eeprom *, dev);
+        eeprom = xwds_cast(struct xwds_eeprom *, dev);
 
         /* release GPIO resources */
         gpiorsc = eeprom->wp_gpiorsc;
@@ -124,7 +124,7 @@ xwer_t xwds_eeprom_drv_stop(struct xwds_device * dev)
         return XWOK;
 }
 
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 xwer_t xwds_eeprom_drv_suspend(struct xwds_device * dev)
 {
         return xwds_eeprom_drv_stop(dev);
@@ -134,9 +134,14 @@ xwer_t xwds_eeprom_drv_resume(struct xwds_device * dev)
 {
         return xwds_eeprom_drv_start(dev);
 }
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
 
 /******** ******** I2C EEPROM operations ******** ********/
+/**
+ * @brief EEPROM API：开启EEPROM的电源
+ * @param eeprom: (I) I2C EEPROM对象的指针
+ * @retrun 错误码
+ */
 xwer_t xwds_eeprom_power_on(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
@@ -152,6 +157,11 @@ xwer_t xwds_eeprom_power_on(struct xwds_eeprom * eeprom)
         return rc;
 }
 
+/**
+ * @brief EEPROM API：关闭EEPROM的电源
+ * @param eeprom: (I) I2C EEPROM对象的指针
+ * @retrun 错误码
+ */
 xwer_t xwds_eeprom_power_off(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
@@ -167,6 +177,11 @@ xwer_t xwds_eeprom_power_off(struct xwds_eeprom * eeprom)
         return rc;
 }
 
+/**
+ * @brief EEPROM API：开启EEPROM的写保护
+ * @param eeprom: (I) I2C EEPROM对象的指针
+ * @retrun 错误码
+ */
 xwer_t xwds_eeprom_wp_enable(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
@@ -182,6 +197,11 @@ xwer_t xwds_eeprom_wp_enable(struct xwds_eeprom * eeprom)
         return rc;
 }
 
+/**
+ * @brief EEPROM API：关闭EEPROM的写保护
+ * @param eeprom: (I) I2C EEPROM对象的指针
+ * @retrun 错误码
+ */
 xwer_t xwds_eeprom_wp_disable(struct xwds_eeprom * eeprom)
 {
         xwer_t rc;
@@ -197,6 +217,21 @@ xwer_t xwds_eeprom_wp_disable(struct xwds_eeprom * eeprom)
         return rc;
 }
 
+/**
+ * @brief EEPROM API：写一个字节到EEPROM
+ * @param eeprom: (I) I2C EEPROM对象的指针
+ * @param data: (I) 数据
+ * @param addr: (I) 地址
+ * @param xwtm: 指向缓冲区的指针，此缓冲区：
+ *              (I) 期望的阻塞等待时间
+ *              (O) 函数返回时，剩余的期望值
+ * @retrun 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EINVAL: 设备对象不可引用
+ * @retval -ESHUTDOWN: 设备没有运行
+ * @retval -EADDRNOTAVAIL: 地址无响应
+ * @retval -ETIMEDOUT: 超时
+ */
 xwer_t xwds_eeprom_putc(struct xwds_eeprom * eeprom,
                         xwu8_t data, xwptr_t addr,
                         xwtm_t * xwtm)
@@ -204,8 +239,7 @@ xwer_t xwds_eeprom_putc(struct xwds_eeprom * eeprom,
         const struct xwds_eeprom_driver * drv;
         xwer_t rc;
 
-        drv = xwds_static_cast(const struct xwds_eeprom_driver *,
-                               eeprom->i2cp.dev.drv);
+        drv = xwds_cast(const struct xwds_eeprom_driver *, eeprom->i2cp.dev.drv);
         if ((drv) && (drv->putc)) {
                 rc = drv->putc(eeprom, data, addr, xwtm);
         } else {
@@ -214,6 +248,21 @@ xwer_t xwds_eeprom_putc(struct xwds_eeprom * eeprom,
         return rc;
 }
 
+/**
+ * @brief EEPROM API：从EEPROM中读取一个字节
+ * @param eeprom: (I) I2C EEPROM对象的指针
+ * @param buf: (O) 指向缓冲区的指针，通过此缓冲区返回数据
+ * @param addr: (I) 地址
+ * @param xwtm: 指向缓冲区的指针，此缓冲区：
+ *              (I) 期望的阻塞等待时间
+ *              (O) 函数返回时，剩余的期望值
+ * @retrun 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EINVAL: 设备对象不可引用
+ * @retval -ESHUTDOWN: 设备没有运行
+ * @retval -EADDRNOTAVAIL: 地址无响应
+ * @retval -ETIMEDOUT: 超时
+ */
 xwer_t xwds_eeprom_getc(struct xwds_eeprom * eeprom,
                         xwu8_t * buf, xwptr_t addr,
                         xwtm_t * xwtm)
@@ -221,8 +270,7 @@ xwer_t xwds_eeprom_getc(struct xwds_eeprom * eeprom,
         const struct xwds_eeprom_driver * drv;
         xwer_t rc;
 
-        drv = xwds_static_cast(const struct xwds_eeprom_driver *,
-                               eeprom->i2cp.dev.drv);
+        drv = xwds_cast(const struct xwds_eeprom_driver *, eeprom->i2cp.dev.drv);
         if ((drv) && (drv->getc)) {
                 rc = drv->getc(eeprom, buf, addr, xwtm);
         } else {
@@ -231,6 +279,24 @@ xwer_t xwds_eeprom_getc(struct xwds_eeprom * eeprom,
         return rc;
 }
 
+/**
+ * @brief EEPROM API：写一页数据到EEPROM
+ * @param eeprom: (I) I2C EEPROM对象的指针
+ * @param data: (I) 待写入的数据的缓冲区
+ * @param size: 指向缓冲区的指针，此缓冲区：
+ *              (I) 作为输入时，数据的大小
+ *              (O) 作为输出时，实际写入的数据大小
+ * @param pgidx: (I) 页的序号
+ * @param xwtm: 指向缓冲区的指针，此缓冲区：
+ *              (I) 期望的阻塞等待时间
+ *              (O) 函数返回时，剩余的期望值
+ * @retrun 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EINVAL: 设备对象不可引用
+ * @retval -ESHUTDOWN: 设备没有运行
+ * @retval -EADDRNOTAVAIL: 地址无响应
+ * @retval -ETIMEDOUT: 超时
+ */
 xwer_t xwds_eeprom_pgwrite(struct xwds_eeprom * eeprom,
                            xwu8_t * data, xwsz_t * size, xwsq_t pgidx,
                            xwtm_t * xwtm)
@@ -238,8 +304,7 @@ xwer_t xwds_eeprom_pgwrite(struct xwds_eeprom * eeprom,
         const struct xwds_eeprom_driver * drv;
         xwer_t rc;
 
-        drv = xwds_static_cast(const struct xwds_eeprom_driver *,
-                               eeprom->i2cp.dev.drv);
+        drv = xwds_cast(const struct xwds_eeprom_driver *, eeprom->i2cp.dev.drv);
         if ((drv) && (drv->pgwrite)) {
                 rc = drv->pgwrite(eeprom, data, size, pgidx, xwtm);
         } else {
@@ -248,6 +313,24 @@ xwer_t xwds_eeprom_pgwrite(struct xwds_eeprom * eeprom,
         return rc;
 }
 
+/**
+ * @brief EEPROM API：从EEPROM读一页数据
+ * @param eeprom: (I) I2C EEPROM对象的指针
+ * @param buf: (O) 指向缓冲区的指针，通过此缓冲区返回数据
+ * @param size: 指向缓冲区的指针，此缓冲区：
+ *              (I) 作为输入时，缓冲区的大小
+ *              (O) 作为输出时，实际读取的数据大小
+ * @param pgidx: (I) 页的序号
+ * @param xwtm: 指向缓冲区的指针，此缓冲区：
+ *              (I) 期望的阻塞等待时间
+ *              (O) 函数返回时，剩余的期望值
+ * @retrun 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EINVAL: 设备对象不可引用
+ * @retval -ESHUTDOWN: 设备没有运行
+ * @retval -EADDRNOTAVAIL: 地址无响应
+ * @retval -ETIMEDOUT: 超时
+ */
 xwer_t xwds_eeprom_pgread(struct xwds_eeprom * eeprom,
                           xwu8_t * buf, xwsz_t * size, xwsq_t pgidx,
                           xwtm_t * xwtm)
@@ -255,8 +338,7 @@ xwer_t xwds_eeprom_pgread(struct xwds_eeprom * eeprom,
         const struct xwds_eeprom_driver * drv;
         xwer_t rc;
 
-        drv = xwds_static_cast(const struct xwds_eeprom_driver *,
-                               eeprom->i2cp.dev.drv);
+        drv = xwds_cast(const struct xwds_eeprom_driver *, eeprom->i2cp.dev.drv);
         if ((drv) && (drv->pgread)) {
                 rc = drv->pgread(eeprom, buf, size, pgidx, xwtm);
         } else {
@@ -265,6 +347,18 @@ xwer_t xwds_eeprom_pgread(struct xwds_eeprom * eeprom,
         return rc;
 }
 
+/**
+ * @brief EEPROM API：复位I2C EEPROM
+ * @param eeprom: (I) I2C EEPROM对象的指针
+ * @param xwtm: (I) 期望的阻塞等待时间
+ *              (O) 函数返回时，剩余的期望值
+ * @retrun 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EINVAL: 设备对象不可引用
+ * @retval -ESHUTDOWN: 设备没有运行
+ * @retval -EADDRNOTAVAIL: 地址无响应
+ * @retval -ETIMEDOUT: 超时
+ */
 xwer_t xwds_eeprom_reset(struct xwds_eeprom * eeprom, xwtm_t * xwtm)
 {
         struct xwds_i2c_msg msg;

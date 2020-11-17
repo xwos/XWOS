@@ -22,19 +22,10 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/irq.h>
-#if defined(XuanWuOS_CFG_CORE__smp)
-  #include <xwos/smp/scheduler.h>
-  #include <xwos/smp/thread.h>
-#elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/scheduler.h>
-  #include <xwos/up/thread.h>
-#endif
-
 #include <armv6m_core.h>
 #include <armv6m_nvic.h>
 #include <arch_irq.h>
-#include <arch_sched.h>
+#include <arch_skd.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      macros       ******** ******** ********
@@ -112,7 +103,7 @@ void arch_isr_hardfault(void)
         __xwcc_unused volatile struct cm_scs_reg * scs;
 
         scs = &cm_scs;
-        arch_scheduler_lib_chkcstk();
+        arch_skd_chkcstk();
         while (true) {
         }
 }
@@ -126,7 +117,7 @@ void arch_isr_mm(void)
         __xwcc_unused volatile struct cm_scs_reg * scs;
 
         scs = &cm_scs;
-        arch_scheduler_lib_chkcstk();
+        arch_skd_chkcstk();
         while (true) {
         }
 }
@@ -140,7 +131,7 @@ void arch_isr_busfault(void)
         __xwcc_unused volatile struct cm_scs_reg * scs;
 
         scs = &cm_scs;
-        arch_scheduler_lib_chkcstk();
+        arch_skd_chkcstk();
         while (true) {
         }
 }
@@ -154,7 +145,7 @@ void arch_isr_usagefault(void)
         __xwcc_unused volatile struct cm_scs_reg * scs;
 
         scs = &cm_scs;
-        arch_scheduler_lib_chkcstk();
+        arch_skd_chkcstk();
         while (true) {
         }
 }
@@ -180,8 +171,8 @@ void arch_isr_dbgmon(void)
  *   SVC的处理机制是Fault，当无法执行时会造成Hard Fault。
  * @note
  * - xwsc (svc 8)
- *   + svc_sysisr()运行在handler模式。ARM内核进入handler模式时会自动将r0 ~ r3, ip,
- *     lr, pc & xpsr压栈保存；返回thread模式时会自动从栈中弹出原始值恢复这些寄存器。
+ *   + ARM内核进入handler模式时会自动将r0 ~ r3, ip,lr, pc & xpsr压栈保存；
+ *     返回thread模式时会自动从栈中弹出原始值恢复这些寄存器。
  *     返回的地址被存放在[SP+24]的地址处。可以将这个内存地址中的内容改为xwsc的真正
  *     入口@ref arch_xwsc_entry()，并将原始返回地址存放在原始LR的位置[SP+20]。原始
  *     LR的值又存放在原始R3的位置[SP+12]。原始R3在xwsc中没有使用到，因此不需要备份。
@@ -235,7 +226,7 @@ void arch_isr_svc(void)
                          ".4byte        svc_11 + 1\n");
         __asm__ volatile("svc_0:"); /* case 0: */
         __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 */
-        __asm__ volatile("      b       arch_scheduler_svcsr_start");
+        __asm__ volatile("      b       arch_skd_svcsr_start");
         __asm__ volatile("svc_1:"); /* case 1: privilege_start */
         __asm__ volatile("      mrs     r0, control");
         __asm__ volatile("      mov     r1, #1");
@@ -255,7 +246,11 @@ void arch_isr_svc(void)
         __asm__ volatile("svc_5:"); /* case 5: freeze thread */
         __asm__ volatile("      push    {r0, lr}");
         __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 value: ctcb */
-        __asm__ volatile("      bl      xwos_thrd_freeze_lic");
+#if defined(XuanWuOS_CFG_CORE__mp)
+        __asm__ volatile("      bl      xwmp_thrd_freeze_lic");
+#elif defined(XuanWuOS_CFG_CORE__up)
+        __asm__ volatile("      bl      xwup_thrd_freeze_lic");
+#endif
         __asm__ volatile("      mov     r2, r0");
         __asm__ volatile("      pop     {r0, r1}");
         __asm__ volatile("      str     r2, [r0, #0]"); /* save the return value */
@@ -267,7 +262,11 @@ void arch_isr_svc(void)
         __asm__ volatile("      push    {r0, lr}");
         __asm__ volatile("      ldr     r1, [r0, #4]"); /* get old r1 value */
         __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 value */
-        __asm__ volatile("      bl      xwos_thrd_exit_lic");
+#if defined(XuanWuOS_CFG_CORE__mp)
+        __asm__ volatile("      bl      xwmp_thrd_exit_lic");
+#elif defined(XuanWuOS_CFG_CORE__up)
+        __asm__ volatile("      bl      xwup_thrd_exit_lic");
+#endif
         __asm__ volatile("      mov     r2, r0");
         __asm__ volatile("      pop     {r0, r1}");
         __asm__ volatile("      str     r2, [r0, #0]"); /* save the return value */
@@ -278,7 +277,11 @@ void arch_isr_svc(void)
         __asm__ volatile("svc_9:"); /* case 9: */
         __asm__ volatile("      push    {r0, lr}");
         __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 value */
-        __asm__ volatile("      bl      xwos_scheduler_suspend_lic");
+#if defined(XuanWuOS_CFG_CORE__mp)
+        __asm__ volatile("      bl      xwmp_skd_suspend_lic");
+#elif defined(XuanWuOS_CFG_CORE__up)
+        __asm__ volatile("      bl      xwup_skd_suspend_lic");
+#endif
         __asm__ volatile("      mov     r2, r0");
         __asm__ volatile("      pop     {r0, r1}");
         __asm__ volatile("      str     r2, [r0, #0]"); /* save the return value */
@@ -287,7 +290,11 @@ void arch_isr_svc(void)
         __asm__ volatile("svc_10:"); /* case 10: */
         __asm__ volatile("      push    {r0, lr}");
         __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 value */
-        __asm__ volatile("      bl      xwos_scheduler_resume_lic");
+#if defined(XuanWuOS_CFG_CORE__mp)
+        __asm__ volatile("      bl      xwmp_skd_resume_lic");
+#elif defined(XuanWuOS_CFG_CORE__up)
+        __asm__ volatile("      bl      xwup_skd_resume_lic");
+#endif
         __asm__ volatile("      mov     r2, r0");
         __asm__ volatile("      pop     {r0, r1}");
         __asm__ volatile("      str     r2, [r0, #0]"); /* save the return value */
@@ -313,6 +320,9 @@ void arch_isr_noop(void)
         }
 }
 
+/**
+ * @brief Get Current IRQ Number
+ */
 __xwbsp_code
 xwer_t arch_irq_get_id(xwirq_t * irqnbuf)
 {

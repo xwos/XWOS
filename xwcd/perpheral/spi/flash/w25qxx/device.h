@@ -35,7 +35,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwmd/ds/spi/perpheral.h>
+#include <xwcd/ds/spi/perpheral.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -170,23 +170,19 @@ struct xwds_w25qxx {
         const struct xwds_w25qxx_cmd * cmdtbl; /**< 参数列表 */
 
         /* private */
-        struct xwosal_mtx apilock; /**< API互斥锁 */
+        struct xwos_mtx apilock; /**< API互斥锁 */
         xwu8_t txq[XWDS_W25QXX_CMD_MAX_PAYLOAD + 16]; /**< 发送缓冲区 */
         xwu8_t rxq[XWDS_W25QXX_CMD_MAX_PAYLOAD + 16]; /**< 接收缓冲区 */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
+ ******** ********       API function prototypes       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** ******** constructor & destructor ******** ******** ********/
 void xwds_w25qxx_construct(struct xwds_w25qxx * w25qxx);
 void xwds_w25qxx_destruct(struct xwds_w25qxx * w25qxx);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 增加对象的引用计数
+ * @brief W25QXX API：增加对象的引用计数
  * @param w25qxx: (I) W25QXX Flash 设备指针
  * @return 错误码
  * @retval @ref xwds_spip_grab()
@@ -198,7 +194,7 @@ xwer_t xwds_w25qxx_grab(struct xwds_w25qxx * w25qxx)
 }
 
 /**
- * @brief 减少对象的引用计数
+ * @brief W25QXX API：减少对象的引用计数
  * @param w25qxx: (I) W25QXX Flash 设备指针
  * @return 错误码
  * @retval @ref xwds_spip_put()
@@ -210,7 +206,7 @@ xwer_t xwds_w25qxx_put(struct xwds_w25qxx * w25qxx)
 }
 
 /**
- * @brief 增加设备运行状态计数器
+ * @brief W25QXX API：增加设备运行状态计数器
  * @param w25qxx: (I) W25QXX Flash 设备指针
  * @return 错误码
  * @retval @ref xwds_spip_request()
@@ -222,7 +218,7 @@ xwer_t xwds_w25qxx_request(struct xwds_w25qxx * w25qxx)
 }
 
 /**
- * @brief 减少设备运行状态计数器
+ * @brief W25QXX API：减少设备运行状态计数器
  * @param w25qxx: (I) W25QXX Flash 设备指针
  * @return 错误码
  * @retval @ref xwds_spip_release()

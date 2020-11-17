@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC I2C module
+ * @brief SOC描述层：I2C
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

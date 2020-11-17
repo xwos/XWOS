@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS的同步机制：同步对象
+ * @brief 玄武OS UP内核同步机制：同步对象
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,16 +21,16 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-struct xwsync_evt;
+struct xwup_evt;
 
 /**
  * @brief 同步对象
  */
-struct xwsync_object {
+struct xwup_sync_object {
         struct {
-                struct xwsync_evt * evt; /**< 事件对象 */
+                struct xwup_evt * evt; /**< 事件对象 */
                 xwsq_t pos; /**< 事件对象中的位图位置 */
-        } selector; /**< 选择器 */
+        } sel; /**< 选择器 */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -41,22 +41,10 @@ struct xwsync_object {
  ********       internal inline function implementations        ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwcc_inline
-void xwsync_object_activate(struct xwsync_object * xwsyncobj)
+void xwup_sync_object_activate(struct xwup_sync_object * synobj)
 {
-        xwsyncobj->selector.evt = NULL;
-        xwsyncobj->selector.pos = 0;
+        synobj->sel.evt = NULL;
+        synobj->sel.pos = 0;
 }
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      inline API implementations     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 
 #endif /* xwos/up/sync/object.h */

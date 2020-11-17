@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS内核：初始化
+ * @brief 玄武OS UP内核：初始化
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -30,8 +30,8 @@
 /**
  * @brief 初始化XWOS UP Kernel
  */
-__xwos_init_code
-xwer_t xwos_up_init(void)
+__xwup_init_code
+xwer_t xwup_init(void)
 {
         return XWOK;
 }

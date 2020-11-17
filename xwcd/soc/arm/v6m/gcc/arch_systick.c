@@ -22,19 +22,12 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/irq.h>
-#if defined(XuanWuOS_CFG_CORE__smp)
-  #include <xwos/smp/scheduler.h>
-  #include <xwos/smp/tt.h>
-#elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/scheduler.h>
-  #include <xwos/up/tt.h>
-#else
-  #error "Can't find the configuration of XuanWuOS_CFG_CORE!"
-#endif
+#include <xwos/osal/irq.h>
+#include <xwos/ospl/skd.h>
+#include <xwos/ospl/syshwt.h>
 #include <armv6m_core.h>
-#include <armv6m_nvic.h>
 #include <arch_irq.h>
+#include <arch_skd.h>
 #include <arch_systick.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -46,8 +39,8 @@
   #define ARCH_SYSHWT_SRCCLK    BRDCFG_SYSCLK
 #endif
 
-#if defined(XuanWuOS_CFG_CORE__smp)
-  #define ARCH_SYSHWT_HZ        (XWTM_S / XWSMPCFG_SYSHWT_PERIOD)
+#if defined(XuanWuOS_CFG_CORE__mp)
+  #define ARCH_SYSHWT_HZ        (XWTM_S / XWMPCFG_SYSHWT_PERIOD)
 #elif defined(XuanWuOS_CFG_CORE__up)
   #define ARCH_SYSHWT_HZ        (XWTM_S / XWUPCFG_SYSHWT_PERIOD)
 #endif
@@ -63,19 +56,16 @@ __xwbsp_rodata const struct soc_irq_cfg cortex_m_systick_irqcfg = {
 
 __xwbsp_rodata const struct xwos_irq_resource cortex_m_systick_irqrsc = {
         .irqn = ARCH_IRQ_SYSTICK,
-        .isr = arch_systick_isr,
+        .isr = arch_isr_systick,
         .cfg = &cortex_m_systick_irqcfg,
-        .description = "cortex_m_systick_irq",
+        .description = "irq.armv6m.systick",
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief Init systick timer
- */
 __xwbsp_code
-xwer_t arch_systick_init(struct xwos_syshwt * hwt)
+xwer_t arch_systick_init(struct xwospl_syshwt * hwt)
 {
         xwer_t rc;
 
@@ -101,47 +91,22 @@ xwer_t arch_systick_init(struct xwos_syshwt * hwt)
         return rc;
 }
 
-/**
- * @brief Systick timer interrupt handler
- */
-__xwbsp_isr
-void arch_systick_isr(void)
-{
-        struct xwos_scheduler * xwsd;
-        __xwcc_unused xwu32_t csr;
-
-        xwmb_read(xwu32_t, csr, &cm_scs.systick.csr.u32); /* read to clear COUNTFLAG */
-        xwsd = xwos_scheduler_get_lc();
-        xwos_syshwt_task(&xwsd->tt.hwt);
-}
-
-/**
- * @brief Start Systick Timer
- */
 __xwbsp_code
-xwer_t arch_systick_start(__xwcc_unused struct xwos_syshwt * hwt)
+xwer_t arch_systick_start(__xwcc_unused struct xwospl_syshwt * hwt)
 {
         cm_scs.systick.csr.bit.en = 1;
         return XWOK;
 }
 
-/**
- * @brief Stop Systick Timer
- */
 __xwbsp_code
-xwer_t arch_systick_stop(__xwcc_unused struct xwos_syshwt * hwt)
+xwer_t arch_systick_stop(__xwcc_unused struct xwospl_syshwt * hwt)
 {
         cm_scs.systick.csr.bit.en = 0;
         return XWOK;
 }
 
-/**
- * @brief Get time confetti in the current tick
- * @param hwt: (I) hardware timer
- * @retval time confetti
- */
 __xwbsp_code
-xwtm_t arch_systick_get_timeconfetti(__xwcc_unused struct xwos_syshwt * hwt)
+xwtm_t arch_systick_get_timeconfetti(__xwcc_unused struct xwospl_syshwt * hwt)
 {
         xwu32_t cnt;
         xwu32_t confetti;
@@ -149,4 +114,19 @@ xwtm_t arch_systick_get_timeconfetti(__xwcc_unused struct xwos_syshwt * hwt)
         cnt = cm_scs.systick.rvr.u32 - cm_scs.systick.cvr.u32 + 1;
         confetti = cnt / (ARCH_SYSHWT_SRCCLK / XWTM_MS) * XWTM_US;
         return (xwtm_t)confetti;
+}
+
+__xwbsp_isr
+void arch_isr_systick(void)
+{
+        struct xwospl_skd * xwskd;
+        __xwcc_unused xwu32_t csr;
+
+        xwmb_read(xwu32_t, csr, &cm_scs.systick.csr.u32); /* read to clear COUNTFLAG */
+        xwskd = arch_skd_get_lc();
+#if defined(XuanWuOS_CFG_CORE__mp)
+        xwmp_syshwt_task(&xwskd->tt.hwt);
+#elif defined(XuanWuOS_CFG_CORE__up)
+        xwup_syshwt_task(&xwskd->tt.hwt);
+#endif
 }

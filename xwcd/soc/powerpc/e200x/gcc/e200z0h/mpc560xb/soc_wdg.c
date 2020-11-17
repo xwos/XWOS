@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief mpc560xb watchdog
+ * @brief SOC描述层：MPC560xB watchdog
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

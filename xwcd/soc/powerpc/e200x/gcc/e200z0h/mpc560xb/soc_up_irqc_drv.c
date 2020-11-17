@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC IRQ controller driver
+ * @brief SOC描述层：MP IRQ controller
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,14 +21,11 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/standard.h>
 #include <string.h>
+#include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
-#include <xwos/up/irq.h>
+#include <xwos/ospl/irq.h>
 #include <soc.h>
-#include <soc_irq.h>
-#include <soc_sched.h>
-#include <soc_up_irqc_drv.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
@@ -37,7 +34,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-extern __xwos_data struct xwos_irqc xwos_irqc;
+extern struct xwup_irqc xwup_irqc;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ******** static function prototypes ******** ********
@@ -52,7 +49,7 @@ xwer_t soc_irqc_drv_init(void)
         __soc_isr_table_qualifier struct soc_isr_table * isr_table;
         xwu32_t i;
 
-        isr_table = xwos_irqc.isr_table;
+        isr_table = xwup_irqc.isr_table;
         /* Module Control Register - MCR */
         /* Bit 26 - The vector table size for e200z0h Core is: 4 bytes */
         /* Bit 31 - The module for e200z0 Core is in Software Vector Mode */
@@ -86,10 +83,10 @@ xwer_t soc_irqc_drv_request(xwirq_t irqn, xwisr_f isrfunc, xwsq_t flag, void * d
                 __soc_isr_table_qualifier struct soc_isr_table * isr_table;
                 __soc_isr_table_qualifier struct soc_isr_data_table * isr_data_table;
 
-                isr_table = xwos_irqc.isr_table;
+                isr_table = xwup_irqc.isr_table;
                 isr_table->soc[irqn] = isrfunc;
 
-                isr_data_table = xwos_irqc.isr_data_table;
+                isr_data_table = xwup_irqc.isr_data_table;
                 if ((NULL != isr_data_table) && (NULL != data)) {
                         isr_data_table->soc[irqn] = data;
                 }
@@ -110,7 +107,7 @@ xwer_t soc_irqc_drv_release(xwirq_t irqn)
                 __soc_isr_table_qualifier struct soc_isr_table * isr_table;
                 __soc_isr_table_qualifier struct soc_isr_data_table * isr_data_table;
 
-                isr_table = xwos_irqc.isr_table;
+                isr_table = xwup_irqc.isr_table;
                 isr_table->soc[irqn] = soc_isr_nop;
         }
 #endif /* !SOCCFG_RO_ISRTABLE */
@@ -213,11 +210,11 @@ xwer_t soc_irqc_drv_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
 __xwbsp_code
 xwer_t soc_irqc_drv_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
 {
-        __soc_isr_table_qualifier struct soc_irq_data_table * irq_data_table;
+        __soc_isr_table_qualifier struct soc_isr_data_table * irq_data_table;
         xwer_t rc;
 
         if (irqn >= 0) {
-                irq_data_table = xwos_irqc.irq_data_table;
+                irq_data_table = xwup_irqc.irq_data_table;
                 databuf->data = irq_data_table->soc[irqn];
                 rc = XWOK;
         } else {

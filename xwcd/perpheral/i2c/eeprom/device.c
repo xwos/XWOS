@@ -22,7 +22,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwmd/ds/i2c/perpheral.h>
+#include <xwcd/ds/i2c/perpheral.h>
 #include <xwcd/perpheral/i2c/eeprom/device.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********

@@ -44,17 +44,17 @@ xwu32_t xwaop__xwu32_t__store(__xwcc_atomic xwu32_t * a,
                 *a = v;
                 break;
         case xwmb_modr_release:
-                xwmb_smp_mb();
+                xwmb_mp_mb();
                 *a = v;
                 break;
         case xwmb_modr_acq_rel:
-                xwmb_smp_mb();
+                xwmb_mp_mb();
                 *a = v;
                 break;
         case xwmb_modr_seq_cst:
-                xwmb_smp_mb();
+                xwmb_mp_mb();
                 *a = v;
-                xwmb_smp_mb();
+                xwmb_mp_mb();
                 break;
         default:
                 *a = v;

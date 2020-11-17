@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS内核：管道等待队列
+ * @brief 玄武OS UP内核：管道等待队列
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -26,8 +26,8 @@
  * @brief 初始化管道等待队列
  * @param xwplwq: (I) 管道等待队列结构体指针
  */
-__xwos_code
-void xwos_plwq_init(struct xwos_plwq * xwplwq)
+__xwup_code
+void xwup_plwq_init(struct xwup_plwq * xwplwq)
 {
         xwlib_bclst_init_head(&xwplwq->head);
 }
@@ -39,8 +39,8 @@ void xwos_plwq_init(struct xwos_plwq * xwplwq)
  * @note
  * - 这个函数只能在临界区被调用。
  */
-__xwos_code
-void xwos_plwq_add_head(struct xwos_plwq * xwplwq, struct xwos_wqn * wqn)
+__xwup_code
+void xwup_plwq_add_head(struct xwup_plwq * xwplwq, struct xwup_wqn * wqn)
 {
         xwlib_bclst_add_head(&xwplwq->head, &wqn->cln.pl);
 }
@@ -52,8 +52,8 @@ void xwos_plwq_add_head(struct xwos_plwq * xwplwq, struct xwos_wqn * wqn)
  * @note
  * - 这个函数只能在临界区被调用。
  */
-__xwos_code
-void xwos_plwq_add_tail(struct xwos_plwq * xwplwq, struct xwos_wqn * wqn)
+__xwup_code
+void xwup_plwq_add_tail(struct xwup_plwq * xwplwq, struct xwup_wqn * wqn)
 {
         xwlib_bclst_add_tail(&xwplwq->head, &wqn->cln.pl);
 }
@@ -67,8 +67,8 @@ void xwos_plwq_add_tail(struct xwos_plwq * xwplwq, struct xwos_wqn * wqn)
  * @note
  * - 这个函数只能在临界区被调用。
  */
-__xwos_code
-xwer_t xwos_plwq_remove(struct xwos_plwq * xwplwq, struct xwos_wqn * wqn)
+__xwup_code
+xwer_t xwup_plwq_remove(struct xwup_plwq * xwplwq, struct xwup_wqn * wqn)
 {
         xwer_t rc;
 
@@ -89,16 +89,16 @@ xwer_t xwos_plwq_remove(struct xwos_plwq * xwplwq, struct xwos_wqn * wqn)
  * @note
  * - 这个函数只能在临界区被调用。
  */
-__xwos_code
-struct xwos_wqn * xwos_plwq_choose(struct xwos_plwq * xwplwq)
+__xwup_code
+struct xwup_wqn * xwup_plwq_choose(struct xwup_plwq * xwplwq)
 {
-        struct xwos_wqn * wqn;
+        struct xwup_wqn * wqn;
 
         if (xwlib_bclst_tst_empty(&xwplwq->head)) {
                 wqn = NULL;
         } else {
                 wqn = xwlib_bclst_first_entry(&xwplwq->head,
-                                              struct xwos_wqn,
+                                              struct xwup_wqn,
                                               cln.pl);
                 xwlib_bclst_del_init(&wqn->cln.pl);
         }

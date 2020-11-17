@@ -35,8 +35,8 @@
 /* USER CODE BEGIN Includes */
 #include <bm/stm32cube/standard.h>
 #include <xwos/osal/lock/spinlock.h>
-#include <xwos/osal/sync/condition.h>
-#include <xwmd/ds/i2c/master.h>
+#include <xwos/osal/sync/cond.h>
+#include <xwcd/ds/i2c/master.h>
 /* USER CODE END Includes */
 
 extern I2C_HandleTypeDef hi2c2;
@@ -47,8 +47,8 @@ extern I2C_HandleTypeDef hi2c2;
 struct MX_I2C_MasterDriverData {
   I2C_HandleTypeDef * halhdl;
   struct xwds_i2cm * i2cm;
-  struct xwosal_cdt cdt; /**< 条件量 */
-  struct xwosal_splk splk; /**< 保证发送状态只被单一上下文访问的锁 */
+  struct xwos_cond cond; /**< 条件量 */
+  struct xwos_splk splk; /**< 保证发送状态只被单一上下文访问的锁 */
   struct xwds_i2c_msg * msg; /**< 正在传输的消息 */
   xwer_t rc; /**< 返回值 */
   xwu8_t mem[MX_I2C_MEM_MAXSIZE] __xwcc_aligned_l1cacheline; /**< 发送缓冲区 */

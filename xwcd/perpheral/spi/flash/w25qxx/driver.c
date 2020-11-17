@@ -23,10 +23,9 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <string.h>
 #include <xwos/standard.h>
-#include <xwos/osal/scheduler.h>
-#include <xwos/osal/thread.h>
-#include <xwos/osal/lock/mutex.h>
-#include <xwmd/ds/spi/perpheral.h>
+#include <xwos/osal/skd.h>
+#include <xwos/osal/lock/mtx.h>
+#include <xwcd/ds/spi/perpheral.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/device.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/driver.h>
 
@@ -52,7 +51,7 @@ xwer_t xwds_w25qxx_drv_start(struct xwds_device * dev)
         const struct xwds_w25qxx_cmd * cmdtbl;
         xwer_t rc;
 
-        w25qxx = xwds_static_cast(struct xwds_w25qxx *, dev);
+        w25qxx = xwds_cast(struct xwds_w25qxx *, dev);
         cmdtbl = w25qxx->cmdtbl;
 
         if ((NULL == cmdtbl) ||
@@ -61,7 +60,7 @@ xwer_t xwds_w25qxx_drv_start(struct xwds_device * dev)
                 goto err_desc_err;
         }
 
-        rc = xwosal_mtx_init(&w25qxx->apilock, XWOSAL_SD_PRIORITY_RT_MAX);
+        rc = xwos_mtx_init(&w25qxx->apilock, XWOS_SKD_PRIORITY_RT_MAX);
         if (rc < 0) {
                 goto err_mtx_init;
         }
@@ -78,12 +77,12 @@ xwer_t xwds_w25qxx_drv_stop(struct xwds_device * dev)
 {
         struct xwds_w25qxx * w25qxx;
 
-        w25qxx = xwds_static_cast(struct xwds_w25qxx *, dev);
-        xwosal_mtx_destroy(&w25qxx->apilock);
+        w25qxx = xwds_cast(struct xwds_w25qxx *, dev);
+        xwos_mtx_destroy(&w25qxx->apilock);
         return XWOK;
 }
 
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 xwer_t xwds_w25qxx_drv_resume(struct xwds_device * dev)
 {
         return xwds_w25qxx_drv_start(dev);
@@ -93,7 +92,7 @@ xwer_t xwds_w25qxx_drv_suspend(struct xwds_device * dev)
 {
         return xwds_w25qxx_drv_stop(dev);
 }
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
 
 /******** ******** ******** APIs ******** ******** ********/
 xwer_t xwds_w25qxx_cfgbus(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
@@ -151,7 +150,7 @@ xwer_t xwds_w25qxx_ctrl(struct xwds_w25qxx * w25qxx,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_w25qxx_request;
         }
-        rc = xwosal_mtx_timedlock(xwosal_mtx_get_id(&w25qxx->apilock), xwtm);
+        rc = xwos_mtx_timedlock(&w25qxx->apilock, xwtm);
         if (rc < 0) {
                 goto err_apilock_lock;
         }
@@ -193,13 +192,13 @@ xwer_t xwds_w25qxx_ctrl(struct xwds_w25qxx * w25qxx,
                 }
         }
 
-        xwosal_mtx_unlock(xwosal_mtx_get_id(&w25qxx->apilock));
+        xwos_mtx_unlock(&w25qxx->apilock);
         xwds_w25qxx_release(w25qxx);
         xwds_w25qxx_put(w25qxx);
         return XWOK;
 
 err_spim_xfer:
-        xwosal_mtx_unlock(xwosal_mtx_get_id(&w25qxx->apilock));
+        xwos_mtx_unlock(&w25qxx->apilock);
 err_apilock_lock:
         xwds_w25qxx_release(w25qxx);
 err_w25qxx_request:
@@ -438,7 +437,7 @@ xwer_t xwds_w25qxx_wait_idle(struct xwds_w25qxx * w25qxx, xwtm_t period,
         sleep = (desired > period) ? period : desired;
         while ((sleep > 0) && (-EBUSY == rc)) {
                 tmp = sleep;
-                rc = xwosal_cthrd_sleep(&tmp);
+                rc = xwos_cthrd_sleep(&tmp);
                 desired = desired - sleep;
                 if (XWOK == rc) {
                         rc = xwds_w25qxx_check_idle(w25qxx, xwtm);

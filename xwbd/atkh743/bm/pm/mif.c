@@ -22,19 +22,18 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
-#include <xwos/osal/scheduler.h>
-#include <xwos/osal/thread.h>
-/* #include <soc_xwpmdm.h> */
-#include <xwos/osal/sync/semaphore.h>
-#include <xwmd/ds/soc/gpio.h>
-#include <xwmd/ds/soc/eirq.h>
+#include <xwos/osal/skd.h>
+#include <xwos/osal/pm.h>
+#include <xwos/osal/sync/sem.h>
+#include <xwcd/ds/soc/gpio.h>
+#include <xwcd/ds/soc/eirq.h>
 #include <bm/stm32cube/mif.h>
 #include <bm/pm/mif.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define PM_THRD_PRIORITY XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 1)
+#define PM_THRD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 #define PM_BTN_GPIO_PORT XWDS_GPIO_PORT_H
 #define PM_BTN_GPIO_PIN XWDS_GPIO_PIN_3
@@ -57,16 +56,16 @@ enum brdpm_btn_event_em {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /* static */
-/* void brdpmdm_resume(struct xwos_pmdm * pmdm, void * arg); */
+/* void xwospl_pm_cb_resume(void * arg); */
 
 /* static */
-/* void brdpmdm_suspend(struct xwos_pmdm * pmdm, void * arg); */
+/* void xwospl_pm_cb_suspend(void * arg); */
 
 /* static */
-/* void brdpmdm_wakeup(struct xwos_pmdm * pmdm, void * arg); */
+/* void xwospl_pm_cb_wakeup(void * arg); */
 
 /* static */
-/* void brdpmdm_sleep(struct xwos_pmdm * pmdm, void * arg); */
+/* void xwospl_pm_cb_sleep(void * arg); */
 
 static
 void brdpm_suspend(void);
@@ -104,18 +103,18 @@ xwer_t brdpm_thrd(void * arg);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-const struct xwosal_thrd_desc brdpm_thrd_td = {
+const struct xwos_thrd_desc brdpm_thrd_td = {
         .name = "bm.pm.thrd",
         .prio = PM_THRD_PRIORITY,
-        .stack = XWOSAL_THRD_STACK_DYNAMIC,
+        .stack = XWOS_THRD_STACK_DYNAMIC,
         .stack_size = 2048,
-        .func = (xwosal_thrd_f)brdpm_thrd,
+        .func = (xwos_thrd_f)brdpm_thrd,
         .arg = NULL,
-        .attr = XWSDOBJ_ATTR_PRIVILEGED,
+        .attr = XWOS_SKDATTR_PRIVILEGED,
 };
 xwid_t brdpm_thrd_id;
 
-struct xwosal_smr brdpm_smr;
+struct xwos_sem brdpm_sem;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
@@ -124,33 +123,32 @@ xwer_t brdpm_start(void)
 {
         xwer_t rc;
 
-        /* xwos_pmdm_set_cb(&soc_xwpm_domain, */
-        /*                  brdpmdm_resume, */
-        /*                  brdpmdm_suspend, */
-        /*                  brdpmdm_wakeup, */
-        /*                  brdpmdm_sleep, */
-        /*                  NULL); */
+        /* xwos_pm_set_cb(xwospl_pm_cb_resume, */
+        /*                xwospl_pm_cb_suspend, */
+        /*                xwospl_pm_cb_wakeup, */
+        /*                xwospl_pm_cb_sleep, */
+        /*                NULL); */
 
-        rc = xwosal_smr_init(&brdpm_smr, 0, 1);
+        rc = xwos_sem_init(&brdpm_sem, 0, 1);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_smr_init;
+                goto err_sem_init;
         }
 
-        rc = xwosal_thrd_create(&brdpm_thrd_id,
-                                brdpm_thrd_td.name,
-                                brdpm_thrd_td.func,
-                                brdpm_thrd_td.arg,
-                                brdpm_thrd_td.stack_size,
-                                brdpm_thrd_td.prio,
-                                brdpm_thrd_td.attr);
+        rc = xwos_thrd_create(&brdpm_thrd_id,
+                              brdpm_thrd_td.name,
+                              brdpm_thrd_td.func,
+                              brdpm_thrd_td.arg,
+                              brdpm_thrd_td.stack_size,
+                              brdpm_thrd_td.prio,
+                              brdpm_thrd_td.attr);
         if (rc < 0) {
                 goto err_thrd_create;
         }
         return XWOK;
 
 err_thrd_create:
-        xwosal_smr_destroy(&brdpm_smr);
-err_smr_init:
+        xwos_sem_destroy(&brdpm_sem);
+err_sem_init:
         return rc;
 }
 
@@ -158,14 +156,14 @@ xwer_t brdpm_stop(void)
 {
         xwer_t rc, trc;
 
-        rc = xwosal_thrd_terminate(brdpm_thrd_id, &trc);
+        rc = xwos_thrd_terminate(brdpm_thrd_id, &trc);
         if (XWOK == rc) {
-                rc = xwosal_thrd_delete(brdpm_thrd_id);
+                rc = xwos_thrd_delete(brdpm_thrd_id);
                 if (XWOK == rc) {
                         brdpm_thrd_id = 0;
                 }
         }
-        xwosal_smr_destroy(&brdpm_smr);
+        xwos_sem_destroy(&brdpm_sem);
         return rc;
 }
 
@@ -184,32 +182,28 @@ void brdpm_resume(void)
 }
 
 /* static */
-/* void brdpmdm_resume(struct xwos_pmdm * pmdm, void * arg) */
+/* void xwospl_pm_cb_resume(void * arg) */
 /* { */
-/*         XWOS_UNUSED(pmdm); */
 /*         XWOS_UNUSED(arg); */
 /*         stm32cube_pm_resume(); */
 /* } */
 
 /* static */
-/* void brdpmdm_suspend(struct xwos_pmdm * pmdm, void * arg) */
+/* void xwospl_pm_cb_suspend(void * arg) */
 /* { */
-/*         XWOS_UNUSED(pmdm); */
 /*         XWOS_UNUSED(arg); */
 /*         stm32cube_pm_suspend(); */
 /* } */
 /* static */
-/* void brdpmdm_wakeup(struct xwos_pmdm * pmdm, void * arg) */
+/* void xwospl_pm_cb_wakeup(void * arg) */
 /* { */
-/*         XWOS_UNUSED(pmdm); */
 /*         XWOS_UNUSED(arg); */
 /*         stm32cube_pm_wakeup(); */
 /* } */
 
 /* static */
-/* void brdpmdm_sleep(struct xwos_pmdm * pmdm, void * arg) */
+/* void xwospl_pm_cb_sleep(void * arg) */
 /* { */
-/*         XWOS_UNUSED(pmdm); */
 /*         XWOS_UNUSED(arg); */
 /*         stm32cube_pm_sleep(); */
 /* } */
@@ -218,19 +212,17 @@ static
 xwer_t brdpm_get_btn_evt(xwsq_t * evt)
 {
         xwer_t rc;
-        xwid_t smrid;
         xwsq_t in;
         xwsq_t cnt;
         xwtm_t time;
 
-        smrid = xwosal_smr_get_id(&brdpm_smr);
-        rc = xwosal_smr_wait(smrid);
+        rc = xwos_sem_wait(&brdpm_sem);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_smr_wait;
+                goto err_sem_wait;
         }
 
         time = PM_BTN_DEBOUNCING_DELAY;
-        rc = xwosal_cthrd_sleep(&time);
+        rc = xwos_cthrd_sleep(&time);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_sleep;
         }
@@ -246,7 +238,7 @@ xwer_t brdpm_get_btn_evt(xwsq_t * evt)
                 }
                 cnt++;
                 time = PM_BTN_DEBOUNCING_DELAY;
-                rc = xwosal_cthrd_sleep(&time);
+                rc = xwos_cthrd_sleep(&time);
                 if (__xwcc_unlikely(rc < 0)) {
                         goto err_sleep;
                 }
@@ -261,7 +253,7 @@ xwer_t brdpm_get_btn_evt(xwsq_t * evt)
 
 err_gpio_input:
 err_sleep:
-err_smr_wait:
+err_sem_wait:
         return rc;
 }
 
@@ -284,7 +276,7 @@ xwer_t brdpm_thrd_init(void)
                            PM_BTN_GPIO_PORT, PM_BTN_GPIO_PIN,
                            PM_BTN_IRQLINE,
                            XWDS_SOC_EIF_TM_FALLING | XWDS_SOC_EIF_WKUP,
-                           brdpm_eirq_btn_isr, &brdpm_smr);
+                           brdpm_eirq_btn_isr, &brdpm_sem);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_eirq_req;
         }
@@ -313,7 +305,7 @@ void brdpm_req_btn_irq(void)
         xwds_eirq_req(&stm32cube_soc_cb,
                       PM_BTN_GPIO_PORT, PM_BTN_GPIO_PIN,
                       PM_BTN_IRQLINE, XWDS_SOC_EIF_TM_FALLING | XWDS_SOC_EIF_WKUP,
-                      brdpm_eirq_btn_isr, &brdpm_smr);
+                      brdpm_eirq_btn_isr, &brdpm_sem);
 }
 
 static
@@ -333,25 +325,25 @@ void brdpm_led_blink(void)
                          PM_LED_GPIO_PORT,
                          PM_LED_GPIO_PIN);
         time = 500 * XWTM_MS;
-        xwosal_cthrd_sleep(&time);
+        xwos_cthrd_sleep(&time);
 
         xwds_gpio_toggle(&stm32cube_soc_cb,
                          PM_LED_GPIO_PORT,
                          PM_LED_GPIO_PIN);
         time = 500 * XWTM_MS;
-        xwosal_cthrd_sleep(&time);
+        xwos_cthrd_sleep(&time);
 
         xwds_gpio_toggle(&stm32cube_soc_cb,
                          PM_LED_GPIO_PORT,
                          PM_LED_GPIO_PIN);
         time = 500 * XWTM_MS;
-        xwosal_cthrd_sleep(&time);
+        xwos_cthrd_sleep(&time);
 
         xwds_gpio_toggle(&stm32cube_soc_cb,
                          PM_LED_GPIO_PORT,
                          PM_LED_GPIO_PIN);
         time = 500 * XWTM_MS;
-        xwosal_cthrd_sleep(&time);
+        xwos_cthrd_sleep(&time);
 }
 
 static
@@ -365,7 +357,7 @@ void brdpm_handle_evt(xwsq_t evt)
                 break;
         case PM_BTNEVT_LONGPRESS:
                 brdpm_led_blink();
-                /* xwos_pmdm_suspend(xwos_pmdm_get_lc()); */
+                /* xwos_pm_suspend(); */
                 break;
         default:
                 break;
@@ -385,10 +377,10 @@ xwer_t brdpm_thrd(void * arg)
                 goto err_init;
         }
 
-        while (!xwosal_cthrd_shld_stop()) {
-                if (xwosal_cthrd_shld_frz()) {
+        while (!xwos_cthrd_shld_stop()) {
+                if (xwos_cthrd_shld_frz()) {
                         brdpm_suspend();
-                        xwosal_cthrd_freeze();
+                        xwos_cthrd_freeze();
                         brdpm_resume();
                 } else {
                         rc = brdpm_get_btn_evt(&evt);
@@ -416,17 +408,12 @@ err_init:
 static
 void brdpm_eirq_btn_isr(struct xwds_soc * soc, xwid_t id, xwds_eirq_arg_t arg)
 {
-        xwid_t smrid;
-        /* struct xwos_pmdm * pmdm; */
-
         XWOS_UNUSED(soc);
         XWOS_UNUSED(id);
 
-        /* pmdm = xwos_pmdm_get_lc(); */
-        /* if (xwos_pmdm_get_stage(pmdm) < XWOS_PMDM_STAGE_RUNNING) { */
-        /*         xwos_pmdm_resume(pmdm); */
+        /* if (xwos_pm_get_stage() < XWOS_PM_STAGE_RUNNING) { */
+        /*         xwos_pm_resume(); */
         /* } */
         brdpm_rls_btn_irq();
-        smrid = xwosal_smr_get_id((struct xwosal_smr *)arg);
-        xwosal_smr_post(smrid);
+        xwos_sem_post((struct xwos_sem *)arg);
 }

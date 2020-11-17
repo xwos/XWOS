@@ -24,14 +24,14 @@
 #include <xwos/standard.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/bma.h>
-#if defined(XuanWuOS_CFG_CORE__smp)
-  #include <xwos/smp/thread.h>
-  #include <xwos/smp/swt.h>
-  #include <xwos/smp/sync/semaphore.h>
-  #include <xwos/smp/sync/condition.h>
-  #include <xwos/smp/sync/event.h>
-  #include <xwos/smp/lock/mutex.h>
-#endif /* XuanWuOS_CFG_CORE__smp */
+#if defined(XuanWuOS_CFG_CORE__mp)
+  #include <xwos/mp/thrd.h>
+  #include <xwos/mp/swt.h>
+  #include <xwos/mp/sync/sem.h>
+  #include <xwos/mp/sync/cond.h>
+  #include <xwos/mp/sync/event.h>
+  #include <xwos/mp/lock/mtx.h>
+#endif /* XuanWuOS_CFG_CORE__mp */
 #include <bdl/board_init.h>
 #include <bm/stm32cube/mif.h>
 
@@ -95,7 +95,7 @@ xwer_t sys_mm_init(void)
         }
         ocheap_bma = bma;
 
-#if defined(XuanWuOS_CFG_CORE__smp)
+#if defined(XuanWuOS_CFG_CORE__mp)
         void * mem;
         xwsz_t size;
 
@@ -119,24 +119,24 @@ xwer_t sys_mm_init(void)
                 goto err_swt_cache_init;
         }
 
-        size = sizeof(struct xwsync_smr) * 32;
+        size = sizeof(struct xwsync_sem) * 32;
         rc = xwmm_kma_alloc(size, 8, &mem);
         if (rc < 0) {
-                goto err_smr_bma_alloc;
+                goto err_sem_bma_alloc;
         }
-        rc = xwsync_smr_cache_init((xwptr_t)mem, size);
+        rc = xwsync_sem_cache_init((xwptr_t)mem, size);
         if (rc < 0) {
-                goto err_smr_cache_init;
+                goto err_sem_cache_init;
         }
 
-        size = sizeof(struct xwsync_cdt) * 32;
+        size = sizeof(struct xwsync_cond) * 32;
         rc = xwmm_kma_alloc(size, 8, &mem);
         if (rc < 0) {
-                goto err_cdt_bma_alloc;
+                goto err_cond_bma_alloc;
         }
-        rc = xwsync_cdt_cache_init((xwptr_t)mem, size);
+        rc = xwsync_cond_cache_init((xwptr_t)mem, size);
         if (rc < 0) {
-                goto err_cdt_cache_init;
+                goto err_cond_cache_init;
         }
 
         size = sizeof(struct xwsync_evt) * 32;
@@ -159,11 +159,11 @@ xwer_t sys_mm_init(void)
                 goto err_mtx_cache_init;
         }
 
-#endif /* XuanWuOS_CFG_CORE__smp */
+#endif /* XuanWuOS_CFG_CORE__mp */
 
         return XWOK;
 
-#if defined(XuanWuOS_CFG_CORE__smp)
+#if defined(XuanWuOS_CFG_CORE__mp)
 err_mtx_cache_init:
         BDL_BUG();
 err_mtx_bma_alloc:
@@ -172,13 +172,13 @@ err_evt_cache_init:
         BDL_BUG();
 err_evt_bma_alloc:
         BDL_BUG();
-err_cdt_cache_init:
+err_cond_cache_init:
         BDL_BUG();
-err_cdt_bma_alloc:
+err_cond_bma_alloc:
         BDL_BUG();
-err_smr_cache_init:
+err_sem_cache_init:
         BDL_BUG();
-err_smr_bma_alloc:
+err_sem_bma_alloc:
         BDL_BUG();
 err_swt_cache_init:
         BDL_BUG();
@@ -188,7 +188,7 @@ err_tcb_cache_init:
         BDL_BUG();
 err_tcb_bma_alloc:
         BDL_BUG();
-#endif /* XuanWuOS_CFG_CORE__smp */
+#endif /* XuanWuOS_CFG_CORE__mp */
 err_ocheap_bma_create:
         BDL_BUG();
         return rc;

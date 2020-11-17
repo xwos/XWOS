@@ -24,8 +24,9 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/crc32.h>
+#include <xwos/osal/skd.h>
 #include <xwos/osal/lock/spinlock.h>
-#include <xwos/osal/lock/mutex.h>
+#include <xwos/osal/lock/mtx.h>
 #include <bm/stm32cube/cubemx/Core/Inc/crc.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -39,33 +40,34 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-struct xwosal_splk stm32cube_crc_splk;
-struct xwosal_mtx stm32cube_crc_mtx;
+struct xwos_splk stm32cube_crc_splk;
+struct xwos_mtx stm32cube_crc_mtx;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********      function implementations       ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 void stm32cube_crc_init(void)
 {
-        xwosal_splk_init(&stm32cube_crc_splk);
-        xwosal_mtx_init(&stm32cube_crc_mtx, XWOSAL_SD_PRIORITY_RT_MAX);
+        xwos_splk_init(&stm32cube_crc_splk);
+        xwos_mtx_init(&stm32cube_crc_mtx, XWOS_SKD_PRIORITY_RT_MAX);
 }
 
 xwer_t stm32cube_crc_lock(xwreg_t * cpuirq)
 {
-        xwid_t mid;
         xwsq_t ctx;
         xwer_t rc;
 
-        xwos_scheduler_get_context_lc(&ctx, NULL);
-        if (XWOS_SCHEDULER_CONTEXT_THRD == ctx) {
-                mid = xwosal_mtx_get_id(&stm32cube_crc_mtx);
-                rc = xwosal_mtx_lock(mid);
-        } else if (XWOS_SCHEDULER_CONTEXT_ISR == ctx) {
-                xwosal_splk_lock_cpuirqsv(&stm32cube_crc_splk, cpuirq);
+        xwos_skd_get_context_lc(&ctx, NULL);
+        if (XWOS_SKD_CONTEXT_THRD == ctx) {
+                rc = xwos_mtx_lock(&stm32cube_crc_mtx);
+        } else if (XWOS_SKD_CONTEXT_ISR == ctx) {
+                xwos_splk_lock_cpuirqsv(&stm32cube_crc_splk, cpuirq);
                 rc = XWOK;
-        } else if (XWOS_SCHEDULER_CONTEXT_BH == ctx) {
-                xwosal_splk_lock_cpuirq(&stm32cube_crc_splk);
+        } else if (XWOS_SKD_CONTEXT_BH == ctx) {
+                xwos_splk_lock_cpuirq(&stm32cube_crc_splk);
+                rc = XWOK;
+        } else if (XWOS_SKD_CONTEXT_IDLE == ctx) {
+                xwos_splk_lock_cpuirq(&stm32cube_crc_splk);
                 rc = XWOK;
         } else {
                 rc = XWOK;
@@ -75,19 +77,20 @@ xwer_t stm32cube_crc_lock(xwreg_t * cpuirq)
 
 xwer_t stm32cube_crc_unlock(xwreg_t cpuirq)
 {
-        xwid_t mid;
         xwsq_t ctx;
         xwer_t rc;
 
-        xwos_scheduler_get_context_lc(&ctx, NULL);
-        if (XWOS_SCHEDULER_CONTEXT_THRD == ctx) {
-                mid = xwosal_mtx_get_id(&stm32cube_crc_mtx);
-                rc = xwosal_mtx_unlock(mid);
-        } else if (XWOS_SCHEDULER_CONTEXT_ISR == ctx) {
-                xwosal_splk_unlock_cpuirqrs(&stm32cube_crc_splk, cpuirq);
+        xwos_skd_get_context_lc(&ctx, NULL);
+        if (XWOS_SKD_CONTEXT_THRD == ctx) {
+                rc = xwos_mtx_unlock(&stm32cube_crc_mtx);
+        } else if (XWOS_SKD_CONTEXT_ISR == ctx) {
+                xwos_splk_unlock_cpuirqrs(&stm32cube_crc_splk, cpuirq);
                 rc = XWOK;
-        } else if (XWOS_SCHEDULER_CONTEXT_BH == ctx) {
-                xwosal_splk_unlock_cpuirq(&stm32cube_crc_splk);
+        } else if (XWOS_SKD_CONTEXT_BH == ctx) {
+                xwos_splk_unlock_cpuirq(&stm32cube_crc_splk);
+                rc = XWOK;
+        } else if (XWOS_SKD_CONTEXT_IDLE == ctx) {
+                xwos_splk_unlock_cpuirq(&stm32cube_crc_splk);
                 rc = XWOK;
         } else {
                 rc = XWOK;

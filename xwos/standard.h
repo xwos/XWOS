@@ -24,10 +24,10 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <cfg/XuanWuOS.h>
-#include <xwos/rule.h>
-#include <xwos/compiler.h>
-#include <xwos/version.h>
-#include <xwos/type.h>
+#include <xwos/lib/rule.h>
+#include <xwos/lib/compiler.h>
+#include <xwos/lib/version.h>
+#include <xwos/lib/type.h>
 #include <xwos/lib/rule.h>
 #include <xwos/lib/error.h>
 
@@ -57,7 +57,7 @@
 
 #if defined(XWKNCFG_BUG) && (1 == XWKNCFG_BUG)
   #if defined(ARCHCFG_BKPT) && (1 == ARCHCFG_BKPT)
-  #define XWOS_BUG()            arch_bkpt()
+    #define XWOS_BUG()          arch_bkpt()
   #else
     #define XWOS_BUG()          do {} while (1)
   #endif
@@ -72,9 +72,9 @@
 #define XWOS_UNUSED(x)          ((void)(x))     /**< 去除未使用变量的警告 */
 
 #if defined(XWKNCFG_CHECK_PARAMETERS) && (1 == XWKNCFG_CHECK_PARAMETERS)
-  #define XWOS_VALIDATE(exp, errstr, ...) \
-          if (__xwcc_unlikely((!(exp)))) {     \
-              return __VA_ARGS__; \
+  #define XWOS_VALIDATE(exp, errstr, ...)       \
+          if (__xwcc_unlikely((!(exp)))) {      \
+              return __VA_ARGS__;               \
           }
 #else /* XWKNCFG_CHECK_PARAMETERS */
   #define XWOS_VALIDATE(exp, errstr, ...)
@@ -93,5 +93,24 @@
     #error "Unkown CPU bits!"
   #endif
 #endif /* !ARCHCFG_PTRSIZE */
+
+/**
+ * @brief 中断向量表限定词
+ */
+#if defined(SOCCFG_RO_ISRTABLE) && (1 == SOCCFG_RO_ISRTABLE)
+  #define __soc_isr_table_qualifier const
+#else /* SOCCFG_RO_ISRTABLE */
+  #define __soc_isr_table_qualifier
+#endif /* !SOCCFG_RO_ISRTABLE */
+
+/**
+ * @brief 玄武OS的中断数量
+ */
+#define XWOS_IRQ_NUM            (ARCHCFG_IRQ_NUM + SOCCFG_IRQ_NUM)
+
+/**
+ * @brief 玄武OS的中断号
+ */
+#define XWOS_IRQ(x)     ((xwirq_t)x)
 
 #endif /* xwos/standard.h */

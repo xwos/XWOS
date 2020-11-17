@@ -23,8 +23,8 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
 #include <xwos/osal/lock/spinlock.h>
-#include <xwos/osal/sync/condition.h>
-#include <xwmd/ds/i2c/master.h>
+#include <xwos/osal/sync/cond.h>
+#include <xwcd/ds/i2c/master.h>
 #include <bm/stm32cube/cubemx/Core/Inc/i2c.h>
 #include <bm/stm32cube/xwac/xwds/device.h>
 #include <bm/stm32cube/xwac/xwds/i2cm.h>
@@ -46,13 +46,13 @@ xwer_t stm32cube_i2c2m_drv_start(struct xwds_device * dev);
 static
 xwer_t stm32cube_i2c2m_drv_stop(struct xwds_device * dev);
 
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
 xwer_t stm32cube_i2c2m_drv_suspend(struct xwds_device * dev);
 
 static
 xwer_t stm32cube_i2c2m_drv_resume(struct xwds_device * dev);
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
 
 static
 xwer_t stm32cube_i2c2m_drv_xfer(struct xwds_i2cm * i2cm,
@@ -74,10 +74,10 @@ const struct xwds_i2cm_driver stm32cube_i2c2m_drv = {
                 .remove = NULL,
                 .start = stm32cube_i2c2m_drv_start,
                 .stop = stm32cube_i2c2m_drv_stop,
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
                 .suspend = stm32cube_i2c2m_drv_suspend,
                 .resume =  stm32cube_i2c2m_drv_resume,
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
         },
         .xfer = stm32cube_i2c2m_drv_xfer,
         .abort = stm32cube_i2c2m_drv_abort,
@@ -89,7 +89,7 @@ struct xwds_i2cm stm32cube_i2c2m_cb = {
                 .name = "stm32cube.i2c.2",
                 .id = 2,
                 .resources = NULL,
-                .drv = xwds_static_cast(struct xwds_driver *, &stm32cube_i2c2m_drv),
+                .drv = xwds_cast(struct xwds_driver *, &stm32cube_i2c2m_drv),
                 .data = (void *)&hi2c2_drvdata,
         },
         .xwccfg = NULL,
@@ -105,7 +105,7 @@ xwer_t stm32cube_i2c2m_drv_start(struct xwds_device * dev)
         struct xwds_i2cm * i2cm;
         struct MX_I2C_MasterDriverData * drvdata;
 
-        i2cm = xwds_static_cast(struct xwds_i2cm *, dev);
+        i2cm = xwds_cast(struct xwds_i2cm *, dev);
         drvdata = i2cm->dev.data;
         drvdata->i2cm = i2cm;
 
@@ -122,7 +122,7 @@ xwer_t stm32cube_i2c2m_drv_stop(struct xwds_device * dev)
         return XWOK;
 }
 
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
 xwer_t stm32cube_i2c2m_drv_resume(struct xwds_device * dev)
 {
@@ -134,7 +134,7 @@ xwer_t stm32cube_i2c2m_drv_suspend(struct xwds_device * dev)
 {
         return stm32cube_i2c2m_drv_stop(dev);
 }
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
 
 static
 xwer_t stm32cube_i2c2m_drv_xfer(struct xwds_i2cm * i2cm,
@@ -143,7 +143,7 @@ xwer_t stm32cube_i2c2m_drv_xfer(struct xwds_i2cm * i2cm,
 {
         struct MX_I2C_MasterDriverData * drvdata;
         xwu32_t addm;
-        union xwlk_ulock ulk;
+        union xwos_ulock ulk;
         xwreg_t cpuirq;
         xwsq_t lkst;
         xwer_t rc;
@@ -154,29 +154,29 @@ xwer_t stm32cube_i2c2m_drv_xfer(struct xwds_i2cm * i2cm,
         }
         drvdata = i2cm->dev.data;
         ulk.osal.splk = &drvdata->splk;
-        xwosal_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+        xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
         drvdata->rc = -EINPROGRESS;
         drvdata->msg = msg;
         rc = MX_I2C2_Xfer(msg);
         if (XWOK == rc) {
-                rc = xwosal_cdt_timedwait(xwosal_cdt_get_id(&drvdata->cdt),
-                                          ulk, XWLK_TYPE_SPLK, NULL,
-                                          xwtm, &lkst);
+                rc = xwos_cond_timedwait(&drvdata->cond,
+                                         ulk, XWOS_LK_SPLK, NULL,
+                                         xwtm, &lkst);
                 if (XWOK == rc) {
-                        if (XWLK_STATE_UNLOCKED == lkst) {
-                                xwosal_splk_lock(&drvdata->splk);
+                        if (XWOS_LKST_UNLOCKED == lkst) {
+                                xwos_splk_lock(&drvdata->splk);
                         }
                         rc = drvdata->rc;
                 } else {
-                        if (XWLK_STATE_UNLOCKED == lkst) {
-                                xwosal_splk_lock(&drvdata->splk);
+                        if (XWOS_LKST_UNLOCKED == lkst) {
+                                xwos_splk_lock(&drvdata->splk);
                         }
                         drvdata->rc = -ECANCELED;
                 }
         } else {
                 drvdata->rc = -ECANCELED;
         }
-        xwosal_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+        xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
         return rc;
 }
 
@@ -204,11 +204,11 @@ void stm32cube_i2c2m_cb_xfercplt(struct xwds_i2cm * i2cm, xwer_t xrc)
         xwreg_t cpuirq;
 
         drvdata = i2cm->dev.data;
-        xwosal_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
+        xwos_splk_lock_cpuirqsv(&drvdata->splk, &cpuirq);
         if (-ECANCELED != drvdata->rc) {
                 drvdata->rc = xrc;
         } else {
         }
-        xwosal_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
-        xwosal_cdt_broadcast(xwosal_cdt_get_id(&drvdata->cdt));
+        xwos_splk_unlock_cpuirqrs(&drvdata->splk, cpuirq);
+        xwos_cond_broadcast(&drvdata->cond);
 }

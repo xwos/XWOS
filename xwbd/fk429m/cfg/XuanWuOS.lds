@@ -38,10 +38,8 @@ MEMORY {
                                                        .xwos.isr.text &
                                                        .xwos.text &
                                                        .xwos.rodata &
-                                                       .xwmd.isr.text &
-                                                       .xwmd.text &
-                                                       .xwmd.rodata &
-                                                       .text & .rodata */
+                                                       .text &
+                                                       .rodata */
         stkmempool_mr (arw): org = 0x20000000, len = 128k /* .stkmempool */
         data_mr (arw): org = 0x20020000, len = 64k /* .data, .bss & .heap */
         xwos_data_mr (arw): org = 0x10000000, len = 24k /* .xwos.data */

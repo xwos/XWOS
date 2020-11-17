@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Flash base driver
+ * @brief SOC描述层：MPC560xB Flash
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

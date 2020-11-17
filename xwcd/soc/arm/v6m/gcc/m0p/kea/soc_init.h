@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC初始化
+ * @brief SOC描述层：初始化
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -42,9 +42,9 @@ struct soc_flash_cfgs {
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_init_code
-void soc_init(void);
+void soc_lowlevel_init(void);
 
 __xwbsp_init_code
-void soc_lowlevel_init(void);
+void soc_init(void);
 
 #endif /* soc_init.h */

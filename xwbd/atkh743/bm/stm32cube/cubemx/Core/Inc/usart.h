@@ -35,8 +35,8 @@
 /* USER CODE BEGIN Includes */
 #include <bm/stm32cube/standard.h>
 #include <xwos/osal/lock/spinlock.h>
-#include <xwos/osal/sync/condition.h>
-#include <xwmd/ds/uart/dma.h>
+#include <xwos/osal/sync/cond.h>
+#include <xwcd/ds/uart/dma.h>
 
 /* USER CODE END Includes */
 
@@ -50,8 +50,8 @@ struct MX_UART_DriverData {
   UART_HandleTypeDef * halhdl;
   struct xwds_dmauartc * dmauartc;
   struct {
-    struct xwosal_cdt cdt; /**< 条件量 */
-    struct xwosal_splk splk; /**< 保证发送状态只被单一上下文访问的锁 */
+    struct xwos_cond cond; /**< 条件量 */
+    struct xwos_splk splk; /**< 保证发送状态只被单一上下文访问的锁 */
     xwer_t rc; /**< 返回值 */
     xwu8_t mem[HAL_UART_TXMEM_MAXSIZE] __xwcc_aligned_l1cacheline; /**< 发送缓冲区 */
     xwu32_t size; /**< 待发送的数据大小 */

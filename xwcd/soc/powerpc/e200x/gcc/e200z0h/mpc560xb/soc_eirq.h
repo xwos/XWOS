@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief MPC560xB External IRQs
+ * @brief SOC描述层：MPC560xB External IRQs
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

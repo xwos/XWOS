@@ -25,6 +25,7 @@
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
+#include <xwos/ospl/syshwt.h>
 #include <arch_irq.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -35,24 +36,14 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       types       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-struct xwos_syshwt;
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwbsp_code
-xwer_t arch_systick_init(struct xwos_syshwt * hwt);
-
-__xwbsp_isr
-void arch_systick_isr(void);
-
-__xwbsp_code
-xwer_t arch_systick_start(struct xwos_syshwt * hwt);
-
-__xwbsp_code
-xwer_t arch_systick_stop(struct xwos_syshwt * hwt);
-
-__xwbsp_code
-xwtm_t arch_systick_get_timeconfetti(struct xwos_syshwt * hwt);
+xwer_t arch_systick_init(struct xwospl_syshwt * hwt);
+xwer_t arch_systick_start(struct xwospl_syshwt * hwt);
+xwer_t arch_systick_stop(struct xwospl_syshwt * hwt);
+xwtm_t arch_systick_get_timeconfetti(struct xwospl_syshwt * hwt);
+void arch_isr_systick(void);
 
 #endif /* arch_systick.h */

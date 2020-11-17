@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief mpc560xb Flash
+ * @brief SOC描述层：MPC560xB Flash
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -58,28 +58,17 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-__xwbsp_code
 void soc_cflash_select(xwsq_t lmsmsk, xwsq_t hsmsk);
-
-__flsopc
 void soc_cflash_erase(xwsq_t lmsmsk, xwsq_t hsmsk);
-
-__flsopc
 void soc_cflash_program(xwu32_t * addr, xwu32_t data0, xwu32_t data1);
 
 #if defined(SOCCFG_FLASH_SHADOW_BLOCK) && (1 == SOCCFG_FLASH_SHADOW_BLOCK)
-__xwbsp_code
 void soc_cflash_erase_shadow_block(void);
-
-__xwbsp_code
 void soc_cflash_program_shadow_test_block(xwu32_t * addr, xwu32_t data0, xwu32_t data1);
 #endif
 /* #if defined(SOCCFG_FLASH_SHADOW_BLOCK) && (1 == SOCCFG_FLASH_SHADOW_BLOCK) */
 
-__xwbsp_code
 void soc_cflash_lock(void);
-
-__xwbsp_code
 void soc_flsopc_relocate(void);
 
 #endif /* soc_flash.h */

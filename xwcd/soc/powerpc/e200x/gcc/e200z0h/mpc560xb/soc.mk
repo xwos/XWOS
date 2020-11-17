@@ -23,7 +23,7 @@ SOC_EOBJS :=
 SOC_CSRCS :=
 SOC_ASRCS :=
 
-SOC_ASRCS += soc_eii_isr.S asm_sched.S
+SOC_ASRCS += soc_eii_isr.S ospl_skd_asmimpl.S
 
 SOC_CSRCS += soc_init.c
 SOC_CSRCS += soc_me.c
@@ -32,43 +32,14 @@ ifeq ($(SOCCFG_FLASH_OPCODE),y)
 endif
 SOC_CSRCS += soc_wdg.c
 SOC_CSRCS += soc_reset.c
-SOC_CSRCS += soc_irq.c
-SOC_CSRCS += soc_syshwt.c
-SOC_CSRCS += soc_sched.c
+SOC_CSRCS += ospl_irq_impl.c
+SOC_CSRCS += ospl_syshwt_impl.c
+SOC_CSRCS += ospl_skd_impl.c
 
 
-ifeq ($(XuanWuOS_CFG_CORE),smp)
-    SOC_CSRCS += soc_xwpmdm.c
-    SOC_CSRCS += soc_smp_irqc.c
-    SOC_CSRCS += soc_smp_irqc_drv.c
+ifeq ($(XuanWuOS_CFG_CORE),mp)
+    SOC_CSRCS += soc_mp_irqc.c
+    SOC_CSRCS += soc_mp_irqc_drv.c
 else
     SOC_CSRCS += soc_up_irqc_drv.c
-endif
-
-ifeq ($(XuanWuOS_CFG_XWMD),y)
-    ifeq ($(XWMDCFG_ds),y)
-        ifeq ($(XWMDCFG_ds_SOC),y)
-            SOC_CSRCS += driver/ds/soc.c
-        endif
-        ifeq ($(XWMDCFG_ds_CLK),y)
-            SOC_CSRCS += driver/ds/clk.c
-        endif
-        ifeq ($(XWMDCFG_ds_GPIO),y)
-            SOC_CSRCS += driver/ds/gpio.c
-        endif
-        ifeq ($(XWMDCFG_ds_UART),y)
-            ifeq ($(XWMDCFG_ds_UART_GNR),y)
-                SOC_CSRCS += driver/ds/uartc.c
-            endif
-            ifeq ($(XWMDCFG_ds_UART_DMA),y)
-                SOC_CSRCS += driver/ds/dmauart0.c
-            endif
-        endif
-        ifeq ($(XWMDCFG_ds_MISC),y)
-            SOC_CSRCS += driver/ds/rtc.c
-        endif
-        ifeq ($(XWMDCFG_ds_I2C_MASTER),y)
-            SOC_CSRCS += driver/ds/i2cm.c
-        endif
-    endif
 endif

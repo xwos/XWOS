@@ -136,7 +136,7 @@ xwer_t xwmm_mempool_page_allocator_init(struct xwmm_mempool_page_allocator * pa,
                 pa->odrbtree[i].leftmost = NULL;
                 pa->odrbtree[i].owner = pa;
                 pa->odrbtree[i].order = i;
-                xwosal_sqlk_init(&pa->odrbtree[i].lock);
+                xwos_sqlk_init(&pa->odrbtree[i].lock);
         }
         for (i = 0; i < nr; i++) {
                 pa->pgarray[i].order = XWMM_MEMPOOL_PAGE_ORDER_CMB;
@@ -443,7 +443,7 @@ xwer_t xwmm_mempool_page_odrbtree_add(struct xwmm_mempool_page_odrbtree * ot,
         }
 
         pg->order = ot->order;
-        xwosal_sqlk_wr_lock_cpuirqsv(&ot->lock, &flag);
+        xwos_sqlk_wr_lock_cpuirqsv(&ot->lock, &flag);
         pg->mapping = XWMM_MEMPOOL_PAGE_MAPPING_FREE;
         new = &tree->root;
         lpc = (xwptr_t)new;
@@ -474,7 +474,7 @@ xwer_t xwmm_mempool_page_odrbtree_add(struct xwmm_mempool_page_odrbtree * ot,
         }
         xwlib_rbtree_link(&pg->attr.free.rbnode, lpc);
         xwlib_rbtree_insert_color(tree, &pg->attr.free.rbnode);
-        xwosal_sqlk_wr_unlock_cpuirqrs(&ot->lock, flag);
+        xwos_sqlk_wr_unlock_cpuirqrs(&ot->lock, flag);
         return XWOK;
 
 err_exist:
@@ -506,7 +506,7 @@ xwer_t xwmm_mempool_page_odrbtree_remove(struct xwmm_mempool_page_odrbtree * ot,
                 goto err_odrerr;
         }
 
-        xwosal_sqlk_wr_lock_cpuirqsv(&ot->lock, &flag);
+        xwos_sqlk_wr_lock_cpuirqsv(&ot->lock, &flag);
         if (pg->mapping) {
                 rc = -EBUSY;
                 goto err_notfree;
@@ -525,12 +525,12 @@ xwer_t xwmm_mempool_page_odrbtree_remove(struct xwmm_mempool_page_odrbtree * ot,
                 }
         }
         xwlib_rbtree_remove(tree, &pg->attr.free.rbnode);
-        xwosal_sqlk_wr_unlock_cpuirqrs(&ot->lock, flag);
+        xwos_sqlk_wr_unlock_cpuirqrs(&ot->lock, flag);
         xwlib_rbtree_init_node(&pg->attr.free.rbnode);
         return XWOK;
 
 err_notfree:
-        xwosal_sqlk_wr_unlock_cpuirqrs(&ot->lock, flag);
+        xwos_sqlk_wr_unlock_cpuirqrs(&ot->lock, flag);
 err_odrerr:
         return rc;
 }
@@ -552,10 +552,10 @@ xwmm_mempool_page_odrbtree_choose(struct xwmm_mempool_page_odrbtree * ot)
         struct xwlib_rbtree_node * s;
 
         tree = &ot->tree;
-        xwosal_sqlk_wr_lock_cpuirqsv(&ot->lock, &flag);
+        xwos_sqlk_wr_lock_cpuirqsv(&ot->lock, &flag);
         leftmost = ot->leftmost;
         if (!leftmost) {
-                xwosal_sqlk_wr_unlock_cpuirqrs(&ot->lock, flag);
+                xwos_sqlk_wr_unlock_cpuirqrs(&ot->lock, flag);
                 goto err_empty;
         }
         leftmost->mapping = XWMM_MEMPOOL_PAGE_MAPPING_INVAILD;
@@ -570,7 +570,7 @@ xwmm_mempool_page_odrbtree_choose(struct xwmm_mempool_page_odrbtree * ot)
                 ot->leftmost = NULL;
         }
         xwlib_rbtree_remove(tree, &leftmost->attr.free.rbnode);
-        xwosal_sqlk_wr_unlock_cpuirqrs(&ot->lock, flag);
+        xwos_sqlk_wr_unlock_cpuirqrs(&ot->lock, flag);
 
         xwlib_rbtree_init_node(&leftmost->attr.free.rbnode);
         return leftmost;

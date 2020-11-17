@@ -39,7 +39,7 @@
  * @note
  * + 确保链接时使用此符号的文件。
  */
-void * const stm32cube_linkage_placeholder[] = {
+void * const stm32cube_linkage_table[] = {
         stm32cube_override_linkage_msp,
         stm32cube_override_linkage_it,
 };

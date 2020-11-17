@@ -23,9 +23,9 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <string.h>
-#include <xwmd/ds/device.h>
-#include <xwmd/ds/soc/gpio.h>
-#include <xwmd/ds/i2c/perpheral.h>
+#include <xwcd/ds/device.h>
+#include <xwcd/ds/soc/gpio.h>
+#include <xwcd/ds/i2c/perpheral.h>
 #include <xwcd/perpheral/i2c/eeprom/device.h>
 #include <xwcd/perpheral/i2c/eeprom/driver.h>
 
@@ -69,10 +69,10 @@ const struct xwds_eeprom_driver at24sd_drv = {
                         .remove = NULL,
                         .start = xwds_eeprom_drv_start,
                         .stop = xwds_eeprom_drv_stop,
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
                         .suspend = xwds_eeprom_drv_suspend,
                         .resume =  xwds_eeprom_drv_resume,
-#endif /* XWMDCFG_ds_PM */
+#endif /* XWCDCFG_ds_PM */
                 },
                 .ioctl = NULL,
         },

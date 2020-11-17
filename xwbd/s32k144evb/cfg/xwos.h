@@ -22,13 +22,13 @@
 #define __cfg_xwos_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********        general Configuration        ******** ********
+ ******** ********        Common Configurations        ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWKNCFG_CHECK_PARAMETERS                        0
 #define XWKNCFG_BUG                                     1
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         xwlib Configuration         ******** ********
+ ******** ********         xwlib Configurations        ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWLIBCFG_LOG                                    0
 #define XWLIBCFG_XWLOG_LEVEL                            (0U)
@@ -69,7 +69,7 @@
 #define XWLIBCFG_CRC8_0X9B                              0
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ********        general memory management Configuration        ********
+ ******** ********   Memory Management Configurations  ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** common ********/
 #define XWMMCFG_ALIGNMENT                               (8U)
@@ -89,68 +89,68 @@
 #define XWMMCFG_MEMPOOL                                 0
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********          SMP Configuration          ******** ********
+ ******** ********          MP Configurations          ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** irqc ******** ******** ********/
 
 /******** ******** ******** syshwt ******** ******** ********/
-#define XWSMPCFG_SYSHWT_PERIOD                          ((xwtm_t)1000000)
+#define XWMPCFG_SYSHWT_PERIOD                           ((xwtm_t)1000000)
 
 /******** ******** ******** memory management ******** ******** ********/
 
 /******** ******** ******** scheduler ******** ******** ********/
-#define XWSMPCFG_SD_PRIORITY_RT_NUM                     (8U)
-#define XWSMPCFG_SD_IDLE_STACK_SIZE                     (1024U)
-#define XWSMPCFG_SD_BH                                  0
-#define XWSMPCFG_SD_BH_STACK_SIZE                       (2048U)
-#define XWSMPCFG_SD_TCB_MEMSLICE                        0
-#define XWSMPCFG_SD_SWT                                 1
-#define XWSMPCFG_SD_SWT_MEMSLICE                        0
+#define XWMPCFG_SKD_PRIORITY_RT_NUM                     (8U)
+#define XWMPCFG_SKD_IDLE_STACK_SIZE                     (2048U)
+#define XWMPCFG_SKD_BH                                  0
+#define XWMPCFG_SKD_BH_STACK_SIZE                       (2048U)
+#define XWMPCFG_SKD_TCB_MEMSLICE                        0
+#define XWMPCFG_SKD_SWT                                 1
+#define XWMPCFG_SKD_SWT_MEMSLICE                        0
 
 /******** ******** ******** sync ******** ******** ********/
-#define XWSMPCFG_SYNC_PLSMR                             1
-#define XWSMPCFG_SYNC_RTSMR                             1
-#define XWSMPCFG_SYNC_SMR_MEMSLICE                      0
+#define XWMPCFG_SYNC_PLSEM                              1
+#define XWMPCFG_SYNC_RTSEM                              1
+#define XWMPCFG_SYNC_SEM_MEMSLICE                       0
 
-#define XWSMPCFG_SYNC_CDT_MEMSLICE                      0
+#define XWMPCFG_SYNC_COND_MEMSLICE                      0
 
-#define XWSMPCFG_SYNC_EVT                               1
-#define XWSMPCFG_SYNC_EVT_MAXNUM                        32
-#define XWSMPCFG_SYNC_EVT_MEMSLICE                      0
+#define XWMPCFG_SYNC_EVT                                1
+#define XWMPCFG_SYNC_EVT_MAXNUM                         32
+#define XWMPCFG_SYNC_EVT_MEMSLICE                       0
 
 /******** ******** ******** lock ******** ******** ********/
-#define XWSMPCFG_LOCK_MTX_MEMSLICE                      0
+#define XWMPCFG_LOCK_MTX_MEMSLICE                       0
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ********          UP Configuration           ******** ********
+ ******** ********          UP Configurations          ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** irqc ******** ******** ********/
 
 /******** ******** ******** syshwt ******** ******** ********/
-/* #define XWUPCFG_SYSHWT_PERIOD                           ((xwtm_t)1000000) */
+/* #define XWUPCFG_SYSHWT_PERIOD                        ((xwtm_t)1000000) */
 
 /******** ******** ******** memory management ******** ******** ********/
 
 /******** ******** ******** scheduler ******** ******** ********/
-/* #define XWUPCFG_SD_PRIORITY_RT_NUM                      (4U) */
-/* #define XWUPCFG_SD_IDLE_STACK_SIZE                      (512U) */
-/* #define XWUPCFG_SD_BH                                   1 */
-/* #define XWUPCFG_SD_BH_STACK_SIZE                        (1024U) */
-/* #define XWUPCFG_SD_PM                                   1 */
-/* #define XWUPCFG_SD_THRD_EXIT                            1 */
-/* #define XWUPCFG_SD_SWT                                  1 */
+/* #define XWUPCFG_SKD_PRIORITY_RT_NUM                  (4U) */
+/* #define XWUPCFG_SKD_IDLE_STACK_SIZE                  (1536U) */
+/* #define XWUPCFG_SKD_BH                               1 */
+/* #define XWUPCFG_SKD_BH_STACK_SIZE                    (2048U) */
+/* #define XWUPCFG_SKD_PM                               1 */
+/* #define XWUPCFG_SKD_THRD_EXIT                        1 */
+/* #define XWUPCFG_SKD_SWT                              1 */
 
 /******** ******** ******** sync ******** ******** ********/
-/* #define XWUPCFG_SYNC_PLSMR                              1 */
-/* #define XWUPCFG_SYNC_RTSMR                              1 */
+/* #define XWUPCFG_SYNC_PLSEM                           1 */
+/* #define XWUPCFG_SYNC_RTSEM                           1 */
 
-/* #define XWUPCFG_SYNC_CDT                                1 */
+/* #define XWUPCFG_SYNC_COND                            1 */
 
-/* #define XWUPCFG_SYNC_EVT                                1 */
-/* #define XWUPCFG_SYNC_EVT_MAXNUM                         32 */
+/* #define XWUPCFG_SYNC_EVT                             1 */
+/* #define XWUPCFG_SYNC_EVT_MAXNUM                      32 */
 
 /******** ******** ******** lock ******** ******** ********/
-/* #define XWUPCFG_LOCK_MTX                                1 */
-/* #define XWUPCFG_LOCK_FAKEMTX                            0 */
+/* #define XWUPCFG_LOCK_MTX                             1 */
+/* #define XWUPCFG_LOCK_FAKEMTX                         0 */
 
 #endif /* cfg/xwos.h */

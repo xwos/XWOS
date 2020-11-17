@@ -24,9 +24,9 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********     XWOS misc     ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define BRDCFG_XWSD_IDLE_HOOK                   1
-#define BRDCFG_XWSD_SYSHWT_HOOK                 0
-#define BRDCFG_XWSD_THRD_STACK_POOL             0
+#define BRDCFG_XWSKD_IDLE_HOOK                  1
+#define BRDCFG_XWSKD_SYSHWT_HOOK                0
+#define BRDCFG_XWSKD_THRD_STACK_POOL            0
 #define BRDCFG_LOG                              0
 
 /******** ******** ******** ******** ******** ******** ******** ********

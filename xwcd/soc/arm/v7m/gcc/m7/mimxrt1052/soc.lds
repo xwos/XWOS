@@ -62,9 +62,6 @@ SECTIONS {
                 *(.xwos.isr.text)
                 *(.xwos.text)
                 *(.xwos.rodata)
-                *(.xwmd.isr.text)
-                *(.xwmd.text)
-                *(.xwmd.rodata)
         } > code_mr
 
         .rx : ALIGN(8) {
@@ -180,15 +177,6 @@ SECTIONS {
         } > data_mr AT> code_mr
         xwos_data_vma_base = ADDR(.xwos.data);
         xwos_data_lma_base = LOADADDR(.xwos.data);
-
-        .xwmd.data : ALIGN(8) {
-                FILL(0xFF)
-                *(.xwmd.data)
-                . = ALIGN(8);
-                xwmd_data_vma_end = .;
-        } > data_mr AT> code_mr
-        xwmd_data_vma_base = ADDR(.xwmd.data);
-        xwmd_data_lma_base = LOADADDR(.xwmd.data);
 
         .data : ALIGN(8) {
                 FILL(0xFF)

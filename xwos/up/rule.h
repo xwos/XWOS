@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS内核：编译规则
+ * @brief 玄武OS UP内核：编译规则
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,46 +21,46 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       rules       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#if defined(XWUPCFG_SD_THRD_EXIT) && (1 == XWUPCFG_SD_THRD_EXIT)
-  #if !defined(XWUPCFG_SYNC_CDT) || (0 == XWUPCFG_SYNC_CDT)
-    #error "XWUPCFG_SYNC_CDT must be '1' when (XWUPCFG_SD_THRD_EXIT == 1) !"
-  #endif /* !XWUPCFG_SYNC_CDT */
-#endif /* XWUPCFG_SD_THRD_EXIT */
+#if defined(XWUPCFG_SKD_THRD_EXIT) && (1 == XWUPCFG_SKD_THRD_EXIT)
+  #if !defined(XWUPCFG_SYNC_COND) || (0 == XWUPCFG_SYNC_COND)
+    #error "XWUPCFG_SYNC_COND must be '1' when (XWUPCFG_SKD_THRD_EXIT == 1) !"
+  #endif /* !XWUPCFG_SYNC_COND */
+#endif /* XWUPCFG_SKD_THRD_EXIT */
 
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-  #if !defined(XWUPCFG_SYNC_CDT) || (0 == XWUPCFG_SYNC_CDT)
-    #error "XWUPCFG_SYNC_EVT must be '1' when (XWUPCFG_SD_THRD_EXIT == 1) !"
-  #endif /* !XWUPCFG_SYNC_CDT */
+  #if !defined(XWUPCFG_SYNC_COND) || (0 == XWUPCFG_SYNC_COND)
+    #error "XWUPCFG_SYNC_EVT must be '1' when (XWUPCFG_SKD_THRD_EXIT == 1) !"
+  #endif /* !XWUPCFG_SYNC_COND */
 #endif /* XWUPCFG_SYNC_EVT */
 
-#if defined(XWUPCFG_SYNC_CDT) && (1 == XWUPCFG_SYNC_CDT)
-  #define XWUPRULE_SD_THRD_DO_LOCK              1
-  #define XWUPRULE_SD_THRD_DO_UNLOCK            1
+#if defined(XWUPCFG_SYNC_COND) && (1 == XWUPCFG_SYNC_COND)
+  #define XWUPRULE_SKD_THRD_DO_LOCK             1
+  #define XWUPRULE_SKD_THRD_DO_UNLOCK           1
 #else
-  #define XWUPRULE_SD_THRD_DO_LOCK              0
-  #define XWUPRULE_SD_THRD_DO_UNLOCK            0
+  #define XWUPRULE_SKD_THRD_DO_LOCK             0
+  #define XWUPRULE_SKD_THRD_DO_UNLOCK           0
 #endif
 
-#if (defined(XWUPCFG_SYNC_PLSMR) && (1 == XWUPCFG_SYNC_PLSMR))
-  #define XWUPRULE_SD_WQ_PL                     1
-#elif (defined(XWUPCFG_SYNC_CDT) && (1 == XWUPCFG_SYNC_CDT))
-  #define XWUPRULE_SD_WQ_PL                     1
+#if (defined(XWUPCFG_SYNC_PLSEM) && (1 == XWUPCFG_SYNC_PLSEM))
+  #define XWUPRULE_SKD_WQ_PL                    1
+#elif (defined(XWUPCFG_SYNC_COND) && (1 == XWUPCFG_SYNC_COND))
+  #define XWUPRULE_SKD_WQ_PL                    1
 #else
-  #define XWUPRULE_SD_WQ_PL                     0
+  #define XWUPRULE_SKD_WQ_PL                    0
 #endif
 
 #if (defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX))
-  #define XWUPRULE_SD_WQ_RT                     1
-#elif (defined(XWUPCFG_SYNC_RTSMR) && (1 == XWUPCFG_SYNC_RTSMR))
-  #define XWUPRULE_SD_WQ_RT                     1
+  #define XWUPRULE_SKD_WQ_RT                    1
+#elif (defined(XWUPCFG_SYNC_RTSEM) && (1 == XWUPCFG_SYNC_RTSEM))
+  #define XWUPRULE_SKD_WQ_RT                    1
 #else
-  #define XWUPRULE_SD_WQ_RT                     0
+  #define XWUPRULE_SKD_WQ_RT                    0
 #endif
 
-#if (defined(XWUPCFG_SD_PM) && (1 == XWUPCFG_SD_PM))
-  #define XWUPRULE_SD_THRD_FREEZE               1
+#if (defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM))
+  #define XWUPRULE_SKD_THRD_FREEZE              1
 #else
-  #define XWUPRULE_SD_THRD_FREEZE               0
+  #define XWUPRULE_SKD_THRD_FREEZE              0
 #endif
 
 #endif /* xwos/up/rule.h */

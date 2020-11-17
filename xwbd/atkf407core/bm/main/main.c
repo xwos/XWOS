@@ -21,17 +21,16 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/osal/thread.h>
-#include <xwos/osal/scheduler.h>
-#include <xwmd/ds/soc/gpio.h>
+#include <xwos/osal/skd.h>
+#include <xwcd/ds/soc/gpio.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/mif.h>
-#include <xwam/example/sync/flag/xwmo.h>
+#include <xwam/example/sync/flg/mif.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macros      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define MAIN_THRD_PRIORITY XWOSAL_SD_PRIORITY_DROP(XWOSAL_SD_PRIORITY_RT_MAX, 0)
+#define MAIN_THRD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
@@ -45,14 +44,14 @@ xwer_t led_task(void);
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       .data       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-const struct xwosal_thrd_desc main_thrd_td = {
+const struct xwos_thrd_desc main_thrd_td = {
         .name = "main.thrd",
         .prio = MAIN_THRD_PRIORITY,
-        .stack = XWOSAL_THRD_STACK_DYNAMIC,
+        .stack = XWOS_THRD_STACK_DYNAMIC,
         .stack_size = 4096,
-        .func = (xwosal_thrd_f)main_thrd,
+        .func = (xwos_thrd_f)main_thrd,
         .arg = NULL,
-        .attr = XWSDOBJ_ATTR_PRIVILEGED,
+        .attr = XWOS_SKDATTR_PRIVILEGED,
 };
 xwid_t main_thrd_id;
 
@@ -63,27 +62,27 @@ xwer_t xwos_main(void)
 {
         xwer_t rc;
 
-        rc = xwosal_thrd_create(&main_thrd_id,
-                                main_thrd_td.name,
-                                main_thrd_td.func,
-                                main_thrd_td.arg,
-                                main_thrd_td.stack_size,
-                                main_thrd_td.prio,
-                                main_thrd_td.attr);
+        rc = xwos_thrd_create(&main_thrd_id,
+                              main_thrd_td.name,
+                              main_thrd_td.func,
+                              main_thrd_td.arg,
+                              main_thrd_td.stack_size,
+                              main_thrd_td.prio,
+                              main_thrd_td.attr);
         if (rc < 0) {
                 goto err_init_thrd_create;
         }
 
-        rc = xwosal_scheduler_start_lc();
+        rc = xwos_skd_start_lc();
         if (rc < 0) {
-                goto err_scheduler_start_lc;
+                goto err_skd_start_lc;
         }
 
         return XWOK;
 
 err_init_thrd_create:
         BDL_BUG();
-err_scheduler_start_lc:
+err_skd_start_lc:
         BDL_BUG();
         return rc;
 }
@@ -100,16 +99,16 @@ xwer_t main_thrd(void * arg)
                 goto err_stm32cube_start;
         }
 
-        rc = example_flag_start();
+        rc = example_flg_start();
         if (rc < 0) {
-                goto err_example_flag_start;
+                goto err_example_flg_start;
         }
 
         rc = led_task();
 
         return rc;
 
-err_example_flag_start:
+err_example_flg_start:
         BDL_BUG();
 err_stm32cube_start:
         BDL_BUG();
@@ -127,12 +126,12 @@ xwer_t led_task(void)
         xwds_gpio_req(&stm32cube_soc_cb,
                       XWDS_GPIO_PORT_F,
                       XWDS_GPIO_PIN_10);
-        while (!xwosal_cthrd_shld_stop()) {
-                if (xwosal_cthrd_shld_frz()) {
-                        xwosal_cthrd_freeze();
+        while (!xwos_cthrd_shld_stop()) {
+                if (xwos_cthrd_shld_frz()) {
+                        xwos_cthrd_freeze();
                 }
                 xwtm = 1 * XWTM_S;
-                xwosal_cthrd_sleep(&xwtm);
+                xwos_cthrd_sleep(&xwtm);
                 xwds_gpio_toggle(&stm32cube_soc_cb,
                                  XWDS_GPIO_PORT_F,
                                  XWDS_GPIO_PIN_9);

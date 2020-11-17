@@ -16,7 +16,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********      include      ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <xwos/type.h>
+#include <xwos/lib/type.h>
 #include <xwos/lib/errno.h>
 #if defined(ARCHCFG_BKPT) && (1 == ARCHCFG_BKPT)
   #include <arch_bkpt.h>

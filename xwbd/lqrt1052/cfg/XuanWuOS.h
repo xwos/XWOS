@@ -24,68 +24,68 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********  ARCH & compiler  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_ARCH                             arm
-#define XuanWuOS_CFG_SUBARCH                          v7m
-#define XuanWuOS_CFG_COMPILER                         gcc
-#define XuanWuOS_CFG_LDSCRIPT                         cfg/XuanWuOS.lds
-#define XuanWuOS_CFG_MK_RULE                          arm-cortex-m.gcc.rule
-#define XuanWuOS_CFG_ELF_MK                           arm-cortex-m.gcc.mk
-#define XuanWuOS_CFG_XWMO_MK                          arm-cortex-m.gcc.xwmo.mk
-#define XuanWuOS_CFG_XWMO_PREBUILT_MK                 asterisk.xwmo.prebuilt.mk
+#define XuanWuOS_CFG_ARCH                               arm
+#define XuanWuOS_CFG_SUBARCH                            v7m
+#define XuanWuOS_CFG_COMPILER                           gcc
+#define XuanWuOS_CFG_LDSCRIPT                           cfg/XuanWuOS.lds
+#define XuanWuOS_CFG_MK_RULE                            arm-cortex-m.gcc.rule
+#define XuanWuOS_CFG_ELF_MK                             arm-cortex-m.gcc.mk
+#define XuanWuOS_CFG_XWMO_MK                            arm-cortex-m.gcc.xwmo.mk
+#define XuanWuOS_CFG_XWMO_PREBUILT_MK                   asterisk.xwmo.prebuilt.mk
 #include <cfg/arch.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********        CPU        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_CPU                              m7
+#define XuanWuOS_CFG_CPU                                m7
 #include <cfg/cpu.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********        SOC        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_SOC                              mimxrt1052
+#define XuanWuOS_CFG_SOC                                mimxrt1052
 #include <cfg/soc.h>
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********     perpheral     ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_PERPHERAL                        1
-#include <cfg/perpheral.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       board       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_BOARD                            lqrt1052
+#define XuanWuOS_CFG_BOARD                              lqrt1052
 #include <cfg/board.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********    XWOS kernel    ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_CORE                             smp
+#define XuanWuOS_CFG_CORE                               mp
 #include <cfg/xwos.h>
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********   chip & device   ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#define XuanWuOS_CFG_XWCD                               1
+#include <cfg/xwcd.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********  XWOS middleware  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_XWMD                             1
+#define XuanWuOS_CFG_XWMD                               1
 #include <cfg/xwmd.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********  external module  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_XWEM                             1
+#define XuanWuOS_CFG_XWEM                               1
 #include <cfg/xwem.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********     APP module    ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_XWAM                             1
+#define XuanWuOS_CFG_XWAM                               1
 #include <cfg/xwam.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********     OEM module    ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_OEMPATH                          ..
+#define XuanWuOS_CFG_OEMPATH                            ..
 #include <cfg/oem.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********

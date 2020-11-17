@@ -24,9 +24,9 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********     XWOS misc     ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define BRDCFG_XWSD_IDLE_HOOK                   1
-#define BRDCFG_XWSD_SYSHWT_HOOK                 1
-#define BRDCFG_XWSD_THRD_STACK_POOL             1
+#define BRDCFG_XWSKD_IDLE_HOOK                  1
+#define BRDCFG_XWSKD_SYSHWT_HOOK                1
+#define BRDCFG_XWSKD_THRD_STACK_POOL            1
 #define BRDCFG_LOG                              1
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -41,8 +41,9 @@
 #define BRDCFG_MM_CCMHEAP_BLKSZ                 (512U)
 #define BRDCFG_MM_STKMEMPOOL_BLKSZ              (1024U)
 #define BRDCFG_XWOS_THRD_CACHE_ODR              3
-#define BRDCFG_XWOS_SMR_CACHE_ODR               0
-#define BRDCFG_XWOS_CDT_CACHE_ODR               0
+#define BRDCFG_XWOS_SWT_CACHE_ODR               0
+#define BRDCFG_XWOS_SEM_CACHE_ODR               0
+#define BRDCFG_XWOS_COND_CACHE_ODR              0
 #define BRDCFG_XWOS_EVT_CACHE_ODR               0
 #define BRDCFG_XWOS_MTX_CACHE_ODR               0
 
