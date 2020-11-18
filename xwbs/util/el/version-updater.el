@@ -120,7 +120,7 @@
 ;;;;;;;; ;;;;;;;; ;;;;;;;; env ;;;;;;;; ;;;;;;;; ;;;;;;;;
 (defvar XuanWuOS-topdir (expand-directory elpath "../../../"))
 (defvar XuanWuOS-kndir (expand-directory XuanWuOS-topdir "xwos/"))
-(defvar XuanWuOS-version-file (expand-file-name "version.h" XuanWuOS-kndir))
+(defvar XuanWuOS-version-file (expand-file-name "lib/version.h" XuanWuOS-kndir))
 
 ;;(logd "XuanWuOS-topdir:%s" XuanWuOS-topdir)
 ;;(logd "XuanWuOS-version-file:%s" XuanWuOS-version-file)

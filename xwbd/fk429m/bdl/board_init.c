@@ -74,7 +74,6 @@ xwer_t sys_mm_init(void);
 __xwbsp_init_code
 void board_lowlevel_init(void)
 {
-        memset((void *)stkmempool_mr_origin, 0, (xwsz_t)stkmempool_mr_size);
         stm32cube_lowlevel_init();
 }
 

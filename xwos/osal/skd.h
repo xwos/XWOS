@@ -60,7 +60,7 @@ struct xwos_thrd_desc {
                                 注意与CPU的ABI接口规定的内存边界对齐 */
         xwos_thrd_f func; /**< 线程函数的指针 */
         void * arg; /**< 线程函数的参数 */
-        xwsq_t attr; /**< 与具体操作系统相关的一些私有数据 */
+        xwsq_t attr; /**< 与具体操作系统相关的一些数据 */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -127,6 +127,11 @@ struct xwos_thrd_desc {
 /**
  * @}
  */
+
+/**
+ * @brief 线程本地数据指针的数量
+ */
+#define XWOS_THRD_LOCAL_DATA_NUM        XWOSDL_THRD_LOCAL_DATA_NUM
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       APIs        ******** ******** ********
@@ -639,5 +644,86 @@ xwer_t xwos_thrd_migrate(xwid_t tid, xwid_t dstcpu)
 {
         return xwosdl_thrd_migrate(tid, dstcpu);
 }
+
+#if (XWOS_THRD_LOCAL_DATA_NUM > 0U)
+/**
+ * @brief XWOS API：设置线程的本地数据指针
+ * @param tcb: (I) 线程控制块的指针
+ * @param pos: (I) 数据存放位置的索引
+ * @param data: (I) 数据指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ECHRNG: 位置超出范围
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_thrd_set_data(struct xwos_tcb * tcb, xwsq_t pos, void * data)
+{
+        return xwosdl_thrd_set_data(&tcb->ostcb, pos, data);
+}
+
+/**
+ * @brief XWOS API：获取线程的本地数据指针
+ * @param tcb: (I) 线程控制块的指针
+ * @param pos: (I) 数据存放位置的索引
+ * @param databuf: (O) 指向缓冲区的指针，通过此缓冲区返回数据指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ECHRNG: 位置超出范围
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_thrd_get_data(struct xwos_tcb * tcb, xwsq_t pos, void ** databuf)
+{
+        return xwosdl_thrd_get_data(&tcb->ostcb, pos, databuf);
+}
+
+/**
+ * @brief XWOS API：设置当前线程的本地数据指针
+ * @param pos: (I) 数据存放位置的索引
+ * @param data: (I) 数据指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ECHRNG: 位置超出范围
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_cthrd_set_data(xwsq_t pos, void * data)
+{
+        return xwosdl_cthrd_set_data(pos, data);
+}
+
+/**
+ * @brief XWOS API：获取当前线程的本地数据指针
+ * @param pos: (I) 数据存放位置的索引
+ * @param databuf: (O) 指向缓冲区的指针，通过此缓冲区返回数据指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ECHRNG: 位置超出范围
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_cthrd_get_data(xwsq_t pos, void ** databuf)
+{
+        return xwosdl_cthrd_get_data(pos, databuf);
+
+}
+#endif /* XWOS_THRD_LOCAL_DATA_NUM */
 
 #endif /* xwos/osal/skd.h */

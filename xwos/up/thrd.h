@@ -61,7 +61,6 @@ struct xwup_tcb {
         struct xwup_skd_stack_info stack; /**< 栈 */
         struct xwlib_bclst_node tcbnode; /**< 调度器线程链表中的节点 */
 
-        /**< 线程状态 */
         xwsq_t state; /**< 线程状态 */
         xwsq_t attribute; /**< 线程属性 */
 
@@ -99,6 +98,11 @@ struct xwup_tcb {
         /* thread completion */
         struct xwup_cond completion; /**< 线程退出时的事件信号量 */
 #endif /* XWUPCFG_SKD_THRD_EXIT */
+
+#if defined(XWUPCFG_SKD_TCB_LOCAL_DATA_NUM) && (XWUPCFG_SKD_TCB_LOCAL_DATA_NUM > 0U)
+        /* 线程本地数据 */
+        void * data[XWUPCFG_SKD_TCB_LOCAL_DATA_NUM];
+#endif /* XWUPCFG_SKD_TCB_LOCAL_DATA_NUM */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -138,7 +142,7 @@ xwer_t xwup_thrd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm,
                          void * lkdata);
 #endif /* (1 == XWUPRULE_SKD_THRD_DO_LOCK) */
 
-/******** XWOS MP IRQ Callback for BSP Adaptation Code ********/
+/******** XWOS UP IRQ Callback for BSP Adaptation Code ********/
 xwer_t xwup_thrd_freeze_lic(struct xwup_tcb * tcb);
 xwer_t xwup_thrd_thaw_lic(struct xwup_tcb * tcb);
 
@@ -182,5 +186,12 @@ xwer_t xwup_cthrd_freeze(void);
 bool xwup_cthrd_shld_frz(void);
 bool xwup_cthrd_frz_shld_stop(bool * frozen);
 bool xwup_cthrd_shld_stop(void);
+
+#if defined(XWUPCFG_SKD_TCB_LOCAL_DATA_NUM) && (XWUPCFG_SKD_TCB_LOCAL_DATA_NUM > 0U)
+xwer_t xwup_thrd_set_data(struct xwup_tcb * tcb, xwsq_t pos, void * data);
+xwer_t xwup_thrd_get_data(struct xwup_tcb * tcb, xwsq_t pos, void ** databuf);
+xwer_t xwup_cthrd_set_data(xwsq_t pos, void * data);
+xwer_t xwup_cthrd_get_data(xwsq_t pos, void ** databuf);
+#endif /* XWUPCFG_SKD_TCB_LOCAL_DATA_NUM */
 
 #endif /* xwos/up/thrd.h */

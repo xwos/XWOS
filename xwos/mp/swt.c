@@ -301,6 +301,9 @@ xwer_t xwmp_swt_destroy(struct xwmp_swt * swt)
  * @param name: (I) 名字
  * @param flag: (I) 标志
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ENOMEM: 内存不足
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -339,6 +342,8 @@ err_swt_alloc:
  * @brief XWMP API：删除动态创建的软件定时器对象
  * @param swt: (I) 软件定时器对象的指针
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程

@@ -28,6 +28,12 @@
 #define XWOSDL_SKD_CONTEXT_BH                   XWMP_SKD_CONTEXT_BH
 #define XWOSDL_SKD_CONTEXT_IDLE                 XWMP_SKD_CONTEXT_IDLE
 
+#if defined(XWMPCFG_SKD_TCB_LOCAL_DATA_NUM)
+  #define XWOSDL_THRD_LOCAL_DATA_NUM            XWMPCFG_SKD_TCB_LOCAL_DATA_NUM
+#else
+  #define XWOSDL_THRD_LOCAL_DATA_NUM            (0U)
+#endif
+
 static __xwcc_inline
 bool xwosdl_skd_prio_tst_valid(xwpr_t prio)
 {
@@ -251,5 +257,32 @@ xwer_t xwosdl_thrd_migrate(xwid_t tid, xwid_t dstcpu)
         tcb = (struct xwmp_tcb *)tid;
         return xwmp_thrd_migrate(tcb, dstcpu);
 }
+
+#if defined(XWMPCFG_SKD_TCB_LOCAL_DATA_NUM) && (XWMPCFG_SKD_TCB_LOCAL_DATA_NUM > 0U)
+static __xwos_inline_api
+xwer_t xwosdl_thrd_set_data(struct xwosdl_tcb * tcb, xwsq_t pos, void * data)
+{
+        return xwmp_thrd_set_data(tcb, pos, data);
+}
+
+static __xwos_inline_api
+xwer_t xwosdl_thrd_get_data(struct xwosdl_tcb * tcb, xwsq_t pos, void ** databuf)
+{
+        return xwmp_thrd_get_data(tcb, pos, databuf);
+}
+
+static __xwos_inline_api
+xwer_t xwosdl_cthrd_set_data(xwsq_t pos, void * data)
+{
+        return xwmp_cthrd_set_data(pos, data);
+}
+
+static __xwos_inline_api
+xwer_t xwosdl_cthrd_get_data(xwsq_t pos, void ** databuf)
+{
+        return xwmp_cthrd_get_data(pos, databuf);
+
+}
+#endif /* XWMPCFG_SKD_TCB_LOCAL_DATA_NUM */
 
 #endif /* xwos/mp/osdl/skd.h */

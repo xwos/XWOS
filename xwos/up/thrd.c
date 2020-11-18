@@ -1468,3 +1468,112 @@ bool xwup_cthrd_frz_shld_stop(bool * frozen)
 #endif /* !(1 == XWUPRULE_SKD_THRD_FREEZE) */
         return xwup_cthrd_shld_stop();
 }
+
+#if defined(XWUPCFG_SKD_TCB_LOCAL_DATA_NUM) && (XWUPCFG_SKD_TCB_LOCAL_DATA_NUM > 0U)
+/**
+ * @brief XWUP API：设置线程的本地数据指针
+ * @param tcb: (I) 线程控制块的指针
+ * @param pos: (I) 数据存放位置的索引
+ * @param data: (I) 数据指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ECHRNG: 位置超出范围
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwup_api
+xwer_t xwup_thrd_set_data(struct xwup_tcb * tcb, xwsq_t pos, void * data)
+{
+        xwer_t rc;
+
+        XWOS_VALIDATE((tcb), "nullptr", -EFAULT);
+
+        if (pos < XWUPCFG_SKD_TCB_LOCAL_DATA_NUM) {
+                tcb->data[pos] = data;
+                rc = XWOK;
+        } else {
+                rc = -ECHRNG;
+        }
+        return rc;
+}
+
+/**
+ * @brief XWUP API：获取线程的本地数据指针
+ * @param tcb: (I) 线程控制块的指针
+ * @param pos: (I) 数据存放位置的索引
+ * @param databuf: (O) 指向缓冲区的指针，通过此缓冲区返回数据指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ECHRNG: 位置超出范围
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwup_api
+xwer_t xwup_thrd_get_data(struct xwup_tcb * tcb, xwsq_t pos, void ** databuf)
+{
+        xwer_t rc;
+
+        XWOS_VALIDATE((tcb), "nullptr", -EFAULT);
+        XWOS_VALIDATE((databuf), "nullptr", -EFAULT);
+
+        if (pos < XWUPCFG_SKD_TCB_LOCAL_DATA_NUM) {
+                *databuf = tcb->data[pos];
+                rc = XWOK;
+        } else {
+                *databuf = NULL;
+                rc = -ECHRNG;
+        }
+        return rc;
+}
+
+/**
+ * @brief XWUP API：设置当前线程的本地数据指针
+ * @param pos: (I) 数据存放位置的索引
+ * @param data: (I) 数据指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ECHRNG: 位置超出范围
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：可重入
+ */
+__xwup_api
+xwer_t xwup_cthrd_set_data(xwsq_t pos, void * data)
+{
+        struct xwup_tcb * ctcb;
+
+        ctcb = xwup_skd_get_ctcb_lc();
+        return xwup_thrd_set_data(ctcb, pos, data);
+}
+
+/**
+ * @brief XWUP API：获取当前线程的本地数据指针
+ * @param pos: (I) 数据存放位置的索引
+ * @param databuf: (O) 指向缓冲区的指针，通过此缓冲区返回数据指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ECHRNG: 位置超出范围
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwup_api
+xwer_t xwup_cthrd_get_data(xwsq_t pos, void ** databuf)
+{
+        struct xwup_tcb * ctcb;
+
+        ctcb = xwup_skd_get_ctcb_lc();
+        return xwup_thrd_set_data(ctcb, pos, databuf);
+
+}
+#endif /* XWUPCFG_SKD_TCB_LOCAL_DATA_NUM */

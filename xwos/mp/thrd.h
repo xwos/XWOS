@@ -51,7 +51,6 @@ struct xwmp_tcb {
         struct xwmp_skd_stack_info stack; /**< 栈 */
         struct xwlib_bclst_node tcbnode; /**< 调度器线程链表中的节点 */
 
-        /**< 线程状态 */
         struct xwmp_splk stlock; /**< 保护状态state的自旋锁 */
         xwsq_t state; /**< 线程状态 */
         xwsq_t attribute; /**< 线程属性 */
@@ -86,6 +85,11 @@ struct xwmp_tcb {
                 xwpr_t rq; /**< 线程的就绪态优先级 */
                 xwpr_t wq; /**< 线程的等待态优先级 */
         } dprio; /**< 线程的动态优先级，被<em><b>stlock</b></em>保护 */
+
+#if defined(XWMPCFG_SKD_TCB_LOCAL_DATA_NUM) && (XWMPCFG_SKD_TCB_LOCAL_DATA_NUM > 0U)
+        /* 线程本地数据 */
+        void * data[XWMPCFG_SKD_TCB_LOCAL_DATA_NUM];
+#endif /* XWMPCFG_SKD_TCB_LOCAL_DATA_NUM */
 };
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -152,5 +156,12 @@ bool xwmp_cthrd_shld_frz(void);
 bool xwmp_cthrd_shld_stop(void);
 bool xwmp_cthrd_frz_shld_stop(bool * frozen);
 xwer_t xwmp_thrd_migrate(struct xwmp_tcb * tcb, xwid_t dstcpu);
+
+#if defined(XWMPCFG_SKD_TCB_LOCAL_DATA_NUM) && (XWMPCFG_SKD_TCB_LOCAL_DATA_NUM > 0U)
+xwer_t xwmp_thrd_set_data(struct xwmp_tcb * tcb, xwsq_t pos, void * data);
+xwer_t xwmp_thrd_get_data(struct xwmp_tcb * tcb, xwsq_t pos, void ** databuf);
+xwer_t xwmp_cthrd_set_data(xwsq_t pos, void * data);
+xwer_t xwmp_cthrd_get_data(xwsq_t pos, void ** databuf);
+#endif /* XWMPCFG_SKD_TCB_LOCAL_DATA_NUM */
 
 #endif /* xwos/mp/thrd.h */
