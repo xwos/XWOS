@@ -18,16 +18,10 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <armv6m_core.h>
 #include <xwos/lib/xwaop32.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
 xws32_t xwaop__xws32_t__store(__xwcc_atomic xws32_t * a,
                               const enum xwmb_memory_order_em mo,

@@ -13,9 +13,6 @@
 #ifndef __xwos_up_skd_h__
 #define __xwos_up_skd_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
@@ -26,9 +23,6 @@
 #endif /* XWUPCFG_SKD_BH */
 #include <xwos/up/tt.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWUP_SKD_PRIORITY_RT_NUM                ((xwpr_t)XWUPCFG_SKD_PRIORITY_RT_NUM)
 #define XWUP_SKD_PRIORITY_RT_MIN                ((xwpr_t)0)
 #define XWUP_SKD_PRIORITY_RT_MAX                (XWUP_SKD_PRIORITY_RT_NUM - 1)
@@ -36,14 +30,11 @@
 #define XWUP_SKD_PRIORITY_RAISE(base, inc)      ((base) + (inc))
 #define XWUP_SKD_PRIORITY_DROP(base, dec)       ((base) - (dec))
 
-#define XWUP_SKD_IDLE_STK(xwskd)         (&((xwskd)->idle))
+#define XWUP_SKD_IDLE_STK(xwskd)                (&((xwskd)->idle))
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
-  #define XWUP_SKD_BH_STK(xwskd)         (&((xwskd)->bh))
+  #define XWUP_SKD_BH_STK(xwskd)                (&((xwskd)->bh))
 #endif /* XWUPCFG_SKD_BH */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwup_skd;
 struct xwup_tcb;
 
@@ -170,13 +161,7 @@ struct xwup_skd {
         xwsz_t thrd_num; /**< 本调度器中的线程数量 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwup_skd * xwup_skd_get_lc(void);
 struct xwup_tcb * xwup_skd_get_ctcb_lc(void);
 
@@ -193,14 +178,10 @@ xwer_t xwup_skd_wakelock_unlock(void);
 void xwup_skd_intr_all(void);
 xwer_t xwup_skd_notify_allfrz_lic(void);
 
-/******** XWOS UP Callback for BSP Adaptation Code ********/
 void xwup_skd_finish_swcx_lic(struct xwup_skd * xwskd);
 xwer_t xwup_skd_suspend_lic(struct xwup_skd * xwskd);
 xwer_t xwup_skd_resume_lic(struct xwup_skd * xwskd);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwup_skd_init_lc(void);
 xwer_t xwup_skd_start_lc(void);
 xwer_t xwup_skd_start_syshwt_lc(void);

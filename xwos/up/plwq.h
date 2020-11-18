@@ -13,15 +13,9 @@
 #ifndef __xwos_up_plwq_h__
 #define __xwos_up_plwq_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/bclst.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwup_wqn;
 
 /**
@@ -31,9 +25,6 @@ struct xwup_plwq {
         struct xwlib_bclst_head head; /**< 链表头 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 安全地遍历管道等待队列中所有节点，以防其被删除
  * @param c: (I) 作为循环光标的等待队列节点结构体(struct xwup_wqn)指针
@@ -55,18 +46,12 @@ struct xwup_plwq {
                                        struct xwup_wqn,                 \
                                        cln.pl)
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwup_plwq_init(struct xwup_plwq * xwplwq);
 void xwup_plwq_add_head(struct xwup_plwq * xwplwq, struct xwup_wqn * wqn);
 void xwup_plwq_add_tail(struct xwup_plwq * xwplwq, struct xwup_wqn * wqn);
 xwer_t xwup_plwq_remove(struct xwup_plwq * xwplwq, struct xwup_wqn * wqn);
 struct xwup_wqn * xwup_plwq_choose(struct xwup_plwq * xwplwq);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 检测管道等待队列是否为空
  * @return 布尔值

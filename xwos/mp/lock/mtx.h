@@ -13,9 +13,6 @@
 #ifndef __xwos_mp_lock_mtx_h__
 #define __xwos_mp_lock_mtx_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
 #include <xwos/lib/xwbop.h>
@@ -23,13 +20,6 @@
 #include <xwos/lib/rbtree.h>
 #include <xwos/mp/rtwq.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwmp_mtxtree;
 
 /**
@@ -56,16 +46,10 @@ struct xwmp_mtx {
         xwpr_t dprio; /**< 动态优先级：此成员被锁rtwq.lock保护。*/
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwmp_mtx_grab(struct xwmp_mtx * mtx);
 xwer_t xwmp_mtx_put(struct xwmp_mtx * mtx);
 xwer_t xwmp_mtx_intr(struct xwmp_mtx * mtx, struct xwmp_tcb * tcb);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
 xwer_t xwmp_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif /* XWMPCFG_LOCK_MTX_MEMSLICE */

@@ -18,19 +18,13 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#include <string.h>
 #include <xwos/standard.h>
+#include <string.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/skd.h>
 #include <xwos/osal/sync/flg.h>
 #include <xwam/example/sync/flg/mif.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWFLGDEMO_CONSUMER_PRIORITY                             \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 2)
 
@@ -45,19 +39,10 @@
 #define flglogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwflgdemo_consumer_func(void * arg);
 xwer_t xwflgdemo_producer_func(void * arg);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwos_flg xwsltdemo_flg;
 
 const struct xwos_thrd_desc xwflgdemo_consumer_td = {
@@ -82,9 +67,6 @@ const struct xwos_thrd_desc xwflgdemo_producer_td = {
 };
 xwid_t xwflgdemo_producer;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 测试模块的启动函数
  */

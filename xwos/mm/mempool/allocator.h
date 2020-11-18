@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS的内存管理机制：内存池分配器
+ * @brief 玄武OS内存管理：内存池分配器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -13,17 +13,11 @@
 #ifndef __xwos_mm_mempool_allocator_h__
 #define __xwos_mm_mempool_allocator_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/mempool/page.h>
 #include <xwos/mm/mempool/objcache.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @note
  * + 页的最小单位是@ref XWMM_MEMPOOL_PAGE_SIZE (4K字节)
@@ -49,9 +43,6 @@
   #error "Page size must be aligned to XWMM_ALIGNMENT!"
 #endif
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 内存池
  */
@@ -73,144 +64,16 @@ struct xwmm_mempool {
         struct xwmm_mempool_objcache oc_2048; /**< 2048-Byte对象缓存 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ********       internal inline function implementations        ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief XWMM API：静态方式初始化内存池。
- * @param mp: (I) 内存池的指针
- * @param name: (I) 名字
- * @param origin: (I) 内存区域的起始地址
- * @param size: (I) 内存区域的总大小
- * @param odrbtree: (I) 阶红黑树数组的指针
- * @param pgarray: (I) 页控制块数组的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -E2SMALL: 内存区域太小
- * @retval -EALIGN: 内存区域没有对齐
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
-__xwos_api
 xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
                          xwptr_t origin, xwsz_t size);
-
-/**
- * @brief XWMM API：销毁静态方式初始化的内存池
- * @param mp: (I) 内存池的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
-__xwos_api
 xwer_t xwmm_mempool_destroy(struct xwmm_mempool * mp);
-
-/**
- * @brief XWMM API：动态创建内存池
- * @param ptrbuf: (O) 指向缓冲区的指针，通过此缓冲区返回新的内存池的指针
- * @param name: (I) 名字
- * @param origin: (I) 内存区域的起始地址
- * @param size: (I) 内存区域的总大小
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -E2SMALL: 内存区域太小
- * @retval -EALIGN: 内存区域没有对齐
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
-__xwos_api
 xwer_t xwmm_mempool_create(struct xwmm_mempool ** ptrbuf, const char * name,
                            xwptr_t origin, xwsz_t size);
-
-/**
- * @brief XWMM API：删除动态创建的内存池
- * @param mp: (I) 内存池的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
-__xwos_api
 xwer_t xwmm_mempool_delete(struct xwmm_mempool * mp);
-
-/**
- * @brief XWMM API：从内存池中申请内存
- * @param mp: (I) 内存池的指针
- * @param size: (I) 申请的大小
- * @param membuf: (O) 指向缓冲区的指针，通过此缓冲区返回申请到的内存的首地址
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-__xwos_api
 xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size,
                            void ** membuf);
-
-/**
- * @brief XWMM API：释放内存
- * @param mp: (I) 内存池的指针
- * @param mem: (I) 内存的首地址
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EALREADY: 页内存已释放
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-__xwos_api
 xwer_t xwmm_mempool_free(struct xwmm_mempool * mp, void * mem);
-
-/**
- * @brief XWMM API：调整内存大小
- * @param mp: (I) 内存池的指针
- * @param size: (I) 申请的大小，当size == 0，realloc等价于free
- * @param membuf: 指向缓冲区的指针，此缓冲区
- *                (I) 作为输入时，当*membuf == NULL，realloc等价于malloc
- *                (O) 作为输出时，通过此缓冲区返回申请到的内存的首地址
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-__xwos_api
 xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size,
                             void ** membuf);
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      inline API implementations     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 
 #endif /* xwos/mm/mempool/allocator.h */

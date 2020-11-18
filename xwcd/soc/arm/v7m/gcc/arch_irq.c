@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <armv7m_core.h>
 #include <armv7m_nvic.h>
@@ -28,15 +25,9 @@
 #include <arch_xwsc.h>
 #include <arch_skd.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define ARCH_IRQ_FAULT_PRIO     (ARCH_IRQ_PRIO_7 | ARCH_IRQ_SUBPRIO_HIGH)
 #define ARCH_IRQ_SVC_PRIO       (ARCH_IRQ_PRIO_7 | ARCH_IRQ_SUBPRIO_LOW)
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief Setup Architecture Fault
  */

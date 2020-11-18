@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
 #include <xwos/ospl/irq.h>
 #include <arch_skd.h>
@@ -28,9 +25,6 @@
 #include <bm/stm32cube/cubemx/Core/Inc/isr.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if (SOCCFG_IRQ_NUM < 8) || (SOCCFG_IRQ_NUM > 240)
   #error "SOCCFG_IRQ_NUM must be between 8 and 240 inclusive"
 #endif /* #if (SOCCFG_IRQ_NUM < 8) || (SOCCFG_IRQ_NUM > 240) */

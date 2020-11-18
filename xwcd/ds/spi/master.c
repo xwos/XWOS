@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：SPI主机模式控制器
+ * @brief 玄武设备栈：SPI主机模式控制器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,22 +18,12 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwcd/ds/standard.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/skd.h>
 #include <xwos/osal/lock/mtx.h>
 #include <xwcd/ds/spi/master.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function prototypes      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwds_vop
 xwer_t xwds_spim_cvop_probe(struct xwds_spim * spim);
 
@@ -54,9 +44,6 @@ static __xwds_vop
 xwer_t xwds_spim_cvop_resume(struct xwds_spim * spim);
 #endif /* XWCDCFG_ds_PM */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwds_rodata const struct xwds_base_virtual_operations xwds_spim_cvops = {
         .probe = (void *)xwds_spim_cvop_probe,
         .remove = (void *)xwds_spim_cvop_remove,
@@ -68,9 +55,6 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_spim_cvops = {
 #endif /* XWCDCFG_ds_PM */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：SPI主机模式控制器对象的构造函数

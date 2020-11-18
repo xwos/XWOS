@@ -13,17 +13,11 @@
 #ifndef __xwos_up_sync_vsem_h__
 #define __xwos_up_sync_vsem_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-#include <xwos/up/sync/object.h>
+  #include <xwos/up/sync/object.h>
 #endif /* XWUPCFG_SYNC_EVT */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwup_evt;
 
 /**
@@ -38,17 +32,11 @@ struct xwup_evt;
         xwssq_t max; /**< 信号量计数器的最大值 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 信号量的负值
  */
 #define XWUP_VSEM_NEGTIVE     ((xwssq_t)(-1))
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwup_code
 void xwup_vsem_activate(struct xwup_vsem * sem);
 
@@ -68,9 +56,6 @@ xwer_t xwup_vsem_thaw(struct xwup_vsem * sem);
 __xwup_code
 xwer_t xwup_vsem_getvalue(struct xwup_vsem * sem, xwssq_t * sval);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     virtual function prototypes     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /*
 __xwup_api
 xwer_t xwup_vsem_init(struct xwup_vsem * sem, xwssq_t val, xwssq_t max) = 0;

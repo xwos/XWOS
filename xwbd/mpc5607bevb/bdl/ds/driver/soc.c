@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <string.h>
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
@@ -40,9 +37,6 @@
 #include <soc_dma.h>
 #include <bdl/ds/driver/soc.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWCDCFG_ds_SOC_DMA) && (1 == XWCDCFG_ds_SOC_DMA)
 #if defined(MPC5607B)
 #define EDMA_CH_ISR(x)                                                  \
@@ -74,9 +68,6 @@ void mpc560xb_edma_ch##x##_isr(void)                                    \
 #endif /* MPC5607B */
 #endif /* XWCDCFG_ds_SOC_DMA */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      static function prototypes     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwbsp_code
 xwer_t mpc560xb_soc_check_desc(struct xwds_soc * soc);
 
@@ -164,9 +155,6 @@ static __xwbsp_code
 xwer_t mpc560xb_soc_drv_dma_stop(struct xwds_soc * soc, xwid_t ch);
 #endif /* XWCDCFG_ds_SOC_DMA */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_rodata const struct xwds_soc_driver mpc560xb_soc_drv = {
         .base = {
                 .name = "mpc560xb.soc",
@@ -206,9 +194,6 @@ __xwbsp_rodata const struct xwds_soc_driver mpc560xb_soc_drv = {
         .ioctl = NULL,
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwbsp_code
 xwer_t mpc560xb_soc_check_desc(struct xwds_soc * soc)
 {

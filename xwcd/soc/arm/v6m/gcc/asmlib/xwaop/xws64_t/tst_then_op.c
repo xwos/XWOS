@@ -18,16 +18,10 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <arch_irq.h>
 #include <xwos/lib/xwaop64.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
 xwer_t xwaop__xws64_t__tst_then_op(__xwcc_atomic xws64_t * a,
                                    xwaop_tst_f tst, void * tst_args,

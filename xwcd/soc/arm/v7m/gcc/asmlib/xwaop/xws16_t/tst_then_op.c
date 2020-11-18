@@ -18,16 +18,10 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <armv7m_core.h>
 #include <xwos/lib/xwaop16.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
 xwer_t xwaop__xws16_t__tst_then_op(__xwcc_atomic xws16_t * a,
                                    xwaop_tst_f tst, void * tst_args,

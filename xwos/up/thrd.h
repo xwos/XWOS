@@ -13,9 +13,6 @@
 #ifndef __xwos_up_thrd_h__
 #define __xwos_up_thrd_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
@@ -37,13 +34,6 @@
   #include <xwos/up/sync/cond.h>
 #endif
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwup_skd;
 
 #if (1 == XWUPRULE_SKD_WQ_RT)
@@ -105,9 +95,6 @@ struct xwup_tcb {
 #endif /* XWUPCFG_SKD_TCB_LOCAL_DATA_NUM */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if (defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX))
 void xwup_thrd_chprio_once(struct xwup_tcb * tcb, xwpr_t dprio,
                            struct xwup_mtx ** pmtx);
@@ -142,13 +129,9 @@ xwer_t xwup_thrd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm,
                          void * lkdata);
 #endif /* (1 == XWUPRULE_SKD_THRD_DO_LOCK) */
 
-/******** XWOS UP IRQ Callback for BSP Adaptation Code ********/
 xwer_t xwup_thrd_freeze_lic(struct xwup_tcb * tcb);
 xwer_t xwup_thrd_thaw_lic(struct xwup_tcb * tcb);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ********       internal inline function implementations        ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 唤醒一个阻塞/睡眠态的线程，将其加入到调度器的就绪队列
  * @param tcb: (I) 线程控制块对象的指针
@@ -160,9 +143,6 @@ void xwup_thrd_wakeup(struct xwup_tcb * tcb)
         xwup_thrd_rq_add_tail(tcb);
 }
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwup_thrd_init(struct xwup_tcb * tcb,
                       const char * name,
                       xwup_thrd_f mainfunc, void * arg,

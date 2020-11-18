@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/osal/irq.h>
@@ -33,9 +30,6 @@
 #include <bm/stm32cube/cubemx/Core/Inc/gpio.h>
 #include <bm/stm32cube/cubemx/Core/Inc/fmc.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct stm32cube_soc_cfg {
         struct {
                 GPIO_TypeDef * const register_map[11];
@@ -46,13 +40,6 @@ struct stm32cube_soc_cfg {
         } eirq;
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static
 xwer_t stm32cube_soc_drv_start(struct xwds_device * dev);
 
@@ -115,9 +102,6 @@ xwer_t stm32cube_soc_drv_eirq_rls(struct xwds_soc * soc,
 static
 xwer_t stm32cube_soc_drv_eram_tst(struct xwds_soc * soc, xwptr_t * erraddr);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 extern xwsz_t sdram_mr_origin[];
 extern xwsz_t sdram_mr_size[];
 
@@ -295,9 +279,6 @@ struct xwds_soc stm32cube_soc_cb = {
         },
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** base driver ******** ********/
 static
 xwer_t stm32cube_soc_drv_start(struct xwds_device * dev)

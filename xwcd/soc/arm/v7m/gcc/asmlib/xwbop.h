@@ -21,14 +21,8 @@
 #ifndef __asmlib_xwbop_h__
 #define __asmlib_xwbop_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  macro functions & inline functions ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if (defined(ARCHCFG_LIB_XWBOP_C0M8) && (1 == ARCHCFG_LIB_XWBOP_C0M8))
 #define arch_xwbop_c0m8(a, mask)                        \
         __asm__ volatile(                               \
@@ -62,61 +56,23 @@
 #endif
 /* #if (defined(ARCHCFG_LIB_XWBOP_C0M32) && (1 == ARCHCFG_LIB_XWBOP_C0M32)) */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-__xwlib_code
 void arch_xwbop_c0m64(xwu64_t * a, xwu64_t mask);
-
-__xwlib_code
 xwu8_t arch_xwbop_rbit8(xwu8_t x);
-
-__xwlib_code
 xwu16_t arch_xwbop_rbit16(xwu16_t x);
-
-__xwlib_code
 xwu32_t arch_xwbop_rbit32(xwu32_t x);
-
-__xwlib_code
 xwu64_t arch_xwbop_rbit64(xwu64_t x);
-
-__xwlib_code
 xwu16_t arch_xwbop_re16(xwu16_t x);
-
-__xwlib_code
 xws32_t arch_xwbop_re16s32(xwu16_t x);
-
-__xwlib_code
 xwu32_t arch_xwbop_re32(xwu32_t x);
-
-__xwlib_code
 xws64_t arch_xwbop_re32s64(xwu32_t x);
-
-__xwlib_code
 xwu64_t arch_xwbop_re64(xwu64_t x);
-
-__xwlib_code
 xwssq_t arch_xwbop_ffs8(xwu8_t x);
-
-__xwlib_code
 xwssq_t arch_xwbop_fls8(xwu8_t x);
-
-__xwlib_code
 xwssq_t arch_xwbop_ffs16(xwu16_t x);
-
-__xwlib_code
 xwssq_t arch_xwbop_fls16(xwu16_t x);
-
-__xwlib_code
 xwssq_t arch_xwbop_ffs32(xwu32_t x);
-
-__xwlib_code
 xwssq_t arch_xwbop_fls32(xwu32_t x);
-
-__xwlib_code
 xwssq_t arch_xwbop_ffs64(xwu64_t x);
-
-__xwlib_code
 xwssq_t arch_xwbop_fls64(xwu64_t x);
 
 #endif /* asmlib/xwbop.h */

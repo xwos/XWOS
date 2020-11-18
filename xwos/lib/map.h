@@ -16,16 +16,10 @@
 #ifndef __xwos_lib_map_h__
 #define __xwos_lib_map_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/rbtree.h>
 #include <xwos/lib/bclst.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 键值对容器
  */
@@ -50,9 +44,6 @@ struct __xwcc_alignptr xwlib_map {
         xwlib_map_cmp_f cmp; /**< 键比较函数 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** inline functions & macro functions  ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 初始化map
  * @param m: (I) map指针
@@ -121,16 +112,8 @@ void xwlib_map_init_container(struct xwlib_map_container * mc,
                                         &(map)->bclh, \
                                         struct xwlib_map_container, bcln)
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-__xwlib_code
 xwer_t xwlib_map_insert(struct xwlib_map * m, struct xwlib_map_container * newmc);
-
-__xwlib_code
 xwer_t xwlib_map_erase(struct xwlib_map * m, struct xwlib_map_container * mc);
-
-__xwlib_code
 xwer_t xwlib_map_find(struct xwlib_map * m, void * key,
                       struct xwlib_map_container ** mcbuf);
 

@@ -13,16 +13,10 @@
 #ifndef __xwos_up_rtwq_h__
 #define __xwos_up_rtwq_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/rbtree.h>
 #include <xwos/up/wqn.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwup_wqn;
 
 /**
@@ -34,9 +28,6 @@ struct xwup_rtwq {
         struct xwup_wqn * rightmost; /**< 拥有最大关键字的节点 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 以删除为目的，遍历实时等待队列中所有节点
  * @param c: (I) 作为循环光标的等待队列节点结构体(struct xwup_wqn)指针
@@ -45,9 +36,6 @@ struct xwup_rtwq {
 #define xwup_rtwq_itr_thrd_rm(c, xwrtwq) \
         for (c = (xwrtwq)->rightmost; c; c = (xwrtwq)->rightmost)
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwup_rtwq_init(struct xwup_rtwq * xwrtwq);
 void xwup_rtwq_add(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn, xwpr_t prio);
 xwer_t xwup_rtwq_remove(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn);

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：CAN总线控制器
+ * @brief 玄武设备栈：CAN总线控制器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,18 +21,12 @@
 #ifndef __xwcd_ds_can_controller_h__
 #define __xwcd_ds_can_controller_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwcd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwcd/ds/device.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/sem.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWCDCFG_ds_CAN_CONTROLLER_ROCBT) && (1 == XWCDCFG_ds_CAN_CONTROLLER_ROCBT)
   #define __xwds_canc_cbtbl_qualifier const
 #else
@@ -42,15 +36,12 @@
 #define XWDS_CANC_RXQNUM        (XWCDCFG_ds_CAN_CONTROLLER_RXQNUM)
 #define XWDS_CANC_SDU_MAXSIZE   (XWCDCFG_ds_CAN_CONTROLLER_SDU_MAXSIZE)
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief CAN消息标志枚举
  */
 enum xwds_can_msgflag_em {
-        XWDS_CAN_MSG_F_EXID = BIT(0), /**< 扩展ID */
-        XWDS_CAN_MSG_F_REMOTE = BIT(1), /**< 远程帧 */
+        XWDS_CAN_MSG_F_EXID = (1U << 0U), /**< 扩展ID */
+        XWDS_CAN_MSG_F_REMOTE = (1U << 1U), /**< 远程帧 */
 };
 
 /**
@@ -229,9 +220,6 @@ struct xwds_canc {
         xwsq_t mode; /**< 控制器模式 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwds_canc_construct(struct xwds_canc * canc);
 void xwds_canc_destruct(struct xwds_canc * canc);
 
@@ -286,7 +274,7 @@ xwer_t xwds_canc_release(struct xwds_canc * canc)
         return xwds_device_release(&canc->bc.dev);
 }
 
-/******** ******** Callbacks for BSP driver ******** ********/
+/******** ******** Callbacks for driver ******** ********/
 void xwds_canc_drvcb_setcb_tx_indication(struct xwds_canc * canc,
                                          void (*cb)(struct xwds_canc *,
                                                     xwid_t, xwer_t));

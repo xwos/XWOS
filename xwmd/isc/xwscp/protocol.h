@@ -13,9 +13,6 @@
 #ifndef __xwmd_xwscp_protocol_h__
 #define __xwmd_xwscp_protocol_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwaop.h>
@@ -28,9 +25,6 @@
 #include <xwmd/isc/xwscp/hwifal.h>
 #include <xwmd/isc/xwscp/api.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWSCP_PERIOD            (XWMDCFG_isc_xwscp_PERIOD)
 #define XWSCP_RETRY_NUM         (XWMDCFG_isc_xwscp_RETRY_NUM)
 #define XWSCP_SDU_MAX_SIZE      (XWMDCFG_isc_xwscp_SDU_MAX_SIZE)
@@ -77,9 +71,6 @@
 #define XWSCP_BUG()     XWOS_BUG()
 #define XWSCP_BUG_ON(x) XWOS_BUG_ON(x)
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 应答信号枚举
  */
@@ -164,9 +155,6 @@ struct xwscp {
         } slot;
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwmd_code
 xwer_t xwscp_alloc_frmslot(struct xwscp * xwscp, struct xwscp_frmslot ** slotbuf);
 

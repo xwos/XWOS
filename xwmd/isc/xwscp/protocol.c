@@ -10,9 +10,6 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/lib/xwaop.h>
@@ -27,13 +24,6 @@
 #include <xwmd/isc/xwscp/hwifal.h>
 #include <xwmd/isc/xwscp/api.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 同步帧的模板
  */
@@ -133,9 +123,6 @@ __xwmd_rodata const xwer_t xwscp_callback_rc[XWSCP_ACK_NUM] = {
         [XWSCP_ACK_ECONNRESET] = -ECONNRESET,
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      static function prototypes     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwmd_code
 xwer_t xwscp_tx_cfrm_sync_ack(struct xwscp * xwscp, xwu32_t rxcnt);
 
@@ -163,9 +150,6 @@ xwer_t xwscp_rx_frm(struct xwscp * xwscp, struct xwscp_frmslot * frmslot);
 static __xwmd_code
 xwer_t xwscp_fsm(struct xwscp * xwscp);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 申请一个帧槽
  * @param xwscp: (I) XWSCP对象的指针

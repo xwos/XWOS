@@ -13,9 +13,6 @@
 #ifndef __xwmd_isc_xwpcp_protocol_h__
 #define __xwmd_isc_xwpcp_protocol_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
@@ -41,9 +38,6 @@
   #error "XWPCP Only supports 64 priorities!"
 #endif
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWPCP_PRIORITY_NUM      (XWMDCFG_isc_xwpcp_PRIORITY_NUM)
 #define XWPCP_MAX_PRIORITY      (XWPCP_PRIORITY_NUM - 1)
 #define XWPCP_PORT_NUM          (XWMDCFG_isc_xwpcp_PORT_NUM)
@@ -95,9 +89,6 @@
 #define XWPCP_VALIDATE(exp, errstr, ...)
 #endif /* !XWMDCFG_CHECK_PARAMETERS */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 应答信号枚举
  */
@@ -202,9 +193,6 @@ struct xwpcp {
         } rxq; /**< 接收队列 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwmd_code
 struct xwpcp_frmslot * xwpcp_txq_choose(struct xwpcp * xwpcp);
 

@@ -216,7 +216,7 @@ xwer_t xwosdl_sem_getvalue(struct xwosdl_sem * sem, xwssq_t * sval)
 }
 
 #else /* XWUPCFG_SYNC_PLSEM */
-#error "Can't find the semaphore configuration !"
+  #error "Can't find the semaphore configuration !"
 #endif /* !XWUPCFG_SYNC_PLSEM */
 
 #endif /* xwos/up/osdl/sync/sem.h */

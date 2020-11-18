@@ -21,99 +21,35 @@
 #ifndef __bdl_ds_driver_soc_h__
 #define __bdl_ds_driver_soc_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwcd/ds/device.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 extern __xwbsp_rodata const struct xwds_soc_driver mpc560xb_soc_drv;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-__xwbsp_isr
 void mpc560xb_wkup_irq0_7_isr(void);
-
-__xwbsp_isr
 void mpc560xb_wkup_irq8_15_isr(void);
-
-__xwbsp_isr
 void mpc560xb_wkup_irq16_23_isr(void);
-
-__xwbsp_isr
 void mpc560xb_wkup_irq24_28_isr(void);
-
-__xwbsp_isr
 void mpc560xb_eirq0_7_isr(void);
-
-__xwbsp_isr
 void mpc560xb_eirq8_15_isr(void);
-
-__xwbsp_isr
 void mpc560xb_eirq16_23_isr(void);
-
-__xwbsp_isr
 void mpc560xb_edma_cmberr_isr(void);
-
-__xwbsp_isr
 void mpc560xb_edma_ch0_isr(void);
-
-__xwbsp_isr
 void mpc560xb_edma_ch1_isr(void);
-
-__xwbsp_isr
 void mpc560xb_edma_ch2_isr(void);
-
-__xwbsp_isr
 void mpc560xb_edma_ch3_isr(void);
-
-__xwbsp_isr
 void mpc560xb_edma_ch4_isr(void);
-
-__xwbsp_isr
 void mpc560xb_edma_ch5_isr(void);
-
-__xwbsp_isr
 void mpc560xb_edma_ch6_isr(void);
-
-__xwbsp_isr
 void mpc560xb_edma_ch7_isr(void);
-
-__xwbsp_isr
 void mpc560xb_edma_ch8_isr(void);
-
-__xwbsp_isr
 void mpc560xb_edma_ch9_isr(void);
-
-__xwbsp_isr
 void mpc560xb_edma_ch10_isr(void);
-
-__xwbsp_isr
 void mpc560xb_edma_ch11_isr(void);
-
-__xwbsp_isr
 void mpc560xb_edma_ch12_isr(void);
-
-__xwbsp_isr
 void mpc560xb_edma_ch13_isr(void);
-
-__xwbsp_isr
 void mpc560xb_edma_ch14_isr(void);
-
-__xwbsp_isr
 void mpc560xb_edma_ch15_isr(void);
 
 #endif /* bdl/ds/driver/soc.h */

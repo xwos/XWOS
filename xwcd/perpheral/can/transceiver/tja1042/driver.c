@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/osal/irq.h>
 #include <xwcd/ds/soc/gpio.h>
@@ -28,17 +25,6 @@
 #include <xwcd/ds/can/transceiver.h>
 #include <xwcd/perpheral/can/transceiver/tja1042/driver.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function prototypes      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwbsp_code
 xwer_t tja1042_check_desc(struct xwds_cantrcv * cantrcv);
 
@@ -69,9 +55,6 @@ xwer_t tja1042_cantrcv_drv_enable_wkup(struct xwds_cantrcv * cantrcv);
 static __xwbsp_code
 xwer_t tja1042_cantrcv_drv_disable_wkup(struct xwds_cantrcv * cantrcv);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_rodata const struct xwds_cantrcv_driver tja1042_cantrcv_drv = {
         .base = {
                 .name = "tja1042",
@@ -89,9 +72,6 @@ __xwbsp_rodata const struct xwds_cantrcv_driver tja1042_cantrcv_drv = {
         .disable_wkup = tja1042_cantrcv_drv_disable_wkup,
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwbsp_code
 xwer_t tja1042_check_desc(struct xwds_cantrcv * cantrcv)
 {

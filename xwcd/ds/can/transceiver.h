@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：CAN总线接收器
+ * @brief 玄武设备栈：CAN总线接收器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,9 +21,6 @@
 #ifndef __xwcd_ds_can_transceiver_h__
 #define __xwcd_ds_can_transceiver_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwcd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwcd/ds/device.h>
@@ -31,13 +28,6 @@
 #include <xwcd/ds/i2c/perpheral.h>
 #include <xwcd/ds/spi/perpheral.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief CAN接收器模式枚举
  */
@@ -130,9 +120,6 @@ struct xwds_cantrcv {
         xwsq_t wkuprs; /**< CAN接收器唤醒原因 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwds_cantrcv_construct(struct xwds_cantrcv * cantrcv);
 void xwds_cantrcv_destruct(struct xwds_cantrcv * cantrcv);
 
@@ -189,7 +176,7 @@ xwer_t xwds_cantrcv_release(struct xwds_cantrcv * cantrcv)
         return xwds_device_release(&cantrcv->bc.dev);
 }
 
-/******** ******** Callbacks for BSP Driver ******** ********/
+/******** ******** Callbacks for Driver ******** ********/
 void xwds_cantrcv_drvcb_wakeup_notification(struct xwds_cantrcv * cantrcv);
 
 #endif /* xwcd/ds/can/transceiver.h */

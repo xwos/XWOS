@@ -21,15 +21,9 @@
 #ifndef __arch_armv6m_nvic_h__
 #define __arch_armv6m_nvic_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <armv6m_core.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #ifndef SOCCFG_NVIC_PRIO_BITNUM
   #error "SOCCFG_NVIC_PRIO_BITNUM is not defined!"
 #else
@@ -110,9 +104,6 @@
 #define SCB_SHCSR_MEMFAULTACT_POS       (0UL)
 #define SCB_SHCSR_MEMFAULTACT_MSK       (1UL << SCB_SHCSR_MEMFAULTACT_POS)
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief configurations of NVIC
  */
@@ -127,9 +118,6 @@ struct cortexm_nvic_irq_cfg {
         xwpr_t priority; /**< priority of irq */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** inline functions & macros functions ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief Enable all interrupts
  */

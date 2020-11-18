@@ -31,22 +31,13 @@
 #ifndef __xwcd_perpheral_spi_flash_w25qxx_device_h__
 #define __xwcd_perpheral_spi_flash_w25qxx_device_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwcd/ds/spi/perpheral.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWDS_W25QXX_CMD_MAX_PAYLOAD     256U
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief W25QXX Flash 指令列表
+ * @brief W25QXX Flash 指令枚举
  */
 enum xwds_w25qxx_cmd_em {
         XWDS_W25QXX_CMD_WRITE_DISABLE,
@@ -89,6 +80,9 @@ enum xwds_w25qxx_cmd_em {
         XWDS_W25QXX_CMD_NUM,
 };
 
+/**
+ * @brief W25QXX Flash MID 枚举
+ */
 enum w25q_mid_em {
         XWDS_W25Q80_MID = 0xEF13,
         XWDS_W25Q16_MID = 0xEF14,
@@ -98,6 +92,9 @@ enum w25q_mid_em {
         XWDS_W25Q256_MID = 0xEF18,
 };
 
+/**
+ * @brief W25QXX Flash SR寄存器序号
+ */
 enum xwds_w25qxx_sr_idx_em {
         XWDS_W25QXX_SR_1,
         XWDS_W25QXX_SR_2,
@@ -105,6 +102,9 @@ enum xwds_w25qxx_sr_idx_em {
         XWDS_W25QXX_SR_NUM,
 };
 
+/**
+ * @brief W25QXX Flash SR1 位枚举
+ */
 enum xwds_w25qxx_sr1_bit_em {
         XWDS_W25QXX_SR1_BUSY = 0x1U,
         XWDS_W25QXX_SR1_WEL = 0x2U,
@@ -115,7 +115,9 @@ enum xwds_w25qxx_sr1_bit_em {
         XWDS_W25QXX_SR1_SEC = 0x40U,
         XWDS_W25QXX_SR1_SRP = 0x80U,
 };
-
+/**
+ * @brief W25QXX Flash SR2 位枚举
+ */
 enum xwds_w25qxx_sr2_bit_em {
         XWDS_W25QXX_SR2_SRL = 0x1U,
         XWDS_W25QXX_SR2_QE = 0x2U,
@@ -127,6 +129,9 @@ enum xwds_w25qxx_sr2_bit_em {
         XWDS_W25QXX_SR2_SUS = 0x80U,
 };
 
+/**
+ * @brief W25QXX Flash SR3 位枚举
+ */
 enum xwds_w25qxx_sr3_bit_em {
         XWDS_W25QXX_SR3_R0 = 0x1U,
         XWDS_W25QXX_SR3_R1 = 0x2U,
@@ -175,9 +180,6 @@ struct xwds_w25qxx {
         xwu8_t rxq[XWDS_W25QXX_CMD_MAX_PAYLOAD + 16]; /**< 接收缓冲区 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwds_w25qxx_construct(struct xwds_w25qxx * w25qxx);
 void xwds_w25qxx_destruct(struct xwds_w25qxx * w25qxx);
 

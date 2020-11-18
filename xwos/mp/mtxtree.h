@@ -13,16 +13,10 @@
 #ifndef __xwos_mp_mtxtree_h__
 #define __xwos_mp_mtxtree_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/rbtree.h>
 #include <xwos/mp/lock/seqlock.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwmp_mtx;
 
 /**
@@ -35,9 +29,6 @@ struct xwmp_mtxtree {
         struct xwmp_sqlk lock; /* 保护结构体的锁 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwmp_mtxtree_init(struct xwmp_mtxtree * mtxtree);
 void xwmp_mtxtree_add_locked(struct xwmp_mtx * mtx, struct xwmp_mtxtree * mt);
 void xwmp_mtxtree_add(struct xwmp_mtx * mtx, struct xwmp_mtxtree * mt);

@@ -10,15 +10,9 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if (defined(XWLIBCFG_XWBOP_RBIT8)) && (1 == XWLIBCFG_XWBOP_RBIT8)
 #if (!defined(ARCHCFG_LIB_XWBOP_RBIT8)) || (1 != ARCHCFG_LIB_XWBOP_RBIT8)
 #define XWBOP_RBIT8_R2(n)  n,           n + 2*64,       n + 1*64,       n + 3*64
@@ -29,9 +23,6 @@
 #endif /* !ARCHCFG_LIB_XWBOP_RBIT8 */
 #endif /* XWLIBCFG_XWBOP_RBIT8 */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if (defined(XWLIBCFG_XWBOP_RBIT8)) && (1 == XWLIBCFG_XWBOP_RBIT8)
 #if (!defined(ARCHCFG_LIB_XWBOP_RBIT8)) || (1 != ARCHCFG_LIB_XWBOP_RBIT8)
 /**
@@ -43,9 +34,6 @@ __xwlib_rodata const xwu8_t xwbop_rbit8_table[256] = {
 #endif /* !ARCHCFG_LIB_XWBOP_RBIT8 */
 #endif /* XWLIBCFG_XWBOP_RBIT8 */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if (defined(XWLIBCFG_XWBOP_FFS8)) && (1 == XWLIBCFG_XWBOP_FFS8)
 #if (!defined(ARCHCFG_LIB_XWBOP_FFS8)) || (1 != ARCHCFG_LIB_XWBOP_FFS8)
 __xwlib_code

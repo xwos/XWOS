@@ -21,18 +21,8 @@
 #ifndef __arch_image_h__
 #define __arch_image_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       type        ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct arch_image_description {
         void * head;
         void * tail_flag_addr;
@@ -44,19 +34,9 @@ struct __xwcc_aligned(32) arch_image_tail {
         char flag[32];
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-extern __image_description
-const struct arch_image_description arch_image_description;
+extern const struct arch_image_description arch_image_description;
+extern const struct arch_image_tail arch_image_tail;
 
-extern __image_tail
-const struct arch_image_tail arch_image_tail;
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-__xwbsp_code
 xwer_t arch_boot_image(void * addr);
 
 #endif /* arch_image.h */

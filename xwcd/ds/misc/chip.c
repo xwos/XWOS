@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：MISC设备
+ * @brief 玄武设备栈：MISC设备
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,19 +18,9 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwcd/ds/standard.h>
 #include <xwcd/ds/misc/chip.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function prototypes      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwds_vop
 xwer_t xwds_misc_cvop_probe(struct xwds_misc * misc);
 
@@ -51,9 +41,6 @@ static __xwds_vop
 xwer_t xwds_misc_cvop_resume(struct xwds_misc * misc);
 #endif /* XWCDCFG_ds_PM */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwds_rodata const struct xwds_base_virtual_operations xwds_misc_cvops = {
         .probe = (void *)xwds_misc_cvop_probe,
         .remove = (void *)xwds_misc_cvop_remove,
@@ -65,9 +52,6 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_misc_cvops = {
 #endif /* XWCDCFG_ds_PM */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：MISC设备的构造函数

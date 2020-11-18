@@ -20,14 +20,8 @@
 #ifndef __xwos_lib_rbtree_h__
 #define __xwos_lib_rbtree_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 红黑树节点位置枚举
  */
@@ -71,9 +65,6 @@ struct __xwcc_alignptr xwlib_rbtree {
         struct xwlib_rbtree_node * root; /**< 根节点 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** inline functions & macro functions  ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 初始化红黑树
  * @param rbt: (I) 红黑树指针
@@ -424,18 +415,10 @@ bool xwlib_rbtree_tst_node_unlinked(struct xwlib_rbtree_node * n)
         return !!(0 == n->lpc.v);
 }
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-__xwlib_code
 void xwlib_rbtree_insert_color(struct xwlib_rbtree * tree,
                                struct xwlib_rbtree_node * node);
-
-__xwlib_code
 void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                          struct xwlib_rbtree_node * node);
-
-__xwlib_code
 void xwlib_rbtree_replace(struct xwlib_rbtree_node * newn,
                           struct xwlib_rbtree_node * oldn);
 

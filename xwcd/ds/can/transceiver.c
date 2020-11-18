@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：CAN总线接收器
+ * @brief 玄武设备栈：CAN总线接收器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,22 +18,12 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#include <string.h>
 #include <xwcd/ds/standard.h>
+#include <string.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/lib/xwbmpaop.h>
 #include <xwcd/ds/can/transceiver.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function prototypes      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwds_vop
 xwer_t xwds_cantrcv_cvop_probe(struct xwds_cantrcv * cantrcv);
 
@@ -54,9 +44,6 @@ static __xwds_vop
 xwer_t xwds_cantrcv_cvop_resume(struct xwds_cantrcv * cantrcv);
 #endif /* XWCDCFG_ds_PM */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwds_rodata const struct xwds_base_virtual_operations xwds_cantrcv_cvops = {
         .probe = (void *)xwds_cantrcv_cvop_probe,
         .remove = (void *)xwds_cantrcv_cvop_remove,
@@ -68,9 +55,6 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_cantrcv_cvops = {
 #endif /* XWCDCFG_ds_PM */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：CAN接收器的构造函数

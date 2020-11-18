@@ -10,20 +10,11 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/crc8.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWLIBCFG_CRC8_0X07) && (1 == XWLIBCFG_CRC8_0X07)
 /**
  * @brief 多项式0x7的查询表
@@ -144,16 +135,13 @@ __xwlib_rodata const xwu8_t xwlib_crc8tbl_0x9B[256] = {
 };
 #endif /* XWLIBCFG_CRC8_0X31 */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(SOCCFG_CRC8) && (1 == SOCCFG_CRC8)
 extern
 xwer_t soc_crc8_cal(xwu8_t * crc8,
                     bool refin, xwu8_t polynomial,
                     const xwu8_t stream[], xwsz_t * size);
 #else /* SOCCFG_CRC8 */
-#define soc_crc8_cal(crc8, refin, plynml, stream, size)         (-EOPNOTSUPP)
+  #define soc_crc8_cal(crc8, refin, plynml, stream, size)       (-EOPNOTSUPP)
 #endif /* !SOCCFG_CRC8 */
 
 static __xwlib_code
@@ -161,9 +149,6 @@ xwer_t xwlib_crc8_swcal(xwu8_t * crc8,
                         bool refin, xwu8_t plynml,
                         const xwu8_t stream[], xwsz_t * size);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 软件方式计算一段数据的CRC8校验值
  * @param crc8: 指向缓冲区的指针，此缓冲区：
@@ -229,6 +214,26 @@ xwer_t xwlib_crc8_swcal(xwu8_t * crc8,
         return rc;
 }
 
+/**
+ * @brief 计算一段数据的CRC8校验值
+ * @param crc8: 指向缓冲区的指针，此缓冲区：
+ *               (I) 作为输入，表示初始值
+ *               (O) 作为输出，返回计算结果，当计算失败时，值不会发生改变
+ * @param xorout: (I) 与结果异或的值
+ * @param refin: (I) 是否按位镜像翻转输入的每个字节(xwbop_rbit8)
+ * @param refout: (I) 是否按位镜像翻转输出(xwbop_rbit32)
+ * @param plynml: (I) 多项式
+ * @param direction: (I) 数据移位的方向
+ * @param stream: (I) 指向数据的指针
+ * @param size: 指向缓冲区的指针，此缓冲区：
+ *              (I) 作为输入，表示数据长度
+ *              (O) 作为输出，返回剩余未计算的数据长度，当返回不为0时，
+ *                  表示计算未完成，计算结果不会镜像翻转，也不会与xorout异或。
+ * @return 错误码
+ * @retval XWOK: 没有错误，计算结果有效
+ * @retval -EFAULT: 空指针
+ * @retval -EOPNOTSUPP: 不支持的多项式
+ */
 __xwlib_code
 xwer_t xwlib_crc8_cal(xwu8_t * crc8,
                       xwu8_t xorout, bool refin, bool refout, xwu8_t plynml,
@@ -264,6 +269,21 @@ xwer_t xwlib_crc8_cal(xwu8_t * crc8,
         return rc;
 }
 
+/**
+ * @brief 用主流CRC8参数模型计算一段数据的CRC8校验值
+ * @param stream: (I) 指向数据的指针
+ * @param size: 指向缓冲区的指针，此缓冲区：
+ *              (I) 作为输入，表示数据长度
+ *              (O) 作为输出，返回剩余未计算的数据长度
+ * @return CRC8
+ * @note
+ * + 主流CRC8参数模型：
+ *   - 多项式：0x7
+ *   - 初始值：0x0
+ *   - 是否按位镜像翻转输入：否
+ *   - 是否按位镜像翻转输出：否
+ *   - 与结果进行异或计算：0x0
+ */
 __xwlib_code
 xwu8_t xwlib_crc8_calms(const xwu8_t stream[], xwsz_t * size)
 {

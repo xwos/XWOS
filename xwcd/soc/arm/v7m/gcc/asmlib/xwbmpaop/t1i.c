@@ -18,15 +18,9 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <asmlib/xwbop.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code __xwcc_naked
 bool xwbmpaop_t1i(__xwcc_unused __xwcc_atomic xwbmp_t * bmp,
                   __xwcc_unused xwsq_t idx)

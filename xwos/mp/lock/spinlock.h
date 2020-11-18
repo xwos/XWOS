@@ -13,15 +13,9 @@
 #ifndef __xwos_mp_lock_spinlock_h__
 #define __xwos_mp_lock_spinlock_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <arch_spinlock.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief XWOS的自旋锁
  */
@@ -31,13 +25,6 @@ struct xwmp_splk {
 
 struct xwmp_irq_resource;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********  macro functions  ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwmp_rawly_lock(struct xwmp_splk * spl);
 xwer_t xwmp_rawly_trylock(struct xwmp_splk * spl);
 void xwmp_rawly_unlock(struct xwmp_splk * spl);
@@ -63,9 +50,6 @@ void xwmp_rawly_unlock_irqsrs(struct xwmp_splk * spl,
                               const struct xwmp_irq_resource * irqs,
                               xwreg_t flags[], xwsz_t num);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwmp_splk_init(struct xwmp_splk * spl);
 void xwmp_splk_lock(struct xwmp_splk * spl);
 xwer_t xwmp_splk_trylock(struct xwmp_splk * spl);

@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/osal/skd.h>
 #include <bm/stm32cube/standard.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
@@ -28,26 +25,17 @@
 #include <xwam/example/xwlib/crc/mif.h>
 #include <bm/stm32cube/mif.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define MAIN_THRD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
 
 #define LED_GPIO_PORT GPIOC
 #define LED_GPIO_PIN LL_GPIO_PIN_13
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static
 xwer_t main_thrd(void * arg);
 
 static
 xwer_t led_task(void);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 const struct xwos_thrd_desc main_thrd_td = {
         .name = "main.thrd",
         .prio = MAIN_THRD_PRIORITY,
@@ -59,9 +47,6 @@ const struct xwos_thrd_desc main_thrd_td = {
 };
 xwid_t main_thrd_id;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwos_main(void)
 {
         xwer_t rc;

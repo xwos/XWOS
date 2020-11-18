@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/mm/common.h>
@@ -37,15 +34,9 @@
 #include <bdl/standard.h>
 #include <bdl/board_init.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define STKMEMPOOL_BLKSZ        BRDCFG_MM_STKMEMPOOL_BLKSZ
 #define CCMHEAP_BLKSZ           BRDCFG_MM_CCMHEAP_BLKSZ
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 extern xwsz_t stkmempool_mr_origin[];
 extern xwsz_t stkmempool_mr_size[];
 
@@ -62,15 +53,9 @@ __xwbsp_data struct xwmm_bma * stkmempool_bma = NULL;
  */
 __xwbsp_data struct xwmm_bma * ccmheap_bma = NULL;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function prototypes      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwbsp_init_code
 xwer_t sys_mm_init(void);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_init_code
 void board_lowlevel_init(void)
 {

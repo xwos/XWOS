@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
@@ -29,18 +26,19 @@
 #include <bm/stm32cube/mif.h>
 #include <armv7m_core.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 extern xwu8_t sram_mr_origin[];
 extern xwu8_t sram_mr_size[];
 
 /**
- * @brief External SRAM
+ * @brief SRAM内存池
+ * @note
+ * + 头文件
+ *   - xwbd/atkf103core/bm/stm32cube/mif.h
+ *   - xwos/mm/mempool/allocator.h
+ * + API
+ *   - 申请：xwmm_mempool_malloc(sram_mempool, ...)
+ *   - 释放：xwmm_mempool_free(sram_mempool, ...)
+ *   - 重新申请：xwmm_mempool_realloc(sram_mempool, ...)
  */
 struct xwmm_mempool * sram_mempool = (void *)sram_mr_origin;
 
@@ -54,18 +52,20 @@ void * const stm32cube_linkage_table[] = {
         stm32cube_override_linkage_it,
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 extern
 void SystemInit(void);
 
 extern
 void SystemClock_Config(void);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief STM32CUBE模块的低级初始化
+ * @retrun 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：低级初始化流程
+ * - 重入性：不可重入
+ */
 __xwbsp_init_code
 void stm32cube_lowlevel_init(void)
 {
@@ -73,6 +73,14 @@ void stm32cube_lowlevel_init(void)
         /* cm_scs.scnscb.actlr.bit.disdefwbuf = 1; */
 }
 
+/**
+ * @brief STM32CUBE模块的初始化
+ * @retrun 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：初始化流程
+ * - 重入性：不可重入
+ */
 __xwbsp_init_code
 void stm32cube_init(void)
 {
@@ -92,6 +100,16 @@ void stm32cube_init(void)
 #endif /* STM32CUBECFG_SRAM */
 }
 
+/**
+ * @brief 启动STM32CUBE模块
+ * @retrun 错误码
+ * @note
+ * - 此函数会启动所有外设，有些外设启动流程需要延时，因此此函数只能运行在线程中。
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：不可重入
+ */
 xwer_t stm32cube_start(void)
 {
         xwer_t rc;
@@ -108,6 +126,16 @@ err_xwds_start:
         return rc;
 }
 
+/**
+ * @brief 停止STM32CUBE模块
+ * @retrun 错误码
+ * @note
+ * - 此函数会停止所有外设，有些外设的停止流程需要延时，因此此函数只能运行在线程中。
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：不可重入
+ */
 xwer_t stm32cube_stop(void)
 {
         xwer_t rc;

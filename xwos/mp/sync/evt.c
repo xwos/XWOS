@@ -15,16 +15,13 @@
  *     + ② evt.lock
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <string.h>
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_SYNC_EVT_MEMSLICE) && (1 == XWMPCFG_SYNC_EVT_MEMSLICE)
-#include <xwos/mm/memslice.h>
+  #include <xwos/mm/memslice.h>
 #endif /* XWMPCFG_SYNC_EVT_MEMSLICE */
 #include <xwos/ospl/irq.h>
 #include <xwos/mp/thrd.h>
@@ -33,13 +30,6 @@
 #include <xwos/mp/sync/cond.h>
 #include <xwos/mp/sync/evt.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWMPCFG_SYNC_EVT_MEMSLICE) && (1 == XWMPCFG_SYNC_EVT_MEMSLICE)
 /**
  * @brief 结构体xwmp_evt的对象缓存
@@ -52,9 +42,6 @@ static __xwmp_data struct xwmm_memslice * xwmp_evt_cache = NULL;
 __xwmp_rodata const char xwmp_evt_cache_name[] = "xwos.mp.sync.evt.cache";
 #endif /* XWMPCFG_SYNC_EVT_MEMSLICE */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      static function prototypes     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwmp_code
 struct xwmp_evt * xwmp_evt_alloc(void);
 
@@ -94,10 +81,6 @@ xwer_t xwmp_evt_timedwait_edge(struct xwmp_evt * evt, xwsq_t trigger,
                                xwbmp_t origin[], xwbmp_t msk[],
                                xwtm_t * xwtm);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** memslice ******** ********/
 #if defined(XWMPCFG_SYNC_EVT_MEMSLICE) && (1 == XWMPCFG_SYNC_EVT_MEMSLICE)
 /**
  * @brief XWMP INIT CODE：初始化结构体xwmp_evt的对象缓存

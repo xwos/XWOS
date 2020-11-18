@@ -10,9 +10,6 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/ospl/irq.h>
@@ -23,21 +20,10 @@
 #include <xwos/up/rtwq.h>
 #include <xwos/mm/kma.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-#include <xwos/up/sync/evt.h>
+  #include <xwos/up/sync/evt.h>
 #endif /* XWUPCFG_SYNC_EVT */
 #include <xwos/up/sync/rtsem.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      static function prototypes     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwup_code
 struct xwup_rtsem * xwup_rtsem_alloc(void);
 
@@ -68,9 +54,6 @@ xwer_t xwup_rtsem_do_blkthrd_unlkwq_cpuirqrs(struct xwup_rtsem * sem,
 static __xwup_code
 xwer_t xwup_rtsem_do_wait_unintr(struct xwup_rtsem * sem, struct xwup_tcb * tcb);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 申请实时信号量对象
  * @return 信号量对象的指针

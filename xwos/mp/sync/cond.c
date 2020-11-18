@@ -15,15 +15,12 @@
  *     + ② 线程控制块的状态锁（tcb->stlock）
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
-#include <xwos/mm/memslice.h>
+  #include <xwos/mm/memslice.h>
 #endif /* XWMPCFG_SYNC_COND_MEMSLICE */
 #include <xwos/ospl/irq.h>
 #include <xwos/mp/skd.h>
@@ -37,15 +34,9 @@
 #include <xwos/mp/sync/evt.h>
 #include <xwos/mp/sync/cond.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWMP_COND_NEGTIVE  ((xwssq_t)(-1))
 #define XWMP_COND_POSITIVE ((xwssq_t)(1))
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
 /**
  * @brief 结构体xwmp_cond的对象缓存
@@ -58,9 +49,6 @@ static __xwmp_data struct xwmm_memslice * xwmp_cond_cache = NULL;
 __xwmp_rodata const char xwmp_cond_cache_name[] = "xwos.mp.sync.cond.cache";
 #endif /* XWMPCFG_SYNC_COND_MEMSLICE */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      static function prototypes     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwmp_code
 struct xwmp_cond * xwmp_cond_alloc(void);
 
@@ -81,10 +69,6 @@ xwer_t xwmp_cond_do_timedblkthrd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
                                                  xwtm_t * xwtm, xwsq_t * lkst,
                                                  xwreg_t cpuirq);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** memslice ******** ********/
 #if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
 /**
  * @brief XWMP INIT CODE：初始化结构体xwmp_cond的对象缓存

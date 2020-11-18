@@ -21,14 +21,8 @@
 #ifndef __xwam_example_mm_bma_mif_h__
 #define __xwam_example_mm_bma_mif_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t example_bma_start(void);
 xwer_t xwmmdemo_bma_alloc(xwsz_t memsize, void ** membuf);
 xwer_t xwmmdemo_bma_free(void * mem);

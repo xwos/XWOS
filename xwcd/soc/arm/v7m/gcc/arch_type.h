@@ -21,9 +21,6 @@
 #ifndef __arch_type_h__
 #define __arch_type_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********   header files    ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <cfg/XuanWuOS.h>
 #include <stdio.h>
 #include <inttypes.h>
@@ -32,9 +29,6 @@
 #include <stdbool.h>
 #include <limits.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 typedef uint8_t arch_uint8_t;
 typedef int8_t arch_int8_t;
 typedef uint16_t arch_uint16_t;
@@ -107,9 +101,6 @@ typedef signed int xwirq_t; /**< 中断号 (有符号) */
 #define ARCH_HAVE_XWPR_T        1
 typedef signed int xwpr_t; /**< 优先级 (有符号) */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #ifndef UCHAR_MAX
   #define UCHAR_MAX             ((unsigned char)(~((unsigned char)0)))
 #endif
@@ -340,9 +331,5 @@ typedef signed int xwpr_t; /**< 优先级 (有符号) */
 #define XWSSQ_T__SIZE
 #define BITS_PER_XWSSQ_T        BITS_PER_LONG
 #define XWSSQ_T_SHIFT           LONG_SHIFT
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      inline function prototypes     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 
 #endif /* arch_type.h */

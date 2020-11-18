@@ -13,16 +13,10 @@
 #ifndef __xwos_up_sync_plsem_h__
 #define __xwos_up_sync_plsem_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/up/plwq.h>
 #include <xwos/up/sync/vsem.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 管道信号量对象
  */
@@ -31,22 +25,11 @@ struct xwup_plsem {
         struct xwup_plwq plwq; /**< 实时等待队列 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t xwup_plsem_intr(struct xwup_plsem * sem, struct xwup_wqn * wqn);
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwup_plsem_init(struct xwup_plsem * sem, xwssq_t val, xwssq_t max);
 xwer_t xwup_plsem_destroy(struct xwup_plsem * sem);
 xwer_t xwup_plsem_create(struct xwup_plsem ** ptrbuf, xwssq_t val, xwssq_t max);
 xwer_t xwup_plsem_delete(struct xwup_plsem * sem);
+xwer_t xwup_plsem_intr(struct xwup_plsem * sem, struct xwup_wqn * wqn);
 
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
 xwer_t xwup_plsem_bind(struct xwup_plsem * sem, struct xwup_evt * evt,

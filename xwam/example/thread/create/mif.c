@@ -18,18 +18,12 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/skd.h>
 #include <xwam/example/thread/create/mif.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define THRD_1_PRIORITY                                         \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
@@ -38,26 +32,15 @@
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
 #define EXAMPLE_THREAD_CREATE_LOG_TAG         "thrdcrt"
-#define thrdcrtlogf(lv, fmt, ...)                                       \
+#define thrdcrtlogf(lv, fmt, ...)                               \
         xwlogf(lv, EXAMPLE_THREAD_CREATE_LOG_TAG, fmt, ##__VA_ARGS__)
 #else /* XWLIBCFG_LOG */
 #define thrdcrtlogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t thrd_1_func(void * arg);
-
 xwer_t thrd_2_func(void * arg);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 动态创建的线程描述表
  */
@@ -95,9 +78,6 @@ const struct xwos_thrd_desc static_tbd[] = {
 };
 struct xwos_tcb static_tcb[xw_array_size(static_tbd)];
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 模块的加载函数
  */

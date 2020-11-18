@@ -13,17 +13,19 @@
 #ifndef __xwos_mp_rtwq_h__
 #define __xwos_mp_rtwq_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/rbtree.h>
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/wqn.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief 以删除为目的，遍历实时等待队列中所有节点
+ * @param c: (I) 作为循环光标的等待队列节点结构体(struct xwmp_wqn)指针
+ * @param xwrtwq: (I) 等待队列的指针
+ */
+#define xwmp_rtwq_itr_thrd_rm(c, xwrtwq) \
+        for (c = (xwrtwq)->rightmost; c; c = (xwrtwq)->rightmost)
+
 /**
  * @brief 实时等待队列
  */
@@ -34,29 +36,12 @@ struct xwmp_rtwq {
         struct xwmp_splk lock; /* 保护结构体的锁 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief 以删除为目的，遍历实时等待队列中所有节点
- * @param c: (I) 作为循环光标的等待队列节点结构体(struct xwmp_wqn)指针
- * @param xwrtwq: (I) 等待队列的指针
- */
-#define xwmp_rtwq_itr_thrd_rm(c, xwrtwq) \
-        for (c = (xwrtwq)->rightmost; c; c = (xwrtwq)->rightmost)
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwmp_rtwq_init(struct xwmp_rtwq * xwrtwq);
 void xwmp_rtwq_add_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn,
                           xwpr_t prio);
 xwer_t xwmp_rtwq_remove_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn);
 struct xwmp_wqn * xwmp_rtwq_choose_locked(struct xwmp_rtwq * xwrtwq);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********   inline function implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 上锁等待队列
  * @param xwrtwq: (I) 实时等待队列

@@ -13,17 +13,22 @@
 #ifndef __xwos_mp_sync_sem_h__
 #define __xwos_mp_sync_sem_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/mp/rtwq.h>
 #include <xwos/mp/plwq.h>
 #include <xwos/mp/sync/object.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief 负信号量的值
+ */
+#define XWMP_SEM_NEGTIVE              ((xwssq_t)(-1))
+
+#if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
+  #define XWMP_SEM_API(api, ...) xwmp_rtsem_##api(__VA_ARGS__)
+#elif defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
+  #define XWMP_SEM_API(api, ...) xwmp_plsem_##api(__VA_ARGS__)
+#endif
+
 struct xwmp_evt;
 
 /**
@@ -60,23 +65,6 @@ struct xwmp_sem {
         } wq; /**< 等待队列 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-/**
- * @brief 负信号量的值
- */
-#define XWMP_SEM_NEGTIVE              ((xwssq_t)(-1))
-
-#if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
-  #define XWMP_SEM_API(api, ...) xwmp_rtsem_##api(__VA_ARGS__)
-#elif defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
-  #define XWMP_SEM_API(api, ...) xwmp_plsem_##api(__VA_ARGS__)
-#endif
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwmp_sem_construct(struct xwmp_sem * sem);
 void xwmp_sem_destruct(struct xwmp_sem * sem);
 xwer_t xwmp_sem_grab(struct xwmp_sem * sem);
@@ -90,9 +78,6 @@ xwer_t xwmp_plsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn);
 xwer_t xwmp_rtsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn);
 #endif /* XWMPCFG_SYNC_RTSEM */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWMPCFG_SYNC_SEM_MEMSLICE) && (1 == XWMPCFG_SYNC_SEM_MEMSLICE)
 xwer_t xwmp_sem_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif /* XWMPCFG_SYNC_SEM_MEMSLICE */

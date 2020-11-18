@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/mm/common.h>
@@ -37,15 +34,9 @@
 #include <bdl/standard.h>
 #include <bdl/board_init.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define AXISRAM_BLKSZ           BRDCFG_MM_AXISRAM_BLKSZ
 #define DTCMHEAP_BLKSZ          BRDCFG_MM_DTCMHEAP_BLKSZ
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 extern xwsz_t axisram_mr_origin[];
 extern xwsz_t axisram_mr_size[];
 
@@ -62,15 +53,9 @@ __xwbsp_data struct xwmm_bma * axisram_bma = NULL;
  */
 __xwbsp_data struct xwmm_bma * dtcmheap_bma = NULL;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function prototypes      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwbsp_init_code
 xwer_t sys_mm_init(void);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_init_code
 void board_lowlevel_init(void)
 {

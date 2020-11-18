@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #if defined(XuanWuOS_CFG_CORE__mp)
   #include <xwos/mp/irq.h>
@@ -34,21 +31,11 @@
 #include <soc_me.h>
 #include <soc_init.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function prototypes      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if (!defined(SOCCFG_RO_ISRTABLE)) || (1 != SOCCFG_RO_ISRTABLE)
 static __xwos_init_code
 void soc_relocate_isrtable(void);
 #endif /* !SOCCFG_RO_ISRTABLE */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 extern xwu8_t xwos_vctbl_lma_base[];
 extern xwu8_t xwos_vctbl_vma_base[];
 extern xwu8_t xwos_vctbl_vma_end[];
@@ -74,9 +61,6 @@ __xwbsp_data struct soc_wkup_flags soc_wkup_flags;
 extern __soc_isr_table_qualifier struct soc_isr_table soc_isr_table;
 extern __soc_isr_table_qualifier struct soc_isr_data_table soc_isr_data_table;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_init_code
 void soc_sysclk_init(void)
 {

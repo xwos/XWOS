@@ -18,16 +18,10 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <armv7m_core.h>
 #include <xwos/lib/xwaop8.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwlib_code
 xws8_t xwaop__xws8_t__store(__xwcc_atomic xws8_t * a,
                             const enum xwmb_memory_order_em mo,

@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
 #include <string.h>
@@ -30,21 +27,12 @@
 #include <bdl/standard.h>
 #include <bdl/ds/description/mpc560xbdkp.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define TASK_LED_PRIORITY       XWOS_SKD_PRIORITY_RT_MIN
 #define LED_PORT                SOC_GPIO_PORT_E
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t task_led(void * arg);
 xwer_t task_dmauart(void * arg);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 const struct xwos_thrd_desc board_td_tbl[] = {
         [0] = {
                 .name = "led",
@@ -67,12 +55,8 @@ const struct xwos_thrd_desc board_td_tbl[] = {
 };
 
 xwid_t board_tcb[xw_array_size(board_td_tbl)];
-
 xwu8_t rxbuffer[4096];
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwos_code
 xwer_t bdl_iftx(const xwu8_t * str, xwsz_t size)
 {

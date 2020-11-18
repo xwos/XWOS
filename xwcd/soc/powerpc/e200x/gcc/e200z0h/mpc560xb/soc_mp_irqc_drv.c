@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/lib/xwbop.h>
@@ -31,17 +28,6 @@
 #include <soc_sched.h>
 #include <soc_mp_irqc_drv.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ******** static function prototypes ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwbsp_code
 xwer_t soc_irqc_drv_probe(struct xwos_irqc * irqc);
 
@@ -84,9 +70,6 @@ static __xwbsp_code
 xwer_t soc_irqc_drv_get_data(struct xwos_irqc * irqc, xwirq_t irqn,
                              struct soc_irq_data * cfgdata);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_rodata const struct xwos_irqc_driver soc_irqc_drv = {
         .probe = soc_irqc_drv_probe,
         .remove = soc_irqc_drv_remove,
@@ -103,9 +86,6 @@ __xwbsp_rodata const struct xwos_irqc_driver soc_irqc_drv = {
         .get_data = soc_irqc_drv_get_data,
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwbsp_code
 xwer_t soc_irqc_drv_probe(struct xwos_irqc * irqc)
 {

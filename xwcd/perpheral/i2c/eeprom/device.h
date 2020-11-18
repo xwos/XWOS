@@ -21,19 +21,9 @@
 #ifndef __xwcd_perpheral_i2c_eeprom_device_h__
 #define __xwcd_perpheral_i2c_eeprom_device_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwcd/ds/i2c/perpheral.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 enum xwds_eeprom_rsc_gpio_idx_em {
         XWDS_EEPROM_RSC_GPIO_IDX_PWR = 0,
         XWDS_EEPROM_RSC_GPIO_IDX_WP,
@@ -52,9 +42,6 @@ struct xwds_eeprom {
         const struct xwds_resource_gpio * wp_gpiorsc; /**< 写保护GPIO */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwds_eeprom_construct(struct xwds_eeprom * eeprom);
 void xwds_eeprom_destruct(struct xwds_eeprom * eeprom);
 

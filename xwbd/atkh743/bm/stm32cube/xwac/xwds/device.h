@@ -21,9 +21,6 @@
 #ifndef __bm_stm32cube_xwac_xwds_device_h__
 #define __bm_stm32cube_xwac_xwds_device_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
 #include <xwcd/ds/device.h>
 #include <xwcd/ds/soc/chip.h>
@@ -32,9 +29,6 @@
 #include <xwcd/perpheral/i2c/eeprom/device.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/device.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ds ******** ********/
 extern struct xwds stm32cube_ds;
 

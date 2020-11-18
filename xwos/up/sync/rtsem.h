@@ -13,16 +13,10 @@
 #ifndef __xwos_up_sync_rtsem_h__
 #define __xwos_up_sync_rtsem_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/up/rtwq.h>
 #include <xwos/up/sync/vsem.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 实时信号量对象
  */
@@ -31,22 +25,11 @@ struct xwup_rtsem {
         struct xwup_rtwq rtwq; /**< 实时等待队列 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t xwup_rtsem_intr(struct xwup_rtsem * sem, struct xwup_wqn * wqn);
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwup_rtsem_init(struct xwup_rtsem * sem, xwssq_t val, xwssq_t max);
 xwer_t xwup_rtsem_destroy(struct xwup_rtsem * sem);
 xwer_t xwup_rtsem_create(struct xwup_rtsem ** ptrbuf, xwssq_t val, xwssq_t max);
 xwer_t xwup_rtsem_delete(struct xwup_rtsem * sem);
+xwer_t xwup_rtsem_intr(struct xwup_rtsem * sem, struct xwup_wqn * wqn);
 
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
 xwer_t xwup_rtsem_bind(struct xwup_rtsem * sem, struct xwup_evt * evt,

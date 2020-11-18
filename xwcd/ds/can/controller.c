@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：CAN总线控制器
+ * @brief 玄武设备栈：CAN总线控制器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,24 +18,14 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#include <string.h>
 #include <xwcd/ds/standard.h>
+#include <string.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/lib/xwbmpaop.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/sem.h>
 #include <xwcd/ds/can/controller.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function prototypes      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwds_vop
 xwer_t xwds_canc_cvop_probe(struct xwds_canc * canc);
 
@@ -56,9 +46,6 @@ static __xwds_vop
 xwer_t xwds_canc_cvop_resume(struct xwds_canc * canc);
 #endif /* XWCDCFG_ds_PM */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwds_rodata const struct xwds_base_virtual_operations xwds_canc_cvops = {
         .probe = (void *)xwds_canc_cvop_probe,
         .remove = (void *)xwds_canc_cvop_remove,
@@ -70,9 +57,6 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_canc_cvops = {
 #endif /* XWCDCFG_ds_PM */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：CAN控制器的构造函数
@@ -473,7 +457,7 @@ err_canc_grab:
         return rc;
 }
 
-/******** ******** Callbacks for BSP driver ******** ********/
+/******** ******** Callbacks for driver ******** ********/
 /**
  * @brief XWDS Driver Callback：设置“指示发送结果”的回调函数
  * @param canc: (I) CAN总线消息结构体的指针

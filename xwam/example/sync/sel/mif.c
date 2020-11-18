@@ -18,11 +18,8 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#include <string.h>
 #include <xwos/standard.h>
+#include <string.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/skd.h>
 #include <xwos/osal/swt.h>
@@ -33,9 +30,6 @@
 #include <xwos/osal/sync/sel.h>
 #include <xwam/example/sync/sel/mif.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWSELDEMO_CONSUMER_PRIORITY                             \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
@@ -52,36 +46,19 @@
 #define sellogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwseldemo_swt0_callback(struct xwos_swt * swt, void * arg);
 void xwseldemo_swt1_callback(struct xwos_swt * swt, void * arg);
 xwer_t xwseldemo_consumer_func(void * arg);
 xwer_t xwseldemo_producer_func(void * arg);
 xwer_t xwseldemo_syncthrd_func(void * arg);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwos_sel xwseldemo_sel0;
-
 struct xwos_sem xwseldemo_sem1;
-
 struct xwos_sem xwseldemo_sem2;
-
 struct xwos_flg xwseldemo_flg3;
-
 struct xwos_sel xwseldemo_sel4;
-
 struct xwos_cond xwseldemo_cond5;
-
 struct xwos_cond xwseldemo_cond6;
-
 struct xwos_br xwseldemo_br7;
 
 const struct xwos_thrd_desc xwseldemo_consumer_td = {
@@ -107,7 +84,6 @@ const struct xwos_thrd_desc xwseldemo_producer_td = {
 xwid_t xwseldemo_producer;
 
 struct xwos_swt xwseldemo_swt0;
-
 struct xwos_swt xwseldemo_swt1;
 
 const struct xwos_thrd_desc xwseldemo_syncthrd_td[] = {
@@ -132,9 +108,6 @@ const struct xwos_thrd_desc xwseldemo_syncthrd_td[] = {
 };
 xwid_t xwseldemo_syncthrd[xw_array_size(xwseldemo_syncthrd_td)];
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 测试模块的启动函数
  */

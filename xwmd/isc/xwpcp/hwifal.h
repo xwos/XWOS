@@ -13,23 +13,14 @@
 #ifndef __xwmd_isc_xwpcp_hwifal_h__
 #define __xwmd_isc_xwpcp_hwifal_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWPCP_HWIFAL_SOF                        ((xwu8_t)'P')
 #define XWPCP_HWIFAL_EOF                        ((xwu8_t)(XWPCP_HWIFAL_SOF ^ 0xFF))
 #define XWPCP_HWIFAL_SOF_SIZE                   (1U)
 #define XWPCP_HWIFAL_EOF_SIZE                   (1U)
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwpcp;
 struct xwpcp_frmslot;
 struct xwpcp_frame;
@@ -62,22 +53,10 @@ enum xwpcp_hwifal_notification_em {
         XWPCP_HWIFNTF_NETUNREACH = 1, /**< 远程端无响应 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-__xwmd_code
 xwer_t xwpcp_hwifal_open(struct xwpcp * xwpcp, void * hwifcb);
-
-__xwmd_code
 xwer_t xwpcp_hwifal_close(struct xwpcp * xwpcp);
-
-__xwmd_code
 xwer_t xwpcp_hwifal_tx(struct xwpcp * xwpcp, struct xwpcp_frame * frm);
-
-__xwmd_code
 xwer_t xwpcp_hwifal_rx(struct xwpcp * xwpcp, struct xwpcp_frmslot ** frmslotbuf);
-
-__xwmd_code
 void xwpcp_hwifal_notify(struct xwpcp * xwpcp, xwsq_t evt);
 
 #endif /* xwmd/isc/xwpcp/hwifal.h */

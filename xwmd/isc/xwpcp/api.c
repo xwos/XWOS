@@ -10,11 +10,8 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#include <string.h>
 #include <xwos/standard.h>
+#include <string.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/xwbmpaop.h>
 #include <xwos/lib/xwbop.h>
@@ -25,24 +22,15 @@
 #include <xwmd/isc/xwpcp/protocol.h>
 #include <xwmd/isc/xwpcp/api.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********        type       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwpcp_tx_cbarg {
         struct xwos_splk splk;
         struct xwos_cond cond;
         volatile xwer_t rc;
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWPCP_TXTHRD_PRIORITY XWMDCFG_isc_xwpcp_TXTHRD_PRIORITY
 #define XWPCP_RXTHRD_PRIORITY XWMDCFG_isc_xwpcp_RXTHRD_PRIORITY
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 发送线程的描述
  */
@@ -77,18 +65,12 @@ const struct xwos_thrd_desc xwpcp_txthrd_td = {
 static __xwmd_rodata
 const char xwpcp_slot_mempool_name[] = "xwpcp.slot.mempool";
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      static function prototypes     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwmd_code
 void xwpcp_init(struct xwpcp * xwpcp);
 
 static __xwmd_code
 void xwpcp_tx_notify(struct xwpcp * xwpcp, xwpcp_fhdl_t fhdl, xwer_t rc, void * arg);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwmd_code
 void xwpcp_init(struct xwpcp * xwpcp)
 {

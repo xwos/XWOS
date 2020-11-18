@@ -10,26 +10,12 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwcd/ds/uart/dma.h>
 #include <xwmd/isc/xwscp/protocol.h>
 #include <xwmd/isc/xwscp/hwifal.h>
 #include <xwmd/isc/xwscp/hwif/uart.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwmd_code
 xwer_t xwscpif_uart_open(struct xwscp * xwscp);
 
@@ -46,9 +32,6 @@ xwer_t xwscpif_uart_rx(struct xwscp * xwscp, xwu8_t * buf, xwsz_t * size);
 static __xwmd_code
 void xwscpif_uart_notify(struct xwscp * xwscp, xwsq_t ntf);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwmd_rodata
 const struct xwscp_hwifal_operations xwscpif_uart_ops = {
         .open = xwscpif_uart_open,
@@ -58,9 +41,6 @@ const struct xwscp_hwifal_operations xwscpif_uart_ops = {
         .notify = xwscpif_uart_notify,
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwmd_code
 xwer_t xwscpif_uart_open(struct xwscp * xwscp)
 {

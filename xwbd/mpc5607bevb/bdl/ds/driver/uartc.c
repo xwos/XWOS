@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/irq.h>
@@ -31,13 +28,6 @@
 #include <soc.h>
 #include <driver/ds/uart.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      static function prototypes     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwbsp_code
 xwer_t mpc560xb_uartc_check_desc(struct xwds_uartc * uartc);
 
@@ -66,9 +56,6 @@ xwer_t mpc560xb_uartc_drv_tx(struct xwds_uartc * uartc, xwu8_t byte);
 static __xwbsp_code
 xwer_t mpc560xb_uartc_drv_rx(struct xwds_uartc * uartc, xwu8_t * rxbuf);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_rodata const struct xwds_uartc_driver mpc560xb_uartc_drv = {
         .base = {
                 .name = "mpc560xb.linflex.uart",
@@ -84,9 +71,6 @@ __xwbsp_rodata const struct xwds_uartc_driver mpc560xb_uartc_drv = {
         .rx = mpc560xb_uartc_drv_rx,
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwbsp_code
 xwer_t mpc560xb_uartc_check_desc(struct xwds_uartc * uartc)
 {

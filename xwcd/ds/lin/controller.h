@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：LIN控制器
+ * @brief 玄武设备栈：LIN控制器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,24 +21,15 @@
 #ifndef __xwcd_ds_lin_controller_h__
 #define __xwcd_ds_lin_controller_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwcd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/osal/lock/mtx.h>
 #include <xwcd/ds/device.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWDS_LIN_DIAG_MSTREQ_MSG        0x3C
 #define XWDS_LIN_DIAG_SLCREP_MSG        0x3D
 #define XWDS_LIN_DEFAULT_DATA_SIZE      8
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief LIN接口模式枚举
  */
@@ -125,9 +116,6 @@ struct xwds_linc {
         struct xwos_mtx txlock; /**< 提供多线程访问安全的锁 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwds_linc_construct(struct xwds_linc * linc);
 void xwds_linc_destruct(struct xwds_linc * linc);
 

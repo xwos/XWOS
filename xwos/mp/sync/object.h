@@ -13,15 +13,9 @@
 #ifndef __xwos_mp_sync_object_h__
 #define __xwos_mp_sync_object_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwmp_evt;
 
 /**
@@ -37,13 +31,6 @@ struct xwmp_sync_object {
 #endif /* XWMPCFG_SYNC_EVT */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwmp_sync_object_construct(struct xwmp_sync_object * synobj, xwid_t type);
 void xwmp_sync_object_destruct(struct xwmp_sync_object * synobj);
 xwer_t xwmp_sync_object_activate(struct xwmp_sync_object * synobj, xwobj_gc_f gcfunc);

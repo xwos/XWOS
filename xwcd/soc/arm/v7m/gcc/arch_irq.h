@@ -21,15 +21,9 @@
 #ifndef __arch_irq_h__
 #define __arch_irq_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <armv7m_nvic.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /* high */
 #define ARCH_IRQ_PRIO_7         0x0
 #define ARCH_IRQ_PRIO_6         0x2
@@ -44,9 +38,6 @@
 #define ARCH_IRQ_SUBPRIO_HIGH   0x0
 #define ARCH_IRQ_SUBPRIO_LOW    0x1
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 enum arch_irq_em {
         ARCH_SP_TOP = -16, /**< initial value of stack point */
         ARCH_IRQ_RESET = -15, /**< Reset Interrupt */
@@ -66,45 +57,18 @@ enum arch_irq_em {
         ARCH_IRQ_SYSTICK = -1, /**< Cortex-M System Tick Interrupt */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-__xwbsp_init_code
 void arch_init_sysirqs(void);
-
-__xwbsp_isr
 void arch_isr_reset(void);
-
-__xwbsp_isr
 void arch_isr_nmi(void);
-
-__xwbsp_isr
 void arch_isr_hardfault(void);
-
-__xwbsp_isr
 void arch_isr_mm(void);
-
-__xwbsp_isr
 void arch_isr_busfault(void);
-
-__xwbsp_isr
 void arch_isr_usagefault(void);
-
-__xwbsp_isr
 void arch_isr_dbgmon(void);
-
-__xwbsp_isr
 void arch_isr_svc(void);
-
-__xwbsp_isr
 void arch_isr_noop(void);
-
-__xwbsp_code
 xwer_t arch_irq_get_id(xwirq_t * irqnbuf);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********   inline function implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief Enable local CPU IRQ
  */

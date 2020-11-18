@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/osal/skd.h>
 #include <xwos/osal/pm.h>
@@ -31,9 +28,6 @@
 #include <bm/stm32cube/xwac/xwds/pm.h>
 #include <bm/pm/mif.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define BRDPM_THRD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 #define BRDPM_BTN_GPIO_PORT XWDS_GPIO_PORT_I
@@ -44,17 +38,11 @@
 #define BRDPM_LED_GPIO_PORT XWDS_GPIO_PORT_G
 #define BRDPM_LED_GPIO_PIN XWDS_GPIO_PIN_7
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 enum brdpm_btn_event_em {
         BRDPM_BTNEVT_CLICK,
         BRDPM_BTNEVT_LONGPRESS,
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static
 void xwospl_pm_cb_resume(void * arg);
 
@@ -100,9 +88,6 @@ void brdpm_eirq_btn_isr(struct xwds_soc * soc, xwid_t id, xwds_eirq_arg_t arg);
 static
 xwer_t brdpm_thrd(void * arg);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 const struct xwos_thrd_desc brdpm_thrd_td = {
         .name = "bm.pm.thrd",
         .prio = BRDPM_THRD_PRIORITY,
@@ -116,9 +101,6 @@ xwid_t brdpm_thrd_id;
 
 struct xwos_sem brdpm_sem;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t brdpm_start(void)
 {
         xwer_t rc;

@@ -13,22 +13,12 @@
 #ifndef __xwos_up_sync_cond_h__
 #define __xwos_up_sync_cond_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/up/plwq.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-#include <xwos/up/sync/object.h>
+  #include <xwos/up/sync/object.h>
 #endif /* XWUPCFG_SYNC_EVT */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwup_tcb;
 
 /**
@@ -43,9 +33,6 @@ struct xwup_cond {
         struct xwup_plwq wq; /**< 等待队列 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwup_cond_activate(struct xwup_cond * cond);
 void xwup_cond_deactivate(struct xwup_cond * cond);
 xwer_t xwup_cond_intr(struct xwup_cond * cond, struct xwup_wqn * wqn);
@@ -55,9 +42,6 @@ xwer_t xwup_cond_do_timedwait(struct xwup_cond * cond,
                               void * lock, xwsq_t lktype, void * lkdata,
                               xwtm_t * xwtm, xwsq_t * lkst);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwup_cond_init(struct xwup_cond * cond);
 xwer_t xwup_cond_destroy(struct xwup_cond * cond);
 xwer_t xwup_cond_create(struct xwup_cond ** ptrbuf);

@@ -21,33 +21,14 @@
 #ifndef __soc_init_h__
 #define __soc_init_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-__xwbsp_init_code
 void soc_sysclk_init(void);
-
-__xwbsp_init_code
 void soc_rgm_init(void);
-
-__xwbsp_init_code
 void soc_flash_init(void);
-
-__xwbsp_init_code
 void soc_ram_init(void);
-
-__xwbsp_init_code
 void soc_me_init(void);
-
-__xwbsp_init_code
 void soc_lowlevel_init(void);
-
-__xwbsp_init_code
 void soc_init(void);
 
 #endif /* soc_init.h */

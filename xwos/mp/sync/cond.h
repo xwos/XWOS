@@ -13,16 +13,10 @@
 #ifndef __xwos_mp_sync_cond_h__
 #define __xwos_mp_sync_cond_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/mp/sync/object.h>
 #include <xwos/mp/plwq.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwmp_tcb;
 struct xwmp_evt;
 
@@ -38,13 +32,6 @@ struct xwmp_cond {
         } wq; /**< 条件量的等待队列 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwmp_cond_construct(struct xwmp_cond * cond);
 void xwmp_cond_destruct(struct xwmp_cond * cond);
 xwer_t xwmp_cond_grab(struct xwmp_cond * cond);
@@ -56,9 +43,6 @@ xwer_t xwmp_cond_do_timedwait(struct xwmp_cond * cond, struct xwmp_tcb * tcb,
                               void * lock, xwsq_t lktype, void * lkdata,
                               xwtm_t * xwtm, xwsq_t * lkst);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
 xwer_t xwmp_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif /* XWMPCFG_SYNC_COND_MEMSLICE */

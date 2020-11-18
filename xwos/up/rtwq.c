@@ -10,9 +10,6 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
@@ -21,18 +18,12 @@
 #include <xwos/up/wqn.h>
 #include <xwos/up/rtwq.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      static function prototypes     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwup_code
 void xwup_rtwq_rmrbb(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn);
 
 static __xwup_code
 void xwup_rtwq_rmrbn(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 初始化等待队列
  * @param xwrtwq: (I) 实时等待队列

@@ -21,14 +21,8 @@
 #ifndef __soc_init_h__
 #define __soc_init_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct soc_flash_cfgs {
         xwu8_t backdoor_key[8]; /**< Backdoor Comparison Key 0 ~ 7, offset: 0x0 */
         xwu8_t reserved0[4];
@@ -38,13 +32,7 @@ struct soc_flash_cfgs {
         xwu8_t fopt; /**< Non-volatile Flash Option Register, offset: 0xF */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-__xwbsp_init_code
 void soc_lowlevel_init(void);
-
-__xwbsp_init_code
 void soc_init(void);
 
 #endif /* soc_init.h */

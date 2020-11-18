@@ -13,9 +13,6 @@
 #ifndef __xwos_mp_tt_h__
 #define __xwos_mp_tt_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
@@ -25,14 +22,8 @@
   #include <xwos/mp/bh.h>
 #endif /* XWMPCFG_SKD_BH */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWMP_TTN_TYPE_MASK            (3UL)
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwmp_skd;
 struct xwmp_tt;
 
@@ -104,19 +95,10 @@ struct xwmp_ttn {
         } entry; /**< 时间树节点所属的对象 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-/******** time tree node ********/
 void xwmp_ttn_init(struct xwmp_ttn * ttn, xwptr_t entry, xwptr_t type);
 xwer_t xwmp_ttn_grab(struct xwmp_ttn * ttn);
 xwer_t xwmp_ttn_put(struct xwmp_ttn * ttn);
 
-/******** time tree ********/
 xwer_t xwmp_tt_init(struct xwmp_tt * xwtt);
 xwer_t xwmp_tt_add_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn,
                           xwreg_t cpuirq);
@@ -124,7 +106,6 @@ xwer_t xwmp_tt_remove_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn);
 xwer_t xwmp_tt_check_deadline(struct xwmp_tt * xwtt);
 struct xwmp_skd * xwmp_tt_get_skd(struct xwmp_tt * xwtt);
 
-/******** system timer ********/
 xwer_t xwmp_syshwt_init(struct xwmp_syshwt * hwt);
 xwer_t xwmp_syshwt_start(struct xwmp_syshwt * hwt);
 xwer_t xwmp_syshwt_stop(struct xwmp_syshwt * hwt);
@@ -134,9 +115,6 @@ xwtm_t xwmp_syshwt_get_timestamp(struct xwmp_syshwt * hwt);
 void xwmp_syshwt_task(struct xwmp_syshwt * hwt);
 struct xwmp_tt * xwmp_syshwt_get_tt(struct xwmp_syshwt * hwt);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********   inline function implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 获取时间树节点所属的对象的地址
  * @param ttn: (I) 时间树节点的指针

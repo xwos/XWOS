@@ -21,26 +21,8 @@
 #ifndef __bm_stm32cube_xwac_xwds_uart_h__
 #define __bm_stm32cube_xwac_xwds_uart_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void stm32cube_usart1_cb_txdma_cplt(struct xwds_dmauartc * dmauartc, xwer_t dmarc);
 void stm32cube_usart1_cb_rxdma_restart(struct xwds_dmauartc * dmauartc);
 void stm32cube_usart1_cb_rxdma_halfcplt(struct xwds_dmauartc * dmauartc);
@@ -52,9 +34,5 @@ void stm32cube_usart2_cb_rxdma_restart(struct xwds_dmauartc * dmauartc);
 void stm32cube_usart2_cb_rxdma_halfcplt(struct xwds_dmauartc * dmauartc);
 void stm32cube_usart2_cb_rxdma_cplt(struct xwds_dmauartc * dmauartc);
 void stm32cube_usart2_cb_rxdma_timer(struct xwds_dmauartc * dmauartc);
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 
 #endif /* bm/stm32cube/xwac/xwds/uart.h */

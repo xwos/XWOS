@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/osal/skd.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/cond.h>
@@ -29,9 +26,6 @@
 #include <bm/stm32cube/cubemx/Core/Inc/spi.h>
 #include <bm/stm32cube/xwac/xwds/spim.h>
 
-/******** ******** ******** ******** ******* * ******** ******** ********
- ******** ******** ********       SPI1       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** function prototypes  ********/
 static
 xwer_t stm32cube_spi1m_drv_start(struct xwds_device * dev);
@@ -194,9 +188,6 @@ void stm32cube_spi1m_cb_xfercplt(struct xwds_spim * spim, xwer_t xrc)
         xwos_cond_broadcast(&drvdata->cond);
 }
 
-/******** ******** ******** ******** ******* * ******** ******** ********
- ******** ******** ********       SPI2       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** function prototypes  ********/
 static
 xwer_t stm32cube_spi2m_drv_start(struct xwds_device * dev);

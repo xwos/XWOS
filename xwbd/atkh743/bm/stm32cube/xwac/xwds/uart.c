@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/cond.h>
@@ -29,9 +26,6 @@
 #include <bm/stm32cube/xwac/xwds/device.h>
 #include <bm/stm32cube/xwac/xwds/uart.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       USART1      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** function prototypes ********/
 static
 xwer_t stm32cube_usart1_drv_start(struct xwds_device * dev);
@@ -243,9 +237,6 @@ void stm32cube_usart1_cb_rxdma_timer(struct xwds_dmauartc * dmauartc)
         }
 }
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       USART2      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** function prototypes ********/
 static
 xwer_t stm32cube_usart2_drv_start(struct xwds_device * dev);

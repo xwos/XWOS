@@ -10,26 +10,12 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwcd/ds/uart/dma.h>
 #include <xwmd/isc/xwpcp/protocol.h>
 #include <xwmd/isc/xwpcp/hwifal.h>
 #include <xwmd/isc/xwpcp/hwif/uart.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwmd_code
 xwer_t xwpcpif_uart_open(struct xwpcp * xwpcp);
 
@@ -45,9 +31,6 @@ xwer_t xwpcpif_uart_rx(struct xwpcp * xwpcp, xwu8_t * buf, xwsz_t * size);
 static __xwmd_code
 void xwpcpif_uart_notify(struct xwpcp * xwpcp, xwsq_t ntf);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwmd_rodata
 const struct xwpcp_hwifal_operations xwpcpif_uart_ops = {
         .open = xwpcpif_uart_open,
@@ -57,9 +40,6 @@ const struct xwpcp_hwifal_operations xwpcpif_uart_ops = {
         .notify = xwpcpif_uart_notify,
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwmd_code
 xwer_t xwpcpif_uart_open(struct xwpcp * xwpcp)
 {

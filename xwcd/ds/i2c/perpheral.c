@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：I2C外设
+ * @brief 玄武设备栈：I2C外设
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,20 +18,10 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwcd/ds/standard.h>
 #include <xwos/osal/skd.h>
 #include <xwcd/ds/i2c/perpheral.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function prototypes      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwds_vop
 xwer_t xwds_i2cp_cvop_probe(struct xwds_i2cp * i2cp);
 
@@ -52,9 +42,6 @@ static __xwds_vop
 xwer_t xwds_i2cp_cvop_resume(struct xwds_i2cp * i2cp);
 #endif /* XWCDCFG_ds_PM */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwds_rodata const struct xwds_base_virtual_operations xwds_i2cp_cvops = {
         .probe = (void *)xwds_i2cp_cvop_probe,
         .remove = (void *)xwds_i2cp_cvop_remove,
@@ -66,9 +53,6 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_i2cp_cvops = {
 #endif /* XWCDCFG_ds_PM */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：I2C外设的构造函数

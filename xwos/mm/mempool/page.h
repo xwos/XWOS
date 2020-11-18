@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS的内存管理机制：内存池 —— 页分配器
+ * @brief 玄武OS内存管理：内存池 —— 页分配器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -13,9 +13,6 @@
 #ifndef __xwos_mm_mempool_page_h__
 #define __xwos_mm_mempool_page_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
@@ -23,17 +20,10 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/mempool/i_allocator.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWMM_MEMPOOL_PAGE_ORDER_CMB             (XWSQ_MAX)
-
 #define XWMM_MEMPOOL_PAGE_MAPPING_FREE          (0)
 #define XWMM_MEMPOOL_PAGE_MAPPING_INVAILD       (XWSQ_MAX)
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 内存页
  */
@@ -93,50 +83,23 @@ struct xwmm_mempool_page_allocator {
         struct xwmm_mempool_page * pgarray; /**< 页数值指针 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-__xwos_code
 xwer_t xwmm_mempool_page_find(struct xwmm_mempool_page_allocator * pa,
                               void * mem,
                               struct xwmm_mempool_page ** pgbuf);
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ********       internal inline function implementations        ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-__xwos_api
 xwer_t xwmm_mempool_page_allocator_init(struct xwmm_mempool_page_allocator * pa,
                                         const char * name,
                                         xwptr_t origin, xwsz_t size, xwsz_t pgsize,
                                         struct xwmm_mempool_page_odrbtree * odrbtree,
                                         struct xwmm_mempool_page * pgarray);
-
-__xwos_api
 xwer_t xwmm_mempool_page_allocator_destroy(struct xwmm_mempool_page_allocator * pa);
-
-__xwos_api
 xwer_t xwmm_mempool_page_allocator_create(struct xwmm_mempool_page_allocator ** ptrbuf,
                                           const char * name,
                                           xwptr_t origin, xwsz_t size, xwsz_t pgsize);
-
-__xwos_api
 xwer_t xwmm_mempool_page_allocator_delete(struct xwmm_mempool_page_allocator * pa);
-
-__xwos_api
 xwer_t xwmm_mempool_page_allocate(struct xwmm_mempool_page_allocator * pa,
                                   xwsq_t order,
                                   struct xwmm_mempool_page ** pgbuf);
-
-__xwos_api
 xwer_t xwmm_mempool_page_free(struct xwmm_mempool_page_allocator * pa,
                               struct xwmm_mempool_page * pg);
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      inline API implementations     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 
 #endif /* xwos/mm/mempool/page.h */

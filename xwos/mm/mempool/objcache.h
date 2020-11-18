@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS的内存管理机制：对象缓存
+ * @brief 玄武OS内存管理：对象缓存
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -13,9 +13,6 @@
 #ifndef __xwos_mm_mempool_objcache_h__
 #define __xwos_mm_mempool_objcache_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
@@ -24,13 +21,6 @@
 #include <xwos/mm/mempool/i_allocator.h>
 #include <xwos/mm/mempool/page.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 对象缓存
  */
@@ -62,53 +52,24 @@ struct xwmm_mempool_objcache {
         } page_list; /**< 页链表 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ********       internal inline function implementations        ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-__xwos_api
 xwer_t xwmm_mempool_objcache_init(struct xwmm_mempool_objcache * oc,
                                   struct xwmm_mempool_page_allocator * pa,
                                   const char * name,
                                   xwsz_t objsize, xwsz_t alignment, xwsq_t pg_order,
                                   ctor_f ctor, dtor_f dtor);
-
-__xwos_api
 xwer_t xwmm_mempool_objcache_destroy(struct xwmm_mempool_objcache * oc);
-
-__xwos_api
 xwer_t xwmm_mempool_objcache_create(struct xwmm_mempool_objcache ** ocbuf,
                                     struct xwmm_mempool_page_allocator * pa,
                                     const char * name,
                                     xwsz_t objsize, xwsz_t alignment, xwsq_t pg_order,
                                     ctor_f ctor, dtor_f dtor);
-
-__xwos_api
 xwer_t xwmm_mempool_objcache_delete(struct xwmm_mempool_objcache * oc);
-
-__xwos_api
 xwer_t xwmm_mempool_objcache_alloc(struct xwmm_mempool_objcache * oc, void ** objbuf);
-
-__xwos_api
 xwer_t xwmm_mempool_objcache_free(struct xwmm_mempool_objcache * oc, void * obj);
-
-__xwos_api
 xwer_t xwmm_mempool_objcache_reserve(struct xwmm_mempool_objcache * oc,
                                      xwsz_t reserved);
-
-__xwos_api
 xwer_t xwmm_mempool_objcache_get_capacity(struct xwmm_mempool_objcache * oc,
                                           xwsz_t * capacity);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      inline API implementations     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 
 #endif /* xwos/mm/mempool/objcache.h */

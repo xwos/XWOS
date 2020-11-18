@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：SOC设备
+ * @brief 玄武设备栈：SOC设备
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,15 +21,9 @@
 #ifndef __xwcd_ds_soc_chip_h__
 #define __xwcd_ds_soc_chip_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwcd/ds/standard.h>
 #include <xwcd/ds/device.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWCDCFG_ds_SOC_EIRQ_ROISRT) && (1 == XWCDCFG_ds_SOC_EIRQ_ROISRT)
   #define __xwds_soc_eirq_tbl_qualifier const
 #else
@@ -42,9 +36,6 @@
   #define __xwds_soc_dma_tbl_qualifier
 #endif
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwds_soc;
 struct xwds_dma_cfg;
 
@@ -220,9 +211,6 @@ struct xwds_soc {
 #endif /* XWCDCFG_ds_SOC_ERAM */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwds_soc_construct(struct xwds_soc * soc);
 void xwds_soc_destruct(struct xwds_soc * soc);
 xwer_t xwds_soc_ioctl(struct xwds_soc * soc, xwsq_t cmd, ...);

@@ -21,14 +21,8 @@
 #ifndef __xwam_example_thread_create_mif_h__
 #define __xwam_example_thread_create_mif_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t example_thread_create_start(void);
 
 #endif /* xwam/example/thread/create/mif.h */

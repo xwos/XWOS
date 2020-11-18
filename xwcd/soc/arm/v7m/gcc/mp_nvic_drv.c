@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/ospl/irq.h>
@@ -30,13 +27,6 @@
 #include <mp_nvic.h>
 #include <mp_nvic_drv.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ******** static function prototypes ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwbsp_code
 xwer_t cortexm_nvic_drv_probe(struct xwmp_irqc * irqc);
 
@@ -83,9 +73,6 @@ static __xwbsp_code
 xwer_t cortexm_nvic_drv_get_data(__xwcc_unused struct xwmp_irqc * irqc,
                                  xwirq_t irqn, struct soc_irq_data * cfgbuf);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_rodata const struct xwmp_irqc_driver cortexm_nvic_drv = {
         .probe = cortexm_nvic_drv_probe,
         .remove = cortexm_nvic_drv_remove,
@@ -102,9 +89,6 @@ __xwbsp_rodata const struct xwmp_irqc_driver cortexm_nvic_drv = {
         .get_data = cortexm_nvic_drv_get_data,
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwbsp_code
 xwer_t cortexm_nvic_drv_probe(struct xwmp_irqc * irqc)
 {

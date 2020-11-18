@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：UART
+ * @brief 玄武设备栈：UART
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwcd/ds/standard.h>
 #include <string.h>
 #include <xwos/lib/xwlog.h>
@@ -29,13 +26,6 @@
 #include <xwos/osal/sync/sem.h>
 #include <xwcd/ds/uart/general.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function prototypes      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwds_vop
 xwer_t xwds_uartc_cvop_probe(struct xwds_uartc * uartc);
 
@@ -59,9 +49,6 @@ xwer_t xwds_uartc_cvop_resume(struct xwds_uartc * uartc);
 static __xwds_code
 xwer_t xwds_uartc_tx_1byte(struct xwds_uartc * uartc, const xwu8_t byte);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwds_rodata const struct xwds_base_virtual_operations xwds_uartc_cvops = {
         .probe = (void *)xwds_uartc_cvop_probe,
         .remove = (void *)xwds_uartc_cvop_remove,
@@ -73,9 +60,6 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_uartc_cvops = {
 #endif /* XWCDCFG_ds_PM */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：UART控制器的构造函数

@@ -21,22 +21,12 @@
 #ifndef __xwam_application_w25qrpt_api_h__
 #define __xwam_application_w25qrpt_api_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/device.h>
 #include <xwam/application/w25qrpt/w25qrpt.h>
 #include <xwam/application/w25qrpt/hwifal.h>
 #include <xwam/application/w25qrpt/hwif/uart.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t w25qrpt_start(struct w25qrpt * w25qrpt,
                      const char * name,
                      struct xwds_w25qxx * flash,

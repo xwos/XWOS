@@ -13,17 +13,11 @@
 #ifndef __xwos_mp_plwq_h__
 #define __xwos_mp_plwq_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/wqn.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwmp_tcb;
 
 /**
@@ -34,9 +28,6 @@ struct xwmp_plwq {
         struct xwmp_splk lock; /**< 保护该结构体的锁 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 安全地遍历管道等待队列中所有节点，以防其被删除
  * @param c: (I) 作为循环光标的等待队列节点结构体(struct xwmp_wqn)指针
@@ -58,18 +49,12 @@ struct xwmp_plwq {
                                        struct xwmp_wqn,                 \
                                        cln.pl)
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwmp_plwq_init(struct xwmp_plwq * xwplwq);
 void xwmp_plwq_add_head_locked(struct xwmp_plwq * xwplwq, struct xwmp_wqn * wqn);
 void xwmp_plwq_add_tail_locked(struct xwmp_plwq * xwplwq, struct xwmp_wqn * wqn);
 xwer_t xwmp_plwq_remove_locked(struct xwmp_plwq * xwplwq, struct xwmp_wqn * wqn);
 struct xwmp_wqn * xwmp_plwq_choose_locked(struct xwmp_plwq * xwplwq);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********   inline function implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 锁住管道等待队列
  * @param xwplwq: (I) 管道等待队列结构体指针

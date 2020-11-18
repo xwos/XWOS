@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS MP同步机制：信号量
+ * @brief 玄武OS MP同步机制：同步对象
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -16,9 +16,6 @@
  *     + ② 事件对象的锁（evt->lock）
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
 #include <xwos/lib/xwbop.h>
@@ -42,18 +39,7 @@
 #include <xwos/mp/sync/object.h>
 #include <xwos/mp/sync/sem.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-__xwcc_inline
+__xwmp_code
 void xwmp_sync_object_construct(struct xwmp_sync_object * synobj, xwid_t type)
 {
         xwos_object_construct(&synobj->xwobj, type);
@@ -63,7 +49,7 @@ void xwmp_sync_object_construct(struct xwmp_sync_object * synobj, xwid_t type)
 #endif /* XWMPCFG_SYNC_EVT */
 }
 
-__xwcc_inline
+__xwmp_code
 void xwmp_sync_object_destruct(struct xwmp_sync_object * synobj)
 {
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
@@ -73,19 +59,19 @@ void xwmp_sync_object_destruct(struct xwmp_sync_object * synobj)
         xwos_object_destruct(&synobj->xwobj);
 }
 
-__xwcc_inline
+__xwmp_code
 xwer_t xwmp_sync_object_activate(struct xwmp_sync_object * synobj, xwobj_gc_f gcfunc)
 {
         return xwos_object_activate(&synobj->xwobj, gcfunc);
 }
 
-__xwcc_inline
+__xwmp_code
 xwer_t xwmp_sync_object_grab(struct xwmp_sync_object * synobj)
 {
         return xwos_object_grab(&synobj->xwobj);
 }
 
-__xwcc_inline
+__xwmp_code
 xwer_t xwmp_sync_object_put(struct xwmp_sync_object * synobj)
 {
         return xwos_object_put(&synobj->xwobj);

@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #if defined(XuanWuOS_CFG_CORE__mp)
   #include <mp_nvic.h>
@@ -37,13 +34,6 @@
 #include <soc.h>
 #include <soc_init.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function prototypes      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if (!defined(SOCCFG_RO_ISRTABLE)) || (1 != SOCCFG_RO_ISRTABLE)
 static __xwos_init_code
 void soc_relocate_isrtable(void);
@@ -52,9 +42,6 @@ void soc_relocate_isrtable(void);
 static __xwbsp_init_code
 void soc_relocate(void);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 extern xwu8_t xwos_vctbl_lma_base[];
 extern xwu8_t xwos_vctbl_vma_base[];
 extern xwu8_t xwos_vctbl_vma_end[];
@@ -77,9 +64,6 @@ extern xwu8_t ncache_vma_end[];
 extern xwu8_t ncache_bss_vma_base[];
 extern xwu8_t ncache_bss_vma_end[];
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_init_code
 void soc_lowlevel_init(void)
 {

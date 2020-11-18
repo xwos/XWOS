@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <bm/stm32cube/standard.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/bma.h>
@@ -31,25 +28,17 @@
 #include <bm/stm32cube/xwac/xwds/device.h>
 #include <bm/stm32cube/xwac/xwds/cmif.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function prototypes      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief 准备启动设备栈
+ * @retrun 错误码
+ * @note
+ * - 在初始化过程中调用此函数，此函数中只能初始化SOC的基本资源，
+ *   例如：GPIO、时钟等。
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：初始化流程
+ * - 重入性：不可重入
+ */
 xwer_t stm32cube_xwds_ll_start(void)
 {
         xwer_t rc;
@@ -67,6 +56,17 @@ err_soc_start:
         return rc;
 }
 
+/**
+ * @brief 准备停止设备栈
+ * @retrun 错误码
+ * @note
+ * - 在反初始化过程中调用此函数，此函数中只能停止SOC的基本资源，
+ *   例如：GPIO、时钟等。
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：反初始化流程
+ * - 重入性：不可重入
+ */
 xwer_t stm32cube_xwds_ll_stop(void)
 {
         xwer_t rc;
@@ -82,6 +82,17 @@ err_soc_stop:
         return rc;
 }
 
+/**
+ * @brief 启动设备栈
+ * @retrun 错误码
+ * @note
+ * - 此函数会启动所有外设，有些外设启动流程需要延时，
+ *   因此此函数只能运行在线程中。
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：不可重入
+ */
 xwer_t stm32cube_xwds_start(void)
 {
         xwer_t rc;
@@ -96,6 +107,17 @@ err_uart_start:
         return rc;
 }
 
+/**
+ * @brief 停止设备栈
+ * @retrun 错误码
+ * @note
+ * - 此函数会停止所有外设，有些外设的停止流程需要延时，
+ *   因此此函数只能运行在线程中。
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：不可重入
+ */
 xwer_t stm32cube_xwds_stop(void)
 {
         xwer_t rc;
@@ -110,6 +132,16 @@ err_uart_stop:
         return rc;
 }
 
+/**
+ * @brief 启动SOC
+ * @retrun 错误码
+ * @note
+ * - 已经由@ref stm32cube_xwds_ll_start()调用。
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：初始化流程
+ * - 重入性：不可重入
+ */
 xwer_t stm32cube_xwds_soc_start(void)
 {
         xwer_t rc;
@@ -135,6 +167,16 @@ err_dev_probe:
         return rc;
 }
 
+/**
+ * @brief 停止SOC
+ * @retrun 错误码
+ * @note
+ * - 已经由@ref stm32cube_xwds_ll_stop()调用。
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：反初始化流程
+ * - 重入性：不可重入
+ */
 xwer_t stm32cube_xwds_soc_stop(void)
 {
         xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_soc_cb));
@@ -143,6 +185,16 @@ xwer_t stm32cube_xwds_soc_stop(void)
         return XWOK;
 }
 
+/**
+ * @brief 启动UART
+ * @retrun 错误码
+ * @note
+ * - 已经由@ref stm32cube_xwds_start()调用。
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：不可重入
+ */
 xwer_t stm32cube_xwds_uart_start(void)
 {
         xwer_t rc;
@@ -168,6 +220,16 @@ err_dev_probe:
         return rc;
 }
 
+/**
+ * @brief 停止UART
+ * @retrun 错误码
+ * @note
+ * - 已经由@ref stm32cube_xwds_stop()调用。
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：不可重入
+ */
 xwer_t stm32cube_xwds_uart_stop(void)
 {
         xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_usart1_cb));

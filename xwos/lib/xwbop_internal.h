@@ -13,15 +13,9 @@
 #ifndef __xwos_lib_xwbop_internal_h__
 #define __xwos_lib_xwbop_internal_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <asmlib/xwbop.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         macros & functions          ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define BIT(n)                  (1UL << (n))
 #define BIT_BMP_MASK(n)         ((xwbmp_t)1 << (xwbmp_t)((n) % BITS_PER_XWBMP_T))
 #define BIT_BMP(n)              ((n) / BITS_PER_XWBMP_T)

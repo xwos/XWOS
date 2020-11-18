@@ -18,16 +18,10 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/ospl/irq.h>
 #include <mp_nvic_drv.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 extern __soc_isr_table_qualifier struct soc_isr_table soc_isr_table;
 extern __soc_isr_table_qualifier struct soc_isr_data_table soc_isr_data_table;
 

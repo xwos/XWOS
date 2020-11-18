@@ -10,36 +10,20 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwmd/libc/newlibac/mif.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 typedef void (*newlibac_linkage_f)(void);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 extern void newlibac_mem_linkage_placeholder(void);
 extern void newlibac_fops_linkage_placeholder(void);
 extern void newlibac_string_linkage_placeholder(void);
 extern void newlibac_lock_linkage_placeholder(void);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 连接占位符
  * @note
- * + 静态连接时，若符号存在多重定义，优先选择包含占位符的文件里面的符号。
+ * + 静态连接时，强制链接此静态库。
  */
 const newlibac_linkage_f newlibac_linkage_table[] = {
         newlibac_mem_linkage_placeholder,
@@ -48,9 +32,6 @@ const newlibac_linkage_f newlibac_linkage_table[] = {
         newlibac_lock_linkage_placeholder,
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t newlibac_init(void)
 {
         const newlibac_linkage_f * f = newlibac_linkage_table;

@@ -21,9 +21,6 @@
 #ifndef __bdl_ds_description_mpc560xbdkp_h__
 #define __bdl_ds_description_mpc560xbdkp_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/osal/irq.h>
 #include <xwcd/ds/device.h>
@@ -34,16 +31,10 @@
 #include <soc_clk.h>
 #include <xwcd/perpheral/i2c/eeprom/device.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macro       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define BDL_IRQ_PRIO_LOW        (SOC_IRQC_MIN_PRIO)
 #define BDL_IRQ_PRIO_MIDDLE     (SOC_IRQC_MIN_PRIO + 1)
 #define BDL_IRQ_PRIO_HIGH       (SOC_IRQC_MIN_PRIO + 2)
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** irqc data ******** ********/
 extern const struct soc_irqc_data mpc560xbdkp_isr_match_table;
 

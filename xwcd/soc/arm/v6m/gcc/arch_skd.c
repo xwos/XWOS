@@ -18,18 +18,12 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/osal/irq.h>
 #include <xwos/ospl/skd.h>
 #include <armv6m_core.h>
 #include <arch_skd.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define ARCH_IRQ_SWCX_PRIO                              (ARCH_IRQ_PRIO_LOWEST)
 
 #define XPSR_INITVAL                                    0x01000000U
@@ -40,9 +34,6 @@
 
 #define ARCH_NVGR_SIZE                                  36U
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 extern xwstk_t xwos_stk_top[];
 
 __xwbsp_rodata const struct soc_irq_cfg cortex_m_swcx_irq_cfg = {
@@ -58,15 +49,9 @@ __xwbsp_rodata const struct xwos_irq_resource cortex_m_swcx_irqrsc = {
         .description = "irq.swcx.armv6m",
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwbsp_code
 void arch_skd_report_stk_overflow(struct xwospl_skd_stack_info * stk);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief ADL BSP：获取调度器结构体指针
  * @return 调度器的指针

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：SPI主机模式控制器
+ * @brief 玄武设备栈：SPI主机模式控制器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,21 +21,11 @@
 #ifndef __xwcd_ds_spi_master_h__
 #define __xwcd_ds_spi_master_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwcd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/osal/lock/mtx.h>
 #include <xwcd/ds/device.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwds_spim;
 
 /**
@@ -69,9 +59,6 @@ struct xwds_spim {
         } xfer; /**< 传输API的状态 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwds_spim_construct(struct xwds_spim * spim);
 void xwds_spim_destruct(struct xwds_spim * spim);
 xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t * xwtm);

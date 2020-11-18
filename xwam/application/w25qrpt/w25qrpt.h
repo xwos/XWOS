@@ -21,17 +21,11 @@
 #ifndef __xwam_application_w25qrpt_w25qrpt_h__
 #define __xwam_application_w25qrpt_w25qrpt_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/device.h>
 #include <xwam/application/w25qrpt/hwifal.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
   #define W25QRPT_LOG_TAG       "w25qrpt"
   #define w25qrptlogf(lv, fmt, ...) \
@@ -40,9 +34,6 @@
   #define w25qrptlogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief W25Qxx编程器
  */

@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <soc.h>
 #include <soc_wdg.h>
@@ -40,13 +37,6 @@
 #endif
 #include <soc_init.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function prototypes      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if (!defined(SOCCFG_RO_ISRTABLE)) || (1 != SOCCFG_RO_ISRTABLE)
 static __xwos_init_code
 void soc_relocate_isrtable(void);
@@ -55,9 +45,6 @@ void soc_relocate_isrtable(void);
 static __xwbsp_init_code
 void soc_wdg_init(void);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __flscfg struct soc_flash_cfgs soc_flash_cfgs = {
         .backdoor_key = {
                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
@@ -67,9 +54,6 @@ __flscfg struct soc_flash_cfgs soc_flash_cfgs = {
         .fopt = 0xFF,
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_init_code
 void soc_lowlevel_init(void)
 {

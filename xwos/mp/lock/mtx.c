@@ -10,9 +10,6 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
 #include <xwos/lib/bclst.h>
@@ -26,17 +23,10 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
-#include <xwos/mm/memslice.h>
+  #include <xwos/mm/memslice.h>
 #endif /* XWMPCFG_LOCK_MTX_MEMSLICE */
 #include <xwos/mp/lock/mtx.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      static function prototypes     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwmp_code
 void xwmp_mtx_construct(struct xwmp_mtx * mtx);
 
@@ -83,9 +73,6 @@ xwer_t xwmp_mtx_do_blkthrd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
 static __xwmp_code
 xwer_t xwmp_mtx_do_lock_unintr(struct xwmp_mtx * mtx, struct xwmp_tcb * tcb);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
 /**
  * @brief 结构体xwmp_mtx的对象缓存
@@ -98,9 +85,6 @@ static __xwmp_data struct xwmm_memslice * xwmp_mtx_cache = NULL;
 __xwmp_rodata const char xwmp_mtx_cache_name[] = "xwos.mp.lk.mtx.cache";
 #endif /* XWMPCFG_LOCK_MTX_MEMSLICE */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
 /**
  * @brief XWMP INIT CODE：初始化结构体xwmp_mtx的对象缓存

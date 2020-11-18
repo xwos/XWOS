@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/lib/xwbop.h>
@@ -30,32 +27,19 @@
 #include <xwos/osal/sync/sem.h>
 #include <xwam/example/sync/sem/mif.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWSEMDEMO_THRD_PRIORITY \
+#define XWSEMDEMO_THRD_PRIORITY         \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
   #define XWSEMDEMO_LOG_TAG     "sem"
-  #define semlogf(lv, fmt, ...) \
+  #define semlogf(lv, fmt, ...)         \
         xwlogf(lv, XWSEMDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
 #else /* XWLIBCFG_LOG */
   #define semlogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwsemdemo_thrd_func(void * arg);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 线程描述表
  */
@@ -71,12 +55,8 @@ const struct xwos_thrd_desc xwsemdemo_tbd = {
 xwid_t xwsemdemo_tid;
 
 struct xwos_swt xwsemdemo_swt;
-
 struct xwos_sem xwsemdemo_sem;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 模块的加载函数
  */

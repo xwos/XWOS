@@ -13,9 +13,6 @@
 #ifndef __xwos_mp_thrd_h__
 #define __xwos_mp_thrd_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
 #include <xwos/lib/xwbop.h>
@@ -30,13 +27,6 @@
 #include <xwos/mp/mtxtree.h>
 #include <xwos/mp/tt.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwmp_plwq;
 struct xwmp_rtwq;
 struct xwmp_skd;
@@ -92,9 +82,6 @@ struct xwmp_tcb {
 #endif /* XWMPCFG_SKD_TCB_LOCAL_DATA_NUM */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwmp_thrd_grab(struct xwmp_tcb * tcb);
 xwer_t xwmp_thrd_put(struct xwmp_tcb * tcb);
 xwer_t xwmp_thrd_chprio_once(struct xwmp_tcb * tcb, xwpr_t dprio,
@@ -120,15 +107,11 @@ xwer_t xwmp_thrd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm, void * lkdat
 xwer_t xwmp_thrd_reqfrz_lic(struct xwmp_tcb * tcb);
 xwer_t xwmp_thrd_thaw_lic_pmlk(struct xwmp_tcb * tcb);
 
-/******** XWOS MP IRQ Callback for BSP Adaptation Code ********/
 xwer_t xwmp_thrd_exit_lic(struct xwmp_tcb * tcb, xwer_t rc);
 xwer_t xwmp_thrd_freeze_lic(struct xwmp_tcb * tcb);
 void xwmp_thrd_immigrate_lic(struct xwmp_tcb * tcb);
 xwer_t xwmp_thrd_outmigrate_lic(struct xwmp_tcb * tcb, xwid_t dstcpu);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWMPCFG_SKD_TCB_MEMSLICE) && (1 == XWMPCFG_SKD_TCB_MEMSLICE)
 xwer_t xwmp_tcb_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif /* XWMPCFG_SKD_TCB_MEMSLICE */

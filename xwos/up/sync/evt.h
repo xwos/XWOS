@@ -13,18 +13,12 @@
 #ifndef __xwos_up_sync_evt_h__
 #define __xwos_up_sync_evt_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/up/lock/fakespinlock.h>
 #include <xwos/up/sync/object.h>
 #include <xwos/up/sync/cond.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWUP_EVT_MAXNUM (XWUPCFG_SYNC_EVT_MAXNUM) /**< 事件最大数量 */
 
 /**
@@ -32,9 +26,6 @@
  */
 #define xwup_evt_declare_bitmap(name) xwbmpop_declare(name, XWUP_EVT_MAXNUM)
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 事件类型枚举
  */
@@ -79,9 +70,6 @@ struct xwup_evt {
         struct xwup_splk lock; /**< 保护位图的锁 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwup_evt_obj_bind(struct xwup_evt * evt,
                          struct xwup_sync_object * synobj,
                          xwsq_t pos,
@@ -92,9 +80,6 @@ xwer_t xwup_evt_obj_unbind(struct xwup_evt * evt,
 xwer_t xwup_evt_obj_s1i(struct xwup_evt * evt, struct xwup_sync_object * synobj);
 xwer_t xwup_evt_obj_c0i(struct xwup_evt * evt, struct xwup_sync_object * synobj);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwup_evt_init(struct xwup_evt * evt, xwbmp_t initval[], xwsq_t attr);
 xwer_t xwup_evt_destroy(struct xwup_evt * evt);
 xwer_t xwup_evt_create(struct xwup_evt ** ptrbuf, xwbmp_t initval[], xwsq_t attr);

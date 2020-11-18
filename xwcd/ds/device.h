@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：设备基类
+ * @brief 玄武设备栈：设备基类
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -26,18 +26,12 @@
 #ifndef __xwcd_ds_device_h__
 #define __xwcd_ds_device_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwcd/ds/standard.h>
 #include <xwos/lib/xwaop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/osal/lock/mtx.h>
 #include <xwcd/ds/object.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 向前迭代每个设备
  */
@@ -91,9 +85,6 @@
          ((nr)   << __IOC_NRSHIFT) |    \
          ((size) << __IOC_SIZESHIFT))
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 设备状态枚举
  */
@@ -158,9 +149,6 @@ struct xwds_device {
         const struct xwds_base_virtual_operations * cvops; /**< 通用操作的虚函数表 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwds_device_cvop_probe(struct xwds_device * dev);
 xwer_t xwds_device_cvop_remove(struct xwds_device * dev);
 xwer_t xwds_device_cvop_start(struct xwds_device * dev);
@@ -171,9 +159,6 @@ xwer_t xwds_device_cvop_suspend(struct xwds_device * dev);
 xwer_t xwds_device_cvop_resume(struct xwds_device * dev);
 #endif /* XWCDCFG_ds_PM */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwds_device_construct(struct xwds_device * dev);
 void xwds_device_destruct(struct xwds_device * dev);
 

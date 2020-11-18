@@ -10,9 +10,6 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/up/lock/seqlock.h>
@@ -23,22 +20,11 @@
 #include <xwos/up/plwq.h>
 #include <xwos/mm/kma.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-#include <xwos/up/sync/object.h>
-#include <xwos/up/sync/evt.h>
+  #include <xwos/up/sync/object.h>
+  #include <xwos/up/sync/evt.h>
 #endif /* XWUPCFG_SYNC_EVT */
 #include <xwos/up/sync/cond.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      static function prototypes     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwup_code
 struct xwup_cond * xwup_cond_alloc(void);
 
@@ -56,9 +42,6 @@ xwer_t xwup_cond_do_timedblkthrd_unlkwq_cpuirqrs(struct xwup_cond * cond,
                                                  xwtm_t * xwtm, xwsq_t * lkst,
                                                  xwreg_t cpuirq);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 申请条件量对象
  * @return 条件量对象的指针

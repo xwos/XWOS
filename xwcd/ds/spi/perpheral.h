@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：SPI外设控制器
+ * @brief 玄武设备栈：SPI外设控制器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,21 +21,11 @@
 #ifndef __xwcd_ds_spi_perpheral_h__
 #define __xwcd_ds_spi_perpheral_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwcd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwcd/ds/device.h>
 #include <xwcd/ds/spi/master.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwds_spip;
 
 /**
@@ -57,9 +47,6 @@ struct xwds_spip {
         xwid_t buscfgid; /**< 总线配置 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwds_spip_construct(struct xwds_spip * spip);
 void xwds_spip_destruct(struct xwds_spip * spip);
 xwer_t xwds_spip_ioctl(struct xwds_spip * spip, xwsq_t cmd, ...);

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：LIN控制器
+ * @brief 玄武设备栈：LIN控制器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,21 +18,11 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwcd/ds/standard.h>
 #include <xwos/osal/skd.h>
 #include <xwos/osal/lock/mtx.h>
 #include <xwcd/ds/lin/controller.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function prototypes      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwds_vop
 xwer_t xwds_linc_cvop_probe(struct xwds_linc * linc);
 
@@ -53,9 +43,6 @@ static __xwds_vop
 xwer_t xwds_linc_cvop_resume(struct xwds_linc * linc);
 #endif /* XWCDCFG_ds_PM */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwds_rodata const struct xwds_base_virtual_operations xwds_linc_cvops = {
         .probe = (void *)xwds_linc_cvop_probe,
         .remove = (void *)xwds_linc_cvop_remove,
@@ -67,9 +54,6 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_linc_cvops = {
 #endif /* XWCDCFG_ds_PM */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：LIN控制器的构造函数

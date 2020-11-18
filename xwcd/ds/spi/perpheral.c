@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：SPI外设控制器
+ * @brief 玄武设备栈：SPI外设控制器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,20 +18,10 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwcd/ds/standard.h>
 #include <xwos/osal/skd.h>
 #include <xwcd/ds/spi/perpheral.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function prototypes      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwds_vop
 xwer_t xwds_spip_cvop_probe(struct xwds_spip * spip);
 
@@ -52,9 +42,6 @@ static __xwds_vop
 xwer_t xwds_spip_cvop_resume(struct xwds_spip * spip);
 #endif /* XWCDCFG_ds_PM */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwds_rodata const struct xwds_base_virtual_operations xwds_spip_cvops = {
         .probe = (void *)xwds_spip_cvop_probe,
         .remove = (void *)xwds_spip_cvop_remove,
@@ -66,9 +53,6 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_spip_cvops = {
 #endif /* XWCDCFG_ds_PM */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：SPI外设控制器对象的构造函数

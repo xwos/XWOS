@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：UART with DMA
+ * @brief 玄武设备栈：UART with DMA
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -26,9 +26,6 @@
  *   - 定时器中断函数与DMA半完成与完成中断函数运行在同一个CPU上
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwcd/ds/standard.h>
 #include <string.h>
 #include <xwos/osal/skd.h>
@@ -37,13 +34,6 @@
 #include <xwos/osal/sync/sem.h>
 #include <xwcd/ds/uart/dma.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function prototypes      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwds_vop
 xwer_t xwds_dmauartc_cvop_probe(struct xwds_dmauartc * dmauartc);
 
@@ -64,9 +54,6 @@ static __xwds_vop
 xwer_t xwds_dmauartc_cvop_resume(struct xwds_dmauartc * dmauartc);
 #endif /* XWCDCFG_ds_PM */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwds_rodata const struct xwds_base_virtual_operations xwds_dmauartc_cvops = {
         .probe = (void *)xwds_dmauartc_cvop_probe,
         .remove = (void *)xwds_dmauartc_cvop_remove,
@@ -78,9 +65,6 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_dmauartc_cvops = {
 #endif /* XWCDCFG_ds_PM */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：DMA UART控制器的构造函数
@@ -553,7 +537,7 @@ err_dmauartc_grab:
         return rc;
 }
 
-/******** ******** Callbacks for BSP driver ******** ********/
+/******** ******** Callbacks for driver ******** ********/
 /**
  * @brief XWDS Driver Callback：清空接收队列
  * @param dmauartc: (I) DMA UART控制器对象指针

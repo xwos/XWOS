@@ -13,14 +13,8 @@
 #ifndef __xwos_up_rule_h__
 #define __xwos_up_rule_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <cfg/XuanWuOS.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       rules       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWUPCFG_SKD_THRD_EXIT) && (1 == XWUPCFG_SKD_THRD_EXIT)
   #if !defined(XWUPCFG_SYNC_COND) || (0 == XWUPCFG_SYNC_COND)
     #error "XWUPCFG_SYNC_COND must be '1' when (XWUPCFG_SKD_THRD_EXIT == 1) !"

@@ -16,15 +16,12 @@
  *     + ② 事件对象的锁（evt->lock）
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_SYNC_SEM_MEMSLICE) && (1 == XWMPCFG_SYNC_SEM_MEMSLICE)
-#include <xwos/mm/memslice.h>
+  #include <xwos/mm/memslice.h>
 #endif /* XWMPCFG_SYNC_SEM_MEMSLICE */
 #include <xwos/ospl/irq.h>
 #include <xwos/mp/skd.h>
@@ -36,18 +33,11 @@
 #include <xwos/mp/lock/seqlock.h>
 #include <xwos/mp/lock/mtx.h>
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
-#include <xwos/mp/sync/evt.h>
+  #include <xwos/mp/sync/evt.h>
 #endif /* XWMPCFG_SYNC_EVT */
 #include <xwos/mp/sync/object.h>
 #include <xwos/mp/sync/sem.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWMPCFG_SYNC_SEM_MEMSLICE) && (1 == XWMPCFG_SYNC_SEM_MEMSLICE)
 /**
  * @brief 结构体xwmp_sem的对象缓存
@@ -60,9 +50,6 @@ static __xwmp_data struct xwmm_memslice * xwmp_sem_cache = NULL;
 __xwmp_rodata const char xwmp_sem_cache_name[] = "xwos.mp.sync.sem.cache";
 #endif /* XWMPCFG_SYNC_SEM_MEMSLICE */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      static function prototypes     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwmp_code
 struct xwmp_sem * xwmp_sem_alloc(void);
 
@@ -120,10 +107,6 @@ static __xwmp_code
 xwer_t xwmp_rtsem_do_wait_unintr(struct xwmp_sem * sem, struct xwmp_tcb * tcb);
 #endif /* XWMPCFG_SYNC_RTSEM */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** memslice ******** ********/
 #if defined(XWMPCFG_SYNC_SEM_MEMSLICE) && (1 == XWMPCFG_SYNC_SEM_MEMSLICE)
 /**
  * @brief XWMP INIT CODE：初始化结构体xwmp_sem的对象缓存

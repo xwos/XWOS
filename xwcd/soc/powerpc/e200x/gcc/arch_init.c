@@ -18,17 +18,11 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <e200x_core.h>
 #include <arch_image_flag.h>
 #include <arch_init.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 extern __xwos_isr
 void arch_isr_reset(void);
 
@@ -38,9 +32,6 @@ void arch_ivpr_init(void);
 static __xwbsp_init_code
 void arch_spr_init(void);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 extern xwu8_t data_lma_base[];
 extern xwu8_t data_vma_base[];
 extern xwu8_t data_vma_end[];
@@ -82,9 +73,6 @@ __image_tail const struct arch_image_tail arch_image_tail = {
         },
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief init special registers of arch
  */

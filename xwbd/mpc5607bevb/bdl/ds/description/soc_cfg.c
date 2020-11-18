@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/osal/irq.h>
@@ -33,9 +30,6 @@
 #include <bdl/ds/description/mpc560xbdkp.h>
 #include <bdl/ds/driver/soc.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 const struct soc_irq_cfg mpc560xb_soc_irq_cfgs[] = {
         [0] = {
                 .priority = BDL_IRQ_PRIO_LOW,

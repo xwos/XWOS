@@ -16,9 +16,6 @@
 #ifndef __xwos_up_lock_fakemtx_h__
 #define __xwos_up_lock_fakemtx_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/up/thrd.h>
 #if defined(XWUPCFG_SYNC_RTSEM) && (1 == XWUPCFG_SYNC_RTSEM)
@@ -29,9 +26,6 @@
   #error "Can't find the configuration of semaphore!"
 #endif
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWUPCFG_SYNC_RTSEM) && (1 == XWUPCFG_SYNC_RTSEM)
   #define XWUP_SEM_API(api, ...) xwup_rtsem_##api(__VA_ARGS__)
   #define xwup_sem xwup_rtsem
@@ -40,9 +34,6 @@
   #define xwup_sem xwup_plsem
 #endif
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 虚假互斥锁对象
  */
@@ -50,9 +41,6 @@ struct xwup_mtx {
         struct xwup_sem fake;
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      inline API implementations     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwup_inline_api
 xwer_t xwup_mtx_init(struct xwup_mtx * mtx, xwpr_t sprio)
 {

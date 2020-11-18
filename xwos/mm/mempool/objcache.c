@@ -1,6 +1,6 @@
  /**
  * @file
- * @brief XuanWuOS的内存管理机制：对象缓存
+ * @brief 玄武OS内存管理：对象缓存
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -10,9 +10,6 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwaop.h>
@@ -24,13 +21,6 @@
 #include <xwos/mm/mempool/page.h>
 #include <xwos/mm/mempool/objcache.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      static function prototypes     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwos_code
 void xwmm_mempool_objcache_page_init(struct xwmm_mempool_objcache * oc,
                                      struct xwmm_mempool_page * pg);
@@ -53,13 +43,6 @@ xwer_t xwmm_mempool_objcache_i_a_malloc(void * this, xwsz_t size, void ** membuf
 static __xwos_code
 xwer_t xwmm_mempool_objcache_i_a_free(void * this, void * mem);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 初始化对象缓存
  * @param oc: (I) 对象缓存的指针

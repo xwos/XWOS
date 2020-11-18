@@ -13,15 +13,9 @@
 #ifndef __xwos_up_mtxtree_h__
 #define __xwos_up_mtxtree_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/rbtree.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwup_mtx;
 
 /**
@@ -33,9 +27,6 @@ struct xwup_mtxtree {
         struct xwup_mtx * rightmost; /**< 拥有最大关键字的互斥锁 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwup_mtxtree_init(struct xwup_mtxtree * mt);
 void xwup_mtxtree_add(struct xwup_mtxtree * mt, struct xwup_mtx * mtx);
 void xwup_mtxtree_remove(struct xwup_mtxtree * mt, struct xwup_mtx * mtx);

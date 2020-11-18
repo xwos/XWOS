@@ -13,9 +13,6 @@
 #ifndef __xwos_up_tt_h__
 #define __xwos_up_tt_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
@@ -24,14 +21,8 @@
   #include <xwos/up/bh.h>
 #endif /* XWUPCFG_SKD_BH */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWUP_TTN_TYPE_MASK            (3UL)
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwup_irq_resource;
 struct xwup_skd;
 struct xwup_tt;
@@ -104,17 +95,8 @@ struct xwup_ttn {
         } entry; /**< 时间树节点所属的对象 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-/******** time tree node ********/
 void xwup_ttn_init(struct xwup_ttn * ttn, xwptr_t entry, xwptr_t type);
 
-/******** time tree ********/
 xwer_t xwup_tt_init(struct xwup_tt * xwtt);
 xwer_t xwup_tt_add_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn,
                           xwreg_t cpuirq);
@@ -122,7 +104,6 @@ xwer_t xwup_tt_remove_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn);
 xwer_t xwup_tt_check_deadline(struct xwup_tt * xwtt);
 struct xwup_skd * xwup_tt_get_skd(struct xwup_tt * xwtt);
 
-/******** system timer ********/
 xwer_t xwup_syshwt_init(struct xwup_syshwt * hwt);
 xwer_t xwup_syshwt_start(struct xwup_syshwt * hwt);
 xwer_t xwup_syshwt_stop(struct xwup_syshwt * hwt);
@@ -132,9 +113,6 @@ xwtm_t xwup_syshwt_get_timestamp(struct xwup_syshwt * hwt);
 void xwup_syshwt_task(struct xwup_syshwt * hwt);
 struct xwup_tt * xwup_syshwt_get_tt(struct xwup_syshwt * hwt);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 获取时间树节点所属的对象的地址
  * @param ttn: (I) 时间树节点的指针

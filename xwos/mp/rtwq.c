@@ -14,9 +14,6 @@
  *     + ② xwmp_wqn.lock
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
@@ -26,18 +23,12 @@
 #include <xwos/mp/rtwq.h>
 #include <xwos/mp/wqn.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      static function prototypes     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwmp_code
 void xwmp_rtwq_rmrbb_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn);
 
 static __xwmp_code
 void xwmp_rtwq_rmrbn_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief 初始化等待队列
  * @param xwrtwq: (I) 实时等待队列

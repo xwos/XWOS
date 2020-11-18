@@ -13,22 +13,12 @@
 #ifndef __xwos_up_lock_mtx_h__
 #define __xwos_up_lock_mtx_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
 #include <xwos/up/rtwq.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwup_mtxtree;
 
 /**
@@ -50,18 +40,11 @@ struct xwup_mtx {
         xwpr_t dprio; /**< 动态优先级：此成员被锁rtwq.lock保护。*/
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-xwer_t xwup_mtx_intr(struct xwup_mtx * mtx, struct xwup_tcb * tcb);
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwup_mtx_init(struct xwup_mtx * mtx, xwpr_t sprio);
 xwer_t xwup_mtx_destroy(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio);
 xwer_t xwup_mtx_delete(struct xwup_mtx * mtx);
+xwer_t xwup_mtx_intr(struct xwup_mtx * mtx, struct xwup_tcb * tcb);
 xwer_t xwup_mtx_unlock(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_lock(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx);

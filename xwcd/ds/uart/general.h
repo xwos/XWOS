@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：UART
+ * @brief 玄武设备栈：UART
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,9 +21,6 @@
 #ifndef __xwcd_ds_uart_general_h__
 #define __xwcd_ds_uart_general_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwcd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/osal/lock/seqlock.h>
@@ -32,13 +29,6 @@
 #include <xwcd/ds/device.h>
 #include <xwcd/ds/uart/common.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwds_uartc;
 
 /**
@@ -78,9 +68,6 @@ struct xwds_uartc {
         xwssz_t txnum; /**< 缓冲区中待发送的数据的数量 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwds_uartc_construct(struct xwds_uartc * uartc);
 void xwds_uartc_destruct(struct xwds_uartc * uartc);
 
@@ -151,7 +138,7 @@ xwer_t xwds_uartc_release(struct xwds_uartc * uartc)
         return xwds_device_release(&uartc->dev);
 }
 
-/******** ******** Callbacks for BSP driver ******** ********/
+/******** ******** Callbacks for driver ******** ********/
 void xwds_uartc_drvcb_rx_isr(struct xwds_uartc * uartc);
 void xwds_uartc_drvcb_tx_isr(struct xwds_uartc * uartc);
 

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：I2C主机
+ * @brief 玄武设备栈：I2C主机
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,22 +21,11 @@
 #ifndef __xwcd_ds_i2c_master_h__
 #define __xwcd_ds_i2c_master_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwcd/ds/standard.h>
-#include <xwos/lib/xwbop.h>
 #include <xwos/osal/lock/mtx.h>
 #include <xwcd/ds/device.h>
 #include <xwcd/ds/i2c/common.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwds_i2cm;
 
 /**
@@ -70,9 +59,6 @@ struct xwds_i2cm {
         } abort; /**< 中止API的状态 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwds_i2cm_construct(struct xwds_i2cm * i2cm);
 void xwds_i2cm_destruct(struct xwds_i2cm * i2cm);
 xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,

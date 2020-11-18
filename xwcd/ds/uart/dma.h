@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：UART with DMA
+ * @brief 玄武设备栈：UART with DMA
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -21,9 +21,6 @@
 #ifndef __xwcd_ds_uart_dma_h__
 #define __xwcd_ds_uart_dma_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwcd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/osal/lock/spinlock.h>
@@ -33,14 +30,8 @@
 #include <xwcd/ds/soc/dma.h>
 #include <xwcd/ds/uart/common.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWDS_DMAUART_RXQ_SIZE   XWCDCFG_ds_UART_DMA_RXQ_SIZE
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwds_dmauartc;
 
 /**
@@ -82,9 +73,6 @@ struct xwds_dmauartc {
         } rxq; /**< 循环接收队列 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 void xwds_dmauartc_construct(struct xwds_dmauartc * dmauartc);
 void xwds_dmauartc_destruct(struct xwds_dmauartc * dmauartc);
 
@@ -150,7 +138,7 @@ xwer_t xwds_dmauartc_release(struct xwds_dmauartc * dmauartc)
         return xwds_device_release(&dmauartc->dev);
 }
 
-/******** ******** Callbacks for BSP driver ******** ********/
+/******** ******** Callbacks for driver ******** ********/
 void xwds_dmauartc_drvcb_rxq_flush(struct xwds_dmauartc * dmauartc);
 void xwds_dmauartc_drvcb_rxq_pub(struct xwds_dmauartc * dmauartc, xwsq_t tail);
 

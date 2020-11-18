@@ -18,17 +18,10 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <arch_irq.h>
 #include <asmlib/lfq.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-__xwbsp_code
 void arch_lfq_push(__xwcc_atomic xwlfq_t * h, __xwcc_atomic xwlfq_t * n)
 {
         xwreg_t flag;
@@ -39,7 +32,6 @@ void arch_lfq_push(__xwcc_atomic xwlfq_t * h, __xwcc_atomic xwlfq_t * n)
         arch_cpuirq_restore_lc(flag);
 }
 
-__xwbsp_code
 xwlfq_t * arch_lfq_pop(__xwcc_atomic xwlfq_t * h)
 {
         xwreg_t flag;

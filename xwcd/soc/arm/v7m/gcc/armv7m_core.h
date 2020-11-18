@@ -21,14 +21,8 @@
 #ifndef __armv7m_core_h__
 #define __armv7m_core_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      macros       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** SCB Application Interrupt and Reset Control Register ********/
 #define SCB_AIRCR_VECTKEY_POS           (16UL)
 #define SCB_AIRCR_VECTKEY_MSK           (0xFFFFUL << SCB_AIRCR_VECTKEY_POS)
@@ -51,9 +45,6 @@
 #define SCB_AIRCR_VECTRESET_POS         (0UL)
 #define SCB_AIRCR_VECTRESET_MSK         (1UL << SCB_AIRCR_VECTRESET_POS)
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief program status register
  * @note little-endian
@@ -1081,9 +1072,6 @@ struct cm_tpiu_reg {
         } devtype; /**< Offset: 0xFCC (R/ ) TPIU_DEVTYPE */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      register     ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /* Memory mapping of Core Hardware */
 #define ARMv7m_SCS_BASE         (0xE000E000UL) /**< System Control Space Base Address */
 #define ARMv7m_ITM_BASE         (0xE0000000UL) /**< ITM Base Address */
@@ -1095,9 +1083,6 @@ struct cm_tpiu_reg {
 #define cm_dwt                  (*((__xw_io struct cm_dwt_reg *)ARMv7m_DWT_BASE))
 #define cm_tpiu                 (*((__xw_io struct cm_tpiu_reg *)ARMv7m_TPI_BASE))
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** special registers ******** ********/
 /**
  * @brief Get xPSR.

@@ -10,9 +10,6 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
 #include <xwos/mm/common.h>
@@ -24,13 +21,6 @@
 #include <xwos/mp/tt.h>
 #include <xwos/mp/swt.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      static function prototypes     ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwmp_code
 struct xwmp_swt * xwmp_swt_alloc(void);
 
@@ -55,9 +45,6 @@ xwer_t xwmp_swt_gc(void * swt);
 static __xwmp_code
 void xwmp_swt_ttn_cb(void * entry);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWMPCFG_SKD_SWT_MEMSLICE) && (1 == XWMPCFG_SKD_SWT_MEMSLICE)
 /**
  * @brief 软件定时器对象缓存
@@ -70,9 +57,6 @@ __xwmp_data static struct xwmm_memslice * xwmp_swt_cache = NULL;
 __xwmp_rodata const char xwmp_swt_cache_name[] = "xwos.mp.swt.cache";
 #endif /* XWMPCFG_SKD_SWT_MEMSLICE */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWMPCFG_SKD_SWT_MEMSLICE) && (1 == XWMPCFG_SKD_SWT_MEMSLICE)
 /**
  * @brief XWMP INIT CODE：初始化软件定时器对象缓存

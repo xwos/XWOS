@@ -21,26 +21,16 @@
 #ifndef __compiler_gcc_h__
 #define __compiler_gcc_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <cfg/XuanWuOS.h>
 
 #ifndef __GNUC__
-#error "Not gcc!"
+  #error "Not gcc!"
 #endif
 
 #ifndef __XWOS_COMPILER__
-#define __XWOS_COMPILER__       gcc
+  #define __XWOS_COMPILER__     gcc
 #endif
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macro       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define __xw_i  volatile const /**< 'read only' structure member permissions */
 #define __xw_o  volatile       /**< 'write only' structure member permissions */
 #define __xw_io volatile       /**< 'read/write' structure member permissions */

@@ -13,22 +13,16 @@
 #ifndef __xwos_mp_skd_h__
 #define __xwos_mp_skd_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/rtrq.h>
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
-#include <xwos/mp/bh.h>
+  #include <xwos/mp/bh.h>
 #endif /* XWMPCFG_SKD_BH */
 #include <xwos/mp/tt.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWMP_CPU_NUM                            ((xwid_t)CPUCFG_CPU_NUM)
 #define XWMP_SKD_PRIORITY_RT_NUM                ((xwpr_t)XWMPCFG_SKD_PRIORITY_RT_NUM)
 #define XWMP_SKD_PRIORITY_RT_MIN                ((xwpr_t)0)
@@ -39,12 +33,9 @@
 
 #define XWMP_SKD_IDLE_STK(xwskd)                (&((xwskd)->idle))
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
-#define XWMP_SKD_BH_STK(xwskd)                (&((xwskd)->bh))
+  #define XWMP_SKD_BH_STK(xwskd)                (&((xwskd)->bh))
 #endif /* XWMPCFG_SKD_BH */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       types       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwmp_pmdm;
 struct xwmp_skd;
 struct xwmp_tcb;
@@ -177,14 +168,8 @@ struct __xwcc_aligned_l1cacheline xwmp_skd {
         struct xwmp_splk tcblistlock; /**< 保护tcblist的锁 */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 extern struct xwmp_skd xwmp_skd[CPUCFG_CPU_NUM];
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     internal function prototypes    ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 struct xwmp_skd * xwmp_skd_get_lc(void);
 xwer_t xwmp_skd_get_by_cpuid(xwid_t cpuid, struct xwmp_skd ** ptrbuf);
 struct xwmp_tcb * xwmp_skd_get_ctcb(struct xwmp_skd * xwskd);
@@ -208,14 +193,10 @@ xwer_t xwmp_skd_wakelock_lock(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_wakelock_unlock(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_notify_allfrz_lic(struct xwmp_skd * xwskd);
 
-/******** XWOS MP IRQ Callback for BSP Adaptation Code ********/
 void xwmp_skd_finish_swcx_lic(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_suspend_lic(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_resume_lic(struct xwmp_skd * xwskd);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********       API function prototypes       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 xwer_t xwmp_skd_init_lc(void);
 xwer_t xwmp_skd_start_lc(void);
 xwer_t xwmp_skd_start_syshwt_lc(void);

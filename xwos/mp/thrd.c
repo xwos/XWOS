@@ -10,9 +10,6 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
 #include <xwos/lib/xwbop.h>
@@ -21,7 +18,7 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_SKD_TCB_MEMSLICE) && (1 == XWMPCFG_SKD_TCB_MEMSLICE)
-#include <xwos/mm/memslice.h>
+  #include <xwos/mm/memslice.h>
 #endif /* XWMPCFG_SKD_TCB_MEMSLICE */
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
@@ -37,13 +34,6 @@
 #include <xwos/mp/lock/mtx.h>
 #include <xwos/mp/thrd.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 extern __xwmp_code
 xwer_t bdl_thrd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf);
 
@@ -91,9 +81,6 @@ void xwmp_thrd_outmigrate_frozen_lic(struct xwmp_tcb * tcb);
 static __xwmp_code
 xwer_t xwmp_thrd_outmigrate_reqfrz_lic(struct xwmp_tcb * tcb, xwid_t dstcpu);
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWMPCFG_SKD_TCB_MEMSLICE) && (1 == XWMPCFG_SKD_TCB_MEMSLICE)
 /**
  * @brief 结构体xwmp_tcb的对象缓存
@@ -106,9 +93,6 @@ __xwmp_data static struct xwmm_memslice * xwmp_tcb_cache = NULL;
 __xwmp_rodata const char xwmp_tcb_cache_name[] = "xwmp.mp.thrd.cache";
 #endif /* XWMPCFG_SKD_TCB_MEMSLICE */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XWMPCFG_SKD_TCB_MEMSLICE) && (1 == XWMPCFG_SKD_TCB_MEMSLICE)
 /**
  * @brief XWMP API：初始化结构体xwmp_tcb的对象缓存

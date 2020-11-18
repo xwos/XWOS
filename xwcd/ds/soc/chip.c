@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief xwcd设备栈：SOC设备
+ * @brief 玄武设备栈：SOC设备
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,20 +18,10 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#include <string.h>
 #include <xwcd/ds/standard.h>
+#include <string.h>
 #include <xwcd/ds/soc/chip.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********     static function prototypes      ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 static __xwds_vop
 xwer_t xwds_soc_cvop_probe(struct xwds_soc * soc);
 
@@ -52,9 +42,6 @@ static __xwds_vop
 xwer_t xwds_soc_cvop_resume(struct xwds_soc * soc);
 #endif /* XWCDCFG_ds_PM */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwds_rodata const struct xwds_base_virtual_operations xwds_soc_cvops = {
         .probe = (void *)xwds_soc_cvop_probe,
         .remove = (void *)xwds_soc_cvop_remove,
@@ -66,9 +53,6 @@ __xwds_rodata const struct xwds_base_virtual_operations xwds_soc_cvops = {
 #endif /* XWCDCFG_ds_PM */
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：SOC构造函数

@@ -21,61 +21,22 @@
 #ifndef __asmlib_xwbop_h__
 #define __asmlib_xwbop_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-__xwbsp_code
 xwssq_t arch_xwbop_ffs8(xwu8_t x);
-
-__xwbsp_code
 xwssq_t arch_xwbop_fls8(xwu8_t x);
-
-__xwbsp_code
 xwu16_t arch_xwbop_re16(xwu16_t x);
-
-__xwbsp_code
 xwssq_t arch_xwbop_ffs16(xwu16_t x);
-
-__xwbsp_code
 xwssq_t arch_xwbop_fls16(xwu16_t x);
-
-__xwbsp_code
 xwu32_t arch_xwbop_re32(xwu32_t x);
-
-__xwbsp_code
 xwssq_t arch_xwbop_ffs32(xwu32_t x);
-
-__xwbsp_code
 xwssq_t arch_xwbop_fls32(xwu32_t x);
-
-__xwbsp_code
 xwu64_t arch_xwbop_re64(xwu64_t x);
-
-__xwbsp_code
 xwssq_t arch_xwbop_ffs64(xwu64_t x);
-
-__xwbsp_code
 xwssq_t arch_xwbop_fls64(xwu64_t x);
-
-__xwbsp_code
 xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t len);
-
-__xwbsp_code
 xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t len);
-
-__xwbsp_code
 xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t len);
-
-__xwbsp_code
 xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t len);
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********  inline functions implementations   ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 
 #endif /* asmlib/xwbop.h */

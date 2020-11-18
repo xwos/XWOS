@@ -18,9 +18,6 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/osal/irq.h>
 #include <xwos/ospl/skd.h>
@@ -30,9 +27,6 @@
 #include <arch_skd.h>
 #include <arch_systick.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #ifdef BRDCFG_SYSHWT_SRCCLK
   #define ARCH_SYSHWT_SRCCLK    BRDCFG_SYSHWT_SRCCLK
 #else
@@ -45,9 +39,6 @@
   #define ARCH_SYSHWT_HZ        (XWTM_S / XWUPCFG_SYSHWT_PERIOD)
 #endif
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_rodata const struct soc_irq_cfg cortex_m_systick_irqcfg = {
         .irqcfg = {
                 .priority = ARCH_IRQ_TICK_PRIO,
@@ -61,9 +52,6 @@ __xwbsp_rodata const struct xwos_irq_resource cortex_m_systick_irqrsc = {
         .description = "irq.armv6m.systick",
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 __xwbsp_code
 xwer_t arch_systick_init(struct xwospl_syshwt * hwt)
 {
