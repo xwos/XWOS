@@ -23,7 +23,7 @@
 
 #include <xwos/standard.h>
 
-void arch_lfq_push(__xwcc_atomic xwlfq_t * h, __xwcc_atomic xwlfq_t * n);
-xwlfq_t * arch_lfq_pop(__xwcc_atomic xwlfq_t * h);
+void arch_lfq_push(xwlfq_a * h, xwlfq_a * n);
+xwlfq_t * arch_lfq_pop(xwlfq_a * h);
 
 #endif /* asmlib/lfq.h */

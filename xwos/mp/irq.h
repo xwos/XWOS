@@ -84,7 +84,7 @@ struct xwmp_irqc {
  * @brief XWOS MP中断
  */
 struct xwmp_irq {
-        __xwcc_atomic xwid_t cpuid; /**< IRQ绑定的CPU ID */
+        xwid_a cpuid; /**< IRQ绑定的CPU ID */
 };
 
 void xwmp_irqc_subsys_init(void);

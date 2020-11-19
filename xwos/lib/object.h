@@ -51,16 +51,16 @@ typedef xwer_t (* xwobj_gc_f)(void *);
  * @brief XWOS对象
  */
 struct __xwcc_aligned(XWMMCFG_ALIGNMENT) xwos_object {
-        __xwcc_atomic xwsq_t refcnt; /**< + 引用计数:
-                                            - 0: 对象可以被销毁；
-                                            - 1: 对象就绪；
-                                            - >1: 对象正在被引用。
-                                          + 内存算法memslice使用结构体的第一块内存字
-                                            作为单链表节点，因此每个对象在定义时必须
-                                            保证其第一个成员的大小等于系统指针大小，
-                                            并且它们的初始值都相同。内存算法memslice
-                                            可以将这个初始值备份起来，当结构体被分配
-                                            出去时使用备份值恢复第一块内存的内容。 */
+        xwsq_a refcnt; /**< + 引用计数:
+                              - 0: 对象可以被销毁；
+                              - 1: 对象就绪；
+                              - >1: 对象正在被引用。
+                            + 内存算法memslice使用结构体的第一块内存字
+                              作为单链表节点，因此每个对象在定义时必须
+                              保证其第一个成员的大小等于系统指针大小，
+                              并且它们的初始值都相同。内存算法memslice
+                              可以将这个初始值备份起来，当结构体被分配
+                              出去时使用备份值恢复第一块内存的内容。 */
         xwobj_gc_f gcfunc; /**< 垃圾回收函数 */
         xwid_t type; /**< 对象的类型 */
 };
@@ -101,7 +101,7 @@ xwer_t xwos_object_activate(struct xwos_object * obj, xwobj_gc_f gcfunc)
 {
         xwer_t rc;
 
-        rc = xwaop_teq_then_add(xwsq_t, &obj->refcnt, 0, 1, NULL, NULL);
+        rc = xwaop_teq_then_add(xwsq, &obj->refcnt, 0, 1, NULL, NULL);
         if (__xwcc_likely(XWOK == rc)) {
                 obj->gcfunc = gcfunc;
         } else {
@@ -122,7 +122,7 @@ xwer_t xwos_object_grab(struct xwos_object * obj)
 {
         xwer_t rc;
 
-        rc = xwaop_tge_then_add(xwsq_t, &obj->refcnt, 1, 1, NULL, NULL);
+        rc = xwaop_tge_then_add(xwsq, &obj->refcnt, 1, 1, NULL, NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 rc = -EOBJDEAD;
         }/* else {} */
@@ -156,7 +156,7 @@ xwer_t xwos_object_put(struct xwos_object * obj)
         xwer_t rc;
         xwsq_t nv;
 
-        rc = xwaop_tgt_then_sub(xwsq_t, &obj->refcnt,
+        rc = xwaop_tgt_then_sub(xwsq, &obj->refcnt,
                                 0, 1,
                                 &nv, NULL);
         if (__xwcc_likely(XWOK == rc)) {
@@ -179,7 +179,7 @@ xwer_t xwos_object_put(struct xwos_object * obj)
 static __xwcc_inline
 xwsq_t xwos_object_get_refcnt(struct xwos_object * obj)
 {
-        return xwaop_load(xwsq_t, &obj->refcnt, xwmb_modr_relaxed);
+        return xwaop_load(xwsq, &obj->refcnt, xwmb_modr_relaxed);
 }
 
 #endif /* xwos/lib/object.h */

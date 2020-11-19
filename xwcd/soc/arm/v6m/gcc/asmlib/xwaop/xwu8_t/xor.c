@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库：xwaop__xwu8_t__xor
+ * @brief 原子操作库：xwaop__xwu8__xor
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -23,9 +23,9 @@
 #include <xwos/lib/xwaop8.h>
 
 __xwlib_code
-void xwaop__xwu8_t__xor(__xwcc_atomic xwu8_t * a,
-                        xwu8_t v,
-                        xwu8_t * nv, xwu8_t * ov)
+void xwaop__xwu8__xor(xwu8_a * a,
+                      xwu8_t v,
+                      xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t n;
         xwu8_t o;

@@ -84,7 +84,7 @@ struct xwmp_ttn {
                                           组成双循环链表，此为链表节点 */
         struct xwlib_rbtree_node rbn; /**< 红黑树节点 */
         xwtm_t wkup_xwtm; /**< 唤醒时间 */
-        __xwcc_atomic xwsq_t wkuprs; /**< 唤醒原因 */
+        xwsq_a wkuprs; /**< 唤醒原因 */
         xwmp_tt_cb_f cb; /**< 回调函数：NULL表示节点不在时间树上 */
         struct xwmp_tt * xwtt; /**< 时间树 */
         union {

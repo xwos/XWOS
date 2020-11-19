@@ -53,8 +53,8 @@ struct xwmp_pmdm {
         struct xwmp_pmdm_callback cb; /**< 回调函数集合 */
 
         /* 私有成员 */
-        __xwcc_atomic xwsq_t stage; /**< 电源管理阶段，取值@ref xwmp_pmdm_stage_em */
-        __xwcc_atomic xwsz_t suspended_xwskd_cnt; /**< 已暂停的调度器的计数器 */
+        xwsq_a stage; /**< 电源管理阶段，取值@ref xwmp_pmdm_stage_em */
+        xwsz_a suspended_xwskd_cnt; /**< 已暂停的调度器的计数器 */
         struct xwmp_splk rslock; /**< 防止cb.resume与cb.suspend被同时调用的锁 */
 };
 

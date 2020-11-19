@@ -98,7 +98,7 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         xwpcplogf(DEBUG, "Starting XWPCP-%s ...\n", XWPCP_VERSION);
 
         xwpcp_init(xwpcp);
-        rc = xwaop_teq_then_add(xwsq_t, &xwpcp->refcnt,
+        rc = xwaop_teq_then_add(xwsq, &xwpcp->refcnt,
                                 XWPCP_REFCNT_STOPPED, 1,
                                 NULL, NULL);
         if (__xwcc_unlikely(rc < 0)) {
@@ -212,7 +212,7 @@ err_txqsem_init:
         xwmm_bma_delete(xwpcp->slot.pool);
         xwpcp->slot.pool = NULL;
 err_bma_create:
-        xwaop_sub(xwsq_t, &xwpcp->refcnt, 1, NULL, NULL);
+        xwaop_sub(xwsq, &xwpcp->refcnt, 1, NULL, NULL);
 err_grab_xwpcp:
         return rc;
 }
@@ -244,7 +244,7 @@ xwer_t xwpcp_stop(struct xwpcp * xwpcp)
                 }
         }
 
-        rc = xwaop_teq_then_sub(xwsq_t, &xwpcp->refcnt,
+        rc = xwaop_teq_then_sub(xwsq, &xwpcp->refcnt,
                                 XWPCP_REFCNT_STARTED, 1,
                                 NULL, NULL);
         if (__xwcc_unlikely(rc < 0)) {
@@ -291,7 +291,7 @@ xwer_t xwpcp_stop(struct xwpcp * xwpcp)
         return XWOK;
 
 err_hwifal_close:
-        xwaop_add(xwsq_t, &xwpcp->refcnt, 1, NULL, NULL);
+        xwaop_add(xwsq, &xwpcp->refcnt, 1, NULL, NULL);
 err_ifbusy:
         return rc;
 }

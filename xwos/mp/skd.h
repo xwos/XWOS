@@ -126,8 +126,7 @@ enum xwmp_skd_wakelock_cnt_em {
  * @brief 调度器电源管理控制块
  */
 struct xwmp_skd_pm {
-        __xwcc_atomic xwsq_t wklkcnt; /**< 唤醒锁，
-                                           取值@ref xwmp_skd_wakelock_cnt_em */
+        xwsq_a wklkcnt; /**< 唤醒锁，取值@ref xwmp_skd_wakelock_cnt_em */
         xwsz_t frz_thrd_cnt; /**< 已冻结的线程计数器 */
         struct xwlib_bclst_head frzlist; /**< 已冻结的线程链表 */
         struct xwmp_splk lock; /**< 保护链表和计数器的锁 */
@@ -139,11 +138,11 @@ struct xwmp_skd_pm {
  */
 struct __xwcc_aligned_l1cacheline xwmp_skd {
         struct xwmp_skd_stack_info * cstk; /**< 当前正在运行的线程的栈信息的指针
-                                              偏移：0，
-                                              汇编代码中会使用这个成员 */
+                                                偏移：0，
+                                                汇编代码中会使用这个成员 */
         struct xwmp_skd_stack_info * pstk; /**< 前一个线程的栈信息的指针
-                                              偏移：sizeof(long)，
-                                              汇编代码中会使用这个成员 */
+                                                偏移：sizeof(long)，
+                                                汇编代码中会使用这个成员 */
         xwid_t id; /**< CPU ID */
         bool state; /**< 调度器状态 */
         struct {
@@ -151,11 +150,11 @@ struct __xwcc_aligned_l1cacheline xwmp_skd {
         } rq; /**< 就绪队列 */
         struct xwmp_skd_stack_info idle; /**< 空闲任务的栈信息 */
         xwsq_t req_schedule_cnt; /**< 请求调度的计数器 */
-        __xwcc_atomic xwsq_t req_chkpmpt_cnt; /**< 请求检查抢占的计数器 */
-        __xwcc_atomic xwsq_t dis_pmpt_cnt; /**< 关闭抢占的计数器 */
+        xwsq_a req_chkpmpt_cnt; /**< 请求检查抢占的计数器 */
+        xwsq_a dis_pmpt_cnt; /**< 关闭抢占的计数器 */
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
-        __xwcc_atomic xwsq_t req_bh_cnt; /**< 请求进入中断底半部的计数器 */
-        __xwcc_atomic xwsq_t dis_bh_cnt; /**< 关闭中断底半部的计数器 */
+        xwsq_a req_bh_cnt; /**< 请求进入中断底半部的计数器 */
+        xwsq_a dis_bh_cnt; /**< 关闭中断底半部的计数器 */
         struct xwmp_bh_cb bhcb; /**< 中断底半部控制块 */
         struct xwmp_skd_stack_info bh; /**< 中断底半部任务的栈信息 */
 #endif /* XWMPCFG_SKD_BH */

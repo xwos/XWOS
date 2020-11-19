@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库：xwaop__xwu8_t__tst_then_op
+ * @brief 原子操作库：xwaop__xwu8__tst_then_op
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -23,10 +23,10 @@
 #include <xwos/lib/xwaop8.h>
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tst_then_op(__xwcc_atomic xwu8_t * a,
-                                  xwaop_tst_f tst, void * tst_args,
-                                  xwaop_op_f op, void * op_args,
-                                  xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tst_then_op(xwu8_a * a,
+                                xwaop_tst_f tst, void * tst_args,
+                                xwaop_op_f op, void * op_args,
+                                xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t n;
         xwu8_t o;

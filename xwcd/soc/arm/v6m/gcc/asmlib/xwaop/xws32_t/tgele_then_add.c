@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库：xwaop__xws32_t__tgele_then_add
+ * @brief 原子操作库：xwaop__xws32__tgele_then_add
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -23,10 +23,10 @@
 #include <xwos/lib/xwaop32.h>
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgele_then_add(__xwcc_atomic xws32_t * a,
-                                      xws32_t l, xws32_t r,
-                                      xws32_t v,
-                                      xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xws32__tgele_then_add(xws32_a * a,
+                                    xws32_t l, xws32_t r,
+                                    xws32_t v,
+                                    xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;

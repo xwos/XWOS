@@ -123,7 +123,7 @@ struct __xwcc_aligned(XWMMCFG_ALIGNMENT) xwscp_frmslot {
 struct xwscp {
         /* 基本信息 */
         const char * name; /**< 名字 */
-        __xwcc_atomic xwsq_t hwifst; /**< 硬件接口抽象层状态 */
+        xwsq_a hwifst; /**< 硬件接口抽象层状态 */
         const struct xwscp_hwifal_operations * hwifops; /**< 硬件接口抽象层操作函数 */
         void * hwifcb; /**< 物理层端口 */
 
@@ -132,7 +132,7 @@ struct xwscp {
         struct xwos_mtx csmtx; /**< 保护发送和接收线程的共享数据的锁 */
         struct xwos_cond cscond; /**< 同步发送和接收线程的条件量 */
         struct {
-                __xwcc_atomic xwu32_t cnt; /**< 发送计数器 */
+                xwu32_a cnt; /**< 发送计数器 */
                 struct xwscp_frame * frm; /**< 正在发送的帧 */
                 xwer_t ack; /**< 应答代码 */
         } txi; /**< 正在发送的帧信息 */
@@ -140,7 +140,7 @@ struct xwscp {
         /* 接收状态机 */
         xwid_t tid; /**< 接收线程的ID */
         struct {
-                __xwcc_atomic xwu32_t cnt; /**< 接收计数器 */
+                xwu32_a cnt; /**< 接收计数器 */
                 struct xwlib_bclst_head head; /**< 链表头 */
                 struct xwos_splk lock; /**< 保护接收队列的自旋锁 */
                 struct xwos_sem sem; /**< 接收队列的信号量 */

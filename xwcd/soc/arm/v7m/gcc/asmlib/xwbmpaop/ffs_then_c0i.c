@@ -23,7 +23,7 @@
 #include <armv7m_core.h>
 
 __xwlib_code
-xwssq_t xwbmpaop_ffs_then_c0i(__xwcc_atomic xwbmp_t * bmp, xwsz_t num)
+xwssq_t xwbmpaop_ffs_then_c0i(xwbmp_a * bmp, xwsz_t num)
 {
         xwsz_t total = BITS_TO_BMPS(num);
         xwsq_t i;

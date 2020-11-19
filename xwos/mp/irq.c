@@ -52,7 +52,7 @@ void xwmp_irqc_subsys_init(void)
         xwmp_splk_init(&xwmp_irqc_subsystem.percpu_irqcslot_lock);
 
         for (i = 0; i < XWOS_IRQ_NUM; i++) {
-                xwaop_store(xwid_t,
+                xwaop_store(xwid,
                             &xwmp_irqc_subsystem.irq.allcfg[i].cpuid,
                             xwmb_modr_relaxed,
                             0);
@@ -258,7 +258,7 @@ struct xwmp_irqc * xwmp_irq_get_irqc(xwirq_t irqn)
         XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM), "nullptr", NULL);
 
         xwmp_rawly_lock_cpuirqsv(&xwmp_irqc_subsystem.percpu_irqcslot_lock, &cpuirq);
-        cpuid = xwaop_load(xwid_t, &xwmp_irqc_subsystem.irq.cfg.cpu[irqn].cpuid,
+        cpuid = xwaop_load(xwid, &xwmp_irqc_subsystem.irq.cfg.cpu[irqn].cpuid,
                            xwmb_modr_relaxed);
         irqc = xwmp_irqc_subsystem.percpu_irqc[cpuid];
         xwmp_rawly_unlock_cpuirqrs(&xwmp_irqc_subsystem.percpu_irqcslot_lock, cpuirq);

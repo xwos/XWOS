@@ -220,7 +220,7 @@ xwer_t xwscp_connect_once(struct xwscp * xwscp, xwtm_t * xwtm, xwsq_t * cnt)
                                  &time, &lockstate);
         if (__xwcc_likely(XWOK == rc)) {
                 xwos_mtx_unlock(&xwscp->csmtx);
-                xwaop_add(xwu32_t, &xwscp->txi.cnt, 1, NULL, NULL);
+                xwaop_add(xwu32, &xwscp->txi.cnt, 1, NULL, NULL);
         } else {
                 if (XWOS_LKST_LOCKED == lockstate) {
                         xwos_mtx_unlock(&xwscp->csmtx);
@@ -323,19 +323,19 @@ xwer_t xwscp_tx_once(struct xwscp * xwscp, const xwu8_t msg[], xwsz_t * size,
                 switch (ack) {
                 case XWSCP_ACK_OK:
                         rc = xwscp_callback_rc[ack];
-                        xwaop_add(xwu32_t, &xwscp->txi.cnt, 1, NULL, NULL);
+                        xwaop_add(xwu32, &xwscp->txi.cnt, 1, NULL, NULL);
                         break;
                 case XWSCP_ACK_ESIZE:
                         rc = xwscp_callback_rc[ack];
-                        xwaop_c0m(xwu32_t, &xwscp->txi.cnt, XWSCP_ID_MSK,
+                        xwaop_c0m(xwu32, &xwscp->txi.cnt, XWSCP_ID_MSK,
                                   NULL, NULL);
                         break;
                 case XWSCP_ACK_EALREADY:
                         rc = xwscp_callback_rc[XWSCP_ACK_OK];
-                        xwaop_add(xwu32_t, &xwscp->txi.cnt, 1, NULL, NULL);
+                        xwaop_add(xwu32, &xwscp->txi.cnt, 1, NULL, NULL);
                         break;
                 case XWSCP_ACK_ECONNRESET:
-                        xwaop_c0m(xwu32_t, &xwscp->txi.cnt, XWSCP_ID_MSK,
+                        xwaop_c0m(xwu32, &xwscp->txi.cnt, XWSCP_ID_MSK,
                                   NULL, NULL);
                         break;
                 }
@@ -413,7 +413,7 @@ xwer_t xwscp_tx(struct xwscp * xwscp, const xwu8_t msg[], xwsz_t * size,
                 }/* else {} */
         } while ((-EAGAIN == rc) && (cnt < XWSCP_RETRY_NUM));
         if (((-EAGAIN == rc)) && (XWSCP_RETRY_NUM == cnt)) {
-                xwaop_c0m(xwu32_t, &xwscp->txi.cnt, XWSCP_ID_MSK, NULL, NULL);
+                xwaop_c0m(xwu32, &xwscp->txi.cnt, XWSCP_ID_MSK, NULL, NULL);
                 rc = -ENOTCONN;
         }/* else {} */
         xwos_mtx_unlock(&xwscp->txmtx);

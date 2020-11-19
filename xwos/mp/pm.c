@@ -82,7 +82,7 @@ xwer_t xwmp_pmdm_suspend(void)
         xwsq_t nv;
         xwer_t rc;
 
-        rc = xwaop_teq_then_sub(xwsq_t, &xwmp_pmdm.stage,
+        rc = xwaop_teq_then_sub(xwsq, &xwmp_pmdm.stage,
                                 XWMP_PM_STAGE_RUNNING,
                                 1,
                                 &nv, NULL);
@@ -116,7 +116,7 @@ xwer_t xwmp_pmdm_resume(void)
         xwer_t rc;
 
         do {
-                rc = xwaop_teq_then_add(xwsq_t, &xwmp_pmdm.stage,
+                rc = xwaop_teq_then_add(xwsq, &xwmp_pmdm.stage,
                                         XWMP_PM_STAGE_SUSPENDED,
                                         1,
                                         &nv, &ov);
@@ -126,7 +126,7 @@ xwer_t xwmp_pmdm_resume(void)
                         }/* else {} */
                 }
 
-                rc = xwaop_teq_then_add(xwsq_t, &xwmp_pmdm.stage,
+                rc = xwaop_teq_then_add(xwsq, &xwmp_pmdm.stage,
                                         XWMP_PM_STAGE_RESUMING,
                                         1,
                                         &nv, &ov);
@@ -138,7 +138,7 @@ xwer_t xwmp_pmdm_resume(void)
                         xwmp_splk_unlock_cpuirqrs(&xwmp_pmdm.rslock, cpuirq);
                 }
 
-                rc = xwaop_teq_then_add(xwsq_t, &xwmp_pmdm.stage,
+                rc = xwaop_teq_then_add(xwsq, &xwmp_pmdm.stage,
                                         XWMP_PM_STAGE_THAWING,
                                         1,
                                         &nv, &ov);
@@ -171,7 +171,7 @@ xwsq_t xwmp_pmdm_get_stage(void)
 {
         xwsq_t stage;
 
-        stage = xwaop_load(xwsq_t, &xwmp_pmdm.stage, xwmb_modr_relaxed);
+        stage = xwaop_load(xwsq, &xwmp_pmdm.stage, xwmb_modr_relaxed);
         return stage;
 }
 
@@ -187,10 +187,10 @@ void xwmp_pmdm_report_xwskd_suspended(struct xwmp_pmdm * pmdm)
         xwreg_t cpuirq;
         xwsz_t suspended_xwskd_cnt;
 
-        xwaop_add(xwsz_t, &pmdm->suspended_xwskd_cnt, 1, &suspended_xwskd_cnt, NULL);
+        xwaop_add(xwsz, &pmdm->suspended_xwskd_cnt, 1, &suspended_xwskd_cnt, NULL);
         if (pmdm->xwskd_num == suspended_xwskd_cnt) {
                 xwmp_splk_lock_cpuirqsv(&pmdm->rslock, &cpuirq);
-                rc = xwaop_teq_then_sub(xwsq_t, &pmdm->stage,
+                rc = xwaop_teq_then_sub(xwsq, &pmdm->stage,
                                         XWMP_PM_STAGE_FREEZING,
                                         1,
                                         &nv, NULL);
@@ -200,7 +200,7 @@ void xwmp_pmdm_report_xwskd_suspended(struct xwmp_pmdm * pmdm)
                         }/* else {} */
                         xwmp_splk_unlock_cpuirqrs(&pmdm->rslock, cpuirq);
 
-                        xwaop_teq_then_sub(xwsq_t, &pmdm->stage,
+                        xwaop_teq_then_sub(xwsq, &pmdm->stage,
                                            XWMP_PM_STAGE_SUSPENDING,
                                            1,
                                            &nv, NULL);
@@ -208,7 +208,7 @@ void xwmp_pmdm_report_xwskd_suspended(struct xwmp_pmdm * pmdm)
                                 if (pmdm->cb.sleep) {
                                         pmdm->cb.sleep(pmdm->cb.arg);
                                 }/* else {} */
-                                nv = xwaop_load(xwsq_t, &pmdm->stage,
+                                nv = xwaop_load(xwsq, &pmdm->stage,
                                                 xwmb_modr_relaxed);
                         }
                 } else {
@@ -224,5 +224,5 @@ void xwmp_pmdm_report_xwskd_suspended(struct xwmp_pmdm * pmdm)
 __xwmp_code
 void xwmp_pmdm_report_xwskd_resuming(struct xwmp_pmdm * pmdm)
 {
-        xwaop_sub(xwsz_t, &pmdm->suspended_xwskd_cnt, 1, NULL, NULL);
+        xwaop_sub(xwsz, &pmdm->suspended_xwskd_cnt, 1, NULL, NULL);
 }

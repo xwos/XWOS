@@ -218,7 +218,7 @@ xwer_t xwds_device_probe(struct xwds * ds, struct xwds_device * dev,
                 goto err_dev_activate;
         }
 
-        rc = xwaop_teq_then_write(xwsq_t, &dev->state,
+        rc = xwaop_teq_then_write(xwsq, &dev->state,
                                   XWDS_DEVICE_STATE_INVALID,
                                   XWDS_DEVICE_STATE_PROBING,
                                   NULL);
@@ -246,7 +246,7 @@ xwer_t xwds_device_probe(struct xwds * ds, struct xwds_device * dev,
         dev->ds = ds;
 
         /* set device state */
-        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
+        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
         return XWOK;
 
 err_xwds_obj_add:
@@ -256,7 +256,7 @@ err_xwds_obj_add:
                 xwds_device_cvop_probe(dev);
         }
 err_dev_cvops_probe:
-        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_INVALID, NULL);
+        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_INVALID, NULL);
 err_dev_set_state:
         xwds_device_put(dev);
 err_dev_activate:
@@ -281,7 +281,7 @@ xwer_t xwds_device_remove(struct xwds_device * dev)
 
         XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
-        rc = xwaop_teq_then_write(xwsq_t, &dev->state,
+        rc = xwaop_teq_then_write(xwsq, &dev->state,
                                   XWDS_DEVICE_STATE_STOPED,
                                   XWDS_DEVICE_STATE_REMOVING,
                                   NULL);
@@ -313,7 +313,7 @@ xwer_t xwds_device_remove(struct xwds_device * dev)
         }
 
         /* set device state */
-        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_INVALID, NULL);
+        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_INVALID, NULL);
         xwds_device_put(dev);
         return XWOK;
 
@@ -321,7 +321,7 @@ err_dev_cvops_remove:
         xwds_obj_add(ds, &dev->obj);
         dev->ds = ds;
 err_xwds_obj_remove:
-        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
+        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
 err_dev_set_state:
         return rc;
 }
@@ -348,7 +348,7 @@ xwer_t xwds_device_start(struct xwds_device * dev)
                 rc = -EOWNERDEAD;
                 goto err_dev_grab;
         }
-        rc = xwaop_teq_then_write(xwsq_t, &dev->state,
+        rc = xwaop_teq_then_write(xwsq, &dev->state,
                                   XWDS_DEVICE_STATE_STOPED,
                                   XWDS_DEVICE_STATE_STARTING,
                                   NULL);
@@ -369,11 +369,11 @@ xwer_t xwds_device_start(struct xwds_device * dev)
         }
 
         /* set device state */
-        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
+        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
         return XWOK;
 
 err_dev_cvops_start:
-        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
+        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
 err_dev_set_state:
         xwds_device_put(dev);
 err_dev_grab:
@@ -397,7 +397,7 @@ xwer_t xwds_device_stop(struct xwds_device * dev)
 
         XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
-        rc = xwaop_teq_then_write(xwsq_t, &dev->state,
+        rc = xwaop_teq_then_write(xwsq, &dev->state,
                                   XWDS_DEVICE_STATE_RUNNING,
                                   XWDS_DEVICE_STATE_STOPING,
                                   NULL);
@@ -426,12 +426,12 @@ xwer_t xwds_device_stop(struct xwds_device * dev)
 
         /* set device state */
         xwds_device_put(dev);
-        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
+        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
         return XWOK;
 
 err_dev_cvops_stop:
 err_dev_refcnt:
-        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
+        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
 err_dev_set_state:
         return rc;
 }
@@ -454,7 +454,7 @@ xwer_t xwds_device_suspend(struct xwds_device * dev)
 
         XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
-        rc = xwaop_teq_then_write(xwsq_t, &dev->state,
+        rc = xwaop_teq_then_write(xwsq, &dev->state,
                                   XWDS_DEVICE_STATE_RUNNING,
                                   XWDS_DEVICE_STATE_SUSPENDING,
                                   NULL);
@@ -475,11 +475,11 @@ xwer_t xwds_device_suspend(struct xwds_device * dev)
         }
 
         /* set device state */
-        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_SUSPENDED, NULL);
+        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_SUSPENDED, NULL);
         return XWOK;
 
 err_cvops_suspend:
-        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
+        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
 err_dev_set_state:
         return rc;
 }
@@ -502,7 +502,7 @@ xwer_t xwds_device_resume(struct xwds_device * dev)
 
         XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
-        rc = xwaop_teq_then_write(xwsq_t, &dev->state,
+        rc = xwaop_teq_then_write(xwsq, &dev->state,
                                   XWDS_DEVICE_STATE_SUSPENDED,
                                   XWDS_DEVICE_STATE_RESUMING,
                                   NULL);
@@ -522,11 +522,11 @@ xwer_t xwds_device_resume(struct xwds_device * dev)
                 goto err_cvops_resume;
         }
 
-        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
+        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
         return XWOK;
 
 err_cvops_resume:
-        xwaop_write(xwsq_t, &dev->state, XWDS_DEVICE_STATE_SUSPENDED, NULL);
+        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_SUSPENDED, NULL);
 err_set_state:
         return rc;
 }

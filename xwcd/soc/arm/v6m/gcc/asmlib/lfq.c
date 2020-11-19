@@ -22,7 +22,7 @@
 #include <arch_irq.h>
 #include <asmlib/lfq.h>
 
-void arch_lfq_push(__xwcc_atomic xwlfq_t * h, __xwcc_atomic xwlfq_t * n)
+void arch_lfq_push(xwlfq_a * h, xwlfq_a * n)
 {
         xwreg_t flag;
 
@@ -32,7 +32,7 @@ void arch_lfq_push(__xwcc_atomic xwlfq_t * h, __xwcc_atomic xwlfq_t * n)
         arch_cpuirq_restore_lc(flag);
 }
 
-xwlfq_t * arch_lfq_pop(__xwcc_atomic xwlfq_t * h)
+xwlfq_t * arch_lfq_pop(xwlfq_a * h)
 {
         xwreg_t flag;
         xwlfq_t * top;

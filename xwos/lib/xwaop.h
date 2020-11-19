@@ -1179,11 +1179,11 @@
  */
 #define DEFINE_XWAOP_LOAD(type, btype) \
 static __xwlib_inline \
-type xwaop__##type##__load(__xwcc_atomic type * a, \
-                           const enum xwmb_memory_order_em mo) \
+type##_t xwaop__##type##__load(type##_a * a, \
+                               const enum xwmb_memory_order_em mo) \
 { \
-        return (type)xwaop__##btype##__load((__xwcc_atomic btype *)a, \
-                                            mo); \
+        return (type##_t)xwaop__##btype##__load((btype##_a *)a, \
+                                                mo); \
 }
 
 /******** ******** store ******** ********/
@@ -1194,13 +1194,13 @@ type xwaop__##type##__load(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_STORE(type, btype) \
 static __xwlib_inline \
-type xwaop__##type##__store(__xwcc_atomic type * a, \
-                            const enum xwmb_memory_order_em mo, \
-                            type v) \
+type##_t xwaop__##type##__store(type##_a * a, \
+                                const enum xwmb_memory_order_em mo, \
+                                type##_t v) \
 { \
-        return (type)xwaop__##btype##__store((__xwcc_atomic btype *)a, \
-                                             mo, \
-                                             (btype)v); \
+        return (type##_t)xwaop__##btype##__store((btype##_a *)a, \
+                                                 mo, \
+                                                 (btype##_t)v); \
 }
 
 /******** ******** read ******** ********/
@@ -1211,11 +1211,11 @@ type xwaop__##type##__store(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_READ(type, btype) \
 static __xwlib_inline \
-void xwaop__##type##__read(__xwcc_atomic type * a, \
-                           type * ov) \
+void xwaop__##type##__read(type##_a * a, \
+                           type##_t * ov) \
 { \
-        xwaop__##btype##__read((__xwcc_atomic btype *)a, \
-                               (btype *)ov); \
+        xwaop__##btype##__read((btype##_a *)a, \
+                               (btype##_t *)ov); \
 }
 
 /******** ******** write ******** ********/
@@ -1226,13 +1226,13 @@ void xwaop__##type##__read(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_WRITE(type, btype) \
 static __xwlib_inline \
-void xwaop__##type##__write(__xwcc_atomic type * a, \
-                            type v, \
-                            type * ov) \
+void xwaop__##type##__write(type##_a * a, \
+                            type##_t v, \
+                            type##_t * ov) \
 { \
-        xwaop__##btype##__write((__xwcc_atomic btype *)a, \
-                                (btype)v, \
-                                (btype *)ov);   \
+        xwaop__##btype##__write((btype##_a *)a, \
+                                (btype##_t)v, \
+                                (btype##_t *)ov); \
 }
 
 /**
@@ -1242,15 +1242,15 @@ void xwaop__##type##__write(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TEQ_THEN_WRITE(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__teq_then_write(__xwcc_atomic type * a, \
-                                       type t, \
-                                       type v, \
-                                       type * ov) \
+xwer_t xwaop__##type##__teq_then_write(type##_a * a, \
+                                       type##_t t, \
+                                       type##_t v, \
+                                       type##_t * ov) \
 { \
-        return xwaop__##btype##__teq_then_write((__xwcc_atomic btype *)a, \
-                                                (btype)t, \
-                                                (btype)v, \
-                                                (btype *)ov); \
+        return xwaop__##btype##__teq_then_write((btype##_a *)a, \
+                                                (btype##_t)t, \
+                                                (btype##_t)v, \
+                                                (btype##_t *)ov); \
 }
 
 /**
@@ -1260,15 +1260,15 @@ xwer_t xwaop__##type##__teq_then_write(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TNE_THEN_WRITE(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tne_then_write(__xwcc_atomic type * a, \
-                                       type t, \
-                                       type v, \
-                                       type * ov) \
+xwer_t xwaop__##type##__tne_then_write(type##_a * a, \
+                                       type##_t t, \
+                                       type##_t v, \
+                                       type##_t * ov) \
 { \
-        return xwaop__##btype##__tne_then_write((__xwcc_atomic btype *)a, \
-                                                (btype)t, \
-                                                (btype)v, \
-                                                (btype *)ov); \
+        return xwaop__##btype##__tne_then_write((btype##_a *)a, \
+                                                (btype##_t)t, \
+                                                (btype##_t)v, \
+                                                (btype##_t *)ov); \
 }
 
 /**
@@ -1278,15 +1278,15 @@ xwer_t xwaop__##type##__tne_then_write(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGT_THEN_WRITE(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgt_then_write(__xwcc_atomic type * a, \
-                                       type t, \
-                                       type v, \
-                                       type * ov) \
+xwer_t xwaop__##type##__tgt_then_write(type##_a * a, \
+                                       type##_t t, \
+                                       type##_t v, \
+                                       type##_t * ov) \
 { \
-        return xwaop__##btype##__tgt_then_write((__xwcc_atomic btype *)a, \
-                                                (btype)t, \
-                                                (btype)v, \
-                                                (btype *)ov); \
+        return xwaop__##btype##__tgt_then_write((btype##_a *)a, \
+                                                (btype##_t)t, \
+                                                (btype##_t)v, \
+                                                (btype##_t *)ov); \
 }
 
 /**
@@ -1296,15 +1296,15 @@ xwer_t xwaop__##type##__tgt_then_write(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGE_THEN_WRITE(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tge_then_write(__xwcc_atomic type * a, \
-                                       type t, \
-                                       type v, \
-                                       type * ov) \
+xwer_t xwaop__##type##__tge_then_write(type##_a * a, \
+                                       type##_t t, \
+                                       type##_t v, \
+                                       type##_t * ov) \
 { \
-        return xwaop__##btype##__tge_then_write((__xwcc_atomic btype *)a, \
-                                                (btype)t, \
-                                                (btype)v, \
-                                                (btype *)ov); \
+        return xwaop__##btype##__tge_then_write((btype##_a *)a, \
+                                                (btype##_t)t, \
+                                                (btype##_t)v, \
+                                                (btype##_t *)ov); \
 }
 
 /**
@@ -1314,15 +1314,15 @@ xwer_t xwaop__##type##__tge_then_write(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TLT_THEN_WRITE(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tlt_then_write(__xwcc_atomic type * a, \
-                                       type t, \
-                                       type v, \
-                                       type * ov) \
+xwer_t xwaop__##type##__tlt_then_write(type##_a * a, \
+                                       type##_t t, \
+                                       type##_t v, \
+                                       type##_t * ov) \
 { \
-        return xwaop__##btype##__tlt_then_write((__xwcc_atomic btype *)a, \
-                                                (btype)t, \
-                                                (btype)v, \
-                                                (btype *)ov); \
+        return xwaop__##btype##__tlt_then_write((btype##_a *)a, \
+                                                (btype##_t)t, \
+                                                (btype##_t)v, \
+                                                (btype##_t *)ov); \
 }
 
 /**
@@ -1332,15 +1332,15 @@ xwer_t xwaop__##type##__tlt_then_write(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TLE_THEN_WRITE(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tle_then_write(__xwcc_atomic type * a, \
-                                       type t, \
-                                       type v, \
-                                       type * ov) \
+xwer_t xwaop__##type##__tle_then_write(type##_a * a, \
+                                       type##_t t, \
+                                       type##_t v, \
+                                       type##_t * ov) \
 { \
-        return xwaop__##btype##__tle_then_write((__xwcc_atomic btype *)a, \
-                                                (btype)t, \
-                                                (btype)v, \
-                                                (btype *)ov); \
+        return xwaop__##btype##__tle_then_write((btype##_a *)a, \
+                                                (btype##_t)t, \
+                                                (btype##_t)v, \
+                                                (btype##_t *)ov); \
 }
 
 /**
@@ -1350,15 +1350,15 @@ xwer_t xwaop__##type##__tle_then_write(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGTLT_THEN_WRITE(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgtlt_then_write(__xwcc_atomic type * a, \
-                                         type l, type r, \
-                                         type v, \
-                                         type * ov) \
+xwer_t xwaop__##type##__tgtlt_then_write(type##_a * a, \
+                                         type##_t l, type##_t r, \
+                                         type##_t v, \
+                                         type##_t * ov) \
 { \
-        return xwaop__##btype##__tgtlt_then_write((__xwcc_atomic btype *)a, \
-                                                  (btype)l, (btype)r, \
-                                                  (btype)v, \
-                                                  (btype *)ov); \
+        return xwaop__##btype##__tgtlt_then_write((btype##_a *)a, \
+                                                  (btype##_t)l, (btype##_t)r, \
+                                                  (btype##_t)v, \
+                                                  (btype##_t *)ov); \
 }
 
 /**
@@ -1368,15 +1368,15 @@ xwer_t xwaop__##type##__tgtlt_then_write(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGELT_THEN_WRITE(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgelt_then_write(__xwcc_atomic type * a, \
-                                         type l, type r, \
-                                         type v, \
-                                         type * ov) \
+xwer_t xwaop__##type##__tgelt_then_write(type##_a * a, \
+                                         type##_t l, type##_t r, \
+                                         type##_t v, \
+                                         type##_t * ov) \
 { \
-        return xwaop__##btype##__tgelt_then_write((__xwcc_atomic btype *)a, \
-                                                  (btype)l, (btype)r, \
-                                                  (btype)v, \
-                                                  (btype *)ov); \
+        return xwaop__##btype##__tgelt_then_write((btype##_a *)a, \
+                                                  (btype##_t)l, (btype##_t)r, \
+                                                  (btype##_t)v, \
+                                                  (btype##_t *)ov); \
 }
 
 /**
@@ -1386,15 +1386,15 @@ xwer_t xwaop__##type##__tgelt_then_write(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGTLE_THEN_WRITE(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgtle_then_write(__xwcc_atomic type * a, \
-                                         type l, type r, \
-                                         type v, \
-                                         type * ov) \
+xwer_t xwaop__##type##__tgtle_then_write(type##_a * a, \
+                                         type##_t l, type##_t r, \
+                                         type##_t v, \
+                                         type##_t * ov) \
 { \
-        return xwaop__##btype##__tgtle_then_write((__xwcc_atomic btype *)a, \
-                                                  (btype)l, (btype)r, \
-                                                  (btype)v, \
-                                                  (btype *)ov); \
+        return xwaop__##btype##__tgtle_then_write((btype##_a *)a, \
+                                                  (btype##_t)l, (btype##_t)r, \
+                                                  (btype##_t)v, \
+                                                  (btype##_t *)ov); \
 }
 
 /**
@@ -1404,15 +1404,15 @@ xwer_t xwaop__##type##__tgtle_then_write(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGELE_THEN_WRITE(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgele_then_write(__xwcc_atomic type * a, \
-                                         type l, type r, \
-                                         type v, \
-                                         type * ov) \
+xwer_t xwaop__##type##__tgele_then_write(type##_a * a, \
+                                         type##_t l, type##_t r, \
+                                         type##_t v, \
+                                         type##_t * ov) \
 { \
-        return xwaop__##btype##__tgele_then_write((__xwcc_atomic btype *)a, \
-                                                  (btype)l, (btype)r, \
-                                                  (btype)v, \
-                                                  (btype *)ov); \
+        return xwaop__##btype##__tgele_then_write((btype##_a *)a, \
+                                                  (btype##_t)l, (btype##_t)r, \
+                                                  (btype##_t)v, \
+                                                  (btype##_t *)ov); \
 }
 
 /******** ******** add ******** ********/
@@ -1423,13 +1423,13 @@ xwer_t xwaop__##type##__tgele_then_write(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_ADD(type, btype) \
 static __xwlib_inline \
-void xwaop__##type##__add(__xwcc_atomic type * a, \
-                          type v, \
-                          type * nv, type * ov) \
+void xwaop__##type##__add(type##_a * a, \
+                          type##_t v, \
+                          type##_t * nv, type##_t * ov) \
 { \
-        xwaop__##btype##__add((__xwcc_atomic btype *)a, \
-                              (btype)v, \
-                              (btype *)nv, (btype *)ov); \
+        xwaop__##btype##__add((btype##_a *)a, \
+                              (btype##_t)v, \
+                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1439,14 +1439,14 @@ void xwaop__##type##__add(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TEQ_THEN_ADD(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__teq_then_add(__xwcc_atomic type * a, \
-                                     type t, \
-                                     type v, \
-                                     type * nv, type * ov) \
+xwer_t xwaop__##type##__teq_then_add(type##_a * a, \
+                                     type##_t t, \
+                                     type##_t v, \
+                                     type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__teq_then_add((__xwcc_atomic btype *)a, \
-                                              (btype)t, (btype)v, \
-                                              (btype *)nv, (btype *)ov);  \
+        return xwaop__##btype##__teq_then_add((btype##_a *)a, \
+                                              (btype##_t)t, (btype##_t)v, \
+                                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1456,15 +1456,15 @@ xwer_t xwaop__##type##__teq_then_add(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TNE_THEN_ADD(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tne_then_add(__xwcc_atomic type * a, \
-                                     type t, \
-                                     type v, \
-                                     type * nv, type * ov) \
+xwer_t xwaop__##type##__tne_then_add(type##_a * a, \
+                                     type##_t t, \
+                                     type##_t v, \
+                                     type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tne_then_add((__xwcc_atomic btype *)a, \
-                                              (btype)t, \
-                                              (btype)v, \
-                                              (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tne_then_add((btype##_a *)a, \
+                                              (btype##_t)t, \
+                                              (btype##_t)v, \
+                                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1474,15 +1474,15 @@ xwer_t xwaop__##type##__tne_then_add(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGT_THEN_ADD(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgt_then_add(__xwcc_atomic type * a, \
-                                     type t, \
-                                     type v, \
-                                     type * nv, type * ov) \
+xwer_t xwaop__##type##__tgt_then_add(type##_a * a, \
+                                     type##_t t, \
+                                     type##_t v, \
+                                     type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tgt_then_add((__xwcc_atomic btype *)a, \
-                                              (btype)t, \
-                                              (btype)v, \
-                                              (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tgt_then_add((btype##_a *)a, \
+                                              (btype##_t)t, \
+                                              (btype##_t)v, \
+                                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1492,15 +1492,15 @@ xwer_t xwaop__##type##__tgt_then_add(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGE_THEN_ADD(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tge_then_add(__xwcc_atomic type * a, \
-                                     type t, \
-                                     type v, \
-                                     type * nv, type * ov) \
+xwer_t xwaop__##type##__tge_then_add(type##_a * a, \
+                                     type##_t t, \
+                                     type##_t v, \
+                                     type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tge_then_add((__xwcc_atomic btype *)a, \
-                                              (btype)t, \
-                                              (btype)v, \
-                                              (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tge_then_add((btype##_a *)a, \
+                                              (btype##_t)t, \
+                                              (btype##_t)v, \
+                                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1510,15 +1510,15 @@ xwer_t xwaop__##type##__tge_then_add(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TLT_THEN_ADD(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tlt_then_add(__xwcc_atomic type * a, \
-                                     type t, \
-                                     type v, \
-                                     type * nv, type * ov) \
+xwer_t xwaop__##type##__tlt_then_add(type##_a * a, \
+                                     type##_t t, \
+                                     type##_t v, \
+                                     type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tlt_then_add((__xwcc_atomic btype *)a, \
-                                              (btype)t, \
-                                              (btype)v, \
-                                              (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tlt_then_add((btype##_a *)a, \
+                                              (btype##_t)t, \
+                                              (btype##_t)v, \
+                                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1528,15 +1528,15 @@ xwer_t xwaop__##type##__tlt_then_add(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TLE_THEN_ADD(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tle_then_add(__xwcc_atomic type * a, \
-                                     type t, \
-                                     type v, \
-                                     type * nv, type * ov) \
+xwer_t xwaop__##type##__tle_then_add(type##_a * a, \
+                                     type##_t t, \
+                                     type##_t v, \
+                                     type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tle_then_add((__xwcc_atomic btype *)a, \
-                                              (btype)t, \
-                                              (btype)v, \
-                                              (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tle_then_add((btype##_a *)a, \
+                                              (btype##_t)t, \
+                                              (btype##_t)v, \
+                                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1546,15 +1546,15 @@ xwer_t xwaop__##type##__tle_then_add(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGTLT_THEN_ADD(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgtlt_then_add(__xwcc_atomic type * a, \
-                                       type l, type r, \
-                                       type v, \
-                                       type * nv, type * ov) \
+xwer_t xwaop__##type##__tgtlt_then_add(type##_a * a, \
+                                       type##_t l, type##_t r, \
+                                       type##_t v, \
+                                       type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tgtlt_then_add((__xwcc_atomic btype *)a, \
-                                                (btype)l, (btype)r, \
-                                                (btype)v, \
-                                                (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tgtlt_then_add((btype##_a *)a, \
+                                                (btype##_t)l, (btype##_t)r, \
+                                                (btype##_t)v, \
+                                                (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1564,15 +1564,15 @@ xwer_t xwaop__##type##__tgtlt_then_add(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGELT_THEN_ADD(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgelt_then_add(__xwcc_atomic type * a, \
-                                       type l, type r, \
-                                       type v, \
-                                       type * nv, type * ov) \
+xwer_t xwaop__##type##__tgelt_then_add(type##_a * a, \
+                                       type##_t l, type##_t r, \
+                                       type##_t v, \
+                                       type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tgelt_then_add((__xwcc_atomic btype *)a, \
-                                                (btype)l, (btype)r, \
-                                                (btype)v, \
-                                                (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tgelt_then_add((btype##_a *)a, \
+                                                (btype##_t)l, (btype##_t)r, \
+                                                (btype##_t)v, \
+                                                (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1582,15 +1582,15 @@ xwer_t xwaop__##type##__tgelt_then_add(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGTLE_THEN_ADD(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgtle_then_add(__xwcc_atomic type * a, \
-                                       type l, type r, \
-                                       type v, \
-                                       type * nv, type * ov) \
+xwer_t xwaop__##type##__tgtle_then_add(type##_a * a, \
+                                       type##_t l, type##_t r, \
+                                       type##_t v, \
+                                       type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tgtle_then_add((__xwcc_atomic btype *)a, \
-                                                (btype)l, (btype)r, \
-                                                (btype)v, \
-                                                (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tgtle_then_add((btype##_a *)a, \
+                                                (btype##_t)l, (btype##_t)r, \
+                                                (btype##_t)v, \
+                                                (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1600,15 +1600,15 @@ xwer_t xwaop__##type##__tgtle_then_add(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGELE_THEN_ADD(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgele_then_add(__xwcc_atomic type * a, \
-                                       type l, type r, \
-                                       type v, \
-                                       type * nv, type * ov) \
+xwer_t xwaop__##type##__tgele_then_add(type##_a * a, \
+                                       type##_t l, type##_t r, \
+                                       type##_t v, \
+                                       type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tgele_then_add((__xwcc_atomic btype *)a, \
-                                                (btype)l, (btype)r, \
-                                                (btype)v, \
-                                                (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tgele_then_add((btype##_a *)a, \
+                                                (btype##_t)l, (btype##_t)r, \
+                                                (btype##_t)v, \
+                                                (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /******** ******** subtract ******** ********/
@@ -1619,13 +1619,13 @@ xwer_t xwaop__##type##__tgele_then_add(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_SUB(type, btype) \
 static __xwlib_inline \
-void xwaop__##type##__sub(__xwcc_atomic type * a, \
-                          type v, \
-                          type * nv, type * ov) \
+void xwaop__##type##__sub(type##_a * a, \
+                          type##_t v, \
+                          type##_t * nv, type##_t * ov) \
 { \
-        xwaop__##btype##__sub((__xwcc_atomic btype *)a, \
-                              (btype)v, \
-                              (btype *)nv, (btype *)ov); \
+        xwaop__##btype##__sub((btype##_a *)a, \
+                              (btype##_t)v, \
+                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1635,15 +1635,15 @@ void xwaop__##type##__sub(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TEQ_THEN_SUB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__teq_then_sub(__xwcc_atomic type * a, \
-                                     type t, \
-                                     type v, \
-                                     type * nv, type * ov) \
+xwer_t xwaop__##type##__teq_then_sub(type##_a * a, \
+                                     type##_t t, \
+                                     type##_t v, \
+                                     type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__teq_then_sub((__xwcc_atomic btype *)a, \
-                                              (btype)t, \
-                                              (btype)v, \
-                                              (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__teq_then_sub((btype##_a *)a, \
+                                              (btype##_t)t, \
+                                              (btype##_t)v, \
+                                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1653,15 +1653,15 @@ xwer_t xwaop__##type##__teq_then_sub(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TNE_THEN_SUB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tne_then_sub(__xwcc_atomic type * a, \
-                                     type t, \
-                                     type v, \
-                                     type * nv, type * ov) \
+xwer_t xwaop__##type##__tne_then_sub(type##_a * a, \
+                                     type##_t t, \
+                                     type##_t v, \
+                                     type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tne_then_sub((__xwcc_atomic btype *)a, \
-                                              (btype)t, \
-                                              (btype)v, \
-                                              (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tne_then_sub((btype##_a *)a, \
+                                              (btype##_t)t, \
+                                              (btype##_t)v, \
+                                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1671,15 +1671,15 @@ xwer_t xwaop__##type##__tne_then_sub(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGT_THEN_SUB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgt_then_sub(__xwcc_atomic type * a, \
-                                     type t, \
-                                     type v, \
-                                     type * nv, type * ov) \
+xwer_t xwaop__##type##__tgt_then_sub(type##_a * a, \
+                                     type##_t t, \
+                                     type##_t v, \
+                                     type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tgt_then_sub((__xwcc_atomic btype *)a, \
-                                              (btype)t, \
-                                              (btype)v, \
-                                              (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tgt_then_sub((btype##_a *)a, \
+                                              (btype##_t)t, \
+                                              (btype##_t)v, \
+                                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1689,15 +1689,15 @@ xwer_t xwaop__##type##__tgt_then_sub(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGE_THEN_SUB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tge_then_sub(__xwcc_atomic type * a, \
-                                     type t, \
-                                     type v, \
-                                     type * nv, type * ov) \
+xwer_t xwaop__##type##__tge_then_sub(type##_a * a, \
+                                     type##_t t, \
+                                     type##_t v, \
+                                     type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tge_then_sub((__xwcc_atomic btype *)a, \
-                                              (btype)t, \
-                                              (btype)v, \
-                                              (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tge_then_sub((btype##_a *)a, \
+                                              (btype##_t)t, \
+                                              (btype##_t)v, \
+                                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1707,15 +1707,15 @@ xwer_t xwaop__##type##__tge_then_sub(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TLT_THEN_SUB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tlt_then_sub(__xwcc_atomic type * a, \
-                                     type t, \
-                                     type v, \
-                                     type * nv, type * ov) \
+xwer_t xwaop__##type##__tlt_then_sub(type##_a * a, \
+                                     type##_t t, \
+                                     type##_t v, \
+                                     type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tlt_then_sub((__xwcc_atomic btype *)a, \
-                                              (btype)t, \
-                                              (btype)v, \
-                                              (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tlt_then_sub((btype##_a *)a, \
+                                              (btype##_t)t, \
+                                              (btype##_t)v, \
+                                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1725,15 +1725,15 @@ xwer_t xwaop__##type##__tlt_then_sub(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TLE_THEN_SUB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tle_then_sub(__xwcc_atomic type * a, \
-                                     type t, \
-                                     type v, \
-                                     type * nv, type * ov) \
+xwer_t xwaop__##type##__tle_then_sub(type##_a * a, \
+                                     type##_t t, \
+                                     type##_t v, \
+                                     type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tle_then_sub((__xwcc_atomic btype *)a, \
-                                              (btype)t, \
-                                              (btype)v, \
-                                              (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tle_then_sub((btype##_a *)a, \
+                                              (btype##_t)t, \
+                                              (btype##_t)v, \
+                                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1743,15 +1743,15 @@ xwer_t xwaop__##type##__tle_then_sub(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGTLT_THEN_SUB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgtlt_then_sub(__xwcc_atomic type * a, \
-                                       type l, type r, \
-                                       type v, \
-                                       type * nv, type * ov) \
+xwer_t xwaop__##type##__tgtlt_then_sub(type##_a * a, \
+                                       type##_t l, type##_t r, \
+                                       type##_t v, \
+                                       type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tgtlt_then_sub((__xwcc_atomic btype *)a, \
-                                                (btype)l, (btype)r, \
-                                                (btype)v, \
-                                                (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tgtlt_then_sub((btype##_a *)a, \
+                                                (btype##_t)l, (btype##_t)r, \
+                                                (btype##_t)v, \
+                                                (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1761,15 +1761,15 @@ xwer_t xwaop__##type##__tgtlt_then_sub(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGELT_THEN_SUB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgelt_then_sub(__xwcc_atomic type * a, \
-                                       type l, type r, \
-                                       type v, \
-                                       type * nv, type * ov) \
+xwer_t xwaop__##type##__tgelt_then_sub(type##_a * a, \
+                                       type##_t l, type##_t r, \
+                                       type##_t v, \
+                                       type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tgelt_then_sub((__xwcc_atomic btype *)a, \
-                                                (btype)l, (btype)r, \
-                                                (btype)v, \
-                                                (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tgelt_then_sub((btype##_a *)a, \
+                                                (btype##_t)l, (btype##_t)r, \
+                                                (btype##_t)v, \
+                                                (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1779,15 +1779,15 @@ xwer_t xwaop__##type##__tgelt_then_sub(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGTLE_THEN_SUB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgtle_then_sub(__xwcc_atomic type * a, \
-                                       type l, type r, \
-                                       type v, \
-                                       type * nv, type * ov) \
+xwer_t xwaop__##type##__tgtle_then_sub(type##_a * a, \
+                                       type##_t l, type##_t r, \
+                                       type##_t v, \
+                                       type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tgtle_then_sub((__xwcc_atomic btype *)a, \
-                                                (btype)l, (btype)r, \
-                                                (btype)v, \
-                                                (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tgtle_then_sub((btype##_a *)a, \
+                                                (btype##_t)l, (btype##_t)r, \
+                                                (btype##_t)v, \
+                                                (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1797,15 +1797,15 @@ xwer_t xwaop__##type##__tgtle_then_sub(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGELE_THEN_SUB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgele_then_sub(__xwcc_atomic type * a, \
-                                       type l, type r, \
-                                       type v, \
-                                       type * nv, type * ov) \
+xwer_t xwaop__##type##__tgele_then_sub(type##_a * a, \
+                                       type##_t l, type##_t r, \
+                                       type##_t v, \
+                                       type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tgele_then_sub((__xwcc_atomic btype *)a, \
-                                                (btype)l, (btype)r, \
-                                                (btype)v, \
-                                                (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tgele_then_sub((btype##_a *)a, \
+                                                (btype##_t)l, (btype##_t)r, \
+                                                (btype##_t)v, \
+                                                (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /******** ******** reverse subtract ******** ********/
@@ -1816,13 +1816,13 @@ xwer_t xwaop__##type##__tgele_then_sub(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_RSB(type, btype) \
 static __xwlib_inline \
-void xwaop__##type##__rsb(__xwcc_atomic type * a, \
-                          type v, \
-                          type * nv, type * ov) \
+void xwaop__##type##__rsb(type##_a * a, \
+                          type##_t v, \
+                          type##_t * nv, type##_t * ov) \
 { \
-        xwaop__##btype##__rsb((__xwcc_atomic btype *)a, \
-                              (btype)v, \
-                              (btype *)nv, (btype *)ov); \
+        xwaop__##btype##__rsb((btype##_a *)a, \
+                              (btype##_t)v, \
+                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1832,15 +1832,15 @@ void xwaop__##type##__rsb(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TEQ_THEN_RSB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__teq_then_rsb(__xwcc_atomic type * a, \
-                                     type t, \
-                                     type v, \
-                                     type * nv, type * ov) \
+xwer_t xwaop__##type##__teq_then_rsb(type##_a * a, \
+                                     type##_t t, \
+                                     type##_t v, \
+                                     type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__teq_then_rsb((__xwcc_atomic btype *)a, \
-                                              (btype)t, \
-                                              (btype)v, \
-                                              (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__teq_then_rsb((btype##_a *)a, \
+                                              (btype##_t)t, \
+                                              (btype##_t)v, \
+                                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1850,15 +1850,15 @@ xwer_t xwaop__##type##__teq_then_rsb(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TNE_THEN_RSB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tne_then_rsb(__xwcc_atomic type * a, \
-                                     type t, \
-                                     type v, \
-                                     type * nv, type * ov) \
+xwer_t xwaop__##type##__tne_then_rsb(type##_a * a, \
+                                     type##_t t, \
+                                     type##_t v, \
+                                     type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tne_then_rsb((__xwcc_atomic btype *)a, \
-                                              (btype)t, \
-                                              (btype)v, \
-                                              (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tne_then_rsb((btype##_a *)a, \
+                                              (btype##_t)t, \
+                                              (btype##_t)v, \
+                                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1868,15 +1868,15 @@ xwer_t xwaop__##type##__tne_then_rsb(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGT_THEN_RSB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgt_then_rsb(__xwcc_atomic type * a, \
-                                     type t, \
-                                     type v, \
-                                     type * nv, type * ov) \
+xwer_t xwaop__##type##__tgt_then_rsb(type##_a * a, \
+                                     type##_t t, \
+                                     type##_t v, \
+                                     type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tgt_then_rsb((__xwcc_atomic btype *)a, \
-                                              (btype)t, \
-                                              (btype)v, \
-                                              (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tgt_then_rsb((btype##_a *)a, \
+                                              (btype##_t)t, \
+                                              (btype##_t)v, \
+                                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1886,15 +1886,15 @@ xwer_t xwaop__##type##__tgt_then_rsb(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGE_THEN_RSB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tge_then_rsb(__xwcc_atomic type * a, \
-                                     type t, \
-                                     type v, \
-                                     type * nv, type * ov) \
+xwer_t xwaop__##type##__tge_then_rsb(type##_a * a, \
+                                     type##_t t, \
+                                     type##_t v, \
+                                     type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tge_then_rsb((__xwcc_atomic btype *)a, \
-                                              (btype)t, \
-                                              (btype)v, \
-                                              (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tge_then_rsb((btype##_a *)a, \
+                                              (btype##_t)t, \
+                                              (btype##_t)v, \
+                                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1904,15 +1904,15 @@ xwer_t xwaop__##type##__tge_then_rsb(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TLT_THEN_RSB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tlt_then_rsb(__xwcc_atomic type * a, \
-                                     type t, \
-                                     type v, \
-                                     type * nv, type * ov) \
+xwer_t xwaop__##type##__tlt_then_rsb(type##_a * a, \
+                                     type##_t t, \
+                                     type##_t v, \
+                                     type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tlt_then_rsb((__xwcc_atomic btype *)a, \
-                                              (btype)t, \
-                                              (btype)v, \
-                                              (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tlt_then_rsb((btype##_a *)a, \
+                                              (btype##_t)t, \
+                                              (btype##_t)v, \
+                                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1922,15 +1922,15 @@ xwer_t xwaop__##type##__tlt_then_rsb(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TLE_THEN_RSB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tle_then_rsb(__xwcc_atomic type * a, \
-                                     type t, \
-                                     type v, \
-                                     type * nv, type * ov) \
+xwer_t xwaop__##type##__tle_then_rsb(type##_a * a, \
+                                     type##_t t, \
+                                     type##_t v, \
+                                     type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tle_then_rsb((__xwcc_atomic btype *)a, \
-                                              (btype)t, \
-                                              (btype)v, \
-                                              (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tle_then_rsb((btype##_a *)a, \
+                                              (btype##_t)t, \
+                                              (btype##_t)v, \
+                                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1940,15 +1940,15 @@ xwer_t xwaop__##type##__tle_then_rsb(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGTLT_THEN_RSB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgtlt_then_rsb(__xwcc_atomic type * a, \
-                                       type l, type r, \
-                                       type v, \
-                                       type * nv, type * ov) \
+xwer_t xwaop__##type##__tgtlt_then_rsb(type##_a * a, \
+                                       type##_t l, type##_t r, \
+                                       type##_t v, \
+                                       type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tgtlt_then_rsb((__xwcc_atomic btype *)a, \
-                                                (btype)l, (btype)r, \
-                                                (btype)v, \
-                                                (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tgtlt_then_rsb((btype##_a *)a, \
+                                                (btype##_t)l, (btype##_t)r, \
+                                                (btype##_t)v, \
+                                                (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1958,15 +1958,15 @@ xwer_t xwaop__##type##__tgtlt_then_rsb(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGELT_THEN_RSB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgelt_then_rsb(__xwcc_atomic type * a, \
-                                       type l, type r, \
-                                       type v, \
-                                       type * nv, type * ov) \
+xwer_t xwaop__##type##__tgelt_then_rsb(type##_a * a, \
+                                       type##_t l, type##_t r, \
+                                       type##_t v, \
+                                       type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tgelt_then_rsb((__xwcc_atomic btype *)a, \
-                                                (btype)l, (btype)r, \
-                                                (btype)v, \
-                                                (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tgelt_then_rsb((btype##_a *)a, \
+                                                (btype##_t)l, (btype##_t)r, \
+                                                (btype##_t)v, \
+                                                (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1976,15 +1976,15 @@ xwer_t xwaop__##type##__tgelt_then_rsb(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGTLE_THEN_RSB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgtle_then_rsb(__xwcc_atomic type * a, \
-                                       type l, type r, \
-                                       type v, \
-                                       type * nv, type * ov) \
+xwer_t xwaop__##type##__tgtle_then_rsb(type##_a * a, \
+                                       type##_t l, type##_t r, \
+                                       type##_t v, \
+                                       type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tgtle_then_rsb((__xwcc_atomic btype *)a, \
-                                                (btype)l, (btype)r, \
-                                                (btype)v, \
-                                                (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tgtle_then_rsb((btype##_a *)a, \
+                                                (btype##_t)l, (btype##_t)r, \
+                                                (btype##_t)v, \
+                                                (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -1994,15 +1994,15 @@ xwer_t xwaop__##type##__tgtle_then_rsb(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TGELE_THEN_RSB(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tgele_then_rsb(__xwcc_atomic type * a, \
-                                       type l, type r, \
-                                       type v, \
-                                       type * nv, type * ov) \
+xwer_t xwaop__##type##__tgele_then_rsb(type##_a * a, \
+                                       type##_t l, type##_t r, \
+                                       type##_t v, \
+                                       type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tgele_then_rsb((__xwcc_atomic btype *)a, \
-                                                (btype)l, (btype)r, \
-                                                (btype)v, \
-                                                (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__tgele_then_rsb((btype##_a *)a, \
+                                                (btype##_t)l, (btype##_t)r, \
+                                                (btype##_t)v, \
+                                                (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /******** ******** bit operations ******** ********/
@@ -2013,13 +2013,13 @@ xwer_t xwaop__##type##__tgele_then_rsb(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_OR(type, btype) \
 static __xwlib_inline \
-void xwaop__##type##__or(__xwcc_atomic type * a, \
-                         type v, \
-                         type * nv, type * ov) \
+void xwaop__##type##__or(type##_a * a, \
+                         type##_t v, \
+                         type##_t * nv, type##_t * ov) \
 { \
-        xwaop__##btype##__or((__xwcc_atomic btype *)a, \
-                             (btype)v, \
-                             (btype *)nv, (btype *)ov); \
+        xwaop__##btype##__or((btype##_a *)a, \
+                             (btype##_t)v, \
+                             (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -2029,13 +2029,13 @@ void xwaop__##type##__or(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_AND(type, btype) \
 static __xwlib_inline \
-void xwaop__##type##__and(__xwcc_atomic type * a, \
-                          type v, \
-                          type * nv, type * ov) \
+void xwaop__##type##__and(type##_a * a, \
+                          type##_t v, \
+                          type##_t * nv, type##_t * ov) \
 { \
-        xwaop__##btype##__and((__xwcc_atomic btype *)a, \
-                              (btype)v, \
-                              (btype *)nv, (btype *)ov); \
+        xwaop__##btype##__and((btype##_a *)a, \
+                              (btype##_t)v, \
+                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -2045,13 +2045,13 @@ void xwaop__##type##__and(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_XOR(type, btype) \
 static __xwlib_inline \
-void xwaop__##type##__xor(__xwcc_atomic type * a, \
-                          type v, \
-                          type * nv, type * ov) \
+void xwaop__##type##__xor(type##_a * a, \
+                          type##_t v, \
+                          type##_t * nv, type##_t * ov) \
 { \
-        xwaop__##btype##__xor((__xwcc_atomic btype *)a, \
-                              (btype)v, \
-                              (btype *)nv, (btype *)ov); \
+        xwaop__##btype##__xor((btype##_a *)a, \
+                              (btype##_t)v, \
+                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -2061,13 +2061,13 @@ void xwaop__##type##__xor(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_C0M(type, btype) \
 static __xwlib_inline \
-void xwaop__##type##__c0m(__xwcc_atomic type * a, \
-                          type m, \
-                          type * nv, type * ov) \
+void xwaop__##type##__c0m(type##_a * a, \
+                          type##_t m, \
+                          type##_t * nv, type##_t * ov) \
 { \
-        xwaop__##btype##__c0m((__xwcc_atomic btype *)a, \
-                              (btype)m, \
-                              (btype *)nv, (btype *)ov); \
+        xwaop__##btype##__c0m((btype##_a *)a, \
+                              (btype##_t)m, \
+                              (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -2077,13 +2077,13 @@ void xwaop__##type##__c0m(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_T1MA_THEN_C0M(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__t1ma_then_c0m(__xwcc_atomic type * a, \
-                                      type m, \
-                                      type * nv, type * ov) \
+xwer_t xwaop__##type##__t1ma_then_c0m(type##_a * a, \
+                                      type##_t m, \
+                                      type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__t1ma_then_c0m((__xwcc_atomic btype *)a, \
-                                               (btype)m, \
-                                               (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__t1ma_then_c0m((btype##_a *)a, \
+                                               (btype##_t)m, \
+                                               (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -2093,13 +2093,13 @@ xwer_t xwaop__##type##__t1ma_then_c0m(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_T1MO_THEN_C0M(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__t1mo_then_c0m(__xwcc_atomic type * a, \
-                                      type m, \
-                                      type * nv, type * ov) \
+xwer_t xwaop__##type##__t1mo_then_c0m(type##_a * a, \
+                                      type##_t m, \
+                                      type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__t1mo_then_c0m((__xwcc_atomic btype *)a, \
-                                               (btype)m, \
-                                               (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__t1mo_then_c0m((btype##_a *)a, \
+                                               (btype##_t)m, \
+                                               (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -2109,13 +2109,13 @@ xwer_t xwaop__##type##__t1mo_then_c0m(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_T0MA_THEN_S1M(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__t0ma_then_s1m(__xwcc_atomic type * a, \
-                                      type m, \
-                                      type * nv, type * ov) \
+xwer_t xwaop__##type##__t0ma_then_s1m(type##_a * a, \
+                                      type##_t m, \
+                                      type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__t0ma_then_s1m((__xwcc_atomic btype *)a, \
-                                               (btype)m, \
-                                               (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__t0ma_then_s1m((btype##_a *)a, \
+                                               (btype##_t)m, \
+                                               (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -2125,13 +2125,13 @@ xwer_t xwaop__##type##__t0ma_then_s1m(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_T0MO_THEN_S1M(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__t0mo_then_s1m(__xwcc_atomic type * a, \
-                                      type m, \
-                                      type * nv, type * ov) \
+xwer_t xwaop__##type##__t0mo_then_s1m(type##_a * a, \
+                                      type##_t m, \
+                                      type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__t0mo_then_s1m((__xwcc_atomic btype *)a, \
-                                               (btype)m, \
-                                               (btype *)nv, (btype *)ov); \
+        return xwaop__##btype##__t0mo_then_s1m((btype##_a *)a, \
+                                               (btype##_t)m, \
+                                               (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /******** ******** test and operation ******** ********/
@@ -2142,15 +2142,15 @@ xwer_t xwaop__##type##__t0mo_then_s1m(__xwcc_atomic type * a, \
  */
 #define DEFINE_XWAOP_TST_THEN_OP(type, btype) \
 static __xwlib_inline \
-xwer_t xwaop__##type##__tst_then_op(__xwcc_atomic type * a, \
+xwer_t xwaop__##type##__tst_then_op(type##_a * a, \
                                     xwaop_tst_f tst, void * tst_args, \
                                     xwaop_op_f op, void * op_args, \
-                                    type * nv, type * ov) \
+                                    type##_t * nv, type##_t * ov) \
 { \
-        return xwaop__##btype##__tst_then_op((__xwcc_atomic btype *)a, \
+        return xwaop__##btype##__tst_then_op((btype##_a *)a, \
                                              tst, tst_args, \
                                              op, op_args, \
-                                             (btype *)nv, (btype *)ov); \
+                                             (btype##_t *)nv, (btype##_t *)ov); \
 }
 
 /**
@@ -2218,102 +2218,102 @@ xwer_t xwaop__##type##__tst_then_op(__xwcc_atomic type * a, \
 
 
 #if (16 == BITS_PER_XWSZ_T)
-DEFINE_XWAOP(xwsz_t, xwu16_t)
+DEFINE_XWAOP(xwsz, xwu16)
 #elif (32 == BITS_PER_XWSZ_T)
-DEFINE_XWAOP(xwsz_t, xwu32_t)
+DEFINE_XWAOP(xwsz, xwu32)
 #elif (64 == BITS_PER_XWSZ_T)
-DEFINE_XWAOP(xwsz_t, xwu64_t)
+DEFINE_XWAOP(xwsz, xwu64)
 #endif
 
 #if (16 == BITS_PER_XWSSZ_T)
-DEFINE_XWAOP(xwssz_t, xws16_t)
+DEFINE_XWAOP(xwssz, xws16)
 #elif (32 == BITS_PER_XWSSZ_T)
-DEFINE_XWAOP(xwssz_t, xws32_t)
+DEFINE_XWAOP(xwssz, xws32)
 #elif (64 == BITS_PER_XWSSZ_T)
-DEFINE_XWAOP(xwssz_t, xws64_t)
+DEFINE_XWAOP(xwssz, xws64)
 #endif
 
 #if (16 == BITS_PER_XWPTR_T)
-DEFINE_XWAOP(xwptr_t, xwu16_t)
-DEFINE_XWAOP(xwlfq_t, xwu16_t)
+DEFINE_XWAOP(xwptr, xwu16)
+DEFINE_XWAOP(xwlfq, xwu16)
 #elif (32 == BITS_PER_XWPTR_T)
-DEFINE_XWAOP(xwlfq_t, xwu32_t)
-DEFINE_XWAOP(xwptr_t, xwu32_t)
+DEFINE_XWAOP(xwlfq, xwu32)
+DEFINE_XWAOP(xwptr, xwu32)
 #elif (64 == BITS_PER_XWPTR_T)
-DEFINE_XWAOP(xwlfq_t, xwu64_t)
-DEFINE_XWAOP(xwptr_t, xwu64_t)
+DEFINE_XWAOP(xwlfq, xwu64)
+DEFINE_XWAOP(xwptr, xwu64)
 #endif
 
 #if (16 == BITS_PER_XWER_T)
-DEFINE_XWAOP(xwer_t, xws16_t)
+DEFINE_XWAOP(xwer, xws16)
 #elif (32 == BITS_PER_XWER_T)
-DEFINE_XWAOP(xwer_t, xws32_t)
+DEFINE_XWAOP(xwer, xws32)
 #elif (64 == BITS_PER_XWER_T)
-DEFINE_XWAOP(xwer_t, xws64_t)
+DEFINE_XWAOP(xwer, xws64)
 #endif
 
 #if (8 == BITS_PER_XWID_T)
-DEFINE_XWAOP(xwid_t, xwu8_t)
+DEFINE_XWAOP(xwid, xwu8)
 #elif (16 == BITS_PER_XWID_T)
-DEFINE_XWAOP(xwid_t, xwu16_t)
+DEFINE_XWAOP(xwid, xwu16)
 #elif (32 == BITS_PER_XWID_T)
-DEFINE_XWAOP(xwid_t, xwu32_t)
+DEFINE_XWAOP(xwid, xwu32)
 #elif (64 == BITS_PER_XWID_T)
-DEFINE_XWAOP(xwid_t, xwu64_t)
+DEFINE_XWAOP(xwid, xwu64)
 #endif
 
 #if (8 == BITS_PER_XWSID_T)
-DEFINE_XWAOP(xwsid_t, xws8_t)
+DEFINE_XWAOP(xwsid, xws8)
 #elif (16 == BITS_PER_XWSID_T)
-DEFINE_XWAOP(xwsid_t, xws16_t)
+DEFINE_XWAOP(xwsid, xws16)
 #elif (32 == BITS_PER_XWSID_T)
-DEFINE_XWAOP(xwsid_t, xws32_t)
+DEFINE_XWAOP(xwsid, xws32)
 #elif (64 == BITS_PER_XWSID_T)
-DEFINE_XWAOP(xwsid_t, xws64_t)
+DEFINE_XWAOP(xwsid, xws64)
 #endif
 
 #if (16 == BITS_PER_XWREG_T)
-DEFINE_XWAOP(xwreg_t, xwu16_t)
+DEFINE_XWAOP(xwreg, xwu16)
 #elif (32 == BITS_PER_XWREG_T)
-DEFINE_XWAOP(xwreg_t, xwu32_t)
+DEFINE_XWAOP(xwreg, xwu32)
 #elif (64 == BITS_PER_XWREG_T)
-DEFINE_XWAOP(xwreg_t, xwu64_t)
+DEFINE_XWAOP(xwreg, xwu64)
 #endif
 
 #if (16 == BITS_PER_XWSREG_T)
-DEFINE_XWAOP(xwsreg_t, xws16_t)
+DEFINE_XWAOP(xwsreg, xws16)
 #elif (32 == BITS_PER_XWSREG_T)
-DEFINE_XWAOP(xwsreg_t, xws32_t)
+DEFINE_XWAOP(xwsreg, xws32)
 #elif (64 == BITS_PER_XWSREG_T)
-DEFINE_XWAOP(xwsreg_t, xws64_t)
+DEFINE_XWAOP(xwsreg, xws64)
 #endif
 
 #if (16 == BITS_PER_XWSQ_T)
-DEFINE_XWAOP(xwsq_t, xwu16_t)
+DEFINE_XWAOP(xwsq, xwu16)
 #elif (32 == BITS_PER_XWSQ_T)
-DEFINE_XWAOP(xwsq_t, xwu32_t)
+DEFINE_XWAOP(xwsq, xwu32)
 #elif (64 == BITS_PER_XWSQ_T)
-DEFINE_XWAOP(xwsq_t, xwu64_t)
+DEFINE_XWAOP(xwsq, xwu64)
 #endif
 
 #if (16 == BITS_PER_XWSSQ_T)
-DEFINE_XWAOP(xwssq_t, xws16_t)
+DEFINE_XWAOP(xwssq, xws16)
 #elif (32 == BITS_PER_XWSSQ_T)
-DEFINE_XWAOP(xwssq_t, xws32_t)
+DEFINE_XWAOP(xwssq, xws32)
 #elif (64 == BITS_PER_XWSSQ_T)
-DEFINE_XWAOP(xwssq_t, xws64_t)
+DEFINE_XWAOP(xwssq, xws64)
 #endif
 
 #if (8 == BITS_PER_XWBMP_T)
-DEFINE_XWAOP(xwbmp_t, xwu16_t)
+DEFINE_XWAOP(xwbmp, xwu16)
 #elif (16 == BITS_PER_XWBMP_T)
-DEFINE_XWAOP(xwbmp_t, xwu16_t)
+DEFINE_XWAOP(xwbmp, xwu16)
 #elif (32 == BITS_PER_XWBMP_T)
-DEFINE_XWAOP(xwbmp_t, xwu32_t)
+DEFINE_XWAOP(xwbmp, xwu32)
 #elif (64 == BITS_PER_XWBMP_T)
-DEFINE_XWAOP(xwbmp_t, xwu64_t)
+DEFINE_XWAOP(xwbmp, xwu64)
 #endif
 
-DEFINE_XWAOP(xwtm_t, xws64_t)
+DEFINE_XWAOP(xwtm, xws64)
 
 #endif /* xwos/lib/xwaop.h */

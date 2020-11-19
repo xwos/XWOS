@@ -26,76 +26,152 @@
 typedef arch_uint8_t xwu8_t;
 #endif
 
+#if !defined(ARCH_HAVE_XWU8_A)
+typedef __xwcc_atomic xwu8_t xwu8_a;
+#endif
+
 #if !defined(ARCH_HAVE_XWS8_T)
 typedef arch_int8_t xws8_t;
+#endif
+
+#if !defined(ARCH_HAVE_XWS8_A)
+typedef __xwcc_atomic xws8_t xws8_a;
 #endif
 
 #if !defined(ARCH_HAVE_XWU16_T)
 typedef arch_uint16_t xwu16_t;
 #endif
 
+#if !defined(ARCH_HAVE_XWU16_A)
+typedef __xwcc_atomic xwu16_t xwu16_a;
+#endif
+
 #if !defined(ARCH_HAVE_XWS16_T)
 typedef arch_int16_t xws16_t;
+#endif
+
+#if !defined(ARCH_HAVE_XWS16_A)
+typedef __xwcc_atomic xws16_t xws16_a;
 #endif
 
 #if !defined(ARCH_HAVE_XWU32_T)
 typedef arch_uint32_t xwu32_t;
 #endif
 
+#if !defined(ARCH_HAVE_XWU32_A)
+typedef __xwcc_atomic xwu32_t xwu32_a;
+#endif
+
 #if !defined(ARCH_HAVE_XWS32_T)
 typedef arch_int32_t xws32_t;
+#endif
+
+#if !defined(ARCH_HAVE_XWS32_A)
+typedef __xwcc_atomic xws32_t xws32_a;
 #endif
 
 #if !defined(ARCH_HAVE_XWU64_T)
 typedef arch_uint64_t xwu64_t;
 #endif
 
+#if !defined(ARCH_HAVE_XWU64_A)
+typedef __xwcc_atomic xwu64_t xwu64_a;
+#endif
+
 #if !defined(ARCH_HAVE_XWS64_T)
 typedef arch_int64_t xws64_t;
+#endif
+
+#if !defined(ARCH_HAVE_XWS64_A)
+typedef __xwcc_atomic xws64_t xws64_a;
 #endif
 
 #if !defined(ARCH_HAVE_XWSZ_T)
 typedef arch_size_t xwsz_t; /**< 大小值 (无符号) */
 #endif
 
+#if !defined(ARCH_HAVE_XWSZ_A)
+typedef __xwcc_atomic xwsz_t xwsz_a; /**< 大小值 (无符号，原子的) */
+#endif
+
 #if !defined(ARCH_HAVE_XWSSZ_T)
 typedef arch_ssize_t xwssz_t; /**< 大小值 (有符号) */
+#endif
+
+#if !defined(ARCH_HAVE_XWSSZ_A)
+typedef __xwcc_atomic xwssz_t xwssz_a; /**< 大小值 (有符号，原子的) */
 #endif
 
 #if !defined(ARCH_HAVE_XWSTK_T)
 typedef unsigned long xwstk_t; /**< 栈槽 */
 #endif
 
+#if !defined(ARCH_HAVE_XWSTK_A)
+typedef __xwcc_atomic xwstk_t xwstk_a; /**< 栈槽 (原子的) */
+#endif
+
 #if !defined(ARCH_HAVE_XWPTR_T)
 typedef unsigned long xwptr_t; /**< 指针数值 */
+#endif
+
+#if !defined(ARCH_HAVE_XWPTR_A)
+typedef __xwcc_atomic xwptr_t xwptr_a; /**< 指针数值 (原子的) */
 #endif
 
 #if !defined(ARCH_HAVE_XWREG_T)
 typedef unsigned long xwreg_t; /**< 寄存器数值 (无符号) */
 #endif
 
+#if !defined(ARCH_HAVE_XWREG_A)
+typedef __xwcc_atomic xwreg_t xwreg_a; /**< 寄存器数值 (无符号，原子的) */
+#endif
+
 #if !defined(ARCH_HAVE_XWSREG_T)
 typedef signed long xwsreg_t; /**< 寄存器数值 (有符号) */
 #endif
 
+#if !defined(ARCH_HAVE_XWSREG_A)
+typedef __xwcc_atomic xwsreg_t xwsreg_a; /**< 寄存器数值 (有符号，原子的) */
+#endif
+
 #if !defined(ARCH_HAVE_XWER_T)
-typedef signed int xwer_t; /**< 错误码 (signed) */
+typedef signed int xwer_t; /**< 错误码 (有符号) */
+#endif
+
+#if !defined(ARCH_HAVE_XWER_A)
+typedef __xwcc_atomic xwer_t xwer_a; /**< 错误码 (有符号，原子的) */
 #endif
 
 #if !defined(ARCH_HAVE_XWSQ_T)
 typedef unsigned long xwsq_t; /**< 顺序值 (无符号) */
 #endif
 
+#if !defined(ARCH_HAVE_XWSQ_A)
+typedef __xwcc_atomic xwsq_t xwsq_a; /**< 顺序值 (无符号，原子的) */
+#endif
+
 #if !defined(ARCH_HAVE_XWSSQ_T)
 typedef signed long xwssq_t; /**< 顺序值 (有符号) */
+#endif
+
+#if !defined(ARCH_HAVE_XWSSQ_A)
+typedef __xwcc_atomic xwssq_t xwssq_a; /**< 顺序值 (有符号，原子的) */
 #endif
 
 #if !defined(ARCH_HAVE_XWID_T)
 typedef unsigned long xwid_t; /**< ID (无符号) */
 #endif
 
+#if !defined(ARCH_HAVE_XWID_A)
+typedef __xwcc_atomic xwid_t xwid_a; /**< ID (无符号，原子的) */
+#endif
+
 #if !defined(ARCH_HAVE_XWSID_T)
 typedef signed long xwsid_t; /**< ID (有符号) */
+#endif
+
+#if !defined(ARCH_HAVE_XWSID_A)
+typedef __xwcc_atomic xwsid_t xwsid_a; /**< ID (有符号，原子的) */
 #endif
 
 #if !defined(ARCH_HAVE_XWISR_F)
@@ -110,16 +186,32 @@ typedef signed int xwirq_t; /**< 中断号 (有符号) */
 typedef signed int xwpr_t; /**< 优先级 (有符号) */
 #endif
 
+#if !defined(ARCH_HAVE_XWPR_A)
+typedef __xwcc_atomic xwpr_t xwpr_a; /**< 优先级 (有符号，原子的) */
+#endif
+
 #if !defined(ARCH_HAVE_XWBMP_T)
 typedef xwu32_t xwbmp_t; /**< 位图 (无符号) */
+#endif
+
+#if !defined(ARCH_HAVE_XWBMP_A)
+typedef __xwcc_atomic xwbmp_t xwbmp_a; /**< 位图 (无符号，原子的) */
 #endif
 
 #if !defined(ARCH_HAVE_XWTM_T)
 typedef xws64_t xwtm_t; /**< XWOS系统时间 (有符号) */
 #endif
 
+#if !defined(ARCH_HAVE_XWTM_A)
+typedef __xwcc_atomic xwtm_t xwtm_a; /**< XWOS系统时间 (有符号，原子的) */
+#endif
+
 #if !defined(ARCH_HAVE_XWLFQ_T)
 typedef xwptr_t xwlfq_t; /**< 无锁队列 */
+#endif
+
+#if !defined(ARCH_HAVE_XWLFQ_A)
+typedef __xwcc_atomic xwlfq_t xwlfq_a; /**< 无锁队列 (原子的) */
 #endif
 
 typedef void (* ctor_f)(void * /*obj*/); /**< 构造函数 */

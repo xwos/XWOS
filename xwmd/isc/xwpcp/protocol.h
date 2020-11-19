@@ -150,8 +150,8 @@ enum xwpcp_refcnt_em {
 struct xwpcp {
         /* 基本信息 */
         const char * name; /**< 名字 */
-        __xwcc_atomic xwsq_t refcnt; /**< 引用计数 */
-        __xwcc_atomic xwsq_t hwifst; /**< 硬件层状态 */
+        xwsq_a refcnt; /**< 引用计数 */
+        xwsq_a hwifst; /**< 硬件层状态 */
         const struct xwpcp_hwifal_operations * hwifops; /**< 硬件接口抽象层操作函数 */
         void * hwifcb; /**< 接口硬件 */
 
@@ -165,7 +165,7 @@ struct xwpcp {
         /* 发送状态机 */
         xwid_t txtid; /**< 发送线程的ID */
         struct {
-                __xwcc_atomic xwu32_t cnt; /**< 发送计数器 */
+                xwu32_a cnt; /**< 发送计数器 */
                 struct xwlib_bclst_head q[XWPCP_PRIORITY_NUM]; /**< 队列 */
                 xwbmpop_declare(nebmp, XWPCP_PRIORITY_NUM); /**< 非空的索引位图 */
                 struct xwos_splk lock; /**< 保护发送队列的自旋锁 */
@@ -186,7 +186,7 @@ struct xwpcp {
         /* 接收状态机 */
         xwid_t rxtid; /**< 接收线程的ID */
         struct {
-                __xwcc_atomic xwu32_t cnt; /**< 接收计数器 */
+                xwu32_a cnt; /**< 接收计数器 */
                 struct xwlib_bclst_head q[XWPCP_PORT_NUM]; /**< 每个端口的接收队列 */
                 struct xwos_splk lock[XWPCP_PORT_NUM]; /**< 保护每个接收队列的锁 */
                 struct xwos_sem sem[XWPCP_PORT_NUM]; /**< 每个接收队列的信号量 */

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库：xwaop__xws64_t__tgele_then_add
+ * @brief 原子操作库：xwaop__xws64__tgele_then_add
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -23,10 +23,10 @@
 #include <xwos/lib/xwaop64.h>
 
 __xwlib_code
-xwer_t xwaop__xws64_t__tgele_then_add(__xwcc_atomic xws64_t * a,
-                                      xws64_t l, xws64_t r,
-                                      xws64_t v,
-                                      xws64_t * nv, xws64_t * ov)
+xwer_t xwaop__xws64__tgele_then_add(xws64_a * a,
+                                    xws64_t l, xws64_t r,
+                                    xws64_t v,
+                                    xws64_t * nv, xws64_t * ov)
 {
         xws64_t n;
         xws64_t o;

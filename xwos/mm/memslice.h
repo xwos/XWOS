@@ -27,9 +27,9 @@ struct xwmm_memslice {
         struct xwmm_zone zone; /**< 内存区域 */
         const char * name; /**< 名字 */
         xwsz_t card_size; /**< “卡片”大小 */
-        __xwcc_atomic xwsz_t num_free; /**< 当前分配器中还剩余多少张“卡片” */
-        __xwcc_atomic xwsz_t num_max; /**< 当前分配器中总共有多少张“卡片” */
-        __xwcc_atomic xwlfq_t free_list; /**< 空闲的内存切片链表 */
+        xwsz_a num_free; /**< 当前分配器中还剩余多少张“卡片” */
+        xwsz_a num_max; /**< 当前分配器中总共有多少张“卡片” */
+        xwlfq_a free_list; /**< 空闲的内存切片链表 */
         xwptr_t backup; /**< 备份值：
                              - 每个对象的第一段内存字(word)用作无锁队列的
                                链表指针，当分配卡片时，用备份值恢复；

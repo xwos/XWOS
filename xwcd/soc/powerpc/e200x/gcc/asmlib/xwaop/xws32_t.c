@@ -23,8 +23,8 @@
 #include <xwos/lib/xwaop32.h>
 
 __xwlib_code
-xws32_t xwaop__xws32_t__load(__xwcc_atomic xws32_t * a,
-                             const enum xwmb_memory_order_em mo)
+xws32_t xwaop__xwu32__load(xws32_a * a,
+                           const enum xwmb_memory_order_em mo)
 {
         xws32_t v;
 
@@ -60,9 +60,9 @@ xws32_t xwaop__xws32_t__load(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xws32_t xwaop__xws32_t__store(__xwcc_atomic xws32_t * a,
-                              const enum xwmb_memory_order_em mo,
-                              xws32_t v)
+xws32_t xwaop__xwu32__store(xws32_a * a,
+                            const enum xwmb_memory_order_em mo,
+                            xws32_t v)
 {
         switch (mo) {
         case xwmb_modr_relaxed:
@@ -95,20 +95,20 @@ xws32_t xwaop__xws32_t__store(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-void xwaop__xws32_t__read(__xwcc_atomic xws32_t * a,
-                          xws32_t * ov)
+void xwaop__xwu32__read(xws32_a * a,
+                        xws32_t * ov)
 {
         xws32_t o;
-        o = xwaop__xws32_t__load(a, xwmb_modr_acquire);
+        o = xwaop__xwu32__load(a, xwmb_modr_acquire);
         if (ov) {
                 *ov = o;
         }
 }
 
 __xwlib_code
-void xwaop__xws32_t__write(__xwcc_atomic xws32_t * a,
-                           xws32_t v,
-                           xws32_t * ov)
+void xwaop__xwu32__write(xws32_a * a,
+                         xws32_t v,
+                         xws32_t * ov)
 {
         xws32_t o;
 
@@ -122,10 +122,10 @@ void xwaop__xws32_t__write(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__teq_then_write(__xwcc_atomic xws32_t * a,
-                                      xws32_t t,
-                                      xws32_t v,
-                                      xws32_t * ov)
+xwer_t xwaop__xwu32__teq_then_write(xws32_a * a,
+                                    xws32_t t,
+                                    xws32_t v,
+                                    xws32_t * ov)
 {
         xws32_t o;
         xwer_t rc;
@@ -148,10 +148,10 @@ xwer_t xwaop__xws32_t__teq_then_write(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tne_then_write(__xwcc_atomic xws32_t * a,
-                                      xws32_t t,
-                                      xws32_t v,
-                                      xws32_t * ov)
+xwer_t xwaop__xwu32__tne_then_write(xws32_a * a,
+                                    xws32_t t,
+                                    xws32_t v,
+                                    xws32_t * ov)
 {
         xws32_t o;
         xwer_t rc;
@@ -174,10 +174,10 @@ xwer_t xwaop__xws32_t__tne_then_write(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgt_then_write(__xwcc_atomic xws32_t * a,
-                                      xws32_t t,
-                                      xws32_t v,
-                                      xws32_t * ov)
+xwer_t xwaop__xwu32__tgt_then_write(xws32_a * a,
+                                    xws32_t t,
+                                    xws32_t v,
+                                    xws32_t * ov)
 {
         xws32_t o;
         xwer_t rc;
@@ -200,10 +200,10 @@ xwer_t xwaop__xws32_t__tgt_then_write(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tge_then_write(__xwcc_atomic xws32_t * a,
-                                      xws32_t t,
-                                      xws32_t v,
-                                      xws32_t * ov)
+xwer_t xwaop__xwu32__tge_then_write(xws32_a * a,
+                                    xws32_t t,
+                                    xws32_t v,
+                                    xws32_t * ov)
 {
         xws32_t o;
         xwer_t rc;
@@ -226,10 +226,10 @@ xwer_t xwaop__xws32_t__tge_then_write(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tlt_then_write(__xwcc_atomic xws32_t * a,
-                                      xws32_t t,
-                                      xws32_t v,
-                                      xws32_t * ov)
+xwer_t xwaop__xwu32__tlt_then_write(xws32_a * a,
+                                    xws32_t t,
+                                    xws32_t v,
+                                    xws32_t * ov)
 {
         xws32_t o;
         xwer_t rc;
@@ -252,10 +252,10 @@ xwer_t xwaop__xws32_t__tlt_then_write(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tle_then_write(__xwcc_atomic xws32_t * a,
-                                      xws32_t t,
-                                      xws32_t v,
-                                      xws32_t * ov)
+xwer_t xwaop__xwu32__tle_then_write(xws32_a * a,
+                                    xws32_t t,
+                                    xws32_t v,
+                                    xws32_t * ov)
 {
         xws32_t o;
         xwer_t rc;
@@ -278,10 +278,10 @@ xwer_t xwaop__xws32_t__tle_then_write(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgtlt_then_write(__xwcc_atomic xws32_t * a,
-                                        xws32_t l, xws32_t r,
-                                        xws32_t v,
-                                        xws32_t * ov)
+xwer_t xwaop__xwu32__tgtlt_then_write(xws32_a * a,
+                                      xws32_t l, xws32_t r,
+                                      xws32_t v,
+                                      xws32_t * ov)
 {
         xws32_t o;
         xwer_t rc;
@@ -304,10 +304,10 @@ xwer_t xwaop__xws32_t__tgtlt_then_write(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgelt_then_write(__xwcc_atomic xws32_t * a,
-                                        xws32_t l, xws32_t r,
-                                        xws32_t v,
-                                        xws32_t * ov)
+xwer_t xwaop__xwu32__tgelt_then_write(xws32_a * a,
+                                      xws32_t l, xws32_t r,
+                                      xws32_t v,
+                                      xws32_t * ov)
 {
         xws32_t o;
         xwer_t rc;
@@ -330,10 +330,10 @@ xwer_t xwaop__xws32_t__tgelt_then_write(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgtle_then_write(__xwcc_atomic xws32_t * a,
-                                        xws32_t l, xws32_t r,
-                                        xws32_t v,
-                                        xws32_t * ov)
+xwer_t xwaop__xwu32__tgtle_then_write(xws32_a * a,
+                                      xws32_t l, xws32_t r,
+                                      xws32_t v,
+                                      xws32_t * ov)
 {
         xws32_t o;
         xwer_t rc;
@@ -356,10 +356,10 @@ xwer_t xwaop__xws32_t__tgtle_then_write(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgele_then_write(__xwcc_atomic xws32_t * a,
-                                        xws32_t l, xws32_t r,
-                                        xws32_t v,
-                                        xws32_t * ov)
+xwer_t xwaop__xwu32__tgele_then_write(xws32_a * a,
+                                      xws32_t l, xws32_t r,
+                                      xws32_t v,
+                                      xws32_t * ov)
 {
         xws32_t o;
         xwer_t rc;
@@ -382,9 +382,9 @@ xwer_t xwaop__xws32_t__tgele_then_write(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-void xwaop__xws32_t__add(__xwcc_atomic xws32_t * a,
-                         xws32_t v,
-                         xws32_t * nv, xws32_t * ov)
+void xwaop__xwu32__add(xws32_a * a,
+                       xws32_t v,
+                       xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -403,10 +403,10 @@ void xwaop__xws32_t__add(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__teq_then_add(__xwcc_atomic xws32_t * a,
-                                    xws32_t t,
-                                    xws32_t v,
-                                    xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__teq_then_add(xws32_a * a,
+                                  xws32_t t,
+                                  xws32_t v,
+                                  xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -435,10 +435,10 @@ xwer_t xwaop__xws32_t__teq_then_add(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tne_then_add(__xwcc_atomic xws32_t * a,
-                                    xws32_t t,
-                                    xws32_t v,
-                                    xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tne_then_add(xws32_a * a,
+                                  xws32_t t,
+                                  xws32_t v,
+                                  xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -467,10 +467,10 @@ xwer_t xwaop__xws32_t__tne_then_add(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgt_then_add(__xwcc_atomic xws32_t * a,
-                                    xws32_t t,
-                                    xws32_t v,
-                                    xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tgt_then_add(xws32_a * a,
+                                  xws32_t t,
+                                  xws32_t v,
+                                  xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -499,10 +499,10 @@ xwer_t xwaop__xws32_t__tgt_then_add(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tge_then_add(__xwcc_atomic xws32_t * a,
-                                    xws32_t t,
-                                    xws32_t v,
-                                    xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tge_then_add(xws32_a * a,
+                                  xws32_t t,
+                                  xws32_t v,
+                                  xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -531,10 +531,10 @@ xwer_t xwaop__xws32_t__tge_then_add(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tlt_then_add(__xwcc_atomic xws32_t * a,
-                                    xws32_t t,
-                                    xws32_t v,
-                                    xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tlt_then_add(xws32_a * a,
+                                  xws32_t t,
+                                  xws32_t v,
+                                  xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -563,10 +563,10 @@ xwer_t xwaop__xws32_t__tlt_then_add(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tle_then_add(__xwcc_atomic xws32_t * a,
-                                    xws32_t t,
-                                    xws32_t v,
-                                    xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tle_then_add(xws32_a * a,
+                                  xws32_t t,
+                                  xws32_t v,
+                                  xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -595,10 +595,10 @@ xwer_t xwaop__xws32_t__tle_then_add(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgtlt_then_add(__xwcc_atomic xws32_t * a,
-                                      xws32_t l, xws32_t r,
-                                      xws32_t v,
-                                      xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tgtlt_then_add(xws32_a * a,
+                                    xws32_t l, xws32_t r,
+                                    xws32_t v,
+                                    xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -627,10 +627,10 @@ xwer_t xwaop__xws32_t__tgtlt_then_add(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgelt_then_add(__xwcc_atomic xws32_t * a,
-                                      xws32_t l, xws32_t r,
-                                      xws32_t v,
-                                      xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tgelt_then_add(xws32_a * a,
+                                    xws32_t l, xws32_t r,
+                                    xws32_t v,
+                                    xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -659,10 +659,10 @@ xwer_t xwaop__xws32_t__tgelt_then_add(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgtle_then_add(__xwcc_atomic xws32_t * a,
-                                      xws32_t l, xws32_t r,
-                                      xws32_t v,
-                                      xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tgtle_then_add(xws32_a * a,
+                                    xws32_t l, xws32_t r,
+                                    xws32_t v,
+                                    xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -691,10 +691,10 @@ xwer_t xwaop__xws32_t__tgtle_then_add(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgele_then_add(__xwcc_atomic xws32_t * a,
-                                      xws32_t l, xws32_t r,
-                                      xws32_t v,
-                                      xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tgele_then_add(xws32_a * a,
+                                    xws32_t l, xws32_t r,
+                                    xws32_t v,
+                                    xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -723,9 +723,9 @@ xwer_t xwaop__xws32_t__tgele_then_add(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-void xwaop__xws32_t__sub(__xwcc_atomic xws32_t * a,
-                         xws32_t v,
-                         xws32_t * nv, xws32_t * ov)
+void xwaop__xwu32__sub(xws32_a * a,
+                       xws32_t v,
+                       xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -744,10 +744,10 @@ void xwaop__xws32_t__sub(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__teq_then_sub(__xwcc_atomic xws32_t * a,
-                                    xws32_t t,
-                                    xws32_t v,
-                                    xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__teq_then_sub(xws32_a * a,
+                                  xws32_t t,
+                                  xws32_t v,
+                                  xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -776,10 +776,10 @@ xwer_t xwaop__xws32_t__teq_then_sub(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tne_then_sub(__xwcc_atomic xws32_t * a,
-                                    xws32_t t,
-                                    xws32_t v,
-                                    xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tne_then_sub(xws32_a * a,
+                                  xws32_t t,
+                                  xws32_t v,
+                                  xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -808,10 +808,10 @@ xwer_t xwaop__xws32_t__tne_then_sub(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgt_then_sub(__xwcc_atomic xws32_t * a,
-                                    xws32_t t,
-                                    xws32_t v,
-                                    xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tgt_then_sub(xws32_a * a,
+                                  xws32_t t,
+                                  xws32_t v,
+                                  xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -840,10 +840,10 @@ xwer_t xwaop__xws32_t__tgt_then_sub(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tge_then_sub(__xwcc_atomic xws32_t * a,
-                                    xws32_t t,
-                                    xws32_t v,
-                                    xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tge_then_sub(xws32_a * a,
+                                  xws32_t t,
+                                  xws32_t v,
+                                  xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -872,10 +872,10 @@ xwer_t xwaop__xws32_t__tge_then_sub(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tlt_then_sub(__xwcc_atomic xws32_t * a,
-                                    xws32_t t,
-                                    xws32_t v,
-                                    xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tlt_then_sub(xws32_a * a,
+                                  xws32_t t,
+                                  xws32_t v,
+                                  xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -904,10 +904,10 @@ xwer_t xwaop__xws32_t__tlt_then_sub(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tle_then_sub(__xwcc_atomic xws32_t * a,
-                                    xws32_t t,
-                                    xws32_t v,
-                                    xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tle_then_sub(xws32_a * a,
+                                  xws32_t t,
+                                  xws32_t v,
+                                  xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -936,10 +936,10 @@ xwer_t xwaop__xws32_t__tle_then_sub(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgtlt_then_sub(__xwcc_atomic xws32_t * a,
-                                      xws32_t l, xws32_t r,
-                                      xws32_t v,
-                                      xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tgtlt_then_sub(xws32_a * a,
+                                    xws32_t l, xws32_t r,
+                                    xws32_t v,
+                                    xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -968,10 +968,10 @@ xwer_t xwaop__xws32_t__tgtlt_then_sub(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgelt_then_sub(__xwcc_atomic xws32_t * a,
-                                      xws32_t l, xws32_t r,
-                                      xws32_t v,
-                                      xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tgelt_then_sub(xws32_a * a,
+                                    xws32_t l, xws32_t r,
+                                    xws32_t v,
+                                    xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -1000,10 +1000,10 @@ xwer_t xwaop__xws32_t__tgelt_then_sub(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgtle_then_sub(__xwcc_atomic xws32_t * a,
-                                      xws32_t l, xws32_t r,
-                                      xws32_t v,
-                                      xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tgtle_then_sub(xws32_a * a,
+                                    xws32_t l, xws32_t r,
+                                    xws32_t v,
+                                    xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -1032,10 +1032,10 @@ xwer_t xwaop__xws32_t__tgtle_then_sub(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgele_then_sub(__xwcc_atomic xws32_t * a,
-                                      xws32_t l, xws32_t r,
-                                      xws32_t v,
-                                      xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tgele_then_sub(xws32_a * a,
+                                    xws32_t l, xws32_t r,
+                                    xws32_t v,
+                                    xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -1064,9 +1064,9 @@ xwer_t xwaop__xws32_t__tgele_then_sub(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-void xwaop__xws32_t__rsb(__xwcc_atomic xws32_t * a,
-                         xws32_t v,
-                         xws32_t * nv, xws32_t * ov)
+void xwaop__xwu32__rsb(xws32_a * a,
+                       xws32_t v,
+                       xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -1085,10 +1085,10 @@ void xwaop__xws32_t__rsb(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__teq_then_rsb(__xwcc_atomic xws32_t * a,
-                                    xws32_t t,
-                                    xws32_t v,
-                                    xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__teq_then_rsb(xws32_a * a,
+                                  xws32_t t,
+                                  xws32_t v,
+                                  xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -1117,10 +1117,10 @@ xwer_t xwaop__xws32_t__teq_then_rsb(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tne_then_rsb(__xwcc_atomic xws32_t * a,
-                                    xws32_t t,
-                                    xws32_t v,
-                                    xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tne_then_rsb(xws32_a * a,
+                                  xws32_t t,
+                                  xws32_t v,
+                                  xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -1149,10 +1149,10 @@ xwer_t xwaop__xws32_t__tne_then_rsb(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgt_then_rsb(__xwcc_atomic xws32_t * a,
-                                    xws32_t t,
-                                    xws32_t v,
-                                    xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tgt_then_rsb(xws32_a * a,
+                                  xws32_t t,
+                                  xws32_t v,
+                                  xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -1181,10 +1181,10 @@ xwer_t xwaop__xws32_t__tgt_then_rsb(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tge_then_rsb(__xwcc_atomic xws32_t * a,
-                                    xws32_t t,
-                                    xws32_t v,
-                                    xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tge_then_rsb(xws32_a * a,
+                                  xws32_t t,
+                                  xws32_t v,
+                                  xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -1213,10 +1213,10 @@ xwer_t xwaop__xws32_t__tge_then_rsb(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tlt_then_rsb(__xwcc_atomic xws32_t * a,
-                                    xws32_t t,
-                                    xws32_t v,
-                                    xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tlt_then_rsb(xws32_a * a,
+                                  xws32_t t,
+                                  xws32_t v,
+                                  xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -1245,10 +1245,10 @@ xwer_t xwaop__xws32_t__tlt_then_rsb(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tle_then_rsb(__xwcc_atomic xws32_t * a,
-                                    xws32_t t,
-                                    xws32_t v,
-                                    xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tle_then_rsb(xws32_a * a,
+                                  xws32_t t,
+                                  xws32_t v,
+                                  xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -1277,10 +1277,10 @@ xwer_t xwaop__xws32_t__tle_then_rsb(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgtlt_then_rsb(__xwcc_atomic xws32_t * a,
-                                      xws32_t l, xws32_t r,
-                                      xws32_t v,
-                                      xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tgtlt_then_rsb(xws32_a * a,
+                                    xws32_t l, xws32_t r,
+                                    xws32_t v,
+                                    xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -1309,10 +1309,10 @@ xwer_t xwaop__xws32_t__tgtlt_then_rsb(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgelt_then_rsb(__xwcc_atomic xws32_t * a,
-                                      xws32_t l, xws32_t r,
-                                      xws32_t v,
-                                      xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tgelt_then_rsb(xws32_a * a,
+                                    xws32_t l, xws32_t r,
+                                    xws32_t v,
+                                    xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -1341,10 +1341,10 @@ xwer_t xwaop__xws32_t__tgelt_then_rsb(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgtle_then_rsb(__xwcc_atomic xws32_t * a,
-                                      xws32_t l, xws32_t r,
-                                      xws32_t v,
-                                      xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tgtle_then_rsb(xws32_a * a,
+                                    xws32_t l, xws32_t r,
+                                    xws32_t v,
+                                    xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -1373,10 +1373,10 @@ xwer_t xwaop__xws32_t__tgtle_then_rsb(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tgele_then_rsb(__xwcc_atomic xws32_t * a,
-                                      xws32_t l, xws32_t r,
-                                      xws32_t v,
-                                      xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tgele_then_rsb(xws32_a * a,
+                                    xws32_t l, xws32_t r,
+                                    xws32_t v,
+                                    xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -1405,9 +1405,9 @@ xwer_t xwaop__xws32_t__tgele_then_rsb(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-void xwaop__xws32_t__or(__xwcc_atomic xws32_t * a,
-                        xws32_t v,
-                        xws32_t * nv, xws32_t * ov)
+void xwaop__xwu32__or(xws32_a * a,
+                      xws32_t v,
+                      xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -1426,9 +1426,9 @@ void xwaop__xws32_t__or(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-void xwaop__xws32_t__and(__xwcc_atomic xws32_t * a,
-                         xws32_t v,
-                         xws32_t * nv, xws32_t * ov)
+void xwaop__xwu32__and(xws32_a * a,
+                       xws32_t v,
+                       xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -1447,9 +1447,9 @@ void xwaop__xws32_t__and(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-void xwaop__xws32_t__xor(__xwcc_atomic xws32_t * a,
-                         xws32_t v,
-                         xws32_t * nv, xws32_t * ov)
+void xwaop__xwu32__xor(xws32_a * a,
+                       xws32_t v,
+                       xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;
@@ -1468,10 +1468,10 @@ void xwaop__xws32_t__xor(__xwcc_atomic xws32_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xws32_t__tst_then_op(__xwcc_atomic xws32_t * a,
-                                   xwaop_tst_f tst, void * tst_args,
-                                   xwaop_op_f op, void * op_args,
-                                   xws32_t * nv, xws32_t * ov)
+xwer_t xwaop__xwu32__tst_then_op(xws32_a * a,
+                                 xwaop_tst_f tst, void * tst_args,
+                                 xwaop_op_f op, void * op_args,
+                                 xws32_t * nv, xws32_t * ov)
 {
         xws32_t o;
         xws32_t n;

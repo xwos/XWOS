@@ -209,7 +209,7 @@ xwer_t xwscp_tx_cfrm_sync(struct xwscp * xwscp, xwtm_t * xwtm)
         xwer_t rc;
 
         frm = (struct xwscp_frame *)stream;
-        xwaop_read(xwu32_t, &xwscp->txi.cnt, &txcnt);
+        xwaop_read(xwu32, &xwscp->txi.cnt, &txcnt);
         if (XWSCP_ID_SYNC == XWSCP_ID(txcnt)) {
                 xwscplogf(DEBUG, "TX SYNC frame.\n");
                 memcpy(frm, xwscp_cfrm_sync, sizeof(xwscp_cfrm_sync));
@@ -325,7 +325,7 @@ xwer_t xwscp_fmt_msg(struct xwscp * xwscp, struct xwscp_frame * frm,
         xwsz_t infolen;
         xwu8_t id;
 
-        xwaop_read(xwu32_t, &xwscp->txi.cnt, &txcnt);
+        xwaop_read(xwu32, &xwscp->txi.cnt, &txcnt);
         id = XWSCP_ID(txcnt);
         if (XWSCP_ID_SYNC == id) {
                 rc = -ENOLINK;
@@ -468,7 +468,7 @@ xwer_t xwscp_rx_cfrm_sync(struct xwscp * xwscp, struct xwscp_frmslot * frmslot)
                 rmttxcnt |= ((xwu32_t)frmslot->frm.sdu[12]) << 0U;
                 rc = xwscp_tx_cfrm_sync_ack(xwscp, rmttxcnt);
                 if (XWOK == rc) {
-                        xwaop_write(xwu32_t, &xwscp->rxq.cnt, rmttxcnt + 1, NULL);
+                        xwaop_write(xwu32, &xwscp->rxq.cnt, rmttxcnt + 1, NULL);
                 }/* else {} */
         } else {
                 rc = -EPERM;
@@ -502,7 +502,7 @@ xwer_t xwscp_rx_cfrm_sync_ack(struct xwscp * xwscp, struct xwscp_frmslot * frmsl
         rmtrxcnt |= ((xwu32_t)frmslot->frm.sdu[10]) << 16U;
         rmtrxcnt |= ((xwu32_t)frmslot->frm.sdu[11]) << 8U;
         rmtrxcnt |= ((xwu32_t)frmslot->frm.sdu[12]) << 0U;
-        xwaop_read(xwu32_t, &xwscp->txi.cnt, &txcnt);
+        xwaop_read(xwu32, &xwscp->txi.cnt, &txcnt);
 
         xwscplogf(DEBUG, "proto:%s-%d.%d.%d, key:0x%X, remote:%d, local:%d\n",
                   proto,
@@ -579,13 +579,13 @@ xwer_t xwscp_rx_frm_sdu(struct xwscp * xwscp, struct xwscp_frmslot * frmslot)
         xwu8_t localid;
 
         rxid = XWSCP_ID(frmslot->frm.head.id);
-        xwaop_read(xwu32_t, &xwscp->rxq.cnt, &rxcnt);
+        xwaop_read(xwu32, &xwscp->rxq.cnt, &rxcnt);
         localid = XWSCP_ID(rxcnt);
 
         if (rxid == localid) {
                 rc = xwscp_tx_sdu_ack(xwscp, localid, XWSCP_ACK_OK);
                 if (XWOK == rc) {
-                        xwaop_add(xwu32_t, &xwscp->rxq.cnt, 1, NULL, NULL);
+                        xwaop_add(xwu32, &xwscp->rxq.cnt, 1, NULL, NULL);
                         xwscp_rxq_pub(xwscp, frmslot);
                 } else {
                         xwscp_free_frmslot(xwscp, frmslot);

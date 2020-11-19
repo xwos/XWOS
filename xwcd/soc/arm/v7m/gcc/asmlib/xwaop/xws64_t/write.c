@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库: xwaop__xws64_t__write
+ * @brief 原子操作库: xwaop__xws64__write
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -23,9 +23,9 @@
 #include <xwos/lib/xwaop64.h>
 
 __xwlib_code
-void xwaop__xws64_t__write(__xwcc_atomic xws64_t * a,
-                           xws64_t v,
-                           xws64_t * ov)
+void xwaop__xws64__write(xws64_a * a,
+                         xws64_t v,
+                         xws64_t * ov)
 {
         xws64_t o;
         xwreg_t flag;

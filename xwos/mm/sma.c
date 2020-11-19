@@ -97,7 +97,7 @@ xwer_t xwmm_sma_alloc(struct xwmm_sma * sa, xwsz_t size, xwsz_t aligned,
 
         size = ALIGN(size, XWMM_ALIGNMENT);
         do {
-                cpos = xwaop_load(xwsq_t, &sa->pos, xwmb_modr_acquire);
+                cpos = xwaop_load(xwsq, &sa->pos, xwmb_modr_acquire);
                 tmp = ALIGN((sa->zone.origin + cpos), aligned);
                 npos = size + tmp - sa->zone.origin;
                 if (npos > sa->zone.size) {
@@ -106,7 +106,7 @@ xwer_t xwmm_sma_alloc(struct xwmm_sma * sa, xwsz_t size, xwsz_t aligned,
                         goto err_nomem;
                 }
                 *membuf = (void *)tmp;
-        } while (xwaop_teq_then_write(xwsq_t, &sa->pos, cpos, npos, NULL));
+        } while (xwaop_teq_then_write(xwsq, &sa->pos, cpos, npos, NULL));
         return XWOK;
 
 err_nomem:

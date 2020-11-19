@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库：xwaop__xwu16_t__tge_then_rsb
+ * @brief 原子操作库：xwaop__xwu16__tge_then_rsb
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -23,10 +23,10 @@
 #include <xwos/lib/xwaop16.h>
 
 __xwlib_code
-xwer_t xwaop__xwu16_t__tge_then_rsb(__xwcc_atomic xwu16_t * a,
-                                    xwu16_t t,
-                                    xwu16_t v,
-                                    xwu16_t * nv, xwu16_t * ov)
+xwer_t xwaop__xwu16__tge_then_rsb(xwu16_a * a,
+                                  xwu16_t t,
+                                  xwu16_t v,
+                                  xwu16_t * nv, xwu16_t * ov)
 {
         xwu16_t n;
         xwu16_t o;

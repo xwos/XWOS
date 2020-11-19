@@ -44,7 +44,7 @@ xwer_t xwpcp_hwifal_open(struct xwpcp * xwpcp, void * hwifcb)
 {
         xwer_t rc;
 
-        rc = xwaop_teq_then_add(xwsq_t, &xwpcp->refcnt,
+        rc = xwaop_teq_then_add(xwsq, &xwpcp->refcnt,
                                 XWPCP_REFCNT_STARTED, 1,
                                 NULL, NULL);
         if (__xwcc_unlikely(rc < 0)) {
@@ -61,13 +61,13 @@ xwer_t xwpcp_hwifal_open(struct xwpcp * xwpcp, void * hwifcb)
                 goto err_hwifops_open;
         }
 
-        xwaop_write(xwsq_t, &xwpcp->hwifst, XWPCP_HWIFST_RX, NULL);
+        xwaop_write(xwsq, &xwpcp->hwifst, XWPCP_HWIFST_RX, NULL);
         xwpcplogf(INFO, "Open HWIF ... [OK]\n");
         return rc;
 
 err_hwifops_open:
         xwpcp->hwifcb = NULL;
-        xwaop_sub(xwsq_t, &xwpcp->refcnt, 1, NULL, NULL);
+        xwaop_sub(xwsq, &xwpcp->refcnt, 1, NULL, NULL);
 err_grab_xwpcp:
         xwpcplogf(INFO, "Failed to open HWIF ... [rc:%d]\n", rc);
         return rc;
@@ -83,7 +83,7 @@ xwer_t xwpcp_hwifal_close(struct xwpcp * xwpcp)
 {
         xwer_t rc;
 
-        rc = xwaop_t1ma_then_c0m(xwsq_t, &xwpcp->hwifst, XWPCP_HWIFST_RX,
+        rc = xwaop_t1ma_then_c0m(xwsq, &xwpcp->hwifst, XWPCP_HWIFST_RX,
                                  NULL, NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwpcp_clear_hwifst;
@@ -102,7 +102,7 @@ xwer_t xwpcp_hwifal_close(struct xwpcp * xwpcp)
         return XWOK;
 
 err_hwifops_close:
-        xwaop_s1m(xwsq_t, &xwpcp->hwifst, XWPCP_HWIFST_RX, NULL, NULL);
+        xwaop_s1m(xwsq, &xwpcp->hwifst, XWPCP_HWIFST_RX, NULL, NULL);
 err_xwpcp_clear_hwifst:
         xwpcplogf(INFO, "Open HWIF ... [rc:%d]\n", rc);
         return rc;

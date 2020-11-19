@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库: xwaop__xwu8_t__load
+ * @brief 原子操作库: xwaop__xwu8__load
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -23,9 +23,9 @@
 #include <xwos/lib/xwaop8.h>
 
 __xwlib_code
-xwu8_t xwaop__xwu8_t__store(__xwcc_atomic xwu8_t * a,
-                            const enum xwmb_memory_order_em mo,
-                            xwu8_t v)
+xwu8_t xwaop__xwu8__store(xwu8_a * a,
+                          const enum xwmb_memory_order_em mo,
+                          xwu8_t v)
 {
         switch (mo) {
         case xwmb_modr_relaxed:

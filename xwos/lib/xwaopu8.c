@@ -18,8 +18,8 @@
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code
-xwu8_t xwaop__xwu8_t__load(__xwcc_atomic xwu8_t * a,
-                           const enum xwmb_memory_order_em mo)
+xwu8_t xwaop__xwu8__load(xwu8_a * a,
+                         const enum xwmb_memory_order_em mo)
 {
         xwu8_t v;
 
@@ -28,17 +28,17 @@ xwu8_t xwaop__xwu8_t__load(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwu8_t xwaop__xwu8_t__store(__xwcc_atomic xwu8_t * a,
-                            const enum xwmb_memory_order_em mo,
-                            xwu8_t v)
+xwu8_t xwaop__xwu8__store(xwu8_a * a,
+                          const enum xwmb_memory_order_em mo,
+                          xwu8_t v)
 {
         atomic_store_explicit(a, v, (int)mo);
         return v;
 }
 
 __xwlib_code
-void xwaop__xwu8_t__read(__xwcc_atomic xwu8_t * a,
-                         xwu8_t * ov)
+void xwaop__xwu8__read(xwu8_a * a,
+                       xwu8_t * ov)
 {
         xwu8_t o;
 
@@ -49,9 +49,9 @@ void xwaop__xwu8_t__read(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-void xwaop__xwu8_t__write(__xwcc_atomic xwu8_t * a,
-                          xwu8_t v,
-                          xwu8_t * ov)
+void xwaop__xwu8__write(xwu8_a * a,
+                        xwu8_t v,
+                        xwu8_t * ov)
 {
         xwu8_t o;
 
@@ -62,10 +62,10 @@ void xwaop__xwu8_t__write(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__teq_then_write(__xwcc_atomic xwu8_t * a,
-                                     xwu8_t t,
-                                     xwu8_t v,
-                                     xwu8_t * ov)
+xwer_t xwaop__xwu8__teq_then_write(xwu8_a * a,
+                                   xwu8_t t,
+                                   xwu8_t v,
+                                   xwu8_t * ov)
 {
         xwu8_t o;
         xwer_t rc;
@@ -86,10 +86,10 @@ xwer_t xwaop__xwu8_t__teq_then_write(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tne_then_write(__xwcc_atomic xwu8_t * a,
-                                     xwu8_t t,
-                                     xwu8_t v,
-                                     xwu8_t * ov)
+xwer_t xwaop__xwu8__tne_then_write(xwu8_a * a,
+                                   xwu8_t t,
+                                   xwu8_t v,
+                                   xwu8_t * ov)
 {
         xwu8_t o;
         xwer_t rc;
@@ -116,10 +116,10 @@ xwer_t xwaop__xwu8_t__tne_then_write(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgt_then_write(__xwcc_atomic xwu8_t * a,
-                                     xwu8_t t,
-                                     xwu8_t v,
-                                     xwu8_t * ov)
+xwer_t xwaop__xwu8__tgt_then_write(xwu8_a * a,
+                                   xwu8_t t,
+                                   xwu8_t v,
+                                   xwu8_t * ov)
 {
         xwu8_t o;
         xwer_t rc;
@@ -146,10 +146,10 @@ xwer_t xwaop__xwu8_t__tgt_then_write(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tge_then_write(__xwcc_atomic xwu8_t * a,
-                                     xwu8_t t,
-                                     xwu8_t v,
-                                     xwu8_t * ov)
+xwer_t xwaop__xwu8__tge_then_write(xwu8_a * a,
+                                   xwu8_t t,
+                                   xwu8_t v,
+                                   xwu8_t * ov)
 {
         xwu8_t o;
         xwer_t rc;
@@ -176,10 +176,10 @@ xwer_t xwaop__xwu8_t__tge_then_write(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tlt_then_write(__xwcc_atomic xwu8_t * a,
-                                     xwu8_t t,
-                                     xwu8_t v,
-                                     xwu8_t * ov)
+xwer_t xwaop__xwu8__tlt_then_write(xwu8_a * a,
+                                   xwu8_t t,
+                                   xwu8_t v,
+                                   xwu8_t * ov)
 {
         xwu8_t o;
         xwer_t rc;
@@ -206,10 +206,10 @@ xwer_t xwaop__xwu8_t__tlt_then_write(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tle_then_write(__xwcc_atomic xwu8_t * a,
-                                     xwu8_t t,
-                                     xwu8_t v,
-                                     xwu8_t * ov)
+xwer_t xwaop__xwu8__tle_then_write(xwu8_a * a,
+                                   xwu8_t t,
+                                   xwu8_t v,
+                                   xwu8_t * ov)
 {
         xwu8_t o;
         xwer_t rc;
@@ -236,10 +236,10 @@ xwer_t xwaop__xwu8_t__tle_then_write(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgtlt_then_write(__xwcc_atomic xwu8_t * a,
-                                       xwu8_t l, xwu8_t r,
-                                       xwu8_t v,
-                                       xwu8_t * ov)
+xwer_t xwaop__xwu8__tgtlt_then_write(xwu8_a * a,
+                                     xwu8_t l, xwu8_t r,
+                                     xwu8_t v,
+                                     xwu8_t * ov)
 {
         xwu8_t o;
         xwer_t rc;
@@ -266,10 +266,10 @@ xwer_t xwaop__xwu8_t__tgtlt_then_write(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgelt_then_write(__xwcc_atomic xwu8_t * a,
-                                       xwu8_t l, xwu8_t r,
-                                       xwu8_t v,
-                                       xwu8_t * ov)
+xwer_t xwaop__xwu8__tgelt_then_write(xwu8_a * a,
+                                     xwu8_t l, xwu8_t r,
+                                     xwu8_t v,
+                                     xwu8_t * ov)
 {
         xwu8_t o;
         xwer_t rc;
@@ -296,10 +296,10 @@ xwer_t xwaop__xwu8_t__tgelt_then_write(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgtle_then_write(__xwcc_atomic xwu8_t * a,
-                                       xwu8_t l, xwu8_t r,
-                                       xwu8_t v,
-                                       xwu8_t * ov)
+xwer_t xwaop__xwu8__tgtle_then_write(xwu8_a * a,
+                                     xwu8_t l, xwu8_t r,
+                                     xwu8_t v,
+                                     xwu8_t * ov)
 {
         xwu8_t o;
         xwer_t rc;
@@ -326,10 +326,10 @@ xwer_t xwaop__xwu8_t__tgtle_then_write(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgele_then_write(__xwcc_atomic xwu8_t * a,
-                                       xwu8_t l, xwu8_t r,
-                                       xwu8_t v,
-                                       xwu8_t * ov)
+xwer_t xwaop__xwu8__tgele_then_write(xwu8_a * a,
+                                     xwu8_t l, xwu8_t r,
+                                     xwu8_t v,
+                                     xwu8_t * ov)
 {
         xwu8_t o;
         xwer_t rc;
@@ -357,9 +357,9 @@ xwer_t xwaop__xwu8_t__tgele_then_write(__xwcc_atomic xwu8_t * a,
 
 /******** ******** add ******** ********/
 __xwlib_code
-void xwaop__xwu8_t__add(__xwcc_atomic xwu8_t * a,
-                        xwu8_t v,
-                        xwu8_t * nv, xwu8_t * ov)
+void xwaop__xwu8__add(xwu8_a * a,
+                      xwu8_t v,
+                      xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
 
@@ -373,10 +373,10 @@ void xwaop__xwu8_t__add(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__teq_then_add(__xwcc_atomic xwu8_t * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__teq_then_add(xwu8_a * a,
+                                 xwu8_t t,
+                                 xwu8_t v,
+                                 xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -404,10 +404,10 @@ xwer_t xwaop__xwu8_t__teq_then_add(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tne_then_add(__xwcc_atomic xwu8_t * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tne_then_add(xwu8_a * a,
+                                 xwu8_t t,
+                                 xwu8_t v,
+                                 xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -440,10 +440,10 @@ xwer_t xwaop__xwu8_t__tne_then_add(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgt_then_add(__xwcc_atomic xwu8_t * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tgt_then_add(xwu8_a * a,
+                                 xwu8_t t,
+                                 xwu8_t v,
+                                 xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -476,10 +476,10 @@ xwer_t xwaop__xwu8_t__tgt_then_add(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tge_then_add(__xwcc_atomic xwu8_t * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tge_then_add(xwu8_a * a,
+                                 xwu8_t t,
+                                 xwu8_t v,
+                                 xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -512,10 +512,10 @@ xwer_t xwaop__xwu8_t__tge_then_add(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tlt_then_add(__xwcc_atomic xwu8_t * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tlt_then_add(xwu8_a * a,
+                                 xwu8_t t,
+                                 xwu8_t v,
+                                 xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -548,10 +548,10 @@ xwer_t xwaop__xwu8_t__tlt_then_add(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tle_then_add(__xwcc_atomic xwu8_t * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tle_then_add(xwu8_a * a,
+                                 xwu8_t t,
+                                 xwu8_t v,
+                                 xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -584,10 +584,10 @@ xwer_t xwaop__xwu8_t__tle_then_add(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgtlt_then_add(__xwcc_atomic xwu8_t * a,
-                                     xwu8_t l, xwu8_t r,
-                                     xwu8_t v,
-                                     xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tgtlt_then_add(xwu8_a * a,
+                                   xwu8_t l, xwu8_t r,
+                                   xwu8_t v,
+                                   xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -620,10 +620,10 @@ xwer_t xwaop__xwu8_t__tgtlt_then_add(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgelt_then_add(__xwcc_atomic xwu8_t * a,
-                                     xwu8_t l, xwu8_t r,
-                                     xwu8_t v,
-                                     xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tgelt_then_add(xwu8_a * a,
+                                   xwu8_t l, xwu8_t r,
+                                   xwu8_t v,
+                                   xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -656,10 +656,10 @@ xwer_t xwaop__xwu8_t__tgelt_then_add(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgtle_then_add(__xwcc_atomic xwu8_t * a,
-                                     xwu8_t l, xwu8_t r,
-                                     xwu8_t v,
-                                     xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tgtle_then_add(xwu8_a * a,
+                                   xwu8_t l, xwu8_t r,
+                                   xwu8_t v,
+                                   xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -692,10 +692,10 @@ xwer_t xwaop__xwu8_t__tgtle_then_add(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgele_then_add(__xwcc_atomic xwu8_t * a,
-                                     xwu8_t l, xwu8_t r,
-                                     xwu8_t v,
-                                     xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tgele_then_add(xwu8_a * a,
+                                   xwu8_t l, xwu8_t r,
+                                   xwu8_t v,
+                                   xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -729,9 +729,9 @@ xwer_t xwaop__xwu8_t__tgele_then_add(__xwcc_atomic xwu8_t * a,
 
 /******** ******** subtract ******** ********/
 __xwlib_code
-void xwaop__xwu8_t__sub(__xwcc_atomic xwu8_t * a,
-                        xwu8_t v,
-                        xwu8_t * nv, xwu8_t * ov)
+void xwaop__xwu8__sub(xwu8_a * a,
+                      xwu8_t v,
+                      xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
 
@@ -745,10 +745,10 @@ void xwaop__xwu8_t__sub(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__teq_then_sub(__xwcc_atomic xwu8_t * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__teq_then_sub(xwu8_a * a,
+                                 xwu8_t t,
+                                 xwu8_t v,
+                                 xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -776,10 +776,10 @@ xwer_t xwaop__xwu8_t__teq_then_sub(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tne_then_sub(__xwcc_atomic xwu8_t * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tne_then_sub(xwu8_a * a,
+                                 xwu8_t t,
+                                 xwu8_t v,
+                                 xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -812,10 +812,10 @@ xwer_t xwaop__xwu8_t__tne_then_sub(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgt_then_sub(__xwcc_atomic xwu8_t * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tgt_then_sub(xwu8_a * a,
+                                 xwu8_t t,
+                                 xwu8_t v,
+                                 xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -848,10 +848,10 @@ xwer_t xwaop__xwu8_t__tgt_then_sub(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tge_then_sub(__xwcc_atomic xwu8_t * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tge_then_sub(xwu8_a * a,
+                                 xwu8_t t,
+                                 xwu8_t v,
+                                 xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -884,10 +884,10 @@ xwer_t xwaop__xwu8_t__tge_then_sub(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tlt_then_sub(__xwcc_atomic xwu8_t * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tlt_then_sub(xwu8_a * a,
+                                 xwu8_t t,
+                                 xwu8_t v,
+                                 xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -920,10 +920,10 @@ xwer_t xwaop__xwu8_t__tlt_then_sub(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tle_then_sub(__xwcc_atomic xwu8_t * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tle_then_sub(xwu8_a * a,
+                                 xwu8_t t,
+                                 xwu8_t v,
+                                 xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -956,10 +956,10 @@ xwer_t xwaop__xwu8_t__tle_then_sub(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgtlt_then_sub(__xwcc_atomic xwu8_t * a,
-                                     xwu8_t l, xwu8_t r,
-                                     xwu8_t v,
-                                     xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tgtlt_then_sub(xwu8_a * a,
+                                   xwu8_t l, xwu8_t r,
+                                   xwu8_t v,
+                                   xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -992,10 +992,10 @@ xwer_t xwaop__xwu8_t__tgtlt_then_sub(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgelt_then_sub(__xwcc_atomic xwu8_t * a,
-                                     xwu8_t l, xwu8_t r,
-                                     xwu8_t v,
-                                     xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tgelt_then_sub(xwu8_a * a,
+                                   xwu8_t l, xwu8_t r,
+                                   xwu8_t v,
+                                   xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -1028,10 +1028,10 @@ xwer_t xwaop__xwu8_t__tgelt_then_sub(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgtle_then_sub(__xwcc_atomic xwu8_t * a,
-                                     xwu8_t l, xwu8_t r,
-                                     xwu8_t v,
-                                     xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tgtle_then_sub(xwu8_a * a,
+                                   xwu8_t l, xwu8_t r,
+                                   xwu8_t v,
+                                   xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -1064,10 +1064,10 @@ xwer_t xwaop__xwu8_t__tgtle_then_sub(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgele_then_sub(__xwcc_atomic xwu8_t * a,
-                                     xwu8_t l, xwu8_t r,
-                                     xwu8_t v,
-                                     xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tgele_then_sub(xwu8_a * a,
+                                   xwu8_t l, xwu8_t r,
+                                   xwu8_t v,
+                                   xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -1101,9 +1101,9 @@ xwer_t xwaop__xwu8_t__tgele_then_sub(__xwcc_atomic xwu8_t * a,
 
 /******** ******** reverse subtract ******** ********/
 __xwlib_code
-void xwaop__xwu8_t__rsb(__xwcc_atomic xwu8_t * a,
-                        xwu8_t v,
-                        xwu8_t * nv, xwu8_t * ov)
+void xwaop__xwu8__rsb(xwu8_a * a,
+                      xwu8_t v,
+                      xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -1126,10 +1126,10 @@ void xwaop__xwu8_t__rsb(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__teq_then_rsb(__xwcc_atomic xwu8_t * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__teq_then_rsb(xwu8_a * a,
+                                 xwu8_t t,
+                                 xwu8_t v,
+                                 xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -1162,10 +1162,10 @@ xwer_t xwaop__xwu8_t__teq_then_rsb(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tne_then_rsb(__xwcc_atomic xwu8_t * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tne_then_rsb(xwu8_a * a,
+                                 xwu8_t t,
+                                 xwu8_t v,
+                                 xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -1198,10 +1198,10 @@ xwer_t xwaop__xwu8_t__tne_then_rsb(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgt_then_rsb(__xwcc_atomic xwu8_t * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tgt_then_rsb(xwu8_a * a,
+                                 xwu8_t t,
+                                 xwu8_t v,
+                                 xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -1234,10 +1234,10 @@ xwer_t xwaop__xwu8_t__tgt_then_rsb(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tge_then_rsb(__xwcc_atomic xwu8_t * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tge_then_rsb(xwu8_a * a,
+                                 xwu8_t t,
+                                 xwu8_t v,
+                                 xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -1270,10 +1270,10 @@ xwer_t xwaop__xwu8_t__tge_then_rsb(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tlt_then_rsb(__xwcc_atomic xwu8_t * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tlt_then_rsb(xwu8_a * a,
+                                 xwu8_t t,
+                                 xwu8_t v,
+                                 xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -1306,10 +1306,10 @@ xwer_t xwaop__xwu8_t__tlt_then_rsb(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tle_then_rsb(__xwcc_atomic xwu8_t * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tle_then_rsb(xwu8_a * a,
+                                 xwu8_t t,
+                                 xwu8_t v,
+                                 xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -1342,10 +1342,10 @@ xwer_t xwaop__xwu8_t__tle_then_rsb(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgtlt_then_rsb(__xwcc_atomic xwu8_t * a,
-                                     xwu8_t l, xwu8_t r,
-                                     xwu8_t v,
-                                     xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tgtlt_then_rsb(xwu8_a * a,
+                                   xwu8_t l, xwu8_t r,
+                                   xwu8_t v,
+                                   xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -1378,10 +1378,10 @@ xwer_t xwaop__xwu8_t__tgtlt_then_rsb(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgelt_then_rsb(__xwcc_atomic xwu8_t * a,
-                                     xwu8_t l, xwu8_t r,
-                                     xwu8_t v,
-                                     xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tgelt_then_rsb(xwu8_a * a,
+                                   xwu8_t l, xwu8_t r,
+                                   xwu8_t v,
+                                   xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -1414,10 +1414,10 @@ xwer_t xwaop__xwu8_t__tgelt_then_rsb(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgtle_then_rsb(__xwcc_atomic xwu8_t * a,
-                                     xwu8_t l, xwu8_t r,
-                                     xwu8_t v,
-                                     xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tgtle_then_rsb(xwu8_a * a,
+                                   xwu8_t l, xwu8_t r,
+                                   xwu8_t v,
+                                   xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -1450,10 +1450,10 @@ xwer_t xwaop__xwu8_t__tgtle_then_rsb(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__tgele_then_rsb(__xwcc_atomic xwu8_t * a,
-                                     xwu8_t l, xwu8_t r,
-                                     xwu8_t v,
-                                     xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tgele_then_rsb(xwu8_a * a,
+                                   xwu8_t l, xwu8_t r,
+                                   xwu8_t v,
+                                   xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -1487,9 +1487,9 @@ xwer_t xwaop__xwu8_t__tgele_then_rsb(__xwcc_atomic xwu8_t * a,
 
 /******** ******** bit operations ******** ********/
 __xwlib_code
-void xwaop__xwu8_t__or(__xwcc_atomic xwu8_t * a,
-                       xwu8_t v,
-                       xwu8_t * nv, xwu8_t * ov)
+void xwaop__xwu8__or(xwu8_a * a,
+                     xwu8_t v,
+                     xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
 
@@ -1503,9 +1503,9 @@ void xwaop__xwu8_t__or(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-void xwaop__xwu8_t__and(__xwcc_atomic xwu8_t * a,
-                        xwu8_t v,
-                        xwu8_t * nv, xwu8_t * ov)
+void xwaop__xwu8__and(xwu8_a * a,
+                      xwu8_t v,
+                      xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
 
@@ -1519,9 +1519,9 @@ void xwaop__xwu8_t__and(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-void xwaop__xwu8_t__xor(__xwcc_atomic xwu8_t * a,
-                        xwu8_t v,
-                        xwu8_t * nv, xwu8_t * ov)
+void xwaop__xwu8__xor(xwu8_a * a,
+                      xwu8_t v,
+                      xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
 
@@ -1535,9 +1535,9 @@ void xwaop__xwu8_t__xor(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-void xwaop__xwu8_t__c0m(__xwcc_atomic xwu8_t * a,
-                        xwu8_t m,
-                        xwu8_t * nv, xwu8_t * ov)
+void xwaop__xwu8__c0m(xwu8_a * a,
+                      xwu8_t m,
+                      xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
 
@@ -1551,9 +1551,9 @@ void xwaop__xwu8_t__c0m(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__t1ma_then_c0m(__xwcc_atomic xwu8_t * a,
-                                    xwu8_t m,
-                                    xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__t1ma_then_c0m(xwu8_a * a,
+                                  xwu8_t m,
+                                  xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -1586,9 +1586,9 @@ xwer_t xwaop__xwu8_t__t1ma_then_c0m(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__t1mo_then_c0m(__xwcc_atomic xwu8_t * a,
-                                    xwu8_t m,
-                                    xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__t1mo_then_c0m(xwu8_a * a,
+                                  xwu8_t m,
+                                  xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -1621,9 +1621,9 @@ xwer_t xwaop__xwu8_t__t1mo_then_c0m(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__t0ma_then_s1m(__xwcc_atomic xwu8_t * a,
-                                    xwu8_t m,
-                                    xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__t0ma_then_s1m(xwu8_a * a,
+                                  xwu8_t m,
+                                  xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -1656,9 +1656,9 @@ xwer_t xwaop__xwu8_t__t0ma_then_s1m(__xwcc_atomic xwu8_t * a,
 }
 
 __xwlib_code
-xwer_t xwaop__xwu8_t__t0mo_then_s1m(__xwcc_atomic xwu8_t * a,
-                                    xwu8_t m,
-                                    xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__t0mo_then_s1m(xwu8_a * a,
+                                  xwu8_t m,
+                                  xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;
@@ -1692,10 +1692,10 @@ xwer_t xwaop__xwu8_t__t0mo_then_s1m(__xwcc_atomic xwu8_t * a,
 
 /******** ******** test and operation ******** ********/
 __xwlib_code
-xwer_t xwaop__xwu8_t__tst_then_op(__xwcc_atomic xwu8_t * a,
-                                  xwaop_tst_f tst, void * tst_args,
-                                  xwaop_op_f op, void * op_args,
-                                  xwu8_t * nv, xwu8_t * ov)
+xwer_t xwaop__xwu8__tst_then_op(xwu8_a * a,
+                                xwaop_tst_f tst, void * tst_args,
+                                xwaop_op_f op, void * op_args,
+                                xwu8_t * nv, xwu8_t * ov)
 {
         xwu8_t o;
         xwu8_t n;

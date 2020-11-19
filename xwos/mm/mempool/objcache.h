@@ -40,9 +40,9 @@ struct xwmm_mempool_objcache {
                              */
         ctor_f ctor; /**< 构造函数 */
         dtor_f dtor; /**< 析构函数 */
-        __xwcc_atomic xwsz_t capacity; /**< 总的对象数量 */
-        __xwcc_atomic xwsz_t idleness; /**< 空闲的对象数量 */
-        __xwcc_atomic xwsz_t reserved; /**< 保留的对象数量 */
+        xwsz_a capacity; /**< 总的对象数量 */
+        xwsz_a idleness; /**< 空闲的对象数量 */
+        xwsz_a reserved; /**< 保留的对象数量 */
 
         struct {
                 struct xwlib_bclst_head full; /**< 对象已完全被分配的页链表 */

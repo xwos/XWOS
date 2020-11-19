@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库: xwaop__xws16_t__add
+ * @brief 原子操作库: xwaop__xws16__add
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -23,9 +23,9 @@
 #include <xwos/lib/xwaop16.h>
 
 __xwlib_code
-void xwaop__xws16_t__add(__xwcc_atomic xws16_t * a,
-                         xws16_t v,
-                         xws16_t * nv, xws16_t * ov)
+void xwaop__xws16__add(xws16_a * a,
+                       xws16_t v,
+                       xws16_t * nv, xws16_t * ov)
 {
         xws16_t n;
         xws16_t o;

@@ -182,7 +182,7 @@ xwer_t xwpcp_grab(struct xwpcp * xwpcp)
 {
         xwer_t rc;
 
-        rc = xwaop_tge_then_add(xwsq_t, &xwpcp->refcnt,
+        rc = xwaop_tge_then_add(xwsq, &xwpcp->refcnt,
                                 XWPCP_REFCNT_STARTED, 1,
                                 NULL, NULL);
         return rc;
@@ -200,7 +200,7 @@ xwer_t xwpcp_put(struct xwpcp * xwpcp)
 {
         xwer_t rc;
 
-        rc = xwaop_tge_then_sub(xwsq_t, &xwpcp->refcnt,
+        rc = xwaop_tge_then_sub(xwsq, &xwpcp->refcnt,
                                 XWPCP_REFCNT_INUSED, 1,
                                 NULL, NULL);
         return rc;
@@ -284,7 +284,7 @@ xwer_t xwpcp_tx_cfrm_sync(struct xwpcp * xwpcp)
         xwer_t rc;
 
         frm = (struct xwpcp_frame *)stream;
-        xwaop_read(xwu32_t, &xwpcp->txq.cnt, &txcnt);
+        xwaop_read(xwu32, &xwpcp->txq.cnt, &txcnt);
         if (XWPCP_ID_SYNC == XWPCP_ID(txcnt)) {
                 xwpcplogf(DEBUG, "TX SYNC frame.\n");
                 memcpy(frm, xwpcp_cfrm_sync, sizeof(xwpcp_cfrm_sync));
@@ -523,7 +523,7 @@ void xwpcp_finish_tx(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
 
         switch (rmtack) {
         case XWPCP_ACK_OK:
-                xwaop_add(xwu32_t, &xwpcp->txq.cnt, 1, NULL, NULL);
+                xwaop_add(xwu32, &xwpcp->txq.cnt, 1, NULL, NULL);
                 xwos_splk_lock(&xwpcp->txq.ntflock);
                 if (frmslot->cbfunc) {
                         frmslot->cbfunc(xwpcp, (xwpcp_fhdl_t)frmslot,
@@ -535,7 +535,7 @@ void xwpcp_finish_tx(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
                 break;
         case XWPCP_ACK_EALREADY:
                 xwpcplogf(DEBUG, "Msg is already TX-ed!\n");
-                xwaop_add(xwu32_t, &xwpcp->txq.cnt, 1, NULL, NULL);
+                xwaop_add(xwu32, &xwpcp->txq.cnt, 1, NULL, NULL);
                 xwos_splk_lock(&xwpcp->txq.ntflock);
                 if (frmslot->cbfunc) {
                         frmslot->cbfunc(xwpcp, (xwpcp_fhdl_t)frmslot,
@@ -547,7 +547,7 @@ void xwpcp_finish_tx(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
                 break;
         case XWPCP_ACK_ECONNRESET:
                 xwpcplogf(WARNING, "Link has been severed!\n");
-                xwaop_c0m(xwu32_t, &xwpcp->txq.cnt, XWPCP_ID_MSK, NULL, NULL);
+                xwaop_c0m(xwu32, &xwpcp->txq.cnt, XWPCP_ID_MSK, NULL, NULL);
                 xwpcp->txq.tmp = frmslot;
                 break;
         default:
@@ -633,7 +633,7 @@ xwer_t xwpcp_rx_cfrm_sync(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
                 rmttxcnt |= ((xwu32_t)frmslot->frm.sdu[12]) << 0U;
                 rc = xwpcp_tx_cfrm_sync_ack(xwpcp, rmttxcnt);
                 if (XWOK == rc) {
-                        xwaop_write(xwu32_t, &xwpcp->rxq.cnt, rmttxcnt + 1, NULL);
+                        xwaop_write(xwu32, &xwpcp->rxq.cnt, rmttxcnt + 1, NULL);
                 }/* else {} */
         } else {
                 rc = -EPERM;
@@ -666,7 +666,7 @@ xwer_t xwpcp_rx_cfrm_sync_ack(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmsl
         rmtrxcnt |= ((xwu32_t)frmslot->frm.sdu[10]) << 16U;
         rmtrxcnt |= ((xwu32_t)frmslot->frm.sdu[11]) << 8U;
         rmtrxcnt |= ((xwu32_t)frmslot->frm.sdu[12]) << 0U;
-        xwaop_read(xwu32_t, &xwpcp->txq.cnt, &txcnt);
+        xwaop_read(xwu32, &xwpcp->txq.cnt, &txcnt);
 
         xwpcplogf(DEBUG, "proto:%s-%d.%d.%d, key:0x%X, remote:%d, local:%d\n",
                   proto,
@@ -681,7 +681,7 @@ xwer_t xwpcp_rx_cfrm_sync_ack(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmsl
             (XWPCP_VERSION_REVISION == frmslot->frm.sdu[7]) &&
             (XWPCP_SYNC_KEY == frmslot->frm.sdu[8]) &&
             (rmtrxcnt == txcnt)) {
-                xwaop_add(xwu32_t, &xwpcp->txq.cnt, 1, NULL, NULL);
+                xwaop_add(xwu32, &xwpcp->txq.cnt, 1, NULL, NULL);
                 xwpcp_hwifal_notify(xwpcp, XWPCP_HWIFNTF_CONNECT);
         }/* else {} */
         xwmm_bma_free(xwpcp->slot.pool, frmslot);
@@ -714,7 +714,7 @@ xwer_t xwpcp_rx_frm_sdu(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
         xwer_t rc;
 
         rc = XWOK;
-        xwaop_read(xwu32_t, &xwpcp->rxq.cnt, &rxcnt);
+        xwaop_read(xwu32, &xwpcp->rxq.cnt, &rxcnt);
         lclid = XWPCP_ID(rxcnt);
         rmtid = frmslot->frm.head.id;
         port = XWPCP_PORT(frmslot->frm.head.port);
@@ -727,7 +727,7 @@ xwer_t xwpcp_rx_frm_sdu(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
                         /* 收到报文 */
                         rc = xwpcp_tx_frm_sdu_ack(xwpcp, port, rmtid, XWPCP_ACK_OK);
                         if (XWOK == rc) {
-                                xwaop_add(xwu32_t, &xwpcp->rxq.cnt, 1, NULL, NULL);
+                                xwaop_add(xwu32, &xwpcp->rxq.cnt, 1, NULL, NULL);
                                 xwpcp_rxq_pub(xwpcp, frmslot, port);
                         } else {
                                 xwmm_bma_free(xwpcp->slot.pool, frmslot);
@@ -770,7 +770,7 @@ xwer_t xwpcp_rx_frm_sdu_ack(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_lock;
         }
-        xwaop_read(xwsq_t, &xwpcp->hwifst, &hwifst);
+        xwaop_read(xwsq, &xwpcp->hwifst, &hwifst);
         if (XWPCP_HWIFST_TX & hwifst) {
                 /* xwpcp->txq.txi.remote在锁外的函数xwpcp_finish_tx()中被使用，
                    此函数在TX线程中运行，而TX线程可能此时正运行在另一个CPU上。
@@ -779,7 +779,7 @@ xwer_t xwpcp_rx_frm_sdu_ack(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot
                    这里代码的顺序不能随意调整。*/
                 xwpcp->txq.txi.remote.ack = ack;
                 xwpcp->txq.txi.remote.id = rmtid;
-                xwaop_c0m(xwsq_t, &xwpcp->hwifst, XWPCP_HWIFST_TX, NULL, NULL);
+                xwaop_c0m(xwsq, &xwpcp->hwifst, XWPCP_HWIFST_TX, NULL, NULL);
                 xwos_mtx_unlock(&xwpcp->txq.csmtx);
                 xwos_cond_unicast(&xwpcp->txq.cscond);
         } else {
@@ -943,7 +943,7 @@ xwer_t xwpcp_tx_frm(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
         xwer_t rc;
 
         ulk.osal.mtx = &xwpcp->txq.csmtx;
-        xwaop_read(xwu32_t, &xwpcp->txq.cnt, &txcnt);
+        xwaop_read(xwu32, &xwpcp->txq.cnt, &txcnt);
         id = XWPCP_ID(txcnt);
         frmslot->frm.head.id = id;
         qos = XWPCP_PORT_QOS(frmslot->frm.head.port);
@@ -961,7 +961,7 @@ xwer_t xwpcp_tx_frm(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
         }
         if (XWPCP_QOS(1) == qos) {
                 xwpcp->txq.txi.sender = frmslot;
-                xwaop_s1m(xwsq_t, &xwpcp->hwifst, XWPCP_HWIFST_TX, NULL, NULL);
+                xwaop_s1m(xwsq, &xwpcp->hwifst, XWPCP_HWIFST_TX, NULL, NULL);
                 do {
                         xwpcplogf(DEBUG,
                                   "frmslot(%p), local id:0x%X, cnt:0x%X\n",
@@ -969,7 +969,7 @@ xwer_t xwpcp_tx_frm(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
                         rc = xwpcp_hwifal_tx(xwpcp, &frmslot->frm);
                         if (__xwcc_unlikely(rc < 0)) {
                                 xwpcp->txq.txi.sender = NULL;
-                                xwaop_c0m(xwsq_t, &xwpcp->hwifst, XWPCP_HWIFST_TX,
+                                xwaop_c0m(xwsq, &xwpcp->hwifst, XWPCP_HWIFST_TX,
                                           NULL, NULL);
                                 xwos_mtx_unlock(&xwpcp->txq.csmtx);
                                 goto err_if_tx;
@@ -990,11 +990,11 @@ xwer_t xwpcp_tx_frm(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
                                         /* 原子操作带有内存屏障的语义，
                                            下面语句顺序不能调换 */
                                         xwpcp->txq.txi.sender = NULL;
-                                        xwaop_c0m(xwsq_t, &xwpcp->hwifst,
+                                        xwaop_c0m(xwsq, &xwpcp->hwifst,
                                                   XWPCP_HWIFST_TX, NULL, NULL);
                                         goto err_mtx_lock;
                                 }
-                                xwaop_read(xwsq_t, &xwpcp->hwifst, &hwifst);
+                                xwaop_read(xwsq, &xwpcp->hwifst, &hwifst);
                                 if (XWPCP_HWIFST_TX & hwifst) {
                                         cnt++;
                                         rc = -ETIMEDOUT;
@@ -1007,7 +1007,7 @@ xwer_t xwpcp_tx_frm(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
                                         break;
                                 }
                         } else {
-                                xwaop_c0m(xwsq_t, &xwpcp->hwifst, XWPCP_HWIFST_TX,
+                                xwaop_c0m(xwsq, &xwpcp->hwifst, XWPCP_HWIFST_TX,
                                           NULL, NULL);
                                 if (XWOS_LKST_LOCKED == lockstate) {
                                         xwos_mtx_unlock(&xwpcp->txq.csmtx);
@@ -1016,10 +1016,10 @@ xwer_t xwpcp_tx_frm(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
                         }
                 } while (cnt < XWPCP_RETRY_NUM);
                 if ((XWPCP_RETRY_NUM == cnt) && (-ETIMEDOUT == rc)) {
-                        xwaop_c0m(xwu32_t, &xwpcp->txq.cnt, XWPCP_ID_MSK,
+                        xwaop_c0m(xwu32, &xwpcp->txq.cnt, XWPCP_ID_MSK,
                                   NULL, NULL);
                         xwpcp->txq.txi.sender = NULL;
-                        xwaop_c0m(xwsq_t, &xwpcp->hwifst, XWPCP_HWIFST_TX,
+                        xwaop_c0m(xwsq, &xwpcp->hwifst, XWPCP_HWIFST_TX,
                                   NULL, NULL);
                         xwos_mtx_unlock(&xwpcp->txq.csmtx);
                         xwpcp_thrd_pause();
@@ -1051,7 +1051,7 @@ xwer_t xwpcp_txfsm(struct xwpcp * xwpcp)
         xwu32_t txcnt;
         xwer_t rc;
 
-        xwaop_read(xwu32_t, &xwpcp->txq.cnt, &txcnt);
+        xwaop_read(xwu32, &xwpcp->txq.cnt, &txcnt);
         if (XWPCP_ID_SYNC == XWPCP_ID(txcnt)) {
                 /* 链接远端 */
                 rc = xwpcp_connect(xwpcp);

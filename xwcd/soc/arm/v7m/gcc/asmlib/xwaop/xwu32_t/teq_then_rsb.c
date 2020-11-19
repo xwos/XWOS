@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库: xwaop__xwu32_t__teq_then_rsb
+ * @brief 原子操作库: xwaop__xwu32__teq_then_rsb
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -23,10 +23,10 @@
 #include <xwos/lib/xwaop32.h>
 
 __xwlib_code
-xwer_t xwaop__xwu32_t__teq_then_rsb(__xwcc_atomic xwu32_t * a,
-                                    xwu32_t t,
-                                    xwu32_t v,
-                                    xwu32_t * nv, xwu32_t * ov)
+xwer_t xwaop__xwu32__teq_then_rsb(xwu32_a * a,
+                                  xwu32_t t,
+                                  xwu32_t v,
+                                  xwu32_t * nv, xwu32_t * ov)
 {
         xwu32_t n;
         xwu32_t o;
