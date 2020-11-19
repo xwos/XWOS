@@ -14,7 +14,7 @@
 #define __xwos_mp_sync_cond_h__
 
 #include <xwos/standard.h>
-#include <xwos/mp/sync/object.h>
+#include <xwos/mp/sync/obj.h>
 #include <xwos/mp/plwq.h>
 
 struct xwmp_tcb;
@@ -24,8 +24,7 @@ struct xwmp_evt;
  * @brief 条件量对象
  */
 struct xwmp_cond {
-        struct xwmp_sync_object synobj; /**< C语言面向对象：
-                                             继承struct xwmp_sync_object */
+        struct xwmp_synobj synobj; /**< C语言面向对象：继承struct xwmp_synobj */
         xwssq_t count; /**< 计数器：<0，条件量处于负状态；*/
         union {
                 struct xwmp_plwq pl; /**< 管道的等待队列 */

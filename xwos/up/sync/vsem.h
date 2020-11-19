@@ -15,7 +15,7 @@
 
 #include <xwos/standard.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-  #include <xwos/up/sync/object.h>
+  #include <xwos/up/sync/obj.h>
 #endif /* XWUPCFG_SYNC_EVT */
 
 struct xwup_evt;
@@ -25,8 +25,7 @@ struct xwup_evt;
  */
 /* abstract */ struct xwup_vsem {
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-        struct xwup_sync_object synobj; /**< C语言面向对象：
-                                             继承struct xwup_sync_object */
+        struct xwup_synobj synobj; /**< C语言面向对象：继承struct xwup_synobj */
 #endif /* XWUPCFG_SYNC_EVT */
         xwssq_t count; /**< 信号量计数器：如果这个成员的值<0，信号量处于负状态。*/
         xwssq_t max; /**< 信号量计数器的最大值 */

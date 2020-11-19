@@ -30,7 +30,7 @@
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/lock/seqlock.h>
 #include <xwos/mp/lock/mtx.h>
-#include <xwos/mp/sync/object.h>
+#include <xwos/mp/sync/obj.h>
 #include <xwos/mp/sync/evt.h>
 #include <xwos/mp/sync/cond.h>
 
@@ -156,7 +156,7 @@ void xwmp_cond_free(struct xwmp_cond * cond)
 __xwmp_code
 void xwmp_cond_construct(struct xwmp_cond * cond)
 {
-        xwmp_sync_object_construct(&cond->synobj, XWOS_OBJ_COND);
+        xwmp_synobj_construct(&cond->synobj, XWOS_OBJ_COND);
 }
 
 /**
@@ -166,7 +166,7 @@ void xwmp_cond_construct(struct xwmp_cond * cond)
 __xwmp_code
 void xwmp_cond_destruct(struct xwmp_cond * cond)
 {
-        xwmp_sync_object_destruct(&cond->synobj);
+        xwmp_synobj_destruct(&cond->synobj);
 }
 
 /**
@@ -189,7 +189,7 @@ xwer_t xwmp_cond_gc(void * cond)
 __xwcc_inline
 xwer_t xwmp_cond_grab(struct xwmp_cond * cond)
 {
-        return xwmp_sync_object_grab(&cond->synobj);
+        return xwmp_synobj_grab(&cond->synobj);
 }
 
 /**
@@ -200,7 +200,7 @@ xwer_t xwmp_cond_grab(struct xwmp_cond * cond)
 __xwcc_inline
 xwer_t xwmp_cond_put(struct xwmp_cond * cond)
 {
-        return xwmp_sync_object_put(&cond->synobj);
+        return xwmp_synobj_put(&cond->synobj);
 }
 
 /**
@@ -218,7 +218,7 @@ xwer_t xwmp_cond_activate(struct xwmp_cond * cond, xwobj_gc_f gcfunc)
 {
         xwer_t rc;
 
-        rc = xwmp_sync_object_activate(&cond->synobj, gcfunc);
+        rc = xwmp_synobj_activate(&cond->synobj, gcfunc);
         if (__xwcc_likely(XWOK == rc)) {
                 xwmp_plwq_init(&cond->wq.pl);
                 cond->count = XWMP_COND_POSITIVE;
@@ -617,7 +617,7 @@ xwer_t xwmp_cond_broadcast(struct xwmp_cond * cond)
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
                 if (__xwcc_likely(XWOK == rc)) {
                         struct xwmp_evt * evt;
-                        struct xwmp_sync_object * synobj;
+                        struct xwmp_synobj * synobj;
                         xwreg_t cpuirq;
 
                         synobj = &cond->synobj;

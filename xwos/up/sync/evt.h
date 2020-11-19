@@ -16,7 +16,7 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/up/lock/fakespinlock.h>
-#include <xwos/up/sync/object.h>
+#include <xwos/up/sync/obj.h>
 #include <xwos/up/sync/cond.h>
 
 #define XWUP_EVT_MAXNUM (XWUPCFG_SYNC_EVT_MAXNUM) /**< 事件最大数量 */
@@ -71,14 +71,14 @@ struct xwup_evt {
 };
 
 xwer_t xwup_evt_obj_bind(struct xwup_evt * evt,
-                         struct xwup_sync_object * synobj,
+                         struct xwup_synobj * synobj,
                          xwsq_t pos,
                          bool exclusive);
 xwer_t xwup_evt_obj_unbind(struct xwup_evt * evt,
-                           struct xwup_sync_object * synobj,
+                           struct xwup_synobj * synobj,
                            bool exclusive);
-xwer_t xwup_evt_obj_s1i(struct xwup_evt * evt, struct xwup_sync_object * synobj);
-xwer_t xwup_evt_obj_c0i(struct xwup_evt * evt, struct xwup_sync_object * synobj);
+xwer_t xwup_evt_obj_s1i(struct xwup_evt * evt, struct xwup_synobj * synobj);
+xwer_t xwup_evt_obj_c0i(struct xwup_evt * evt, struct xwup_synobj * synobj);
 
 xwer_t xwup_evt_init(struct xwup_evt * evt, xwbmp_t initval[], xwsq_t attr);
 xwer_t xwup_evt_destroy(struct xwup_evt * evt);

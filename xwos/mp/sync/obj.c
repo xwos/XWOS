@@ -36,11 +36,11 @@
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
   #include <xwos/mp/sync/evt.h>
 #endif /* XWMPCFG_SYNC_EVT */
-#include <xwos/mp/sync/object.h>
+#include <xwos/mp/sync/obj.h>
 #include <xwos/mp/sync/sem.h>
 
 __xwmp_code
-void xwmp_sync_object_construct(struct xwmp_sync_object * synobj, xwid_t type)
+void xwmp_synobj_construct(struct xwmp_synobj * synobj, xwid_t type)
 {
         xwos_object_construct(&synobj->xwobj, type);
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
@@ -50,7 +50,7 @@ void xwmp_sync_object_construct(struct xwmp_sync_object * synobj, xwid_t type)
 }
 
 __xwmp_code
-void xwmp_sync_object_destruct(struct xwmp_sync_object * synobj)
+void xwmp_synobj_destruct(struct xwmp_synobj * synobj)
 {
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
         synobj->sel.evt = NULL;
@@ -60,19 +60,19 @@ void xwmp_sync_object_destruct(struct xwmp_sync_object * synobj)
 }
 
 __xwmp_code
-xwer_t xwmp_sync_object_activate(struct xwmp_sync_object * synobj, xwobj_gc_f gcfunc)
+xwer_t xwmp_synobj_activate(struct xwmp_synobj * synobj, xwobj_gc_f gcfunc)
 {
         return xwos_object_activate(&synobj->xwobj, gcfunc);
 }
 
 __xwmp_code
-xwer_t xwmp_sync_object_grab(struct xwmp_sync_object * synobj)
+xwer_t xwmp_synobj_grab(struct xwmp_synobj * synobj)
 {
         return xwos_object_grab(&synobj->xwobj);
 }
 
 __xwmp_code
-xwer_t xwmp_sync_object_put(struct xwmp_sync_object * synobj)
+xwer_t xwmp_synobj_put(struct xwmp_synobj * synobj)
 {
         return xwos_object_put(&synobj->xwobj);
 }

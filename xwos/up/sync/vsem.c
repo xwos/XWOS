@@ -13,7 +13,7 @@
 #include <xwos/standard.h>
 #include <xwos/ospl/irq.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-  #include <xwos/up/sync/object.h>
+  #include <xwos/up/sync/obj.h>
   #include <xwos/up/sync/evt.h>
 #endif /* XWUPCFG_SYNC_EVT */
 #include <xwos/up/sync/vsem.h>
@@ -26,7 +26,7 @@ __xwup_code
 void xwup_vsem_activate(struct xwup_vsem * vsem)
 {
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-        xwup_sync_object_activate(&vsem->synobj);
+        xwup_synobj_activate(&vsem->synobj);
 #endif /* XWUPCFG_SYNC_EVT */
 }
 
@@ -116,7 +116,7 @@ xwer_t xwup_vsem_freeze(struct xwup_vsem * vsem)
                 vsem->count = XWUP_VSEM_NEGTIVE;
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
                 struct xwup_evt * evt;
-                struct xwup_sync_object * synobj;
+                struct xwup_synobj * synobj;
 
                 synobj = &vsem->synobj;
                 evt = synobj->sel.evt;

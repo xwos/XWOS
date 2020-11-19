@@ -26,7 +26,7 @@
 #include <xwos/ospl/irq.h>
 #include <xwos/mp/thrd.h>
 #include <xwos/mp/lock/spinlock.h>
-#include <xwos/mp/sync/object.h>
+#include <xwos/mp/sync/obj.h>
 #include <xwos/mp/sync/cond.h>
 #include <xwos/mp/sync/evt.h>
 
@@ -168,7 +168,7 @@ void xwmp_evt_free(struct xwmp_evt * evt)
 static __xwmp_code
 void xwmp_evt_construct(struct xwmp_evt * evt)
 {
-        xwmp_sync_object_construct(&evt->cond.synobj, XWOS_OBJ_EVT);
+        xwmp_synobj_construct(&evt->cond.synobj, XWOS_OBJ_EVT);
 }
 
 /**
@@ -201,7 +201,7 @@ xwer_t xwmp_evt_gc(void * evt)
 __xwcc_inline
 xwer_t xwmp_evt_grab(struct xwmp_evt * evt)
 {
-        return xwmp_sync_object_grab(&evt->cond.synobj);
+        return xwmp_synobj_grab(&evt->cond.synobj);
 }
 
 /**
@@ -1196,7 +1196,7 @@ err_evt_grab:
  */
 __xwmp_code
 xwer_t xwmp_evt_obj_bind(struct xwmp_evt * evt,
-                         struct xwmp_sync_object * synobj,
+                         struct xwmp_synobj * synobj,
                          xwsq_t pos,
                          bool exclusive)
 {
@@ -1253,7 +1253,7 @@ err_evt_grab:
  */
 __xwmp_code
 xwer_t xwmp_evt_obj_unbind(struct xwmp_evt * evt,
-                           struct xwmp_sync_object * synobj,
+                           struct xwmp_synobj * synobj,
                            bool exclusive)
 {
         struct xwmp_evt * owner;
@@ -1292,7 +1292,7 @@ err_notconn:
  * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  */
 __xwmp_code
-xwer_t xwmp_evt_obj_s1i(struct xwmp_evt * evt, struct xwmp_sync_object * synobj)
+xwer_t xwmp_evt_obj_s1i(struct xwmp_evt * evt, struct xwmp_synobj * synobj)
 {
         struct xwmp_evt * owner;
         xwreg_t cpuirq;
@@ -1331,7 +1331,7 @@ err_evt_grab:
  * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  */
 __xwmp_code
-xwer_t xwmp_evt_obj_c0i(struct xwmp_evt * evt, struct xwmp_sync_object * synobj)
+xwer_t xwmp_evt_obj_c0i(struct xwmp_evt * evt, struct xwmp_synobj * synobj)
 {
         struct xwmp_evt * owner;
         xwreg_t cpuirq;

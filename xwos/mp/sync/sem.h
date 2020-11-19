@@ -16,7 +16,7 @@
 #include <xwos/standard.h>
 #include <xwos/mp/rtwq.h>
 #include <xwos/mp/plwq.h>
-#include <xwos/mp/sync/object.h>
+#include <xwos/mp/sync/obj.h>
 
 /**
  * @brief 负信号量的值
@@ -50,8 +50,7 @@ enum xwmp_sem_type_em {
  * @brief 信号量对象
  */
 struct xwmp_sem {
-        struct xwmp_sync_object synobj; /**< C语言面向对象：
-                                             继承struct xwmp_sync_object */
+        struct xwmp_synobj synobj; /**< C语言面向对象：继承struct xwmp_synobj */
         xwid_t type; /**< 类型 */
         xwssq_t count; /**< 信号量计数器：<0，信号量处于负状态 */
         xwssq_t max; /**< 信号量计数器的最大值 */

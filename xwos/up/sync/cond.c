@@ -20,7 +20,7 @@
 #include <xwos/up/plwq.h>
 #include <xwos/mm/kma.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-  #include <xwos/up/sync/object.h>
+  #include <xwos/up/sync/obj.h>
   #include <xwos/up/sync/evt.h>
 #endif /* XWUPCFG_SYNC_EVT */
 #include <xwos/up/sync/cond.h>
@@ -80,7 +80,7 @@ __xwup_code
 void xwup_cond_activate(struct xwup_cond * cond)
 {
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-        xwup_sync_object_activate(&cond->synobj);
+        xwup_synobj_activate(&cond->synobj);
 #endif /* XWUPCFG_SYNC_EVT */
         xwup_plwq_init(&cond->wq);
         cond->neg = false;
@@ -455,7 +455,7 @@ xwer_t xwup_cond_broadcast(struct xwup_cond * cond)
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
         if (__xwcc_likely(XWOK == rc)) {
                 struct xwup_evt * evt;
-                struct xwup_sync_object * synobj;
+                struct xwup_synobj * synobj;
 
                 synobj = &cond->synobj;
                 xwospl_cpuirq_save_lc(&cpuirq);

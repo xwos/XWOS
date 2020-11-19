@@ -14,8 +14,6 @@
 #include <string.h>
 #include <xwos/lib/xwaop.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/osal/lock/mtx.h>
-#include <xwos/osal/sync/sem.h>
 #include <xwmd/isc/xwpcp/hwifal.h>
 #include <xwmd/isc/xwpcp/protocol.h>
 

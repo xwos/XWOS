@@ -35,7 +35,7 @@
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
   #include <xwos/mp/sync/evt.h>
 #endif /* XWMPCFG_SYNC_EVT */
-#include <xwos/mp/sync/object.h>
+#include <xwos/mp/sync/obj.h>
 #include <xwos/mp/sync/sem.h>
 
 #if defined(XWMPCFG_SYNC_SEM_MEMSLICE) && (1 == XWMPCFG_SYNC_SEM_MEMSLICE)
@@ -194,7 +194,7 @@ void xwmp_sem_free(struct xwmp_sem * sem)
 __xwmp_code
 void xwmp_sem_construct(struct xwmp_sem * sem)
 {
-        xwmp_sync_object_construct(&sem->synobj, XWOS_OBJ_SEM);
+        xwmp_synobj_construct(&sem->synobj, XWOS_OBJ_SEM);
 }
 
 /**
@@ -204,7 +204,7 @@ void xwmp_sem_construct(struct xwmp_sem * sem)
 __xwmp_code
 void xwmp_sem_destruct(struct xwmp_sem * sem)
 {
-        xwmp_sync_object_destruct(&sem->synobj);
+        xwmp_synobj_destruct(&sem->synobj);
 }
 
 /**
@@ -227,7 +227,7 @@ xwer_t xwmp_sem_gc(void * sem)
 __xwcc_inline
 xwer_t xwmp_sem_grab(struct xwmp_sem * sem)
 {
-        return xwmp_sync_object_grab(&sem->synobj);
+        return xwmp_synobj_grab(&sem->synobj);
 }
 
 /**
@@ -238,7 +238,7 @@ xwer_t xwmp_sem_grab(struct xwmp_sem * sem)
 __xwcc_inline
 xwer_t xwmp_sem_put(struct xwmp_sem * sem)
 {
-        return xwmp_sync_object_put(&sem->synobj);
+        return xwmp_synobj_put(&sem->synobj);
 }
 
 /**
@@ -463,7 +463,7 @@ xwer_t xwmp_plsem_activate(struct xwmp_sem * sem, xwssq_t val, xwssq_t max,
         XWOS_VALIDATE(((val >= 0) && (max > 0) && (val <= max)),
                       "invalid-value", -EINVAL);
 
-        rc = xwmp_sync_object_activate(&sem->synobj, gcfunc);
+        rc = xwmp_synobj_activate(&sem->synobj, gcfunc);
         if (__xwcc_likely(XWOK == rc)) {
                 sem->max = max;
                 xwmp_plwq_init(&sem->wq.pl);
@@ -530,7 +530,7 @@ xwer_t xwmp_plsem_freeze(struct xwmp_sem * sem)
                         sem->count = XWMP_SEM_NEGTIVE;
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
                         struct xwmp_evt * evt;
-                        struct xwmp_sync_object * synobj;
+                        struct xwmp_synobj * synobj;
 
                         synobj = &sem->synobj;
                         xwmb_mp_load_acquire(struct xwmp_evt *,
@@ -686,7 +686,7 @@ xwer_t xwmp_plsem_post(struct xwmp_sem * sem)
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
                                 if (sem->count > 0) {
                                         struct xwmp_evt * evt;
-                                        struct xwmp_sync_object * synobj;
+                                        struct xwmp_synobj * synobj;
 
                                         synobj = &sem->synobj;
                                         xwmb_mp_load_acquire(struct xwmp_evt *,
@@ -758,7 +758,7 @@ xwer_t xwmp_plsem_trywait(struct xwmp_sem * sem)
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
                         if (0 == sem->count) {
                                 struct xwmp_evt * evt;
-                                struct xwmp_sync_object * synobj;
+                                struct xwmp_synobj * synobj;
 
                                 synobj = &sem->synobj;
                                 xwmb_mp_load_acquire(struct xwmp_evt *,
@@ -960,7 +960,7 @@ xwer_t xwmp_plsem_do_timedwait(struct xwmp_sem * sem, struct xwmp_tcb * tcb,
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
                 if (0 == sem->count) {
                         struct xwmp_evt * evt;
-                        struct xwmp_sync_object * synobj;
+                        struct xwmp_synobj * synobj;
 
                         synobj = &sem->synobj;
                         xwmb_mp_load_acquire(struct xwmp_evt *,
@@ -1086,7 +1086,7 @@ xwer_t xwmp_plsem_do_wait_unintr(struct xwmp_sem * sem, struct xwmp_tcb * tcb)
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
                 if (0 == sem->count) {
                         struct xwmp_evt * evt;
-                        struct xwmp_sync_object * synobj;
+                        struct xwmp_synobj * synobj;
 
                         synobj = &sem->synobj;
                         xwmb_mp_load_acquire(struct xwmp_evt *,
@@ -1160,7 +1160,7 @@ xwer_t xwmp_rtsem_activate(struct xwmp_sem * sem, xwssq_t val, xwssq_t max,
         XWOS_VALIDATE(((val >= 0) && (max > 0) && (val <= max)),
                       "invalid-value", -EINVAL);
 
-        rc = xwmp_sync_object_activate(&sem->synobj, gcfunc);
+        rc = xwmp_synobj_activate(&sem->synobj, gcfunc);
         if (__xwcc_likely(XWOK == rc)) {
                 sem->max = max;
                 xwmp_rtwq_init(&sem->wq.rt);
@@ -1229,7 +1229,7 @@ xwer_t xwmp_rtsem_freeze(struct xwmp_sem * sem)
                         sem->count = XWMP_SEM_NEGTIVE;
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
                         struct xwmp_evt * evt;
-                        struct xwmp_sync_object * synobj;
+                        struct xwmp_synobj * synobj;
 
                         synobj = &sem->synobj;
                         xwmb_mp_load_acquire(struct xwmp_evt *,
@@ -1385,7 +1385,7 @@ xwer_t xwmp_rtsem_post(struct xwmp_sem * sem)
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
                                 if (sem->count > 0) {
                                         struct xwmp_evt * evt;
-                                        struct xwmp_sync_object * synobj;
+                                        struct xwmp_synobj * synobj;
 
                                         synobj = &sem->synobj;
                                         xwmb_mp_load_acquire(struct xwmp_evt *,
@@ -1457,7 +1457,7 @@ xwer_t xwmp_rtsem_trywait(struct xwmp_sem * sem)
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
                         if (0 == sem->count) {
                                 struct xwmp_evt * evt;
-                                struct xwmp_sync_object * synobj;
+                                struct xwmp_synobj * synobj;
 
                                 synobj = &sem->synobj;
                                 xwmb_mp_load_acquire(struct xwmp_evt *,
@@ -1657,7 +1657,7 @@ xwer_t xwmp_rtsem_do_timedwait(struct xwmp_sem * sem, struct xwmp_tcb * tcb,
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
                 if (0 == sem->count) {
                         struct xwmp_evt * evt;
-                        struct xwmp_sync_object * synobj;
+                        struct xwmp_synobj * synobj;
 
                         synobj = &sem->synobj;
                         xwmb_mp_load_acquire(struct xwmp_evt *,
@@ -1784,7 +1784,7 @@ xwer_t xwmp_rtsem_do_wait_unintr(struct xwmp_sem * sem, struct xwmp_tcb * tcb)
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
                 if (0 == sem->count) {
                         struct xwmp_evt * evt;
-                        struct xwmp_sync_object * synobj;
+                        struct xwmp_synobj * synobj;
 
                         synobj = &sem->synobj;
                         xwmb_mp_load_acquire(struct xwmp_evt *,

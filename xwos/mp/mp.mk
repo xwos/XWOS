@@ -47,7 +47,7 @@ XWOS_CSRCS += mp/lock/spinlock.c
 XWOS_CSRCS += mp/lock/mtx.c
 
 ######## ######## ######## ######## sync ######## ######## ######## ########
-XWOS_CSRCS += mp/sync/object.c
+XWOS_CSRCS += mp/sync/obj.c
 XWOS_CSRCS += mp/sync/sem.c
 XWOS_CSRCS += mp/sync/cond.c
 ifeq ($(XWMPCFG_SYNC_EVT),y)

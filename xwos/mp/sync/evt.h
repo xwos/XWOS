@@ -16,7 +16,7 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/mp/lock/spinlock.h>
-#include <xwos/mp/sync/object.h>
+#include <xwos/mp/sync/obj.h>
 #include <xwos/mp/sync/cond.h>
 
 #define XWMP_EVT_MAXNUM (XWMPCFG_SYNC_EVT_MAXNUM) /**< 事件最大数量 */
@@ -73,14 +73,14 @@ struct xwmp_evt {
 xwer_t xwmp_evt_grab(struct xwmp_evt * evt);
 xwer_t xwmp_evt_put(struct xwmp_evt * evt);
 xwer_t xwmp_evt_obj_bind(struct xwmp_evt * evt,
-                         struct xwmp_sync_object * synobj,
+                         struct xwmp_synobj * synobj,
                          xwsq_t pos,
                          bool exclusive);
 xwer_t xwmp_evt_obj_unbind(struct xwmp_evt * evt,
-                           struct xwmp_sync_object * synobj,
+                           struct xwmp_synobj * synobj,
                            bool exclusive);
-xwer_t xwmp_evt_obj_s1i(struct xwmp_evt * evt, struct xwmp_sync_object * synobj);
-xwer_t xwmp_evt_obj_c0i(struct xwmp_evt * evt, struct xwmp_sync_object * synobj);
+xwer_t xwmp_evt_obj_s1i(struct xwmp_evt * evt, struct xwmp_synobj * synobj);
+xwer_t xwmp_evt_obj_c0i(struct xwmp_evt * evt, struct xwmp_synobj * synobj);
 
 #if defined(XWMPCFG_SYNC_EVT_MEMSLICE) && (1 == XWMPCFG_SYNC_EVT_MEMSLICE)
 xwer_t xwmp_evt_cache_init(xwptr_t zone_origin, xwsz_t zone_size);

@@ -19,7 +19,7 @@
 #include <xwos/up/thrd.h>
 #include <xwos/up/lock/fakespinlock.h>
 #include <xwos/up/sync/cond.h>
-#include <xwos/up/sync/object.h>
+#include <xwos/up/sync/obj.h>
 #include <xwos/up/sync/evt.h>
 
 static __xwup_code
@@ -979,7 +979,7 @@ xwer_t xwup_evt_timedwait(struct xwup_evt * evt,
  */
 __xwup_code
 xwer_t xwup_evt_obj_bind(struct xwup_evt * evt,
-                         struct xwup_sync_object * synobj,
+                         struct xwup_synobj * synobj,
                          xwsq_t pos,
                          bool exclusive)
 {
@@ -1029,7 +1029,7 @@ err_already:
  */
 __xwup_code
 xwer_t xwup_evt_obj_unbind(struct xwup_evt * evt,
-                           struct xwup_sync_object * synobj,
+                           struct xwup_synobj * synobj,
                            bool exclusive)
 {
         struct xwup_evt * owner;
@@ -1067,7 +1067,7 @@ err_notconn:
  * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  */
 __xwup_code
-xwer_t xwup_evt_obj_s1i(struct xwup_evt * evt, struct xwup_sync_object * synobj)
+xwer_t xwup_evt_obj_s1i(struct xwup_evt * evt, struct xwup_synobj * synobj)
 {
         struct xwup_evt * owner;
         xwreg_t cpuirq;
@@ -1098,7 +1098,7 @@ err_notconn:
  * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  */
 __xwup_code
-xwer_t xwup_evt_obj_c0i(struct xwup_evt * evt, struct xwup_sync_object * synobj)
+xwer_t xwup_evt_obj_c0i(struct xwup_evt * evt, struct xwup_synobj * synobj)
 {
         struct xwup_evt * owner;
         xwreg_t cpuirq;

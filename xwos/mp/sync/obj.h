@@ -21,7 +21,7 @@ struct xwmp_evt;
 /**
  * @brief 同步对象
  */
-struct xwmp_sync_object {
+struct xwmp_synobj {
         struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
         struct {
@@ -31,10 +31,10 @@ struct xwmp_sync_object {
 #endif /* XWMPCFG_SYNC_EVT */
 };
 
-void xwmp_sync_object_construct(struct xwmp_sync_object * synobj, xwid_t type);
-void xwmp_sync_object_destruct(struct xwmp_sync_object * synobj);
-xwer_t xwmp_sync_object_activate(struct xwmp_sync_object * synobj, xwobj_gc_f gcfunc);
-xwer_t xwmp_sync_object_grab(struct xwmp_sync_object * synobj);
-xwer_t xwmp_sync_object_put(struct xwmp_sync_object * synobj);
+void xwmp_synobj_construct(struct xwmp_synobj * synobj, xwid_t type);
+void xwmp_synobj_destruct(struct xwmp_synobj * synobj);
+xwer_t xwmp_synobj_activate(struct xwmp_synobj * synobj, xwobj_gc_f gcfunc);
+xwer_t xwmp_synobj_grab(struct xwmp_synobj * synobj);
+xwer_t xwmp_synobj_put(struct xwmp_synobj * synobj);
 
 #endif /* xwos/mp/sync/object.h */

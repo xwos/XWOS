@@ -10,8 +10,8 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __xwos_up_sync_object_h__
-#define __xwos_up_sync_object_h__
+#ifndef __xwos_up_sync_obj_h__
+#define __xwos_up_sync_obj_h__
 
 #include <xwos/standard.h>
 
@@ -20,7 +20,7 @@ struct xwup_evt;
 /**
  * @brief 同步对象
  */
-struct xwup_sync_object {
+struct xwup_synobj {
         struct {
                 struct xwup_evt * evt; /**< 事件对象 */
                 xwsq_t pos; /**< 事件对象中的位图位置 */
@@ -28,10 +28,10 @@ struct xwup_sync_object {
 };
 
 static __xwcc_inline
-void xwup_sync_object_activate(struct xwup_sync_object * synobj)
+void xwup_synobj_activate(struct xwup_synobj * synobj)
 {
         synobj->sel.evt = NULL;
         synobj->sel.pos = 0;
 }
 
-#endif /* xwos/up/sync/object.h */
+#endif /* xwos/up/sync/obj.h */
