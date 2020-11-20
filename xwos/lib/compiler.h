@@ -41,8 +41,8 @@
  *     - data: BSP中的数据
  */
 
-#ifndef __xwos_common_compiler_h__
-#define __xwos_common_compiler_h__
+#ifndef __xwos_lib_compiler_h__
+#define __xwos_lib_compiler_h__
 
 #include <cfg/XuanWuOS.h>
 #include <arch_compiler.h>

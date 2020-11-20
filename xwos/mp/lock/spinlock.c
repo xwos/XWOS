@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS MP锁机制：自旋锁
+ * @brief 玄武OS MP内核锁机制：自旋锁
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

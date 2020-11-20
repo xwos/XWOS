@@ -27,8 +27,8 @@ ARCH_CSRCS :=
 ARCH_ASRCS :=
 
 ifeq ($(ARCHCFG_LIB_XWAOP32),y)
-    ARCH_CSRCS += asmlib/xwaop/xws32_t.c
-    ARCH_CSRCS += asmlib/xwaop/xwu32_t.c
+    ARCH_CSRCS += asmlib/xwaop/xws32.c
+    ARCH_CSRCS += asmlib/xwaop/xwu32.c
 endif
 
 ifeq ($(ARCHCFG_LIB_XWBMPAOP),y)

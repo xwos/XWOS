@@ -524,25 +524,25 @@ void xwpcp_finish_tx(struct xwpcp * xwpcp, struct xwpcp_frmslot * frmslot)
         switch (rmtack) {
         case XWPCP_ACK_OK:
                 xwaop_add(xwu32, &xwpcp->txq.cnt, 1, NULL, NULL);
-                xwos_splk_lock(&xwpcp->txq.ntflock);
+                xwos_splk_lock(&xwpcp->txq.notiflk);
                 if (frmslot->cbfunc) {
                         frmslot->cbfunc(xwpcp, (xwpcp_fhdl_t)frmslot,
                                         xwpcp_callback_rc[XWPCP_ACK_OK],
                                         frmslot->cbarg);
                 }/* else {} */
-                xwos_splk_unlock(&xwpcp->txq.ntflock);
+                xwos_splk_unlock(&xwpcp->txq.notiflk);
                 xwmm_bma_free(xwpcp->slot.pool, frmslot);
                 break;
         case XWPCP_ACK_EALREADY:
                 xwpcplogf(DEBUG, "Msg is already TX-ed!\n");
                 xwaop_add(xwu32, &xwpcp->txq.cnt, 1, NULL, NULL);
-                xwos_splk_lock(&xwpcp->txq.ntflock);
+                xwos_splk_lock(&xwpcp->txq.notiflk);
                 if (frmslot->cbfunc) {
                         frmslot->cbfunc(xwpcp, (xwpcp_fhdl_t)frmslot,
                                         xwpcp_callback_rc[XWPCP_ACK_OK],
                                         frmslot->cbarg);
                 }/* else {} */
-                xwos_splk_unlock(&xwpcp->txq.ntflock);
+                xwos_splk_unlock(&xwpcp->txq.notiflk);
                 xwmm_bma_free(xwpcp->slot.pool, frmslot);
                 break;
         case XWPCP_ACK_ECONNRESET:

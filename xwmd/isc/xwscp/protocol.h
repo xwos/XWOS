@@ -155,27 +155,14 @@ struct xwscp {
         } slot;
 };
 
-__xwmd_code
 xwer_t xwscp_alloc_frmslot(struct xwscp * xwscp, struct xwscp_frmslot ** slotbuf);
-
-__xwmd_code
 void xwscp_free_frmslot(struct xwscp * xwscp, struct xwscp_frmslot * frmslot);
-
-__xwmd_code
 xwer_t xwscp_tx_cfrm_sync(struct xwscp * xwscp, xwtm_t * xwtm);
-
-__xwmd_code
 xwer_t xwscp_fmt_msg(struct xwscp * xwscp, struct xwscp_frame * frm,
                      const xwu8_t sdu[], xwu8_t size);
-
-__xwmd_code
 void xwscp_rxq_pub(struct xwscp * xwscp, struct xwscp_frmslot * pubfrm);
-
-__xwmd_code
 xwer_t xwscp_rxq_choose(struct xwscp * xwscp, struct xwscp_frmslot ** slotbuf,
                         xwtm_t * xwtm);
-
-__xwmd_code
 xwer_t xwscp_thrd(struct xwscp * xwscp);
 
 #endif /* xwmd/isc/xwscp/protocol.h */

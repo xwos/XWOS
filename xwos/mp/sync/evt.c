@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS MP同步机制：事件
+ * @brief 玄武OS MP内核同步机制：事件
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

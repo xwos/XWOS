@@ -259,7 +259,7 @@ enum xwos_lock_type_em {
 };
 
 /**
- * @breif 类型为XWOS_TYPE_CALLBACK时的抽象锁函数
+ * @breif 类型为XWOS_LK_CALLBACK时的抽象锁函数
  */
 struct xwos_cblk {
         xwer_t (* lock)(void * /*arg*/); /**< 加锁函数 */

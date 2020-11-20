@@ -85,7 +85,7 @@ int xwpf(const char * fmt, ...)
 #endif
 
 /**
- * @brief 格式化日志，并输出（线程安全）
+ * @brief 格式化日志，并输出
  * @param lv: (I) 等级，取值
  *                - VERBOSE，等级1
  *                - DEBUG，等级2
@@ -99,9 +99,9 @@ int xwpf(const char * fmt, ...)
  * @param fmt: (I) 格式的字符串
  * @param ...: (I) 需要格式化的参数
  * @note
- * - 同步/异步：同soc_log_isr_write()或board_log_isr_write()的实现
- * - 上下文：线程
- * - 重入性：依据BSP中soc_log_write()或board_log_write()的实现是否具有可重入性
+ * - 同步/异步：依据BSP中soc_log_write()或board_log_write()的实现
+ * - 上下文：依据BSP中soc_log_write()或board_log_write()的实现
+ * - 重入性：依据BSP中soc_log_write()或board_log_write()的实现
  */
 #define xwlogf(lv, tag, fmt, ...)    XWLOGF_##lv(tag, fmt, ##__VA_ARGS__)
 

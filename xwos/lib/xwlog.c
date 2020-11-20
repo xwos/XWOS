@@ -22,8 +22,9 @@ extern xwer_t board_log_write(const char * s, xwsz_t * n);
  * @param ...: (I) 需要转换位字符串的其他参数
  * @return 同vsnprintf()函数
  * @note
- * - 同步/异步：同@ref soc_log_write()的实现
- * - 上下文：线程
+ * - 同步/异步：依据BSP中soc_log_write()或board_log_write()的实现
+ * - 上下文：依据BSP中soc_log_write()或board_log_write()的实现
+ * - 重入性：依据BSP中soc_log_write()或board_log_write()的实现
  */
 __xwlib_code
 int xwpf(const char * fmt, ...)

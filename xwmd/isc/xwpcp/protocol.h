@@ -180,7 +180,7 @@ struct xwpcp {
                         } remote; /** 远端信息 */
                 } txi; /**< 正在发送的帧信息 */
                 struct xwpcp_frmslot * tmp; /**< 缓存正在发送的帧槽 */
-                struct xwos_splk ntflock; /**< 保证通知回调函数原子性的自旋锁 */
+                struct xwos_splk notiflk; /**< 保证通知回调函数原子性的自旋锁 */
         } txq; /**< 发送队列 */
 
         /* 接收状态机 */
@@ -193,32 +193,17 @@ struct xwpcp {
         } rxq; /**< 接收队列 */
 };
 
-__xwmd_code
 struct xwpcp_frmslot * xwpcp_txq_choose(struct xwpcp * xwpcp);
-
-__xwmd_code
 xwer_t xwpcp_eq_msg(struct xwpcp * xwpcp,
                     const struct xwpcp_msg * msg,
                     xwu8_t prio,
                     xwpcp_ntf_f cbfunc, void * cbarg,
                     xwpcp_fhdl_t * fhdlbuf);
-
-__xwmd_code
 struct xwpcp_frmslot * xwpcp_rxq_choose(struct xwpcp * xwpcp, xwu8_t port);
-
-__xwmd_code
 xwer_t xwpcp_rxthrd(struct xwpcp * xwpcp);
-
-__xwmd_code
 xwer_t xwpcp_txthrd(struct xwpcp * xwpcp);
-
-__xwmd_code
 xwer_t xwpcp_prestop(struct xwpcp * xwpcp);
-
-__xwmd_code
 xwer_t xwpcp_grab(struct xwpcp * xwpcp);
-
-__xwmd_code
 xwer_t xwpcp_put(struct xwpcp * xwpcp);
 
 #endif /* xwmd/isc/xwpcp/protocol.h */
