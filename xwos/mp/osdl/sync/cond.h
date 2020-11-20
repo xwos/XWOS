@@ -33,14 +33,13 @@ xwer_t xwosdl_cond_destroy(struct xwosdl_cond * cond)
 static __xwcc_inline
 xwer_t xwosdl_cond_create(struct xwosdl_cond ** condp)
 {
-        struct xwosdl_cond * cond;
         xwer_t rc;
 
-        rc = xwmp_cond_create(&cond);
-        if (XWOK == rc) {
-                *condp = cond;
-        } else {
+        if (NULL != condp) {
                 *condp = NULL;
+                rc = xwmp_cond_create(condp);
+        } else {
+                rc = -EFAULT;
         }
         return rc;
 }

@@ -124,13 +124,17 @@ xwer_t xwosdl_thrd_create(xwid_t * tidbuf, const char * name,
         struct xwup_tcb * tcb;
         xwer_t rc;
 
-        rc = xwup_thrd_create(&tcb, name,
-                              (xwup_thrd_f)mainfunc, arg,
-                              stack_size, priority, attr);
-        if (XWOK == rc) {
-                *tidbuf = (xwid_t)tcb;
+        if (NULL != tidbuf) {
+                rc = xwup_thrd_create(&tcb, name,
+                                      (xwup_thrd_f)mainfunc, arg,
+                                      stack_size, priority, attr);
+                if (XWOK == rc) {
+                        *tidbuf = (xwid_t)tcb;
+                } else {
+                        *tidbuf = (xwid_t)0;
+                }
         } else {
-                *tidbuf = (xwid_t)0;
+                rc = -EFAULT;
         }
         return rc;
 }

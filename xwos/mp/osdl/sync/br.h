@@ -35,14 +35,13 @@ xwer_t xwosdl_br_destroy(struct xwosdl_br * br)
 static __xwcc_inline
 xwer_t xwosdl_br_create(struct xwosdl_br ** brp)
 {
-        struct xwosdl_br * br;
         xwer_t rc;
 
-        rc = xwmp_evt_create(&br, NULL, XWMP_EVT_TYPE_BR);
-        if (XWOK == rc) {
-                *brp = br;
-        } else {
+        if (NULL != brp) {
                 *brp = NULL;
+                rc = xwmp_evt_create(brp, NULL, XWMP_EVT_TYPE_BR);
+        } else {
+                rc = -EFAULT;
         }
         return rc;
 }

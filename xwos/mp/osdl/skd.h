@@ -97,6 +97,9 @@ void xwosdl_skd_enpmpt_lc(void)
 typedef xwmp_thrd_f xwosdl_thrd_f;
 
 static __xwcc_inline
+xwid_t xwosdl_thrd_id(struct xwosdl_tcb * tcb);
+
+static __xwcc_inline
 xwer_t xwosdl_thrd_init(struct xwosdl_tcb * tcb,
                         const char * name,
                         xwosdl_thrd_f mainfunc, void * arg,
@@ -125,15 +128,19 @@ xwer_t xwosdl_thrd_create(xwid_t * tidbuf, const char * name,
         struct xwmp_tcb * tcb;
         xwer_t rc;
 
-        rc = xwmp_thrd_create(&tcb,
-                              name,
-                              (xwmp_thrd_f)mainfunc, arg,
-                              stack_size,
-                              priority, attr);
-        if (XWOK == rc) {
-                *tidbuf = (xwid_t)tcb;
+        if (NULL != tidbuf) {
+                rc = xwmp_thrd_create(&tcb,
+                                      name,
+                                      (xwmp_thrd_f)mainfunc, arg,
+                                      stack_size,
+                                      priority, attr);
+                if (XWOK == rc) {
+                        *tidbuf = xwosdl_thrd_id(tcb);
+                } else {
+                        *tidbuf = (xwid_t)0;
+                }
         } else {
-                *tidbuf = (xwid_t)0;
+                rc = EFAULT;
         }
         return rc;
 }

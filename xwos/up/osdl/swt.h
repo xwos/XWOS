@@ -23,9 +23,9 @@
 typedef xwup_swt_f xwosdl_swt_f;
 
 static __xwcc_inline
-xwer_t xwosdl_swt_init(struct xwosdl_swt * swt, const char * name, xwsq_t flags)
+xwer_t xwosdl_swt_init(struct xwosdl_swt * swt, const char * name, xwsq_t flag)
 {
-        return xwup_swt_init(swt, name, flags);
+        return xwup_swt_init(swt, name, flag);
 }
 
 static __xwcc_inline
@@ -35,16 +35,15 @@ xwer_t xwosdl_swt_destroy(struct xwosdl_swt * swt)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_swt_create(struct xwosdl_swt ** swtp, const char * name, xwsq_t flags)
+xwer_t xwosdl_swt_create(struct xwosdl_swt ** swtp, const char * name, xwsq_t flag)
 {
-        struct xwup_swt * swt;
         xwer_t rc;
 
-        rc = xwup_swt_create(&swt, name, flags);
-        if (XWOK == rc) {
-                *swtp = swt;
-        } else {
+        if (NULL != swtp) {
                 *swtp = NULL;
+                rc = xwup_swt_create(swtp, name, flag);
+        } else {
+                rc = -EFAULT;
         }
         return rc;
 }

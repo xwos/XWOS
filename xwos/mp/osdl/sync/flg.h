@@ -47,14 +47,13 @@ xwer_t xwosdl_flg_destroy(struct xwosdl_flg * flg)
 static __xwcc_inline
 xwer_t xwosdl_flg_create(struct xwosdl_flg ** flgp, xwbmp_t initval[])
 {
-        struct xwosdl_flg * flg;
         xwer_t rc;
 
-        rc = xwmp_evt_create(&flg, initval, XWMP_EVT_TYPE_FLG);
-        if (XWOK == rc) {
-                *flgp = flg;
-        } else {
+        if (NULL != flgp) {
                 *flgp = NULL;
+                rc = xwmp_evt_create(flgp, initval, XWMP_EVT_TYPE_FLG);
+        } else {
+                rc = -EFAULT;
         }
         return rc;
 }

@@ -35,14 +35,13 @@ xwer_t xwosdl_sel_destroy(struct xwosdl_sel * sel)
 static __xwcc_inline
 xwer_t xwosdl_sel_create(struct xwosdl_sel ** selp)
 {
-        struct xwosdl_sel * sel;
         xwer_t rc;
 
-        rc = xwup_evt_create(&sel, NULL, XWUP_EVT_TYPE_SEL);
-        if (XWOK == rc) {
-                *selp = sel;
-        } else {
+        if (NULL != selp) {
                 *selp = NULL;
+                rc = xwup_evt_create(selp, NULL, XWUP_EVT_TYPE_SEL);
+        } else {
+                rc = -EFAULT;
         }
         return rc;
 }

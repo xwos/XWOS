@@ -37,14 +37,13 @@ xwer_t xwosdl_swt_destroy(struct xwosdl_swt * swt)
 static __xwcc_inline
 xwer_t xwosdl_swt_create(struct xwosdl_swt ** swtp, const char * name, xwsq_t flag)
 {
-        struct xwmp_swt * swt;
         xwer_t rc;
 
-        rc = xwmp_swt_create(&swt, name, flag);
-        if (XWOK == rc) {
-                *swtp = swt;
-        } else {
+        if (NULL != swtp) {
                 *swtp = NULL;
+                rc = xwmp_swt_create(swtp, name, flag);
+        } else {
+                rc = -EFAULT;
         }
         return rc;
 }

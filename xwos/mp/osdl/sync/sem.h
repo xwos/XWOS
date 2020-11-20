@@ -52,14 +52,13 @@ xwer_t xwosdl_sem_destroy(struct xwosdl_sem * sem)
 static __xwcc_inline
 xwer_t xwosdl_sem_create(struct xwosdl_sem ** semp, xwssq_t val, xwssq_t max)
 {
-        struct xwosdl_sem * sem;
         xwer_t rc;
 
-        rc = xwmp_sem_create(&sem, XWMP_SEM_TYPE_RT, val, max);
-        if (XWOK == rc) {
-                *semp = sem;
-        } else {
+        if (NULL != semp) {
                 *semp = NULL;
+                rc = xwmp_sem_create(semp, XWMP_SEM_TYPE_RT, val, max);
+        } else {
+                rc = -EFAULT;
         }
         return rc;
 }
@@ -129,14 +128,13 @@ xwer_t xwosdl_sem_destroy(struct xwosdl_sem * sem)
 static __xwcc_inline
 xwer_t xwosdl_sem_create(struct xwosdl_sem ** semp, xwssq_t val, xwssq_t max)
 {
-        struct xwosdl_sem * sem;
         xwer_t rc;
 
-        rc = xwmp_sem_create(&sem, XWMP_SEM_TYPE_PIPELINE, val, max);
-        if (XWOK == rc) {
-                *semp = sem;
-        } else {
+        if (NULL != semp) {
                 *semp = NULL;
+                rc = xwmp_sem_create(&sem, XWMP_SEM_TYPE_PIPELINE, val, max);
+        } else {
+                rc = -EFAULT;
         }
         return rc;
 }
