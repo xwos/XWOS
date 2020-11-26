@@ -32,7 +32,7 @@ static __xwmd_code
 void xwpcpif_uart_notify(struct xwpcp * xwpcp, xwsq_t ntf);
 
 __xwmd_rodata
-const struct xwpcp_hwifal_operations xwpcpif_uart_ops = {
+const struct xwpcp_hwifal_operation xwpcpif_uart_ops = {
         .open = xwpcpif_uart_open,
         .close = xwpcpif_uart_close,
         .tx = xwpcpif_uart_tx,

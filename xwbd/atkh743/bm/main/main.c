@@ -25,6 +25,7 @@
 #include <bdl/standard.h>
 #include <bm/stm32cube/mif.h>
 #include <bm/pm/mif.h>
+#include <bm/main/xwpcp.h>
 #include <bm/main/thrd.h>
 
 #define MAIN_THRD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
@@ -99,6 +100,11 @@ xwer_t main_thrd(void * arg)
                 goto err_brdpm_start;
         }
 
+        rc = bm_xwpcp_start();
+        if (rc < 0) {
+                goto err_xwpcp_start;
+        }
+
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
         rc = xwlua_start();
         if (rc < 0) {
@@ -113,6 +119,8 @@ xwer_t main_thrd(void * arg)
 err_xwlua_start:
         BDL_BUG();
 #endif /* XWEMCFG_vm_lua */
+err_xwpcp_start:
+        BDL_BUG();
 err_brdpm_start:
         BDL_BUG();
 err_child_thrd_start:

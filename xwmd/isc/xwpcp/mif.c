@@ -20,13 +20,7 @@
 #include <xwos/osal/lock/spinlock.h>
 #include <xwmd/isc/xwpcp/hwifal.h>
 #include <xwmd/isc/xwpcp/protocol.h>
-#include <xwmd/isc/xwpcp/api.h>
-
-struct xwpcp_tx_cbarg {
-        struct xwos_splk splk;
-        struct xwos_cond cond;
-        volatile xwer_t rc;
-};
+#include <xwmd/isc/xwpcp/mif.h>
 
 #define XWPCP_TXTHRD_PRIORITY XWMDCFG_isc_xwpcp_TXTHRD_PRIORITY
 #define XWPCP_RXTHRD_PRIORITY XWMDCFG_isc_xwpcp_RXTHRD_PRIORITY
@@ -69,7 +63,7 @@ static __xwmd_code
 void xwpcp_init(struct xwpcp * xwpcp);
 
 static __xwmd_code
-void xwpcp_tx_notify(struct xwpcp * xwpcp, xwpcp_fhdl_t fhdl, xwer_t rc, void * arg);
+void xwpcp_txcb_notify(struct xwpcp * xwpcp, xwpcp_fh_t fh, xwer_t rc, void * arg);
 
 static __xwmd_code
 void xwpcp_init(struct xwpcp * xwpcp)
@@ -94,14 +88,12 @@ void xwpcp_init(struct xwpcp * xwpcp)
  * @retval -EPERM: XWPCP未初始化
  * @note
  * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
+ * - 上下文：线程
  * - 重入性：不可重入
  */
 __xwmd_api
 xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
-                   const struct xwpcp_hwifal_operations * hwifops,
+                   const struct xwpcp_hwifal_operation * hwifops,
                    void * hwifcb)
 {
         xwer_t rc, childrc;
@@ -138,8 +130,8 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         xwpcplogf(DEBUG, "Create BMA ... [OK], slotpool:%p\n", slotpool);
 
         /* 初始化发送状态机 */
-        xwpcp->txq.cnt = XWPCP_ID_SYNC;
-        for (i = 0; i < (xwssq_t)XWPCP_PRIORITY_NUM; i++) {
+        xwpcp->txq.cnt = 0;
+        for (i = 0; i < (xwssq_t)XWPCP_PRI_NUM; i++) {
                 xwlib_bclst_init_head(&xwpcp->txq.q[i]);
         }
         memset(&xwpcp->txq.nebmp, 0, sizeof(xwpcp->txq.nebmp));
@@ -164,7 +156,7 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         xwos_splk_init(&xwpcp->txq.notiflk);
 
         /* 初始化接收状态机 */
-        xwpcp->rxq.cnt = XWPCP_ID_SYNC;
+        xwpcp->rxq.cnt = 0;
         for (i = 0; i < (xwssq_t)XWPCP_PORT_NUM; i++) {
                 xwlib_bclst_init_head(&xwpcp->rxq.q[i]);
                 xwos_splk_init(&xwpcp->rxq.lock[i]);
@@ -244,15 +236,13 @@ err_grab_xwpcp:
  * @retval -EPERM: XWPCP正在被使用中
  * @note
  * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
+ * - 上下文：线程
  * - 重入性：不可重入
  */
 __xwmd_api
 xwer_t xwpcp_stop(struct xwpcp * xwpcp)
 {
-        struct xwpcp_frmslot * frmslot;
+        union xwpcp_slot * slot;
         xwer_t rc, childrc;
         xwssq_t j;
 
@@ -296,8 +286,8 @@ xwer_t xwpcp_stop(struct xwpcp * xwpcp)
                 if (rc < 0) {
                         break;
                 }
-                frmslot = xwpcp_txq_choose(xwpcp);
-                xwmm_bma_free(xwpcp->slot.pool, frmslot);
+                slot = xwpcp_txq_choose(xwpcp);
+                xwmm_bma_free(xwpcp->slot.pool, slot);
         } while (true);
 
         /* 释放RXQ中的剩余帧 */
@@ -307,8 +297,8 @@ xwer_t xwpcp_stop(struct xwpcp * xwpcp)
                         if (rc < 0) {
                                 break;
                         }
-                        frmslot = xwpcp_rxq_choose(xwpcp, (xwu8_t)j);
-                        xwmm_bma_free(xwpcp->slot.pool, frmslot);
+                        slot = xwpcp_rxq_choose(xwpcp, (xwu8_t)j);
+                        xwmm_bma_free(xwpcp->slot.pool, slot);
                 } while (true);
         }
 
@@ -329,21 +319,30 @@ err_ifbusy:
 }
 
 /**
- * @brief 实现@ref xwpcp_tx()的回调函数
+ * @brief 用于实现@ref xwpcp_tx()的回调函数参数结构体
+ */
+struct xwpcp_txcb_arg {
+        struct xwos_splk splk;
+        struct xwos_cond cond;
+        xwer_t rc;
+};
+
+/**
+ * @brief 用于实现@ref xwpcp_tx()的通知发送结果的回调函数
  * @param xwpcp: (I) XWPCP对象的指针
- * @param fhdl: (I) 帧槽句柄
+ * @param fh: (I) 帧槽句柄
  * @param rc: (I) 发送结果
- * @param arg: (I) 自定义参数
+ * @param arg: (I) 回调函数的参数（此处用于传递struct xwpcp_txcb_arg的指针）
  */
 static __xwmd_code
-void xwpcp_tx_notify(struct xwpcp * xwpcp, xwpcp_fhdl_t fhdl, xwer_t rc, void * arg)
+void xwpcp_txcb_notify(struct xwpcp * xwpcp, xwpcp_fh_t fh, xwer_t rc, void * arg)
 {
-        struct xwpcp_tx_cbarg * cbarg;
+        struct xwpcp_txcb_arg * cbarg;
 
         XWOS_UNUSED(xwpcp);
-        XWOS_UNUSED(fhdl);
+        XWOS_UNUSED(fh);
 
-        xwpcplogf(DEBUG, "fhdl:%p, rc:%d\n", fhdl, rc);
+        xwpcplogf(DEBUG, "fh:%p, rc:%d\n", fh, rc);
         cbarg = arg;
         xwos_splk_lock(&cbarg->splk);
         cbarg->rc = rc;
@@ -352,11 +351,14 @@ void xwpcp_tx_notify(struct xwpcp * xwpcp, xwpcp_fhdl_t fhdl, xwer_t rc, void * 
 }
 
 /**
- * @brief XWPCP API: 在限定的时间内，将一条用户报文加入到XWPCP的发送队列中，
+ * @brief XWPCP API: 在限定的时间内，将一条用户数据加入到XWPCP的发送队列中，
  *                   并等待发送结果
  * @param xwpcp: (I) XWPCP对象的指针
- * @param msg: (I) 描述用户报文的结构体指针
- * @param prio: (I) 用户报文的优先级
+ * @param data: (I) 数据
+ * @param size: (I) 数据长度
+ * @param pri: (I) 用户数据的优先级
+ * @param port: (I) 端口
+ * @param qos: (I) 服务质量
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -371,33 +373,30 @@ void xwpcp_tx_notify(struct xwpcp * xwpcp, xwpcp_fhdl_t fhdl, xwer_t rc, void * 
  * @retval -EPERM: XWPCP未启动
  * @note
  * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
+ * - 上下文：线程
  * - 重入性：可重入
  */
 __xwmd_api
 xwer_t xwpcp_tx(struct xwpcp * xwpcp,
-                const struct xwpcp_msg * msg, xwu8_t prio,
+                xwu8_t data[], xwsz_t size,
+                xwu8_t pri, xwu8_t port, xwu8_t qos,
                 xwtm_t * xwtm)
 {
-        struct xwpcp_tx_cbarg cbarg;
+        struct xwpcp_txcb_arg cbarg;
         union xwos_ulock ulk;
-        xwpcp_fhdl_t fhdl;
+        xwpcp_fh_t fh;
         xwsq_t lkst;
         xwer_t rc;
 
         XWPCP_VALIDATE((xwpcp), "nullptr", -EFAULT);
-        XWPCP_VALIDATE((msg), "nullptr", -EFAULT);
-        XWPCP_VALIDATE((msg->port > XWPCP_PORT_CMD), "port0-not-permitted", -ENXIO);
-        XWPCP_VALIDATE((msg->port < XWPCP_PORT_NUM), "no-such-port", -ENODEV);
-        XWPCP_VALIDATE(((XWPCP_MSG_QOS_1 == msg->qos) ||
-                        (XWPCP_MSG_QOS_0 == msg->qos)), "qos-invalid", -EINVAL);
-        XWPCP_VALIDATE((msg->size <= XWPCP_SDU_MAX_SIZE), "size-invalid", -E2BIG);
+        XWPCP_VALIDATE((data), "nullptr", -EFAULT);
+        XWPCP_VALIDATE((size <= XWPCP_SDU_MAX_SIZE), "size-invalid", -E2BIG);
+        XWPCP_VALIDATE((pri < XWPCP_PRI_NUM), "pri-invalid", -E2BIG);
+        XWPCP_VALIDATE((port > XWPCP_PORT_CMD), "port0-not-permitted", -ENXIO);
+        XWPCP_VALIDATE((port < XWPCP_PORT_NUM), "no-such-port", -ENODEV);
+        XWPCP_VALIDATE((qos < XWPCP_MSG_QOS_NUM), "qos-invalid", -EINVAL);
         XWPCP_VALIDATE((xwtm), "nullptr", -EFAULT);
-        XWPCP_VALIDATE((prio < XWPCP_PRIORITY_NUM), "prio-invalid", -E2BIG);
 
-        xwpcplogf(DEBUG, "msg->port:%d, msg->size:0x%X\n", msg->port, msg->size);
         rc = xwpcp_grab(xwpcp);
         if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
@@ -405,13 +404,11 @@ xwer_t xwpcp_tx(struct xwpcp * xwpcp,
         }
 
         xwos_splk_init(&cbarg.splk);
-        rc = xwos_cond_init(&cbarg.cond);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_cond_init;
-        }
+        xwos_cond_init(&cbarg.cond);
         cbarg.rc = -EINPROGRESS;
 
-        rc = xwpcp_eq(xwpcp, msg, prio, xwpcp_tx_notify, &cbarg, &fhdl);
+        rc = xwpcp_eq(xwpcp, data, size, pri, port, qos,
+                      xwpcp_txcb_notify, &cbarg, &fh);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwpcp_eq;
         }
@@ -431,8 +428,8 @@ xwer_t xwpcp_tx(struct xwpcp * xwpcp,
                         xwpcp_lock_notif(xwpcp);
                         xwos_splk_lock(&cbarg.splk);
                         if (-EINPROGRESS == cbarg.rc) {
-                                fhdl->cbfunc = NULL;
-                                fhdl->cbarg = NULL;
+                                fh->tx.ntfcb = NULL;
+                                fh->tx.cbarg = NULL;
                         } else {
                                 rc = cbarg.rc;
                         }
@@ -449,20 +446,22 @@ xwer_t xwpcp_tx(struct xwpcp * xwpcp,
 
 err_xwpcp_eq:
         xwos_cond_destroy(&cbarg.cond);
-err_cond_init:
         xwpcp_put(xwpcp);
 err_ifnotrdy:
         return rc;
 }
 
 /**
- * @brief XWPCP API: 将一条用户报文加入到XWPCP的发送队列中
+ * @brief XWPCP API: 将一条用户数据加入到XWPCP的发送队列中
  * @param xwpcp: (I) XWPCP对象的指针
- * @param msg: (I) 描述用户报文的结构体指针
- * @param prio: (I) 用户报文的优先级
- * @param cbfunc: (I) 异步通知的回调函数
- * @param cbarg: (I) 调用异步通知回调函数时用户自定义的参数
- * @param fhdlbuf: (O) 指向缓冲区的指针，通过此缓冲区返回帧句柄
+ * @param sdu: (I) 数据
+ * @param sdusize: (I) 数据长度
+ * @param pri: (I) 优先级
+ * @param port: (I) 端口
+ * @param qos: (I) 服务质量
+ * @param ntfcb: (I) 通知发送结果的回调函数
+ * @param cbarg: (I) 调用回调函数时的用户数据
+ * @param fhbuf: (O) 指向缓冲区的指针，通过此缓冲区返回帧句柄
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -473,22 +472,21 @@ err_ifnotrdy:
  * @retval -ENOBUFS: 帧槽被使用完
  * @retval -EPERM: XWPCP未启动
  * @note
- * - 此函数将用户报文加入到XWPCP的发送队列并注册回调函数后就返回。当用户报文被
- *   XWPCP的发送线程成功发送出去（接收到远程端应答）后，注册的回调函数会被调用。
- *   需要注意回调函数是在XWPCP的发送线程的线程上下文中执行，如果在此函数中使用了会
+ * - 此函数将用户数据放如发送队列就返回。当用户数据被XWPCP的发送线程成功发送
+ *   （接收到远程端应答），注册的回调函数会被调用；
+ * - 回调函数在XWPCP的发送线程的线程上下文中执行，如果在此函数中使用了会
  *   长时间阻塞线程的函数，会导致XWPCP停止发送。
  * @note
  * - 同步/异步：异步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
+ * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  */
 __xwmd_api
 xwer_t xwpcp_eq(struct xwpcp * xwpcp,
-                const struct xwpcp_msg * msg, xwu8_t prio,
-                xwpcp_ntf_f cbfunc, void * cbarg,
-                xwpcp_fhdl_t * fhdlbuf)
+                xwu8_t data[], xwsz_t size,
+                xwu8_t pri, xwu8_t port, xwu8_t qos,
+                xwpcp_ntf_f ntfcb, void * cbarg,
+                xwpcp_fh_t * fhbuf)
 {
         xwer_t rc;
 
@@ -499,17 +497,17 @@ xwer_t xwpcp_eq(struct xwpcp * xwpcp,
         XWPCP_VALIDATE(((XWPCP_MSG_QOS_1 == msg->qos) ||
                         (XWPCP_MSG_QOS_0 == msg->qos)), "qos-invalid", -EINVAL);
         XWPCP_VALIDATE((msg->size <= XWPCP_SDU_MAX_SIZE), "size-invalid", -E2BIG);
-        XWPCP_VALIDATE((prio < XWPCP_PRIORITY_NUM), "prio-invalid", -E2BIG);
+        XWPCP_VALIDATE((pri < XWPCP_PRI_NUM), "pri-invalid", -E2BIG);
 
         rc = xwpcp_grab(xwpcp);
         if (__xwcc_unlikely(rc < 0)) {
                 rc = -EPERM;
                 goto err_ifnotrdy;
         }
-        if (prio >= XWPCP_MAX_PRIORITY) {
-                prio = XWPCP_MAX_PRIORITY - 1;
+        if (pri >= XWPCP_MAX_PRI) {
+                pri = XWPCP_MAX_PRI - 1;
         }/* else {} */
-        rc = xwpcp_eq_msg(xwpcp, msg, prio, cbfunc, cbarg, fhdlbuf);
+        rc = xwpcp_eq_msg(xwpcp, data, size, pri, port, qos, ntfcb, cbarg, fhbuf);
         xwpcp_put(xwpcp);
 
 err_ifnotrdy:
@@ -524,9 +522,7 @@ err_ifnotrdy:
  *   线程调用异步通知回调函数。
  * @note
  * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
+ * - 上下文：中断、中断底半部、线程
  * - 重入性：不可重入
  */
 __xwmd_api
@@ -540,9 +536,7 @@ void xwpcp_lock_notif(struct xwpcp * xwpcp)
  * @param xwpcp: (I) XWPCP对象的指针
  * @note
  * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
+ * - 上下文：中断、中断底半部、线程
  * - 重入性：不可重入
  */
 __xwmd_api
@@ -554,7 +548,12 @@ void xwpcp_unlock_notif(struct xwpcp * xwpcp)
 /**
  * @brief XWPCP API: 接收消息，若接收队列为空，就限时等待
  * @param xwpcp: (I) XWPCP对象的指针
- * @param msgbuf: (O) 指向缓冲区的指针，此缓冲区被用于接收消息
+ * @param port: (I) 接收消息的端口
+ * @param rxbuf: (O) 指向缓冲区的指针，此缓冲区用于接收消息
+ * @param size: 指向缓冲区的指针，此缓冲区：
+ *              (I) 作为输入时，表示接收缓冲区的大小
+ *              (O) 作为输出时，返回实际接收的消息大小
+ * @param qos: (O) 指向缓冲区的指针，此缓冲区用于返回消息的QoS，可为NULL表示不关心QoS
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -567,23 +566,26 @@ void xwpcp_unlock_notif(struct xwpcp * xwpcp)
  * @retval -ETIMEDOUT: 超时
  * @note
  * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
+ * - 上下文：线程
  * - 重入性：可重入
  */
 __xwmd_api
-xwer_t xwpcp_rx(struct xwpcp * xwpcp, struct xwpcp_msg * msgbuf, xwtm_t * xwtm)
+xwer_t xwpcp_rx(struct xwpcp * xwpcp, xwu8_t port,
+                xwu8_t rxbuf[], xwsz_t * size, xwu8_t * qos,
+                xwtm_t * xwtm)
 {
-        struct xwpcp_frmslot * frmslot;
+        union xwpcp_slot * slot;
+        xwu8_t * sdupos;
+        xwsz_t bufsize;
         xwsz_t sdusize;
         xwsz_t realsize;
         xwer_t rc;
 
         XWPCP_VALIDATE((xwpcp), "nullptr", -EFAULT);
-        XWPCP_VALIDATE((msgbuf), "nullptr", -EFAULT);
-        XWPCP_VALIDATE((msgbuf->port > XWPCP_PORT_CMD), "port0-not-permitted", -ENXIO);
-        XWPCP_VALIDATE((msgbuf->port < XWPCP_PORT_NUM), "no-such-port", -ENODEV);
+        XWPCP_VALIDATE((rxbuf), "nullptr", -EFAULT);
+        XWPCP_VALIDATE((size), "nullptr", -EFAULT);
+        XWPCP_VALIDATE((port > XWPCP_PORT_CMD), "port0-not-permitted", -ENXIO);
+        XWPCP_VALIDATE((port < XWPCP_PORT_NUM), "no-such-port", -ENODEV);
         XWPCP_VALIDATE((xwtm), "nullptr", -EFAULT);
 
         rc = xwpcp_grab(xwpcp);
@@ -592,30 +594,32 @@ xwer_t xwpcp_rx(struct xwpcp * xwpcp, struct xwpcp_msg * msgbuf, xwtm_t * xwtm)
                 goto err_ifnotrdy;
         }
 
-        xwpcplogf(DEBUG, "port:%d, buffer size:0x%X\n", msgbuf->port, msgbuf->size);
-        rc = xwos_sem_timedwait(&xwpcp->rxq.sem[msgbuf->port], xwtm);
+        bufsize = *size;
+        xwpcplogf(DEBUG, "port:%d, buffer size:0x%X\n", port, bufsize);
+        rc = xwos_sem_timedwait(&xwpcp->rxq.sem[port], xwtm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_sem_timedwait;
         }
 
-        frmslot = xwpcp_rxq_choose(xwpcp, msgbuf->port);
-        sdusize = frmslot->frm.head.frmlen -
-                  sizeof(struct xwpcp_frmhead) -
-                  XWPCP_CHKSUM_SIZE;
+        slot = xwpcp_rxq_choose(xwpcp, port);
+        sdupos = XWPCP_SDUPOS(&slot->rx.frm.head);
+        sdusize = XWPCP_RXSDUSIZE(&slot->rx);
 
-        if (msgbuf->size < sdusize) {
-                realsize = msgbuf->size;
+        if (bufsize < sdusize) {
+                realsize = bufsize;
                 xwpcplogf(WARNING,
                           "buffer size is too small(0x%X)!, expected size is 0x%X\n",
-                          msgbuf->size, sdusize);
+                          bufsize, sdusize);
         } else {
                 realsize = sdusize;
         }
-        memcpy(msgbuf->text, frmslot->frm.sdu, realsize);
-        msgbuf->qos = XWPCP_PORT_QOS(frmslot->frm.head.port);
-        msgbuf->size = realsize;
+        memcpy(rxbuf, sdupos, realsize);
+        if (qos) {
+                *qos = slot->rx.frm.head.qos;
+        }
+        *size = realsize;
 
-        xwmm_bma_free(xwpcp->slot.pool, frmslot);
+        xwmm_bma_free(xwpcp->slot.pool, slot);
         xwpcp_put(xwpcp);
         return XWOK;
 
@@ -628,7 +632,12 @@ err_ifnotrdy:
 /**
  * @brief XWPCP API: 尝试接收消息，若接收队列为空，立即返回错误码
  * @param xwpcp: (I) XWPCP对象的指针
- * @param msgbuf: (O) 指向缓冲区的指针，此缓冲区被用于接收消息
+ * @param port: (I) 接收消息的端口
+ * @param rxbuf: (O) 指向缓冲区的指针，此缓冲区用于接收消息
+ * @param size: 指向缓冲区的指针，此缓冲区：
+ *              (I) 作为输入时，表示接收缓冲区的大小
+ *              (O) 作为输出时，返回实际接收的消息大小
+ * @param qos: (O) 指向缓冲区的指针，此缓冲区用于返回消息的QoS，可为NULL表示不关心QoS
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -638,23 +647,25 @@ err_ifnotrdy:
  * @retval -EPERM: XWPCP未启动
  * @note
  * - 同步/异步：同步
- * - 中断上下文：可以使用
- * - 中断底半部：可以使用
- * - 线程上下文：可以使用
+ * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  */
 __xwmd_api
-xwer_t xwpcp_try_rx(struct xwpcp * xwpcp, struct xwpcp_msg * msgbuf)
+xwer_t xwpcp_try_rx(struct xwpcp * xwpcp, xwu8_t port,
+                    xwu8_t rxbuf[], xwsz_t * size, xwu8_t * qos)
 {
-        struct xwpcp_frmslot * frmslot;
+        union xwpcp_slot * slot;
+        xwu8_t * sdupos;
+        xwsz_t bufsize;
         xwsz_t sdusize;
         xwsz_t realsize;
         xwer_t rc;
 
         XWPCP_VALIDATE((xwpcp), "nullptr", -EFAULT);
-        XWPCP_VALIDATE((msgbuf), "nullptr", -EFAULT);
-        XWPCP_VALIDATE((msgbuf->port > XWPCP_PORT_CMD), "port0-not-permitted", -ENXIO);
-        XWPCP_VALIDATE((msgbuf->port < XWPCP_PORT_NUM), "no-such-port", -ENODEV);
+        XWPCP_VALIDATE((rxbuf), "nullptr", -EFAULT);
+        XWPCP_VALIDATE((size), "nullptr", -EFAULT);
+        XWPCP_VALIDATE((port > XWPCP_PORT_CMD), "port0-not-permitted", -ENXIO);
+        XWPCP_VALIDATE((port < XWPCP_PORT_NUM), "no-such-port", -ENODEV);
 
         rc = xwpcp_grab(xwpcp);
         if (__xwcc_unlikely(rc < 0)) {
@@ -662,29 +673,32 @@ xwer_t xwpcp_try_rx(struct xwpcp * xwpcp, struct xwpcp_msg * msgbuf)
                 goto err_ifnotrdy;
         }
 
-        xwpcplogf(DEBUG, "port:%d, buffer size:0x%X\n", msgbuf->port, msgbuf->size);
-        rc = xwos_sem_trywait(&xwpcp->rxq.sem[msgbuf->port]);
+        bufsize = *size;
+        xwpcplogf(DEBUG, "port:%d, buffer size:0x%X\n", port, bufsize);
+        rc = xwos_sem_trywait(&xwpcp->rxq.sem[port]);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_sem_trywait;
         }
 
-        frmslot = xwpcp_rxq_choose(xwpcp, msgbuf->port);
-        sdusize = frmslot->frm.head.frmlen - sizeof(struct xwpcp_frmhead) -
-                  XWPCP_CHKSUM_SIZE;
+        slot = xwpcp_rxq_choose(xwpcp, port);
+        sdupos = XWPCP_SDUPOS(&slot->rx.frm.head);
+        sdusize = XWPCP_RXSDUSIZE(&slot->rx);
 
-        if (msgbuf->size < sdusize) {
-                realsize = msgbuf->size;
+        if (bufsize < sdusize) {
+                realsize = bufsize;
                 xwpcplogf(WARNING,
                           "buffer size is too small(0x%X)!, expected size is 0x%X\n",
-                          msgbuf->size, sdusize);
+                          bufsize, sdusize);
         } else {
                 realsize = sdusize;
         }
-        memcpy(msgbuf->text, frmslot->frm.sdu, realsize);
-        msgbuf->size = realsize;
-        msgbuf->qos = XWPCP_PORT_QOS(frmslot->frm.head.port);
+        memcpy(rxbuf, sdupos, realsize);
+        if (qos) {
+                *qos = slot->rx.frm.head.qos;
+        }
+        *size = realsize;
 
-        xwmm_bma_free(xwpcp->slot.pool, frmslot);
+        xwmm_bma_free(xwpcp->slot.pool, slot);
         xwpcp_put(xwpcp);
         return XWOK;
 

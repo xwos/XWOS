@@ -21,14 +21,14 @@
  * @brief 空白帧
  */
 __xwmd_rodata const xwu8_t xwpcp_frm_blank[] = {
-        (xwu8_t)XWPCP_HWIFAL_EOF,
-        (xwu8_t)XWPCP_HWIFAL_EOF,
-        (xwu8_t)XWPCP_HWIFAL_EOF,
-        (xwu8_t)XWPCP_HWIFAL_EOF,
-        (xwu8_t)XWPCP_HWIFAL_EOF,
-        (xwu8_t)XWPCP_HWIFAL_EOF,
-        (xwu8_t)XWPCP_HWIFAL_EOF,
-        (xwu8_t)XWPCP_HWIFAL_EOF,
+        (xwu8_t)XWPCP_EOF,
+        (xwu8_t)XWPCP_EOF,
+        (xwu8_t)XWPCP_EOF,
+        (xwu8_t)XWPCP_EOF,
+        (xwu8_t)XWPCP_EOF,
+        (xwu8_t)XWPCP_EOF,
+        (xwu8_t)XWPCP_EOF,
+        (xwu8_t)XWPCP_EOF,
 };
 
 /**
@@ -107,87 +107,123 @@ err_xwpcp_clear_hwifst:
 }
 
 /**
- * @brief 通过硬件接口发送一帧
+ * @brief 通过硬件接口发送RAW数据
  * @param xwpcp: (I) XWPCP对象的指针
- * @param frm: (I) 指向发送帧缓冲区的指针
+ * @param stream: (I) 数据
+ * @param size: (I) 数据长度
  * @return 错误码
  */
 __xwmd_code
-xwer_t xwpcp_hwifal_tx(struct xwpcp * xwpcp, struct xwpcp_frame * frm)
+xwer_t xwpcp_hwifal_tx_raw(struct xwpcp * xwpcp, xwu8_t * stream, xwsz_t size)
 {
-        xwu8_t * stream;
-        xwsz_t txsize;
+        xwer_t rc;
 
-        stream = (xwu8_t *)frm;
-        txsize = frm->head.frmlen + 2U;
-        return xwpcp->hwifops->tx(xwpcp, stream, txsize);
+        rc = xwpcp->hwifops->tx(xwpcp, stream, size);
+        return rc;
+}
+
+/**
+ * @brief 通过硬件接口发送一帧
+ * @param xwpcp: (I) XWPCP对象的指针
+ * @param slot: (I) 包含待发送帧的帧槽
+ * @return 错误码
+ */
+__xwmd_code
+xwer_t xwpcp_hwifal_tx(struct xwpcp * xwpcp, union xwpcp_slot * slot)
+{
+        xwer_t rc;
+        xwu8_t * stream;
+
+        /* HEAD */
+        stream = (xwu8_t *)&slot->tx.frm;
+        rc = xwpcp->hwifops->tx(xwpcp, stream, slot->tx.headsize);
+        if (rc < 0) {
+                goto err_tx_head;
+        }
+
+        /* SDU */
+        stream = slot->tx.sdu;
+        rc = xwpcp->hwifops->tx(xwpcp, stream, slot->tx.sdusize);
+        if (rc < 0) {
+                goto err_tx_sdu;
+        }
+
+        /* Tail */
+        stream = slot->tx.tail;
+        rc = xwpcp->hwifops->tx(xwpcp, stream, sizeof(slot->tx.tail));
+        if (rc < 0) {
+                goto err_tx_tail;
+        }
+
+        return XWOK;
+
+err_tx_tail:
+err_tx_sdu:
+err_tx_head:
+        return rc;
 }
 
 /**
  * @brief 通过硬件接口接收一帧
  * @param xwpcp: (I) XWPCP对象的指针
- * @param frmslotbuf: (O) 指向缓冲区的指针，通过此缓冲区返回struct xwpcp_frmslot *
+ * @param slotbuf: (O) 指向缓冲区的指针，通过此缓冲区返回union xwpcp_slot *
  * @return 错误码
  */
 __xwmd_code
-xwer_t xwpcp_hwifal_rx(struct xwpcp * xwpcp, struct xwpcp_frmslot ** frmslotbuf)
+xwer_t xwpcp_hwifal_rx(struct xwpcp * xwpcp, union xwpcp_slot ** slotbuf)
 {
-        union {
-                xwu8_t data[sizeof(struct xwpcp_frmhead)];
-                struct xwpcp_frmhead head;
-        } stream;
-        xwu8_t delimiter;
+        xwu8_t delim;
+        xwsz_t delimcnt;
+
         xwsz_t rxsize;
         xwsz_t total;
         xwssz_t rest;
+
+        union {
+                xwu8_t data[XWPCP_FRMHEAD_MAXSIZE];
+                struct xwpcp_frmhead head;
+        } stream;
+        xwu8_t headsize;
+        xwu8_t headsize_mirror;
+        bool headchk;
+        xwsz_t ecsize, sdusize;
+
         xwsz_t need, neednum;
         xwssq_t odr;
         void * mem;
-        struct xwpcp_frmslot * frmslot;
+        xwu8_t * sdupos;
+        union xwpcp_slot * slot;
         xwer_t rc;
 
         /* 接收帧首定界符 */
+        delimcnt = 0;
         do {
                 rxsize = 1;
-                rc = xwpcp->hwifops->rx(xwpcp, &delimiter, &rxsize);
+                rc = xwpcp->hwifops->rx(xwpcp, &delim, &rxsize);
                 if (__xwcc_unlikely(rc < 0)) {
                         goto err_sof_ifrx;
                 }
-        } while (XWPCP_HWIFAL_SOF != delimiter);
-
-        /* 接收head */
-        do {
-                total = 2;
-                rest = (xwssz_t)total;
-                do {
-                        rxsize = (xwsz_t)rest;
-                        rc = xwpcp->hwifops->rx(xwpcp,
-                                                &stream.data[total - rxsize],
-                                                &rxsize);
-                        if (__xwcc_unlikely(rc < 0)) {
-                                goto err_head_ifrx;
-                        }
-                        rest -= (xwssz_t)rxsize;
-                } while (rest > 0);
-                if (XWPCP_HWIFAL_SOF == stream.data[0]) {
-                        if (XWPCP_HWIFAL_EOF == stream.data[1]) {
-                                total = sizeof(struct xwpcp_frmhead);
-                                rest = (xwssz_t)total - 2;
-                                break;
-                        } else if (XWPCP_HWIFAL_SOF == stream.data[1]) {
-                                /* continue; */
-                        } else {
-                                total = sizeof(struct xwpcp_frmhead);
-                                rest = (xwssz_t)total - 1;
-                                stream.data[0] = stream.data[1];
-                                break;
-                        }
+                if (XWPCP_SOF == delim) {
+                        delimcnt++;
                 } else {
-                        total = sizeof(struct xwpcp_frmhead);
-                        rest = (xwssz_t)total - 2;
                         break;
                 }
         } while (true);
+        if (delimcnt < XWPCP_SOF_SIZE) {
+                rc = -EAGAIN;
+                goto err_sof_ifrx;
+        }
+
+        /* 接收Head */
+        stream.head.headsize = delim;
+        headsize = XWPCP_FRMHEAD_SIZE(stream.head.headsize);
+        headsize_mirror = XWPCP_FRMHEAD_SIZE_MIRROR(stream.head.headsize);
+        if (headsize_mirror != xwbop_rbit(xwu8_t, headsize)) {
+                rc = -EAGAIN;
+                goto err_head_ifrx;
+        }
+        total = headsize;
+        rest = (xwssz_t)total - 1;
         do {
                 rxsize = (xwsz_t)rest;
                 rc = xwpcp->hwifops->rx(xwpcp,
@@ -198,18 +234,17 @@ xwer_t xwpcp_hwifal_rx(struct xwpcp * xwpcp, struct xwpcp_frmslot ** frmslotbuf)
                 }
                 rest -= (xwssz_t)rxsize;
         } while (rest > 0);
-        if (stream.head.frmlen != xwbop_rbit(xwu8_t, stream.head.mirror)) {
+        headchk = xwpcp_chk_data((xwu8_t *)&stream.head, headsize);
+        if (!headchk) {
                 rc = -EAGAIN;
                 goto err_head_ifrx;
         }
-        if (stream.head.frmlen < (sizeof(struct xwpcp_frmhead) + XWPCP_CHKSUM_SIZE)) {
-                rc = -EAGAIN;
-                goto err_head_ifrx;
-        }
+        xwpcp_decode_sdusize(stream.head.ecsdusz, &sdusize);
 
         /* 申请接收帧槽 */
-        need = stream.head.frmlen + sizeof(struct xwpcp_frmslot) -
-               sizeof(struct xwpcp_frame);
+        ecsize = XWPCP_ECSIZE(&stream.head);
+        need = sizeof(union xwpcp_slot) + ecsize + sdusize +
+               XWPCP_CRC32_SIZE + XWPCP_EOF_SIZE;
         neednum = DIV_ROUND_UP(need, XWPCP_MEMBLK_SIZE);
         odr = xwbop_fls(xwsz_t, neednum);
         if ((odr < 0) || ((XWPCP_MEMBLK_SIZE << odr) < need)) {
@@ -219,20 +254,22 @@ xwer_t xwpcp_hwifal_rx(struct xwpcp * xwpcp, struct xwpcp_frmslot ** frmslotbuf)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_bma_alloc;
         }
-        frmslot = mem;
-        frmslot->cbfunc = NULL;
-        frmslot->cbarg = NULL;
-        xwlib_bclst_init_node(&frmslot->node);
-        frmslot->priority = XWPCP_INVALID_PRIORITY;
-        memcpy(&frmslot->frm.head, &stream.head, sizeof(stream.head));
+        slot = mem;
+        xwlib_bclst_init_node(&slot->rx.node);
+        slot->rx.frmsize = sizeof(struct xwpcp_frm) + ecsize + sdusize +
+                           XWPCP_CRC32_SIZE + XWPCP_EOF_SIZE;
+        memset(slot->rx.frm.sof, XWPCP_SOF, XWPCP_SOF_SIZE);
+        memcpy(&slot->rx.frm.head, &stream.data,
+               sizeof(struct xwpcp_frmhead) + ecsize);
+        sdupos = &slot->rx.frm.head.ecsdusz[ecsize];
 
         /* 接收body */
-        total = frmslot->frm.head.frmlen - sizeof(struct xwpcp_frmhead);
+        total = sdusize + XWPCP_CRC32_SIZE;
         rest = (xwssz_t)total;
         do {
                 rxsize = (xwsz_t)rest;
                 rc = xwpcp->hwifops->rx(xwpcp,
-                                        &frmslot->frm.sdu[total - rxsize],
+                                        &sdupos[total - rxsize],
                                         &rxsize);
                 if (__xwcc_unlikely(rc < 0)) {
                         goto err_body_ifrx;
@@ -241,17 +278,29 @@ xwer_t xwpcp_hwifal_rx(struct xwpcp * xwpcp, struct xwpcp_frmslot ** frmslotbuf)
         } while (rest > 0);
 
         /* 接收帧尾定界符 */
-        rxsize = 1;
-        xwpcp->hwifops->rx(xwpcp, &delimiter, &rxsize);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_eof_ifrx;
-        }
-        if (XWPCP_HWIFAL_EOF != delimiter) {
+        delimcnt = 0;
+        do {
+                rxsize = 1;
+                rc = xwpcp->hwifops->rx(xwpcp, &delim, &rxsize);
+                if (__xwcc_unlikely(rc < 0)) {
+                        goto err_eof_ifrx;
+                }
+                if (XWPCP_EOF == delim) {
+                        delimcnt++;
+                        if (delimcnt >= XWPCP_EOF_SIZE) {
+                                break;
+                        }
+                } else {
+                        break;
+                }
+        } while (true);
+        if (delimcnt < XWPCP_EOF_SIZE) {
                 rc = -EAGAIN;
                 goto err_eof_ifrx;
         }
+        memset(&sdupos[sdusize + XWPCP_CRC32_SIZE], XWPCP_EOF, XWPCP_EOF_SIZE);
 
-        *frmslotbuf = frmslot;
+        *slotbuf = slot;
         return XWOK;
 
 err_eof_ifrx:

@@ -17,6 +17,6 @@
 #include <xwmd/isc/xwpcp/hwifal.h>
 
 extern
-const struct xwpcp_hwifal_operations xwpcpif_uart_ops;
+const struct xwpcp_hwifal_operation xwpcpif_uart_ops;
 
 #endif /* xwmd/isc/xwpcp/hwif/uart.h */

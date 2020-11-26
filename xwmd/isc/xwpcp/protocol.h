@@ -23,7 +23,7 @@
 #include <xwos/osal/sync/sem.h>
 #include <xwos/osal/sync/cond.h>
 #include <xwmd/isc/xwpcp/hwifal.h>
-#include <xwmd/isc/xwpcp/api.h>
+#include <xwmd/isc/xwpcp/mif.h>
 
 #if (XWMDCFG_isc_xwpcp_MEMBLK_SIZE & (XWMDCFG_isc_xwpcp_MEMBLK_SIZE - 1))
   #error "XWMDCFG_isc_xwpcp_MEMBLK_SIZE must be the order of 2!"
@@ -31,44 +31,53 @@
 #if (XWMDCFG_isc_xwpcp_MEMBLK_NUM & (XWMDCFG_isc_xwpcp_MEMBLK_NUM - 1))
   #error "XWMDCFG_isc_xwpcp_MEMBLK_NUM must be the order of 2!"
 #endif
-#if (XWMDCFG_isc_xwpcp_PORT_NUM > 128)
-  #error "XWPCP Only supports 128 ports (0 ~ 127)!"
+#if (XWMDCFG_isc_xwpcp_PORT_NUM > 256)
+  #error "XWPCP Only supports 256 ports (0 ~ 255)!"
 #endif
-#if (XWMDCFG_isc_xwpcp_PRIORITY_NUM > 64)
+#if (XWMDCFG_isc_xwpcp_PRI_NUM > 64)
   #error "XWPCP Only supports 64 priorities!"
 #endif
 
-#define XWPCP_PRIORITY_NUM      (XWMDCFG_isc_xwpcp_PRIORITY_NUM)
-#define XWPCP_MAX_PRIORITY      (XWPCP_PRIORITY_NUM - 1)
+#define XWPCP_VERSION           ("3.0.0")
+#define XWPCP_VERSION_MAJOR     3U
+#define XWPCP_VERSION_MINOR     0U
+#define XWPCP_VERSION_REVISION  0U
+
+#define XWPCP_PRI_NUM           (XWMDCFG_isc_xwpcp_PRI_NUM)
+#define XWPCP_MAX_PRI           (XWPCP_PRI_NUM - 1)
 #define XWPCP_PORT_NUM          (XWMDCFG_isc_xwpcp_PORT_NUM)
 #define XWPCP_RETRY_PERIOD      (XWMDCFG_isc_xwpcp_RETRY_PERIOD)
 #define XWPCP_RETRY_NUM         (XWMDCFG_isc_xwpcp_RETRY_NUM)
 #define XWPCP_MEMBLK_SIZE       (XWMDCFG_isc_xwpcp_MEMBLK_SIZE)
 #define XWPCP_MEMBLK_NUM        (XWMDCFG_isc_xwpcp_MEMBLK_NUM)
-#define XWPCP_SYNC_KEY          (XWMDCFG_isc_xwpcp_SYNC_KEY)
+#define XWPCP_INVALID_PRI       (0xFFU)
 
-#define XWPCP_CHKSUM_SIZE       (4U)
-#define XWPCP_INVALID_PRIORITY  (0xFFU)
+#define XWPCP_SOF               ((xwu8_t)0xAA)
+#define XWPCP_EOF               ((xwu8_t)(XWPCP_SOF ^ 0xFF))
+#define XWPCP_SOF_SIZE          (2U)
+#define XWPCP_EOF_SIZE          (2U)
 
-#define XWPCP_PORT_MSK          (0x7FU)
-#define XWPCP_PORT(port)        ((port) & XWPCP_PORT_MSK)
-#define XWPCP_PORT_CMD          XWPCP_PORT(0)
-#define XWPCP_PORT_QOS(p)       ((xwu8_t)((xwu8_t)(p) & XWPCP_QOS_MSK))
+#define XWPCP_FRMHEAD_SIZE(size)        ((size) & 0xFU)
+#define XWPCP_FRMHEAD_SIZE_MIRROR(size) ((size) & 0xF0U)
+#define XWPCP_FRMHEAD_MAXSIZE           (16U)
+
+#define XWPCP_PORT_CMD          (0U)
 
 #define XWPCP_ID_MSK            (0x7FU)
 #define XWPCP_ID(id)            ((xwu8_t)((xwu8_t)(id) & XWPCP_ID_MSK))
-#define XWPCP_ID_SYNC           XWPCP_ID(0)
 #define XWPCP_ID_ACK            BIT(7)
 
-#define XWPCP_VERSION           ("2.0.0")
-#define XWPCP_VERSION_MAJOR     2U
-#define XWPCP_VERSION_MINOR     0U
-#define XWPCP_VERSION_REVISION  0U
+#define XWPCP_ECSIZE(head)      (XWPCP_FRMHEAD_SIZE((head)->headsize) - \
+                                 sizeof(struct xwpcp_frmhead))
+#define XWPCP_SDUPOS(head)      (&((head)->ecsdusz[XWPCP_ECSIZE(head)]))
+#define XWPCP_RXSDUSIZE(slot)   ((slot)->frmsize - \
+                                 XWPCP_FRMHEAD_SIZE((slot)->frm.head.headsize) - \
+                                 XWPCP_CRC32_SIZE - XWPCP_SOF_SIZE - XWPCP_EOF_SIZE)
+#define XWPCP_CRC32_SIZE        (4U)
 
 #define XWPCP_MEMPOOL_SIZE      (XWPCP_MEMBLK_SIZE * XWPCP_MEMBLK_NUM)
 #define XWPCP_SDU_MAX_SIZE      (XWPCP_MEMPOOL_SIZE / 8)
-
-#define XWPCP_FRM_MINSIZE       (sizeof(struct xwpcp_frmhead) + XWPCP_CHKSUM_SIZE)
+#define XWPCP_FRM_MINSIZE       (sizeof(struct xwpcp_frmhead) + 1 + XWPCP_CRC32_SIZE)
 
 #if defined(XWMDCFG_isc_xwpcp_LOG) && (1 == XWMDCFG_isc_xwpcp_LOG)
   #define XWPCP_LOG_TAG                 "xwpcp"
@@ -86,13 +95,20 @@
             return __VA_ARGS__;                  \
         }
 #else /* XWMDCFG_CHECK_PARAMETERS */
-#define XWPCP_VALIDATE(exp, errstr, ...)
+  #define XWPCP_VALIDATE(exp, errstr, ...)
 #endif /* !XWMDCFG_CHECK_PARAMETERS */
+
+/**
+ * @brief 端口0命令
+ */
+enum xwpcp_port0_cmd_em {
+        XWPCP_PORT0_CMDID_SYNC,
+};
 
 /**
  * @brief 应答信号枚举
  */
-enum xwpcp_frame_ack_em {
+enum xwpcp_frm_ack_em {
         XWPCP_ACK_OK = 0, /**< OK */
         XWPCP_ACK_ECONNRESET, /**< 链接被重置（远端复位？） */
         XWPCP_ACK_EALREADY, /**< 已经完成 */
@@ -103,36 +119,57 @@ enum xwpcp_frame_ack_em {
  * @brief XWPCP帧的信息头
  */
 struct __xwcc_packed xwpcp_frmhead {
-        xwu8_t frmlen; /**< 帧的长度：信息头+消息帧+CRC32校验码的总长度 */
-        xwu8_t mirror; /**< 帧的长度的镜像反转（xwbop_rbit8(frmlen)）：
-                            作为frmlen的检验 */
-        xwu8_t port; /**< bit7 QoS: 1:可靠消息；0:不可靠消息
-                          bit6:0 端口，端口0为协议的内部使用的端口 */
-        xwu8_t id; /**< bit6 ~ bit0:消息的ID；
-                        bit7: 应答标志
-                        ID0: 作为同步消息ID */
+        xwu8_t headsize; /**< 帧头的长度 */
+        xwu8_t chksum; /**< 帧头的校验和 */
+        xwu8_t port; /**< 端口，端口0保留为协议内部使用 */
+        xwu8_t id; /**< bit[0:6]:消息的ID
+                        bit[7]: 应答标志 */
+        xwu8_t qos; /**< QoS */
+        xwu8_t ecsdusz[0]; /**< 数据长度：变长编码 */
 };
 
 /**
  * @brief XWPCP的帧
  */
-struct __xwcc_packed xwpcp_frame {
-        xwu8_t sof; /* 帧首定界符（SOF:Start-of-Frame Delimiter） */
-        struct xwpcp_frmhead head; /**< 信息头 */
-        xwu8_t sdu[0]; /**< 报文 */
-        /* CRC32 */
-        /* eof 帧尾定界符（EOF:End-of-Frame Delimiter） */
+struct __xwcc_packed xwpcp_frm {
+        xwu8_t sof[XWPCP_SOF_SIZE]; /**< 帧首定界符（SOF:Start-of-Frame Delimiter） */
+        struct xwpcp_frmhead head; /**< 帧头 */
+        /* xwu8_t sdu[x]; 数据 */
+        /* xwu8_t sducrc32[4]; 数据的CRC32校验码 */
+        /* xwu8_t eof[XWPCP_EOF_SIZE]; 帧尾定界符（EOF:End-of-Frame Delimiter） */
+};
+
+/**
+ * @brief 发送状态枚举
+ */
+enum xwpcp_slot_txstate_em {
+        XWPCP_TXS_IDLE,
+        XWPCP_TXS_READY,
+        XWPCP_TXS_INPROGRESS,
+        XWPCP_TXS_ABORT,
+        XWPCP_TXS_FINISH,
 };
 
 /**
  * @brief XWPCP帧槽
  */
-struct xwpcp_frmslot {
-        xwpcp_ntf_f cbfunc; /**< 回调函数 */
-        void * cbarg; /**< 回调函数的参数 */
-        struct xwlib_bclst_node node; /**< 链表节点 */
-        xwu8_t priority; /**< 帧优先级 */
-        struct xwpcp_frame frm; /**< 帧 */
+union xwpcp_slot {
+        struct {
+                struct xwlib_bclst_node node; /**< 链表节点 */
+                xwpcp_ntf_f ntfcb; /**< 通知发送结果的回调函数 */
+                void * cbarg; /**< 调用回调函数时的用户数据 */
+                xwu8_t pri; /**< 优先级 */
+                xwu8_t headsize; /**< 帧头长度 */
+                xwu8_t * sdu; /**< 指向数据缓冲区的指针 */
+                xwsz_t sdusize; /**< 数据长度 */
+                xwu8_t tail[XWPCP_CRC32_SIZE + XWPCP_EOF_SIZE]; /**< CRC32 & EOF */
+                struct xwpcp_frm frm; /**< 帧 */
+        } tx; /**< 发送时的帧槽 */
+        struct {
+                struct xwlib_bclst_node node; /**< 链表节点 */
+                xwsz_t frmsize; /**< 帧的总长度 */
+                struct xwpcp_frm frm; /**< 帧 */
+        } rx; /**< 接收时的帧槽 */
 };
 
 /**
@@ -152,12 +189,12 @@ struct xwpcp {
         const char * name; /**< 名字 */
         xwsq_a refcnt; /**< 引用计数 */
         xwsq_a hwifst; /**< 硬件层状态 */
-        const struct xwpcp_hwifal_operations * hwifops; /**< 硬件接口抽象层操作函数 */
+        const struct xwpcp_hwifal_operation * hwifops; /**< 硬件接口抽象层操作函数 */
         void * hwifcb; /**< 接口硬件 */
 
         /* 帧槽内存池 */
         struct {
-                struct xwmm_bma * pool; /**< 内存池 */
+                struct xwmm_bma * pool; /**< 内存池分配器 */
                 xwu8_t __xwcc_aligned_l1cacheline mempool[XWPCP_MEMPOOL_SIZE];
                                         /**< 内存池 */
         } slot; /**< 帧槽 */
@@ -166,20 +203,20 @@ struct xwpcp {
         xwid_t txtid; /**< 发送线程的ID */
         struct {
                 xwu32_a cnt; /**< 发送计数器 */
-                struct xwlib_bclst_head q[XWPCP_PRIORITY_NUM]; /**< 队列 */
-                xwbmpop_declare(nebmp, XWPCP_PRIORITY_NUM); /**< 非空的索引位图 */
+                struct xwlib_bclst_head q[XWPCP_PRI_NUM]; /**< 队列 */
+                xwbmpop_declare(nebmp, XWPCP_PRI_NUM); /**< 非空的索引位图 */
                 struct xwos_splk lock; /**< 保护发送队列的自旋锁 */
                 struct xwos_sem sem; /**< 指示待发送帧的数量的信号量 */
                 struct xwos_mtx csmtx; /**< 保护发送和接收线程的共享数据的锁 */
                 struct xwos_cond cscond; /**< 同步发送和接收线程的条件量 */
                 union {
-                        struct xwpcp_frmslot * sender; /**< 正在发送的帧槽 */
+                        union xwpcp_slot * sender; /**< 正在发送的帧槽 */
                         struct {
                                 xwu8_t ack; /**< 远端回复的应答 */
                                 xwu8_t id; /**< 远端的消息id */
                         } remote; /** 远端信息 */
                 } txi; /**< 正在发送的帧信息 */
-                struct xwpcp_frmslot * tmp; /**< 缓存正在发送的帧槽 */
+                union xwpcp_slot * tmp; /**< 缓存正在发送的帧槽 */
                 struct xwos_splk notiflk; /**< 保证通知回调函数原子性的自旋锁 */
         } txq; /**< 发送队列 */
 
@@ -193,17 +230,20 @@ struct xwpcp {
         } rxq; /**< 接收队列 */
 };
 
-struct xwpcp_frmslot * xwpcp_txq_choose(struct xwpcp * xwpcp);
-xwer_t xwpcp_eq_msg(struct xwpcp * xwpcp,
-                    const struct xwpcp_msg * msg,
-                    xwu8_t prio,
-                    xwpcp_ntf_f cbfunc, void * cbarg,
-                    xwpcp_fhdl_t * fhdlbuf);
-struct xwpcp_frmslot * xwpcp_rxq_choose(struct xwpcp * xwpcp, xwu8_t port);
-xwer_t xwpcp_rxthrd(struct xwpcp * xwpcp);
-xwer_t xwpcp_txthrd(struct xwpcp * xwpcp);
-xwer_t xwpcp_prestop(struct xwpcp * xwpcp);
 xwer_t xwpcp_grab(struct xwpcp * xwpcp);
 xwer_t xwpcp_put(struct xwpcp * xwpcp);
+void xwpcp_encode_sdusize(xwsz_t sdusize, xwu8_t * ecsdusz, xwu8_t * ecsize);
+void xwpcp_decode_sdusize(xwu8_t * ecsdusz, xwsz_t * sdusize);
+union xwpcp_slot * xwpcp_rxq_choose(struct xwpcp * xwpcp, xwu8_t port);
+xwer_t xwpcp_rxthrd(struct xwpcp * xwpcp);
+union xwpcp_slot * xwpcp_txq_choose(struct xwpcp * xwpcp);
+xwu8_t xwpcp_cal_chksum(xwu8_t data[], xwsz_t size);
+bool xwpcp_chk_data(xwu8_t data[], xwsz_t size);
+xwer_t xwpcp_eq_msg(struct xwpcp * xwpcp,
+                    xwu8_t sdu[], xwsz_t sdusize,
+                    xwu8_t pri, xwu8_t port, xwu8_t qos,
+                    xwpcp_ntf_f ntfcb, void * cbarg,
+                    xwpcp_fh_t * fhbuf);
+xwer_t xwpcp_txthrd(struct xwpcp * xwpcp);
 
 #endif /* xwmd/isc/xwpcp/protocol.h */
