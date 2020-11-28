@@ -66,14 +66,14 @@ struct xwmp_skd xwmp_skd[CPUCFG_CPU_NUM];
 /**
  * @brief 每CPU的调度器的空闲线程栈
  */
-__xwmp_data __xwcc_aligned_l1cacheline
+__xwmp_data __xwcc_alignl1cache
 xwu8_t xwmp_skd_idled_stack[CPUCFG_CPU_NUM][XWMPCFG_SKD_IDLE_STACK_SIZE];
 
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
 /**
  * @brief 每CPU的调度器的中断底半部栈
  */
-__xwmp_data __xwcc_aligned_l1cacheline
+__xwmp_data __xwcc_alignl1cache
 xwu8_t xwmp_skd_bhd_stack[CPUCFG_CPU_NUM][XWMPCFG_SKD_BH_STACK_SIZE];
 #endif /* XWMPCFG_SKD_BH */
 

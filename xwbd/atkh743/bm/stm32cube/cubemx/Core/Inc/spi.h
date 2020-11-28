@@ -56,8 +56,8 @@ struct MX_SPI_MasterDriverData {
   xwu32_t size; /**< 待传输的数据大小 */
   xwer_t rc; /**< 返回值 */
   struct {
-    xwu8_t tx[MX_SPI_MEM_MAXSIZE] __xwcc_aligned_l1cacheline; /**< 发送缓冲区 */
-    xwu8_t rx[MX_SPI_MEM_MAXSIZE] __xwcc_aligned_l1cacheline; /**< 发送缓冲区 */
+    xwu8_t tx[MX_SPI_MEM_MAXSIZE] __xwcc_alignl1cache; /**< 发送缓冲区 */
+    xwu8_t rx[MX_SPI_MEM_MAXSIZE] __xwcc_alignl1cache; /**< 发送缓冲区 */
   } mem; /**< 缓冲区 */
 };
 

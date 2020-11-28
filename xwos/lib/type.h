@@ -175,7 +175,7 @@ typedef __xwcc_atomic xwsid_t xwsid_a; /**< ID (有符号，原子的) */
 #endif
 
 #if !defined(ARCH_HAVE_XWISR_F)
-typedef void (*xwisr_f)(void); /**< 中断向量 */
+typedef void (* xwisr_f)(void); /**< 中断向量 */
 #endif
 
 #if !defined(ARCH_HAVE_XWIRQ_T)

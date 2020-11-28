@@ -68,7 +68,7 @@ struct xwds_dmauartc {
                 struct xwos_splk lock; /**< 保护接收队列的锁 */
                 xwsq_t pos; /**< 当前有效数据的起始位置 */
                 xwsz_t tail; /**< 当前有效数据的结束位置 + 1 */
-                xwu8_t mem[2 * XWDS_DMAUART_RXQ_SIZE] __xwcc_aligned_l1cacheline;
+                xwu8_t mem[2 * XWDS_DMAUART_RXQ_SIZE] __xwcc_alignl1cache;
                                 /**< 双缓冲区 */
         } rxq; /**< 循环接收队列 */
 };

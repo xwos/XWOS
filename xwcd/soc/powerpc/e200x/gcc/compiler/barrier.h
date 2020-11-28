@@ -33,15 +33,6 @@
 #define xwmb_mp_mb()            eppc_dmb()
 #define xwmb_mp_rmb()           xwmb_mp_mb()
 #define xwmb_mp_wmb()           __asm__ volatile("mbar      0" : : : "memory")
-
-#define __raw_read8(a)          (*(volatile xwu8_t *)(a))
-#define __raw_read16(a)         (*(volatile xwu16_t *)(a))
-#define __raw_read32(a)         (*(volatile xwu32_t *)(a))
-#define __raw_read64(a)         (*(volatile xwu64_t *)(a))
-
-#define __raw_write8(a, v)      (*(volatile unsigned char *)(a) = (v))
-#define __raw_write16(a, v)     (*(volatile unsigned short *)(a) = (v))
-#define __raw_write32(a, v)     (*(volatile unsigned int *)(a) = (v))
-#define __raw_write64(a, v)     (*(volatile unsigned long long *)(a) = (v))
+#define xwmb_mp_ddb()           xwccmb()
 
 #endif /* barrier.h */

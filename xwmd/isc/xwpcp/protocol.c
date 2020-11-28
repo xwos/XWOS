@@ -956,7 +956,9 @@ xwer_t xwpcp_eq_msg(struct xwpcp * xwpcp,
         xwpcp_txq_add_tail(xwpcp, slot);
         xwos_sem_post(&xwpcp->txq.sem);
 
-        *fhbuf = (xwpcp_fh_t)slot;
+        if (fhbuf) {
+                *fhbuf = (xwpcp_fh_t)slot;
+        }
         return XWOK;
 
 err_bma_alloc:

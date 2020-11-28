@@ -92,7 +92,7 @@ typedef unsigned long xwid_t; /**< ID (无符号) */
 typedef signed long xwsid_t; /**< ID (有符号) */
 
 #define ARCH_HAVE_XWISR_F       1
-typedef void (*xwisr_f)(void); /**< 中断向量 */
+typedef void (* xwisr_f)(void); /**< 中断向量 */
 
 #define ARCH_HAVE_XWIRQ_T       1
 typedef signed int xwirq_t; /**< 中断号 (有符号) */

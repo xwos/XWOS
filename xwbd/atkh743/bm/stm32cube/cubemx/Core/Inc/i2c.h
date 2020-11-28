@@ -51,7 +51,7 @@ struct MX_I2C_MasterDriverData {
   struct xwos_splk splk; /**< 保证发送状态只被单一上下文访问的锁 */
   struct xwds_i2c_msg * msg; /**< 正在传输的消息 */
   xwer_t rc; /**< 返回值 */
-  xwu8_t mem[MX_I2C_MEM_MAXSIZE] __xwcc_aligned_l1cacheline; /**< 发送缓冲区 */
+  xwu8_t mem[MX_I2C_MEM_MAXSIZE] __xwcc_alignl1cache; /**< 发送缓冲区 */
   xwu32_t size; /**< 待发送的数据大小 */
 };
 

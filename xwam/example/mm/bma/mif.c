@@ -29,7 +29,7 @@
 /**
  * @brief 伙伴算法内存块分配器的内存区间
  */
-xwu8_t __xwcc_aligned_l1cacheline xwmmdemo_bma_mempool[XWMMDEMO_BMA_MEMSIZE];
+xwu8_t __xwcc_alignl1cache xwmmdemo_bma_mempool[XWMMDEMO_BMA_MEMSIZE];
 
 /**
  * @brief 伙伴算法内存块分配器

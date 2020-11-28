@@ -491,13 +491,12 @@ xwer_t xwpcp_eq(struct xwpcp * xwpcp,
         xwer_t rc;
 
         XWPCP_VALIDATE((xwpcp), "nullptr", -EFAULT);
-        XWPCP_VALIDATE(msg, "nullptr", -EFAULT);
-        XWPCP_VALIDATE((msg->port > XWPCP_PORT_CMD), "port0-not-permitted", -ENXIO);
-        XWPCP_VALIDATE((msg->port < XWPCP_PORT_NUM), "no-such-port", -ENODEV);
-        XWPCP_VALIDATE(((XWPCP_MSG_QOS_1 == msg->qos) ||
-                        (XWPCP_MSG_QOS_0 == msg->qos)), "qos-invalid", -EINVAL);
-        XWPCP_VALIDATE((msg->size <= XWPCP_SDU_MAX_SIZE), "size-invalid", -E2BIG);
+        XWPCP_VALIDATE((data), "nullptr", -EFAULT);
+        XWPCP_VALIDATE((size <= XWPCP_SDU_MAX_SIZE), "size-invalid", -E2BIG);
         XWPCP_VALIDATE((pri < XWPCP_PRI_NUM), "pri-invalid", -E2BIG);
+        XWPCP_VALIDATE((port > XWPCP_PORT_CMD), "port0-not-permitted", -ENXIO);
+        XWPCP_VALIDATE((port < XWPCP_PORT_NUM), "no-such-port", -ENODEV);
+        XWPCP_VALIDATE((qos < XWPCP_MSG_QOS_NUM), "qos-invalid", -EINVAL);
 
         rc = xwpcp_grab(xwpcp);
         if (__xwcc_unlikely(rc < 0)) {

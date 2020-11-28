@@ -31,6 +31,20 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief XWOS中断资源
+ * @note
+ * - 定义：
+ *   ```
+ *   struct xwmp_irq_resource {
+ *           xwirq_t irqn;
+ *           xwisr_f isr;
+ *           const struct soc_irq_cfg * cfg;
+ *           const char * description;
+ *   };
+ *   ```
+ * - irq：中断号
+ * - isr：中断处理函数
+ * - cfg：配置
+ * - description：描述
  */
 #define xwos_irq_resource xwosdl_irq_resource
 

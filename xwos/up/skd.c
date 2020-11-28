@@ -38,14 +38,14 @@ __xwup_data struct xwup_skd xwup_skd;
 /**
  * @brief XWOS UP调度器的空闲线程栈
  */
-__xwup_data __xwcc_aligned_l1cacheline
+__xwup_data __xwcc_alignl1cache
 xwu8_t xwup_skd_idled_stack[XWUPCFG_SKD_IDLE_STACK_SIZE];
 
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
 /**
  * @brief XWOS UP调度器的中断底半部栈
  */
-__xwup_data __xwcc_aligned_l1cacheline
+__xwup_data __xwcc_alignl1cache
 xwu8_t xwup_skd_bhd_stack[XWUPCFG_SKD_BH_STACK_SIZE];
 #endif /* XWUPCFG_SKD_BH */
 

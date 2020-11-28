@@ -28,7 +28,7 @@
 /**
  * @brief 内存切片分配器的内存区间
  */
-xwu8_t __xwcc_aligned_l1cacheline xwmmdemo_memslice_mempool[XWMMDEMO_MEMSLICE_MEMSIZE];
+xwu8_t __xwcc_alignl1cache xwmmdemo_memslice_mempool[XWMMDEMO_MEMSLICE_MEMSIZE];
 
 /**
  * @brief 内存切片分配器

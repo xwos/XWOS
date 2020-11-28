@@ -55,9 +55,9 @@ struct xwmp_irqc_driver {
         xwer_t (* cfg)(struct xwmp_irqc *, xwirq_t,
                        const struct soc_irq_cfg *); /**< 配置中断 */
         xwer_t (* get_cfg)(struct xwmp_irqc *, xwirq_t,
-                           struct soc_irq_cfg *); /**< 得到中断配置 */
+                           struct soc_irq_cfg *); /**< 获取中断配置 */
         xwer_t (* get_data)(struct xwmp_irqc *, xwirq_t,
-                            struct soc_irq_data *); /**< 得到中断数据 */
+                            struct soc_irq_data *); /**< 获取中断数据 */
 };
 
 /**

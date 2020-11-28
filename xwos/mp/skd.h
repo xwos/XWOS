@@ -136,7 +136,7 @@ struct xwmp_skd_pm {
 /**
  * @brief XWOS MP 调度器
  */
-struct __xwcc_aligned_l1cacheline xwmp_skd {
+struct __xwcc_alignl1cache xwmp_skd {
         struct xwmp_skd_stack_info * cstk; /**< 当前正在运行的线程的栈信息的指针
                                                 偏移：0，
                                                 汇编代码中会使用这个成员 */

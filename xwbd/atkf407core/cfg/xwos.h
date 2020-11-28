@@ -26,6 +26,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWKNCFG_CHECK_PARAMETERS                        1
 #define XWKNCFG_BUG                                     1
+#define XWKNCFG_RELOCATE_DATA                           1
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         xwlib Configurations        ******** ********

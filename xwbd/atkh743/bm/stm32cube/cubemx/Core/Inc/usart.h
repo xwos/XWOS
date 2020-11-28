@@ -53,7 +53,7 @@ struct MX_UART_DriverData {
     struct xwos_cond cond; /**< 条件量 */
     struct xwos_splk splk; /**< 保证发送状态只被单一上下文访问的锁 */
     xwer_t rc; /**< 返回值 */
-    xwu8_t mem[HAL_UART_TXMEM_MAXSIZE] __xwcc_aligned_l1cacheline; /**< 发送缓冲区 */
+    xwu8_t mem[HAL_UART_TXMEM_MAXSIZE] __xwcc_alignl1cache; /**< 发送缓冲区 */
     xwu32_t size; /**< 待发送的数据大小 */
   } tx;
 };

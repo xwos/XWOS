@@ -24,7 +24,7 @@
 /**
  * @brief 简单内存分配器的内存区间
  */
-xwu8_t __xwcc_aligned_l1cacheline xwmmdemo_sma_mempool[4096];
+xwu8_t __xwcc_alignl1cache xwmmdemo_sma_mempool[4096];
 
 /**
  * @brief 简单内存分配器

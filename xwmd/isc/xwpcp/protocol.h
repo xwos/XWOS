@@ -195,8 +195,7 @@ struct xwpcp {
         /* 帧槽内存池 */
         struct {
                 struct xwmm_bma * pool; /**< 内存池分配器 */
-                xwu8_t __xwcc_aligned_l1cacheline mempool[XWPCP_MEMPOOL_SIZE];
-                                        /**< 内存池 */
+                xwu8_t __xwcc_alignl1cache mempool[XWPCP_MEMPOOL_SIZE]; /**< 内存池 */
         } slot; /**< 帧槽 */
 
         /* 发送状态机 */

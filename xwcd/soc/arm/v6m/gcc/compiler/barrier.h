@@ -37,14 +37,4 @@
 #define xwmb_mp_wmb()           armv6m_dmb()
 #define xwmb_mp_ddb()           xwccmb()
 
-#define xwmb_read8(a)           (*(volatile xwu8_t *)(a))
-#define xwmb_read16(a)          (*(volatile xwu16_t *)(a))
-#define xwmb_read32(a)          (*(volatile xwu32_t *)(a))
-#define xwmb_read64(a)          (*(volatile xwu64_t *)(a))
-
-#define xwmb_write8(a, v)       (*(volatile unsigned char *)(a) = (v))
-#define xwmb_write16(a, v)      (*(volatile unsigned short *)(a) = (v))
-#define xwmb_write32(a, v)      (*(volatile unsigned int *)(a) = (v))
-#define xwmb_write64(a, v)      (*(volatile unsigned long long *)(a) = (v))
-
 #endif /* barrier.h */
