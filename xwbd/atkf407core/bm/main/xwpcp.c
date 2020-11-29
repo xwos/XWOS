@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <xwmd/isc/xwpcp/protocol.h>
-#include <xwmd/isc/xwpcp/api.h>
+#include <xwmd/isc/xwpcp/mif.h>
 #include <xwmd/isc/xwpcp/hwif/uart.h>
 #include <bm/stm32cube/mif.h>
 #include <bm/main/xwpcp.h>

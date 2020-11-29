@@ -65,14 +65,14 @@ xwid_t xwospl_skd_get_id(void);
 xwer_t xwospl_skd_start_lc(struct xwospl_skd * xwskd);
 
 /**
- * @brief 玄武OS内核移植层：暂停调度器
+ * @brief 玄武OS内核移植层：暂停调度器，用于电源管理
  * @param xwskd: (I) 调度器的指针
  * @return 错误码
  */
 xwer_t xwospl_skd_suspend(struct xwospl_skd * xwskd);
 
 /**
- * @brief 玄武OS内核移植层：继续调度器
+ * @brief 玄武OS内核移植层：继续调度器，用于电源管理
  * @param xwskd: (I) 调度器的指针
  * @return 错误码
  */
