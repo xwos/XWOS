@@ -75,4 +75,4 @@ ocheap_mr_size = LENGTH(ocheap_mr);
 sram_mr_origin = ORIGIN(sram_mr);
 sram_mr_size = LENGTH(sram_mr);
 
-INCLUDE soc.lds
+INCLUDE f1.lds

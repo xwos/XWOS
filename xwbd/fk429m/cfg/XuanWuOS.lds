@@ -56,4 +56,4 @@ ccmheap_mr_size = LENGTH(ccmheap_mr);
 sdram_mr_origin = ORIGIN(sdram_mr);
 sdram_mr_size = LENGTH(sdram_mr);
 
-INCLUDE soc.lds
+INCLUDE f4.lds

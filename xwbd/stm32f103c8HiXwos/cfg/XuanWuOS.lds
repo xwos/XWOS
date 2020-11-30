@@ -63,4 +63,4 @@ MEMORY {
                 len = ocram_mr_size - LENGTH(data_mr)
 }
 
-INCLUDE soc.lds
+INCLUDE f1.lds

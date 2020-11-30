@@ -59,4 +59,4 @@ axisram_mr_size = LENGTH(axisram_mr);
 sdram_mr_origin = ORIGIN(sdram_mr);
 sdram_mr_size = LENGTH(sdram_mr);
 
-INCLUDE soc.lds
+INCLUDE h7.lds
