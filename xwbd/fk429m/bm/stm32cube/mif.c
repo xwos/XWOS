@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#include <armv7m_core.h>
 #include <bm/stm32cube/standard.h>
+#include <armv7m_core.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
 #include <bm/stm32cube/cubemx/Core/Inc/isr.h>

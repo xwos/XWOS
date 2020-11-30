@@ -43,7 +43,6 @@ XWMO_CSRCS += xwac/xwos/vector.c
 
 
 # 定义编译选项
-XWMO_CFLAGS := -include standard.h
 XWMO_CFLAGS += -Wno-undef -Wno-unused-parameter
 XWMO_CFLAGS += $(CUBEMX_CFLAGS)
 

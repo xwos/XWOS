@@ -28,7 +28,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <bm/stm32cube/cubemx/Weak/stm32f103xe_isr.h>
+#include "standard.h"
 
 /* USER CODE END Includes */
 

@@ -2,3 +2,5 @@
 .cproject.bak
 .mxproject
 .project.bak
+startup_stm32f103xe.s
+STM32F103ZETx_FLASH.ld

@@ -40,10 +40,10 @@
 
 /* USER CODE END Includes */
 
-extern UART_HandleTypeDef husart1;
+extern UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN Private defines */
-struct MX_UART_Xwds_driver_data {
+struct MX_UART_DriverData {
   UART_HandleTypeDef * halhdl;
   struct xwds_dmauartc * dmauartc;
   struct {
@@ -53,7 +53,7 @@ struct MX_UART_Xwds_driver_data {
   } tx;
 };
 
-extern struct MX_UART_Xwds_driver_data husart1_xwds_drvdata;
+extern struct MX_UART_DriverData huart1_xwds_drvdata;
 
 /* USER CODE END Private defines */
 

@@ -2,3 +2,5 @@
 .cproject.bak
 .mxproject
 .project.bak
+startup_stm32f429xx.s
+STM32F429BITx_FLASH.ld

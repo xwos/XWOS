@@ -40,7 +40,7 @@
 
 /* USER CODE END Includes */
 
-extern UART_HandleTypeDef husart1;
+extern UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN Private defines */
 struct MX_UART_DriverData {
@@ -53,7 +53,7 @@ struct MX_UART_DriverData {
   } tx;
 };
 
-extern struct MX_UART_DriverData husart1_drvdata;
+extern struct MX_UART_DriverData huart1_drvdata;
 
 /* USER CODE END Private defines */
 

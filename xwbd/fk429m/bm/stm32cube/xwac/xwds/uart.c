@@ -79,7 +79,7 @@ struct xwds_dmauartc stm32cube_usart1_cb = {
                 .id = 1,
                 .resources = NULL,
                 .drv = xwds_cast(struct xwds_driver *, &stm32cube_usart1_drv),
-                .data = (void *)&husart1_xwds_drvdata,
+                .data = (void *)&huart1_xwds_drvdata,
         },
         .cfg = NULL,
 };
@@ -89,7 +89,7 @@ static
 xwer_t stm32cube_usart1_drv_start(struct xwds_device * dev)
 {
         struct xwds_dmauartc * dmauartc;
-        struct MX_UART_Xwds_driver_data * drvdata;
+        struct MX_UART_DriverData * drvdata;
         xwer_t rc;
 
         dmauartc = xwds_cast(struct xwds_dmauartc *, dev);
@@ -148,7 +148,7 @@ xwer_t stm32cube_usart1_drv_tx(struct xwds_dmauartc * dmauartc,
                                const xwu8_t * data, xwsz_t * size,
                                xwtm_t * xwtm)
 {
-        struct MX_UART_Xwds_driver_data * drvdata;
+        struct MX_UART_DriverData * drvdata;
         xwreg_t flag;
         union xwos_ulock ulk;
         xwsz_t wrsz;
@@ -188,7 +188,7 @@ xwer_t stm32cube_usart1_drv_tx(struct xwds_dmauartc * dmauartc,
 
 void stm32cube_usart1_cb_txdma_cplt(struct xwds_dmauartc * dmauartc, xwer_t dmarc)
 {
-        struct MX_UART_Xwds_driver_data * drvdata;
+        struct MX_UART_DriverData * drvdata;
         xwreg_t flag;
 
         drvdata = dmauartc->dev.data;

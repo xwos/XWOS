@@ -95,7 +95,7 @@ void HAL_MspInit(void)
   HAL_NVIC_SetPriority(PVD_AVD_IRQn, 6, 0);
   HAL_NVIC_EnableIRQ(PVD_AVD_IRQn);
   /* WAKEUP_PIN_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(WAKEUP_PIN_IRQn, 0, 1);
+  HAL_NVIC_SetPriority(WAKEUP_PIN_IRQn, 1, 1);
   HAL_NVIC_EnableIRQ(WAKEUP_PIN_IRQn);
 
   /* USER CODE BEGIN MspInit 1 */

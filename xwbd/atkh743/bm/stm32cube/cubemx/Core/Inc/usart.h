@@ -40,8 +40,8 @@
 
 /* USER CODE END Includes */
 
-extern UART_HandleTypeDef husart1;
-extern UART_HandleTypeDef husart2;
+extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN Private defines */
 #define HAL_UART_TXMEM_MAXSIZE    512U /**< 单次最大发送的字节数 */
@@ -58,8 +58,8 @@ struct MX_UART_DriverData {
   } tx;
 };
 
-extern struct MX_UART_DriverData husart1_drvdata;
-extern struct MX_UART_DriverData husart2_drvdata;
+extern struct MX_UART_DriverData huart1_drvdata;
+extern struct MX_UART_DriverData huart2_drvdata;
 
 /* USER CODE END Private defines */
 

@@ -78,7 +78,7 @@ struct xwds_dmauartc stm32cube_usart1_cb = {
                 .id = 1,
                 .resources = NULL,
                 .drv = xwds_cast(struct xwds_driver *, &stm32cube_usart1_drv),
-                .data = (void *)&husart1_drvdata,
+                .data = (void *)&huart1_drvdata,
         },
         .cfg = NULL,
 };
@@ -289,7 +289,7 @@ struct xwds_dmauartc stm32cube_usart2_cb = {
                 .id = 1,
                 .resources = NULL,
                 .drv = xwds_cast(struct xwds_driver *, &stm32cube_usart2_drv),
-                .data = (void *)&husart2_drvdata,
+                .data = (void *)&huart2_drvdata,
         },
         .cfg = NULL,
 };
