@@ -86,7 +86,6 @@ void DMA2_Stream5_IRQHandler(void);
 void QUADSPI_IRQHandler(void);
 void WAKEUP_PIN_IRQHandler(void);
 /* USER CODE BEGIN EFP */
-void stm32cube_override_linkage_it(void);
 
 /* USER CODE END EFP */
 

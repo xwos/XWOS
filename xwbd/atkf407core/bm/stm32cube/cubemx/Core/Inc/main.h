@@ -36,7 +36,6 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_ll_crc.h"
-#include "stm32f4xx_hal.h"
 #include "stm32f4xx_ll_rng.h"
 #include "stm32f4xx_ll_system.h"
 #include "stm32f4xx_ll_gpio.h"
@@ -74,6 +73,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 void stm32cube_override_linkage_msp(void);
+void stm32cube_override_linkage_it(void);
 
 /* USER CODE END EFP */
 
