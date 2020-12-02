@@ -1098,6 +1098,7 @@ xwer_t xwmp_thrd_intr(struct xwmp_tcb * tcb)
                 } else {
                         xwmp_splk_unlock_cpuirqrs(&tcb->wqn.lock, cpuirq);
                         XWOS_BUG();
+                        rc = -EBUG;
                 }
         } else if (XWMP_SKDOBJ_DST_SLEEPING & tcb->state) {
                 xwmp_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);

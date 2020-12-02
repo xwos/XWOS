@@ -106,6 +106,7 @@ int __retarget_lock_try_acquire(_LOCK_T lock)
                 if (XWOS_SKD_CONTEXT_THRD == ctx) {
                         rc = xwos_mtx_trylock(&lock->xwmtx);
                 } else if (XWMP_SKD_CONTEXT_INIT_EXIT == ctx) {
+                        rc = XWOK;
                 } else {
                         rc = -ENOTINTHRD;
                 }

@@ -170,6 +170,7 @@ xwer_t soc_crc32_cal(xwu32_t * crc32,
                 seg = LL_CRC_ReadData32(CRC);
                 rc = XWOK;
         } else {
+                seg = *crc32;
                 rc = -EOPNOTSUPP;
         }
         LL_AHB4_GRP1_DisableClock(LL_AHB4_GRP1_PERIPH_CRC);

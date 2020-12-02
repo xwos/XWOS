@@ -846,6 +846,7 @@ xwer_t xwup_thrd_intr(struct xwup_tcb * tcb)
 #endif /* XWUPCFG_LOCK_MTX */
                 } else {
                         xwospl_cpuirq_restore_lc(cpuirq);
+                        rc = -EBUG;
                         XWOS_BUG();
                 }
         } else if (XWUP_SKDOBJ_DST_SLEEPING & tcb->state) {

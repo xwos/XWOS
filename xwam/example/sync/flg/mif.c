@@ -124,7 +124,7 @@ xwer_t xwflgdemo_consumer_func(void * arg)
         xwos_flg_declare_bitmap(org);
         xwos_flg_declare_bitmap(tgevt);
         xwtm_t ts;
-        xwer_t rc;
+        xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
 
@@ -282,7 +282,7 @@ xwer_t xwflgdemo_producer_func(void * arg)
         xwos_flg_declare_bitmap(org);
         xwos_flg_declare_bitmap(msk);
         xwtm_t ts;
-        xwer_t rc;
+        xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
 
