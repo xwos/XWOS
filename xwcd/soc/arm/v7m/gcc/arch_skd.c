@@ -50,7 +50,7 @@ __xwbsp_rodata const struct xwos_irq_resource cortex_m_swcx_irqrsc = {
         .irqn = ARCH_IRQ_PENDSV,
         .isr = arch_isr_pendsv,
         .cfg = &cortex_m_swcx_irq_cfg,
-        .description = "irq.swcx.armv7m",
+        .description = "irq.pendsv.armv7m",
 };
 
 static __xwbsp_code
@@ -329,7 +329,7 @@ void arch_isr_pendsv(void)
                          :
                          :[__nvfr] "I" (ARCH_NVFR_SIZE)
                          :);
-        __asm__ volatile("      vstm    r2, {s16-s31}");
+        __asm__ volatile("      vstmia  r2, {s16-s31}");
 #endif /* ARCHCFG_FPU */
         /* save non-volatile registers: lr, r11-r4 */
         __asm__ volatile("      stmfd   r2!, {r4-r11, lr}");
@@ -351,7 +351,7 @@ void arch_isr_pendsv(void)
         __asm__ volatile("      ldmfd   r2!, {r4-r11, lr}");
 #if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
         /* restore s16-s31 */
-        __asm__ volatile("      vldm    r2, {s16-s31}");
+        __asm__ volatile("      vldmia  r2, {s16-s31}");
         __asm__ volatile("      add     r2, %[__nvfr]"
                          :
                          :[__nvfr] "I" (ARCH_NVFR_SIZE)

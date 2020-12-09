@@ -569,6 +569,9 @@ endif
 ifeq ($(ARCHCFG_LIB_XWBMPOP_FLZ),y)
     ARCH_CSRCS += asmlib/xwbmpop/flz.c
 endif
+ifeq ($(ARCHCFG_LIB_JMP),y)
+    ARCH_CSRCS += asmlib/jmp.c
+endif
 
 ARCH_CSRCS += arch_init.c arch_image.c arch_irq.c arch_xwsc.c
 ARCH_CSRCS += arch_skd.c arch_systick.c

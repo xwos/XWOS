@@ -94,6 +94,9 @@
 #define ARCHCFG_LIB_XWAOP64                     1
 #define ARCHCFG_LIB_XWBMPAOP                    1
 
+/******** setjmp/longjmp ********/
+#define ARCHCFG_LIB_JMP                         1
+
 /******** debug ********/
 #define ARCHCFG_BKPT                            1
 
