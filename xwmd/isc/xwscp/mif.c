@@ -19,7 +19,7 @@
 #include <xwos/osal/sync/cond.h>
 #include <xwmd/isc/xwscp/protocol.h>
 #include <xwmd/isc/xwscp/hwifal.h>
-#include <xwmd/isc/xwscp/api.h>
+#include <xwmd/isc/xwscp/mif.h>
 
 /**
  * @brief 接收线程的优先级
@@ -178,12 +178,12 @@ xwer_t xwscp_stop(struct xwscp * xwscp)
 
         XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
 
-        rc = xwos_thrd_terminate(xwscp->tid, &childrc);
+        rc = xwos_thrd_stop(xwscp->tid, &childrc);
         if (XWOK == rc) {
                 rc = xwos_thrd_delete(xwscp->tid);
                 if (XWOK == rc) {
                         xwscp->tid = 0;
-                        xwscplogf(INFO, "Terminate XWSCP thread... [OK]\n");
+                        xwscplogf(INFO, "Stop XWSCP thread... [OK]\n");
                 }
         }
 

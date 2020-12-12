@@ -16,6 +16,8 @@
 #include <xwos/up/skd.h>
 
 #define XWOSDL_SKDATTR_PRIVILEGED               XWUP_SKDATTR_PRIVILEGED
+#define XWOSDL_SKDATTR_DETACHED                 XWUP_SKDATTR_DETACHED
+#define XWOSDL_SKDATTR_JOINABLE                 XWUP_SKDATTR_JOINABLE
 #define XWOSDL_SKD_PRIORITY_RT_MIN              XWUP_SKD_PRIORITY_RT_MIN
 #define XWOSDL_SKD_PRIORITY_RT_MAX              XWUP_SKD_PRIORITY_RT_MAX
 #define XWOSDL_SKD_PRIORITY_INVALID             XWUP_SKD_PRIORITY_INVALID
@@ -192,18 +194,39 @@ void xwosdl_cthrd_exit(xwer_t rc)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_thrd_terminate(xwid_t tid, xwer_t * rc)
+xwer_t xwosdl_thrd_stop(xwid_t tid, xwer_t * rc)
 {
         struct xwup_tcb * tcb;
 
         tcb = (struct xwup_tcb *)tid;
-        return xwup_thrd_terminate(tcb, rc);
+        return xwup_thrd_stop(tcb, rc);
 }
 
 static __xwcc_inline
-void xwosdl_cthrd_wait_exit(void)
+xwer_t xwosdl_thrd_cancel(xwid_t tid)
 {
-        xwup_cthrd_wait_exit();
+        struct xwup_tcb * tcb;
+
+        tcb = (struct xwup_tcb *)tid;
+        return xwup_thrd_cancel(tcb);
+}
+
+static __xwos_inline_api
+xwer_t xwosdl_thrd_join(xwid_t tid, xwer_t * trc)
+{
+        struct xwup_tcb * tcb;
+
+        tcb = (struct xwup_tcb *)tid;
+        return xwup_thrd_join(tcb, trc);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_thrd_detach(xwid_t tid)
+{
+        struct xwup_tcb * tcb;
+
+        tcb = (struct xwup_tcb *)tid;
+        return xwup_thrd_detach(tcb);
 }
 
 static __xwcc_inline

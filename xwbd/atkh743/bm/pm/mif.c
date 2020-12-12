@@ -138,7 +138,7 @@ xwer_t brdpm_stop(void)
 {
         xwer_t rc, trc;
 
-        rc = xwos_thrd_terminate(brdpm_thrd_id, &trc);
+        rc = xwos_thrd_stop(brdpm_thrd_id, &trc);
         if (XWOK == rc) {
                 rc = xwos_thrd_delete(brdpm_thrd_id);
                 if (XWOK == rc) {

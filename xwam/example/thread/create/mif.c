@@ -149,8 +149,7 @@ xwer_t thrd_1_func(void * arg)
         /* 结束刚创建的线程2 */
         for (i = 0; i < xw_array_size(static_tbd); i++) {
                 /* 等待线程2结束，并从childrc中获取线程2的返回值 */
-                rc = xwos_thrd_terminate(xwos_thrd_id(&static_tcb[i]),
-                                         &childrc);
+                rc = xwos_thrd_stop(xwos_thrd_id(&static_tcb[i]), &childrc);
                 if (rc < 0) {
                         thrdcrtlogf(ERR, "[线程1] 终止线程 [%s] 失败，rc:%d。\n",
                                     static_tbd[i].name, rc);

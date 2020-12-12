@@ -23,7 +23,7 @@
 #include <xwos/osal/sync/sem.h>
 #include <xwos/osal/sync/cond.h>
 #include <xwmd/isc/xwscp/hwifal.h>
-#include <xwmd/isc/xwscp/api.h>
+#include <xwmd/isc/xwscp/mif.h>
 
 #define XWSCP_PERIOD            (XWMDCFG_isc_xwscp_PERIOD)
 #define XWSCP_RETRY_NUM         (XWMDCFG_isc_xwscp_RETRY_NUM)

@@ -10,8 +10,8 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __xwmd_isc_xwscp_api_h__
-#define __xwmd_isc_xwscp_api_h__
+#ifndef __xwmd_isc_xwscp_mif_h__
+#define __xwmd_isc_xwscp_mif_h__
 
 #include <xwos/standard.h>
 
@@ -30,4 +30,4 @@ xwer_t xwscp_rx(struct xwscp * xwscp,
                 xwu8_t buf[], xwsz_t * size,
                 xwtm_t * xwtm);
 
-#endif /* xwmd/isc/xwscp/api.h */
+#endif /* xwmd/isc/xwscp/mif.h */

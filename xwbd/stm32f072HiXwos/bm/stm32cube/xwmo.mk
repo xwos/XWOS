@@ -40,7 +40,6 @@ XWMO_CSRCS += main.c
 # 增加xwac中的源文件
 XWMO_CSRCS += xwac/xwlib/crc32.c
 XWMO_CSRCS += xwac/xwos/hook.c
-XWMO_CSRCS += xwac/xwos/vector.c
 
 
 # 定义编译选项

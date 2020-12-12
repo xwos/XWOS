@@ -120,7 +120,7 @@ xwer_t w25qrpt_stop(struct w25qrpt * w25qrpt)
 
         XWOS_VALIDATE((w25qrpt), "nullptr", -EFAULT);
 
-        rc = xwos_thrd_terminate(w25qrpt->tid, &childrc);
+        rc = xwos_thrd_stop(w25qrpt->tid, &childrc);
         if (XWOK == rc) {
                 rc = xwos_thrd_delete(w25qrpt->tid);
                 if (XWOK == rc) {
@@ -983,11 +983,9 @@ xwer_t w25qrpt_thrd_func(void * arg)
                                 w25qrptlogf(WARNING, "错误的消息\n");
                         } else {
                                 w25qrptlogf(ERR, "其他错误 ... [%d]\n", rc);
-                                xwos_cthrd_wait_exit();
                                 break;
                         }
                 } else {
-                        xwos_cthrd_wait_exit();
                         break;
                 }
         }

@@ -59,6 +59,7 @@ enum xwup_skdobj_state_em {
         XWUP_SKDOBJ_DST_FROZEN = (1U << 6U), /**< 已经被冻结 */
         XWUP_SKDOBJ_DST_EXITING = (1U << 7U), /**< 正在退出 */
         XWUP_SKDOBJ_DST_RESERVED8 = (1U << 8U), /**< 保留位8 */
+        XWUP_SKDOBJ_DST_DETACHED = (1U << 9U), /**< 分离态 */
         XWUP_SKDOBJ_DST_UNINTERRUPTED = (1U << 15U), /**< 阻塞态不可中断 */
         XWUP_SKDOBJ_DST_MASK = (XWUP_SKDOBJ_DST_STANDBY |
                                 XWUP_SKDOBJ_DST_RUNNING |
@@ -75,6 +76,9 @@ enum xwup_skdobj_state_em {
  */
 enum xwup_skdobj_attr_em {
         XWUP_SKDATTR_PRIVILEGED = (1U << 0U), /**< 拥有超级权限 */
+
+        XWUP_SKDATTR_DETACHED = (1U << 1U), /**< DETACHED态，类似于pthread的DETACHED */
+        XWUP_SKDATTR_JOINABLE = 0, /**< JOINABLE态，类似于pthread的JOINABLE */
 };
 
 /**

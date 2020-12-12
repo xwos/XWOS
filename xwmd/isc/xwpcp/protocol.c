@@ -610,7 +610,6 @@ xwer_t xwpcp_rxthrd(struct xwpcp * xwpcp)
                                 xwpcplogf(WARNING, "Bad Frame! \n");
                         } else {
                                 xwpcplogf(ERR, "xwpcp_rxfsm() returns %d.\n", rc);
-                                xwos_cthrd_wait_exit();
                                 break;
                         }
                 }
@@ -1206,7 +1205,6 @@ xwer_t xwpcp_txthrd(struct xwpcp * xwpcp)
                                 xwpcp_doze(1);
                         } else if ((-ETIMEDOUT != rc) && (XWOK != rc)) {
                                 xwpcplogf(ERR, "xwpcp_txfsm() ... rc: %d.\n", rc);
-                                xwos_cthrd_wait_exit();
                                 break;
                         }/* else {} */
                 }

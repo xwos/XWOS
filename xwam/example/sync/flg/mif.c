@@ -108,7 +108,7 @@ xwer_t example_flg_start(void)
 
 
 err_producer_create:
-        xwos_thrd_terminate(xwflgdemo_consumer, NULL);
+        xwos_thrd_cancel(xwflgdemo_consumer);
 err_consumer_create:
         xwos_flg_destroy(&xwsltdemo_flg);
 err_flg_init:

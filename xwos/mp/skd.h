@@ -61,6 +61,7 @@ enum xwmp_skdobj_state_em {
         XWMP_SKDOBJ_DST_FROZEN = (1U << 6U), /**< 已经被冻结 */
         XWMP_SKDOBJ_DST_EXITING = (1U << 7U), /**< 正在退出 */
         XWMP_SKDOBJ_DST_MIGRATING = (1U << 8U), /**< 正在迁移 */
+        XWMP_SKDOBJ_DST_DETACHED = (1U << 9U), /**< 分离态 */
         XWMP_SKDOBJ_DST_UNINTERRUPTED = (1U << 15U), /**< 阻塞态不可中断 */
         XWMP_SKDOBJ_DST_MASK = (XWMP_SKDOBJ_DST_STANDBY |
                                 XWMP_SKDOBJ_DST_RUNNING |
@@ -79,6 +80,9 @@ enum xwmp_skdobj_state_em {
  */
 enum xwmp_skdattr_em {
         XWMP_SKDATTR_PRIVILEGED = (1U << 0U), /**< 拥有超级权限 */
+
+        XWMP_SKDATTR_DETACHED = (1U << 1U), /**< DETACHED态，类似于pthread的DETACHED */
+        XWMP_SKDATTR_JOINABLE = 0, /**< JOINABLE态，类似于pthread的JOINABLE */
 };
 
 /**

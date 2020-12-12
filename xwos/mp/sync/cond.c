@@ -911,7 +911,7 @@ xwer_t xwmp_cond_do_timedwait(struct xwmp_cond * cond, struct xwmp_tcb * tcb,
 /**
  * @brief XWMP API：等待条件量
  * @param cond: (I) 条件量对象指针
- * @param lock: (I) (I) 锁的地址
+ * @param lock: (I) 锁的地址
  * @param lktype: (I) 锁的类型，取值：@ref xwmp_lock_type_em
  * @param lkdata: (I) 锁的数据
  * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
@@ -922,9 +922,8 @@ xwer_t xwmp_cond_do_timedwait(struct xwmp_cond * cond, struct xwmp_tcb * tcb,
  * @retval -ENOTINTHRD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
+ * - 上下文：线程
+ * - 重入性：可重入
  */
 __xwmp_inline_api
 xwer_t xwmp_cond_wait(struct xwmp_cond * cond,
@@ -958,7 +957,7 @@ xwer_t xwmp_cond_wait(struct xwmp_cond * cond,
  * - 上下文：线程
  * - 重入性：可重入
  * @note
- * - 函数返回返回-ETIMEDOUT时，*xwtm* 指向的缓冲区内的期望时间会减为0。
+ * - 函数返回返回-ETIMEDOUT时，**xwtm**指向的缓冲区内的期望时间会减为0。
  */
 __xwmp_api
 xwer_t xwmp_cond_timedwait(struct xwmp_cond * cond,
@@ -972,8 +971,10 @@ xwer_t xwmp_cond_timedwait(struct xwmp_cond * cond,
         XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
         XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
         XWOS_VALIDATE((xwtm_cmp(*xwtm, 0) >= 0), "out-of-time", -ETIMEDOUT);
-        XWOS_VALIDATE(((NULL == lock) || (lktype < XWOS_LK_NUM)),
-                      "invalid-type", -EINVAL);
+        XWOS_VALIDATE((lktype < XWOS_LK_NUM), "invalid-type", -EINVAL);
+        XWOS_VALIDATE((((NULL == lock) && (XWOS_LK_NONE == lktype)) ||
+                       ((lock) && (lktype > XWOS_LK_NONE))),
+                      "invalid-lock", -EINVAL);
         XWOS_VALIDATE((-EINTHRD == xwmp_irq_get_id(NULL)),
                       "not-in-thrd", -ENOTINTHRD);
 

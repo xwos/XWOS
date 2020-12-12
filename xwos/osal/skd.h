@@ -42,6 +42,16 @@ typedef xwosdl_thrd_f xwos_thrd_f;
  * @brief XWOS API：线程属性，超级权限
  */
 #define XWOS_SKDATTR_PRIVILEGED XWOSDL_SKDATTR_PRIVILEGED
+
+/**
+ * @brief XWOS API：线程属性，DETACHED态
+ */
+#define XWOS_SKDATTR_DETACHED XWOSDL_SKDATTR_DETACHED
+
+/**
+ * @brief XWOS API：线程属性，JOINABLE态
+ */
+#define XWOS_SKDATTR_JOINABLE XWOSDL_SKDATTR_JOINABLE
 /**
  * @}
  */
@@ -385,48 +395,92 @@ void xwos_cthrd_exit(xwer_t rc)
 }
 
 /**
- * @brief XWOS API：终止线程并等待它的返回值
+ * @brief XWOS API：终止线程并等待它的返回值，最后回收线程资源
  * @param tid: (I) 线程ID
- * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回被终止线程的返回值，
- *                 可为NULL，表示不需要返回
+ * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回子线程的返回值，
+ *                 可为NULL，表示不需要获取返回值
  * @return 错误码
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
- * - 重入性：不可重入，调用时要确保线程没有退出
+ * - 重入性：不可重入
  * @note
- * - 此函数通常由父线程调用，用于终止一个子线程。父线程会一直等待子线程退出，
- *   并获取子线程的返回值。此函数类似于POSIX线程库中的pthread_join()函数。
- * - *注意* ，子线程不可在此函数调用之前就返回，这是因为不同OS的实现有细微差异。
- *   例如xwos在Linux内核中，使用了kthread_stop()函数来实现此API，
- *   kthread_stop()在调用时，如果子线程已经退出，会造成Kernel Panic。
- * - XuanWuOS的线程可在此函数调用之前就返回，此时此函数的返回值是一个
- *   小于0的错误码，指针trc指向的缓冲区依然可以获取线程之前的返回值。
- *   但是，为了保证基于操作系统抽象层的代码的移植性，不建议子线程提前退出。
+ * - 此函数由父线程调用，用于终止Joinable的子线程，父线程会一直阻塞等待子线程退出，
+ *   并获取子线程的返回值，最后释放子线程资源，此函数类似于POSIX线程库
+ *   中的pthread_cancel() + pthread_join()组合；
+ * - 子线程收到终止信号后，并不会立即退出，退出的时机由子线程自己控制；
+ * - 不可对Detached态的线程使用此函数。
  */
 static __xwos_inline_api
-xwer_t xwos_thrd_terminate(xwid_t tid, xwer_t * trc)
+xwer_t xwos_thrd_stop(xwid_t tid, xwer_t * trc)
 {
-        return xwosdl_thrd_terminate(tid, trc);
+        return xwosdl_thrd_stop(tid, trc);
 }
 
 /**
- * @brief XWOS API：判断当前线程是否可退出，若不是，当前线程就一直等待，直到它被终止
+ * @brief XWOS API：取消线程
+ * @param tid: (I) 线程ID
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ * @note
+ * - 此函数功能类似于pthread_cancel()，通知子线程退出；
+ * - 此函数可中断子线程的阻塞态与睡眠态；
+ * - 子线程收到终止信号后，并不会立即退出，退出的时机由子线程自己控制；
+ * - 此函数与xwos_thrd_stop()不同，不会阻塞调用者，也不会回收子线程资源，因此
+ *   可在中断中调用。
+ */
+static __xwos_inline_api
+xwer_t xwos_thrd_cancel(xwid_t tid)
+{
+        return xwosdl_thrd_cancel(tid);
+}
+
+/**
+ * @brief XWOS API：等待线程结束并获取它的返回值，最后回收线程资源
+ * @param tid: (I) 线程ID
+ * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回子线程的返回值，
+ *                 可为NULL，表示不需要获取返回值
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EINVAL: 线程不是Joinable的
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
- * - 重入性：可重入
+ * - 重入性：不可重入
  * @note
- * - 此函数由子线程调用，用于等待父线程调用xwos_thrd_terminate()发出退出信号。
- * - 在父线程需要获取子线程运行结果的应用场景，子线程不可在父线程
- *   还未调用@ref xwos_thrd_terminate()时就提前退出。但有时父线程可能还没来得及
- *   调用@ref xwos_thrd_terminate()，子线程就已经准备退出。此种情况，子线程可
- *   通过调用此函数等待父线程调用@ref xwos_thrd_terminate()。
+ * - 此函数由父线程调用，父线程会一直阻塞等待子线程退出，
+ *   并获取子线程的返回值，最后释放子线程资源，此函数类似于POSIX线程库
+ *   pthread_join()函数；
+ * - 不可对Detached态的线程使用此函数；
+ * - 此函数与xwos_thrd_stop()不同，只会等待子线程退出，不会通知子线程退出。
  */
 static __xwos_inline_api
-void xwos_cthrd_wait_exit(void)
+xwer_t xwos_thrd_join(xwid_t tid, xwer_t * trc)
 {
-        xwosdl_cthrd_wait_exit();
+        return xwosdl_thrd_join(tid, trc);
+}
+
+/**
+ * @brief XWMP API：分离线程
+ * @param tid: (I) 线程ID
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ * @note
+ * - 此函数功能类似于pthread_detach()，处于分离态的线程退出后，系统自动回收资源，
+ *   不需要父线程join()或stop()。
+ */
+static __xwos_inline_api
+xwer_t xwos_thrd_detach(xwid_t tid)
+{
+        return xwosdl_thrd_detach(tid);
 }
 
 /**
@@ -455,8 +509,7 @@ bool xwos_cthrd_shld_frz(void)
  * - 上下文：线程
  * - 重入性：可重入
  * @note
- * - 此函数类似于@ref xwos_cthrd_wait_exit()，但不会阻塞，只会立即返回
- *   true或false，通常用在线程主循环的循环条件中。例如：
+ * - 此函数常用在线程主循环的循环条件中。例如：
  *   ```C
  *   xwer_t thread_main(void * arg)
  *   {

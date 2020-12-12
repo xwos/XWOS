@@ -157,8 +157,10 @@ xwer_t xwup_thrd_create(struct xwup_tcb ** tcbpbuf,
 xwer_t xwup_thrd_delete(struct xwup_tcb * tcb);
 void xwup_cthrd_yield(void);
 void xwup_cthrd_exit(xwer_t rc);
-xwer_t xwup_thrd_terminate(struct xwup_tcb * tcb, xwer_t * trc);
-void xwup_cthrd_wait_exit(void);
+xwer_t xwup_thrd_stop(struct xwup_tcb * tcb, xwer_t * trc);
+xwer_t xwup_thrd_cancel(struct xwup_tcb * tcb);
+xwer_t xwup_thrd_join(struct xwup_tcb * tcb, xwer_t * trc);
+xwer_t xwup_thrd_detach(struct xwup_tcb * tcb);
 xwer_t xwup_thrd_intr(struct xwup_tcb * tcb);
 xwer_t xwup_cthrd_sleep(xwtm_t * xwtm);
 xwer_t xwup_cthrd_sleep_from(xwtm_t * origin, xwtm_t inc);

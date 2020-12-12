@@ -73,7 +73,7 @@ static __xwmp_code
 void xwmp_thrd_launch(struct xwmp_tcb * tcb, xwmp_thrd_f mainfunc, void * arg);
 
 static __xwmp_code
-xwer_t xwmp_thrd_terminate_unlock_cb(struct xwmp_tcb * tcb);
+xwer_t xwmp_thrd_stop_unlock_cb(struct xwmp_tcb * tcb);
 
 static __xwmp_code
 void xwmp_thrd_outmigrate_frozen_lic(struct xwmp_tcb * tcb);
@@ -319,6 +319,9 @@ xwer_t xwmp_thrd_activate(struct xwmp_tcb * tcb,
         xwmp_splk_init(&tcb->stlock);
         tcb->state = XWMP_SKDOBJ_DST_UNKNOWN;
         tcb->attribute = attr;
+        if (XWMP_SKDATTR_DETACHED & attr) {
+                tcb->state |= XWMP_SKDOBJ_DST_DETACHED;
+        }
 
         /* frozen state info */
         xwlib_bclst_init_node(&tcb->frznode);
@@ -606,11 +609,17 @@ xwer_t xwmp_thrd_exit_lic(struct xwmp_tcb * tcb, xwer_t rc)
                 xwmp_splk_unlock(&xwskd->tcblistlock);
                 xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
                 xwmp_thrd_put(tcb);
+                if (XWMP_SKDATTR_DETACHED & tcb->attribute) {
+                        xwmp_thrd_delete(tcb);
+                }
                 xwmp_skd_notify_allfrz_lic(xwskd);
         } else {
                 xwmp_splk_unlock(&xwskd->tcblistlock);
                 xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
                 xwmp_thrd_put(tcb);
+                if (XWMP_SKDATTR_DETACHED & tcb->attribute) {
+                        xwmp_thrd_delete(tcb);
+                }
                 xwmp_skd_req_swcx(xwskd);
         }
         return XWOK;
@@ -636,13 +645,13 @@ void xwmp_cthrd_exit(xwer_t rc)
 }
 
 /**
- * @brief @ref xwmp_thrd_terminate()中使用的回调锁的解锁函数
+ * @brief @ref xwmp_thrd_stop()中使用的回调锁的解锁函数
  * @param tcb: (I) 线程控制块对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  */
 static __xwmp_code
-xwer_t xwmp_thrd_terminate_unlock_cb(struct xwmp_tcb * tcb)
+xwer_t xwmp_thrd_stop_unlock_cb(struct xwmp_tcb * tcb)
 {
         xwmp_splk_unlock(&tcb->stlock);
         xwmp_thrd_intr(tcb);
@@ -650,26 +659,25 @@ xwer_t xwmp_thrd_terminate_unlock_cb(struct xwmp_tcb * tcb)
 }
 
 /**
- * @brief XWMP API：终止线程并等待它的返回值
+ * @brief XWMP API：终止线程并等待它的返回值，最后回收线程资源
  * @param tcb: (I) 线程控制块对象的指针
- * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回被终止线程的返回值，
- *                 可为NULL，表示不需要返回
+ * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回子线程的返回值，
+ *                 可为NULL，表示不需要获取返回值
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -EALREADY: 线程在此之前已经退出
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
- * - 重入性：可重入
+ * - 重入性：不可重入
  * @note
- * - 此函数通常由父线程调用，用于终止子线程：父线程会一直阻塞等待子线程退出，
- *   并获取子线程的返回值，此函数类似于POSIX线程库中的pthread_join()函数。
- * - 注意：与其他操作系统不同（POSIX的pthread_join()和Linux的kthread_stop()），
- *   玄武OS的线程在此函数调用之前就返回并不会引起错误，此函数的返回值是
- *   小于0的错误码，指针trc指向的缓冲区依然可以获取线程之前的返回值。
+ * - 此函数由父线程调用，用于终止Joinable的子线程，父线程会一直阻塞等待子线程退出，
+ *   并获取子线程的返回值，最后释放子线程资源，此函数类似于POSIX线程库
+ *   中的pthread_cancel() + pthread_join()组合；
+ * - 子线程收到终止信号后，并不会立即退出，退出的时机由子线程自己控制；
+ * - 不可对Detached态的线程使用此函数。
  */
 __xwmp_api
-xwer_t xwmp_thrd_terminate(struct xwmp_tcb * tcb, xwer_t * trc)
+xwer_t xwmp_thrd_stop(struct xwmp_tcb * tcb, xwer_t * trc)
 {
         struct xwos_cblk lockcb;
         xwsq_t lkst;
@@ -678,14 +686,25 @@ xwer_t xwmp_thrd_terminate(struct xwmp_tcb * tcb, xwer_t * trc)
 
         XWOS_VALIDATE((NULL != tcb), "nullptr", -EFAULT);
 
-        lockcb.unlock = (xwer_t (*)(void *))xwmp_thrd_terminate_unlock_cb;
+        rc = xwmp_thrd_grab(tcb);
+        if (rc < 0) {
+                goto err_thrd_grab;
+        }
+        lockcb.unlock = (xwer_t (*)(void *))xwmp_thrd_stop_unlock_cb;
         lockcb.lock = NULL;
         xwmp_splk_lock_cpuirqsv(&tcb->stlock, &cpuirq);
-        if (XWMP_SKDOBJ_DST_STANDBY & tcb->state) {
-                rc = -EALREADY;
+        if (XWMP_SKDOBJ_DST_DETACHED & tcb->state) {
+                xwmp_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);
+                xwmp_thrd_put(tcb);
+                rc = -EINVAL;
+        } else if (XWMP_SKDOBJ_DST_STANDBY & tcb->state) {
+                xwmp_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);
+                rc = XWOK;
                 if (!is_err_or_null(trc)) {
                         *trc = (xwer_t)tcb->stack.arg;
                 }
+                xwmp_thrd_put(tcb);
+                xwmp_thrd_delete(tcb);
         } else {
                 xwbop_s1m(xwsq_t, &tcb->state, XWMP_SKDOBJ_DST_EXITING);
                 rc = xwmp_cond_wait(&tcb->completion,
@@ -695,64 +714,171 @@ xwer_t xwmp_thrd_terminate(struct xwmp_tcb * tcb, xwer_t * trc)
                         if (!is_err_or_null(trc)) {
                                 *trc = (xwer_t)tcb->stack.arg;
                         }
-                } else {
-                        if (XWOS_LKST_LOCKED == lkst) {
-                                xwmp_splk_unlock(&tcb->stlock);
-                        }
+                }
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                        xwmp_splk_lock(&tcb->stlock);
+                }
+                xwmp_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);
+                xwmp_thrd_put(tcb);
+                if (XWOK == rc) {
+                        xwmp_thrd_delete(tcb);
                 }
         }
-        xwospl_cpuirq_restore_lc(cpuirq);
 
+err_thrd_grab:
         return rc;
 }
 
 /**
- * @brief XWMP API：判断线程是否可以退出，若不是，线程就阻塞直到它被终止
+ * @brief XWMP API：取消线程
+ * @param tcb: (I) 线程控制块对象的指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ * @note
+ * - 此函数功能类似于pthread_cancel()，通知子线程退出；
+ * - 此函数可中断子线程的阻塞态与睡眠态；
+ * - 此函数与xwmp_thrd_stop()不同，不会阻塞调用者，也不会回收子线程资源，因此
+ *   可在中断中调用。
+ */
+__xwmp_api
+xwer_t xwmp_thrd_cancel(struct xwmp_tcb * tcb)
+{
+        xwreg_t cpuirq;
+        xwer_t rc;
+
+        XWOS_VALIDATE((NULL != tcb), "nullptr", -EFAULT);
+
+        rc = xwmp_thrd_grab(tcb);
+        if (rc < 0) {
+                goto err_thrd_grab;
+        }
+        xwmp_splk_lock_cpuirqsv(&tcb->stlock, &cpuirq);
+        if (XWMP_SKDOBJ_DST_STANDBY & tcb->state) {
+                xwmp_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);
+                rc = XWOK;
+        } else {
+                xwbop_s1m(xwsq_t, &tcb->state, XWMP_SKDOBJ_DST_EXITING);
+                xwmp_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);
+                xwmp_thrd_intr(tcb);
+        }
+        xwmp_thrd_put(tcb);
+
+err_thrd_grab:
+        return rc;
+}
+
+/**
+ * @brief XWMP API：等待线程结束并获取它的返回值，最后回收线程资源
+ * @param tcb: (I) 线程控制块对象的指针
+ * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回子线程的返回值，
+ *                 可为NULL，表示不需要获取返回值
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EINVAL: 线程不是Joinable的
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
- * - 重入性：可重入
+ * - 重入性：不可重入
  * @note
- * - 此函数由子线程调用，等待父线程发出退出信号。
- * - 在父线程需要同步获取子线程运行结果的应用场景，子线程不可在父线程
- *   调用@ref xwmp_thrd_terminate()前退出。但有时子线程运行得很快，
- *   即将退出，父线程此时还没来得及调用xwmp_thrd_terminate()。子线程通过调用
- *   此函数阻塞自身并等待父线程调用@ref xwmp_thrd_terminate()。
- * - 如果父线程不关心子线程的返回值，也不会调用@ref xwmp_thrd_terminate()，
- *   子线程可以直接退出。
+ * - 此函数由父线程调用，父线程会一直阻塞等待子线程退出，
+ *   并获取子线程的返回值，最后释放子线程资源，此函数类似于POSIX线程库
+ *   pthread_join()函数；
+ * - 不可对Detached态的线程使用此函数；
+ * - 此函数与xwos_thrd_stop()不同，只会等待子线程退出，不会通知子线程退出。
  */
 __xwmp_api
-void xwmp_cthrd_wait_exit(void)
+xwer_t xwmp_thrd_join(struct xwmp_tcb * tcb, xwer_t * trc)
 {
-        struct xwmp_tcb * ctcb;
-        xwpr_t dprio;
+        xwsq_t lkst;
         xwreg_t cpuirq;
+        xwer_t rc;
 
-        ctcb = xwmp_skd_get_ctcb_lc();
-        xwmp_splk_lock_cpuirqsv(&ctcb->wqn.lock, &cpuirq);
-        xwmp_splk_lock(&ctcb->stlock);
-        while (!(XWMP_SKDOBJ_DST_EXITING & ctcb->state)) {
-                dprio = ctcb->dprio.r;
-                xwbop_c0m(xwsq_t, &ctcb->state, XWMP_SKDOBJ_DST_RUNNING);
-                ctcb->dprio.r = XWMP_SKD_PRIORITY_INVALID;
-                ctcb->dprio.wq = dprio;
-                xwbop_s1m(xwsq_t, &ctcb->state, XWMP_SKDOBJ_DST_BLOCKING);
-                xwmp_splk_unlock(&ctcb->stlock);
-                ctcb->wqn.type = XWMP_WQTYPE_NULL;
-                xwaop_store(xwsq, &ctcb->wqn.reason,
-                            xwmb_modr_release, XWMP_WQN_REASON_UNKNOWN);
-                ctcb->wqn.wq = NULL;
-                ctcb->wqn.cb = xwmp_thrd_wqn_callback;
-                xwmp_splk_unlock_cpuirq(&ctcb->wqn.lock);
-                xwmp_skd_req_swcx(ctcb->xwskd);
-                if (xwmp_cthrd_shld_frz()) {
-                        xwmp_cthrd_freeze();
-                }
-                xwmp_splk_lock_cpuirq(&ctcb->wqn.lock);
-                xwmp_splk_lock(&ctcb->stlock);
+        XWOS_VALIDATE((NULL != tcb), "nullptr", -EFAULT);
+
+        rc = xwmp_thrd_grab(tcb);
+        if (rc < 0) {
+                goto err_thrd_grab;
         }
-        xwmp_splk_unlock(&ctcb->stlock);
-        xwmp_splk_unlock_cpuirqrs(&ctcb->wqn.lock, cpuirq);
+        xwmp_splk_lock_cpuirqsv(&tcb->stlock, &cpuirq);
+        if (XWMP_SKDOBJ_DST_DETACHED & tcb->state) {
+                xwmp_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);
+                xwmp_thrd_put(tcb);
+                rc = -EINVAL;
+        } else if (XWMP_SKDOBJ_DST_STANDBY & tcb->state) {
+                xwmp_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);
+                rc = XWOK;
+                if (!is_err_or_null(trc)) {
+                        *trc = (xwer_t)tcb->stack.arg;
+                }
+                xwmp_thrd_put(tcb);
+                xwmp_thrd_delete(tcb);
+        } else {
+                rc = xwmp_cond_wait(&tcb->completion,
+                                    &tcb->stlock, XWOS_LK_SPLK, NULL,
+                                    &lkst);
+                if (XWOK == rc) {
+                        if (!is_err_or_null(trc)) {
+                                *trc = (xwer_t)tcb->stack.arg;
+                        }
+                } else {
+                }
+                if (XWOS_LKST_UNLOCKED == lkst) {
+                        xwmp_splk_lock(&tcb->stlock);
+                }
+                xwmp_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);
+                xwmp_thrd_put(tcb);
+                if (XWOK == rc) {
+                        xwmp_thrd_delete(tcb);
+                }
+        }
+
+err_thrd_grab:
+        return rc;
+}
+
+/**
+ * @brief XWMP API：分离线程
+ * @param tcb: (I) 线程控制块对象的指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ * @note
+ * - 此函数功能类似于pthread_detach()，处于分离态的线程退出后，系统自动回收资源，
+ *   不需要父线程join()或stop()。
+ */
+__xwmp_api
+xwer_t xwmp_thrd_detach(struct xwmp_tcb * tcb)
+{
+        xwreg_t cpuirq;
+        xwer_t rc;
+
+        XWOS_VALIDATE((NULL != tcb), "nullptr", -EFAULT);
+
+        rc = xwmp_thrd_grab(tcb);
+        if (rc < 0) {
+                goto err_thrd_grab;
+        }
+        xwmp_splk_lock_cpuirqsv(&tcb->stlock, &cpuirq);
+        xwbop_s1m(xwsq_t, &tcb->state, XWMP_SKDOBJ_DST_DETACHED);
+        if (XWMP_SKDOBJ_DST_STANDBY & tcb->state) {
+                xwmp_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);
+                xwmp_thrd_put(tcb);
+                xwmp_thrd_delete(tcb);
+        } else {
+                tcb->attribute |= XWMP_SKDATTR_DETACHED;
+                xwmp_splk_unlock_cpuirqrs(&tcb->stlock, cpuirq);
+                xwmp_thrd_put(tcb);
+        }
+
+err_thrd_grab:
+        return rc;
 }
 
 /**
@@ -1323,6 +1449,7 @@ xwer_t xwmp_thrd_do_unlock(void * lock, xwsq_t lktype, void * lkdata)
                         rc = ulk.cb->unlock(lkdata);
                 }
                 break;
+        case XWOS_LK_NONE:
         default:
                 break;
         }
@@ -1374,6 +1501,7 @@ xwer_t xwmp_thrd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm, void * lkdat
                         rc = ulk.cb->lock(lkdata);
                 }
                 break;
+        case XWOS_LK_NONE:
         default:
                 break;
         }
@@ -1758,8 +1886,7 @@ bool xwmp_cthrd_shld_frz(void)
  * - 上下文：线程
  * - 重入性：可重入
  * @note
- * - 此函数类似于@ref xwmp_cthrd_wait_exit()，但不会阻塞，只会立即返回
- *   true或false，通常用在线程主循环的循环条件中。例如：
+ * - 此函数常用在线程主循环的循环条件中。例如：
  * ```C
  * xwer_t thread_main(void * arg)
  * {

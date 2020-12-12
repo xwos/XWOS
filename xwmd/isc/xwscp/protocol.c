@@ -22,7 +22,7 @@
 #include <xwos/osal/sync/cond.h>
 #include <xwmd/isc/xwscp/protocol.h>
 #include <xwmd/isc/xwscp/hwifal.h>
-#include <xwmd/isc/xwscp/api.h>
+#include <xwmd/isc/xwscp/mif.h>
 
 /**
  * @brief 同步帧的模板
@@ -684,11 +684,9 @@ xwer_t xwscp_thrd(struct xwscp * xwscp)
                                 xwscplogf(WARNING, "Bad frame! \n");
                         } else {
                                 xwscplogf(ERR, "xwscp_fsm() ... [rc:%d]\n", rc);
-                                xwos_cthrd_wait_exit();
                                 break;
                         }
                 } else {
-                        xwos_cthrd_wait_exit();
                         break;
                 }
         }

@@ -250,9 +250,9 @@ xwer_t example_sel_start(void)
         return XWOK;
 
 err_syncthrd_create:
-        xwos_thrd_terminate(xwseldemo_producer, NULL);
+        xwos_thrd_cancel(xwseldemo_producer);
 err_producer_create:
-        xwos_thrd_terminate(xwseldemo_consumer, NULL);
+        xwos_thrd_cancel(xwseldemo_consumer);
 err_consumer_create:
         xwos_br_unbind(&xwseldemo_br7, &xwseldemo_sel4);
 err_br7_bind:

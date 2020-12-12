@@ -96,7 +96,7 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
                    const struct xwpcp_hwifal_operation * hwifops,
                    void * hwifcb)
 {
-        xwer_t rc, childrc;
+        xwer_t rc;
         struct xwmm_bma * slotpool;
         xwssq_t i, j;
 
@@ -203,7 +203,7 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         return XWOK;
 
 err_txthrd_create:
-        xwos_thrd_terminate(xwpcp->rxtid, &childrc);
+        xwos_thrd_cancel(xwpcp->rxtid);
         xwos_thrd_delete(xwpcp->rxtid);
         xwpcp->rxtid = 0;
 err_rxthrd_create:
@@ -248,21 +248,21 @@ xwer_t xwpcp_stop(struct xwpcp * xwpcp)
 
         XWPCP_VALIDATE((xwpcp), "nullptr", -EFAULT);
 
-        rc = xwos_thrd_terminate(xwpcp->txtid, &childrc);
+        rc = xwos_thrd_stop(xwpcp->txtid, &childrc);
         if (XWOK == rc) {
                 rc = xwos_thrd_delete(xwpcp->txtid);
                 if (XWOK == rc) {
                         xwpcp->txtid = 0;
-                        xwpcplogf(INFO, "Terminate XWPCP TX thread... [OK]\n");
+                        xwpcplogf(INFO, "Stop XWPCP TX thread... [OK]\n");
                 }
         }
 
-        rc = xwos_thrd_terminate(xwpcp->rxtid, &childrc);
+        rc = xwos_thrd_stop(xwpcp->rxtid, &childrc);
         if (XWOK == rc) {
                 rc = xwos_thrd_delete(xwpcp->rxtid);
                 if (XWOK == rc) {
                         xwpcp->rxtid = 0;
-                        xwpcplogf(INFO, "Terminate XWPCP RX thread... [OK]\n");
+                        xwpcplogf(INFO, "Stop XWPCP RX thread... [OK]\n");
                 }
         }
 
