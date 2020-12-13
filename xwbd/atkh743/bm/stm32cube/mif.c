@@ -125,9 +125,13 @@ void stm32cube_init(void)
            若SDRAM、QSPI Flash等可映射到内存地址上的器件未初始化完成，
            开启Cache可能会因为Cache的预取操作去访问这些器件导致宕机。
          */
+#if defined(STM32CUBECFG_ICACHE) && (1 == STM32CUBECFG_ICACHE)
         SCB_EnableICache();
+#endif /* STM32CUBECFG_ICACHE */
+#if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
         SCB_EnableDCache();
         SCB_CleanInvalidateDCache();
+#endif /* STM32CUBECFG_DCACHE */
 
         rc = xwmm_mempool_init(sdram_mempool, "SDRAM",
                                (xwptr_t)sdram_mr_origin,

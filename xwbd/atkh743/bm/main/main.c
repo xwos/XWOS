@@ -21,7 +21,6 @@
 #include <xwos/osal/skd.h>
 #include <xwmd/libc/newlibac/mif.h>
 #include <xwem/vm/lua/mif.h>
-#include <xwam/example/xwlib/crc/mif.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/mif.h>
 #include <bm/pm/mif.h>
@@ -87,8 +86,6 @@ xwer_t main_thrd(void * arg)
         if (rc < 0) {
                 goto err_newlibac_init;
         }
-
-        example_crc_start();
 
         rc = child_thrd_start();
         if (rc < 0) {
