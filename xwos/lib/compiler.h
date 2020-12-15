@@ -47,6 +47,10 @@
 #include <cfg/XuanWuOS.h>
 #include <arch_compiler.h>
 
+#ifndef __XWOS_COMPILER__
+  #error "Unknown compiler!"
+#endif
+
 #ifndef __xwos_init_code
   #define __xwos_init_code
 #endif
@@ -321,10 +325,6 @@
 
 #ifndef __xwcd_data
   #define __xwcd_data           __xwos_data
-#endif
-
-#ifndef __XWOS_COMPILER__
-  #error "Unknown compiler!"
 #endif
 
 /**

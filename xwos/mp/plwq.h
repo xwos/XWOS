@@ -18,7 +18,7 @@
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/wqn.h>
 
-struct xwmp_tcb;
+struct xwmp_thd;
 
 /**
  * @brief 管道等待队列

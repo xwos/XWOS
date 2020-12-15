@@ -39,33 +39,32 @@
 #define flglogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
 
-
 xwer_t xwflgdemo_consumer_func(void * arg);
 xwer_t xwflgdemo_producer_func(void * arg);
 
 struct xwos_flg xwsltdemo_flg;
 
-const struct xwos_thrd_desc xwflgdemo_consumer_td = {
+const struct xwos_thd_desc xwflgdemo_consumer_td = {
         .name = "example.flag.consumer",
         .prio = XWFLGDEMO_CONSUMER_PRIORITY,
-        .stack = XWOS_THRD_STACK_DYNAMIC,
+        .stack = XWOS_THD_STACK_DYNAMIC,
         .stack_size = 4096,
-        .func = (xwos_thrd_f)xwflgdemo_consumer_func,
+        .func = (xwos_thd_f)xwflgdemo_consumer_func,
         .arg = NULL,
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
-xwid_t xwflgdemo_consumer;
+xwos_thd_d xwflgdemo_consumer;
 
-const struct xwos_thrd_desc xwflgdemo_producer_td = {
+const struct xwos_thd_desc xwflgdemo_producer_td = {
         .name = "example.flag.producer",
         .prio = XWFLGDEMO_PRODUCER_PRIORITY,
-        .stack = XWOS_THRD_STACK_DYNAMIC,
+        .stack = XWOS_THD_STACK_DYNAMIC,
         .stack_size = 4096,
-        .func = (xwos_thrd_f)xwflgdemo_producer_func,
+        .func = (xwos_thd_f)xwflgdemo_producer_func,
         .arg = NULL,
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
-xwid_t xwflgdemo_producer;
+xwos_thd_d xwflgdemo_producer;
 
 /**
  * @brief 测试模块的启动函数
@@ -81,25 +80,25 @@ xwer_t example_flg_start(void)
         }
 
         /* 创建等待事件标志的线程 */
-        rc = xwos_thrd_create(&xwflgdemo_consumer,
-                              xwflgdemo_consumer_td.name,
-                              xwflgdemo_consumer_td.func,
-                              xwflgdemo_consumer_td.arg,
-                              xwflgdemo_consumer_td.stack_size,
-                              xwflgdemo_consumer_td.prio,
-                              xwflgdemo_consumer_td.attr);
+        rc = xwos_thd_create(&xwflgdemo_consumer,
+                             xwflgdemo_consumer_td.name,
+                             xwflgdemo_consumer_td.func,
+                             xwflgdemo_consumer_td.arg,
+                             xwflgdemo_consumer_td.stack_size,
+                             xwflgdemo_consumer_td.prio,
+                             xwflgdemo_consumer_td.attr);
         if (rc < 0) {
                 goto err_consumer_create;
         }
 
         /* 创建发布事件标志的线程 */
-        rc = xwos_thrd_create(&xwflgdemo_producer,
-                              xwflgdemo_producer_td.name,
-                              xwflgdemo_producer_td.func,
-                              xwflgdemo_producer_td.arg,
-                              xwflgdemo_producer_td.stack_size,
-                              xwflgdemo_producer_td.prio,
-                              xwflgdemo_producer_td.attr);
+        rc = xwos_thd_create(&xwflgdemo_producer,
+                             xwflgdemo_producer_td.name,
+                             xwflgdemo_producer_td.func,
+                             xwflgdemo_producer_td.arg,
+                             xwflgdemo_producer_td.stack_size,
+                             xwflgdemo_producer_td.prio,
+                             xwflgdemo_producer_td.attr);
         if (rc < 0) {
                 goto err_producer_create;
         }
@@ -108,7 +107,7 @@ xwer_t example_flg_start(void)
 
 
 err_producer_create:
-        xwos_thrd_cancel(xwflgdemo_consumer);
+        xwos_thd_cancel(xwflgdemo_consumer);
 err_consumer_create:
         xwos_flg_destroy(&xwsltdemo_flg);
 err_flg_init:
@@ -132,7 +131,7 @@ xwer_t xwflgdemo_consumer_func(void * arg)
 
         memset(msk, 0, sizeof(msk));
 
-        while (!xwos_cthrd_frz_shld_stop(NULL)) {
+        while (!xwos_cthd_frz_shld_stop(NULL)) {
                 msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
                 flglogf(INFO,
                         "[等待线程] 事件掩码：0x%X，"
@@ -270,7 +269,7 @@ xwer_t xwflgdemo_consumer_func(void * arg)
         }
 
         flglogf(INFO, "[等待线程] 退出。\n");
-        xwos_thrd_delete(xwos_cthrd_id());
+        xwos_thd_delete(xwos_cthd_getd());
         return rc;
 }
 
@@ -289,10 +288,10 @@ xwer_t xwflgdemo_producer_func(void * arg)
         flglogf(INFO, "[触发线程] 启动。\n");
         memset(msk, 0, sizeof(msk));
 
-        while (!xwos_cthrd_frz_shld_stop(NULL)) {
+        while (!xwos_cthd_frz_shld_stop(NULL)) {
                 /* 休眠1000ms，让出CPU使用权 */
                 ts = 1000 * XWTM_MS;
-                xwos_cthrd_sleep(&ts);
+                xwos_cthd_sleep(&ts);
 
                 msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
                 /* 将事件位图掩码部分全部置1 */
@@ -313,7 +312,7 @@ xwer_t xwflgdemo_producer_func(void * arg)
 
                 /* 休眠1000ms，让出CPU使用权 */
                 ts = 1000 * XWTM_MS;
-                xwos_cthrd_sleep(&ts);
+                xwos_cthd_sleep(&ts);
 
                 /* 将事件位图的第3位置1 */
                 rc = xwos_flg_s1i(&xwsltdemo_flg, 3);
@@ -333,7 +332,7 @@ xwer_t xwflgdemo_producer_func(void * arg)
 
                 /* 休眠1000ms，让出CPU使用权 */
                 ts = 1000 * XWTM_MS;
-                xwos_cthrd_sleep(&ts);
+                xwos_cthd_sleep(&ts);
 
                 msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
                 /* 将事件位图掩码部分全部清0 */
@@ -354,7 +353,7 @@ xwer_t xwflgdemo_producer_func(void * arg)
 
                 /* 休眠1000ms，让出CPU使用权 */
                 ts = 1000 * XWTM_MS;
-                xwos_cthrd_sleep(&ts);
+                xwos_cthd_sleep(&ts);
 
                 /* 将事件位图的第7位清0 */
                 rc = xwos_flg_c0i(&xwsltdemo_flg, 7);
@@ -374,7 +373,7 @@ xwer_t xwflgdemo_producer_func(void * arg)
 
                 /* 休眠1000ms，让出CPU使用权 */
                 ts = 1000 * XWTM_MS;
-                xwos_cthrd_sleep(&ts);
+                xwos_cthd_sleep(&ts);
 
                 msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
                 /* 将事件位图掩码部分全部翻转 */
@@ -395,7 +394,7 @@ xwer_t xwflgdemo_producer_func(void * arg)
 
                 /* 休眠1000ms，让出CPU使用权 */
                 ts = 1000 * XWTM_MS;
-                xwos_cthrd_sleep(&ts);
+                xwos_cthd_sleep(&ts);
 
                 /* 将事件位图的第5位翻转 */
                 rc = xwos_flg_x1i(&xwsltdemo_flg, 5);
@@ -415,6 +414,6 @@ xwer_t xwflgdemo_producer_func(void * arg)
         }
 
         flglogf(INFO, "[触发线程] 退出。\n");
-        xwos_thrd_delete(xwos_cthrd_id());
+        xwos_thd_delete(xwos_cthd_getd());
         return rc;
 }

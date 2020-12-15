@@ -24,9 +24,9 @@
 #define XWMP_SEM_NEGTIVE              ((xwssq_t)(-1))
 
 #if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
-  #define XWMP_SEM_API(api, ...) xwmp_rtsem_##api(__VA_ARGS__)
+#define XWMP_SEM_API(api, ...) xwmp_rtsem_##api(__VA_ARGS__)
 #elif defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
-  #define XWMP_SEM_API(api, ...) xwmp_plsem_##api(__VA_ARGS__)
+#define XWMP_SEM_API(api, ...) xwmp_plsem_##api(__VA_ARGS__)
 #endif
 
 struct xwmp_evt;

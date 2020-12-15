@@ -21,10 +21,10 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_SYNC_EVT_MEMSLICE) && (1 == XWMPCFG_SYNC_EVT_MEMSLICE)
-  #include <xwos/mm/memslice.h>
+#include <xwos/mm/memslice.h>
 #endif /* XWMPCFG_SYNC_EVT_MEMSLICE */
 #include <xwos/ospl/irq.h>
-#include <xwos/mp/thrd.h>
+#include <xwos/mp/thd.h>
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/sync/obj.h>
 #include <xwos/mp/sync/cond.h>
@@ -168,7 +168,7 @@ void xwmp_evt_free(struct xwmp_evt * evt)
 static __xwmp_code
 void xwmp_evt_construct(struct xwmp_evt * evt)
 {
-        xwmp_synobj_construct(&evt->cond.synobj, XWOS_OBJ_EVT);
+        xwmp_synobj_construct(&evt->cond.synobj);
 }
 
 /**
@@ -867,7 +867,7 @@ xwer_t xwmp_evt_trywait_edge(struct xwmp_evt * evt, xwsq_t trigger,
  * @retval -ETYPE: 事件对象类型错误
  * @retval -EINVAL: 参数无效
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -1140,7 +1140,7 @@ xwer_t xwmp_evt_timedwait_edge(struct xwmp_evt * evt, xwsq_t trigger,
  * @retval -EINVAL: 参数无效
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -1161,8 +1161,8 @@ xwer_t xwmp_evt_timedwait(struct xwmp_evt * evt,
         XWOS_VALIDATE(((evt->attr & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_FLG),
                       "type-error", -ETYPE);
         XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHRD == xwmp_irq_get_id(NULL)),
-                      "not-in-thrd", -ENOTINTHRD);
+        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)),
+                      "not-in-thd", -ENOTINTHD);
 
         rc = xwmp_evt_grab(evt);
         if (rc < 0) {
@@ -1371,7 +1371,7 @@ err_evt_grab:
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 事件对象类型错误
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -1456,7 +1456,7 @@ err_evt_grab:
  * @retval -ETYPE: 事件对象类型错误
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -1478,8 +1478,8 @@ xwer_t xwmp_evt_timedselect(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
         XWOS_VALIDATE(((evt->attr & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_SEL),
                       "type-error", -ETYPE);
         XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHRD == xwmp_irq_get_id(NULL)),
-                      "not-in-thrd", -ENOTINTHRD);
+        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)),
+                      "not-in-thd", -ENOTINTHD);
 
         rc = xwmp_evt_grab(evt);
         if (rc < 0) {
@@ -1543,7 +1543,7 @@ err_evt_grab:
  * @retval -ECHRNG: 位置超出范围
  * @retval -ETYPE: 事件对象类型错误
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -1571,7 +1571,7 @@ xwer_t xwmp_evt_sync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t sync[])
  * @retval -ECHRNG: 位置超出范围
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -1594,8 +1594,8 @@ xwer_t xwmp_evt_timedsync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t sync[],
         XWOS_VALIDATE(((evt->attr & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_BR),
                       "type-error", -ETYPE);
         XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHRD == xwmp_irq_get_id(NULL)),
-                      "not-in-thrd", -ENOTINTHRD);
+        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)),
+                      "not-in-thd", -ENOTINTHD);
 
         rc = xwmp_evt_grab(evt);
         if (__xwcc_unlikely(rc < 0)) {
@@ -1609,7 +1609,7 @@ xwer_t xwmp_evt_timedsync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t sync[],
                 xwbmpop_c0i(evt->bmp, pos);
                 xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                 xwmp_cond_broadcast(&evt->cond);
-                xwmp_cthrd_yield();
+                xwmp_cthd_yield();
                 rc = XWOK;
         } else {
                 rc = xwmp_cond_timedwait(&evt->cond,

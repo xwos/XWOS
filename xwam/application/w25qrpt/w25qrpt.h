@@ -23,6 +23,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
+#include <xwos/osal/skd.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/device.h>
 #include <xwam/application/w25qrpt/hwifal.h>
 
@@ -39,7 +40,7 @@
  */
 struct w25qrpt {
         const char * name; /**< 名字 */
-        xwid_t tid; /**< 线程ID */
+        xwos_thd_d thdd; /**< 线程描述符 */
         struct xwds_w25qxx * flash; /**< Flash */
         xwsq_t hwifst; /**< 硬件接口抽象层状态 */
         const struct w25qrpt_hwifal_operations * hwifops; /**< 硬件接口抽象层操作函数 */

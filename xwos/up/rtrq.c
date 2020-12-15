@@ -15,7 +15,7 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/up/skd.h>
-#include <xwos/up/thrd.h>
+#include <xwos/up/thd.h>
 #include <xwos/up/rtrq.h>
 
 /**
@@ -37,7 +37,7 @@ void xwup_rtrq_init(struct xwup_rtrq * xwrtrq)
 /**
  * @brief 将线程加入到实时就绪队列的头部
  * @param xwrtrq: (I) XWOS UP内核的实时就绪队列
- * @param tcb: (I) 线程控制块的指针
+ * @param thd: (I) 线程控制块的指针
  * @retval XWOK: 没有错误
  * @retval -EPERM: 线程没有设置状态标志@ref XWUP_SKDOBJ_DST_READY
  * @note
@@ -48,12 +48,12 @@ void xwup_rtrq_init(struct xwup_rtrq * xwrtrq)
  * - 这个函数只能在临界区中调用。
  */
 __xwup_code
-void xwup_rtrq_add_head(struct xwup_rtrq * xwrtrq, struct xwup_tcb * tcb)
+void xwup_rtrq_add_head(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
 {
         xwpr_t prio;
 
-        prio = tcb->prio.d;
-        xwlib_bclst_add_head(&xwrtrq->q[prio], &tcb->rqnode);
+        prio = thd->prio.d;
+        xwlib_bclst_add_head(&xwrtrq->q[prio], &thd->rqnode);
         if (!xwbmpop_t1i(xwrtrq->bmp, (xwsq_t)prio)) {
                 xwbmpop_s1i(xwrtrq->bmp, (xwsq_t)prio);
                 if (xwrtrq->top < prio) {
@@ -66,7 +66,7 @@ void xwup_rtrq_add_head(struct xwup_rtrq * xwrtrq, struct xwup_tcb * tcb)
 /**
  * @brief 将线程加入到实时就绪队列的尾部
  * @param xwrtrq: (I) XWOS UP内核的实时就绪队列
- * @param tcb: (I) 线程控制块的指针
+ * @param thd: (I) 线程控制块的指针
  * @retval XWOK: 没有错误
  * @retval -EPERM: 线程没有设置状态标志@ref XWUP_SKDOBJ_DST_READY
  * @note
@@ -77,12 +77,12 @@ void xwup_rtrq_add_head(struct xwup_rtrq * xwrtrq, struct xwup_tcb * tcb)
  * - 这个函数只能在临界区中调用。
  */
 __xwup_code
-void xwup_rtrq_add_tail(struct xwup_rtrq * xwrtrq, struct xwup_tcb * tcb)
+void xwup_rtrq_add_tail(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
 {
         xwpr_t prio;
 
-        prio = tcb->prio.d;
-        xwlib_bclst_add_tail(&xwrtrq->q[prio], &tcb->rqnode);
+        prio = thd->prio.d;
+        xwlib_bclst_add_tail(&xwrtrq->q[prio], &thd->rqnode);
         if (!xwbmpop_t1i(xwrtrq->bmp, (xwsq_t)prio)) {
                 xwbmpop_s1i(xwrtrq->bmp, (xwsq_t)prio);
                 if (xwrtrq->top < prio) {
@@ -94,17 +94,17 @@ void xwup_rtrq_add_tail(struct xwup_rtrq * xwrtrq, struct xwup_tcb * tcb)
 /**
  * @brief 将线程从实时就绪队列中删除
  * @param xwrtrq: (I) XWOS UP内核的实时就绪队列
- * @param tcb: (I) 线程控制块的指针
+ * @param thd: (I) 线程控制块的指针
  * @note
  * - 这个函数只能在临界区中调用。
  */
 __xwup_code
-void xwup_rtrq_remove(struct xwup_rtrq * xwrtrq, struct xwup_tcb * tcb)
+void xwup_rtrq_remove(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
 {
         xwpr_t prio;
 
-        prio = tcb->prio.d;
-        xwlib_bclst_del_init(&tcb->rqnode);
+        prio = thd->prio.d;
+        xwlib_bclst_del_init(&thd->rqnode);
         if (xwlib_bclst_tst_empty(&xwrtrq->q[prio])) {
                 xwbmpop_c0i(xwrtrq->bmp, (xwsq_t)prio);
                 prio = (xwpr_t)xwbmpop_fls(xwrtrq->bmp, XWUP_RTRQ_QNUM);
@@ -124,15 +124,15 @@ void xwup_rtrq_remove(struct xwup_rtrq * xwrtrq, struct xwup_tcb * tcb)
  * - 这个函数只能在临界区中调用。
  */
 __xwup_code
-struct xwup_tcb * xwup_rtrq_choose(struct xwup_rtrq * xwrtrq)
+struct xwup_thd * xwup_rtrq_choose(struct xwup_rtrq * xwrtrq)
 {
-        struct xwup_tcb * t;
+        struct xwup_thd * t;
 
         if (XWUP_SKD_PRIORITY_INVALID == xwrtrq->top) {
                 t = NULL;
         } else {
                 t = xwlib_bclst_first_entry(&xwrtrq->q[xwrtrq->top],
-                                            struct xwup_tcb,
+                                            struct xwup_thd,
                                             rqnode);
         }
         return t;

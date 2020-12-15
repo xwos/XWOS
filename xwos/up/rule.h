@@ -15,24 +15,24 @@
 
 #include <cfg/XuanWuOS.h>
 
-#if defined(XWUPCFG_SKD_THRD_EXIT) && (1 == XWUPCFG_SKD_THRD_EXIT)
+#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
   #if !defined(XWUPCFG_SYNC_COND) || (0 == XWUPCFG_SYNC_COND)
-    #error "XWUPCFG_SYNC_COND must be '1' when (XWUPCFG_SKD_THRD_EXIT == 1) !"
+    #error "XWUPCFG_SYNC_COND must be '1' when (XWUPCFG_SKD_THD_EXIT == 1) !"
   #endif /* !XWUPCFG_SYNC_COND */
-#endif /* XWUPCFG_SKD_THRD_EXIT */
+#endif /* XWUPCFG_SKD_THD_EXIT */
 
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
   #if !defined(XWUPCFG_SYNC_COND) || (0 == XWUPCFG_SYNC_COND)
-    #error "XWUPCFG_SYNC_EVT must be '1' when (XWUPCFG_SKD_THRD_EXIT == 1) !"
+    #error "XWUPCFG_SYNC_EVT must be '1' when (XWUPCFG_SKD_THD_EXIT == 1) !"
   #endif /* !XWUPCFG_SYNC_COND */
 #endif /* XWUPCFG_SYNC_EVT */
 
 #if defined(XWUPCFG_SYNC_COND) && (1 == XWUPCFG_SYNC_COND)
-  #define XWUPRULE_SKD_THRD_DO_LOCK             1
-  #define XWUPRULE_SKD_THRD_DO_UNLOCK           1
+  #define XWUPRULE_SKD_THD_DO_LOCK              1
+  #define XWUPRULE_SKD_THD_DO_UNLOCK            1
 #else
-  #define XWUPRULE_SKD_THRD_DO_LOCK             0
-  #define XWUPRULE_SKD_THRD_DO_UNLOCK           0
+  #define XWUPRULE_SKD_THD_DO_LOCK              0
+  #define XWUPRULE_SKD_THD_DO_UNLOCK            0
 #endif
 
 #if (defined(XWUPCFG_SYNC_PLSEM) && (1 == XWUPCFG_SYNC_PLSEM))
@@ -52,9 +52,9 @@
 #endif
 
 #if (defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM))
-  #define XWUPRULE_SKD_THRD_FREEZE              1
+  #define XWUPRULE_SKD_THD_FREEZE               1
 #else
-  #define XWUPRULE_SKD_THRD_FREEZE              0
+  #define XWUPRULE_SKD_THD_FREEZE               0
 #endif
 
 #endif /* xwos/up/rule.h */

@@ -26,15 +26,15 @@ XWOS_CSRCS += mp/init.c
 XWOS_CSRCS += mp/irq.c
 
 ######## ######## ######## ######## scheduler ######## ######## ######## ########
-XWOS_CSRCS += mp/skd.c
 XWOS_CSRCS += mp/rtrq.c
 XWOS_CSRCS += mp/bh.c
 XWOS_CSRCS += mp/tt.c
-XWOS_CSRCS += mp/pm.c
-XWOS_CSRCS += mp/thrd.c
 XWOS_CSRCS += mp/wqn.c
 XWOS_CSRCS += mp/rtwq.c
 XWOS_CSRCS += mp/plwq.c
+XWOS_CSRCS += mp/skd.c
+XWOS_CSRCS += mp/thd.c
+XWOS_CSRCS += mp/pm.c
 XWOS_CSRCS += mp/mtxtree.c
 
 ######## ######## ######## ######## swt ######## ######## ######## ########

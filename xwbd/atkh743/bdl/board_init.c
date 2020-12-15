@@ -23,7 +23,7 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/bma.h>
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/thrd.h>
+  #include <xwos/mp/thd.h>
   #include <xwos/mp/swt.h>
   #include <xwos/mp/sync/sem.h>
   #include <xwos/mp/sync/cond.h>
@@ -106,14 +106,14 @@ xwer_t sys_mm_init(void)
 #if defined(XuanWuOS_CFG_CORE__mp)
         void * mem;
 
-        rc = xwmm_bma_alloc(dtcmheap_bma, BRDCFG_XWOS_THRD_CACHE_ODR, &mem);
+        rc = xwmm_bma_alloc(dtcmheap_bma, BRDCFG_XWOS_THD_CACHE_ODR, &mem);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_tcb_bma_alloc;
+                goto err_thd_bma_alloc;
         }
-        rc = xwmp_tcb_cache_init((xwptr_t)mem,
-                                 (DTCMHEAP_BLKSZ << BRDCFG_XWOS_THRD_CACHE_ODR));
+        rc = xwmp_thd_cache_init((xwptr_t)mem,
+                                 (DTCMHEAP_BLKSZ << BRDCFG_XWOS_THD_CACHE_ODR));
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_tcb_cache_init;
+                goto err_thd_cache_init;
         }
 
         rc = xwmm_bma_alloc(dtcmheap_bma, BRDCFG_XWOS_SWT_CACHE_ODR, &mem);
@@ -190,9 +190,9 @@ err_swt_cache_init:
         BDL_BUG();
 err_swt_bma_alloc:
         BDL_BUG();
-err_tcb_cache_init:
+err_thd_cache_init:
         BDL_BUG();
-err_tcb_bma_alloc:
+err_thd_bma_alloc:
         BDL_BUG();
 #endif /* XuanWuOS_CFG_CORE__mp */
 err_dtcmheap_bma_create:

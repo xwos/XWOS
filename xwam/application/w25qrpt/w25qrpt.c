@@ -30,22 +30,22 @@
 #include <xwam/application/w25qrpt/w25qrpt.h>
 #include <xwam/application/w25qrpt/hwifal.h>
 #include <xwam/application/w25qrpt/protocol.h>
-#include <xwam/application/w25qrpt/api.h>
+#include <xwam/application/w25qrpt/mif.h>
 
-#define W25QRPT_THRD_PRIORITY \
+#define W25QRPT_THD_PRIORITY \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
-xwer_t w25qrpt_thrd_func(void * arg);
+xwer_t w25qrpt_thd_func(void * arg);
 
 /**
  * @brief 线程描述表
  */
-const struct xwos_thrd_desc w25qrpt_tbd = {
-        .name = "w25qrpt.thrd",
-        .prio = W25QRPT_THRD_PRIORITY,
-        .stack = XWOS_THRD_STACK_DYNAMIC,
+const struct xwos_thd_desc w25qrpt_tbd = {
+        .name = "w25qrpt.thd",
+        .prio = W25QRPT_THD_PRIORITY,
+        .stack = XWOS_THD_STACK_DYNAMIC,
         .stack_size = 4096,
-        .func = (xwos_thrd_f)w25qrpt_thrd_func,
+        .func = (xwos_thd_f)w25qrpt_thd_func,
         .arg = NULL, /* TBD */
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
@@ -91,19 +91,19 @@ xwer_t w25qrpt_start(struct w25qrpt * w25qrpt,
                 goto err_hwifal_open;
         }
 
-        rc = xwos_thrd_create(&w25qrpt->tid,
-                              w25qrpt_tbd.name,
-                              w25qrpt_tbd.func,
-                              w25qrpt,
-                              w25qrpt_tbd.stack_size,
-                              w25qrpt_tbd.prio,
-                              w25qrpt_tbd.attr);
+        rc = xwos_thd_create(&w25qrpt->thdd,
+                             w25qrpt_tbd.name,
+                             w25qrpt_tbd.func,
+                             w25qrpt,
+                             w25qrpt_tbd.stack_size,
+                             w25qrpt_tbd.prio,
+                             w25qrpt_tbd.attr);
         if (rc < 0) {
-                goto err_thrd_create;
+                goto err_thd_create;
         }
         return XWOK;
 
-err_thrd_create:
+err_thd_create:
         w25qrpt_hwifal_close(w25qrpt);
 err_hwifal_open:
 err_flash_init_parameter:
@@ -120,15 +120,9 @@ xwer_t w25qrpt_stop(struct w25qrpt * w25qrpt)
 
         XWOS_VALIDATE((w25qrpt), "nullptr", -EFAULT);
 
-        rc = xwos_thrd_stop(w25qrpt->tid, &childrc);
-        if (XWOK == rc) {
-                rc = xwos_thrd_delete(w25qrpt->tid);
-                if (XWOK == rc) {
-                        w25qrpt->tid = 0;
-                }
-        }
+        rc = xwos_thd_stop(w25qrpt->thdd, &childrc);
         w25qrpt_hwifal_close(w25qrpt);
-        return XWOK;
+        return rc;
 }
 
 /**
@@ -957,20 +951,20 @@ xwer_t w25qrpt_fsm(struct w25qrpt * w25qrpt)
 /**
  * @brief W25Qxx编程器线程的主函数
  */
-xwer_t w25qrpt_thrd_func(void * arg)
+xwer_t w25qrpt_thd_func(void * arg)
 {
         xwer_t rc = XWOK;
         struct w25qrpt * w25qrpt;
 
         rc = XWOK;
         w25qrpt = arg;
-        while (!xwos_cthrd_shld_stop()) {
-                if (xwos_cthrd_shld_frz()) {
+        while (!xwos_cthd_shld_stop()) {
+                if (xwos_cthd_shld_frz()) {
                         w25qrptlogf(DEBUG, "开始冻结 ...\n");
-                        rc = xwos_cthrd_freeze();
+                        rc = xwos_cthd_freeze();
                         if (__xwcc_unlikely(rc < 0)) {
                                 w25qrptlogf(ERR, "冻结失败 ... [%d]\n", rc);
-                                xwos_cthrd_yield();
+                                xwos_cthd_yield();
                         }/* else {} */
                         w25qrptlogf(DEBUG, "开始复苏 ...\n");
                 } else if (W25QRPT_HWIFST_OPENED == w25qrpt->hwifst) {

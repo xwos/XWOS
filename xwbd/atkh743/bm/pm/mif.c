@@ -27,7 +27,7 @@
 #include <bm/stm32cube/mif.h>
 #include <bm/pm/mif.h>
 
-#define PM_THRD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+#define PM_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 #define PM_BTN_GPIO_PORT XWDS_GPIO_PORT_H
 #define PM_BTN_GPIO_PIN XWDS_GPIO_PIN_3
@@ -65,10 +65,10 @@ static
 xwer_t brdpm_get_btn_evt(xwsq_t * evt);
 
 static
-xwer_t brdpm_thrd_init(void);
+xwer_t brdpm_thd_init(void);
 
 static
-void brdpm_thrd_deinit(void);
+void brdpm_thd_deinit(void);
 
 static
 void brdpm_req_btn_irq(void);
@@ -86,18 +86,18 @@ static
 void brdpm_eirq_btn_isr(struct xwds_soc * soc, xwid_t id, xwds_eirq_arg_t arg);
 
 static
-xwer_t brdpm_thrd(void * arg);
+xwer_t brdpm_thd(void * arg);
 
-const struct xwos_thrd_desc brdpm_thrd_td = {
-        .name = "bm.pm.thrd",
-        .prio = PM_THRD_PRIORITY,
-        .stack = XWOS_THRD_STACK_DYNAMIC,
+const struct xwos_thd_desc brdpm_thd_td = {
+        .name = "bm.pm.thd",
+        .prio = PM_THD_PRIORITY,
+        .stack = XWOS_THD_STACK_DYNAMIC,
         .stack_size = 2048,
-        .func = (xwos_thrd_f)brdpm_thrd,
+        .func = (xwos_thd_f)brdpm_thd,
         .arg = NULL,
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
-xwid_t brdpm_thrd_id;
+xwos_thd_d brdpm_thdd;
 
 struct xwos_sem brdpm_sem;
 
@@ -116,19 +116,19 @@ xwer_t brdpm_start(void)
                 goto err_sem_init;
         }
 
-        rc = xwos_thrd_create(&brdpm_thrd_id,
-                              brdpm_thrd_td.name,
-                              brdpm_thrd_td.func,
-                              brdpm_thrd_td.arg,
-                              brdpm_thrd_td.stack_size,
-                              brdpm_thrd_td.prio,
-                              brdpm_thrd_td.attr);
+        rc = xwos_thd_create(&brdpm_thdd,
+                             brdpm_thd_td.name,
+                             brdpm_thd_td.func,
+                             brdpm_thd_td.arg,
+                             brdpm_thd_td.stack_size,
+                             brdpm_thd_td.prio,
+                             brdpm_thd_td.attr);
         if (rc < 0) {
-                goto err_thrd_create;
+                goto err_thd_create;
         }
         return XWOK;
 
-err_thrd_create:
+err_thd_create:
         xwos_sem_destroy(&brdpm_sem);
 err_sem_init:
         return rc;
@@ -138,13 +138,7 @@ xwer_t brdpm_stop(void)
 {
         xwer_t rc, trc;
 
-        rc = xwos_thrd_stop(brdpm_thrd_id, &trc);
-        if (XWOK == rc) {
-                rc = xwos_thrd_delete(brdpm_thrd_id);
-                if (XWOK == rc) {
-                        brdpm_thrd_id = 0;
-                }
-        }
+        rc = xwos_thd_stop(brdpm_thdd, &trc);
         xwos_sem_destroy(&brdpm_sem);
         return rc;
 }
@@ -204,7 +198,7 @@ xwer_t brdpm_get_btn_evt(xwsq_t * evt)
         }
 
         time = PM_BTN_DEBOUNCING_DELAY;
-        rc = xwos_cthrd_sleep(&time);
+        rc = xwos_cthd_sleep(&time);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_sleep;
         }
@@ -220,7 +214,7 @@ xwer_t brdpm_get_btn_evt(xwsq_t * evt)
                 }
                 cnt++;
                 time = PM_BTN_DEBOUNCING_DELAY;
-                rc = xwos_cthrd_sleep(&time);
+                rc = xwos_cthd_sleep(&time);
                 if (__xwcc_unlikely(rc < 0)) {
                         goto err_sleep;
                 }
@@ -240,7 +234,7 @@ err_sem_wait:
 }
 
 static
-xwer_t brdpm_thrd_init(void)
+xwer_t brdpm_thd_init(void)
 {
         xwer_t rc;
 
@@ -271,7 +265,7 @@ err_led_gpio_req:
 }
 
 static
-void brdpm_thrd_deinit(void)
+void brdpm_thd_deinit(void)
 {
         xwds_eirq_rls(&stm32cube_soc_cb,
                       PM_BTN_GPIO_PORT, PM_BTN_GPIO_PIN,
@@ -307,25 +301,25 @@ void brdpm_led_blink(void)
                          PM_LED_GPIO_PORT,
                          PM_LED_GPIO_PIN);
         time = 500 * XWTM_MS;
-        xwos_cthrd_sleep(&time);
+        xwos_cthd_sleep(&time);
 
         xwds_gpio_toggle(&stm32cube_soc_cb,
                          PM_LED_GPIO_PORT,
                          PM_LED_GPIO_PIN);
         time = 500 * XWTM_MS;
-        xwos_cthrd_sleep(&time);
+        xwos_cthd_sleep(&time);
 
         xwds_gpio_toggle(&stm32cube_soc_cb,
                          PM_LED_GPIO_PORT,
                          PM_LED_GPIO_PIN);
         time = 500 * XWTM_MS;
-        xwos_cthrd_sleep(&time);
+        xwos_cthd_sleep(&time);
 
         xwds_gpio_toggle(&stm32cube_soc_cb,
                          PM_LED_GPIO_PORT,
                          PM_LED_GPIO_PIN);
         time = 500 * XWTM_MS;
-        xwos_cthrd_sleep(&time);
+        xwos_cthd_sleep(&time);
 }
 
 static
@@ -347,22 +341,22 @@ void brdpm_handle_evt(xwsq_t evt)
 }
 
 static
-xwer_t brdpm_thrd(void * arg)
+xwer_t brdpm_thd(void * arg)
 {
         xwer_t rc;
         xwsq_t evt;
 
         XWOS_UNUSED(arg);
 
-        rc = brdpm_thrd_init();
+        rc = brdpm_thd_init();
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_init;
         }
 
-        while (!xwos_cthrd_shld_stop()) {
-                if (xwos_cthrd_shld_frz()) {
+        while (!xwos_cthd_shld_stop()) {
+                if (xwos_cthd_shld_frz()) {
                         brdpm_suspend();
-                        xwos_cthrd_freeze();
+                        xwos_cthd_freeze();
                         brdpm_resume();
                 } else {
                         rc = brdpm_get_btn_evt(&evt);
@@ -382,7 +376,7 @@ xwer_t brdpm_thrd(void * arg)
         }
 
 err_get_btn_evt:
-        brdpm_thrd_deinit();
+        brdpm_thd_deinit();
 err_init:
         return rc;
 }

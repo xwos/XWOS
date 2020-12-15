@@ -120,7 +120,7 @@ soc_skd_isr_swcx:
         /* get thread SP */
         e_lis           r4, soc_context@h /* r4 = &soc_context; */
         e_or2i          r4, soc_context@l
-        se_lwz          r5, 0x4 (r4) /* r5 = soc_context.thrd_sp; */
+        se_lwz          r5, 0x4 (r4) /* r5 = soc_context.thd_sp; */
         /* save previous context */
         se_lwz          r4, 4 (r3) /* r4 = xwskd->pstk; */
         /* save non-volatile registers */
@@ -140,7 +140,7 @@ soc_skd_isr_swcx:
         /* set thread SP */
         e_lis           r4, soc_context@h /* r4 = &soc_context; */
         e_or2i          r4, soc_context@l
-        se_stw          r5, 0x4 (r4) /* soc_context.thrd_sp = r5; */
+        se_stw          r5, 0x4 (r4) /* soc_context.thd_sp = r5; */
 
         /* finish the progress */
 #if defined(XuanWuOS_CFG_CORE__mp)

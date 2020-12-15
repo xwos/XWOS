@@ -199,7 +199,7 @@ struct xwpcp {
         } slot; /**< 帧槽 */
 
         /* 发送状态机 */
-        xwid_t txtid; /**< 发送线程的ID */
+        xwos_thd_d txthdd; /**< 发送线程的描述符 */
         struct {
                 xwu32_a cnt; /**< 发送计数器 */
                 struct xwlib_bclst_head q[XWPCP_PRI_NUM]; /**< 队列 */
@@ -220,7 +220,7 @@ struct xwpcp {
         } txq; /**< 发送队列 */
 
         /* 接收状态机 */
-        xwid_t rxtid; /**< 接收线程的ID */
+        xwos_thd_d rxthdd; /**< 接收线程的描述符 */
         struct {
                 xwu32_a cnt; /**< 接收计数器 */
                 struct xwlib_bclst_head q[XWPCP_PORT_NUM]; /**< 每个端口的接收队列 */
@@ -234,7 +234,7 @@ xwer_t xwpcp_put(struct xwpcp * xwpcp);
 void xwpcp_encode_sdusize(xwsz_t sdusize, xwu8_t * ecsdusz, xwu8_t * ecsize);
 void xwpcp_decode_sdusize(xwu8_t * ecsdusz, xwsz_t * sdusize);
 union xwpcp_slot * xwpcp_rxq_choose(struct xwpcp * xwpcp, xwu8_t port);
-xwer_t xwpcp_rxthrd(struct xwpcp * xwpcp);
+xwer_t xwpcp_rxthd(struct xwpcp * xwpcp);
 union xwpcp_slot * xwpcp_txq_choose(struct xwpcp * xwpcp);
 xwu8_t xwpcp_cal_chksum(xwu8_t data[], xwsz_t size);
 bool xwpcp_chk_data(xwu8_t data[], xwsz_t size);
@@ -243,6 +243,6 @@ xwer_t xwpcp_eq_msg(struct xwpcp * xwpcp,
                     xwu8_t pri, xwu8_t port, xwu8_t qos,
                     xwpcp_ntf_f ntfcb, void * cbarg,
                     xwpcp_fh_t * fhbuf);
-xwer_t xwpcp_txthrd(struct xwpcp * xwpcp);
+xwer_t xwpcp_txthd(struct xwpcp * xwpcp);
 
 #endif /* xwmd/isc/xwpcp/protocol.h */

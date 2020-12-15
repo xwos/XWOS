@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#include <string.h>
 #include <xwos/standard.h>
+#include <string.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/skd.h>
@@ -28,32 +28,32 @@
 #include <xwos/osal/sync/cond.h>
 #include <xwam/example/sync/cond/mif.h>
 
-#define XWCONDDEMO_THRD_PRIORITY        \
+#define XWCONDDEMO_THD_PRIORITY                                 \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
 #define XWCONDDEMO_LOG_TAG     "cond"
-#define condlogf(lv, fmt, ...)          \
+#define condlogf(lv, fmt, ...)                                  \
         xwlogf(lv, XWCONDDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
 #else /* XWLIBCFG_LOG */
 #define condlogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
 
-xwer_t xwconddemo_thrd_func(void * arg);
+xwer_t xwconddemo_thd_func(void * arg);
 
 /**
  * @brief 线程描述表
  */
-const struct xwos_thrd_desc xwconddemo_tbd = {
-        .name = "xwconddemo.thrd",
-        .prio = XWCONDDEMO_THRD_PRIORITY,
-        .stack = XWOS_THRD_STACK_DYNAMIC,
+const struct xwos_thd_desc xwconddemo_tbd = {
+        .name = "xwconddemo.thd",
+        .prio = XWCONDDEMO_THD_PRIORITY,
+        .stack = XWOS_THD_STACK_DYNAMIC,
         .stack_size = 2048,
-        .func = (xwos_thrd_f)xwconddemo_thrd_func,
+        .func = (xwos_thd_f)xwconddemo_thd_func,
         .arg = NULL,
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
-xwid_t xwconddemo_tid;
+xwos_thd_d xwconddemo_thd_d;
 
 struct xwos_swt xwconddemo_swt;
 struct xwos_cond xwconddemo_cond;
@@ -85,20 +85,20 @@ xwer_t example_cond_start(void)
         }
 
         /* 创建线程 */
-        rc = xwos_thrd_create(&xwconddemo_tid,
-                              xwconddemo_tbd.name,
-                              xwconddemo_tbd.func,
-                              xwconddemo_tbd.arg,
-                              xwconddemo_tbd.stack_size,
-                              xwconddemo_tbd.prio,
-                              xwconddemo_tbd.attr);
+        rc = xwos_thd_create(&xwconddemo_thd_d,
+                             xwconddemo_tbd.name,
+                             xwconddemo_tbd.func,
+                             xwconddemo_tbd.arg,
+                             xwconddemo_tbd.stack_size,
+                             xwconddemo_tbd.prio,
+                             xwconddemo_tbd.attr);
         if (rc < 0) {
-                goto err_thrd_create;
+                goto err_thd_create;
         }
 
         return XWOK;
 
-err_thrd_create:
+err_thd_create:
         xwos_swt_destroy(&xwconddemo_swt);
 err_swt_init:
         xwos_cond_destroy(&xwconddemo_cond);
@@ -148,7 +148,7 @@ void xwconddemo_swt_callback(struct xwos_swt * swt, void * arg)
 /**
  * @brief 线程1的主函数
  */
-xwer_t xwconddemo_thrd_func(void * arg)
+xwer_t xwconddemo_thd_func(void * arg)
 {
         xwer_t rc;
         xwtm_t base, ts;
@@ -166,7 +166,7 @@ xwer_t xwconddemo_thrd_func(void * arg)
         rc = xwos_swt_start(&xwconddemo_swt, base, 1000 * XWTM_MS,
                             xwconddemo_swt_callback, NULL);
 
-        while (!xwos_cthrd_frz_shld_stop(NULL)) {
+        while (!xwos_cthd_frz_shld_stop(NULL)) {
                 xwos_splk_lock_cpuirqsv(&xwconddemo_lock, &cpuirq);
                 if (is_updated) {
                         rc = XWOK;
@@ -195,19 +195,19 @@ xwer_t xwconddemo_thrd_func(void * arg)
                 if (XWOK == rc) {
                         ts = xwos_skd_get_timestamp_lc();
                         condlogf(INFO,
-                                "[线程] 定时器唤醒，时间戳：%lld 纳秒，"
-                                "计数器：%d。\n",
-                                ts, cnt);
+                                 "[线程] 定时器唤醒，时间戳：%lld 纳秒，"
+                                 "计数器：%d。\n",
+                                 ts, cnt);
                 } else if (-ETIMEDOUT == rc) {
                         ts = xwos_skd_get_timestamp_lc();
                         condlogf(INFO,
-                                "[线程] 等待超时，时间戳：%lld 纳秒，"
-                                "计数器：%d，错误码：%d。\n",
-                                ts, cnt, rc);
+                                 "[线程] 等待超时，时间戳：%lld 纳秒，"
+                                 "计数器：%d，错误码：%d。\n",
+                                 ts, cnt, rc);
                 }
         }
 
         condlogf(INFO, "[线程] 退出。\n");
-        xwos_thrd_delete(xwos_cthrd_id());
+        xwos_thd_delete(xwos_cthd_getd());
         return rc;
 }

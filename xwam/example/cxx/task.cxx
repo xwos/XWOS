@@ -25,7 +25,7 @@
 #include "test/vector.hxx"
 #include "task.hxx"
 
-xwer_t cxx_thrd(void * arg)
+xwer_t cxx_thd(void * arg)
 {
   xwtm_t xwtm;
   xwer_t rc;
@@ -36,9 +36,9 @@ xwer_t cxx_thrd(void * arg)
   testStdVector();
 
   rc = XWOK;
-  while (!xwos_cthrd_frz_shld_stop(NULL)) {
+  while (!xwos_cthd_frz_shld_stop(NULL)) {
     xwtm = 2000 * XWTM_MS;
-    xwos_cthrd_sleep(&xwtm);
+    xwos_cthd_sleep(&xwtm);
   }
   return rc;
 }

@@ -25,36 +25,36 @@
 #include <bm/stm32cube/mif.h>
 #include <bm/pm/mif.h>
 #include <bm/main/xwpcp.h>
-#include <bm/main/thrd.h>
+#include <bm/main/thd.h>
 
-#define MAIN_THRD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
+#define MAIN_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
 
-xwer_t main_thrd(void * arg);
+xwer_t main_thd(void * arg);
 
-const struct xwos_thrd_desc main_thrd_td = {
-        .name = "main.thrd",
-        .prio = MAIN_THRD_PRIORITY,
-        .stack = XWOS_THRD_STACK_DYNAMIC,
+const struct xwos_thd_desc main_thd_td = {
+        .name = "main.thd",
+        .prio = MAIN_THD_PRIORITY,
+        .stack = XWOS_THD_STACK_DYNAMIC,
         .stack_size = 4096,
-        .func = (xwos_thrd_f)main_thrd,
+        .func = (xwos_thd_f)main_thd,
         .arg = NULL,
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
-xwid_t main_thrd_id;
+xwos_thd_d main_thdd;
 
 xwer_t xwos_main(void)
 {
         xwer_t rc;
 
-        rc = xwos_thrd_create(&main_thrd_id,
-                              main_thrd_td.name,
-                              main_thrd_td.func,
-                              main_thrd_td.arg,
-                              main_thrd_td.stack_size,
-                              main_thrd_td.prio,
-                              main_thrd_td.attr);
+        rc = xwos_thd_create(&main_thdd,
+                             main_thd_td.name,
+                             main_thd_td.func,
+                             main_thd_td.arg,
+                             main_thd_td.stack_size,
+                             main_thd_td.prio,
+                             main_thd_td.attr);
         if (rc < 0) {
-                goto err_init_thrd_create;
+                goto err_init_thd_create;
         }
 
         rc = xwos_skd_start_lc();
@@ -64,14 +64,14 @@ xwer_t xwos_main(void)
 
         return XWOK;
 
-err_init_thrd_create:
+err_init_thd_create:
         BDL_BUG();
 err_skd_start_lc:
         BDL_BUG();
         return rc;
 }
 
-xwer_t main_thrd(void * arg)
+xwer_t main_thd(void * arg)
 {
         xwer_t rc;
 
@@ -87,9 +87,9 @@ xwer_t main_thrd(void * arg)
                 goto err_newlibac_init;
         }
 
-        rc = child_thrd_start();
+        rc = child_thd_start();
         if (rc < 0) {
-                goto err_child_thrd_start;
+                goto err_child_thd_start;
         }
 
         rc = brdpm_start();
@@ -109,7 +109,7 @@ xwer_t main_thrd(void * arg)
         }
 #endif /* XWEMCFG_vm_lua */
 
-        xwos_thrd_delete(main_thrd_id);
+        xwos_thd_delete(main_thdd);
         return XWOK;
 
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
@@ -120,7 +120,7 @@ err_xwpcp_start:
         BDL_BUG();
 err_brdpm_start:
         BDL_BUG();
-err_child_thrd_start:
+err_child_thd_start:
         BDL_BUG();
 err_newlibac_init:
         BDL_BUG();

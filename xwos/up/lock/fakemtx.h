@@ -17,7 +17,7 @@
 #define __xwos_up_lock_fakemtx_h__
 
 #include <xwos/standard.h>
-#include <xwos/up/thrd.h>
+#include <xwos/up/thd.h>
 #if defined(XWUPCFG_SYNC_RTSEM) && (1 == XWUPCFG_SYNC_RTSEM)
   #include <xwos/up/sync/rtsem.h>
 #elif defined(XWUPCFG_SYNC_PLSEM) && (1 == XWUPCFG_SYNC_PLSEM)
@@ -75,9 +75,9 @@ xwer_t xwup_mtx_delete(struct xwup_mtx * mtx)
 }
 
 static __xwup_inline_api
-xwer_t xwup_mtx_intr(struct xwup_mtx * mtx, struct xwup_tcb * tcb)
+xwer_t xwup_mtx_intr(struct xwup_mtx * mtx, struct xwup_thd * thd)
 {
-        return XWUP_SEM_API(intr, &mtx->fake, &tcb->wqn);
+        return XWUP_SEM_API(intr, &mtx->fake, &thd->wqn);
 }
 
 static __xwup_inline_api

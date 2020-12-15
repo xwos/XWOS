@@ -27,32 +27,32 @@
 #include <xwos/osal/sync/sem.h>
 #include <xwam/example/sync/sem/mif.h>
 
-#define XWSEMDEMO_THRD_PRIORITY         \
+#define XWSEMDEMO_THD_PRIORITY                                  \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-  #define XWSEMDEMO_LOG_TAG     "sem"
-  #define semlogf(lv, fmt, ...)         \
+#define XWSEMDEMO_LOG_TAG     "sem"
+#define semlogf(lv, fmt, ...)                                   \
         xwlogf(lv, XWSEMDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
 #else /* XWLIBCFG_LOG */
-  #define semlogf(lv, fmt, ...)
+#define semlogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
 
-xwer_t xwsemdemo_thrd_func(void * arg);
+xwer_t xwsemdemo_thd_func(void * arg);
 
 /**
  * @brief 线程描述表
  */
-const struct xwos_thrd_desc xwsemdemo_tbd = {
-        .name = "xwsemdemo.thrd",
-        .prio = XWSEMDEMO_THRD_PRIORITY,
-        .stack = XWOS_THRD_STACK_DYNAMIC,
+const struct xwos_thd_desc xwsemdemo_tbd = {
+        .name = "xwsemdemo.thd",
+        .prio = XWSEMDEMO_THD_PRIORITY,
+        .stack = XWOS_THD_STACK_DYNAMIC,
         .stack_size = 2048,
-        .func = (xwos_thrd_f)xwsemdemo_thrd_func,
+        .func = (xwos_thd_f)xwsemdemo_thd_func,
         .arg = NULL,
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
-xwid_t xwsemdemo_tid;
+xwos_thd_d xwsemdemo_thdd;
 
 struct xwos_swt xwsemdemo_swt;
 struct xwos_sem xwsemdemo_sem;
@@ -78,20 +78,20 @@ xwer_t example_sem_start(void)
         }
 
         /* 创建线程 */
-        rc = xwos_thrd_create(&xwsemdemo_tid,
-                              xwsemdemo_tbd.name,
-                              xwsemdemo_tbd.func,
-                              xwsemdemo_tbd.arg,
-                              xwsemdemo_tbd.stack_size,
-                              xwsemdemo_tbd.prio,
-                              xwsemdemo_tbd.attr);
+        rc = xwos_thd_create(&xwsemdemo_thdd,
+                             xwsemdemo_tbd.name,
+                             xwsemdemo_tbd.func,
+                             xwsemdemo_tbd.arg,
+                             xwsemdemo_tbd.stack_size,
+                             xwsemdemo_tbd.prio,
+                             xwsemdemo_tbd.attr);
         if (rc < 0) {
-                goto err_thrd_create;
+                goto err_thd_create;
         }
 
         return XWOK;
 
-err_thrd_create:
+err_thd_create:
         xwos_swt_destroy(&xwsemdemo_swt);
 err_swt_init:
         xwos_sem_destroy(&xwsemdemo_sem);
@@ -121,7 +121,7 @@ void xwsemdemo_swt_callback(struct xwos_swt * swt, void * arg)
 /**
  * @brief 线程1的主函数
  */
-xwer_t xwsemdemo_thrd_func(void * arg)
+xwer_t xwsemdemo_thd_func(void * arg)
 {
         xwtm_t base, ts;
         xwer_t rc;
@@ -135,7 +135,7 @@ xwer_t xwsemdemo_thrd_func(void * arg)
         rc = xwos_swt_start(&xwsemdemo_swt, base, 1000 * XWTM_MS,
                             xwsemdemo_swt_callback, NULL);
 
-        while (!xwos_cthrd_frz_shld_stop(NULL)) {
+        while (!xwos_cthd_frz_shld_stop(NULL)) {
                 ts = 500 * XWTM_MS;
                 rc = xwos_sem_timedwait(&xwsemdemo_sem, &ts);
                 if (XWOK == rc) {
@@ -152,6 +152,6 @@ xwer_t xwsemdemo_thrd_func(void * arg)
         }
 
         semlogf(INFO, "[线程] 退出。\n");
-        xwos_thrd_delete(xwos_cthrd_id());
+        xwos_thd_delete(xwos_cthd_getd());
         return rc;
 }

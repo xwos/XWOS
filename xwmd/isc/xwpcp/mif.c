@@ -22,19 +22,19 @@
 #include <xwmd/isc/xwpcp/protocol.h>
 #include <xwmd/isc/xwpcp/mif.h>
 
-#define XWPCP_TXTHRD_PRIORITY XWMDCFG_isc_xwpcp_TXTHRD_PRIORITY
-#define XWPCP_RXTHRD_PRIORITY XWMDCFG_isc_xwpcp_RXTHRD_PRIORITY
+#define XWPCP_TXTHD_PRIORITY XWMDCFG_isc_xwpcp_TXTHD_PRIORITY
+#define XWPCP_RXTHD_PRIORITY XWMDCFG_isc_xwpcp_RXTHD_PRIORITY
 
 /**
  * @brief 发送线程的描述
  */
 static __xwmd_rodata
-const struct xwos_thrd_desc xwpcp_rxthrd_td = {
-        .name = "xwmd.isc.xwpcp.rxthrd",
-        .prio = XWPCP_RXTHRD_PRIORITY,
-        .stack = XWOS_THRD_STACK_DYNAMIC,
+const struct xwos_thd_desc xwpcp_rxthd_td = {
+        .name = "xwmd.isc.xwpcp.rxthd",
+        .prio = XWPCP_RXTHD_PRIORITY,
+        .stack = XWOS_THD_STACK_DYNAMIC,
         .stack_size = 2048,
-        .func = (xwos_thrd_f)xwpcp_rxthrd,
+        .func = (xwos_thd_f)xwpcp_rxthd,
         .arg = NULL, /* TBD */
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
@@ -43,12 +43,12 @@ const struct xwos_thrd_desc xwpcp_rxthrd_td = {
  * @brief 发送线程的描述
  */
 static __xwmd_rodata
-const struct xwos_thrd_desc xwpcp_txthrd_td = {
-        .name = "xwmd.isc.xwpcp.txthrd",
-        .prio = XWPCP_TXTHRD_PRIORITY,
-        .stack = XWOS_THRD_STACK_DYNAMIC,
+const struct xwos_thd_desc xwpcp_txthd_td = {
+        .name = "xwmd.isc.xwpcp.txthd",
+        .prio = XWPCP_TXTHD_PRIORITY,
+        .stack = XWOS_THD_STACK_DYNAMIC,
         .stack_size = 2048,
-        .func = (xwos_thrd_f)xwpcp_txthrd,
+        .func = (xwos_thd_f)xwpcp_txthd,
         .arg = NULL, /* TBD */
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
@@ -178,35 +178,34 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         }
 
         /* 创建线程 */
-        rc = xwos_thrd_create(&xwpcp->rxtid,
-                              xwpcp_rxthrd_td.name,
-                              xwpcp_rxthrd_td.func,
+        rc = xwos_thd_create(&xwpcp->rxthdd,
+                              xwpcp_rxthd_td.name,
+                              xwpcp_rxthd_td.func,
                               xwpcp,
-                              xwpcp_rxthrd_td.stack_size,
-                              xwpcp_rxthrd_td.prio,
-                              xwpcp_rxthrd_td.attr);
+                              xwpcp_rxthd_td.stack_size,
+                              xwpcp_rxthd_td.prio,
+                              xwpcp_rxthd_td.attr);
         if (rc < 0) {
-                goto err_rxthrd_create;
+                goto err_rxthd_create;
         }
 
-        rc = xwos_thrd_create(&xwpcp->txtid,
-                              xwpcp_txthrd_td.name,
-                              xwpcp_txthrd_td.func,
-                              xwpcp,
-                              xwpcp_txthrd_td.stack_size,
-                              xwpcp_txthrd_td.prio,
-                              xwpcp_txthrd_td.attr);
+        rc = xwos_thd_create(&xwpcp->txthdd,
+                             xwpcp_txthd_td.name,
+                             xwpcp_txthd_td.func,
+                             xwpcp,
+                             xwpcp_txthd_td.stack_size,
+                             xwpcp_txthd_td.prio,
+                             xwpcp_txthd_td.attr);
         if (rc < 0) {
-                goto err_txthrd_create;
+                goto err_txthd_create;
         }
 
         return XWOK;
 
-err_txthrd_create:
-        xwos_thrd_cancel(xwpcp->rxtid);
-        xwos_thrd_delete(xwpcp->rxtid);
-        xwpcp->rxtid = 0;
-err_rxthrd_create:
+err_txthd_create:
+        xwos_thd_cancel(xwpcp->rxthdd);
+        xwos_thd_delete(xwpcp->rxthdd);
+err_rxthd_create:
         xwpcp_hwifal_close(xwpcp);
 err_hwifal_open:
 err_rxqsem_init:
@@ -248,22 +247,14 @@ xwer_t xwpcp_stop(struct xwpcp * xwpcp)
 
         XWPCP_VALIDATE((xwpcp), "nullptr", -EFAULT);
 
-        rc = xwos_thrd_stop(xwpcp->txtid, &childrc);
+        rc = xwos_thd_stop(xwpcp->txthdd, &childrc);
         if (XWOK == rc) {
-                rc = xwos_thrd_delete(xwpcp->txtid);
-                if (XWOK == rc) {
-                        xwpcp->txtid = 0;
-                        xwpcplogf(INFO, "Stop XWPCP TX thread... [OK]\n");
-                }
+                xwpcplogf(INFO, "Stop XWPCP TX thread... [OK]\n");
         }
 
-        rc = xwos_thrd_stop(xwpcp->rxtid, &childrc);
+        rc = xwos_thd_stop(xwpcp->rxthdd, &childrc);
         if (XWOK == rc) {
-                rc = xwos_thrd_delete(xwpcp->rxtid);
-                if (XWOK == rc) {
-                        xwpcp->rxtid = 0;
-                        xwpcplogf(INFO, "Stop XWPCP RX thread... [OK]\n");
-                }
+                xwpcplogf(INFO, "Stop XWPCP RX thread... [OK]\n");
         }
 
         rc = xwaop_teq_then_sub(xwsq, &xwpcp->refcnt,

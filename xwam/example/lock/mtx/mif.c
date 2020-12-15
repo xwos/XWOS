@@ -25,10 +25,10 @@
 #include <xwos/osal/lock/mtx.h>
 #include <xwam/example/lock/mtx/mif.h>
 
-#define XWMTXDEMO_THRD_0_PRIORITY                               \
+#define XWMTXDEMO_THD_0_PRIORITY                                \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
 
-#define XWMTXDEMO_THRD_1_PRIORITY                               \
+#define XWMTXDEMO_THD_1_PRIORITY                                \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
@@ -39,33 +39,33 @@
 #define mtxlogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
 
-xwer_t xwmtxdemo_thrd_0_func(void * arg);
-xwer_t xwmtxdemo_thrd_1_func(void * arg);
+xwer_t xwmtxdemo_thd_0_func(void * arg);
+xwer_t xwmtxdemo_thd_1_func(void * arg);
 
 /**
  * @brief 动态创建的线程描述表
  */
-const struct xwos_thrd_desc xwmtxdemo_tbd[] = {
+const struct xwos_thd_desc xwmtxdemo_tbd[] = {
         [0] = {
-                .name = "xwmtxdemo.thrd.0",
-                .prio = XWMTXDEMO_THRD_0_PRIORITY,
-                .stack = XWOS_THRD_STACK_DYNAMIC,
+                .name = "xwmtxdemo.thd.0",
+                .prio = XWMTXDEMO_THD_0_PRIORITY,
+                .stack = XWOS_THD_STACK_DYNAMIC,
                 .stack_size = 2048,
-                .func = (xwos_thrd_f)xwmtxdemo_thrd_0_func,
+                .func = (xwos_thd_f)xwmtxdemo_thd_0_func,
                 .arg = NULL,
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [1] = {
-                .name = "xwmtxdemo.thrd.1",
-                .prio = XWMTXDEMO_THRD_1_PRIORITY,
-                .stack = XWOS_THRD_STACK_DYNAMIC,
+                .name = "xwmtxdemo.thd.1",
+                .prio = XWMTXDEMO_THD_1_PRIORITY,
+                .stack = XWOS_THD_STACK_DYNAMIC,
                 .stack_size = 2048,
-                .func = (xwos_thrd_f)xwmtxdemo_thrd_1_func,
+                .func = (xwos_thd_f)xwmtxdemo_thd_1_func,
                 .arg = (void *)3,
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
-xwid_t xwmtxdemo_tid[xw_array_size(xwmtxdemo_tbd)];
+xwos_thd_d xwmtxdemo_thdd[xw_array_size(xwmtxdemo_tbd)];
 
 struct xwos_mtx * xwmtxdemo_mtx;
 xwsq_t xwmtxdemo_shared_count = 0;
@@ -84,21 +84,21 @@ xwer_t example_mtx_start(void)
         }
 
         for (i = 0; i < xw_array_size(xwmtxdemo_tbd); i++) {
-                rc = xwos_thrd_create(&xwmtxdemo_tid[i],
-                                      xwmtxdemo_tbd[i].name,
-                                      xwmtxdemo_tbd[i].func,
-                                      xwmtxdemo_tbd[i].arg,
-                                      xwmtxdemo_tbd[i].stack_size,
-                                      xwmtxdemo_tbd[i].prio,
-                                      xwmtxdemo_tbd[i].attr);
+                rc = xwos_thd_create(&xwmtxdemo_thdd[i],
+                                     xwmtxdemo_tbd[i].name,
+                                     xwmtxdemo_tbd[i].func,
+                                     xwmtxdemo_tbd[i].arg,
+                                     xwmtxdemo_tbd[i].stack_size,
+                                     xwmtxdemo_tbd[i].prio,
+                                     xwmtxdemo_tbd[i].attr);
                 if (rc < 0) {
-                        goto err_thrd_create;
+                        goto err_thd_create;
                 }
         }
 
         return XWOK;
 
-err_thrd_create:
+err_thd_create:
         xwos_mtx_delete(xwmtxdemo_mtx);
 err_mtx_create:
         return rc;
@@ -107,7 +107,7 @@ err_mtx_create:
 /**
  * @brief 线程0的主函数
  */
-xwer_t xwmtxdemo_thrd_0_func(void * arg)
+xwer_t xwmtxdemo_thd_0_func(void * arg)
 {
         xwtm_t time;
         xwer_t rc = XWOK;
@@ -115,9 +115,9 @@ xwer_t xwmtxdemo_thrd_0_func(void * arg)
         XWOS_UNUSED(arg);
         mtxlogf(INFO, "[线程0] 启动。\n");
 
-        while (!xwos_cthrd_frz_shld_stop(NULL)) {
+        while (!xwos_cthd_frz_shld_stop(NULL)) {
                 time = 500 * XWTM_MS;
-                xwos_cthrd_sleep(&time);
+                xwos_cthd_sleep(&time);
                 rc = xwos_mtx_lock(xwmtxdemo_mtx);
                 if (XWOK == rc) {
                         time = xwos_skd_get_timestamp_lc();
@@ -129,14 +129,14 @@ xwer_t xwmtxdemo_thrd_0_func(void * arg)
                 }
         }
         mtxlogf(INFO, "[线程0] 退出。\n");
-        xwos_thrd_delete(xwos_cthrd_id());
+        xwos_thd_delete(xwos_cthd_getd());
         return rc;
 }
 
 /**
  * @brief 线程1的主函数
  */
-xwer_t xwmtxdemo_thrd_1_func(void * arg)
+xwer_t xwmtxdemo_thd_1_func(void * arg)
 {
         xwtm_t time;
         xwer_t rc = XWOK;
@@ -144,9 +144,9 @@ xwer_t xwmtxdemo_thrd_1_func(void * arg)
         XWOS_UNUSED(arg);
         mtxlogf(INFO, "[线程1] 开始。\n");
 
-        while (!xwos_cthrd_frz_shld_stop(NULL)) {
+        while (!xwos_cthd_frz_shld_stop(NULL)) {
                 time = 500 * XWTM_MS;
-                xwos_cthrd_sleep(&time);
+                xwos_cthd_sleep(&time);
                 rc = xwos_mtx_lock(xwmtxdemo_mtx);
                 if (XWOK == rc) {
                         time = xwos_skd_get_timestamp_lc();
@@ -158,6 +158,6 @@ xwer_t xwmtxdemo_thrd_1_func(void * arg)
                 }
         }
         mtxlogf(INFO, "[线程1] 退出。\n");
-        xwos_thrd_delete(xwos_cthrd_id());
+        xwos_thd_delete(xwos_cthd_getd());
         return rc;
 }

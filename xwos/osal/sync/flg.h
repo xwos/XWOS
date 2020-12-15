@@ -433,7 +433,7 @@ xwer_t xwos_flg_trywait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -EINVAL: 参数无效
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -480,7 +480,7 @@ xwer_t xwos_flg_wait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
  * @retval -EINVAL: 参数无效
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程

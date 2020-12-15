@@ -23,11 +23,11 @@ XWOS_EOBJS :=
 ######## ######## ######## ########   rules  ######## ######## ######## ########
 ######## ######## ######## ######## ******** ######## ######## ######## ########
 ifeq ($(XWUPCFG_SYNC_COND),y)
-        XWUPRULE_SKD_THRD_DO_LOCK := y
-        XWUPRULE_SKD_THRD_DO_UNLOCK := y
+        XWUPRULE_SKD_THD_DO_LOCK := y
+        XWUPRULE_SKD_THD_DO_UNLOCK := y
 else
-        XWUPRULE_SKD_THRD_DO_LOCK := n
-        XWUPRULE_SKD_THRD_DO_UNLOCK := n
+        XWUPRULE_SKD_THD_DO_LOCK := n
+        XWUPRULE_SKD_THD_DO_UNLOCK := n
 endif
 
 ifeq ($(XWUPCFG_SYNC_PLSEM),y)
@@ -63,7 +63,7 @@ ifeq ($(XWUPCFG_SKD_BH),y)
     XWOS_CSRCS += up/bh.c
 endif
 XWOS_CSRCS += up/tt.c
-XWOS_CSRCS += up/thrd.c
+XWOS_CSRCS += up/thd.c
 XWOS_CSRCS += up/wqn.c
 
 ifeq ($(XWUPRULE_SKD_WQ_PL),y)

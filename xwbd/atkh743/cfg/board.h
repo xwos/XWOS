@@ -26,7 +26,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define BRDCFG_XWSKD_IDLE_HOOK                  1
 #define BRDCFG_XWSKD_SYSHWT_HOOK                1
-#define BRDCFG_XWSKD_THRD_STACK_POOL            1
+#define BRDCFG_XWSKD_THD_STACK_POOL             1
 #define BRDCFG_LOG                              1
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -39,7 +39,7 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define BRDCFG_MM_DTCMHEAP_BLKSZ                (512U)
 #define BRDCFG_MM_AXISRAM_BLKSZ                 (1024U)
-#define BRDCFG_XWOS_THRD_CACHE_ODR              3
+#define BRDCFG_XWOS_THD_CACHE_ODR               3
 #define BRDCFG_XWOS_SWT_CACHE_ODR               0
 #define BRDCFG_XWOS_SEM_CACHE_ODR               0
 #define BRDCFG_XWOS_COND_CACHE_ODR              0

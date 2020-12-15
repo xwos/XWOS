@@ -176,8 +176,8 @@
 #define XWOK            0 /* no error */
 #define EEMPTY          1080 /* is empty */
 #define ETYPE           1081 /* type error */
-#define EINTHRD         1082 /* in Thread mode */
-#define ENOTINTHRD      1083 /* not in Thread mode */
+#define EINTHD          1082 /* in Thread mode */
+#define ENOTINTHD       1083 /* not in Thread mode */
 #define EINBH           1084 /* in Bottom Half */
 #define ENOTINBH        1085 /* not in Bottom Half */
 #define EINISR          1086 /* in ISR */

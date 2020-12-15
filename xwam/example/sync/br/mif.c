@@ -24,7 +24,7 @@
 #include <xwos/osal/sync/br.h>
 #include <xwam/example/sync/br/mif.h>
 
-#define XWBRDEMO_THRD_PRIORITY                                  \
+#define XWBRDEMO_THD_PRIORITY                                   \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
@@ -35,56 +35,56 @@
 #define brlogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
 
-xwer_t xwbrdemo_thrd_func(void * arg);
+xwer_t xwbrdemo_thd_func(void * arg);
 
-const struct xwos_thrd_desc xwbrdemo_td[] = {
+const struct xwos_thd_desc xwbrdemo_td[] = {
         [0] = {
-                .name = "example.br.thrd.0",
-                .prio = XWBRDEMO_THRD_PRIORITY,
-                .stack = XWOS_THRD_STACK_DYNAMIC,
+                .name = "example.br.thd.0",
+                .prio = XWBRDEMO_THD_PRIORITY,
+                .stack = XWOS_THD_STACK_DYNAMIC,
                 .stack_size = 2048,
-                .func = (xwos_thrd_f)xwbrdemo_thrd_func,
+                .func = (xwos_thd_f)xwbrdemo_thd_func,
                 .arg = (void *)0,
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [1] = {
-                .name = "example.br.thrd.1",
-                .prio = XWBRDEMO_THRD_PRIORITY,
-                .stack = XWOS_THRD_STACK_DYNAMIC,
+                .name = "example.br.thd.1",
+                .prio = XWBRDEMO_THD_PRIORITY,
+                .stack = XWOS_THD_STACK_DYNAMIC,
                 .stack_size = 2048,
-                .func = (xwos_thrd_f)xwbrdemo_thrd_func,
+                .func = (xwos_thd_f)xwbrdemo_thd_func,
                 .arg = (void *)1,
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [2] = {
-                .name = "example.br.thrd.2",
-                .prio = XWBRDEMO_THRD_PRIORITY,
-                .stack = XWOS_THRD_STACK_DYNAMIC,
+                .name = "example.br.thd.2",
+                .prio = XWBRDEMO_THD_PRIORITY,
+                .stack = XWOS_THD_STACK_DYNAMIC,
                 .stack_size = 2048,
-                .func = (xwos_thrd_f)xwbrdemo_thrd_func,
+                .func = (xwos_thd_f)xwbrdemo_thd_func,
                 .arg = (void *)2,
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [3] = {
-                .name = "example.br.thrd.3",
-                .prio = XWBRDEMO_THRD_PRIORITY,
-                .stack = XWOS_THRD_STACK_DYNAMIC,
+                .name = "example.br.thd.3",
+                .prio = XWBRDEMO_THD_PRIORITY,
+                .stack = XWOS_THD_STACK_DYNAMIC,
                 .stack_size = 2048,
-                .func = (xwos_thrd_f)xwbrdemo_thrd_func,
+                .func = (xwos_thd_f)xwbrdemo_thd_func,
                 .arg = (void *)3,
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [4] = {
-                .name = "example.br.thrd.4",
-                .prio = XWBRDEMO_THRD_PRIORITY,
-                .stack = XWOS_THRD_STACK_DYNAMIC,
+                .name = "example.br.thd.4",
+                .prio = XWBRDEMO_THD_PRIORITY,
+                .stack = XWOS_THD_STACK_DYNAMIC,
                 .stack_size = 2048,
-                .func = (xwos_thrd_f)xwbrdemo_thrd_func,
+                .func = (xwos_thd_f)xwbrdemo_thd_func,
                 .arg = (void *)4,
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
-xwid_t xwbrdemo_tid[xw_array_size(xwbrdemo_td)];
+xwos_thd_d xwbrdemo_thdd[xw_array_size(xwbrdemo_td)];
 
 struct xwos_br xwbrdemo_br;
 
@@ -104,21 +104,21 @@ xwer_t example_br_start(void)
 
         /* 创建5个线程 */
         for (i = 0; i < xw_array_size(xwbrdemo_td); i++) {
-                rc = xwos_thrd_create(&xwbrdemo_tid[i],
-                                      xwbrdemo_td[i].name,
-                                      xwbrdemo_td[i].func,
-                                      xwbrdemo_td[i].arg,
-                                      xwbrdemo_td[i].stack_size,
-                                      xwbrdemo_td[i].prio,
-                                      xwbrdemo_td[i].attr);
+                rc = xwos_thd_create(&xwbrdemo_thdd[i],
+                                     xwbrdemo_td[i].name,
+                                     xwbrdemo_td[i].func,
+                                     xwbrdemo_td[i].arg,
+                                     xwbrdemo_td[i].stack_size,
+                                     xwbrdemo_td[i].prio,
+                                     xwbrdemo_td[i].attr);
                 if (rc < 0) {
-                        goto err_thrd_create;
+                        goto err_thd_create;
                 }
         }
 
         return XWOK;
 
-err_thrd_create:
+err_thd_create:
         xwos_br_destroy(&xwbrdemo_br);
 err_br_init:
         return rc;
@@ -127,7 +127,7 @@ err_br_init:
 /**
  * @brief 线程函数
  */
-xwer_t xwbrdemo_thrd_func(void * arg)
+xwer_t xwbrdemo_thd_func(void * arg)
 {
         xwos_br_declare_bitmap(msk);
         xwer_t rc;
@@ -150,6 +150,6 @@ xwer_t xwbrdemo_thrd_func(void * arg)
         }
 
         brlogf(INFO, "[线程%d] 退出。\n", pos);
-        xwos_thrd_delete(xwos_cthrd_id());
+        xwos_thd_delete(xwos_cthd_getd());
         return rc;
 }

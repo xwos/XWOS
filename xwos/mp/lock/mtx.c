@@ -19,11 +19,11 @@
 #include <xwos/mp/tt.h>
 #include <xwos/mp/rtwq.h>
 #include <xwos/mp/mtxtree.h>
-#include <xwos/mp/thrd.h>
+#include <xwos/mp/thd.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
-  #include <xwos/mm/memslice.h>
+#include <xwos/mm/memslice.h>
 #endif /* XWMPCFG_LOCK_MTX_MEMSLICE */
 #include <xwos/mp/lock/mtx.h>
 
@@ -48,30 +48,30 @@ xwer_t xwmp_mtx_gc(void * mtx);
 
 static __xwmp_code
 xwer_t xwmp_mtx_chprio_once(struct xwmp_mtx * mtx,
-                            struct xwmp_tcb ** ptcb,
+                            struct xwmp_thd ** pthd,
                             xwsq_t * seq);
 
 static __xwmp_code
 void xwmp_mtx_chprio(struct xwmp_mtx * mtx);
 
 static __xwmp_code
-xwer_t xwmp_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
-                                                struct xwmp_tcb * tcb,
-                                                xwtm_t * xwtm,
-                                                xwreg_t cpuirq);
+xwer_t xwmp_mtx_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
+                                               struct xwmp_thd * thd,
+                                               xwtm_t * xwtm,
+                                               xwreg_t cpuirq);
 
 static __xwmp_code
 xwer_t xwmp_mtx_do_timedlock(struct xwmp_mtx * mtx,
-                             struct xwmp_tcb * tcb,
+                             struct xwmp_thd * thd,
                              xwtm_t * xwtm);
 
 static __xwmp_code
-xwer_t xwmp_mtx_do_blkthrd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
-                                           struct xwmp_tcb * tcb,
-                                           xwreg_t cpuirq);
+xwer_t xwmp_mtx_do_blkthd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
+                                          struct xwmp_thd * thd,
+                                          xwreg_t cpuirq);
 
 static __xwmp_code
-xwer_t xwmp_mtx_do_lock_unintr(struct xwmp_mtx * mtx, struct xwmp_tcb * tcb);
+xwer_t xwmp_mtx_do_lock_unintr(struct xwmp_mtx * mtx, struct xwmp_thd * thd);
 
 #if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
 /**
@@ -172,7 +172,7 @@ void xwmp_mtx_free(struct xwmp_mtx * mtx)
 static __xwmp_code
 void xwmp_mtx_construct(struct xwmp_mtx * mtx)
 {
-        xwos_object_construct(&mtx->xwobj, XWOS_OBJ_MTX);
+        xwos_object_construct(&mtx->xwobj);
 }
 
 /**
@@ -357,7 +357,7 @@ xwer_t xwmp_mtx_delete(struct xwmp_mtx * mtx)
 /**
  * @brief 修改一次互斥锁的动态优先级
  * @param mtx: (I) 互斥锁对象的指针
- * @param ptcb: (O) 指向缓冲区的指针，通过此缓冲区返回下一个需要修改动态优先级的
+ * @param pthd: (O) 指向缓冲区的指针，通过此缓冲区返回下一个需要修改动态优先级的
  *                  线程控制块对象的指针
  * @param pseq: (O) 指向缓冲区的指针，通过此缓冲区返回线程控制块中互斥锁树中的
  *                  顺序锁的顺序值
@@ -365,15 +365,15 @@ xwer_t xwmp_mtx_delete(struct xwmp_mtx * mtx)
  */
 static __xwmp_code
 xwer_t xwmp_mtx_chprio_once(struct xwmp_mtx * mtx,
-                            struct xwmp_tcb ** ptcb,
+                            struct xwmp_thd ** pthd,
                             xwsq_t * seq)
 {
-        struct xwmp_tcb * owner;
+        struct xwmp_thd * owner;
         struct xwmp_mtxtree * mt;
         xwreg_t cpuirq;
         xwer_t rc;
 
-        *ptcb = NULL;
+        *pthd = NULL;
         rc = xwmp_mtx_grab(mtx);
         if (__xwcc_likely(XWOK == rc)) {
                 xwmp_rtwq_lock_cpuirqsv(&mtx->rtwq, &cpuirq);
@@ -386,7 +386,7 @@ xwer_t xwmp_mtx_chprio_once(struct xwmp_mtx * mtx,
                                 mtx->dprio = mtx->sprio;
                                 mt = mtx->ownertree;
                                 if (mt) {
-                                        owner = xwcc_baseof(mt, struct xwmp_tcb,
+                                        owner = xwcc_baseof(mt, struct xwmp_thd,
                                                             mtxtree);
                                         xwmp_sqlk_wr_lock(&mt->lock);
                                         *seq = xwmp_sqlk_get_seq(&mt->lock);
@@ -395,7 +395,7 @@ xwer_t xwmp_mtx_chprio_once(struct xwmp_mtx * mtx,
                                         xwmp_sqlk_wr_unlock(&mt->lock);
                                         xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                                         *seq += XWMP_SQLK_GRANULARITY;
-                                        *ptcb = owner;
+                                        *pthd = owner;
                                 } else {
                                         xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                                 }
@@ -404,7 +404,7 @@ xwer_t xwmp_mtx_chprio_once(struct xwmp_mtx * mtx,
                         mtx->dprio = mtx->rtwq.max_prio;
                         mt = mtx->ownertree;
                         if (mt) {
-                                owner = xwcc_baseof(mt, struct xwmp_tcb, mtxtree);
+                                owner = xwcc_baseof(mt, struct xwmp_thd, mtxtree);
                                 xwmp_sqlk_wr_lock(&mt->lock);
                                 *seq = xwmp_sqlk_get_seq(&mt->lock);
                                 xwmp_mtxtree_remove_locked(mtx, mt);
@@ -412,7 +412,7 @@ xwer_t xwmp_mtx_chprio_once(struct xwmp_mtx * mtx,
                                 xwmp_sqlk_wr_unlock(&mt->lock);
                                 xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                                 *seq += XWMP_SQLK_GRANULARITY;
-                                *ptcb = owner;
+                                *pthd = owner;
                         } else {
                                 xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                         }
@@ -430,27 +430,27 @@ xwer_t xwmp_mtx_chprio_once(struct xwmp_mtx * mtx,
 static __xwmp_code
 void xwmp_mtx_chprio(struct xwmp_mtx * mtx)
 {
-        struct xwmp_tcb * tcb;
+        struct xwmp_thd * thd;
         struct xwmp_mtxtree * mt;
         xwsq_t pseq, cseq;
         xwpr_t dprio;
         xwer_t rc;
 
         while (mtx) {
-                rc = xwmp_mtx_chprio_once(mtx, &tcb, &pseq);
+                rc = xwmp_mtx_chprio_once(mtx, &thd, &pseq);
                 if (__xwcc_unlikely(rc < 0)) {
                         break;
                 }/* else {} */
-                if (__xwcc_likely(NULL == tcb)) {
+                if (__xwcc_likely(NULL == thd)) {
                         break;
                 }/* else {} */
-                mt = &tcb->mtxtree;
+                mt = &thd->mtxtree;
                 cseq = xwmp_sqlk_rd_begin(&mt->lock);
                 if (cseq == pseq) {
-                        dprio = tcb->sprio > mt->maxprio ?
-                                tcb->sprio : mt->maxprio;
+                        dprio = thd->sprio > mt->maxprio ?
+                                thd->sprio : mt->maxprio;
                         mtx = NULL;
-                        rc = xwmp_thrd_chprio_once(tcb, dprio, &mtx);
+                        rc = xwmp_thd_chprio_once(thd, dprio, &mtx);
                         if (xwmp_sqlk_rd_retry(&mt->lock, cseq) || (rc < 0)) {
                                 break;
                         }/* else {} */
@@ -461,7 +461,7 @@ void xwmp_mtx_chprio(struct xwmp_mtx * mtx)
 /**
  * @brief 中断互斥锁等待队列中的一个线程
  * @param mtx: (I) 互斥锁对象的指针
- * @param tcb: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程控制块对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @note
@@ -470,7 +470,7 @@ void xwmp_mtx_chprio(struct xwmp_mtx * mtx)
  * - 重入性：可重入
  */
 __xwmp_code
-xwer_t xwmp_mtx_intr(struct xwmp_mtx * mtx, struct xwmp_tcb * tcb)
+xwer_t xwmp_mtx_intr(struct xwmp_mtx * mtx, struct xwmp_thd * thd)
 {
         struct xwmp_skd * xwskd;
         xwreg_t cpuirq;
@@ -479,27 +479,27 @@ xwer_t xwmp_mtx_intr(struct xwmp_mtx * mtx, struct xwmp_tcb * tcb)
         rc = xwmp_mtx_grab(mtx);
         if (__xwcc_likely(XWOK == rc)) {
                 xwmp_rtwq_lock_cpuirqsv(&mtx->rtwq, &cpuirq);
-                xwmp_splk_lock(&tcb->wqn.lock);
-                rc = xwmp_rtwq_remove_locked(&mtx->rtwq, &tcb->wqn);
+                xwmp_splk_lock(&thd->wqn.lock);
+                rc = xwmp_rtwq_remove_locked(&mtx->rtwq, &thd->wqn);
                 if (XWOK == rc) {
-                        tcb->wqn.wq = NULL;
-                        tcb->wqn.type = XWMP_WQTYPE_UNKNOWN;
-                        xwaop_store(xwsq, &tcb->wqn.reason,
+                        thd->wqn.wq = NULL;
+                        thd->wqn.type = XWMP_WQTYPE_UNKNOWN;
+                        xwaop_store(xwsq, &thd->wqn.reason,
                                     xwmb_modr_release, XWMP_WQN_REASON_INTR);
-                        tcb->wqn.cb = NULL;
-                        xwmp_splk_unlock(&tcb->wqn.lock);
-                        xwmp_splk_lock(&tcb->stlock);
-                        xwbop_c0m(xwsq_t, &tcb->state, XWMP_SKDOBJ_DST_BLOCKING);
-                        tcb->dprio.wq = XWMP_SKD_PRIORITY_INVALID;
-                        xwmp_splk_unlock(&tcb->stlock);
+                        thd->wqn.cb = NULL;
+                        xwmp_splk_unlock(&thd->wqn.lock);
+                        xwmp_splk_lock(&thd->stlock);
+                        xwbop_c0m(xwsq_t, &thd->state, XWMP_SKDOBJ_DST_BLOCKING);
+                        thd->dprio.wq = XWMP_SKD_PRIORITY_INVALID;
+                        xwmp_splk_unlock(&thd->stlock);
                         xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                         xwmp_mtx_chprio(mtx);
                         xwmp_mtx_put(mtx);
-                        xwmp_thrd_wakeup(tcb);
-                        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &tcb->xwskd);
+                        xwmp_thd_wakeup(thd);
+                        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &thd->xwskd);
                         xwmp_skd_chkpmpt(xwskd);
                 } else {
-                        xwmp_splk_unlock(&tcb->wqn.lock);
+                        xwmp_splk_unlock(&thd->wqn.lock);
                         xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                         xwmp_mtx_put(mtx);
                 }
@@ -514,7 +514,7 @@ xwer_t xwmp_mtx_intr(struct xwmp_mtx * mtx, struct xwmp_tcb * tcb)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EOWNER: 线程并没有锁定此互斥锁
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -526,7 +526,7 @@ xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx)
         xwer_t rc;
         struct xwmp_skd * local, * xwskd;
         struct xwmp_wqn * wqn;
-        struct xwmp_tcb * t, * ctcb;
+        struct xwmp_thd * t, * cthd;
         struct xwmp_mtx * tmp;
         struct xwmp_mtxtree * mt;
         xwpr_t dprio;
@@ -534,13 +534,13 @@ xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx)
         xwreg_t cpuirq;
 
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHRD == xwmp_irq_get_id(NULL)),
-                      "not-in-thrd", -ENOTINTHRD);
+        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)),
+                      "not-in-thd", -ENOTINTHD);
 
         rc = XWOK;
         local = xwmp_skd_dspmpt_lc();
-        ctcb = xwmp_skd_get_ctcb(local);
-        mt = &ctcb->mtxtree;
+        cthd = xwmp_skd_get_cthd(local);
+        mt = &cthd->mtxtree;
         xwmp_rtwq_lock_cpuirqsv(&mtx->rtwq, &cpuirq);
         if (mtx->ownertree != mt) {
                 rc = -EOWNER;
@@ -578,7 +578,7 @@ xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx)
                         }
                         xwmp_mtxtree_add(mtx, mt);
                         xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
-                        rc = xwmp_thrd_wakeup(t);
+                        rc = xwmp_thd_wakeup(t);
                         if (__xwcc_unlikely(rc < 0)) {
                                 /* 如果t已经在其他CPU开始运行，
                                    它的动态优先级需要被修改。*/
@@ -586,7 +586,7 @@ xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx)
                                 dprio = t->sprio > mt->maxprio ?
                                         t->sprio : mt->maxprio;
                                 tmp = NULL;
-                                rc = xwmp_thrd_chprio_once(t, dprio, &tmp);
+                                rc = xwmp_thd_chprio_once(t, dprio, &tmp);
                                 if ((!xwmp_sqlk_rd_retry(&mt->lock, seq)) &&
                                     (XWOK == rc) && (tmp)) {
                                         xwmp_mtx_chprio(tmp);
@@ -594,7 +594,7 @@ xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx)
                         }/* else {} */
                         xwmp_mtx_put(mtx);
                         /* change the priority of old owner */
-                        xwmp_thrd_chprio(ctcb);
+                        xwmp_thd_chprio(cthd);
                         xwmp_skd_enpmpt(local);
                         /* 如果函数在xwmpsyn_cond_timedwait()中被调用，
                            当前线程已经不是`XWMP_SKDOBJ_DST_RUNNING'状态，
@@ -608,7 +608,7 @@ xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx)
                         /* Case 2: 没有线程正在等待互斥锁 */
                         xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                         xwmp_mtx_put(mtx);
-                        xwmp_thrd_chprio(ctcb);
+                        xwmp_thd_chprio(cthd);
                         xwmp_skd_enpmpt(local);
                         /* 如果函数在xwmpsyn_cond_timedwait()中被调用，
                            当前线程已经不是`XWMP_SKDOBJ_DST_RUNNING'状态，
@@ -626,7 +626,7 @@ xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -648,7 +648,7 @@ xwer_t xwmp_mtx_lock(struct xwmp_mtx * mtx)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ENODATA: 获取锁失败
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -662,13 +662,13 @@ __xwmp_api
 xwer_t xwmp_mtx_trylock(struct xwmp_mtx * mtx)
 {
         struct xwmp_skd * xwskd;
-        struct xwmp_tcb * ctcb;
+        struct xwmp_thd * cthd;
         struct xwmp_mtxtree * mt;
         xwer_t rc;
 
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHRD == xwmp_irq_get_id(NULL)),
-                      "not-in-thrd", -ENOTINTHRD);
+        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)),
+                      "not-in-thd", -ENOTINTHD);
 
         rc = xwmp_mtx_grab(mtx);
         if (__xwcc_unlikely(rc < 0)) {
@@ -676,8 +676,8 @@ xwer_t xwmp_mtx_trylock(struct xwmp_mtx * mtx)
         }
         rc = XWOK;
         xwskd = xwmp_skd_dspmpt_lc();
-        ctcb = xwmp_skd_get_ctcb(xwskd);
-        mt = &ctcb->mtxtree;
+        cthd = xwmp_skd_get_cthd(xwskd);
+        mt = &cthd->mtxtree;
         xwmp_rtwq_lock_cpuirq(&mtx->rtwq);
         if (mtx->ownertree == mt) {
                 mtx->reentrant++;
@@ -691,7 +691,7 @@ xwer_t xwmp_mtx_trylock(struct xwmp_mtx * mtx)
         } else {
                 xwmp_mtxtree_add(mtx, mt);
                 xwmp_rtwq_unlock_cpuirq(&mtx->rtwq);
-                xwmp_thrd_chprio(ctcb);
+                xwmp_thd_chprio(cthd);
                 xwmp_skd_enpmpt(xwskd);
                 xwmp_skd_chkpmpt(xwskd);
         }
@@ -701,10 +701,10 @@ err_mtx_grab:
 }
 
 static __xwmp_code
-xwer_t xwmp_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
-                                                struct xwmp_tcb * tcb,
-                                                xwtm_t * xwtm,
-                                                xwreg_t cpuirq)
+xwer_t xwmp_mtx_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
+                                               struct xwmp_thd * thd,
+                                               xwtm_t * xwtm,
+                                               xwreg_t cpuirq)
 {
         xwer_t rc;
         struct xwmp_skd * xwskd;
@@ -715,31 +715,31 @@ xwer_t xwmp_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
         xwsq_t reason;
         xwsq_t wkuprs;
 
-        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &tcb->xwskd);
+        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &thd->xwskd);
         xwtt = &xwskd->tt;
         hwt = &xwtt->hwt;
         currtick = xwmp_syshwt_get_timetick(hwt);
         expected = xwtm_add_safely(currtick, *xwtm);
 
         /* 加入等待队列 */
-        xwmp_splk_lock(&tcb->stlock);
+        xwmp_splk_lock(&thd->stlock);
         XWOS_BUG_ON((XWMP_SKDOBJ_DST_BLOCKING | XWMP_SKDOBJ_DST_SLEEPING |
                      XWMP_SKDOBJ_DST_READY | XWMP_SKDOBJ_DST_STANDBY |
                      XWMP_SKDOBJ_DST_FROZEN | XWMP_SKDOBJ_DST_MIGRATING)
-                    & tcb->state);
-        if (XWMP_SKDOBJ_DST_FREEZABLE & tcb->state) {
-                xwmp_splk_unlock(&tcb->stlock);
+                    & thd->state);
+        if (XWMP_SKDOBJ_DST_FREEZABLE & thd->state) {
+                xwmp_splk_unlock(&thd->stlock);
                 xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                 rc = -EINTR;
                 goto err_needfrz;
         }
-        dprio = tcb->dprio.r;
-        xwbop_c0m(xwsq_t, &tcb->state, XWMP_SKDOBJ_DST_RUNNING);
-        tcb->dprio.r = XWMP_SKD_PRIORITY_INVALID;
-        tcb->dprio.wq = dprio;
-        xwbop_s1m(xwsq_t, &tcb->state, XWMP_SKDOBJ_DST_BLOCKING);
-        xwmp_splk_unlock(&tcb->stlock);
-        xwmp_thrd_eq_rtwq_locked(tcb, &mtx->rtwq, XWMP_WQTYPE_MTX, dprio);
+        dprio = thd->dprio.r;
+        xwbop_c0m(xwsq_t, &thd->state, XWMP_SKDOBJ_DST_RUNNING);
+        thd->dprio.r = XWMP_SKD_PRIORITY_INVALID;
+        thd->dprio.wq = dprio;
+        xwbop_s1m(xwsq_t, &thd->state, XWMP_SKDOBJ_DST_BLOCKING);
+        xwmp_splk_unlock(&thd->stlock);
+        xwmp_thd_eq_rtwq_locked(thd, &mtx->rtwq, XWMP_WQTYPE_MTX, dprio);
         xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
 
         /* 改变优先级 */
@@ -747,10 +747,10 @@ xwer_t xwmp_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
 
         /* 加入时间树 */
         xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
-        xwmp_splk_lock(&tcb->stlock);
-        xwbop_s1m(xwsq_t, &tcb->state, XWMP_SKDOBJ_DST_SLEEPING);
-        xwmp_splk_unlock(&tcb->stlock);
-        xwmp_thrd_tt_add_locked(tcb, xwtt, expected, cpuirq);
+        xwmp_splk_lock(&thd->stlock);
+        xwbop_s1m(xwsq_t, &thd->state, XWMP_SKDOBJ_DST_SLEEPING);
+        xwmp_splk_unlock(&thd->stlock);
+        xwmp_thd_tt_add_locked(thd, xwtt, expected, cpuirq);
         xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
 
         /* 调度 */
@@ -764,50 +764,50 @@ xwer_t xwmp_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
         /* 判断唤醒原因 */
         xwmb_mp_rmb();
         /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
-        reason = xwaop_load(xwsq, &tcb->wqn.reason, xwmb_modr_relaxed);
-        wkuprs = xwaop_load(xwsq, &tcb->ttn.wkuprs, xwmb_modr_relaxed);
+        reason = xwaop_load(xwsq, &thd->wqn.reason, xwmb_modr_relaxed);
+        wkuprs = xwaop_load(xwsq, &thd->ttn.wkuprs, xwmb_modr_relaxed);
         if (XWMP_WQN_REASON_INTR == reason) {
                 xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                rc = xwmp_tt_remove_locked(xwtt, &tcb->ttn);
+                rc = xwmp_tt_remove_locked(xwtt, &thd->ttn);
                 if (XWOK == rc) {
-                        xwmp_splk_lock(&tcb->stlock);
-                        xwbop_c0m(xwsq_t, &tcb->state, XWMP_SKDOBJ_DST_SLEEPING);
-                        xwmp_splk_unlock(&tcb->stlock);
+                        xwmp_splk_lock(&thd->stlock);
+                        xwbop_c0m(xwsq_t, &thd->state, XWMP_SKDOBJ_DST_SLEEPING);
+                        xwmp_splk_unlock(&thd->stlock);
                 }/* else {} */
                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 rc = -EINTR;
         } else if (XWMP_WQN_REASON_UP == reason) {
                 xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                rc = xwmp_tt_remove_locked(xwtt, &tcb->ttn);
+                rc = xwmp_tt_remove_locked(xwtt, &thd->ttn);
                 if (XWOK == rc) {
-                        xwmp_splk_lock(&tcb->stlock);
-                        xwbop_c0m(xwsq_t, &tcb->state, XWMP_SKDOBJ_DST_SLEEPING);
-                        xwmp_splk_unlock(&tcb->stlock);
+                        xwmp_splk_lock(&thd->stlock);
+                        xwbop_c0m(xwsq_t, &thd->state, XWMP_SKDOBJ_DST_SLEEPING);
+                        xwmp_splk_unlock(&thd->stlock);
                 }/* else {} */
                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 rc = XWOK;
         } else if (XWMP_TTN_WKUPRS_TIMEDOUT == wkuprs) {
                 xwmp_rtwq_lock_cpuirq(&mtx->rtwq);
-                xwmp_splk_lock(&tcb->wqn.lock);
-                rc = xwmp_rtwq_remove_locked(&mtx->rtwq, &tcb->wqn);
+                xwmp_splk_lock(&thd->wqn.lock);
+                rc = xwmp_rtwq_remove_locked(&mtx->rtwq, &thd->wqn);
                 if (XWOK == rc) {
-                        tcb->wqn.wq = NULL;
-                        tcb->wqn.type = XWMP_WQTYPE_UNKNOWN;
-                        xwaop_store(xwsq, &tcb->wqn.reason,
+                        thd->wqn.wq = NULL;
+                        thd->wqn.type = XWMP_WQTYPE_UNKNOWN;
+                        xwaop_store(xwsq, &thd->wqn.reason,
                                     xwmb_modr_release, XWMP_WQN_REASON_INTR);
-                        tcb->wqn.cb = NULL;
-                        xwmp_splk_unlock(&tcb->wqn.lock);
-                        xwmp_splk_lock(&tcb->stlock);
-                        xwbop_c0m(xwsq_t, &tcb->state, XWMP_SKDOBJ_DST_BLOCKING);
-                        tcb->dprio.wq = XWMP_SKD_PRIORITY_INVALID;
-                        xwmp_splk_unlock(&tcb->stlock);
+                        thd->wqn.cb = NULL;
+                        xwmp_splk_unlock(&thd->wqn.lock);
+                        xwmp_splk_lock(&thd->stlock);
+                        xwbop_c0m(xwsq_t, &thd->state, XWMP_SKDOBJ_DST_BLOCKING);
+                        thd->dprio.wq = XWMP_SKD_PRIORITY_INVALID;
+                        xwmp_splk_unlock(&thd->stlock);
                         xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                         xwmp_mtx_chprio(mtx);
                         rc = -ETIMEDOUT;
                 } else {
-                        xwmp_splk_unlock(&tcb->wqn.lock);
+                        xwmp_splk_unlock(&thd->wqn.lock);
                         xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
-                        reason = xwaop_load(xwsq, &tcb->wqn.reason,
+                        reason = xwaop_load(xwsq, &thd->wqn.reason,
                                             xwmb_modr_relaxed);
                         if (XWMP_WQN_REASON_INTR == reason) {
                                 rc = -EINTR;
@@ -820,26 +820,26 @@ xwer_t xwmp_mtx_do_timedblkthrd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
                 }
         } else if (XWMP_TTN_WKUPRS_INTR == wkuprs) {
                 xwmp_rtwq_lock_cpuirq(&mtx->rtwq);
-                xwmp_splk_lock(&tcb->wqn.lock);
-                rc = xwmp_rtwq_remove_locked(&mtx->rtwq, &tcb->wqn);
+                xwmp_splk_lock(&thd->wqn.lock);
+                rc = xwmp_rtwq_remove_locked(&mtx->rtwq, &thd->wqn);
                 if (XWOK == rc) {
-                        tcb->wqn.wq = NULL;
-                        tcb->wqn.type = XWMP_WQTYPE_UNKNOWN;
-                        xwaop_store(xwsq, &tcb->wqn.reason,
+                        thd->wqn.wq = NULL;
+                        thd->wqn.type = XWMP_WQTYPE_UNKNOWN;
+                        xwaop_store(xwsq, &thd->wqn.reason,
                                     xwmb_modr_release, XWMP_WQN_REASON_INTR);
-                        tcb->wqn.cb = NULL;
-                        xwmp_splk_unlock(&tcb->wqn.lock);
-                        xwmp_splk_lock(&tcb->stlock);
-                        xwbop_c0m(xwsq_t, &tcb->state, XWMP_SKDOBJ_DST_BLOCKING);
-                        tcb->dprio.wq = XWMP_SKD_PRIORITY_INVALID;
-                        xwmp_splk_unlock(&tcb->stlock);
+                        thd->wqn.cb = NULL;
+                        xwmp_splk_unlock(&thd->wqn.lock);
+                        xwmp_splk_lock(&thd->stlock);
+                        xwbop_c0m(xwsq_t, &thd->state, XWMP_SKDOBJ_DST_BLOCKING);
+                        thd->dprio.wq = XWMP_SKD_PRIORITY_INVALID;
+                        xwmp_splk_unlock(&thd->stlock);
                         xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                         xwmp_mtx_chprio(mtx);
                         rc = -EINTR;
                 } else {
-                        xwmp_splk_unlock(&tcb->wqn.lock);
+                        xwmp_splk_unlock(&thd->wqn.lock);
                         xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
-                        reason = xwaop_load(xwsq, &tcb->wqn.reason,
+                        reason = xwaop_load(xwsq, &thd->wqn.reason,
                                             xwmb_modr_relaxed);
                         if (XWMP_WQN_REASON_INTR == reason) {
                                 rc = -EINTR;
@@ -862,7 +862,7 @@ err_needfrz:
 
 static __xwmp_code
 xwer_t xwmp_mtx_do_timedlock(struct xwmp_mtx * mtx,
-                             struct xwmp_tcb * tcb,
+                             struct xwmp_thd * thd,
                              xwtm_t * xwtm)
 {
         struct xwmp_skd * xwskd;
@@ -872,11 +872,11 @@ xwer_t xwmp_mtx_do_timedlock(struct xwmp_mtx * mtx,
 
         rc = XWOK;
         /* 当线程执行此处代码时，不可能拥有状态XWMP_SKDOBJ_DST_MIGRATING，
-           因为，迁移永远发生在线程处于冻结点时。也因此可在锁xwskd->tcblistlock外
-           读取tcb->xwskd。*/
-        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &tcb->xwskd);
+           因为，迁移永远发生在线程处于冻结点时。也因此可在锁xwskd->thdlistlock外
+           读取thd->xwskd。*/
+        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &thd->xwskd);
         xwmp_skd_dspmpt(xwskd);
-        mt = &tcb->mtxtree;
+        mt = &thd->mtxtree;
         xwmp_rtwq_lock_cpuirqsv(&mtx->rtwq, &cpuirq);
         if (mtx->ownertree == mt) {
                 mtx->reentrant++;
@@ -890,14 +890,14 @@ xwer_t xwmp_mtx_do_timedlock(struct xwmp_mtx * mtx,
                         xwmp_skd_enpmpt(xwskd);
                         rc = -EINTR;
                 } else {
-                        rc = xwmp_mtx_do_timedblkthrd_unlkwq_cpuirqrs(mtx, tcb,
-                                                                      xwtm, cpuirq);
+                        rc = xwmp_mtx_do_timedblkthd_unlkwq_cpuirqrs(mtx, thd,
+                                                                     xwtm, cpuirq);
                         xwmp_skd_wakelock_unlock(xwskd);
                 }
         } else {
                 xwmp_mtxtree_add(mtx, mt);
                 xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
-                xwmp_thrd_chprio(tcb);
+                xwmp_thd_chprio(thd);
                 xwmp_skd_enpmpt(xwskd);
                 xwmp_skd_chkpmpt(xwskd);
         }
@@ -915,7 +915,7 @@ xwer_t xwmp_mtx_do_timedlock(struct xwmp_mtx * mtx,
  * @retval -EFAULT: 空指针
  * @retval -EINTR: 等待被中断
  * @retval -ETIMEDOUT: 超时
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -932,12 +932,12 @@ __xwmp_api
 xwer_t xwmp_mtx_timedlock(struct xwmp_mtx * mtx, xwtm_t * xwtm)
 {
         xwer_t rc;
-        struct xwmp_tcb * ctcb;
+        struct xwmp_thd * cthd;
 
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
         XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHRD == xwmp_irq_get_id(NULL)),
-                      "not-in-thrd", -ENOTINTHRD);
+        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)),
+                      "not-in-thd", -ENOTINTHD);
 
         if (__xwcc_unlikely(xwtm_cmp(*xwtm, 0) < 0)) {
                 rc = -ETIMEDOUT;
@@ -951,8 +951,8 @@ xwer_t xwmp_mtx_timedlock(struct xwmp_mtx * mtx, xwtm_t * xwtm)
         } else {
                 rc = xwmp_mtx_grab(mtx);
                 if (__xwcc_likely(XWOK == rc)) {
-                        ctcb = xwmp_skd_get_ctcb_lc();
-                        rc = xwmp_mtx_do_timedlock(mtx, ctcb, xwtm);
+                        cthd = xwmp_skd_get_cthd_lc();
+                        rc = xwmp_mtx_do_timedlock(mtx, cthd, xwtm);
                         if (__xwcc_unlikely(rc < 0)) {
                                 xwmp_mtx_put(mtx);
                         } /* else {} */
@@ -962,26 +962,26 @@ xwer_t xwmp_mtx_timedlock(struct xwmp_mtx * mtx, xwtm_t * xwtm)
 }
 
 static __xwmp_code
-xwer_t xwmp_mtx_do_blkthrd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
-                                           struct xwmp_tcb * tcb,
-                                           xwreg_t cpuirq)
+xwer_t xwmp_mtx_do_blkthd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
+                                          struct xwmp_thd * thd,
+                                          xwreg_t cpuirq)
 {
         struct xwmp_skd * xwskd;
         xwsq_t reason;
         xwpr_t dprio;
         xwer_t rc;
 
-        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &tcb->xwskd);
+        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &thd->xwskd);
         /* 加入等待队列 */
-        xwmp_splk_lock(&tcb->stlock);
-        dprio = tcb->dprio.r;
-        xwbop_c0m(xwsq_t, &tcb->state, XWMP_SKDOBJ_DST_RUNNING);
-        tcb->dprio.r = XWMP_SKD_PRIORITY_INVALID;
-        tcb->dprio.wq = dprio;
-        xwbop_s1m(xwsq_t, &tcb->state,
+        xwmp_splk_lock(&thd->stlock);
+        dprio = thd->dprio.r;
+        xwbop_c0m(xwsq_t, &thd->state, XWMP_SKDOBJ_DST_RUNNING);
+        thd->dprio.r = XWMP_SKD_PRIORITY_INVALID;
+        thd->dprio.wq = dprio;
+        xwbop_s1m(xwsq_t, &thd->state,
                   XWMP_SKDOBJ_DST_BLOCKING | XWMP_SKDOBJ_DST_UNINTERRUPTED);
-        xwmp_splk_unlock(&tcb->stlock);
-        xwmp_thrd_eq_rtwq_locked(tcb, &mtx->rtwq, XWMP_WQTYPE_MTX, dprio);
+        xwmp_splk_unlock(&thd->stlock);
+        xwmp_thd_eq_rtwq_locked(thd, &mtx->rtwq, XWMP_WQTYPE_MTX, dprio);
         xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
 
         /* 改变优先级 */
@@ -996,7 +996,7 @@ xwer_t xwmp_mtx_do_blkthrd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
         /* 判断唤醒原因 */
         xwmb_mp_rmb();
         /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
-        reason = xwaop_load(xwsq, &tcb->wqn.reason, xwmb_modr_relaxed);
+        reason = xwaop_load(xwsq, &thd->wqn.reason, xwmb_modr_relaxed);
         if (XWMP_WQN_REASON_UP == reason) {
                 rc = XWOK;
         } else {
@@ -1008,7 +1008,7 @@ xwer_t xwmp_mtx_do_blkthrd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
 }
 
 static __xwmp_code
-xwer_t xwmp_mtx_do_lock_unintr(struct xwmp_mtx * mtx, struct xwmp_tcb * tcb)
+xwer_t xwmp_mtx_do_lock_unintr(struct xwmp_mtx * mtx, struct xwmp_thd * thd)
 {
         struct xwmp_skd * xwskd;
         struct xwmp_mtxtree * mt;
@@ -1016,20 +1016,20 @@ xwer_t xwmp_mtx_do_lock_unintr(struct xwmp_mtx * mtx, struct xwmp_tcb * tcb)
         xwer_t rc;
 
         rc = XWOK;
-        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &tcb->xwskd);
+        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &thd->xwskd);
         xwmp_skd_dspmpt(xwskd);
-        mt = &tcb->mtxtree;
+        mt = &thd->mtxtree;
         xwmp_rtwq_lock_cpuirqsv(&mtx->rtwq, &cpuirq);
         if (mtx->ownertree == mt) {
                 mtx->reentrant++;
                 xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                 xwmp_skd_enpmpt(xwskd);
         } else if (mtx->ownertree) {
-                rc = xwmp_mtx_do_blkthrd_unlkwq_cpuirqrs(mtx, tcb, cpuirq);
+                rc = xwmp_mtx_do_blkthd_unlkwq_cpuirqrs(mtx, thd, cpuirq);
         } else {
                 xwmp_mtxtree_add(mtx, mt);
                 xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
-                xwmp_thrd_chprio(tcb);
+                xwmp_thd_chprio(thd);
                 xwmp_skd_enpmpt(xwskd);
                 xwmp_skd_chkpmpt(xwskd);
         }
@@ -1042,7 +1042,7 @@ xwer_t xwmp_mtx_do_lock_unintr(struct xwmp_mtx * mtx, struct xwmp_tcb * tcb)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -1052,18 +1052,18 @@ __xwmp_api
 xwer_t xwmp_mtx_lock_unintr(struct xwmp_mtx * mtx)
 {
         xwer_t rc;
-        struct xwmp_tcb * ctcb;
+        struct xwmp_thd * cthd;
 
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHRD == xwmp_irq_get_id(NULL)),
-                      "not-in-thrd", -ENOTINTHRD);
+        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)),
+                      "not-in-thd", -ENOTINTHD);
 
         rc = xwmp_mtx_grab(mtx);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_grab;
         }
-        ctcb = xwmp_skd_get_ctcb_lc();
-        rc = xwmp_mtx_do_lock_unintr(mtx, ctcb);
+        cthd = xwmp_skd_get_cthd_lc();
+        rc = xwmp_mtx_do_lock_unintr(mtx, cthd);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_do_lock_unintr;
         }

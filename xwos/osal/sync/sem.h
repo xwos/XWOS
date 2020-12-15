@@ -218,7 +218,7 @@ xwer_t xwos_sem_post(struct xwos_sem * sem)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的ID或空指针
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -259,7 +259,7 @@ xwer_t xwos_sem_trywait(struct xwos_sem * sem)
  * @retval -EFAULT: 无效的ID或空指针
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -279,7 +279,7 @@ xwer_t xwos_sem_timedwait(struct xwos_sem * sem, xwtm_t * xwtm)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的ID或空指针
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程

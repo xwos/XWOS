@@ -22,7 +22,7 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/bma.h>
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/thrd.h>
+  #include <xwos/mp/thd.h>
   #include <xwos/mp/swt.h>
   #include <xwos/mp/sync/sem.h>
   #include <xwos/mp/sync/cond.h>
@@ -84,14 +84,14 @@ xwer_t sys_mm_init(void)
         void * mem;
         xwsz_t size;
 
-        size = sizeof(struct xwos_tcb) * 16;
+        size = sizeof(struct xwos_thd) * 16;
         rc = xwmm_kma_alloc(size, 8, &mem);
         if (rc < 0) {
-                goto err_tcb_bma_alloc;
+                goto err_thd_bma_alloc;
         }
-        rc = xwos_tcb_cache_init((xwptr_t)mem, size);
+        rc = xwos_thd_cache_init((xwptr_t)mem, size);
         if (rc < 0) {
-                goto err_tcb_cache_init;
+                goto err_thd_cache_init;
         }
 
         size = sizeof(struct xwsync_swt) * 32;
@@ -169,9 +169,9 @@ err_swt_cache_init:
         BDL_BUG();
 err_swt_bma_alloc:
         BDL_BUG();
-err_tcb_cache_init:
+err_thd_cache_init:
         BDL_BUG();
-err_tcb_bma_alloc:
+err_thd_bma_alloc:
         BDL_BUG();
 #endif /* XuanWuOS_CFG_CORE__mp */
 err_ocheap_bma_create:

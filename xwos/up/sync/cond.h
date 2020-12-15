@@ -19,7 +19,7 @@
   #include <xwos/up/sync/obj.h>
 #endif /* XWUPCFG_SYNC_EVT */
 
-struct xwup_tcb;
+struct xwup_thd;
 
 /**
  * @brief 条件量对象
@@ -37,7 +37,7 @@ void xwup_cond_deactivate(struct xwup_cond * cond);
 xwer_t xwup_cond_intr(struct xwup_cond * cond, struct xwup_wqn * wqn);
 xwer_t xwup_cond_do_unicast(struct xwup_cond * cond);
 xwer_t xwup_cond_do_timedwait(struct xwup_cond * cond,
-                              struct xwup_tcb * tcb,
+                              struct xwup_thd * thd,
                               void * lock, xwsq_t lktype, void * lkdata,
                               xwtm_t * xwtm, xwsq_t * lkst);
 

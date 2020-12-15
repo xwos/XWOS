@@ -48,7 +48,7 @@ struct xwmp_mtx {
 
 xwer_t xwmp_mtx_grab(struct xwmp_mtx * mtx);
 xwer_t xwmp_mtx_put(struct xwmp_mtx * mtx);
-xwer_t xwmp_mtx_intr(struct xwmp_mtx * mtx, struct xwmp_tcb * tcb);
+xwer_t xwmp_mtx_intr(struct xwmp_mtx * mtx, struct xwmp_thd * thd);
 
 #if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
 xwer_t xwmp_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size);

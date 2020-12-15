@@ -13,7 +13,7 @@
  *   + ① xwmp_mtxtree.lock
  *   + ① xwmp_skd.pm.lock
  *     + ② xwmp_rtrq.lock
- *       + ③ xwmp_tcb.stlock
+ *       + ③ xwmp_thd.stlock
  */
 
 #include <xwos/standard.h>
@@ -22,7 +22,7 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/skd.h>
-#include <xwos/mp/thrd.h>
+#include <xwos/mp/thd.h>
 #include <xwos/mp/rtrq.h>
 
 /**
@@ -46,7 +46,7 @@ xwer_t xwmp_rtrq_init(struct xwmp_rtrq * xwrtrq)
 /**
  * @brief 将线程加入到实时就绪队列的头部
  * @param xwrtrq: (I) XWOS MP内核的实时就绪队列
- * @param tcb: (I) 线程控制块的指针
+ * @param thd: (I) 线程控制块的指针
  * @retval XWOK: 没有错误
  * @retval -EPERM: 线程没有设置状态标志@ref XWMP_SKDOBJ_DST_READY
  * @note
@@ -57,16 +57,16 @@ xwer_t xwmp_rtrq_init(struct xwmp_rtrq * xwrtrq)
  * - 此函数必须在持有锁xwrtrq->lock时才可调用。
  */
 __xwmp_code
-xwer_t xwmp_rtrq_add_head_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_tcb * tcb)
+xwer_t xwmp_rtrq_add_head_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * thd)
 {
         xwpr_t prio;
         xwer_t rc;
 
-        if (!(XWMP_SKDOBJ_DST_READY & tcb->state)) {
+        if (!(XWMP_SKDOBJ_DST_READY & thd->state)) {
                 rc = -EPERM;
         } else {
-                prio = tcb->dprio.rq;
-                xwlib_bclst_add_head(&xwrtrq->q[prio], &tcb->rqnode);
+                prio = thd->dprio.rq;
+                xwlib_bclst_add_head(&xwrtrq->q[prio], &thd->rqnode);
                 if (!xwbmpop_t1i(xwrtrq->bmp, (xwsq_t)prio)) {
                         xwbmpop_s1i(xwrtrq->bmp, (xwsq_t)prio);
                         if (xwrtrq->top < prio) {
@@ -81,7 +81,7 @@ xwer_t xwmp_rtrq_add_head_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_tcb * tc
 /**
  * @brief 将线程加入到实时就绪队列的尾部
  * @param xwrtrq: (I) XWOS MP内核的实时就绪队列
- * @param tcb: (I) 线程控制块的指针
+ * @param thd: (I) 线程控制块的指针
  * @retval XWOK: 没有错误
  * @retval -EPERM: 线程没有设置状态标志@ref XWMP_SKDOBJ_DST_READY
  * @note
@@ -92,16 +92,16 @@ xwer_t xwmp_rtrq_add_head_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_tcb * tc
  * - 此函数必须在持有锁xwrtrq->lock时才可调用。
  */
 __xwmp_code
-xwer_t xwmp_rtrq_add_tail_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_tcb * tcb)
+xwer_t xwmp_rtrq_add_tail_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * thd)
 {
         xwpr_t prio;
         xwer_t rc;
 
-        if (!(XWMP_SKDOBJ_DST_READY & tcb->state)) {
+        if (!(XWMP_SKDOBJ_DST_READY & thd->state)) {
                 rc = -EPERM;
         } else {
-                prio = tcb->dprio.rq;
-                xwlib_bclst_add_tail(&xwrtrq->q[prio], &tcb->rqnode);
+                prio = thd->dprio.rq;
+                xwlib_bclst_add_tail(&xwrtrq->q[prio], &thd->rqnode);
                 if (!xwbmpop_t1i(xwrtrq->bmp, (xwsq_t)prio)) {
                         xwbmpop_s1i(xwrtrq->bmp, (xwsq_t)prio);
                         if (xwrtrq->top < prio) {
@@ -116,23 +116,23 @@ xwer_t xwmp_rtrq_add_tail_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_tcb * tc
 /**
  * @brief 将线程从实时就绪队列中删除
  * @param xwrtrq: (I) XWOS MP内核的实时就绪队列
- * @param tcb: (I) 线程控制块的指针
+ * @param thd: (I) 线程控制块的指针
  * @retval XWOK: 没有错误
  * @retval -ESRCH: 就绪队列中没有这个线程
  * @note
  * - 此函数必须在持有锁xwrtrq->lock时才可调用。
  */
 __xwmp_code
-xwer_t xwmp_rtrq_remove_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_tcb * tcb)
+xwer_t xwmp_rtrq_remove_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * thd)
 {
         xwpr_t prio;
         xwer_t rc;
 
-        if (!(XWMP_SKDOBJ_DST_READY & tcb->state)) {
+        if (!(XWMP_SKDOBJ_DST_READY & thd->state)) {
                 rc = -ESRCH;
         } else {
-                prio = tcb->dprio.rq;
-                xwlib_bclst_del_init(&tcb->rqnode);
+                prio = thd->dprio.rq;
+                xwlib_bclst_del_init(&thd->rqnode);
                 if (xwlib_bclst_tst_empty(&xwrtrq->q[prio])) {
                         xwbmpop_c0i(xwrtrq->bmp, (xwsq_t)prio);
                         prio = (xwpr_t)xwbmpop_fls(xwrtrq->bmp, XWMP_RTRQ_QNUM);
@@ -155,15 +155,15 @@ xwer_t xwmp_rtrq_remove_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_tcb * tcb)
  * - 此函数必须在持有锁xwrtrq->lock时才可调用。
  */
 __xwmp_code
-struct xwmp_tcb * xwmp_rtrq_choose_locked(struct xwmp_rtrq * xwrtrq)
+struct xwmp_thd * xwmp_rtrq_choose_locked(struct xwmp_rtrq * xwrtrq)
 {
-        struct xwmp_tcb * t;
+        struct xwmp_thd * t;
 
         if (XWMP_SKD_PRIORITY_INVALID == xwrtrq->top) {
                 t = NULL;
         } else {
                 t = xwlib_bclst_first_entry(&xwrtrq->q[xwrtrq->top],
-                                            struct xwmp_tcb,
+                                            struct xwmp_thd,
                                             rqnode);
         }
         return t;

@@ -20,7 +20,7 @@
 #define XWUP_RTRQ_QNUM          XWUPCFG_SKD_PRIORITY_RT_NUM
 
 struct xwup_skd;
-struct xwup_tcb;
+struct xwup_thd;
 
 /**
  * @brief 实时就绪队列
@@ -32,9 +32,9 @@ struct xwup_rtrq {
 };
 
 void xwup_rtrq_init(struct xwup_rtrq * xwrtrq);
-void xwup_rtrq_add_head(struct xwup_rtrq * xwrtrq, struct xwup_tcb * tcb);
-void xwup_rtrq_add_tail(struct xwup_rtrq * xwrtrq, struct xwup_tcb * tcb);
-void xwup_rtrq_remove(struct xwup_rtrq * xwrtrq, struct xwup_tcb * tcb);
-struct xwup_tcb * xwup_rtrq_choose(struct xwup_rtrq * xwrtrq);
+void xwup_rtrq_add_head(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd);
+void xwup_rtrq_add_tail(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd);
+void xwup_rtrq_remove(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd);
+struct xwup_thd * xwup_rtrq_choose(struct xwup_rtrq * xwrtrq);
 
 #endif /* xwos/up/rtrq.h */

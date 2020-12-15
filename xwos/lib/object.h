@@ -24,23 +24,9 @@
  * @patam type: (I) 类型
  * @param obj: (I) 对象
  * @note
- * 类似于C++中的关键字：static_cast<type>(obj)
+ * - 类似于C++中的关键字：static_cast<type>(obj)
  */
 #define xwos_cast(type, obj)    ((type)(obj))
-
-enum xwos_object_type_em {
-        XWOS_OBJ_NULL = 0,
-        XWOS_OBJ_IRQC,
-        XWOS_OBJ_THRD,
-        XWOS_OBJ_SWT,
-        XWOS_OBJ_SEM,
-        XWOS_OBJ_COND,
-        XWOS_OBJ_EVT,
-        XWOS_OBJ_MTX,
-        XWOS_OBJ_MAX = 0xFF,
-        XWCD_OBJ_DEVICE,
-        XWCD_OBJ_MAX = 0x1FF,
-};
 
 /**
  * @brief 垃圾回收函数指针类型
@@ -62,124 +48,25 @@ struct __xwcc_aligned(XWMMCFG_ALIGNMENT) xwos_object {
                               可以将这个初始值备份起来，当结构体被分配
                               出去时使用备份值恢复第一块内存的内容。 */
         xwobj_gc_f gcfunc; /**< 垃圾回收函数 */
-        xwid_t type; /**< 对象的类型 */
+        xwsq_t ticket; /**< 对象的标签 */
 };
 
 /**
- * @brief XWOS对象的构造函数
- * @param obj: (I) 对象指针
+ * @brief XWOS对象描述符
  */
-static __xwcc_inline
-void xwos_object_construct(struct xwos_object * obj, xwid_t type)
-{
-        obj->refcnt = 0;
-        obj->gcfunc = NULL;
-        obj->type = type;
-}
+typedef struct {
+        struct xwos_object * obj;
+        xwsq_t ticket;
+} xwobj_d;
 
-/**
- * @brief XWOS对象的析构函数
- * @param obj: (I) 对象指针
- */
-static __xwcc_inline
-void xwos_object_destruct(struct xwos_object * obj)
-{
-        obj->gcfunc = NULL;
-        obj->type = XWOS_OBJ_NULL;
-}
-
-/**
- * @brief 激活一个XWOS对象（将其引用计数初始化位1）
- * @param obj: (I) 对象指针
- * @param gcfunc: (I) 垃圾回收函数：当对象应用计数为0，调用此函数回收资源。
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EOBJACTIVE: 对象已激活
- */
-static __xwcc_inline
-xwer_t xwos_object_activate(struct xwos_object * obj, xwobj_gc_f gcfunc)
-{
-        xwer_t rc;
-
-        rc = xwaop_teq_then_add(xwsq, &obj->refcnt, 0, 1, NULL, NULL);
-        if (__xwcc_likely(XWOK == rc)) {
-                obj->gcfunc = gcfunc;
-        } else {
-                rc = -EOBJACTIVE;
-        }
-        return rc;
-}
-
-/**
- * @brief 增加对象的引用计数
- * @param obj: (I) 对象指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EOBJDEAD: 对象已销毁
- */
-static __xwcc_inline
-xwer_t xwos_object_grab(struct xwos_object * obj)
-{
-        xwer_t rc;
-
-        rc = xwaop_tge_then_add(xwsq, &obj->refcnt, 1, 1, NULL, NULL);
-        if (__xwcc_unlikely(rc < 0)) {
-                rc = -EOBJDEAD;
-        }/* else {} */
-        return rc;
-}
-
-/**
- * @brief 测试类型
- * @param obj: (I) 对象指针
- * @param type: (I) 对象类型
- * @return 布尔值
- * @retval true: 类型一致
- * @retval false: 类型不一致
- */
-static __xwcc_inline
-bool xwos_object_tst_type(struct xwos_object * obj, xwid_t type)
-{
-        return !!(obj->type == type);
-}
-
-/**
- * @brief 减少对象的引用计数
- * @param obj: (I) 对象指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EOBJDEAD: 对象已销毁
- */
-static __xwcc_inline
-xwer_t xwos_object_put(struct xwos_object * obj)
-{
-        xwer_t rc;
-        xwsq_t nv;
-
-        rc = xwaop_tgt_then_sub(xwsq, &obj->refcnt,
-                                0, 1,
-                                &nv, NULL);
-        if (__xwcc_likely(XWOK == rc)) {
-                if (__xwcc_unlikely(0 == nv)) {
-                        if (obj->gcfunc) {
-                                rc = obj->gcfunc(obj);
-                        }/* else {} */
-                }/* else {} */
-        } else {
-                rc = -EOBJDEAD;
-        }
-        return rc;
-}
-
-/**
- * @brief 获取XWOS对象的引用计数
- * @param obj: (I) 对象指针
- * @return 引用计数
- */
-static __xwcc_inline
-xwsq_t xwos_object_get_refcnt(struct xwos_object * obj)
-{
-        return xwaop_load(xwsq, &obj->refcnt, xwmb_modr_relaxed);
-}
+void xwos_objtix_init(void);
+void xwos_object_construct(struct xwos_object * obj);
+void xwos_object_destruct(struct xwos_object * obj);
+xwer_t xwos_object_activate(struct xwos_object * obj, xwobj_gc_f gcfunc);
+xwobj_d xwos_object_get_d(struct xwos_object * obj);
+xwer_t xwos_object_grab(struct xwos_object * obj);
+xwer_t xwos_object_grab_safely(xwobj_d objd);
+xwer_t xwos_object_put(struct xwos_object * obj);
+xwsq_t xwos_object_get_refcnt(struct xwos_object * obj);
 
 #endif /* xwos/lib/object.h */

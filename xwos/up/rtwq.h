@@ -33,7 +33,7 @@ struct xwup_rtwq {
  * @param c: (I) 作为循环光标的等待队列节点结构体(struct xwup_wqn)指针
  * @param xwrtwq: (I) 等待队列的指针
  */
-#define xwup_rtwq_itr_thrd_rm(c, xwrtwq) \
+#define xwup_rtwq_itr_thd_rm(c, xwrtwq) \
         for (c = (xwrtwq)->rightmost; c; c = (xwrtwq)->rightmost)
 
 void xwup_rtwq_init(struct xwup_rtwq * xwrtwq);

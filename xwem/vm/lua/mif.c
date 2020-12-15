@@ -35,19 +35,19 @@ struct xwlua_arg xwlua_arg = {
         .argv = xwlua_argv,
 };
 
-const struct xwos_thrd_desc xwlua_tbd[] = {
+const struct xwos_thd_desc xwlua_tbd[] = {
         [0] = {
                 .name = "task.lua",
                 .prio = XWLUA_TASK_PRIORITY,
                 .stack = NULL,
                 .stack_size = 8192,
-                .func = xwlua_thrd,
+                .func = xwlua_thd,
                 .arg = &xwlua_arg,
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
 
-xwid_t xwlua_tid[xw_array_size(xwlua_tbd)];
+xwos_thd_d xwlua_thdd[xw_array_size(xwlua_tbd)];
 
 xwer_t xwlua_start(void)
 {
@@ -55,13 +55,13 @@ xwer_t xwlua_start(void)
         xwsq_t i;
 
         for (i = 0; i < xw_array_size(xwlua_tbd); i++) {
-                rc = xwos_thrd_create(&xwlua_tid[i],
-                                      xwlua_tbd[i].name,
-                                      xwlua_tbd[i].func,
-                                      xwlua_tbd[i].arg,
-                                      xwlua_tbd[i].stack_size,
-                                      xwlua_tbd[i].prio,
-                                      xwlua_tbd[i].attr);
+                rc = xwos_thd_create(&xwlua_thdd[i],
+                                     xwlua_tbd[i].name,
+                                     xwlua_tbd[i].func,
+                                     xwlua_tbd[i].arg,
+                                     xwlua_tbd[i].stack_size,
+                                     xwlua_tbd[i].prio,
+                                     xwlua_tbd[i].attr);
                 if (rc < 0) {
                         break;
                 }

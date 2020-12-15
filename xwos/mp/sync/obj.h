@@ -31,7 +31,7 @@ struct xwmp_synobj {
 #endif /* XWMPCFG_SYNC_EVT */
 };
 
-void xwmp_synobj_construct(struct xwmp_synobj * synobj, xwid_t type);
+void xwmp_synobj_construct(struct xwmp_synobj * synobj);
 void xwmp_synobj_destruct(struct xwmp_synobj * synobj);
 xwer_t xwmp_synobj_activate(struct xwmp_synobj * synobj, xwobj_gc_f gcfunc);
 xwer_t xwmp_synobj_grab(struct xwmp_synobj * synobj);

@@ -419,7 +419,7 @@ xwer_t xwds_w25qxx_wait_idle(struct xwds_w25qxx * w25qxx, xwtm_t period,
         sleep = (desired > period) ? period : desired;
         while ((sleep > 0) && (-EBUSY == rc)) {
                 tmp = sleep;
-                rc = xwos_cthrd_sleep(&tmp);
+                rc = xwos_cthd_sleep(&tmp);
                 desired = desired - sleep;
                 if (XWOK == rc) {
                         rc = xwds_w25qxx_check_idle(w25qxx, xwtm);

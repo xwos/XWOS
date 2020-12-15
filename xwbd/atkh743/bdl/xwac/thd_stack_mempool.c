@@ -19,44 +19,29 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/lib/xwbop.h>
-#include <xwos/mm/common.h>
-#include <xwos/mm/bma.h>
-#include <bdl/xwac/thrd_stack_mempool.h>
-
-extern struct xwmm_bma * stkmempool_bma;
-
-#if ((BRDCFG_MM_STKMEMPOOL_BLKSZ % XWMMCFG_STACK_ALIGNMENT) != 0)
-  #error BRDCFG_MM_STKMEMPOOL_BLKSZ is not aligned to XWMMCFG_STACK_ALIGNMENT!
-#endif
+#include <bdl/axisram.h>
+#include <bdl/xwac/thd_stack_mempool.h>
 
 __xwos_code
-xwer_t bdl_thrd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf)
+xwer_t bdl_thd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf)
 {
         union {
                 xwstk_t * stk;
                 void * anon;
         } mem;
-        xwsz_t stknum;
-        xwsq_t numodr;
         xwer_t rc;
 
-        stknum = DIV_ROUND_UP(stack_size, BRDCFG_MM_STKMEMPOOL_BLKSZ);
-        numodr = (xwsq_t)xwbop_fls(xwsz_t, stknum);
-        if (stknum & (stknum - 1U)) {
-                numodr++;
-        }
-        rc = xwmm_bma_alloc(stkmempool_bma, numodr, &mem.anon);
-        if (rc < 0) {
-                *membuf = NULL;
-        } else {
+        rc = axisram_alloc(stack_size, &mem.anon);
+        if (XWOK == rc) {
                 *membuf = mem.stk;
+        } else {
+                *membuf = NULL;
         }
         return rc;
 }
 
 __xwos_code
-xwer_t bdl_thrd_stack_pool_free(xwstk_t * stk)
+xwer_t bdl_thd_stack_pool_free(xwstk_t * stk)
 {
-        return xwmm_bma_free(stkmempool_bma, stk);
+        return axisram_free(stk);
 }

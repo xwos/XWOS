@@ -27,7 +27,7 @@
 #include <xwos/osal/sync/flg.h>
 #include <xwam/example/timer/mif.h>
 
-#define XWSWTDEMO_THRD_PRIORITY                                 \
+#define XWSWTDEMO_THD_PRIORITY                                  \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
@@ -38,21 +38,21 @@
 #define swtlogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
 
-xwer_t xwswtdemo_thrd_func(void * arg);
+xwer_t xwswtdemo_thd_func(void * arg);
 
 /**
  * @brief 线程描述表
  */
-const struct xwos_thrd_desc xwswtdemo_tbd = {
-        .name = "xwswtdemo.thrd",
-        .prio = XWSWTDEMO_THRD_PRIORITY,
-        .stack = XWOS_THRD_STACK_DYNAMIC,
+const struct xwos_thd_desc xwswtdemo_tbd = {
+        .name = "xwswtdemo.thd",
+        .prio = XWSWTDEMO_THD_PRIORITY,
+        .stack = XWOS_THD_STACK_DYNAMIC,
         .stack_size = 2048,
-        .func = (xwos_thrd_f)xwswtdemo_thrd_func,
+        .func = (xwos_thd_f)xwswtdemo_thd_func,
         .arg = NULL,
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
-xwid_t xwswtdemo_tid;
+xwos_thd_d xwswtdemo_thdd;
 
 struct xwos_swt xwswtdemo_swt0;
 struct xwos_swt * xwswtdemo_swt1;
@@ -86,20 +86,20 @@ xwer_t example_timer_start(void)
         }
 
         /* 创建线程 */
-        rc = xwos_thrd_create(&xwswtdemo_tid,
-                              xwswtdemo_tbd.name,
-                              xwswtdemo_tbd.func,
-                              xwswtdemo_tbd.arg,
-                              xwswtdemo_tbd.stack_size,
-                              xwswtdemo_tbd.prio,
-                              xwswtdemo_tbd.attr);
+        rc = xwos_thd_create(&xwswtdemo_thdd,
+                             xwswtdemo_tbd.name,
+                             xwswtdemo_tbd.func,
+                             xwswtdemo_tbd.arg,
+                             xwswtdemo_tbd.stack_size,
+                             xwswtdemo_tbd.prio,
+                             xwswtdemo_tbd.attr);
         if (rc < 0) {
-                goto err_thrd_create;
+                goto err_thd_create;
         }
 
         return XWOK;
 
-err_thrd_create:
+err_thd_create:
         xwos_swt_delete(xwswtdemo_swt1);
 err_swt1_create:
         xwos_swt_destroy(&xwswtdemo_swt0);
@@ -150,7 +150,7 @@ void xwswtdemo_swt1_callback(struct xwos_swt * swt, void * arg)
 /**
  * @brief 线程1的主函数
  */
-xwer_t xwswtdemo_thrd_func(void * arg)
+xwer_t xwswtdemo_thd_func(void * arg)
 {
         xwtm_t base, ts;
         xwer_t rc;
@@ -176,7 +176,7 @@ xwer_t xwswtdemo_thrd_func(void * arg)
         /* 设置掩码位为bit0:1共2位 */
         memset(msk, 0, sizeof(msk));
         msk[0] = BIT(0) | BIT(1);
-        while (!xwos_cthrd_frz_shld_stop(NULL)) {
+        while (!xwos_cthd_frz_shld_stop(NULL)) {
                 /* 等待事件 */
                 rc = xwos_flg_wait(&swtflg,
                                    XWOS_FLG_TRIGGER_SET_ANY,
@@ -207,6 +207,6 @@ xwer_t xwswtdemo_thrd_func(void * arg)
         }
 
         swtlogf(INFO, "[线程] 退出。\n");
-        xwos_thrd_delete(xwos_cthrd_id());
+        xwos_thd_delete(xwos_cthd_getd());
         return rc;
 }

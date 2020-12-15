@@ -66,7 +66,7 @@ void xwmp_irqc_subsys_init(void)
 __xwmp_code
 void xwmp_irqc_construct(struct xwmp_irqc * irqc)
 {
-        xwos_object_construct(&irqc->xwobj, XWOS_OBJ_IRQC);
+        xwos_object_construct(&irqc->xwobj);
         irqc->cpuid = XWID_MAX;
 }
 
@@ -206,7 +206,7 @@ struct xwmp_irqc * xwmp_irqc_get_lc(void)
         xwid_t cpuid;
         xwer_t rc;
 
-        cpuid = xwmp_skd_get_id();
+        cpuid = xwmp_skd_id_lc();
         xwmp_rawly_lock_cpuirqsv(&xwmp_irqc_subsystem.percpu_irqcslot_lock, &cpuirq);
         irqc = xwmp_irqc_subsystem.percpu_irqc[cpuid];
         if (irqc) {
@@ -640,7 +640,7 @@ xwer_t xwmp_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
  *                     - 可为NULL，表示不需要返回中断号
  * @return 错误码
  * @retval OK: 当前上下文为中断
- * @retval -EINTHRD: 当前上下文为线程
+ * @retval -EINTHD: 当前上下文为线程
  * @retval -EINBH: 当前上下文为中断底半部
  * @note
  * - 同步/异步：同步
@@ -658,10 +658,10 @@ xwer_t xwmp_irq_get_id(xwirq_t * irqnbuf)
                 if (xwmp_skd_tst_in_bh_lc()) {
                         rc = -EINBH;
                 } else {
-                        rc = -EINTHRD;
+                        rc = -EINTHD;
                 }
 #else
-                rc = -EINTHRD;
+                rc = -EINTHD;
 #endif /* XWMPCFG_SKD_BH */
         }
         return rc;

@@ -16,26 +16,26 @@
 #include <xwos/standard.h>
 
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/skd.h>
-  #include <xwos/mp/thrd.h>
+#include <xwos/mp/skd.h>
+#include <xwos/mp/thd.h>
 
-  #define xwospl_skd_stack_info xwmp_skd_stack_info
-  #define xwospl_skd xwmp_skd
-  #define xwospl_tcb xwmp_tcb
+#define xwospl_skd_stack_info xwmp_skd_stack_info
+#define xwospl_skd xwmp_skd
+#define xwospl_thd xwmp_thd
 #elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/skd.h>
-  #include <xwos/up/thrd.h>
+#include <xwos/up/skd.h>
+#include <xwos/up/thd.h>
 
-  #define xwospl_skd_stack_info xwup_skd_stack_info
-  #define xwospl_skd xwup_skd
-  #define xwospl_tcb xwup_tcb
+#define xwospl_skd_stack_info xwup_skd_stack_info
+#define xwospl_skd xwup_skd
+#define xwospl_thd xwup_thd
 #else
-  #error "Can't find the configuration XuanWuOS_CFG_CORE!"
+#error "Can't find the configuration XuanWuOS_CFG_CORE!"
 #endif
 
 struct xwospl_skd_stack_info;
 struct xwospl_skd;
-struct xwospl_tcb;
+struct xwospl_thd;
 
 /**
  * @brief 玄武OS内核移植层：初始化调度调度器
@@ -56,7 +56,7 @@ void xwospl_skd_init_stack(struct xwospl_skd_stack_info * stk,
 /**
  * @brief 玄武OS内核移植层：获取当前CPU的ID
  */
-xwid_t xwospl_skd_get_id(void);
+xwid_t xwospl_skd_id_lc(void);
 
 /**
  * @brief 玄武OS内核移植层：启动调度器
@@ -87,32 +87,32 @@ void xwospl_skd_req_swcx(struct xwospl_skd * xwskd);
 
 /**
  * @brief 玄武OS内核移植层：本地CPU上的线程退出
- * @param tcb: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @param rc: (I) 线程退出抛出的返回值
  */
-void xwospl_thrd_exit_lc(struct xwospl_tcb * tcb, xwer_t rc);
+void xwospl_thd_exit_lc(struct xwospl_thd * thd, xwer_t rc);
 
 /**
  * @brief 玄武OS内核移植层：冻结本地CPU中正在运行的线程
- * @param tcb: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  */
-xwer_t xwospl_thrd_freeze_lc(struct xwospl_tcb * tcb);
+xwer_t xwospl_thd_freeze_lc(struct xwospl_thd * thd);
 
 #if defined(XuanWuOS_CFG_CORE__mp)
 /**
  * @brief 玄武OS内核移植层：将线程迁出其他CPU，并准备迁入其他CPU
- * @param tcb: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @param cpuid: (I) 目的地CPU的ID
  * @return 错误码
  */
-xwer_t xwospl_thrd_outmigrate(struct xwospl_tcb * tcb, xwid_t cpuid);
+xwer_t xwospl_thd_outmigrate(struct xwospl_thd * thd, xwid_t cpuid);
 
 /**
  * @brief 玄武OS内核移植层：迁移线程至目标CPU
- * @param tcb: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @param cpuid: (I) 目的地CPU的ID
  */
-void xwospl_thrd_immigrate(struct xwospl_tcb * tcb, xwid_t cpuid);
+void xwospl_thd_immigrate(struct xwospl_thd * thd, xwid_t cpuid);
 #endif /* XuanWuOS_CFG_CORE__mp */
 
 #include <ospl_skd_impl.h>

@@ -586,15 +586,15 @@ xwer_t xwpcp_rxfsm(struct xwpcp * xwpcp)
  * @return 线程返回值
  */
 __xwmd_code
-xwer_t xwpcp_rxthrd(struct xwpcp * xwpcp)
+xwer_t xwpcp_rxthd(struct xwpcp * xwpcp)
 {
         xwer_t rc;
 
         rc = XWOK;
-        while (!xwos_cthrd_shld_stop()) {
-                if (xwos_cthrd_shld_frz()) {
+        while (!xwos_cthd_shld_stop()) {
+                if (xwos_cthd_shld_frz()) {
                         xwpcplogf(DEBUG, "Start freezing ...\n");
-                        rc = xwos_cthrd_freeze();
+                        rc = xwos_cthd_freeze();
                         if (__xwcc_unlikely(rc < 0)) {
                                 xwpcplogf(DEBUG, "Failed to freeze ... rc: %d\n", rc);
                                 xwpcp_doze(1);
@@ -1183,15 +1183,15 @@ err_txqsem_wait:
  * @return 线程返回值
  */
 __xwmd_code
-xwer_t xwpcp_txthrd(struct xwpcp * xwpcp)
+xwer_t xwpcp_txthd(struct xwpcp * xwpcp)
 {
         xwer_t rc;
 
         rc = XWOK;
-        while (!xwos_cthrd_shld_stop()) {
-                if (xwos_cthrd_shld_frz()) {
+        while (!xwos_cthd_shld_stop()) {
+                if (xwos_cthd_shld_frz()) {
                         xwpcplogf(DEBUG, "Start freezing ...\n");
-                        rc = xwos_cthrd_freeze();
+                        rc = xwos_cthd_freeze();
                         if (__xwcc_unlikely(rc < 0)) {
                                 xwpcplogf(DEBUG, "Failed to freeze ... rc: %d\n", rc);
                         }
@@ -1227,5 +1227,5 @@ xwer_t xwpcp_doze(xwu32_t cnt)
         xwtm_t sleep;
 
         sleep = XWPCP_RETRY_PERIOD * cnt;
-        return xwos_cthrd_sleep(&sleep);
+        return xwos_cthd_sleep(&sleep);
 }

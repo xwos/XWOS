@@ -38,9 +38,9 @@
 #define XWMDCFG_isc_xwpcp_RETRY_NUM                             (8U)
 #define XWMDCFG_isc_xwpcp_MEMBLK_SIZE                           (64U)
 #define XWMDCFG_isc_xwpcp_MEMBLK_NUM                            (64U)
-#define XWMDCFG_isc_xwpcp_RXTHRD_PRIORITY                       \
+#define XWMDCFG_isc_xwpcp_RXTHD_PRIORITY                        \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
-#define XWMDCFG_isc_xwpcp_TXTHRD_PRIORITY                       \
+#define XWMDCFG_isc_xwpcp_TXTHD_PRIORITY                        \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 /******** ******** simple communication protocol ******** ********/
@@ -51,7 +51,7 @@
 #define XWMDCFG_isc_xwscp_SDU_MAX_SIZE                          (40U)
 #define XWMDCFG_isc_xwscp_FRMSLOT_NUM                           (8U)
 #define XWMDCFG_isc_xwscp_SYNC_KEY                              ('S')
-#define XWMDCFG_isc_xwscp_THRD_PRIORITY                         \
+#define XWMDCFG_isc_xwscp_THD_PRIORITY                          \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 /******** ******** ******** ******** ******** ******** ******** ********

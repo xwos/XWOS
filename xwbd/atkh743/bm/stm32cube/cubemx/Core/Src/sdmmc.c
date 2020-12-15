@@ -224,7 +224,7 @@ xwer_t MX_SDMMC1_SD_TrimClk(xwsq_t cnt)
   memset(buf, 0xFF, 512);
   for (i = 0; i < cnt; i++) {
     time = 1 * XWTM_MS;
-    xwos_cthrd_sleep(&time);
+    xwos_cthd_sleep(&time);
     rc = MX_SDMMC1_SD_Read(buf, i, 1);
     if (XWOK == rc) {
     } else if (-EIO == rc) {

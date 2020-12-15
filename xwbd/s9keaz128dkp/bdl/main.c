@@ -22,27 +22,27 @@
 #include <xwos/osal/skd.h>
 #include <bdl/standard.h>
 
-#define SYS_MGR_THRD_PRIORITY   XWOS_SKD_PRIORITY_RT_MIN
+#define SYS_MGR_THD_PRIORITY   XWOS_SKD_PRIORITY_RT_MIN
 
 static
-xwer_t sys_mgr_thrd(void *arg);
+xwer_t sys_mgr_thd(void *arg);
 
-const struct xwos_thrd_desc sys_mgr_td = {
+const struct xwos_thd_desc sys_mgr_td = {
         .name = "sys.mgr",
-        .prio = SYS_MGR_THRD_PRIORITY,
+        .prio = SYS_MGR_THD_PRIORITY,
         .stack = NULL,
         .stack_size = 1024,
-        .func = sys_mgr_thrd,
+        .func = sys_mgr_thd,
         .arg = NULL,
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
-xwid_t sys_mgr_tid;
+xwos_thd_d sys_mgr_thdd;
 
 xwer_t xwos_main(void)
 {
         xwer_t rc;
 
-        rc = xwos_thrd_create(&sys_mgr_tid,
+        rc = xwos_thd_create(&sys_mgr_thdd,
                               sys_mgr_td.name,
                               sys_mgr_td.func,
                               sys_mgr_td.arg,
@@ -56,7 +56,7 @@ xwer_t xwos_main(void)
         return rc;
 }
 
-xwer_t sys_mgr_thrd(void *arg)
+xwer_t sys_mgr_thd(void *arg)
 {
         xwtm_t time;
         xwer_t rc;
@@ -64,9 +64,9 @@ xwer_t sys_mgr_thrd(void *arg)
         XWOS_UNUSED(arg);
         while (true) {
                 time = 300 * XWTM_MS;
-                xwos_cthrd_sleep(&time);
+                xwos_cthd_sleep(&time);
                 time = 300 * XWTM_MS;
-                xwos_cthrd_sleep(&time);
+                xwos_cthd_sleep(&time);
         }
         return rc;
 }

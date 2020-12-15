@@ -18,6 +18,7 @@
 #else
   #error "Can't find the configuration XuanWuOS_CFG_CORE!"
 #endif
+#include <xwos/lib/object.h>
 #include <xwos/mm/kma.h>
 #include <xwos/init.h>
 
@@ -57,6 +58,9 @@ void xwos_init(void)
         /* 将数据(.xwos.data)从flash中重定向到内存 */
         xwos_relocate();
 #endif /* XWKNCFG_RELOCATE_DATA */
+
+        /* 初始化对象标签分配器 */
+        xwos_objtix_init();
 
         /* 初始化KMA */
         xwmm_kma_init();

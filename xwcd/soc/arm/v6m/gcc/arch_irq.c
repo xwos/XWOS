@@ -236,11 +236,11 @@ void arch_isr_svc(void)
         __asm__ volatile("      bx      lr");
         __asm__ volatile("svc_5:"); /* case 5: freeze thread */
         __asm__ volatile("      push    {r0, lr}");
-        __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 value: ctcb */
+        __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 value: cthd */
 #if defined(XuanWuOS_CFG_CORE__mp)
-        __asm__ volatile("      bl      xwmp_thrd_freeze_lic");
+        __asm__ volatile("      bl      xwmp_thd_freeze_lic");
 #elif defined(XuanWuOS_CFG_CORE__up)
-        __asm__ volatile("      bl      xwup_thrd_freeze_lic");
+        __asm__ volatile("      bl      xwup_thd_freeze_lic");
 #endif
         __asm__ volatile("      mov     r2, r0");
         __asm__ volatile("      pop     {r0, r1}");
@@ -254,9 +254,9 @@ void arch_isr_svc(void)
         __asm__ volatile("      ldr     r1, [r0, #4]"); /* get old r1 value */
         __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 value */
 #if defined(XuanWuOS_CFG_CORE__mp)
-        __asm__ volatile("      bl      xwmp_thrd_exit_lic");
+        __asm__ volatile("      bl      xwmp_thd_exit_lic");
 #elif defined(XuanWuOS_CFG_CORE__up)
-        __asm__ volatile("      bl      xwup_thrd_exit_lic");
+        __asm__ volatile("      bl      xwup_thd_exit_lic");
 #endif
         __asm__ volatile("      mov     r2, r0");
         __asm__ volatile("      pop     {r0, r1}");

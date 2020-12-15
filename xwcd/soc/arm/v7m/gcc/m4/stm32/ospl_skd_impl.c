@@ -38,7 +38,7 @@ void xwospl_skd_init_stack(struct xwospl_skd_stack_info * stk,
 }
 
 __xwbsp_code
-xwid_t xwospl_skd_get_id(void)
+xwid_t xwospl_skd_id_lc(void)
 {
         return 0;
 }
@@ -68,8 +68,8 @@ xwer_t xwospl_skd_resume(__xwcc_unused struct xwospl_skd * xwskd)
 }
 
 __xwbsp_code __xwcc_naked
-void xwospl_thrd_exit_lc(__xwcc_unused struct xwospl_tcb * tcb,
-                         __xwcc_unused xwer_t rc)
+void xwospl_thd_exit_lc(__xwcc_unused struct xwospl_thd * thd,
+                        __xwcc_unused xwer_t rc)
 {
         __asm__ volatile(
         "       svc     7\n");
@@ -80,7 +80,7 @@ void xwospl_thrd_exit_lc(__xwcc_unused struct xwospl_tcb * tcb,
 }
 
 __xwbsp_code __xwcc_naked
-xwer_t xwospl_thrd_freeze_lc(__xwcc_unused struct xwospl_tcb * tcb)
+xwer_t xwospl_thd_freeze_lc(__xwcc_unused struct xwospl_thd * thd)
 {
         __asm__ volatile(
         "       svc     5\n"
@@ -89,8 +89,8 @@ xwer_t xwospl_thrd_freeze_lc(__xwcc_unused struct xwospl_tcb * tcb)
 
 #if defined(XuanWuOS_CFG_CORE__mp)
 __xwbsp_code __xwcc_naked
-xwer_t xwospl_thrd_outmigrate(__xwcc_unused struct xwospl_tcb * tcb,
-                              __xwcc_unused xwid_t cpuid)
+xwer_t xwospl_thd_outmigrate(__xwcc_unused struct xwospl_thd * thd,
+                             __xwcc_unused xwid_t cpuid)
 {
         __asm__ volatile(
         "       svc     11\n"
@@ -98,9 +98,9 @@ xwer_t xwospl_thrd_outmigrate(__xwcc_unused struct xwospl_tcb * tcb,
 }
 
 __xwbsp_code
-void xwospl_thrd_immigrate(struct xwospl_tcb * tcb, xwid_t cpuid)
+void xwospl_thd_immigrate(struct xwospl_thd * thd, xwid_t cpuid)
 {
         XWOS_UNUSED(cpuid);
-        xwmp_thrd_immigrate_lic(tcb);
+        xwmp_thd_immigrate_lic(thd);
 }
 #endif /* XuanWuOS_CFG_CORE__mp */

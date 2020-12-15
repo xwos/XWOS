@@ -41,7 +41,7 @@ xwer_t stm32cube_crc_lock(xwreg_t * cpuirq)
         xwer_t rc;
 
         xwos_skd_get_context_lc(&ctx, NULL);
-        if (XWOS_SKD_CONTEXT_THRD == ctx) {
+        if (XWOS_SKD_CONTEXT_THD == ctx) {
                 rc = xwos_mtx_lock(&stm32cube_crc_mtx);
         } else if (XWOS_SKD_CONTEXT_ISR == ctx) {
                 xwos_splk_lock_cpuirqsv(&stm32cube_crc_splk, cpuirq);
@@ -64,7 +64,7 @@ xwer_t stm32cube_crc_unlock(xwreg_t cpuirq)
         xwer_t rc;
 
         xwos_skd_get_context_lc(&ctx, NULL);
-        if (XWOS_SKD_CONTEXT_THRD == ctx) {
+        if (XWOS_SKD_CONTEXT_THD == ctx) {
                 rc = xwos_mtx_unlock(&stm32cube_crc_mtx);
         } else if (XWOS_SKD_CONTEXT_ISR == ctx) {
                 xwos_splk_unlock_cpuirqrs(&stm32cube_crc_splk, cpuirq);

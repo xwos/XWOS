@@ -24,7 +24,7 @@
 /**
  * @brief 接收线程的优先级
  */
-#define XWSCP_THRD_PRIORITY XWMDCFG_isc_xwscp_THRD_PRIORITY
+#define XWSCP_THD_PRIORITY XWMDCFG_isc_xwscp_THD_PRIORITY
 
 extern __xwmd_rodata const xwer_t xwscp_callback_rc[XWSCP_ACK_NUM];
 
@@ -32,12 +32,12 @@ extern __xwmd_rodata const xwer_t xwscp_callback_rc[XWSCP_ACK_NUM];
  * @brief 接收线程的描述
  */
 static __xwmd_rodata
-const struct xwos_thrd_desc xwscp_thrd_td = {
-        .name = "xwmd.isc.xwscp.thrd",
-        .prio = XWSCP_THRD_PRIORITY,
-        .stack = XWOS_THRD_STACK_DYNAMIC,
+const struct xwos_thd_desc xwscp_thd_td = {
+        .name = "xwmd.isc.xwscp.thd",
+        .prio = XWSCP_THD_PRIORITY,
+        .stack = XWOS_THD_STACK_DYNAMIC,
         .stack_size = 2048,
-        .func = (xwos_thrd_f)xwscp_thrd,
+        .func = (xwos_thd_f)xwscp_thd,
         .arg = NULL, /* TBD */
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
@@ -137,20 +137,20 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
         }
 
         /* 创建线程 */
-        rc = xwos_thrd_create(&xwscp->tid,
-                              xwscp_thrd_td.name,
-                              xwscp_thrd_td.func,
-                              xwscp,
-                              xwscp_thrd_td.stack_size,
-                              xwscp_thrd_td.prio,
-                              xwscp_thrd_td.attr);
+        rc = xwos_thd_create(&xwscp->thdd,
+                             xwscp_thd_td.name,
+                             xwscp_thd_td.func,
+                             xwscp,
+                             xwscp_thd_td.stack_size,
+                             xwscp_thd_td.prio,
+                             xwscp_thd_td.attr);
         if (rc < 0) {
-                goto err_thrd_create;
+                goto err_thd_create;
         }
 
         return XWOK;
 
-err_thrd_create:
+err_thd_create:
         xwscp_hwifal_close(xwscp);
 err_hwifal_open:
 err_rxqsem_init:
@@ -178,13 +178,9 @@ xwer_t xwscp_stop(struct xwscp * xwscp)
 
         XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
 
-        rc = xwos_thrd_stop(xwscp->tid, &childrc);
+        rc = xwos_thd_stop(xwscp->thdd, &childrc);
         if (XWOK == rc) {
-                rc = xwos_thrd_delete(xwscp->tid);
-                if (XWOK == rc) {
-                        xwscp->tid = 0;
-                        xwscplogf(INFO, "Stop XWSCP thread... [OK]\n");
-                }
+                xwscplogf(INFO, "Stop XWSCP thread... [OK]\n");
         }
 
         xwscp_hwifal_close(xwscp);

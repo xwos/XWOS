@@ -16,7 +16,7 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #include <xwos/ospl/irq.h>
-#include <xwos/up/thrd.h>
+#include <xwos/up/thd.h>
 #include <xwos/up/lock/fakespinlock.h>
 #include <xwos/up/sync/cond.h>
 #include <xwos/up/sync/obj.h>
@@ -880,7 +880,7 @@ xwer_t xwup_evt_timedwait_edge(struct xwup_evt * evt, xwsq_t trigger,
  * @retval -ETYPE: 事件对象类型错误
  * @retval -EINVAL: 参数无效
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -930,7 +930,7 @@ xwer_t xwup_evt_wait(struct xwup_evt * evt,
  * @retval -EINVAL: 参数无效
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -951,8 +951,8 @@ xwer_t xwup_evt_timedwait(struct xwup_evt * evt,
         XWOS_VALIDATE(((evt->attr & XWUP_EVT_TYPE_MASK) == XWUP_EVT_TYPE_FLG),
                       "type-error", -ETYPE);
         XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHRD == xwup_irq_get_id(NULL)),
-                      "not-in-thrd", -ENOTINTHRD);
+        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)),
+                      "not-in-thd", -ENOTINTHD);
 
         if (trigger <= XWUP_EVT_TRIGGER_CLR_ANY) {
                 rc = xwup_evt_timedwait_level(evt, trigger, action,
@@ -1130,7 +1130,7 @@ err_notconn:
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 事件对象类型错误
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -1207,7 +1207,7 @@ xwer_t xwup_evt_tryselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
  * @retval -ETYPE: 事件对象类型错误
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -1229,8 +1229,8 @@ xwer_t xwup_evt_timedselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
         XWOS_VALIDATE(((evt->attr & XWUP_EVT_TYPE_MASK) == XWUP_EVT_TYPE_SEL),
                       "type-error", -ETYPE);
         XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHRD == xwup_irq_get_id(NULL)),
-                      "not-in-thrd", -ENOTINTHRD);
+        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)),
+                      "not-in-thd", -ENOTINTHD);
 
         xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         while (true) {
@@ -1286,7 +1286,7 @@ xwer_t xwup_evt_timedselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
  * @retval -ECHRNG: 位置超出范围
  * @retval -ETYPE: 事件对象类型错误
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -1314,7 +1314,7 @@ xwer_t xwup_evt_sync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t sync[])
  * @retval -ECHRNG: 位置超出范围
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -1337,8 +1337,8 @@ xwer_t xwup_evt_timedsync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t sync[],
         XWOS_VALIDATE(((evt->attr & XWUP_EVT_TYPE_MASK) == XWUP_EVT_TYPE_BR),
                       "type-error", -ETYPE);
         XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHRD == xwup_irq_get_id(NULL)),
-                      "not-in-thrd", -ENOTINTHRD);
+        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)),
+                      "not-in-thd", -ENOTINTHD);
 
         xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         xwbmpop_s1i(evt->bmp, pos);
@@ -1347,7 +1347,7 @@ xwer_t xwup_evt_timedsync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t sync[],
                 xwbmpop_c0i(evt->bmp, pos);
                 xwup_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                 xwup_cond_broadcast(&evt->cond);
-                xwup_cthrd_yield();
+                xwup_cthd_yield();
                 rc = XWOK;
         } else {
                 rc = xwup_cond_timedwait(&evt->cond,

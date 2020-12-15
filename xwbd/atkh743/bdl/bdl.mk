@@ -30,7 +30,7 @@ BDL_ASRCS :=
 
 BDL_CSRCS += board_init.c
 BDL_CSRCS += axisram.c
-ifeq ($(BRDCFG_XWSKD_THRD_STACK_POOL),y)
-    BDL_CSRCS += xwac/thrd_stack_mempool.c
+ifeq ($(BRDCFG_XWSKD_THD_STACK_POOL),y)
+    BDL_CSRCS += xwac/thd_stack_mempool.c
 endif
 BDL_CSRCS += xwac/xwskd_hook.c

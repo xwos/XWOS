@@ -60,9 +60,9 @@ int xwlua_readline(lua_State * L, char buffer[], const char * prompt)
                         if (c < 0) {
                                 rc = -errno;
                                 if (-EINTR == rc) {
-                                        if (xwos_cthrd_shld_frz()) {
-                                                xwos_cthrd_freeze();
-                                        } else if (xwos_cthrd_shld_stop()) {
+                                        if (xwos_cthd_shld_frz()) {
+                                                xwos_cthd_freeze();
+                                        } else if (xwos_cthd_shld_stop()) {
                                                 ret = 0;
                                         }
                                 }

@@ -72,7 +72,7 @@ enum xwmp_ttn_wkup_reasaon_em {
  * @brief 时间树节点的类型枚举
  */
 enum xwmp_ttn_type_em {
-        XWMP_TTN_TYPE_THRD = 0, /**< 线程 */
+        XWMP_TTN_TYPE_THD = 0, /**< 线程 */
         XWMP_TTN_TYPE_SWT, /**< 软件定时器 */
 };
 

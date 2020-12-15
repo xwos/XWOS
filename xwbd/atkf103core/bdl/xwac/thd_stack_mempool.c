@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief W25Qxx编程器
+ * @brief 玄武OS内核适配代码：线程栈内存池
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,21 +18,30 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_application_w25qrpt_api_h__
-#define __xwam_application_w25qrpt_api_h__
-
 #include <xwos/standard.h>
-#include <xwcd/perpheral/spi/flash/w25qxx/device.h>
-#include <xwam/application/w25qrpt/w25qrpt.h>
-#include <xwam/application/w25qrpt/hwifal.h>
-#include <xwam/application/w25qrpt/hwif/uart.h>
+#include <bdl/ocheap.h>
+#include <bdl/xwac/thd_stack_mempool.h>
 
-xwer_t w25qrpt_start(struct w25qrpt * w25qrpt,
-                     const char * name,
-                     struct xwds_w25qxx * flash,
-                     const struct w25qrpt_hwifal_operations * hwifops,
-                     void * hwifcb);
+__xwos_code
+xwer_t bdl_thd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf)
+{
+        union {
+                xwstk_t * stk;
+                void * anon;
+        } mem;
+        xwer_t rc;
 
-xwer_t w25qrpt_stop(struct w25qrpt * w25qrpt);
+        rc = ocheap_alloc(stack_size, &mem.anon);
+        if (XWOK == rc) {
+                *membuf = mem.stk;
+        } else {
+                *membuf = NULL;
+        }
+        return rc;
+}
 
-#endif /* xwam/application/w25qrpt/api.h */
+__xwos_code
+xwer_t bdl_thd_stack_pool_free(xwstk_t * stk)
+{
+        return ocheap_free(stk);
+}

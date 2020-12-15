@@ -661,17 +661,17 @@ xwer_t xwscp_fsm(struct xwscp * xwscp)
  * @return 线程返回值
  */
 __xwmd_code
-xwer_t xwscp_thrd(struct xwscp * xwscp)
+xwer_t xwscp_thd(struct xwscp * xwscp)
 {
         xwer_t rc = XWOK;
 
-        while (!xwos_cthrd_shld_stop()) {
-                if (xwos_cthrd_shld_frz()) {
+        while (!xwos_cthd_shld_stop()) {
+                if (xwos_cthd_shld_frz()) {
                         xwscplogf(DEBUG, "Start freezing ...\n");
-                        rc = xwos_cthrd_freeze();
+                        rc = xwos_cthd_freeze();
                         if (__xwcc_unlikely(rc < 0)) {
                                 xwscplogf(ERR, "Failed to freeze ... [rc:%d]\n", rc);
-                                xwos_cthrd_yield();
+                                xwos_cthd_yield();
                         }/* else {} */
                         xwscplogf(DEBUG, "Resuming ...\n");
                 } else if (XWSCP_HWIFST_OPENED == xwscp->hwifst) {

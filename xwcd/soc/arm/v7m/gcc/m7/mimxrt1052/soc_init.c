@@ -82,7 +82,7 @@ void soc_init(void)
         soc_relocate();
 
 #if defined(XuanWuOS_CFG_CORE__mp)
-        xwid_t id = xwmp_skd_get_id();
+        xwid_t id = xwmp_skd_id_lc();
 
         /* Interrupt controller of CPU */
         xwmp_irqc_construct(&cortexm_nvic[id]);

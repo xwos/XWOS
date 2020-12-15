@@ -21,7 +21,7 @@
 #include <xwos/mp/lock/mtx.h>
 #include <xwos/mp/mtxtree.h>
 #include <xwos/mp/skd.h>
-#include <xwos/mp/thrd.h>
+#include <xwos/mp/thd.h>
 
 /**
  * @brief 初始化互斥锁树

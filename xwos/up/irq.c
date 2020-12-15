@@ -167,10 +167,10 @@ xwer_t xwup_irq_get_id(xwirq_t * irqnbuf)
                 if (xwup_skd_tst_in_bh_lc()) {
                         rc = -EINBH;
                 } else {
-                        rc = -EINTHRD;
+                        rc = -EINTHD;
                 }
 #else
-                rc = -EINTHRD;
+                rc = -EINTHD;
 #endif /* XWUPCFG_SKD_BH */
         }
         return rc;

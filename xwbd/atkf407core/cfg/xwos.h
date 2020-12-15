@@ -104,8 +104,8 @@
 /* #define XWMPCFG_SKD_IDLE_STACK_SIZE                  (2048U) */
 /* #define XWMPCFG_SKD_BH                               1 */
 /* #define XWMPCFG_SKD_BH_STACK_SIZE                    (2048U) */
-/* #define XWMPCFG_SKD_TCB_MEMSLICE                     1 */
-/* #define XWMPCFG_SKD_TCB_LOCAL_DATA_NUM               (2U) */
+/* #define XWMPCFG_SKD_THD_MEMSLICE                     1 */
+/* #define XWMPCFG_SKD_THD_LOCAL_DATA_NUM               (2U) */
 /* #define XWMPCFG_SKD_SWT                              1 */
 /* #define XWMPCFG_SKD_SWT_MEMSLICE                     1 */
 
@@ -139,8 +139,8 @@
 #define XWUPCFG_SKD_BH                                  0
 #define XWUPCFG_SKD_BH_STACK_SIZE                       (2048U)
 #define XWUPCFG_SKD_PM                                  1
-#define XWUPCFG_SKD_TCB_LOCAL_DATA_NUM                  (2U)
-#define XWUPCFG_SKD_THRD_EXIT                           1
+#define XWUPCFG_SKD_THD_LOCAL_DATA_NUM                  (2U)
+#define XWUPCFG_SKD_THD_EXIT                            1
 #define XWUPCFG_SKD_SWT                                 1
 
 /******** ******** ******** sync ******** ******** ********/

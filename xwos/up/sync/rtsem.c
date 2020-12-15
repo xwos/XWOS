@@ -16,11 +16,11 @@
 #include <xwos/ospl/skd.h>
 #include <xwos/up/lock/seqlock.h>
 #include <xwos/up/tt.h>
-#include <xwos/up/thrd.h>
+#include <xwos/up/thd.h>
 #include <xwos/up/rtwq.h>
 #include <xwos/mm/kma.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-  #include <xwos/up/sync/evt.h>
+#include <xwos/up/sync/evt.h>
 #endif /* XWUPCFG_SYNC_EVT */
 #include <xwos/up/sync/rtsem.h>
 
@@ -37,22 +37,22 @@ static __xwup_code
 void xwup_rtsem_deactivate(struct xwup_rtsem * sem);
 
 static __xwup_code
-xwer_t xwup_rtsem_do_timedblkthrd_unlkwq_cpuirqrs(struct xwup_rtsem * sem,
-                                                  struct xwup_tcb * tcb,
-                                                  xwtm_t * xwtm,
-                                                  xwreg_t flag);
+xwer_t xwup_rtsem_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_rtsem * sem,
+                                                 struct xwup_thd * thd,
+                                                 xwtm_t * xwtm,
+                                                 xwreg_t flag);
 
 static __xwup_code
-xwer_t xwup_rtsem_do_timedwait(struct xwup_rtsem * sem, struct xwup_tcb * tcb,
+xwer_t xwup_rtsem_do_timedwait(struct xwup_rtsem * sem, struct xwup_thd * thd,
                                xwtm_t * xwtm);
 
 static __xwup_code
-xwer_t xwup_rtsem_do_blkthrd_unlkwq_cpuirqrs(struct xwup_rtsem * sem,
-                                             struct xwup_tcb * tcb,
-                                             xwreg_t flag);
+xwer_t xwup_rtsem_do_blkthd_unlkwq_cpuirqrs(struct xwup_rtsem * sem,
+                                            struct xwup_thd * thd,
+                                            xwreg_t flag);
 
 static __xwup_code
-xwer_t xwup_rtsem_do_wait_unintr(struct xwup_rtsem * sem, struct xwup_tcb * tcb);
+xwer_t xwup_rtsem_do_wait_unintr(struct xwup_rtsem * sem, struct xwup_thd * thd);
 
 /**
  * @brief 申请实时信号量对象
@@ -375,7 +375,7 @@ xwer_t xwup_rtsem_post(struct xwup_rtsem * sem)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 中断上下文：不可以使用
@@ -432,10 +432,10 @@ xwer_t xwup_rtsem_trywait(struct xwup_rtsem * sem)
 }
 
 static __xwup_code
-xwer_t xwup_rtsem_do_timedblkthrd_unlkwq_cpuirqrs(struct xwup_rtsem * sem,
-                                                  struct xwup_tcb * tcb,
-                                                  xwtm_t * xwtm,
-                                                  xwreg_t flag)
+xwer_t xwup_rtsem_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_rtsem * sem,
+                                                 struct xwup_thd * thd,
+                                                 xwtm_t * xwtm,
+                                                 xwreg_t flag)
 {
         xwer_t rc;
         xwtm_t expected, currtick;
@@ -451,18 +451,18 @@ xwer_t xwup_rtsem_do_timedblkthrd_unlkwq_cpuirqrs(struct xwup_rtsem * sem,
         XWOS_BUG_ON((XWUP_SKDOBJ_DST_BLOCKING | XWUP_SKDOBJ_DST_SLEEPING |
                      XWUP_SKDOBJ_DST_READY | XWUP_SKDOBJ_DST_STANDBY |
                      XWUP_SKDOBJ_DST_FROZEN)
-                    & tcb->state);
+                    & thd->state);
 
         /* 加入等待队列 */
-        xwbop_c0m(xwsq_t, &tcb->state, XWUP_SKDOBJ_DST_RUNNING);
-        xwbop_s1m(xwsq_t, &tcb->state, XWUP_SKDOBJ_DST_BLOCKING);
-        xwup_thrd_eq_rtwq(tcb, &sem->rtwq, XWUP_WQTYPE_RTSEM);
+        xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_RUNNING);
+        xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_BLOCKING);
+        xwup_thd_eq_rtwq(thd, &sem->rtwq, XWUP_WQTYPE_RTSEM);
         xwospl_cpuirq_restore_lc(flag);
 
         /* 加入时间树 */
         xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
-        xwbop_s1m(xwsq_t, &tcb->state, XWUP_SKDOBJ_DST_SLEEPING);
-        xwup_thrd_tt_add_locked(tcb, xwtt, expected, flag);
+        xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_SLEEPING);
+        xwup_thd_tt_add_locked(thd, xwtt, expected, flag);
         xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, flag);
 
         /* 调度 */
@@ -477,60 +477,60 @@ xwer_t xwup_rtsem_do_timedblkthrd_unlkwq_cpuirqrs(struct xwup_rtsem * sem,
         xwospl_cpuirq_restore_lc(flag);
 
         /* 判断唤醒原因 */
-        if (XWUP_WQN_REASON_INTR == tcb->wqn.reason) {
+        if (XWUP_WQN_REASON_INTR == thd->wqn.reason) {
                 xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                rc = xwup_tt_remove_locked(xwtt, &tcb->ttn);
+                rc = xwup_tt_remove_locked(xwtt, &thd->ttn);
                 if (XWOK == rc) {
-                        xwbop_c0m(xwsq_t, &tcb->state, XWUP_SKDOBJ_DST_SLEEPING);
+                        xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_SLEEPING);
                 }/* else {} */
                 xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, flag);
                 rc = -EINTR;
-        } else if (XWUP_WQN_REASON_UP == tcb->wqn.reason) {
+        } else if (XWUP_WQN_REASON_UP == thd->wqn.reason) {
                 xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                rc = xwup_tt_remove_locked(xwtt, &tcb->ttn);
+                rc = xwup_tt_remove_locked(xwtt, &thd->ttn);
                 if (XWOK == rc) {
-                        xwbop_c0m(xwsq_t, &tcb->state, XWUP_SKDOBJ_DST_SLEEPING);
+                        xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_SLEEPING);
                 }/* else {} */
                 xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, flag);
                 rc = XWOK;
-        } else if (XWUP_TTN_WKUPRS_TIMEDOUT == tcb->ttn.wkuprs) {
+        } else if (XWUP_TTN_WKUPRS_TIMEDOUT == thd->ttn.wkuprs) {
                 xwospl_cpuirq_disable_lc();
-                rc = xwup_rtwq_remove(&sem->rtwq, &tcb->wqn);
+                rc = xwup_rtwq_remove(&sem->rtwq, &thd->wqn);
                 if (XWOK == rc) {
-                        tcb->wqn.wq = NULL;
-                        tcb->wqn.type = XWUP_WQTYPE_UNKNOWN;
-                        tcb->wqn.reason = XWUP_WQN_REASON_INTR;
-                        tcb->wqn.cb = NULL;
-                        xwbop_c0m(xwsq_t, &tcb->state, XWUP_SKDOBJ_DST_BLOCKING);
+                        thd->wqn.wq = NULL;
+                        thd->wqn.type = XWUP_WQTYPE_UNKNOWN;
+                        thd->wqn.reason = XWUP_WQN_REASON_INTR;
+                        thd->wqn.cb = NULL;
+                        xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_BLOCKING);
                         xwospl_cpuirq_restore_lc(flag);
                         rc = -ETIMEDOUT;
                 } else {
                         xwospl_cpuirq_restore_lc(flag);
-                        if (XWUP_WQN_REASON_INTR == tcb->wqn.reason) {
+                        if (XWUP_WQN_REASON_INTR == thd->wqn.reason) {
                                 rc = -EINTR;
-                        } else if (XWUP_WQN_REASON_UP == tcb->wqn.reason) {
+                        } else if (XWUP_WQN_REASON_UP == thd->wqn.reason) {
                                 rc = XWOK;
                         } else {
                                 XWOS_BUG();
                                 rc = -EBUG;
                         }
                 }
-        } else if (XWUP_TTN_WKUPRS_INTR == tcb->ttn.wkuprs) {
+        } else if (XWUP_TTN_WKUPRS_INTR == thd->ttn.wkuprs) {
                 xwospl_cpuirq_disable_lc();
-                rc = xwup_rtwq_remove(&sem->rtwq, &tcb->wqn);
+                rc = xwup_rtwq_remove(&sem->rtwq, &thd->wqn);
                 if (XWOK == rc) {
-                        tcb->wqn.wq = NULL;
-                        tcb->wqn.type = XWUP_WQTYPE_UNKNOWN;
-                        tcb->wqn.reason = XWUP_WQN_REASON_INTR;
-                        tcb->wqn.cb = NULL;
-                        xwbop_c0m(xwsq_t, &tcb->state, XWUP_SKDOBJ_DST_BLOCKING);
+                        thd->wqn.wq = NULL;
+                        thd->wqn.type = XWUP_WQTYPE_UNKNOWN;
+                        thd->wqn.reason = XWUP_WQN_REASON_INTR;
+                        thd->wqn.cb = NULL;
+                        xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_BLOCKING);
                         xwospl_cpuirq_restore_lc(flag);
                         rc = -EINTR;
                 } else {
                         xwospl_cpuirq_restore_lc(flag);
-                        if (XWUP_WQN_REASON_INTR == tcb->wqn.reason) {
+                        if (XWUP_WQN_REASON_INTR == thd->wqn.reason) {
                                 rc = -EINTR;
-                        } else if (XWUP_WQN_REASON_UP == tcb->wqn.reason) {
+                        } else if (XWUP_WQN_REASON_UP == thd->wqn.reason) {
                                 rc = XWOK;
                         } else {
                                 XWOS_BUG();
@@ -547,7 +547,7 @@ xwer_t xwup_rtsem_do_timedblkthrd_unlkwq_cpuirqrs(struct xwup_rtsem * sem,
 }
 
 static __xwup_code
-xwer_t xwup_rtsem_do_timedwait(struct xwup_rtsem * sem, struct xwup_tcb * tcb,
+xwer_t xwup_rtsem_do_timedwait(struct xwup_rtsem * sem, struct xwup_thd * thd,
                                xwtm_t * xwtm)
 {
         xwreg_t flag;
@@ -563,8 +563,8 @@ xwer_t xwup_rtsem_do_timedwait(struct xwup_rtsem * sem, struct xwup_tcb * tcb,
                         rc = -EINTR;
                 } else {
 #endif /* XWUPCFG_SKD_PM */
-                        rc = xwup_rtsem_do_timedblkthrd_unlkwq_cpuirqrs(sem, tcb,
-                                                                        xwtm, flag);
+                        rc = xwup_rtsem_do_timedblkthd_unlkwq_cpuirqrs(sem, thd,
+                                                                       xwtm, flag);
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
                         xwup_skd_wakelock_unlock();
                 }
@@ -599,7 +599,7 @@ xwer_t xwup_rtsem_do_timedwait(struct xwup_rtsem * sem, struct xwup_tcb * tcb,
  * @retval -EFAULT: 空指针
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -610,14 +610,14 @@ xwer_t xwup_rtsem_do_timedwait(struct xwup_rtsem * sem, struct xwup_tcb * tcb,
 __xwup_api
 xwer_t xwup_rtsem_timedwait(struct xwup_rtsem * sem, xwtm_t * xwtm)
 {
-        struct xwup_tcb * ctcb;
+        struct xwup_thd * cthd;
         xwer_t rc;
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
         XWOS_VALIDATE((xwtm_cmp(*xwtm, 0) >= 0), "out-of-time", -ETIMEDOUT);
-        XWOS_VALIDATE((-EINTHRD == xwup_irq_get_id(NULL)),
-                      "not-in-thrd", -ENOTINTHRD);
+        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)),
+                      "not-in-thd", -ENOTINTHD);
 
         if (__xwcc_unlikely(0 == xwtm_cmp(*xwtm, 0))) {
                 rc = xwup_rtsem_trywait(sem);
@@ -627,29 +627,29 @@ xwer_t xwup_rtsem_timedwait(struct xwup_rtsem * sem, xwtm_t * xwtm)
                         }/* else {} */
                 }/* else {} */
         } else {
-                ctcb = xwup_skd_get_ctcb_lc();
-                rc = xwup_rtsem_do_timedwait(sem, ctcb, xwtm);
+                cthd = xwup_skd_get_cthd_lc();
+                rc = xwup_rtsem_do_timedwait(sem, cthd, xwtm);
         }
         return rc;
 }
 
 static __xwup_code
-xwer_t xwup_rtsem_do_blkthrd_unlkwq_cpuirqrs(struct xwup_rtsem * sem,
-                                             struct xwup_tcb * tcb,
-                                             xwreg_t flag)
+xwer_t xwup_rtsem_do_blkthd_unlkwq_cpuirqrs(struct xwup_rtsem * sem,
+                                            struct xwup_thd * thd,
+                                            xwreg_t flag)
 {
         xwer_t rc;
 
         XWOS_BUG_ON((XWUP_SKDOBJ_DST_BLOCKING | XWUP_SKDOBJ_DST_SLEEPING |
                      XWUP_SKDOBJ_DST_READY | XWUP_SKDOBJ_DST_STANDBY |
                      XWUP_SKDOBJ_DST_FROZEN)
-                    & tcb->state);
+                    & thd->state);
 
         /* 加入等待队列 */
-        xwbop_c0m(xwsq_t, &tcb->state, XWUP_SKDOBJ_DST_RUNNING);
-        xwbop_s1m(xwsq_t, &tcb->state,
+        xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_RUNNING);
+        xwbop_s1m(xwsq_t, &thd->state,
                   XWUP_SKDOBJ_DST_BLOCKING | XWUP_SKDOBJ_DST_UNINTERRUPTED);
-        xwup_thrd_eq_rtwq(tcb, &sem->rtwq, XWUP_WQTYPE_RTSEM);
+        xwup_thd_eq_rtwq(thd, &sem->rtwq, XWUP_WQTYPE_RTSEM);
         xwospl_cpuirq_restore_lc(flag);
 
         /* 调度 */
@@ -658,7 +658,7 @@ xwer_t xwup_rtsem_do_blkthrd_unlkwq_cpuirqrs(struct xwup_rtsem * sem,
         xwospl_cpuirq_restore_lc(flag);
 
         /* 判断唤醒原因 */
-        if (XWUP_WQN_REASON_UP == tcb->wqn.reason) {
+        if (XWUP_WQN_REASON_UP == thd->wqn.reason) {
                 rc = XWOK;
         } else {
                 XWOS_BUG();
@@ -668,7 +668,7 @@ xwer_t xwup_rtsem_do_blkthrd_unlkwq_cpuirqrs(struct xwup_rtsem * sem,
 }
 
 static __xwup_code
-xwer_t xwup_rtsem_do_wait_unintr(struct xwup_rtsem * sem, struct xwup_tcb * tcb)
+xwer_t xwup_rtsem_do_wait_unintr(struct xwup_rtsem * sem, struct xwup_thd * thd)
 {
         xwreg_t flag;
         xwer_t rc;
@@ -676,7 +676,7 @@ xwer_t xwup_rtsem_do_wait_unintr(struct xwup_rtsem * sem, struct xwup_tcb * tcb)
         /* test the rtsem */
         xwospl_cpuirq_save_lc(&flag);
         if (sem->vsem.count <= 0) {
-                rc = xwup_rtsem_do_blkthrd_unlkwq_cpuirqrs(sem, tcb, flag);
+                rc = xwup_rtsem_do_blkthd_unlkwq_cpuirqrs(sem, thd, flag);
         } else {
                 sem->vsem.count--;
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
@@ -701,7 +701,7 @@ xwer_t xwup_rtsem_do_wait_unintr(struct xwup_rtsem * sem, struct xwup_tcb * tcb)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -710,15 +710,15 @@ xwer_t xwup_rtsem_do_wait_unintr(struct xwup_rtsem * sem, struct xwup_tcb * tcb)
 __xwup_api
 xwer_t xwup_rtsem_wait_unintr(struct xwup_rtsem * sem)
 {
-        struct xwup_tcb * ctcb;
+        struct xwup_thd * cthd;
         xwer_t rc;
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHRD == xwup_irq_get_id(NULL)),
-                      "not-in-thrd", -ENOTINTHRD);
+        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)),
+                      "not-in-thd", -ENOTINTHD);
 
-        ctcb = xwup_skd_get_ctcb_lc();
-        rc = xwup_rtsem_do_wait_unintr(sem, ctcb);
+        cthd = xwup_skd_get_cthd_lc();
+        rc = xwup_rtsem_do_wait_unintr(sem, cthd);
         return rc;
 }
 

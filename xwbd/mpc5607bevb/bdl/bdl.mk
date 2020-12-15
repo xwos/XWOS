@@ -30,7 +30,7 @@ BDL_ASRCS :=
 
 BDL_CSRCS += board_init.c
 BDL_CSRCS += vector.c
-ifeq ($(BRDCFG_XWSKD_THRD_STACK_POOL),y)
+ifeq ($(BRDCFG_XWSKD_THD_STACK_POOL),y)
     BDL_CSRCS += xwac/thread_stack_pool.c
 endif
 BDL_CSRCS += xwac/xwskd_hook.c

@@ -138,7 +138,7 @@ struct xwscp {
         } txi; /**< 正在发送的帧信息 */
 
         /* 接收状态机 */
-        xwid_t tid; /**< 接收线程的ID */
+        xwos_thd_d thdd; /**< 接收线程的描述符 */
         struct {
                 xwu32_a cnt; /**< 接收计数器 */
                 struct xwlib_bclst_head head; /**< 链表头 */
@@ -163,6 +163,6 @@ xwer_t xwscp_fmt_msg(struct xwscp * xwscp, struct xwscp_frame * frm,
 void xwscp_rxq_pub(struct xwscp * xwscp, struct xwscp_frmslot * pubfrm);
 xwer_t xwscp_rxq_choose(struct xwscp * xwscp, struct xwscp_frmslot ** slotbuf,
                         xwtm_t * xwtm);
-xwer_t xwscp_thrd(struct xwscp * xwscp);
+xwer_t xwscp_thd(struct xwscp * xwscp);
 
 #endif /* xwmd/isc/xwscp/protocol.h */

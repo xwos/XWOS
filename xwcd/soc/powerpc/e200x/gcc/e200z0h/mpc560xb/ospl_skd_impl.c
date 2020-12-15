@@ -61,7 +61,7 @@ __xwbsp_rodata const struct xwos_irq_resource soc_skd_irqrsc[] = {
 
 __xwbsp_data struct e200x_context soc_context = {
         .isr_sp = xwos_stk_top,
-        .thrd_sp = NULL,
+        .thd_sp = NULL,
         .irq_nesting_cnt = 0,
         .irqn = SOC_IRQN_NIL,
 };
@@ -148,7 +148,7 @@ xwer_t xwospl_skd_init(struct xwospl_skd * xwskd)
  * @brief 玄武OS内核调度器适配函数：获取当前CPU的ID
  */
 __xwbsp_code
-xwid_t xwospl_skd_get_id(void)
+xwid_t xwospl_skd_id_lc(void)
 {
         return 0;
 }
@@ -305,7 +305,7 @@ struct xwospl_skd * soc_skd_chkcstk(void)
 
         xwskd = soc_skd_get_lc();
         cstk = xwskd->cstk;
-        stk.ptr = soc_context.thrd_sp;
+        stk.ptr = soc_context.thd_sp;
         if ((stk.value - 0x50) < (xwptr_t)cstk->base) {
                 soc_skd_report_stk_overflow(cstk);
         }
@@ -328,7 +328,7 @@ struct xwospl_skd * soc_skd_chkpstk(void)
 
         xwskd = soc_skd_get_lc();
         pstk = xwskd->pstk;
-        stk.ptr = soc_context.thrd_sp;
+        stk.ptr = soc_context.thd_sp;
         if ((stk.value - 0x50) < (xwptr_t)pstk->base) {
                 soc_skd_report_stk_overflow(pstk);
         }
@@ -388,18 +388,18 @@ xwer_t xwospl_skd_resume(struct xwospl_skd * xwskd)
 
 /**
  * @brief 玄武OS内核调度器适配函数：本地CPU上的线程退出
- * @param tcb: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程控制块对象的指针
  * @param rc: (I) 线程退出抛出的返回值
  */
 __xwbsp_code
-void xwospl_thrd_exit_lc(struct xwospl_tcb * tcb, xwer_t rc)
+void xwospl_thd_exit_lc(struct xwospl_thd * thd, xwer_t rc)
 {
 #if defined(XuanWuOS_CFG_CORE__mp)
-        soc_skd_swi((xwer_t(*)(void *, void *))xwmp_thrd_exit_lic,
-                    (void *)tcb, (void *)rc);
+        soc_skd_swi((xwer_t(*)(void *, void *))xwmp_thd_exit_lic,
+                    (void *)thd, (void *)rc);
 #elif defined(XuanWuOS_CFG_CORE__up)
-        soc_skd_swi((xwer_t(*)(void *, void *))xwup_thrd_exit_lic,
-                    (void *)tcb, (void *)rc);
+        soc_skd_swi((xwer_t(*)(void *, void *))xwup_thd_exit_lic,
+                    (void *)thd, (void *)rc);
 #endif
         while (true) {
         }
@@ -407,19 +407,19 @@ void xwospl_thrd_exit_lc(struct xwospl_tcb * tcb, xwer_t rc)
 
 /**
  * @brief 玄武OS内核调度器适配函数：冻结本地CPU中正在运行的线程
- * @param tcb: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程控制块对象的指针
  */
 __xwbsp_code
-xwer_t xwospl_thrd_freeze_lc(struct xwospl_tcb * tcb)
+xwer_t xwospl_thd_freeze_lc(struct xwospl_thd * thd)
 {
         xwer_t rc;
 
 #if defined(XuanWuOS_CFG_CORE__mp)
-        rc = soc_skd_swi((xwer_t(*)(void *, void *))xwmp_thrd_freeze_lic,
-                         (void *)tcb, (void *)XWOS_UNUSED_ARGUMENT);
+        rc = soc_skd_swi((xwer_t(*)(void *, void *))xwmp_thd_freeze_lic,
+                         (void *)thd, (void *)XWOS_UNUSED_ARGUMENT);
 #elif defined(XuanWuOS_CFG_CORE__up)
-        rc = soc_skd_swi((xwer_t(*)(void *, void *))xwup_thrd_freeze_lic,
-                         (void *)tcb, (void *)XWOS_UNUSED_ARGUMENT);
+        rc = soc_skd_swi((xwer_t(*)(void *, void *))xwup_thd_freeze_lic,
+                         (void *)thd, (void *)XWOS_UNUSED_ARGUMENT);
 #endif
         return rc;
 }
@@ -427,32 +427,32 @@ xwer_t xwospl_thrd_freeze_lc(struct xwospl_tcb * tcb)
 #if defined(XuanWuOS_CFG_CORE__mp)
 /**
  * @brief 玄武OS内核调度器适配函数：将线程迁出其他CPU，并准备迁入其他CPU
- * @param tcb: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程控制块对象的指针
  * @param cpuid: (I) 目的地CPU的ID
  * @return 错误码
  */
 __xwbsp_code
-xwer_t xwospl_thrd_outmigrate(struct xwospl_tcb * tcb, xwid_t cpuid)
+xwer_t xwospl_thd_outmigrate(struct xwospl_thd * thd, xwid_t cpuid)
 {
         xwer_t rc;
 
-        XWOS_UNUSED(tcb);
+        XWOS_UNUSED(thd);
         XWOS_UNUSED(cpuid);
 
-        rc = soc_skd_swi((xwer_t(*)(void *, void *))xwmp_thrd_outmigrate_lic,
-                         (void *)tcb, (void *)cpuid);
+        rc = soc_skd_swi((xwer_t(*)(void *, void *))xwmp_thd_outmigrate_lic,
+                         (void *)thd, (void *)cpuid);
         return rc;
 }
 
 /**
  * @brief 玄武OS内核调度器适配函数：迁移线程至目标CPU
- * @param tcb: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程控制块对象的指针
  * @param cpuid: (I) 目的地CPU的ID
  */
 __xwbsp_code
-void xwospl_thrd_immigrate(struct xwospl_tcb * tcb, xwid_t cpuid)
+void xwospl_thd_immigrate(struct xwospl_thd * thd, xwid_t cpuid)
 {
         XWOS_UNUSED(cpuid);
-        xwmp_thrd_immigrate_lic(tcb);
+        xwmp_thd_immigrate_lic(thd);
 }
 #endif /* XuanWuOS_CFG_CORE__mp */

@@ -62,7 +62,7 @@ union msr_reg {
  */
 struct e200x_context {
         xwstk_t * isr_sp;
-        xwstk_t * thrd_sp;
+        xwstk_t * thd_sp;
         xwptr_t irq_nesting_cnt;
         xwirq_t irqn;
 };

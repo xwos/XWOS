@@ -19,6 +19,7 @@
 
 
 ######## ######## ######## ######## xwlib ######## ######## ######## ########
+XWOS_CSRCS += lib/object.c
 XWOS_CSRCS += lib/sc.c
 XWOS_CSRCS += lib/xwbop.c
 XWOS_CSRCS += lib/rbtree.c

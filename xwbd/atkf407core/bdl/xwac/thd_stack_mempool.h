@@ -18,12 +18,12 @@
  * > limitations under the License.
  */
 
-#ifndef __bdl_xwac_thrd_stack_mempool_h__
-#define __bdl_xwac_thrd_stack_mempool_h__
+#ifndef __bdl_xwac_thd_stack_mempool_h__
+#define __bdl_xwac_thd_stack_mempool_h__
 
 #include <xwos/standard.h>
 
-xwer_t bdl_thrd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf);
-xwer_t bdl_thrd_stack_pool_free(xwstk_t * stk);
+xwer_t bdl_thd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf);
+xwer_t bdl_thd_stack_pool_free(xwstk_t * stk);
 
-#endif /* bdl/xwac/thrd_stack_mempool.h */
+#endif /* bdl/xwac/thd_stack_mempool.h */

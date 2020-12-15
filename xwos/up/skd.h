@@ -36,7 +36,7 @@
 #endif /* XWUPCFG_SKD_BH */
 
 struct xwup_skd;
-struct xwup_tcb;
+struct xwup_thd;
 
 /**
  * @brief 调度策略枚举
@@ -84,7 +84,7 @@ enum xwup_skdobj_attr_em {
 /**
  * @brief 线程主函数
  */
-typedef xwer_t (* xwup_thrd_f)(void *);
+typedef xwer_t (* xwup_thd_f)(void *);
 
 /**
  * @brief 线程栈信息
@@ -93,7 +93,7 @@ struct xwup_skd_stack_info {
         xwstk_t * sp; /**< 栈指针 */
         xwstk_t * base; /**< 栈基地址 */
         xwsz_t size; /**< 栈大小，单位：字节 */
-        xwup_thrd_f main; /**< 主函数 */
+        xwup_thd_f main; /**< 主函数 */
         void * arg; /**< 主函数的参数 */
         const char * name; /**< 名字字符串 */
 };
@@ -103,7 +103,7 @@ struct xwup_skd_stack_info {
  */
 enum xwup_skd_context_em {
         XWUP_SKD_CONTEXT_INIT_EXIT = 0, /**< 初始化与反初始化 */
-        XWUP_SKD_CONTEXT_THRD, /**< 线程 */
+        XWUP_SKD_CONTEXT_THD, /**< 线程 */
         XWUP_SKD_CONTEXT_ISR, /**< 中断 */
         XWUP_SKD_CONTEXT_BH, /**< 中断底半部 */
         XWUP_SKD_CONTEXT_IDLE, /**< 空闲任务 */
@@ -127,7 +127,7 @@ struct xwup_skd_pm_callback {
 struct xwup_skd_pm {
         __xw_io xwsq_t wklkcnt; /**< 唤醒锁，
                                      取值@ref xwup_skd_wakelock_cnt_em */
-        xwsz_t frz_thrd_cnt; /**< 已冻结的线程计数器 */
+        xwsz_t frz_thd_cnt; /**< 已冻结的线程计数器 */
         struct xwlib_bclst_head frzlist; /**< 已冻结的线程链表 */
         struct xwup_skd_pm_callback cb; /**< 电源管理回调函数集合 */
 };
@@ -161,13 +161,13 @@ struct xwup_skd {
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
         struct xwup_skd_pm pm; /**< 调度器低功耗控制块 */
 #endif /* XWUPCFG_SKD_PM */
-        struct xwlib_bclst_head tcblist; /**< 链接本调度器中所有线程的链表头 */
-        xwsz_t thrd_num; /**< 本调度器中的线程数量 */
+        struct xwlib_bclst_head thdlist; /**< 链接本调度器中所有线程的链表头 */
+        xwsz_t thd_num; /**< 本调度器中的线程数量 */
 };
 
 
 struct xwup_skd * xwup_skd_get_lc(void);
-struct xwup_tcb * xwup_skd_get_ctcb_lc(void);
+struct xwup_thd * xwup_skd_get_cthd_lc(void);
 
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
 xwer_t xwup_skd_req_bh(void);

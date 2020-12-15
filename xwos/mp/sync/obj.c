@@ -12,7 +12,7 @@
  * - 锁的顺序：同级的锁不可同时获得
  *   + ① 等待队列的锁（rtwq->lock & plwq->lock）
  *     + ② 等待队列节点的锁（wqn->lock）
- *     + ② 线程控制块的状态锁（tcb->stlock）
+ *     + ② 线程控制块的状态锁（thd->stlock）
  *     + ② 事件对象的锁（evt->lock）
  */
 
@@ -22,27 +22,27 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_SYNC_SEM_MEMSLICE) && (1 == XWMPCFG_SYNC_SEM_MEMSLICE)
-  #include <xwos/mm/memslice.h>
+#include <xwos/mm/memslice.h>
 #endif /* XWMPCFG_SYNC_SEM_MEMSLICE */
 #include <xwos/mp/irq.h>
 #include <xwos/mp/skd.h>
 #include <xwos/mp/tt.h>
-#include <xwos/mp/thrd.h>
+#include <xwos/mp/thd.h>
 #include <xwos/mp/rtwq.h>
 #include <xwos/mp/plwq.h>
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/lock/seqlock.h>
 #include <xwos/mp/lock/mtx.h>
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
-  #include <xwos/mp/sync/evt.h>
+#include <xwos/mp/sync/evt.h>
 #endif /* XWMPCFG_SYNC_EVT */
 #include <xwos/mp/sync/obj.h>
 #include <xwos/mp/sync/sem.h>
 
 __xwmp_code
-void xwmp_synobj_construct(struct xwmp_synobj * synobj, xwid_t type)
+void xwmp_synobj_construct(struct xwmp_synobj * synobj)
 {
-        xwos_object_construct(&synobj->xwobj, type);
+        xwos_object_construct(&synobj->xwobj);
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
         synobj->sel.evt = NULL;
         synobj->sel.pos = 0;

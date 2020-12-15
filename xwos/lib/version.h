@@ -52,6 +52,6 @@
         stringify(XWOS_VERSION_REVISION)
 
 #define XWOS_COPYRIGHT "XuanWuOS " XWOS_VER_STR \
-        "  Copyright (C) 2015-2020 https://xwos.tech, Roy.Sun"
+        "  Copyright (C) 2015-2021 http://xwos.tech, Roy.Sun"
 
 #endif /* xwos/lib/version.h */

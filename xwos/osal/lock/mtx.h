@@ -117,7 +117,7 @@ xwer_t xwos_mtx_delete(struct xwos_mtx * mtx)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -EOWNER: 线程并没有锁定此互斥锁
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -136,7 +136,7 @@ xwer_t xwos_mtx_unlock(struct xwos_mtx * mtx)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -155,7 +155,7 @@ xwer_t xwos_mtx_lock(struct xwos_mtx * mtx)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -ENODATA: 获取锁失败
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -182,7 +182,7 @@ xwer_t xwos_mtx_trylock(struct xwos_mtx * mtx)
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -EINTR: 等待被中断
  * @retval -ETIMEDOUT: 超时
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -202,7 +202,7 @@ xwer_t xwos_mtx_timedlock(struct xwos_mtx * mtx, xwtm_t * xwtm)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
- * @retval -ENOTINTHRD: 不在线程上下文中
+ * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程

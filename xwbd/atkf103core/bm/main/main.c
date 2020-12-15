@@ -24,38 +24,38 @@
 #include <bdl/standard.h>
 #include <bm/stm32cube/mif.h>
 
-#define MAIN_THRD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
+#define MAIN_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
 
 static
-xwer_t main_thrd(void * arg);
+xwer_t main_thd(void * arg);
 
 static
 xwer_t led_task(void);
 
-const struct xwos_thrd_desc main_thrd_td = {
-        .name = "main.thrd",
-        .prio = MAIN_THRD_PRIORITY,
-        .stack = XWOS_THRD_STACK_DYNAMIC,
+const struct xwos_thd_desc main_thd_td = {
+        .name = "main.thd",
+        .prio = MAIN_THD_PRIORITY,
+        .stack = XWOS_THD_STACK_DYNAMIC,
         .stack_size = 4096,
-        .func = (xwos_thrd_f)main_thrd,
+        .func = (xwos_thd_f)main_thd,
         .arg = NULL,
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
-xwid_t main_thrd_id;
+xwos_thd_d main_thdd;
 
 xwer_t xwos_main(void)
 {
         xwer_t rc;
 
-        rc = xwos_thrd_create(&main_thrd_id,
-                              main_thrd_td.name,
-                              main_thrd_td.func,
-                              main_thrd_td.arg,
-                              main_thrd_td.stack_size,
-                              main_thrd_td.prio,
-                              main_thrd_td.attr);
+        rc = xwos_thd_create(&main_thdd,
+                             main_thd_td.name,
+                             main_thd_td.func,
+                             main_thd_td.arg,
+                             main_thd_td.stack_size,
+                             main_thd_td.prio,
+                             main_thd_td.attr);
         if (rc < 0) {
-                goto err_init_thrd_create;
+                goto err_init_thd_create;
         }
 
         rc = xwos_skd_start_lc();
@@ -65,7 +65,7 @@ xwer_t xwos_main(void)
 
         return XWOK;
 
-err_init_thrd_create:
+err_init_thd_create:
         BDL_BUG();
 err_skd_start_lc:
         BDL_BUG();
@@ -73,7 +73,7 @@ err_skd_start_lc:
 }
 
 static
-xwer_t main_thrd(void * arg)
+xwer_t main_thd(void * arg)
 {
         xwer_t rc;
 
@@ -110,12 +110,12 @@ xwer_t led_task(void)
         xwds_gpio_req(&stm32cube_soc_cb,
                       XWDS_GPIO_PORT_E,
                       XWDS_GPIO_PIN_5);
-        while (!xwos_cthrd_shld_stop()) {
-                if (xwos_cthrd_shld_frz()) {
-                        xwos_cthrd_freeze();
+        while (!xwos_cthd_shld_stop()) {
+                if (xwos_cthd_shld_frz()) {
+                        xwos_cthd_freeze();
                 }
                 xwtm = 1 * XWTM_S;
-                xwos_cthrd_sleep(&xwtm);
+                xwos_cthd_sleep(&xwtm);
                 xwds_gpio_toggle(&stm32cube_soc_cb,
                                  XWDS_GPIO_PORT_B,
                                  XWDS_GPIO_PIN_5);

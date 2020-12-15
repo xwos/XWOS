@@ -25,15 +25,15 @@
 #define XWOSDL_SKD_PRIORITY_DROP(base, dec)     XWUP_SKD_PRIORITY_DROP(base, dec)
 
 #define XWOSDL_SKD_CONTEXT_INIT_EXIT            XWUP_SKD_CONTEXT_INIT_EXIT
-#define XWOSDL_SKD_CONTEXT_THRD                 XWUP_SKD_CONTEXT_THRD
+#define XWOSDL_SKD_CONTEXT_THD                  XWUP_SKD_CONTEXT_THD
 #define XWOSDL_SKD_CONTEXT_ISR                  XWUP_SKD_CONTEXT_ISR
 #define XWOSDL_SKD_CONTEXT_BH                   XWUP_SKD_CONTEXT_BH
 #define XWOSDL_SKD_CONTEXT_IDLE                 XWUP_SKD_CONTEXT_IDLE
 
-#if defined(XWUPCFG_SKD_TCB_LOCAL_DATA_NUM)
-  #define XWOSDL_THRD_LOCAL_DATA_NUM            XWUPCFG_SKD_TCB_LOCAL_DATA_NUM
+#if defined(XWUPCFG_SKD_THD_LOCAL_DATA_NUM)
+  #define XWOSDL_THD_LOCAL_DATA_NUM             XWUPCFG_SKD_THD_LOCAL_DATA_NUM
 #else
-  #define XWOSDL_THRD_LOCAL_DATA_NUM            (0U)
+  #define XWOSDL_THD_LOCAL_DATA_NUM             (0U)
 #endif
 
 static __xwcc_inline
@@ -46,6 +46,12 @@ static __xwcc_inline
 xwer_t xwosdl_skd_start_lc(void)
 {
         return xwup_skd_start_lc();
+}
+
+static __xwcc_inline
+xwid_t xwosdl_skd_id_lc(void)
+{
+        return 0;
 }
 
 static __xwcc_inline
@@ -93,47 +99,58 @@ void xwosdl_skd_enpmpt_lc(void)
         xwup_skd_enpmpt_lc();
 }
 
-#include <xwos/up/thrd.h>
+#include <xwos/up/thd.h>
 
-#define xwosdl_tcb xwup_tcb
-typedef xwup_thrd_f xwosdl_thrd_f;
-
-static __xwcc_inline
-xwer_t xwosdl_thrd_init(struct xwosdl_tcb * tcb,
-                        const char * name,
-                        xwosdl_thrd_f mainfunc, void * arg,
-                        xwstk_t * stack, xwsz_t stack_size,
-                        xwpr_t priority, xwsq_t attr)
-{
-        return xwup_thrd_init(tcb,
-                              name,
-                              (xwup_thrd_f)mainfunc, arg,
-                              stack, stack_size,
-                              priority, attr);
-}
+#define xwosdl_thd xwup_thd
+typedef xwup_thd_f xwosdl_thd_f;
+typedef struct xwup_thd * xwosdl_thd_d;
+#define XWOSDL_THD_NILD NULL
 
 static __xwcc_inline
-xwer_t xwosdl_thrd_destroy(struct xwosdl_tcb * tcb)
+xwer_t xwosdl_thd_init(struct xwosdl_thd * thd,
+                       xwosdl_thd_d * thdd,
+                       const char * name,
+                       xwosdl_thd_f mainfunc, void * arg,
+                       xwstk_t * stack, xwsz_t stack_size,
+                       xwpr_t priority, xwsq_t attr)
 {
-        return xwup_thrd_destroy(tcb);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_thrd_create(xwid_t * tidbuf, const char * name,
-                          xwosdl_thrd_f mainfunc, void * arg, xwsz_t stack_size,
-                          xwpr_t priority, xwsq_t attr)
-{
-        struct xwup_tcb * tcb;
         xwer_t rc;
 
-        if (NULL != tidbuf) {
-                rc = xwup_thrd_create(&tcb, name,
-                                      (xwup_thrd_f)mainfunc, arg,
-                                      stack_size, priority, attr);
+        rc = xwup_thd_init(thd,
+                           name,
+                           (xwup_thd_f)mainfunc, arg,
+                           stack, stack_size,
+                           priority, attr);
+        if (XWOK == rc) {
+                if (thdd) {
+                        *thdd = thd;
+                }
+        }
+        return rc;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_thd_destroy(xwosdl_thd_d thdd)
+{
+        return xwup_thd_destroy(thdd);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd, const char * name,
+                         xwosdl_thd_f mainfunc, void * arg, xwsz_t stack_size,
+                         xwpr_t priority, xwsq_t attr)
+{
+        struct xwup_thd * thd;
+        xwer_t rc;
+
+        if (NULL != thdd) {
+                rc = xwup_thd_create(&thd, name,
+                                     (xwup_thd_f)mainfunc, arg,
+                                     stack_size, priority, attr);
                 if (XWOK == rc) {
-                        *tidbuf = (xwid_t)tcb;
+                        *thdd = thd;
                 } else {
-                        *tidbuf = (xwid_t)0;
+                        *thdd = NULL;
                 }
         } else {
                 rc = -EFAULT;
@@ -142,171 +159,137 @@ xwer_t xwosdl_thrd_create(xwid_t * tidbuf, const char * name,
 }
 
 static __xwcc_inline
-xwer_t xwosdl_thrd_delete(xwid_t tid)
+xwer_t xwosdl_thd_delete(xwosdl_thd_d thdd)
 {
-        struct xwup_tcb * tcb;
-
-        tcb = (struct xwup_tcb *)tid;
-
-        return xwup_thrd_delete(tcb);
+        return xwup_thd_delete(thdd);
 }
 
 static __xwcc_inline
-xwid_t xwosdl_cthrd_id(void)
+xwosdl_thd_d xwosdl_cthd_getd(void)
 {
-        struct xwup_tcb * ctcb;
+        struct xwup_thd * cthd;
 
-        ctcb = xwup_skd_get_ctcb_lc();
-        return (xwid_t)ctcb;
+        cthd = xwup_skd_get_cthd_lc();
+        return (xwosdl_thd_d)cthd;
 }
 
 static __xwcc_inline
-struct xwosdl_thrd * xwosdl_cthrd_obj(void)
+xwosdl_thd_d xwosdl_thd_getd(struct xwosdl_thd * thd)
 {
-        struct xwup_tcb * ctcb;
-
-        ctcb = xwup_skd_get_ctcb_lc();
-        return (struct xwosdl_thrd *)ctcb;
+        return (xwosdl_thd_d)thd;
 }
 
 static __xwcc_inline
-xwid_t xwosdl_thrd_id(struct xwosdl_tcb * tcb)
+void xwosdl_cthd_yield(void)
 {
-        return (xwid_t)tcb;
+        return xwup_cthd_yield();
 }
 
 static __xwcc_inline
-struct xwosdl_thrd * xwosdl_thrd_obj(xwid_t tid)
+void xwosdl_cthd_exit(xwer_t rc)
 {
-        return (struct xwosdl_thrd *)tid;
+        xwup_cthd_exit(rc);
 }
 
 static __xwcc_inline
-void xwosdl_cthrd_yield(void)
+xwer_t xwosdl_thd_stop(xwosdl_thd_d thdd, xwer_t * rc)
 {
-        return xwup_cthrd_yield();
+        return xwup_thd_stop(thdd, rc);
 }
 
 static __xwcc_inline
-void xwosdl_cthrd_exit(xwer_t rc)
+xwer_t xwosdl_thd_cancel(xwosdl_thd_d thdd)
 {
-        xwup_cthrd_exit(rc);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_thrd_stop(xwid_t tid, xwer_t * rc)
-{
-        struct xwup_tcb * tcb;
-
-        tcb = (struct xwup_tcb *)tid;
-        return xwup_thrd_stop(tcb, rc);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_thrd_cancel(xwid_t tid)
-{
-        struct xwup_tcb * tcb;
-
-        tcb = (struct xwup_tcb *)tid;
-        return xwup_thrd_cancel(tcb);
+        return xwup_thd_cancel(thdd);
 }
 
 static __xwos_inline_api
-xwer_t xwosdl_thrd_join(xwid_t tid, xwer_t * trc)
+xwer_t xwosdl_thd_join(xwosdl_thd_d thdd, xwer_t * trc)
 {
-        struct xwup_tcb * tcb;
-
-        tcb = (struct xwup_tcb *)tid;
-        return xwup_thrd_join(tcb, trc);
+        return xwup_thd_join(thdd, trc);
 }
 
 static __xwcc_inline
-xwer_t xwosdl_thrd_detach(xwid_t tid)
+xwer_t xwosdl_thd_detach(xwosdl_thd_d thdd)
 {
-        struct xwup_tcb * tcb;
-
-        tcb = (struct xwup_tcb *)tid;
-        return xwup_thrd_detach(tcb);
+        return xwup_thd_detach(thdd);
 }
 
 static __xwcc_inline
-bool xwosdl_cthrd_shld_frz(void)
+bool xwosdl_cthd_shld_frz(void)
 {
-        return xwup_cthrd_shld_frz();
+        return xwup_cthd_shld_frz();
 }
 
 static __xwcc_inline
-bool xwosdl_cthrd_shld_stop(void)
+bool xwosdl_cthd_shld_stop(void)
 {
-        return xwup_cthrd_shld_stop();
+        return xwup_cthd_shld_stop();
 }
 
 static __xwcc_inline
-bool xwosdl_cthrd_frz_shld_stop(bool * frozen)
+bool xwosdl_cthd_frz_shld_stop(bool * frozen)
 {
-        return xwup_cthrd_frz_shld_stop(frozen);
+        return xwup_cthd_frz_shld_stop(frozen);
 }
 
 static __xwcc_inline
-xwer_t xwosdl_cthrd_sleep(xwtm_t * xwtm)
+xwer_t xwosdl_cthd_sleep(xwtm_t * xwtm)
 {
-        return xwup_cthrd_sleep(xwtm);
+        return xwup_cthd_sleep(xwtm);
 }
 
 static __xwcc_inline
-xwer_t xwosdl_cthrd_sleep_from(xwtm_t * origin, xwtm_t inc)
+xwer_t xwosdl_cthd_sleep_from(xwtm_t * origin, xwtm_t inc)
 {
-        return xwup_cthrd_sleep_from(origin, inc);
+        return xwup_cthd_sleep_from(origin, inc);
 }
 
 static __xwcc_inline
-xwer_t xwosdl_thrd_intr(xwid_t tid)
+xwer_t xwosdl_thd_intr(xwosdl_thd_d thdd)
 {
-        struct xwup_tcb * tcb;
-
-        tcb = (struct xwup_tcb *)tid;
-        return xwup_thrd_intr(tcb);
+        return xwup_thd_intr(thdd);
 }
 
 static __xwcc_inline
-xwer_t xwosdl_cthrd_freeze(void)
+xwer_t xwosdl_cthd_freeze(void)
 {
-        return xwup_cthrd_freeze();
+        return xwup_cthd_freeze();
 }
 
 static __xwcc_inline
-xwer_t xwosdl_thrd_migrate(xwid_t tid, xwid_t dstcpu)
+xwer_t xwosdl_thd_migrate(xwosdl_thd_d thdd, xwid_t dstcpu)
 {
-        XWOS_UNUSED(tid);
+        XWOS_UNUSED(thdd);
         XWOS_UNUSED(dstcpu);
         return XWOK;
 }
 
-#if defined(XWUPCFG_SKD_TCB_LOCAL_DATA_NUM) && (XWUPCFG_SKD_TCB_LOCAL_DATA_NUM > 0U)
+#if defined(XWUPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWUPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
 static __xwos_inline_api
-xwer_t xwosdl_thrd_set_data(struct xwosdl_tcb * tcb, xwsq_t pos, void * data)
+xwer_t xwosdl_thd_set_data(xwosdl_thd_d thdd, xwsq_t pos, void * data)
 {
-        return xwup_thrd_set_data(tcb, pos, data);
+        return xwup_thd_set_data(thdd, pos, data);
 }
 
 static __xwos_inline_api
-xwer_t xwosdl_thrd_get_data(struct xwosdl_tcb * tcb, xwsq_t pos, void ** databuf)
+xwer_t xwosdl_thd_get_data(xwosdl_thd_d thdd, xwsq_t pos, void ** databuf)
 {
-        return xwup_thrd_get_data(tcb, pos, databuf);
+        return xwup_thd_get_data(thdd, pos, databuf);
 }
 
 static __xwos_inline_api
-xwer_t xwosdl_cthrd_set_data(xwsq_t pos, void * data)
+xwer_t xwosdl_cthd_set_data(xwsq_t pos, void * data)
 {
-        return xwup_cthrd_set_data(pos, data);
+        return xwup_cthd_set_data(pos, data);
 }
 
 static __xwos_inline_api
-xwer_t xwosdl_cthrd_get_data(xwsq_t pos, void ** databuf)
+xwer_t xwosdl_cthd_get_data(xwsq_t pos, void ** databuf)
 {
-        return xwup_cthrd_get_data(pos, databuf);
+        return xwup_cthd_get_data(pos, databuf);
 
 }
-#endif /* XWUPCFG_SKD_TCB_LOCAL_DATA_NUM */
+#endif /* XWUPCFG_SKD_THD_LOCAL_DATA_NUM */
 
 #endif /* xwos/up/osdl/skd.h */

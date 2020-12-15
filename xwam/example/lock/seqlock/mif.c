@@ -27,7 +27,7 @@
 #include <xwos/osal/swt.h>
 #include <xwam/example/lock/seqlock/mif.h>
 
-#define XWSQLKDEMO_THRD_PRIORITY                                \
+#define XWSQLKDEMO_THD_PRIORITY                                 \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
@@ -40,21 +40,21 @@
 
 
 void xwsqlkdemo_swt_callback(struct xwos_swt * swt, void * arg);
-xwer_t xwsqlkdemo_thrd_func(void * arg);
+xwer_t xwsqlkdemo_thd_func(void * arg);
 
 /**
  * @brief 线程描述表
  */
-const struct xwos_thrd_desc xwsqlkdemo_tbd = {
-        .name = "xwsqlkdemo.thrd",
-        .prio = XWSQLKDEMO_THRD_PRIORITY,
-        .stack = XWOS_THRD_STACK_DYNAMIC,
+const struct xwos_thd_desc xwsqlkdemo_tbd = {
+        .name = "xwsqlkdemo.thd",
+        .prio = XWSQLKDEMO_THD_PRIORITY,
+        .stack = XWOS_THD_STACK_DYNAMIC,
         .stack_size = 2048,
-        .func = (xwos_thrd_f)xwsqlkdemo_thrd_func,
+        .func = (xwos_thd_f)xwsqlkdemo_thd_func,
         .arg = NULL,
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
-xwid_t xwsqlkdemo_tid;
+xwos_thd_d xwsqlkdemo_thdd;
 
 struct xwos_swt xwsqlkdemo_swt;
 
@@ -79,20 +79,20 @@ xwer_t example_seqlock_start(void)
         }
 
         /* 创建线程 */
-        rc = xwos_thrd_create(&xwsqlkdemo_tid,
-                              xwsqlkdemo_tbd.name,
-                              xwsqlkdemo_tbd.func,
-                              xwsqlkdemo_tbd.arg,
-                              xwsqlkdemo_tbd.stack_size,
-                              xwsqlkdemo_tbd.prio,
-                              xwsqlkdemo_tbd.attr);
+        rc = xwos_thd_create(&xwsqlkdemo_thdd,
+                             xwsqlkdemo_tbd.name,
+                             xwsqlkdemo_tbd.func,
+                             xwsqlkdemo_tbd.arg,
+                             xwsqlkdemo_tbd.stack_size,
+                             xwsqlkdemo_tbd.prio,
+                             xwsqlkdemo_tbd.attr);
         if (rc < 0) {
-                goto err_thrd_create;
+                goto err_thd_create;
         }
 
         return XWOK;
 
-err_thrd_create:
+err_thd_create:
         xwos_swt_destroy(&xwsqlkdemo_swt);
 err_swt_init:
         return rc;
@@ -125,7 +125,7 @@ void xwsqlkdemo_swt_callback(struct xwos_swt * swt, void * arg)
 /**
  * @brief 线程的主函数
  */
-xwer_t xwsqlkdemo_thrd_func(void * arg)
+xwer_t xwsqlkdemo_thd_func(void * arg)
 {
         xwtm_t ts;
         xwsq_t cnt, lkseq;
@@ -142,9 +142,9 @@ xwer_t xwsqlkdemo_thrd_func(void * arg)
                             ts, 500 * XWTM_MS,
                             xwsqlkdemo_swt_callback, NULL);
 
-        while (!xwos_cthrd_frz_shld_stop(NULL)) {
+        while (!xwos_cthd_frz_shld_stop(NULL)) {
                 ts = 1 * XWTM_S;
-                xwos_cthrd_sleep(&ts);
+                xwos_cthd_sleep(&ts);
 
                 do {
                         lkseq = xwos_sqlk_rd_begin(&xwsqlkdemo_lock);
@@ -160,6 +160,6 @@ xwer_t xwsqlkdemo_thrd_func(void * arg)
         }
 
         swtlogf(INFO, "[线程] 退出。\n");
-        xwos_thrd_delete(xwos_cthrd_id());
+        xwos_thd_delete(xwos_cthd_getd());
         return rc;
 }

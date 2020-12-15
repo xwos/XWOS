@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Board Module: STM32CUBE
+ * @brief 主模块：子线程
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_main_thrd_h__
-#define __bm_main_thrd_h__
+#ifndef __bm_main_thd_h__
+#define __bm_main_thd_h__
 
 #include <bdl/standard.h>
 
-xwer_t child_thrd_start(void);
+xwer_t child_thd_start(void);
 
 #endif /* bm/stm32cube/init.h */

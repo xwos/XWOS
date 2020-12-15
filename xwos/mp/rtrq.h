@@ -21,7 +21,7 @@
 #define XWMP_RTRQ_QNUM          XWMPCFG_SKD_PRIORITY_RT_NUM
 
 struct xwmp_skd;
-struct xwmp_tcb;
+struct xwmp_thd;
 
 /**
  * @brief 实时就绪队列
@@ -34,9 +34,9 @@ struct xwmp_rtrq {
 };
 
 xwer_t xwmp_rtrq_init(struct xwmp_rtrq * xwrtrq);
-xwer_t xwmp_rtrq_add_head_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_tcb * tcb);
-xwer_t xwmp_rtrq_add_tail_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_tcb * tcb);
-xwer_t xwmp_rtrq_remove_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_tcb * tcb);
-struct xwmp_tcb * xwmp_rtrq_choose_locked(struct xwmp_rtrq * xwrtrq);
+xwer_t xwmp_rtrq_add_head_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * thd);
+xwer_t xwmp_rtrq_add_tail_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * thd);
+xwer_t xwmp_rtrq_remove_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * thd);
+struct xwmp_thd * xwmp_rtrq_choose_locked(struct xwmp_rtrq * xwrtrq);
 
 #endif /* xwos/mp/rtrq.h */

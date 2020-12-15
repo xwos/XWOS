@@ -33,7 +33,7 @@
 __xwds_code
 void xwds_obj_construct(struct xwds_object * obj)
 {
-        xwos_object_construct(&obj->xwobj, XWCD_OBJ_DEVICE);
+        xwos_object_construct(&obj->xwobj);
         xwlib_bclst_init_node(&obj->node);
         obj->ds = NULL;
 }

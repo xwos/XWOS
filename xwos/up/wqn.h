@@ -35,7 +35,7 @@ enum xwup_wqtype_em {
  */
 enum xwup_wqowner_em {
         XWUP_WQOWNER_UNKNOWN = 0,
-        XWUP_WQOWNER_THRD,
+        XWUP_WQOWNER_THD,
 };
 
 /**

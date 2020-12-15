@@ -867,7 +867,7 @@ void soc_init(void)
         }
 
 #if defined(XuanWuOS_CFG_CORE__mp)
-        xwid_t id = xwmp_skd_get_id();
+        xwid_t id = xwmp_skd_id_lc();
 
         /* interrupt controller */
         xwmp_irqc_construct(&soc_irqc_cb);

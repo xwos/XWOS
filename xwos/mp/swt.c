@@ -144,7 +144,7 @@ void xwmp_swt_free(struct xwmp_swt * swt)
 static __xwmp_code
 void xwmp_swt_construct(struct xwmp_swt * swt)
 {
-        xwos_object_construct(&swt->xwobj, XWOS_OBJ_SWT);
+        xwos_object_construct(&swt->xwobj);
         swt->name = NULL;
         swt->xwskd = NULL;
         swt->flag = 0;

@@ -22,7 +22,7 @@
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/up/pm.h>
-#include <xwos/up/thrd.h>
+#include <xwos/up/thd.h>
 #include <xwos/up/rtrq.h>
 #include <xwos/up/tt.h>
 #include <xwos/up/skd.h>
@@ -53,7 +53,7 @@ extern __xwup_code
 void bdl_xwskd_idle_hook(struct xwup_skd * xwskd);
 
 static __xwup_code
-struct xwup_tcb * xwup_skd_rtrq_choose(void);
+struct xwup_thd * xwup_skd_rtrq_choose(void);
 
 static __xwup_code
 xwer_t xwup_skd_idled(struct xwup_skd * xwskd);
@@ -70,10 +70,10 @@ void xwup_skd_init_bhd(void);
 #endif /* XWUPCFG_SKD_BH */
 
 static __xwup_code
-bool xwup_skd_do_chkpmpt(struct xwup_tcb * t);
+bool xwup_skd_do_chkpmpt(struct xwup_thd * t);
 
 static __xwup_code
-xwer_t xwup_skd_check_swcx(struct xwup_tcb * t, struct xwup_tcb ** pmtcb);
+xwer_t xwup_skd_check_swcx(struct xwup_thd * t, struct xwup_thd ** pmthd);
 
 static __xwup_code
 xwer_t xwup_skd_do_swcx(void);
@@ -111,8 +111,8 @@ xwer_t xwup_skd_init_lc(void)
         xwup_bh_cb_init(&xwskd->bhcb);
         xwup_skd_init_bhd();
 #endif /* XWUPCFG_SKD_BH */
-        xwlib_bclst_init_head(&xwskd->tcblist);
-        xwskd->thrd_num = 0;
+        xwlib_bclst_init_head(&xwskd->thdlist);
+        xwskd->thd_num = 0;
         rc = xwup_tt_init(&xwskd->tt);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_tt_init;
@@ -121,7 +121,7 @@ xwer_t xwup_skd_init_lc(void)
         xwup_skd_init_idled();
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
         xwskd->pm.wklkcnt = XWUP_SKD_WKLKCNT_UNLOCKED;
-        xwskd->pm.frz_thrd_cnt = 0;
+        xwskd->pm.frz_thd_cnt = 0;
         xwlib_bclst_init_head(&xwskd->pm.frzlist);
         xwskd->pm.cb.resume = NULL;
         xwskd->pm.cb.suspend = NULL;
@@ -209,12 +209,12 @@ struct xwup_skd * xwup_skd_get_lc(void)
  * @return 本地CPU的调度器中正在运行的线程的线程控制块指针
  */
 __xwup_code
-struct xwup_tcb * xwup_skd_get_ctcb_lc(void)
+struct xwup_thd * xwup_skd_get_cthd_lc(void)
 {
-        struct xwup_tcb * ctcb;
+        struct xwup_thd * cthd;
 
-        ctcb = xwcc_baseof(xwup_skd.cstk, struct xwup_tcb, stack);
-        return ctcb;
+        cthd = xwcc_baseof(xwup_skd.cstk, struct xwup_thd, stack);
+        return cthd;
 }
 
 /**
@@ -225,11 +225,11 @@ struct xwup_tcb * xwup_skd_get_ctcb_lc(void)
  * - 此函数只能在临界区中调用。
  */
 static __xwup_code
-struct xwup_tcb * xwup_skd_rtrq_choose(void)
+struct xwup_thd * xwup_skd_rtrq_choose(void)
 {
         struct xwup_skd * xwskd;
         struct xwup_rtrq * xwrtrq;
-        struct xwup_tcb * t;
+        struct xwup_thd * t;
 
         xwskd = &xwup_skd;
         xwrtrq = &xwskd->rq.rt;
@@ -272,7 +272,7 @@ void xwup_skd_init_idled(void)
 
         xwskd = &xwup_skd;
         xwskd->idle.name = NULL;
-        xwskd->idle.main = (xwup_thrd_f)xwup_skd_idled;
+        xwskd->idle.main = (xwup_thd_f)xwup_skd_idled;
         xwskd->idle.arg = xwskd;
         xwskd->idle.size = XWUPCFG_SKD_IDLE_STACK_SIZE;
         xwskd->idle.base = (xwstk_t *)xwup_skd_idled_stack;
@@ -287,7 +287,7 @@ void xwup_skd_init_idled(void)
 #else
   #error "Unknown stack type!"
 #endif
-        xwospl_skd_init_stack(&xwskd->idle, xwup_cthrd_exit, XWUP_SKDATTR_PRIVILEGED);
+        xwospl_skd_init_stack(&xwskd->idle, xwup_cthd_exit, XWUP_SKDATTR_PRIVILEGED);
 }
 
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
@@ -335,7 +335,7 @@ void xwup_skd_init_bhd(void)
 
         xwskd = &xwup_skd;
         xwskd->bh.name = NULL;
-        xwskd->bh.main = (xwup_thrd_f)xwup_skd_bhd;
+        xwskd->bh.main = (xwup_thd_f)xwup_skd_bhd;
         xwskd->bh.arg = xwskd;
         xwskd->bh.size = XWUPCFG_SKD_BH_STACK_SIZE;
         xwskd->bh.base = (xwstk_t *)xwup_skd_bhd_stack;
@@ -350,7 +350,7 @@ void xwup_skd_init_bhd(void)
 #else
   #error "Unknown stack type!"
 #endif
-        xwospl_skd_init_stack(&xwskd->bh, xwup_cthrd_exit, XWUP_SKDATTR_PRIVILEGED);
+        xwospl_skd_init_stack(&xwskd->bh, xwup_cthd_exit, XWUP_SKDATTR_PRIVILEGED);
 }
 
 /**
@@ -496,7 +496,7 @@ __xwup_api
 struct xwup_skd * xwup_skd_enpmpt_lc(void)
 {
         struct xwup_skd * xwskd;
-        struct xwup_tcb * t;
+        struct xwup_thd * t;
         bool sched;
         xwreg_t cpuirq;
 
@@ -518,7 +518,7 @@ struct xwup_skd * xwup_skd_enpmpt_lc(void)
                         cstk = xwskd->cstk;
 #endif /* !XWUPCFG_SKD_BH */
                         if (XWUP_SKD_IDLE_STK(xwskd) != cstk) {
-                                t = xwcc_baseof(cstk, struct xwup_tcb, stack);
+                                t = xwcc_baseof(cstk, struct xwup_thd, stack);
                                 sched = xwup_skd_do_chkpmpt(t);
                         } else {
                                 sched = true;
@@ -544,7 +544,7 @@ struct xwup_skd * xwup_skd_enpmpt_lc(void)
  * - 此函数被调用时需要关闭本地CPU的中断。
  */
 static __xwup_code
-bool xwup_skd_do_chkpmpt(struct xwup_tcb * t)
+bool xwup_skd_do_chkpmpt(struct xwup_thd * t)
 {
         struct xwup_skd * xwskd;
         struct xwup_rtrq * xwrtrq;
@@ -574,7 +574,7 @@ void xwup_skd_chkpmpt(void)
 {
         struct xwup_skd * xwskd;
         struct xwup_skd_stack_info * cstk;
-        struct xwup_tcb * t;
+        struct xwup_thd * t;
         xwreg_t cpuirq;
         bool sched;
 
@@ -594,7 +594,7 @@ void xwup_skd_chkpmpt(void)
                 cstk = xwskd->cstk;
 #endif /* !XWUPCFG_SKD_BH */
                 if (XWUP_SKD_IDLE_STK(xwskd) != cstk) {
-                        t = xwcc_baseof(cstk, struct xwup_tcb, stack);
+                        t = xwcc_baseof(cstk, struct xwup_thd, stack);
                         sched = xwup_skd_do_chkpmpt(t);
                 } else {
                         sched = true;
@@ -611,7 +611,7 @@ void xwup_skd_chkpmpt(void)
 /**
  * @brief 检测调度器是否需要切换上下文
  * @param t: (I) 被检测的线程的控制块对象的指针
- * @param pmtcb: (O) 指向缓冲区的指针，通过此缓冲区返回指向抢占线程控制块对象的指针
+ * @param pmthd: (O) 指向缓冲区的指针，通过此缓冲区返回指向抢占线程控制块对象的指针
  * @return 错误码
  * @retval OK: 需要切换上下文
  * @retval <0: 不需要切换上下文
@@ -619,7 +619,7 @@ void xwup_skd_chkpmpt(void)
  * - 此函数被调用时需要关闭本地CPU的中断。
  */
 static __xwup_code
-xwer_t xwup_skd_check_swcx(struct xwup_tcb * t, struct xwup_tcb ** pmtcb)
+xwer_t xwup_skd_check_swcx(struct xwup_thd * t, struct xwup_thd ** pmthd)
 {
         struct xwup_skd * xwskd;
         struct xwup_rtrq * xwrtrq;
@@ -632,13 +632,13 @@ xwer_t xwup_skd_check_swcx(struct xwup_tcb * t, struct xwup_tcb ** pmtcb)
                         rc = -EPERM;
                 } else {
                         xwbop(xwsq_t, c0m, &t->state, XWUP_SKDOBJ_DST_RUNNING);
-                        rc = xwup_thrd_rq_add_head(t);
+                        rc = xwup_thd_rq_add_head(t);
                         XWOS_BUG_ON(rc < 0);
-                        *pmtcb = xwup_skd_rtrq_choose();
+                        *pmthd = xwup_skd_rtrq_choose();
                         rc = XWOK;
                 }
         } else {
-                *pmtcb = xwup_skd_rtrq_choose();
+                *pmthd = xwup_skd_rtrq_choose();
                 rc = XWOK;
         }
         return rc;
@@ -653,7 +653,7 @@ static __xwup_code
 xwer_t xwup_skd_do_swcx(void)
 {
         struct xwup_skd * xwskd;
-        struct xwup_tcb * swt, * ctcb;
+        struct xwup_thd * swt, * cthd;
         xwer_t rc;
 
         xwskd = &xwup_skd;
@@ -667,10 +667,10 @@ xwer_t xwup_skd_do_swcx(void)
                         rc = -EAGAIN;
                 }
         } else {
-                ctcb = xwup_skd_get_ctcb_lc();
-                rc = xwup_skd_check_swcx(ctcb, &swt);
+                cthd = xwup_skd_get_cthd_lc();
+                rc = xwup_skd_check_swcx(cthd, &swt);
                 if (XWOK == rc) {
-                        if (ctcb == swt) {
+                        if (cthd == swt) {
                                 /* 当前线程的状态可能在中断中被改变，
                                    并被加入到就绪队列，然后在这里又被重新选择。
                                    这种情况下，调度器只需要恢复这个线程的
@@ -683,7 +683,7 @@ xwer_t xwup_skd_do_swcx(void)
                                 } else {
                                         xwskd->cstk = &swt->stack;
                                 }
-                                xwskd->pstk = &ctcb->stack;
+                                xwskd->pstk = &cthd->stack;
                                 rc = XWOK;
                         }
                 } else {
@@ -854,15 +854,15 @@ __xwup_code
 void xwup_skd_intr_all(void)
 {
         struct xwup_skd * xwskd;
-        struct xwup_tcb * c, * n;
+        struct xwup_thd * c, * n;
         xwreg_t cpuirq;
 
         xwskd = &xwup_skd;
         xwospl_cpuirq_save_lc(&cpuirq);
-        xwlib_bclst_itr_next_entry_safe(c, n, &xwskd->tcblist,
-                                        struct xwup_tcb, tcbnode) {
+        xwlib_bclst_itr_next_entry_safe(c, n, &xwskd->thdlist,
+                                        struct xwup_thd, thdnode) {
                 xwospl_cpuirq_restore_lc(cpuirq);
-                xwup_thrd_intr(c);
+                xwup_thd_intr(c);
                 xwospl_cpuirq_disable_lc();
         }
         xwospl_cpuirq_restore_lc(cpuirq);
@@ -998,7 +998,7 @@ xwer_t xwup_skd_suspend_lic(struct xwup_skd * xwskd)
 
         xwup_skd_intr_all();
         xwospl_cpuirq_save_lc(&cpuirq);
-        if (xwskd->thrd_num == xwskd->pm.frz_thrd_cnt) {
+        if (xwskd->thd_num == xwskd->pm.frz_thd_cnt) {
                 xwospl_cpuirq_restore_lc(cpuirq);
                 xwup_skd_notify_allfrz_lic();
         } else {
@@ -1071,19 +1071,19 @@ static __xwup_code
 xwer_t xwup_skd_thaw_allfrz_lic(void)
 {
         struct xwup_skd * xwskd;
-        struct xwup_tcb * c, * n;
+        struct xwup_thd * c, * n;
         xwreg_t cpuirq;
         xwer_t rc;
 
         xwskd = &xwup_skd;
         xwospl_cpuirq_save_lc(&cpuirq);
         xwlib_bclst_itr_next_entry_safe(c, n, &xwskd->pm.frzlist,
-                                        struct xwup_tcb, frznode) {
+                                        struct xwup_thd, frznode) {
                 xwospl_cpuirq_restore_lc(cpuirq);
-                xwup_thrd_thaw_lic(c);
+                xwup_thd_thaw_lic(c);
                 xwospl_cpuirq_disable_lc();
         }
-        if (0 == xwskd->pm.frz_thrd_cnt) {
+        if (0 == xwskd->pm.frz_thd_cnt) {
                 rc = XWOK;
         } else {
                 rc = -EBUG;
@@ -1257,7 +1257,7 @@ void xwup_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
                         } else if (XWUP_SKD_IDLE_STK(xwskd) == xwskd->cstk) {
                                 ctx = XWUP_SKD_CONTEXT_IDLE;
                         } else {
-                                ctx = XWUP_SKD_CONTEXT_THRD;
+                                ctx = XWUP_SKD_CONTEXT_THD;
                         }
                 } else {
                         ctx = XWUP_SKD_CONTEXT_INIT_EXIT;

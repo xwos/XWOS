@@ -15,7 +15,7 @@
 #include <xwos/lib/rbtree.h>
 #include <xwos/up/lock/mtx.h>
 #include <xwos/up/skd.h>
-#include <xwos/up/thrd.h>
+#include <xwos/up/thd.h>
 #include <xwos/up/mtxtree.h>
 
 /**

@@ -25,14 +25,14 @@
 /**
  * @brief XWOS API：线程控制块
  */
-struct xwos_tcb {
-        struct xwosdl_tcb ostcb;
+struct xwos_thd {
+        struct xwosdl_thd osthd;
 };
 
 /**
  * @brief XWOS API：线程函数指针类型
  */
-typedef xwosdl_thrd_f xwos_thrd_f;
+typedef xwosdl_thd_f xwos_thd_f;
 
 /**
  * @defgroup xwos_skdattr_em
@@ -57,9 +57,9 @@ typedef xwosdl_thrd_f xwos_thrd_f;
  */
 
 /**
- * @brief XWOS API：线程描述结构
+ * @brief XWOS API：线程描述表
  */
-struct xwos_thrd_desc {
+struct xwos_thd_desc {
         const char * name; /**< 线程的名字 */
         xwpr_t prio; /**< 线程的优先级 */
         xwstk_t * stack; /**< 线程栈的首地址指针：
@@ -68,18 +68,28 @@ struct xwos_thrd_desc {
                                 动态内存申请。*/
         xwsz_t stack_size; /**< 线程栈的大小，以字节(byte)为单位，
                                 注意与CPU的ABI接口规定的内存边界对齐 */
-        xwos_thrd_f func; /**< 线程函数的指针 */
+        xwos_thd_f func; /**< 线程函数的指针 */
         void * arg; /**< 线程函数的参数 */
         xwsq_t attr; /**< 与具体操作系统相关的一些数据 */
 };
+
+/**
+ * @brief XWOS API：线程描述符
+ */
+typedef xwosdl_thd_d xwos_thd_d;
+
+/**
+ * @brief XWOS API：空的线程描述符
+ */
+#define XWOS_THD_NILD XWOSDL_THD_NILD
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       macro       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /**
- * @brief 栈内存动态方式创建
+ * @brief XWOS API：栈内存动态方式创建
  */
-#define XWOS_THRD_STACK_DYNAMIC (NULL)
+#define XWOS_THD_STACK_DYNAMIC (NULL)
 
 /**
  * @brief XWOS API：最小实时优先级
@@ -118,7 +128,7 @@ struct xwos_thrd_desc {
 /**
  * @brief XWOS API：上下文：线程
  */
-#define XWOS_SKD_CONTEXT_THRD           XWOSDL_SKD_CONTEXT_THRD
+#define XWOS_SKD_CONTEXT_THD            XWOSDL_SKD_CONTEXT_THD
 
 /**
  * @brief XWOS API：上下文：中断
@@ -139,9 +149,9 @@ struct xwos_thrd_desc {
  */
 
 /**
- * @brief 线程本地数据指针的数量
+ * @brief XWOS API：线程本地数据指针的数量
  */
-#define XWOS_THRD_LOCAL_DATA_NUM        XWOSDL_THRD_LOCAL_DATA_NUM
+#define XWOS_THD_LOCAL_DATA_NUM        XWOSDL_THD_LOCAL_DATA_NUM
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********        API        ******** ******** ********
@@ -175,6 +185,20 @@ static __xwos_inline_api
 xwer_t xwos_skd_start_lc(void)
 {
         return xwosdl_skd_start_lc();
+}
+
+/**
+ * @brief XWOS API：获取当前CPU的ID
+ * @return 当前CPU的ID
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwid_t xwos_skd_id_lc(void)
+{
+        return xwosdl_skd_id_lc();
 }
 
 /**
@@ -263,7 +287,8 @@ void xwos_skd_enpmpt_lc(void)
 
 /**
  * @brief XWOS API：静态方式初始化线程
- * @param tcb: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
+ * @param thdd: (O) 指向缓冲区的指针，通过此缓冲区返回线程描述符
  * @param name: (I) 线程的名字
  * @param mainfunc: (I) 线程函数的指针
  * @param arg: (I) 线程函数的参数
@@ -277,7 +302,7 @@ void xwos_skd_enpmpt_lc(void)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：不可重入
  * @note
- * - 静态初始化线程需预先定义线程控制块对象和线程栈数组，通常定义为全局变量。
+ * - 静态初始化线程需预先定义线程对象和线程栈数组，通常定义为全局变量。
  * - 栈数组的首地址与大小，必须要满足CPU的ABI规则，
  *   例如ARM，就需要8字节对齐。因此在定义栈数组时需要使用__xwcc_aligned(8)来修饰，
  *   且大小是8的倍数。
@@ -286,22 +311,23 @@ void xwos_skd_enpmpt_lc(void)
  *   attr参数的类型是xwsq_t，此类型定义成与指针一样长，因此也可传递一个指针。
  */
 static __xwos_inline_api
-xwer_t xwos_thrd_init(struct xwos_tcb * tcb,
-                      const char * name,
-                      xwos_thrd_f mainfunc, void * arg,
-                      xwstk_t * stack, xwsz_t stack_size,
-                      xwpr_t priority, xwsq_t attr)
+xwer_t xwos_thd_init(struct xwos_thd * thd,
+                     xwos_thd_d * thdd,
+                     const char * name,
+                     xwos_thd_f mainfunc, void * arg,
+                     xwstk_t * stack, xwsz_t stack_size,
+                     xwpr_t priority, xwsq_t attr)
 {
-        return xwosdl_thrd_init(&tcb->ostcb,
-                                name,
-                                (xwosdl_thrd_f)mainfunc, arg,
-                                stack, stack_size,
-                                priority, attr);
+        return xwosdl_thd_init(&thd->osthd, thdd,
+                               name,
+                               (xwosdl_thd_f)mainfunc, arg,
+                               stack, stack_size,
+                               priority, attr);
 }
 
 /**
  * @brief XWOS API：销毁静态方式初始化的线程
- * @param tcb: (I) 线程控制块的指针
+ * @param thd: (I) 线程控制块的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -309,14 +335,14 @@ xwer_t xwos_thrd_init(struct xwos_tcb * tcb,
  * - 重入性：不可重入
  */
 static __xwos_inline_api
-xwer_t xwos_thrd_destroy(struct xwos_tcb * tcb)
+xwer_t xwos_thd_destroy(xwos_thd_d thdd)
 {
-        return xwosdl_thrd_destroy(&tcb->ostcb);
+        return xwosdl_thd_destroy(thdd);
 }
 
 /**
  * @brief XWOS API：动态方式创建并初始化线程
- * @param tidp: (O) 指向缓冲区的指针，通过此缓冲区返回线程ID
+ * @param thdd: (O) 指向缓冲区的指针，通过此缓冲区返回线程描述符
  * @param name: (I) 线程的名字
  * @param mainfunc: (I) 线程函数的指针
  * @param arg: (I) 线程函数的参数
@@ -330,28 +356,28 @@ xwer_t xwos_thrd_destroy(struct xwos_tcb * tcb)
  * - 重入性：可重入
  * @note
  * - 动态创建线程采用的是操作系统提供的动态内存分配的接口创建线程控制块和线程
- *   的栈，当线程不使用时调用@ref xwos_thrd_delete()回收资源，防止资源泄漏。
+ *   的栈，当线程不使用时调用@ref xwos_thd_delete()回收资源，防止资源泄漏。
  * - attr参数的作用由OS而决定，在XWOS中，它的作用是设置线程的一些属性。
  *   此参数的类型是xwsq_t，此类型定义成与unsigned long一样长，也就是
  *   和指针类型一样长，因此也可传递一个指针。
  */
 static __xwos_inline_api
-xwer_t xwos_thrd_create(xwid_t * tidp,
-                        const char * name,
-                        xwos_thrd_f mainfunc, void * arg,
-                        xwsz_t stack_size,
-                        xwpr_t priority, xwsq_t attr)
+xwer_t xwos_thd_create(xwos_thd_d * thdd,
+                       const char * name,
+                       xwos_thd_f mainfunc, void * arg,
+                       xwsz_t stack_size,
+                       xwpr_t priority, xwsq_t attr)
 {
-        return xwosdl_thrd_create(tidp,
-                                  name,
-                                  (xwosdl_thrd_f)mainfunc, arg,
-                                  stack_size,
-                                  priority, attr);
+        return xwosdl_thd_create(thdd,
+                                 name,
+                                 (xwosdl_thd_f)mainfunc, arg,
+                                 stack_size,
+                                 priority, attr);
 }
 
 /**
  * @brief XWOS API：删除动态方式创建的线程
- * @param tid: (I) 线程ID
+ * @param thdd: (I) 线程描述符
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -359,22 +385,22 @@ xwer_t xwos_thrd_create(xwid_t * tidp,
  * - 重入性：不可重入
  */
 static __xwos_inline_api
-xwer_t xwos_thrd_delete(xwid_t tid)
+xwer_t xwos_thd_delete(xwos_thd_d thdd)
 {
-        return xwosdl_thrd_delete(tid);
+        return xwosdl_thd_delete(thdd);
 }
 
 /**
- * @brief XWOS API：让出当前线程的CPU，调度器重新选择线程
+ * @brief XWOS API：通知调度器重新选择线程
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
  */
 static __xwos_inline_api
-void xwos_cthrd_yield(void)
+void xwos_cthd_yield(void)
 {
-        xwosdl_cthrd_yield();
+        xwosdl_cthd_yield();
 }
 
 /**
@@ -389,14 +415,14 @@ void xwos_cthrd_yield(void)
  *   pthread_exit()函数。
  */
 static __xwos_inline_api
-void xwos_cthrd_exit(xwer_t rc)
+void xwos_cthd_exit(xwer_t rc)
 {
-        xwosdl_cthrd_exit(rc);
+        xwosdl_cthd_exit(rc);
 }
 
 /**
  * @brief XWOS API：终止线程并等待它的返回值，最后回收线程资源
- * @param tid: (I) 线程ID
+ * @param thdd: (I) 线程描述符
  * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回子线程的返回值，
  *                 可为NULL，表示不需要获取返回值
  * @return 错误码
@@ -412,14 +438,14 @@ void xwos_cthrd_exit(xwer_t rc)
  * - 不可对Detached态的线程使用此函数。
  */
 static __xwos_inline_api
-xwer_t xwos_thrd_stop(xwid_t tid, xwer_t * trc)
+xwer_t xwos_thd_stop(xwos_thd_d thdd, xwer_t * trc)
 {
-        return xwosdl_thrd_stop(tid, trc);
+        return xwosdl_thd_stop(thdd, trc);
 }
 
 /**
  * @brief XWOS API：取消线程
- * @param tid: (I) 线程ID
+ * @param thdd: (I) 线程描述符
  * @return 错误码
  * @retval XWOK: 没有错误
  * @note
@@ -430,18 +456,18 @@ xwer_t xwos_thrd_stop(xwid_t tid, xwer_t * trc)
  * - 此函数功能类似于pthread_cancel()，通知子线程退出；
  * - 此函数可中断子线程的阻塞态与睡眠态；
  * - 子线程收到终止信号后，并不会立即退出，退出的时机由子线程自己控制；
- * - 此函数与xwos_thrd_stop()不同，不会阻塞调用者，也不会回收子线程资源，因此
+ * - 此函数与xwos_thd_stop()不同，不会阻塞调用者，也不会回收子线程资源，因此
  *   可在中断中调用。
  */
 static __xwos_inline_api
-xwer_t xwos_thrd_cancel(xwid_t tid)
+xwer_t xwos_thd_cancel(xwos_thd_d thdd)
 {
-        return xwosdl_thrd_cancel(tid);
+        return xwosdl_thd_cancel(thdd);
 }
 
 /**
  * @brief XWOS API：等待线程结束并获取它的返回值，最后回收线程资源
- * @param tid: (I) 线程ID
+ * @param thdd: (I) 线程描述符
  * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回子线程的返回值，
  *                 可为NULL，表示不需要获取返回值
  * @return 错误码
@@ -456,17 +482,17 @@ xwer_t xwos_thrd_cancel(xwid_t tid)
  *   并获取子线程的返回值，最后释放子线程资源，此函数类似于POSIX线程库
  *   pthread_join()函数；
  * - 不可对Detached态的线程使用此函数；
- * - 此函数与xwos_thrd_stop()不同，只会等待子线程退出，不会通知子线程退出。
+ * - 此函数与xwos_thd_stop()不同，只会等待子线程退出，不会通知子线程退出。
  */
 static __xwos_inline_api
-xwer_t xwos_thrd_join(xwid_t tid, xwer_t * trc)
+xwer_t xwos_thd_join(xwos_thd_d thdd, xwer_t * trc)
 {
-        return xwosdl_thrd_join(tid, trc);
+        return xwosdl_thd_join(thdd, trc);
 }
 
 /**
  * @brief XWMP API：分离线程
- * @param tid: (I) 线程ID
+ * @param thdd: (I) 线程描述符
  * @return 错误码
  * @retval XWOK: 没有错误
  * @note
@@ -478,9 +504,9 @@ xwer_t xwos_thrd_join(xwid_t tid, xwer_t * trc)
  *   不需要父线程join()或stop()。
  */
 static __xwos_inline_api
-xwer_t xwos_thrd_detach(xwid_t tid)
+xwer_t xwos_thd_detach(xwos_thd_d thdd)
 {
-        return xwosdl_thrd_detach(tid);
+        return xwosdl_thd_detach(thdd);
 }
 
 /**
@@ -494,9 +520,9 @@ xwer_t xwos_thrd_detach(xwid_t tid)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-bool xwos_cthrd_shld_frz(void)
+bool xwos_cthd_shld_frz(void)
 {
-        return xwosdl_cthrd_shld_frz();
+        return xwosdl_cthd_shld_frz();
 }
 
 /**
@@ -513,16 +539,16 @@ bool xwos_cthrd_shld_frz(void)
  *   ```C
  *   xwer_t thread_main(void * arg)
  *   {
- *           while (!xwos_cthrd_shld_stop()) {
+ *           while (!xwos_cthd_shld_stop()) {
  *                   thread loop ...;
  *           }
  *   }
  *   ```
  */
 static __xwos_inline_api
-bool xwos_cthrd_shld_stop(void)
+bool xwos_cthd_shld_stop(void)
 {
-        return xwosdl_cthrd_shld_stop();
+        return xwosdl_cthd_shld_stop();
 }
 
 /**
@@ -537,79 +563,50 @@ bool xwos_cthrd_shld_stop(void)
  * - 上下文：线程
  * - 重入性：可重入
  * @note
- * - 此函数在@ref xwos_cthrd_shld_stop()的基础上增加了对冻结条件是否满足
+ * - 此函数在@ref xwos_cthd_shld_stop()的基础上增加了对冻结条件是否满足
  *   的判断，如果可以冻结，就在函数中将线程冻结。例如：
  *   ```C
  *   xwer_t thread_main(void * arg)
  *   {
- *           while (!xwos_cthrd_frz_shld_stop()) {
+ *           while (!xwos_cthd_frz_shld_stop()) {
  *                   thread loop ...;
  *           }
  *   }
  *   ```
  */
 static __xwos_inline_api
-bool xwos_cthrd_frz_shld_stop(bool * frozen)
+bool xwos_cthd_frz_shld_stop(bool * frozen)
 {
-        return xwosdl_cthrd_frz_shld_stop(frozen);
+        return xwosdl_cthd_frz_shld_stop(frozen);
 }
 
 /**
- * @brief XWOS API：获取当前线程的线程ID
- * @return 线程ID
+ * @brief XWOS API：获取当前线程的线程描述符
+ * @return 线程描述符
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwid_t xwos_cthrd_id(void)
+xwos_thd_d xwos_cthd_getd(void)
 {
-        return xwosdl_cthrd_id();
+        return xwosdl_cthd_getd();
 }
 
 /**
- * @brief XWOS API：获取当前线程的对象指针
- * @return 线程控制块对象的指针
+ * @brief XWOS API：获取指定线程的线程描述符
+ * @param thd: (I) 线程对象的指针
+ * @return 线程描述符
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  */
 static __xwos_inline_api
-struct xwos_tcb * xwos_cthrd_obj(void)
+xwos_thd_d xwos_thd_getd(struct xwos_thd * thd)
 {
-        return (struct xwos_tcb *)xwosdl_cthrd_obj();
-}
-
-/**
- * @brief XWOS API：通过线程控制块对象的指针获取线程ID
- * @param tcb: (I) 线程控制块对象的指针
- * @return 线程ID
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwid_t xwos_thrd_id(struct xwos_tcb * tcb)
-{
-        return xwosdl_thrd_id(&tcb->ostcb);
-}
-
-/**
- * @brief XWOS API：从线程ID获取对象指针
- * @param tid: (I) 线程ID
- * @return 线程控制块对象的指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-struct xwos_tcb * xwos_thrd_obj(xwid_t tid)
-{
-        return (struct xwos_tcb *)xwosdl_thrd_obj(tid);
+        return xwosdl_thd_getd(&thd->osthd);
 }
 
 /**
@@ -627,9 +624,9 @@ struct xwos_tcb * xwos_thrd_obj(xwid_t tid)
  * - 超时后将以返回值OK返回，并且 *xwtm* 指向缓冲区返回0。
  */
 static __xwos_inline_api
-xwer_t xwos_cthrd_sleep(xwtm_t * xwtm)
+xwer_t xwos_cthd_sleep(xwtm_t * xwtm)
 {
-        return xwosdl_cthrd_sleep(xwtm);
+        return xwosdl_cthd_sleep(xwtm);
 }
 
 /**
@@ -648,14 +645,14 @@ xwer_t xwos_cthrd_sleep(xwtm_t * xwtm)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_cthrd_sleep_from(xwtm_t * origin, xwtm_t inc)
+xwer_t xwos_cthd_sleep_from(xwtm_t * origin, xwtm_t inc)
 {
-        return xwosdl_cthrd_sleep_from(origin, inc);
+        return xwosdl_cthd_sleep_from(origin, inc);
 }
 
 /**
  * @brief XWOS API：中断线程的睡眠或阻塞状态
- * @param tid: (I) 线程ID
+ * @param thdd: (I) 线程描述符
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -663,9 +660,9 @@ xwer_t xwos_cthrd_sleep_from(xwtm_t * origin, xwtm_t inc)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_thrd_intr(xwid_t tid)
+xwer_t xwos_thd_intr(xwos_thd_d thdd)
 {
-        return xwosdl_thrd_intr(tid);
+        return xwosdl_thd_intr(thdd);
 }
 
 /**
@@ -677,31 +674,31 @@ xwer_t xwos_thrd_intr(xwid_t tid)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_cthrd_freeze(void)
+xwer_t xwos_cthd_freeze(void)
 {
-        return xwosdl_cthrd_freeze();
+        return xwosdl_cthd_freeze();
 }
 
 /**
  * @brief XWOS API：将线程迁移到其他CPU
- * @param tid: (I) 线程ID
+ * @param thdd: (I) 线程描述符
  * @param dstcpu: (I) 目标CPU的ID
  * @return 错误码
  * @note
  * - 同步/异步：异步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个tid，不可重入
+ * - 重入性：对于同一个thdd，不可重入
  */
 static __xwos_inline_api
-xwer_t xwos_thrd_migrate(xwid_t tid, xwid_t dstcpu)
+xwer_t xwos_thd_migrate(xwos_thd_d thdd, xwid_t dstcpu)
 {
-        return xwosdl_thrd_migrate(tid, dstcpu);
+        return xwosdl_thd_migrate(thdd, dstcpu);
 }
 
-#if (XWOS_THRD_LOCAL_DATA_NUM > 0U)
+#if (XWOS_THD_LOCAL_DATA_NUM > 0U)
 /**
  * @brief XWOS API：设置线程的本地数据指针
- * @param tcb: (I) 线程控制块的指针
+ * @param thdd: (I) 线程描述符
  * @param pos: (I) 数据存放位置的索引
  * @param data: (I) 数据指针
  * @return 错误码
@@ -714,14 +711,14 @@ xwer_t xwos_thrd_migrate(xwid_t tid, xwid_t dstcpu)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_thrd_set_data(struct xwos_tcb * tcb, xwsq_t pos, void * data)
+xwer_t xwos_thd_set_data(xwos_thd_d thdd, xwsq_t pos, void * data)
 {
-        return xwosdl_thrd_set_data(&tcb->ostcb, pos, data);
+        return xwosdl_thd_set_data(thdd, pos, data);
 }
 
 /**
  * @brief XWOS API：获取线程的本地数据指针
- * @param tcb: (I) 线程控制块的指针
+ * @param thdd: (I) 线程描述符
  * @param pos: (I) 数据存放位置的索引
  * @param databuf: (O) 指向缓冲区的指针，通过此缓冲区返回数据指针
  * @return 错误码
@@ -734,9 +731,9 @@ xwer_t xwos_thrd_set_data(struct xwos_tcb * tcb, xwsq_t pos, void * data)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_thrd_get_data(struct xwos_tcb * tcb, xwsq_t pos, void ** databuf)
+xwer_t xwos_thd_get_data(xwos_thd_d thdd, xwsq_t pos, void ** databuf)
 {
-        return xwosdl_thrd_get_data(&tcb->ostcb, pos, databuf);
+        return xwosdl_thd_get_data(thdd, pos, databuf);
 }
 
 /**
@@ -753,9 +750,9 @@ xwer_t xwos_thrd_get_data(struct xwos_tcb * tcb, xwsq_t pos, void ** databuf)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_cthrd_set_data(xwsq_t pos, void * data)
+xwer_t xwos_cthd_set_data(xwsq_t pos, void * data)
 {
-        return xwosdl_cthrd_set_data(pos, data);
+        return xwosdl_cthd_set_data(pos, data);
 }
 
 /**
@@ -772,11 +769,11 @@ xwer_t xwos_cthrd_set_data(xwsq_t pos, void * data)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_cthrd_get_data(xwsq_t pos, void ** databuf)
+xwer_t xwos_cthd_get_data(xwsq_t pos, void ** databuf)
 {
-        return xwosdl_cthrd_get_data(pos, databuf);
+        return xwosdl_cthd_get_data(pos, databuf);
 
 }
-#endif /* XWOS_THRD_LOCAL_DATA_NUM */
+#endif /* XWOS_THD_LOCAL_DATA_NUM */
 
 #endif /* xwos/osal/skd.h */

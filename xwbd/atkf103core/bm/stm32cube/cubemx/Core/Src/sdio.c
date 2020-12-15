@@ -234,7 +234,7 @@ xwer_t MX_SDIO_SD_TrimClk(xwsq_t cnt)
 
   for (i = 0; i < cnt; i++) {
     time = 1 * XWTM_MS;
-    xwos_cthrd_sleep(&time);
+    xwos_cthd_sleep(&time);
     rc = MX_SDIO_SD_Read(buf, i, 1);
     if (XWOK == rc) {
     } else if (-EIO == rc) {

@@ -24,34 +24,34 @@
 #include <xwos/osal/skd.h>
 #include <xwam/example/thread/sleep/mif.h>
 
-#define XWSLPDEMO_THRD_PRIORITY                                 \
+#define XWSLPDEMO_THD_PRIORITY                                  \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-#define EXAMPLE_THREAD_SLEEP_LOG_TAG        "thrdsleep"
-#define thrdslplogf(lv, fmt, ...)                               \
+#define EXAMPLE_THREAD_SLEEP_LOG_TAG        "thdsleep"
+#define thdslplogf(lv, fmt, ...)                                        \
         xwlogf(lv, EXAMPLE_THREAD_SLEEP_LOG_TAG, fmt, ##__VA_ARGS__)
 #else /* XWLIBCFG_LOG */
-#define thrdslplogf(lv, fmt, ...)
+#define thdslplogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
 
-xwer_t xwslpdemo_thrd_func(void * arg);
+xwer_t xwslpdemo_thd_func(void * arg);
 
 /**
  * @brief 动态创建的线程描述表
  */
-const struct xwos_thrd_desc xwslpdemo_tbd[] = {
+const struct xwos_thd_desc xwslpdemo_tbd[] = {
         [0] = {
-                .name = "xwslpdemo.thrd",
-                .prio = XWSLPDEMO_THRD_PRIORITY,
-                .stack = XWOS_THRD_STACK_DYNAMIC,
+                .name = "xwslpdemo.thd",
+                .prio = XWSLPDEMO_THD_PRIORITY,
+                .stack = XWOS_THD_STACK_DYNAMIC,
                 .stack_size = 2048,
-                .func = (xwos_thrd_f)xwslpdemo_thrd_func,
+                .func = (xwos_thd_f)xwslpdemo_thd_func,
                 .arg = NULL,
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
-xwid_t xwslpdemo_tid[xw_array_size(xwslpdemo_tbd)];
+xwos_thd_d xwslpdemo_thdd[xw_array_size(xwslpdemo_tbd)];
 
 /**
  * @brief 模块的加载函数
@@ -63,48 +63,48 @@ xwer_t example_thread_sleep_start(void)
 
 
         for (i = 0; i < xw_array_size(xwslpdemo_tbd); i++) {
-                rc = xwos_thrd_create(&xwslpdemo_tid[i],
-                                      xwslpdemo_tbd[i].name,
-                                      xwslpdemo_tbd[i].func,
-                                      xwslpdemo_tbd[i].arg,
-                                      xwslpdemo_tbd[i].stack_size,
-                                      xwslpdemo_tbd[i].prio,
-                                      xwslpdemo_tbd[i].attr);
+                rc = xwos_thd_create(&xwslpdemo_thdd[i],
+                                     xwslpdemo_tbd[i].name,
+                                     xwslpdemo_tbd[i].func,
+                                     xwslpdemo_tbd[i].arg,
+                                     xwslpdemo_tbd[i].stack_size,
+                                     xwslpdemo_tbd[i].prio,
+                                     xwslpdemo_tbd[i].attr);
                 if (rc < 0) {
-                        goto err_thrd_create;
+                        goto err_thd_create;
                 }
         }
 
         return XWOK;
 
-err_thrd_create:
+err_thd_create:
         return rc;
 }
 
 /**
  * @brief 线程的主函数
  */
-xwer_t xwslpdemo_thrd_func(void * arg)
+xwer_t xwslpdemo_thd_func(void * arg)
 {
         xwtm_t tk, ts;
         xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
 
-        thrdslplogf(INFO, "[线程] 启动。\n");
+        thdslplogf(INFO, "[线程] 启动。\n");
 
-        thrdslplogf(INFO, "[线程] 睡眠1秒 ...\n");
+        thdslplogf(INFO, "[线程] 睡眠1秒 ...\n");
         tk = 1 * XWTM_S;
-        xwos_cthrd_sleep(&tk);
+        xwos_cthd_sleep(&tk);
 
         tk = xwos_skd_get_timetick_lc();
-        while (!xwos_cthrd_frz_shld_stop(NULL)) {
-                xwos_cthrd_sleep_from(&tk, 500 * XWTM_MS);
+        while (!xwos_cthd_frz_shld_stop(NULL)) {
+                xwos_cthd_sleep_from(&tk, 500 * XWTM_MS);
                 ts = xwos_skd_get_timestamp_lc();
-                thrdslplogf(INFO, "[线程] 时间戳：%lld 纳秒。\n", ts);
+                thdslplogf(INFO, "[线程] 时间戳：%lld 纳秒。\n", ts);
         }
 
-        thrdslplogf(INFO, "[线程] 退出。\n");
-        xwos_thrd_delete(xwos_cthrd_id());
+        thdslplogf(INFO, "[线程] 退出。\n");
+        xwos_thd_delete(xwos_cthd_getd());
         return rc;
 }

@@ -33,7 +33,7 @@
 xwer_t task_led(void * arg);
 xwer_t task_dmauart(void * arg);
 
-const struct xwos_thrd_desc board_td_tbl[] = {
+const struct xwos_thd_desc board_td_tbl[] = {
         [0] = {
                 .name = "led",
                 .prio = TASK_LED_PRIORITY,
@@ -54,7 +54,7 @@ const struct xwos_thrd_desc board_td_tbl[] = {
         },
 };
 
-xwid_t board_tcb[xw_array_size(board_td_tbl)];
+xwos_thd_d board_thdd[xw_array_size(board_td_tbl)];
 xwu8_t rxbuffer[4096];
 
 static __xwos_code
@@ -81,13 +81,13 @@ xwer_t task_dmauart(void * arg)
         xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
-        while (!xwos_cthrd_frz_shld_stop(NULL)) {
+        while (!xwos_cthd_frz_shld_stop(NULL)) {
                 time = XWTM_MAX;
                 size = sizeof(rxbuffer);
                 rc = xwds_dmauartc_rx(&mpc560xb_uart0_cb, rxbuffer, &size, &time);
                 if ((XWOK == rc) && (size > 0)) {
                         time = 5 * XWTM_S;
-                        xwos_cthrd_sleep(&time);
+                        xwos_cthd_sleep(&time);
                         rc = bdl_iftx(rxbuffer, size >> 1);
                         if (XWOK == rc) {
                                 rc = bdl_iftx(&rxbuffer[size >> 1], size >> 1);
@@ -106,7 +106,7 @@ xwer_t task_led(void * arg)
         XWOS_UNUSED(arg);
         pinmask = (BIT(SOC_GPIO_PIN_12) | BIT(SOC_GPIO_PIN_13));
         rc = XWOK;
-        while (!xwos_cthrd_frz_shld_stop(NULL)) {
+        while (!xwos_cthd_frz_shld_stop(NULL)) {
                 rc = xwds_gpio_req(&mpc560xb_soc_cb, LED_PORT, pinmask);
                 if (XWOK == rc) {
                         while (1) {
@@ -117,7 +117,7 @@ xwer_t task_led(void * arg)
                                 xwds_gpio_reset(&mpc560xb_soc_cb, LED_PORT,
                                                 pinmask);
                                 time = 500*XWTM_MS;
-                                rc = xwos_cthrd_sleep(&time);
+                                rc = xwos_cthd_sleep(&time);
                                 if (__xwcc_unlikely(rc < 0)) {
                                         break;
                                 }
@@ -128,7 +128,7 @@ xwer_t task_led(void * arg)
                                 xwds_gpio_set(&mpc560xb_soc_cb, LED_PORT,
                                               pinmask);
                                 time = 500*XWTM_MS;
-                                rc = xwos_cthrd_sleep(&time);
+                                rc = xwos_cthd_sleep(&time);
                                 if (__xwcc_unlikely(rc < 0)) {
                                         break;
                                 }
@@ -145,12 +145,12 @@ xwer_t xwos_main(void)
         xwsz_t i;
 
         for (i = 0; i < xw_array_size(board_td_tbl); i ++) {
-                rc = xwos_thrd_create(&board_tcb[i], board_td_tbl[i].name,
-                                      board_td_tbl[i].func,
-                                      board_td_tbl[i].arg,
-                                      board_td_tbl[i].stack_size,
-                                      board_td_tbl[i].prio,
-                                      board_td_tbl[i].attr);
+                rc = xwos_thd_create(&board_thdd[i], board_td_tbl[i].name,
+                                     board_td_tbl[i].func,
+                                     board_td_tbl[i].arg,
+                                     board_td_tbl[i].stack_size,
+                                     board_td_tbl[i].prio,
+                                     board_td_tbl[i].attr);
                 BDL_BUG_ON(rc);
         }
         rc = xwos_skd_start_lc();

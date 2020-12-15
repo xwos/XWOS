@@ -38,7 +38,7 @@
 
 struct xwmp_pmdm;
 struct xwmp_skd;
-struct xwmp_tcb;
+struct xwmp_thd;
 
 /**
  * @brief 调度策略枚举
@@ -88,7 +88,7 @@ enum xwmp_skdattr_em {
 /**
  * @brief 线程主函数
  */
-typedef xwer_t (* xwmp_thrd_f)(void *);
+typedef xwer_t (* xwmp_thd_f)(void *);
 
 /**
  * @brief 线程栈信息
@@ -97,7 +97,7 @@ struct xwmp_skd_stack_info {
         xwstk_t * sp; /**< 栈指针 */
         xwstk_t * base; /**< 栈基地址 */
         xwsz_t size; /**< 栈大小，单位：字节 */
-        xwmp_thrd_f main; /**< 主函数 */
+        xwmp_thd_f main; /**< 主函数 */
         void * arg; /**< 主函数的参数 */
         const char * name; /**< 名字字符串 */
 };
@@ -107,7 +107,7 @@ struct xwmp_skd_stack_info {
  */
 enum xwmp_skd_context_em {
         XWMP_SKD_CONTEXT_INIT_EXIT = 0, /**< 初始化与反初始化 */
-        XWMP_SKD_CONTEXT_THRD, /**< 线程 */
+        XWMP_SKD_CONTEXT_THD, /**< 线程 */
         XWMP_SKD_CONTEXT_ISR, /**< 中断 */
         XWMP_SKD_CONTEXT_BH, /**< 中断底半部 */
         XWMP_SKD_CONTEXT_IDLE, /**< 空闲任务 */
@@ -131,7 +131,7 @@ enum xwmp_skd_wakelock_cnt_em {
  */
 struct xwmp_skd_pm {
         xwsq_a wklkcnt; /**< 唤醒锁，取值@ref xwmp_skd_wakelock_cnt_em */
-        xwsz_t frz_thrd_cnt; /**< 已冻结的线程计数器 */
+        xwsz_t frz_thd_cnt; /**< 已冻结的线程计数器 */
         struct xwlib_bclst_head frzlist; /**< 已冻结的线程链表 */
         struct xwmp_splk lock; /**< 保护链表和计数器的锁 */
         struct xwmp_pmdm * xwpmdm; /**< 归属的电源管理领域 */
@@ -166,17 +166,17 @@ struct __xwcc_alignl1cache xwmp_skd {
         struct xwmp_splk cxlock; /**< 上下文切换的锁 */
         struct xwmp_skd_pm pm; /**< 调度器电源管理控制块 */
 
-        struct xwlib_bclst_head tcblist; /**< 链接本调度器中所有线程的链表头 */
-        xwsz_t thrd_num; /**< 本调度器中的线程数量 */
-        struct xwmp_splk tcblistlock; /**< 保护tcblist的锁 */
+        struct xwlib_bclst_head thdlist; /**< 链接本调度器中所有线程的链表头 */
+        xwsz_t thd_num; /**< 本调度器中的线程数量 */
+        struct xwmp_splk thdlistlock; /**< 保护thdlist的锁 */
 };
 
 extern struct xwmp_skd xwmp_skd[CPUCFG_CPU_NUM];
 
 struct xwmp_skd * xwmp_skd_get_lc(void);
 xwer_t xwmp_skd_get_by_cpuid(xwid_t cpuid, struct xwmp_skd ** ptrbuf);
-struct xwmp_tcb * xwmp_skd_get_ctcb(struct xwmp_skd * xwskd);
-struct xwmp_tcb * xwmp_skd_get_ctcb_lc(void);
+struct xwmp_thd * xwmp_skd_get_cthd(struct xwmp_skd * xwskd);
+struct xwmp_thd * xwmp_skd_get_cthd_lc(void);
 struct xwmp_skd * xwmp_skd_dspmpt(struct xwmp_skd * xwskd);
 struct xwmp_skd * xwmp_skd_enpmpt(struct xwmp_skd * xwskd);
 
@@ -204,7 +204,7 @@ xwer_t xwmp_skd_init_lc(void);
 xwer_t xwmp_skd_start_lc(void);
 xwer_t xwmp_skd_start_syshwt_lc(void);
 xwer_t xwmp_skd_stop_syshwt_lc(void);
-xwid_t xwmp_skd_get_id(void);
+xwid_t xwmp_skd_id_lc(void);
 
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
 struct xwmp_skd * xwmp_skd_dsbh_lc(void);

@@ -620,7 +620,7 @@ int pmain(lua_State * L)
   return 1;
 }
 
-xwer_t xwlua_thrd(void * arg)
+xwer_t xwlua_thd(void * arg)
 {
   xwer_t rc;
   int status, result;

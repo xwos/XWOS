@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 主模块：子线程
+ * @brief 玄武OS内核适配代码：线程栈内存池
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,11 +18,30 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_main_thrd_h__
-#define __bm_main_thrd_h__
+#include <xwos/standard.h>
+#include <bdl/ocheap.h>
+#include <bdl/xwac/thd_stack_mempool.h>
 
-#include <bdl/standard.h>
+__xwos_code
+xwer_t bdl_thd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf)
+{
+        union {
+                xwstk_t * stk;
+                void * anon;
+        } mem;
+        xwer_t rc;
 
-xwer_t child_thrd_start(void);
+        rc = ocheap_alloc(stack_size, &mem.anon);
+        if (XWOK == rc) {
+                *membuf = mem.stk;
+        } else {
+                *membuf = NULL;
+        }
+        return rc;
+}
 
-#endif /* bm/main/thrd.h */
+__xwos_code
+xwer_t bdl_thd_stack_pool_free(xwstk_t * stk)
+{
+        return ocheap_free(stk);
+}

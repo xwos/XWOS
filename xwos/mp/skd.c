@@ -16,27 +16,27 @@
  * - 调度器服务中断处理以下操作：
  *   + 调度器暂停：xwmp_skd_suspend_lic()
  *                   |--> xwmp_skd_notify_allfrz_lic()
- *   + 线程退出：xwmp_thrd_exit_lic()
+ *   + 线程退出：xwmp_thd_exit_lic()
  *                 |--> xwmp_skd_notify_allfrz_lic()
- *   + 线程冻结：xwmp_thrd_freeze_lic()
+ *   + 线程冻结：xwmp_thd_freeze_lic()
  *                 |--> xwmp_skd_notify_allfrz_lic()
- *   + 线程解冻：xwmp_thrd_thaw_lic()
- *   + 线程迁出：xwmp_thrd_outmigrate_lic()
- *   + 线程迁入：xwmp_thrd_immigrate_lic()
+ *   + 线程解冻：xwmp_thd_thaw_lic()
+ *   + 线程迁出：xwmp_thd_outmigrate_lic()
+ *   + 线程迁入：xwmp_thd_immigrate_lic()
  * - 调度器服务中断的中断优先级必须为系统最高优先级。
  * - 调度时锁的顺序：同级的锁不可同时获得
  *   + ① xwmp_skd.cxlock
  *     + ② xwmp_skd.rq.rt.lock
- *       + ③ xwmp_tcb.stlock
+ *       + ③ xwmp_thd.stlock
  * - 休眠时锁的顺序：同级的锁不可同时获得
  *   + ① xwmp_skd.pm.lock
- *     + ② xwmp_tcb.stlock
- *     + ② xwmp_skd.tcblistlock
+ *     + ② xwmp_thd.stlock
+ *     + ② xwmp_skd.thdlistlock
  * - 函数suffix意义：
  *   1. _lc: Local Context，是指只能在“本地”CPU的中执行的代码。
  *   2. _lic: Local ISR Context，是指只能在“本地”CPU的中断上下文中执行的代码。
  *   3. _pmlk: 是只持有锁xwmp_skd.pm.lock才可调用的函数。
- *   3. _tllk: 是只持有锁xwmp_skd.tcblistlock才可调用的函数。
+ *   3. _tllk: 是只持有锁xwmp_skd.thdlistlock才可调用的函数。
  */
 
 #include <string.h>
@@ -50,11 +50,11 @@
 #include <xwos/mp/irq.h>
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/pm.h>
-#include <xwos/mp/thrd.h>
+#include <xwos/mp/thd.h>
 #include <xwos/mp/rtrq.h>
 #include <xwos/mp/tt.h>
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
-  #include <xwos/mp/bh.h>
+#include <xwos/mp/bh.h>
 #endif /* XWMPCFG_SKD_BH */
 
 /**
@@ -87,7 +87,7 @@ extern __xwmp_code
 void xwmp_pmdm_report_xwskd_resuming(struct xwmp_pmdm * pmdm);
 
 static __xwmp_code
-struct xwmp_tcb * xwmp_skd_rtrq_choose(struct xwmp_skd * xwskd);
+struct xwmp_thd * xwmp_skd_rtrq_choose(struct xwmp_skd * xwskd);
 
 static __xwmp_code
 xwer_t xwmp_skd_idled(struct xwmp_skd * xwskd);
@@ -110,12 +110,12 @@ void xwmp_skd_bh_yield(struct xwmp_skd * xwskd);
 #endif /* XWMPCFG_SKD_BH */
 
 static __xwmp_code
-bool xwmp_skd_do_chkpmpt(struct xwmp_skd * xwskd, struct xwmp_tcb * t);
+bool xwmp_skd_do_chkpmpt(struct xwmp_skd * xwskd, struct xwmp_thd * t);
 
 static __xwmp_code
 xwer_t xwmp_skd_check_swcx(struct xwmp_skd * xwskd,
-                           struct xwmp_tcb * t,
-                           struct xwmp_tcb ** pmtcb);
+                           struct xwmp_thd * t,
+                           struct xwmp_thd ** pmthd);
 
 static __xwmp_code
 xwer_t xwmp_skd_do_swcx(struct xwmp_skd * xwskd);
@@ -142,7 +142,7 @@ xwer_t xwmp_skd_init_lc(void)
         xwer_t rc;
         struct xwmp_skd * xwskd;
 
-        id = xwmp_skd_get_id();
+        id = xwmp_skd_id_lc();
         xwskd = &xwmp_skd[id];
 
         xwskd->cstk = XWMP_SKD_IDLE_STK(xwskd);
@@ -159,9 +159,9 @@ xwer_t xwmp_skd_init_lc(void)
         xwmp_skd_init_bhd(xwskd);
 #endif /* XWMPCFG_SKD_BH */
         xwmp_splk_init(&xwskd->cxlock);
-        xwmp_splk_init(&xwskd->tcblistlock);
-        xwlib_bclst_init_head(&xwskd->tcblist);
-        xwskd->thrd_num = 0;
+        xwmp_splk_init(&xwskd->thdlistlock);
+        xwlib_bclst_init_head(&xwskd->thdlist);
+        xwskd->thd_num = 0;
         rc = xwmp_tt_init(&xwskd->tt);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_tt_init;
@@ -172,7 +172,7 @@ xwer_t xwmp_skd_init_lc(void)
         }
         xwmp_skd_init_idled(xwskd);
         xwskd->pm.wklkcnt = XWMP_SKD_WKLKCNT_RUNNING;
-        xwskd->pm.frz_thrd_cnt = 0;
+        xwskd->pm.frz_thd_cnt = 0;
         xwmp_splk_init(&xwskd->pm.lock);
         xwlib_bclst_init_head(&xwskd->pm.frzlist);
         xwskd->pm.xwpmdm = &xwmp_pmdm;
@@ -205,7 +205,7 @@ xwer_t xwmp_skd_start_lc(void)
         xwer_t rc;
         xwid_t id;
 
-        id = xwmp_skd_get_id();
+        id = xwmp_skd_id_lc();
         xwskd = &xwmp_skd[id];
         rc = xwmp_syshwt_start(&xwskd->tt.hwt);
         if (__xwcc_unlikely(XWOK == rc)) {
@@ -258,9 +258,9 @@ xwer_t xwmp_skd_stop_syshwt_lc(void)
  * @return 当前CPU的ID
  */
 __xwmp_api
-xwid_t xwmp_skd_get_id(void)
+xwid_t xwmp_skd_id_lc(void)
 {
-        return xwospl_skd_get_id();
+        return xwospl_skd_id_lc();
 }
 
 /**
@@ -273,11 +273,11 @@ struct xwmp_skd * xwmp_skd_get_lc(void)
         struct xwmp_skd * xwskd;
         xwid_t cpuid;
 
-        cpuid = xwmp_skd_get_id();
+        cpuid = xwmp_skd_id_lc();
         xwmb_mp_ddb();
         do {
                 xwskd = &xwmp_skd[cpuid];
-                cpuid = xwmp_skd_get_id();
+                cpuid = xwmp_skd_id_lc();
                 xwmb_mp_ddb();
         } while (xwskd->id != cpuid);
         return xwskd;
@@ -309,12 +309,12 @@ xwer_t xwmp_skd_get_by_cpuid(xwid_t cpuid, struct xwmp_skd ** ptrbuf)
  * @return 调度器中正在运行的线程的线程控制块指针
  */
 __xwmp_code
-struct xwmp_tcb * xwmp_skd_get_ctcb(struct xwmp_skd * xwskd)
+struct xwmp_thd * xwmp_skd_get_cthd(struct xwmp_skd * xwskd)
 {
-        struct xwmp_tcb * ctcb;
+        struct xwmp_thd * cthd;
 
-        ctcb = xwcc_baseof(xwskd->cstk, struct xwmp_tcb, stack);
-        return ctcb;
+        cthd = xwcc_baseof(xwskd->cstk, struct xwmp_thd, stack);
+        return cthd;
 }
 
 /**
@@ -322,21 +322,21 @@ struct xwmp_tcb * xwmp_skd_get_ctcb(struct xwmp_skd * xwskd)
  * @return 本地CPU的调度器中正在运行的线程的线程控制块指针
  */
 __xwmp_code
-struct xwmp_tcb * xwmp_skd_get_ctcb_lc(void)
+struct xwmp_thd * xwmp_skd_get_cthd_lc(void)
 {
         struct xwmp_skd * xwskd;
-        struct xwmp_tcb * ctcb;
+        struct xwmp_thd * cthd;
         xwid_t cpuid;
 
-        cpuid = xwmp_skd_get_id();
+        cpuid = xwmp_skd_id_lc();
         xwmb_mp_ddb();
         do {
                 xwskd = &xwmp_skd[cpuid];
-                ctcb = xwcc_baseof(xwskd->cstk, struct xwmp_tcb, stack);
-                cpuid = xwmp_skd_get_id();
+                cthd = xwcc_baseof(xwskd->cstk, struct xwmp_thd, stack);
+                cpuid = xwmp_skd_id_lc();
                 xwmb_mp_ddb();
         } while (xwskd->id != cpuid);
-        return ctcb;
+        return cthd;
 }
 
 /**
@@ -347,10 +347,10 @@ struct xwmp_tcb * xwmp_skd_get_ctcb_lc(void)
  * - 此函数只能在锁xwskd->cxlock中调用。
  */
 static __xwmp_code
-struct xwmp_tcb * xwmp_skd_rtrq_choose(struct xwmp_skd * xwskd)
+struct xwmp_thd * xwmp_skd_rtrq_choose(struct xwmp_skd * xwskd)
 {
         struct xwmp_rtrq * xwrtrq;
-        struct xwmp_tcb * t;
+        struct xwmp_thd * t;
         xwpr_t prio;
         xwer_t rc;
 
@@ -401,7 +401,7 @@ static __xwmp_code
 void xwmp_skd_init_idled(struct xwmp_skd * xwskd)
 {
         xwskd->idle.name = NULL;
-        xwskd->idle.main = (xwmp_thrd_f)xwmp_skd_idled;
+        xwskd->idle.main = (xwmp_thd_f)xwmp_skd_idled;
         xwskd->idle.arg = xwskd;
         xwskd->idle.size = XWMPCFG_SKD_IDLE_STACK_SIZE;
         xwskd->idle.base = (xwstk_t *)xwmp_skd_idled_stack[xwskd->id];
@@ -414,9 +414,9 @@ void xwmp_skd_init_idled(struct xwmp_skd * xwskd)
 #elif (defined(XWMMCFG_EA_STACK) && (1 == XWMMCFG_EA_STACK))
         xwskd->idle.sp = xwskd->idle.base;
 #else
-  #error "Unknown stack type!"
+#error "Unknown stack type!"
 #endif
-        xwospl_skd_init_stack(&xwskd->idle, xwmp_cthrd_exit, XWMP_SKDATTR_PRIVILEGED);
+        xwospl_skd_init_stack(&xwskd->idle, xwmp_cthd_exit, XWMP_SKDATTR_PRIVILEGED);
 }
 
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
@@ -459,7 +459,7 @@ static __xwmp_code
 void xwmp_skd_init_bhd(struct xwmp_skd * xwskd)
 {
         xwskd->bh.name = NULL;
-        xwskd->bh.main = (xwmp_thrd_f)xwmp_skd_bhd;
+        xwskd->bh.main = (xwmp_thd_f)xwmp_skd_bhd;
         xwskd->bh.arg = xwskd;
         xwskd->bh.size = XWMPCFG_SKD_BH_STACK_SIZE;
         xwskd->bh.base = (xwstk_t *)xwmp_skd_bhd_stack[xwskd->id];
@@ -472,9 +472,9 @@ void xwmp_skd_init_bhd(struct xwmp_skd * xwskd)
 #elif defined(XWMMCFG_EA_STACK) && (1 == XWMMCFG_EA_STACK)
         xwskd->bh.sp = xwskd->bh.base;
 #else
-  #error "Unknown stack type!"
+#error "Unknown stack type!"
 #endif
-        xwospl_skd_init_stack(&xwskd->bh, xwmp_cthrd_exit, XWMP_SKDATTR_PRIVILEGED);
+        xwospl_skd_init_stack(&xwskd->bh, xwmp_cthd_exit, XWMP_SKDATTR_PRIVILEGED);
 }
 
 /**
@@ -492,12 +492,12 @@ struct xwmp_skd * xwmp_skd_dsbh_lc(void)
         xwid_t cpuid;
         bool retry;
 
-        cpuid = xwmp_skd_get_id();
+        cpuid = xwmp_skd_id_lc();
         xwmb_mp_ddb();
         do {
                 xwskd = &xwmp_skd[cpuid];
                 xwaop_add(xwsq, &xwskd->dis_bh_cnt, 1, NULL, NULL);
-                cpuid = xwmp_skd_get_id();
+                cpuid = xwmp_skd_id_lc();
                 xwmb_mp_ddb();
                 if (__xwcc_unlikely(xwskd->id != cpuid)) {
                         xwaop_sub(xwsq, &xwskd->dis_bh_cnt, 1, NULL, NULL);
@@ -681,12 +681,12 @@ struct xwmp_skd * xwmp_skd_dspmpt_lc(void)
         xwid_t cpuid;
         bool retry;
 
-        cpuid = xwmp_skd_get_id();
+        cpuid = xwmp_skd_id_lc();
         xwmb_mp_ddb();
         do {
                 xwskd = &xwmp_skd[cpuid];
                 xwaop_add(xwsq, &xwskd->dis_pmpt_cnt, 1, NULL, NULL);
-                cpuid = xwmp_skd_get_id();
+                cpuid = xwmp_skd_id_lc();
                 xwmb_mp_ddb();
                 if (__xwcc_unlikely(xwskd->id != cpuid)) {
                         xwaop_sub(xwsq, &xwskd->dis_pmpt_cnt, 1, NULL, NULL);
@@ -770,7 +770,7 @@ struct xwmp_skd * xwmp_skd_enpmpt(struct xwmp_skd * xwskd)
  * - 此函数被调用时需要获得锁xwskd->cxlock并且关闭本地CPU的中断。
  */
 static __xwmp_code
-bool xwmp_skd_do_chkpmpt(struct xwmp_skd * xwskd, struct xwmp_tcb * t)
+bool xwmp_skd_do_chkpmpt(struct xwmp_skd * xwskd, struct xwmp_thd * t)
 {
         struct xwmp_rtrq * xwrtrq;
         bool sched;
@@ -805,7 +805,7 @@ bool xwmp_skd_do_chkpmpt(struct xwmp_skd * xwskd, struct xwmp_tcb * t)
 __xwmp_code
 void xwmp_skd_chkpmpt(struct xwmp_skd * xwskd)
 {
-        struct xwmp_tcb * t;
+        struct xwmp_thd * t;
         struct xwmp_skd_stack_info * cstk;
         xwreg_t cpuirq;
         bool sched;
@@ -824,7 +824,7 @@ void xwmp_skd_chkpmpt(struct xwmp_skd * xwskd)
                 cstk = xwskd->cstk;
 #endif /* !XWMPCFG_SKD_BH */
                 if (XWMP_SKD_IDLE_STK(xwskd) != cstk) {
-                        t = xwcc_baseof(cstk, struct xwmp_tcb, stack);
+                        t = xwcc_baseof(cstk, struct xwmp_thd, stack);
                         sched = xwmp_skd_do_chkpmpt(xwskd, t);
                 } else {
                         sched = true;
@@ -856,7 +856,7 @@ void xwmp_skd_chkpmpt_all(void)
  * @brief 检测调度器是否需要切换上下文
  * @param xwskd: (I) XWOS MP调度器的指针
  * @param t: (I) 被检测的线程控制块对象的指针
- * @param pmtcb: (O) 指向缓冲区的指针，此缓冲区用于返回抢占线程的控制块的指针
+ * @param pmthd: (O) 指向缓冲区的指针，此缓冲区用于返回抢占线程的控制块的指针
  * @return 错误码
  * @retval OK: 需要切换上下文
  * @retval <0: 不需要切换上下文
@@ -865,8 +865,8 @@ void xwmp_skd_chkpmpt_all(void)
  */
 static __xwmp_code
 xwer_t xwmp_skd_check_swcx(struct xwmp_skd * xwskd,
-                           struct xwmp_tcb * t,
-                           struct xwmp_tcb ** pmtcb)
+                           struct xwmp_thd * t,
+                           struct xwmp_thd ** pmthd)
 {
         struct xwmp_rtrq * xwrtrq;
         xwpr_t prio;
@@ -886,15 +886,15 @@ xwer_t xwmp_skd_check_swcx(struct xwmp_skd * xwskd,
                         t->dprio.r = XWMP_SKD_PRIORITY_INVALID;
                         xwmp_rawly_unlock(&t->stlock);
                         xwmp_rawly_unlock(&xwrtrq->lock);
-                        rc = xwmp_thrd_rq_add_head(t, prio);
+                        rc = xwmp_thd_rq_add_head(t, prio);
                         XWOS_BUG_ON(rc < 0);
-                        *pmtcb = xwmp_skd_rtrq_choose(xwskd);
+                        *pmthd = xwmp_skd_rtrq_choose(xwskd);
                         rc = XWOK;
                 }
         } else {
                 xwmp_rawly_unlock(&t->stlock);
                 xwmp_rawly_unlock(&xwrtrq->lock);
-                *pmtcb = xwmp_skd_rtrq_choose(xwskd);
+                *pmthd = xwmp_skd_rtrq_choose(xwskd);
                 rc = XWOK;
         }
         return rc;
@@ -910,23 +910,23 @@ xwer_t xwmp_skd_check_swcx(struct xwmp_skd * xwskd,
 static __xwmp_code
 xwer_t xwmp_skd_do_swcx(struct xwmp_skd * xwskd)
 {
-        struct xwmp_tcb * swtcb, * ctcb;
+        struct xwmp_thd * swthd, * cthd;
         xwer_t rc;
 
         if (XWMP_SKD_IDLE_STK(xwskd) == xwskd->cstk) {
-                swtcb = xwmp_skd_rtrq_choose(xwskd);
-                if (NULL != swtcb) {
+                swthd = xwmp_skd_rtrq_choose(xwskd);
+                if (NULL != swthd) {
                         xwskd->pstk = xwskd->cstk;
-                        xwskd->cstk = &swtcb->stack;
+                        xwskd->cstk = &swthd->stack;
                         rc = XWOK;
                 } else {
                         rc = -EAGAIN;
                 }
         } else {
-                ctcb = xwmp_skd_get_ctcb(xwskd);
-                rc = xwmp_skd_check_swcx(xwskd, ctcb, &swtcb);
+                cthd = xwmp_skd_get_cthd(xwskd);
+                rc = xwmp_skd_check_swcx(xwskd, cthd, &swthd);
                 if (XWOK == rc) {
-                        if (ctcb == swtcb) {
+                        if (cthd == swthd) {
                                 /* 当前线程的状态可能在中断或其他CPU中被改变，
                                    并又被加入到就绪队列中，然后在此处又被重新选择。
                                    这种情况下，调度器只需要恢复此线程的
@@ -934,12 +934,12 @@ xwer_t xwmp_skd_do_swcx(struct xwmp_skd * xwskd)
                                    并不需要切换线程上下文。*/
                                 rc = -EAGAIN;
                         } else {
-                                if (NULL == swtcb) {
+                                if (NULL == swthd) {
                                         xwskd->cstk = XWMP_SKD_IDLE_STK(xwskd);
                                 } else {
-                                        xwskd->cstk = &swtcb->stack;
+                                        xwskd->cstk = &swthd->stack;
                                 }
-                                xwskd->pstk = &ctcb->stack;
+                                xwskd->pstk = &cthd->stack;
                                 rc = XWOK;
                         }
                 } else {
@@ -1179,20 +1179,20 @@ xwer_t xwmp_skd_wakelock_unlock(struct xwmp_skd * xwskd)
 static __xwmp_code
 void xwmp_skd_reqfrz_intr_all_lic(struct xwmp_skd * xwskd)
 {
-        struct xwmp_tcb * c, * n;
+        struct xwmp_thd * c, * n;
         xwreg_t cpuirq;
 
-        xwmp_splk_lock_cpuirqsv(&xwskd->tcblistlock, &cpuirq);
-        xwlib_bclst_itr_next_entry_safe(c, n, &xwskd->tcblist,
-                                        struct xwmp_tcb, tcbnode) {
-                xwmp_thrd_grab(c);
-                xwmp_splk_unlock_cpuirqrs(&xwskd->tcblistlock, cpuirq);
-                xwmp_thrd_reqfrz_lic(c);
-                xwmp_thrd_intr(c);
-                xwmp_thrd_put(c);
-                xwmp_splk_lock_cpuirqsv(&xwskd->tcblistlock, &cpuirq);
+        xwmp_splk_lock_cpuirqsv(&xwskd->thdlistlock, &cpuirq);
+        xwlib_bclst_itr_next_entry_safe(c, n, &xwskd->thdlist,
+                                        struct xwmp_thd, thdnode) {
+                xwmp_thd_grab(c);
+                xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
+                xwmp_thd_reqfrz_lic(c);
+                xwmp_thd_intr(c);
+                xwmp_thd_put(c);
+                xwmp_splk_lock_cpuirqsv(&xwskd->thdlistlock, &cpuirq);
         }
-        xwmp_splk_unlock_cpuirqrs(&xwskd->tcblistlock, cpuirq);
+        xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
 }
 
 /**
@@ -1249,23 +1249,23 @@ void xwmp_skd_notify_allfrz_lc(void)
 static __xwmp_code
 void xwmp_skd_thaw_allfrz_lic(struct xwmp_skd * xwskd)
 {
-        struct xwmp_tcb * c, * n;
+        struct xwmp_thd * c, * n;
         xwreg_t cpuirq;
 
         xwmp_splk_lock_cpuirqsv(&xwskd->pm.lock, &cpuirq);
-        xwmp_splk_lock(&xwskd->tcblistlock);
-        xwlib_bclst_itr_next_entry_safe(c, n, &xwskd->tcblist,
-                                        struct xwmp_tcb, tcbnode) {
-                xwmp_thrd_grab(c);
-                xwmp_splk_unlock(&xwskd->tcblistlock);
-                xwmp_thrd_thaw_lic_pmlk(c);
-                xwmp_thrd_put(c);
-                xwmp_splk_lock(&xwskd->tcblistlock);
+        xwmp_splk_lock(&xwskd->thdlistlock);
+        xwlib_bclst_itr_next_entry_safe(c, n, &xwskd->thdlist,
+                                        struct xwmp_thd, thdnode) {
+                xwmp_thd_grab(c);
+                xwmp_splk_unlock(&xwskd->thdlistlock);
+                xwmp_thd_thaw_lic_pmlk(c);
+                xwmp_thd_put(c);
+                xwmp_splk_lock(&xwskd->thdlistlock);
         }
-        xwmp_splk_unlock(&xwskd->tcblistlock);
+        xwmp_splk_unlock(&xwskd->thdlistlock);
         xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
         xwmp_skd_req_swcx(xwskd);
-        XWOS_BUG_ON(xwskd->pm.frz_thrd_cnt != 0);
+        XWOS_BUG_ON(xwskd->pm.frz_thd_cnt != 0);
 }
 
 /**
@@ -1284,13 +1284,13 @@ xwer_t xwmp_skd_suspend_lic(struct xwmp_skd * xwskd)
 
         xwmp_skd_reqfrz_intr_all_lic(xwskd);
         xwmp_splk_lock_cpuirqsv(&xwskd->pm.lock, &cpuirq);
-        xwmp_splk_lock(&xwskd->tcblistlock);
-        if (xwskd->thrd_num == xwskd->pm.frz_thrd_cnt) {
-                xwmp_splk_unlock(&xwskd->tcblistlock);
+        xwmp_splk_lock(&xwskd->thdlistlock);
+        if (xwskd->thd_num == xwskd->pm.frz_thd_cnt) {
+                xwmp_splk_unlock(&xwskd->thdlistlock);
                 xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
                 xwmp_skd_notify_allfrz_lic(xwskd);
         } else {
-                xwmp_splk_unlock(&xwskd->tcblistlock);
+                xwmp_splk_unlock(&xwskd->thdlistlock);
                 xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
         }
         return XWOK;
@@ -1385,7 +1385,7 @@ xwer_t xwmp_skd_resume(xwid_t cpuid)
         xwid_t localid;
         xwer_t rc;
 
-        localid = xwmp_skd_get_id();
+        localid = xwmp_skd_id_lc();
         if (localid == cpuid) {
                 xwskd = xwmp_skd_get_lc();
                 if (XWOK == xwmp_irq_get_id(NULL)) {
@@ -1452,7 +1452,7 @@ void xwmp_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
                         } else if (XWMP_SKD_IDLE_STK(xwskd) == xwskd->cstk) {
                                 ctx = XWMP_SKD_CONTEXT_IDLE;
                         } else {
-                                ctx = XWMP_SKD_CONTEXT_THRD;
+                                ctx = XWMP_SKD_CONTEXT_THD;
                         }
                 } else {
                         ctx = XWMP_SKD_CONTEXT_INIT_EXIT;

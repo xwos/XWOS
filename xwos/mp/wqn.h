@@ -41,7 +41,7 @@ enum xwmp_wqtype_em {
  */
 enum xwmp_wqowner_em {
         XWMP_WQOWNER_UNKNOWN = 0,
-        XWMP_WQOWNER_THRD,
+        XWMP_WQOWNER_THD,
 };
 
 /**

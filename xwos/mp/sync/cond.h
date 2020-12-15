@@ -17,7 +17,7 @@
 #include <xwos/mp/sync/obj.h>
 #include <xwos/mp/plwq.h>
 
-struct xwmp_tcb;
+struct xwmp_thd;
 struct xwmp_evt;
 
 /**
@@ -38,7 +38,7 @@ xwer_t xwmp_cond_put(struct xwmp_cond * cond);
 xwer_t xwmp_cond_activate(struct xwmp_cond * cond, xwobj_gc_f gcfunc);
 xwer_t xwmp_cond_intr(struct xwmp_cond * cond, struct xwmp_wqn * wqn);
 xwer_t xwmp_cond_do_unicast(struct xwmp_cond * cond);
-xwer_t xwmp_cond_do_timedwait(struct xwmp_cond * cond, struct xwmp_tcb * tcb,
+xwer_t xwmp_cond_do_timedwait(struct xwmp_cond * cond, struct xwmp_thd * thd,
                               void * lock, xwsq_t lktype, void * lkdata,
                               xwtm_t * xwtm, xwsq_t * lkst);
 
