@@ -199,7 +199,7 @@ struct xwpcp {
         } slot; /**< 帧槽 */
 
         /* 发送状态机 */
-        xwos_thd_d txthdd; /**< 发送线程的描述符 */
+        struct xwos_thd * txthd; /**< 发送线程的描述符 */
         struct {
                 xwu32_a cnt; /**< 发送计数器 */
                 struct xwlib_bclst_head q[XWPCP_PRI_NUM]; /**< 队列 */
@@ -220,7 +220,7 @@ struct xwpcp {
         } txq; /**< 发送队列 */
 
         /* 接收状态机 */
-        xwos_thd_d rxthdd; /**< 接收线程的描述符 */
+        struct xwos_thd * rxthd; /**< 接收线程的描述符 */
         struct {
                 xwu32_a cnt; /**< 接收计数器 */
                 struct xwlib_bclst_head q[XWPCP_PORT_NUM]; /**< 每个端口的接收队列 */

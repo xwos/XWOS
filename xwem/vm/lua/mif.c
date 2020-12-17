@@ -41,13 +41,13 @@ const struct xwos_thd_desc xwlua_tbd[] = {
                 .prio = XWLUA_TASK_PRIORITY,
                 .stack = NULL,
                 .stack_size = 8192,
-                .func = xwlua_thd,
+                .func = xwlua_task,
                 .arg = &xwlua_arg,
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
 
-xwos_thd_d xwlua_thdd[xw_array_size(xwlua_tbd)];
+struct xwos_thd * xwlua_thdd[xw_array_size(xwlua_tbd)];
 
 xwer_t xwlua_start(void)
 {

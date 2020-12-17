@@ -94,7 +94,7 @@ void xwup_rtsem_free(struct xwup_rtsem * sem)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 static __xwup_code
 void xwup_rtsem_activate(struct xwup_rtsem * sem, xwssq_t val, xwssq_t max)
@@ -127,7 +127,7 @@ void xwup_rtsem_deactivate(struct xwup_rtsem * sem)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 __xwup_api
 xwer_t xwup_rtsem_init(struct xwup_rtsem * sem, xwssq_t val, xwssq_t max)
@@ -149,7 +149,7 @@ xwer_t xwup_rtsem_init(struct xwup_rtsem * sem, xwssq_t val, xwssq_t max)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 __xwup_api
 xwer_t xwup_rtsem_destroy(struct xwup_rtsem * sem)
@@ -207,7 +207,7 @@ xwer_t xwup_rtsem_create(struct xwup_rtsem ** ptrbuf, xwssq_t val, xwssq_t max)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 __xwup_api
 xwer_t xwup_rtsem_delete(struct xwup_rtsem * sem)
@@ -235,7 +235,7 @@ xwer_t xwup_rtsem_delete(struct xwup_rtsem * sem)
  * @note
  * - 同步/异步：异步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 __xwup_api
 xwer_t xwup_rtsem_bind(struct xwup_rtsem * sem, struct xwup_evt * evt,
@@ -260,7 +260,7 @@ xwer_t xwup_rtsem_bind(struct xwup_rtsem * sem, struct xwup_evt * evt,
  * @note
  * - 同步/异步：异步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 __xwup_api
 xwer_t xwup_rtsem_unbind(struct xwup_rtsem * sem, struct xwup_evt * evt)

@@ -24,9 +24,9 @@
 #define XWMP_SEM_NEGTIVE              ((xwssq_t)(-1))
 
 #if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
-#define XWMP_SEM_API(api, ...) xwmp_rtsem_##api(__VA_ARGS__)
+  #define XWMP_SEM_API(api, ...) xwmp_rtsem_##api(__VA_ARGS__)
 #elif defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
-#define XWMP_SEM_API(api, ...) xwmp_plsem_##api(__VA_ARGS__)
+  #define XWMP_SEM_API(api, ...) xwmp_plsem_##api(__VA_ARGS__)
 #endif
 
 struct xwmp_evt;
@@ -64,11 +64,6 @@ struct xwmp_sem {
         } wq; /**< 等待队列 */
 };
 
-void xwmp_sem_construct(struct xwmp_sem * sem);
-void xwmp_sem_destruct(struct xwmp_sem * sem);
-xwer_t xwmp_sem_grab(struct xwmp_sem * sem);
-xwer_t xwmp_sem_put(struct xwmp_sem * sem);
-
 #if defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
 xwer_t xwmp_plsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn);
 #endif /* XWMPCFG_SYNC_PLSEM */
@@ -85,6 +80,11 @@ xwer_t xwmp_sem_create(struct xwmp_sem ** ptrbuf, xwid_t type,
                        xwssq_t val, xwssq_t max);
 xwer_t xwmp_sem_delete(struct xwmp_sem * sem);
 xwer_t xwmp_sem_destroy(struct xwmp_sem * sem);
+
+xwer_t xwmp_sem_acquire(struct xwmp_sem * sem, xwsq_t tik);
+xwer_t xwmp_sem_release(struct xwmp_sem * sem, xwsq_t tik);
+xwer_t xwmp_sem_grab(struct xwmp_sem * sem);
+xwer_t xwmp_sem_put(struct xwmp_sem * sem);
 
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
 xwer_t xwmp_sem_bind(struct xwmp_sem * sem, struct xwmp_evt * evt, xwsq_t pos);

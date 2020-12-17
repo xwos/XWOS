@@ -50,13 +50,13 @@ xwer_t xwosdl_sem_destroy(struct xwosdl_sem * sem)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sem_create(struct xwosdl_sem ** semp, xwssq_t val, xwssq_t max)
+xwer_t xwosdl_sem_create(struct xwosdl_sem ** sembuf, xwssq_t val, xwssq_t max)
 {
         xwer_t rc;
 
-        if (NULL != semp) {
-                *semp = NULL;
-                rc = xwmp_sem_create(semp, XWMP_SEM_TYPE_RT, val, max);
+        if (NULL != sembuf) {
+                *sembuf = NULL;
+                rc = xwmp_sem_create(sembuf, XWMP_SEM_TYPE_RT, val, max);
         } else {
                 rc = -EFAULT;
         }
@@ -67,6 +67,43 @@ static __xwcc_inline
 xwer_t xwosdl_sem_delete(struct xwosdl_sem * sem)
 {
         return xwmp_sem_delete(sem);
+}
+
+static __xwcc_inline
+xwsq_t xwosdl_sem_gettik(struct xwosdl_sem * sem)
+{
+        xwsq_t tik;
+
+        if (sem) {
+                tik = sem->synobj.xwobj.tik;
+        } else {
+                tik = 0;
+        }
+        return tik;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sem_acquire(struct xwosdl_sem * sem, xwsq_t tik)
+{
+        return xwmp_sem_acquire(sem, tik);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sem_release(struct xwosdl_sem * sem, xwsq_t tik)
+{
+        return xwmp_sem_release(sem, tik);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sem_grab(struct xwosdl_sem * sem)
+{
+        return xwmp_sem_grab(sem);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sem_put(struct xwosdl_sem * sem)
+{
+        return xwmp_sem_put(sem);
 }
 
 static __xwcc_inline
@@ -126,12 +163,12 @@ xwer_t xwosdl_sem_destroy(struct xwosdl_sem * sem)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sem_create(struct xwosdl_sem ** semp, xwssq_t val, xwssq_t max)
+xwer_t xwosdl_sem_create(struct xwosdl_sem ** sembuf, xwssq_t val, xwssq_t max)
 {
         xwer_t rc;
 
-        if (NULL != semp) {
-                *semp = NULL;
+        if (NULL != sembuf) {
+                *sembuf = NULL;
                 rc = xwmp_sem_create(&sem, XWMP_SEM_TYPE_PIPELINE, val, max);
         } else {
                 rc = -EFAULT;

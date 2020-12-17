@@ -35,13 +35,13 @@ xwer_t xwosdl_swt_destroy(struct xwosdl_swt * swt)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_swt_create(struct xwosdl_swt ** swtp, const char * name, xwsq_t flag)
+xwer_t xwosdl_swt_create(struct xwosdl_swt ** swtbuf, const char * name, xwsq_t flag)
 {
         xwer_t rc;
 
-        if (NULL != swtp) {
-                *swtp = NULL;
-                rc = xwup_swt_create(swtp, name, flag);
+        if (NULL != swtbuf) {
+                *swtbuf = NULL;
+                rc = xwup_swt_create(swtbuf, name, flag);
         } else {
                 rc = -EFAULT;
         }
@@ -52,6 +52,43 @@ static __xwcc_inline
 xwer_t xwosdl_swt_delete(struct xwosdl_swt * swt)
 {
         return xwup_swt_delete(swt);
+}
+
+static __xwcc_inline
+xwsq_t xwosdl_swt_gettik(struct xwosdl_swt * swt)
+{
+        XWOS_UNUSED(swt);
+        return 0;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_swt_acquire(struct xwosdl_swt * swt, xwsq_t tik)
+{
+        XWOS_UNUSED(swt);
+        XWOS_UNUSED(tik);
+        return XWOK;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_swt_release(struct xwosdl_swt * swt, xwsq_t tik)
+{
+        XWOS_UNUSED(swt);
+        XWOS_UNUSED(tik);
+        return XWOK;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_swt_grab(struct xwosdl_swt * swt)
+{
+        XWOS_UNUSED(swt);
+        return XWOK;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_swt_put(struct xwosdl_swt * swt)
+{
+        XWOS_UNUSED(swt);
+        return XWOK;
 }
 
 static __xwcc_inline

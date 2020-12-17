@@ -59,7 +59,7 @@ $(subst $(call getXwmoDir)/,,$(shell find $(call getXwmoDir)/$(2) -name $(1)))
 endef
 
 define XwmoReqCfg
-ifneq ($$($(1)),y)
-    $$(error "$(1) is not configured!")
+ifneq ($$($(1)),$(2))
+    $$(error "$(1) is not configured to $(2)!")
 endif
 endef

@@ -13,16 +13,10 @@
 #ifndef __xwos_osal_lock_mtx_h__
 #define __xwos_osal_lock_mtx_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/osal/jack/lock/mtx.h>
 #include <xwos/osal/skd.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       type        ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief XWOS API：互斥锁
  */
@@ -30,13 +24,19 @@ struct xwos_mtx {
         struct xwosdl_mtx osmtx;
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macro       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief XWOS API：互斥锁对象描述符
+ */
+typedef struct {
+        struct xwos_mtx * mtx; /**< 互斥锁对象的指针 */
+        xwsq_t tik; /**< 标签 */
+} xwos_mtx_d;
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********        API        ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief XWOS API：空的互斥锁对象描述符
+ */
+#define XWOS_MTX_NILD ((xwos_mtx_d){NULL, 0,})
+
 /**
  * @brief XWOS API：静态方式初始化互斥锁
  * @param mtx: (I) 互斥锁的指针
@@ -75,7 +75,7 @@ xwer_t xwos_mtx_destroy(struct xwos_mtx * mtx)
 
 /**
  * @brief XWOS API：动态方式创建互斥锁
- * @param mtxp: (O) 指向缓冲区的指针，通过此缓冲区返回互斥锁的指针
+ * @param mtxbuf: (O) 指向缓冲区的指针，通过此缓冲区返回互斥锁的指针
  * @param sprio: (I) 互斥锁的静态优先级
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -88,9 +88,9 @@ xwer_t xwos_mtx_destroy(struct xwos_mtx * mtx)
  * - 重入性：不可重入
  */
 static __xwos_inline_api
-xwer_t xwos_mtx_create(struct xwos_mtx ** mtxp, xwpr_t sprio)
+xwer_t xwos_mtx_create(struct xwos_mtx ** mtxbuf, xwpr_t sprio)
 {
-        return xwosdl_mtx_create((struct xwosdl_mtx **)mtxp, sprio);
+        return xwosdl_mtx_create((struct xwosdl_mtx **)mtxbuf, sprio);
 }
 
 /**
@@ -108,6 +108,110 @@ static __xwos_inline_api
 xwer_t xwos_mtx_delete(struct xwos_mtx * mtx)
 {
         return xwosdl_mtx_delete(&mtx->osmtx);
+}
+
+/**
+ * @brief XWOS API：获取互斥锁对象的标签
+ * @param mtx: (I) 互斥锁对象的指针
+ * @return 互斥锁对象的标签
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwsq_t xwos_mtx_gettik(struct xwos_mtx * mtx)
+{
+        return xwosdl_mtx_gettik(&mtx->osmtx);
+}
+
+/**
+ * @brief XWOS API：获取互斥锁对象的描述符
+ * @param mtx: (I) 互斥锁对象的指针
+ * @return 互斥锁对象的描述符
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwos_mtx_d xwos_mtx_getd(struct xwos_mtx * mtx)
+{
+        xwos_mtx_d mtxd;
+
+        mtxd.mtx = mtx;
+        mtxd.tik = xwosdl_mtx_gettik(&mtx->osmtx);
+        return mtxd;
+}
+
+/**
+ * @brief XWOS API：检查互斥锁对象的标签并增加引用计数
+ * @param mtxd: (I) 互斥锁对象的描述符
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -EOBJDEAD: 对象无效
+ * @retval -EACCES: 对象标签检查失败
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_mtx_acquire(xwos_mtx_d mtxd)
+{
+        return xwosdl_mtx_acquire(&mtxd.mtx->osmtx, mtxd.tik);
+}
+
+/**
+ * @brief XWOS API：检查对象的标签并减少引用计数
+ * @param mtxd: (I) 互斥锁对象的描述符
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -EOBJDEAD: 对象无效
+ * @retval -EACCES: 对象标签检查失败
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_mtx_release(xwos_mtx_d mtxd)
+{
+        return xwosdl_mtx_release(&mtxd.mtx->osmtx, mtxd.tik);
+}
+
+/**
+ * @brief XWOS API：增加互斥锁对象的引用计数
+ * @param mtx: (I) 互斥锁对象的指针
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -EOBJDEAD: 对象无效
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_mtx_grab(struct xwos_mtx * mtx)
+{
+        return xwosdl_mtx_grab(&mtx->osmtx);
+}
+
+/**
+ * @brief XWOS API：减少互斥锁对象的引用计数
+ * @param mtx: (I) 互斥锁对象的指针
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -EOBJDEAD: 对象无效
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_mtx_put(struct xwos_mtx * mtx)
+{
+        return xwosdl_mtx_put(&mtx->osmtx);
 }
 
 /**

@@ -27,34 +27,35 @@
 #include <bdl/standard.h>
 #include <bdl/ds/description/mpc560xbdkp.h>
 
-#define TASK_LED_PRIORITY       XWOS_SKD_PRIORITY_RT_MIN
+#define LED_TASK_PRIORITY       XWOS_SKD_PRIORITY_RT_MIN
 #define LED_PORT                SOC_GPIO_PORT_E
+#define UART_TASK_PRIORITY       XWOS_SKD_PRIORITY_RT_MIN
 
-xwer_t task_led(void * arg);
-xwer_t task_dmauart(void * arg);
+xwer_t led_task(void * arg);
+xwer_t uart_task(void * arg);
 
-const struct xwos_thd_desc board_td_tbl[] = {
+const struct xwos_thd_desc board_thd_desc[] = {
         [0] = {
                 .name = "led",
-                .prio = TASK_LED_PRIORITY,
+                .prio = LED_TASK_PRIORITY,
                 .stack = NULL,
                 .stack_size = 1024,
-                .func = task_led,
+                .func = led_task,
                 .arg = NULL,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
+                .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
         },
         [1] = {
-                .name = "dmauart",
-                .prio = TASK_LED_PRIORITY,
+                .name = "uart",
+                .prio = UART_TASK_PRIORITY,
                 .stack = NULL,
                 .stack_size = 2048,
-                .func = task_dmauart,
+                .func = uart_task,
                 .arg = NULL,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
+                .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
         },
 };
 
-xwos_thd_d board_thdd[xw_array_size(board_td_tbl)];
+struct xwos_thd * board_thd[xw_array_size(board_thd_desc)];
 xwu8_t rxbuffer[4096];
 
 static __xwos_code
@@ -74,7 +75,7 @@ err_dmatx:
         return rc;
 }
 
-xwer_t task_dmauart(void * arg)
+xwer_t uart_task(void * arg)
 {
         xwsz_t size;
         xwtm_t time;
@@ -97,7 +98,7 @@ xwer_t task_dmauart(void * arg)
         return rc;
 }
 
-xwer_t task_led(void * arg)
+xwer_t led_task(void * arg)
 {
         xwtm_t time;
         xwsq_t pinmask;
@@ -144,13 +145,14 @@ xwer_t xwos_main(void)
         xwer_t rc = XWOK;
         xwsz_t i;
 
-        for (i = 0; i < xw_array_size(board_td_tbl); i ++) {
-                rc = xwos_thd_create(&board_thdd[i], board_td_tbl[i].name,
-                                     board_td_tbl[i].func,
-                                     board_td_tbl[i].arg,
-                                     board_td_tbl[i].stack_size,
-                                     board_td_tbl[i].prio,
-                                     board_td_tbl[i].attr);
+        for (i = 0; i < xw_array_size(board_thd_desc); i++) {
+                rc = xwos_thd_create(&board_thd[i],
+                                     board_thd_desc[i].name,
+                                     board_thd_desc[i].func,
+                                     board_thd_desc[i].arg,
+                                     board_thd_desc[i].stack_size,
+                                     board_thd_desc[i].prio,
+                                     board_thd_desc[i].attr);
                 BDL_BUG_ON(rc);
         }
         rc = xwos_skd_start_lc();

@@ -28,6 +28,8 @@
  */
 #define xwos_cast(type, obj)    ((type)(obj))
 
+#define XWOS_OBJ_MAGIC  0x58574F53U /**< 所有玄武OS的对象都有相同的幻数 */
+
 /**
  * @brief 垃圾回收函数指针类型
  */
@@ -42,13 +44,14 @@ struct __xwcc_aligned(XWMMCFG_ALIGNMENT) xwos_object {
                               - 1: 对象就绪；
                               - >1: 对象正在被引用。
                             + 内存算法memslice使用结构体的第一块内存字
-                              作为单链表节点，因此每个对象在定义时必须
+                              作为无锁单链表节点，因此每个对象在定义时必须
                               保证其第一个成员的大小等于系统指针大小，
-                              并且它们的初始值都相同。内存算法memslice
-                              可以将这个初始值备份起来，当结构体被分配
-                              出去时使用备份值恢复第一块内存的内容。 */
+                              并且它们的初始值都相同。memslice可以将
+                              这个初始值备份起来，当结构体被分配
+                              出去时使用备份值恢复原内容。 */
+        xwsq_t magic; /**< 对象的幻数，用于防止ABA问题与野指针问题 */
+        xwsq_t tik; /**< 对象的标签，用于防止ABA问题与野指针问题 */
         xwobj_gc_f gcfunc; /**< 垃圾回收函数 */
-        xwsq_t ticket; /**< 对象的标签 */
 };
 
 /**
@@ -56,16 +59,16 @@ struct __xwcc_aligned(XWMMCFG_ALIGNMENT) xwos_object {
  */
 typedef struct {
         struct xwos_object * obj;
-        xwsq_t ticket;
+        xwsq_t tik;
 } xwobj_d;
 
-void xwos_objtix_init(void);
+void xwos_objtik_init(void);
 void xwos_object_construct(struct xwos_object * obj);
 void xwos_object_destruct(struct xwos_object * obj);
 xwer_t xwos_object_activate(struct xwos_object * obj, xwobj_gc_f gcfunc);
-xwobj_d xwos_object_get_d(struct xwos_object * obj);
+xwer_t xwos_object_acquire(struct xwos_object * obj, xwsq_t tik);
+xwer_t xwos_object_release(struct xwos_object * obj, xwsq_t tik);
 xwer_t xwos_object_grab(struct xwos_object * obj);
-xwer_t xwos_object_grab_safely(xwobj_d objd);
 xwer_t xwos_object_put(struct xwos_object * obj);
 xwsq_t xwos_object_get_refcnt(struct xwos_object * obj);
 

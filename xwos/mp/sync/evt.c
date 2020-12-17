@@ -15,13 +15,13 @@
  *     + ② evt.lock
  */
 
-#include <string.h>
 #include <xwos/standard.h>
+#include <string.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_SYNC_EVT_MEMSLICE) && (1 == XWMPCFG_SYNC_EVT_MEMSLICE)
-#include <xwos/mm/memslice.h>
+  #include <xwos/mm/memslice.h>
 #endif /* XWMPCFG_SYNC_EVT_MEMSLICE */
 #include <xwos/ospl/irq.h>
 #include <xwos/mp/thd.h>
@@ -194,24 +194,68 @@ xwer_t xwmp_evt_gc(void * evt)
 }
 
 /**
- * @brief 增加对象的引用计数
+ * @brief XWMP API：检查事件对象的标签并增加引用计数
+ * @param evt: (I) 事件对象指针
+ * @param tik: (I) 标签
+ * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwmp_api
+xwer_t xwmp_evt_acquire(struct xwmp_evt * evt, xwsq_t tik)
+{
+        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
+        return xwmp_synobj_acquire(&evt->cond.synobj, tik);
+}
+
+/**
+ * @brief XWMP API：检查事件对象的标签并增加引用计数
+ * @param evt: (I) 事件对象指针
+ * @param tik: (I) 标签
+ * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwmp_api
+xwer_t xwmp_evt_release(struct xwmp_evt * evt, xwsq_t tik)
+{
+        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
+        return xwmp_synobj_release(&evt->cond.synobj, tik);
+}
+
+/**
+ * @brief XWMP API：增加事件对象的引用计数
  * @param evt: (I) 事件对象指针
  * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
-__xwcc_inline
+__xwmp_api
 xwer_t xwmp_evt_grab(struct xwmp_evt * evt)
 {
+        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
         return xwmp_synobj_grab(&evt->cond.synobj);
 }
 
 /**
- * @brief 减少对象的引用计数
+ * @brief XWMP API：减少事件对象的引用计数
  * @param evt: (I) 事件对象指针
  * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
-__xwcc_inline
+__xwmp_api
 xwer_t xwmp_evt_put(struct xwmp_evt * evt)
 {
+        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
         return xwmp_cond_put(&evt->cond);
 }
 
@@ -222,11 +266,10 @@ xwer_t xwmp_evt_put(struct xwmp_evt * evt)
  * @param attr: (I) 事件的属性，取值 @ref xwmp_evt_attr_em
  * @param gcfunc: (I) 垃圾回收函数的指针
  * @return 错误码
- * @retval XWOK: 没有错误
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *evt* ，不可重入
+ * - 重入性：对于同一个事件对象，不可重入
  * @note
  * - 由于静态初始化的对象所有资源都是由用户自己提供的，
  *   因此当信号量不使用时，回收资源的函数也需要用户自己提供。
@@ -315,7 +358,7 @@ xwer_t xwmp_evt_create(struct xwmp_evt ** ptrbuf, xwbmp_t initval[], xwsq_t attr
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *evt* ，不可重入
+ * - 重入性：对于同一个事件对象，不可重入
  */
 __xwmp_api
 xwer_t xwmp_evt_delete(struct xwmp_evt * evt)
@@ -337,7 +380,7 @@ xwer_t xwmp_evt_delete(struct xwmp_evt * evt)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *evt* ，不可重入
+ * - 重入性：对于同一个事件对象，不可重入
  */
 __xwmp_api
 xwer_t xwmp_evt_init(struct xwmp_evt * evt, xwbmp_t initval[], xwsq_t attr)
@@ -359,7 +402,7 @@ xwer_t xwmp_evt_init(struct xwmp_evt * evt, xwbmp_t initval[], xwsq_t attr)
  * @note
  * - 同步/异步：异步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *evt* ，不可重入
+ * - 重入性：对于同一个事件对象，不可重入
  */
 __xwmp_api
 xwer_t xwmp_evt_destroy(struct xwmp_evt * evt)
@@ -385,7 +428,7 @@ xwer_t xwmp_evt_destroy(struct xwmp_evt * evt)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *evt* ，不可重入
+ * - 重入性：对于同一个事件对象，不可重入
  */
 __xwmp_api
 xwer_t xwmp_evt_bind(struct xwmp_evt * evt, struct xwmp_evt * sel, xwsq_t pos)
@@ -406,7 +449,7 @@ xwer_t xwmp_evt_bind(struct xwmp_evt * evt, struct xwmp_evt * sel, xwsq_t pos)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *evt* ，不可重入
+ * - 重入性：对于同一个事件对象，不可重入
  */
 __xwmp_api
 xwer_t xwmp_evt_unbind(struct xwmp_evt * evt, struct xwmp_evt * sel)
@@ -913,7 +956,7 @@ xwer_t xwmp_evt_wait(struct xwmp_evt * evt,
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 事件对象类型错误
  * @retval -EINVAL: 参数无效
- * @retval -ENODATA: 没有任何事件触发信号
+ * @retval -ENODATA: 没有任何事件触发
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -1146,7 +1189,7 @@ xwer_t xwmp_evt_timedwait_edge(struct xwmp_evt * evt, xwsq_t trigger,
  * - 上下文：线程
  * - 重入性：可重入
  * @note
- * - 函数返回返回-ETIMEDOUT时，*xwtm* 指向的缓冲区内的期望时间会减为0。
+ * - 函数返回返回**-ETIMEDOUT**时，**xwtm**指向的缓冲区内的期望时间会减为0。
  */
 __xwmp_api
 xwer_t xwmp_evt_timedwait(struct xwmp_evt * evt,
@@ -1462,7 +1505,7 @@ err_evt_grab:
  * - 上下文：线程
  * - 重入性：可重入
  * @note
- * - 函数返回返回-ETIMEDOUT时，*xwtm* 指向的缓冲区内的期望时间会减为0。
+ * - 函数返回返回**-ETIMEDOUT**时，**xwtm**指向的缓冲区内的期望时间会减为0。
  */
 __xwmp_api
 xwer_t xwmp_evt_timedselect(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
@@ -1577,7 +1620,7 @@ xwer_t xwmp_evt_sync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t sync[])
  * - 上下文：线程
  * - 重入性：可重入
  * @note
- * - 函数返回返回-ETIMEDOUT时，*xwtm* 指向的缓冲区内的期望时间会减为0。
+ * - 函数返回返回**-ETIMEDOUT**时，**xwtm**指向的缓冲区内的期望时间会减为0。
  */
 __xwmp_api
 xwer_t xwmp_evt_timedsync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t sync[],

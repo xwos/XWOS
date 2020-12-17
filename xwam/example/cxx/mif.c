@@ -25,35 +25,35 @@
 #define CXX_TASK_PRIORITY \
         (XWOS_SKD_PRIORITY_RAISE(XWOS_SKD_PRIORITY_RT_MIN, 1))
 
-extern xwer_t cxx_thd(void * arg);
+extern xwer_t cxx_thd_main(void * arg);
 
-const struct xwos_thd_desc cxx_tbd[] = {
+const struct xwos_thd_desc cxx_thd_desc[] = {
         [0] = {
-                .name = "task.lua",
+                .name = "task.cxx",
                 .prio = CXX_TASK_PRIORITY,
                 .stack = NULL,
                 .stack_size = 4096,
-                .func = cxx_thd,
+                .func = cxx_thd_main,
                 .arg = NULL,
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
 
-xwos_thd_d cxx_thdd[xw_array_size(cxx_tbd)];
+struct xwos_thd * cxx_thd[xw_array_size(cxx_thd_desc)];
 
 xwer_t example_cxx_start(void)
 {
         xwer_t rc;
         xwsq_t i;
 
-        for (i = 0; i < xw_array_size(cxx_tbd); i++) {
-                rc = xwos_thd_create(&cxx_thdd[i],
-                                     cxx_tbd[i].name,
-                                     cxx_tbd[i].func,
-                                     cxx_tbd[i].arg,
-                                     cxx_tbd[i].stack_size,
-                                     cxx_tbd[i].prio,
-                                     cxx_tbd[i].attr);
+        for (i = 0; i < xw_array_size(cxx_thd_desc); i++) {
+                rc = xwos_thd_create(&cxx_thd[i],
+                                     cxx_thd_desc[i].name,
+                                     cxx_thd_desc[i].func,
+                                     cxx_thd_desc[i].arg,
+                                     cxx_thd_desc[i].stack_size,
+                                     cxx_thd_desc[i].prio,
+                                     cxx_thd_desc[i].attr);
                 if (rc < 0) {
                         break;
                 }

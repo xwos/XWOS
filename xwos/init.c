@@ -60,7 +60,7 @@ void xwos_init(void)
 #endif /* XWKNCFG_RELOCATE_DATA */
 
         /* 初始化对象标签分配器 */
-        xwos_objtix_init();
+        xwos_objtik_init();
 
         /* 初始化KMA */
         xwmm_kma_init();

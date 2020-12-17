@@ -30,30 +30,30 @@
 
 #define MAIN_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
 
-xwer_t main_thd(void * arg);
+xwer_t main_task(void * arg);
 
-const struct xwos_thd_desc main_thd_td = {
+const struct xwos_thd_desc main_thd_desc = {
         .name = "main.thd",
         .prio = MAIN_THD_PRIORITY,
         .stack = XWOS_THD_STACK_DYNAMIC,
         .stack_size = 4096,
-        .func = (xwos_thd_f)main_thd,
+        .func = main_task,
         .arg = NULL,
-        .attr = XWOS_SKDATTR_PRIVILEGED,
+        .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
 };
-xwos_thd_d main_thdd;
+struct xwos_thd * main_thd;
 
 xwer_t xwos_main(void)
 {
         xwer_t rc;
 
-        rc = xwos_thd_create(&main_thdd,
-                             main_thd_td.name,
-                             main_thd_td.func,
-                             main_thd_td.arg,
-                             main_thd_td.stack_size,
-                             main_thd_td.prio,
-                             main_thd_td.attr);
+        rc = xwos_thd_create(&main_thd,
+                             main_thd_desc.name,
+                             main_thd_desc.func,
+                             main_thd_desc.arg,
+                             main_thd_desc.stack_size,
+                             main_thd_desc.prio,
+                             main_thd_desc.attr);
         if (rc < 0) {
                 goto err_init_thd_create;
         }
@@ -72,7 +72,7 @@ err_skd_start_lc:
         return rc;
 }
 
-xwer_t main_thd(void * arg)
+xwer_t main_task(void * arg)
 {
         xwer_t rc;
 
@@ -115,7 +115,6 @@ xwer_t main_thd(void * arg)
         /*         goto err_example_sel_start; */
         /* } */
 
-        xwos_thd_detach(main_thdd);
         return XWOK;
 
 /* err_example_sel_start: */

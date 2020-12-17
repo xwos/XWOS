@@ -45,13 +45,13 @@ xwer_t xwosdl_flg_destroy(struct xwosdl_flg * flg)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_flg_create(struct xwosdl_flg ** flgp, xwbmp_t initval[])
+xwer_t xwosdl_flg_create(struct xwosdl_flg ** flgbuf, xwbmp_t initval[])
 {
         xwer_t rc;
 
-        if (NULL != flgp) {
-                *flgp = NULL;
-                rc = xwmp_evt_create(flgp, initval, XWMP_EVT_TYPE_FLG);
+        if (NULL != flgbuf) {
+                *flgbuf = NULL;
+                rc = xwmp_evt_create(flgbuf, initval, XWMP_EVT_TYPE_FLG);
         } else {
                 rc = -EFAULT;
         }
@@ -62,6 +62,43 @@ static __xwcc_inline
 xwer_t xwosdl_flg_delete(struct xwosdl_flg * flg)
 {
         return xwmp_evt_delete(flg);
+}
+
+static __xwcc_inline
+xwsq_t xwosdl_flg_gettik(struct xwosdl_flg * flg)
+{
+        xwsq_t tik;
+
+        if (flg) {
+                tik = flg->cond.synobj.xwobj.tik;
+        } else {
+                tik = 0;
+        }
+        return tik;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_flg_acquire(struct xwosdl_flg * flg, xwsq_t tik)
+{
+        return xwmp_evt_acquire(flg, tik);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_flg_release(struct xwosdl_flg * flg, xwsq_t tik)
+{
+        return xwmp_evt_release(flg, tik);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_flg_grab(struct xwosdl_flg * flg)
+{
+        return xwmp_evt_grab(flg);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_flg_put(struct xwosdl_flg * flg)
+{
+        return xwmp_evt_put(flg);
 }
 
 static __xwcc_inline

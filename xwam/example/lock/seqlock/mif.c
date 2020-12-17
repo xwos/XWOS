@@ -45,7 +45,7 @@ xwer_t xwsqlkdemo_thd_func(void * arg);
 /**
  * @brief 线程描述表
  */
-const struct xwos_thd_desc xwsqlkdemo_tbd = {
+const struct xwos_thd_desc xwsqlkdemo_thd_desc = {
         .name = "xwsqlkdemo.thd",
         .prio = XWSQLKDEMO_THD_PRIORITY,
         .stack = XWOS_THD_STACK_DYNAMIC,
@@ -54,7 +54,7 @@ const struct xwos_thd_desc xwsqlkdemo_tbd = {
         .arg = NULL,
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
-xwos_thd_d xwsqlkdemo_thdd;
+struct xwos_thd * xwsqlkdemo_thd;
 
 struct xwos_swt xwsqlkdemo_swt;
 
@@ -79,13 +79,13 @@ xwer_t example_seqlock_start(void)
         }
 
         /* 创建线程 */
-        rc = xwos_thd_create(&xwsqlkdemo_thdd,
-                             xwsqlkdemo_tbd.name,
-                             xwsqlkdemo_tbd.func,
-                             xwsqlkdemo_tbd.arg,
-                             xwsqlkdemo_tbd.stack_size,
-                             xwsqlkdemo_tbd.prio,
-                             xwsqlkdemo_tbd.attr);
+        rc = xwos_thd_create(&xwsqlkdemo_thd,
+                             xwsqlkdemo_thd_desc.name,
+                             xwsqlkdemo_thd_desc.func,
+                             xwsqlkdemo_thd_desc.arg,
+                             xwsqlkdemo_thd_desc.stack_size,
+                             xwsqlkdemo_thd_desc.prio,
+                             xwsqlkdemo_thd_desc.attr);
         if (rc < 0) {
                 goto err_thd_create;
         }
@@ -160,6 +160,6 @@ xwer_t xwsqlkdemo_thd_func(void * arg)
         }
 
         swtlogf(INFO, "[线程] 退出。\n");
-        xwos_thd_delete(xwos_cthd_getd());
+        xwos_thd_detach(xwos_cthd_self());
         return rc;
 }

@@ -1548,7 +1548,8 @@ xwer_t xwaop__xws16__tst_then_op(xws16_a * a,
         do {
                 o = atomic_load_explicit(a, memory_order_consume);
                 if (tst) {
-                        if (tst((const void *)&o, tst_args)) {
+                        rc = tst((const void *)&o, tst_args);
+                        if (XWOK == rc) {
                                 if (op) {
                                         op(&n, (const void *)&o, op_args);
                                         rc = (xwer_t)atomic_compare_exchange_strong_explicit(
@@ -1556,12 +1557,10 @@ xwer_t xwaop__xws16__tst_then_op(xws16_a * a,
                                                 memory_order_acq_rel,
                                                 memory_order_consume);
                                 } else {
-                                        rc = XWOK;
                                         n = o;
                                         break;
                                 }
                         } else {
-                                rc = -EACCES;
                                 n = o;
                                 break;
                         }

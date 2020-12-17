@@ -37,7 +37,7 @@
 
 xwer_t xwbrdemo_thd_func(void * arg);
 
-const struct xwos_thd_desc xwbrdemo_td[] = {
+const struct xwos_thd_desc xwbrdemo_thd_desc[] = {
         [0] = {
                 .name = "example.br.thd.0",
                 .prio = XWBRDEMO_THD_PRIORITY,
@@ -84,7 +84,7 @@ const struct xwos_thd_desc xwbrdemo_td[] = {
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
-xwos_thd_d xwbrdemo_thdd[xw_array_size(xwbrdemo_td)];
+struct xwos_thd * xwbrdemo_thd[xw_array_size(xwbrdemo_thd_desc)];
 
 struct xwos_br xwbrdemo_br;
 
@@ -103,14 +103,14 @@ xwer_t example_br_start(void)
         }
 
         /* 创建5个线程 */
-        for (i = 0; i < xw_array_size(xwbrdemo_td); i++) {
-                rc = xwos_thd_create(&xwbrdemo_thdd[i],
-                                     xwbrdemo_td[i].name,
-                                     xwbrdemo_td[i].func,
-                                     xwbrdemo_td[i].arg,
-                                     xwbrdemo_td[i].stack_size,
-                                     xwbrdemo_td[i].prio,
-                                     xwbrdemo_td[i].attr);
+        for (i = 0; i < xw_array_size(xwbrdemo_thd_desc); i++) {
+                rc = xwos_thd_create(&xwbrdemo_thd[i],
+                                     xwbrdemo_thd_desc[i].name,
+                                     xwbrdemo_thd_desc[i].func,
+                                     xwbrdemo_thd_desc[i].arg,
+                                     xwbrdemo_thd_desc[i].stack_size,
+                                     xwbrdemo_thd_desc[i].prio,
+                                     xwbrdemo_thd_desc[i].attr);
                 if (rc < 0) {
                         goto err_thd_create;
                 }
@@ -139,7 +139,7 @@ xwer_t xwbrdemo_thd_func(void * arg)
         xwbmpop_c0all(msk, XWOS_BR_MAXNUM);
 
         /* 设置位图掩码 */
-        for (xwsq_t i = 0; i < xw_array_size(xwbrdemo_td); i++) {
+        for (xwsq_t i = 0; i < xw_array_size(xwbrdemo_thd_desc); i++) {
                 xwbmpop_s1i(msk, i);
         }
 
@@ -150,6 +150,6 @@ xwer_t xwbrdemo_thd_func(void * arg)
         }
 
         brlogf(INFO, "[线程%d] 退出。\n", pos);
-        xwos_thd_delete(xwos_cthd_getd());
+        xwos_thd_detach(xwos_cthd_self());
         return rc;
 }

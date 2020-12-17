@@ -82,22 +82,6 @@ struct xwmp_thd {
 #endif /* XWMPCFG_SKD_THD_LOCAL_DATA_NUM */
 };
 
-/**
- * @brief XWOS MP线程对象描述符
- */
-typedef struct {
-        struct xwmp_thd * thd;
-        xwsq_t ticket;
-} xwmp_thd_d;
-
-/**
- * @brief XWOS MP 空的线程描述符
- */
-#define XWMP_THD_NILD ((xwmp_thd_d){NULL, 0,})
-
-xwer_t xwmp_thd_grab(struct xwmp_thd * thd);
-xwer_t xwmp_thd_grab_safely(xwmp_thd_d thdd);
-xwer_t xwmp_thd_put(struct xwmp_thd * thd);
 xwer_t xwmp_thd_chprio_once(struct xwmp_thd * thd, xwpr_t dprio,
                             struct xwmp_mtx ** pmtx);
 void xwmp_thd_chprio(struct xwmp_thd * thd);
@@ -141,6 +125,10 @@ xwer_t xwmp_thd_create(struct xwmp_thd ** thdpbuf, const char * name,
                        xwsz_t stack_size,
                        xwpr_t priority, xwsq_t attr);
 xwer_t xwmp_thd_delete(struct xwmp_thd * thd);
+xwer_t xwmp_thd_acquire(struct xwmp_thd * thd, xwsq_t tik);
+xwer_t xwmp_thd_release(struct xwmp_thd * thd, xwsq_t tik);
+xwer_t xwmp_thd_grab(struct xwmp_thd * thd);
+xwer_t xwmp_thd_put(struct xwmp_thd * thd);
 void xwmp_cthd_yield(void);
 void xwmp_cthd_exit(xwer_t rc);
 xwer_t xwmp_thd_stop(struct xwmp_thd * thd, xwer_t * trc);

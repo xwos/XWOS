@@ -103,52 +103,24 @@ void xwosdl_skd_enpmpt_lc(void)
 
 #define xwosdl_thd xwmp_thd
 typedef xwmp_thd_f xwosdl_thd_f;
-typedef xwmp_thd_d xwosdl_thd_d;
-#define XWOSDL_THD_NILD XWMP_THD_NILD
 
 static __xwcc_inline
-xwer_t xwosdl_thd_init(struct xwosdl_thd * thd,
-                       xwosdl_thd_d * thdd,
-                       const char * name,
+xwer_t xwosdl_thd_init(struct xwosdl_thd * thd, const char * name,
                        xwosdl_thd_f mainfunc, void * arg,
                        xwstk_t * stack, xwsz_t stack_size,
                        xwpr_t priority, xwsq_t attr)
 {
         xwer_t rc;
 
-        rc = xwmp_thd_init(thd,
-                           name,
+        rc = xwmp_thd_init(thd, name,
                            (xwmp_thd_f)mainfunc, arg,
                            stack, stack_size,
                            priority, attr);
-        if (XWOK == rc) {
-                if (thdd) {
-                        thdd->thd = thd;
-                        thdd->ticket = thd->xwobj.ticket;
-                }
-        } else {
-                if (thdd) {
-                        *thdd = XWOSDL_THD_NILD;
-                }
-        }
         return rc;
 }
 
 static __xwcc_inline
-xwer_t xwosdl_thd_destroy(xwosdl_thd_d thdd)
-{
-        xwer_t rc;
-
-        rc = xwmp_thd_grab_safely(thdd);
-        if (XWOK == rc) {
-                xwmp_thd_put(thdd.thd);
-                rc = xwmp_thd_destroy(thdd.thd);
-        }
-        return rc;
-}
-
-static __xwcc_inline
-xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd, const char * name,
+xwer_t xwosdl_thd_create(struct xwosdl_thd ** thdbuf, const char * name,
                          xwosdl_thd_f mainfunc, void * arg,
                          xwsz_t stack_size,
                          xwpr_t priority, xwsq_t attr)
@@ -156,17 +128,15 @@ xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd, const char * name,
         struct xwmp_thd * thd;
         xwer_t rc;
 
-        if (NULL != thdd) {
-                rc = xwmp_thd_create(&thd,
-                                     name,
+        if (NULL != thdbuf) {
+                rc = xwmp_thd_create(&thd, name,
                                      (xwmp_thd_f)mainfunc, arg,
                                      stack_size,
                                      priority, attr);
                 if (XWOK == rc) {
-                        thdd->thd = thd;
-                        thdd->ticket = thd->xwobj.ticket;
+                        *thdbuf = thd;
                 } else {
-                        *thdd = XWOSDL_THD_NILD;
+                        *thdbuf = NULL;
                 }
         } else {
                 rc = EFAULT;
@@ -175,42 +145,82 @@ xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd, const char * name,
 }
 
 static __xwcc_inline
-xwer_t xwosdl_thd_delete(xwosdl_thd_d thdd)
+xwsq_t xwosdl_thd_gettik(struct xwosdl_thd * thd)
 {
-        xwer_t rc;
-
-        rc = xwmp_thd_grab_safely(thdd);
-        if (XWOK == rc) {
-                xwmp_thd_put(thdd.thd);
-                rc = xwmp_thd_delete(thdd.thd);
-        }
-        return rc;
-}
-
-static __xwcc_inline
-xwosdl_thd_d xwosdl_cthd_getd(void)
-{
-        struct xwmp_thd * cthd;
-        xwosdl_thd_d thdd;
-
-        cthd = xwmp_skd_get_cthd_lc();
-        thdd.thd = cthd;
-        thdd.ticket = cthd->xwobj.ticket;
-        return thdd;
-}
-
-static __xwcc_inline
-xwosdl_thd_d xwosdl_thd_getd(struct xwosdl_thd * thd)
-{
-        xwosdl_thd_d thdd;
+        xwsq_t tik;
 
         if (thd) {
-                thdd.ticket = thd->xwobj.ticket;
+                tik = thd->xwobj.tik;
         } else {
-                thdd.ticket = 0;
+                tik = 0;
         }
-        thdd.thd = thd;
-        return thdd;
+        return tik;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_thd_acquire(struct xwosdl_thd * thd, xwsq_t tik)
+{
+        return xwmp_thd_acquire(thd, tik);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_thd_release(struct xwosdl_thd * thd, xwsq_t tik)
+{
+        return xwmp_thd_release(thd, tik);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_thd_grab(struct xwosdl_thd * thd)
+{
+        return xwmp_thd_grab(thd);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_thd_put(struct xwosdl_thd * thd)
+{
+        return xwmp_thd_put(thd);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_thd_stop(struct xwosdl_thd * thd, xwer_t * trc)
+{
+        return xwmp_thd_stop(thd, trc);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_thd_cancel(struct xwosdl_thd * thd)
+{
+        return xwmp_thd_cancel(thd);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_thd_join(struct xwosdl_thd * thd, xwer_t * trc)
+{
+        return xwmp_thd_join(thd, trc);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_thd_detach(struct xwosdl_thd * thd)
+{
+        return xwmp_thd_detach(thd);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_thd_intr(struct xwosdl_thd * thd)
+{
+        return xwmp_thd_intr(thd);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_thd_migrate(struct xwosdl_thd * thd, xwid_t dstcpu)
+{
+        return xwmp_thd_migrate(thd, dstcpu);
+}
+
+static __xwcc_inline
+struct xwosdl_thd * xwosdl_cthd_self(void)
+{
+        return xwmp_skd_get_cthd_lc();
 }
 
 static __xwcc_inline
@@ -223,58 +233,6 @@ static __xwcc_inline
 void xwosdl_cthd_exit(xwer_t rc)
 {
         xwmp_cthd_exit(rc);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_thd_stop(xwosdl_thd_d thdd, xwer_t * trc)
-{
-        xwer_t rc;
-
-        rc = xwmp_thd_grab_safely(thdd);
-        if (XWOK == rc) {
-                rc = xwmp_thd_stop(thdd.thd, trc);
-                xwmp_thd_put(thdd.thd);
-        }
-        return rc;
-}
-
-static __xwcc_inline
-xwer_t xwosdl_thd_cancel(xwosdl_thd_d thdd)
-{
-        xwer_t rc;
-
-        rc = xwmp_thd_grab_safely(thdd);
-        if (XWOK == rc) {
-                rc = xwmp_thd_cancel(thdd.thd);
-                xwmp_thd_put(thdd.thd);
-        }
-        return rc;
-}
-
-static __xwos_inline_api
-xwer_t xwosdl_thd_join(xwosdl_thd_d thdd, xwer_t * trc)
-{
-        xwer_t rc;
-
-        rc = xwmp_thd_grab_safely(thdd);
-        if (XWOK == rc) {
-                rc = xwmp_thd_join(thdd.thd, trc);
-                xwmp_thd_put(thdd.thd);
-        }
-        return rc;
-}
-
-static __xwcc_inline
-xwer_t xwosdl_thd_detach(xwosdl_thd_d thdd)
-{
-        xwer_t rc;
-
-        rc = xwmp_thd_grab_safely(thdd);
-        if (XWOK == rc) {
-                rc = xwmp_thd_detach(thdd.thd);
-                xwmp_thd_put(thdd.thd);
-        }
-        return rc;
 }
 
 static __xwcc_inline
@@ -308,71 +266,31 @@ xwer_t xwosdl_cthd_sleep_from(xwtm_t * origin, xwtm_t inc)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_thd_intr(xwosdl_thd_d thdd)
-{
-        xwer_t rc;
-
-        rc = xwmp_thd_grab_safely(thdd);
-        if (XWOK == rc) {
-                rc = xwmp_thd_intr(thdd.thd);
-                xwmp_thd_put(thdd.thd);
-        }
-        return rc;
-}
-
-static __xwcc_inline
 xwer_t xwosdl_cthd_freeze(void)
 {
         return xwmp_cthd_freeze();
 }
 
-static __xwcc_inline
-xwer_t xwosdl_thd_migrate(xwosdl_thd_d thdd, xwid_t dstcpu)
-{
-        xwer_t rc;
-
-        rc = xwmp_thd_grab_safely(thdd);
-        if (XWOK == rc) {
-                rc = xwmp_thd_migrate(thdd.thd, dstcpu);
-                xwmp_thd_put(thdd.thd);
-        }
-        return rc;
-}
-
 #if defined(XWMPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWMPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
-static __xwos_inline_api
-xwer_t xwosdl_thd_set_data(xwosdl_thd_d thdd, xwsq_t pos, void * data)
+static __xwcc_inline
+xwer_t xwosdl_thd_set_data(struct xwosdl_thd * thd, xwsq_t pos, void * data)
 {
-        xwer_t rc;
-
-        rc = xwmp_thd_grab_safely(thdd);
-        if (XWOK == rc) {
-                rc = xwmp_thd_set_data(thdd.thd, pos, data);
-                xwmp_thd_put(thdd.thd);
-        }
-        return rc;
+        return xwmp_thd_set_data(thd, pos, data);
 }
 
-static __xwos_inline_api
-xwer_t xwosdl_thd_get_data(xwosdl_thd_d thdd, xwsq_t pos, void ** databuf)
+static __xwcc_inline
+xwer_t xwosdl_thd_get_data(struct xwosdl_thd * thd, xwsq_t pos, void ** databuf)
 {
-        xwer_t rc;
-
-        rc = xwmp_thd_grab_safely(thdd);
-        if (XWOK == rc) {
-                rc = xwmp_thd_get_data(thdd.thd, pos, databuf);
-                xwmp_thd_put(thdd.thd);
-        }
-        return rc;
+        return xwmp_thd_get_data(thd, pos, databuf);
 }
 
-static __xwos_inline_api
+static __xwcc_inline
 xwer_t xwosdl_cthd_set_data(xwsq_t pos, void * data)
 {
         return xwmp_cthd_set_data(pos, data);
 }
 
-static __xwos_inline_api
+static __xwcc_inline
 xwer_t xwosdl_cthd_get_data(xwsq_t pos, void ** databuf)
 {
         return xwmp_cthd_get_data(pos, databuf);

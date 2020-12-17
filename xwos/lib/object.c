@@ -15,30 +15,30 @@
 #include <xwos/osal/irq.h>
 #include <xwos/osal/skd.h>
 
-#define XWOS_OBJTIX_CHUNK        ((xwsq_t)(1 << 20)) /* 1M */
-#define XWOS_OBJTIX_CHUNK_MSK    (XWOS_OBJTIX_CHUNK - 1)
+#define XWOS_OBJTIK_CHUNK        ((xwsq_t)(1 << 20)) /* 1M */
+#define XWOS_OBJTIK_CHUNK_MSK    (XWOS_OBJTIK_CHUNK - 1)
 
 /**
- * @brief 对象标签分配器，每次分配XWOS_OBJTIX_CHUNK个ID给CPU
+ * @brief 对象标签分配器，每次分配XWOS_OBJTIK_CHUNK个ID给CPU
  */
-__xwlib_data xwsq_a xwos_objtix_dispatcher = (CPUCFG_CPU_NUM * XWOS_OBJTIX_CHUNK);
+__xwlib_data xwsq_a xwos_objtik_dispatcher = (CPUCFG_CPU_NUM * XWOS_OBJTIK_CHUNK);
 
 /**
  * @brief 每CPU的对象标签分配器
  */
-__xwlib_data xwsq_a xwos_objtix[CPUCFG_CPU_NUM] __xwcc_alignl1cache = {0};
+__xwlib_data xwsq_a xwos_objtik[CPUCFG_CPU_NUM] __xwcc_alignl1cache = {0};
 
 /**
  * @brief 初始化对象标签分配器
  */
 __xwlib_code
-void xwos_objtix_init(void)
+void xwos_objtik_init(void)
 {
         xwsq_t i;
 
-        xwos_objtix_dispatcher = (CPUCFG_CPU_NUM * XWOS_OBJTIX_CHUNK);
+        xwos_objtik_dispatcher = (CPUCFG_CPU_NUM * XWOS_OBJTIK_CHUNK);
         for (i = 0; i < CPUCFG_CPU_NUM; i++) {
-                xwos_objtix[i] = (i * XWOS_OBJTIX_CHUNK);
+                xwos_objtik[i] = (i * XWOS_OBJTIK_CHUNK);
         }
 }
 
@@ -46,36 +46,36 @@ void xwos_objtix_init(void)
  * @brief 从对象标签分配器获取一个标签
  * @return 标签
  * @note
- * - 为了避免频繁地访问多CPU共享原子变量xwos_objtix_dispatcher，每次获取标签
- *   都是从当前CPU的每CPU变量xwos_objtix中分配的，只有当xwos_objtix的分配额
- *   达到最大额度XWOS_OBJTIX_CHUNK时，才会访问xwos_objtix_dispatcher再次预先分配
- *   XWOS_OBJTIX_CHUNK个标签。
+ * - 为了避免频繁地访问多CPU共享原子变量xwos_objtik_dispatcher，每次获取标签
+ *   都是从当前CPU的每CPU变量xwos_objtik中分配的，只有当xwos_objtik的分配额
+ *   达到最大额度XWOS_OBJTIK_CHUNK时，才会访问xwos_objtik_dispatcher再次预先分配
+ *   XWOS_OBJTIK_CHUNK个标签。
  */
 __xwlib_code
-xwsq_t xwos_objtix_get(void)
+xwsq_t xwos_objtik_get(void)
 {
         xwid_t cpu;
-        xwsq_a * objtix;
+        xwsq_a * objtik;
         xwsq_t curr, max, ov;
         xwer_t rc;
 
         cpu = xwos_skd_id_lc();
-        objtix = &xwos_objtix[cpu];
+        objtik = &xwos_objtik[cpu];
         while (true) {
-                curr = xwaop_load(xwsq, objtix, xwmb_modr_relaxed);
-                max = (curr & (~XWOS_OBJTIX_CHUNK_MSK)) + XWOS_OBJTIX_CHUNK_MSK;
-                rc = xwaop_tlt_then_add(xwsq, objtix, max, 1, NULL, &ov);
+                curr = xwaop_load(xwsq, objtik, xwmb_modr_relaxed);
+                max = (curr & (~XWOS_OBJTIK_CHUNK_MSK)) + XWOS_OBJTIK_CHUNK_MSK;
+                rc = xwaop_tlt_then_add(xwsq, objtik, max, 1, NULL, &ov);
                 if (rc < 0) {
                         xwreg_t cpuirq;
                         xwsq_t chunk;
 
                         xwos_cpuirq_save_lc(&cpuirq);
-                        curr = xwaop_load(xwsq, objtix, xwmb_modr_relaxed);
+                        curr = xwaop_load(xwsq, objtik, xwmb_modr_relaxed);
                         if (curr == max) {
                                 ov = curr;
-                                xwaop_add(xwsq, &xwos_objtix_dispatcher,
-                                          XWOS_OBJTIX_CHUNK, NULL, &chunk);
-                                xwaop_store(xwsq, objtix, xwmb_modr_relaxed, chunk);
+                                xwaop_add(xwsq, &xwos_objtik_dispatcher,
+                                          XWOS_OBJTIK_CHUNK, NULL, &chunk);
+                                xwaop_store(xwsq, objtik, xwmb_modr_relaxed, chunk);
                                 xwos_cpuirq_restore_lc(cpuirq);
                                 break;
                         } else {
@@ -97,7 +97,7 @@ void xwos_object_construct(struct xwos_object * obj)
 {
         obj->refcnt = 0;
         obj->gcfunc = NULL;
-        obj->ticket = 0;
+        obj->tik = 0;
 }
 
 /**
@@ -108,7 +108,8 @@ __xwlib_code
 void xwos_object_destruct(struct xwos_object * obj)
 {
         obj->gcfunc = NULL;
-        obj->ticket = 0;
+        obj->tik = 0;
+        obj->magic = 0;
 }
 
 /**
@@ -126,7 +127,8 @@ xwer_t xwos_object_activate(struct xwos_object * obj, xwobj_gc_f gcfunc)
 
         rc = xwaop_teq_then_add(xwsq, &obj->refcnt, 0, 1, NULL, NULL);
         if (__xwcc_likely(XWOK == rc)) {
-                obj->ticket = xwos_objtix_get();
+                obj->tik = xwos_objtik_get();
+                obj->magic = XWOS_OBJ_MAGIC;
                 obj->gcfunc = gcfunc;
         } else {
                 rc = -EOBJACTIVE;
@@ -134,24 +136,120 @@ xwer_t xwos_object_activate(struct xwos_object * obj, xwobj_gc_f gcfunc)
         return rc;
 }
 
+__xwlib_code
+xwer_t xwos_object_acquire_refaop_tst(const void * ov, void * arg)
+{
+        const xwsq_t * o;
+        xwobj_d * objd;
+        xwer_t rc;
+
+        o = (const xwsq_t *)ov;
+        objd = arg;
+        if ((XWOS_OBJ_MAGIC != objd->obj->magic) ||
+                   (objd->tik != objd->obj->tik)) {
+                rc = -EACCES;
+        } else if (*o < 1) {
+                rc = -EOBJDEAD;
+        } else {
+                rc = XWOK;
+        }
+        return rc;
+}
+
+__xwlib_code
+void xwos_object_acquire_refaop_op(void * nv, const void * ov, void * arg)
+{
+        xwsq_t * n;
+        const xwsq_t * o;
+
+        XWOS_UNUSED(arg);
+        n = (xwsq_t *)nv;
+        o = (xwsq_t *)ov;
+        *n = *o + 1;
+}
+
 /**
- * @brief 获取对象的描述符
+ * @brief 检查对象的标签并增加引用计数
  * @param obj: (I) 对象指针
- * @return 对象描述符
+ * @param tik: (I) 标签
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EOBJDEAD: 对象无效
+ * @retval -EACCES: 对象标签检查失败
  */
 __xwlib_code
-xwobj_d xwos_object_get_d(struct xwos_object * obj)
+xwer_t xwos_object_acquire(struct xwos_object * obj, xwsq_t tik)
 {
-        xwobj_d objd;
+        xwobj_d objd = {obj, tik};
+        xwer_t rc;
 
-        if (obj) {
-                objd.obj = obj;
-                objd.ticket = obj->ticket;
+        rc = xwaop_tst_then_op(xwsq, &obj->refcnt,
+                               xwos_object_acquire_refaop_tst, &objd,
+                               xwos_object_acquire_refaop_op, &objd,
+                               NULL, NULL);
+        return rc;
+}
+
+__xwlib_code
+xwer_t xwos_object_release_refaop_tst(const void * ov, void * arg)
+{
+        const xwsq_t * o;
+        xwobj_d * objd;
+        xwer_t rc;
+
+        o = (const xwsq_t *)ov;
+        objd = arg;
+        if ((XWOS_OBJ_MAGIC != objd->obj->magic) ||
+                   (objd->tik != objd->obj->tik)) {
+                rc = -EACCES;
+        } else if (*o < 1) {
+                rc = -EOBJDEAD;
         } else {
-                objd.obj = NULL;
-                objd.ticket = 0;
+                rc = XWOK;
         }
-        return objd;
+        return rc;
+}
+
+__xwlib_code
+void xwos_object_release_refaop_op(void * nv, const void * ov, void * arg)
+{
+        xwsq_t * n;
+        const xwsq_t * o;
+
+        XWOS_UNUSED(arg);
+        n = (xwsq_t *)nv;
+        o = (xwsq_t *)ov;
+        *n = *o - 1;
+}
+
+/**
+ * @brief 检查对象的标签并减少引用计数
+ * @param obj: (I) 对象指针
+ * @param tik: (I) 标签
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EOBJDEAD: 对象无效
+ * @retval -EACCES: 对象标签检查失败
+ */
+__xwlib_code
+xwer_t xwos_object_release(struct xwos_object * obj, xwsq_t tik)
+{
+        xwobj_d objd = {obj, tik};
+        xwsq_t nv;
+        xwer_t rc;
+
+        rc = xwaop_tst_then_op(xwsq, &obj->refcnt,
+                               xwos_object_release_refaop_tst, &objd,
+                               xwos_object_release_refaop_op, &objd,
+                               &nv, NULL);
+        if (__xwcc_likely(XWOK == rc)) {
+                if (__xwcc_unlikely(0 == nv)) {
+                        if (obj->gcfunc) {
+                                rc = obj->gcfunc(obj);
+                        }/* else {} */
+                }/* else {} */
+        }/* else {} */
+        return rc;
 }
 
 /**
@@ -170,28 +268,6 @@ xwer_t xwos_object_grab(struct xwos_object * obj)
         if (__xwcc_unlikely(rc < 0)) {
                 rc = -EOBJDEAD;
         }/* else {} */
-        return rc;
-}
-
-/**
- * @brief 安全地增加对象的引用计数
- * @param objd: (I) 对象描述符
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EPERM: 对象检查失败
- * @note
- * - 此函数会检测对象的标签，防止出现相同地址不同对象（即ABA）的问题。
- */
-__xwlib_code
-xwer_t xwos_object_grab_safely(xwobj_d objd)
-{
-        xwer_t rc;
-
-        if ((NULL == objd.obj) || (objd.ticket != objd.obj->ticket)) {
-                rc = -EPERM;
-        } else {
-                rc = xwos_object_grab(objd.obj);
-        }
         return rc;
 }
 
@@ -216,7 +292,6 @@ xwer_t xwos_object_put(struct xwos_object * obj)
                         if (obj->gcfunc) {
                                 rc = obj->gcfunc(obj);
                         }/* else {} */
-                        obj->ticket = 0;
                 }/* else {} */
         } else {
                 rc = -EOBJDEAD;

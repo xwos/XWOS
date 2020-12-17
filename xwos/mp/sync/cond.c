@@ -20,7 +20,7 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
-#include <xwos/mm/memslice.h>
+  #include <xwos/mm/memslice.h>
 #endif /* XWMPCFG_SYNC_COND_MEMSLICE */
 #include <xwos/ospl/irq.h>
 #include <xwos/mp/skd.h>
@@ -182,24 +182,68 @@ xwer_t xwmp_cond_gc(void * cond)
 }
 
 /**
- * @brief 增加对象的引用计数
+ * @brief XWMP API：检查条件量对象的标签并增加引用计数
+ * @param cond: (I) 条件量对象指针
+ * @param tik: (I) 标签
+ * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwmp_api
+xwer_t xwmp_cond_acquire(struct xwmp_cond * cond, xwsq_t tik)
+{
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+        return xwmp_synobj_acquire(&cond->synobj, tik);
+}
+
+/**
+ * @brief XWMP API：检查条件量对象的标签并增加引用计数
+ * @param cond: (I) 条件量对象指针
+ * @param tik: (I) 标签
+ * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwmp_api
+xwer_t xwmp_cond_release(struct xwmp_cond * cond, xwsq_t tik)
+{
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+        return xwmp_synobj_release(&cond->synobj, tik);
+}
+
+/**
+ * @brief XWMP API：增加条件量对象的引用计数
  * @param cond: (I) 条件量对象指针
  * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
-__xwcc_inline
+__xwmp_api
 xwer_t xwmp_cond_grab(struct xwmp_cond * cond)
 {
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         return xwmp_synobj_grab(&cond->synobj);
 }
 
 /**
- * @brief 减少对象的引用计数
+ * @brief XWMP API：减少条件量对象的引用计数
  * @param cond: (I) 条件量对象指针
  * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
-__xwcc_inline
+__xwmp_api
 xwer_t xwmp_cond_put(struct xwmp_cond * cond)
 {
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         return xwmp_synobj_put(&cond->synobj);
 }
 

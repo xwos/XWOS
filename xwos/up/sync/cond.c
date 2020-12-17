@@ -20,8 +20,8 @@
 #include <xwos/up/plwq.h>
 #include <xwos/mm/kma.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-#include <xwos/up/sync/obj.h>
-#include <xwos/up/sync/evt.h>
+  #include <xwos/up/sync/obj.h>
+  #include <xwos/up/sync/evt.h>
 #endif /* XWUPCFG_SYNC_EVT */
 #include <xwos/up/sync/cond.h>
 
@@ -105,7 +105,7 @@ void xwup_cond_deactivate(struct xwup_cond * cond)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *cond* ，不可重入
+ * - 重入性：对于同一个条件量对象，不可重入
  */
 __xwup_api
 xwer_t xwup_cond_init(struct xwup_cond * cond)
@@ -125,7 +125,7 @@ xwer_t xwup_cond_init(struct xwup_cond * cond)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *cond* ，不可重入
+ * - 重入性：对于同一个条件量对象，不可重入
  */
 __xwup_api
 xwer_t xwup_cond_destroy(struct xwup_cond * cond)
@@ -177,7 +177,7 @@ xwer_t xwup_cond_create(struct xwup_cond ** ptrbuf)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *cond* ，不可重入
+ * - 重入性：对于同一个条件量对象，不可重入
  */
 __xwup_api
 xwer_t xwup_cond_delete(struct xwup_cond * cond)
@@ -205,7 +205,7 @@ xwer_t xwup_cond_delete(struct xwup_cond * cond)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *cond* ，不可重入
+ * - 重入性：对于同一个条件量对象，不可重入
  */
 __xwup_api
 xwer_t xwup_cond_bind(struct xwup_cond * cond,
@@ -235,7 +235,7 @@ xwer_t xwup_cond_bind(struct xwup_cond * cond,
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *cond* ，不可重入
+ * - 重入性：对于同一个条件量对象，不可重入
  */
 __xwup_api
 xwer_t xwup_cond_unbind(struct xwup_cond * cond, struct xwup_evt * evt)
@@ -254,7 +254,7 @@ xwer_t xwup_cond_unbind(struct xwup_cond * cond, struct xwup_evt * evt)
 #endif /* XWUPCFG_SYNC_EVT */
 
 /**
- * @brief XWUP API：冻结条件量（值设置为负）
+ * @brief XWUP API：冻结条件量
  * @param cond: (I) 条件量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误

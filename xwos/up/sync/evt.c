@@ -173,7 +173,7 @@ xwer_t xwup_evt_create(struct xwup_evt ** ptrbuf, xwbmp_t initval[], xwsq_t attr
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *evt* ，不可重入
+ * - 重入性：对于同一个事件对象，不可重入
  */
 __xwup_api
 xwer_t xwup_evt_delete(struct xwup_evt * evt)
@@ -197,7 +197,7 @@ xwer_t xwup_evt_delete(struct xwup_evt * evt)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *evt* ，不可重入
+ * - 重入性：对于同一个事件对象，不可重入
  */
 __xwup_api
 xwer_t xwup_evt_init(struct xwup_evt * evt, xwbmp_t initval[], xwsq_t attr)
@@ -219,7 +219,7 @@ xwer_t xwup_evt_init(struct xwup_evt * evt, xwbmp_t initval[], xwsq_t attr)
  * @note
  * - 同步/异步：异步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *evt* ，不可重入
+ * - 重入性：对于同一个事件对象，不可重入
  */
 __xwup_api
 xwer_t xwup_evt_destroy(struct xwup_evt * evt)
@@ -246,7 +246,7 @@ xwer_t xwup_evt_destroy(struct xwup_evt * evt)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *evt* ，不可重入
+ * - 重入性：对于同一个事件对象，不可重入
  */
 __xwup_api
 xwer_t xwup_evt_bind(struct xwup_evt * evt, struct xwup_evt * sel, xwsq_t pos)
@@ -267,7 +267,7 @@ xwer_t xwup_evt_bind(struct xwup_evt * evt, struct xwup_evt * sel, xwsq_t pos)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *evt* ，不可重入
+ * - 重入性：对于同一个事件对象，不可重入
  */
 __xwup_api
 xwer_t xwup_evt_unbind(struct xwup_evt * evt, struct xwup_evt * sel)
@@ -665,7 +665,7 @@ xwer_t xwup_evt_trywait_edge(struct xwup_evt * evt, xwsq_t trigger,
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 事件对象类型错误
  * @retval -EINVAL: 参数无效
- * @retval -ENODATA: 没有任何事件触发信号
+ * @retval -ENODATA: 没有任何事件触发
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -936,7 +936,7 @@ xwer_t xwup_evt_wait(struct xwup_evt * evt,
  * - 上下文：线程
  * - 重入性：可重入
  * @note
- * - 函数返回返回-ETIMEDOUT时，*xwtm* 指向的缓冲区内的期望时间会减为0。
+ * - 函数返回返回**-ETIMEDOUT**时，**xwtm**指向的缓冲区内的期望时间会减为0。
  */
 __xwup_api
 xwer_t xwup_evt_timedwait(struct xwup_evt * evt,
@@ -1213,7 +1213,7 @@ xwer_t xwup_evt_tryselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
  * - 上下文：线程
  * - 重入性：可重入
  * @note
- * - 函数返回返回-ETIMEDOUT时，*xwtm* 指向的缓冲区内的期望时间会减为0。
+ * - 函数返回返回**-ETIMEDOUT**时，**xwtm**指向的缓冲区内的期望时间会减为0。
  */
 __xwup_api
 xwer_t xwup_evt_timedselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
@@ -1320,7 +1320,7 @@ xwer_t xwup_evt_sync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t sync[])
  * - 上下文：线程
  * - 重入性：可重入
  * @note
- * - 函数返回返回-ETIMEDOUT时，*xwtm* 指向的缓冲区内的期望时间会减为0。
+ * - 函数返回返回**-ETIMEDOUT**时，**xwtm**指向的缓冲区内的期望时间会减为0。
  */
 __xwup_api
 xwer_t xwup_evt_timedsync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t sync[],

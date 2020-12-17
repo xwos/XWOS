@@ -26,7 +26,7 @@ extern "C" {
 }
 
 extern "C" {
-xwer_t cxx_thd(void * arg);
+xwer_t cxx_thd_main(void * arg);
 }
 
 #endif /* example/cxx/task.hxx */

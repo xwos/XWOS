@@ -205,8 +205,8 @@ struct xwup_skd * xwup_skd_get_lc(void)
 }
 
 /**
- * @brief 获得本地CPU的调度器中正在运行的线程的线程控制块指针
- * @return 本地CPU的调度器中正在运行的线程的线程控制块指针
+ * @brief 获得本地CPU的调度器中正在运行的线程对象的指针
+ * @return 本地CPU的调度器中正在运行的线程对象的指针
  */
 __xwup_code
 struct xwup_thd * xwup_skd_get_cthd_lc(void)
@@ -219,7 +219,7 @@ struct xwup_thd * xwup_skd_get_cthd_lc(void)
 
 /**
  * @brief 从XWOS UP调度器中选择一个就绪的线程
- * @retval pointer: 被选择线程的线程控制块对象指针
+ * @retval pointer: 被选择的线程对象的指针
  * @retval NULL: 空闲任务
  * @note
  * - 此函数只能在临界区中调用。
@@ -277,9 +277,9 @@ void xwup_skd_init_idled(void)
         xwskd->idle.size = XWUPCFG_SKD_IDLE_STACK_SIZE;
         xwskd->idle.base = (xwstk_t *)xwup_skd_idled_stack;
 #if (defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK))
-        xwskd->idle.sp = xwskd->idle.base + (xwskd->idle.size >> 2);
+        xwskd->idle.sp = xwskd->idle.base + (xwskd->idle.size / sizeof(xwstk_t));
 #elif (defined(XWMMCFG_ED_STACK) && (1 == XWMMCFG_ED_STACK))
-        xwskd->idle.sp = xwskd->idle.base + (xwskd->idle.size >> 2) - 1;
+        xwskd->idle.sp = xwskd->idle.base + (xwskd->idle.size / sizeof(xwstk_t)) - 1;
 #elif (defined(XWMMCFG_FA_STACK) && (1 == XWMMCFG_FA_STACK))
         xwskd->idle.sp = xwskd->idle.base - 1;
 #elif (defined(XWMMCFG_EA_STACK) && (1 == XWMMCFG_EA_STACK))
@@ -340,9 +340,9 @@ void xwup_skd_init_bhd(void)
         xwskd->bh.size = XWUPCFG_SKD_BH_STACK_SIZE;
         xwskd->bh.base = (xwstk_t *)xwup_skd_bhd_stack;
 #if defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK)
-        xwskd->bh.sp = xwskd->bh.base + (xwskd->bh.size >> 2);
+        xwskd->bh.sp = xwskd->bh.base + (xwskd->bh.size / sizeof(xwstk_t));
 #elif defined(XWMMCFG_ED_STACK) && (1 == XWMMCFG_ED_STACK)
-        xwskd->bh.sp = xwskd->bh.base + (xwskd->bh.size >> 2) - 1;
+        xwskd->bh.sp = xwskd->bh.base + (xwskd->bh.size / sizeof(xwstk_t)) - 1;
 #elif defined(XWMMCFG_FA_STACK) && (1 == XWMMCFG_FA_STACK)
         xwskd->bh.sp = xwskd->bh.base - 1;
 #elif defined(XWMMCFG_EA_STACK) && (1 == XWMMCFG_EA_STACK)
@@ -536,7 +536,7 @@ struct xwup_skd * xwup_skd_enpmpt_lc(void)
 /**
  * @brief 检查是否需要抢占
  * @param xwskd: (I) XWOS UP调度器的指针
- * @param t: (I) 线程控制块对象的指针
+ * @param t: (I) 线程对象的指针
  * @return 布尔值
  * @retval true: 需要抢占
  * @retval false: 不需要抢占
@@ -610,8 +610,8 @@ void xwup_skd_chkpmpt(void)
 
 /**
  * @brief 检测调度器是否需要切换上下文
- * @param t: (I) 被检测的线程的控制块对象的指针
- * @param pmthd: (O) 指向缓冲区的指针，通过此缓冲区返回指向抢占线程控制块对象的指针
+ * @param t: (I) 被检测的线程对象的指针
+ * @param pmthd: (O) 指向缓冲区的指针，通过此缓冲区返回抢占线程对象的指针
  * @return 错误码
  * @retval OK: 需要切换上下文
  * @retval <0: 不需要切换上下文

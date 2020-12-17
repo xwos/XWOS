@@ -25,7 +25,7 @@
 #include "test/vector.hxx"
 #include "task.hxx"
 
-xwer_t cxx_thd(void * arg)
+xwer_t cxx_thd_main(void * arg)
 {
   xwtm_t xwtm;
   xwer_t rc;
@@ -40,5 +40,6 @@ xwer_t cxx_thd(void * arg)
     xwtm = 2000 * XWTM_MS;
     xwos_cthd_sleep(&xwtm);
   }
+  xwos_thd_detach(xwos_cthd_self());
   return rc;
 }

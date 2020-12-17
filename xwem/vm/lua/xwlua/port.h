@@ -26,6 +26,6 @@ int xwlua_readline(lua_State * L, char buffer[], const char * prompt);
 void * xwlua_alloc(void * ud, void * ptr, size_t osize, size_t nsize);
 void xwlua_openlibs(lua_State * L);
 lua_State * xwlua_newstate(lua_Alloc f);
-xwer_t xwlua_thd(void * arg);
+xwer_t xwlua_task(void * arg);
 
 #endif /* xwem/vm/lua/port.h */

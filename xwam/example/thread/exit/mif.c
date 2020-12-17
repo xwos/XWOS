@@ -45,7 +45,7 @@ xwer_t xwexitdemo_child1_thd_func(void * arg);
 /**
  * @brief Detached线程描述表
  */
-const struct xwos_thd_desc xwexitdemo_detached_tbd[] = {
+const struct xwos_thd_desc xwexitdemo_detached_thd_desc[] = {
         [0] = {
                 .name = "xwexitdemo.detached.thd.0",
                 .prio = XWEXITDEMO_THD_PRIORITY,
@@ -65,12 +65,12 @@ const struct xwos_thd_desc xwexitdemo_detached_tbd[] = {
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
-xwos_thd_d xwexitdemo_detached_thdd[xw_array_size(xwexitdemo_detached_tbd)];
+struct xwos_thd * xwexitdemo_detached_thd[xw_array_size(xwexitdemo_detached_thd_desc)];
 
 /**
  * @brief Joinable线程描述表
  */
-const struct xwos_thd_desc xwexitdemo_joinable_tbd[] = {
+const struct xwos_thd_desc xwexitdemo_joinable_thd_desc[] = {
         [0] = {
                 .name = "xwexitdemo.parent.thd",
                 .prio = XWEXITDEMO_THD_PRIORITY,
@@ -99,9 +99,9 @@ const struct xwos_thd_desc xwexitdemo_joinable_tbd[] = {
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
-xwos_thd_d xwexitdemo_parent_thdd;
-xwos_thd_d xwexitdemo_child0_thdd;
-xwos_thd_d xwexitdemo_child1_thdd;
+struct xwos_thd * xwexitdemo_parent_thd;
+struct xwos_thd * xwexitdemo_child0_thd;
+struct xwos_thd * xwexitdemo_child1_thd;
 
 /**
  * @brief 模块的加载函数
@@ -112,26 +112,26 @@ xwer_t example_thread_exit_start(void)
         xwsq_t i;
 
 
-        for (i = 0; i < xw_array_size(xwexitdemo_detached_tbd); i++) {
-                rc = xwos_thd_create(&xwexitdemo_detached_thdd[i],
-                                     xwexitdemo_detached_tbd[i].name,
-                                     xwexitdemo_detached_tbd[i].func,
-                                     xwexitdemo_detached_tbd[i].arg,
-                                     xwexitdemo_detached_tbd[i].stack_size,
-                                     xwexitdemo_detached_tbd[i].prio,
-                                     xwexitdemo_detached_tbd[i].attr);
+        for (i = 0; i < xw_array_size(xwexitdemo_detached_thd_desc); i++) {
+                rc = xwos_thd_create(&xwexitdemo_detached_thd[i],
+                                     xwexitdemo_detached_thd_desc[i].name,
+                                     xwexitdemo_detached_thd_desc[i].func,
+                                     xwexitdemo_detached_thd_desc[i].arg,
+                                     xwexitdemo_detached_thd_desc[i].stack_size,
+                                     xwexitdemo_detached_thd_desc[i].prio,
+                                     xwexitdemo_detached_thd_desc[i].attr);
                 if (rc < 0) {
                         goto err_thd_create;
                 }
         }
 
-        rc = xwos_thd_create(&xwexitdemo_parent_thdd,
-                             xwexitdemo_joinable_tbd[0].name,
-                             xwexitdemo_joinable_tbd[0].func,
-                             xwexitdemo_joinable_tbd[0].arg,
-                             xwexitdemo_joinable_tbd[0].stack_size,
-                             xwexitdemo_joinable_tbd[0].prio,
-                             xwexitdemo_joinable_tbd[0].attr);
+        rc = xwos_thd_create(&xwexitdemo_parent_thd,
+                             xwexitdemo_joinable_thd_desc[0].name,
+                             xwexitdemo_joinable_thd_desc[0].func,
+                             xwexitdemo_joinable_thd_desc[0].arg,
+                             xwexitdemo_joinable_thd_desc[0].stack_size,
+                             xwexitdemo_joinable_thd_desc[0].prio,
+                             xwexitdemo_joinable_thd_desc[0].attr);
         if (rc < 0) {
                 goto err_thd_create;
         }
@@ -171,7 +171,7 @@ xwer_t xwexitdemo_detached_thd1_func(void * arg)
 
         thdexitlogf(INFO, "[Detached][线程1] 启动\n");
         thdexitlogf(INFO, "[Detached][线程1] Detech\n");
-        xwos_thd_detach(xwos_cthd_getd());
+        xwos_thd_detach(xwos_cthd_self());
         thdexitlogf(INFO, "[Detached][线程1] sleep(2s) ...\n");
         time = 2 * XWTM_S;
         xwos_cthd_sleep(&time);
@@ -195,57 +195,58 @@ xwer_t xwexitdemo_parent_thd_func(void * arg)
         time = 3 * XWTM_S;
         xwos_cthd_sleep(&time);
 
-        rc = xwos_thd_create(&xwexitdemo_child0_thdd,
-                             xwexitdemo_joinable_tbd[1].name,
-                             xwexitdemo_joinable_tbd[1].func,
-                             xwexitdemo_joinable_tbd[1].arg,
-                             xwexitdemo_joinable_tbd[1].stack_size,
-                             xwexitdemo_joinable_tbd[1].prio,
-                             xwexitdemo_joinable_tbd[1].attr);
+        rc = xwos_thd_create(&xwexitdemo_child0_thd,
+                             xwexitdemo_joinable_thd_desc[1].name,
+                             xwexitdemo_joinable_thd_desc[1].func,
+                             xwexitdemo_joinable_thd_desc[1].arg,
+                             xwexitdemo_joinable_thd_desc[1].stack_size,
+                             xwexitdemo_joinable_thd_desc[1].prio,
+                             xwexitdemo_joinable_thd_desc[1].attr);
         if (XWOK == rc) {
                 thdexitlogf(INFO, "[Joinable][父线程] join(子线程0) ...\n");
-                rc = xwos_thd_join(xwexitdemo_child0_thdd, &childrc);
+                rc = xwos_thd_join(xwexitdemo_child0_thd, &childrc);
                 thdexitlogf(INFO, "[Joinable][父线程] 子线程返回值：%d\n", childrc);
         }
 
-        rc = xwos_thd_create(&xwexitdemo_child1_thdd,
-                             xwexitdemo_joinable_tbd[2].name,
-                             xwexitdemo_joinable_tbd[2].func,
-                             xwexitdemo_joinable_tbd[2].arg,
-                             xwexitdemo_joinable_tbd[2].stack_size,
-                             xwexitdemo_joinable_tbd[2].prio,
-                             xwexitdemo_joinable_tbd[2].attr);
+        rc = xwos_thd_create(&xwexitdemo_child1_thd,
+                             xwexitdemo_joinable_thd_desc[2].name,
+                             xwexitdemo_joinable_thd_desc[2].func,
+                             xwexitdemo_joinable_thd_desc[2].arg,
+                             xwexitdemo_joinable_thd_desc[2].stack_size,
+                             xwexitdemo_joinable_thd_desc[2].prio,
+                             xwexitdemo_joinable_thd_desc[2].attr);
         if (XWOK == rc) {
                 thdexitlogf(INFO, "[Joinable][父线程] sleep(1s) ...\n");
                 time = 1 * XWTM_S;
                 xwos_cthd_sleep(&time);
                 thdexitlogf(INFO, "[Joinable][父线程] stop(子线程1) ...\n");
-                rc = xwos_thd_stop(xwexitdemo_child1_thdd, &childrc);
+                rc = xwos_thd_stop(xwexitdemo_child1_thd, &childrc);
                 thdexitlogf(INFO, "[Joinable][父线程] 子线程返回值：%d\n", childrc);
         }
 
-        rc = xwos_thd_create(&xwexitdemo_child1_thdd,
-                             xwexitdemo_joinable_tbd[2].name,
-                             xwexitdemo_joinable_tbd[2].func,
-                             xwexitdemo_joinable_tbd[2].arg,
-                             xwexitdemo_joinable_tbd[2].stack_size,
-                             xwexitdemo_joinable_tbd[2].prio,
-                             xwexitdemo_joinable_tbd[2].attr);
+        rc = xwos_thd_create(&xwexitdemo_child1_thd,
+                             xwexitdemo_joinable_thd_desc[2].name,
+                             xwexitdemo_joinable_thd_desc[2].func,
+                             xwexitdemo_joinable_thd_desc[2].arg,
+                             xwexitdemo_joinable_thd_desc[2].stack_size,
+                             xwexitdemo_joinable_thd_desc[2].prio,
+                             xwexitdemo_joinable_thd_desc[2].attr);
         if (XWOK == rc) {
                 thdexitlogf(INFO, "[Joinable][父线程] sleep(1s) ...\n");
                 time = 1 * XWTM_S;
                 xwos_cthd_sleep(&time);
                 thdexitlogf(INFO, "[Joinable][父线程] cancel(子线程1) ...\n");
-                rc = xwos_thd_cancel(xwexitdemo_child1_thdd);
+                rc = xwos_thd_cancel(xwexitdemo_child1_thd);
                 if (XWOK == rc) {
                         thdexitlogf(INFO, "[Joinable][父线程] join(子线程1) ...\n");
-                        rc = xwos_thd_join(xwexitdemo_child1_thdd, &childrc);
+                        rc = xwos_thd_join(xwexitdemo_child1_thd, &childrc);
                         thdexitlogf(INFO, "[Joinable][父线程] 子线程返回值：%d\n",
                                     childrc);
                 }
         }
 
-        xwos_thd_delete(xwos_cthd_getd());
+        /* 退出前变成分离态，以便系统回收资源 */
+        xwos_thd_detach(xwos_cthd_self());
         return rc;
 }
 

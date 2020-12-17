@@ -91,7 +91,7 @@ xwer_t w25qrpt_start(struct w25qrpt * w25qrpt,
                 goto err_hwifal_open;
         }
 
-        rc = xwos_thd_create(&w25qrpt->thdd,
+        rc = xwos_thd_create(&w25qrpt->thd,
                              w25qrpt_tbd.name,
                              w25qrpt_tbd.func,
                              w25qrpt,
@@ -120,7 +120,7 @@ xwer_t w25qrpt_stop(struct w25qrpt * w25qrpt)
 
         XWOS_VALIDATE((w25qrpt), "nullptr", -EFAULT);
 
-        rc = xwos_thd_stop(w25qrpt->thdd, &childrc);
+        rc = xwos_thd_stop(w25qrpt->thd, &childrc);
         w25qrpt_hwifal_close(w25qrpt);
         return rc;
 }

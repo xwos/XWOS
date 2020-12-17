@@ -86,18 +86,18 @@ static
 void brdpm_eirq_btn_isr(struct xwds_soc * soc, xwid_t id, xwds_eirq_arg_t arg);
 
 static
-xwer_t brdpm_thd(void * arg);
+xwer_t brdpm_task(void * arg);
 
-const struct xwos_thd_desc brdpm_thd_td = {
+const struct xwos_thd_desc brdpm_thd_desc = {
         .name = "bm.pm.thd",
         .prio = BRDPM_THD_PRIORITY,
         .stack = XWOS_THD_STACK_DYNAMIC,
         .stack_size = 2048,
-        .func = (xwos_thd_f)brdpm_thd,
+        .func = brdpm_task,
         .arg = NULL,
-        .attr = XWOS_SKDATTR_PRIVILEGED,
+        .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
 };
-xwos_thd_d brdpm_thdd;
+struct xwos_thd * brdpm_thd;
 
 struct xwos_sem brdpm_sem;
 
@@ -116,13 +116,13 @@ xwer_t brdpm_start(void)
                 goto err_sem_init;
         }
 
-        rc = xwos_thd_create(&brdpm_thdd,
-                             brdpm_thd_td.name,
-                             brdpm_thd_td.func,
-                             brdpm_thd_td.arg,
-                             brdpm_thd_td.stack_size,
-                             brdpm_thd_td.prio,
-                             brdpm_thd_td.attr);
+        rc = xwos_thd_create(&brdpm_thd,
+                             brdpm_thd_desc.name,
+                             brdpm_thd_desc.func,
+                             brdpm_thd_desc.arg,
+                             brdpm_thd_desc.stack_size,
+                             brdpm_thd_desc.prio,
+                             brdpm_thd_desc.attr);
         if (rc < 0) {
                 goto err_thd_create;
         }
@@ -136,9 +136,9 @@ err_sem_init:
 
 xwer_t brdpm_stop(void)
 {
-        xwer_t rc, trc;
+        xwer_t rc;
 
-        rc = xwos_thd_stop(brdpm_thdd, &trc);
+        rc = xwos_thd_cancel(brdpm_thd);
         xwos_sem_destroy(&brdpm_sem);
         return rc;
 }
@@ -336,7 +336,7 @@ void brdpm_handle_evt(xwsq_t evt)
 }
 
 static
-xwer_t brdpm_thd(void * arg)
+xwer_t brdpm_task(void * arg)
 {
         xwer_t rc;
         xwsq_t evt;

@@ -33,13 +33,13 @@ xwer_t xwosdl_br_destroy(struct xwosdl_br * br)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_br_create(struct xwosdl_br ** brp)
+xwer_t xwosdl_br_create(struct xwosdl_br ** brbuf)
 {
         xwer_t rc;
 
-        if (NULL != brp) {
-                *brp = NULL;
-                rc = xwup_evt_create(brp, NULL, XWUP_EVT_TYPE_BR);
+        if (NULL != brbuf) {
+                *brbuf = NULL;
+                rc = xwup_evt_create(brbuf, NULL, XWUP_EVT_TYPE_BR);
         } else {
                 rc = -EFAULT;
         }
@@ -50,6 +50,43 @@ static __xwcc_inline
 xwer_t xwosdl_br_delete(struct xwosdl_br * br)
 {
         return xwup_evt_delete(br);
+}
+
+static __xwcc_inline
+xwsq_t xwosdl_br_gettik(struct xwosdl_br * br)
+{
+        XWOS_UNUSED(br);
+        return 0;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_br_acquire(struct xwosdl_br * br, xwsq_t tik)
+{
+        XWOS_UNUSED(br);
+        XWOS_UNUSED(tik);
+        return XWOK;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_br_release(struct xwosdl_br * br, xwsq_t tik)
+{
+        XWOS_UNUSED(br);
+        XWOS_UNUSED(tik);
+        return XWOK;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_br_grab(struct xwosdl_br * br)
+{
+        XWOS_UNUSED(br);
+        return XWOK;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_br_put(struct xwosdl_br * br)
+{
+        XWOS_UNUSED(br);
+        return XWOK;
 }
 
 static __xwcc_inline

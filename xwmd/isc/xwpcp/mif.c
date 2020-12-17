@@ -29,7 +29,7 @@
  * @brief 发送线程的描述
  */
 static __xwmd_rodata
-const struct xwos_thd_desc xwpcp_rxthd_td = {
+const struct xwos_thd_desc xwpcp_rxthd_desc = {
         .name = "xwmd.isc.xwpcp.rxthd",
         .prio = XWPCP_RXTHD_PRIORITY,
         .stack = XWOS_THD_STACK_DYNAMIC,
@@ -43,7 +43,7 @@ const struct xwos_thd_desc xwpcp_rxthd_td = {
  * @brief 发送线程的描述
  */
 static __xwmd_rodata
-const struct xwos_thd_desc xwpcp_txthd_td = {
+const struct xwos_thd_desc xwpcp_txthd_desc = {
         .name = "xwmd.isc.xwpcp.txthd",
         .prio = XWPCP_TXTHD_PRIORITY,
         .stack = XWOS_THD_STACK_DYNAMIC,
@@ -178,24 +178,24 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         }
 
         /* 创建线程 */
-        rc = xwos_thd_create(&xwpcp->rxthdd,
-                              xwpcp_rxthd_td.name,
-                              xwpcp_rxthd_td.func,
+        rc = xwos_thd_create(&xwpcp->rxthd,
+                              xwpcp_rxthd_desc.name,
+                              xwpcp_rxthd_desc.func,
                               xwpcp,
-                              xwpcp_rxthd_td.stack_size,
-                              xwpcp_rxthd_td.prio,
-                              xwpcp_rxthd_td.attr);
+                              xwpcp_rxthd_desc.stack_size,
+                              xwpcp_rxthd_desc.prio,
+                              xwpcp_rxthd_desc.attr);
         if (rc < 0) {
                 goto err_rxthd_create;
         }
 
-        rc = xwos_thd_create(&xwpcp->txthdd,
-                             xwpcp_txthd_td.name,
-                             xwpcp_txthd_td.func,
+        rc = xwos_thd_create(&xwpcp->txthd,
+                             xwpcp_txthd_desc.name,
+                             xwpcp_txthd_desc.func,
                              xwpcp,
-                             xwpcp_txthd_td.stack_size,
-                             xwpcp_txthd_td.prio,
-                             xwpcp_txthd_td.attr);
+                             xwpcp_txthd_desc.stack_size,
+                             xwpcp_txthd_desc.prio,
+                             xwpcp_txthd_desc.attr);
         if (rc < 0) {
                 goto err_txthd_create;
         }
@@ -203,8 +203,9 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         return XWOK;
 
 err_txthd_create:
-        xwos_thd_cancel(xwpcp->rxthdd);
-        xwos_thd_delete(xwpcp->rxthdd);
+        xwos_thd_cancel(xwpcp->rxthd);
+        xwos_thd_detach(xwpcp->rxthd);
+        xwpcp->rxthd = NULL;
 err_rxthd_create:
         xwpcp_hwifal_close(xwpcp);
 err_hwifal_open:
@@ -247,13 +248,15 @@ xwer_t xwpcp_stop(struct xwpcp * xwpcp)
 
         XWPCP_VALIDATE((xwpcp), "nullptr", -EFAULT);
 
-        rc = xwos_thd_stop(xwpcp->txthdd, &childrc);
+        rc = xwos_thd_stop(xwpcp->txthd, &childrc);
         if (XWOK == rc) {
+                xwpcp->txthd = NULL;
                 xwpcplogf(INFO, "Stop XWPCP TX thread... [OK]\n");
         }
 
-        rc = xwos_thd_stop(xwpcp->rxthdd, &childrc);
+        rc = xwos_thd_stop(xwpcp->rxthd, &childrc);
         if (XWOK == rc) {
+                xwpcp->rxthd = NULL;
                 xwpcplogf(INFO, "Stop XWPCP RX thread... [OK]\n");
         }
 

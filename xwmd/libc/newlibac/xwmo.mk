@@ -21,8 +21,8 @@
 include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
-$(eval $(call XwmoReqCfg,XWEMCFG_fs_fatfs))
-$(eval $(call XwmoReqCfg,XWMMCFG_MEMPOOL))
+$(eval $(call XwmoReqCfg,XWEMCFG_fs_fatfs,y))
+$(eval $(call XwmoReqCfg,XWMMCFG_MEMPOOL,y))
 
 XWMO_CSRCS := mif.c mem.c string.c fops.c lock.c
 XWMO_CFLAGS := -Wno-unused-value

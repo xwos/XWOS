@@ -222,8 +222,8 @@ typedef xws64_t (* xwsc_f)(void * /*arg*/, ...); /**< 系统调用 */
 /**
  * @brief 原子变量测试函数指针类型
  */
-typedef bool (* xwaop_tst_f)(const void * /* ov */ ,
-                             void * /* args */);
+typedef xwer_t (* xwaop_tst_f)(const void * /* ov */ ,
+                               void * /* args */);
 
 /**
  * @brief 原子变量操作函数指针类型

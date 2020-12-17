@@ -66,6 +66,18 @@ xwer_t xwmp_synobj_activate(struct xwmp_synobj * synobj, xwobj_gc_f gcfunc)
 }
 
 __xwmp_code
+xwer_t xwmp_synobj_acquire(struct xwmp_synobj * synobj, xwsq_t tik)
+{
+        return xwos_object_acquire(&synobj->xwobj, tik);
+}
+
+__xwmp_code
+xwer_t xwmp_synobj_release(struct xwmp_synobj * synobj, xwsq_t tik)
+{
+        return xwos_object_release(&synobj->xwobj, tik);
+}
+
+__xwmp_code
 xwer_t xwmp_synobj_grab(struct xwmp_synobj * synobj)
 {
         return xwos_object_grab(&synobj->xwobj);

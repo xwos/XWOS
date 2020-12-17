@@ -21,8 +21,8 @@
 include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
-$(eval $(call XwmoReqCfg,XWCDCFG_ds_I2C_MASTER))
-$(eval $(call XwmoReqCfg,XWCDCFG_ds_I2C_PERPHERAL))
+$(eval $(call XwmoReqCfg,XWCDCFG_ds_I2C_MASTER,y))
+$(eval $(call XwmoReqCfg,XWCDCFG_ds_I2C_PERPHERAL,y))
 
 XWMO_CSRCS := device.c
 XWMO_CSRCS += driver.c

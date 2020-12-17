@@ -34,13 +34,13 @@ xwer_t xwosdl_sem_destroy(struct xwosdl_sem * sem)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sem_create(struct xwosdl_sem ** semp, xwssq_t val, xwssq_t max)
+xwer_t xwosdl_sem_create(struct xwosdl_sem ** sembuf, xwssq_t val, xwssq_t max)
 {
         xwer_t rc;
 
-        if (NULL != semp) {
-                *semp = NULL;
-                rc = xwup_rtsem_create(semp, val, max);
+        if (NULL != sembuf) {
+                *sembuf = NULL;
+                rc = xwup_rtsem_create(sembuf, val, max);
         } else {
                 rc = -EFAULT;
         }
@@ -51,6 +51,43 @@ static __xwcc_inline
 xwer_t xwosdl_sem_delete(struct xwosdl_sem * sem)
 {
         return xwup_rtsem_delete(sem);
+}
+
+static __xwcc_inline
+xwsq_t xwosdl_sem_gettik(struct xwosdl_sem * sem)
+{
+        XWOS_UNUSED(sem);
+        return 0;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sem_acquire(struct xwosdl_sem * sem, xwsq_t tik)
+{
+        XWOS_UNUSED(sem);
+        XWOS_UNUSED(tik);
+        return XWOK;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sem_release(struct xwosdl_sem * sem, xwsq_t tik)
+{
+        XWOS_UNUSED(sem);
+        XWOS_UNUSED(tik);
+        return XWOK;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sem_grab(struct xwosdl_sem * sem)
+{
+        XWOS_UNUSED(sem);
+        return XWOK;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sem_put(struct xwosdl_sem * sem)
+{
+        XWOS_UNUSED(sem);
+        return XWOK;
 }
 
 static __xwcc_inline
@@ -133,13 +170,13 @@ xwer_t xwosdl_sem_destroy(struct xwosdl_sem * sem)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sem_create(struct xwosdl_sem ** semp, xwssq_t val, xwssq_t max)
+xwer_t xwosdl_sem_create(struct xwosdl_sem ** sembuf, xwssq_t val, xwssq_t max)
 {
         xwer_t rc;
 
-        if (NULL != semp) {
-                *semp = NULL;
-                rc = xwup_plsem_create(semp, val, max);
+        if (NULL != sembuf) {
+                *sembuf = NULL;
+                rc = xwup_plsem_create(sembuf, val, max);
         } else {
                 rc = -EFAULT;
         }

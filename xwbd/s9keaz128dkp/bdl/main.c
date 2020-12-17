@@ -27,28 +27,28 @@
 static
 xwer_t sys_mgr_thd(void *arg);
 
-const struct xwos_thd_desc sys_mgr_td = {
+const struct xwos_thd_desc sys_mgr_thd_desc = {
         .name = "sys.mgr",
         .prio = SYS_MGR_THD_PRIORITY,
         .stack = NULL,
         .stack_size = 1024,
         .func = sys_mgr_thd,
         .arg = NULL,
-        .attr = XWOS_SKDATTR_PRIVILEGED,
+        .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
 };
-xwos_thd_d sys_mgr_thdd;
+struct xwos_thd * sys_mgr_thd;
 
 xwer_t xwos_main(void)
 {
         xwer_t rc;
 
-        rc = xwos_thd_create(&sys_mgr_thdd,
-                              sys_mgr_td.name,
-                              sys_mgr_td.func,
-                              sys_mgr_td.arg,
-                              sys_mgr_td.stack_size,
-                              sys_mgr_td.prio,
-                              sys_mgr_td.attr);
+        rc = xwos_thd_create(&sys_mgr_thd,
+                              sys_mgr_thd_desc.name,
+                              sys_mgr_thd_desc.func,
+                              sys_mgr_thd_desc.arg,
+                              sys_mgr_thd_desc.stack_size,
+                              sys_mgr_thd_desc.prio,
+                              sys_mgr_thd_desc.attr);
         if (XWOK == rc) {
                 rc = xwos_skd_start_lc();
         }

@@ -80,8 +80,8 @@ xwer_t xwup_thd_stop_unlock_cb(struct xwup_thd * thd);
 #endif /* XWUPCFG_SKD_THD_EXIT */
 
 /**
- * @brief 从线程控制块对象缓存中申请一个对象
- * @return 线程控制块对象的指针
+ * @brief 从线程对象缓存中申请一个对象
+ * @return 线程对象的指针
  */
 static __xwup_code
 struct xwup_thd * xwup_thd_alloc(void)
@@ -100,8 +100,8 @@ struct xwup_thd * xwup_thd_alloc(void)
 }
 
 /**
- * @brief 释放线程控制块对象
- * @param thd: (I) 线程控制块对象的指针
+ * @brief 释放线程对象
+ * @param thd: (I) 线程对象的指针
  */
 static __xwup_code
 void xwup_thd_free(struct xwup_thd * thd)
@@ -159,8 +159,8 @@ xwer_t xwup_thd_stack_free(xwstk_t * stk)
 }
 
 /**
- * @brief 激活线程控制块对象
- * @param thd: (I) 线程控制块对象的指针
+ * @brief 激活线程对象
+ * @param thd: (I) 线程对象的指针
  * @param name: (I) 线程的名字
  * @param mainfunc: (I) 线程函数的指针
  * @param arg: (I) 线程函数的参数
@@ -213,12 +213,13 @@ void xwup_thd_activate(struct xwup_thd * thd,
 
         /* init stack */
         thd->stack.name = name;
+        stack_size = (stack_size + XWMM_ALIGNMENT_MASK) & (~XWMM_ALIGNMENT_MASK);
         thd->stack.size = stack_size;
         thd->stack.base = stack;
 #if defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK)
-        thd->stack.sp = thd->stack.base + (stack_size >> 2);
+        thd->stack.sp = thd->stack.base + (stack_size / sizeof(xwstk_t));
 #elif defined(XWMMCFG_ED_STACK) && (1 == XWMMCFG_ED_STACK)
-        thd->stack.sp = thd->stack.base + (stack_size >> 2) - 1;
+        thd->stack.sp = thd->stack.base + (stack_size / sizeof(xwstk_t)) - 1;
 #elif defined(XWMMCFG_FA_STACK) && (1 == XWMMCFG_FA_STACK)
         thd->stack.sp = thd->stack.base - 1;
 #elif defined(XWMMCFG_EA_STACK) && (1 == XWMMCFG_EA_STACK)
@@ -243,8 +244,8 @@ void xwup_thd_activate(struct xwup_thd * thd,
 }
 
 /**
- * @brief 使得线程控制块对象无效
- * @param thd: (I) 线程控制块对象的指针
+ * @brief 使得线程对象无效
+ * @param thd: (I) 线程对象的指针
  */
 static __xwup_code
 void xwup_thd_deactivate(struct xwup_thd * thd)
@@ -254,7 +255,7 @@ void xwup_thd_deactivate(struct xwup_thd * thd)
 
 /**
  * @brief 加载线程
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @param mainfunc: (I) 线程主函数
  * @param arg: (I) 线程主函数的参数
  */
@@ -278,8 +279,8 @@ void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f mainfunc, void * arg)
 }
 
 /**
- * @brief XWUP API：静态初始化线程控制块对象
- * @param thd: (I) 线程控制块对象的指针
+ * @brief XWUP API：静态初始化线程对象
+ * @param thd: (I) 线程对象的指针
  * @param name: (I) 线程的名字
  * @param mainfunc: (I) 线程函数的指针
  * @param arg: (I) 线程函数的参数
@@ -295,7 +296,7 @@ void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f mainfunc, void * arg)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个 *thd* ，不可重入
  * @note
- * - 静态初始化线程需预先定义线程控制块对象和线程栈数组，通常定义为全局变量；
+ * - 静态初始化线程需预先定义线程对象和线程栈数组，通常定义为全局变量；
  * - 栈数组的首地址与大小，必须要满足CPU的ABI规则，例如ARM，就需要8字节对齐，
  *   因此在定义栈数组时需要__xwcc_aligned(8)来修饰，且大小是8的倍数
  */
@@ -317,8 +318,8 @@ xwer_t xwup_thd_init(struct xwup_thd * thd,
 }
 
 /**
- * @brief XWUP API：销毁线程控制块对象
- * @param thd: (I) 线程控制块对象的指针
+ * @brief XWUP API：销毁线程对象
+ * @param thd: (I) 线程对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -338,7 +339,7 @@ xwer_t xwup_thd_destroy(struct xwup_thd * thd)
 
 /**
  * @brief XWUP API：动态创建线程
- * @param thdpbuf: (O) 指向缓冲区的指针，通过此缓冲区返回线程控制块对象的指针
+ * @param thdpbuf: (O) 指向缓冲区的指针，通过此缓冲区返回线程对象的指针
  * @param name: (I) 线程的名字
  * @param mainfunc: (I) 线程函数的指针
  * @param arg: (I) 线程函数的参数
@@ -394,7 +395,7 @@ err_stack_alloc:
 
 /**
  * @brief XWUP API：删除动态创建线程
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -448,7 +449,7 @@ void xwup_cthd_exit(xwer_t rc)
 
 /**
  * @brief 执行退出线程
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @param rc: (I) 线程的返回值
  */
 __xwup_code
@@ -497,7 +498,7 @@ xwer_t xwup_thd_exit_lic(struct xwup_thd * thd, xwer_t rc)
 #if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
 /**
  * @brief @ref xwup_thd_stop()中使用的回调锁的解锁函数
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  */
@@ -510,7 +511,7 @@ xwer_t xwup_thd_stop_unlock_cb(struct xwup_thd * thd)
 
 /**
  * @brief XWUP API：终止线程并等待它的返回值，最后回收线程资源
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回被终止线程的返回值，
  *                 可为NULL，表示不需要获取返回值
  * @return 错误码
@@ -518,9 +519,9 @@ xwer_t xwup_thd_stop_unlock_cb(struct xwup_thd * thd)
  * @retval -EFAULT: 空指针
  * @retval -EALREADY: 线程在此之前已经退出
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
+ * @retval XWOK: 没有错误
+ * @retval -EINVAL: 线程不是Joinable的
+ * @retval -EPERM: 线程不可stop自己
  * @note
  * - 此函数由父线程调用，用于终止Joinable的子线程，父线程会一直阻塞等待子线程退出，
  *   并获取子线程的返回值，最后释放子线程资源，此函数类似于POSIX线程库
@@ -531,12 +532,18 @@ xwer_t xwup_thd_stop_unlock_cb(struct xwup_thd * thd)
 __xwup_api
 xwer_t xwup_thd_stop(struct xwup_thd * thd, xwer_t * trc)
 {
+        struct xwup_thd * cthd;
         struct xwos_cblk lockcb;
         xwsq_t lkst;
         xwreg_t cpuirq;
         xwer_t rc;
 
         XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
+        cthd = xwup_skd_get_cthd_lc();
+        if (thd == cthd) {
+                rc = -EPERM;
+                goto err_stop_self;
+        }
 
         lockcb.unlock = (xwer_t (*)(void *))xwup_thd_stop_unlock_cb;
         lockcb.lock = NULL;
@@ -566,12 +573,14 @@ xwer_t xwup_thd_stop(struct xwup_thd * thd, xwer_t * trc)
                         xwup_thd_delete(thd);
                 }
         }
+
+err_stop_self:
         return rc;
 }
 
 /**
  * @brief XWUP API：取消线程
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @note
@@ -607,12 +616,13 @@ xwer_t xwup_thd_cancel(struct xwup_thd * thd)
 
 /**
  * @brief XWUP API：等待线程结束并获取它的返回值，最后回收线程资源
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回子线程的返回值，
  *                 可为NULL，表示不需要获取返回值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 线程不是Joinable的
+ * @retval -EPERM: 线程不可join自己
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -627,12 +637,18 @@ xwer_t xwup_thd_cancel(struct xwup_thd * thd)
 __xwup_api
 xwer_t xwup_thd_join(struct xwup_thd * thd, xwer_t * trc)
 {
+        struct xwup_thd * cthd;
         xwsq_t lkst;
         xwreg_t cpuirq;
         xwer_t rc;
 
         XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
 
+        cthd = xwup_skd_get_cthd_lc();
+        if (thd == cthd) {
+                rc = -EPERM;
+                goto err_join_self;
+        }
         xwospl_cpuirq_save_lc(&cpuirq);
         if (XWUP_SKDOBJ_DST_DETACHED & thd->state) {
                 xwospl_cpuirq_restore_lc(cpuirq);
@@ -659,12 +675,14 @@ xwer_t xwup_thd_join(struct xwup_thd * thd, xwer_t * trc)
                         xwup_thd_delete(thd);
                 }
         }
+
+err_join_self:
         return rc;
 }
 
 /**
  * @brief XWUP API：分离线程
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @note
@@ -698,7 +716,7 @@ xwer_t xwup_thd_detach(struct xwup_thd * thd)
 
 /**
  * @brief XWUP API：终止线程并等待它的返回值，最后回收线程资源
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回被终止线程的返回值，
  *                 可为NULL，表示不需要获取返回值
  * @return 错误码
@@ -718,7 +736,7 @@ xwer_t xwup_thd_stop(struct xwup_thd * thd, xwer_t * trc)
 
 /**
  * @brief XWUP API：取消线程
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @return 错误码
  * @retval -ENOSYS: 系统配置为不允许线程退出
  * @note
@@ -735,7 +753,7 @@ xwer_t xwup_thd_cancel(struct xwup_thd * thd)
 
 /**
  * @brief XWUP API：等待线程结束并获取它的返回值，最后回收线程资源
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回子线程的返回值，
  *                 可为NULL，表示不需要获取返回值
  * @return 错误码
@@ -755,7 +773,7 @@ xwer_t xwup_thd_join(struct xwup_thd * thd, xwer_t * trc)
 
 /**
  * @brief XWUP API：分离线程
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @return 错误码
  * @retval -ENOSYS: 系统配置为不允许线程退出
  * @note
@@ -774,7 +792,7 @@ xwer_t xwup_thd_detach(struct xwup_thd * thd)
 #if defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)
 /**
  * @brief 改变线程的动态优先级一次
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @param dprio: (I) 动态优先级
  * @param pmtx: (O) 指向缓冲区的指针，通过此缓冲区返回互斥锁对象的指针
  * @return 错误码
@@ -827,7 +845,7 @@ void xwup_thd_chprio_once(struct xwup_thd * thd, xwpr_t dprio,
 
 /**
  * @brief 重新设定线程的动态优先级
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  */
 __xwup_code
 void xwup_thd_chprio(struct xwup_thd * thd)
@@ -844,7 +862,7 @@ void xwup_thd_chprio(struct xwup_thd * thd)
 
 /**
  * @brief 将线程加入到调度器就绪队列的头部
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @param prio: (I) 动态优先级
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -871,7 +889,7 @@ xwer_t xwup_thd_rq_add_head(struct xwup_thd * thd)
 
 /**
  * @brief 将线程加入到调度器就绪队列的尾部
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @param prio: (I) 动态优先级
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -898,7 +916,7 @@ xwer_t xwup_thd_rq_add_tail(struct xwup_thd * thd)
 
 /**
  * @brief 将线程从就绪队列中删除
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ESRCH: 没有这个线程
@@ -917,7 +935,7 @@ void xwup_thd_rq_remove(struct xwup_thd * thd)
 
 /**
  * @brief XWUP API：中断线程的睡眠或阻塞状态
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EPERM: 线程不可被中断
@@ -1021,7 +1039,7 @@ xwer_t xwup_thd_intr(struct xwup_thd * thd)
 
 /**
  * @brief 线程的时间树节点回调函数
- * @param entry: (I) 线程控制块对象的地址
+ * @param entry: (I) 线程对象的地址
  */
 __xwup_code
 void xwup_thd_ttn_callback(void * entry)
@@ -1038,7 +1056,7 @@ void xwup_thd_ttn_callback(void * entry)
 
 /**
  * @brief 将线程加入到时间树上
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @param xwtt: (I) 时间树的指针
  * @param expected: (I) 期望被唤醒的时间
  * @param cpuirq: (I) 本地CPU的中断标志
@@ -1063,7 +1081,7 @@ xwer_t xwup_thd_tt_add_locked(struct xwup_thd * thd, struct xwup_tt * xwtt,
 
 /**
  * @brief 线程的等待队列节点回调函数
- * @param entry: (I) 线程控制块对象的地址
+ * @param entry: (I) 线程对象的地址
  */
 __xwup_code
 void xwup_thd_wqn_callback(void * entry)
@@ -1083,7 +1101,7 @@ void xwup_thd_wqn_callback(void * entry)
 #if (1 == XWUPRULE_SKD_WQ_RT)
 /**
  * @brief 将线程加入到实时（红黑树）等待队列中
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @param xwrtwq: (I) 实时（红黑树）等待队列
  * @param type: (I) 等待队列的类型
  */
@@ -1102,7 +1120,7 @@ void xwup_thd_eq_rtwq(struct xwup_thd * thd, struct xwup_rtwq * xwrtwq,
 #if (1 == XWUPRULE_SKD_WQ_PL)
 /**
  * @brief 将线程加入到管道（双循环链表）等待队列中
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @param xwplwq: (I) 管道（双循环链表）等待队列
  * @param type: (I) 等待队列的类型
  */
@@ -1335,7 +1353,7 @@ xwer_t xwup_cthd_sleep(xwtm_t * xwtm)
 }
 
 /**
- * @brief XWUP API：线程睡眠到指定的系统时间
+ * @brief XWUP API：当前线程从一个时间起点睡眠到另一个时间点
  * @param origin: 指向缓冲区的指针，此缓冲区：
  *                (I) 作为输入时，作为时间起点
  *                (O) 作为输出时，返回线程被唤醒的时间
@@ -1432,7 +1450,7 @@ xwer_t xwup_cthd_freeze(void)
 
 /**
  * @brief 冻结线程
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @return 错误码
  * @note
  * - 此函数只能在中断上下文中调用并且这个中断只能由@ref xwup_cthd_freeze()触发。
@@ -1468,7 +1486,7 @@ xwer_t xwup_thd_freeze_lic(struct xwup_thd * thd)
 
 /**
  * @brief 解冻线程
- * @param thd: (I) 线程控制块对象的指针
+ * @param thd: (I) 线程对象的指针
  * @return 错误码
  */
 __xwup_code
@@ -1602,7 +1620,7 @@ bool xwup_cthd_frz_shld_stop(bool * frozen)
 #if defined(XWUPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWUPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
 /**
  * @brief XWUP API：设置线程的本地数据指针
- * @param thd: (I) 线程控制块的指针
+ * @param thd: (I) 线程对象的指针
  * @param pos: (I) 数据存放位置的索引
  * @param data: (I) 数据指针
  * @return 错误码
@@ -1632,7 +1650,7 @@ xwer_t xwup_thd_set_data(struct xwup_thd * thd, xwsq_t pos, void * data)
 
 /**
  * @brief XWUP API：获取线程的本地数据指针
- * @param thd: (I) 线程控制块的指针
+ * @param thd: (I) 线程对象的指针
  * @param pos: (I) 数据存放位置的索引
  * @param databuf: (O) 指向缓冲区的指针，通过此缓冲区返回数据指针
  * @return 错误码

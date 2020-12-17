@@ -32,7 +32,7 @@ extern __xwmd_rodata const xwer_t xwscp_callback_rc[XWSCP_ACK_NUM];
  * @brief 接收线程的描述
  */
 static __xwmd_rodata
-const struct xwos_thd_desc xwscp_thd_td = {
+const struct xwos_thd_desc xwscp_thd_desc = {
         .name = "xwmd.isc.xwscp.thd",
         .prio = XWSCP_THD_PRIORITY,
         .stack = XWOS_THD_STACK_DYNAMIC,
@@ -137,13 +137,13 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
         }
 
         /* 创建线程 */
-        rc = xwos_thd_create(&xwscp->thdd,
-                             xwscp_thd_td.name,
-                             xwscp_thd_td.func,
+        rc = xwos_thd_create(&xwscp->thd,
+                             xwscp_thd_desc.name,
+                             xwscp_thd_desc.func,
                              xwscp,
-                             xwscp_thd_td.stack_size,
-                             xwscp_thd_td.prio,
-                             xwscp_thd_td.attr);
+                             xwscp_thd_desc.stack_size,
+                             xwscp_thd_desc.prio,
+                             xwscp_thd_desc.attr);
         if (rc < 0) {
                 goto err_thd_create;
         }
@@ -178,7 +178,7 @@ xwer_t xwscp_stop(struct xwscp * xwscp)
 
         XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
 
-        rc = xwos_thd_stop(xwscp->thdd, &childrc);
+        rc = xwos_thd_stop(xwscp->thd, &childrc);
         if (XWOK == rc) {
                 xwscplogf(INFO, "Stop XWSCP thread... [OK]\n");
         }

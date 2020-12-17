@@ -132,7 +132,7 @@ void xwup_mtx_deactivate(struct xwup_mtx * mtx)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *mtx* ，不可重入
+ * - 重入性：对于同一个互斥锁对象，不可重入
  */
 __xwup_api
 xwer_t xwup_mtx_init(struct xwup_mtx * mtx, xwpr_t sprio)
@@ -154,7 +154,7 @@ xwer_t xwup_mtx_init(struct xwup_mtx * mtx, xwpr_t sprio)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *mtx* ，不可重入
+ * - 重入性：对于同一个互斥锁对象，不可重入
  */
 __xwup_api
 xwer_t xwup_mtx_destroy(struct xwup_mtx * mtx)
@@ -210,7 +210,7 @@ xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *mtx* ，不可重入
+ * - 重入性：对于同一个互斥锁对象，不可重入
  */
 __xwup_api
 xwer_t xwup_mtx_delete(struct xwup_mtx * mtx)

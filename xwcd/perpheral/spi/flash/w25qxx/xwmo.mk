@@ -21,8 +21,8 @@
 include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
-$(eval $(call XwmoReqCfg,XWCDCFG_ds_SPI_MASTER))
-$(eval $(call XwmoReqCfg,XWCDCFG_ds_SPI_PERPHERAL))
+$(eval $(call XwmoReqCfg,XWCDCFG_ds_SPI_MASTER,y))
+$(eval $(call XwmoReqCfg,XWCDCFG_ds_SPI_PERPHERAL,y))
 
 XWMO_CSRCS := device.c driver.c
 XWMO_CSRCS += chip/w25q64jv.c

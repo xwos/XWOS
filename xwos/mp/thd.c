@@ -18,7 +18,7 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_SKD_THD_MEMSLICE) && (1 == XWMPCFG_SKD_THD_MEMSLICE)
-#include <xwos/mm/memslice.h>
+  #include <xwos/mm/memslice.h>
 #endif /* XWMPCFG_SKD_THD_MEMSLICE */
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
@@ -259,42 +259,68 @@ xwer_t xwmp_thd_gc(void * thd)
 }
 
 /**
- * @brief 增加对象的引用计数
+ * @brief XWMP API：检查线程对象的标签并增加引用计数
+ * @param thd: (I) 线程对象指针
+ * @param tik: (I) 标签
+ * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwmp_api
+xwer_t xwmp_thd_acquire(struct xwmp_thd * thd, xwsq_t tik)
+{
+        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
+        return xwos_object_acquire(&thd->xwobj, tik);
+}
+
+/**
+ * @brief XWMP API：检查线程对象的标签并增加引用计数
+ * @param thd: (I) 线程对象指针
+ * @param tik: (I) 标签
+ * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwmp_api
+xwer_t xwmp_thd_release(struct xwmp_thd * thd, xwsq_t tik)
+{
+        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
+        return xwos_object_release(&thd->xwobj, tik);
+}
+
+/**
+ * @brief XWMP API：增加对象的引用计数
  * @param thd: (I) 线程对象指针
  * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
-__xwmp_code
+__xwmp_api
 xwer_t xwmp_thd_grab(struct xwmp_thd * thd)
 {
+        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
         return xwos_object_grab(&thd->xwobj);
 }
 
 /**
- * @brief 增加对象的引用计数
+ * @brief XWMP API：减少对象的引用计数
  * @param thd: (I) 线程对象指针
  * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
-__xwmp_code
-xwer_t xwmp_thd_grab_safely(xwmp_thd_d thdd)
-{
-        xwer_t rc;
-
-        if ((NULL == thdd.thd) || (thdd.ticket != thdd.thd->xwobj.ticket)) {
-                rc = -EPERM;
-        } else {
-                rc = xwmp_thd_grab(thdd.thd);
-        }
-        return rc;
-}
-
-/**
- * @brief 减少对象的引用计数
- * @param thd: (I) 线程对象指针
- * @return 错误码
- */
-__xwmp_code
+__xwmp_api
 xwer_t xwmp_thd_put(struct xwmp_thd * thd)
 {
+        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
         return xwos_object_put(&thd->xwobj);
 }
 
@@ -371,12 +397,13 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
         thd->dprio.wq = XWMP_SKD_PRIORITY_INVALID;
 
         thd->stack.name = name;
+        stack_size = (stack_size + XWMM_ALIGNMENT_MASK) & (~XWMM_ALIGNMENT_MASK);
         thd->stack.size = stack_size;
         thd->stack.base = stack;
 #if (defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK))
-        thd->stack.sp = thd->stack.base + (stack_size >> 2);
+        thd->stack.sp = thd->stack.base + (stack_size / sizeof(xwstk_t));
 #elif (defined(XWMMCFG_ED_STACK) && (1 == XWMMCFG_ED_STACK))
-        thd->stack.sp = thd->stack.base + (stack_size >> 2) - 1;
+        thd->stack.sp = thd->stack.base + (stack_size / sizeof(xwstk_t)) - 1;
 #elif (defined(XWMMCFG_FA_STACK) && (1 == XWMMCFG_FA_STACK))
         thd->stack.sp = thd->stack.base - 1;
 #elif (defined(XWMMCFG_EA_STACK) && (1 == XWMMCFG_EA_STACK))
@@ -683,6 +710,8 @@ xwer_t xwmp_thd_stop_unlock_cb(struct xwmp_thd * thd)
  *                 可为NULL，表示不需要获取返回值
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -EINVAL: 线程不是Joinable的
+ * @retval -EPERM: 线程不可stop自己
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -697,6 +726,7 @@ xwer_t xwmp_thd_stop_unlock_cb(struct xwmp_thd * thd)
 __xwmp_api
 xwer_t xwmp_thd_stop(struct xwmp_thd * thd, xwer_t * trc)
 {
+        struct xwmp_thd * cthd;
         struct xwos_cblk lockcb;
         xwsq_t lkst;
         xwreg_t cpuirq;
@@ -704,6 +734,11 @@ xwer_t xwmp_thd_stop(struct xwmp_thd * thd, xwer_t * trc)
 
         XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
 
+        cthd = xwmp_skd_get_cthd_lc();
+        if (thd == cthd) {
+                rc = -EPERM;
+                goto err_stop_self;
+        }
         rc = xwmp_thd_grab(thd);
         if (rc < 0) {
                 goto err_thd_grab;
@@ -744,6 +779,7 @@ xwer_t xwmp_thd_stop(struct xwmp_thd * thd, xwer_t * trc)
         }
 
 err_thd_grab:
+err_stop_self:
         return rc;
 }
 
@@ -797,6 +833,7 @@ err_thd_grab:
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 线程不是Joinable的
+ * @retval -EPERM: 线程不可join自己
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -811,12 +848,18 @@ err_thd_grab:
 __xwmp_api
 xwer_t xwmp_thd_join(struct xwmp_thd * thd, xwer_t * trc)
 {
+        struct xwmp_thd * cthd;
         xwsq_t lkst;
         xwreg_t cpuirq;
         xwer_t rc;
 
         XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
 
+        cthd = xwmp_skd_get_cthd_lc();
+        if (thd == cthd) {
+                rc = -EPERM;
+                goto err_join_self;
+        }
         rc = xwmp_thd_grab(thd);
         if (rc < 0) {
                 goto err_thd_grab;
@@ -855,6 +898,7 @@ xwer_t xwmp_thd_join(struct xwmp_thd * thd, xwer_t * trc)
         }
 
 err_thd_grab:
+err_join_self:
         return rc;
 }
 
@@ -1618,7 +1662,7 @@ err_xwtm:
 }
 
 /**
- * @brief XWMP API：线程睡眠到指定的系统时间
+ * @brief XWMP API：当前线程从一个时间起点睡眠到另一个时间点
  * @param origin: 指向缓冲区的指针，此缓冲区：
  *                (I) 作为输入时，作为时间起点
  *                (O) 作为输出时，返回线程被唤醒的时间
@@ -1703,7 +1747,7 @@ err_needfrz:
 
 /**
  * @brief 申请冻结当前CPU中的线程
- * @param thd: (I) 线程控制块
+ * @param thd: (I) 线程对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EALREADY: 线程已经被冻结
@@ -2043,7 +2087,7 @@ void xwmp_thd_outmigrate_frozen_lic(struct xwmp_thd * thd)
 
 /**
  * @brief 申请冻结线程，以便将线程从本地CPU迁移到另一个CPU
- * @param thd: (I) 线程控制块
+ * @param thd: (I) 线程对象的指针
  * @param dstcpu: (I) 目标CPU的ID
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -2094,7 +2138,7 @@ xwer_t xwmp_thd_outmigrate_reqfrz_lic(struct xwmp_thd * thd, xwid_t dstcpu)
 
 /**
  * @brief 从本地CPU中移出线程，并准备迁移入目标CPU
- * @param thd: (I) 线程控制块的指针
+ * @param thd: (I) 线程对象的指针
  * @param dstcpu: (I) 目标CPU的ID
  * @return 错误码
  * @note
@@ -2116,7 +2160,7 @@ xwer_t xwmp_thd_outmigrate_lic(struct xwmp_thd * thd, xwid_t dstcpu)
 
 /**
  * @brief XWMP API：迁移线程到其他CPU
- * @param thd: (I) 线程控制块的指针
+ * @param thd: (I) 线程对象的指针
  * @param dstcpu: (I) 目标CPU的ID
  * @return 错误码
  * @note
@@ -2157,7 +2201,7 @@ err_badcpuid:
 #if defined(XWMPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWMPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
 /**
  * @brief XWMP API：设置线程的本地数据指针
- * @param thd: (I) 线程控制块的指针
+ * @param thd: (I) 线程对象的指针
  * @param pos: (I) 数据存放位置的索引
  * @param data: (I) 数据指针
  * @return 错误码
@@ -2187,7 +2231,7 @@ xwer_t xwmp_thd_set_data(struct xwmp_thd * thd, xwsq_t pos, void * data)
 
 /**
  * @brief XWMP API：获取线程的本地数据指针
- * @param thd: (I) 线程控制块的指针
+ * @param thd: (I) 线程对象的指针
  * @param pos: (I) 数据存放位置的索引
  * @param databuf: (O) 指向缓冲区的指针，通过此缓冲区返回数据指针
  * @return 错误码

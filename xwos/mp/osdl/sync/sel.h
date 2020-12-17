@@ -33,13 +33,13 @@ xwer_t xwosdl_sel_destroy(struct xwosdl_sel * sel)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sel_create(struct xwosdl_sel ** selp)
+xwer_t xwosdl_sel_create(struct xwosdl_sel ** selbuf)
 {
         xwer_t rc;
 
-        if (NULL != selp) {
-                *selp = NULL;
-                rc = xwmp_evt_create(selp, NULL, XWMP_EVT_TYPE_SEL);
+        if (NULL != selbuf) {
+                *selbuf = NULL;
+                rc = xwmp_evt_create(selbuf, NULL, XWMP_EVT_TYPE_SEL);
         } else {
                 rc = -EFAULT;
         }
@@ -50,6 +50,43 @@ static __xwcc_inline
 xwer_t xwosdl_sel_delete(struct xwosdl_sel * sel)
 {
         return xwmp_evt_delete(sel);
+}
+
+static __xwcc_inline
+xwsq_t xwosdl_sel_gettik(struct xwosdl_sel * sel)
+{
+        xwsq_t tik;
+
+        if (sel) {
+                tik = sel->cond.synobj.xwobj.tik;
+        } else {
+                tik = 0;
+        }
+        return tik;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sel_acquire(struct xwosdl_sel * sel, xwsq_t tik)
+{
+        return xwmp_evt_acquire(sel, tik);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sel_release(struct xwosdl_sel * sel, xwsq_t tik)
+{
+        return xwmp_evt_release(sel, tik);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sel_grab(struct xwosdl_sel * sel)
+{
+        return xwmp_evt_grab(sel);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sel_put(struct xwosdl_sel * sel)
+{
+        return xwmp_evt_put(sel);
 }
 
 static __xwcc_inline

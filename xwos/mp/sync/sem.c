@@ -21,7 +21,7 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_SYNC_SEM_MEMSLICE) && (1 == XWMPCFG_SYNC_SEM_MEMSLICE)
-#include <xwos/mm/memslice.h>
+  #include <xwos/mm/memslice.h>
 #endif /* XWMPCFG_SYNC_SEM_MEMSLICE */
 #include <xwos/ospl/irq.h>
 #include <xwos/mp/skd.h>
@@ -33,7 +33,7 @@
 #include <xwos/mp/lock/seqlock.h>
 #include <xwos/mp/lock/mtx.h>
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
-#include <xwos/mp/sync/evt.h>
+  #include <xwos/mp/sync/evt.h>
 #endif /* XWMPCFG_SYNC_EVT */
 #include <xwos/mp/sync/obj.h>
 #include <xwos/mp/sync/sem.h>
@@ -55,6 +55,12 @@ struct xwmp_sem * xwmp_sem_alloc(void);
 
 static __xwmp_code
 void xwmp_sem_free(struct xwmp_sem * sem);
+
+static __xwmp_code
+void xwmp_sem_construct(struct xwmp_sem * sem);
+
+static __xwmp_code
+void xwmp_sem_destruct(struct xwmp_sem * sem);
 
 static __xwmp_code
 xwer_t xwmp_sem_gc(void * sem);
@@ -191,7 +197,7 @@ void xwmp_sem_free(struct xwmp_sem * sem)
  * @brief 信号量对象的构造函数
  * @param sem: (I) 信号量对象的指针
  */
-__xwmp_code
+static __xwmp_code
 void xwmp_sem_construct(struct xwmp_sem * sem)
 {
         xwmp_synobj_construct(&sem->synobj);
@@ -201,7 +207,7 @@ void xwmp_sem_construct(struct xwmp_sem * sem)
  * @brief 信号量对象的析构函数
  * @param sem: (I) 信号量对象的指针
  */
-__xwmp_code
+static __xwmp_code
 void xwmp_sem_destruct(struct xwmp_sem * sem)
 {
         xwmp_synobj_destruct(&sem->synobj);
@@ -220,24 +226,68 @@ xwer_t xwmp_sem_gc(void * sem)
 }
 
 /**
- * @brief 增加对象的引用计数
+ * @brief XWMP API：检查信号量对象的标签并增加引用计数
+ * @param sem: (I) 信号量对象指针
+ * @param tik: (I) 标签
+ * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwmp_api
+xwer_t xwmp_sem_acquire(struct xwmp_sem * sem, xwsq_t tik)
+{
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        return xwmp_synobj_acquire(&sem->synobj, tik);
+}
+
+/**
+ * @brief XWMP API：检查信号量对象的标签并增加引用计数
+ * @param sem: (I) 信号量对象指针
+ * @param tik: (I) 标签
+ * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwmp_api
+xwer_t xwmp_sem_release(struct xwmp_sem * sem, xwsq_t tik)
+{
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        return xwmp_synobj_release(&sem->synobj, tik);
+}
+
+/**
+ * @brief XWMP API：增加信号量对象的引用计数
  * @param sem: (I) 信号量对象指针
  * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
-__xwcc_inline
+__xwmp_api
 xwer_t xwmp_sem_grab(struct xwmp_sem * sem)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         return xwmp_synobj_grab(&sem->synobj);
 }
 
 /**
- * @brief 减少对象的引用计数
+ * @brief XWMP API：减少信号量对象的引用计数
  * @param sem: (I) 信号量对象指针
  * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
-__xwcc_inline
+__xwmp_api
 xwer_t xwmp_sem_put(struct xwmp_sem * sem)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         return xwmp_synobj_put(&sem->synobj);
 }
 
@@ -303,13 +353,12 @@ xwer_t xwmp_sem_create(struct xwmp_sem ** ptrbuf, xwid_t type,
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 __xwmp_api
 xwer_t xwmp_sem_delete(struct xwmp_sem * sem)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-
         return xwmp_sem_put(sem);
 }
 
@@ -322,13 +371,12 @@ xwer_t xwmp_sem_delete(struct xwmp_sem * sem)
  * @note
  * - 同步/异步：异步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 __xwmp_api
 xwer_t xwmp_sem_destroy(struct xwmp_sem * sem)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-
         return xwmp_sem_put(sem);
 }
 
@@ -348,7 +396,7 @@ xwer_t xwmp_sem_destroy(struct xwmp_sem * sem)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 __xwmp_api
 xwer_t xwmp_sem_bind(struct xwmp_sem * sem, struct xwmp_evt * evt, xwsq_t pos)
@@ -399,7 +447,7 @@ xwer_t xwmp_sem_bind(struct xwmp_sem * sem, struct xwmp_evt * evt, xwsq_t pos)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 __xwmp_api
 xwer_t xwmp_sem_unbind(struct xwmp_sem * sem, struct xwmp_evt * evt)
@@ -452,7 +500,7 @@ xwer_t xwmp_sem_unbind(struct xwmp_sem * sem, struct xwmp_evt * evt)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 static __xwmp_code
 xwer_t xwmp_plsem_activate(struct xwmp_sem * sem, xwssq_t val, xwssq_t max,
@@ -485,7 +533,7 @@ xwer_t xwmp_plsem_activate(struct xwmp_sem * sem, xwssq_t val, xwssq_t max,
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 __xwmp_api
 xwer_t xwmp_plsem_init(struct xwmp_sem * sem, xwssq_t val, xwssq_t max)
@@ -663,6 +711,7 @@ xwer_t xwmp_plsem_post(struct xwmp_sem * sem)
                 xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
                 if (sem->count < 0) {
                         xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
+                        xwmp_sem_put(sem);
                         rc = -ENEGATIVE;
                 } else {
                         wqn = xwmp_plwq_choose_locked(&sem->wq.pl);
@@ -1149,7 +1198,7 @@ xwer_t xwmp_plsem_wait_unintr(struct xwmp_sem * sem)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 static __xwmp_code
 xwer_t xwmp_rtsem_activate(struct xwmp_sem * sem, xwssq_t val, xwssq_t max,
@@ -1182,7 +1231,7 @@ xwer_t xwmp_rtsem_activate(struct xwmp_sem * sem, xwssq_t val, xwssq_t max,
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 __xwmp_api
 xwer_t xwmp_rtsem_init(struct xwmp_sem * sem, xwssq_t val, xwssq_t max)
@@ -1206,7 +1255,7 @@ xwer_t xwmp_rtsem_init(struct xwmp_sem * sem, xwssq_t val, xwssq_t max)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  * @note
  * - 已冻结的信号量不允许增加(V操作)，但可以被测试(P操作)，
  *   测试信号量的线程会被加入到信号量的等待队列。
@@ -1362,6 +1411,7 @@ xwer_t xwmp_rtsem_post(struct xwmp_sem * sem)
                 xwmp_rtwq_lock_cpuirqsv(&sem->wq.rt, &cpuirq);
                 if (__xwcc_unlikely(sem->count < 0)) {
                         xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
+                        xwmp_sem_put(sem);
                         rc = -ENEGATIVE;
                 } else {
                         wqn = xwmp_rtwq_choose_locked(&sem->wq.rt);

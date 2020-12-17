@@ -45,7 +45,7 @@ xwer_t xwmtxdemo_thd_1_func(void * arg);
 /**
  * @brief 动态创建的线程描述表
  */
-const struct xwos_thd_desc xwmtxdemo_tbd[] = {
+const struct xwos_thd_desc xwmtxdemo_thd_desc[] = {
         [0] = {
                 .name = "xwmtxdemo.thd.0",
                 .prio = XWMTXDEMO_THD_0_PRIORITY,
@@ -65,7 +65,7 @@ const struct xwos_thd_desc xwmtxdemo_tbd[] = {
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
-xwos_thd_d xwmtxdemo_thdd[xw_array_size(xwmtxdemo_tbd)];
+struct xwos_thd * xwmtxdemo_thd[xw_array_size(xwmtxdemo_thd_desc)];
 
 struct xwos_mtx * xwmtxdemo_mtx;
 xwsq_t xwmtxdemo_shared_count = 0;
@@ -83,14 +83,14 @@ xwer_t example_mtx_start(void)
                 goto err_mtx_create;
         }
 
-        for (i = 0; i < xw_array_size(xwmtxdemo_tbd); i++) {
-                rc = xwos_thd_create(&xwmtxdemo_thdd[i],
-                                     xwmtxdemo_tbd[i].name,
-                                     xwmtxdemo_tbd[i].func,
-                                     xwmtxdemo_tbd[i].arg,
-                                     xwmtxdemo_tbd[i].stack_size,
-                                     xwmtxdemo_tbd[i].prio,
-                                     xwmtxdemo_tbd[i].attr);
+        for (i = 0; i < xw_array_size(xwmtxdemo_thd_desc); i++) {
+                rc = xwos_thd_create(&xwmtxdemo_thd[i],
+                                     xwmtxdemo_thd_desc[i].name,
+                                     xwmtxdemo_thd_desc[i].func,
+                                     xwmtxdemo_thd_desc[i].arg,
+                                     xwmtxdemo_thd_desc[i].stack_size,
+                                     xwmtxdemo_thd_desc[i].prio,
+                                     xwmtxdemo_thd_desc[i].attr);
                 if (rc < 0) {
                         goto err_thd_create;
                 }
@@ -129,7 +129,7 @@ xwer_t xwmtxdemo_thd_0_func(void * arg)
                 }
         }
         mtxlogf(INFO, "[线程0] 退出。\n");
-        xwos_thd_delete(xwos_cthd_getd());
+        xwos_thd_detach(xwos_cthd_self());
         return rc;
 }
 
@@ -158,6 +158,6 @@ xwer_t xwmtxdemo_thd_1_func(void * arg)
                 }
         }
         mtxlogf(INFO, "[线程1] 退出。\n");
-        xwos_thd_delete(xwos_cthd_getd());
+        xwos_thd_detach(xwos_cthd_self());
         return rc;
 }

@@ -44,7 +44,7 @@ xwer_t xwflgdemo_producer_func(void * arg);
 
 struct xwos_flg xwsltdemo_flg;
 
-const struct xwos_thd_desc xwflgdemo_consumer_td = {
+const struct xwos_thd_desc xwflgdemo_consumer_thd_desc = {
         .name = "example.flag.consumer",
         .prio = XWFLGDEMO_CONSUMER_PRIORITY,
         .stack = XWOS_THD_STACK_DYNAMIC,
@@ -53,9 +53,9 @@ const struct xwos_thd_desc xwflgdemo_consumer_td = {
         .arg = NULL,
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
-xwos_thd_d xwflgdemo_consumer;
+struct xwos_thd * xwflgdemo_consumer;
 
-const struct xwos_thd_desc xwflgdemo_producer_td = {
+const struct xwos_thd_desc xwflgdemo_producer_thd_desc = {
         .name = "example.flag.producer",
         .prio = XWFLGDEMO_PRODUCER_PRIORITY,
         .stack = XWOS_THD_STACK_DYNAMIC,
@@ -64,7 +64,7 @@ const struct xwos_thd_desc xwflgdemo_producer_td = {
         .arg = NULL,
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
-xwos_thd_d xwflgdemo_producer;
+struct xwos_thd * xwflgdemo_producer;
 
 /**
  * @brief 测试模块的启动函数
@@ -81,24 +81,24 @@ xwer_t example_flg_start(void)
 
         /* 创建等待事件标志的线程 */
         rc = xwos_thd_create(&xwflgdemo_consumer,
-                             xwflgdemo_consumer_td.name,
-                             xwflgdemo_consumer_td.func,
-                             xwflgdemo_consumer_td.arg,
-                             xwflgdemo_consumer_td.stack_size,
-                             xwflgdemo_consumer_td.prio,
-                             xwflgdemo_consumer_td.attr);
+                             xwflgdemo_consumer_thd_desc.name,
+                             xwflgdemo_consumer_thd_desc.func,
+                             xwflgdemo_consumer_thd_desc.arg,
+                             xwflgdemo_consumer_thd_desc.stack_size,
+                             xwflgdemo_consumer_thd_desc.prio,
+                             xwflgdemo_consumer_thd_desc.attr);
         if (rc < 0) {
                 goto err_consumer_create;
         }
 
         /* 创建发布事件标志的线程 */
         rc = xwos_thd_create(&xwflgdemo_producer,
-                             xwflgdemo_producer_td.name,
-                             xwflgdemo_producer_td.func,
-                             xwflgdemo_producer_td.arg,
-                             xwflgdemo_producer_td.stack_size,
-                             xwflgdemo_producer_td.prio,
-                             xwflgdemo_producer_td.attr);
+                             xwflgdemo_producer_thd_desc.name,
+                             xwflgdemo_producer_thd_desc.func,
+                             xwflgdemo_producer_thd_desc.arg,
+                             xwflgdemo_producer_thd_desc.stack_size,
+                             xwflgdemo_producer_thd_desc.prio,
+                             xwflgdemo_producer_thd_desc.attr);
         if (rc < 0) {
                 goto err_producer_create;
         }
@@ -269,7 +269,7 @@ xwer_t xwflgdemo_consumer_func(void * arg)
         }
 
         flglogf(INFO, "[等待线程] 退出。\n");
-        xwos_thd_delete(xwos_cthd_getd());
+        xwos_thd_detach(xwos_cthd_self());
         return rc;
 }
 
@@ -414,6 +414,6 @@ xwer_t xwflgdemo_producer_func(void * arg)
         }
 
         flglogf(INFO, "[触发线程] 退出。\n");
-        xwos_thd_delete(xwos_cthd_getd());
+        xwos_thd_detach(xwos_cthd_self());
         return rc;
 }

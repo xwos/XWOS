@@ -20,7 +20,7 @@
 #include <xwos/up/plwq.h>
 #include <xwos/mm/kma.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-#include <xwos/up/sync/evt.h>
+  #include <xwos/up/sync/evt.h>
 #endif /* XWUPCFG_SYNC_EVT */
 #include <xwos/up/sync/plsem.h>
 
@@ -121,7 +121,7 @@ void xwup_plsem_deactivate(struct xwup_plsem * sem)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 __xwup_api
 xwer_t xwup_plsem_init(struct xwup_plsem * sem, xwssq_t val, xwssq_t max)
@@ -143,7 +143,7 @@ xwer_t xwup_plsem_init(struct xwup_plsem * sem, xwssq_t val, xwssq_t max)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 __xwup_api
 xwer_t xwup_plsem_destroy(struct xwup_plsem * sem)
@@ -201,7 +201,7 @@ xwer_t xwup_plsem_create(struct xwup_plsem ** ptrbuf, xwssq_t val, xwssq_t max)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 __xwup_api
 xwer_t xwup_plsem_delete(struct xwup_plsem * sem)
@@ -230,7 +230,7 @@ xwer_t xwup_plsem_delete(struct xwup_plsem * sem)
  * @note
  * - 同步/异步：异步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 __xwup_api
 xwer_t xwup_plsem_bind(struct xwup_plsem * sem, struct xwup_evt * evt,
@@ -255,7 +255,7 @@ xwer_t xwup_plsem_bind(struct xwup_plsem * sem, struct xwup_evt * evt,
  * @note
  * - 同步/异步：异步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *sem* ，不可重入
+ * - 重入性：对于同一个信号量对象，不可重入
  */
 __xwup_api
 xwer_t xwup_plsem_unbind(struct xwup_plsem * sem, struct xwup_evt * evt)

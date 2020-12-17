@@ -61,7 +61,7 @@ struct xwos_cond xwseldemo_cond5;
 struct xwos_cond xwseldemo_cond6;
 struct xwos_br xwseldemo_br7;
 
-const struct xwos_thd_desc xwseldemo_consumer_td = {
+const struct xwos_thd_desc xwseldemo_consumer_thd_desc = {
         .name = "xwseldemo.consumer",
         .prio = XWSELDEMO_CONSUMER_PRIORITY,
         .stack = XWOS_THD_STACK_DYNAMIC,
@@ -70,9 +70,9 @@ const struct xwos_thd_desc xwseldemo_consumer_td = {
         .arg = NULL,
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
-xwos_thd_d xwseldemo_consumer;
+struct xwos_thd * xwseldemo_consumer;
 
-const struct xwos_thd_desc xwseldemo_producer_td = {
+const struct xwos_thd_desc xwseldemo_producer_thd_desc = {
         .name = "xwseldemo.producer",
         .prio = XWSELDEMO_PRODUCER_PRIORITY,
         .stack = XWOS_THD_STACK_DYNAMIC,
@@ -81,12 +81,12 @@ const struct xwos_thd_desc xwseldemo_producer_td = {
         .arg = NULL,
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
-xwos_thd_d xwseldemo_producer;
+struct xwos_thd * xwseldemo_producer;
 
 struct xwos_swt xwseldemo_swt0;
 struct xwos_swt xwseldemo_swt1;
 
-const struct xwos_thd_desc xwseldemo_syncthd_td[] = {
+const struct xwos_thd_desc xwseldemo_sync_thd_desc[] = {
         [0] = {
                 .name = "xwseldemo.syncthd.0",
                 .prio = XWSELDEMO_BRTHD_PRIORITY,
@@ -106,7 +106,7 @@ const struct xwos_thd_desc xwseldemo_syncthd_td[] = {
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
-xwos_thd_d xwseldemo_syncthd[xw_array_size(xwseldemo_syncthd_td)];
+struct xwos_thd * xwseldemo_syncthd[xw_array_size(xwseldemo_sync_thd_desc)];
 
 /**
  * @brief 测试模块的启动函数
@@ -211,37 +211,37 @@ xwer_t example_sel_start(void)
 
         /* 创建等待同步对象的线程 */
         rc = xwos_thd_create(&xwseldemo_consumer,
-                             xwseldemo_consumer_td.name,
-                             xwseldemo_consumer_td.func,
-                             xwseldemo_consumer_td.arg,
-                             xwseldemo_consumer_td.stack_size,
-                             xwseldemo_consumer_td.prio,
-                             xwseldemo_consumer_td.attr);
+                             xwseldemo_consumer_thd_desc.name,
+                             xwseldemo_consumer_thd_desc.func,
+                             xwseldemo_consumer_thd_desc.arg,
+                             xwseldemo_consumer_thd_desc.stack_size,
+                             xwseldemo_consumer_thd_desc.prio,
+                             xwseldemo_consumer_thd_desc.attr);
         if (rc < 0) {
                 goto err_consumer_create;
         }
 
         /* 建立发布同步对象的线程 */
         rc = xwos_thd_create(&xwseldemo_producer,
-                             xwseldemo_producer_td.name,
-                             xwseldemo_producer_td.func,
-                             xwseldemo_producer_td.arg,
-                             xwseldemo_producer_td.stack_size,
-                             xwseldemo_producer_td.prio,
-                             xwseldemo_producer_td.attr);
+                             xwseldemo_producer_thd_desc.name,
+                             xwseldemo_producer_thd_desc.func,
+                             xwseldemo_producer_thd_desc.arg,
+                             xwseldemo_producer_thd_desc.stack_size,
+                             xwseldemo_producer_thd_desc.prio,
+                             xwseldemo_producer_thd_desc.attr);
         if (rc < 0) {
                 goto err_producer_create;
         }
 
         /* 创建同步线程 */
-        for (i = 0; i < xw_array_size(xwseldemo_syncthd_td); i++) {
+        for (i = 0; i < xw_array_size(xwseldemo_sync_thd_desc); i++) {
                 rc = xwos_thd_create(&xwseldemo_syncthd[i],
-                                     xwseldemo_syncthd_td[i].name,
-                                     xwseldemo_syncthd_td[i].func,
-                                     xwseldemo_syncthd_td[i].arg,
-                                     xwseldemo_syncthd_td[i].stack_size,
-                                     xwseldemo_syncthd_td[i].prio,
-                                     xwseldemo_syncthd_td[i].attr);
+                                     xwseldemo_sync_thd_desc[i].name,
+                                     xwseldemo_sync_thd_desc[i].func,
+                                     xwseldemo_sync_thd_desc[i].arg,
+                                     xwseldemo_sync_thd_desc[i].stack_size,
+                                     xwseldemo_sync_thd_desc[i].prio,
+                                     xwseldemo_sync_thd_desc[i].attr);
                 if (rc < 0) {
                         goto err_syncthd_create;
                 }
@@ -519,7 +519,7 @@ xwer_t xwseldemo_producer_func(void * arg)
         }
 
         sellogf(INFO, "[生产者] 退出。\n");
-        xwos_thd_delete(xwos_cthd_getd());
+        xwos_thd_detach(xwos_cthd_self());
         return rc;
 }
 
@@ -537,7 +537,7 @@ xwer_t xwseldemo_syncthd_func(void * arg)
         xwbmpop_c0all(msk, XWOS_BR_MAXNUM);
 
         /* 设置位图掩码 */
-        for (xwsq_t i = 0; i < xw_array_size(xwseldemo_syncthd_td); i++) {
+        for (xwsq_t i = 0; i < xw_array_size(xwseldemo_sync_thd_desc); i++) {
                 xwbmpop_s1i(msk, i);
         }
 
@@ -548,6 +548,6 @@ xwer_t xwseldemo_syncthd_func(void * arg)
         }
 
         sellogf(INFO, "[同步线程%d] 退出。\n", pos);
-        xwos_thd_delete(xwos_cthd_getd());
+        xwos_thd_detach(xwos_cthd_self());
         return rc;
 }

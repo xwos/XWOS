@@ -70,8 +70,6 @@ struct xwmp_evt {
         struct xwmp_splk lock; /**< 保护位图的锁 */
 };
 
-xwer_t xwmp_evt_grab(struct xwmp_evt * evt);
-xwer_t xwmp_evt_put(struct xwmp_evt * evt);
 xwer_t xwmp_evt_obj_bind(struct xwmp_evt * evt,
                          struct xwmp_synobj * synobj,
                          xwsq_t pos,
@@ -90,6 +88,10 @@ xwer_t xwmp_evt_init(struct xwmp_evt * evt, xwbmp_t initval[], xwsq_t attr);
 xwer_t xwmp_evt_destroy(struct xwmp_evt * evt);
 xwer_t xwmp_evt_create(struct xwmp_evt ** ptrbuf, xwbmp_t initval[], xwsq_t attr);
 xwer_t xwmp_evt_delete(struct xwmp_evt * evt);
+xwer_t xwmp_evt_acquire(struct xwmp_evt * evt, xwsq_t tik);
+xwer_t xwmp_evt_release(struct xwmp_evt * evt, xwsq_t tik);
+xwer_t xwmp_evt_grab(struct xwmp_evt * evt);
+xwer_t xwmp_evt_put(struct xwmp_evt * evt);
 xwer_t xwmp_evt_bind(struct xwmp_evt * evt, struct xwmp_evt * slt, xwsq_t pos);
 xwer_t xwmp_evt_unbind(struct xwmp_evt * evt, struct xwmp_evt * slt);
 xwer_t xwmp_evt_intr_all(struct xwmp_evt * evt);

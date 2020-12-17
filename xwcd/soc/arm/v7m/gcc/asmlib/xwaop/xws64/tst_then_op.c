@@ -36,16 +36,15 @@ xwer_t xwaop__xws64__tst_then_op(xws64_a * a,
         arch_cpuirq_save_lc(&flag);
         o = *a;
         if (tst) {
-                if (tst((const void *)&o, tst_args)) {
+                rc = tst((const void *)&o, tst_args);
+                if (XWOK == rc) {
                         if (op) {
                                 op(&n, (const void *)&o, op_args);
                                 *a = n;
                         } else {
                                 n = o;
                         }
-                        rc = XWOK;
                 } else {
-                        rc = -EACCES;
                         n = o;
                 }
         } else {

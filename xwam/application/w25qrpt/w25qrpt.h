@@ -40,7 +40,7 @@
  */
 struct w25qrpt {
         const char * name; /**< 名字 */
-        xwos_thd_d thdd; /**< 线程描述符 */
+        struct xwos_thd * thd; /**< 线程描述符 */
         struct xwds_w25qxx * flash; /**< Flash */
         xwsq_t hwifst; /**< 硬件接口抽象层状态 */
         const struct w25qrpt_hwifal_operations * hwifops; /**< 硬件接口抽象层操作函数 */

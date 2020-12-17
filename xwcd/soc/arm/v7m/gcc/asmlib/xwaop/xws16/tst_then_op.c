@@ -35,19 +35,18 @@ xwer_t xwaop__xws16__tst_then_op(xws16_a * a,
         do {
                 o = (xws16_t)ldrexh(a);
                 if (tst) {
-                        if (tst((const void *)&o, tst_args)) {
+                        rc = tst((const void *)&o, tst_args);
+                        if (XWOK == rc) {
                                 if (op) {
                                         op(&n, (const void *)&o, op_args);
                                         xwmb_mp_mb();
                                         rc = strexh(a, (xwu16_t)n);
                                 } else {
-                                        rc = XWOK;
                                         n = o;
                                         xwmb_mp_mb();
                                         break;
                                 }
                         } else {
-                                rc = -EACCES;
                                 n = o;
                                 xwmb_mp_ddb();
                                 break;

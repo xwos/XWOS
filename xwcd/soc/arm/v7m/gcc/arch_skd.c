@@ -112,13 +112,19 @@ void arch_skd_init_stack(struct xwospl_skd_stack_info * stk,
 {
         bool privileged;
         xwu32_t * stkbtn;
-        xwsq_t i;
+        xwsq_t i, stknum;
 
 #if defined(XuanWuOS_CFG_CORE__mp)
         privileged = !!(attr & XWMP_SKDATTR_PRIVILEGED);
 #elif defined(XuanWuOS_CFG_CORE__up)
         privileged = !!(attr & XWUP_SKDATTR_PRIVILEGED);
 #endif
+
+        stkbtn = (xwu32_t *)stk->base;
+        stknum = stk->size / sizeof(xwu32_t);
+        for (i = 0; i < stknum; i++) {
+                stkbtn[i] = 0xFFFFFFFFU;
+        }
 
 #if (defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU))
         /* volatile FPU registers */
@@ -258,11 +264,6 @@ void arch_skd_init_stack(struct xwospl_skd_stack_info * stk,
                 stk->sp--;
                 *(stk->sp) = (xwstk_t)0x3; /* CONTROL: unprivileged access, psp */
 #endif /* !ARCHCFG_FPU */
-        }
-
-        stkbtn = (xwu32_t *)stk->base;
-        for (i = 0; i < 16; i++) {
-                stkbtn[i] = 0xFFFFFFFFU;
         }
 }
 

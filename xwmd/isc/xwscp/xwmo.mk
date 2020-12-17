@@ -20,6 +20,8 @@
 include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
+$(eval $(call XwmoReqCfg,XWLIBCFG_CRC32,y))
+
 XWMO_CSRCS := protocol.c hwifal.c mif.c hwif/uart.c
 XWMO_CFLAGS :=
 XWMO_INCDIRS :=

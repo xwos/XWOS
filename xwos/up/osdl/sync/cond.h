@@ -31,13 +31,13 @@ xwer_t xwosdl_cond_destroy(struct xwosdl_cond * cond)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_cond_create(struct xwosdl_cond ** condp)
+xwer_t xwosdl_cond_create(struct xwosdl_cond ** condbuf)
 {
         xwer_t rc;
 
-        if (NULL != condp) {
-                *condp = NULL;
-                rc = xwup_cond_create(condp);
+        if (NULL != condbuf) {
+                *condbuf = NULL;
+                rc = xwup_cond_create(condbuf);
         } else {
                 rc = -EFAULT;
         }
@@ -48,6 +48,43 @@ static __xwcc_inline
 xwer_t xwosdl_cond_delete(struct xwosdl_cond * cond)
 {
         return xwup_cond_delete(cond);
+}
+
+static __xwcc_inline
+xwsq_t xwosdl_cond_gettik(struct xwosdl_cond * cond)
+{
+        XWOS_UNUSED(cond);
+        return 0;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_cond_acquire(struct xwosdl_cond * cond, xwsq_t tik)
+{
+        XWOS_UNUSED(cond);
+        XWOS_UNUSED(tik);
+        return XWOK;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_cond_release(struct xwosdl_cond * cond, xwsq_t tik)
+{
+        XWOS_UNUSED(cond);
+        XWOS_UNUSED(tik);
+        return XWOK;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_cond_grab(struct xwosdl_cond * cond)
+{
+        XWOS_UNUSED(cond);
+        return XWOK;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_cond_put(struct xwosdl_cond * cond)
+{
+        XWOS_UNUSED(cond);
+        return XWOK;
 }
 
 static __xwcc_inline

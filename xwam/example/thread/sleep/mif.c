@@ -40,7 +40,7 @@ xwer_t xwslpdemo_thd_func(void * arg);
 /**
  * @brief 动态创建的线程描述表
  */
-const struct xwos_thd_desc xwslpdemo_tbd[] = {
+const struct xwos_thd_desc xwslpdemo_thd_desc[] = {
         [0] = {
                 .name = "xwslpdemo.thd",
                 .prio = XWSLPDEMO_THD_PRIORITY,
@@ -51,7 +51,7 @@ const struct xwos_thd_desc xwslpdemo_tbd[] = {
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
-xwos_thd_d xwslpdemo_thdd[xw_array_size(xwslpdemo_tbd)];
+struct xwos_thd * xwslpdemo_thd[xw_array_size(xwslpdemo_thd_desc)];
 
 /**
  * @brief 模块的加载函数
@@ -62,14 +62,14 @@ xwer_t example_thread_sleep_start(void)
         xwsq_t i;
 
 
-        for (i = 0; i < xw_array_size(xwslpdemo_tbd); i++) {
-                rc = xwos_thd_create(&xwslpdemo_thdd[i],
-                                     xwslpdemo_tbd[i].name,
-                                     xwslpdemo_tbd[i].func,
-                                     xwslpdemo_tbd[i].arg,
-                                     xwslpdemo_tbd[i].stack_size,
-                                     xwslpdemo_tbd[i].prio,
-                                     xwslpdemo_tbd[i].attr);
+        for (i = 0; i < xw_array_size(xwslpdemo_thd_desc); i++) {
+                rc = xwos_thd_create(&xwslpdemo_thd[i],
+                                     xwslpdemo_thd_desc[i].name,
+                                     xwslpdemo_thd_desc[i].func,
+                                     xwslpdemo_thd_desc[i].arg,
+                                     xwslpdemo_thd_desc[i].stack_size,
+                                     xwslpdemo_thd_desc[i].prio,
+                                     xwslpdemo_thd_desc[i].attr);
                 if (rc < 0) {
                         goto err_thd_create;
                 }
@@ -105,6 +105,6 @@ xwer_t xwslpdemo_thd_func(void * arg)
         }
 
         thdslplogf(INFO, "[线程] 退出。\n");
-        xwos_thd_delete(xwos_cthd_getd());
+        xwos_thd_detach(xwos_cthd_self());
         return rc;
 }

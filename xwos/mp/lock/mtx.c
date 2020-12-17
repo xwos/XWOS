@@ -23,7 +23,7 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
-#include <xwos/mm/memslice.h>
+  #include <xwos/mm/memslice.h>
 #endif /* XWMPCFG_LOCK_MTX_MEMSLICE */
 #include <xwos/mp/lock/mtx.h>
 
@@ -198,24 +198,68 @@ xwer_t xwmp_mtx_gc(void * mtx)
 }
 
 /**
- * @brief 增加对象的引用计数
+ * @brief XWMP API：检查互斥锁对象的标签并增加引用计数
+ * @param mtx: (I) 互斥锁对象指针
+ * @param tik: (I) 标签
+ * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwmp_api
+xwer_t xwmp_mtx_acquire(struct xwmp_mtx * mtx, xwsq_t tik)
+{
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+        return xwos_object_acquire(&mtx->xwobj, tik);
+}
+
+/**
+ * @brief XWMP API：检查互斥锁对象的标签并增加引用计数
+ * @param mtx: (I) 互斥锁对象指针
+ * @param tik: (I) 标签
+ * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwmp_api
+xwer_t xwmp_mtx_release(struct xwmp_mtx * mtx, xwsq_t tik)
+{
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+        return xwos_object_release(&mtx->xwobj, tik);
+}
+
+/**
+ * @brief XWMP API：增加互斥锁对象的引用计数
  * @param mtx: (I) 互斥锁对象指针
  * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
-__xwcc_inline
+__xwmp_api
 xwer_t xwmp_mtx_grab(struct xwmp_mtx * mtx)
 {
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
         return xwos_object_grab(&mtx->xwobj);
 }
 
 /**
- * @brief 减少对象的引用计数
+ * @brief XWMP API：减少互斥锁对象的引用计数
  * @param mtx: (I) 互斥锁对象指针
  * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
-__xwcc_inline
+__xwmp_api
 xwer_t xwmp_mtx_put(struct xwmp_mtx * mtx)
 {
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
         return xwos_object_put(&mtx->xwobj);
 }
 
@@ -230,7 +274,7 @@ xwer_t xwmp_mtx_put(struct xwmp_mtx * mtx)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *mtx* ，不可重入
+ * - 重入性：对于同一个互斥锁对象，不可重入
  */
 static __xwmp_code
 xwer_t xwmp_mtx_activate(struct xwmp_mtx * mtx, xwpr_t sprio,
@@ -267,7 +311,7 @@ xwer_t xwmp_mtx_activate(struct xwmp_mtx * mtx, xwpr_t sprio,
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *mtx* ，不可重入
+ * - 重入性：对于同一个互斥锁对象，不可重入
  */
 __xwmp_api
 xwer_t xwmp_mtx_init(struct xwmp_mtx * mtx, xwpr_t sprio)
@@ -287,7 +331,7 @@ xwer_t xwmp_mtx_init(struct xwmp_mtx * mtx, xwpr_t sprio)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *mtx* ，不可重入
+ * - 重入性：对于同一个互斥锁对象，不可重入
  */
 __xwmp_api
 xwer_t xwmp_mtx_destroy(struct xwmp_mtx * mtx)
@@ -309,7 +353,7 @@ xwer_t xwmp_mtx_destroy(struct xwmp_mtx * mtx)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *mtx* ，不可重入
+ * - 重入性：对于同一个互斥锁对象，不可重入
  */
 __xwmp_api
 xwer_t xwmp_mtx_create(struct xwmp_mtx ** ptrbuf, xwpr_t sprio)
@@ -344,7 +388,7 @@ xwer_t xwmp_mtx_create(struct xwmp_mtx ** ptrbuf, xwpr_t sprio)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *mtx* ，不可重入
+ * - 重入性：对于同一个互斥锁对象，不可重入
  */
 __xwmp_api
 xwer_t xwmp_mtx_delete(struct xwmp_mtx * mtx)

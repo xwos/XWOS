@@ -36,7 +36,7 @@ xwer_t led_task(void * arg);
 
 xwer_t memtst_task(void * arg);
 
-const struct xwos_thd_desc child_tbd[] = {
+const struct xwos_thd_desc child_thd_desc[] = {
         [0] = {
                 .name = "task.led",
                 .prio = LED_TASK_PRIORITY,
@@ -44,7 +44,7 @@ const struct xwos_thd_desc child_tbd[] = {
                 .stack_size = 4096,
                 .func = led_task,
                 .arg = NULL,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
+                .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
         },
         [1] = {
                 .name = "task.memtst",
@@ -53,24 +53,25 @@ const struct xwos_thd_desc child_tbd[] = {
                 .stack_size = 2048,
                 .func = memtst_task,
                 .arg = NULL,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
+                .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
         },
 };
 
-xwos_thd_d child_thdd[xw_array_size(child_tbd)];
+struct xwos_thd * child_thd[xw_array_size(child_thd_desc)];
 
 xwer_t child_thd_start(void)
 {
         xwer_t rc;
         xwsq_t i;
 
-        for (i = 0; i < xw_array_size(child_tbd); i++) {
-                rc = xwos_thd_create(&child_thdd[i], child_tbd[i].name,
-                                     child_tbd[i].func,
-                                     child_tbd[i].arg,
-                                     child_tbd[i].stack_size,
-                                     child_tbd[i].prio,
-                                     child_tbd[i].attr);
+        for (i = 0; i < xw_array_size(child_thd_desc); i++) {
+                rc = xwos_thd_create(&child_thd[i],
+                                     child_thd_desc[i].name,
+                                     child_thd_desc[i].func,
+                                     child_thd_desc[i].arg,
+                                     child_thd_desc[i].stack_size,
+                                     child_thd_desc[i].prio,
+                                     child_thd_desc[i].attr);
                 if (rc < 0) {
                         goto err_thd_create;
                 }
@@ -108,7 +109,6 @@ xwer_t eeprom_task(void)
         if (rc < 0) {
                 goto err_eeprom_read;
         }
-
         return XWOK;
 
 err_eeprom_read:
@@ -251,6 +251,5 @@ xwer_t memtst_task(void * arg)
                 xwos_cthd_sleep(&xwtm);
                 rc = xwmm_mempool_free(sdram_mempool, mem);
         }
-
         return rc;
 }

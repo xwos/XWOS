@@ -13,15 +13,9 @@
 #ifndef __xwos_osal_sync_sel_h__
 #define __xwos_osal_sync_sel_h__
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <xwos/standard.h>
 #include <xwos/osal/jack/sync/sel.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       type        ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief XWOS API：信号选择器
  */
@@ -29,9 +23,19 @@ struct xwos_sel {
         struct xwosdl_sel ossel;
 };
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macro       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief XWOS API：信号选择器对象描述符
+ */
+typedef struct {
+        struct xwos_sel * sel; /**< 信号选择器对象的指针 */
+        xwsq_t tik; /**< 标签 */
+} xwos_sel_d;
+
+/**
+ * @brief XWOS API：空的信号选择器对象描述符
+ */
+#define XWOS_SEL_NILD ((xwos_sel_d){NULL, 0,})
+
 /**
  * @brief XWOS API：信号选择器的最大信号数量
  */
@@ -42,19 +46,16 @@ struct xwos_sel {
  */
 #define xwos_sel_declare_bitmap(name) xwosdl_sel_declare_bitmap(name)
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********        API        ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 /**
  * @brief XWOS API：静态方式初始化信号选择器
  * @param sel: (I) 信号选择器的指针
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效的ID或空指针
+ * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个**sel**，不可重入
+ * - 重入性：对于同一个信号选择器，不可重入
  */
 static __xwos_inline_api
 xwer_t xwos_sel_init(struct xwos_sel * sel)
@@ -67,11 +68,11 @@ xwer_t xwos_sel_init(struct xwos_sel * sel)
  * @param sel: (I) 信号选择器的指针
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效的ID或空指针
+ * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个**sel**，不可重入
+ * - 重入性：对于同一个信号选择器，不可重入
  */
 static __xwos_inline_api
 xwer_t xwos_sel_destroy(struct xwos_sel * sel)
@@ -81,12 +82,12 @@ xwer_t xwos_sel_destroy(struct xwos_sel * sel)
 
 /**
  * @brief XWOS API：动态方式创建信号选择器
- * @param selp: (O) 指向缓冲区的指针，通过此缓冲区返回信号选择器的指针
+ * @param selbuf: (O) 指向缓冲区的指针，通过此缓冲区返回信号选择器的指针
  * @param val: (I) 信号选择器的初始值
  * @param max: (I) 信号选择器的最大值
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效的ID或空指针
+ * @retval -EFAULT: 空指针
  * @retval -ENOMEM: 内存不足
  * @note
  * - 同步/异步：同步
@@ -94,9 +95,9 @@ xwer_t xwos_sel_destroy(struct xwos_sel * sel)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_sel_create(struct xwos_sel ** selp)
+xwer_t xwos_sel_create(struct xwos_sel ** selbuf)
 {
-        return xwosdl_sel_create((struct xwosdl_sel **)selp);
+        return xwosdl_sel_create((struct xwosdl_sel **)selbuf);
 }
 
 /**
@@ -104,16 +105,120 @@ xwer_t xwos_sel_create(struct xwos_sel ** selp)
  * @param sel: (I) 信号选择器的指针
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效的ID或空指针
+ * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个**sel**，不可重入
+ * - 重入性：对于同一个信号选择器，不可重入
  */
 static __xwos_inline_api
 xwer_t xwos_sel_delete(struct xwos_sel * sel)
 {
         return xwosdl_sel_delete(&sel->ossel);
+}
+
+/**
+ * @brief XWOS API：获取信号选择器对象的标签
+ * @param sel: (I) 信号选择器对象的指针
+ * @return 信号选择器对象的标签
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwsq_t xwos_sel_gettik(struct xwos_sel * sel)
+{
+        return xwosdl_sel_gettik(&sel->ossel);
+}
+
+/**
+ * @brief XWOS API：获取信号选择器对象的描述符
+ * @param sel: (I) 信号选择器对象的指针
+ * @return 信号选择器对象的描述符
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwos_sel_d xwos_sel_getd(struct xwos_sel * sel)
+{
+        xwos_sel_d seld;
+
+        seld.sel = sel;
+        seld.tik = xwosdl_sel_gettik(&sel->ossel);
+        return seld;
+}
+
+/**
+ * @brief XWOS API：检查信号选择器对象的标签并增加引用计数
+ * @param seld: (I) 信号选择器对象的描述符
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -EOBJDEAD: 对象无效
+ * @retval -EACCES: 对象标签检查失败
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_sel_acquire(xwos_sel_d seld)
+{
+        return xwosdl_sel_acquire(&seld.sel->ossel, seld.tik);
+}
+
+/**
+ * @brief XWOS API：检查对象的标签并减少引用计数
+ * @param seld: (I) 信号选择器对象的描述符
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -EOBJDEAD: 对象无效
+ * @retval -EACCES: 对象标签检查失败
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_sel_release(xwos_sel_d seld)
+{
+        return xwosdl_sel_release(&seld.sel->ossel, seld.tik);
+}
+
+/**
+ * @brief XWOS API：增加信号选择器对象的引用计数
+ * @param sel: (I) 信号选择器对象的指针
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -EOBJDEAD: 对象无效
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_sel_grab(struct xwos_sel * sel)
+{
+        return xwosdl_sel_grab(&sel->ossel);
+}
+
+/**
+ * @brief XWOS API：减少信号选择器对象的引用计数
+ * @param sel: (I) 信号选择器对象的指针
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -EOBJDEAD: 对象无效
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_sel_put(struct xwos_sel * sel)
+{
+        return xwosdl_sel_put(&sel->ossel);
 }
 
 /**

@@ -180,24 +180,68 @@ xwer_t xwmp_swt_gc(void * swt)
 }
 
 /**
- * @brief 增加对象的引用计数
+ * @brief XWMP API：检查软件定时器对象的标签并增加引用计数
+ * @param swt: (I) 软件定时器对象指针
+ * @param tik: (I) 标签
+ * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwmp_api
+xwer_t xwmp_swt_acquire(struct xwmp_swt * swt, xwsq_t tik)
+{
+        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
+        return xwos_object_acquire(&swt->xwobj, tik);
+}
+
+/**
+ * @brief XWMP API：检查软件定时器对象的标签并增加引用计数
+ * @param swt: (I) 软件定时器对象指针
+ * @param tik: (I) 标签
+ * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwmp_api
+xwer_t xwmp_swt_release(struct xwmp_swt * swt, xwsq_t tik)
+{
+        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
+        return xwos_object_release(&swt->xwobj, tik);
+}
+
+/**
+ * @brief XWMP API：增加软件定时器对象的引用计数
  * @param swt: (I) 软件定时器控制块对象指针
  * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
-__xwmp_code
+__xwmp_api
 xwer_t xwmp_swt_grab(struct xwmp_swt * swt)
 {
+        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
         return xwos_object_grab(&swt->xwobj);
 }
 
 /**
- * @brief 减少对象的引用计数
+ * @brief XWMP API：减少软件定时器对象的引用计数
  * @param swt: (I) 软件定时器控制块对象指针
  * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
-__xwmp_code
+__xwmp_api
 xwer_t xwmp_swt_put(struct xwmp_swt * swt)
 {
+        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
         return xwos_object_put(&swt->xwobj);
 }
 

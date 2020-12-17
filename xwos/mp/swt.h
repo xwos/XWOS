@@ -50,9 +50,6 @@ struct xwmp_swt {
         xwtm_t period; /**< 周期 */
 };
 
-xwer_t xwmp_swt_grab(struct xwmp_swt * swt);
-xwer_t xwmp_swt_put(struct xwmp_swt * swt);
-
 #if defined(XWMPCFG_SKD_SWT_MEMSLICE) && (1 == XWMPCFG_SKD_SWT_MEMSLICE)
 xwer_t xwmp_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif /* XWMPCFG_SKD_SWT_MEMSLICE */
@@ -65,6 +62,12 @@ xwer_t xwmp_swt_create(struct xwmp_swt ** ptrbuf,
                        const char * name,
                        xwsq_t flag);
 xwer_t xwmp_swt_delete(struct xwmp_swt * swt);
+
+xwer_t xwmp_swt_acquire(struct xwmp_swt * swt, xwsq_t tik);
+xwer_t xwmp_swt_release(struct xwmp_swt * swt, xwsq_t tik);
+xwer_t xwmp_swt_grab(struct xwmp_swt * swt);
+xwer_t xwmp_swt_put(struct xwmp_swt * swt);
+
 xwer_t xwmp_swt_start(struct xwmp_swt * swt,
                       xwtm_t base, xwtm_t period,
                       xwmp_swt_f cb, void * arg);
