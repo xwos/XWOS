@@ -50,5 +50,6 @@ xwer_t xwup_mtx_lock(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_timedlock(struct xwup_mtx * mtx, xwtm_t * xwtm);
 xwer_t xwup_mtx_lock_unintr(struct xwup_mtx * mtx);
+xwer_t xwup_mtx_getlkst(struct xwup_mtx * mtx, xwsq_t * lkst);
 
 #endif /* xwos/up/lock/mtx.h */

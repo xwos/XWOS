@@ -915,9 +915,6 @@ xwer_t xwmp_mtx_do_timedlock(struct xwmp_mtx * mtx,
         xwer_t rc;
 
         rc = XWOK;
-        /* 当线程执行此处代码时，不可能拥有状态XWMP_SKDOBJ_DST_MIGRATING，
-           因为，迁移永远发生在线程处于冻结点时。也因此可在锁xwskd->thdlistlock外
-           读取thd->xwskd。*/
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &thd->xwskd);
         xwmp_skd_dspmpt(xwskd);
         mt = &thd->mtxtree;
@@ -1115,6 +1112,44 @@ xwer_t xwmp_mtx_lock_unintr(struct xwmp_mtx * mtx)
 
 err_mtx_do_lock_unintr:
         xwmp_mtx_put(mtx);
+err_mtx_grab:
+        return rc;
+}
+
+/**
+ * @brief XWMP API：获取锁的状态
+ * @param mtx: (I) 互斥锁对象的指针
+ * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwmp_api
+xwer_t xwmp_mtx_getlkst(struct xwmp_mtx * mtx, xwsq_t * lkst)
+{
+        xwer_t rc;
+        volatile struct xwmp_mtxtree * ownertree;
+
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+        XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
+
+        rc = xwmp_mtx_grab(mtx);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_mtx_grab;
+        }
+        xwmb_mp_load_acquire(struct xwmp_mtxtree *, ownertree, &mtx->ownertree);
+        if (ownertree) {
+                *lkst = XWOS_LKST_LOCKED;
+        } else {
+                *lkst = XWOS_LKST_UNLOCKED;
+        }
+        xwmp_mtx_put(mtx);
+        return XWOK;
+
 err_mtx_grab:
         return rc;
 }

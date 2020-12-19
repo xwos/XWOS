@@ -116,4 +116,10 @@ xwer_t xwosdl_mtx_lock_unintr(struct xwosdl_mtx * mtx)
         return xwmp_mtx_lock_unintr(mtx);
 }
 
+static __xwcc_inline
+xwer_t xwosdl_mtx_getlkst(struct xwosdl_mtx * mtx, xwsq_t * lkst)
+{
+        return xwmp_mtx_getlkst(mtx, lkst);
+}
+
 #endif /* xwos/mp/osdl/lock/mtx.h */

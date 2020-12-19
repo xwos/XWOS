@@ -19,6 +19,7 @@ extern void newlibac_mem_linkage_placeholder(void);
 extern void newlibac_fops_linkage_placeholder(void);
 extern void newlibac_string_linkage_placeholder(void);
 extern void newlibac_lock_linkage_placeholder(void);
+extern void newlibac_exit_linkage_placeholder(void);
 
 /**
  * @brief 连接占位符
@@ -30,6 +31,7 @@ const newlibac_linkage_f newlibac_linkage_table[] = {
         newlibac_fops_linkage_placeholder,
         newlibac_string_linkage_placeholder,
         newlibac_lock_linkage_placeholder,
+        newlibac_exit_linkage_placeholder,
 };
 
 xwer_t newlibac_init(void)

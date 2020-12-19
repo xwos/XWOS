@@ -216,7 +216,7 @@ xwer_t xwos_mtx_put(struct xwos_mtx * mtx)
 
 /**
  * @brief XWOS API：解锁互斥锁
- * @param mtx: (I) 互斥锁指针
+ * @param mtx: (I) 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -235,7 +235,7 @@ xwer_t xwos_mtx_unlock(struct xwos_mtx * mtx)
 
 /**
  * @brief XWOS API：等待上锁互斥锁
- * @param mtx: (I) 互斥锁指针
+ * @param mtx: (I) 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -254,7 +254,7 @@ xwer_t xwos_mtx_lock(struct xwos_mtx * mtx)
 
 /**
  * @brief XWOS API：尝试上锁互斥锁，不会阻塞调用者
- * @param mtx: (I) 互斥锁指针
+ * @param mtx: (I) 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -277,7 +277,7 @@ xwer_t xwos_mtx_trylock(struct xwos_mtx * mtx)
 
 /**
  * @brief XWOS API：限时等待上锁互斥锁
- * @param mtx: (I) 互斥锁指针
+ * @param mtx: (I) 互斥锁对象的指针
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -302,7 +302,7 @@ xwer_t xwos_mtx_timedlock(struct xwos_mtx * mtx, xwtm_t * xwtm)
 
 /**
  * @brief XWOS API：等待上锁互斥锁，且等待不可被中断
- * @param mtx: (I) 互斥锁指针
+ * @param mtx: (I) 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -316,6 +316,24 @@ static __xwos_inline_api
 xwer_t xwos_mtx_lock_unintr(struct xwos_mtx * mtx)
 {
         return xwosdl_mtx_lock_unintr(&mtx->osmtx);
+}
+
+/**
+ * @brief XWOS API：获取锁的状态
+ * @param mtx: (I) 互斥锁对象的指针
+ * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_mtx_getlkst(struct xwos_mtx * mtx, xwsq_t * lkst)
+{
+        return xwosdl_mtx_getlkst(&mtx->osmtx, lkst);
 }
 
 #endif /* xwos/osal/lock/mtx.h */

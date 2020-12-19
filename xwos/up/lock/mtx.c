@@ -782,3 +782,33 @@ xwer_t xwup_mtx_lock_unintr(struct xwup_mtx * mtx)
         rc = xwup_mtx_do_lock_unintr(mtx, cthd);
         return rc;
 }
+
+/**
+ * @brief XWUP API：获取锁的状态
+ * @param mtx: (I) 互斥锁对象的指针
+ * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwup_api
+xwer_t xwup_mtx_getlkst(struct xwup_mtx * mtx, xwsq_t * lkst)
+{
+        xwer_t rc;
+        volatile struct xwup_mtxtree * ownertree;
+
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+        XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
+
+        xwmb_read(struct xwup_mtxtree *, ownertree, &mtx->ownertree);
+        if (ownertree) {
+                *lkst = XWOS_LKST_LOCKED;
+        } else {
+                *lkst = XWOS_LKST_UNLOCKED;
+        }
+        return XWOK;
+}

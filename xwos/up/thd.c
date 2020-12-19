@@ -22,28 +22,28 @@
 #include <xwos/up/lock/fakespinlock.h>
 #include <xwos/up/rtrq.h>
 #if (1 == XWUPRULE_SKD_WQ_RT)
-#include <xwos/up/rtwq.h>
+  #include <xwos/up/rtwq.h>
 #endif /* XWUPRULE_SKD_WQ_RT */
 #if (1 == XWUPRULE_SKD_WQ_PL)
-#include <xwos/up/plwq.h>
+  #include <xwos/up/plwq.h>
 #endif /* XWUPRULE_SKD_WQ_PL */
 #include <xwos/up/tt.h>
 #include <xwos/up/thd.h>
 #if defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)
-#include <xwos/up/lock/mtx.h>
-#include <xwos/up/mtxtree.h>
+  #include <xwos/up/lock/mtx.h>
+  #include <xwos/up/mtxtree.h>
 #endif /* XWUPCFG_LOCK_MTX */
 #if defined(XWUPCFG_LOCK_FAKEMTX) && (1 == XWUPCFG_LOCK_FAKEMTX)
-#include <xwos/up/lock/fakemtx.h>
+  #include <xwos/up/lock/fakemtx.h>
 #endif /* XWUPCFG_LOCK_FAKEMTX */
 #if defined(XWUPCFG_SYNC_PLSEM) && (1 == XWUPCFG_SYNC_PLSEM)
-#include <xwos/up/sync/plsem.h>
+  #include <xwos/up/sync/plsem.h>
 #endif /* XWUPCFG_SYNC_PLSEM */
 #if defined(XWUPCFG_SYNC_RTSEM) && (1 == XWUPCFG_SYNC_RTSEM)
-#include <xwos/up/sync/rtsem.h>
+  #include <xwos/up/sync/rtsem.h>
 #endif /* XWUPCFG_SYNC_RTSEM */
 #if defined(XWUPCFG_SYNC_COND) && (1 == XWUPCFG_SYNC_COND)
-#include <xwos/up/sync/cond.h>
+  #include <xwos/up/sync/cond.h>
 #endif /* XWUPCFG_SYNC_COND */
 
 extern __xwup_code
@@ -552,25 +552,26 @@ xwer_t xwup_thd_stop(struct xwup_thd * thd, xwer_t * trc)
                 xwospl_cpuirq_restore_lc(cpuirq);
                 rc = -EINVAL;
         } else if (XWUP_SKDOBJ_DST_STANDBY & thd->state) {
-                rc = XWOK;
+                xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_DETACHED);
+                xwospl_cpuirq_restore_lc(cpuirq);
                 if (!is_err_or_null(trc)) {
                         *trc = (xwer_t)thd->stack.arg;
                 }
-                xwospl_cpuirq_restore_lc(cpuirq);
-                xwup_thd_delete(thd);
+                rc = xwup_thd_delete(thd);
         } else {
                 xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_EXITING);
                 rc = xwup_cond_wait(&thd->completion,
                                     &lockcb, XWOS_LK_CALLBACK, thd,
                                     &lkst);
                 if (XWOK == rc) {
+                        xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_DETACHED);
                         if (!is_err_or_null(trc)) {
                                 *trc = (xwer_t)thd->stack.arg;
                         }
                 }
                 xwospl_cpuirq_restore_lc(cpuirq);
                 if (XWOK == rc) {
-                        xwup_thd_delete(thd);
+                        rc = xwup_thd_delete(thd);
                 }
         }
 
