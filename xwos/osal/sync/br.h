@@ -283,7 +283,8 @@ xwer_t xwos_br_intr_all(struct xwos_br * br)
  * @brief XWOS API：等待所有线程到达栅栏
  * @param br: (I) 线程栅栏对象的指针
  * @param pos: (I) 当前线程的位图位置
- * @param sync: (I) 当前线程需要同步的线程掩码
+ * @param msk: (I) 需要同步的线程位图掩码
+ * @param sync: (O) 指向缓冲区的指针，通过此缓冲区返回已经抵达栅栏的线程位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -295,16 +296,17 @@ xwer_t xwos_br_intr_all(struct xwos_br * br)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_br_sync(struct xwos_br * br, xwsq_t pos, xwbmp_t sync[])
+xwer_t xwos_br_sync(struct xwos_br * br, xwsq_t pos, xwbmp_t msk[], xwbmp_t sync[])
 {
-        return xwosdl_br_sync(&br->osbr, pos, sync);
+        return xwosdl_br_sync(&br->osbr, pos, msk, sync);
 }
 
 /**
  * @brief XWOS API：限时等待所有线程到达栅栏
  * @param br: (I) 线程栅栏对象的指针
  * @param pos: (I) 当前线程的位图位置
- * @param sync: (I) 当前线程需要同步的线程掩码
+ * @param msk: (I) 需要同步的线程位图掩码
+ * @param sync: (O) 指向缓冲区的指针，通过此缓冲区返回已经抵达栅栏的线程位图掩码
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -323,9 +325,10 @@ xwer_t xwos_br_sync(struct xwos_br * br, xwsq_t pos, xwbmp_t sync[])
  */
 static __xwos_inline_api
 xwer_t xwos_br_timedsync(struct xwos_br * br, xwsq_t pos,
-                         xwbmp_t sync[], xwtm_t * xwtm)
+                         xwbmp_t msk[], xwbmp_t sync[],
+                         xwtm_t * xwtm)
 {
-        return xwosdl_br_timedsync(&br->osbr, pos, sync, xwtm);
+        return xwosdl_br_timedsync(&br->osbr, pos, msk, sync, xwtm);
 }
 
 #endif /* xwos/osal/sync/br.h */

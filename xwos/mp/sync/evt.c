@@ -896,14 +896,14 @@ xwer_t xwmp_evt_trywait_edge(struct xwmp_evt * evt, xwsq_t trigger,
  *                  @ref XWMP_EVT_TRIGGER_SET_ANY
  *                  @ref XWMP_EVT_TRIGGER_CLR_ALL
  *                  @ref XWMP_EVT_TRIGGER_CLR_ANY
- *                  (O) 返回事件对象中位图状态（action之前）
+ *                  (O) 返回触发时事件对象中位图状态（action之前）
  *                - 当trigger取值
  *                  @ref XWMP_EVT_TRIGGER_TGL_ALL
  *                  @ref XWMP_EVT_TRIGGER_TGL_ANY
  *                  (I) 作为输入时，作为用于比较的初始值
  *                  (O) 作为输出时，返回事件对象中位图状态
  *                      （可作为下一次调用的初始值）
- * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的位
+ * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的事件
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -943,14 +943,14 @@ xwer_t xwmp_evt_wait(struct xwmp_evt * evt,
  *                  @ref XWMP_EVT_TRIGGER_SET_ANY
  *                  @ref XWMP_EVT_TRIGGER_CLR_ALL
  *                  @ref XWMP_EVT_TRIGGER_CLR_ANY
- *                  (O) 返回事件对象中位图状态（action之前）
+ *                  (O) 返回触发时返回事件对象中位图状态（action之前）
  *                - 当trigger取值
  *                  @ref XWMP_EVT_TRIGGER_TGL_ALL
  *                  @ref XWMP_EVT_TRIGGER_TGL_ANY
  *                  (I) 作为输入时，作为用于比较的初始值
  *                  (O) 作为输出时，返回事件对象中位图状态
  *                      （可作为下一次调用的初始值）
- * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的位
+ * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的事件
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -1165,14 +1165,14 @@ xwer_t xwmp_evt_timedwait_edge(struct xwmp_evt * evt, xwsq_t trigger,
  *                  @ref XWMP_EVT_TRIGGER_SET_ANY
  *                  @ref XWMP_EVT_TRIGGER_CLR_ALL
  *                  @ref XWMP_EVT_TRIGGER_CLR_ANY
- *                  (O) 返回事件对象中位图状态（action之前）
+ *                  (O) 返回触发时事件对象中位图状态（action之前）
  *                - 当trigger取值
  *                  @ref XWMP_EVT_TRIGGER_TGL_ALL
  *                  @ref XWMP_EVT_TRIGGER_TGL_ANY
  *                  (I) 作为输入时，作为用于比较的初始值
  *                  (O) 作为输出时，返回事件对象中位图状态
  *                      （可作为下一次调用的初始值）
- * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的位
+ * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的事件
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -1407,8 +1407,8 @@ err_evt_grab:
  * @brief XWMP API：等待事件对象中绑定的同步对象，
  *                  事件对象类型为XWMP_EVT_TYPE_SEL
  * @param evt: (I) 事件对象的指针
- * @param msk: (I) 待触发的同步对象的位图掩码（表示只关注掩码部分的同步对象）
- * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象的位图
+ * @param msk: (I) 待触发的同步对象位图掩码
+ * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -1430,8 +1430,8 @@ xwer_t xwmp_evt_select(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
 /**
  * @brief XWMP API：检测一下事件对象中绑定的同步对象，不会阻塞调用者
  * @param evt: (I) 事件对象的指针
- * @param msk: (I) 待触发的同步对象的位图掩码，表示只关注掩码部分的位
- * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象的位图
+ * @param msk: (I) 待触发的同步对象位图掩码
+ * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -1488,8 +1488,8 @@ err_evt_grab:
  * @brief XWMP API：限时等待事件对象中绑定的同步对象，
  *                  事件对象类型为XWMP_EVT_TYPE_SEL
  * @param evt: (I) 事件对象的指针
- * @param msk: (I) 待触发的同步对象的位图掩码（表示只关注掩码部分的同步对象）
- * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象的位图
+ * @param msk: (I) 待触发的同步对象位图掩码
+ * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -1579,7 +1579,8 @@ err_evt_grab:
  * @brief XWMP API：等待所有线程到达栅栏，事件对象类型为XWMP_EVT_TYPE_BR
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 当前线程的位图位置
- * @param sync: (I) 当前线程需要同步的线程掩码
+ * @param msk: (I) 需要同步的线程位图掩码
+ * @param sync: (O) 指向缓冲区的指针，通过此缓冲区返回已经抵达栅栏的线程位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -1593,17 +1594,18 @@ err_evt_grab:
  * - 重入性：可重入
  */
 __xwmp_api
-xwer_t xwmp_evt_sync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t sync[])
+xwer_t xwmp_evt_sync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t msk[], xwbmp_t sync[])
 {
         xwtm_t expected = XWTM_MAX;
-        return xwmp_evt_timedsync(evt, pos, sync, &expected);
+        return xwmp_evt_timedsync(evt, pos, msk, sync, &expected);
 }
 
 /**
  * @brief XWMP API：等待所有线程到达栅栏，事件对象类型为XWMP_EVT_TYPE_BR
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 当前线程的位图位置
- * @param sync: (I) 当前线程需要同步的线程掩码
+ * @param msk: (I) 需要同步的线程位图掩码
+ * @param sync: (O) 指向缓冲区的指针，通过此缓冲区返回已经抵达栅栏的线程位图掩码
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -1623,7 +1625,8 @@ xwer_t xwmp_evt_sync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t sync[])
  * - 函数返回返回**-ETIMEDOUT**时，**xwtm**指向的缓冲区内的期望时间会减为0。
  */
 __xwmp_api
-xwer_t xwmp_evt_timedsync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t sync[],
+xwer_t xwmp_evt_timedsync(struct xwmp_evt * evt, xwsq_t pos,
+                          xwbmp_t msk[], xwbmp_t sync[],
                           xwtm_t * xwtm)
 {
         xwreg_t cpuirq;
@@ -1632,7 +1635,7 @@ xwer_t xwmp_evt_timedsync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t sync[],
         xwer_t rc;
 
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((sync), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE((pos < XWMP_EVT_MAXNUM), "out-of-range", -ECHRNG);
         XWOS_VALIDATE(((evt->attr & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_BR),
                       "type-error", -ETYPE);
@@ -1647,8 +1650,11 @@ xwer_t xwmp_evt_timedsync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t sync[],
 
         xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         xwbmpop_s1i(evt->bmp, pos);
-        triggered = xwbmpop_t1ma(evt->bmp, sync, XWMP_EVT_MAXNUM);
+        triggered = xwbmpop_t1ma(evt->bmp, msk, XWMP_EVT_MAXNUM);
         if (triggered) {
+                if (sync) {
+                        xwbmpop_assign(sync, evt->bmp, XWMP_EVT_MAXNUM);
+                }
                 xwbmpop_c0i(evt->bmp, pos);
                 xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                 xwmp_cond_broadcast(&evt->cond);
@@ -1660,6 +1666,9 @@ xwer_t xwmp_evt_timedsync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t sync[],
                                          xwtm, &lkst);
                 if (XWOS_LKST_UNLOCKED == lkst) {
                         xwmp_splk_lock(&evt->lock);
+                }
+                if (sync) {
+                        xwbmpop_assign(sync, evt->bmp, XWMP_EVT_MAXNUM);
                 }
                 xwbmpop_c0i(evt->bmp, pos);
                 xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);

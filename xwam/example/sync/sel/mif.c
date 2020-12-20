@@ -542,7 +542,7 @@ xwer_t xwseldemo_syncthd_func(void * arg)
         }
 
         /* 同步线程 */
-        rc = xwos_br_sync(&xwseldemo_br7, pos, msk);
+        rc = xwos_br_sync(&xwseldemo_br7, pos, msk, NULL);
         if (XWOK == rc) {
                 sellogf(INFO, "[同步线程%d] 已就位。\n", pos);
         }

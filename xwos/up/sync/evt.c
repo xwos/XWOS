@@ -511,6 +511,52 @@ xwer_t xwup_evt_read(struct xwup_evt * evt, xwbmp_t out[])
         return XWOK;
 }
 
+/**
+ * @brief XWUP API：等待事件对象中的触发信号，事件对象类型为XWUP_EVT_TYPE_FLG
+ * @param evt: (I) 事件对象的指针
+ * @param trigger: (I) 事件触发条件，取值 @ref xwup_evt_trigger_em
+ * @param action: (I) 事件触发后的动作，取值 @ref xwup_evt_action_em，
+ *                    仅当trigger取值
+ *                    @ref XWUP_EVT_TRIGGER_SET_ALL
+ *                    @ref XWUP_EVT_TRIGGER_SET_ANY
+ *                    @ref XWUP_EVT_TRIGGER_CLR_ALL
+ *                    @ref XWUP_EVT_TRIGGER_CLR_ALL
+ *                    时有效，其他情况不使用此参数，可填 @ref XWOS_UNUSED_ARGUMENT
+ * @param origin: 指向缓冲区的指针：
+ *                - 当trigger取值
+ *                  @ref XWUP_EVT_TRIGGER_SET_ALL
+ *                  @ref XWUP_EVT_TRIGGER_SET_ANY
+ *                  @ref XWUP_EVT_TRIGGER_CLR_ALL
+ *                  @ref XWUP_EVT_TRIGGER_CLR_ANY
+ *                  (O) 返回触发时事件对象中位图状态（action之前）
+ *                - 当trigger取值
+ *                  @ref XWUP_EVT_TRIGGER_TGL_ALL
+ *                  @ref XWUP_EVT_TRIGGER_TGL_ANY
+ *                  (I) 作为输入时，作为用于比较的初始值
+ *                  (O) 作为输出时，返回事件对象中位图状态
+ *                      （可作为下一次调用的初始值）
+ * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的事件
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ETYPE: 事件对象类型错误
+ * @retval -EINVAL: 参数无效
+ * @retval -EINTR: 等待被中断
+ * @retval -ENOTINTHD: 不在线程上下文中
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：可重入
+ */
+__xwup_api
+xwer_t xwup_evt_wait(struct xwup_evt * evt,
+                     xwsq_t trigger, xwsq_t action,
+                     xwbmp_t origin[], xwbmp_t msk[])
+{
+        xwtm_t expected = XWTM_MAX;
+        return xwup_evt_timedwait(evt, trigger, action, origin, msk, &expected);
+}
+
 static __xwup_code
 xwer_t xwup_evt_trywait_level(struct xwup_evt * evt,
                               xwsq_t trigger, xwsq_t action,
@@ -652,14 +698,14 @@ xwer_t xwup_evt_trywait_edge(struct xwup_evt * evt, xwsq_t trigger,
  *                  @ref XWUP_EVT_TRIGGER_SET_ANY
  *                  @ref XWUP_EVT_TRIGGER_CLR_ALL
  *                  @ref XWUP_EVT_TRIGGER_CLR_ANY
- *                  (O) 返回事件对象中位图状态（action之前）
+ *                  (O) 返回触发时事件对象中位图状态（action之前）
  *                - 当trigger取值
  *                  @ref XWUP_EVT_TRIGGER_TGL_ALL
  *                  @ref XWUP_EVT_TRIGGER_TGL_ANY
  *                  (I) 作为输入时，作为用于比较的初始值
  *                  (O) 作为输出时，返回事件对象中位图状态
  *                      （可作为下一次调用的初始值）
- * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的位
+ * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的事件
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -850,52 +896,6 @@ xwer_t xwup_evt_timedwait_edge(struct xwup_evt * evt, xwsq_t trigger,
 }
 
 /**
- * @brief XWUP API：等待事件对象中的触发信号，事件对象类型为XWUP_EVT_TYPE_FLG
- * @param evt: (I) 事件对象的指针
- * @param trigger: (I) 事件触发条件，取值 @ref xwup_evt_trigger_em
- * @param action: (I) 事件触发后的动作，取值 @ref xwup_evt_action_em，
- *                    仅当trigger取值
- *                    @ref XWUP_EVT_TRIGGER_SET_ALL
- *                    @ref XWUP_EVT_TRIGGER_SET_ANY
- *                    @ref XWUP_EVT_TRIGGER_CLR_ALL
- *                    @ref XWUP_EVT_TRIGGER_CLR_ALL
- *                    时有效，其他情况不使用此参数，可填 @ref XWOS_UNUSED_ARGUMENT
- * @param origin: 指向缓冲区的指针：
- *                - 当trigger取值
- *                  @ref XWUP_EVT_TRIGGER_SET_ALL
- *                  @ref XWUP_EVT_TRIGGER_SET_ANY
- *                  @ref XWUP_EVT_TRIGGER_CLR_ALL
- *                  @ref XWUP_EVT_TRIGGER_CLR_ANY
- *                  (O) 返回事件对象中位图状态（action之前）
- *                - 当trigger取值
- *                  @ref XWUP_EVT_TRIGGER_TGL_ALL
- *                  @ref XWUP_EVT_TRIGGER_TGL_ANY
- *                  (I) 作为输入时，作为用于比较的初始值
- *                  (O) 作为输出时，返回事件对象中位图状态
- *                      （可作为下一次调用的初始值）
- * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的位
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
- * @retval -EINVAL: 参数无效
- * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- */
-__xwup_api
-xwer_t xwup_evt_wait(struct xwup_evt * evt,
-                     xwsq_t trigger, xwsq_t action,
-                     xwbmp_t origin[], xwbmp_t msk[])
-{
-        xwtm_t expected = XWTM_MAX;
-        return xwup_evt_timedwait(evt, trigger, action, origin, msk, &expected);
-}
-
-/**
  * @brief XWUP API：限时等待事件对象中的触发信号，事件对象类型为XWUP_EVT_TYPE_FLG
  * @param evt: (I) 事件对象的指针
  * @param trigger: (I) 事件触发条件，取值 @ref xwup_evt_trigger_em
@@ -912,14 +912,14 @@ xwer_t xwup_evt_wait(struct xwup_evt * evt,
  *                  @ref XWUP_EVT_TRIGGER_SET_ANY
  *                  @ref XWUP_EVT_TRIGGER_CLR_ALL
  *                  @ref XWUP_EVT_TRIGGER_CLR_ANY
- *                  (O) 返回事件对象中位图状态（action之前）
+ *                  (O) 返回触发时事件对象中位图状态（action之前）
  *                - 当trigger取值
  *                  @ref XWUP_EVT_TRIGGER_TGL_ALL
  *                  @ref XWUP_EVT_TRIGGER_TGL_ANY
  *                  (I) 作为输入时，作为用于比较的初始值
  *                  (O) 作为输出时，返回事件对象中位图状态
  *                      （可作为下一次调用的初始值）
- * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的位
+ * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的事件
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -1123,8 +1123,8 @@ err_notconn:
  * @brief XWUP API：等待事件对象中绑定的同步对象，
  *                  事件对象类型为XWUP_EVT_TYPE_SEL
  * @param evt: (I) 事件对象的指针
- * @param msk: (I) 待触发的同步对象的位图掩码（表示只关注掩码部分的同步对象）
- * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象的位图
+ * @param msk: (I) 待触发的同步对象位图掩码
+ * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -1146,8 +1146,8 @@ xwer_t xwup_evt_select(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
 /**
  * @brief XWUP API：检测一下事件对象中绑定的同步对象，不会阻塞调用者
  * @param evt: (I) 事件对象的指针
- * @param msk: (I) 待触发的同步对象的位图掩码，表示只关注掩码部分的位
- * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象的位图
+ * @param msk: (I) 待触发的同步对象位图掩码
+ * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -1196,8 +1196,8 @@ xwer_t xwup_evt_tryselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
  * @brief XWUP API：限时等待事件对象中绑定的同步对象，
  *                  事件对象类型为XWUP_EVT_TYPE_SEL
  * @param evt: (I) 事件对象的指针
- * @param msk: (I) 待触发的同步对象的位图掩码（表示只关注掩码部分的同步对象）
- * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象的位图
+ * @param msk: (I) 待触发的同步对象位图掩码
+ * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -1279,7 +1279,8 @@ xwer_t xwup_evt_timedselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
  * @brief XWUP API：等待所有线程到达栅栏，事件对象类型为XWUP_EVT_TYPE_BR
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 当前线程的位图位置
- * @param sync: (I) 当前线程需要同步的线程掩码
+ * @param msk: (I) 需要同步的线程位图掩码
+ * @param sync: (O) 指向缓冲区的指针，通过此缓冲区返回已经抵达栅栏的线程位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -1293,7 +1294,7 @@ xwer_t xwup_evt_timedselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
  * - 重入性：可重入
  */
 __xwup_api
-xwer_t xwup_evt_sync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t sync[])
+xwer_t xwup_evt_sync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t msk[], xwbmp_t sync[])
 {
         xwtm_t expected = XWTM_MAX;
         return xwup_evt_timedsync(evt, pos, sync, &expected);
@@ -1303,7 +1304,8 @@ xwer_t xwup_evt_sync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t sync[])
  * @brief XWUP API：等待所有线程到达栅栏，事件对象类型为XWUP_EVT_TYPE_BR
  * @param evt: (I) 事件对象的指针
  * @param pos: (I) 当前线程的位图位置
- * @param sync: (I) 当前线程需要同步的线程掩码
+ * @param msk: (I) 需要同步的线程位图掩码
+ * @param sync: (O) 指向缓冲区的指针，通过此缓冲区返回已经抵达栅栏的线程位图掩码
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -1323,7 +1325,8 @@ xwer_t xwup_evt_sync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t sync[])
  * - 函数返回返回**-ETIMEDOUT**时，**xwtm**指向的缓冲区内的期望时间会减为0。
  */
 __xwup_api
-xwer_t xwup_evt_timedsync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t sync[],
+xwer_t xwup_evt_timedsync(struct xwup_evt * evt, xwsq_t pos,
+                          xwbmp_t msk[], xwbmp_t sync[],
                           xwtm_t * xwtm)
 {
         xwreg_t cpuirq;
@@ -1332,7 +1335,7 @@ xwer_t xwup_evt_timedsync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t sync[],
         xwer_t rc;
 
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((sync), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE((pos < XWUP_EVT_MAXNUM), "out-of-range", -ECHRNG);
         XWOS_VALIDATE(((evt->attr & XWUP_EVT_TYPE_MASK) == XWUP_EVT_TYPE_BR),
                       "type-error", -ETYPE);
@@ -1342,8 +1345,11 @@ xwer_t xwup_evt_timedsync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t sync[],
 
         xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         xwbmpop_s1i(evt->bmp, pos);
-        triggered = xwbmpop_t1ma(evt->bmp, sync, XWUP_EVT_MAXNUM);
+        triggered = xwbmpop_t1ma(evt->bmp, msk, XWUP_EVT_MAXNUM);
         if (triggered) {
+                if (sync) {
+                        xwbmpop_assign(sync, evt->bmp, XWUP_EVT_MAXNUM);
+                }
                 xwbmpop_c0i(evt->bmp, pos);
                 xwup_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                 xwup_cond_broadcast(&evt->cond);
@@ -1355,6 +1361,9 @@ xwer_t xwup_evt_timedsync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t sync[],
                                          xwtm, &lkst);
                 if (XWOS_LKST_UNLOCKED == lkst) {
                         xwup_splk_lock(&evt->lock);
+                }
+                if (sync) {
+                        xwbmpop_assign(sync, evt->bmp, XWUP_EVT_MAXNUM);
                 }
                 xwbmpop_c0i(evt->bmp, pos);
                 xwup_splk_unlock_cpuirqrs(&evt->lock, cpuirq);

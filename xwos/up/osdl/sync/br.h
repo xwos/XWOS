@@ -108,16 +108,18 @@ xwer_t xwosdl_br_intr_all(struct xwosdl_br * br)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_br_sync(struct xwosdl_br * br, xwsq_t pos, xwbmp_t sync[])
+xwer_t xwosdl_br_sync(struct xwosdl_br * br, xwsq_t pos,
+                      xwbmp_t msk[], xwbmp_t sync[])
 {
-        return xwup_evt_sync(br, pos, sync);
+        return xwup_evt_sync(br, pos, msk, sync);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_br_timedsync(struct xwosdl_br * br, xwsq_t pos,
-                           xwbmp_t sync[], xwtm_t * xwtm)
+                           xwbmp_t msk[], xwbmp_t sync[],
+                           xwtm_t * xwtm)
 {
-        return xwup_evt_timedsync(br, pos, sync, xwtm);
+        return xwup_evt_timedsync(br, pos, msk, sync, xwtm);
 }
 
 #endif /* xwos/up/osdl/sync/br.h */

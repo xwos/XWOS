@@ -108,8 +108,8 @@ xwer_t xwup_evt_select(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[]);
 xwer_t xwup_evt_tryselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[]);
 xwer_t xwup_evt_timedselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
                             xwtm_t * xwtm);
-xwer_t xwup_evt_sync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t sync[]);
-xwer_t xwup_evt_timedsync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t sync[],
+xwer_t xwup_evt_sync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t msk[], xwbmp_t sync[]);
+xwer_t xwup_evt_timedsync(struct xwup_evt * evt, xwsq_t pos,
+                          xwbmp_t msk[], xwbmp_t sync[],
                           xwtm_t * xwtm);
-
 #endif /* xwos/up/sync/evt.h */

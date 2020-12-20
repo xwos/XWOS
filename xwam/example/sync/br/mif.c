@@ -28,11 +28,11 @@
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-#define XWBRDEMO_LOG_TAG      "br"
-#define brlogf(lv, fmt, ...)                                    \
-        xwlogf(lv, XWBRDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
+  #define XWBRDEMO_LOG_TAG      "br"
+  #define brlogf(lv, fmt, ...)                                  \
+          xwlogf(lv, XWBRDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
 #else /* XWLIBCFG_LOG */
-#define brlogf(lv, fmt, ...)
+  #define brlogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
 
 xwer_t xwbrdemo_thd_func(void * arg);
@@ -144,7 +144,7 @@ xwer_t xwbrdemo_thd_func(void * arg)
         }
 
         /* 同步线程 */
-        rc = xwos_br_sync(&xwbrdemo_br, pos, msk);
+        rc = xwos_br_sync(&xwbrdemo_br, pos, msk, NULL);
         if (XWOK == rc) {
                 brlogf(INFO, "[线程%d] 同步。\n", pos);
         }
