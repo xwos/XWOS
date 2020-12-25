@@ -52,14 +52,12 @@
 #if (defined(ARCHCFG_LIB_XWBOP_FFS8) && (1 == ARCHCFG_LIB_XWBOP_FFS8))
 #define xwbop_ffs8(x)           arch_xwbop_ffs8(x)
 #else
-__xwlib_code
 xwssq_t xwbop_ffs8(xwu8_t x);
 #endif
 
 #if (defined(ARCHCFG_LIB_XWBOP_FLS8) && (1 == ARCHCFG_LIB_XWBOP_FLS8))
 #define xwbop_fls8(x)           arch_xwbop_fls8(x)
 #else
-__xwlib_code
 xwssq_t xwbop_fls8(xwu8_t x);
 #endif
 
@@ -78,23 +76,16 @@ xwssq_t xwbop_flz8(xwu8_t x)
 #if (defined(ARCHCFG_LIB_XWBOP_RBIT8) && (1 == ARCHCFG_LIB_XWBOP_RBIT8))
   #define xwbop_rbit8(x)        arch_xwbop_rbit8(x)
 #else
-__xwlib_code
 xwu8_t xwbop_rbit8(xwu8_t x);
 #endif
 
-/**
- * @brief 翻转8位数据的大小端
- * @param x: (I) 8位数据
- * @return 结果
- * @note
- * - 这个函数不做任何操作，是为了位操作模板的统一接口而实现的dummy函数。
- *   因为大小端是以字节为单位的。
- */
 static __xwlib_inline
 xwu8_t xwbop_re8(xwu8_t x)
 {
         return x;
 }
+
+xwsz_t xwbop_weight8(xwu8_t x);
 
 /******** ******** 16-bit data bit operations ******** ********/
 #if (defined(ARCHCFG_LIB_XWBOP_S1M16) && (1 == ARCHCFG_LIB_XWBOP_S1M16))
@@ -118,14 +109,12 @@ xwu8_t xwbop_re8(xwu8_t x)
 #if (defined(ARCHCFG_LIB_XWBOP_FFS16) && (1 == ARCHCFG_LIB_XWBOP_FFS16))
 #define xwbop_ffs16(x)          arch_xwbop_ffs16(x)
 #else
-__xwlib_code
 xwssq_t xwbop_ffs16(xwu16_t x);
 #endif
 
 #if (defined(ARCHCFG_LIB_XWBOP_FLS16) && (1 == ARCHCFG_LIB_XWBOP_FLS16))
 #define xwbop_fls16(x)          arch_xwbop_fls16(x)
 #else
-__xwlib_code
 xwssq_t xwbop_fls16(xwu16_t x);
 #endif
 
@@ -144,28 +133,22 @@ xwssq_t xwbop_flz16(xwu16_t x)
 #if (defined(ARCHCFG_LIB_XWBOP_RBIT16) && (1 == ARCHCFG_LIB_XWBOP_RBIT16))
 #define xwbop_rbit16(x)         arch_xwbop_rbit16(x)
 #else
-__xwlib_code
 xwu16_t xwbop_rbit16(xwu16_t x);
 #endif
 
 #if (defined(ARCHCFG_LIB_XWBOP_RE16) && (1 == ARCHCFG_LIB_XWBOP_RE16))
 #define xwbop_re16(x)           arch_xwbop_re16(x)
 #else
-__xwlib_code
 xwu16_t xwbop_re16(xwu16_t a);
 #endif
 
-/**
- * @brief 将16位数据的大小端翻转，并将符号位扩展到32位
- * @param x: (I) 数据（注：非指针）
- * @return 结果
- */
 #if (defined(ARCHCFG_LIB_XWBOP_RE16S32) && (1 == ARCHCFG_LIB_XWBOP_RE16S32))
 #define xwbop_re16s32(x)        arch_xwbop_re16s32(x)
 #else
-__xwlib_code
 xws32_t xwbop_re16s32(xwu16_t x);
 #endif
+
+xwsz_t xwbop_weight16(xwu16_t x);
 
 /******** ******** 32-bit data bit operations ******** ********/
 #if (defined(ARCHCFG_LIB_XWBOP_S1M32) && (1 == ARCHCFG_LIB_XWBOP_S1M32))
@@ -189,14 +172,12 @@ xws32_t xwbop_re16s32(xwu16_t x);
 #if (defined(ARCHCFG_LIB_XWBOP_FFS32) && (1 == ARCHCFG_LIB_XWBOP_FFS32))
 #define xwbop_ffs32(x)                  arch_xwbop_ffs32(x)
 #else
-__xwlib_code
 xwssq_t xwbop_ffs32(xwu32_t x);
 #endif
 
 #if (defined(ARCHCFG_LIB_XWBOP_FLS32) && (1 == ARCHCFG_LIB_XWBOP_FLS32))
 #define xwbop_fls32(x)                  arch_xwbop_fls32(x)
 #else
-__xwlib_code
 xwssq_t xwbop_fls32(xwu32_t x);
 #endif
 
@@ -215,28 +196,22 @@ xwssq_t xwbop_flz32(xwu32_t x)
 #if (defined(ARCHCFG_LIB_XWBOP_RBIT32) && (1 == ARCHCFG_LIB_XWBOP_RBIT32))
 #define xwbop_rbit32(x)         arch_xwbop_rbit32(x)
 #else
-__xwlib_code
 xwu32_t xwbop_rbit32(xwu32_t x);
 #endif
 
 #if (defined(ARCHCFG_LIB_XWBOP_RE32) && (1 == ARCHCFG_LIB_XWBOP_RE32))
 #define xwbop_re32(x)           arch_xwbop_re32(x)
 #else
-__xwlib_code
 xwu32_t xwbop_re32(xwu32_t x);
 #endif
 
-/**
- * @brief 将32位数据的大小端翻转，并将符号位扩展到64位
- * @param x: (I) 数据（注：非指针）
- * @return 结果
- */
 #if (defined(ARCHCFG_LIB_XWBOP_RE32S64) && (1 == ARCHCFG_LIB_XWBOP_RE32S64))
 #define xwbop_re32s64(x)        arch_xwbop_re32s64(x)
 #else
-__xwlib_code
 xws64_t xwbop_re32s64(xwu32_t x);
 #endif
+
+xwsz_t xwbop_weight32(xwu32_t x);
 
 /******** ******** 64-bit data bit operations ******** ********/
 #if (defined(ARCHCFG_LIB_XWBOP_S1M64) && (1 == ARCHCFG_LIB_XWBOP_S1M64))
@@ -260,14 +235,12 @@ xws64_t xwbop_re32s64(xwu32_t x);
 #if (defined(ARCHCFG_LIB_XWBOP_FFS64) && (1 == ARCHCFG_LIB_XWBOP_FFS64))
 #define xwbop_ffs64(x)                  arch_xwbop_ffs64(x)
 #else
-__xwlib_code
 xwssq_t xwbop_ffs64(xwu64_t x);
 #endif
 
 #if (defined(ARCHCFG_LIB_XWBOP_FLS64) && (1 == ARCHCFG_LIB_XWBOP_FLS64))
 #define xwbop_fls64(x)                  arch_xwbop_fls64(x)
 #else
-__xwlib_code
 xwssq_t xwbop_fls64(xwu64_t x);
 #endif
 
@@ -286,15 +259,15 @@ xwssq_t xwbop_flz64(xwu64_t x)
 #if (defined(ARCHCFG_LIB_XWBOP_RE64) && (1 == ARCHCFG_LIB_XWBOP_RE64))
 #define xwbop_re64(x)           arch_xwbop_re64(x)
 #else
-__xwlib_code
 xwu64_t xwbop_re64(xwu64_t x);
 #endif
 
 #if (defined(ARCHCFG_LIB_XWBOP_RBIT64) && (1 == ARCHCFG_LIB_XWBOP_RBIT64))
 #define xwbop_rbit64(x)         arch_xwbop_rbit64(x)
 #else
-__xwlib_code
 xwu64_t xwbop_rbit64(xwu64_t x);
 #endif
+
+xwsz_t xwbop_weight64(xwu64_t x);
 
 #endif /* xwos/lib/xwbop_internal.h */

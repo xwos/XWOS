@@ -8,8 +8,8 @@
  * + http://www.lua.org/license.html
  */
 
-#include <stdio.h>
 #include <xwos/standard.h>
+#include <stdio.h>
 #include <xwos/lib/ctype.h>
 #include <xwos/osal/skd.h>
 #include "lua.h"

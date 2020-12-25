@@ -51,7 +51,7 @@
         stringify(XWOS_VERSION_MINOR) "." \
         stringify(XWOS_VERSION_REVISION)
 
-#define XWOS_COPYRIGHT "XuanWuOS " XWOS_VER_STR \
+#define XWOS_COPYRIGHT "玄武OS " XWOS_VER_STR \
         "  Copyright (C) 2015-2021 http://xwos.tech, Roy.Sun"
 
 #endif /* xwos/lib/version.h */

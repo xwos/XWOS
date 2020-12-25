@@ -8,12 +8,12 @@
  * > http://www.lua.org/license.html
  */
 
-#ifndef __xwem_vm_lua_port_h__
-#define __xwem_vm_lua_port_h__
+#ifndef __xwem_vm_lua_xwlua_port_h__
+#define __xwem_vm_lua_xwlua_port_h__
 
 #include <xwos/standard.h>
-#include "lua.h"
-#include "lauxlib.h"
+#include "src/lua.h"
+#include "src/lauxlib.h"
 
 struct xwlua_arg {
         int argc;
@@ -23,9 +23,16 @@ struct xwlua_arg {
 extern struct xwmm_mempool * xwlua_mempool;
 
 int xwlua_readline(lua_State * L, char buffer[], const char * prompt);
-void * xwlua_alloc(void * ud, void * ptr, size_t osize, size_t nsize);
 void xwlua_openlibs(lua_State * L);
-lua_State * xwlua_newstate(lua_Alloc f);
 xwer_t xwlua_task(void * arg);
 
-#endif /* xwem/vm/lua/port.h */
+#define XWLUA_LIB_NAME          "xwlib"
+#define XWLUA_OS_NAME           "xwos"
+#define XWLUA_XT_NAME           "xwxt"
+#define XWLUA_THD_STACK         XWEMCFG_vm_lua_THD_STACK
+
+LUAMOD_API int xwlua_open_lib(lua_State * L);
+LUAMOD_API int xwlua_open_xt(lua_State * L);
+LUAMOD_API int xwlua_open_os(lua_State * L);
+
+#endif /* xwem/vm/lua/xwlua/port.h */

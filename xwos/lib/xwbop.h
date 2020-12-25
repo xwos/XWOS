@@ -69,6 +69,7 @@
  * @brief XWOS BOPLIB：在数据中从最低位起查找第一个被置1的位
  * @param type: (I) 数据类型
  * @param data: (I) 数据（注：非指针）
+ * @return 位的序号
  * @retval >=0: 位的序号
  * @retval -1: 没有任何一个位为1
  * @note
@@ -80,6 +81,7 @@
  * @brief XWOS BOPLIB：在数据中从最高位起查找第一个被置1的位
  * @param type: (I) 数据类型
  * @param data: (I) 数据（注：非指针）
+ * @return 位的序号
  * @retval >=0: 位的序号
  * @retval -1: 没有任何一个位为1
  * @note
@@ -91,6 +93,7 @@
  * @brief XWOS BOPLIB：在数据中从最低位起查找第一个被清0的位
  * @param type: (I) 数据类型
  * @param data: (I) 数据（注：非指针）
+ * @return 位的序号
  * @retval >=0: 位的序号
  * @retval -1: 没有任何一个位为0
  * @note
@@ -102,12 +105,21 @@
  * @brief XWOS BOPLIB：在数据中从最高位起查找第一个被清0的位
  * @param type: (I) 数据类型
  * @param data: (I) 数据（注：非指针）
+ * @return 位的序号
  * @retval >=0: 位的序号
  * @retval -1: 没有任何一个位为0
  * @note
  * - 返回的序号是从0开始编号的。
  */
 #define xwbop_flz(type, data)           xwbop(type, flz, (data))
+
+/**
+ * @brief XWOS BOPLIB：统计数据中1的个数
+ * @param type: (I) 数据类型
+ * @param data: (I) 数据（注：非指针）
+ * @return 数据中1的个数
+ */
+#define xwbop_weight(type, data)        xwbop(type, weight, (data))
 
 /******** ******** 位操作模板 ******** ********/
 /**
@@ -219,6 +231,18 @@ xwssq_t xwbop_ffz__##type(type x)                                               
 }
 
 /**
+ * @brief 定义位操作模板：weight
+ * @param type: (I) 类型
+ * @param bw: (I) 位宽
+ */
+#define DEFINE_XWBOP_WEIGHT(type, bw)                                           \
+static __xwlib_inline                                                           \
+xwsq_t xwbop_weight__##type(type x)                                             \
+{                                                                               \
+        return xwbop_weight##bw((xwu##bw##_t)x);                                \
+}
+
+/**
  * @brief 使用模板为类型定义所有的位操作函数
  * @param type: (I) 类型
  * @param bw: (I) 位宽
@@ -232,7 +256,8 @@ xwssq_t xwbop_ffz__##type(type x)                                               
         DEFINE_XWBOP_FFS(type, bw)                                              \
         DEFINE_XWBOP_FLS(type, bw)                                              \
         DEFINE_XWBOP_FLZ(type, bw)                                              \
-        DEFINE_XWBOP_FFZ(type, bw)
+        DEFINE_XWBOP_FFZ(type, bw)                                              \
+        DEFINE_XWBOP_WEIGHT(type, bw)
 
 DEFINE_XWBOP(xwu8_t, 8)
 DEFINE_XWBOP(xws8_t, 8)
@@ -314,7 +339,6 @@ DEFINE_XWBOP(xwbmp_t, 64)
  * @param opd: (I) 操作数
  * @param num: (I) 位图中总的位数
  */
-__xwlib_code
 void xwbmpop_assign(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 
 /**
@@ -327,7 +351,6 @@ void xwbmpop_assign(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
  * @retval <0: 小于
  * @retval >0: 大于
  */
-__xwlib_code
 xwssq_t xwbmpop_cmp(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 
 /**
@@ -335,7 +358,6 @@ xwssq_t xwbmpop_cmp(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
  * @param bmp: (I) 位图的起始地址指针
  * @param num: (I) 位图中总的位数
  */
-__xwlib_code
 void xwbmpop_s1all(xwbmp_t * bmp, xwsq_t num);
 
 /**
@@ -343,7 +365,6 @@ void xwbmpop_s1all(xwbmp_t * bmp, xwsq_t num);
  * @param bmp: (I) 位图的起始地址指针
  * @param num: (I) 位图中总的位数
  */
-__xwlib_code
 void xwbmpop_c0all(xwbmp_t * bmp, xwsq_t num);
 
 /**
@@ -351,7 +372,6 @@ void xwbmpop_c0all(xwbmp_t * bmp, xwsq_t num);
  * @param bmp: (I) 位图的起始地址指针
  * @param n: (I) 位的序号
  */
-__xwlib_code
 void xwbmpop_s1i(xwbmp_t * bmp, xwsq_t n);
 
 /**
@@ -360,7 +380,6 @@ void xwbmpop_s1i(xwbmp_t * bmp, xwsq_t n);
  * @param msk: (I) 掩码
  * @param num: (I) 掩码的有效位数
  */
-__xwlib_code
 void xwbmpop_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
@@ -368,7 +387,6 @@ void xwbmpop_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
  * @param bmp: (I) 位图的起始地址指针
  * @param n: (I) 被清0的位的序号
  */
-__xwlib_code
 void xwbmpop_c0i(xwbmp_t * bmp, xwsq_t n);
 
 /**
@@ -377,7 +395,6 @@ void xwbmpop_c0i(xwbmp_t * bmp, xwsq_t n);
  * @param msk: (I) 掩码
  * @param num: (I) 掩码的有效位数
  */
-__xwlib_code
 void xwbmpop_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
@@ -385,7 +402,6 @@ void xwbmpop_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
  * @param bmp: (I) 位图的起始地址指针
  * @param n: (I) 被翻转的位的序号
  */
-__xwlib_code
 void xwbmpop_x1i(xwbmp_t * bmp, xwsq_t n);
 
 /**
@@ -394,7 +410,6 @@ void xwbmpop_x1i(xwbmp_t * bmp, xwsq_t n);
  * @param msk: (I) 掩码
  * @param num: (I) 掩码的有效位数
  */
-__xwlib_code
 void xwbmpop_x1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
@@ -405,7 +420,6 @@ void xwbmpop_x1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
  * @retval true: 置位
  * @retval false: 复位
  */
-__xwlib_code
 bool xwbmpop_t1i(xwbmp_t * bmp, xwsq_t n);
 
 /**
@@ -417,7 +431,6 @@ bool xwbmpop_t1i(xwbmp_t * bmp, xwsq_t n);
  * @retval true: 全部为1
  * @retval false: 至少一位为0
  */
-__xwlib_code
 bool xwbmpop_t1ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
@@ -429,7 +442,6 @@ bool xwbmpop_t1ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
  * @retval true: 全部为1
  * @retval false: 至少一位为0
  */
-__xwlib_code
 bool xwbmpop_t1ma_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
@@ -441,7 +453,6 @@ bool xwbmpop_t1ma_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
  * @retval true: 至少一位为1
  * @retval false: 全部为0
  */
-__xwlib_code
 bool xwbmpop_t1mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
@@ -453,7 +464,6 @@ bool xwbmpop_t1mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
  * @retval true: 至少一位为1
  * @retval false: 全部为0
  */
-__xwlib_code
 bool xwbmpop_t1mo_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
@@ -465,7 +475,6 @@ bool xwbmpop_t1mo_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
  * @retval true: 全部为0
  * @retval false: 至少一位为1
  */
-__xwlib_code
 bool xwbmpop_t0ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
@@ -477,7 +486,6 @@ bool xwbmpop_t0ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
  * @retval true: 全部为0
  * @retval false: 至少一位为1
  */
-__xwlib_code
 bool xwbmpop_t0ma_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
@@ -489,7 +497,6 @@ bool xwbmpop_t0ma_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
  * @retval true: 至少一位为0
  * @retval false: 全部为1
  */
-__xwlib_code
 bool xwbmpop_t0mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
@@ -501,8 +508,14 @@ bool xwbmpop_t0mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
  * @retval true: 至少一位为0
  * @retval false: 全部为1
  */
-__xwlib_code
 bool xwbmpop_t0mo_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
+
+/**
+ * @brief XWOS BOPLIB：将位图按位取反
+ * @param bmp: (I) 位图的起始地址指针
+ * @param num: (I) 掩码的有效位数
+ */
+void xwbmpop_not(xwbmp_t * bmp, xwsz_t num);
 
 /**
  * @brief XWOS BOPLIB：将位图与操作数进行逐位“与”操作
@@ -510,7 +523,6 @@ bool xwbmpop_t0mo_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
  * @param opd: (I) 操作数
  * @param num: (I) 掩码的有效位数
  */
-__xwlib_code
 void xwbmpop_and(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 
 /**
@@ -519,7 +531,6 @@ void xwbmpop_and(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
  * @param opd: (I) 操作数
  * @param num: (I) 掩码的有效位数
  */
-__xwlib_code
 void xwbmpop_or(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 
 /**
@@ -528,7 +539,6 @@ void xwbmpop_or(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
  * @param opd: (I) 操作数
  * @param num: (I) 掩码的有效位数
  */
-__xwlib_code
 void xwbmpop_xor(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 
 /**
@@ -541,7 +551,6 @@ void xwbmpop_xor(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
  * @note
  * - 返回的序号是从0开始编号的，与C标准库中ffs()函数返回值不同。
  */
-__xwlib_code
 xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t num);
 
 /**
@@ -554,7 +563,6 @@ xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t num);
  * @note
  * - 返回的序号是从0开始编号的，与C标准库中ffs()函数返回值不同。
  */
-__xwlib_code
 xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t num);
 
 /**
@@ -567,7 +575,6 @@ xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t num);
  * @note
  * - 返回的序号是从0开始编号的，与C标准库中ffs()函数返回值不同。
  */
-__xwlib_code
 xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num);
 
 /**
@@ -580,7 +587,14 @@ xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num);
  * @note
  * - 返回的序号是从0开始编号的，与C标准库中ffs()函数返回值不同。
  */
-__xwlib_code
 xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t num);
+
+/**
+ * @brief XWOS BOPLIB：在位图中统计1的个数
+ * @param bmp: (I) 位图的起始地址指针
+ * @param num: (I) 位图中总的位数
+ * @return 数据中1的个数
+ */
+xwsz_t xwbmpop_weight(xwbmp_t * bmp, xwsz_t num);
 
 #endif /* xwos/lib/xwbop.h */

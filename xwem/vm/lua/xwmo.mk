@@ -21,6 +21,7 @@
 include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
+$(eval $(call XwmoReqCfg,XuanWuOS_CFG_CORE,mp))
 $(eval $(call XwmoReqCfg,XWEMCFG_fs_fatfs,y))
 $(eval $(call XwmoReqCfg,XWMDCFG_libc_newlibac,y))
 
@@ -29,8 +30,11 @@ LUA_CORE := $(addprefix src/,$(addsuffix .c,$(basename $(CORE_O))))
 LIB_O := $(shell xwbs/util/el/makefile-grep-variable.el -a LIB_O $(call getXwmoDir)/src/Makefile)
 LUA_LIB := $(addprefix src/,$(addsuffix .c,$(basename $(LIB_O))))
 LUA_PORT := xwlua/port.c xwlua/readline.c xwlua/lua.c mif.c
+LUA_PORT += $(call getAllFileUnderXwmoDir,*.c,xwlua/xwlib)
+LUA_PORT += $(call getAllFileUnderXwmoDir,*.c,xwlua/xwos)
+LUA_PORT += $(call getAllFileUnderXwmoDir,*.c,xwlua/xwxt)
 
 XWMO_CSRCS = $(LUA_CORE) $(LUA_LIB) $(LUA_PORT)
-XWMO_CFLAGS = -include xwlua/prefix.h -Wno-sign-conversion -DLUA_32BITS
+XWMO_CFLAGS = -Wno-sign-conversion
 XWMO_INCDIRS = $(call getXwmoDir) $(call getXwmoDir)/src
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)
