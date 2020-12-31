@@ -22,8 +22,4 @@ typedef xwos_sem_d xwlua_sem_sp; /**< 信号量的强指针 */
 
 void xwlua_os_open_sem(lua_State * L);
 
-void xwlua_semsp_xt_init(lua_State * xt);
-void xwlua_semsp_xt_export(lua_State * xt, const char * key, xwlua_sem_sp * semsp);
-void xwlua_semsp_xt_copy(lua_State * L, xwlua_sem_sp * semsp);
-
 #endif /* xwem/vm/lua/xwlua/xwos/sem.h */

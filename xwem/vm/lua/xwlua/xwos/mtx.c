@@ -73,10 +73,36 @@ int xwlua_mtxsp_tostring(lua_State * L)
         return 1;
 }
 
+int xwlua_mtxsp_copy(lua_State * L)
+{
+        xwlua_mtx_sp * mtxsp;
+        xwlua_mtx_sp * newmtxsp;
+        lua_State * D;
+
+        mtxsp = (xwlua_mtx_sp *)luaL_checkudata(L, 1, "xwlua_mtx_sp");
+        D = (lua_State *)lua_touserdata(L, 2);
+        if (D) {
+                xwer_t rc;
+                rc = xwos_mtx_acquire(*mtxsp);
+                if (XWOK == rc) {
+                        newmtxsp = lua_newuserdatauv(D, sizeof(xwlua_mtx_sp), 0);
+                        newmtxsp->mtx = mtxsp->mtx;
+                        newmtxsp->tik = mtxsp->tik;
+                        luaL_setmetatable(D, "xwlua_mtx_sp");
+                } else {
+                        lua_pushnil(D);
+                }
+        } else {
+                luaL_error(L, "Destination lua_State is NULL!");
+        }
+        return 0;
+}
+
 const luaL_Reg xwlua_mtxsp_metamethod[] = {
         {"__index", NULL},  /* place holder */
         {"__gc", xwlua_mtxsp_gc},
         {"__tostring", xwlua_mtxsp_tostring},
+        {"__copy", xwlua_mtxsp_copy},
         {NULL, NULL}
 };
 
@@ -159,42 +185,4 @@ void xwlua_os_init_mtxsp(lua_State * L)
         luaL_setfuncs(L, xwlua_mtxsp_method, 0); /* add mtx methods */
         lua_setfield(L, -2, "__index");  /* metatable.__index = xwlua_mtxsp_method */
         lua_pop(L, 1); /* pop metatable */
-}
-
-void xwlua_mtxsp_xt_init(lua_State * xt)
-{
-        luaL_newmetatable(xt, "xwlua_mtx_sp");
-        luaL_setfuncs(xt, xwlua_mtxsp_metamethod, 0); /* add metamethods */
-        lua_pop(xt, 1); /* pop metatable */
-}
-
-void xwlua_mtxsp_xt_export(lua_State * xt, const char * key, xwlua_mtx_sp * mtxsp)
-{
-        xwlua_mtx_sp * exp;
-        xwer_t rc;
-
-        /* 增加对象的强引用 */
-        rc = xwos_mtx_acquire(*mtxsp);
-        if (XWOK == rc) {
-                exp = lua_newuserdatauv(xt, sizeof(xwlua_mtx_sp), 0);
-                exp->mtx = mtxsp->mtx;
-                exp->tik = mtxsp->tik;
-                luaL_setmetatable(xt, "xwlua_mtx_sp");
-                lua_setglobal(xt, key);
-        }
-}
-
-void xwlua_mtxsp_xt_copy(lua_State * L, xwlua_mtx_sp * mtxsp)
-{
-        xwlua_mtx_sp * cp;
-        xwer_t rc;
-
-        /* 增加对象的强引用 */
-        rc = xwos_mtx_acquire(*mtxsp);
-        if (XWOK == rc) {
-                cp = lua_newuserdatauv(L, sizeof(xwlua_mtx_sp), 0);
-                cp->mtx = mtxsp->mtx;
-                cp->tik = mtxsp->tik;
-                luaL_setmetatable(L, "xwlua_mtx_sp");
-        }
 }

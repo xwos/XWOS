@@ -11,7 +11,6 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/lib/object.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <stdlib.h>
 #include "src/lauxlib.h"
@@ -177,10 +176,36 @@ int xwlua_splksp_tostring(lua_State * L)
         return 1;
 }
 
+int xwlua_splksp_copy(lua_State * L)
+{
+        xwlua_splk_sp * splksp;
+        xwlua_splk_sp * newsplksp;
+        lua_State * D;
+
+        splksp = (xwlua_splk_sp *)luaL_checkudata(L, 1, "xwlua_splk_sp");
+        D = (lua_State *)lua_touserdata(L, 2);
+        if (D) {
+                xwer_t rc;
+                rc = xwlua_splk_acquire(*splksp);
+                if (XWOK == rc) {
+                        newsplksp = lua_newuserdatauv(D, sizeof(xwlua_splk_sp), 0);
+                        newsplksp->luasplk = splksp->luasplk;
+                        newsplksp->tik = splksp->tik;
+                        luaL_setmetatable(D, "xwlua_splk_sp");
+                } else {
+                        lua_pushnil(D);
+                }
+        } else {
+                luaL_error(L, "Destination lua_State is NULL!");
+        }
+        return 0;
+}
+
 const luaL_Reg xwlua_splksp_metamethod[] = {
         {"__index", NULL},  /* place holder */
         {"__gc", xwlua_splksp_gc},
         {"__tostring", xwlua_splksp_tostring},
+        {"__copy", xwlua_splksp_copy},
         {NULL, NULL}
 };
 
@@ -257,42 +282,4 @@ void xwlua_os_init_splksp(lua_State * L)
         luaL_setfuncs(L, xwlua_splksp_method, 0); /* add splksp methods */
         lua_setfield(L, -2, "__index");  /* metatable.__index = xwlua_splksp_method */
         lua_pop(L, 1); /* pop metatable */
-}
-
-void xwlua_splksp_xt_init(lua_State * xt)
-{
-        luaL_newmetatable(xt, "xwlua_splk_sp");
-        luaL_setfuncs(xt, xwlua_splksp_metamethod, 0); /* add metamethods */
-        lua_pop(xt, 1); /* pop metatable */
-}
-
-void xwlua_splksp_xt_export(lua_State * xt, const char * key, xwlua_splk_sp * splksp)
-{
-        xwlua_splk_sp * exp;
-        xwer_t rc;
-
-        /* 增加对象的强引用 */
-        rc = xwlua_splk_acquire(*splksp);
-        if (XWOK == rc) {
-                exp = lua_newuserdatauv(xt, sizeof(xwlua_splk_sp), 0);
-                exp->luasplk = splksp->luasplk;
-                exp->tik = splksp->tik;
-                luaL_setmetatable(xt, "xwlua_splk_sp");
-                lua_setglobal(xt, key);
-        }
-}
-
-void xwlua_splksp_xt_copy(lua_State * L, xwlua_splk_sp * splksp)
-{
-        xwlua_splk_sp * cp;
-        xwer_t rc;
-
-        /* 增加对象的强引用 */
-        rc = xwlua_splk_acquire(*splksp);
-        if (XWOK == rc) {
-                cp = lua_newuserdatauv(L, sizeof(xwlua_splk_sp), 0);
-                cp->luasplk = splksp->luasplk;
-                cp->tik = splksp->tik;
-                luaL_setmetatable(L, "xwlua_splk_sp");
-        }
 }

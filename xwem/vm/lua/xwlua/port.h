@@ -24,6 +24,7 @@ extern struct xwmm_mempool * xwlua_mempool;
 
 int xwlua_readline(lua_State * L, char buffer[], const char * prompt);
 void xwlua_openlibs(lua_State * L);
+void xwlua_xt_openlibs(lua_State * L);
 xwer_t xwlua_task(void * arg);
 
 #define XWLUA_LIB_NAME          "xwlib"

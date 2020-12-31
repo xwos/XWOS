@@ -72,10 +72,36 @@ int xwlua_semsp_tostring(lua_State * L)
         return 1;
 }
 
+int xwlua_semsp_copy(lua_State * L)
+{
+        xwlua_sem_sp * semsp;
+        xwlua_sem_sp * newsemsp;
+        lua_State * D;
+
+        semsp = (xwlua_sem_sp *)luaL_checkudata(L, 1, "xwlua_sem_sp");
+        D = (lua_State *)lua_touserdata(L, 2);
+        if (D) {
+                xwer_t rc;
+                rc = xwos_sem_acquire(*semsp);
+                if (XWOK == rc) {
+                        newsemsp = lua_newuserdatauv(D, sizeof(xwlua_sem_sp), 0);
+                        newsemsp->sem = semsp->sem;
+                        newsemsp->tik = semsp->tik;
+                        luaL_setmetatable(D, "xwlua_sem_sp");
+                } else {
+                        lua_pushnil(D);
+                }
+        } else {
+                luaL_error(L, "Destination lua_State is NULL!");
+        }
+        return 0;
+}
+
 const luaL_Reg xwlua_semsp_metamethod[] = {
         {"__index", NULL},  /* place holder */
         {"__gc", xwlua_semsp_gc},
         {"__tostring", xwlua_semsp_tostring},
+        {"__copy", xwlua_semsp_copy},
         {NULL, NULL}
 };
 
@@ -189,42 +215,4 @@ void xwlua_os_init_semsp(lua_State * L)
         luaL_setfuncs(L, xwlua_semsp_method, 0); /* add sem methods */
         lua_setfield(L, -2, "__index");  /* metatable.__index = xwlua_semsp_method */
         lua_pop(L, 1); /* pop metatable */
-}
-
-void xwlua_semsp_xt_init(lua_State * xt)
-{
-        luaL_newmetatable(xt, "xwlua_sem_sp");
-        luaL_setfuncs(xt, xwlua_semsp_metamethod, 0); /* add metamethods */
-        lua_pop(xt, 1); /* pop metatable */
-}
-
-void xwlua_semsp_xt_export(lua_State * xt, const char * key, xwlua_sem_sp * semsp)
-{
-        xwlua_sem_sp * exp;
-        xwer_t rc;
-
-        /* 增加对象的强引用 */
-        rc = xwos_sem_acquire(*semsp);
-        if (XWOK == rc) {
-                exp = lua_newuserdatauv(xt, sizeof(xwlua_sem_sp), 0);
-                exp->sem = semsp->sem;
-                exp->tik = semsp->tik;
-                luaL_setmetatable(xt, "xwlua_sem_sp");
-                lua_setglobal(xt, key);
-        }
-}
-
-void xwlua_semsp_xt_copy(lua_State * L, xwlua_sem_sp * semsp)
-{
-        xwlua_sem_sp * cp;
-        xwer_t rc;
-
-        /* 增加对象的强引用 */
-        rc = xwos_sem_acquire(*semsp);
-        if (XWOK == rc) {
-                cp = lua_newuserdatauv(L, sizeof(xwlua_sem_sp), 0);
-                cp->sem = semsp->sem;
-                cp->tik = semsp->tik;
-                luaL_setmetatable(L, "xwlua_sem_sp");
-        }
 }

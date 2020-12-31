@@ -450,13 +450,13 @@ int xwlua_bmp_eq(lua_State * L)
 int xwlua_bmp_tostring(lua_State * L)
 {
         xwlua_bmp_t * luabmp;
-        luaL_Buffer b;
+        luaL_Buffer sb;
         char strbuf[16];
         xwsz_t aysz;
 
         luabmp = (xwlua_bmp_t *)luaL_checkudata(L, 1, "xwlua_bmp_t");
         aysz = BITS_TO_BMPS(luabmp->bits);
-        luaL_buffinit(L, &b);
+        luaL_buffinit(L, &sb);
         while (aysz > 0) {
                 aysz--;
 #if (LUA_INT_TYPE == LUA_INT_LONGLONG)
@@ -464,9 +464,9 @@ int xwlua_bmp_tostring(lua_State * L)
 #else
                 sprintf(strbuf, "%08lX", luabmp->bmp[aysz]);
 #endif
-                luaL_addlstring(&b, strbuf, 8);
+                luaL_addlstring(&sb, strbuf, 8);
         }
-        luaL_pushresult(&b);
+        luaL_pushresult(&sb);
         return 1;
 }
 

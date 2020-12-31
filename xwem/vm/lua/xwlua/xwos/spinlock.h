@@ -45,8 +45,4 @@ xwer_t xwlua_splk_grab(struct xwlua_splk * luasplk);
 xwer_t xwlua_splk_put(struct xwlua_splk * luasplk);
 void xwlua_splk_unlock(struct xwlua_splk * luasplk);
 
-void xwlua_splksp_xt_init(lua_State * xt);
-void xwlua_splksp_xt_export(lua_State * xt, const char * key, xwlua_splk_sp * splksp);
-void xwlua_splksp_xt_copy(lua_State * L, xwlua_splk_sp * splksp);
-
 #endif /* xwem/vm/lua/xwlua/xwos/spinlock.h */

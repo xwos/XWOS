@@ -22,8 +22,4 @@ typedef xwos_cond_d xwlua_cond_sp; /**< 信号量的强指针 */
 
 void xwlua_os_open_cond(lua_State * L);
 
-void xwlua_condsp_xt_init(lua_State * xt);
-void xwlua_condsp_xt_export(lua_State * xt, const char * key, xwlua_cond_sp * condsp);
-void xwlua_condsp_xt_copy(lua_State * L, xwlua_cond_sp * condsp);
-
 #endif /* xwem/vm/lua/xwlua/xwos/cond.h */

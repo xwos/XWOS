@@ -197,10 +197,36 @@ int xwlua_sqlksp_tostring(lua_State * L)
         return 1;
 }
 
+int xwlua_sqlksp_copy(lua_State * L)
+{
+        xwlua_sqlk_sp * sqlksp;
+        xwlua_sqlk_sp * newsqlksp;
+        lua_State * D;
+
+        sqlksp = (xwlua_sqlk_sp *)luaL_checkudata(L, 1, "xwlua_sqlk_sp");
+        D = (lua_State *)lua_touserdata(L, 2);
+        if (D) {
+                xwer_t rc;
+                rc = xwlua_sqlk_acquire(*sqlksp);
+                if (XWOK == rc) {
+                        newsqlksp = lua_newuserdatauv(D, sizeof(xwlua_sqlk_sp), 0);
+                        newsqlksp->luasqlk = sqlksp->luasqlk;
+                        newsqlksp->tik = sqlksp->tik;
+                        luaL_setmetatable(D, "xwlua_sqlk_sp");
+                } else {
+                        lua_pushnil(D);
+                }
+        } else {
+                luaL_error(L, "Destination lua_State is NULL!");
+        }
+        return 0;
+}
+
 const luaL_Reg xwlua_sqlksp_metamethod[] = {
         {"__index", NULL},  /* place holder */
         {"__gc", xwlua_sqlksp_gc},
         {"__tostring", xwlua_sqlksp_tostring},
+        {"__copy", xwlua_sqlksp_copy},
         {NULL, NULL}
 };
 
@@ -371,42 +397,4 @@ void xwlua_os_init_sqlksp(lua_State * L)
         luaL_setfuncs(L, xwlua_sqlksp_method, 0); /* add sqlk methods */
         lua_setfield(L, -2, "__index");  /* metatable.__index = xwlua_sqlksp_method */
         lua_pop(L, 1); /* pop metatable */
-}
-
-void xwlua_sqlksp_xt_init(lua_State * xt)
-{
-        luaL_newmetatable(xt, "xwlua_sqlk_sp");
-        luaL_setfuncs(xt, xwlua_sqlksp_metamethod, 0); /* add metamethods */
-        lua_pop(xt, 1); /* pop metatable */
-}
-
-void xwlua_sqlksp_xt_export(lua_State * xt, const char * key, xwlua_sqlk_sp * sqlksp)
-{
-        xwlua_sqlk_sp * exp;
-        xwer_t rc;
-
-        /* 增加对象的强引用 */
-        rc = xwlua_sqlk_acquire(*sqlksp);
-        if (XWOK == rc) {
-                exp = lua_newuserdatauv(xt, sizeof(xwlua_sqlk_sp), 0);
-                exp->luasqlk = sqlksp->luasqlk;
-                exp->tik = sqlksp->tik;
-                luaL_setmetatable(xt, "xwlua_sqlk_sp");
-                lua_setglobal(xt, key);
-        }
-}
-
-void xwlua_sqlksp_xt_copy(lua_State * L, xwlua_sqlk_sp * sqlksp)
-{
-        xwlua_sqlk_sp * cp;
-        xwer_t rc;
-
-        /* 增加对象的强引用 */
-        rc = xwlua_sqlk_acquire(*sqlksp);
-        if (XWOK == rc) {
-                cp = lua_newuserdatauv(L, sizeof(xwlua_sqlk_sp), 0);
-                cp->luasqlk = sqlksp->luasqlk;
-                cp->tik = sqlksp->tik;
-                luaL_setmetatable(L, "xwlua_sqlk_sp");
-        }
 }

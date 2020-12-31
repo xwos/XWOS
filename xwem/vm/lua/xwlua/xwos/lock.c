@@ -147,7 +147,7 @@ int xwlua_lock_call(lua_State * L)
                 } while (false);
         }
         if (islock) {
-                lua_createtable(L, 1, 1);
+                lua_createtable(L, 1, 0);
                 lua_pushvalue(L, 2);
                 lua_setfield(L, -2, "xwlualock");
                 luaL_setmetatable(L, "xwlua_autolock");

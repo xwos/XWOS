@@ -16,23 +16,34 @@
 #include "lauxlib.h"
 #include "xwlua/port.h"
 
-static const luaL_Reg xwlua_loadedlibs[] = {
+const luaL_Reg xwlua_loadedlibs[] = {
         {LUA_GNAME, luaopen_base},
         {LUA_LOADLIBNAME, luaopen_package},
         {LUA_COLIBNAME, luaopen_coroutine},
         {LUA_TABLIBNAME, luaopen_table},
         {LUA_IOLIBNAME, luaopen_io},
-        {XWLUA_LIB_NAME, xwlua_open_lib},
-        {XWLUA_XT_NAME, xwlua_open_xt},
-        {XWLUA_OS_NAME, xwlua_open_os},
         {LUA_STRLIBNAME, luaopen_string},
         {LUA_MATHLIBNAME, luaopen_math},
         {LUA_UTF8LIBNAME, luaopen_utf8},
         {LUA_DBLIBNAME, luaopen_debug},
+        {XWLUA_LIB_NAME, xwlua_open_lib},
+        {XWLUA_OS_NAME, xwlua_open_os},
         {NULL, NULL},
 };
 
 void xwlua_openlibs(lua_State * L)
+{
+        const luaL_Reg *lib;
+
+        for (lib = xwlua_loadedlibs; lib->func; lib++) {
+                luaL_requiref(L, lib->name, lib->func, 1);
+                lua_pop(L, 1);
+        }
+        luaL_requiref(L, XWLUA_XT_NAME, xwlua_open_xt, 1);
+        lua_pop(L, 1);
+}
+
+void xwlua_xt_openlibs(lua_State * L)
 {
         const luaL_Reg *lib;
 

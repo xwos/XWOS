@@ -24,8 +24,4 @@ void xwlua_os_open_skd(lua_State * L);
 void xwlua_os_open_thd(lua_State * L);
 void xwlua_os_open_cthd(lua_State * L);
 
-void xwlua_thdsp_xt_init(lua_State * xt);
-void xwlua_thdsp_xt_export(lua_State * xt, const char * key, xwlua_thd_sp * thdsp);
-void xwlua_thdsp_xt_copy(lua_State * L, xwlua_thd_sp * thdsp);
-
 #endif /* xwem/vm/lua/xwlua/xwos/skd.h */

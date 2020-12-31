@@ -81,10 +81,36 @@ int xwlua_brsp_tostring(lua_State * L)
         return 1;
 }
 
+int xwlua_brsp_copy(lua_State * L)
+{
+        xwlua_br_sp * brsp;
+        xwlua_br_sp * newbrsp;
+        lua_State * D;
+
+        brsp = (xwlua_br_sp *)luaL_checkudata(L, 1, "xwlua_br_sp");
+        D = (lua_State *)lua_touserdata(L, 2);
+        if (D) {
+                xwer_t rc;
+                rc = xwos_br_acquire(*brsp);
+                if (XWOK == rc) {
+                        newbrsp = lua_newuserdatauv(D, sizeof(xwlua_br_sp), 0);
+                        newbrsp->br = brsp->br;
+                        newbrsp->tik = brsp->tik;
+                        luaL_setmetatable(D, "xwlua_br_sp");
+                } else {
+                        lua_pushnil(D);
+                }
+        } else {
+                luaL_error(L, "Destination lua_State is NULL!");
+        }
+        return 0;
+}
+
 const luaL_Reg xwlua_brsp_metamethod[] = {
         {"__index", NULL},  /* place holder */
         {"__gc", xwlua_brsp_gc},
         {"__tostring", xwlua_brsp_tostring},
+        {"__copy", xwlua_brsp_copy},
         {NULL, NULL}
 };
 
@@ -156,42 +182,4 @@ void xwlua_os_init_brsp(lua_State * L)
         luaL_setfuncs(L, xwlua_brsp_method, 0); /* add br methods */
         lua_setfield(L, -2, "__index");  /* metatable.__index = xwlua_brsp_method */
         lua_pop(L, 1); /* pop metatable */
-}
-
-void xwlua_brsp_xt_init(lua_State * xt)
-{
-        luaL_newmetatable(xt, "xwlua_br_sp");
-        luaL_setfuncs(xt, xwlua_brsp_metamethod, 0); /* add metamethods */
-        lua_pop(xt, 1); /* pop metatable */
-}
-
-void xwlua_brsp_xt_export(lua_State * xt, const char * key, xwlua_br_sp * brsp)
-{
-        xwlua_br_sp * exp;
-        xwer_t rc;
-
-        /* 增加对象的强引用 */
-        rc = xwos_br_acquire(*brsp);
-        if (XWOK == rc) {
-                exp = lua_newuserdatauv(xt, sizeof(xwlua_br_sp), 0);
-                exp->br = brsp->br;
-                exp->tik = brsp->tik;
-                luaL_setmetatable(xt, "xwlua_br_sp");
-                lua_setglobal(xt, key);
-        }
-}
-
-void xwlua_brsp_xt_copy(lua_State * L, xwlua_br_sp * brsp)
-{
-        xwlua_br_sp * cp;
-        xwer_t rc;
-
-        /* 增加对象的强引用 */
-        rc = xwos_br_acquire(*brsp);
-        if (XWOK == rc) {
-                cp = lua_newuserdatauv(L, sizeof(xwlua_br_sp), 0);
-                cp->br = brsp->br;
-                cp->tik = brsp->tik;
-                luaL_setmetatable(L, "xwlua_br_sp");
-        }
 }
