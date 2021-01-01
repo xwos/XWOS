@@ -18,8 +18,11 @@
 # > limitations under the License.
 #
 
+XuanWuOS ?= ../..
 WKSPC ?= wkspc
 TARGET ?= XuanWuOS
+
+MKCFG := ${XuanWuOS}/xwbs/util/el/mkcfg.el
 
 all: $(WKSPC) cfg
 	$(MAKE) -C $(WKSPC) TARGET=$(TARGET)
@@ -30,8 +33,8 @@ $(WKSPC):
 cfg: $(WKSPC) $(WKSPC)/XuanWuOS.cfg
 
 $(WKSPC)/XuanWuOS.cfg: cfg/*.h
-	@[ -x ../../xwbs/util/el/mkcfg.el ] || chmod +x ../../xwbs/util/el/mkcfg.el
-	@../../xwbs/util/el/mkcfg.el --cfgdir=cfg --topdir=../.. --wkspc=$(WKSPC) -- $(@F)
+	@[ -x ${MKCFG} ] || chmod +x ${MKCFG}
+	@${MKCFG} --XuanWuOS=$(XuanWuOS) --cfgdir=cfg --wkspc=$(WKSPC) -- $(@F)
 
 fmw: all
 	@dd if=$(WKSPC)/$(TARGET).bin of=$(WKSPC)/$(TARGET).fmw bs=1 skip=65536

@@ -84,8 +84,6 @@ LDFLAGS = -mthumb -mabi=aapcs -m$(ENDIAN) \
           -Wl,--gc-sections \
           -Wl,-Map=$(XWOS_WKSPC_DIR)/$(TARGET).map,--cref
 
-OBJ_DIR := $(XWOS_WKSPC_DIR)/obj/
-
 include $(XWOS_ARCH_DIR)/arch.mk
 include $(XWOS_CPU_DIR)/cpu.mk
 include $(XWOS_SOC_DIR)/soc.mk

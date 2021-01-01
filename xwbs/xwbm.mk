@@ -33,24 +33,23 @@ endif
 endef
 
 $(foreach xwbm,$(XWBM_LIST),$(eval $(call findXwbmTarget,$(xwbm))))
-
-XWBM := $(addprefix $(OBJ_DIR),$(XWBM))
-XWBM_DSM := $(addprefix $(OBJ_DIR),$(XWBM_DSM))
-XWBM_CLEAN := $(addprefix $(OBJ_DIR),$(XWBM_CLEAN))
-XWBM_DISTCLEAN := $(addprefix $(OBJ_DIR),$(XWBM_DISTCLEAN))
+XWBM := $(addprefix $(XWOS_OBJ_DIR)/,$(XWBM))
+XWBM_DSM := $(addprefix $(XWOS_OBJ_DIR)/,$(XWBM_DSM))
+XWBM_CLEAN := $(addprefix $(XWOS_OBJ_DIR)/,$(XWBM_CLEAN))
+XWBM_DISTCLEAN := $(addprefix $(XWOS_OBJ_DIR)/,$(XWBM_DISTCLEAN))
 
 $(XWBM):
 	@echo "building $@ ..."
-	@$(MAKE) -C $(XWOS_PATH) -f $(subst $(OBJ_DIR),,$(@D))/xwmo.mk XWOS_BRD_DIR=$(XWOS_BRD_DIR)
+	$(MAKE) -C $(XWOS_PATH) -f $(subst $(XWOS_OBJ_DIR)/,,$(@D))/xwmo.mk XWOS_BRD_DIR=$(XWOS_BRD_DIR)
 
 $(XWBM_DSM):
-	@$(MAKE) -C $(XWOS_PATH) -f $(subst $(OBJ_DIR),,$(@D))/xwmo.mk XWOS_BRD_DIR=$(XWOS_BRD_DIR) NODEP=y dsm
+	$(MAKE) -C $(XWOS_PATH) -f $(subst $(XWOS_OBJ_DIR)/,,$(@D))/xwmo.mk XWOS_BRD_DIR=$(XWOS_BRD_DIR) NODEP=y dsm
 
 $(XWBM_CLEAN):
-	@$(MAKE) -C $(XWOS_PATH) -f $(subst $(OBJ_DIR),,$(@D))/xwmo.mk XWOS_BRD_DIR=$(XWOS_BRD_DIR) NODEP=y clean
+	$(MAKE) -C $(XWOS_PATH) -f $(subst $(XWOS_OBJ_DIR)/,,$(@D))/xwmo.mk XWOS_BRD_DIR=$(XWOS_BRD_DIR) NODEP=y clean
 
 $(XWBM_DISTCLEAN):
-	@$(MAKE) -C $(XWOS_PATH) -f $(subst $(OBJ_DIR),,$(@D))/xwmo.mk XWOS_BRD_DIR=$(XWOS_BRD_DIR) NODEP=y distclean
+	$(MAKE) -C $(XWOS_PATH) -f $(subst $(XWOS_OBJ_DIR)/,,$(@D))/xwmo.mk XWOS_BRD_DIR=$(XWOS_BRD_DIR) NODEP=y distclean
 
 xwbm.mk.dbg:
 	@echo XWBM_LIST:$(XWBM_LIST)
