@@ -18,6 +18,7 @@
 #include "xwlua/xwos/spinlock.h"
 #include "xwlua/xwos/seqlock.h"
 #include "xwlua/xwos/lock.h"
+#include "xwlua/xwos/sel.h"
 #include "xwlua/xwos/cond.h"
 
 int xwlua_cond_new(lua_State * L)
@@ -101,6 +102,34 @@ const luaL_Reg xwlua_condsp_metamethod[] = {
         {"__copy", xwlua_condsp_copy},
         {NULL, NULL}
 };
+
+int xwlua_condsp_bind(lua_State * L)
+{
+        xwlua_cond_sp * condsp;
+        xwlua_sel_sp * selsp;
+        xwsq_t pos;
+        xwer_t rc;
+
+        condsp = (xwlua_cond_sp *)luaL_checkudata(L, 1, "xwlua_cond_sp");
+        selsp = (xwlua_sel_sp *)luaL_checkudata(L, 2, "xwlua_sel_sp");
+        pos = (xwsq_t)luaL_checkinteger(L, 3);
+        rc = xwos_cond_bind(condsp->cond, selsp->sel, pos);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
+}
+
+int xwlua_condsp_unbind(lua_State * L)
+{
+        xwlua_cond_sp * condsp;
+        xwlua_sel_sp * selsp;
+        xwer_t rc;
+
+        condsp = (xwlua_cond_sp *)luaL_checkudata(L, 1, "xwlua_cond_sp");
+        selsp = (xwlua_sel_sp *)luaL_checkudata(L, 2, "xwlua_sel_sp");
+        rc = xwos_cond_unbind(condsp->cond, selsp->sel);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
+}
 
 int xwlua_condsp_freeze(lua_State * L)
 {
@@ -222,6 +251,8 @@ int xwlua_condsp_wait(lua_State * L)
 }
 
 const luaL_Reg xwlua_condsp_method[] = {
+        {"bind", xwlua_condsp_bind},
+        {"unbind", xwlua_condsp_unbind},
         {"freeze", xwlua_condsp_freeze},
         {"thaw", xwlua_condsp_thaw},
         {"unicast", xwlua_condsp_unicast},

@@ -121,7 +121,7 @@ int xwlua_mtxsp_unlock(lua_State * L)
         return 1;
 }
 
-#define XWLUA_MTX_LKOPT_TRY             0
+#define XWLUA_MTX_OPT_TRY               0
 const char * const xwlua_mtx_lkopt[] = {"t", NULL};
 
 int xwlua_mtxsp_lock(lua_State * L)
@@ -149,7 +149,7 @@ int xwlua_mtxsp_lock(lua_State * L)
                 case LUA_TSTRING:
                         lkopt = luaL_checkoption(L, 2, "t", xwlua_mtx_lkopt);
                         switch (lkopt) {
-                        case XWLUA_MTX_LKOPT_TRY:
+                        case XWLUA_MTX_OPT_TRY:
                                 rc = xwos_mtx_trylock(mtxsp->mtx);
                                 break;
                         default:

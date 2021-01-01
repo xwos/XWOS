@@ -61,10 +61,12 @@ typedef struct {
 
 /**
  * @brief XWOS API：所有事件位发生翻转触发
+ * @note 缩写TGL == toggle
  */
 #define XWOS_FLG_TRIGGER_TGL_ALL      XWOSDL_FLG_TRIGGER_TGL_ALL
 /**
  * @brief XWOS API：任意事件位发生翻转触发
+ * @note 缩写TGL == toggle
  */
 #define XWOS_FLG_TRIGGER_TGL_ANY      XWOSDL_FLG_TRIGGER_TGL_ANY
 /**

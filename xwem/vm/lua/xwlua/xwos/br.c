@@ -15,6 +15,7 @@
 #include "src/lauxlib.h"
 #include "xwlua/port.h"
 #include "xwlua/xwlib/bmp.h"
+#include "xwlua/xwos/sel.h"
 #include "xwlua/xwos/br.h"
 
 int xwlua_br_new(lua_State * L)
@@ -114,6 +115,34 @@ const luaL_Reg xwlua_brsp_metamethod[] = {
         {NULL, NULL}
 };
 
+int xwlua_brsp_bind(lua_State * L)
+{
+        xwlua_br_sp * brsp;
+        xwlua_sel_sp * selsp;
+        xwsq_t pos;
+        xwer_t rc;
+
+        brsp = (xwlua_br_sp *)luaL_checkudata(L, 1, "xwlua_br_sp");
+        selsp = (xwlua_sel_sp *)luaL_checkudata(L, 2, "xwlua_sel_sp");
+        pos = (xwsq_t)luaL_checkinteger(L, 3);
+        rc = xwos_br_bind(brsp->br, selsp->sel, pos);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
+}
+
+int xwlua_brsp_unbind(lua_State * L)
+{
+        xwlua_br_sp * brsp;
+        xwlua_sel_sp * selsp;
+        xwer_t rc;
+
+        brsp = (xwlua_br_sp *)luaL_checkudata(L, 1, "xwlua_br_sp");
+        selsp = (xwlua_sel_sp *)luaL_checkudata(L, 2, "xwlua_sel_sp");
+        rc = xwos_br_unbind(brsp->br, selsp->sel);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
+}
+
 int xwlua_brsp_intr_all(lua_State * L)
 {
         xwlua_br_sp * brsp;
@@ -152,6 +181,7 @@ int xwlua_brsp_sync(lua_State * L)
                         sizeof(xwlua_bmp_t);
                 out = lua_newuserdatauv(L, bmpsz, 0);
                 out->bits = XWOS_BR_MAXNUM;
+                xwbmpop_c0all(out->bmp, out->bits);
                 luaL_setmetatable(L, "xwlua_bmp_t");
                 rc = xwos_br_timedsync(brsp->br, pos, msk->bmp, out->bmp, &time);
         } else {
@@ -159,6 +189,7 @@ int xwlua_brsp_sync(lua_State * L)
                         sizeof(xwlua_bmp_t);
                 out = lua_newuserdatauv(L, bmpsz, 0);
                 out->bits = XWOS_BR_MAXNUM;
+                xwbmpop_c0all(out->bmp, out->bits);
                 luaL_setmetatable(L, "xwlua_bmp_t");
                 rc = xwos_br_sync(brsp->br, pos, msk->bmp, out->bmp);
         }
@@ -168,6 +199,8 @@ int xwlua_brsp_sync(lua_State * L)
 }
 
 const luaL_Reg xwlua_brsp_method[] = {
+        {"bind", xwlua_brsp_bind},
+        {"unbind", xwlua_brsp_unbind},
         {"intr_all", xwlua_brsp_intr_all},
         {"sync", xwlua_brsp_sync},
         {NULL, NULL},

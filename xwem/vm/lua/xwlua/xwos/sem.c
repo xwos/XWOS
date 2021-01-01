@@ -14,6 +14,7 @@
 #include <xwos/osal/sync/sem.h>
 #include "src/lauxlib.h"
 #include "xwlua/port.h"
+#include "xwlua/xwos/sel.h"
 #include "xwlua/xwos/sem.h"
 
 int xwlua_sem_new(lua_State * L)
@@ -105,6 +106,34 @@ const luaL_Reg xwlua_semsp_metamethod[] = {
         {NULL, NULL}
 };
 
+int xwlua_semsp_bind(lua_State * L)
+{
+        xwlua_sem_sp * semsp;
+        xwlua_sel_sp * selsp;
+        xwsq_t pos;
+        xwer_t rc;
+
+        semsp = (xwlua_sem_sp *)luaL_checkudata(L, 1, "xwlua_sem_sp");
+        selsp = (xwlua_sel_sp *)luaL_checkudata(L, 2, "xwlua_sel_sp");
+        pos = (xwsq_t)luaL_checkinteger(L, 3);
+        rc = xwos_sem_bind(semsp->sem, selsp->sel, pos);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
+}
+
+int xwlua_semsp_unbind(lua_State * L)
+{
+        xwlua_sem_sp * semsp;
+        xwlua_sel_sp * selsp;
+        xwer_t rc;
+
+        semsp = (xwlua_sem_sp *)luaL_checkudata(L, 1, "xwlua_sem_sp");
+        selsp = (xwlua_sel_sp *)luaL_checkudata(L, 2, "xwlua_sel_sp");
+        rc = xwos_sem_unbind(semsp->sem, selsp->sel);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
+}
+
 int xwlua_semsp_freeze(lua_State * L)
 {
         xwlua_sem_sp * semsp;
@@ -138,14 +167,14 @@ int xwlua_semsp_post(lua_State * L)
         return 1;
 }
 
-#define XWLUA_SEM_LKOPT_TRY             0
-const char * const xwlua_sem_lkopt[] = {"t", NULL};
+#define XWLUA_SEM_OPT_TRY       0
+const char * const xwlua_sem_opt[] = {"t", NULL};
 
 int xwlua_semsp_wait(lua_State * L)
 {
         xwlua_sem_sp * semsp;
         xwtm_t time;
-        int lkopt;
+        int opt;
         int type;
         int top;
         xwer_t rc;
@@ -160,9 +189,9 @@ int xwlua_semsp_wait(lua_State * L)
                         rc = xwos_sem_timedwait(semsp->sem, &time);
                         break;
                 case LUA_TSTRING:
-                        lkopt = luaL_checkoption(L, 2, "t", xwlua_sem_lkopt);
-                        switch (lkopt) {
-                        case XWLUA_SEM_LKOPT_TRY:
+                        opt = luaL_checkoption(L, 2, "t", xwlua_sem_opt);
+                        switch (opt) {
+                        case XWLUA_SEM_OPT_TRY:
                                 rc = xwos_sem_trywait(semsp->sem);
                                 break;
                         default:
@@ -198,6 +227,8 @@ int xwlua_semsp_getvalue(lua_State * L)
 }
 
 const luaL_Reg xwlua_semsp_method[] = {
+        {"bind", xwlua_semsp_bind},
+        {"unbind", xwlua_semsp_unbind},
         {"freeze", xwlua_semsp_freeze},
         {"thaw", xwlua_semsp_thaw},
         {"post", xwlua_semsp_post},
