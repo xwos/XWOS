@@ -16,6 +16,7 @@
 #include "xwlua/xwos/skd.h"
 #include "xwlua/xwos/sem.h"
 #include "xwlua/xwos/cond.h"
+#include "xwlua/xwos/flg.h"
 #include "xwlua/xwos/br.h"
 #include "xwlua/xwos/sel.h"
 #include "xwlua/xwos/lock.h"
@@ -29,6 +30,7 @@ const luaL_Reg xwlua_os[] = {
         {"cthd", NULL},
         {"sem", NULL},
         {"cond", NULL},
+        {"flg", NULL},
         {"br", NULL},
         {"sel", NULL},
         {"lock", NULL},
@@ -51,6 +53,8 @@ LUAMOD_API int xwlua_open_os(lua_State * L)
         lua_setfield(L, -2, "sem");
         xwlua_os_open_cond(L);
         lua_setfield(L, -2, "cond");
+        xwlua_os_open_flg(L);
+        lua_setfield(L, -2, "flg");
         xwlua_os_open_br(L);
         lua_setfield(L, -2, "br");
         xwlua_os_open_sel(L);

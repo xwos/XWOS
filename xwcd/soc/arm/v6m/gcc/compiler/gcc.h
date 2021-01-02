@@ -52,12 +52,13 @@
 #define __xwcc_naked            __attribute__((naked))
 #define __xwcc_unused           __attribute__((unused))
 #define __xwcc_used             __attribute__((used))
-#define __xwcc_noreturn         __attribute__((noreturn))
 #define __xwcc_hot              __attribute__((hot))
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
   #define __xwcc_atomic         _Atomic
+  #define __xwcc_noreturn       _Noreturn
 #else
   #define __xwcc_atomic         volatile
+  #define __xwcc_noreturn       __attribute__((noreturn))
 #endif
 #define __xwcc_likely(x)        __builtin_expect(!!(x), 1)
 #define __xwcc_unlikely(x)      __builtin_expect(!!(x), 0)
