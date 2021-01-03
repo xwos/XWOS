@@ -17,6 +17,7 @@
 #include <xwos/osal/lock/mtx.h>
 #include <xwos/osal/sync/sem.h>
 #include <xwos/osal/sync/cond.h>
+#include <xwos/mm/bma.h>
 #include <xwmd/isc/xwscp/protocol.h>
 #include <xwmd/isc/xwscp/hwifal.h>
 #include <xwmd/isc/xwscp/mif.h>
@@ -42,93 +43,116 @@ const struct xwos_thd_desc xwscp_thd_desc = {
         .attr = XWOS_SKDATTR_PRIVILEGED,
 };
 
-static __xwmd_code
-xwer_t xwscp_connect_once(struct xwscp * xwscp, xwtm_t * xwtm, xwsq_t * txcnt);
+/**
+ * @brief 内存池名字
+ */
+static __xwmd_rodata
+const char xwscp_mempool_name[] = "xwscp.mempool";
 
 static __xwmd_code
-xwer_t xwscp_tx_once(struct xwscp * xwscp, const xwu8_t msg[], xwsz_t * size,
-                     xwtm_t * xwtm, xwsq_t * txcnt);
+xwer_t xwscp_gc(void * obj);
 
 static __xwmd_code
-void xwscp_init(struct xwscp * xwscp)
-{
-        xwscp->name = NULL;
-        xwscp->hwifst = XWSCP_HWIFST_CLOSED;
-        xwscp->hwifops = NULL;
-        xwscp->hwifcb = NULL;
-}
+xwer_t xwscp_connect_once(struct xwscp * xwscp, xwtm_t * xwtm);
+
+static __xwmd_code
+xwer_t xwscp_tx_once(struct xwscp * xwscp,
+                     const xwu8_t data[], xwsz_t * size, xwu8_t qos,
+                     xwtm_t * xwtm);
 
 /**
  * @brief XWSCP API: 启动XWSCP
  * @param xwscp: (I) XWSCP对象的指针
  * @param name: (I) XWSCP实例的名字
- * @param hwifops: (I) 数据链路层操作函数集合
+ * @param hwifops: (I) 硬件接口抽象层操作函数集合
  * @param hwifcb: (I) 硬件接口控制块指针
+ * @param mem: (I) 连续的内存块，大小必须为@ref XWSCP_MEMPOOL_SIZE
+ * @param memsize: (I) 连续的内存块大小，值必须为@ref XWSCP_MEMPOOL_SIZE
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval --ENOMEM: 内存池台小
+ * @retval -EPERM: XWSCP未初始化
+ * @note
+ * + 参数**mem**作为xwscp发送和接收缓冲区，用户可以
+ *   使用```xwu8_t xwscp_mem[XWSCP_MEMPOOL_SIZE];```定义，也可增加修饰符
+ *   将这段内存定义在DMA区域，并对齐到L1CacheLine，以便提高整体效率；
+ * + 参数**memsize**作用是提醒用户**mem**的大小必须为@ref XWSCP_MEMPOOL_SIZE，
+ *   API内部会做检查。
+ * @note
+ * + 同步/异步：同步
+ * + 上下文：线程
+ * + 重入性：不可重入
  */
 __xwmd_api
 xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
-                   const struct xwscp_hwifal_operations * hwifops,
-                   void * hwifcb)
+                   const struct xwscp_hwifal_operations * hwifops, void * hwifcb,
+                   xwu8_t * mem, xwsz_t memsize)
 {
-        xwsq_t i;
         xwer_t rc;
+        struct xwmm_bma * bma;
 
         XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
         XWSCP_VALIDATE((hwifops), "nullptr", -EFAULT);
         XWSCP_VALIDATE((hwifops->tx), "nullptr", -EFAULT);
         XWSCP_VALIDATE((hwifops->rx), "nullptr", -EFAULT);
 
+        XWSCP_VALIDATE_FORCE((mem), "nullptr", -EFAULT);
+        XWSCP_VALIDATE_FORCE((XWSCP_MEMPOOL_SIZE == memsize),
+                             "memsize-error",
+                             -ESIZE);
+
         xwscplogf(DEBUG, "Starting XWSCP-%s ...\n", XWSCP_VERSION);
 
-        xwscp_init(xwscp);
+        xwos_object_construct(&xwscp->xwobj);
+        xwscp->hwifcb = NULL;
+        xwscp->hwifst = XWSCP_HWIFST_CLOSED;
+        xwscp->name = name;
+        xwscp->hwifops = hwifops;
+        xwscp->rx.thd = NULL;
+        xwscp->mempool = NULL;
+        xwos_object_activate(&xwscp->xwobj, xwscp_gc);
+
+        /* 创建内存池 */
+        rc = xwmm_bma_create(&bma, xwscp_mempool_name,
+                             (xwptr_t)mem,
+                             XWSCP_MEMPOOL_SIZE,
+                             XWSCP_MEMBLK_SIZE);
+        if (__xwcc_unlikely(rc < 0)) {
+                xwscplogf(ERR, "Create BMA ... [rc:%d]\n", rc);
+                goto err_bma_create;
+        }
+        xwscp->mempool = bma;
 
         /* 初始化发送状态机 */
-        xwscp->txi.cnt = XWSCP_ID_SYNC;
-        rc = xwos_mtx_init(&xwscp->txmtx, XWOS_SKD_PRIORITY_RT_MIN);
+        xwscp->tx.cnt = 0;
+        rc = xwos_mtx_init(&xwscp->tx.mtx, XWOS_SKD_PRIORITY_RT_MIN);
         if (__xwcc_unlikely(rc < 0)) {
-                xwscplogf(ERR, "Init txmtx ... [rc:%d]\n", rc);
+                xwscplogf(ERR, "Init tx.mtx ... [rc:%d]\n", rc);
                 goto err_txmtx_init;
         }
-        rc = xwos_mtx_init(&xwscp->csmtx, XWOS_SKD_PRIORITY_RT_MIN);
+        rc = xwos_mtx_init(&xwscp->tx.csmtx, XWOS_SKD_PRIORITY_RT_MIN);
         if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR, "Init csmtx ... [rc:%d]\n", rc);
                 goto err_csmtx_init;
         }
-        rc = xwos_cond_init(&xwscp->cscond);
+        rc = xwos_cond_init(&xwscp->tx.cscond);
         if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR, "Init ACK condition ... [rc:%d]\n", rc);
                 goto err_cscond_init;
         }
-        xwscp->txi.frm = NULL;
+        xwscp->tx.remote.ack = 0;
+        xwscp->tx.remote.id = 0;
 
         /* 初始化接收状态机 */
-        xwscp->rxq.cnt = XWSCP_ID_SYNC;
-        xwlib_bclst_init_head(&xwscp->rxq.head);
-        xwos_splk_init(&xwscp->rxq.lock);
-        rc = xwos_sem_init(&xwscp->slot.sem, XWSCP_FRMSLOT_NUM, XWSCP_FRMSLOT_NUM);
+        xwscp->rx.cnt = 0;
+        xwlib_bclst_init_head(&xwscp->rx.head);
+        xwos_splk_init(&xwscp->rx.lock);
+        rc = xwos_sem_init(&xwscp->rx.sem, 0, XWSCP_MEMBLK_NUM);
         if (__xwcc_unlikely(rc < 0)) {
-                xwscplogf(ERR, "Init slotsem ... [rc:%d]\n", rc);
-                goto err_slotsem_init;
+                xwscplogf(ERR, "Init rx.sem ... [rc:%d]\n", rc);
+                goto err_rxsem_init;
         }
-
-        /* 初始化帧槽 */
-        rc = xwos_sem_init(&xwscp->rxq.sem, 0, XWSCP_FRMSLOT_NUM);
-        if (__xwcc_unlikely(rc < 0)) {
-                xwscplogf(ERR, "Init rxqsem ... [rc:%d]\n", rc);
-                goto err_rxqsem_init;
-        }
-        memset(xwscp->slot.frm, 0, sizeof(xwscp->slot.frm));
-        xwlib_bclst_init_head(&xwscp->slot.q);
-        for (i = 0; i < XWSCP_FRMSLOT_NUM; i ++) {
-                xwlib_bclst_init_node(&xwscp->slot.frm[i].node);
-                xwlib_bclst_add_tail(&xwscp->slot.q, &xwscp->slot.frm[i].node);
-        }
-        xwos_splk_init(&xwscp->slot.lock);
-
-        xwscp->name = name;
-        xwscp->hwifops = hwifops;
 
         /* 打开端口 */
         rc = xwscp_hwifal_open(xwscp, hwifcb);
@@ -137,7 +161,7 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
         }
 
         /* 创建线程 */
-        rc = xwos_thd_create(&xwscp->thd,
+        rc = xwos_thd_create(&xwscp->rx.thd,
                              xwscp_thd_desc.name,
                              xwscp_thd_desc.func,
                              xwscp,
@@ -145,23 +169,26 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
                              xwscp_thd_desc.prio,
                              xwscp_thd_desc.attr);
         if (rc < 0) {
-                goto err_thd_create;
+                goto err_rxthd_create;
         }
 
         return XWOK;
 
-err_thd_create:
+err_rxthd_create:
         xwscp_hwifal_close(xwscp);
 err_hwifal_open:
-err_rxqsem_init:
-        xwos_sem_destroy(&xwscp->slot.sem);
-err_slotsem_init:
-        xwos_cond_destroy(&xwscp->cscond);
+        xwos_sem_destroy(&xwscp->rx.sem);
+err_rxsem_init:
+        xwos_cond_destroy(&xwscp->tx.cscond);
 err_cscond_init:
-        xwos_mtx_destroy(&xwscp->csmtx);
+        xwos_mtx_destroy(&xwscp->tx.csmtx);
 err_csmtx_init:
-        xwos_mtx_destroy(&xwscp->txmtx);
+        xwos_mtx_destroy(&xwscp->tx.mtx);
 err_txmtx_init:
+        xwmm_bma_delete(xwscp->mempool);
+        xwscp->mempool = NULL;
+err_bma_create:
+        xwos_object_rawput(&xwscp->xwobj);
         return rc;
 }
 
@@ -170,69 +197,91 @@ err_txmtx_init:
  * @param xwscp: (I) XWSCP对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：不可重入
  */
 __xwmd_api
 xwer_t xwscp_stop(struct xwscp * xwscp)
 {
+        XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
+
+        return xwscp_put(xwscp);
+}
+
+/**
+ * @brief XWSCP的垃圾回收函数
+ * @param obj: (I) XWSCP对象的指针
+ * @return 错误码
+ */
+static __xwmd_code
+xwer_t xwscp_gc(void * obj)
+{
+        struct xwscp * xwscp;
         xwer_t rc, childrc;
 
         XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
 
-        rc = xwos_thd_stop(xwscp->thd, &childrc);
-        if (XWOK == rc) {
-                xwscplogf(INFO, "Stop XWSCP thread... [OK]\n");
+        xwscp = obj;
+        if (xwscp->rx.thd) {
+                rc = xwos_thd_stop(xwscp->rx.thd, &childrc);
+                if (XWOK == rc) {
+                        xwscp->rx.thd = NULL;
+                        xwscplogf(INFO, "Stop XWSCP RX thread... [OK]\n");
+                }
         }
 
         xwscp_hwifal_close(xwscp);
-        xwos_sem_destroy(&xwscp->rxq.sem);
-        xwos_sem_destroy(&xwscp->slot.sem);
-        xwos_cond_destroy(&xwscp->cscond);
-        xwos_mtx_destroy(&xwscp->csmtx);
-        xwos_mtx_destroy(&xwscp->txmtx);
+        xwos_sem_destroy(&xwscp->rx.sem);
+        xwos_cond_destroy(&xwscp->tx.cscond);
+        xwos_mtx_destroy(&xwscp->tx.csmtx);
+        xwos_mtx_destroy(&xwscp->tx.mtx);
+        if (xwscp->mempool) {
+                xwmm_bma_delete(xwscp->mempool);
+                xwscp->mempool = NULL;
+        }
         return XWOK;
 }
 
 static __xwmd_code
-xwer_t xwscp_connect_once(struct xwscp * xwscp, xwtm_t * xwtm, xwsq_t * cnt)
+xwer_t xwscp_connect_once(struct xwscp * xwscp, xwtm_t * xwtm)
 {
         union xwos_ulock ulk;
-        xwsq_t lockstate;
-        xwtm_t time;
+        xwsq_t lkst;
+        xwtm_t period, time;
         xwer_t rc;
 
-        ulk.osal.mtx = &xwscp->csmtx;
-        rc = xwos_mtx_lock(&xwscp->csmtx);
+        ulk.osal.mtx = &xwscp->tx.csmtx;
+        rc = xwos_mtx_lock(&xwscp->tx.csmtx);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_lock;
         }
-        xwscp->txi.frm = NULL;
-        rc = xwscp_tx_cfrm_sync(xwscp, xwtm);
+        xwaop_c0m(xwsq, &xwscp->hwifst, XWSCP_HWIFST_CONNECT, NULL, NULL);
+        rc = xwscp_tx_cmd_connect(xwscp);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_tx;
         }
-        time = *xwtm > XWSCP_PERIOD ? XWSCP_PERIOD : *xwtm;
-        rc = xwos_cond_timedwait(&xwscp->cscond,
+        period = *xwtm > XWSCP_RETRY_PERIOD ? XWSCP_RETRY_PERIOD : *xwtm;
+        time = period;
+        rc = xwos_cond_timedwait(&xwscp->tx.cscond,
                                  ulk, XWOS_LK_MTX, NULL,
-                                 &time, &lockstate);
+                                 &time, &lkst);
         if (__xwcc_likely(XWOK == rc)) {
-                xwos_mtx_unlock(&xwscp->csmtx);
-                xwaop_add(xwu32, &xwscp->txi.cnt, 1, NULL, NULL);
+                xwos_mtx_unlock(&xwscp->tx.csmtx);
+                xwaop_write(xwu32, &xwscp->tx.cnt, 0, NULL);
+                xwaop_s1m(xwsq, &xwscp->hwifst, XWSCP_HWIFST_CONNECT, NULL, NULL);
+                xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_CONNECT);
+                *xwtm -= time;
+        } else if (-ETIMEDOUT == rc) {
+                *xwtm -= period;
         } else {
-                if (XWOS_LKST_LOCKED == lockstate) {
-                        xwos_mtx_unlock(&xwscp->csmtx);
-                }/* else {} */
-                if (-ETIMEDOUT == rc) {
-                        *xwtm -= XWSCP_PERIOD;
-                        if (__xwcc_likely(*xwtm > 0)) {
-                                *cnt = *cnt + 1;
-                                rc = -EAGAIN;
-                        }/* else {} */
-                }/* else {} */
         }
         return rc;
 
 err_tx:
-        xwos_mtx_unlock(&xwscp->csmtx);
+        xwos_mtx_unlock(&xwscp->tx.csmtx);
 err_mtx_lock:
         return rc;
 }
@@ -249,34 +298,28 @@ err_mtx_lock:
  * @retval -ENOTCONN: 远程端无回应
  * @note
  * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
+ * - 上下文：线程
+ * - 重入性：可重入
  */
 __xwmd_api
 xwer_t xwscp_connect(struct xwscp * xwscp, xwtm_t * xwtm)
 {
-        xwsq_t cnt;
         xwer_t rc;
 
         XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
         XWSCP_VALIDATE((xwtm), "nullptr", -EFAULT);
 
-        rc = xwos_mtx_timedlock(&xwscp->txmtx, xwtm);
+        rc = xwos_mtx_timedlock(&xwscp->tx.mtx, xwtm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_txmtx_timedlock;
         }
-        cnt = 0;
         do {
-                if ((XWMDCFG_isc_xwscp_RETRY_NUM / 2) == cnt) {
-                        xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_NETUNREACH, xwtm);
-                }/* else {} */
-                rc = xwscp_connect_once(xwscp, xwtm, &cnt);
-        } while ((-EAGAIN == rc) && (cnt < XWSCP_RETRY_NUM));
-        if (((-EAGAIN == rc)) && (XWSCP_RETRY_NUM == cnt)) {
-                rc = -ENOTCONN;
+                rc = xwscp_connect_once(xwscp, xwtm);
+        } while ((-ETIMEDOUT == rc) && (*xwtm > 0));
+        if ((-ETIMEDOUT == rc) && (*xwtm <= 0)) {
+                xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_NETUNREACH);
         }/* else {} */
-        xwos_mtx_unlock(&xwscp->txmtx);
+        xwos_mtx_unlock(&xwscp->tx.mtx);
         return rc;
 
 err_txmtx_timedlock:
@@ -284,75 +327,91 @@ err_txmtx_timedlock:
 }
 
 static __xwmd_code
-xwer_t xwscp_tx_once(struct xwscp * xwscp, const xwu8_t msg[], xwsz_t * size,
-                     xwtm_t * xwtm, xwsq_t * cnt)
+xwer_t xwscp_finish_tx(struct xwscp * xwscp, union xwscp_slot * slot)
 {
-        union xwos_ulock ulk;
-        struct xwscp_frame frm;
-        xwsq_t lockstate;
-        xwtm_t time;
+        xwu8_t ack;
+        xwu8_t rmtid;
         xwer_t rc;
-        xwer_t ack;
 
-        rc = xwscp_fmt_msg(xwscp, &frm, msg, (xwu8_t)*size);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_fmt_msg;
-        }
-        ulk.osal.mtx = &xwscp->csmtx;
-        rc = xwos_mtx_lock(&xwscp->csmtx);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_mtx_lock;
-        }
-        xwscp->txi.frm = &frm;
-        rc = xwscp_hwifal_tx(xwscp, &frm, xwtm);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_iftx;
-        }
-        time = *xwtm > XWSCP_PERIOD ? XWSCP_PERIOD : *xwtm;
-        rc = xwos_cond_timedwait(&xwscp->cscond,
-                                 ulk, XWOS_LK_MTX, NULL,
-                                 &time, &lockstate);
-        if (__xwcc_likely(XWOK == rc)) {
-                ack = xwscp->txi.ack;
-                xwscp->txi.frm = NULL;
-                xwos_mtx_unlock(&xwscp->csmtx);
+        ack = xwscp->tx.remote.ack;
+        rmtid = xwscp->tx.remote.id;
+
+        if (rmtid != slot->tx.frm.head.id) {
+                xwaop_c0m(xwsq, &xwscp->hwifst, XWSCP_HWIFST_CONNECT, NULL, NULL);
+                xwscplogf(DEBUG, "[txthd] Remote ACK ID error!\n");
+                rc = -ECONNRESET;
+        } else {
                 switch (ack) {
                 case XWSCP_ACK_OK:
                         rc = xwscp_callback_rc[ack];
-                        xwaop_add(xwu32, &xwscp->txi.cnt, 1, NULL, NULL);
-                        break;
-                case XWSCP_ACK_ESIZE:
-                        rc = xwscp_callback_rc[ack];
-                        xwaop_c0m(xwu32, &xwscp->txi.cnt, XWSCP_ID_MSK,
-                                  NULL, NULL);
+                        xwaop_add(xwu32, &xwscp->tx.cnt, 1, NULL, NULL);
                         break;
                 case XWSCP_ACK_EALREADY:
                         rc = xwscp_callback_rc[XWSCP_ACK_OK];
-                        xwaop_add(xwu32, &xwscp->txi.cnt, 1, NULL, NULL);
+                        xwaop_add(xwu32, &xwscp->tx.cnt, 1, NULL, NULL);
                         break;
                 case XWSCP_ACK_ECONNRESET:
-                        xwaop_c0m(xwu32, &xwscp->txi.cnt, XWSCP_ID_MSK,
+                        xwaop_c0m(xwsq, &xwscp->hwifst, XWSCP_HWIFST_CONNECT,
                                   NULL, NULL);
+                        rc = -ECONNRESET;
+                        break;
+                case XWSCP_ACK_NOMEM:
+                        xwscplogf(WARNING, "[txthd] Remote has no memory!\n");
+                        rc = -ENOMEM;
+                        break;
+                default:
+                        XWSCP_BUG();
+                        rc = -EBUG;
                         break;
                 }
+        }
+        return rc;
+}
+
+static __xwmd_code
+xwer_t xwscp_tx_once(struct xwscp * xwscp,
+                     const xwu8_t data[], xwsz_t * size, xwu8_t qos,
+                     xwtm_t * xwtm)
+{
+        union xwos_ulock ulk;
+        union xwscp_slot * slot;
+        xwsq_t lkst;
+        xwtm_t period, time;
+        xwer_t rc;
+
+        rc = xwscp_fmt_msg(xwscp, data, *size, qos, &slot);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_fmt_msg;
+        }
+        ulk.osal.mtx = &xwscp->tx.csmtx;
+        rc = xwos_mtx_lock(&xwscp->tx.csmtx);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_mtx_lock;
+        }
+        xwaop_s1m(xwsq, &xwscp->hwifst, XWSCP_HWIFST_TX, NULL, NULL);
+        rc = xwscp_hwifal_tx(xwscp, (xwu8_t *)&slot->tx.frm, slot->tx.frmsize);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_iftx;
+        }
+        period = *xwtm > XWSCP_RETRY_PERIOD ? XWSCP_RETRY_PERIOD : *xwtm;
+        time = period;
+        rc = xwos_cond_timedwait(&xwscp->tx.cscond,
+                                 ulk, XWOS_LK_MTX, NULL,
+                                 &time, &lkst);
+        if (__xwcc_likely(XWOK == rc)) {
+                xwos_mtx_unlock(&xwscp->tx.csmtx);
+                rc = xwscp_finish_tx(xwscp, slot);
+                *xwtm -= time;
+        } else if (-ETIMEDOUT == rc) {
+                xwaop_c0m(xwsq, &xwscp->hwifst, XWSCP_HWIFST_TX, NULL, NULL);
+                *xwtm -= period;
         } else {
-                xwscp->txi.frm = NULL;
-                if (XWOS_LKST_LOCKED == lockstate) {
-                        xwos_mtx_unlock(&xwscp->csmtx);
-                }/* else {} */
-                if (-ETIMEDOUT == rc) {
-                        *xwtm -= XWSCP_PERIOD;
-                        if (__xwcc_likely(*xwtm > 0)) {
-                                *cnt = *cnt + 1;
-                                rc = -EAGAIN;
-                        }/* else {} */
-                }/* else {} */
+                xwaop_c0m(xwsq, &xwscp->hwifst, XWSCP_HWIFST_TX, NULL, NULL);
         }
         return rc;
 
 err_iftx:
-        xwscp->txi.frm = NULL;
-        xwos_mtx_unlock(&xwscp->csmtx);
+        xwos_mtx_unlock(&xwscp->tx.csmtx);
 err_mtx_lock:
 err_fmt_msg:
         return rc;
@@ -361,9 +420,9 @@ err_fmt_msg:
 /**
  * @brief XWSCP API: 发送一条报文，并在限定的时间等待回应
  * @param xwscp: (I) XWSCP对象的指针
- * @param msg: (I) 报文
+ * @param data: (I) 数据缓冲区的指针
  * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示报文的字节数
+ *              (I) 作为输入时，表示数据的字节数
  *              (O) 作为输出时，返回实际发送的字节数
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
@@ -375,15 +434,15 @@ err_fmt_msg:
  * @retval -ENOTCONN: 远程端无回应
  * @note
  * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
+ * - 上下文：线程
+ * - 重入性：可重入
  */
 __xwmd_api
-xwer_t xwscp_tx(struct xwscp * xwscp, const xwu8_t msg[], xwsz_t * size,
-                xwtm_t * xwtm)
+xwer_t xwscp_tx(struct xwscp * xwscp,
+                const xwu8_t msg[], xwsz_t * size,
+                xwu8_t qos, xwtm_t * xwtm)
 {
-        xwsq_t cnt;
+        xwsq_t hwifst;
         xwer_t rc;
 
         XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
@@ -391,28 +450,32 @@ xwer_t xwscp_tx(struct xwscp * xwscp, const xwu8_t msg[], xwsz_t * size,
         XWSCP_VALIDATE((xwtm), "nullptr", -EFAULT);
         XWSCP_VALIDATE((*size <= XWSCP_SDU_MAX_SIZE), "msg2long", -E2BIG);
 
-        rc = xwos_mtx_timedlock(&xwscp->txmtx, xwtm);
+        rc = xwos_mtx_timedlock(&xwscp->tx.mtx, xwtm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_txmtx_timedlock;
         }
-        cnt = 0;
         do {
-                if ((XWMDCFG_isc_xwscp_RETRY_NUM / 2) == cnt) {
-                        xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_NETUNREACH, xwtm);
-                }/* else {} */
-                rc = xwscp_tx_once(xwscp, msg, size, xwtm, &cnt);
-                if (-ENOLINK == rc) {
-                        rc = xwscp_connect_once(xwscp, xwtm, &cnt);
-                        if (XWOK == rc) {
-                                rc = -EAGAIN;
+                xwaop_read(xwsq, &xwscp->hwifst, &hwifst);
+                if (XWSCP_HWIFST_CONNECT & hwifst) {
+                        do {
+                                rc = xwscp_tx_once(xwscp, msg, size, qos, xwtm);
+                        } while ((-ETIMEDOUT == rc) && (*xwtm > 0));
+                        if ((-ETIMEDOUT == rc) && (*xwtm <= 0)) {
+                                xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_NETUNREACH);
                         }/* else {} */
-                }/* else {} */
-        } while ((-EAGAIN == rc) && (cnt < XWSCP_RETRY_NUM));
-        if (((-EAGAIN == rc)) && (XWSCP_RETRY_NUM == cnt)) {
-                xwaop_c0m(xwu32, &xwscp->txi.cnt, XWSCP_ID_MSK, NULL, NULL);
-                rc = -ENOTCONN;
-        }/* else {} */
-        xwos_mtx_unlock(&xwscp->txmtx);
+                } else {
+                        do {
+                                rc = xwscp_connect_once(xwscp, xwtm);
+                        } while ((-ETIMEDOUT == rc) && (*xwtm > 0));
+                        if ((-ETIMEDOUT == rc) && (*xwtm <= 0)) {
+                                xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_NETUNREACH);
+                        }/* else {} */
+                        if ((XWOK == rc) && (*xwtm > 0)) {
+                                rc = -EAGAIN;
+                        }
+                }
+        } while ((-EAGAIN == rc) && (*xwtm > 0));
+        xwos_mtx_unlock(&xwscp->tx.mtx);
         return rc;
 
 err_txmtx_timedlock:
@@ -422,7 +485,7 @@ err_txmtx_timedlock:
 /**
  * @brief XWSCP API: 接收一条报文，若接收队列为空，就限时等待
  * @param xwscp: (I) XWSCP对象的指针
- * @param buf: (I) 接收报文数据的缓冲区指针
+ * @param buf: (I) 接收数据的缓冲区指针
  * @param size: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示报文的字节数
  *              (O) 作为输出时，返回实际接收的字节数
@@ -434,33 +497,82 @@ err_txmtx_timedlock:
  * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
+ * - 上下文：线程
+ * - 重入性：可重入
  */
 __xwmd_api
 xwer_t xwscp_rx(struct xwscp * xwscp, xwu8_t buf[], xwsz_t * size, xwtm_t * xwtm)
 {
         xwer_t rc;
-        struct xwscp_frmslot * pubfrm;
+        union xwscp_slot * slot;
+        xwu8_t * sdupos;
+        xwsz_t sdusize;
         xwsz_t realsize;
 
         XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
         XWSCP_VALIDATE((size), "nullptr", -EFAULT);
         XWSCP_VALIDATE((xwtm), "nullptr", -EFAULT);
 
-        rc = xwscp_rxq_choose(xwscp, &pubfrm, xwtm);
+        rc = xwos_sem_timedwait(&xwscp->rx.sem, xwtm);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_rxq_choose;
+                goto err_sem_timedwait;
         }
-        realsize = pubfrm->frm.head.frmlen - sizeof(struct xwscp_frmhead) -
-                   XWSCP_CHKSUM_SIZE;
-        realsize = realsize > *size ? *size : realsize;
-        memcpy(buf, pubfrm->frm.sdu, realsize);
-        xwscp_free_frmslot(xwscp, pubfrm);
+        slot = xwscp_rxq_choose(xwscp);
+        sdupos = XWSCP_SDUPOS(&slot->rx.frm.head);
+        sdusize = XWSCP_RXSDUSIZE(&slot->rx);
+        realsize = sdusize > *size ? *size : sdusize;
+        memcpy(buf, sdupos, realsize);
+        xwmm_bma_free(xwscp->mempool, slot);
         *size = realsize;
         return XWOK;
 
-err_rxq_choose:
+err_sem_timedwait:
+        return rc;
+}
+
+/**
+ * @brief XWSCP API: 尝试接收消息，若接收队列为空，立即返回错误码
+ * @param xwscp: (I) XWSCP对象的指针
+ * @param buf: (I) 接收数据的缓冲区指针
+ * @param size: 指向缓冲区的指针，此缓冲区：
+ *              (I) 作为输入时，表示报文的字节数
+ *              (O) 作为输出时，返回实际接收的字节数
+ * @param xwtm: 指向缓冲区的指针，此缓冲区：
+ *              (I) 作为输入时，表示期望的阻塞等待时间
+ *              (O) 作为输出时，返回剩余的期望时间
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwmd_api
+xwer_t xwscp_try_rx(struct xwscp * xwscp, xwu8_t buf[], xwsz_t * size)
+{
+        xwer_t rc;
+        union xwscp_slot * slot;
+        xwu8_t * sdupos;
+        xwsz_t sdusize;
+        xwsz_t realsize;
+
+        XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
+        XWSCP_VALIDATE((size), "nullptr", -EFAULT);
+
+        rc = xwos_sem_trywait(&xwscp->rx.sem);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_sem_trywait;
+        }
+        slot = xwscp_rxq_choose(xwscp);
+        sdupos = XWSCP_SDUPOS(&slot->rx.frm.head);
+        sdusize = XWSCP_RXSDUSIZE(&slot->rx);
+        realsize = sdusize > *size ? *size : sdusize;
+        memcpy(buf, sdupos, realsize);
+        xwmm_bma_free(xwscp->mempool, slot);
+        *size = realsize;
+        return XWOK;
+
+err_sem_trywait:
         return rc;
 }

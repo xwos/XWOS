@@ -136,6 +136,19 @@ xwer_t xwos_object_activate(struct xwos_object * obj, xwobj_gc_f gcfunc)
         return rc;
 }
 
+/**
+ * @brief 设置XWOS对象的垃圾回收函数
+ * @param obj: (I) 对象指针
+ * @param gcfunc: (I) 垃圾回收函数：当对象应用计数为0，调用此函数回收资源。
+ */
+__xwlib_code
+void xwos_object_setgc(struct xwos_object * obj, xwobj_gc_f gcfunc)
+{
+        if (XWOS_OBJ_MAGIC == obj->magic) {
+                obj->gcfunc = gcfunc;
+        }
+}
+
 __xwlib_code
 xwer_t xwos_object_acquire_refaop_tst(const void * ov, void * arg)
 {
@@ -294,6 +307,27 @@ xwer_t xwos_object_put(struct xwos_object * obj)
                         }/* else {} */
                 }/* else {} */
         } else {
+                rc = -EOBJDEAD;
+        }
+        return rc;
+}
+
+/**
+ * @brief 减少对象的引用计数，不触发垃圾回收函数
+ * @param obj: (I) 对象指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EOBJDEAD: 对象已销毁
+ */
+__xwlib_code
+xwer_t xwos_object_rawput(struct xwos_object * obj)
+{
+        xwer_t rc;
+
+        rc = xwaop_tgt_then_sub(xwsq, &obj->refcnt,
+                                0, 1,
+                                NULL, NULL);
+        if (rc < 0) {
                 rc = -EOBJDEAD;
         }
         return rc;

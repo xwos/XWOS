@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 主模块：xwpcp子模块
+ * @brief 主模块：xwscp子模块
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,31 +18,12 @@
  * > limitations under the License.
  */
 
+#ifndef __bm_main_xwscp_h__
+#define __bm_main_xwscp_h__
+
 #include <xwos/standard.h>
-#include <xwmd/isc/xwpcp/protocol.h>
-#include <xwmd/isc/xwpcp/mif.h>
-#include <xwmd/isc/xwpcp/hwif/uart.h>
-#include <bm/stm32cube/mif.h>
-#include <bm/main/xwpcp.h>
 
-struct xwpcp bm_xwpcp;
+xwer_t bm_xwscp_start(void);
+xwer_t bm_xwscp_stop(void);
 
-XWPCP_DEF_MEMPOOL(bm_xwpcp_mem);
-
-xwer_t bm_xwpcp_start(void)
-{
-        xwer_t rc;
-
-        rc = xwpcp_start(&bm_xwpcp, "bm.xwpcp",
-                         &xwpcpif_uart_ops, &stm32cube_usart2_cb,
-                         bm_xwpcp_mem, sizeof(bm_xwpcp_mem));
-        return rc;
-}
-
-xwer_t bm_xwpcp_stop(void)
-{
-        xwer_t rc;
-
-        rc = xwpcp_stop(&bm_xwpcp);
-        return rc;
-}
+#endif /* bm/main/xwscp.h */

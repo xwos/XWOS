@@ -97,9 +97,7 @@
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
- * - 内存序：测试成功，acq_rel；测试失败，consume；
- * - 测试成功时，nv为原子操作后的新值，ov为原子操作前的旧值；
- * - 测试失败时，nv与ov都为旧值。
+ * - 内存序：测试成功，acq_rel；测试失败，consume。
  */
 #define xwaop_teq_then_write(type, a, t, v, ov) \
         xwaop(type, teq_then_write, (a), (t), (v), (ov))
@@ -117,9 +115,7 @@
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
- * - 内存序：测试成功，acq_rel；测试失败，consume；
- * - 测试成功时，nv为原子操作后的新值，ov为原子操作前的旧值；
- * - 测试失败时，nv与ov都为旧值。
+ * - 内存序：测试成功，acq_rel；测试失败，consume。
  */
 #define xwaop_tne_then_write(type, a, t, v, ov) \
         xwaop(type, tne_then_write, (a), (t), (v), (ov))
@@ -137,9 +133,7 @@
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
- * - 内存序：测试成功，acq_rel；测试失败，consume；
- * - 测试成功时，nv为原子操作后的新值，ov为原子操作前的旧值；
- * - 测试失败时，nv与ov都为旧值。
+ * - 内存序：测试成功，acq_rel；测试失败，consume。
  */
 #define xwaop_tgt_then_write(type, a, t, v, ov) \
         xwaop(type, tgt_then_write, (a), (t), (v), (ov))
@@ -157,9 +151,7 @@
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
- * - 内存序：测试成功，acq_rel；测试失败，consume；
- * - 测试成功时，nv为原子操作后的新值，ov为原子操作前的旧值；
- * - 测试失败时，nv与ov都为旧值。
+ * - 内存序：测试成功，acq_rel；测试失败，consume。
  */
 #define xwaop_tge_then_write(type, a, t, v, ov) \
         xwaop(type, tge_then_write, (a), (t), (v), (ov))
@@ -177,9 +169,7 @@
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
- * - 内存序：测试成功，acq_rel；测试失败，consume；
- * - 测试成功时，nv为原子操作后的新值，ov为原子操作前的旧值；
- * - 测试失败时，nv与ov都为旧值。
+ * - 内存序：测试成功，acq_rel；测试失败，consume。
  */
 #define xwaop_tlt_then_write(type, a, t, v, ov) \
         xwaop(type, tlt_then_write, (a), (t), (v), (ov))
@@ -197,9 +187,7 @@
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
- * - 内存序：测试成功，acq_rel；测试失败，consume；
- * - 测试成功时，nv为原子操作后的新值，ov为原子操作前的旧值；
- * - 测试失败时，nv与ov都为旧值。
+ * - 内存序：测试成功，acq_rel；测试失败，consume。
  */
 #define xwaop_tle_then_write(type, a, t, v, ov) \
         xwaop(type, tle_then_write, (a), (t), (v), (ov))
@@ -218,9 +206,7 @@
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
- * - 内存序：测试成功，acq_rel；测试失败，consume；
- * - 测试成功时，nv为原子操作后的新值，ov为原子操作前的旧值；
- * - 测试失败时，nv与ov都为旧值。
+ * - 内存序：测试成功，acq_rel；测试失败，consume。
  */
 #define xwaop_tgtlt_then_write(type, a, l, r, v, ov) \
         xwaop(type, tgtlt_then_write, (a), (l), (r), (v), (ov))
@@ -239,9 +225,7 @@
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
- * - 内存序：测试成功，acq_rel；测试失败，consume；
- * - 测试成功时，nv为原子操作后的新值，ov为原子操作前的旧值；
- * - 测试失败时，nv与ov都为旧值。
+ * - 内存序：测试成功，acq_rel；测试失败，consume。
  */
 #define xwaop_tgelt_then_write(type, a, l, r, v, ov) \
         xwaop(type, tgelt_then_write, (a), (l), (r), (v), (ov))
@@ -260,9 +244,7 @@
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
- * - 内存序：测试成功，acq_rel；测试失败，consume；
- * - 测试成功时，nv为原子操作后的新值，ov为原子操作前的旧值；
- * - 测试失败时，nv与ov都为旧值。
+ * - 内存序：测试成功，acq_rel；测试失败，consume。
  */
 #define xwaop_tgtle_then_write(type, a, l, r, v, ov) \
         xwaop(type, tgtle_then_write, (a), (l), (r), (v), (ov))
@@ -281,9 +263,7 @@
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
  * @note
- * - 内存序：测试成功，acq_rel；测试失败，consume；
- * - 测试成功时，nv为原子操作后的新值，ov为原子操作前的旧值；
- * - 测试失败时，nv与ov都为旧值。
+ * - 内存序：测试成功，acq_rel；测试失败，consume。
  */
 #define xwaop_tgele_then_write(type, a, l, r, v, ov) \
         xwaop(type, tgele_then_write, (a), (l), (r), (v), (ov))

@@ -17,6 +17,13 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwaop.h>
 
+/**
+ * @brief XWOS BOPLIB：声明位图
+ * @param name: (I) 符号名
+ * @param bits: (I) 位图中的位数
+ */
+#define xwbmpaop_declare(name, bits)    xwbmp_a name[BITS_TO_BMPS(bits)]
+
 bool xwbmpaop_t1i(xwbmp_a * bmp, xwsq_t idx);
 
 void xwbmpaop_s1i(xwbmp_a * bmp, xwsq_t idx);

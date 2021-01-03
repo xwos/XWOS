@@ -65,10 +65,12 @@ void xwos_objtik_init(void);
 void xwos_object_construct(struct xwos_object * obj);
 void xwos_object_destruct(struct xwos_object * obj);
 xwer_t xwos_object_activate(struct xwos_object * obj, xwobj_gc_f gcfunc);
+void xwos_object_setgc(struct xwos_object * obj, xwobj_gc_f gcfunc);
 xwer_t xwos_object_acquire(struct xwos_object * obj, xwsq_t tik);
 xwer_t xwos_object_release(struct xwos_object * obj, xwsq_t tik);
 xwer_t xwos_object_grab(struct xwos_object * obj);
 xwer_t xwos_object_put(struct xwos_object * obj);
+xwer_t xwos_object_rawput(struct xwos_object * obj);
 xwsq_t xwos_object_get_refcnt(struct xwos_object * obj);
 
 #endif /* xwos/lib/object.h */

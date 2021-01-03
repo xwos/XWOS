@@ -23,8 +23,7 @@ static __xwmd_code
 xwer_t xwscpif_uart_close(struct xwscp * xwscp);
 
 static __xwmd_code
-xwer_t xwscpif_uart_tx(struct xwscp * xwscp, const xwu8_t * data,
-                       xwsz_t size, xwtm_t * xwtm);
+xwer_t xwscpif_uart_tx(struct xwscp * xwscp, const xwu8_t * data, xwsz_t size);
 
 static __xwmd_code
 xwer_t xwscpif_uart_rx(struct xwscp * xwscp, xwu8_t * buf, xwsz_t * size);
@@ -56,10 +55,12 @@ xwer_t xwscpif_uart_close(struct xwscp * xwscp)
 }
 
 static __xwmd_code
-xwer_t xwscpif_uart_tx(struct xwscp * xwscp, const xwu8_t * data,
-                       xwsz_t size, xwtm_t * xwtm)
+xwer_t xwscpif_uart_tx(struct xwscp * xwscp, const xwu8_t * data, xwsz_t size)
 {
-        return xwds_dmauartc_tx(xwscp->hwifcb, data, &size, xwtm);
+        xwtm_t desired;
+
+        desired = XWTM_MAX;
+        return xwds_dmauartc_tx(xwscp->hwifcb, data, &size, &desired);
 }
 
 static __xwmd_code
