@@ -43,6 +43,5 @@ xwer_t xwlua_splk_acquire(xwlua_splk_sp splksp);
 xwer_t xwlua_splk_release(xwlua_splk_sp splksp);
 xwer_t xwlua_splk_grab(struct xwlua_splk * luasplk);
 xwer_t xwlua_splk_put(struct xwlua_splk * luasplk);
-void xwlua_splk_unlock(struct xwlua_splk * luasplk);
 
 #endif /* xwem/vm/lua/xwlua/xwos/spinlock.h */

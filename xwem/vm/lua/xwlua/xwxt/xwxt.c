@@ -66,6 +66,41 @@ void xwlua_xt_copy_function(lua_State * S, int sidx, lua_State * D)
 }
 
 /**
+ * @brief 将虚拟机S中的userdata拷贝到虚拟机D的栈顶
+ * @param S: (I) 源虚拟机
+ * @param idx: (I) userdata在虚拟机S栈中的位置
+ * @param D: (I) 目的虚拟机
+ */
+void xwlua_xt_copy_ud(lua_State * S, int idx, lua_State * D)
+{
+        int rc;
+        int type;
+        bool hasmt;
+
+        idx = lua_absindex(S, idx);
+        hasmt = lua_getmetatable(S, idx); /* push metatable */
+        if (hasmt) {
+                type = lua_getfield(S, -1, "__copy"); /* function */
+                if (LUA_TFUNCTION == type) {
+                        lua_pushvalue(S, idx); /* arg1 */
+                        lua_pushlightuserdata(S, (void *)D); /* arg2 */
+                        /* call __copy(arg1, arg2) then pop */
+                        rc = lua_pcall(S, 2, LUA_MULTRET, 0);
+                        if (LUA_OK != rc) {
+                                lua_pop(S, 1); /* pop error */
+                                lua_pushnil(D);
+                        }
+                } else {
+                        lua_pop(S, 1); /* pop "__copy" */
+                        lua_pushnil(D);
+                }
+                lua_pop(S, 1); /* pop metatable */
+        } else {
+                lua_pushnil(D);
+        }
+}
+
+/**
  * @brief 将虚拟机S栈中的表元素拷贝到虚拟机D的栈中
  * @param S: (I) 虚拟机S
  * @param sidx: (I) 表在虚拟机S栈中的位置
@@ -122,10 +157,20 @@ void xwlua_xt_copy_table(lua_State * S, int sidx, lua_State * D, int didx)
                         case LUA_TTABLE:
                                 lua_newtable(D);
                                 xwlua_xt_copy_table(S, -1, D, -1);
+                                if (lua_getmetatable(S, -1)) {
+                                        lua_newtable(D);
+                                        xwlua_xt_copy_table(S, -1, D, -1);
+                                        lua_setmetatable(D, -2);
+                                }
                                 lua_setfield(D, didx, key);
                                 break;
                         case LUA_TFUNCTION:
                                 xwlua_xt_copy_function(S, -1, D);
+                                lua_setfield(D, didx, key);
+                                break;
+                        case LUA_TLIGHTUSERDATA:
+                        case LUA_TUSERDATA:
+                                xwlua_xt_copy_ud(S, -1, D);
                                 lua_setfield(D, didx, key);
                                 break;
                         default:
@@ -134,41 +179,6 @@ void xwlua_xt_copy_table(lua_State * S, int sidx, lua_State * D, int didx)
                 }
                 /* removes 'value'; keeps 'key' for next iteration */
                 lua_pop(S, 1);
-        }
-}
-
-/**
- * @brief 将虚拟机S中的userdata拷贝到虚拟机D的栈顶
- * @param S: (I) 源虚拟机
- * @param idx: (I) userdata在虚拟机S栈中的位置
- * @param D: (I) 目的虚拟机
- */
-void xwlua_xt_copy_ud(lua_State * S, int idx, lua_State * D)
-{
-        int rc;
-        int type;
-        bool hasmt;
-
-        idx = lua_absindex(S, idx);
-        hasmt = lua_getmetatable(S, idx); /* push metatable */
-        if (hasmt) {
-                type = lua_getfield(S, -1, "__copy"); /* function */
-                if (LUA_TFUNCTION == type) {
-                        lua_pushvalue(S, idx); /* arg1 */
-                        lua_pushlightuserdata(S, (void *)D); /* arg2 */
-                        /* call then pop function & arg1, arg2 */
-                        rc = lua_pcall(S, 2, LUA_MULTRET, 0);
-                        if (LUA_OK != rc) {
-                                lua_pop(S, 1); /* pop error */
-                                lua_pushnil(D);
-                        }
-                } else {
-                        lua_pop(S, 1); /* pop "__copy" */
-                        lua_pushnil(D);
-                }
-                lua_pop(S, 1); /* pop metatable */
-        } else {
-                lua_pushnil(D);
         }
 }
 
@@ -224,10 +234,20 @@ void xwlua_xt_copy_env(lua_State * S, int idx, lua_State * D)
                         case LUA_TTABLE:
                                 lua_newtable(D);
                                 xwlua_xt_copy_table(S, -1, D, -1);
+                                if (lua_getmetatable(S, -1)) {
+                                        lua_newtable(D);
+                                        xwlua_xt_copy_table(S, -1, D, -1);
+                                        lua_setmetatable(D, -2);
+                                }
                                 lua_setglobal(D, key);
                                 break;
                         case LUA_TFUNCTION:
                                 xwlua_xt_copy_function(S, -1, D);
+                                lua_setglobal(D, key);
+                                break;
+                        case LUA_TLIGHTUSERDATA:
+                        case LUA_TUSERDATA:
+                                xwlua_xt_copy_ud(S, -1, D);
                                 lua_setglobal(D, key);
                                 break;
                         default:
@@ -328,10 +348,10 @@ int xwlua_xt_index(lua_State * L)
         key = luaL_checklstring(L, 2, NULL);
         lua_pushcfunction(L, xwlua_xt_import); /* function */
         xwos_mtx_lock_unintr(&xwlua_xt_lock);
-        vt = lua_getglobal(xwlua_xt, key); /* get value of key */
+        vt = lua_getglobal(xwlua_xt, key); /* push value of key */
         lua_pushinteger(L, vt); /* arg1 */
-        rc = lua_pcall(L, 1, 1, 0); /* call */
-        lua_pop(xwlua_xt, 1); /* remove value of key */
+        rc = lua_pcall(L, 1, 1, 0); /* call xwlua_xt_import(arg1) then pop */
+        lua_pop(xwlua_xt, 1); /* pop value of key */
         xwos_mtx_unlock(&xwlua_xt_lock);
         if (LUA_OK != rc) {
                 lua_error(L);
@@ -410,6 +430,7 @@ int xwlua_xt_newindex(lua_State * L)
                 lua_pushvalue(L, 2); /* arg1 */
                 lua_pushvalue(L, 3); /* arg2 */
                 xwos_mtx_lock_unintr(&xwlua_xt_lock);
+                /* call xwlua_xt_export(arg1, arg2) then pop */
                 rc = lua_pcall(L, 2, LUA_MULTRET, 0);
                 xwos_mtx_unlock(&xwlua_xt_lock);
                 if (LUA_OK != rc) {

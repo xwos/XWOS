@@ -183,8 +183,18 @@ int xwlua_sqlksp_gc(lua_State * L)
         xwlua_sqlk_sp * sqlksp;
 
         sqlksp = (xwlua_sqlk_sp *)luaL_checkudata(L, 1, "xwlua_sqlk_sp");
+        xwlua_sqlk_unlock(sqlksp->luasqlk);
         xwlua_sqlk_release(*sqlksp);
         *sqlksp = XWLUA_SQLK_NULLSP;
+        return 0;
+}
+
+int xwlua_sqlksp_unlock(lua_State * L)
+{
+        xwlua_sqlk_sp * sqlksp;
+
+        sqlksp = (xwlua_sqlk_sp *)luaL_checkudata(L, 1, "xwlua_sqlk_sp");
+        xwlua_sqlk_unlock(sqlksp->luasqlk);
         return 0;
 }
 
@@ -225,33 +235,17 @@ int xwlua_sqlksp_copy(lua_State * L)
 const luaL_Reg xwlua_sqlksp_metamethod[] = {
         {"__index", NULL},  /* place holder */
         {"__gc", xwlua_sqlksp_gc},
+        {"__close", xwlua_sqlksp_unlock},
         {"__tostring", xwlua_sqlksp_tostring},
         {"__copy", xwlua_sqlksp_copy},
         {NULL, NULL}
 };
-
-int xwlua_sqlksp_unlock(lua_State * L)
-{
-        xwlua_sqlk_sp * sqlksp;
-
-        if (lua_istable(L, 1)) {
-                lua_getfield(L, 1, "xwlualock"); /* top = autolock.xwlualock */
-                lua_replace(L, 1); /* bottom = autolock.xwlualock */
-        }
-        sqlksp = (xwlua_sqlk_sp *)luaL_checkudata(L, 1, "xwlua_sqlk_sp");
-        xwlua_sqlk_unlock(sqlksp->luasqlk);
-        return 0;
-}
 
 int xwlua_sqlksp_rd_begin(lua_State * L)
 {
         xwlua_sqlk_sp * sqlksp;
         xwsq_t seq;
 
-        if (lua_istable(L, 1)) {
-                lua_getfield(L, 1, "xwlualock"); /* top = autolock.xwlualock */
-                lua_replace(L, 1); /* bottom = autolock.xwlualock */
-        }
         sqlksp = (xwlua_sqlk_sp *)luaL_checkudata(L, 1, "xwlua_sqlk_sp");
         seq = xwos_sqlk_rd_begin(&sqlksp->luasqlk->ossqlk);
         lua_pushinteger(L, (lua_Integer)seq);
@@ -264,10 +258,6 @@ int xwlua_sqlksp_rd_retry(lua_State * L)
         xwsq_t start;
         bool ret;
 
-        if (lua_istable(L, 1)) {
-                lua_getfield(L, 1, "xwlualock"); /* top = autolock.xwlualock */
-                lua_replace(L, 1); /* bottom = autolock.xwlualock */
-        }
         sqlksp = (xwlua_sqlk_sp *)luaL_checkudata(L, 1, "xwlua_sqlk_sp");
         start = luaL_checkinteger(L, 2);
         ret = xwos_sqlk_rd_retry(&sqlksp->luasqlk->ossqlk, start);
@@ -280,10 +270,6 @@ int xwlua_sqlksp_get_seq(lua_State * L)
         xwlua_sqlk_sp * sqlksp;
         xwsq_t seq;
 
-        if (lua_istable(L, 1)) {
-                lua_getfield(L, 1, "xwlualock"); /* top = autolock.xwlualock */
-                lua_replace(L, 1); /* bottom = autolock.xwlualock */
-        }
         sqlksp = (xwlua_sqlk_sp *)luaL_checkudata(L, 1, "xwlua_sqlk_sp");
         seq = xwos_sqlk_get_seq(&sqlksp->luasqlk->ossqlk);
         lua_pushinteger(L, (lua_Integer)seq);
@@ -307,10 +293,6 @@ int xwlua_sqlksp_lock(lua_State * L)
         xwer_t rc;
 
         top = lua_gettop(L);
-        if (lua_istable(L, 1)) {
-                lua_getfield(L, 1, "xwlualock"); /* top = autolock.xwlualock */
-                lua_replace(L, 1); /* bottom = autolock.xwlualock */
-        }
         sqlksp = (xwlua_sqlk_sp *)luaL_checkudata(L, 1, "xwlua_sqlk_sp");
         lktype = luaL_checkoption(L, 2, "wr", xwlua_sqlk_lktype);
         switch (lktype) {

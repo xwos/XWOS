@@ -59,9 +59,21 @@ int xwlua_mtxsp_gc(lua_State * L)
         xwlua_mtx_sp * mtxsp;
 
         mtxsp = (xwlua_mtx_sp *)luaL_checkudata(L, 1, "xwlua_mtx_sp");
+        xwlua_mtx_unlock(mtxsp->mtx);
         xwos_mtx_release(*mtxsp);
         *mtxsp = XWLUA_MTX_NULLSP;
         return 0;
+}
+
+int xwlua_mtxsp_unlock(lua_State * L)
+{
+        xwlua_mtx_sp * mtxsp;
+        xwer_t rc;
+
+        mtxsp = (xwlua_mtx_sp *)luaL_checkudata(L, 1, "xwlua_mtx_sp");
+        rc = xwos_mtx_unlock(mtxsp->mtx);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
 }
 
 int xwlua_mtxsp_tostring(lua_State * L)
@@ -101,25 +113,11 @@ int xwlua_mtxsp_copy(lua_State * L)
 const luaL_Reg xwlua_mtxsp_metamethod[] = {
         {"__index", NULL},  /* place holder */
         {"__gc", xwlua_mtxsp_gc},
+        {"__close", xwlua_mtxsp_unlock},
         {"__tostring", xwlua_mtxsp_tostring},
         {"__copy", xwlua_mtxsp_copy},
         {NULL, NULL}
 };
-
-int xwlua_mtxsp_unlock(lua_State * L)
-{
-        xwlua_mtx_sp * mtxsp;
-        xwer_t rc;
-
-        if (lua_istable(L, 1)) {
-                lua_getfield(L, 1, "xwlualock"); /* top = autolock.xwlualock */
-                lua_replace(L, 1); /* bottom = autolock.xwlualock */
-        }
-        mtxsp = (xwlua_mtx_sp *)luaL_checkudata(L, 1, "xwlua_mtx_sp");
-        rc = xwos_mtx_unlock(mtxsp->mtx);
-        lua_pushinteger(L, (lua_Integer)rc);
-        return 1;
-}
 
 #define XWLUA_MTX_OPT_TRY               0
 const char * const xwlua_mtx_lkopt[] = {"t", NULL};
@@ -134,10 +132,6 @@ int xwlua_mtxsp_lock(lua_State * L)
         xwer_t rc;
 
         top = lua_gettop(L);
-        if (lua_istable(L, 1)) {
-                lua_getfield(L, 1, "xwlualock"); /* top = autolock.xwlualock */
-                lua_replace(L, 1); /* bottom = autolock.xwlualock */
-        }
         mtxsp = (xwlua_mtx_sp *)luaL_checkudata(L, 1, "xwlua_mtx_sp");
         if (top >= 2) {
                 type = lua_type(L, 2);

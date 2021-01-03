@@ -162,8 +162,18 @@ int xwlua_splksp_gc(lua_State * L)
         xwlua_splk_sp * splksp;
 
         splksp = (xwlua_splk_sp *)luaL_checkudata(L, 1, "xwlua_splk_sp");
+        xwlua_splk_unlock(splksp->luasplk);
         xwlua_splk_release(*splksp);
         *splksp = XWLUA_SPLK_NULLSP;
+        return 0;
+}
+
+int xwlua_splksp_unlock(lua_State * L)
+{
+        xwlua_splk_sp * splksp;
+
+        splksp = (xwlua_splk_sp *)luaL_checkudata(L, 1, "xwlua_splk_sp");
+        xwlua_splk_unlock(splksp->luasplk);
         return 0;
 }
 
@@ -204,23 +214,11 @@ int xwlua_splksp_copy(lua_State * L)
 const luaL_Reg xwlua_splksp_metamethod[] = {
         {"__index", NULL},  /* place holder */
         {"__gc", xwlua_splksp_gc},
+        {"__close", xwlua_splksp_unlock},
         {"__tostring", xwlua_splksp_tostring},
         {"__copy", xwlua_splksp_copy},
         {NULL, NULL}
 };
-
-int xwlua_splksp_unlock(lua_State * L)
-{
-        xwlua_splk_sp * splksp;
-
-        if (lua_istable(L, 1)) {
-                lua_getfield(L, 1, "xwlualock"); /* top = autolock.xwlualock */
-                lua_replace(L, 1); /* bottom = autolock.xwlualock */
-        }
-        splksp = (xwlua_splk_sp *)luaL_checkudata(L, 1, "xwlua_splk_sp");
-        xwlua_splk_unlock(splksp->luasplk);
-        return 0;
-}
 
 #define XWLUA_SPLK_LKOPT_TRY             0
 const char * const xwlua_splk_lkopt[] = {"t", NULL};
@@ -234,10 +232,6 @@ int xwlua_splksp_lock(lua_State * L)
         xwer_t rc;
 
         top = lua_gettop(L);
-        if (lua_istable(L, 1)) {
-                lua_getfield(L, 1, "xwlualock"); /* top = autolock.xwlualock */
-                lua_replace(L, 1); /* bottom = autolock.xwlualock */
-        }
         splksp = (xwlua_splk_sp *)luaL_checkudata(L, 1, "xwlua_splk_sp");
         if (top >= 2) {
                 type = lua_type(L, 2);

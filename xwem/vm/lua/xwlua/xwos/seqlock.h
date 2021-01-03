@@ -44,6 +44,5 @@ xwer_t xwlua_sqlk_acquire(xwlua_sqlk_sp sqlksp);
 xwer_t xwlua_sqlk_release(xwlua_sqlk_sp sqlksp);
 xwer_t xwlua_sqlk_grab(struct xwlua_sqlk * luasqlk);
 xwer_t xwlua_sqlk_put(struct xwlua_sqlk * luasqlk);
-void xwlua_sqlk_unlock(struct xwlua_sqlk * luasqlk);
 
 #endif /* xwem/vm/lua/xwlua/xwos/seqlock.h */

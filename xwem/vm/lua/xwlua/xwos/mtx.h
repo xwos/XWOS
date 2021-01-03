@@ -21,6 +21,5 @@ typedef xwos_mtx_d xwlua_mtx_sp; /**< 互斥锁的强指针 */
 #define XWLUA_MTX_NULLSP XWOS_MTX_NILD
 
 void xwlua_os_open_mtx(lua_State * L);
-void xwlua_mtx_unlock(struct xwos_mtx * mtx);
 
 #endif /* xwem/vm/lua/xwlua/xwos/mtx.h */

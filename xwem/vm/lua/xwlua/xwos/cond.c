@@ -17,7 +17,6 @@
 #include "xwlua/xwos/mtx.h"
 #include "xwlua/xwos/spinlock.h"
 #include "xwlua/xwos/seqlock.h"
-#include "xwlua/xwos/lock.h"
 #include "xwlua/xwos/sel.h"
 #include "xwlua/xwos/cond.h"
 
@@ -218,13 +217,19 @@ int xwlua_condsp_wait(lua_State * L)
                         ulualksp.ud = luaL_testudata(L, 2, "xwlua_splk_sp");
                         if (ulualksp.ud) {
                                 ulock.osal.splk = &ulualksp.splksp->luasplk->ossplk;
-                                lktype = XWOS_LK_SPLK;
+                                lkst = ulualksp.splksp->luasplk->lkst;
+                                if (XWLUA_SPLK_LKST_LOCK == lkst) {
+                                        lktype = XWOS_LK_SPLK;
+                                } else {
+                                        lktype = XWOS_LK_NONE;
+                                }
                                 break;
                         }
                         ulualksp.ud = luaL_testudata(L, 2, "xwlua_sqlk_sp");
                         if (ulualksp.ud) {
                                 ulock.osal.sqlk = &ulualksp.sqlksp->luasqlk->ossqlk;
-                                switch (ulualksp.sqlksp->luasqlk->lkst) {
+                                lkst = ulualksp.sqlksp->luasqlk->lkst;
+                                switch (lkst) {
                                 case XWLUA_SQLK_LKST_RDEX_LOCK:
                                         lktype = XWOS_LK_SQLK_RDEX;
                                         break;
