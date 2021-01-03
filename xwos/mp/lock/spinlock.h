@@ -82,34 +82,4 @@ void xwmp_splk_lock_bh(struct xwmp_splk * spl);
 xwer_t xwmp_splk_trylock_bh(struct xwmp_splk * spl);
 void xwmp_splk_unlock_bh(struct xwmp_splk * spl);
 
-void xwmp_bitsplk_init(xwptr_t * ptr);
-void xwmp_bitsplk_lock(xwptr_t * ptr);
-xwer_t xwmp_bitsplk_trylock(xwptr_t * ptr);
-void xwmp_bitsplk_unlock(xwptr_t * ptr);
-void xwmp_bitsplk_lock_cpuirq(xwptr_t * ptr);
-xwer_t xwmp_bitsplk_trylock_cpuirq(xwptr_t * ptr);
-void xwmp_bitsplk_unlock_cpuirq(xwptr_t * ptr);
-void xwmp_bitsplk_lock_cpuirqsv(xwptr_t * ptr, xwreg_t * cpuirq);
-xwer_t xwmp_bitsplk_trylock_cpuirqsv(xwptr_t * ptr, xwreg_t * cpuirq);
-void xwmp_bitsplk_unlock_cpuirqrs(xwptr_t * ptr, xwreg_t cpuirq);
-void xwmp_bitsplk_lock_irqs(xwptr_t * ptr, const struct xwmp_irq_resource * irqs,
-                            xwsz_t num);
-xwer_t xwmp_bitsplk_trylock_irqs(xwptr_t * ptr,
-                                 const struct xwmp_irq_resource * irqs,
-                                 xwsz_t num);
-void xwmp_bitsplk_unlock_irqs(xwptr_t * ptr, const struct xwmp_irq_resource * irqs,
-                              xwsz_t num);
-void xwmp_bitsplk_lock_irqssv(xwptr_t * ptr,
-                              const struct xwmp_irq_resource * irqs,
-                              xwreg_t flags[], xwsz_t num);
-xwer_t xwmp_bitsplk_trylock_irqssv(xwptr_t * ptr,
-                                   const struct xwmp_irq_resource * irqs,
-                                   xwreg_t flags[], xwsz_t num);
-void xwmp_bitsplk_unlock_irqsrs(xwptr_t * ptr,
-                                const struct xwmp_irq_resource * irqs,
-                                xwreg_t flags[], xwsz_t num);
-void xwmp_bitsplk_lock_bh(xwptr_t * ptr);
-xwer_t xwmp_bitsplk_trylock_bh(xwptr_t * ptr);
-void xwmp_bitsplk_unlock_bh(xwptr_t * ptr);
-
 #endif /* xwos/mp/lock/spinlock.h */

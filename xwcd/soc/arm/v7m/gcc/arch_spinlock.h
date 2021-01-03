@@ -25,7 +25,6 @@
 #include <armv7m_core.h>
 
 #define ARCH_SPLK_TICKET_SHIFT          16
-#define ARCH_SPLK_USING_BITSPLK         0
 
 struct arch_splk {
         union {
@@ -41,102 +40,6 @@ struct arch_splk {
                 } tickets;
         } v;
 };
-
-/**
- * @brief 在指针中初始化位自旋锁。
- * @param ptr: (I) 待初始化位自旋锁的指针
- */
-static __xwbsp_inline
-void arch_bitsplk_init(xwptr_t * ptr)
-{
-        *ptr |= 1U;
-}
-
-#if (CPUCFG_CPU_NUM > 1)
-/**
- * @brief 对位自旋锁上锁。
- * @param ptr: (I) 携带位自旋锁的指针
- */
-static __xwbsp_inline
-void arch_bitsplk_lock(xwptr_t * ptr)
-{
-        prefetch(ptr);
-        __asm__ volatile(
-        "1:\n"
-        "       ldrex   r0, [%[__lock]]\n"
-        "       tst     r0, #1\n"       /* Z = ~(r0 & 1); */
-        "       ittte   ne\n"
-        "       bicne   r0, #1\n"
-        "       strexne r1, r0, [%[__lock]]\n"
-        "       teqne   r1, #1\n"
-        "       beq     1b\n"
-        :
-        : [__lock] "r" (ptr)
-        : "r0", "r1", "cc", "memory"
-        );
-        xwmb_mp_mb();
-}
-
-#endif /* (CPUCFG_CPU_NUM > 1) */
-
-#if (CPUCFG_CPU_NUM > 1)
-/**
- * @brief 试图对位自旋锁上锁。
- * @param ptr: (I) 携带位自旋锁的指针
- * @retval 0: OK
- * @retval -EAGAIN: 上锁失败
- */
-static __xwbsp_inline
-xwer_t arch_bitsplk_trylock(xwptr_t * ptr)
-{
-        int rc;
-
-        prefetch(ptr);
-        __asm__ volatile(
-        "1:\n"
-        "       ldrex   r1, [%[__lock]]\n"
-        "       tst     r1, #1\n"       /* Z = ~(r0 & 1); */
-        "       itte    ne\n"           /* if (Z != 1) */
-        "       bicne   r1, #1\n"
-        "       strexne r0, r1, [%[__lock]]\n"
-        "       mvneq   r0, #10\n" /* -EAGAIN */
-        "       teq     r0, #1\n"
-        "       beq     1b\n"
-        "       mov     %[rc], r0\n"
-        : [rc] "=&r" (rc)
-        : [__lock] "r" (ptr)
-        : "r0", "r1", "cc", "memory"
-        );
-        xwmb_mp_mb();
-        return rc;
-}
-#endif /* (CPUCFG_CPU_NUM > 1) */
-
-#if (CPUCFG_CPU_NUM > 1)
-/**
- * @brief 解锁位自旋锁。
- * @param ptr: ptr: (I) 携带位自旋锁的指针
- */
-static __xwbsp_inline
-void arch_bitsplk_unlock(xwptr_t * ptr)
-{
-        xwmb_mp_mb();
-        __asm__ volatile(
-        "1:\n"
-        "       ldrex   r0, [%[__lock]]\n"
-        "       tst     r0, #1\n"       /* Z = ~(r0 & 1); */
-        "       ittte   eq\n"           /* if (Z == 1) */
-        "       orreq   r0, #1\n"
-        "       strexeq r1, r0, [%[__lock]]\n"
-        "       teqeq   r1, #0\n"
-        "       bne     1b\n"
-        :
-        : [__lock] "r" (ptr)
-        : "r0", "r1", "cc", "memory"
-        );
-        armv7m_dsb();
-}
-#endif /* (CPUCFG_CPU_NUM > 1) */
 
 /**
  * @brief Initialize a spinlock
@@ -157,9 +60,6 @@ void arch_splk_init(struct arch_splk * asl)
 static __xwbsp_inline
 void arch_splk_lock(struct arch_splk * asl)
 {
-#if (1 == ARCH_SPLK_USING_BITSPLK)
-        arch_bitsplk_lock(asl);
-#else /* (1 == ARCH_SPLK_USING_BITSPLK) */
         xwer_t rc;
         xwu32_t newval;
         struct arch_splk tmp;
@@ -185,7 +85,6 @@ void arch_splk_lock(struct arch_splk * asl)
                 tmp.v.tickets.curr = xwmb_access(xwu16_t, asl->v.tickets.curr);
         }
         xwmb_mp_mb();
-#endif /* !(1 == ARCH_SPLK_USING_BITSPLK) */
 }
 
 /**
@@ -197,9 +96,6 @@ void arch_splk_lock(struct arch_splk * asl)
 static __xwbsp_inline
 xwer_t arch_splk_trylock(struct arch_splk * asl)
 {
-#if (1 == ARCH_SPLK_USING_BITSPLK)
-        return arch_bitsplk_trylock(asl);
-#else /* (1 == ARCH_SPLK_USING_BITSPLK) */
         xwer_t rc;
         xwu32_t contended;
         struct arch_splk tmp;
@@ -229,7 +125,6 @@ xwer_t arch_splk_trylock(struct arch_splk * asl)
         } else {
                 return -EAGAIN;
         }
-#endif /* !(1 == ARCH_SPLK_USING_BITSPLK) */
 }
 
 /**
@@ -239,14 +134,10 @@ xwer_t arch_splk_trylock(struct arch_splk * asl)
 static __xwbsp_inline
 void arch_splk_unlock(struct arch_splk * asl)
 {
-#if (1 == ARCH_SPLK_USING_BITSPLK)
-        arch_bitsplk_unlock(asl);
-#else /* (1 == ARCH_SPLK_USING_BITSPLK) */
         xwmb_mp_mb();
         asl->v.tickets.curr++;
         armv7m_dsb();
         sev();
-#endif /* !(1 == ARCH_SPLK_USING_BITSPLK) */
 }
 #endif /* (CPUCFG_CPU_NUM > 1) */
 
