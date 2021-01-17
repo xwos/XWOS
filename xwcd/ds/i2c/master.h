@@ -91,28 +91,4 @@ xwer_t xwds_i2cm_put(struct xwds_i2cm * i2cm)
         return xwds_device_put(&i2cm->dev);
 }
 
-/**
- * @brief XWDS API：增加设备运行状态计数器
- * @param i2cm: (I) I2C主机控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_request()
- */
-static __xwds_inline_api
-xwer_t xwds_i2cm_request(struct xwds_i2cm * i2cm)
-{
-        return xwds_device_request(&i2cm->dev);
-}
-
-/**
- * @brief XWDS API：减少设备运行状态计数器
- * @param i2cm: (I) I2C主机控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_release()
- */
-static __xwds_inline_api
-xwer_t xwds_i2cm_release(struct xwds_i2cm * i2cm)
-{
-        return xwds_device_release(&i2cm->dev);
-}
-
 #endif /* xwcd/ds/i2c/master.h */

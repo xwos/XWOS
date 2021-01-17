@@ -154,28 +154,6 @@ xwer_t xwds_cantrcv_put(struct xwds_cantrcv * cantrcv)
         return xwds_device_put(&cantrcv->bc.dev);
 }
 
-/**
- * @brief XWDS API：增加设备运行状态计数器
- * @param cantrcv: (I) CAN接收器对象指针
- * @return 错误码
- */
-static __xwds_inline_api
-xwer_t xwds_cantrcv_request(struct xwds_cantrcv * cantrcv)
-{
-        return xwds_device_request(&cantrcv->bc.dev);
-}
-
-/**
- * @brief XWDS API：减少设备运行状态计数器
- * @param cantrcv: (I) CAN接收器对象指针
- * @return 错误码
- */
-static __xwds_inline_api
-xwer_t xwds_cantrcv_release(struct xwds_cantrcv * cantrcv)
-{
-        return xwds_device_release(&cantrcv->bc.dev);
-}
-
 /******** ******** Callbacks for Driver ******** ********/
 void xwds_cantrcv_drvcb_wakeup_notification(struct xwds_cantrcv * cantrcv);
 

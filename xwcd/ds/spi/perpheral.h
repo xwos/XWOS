@@ -75,28 +75,4 @@ xwer_t xwds_spip_put(struct xwds_spip * spip)
         return xwds_device_put(&spip->dev);
 }
 
-/**
- * @brief XWDS API：增加设备运行状态计数器
- * @param spip: (I) SPI外设控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_request()
- */
-static __xwds_inline_api
-xwer_t xwds_spip_request(struct xwds_spip * spip)
-{
-        return xwds_device_request(&spip->dev);
-}
-
-/**
- * @brief XWDS API：减少设备运行状态计数器
- * @param spip: (I) SPI外设控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_release()
- */
-static __xwds_inline_api
-xwer_t xwds_spip_release(struct xwds_spip * spip)
-{
-        return xwds_device_release(&spip->dev);
-}
-
 #endif /* xwcd/ds/spi/perpheral.h */

@@ -46,10 +46,30 @@ struct xwds_misc {
 
 void xwds_misc_construct(struct xwds_misc * misc);
 void xwds_misc_destruct(struct xwds_misc * misc);
-xwer_t xwds_misc_grab(struct xwds_misc * misc);
-xwer_t xwds_misc_put(struct xwds_misc * misc);
-xwer_t xwds_misc_request(struct xwds_misc * misc);
-xwer_t xwds_misc_release(struct xwds_misc * misc);
 xwer_t xwds_misc_ioctl(struct xwds_misc * misc, xwsq_t cmd, ...);
+
+/**
+ * @brief XWDS API：增加对象的引用计数
+ * @param misc: (I) MISC设备对象指针
+ * @return 错误码
+ * @retval @ref xwds_device_grab()
+ */
+static __xwds_inline_api
+xwer_t xwds_misc_grab(struct xwds_misc * misc)
+{
+        return xwds_device_grab(&misc->dev);
+}
+
+/**
+ * @brief XWDS API：减少对象的引用计数
+ * @param misc: (I) MISC设备对象指针
+ * @return 错误码
+ * @retval @ref xwds_device_put()
+ */
+static __xwds_inline_api
+xwer_t xwds_misc_put(struct xwds_misc * misc)
+{
+        return xwds_device_put(&misc->dev);
+}
 
 #endif /* xwcd/ds/misc/chip.h */

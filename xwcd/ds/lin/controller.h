@@ -156,28 +156,4 @@ xwer_t xwds_linc_put(struct xwds_linc * linc)
         return xwds_device_put(&linc->dev);
 }
 
-/**
- * @brief XWDS API：增加设备运行状态计数器
- * @param linc: (I) LIN控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_request()
- */
-static __xwds_inline_api
-xwer_t xwds_linc_request(struct xwds_linc * linc)
-{
-        return xwds_device_request(&linc->dev);
-}
-
-/**
- * @brief XWDS API：减少设备运行状态计数器
- * @param linc: (I) LIN控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_release()
- */
-static __xwds_inline_api
-xwer_t xwds_linc_release(struct xwds_linc * linc)
-{
-        return xwds_device_release(&linc->dev);
-}
-
 #endif /* xwcd/ds/lin/controller.h */

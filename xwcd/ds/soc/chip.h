@@ -141,7 +141,7 @@ typedef void * xwds_eirq_arg_t;
 /**
  * @brief 外部中断函数
  */
-typedef void (*xwds_eirq_f)(struct xwds_soc *, xwid_t, xwds_eirq_arg_t);
+typedef void (* xwds_eirq_f)(struct xwds_soc *, xwid_t, xwds_eirq_arg_t);
 
 /**
  * @brief DMA完成回调函数参数
@@ -151,10 +151,10 @@ typedef void * xwds_dma_cbarg_t;
 /**
  * @brief DMA完成回调函数类型
  */
-typedef void (*xwds_dma_f)(struct xwds_soc * /* soc */,
-                           xwid_t /* ch */,
-                           xwu32_t /* rc */,
-                           xwds_dma_cbarg_t /* arg */);
+typedef void (* xwds_dma_f)(struct xwds_soc * /* soc */,
+                            xwid_t /* ch */,
+                            xwu32_t /* rc */,
+                            xwds_dma_cbarg_t /* arg */);
 
 /**
  * @brief SOC设备
@@ -237,30 +237,6 @@ static __xwds_inline_api
 xwer_t xwds_soc_put(struct xwds_soc * soc)
 {
         return xwds_device_put(&soc->dev);
-}
-
-/**
- * @brief XWDS API：增加设备运行状态计数器
- * @param soc: (I) SOC对象指针
- * @return 错误码
- * @retval @ref xwds_device_request()
- */
-static __xwds_inline_api
-xwer_t xwds_soc_request(struct xwds_soc * soc)
-{
-        return xwds_device_request(&soc->dev);
-}
-
-/**
- * @brief XWDS API：减少设备运行状态计数器
- * @param soc: (I) SOC对象指针
- * @return 错误码
- * @retval @ref xwds_device_release()
- */
-static __xwds_inline_api
-xwer_t xwds_soc_release(struct xwds_soc * soc)
-{
-        return xwds_device_release(&soc->dev);
 }
 
 #endif /* xwcd/ds/soc/chip.h */

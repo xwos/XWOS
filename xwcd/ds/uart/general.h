@@ -114,30 +114,6 @@ xwer_t xwds_uartc_put(struct xwds_uartc * uartc)
         return xwds_device_put(&uartc->dev);
 }
 
-/**
- * @brief XWDS API：增加设备运行状态计数器
- * @param uartc: (I) UART控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_request()
- */
-static __xwds_inline_api
-xwer_t xwds_uartc_request(struct xwds_uartc * uartc)
-{
-        return xwds_device_request(&uartc->dev);
-}
-
-/**
- * @brief XWDS API：减少设备运行状态计数器
- * @param uartc: (I) UART控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_release()
- */
-static __xwds_inline_api
-xwer_t xwds_uartc_release(struct xwds_uartc * uartc)
-{
-        return xwds_device_release(&uartc->dev);
-}
-
 /******** ******** Callbacks for driver ******** ********/
 void xwds_uartc_drvcb_rx_isr(struct xwds_uartc * uartc);
 void xwds_uartc_drvcb_tx_isr(struct xwds_uartc * uartc);

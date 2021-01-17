@@ -76,28 +76,4 @@ xwer_t xwds_i2cp_put(struct xwds_i2cp * i2cp)
         return xwds_device_put(&i2cp->dev);
 }
 
-/**
- * @brief XWDS API：增加设备运行状态计数器
- * @param i2cp: (I) I2C外设对象指针
- * @return 错误码
- * @retval @ref xwds_device_request()
- */
-static __xwds_inline_api
-xwer_t xwds_i2cp_request(struct xwds_i2cp * i2cp)
-{
-        return xwds_device_request(&i2cp->dev);
-}
-
-/**
- * @brief XWDS API：减少设备运行状态计数器
- * @param i2cp: (I) I2C外设对象指针
- * @return 错误码
- * @retval @ref xwds_device_release()
- */
-static __xwds_inline_api
-xwer_t xwds_i2cp_release(struct xwds_i2cp * i2cp)
-{
-        return xwds_device_release(&i2cp->dev);
-}
-
 #endif /* xwcd/ds/i2c/perpheral.h */

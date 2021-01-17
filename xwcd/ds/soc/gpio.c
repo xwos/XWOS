@@ -48,12 +48,10 @@ xwer_t xwds_gpio_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         XWDS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
 
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
-
         rc = xwds_soc_grab(soc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-
         rc = xwaop_t0ma_then_s1m(xwsq, &soc->gpio.pins[port], pinmask, NULL, NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 rc = -EBUSY;
@@ -153,12 +151,10 @@ xwer_t xwds_gpio_cfg(struct xwds_soc * soc,
         XWDS_VALIDATE(cfg, "nullptr", -EFAULT);
 
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
-
         rc = xwds_soc_grab(soc);
         if (__xwcc_unlikely(rc < 0)) {
                goto err_soc_grab;
         }
-
         drv = xwds_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->gpio_cfg)) {
                 rc = drv->gpio_cfg(soc, port, pinmask, cfg);
@@ -168,7 +164,6 @@ xwer_t xwds_gpio_cfg(struct xwds_soc * soc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_gpio_cfg;
         }
-
         xwds_soc_put(soc);
         return XWOK;
 
@@ -205,12 +200,10 @@ xwer_t xwds_gpio_set(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         XWDS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
 
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
-
         rc = xwds_soc_grab(soc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-
         pinsts = xwaop_load(xwsq, &soc->gpio.pins[port], xwmb_modr_relaxed);
         if (__xwcc_unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
@@ -225,7 +218,6 @@ xwer_t xwds_gpio_set(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_set;
         }
-
         xwds_soc_put(soc);
         return XWOK;
 
@@ -263,12 +255,10 @@ xwer_t xwds_gpio_reset(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         XWDS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
 
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
-
         rc = xwds_soc_grab(soc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-
         pinsts = xwaop_load(xwsq, &soc->gpio.pins[port], xwmb_modr_relaxed);
         if (__xwcc_unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
@@ -283,7 +273,6 @@ xwer_t xwds_gpio_reset(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_reset;
         }
-
         xwds_soc_put(soc);
         return XWOK;
 
@@ -321,12 +310,10 @@ xwer_t xwds_gpio_toggle(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         XWDS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
 
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
-
         rc = xwds_soc_grab(soc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-
         pinsts = xwaop_load(xwsq, &soc->gpio.pins[port], xwmb_modr_relaxed);
         if (__xwcc_unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
@@ -341,7 +328,6 @@ xwer_t xwds_gpio_toggle(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_toggle;
         }
-
         xwds_soc_put(soc);
         return XWOK;
 
@@ -383,12 +369,10 @@ xwer_t xwds_gpio_output(struct xwds_soc * soc,
         XWDS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
 
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
-
         rc = xwds_soc_grab(soc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-
         pinsts = xwaop_load(xwsq, &soc->gpio.pins[port], xwmb_modr_relaxed);
         if (__xwcc_unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
@@ -403,7 +387,6 @@ xwer_t xwds_gpio_output(struct xwds_soc * soc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_out;
         }
-
         xwds_soc_put(soc);
         return XWOK;
 
@@ -444,12 +427,10 @@ xwer_t xwds_gpio_input(struct xwds_soc * soc,
         XWDS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
 
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
-
         rc = xwds_soc_grab(soc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-
         pinsts = xwaop_load(xwsq, &soc->gpio.pins[port], xwmb_modr_relaxed);
         if (__xwcc_unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
@@ -464,7 +445,6 @@ xwer_t xwds_gpio_input(struct xwds_soc * soc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_in;
         }
-
         xwds_soc_put(soc);
         return XWOK;
 

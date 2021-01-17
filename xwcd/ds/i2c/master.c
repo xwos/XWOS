@@ -24,33 +24,33 @@
 #include <xwcd/ds/i2c/master.h>
 
 static __xwds_vop
-xwer_t xwds_i2cm_cvop_probe(struct xwds_i2cm * i2cm);
+xwer_t xwds_i2cm_vop_probe(struct xwds_i2cm * i2cm);
 
 static __xwds_vop
-xwer_t xwds_i2cm_cvop_remove(struct xwds_i2cm * i2cm);
+xwer_t xwds_i2cm_vop_remove(struct xwds_i2cm * i2cm);
 
 static __xwds_vop
-xwer_t xwds_i2cm_cvop_start(struct xwds_i2cm * i2cm);
+xwer_t xwds_i2cm_vop_start(struct xwds_i2cm * i2cm);
 
 static __xwds_vop
-xwer_t xwds_i2cm_cvop_stop(struct xwds_i2cm * i2cm);
+xwer_t xwds_i2cm_vop_stop(struct xwds_i2cm * i2cm);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static __xwds_vop
-xwer_t xwds_i2cm_cvop_suspend(struct xwds_i2cm * i2cm);
+xwer_t xwds_i2cm_vop_suspend(struct xwds_i2cm * i2cm);
 
 static __xwds_vop
-xwer_t xwds_i2cm_cvop_resume(struct xwds_i2cm * i2cm);
+xwer_t xwds_i2cm_vop_resume(struct xwds_i2cm * i2cm);
 #endif /* XWCDCFG_ds_PM */
 
-__xwds_rodata const struct xwds_base_virtual_operations xwds_i2cm_cvops = {
-        .probe = (void *)xwds_i2cm_cvop_probe,
-        .remove = (void *)xwds_i2cm_cvop_remove,
-        .start = (void *)xwds_i2cm_cvop_start,
-        .stop = (void *)xwds_i2cm_cvop_stop,
+__xwds_rodata const struct xwds_virtual_operation xwds_i2cm_vop = {
+        .probe = (void *)xwds_i2cm_vop_probe,
+        .remove = (void *)xwds_i2cm_vop_remove,
+        .start = (void *)xwds_i2cm_vop_start,
+        .stop = (void *)xwds_i2cm_vop_stop,
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-        .suspend = (void *)xwds_i2cm_cvop_suspend,
-        .resume = (void *)xwds_i2cm_cvop_resume,
+        .suspend = (void *)xwds_i2cm_vop_suspend,
+        .resume = (void *)xwds_i2cm_vop_resume,
 #endif /* XWCDCFG_ds_PM */
 };
 
@@ -63,7 +63,7 @@ __xwds_api
 void xwds_i2cm_construct(struct xwds_i2cm * i2cm)
 {
         xwds_device_construct(&i2cm->dev);
-        i2cm->dev.cvops = &xwds_i2cm_cvops;
+        i2cm->dev.vop = &xwds_i2cm_vop;
 }
 
 /**
@@ -83,7 +83,7 @@ void xwds_i2cm_destruct(struct xwds_i2cm * i2cm)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_i2cm_cvop_probe(struct xwds_i2cm * i2cm)
+xwer_t xwds_i2cm_vop_probe(struct xwds_i2cm * i2cm)
 {
         xwer_t rc;
 
@@ -97,13 +97,13 @@ xwer_t xwds_i2cm_cvop_probe(struct xwds_i2cm * i2cm)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_abort_mtx_init;
         }
-        rc = xwds_device_cvop_probe(&i2cm->dev);
+        rc = xwds_device_vop_probe(&i2cm->dev);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_cvop_probe;
+                goto err_dev_vop_probe;
         }
         return XWOK;
 
-err_dev_cvop_probe:
+err_dev_vop_probe:
         xwos_mtx_destroy(&i2cm->abort.apimtx);
 err_abort_mtx_init:
         xwos_mtx_destroy(&i2cm->xfer.apimtx);
@@ -118,19 +118,19 @@ err_xfer_mtx_init:
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_i2cm_cvop_remove(struct xwds_i2cm * i2cm)
+xwer_t xwds_i2cm_vop_remove(struct xwds_i2cm * i2cm)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_remove(&i2cm->dev);
+        rc = xwds_device_vop_remove(&i2cm->dev);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_cvop_remove;
+                goto err_dev_vop_remove;
         }
         xwos_mtx_destroy(&i2cm->abort.apimtx);
         xwos_mtx_destroy(&i2cm->xfer.apimtx);
         return XWOK;
 
-err_dev_cvop_remove:
+err_dev_vop_remove:
         return rc;
 }
 
@@ -140,11 +140,11 @@ err_dev_cvop_remove:
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_i2cm_cvop_start(struct xwds_i2cm * i2cm)
+xwer_t xwds_i2cm_vop_start(struct xwds_i2cm * i2cm)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_start(&i2cm->dev);
+        rc = xwds_device_vop_start(&i2cm->dev);
         return rc;
 }
 
@@ -154,11 +154,11 @@ xwer_t xwds_i2cm_cvop_start(struct xwds_i2cm * i2cm)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_i2cm_cvop_stop(struct xwds_i2cm * i2cm)
+xwer_t xwds_i2cm_vop_stop(struct xwds_i2cm * i2cm)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_stop(&i2cm->dev);
+        rc = xwds_device_vop_stop(&i2cm->dev);
         return rc;
 }
 
@@ -170,11 +170,11 @@ xwer_t xwds_i2cm_cvop_stop(struct xwds_i2cm * i2cm)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_i2cm_cvop_suspend(struct xwds_i2cm * i2cm)
+xwer_t xwds_i2cm_vop_suspend(struct xwds_i2cm * i2cm)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_suspend(&i2cm->dev);
+        rc = xwds_device_vop_suspend(&i2cm->dev);
         return rc;
 }
 
@@ -184,11 +184,11 @@ xwer_t xwds_i2cm_cvop_suspend(struct xwds_i2cm * i2cm)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_i2cm_cvop_resume(struct xwds_i2cm * i2cm)
+xwer_t xwds_i2cm_vop_resume(struct xwds_i2cm * i2cm)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_resume(&i2cm->dev);
+        rc = xwds_device_vop_resume(&i2cm->dev);
         return rc;
 }
 #endif /* XWCDCFG_ds_PM */
@@ -228,11 +228,6 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_i2cm_grab;
         }
-        rc = xwds_i2cm_request(i2cm);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_i2cm_request;
-        }
-
         rc = xwos_mtx_timedlock(&i2cm->xfer.apimtx, xwtm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_i2cm_lock;
@@ -247,15 +242,12 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
                 goto err_drv_xfer;
         }
         xwos_mtx_unlock(&i2cm->xfer.apimtx);
-        xwds_i2cm_release(i2cm);
         xwds_i2cm_put(i2cm);
         return XWOK;
 
 err_drv_xfer:
         xwos_mtx_unlock(&i2cm->xfer.apimtx);
 err_i2cm_lock:
-        xwds_i2cm_release(i2cm);
-err_i2cm_request:
         xwds_i2cm_put(i2cm);
 err_i2cm_grab:
         return rc;
@@ -297,11 +289,6 @@ xwer_t xwds_i2cm_abort(struct xwds_i2cm * i2cm,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_i2cm_grab;
         }
-        rc = xwds_i2cm_request(i2cm);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_i2cm_request;
-        }
-
         rc = xwos_mtx_timedlock(&i2cm->abort.apimtx, xwtm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_i2cm_lock;
@@ -316,15 +303,12 @@ xwer_t xwds_i2cm_abort(struct xwds_i2cm * i2cm,
                 goto err_drv_abort;
         }
         xwos_mtx_unlock(&i2cm->abort.apimtx);
-        xwds_i2cm_release(i2cm);
         xwds_i2cm_put(i2cm);
         return XWOK;
 
 err_drv_abort:
         xwos_mtx_unlock(&i2cm->abort.apimtx);
 err_i2cm_lock:
-        xwds_i2cm_release(i2cm);
-err_i2cm_request:
         xwds_i2cm_put(i2cm);
 err_i2cm_grab:
         return rc;

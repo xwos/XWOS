@@ -46,11 +46,6 @@ xwer_t xwds_eram_test(struct xwds_soc * soc, xwptr_t * erraddr)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-        rc = xwds_soc_request(soc);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_soc_request;
-        }
-
         drv = xwds_cast(struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->eram_tst)) {
                 rc = drv->eram_tst(soc, erraddr);
@@ -63,14 +58,10 @@ xwer_t xwds_eram_test(struct xwds_soc * soc, xwptr_t * erraddr)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_tst;
         }
-
-        xwds_soc_release(soc);
         xwds_soc_put(soc);
         return XWOK;
 
 err_drv_tst:
-        xwds_soc_release(soc);
-err_soc_request:
         xwds_soc_put(soc);
 err_soc_grab:
         return rc;

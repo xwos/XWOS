@@ -26,10 +26,6 @@
 #include <xwcd/ds/xwds.h>
 #include <xwcd/ds/object.h>
 
-/**
- * @brief 设备栈对象的构造函数
- * @param obj: (I) 对象的指针
- */
 __xwds_code
 void xwds_obj_construct(struct xwds_object * obj)
 {
@@ -38,10 +34,6 @@ void xwds_obj_construct(struct xwds_object * obj)
         obj->ds = NULL;
 }
 
-/**
- * @brief 设备栈对象的析构函数
- * @param obj: (I) 对象的指针
- */
 __xwds_code
 void xwds_obj_destruct(struct xwds_object * obj)
 {
@@ -49,59 +41,133 @@ void xwds_obj_destruct(struct xwds_object * obj)
         xwos_object_destruct(&obj->xwobj);
 }
 
-/**
- * @brief 增加对象的引用计数
- * @param obj: (I) 对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EINVAL: 对象未被激活（引用计数小于1）
- */
+__xwds_code
+xwsq_t xwds_obj_gettik(struct xwds_object * obj)
+{
+        xwsq_t tik;
+
+        if (obj) {
+                tik = obj->xwobj.tik;
+        } else {
+                tik = 0;
+        }
+        return tik;
+}
+
+__xwds_code
+xwer_t xwds_obj_probe(struct xwds_object * obj, xwobj_gc_f gcfunc)
+{
+        return xwos_object_activate(&obj->xwobj, gcfunc);
+}
+
+__xwds_code
+xwer_t xwds_obj_remove(struct xwds_object * obj)
+{
+        xwer_t rc;
+
+        rc = xwaop_teq_then_sub(xwsq, &obj->xwobj.refcnt,
+                                XWDS_OBJ_REF_SHUTDOWN, 1,
+                                NULL, NULL);
+        if (XWOK == rc) {
+                if (obj->xwobj.gcfunc) {
+                        rc = obj->xwobj.gcfunc(obj);
+                }
+        } else {
+                rc = -EPERM;
+        }
+        return rc;
+}
+
+__xwds_code
+xwer_t xwds_obj_start(struct xwds_object * obj)
+{
+        xwer_t rc;
+
+        rc = xwaop_teq_then_add(xwsq, &obj->xwobj.refcnt,
+                                XWDS_OBJ_REF_SHUTDOWN, 2,
+                                NULL, NULL);
+        if (rc < 0) {
+                rc = -EPERM;
+        }/* else {} */
+        return rc;
+}
+
+__xwds_code
+xwer_t xwds_obj_stop(struct xwds_object * obj)
+{
+        xwer_t rc;
+
+        rc = xwaop_teq_then_sub(xwsq, &obj->xwobj.refcnt,
+                                XWDS_OBJ_REF_RUNNING, 2,
+                                NULL, NULL);
+        if (rc < 0) {
+                rc = -EPERM;
+        }/* else {} */
+        return rc;
+}
+
+__xwds_code
+xwer_t xwds_obj_suspend(struct xwds_object * obj)
+{
+        xwer_t rc;
+
+        rc = xwaop_teq_then_sub(xwsq, &obj->xwobj.refcnt,
+                                XWDS_OBJ_REF_RUNNING, 1,
+                                NULL, NULL);
+        if (rc < 0) {
+                rc = -EPERM;
+        }/* else {} */
+        return rc;
+}
+
+__xwds_code
+xwer_t xwds_obj_resume(struct xwds_object * obj)
+{
+        xwer_t rc;
+
+        rc = xwaop_teq_then_add(xwsq, &obj->xwobj.refcnt,
+                                XWDS_OBJ_REF_SUSPEND, 1,
+                                NULL, NULL);
+        if (rc < 0) {
+                rc = -EPERM;
+        }/* else {} */
+        return rc;
+}
+
 __xwds_code
 xwer_t xwds_obj_grab(struct xwds_object * obj)
 {
-        return xwos_object_grab(&obj->xwobj);
+        xwer_t rc;
+
+        rc = xwaop_tge_then_add(xwsq, &obj->xwobj.refcnt,
+                                XWDS_OBJ_REF_RUNNING, 1,
+                                NULL, NULL);
+        if (__xwcc_unlikely(rc < 0)) {
+                rc = -EPERM;
+        }/* else {} */
+        return rc;
 }
 
-/**
- * @brief 减少对象的引用计数
- * @param obj: (I) 对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EINVAL: 对象未被激活（引用计数小于1）
- */
 __xwds_code
 xwer_t xwds_obj_put(struct xwds_object * obj)
 {
-        return xwos_object_put(&obj->xwobj);
+        xwer_t rc;
+
+        rc = xwaop_tgt_then_sub(xwsq, &obj->xwobj.refcnt,
+                                XWDS_OBJ_REF_RUNNING, 1,
+                                NULL, NULL);
+        if (rc < 0) {
+                rc = -EPERM;
+        }/* else {} */
+        return rc;
 }
 
-/**
- * @brief 得到对象的引用计数
- * @param obj: (I) 对象的指针
- * @return 引用计数
- */
 __xwds_code
 xwsq_t xwds_obj_get_refcnt(struct xwds_object * obj)
 {
         return xwos_object_get_refcnt(&obj->xwobj);
 }
 
-/**
- * @brief 激活设备栈对象
- * @param obj: (I) 对象的指针
- * @return 错误码
- */
-__xwds_code
-xwer_t xwds_obj_activate(struct xwds_object * obj, xwobj_gc_f gcfunc)
-{
-        return xwos_object_activate(&obj->xwobj, gcfunc);
-}
-
-/**
- * @brief 将设备栈对象加入到设备栈
- * @param obj: (I) 对象的指针
- * @return 错误码
- */
 __xwds_code
 xwer_t xwds_obj_add(struct xwds * ds, struct xwds_object * obj)
 {
@@ -120,13 +186,8 @@ xwer_t xwds_obj_add(struct xwds * ds, struct xwds_object * obj)
         return rc;
 }
 
-/**
- * @brief 将设备栈对象从设备栈中删除
- * @param obj: (I) 对象的指针
- * @return 错误码
- */
 __xwds_code
-xwer_t xwds_obj_remove(struct xwds * ds, struct xwds_object * obj)
+xwer_t xwds_obj_del(struct xwds * ds, struct xwds_object * obj)
 {
         xwreg_t cpuirq;
         xwer_t rc;

@@ -25,33 +25,33 @@
 #include <xwcd/ds/can/transceiver.h>
 
 static __xwds_vop
-xwer_t xwds_cantrcv_cvop_probe(struct xwds_cantrcv * cantrcv);
+xwer_t xwds_cantrcv_vop_probe(struct xwds_cantrcv * cantrcv);
 
 static __xwds_vop
-xwer_t xwds_cantrcv_cvop_remove(struct xwds_cantrcv * cantrcv);
+xwer_t xwds_cantrcv_vop_remove(struct xwds_cantrcv * cantrcv);
 
 static __xwds_vop
-xwer_t xwds_cantrcv_cvop_start(struct xwds_cantrcv * cantrcv);
+xwer_t xwds_cantrcv_vop_start(struct xwds_cantrcv * cantrcv);
 
 static __xwds_vop
-xwer_t xwds_cantrcv_cvop_stop(struct xwds_cantrcv * cantrcv);
+xwer_t xwds_cantrcv_vop_stop(struct xwds_cantrcv * cantrcv);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static __xwds_vop
-xwer_t xwds_cantrcv_cvop_suspend(struct xwds_cantrcv * cantrcv);
+xwer_t xwds_cantrcv_vop_suspend(struct xwds_cantrcv * cantrcv);
 
 static __xwds_vop
-xwer_t xwds_cantrcv_cvop_resume(struct xwds_cantrcv * cantrcv);
+xwer_t xwds_cantrcv_vop_resume(struct xwds_cantrcv * cantrcv);
 #endif /* XWCDCFG_ds_PM */
 
-__xwds_rodata const struct xwds_base_virtual_operations xwds_cantrcv_cvops = {
-        .probe = (void *)xwds_cantrcv_cvop_probe,
-        .remove = (void *)xwds_cantrcv_cvop_remove,
-        .start = (void *)xwds_cantrcv_cvop_start,
-        .stop = (void *)xwds_cantrcv_cvop_stop,
+__xwds_rodata const struct xwds_virtual_operation xwds_cantrcv_vop = {
+        .probe = (void *)xwds_cantrcv_vop_probe,
+        .remove = (void *)xwds_cantrcv_vop_remove,
+        .start = (void *)xwds_cantrcv_vop_start,
+        .stop = (void *)xwds_cantrcv_vop_stop,
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-        .suspend = (void *)xwds_cantrcv_cvop_suspend,
-        .resume = (void *)xwds_cantrcv_cvop_resume,
+        .suspend = (void *)xwds_cantrcv_vop_suspend,
+        .resume = (void *)xwds_cantrcv_vop_resume,
 #endif /* XWCDCFG_ds_PM */
 };
 
@@ -64,7 +64,7 @@ __xwds_api
 void xwds_cantrcv_construct(struct xwds_cantrcv * cantrcv)
 {
         xwds_device_construct(&cantrcv->bc.dev);
-        cantrcv->bc.dev.cvops = &xwds_cantrcv_cvops;
+        cantrcv->bc.dev.vop = &xwds_cantrcv_vop;
 }
 
 /**
@@ -84,14 +84,14 @@ void xwds_cantrcv_destruct(struct xwds_cantrcv * cantrcv)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_cantrcv_cvop_probe(struct xwds_cantrcv * cantrcv)
+xwer_t xwds_cantrcv_vop_probe(struct xwds_cantrcv * cantrcv)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(cantrcv, "nullptr", -EFAULT);
         XWDS_VALIDATE(cantrcv->cfg, "nullptr", -EFAULT);
 
-        rc = xwds_device_cvop_probe(&cantrcv->bc.dev);
+        rc = xwds_device_vop_probe(&cantrcv->bc.dev);
         return rc;
 }
 
@@ -101,14 +101,14 @@ xwer_t xwds_cantrcv_cvop_probe(struct xwds_cantrcv * cantrcv)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_cantrcv_cvop_remove(struct xwds_cantrcv * cantrcv)
+xwer_t xwds_cantrcv_vop_remove(struct xwds_cantrcv * cantrcv)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(cantrcv, "nullptr", -EFAULT);
         XWDS_VALIDATE(cantrcv->cfg, "nullptr", -EFAULT);
 
-        rc = xwds_device_cvop_remove(&cantrcv->bc.dev);
+        rc = xwds_device_vop_remove(&cantrcv->bc.dev);
         return rc;
 }
 
@@ -117,17 +117,17 @@ xwer_t xwds_cantrcv_cvop_remove(struct xwds_cantrcv * cantrcv)
  * @param cantrcv: (I) CAN接收器对象指针
  * @return 错误码
  */
-__xwds_api
-xwer_t xwds_cantrcv_cvop_start(struct xwds_cantrcv * cantrcv)
+static __xwds_vop
+xwer_t xwds_cantrcv_vop_start(struct xwds_cantrcv * cantrcv)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(cantrcv, "nullptr", -EFAULT);
         XWDS_VALIDATE(cantrcv->cfg, "nullptr", -EFAULT);
 
-        rc = xwds_device_cvop_start(&cantrcv->bc.dev);
+        rc = xwds_device_vop_start(&cantrcv->bc.dev);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_cvop_start;
+                goto err_dev_vop_start;
         }
         cantrcv->wkuprs = XWDS_CANTRCV_WKUPRS_NONE;
         rc = xwds_cantrcv_set_opmode(cantrcv, cantrcv->cfg->init_opmode);
@@ -137,8 +137,8 @@ xwer_t xwds_cantrcv_cvop_start(struct xwds_cantrcv * cantrcv)
         return XWOK;
 
 err_set_opmode:
-        xwds_device_cvop_stop(&cantrcv->bc.dev);
-err_dev_cvop_start:
+        xwds_device_vop_stop(&cantrcv->bc.dev);
+err_dev_vop_start:
         return rc;
 }
 
@@ -147,14 +147,14 @@ err_dev_cvop_start:
  * @param cantrcv: (I) CAN接收器对象指针
  * @return 错误码
  */
-__xwds_api
-xwer_t xwds_cantrcv_cvop_stop(struct xwds_cantrcv * cantrcv)
+static __xwds_vop
+xwer_t xwds_cantrcv_vop_stop(struct xwds_cantrcv * cantrcv)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(cantrcv, "nullptr", -EFAULT);
 
-        rc = xwds_device_cvop_stop(&cantrcv->bc.dev);
+        rc = xwds_device_vop_stop(&cantrcv->bc.dev);
         return rc;
 }
 
@@ -165,14 +165,14 @@ xwer_t xwds_cantrcv_cvop_stop(struct xwds_cantrcv * cantrcv)
  * @param cantrcv: (I) CAN接收器对象指针
  * @return 错误码
  */
-__xwds_api
-xwer_t xwds_cantrcv_cvop_suspend(struct xwds_cantrcv * cantrcv)
+static __xwds_vop
+xwer_t xwds_cantrcv_vop_suspend(struct xwds_cantrcv * cantrcv)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(cantrcv, "nullptr", -EFAULT);
 
-        rc = xwds_device_cvop_suspend(&cantrcv->bc.dev);
+        rc = xwds_device_vop_suspend(&cantrcv->bc.dev);
         return rc;
 }
 
@@ -181,14 +181,14 @@ xwer_t xwds_cantrcv_cvop_suspend(struct xwds_cantrcv * cantrcv)
  * @param cantrcv: (I) CAN接收器对象指针
  * @return 错误码
  */
-__xwds_api
-xwer_t xwds_cantrcv_cvop_resume(struct xwds_cantrcv * cantrcv)
+static __xwds_vop
+xwer_t xwds_cantrcv_vop_resume(struct xwds_cantrcv * cantrcv)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(cantrcv, "nullptr", -EFAULT);
 
-        rc = xwds_device_cvop_resume(&cantrcv->bc.dev);
+        rc = xwds_device_vop_resume(&cantrcv->bc.dev);
         return rc;
 }
 #endif /* XWCDCFG_ds_PM */

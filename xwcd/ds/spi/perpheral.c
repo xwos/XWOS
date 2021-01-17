@@ -23,33 +23,33 @@
 #include <xwcd/ds/spi/perpheral.h>
 
 static __xwds_vop
-xwer_t xwds_spip_cvop_probe(struct xwds_spip * spip);
+xwer_t xwds_spip_vop_probe(struct xwds_spip * spip);
 
 static __xwds_vop
-xwer_t xwds_spip_cvop_remove(struct xwds_spip * spip);
+xwer_t xwds_spip_vop_remove(struct xwds_spip * spip);
 
 static __xwds_vop
-xwer_t xwds_spip_cvop_start(struct xwds_spip * spip);
+xwer_t xwds_spip_vop_start(struct xwds_spip * spip);
 
 static __xwds_vop
-xwer_t xwds_spip_cvop_stop(struct xwds_spip * spip);
+xwer_t xwds_spip_vop_stop(struct xwds_spip * spip);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static __xwds_vop
-xwer_t xwds_spip_cvop_suspend(struct xwds_spip * spip);
+xwer_t xwds_spip_vop_suspend(struct xwds_spip * spip);
 
 static __xwds_vop
-xwer_t xwds_spip_cvop_resume(struct xwds_spip * spip);
+xwer_t xwds_spip_vop_resume(struct xwds_spip * spip);
 #endif /* XWCDCFG_ds_PM */
 
-__xwds_rodata const struct xwds_base_virtual_operations xwds_spip_cvops = {
-        .probe = (void *)xwds_spip_cvop_probe,
-        .remove = (void *)xwds_spip_cvop_remove,
-        .start = (void *)xwds_spip_cvop_start,
-        .stop = (void *)xwds_spip_cvop_stop,
+__xwds_rodata const struct xwds_virtual_operation xwds_spip_vop = {
+        .probe = (void *)xwds_spip_vop_probe,
+        .remove = (void *)xwds_spip_vop_remove,
+        .start = (void *)xwds_spip_vop_start,
+        .stop = (void *)xwds_spip_vop_stop,
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-        .suspend = (void *)xwds_spip_cvop_suspend,
-        .resume = (void *)xwds_spip_cvop_resume,
+        .suspend = (void *)xwds_spip_vop_suspend,
+        .resume = (void *)xwds_spip_vop_resume,
 #endif /* XWCDCFG_ds_PM */
 };
 
@@ -62,7 +62,7 @@ __xwds_api
 void xwds_spip_construct(struct xwds_spip * spip)
 {
         xwds_device_construct(&spip->dev);
-        spip->dev.cvops = &xwds_spip_cvops;
+        spip->dev.vop = &xwds_spip_vop;
 }
 
 /**
@@ -82,28 +82,17 @@ void xwds_spip_destruct(struct xwds_spip * spip)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_spip_cvop_probe(struct xwds_spip * spip)
+xwer_t xwds_spip_vop_probe(struct xwds_spip * spip)
 {
         xwer_t rc;
 
-        if (!is_err_or_null(spip->bus)) {
-                rc = xwds_spim_grab(spip->bus);
-        } else {
-                rc = -EHOSTUNREACH;
-        }
+        rc = xwds_device_vop_probe(&spip->dev);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_spim_grab;
-        }
-
-        rc = xwds_device_cvop_probe(&spip->dev);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_cvop_probe;
+                goto err_dev_vop_probe;
         }
         return XWOK;
 
-err_dev_cvop_probe:
-        xwds_spim_put(spip->bus);
-err_spim_grab:
+err_dev_vop_probe:
         return rc;
 }
 
@@ -113,21 +102,19 @@ err_spim_grab:
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_spip_cvop_remove(struct xwds_spip * spip)
+xwer_t xwds_spip_vop_remove(struct xwds_spip * spip)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(spip->bus, "nullptr", -EHOSTUNREACH);
 
-        rc = xwds_device_cvop_remove(&spip->dev);
+        rc = xwds_device_vop_remove(&spip->dev);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_cvop_remove;
+                goto err_dev_vop_remove;
         }
-
-        xwds_spim_put(spip->bus);
         return XWOK;
 
-err_dev_cvop_remove:
+err_dev_vop_remove:
         return rc;
 }
 
@@ -137,28 +124,27 @@ err_dev_cvop_remove:
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_spip_cvop_start(struct xwds_spip * spip)
+xwer_t xwds_spip_vop_start(struct xwds_spip * spip)
 {
         xwer_t rc;
 
         if (spip->bus) {
-                rc = xwds_spim_request(spip->bus);
+                rc = xwds_spim_grab(spip->bus);
         } else {
                 rc = -EHOSTUNREACH;
         }
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_spim_request;
+                goto err_spim_grab;
         }
-
-        rc = xwds_device_cvop_start(&spip->dev);
+        rc = xwds_device_vop_start(&spip->dev);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_cvop_start;
+                goto err_dev_vop_start;
         }
         return XWOK;
 
-err_dev_cvop_start:
-        xwds_spim_release(spip->bus);
-err_spim_request:
+err_dev_vop_start:
+        xwds_spim_put(spip->bus);
+err_spim_grab:
         return rc;
 }
 
@@ -168,21 +154,20 @@ err_spim_request:
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_spip_cvop_stop(struct xwds_spip * spip)
+xwer_t xwds_spip_vop_stop(struct xwds_spip * spip)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(spip->bus, "nullptr", -EHOSTUNREACH);
 
-        rc = xwds_device_cvop_stop(&spip->dev);
+        rc = xwds_device_vop_stop(&spip->dev);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_cvop_stop;
+                goto err_dev_vop_stop;
         }
-
-        xwds_spim_release(spip->bus);
+        xwds_spim_put(spip->bus);
         return XWOK;
 
-err_dev_cvop_stop:
+err_dev_vop_stop:
         return rc;
 }
 
@@ -194,21 +179,20 @@ err_dev_cvop_stop:
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_spip_cvop_suspend(struct xwds_spip * spip)
+xwer_t xwds_spip_vop_suspend(struct xwds_spip * spip)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(spip->bus, "nullptr", -EHOSTUNREACH);
 
-        rc = xwds_device_cvop_suspend(&spip->dev);
+        rc = xwds_device_vop_suspend(&spip->dev);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_cvop_suspend;
+                goto err_dev_vop_suspend;
         }
-
-        xwds_spim_release(spip->bus);
+        xwds_spim_put(spip->bus);
         return XWOK;
 
-err_dev_cvop_suspend:
+err_dev_vop_suspend:
         return rc;
 }
 
@@ -218,28 +202,27 @@ err_dev_cvop_suspend:
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_spip_cvop_resume(struct xwds_spip * spip)
+xwer_t xwds_spip_vop_resume(struct xwds_spip * spip)
 {
         xwer_t rc;
 
         if (spip->bus) {
-                rc = xwds_spim_request(spip->bus);
+                rc = xwds_spim_grab(spip->bus);
         } else {
                 rc = -EHOSTUNREACH;
         }
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_spim_request;
+                goto err_spim_grab;
         }
-
-        rc = xwds_device_cvop_resume(&spip->dev);
+        rc = xwds_device_vop_resume(&spip->dev);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_cvop_resume;
+                goto err_dev_vop_resume;
         }
         return XWOK;
 
-err_dev_cvop_resume:
-        xwds_spim_release(spip->bus);
-err_spim_request:
+err_dev_vop_resume:
+        xwds_spim_put(spip->bus);
+err_spim_grab:
         return rc;
 }
 #endif /* XWCDCFG_ds_PM */
@@ -272,11 +255,6 @@ xwer_t xwds_spip_ioctl(struct xwds_spip * spip, xwsq_t cmd, ...)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spip_grab;
         }
-        rc = xwds_spip_request(spip);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_spip_request;
-        }
-
         va_start(args, cmd);
         drv = xwds_cast(const struct xwds_spip_driver *, spip->dev.drv);
         if (drv->ioctl) {
@@ -288,15 +266,10 @@ xwer_t xwds_spip_ioctl(struct xwds_spip * spip, xwsq_t cmd, ...)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_ioctl;
         }
-
-        xwds_spip_release(spip);
         xwds_spip_put(spip);
-
         return XWOK;
 
 err_drv_ioctl:
-        xwds_spip_release(spip);
-err_spip_request:
         xwds_spip_put(spip);
 err_spip_grab:
         return rc;

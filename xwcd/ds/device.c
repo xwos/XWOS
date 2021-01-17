@@ -32,14 +32,14 @@
 /**
  * @brief 实现面向对象“多态”的函数表
  */
-__xwds_rodata const struct xwds_base_virtual_operations xwds_dev_cvops = {
-        .probe = xwds_device_cvop_probe,
-        .remove = xwds_device_cvop_remove,
-        .start = xwds_device_cvop_start,
-        .stop = xwds_device_cvop_stop,
+__xwds_rodata const struct xwds_virtual_operation xwds_dev_vop = {
+        .probe = xwds_device_vop_probe,
+        .remove = xwds_device_vop_remove,
+        .start = xwds_device_vop_start,
+        .stop = xwds_device_vop_stop,
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-        .suspend = xwds_device_cvop_suspend,
-        .resume = xwds_device_cvop_resume,
+        .suspend = xwds_device_vop_suspend,
+        .resume = xwds_device_vop_resume,
 #endif /* XWCDCFG_ds_PM */
 };
 
@@ -53,8 +53,7 @@ __xwds_api
 void xwds_device_construct(struct xwds_device * dev)
 {
         xwds_obj_construct(&dev->obj);
-        dev->state = XWDS_DEVICE_STATE_INVALID;
-        dev->cvops = &xwds_dev_cvops;
+        dev->vop = &xwds_dev_vop;
         dev->ds = NULL;
 }
 
@@ -75,7 +74,7 @@ void xwds_device_destruct(struct xwds_device * dev)
  * @return 错误码
  */
 __xwds_vop
-xwer_t xwds_device_cvop_probe(struct xwds_device * dev)
+xwer_t xwds_device_vop_probe(struct xwds_device * dev)
 {
         const struct xwds_driver * drv;
         xwer_t rc;
@@ -95,7 +94,7 @@ xwer_t xwds_device_cvop_probe(struct xwds_device * dev)
  * @return 错误码
  */
 __xwds_vop
-xwer_t xwds_device_cvop_remove(struct xwds_device * dev)
+xwer_t xwds_device_vop_remove(struct xwds_device * dev)
 {
         const struct xwds_driver * drv;
         xwer_t rc;
@@ -115,7 +114,7 @@ xwer_t xwds_device_cvop_remove(struct xwds_device * dev)
  * @return 错误码
  */
 __xwds_vop
-xwer_t xwds_device_cvop_start(struct xwds_device * dev)
+xwer_t xwds_device_vop_start(struct xwds_device * dev)
 {
         const struct xwds_driver * drv;
         xwer_t rc;
@@ -135,7 +134,7 @@ xwer_t xwds_device_cvop_start(struct xwds_device * dev)
  * @return 错误码
  */
 __xwds_vop
-xwer_t xwds_device_cvop_stop(struct xwds_device * dev)
+xwer_t xwds_device_vop_stop(struct xwds_device * dev)
 {
         const struct xwds_driver * drv;
         xwer_t rc;
@@ -156,7 +155,7 @@ xwer_t xwds_device_cvop_stop(struct xwds_device * dev)
  * @return 错误码
  */
 __xwds_vop
-xwer_t xwds_device_cvop_suspend(struct xwds_device * dev)
+xwer_t xwds_device_vop_suspend(struct xwds_device * dev)
 {
         const struct xwds_driver * drv;
         xwer_t rc;
@@ -176,7 +175,7 @@ xwer_t xwds_device_cvop_suspend(struct xwds_device * dev)
  * @return 错误码
  */
 __xwds_vop
-xwer_t xwds_device_cvop_resume(struct xwds_device * dev)
+xwer_t xwds_device_vop_resume(struct xwds_device * dev)
 {
         const struct xwds_driver * drv;
         xwer_t rc;
@@ -192,12 +191,47 @@ xwer_t xwds_device_cvop_resume(struct xwds_device * dev)
 #endif /* XWCDCFG_ds_PM */
 
 /******** ******** ******** APIs ******** ******** ********/
+__xwds_code
+xwer_t xwds_device_gc(void * obj)
+{
+        struct xwds_device * dev;
+        struct xwds * ds;
+        const struct xwds_virtual_operation * vop;
+        xwer_t rc;
+
+        dev = obj;
+        ds = dev->ds;
+        if (ds) {
+                xwds_obj_del(ds, &dev->obj);
+        }
+        dev->ds = NULL;
+
+        /* remove device */
+        vop = dev->vop;
+        if (vop && vop->remove) {
+                rc = vop->remove(dev);
+        } else {
+                rc = xwds_device_vop_remove(dev);
+        }
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_dev_vop_remove;
+        }
+        return XWOK;
+
+err_dev_vop_remove:
+        xwds_obj_add(ds, &dev->obj);
+        dev->ds = ds;
+        return rc;
+}
+
 /**
  * @brief XWDS API：探测设备
  * @param ds: (I) 设备栈控制块指针
  * @param dev: (I) 设备对象的指针
  * @param gcfunc: (I) 垃圾回收函数
  * @return 错误码
+ * @retval XWOK: 没有错误发生
+ * @retval -EPERM: 引用计数错误
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -207,35 +241,27 @@ __xwds_api
 xwer_t xwds_device_probe(struct xwds * ds, struct xwds_device * dev,
                          xwobj_gc_f gcfunc)
 {
-        const struct xwds_base_virtual_operations * cvops;
+        const struct xwds_virtual_operation * vop;
         xwer_t rc;
 
         XWDS_VALIDATE(ds, "nullptr", -EFAULT);
         XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
-        rc = xwds_obj_activate(&dev->obj, gcfunc);
+        rc = xwds_obj_probe(&dev->obj, gcfunc);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_activate;
+                goto err_obj_probe;
         }
-
-        rc = xwaop_teq_then_write(xwsq, &dev->state,
-                                  XWDS_DEVICE_STATE_INVALID,
-                                  XWDS_DEVICE_STATE_PROBING,
-                                  NULL);
-        if (__xwcc_unlikely(rc < 0)) {
-                rc = -EPERM;
-                goto err_dev_set_state;
-        }
+        /* refcnt == XWDS_OBJ_REF_SHUTDOWN */
 
         /* probe device */
-        cvops = dev->cvops;
-        if (cvops && cvops->probe) {
-                rc = cvops->probe(dev);
+        vop = dev->vop;
+        if (vop && vop->probe) {
+                rc = vop->probe(dev);
         } else {
-                rc = xwds_device_cvop_probe(dev);
+                rc = xwds_device_vop_probe(dev);
         }
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_cvops_probe;
+                goto err_dev_vop_probe;
         }
 
         /* add to device stack */
@@ -245,21 +271,17 @@ xwer_t xwds_device_probe(struct xwds * ds, struct xwds_device * dev,
         }
         dev->ds = ds;
 
-        /* set device state */
-        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
         return XWOK;
 
 err_xwds_obj_add:
-        if ((cvops) && (cvops->remove)) {
-                cvops->remove(dev);
+        if ((vop) && (vop->remove)) {
+                vop->remove(dev);
         } else {
-                xwds_device_cvop_probe(dev);
+                xwds_device_vop_probe(dev);
         }
-err_dev_cvops_probe:
-        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_INVALID, NULL);
-err_dev_set_state:
-        xwds_device_put(dev);
-err_dev_activate:
+err_dev_vop_probe:
+        xwos_object_rawput(&dev->obj.xwobj);
+err_obj_probe:
         return rc;
 }
 
@@ -267,6 +289,8 @@ err_dev_activate:
  * @brief XWDS API：删除设备
  * @param dev: (I) 设备对象的指针
  * @return 错误码
+ * @retval XWOK: 没有错误发生
+ * @retval -EPERM: 引用计数错误
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -275,61 +299,17 @@ err_dev_activate:
 __xwds_api
 xwer_t xwds_device_remove(struct xwds_device * dev)
 {
-        struct xwds * ds;
-        const struct xwds_base_virtual_operations * cvops;
-        xwer_t rc;
-
         XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
-        rc = xwaop_teq_then_write(xwsq, &dev->state,
-                                  XWDS_DEVICE_STATE_STOPED,
-                                  XWDS_DEVICE_STATE_REMOVING,
-                                  NULL);
-        if (__xwcc_unlikely(rc < 0)) {
-                rc = -EPERM;
-                goto err_dev_set_state;
-        }
-
-        ds = dev->ds;
-        if (ds) {
-                rc = xwds_obj_remove(ds, &dev->obj);
-        } else {
-                rc = -EOWNER;
-        }
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_xwds_obj_remove;
-        }
-        dev->ds = NULL;
-
-        /* remove device */
-        cvops = dev->cvops;
-        if (cvops && cvops->remove) {
-                rc = cvops->remove(dev);
-        } else {
-                rc = xwds_device_cvop_remove(dev);
-        }
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_cvops_remove;
-        }
-
-        /* set device state */
-        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_INVALID, NULL);
-        xwds_device_put(dev);
-        return XWOK;
-
-err_dev_cvops_remove:
-        xwds_obj_add(ds, &dev->obj);
-        dev->ds = ds;
-err_xwds_obj_remove:
-        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
-err_dev_set_state:
-        return rc;
+        return xwds_obj_remove(&dev->obj);
 }
 
 /**
  * @brief XWDS API：启动设备
  * @param dev: (I) 设备对象的指针
  * @return 错误码
+ * @retval XWOK: 没有错误发生
+ * @retval -EPERM: 引用计数错误
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -338,45 +318,32 @@ err_dev_set_state:
 __xwds_api
 xwer_t xwds_device_start(struct xwds_device * dev)
 {
-        const struct xwds_base_virtual_operations * cvops;
+        const struct xwds_virtual_operation * vop;
         xwer_t rc;
 
         XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
-        rc = xwds_device_grab(dev);
+        rc = xwds_obj_start(&dev->obj);
         if (__xwcc_unlikely(rc < 0)) {
-                rc = -EOWNERDEAD;
-                goto err_dev_grab;
+                goto err_obj_start;
         }
-        rc = xwaop_teq_then_write(xwsq, &dev->state,
-                                  XWDS_DEVICE_STATE_STOPED,
-                                  XWDS_DEVICE_STATE_STARTING,
-                                  NULL);
-        if (__xwcc_unlikely(rc < 0)) {
-                rc = -EPERM;
-                goto err_dev_set_state;
-        }
+        /* refcnt == XWDS_OBJ_REF_RUNNING */
 
         /* start device */
-        cvops = dev->cvops;
-        if (cvops && cvops->start) {
-                rc = cvops->start(dev);
+        vop = dev->vop;
+        if (vop && vop->start) {
+                rc = vop->start(dev);
         } else {
-                rc = xwds_device_cvop_start(dev);
+                rc = xwds_device_vop_start(dev);
         }
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_cvops_start;
+                goto err_dev_vop_start;
         }
-
-        /* set device state */
-        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
         return XWOK;
 
-err_dev_cvops_start:
-        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
-err_dev_set_state:
-        xwds_device_put(dev);
-err_dev_grab:
+err_dev_vop_start:
+        xwds_obj_stop(&dev->obj);
+err_obj_start:
         return rc;
 }
 
@@ -392,47 +359,32 @@ err_dev_grab:
 __xwds_api
 xwer_t xwds_device_stop(struct xwds_device * dev)
 {
-        const struct xwds_base_virtual_operations * cvops;
+        const struct xwds_virtual_operation * vop;
         xwer_t rc;
 
         XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
-        rc = xwaop_teq_then_write(xwsq, &dev->state,
-                                  XWDS_DEVICE_STATE_RUNNING,
-                                  XWDS_DEVICE_STATE_STOPING,
-                                  NULL);
+        rc = xwds_obj_stop(&dev->obj);
         if (__xwcc_unlikely(rc < 0)) {
-                rc = -EPERM;
-                goto err_dev_set_state;
+                goto err_obj_stop;
         }
-
-        /* The device must has no child in running state or suspending state.
-           So the refence count must be 2. */
-        if (2 == xwds_device_get_refcnt(dev)) {
-                rc = -EBUSY;
-                goto err_dev_refcnt;
-        }
+        /* refcnt == XWDS_OBJ_REF_SHUTDOWN */
 
         /* stop device */
-        cvops = dev->cvops;
-        if ((cvops) && (cvops->stop)) {
-                rc = cvops->stop(dev);
+        vop = dev->vop;
+        if (vop && vop->stop) {
+                rc = vop->stop(dev);
         } else {
-                rc = xwds_device_cvop_stop(dev);
+                rc = xwds_device_vop_stop(dev);
         }
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_cvops_stop;
+                goto err_dev_vop_stop;
         }
-
-        /* set device state */
-        xwds_device_put(dev);
-        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_STOPED, NULL);
         return XWOK;
 
-err_dev_cvops_stop:
-err_dev_refcnt:
-        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
-err_dev_set_state:
+err_dev_vop_stop:
+        xwds_obj_start(&dev->obj);
+err_obj_stop:
         return rc;
 }
 
@@ -449,38 +401,32 @@ err_dev_set_state:
 __xwds_api
 xwer_t xwds_device_suspend(struct xwds_device * dev)
 {
-        const struct xwds_base_virtual_operations * cvops;
+        const struct xwds_virtual_operation * vop;
         xwer_t rc;
 
         XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
-        rc = xwaop_teq_then_write(xwsq, &dev->state,
-                                  XWDS_DEVICE_STATE_RUNNING,
-                                  XWDS_DEVICE_STATE_SUSPENDING,
-                                  NULL);
+        rc = xwds_obj_suspend(&dev->obj);
         if (__xwcc_unlikely(rc < 0)) {
-                rc = -EPERM;
-                goto err_dev_set_state;
+                goto err_obj_suspend;
         }
+        /* refcnt == XWDS_OBJ_REF_SUSPEND */
 
         /* suspend device */
-        cvops = dev->cvops;
-        if (cvops && cvops->suspend) {
-                rc = cvops->suspend(dev);
+        vop = dev->vop;
+        if (vop && vop->suspend) {
+                rc = vop->suspend(dev);
         } else {
-                rc = xwds_device_cvop_suspend(dev);
+                rc = xwds_device_vop_suspend(dev);
         }
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_cvops_suspend;
+                goto err_dev_vop_suspend;
         }
-
-        /* set device state */
-        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_SUSPENDED, NULL);
         return XWOK;
 
-err_cvops_suspend:
-        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
-err_dev_set_state:
+err_dev_vop_suspend:
+        xwds_obj_resume(&dev->obj);
+err_obj_suspend:
         return rc;
 }
 
@@ -496,38 +442,32 @@ err_dev_set_state:
 __xwds_api
 xwer_t xwds_device_resume(struct xwds_device * dev)
 {
-
-        const struct xwds_base_virtual_operations * cvops;
+        const struct xwds_virtual_operation * vop;
         xwer_t rc;
 
         XWDS_VALIDATE(dev, "nullptr", -EFAULT);
 
-        rc = xwaop_teq_then_write(xwsq, &dev->state,
-                                  XWDS_DEVICE_STATE_SUSPENDED,
-                                  XWDS_DEVICE_STATE_RESUMING,
-                                  NULL);
+        rc = xwds_obj_resume(&dev->obj);
         if (__xwcc_unlikely(rc < 0)) {
-                rc = -EPERM;
-                goto err_set_state;
+                goto err_obj_resume;
         }
+        /* refcnt == XWDS_OBJ_REF_RUNNING */
 
         /* resume device */
-        cvops = dev->cvops;
-        if (cvops && cvops->resume) {
-                rc = cvops->resume(dev);
+        vop = dev->vop;
+        if (vop && vop->resume) {
+                rc = vop->resume(dev);
         } else {
-                rc = xwds_device_cvop_resume(dev);
+                rc = xwds_device_vop_resume(dev);
         }
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_cvops_resume;
+                goto err_dev_vop_resume;
         }
-
-        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_RUNNING, NULL);
         return XWOK;
 
-err_cvops_resume:
-        xwaop_write(xwsq, &dev->state, XWDS_DEVICE_STATE_SUSPENDED, NULL);
-err_set_state:
+err_dev_vop_resume:
+        xwds_obj_suspend(&dev->obj);
+err_obj_resume:
         return rc;
 }
 

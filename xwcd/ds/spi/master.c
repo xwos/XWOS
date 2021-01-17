@@ -25,33 +25,33 @@
 #include <xwcd/ds/spi/master.h>
 
 static __xwds_vop
-xwer_t xwds_spim_cvop_probe(struct xwds_spim * spim);
+xwer_t xwds_spim_vop_probe(struct xwds_spim * spim);
 
 static __xwds_vop
-xwer_t xwds_spim_cvop_remove(struct xwds_spim * spim);
+xwer_t xwds_spim_vop_remove(struct xwds_spim * spim);
 
 static __xwds_vop
-xwer_t xwds_spim_cvop_start(struct xwds_spim * spim);
+xwer_t xwds_spim_vop_start(struct xwds_spim * spim);
 
 static __xwds_vop
-xwer_t xwds_spim_cvop_stop(struct xwds_spim * spim);
+xwer_t xwds_spim_vop_stop(struct xwds_spim * spim);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static __xwds_vop
-xwer_t xwds_spim_cvop_suspend(struct xwds_spim * spim);
+xwer_t xwds_spim_vop_suspend(struct xwds_spim * spim);
 
 static __xwds_vop
-xwer_t xwds_spim_cvop_resume(struct xwds_spim * spim);
+xwer_t xwds_spim_vop_resume(struct xwds_spim * spim);
 #endif /* XWCDCFG_ds_PM */
 
-__xwds_rodata const struct xwds_base_virtual_operations xwds_spim_cvops = {
-        .probe = (void *)xwds_spim_cvop_probe,
-        .remove = (void *)xwds_spim_cvop_remove,
-        .start = (void *)xwds_spim_cvop_start,
-        .stop = (void *)xwds_spim_cvop_stop,
+__xwds_rodata const struct xwds_virtual_operation xwds_spim_vop = {
+        .probe = (void *)xwds_spim_vop_probe,
+        .remove = (void *)xwds_spim_vop_remove,
+        .start = (void *)xwds_spim_vop_start,
+        .stop = (void *)xwds_spim_vop_stop,
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-        .suspend = (void *)xwds_spim_cvop_suspend,
-        .resume = (void *)xwds_spim_cvop_resume,
+        .suspend = (void *)xwds_spim_vop_suspend,
+        .resume = (void *)xwds_spim_vop_resume,
 #endif /* XWCDCFG_ds_PM */
 };
 
@@ -64,7 +64,7 @@ __xwds_api
 void xwds_spim_construct(struct xwds_spim * spim)
 {
         xwds_device_construct(&spim->dev);
-        spim->dev.cvops = &xwds_spim_cvops;
+        spim->dev.vop = &xwds_spim_vop;
 }
 
 /**
@@ -87,7 +87,7 @@ void xwds_spim_destruct(struct xwds_spim * spim)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_spim_cvop_probe(struct xwds_spim * spim)
+xwer_t xwds_spim_vop_probe(struct xwds_spim * spim)
 {
         xwer_t rc;
 
@@ -95,7 +95,7 @@ xwer_t xwds_spim_cvop_probe(struct xwds_spim * spim)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_xfer_apimtx_init;
         }
-        rc = xwds_device_cvop_probe(&spim->dev);
+        rc = xwds_device_vop_probe(&spim->dev);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_probe;
         }
@@ -113,19 +113,19 @@ err_xfer_apimtx_init:
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_spim_cvop_remove(struct xwds_spim * spim)
+xwer_t xwds_spim_vop_remove(struct xwds_spim * spim)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_remove(&spim->dev);
+        rc = xwds_device_vop_remove(&spim->dev);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_cvop_remove;
+                goto err_dev_vop_remove;
         }
 
         xwos_mtx_destroy(&spim->xfer.apimtx);
         return XWOK;
 
-err_dev_cvop_remove:
+err_dev_vop_remove:
         return rc;
 }
 
@@ -135,11 +135,11 @@ err_dev_cvop_remove:
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_spim_cvop_start(struct xwds_spim * spim)
+xwer_t xwds_spim_vop_start(struct xwds_spim * spim)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_start(&spim->dev);
+        rc = xwds_device_vop_start(&spim->dev);
         return rc;
 }
 
@@ -149,11 +149,11 @@ xwer_t xwds_spim_cvop_start(struct xwds_spim * spim)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_spim_cvop_stop(struct xwds_spim * spim)
+xwer_t xwds_spim_vop_stop(struct xwds_spim * spim)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_stop(&spim->dev);
+        rc = xwds_device_vop_stop(&spim->dev);
         return rc;
 }
 
@@ -165,11 +165,11 @@ xwer_t xwds_spim_cvop_stop(struct xwds_spim * spim)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_spim_cvop_suspend(struct xwds_spim * spim)
+xwer_t xwds_spim_vop_suspend(struct xwds_spim * spim)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_suspend(&spim->dev);
+        rc = xwds_device_vop_suspend(&spim->dev);
         return rc;
 }
 
@@ -179,11 +179,11 @@ xwer_t xwds_spim_cvop_suspend(struct xwds_spim * spim)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_spim_cvop_resume(struct xwds_spim * spim)
+xwer_t xwds_spim_vop_resume(struct xwds_spim * spim)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_resume(&spim->dev);
+        rc = xwds_device_vop_resume(&spim->dev);
         return rc;
 }
 #endif /* XWCDCFG_ds_PM */
@@ -219,11 +219,6 @@ xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t * xwtm)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spim_grab;
         }
-        rc = xwds_spim_request(spim);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_spim_request;
-        }
-
         if (NULL == spim->buscfg) {
                 rc = -ENOSYS;
                 goto err_nosys;
@@ -247,8 +242,6 @@ xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t * xwtm)
                 goto err_drv_buscfg;
         }
         xwos_mtx_unlock(&spim->xfer.apimtx);
-
-        xwds_spim_release(spim);
         xwds_spim_put(spim);
         return XWOK;
 
@@ -257,8 +250,6 @@ err_drv_buscfg:
 err_spim_lock:
 err_chrng:
 err_nosys:
-        xwds_spim_release(spim);
-err_spim_request:
         xwds_spim_put(spim);
 err_spim_grab:
         return rc;
@@ -298,11 +289,6 @@ xwer_t xwds_spim_xfer(struct xwds_spim * spim,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spim_grab;
         }
-        rc = xwds_spim_request(spim);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_spim_request;
-        }
-
         rc = xwos_mtx_timedlock(&spim->xfer.apimtx, xwtm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spim_lock;
@@ -317,16 +303,12 @@ xwer_t xwds_spim_xfer(struct xwds_spim * spim,
                 goto err_drv_xfer;
         }
         xwos_mtx_unlock(&spim->xfer.apimtx);
-
-        xwds_spim_release(spim);
         xwds_spim_put(spim);
         return XWOK;
 
 err_drv_xfer:
         xwos_mtx_unlock(&spim->xfer.apimtx);
 err_spim_lock:
-        xwds_spim_release(spim);
-err_spim_request:
         xwds_spim_put(spim);
 err_spim_grab:
         return rc;
@@ -357,11 +339,6 @@ xwer_t xwds_spim_abort(struct xwds_spim * spim, xwtm_t * xwtm)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spim_grab;
         }
-        rc = xwds_spim_request(spim);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_spim_request;
-        }
-
         drv = xwds_cast(const struct xwds_spim_driver *, spim->dev.drv);
         if (__xwcc_likely((drv) && (drv->abort))) {
                 rc = drv->abort(spim, xwtm);
@@ -371,14 +348,10 @@ xwer_t xwds_spim_abort(struct xwds_spim * spim, xwtm_t * xwtm)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_abort;
         }
-
-        xwds_spim_release(spim);
         xwds_spim_put(spim);
         return XWOK;
 
 err_drv_abort:
-        xwds_spim_release(spim);
-err_spim_request:
         xwds_spim_put(spim);
 err_spim_grab:
         return rc;

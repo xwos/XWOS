@@ -35,33 +35,33 @@
 #include <xwcd/ds/uart/dma.h>
 
 static __xwds_vop
-xwer_t xwds_dmauartc_cvop_probe(struct xwds_dmauartc * dmauartc);
+xwer_t xwds_dmauartc_vop_probe(struct xwds_dmauartc * dmauartc);
 
 static __xwds_vop
-xwer_t xwds_dmauartc_cvop_remove(struct xwds_dmauartc * dmauartc);
+xwer_t xwds_dmauartc_vop_remove(struct xwds_dmauartc * dmauartc);
 
 static __xwds_vop
-xwer_t xwds_dmauartc_cvop_start(struct xwds_dmauartc * dmauartc);
+xwer_t xwds_dmauartc_vop_start(struct xwds_dmauartc * dmauartc);
 
 static __xwds_vop
-xwer_t xwds_dmauartc_cvop_stop(struct xwds_dmauartc * dmauartc);
+xwer_t xwds_dmauartc_vop_stop(struct xwds_dmauartc * dmauartc);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static __xwds_vop
-xwer_t xwds_dmauartc_cvop_suspend(struct xwds_dmauartc * dmauartc);
+xwer_t xwds_dmauartc_vop_suspend(struct xwds_dmauartc * dmauartc);
 
 static __xwds_vop
-xwer_t xwds_dmauartc_cvop_resume(struct xwds_dmauartc * dmauartc);
+xwer_t xwds_dmauartc_vop_resume(struct xwds_dmauartc * dmauartc);
 #endif /* XWCDCFG_ds_PM */
 
-__xwds_rodata const struct xwds_base_virtual_operations xwds_dmauartc_cvops = {
-        .probe = (void *)xwds_dmauartc_cvop_probe,
-        .remove = (void *)xwds_dmauartc_cvop_remove,
-        .start = (void *)xwds_dmauartc_cvop_start,
-        .stop = (void *)xwds_dmauartc_cvop_stop,
+__xwds_rodata const struct xwds_virtual_operation xwds_dmauartc_vop = {
+        .probe = (void *)xwds_dmauartc_vop_probe,
+        .remove = (void *)xwds_dmauartc_vop_remove,
+        .start = (void *)xwds_dmauartc_vop_start,
+        .stop = (void *)xwds_dmauartc_vop_stop,
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-        .suspend = (void *)xwds_dmauartc_cvop_suspend,
-        .resume = (void *)xwds_dmauartc_cvop_resume,
+        .suspend = (void *)xwds_dmauartc_vop_suspend,
+        .resume = (void *)xwds_dmauartc_vop_resume,
 #endif /* XWCDCFG_ds_PM */
 };
 
@@ -74,7 +74,7 @@ __xwds_api
 void xwds_dmauartc_construct(struct xwds_dmauartc * dmauartc)
 {
         xwds_device_construct(&dmauartc->dev);
-        dmauartc->dev.cvops = &xwds_dmauartc_cvops;
+        dmauartc->dev.vop = &xwds_dmauartc_vop;
 }
 
 /**
@@ -94,7 +94,7 @@ void xwds_dmauartc_destruct(struct xwds_dmauartc * dmauartc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_dmauartc_cvop_probe(struct xwds_dmauartc * dmauartc)
+xwer_t xwds_dmauartc_vop_probe(struct xwds_dmauartc * dmauartc)
 {
         xwer_t rc;
 
@@ -107,7 +107,7 @@ xwer_t xwds_dmauartc_cvop_probe(struct xwds_dmauartc * dmauartc)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_txmtx_init;
         }
-        rc = xwds_device_cvop_probe(&dmauartc->dev);
+        rc = xwds_device_vop_probe(&dmauartc->dev);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_probe;
         }
@@ -127,20 +127,20 @@ err_sem_init:
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_dmauartc_cvop_remove(struct xwds_dmauartc * dmauartc)
+xwer_t xwds_dmauartc_vop_remove(struct xwds_dmauartc * dmauartc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_remove(&dmauartc->dev);
+        rc = xwds_device_vop_remove(&dmauartc->dev);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_cvop_remove;
+                goto err_dev_vop_remove;
         }
 
         xwos_mtx_destroy(&dmauartc->txmtx);
         xwos_sem_destroy(&dmauartc->rxq.sem);
         return XWOK;
 
-err_dev_cvop_remove:
+err_dev_vop_remove:
         return rc;
 }
 
@@ -150,7 +150,7 @@ err_dev_cvop_remove:
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_dmauartc_cvop_start(struct xwds_dmauartc * dmauartc)
+xwer_t xwds_dmauartc_vop_start(struct xwds_dmauartc * dmauartc)
 {
         xwer_t rc;
 
@@ -158,7 +158,7 @@ xwer_t xwds_dmauartc_cvop_start(struct xwds_dmauartc * dmauartc)
         dmauartc->rxq.pos = 0;
         dmauartc->rxq.tail = 0;
 
-        rc = xwds_device_cvop_start(&dmauartc->dev);
+        rc = xwds_device_vop_start(&dmauartc->dev);
         return rc;
 }
 
@@ -168,11 +168,11 @@ xwer_t xwds_dmauartc_cvop_start(struct xwds_dmauartc * dmauartc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_dmauartc_cvop_stop(struct xwds_dmauartc * dmauartc)
+xwer_t xwds_dmauartc_vop_stop(struct xwds_dmauartc * dmauartc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_stop(&dmauartc->dev);
+        rc = xwds_device_vop_stop(&dmauartc->dev);
         return rc;
 }
 
@@ -184,11 +184,11 @@ xwer_t xwds_dmauartc_cvop_stop(struct xwds_dmauartc * dmauartc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_dmauartc_cvop_suspend(struct xwds_dmauartc * dmauartc)
+xwer_t xwds_dmauartc_vop_suspend(struct xwds_dmauartc * dmauartc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_suspend(&dmauartc->dev);
+        rc = xwds_device_vop_suspend(&dmauartc->dev);
         return rc;
 }
 
@@ -198,15 +198,14 @@ xwer_t xwds_dmauartc_cvop_suspend(struct xwds_dmauartc * dmauartc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_dmauartc_cvop_resume(struct xwds_dmauartc * dmauartc)
+xwer_t xwds_dmauartc_vop_resume(struct xwds_dmauartc * dmauartc)
 {
         xwer_t rc;
 
         memset(dmauartc->rxq.mem, 0, sizeof(dmauartc->rxq.mem));
         dmauartc->rxq.pos = 0;
         dmauartc->rxq.tail = 0;
-
-        rc = xwds_device_cvop_resume(&dmauartc->dev);
+        rc = xwds_device_vop_resume(&dmauartc->dev);
         return rc;
 }
 #endif /* XWCDCFG_ds_PM */
@@ -246,12 +245,10 @@ xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
         XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         pos = 0;
-
         rc = xwds_dmauartc_grab(dmauartc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmauartc_grab;
         }
-
         rest_buffer_size = *size;
         while (rest_buffer_size) {
                 rc = xwos_sem_timedwait(&dmauartc->rxq.sem, xwtm);
@@ -282,7 +279,6 @@ xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
                         xwos_sem_post(&dmauartc->rxq.sem);
                 }
         }
-
         xwds_dmauartc_put(dmauartc);
         *size = pos;
         return XWOK;
@@ -323,12 +319,10 @@ xwer_t xwds_dmauartc_try_rx(struct xwds_dmauartc * dmauartc,
         XWDS_VALIDATE(size, "nullptr", -EFAULT);
 
         pos = 0;
-
         rc = xwds_dmauartc_grab(dmauartc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmauartc_grab;
         }
-
         rest_buffer_size = *size;
         while (rest_buffer_size) {
                 rc = xwos_sem_trywait(&dmauartc->rxq.sem);
@@ -359,7 +353,6 @@ xwer_t xwds_dmauartc_try_rx(struct xwds_dmauartc * dmauartc,
                         xwos_sem_post(&dmauartc->rxq.sem);
                 }/* else {} */
         }
-
         xwds_dmauartc_put(dmauartc);
         *size = pos;
         return XWOK;
@@ -405,12 +398,10 @@ xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmauartc_grab;
         }
-
         rc = xwos_mtx_timedlock(&dmauartc->txmtx, xwtm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmauartc_lock;
         }
-
         drv = xwds_cast(const struct xwds_dmauartc_driver *, dmauartc->dev.drv);
         if ((drv) && (drv->tx)) {
                 rc = drv->tx(dmauartc, data, size, xwtm);
@@ -420,7 +411,6 @@ xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_tx;
         }
-
         xwos_mtx_unlock(&dmauartc->txmtx);
         xwds_dmauartc_put(dmauartc);
         return XWOK;
@@ -463,12 +453,10 @@ xwer_t xwds_dmauartc_putc(struct xwds_dmauartc * dmauartc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmauartc_grab;
         }
-
         rc = xwos_mtx_timedlock(&dmauartc->txmtx, xwtm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmauartc_lock;
         }
-
         drv = xwds_cast(const struct xwds_dmauartc_driver *, dmauartc->dev.drv);
         if ((drv) && (drv->putc)) {
                 rc = drv->putc(dmauartc, byte);
@@ -478,7 +466,6 @@ xwer_t xwds_dmauartc_putc(struct xwds_dmauartc * dmauartc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_putc;
         }
-
         xwos_mtx_unlock(&dmauartc->txmtx);
         xwds_dmauartc_put(dmauartc);
         return XWOK;
@@ -517,7 +504,6 @@ xwer_t xwds_dmauartc_cfg(struct xwds_dmauartc * dmauartc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmauartc_grab;
         }
-
         drv = xwds_cast(const struct xwds_dmauartc_driver *, dmauartc->dev.drv);
         if ((drv) && (drv->cfg)) {
                 rc = drv->cfg(dmauartc, cfg);
@@ -527,7 +513,6 @@ xwer_t xwds_dmauartc_cfg(struct xwds_dmauartc * dmauartc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_cfg;
         }
-
         xwds_dmauartc_put(dmauartc);
         return XWOK;
 

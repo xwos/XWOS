@@ -51,12 +51,10 @@ xwer_t xwds_eeprom_drv_start(struct xwds_device * dev)
         xwer_t rc;
 
         eeprom = xwds_cast(struct xwds_eeprom *, dev);
-
         rc = xwds_eeprom_check_desc(eeprom);
         if (rc < 0) {
                 goto err_chk_desc;
         }
-
         /* request GPIO resources */
         gpiorsc = eeprom->pwr_gpiorsc;
         if (NULL != gpiorsc) {
@@ -65,7 +63,6 @@ xwer_t xwds_eeprom_drv_start(struct xwds_device * dev)
                         goto err_pwrgpio_req;
                 }
         }
-
         gpiorsc = eeprom->wp_gpiorsc;
         if (NULL != gpiorsc) {
                 rc = xwds_gpio_req(gpiorsc->soc, gpiorsc->port, gpiorsc->pinmask);
@@ -91,13 +88,11 @@ xwer_t xwds_eeprom_drv_stop(struct xwds_device * dev)
         const struct xwds_resource_gpio * gpiorsc;
 
         eeprom = xwds_cast(struct xwds_eeprom *, dev);
-
         /* release GPIO resources */
         gpiorsc = eeprom->wp_gpiorsc;
         if (NULL != gpiorsc) {
                 xwds_gpio_rls(gpiorsc->soc, gpiorsc->port, gpiorsc->pinmask);
         }
-
         gpiorsc = eeprom->pwr_gpiorsc;
         if (NULL != gpiorsc) {
                 xwds_gpio_rls(gpiorsc->soc, gpiorsc->port, gpiorsc->pinmask);

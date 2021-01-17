@@ -27,36 +27,36 @@
 #include <xwcd/ds/uart/general.h>
 
 static __xwds_vop
-xwer_t xwds_uartc_cvop_probe(struct xwds_uartc * uartc);
+xwer_t xwds_uartc_vop_probe(struct xwds_uartc * uartc);
 
 static __xwds_vop
-xwer_t xwds_uartc_cvop_remove(struct xwds_uartc * uartc);
+xwer_t xwds_uartc_vop_remove(struct xwds_uartc * uartc);
 
 static __xwds_vop
-xwer_t xwds_uartc_cvop_start(struct xwds_uartc * uartc);
+xwer_t xwds_uartc_vop_start(struct xwds_uartc * uartc);
 
 static __xwds_vop
-xwer_t xwds_uartc_cvop_stop(struct xwds_uartc * uartc);
+xwer_t xwds_uartc_vop_stop(struct xwds_uartc * uartc);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static __xwds_vop
-xwer_t xwds_uartc_cvop_suspend(struct xwds_uartc * uartc);
+xwer_t xwds_uartc_vop_suspend(struct xwds_uartc * uartc);
 
 static __xwds_vop
-xwer_t xwds_uartc_cvop_resume(struct xwds_uartc * uartc);
+xwer_t xwds_uartc_vop_resume(struct xwds_uartc * uartc);
 #endif /* XWCDCFG_ds_PM */
 
 static __xwds_code
 xwer_t xwds_uartc_tx_1byte(struct xwds_uartc * uartc, const xwu8_t byte);
 
-__xwds_rodata const struct xwds_base_virtual_operations xwds_uartc_cvops = {
-        .probe = (void *)xwds_uartc_cvop_probe,
-        .remove = (void *)xwds_uartc_cvop_remove,
-        .start = (void *)xwds_uartc_cvop_start,
-        .stop = (void *)xwds_uartc_cvop_stop,
+__xwds_rodata const struct xwds_virtual_operation xwds_uartc_vop = {
+        .probe = (void *)xwds_uartc_vop_probe,
+        .remove = (void *)xwds_uartc_vop_remove,
+        .start = (void *)xwds_uartc_vop_start,
+        .stop = (void *)xwds_uartc_vop_stop,
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-        .suspend = (void *)xwds_uartc_cvop_suspend,
-        .resume = (void *)xwds_uartc_cvop_resume,
+        .suspend = (void *)xwds_uartc_vop_suspend,
+        .resume = (void *)xwds_uartc_vop_resume,
 #endif /* XWCDCFG_ds_PM */
 };
 
@@ -69,7 +69,7 @@ __xwds_api
 void xwds_uartc_construct(struct xwds_uartc * uartc)
 {
         xwds_device_construct(&uartc->dev);
-        uartc->dev.cvops = &xwds_uartc_cvops;
+        uartc->dev.vop = &xwds_uartc_vop;
 }
 
 /**
@@ -89,7 +89,7 @@ void xwds_uartc_destruct(struct xwds_uartc * uartc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_uartc_cvop_probe(struct xwds_uartc * uartc)
+xwer_t xwds_uartc_vop_probe(struct xwds_uartc * uartc)
 {
         xwer_t rc;
 
@@ -120,7 +120,7 @@ xwer_t xwds_uartc_cvop_probe(struct xwds_uartc * uartc)
                 goto err_txmtx_init;
         }
 
-        rc = xwds_device_cvop_probe(&uartc->dev);
+        rc = xwds_device_vop_probe(&uartc->dev);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_probe;
         }
@@ -141,19 +141,19 @@ err_rxsem_init:
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_uartc_cvop_remove(struct xwds_uartc * uartc)
+xwer_t xwds_uartc_vop_remove(struct xwds_uartc * uartc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_remove(&uartc->dev);
+        rc = xwds_device_vop_remove(&uartc->dev);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_cvop_remove;
+                goto err_dev_vop_remove;
         }
         xwos_mtx_destroy(&uartc->txmtx);
         xwos_sem_destroy(&uartc->rxsem);
         return XWOK;
 
-err_dev_cvop_remove:
+err_dev_vop_remove:
         return rc;
 }
 
@@ -163,13 +163,13 @@ err_dev_cvop_remove:
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_uartc_cvop_start(struct xwds_uartc * uartc)
+xwer_t xwds_uartc_vop_start(struct xwds_uartc * uartc)
 {
         const struct xwds_uartc_driver * drv;
         xwreg_t cpuirq;
         xwer_t rc;
 
-        rc = xwds_device_cvop_start(&uartc->dev);
+        rc = xwds_device_vop_start(&uartc->dev);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_start;
         }
@@ -196,7 +196,7 @@ xwer_t xwds_uartc_cvop_start(struct xwds_uartc * uartc)
         return XWOK;
 
 err_rxsem_thaw:
-        xwds_device_cvop_stop(&uartc->dev);
+        xwds_device_vop_stop(&uartc->dev);
 err_dev_start:
         return rc;
 }
@@ -207,7 +207,7 @@ err_dev_start:
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_uartc_cvop_stop(struct xwds_uartc * uartc)
+xwer_t xwds_uartc_vop_stop(struct xwds_uartc * uartc)
 {
         xwreg_t cpuirq;
         xwer_t rc;
@@ -216,7 +216,7 @@ xwer_t xwds_uartc_cvop_stop(struct xwds_uartc * uartc)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_rxsem_freeze;
         }
-        rc = xwds_device_cvop_stop(&uartc->dev);
+        rc = xwds_device_vop_stop(&uartc->dev);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_stop;
         }
@@ -240,12 +240,12 @@ err_rxsem_freeze:
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_uartc_cvop_suspend(struct xwds_uartc * uartc)
+xwer_t xwds_uartc_vop_suspend(struct xwds_uartc * uartc)
 {
         xwreg_t cpuirq;
         xwer_t rc;
 
-        rc = xwds_device_cvop_suspend(&uartc->dev);
+        rc = xwds_device_vop_suspend(&uartc->dev);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_suspend;
         }
@@ -264,13 +264,13 @@ err_dev_suspend:
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_uartc_cvop_resume(struct xwds_uartc * uartc)
+xwer_t xwds_uartc_vop_resume(struct xwds_uartc * uartc)
 {
         const struct xwds_uartc_driver * drv;
         xwreg_t cpuirq;
         xwer_t rc;
 
-        rc = xwds_device_cvop_resume(&uartc->dev);
+        rc = xwds_device_vop_resume(&uartc->dev);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_resume;
         }
@@ -319,7 +319,6 @@ xwer_t xwds_uartc_clear_rxq(struct xwds_uartc * uartc)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
-
         rc = xwos_sem_freeze(&uartc->rxsem);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_sem_freeze;
@@ -332,7 +331,6 @@ xwer_t xwds_uartc_clear_rxq(struct xwds_uartc * uartc)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_sem_thaw;
         }
-
         xwds_uartc_put(uartc);
         return XWOK;
 
@@ -369,7 +367,6 @@ xwer_t xwds_uartc_get_rxq_datasize(struct xwds_uartc * uartc, xwsz_t *ret)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
-
         do {
                 seq = xwos_sqlk_rd_begin(&uartc->rxseqlock);
                 size = uartc->rxnum - uartc->rxpos;
@@ -379,7 +376,6 @@ xwer_t xwds_uartc_get_rxq_datasize(struct xwds_uartc * uartc, xwsz_t *ret)
                         size += uartc->rxnum;
                 }
         } while (xwos_sqlk_rd_retry(&uartc->rxseqlock, seq));
-
         xwds_uartc_put(uartc);
         *ret = (xwsz_t)size;
         return XWOK;
@@ -417,7 +413,6 @@ xwer_t xwds_uartc_getc(struct xwds_uartc * uartc, xwu8_t * buf, xwtm_t * xwtm)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
-
         rc = xwos_sem_timedwait(&uartc->rxsem, xwtm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_sem_timedwait;
@@ -429,7 +424,6 @@ xwer_t xwds_uartc_getc(struct xwds_uartc * uartc, xwu8_t * buf, xwtm_t * xwtm)
                 uartc->rxpos = 0;
         }/* else {} */
         xwos_sqlk_wr_unlock_cpuirqrs(&uartc->rxseqlock, cpuirq);
-
         xwds_uartc_put(uartc);
         return XWOK;
 
@@ -464,7 +458,6 @@ xwer_t xwds_uartc_try_getc(struct xwds_uartc * uartc, xwu8_t * buf)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
-
         rc = xwos_sem_trywait(&uartc->rxsem);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_sem_trywait;
@@ -476,7 +469,6 @@ xwer_t xwds_uartc_try_getc(struct xwds_uartc * uartc, xwu8_t * buf)
                 uartc->rxpos = 0;
         }/* else {} */
         xwos_sqlk_wr_unlock_cpuirqrs(&uartc->rxseqlock, cpuirq);
-
         xwds_uartc_put(uartc);
         return XWOK;
 
@@ -523,7 +515,6 @@ xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
                 *size = 0;
                 goto err_uartc_grab;
         }
-
         for (i = 0; i < *size; i++) {
                 rc = xwos_sem_timedwait(&uartc->rxsem, xwtm);
                 if (__xwcc_unlikely(rc < 0)) {
@@ -538,7 +529,6 @@ xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
                 }/* else {} */
                 xwos_sqlk_wr_unlock_cpuirqrs(&uartc->rxseqlock, cpuirq);
         }
-
         xwds_uartc_put(uartc);
         *size = i;
         return XWOK;
@@ -580,7 +570,6 @@ xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc, void * buf, xwsz_t * size)
                 *size = 0;
                 goto err_uartc_grab;
         }
-
         for (i = 0; i < *size; i++) {
                 rc = xwos_sem_trywait(&uartc->rxsem);
                 if (__xwcc_unlikely(rc < 0)) {
@@ -595,7 +584,6 @@ xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc, void * buf, xwsz_t * size)
                 }/* else {} */
                 xwos_sqlk_wr_unlock_cpuirqrs(&uartc->rxseqlock, cpuirq);
         }
-
         xwds_uartc_put(uartc);
         *size = i;
         return XWOK;
@@ -629,12 +617,10 @@ xwer_t xwds_uartc_clear_txq(struct xwds_uartc * uartc)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
-
         xwos_sqlk_wr_lock_cpuirqsv(&uartc->txseqlock, &cpuirq);
         uartc->txnum = 0;
         uartc->txpos = 0;
         xwos_sqlk_wr_unlock_cpuirqrs(&uartc->txseqlock, cpuirq);
-
         xwds_uartc_put(uartc);
         return rc;
 
@@ -711,7 +697,6 @@ xwer_t xwds_uartc_putc(struct xwds_uartc * uartc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
-
         rc = xwos_mtx_timedlock(&uartc->txmtx, xwtm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_lock;
@@ -721,7 +706,6 @@ xwer_t xwds_uartc_putc(struct xwds_uartc * uartc,
                 goto err_tx_1byte;
         }
         xwos_mtx_unlock(&uartc->txmtx);
-
         xwds_uartc_put(uartc);
         return XWOK;
 
@@ -769,7 +753,6 @@ xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
                 *size = 0;
                 goto err_uartc_grab;
         }
-
         rc = xwos_mtx_timedlock(&uartc->txmtx, xwtm);
         if (__xwcc_unlikely(rc < 0)) {
                 *size = 0;
@@ -784,7 +767,6 @@ xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
                 }
         }
         xwos_mtx_unlock(&uartc->txmtx);
-
         xwds_uartc_put(uartc);
         *size = i;
         return XWOK;
@@ -823,7 +805,6 @@ xwer_t xwds_uartc_cfg(struct xwds_uartc * uartc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
-
         drv = xwds_cast(const struct xwds_uartc_driver *, uartc->dev.drv);
         if ((drv) && (drv->cfg)) {
                 rc = drv->cfg(uartc, cfg);
@@ -833,7 +814,6 @@ xwer_t xwds_uartc_cfg(struct xwds_uartc * uartc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_cfg;
         }
-
         xwds_uartc_put(uartc);
         return XWOK;
 

@@ -92,28 +92,4 @@ xwer_t xwds_spim_put(struct xwds_spim * spim)
         return xwds_device_put(&spim->dev);
 }
 
-/**
- * @brief XWDS API：增加设备运行状态计数器
- * @param spim: (I) SPI主机模式控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_request()
- */
-static __xwds_inline_api
-xwer_t xwds_spim_request(struct xwds_spim * spim)
-{
-        return xwds_device_request(&spim->dev);
-}
-
-/**
- * @brief XWDS API：减少设备运行状态计数器
- * @param spim: (I) SPI主机模式控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_release()
- */
-static __xwds_inline_api
-xwer_t xwds_spim_release(struct xwds_spim * spim)
-{
-        return xwds_device_release(&spim->dev);
-}
-
 #endif /* xwcd/ds/spi/master.h */

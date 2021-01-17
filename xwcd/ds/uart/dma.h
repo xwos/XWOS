@@ -114,30 +114,6 @@ xwer_t xwds_dmauartc_put(struct xwds_dmauartc * dmauartc)
         return xwds_device_put(&dmauartc->dev);
 }
 
-/**
- * @brief 增加设备运行状态计数器
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_request()
- */
-static __xwds_inline_api
-xwer_t xwds_dmauartc_request(struct xwds_dmauartc * dmauartc)
-{
-        return xwds_device_request(&dmauartc->dev);
-}
-
-/**
- * @brief 减少设备运行状态计数器
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_release()
- */
-static __xwds_inline_api
-xwer_t xwds_dmauartc_release(struct xwds_dmauartc * dmauartc)
-{
-        return xwds_device_release(&dmauartc->dev);
-}
-
 /******** ******** Callbacks for driver ******** ********/
 void xwds_dmauartc_drvcb_rxq_flush(struct xwds_dmauartc * dmauartc);
 void xwds_dmauartc_drvcb_rxq_pub(struct xwds_dmauartc * dmauartc, xwsq_t tail);

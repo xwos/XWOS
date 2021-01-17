@@ -69,28 +69,4 @@ xwer_t xwds_eeprom_put(struct xwds_eeprom * eeprom)
         return xwds_i2cp_put(&eeprom->i2cp);
 }
 
-/**
- * @brief EEPROM API：增加设备运行状态计数器
- * @param eeprom: (I) I2C EEPROM对象指针
- * @return 错误码
- * @retval @ref xwds_i2cp_request()
- */
-static __xwds_inline
-xwer_t xwds_eeprom_request(struct xwds_eeprom * eeprom)
-{
-        return xwds_i2cp_request(&eeprom->i2cp);
-}
-
-/**
- * @brief EEPROM API：减少设备运行状态计数器
- * @param eeprom: (I) I2C EEPROM对象指针
- * @return 错误码
- * @retval @ref xwds_i2cp_release()
- */
-static __xwds_inline
-xwer_t xwds_eeprom_release(struct xwds_eeprom * eeprom)
-{
-        return xwds_i2cp_release(&eeprom->i2cp);
-}
-
 #endif /* xwcd/perpheral/i2c/eeprom/device.h */

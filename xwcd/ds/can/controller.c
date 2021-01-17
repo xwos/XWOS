@@ -27,33 +27,33 @@
 #include <xwcd/ds/can/controller.h>
 
 static __xwds_vop
-xwer_t xwds_canc_cvop_probe(struct xwds_canc * canc);
+xwer_t xwds_canc_vop_probe(struct xwds_canc * canc);
 
 static __xwds_vop
-xwer_t xwds_canc_cvop_remove(struct xwds_canc * canc);
+xwer_t xwds_canc_vop_remove(struct xwds_canc * canc);
 
 static __xwds_vop
-xwer_t xwds_canc_cvop_start(struct xwds_canc * canc);
+xwer_t xwds_canc_vop_start(struct xwds_canc * canc);
 
 static __xwds_vop
-xwer_t xwds_canc_cvop_stop(struct xwds_canc * canc);
+xwer_t xwds_canc_vop_stop(struct xwds_canc * canc);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static __xwds_vop
-xwer_t xwds_canc_cvop_suspend(struct xwds_canc * canc);
+xwer_t xwds_canc_vop_suspend(struct xwds_canc * canc);
 
 static __xwds_vop
-xwer_t xwds_canc_cvop_resume(struct xwds_canc * canc);
+xwer_t xwds_canc_vop_resume(struct xwds_canc * canc);
 #endif /* XWCDCFG_ds_PM */
 
-__xwds_rodata const struct xwds_base_virtual_operations xwds_canc_cvops = {
-        .probe = (void *)xwds_canc_cvop_probe,
-        .remove = (void *)xwds_canc_cvop_remove,
-        .start = (void *)xwds_canc_cvop_start,
-        .stop = (void *)xwds_canc_cvop_stop,
+__xwds_rodata const struct xwds_virtual_operation xwds_canc_vop = {
+        .probe = (void *)xwds_canc_vop_probe,
+        .remove = (void *)xwds_canc_vop_remove,
+        .start = (void *)xwds_canc_vop_start,
+        .stop = (void *)xwds_canc_vop_stop,
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-        .suspend = (void *)xwds_canc_cvop_suspend,
-        .resume = (void *)xwds_canc_cvop_resume,
+        .suspend = (void *)xwds_canc_vop_suspend,
+        .resume = (void *)xwds_canc_vop_resume,
 #endif /* XWCDCFG_ds_PM */
 };
 
@@ -66,7 +66,7 @@ __xwds_api
 void xwds_canc_construct(struct xwds_canc * canc)
 {
         xwds_device_construct(&canc->bc.dev);
-        canc->bc.dev.cvops = &xwds_canc_cvops;
+        canc->bc.dev.vop = &xwds_canc_vop;
 }
 
 /**
@@ -86,14 +86,14 @@ void xwds_canc_destruct(struct xwds_canc * canc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_canc_cvop_probe(struct xwds_canc * canc)
+xwer_t xwds_canc_vop_probe(struct xwds_canc * canc)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(canc->cfg, "nullptr", -EFAULT);
 
         canc->mode = XWDS_CANC_MODE_UNINIT;
-        rc = xwds_device_cvop_probe(&canc->bc.dev);
+        rc = xwds_device_vop_probe(&canc->bc.dev);
         return rc;
 }
 
@@ -103,11 +103,11 @@ xwer_t xwds_canc_cvop_probe(struct xwds_canc * canc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_canc_cvop_remove(struct xwds_canc * canc)
+xwer_t xwds_canc_vop_remove(struct xwds_canc * canc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_remove(&canc->bc.dev);
+        rc = xwds_device_vop_remove(&canc->bc.dev);
         return rc;
 }
 
@@ -117,11 +117,11 @@ xwer_t xwds_canc_cvop_remove(struct xwds_canc * canc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_canc_cvop_start(struct xwds_canc * canc)
+xwer_t xwds_canc_vop_start(struct xwds_canc * canc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_start(&canc->bc.dev);
+        rc = xwds_device_vop_start(&canc->bc.dev);
         return rc;
 }
 
@@ -131,11 +131,11 @@ xwer_t xwds_canc_cvop_start(struct xwds_canc * canc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_canc_cvop_stop(struct xwds_canc * canc)
+xwer_t xwds_canc_vop_stop(struct xwds_canc * canc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_stop(&canc->bc.dev);
+        rc = xwds_device_vop_stop(&canc->bc.dev);
         return rc;
 }
 
@@ -147,11 +147,11 @@ xwer_t xwds_canc_cvop_stop(struct xwds_canc * canc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_canc_cvop_suspend(struct xwds_canc * canc)
+xwer_t xwds_canc_vop_suspend(struct xwds_canc * canc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_suspend(&canc->bc.dev);
+        rc = xwds_device_vop_suspend(&canc->bc.dev);
         return rc;
 }
 
@@ -161,11 +161,11 @@ xwer_t xwds_canc_cvop_suspend(struct xwds_canc * canc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_canc_cvop_resume(struct xwds_canc * canc)
+xwer_t xwds_canc_vop_resume(struct xwds_canc * canc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_resume(&canc->bc.dev);
+        rc = xwds_device_vop_resume(&canc->bc.dev);
         return rc;
 }
 #endif /* XWCDCFG_ds_PM */
@@ -208,11 +208,6 @@ xwer_t xwds_canc_write(struct xwds_canc * canc, xwid_t txobjid,
                 goto err_txobjid;
         }
 
-        rc = xwds_canc_request(canc);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_canc_request;
-        }
-
         txobjcfg = &canc->cfg->txobjs[txobjid];
         if (XWDS_CAN_MSG_F_EXID & msg->flag) {
                 if (!(XWDS_CANC_HWOBJ_T_ID_EXT & txobjcfg->type)) {
@@ -234,16 +229,12 @@ xwer_t xwds_canc_write(struct xwds_canc * canc, xwid_t txobjid,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_write;
         }
-
-        xwds_canc_release(canc);
         xwds_canc_put(canc);
 
         return XWOK;
 
 err_drv_write:
 err_badtxobj:
-        xwds_canc_release(canc);
-err_canc_request:
 err_txobjid:
         xwds_canc_put(canc);
 err_canc_grab:
@@ -273,11 +264,6 @@ xwer_t xwds_canc_enable_irqs(struct xwds_canc * canc)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_canc_grab;
         }
-        rc = xwds_canc_request(canc);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_canc_request;
-        }
-
         drv = xwds_cast(const struct xwds_canc_driver *, canc->bc.dev.drv);
         if ((drv) && (drv->enable_irqs)) {
                 rc = drv->enable_irqs(canc);
@@ -287,12 +273,10 @@ xwer_t xwds_canc_enable_irqs(struct xwds_canc * canc)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_canc_drv_enable_irqs;
         }
-
+        xwds_canc_put(canc);
         return XWOK;
 
 err_canc_drv_enable_irqs:
-        xwds_canc_release(canc);
-err_canc_request:
         xwds_canc_put(canc);
 err_canc_grab:
         return rc;
@@ -317,6 +301,10 @@ xwer_t xwds_canc_disable_irqs(struct xwds_canc * canc)
 
         XWDS_VALIDATE(canc, "nullptr", -EFAULT);
 
+        rc = xwds_canc_grab(canc);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_canc_grab;
+        }
         drv = xwds_cast(const struct xwds_canc_driver *, canc->bc.dev.drv);
         if ((drv) && (drv->disable_irqs)) {
                 rc = drv->disable_irqs(canc);
@@ -326,12 +314,12 @@ xwer_t xwds_canc_disable_irqs(struct xwds_canc * canc)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_canc_drv_disable_irqs;
         }
-
-        xwds_canc_release(canc);
         xwds_canc_put(canc);
         return XWOK;
 
 err_canc_drv_disable_irqs:
+        xwds_canc_put(canc);
+err_canc_grab:
         return rc;
 }
 
@@ -362,10 +350,6 @@ xwer_t xwds_canc_set_mode(struct xwds_canc * canc, xwsq_t mode)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_canc_grab;
         }
-        rc = xwds_canc_request(canc);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_canc_request;
-        }
 
         if (canc->mode == mode) {
                 rc = -EALREADY;
@@ -382,16 +366,12 @@ xwer_t xwds_canc_set_mode(struct xwds_canc * canc, xwsq_t mode)
         }
         canc->mode = mode;
 
-        xwds_canc_release(canc);
         xwds_canc_put(canc);
-
         xwds_canc_drvcb_mode_indication(canc, mode);
         return XWOK;
 
 err_drv_set_mode:
 err_same_mode:
-        xwds_canc_release(canc);
-err_canc_request:
         xwds_canc_put(canc);
 err_canc_grab:
         return rc;
@@ -423,16 +403,10 @@ xwer_t xwds_canc_set_bd(struct xwds_canc * canc, xwid_t bdcfgid)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_canc_grab;
         }
-        rc = xwds_canc_request(canc);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_canc_request;
-        }
-
         if (bdcfgid >= canc->cfg->bdcfgs_num) {
                 rc = -ERANGE;
                 goto err_nobd;
         }
-
         bdcfg = &canc->cfg->bdcfgs[bdcfgid];
         drv = xwds_cast(const struct xwds_canc_driver *, canc->bc.dev.drv);
         if ((drv) && (drv->set_bd)) {
@@ -443,15 +417,11 @@ xwer_t xwds_canc_set_bd(struct xwds_canc * canc, xwid_t bdcfgid)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_set_bd;
         }
-
-        xwds_canc_release(canc);
         xwds_canc_put(canc);
         return XWOK;
 
 err_drv_set_bd:
 err_nobd:
-        xwds_canc_release(canc);
-err_canc_request:
         xwds_canc_put(canc);
 err_canc_grab:
         return rc;
@@ -464,9 +434,9 @@ err_canc_grab:
  * @param cb: (I) 回调函数
  */
 __xwds_code
-void xwds_canc_drvcb_setcb_tx_indication(struct xwds_canc * canc,
-                                         void (*cb)(struct xwds_canc *,
-                                                    xwid_t, xwer_t))
+void xwds_canc_setcb_tx_indication(struct xwds_canc * canc,
+                                   void (*cb)(struct xwds_canc *,
+                                              xwid_t, xwer_t))
 {
 #if !defined(XWCDCFG_ds_CAN_CONTROLLER_ROCBT) || (1 != XWCDCFG_ds_CAN_CONTROLLER_ROCBT)
         if (canc->cbtbl) {
@@ -484,10 +454,10 @@ void xwds_canc_drvcb_setcb_tx_indication(struct xwds_canc * canc,
  * @param cb: (I) 回调函数
  */
 __xwds_code
-void xwds_canc_drvcb_setcb_rx_indication(struct xwds_canc * canc,
-                                         void (*cb)(struct xwds_canc *,
-                                                    xwid_t,
-                                                    struct xwds_can_msg *))
+void xwds_canc_setcb_rx_indication(struct xwds_canc * canc,
+                                   void (*cb)(struct xwds_canc *,
+                                              xwid_t,
+                                              struct xwds_can_msg *))
 {
 #if !defined(XWCDCFG_ds_CAN_CONTROLLER_ROCBT) || (1 != XWCDCFG_ds_CAN_CONTROLLER_ROCBT)
         if (canc->cbtbl) {
@@ -505,8 +475,8 @@ void xwds_canc_drvcb_setcb_rx_indication(struct xwds_canc * canc,
  * @param cb: (I) 回调函数
  */
 __xwds_code
-void xwds_canc_drvcb_setcb_wakeup_notification(struct xwds_canc * canc,
-                                               void (*cb)(struct xwds_canc *))
+void xwds_canc_setcb_wakeup_notification(struct xwds_canc * canc,
+                                         void (*cb)(struct xwds_canc *))
 {
 #if !defined(XWCDCFG_ds_CAN_CONTROLLER_ROCBT) || (1 != XWCDCFG_ds_CAN_CONTROLLER_ROCBT)
         if (canc->cbtbl) {
@@ -524,8 +494,8 @@ void xwds_canc_drvcb_setcb_wakeup_notification(struct xwds_canc * canc,
  * @param cb: (I) 回调函数
  */
 __xwds_code
-void xwds_canc_drvcb_setcb_mode_indication(struct xwds_canc * canc,
-                                           void (*cb)(struct xwds_canc *, xwsq_t))
+void xwds_canc_setcb_mode_indication(struct xwds_canc * canc,
+                                     void (*cb)(struct xwds_canc *, xwsq_t))
 {
 #if !defined(XWCDCFG_ds_CAN_CONTROLLER_ROCBT) || (1 != XWCDCFG_ds_CAN_CONTROLLER_ROCBT)
         if (canc->cbtbl) {
@@ -543,9 +513,9 @@ void xwds_canc_drvcb_setcb_mode_indication(struct xwds_canc * canc,
  * @param cb: (I) 回调函数
  */
 __xwds_code
-void xwds_canc_drvcb_setcb_err_indication(struct xwds_canc * canc,
-                                          void (*cb)(struct xwds_canc *,
-                                                     xwsq_t, xwsq_t, xwsq_t))
+void xwds_canc_setcb_err_indication(struct xwds_canc * canc,
+                                    void (*cb)(struct xwds_canc *,
+                                               xwsq_t, xwsq_t, xwsq_t))
 {
 #if !defined(XWCDCFG_ds_CAN_CONTROLLER_ROCBT) || (1 != XWCDCFG_ds_CAN_CONTROLLER_ROCBT)
         if (canc->cbtbl) {
@@ -563,8 +533,8 @@ void xwds_canc_drvcb_setcb_err_indication(struct xwds_canc * canc,
  * @param cb: (I) 回调函数
  */
 __xwds_code
-void xwds_canc_drvcb_setcb_busoff_indication(struct xwds_canc * canc,
-                                             void (*cb)(struct xwds_canc *))
+void xwds_canc_setcb_busoff_indication(struct xwds_canc * canc,
+                                       void (*cb)(struct xwds_canc *))
 {
 #if !defined(XWCDCFG_ds_CAN_CONTROLLER_ROCBT) || (1 != XWCDCFG_ds_CAN_CONTROLLER_ROCBT)
         if (canc->cbtbl) {

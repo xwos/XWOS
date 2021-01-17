@@ -24,33 +24,33 @@
 #include <xwcd/ds/lin/controller.h>
 
 static __xwds_vop
-xwer_t xwds_linc_cvop_probe(struct xwds_linc * linc);
+xwer_t xwds_linc_vop_probe(struct xwds_linc * linc);
 
 static __xwds_vop
-xwer_t xwds_linc_cvop_remove(struct xwds_linc * linc);
+xwer_t xwds_linc_vop_remove(struct xwds_linc * linc);
 
 static __xwds_vop
-xwer_t xwds_linc_cvop_start(struct xwds_linc * linc);
+xwer_t xwds_linc_vop_start(struct xwds_linc * linc);
 
 static __xwds_vop
-xwer_t xwds_linc_cvop_stop(struct xwds_linc * linc);
+xwer_t xwds_linc_vop_stop(struct xwds_linc * linc);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static __xwds_vop
-xwer_t xwds_linc_cvop_suspend(struct xwds_linc * linc);
+xwer_t xwds_linc_vop_suspend(struct xwds_linc * linc);
 
 static __xwds_vop
-xwer_t xwds_linc_cvop_resume(struct xwds_linc * linc);
+xwer_t xwds_linc_vop_resume(struct xwds_linc * linc);
 #endif /* XWCDCFG_ds_PM */
 
-__xwds_rodata const struct xwds_base_virtual_operations xwds_linc_cvops = {
-        .probe = (void *)xwds_linc_cvop_probe,
-        .remove = (void *)xwds_linc_cvop_remove,
-        .start = (void *)xwds_linc_cvop_start,
-        .stop = (void *)xwds_linc_cvop_stop,
+__xwds_rodata const struct xwds_virtual_operation xwds_linc_vop = {
+        .probe = (void *)xwds_linc_vop_probe,
+        .remove = (void *)xwds_linc_vop_remove,
+        .start = (void *)xwds_linc_vop_start,
+        .stop = (void *)xwds_linc_vop_stop,
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-        .suspend = (void *)xwds_linc_cvop_suspend,
-        .resume = (void *)xwds_linc_cvop_resume,
+        .suspend = (void *)xwds_linc_vop_suspend,
+        .resume = (void *)xwds_linc_vop_resume,
 #endif /* XWCDCFG_ds_PM */
 };
 
@@ -63,7 +63,7 @@ __xwds_code
 void xwds_linc_construct(struct xwds_linc * linc)
 {
         xwds_device_construct(&linc->dev);
-        linc->dev.cvops = &xwds_linc_cvops;
+        linc->dev.vop = &xwds_linc_vop;
 }
 
 /**
@@ -83,7 +83,7 @@ void xwds_linc_destruct(struct xwds_linc * linc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_linc_cvop_probe(struct xwds_linc * linc)
+xwer_t xwds_linc_vop_probe(struct xwds_linc * linc)
 {
         xwer_t rc;
 
@@ -94,13 +94,13 @@ xwer_t xwds_linc_cvop_probe(struct xwds_linc * linc)
         if (is_err_or_null(linc->get_msg_size)) {
                 linc->get_msg_size = xwds_linc_get_msg_size;
         }
-        rc = xwds_device_cvop_probe(&linc->dev);
+        rc = xwds_device_vop_probe(&linc->dev);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_cvop_probe;
+                goto err_dev_vop_probe;
         }
         return XWOK;
 
-err_dev_cvop_probe:
+err_dev_vop_probe:
         xwos_mtx_destroy(&linc->txlock);
 err_mtx_init:
         return rc;
@@ -112,18 +112,18 @@ err_mtx_init:
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_linc_cvop_remove(struct xwds_linc * linc)
+xwer_t xwds_linc_vop_remove(struct xwds_linc * linc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_remove(&linc->dev);
+        rc = xwds_device_vop_remove(&linc->dev);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_dev_cvop_remove;
+                goto err_dev_vop_remove;
         }
         xwos_mtx_destroy(&linc->txlock);
         return XWOK;
 
-err_dev_cvop_remove:
+err_dev_vop_remove:
         return rc;
 }
 
@@ -133,11 +133,11 @@ err_dev_cvop_remove:
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_linc_cvop_start(struct xwds_linc * linc)
+xwer_t xwds_linc_vop_start(struct xwds_linc * linc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_start(&linc->dev);
+        rc = xwds_device_vop_start(&linc->dev);
         return rc;
 }
 
@@ -147,11 +147,11 @@ xwer_t xwds_linc_cvop_start(struct xwds_linc * linc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_linc_cvop_stop(struct xwds_linc * linc)
+xwer_t xwds_linc_vop_stop(struct xwds_linc * linc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_stop(&linc->dev);
+        rc = xwds_device_vop_stop(&linc->dev);
         return rc;
 }
 
@@ -163,11 +163,11 @@ xwer_t xwds_linc_cvop_stop(struct xwds_linc * linc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_linc_cvop_suspend(struct xwds_linc * linc)
+xwer_t xwds_linc_vop_suspend(struct xwds_linc * linc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_suspend(&linc->dev);
+        rc = xwds_device_vop_suspend(&linc->dev);
         return rc;
 }
 
@@ -177,11 +177,11 @@ xwer_t xwds_linc_cvop_suspend(struct xwds_linc * linc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_linc_cvop_resume(struct xwds_linc * linc)
+xwer_t xwds_linc_vop_resume(struct xwds_linc * linc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_resume(&linc->dev);
+        rc = xwds_device_vop_resume(&linc->dev);
         return rc;
 }
 #endif /* XWCDCFG_ds_PM */
@@ -220,12 +220,6 @@ xwer_t xwds_linc_msttx(struct xwds_linc * linc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_linc_grab;
         }
-
-        rc = xwds_linc_request(linc);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_linc_request;
-        }
-
         rc = xwos_mtx_timedlock(&linc->txlock, xwtm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_linc_txlock;
@@ -240,16 +234,12 @@ xwer_t xwds_linc_msttx(struct xwds_linc * linc,
                 goto err_drv_msttx;
         }
         xwos_mtx_unlock(&linc->txlock);
-
-        xwds_linc_release(linc);
         xwds_linc_put(linc);
         return XWOK;
 
 err_drv_msttx:
         xwos_mtx_unlock(&linc->txlock);
 err_linc_txlock:
-        xwds_linc_release(linc);
-err_linc_request:
         xwds_linc_put(linc);
 err_linc_grab:
         return rc;
@@ -287,11 +277,6 @@ xwer_t xwds_linc_slvtx(struct xwds_linc * linc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_linc_grab;
         }
-        rc = xwds_linc_request(linc);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_linc_request;
-        }
-
         rc = xwos_mtx_timedlock(&linc->txlock, xwtm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_linc_txlock;
@@ -306,16 +291,12 @@ xwer_t xwds_linc_slvtx(struct xwds_linc * linc,
                 goto err_drv_slvtx;
         }
         xwos_mtx_unlock(&linc->txlock);
-
-        xwds_linc_release(linc);
         xwds_linc_put(linc);
         return XWOK;
 
 err_drv_slvtx:
         xwos_mtx_unlock(&linc->txlock);
 err_linc_txlock:
-        xwds_linc_release(linc);
-err_linc_request:
         xwds_linc_put(linc);
 err_linc_grab:
         return rc;
@@ -353,11 +334,6 @@ xwer_t xwds_linc_rx(struct xwds_linc * linc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_linc_grab;
         }
-        rc = xwds_linc_request(linc);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_linc_request;
-        }
-
         drv = xwds_cast(const struct xwds_linc_driver *, linc->dev.drv);
         if (__xwcc_likely((drv) && (drv->rx))) {
                 rc = drv->rx(linc, msgbuf, xwtm);
@@ -367,14 +343,10 @@ xwer_t xwds_linc_rx(struct xwds_linc * linc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_drv_rx;
         }
-
-        xwds_linc_release(linc);
         xwds_linc_put(linc);
         return XWOK;
 
 err_drv_rx:
-        xwds_linc_release(linc);
-err_linc_request:
         xwds_linc_put(linc);
 err_linc_grab:
         return rc;

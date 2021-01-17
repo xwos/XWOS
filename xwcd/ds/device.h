@@ -85,28 +85,12 @@
          ((nr)   << __IOC_NRSHIFT) |    \
          ((size) << __IOC_SIZESHIFT))
 
-/**
- * @brief 设备状态枚举
- */
-enum xwds_device_state_em {
-        XWDS_DEVICE_STATE_INVALID = 0,
-        XWDS_DEVICE_STATE_REMOVING,
-        XWDS_DEVICE_STATE_PROBING,
-        XWDS_DEVICE_STATE_STOPING,
-        XWDS_DEVICE_STATE_STOPED,
-        XWDS_DEVICE_STATE_SUSPENDING,
-        XWDS_DEVICE_STATE_SUSPENDED,
-        XWDS_DEVICE_STATE_RESUMING,
-        XWDS_DEVICE_STATE_STARTING,
-        XWDS_DEVICE_STATE_RUNNING,
-};
-
 struct xwds_device;
 
 /**
  * @brief 基本操作的虚函数表（类似C++的虚函数表）
  */
-struct xwds_base_virtual_operations {
+struct xwds_virtual_operation {
         xwer_t (* probe)(struct xwds_device *); /**< 探测 */
         xwer_t (* remove)(struct xwds_device *); /**< 删除 */
         xwer_t (* start)(struct xwds_device *); /**< 启动 */
@@ -144,19 +128,18 @@ struct xwds_device {
         void * data; /**< 私有数据 */
 
         /* private */
-        xwsq_a state; /**< 设备状态 */
         struct xwds * ds; /**< 设备所属的设备栈的指针 */
-        const struct xwds_base_virtual_operations * cvops; /**< 通用操作的虚函数表 */
+        const struct xwds_virtual_operation * vop; /**< 通用操作的虚函数表 */
 };
 
-xwer_t xwds_device_cvop_probe(struct xwds_device * dev);
-xwer_t xwds_device_cvop_remove(struct xwds_device * dev);
-xwer_t xwds_device_cvop_start(struct xwds_device * dev);
-xwer_t xwds_device_cvop_stop(struct xwds_device * dev);
+xwer_t xwds_device_vop_probe(struct xwds_device * dev);
+xwer_t xwds_device_vop_remove(struct xwds_device * dev);
+xwer_t xwds_device_vop_start(struct xwds_device * dev);
+xwer_t xwds_device_vop_stop(struct xwds_device * dev);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-xwer_t xwds_device_cvop_suspend(struct xwds_device * dev);
-xwer_t xwds_device_cvop_resume(struct xwds_device * dev);
+xwer_t xwds_device_vop_suspend(struct xwds_device * dev);
+xwer_t xwds_device_vop_resume(struct xwds_device * dev);
 #endif /* XWCDCFG_ds_PM */
 
 void xwds_device_construct(struct xwds_device * dev);
@@ -174,6 +157,17 @@ xwer_t xwds_device_resume(struct xwds_device * dev);
 xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err);
 xwer_t xwds_device_resume_all(struct xwds * ds, bool ign_err);
 #endif /* XWCDCFG_ds_PM */
+
+/**
+ * @brief XWDS API：获取设备对象的标签
+ * @param dev: (I) 设备对象的指针
+ * @return 标签
+ */
+static __xwds_inline_api
+xwsq_t xwds_device_gettik(struct xwds_device * dev)
+{
+        return xwds_obj_gettik(&dev->obj);
+}
 
 #if defined(XWCDCFG_ds_LITE) && (1 == XWCDCFG_ds_LITE)
 
@@ -214,34 +208,6 @@ xwsq_t xwds_device_get_refcnt(struct xwds_device * dev)
         return xwds_obj_get_refcnt(&dev->obj);
 }
 
-/**
- * @brief XWDS API：增加设备运行状态计数器
- * @param dev: (I) 设备对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -ESHUTDOWN: 设备已经停止运行
- */
-static __xwds_inline_api
-xwer_t xwds_device_request(struct xwds_device * dev)
-{
-        XWOS_UNUSED(dev);
-        return XWOK;
-}
-
-/**
- * @brief XWDS API：减少设备运行状态计数器
- * @param dev: (I) 设备对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EALREADY: 设备已经停止运行
- */
-static __xwds_inline_api
-xwer_t xwds_device_release(struct xwds_device * dev)
-{
-        XWOS_UNUSED(dev);
-        return XWOK;
-}
-
 #else /* XWCDCFG_ds_LITE */
 
 /**
@@ -277,48 +243,6 @@ static __xwds_inline_api
 xwsq_t xwds_device_get_refcnt(struct xwds_device * dev)
 {
         return xwds_obj_get_refcnt(&dev->obj);
-}
-
-/**
- * @brief XWDS API：增加设备运行状态计数器
- * @param dev: (I) 设备对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -ESHUTDOWN: 设备已经停止运行
- */
-static __xwds_inline_api
-xwer_t xwds_device_request(struct xwds_device * dev)
-{
-        xwer_t rc;
-
-        rc = xwaop_tge_then_add(xwsq, &dev->state,
-                                XWDS_DEVICE_STATE_RUNNING, 1,
-                                NULL, NULL);
-        if (__xwcc_unlikely(rc < 0)) {
-                rc = -ESHUTDOWN;
-        }
-        return rc;
-}
-
-/**
- * @brief XWDS API：减少设备运行状态计数器
- * @param dev: (I) 设备对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EALREADY: 设备已经停止运行
- */
-static __xwds_inline_api
-xwer_t xwds_device_release(struct xwds_device * dev)
-{
-        xwer_t rc;
-
-        rc = xwaop_tgt_then_sub(xwsq, &dev->state,
-                                XWDS_DEVICE_STATE_RUNNING, 1,
-                                NULL, NULL);
-        if (__xwcc_unlikely(rc < 0)) {
-                rc = -EALREADY;
-        }
-        return rc;
 }
 #endif /* !XWCDCFG_ds_LITE */
 

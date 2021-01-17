@@ -50,7 +50,6 @@ xwer_t xwds_dma_req(struct xwds_soc * soc, xwid_t ch)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-
         rc = xwbmpaop_t0i_then_s1i(soc->dma.chstatus, ch);
         if (__xwcc_unlikely(rc < 0)) {
                 rc = -EBUSY;
@@ -147,7 +146,6 @@ xwer_t xwds_dma_cfg(struct xwds_soc * soc, xwid_t ch, void * cfg,
                 rc = -EPERM;
                 goto err_notreq;
         }
-
 #if defined(XWCDCFG_ds_SOC_DMA_ROCBT) && (1 == XWCDCFG_ds_SOC_DMA_ROCBT)
         XWOS_UNUSED(cb);
         XWOS_UNUSED(arg);
@@ -159,7 +157,6 @@ xwer_t xwds_dma_cfg(struct xwds_soc * soc, xwid_t ch, void * cfg,
                 soc->dma.chcbargs[ch] = arg;
         }
 #endif
-
         drv = xwds_cast(const struct xwds_soc_driver *, soc->dev.drv);
         if ((drv) && (drv->dma_cfg)) {
                 rc = drv->dma_cfg(soc, ch, cfg);

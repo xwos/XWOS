@@ -35,13 +35,10 @@ xwer_t xwds_w25qxx_drv_start(struct xwds_device * dev)
 
         w25qxx = xwds_cast(struct xwds_w25qxx *, dev);
         cmdtbl = w25qxx->cmdtbl;
-
-        if ((NULL == cmdtbl) ||
-            (NULL == w25qxx->spip.bus)) {
+        if ((NULL == cmdtbl) || (NULL == w25qxx->spip.bus)) {
                 rc = -EINVAL;
                 goto err_desc_err;
         }
-
         rc = xwos_mtx_init(&w25qxx->apilock, XWOS_SKD_PRIORITY_RT_MAX);
         if (rc < 0) {
                 goto err_mtx_init;
@@ -88,23 +85,14 @@ xwer_t xwds_w25qxx_cfgbus(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_w25qxx_grab;
         }
-        rc = xwds_w25qxx_request(w25qxx);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_w25qxx_request;
-        }
-
         rc = xwds_spim_buscfg(w25qxx->spip.bus, w25qxx->spip.buscfgid, xwtm);
         if (rc < 0) {
                 goto err_spim_buscfg;
         }
-
-        xwds_w25qxx_release(w25qxx);
         xwds_w25qxx_put(w25qxx);
         return XWOK;
 
 err_spim_buscfg:
-        xwds_w25qxx_release(w25qxx);
-err_w25qxx_request:
         xwds_w25qxx_put(w25qxx);
 err_w25qxx_grab:
         return rc;
@@ -128,15 +116,10 @@ xwer_t xwds_w25qxx_ctrl(struct xwds_w25qxx * w25qxx,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_w25qxx_grab;
         }
-        rc = xwds_w25qxx_request(w25qxx);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_w25qxx_request;
-        }
         rc = xwos_mtx_timedlock(&w25qxx->apilock, xwtm);
         if (rc < 0) {
                 goto err_apilock_lock;
         }
-
         idx = 0;
         w25qxx->txq[idx] = instruction;
         idx++;
@@ -155,7 +138,6 @@ xwer_t xwds_w25qxx_ctrl(struct xwds_w25qxx * w25qxx,
                 }
         }
         rxofs = idx;
-
         for (i = 0; i < size; i++) {
                 if (txd) {
                         w25qxx->txq[idx] = txd[i];
@@ -173,17 +155,13 @@ xwer_t xwds_w25qxx_ctrl(struct xwds_w25qxx * w25qxx,
                         rxb[i] = w25qxx->rxq[rxofs + i];
                 }
         }
-
         xwos_mtx_unlock(&w25qxx->apilock);
-        xwds_w25qxx_release(w25qxx);
         xwds_w25qxx_put(w25qxx);
         return XWOK;
 
 err_spim_xfer:
         xwos_mtx_unlock(&w25qxx->apilock);
 err_apilock_lock:
-        xwds_w25qxx_release(w25qxx);
-err_w25qxx_request:
         xwds_w25qxx_put(w25qxx);
 err_w25qxx_grab:
         return rc;
@@ -208,7 +186,6 @@ xwer_t xwds_w25qxx_reset(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
                         goto err_w25qxx_ctrl;
                 }
         }
-
         cmd = w25qxx->cmdtbl[XWDS_W25QXX_CMD_RESET];
         if (cmd.existing) {
                 rc = xwds_w25qxx_ctrl(w25qxx,
@@ -237,17 +214,14 @@ xwer_t xwds_w25qxx_init_parameter(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
         if (rc < 0) {
                 goto err_read_uid;
         }
-
         rc = xwds_w25qxx_read_mid(w25qxx, &mid, xwtm);
         if (rc < 0) {
                 goto err_read_mid;
         }
-
         rc = xwds_w25qxx_read_jid(w25qxx, &jid, xwtm);
         if (rc < 0) {
                 goto err_read_jid;
         }
-
         switch (w25qxx->parameter.mid) {
         case XWDS_W25Q80_MID:
                 w25qxx->parameter.size = 1 * 1024 * 1024;
@@ -270,7 +244,6 @@ xwer_t xwds_w25qxx_init_parameter(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
         default:
                 break;
         }
-
         return XWOK;
 
 err_read_jid:
@@ -301,7 +274,6 @@ xwer_t xwds_w25qxx_write_enable(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
-
         rc = xwds_w25qxx_read_sr(w25qxx,
                                  XWDS_W25QXX_SR_1, &sr1,
                                  xwtm);
@@ -312,7 +284,6 @@ xwer_t xwds_w25qxx_write_enable(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
                 rc = -EACCES;
                 goto err_chk_wel;
         }
-
         return XWOK;
 
 err_chk_wel:
@@ -376,7 +347,6 @@ xwer_t xwds_w25qxx_read_sr(struct xwds_w25qxx * w25qxx,
                 rc = -ENOTSUP;
                 goto err_not_support;
         }
-
         rc = xwds_w25qxx_ctrl(w25qxx,
                               cmd.instruction,
                               cmd.address_size, cmd.address,
@@ -446,7 +416,6 @@ xwer_t xwds_w25qxx_read_uid(struct xwds_w25qxx * w25qxx, xwu64_t * uidbuf,
                 rc = -ENOTSUP;
                 goto err_not_support;
         }
-
         rc = xwds_w25qxx_ctrl(w25qxx,
                               cmd.instruction,
                               cmd.address_size, cmd.address,
@@ -577,12 +546,10 @@ xwer_t xwds_w25qxx_write(struct xwds_w25qxx * w25qxx, xwu32_t address,
         if (rc < 0) {
                 goto err_we;
         }
-
         rc = xwds_w25qxx_wait_idle(w25qxx, 1 * XWTM_MS, xwtm);
         if (rc < 0) {
                 goto err_wait_idle;
         }
-
         xfsize = *size;
         cmd = w25qxx->cmdtbl[XWDS_W25QXX_CMD_PAGE_PROGRAM];
         if (1 != cmd.existing) {
@@ -597,7 +564,6 @@ xwer_t xwds_w25qxx_write(struct xwds_w25qxx * w25qxx, xwu32_t address,
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
-
         *size = xfsize;
         return XWOK;
 
@@ -622,7 +588,6 @@ xwer_t xwds_w25qxx_erase_sector(struct xwds_w25qxx * w25qxx, xwu32_t address,
         if (rc < 0) {
                 goto err_we;
         }
-
         cmd = w25qxx->cmdtbl[XWDS_W25QXX_CMD_SECTOR_ERASE];
         if (1 != cmd.existing) {
                 rc = -ENOTSUP;
@@ -636,12 +601,10 @@ xwer_t xwds_w25qxx_erase_sector(struct xwds_w25qxx * w25qxx, xwu32_t address,
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
-
         rc = xwds_w25qxx_wait_idle(w25qxx, 400 * XWTM_MS, xwtm);
         if (rc < 0) {
                 goto err_chk_idle;
         }
-
         return XWOK;
 
 err_chk_idle:
@@ -665,7 +628,6 @@ xwer_t xwds_w25qxx_erase_32kblk(struct xwds_w25qxx * w25qxx, xwu32_t address,
         if (rc < 0) {
                 goto err_we;
         }
-
         cmd = w25qxx->cmdtbl[XWDS_W25QXX_CMD_32KBLOCK_ERASE];
         if (1 != cmd.existing) {
                 rc = -ENOTSUP;
@@ -679,12 +641,10 @@ xwer_t xwds_w25qxx_erase_32kblk(struct xwds_w25qxx * w25qxx, xwu32_t address,
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
-
         rc = xwds_w25qxx_wait_idle(w25qxx, 1600 * XWTM_MS, xwtm);
         if (rc < 0) {
                 goto err_chk_idle;
         }
-
         return XWOK;
 
 err_chk_idle:
@@ -708,7 +668,6 @@ xwer_t xwds_w25qxx_erase_64kblk(struct xwds_w25qxx * w25qxx, xwu32_t address,
         if (rc < 0) {
                 goto err_we;
         }
-
         cmd = w25qxx->cmdtbl[XWDS_W25QXX_CMD_64KBLOCK_ERASE];
         if (1 != cmd.existing) {
                 rc = -ENOTSUP;
@@ -722,12 +681,10 @@ xwer_t xwds_w25qxx_erase_64kblk(struct xwds_w25qxx * w25qxx, xwu32_t address,
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
-
         rc = xwds_w25qxx_wait_idle(w25qxx, 2000 * XWTM_MS, xwtm);
         if (rc < 0) {
                 goto err_chk_idle;
         }
-
         return XWOK;
 
 err_chk_idle:
@@ -750,7 +707,6 @@ xwer_t xwds_w25qxx_erase_chip(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
         if (rc < 0) {
                 goto err_we;
         }
-
         cmd = w25qxx->cmdtbl[XWDS_W25QXX_CMD_CHIP_ERASE];
         if (1 != cmd.existing) {
                 rc = -ENOTSUP;
@@ -764,12 +720,10 @@ xwer_t xwds_w25qxx_erase_chip(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
-
         rc = xwds_w25qxx_wait_idle(w25qxx, 2000 * XWTM_MS, xwtm);
         if (rc < 0) {
                 goto err_chk_idle;
         }
-
         return XWOK;
 
 err_chk_idle:

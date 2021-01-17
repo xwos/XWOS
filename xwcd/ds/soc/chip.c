@@ -23,33 +23,33 @@
 #include <xwcd/ds/soc/chip.h>
 
 static __xwds_vop
-xwer_t xwds_soc_cvop_probe(struct xwds_soc * soc);
+xwer_t xwds_soc_vop_probe(struct xwds_soc * soc);
 
 static __xwds_vop
-xwer_t xwds_soc_cvop_remove(struct xwds_soc * soc);
+xwer_t xwds_soc_vop_remove(struct xwds_soc * soc);
 
 static __xwds_vop
-xwer_t xwds_soc_cvop_start(struct xwds_soc * soc);
+xwer_t xwds_soc_vop_start(struct xwds_soc * soc);
 
 static __xwds_vop
-xwer_t xwds_soc_cvop_stop(struct xwds_soc * soc);
+xwer_t xwds_soc_vop_stop(struct xwds_soc * soc);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static __xwds_vop
-xwer_t xwds_soc_cvop_suspend(struct xwds_soc * soc);
+xwer_t xwds_soc_vop_suspend(struct xwds_soc * soc);
 
 static __xwds_vop
-xwer_t xwds_soc_cvop_resume(struct xwds_soc * soc);
+xwer_t xwds_soc_vop_resume(struct xwds_soc * soc);
 #endif /* XWCDCFG_ds_PM */
 
-__xwds_rodata const struct xwds_base_virtual_operations xwds_soc_cvops = {
-        .probe = (void *)xwds_soc_cvop_probe,
-        .remove = (void *)xwds_soc_cvop_remove,
-        .start = (void *)xwds_soc_cvop_start,
-        .stop = (void *)xwds_soc_cvop_stop,
+__xwds_rodata const struct xwds_virtual_operation xwds_soc_vop = {
+        .probe = (void *)xwds_soc_vop_probe,
+        .remove = (void *)xwds_soc_vop_remove,
+        .start = (void *)xwds_soc_vop_start,
+        .stop = (void *)xwds_soc_vop_stop,
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-        .suspend = (void *)xwds_soc_cvop_suspend,
-        .resume = (void *)xwds_soc_cvop_resume,
+        .suspend = (void *)xwds_soc_vop_suspend,
+        .resume = (void *)xwds_soc_vop_resume,
 #endif /* XWCDCFG_ds_PM */
 };
 
@@ -62,7 +62,7 @@ __xwds_api
 void xwds_soc_construct(struct xwds_soc * soc)
 {
         xwds_device_construct(&soc->dev);
-        soc->dev.cvops = &xwds_soc_cvops;
+        soc->dev.vop = &xwds_soc_vop;
 }
 
 /**
@@ -82,13 +82,13 @@ void xwds_soc_destruct(struct xwds_soc * soc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_soc_cvop_probe(struct xwds_soc * soc)
+xwer_t xwds_soc_vop_probe(struct xwds_soc * soc)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(soc->xwccfg, "nullptr", -EFAULT);
 
-        rc = xwds_device_cvop_probe(&soc->dev);
+        rc = xwds_device_vop_probe(&soc->dev);
         return rc;
 }
 
@@ -98,11 +98,11 @@ xwer_t xwds_soc_cvop_probe(struct xwds_soc * soc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_soc_cvop_remove(struct xwds_soc * soc)
+xwer_t xwds_soc_vop_remove(struct xwds_soc * soc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_remove(&soc->dev);
+        rc = xwds_device_vop_remove(&soc->dev);
         return rc;
 }
 
@@ -112,11 +112,11 @@ xwer_t xwds_soc_cvop_remove(struct xwds_soc * soc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_soc_cvop_start(struct xwds_soc * soc)
+xwer_t xwds_soc_vop_start(struct xwds_soc * soc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_start(&soc->dev);
+        rc = xwds_device_vop_start(&soc->dev);
         return rc;
 }
 
@@ -126,11 +126,11 @@ xwer_t xwds_soc_cvop_start(struct xwds_soc * soc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_soc_cvop_stop(struct xwds_soc * soc)
+xwer_t xwds_soc_vop_stop(struct xwds_soc * soc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_stop(&soc->dev);
+        rc = xwds_device_vop_stop(&soc->dev);
         return rc;
 }
 
@@ -142,11 +142,11 @@ xwer_t xwds_soc_cvop_stop(struct xwds_soc * soc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_soc_cvop_suspend(struct xwds_soc * soc)
+xwer_t xwds_soc_vop_suspend(struct xwds_soc * soc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_suspend(&soc->dev);
+        rc = xwds_device_vop_suspend(&soc->dev);
         return rc;
 }
 
@@ -156,11 +156,11 @@ xwer_t xwds_soc_cvop_suspend(struct xwds_soc * soc)
  * @return 错误码
  */
 static __xwds_vop
-xwer_t xwds_soc_cvop_resume(struct xwds_soc * soc)
+xwer_t xwds_soc_vop_resume(struct xwds_soc * soc)
 {
         xwer_t rc;
 
-        rc = xwds_device_cvop_resume(&soc->dev);
+        rc = xwds_device_vop_resume(&soc->dev);
         return rc;
 }
 #endif /* XWCDCFG_ds_PM */

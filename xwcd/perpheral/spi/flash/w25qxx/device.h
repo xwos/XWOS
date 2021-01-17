@@ -207,28 +207,4 @@ xwer_t xwds_w25qxx_put(struct xwds_w25qxx * w25qxx)
         return xwds_spip_put(&w25qxx->spip);
 }
 
-/**
- * @brief W25QXX API：增加设备运行状态计数器
- * @param w25qxx: (I) W25QXX Flash 设备指针
- * @return 错误码
- * @retval @ref xwds_spip_request()
- */
-static __xwds_inline
-xwer_t xwds_w25qxx_request(struct xwds_w25qxx * w25qxx)
-{
-        return xwds_spip_request(&w25qxx->spip);
-}
-
-/**
- * @brief W25QXX API：减少设备运行状态计数器
- * @param w25qxx: (I) W25QXX Flash 设备指针
- * @return 错误码
- * @retval @ref xwds_spip_release()
- */
-static __xwds_inline
-xwer_t xwds_w25qxx_release(struct xwds_w25qxx * w25qxx)
-{
-        return xwds_spip_release(&w25qxx->spip);
-}
-
 #endif /* xwcd/perpheral/spi/flash/w25qxx/device.h */
