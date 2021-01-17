@@ -76,7 +76,7 @@ int xwlua_condsp_copy(lua_State * L)
         lua_State * D;
 
         condsp = (xwlua_cond_sp *)luaL_checkudata(L, 1, "xwlua_cond_sp");
-        D = (lua_State *)lua_touserdata(L, 2);
+        D = (lua_State *)luaL_checkudata(L, 2, "xwlua_vm");
         if (D) {
                 xwer_t rc;
                 rc = xwos_cond_acquire(*condsp);

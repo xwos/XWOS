@@ -358,7 +358,7 @@ int xwlua_thdsp_copy(lua_State * L)
         lua_State * D;
 
         thdsp = (xwlua_thd_sp *)luaL_checkudata(L, 1, "xwlua_thd_sp");
-        D = (lua_State *)lua_touserdata(L, 2);
+        D = (lua_State *)luaL_checkudata(L, 2, "xwlua_vm");
         if (D) {
                 xwer_t rc;
                 rc = xwos_thd_acquire(*thdsp);

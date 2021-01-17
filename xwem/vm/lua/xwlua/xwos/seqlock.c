@@ -214,7 +214,7 @@ int xwlua_sqlksp_copy(lua_State * L)
         lua_State * D;
 
         sqlksp = (xwlua_sqlk_sp *)luaL_checkudata(L, 1, "xwlua_sqlk_sp");
-        D = (lua_State *)lua_touserdata(L, 2);
+        D = (lua_State *)luaL_checkudata(L, 2, "xwlua_vm");
         if (D) {
                 xwer_t rc;
                 rc = xwlua_sqlk_acquire(*sqlksp);

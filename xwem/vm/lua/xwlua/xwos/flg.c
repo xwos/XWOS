@@ -102,7 +102,7 @@ int xwlua_flgsp_copy(lua_State * L)
         lua_State * D;
 
         flgsp = (xwlua_flg_sp *)luaL_checkudata(L, 1, "xwlua_flg_sp");
-        D = (lua_State *)lua_touserdata(L, 2);
+        D = (lua_State *)luaL_checkudata(L, 2, "xwlua_vm");
         if (D) {
                 xwer_t rc;
                 rc = xwos_flg_acquire(*flgsp);

@@ -55,7 +55,7 @@ int xwlua_bmp_zero(lua_State * L)
         return 0;
 }
 
-int xwlua_bmp_copy(lua_State * L)
+int xwlua_bmp_assign(lua_State * L)
 {
         xwlua_bmp_t * luabmp;
         xwlua_bmp_t * opd;
@@ -312,7 +312,7 @@ int xwlua_bmp_t0mo(lua_State * L)
 const luaL_Reg xwlua_bmp_indexmethod[] = {
         {"fill", xwlua_bmp_fill},
         {"zero", xwlua_bmp_zero},
-        {"copy", xwlua_bmp_copy},
+        {"assign", xwlua_bmp_assign},
         {"weight", xwlua_bmp_weight},
         {"ffs", xwlua_bmp_ffs},
         {"ffz", xwlua_bmp_ffz},

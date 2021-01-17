@@ -40,12 +40,17 @@ void xwlua_openlibs(lua_State * L)
 {
         const luaL_Reg *lib;
 
+        /* open xwxt */
+        luaL_requiref(L, XWLUA_XT_NAME, xwlua_open_xt, 1);
+        lua_pop(L, 1);
+
+        /* open all libs */
         for (lib = xwlua_loadedlibs; lib->func; lib++) {
                 luaL_requiref(L, lib->name, lib->func, 1);
                 lua_pop(L, 1);
         }
-        luaL_requiref(L, XWLUA_XT_NAME, xwlua_open_xt, 1);
-        lua_pop(L, 1);
+
+        /* open brd libs */
 #if defined(XWEMCFG_vm_lua_BRDLIBS) && (1 == XWEMCFG_vm_lua_BRDLIBS)
         xwlua_open_brdlibs(L);
 #endif

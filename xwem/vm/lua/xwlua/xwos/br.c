@@ -89,7 +89,7 @@ int xwlua_brsp_copy(lua_State * L)
         lua_State * D;
 
         brsp = (xwlua_br_sp *)luaL_checkudata(L, 1, "xwlua_br_sp");
-        D = (lua_State *)lua_touserdata(L, 2);
+        D = (lua_State *)luaL_checkudata(L, 2, "xwlua_vm");
         if (D) {
                 xwer_t rc;
                 rc = xwos_br_acquire(*brsp);

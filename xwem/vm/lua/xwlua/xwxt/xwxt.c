@@ -39,6 +39,7 @@ int xwlua_xt_function_writer(lua_State * S, const void * b, size_t size, void * 
  * @param S: (I) 虚拟机S
  * @param sidx: (I) 函数在虚拟机S栈中的位置
  * @param D: (I) 虚拟机D
+ * @return 目的虚拟机D的栈顶为拷贝的函数或nil
  */
 void xwlua_xt_copy_function(lua_State * S, int sidx, lua_State * D)
 {
@@ -70,6 +71,7 @@ void xwlua_xt_copy_function(lua_State * S, int sidx, lua_State * D)
  * @param S: (I) 源虚拟机
  * @param idx: (I) userdata在虚拟机S栈中的位置
  * @param D: (I) 目的虚拟机
+ * @return 目的虚拟机D的栈顶为拷贝的userdata或nil
  */
 void xwlua_xt_copy_ud(lua_State * S, int idx, lua_State * D)
 {
@@ -78,12 +80,13 @@ void xwlua_xt_copy_ud(lua_State * S, int idx, lua_State * D)
         bool hasmt;
 
         idx = lua_absindex(S, idx);
-        hasmt = lua_getmetatable(S, idx); /* push metatable */
+        hasmt = lua_getmetatable(S, idx); /* push metatable["__copy"] */
         if (hasmt) {
                 type = lua_getfield(S, -1, "__copy"); /* function */
                 if (LUA_TFUNCTION == type) {
                         lua_pushvalue(S, idx); /* arg1 */
                         lua_pushlightuserdata(S, (void *)D); /* arg2 */
+                        luaL_setmetatable(S, "xwlua_vm");
                         /* call __copy(arg1, arg2) then pop */
                         rc = lua_pcall(S, 2, LUA_MULTRET, 0);
                         if (LUA_OK != rc) {
@@ -91,7 +94,7 @@ void xwlua_xt_copy_ud(lua_State * S, int idx, lua_State * D)
                                 lua_pushnil(D);
                         }
                 } else {
-                        lua_pop(S, 1); /* pop "__copy" */
+                        lua_pop(S, 1); /* pop metatable["__copy"] */
                         lua_pushnil(D);
                 }
                 lua_pop(S, 1); /* pop metatable */
@@ -100,16 +103,17 @@ void xwlua_xt_copy_ud(lua_State * S, int idx, lua_State * D)
         }
 }
 
+void xwlua_xt_copy_table(lua_State * S, int sidx, lua_State * D);
+
 /**
- * @brief 将虚拟机S栈中的表元素拷贝到虚拟机D的栈中
+ * @brief 将虚拟机S栈中的表元素，逐一拷贝到虚拟机D栈的表中
  * @param S: (I) 虚拟机S
- * @param sidx: (I) 表在虚拟机S栈中的位置
+ * @param sidx: (I) 源表在虚拟机S栈中的位置
  * @param D: (I) 虚拟机D
- * @param didx: (I) 表在虚拟机D栈中的位置
- * @note
- * + 本函数只会对表中索引(key)为字符串的键值对进行拷贝，其他类型的索引忽略。
+ * @param sidx: (I) 目的表在虚拟机D栈中的位置
  */
-void xwlua_xt_copy_table(lua_State * S, int sidx, lua_State * D, int didx)
+static
+void xwlua_xt_deepcopy_table(lua_State * S, int sidx, lua_State * D, int didx)
 {
         int kt;
         const char * key;
@@ -125,7 +129,8 @@ void xwlua_xt_copy_table(lua_State * S, int sidx, lua_State * D, int didx)
 
         sidx = lua_absindex(S, sidx);
         didx = lua_absindex(D, didx);
-        /* table is in the stack at index sidx */
+
+        /* traverse table is in the stack at index sidx */
         lua_pushnil(S); /* first key */
         while (lua_next(S, sidx) != 0) {
                 /* uses 'key' (at index -2) and 'value' (at index -1) */
@@ -155,13 +160,7 @@ void xwlua_xt_copy_table(lua_State * S, int sidx, lua_State * D, int didx)
                                 lua_setfield(D, didx, key);
                                 break;
                         case LUA_TTABLE:
-                                lua_newtable(D);
-                                xwlua_xt_copy_table(S, -1, D, -1);
-                                if (lua_getmetatable(S, -1)) {
-                                        lua_newtable(D);
-                                        xwlua_xt_copy_table(S, -1, D, -1);
-                                        lua_setmetatable(D, -2);
-                                }
+                                xwlua_xt_copy_table(S, -1, D);
                                 lua_setfield(D, didx, key);
                                 break;
                         case LUA_TFUNCTION:
@@ -179,6 +178,57 @@ void xwlua_xt_copy_table(lua_State * S, int sidx, lua_State * D, int didx)
                 }
                 /* removes 'value'; keeps 'key' for next iteration */
                 lua_pop(S, 1);
+        }
+}
+
+/**
+ * @brief 将虚拟机S中的表拷贝到虚拟机D的栈顶
+ * @param S: (I) 虚拟机S
+ * @param sidx: (I) 表在虚拟机S栈中的位置
+ * @param D: (I) 虚拟机D
+ * @return 目的虚拟机D的栈顶为拷贝的表或nil
+ * @note
+ * + 本函数只会对表中索引(key)为字符串的键值对进行拷贝，其他类型的索引忽略。
+ */
+void xwlua_xt_copy_table(lua_State * S, int sidx, lua_State * D)
+{
+        int rc;
+        int type;
+        bool hasmt;
+
+        sidx = lua_absindex(S, sidx);
+        hasmt = lua_getmetatable(S, sidx); /* push metatable */
+        if (hasmt) {
+                /* push metatable["__copy"] */
+                type = lua_getfield(S, -1, "__copy");
+                if (LUA_TFUNCTION == type) {
+                        lua_pushvalue(S, -1); /* arg1: table */
+                        lua_pushlightuserdata(S, (void *)D); /* arg2: D */
+                        luaL_setmetatable(S, "xwlua_vm");
+                        /* call __copy(table, D) then pop */
+                        rc = lua_pcall(S, 2, LUA_MULTRET, 0);
+                        if (LUA_OK != rc) {
+                                lua_pop(S, 1); /* pop error */
+                                lua_pushnil(D); /* result is nil */
+                        }
+                } else {
+                        /* pop metatable["__copy"] */
+                        lua_pop(S, 1);
+
+                        /* create a empty table in D */
+                        lua_newtable(D);
+
+                        /* copy metatable to the top of D */
+                        xwlua_xt_copy_table(S, -1, D);
+                        lua_setmetatable(D, -2); /* set metatable to the empty table */
+
+                        /* deep copy */
+                        xwlua_xt_deepcopy_table(S, -1, D, -1);
+                }
+                lua_pop(S, 1); /* pop metatable */
+        } else {
+                lua_newtable(D);
+                xwlua_xt_deepcopy_table(S, -1, D, -1);
         }
 }
 
@@ -232,13 +282,7 @@ void xwlua_xt_copy_env(lua_State * S, int idx, lua_State * D)
                                 lua_setglobal(D, key);
                                 break;
                         case LUA_TTABLE:
-                                lua_newtable(D);
-                                xwlua_xt_copy_table(S, -1, D, -1);
-                                if (lua_getmetatable(S, -1)) {
-                                        lua_newtable(D);
-                                        xwlua_xt_copy_table(S, -1, D, -1);
-                                        lua_setmetatable(D, -2);
-                                }
+                                xwlua_xt_copy_table(S, -1, D);
                                 lua_setglobal(D, key);
                                 break;
                         case LUA_TFUNCTION:
@@ -322,8 +366,7 @@ int xwlua_xt_import(lua_State * L)
                 }
                 break;
         case LUA_TTABLE:
-                lua_newtable(L);
-                xwlua_xt_copy_table(xwlua_xt, -1, L, -1);
+                xwlua_xt_copy_table(xwlua_xt, -1, L);
                 break;
         case LUA_TFUNCTION:
                 xwlua_xt_copy_function(xwlua_xt, -1, L);
@@ -395,8 +438,7 @@ int xwlua_xt_export(lua_State * L)
                 lua_setglobal(xwlua_xt, key);
                 break;
         case LUA_TTABLE:
-                lua_newtable(xwlua_xt);
-                xwlua_xt_copy_table(L, 2, xwlua_xt, -1);
+                xwlua_xt_copy_table(L, 2, xwlua_xt);
                 lua_setglobal(xwlua_xt, key);
                 break;
         case LUA_TFUNCTION:
@@ -458,6 +500,9 @@ LUAMOD_API int xwlua_open_xt(lua_State * L)
 
         luaL_newmetatable(L, "xwlua_xt");
         luaL_setfuncs(L, xwlua_xt_metamethod, 0); /* add metamethods */
+        lua_pop(L, 1); /* pop metatable */
+
+        luaL_newmetatable(L, "xwlua_vm");
         lua_pop(L, 1); /* pop metatable */
 
         luaL_newlib(L, xwlua_xt_method);

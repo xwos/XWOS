@@ -92,7 +92,7 @@ int xwlua_mtxsp_copy(lua_State * L)
         lua_State * D;
 
         mtxsp = (xwlua_mtx_sp *)luaL_checkudata(L, 1, "xwlua_mtx_sp");
-        D = (lua_State *)lua_touserdata(L, 2);
+        D = (lua_State *)luaL_checkudata(L, 2, "xwlua_vm");
         if (D) {
                 xwer_t rc;
                 rc = xwos_mtx_acquire(*mtxsp);
