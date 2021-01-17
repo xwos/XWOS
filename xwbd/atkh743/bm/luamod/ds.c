@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 外部模块配置
+ * @brief 电路板Lua模块：玄武设备栈
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,19 +18,12 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_xwem_h__
-#define __cfg_xwem_h__
+#include <xwos/standard.h>
+#include <xwem/vm/lua/src/lauxlib.h>
+#include <xwem/vm/lua/xwlua/xwds/soc.h>
+#include <bm/stm32cube/mif.h>
 
-#define XWEMCFG_serializing_nanopb                      1
-#define XWEMCFG_fs_fatfs                                0
-#define XWEMCFG_fs_littlefs                             0
-#define XWEMCFG_fs_spiffs                               0
-#define XWEMCFG_fs_dhara                                0
-
-#define XWEMCFG_vm_lua                                  0
-#define XWEMCFG_vm_lua_INT_TYPE                         LUA_INT_LONG
-#define XWEMCFG_vm_lua_FLOAT_TYPE                       LUA_FLOAT_FLOAT
-#define XWEMCFG_vm_lua_THD_STACK                        8192
-#define XWEMCFG_vm_lua_BRDLIBS                          0
-
-#endif /* cfg/xwem.h */
+void xwlua_open_brdlibs(lua_State * L)
+{
+        xwlua_soc_register(L, "stm32", &stm32cube_soc_cb);
+}

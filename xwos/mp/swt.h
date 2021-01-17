@@ -34,7 +34,7 @@ enum xwmp_swt_flag_em {
 /**
  * @brief 软件定时器回调函数
  */
-typedef void (*xwmp_swt_f)(struct xwmp_swt *, void *);
+typedef void (* xwmp_swt_f)(struct xwmp_swt *, void *);
 
 /**
  * @brief 软件定时器控制块

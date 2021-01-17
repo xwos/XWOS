@@ -24,7 +24,7 @@ include $(XWBS_UTIL_MK_XWMO)
 
 # 增加源代码文件
 XWMO_CSRCS :=
-XWMO_CSRCS += main.c thd.c xwpcp.c xwscp.c
+XWMO_CSRCS += ds.c
 
 # 定义编译选项
 XWMO_CFLAGS :=
@@ -33,6 +33,8 @@ XWMO_CFLAGS += $(CUBEMX_CFLAGS)
 
 # 定义头文件路径
 XWMO_INCDIRS := $(call getXwmoDir) # getXwmoDir函数可获取当前玄武模块的路径
+XWMO_INCDIRS += xwem/vm/lua
+XWMO_INCDIRS += xwem/vm/lua/src
 
 # 引入编译规则
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)

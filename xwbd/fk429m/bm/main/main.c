@@ -26,7 +26,6 @@
 #include <bm/pm/mif.h>
 #include <bm/main/thd.h>
 #include <xwam/example/cxx/mif.h>
-/* #include <xwam/example/sync/sel/mif.h> */
 
 #define MAIN_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
 
@@ -110,15 +109,8 @@ xwer_t main_task(void * arg)
                 goto err_example_cxx_start;
         }
 
-        /* rc = example_sel_start(); */
-        /* if (rc < 0) { */
-        /*         goto err_example_sel_start; */
-        /* } */
-
         return XWOK;
 
-/* err_example_sel_start: */
-/*         BDL_BUG(); */
 err_example_cxx_start:
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
         BDL_BUG();

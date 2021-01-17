@@ -52,5 +52,6 @@
 #define BMCFG_main                              1
 #define BMCFG_stm32cube                         1
 #define BMCFG_pm                                1
+#define BMCFG_luamod                            1
 
 #endif /* cfg/board.h */

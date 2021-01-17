@@ -11,9 +11,9 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/mm/mempool/allocator.h>
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#include "src/lua.h"
+#include "src/lualib.h"
+#include "src/lauxlib.h"
 #include "xwlua/port.h"
 
 const luaL_Reg xwlua_loadedlibs[] = {
@@ -28,8 +28,13 @@ const luaL_Reg xwlua_loadedlibs[] = {
         {LUA_DBLIBNAME, luaopen_debug},
         {XWLUA_LIB_NAME, xwlua_open_lib},
         {XWLUA_OS_NAME, xwlua_open_os},
+        {XWLUA_DS_NAME, xwlua_open_ds},
         {NULL, NULL},
 };
+
+#if defined(XWEMCFG_vm_lua_BRDLIBS) && (1 == XWEMCFG_vm_lua_BRDLIBS)
+extern void xwlua_open_brdlibs(lua_State * L);
+#endif
 
 void xwlua_openlibs(lua_State * L)
 {
@@ -41,6 +46,9 @@ void xwlua_openlibs(lua_State * L)
         }
         luaL_requiref(L, XWLUA_XT_NAME, xwlua_open_xt, 1);
         lua_pop(L, 1);
+#if defined(XWEMCFG_vm_lua_BRDLIBS) && (1 == XWEMCFG_vm_lua_BRDLIBS)
+        xwlua_open_brdlibs(L);
+#endif
 }
 
 void xwlua_xt_openlibs(lua_State * L)
