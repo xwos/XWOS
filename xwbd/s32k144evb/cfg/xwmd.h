@@ -52,6 +52,12 @@
 #define XWMDCFG_isc_xwscp_THD_PRIORITY                          \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
+/******** ******** Message Queue ******** ********/
+#define XWMDCFG_isc_xwmq                                        0
+#define XWMDCFG_isc_xwmq_LOG                                    0
+#define XWMDCFG_isc_xwmq_MEMSLICE                               0
+#define XWMDCFG_isc_xwmq_STDC_MM                                1
+
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********            C/C++ Runtime            ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
