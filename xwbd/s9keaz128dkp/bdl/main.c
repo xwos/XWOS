@@ -22,33 +22,33 @@
 #include <xwos/osal/skd.h>
 #include <bdl/standard.h>
 
-#define SYS_MGR_THD_PRIORITY   XWOS_SKD_PRIORITY_RT_MIN
+#define SYSMGR_THD_PRIORITY   XWOS_SKD_PRIORITY_RT_MIN
 
 static
-xwer_t sys_mgr_thd(void *arg);
+xwer_t sysmgr_thd_main(void *arg);
 
-const struct xwos_thd_desc sys_mgr_thd_desc = {
+const struct xwos_thd_desc sysmgr_thd_desc = {
         .name = "sys.mgr",
-        .prio = SYS_MGR_THD_PRIORITY,
+        .prio = SYSMGR_THD_PRIORITY,
         .stack = NULL,
         .stack_size = 1024,
-        .func = sys_mgr_thd,
+        .func = sysmgr_thd_main,
         .arg = NULL,
         .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
 };
-struct xwos_thd * sys_mgr_thd;
+struct xwos_thd * sysmgr_thd;
 
 xwer_t xwos_main(void)
 {
         xwer_t rc;
 
-        rc = xwos_thd_create(&sys_mgr_thd,
-                              sys_mgr_thd_desc.name,
-                              sys_mgr_thd_desc.func,
-                              sys_mgr_thd_desc.arg,
-                              sys_mgr_thd_desc.stack_size,
-                              sys_mgr_thd_desc.prio,
-                              sys_mgr_thd_desc.attr);
+        rc = xwos_thd_create(&sysmgr_thd,
+                             sysmgr_thd_desc.name,
+                             sysmgr_thd_desc.func,
+                             sysmgr_thd_desc.arg,
+                             sysmgr_thd_desc.stack_size,
+                             sysmgr_thd_desc.prio,
+                             sysmgr_thd_desc.attr);
         if (XWOK == rc) {
                 rc = xwos_skd_start_lc();
         }
@@ -56,7 +56,7 @@ xwer_t xwos_main(void)
         return rc;
 }
 
-xwer_t sys_mgr_thd(void *arg)
+xwer_t sysmgr_thd_main(void *arg)
 {
         xwtm_t time;
         xwer_t rc;

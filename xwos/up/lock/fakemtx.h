@@ -60,6 +60,8 @@ xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio)
         struct xwup_sem * sem;
         xwer_t rc;
 
+        XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
+
         XWOS_UNUSED(sprio);
         rc = XWUP_SEM_API(create, &sem, 1, 1);
         if (XWOK == rc) {
@@ -108,6 +110,25 @@ static __xwup_inline_api
 xwer_t xwup_mtx_lock_unintr(struct xwup_mtx * mtx)
 {
         return XWUP_SEM_API(wait_unintr, &mtx->fake);
+}
+
+static __xwup_inline_api
+xwer_t xwup_mtx_getlkst(struct xwup_mtx * mtx, xwsq_t * lkst)
+{
+        xwer_t rc;
+        xwssq_t val;
+
+        XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
+
+        val = 0;
+        rc = XWUP_SEM_API(getvalue, &mtx->fake, &val);
+        if (val) {
+                *lkst = XWOS_LKST_LOCKED;
+        } else {
+                *lkst = XWOS_LKST_UNLOCKED;
+        }
+        return rc;
+
 }
 
 #endif /* xwos/up/lock/fakemtx.h */

@@ -1297,7 +1297,7 @@ __xwup_api
 xwer_t xwup_evt_sync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t msk[], xwbmp_t sync[])
 {
         xwtm_t expected = XWTM_MAX;
-        return xwup_evt_timedsync(evt, pos, sync, &expected);
+        return xwup_evt_timedsync(evt, pos, msk, sync, &expected);
 }
 
 /**

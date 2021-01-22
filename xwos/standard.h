@@ -70,6 +70,11 @@
   #define XWOS_VALIDATE(exp, errstr, ...)
 #endif /* !XWKNCFG_CHECK_PARAMETERS */
 
+#define XWOS_VALIDATE_FORCE(exp, errstr, ...)   \
+        if (__xwcc_unlikely((!(exp)))) {        \
+                return __VA_ARGS__;             \
+        }
+
 #if defined(ARCHCFG_PTRSIZE)
   #define XWOS_PTRSIZE        (ARCHCFG_PTRSIZE)
 #else /* ARCHCFG_PTRSIZE */

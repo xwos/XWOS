@@ -27,12 +27,15 @@
 
 struct xwpcp bm_xwpcp;
 
+XWPCP_DEF_MEMPOOL(bm_xwpcp_mem);
+
 xwer_t bm_xwpcp_start(void)
 {
         xwer_t rc;
 
         rc = xwpcp_start(&bm_xwpcp, "bm.xwpcp",
-                         &xwpcpif_uart_ops, &stm32cube_usart1_cb);
+                         &xwpcpif_uart_ops, &stm32cube_usart1_cb,
+                         bm_xwpcp_mem, sizeof(bm_xwpcp_mem));
         return rc;
 }
 

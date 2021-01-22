@@ -27,12 +27,15 @@
 
 struct xwscp bm_xwscp;
 
+XWSCP_DEF_MEMPOOL(bm_xwscp_mem);
+
 xwer_t bm_xwscp_start(void)
 {
         xwer_t rc;
 
         rc = xwscp_start(&bm_xwscp, "bm.xwscp",
-                         &xwscpif_uart_ops, &stm32cube_usart1_cb);
+                         &xwscpif_uart_ops, &stm32cube_usart1_cb,
+                         bm_xwscp_mem, sizeof(bm_xwscp_mem));
         return rc;
 }
 

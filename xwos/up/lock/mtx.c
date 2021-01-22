@@ -798,7 +798,6 @@ xwer_t xwup_mtx_lock_unintr(struct xwup_mtx * mtx)
 __xwup_api
 xwer_t xwup_mtx_getlkst(struct xwup_mtx * mtx, xwsq_t * lkst)
 {
-        xwer_t rc;
         volatile struct xwup_mtxtree * ownertree;
 
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);

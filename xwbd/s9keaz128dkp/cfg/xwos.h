@@ -32,8 +32,8 @@
  ******** ********         xwlib Configurations        ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWLIBCFG_LOG                                    0
-#define XWLIBCFG_XWLOG_LEVEL                            (0)
-#define XWLIBCFG_XWLOG_BUFSIZE                          (128)
+#define XWLIBCFG_XWLOG_LEVEL                            (0U)
+#define XWLIBCFG_XWLOG_BUFSIZE                          (128U)
 
 #define XWLIBCFG_XWBOP_FFS8                             1
 #define XWLIBCFG_XWBOP_FLS8                             1
