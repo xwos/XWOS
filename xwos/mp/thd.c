@@ -88,12 +88,12 @@ xwer_t xwmp_thd_outmigrate_reqfrz_lic(struct xwmp_thd * thd, xwid_t dstcpu);
 /**
  * @brief 结构体xwmp_thd的对象缓存
  */
-__xwmp_data static struct xwmm_memslice * xwmp_thd_cache = NULL;
+static __xwmp_data struct xwmm_memslice xwmp_thd_cache;
 
 /**
  * @brief 结构体xwmp_thd的对象缓存的名字
  */
-__xwmp_rodata const char xwmp_thd_cache_name[] = "xwmp.mp.thd.cache";
+const __xwmp_rodata char xwmp_thd_cache_name[] = "xwmp.mp.thd.cache";
 #endif /* XWMPCFG_SKD_THD_MEMSLICE */
 
 #if defined(XWMPCFG_SKD_THD_MEMSLICE) && (1 == XWMPCFG_SKD_THD_MEMSLICE)
@@ -108,19 +108,13 @@ __xwmp_rodata const char xwmp_thd_cache_name[] = "xwmp.mp.thd.cache";
 __xwmp_init_code
 xwer_t xwmp_thd_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 {
-        struct xwmm_memslice * msa;
         xwer_t rc;
 
-        rc = xwmm_memslice_create(&msa, zone_origin, zone_size,
-                                  sizeof(struct xwmp_thd),
-                                  xwmp_thd_cache_name,
-                                  (ctor_f)xwmp_thd_construct,
-                                  (dtor_f)xwmp_thd_destruct);
-        if (__xwcc_unlikely(rc < 0)) {
-                xwmp_thd_cache = NULL;
-        } else {
-                xwmp_thd_cache = msa;
-        }
+        rc = xwmm_memslice_init(&xwmp_thd_cache, zone_origin, zone_size,
+                                sizeof(struct xwmp_thd),
+                                xwmp_thd_cache_name,
+                                (ctor_f)xwmp_thd_construct,
+                                (dtor_f)xwmp_thd_destruct);
         return rc;
 }
 #endif /* XWMPCFG_SKD_THD_MEMSLICE */
@@ -139,7 +133,7 @@ struct xwmp_thd * xwmp_thd_alloc(void)
         } mem;
         xwer_t rc;
 
-        rc = xwmm_memslice_alloc(xwmp_thd_cache, &mem.anon);
+        rc = xwmm_memslice_alloc(&xwmp_thd_cache, &mem.anon);
         if (rc < 0) {
                 mem.thd = err_ptr(rc);
         }/* else {} */
@@ -169,7 +163,7 @@ static __xwmp_code
 void xwmp_thd_free(struct xwmp_thd * thd)
 {
 #if defined(XWMPCFG_SKD_THD_MEMSLICE) && (1 == XWMPCFG_SKD_THD_MEMSLICE)
-        xwmm_memslice_free(xwmp_thd_cache, thd);
+        xwmm_memslice_free(&xwmp_thd_cache, thd);
 #else /* XWMPCFG_SKD_THD_MEMSLICE */
         xwmp_thd_destruct(thd);
         xwmm_kma_free(thd);

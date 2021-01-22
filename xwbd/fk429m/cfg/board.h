@@ -39,7 +39,9 @@
  ******** ********          memory management          ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define BRDCFG_MM_CCMHEAP_BLKSZ                 (512U)
+#define BRDCFG_MM_CCMHEAP_BLKODR                (6U) /* 64 */
 #define BRDCFG_MM_STKMEMPOOL_BLKSZ              (1024U)
+#define BRDCFG_MM_STKMEMPOOL_BLKODR             (7U) /* 128 */
 #define BRDCFG_XWOS_THD_CACHE_ODR               3
 #define BRDCFG_XWOS_SWT_CACHE_ODR               0
 #define BRDCFG_XWOS_SEM_CACHE_ODR               0

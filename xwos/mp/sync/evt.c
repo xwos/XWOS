@@ -34,12 +34,12 @@
 /**
  * @brief 结构体xwmp_evt的对象缓存
  */
-static __xwmp_data struct xwmm_memslice * xwmp_evt_cache = NULL;
+static __xwmp_data struct xwmm_memslice xwmp_evt_cache;
 
 /**
  * @brief 结构体xwmp_evt的对象缓存的名字
  */
-__xwmp_rodata const char xwmp_evt_cache_name[] = "xwos.mp.sync.evt.cache";
+const __xwmp_rodata char xwmp_evt_cache_name[] = "xwos.mp.sync.evt.cache";
 #endif /* XWMPCFG_SYNC_EVT_MEMSLICE */
 
 static __xwmp_code
@@ -93,19 +93,13 @@ xwer_t xwmp_evt_timedwait_edge(struct xwmp_evt * evt, xwsq_t trigger,
 __xwmp_init_code
 xwer_t xwmp_evt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 {
-        struct xwmm_memslice * msa;
         xwer_t rc;
 
-        rc = xwmm_memslice_create(&msa, zone_origin, zone_size,
-                                  sizeof(struct xwmp_evt),
-                                  xwmp_evt_cache_name,
-                                  (ctor_f)xwmp_evt_construct,
-                                  (dtor_f)xwmp_evt_destruct);
-        if (__xwcc_unlikely(rc < 0)) {
-                xwmp_evt_cache = NULL;
-        } else {
-                xwmp_evt_cache = msa;
-        }
+        rc = xwmm_memslice_init(&xwmp_evt_cache, zone_origin, zone_size,
+                                sizeof(struct xwmp_evt),
+                                xwmp_evt_cache_name,
+                                (ctor_f)xwmp_evt_construct,
+                                (dtor_f)xwmp_evt_destruct);
         return rc;
 }
 #endif /* XWMPCFG_SYNC_EVT_MEMSLICE */
@@ -124,7 +118,7 @@ struct xwmp_evt * xwmp_evt_alloc(void)
         } mem;
         xwer_t rc;
 
-        rc = xwmm_memslice_alloc(xwmp_evt_cache, &mem.anon);
+        rc = xwmm_memslice_alloc(&xwmp_evt_cache, &mem.anon);
         if (rc < 0) {
                 mem.evt = err_ptr(rc);
         }/* else {} */
@@ -154,7 +148,7 @@ static __xwmp_code
 void xwmp_evt_free(struct xwmp_evt * evt)
 {
 #if defined(XWMPCFG_SYNC_EVT_MEMSLICE) && (1 == XWMPCFG_SYNC_EVT_MEMSLICE)
-        xwmm_memslice_free(xwmp_evt_cache, evt);
+        xwmm_memslice_free(&xwmp_evt_cache, evt);
 #else /* XWMPCFG_SYNC_EVT_MEMSLICE */
         xwmp_evt_destruct(evt);
         xwmm_kma_free(evt);

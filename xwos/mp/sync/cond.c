@@ -41,12 +41,12 @@
 /**
  * @brief 结构体xwmp_cond的对象缓存
  */
-static __xwmp_data struct xwmm_memslice * xwmp_cond_cache = NULL;
+static __xwmp_data struct xwmm_memslice xwmp_cond_cache;
 
 /**
  * @brief 结构体xwmp_cond的对象缓存的名字
  */
-__xwmp_rodata const char xwmp_cond_cache_name[] = "xwos.mp.sync.cond.cache";
+const __xwmp_rodata char xwmp_cond_cache_name[] = "xwos.mp.sync.cond.cache";
 #endif /* XWMPCFG_SYNC_COND_MEMSLICE */
 
 static __xwmp_code
@@ -81,19 +81,13 @@ xwer_t xwmp_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
 __xwmp_init_code
 xwer_t xwmp_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 {
-        struct xwmm_memslice * msa;
         xwer_t rc;
 
-        rc = xwmm_memslice_create(&msa, zone_origin, zone_size,
-                                  sizeof(struct xwmp_cond),
-                                  xwmp_cond_cache_name,
-                                  (ctor_f)xwmp_cond_construct,
-                                  (dtor_f)xwmp_cond_destruct);
-        if (__xwcc_unlikely(rc < 0)) {
-                xwmp_cond_cache = NULL;
-        } else {
-                xwmp_cond_cache = msa;
-        }
+        rc = xwmm_memslice_init(&xwmp_cond_cache, zone_origin, zone_size,
+                                sizeof(struct xwmp_cond),
+                                xwmp_cond_cache_name,
+                                (ctor_f)xwmp_cond_construct,
+                                (dtor_f)xwmp_cond_destruct);
         return rc;
 }
 #endif /* XWMPCFG_SYNC_COND_MEMSLICE */
@@ -112,7 +106,7 @@ struct xwmp_cond * xwmp_cond_alloc(void)
         } mem;
         xwer_t rc;
 
-        rc = xwmm_memslice_alloc(xwmp_cond_cache, &mem.anon);
+        rc = xwmm_memslice_alloc(&xwmp_cond_cache, &mem.anon);
         if (rc < 0) {
                 mem.cond = err_ptr(rc);
         }/* else {} */
@@ -142,7 +136,7 @@ static __xwmp_code
 void xwmp_cond_free(struct xwmp_cond * cond)
 {
 #if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
-        xwmm_memslice_free(xwmp_cond_cache, cond);
+        xwmm_memslice_free(&xwmp_cond_cache, cond);
 #else /* XWMPCFG_SYNC_COND_MEMSLICE */
         xwmp_cond_destruct(cond);
         xwmm_kma_free(cond);

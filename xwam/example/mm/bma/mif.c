@@ -25,6 +25,7 @@
 
 #define XWMMDEMO_BMA_MEMSIZE            8192U
 #define XWMMDEMO_BMA_BLKSIZE            128U
+#define XWMMDEMO_BMA_BLKODR             6U
 
 /**
  * @brief 伙伴算法内存块分配器的内存区间
@@ -34,7 +35,8 @@ xwu8_t __xwcc_alignl1cache xwmmdemo_bma_mempool[XWMMDEMO_BMA_MEMSIZE];
 /**
  * @brief 伙伴算法内存块分配器
  */
-struct xwmm_bma * xwmmdemo_bma;
+XWMM_BMA_DEF(xwmmdemo_bma_raw, XWMMDEMO_BMA_BLKODR);
+struct xwmm_bma * xwmmdemo_bma = (struct xwmm_bma *)xwmmdemo_bma_raw;
 
 /**
  * @brief 模块的加载函数
@@ -48,12 +50,13 @@ xwer_t example_bma_start(void)
            + 内存区域：xwmmdemo_bma_mempool
            + 大小：XWMMDEMO_BMA_MEMSIZE
            + 单位块内存大小：XWMMDEMO_BMA_BLKSIZE
-           + 单位块的数量：XWMMDEMO_BMA_MEMSIZE / XWMMDEMO_BMA_BLKSIZE
-                           （必须满足数量为2的n次方） */
-        rc = xwmm_bma_create(&xwmmdemo_bma, "xwmmdemo_bma",
-                             (xwptr_t)xwmmdemo_bma_mempool,
-                             sizeof(xwmmdemo_bma_mempool),
-                             XWMMDEMO_BMA_BLKSIZE);
+           + 单位块的数量：XWMMDEMO_BMA_MEMSIZE / XWMMDEMO_BMA_BLKSIZE，
+             数量的值必须为2的n次方，并以2为底的对数形式表示，即下面等式必须成立
+             (1 << XWMMDEMO_BMA_BLKODR) == XWMMDEMO_BMA_MEMSIZE / XWMMDEMO_BMA_BLKSIZE
+         */
+        rc = xwmm_bma_init(xwmmdemo_bma, "xwmmdemo_bma",
+                           (xwptr_t)xwmmdemo_bma_mempool, XWMMDEMO_BMA_MEMSIZE,
+                           XWMMDEMO_BMA_BLKSIZE, XWMMDEMO_BMA_BLKODR);
         if (rc < 0) {
                 /* 初始化失败 */
                 goto err_bma_init;

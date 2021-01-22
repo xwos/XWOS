@@ -18,11 +18,8 @@
 #if (XWMDCFG_isc_xwpcp_MEMBLK_SIZE & (XWMDCFG_isc_xwpcp_MEMBLK_SIZE - 1))
   #error "XWMDCFG_isc_xwpcp_MEMBLK_SIZE must be the power of 2!"
 #endif
-#if (XWMDCFG_isc_xwpcp_MEMBLK_NUM > 32768U)
-  #error "XWMDCFG_isc_xwpcp_MEMBLK_SIZE must be <= 32768!"
-#endif
-#if (XWMDCFG_isc_xwpcp_MEMBLK_NUM & (XWMDCFG_isc_xwpcp_MEMBLK_NUM - 1))
-  #error "XWMDCFG_isc_xwpcp_MEMBLK_NUM must be the power of 2!"
+#if ((1 << XWMDCFG_isc_xwpcp_MEMBLK_ODR) > 32768U)
+  #error "power(2, XWMDCFG_isc_xwpcp_MEMBLK_ODR) must be <= 32768!"
 #endif
 #if (XWMDCFG_isc_xwpcp_PORT_NUM > 256)
   #error "XWPCP Only supports 256 ports (0 ~ 255)!"
@@ -43,7 +40,8 @@
 #define XWPCP_RETRY_PERIOD      (XWMDCFG_isc_xwpcp_RETRY_PERIOD)
 #define XWPCP_RETRY_NUM         (XWMDCFG_isc_xwpcp_RETRY_NUM)
 #define XWPCP_MEMBLK_SIZE       (XWMDCFG_isc_xwpcp_MEMBLK_SIZE)
-#define XWPCP_MEMBLK_NUM        (XWMDCFG_isc_xwpcp_MEMBLK_NUM)
+#define XWPCP_MEMBLK_ODR        (XWMDCFG_isc_xwpcp_MEMBLK_ODR)
+#define XWPCP_MEMBLK_NUM        (1 << XWPCP_MEMBLK_ODR)
 #define XWPCP_MEMPOOL_SIZE      (XWPCP_MEMBLK_SIZE * XWPCP_MEMBLK_NUM)
 #define XWPCP_DEF_MEMPOOL(name) __xwcc_alignl1cache xwu8_t name[XWPCP_MEMPOOL_SIZE]
 

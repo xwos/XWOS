@@ -49,12 +49,12 @@ void xwmp_swt_ttn_cb(void * entry);
 /**
  * @brief 软件定时器对象缓存
  */
-__xwmp_data static struct xwmm_memslice * xwmp_swt_cache = NULL;
+static __xwmp_data struct xwmm_memslice xwmp_swt_cache;
 
 /**
  * @brief 软件定时器对象缓存的名字
  */
-__xwmp_rodata const char xwmp_swt_cache_name[] = "xwos.mp.swt.cache";
+const __xwmp_rodata char xwmp_swt_cache_name[] = "xwos.mp.swt.cache";
 #endif /* XWMPCFG_SKD_SWT_MEMSLICE */
 
 #if defined(XWMPCFG_SKD_SWT_MEMSLICE) && (1 == XWMPCFG_SKD_SWT_MEMSLICE)
@@ -69,19 +69,13 @@ __xwmp_rodata const char xwmp_swt_cache_name[] = "xwos.mp.swt.cache";
 __xwmp_init_code
 xwer_t xwmp_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 {
-        struct xwmm_memslice * msa;
         xwer_t rc;
 
-        rc = xwmm_memslice_create(&msa, zone_origin, zone_size,
-                                  sizeof(struct xwmp_swt),
-                                  xwmp_swt_cache_name,
-                                  (ctor_f)xwmp_swt_construct,
-                                  (dtor_f)xwmp_swt_destruct);
-        if (__xwcc_unlikely(rc < 0)) {
-                xwmp_swt_cache = NULL;
-        } else {
-                xwmp_swt_cache = msa;
-        }
+        rc = xwmm_memslice_init(&xwmp_swt_cache, zone_origin, zone_size,
+                                sizeof(struct xwmp_swt),
+                                xwmp_swt_cache_name,
+                                (ctor_f)xwmp_swt_construct,
+                                (dtor_f)xwmp_swt_destruct);
         return rc;
 }
 #endif /* XWMPCFG_SKD_SWT_MEMSLICE */
@@ -100,7 +94,7 @@ struct xwmp_swt * xwmp_swt_alloc(void)
         } mem;
         xwer_t rc;
 
-        rc = xwmm_memslice_alloc(xwmp_swt_cache, &mem.anon);
+        rc = xwmm_memslice_alloc(&xwmp_swt_cache, &mem.anon);
         if (rc < 0) {
                 mem.swt = err_ptr(rc);
         }/* else {} */
@@ -130,7 +124,7 @@ static __xwmp_code
 void xwmp_swt_free(struct xwmp_swt * swt)
 {
 #if defined(XWMPCFG_SKD_SWT_MEMSLICE) && (1 == XWMPCFG_SKD_SWT_MEMSLICE)
-        xwmm_memslice_free(xwmp_swt_cache, swt);
+        xwmm_memslice_free(&xwmp_swt_cache, swt);
 #else /* XWMPCFG_SKD_SWT_MEMSLICE */
         xwmp_swt_destruct(swt);
         xwmm_kma_free(swt);

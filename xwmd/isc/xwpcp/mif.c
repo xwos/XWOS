@@ -95,7 +95,6 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
                    xwu8_t * mem, xwsz_t memsize)
 {
         xwer_t rc;
-        struct xwmm_bma * bma;
         xwssq_t i, j;
 
         XWPCP_VALIDATE((xwpcp), "nullptr", -EFAULT);
@@ -121,15 +120,14 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         xwos_object_activate(&xwpcp->xwobj, xwpcp_gc);
 
         /* 创建内存池 */
-        rc = xwmm_bma_create(&bma, xwpcp_mempool_name,
-                             (xwptr_t)mem,
-                             XWPCP_MEMPOOL_SIZE,
-                             XWPCP_MEMBLK_SIZE);
+        xwpcp->mempool = (struct xwmm_bma *)&xwpcp->mempool_bma_raw;
+        rc = xwmm_bma_init(xwpcp->mempool, xwpcp_mempool_name,
+                           (xwptr_t)mem, memsize,
+                           XWPCP_MEMBLK_SIZE, XWPCP_MEMBLK_ODR);
         if (__xwcc_unlikely(rc < 0)) {
-                xwpcplogf(ERR, "Create bma ... [rc:%d]\n", rc);
-                goto err_bma_create;
+                xwpcplogf(ERR, "Init bma ... [rc:%d]\n", rc);
+                goto err_bma_init;
         }
-        xwpcp->mempool = bma;
         xwpcplogf(DEBUG, "Create BMA ... [OK]\n");
 
         /* 初始化发送状态机 */
@@ -228,9 +226,7 @@ err_cscond_init:
 err_csmtx_init:
         xwos_sem_destroy(&xwpcp->txq.qsem);
 err_txqsem_init:
-        xwmm_bma_delete(xwpcp->mempool);
-        xwpcp->mempool = NULL;
-err_bma_create:
+err_bma_init:
         xwos_object_rawput(&xwpcp->xwobj);
         return rc;
 }
@@ -317,10 +313,6 @@ xwer_t xwpcp_gc(void * obj)
         xwos_cond_destroy(&xwpcp->txq.cscond);
         xwos_mtx_destroy(&xwpcp->txq.csmtx);
         xwos_sem_destroy(&xwpcp->txq.qsem);
-        if (xwpcp->mempool) {
-                xwmm_bma_delete(xwpcp->mempool);
-                xwpcp->mempool = NULL;
-        }
         return XWOK;
 }
 
@@ -566,8 +558,6 @@ xwer_t xwpcp_abort(struct xwpcp * xwpcp, xwpcp_txh_t txh)
 __xwmd_api
 xwsq_t xwpcp_get_txstate(xwpcp_txh_t txh)
 {
-        XWPCP_VALIDATE((txh), "nullptr", -EFAULT);
-
         return txh->state;
 }
 

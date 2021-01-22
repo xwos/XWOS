@@ -44,11 +44,6 @@ xwer_t xwmm_memslice_init(struct xwmm_memslice * msa,
                           xwptr_t origin, xwsz_t total_size,
                           xwsz_t card_size, const char * name,
                           ctor_f ctor, dtor_f dtor);
-xwer_t xwmm_memslice_destroy(struct xwmm_memslice * msa);
-xwer_t xwmm_memslice_create(struct xwmm_memslice ** ptrbuf,
-                            xwptr_t origin, xwsz_t total_size, xwsz_t card_size,
-                            const char * name, ctor_f ctor, dtor_f dtor);
-xwer_t xwmm_memslice_delete(struct xwmm_memslice * msa);
 xwer_t xwmm_memslice_alloc(struct xwmm_memslice * msa, void ** membuf);
 xwer_t xwmm_memslice_free(struct xwmm_memslice * msa, void * mem);
 

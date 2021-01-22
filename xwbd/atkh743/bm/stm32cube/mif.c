@@ -18,6 +18,7 @@
  * > limitations under the License.
  */
 
+#include <xwos/lib/xwbop.h>
 #include <bm/stm32cube/standard.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
@@ -110,6 +111,7 @@ __xwbsp_init_code
 void stm32cube_init(void)
 {
         xwer_t rc;
+        xwssq_t odr;
 
         HAL_Init();
         SystemClock_Config();
@@ -133,9 +135,11 @@ void stm32cube_init(void)
         SCB_CleanInvalidateDCache();
 #endif /* STM32CUBECFG_DCACHE */
 
+        odr = xwbop_fls(xwsz_t, (xwsz_t)sdram_mr_size / XWMM_MEMPOOL_PAGE_SIZE);
         rc = xwmm_mempool_init(sdram_mempool, "SDRAM",
                                (xwptr_t)sdram_mr_origin,
-                               (xwsz_t)sdram_mr_size);
+                               (xwsz_t)sdram_mr_size,
+                               (xwsz_t)odr);
         BDL_BUG_ON(rc < 0);
 
         stm32cube_crc_init();

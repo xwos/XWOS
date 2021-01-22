@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 消息队列：应用接口层
+ * @brief 消息队列
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -31,8 +31,6 @@ void xwmq_construct(struct xwmq * mq)
         xwos_object_construct(&mq->xwobj);
         mq->name = NULL;
         xwlib_bclst_init_head(&mq->head);
-        xwos_splk_init(&mq->lock);
-        xwos_sem_init(&mq->sem, 0, XWSSQ_MAX);
 }
 
 /**
@@ -42,7 +40,6 @@ void xwmq_construct(struct xwmq * mq)
 static __xwmd_code
 void xwmq_destruct(struct xwmq * mq)
 {
-        xwos_sem_destroy(&mq->sem);
         xwos_object_destruct(&mq->xwobj);
 }
 
@@ -50,12 +47,12 @@ void xwmq_destruct(struct xwmq * mq)
 /**
  * @brief 消息队列对象缓存
  */
-__xwmd_data static struct xwmm_memslice * xwmq_cache = NULL;
+static __xwmd_data struct xwmm_memslice xwmq_cache;
 
 /**
  * @brief 消息队列对象缓存的名字
  */
-__xwmd_rodata const char xwmq_cache_name[] = "xwmd.mq.cache";
+const __xwmd_rodata char xwmq_cache_name[] = "xwmd.mq.cache";
 #endif /* XWMDCFG_isc_xwmq_MEMSLICE */
 
 #if defined(XWMDCFG_isc_xwmq_MEMSLICE) && (1 == XWMDCFG_isc_xwmq_MEMSLICE)
@@ -70,19 +67,13 @@ __xwmd_rodata const char xwmq_cache_name[] = "xwmd.mq.cache";
 __xwmd_init_code
 xwer_t xwmq_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 {
-        struct xwmm_memslice * msa;
         xwer_t rc;
 
-        rc = xwmm_memslice_create(&msa, zone_origin, zone_size,
-                                  sizeof(struct xwmq),
-                                  xwmq_cache_name,
-                                  (ctor_f)xwmq_construct,
-                                  (dtor_f)xwmq_destruct);
-        if (__xwcc_unlikely(rc < 0)) {
-                xwmq_cache = NULL;
-        } else {
-                xwmq_cache = msa;
-        }
+        rc = xwmm_memslice_init(&xwmq_cache, zone_origin, zone_size,
+                                sizeof(struct xwmq),
+                                xwmq_cache_name,
+                                (ctor_f)xwmq_construct,
+                                (dtor_f)xwmq_destruct);
         return rc;
 }
 #endif /* XWMDCFG_isc_xwmq_MEMSLICE */
@@ -101,7 +92,7 @@ struct xwmq * xwmq_alloc(void)
         } mem;
         xwer_t rc;
 
-        rc = xwmm_memslice_alloc(xwmq_cache, &mem.anon);
+        rc = xwmm_memslice_alloc(&xwmq_cache, &mem.anon);
         if (rc < 0) {
                 mem.mq = err_ptr(rc);
         }/* else {} */
@@ -140,7 +131,7 @@ static __xwmd_code
 void xwmq_free(struct xwmq * mq)
 {
 #if defined(XWMDCFG_isc_xwmq_MEMSLICE) && (1 == XWMDCFG_isc_xwmq_MEMSLICE)
-        xwmm_memslice_free(xwmq_cache, mq);
+        xwmm_memslice_free(&xwmq_cache, mq);
 #elif defined(XWMDCFG_isc_xwmq_STDC_MM) && (1 == XWMDCFG_isc_xwmq_STDC_MM)
         xwmq_destruct(mq);
         free(mq);
@@ -156,8 +147,12 @@ void xwmq_free(struct xwmq * mq)
  * @return 错误码
  */
 static __xwmd_code
-xwer_t xwmq_gc(void * mq)
+xwer_t xwmq_gc(void * obj)
 {
+        struct xwmq * mq;
+
+        mq = obj;
+        xwos_sem_destroy(&mq->sem);
         xwmq_free(mq);
         return XWOK;
 }
@@ -270,6 +265,8 @@ xwer_t xwmq_activate(struct xwmq * mq, const char * name, xwobj_gc_f gcfunc)
                 goto err_xwobj_activate;
         }
         mq->name = name;
+        xwos_splk_init(&mq->lock);
+        xwos_sem_init(&mq->sem, 0, XWSSQ_MAX);
         return XWOK;
 
 err_xwobj_activate:
@@ -398,12 +395,12 @@ void xwmq_msg_destruct(struct xwmq_msg * msg)
 /**
  * @brief 消息对象缓存
  */
-__xwmd_data static struct xwmm_memslice * xwmq_msg_cache = NULL;
+static __xwmd_data struct xwmm_memslice xwmq_msg_cache;
 
 /**
  * @brief 消息对象缓存的名字
  */
-__xwmd_rodata const char xwmq_msg_cache_name[] = "xwmd.mq.msg.cache";
+const __xwmd_rodata char xwmq_msg_cache_name[] = "xwmd.mq.msg.cache";
 #endif /* XWMDCFG_isc_xwmq_MEMSLICE */
 
 #if defined(XWMDCFG_isc_xwmq_MEMSLICE) && (1 == XWMDCFG_isc_xwmq_MEMSLICE)
@@ -418,19 +415,13 @@ __xwmd_rodata const char xwmq_msg_cache_name[] = "xwmd.mq.msg.cache";
 __xwmd_init_code
 xwer_t xwmq_msg_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 {
-        struct xwmm_memslice * msa;
         xwer_t rc;
 
-        rc = xwmm_memslice_create(&msa, zone_origin, zone_size,
-                                  sizeof(struct xwmq_msg),
-                                  xwmq_msg_cache_name,
-                                  (ctor_f)xwmq_msg_construct,
-                                  (dtor_f)xwmq_msg_destruct);
-        if (__xwcc_unlikely(rc < 0)) {
-                xwmq_msg_cache = NULL;
-        } else {
-                xwmq_msg_cache = msa;
-        }
+        rc = xwmm_memslice_init(&xwmq_msg_cache, zone_origin, zone_size,
+                                sizeof(struct xwmq_msg),
+                                xwmq_msg_cache_name,
+                                (ctor_f)xwmq_msg_construct,
+                                (dtor_f)xwmq_msg_destruct);
         return rc;
 }
 #endif /* XWMDCFG_isc_xwmq_MEMSLICE */
@@ -449,7 +440,7 @@ struct xwmq_msg * xwmq_msg_alloc(void)
         } mem;
         xwer_t rc;
 
-        rc = xwmm_memslice_alloc(xwmq_msg_cache, &mem.anon);
+        rc = xwmm_memslice_alloc(&xwmq_msg_cache, &mem.anon);
         if (rc < 0) {
                 mem.msg = err_ptr(rc);
         }/* else {} */
@@ -488,7 +479,7 @@ static __xwmd_code
 void xwmq_msg_free(struct xwmq_msg * msg)
 {
 #if defined(XWMDCFG_isc_xwmq_MEMSLICE) && (1 == XWMDCFG_isc_xwmq_MEMSLICE)
-        xwmm_memslice_free(xwmq_msg_cache, msg);
+        xwmm_memslice_free(&xwmq_msg_cache, msg);
 #elif defined(XWMDCFG_isc_xwmq_STDC_MM) && (1 == XWMDCFG_isc_xwmq_STDC_MM)
         xwmq_msg_destruct(msg);
         free(msg);

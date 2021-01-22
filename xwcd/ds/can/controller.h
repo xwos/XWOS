@@ -61,7 +61,7 @@ struct xwds_canc_bd_cfg {
         xwid_t id; /**< 配置ID */
         xwu32_t bdkb; /**< 波特率（单位：Kb） */
         struct {
-                xwu8_t ss; /**< 同步段(sync seg)：根据CAN网络协议始终设置为1 tq */
+                xwu8_t ss; /**< 同步段(sync seg)：始终设置为1 tq */
                 xwu8_t pts; /**< 传播段(propagation time segment)：1 ~ 8 tq */
                 xwu8_t ps1; /**< 相位缓冲段1(phase buffer segment 1)：1 ~ 8 tq */
                 xwu8_t ps2; /**< 相位缓冲段2(phase buffer segment 2)：1 ~ 8 tq */
@@ -172,15 +172,15 @@ struct xwds_canc_driver {
  * @brief CAN控制器应用层回调函数表
  */
 struct xwds_canc_cbtbl {
-        void (*tx_indication)(struct xwds_canc *, xwid_t,
-                              xwer_t); /**< 指示消息发送结果 */
-        void (*rx_indication)(struct xwds_canc *, xwid_t,
-                              struct xwds_can_msg *); /**< 指示消息接收结果 */
-        void (*wakeup_notification)(struct xwds_canc *); /**< 指示唤醒 */
-        void (*mode_indication)(struct xwds_canc *, xwsq_t); /**< 指示模式切换 */
-        void (*err_indication)(struct xwds_canc *, xwsq_t,
-                               xwsq_t, xwsq_t); /**< 指示错误发生 */
-        void (*busoff_indication)(struct xwds_canc *); /**< 指示busoff */
+        void (* tx_indication)(struct xwds_canc *, xwid_t,
+                               xwer_t); /**< 指示消息发送结果 */
+        void (* rx_indication)(struct xwds_canc *, xwid_t,
+                               struct xwds_can_msg *); /**< 指示消息接收结果 */
+        void (* wakeup_notification)(struct xwds_canc *); /**< 指示唤醒 */
+        void (* mode_indication)(struct xwds_canc *, xwsq_t); /**< 指示模式切换 */
+        void (* err_indication)(struct xwds_canc *, xwsq_t,
+                                xwsq_t, xwsq_t); /**< 指示错误发生 */
+        void (* busoff_indication)(struct xwds_canc *); /**< 指示busoff */
 };
 
 /**

@@ -90,7 +90,6 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
                    xwu8_t * mem, xwsz_t memsize)
 {
         xwer_t rc;
-        struct xwmm_bma * bma;
 
         XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
         XWSCP_VALIDATE((hwifops), "nullptr", -EFAULT);
@@ -114,15 +113,14 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
         xwos_object_activate(&xwscp->xwobj, xwscp_gc);
 
         /* 创建内存池 */
-        rc = xwmm_bma_create(&bma, xwscp_mempool_name,
-                             (xwptr_t)mem,
-                             XWSCP_MEMPOOL_SIZE,
-                             XWSCP_MEMBLK_SIZE);
+        xwscp->mempool = (struct xwmm_bma *)&xwscp->mempool_bma_raw;
+        rc = xwmm_bma_init(xwscp->mempool, xwscp_mempool_name,
+                           (xwptr_t)mem, memsize,
+                           XWSCP_MEMPOOL_SIZE, XWSCP_MEMBLK_ODR);
         if (__xwcc_unlikely(rc < 0)) {
-                xwscplogf(ERR, "Create BMA ... [rc:%d]\n", rc);
-                goto err_bma_create;
+                xwscplogf(ERR, "init bma ... [rc:%d]\n", rc);
+                goto err_bma_init;
         }
-        xwscp->mempool = bma;
 
         /* 初始化发送状态机 */
         xwscp->tx.cnt = 0;
@@ -185,9 +183,7 @@ err_cscond_init:
 err_csmtx_init:
         xwos_mtx_destroy(&xwscp->tx.mtx);
 err_txmtx_init:
-        xwmm_bma_delete(xwscp->mempool);
-        xwscp->mempool = NULL;
-err_bma_create:
+err_bma_init:
         xwos_object_rawput(&xwscp->xwobj);
         return rc;
 }
@@ -222,8 +218,6 @@ xwer_t xwscp_gc(void * obj)
         struct xwscp * xwscp;
         xwer_t rc, childrc;
 
-        XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
-
         xwscp = obj;
         if (xwscp->rx.thd) {
                 rc = xwos_thd_stop(xwscp->rx.thd, &childrc);
@@ -238,10 +232,6 @@ xwer_t xwscp_gc(void * obj)
         xwos_cond_destroy(&xwscp->tx.cscond);
         xwos_mtx_destroy(&xwscp->tx.csmtx);
         xwos_mtx_destroy(&xwscp->tx.mtx);
-        if (xwscp->mempool) {
-                xwmm_bma_delete(xwscp->mempool);
-                xwscp->mempool = NULL;
-        }
         return XWOK;
 }
 

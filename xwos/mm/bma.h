@@ -35,6 +35,17 @@
 #endif /* !XWMM_BMA_LOG */
 
 /**
+ * @brief 定义伙伴算法内存块分配器结构体的RAW内存空间，
+ *        用于初始化伙伴算法内存块分配器结构体
+ * @param mem: (I) 内存数组名
+ * @param blkodr: (I) 伙伴算法内存块分配器中单位内存块的数量，以2的blkodr次方形式表示
+ */
+#define XWMM_BMA_DEF(mem, blkodr) \
+        xwu8_t mem[sizeof(struct xwmm_bma) + \
+                   (sizeof(struct xwmm_bma_bcb) * (1 << (blkodr))) + \
+                   (sizeof(struct xwmm_bma_orderlist) * ((blkodr) + 1))]
+
+/**
  * @brief 阶链表
  */
 struct xwmm_bma_orderlist {
@@ -59,19 +70,15 @@ struct xwmm_bma {
         struct xwmm_zone zone; /**< 内存区域 */
         const char * name; /**< 名字 */
         xwsz_t blksize; /**< 单位块的大小（单位：字节） */
-        xwsq_t max_order; /**< 最大阶数 */
+        xwsq_t blkodr; /**< 单位块的数量，以2的blkodr次方的形式表示 */
         struct xwmm_bma_orderlist * orderlists; /**< 阶链表数组指针 */
         struct xwmm_bma_bcb * bcbs; /**< 内存块控制块数组指针 */
+        xwu8_t rem[0]; /**< 结构体剩余的内存空间 */
 };
 
 xwer_t xwmm_bma_init(struct xwmm_bma * bma, const char * name,
-                     xwptr_t origin, xwsz_t total, xwsz_t blksize,
-                     struct xwmm_bma_orderlist * orderlists,
-                     struct xwmm_bma_bcb * bcbs);
-xwer_t xwmm_bma_destroy(struct xwmm_bma * bma);
-xwer_t xwmm_bma_create(struct xwmm_bma ** ptrbuf, const char * name,
-                       xwptr_t origin, xwsz_t total, xwsz_t blksize);
-xwer_t xwmm_bma_delete(struct xwmm_bma * bma);
+                     xwptr_t origin, xwsz_t size,
+                     xwsz_t blksize, xwsz_t blkodr);
 xwer_t xwmm_bma_alloc(struct xwmm_bma * bma, xwsq_t order, void ** membuf);
 xwer_t xwmm_bma_free(struct xwmm_bma * bma, void * mem);
 

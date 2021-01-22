@@ -33,6 +33,7 @@
 #include <bm/stm32cube/mif.h>
 
 #define OCHEAP_BLKSZ    BRDCFG_MM_OCHEAP_BLKSZ
+#define OCHEAP_BLKODR   BRDCFG_MM_OCHEAP_BLKODR
 
 extern xwsz_t ocheap_mr_origin[];
 extern xwsz_t ocheap_mr_size[];
@@ -40,7 +41,8 @@ extern xwsz_t ocheap_mr_size[];
 /**
  * @brief thread stack mempool zone
  */
-__xwbsp_data struct xwmm_bma * ocheap_bma = NULL;
+__xwbsp_data XWMM_BMA_DEF(ocheap_bma_raw, OCHEAP_BLKODR);
+__xwbsp_data struct xwmm_bma * ocheap_bma = (void *)ocheap_bma_raw;
 
 static __xwbsp_init_code
 xwer_t sys_mm_init(void);
@@ -68,17 +70,14 @@ void board_init(void)
 static __xwbsp_init_code
 xwer_t sys_mm_init(void)
 {
-        struct xwmm_bma * bma;
         xwer_t rc;
 
-        rc = xwmm_bma_create(&bma, "ocheap",
-                             (xwptr_t)ocheap_mr_origin,
-                             (xwsz_t)ocheap_mr_size,
-                             OCHEAP_BLKSZ);
+        rc = xwmm_bma_init(ocheap_bma, "ocheap",
+                           (xwptr_t)ocheap_mr_origin, (xwsz_t)ocheap_mr_size,
+                           OCHEAP_BLKSZ, OCHEAP_BLKODR);
         if (rc < 0) {
-                goto err_ocheap_bma_create;
+                goto err_ocheap_bma_init;
         }
-        ocheap_bma = bma;
 
 #if defined(XuanWuOS_CFG_CORE__mp)
         void * mem;
@@ -174,7 +173,7 @@ err_thd_cache_init:
 err_thd_bma_alloc:
         BDL_BUG();
 #endif /* XuanWuOS_CFG_CORE__mp */
-err_ocheap_bma_create:
+err_ocheap_bma_init:
         BDL_BUG();
         return rc;
 }

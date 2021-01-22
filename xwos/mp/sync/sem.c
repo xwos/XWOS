@@ -42,12 +42,12 @@
 /**
  * @brief 结构体xwmp_sem的对象缓存
  */
-static __xwmp_data struct xwmm_memslice * xwmp_sem_cache = NULL;
+static __xwmp_data struct xwmm_memslice xwmp_sem_cache;
 
 /**
  * @brief 结构体xwmp_sem的对象缓存的名字
  */
-__xwmp_rodata const char xwmp_sem_cache_name[] = "xwos.mp.sync.sem.cache";
+const __xwmp_rodata char xwmp_sem_cache_name[] = "xwos.mp.sync.sem.cache";
 #endif /* XWMPCFG_SYNC_SEM_MEMSLICE */
 
 static __xwmp_code
@@ -125,19 +125,13 @@ xwer_t xwmp_rtsem_do_wait_unintr(struct xwmp_sem * sem, struct xwmp_thd * thd);
 __xwmp_init_code
 xwer_t xwmp_sem_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 {
-        struct xwmm_memslice * msa;
         xwer_t rc;
 
-        rc = xwmm_memslice_create(&msa, zone_origin, zone_size,
-                                  sizeof(struct xwmp_sem),
-                                  xwmp_sem_cache_name,
-                                  (ctor_f)xwmp_sem_construct,
-                                  (dtor_f)xwmp_sem_destruct);
-        if (__xwcc_unlikely(rc < 0)) {
-                xwmp_sem_cache = NULL;
-        } else {
-                xwmp_sem_cache = msa;
-        }
+        rc = xwmm_memslice_init(&xwmp_sem_cache, zone_origin, zone_size,
+                                sizeof(struct xwmp_sem),
+                                xwmp_sem_cache_name,
+                                (ctor_f)xwmp_sem_construct,
+                                (dtor_f)xwmp_sem_destruct);
         return rc;
 }
 #endif /* XWMPCFG_SYNC_SEM_MEMSLICE */
@@ -156,7 +150,7 @@ struct xwmp_sem * xwmp_sem_alloc(void)
         } mem;
         xwer_t rc;
 
-        rc = xwmm_memslice_alloc(xwmp_sem_cache, &mem.anon);
+        rc = xwmm_memslice_alloc(&xwmp_sem_cache, &mem.anon);
         if (rc < 0) {
                 mem.sem = err_ptr(rc);
         }/* else {} */
@@ -186,7 +180,7 @@ static __xwmp_code
 void xwmp_sem_free(struct xwmp_sem * sem)
 {
 #if defined(XWMPCFG_SYNC_SEM_MEMSLICE) && (1 == XWMPCFG_SYNC_SEM_MEMSLICE)
-        xwmm_memslice_free(xwmp_sem_cache, sem);
+        xwmm_memslice_free(&xwmp_sem_cache, sem);
 #else /* XWMPCFG_SYNC_SEM_MEMSLICE */
         xwmp_sem_destruct(sem);
         xwmm_kma_free(sem);

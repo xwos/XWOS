@@ -14,6 +14,7 @@
 #define __xwmd_xwscp_protocol_h__
 
 #include <xwos/standard.h>
+#include <xwos/lib/object.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwaop.h>
 #include <xwos/lib/bclst.h>
@@ -151,6 +152,7 @@ struct xwscp {
         void * hwifcb; /**< 物理层端口 */
 
         /* 内存池 */
+        XWMM_BMA_DEF(mempool_bma_raw, XWSCP_MEMBLK_ODR); /**< 内存池分配器的原始内存 */
         struct xwmm_bma * mempool; /**< 内存池分配器 */
 
         /* 发送状态机 */

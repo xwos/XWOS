@@ -31,8 +31,10 @@
 #define XWMM_MEMPOOL_OC_64_PAGE_ODR     (0U) /**< 64字节分配器所使用的页的阶数 */
 #define XWMM_MEMPOOL_OC_96_PAGE_ODR     (1U) /**< 96字节分配器所使用的页的阶数 */
 #define XWMM_MEMPOOL_OC_128_PAGE_ODR    (0U) /**< 128字节分配器所使用的页的阶数 */
+#define XWMM_MEMPOOL_OC_160_PAGE_ODR    (0U) /**< 160字节分配器所使用的页的阶数 */
 #define XWMM_MEMPOOL_OC_192_PAGE_ODR    (0U) /**< 192字节分配器所使用的页的阶数 */
 #define XWMM_MEMPOOL_OC_256_PAGE_ODR    (0U) /**< 256字节分配器所使用的页的阶数 */
+#define XWMM_MEMPOOL_OC_320_PAGE_ODR    (1U) /**< 320字节分配器所使用的页的阶数 */
 #define XWMM_MEMPOOL_OC_384_PAGE_ODR    (1U) /**< 384字节分配器所使用的页的阶数 */
 #define XWMM_MEMPOOL_OC_512_PAGE_ODR    (1U) /**< 512字节分配器所使用的页的阶数 */
 #define XWMM_MEMPOOL_OC_768_PAGE_ODR    (0U) /**< 768字节分配器所使用的页的阶数 */
@@ -42,6 +44,16 @@
 #if (XWMM_MEMPOOL_PAGE_SIZE & XWMM_ALIGNMENT_MASK)
   #error "Page size must be aligned to XWMM_ALIGNMENT!"
 #endif
+
+/**
+ * @brief 定义内存池结构体的RAW内存空间，用于初始化内存池结构体
+ * @param mem: (I) 内存数组名
+ * @param pgodr: (I) 页的数量，以2的pgodr次方形式表示
+ */
+#define XWMM_MEMPOOL_DEF(mem, pgodr) \
+        xwu8_t mem[sizeof(struct xwmm_mempool) + \
+                   (sizeof(struct xwmm_mempool_page) * (1 << (pgodr))) + \
+                   (sizeof(struct xwmm_mempool_page_odrbtree) * ((pgodr) + 1))]
 
 /**
  * @brief 内存池
@@ -55,21 +67,20 @@ struct xwmm_mempool {
         struct xwmm_mempool_objcache oc_64; /**< 64-Byte对象缓存 */
         struct xwmm_mempool_objcache oc_96; /**< 96-Byte对象缓存 */
         struct xwmm_mempool_objcache oc_128; /**< 128-Byte对象缓存 */
+        struct xwmm_mempool_objcache oc_160; /**< 160-Byte对象缓存 */
         struct xwmm_mempool_objcache oc_192; /**< 192-Byte对象缓存 */
         struct xwmm_mempool_objcache oc_256; /**< 256-Byte对象缓存 */
+        struct xwmm_mempool_objcache oc_320; /**< 320-Byte对象缓存 */
         struct xwmm_mempool_objcache oc_384; /**< 384-Byte对象缓存 */
         struct xwmm_mempool_objcache oc_512; /**< 512-Byte对象缓存 */
         struct xwmm_mempool_objcache oc_768; /**< 768-Byte对象缓存 */
         struct xwmm_mempool_objcache oc_1024; /**< 1024-Byte对象缓存 */
         struct xwmm_mempool_objcache oc_2048; /**< 2048-Byte对象缓存 */
+        xwu8_t rem[0]; /**< 结构体剩余的内存空间 */
 };
 
 xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
-                         xwptr_t origin, xwsz_t size);
-xwer_t xwmm_mempool_destroy(struct xwmm_mempool * mp);
-xwer_t xwmm_mempool_create(struct xwmm_mempool ** ptrbuf, const char * name,
-                           xwptr_t origin, xwsz_t size);
-xwer_t xwmm_mempool_delete(struct xwmm_mempool * mp);
+                         xwptr_t origin, xwsz_t size, xwsz_t pgodr);
 xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size,
                            void ** membuf);
 xwer_t xwmm_mempool_free(struct xwmm_mempool * mp, void * mem);

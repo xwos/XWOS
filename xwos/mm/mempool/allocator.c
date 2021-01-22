@@ -18,17 +18,8 @@
 #include <xwos/mm/mempool/page.h>
 #include <xwos/mm/mempool/allocator.h>
 
-static __xwos_code
-xwer_t xwmm_mempool_construct(struct xwmm_mempool * mp, const char * name,
-                              xwptr_t origin, xwsz_t size,
-                              struct xwmm_mempool_page_odrbtree * odrbtree,
-                              struct xwmm_mempool_page * pgarray);
-
-static __xwos_code
-xwer_t xwmm_mempool_destruct(struct xwmm_mempool * mp);
-
 /**
- * @brief XWMM API：内存池的构造函数
+ * @brief 构建内存池
  * @param mp: (I) 内存池的指针
  * @param name: (I) 名字
  * @param origin: (I) 内存区域的起始地址
@@ -103,6 +94,14 @@ xwer_t xwmm_mempool_construct(struct xwmm_mempool * mp, const char * name,
                 goto err_oc_128_init;
         }
 
+        rc = xwmm_mempool_objcache_init(&mp->oc_160, &mp->pa, NULL,
+                                        160, XWMM_ALIGNMENT,
+                                        XWMM_MEMPOOL_OC_160_PAGE_ODR,
+                                        NULL, NULL);
+        if (rc < 0) {
+                goto err_oc_160_init;
+        }
+
         rc = xwmm_mempool_objcache_init(&mp->oc_192, &mp->pa, NULL,
                                         192, XWMM_ALIGNMENT,
                                         XWMM_MEMPOOL_OC_192_PAGE_ODR,
@@ -117,6 +116,14 @@ xwer_t xwmm_mempool_construct(struct xwmm_mempool * mp, const char * name,
                                         NULL, NULL);
         if (rc < 0) {
                 goto err_oc_256_init;
+        }
+
+        rc = xwmm_mempool_objcache_init(&mp->oc_320, &mp->pa, NULL,
+                                        320, XWMM_ALIGNMENT,
+                                        XWMM_MEMPOOL_OC_320_PAGE_ODR,
+                                        NULL, NULL);
+        if (rc < 0) {
+                goto err_oc_320_init;
         }
 
         rc = xwmm_mempool_objcache_init(&mp->oc_384, &mp->pa, NULL,
@@ -164,60 +171,22 @@ xwer_t xwmm_mempool_construct(struct xwmm_mempool * mp, const char * name,
         return XWOK;
 
 err_oc_2048_init:
-        xwmm_mempool_objcache_destroy(&mp->oc_1024);
 err_oc_1024_init:
-        xwmm_mempool_objcache_destroy(&mp->oc_768);
 err_oc_768_init:
-        xwmm_mempool_objcache_destroy(&mp->oc_512);
 err_oc_512_init:
-        xwmm_mempool_objcache_destroy(&mp->oc_384);
 err_oc_384_init:
-        xwmm_mempool_objcache_destroy(&mp->oc_256);
+err_oc_320_init:
 err_oc_256_init:
-        xwmm_mempool_objcache_destroy(&mp->oc_192);
 err_oc_192_init:
-        xwmm_mempool_objcache_destroy(&mp->oc_128);
+err_oc_160_init:
 err_oc_128_init:
-        xwmm_mempool_objcache_destroy(&mp->oc_96);
 err_oc_96_init:
-        xwmm_mempool_objcache_destroy(&mp->oc_64);
 err_oc_64_init:
-        xwmm_mempool_objcache_destroy(&mp->oc_32);
 err_oc_32_init:
-        xwmm_mempool_objcache_destroy(&mp->oc_16);
 err_oc_16_init:
-        xwmm_mempool_objcache_destroy(&mp->oc_8);
 err_oc_8_init:
-        xwmm_mempool_page_allocator_destroy(&mp->pa);
 err_pa_init:
         return rc;
-}
-
-/**
- * @brief XWMM API：内存池的析构函数
- * @param mp: (I) 内存池的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- */
-static __xwos_code
-xwer_t xwmm_mempool_destruct(struct xwmm_mempool * mp)
-{
-        xwmm_mempool_objcache_destroy(&mp->oc_2048);
-        xwmm_mempool_objcache_destroy(&mp->oc_1024);
-        xwmm_mempool_objcache_destroy(&mp->oc_768);
-        xwmm_mempool_objcache_destroy(&mp->oc_512);
-        xwmm_mempool_objcache_destroy(&mp->oc_384);
-        xwmm_mempool_objcache_destroy(&mp->oc_256);
-        xwmm_mempool_objcache_destroy(&mp->oc_192);
-        xwmm_mempool_objcache_destroy(&mp->oc_128);
-        xwmm_mempool_objcache_destroy(&mp->oc_96);
-        xwmm_mempool_objcache_destroy(&mp->oc_64);
-        xwmm_mempool_objcache_destroy(&mp->oc_32);
-        xwmm_mempool_objcache_destroy(&mp->oc_16);
-        xwmm_mempool_objcache_destroy(&mp->oc_8);
-        xwmm_mempool_page_allocator_destroy(&mp->pa);
-
-        return XWOK;
 }
 
 /**
@@ -228,11 +197,16 @@ xwer_t xwmm_mempool_destruct(struct xwmm_mempool * mp)
  * @param size: (I) 内存区域的总大小
  * @param odrbtree: (I) 阶红黑树数组的指针
  * @param pgarray: (I) 页控制块数组的指针
+ * @param pgodr: (I) 页的数量，以2的blkodr次方形式表示
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -E2SMALL: 内存区域太小
- * @retval -EALIGN: 内存区域没有对齐
+ * @retval -ESIZE: 内存区域大小size与pgodr指明的页数量不匹配
+ * @note
+ * - 页的数量只能是2的n次方，即2, 4, 8, 16, 32, 64, 128, ...，对应的pgodr
+ *   分别为1, 2, 3, 4, 5, 6, 7, ...；
+ * - 内存区域大小必须满足关系：size == (XWMM_MEMPOOL_PAGE_SIZE * (1 << pgodr))。
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -240,7 +214,7 @@ xwer_t xwmm_mempool_destruct(struct xwmm_mempool * mp)
  */
 __xwos_api
 xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
-                         xwptr_t origin, xwsz_t size)
+                         xwptr_t origin, xwsz_t size, xwsz_t pgodr)
 {
         struct xwmm_mempool_page_odrbtree * odrbtree;
         struct xwmm_mempool_page * pgarray;
@@ -253,11 +227,11 @@ xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
         XWOS_VALIDATE((mp), "nullptr", -EFAULT);
 
         nr = size / XWMM_MEMPOOL_PAGE_SIZE;
-        order = xwbop_fls(xwsz_t, nr);
-        if ((order < 0) || (nr & ((1U << order) - 1U))) {
-                rc = -EALIGN;
-                goto err_aligned;
+        if (nr != (1U << pgodr)) {
+                rc = - ESIZE;
+                goto err_size;
         }
+        order = xwbop_fls(xwsz_t, nr);
         odrbtree_size = sizeof(struct xwmm_mempool_page_odrbtree) * (xwsz_t)(order + 1);
         array_size = (sizeof(struct xwmm_mempool_page) << order);
         odrbtree = (void *)(((xwptr_t)mp) + sizeof(struct xwmm_mempool));
@@ -278,130 +252,16 @@ xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
                 }
                 rc = xwmm_mempool_malloc(mp, mpsz, &mem);
                 if (rc < 0) {
-                        goto err_mempool_alloc;
+                        goto err_mempool_selfalloc;
                 }
         }
 
         return XWOK;
 
-err_mempool_alloc:
-        xwmm_mempool_destroy(mp);
+err_mempool_selfalloc:
 err_mempool_construct:
-err_aligned:
+err_size:
         return rc;
-}
-
-/**
- * @brief XWMM API：销毁静态方式初始化的内存池
- * @param mp: (I) 内存池的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
-__xwos_api
-xwer_t xwmm_mempool_destroy(struct xwmm_mempool * mp)
-{
-        XWOS_VALIDATE((mp), "nullptr", -EFAULT);
-
-        return xwmm_mempool_destruct(mp);
-}
-
-/**
- * @brief XWMM API：动态创建内存池
- * @param ptrbuf: (O) 指向缓冲区的指针，通过此缓冲区返回新的内存池的指针
- * @param name: (I) 名字
- * @param origin: (I) 内存区域的起始地址
- * @param size: (I) 内存区域的总大小
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -E2SMALL: 内存区域太小
- * @retval -EALIGN: 内存区域没有对齐
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
-__xwos_api
-xwer_t xwmm_mempool_create(struct xwmm_mempool ** ptrbuf, const char * name,
-                           xwptr_t origin, xwsz_t size)
-{
-        void * mem;
-        xwsz_t nr;
-        xwssq_t order;
-        xwsz_t odrbtree_size;
-        xwsz_t array_size;
-        struct xwmm_mempool * mp;
-        struct xwmm_mempool_page_odrbtree * odrbtree;
-        struct xwmm_mempool_page * pgarray;
-        xwer_t rc;
-
-        XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
-
-        if (size < (XWMM_MEMPOOL_PAGE_SIZE * 16)) {
-                rc = -E2SMALL;
-                goto err_mem2small;
-        }
-
-        nr = size / XWMM_MEMPOOL_PAGE_SIZE;
-        order = xwbop_fls(xwsz_t, nr);
-        if ((order < 0) || (nr & ((1U << order) - 1U))) {
-                rc = -EALIGN;
-                goto err_aligned;
-        }
-
-        odrbtree_size = sizeof(struct xwmm_mempool_page_odrbtree) * (xwsz_t)(order + 1);
-        array_size = (sizeof(struct xwmm_mempool_page) << order);
-        rc = xwmm_kma_alloc(sizeof(struct xwmm_mempool) +
-                            odrbtree_size + array_size,
-                            XWMM_ALIGNMENT, &mem);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_alloc;
-        }
-        mp = mem;
-        odrbtree = (void *)(((xwptr_t)mem) + sizeof(struct xwmm_mempool));
-        pgarray = (struct xwmm_mempool_page *)(((xwptr_t)odrbtree) + odrbtree_size);
-
-        rc = xwmm_mempool_construct(mp, name, origin, size, odrbtree, pgarray);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_mempool_construct;
-        }
-        *ptrbuf = mp;
-        return XWOK;
-
-err_mempool_construct:
-        xwmm_kma_free(mp);
-err_alloc:
-err_aligned:
-err_mem2small:
-        return rc;
-}
-
-/**
- * @brief XWMM API：删除动态创建的内存池
- * @param mp: (I) 内存池的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
-__xwos_api
-xwer_t xwmm_mempool_delete(struct xwmm_mempool * mp)
-{
-
-        XWOS_VALIDATE((mp), "nullptr", -EFAULT);
-
-        xwmm_mempool_destroy(mp);
-        xwmm_kma_free(mp);
-        return XWOK;
 }
 
 /**
@@ -421,7 +281,7 @@ xwer_t xwmm_mempool_delete(struct xwmm_mempool * mp)
 __xwos_api
 xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf)
 {
-        xwsz_t real;
+        xwsz_t szp2, adjsize;
         interface xwmm_mempool_i_allocator * ia;
         xwssq_t odr;
         xwer_t rc;
@@ -433,14 +293,14 @@ xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf
                 rc = XWOK;
                 *membuf = NULL;
         } else {
-                real = ALIGN(size, 8);
-                odr = xwbop_fls(xwsz_t, real);
-                if ((odr < 0) || ((1U << odr) < real)) {
+                adjsize = ALIGN(size, 8);
+                odr = xwbop_fls(xwsz_t, adjsize);
+                if ((odr < 0) || ((1U << odr) < adjsize)) {
                         odr++;
                 }
-                real = 1U << odr;
+                szp2 = 1U << odr;
 
-                switch (real) {
+                switch (szp2) {
                 case 8:
                         ia = (void *)&mp->oc_8;
                         break;
@@ -453,29 +313,37 @@ xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf
                 case 64:
                         ia = (void *)&mp->oc_64;
                         break;
-                case 96:
-                        ia = (void *)&mp->oc_96;
-                        break;
                 case 128:
-                        ia = (void *)&mp->oc_128;
-                        break;
-                case 192:
-                        ia = (void *)&mp->oc_192;
+                        if (adjsize <= 96) {
+                                ia = (void *)&mp->oc_96;
+                        } else {
+                                ia = (void *)&mp->oc_128;
+                        }
                         break;
                 case 256:
-                        ia = (void *)&mp->oc_256;
-                        break;
-                case 384:
-                        ia = (void *)&mp->oc_384;
+                        if (adjsize <= 160) {
+                                ia = (void *)&mp->oc_160;
+                        } else if (adjsize <= 192) {
+                                ia = (void *)&mp->oc_192;
+                        } else {
+                                ia = (void *)&mp->oc_256;
+                        }
                         break;
                 case 512:
-                        ia = (void *)&mp->oc_512;
-                        break;
-                case 768:
-                        ia = (void *)&mp->oc_768;
+                        if (adjsize <= 320) {
+                                ia = (void *)&mp->oc_320;
+                        } else if (adjsize <= 384) {
+                                ia = (void *)&mp->oc_384;
+                        } else {
+                                ia = (void *)&mp->oc_512;
+                        }
                         break;
                 case 1024:
-                        ia = (void *)&mp->oc_1024;
+                        if (adjsize <= 768) {
+                                ia = (void *)&mp->oc_768;
+                        } else {
+                                ia = (void *)&mp->oc_1024;
+                        }
                         break;
                 case 2048:
                         ia = (void *)&mp->oc_2048;
@@ -484,7 +352,7 @@ xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf
                         ia = (void *)&mp->pa;
                         break;
                 }
-                rc = ia->malloc(ia, real, membuf);
+                rc = ia->malloc(ia, adjsize, membuf);
                 if (rc < 0) {
                         *membuf = NULL;
                 }
@@ -543,11 +411,17 @@ xwer_t xwmm_mempool_free(struct xwmm_mempool * mp, void * mem)
         case 128:
                 ia = (void *)&mp->oc_128;
                 break;
+        case 160:
+                ia = (void *)&mp->oc_160;
+                break;
         case 192:
                 ia = (void *)&mp->oc_192;
                 break;
         case 256:
                 ia = (void *)&mp->oc_256;
+                break;
+        case 320:
+                ia = (void *)&mp->oc_320;
                 break;
         case 384:
                 ia = (void *)&mp->oc_384;

@@ -77,12 +77,12 @@ xwer_t xwmp_mtx_do_lock_unintr(struct xwmp_mtx * mtx, struct xwmp_thd * thd);
 /**
  * @brief 结构体xwmp_mtx的对象缓存
  */
-static __xwmp_data struct xwmm_memslice * xwmp_mtx_cache = NULL;
+static __xwmp_data struct xwmm_memslice xwmp_mtx_cache;
 
 /**
  * @brief 结构体xwmp_mtx的对象缓存的名字
  */
-__xwmp_rodata const char xwmp_mtx_cache_name[] = "xwos.mp.lk.mtx.cache";
+const __xwmp_rodata char xwmp_mtx_cache_name[] = "xwos.mp.lk.mtx.cache";
 #endif /* XWMPCFG_LOCK_MTX_MEMSLICE */
 
 #if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
@@ -97,19 +97,13 @@ __xwmp_rodata const char xwmp_mtx_cache_name[] = "xwos.mp.lk.mtx.cache";
 __xwmp_init_code
 xwer_t xwmp_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 {
-        struct xwmm_memslice * msa;
         xwer_t rc;
 
-        rc = xwmm_memslice_create(&msa, zone_origin, zone_size,
-                                  sizeof(struct xwmp_mtx),
-                                  xwmp_mtx_cache_name,
-                                  (ctor_f)xwmp_mtx_construct,
-                                  (dtor_f)xwmp_mtx_destruct);
-        if (__xwcc_unlikely(rc < 0)) {
-                xwmp_mtx_cache = NULL;
-        } else {
-                xwmp_mtx_cache = msa;
-        }
+        rc = xwmm_memslice_init(&xwmp_mtx_cache, zone_origin, zone_size,
+                                sizeof(struct xwmp_mtx),
+                                xwmp_mtx_cache_name,
+                                (ctor_f)xwmp_mtx_construct,
+                                (dtor_f)xwmp_mtx_destruct);
         return rc;
 }
 #endif /* XWMPCFG_LOCK_MTX_MEMSLICE */
@@ -128,7 +122,7 @@ struct xwmp_mtx * xwmp_mtx_alloc(void)
         } mem;
         xwer_t rc;
 
-        rc = xwmm_memslice_alloc(xwmp_mtx_cache, &mem.anon);
+        rc = xwmm_memslice_alloc(&xwmp_mtx_cache, &mem.anon);
         if (rc < 0) {
                 mem.mtx = err_ptr(rc);
         }/* else {} */
@@ -158,7 +152,7 @@ static __xwmp_code
 void xwmp_mtx_free(struct xwmp_mtx * mtx)
 {
 #if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
-        xwmm_memslice_free(xwmp_mtx_cache, mtx);
+        xwmm_memslice_free(&xwmp_mtx_cache, mtx);
 #else /* XWMPCFG_LOCK_MTX_MEMSLICE */
         xwmp_mtx_destruct(mtx);
         xwmm_kma_free(mtx);

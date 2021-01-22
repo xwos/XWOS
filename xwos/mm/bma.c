@@ -52,15 +52,19 @@ static __xwos_code
 void xwmm_bma_combine(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb);
 
 /**
- * @brief XWMM API：静态方式初始化伙伴算法内存块分配器
- * @param bma: (I) 伙伴算法内存块分配器对象的指针
+ * @brief XWMM API：初始化伙伴算法内存块分配器
+ * @param bma: (I) 伙伴算法内存块分配器的指针
  * @param name: (I) 名字
  * @param origin: (I) 内存区域的起始地址
- * @param total: (I) 内存区域的总大小
- * @param blksize: (I) 单位内存块的大小
- * @param orderlists: (I) 阶链表数组的指针
- * @param bcbs: (I) 块控制块数组的指针
+ * @param size: (I) 内存区域的大小
+ * @param blksize: (I) 伙伴算法内存块分配器中单位内存块的大小
+ * @param blkodr: (I) 伙伴算法内存块分配器中单位内存块的数量，以2的blkodr次方形式表示
  * @return 错误码
+ * @retval -ESIZE: 内存区域大小不匹配
+ * @note
+ * - 单位内存块的数量只能是2的n次方，即2, 4, 8, 16, 32, 64, 128, ...，对应的blkodr
+ *   分别为1, 2, 3, 4, 5, 6, 7, ...；
+ * - 内存区域大小必须满足关系：size == (blksize * (1 << blkodr))。
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -68,176 +72,46 @@ void xwmm_bma_combine(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb);
  */
 __xwos_api
 xwer_t xwmm_bma_init(struct xwmm_bma * bma, const char * name,
-                     xwptr_t origin, xwsz_t total, xwsz_t blksize,
-                     struct xwmm_bma_orderlist * orderlists,
-                     struct xwmm_bma_bcb * bcbs)
+                     xwptr_t origin, xwsz_t size,
+                     xwsz_t blksize, xwsz_t blkodr)
 {
         xwer_t rc;
-        xwsq_t odr;
         xwsz_t num;
         xwsz_t i;
-        xwsq_t j;
 
         XWOS_VALIDATE((bma), "nullptr", -EFAULT);
-        XWOS_VALIDATE((orderlists), "nullptr", -EFAULT);
-        XWOS_VALIDATE((bcbs), "nullptr", -EFAULT);
 
-        if (__xwcc_unlikely(total < blksize)) {
-                rc = -E2SMALL;
-                goto err_mem2small;
+        num = 1U << blkodr;
+        if (size != (num * blksize)) {
+                rc = -ESIZE;
+                xwmm_bmalogf(ERR, "Size of memory(0x%X, %d) is error!\n",
+                             origin, size);
+                goto err_size;
         }
-        num = total / blksize;
-        odr = (xwsq_t)xwbop_fls(xwsz_t, num);
-        if (__xwcc_unlikely(odr > XWMM_BMA_MAX_ORDER)) {
-                rc = -ERANGE;
-                goto err_odr2large;
-        }
-        if (__xwcc_unlikely((1U << odr) != num)) {
-                xwmm_bmalogf(WARNING,
-                             "The number of blocks is not power(2, order)!\n");
-        }
-
         bma->name = name;
         bma->zone.origin = origin;
-        bma->zone.size = total;
+        bma->zone.size = blksize * num;
         bma->blksize = blksize;
-        bma->orderlists = orderlists;
-        bma->bcbs = bcbs;
-        bma->max_order = odr;
+        bma->blkodr = blkodr;
+        bma->orderlists = (void *)bma->rem;
+        bma->bcbs = (void *)&bma->rem[sizeof(struct xwmm_bma_orderlist) * (1 + blkodr)];
 
-        /* init all blocks */
+        /* Init all blocks */
         for (i = 0; i < num; i++) {
-                bcbs[i].order = XWMM_BMA_COMBINED;
+                bma->bcbs[i].order = XWMM_BMA_COMBINED;
         }
-        bcbs[0].order = (xwu8_t)odr;
+        bma->bcbs[0].order = (xwu8_t)blkodr;
 
-        /* init all order lists */
-        for (j = 0; j <= odr; j++) {
-                xwlib_bclst_init_head(&orderlists[j].head);
-                xwos_splk_init(&orderlists[j].lock);
+        /* Init all order lists */
+        for (i = 0; i <= blkodr; i++) {
+                xwlib_bclst_init_head(&bma->orderlists[i].head);
+                xwos_splk_init(&bma->orderlists[i].lock);
         }
-        xwmm_bma_orderlist_add(bma, &orderlists[odr], &bcbs[0]);
+        xwmm_bma_orderlist_add(bma, &bma->orderlists[blkodr], &bma->bcbs[0]);
         return XWOK;
 
-err_odr2large:
-err_mem2small:
+err_size:
         return rc;
-}
-
-/**
- * @brief XWMM API：销毁静态方式初始化的伙伴算法内存块分配器
- * @param bma: (I) 伙伴算法内存块分配器对象的指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
-__xwos_api
-xwer_t xwmm_bma_destroy(struct xwmm_bma * bma)
-{
-        XWOS_VALIDATE((bma), "nullptr", -EFAULT);
-
-        XWOS_UNUSED(bma);
-        return XWOK;
-}
-
-/**
- * @brief XWMM API：动态方式创建伙伴算法内存块分配器
- * @param ptrbuf: (O) 用于返回新的伙伴算法内存块分配器对象指针的缓存
- * @param name: (I) 名字
- * @param origin: (I) 内存区域的起始地址
- * @param total: (I) 内存区域的总大小
- * @param blksize: (I) 单位内存块的大小
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
-__xwos_api
-xwer_t xwmm_bma_create(struct xwmm_bma ** ptrbuf, const char * name,
-                       xwptr_t origin, xwsz_t total, xwsz_t blksize)
-{
-        void * mem;
-        struct xwmm_bma * bma;
-        xwsz_t num;
-        xwsq_t odr;
-        struct xwmm_bma_orderlist * orderlists;
-        struct xwmm_bma_bcb * bcbs;
-        xwer_t rc;
-
-        XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
-
-        if (__xwcc_unlikely(total < blksize)) {
-                rc = -E2SMALL;
-                goto err_mem2small;
-        }
-        num = total / blksize;
-        odr = (xwsq_t)xwbop_fls(xwsz_t, num);
-        if (__xwcc_unlikely(odr > XWMM_BMA_MAX_ORDER)) {
-                rc = -ERANGE;
-                goto err_odr2large;
-        }
-
-        rc = xwmm_kma_alloc(sizeof(struct xwmm_bma), XWMM_ALIGNMENT, &mem);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_bma_alloc;
-        }
-        bma = mem;
-
-        rc = xwmm_kma_alloc((odr + 1) * sizeof(struct xwmm_bma_orderlist),
-                            XWMM_ALIGNMENT, &mem);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_orderlists_alloc;
-        }
-        orderlists = mem;
-
-        rc = xwmm_kma_alloc(num * sizeof(struct xwmm_bma_bcb),
-                            XWMM_ALIGNMENT, &mem);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_bcbs_alloc;
-        }
-        bcbs = mem;
-
-        rc = xwmm_bma_init(bma, name, origin, total, blksize, orderlists, bcbs);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_bma_init;
-        }
-        *ptrbuf = bma;
-        return XWOK;
-
-err_bma_init:
-        xwmm_kma_free(bcbs);
-err_bcbs_alloc:
-        xwmm_kma_free(orderlists);
-err_orderlists_alloc:
-        xwmm_kma_free(bma);
-err_bma_alloc:
-err_odr2large:
-err_mem2small:
-        return rc;
-}
-
-/**
- * @brief XWMM API：删除动态方式创建的伙伴算法内存块分配器
- * @param bma: (I) 伙伴算法内存块分配器对象的指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
-__xwos_api
-xwer_t xwmm_bma_delete(struct xwmm_bma * bma)
-{
-        XWOS_VALIDATE((bma), "nullptr", -EFAULT);
-
-        xwmm_kma_free(((struct xwmm_bma *)bma)->bcbs);
-        xwmm_kma_free(((struct xwmm_bma *)bma)->orderlists);
-        xwmm_bma_destroy(bma);
-        xwmm_kma_free(bma);
-        return XWOK;
 }
 
 /**
@@ -443,7 +317,7 @@ xwer_t xwmm_bma_alloc(struct xwmm_bma * bma, xwsq_t order, void ** membuf)
 
         ol = NULL;
         bcb = err_ptr(-ENOENT);
-        for (o = order; o <= bma->max_order; o++) {
+        for (o = order; o <= bma->blkodr; o++) {
                 ol = &bma->orderlists[o];
                 bcb = xwmm_bma_orderlist_choose(bma, ol);
                 if (!is_err(bcb)) {
@@ -483,7 +357,7 @@ void xwmm_bma_combine(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb)
         bcb->order &= XWMM_BMA_ORDER_MASK; /* clear the `inused' state */
         odr = (xwsq_t)bcb->order + 1;
 
-        while (odr <= bma->max_order) {
+        while (odr <= bma->blkodr) {
                 buddy = xwmm_bma_find_buddy(bma, bcb);
                 XWOS_BUG_ON(XWMM_BMA_COMBINED == buddy->order);
                 xwmm_bmalogf(DEBUG,

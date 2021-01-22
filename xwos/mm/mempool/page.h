@@ -91,11 +91,6 @@ xwer_t xwmm_mempool_page_allocator_init(struct xwmm_mempool_page_allocator * pa,
                                         xwptr_t origin, xwsz_t size, xwsz_t pgsize,
                                         struct xwmm_mempool_page_odrbtree * odrbtree,
                                         struct xwmm_mempool_page * pgarray);
-xwer_t xwmm_mempool_page_allocator_destroy(struct xwmm_mempool_page_allocator * pa);
-xwer_t xwmm_mempool_page_allocator_create(struct xwmm_mempool_page_allocator ** ptrbuf,
-                                          const char * name,
-                                          xwptr_t origin, xwsz_t size, xwsz_t pgsize);
-xwer_t xwmm_mempool_page_allocator_delete(struct xwmm_mempool_page_allocator * pa);
 xwer_t xwmm_mempool_page_allocate(struct xwmm_mempool_page_allocator * pa,
                                   xwsq_t order,
                                   struct xwmm_mempool_page ** pgbuf);

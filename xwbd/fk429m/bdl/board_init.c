@@ -35,7 +35,10 @@
 #include <bdl/board_init.h>
 
 #define STKMEMPOOL_BLKSZ        BRDCFG_MM_STKMEMPOOL_BLKSZ
+#define STKMEMPOOL_BLKODR       BRDCFG_MM_STKMEMPOOL_BLKODR
+
 #define CCMHEAP_BLKSZ           BRDCFG_MM_CCMHEAP_BLKSZ
+#define CCMHEAP_BLKODR          BRDCFG_MM_CCMHEAP_BLKODR
 
 extern xwsz_t stkmempool_mr_origin[];
 extern xwsz_t stkmempool_mr_size[];
@@ -46,12 +49,14 @@ extern xwsz_t ccmheap_mr_size[];
 /**
  * @brief thread stack mempool zone
  */
-__xwbsp_data struct xwmm_bma * stkmempool_bma = NULL;
+__xwbsp_data XWMM_BMA_DEF(stkmempool_bma_raw, STKMEMPOOL_BLKODR);
+__xwbsp_data struct xwmm_bma * stkmempool_bma = (void *)&stkmempool_bma_raw;
 
 /**
  * @brief CCMRAM zone
  */
-__xwbsp_data struct xwmm_bma * ccmheap_bma = NULL;
+__xwbsp_data XWMM_BMA_DEF(ccmheap_bma_raw, CCMHEAP_BLKODR);
+__xwbsp_data struct xwmm_bma * ccmheap_bma = (void *)&ccmheap_bma_raw;
 
 static __xwbsp_init_code
 xwer_t sys_mm_init(void);
@@ -82,26 +87,25 @@ void board_init(void)
 static __xwbsp_init_code
 xwer_t sys_mm_init(void)
 {
-        struct xwmm_bma * bma;
         xwer_t rc;
 
-        rc = xwmm_bma_create(&bma, "stkmempool",
-                             (xwptr_t)stkmempool_mr_origin,
-                             (xwsz_t)stkmempool_mr_size,
-                             STKMEMPOOL_BLKSZ);
+        rc = xwmm_bma_init(stkmempool_bma, "stkmempool",
+                           (xwptr_t)stkmempool_mr_origin,
+                           (xwsz_t)stkmempool_mr_size,
+                           STKMEMPOOL_BLKSZ,
+                           STKMEMPOOL_BLKODR);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_stkmempool_bma_create;
+                goto err_stkmempool_bma_init;
         }
-        stkmempool_bma = bma;
 
-        rc = xwmm_bma_create(&bma, "ccmheap",
-                             (xwptr_t)ccmheap_mr_origin,
-                             (xwsz_t)ccmheap_mr_size,
-                             CCMHEAP_BLKSZ);
+        rc = xwmm_bma_init(ccmheap_bma, "ccmheap",
+                           (xwptr_t)ccmheap_mr_origin,
+                           (xwsz_t)ccmheap_mr_size,
+                           CCMHEAP_BLKSZ,
+                           CCMHEAP_BLKODR);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_ccmheap_bma_create;
+                goto err_ccmheap_bma_init;
         }
-        ccmheap_bma = bma;
 
 #if defined(XuanWuOS_CFG_CORE__mp)
         void * mem;
@@ -195,9 +199,9 @@ err_thd_cache_init:
 err_thd_bma_alloc:
         BDL_BUG();
 #endif /* XuanWuOS_CFG_CORE__mp */
-err_ccmheap_bma_create:
+err_ccmheap_bma_init:
         BDL_BUG();
-err_stkmempool_bma_create:
+err_stkmempool_bma_init:
         BDL_BUG();
         return rc;
 }
