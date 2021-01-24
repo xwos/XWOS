@@ -73,7 +73,8 @@ xwer_t xwlua_thd_script_main(void * arg)
         script = lua_tolstring(L, -1, NULL);
         ret = lua_pcall(L, 1, LUA_MULTRET, 0);
         if (LUA_OK != ret) {
-                lua_writestringerror("Cannot run %s", script);
+                lua_writestringerror("Cannot run %s\n", script);
+                lua_error(L);
                 rc = -ENOEXEC;
         } else {
                 rc = XWOK;
@@ -210,7 +211,7 @@ int xwlua_thd_call(lua_State * L)
 
 const luaL_Reg xwlua_thd_method[] = {
         {"dofile", xwlua_thd_dofile},
-        {"do", xwlua_thd_dostring},
+        {"dostring", xwlua_thd_dostring},
         {"call", xwlua_thd_call},
         {NULL, NULL},
 };
