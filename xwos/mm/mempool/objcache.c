@@ -66,11 +66,6 @@ xwer_t xwmm_mempool_objcache_init(struct xwmm_mempool_objcache * oc,
 {
         xwsz_t nr, pgsize;
 
-        XWOS_VALIDATE((oc), "nullptr", -EFAULT);
-        XWOS_VALIDATE((pa), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((alignment & XWMM_ALIGNMENT_MASK) == 0),
-                      "not-aligned", -EALIGN);
-
 /*
  * ----------------------------
  * | struct xwmm_mempool_page |
@@ -282,9 +277,6 @@ xwer_t xwmm_mempool_objcache_alloc(struct xwmm_mempool_objcache * oc, void ** ob
         xwreg_t flag;
         xwer_t rc;
 
-        XWOS_VALIDATE((oc), "nullptr", -EFAULT);
-        XWOS_VALIDATE((objbuf), "nullptr", -EFAULT);
-
         rc = xwmm_mempool_objcache_page_get(oc, &pg);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_page_get;
@@ -330,15 +322,12 @@ xwer_t xwmm_mempool_objcache_free(struct xwmm_mempool_objcache * oc, void * obj)
         xwsz_t idleness;
         xwer_t rc;
 
-        XWOS_VALIDATE((oc), "nullptr", -EFAULT);
-        XWOS_VALIDATE((obj), "nullptr", -EFAULT);
-
         rc = xwmm_mempool_page_find(oc->pa, obj, &pg);
         if (rc < 0) {
                 goto err_pg_find;
         }
 
-        if (((xwptr_t)obj - (xwptr_t)pg->attr.objcache.objhead) % oc->objsize != 0) {
+        if (((xwptr_t)obj - pg->mapping) % oc->objsize != 0) {
                 rc = -EALIGN;
                 goto err_not_aligned;
         }
@@ -386,8 +375,6 @@ xwer_t xwmm_mempool_objcache_reserve(struct xwmm_mempool_objcache * oc,
         xwreg_t flag;
         xwer_t rc;
 
-        XWOS_VALIDATE((oc), "nullptr", -EFAULT);
-
         reserved = DIV_ROUND_UP(reserved, oc->pg_objnr);
         xwaop_write(xwsz, &oc->reserved, reserved, NULL);
         capacity = xwaop_load(xwsz, &oc->capacity, xwmb_modr_relaxed);
@@ -427,9 +414,6 @@ __xwos_code
 xwer_t xwmm_mempool_objcache_get_capacity(struct xwmm_mempool_objcache * oc,
                                           xwsz_t * capacity)
 {
-        XWOS_VALIDATE((oc), "nullptr", -EFAULT);
-        XWOS_VALIDATE((capacity), "nullptr", -EFAULT);
-
         *capacity = xwaop_load(xwsz, &oc->capacity, xwmb_modr_relaxed);
         return XWOK;
 }
@@ -448,9 +432,6 @@ xwer_t xwmm_mempool_objcache_i_a_malloc(void * this, xwsz_t size, void ** membuf
 {
         struct xwmm_mempool_objcache * oc;
         xwer_t rc;
-
-        XWOS_VALIDATE((this), "nullptr", -EFAULT);
-        XWOS_VALIDATE((membuf), "nullptr", -EFAULT);
 
         oc = this;
         if (size > oc->objsize) {
@@ -481,9 +462,6 @@ xwer_t xwmm_mempool_objcache_i_a_free(void * this, void * mem)
 {
         struct xwmm_mempool_objcache * oc;
         xwer_t rc;
-
-        XWOS_VALIDATE((this), "nullptr", -EFAULT);
-        XWOS_VALIDATE((mem), "nullptr", -EFAULT);
 
         oc = this;
         rc = xwmm_mempool_objcache_free(oc, mem);

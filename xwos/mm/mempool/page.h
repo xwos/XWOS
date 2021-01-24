@@ -22,7 +22,7 @@
 
 #define XWMM_MEMPOOL_PAGE_ORDER_CMB             (XWSQ_MAX)
 #define XWMM_MEMPOOL_PAGE_MAPPING_FREE          (0)
-#define XWMM_MEMPOOL_PAGE_MAPPING_INVAILD       (XWSQ_MAX)
+#define XWMM_MEMPOOL_PAGE_MAPPING_INVAILD       (XWPTR_MAX)
 
 /**
  * @brief 内存页

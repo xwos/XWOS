@@ -87,10 +87,6 @@ xwer_t xwmm_mempool_page_allocator_init(struct xwmm_mempool_page_allocator * pa,
         xwsz_t nr;
         xwer_t rc;
 
-        XWOS_VALIDATE((pa), "nullptr", -EFAULT);
-        XWOS_VALIDATE((odrbtree), "nullptr", -EFAULT);
-        XWOS_VALIDATE((pgarray), "nullptr", -EFAULT);
-
         if (__xwcc_unlikely(size < pgsize)) {
                 rc = -E2SMALL;
                 goto err_mem2small;
@@ -161,9 +157,6 @@ xwer_t xwmm_mempool_page_allocate(struct xwmm_mempool_page_allocator * pa,
         xwptr_t origin;
         xwer_t rc;
 
-        XWOS_VALIDATE((pa), "nullptr", -EFAULT);
-        XWOS_VALIDATE((pgbuf), "nullptr", -EFAULT);
-
         rc = -ENOMEM;
         for (odr = order; odr <= pa->max_order; odr++) {
                 ot = &pa->odrbtree[odr];
@@ -194,9 +187,6 @@ xwer_t xwmm_mempool_page_free(struct xwmm_mempool_page_allocator * pa,
                               struct xwmm_mempool_page * pg)
 {
         xwer_t rc;
-
-        XWOS_VALIDATE((pa), "nullptr", -EFAULT);
-        XWOS_VALIDATE((pg), "nullptr", -EFAULT);
 
         if (!pg->mapping) {
                 rc = -EALREADY;
@@ -528,13 +518,6 @@ xwer_t xwmm_mempool_page_find(struct xwmm_mempool_page_allocator * pa, void * me
 {
         struct xwmm_mempool_page * pg;
 
-        XWOS_VALIDATE((pa), "nullptr", -EFAULT);
-        XWOS_VALIDATE((mem), "nullptr", -EFAULT);
-        XWOS_VALIDATE((pgbuf), "nullptr", -EFAULT);
-        XWOS_VALIDATE((((xwptr_t)mem >= pa->zone.origin) ||
-                       ((xwsz_t)mem < ((xwsz_t)pa->zone.origin + pa->zone.size))),
-                      "out-of-range", -EOOR);
-
         pg = xwmm_mempool_mem_to_page(pa, mem);
         while (XWMM_MEMPOOL_PAGE_ORDER_CMB == pg->order) {
                 pg--;
@@ -560,9 +543,6 @@ xwer_t xwmm_mempool_page_i_a_malloc(void * this, xwsz_t size, void ** membuf)
         xwssq_t order;
         xwsz_t nr;
         xwer_t rc;
-
-        XWOS_VALIDATE((this), "nullptr", -EFAULT);
-        XWOS_VALIDATE((membuf), "nullptr", -EFAULT);
 
         pa = this;
         nr = size / pa->pgsize;
@@ -592,9 +572,6 @@ xwer_t xwmm_mempool_page_i_a_free(void * this, void * mem)
         struct xwmm_mempool_page_allocator * pa;
         struct xwmm_mempool_page * pg;
         xwer_t rc;
-
-        XWOS_VALIDATE((this), "nullptr", -EFAULT);
-        XWOS_VALIDATE((mem), "nullptr", -EFAULT);
 
         pa = this;
 

@@ -471,6 +471,7 @@ xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size, void ** membu
         xwer_t rc;
 
         XWOS_VALIDATE((mp), "nullptr", -EFAULT);
+        XWOS_VALIDATE((membuf), "nullptr", -EFAULT);
 
         if (NULL == *membuf) {
                 rc = xwmm_mempool_malloc(mp, size, membuf);
