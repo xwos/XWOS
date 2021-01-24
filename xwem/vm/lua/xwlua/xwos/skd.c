@@ -257,7 +257,8 @@ int xwlua_cthd_sleep_from(lua_State * L)
         inc = (xwtm_t)luaL_checknumber(L, 2);
         rc = xwosdl_cthd_sleep_from(&origin, inc);
         lua_pushinteger(L, (lua_Integer)rc);
-        return 1;
+        lua_pushnumber(L, (lua_Number)origin);
+        return 2;
 }
 
 int xwlua_cthd_yield(lua_State * L)
@@ -317,13 +318,13 @@ int xwlua_cthd_freeze(lua_State * L)
 const luaL_Reg xwcthdlib[] = {
         {"sp", xwlua_cthd_sp},
         {"sleep", xwlua_cthd_sleep},
-        {"sleep_from", xwlua_cthd_sleep_from},
+        {"sleepFrom", xwlua_cthd_sleep_from},
         {"yield", xwlua_cthd_yield},
         {"exit", xwlua_cthd_exit},
-        {"shld_frz", xwlua_cthd_shld_frz},
-        {"shld_stop", xwlua_cthd_shld_stop},
-        {"frz_shld_stop", xwlua_cthd_frz_shld_stop},
-        {"freeze", xwlua_cthd_freeze},
+        {"shldFrz", xwlua_cthd_shld_frz},
+        {"shldStop", xwlua_cthd_shld_stop},
+        {"frzShldStop", xwlua_cthd_frz_shld_stop},
+        {"frz", xwlua_cthd_freeze},
         {NULL, NULL},
 };
 
