@@ -497,6 +497,9 @@ LUAMOD_API int xwlua_open_xt(lua_State * L)
         }
         /* libs in xwxt */
         xwlua_xt_openlibs(xwlua_xt);
+        /* metatable in xwxt */
+        luaL_newmetatable(xwlua_xt, "xwlua_vm");
+        lua_pop(xwlua_xt, 1); /* pop metatable */
 
         luaL_newmetatable(L, "xwlua_xt");
         luaL_setfuncs(L, xwlua_xt_metamethod, 0); /* add metamethods */
