@@ -50,6 +50,9 @@
 #define SOCCFG_CLK_SIRC_DIV                     (25U)
 #define SOCCFG_CLK_FMPLL_VALUE                  (64000000U)
 
+/******** ******** ******** BKUP DATA ******** ******** ********/
+#define SOCCFG_BKUP                             0
+
 /******** ******** CRC32 ******** ********/
 #define SOCCFG_CRC32                            0
 #define SOCCFG_CRC8                             0

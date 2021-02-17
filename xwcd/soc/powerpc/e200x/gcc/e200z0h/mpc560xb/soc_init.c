@@ -254,6 +254,7 @@ void soc_ram_init(void)
         xwu8_t * rlc_dst;
 
         /* 初始化备份数据 */
+#if defined(SOCCFG_BKUP) && (1 == SOCCFG_BKUP)
         if ((!RGM.DES.R) && ((0x0004 & RGM.FES.R) || (!RGM.FES.R))) {
                 /* soft-reset & wake-up */
                 src = (xwu32_t *)bkup_vma_base;
@@ -288,6 +289,28 @@ void soc_ram_init(void)
                         }
                 }
         }
+#else /* SOCCFG_BKUP */
+        /* fill zero. */
+        src = (xwu32_t *)bkup_mr_origin;
+        cnt = (xwu32_t)bkup_mr_size;
+        XWOS_BUG_ON(cnt & 3); /* Memory must be aligned 4. */
+        cnt >>= 2;
+        for (i = 0; i < cnt; i++) {
+                src[i] = 0;
+        }
+
+        /* relocate backup data */
+        rlc_src = bkup_lma_base;
+        if (bkup_vma_base != rlc_src) {
+                rlc_dst = bkup_vma_base;
+                cnt = (xwu32_t)bkup_vma_end - (xwu32_t)bkup_vma_base;
+                for (i = 0; i < cnt; i++) {
+                        *rlc_dst = *rlc_src;
+                        rlc_dst++;
+                        rlc_src++;
+                }
+        }
+#endif /* !SOCCFG_BKUP */
 
         /* Init standby mode wakeup entry */
         src = (xwu32_t *)stdby_wkup_mr_origin;
