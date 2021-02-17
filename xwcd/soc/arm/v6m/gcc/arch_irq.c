@@ -94,7 +94,7 @@ void arch_isr_hardfault(void)
         __xwcc_unused volatile struct cm_scs_reg * scs;
 
         scs = &cm_scs;
-        arch_skd_chkcstk();
+        arch_skd_chk_stk();
         while (true) {
         }
 }
@@ -108,7 +108,7 @@ void arch_isr_mm(void)
         __xwcc_unused volatile struct cm_scs_reg * scs;
 
         scs = &cm_scs;
-        arch_skd_chkcstk();
+        arch_skd_chk_stk();
         while (true) {
         }
 }
@@ -122,7 +122,7 @@ void arch_isr_busfault(void)
         __xwcc_unused volatile struct cm_scs_reg * scs;
 
         scs = &cm_scs;
-        arch_skd_chkcstk();
+        arch_skd_chk_stk();
         while (true) {
         }
 }
@@ -136,7 +136,7 @@ void arch_isr_usagefault(void)
         __xwcc_unused volatile struct cm_scs_reg * scs;
 
         scs = &cm_scs;
-        arch_skd_chkcstk();
+        arch_skd_chk_stk();
         while (true) {
         }
 }

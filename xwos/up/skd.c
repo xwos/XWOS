@@ -49,8 +49,14 @@ __xwup_data __xwcc_alignl1cache
 xwu8_t xwup_skd_bhd_stack[XWUPCFG_SKD_BH_STACK_SIZE];
 #endif /* XWUPCFG_SKD_BH */
 
-extern __xwup_code
+extern
 void bdl_xwskd_idle_hook(struct xwup_skd * xwskd);
+
+extern
+void bdl_xwskd_pre_swcx_hook(struct xwup_skd * xwskd);
+
+extern
+void bdl_xwskd_post_swcx_hook(struct xwup_skd * xwskd);
 
 static __xwup_code
 struct xwup_thd * xwup_skd_rtrq_choose(void);
@@ -77,6 +83,9 @@ xwer_t xwup_skd_check_swcx(struct xwup_thd * t, struct xwup_thd ** pmthd);
 
 static __xwup_code
 xwer_t xwup_skd_do_swcx(void);
+
+static __xwup_code
+void xwup_skd_finish_swcx_lic(struct xwup_skd * xwskd);
 
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
 static __xwup_code
@@ -693,6 +702,33 @@ xwer_t xwup_skd_do_swcx(void)
         return rc;
 }
 
+/**
+ * @brief 切换上下文之前的回调函数
+ * @param xwskd: (I) XWOS UP调度器的指针
+ */
+__xwup_code
+struct xwup_skd * xwup_skd_pre_swcx_lic(struct xwup_skd * xwskd)
+{
+#if defined(BRDCFG_XWSKD_PRE_SWCX_HOOK) && (1 == BRDCFG_XWSKD_PRE_SWCX_HOOK)
+        bdl_xwskd_pre_swcx_hook(xwskd);
+#endif
+        return xwskd;
+}
+
+/**
+ * @brief 切换上下文之后的回调函数
+ * @param xwskd: (I) XWOS UP调度器的指针
+ */
+__xwup_code
+struct xwup_skd * xwup_skd_post_swcx_lic(struct xwup_skd * xwskd)
+{
+#if defined(BRDCFG_XWSKD_POST_SWCX_HOOK) && (1 == BRDCFG_XWSKD_POST_SWCX_HOOK)
+        bdl_xwskd_post_swcx_hook(xwskd);
+#endif
+        xwup_skd_finish_swcx_lic(xwskd);
+        return xwskd;
+}
+
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
 /**
  * @brief 请求切换上下文
@@ -738,10 +774,11 @@ xwer_t xwup_skd_req_swcx(void)
 
 /**
  * @brief 结束上下文的切换
+ * @param xwskd: (I) XWOS UP调度器的指针
  * @note
- * - 此函数需要在切换上下文的中断的最后调用。
+ * - 此函数需要在BSP切换上下文的中断的最后调用。
  */
-__xwup_code
+static __xwup_code
 void xwup_skd_finish_swcx_lic(struct xwup_skd * xwskd)
 {
         xwreg_t cpuirq;
@@ -825,10 +862,11 @@ xwer_t xwup_skd_req_swcx(void)
 
 /**
  * @brief 结束上下文的切换
+ * @param xwskd: (I) XWOS UP调度器的指针
  * @note
- * - 此函数需在切换上下文的中断的最后调用。
+ * - 此函数需在BSP切换上下文的中断的最后调用。
  */
-__xwup_code
+static __xwup_code
 void xwup_skd_finish_swcx_lic(struct xwup_skd * xwskd)
 {
         xwreg_t cpuirq;

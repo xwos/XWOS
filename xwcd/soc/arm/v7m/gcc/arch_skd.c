@@ -111,7 +111,7 @@ void arch_skd_init_stack(struct xwospl_skd_stack_info * stk,
                          xwsq_t attr)
 {
         bool privileged;
-        xwu32_t * stkbtn;
+        xwstk_t * stkbtn;
         xwsq_t i, stknum;
 
 #if defined(XuanWuOS_CFG_CORE__mp)
@@ -120,8 +120,8 @@ void arch_skd_init_stack(struct xwospl_skd_stack_info * stk,
         privileged = !!(attr & XWUP_SKDATTR_PRIVILEGED);
 #endif
 
-        stkbtn = (xwu32_t *)stk->base;
-        stknum = stk->size / sizeof(xwu32_t);
+        stkbtn = (xwstk_t *)stk->base;
+        stknum = stk->size / sizeof(xwstk_t);
         for (i = 0; i < stknum; i++) {
                 stkbtn[i] = 0xFFFFFFFFU;
         }
@@ -314,8 +314,13 @@ void arch_isr_pendsv(void)
         /* get scheduler */
         __asm__ volatile("      push    {lr}");
         __asm__ volatile("      sub     sp, #4");
-        /* r0 = arch_skd_chkpstk(); */
-        __asm__ volatile("      bl      arch_skd_chkpstk");
+        /* r0 = arch_skd_chk_swcx(); */
+        __asm__ volatile("      bl      arch_skd_chk_swcx");
+#if defined(XuanWuOS_CFG_CORE__mp)
+        __asm__ volatile("      bl      xwmp_skd_pre_swcx_lic");
+#elif defined(XuanWuOS_CFG_CORE__up)
+        __asm__ volatile("      bl      xwup_skd_pre_swcx_lic");
+#endif
         __asm__ volatile("      add     sp, #4");
         __asm__ volatile("      pop     {lr}");
 
@@ -368,14 +373,57 @@ void arch_isr_pendsv(void)
         __asm__ volatile("      push    {lr}");
         __asm__ volatile("      sub     sp, #4");
 #if defined(XuanWuOS_CFG_CORE__mp)
-        /* xwmp_skd_finish_swcx_lc(r0) */
-        __asm__ volatile("      bl      xwmp_skd_finish_swcx_lic");
+        /* xwmp_skd_post_swcx_lc(r0) */
+        __asm__ volatile("      bl      xwmp_skd_post_swcx_lic");
 #elif defined(XuanWuOS_CFG_CORE__up)
-        /* xwup_skd_finish_swcx_lc(r0) */
-        __asm__ volatile("      bl      xwup_skd_finish_swcx_lic");
+        /* xwup_skd_post_swcx_lc(r0) */
+        __asm__ volatile("      bl      xwup_skd_post_swcx_lic");
 #endif
         __asm__ volatile("      add     sp, #4");
         __asm__ volatile("      pop     {pc}");
+}
+
+/**
+ * @brief ADL BSP：切换线程上下文时检查线程的栈溢出
+ * @return 调度器的指针
+ */
+__xwbsp_code
+struct xwospl_skd * arch_skd_chk_swcx(void)
+{
+#if defined(XWMMCFG_STACK_CHK_SWCX) && (1 == XWMMCFG_STACK_CHK_SWCX)
+        struct xwospl_skd * xwskd;
+        struct xwospl_skd_stack_info * cstk;
+        union {
+                xwstk_t * ptr;
+                xwptr_t value;
+        } stk;
+        xwstk_t * stkbtn;
+        xwsz_t i;
+
+        xwskd = arch_skd_get_lc();
+        cstk = xwskd->cstk;
+        stkbtn = (xwstk_t *)cstk->base;
+        stk.ptr = cstk->sp;
+#if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
+        if ((stk.value - (ARCH_NVFR_SIZE + ARCH_NVGR_SIZE)) <
+            (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
+                arch_skd_report_stk_overflow(cstk);
+        }
+#else /* ARCHCFG_FPU */
+        if ((stk.value - ARCH_NVGR_SIZE) <
+            (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
+                arch_skd_report_stk_overflow(cstk);
+        }
+#endif /* !ARCHCFG_FPU */
+        for (i = 0; i < XWOSPL_STACK_WATERMARK; i++) {
+                if (0xFFFFFFFFU != stkbtn[i]) {
+                        arch_skd_report_stk_overflow(cstk);
+                }
+        }
+        return xwskd;
+#else /* XWMMCFG_STACK_CHK_SWCX */
+        return arch_skd_get_lc();
+#endif /* !XWMMCFG_STACK_CHK_SWCX */
 }
 
 /**
@@ -383,7 +431,7 @@ void arch_isr_pendsv(void)
  * @return 调度器的指针
  */
 __xwbsp_code
-struct xwospl_skd * arch_skd_chkcstk(void)
+struct xwospl_skd * arch_skd_chk_stk(void)
 {
         struct xwospl_skd * xwskd;
         struct xwospl_skd_stack_info * cstk;
@@ -391,48 +439,29 @@ struct xwospl_skd * arch_skd_chkcstk(void)
                 xwstk_t * ptr;
                 xwptr_t value;
         } stk;
+        xwstk_t * stkbtn;
+        xwsz_t i;
 
         xwskd = arch_skd_get_lc();
         cstk = xwskd->cstk;
+        stkbtn = (xwstk_t *)cstk->base;
         cm_get_psp(&stk.value);
 #if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
-        if (stk.value - (ARCH_NVFR_SIZE + ARCH_NVGR_SIZE) < (xwptr_t)cstk->base) {
+        if ((stk.value - (ARCH_NVFR_SIZE + ARCH_NVGR_SIZE)) <
+            (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
                 arch_skd_report_stk_overflow(cstk);
         }
 #else /* ARCHCFG_FPU */
-        if ((stk.value - ARCH_NVGR_SIZE) < (xwptr_t)cstk->base) {
+        if ((stk.value - ARCH_NVGR_SIZE) <
+            (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
                 arch_skd_report_stk_overflow(cstk);
         }
 #endif /* !ARCHCFG_FPU */
-        return xwskd;
-}
-
-/**
- * @brief ADL BSP：切换线程上下文时检查前一个线程的栈溢出
- * @return 调度器的指针
- */
-__xwbsp_code
-struct xwospl_skd * arch_skd_chkpstk(void)
-{
-        struct xwospl_skd * xwskd;
-        struct xwospl_skd_stack_info * pstk;
-        union {
-                xwstk_t * ptr;
-                xwptr_t value;
-        } stk;
-
-        xwskd = arch_skd_get_lc();
-        pstk = xwskd->pstk;
-        cm_get_psp(&stk.value);
-#if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
-        if (stk.value - (ARCH_NVFR_SIZE + ARCH_NVGR_SIZE) < (xwptr_t)pstk->base) {
-                arch_skd_report_stk_overflow(pstk);
+        for (i = 0; i < XWOSPL_STACK_WATERMARK; i++) {
+                if (0xFFFFFFFFU != stkbtn[i]) {
+                        arch_skd_report_stk_overflow(cstk);
+                }
         }
-#else /* ARCHCFG_FPU */
-        if ((stk.value - ARCH_NVGR_SIZE) < (xwptr_t)pstk->base) {
-                arch_skd_report_stk_overflow(pstk);
-        }
-#endif /* !ARCHCFG_FPU */
         return xwskd;
 }
 

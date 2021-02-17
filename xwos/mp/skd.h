@@ -196,7 +196,8 @@ xwer_t xwmp_skd_wakelock_lock(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_wakelock_unlock(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_notify_allfrz_lic(struct xwmp_skd * xwskd);
 
-void xwmp_skd_finish_swcx_lic(struct xwmp_skd * xwskd);
+struct xwmp_skd * xwmp_skd_pre_swcx_lic(struct xwmp_skd * xwskd);
+struct xwmp_skd * xwmp_skd_post_swcx_lic(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_suspend_lic(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_resume_lic(struct xwmp_skd * xwskd);
 

@@ -25,6 +25,8 @@
 #include <arch_sc_trap.h>
 #include <soc.h>
 
+#define SOC_STKFRAME_SIZE               0x50
+
 static __xwbsp_code
 xwer_t soc_skd_swi(xwer_t(* swifunc)(void *, void *), void * arg0, void * arg1);
 
@@ -165,8 +167,8 @@ void xwospl_skd_init_stack(struct xwospl_skd_stack_info * stk,
 {
         bool privileged;
         union msr_reg msr;
-        xwu32_t * stkbtn;
-        xwsq_t i;
+        xwstk_t * stkbtn;
+        xwsq_t i, stknum;
 
 #if defined(XuanWuOS_CFG_CORE__mp)
         privileged = !!(attr & XWMP_SKDATTR_PRIVILEGED);
@@ -184,6 +186,12 @@ void xwospl_skd_init_stack(struct xwospl_skd_stack_info * stk,
                 msr.b.pr = 0; /* privileged */
         } else {
                 msr.b.pr = 1; /* unprivileged */
+        }
+
+        stkbtn = (xwstk_t *)stk->base;
+        stknum = stk->size / sizeof(xwstk_t);
+        for (i = 0; i < stknum; i++) {
+                stkbtn[i] = 0xFFFFFFFFU;
         }
 
         /* reserved frame (used by compiler) 8*4 = 32 bytes */
@@ -271,11 +279,6 @@ void xwospl_skd_init_stack(struct xwospl_skd_stack_info * stk,
         *(stk->sp) = (xwstk_t)_SDA_BASE_; /* r13 */
         stk->sp--;
         *(stk->sp) = (xwstk_t)_SDA2_BASE_; /* r2 */
-
-        stkbtn = (xwu32_t *)stk->base;
-        for (i = 0; i < 16; i++) {
-                stkbtn[i] = 0xFFFFFFFFU;
-        }
 }
 
 /**
@@ -290,11 +293,47 @@ void soc_skd_req_swcx(struct xwospl_skd * xwskd)
 }
 
 /**
+ * @brief 切换线程上下文时检查线程的栈溢出
+ * @return XWOS调度器的指针
+ */
+__xwbsp_code
+struct xwospl_skd * soc_skd_chk_swcx(void)
+{
+#if defined(XWMMCFG_STACK_CHK_SWCX) && (1 == XWMMCFG_STACK_CHK_SWCX)
+        struct xwospl_skd * xwskd;
+        struct xwospl_skd_stack_info * cstk;
+        union {
+                xwstk_t * ptr;
+                xwptr_t value;
+        } stk;
+        xwstk_t * stkbtn;
+        xwsz_t i;
+
+        xwskd = soc_skd_get_lc();
+        cstk = xwskd->cstk;
+        stkbtn = (xwstk_t *)cstk->base;
+        stk.ptr = cstk->sp;
+        if ((stk.value - SOC_STKFRAME_SIZE) <
+            (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
+                soc_skd_report_stk_overflow(cstk);
+        }
+        for (i = 0; i < XWOSPL_STACK_WATERMARK; i++) {
+                if (0xFFFFFFFFU != stkbtn[i]) {
+                        soc_skd_report_stk_overflow(cstk);
+                }
+        }
+        return xwskd;
+#else /* XWMMCFG_STACK_CHK_SWCX */
+        return arch_skd_get_lc();
+#endif /* !XWMMCFG_STACK_CHK_SWCX */
+}
+
+/**
  * @brief 异常时检查当前线程的栈溢出
  * @return XWOS调度器的指针
  */
 __xwbsp_code
-struct xwospl_skd * soc_skd_chkcstk(void)
+struct xwospl_skd * soc_skd_chk_stk(void)
 {
         struct xwospl_skd * xwskd;
         struct xwospl_skd_stack_info * cstk;
@@ -302,35 +341,21 @@ struct xwospl_skd * soc_skd_chkcstk(void)
                 xwstk_t * ptr;
                 xwptr_t value;
         } stk;
+        xwstk_t * stkbtn;
+        xwsz_t i;
 
         xwskd = soc_skd_get_lc();
         cstk = xwskd->cstk;
+        stkbtn = (xwstk_t *)cstk->base;
         stk.ptr = soc_context.thd_sp;
-        if ((stk.value - 0x50) < (xwptr_t)cstk->base) {
+        if ((stk.value - SOC_STKFRAME_SIZE) <
+            (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
                 soc_skd_report_stk_overflow(cstk);
         }
-        return xwskd;
-}
-
-/**
- * @brief 切换线程上下文时检查前一个线程的栈溢出
- * @return XWOS调度器的指针
- */
-__xwbsp_code
-struct xwospl_skd * soc_skd_chkpstk(void)
-{
-        struct xwospl_skd * xwskd;
-        struct xwospl_skd_stack_info * pstk;
-        union {
-                xwstk_t * ptr;
-                xwptr_t value;
-        } stk;
-
-        xwskd = soc_skd_get_lc();
-        pstk = xwskd->pstk;
-        stk.ptr = soc_context.thd_sp;
-        if ((stk.value - 0x50) < (xwptr_t)pstk->base) {
-                soc_skd_report_stk_overflow(pstk);
+        for (i = 0; i < XWOSPL_STACK_WATERMARK; i++) {
+                if (0xFFFFFFFFU != stkbtn[i]) {
+                        soc_skd_report_stk_overflow(cstk);
+                }
         }
         return xwskd;
 }

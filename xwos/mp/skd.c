@@ -54,7 +54,7 @@
 #include <xwos/mp/rtrq.h>
 #include <xwos/mp/tt.h>
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
-#include <xwos/mp/bh.h>
+  #include <xwos/mp/bh.h>
 #endif /* XWMPCFG_SKD_BH */
 
 /**
@@ -79,6 +79,12 @@ xwu8_t xwmp_skd_bhd_stack[CPUCFG_CPU_NUM][XWMPCFG_SKD_BH_STACK_SIZE];
 
 extern
 void bdl_xwskd_idle_hook(struct xwmp_skd * xwskd);
+
+extern
+void bdl_xwskd_pre_swcx_hook(struct xwmp_skd * xwskd);
+
+extern
+void bdl_xwskd_post_swcx_hook(struct xwmp_skd * xwskd);
 
 extern __xwmp_code
 void xwmp_pmdm_report_xwskd_suspended(struct xwmp_pmdm * pmdm);
@@ -119,6 +125,9 @@ xwer_t xwmp_skd_check_swcx(struct xwmp_skd * xwskd,
 
 static __xwmp_code
 xwer_t xwmp_skd_do_swcx(struct xwmp_skd * xwskd);
+
+static __xwmp_code
+void xwmp_skd_finish_swcx_lic(struct xwmp_skd * xwskd);
 
 static __xwmp_code
 void xwmp_skd_reqfrz_intr_all_lic(struct xwmp_skd * xwskd);
@@ -949,6 +958,33 @@ xwer_t xwmp_skd_do_swcx(struct xwmp_skd * xwskd)
         return rc;
 }
 
+/**
+ * @brief 切换上下文之前的回调函数
+ * @param xwskd: (I) XWOS MP调度器的指针
+ */
+__xwmp_code
+struct xwmp_skd * xwmp_skd_pre_swcx_lic(struct xwmp_skd * xwskd)
+{
+#if defined(BRDCFG_XWSKD_PRE_SWCX_HOOK) && (1 == BRDCFG_XWSKD_PRE_SWCX_HOOK)
+        bdl_xwskd_pre_swcx_hook(xwskd);
+#endif
+        return xwskd;
+}
+
+/**
+ * @brief 切换上下文之后的回调函数
+ * @param xwskd: (I) XWOS MP调度器的指针
+ */
+__xwmp_code
+struct xwmp_skd * xwmp_skd_post_swcx_lic(struct xwmp_skd * xwskd)
+{
+#if defined(BRDCFG_XWSKD_POST_SWCX_HOOK) && (1 == BRDCFG_XWSKD_POST_SWCX_HOOK)
+        bdl_xwskd_post_swcx_hook(xwskd);
+#endif
+        xwmp_skd_finish_swcx_lic(xwskd);
+        return xwskd;
+}
+
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
 /**
  * @brief 请求切换上下文
@@ -995,9 +1031,9 @@ xwer_t xwmp_skd_req_swcx(struct xwmp_skd * xwskd)
  * @brief 结束上下文的切换
  * @param xwskd: (I) XWOS MP调度器的指针
  * @note
- * - 此函数需要在BSP中切换线程上下文的中断函数的最后一步调用。
+ * - 此函数需要在BSP切换线程上下文的中断函数的最后一步调用。
  */
-__xwmp_code
+static __xwmp_code
 void xwmp_skd_finish_swcx_lic(struct xwmp_skd * xwskd)
 {
         xwreg_t cpuirq;
@@ -1080,9 +1116,9 @@ xwer_t xwmp_skd_req_swcx(struct xwmp_skd * xwskd)
  * @brief 结束上下文的切换
  * @param xwskd: (I) XWOS MP调度器的指针
  * @note
- * - 此函数需要在BSP中切换线程上下文的中断函数的最后一步调用。
+ * - 此函数需要在BSP切换线程上下文的中断函数的最后一步调用。
  */
-__xwmp_code
+static __xwmp_code
 void xwmp_skd_finish_swcx_lic(struct xwmp_skd * xwskd)
 {
         xwreg_t cpuirq;

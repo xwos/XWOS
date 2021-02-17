@@ -182,7 +182,8 @@ xwer_t xwup_skd_wakelock_unlock(void);
 void xwup_skd_intr_all(void);
 xwer_t xwup_skd_notify_allfrz_lic(void);
 
-void xwup_skd_finish_swcx_lic(struct xwup_skd * xwskd);
+struct xwup_skd * xwup_skd_pre_swcx_lic(struct xwup_skd * xwskd);
+struct xwup_skd * xwup_skd_post_swcx_lic(struct xwup_skd * xwskd);
 xwer_t xwup_skd_suspend_lic(struct xwup_skd * xwskd);
 xwer_t xwup_skd_resume_lic(struct xwup_skd * xwskd);
 

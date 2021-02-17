@@ -37,11 +37,11 @@
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XuanWuOS_CFG_CORE__mp)
-        .extern         xwmp_skd_finish_swcx_lic
+        .extern         xwmp_skd_post_swcx_lic
 #elif defined(XuanWuOS_CFG_CORE__up)
-        .extern         xwup_skd_finish_swcx_lic
+        .extern         xwup_skd_post_swcx_lic
 #endif
-        .extern         soc_skd_chkpstk
+        .extern         soc_skd_chk_swcx
         .extern         _SDA_BASE_
         .extern         _SDA2_BASE_
 
@@ -115,7 +115,12 @@ soc_skd_isr_swcx:
         se_mflr         r0
         se_stw          r0, 36 (r1) /* save the lr to caller stack frame */
         /* check thread stack & get xwos scheduler */
-        e_bl            soc_skd_chkpstk /* r3 = soc_skd_chkpstk(); */
+        e_bl            soc_skd_chk_swcx /* r3 = soc_skd_chk_swcx(); */
+#if defined(XuanWuOS_CFG_CORE__mp)
+        e_bl            xwmp_skd_pre_swcx_lic
+#elif defined(XuanWuOS_CFG_CORE__up)
+        e_bl            xwup_skd_pre_swcx_lic
+#endif
 
         /* get thread SP */
         e_lis           r4, soc_context@h /* r4 = &soc_context; */
@@ -144,9 +149,9 @@ soc_skd_isr_swcx:
 
         /* finish the progress */
 #if defined(XuanWuOS_CFG_CORE__mp)
-        e_bl            xwmp_skd_finish_swcx_lic
+        e_bl            xwmp_skd_post_swcx_lic
 #elif defined(XuanWuOS_CFG_CORE__up)
-        e_bl            xwup_skd_finish_swcx_lic
+        e_bl            xwup_skd_post_swcx_lic
 #endif
         se_lwz          r0, 36 (r1)
         se_mtlr         r0

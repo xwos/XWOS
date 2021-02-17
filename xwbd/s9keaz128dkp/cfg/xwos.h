@@ -75,6 +75,8 @@
 /******** common ********/
 #define XWMMCFG_ALIGNMENT                               (8U)
 #define XWMMCFG_STACK_ALIGNMENT                         (8U)
+#define XWMMCFG_STACK_WATERMARK                         (4U)
+#define XWMMCFG_STACK_CHK_SWCX                          1
 #define XWMMCFG_FD_STACK                                1
 #define XWMMCFG_ED_STACK                                0
 #define XWMMCFG_FA_STACK                                0

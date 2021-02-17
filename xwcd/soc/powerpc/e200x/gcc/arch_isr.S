@@ -35,6 +35,7 @@
         .extern         arch_privilege_start_entry
         .extern         arch_privilege_end_entry
         .extern         soc_reset_hard
+        .extern         soc_skd_chk_stk
         .extern         soc_eii_isr
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -129,7 +130,7 @@ arch_isr_cii_end:
         .align          4
 arch_isr_mci:
         e_stwu          r1, -0x50 (r1)
-        e_bl            soc_reset_hard
+        e_bl            soc_skd_chk_stk
         e_b             .
         e_add16i        r1, r1, 0x50
         se_rfi
@@ -144,7 +145,7 @@ arch_isr_mci_end:
         .align          4
 arch_isr_dsi:
         e_stwu          r1, -0x50 (r1)
-        e_bl            soc_reset_hard
+        e_bl            soc_skd_chk_stk
         e_b             .
         e_add16i        r1, r1, 0x50
         se_rfi
@@ -159,7 +160,7 @@ arch_isr_dsi_end:
         .align          4
 arch_isr_isi:
         e_stwu          r1, -0x50 (r1)
-        e_bl            soc_reset_hard
+        e_bl            soc_skd_chk_stk
         e_b             .
         e_add16i        r1, r1, 0x50
         se_rfi
@@ -174,7 +175,7 @@ arch_isr_isi_end:
         .align          4
 arch_isr_ai:
         e_stwu          r1, -0x50 (r1)
-        e_bl            soc_reset_hard
+        e_bl            soc_skd_chk_stk
         e_b             .
         e_add16i        r1, r1, 0x50
         se_rfi
@@ -189,7 +190,7 @@ arch_isr_ai_end:
         .align          4
 arch_isr_pi:
         e_stwu          r1, -0x50 (r1)
-        e_bl            soc_reset_hard
+        e_bl            soc_skd_chk_stk
         e_b             .
         e_add16i        r1, r1, 0x50
         se_rfi

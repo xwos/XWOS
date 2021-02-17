@@ -17,6 +17,7 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/sem.h>
+#include <xwos/osal/sync/sel.h>
 
 /**
  * @breif 消息队列对象
@@ -67,5 +68,13 @@ xwer_t xwmq_jq(struct xwmq * mq, struct xwmq_msg * msg, int topic, void * data);
 xwer_t xwmq_dq(struct xwmq * mq, struct xwmq_msg ** ptrbuf);
 xwer_t xwmq_timedq(struct xwmq * mq, struct xwmq_msg ** ptrbuf, xwtm_t * xwtm);
 xwer_t xwmq_trydq(struct xwmq * mq, struct xwmq_msg ** ptrbuf);
+
+xwer_t xwmq_timedselect(struct xwos_sel * sel,
+                        struct xwmq * mqs[], xwsz_t * mqsz,
+                        xwtm_t * xwtm);
+xwer_t xwmq_select(struct xwos_sel * sel,
+                   struct xwmq * mqs[], xwsz_t * mqsz);
+xwer_t xwmq_tryselect(struct xwos_sel * sel,
+                      struct xwmq * mqs[], xwsz_t * mqsz);
 
 #endif /* xwmd/isc/xwmq/mif.h */
