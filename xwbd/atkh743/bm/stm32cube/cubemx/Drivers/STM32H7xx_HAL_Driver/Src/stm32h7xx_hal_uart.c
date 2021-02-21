@@ -1475,7 +1475,7 @@ HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData
 
         __HAL_UNLOCK(huart);
 
-        /* Restore huart->gState to ready */
+        /* Restore huart->RxState to ready */
         huart->RxState = HAL_UART_STATE_READY;
 
         return HAL_ERROR;

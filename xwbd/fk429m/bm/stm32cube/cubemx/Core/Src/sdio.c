@@ -257,6 +257,7 @@ xwer_t MX_SDIO_SD_TrimClk(xwsq_t cnt)
   xwsq_t i;
   xwtm_t time;
 
+  rc = XWOK;
   for (i = 0; i < cnt; i++) {
     time = 1 * XWTM_MS;
     xwos_cthd_sleep(&time);

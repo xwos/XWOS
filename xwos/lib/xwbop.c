@@ -759,14 +759,14 @@ xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num)
         if ((xwbmp_t)0 == msk) {
                 msk = (xwbmp_t)(~(xwbmp_t)0);
         }/* else {} */
-        for (; i > 0;) {
+        do {
                 i--;
                 p = xwbop_fls(xwbmp_t, bmp[i] & msk);
                 if (p >= 0) {
                         break;
                 }
                 msk = (xwbmp_t)(~(xwbmp_t)0);
-        }
+        } while (i > 0);
         p += ((xwssq_t)i << XWBMP_T_SHIFT); /* p = p + i * BITS_PER_XWBMP_T; */
         return p;
 }
@@ -784,14 +784,14 @@ xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t num)
         if ((xwbmp_t)(~(xwbmp_t)0) == msk) {
                 msk = (xwbmp_t)0;
         }/* else {} */
-        while (i > 0) {
+        do {
                 i--;
                 p = xwbop_flz(xwbmp_t, bmp[i] | msk);
                 if (p >= 0) {
                         break;
                 }
                 msk = (xwbmp_t)0;
-        }
+        } while (i > 0);
         p += ((xwssq_t)i << XWBMP_T_SHIFT); /* p = p + i * BITS_PER_XWBMP_T; */
         return p;
 }

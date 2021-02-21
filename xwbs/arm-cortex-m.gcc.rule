@@ -69,11 +69,16 @@ CXXFLAGS = -mabi=aapcs -mthumb -std=gnu++17 \
 
 MMFLAGS = -MM -MP
 
-ifeq ($(~D),0)
-    CFLAGS += -O2
-else
-    CFLAGS += -O0
+ifeq ($(~O),)
+    ifeq ($(~D),0)
+        ~O := 1
+    else
+        ~O := g
+    endif
 endif
+
+CFLAGS += -O$(~O)
+CXXFLAGS += -O$(~O)
 
 ifeq ($(ARCHCFG_COMPILER_CLIB),n)
     CFLAGS += -fno-builtin

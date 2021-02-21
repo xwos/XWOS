@@ -484,6 +484,7 @@ xwer_t xwscp_rx_sdu(struct xwscp * xwscp, union xwscp_slot * slot)
                 }
         } else {
                 xwscp_rxq_pub(xwscp, slot);
+                rc = XWOK;
         }
         return rc;
 }

@@ -44,8 +44,8 @@ struct xwds_eeprom_driver {
                           xwtm_t * /*xwtm*/);
 };
 
-const struct xwds_eeprom_driver at24sd_drv;
-const struct xwds_eeprom_driver at24md_drv;
+extern const struct xwds_eeprom_driver at24sd_drv;
+extern const struct xwds_eeprom_driver at24md_drv;
 
 /******** ******** base driver ******** ********/
 xwer_t xwds_eeprom_drv_start(struct xwds_device * dev);

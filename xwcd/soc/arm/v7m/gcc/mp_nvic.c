@@ -36,7 +36,7 @@ __xwbsp_data struct xwmp_irqc cortexm_nvic[CPUCFG_CPU_NUM] = {
                 .drv = &cortexm_nvic_drv,
                 .irqs_num = (SOCCFG_IRQ_NUM + ARCHCFG_IRQ_NUM),
                 .isr_table = &soc_isr_table,
-                .irq_data_table = &soc_isr_data_table,
+                .isr_data_table = &soc_isr_data_table,
                 .soc_cfg = &armv7_nvic_cfg,
                 .data = NULL,
         }

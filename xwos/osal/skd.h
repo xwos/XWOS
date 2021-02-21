@@ -558,7 +558,7 @@ xwer_t xwos_thd_intr(struct xwos_thd * thd)
 }
 
 /**
- * @brief XWOS API：将线程迁移到其他CPU
+ * @brief XWOS API：将线程迁移到目标CPU
  * @param thd: (I) 线程对象的指针
  * @param dstcpu: (I) 目标CPU的ID
  * @return 错误码

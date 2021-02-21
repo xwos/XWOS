@@ -485,7 +485,6 @@ xwer_t xwpcp_rx_sdu(struct xwpcp * xwpcp, union xwpcp_slot * slot)
         xwu8_t port;
         xwer_t rc;
 
-        rc = XWOK;
         xwaop_read(xwu32, &xwpcp->rxq.cnt, &rxcnt);
         lclid = XWPCP_ID(rxcnt);
         rmtid = slot->rx.frm.head.id;
@@ -515,6 +514,7 @@ xwer_t xwpcp_rx_sdu(struct xwpcp * xwpcp, union xwpcp_slot * slot)
                 }
         } else {
                 xwpcp_rxq_pub(xwpcp, slot, port);
+                rc = XWOK;
         }
         return rc;
 }

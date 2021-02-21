@@ -41,7 +41,7 @@ xwer_t xwup_irqc_init(const char * name, xwsz_t irqs_num,
         xwup_irqc.name = name;
         xwup_irqc.irqs_num = irqs_num;
         xwup_irqc.isr_table = isr_table;
-        xwup_irqc.irq_data_table = data_table;
+        xwup_irqc.isr_data_table = data_table;
         xwup_irqc.soc_cfg = soc_cfg;
         rc = xwospl_irqc_init();
         return rc;

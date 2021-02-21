@@ -191,7 +191,7 @@ xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t len)
                 msk = (~(xwbmp_t)0);
         }/* else {} */
         p = -1;
-        while (i > 0) {
+        do {
                 i--;
                 tmp = bmp[i] & msk;
                 if (tmp) {
@@ -206,7 +206,7 @@ xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t len)
                         break;
                 }/* else {} */
                 msk = (~(xwbmp_t)0);
-        }
+        } while (i > 0);
         return p;
 }
 #endif
@@ -226,7 +226,7 @@ xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t len)
                 msk = (xwbmp_t)0;
         }/* else {} */
         p = -1;
-        while (i > 0) {
+        do {
                 i--;
                 tmp = ~(bmp[i] | msk);
                 if (tmp) {
@@ -241,7 +241,7 @@ xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t len)
                         break;
                 }/* else {} */
                 msk = (xwbmp_t)0;
-        }
+        } while (i > 0);
         return p;
 }
 #endif

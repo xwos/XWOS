@@ -360,7 +360,7 @@ xwer_t xwos_flg_s1m(struct xwos_flg * flg, xwbmp_t msk[])
 /**
  * @brief XWOS API：设置单个事件标志位
  * @param flg: (I) 事件标志对象指针
- * @param pos: (I) 事件标志对象的序号
+ * @param pos: (I) 事件的序号
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -379,7 +379,7 @@ xwer_t xwos_flg_s1i(struct xwos_flg * flg, xwsq_t pos)
 /**
  * @brief XWOS API：同时清除多个事件标志位
  * @param flg: (I) 事件标志对象指针
- * @param msk: (I) 事件标志对象的位图掩码
+ * @param msk: (I) 事件的位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -397,7 +397,7 @@ xwer_t xwos_flg_c0m(struct xwos_flg * flg, xwbmp_t msk[])
 /**
  * @brief XWOS API：清除单个事件标志位
  * @param flg: (I) 事件标志对象指针
- * @param pos: (I) 事件标志对象的序号
+ * @param pos: (I) 事件的序号
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -416,7 +416,7 @@ xwer_t xwos_flg_c0i(struct xwos_flg * flg, xwsq_t pos)
 /**
  * @brief XWOS API：同时翻转多个事件标志位
  * @param flg: (I) 事件标志对象指针
- * @param msk: (I) 事件标志对象的位图掩码
+ * @param msk: (I) 事件的位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -434,7 +434,7 @@ xwer_t xwos_flg_x1m(struct xwos_flg * flg, xwbmp_t msk[])
 /**
  * @brief XWOS API：翻转单个事件标志位
  * @param flg: (I) 事件标志对象指针
- * @param pos: (I) 事件标志对象的序号
+ * @param pos: (I) 事件的序号
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -492,7 +492,7 @@ xwer_t xwos_flg_read(struct xwos_flg * flg, xwbmp_t out[])
  *                  (I) 作为输入时，作为用于比较的初始值
  *                  (O) 作为输出时，返回事件对象中位图状态
  *                      （可作为下一次调用的初始值）
- * @param msk: (I) 事件标志对象的位图掩码，表示只关注掩码部分的事件
+ * @param msk: (I) 事件的位图掩码，表示只关注掩码部分的事件
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -534,7 +534,7 @@ xwer_t xwos_flg_trywait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
  *                  (I) 作为输入时，作为用于比较的初始值
  *                  (O) 作为输出时，返回事件对象中位图状态
  *                      （可作为下一次调用的初始值）
- * @param msk: (I) 事件标志对象的位图掩码，表示只关注掩码部分的事件
+ * @param msk: (I) 事件的位图掩码，表示只关注掩码部分的事件
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -577,7 +577,7 @@ xwer_t xwos_flg_wait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
  *                  (I) 作为输入时，作为用于比较的初始值
  *                  (O) 作为输出时，返回事件对象中位图状态
  *                      （可作为下一次调用的初始值）
- * @param msk: (I) 事件标志对象的位图掩码，表示只关注掩码部分的事件
+ * @param msk: (I) 事件的位图掩码，表示只关注掩码部分的事件
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间

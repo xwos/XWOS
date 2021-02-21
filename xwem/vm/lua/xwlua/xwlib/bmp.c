@@ -128,15 +128,19 @@ int xwlua_bmp_flz(lua_State * L)
 int xwlua_bmp_s1i(lua_State * L)
 {
         xwlua_bmp_t * luabmp;
+        int top, i;
         xwsq_t idx;
 
         luabmp = (xwlua_bmp_t *)luaL_checkudata(L, 1, "xwlua_bmp_t");
-        idx = (xwsq_t)luaL_checkinteger(L, 2);
-        if ((0 == idx) || (idx > luabmp->bits)) {
-                luaL_error(L, "Bit index is out of range!");
-        } else {
-                idx--;
-                xwbmpop_s1i(luabmp->bmp, idx);
+        top = lua_gettop(L);
+        for (i = 2; i <= top; i++) {
+                idx = (xwsq_t)luaL_checkinteger(L, i);
+                if ((0 == idx) || (idx > luabmp->bits)) {
+                        luaL_error(L, "Bit index is out of range!");
+                } else {
+                        idx--;
+                        xwbmpop_s1i(luabmp->bmp, idx);
+                }
         }
         return 0;
 }
@@ -159,15 +163,19 @@ int xwlua_bmp_s1m(lua_State * L)
 int xwlua_bmp_c0i(lua_State * L)
 {
         xwlua_bmp_t * luabmp;
+        int top, i;
         xwsq_t idx;
 
         luabmp = (xwlua_bmp_t *)luaL_checkudata(L, 1, "xwlua_bmp_t");
-        idx = (xwsq_t)luaL_checkinteger(L, 2);
-        if ((0 == idx) || (idx > luabmp->bits)) {
-                luaL_error(L, "Bit index is out of range!");
-        } else {
-                idx--;
-                xwbmpop_c0i(luabmp->bmp, idx);
+        top = lua_gettop(L);
+        for (i = 2; i <= top; i++) {
+                idx = (xwsq_t)luaL_checkinteger(L, i);
+                if ((0 == idx) || (idx > luabmp->bits)) {
+                        luaL_error(L, "Bit index is out of range!");
+                } else {
+                        idx--;
+                        xwbmpop_c0i(luabmp->bmp, idx);
+                }
         }
         return 0;
 }
@@ -190,15 +198,19 @@ int xwlua_bmp_c0m(lua_State * L)
 int xwlua_bmp_x1i(lua_State * L)
 {
         xwlua_bmp_t * luabmp;
+        int top, i;
         xwsq_t idx;
 
         luabmp = (xwlua_bmp_t *)luaL_checkudata(L, 1, "xwlua_bmp_t");
-        idx = luaL_checkinteger(L, 2);
-        if ((0 == idx) || (idx > luabmp->bits)) {
-                luaL_error(L, "Bit index is out of range!");
-        } else {
-                idx--;
-                xwbmpop_x1i(luabmp->bmp, idx);
+        top = lua_gettop(L);
+        for (i = 2; i <= top; i++) {
+                idx = luaL_checkinteger(L, i);
+                if ((0 == idx) || (idx > luabmp->bits)) {
+                        luaL_error(L, "Bit index is out of range!");
+                } else {
+                        idx--;
+                        xwbmpop_x1i(luabmp->bmp, idx);
+                }
         }
         return 0;
 }

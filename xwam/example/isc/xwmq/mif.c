@@ -125,6 +125,7 @@ xwer_t xwmqdemo_producer_func(void * arg)
         struct xwmq_msg * msg;
 
         XWOS_UNUSED(arg);
+        rc = XWOK;
         mqlogf(INFO, "[生产者] 启动。\n");
         topic = 0;
         while (!xwos_cthd_frz_shld_stop(NULL)) {
@@ -154,6 +155,7 @@ xwer_t xwmqdemo_consumer_func(void * arg)
         struct xwmq_msg * msg;
 
         XWOS_UNUSED(arg);
+        rc = XWOK;
         mqlogf(INFO, "[消费者] 启动。\n");
         while (!xwos_cthd_frz_shld_stop(NULL)) {
                 rc = xwmq_dq(&xwmqdemo_mq, &msg);

@@ -33,7 +33,7 @@ void xwlib_rbtree_insert_color(struct xwlib_rbtree * tree,
 recursively_fix:
         if (node == tree->root) {
                 /*
-                 * 情况 1：红黑树为空
+                 * 情况 1 红黑树为空
                  * ==================
                  *               n(r)
                  *               /  \
@@ -54,7 +54,7 @@ recursively_fix:
         parent = xwlib_rbtree_get_parent(node);
         if (xwlib_rbtree_tst_black(parent->lpc.v)) {
                 /*
-                 * 情况 2：父节点为黑色
+                 * 情况 2 父节点为黑色
                  * ====================
                  */
                 return;
@@ -72,7 +72,7 @@ recursively_fix:
 
         if ((tmp.uncle) && xwlib_rbtree_tst_red(tmp.uncle->lpc.v)) {
                 /*
-                 * 情况 3.1：叔节点(u)是红色
+                 * 情况 3.1 叔节点(u)是红色
                  * =========================
                  *
                  *                   |
@@ -99,9 +99,7 @@ recursively_fix:
                  *  recursively fix_color(g);
                  * --------------------------->
                  *
-                 * ******** ******** ******** ******** ******** ********
-                 *  OR
-                 * ******** ******** ******** ******** ******** ********
+                 * ******** ******** ******** OR ******** ******** ********
                  *
                  *                   |
                  *                  g(B)
@@ -135,7 +133,7 @@ recursively_fix:
                 goto recursively_fix;
         }
 
-        /* 情况 3.2: 叔节点(U)是叶子或黑色 */
+        /* 情况 3.2 叔节点(U)是叶子或黑色 */
         if (xwlib_rbtree_get_pos(parent->lpc.v) != xwlib_rbtree_get_pos(node->lpc.v)) {
                 /*
                  * Case 3.2.1: node->lpc.pos != parent->lpc.pos
@@ -168,9 +166,7 @@ recursively_fix:
                  *        s(B)    l(B)
                  *        /  \    /  \
                  *
-                 * ******** ******** ******** ******** ******** ********
-                 *  OR
-                 * ******** ******** ******** ******** ******** ********
+                 * ******** ******** ******** OR ******** ******** ********
                  *
                  *               |
                  *              g(B)
@@ -223,7 +219,7 @@ recursively_fix:
         }
 
         /*
-         * 情况 3.2.2: node->lpc.pos == parent->lpc.pos
+         * 情况 3.2.2 node->lpc.pos == parent->lpc.pos
          * ============================================
          *
          *                           |
@@ -262,9 +258,7 @@ recursively_fix:
          *        l(B)    r(B)    s(B)    u(B)
          *        /  \    /  \    /  \    /  \
          *
-         * ******** ******** ******** ******** ******** ********
-         *  OR
-         * ******** ******** ******** ******** ******** ********
+         * ******** ******** ******** OR ******** ******** ********
          *
          *               |
          *              g(B)
@@ -351,7 +345,7 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
         xwptr_t lpc;
         xwptr_t rotation;
 
-        /* 步骤 1：删除节点 */
+        /* 步骤 1 删除节点 */
         rr.right =  node->right;
         sl.left =  node->left;
         if (!sl.left) {
@@ -359,23 +353,30 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                 *xwlib_rbtree_get_link(node->lpc.v) = rr.right;
                 if (!rr.right) {
                         /*
-                         * 情况 1：待删除的节点(n)没有子节点
-                         * =================================
-                         *
-                         *                  |
-                         *                p(*)
-                         *                /   \
-                         * s(r) or NULL(B)     n(r)
-                         *
-                         *  transplant_nil(n)
-                         * -------------------->
-                         *
-                         *                  |
-                         *                p(*)
-                         *                /   \
-                         * s(r) or NULL(B)     NULL(B)
-                         *
+                         * 情况 1.1 待删除的节点(n)没有子节点
+                         * ===================================
+                         * 情况 1.1.1 节点(n)是红色
+                         * 根据性质5，它的兄弟节点(s)不是叶子，就是红色节点，
+                         * 且(s)没有子节点；
+                         *                             *
+                         *                  |          *        |
+                         *                p(*)         *      p(*)
+                         *                /   \        *      /   \
+                         * s(r) or NULL(B)     n(r)    *  n(r)     NULL(B) or s(r)
+                         *                             *
+                         *  transplant_nil(n)          *  transplant_nil(n)
+                         * -------------------->       * -------------------->
+                         *                             *
+                         *                  |          *          |
+                         *                p(*)         *        p(*)
+                         *                /   \        *        /   \
+                         * s(r) or NULL(B)     NULL(B) * NULL(B)     NULL(B) or s(r)
+                         *                             *
                          * =====================================================
+                         * 情况 1.1.2 节点(n)是黑色
+                         * 根据性质5，(n)的兄弟节点(s)一定不是叶子：
+                         * + 如果兄弟节点(s)是红色，那么兄弟节点(s)有两个黑色子节点；
+                         * + 如果兄弟节点(s)是黑色，那么兄弟节点(s)没子节点。
                          *
                          *               |
                          *             p(*)
@@ -392,23 +393,7 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                          *         /  \                           /  \
                          *  NULL(B)    NULL(B)                l(B)    r(B)
                          *
-                         * ******** ******** ******** ******** ******** ********
-                         *  OR
-                         * ******** ******** ******** ******** ******** ********
-                         *        |
-                         *      p(*)
-                         *      /   \
-                         *  n(r)     NULL(B) or s(r)
-                         *
-                         *  transplant_nil(n)
-                         * -------------------->
-                         *
-                         *          |
-                         *        p(*)
-                         *        /   \
-                         * NULL(B)     NULL(B) or s(r)
-                         *
-                         * =====================================================
+                         * ******** ******** ******** OR ******** ******** ********
                          *
                          *        |
                          *      p(*)
@@ -424,13 +409,6 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                          *  NULL(BB)     s(B)           or    NULL(BB)     s(r)
                          *               /  \                              /  \
                          *        NULL(B)    NULL(B)                   l(B)    r(B)
-                         *
-                         * + 如果待删除的节点(n)是红色，根据性质5，
-                         *   它的兄弟节点(s)不是叶子，就是红色节点，且没有子节点；
-                         * + 如果待删除的节点(n)是黑色，根据性质5，
-                         *   它的兄弟节点(s)一定不是叶子：
-                         *   - 如果兄弟节点(s)是红色，那么兄弟节点(s)有两个黑色子节点；
-                         *   - 如果兄弟节点(s)是黑色，那么兄弟节点(s)没子节点。
                          */
                         if (NULL == tree->root) {
                                 return;
@@ -450,12 +428,12 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                         }
                 } else {
                         /*
-                         * 情况 2：待删除的节点(n)只有一个子节点
-                         * =====================================
+                         * 情况 1.2 待删除的节点(n)只有一个子节点
+                         * ======================================
                          */
                         /*
-                         * 情况 2.1：待删除的节点(n)没有左子节点
-                         * =====================================
+                         * 情况 1.2.1 待删除的节点(n)没有左子节点
+                         * ======================================
                          *    |
                          *   n(B)
                          *      \
@@ -481,8 +459,8 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                 }
         } else if (!rr.right) {
                 /*
-                 * 情况 2.2：待删除的节点(n)没有右子节点
-                 * =====================================
+                 * 情况 1.2.2 待删除的节点(n)没有右子节点
+                 * ======================================
                  *
                  *       |
                  *      n(B)
@@ -508,20 +486,20 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                 sibling = NULL;
         } else {
                 /*
-                 * 情况 3：待删除的节点(n)同时存在左右子节点
+                 * 情况 1.3 待删除的节点(n)同时存在左右子节点
                  */
                 struct xwlib_rbtree_node * successor;
 
                 successor = xwlib_rbtree_get_successor(node);
                 if (successor == rr.right) {
                         /*
-                         * 情况 3.1：待删除的节点(n)的后继节点(s)是它的右节点
-                         * ==================================================
+                         * 情况 1.3.1 待删除的节点(n)的后继节点(s)是它的右节点
+                         * ====================================================
                          *
                          *        |
                          *       n(*)
                          *      /   \
-                         *  l(*)     s(*)
+                         *  l(*)     s(B)
                          *               \
                          *                c(r)_or_NULL(B)
                          *
@@ -540,13 +518,43 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                          *         |
                          *       s(*)                       n()
                          *       /   \
-                         *   l(*)     c(B)_or_NULL(BB)
+                         *   l(*)     c(rB)_or_NULL(BB)
                          *
-                         * + 如果后继节点(s)有右子节点，根据性质5，(s)的右子节点
-                         *   必然为红色，再根据性质4，(s)必然不可能为红色（即为黑色）；
-                         * + 如果后继节点(s)为红色，其不可能存在子节点；
-                         * + 如果后继节点(s)没有右子节点且(s)为黑色，根据性质5，
-                         *   (s)的兄弟节点也即是(n)的左子节点(l)必然存在。
+                         * ******** ******** ******** OR ******** ******** ********
+                         *
+                         *        |
+                         *       n(*)
+                         *      /   \
+                         *  l(*)     s(r)
+                         *               \
+                         *                NULL(B)
+                         *
+                         *   transplant(s, n)
+                         *  -------------------------------------------->
+                         *  s把自己的颜色留给了c，n把自己的颜色留给了s
+                         *
+                         *      |
+                         *    s(*)                          n()
+                         *        \                         /
+                         *         NULL(rB)             l(*)
+                         *
+                         *   link(l, ((&s->left) | (RBTREE_LEFT) | color(l)))
+                         *  -------------------------------------------------->
+                         *
+                         *         |
+                         *       s(*)                       n()
+                         *       /   \
+                         *   l(*)     NULL(rB)
+                         *
+                         * ******** ******** ******** ******** ******** ********
+                         * + 如果后继接点(s)是黑色，则只存在两种情况：
+                         *   - 后继节点(s)有红色右子节点（根据性质4和5），transplant
+                         *     操作后，s把黑色留给右子节点，黑+红=黑；
+                         *   - 后继节点(s)没有右子节，(s)的兄弟节点(l)必然
+                         *     存在（根据性质5），transplant操作后，会产生一个双黑的
+                         *     叶子，需要修复颜色；
+                         * + 如果后继节点(s)为红色，其不可能存在子节点（根据性质5），
+                         *   transplant操作后，不会产生双黑的叶子；
                          */
 
                         if (successor->right) {
@@ -567,8 +575,8 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                                           xwlib_rbtree_gen_lc(successor, cc.color));
                 } else {
                         /*
-                         * 情况 3.2：(n)的后继节点(s)是(n)的右子树上最左端的节点
-                         * =====================================================
+                         * 情况 1.3.2 (n)的后继节点(s)是(n)的右子树上最左端的节点
+                         * ======================================================
                          *
                          *        |
                          *      n(*)
@@ -677,7 +685,7 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
 recursively_fix:
         if (xwlib_rbtree_tst_red(sibling->lpc.v)) {
                 /*
-                 * Case 1: 兄弟节点(s)是红色
+                 * 情况 2.1 兄弟节点(s)是红色
                  * ===================================================
                  *                          *
                  *         |                *           |
@@ -732,28 +740,32 @@ recursively_fix:
 
 black_sibling:
         /*
-         * 情况 2：兄弟节点(s)是黑色
+         * 情况 2.2 兄弟节点(s)是黑色
          */
         if (xwlib_rbtree_tst_right(sibling->lpc.v)) {
-                rotation = xwlib_rbtree_gen_lr(sibling); /* 左旋 */
+                rotation = xwlib_rbtree_gen_lr(sibling); /* 用于情况2.2.3中左旋 */
                 rr.reverse = sibling->left;
                 sl.same = sibling->right;
                 if (rr.reverse) {
-                        lpc = xwlib_rbtree_gen_rr(rr.reverse); /* 右旋 */
-                }/* else {} */
+                        lpc = xwlib_rbtree_gen_rr(rr.reverse); /* 用于情况2.2.2中右旋 */
+                } else {
+                        lpc = 0;
+                }
         } else {
-                rotation = xwlib_rbtree_gen_rr(sibling); /* 右旋 */
+                rotation = xwlib_rbtree_gen_rr(sibling); /* 用于情况2.2.3中右旋 */
                 rr.reverse = sibling->right;
                 sl.same = sibling->left;
                 if (rr.reverse) {
-                        lpc = xwlib_rbtree_gen_lr(rr.reverse); /* 左旋 */
-                }/* else {} */
+                        lpc = xwlib_rbtree_gen_lr(rr.reverse); /* 用于情况2.2.2中左旋 */
+                } else {
+                        lpc = 0;
+                }
         }
 
         if (!sl.same || xwlib_rbtree_tst_black(sl.same->lpc.v)) {
                 if (!rr.reverse || xwlib_rbtree_tst_black(rr.reverse->lpc.v)) {
                         /*
-                         * 情况 2.1：兄弟节点(s)没有红色的子节点
+                         * 情况 2.2.1 兄弟节点(s)没有红色的子节点
                          * =====================================
                          *
                          *               |
@@ -777,9 +789,7 @@ black_sibling:
                          * --------------------------------------->
                          *  如果p是黑色，p就作为新的X递归调整颜色
                          *
-                         * ******** ******** ******** ******** ******** ********
-                         *  OR
-                         * ******** ******** ******** ******** ******** ********
+                         * ******** ******** ******** OR ******** ******** ********
                          *
                          *            |
                          *          p(*)
@@ -823,8 +833,8 @@ black_sibling:
                 }
 
                 /*
-                 * 情况 2.2：与兄弟节点(s)位置相同的子节点为黑色，
-                 *           位置相反的子节点为红色
+                 * 情况 2.2.2 与兄弟节点(s)位置相同的子节点为黑色，
+                 *            位置相反的子节点为红色
                  *
                  *               |
                  *             p(*)
@@ -859,9 +869,7 @@ black_sibling:
                  *         /  \
                  *  same(B)    z(B)
                  *
-                 * ******** ******** ******** ******** ******** ********
-                 *  OR
-                 * ******** ******** ******** ******** ******** ********
+                 * ******** ******** ******** OR ******** ******** ********
                  *
                  *            |
                  *          p(*)
@@ -896,10 +904,14 @@ black_sibling:
                  *                    /  \
                  *                z(B)    same(B)
                  *
-                 * 转换为情况 2.3
+                 * 转换为情况 2.2.3
                  */
-                rotation = sibling->lpc.v;
-                cc.child = *xwlib_rbtree_get_link(lpc);
+                /* lpc 由black_sibling:处的条件语句赋值为
+                       xwlib_rbtree_gen_lr(rr.reverse)
+                       或 xwlib_rbtree_gen_rr(rr.reverse) */
+                rotation = sibling->lpc.v; /* rotation在此处作为临时变量
+                                              用于记录sibling的位置 */
+                cc.child = *xwlib_rbtree_get_link(lpc); /* child is z */
 
                 /* xwlib_rbtree_link(sibling, lpc); */
                 *xwlib_rbtree_get_link(lpc) = sibling;
@@ -924,13 +936,13 @@ black_sibling:
                 /* flip_color(cr) */
                 rr.reverse->lpc.v = rotation | XWLIB_RBTREE_COLOR_BLACK;
 
-                /* 转换为情况 2.3 */
+                /* 转换为情况 2.2 */
                 sibling = rr.reverse;
                 goto black_sibling;
         }
 
         /*
-         * 情况 2.3：与兄弟节点(s)位置相同的子节点为红色
+         * 情况 2.2.3 与兄弟节点(s)位置相同的子节点为红色
          *
          *               |
          *             p(*)

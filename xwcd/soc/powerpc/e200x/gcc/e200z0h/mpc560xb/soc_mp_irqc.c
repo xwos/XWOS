@@ -32,7 +32,7 @@ __xwbsp_data struct xwmp_irqc soc_irqc[CPUCFG_CPU_NUM] = {
                 .drv = &soc_irqc_drv,
                 .irqs_num = (SOCCFG_IRQ_NUM + ARCHCFG_IRQ_NUM),
                 .isr_table = &soc_isr_table,
-                .irq_data_table = &soc_isr_data_table,
+                .isr_data_table = &soc_isr_data_table,
                 .soc_cfg = NULL,
                 .data = NULL,
         },

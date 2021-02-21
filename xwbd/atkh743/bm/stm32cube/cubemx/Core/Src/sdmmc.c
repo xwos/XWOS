@@ -221,6 +221,7 @@ xwer_t MX_SDMMC1_SD_TrimClk(xwsq_t cnt)
   xwsq_t i;
   xwtm_t time;
 
+  rc = XWOK;
   memset(buf, 0xFF, 512);
   for (i = 0; i < cnt; i++) {
     time = 1 * XWTM_MS;

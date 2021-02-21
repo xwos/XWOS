@@ -119,14 +119,14 @@ xwer_t cortexm_nvic_drv_request(__xwcc_unused struct xwmp_irqc * irqc,
 {
 #if (!defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE))
         struct soc_isr_table * isr_table;
-        struct soc_isr_data_table * irq_data_table;
+        struct soc_isr_data_table * isr_data_table;
 
         isr_table = irqc->isr_table;
         isr_table->soc[irqn] = isrfunc;
 
-        irq_data_table = irqc->irq_data_table;
-        if ((NULL != irq_data_table) && (NULL != data)) {
-                irq_data_table->soc[irqn] = data;
+        isr_data_table = irqc->isr_data_table;
+        if ((NULL != isr_data_table) && (NULL != data)) {
+                isr_data_table->soc[irqn] = data;
         }
 #endif /* !SOCCFG_RO_ISRTABLE */
         return XWOK;
@@ -289,9 +289,9 @@ static __xwbsp_code
 xwer_t cortexm_nvic_drv_get_data(__xwcc_unused struct xwmp_irqc * irqc,
                                  xwirq_t irqn, struct soc_irq_data * databuf)
 {
-        __soc_isr_table_qualifier struct soc_isr_data_table * irq_data_table;
+        __soc_isr_table_qualifier struct soc_isr_data_table * isr_data_table;
 
-        irq_data_table = irqc->irq_data_table;
-        databuf->data = irq_data_table->soc[irqn];
+        isr_data_table = irqc->isr_data_table;
+        databuf->data = isr_data_table->soc[irqn];
         return XWOK;
 }

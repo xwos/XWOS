@@ -272,12 +272,12 @@ static __xwbsp_code
 xwer_t soc_irqc_drv_get_data(struct xwos_irqc * irqc, xwirq_t irqn,
                              struct soc_irq_data * databuf)
 {
-        __soc_isr_table_qualifier struct soc_isr_data_table * irq_data_table;
+        __soc_isr_table_qualifier struct soc_isr_data_table * isr_data_table;
         xwer_t rc;
 
         if (irqn >= 0) {
-                irq_data_table = irqc->irq_data_table;
-                databuf->data = irq_data_table->soc[irqn];
+                isr_data_table = irqc->isr_data_table;
+                databuf->data = isr_data_table->soc[irqn];
                 rc = XWOK;
         } else {
                 rc = -EPERM;

@@ -34,14 +34,14 @@ xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num)
         if ((xwbmp_t)0 == msk) {
                 msk = (~(xwbmp_t)0);
         }/* else {} */
-        while (i > 0) {
+        do {
                 i--;
                 tmp = bmp[i] & msk;
                 if (tmp) {
                         break;
                 }
                 msk = (~(xwbmp_t)0);
-        }
+        } while (i > 0);
         __asm__ volatile(
         "       clz             %[__p], %[__tmp]\n"
         : [__p] "=&r" (p)

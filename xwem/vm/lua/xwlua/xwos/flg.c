@@ -47,23 +47,23 @@ int xwlua_flg_new(lua_State * L)
         return 1;
 }
 
-int xwlua_flg_msk(lua_State * L)
+int xwlua_flg_bmp(lua_State * L)
 {
         xwsz_t bmpsz;
-        xwlua_bmp_t * msk;
+        xwlua_bmp_t * bmp;
 
         bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(XWOS_FLG_MAXNUM)) +
                 sizeof(xwlua_bmp_t);
-        msk = lua_newuserdatauv(L, bmpsz, 0);
-        msk->bits = XWOS_FLG_MAXNUM;
-        xwbmpop_c0all(msk->bmp, msk->bits);
+        bmp = lua_newuserdatauv(L, bmpsz, 0);
+        bmp->bits = XWOS_FLG_MAXNUM;
+        xwbmpop_c0all(bmp->bmp, bmp->bits);
         luaL_setmetatable(L, "xwlua_bmp_t");
         return 1;
 }
 
 const luaL_Reg xwlua_flg_method[] = {
         {"new", xwlua_flg_new},
-        {"msk", xwlua_flg_msk},
+        {"bmp", xwlua_flg_bmp},
         {NULL, NULL},
 };
 
@@ -307,23 +307,23 @@ int xwlua_flgsp_wait(lua_State * L)
         }
         origin = (xwlua_bmp_t *)luaL_checkudata(L, 4, "xwlua_bmp_t");
         msk = (xwlua_bmp_t *)luaL_checkudata(L, 5, "xwlua_bmp_t");
-        if (top >= 5) {
-                type = lua_type(L, 5);
+        if (top >= 6) {
+                type = lua_type(L, 6);
                 switch (type) {
                 case LUA_TNUMBER:
-                        time = (xwtm_t)luaL_checknumber(L, 5);
+                        time = (xwtm_t)luaL_checknumber(L, 6);
                         rc = xwos_flg_timedwait(flgsp->flg, trigger, action,
                                                 origin->bmp, msk->bmp, &time);
                         break;
                 case LUA_TSTRING:
-                        opt = luaL_checkoption(L, 5, "t", xwlua_flg_opt);
+                        opt = luaL_checkoption(L, 6, "t", xwlua_flg_opt);
                         switch (opt) {
                         case XWLUA_FLG_OPT_TRY:
                                 rc = xwos_flg_trywait(flgsp->flg, trigger, action,
                                                       origin->bmp, msk->bmp);
                                 break;
                         default:
-                                luaL_error(L, "Invalid arg: %s", lua_tostring(L, 5));
+                                luaL_error(L, "Invalid arg: %s", lua_tostring(L, 6));
                                 rc = -EINVAL;
                                 break;
                         }

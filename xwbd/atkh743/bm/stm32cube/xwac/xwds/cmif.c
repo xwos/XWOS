@@ -196,7 +196,6 @@ xwer_t stm32cube_xwds_soc_start(void)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_start;
         }
-
         return XWOK;
 
 err_dev_start:

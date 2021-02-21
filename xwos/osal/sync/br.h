@@ -290,6 +290,7 @@ xwer_t xwos_br_intr_all(struct xwos_br * br)
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -ECHRNG: 位置超出范围
  * @retval -EINTR: 等待被中断
+ * @retval -ENOTINTHD：不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -316,6 +317,7 @@ xwer_t xwos_br_sync(struct xwos_br * br, xwsq_t pos, xwbmp_t msk[], xwbmp_t sync
  * @retval -ECHRNG: 位置超出范围
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
+ * @retval -ENOTINTHD：不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程

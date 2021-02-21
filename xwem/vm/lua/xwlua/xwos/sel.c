@@ -33,23 +33,23 @@ int xwlua_sel_new(lua_State * L)
         return 1;
 }
 
-int xwlua_sel_msk(lua_State * L)
+int xwlua_sel_bmp(lua_State * L)
 {
         xwsz_t bmpsz;
-        xwlua_bmp_t * msk;
+        xwlua_bmp_t * bmp;
 
         bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(XWOS_SEL_MAXNUM)) +
                 sizeof(xwlua_bmp_t);
-        msk = lua_newuserdatauv(L, bmpsz, 0);
-        msk->bits = XWOS_SEL_MAXNUM;
-        xwbmpop_c0all(msk->bmp, msk->bits);
+        bmp = lua_newuserdatauv(L, bmpsz, 0);
+        bmp->bits = XWOS_SEL_MAXNUM;
+        xwbmpop_c0all(bmp->bmp, bmp->bits);
         luaL_setmetatable(L, "xwlua_bmp_t");
         return 1;
 }
 
 const luaL_Reg xwlua_sel_method[] = {
         {"new", xwlua_sel_new},
-        {"msk", xwlua_sel_msk},
+        {"bmp", xwlua_sel_bmp},
         {NULL, NULL},
 };
 

@@ -72,7 +72,7 @@ struct xwmp_irqc {
         __soc_isr_table_qualifier
         struct soc_isr_table * isr_table; /**< 中断向量表 */
         __soc_isr_table_qualifier
-        struct soc_isr_data_table * irq_data_table; /**< 中断数据表 */
+        struct soc_isr_data_table * isr_data_table; /**< 中断数据表 */
         const void * soc_cfg; /**< SOC的私有配置 */
         void * data; /**< SOC平台的私有数据 */
 
