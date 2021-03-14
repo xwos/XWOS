@@ -28,10 +28,11 @@
 
 char * xwlua_argv[] = {
         "xwlua",
+        NULL,
 };
 
 struct xwlua_arg xwlua_arg = {
-        .argc = xw_array_size(xwlua_argv),
+        .argc = xw_array_size(xwlua_argv) - 1,
         .argv = xwlua_argv,
 };
 
