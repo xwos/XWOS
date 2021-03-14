@@ -96,6 +96,9 @@ static __xwmp_code
 struct xwmp_thd * xwmp_skd_rtrq_choose(struct xwmp_skd * xwskd);
 
 static __xwmp_code
+void xwmp_skd_del_thd_lc(struct xwmp_skd * xwskd);
+
+static __xwmp_code
 xwer_t xwmp_skd_idled(struct xwmp_skd * xwskd);
 
 static __xwmp_code
@@ -133,7 +136,7 @@ static __xwmp_code
 void xwmp_skd_reqfrz_intr_all_lic(struct xwmp_skd * xwskd);
 
 static __xwmp_code
-void xwmp_skd_notify_allfrz_lc(void);
+void xwmp_skd_notify_allfrz_lc(struct xwmp_skd * xwskd);
 
 static __xwmp_code
 void xwmp_skd_thaw_allfrz_lic(struct xwmp_skd * xwskd);
@@ -171,6 +174,7 @@ xwer_t xwmp_skd_init_lc(void)
         xwmp_splk_init(&xwskd->thdlistlock);
         xwlib_bclst_init_head(&xwskd->thdlist);
         xwskd->thd_num = 0;
+        xwlib_bclst_init_head(&xwskd->thdelist);
         rc = xwmp_tt_init(&xwskd->tt);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_tt_init;
@@ -384,6 +388,27 @@ struct xwmp_thd * xwmp_skd_rtrq_choose(struct xwmp_skd * xwskd)
 }
 
 /**
+ * @brief 删除“删除列表”中的线程
+ * @param xwskd: (I) XWOS MP调度器的指针
+ * @return 错误码
+ */
+static __xwmp_code
+void xwmp_skd_del_thd_lc(struct xwmp_skd * xwskd)
+{
+        if (xwlib_bclst_tst_empty(&xwskd->thdelist)) {
+                struct xwmp_thd * thd;
+                xwmp_splk_lock_cpuirq(&xwskd->thdlistlock);
+                xwlib_bclst_itr_next_entry_del(thd, &xwskd->thdelist,
+                                               struct xwmp_thd, thdnode) {
+                        xwmp_splk_unlock_cpuirq(&xwskd->thdlistlock);
+                        xwmp_thd_delete(thd);
+                        xwmp_splk_lock_cpuirq(&xwskd->thdlistlock);
+                }
+                xwmp_splk_unlock_cpuirq(&xwskd->thdlistlock);
+        }
+}
+
+/**
  * @brief 空闲任务的主函数
  * @param xwskd: (I) XWOS MP调度器的指针
  * @return 错误码
@@ -394,7 +419,8 @@ xwer_t xwmp_skd_idled(struct xwmp_skd * xwskd)
         XWOS_UNUSED(xwskd);
 
         while (true) {
-                xwmp_skd_notify_allfrz_lc();
+                xwmp_skd_del_thd_lc(xwskd);
+                xwmp_skd_notify_allfrz_lc(xwskd);
 #if defined(BRDCFG_XWSKD_IDLE_HOOK) && (1 == BRDCFG_XWSKD_IDLE_HOOK)
                 bdl_xwskd_idle_hook(xwskd);
 #endif /* BRDCFG_XWSKD_IDLE_HOOK */
@@ -1257,15 +1283,14 @@ xwer_t xwmp_skd_notify_allfrz_lic(struct xwmp_skd * xwskd)
 
 /**
  * @brief 通知所有线程已经冻结（空闲任务中执行的部分）
+ * @param xwskd: (I) XWOS MP调度器的指针
  */
 static __xwmp_code
-void xwmp_skd_notify_allfrz_lc(void)
+void xwmp_skd_notify_allfrz_lc(struct xwmp_skd * xwskd)
 {
-        struct xwmp_skd * xwskd;
         xwsq_t nv;
         xwer_t rc;
 
-        xwskd = xwmp_skd_get_lc();
         rc = xwaop_teq_then_sub(xwsq, &xwskd->pm.wklkcnt,
                                 XWMP_SKD_WKLKCNT_ALLFRZ,
                                 1,

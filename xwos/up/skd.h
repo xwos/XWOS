@@ -161,8 +161,9 @@ struct xwup_skd {
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
         struct xwup_skd_pm pm; /**< 调度器低功耗控制块 */
 #endif /* XWUPCFG_SKD_PM */
-        struct xwlib_bclst_head thdlist; /**< 链接本调度器中所有线程的链表头 */
+        struct xwlib_bclst_head thdlist; /**< 本调度器中所有线程的链表头 */
         xwsz_t thd_num; /**< 本调度器中的线程数量 */
+        struct xwlib_bclst_head thdelist; /**< 本调度器中所有待删除的线程的链表头 */
 };
 
 

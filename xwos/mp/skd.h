@@ -166,9 +166,10 @@ struct __xwcc_alignl1cache xwmp_skd {
         struct xwmp_splk cxlock; /**< 上下文切换的锁 */
         struct xwmp_skd_pm pm; /**< 调度器电源管理控制块 */
 
-        struct xwlib_bclst_head thdlist; /**< 链接本调度器中所有线程的链表头 */
+        struct xwlib_bclst_head thdlist; /**< 本调度器中所有线程的链表头 */
         xwsz_t thd_num; /**< 本调度器中的线程数量 */
         struct xwmp_splk thdlistlock; /**< 保护thdlist的锁 */
+        struct xwlib_bclst_head thdelist; /**< 本调度器中所有待删除的线程的链表头 */
 };
 
 extern struct xwmp_skd xwmp_skd[CPUCFG_CPU_NUM];

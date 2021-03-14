@@ -647,21 +647,18 @@ xwer_t xwmp_thd_exit_lic(struct xwmp_thd * thd, xwer_t rc)
         xwmp_splk_lock(&xwskd->thdlistlock);
         xwlib_bclst_del_init(&thd->thdnode);
         xwskd->thd_num--;
+        if (XWMP_SKDATTR_DETACHED & thd->attribute) {
+                xwlib_bclst_add_tail(&xwskd->thdelist, &thd->thdnode);
+        }
         if (xwskd->pm.frz_thd_cnt == xwskd->thd_num) {
                 xwmp_splk_unlock(&xwskd->thdlistlock);
                 xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
                 xwmp_thd_put(thd);
-                if (XWMP_SKDATTR_DETACHED & thd->attribute) {
-                        xwmp_thd_delete(thd);
-                }
                 xwmp_skd_notify_allfrz_lic(xwskd);
         } else {
                 xwmp_splk_unlock(&xwskd->thdlistlock);
                 xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
                 xwmp_thd_put(thd);
-                if (XWMP_SKDATTR_DETACHED & thd->attribute) {
-                        xwmp_thd_delete(thd);
-                }
                 xwmp_skd_req_swcx(xwskd);
         }
         return XWOK;

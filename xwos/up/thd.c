@@ -470,18 +470,15 @@ xwer_t xwup_thd_exit_lic(struct xwup_thd * thd, xwer_t rc)
         xwospl_cpuirq_disable_lc();
         xwlib_bclst_del_init(&thd->thdnode);
         xwskd->thd_num--;
+        if (XWUP_SKDATTR_DETACHED & thd->attribute) {
+                xwlib_bclst_add_tail(&xwskd->thdelist, &thd->thdnode);
+        }
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
         if (xwskd->pm.frz_thd_cnt == xwskd->thd_num) {
                 xwospl_cpuirq_restore_lc(cpuirq);
-                if (XWUP_SKDATTR_DETACHED & thd->attribute) {
-                        xwup_thd_delete(thd);
-                }
                 xwup_skd_notify_allfrz_lic();
         } else {
                 xwospl_cpuirq_restore_lc(cpuirq);
-                if (XWUP_SKDATTR_DETACHED & thd->attribute) {
-                        xwup_thd_delete(thd);
-                }
                 xwup_skd_req_swcx();
         }
 #else /* XWUPCFG_SKD_PM */

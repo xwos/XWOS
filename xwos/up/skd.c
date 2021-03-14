@@ -61,6 +61,11 @@ void bdl_xwskd_post_swcx_hook(struct xwup_skd * xwskd);
 static __xwup_code
 struct xwup_thd * xwup_skd_rtrq_choose(void);
 
+#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
+static __xwup_code
+void xwup_skd_del_thd_lc(struct xwup_skd * xwskd);
+#endif /* XWUPCFG_SKD_THD_EXIT */
+
 static __xwup_code
 xwer_t xwup_skd_idled(struct xwup_skd * xwskd);
 
@@ -89,10 +94,10 @@ void xwup_skd_finish_swcx_lic(struct xwup_skd * xwskd);
 
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
 static __xwup_code
-void xwup_skd_notify_allfrz_lc(void);
+void xwup_skd_notify_allfrz_lc(struct xwup_skd * xwskd);
 
 static __xwup_code
-xwer_t xwup_skd_thaw_allfrz_lic(void);
+xwer_t xwup_skd_thaw_allfrz_lic(struct xwup_skd * xwskd);
 #endif /* XWUPCFG_SKD_PM */
 
 /**
@@ -122,6 +127,7 @@ xwer_t xwup_skd_init_lc(void)
 #endif /* XWUPCFG_SKD_BH */
         xwlib_bclst_init_head(&xwskd->thdlist);
         xwskd->thd_num = 0;
+        xwlib_bclst_init_head(&xwskd->thdelist);
         rc = xwup_tt_init(&xwskd->tt);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_tt_init;
@@ -251,6 +257,29 @@ struct xwup_thd * xwup_skd_rtrq_choose(void)
         return t;
 }
 
+#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
+/**
+ * @brief 删除“删除列表”中的线程
+ * @param xwskd: (I) XWOS UP调度器的指针
+ * @return 错误码
+ */
+static __xwup_code
+void xwup_skd_del_thd_lc(struct xwup_skd * xwskd)
+{
+        if (xwlib_bclst_tst_empty(&xwskd->thdelist)) {
+                struct xwup_thd * thd;
+                xwospl_cpuirq_disable_lc();
+                xwlib_bclst_itr_next_entry_del(thd, &xwskd->thdelist,
+                                               struct xwup_thd, thdnode) {
+                        xwospl_cpuirq_enable_lc();
+                        xwup_thd_delete(thd);
+                        xwospl_cpuirq_disable_lc();
+                }
+                xwospl_cpuirq_enable_lc();
+        }
+}
+#endif /* XWUPCFG_SKD_THD_EXIT */
+
 /**
  * @brief 空闲任务的主函数
  * @param xwskd: (I) XWOS UP调度器的指针
@@ -261,8 +290,11 @@ xwer_t xwup_skd_idled(struct xwup_skd * xwskd)
         XWOS_UNUSED(xwskd);
 
         while (true) {
+#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
+                xwup_skd_del_thd_lc(xwskd);
+#endif /* XWUPCFG_SKD_THD_EXIT */
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
-                xwup_skd_notify_allfrz_lc();
+                xwup_skd_notify_allfrz_lc(xwskd);
 #endif /* XWUPCFG_SKD_PM */
 #if (defined(BRDCFG_XWSKD_IDLE_HOOK) && (1 == BRDCFG_XWSKD_IDLE_HOOK))
                 bdl_xwskd_idle_hook(xwskd);
@@ -1023,7 +1055,7 @@ xwer_t xwup_skd_wakelock_unlock(void)
 
 /**
  * @brief 暂停调度器（中断中执行）
- * @param xwskd: (I) 调度器对象的指针
+ * @param xwskd: (I) XWOS UP调度器的指针
  * @return 错误码
  * @note
  * - 此函数只能在CPU自身的调度器服务中断中执行，可通过@ref xwospl_skd_suspend()
@@ -1073,14 +1105,13 @@ xwer_t xwup_skd_notify_allfrz_lic(void)
 
 /**
  * @brief 通知所有线程已经冻结（空闲任务中执行的部分）
+ * @param xwskd: (I) XWOS UP调度器的指针
  */
 static __xwup_code
-void xwup_skd_notify_allfrz_lc(void)
+void xwup_skd_notify_allfrz_lc(struct xwup_skd * xwskd)
 {
-        struct xwup_skd * xwskd;
         xwreg_t cpuirq;
 
-        xwskd = &xwup_skd;
         if (XWUP_SKD_WKLKCNT_ALLFRZ == xwskd->pm.wklkcnt) {
                 xwospl_cpuirq_save_lc(&cpuirq);
                 if (XWUP_SKD_WKLKCNT_ALLFRZ == xwskd->pm.wklkcnt) {
@@ -1103,17 +1134,16 @@ void xwup_skd_notify_allfrz_lc(void)
 
 /**
  * @brief 解冻所有线程
+ * @param xwskd: (I) XWOS UP调度器的指针
  * @return 错误码
  */
 static __xwup_code
-xwer_t xwup_skd_thaw_allfrz_lic(void)
+xwer_t xwup_skd_thaw_allfrz_lic(struct xwup_skd * xwskd)
 {
-        struct xwup_skd * xwskd;
         struct xwup_thd * c, * n;
         xwreg_t cpuirq;
         xwer_t rc;
 
-        xwskd = &xwup_skd;
         xwospl_cpuirq_save_lc(&cpuirq);
         xwlib_bclst_itr_next_entry_safe(c, n, &xwskd->pm.frzlist,
                                         struct xwup_thd, frznode) {
@@ -1147,7 +1177,7 @@ xwer_t xwup_skd_suspend(void)
 
 /**
  * @brief 继续已经暂停的调度器（在中断中执行）
- * @param xwskd: (I) 调度器对象的指针
+ * @param xwskd: (I) XWOS UP调度器的指针
  * @return 错误码
  * @note
  * - 此函数只可由xwup_skd_resume()调用。
@@ -1185,7 +1215,7 @@ xwer_t xwup_skd_resume_lic(struct xwup_skd * xwskd)
                 if (XWUP_SKD_WKLKCNT_THAWING == xwskd->pm.wklkcnt) {
                         xwskd->pm.wklkcnt++;
                         xwospl_cpuirq_restore_lc(cpuirq);
-                        xwup_skd_thaw_allfrz_lic();
+                        xwup_skd_thaw_allfrz_lic(xwskd);
                         xwospl_cpuirq_save_lc(&cpuirq);
                         rc = XWOK;
                         break;
