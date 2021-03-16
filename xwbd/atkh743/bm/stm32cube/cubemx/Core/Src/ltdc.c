@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : LTDC.c
-  * Description        : This file provides code for the configuration
-  *                      of the LTDC instances.
+  * @file    ltdc.c
+  * @brief   This file provides code for the configuration
+  *          of the LTDC instances.
   ******************************************************************************
   * @author
   * + 隐星魂 (Roy.Sun) <https://xwos.tech>
@@ -35,9 +35,17 @@ LTDC_HandleTypeDef hltdc;
 /* LTDC init function */
 void MX_LTDC_Init(void)
 {
+
+  /* USER CODE BEGIN LTDC_Init 0 */
+
+  /* USER CODE END LTDC_Init 0 */
+
   LTDC_LayerCfgTypeDef pLayerCfg = {0};
   LTDC_LayerCfgTypeDef pLayerCfg1 = {0};
 
+  /* USER CODE BEGIN LTDC_Init 1 */
+
+  /* USER CODE END LTDC_Init 1 */
   hltdc.Instance = LTDC;
   hltdc.Init.HSPolarity = LTDC_HSPOLARITY_AL;
   hltdc.Init.VSPolarity = LTDC_VSPOLARITY_AL;
@@ -96,6 +104,9 @@ void MX_LTDC_Init(void)
   {
     Error_Handler();
   }
+  /* USER CODE BEGIN LTDC_Init 2 */
+
+  /* USER CODE END LTDC_Init 2 */
 
 }
 
@@ -103,11 +114,28 @@ void HAL_LTDC_MspInit(LTDC_HandleTypeDef* ltdcHandle)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
   if(ltdcHandle->Instance==LTDC)
   {
   /* USER CODE BEGIN LTDC_MspInit 0 */
 
   /* USER CODE END LTDC_MspInit 0 */
+  /** Initializes the peripherals clock
+  */
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LTDC;
+    PeriphClkInitStruct.PLL3.PLL3M = 25;
+    PeriphClkInitStruct.PLL3.PLL3N = 150;
+    PeriphClkInitStruct.PLL3.PLL3P = 2;
+    PeriphClkInitStruct.PLL3.PLL3Q = 2;
+    PeriphClkInitStruct.PLL3.PLL3R = 2;
+    PeriphClkInitStruct.PLL3.PLL3RGE = RCC_PLL3VCIRANGE_0;
+    PeriphClkInitStruct.PLL3.PLL3VCOSEL = RCC_PLL3VCOMEDIUM;
+    PeriphClkInitStruct.PLL3.PLL3FRACN = 0;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
     /* LTDC clock enable */
     __HAL_RCC_LTDC_CLK_ENABLE();
 

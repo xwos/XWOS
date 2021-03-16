@@ -21,6 +21,7 @@
 #ifndef __bm_stm32cube_cfg_h__
 #define __bm_stm32cube_cfg_h__
 
-#define STM32CUBECFG_SRAM       1
+#define STM32CUBECFG_SRAM               1
+#define STM32CUBECFG_DISDEFWBUF         1
 
 #endif /* bm/stm32cube/cfg.h */

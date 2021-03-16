@@ -267,7 +267,7 @@ xwer_t stm32cube_usart2_drv_putc(struct xwds_dmauartc * dmauartc,
 /******** .data ********/
 const struct xwds_dmauartc_driver stm32cube_usart2_drv = {
         .base = {
-                .name = "stm32cube.usart.1",
+                .name = "stm32cube.usart.2",
                 .probe = NULL,
                 .remove = NULL,
                 .start = stm32cube_usart2_drv_start,
@@ -285,7 +285,7 @@ const struct xwds_dmauartc_driver stm32cube_usart2_drv = {
 struct xwds_dmauartc stm32cube_usart2_cb = {
         /* attributes */
         .dev = {
-                .name = "stm32cube.usart.1",
+                .name = "stm32cube.usart.2",
                 .id = 1,
                 .resources = NULL,
                 .drv = xwds_cast(struct xwds_driver *, &stm32cube_usart2_drv),

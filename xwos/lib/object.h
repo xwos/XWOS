@@ -8,9 +8,6 @@
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * @note
- * XWOS对象是XWOS中所有具体对象（例如线程控制块/信号量等等）的父类，
- * XWOS对象提供了最基本的基于引用计数法的垃圾回收(GC)机制。
  */
 
 #ifndef __xwos_lib_object_h__

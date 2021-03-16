@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : CRC.c
-  * Description        : This file provides code for the configuration
-  *                      of the CRC instances.
+  * @file    crc.c
+  * @brief   This file provides code for the configuration
+  *          of the CRC instances.
   ******************************************************************************
   * @author
   * + 隐星魂 (Roy.Sun) <https://xwos.tech>
@@ -34,8 +34,19 @@
 void MX_CRC_Init(void)
 {
 
+  /* USER CODE BEGIN CRC_Init 0 */
+
+  /* USER CODE END CRC_Init 0 */
+
   /* Peripheral clock enable */
   LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_CRC);
+
+  /* USER CODE BEGIN CRC_Init 1 */
+
+  /* USER CODE END CRC_Init 1 */
+  /* USER CODE BEGIN CRC_Init 2 */
+
+  /* USER CODE END CRC_Init 2 */
 
 }
 

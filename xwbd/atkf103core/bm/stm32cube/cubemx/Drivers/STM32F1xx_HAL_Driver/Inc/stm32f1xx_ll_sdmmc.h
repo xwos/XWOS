@@ -301,6 +301,7 @@ typedef struct
 #define SDMMC_SINGLE_BUS_SUPPORT           ((uint32_t)0x00010000U)
 #define SDMMC_CARD_LOCKED                  ((uint32_t)0x02000000U)
 
+/* #define SDMMC_DATATIMEOUT                  ((uint32_t)0xFFFFFFFFU) */
 #define SDMMC_DATATIMEOUT                  ((uint32_t)0x1000U)
 
 #define SDMMC_0TO7BITS                     ((uint32_t)0x000000FFU)
@@ -317,9 +318,12 @@ typedef struct
   */
 #define SDIO_CCCC_ERASE                   ((uint32_t)0x00000020U)
 
-#define SDIO_CMDTIMEOUT                   ((uint32_t)1000U)  /* Command send and response timeout */
-#define SDIO_MAXERASETIMEOUT              ((uint32_t)63000U) /* Max erase Timeout 63 s */
-#define SDIO_STOPTRANSFERTIMEOUT          ((uint32_t)1000U)  /* Timeout for STOP TRANSMISSION command */
+/* #define SDIO_CMDTIMEOUT                   ((uint32_t)5000U) */        /* Command send and response timeout */
+#define SDIO_CMDTIMEOUT                   ((uint32_t)1000U)        /* Command send and response timeout */
+#define SDIO_MAXERASETIMEOUT              ((uint32_t)63000U)       /* Max erase Timeout 63 s            */
+/* #define SDIO_STOPTRANSFERTIMEOUT          ((uint32_t)100000000U) */   /* Timeout for STOP TRANSMISSION command */
+#define SDIO_STOPTRANSFERTIMEOUT          ((uint32_t)1000U)        /* Timeout for STOP TRANSMISSION command */
+
 
 /** @defgroup SDIO_LL_Clock_Edge Clock Edge
   * @{

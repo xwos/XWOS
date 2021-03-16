@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : QUADSPI.c
-  * Description        : This file provides code for the configuration
-  *                      of the QUADSPI instances.
+  * @file    quadspi.c
+  * @brief   This file provides code for the configuration
+  *          of the QUADSPI instances.
   ******************************************************************************
   * @author
   * + 隐星魂 (Roy.Sun) <https://xwos.tech>
@@ -160,12 +160,18 @@ xwer_t MX_W25Q_Set_ReadParameters(void);
 /* USER CODE END 0 */
 
 QSPI_HandleTypeDef hqspi;
-MDMA_HandleTypeDef hmdma_quadspi_fifo_th;
 
 /* QUADSPI init function */
 void MX_QUADSPI_Init(void)
 {
 
+  /* USER CODE BEGIN QUADSPI_Init 0 */
+
+  /* USER CODE END QUADSPI_Init 0 */
+
+  /* USER CODE BEGIN QUADSPI_Init 1 */
+
+  /* USER CODE END QUADSPI_Init 1 */
   hqspi.Instance = QUADSPI;
   hqspi.Init.ClockPrescaler = 1;
   hqspi.Init.FifoThreshold = 4;
@@ -179,6 +185,9 @@ void MX_QUADSPI_Init(void)
   {
     Error_Handler();
   }
+  /* USER CODE BEGIN QUADSPI_Init 2 */
+
+  /* USER CODE END QUADSPI_Init 2 */
 
 }
 
@@ -186,15 +195,23 @@ void HAL_QSPI_MspInit(QSPI_HandleTypeDef* qspiHandle)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
   if(qspiHandle->Instance==QUADSPI)
   {
   /* USER CODE BEGIN QUADSPI_MspInit 0 */
 
   /* USER CODE END QUADSPI_MspInit 0 */
+  /** Initializes the peripherals clock
+  */
+    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_QSPI;
+    PeriphClkInitStruct.QspiClockSelection = RCC_QSPICLKSOURCE_D1HCLK;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
     /* QUADSPI clock enable */
     __HAL_RCC_QSPI_CLK_ENABLE();
-    __HAL_RCC_QSPI_FORCE_RESET();
-    __HAL_RCC_QSPI_RELEASE_RESET();
 
     __HAL_RCC_GPIOF_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
@@ -234,40 +251,12 @@ void HAL_QSPI_MspInit(QSPI_HandleTypeDef* qspiHandle)
     GPIO_InitStruct.Alternate = GPIO_AF10_QUADSPI;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-    /* QUADSPI MDMA Init */
-    /* QUADSPI_FIFO_TH Init */
-    hmdma_quadspi_fifo_th.Instance = MDMA_Channel0;
-    hmdma_quadspi_fifo_th.Init.Request = MDMA_REQUEST_QUADSPI_FIFO_TH;
-    hmdma_quadspi_fifo_th.Init.TransferTriggerMode = MDMA_BUFFER_TRANSFER;
-    hmdma_quadspi_fifo_th.Init.Priority = MDMA_PRIORITY_VERY_HIGH;
-    hmdma_quadspi_fifo_th.Init.Endianness = MDMA_LITTLE_ENDIANNESS_PRESERVE;
-    hmdma_quadspi_fifo_th.Init.SourceInc = MDMA_SRC_INC_BYTE;
-    hmdma_quadspi_fifo_th.Init.DestinationInc = MDMA_DEST_INC_DISABLE;
-    hmdma_quadspi_fifo_th.Init.SourceDataSize = MDMA_SRC_DATASIZE_BYTE;
-    hmdma_quadspi_fifo_th.Init.DestDataSize = MDMA_DEST_DATASIZE_BYTE;
-    hmdma_quadspi_fifo_th.Init.DataAlignment = MDMA_DATAALIGN_PACKENABLE;
-    hmdma_quadspi_fifo_th.Init.BufferTransferLength = 1;
-    hmdma_quadspi_fifo_th.Init.SourceBurst = MDMA_SOURCE_BURST_SINGLE;
-    hmdma_quadspi_fifo_th.Init.DestBurst = MDMA_DEST_BURST_SINGLE;
-    hmdma_quadspi_fifo_th.Init.SourceBlockAddressOffset = 0;
-    hmdma_quadspi_fifo_th.Init.DestBlockAddressOffset = 0;
-    if (HAL_MDMA_Init(&hmdma_quadspi_fifo_th) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-    if (HAL_MDMA_ConfigPostRequestMask(&hmdma_quadspi_fifo_th, 0, 0) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-    __HAL_LINKDMA(qspiHandle,hmdma,hmdma_quadspi_fifo_th);
-
     /* QUADSPI interrupt Init */
     HAL_NVIC_SetPriority(QUADSPI_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(QUADSPI_IRQn);
   /* USER CODE BEGIN QUADSPI_MspInit 1 */
-
+    __HAL_RCC_QSPI_FORCE_RESET();
+    __HAL_RCC_QSPI_RELEASE_RESET();
   /* USER CODE END QUADSPI_MspInit 1 */
   }
 }
@@ -296,9 +285,6 @@ void HAL_QSPI_MspDeInit(QSPI_HandleTypeDef* qspiHandle)
     HAL_GPIO_DeInit(GPIOF, GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9);
 
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_2|GPIO_PIN_6);
-
-    /* QUADSPI MDMA DeInit */
-    HAL_MDMA_DeInit(qspiHandle->hmdma);
 
     /* QUADSPI interrupt Deinit */
     HAL_NVIC_DisableIRQ(QUADSPI_IRQn);

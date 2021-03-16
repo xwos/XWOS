@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : SDIO.h
-  * Description        : This file provides code for the configuration
-  *                      of the SDIO instances.
+  * @file    sdio.h
+  * @brief   This file contains all the function prototypes for
+  *          the sdio.c file
   ******************************************************************************
   * @author
   * + 隐星魂 (Roy.Sun) <https://xwos.tech>
@@ -23,10 +23,11 @@
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __sdio_H
-#define __sdio_H
+#ifndef __SDIO_H__
+#define __SDIO_H__
+
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -62,14 +63,7 @@ xwer_t MX_SDIO_SD_Write(uint8_t * data, uint32_t blkaddr,
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ sdio_H */
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+#endif /* __SDIO_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

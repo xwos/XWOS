@@ -69,7 +69,9 @@ __xwbsp_init_code
 void stm32cube_lowlevel_init(void)
 {
         SystemInit();
-        /* cm_scs.scnscb.actlr.bit.disdefwbuf = 1; */
+#if defined(STM32CUBECFG_DISDEFWBUF) && (1 == STM32CUBECFG_DISDEFWBUF)
+        cm_scs.scnscb.actlr.bit.disdefwbuf = 1;
+#endif /* STM32CUBECFG_DISDEFWBUF */
 }
 
 /**

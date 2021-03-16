@@ -52,7 +52,7 @@ xwer_t stm32cube_i2c2m_drv_abort(struct xwds_i2cm * i2cm,
 
 const struct xwds_i2cm_driver stm32cube_i2c2m_drv = {
         .base = {
-                .name = "stm32cube.i2c.2",
+                .name = "stm32cube.i2cm.2",
                 .probe = NULL,
                 .remove = NULL,
                 .start = stm32cube_i2c2m_drv_start,
@@ -69,7 +69,7 @@ const struct xwds_i2cm_driver stm32cube_i2c2m_drv = {
 struct xwds_i2cm stm32cube_i2c2m_cb = {
         /* attributes */
         .dev = {
-                .name = "stm32cube.i2c.2",
+                .name = "stm32cube.i2cm.2",
                 .id = 2,
                 .resources = NULL,
                 .drv = xwds_cast(struct xwds_driver *, &stm32cube_i2c2m_drv),

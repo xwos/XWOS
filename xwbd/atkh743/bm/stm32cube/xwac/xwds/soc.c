@@ -26,7 +26,7 @@
 #include <xwcd/ds/soc/eirq.h>
 #include <bm/stm32cube/xwac/xwds/device.h>
 #include <bm/stm32cube/xwac/xwds/soc.h>
-#include <bm/stm32cube/cubemx/Core/Inc/mdma.h>
+/* #include <bm/stm32cube/cubemx/Core/Inc/mdma.h> */
 /* #include <bm/stm32cube/cubemx/Core/Inc/bdma.h> */
 #include <bm/stm32cube/cubemx/Core/Inc/dma.h>
 #include <bm/stm32cube/cubemx/Core/Inc/gpio.h>
@@ -262,7 +262,7 @@ xwer_t stm32cube_soc_drv_start(struct xwds_device * dev)
         XWOS_UNUSED(dev);
 
         MX_GPIO_Init();
-        MX_MDMA_Init();
+        /* MX_MDMA_Init(); */
         MX_DMA_Init();
         /* MX_BDMA_Init(); */
         MX_FMC_Init();
@@ -281,7 +281,7 @@ xwer_t stm32cube_soc_drv_stop(struct xwds_device * dev)
         MX_SDRAM_DeInit();
         /* MX_BDMA_Init(); */
         MX_DMA_DeInit();
-        MX_MDMA_DeInit();
+        /* MX_MDMA_DeInit(); */
         MX_GPIO_DeInit();
 
         return XWOK;

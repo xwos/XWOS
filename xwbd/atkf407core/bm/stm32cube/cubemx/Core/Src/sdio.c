@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : SDIO.c
-  * Description        : This file provides code for the configuration
-  *                      of the SDIO instances.
+  * @file    sdio.c
+  * @brief   This file provides code for the configuration
+  *          of the SDIO instances.
   ******************************************************************************
   * @author
   * + 隐星魂 (Roy.Sun) <https://xwos.tech>
@@ -39,6 +39,13 @@ DMA_HandleTypeDef hdma_sdio_tx;
 void MX_SDIO_SD_Init(void)
 {
 
+  /* USER CODE BEGIN SDIO_Init 0 */
+
+  /* USER CODE END SDIO_Init 0 */
+
+  /* USER CODE BEGIN SDIO_Init 1 */
+
+  /* USER CODE END SDIO_Init 1 */
   hsd.Instance = SDIO;
   hsd.Init.ClockEdge = SDIO_CLOCK_EDGE_RISING;
   hsd.Init.ClockBypass = SDIO_CLOCK_BYPASS_DISABLE;
@@ -54,6 +61,9 @@ void MX_SDIO_SD_Init(void)
   {
     Error_Handler();
   }
+  /* USER CODE BEGIN SDIO_Init 2 */
+
+  /* USER CODE END SDIO_Init 2 */
 
 }
 

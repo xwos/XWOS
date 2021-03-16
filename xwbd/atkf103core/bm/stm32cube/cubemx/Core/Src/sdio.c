@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : SDIO.c
-  * Description        : This file provides code for the configuration
-  *                      of the SDIO instances.
+  * @file    sdio.c
+  * @brief   This file provides code for the configuration
+  *          of the SDIO instances.
   ******************************************************************************
   * @author
   * + 隐星魂 (Roy.Sun) <https://xwos.tech>
@@ -61,9 +61,14 @@ DMA_HandleTypeDef hdma_sdio;
 
 void MX_SDIO_SD_Init(void)
 {
-  HAL_StatusTypeDef ret;
-  uint32_t cnt;
 
+  /* USER CODE BEGIN SDIO_Init 0 */
+
+  /* USER CODE END SDIO_Init 0 */
+
+  /* USER CODE BEGIN SDIO_Init 1 */
+
+  /* USER CODE END SDIO_Init 1 */
   hsd.Instance = SDIO;
   hsd.Init.ClockEdge = SDIO_CLOCK_EDGE_RISING;
   hsd.Init.ClockBypass = SDIO_CLOCK_BYPASS_DISABLE;
@@ -71,20 +76,18 @@ void MX_SDIO_SD_Init(void)
   hsd.Init.BusWide = SDIO_BUS_WIDE_1B;
   hsd.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_DISABLE;
   hsd.Init.ClockDiv = 6;
-
-  cnt = 0;
-  do {
-    ret = HAL_SD_Init(&hsd);
-    if (HAL_OK == ret)
-    {
-      ret = HAL_SD_ConfigWideBusOperation(&hsd, SDIO_BUS_WIDE_4B);
-    }
-    cnt++;
-  } while ((ret != HAL_OK) && (cnt < MX_SDIO_SD_MAX_RETRY_TIMES));
-  if (ret != HAL_OK)
+  if (HAL_SD_Init(&hsd) != HAL_OK)
   {
     Error_Handler();
   }
+  if (HAL_SD_ConfigWideBusOperation(&hsd, SDIO_BUS_WIDE_4B) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN SDIO_Init 2 */
+
+  /* USER CODE END SDIO_Init 2 */
+
 }
 
 void HAL_SD_MspInit(SD_HandleTypeDef* sdHandle)
@@ -232,6 +235,7 @@ xwer_t MX_SDIO_SD_TrimClk(xwsq_t cnt)
   xwsq_t i;
   xwtm_t time;
 
+  rc = XWOK;
   for (i = 0; i < cnt; i++) {
     time = 1 * XWTM_MS;
     xwos_cthd_sleep(&time);

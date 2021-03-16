@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : CRC.h
-  * Description        : This file provides code for the configuration
-  *                      of the CRC instances.
+  * @file    crc.h
+  * @brief   This file contains all the function prototypes for
+  *          the crc.c file
   ******************************************************************************
   * @author
   * + 隐星魂 (Roy.Sun) <https://xwos.tech>
@@ -23,10 +23,11 @@
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __crc_H
-#define __crc_H
+#ifndef __CRC_H__
+#define __CRC_H__
+
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -49,14 +50,7 @@ void MX_CRC_Init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ crc_H */
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+#endif /* __CRC_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

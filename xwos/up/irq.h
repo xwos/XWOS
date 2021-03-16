@@ -31,7 +31,6 @@ struct xwup_irq_resource {
         const char * description; /**< 描述 */
 };
 
-
 /**
  * @brief XWOS UP中断控制器
  */

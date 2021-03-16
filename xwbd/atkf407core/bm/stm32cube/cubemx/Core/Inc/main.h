@@ -35,6 +35,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
+
 #include "stm32f4xx_ll_crc.h"
 #include "stm32f4xx_ll_rng.h"
 #include "stm32f4xx_ll_system.h"

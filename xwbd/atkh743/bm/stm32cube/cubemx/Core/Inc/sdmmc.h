@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : SDMMC.h
-  * Description        : This file provides code for the configuration
-  *                      of the SDMMC instances.
+  * @file    sdmmc.h
+  * @brief   This file contains all the function prototypes for
+  *          the sdmmc.c file
   ******************************************************************************
   * @author
   * + 隐星魂 (Roy.Sun) <https://xwos.tech>
@@ -23,10 +23,11 @@
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __sdmmc_H
-#define __sdmmc_H
+#ifndef __SDMMC_H__
+#define __SDMMC_H__
+
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -60,14 +61,7 @@ xwer_t MX_SDMMC1_SD_Write(uint8_t * data, uint32_t blkaddr,
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ sdmmc_H */
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+#endif /* __SDMMC_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

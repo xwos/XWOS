@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : CRC.c
-  * Description        : This file provides code for the configuration
-  *                      of the CRC instances.
+  * @file    crc.c
+  * @brief   This file provides code for the configuration
+  *          of the CRC instances.
   ******************************************************************************
   * @author
   * + 隐星魂 (Roy.Sun) <https://xwos.tech>
@@ -34,14 +34,24 @@
 void MX_CRC_Init(void)
 {
 
+  /* USER CODE BEGIN CRC_Init 0 */
+
+  /* USER CODE END CRC_Init 0 */
+
   /* Peripheral clock enable */
   LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_CRC);
 
+  /* USER CODE BEGIN CRC_Init 1 */
+
+  /* USER CODE END CRC_Init 1 */
   LL_CRC_SetInputDataReverseMode(CRC, LL_CRC_INDATA_REVERSE_NONE);
   LL_CRC_SetOutputDataReverseMode(CRC, LL_CRC_OUTDATA_REVERSE_NONE);
   LL_CRC_SetPolynomialCoef(CRC, LL_CRC_DEFAULT_CRC32_POLY);
   LL_CRC_SetPolynomialSize(CRC, LL_CRC_POLYLENGTH_32B);
   LL_CRC_SetInitialData(CRC, LL_CRC_DEFAULT_CRC_INITVALUE);
+  /* USER CODE BEGIN CRC_Init 2 */
+
+  /* USER CODE END CRC_Init 2 */
 
 }
 

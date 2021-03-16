@@ -50,21 +50,21 @@ PERDEF = -D__XuanWuOS__
 AFLAGS = -mabi=aapcs -mno-thumb-interwork -m$(ENDIAN) -mthumb \
          -nostdinc -nostdlib -mno-unaligned-access \
          -ffunction-sections -fdata-sections \
-         -gdwarf-4 -fvar-tracking-assignments \
+         -g -g3 -gdwarf-4 -fvar-tracking -fvar-tracking-assignments \
          -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
 CFLAGS = -mabi=aapcs -mthumb -std=gnu11 \
          -fomit-frame-pointer -mno-thumb-interwork -m$(ENDIAN) \
          -mno-unaligned-access \
          -ffunction-sections -fdata-sections \
-         -gdwarf-4 -fvar-tracking-assignments -fverbose-asm \
+         -g -g3 -gdwarf-4 -fvar-tracking -fvar-tracking-assignments -fverbose-asm \
          -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
 CXXFLAGS = -mabi=aapcs -mthumb -std=gnu++17 \
            -fomit-frame-pointer -mno-thumb-interwork -m$(ENDIAN) \
            -mno-unaligned-access \
            -ffunction-sections -fdata-sections \
-           -gdwarf-4 -fvar-tracking-assignments -fverbose-asm \
+           -g -g3 -gdwarf-4 -fvar-tracking -fvar-tracking-assignments -fverbose-asm \
            -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
 MMFLAGS = -MM -MP

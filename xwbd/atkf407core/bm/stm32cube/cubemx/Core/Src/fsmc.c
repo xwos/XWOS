@@ -39,7 +39,15 @@ SRAM_HandleTypeDef hsram3;
 /* FSMC initialization function */
 void MX_FSMC_Init(void)
 {
+  /* USER CODE BEGIN FSMC_Init 0 */
+
+  /* USER CODE END FSMC_Init 0 */
+
   FSMC_NORSRAM_TimingTypeDef Timing = {0};
+
+  /* USER CODE BEGIN FSMC_Init 1 */
+
+  /* USER CODE END FSMC_Init 1 */
 
   /** Perform the SRAM3 memory initialization sequence
   */
@@ -75,6 +83,9 @@ void MX_FSMC_Init(void)
     Error_Handler( );
   }
 
+  /* USER CODE BEGIN FSMC_Init 2 */
+
+  /* USER CODE END FSMC_Init 2 */
 }
 
 static uint32_t FSMC_Initialized = 0;

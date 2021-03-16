@@ -71,7 +71,7 @@ const struct xwds_spim_driver stm32cube_spi1m_drv = {
 struct xwds_spim stm32cube_spi1m_cb = {
         /* attributes */
         .dev = {
-                .name = "stm32cube.spi.2",
+                .name = "stm32cube.spim.1",
                 .id = 1,
                 .resources = NULL,
                 .drv = xwds_cast(struct xwds_driver *, &stm32cube_spi1m_drv),
@@ -233,7 +233,7 @@ const struct xwds_spim_driver stm32cube_spi2m_drv = {
 struct xwds_spim stm32cube_spi2m_cb = {
         /* attributes */
         .dev = {
-                .name = "stm32cube.spi.2",
+                .name = "stm32cube.spim.2",
                 .id = 1,
                 .resources = NULL,
                 .drv = xwds_cast(struct xwds_driver *, &stm32cube_spi2m_drv),

@@ -41,8 +41,8 @@
 -   适用范围： *xwos* 、 *xwmd* 文件夹下的源码；
 -   所有这些源码文件只包含了 *附录A* 中的声明，即 *Exhibit A - Source Code Form License Notice* ,
     它们都 *不* 属于 *Incompatible With Secondary Licenses* 形式的 *Covered Software* ；
--   可将玄武OS作为组件之一集成到应用场景中，在[[http://mozilla.org/MPL/2.0/][ *MPL-2.0* ]]中
-    被称为 *Larger Work* 。
+-   可以任意形式（源码文件、静态库等）将玄武OS作为组件之一集成到应用场景中，
+    在[[http://mozilla.org/MPL/2.0/][ *MPL-2.0* ]]中被称为 *Larger Work* 。
 
 
 ** Apache-2.0

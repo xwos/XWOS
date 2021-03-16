@@ -116,7 +116,7 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
         xwscp->mempool = (struct xwmm_bma *)&xwscp->mempool_bma_raw;
         rc = xwmm_bma_init(xwscp->mempool, xwscp_mempool_name,
                            (xwptr_t)mem, memsize,
-                           XWSCP_MEMPOOL_SIZE, XWSCP_MEMBLK_ODR);
+                           XWSCP_MEMBLK_SIZE, XWSCP_MEMBLK_ODR);
         if (__xwcc_unlikely(rc < 0)) {
                 xwscplogf(ERR, "init bma ... [rc:%d]\n", rc);
                 goto err_bma_init;

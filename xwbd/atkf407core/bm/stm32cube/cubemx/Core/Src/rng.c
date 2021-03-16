@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : RNG.c
-  * Description        : This file provides code for the configuration
-  *                      of the RNG instances.
+  * @file    rng.c
+  * @brief   This file provides code for the configuration
+  *          of the RNG instances.
   ******************************************************************************
   * @author
   * + 隐星魂 (Roy.Sun) <https://xwos.tech>
@@ -34,10 +34,20 @@
 void MX_RNG_Init(void)
 {
 
+  /* USER CODE BEGIN RNG_Init 0 */
+
+  /* USER CODE END RNG_Init 0 */
+
   /* Peripheral clock enable */
   LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_RNG);
 
+  /* USER CODE BEGIN RNG_Init 1 */
+
+  /* USER CODE END RNG_Init 1 */
   LL_RNG_Enable(RNG);
+  /* USER CODE BEGIN RNG_Init 2 */
+
+  /* USER CODE END RNG_Init 2 */
 
 }
 

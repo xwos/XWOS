@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : QUADSPI.h
-  * Description        : This file provides code for the configuration
-  *                      of the QUADSPI instances.
+  * @file    quadspi.h
+  * @brief   This file contains all the function prototypes for
+  *          the quadspi.c file
   ******************************************************************************
   * @author
   * + 隐星魂 (Roy.Sun) <https://xwos.tech>
@@ -23,10 +23,11 @@
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __quadspi_H
-#define __quadspi_H
+#ifndef __QUADSPI_H__
+#define __QUADSPI_H__
+
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -62,14 +63,7 @@ xwer_t MX_W25Q_Reset(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ quadspi_H */
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+#endif /* __QUADSPI_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

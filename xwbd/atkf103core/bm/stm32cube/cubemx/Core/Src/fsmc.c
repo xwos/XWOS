@@ -39,7 +39,15 @@ SRAM_HandleTypeDef hsram3;
 /* FSMC initialization function */
 void MX_FSMC_Init(void)
 {
+  /* USER CODE BEGIN FSMC_Init 0 */
+
+  /* USER CODE END FSMC_Init 0 */
+
   FSMC_NORSRAM_TimingTypeDef Timing = {0};
+
+  /* USER CODE BEGIN FSMC_Init 1 */
+
+  /* USER CODE END FSMC_Init 1 */
 
   /** Perform the SRAM3 memory initialization sequence
   */
@@ -61,11 +69,11 @@ void MX_FSMC_Init(void)
   hsram3.Init.WriteBurst = FSMC_WRITE_BURST_DISABLE;
   /* Timing */
   Timing.AddressSetupTime = 0;
-  Timing.AddressHoldTime = 15; /* Not Used */
+  Timing.AddressHoldTime = 15;
   Timing.DataSetupTime = 3;
   Timing.BusTurnAroundDuration = 0;
-  Timing.CLKDivision = 16; /* Not Used */
-  Timing.DataLatency = 17; /* Not Used */
+  Timing.CLKDivision = 16;
+  Timing.DataLatency = 17;
   Timing.AccessMode = FSMC_ACCESS_MODE_A;
   /* ExtTiming */
 
@@ -79,6 +87,9 @@ void MX_FSMC_Init(void)
 
   __HAL_AFIO_FSMCNADV_DISCONNECTED();
 
+  /* USER CODE BEGIN FSMC_Init 2 */
+
+  /* USER CODE END FSMC_Init 2 */
 }
 
 static uint32_t FSMC_Initialized = 0;
