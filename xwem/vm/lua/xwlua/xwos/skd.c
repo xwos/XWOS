@@ -5,9 +5,7 @@
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
  * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
- * > This Source Code Form is subject to the terms of the Mozilla Public
- * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > http://www.lua.org/license.html
  */
 
 #include <xwos/standard.h>
@@ -45,7 +43,7 @@ int xwlua_skd_get_timestamp_lc(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_skd_method[] = {
+const luaL_Reg xwlua_skd_libconstructor[] = {
         {"tt", xwlua_skd_get_timetick_lc},
         {"tc", xwlua_skd_get_tickcount_lc},
         {"ts", xwlua_skd_get_timestamp_lc},
@@ -54,7 +52,7 @@ const luaL_Reg xwlua_skd_method[] = {
 
 void xwlua_os_open_skd(lua_State * L)
 {
-        luaL_newlib(L, xwlua_skd_method);
+        luaL_newlib(L, xwlua_skd_libconstructor);
 }
 
 /******** xwos.thd ********/
@@ -172,6 +170,7 @@ int xwlua_thd_call(lua_State * L)
         luaL_checktype(L, 1, LUA_TFUNCTION);
         lua_pushvalue(L, 1); /* Ensure that top is the function */
         luaL_buffinit(L, &lb);
+        luaL_prepbuffer(&lb);
         rc = lua_dump(L, xwlua_xt_function_writer, &lb, true);
         lua_pop(L, 1);
         if (0 != rc) {
@@ -209,7 +208,7 @@ int xwlua_thd_call(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_thd_method[] = {
+const luaL_Reg xwlua_thd_libconstructor[] = {
         {"dofile", xwlua_thd_dofile},
         {"dostring", xwlua_thd_dostring},
         {"call", xwlua_thd_call},
@@ -219,7 +218,7 @@ const luaL_Reg xwlua_thd_method[] = {
 void xwlua_os_open_thd(lua_State * L)
 {
         xwlua_os_init_thdsp(L);
-        luaL_newlib(L, xwlua_thd_method);
+        luaL_newlib(L, xwlua_thd_libconstructor);
 }
 
 /******** xwos.cthd ********/
@@ -455,7 +454,7 @@ int xwlua_thdsp_migrate(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_thdsp_method[] = {
+const luaL_Reg xwlua_thdsp_indexmethod[] = {
         {"stop", xwlua_thdsp_stop},
         {"cancel", xwlua_thdsp_cancel},
         {"join", xwlua_thdsp_join},
@@ -469,8 +468,8 @@ void xwlua_os_init_thdsp(lua_State * L)
         /* metatable for struct xwlua_thd_sp */
         luaL_newmetatable(L, "xwlua_thd_sp");
         luaL_setfuncs(L, xwlua_thdsp_metamethod, 0); /* add metamethods */
-        luaL_newlibtable(L, xwlua_thdsp_method); /* create thdsp method table */
-        luaL_setfuncs(L, xwlua_thdsp_method, 0); /* add thdsp methods */
-        lua_setfield(L, -2, "__index");  /* metatable.__index = xwlua_thdsp_method */
+        luaL_newlibtable(L, xwlua_thdsp_indexmethod); /* create thdsp method table */
+        luaL_setfuncs(L, xwlua_thdsp_indexmethod, 0); /* add thdsp indexmethod table */
+        lua_setfield(L, -2, "__index");  /* metatable.__index = indexmethod table */
         lua_pop(L, 1); /* pop metatable */
 }

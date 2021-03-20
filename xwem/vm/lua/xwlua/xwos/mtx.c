@@ -5,9 +5,7 @@
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
  * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
- * > This Source Code Form is subject to the terms of the Mozilla Public
- * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > http://www.lua.org/license.html
  */
 
 #include <xwos/standard.h>
@@ -40,7 +38,7 @@ int xwlua_mtx_new(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_mtx_method[] = {
+const luaL_Reg xwlua_mtx_libconstructor[] = {
         {"new", xwlua_mtx_new},
         {NULL, NULL},
 };
@@ -50,7 +48,7 @@ void xwlua_os_init_mtxsp(lua_State * L);
 void xwlua_os_open_mtx(lua_State * L)
 {
         xwlua_os_init_mtxsp(L);
-        luaL_newlib(L, xwlua_mtx_method);
+        luaL_newlib(L, xwlua_mtx_libconstructor);
 }
 
 /******** class xwlua_mtx_sp ********/
@@ -164,7 +162,7 @@ int xwlua_mtxsp_lock(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_mtxsp_method[] = {
+const luaL_Reg xwlua_mtxsp_indexmethod[] = {
         {"unlock", xwlua_mtxsp_unlock},
         {"lock", xwlua_mtxsp_lock},
         {NULL, NULL},
@@ -175,8 +173,8 @@ void xwlua_os_init_mtxsp(lua_State * L)
         /* metatable for xwlua_mtx_sp */
         luaL_newmetatable(L, "xwlua_mtx_sp");
         luaL_setfuncs(L, xwlua_mtxsp_metamethod, 0); /* add metamethods */
-        luaL_newlibtable(L, xwlua_mtxsp_method); /* create mtx method table */
-        luaL_setfuncs(L, xwlua_mtxsp_method, 0); /* add mtx methods */
-        lua_setfield(L, -2, "__index");  /* metatable.__index = xwlua_mtxsp_method */
+        luaL_newlibtable(L, xwlua_mtxsp_indexmethod); /* create mtx method table */
+        luaL_setfuncs(L, xwlua_mtxsp_indexmethod, 0); /* add mtx indexmethod table */
+        lua_setfield(L, -2, "__index");  /* metatable.__index = indexmethod table */
         lua_pop(L, 1); /* pop metatable */
 }

@@ -5,9 +5,7 @@
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
  * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
- * > This Source Code Form is subject to the terms of the Mozilla Public
- * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > http://www.lua.org/license.html
  */
 
 #include <xwos/standard.h>
@@ -15,13 +13,16 @@
 #include "xwlua/port.h"
 #include "xwlua/xwds/soc.h"
 #include "xwlua/xwds/gpio.h"
+#include "xwlua/xwds/uart.h"
+#include "xwlua/xwds/i2cm.h"
+#include "xwlua/xwds/spim.h"
 
 const luaL_Reg xwlua_ds[] = {
         {"soc", NULL},
         {"gpio", NULL},
+        {"uart", NULL},
         {"i2cm", NULL},
         {"spim", NULL},
-        {"uart", NULL},
         {"can", NULL},
         {NULL, NULL},
 };
@@ -33,5 +34,11 @@ LUAMOD_API int xwlua_open_ds(lua_State * L)
         lua_setfield(L, -2, "soc");
         xwlua_ds_open_gpio(L);
         lua_setfield(L, -2, "gpio");
+        xwlua_ds_open_uart(L);
+        lua_setfield(L, -2, "uart");
+        xwlua_ds_open_i2cm(L);
+        lua_setfield(L, -2, "i2cm");
+        xwlua_ds_open_spim(L);
+        lua_setfield(L, -2, "spim");
         return 1;
 }

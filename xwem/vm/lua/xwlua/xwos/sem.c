@@ -5,9 +5,7 @@
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
  * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
- * > This Source Code Form is subject to the terms of the Mozilla Public
- * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > http://www.lua.org/license.html
  */
 
 #include <xwos/standard.h>
@@ -40,7 +38,7 @@ int xwlua_sem_new(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_sem_method[] = {
+const luaL_Reg xwlua_sem_libconstructor[] = {
         {"new", xwlua_sem_new},
         {NULL, NULL},
 };
@@ -50,7 +48,7 @@ void xwlua_os_init_semsp(lua_State * L);
 void xwlua_os_open_sem(lua_State * L)
 {
         xwlua_os_init_semsp(L);
-        luaL_newlib(L, xwlua_sem_method);
+        luaL_newlib(L, xwlua_sem_libconstructor);
 }
 
 /******** class xwlua_sem_sp ********/
@@ -226,7 +224,7 @@ int xwlua_semsp_getvalue(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_semsp_method[] = {
+const luaL_Reg xwlua_semsp_indexmethod[] = {
         {"bind", xwlua_semsp_bind},
         {"unbind", xwlua_semsp_unbind},
         {"freeze", xwlua_semsp_freeze},
@@ -242,8 +240,8 @@ void xwlua_os_init_semsp(lua_State * L)
         /* metatable for xwlua_sem_sp */
         luaL_newmetatable(L, "xwlua_sem_sp");
         luaL_setfuncs(L, xwlua_semsp_metamethod, 0); /* add metamethods */
-        luaL_newlibtable(L, xwlua_semsp_method); /* create sem method table */
-        luaL_setfuncs(L, xwlua_semsp_method, 0); /* add sem methods */
-        lua_setfield(L, -2, "__index");  /* metatable.__index = xwlua_semsp_method */
+        luaL_newlibtable(L, xwlua_semsp_indexmethod); /* create sem method table */
+        luaL_setfuncs(L, xwlua_semsp_indexmethod, 0); /* add sem indexmethod table */
+        lua_setfield(L, -2, "__index");  /* metatable.__index = indexmethod table */
         lua_pop(L, 1); /* pop metatable */
 }

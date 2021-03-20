@@ -5,9 +5,7 @@
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
  * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
- * > This Source Code Form is subject to the terms of the Mozilla Public
- * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > http://www.lua.org/license.html
  */
 
 #include <xwos/standard.h>
@@ -329,7 +327,7 @@ int xwlua_xt_gc(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_xt_method[] = {
+const luaL_Reg xwlua_xt_libconstructor[] = {
         {"gc", xwlua_xt_gc},
         {"setup", xwlua_xt_setup},
         {NULL, NULL},
@@ -508,7 +506,7 @@ LUAMOD_API int xwlua_open_xt(lua_State * L)
         luaL_newmetatable(L, "xwlua_vm");
         lua_pop(L, 1); /* pop metatable */
 
-        luaL_newlib(L, xwlua_xt_method);
+        luaL_newlib(L, xwlua_xt_libconstructor);
         luaL_setmetatable(L, "xwlua_xt");
         return 1;
 }

@@ -5,9 +5,7 @@
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
  * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
- * > This Source Code Form is subject to the terms of the Mozilla Public
- * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > http://www.lua.org/license.html
  */
 
 #include <xwos/standard.h>
@@ -47,7 +45,7 @@ int xwlua_sel_bmp(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_sel_method[] = {
+const luaL_Reg xwlua_sel_libconstructor[] = {
         {"new", xwlua_sel_new},
         {"bmp", xwlua_sel_bmp},
         {NULL, NULL},
@@ -58,7 +56,7 @@ void xwlua_os_init_selsp(lua_State * L);
 void xwlua_os_open_sel(lua_State * L)
 {
         xwlua_os_init_selsp(L);
-        luaL_newlib(L, xwlua_sel_method);
+        luaL_newlib(L, xwlua_sel_libconstructor);
 }
 
 /******** class xwlua_sel_sp ********/
@@ -238,7 +236,7 @@ int xwlua_selsp_wait(lua_State * L)
         return 2;
 }
 
-const luaL_Reg xwlua_selsp_method[] = {
+const luaL_Reg xwlua_selsp_indexmethod[] = {
         {"bind", xwlua_selsp_bind},
         {"unbind", xwlua_selsp_unbind},
         {"intr_all", xwlua_selsp_intr_all},
@@ -251,8 +249,8 @@ void xwlua_os_init_selsp(lua_State * L)
         /* metatable for xwlua_sel_sp */
         luaL_newmetatable(L, "xwlua_sel_sp");
         luaL_setfuncs(L, xwlua_selsp_metamethod, 0); /* add metamethods */
-        luaL_newlibtable(L, xwlua_selsp_method); /* create sel method table */
-        luaL_setfuncs(L, xwlua_selsp_method, 0); /* add sel methods */
-        lua_setfield(L, -2, "__index");  /* metatable.__index = xwlua_selsp_method */
+        luaL_newlibtable(L, xwlua_selsp_indexmethod); /* create sel method table */
+        luaL_setfuncs(L, xwlua_selsp_indexmethod, 0); /* add sel indexmethod table */
+        lua_setfield(L, -2, "__index");  /* metatable.__index = indexmethod table */
         lua_pop(L, 1); /* pop metatable */
 }

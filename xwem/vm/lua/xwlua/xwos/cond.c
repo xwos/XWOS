@@ -5,9 +5,7 @@
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
  * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
- * > This Source Code Form is subject to the terms of the Mozilla Public
- * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > http://www.lua.org/license.html
  */
 
 #include <xwos/standard.h>
@@ -36,7 +34,7 @@ int xwlua_cond_new(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_cond_method[] = {
+const luaL_Reg xwlua_cond_libconstructor[] = {
         {"new", xwlua_cond_new},
         {NULL, NULL},
 };
@@ -46,7 +44,7 @@ void xwlua_os_init_condsp(lua_State * L);
 void xwlua_os_open_cond(lua_State * L)
 {
         xwlua_os_init_condsp(L);
-        luaL_newlib(L, xwlua_cond_method);
+        luaL_newlib(L, xwlua_cond_libconstructor);
 }
 
 /******** class xwlua_cond_sp ********/
@@ -255,7 +253,7 @@ int xwlua_condsp_wait(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_condsp_method[] = {
+const luaL_Reg xwlua_condsp_indexmethod[] = {
         {"bind", xwlua_condsp_bind},
         {"unbind", xwlua_condsp_unbind},
         {"freeze", xwlua_condsp_freeze},
@@ -271,8 +269,8 @@ void xwlua_os_init_condsp(lua_State * L)
         /* metatable for xwlua_cond_sp */
         luaL_newmetatable(L, "xwlua_cond_sp");
         luaL_setfuncs(L, xwlua_condsp_metamethod, 0); /* add metamethods */
-        luaL_newlibtable(L, xwlua_condsp_method); /* create cond method table */
-        luaL_setfuncs(L, xwlua_condsp_method, 0); /* add cond methods */
-        lua_setfield(L, -2, "__index");  /* metatable.__index = xwlua_condsp_method */
+        luaL_newlibtable(L, xwlua_condsp_indexmethod); /* create cond method table */
+        luaL_setfuncs(L, xwlua_condsp_indexmethod, 0); /* add cond indexmethod table */
+        lua_setfield(L, -2, "__index");  /* metatable.__index = indexmethod table */
         lua_pop(L, 1); /* pop metatable */
 }

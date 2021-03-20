@@ -5,9 +5,7 @@
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
  * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
- * > This Source Code Form is subject to the terms of the Mozilla Public
- * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > http://www.lua.org/license.html
  */
 
 #include <xwos/standard.h>
@@ -143,7 +141,7 @@ int xwlua_splk_new(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_splk_method[] = {
+const luaL_Reg xwlua_splk_libconstructor[] = {
         {"new", xwlua_splk_new},
         {NULL, NULL},
 };
@@ -153,7 +151,7 @@ void xwlua_os_init_splksp(lua_State * L);
 void xwlua_os_open_splk(lua_State * L)
 {
         xwlua_os_init_splksp(L);
-        luaL_newlib(L, xwlua_splk_method);
+        luaL_newlib(L, xwlua_splk_libconstructor);
 }
 
 /******** class xwlua_splk_sp ********/
@@ -261,7 +259,7 @@ int xwlua_splksp_lock(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_splksp_method[] = {
+const luaL_Reg xwlua_splksp_indexmethod[] = {
         {"unlock", xwlua_splksp_unlock},
         {"lock", xwlua_splksp_lock},
         {NULL, NULL},
@@ -272,8 +270,8 @@ void xwlua_os_init_splksp(lua_State * L)
         /* metatable for xwlua_splk_sp */
         luaL_newmetatable(L, "xwlua_splk_sp");
         luaL_setfuncs(L, xwlua_splksp_metamethod, 0); /* add metamethods */
-        luaL_newlibtable(L, xwlua_splksp_method); /* create splksp method table */
-        luaL_setfuncs(L, xwlua_splksp_method, 0); /* add splksp methods */
-        lua_setfield(L, -2, "__index");  /* metatable.__index = xwlua_splksp_method */
+        luaL_newlibtable(L, xwlua_splksp_indexmethod); /* create splksp method table */
+        luaL_setfuncs(L, xwlua_splksp_indexmethod, 0); /* add splk indexmethod table */
+        lua_setfield(L, -2, "__index");  /* metatable.__index = indexmethod table */
         lua_pop(L, 1); /* pop metatable */
 }

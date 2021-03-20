@@ -5,9 +5,7 @@
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
  * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
- * > This Source Code Form is subject to the terms of the Mozilla Public
- * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > http://www.lua.org/license.html
  */
 
 #ifndef __xwem_vm_lua_xwlua_xwds_soc_h__
@@ -16,6 +14,11 @@
 #include <xwos/standard.h>
 #include <xwcd/ds/soc/chip.h>
 #include "src/lauxlib.h"
+
+struct xwlua_soc {
+        struct xwds_soc * soc;
+        xwsq_t tik;
+};
 
 void xwlua_soc_register(lua_State * L, const char * name, struct xwds_soc * soc);
 void xwlua_soc_unregister(lua_State * L, const char * name);

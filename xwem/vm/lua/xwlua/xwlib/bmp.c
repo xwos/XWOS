@@ -5,9 +5,7 @@
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
  * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
- * > This Source Code Form is subject to the terms of the Mozilla Public
- * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > http://www.lua.org/license.html
  */
 
 #include <xwos/standard.h>
@@ -32,7 +30,7 @@ int xwlua_bmp_new(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_bmp_method[] = {
+const luaL_Reg xwlua_bmp_libconstructor[] = {
         {"new", xwlua_bmp_new},
         {NULL, NULL},
 };
@@ -500,13 +498,13 @@ void xwlua_lib_init_bmp(lua_State * L)
         luaL_newmetatable(L, "xwlua_bmp_t");
         luaL_setfuncs(L, xwlua_bmp_metamethod, 0); /* add metamethods */
         luaL_newlibtable(L, xwlua_bmp_indexmethod); /* create bmp indexmethod table */
-        luaL_setfuncs(L, xwlua_bmp_indexmethod, 0); /* add bmp indexmethod */
-        lua_setfield(L, -2, "__index");  /* metatable.__index = xwlua_bmp_indexmethod */
+        luaL_setfuncs(L, xwlua_bmp_indexmethod, 0); /* add bmp indexmethod table */
+        lua_setfield(L, -2, "__index");  /* metatable.__index = indexmethod table */
         lua_pop(L, 1); /* pop metatable */
 }
 
 void xwlua_lib_open_bmp(lua_State * L)
 {
         xwlua_lib_init_bmp(L);
-        luaL_newlib(L, xwlua_bmp_method);
+        luaL_newlib(L, xwlua_bmp_libconstructor);
 }

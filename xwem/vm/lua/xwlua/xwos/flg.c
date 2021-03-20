@@ -5,9 +5,7 @@
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
  * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
- * > This Source Code Form is subject to the terms of the Mozilla Public
- * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > http://www.lua.org/license.html
  */
 
 #include <xwos/standard.h>
@@ -61,7 +59,7 @@ int xwlua_flg_bmp(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_flg_method[] = {
+const luaL_Reg xwlua_flg_libconstructor[] = {
         {"new", xwlua_flg_new},
         {"bmp", xwlua_flg_bmp},
         {NULL, NULL},
@@ -72,7 +70,7 @@ void xwlua_os_init_flgsp(lua_State * L);
 void xwlua_os_open_flg(lua_State * L)
 {
         xwlua_os_init_flgsp(L);
-        luaL_newlib(L, xwlua_flg_method);
+        luaL_newlib(L, xwlua_flg_libconstructor);
 }
 
 /******** class xwlua_flg_sp ********/
@@ -345,7 +343,7 @@ int xwlua_flgsp_wait(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_flgsp_method[] = {
+const luaL_Reg xwlua_flgsp_indexmethod[] = {
         {"bind", xwlua_flgsp_bind},
         {"unbind", xwlua_flgsp_unbind},
         {"intr_all", xwlua_flgsp_intr_all},
@@ -365,8 +363,8 @@ void xwlua_os_init_flgsp(lua_State * L)
         /* metatable for xwlua_flg_sp */
         luaL_newmetatable(L, "xwlua_flg_sp");
         luaL_setfuncs(L, xwlua_flgsp_metamethod, 0); /* add metamethods */
-        luaL_newlibtable(L, xwlua_flgsp_method); /* create flg method table */
-        luaL_setfuncs(L, xwlua_flgsp_method, 0); /* add flg methods */
-        lua_setfield(L, -2, "__index");  /* metatable.__index = xwlua_flgsp_method */
+        luaL_newlibtable(L, xwlua_flgsp_indexmethod); /* create flg method table */
+        luaL_setfuncs(L, xwlua_flgsp_indexmethod, 0); /* add flg indexmethod table */
+        lua_setfield(L, -2, "__index");  /* metatable.__index = indexmethod table */
         lua_pop(L, 1); /* pop metatable */
 }

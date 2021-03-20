@@ -5,9 +5,7 @@
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
  * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
- * > This Source Code Form is subject to the terms of the Mozilla Public
- * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > http://www.lua.org/license.html
  */
 
 #include <xwos/standard.h>
@@ -164,7 +162,7 @@ int xwlua_sqlk_new(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_sqlk_method[] = {
+const luaL_Reg xwlua_sqlk_libconstructor[] = {
         {"new", xwlua_sqlk_new},
         {NULL, NULL},
 };
@@ -174,7 +172,7 @@ void xwlua_os_init_sqlksp(lua_State * L);
 void xwlua_os_open_sqlk(lua_State * L)
 {
         xwlua_os_init_sqlksp(L);
-        luaL_newlib(L, xwlua_sqlk_method);
+        luaL_newlib(L, xwlua_sqlk_libconstructor);
 }
 
 /******** class xwlua_sqlk_sp ********/
@@ -361,7 +359,7 @@ int xwlua_sqlksp_lock(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_sqlksp_method[] = {
+const luaL_Reg xwlua_sqlksp_indexmethod[] = {
         {"rd_begin", xwlua_sqlksp_rd_begin},
         {"rd_retry", xwlua_sqlksp_rd_retry},
         {"get_seq", xwlua_sqlksp_get_seq},
@@ -375,8 +373,8 @@ void xwlua_os_init_sqlksp(lua_State * L)
         /* metatable for xwlua_sqlksp_d */
         luaL_newmetatable(L, "xwlua_sqlk_sp");
         luaL_setfuncs(L, xwlua_sqlksp_metamethod, 0); /* add metamethods */
-        luaL_newlibtable(L, xwlua_sqlksp_method); /* create sqlk method table */
-        luaL_setfuncs(L, xwlua_sqlksp_method, 0); /* add sqlk methods */
-        lua_setfield(L, -2, "__index");  /* metatable.__index = xwlua_sqlksp_method */
+        luaL_newlibtable(L, xwlua_sqlksp_indexmethod); /* create sqlk method table */
+        luaL_setfuncs(L, xwlua_sqlksp_indexmethod, 0); /* add sqlk indexmethod table */
+        lua_setfield(L, -2, "__index");  /* metatable.__index = indexmethod table */
         lua_pop(L, 1); /* pop metatable */
 }

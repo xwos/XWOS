@@ -10,6 +10,7 @@
 
 #include <xwos/standard.h>
 #include <string.h>
+#include <stdio.h>
 #include <xwos/mm/mempool/allocator.h>
 #include "src/lua.h"
 #include "src/lualib.h"
@@ -84,4 +85,36 @@ void * xwlua_alloc(void * ud, void * ptr, size_t osize, size_t nsize)
                 xwmm_mempool_realloc(xwlua_mempool, nsize, &mem);
         }
         return mem;
+}
+
+void xwlua_dump_stack(lua_State* L)
+{
+        int i = 0;
+        int top = lua_gettop(L);
+        printf("++++++++ lua stack ++++++++\n");
+        for (i = top; i <= top; --i) {
+                if (i == 0) {
+                        break;
+                }
+                int t = lua_type(L, i);
+                switch (t) {
+                case LUA_TSTRING:
+                        printf("|INDEX='%d','LUA_TSTRING=%s'|\n",
+                               i, lua_tostring(L, i));
+                        break;
+                case LUA_TBOOLEAN:
+                        printf("|INDEX='%d','LUA_TBOOLEAN=%s'|\n",
+                               i, lua_toboolean(L, i) ? "true" : "false");
+                        break;
+                case LUA_TNUMBER:
+                        printf("|INDEX='%d','LUA_TNUMBER=%g'|\n",
+                               i, lua_tonumber(L, i));
+                        break;
+                default:
+                        printf("|INDEX='%d','DEFAULT=%s'|\n",
+                               i, lua_typename(L, t));
+                        break;
+                }
+        }
+        printf("-------- lua stack --------\n");
 }

@@ -5,9 +5,7 @@
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
  * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
- * > This Source Code Form is subject to the terms of the Mozilla Public
- * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > http://www.lua.org/license.html
  */
 
 #include <xwos/standard.h>
@@ -48,7 +46,7 @@ int xwlua_br_bmp(lua_State * L)
         return 1;
 }
 
-const luaL_Reg xwlua_br_method[] = {
+const luaL_Reg xwlua_br_libconstructor[] = {
         {"new", xwlua_br_new},
         {"bmp", xwlua_br_bmp},
         {NULL, NULL},
@@ -59,7 +57,7 @@ void xwlua_os_init_brsp(lua_State * L);
 void xwlua_os_open_br(lua_State * L)
 {
         xwlua_os_init_brsp(L);
-        luaL_newlib(L, xwlua_br_method);
+        luaL_newlib(L, xwlua_br_libconstructor);
 }
 
 /******** class xwlua_br_sp ********/
@@ -198,7 +196,7 @@ int xwlua_brsp_sync(lua_State * L)
         return 2;
 }
 
-const luaL_Reg xwlua_brsp_method[] = {
+const luaL_Reg xwlua_brsp_indexmethod[] = {
         {"bind", xwlua_brsp_bind},
         {"unbind", xwlua_brsp_unbind},
         {"intr_all", xwlua_brsp_intr_all},
@@ -211,8 +209,8 @@ void xwlua_os_init_brsp(lua_State * L)
         /* metatable for xwlua_br_sp */
         luaL_newmetatable(L, "xwlua_br_sp");
         luaL_setfuncs(L, xwlua_brsp_metamethod, 0); /* add metamethods */
-        luaL_newlibtable(L, xwlua_brsp_method); /* create br method table */
-        luaL_setfuncs(L, xwlua_brsp_method, 0); /* add br methods */
-        lua_setfield(L, -2, "__index");  /* metatable.__index = xwlua_brsp_method */
+        luaL_newlibtable(L, xwlua_brsp_indexmethod); /* create br method table */
+        luaL_setfuncs(L, xwlua_brsp_indexmethod, 0); /* add br indexmethod table */
+        lua_setfield(L, -2, "__index");  /* metatable.__index = indexmethod table */
         lua_pop(L, 1); /* pop metatable */
 }
