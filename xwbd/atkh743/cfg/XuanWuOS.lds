@@ -21,6 +21,7 @@
 MEMORY {
         itcm_mr (rwx): o = 0x00000000, l = 64k /* ITCM */
         flash_mr (rx): o = 0x08000000, l = 2M /* internal FLASH */
+        qspiflash_mr (rx): o = 0x90000000, l = 32M /* external FLASH */
         dtcm_mr (rwx): o = 0x20000000, l = 128k /* DTCM */
         axisram_mr (rwx): org = 0x24000000, len = 512k /* AXI SRAM bank1 */
         sram1_mr (rwx): org = 0x30000000, len = 128k /* internal SRAM bank1 */
@@ -55,6 +56,9 @@ dtcmheap_mr_size = LENGTH(dtcmheap_mr);
 
 axisram_mr_origin = ORIGIN(axisram_mr);
 axisram_mr_size = LENGTH(axisram_mr);
+
+qspiflash_mr_origin = ORIGIN(qspiflash_mr);
+qspiflash_mr_size = LENGTH(qspiflash_mr);
 
 sdram_mr_origin = ORIGIN(sdram_mr);
 sdram_mr_size = LENGTH(sdram_mr);

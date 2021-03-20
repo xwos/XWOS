@@ -18,6 +18,7 @@
  * > limitations under the License.
  */
 
+#include <xwos/standard.h>
 #include <xwos/osal/skd.h>
 #include <xwmd/libc/newlibac/mif.h>
 #include <xwem/vm/lua/mif.h>
@@ -61,7 +62,6 @@ xwer_t xwos_main(void)
         if (rc < 0) {
                 goto err_skd_start_lc;
         }
-
         return XWOK;
 
 err_init_thd_create:

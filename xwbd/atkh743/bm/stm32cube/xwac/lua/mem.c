@@ -23,4 +23,4 @@
 
 extern xwsz_t sdram_mr_origin[];
 
-struct xwmm_mempool * xwlua_mempool = (void *)sdram_mr_origin;
+__xwbsp_data struct xwmm_mempool * xwlua_mempool = (void *)sdram_mr_origin;

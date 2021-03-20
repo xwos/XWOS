@@ -34,7 +34,7 @@
 #define ARCHCFG_IRQ_NUM                         16
 
 /******** ******** fpu ******** ********/
-#define ARCHCFG_FPU                             0
+#define ARCHCFG_FPU                             1
 
 /******** ******** architecture libs ******** ********/
 /******** libc.a ********/

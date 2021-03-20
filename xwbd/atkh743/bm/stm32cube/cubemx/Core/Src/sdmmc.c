@@ -398,8 +398,8 @@ xwer_t MX_SDMMC1_SD_Write(uint8_t * data, uint32_t blkaddr,
       if (rc < 0) {
         goto err_nomem;
       }
-      memcpy(mem, data, nrblk * BLOCKSIZE);
     }
+    memcpy(mem, data, nrblk * BLOCKSIZE);
   } else {
     mem = data;
   }

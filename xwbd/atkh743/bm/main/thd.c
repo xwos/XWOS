@@ -18,6 +18,7 @@
  * > limitations under the License.
  */
 
+#include <xwos/standard.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <xwos/osal/skd.h>
 #include <xwcd/ds/soc/gpio.h>
@@ -56,7 +57,6 @@ const struct xwos_thd_desc child_thd_desc[] = {
                 .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
         },
 };
-
 struct xwos_thd * child_thd[xw_array_size(child_thd_desc)];
 
 xwer_t child_thd_start(void)

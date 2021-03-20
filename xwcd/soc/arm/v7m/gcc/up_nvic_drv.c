@@ -75,6 +75,11 @@ xwer_t cortexm_nvic_drv_release(__xwcc_unused xwirq_t irqn)
 
         isr_table = xwup_irqc.isr_table;
         isr_table->soc[irqn] = arch_isr_noop;
+
+        isr_data_table = xwup_irqc.isr_data_table;
+        if (NULL != isr_data_table) {
+                isr_data_table->soc[irqn] = NULL;
+        }
 #endif /* !SOCCFG_RO_ISRTABLE */
         return XWOK;
 }
