@@ -1,7 +1,7 @@
 #! /bin/sh
 ":"; exec emacs --quick --script "$0" -- "$@" # -*- mode: emacs-lisp; lexical-binding: t; -*-
 ;; @file
-;; @brief Emacs-script to generate STM32 Interupt Vector Table (IVT)
+;; @brief Emacs-script to generate S32K Interupt Vector Table (IVT)
 ;; @author
 ;; + 隐星魂 (Roy.Sun) <https://xwos.tech>
 ;; @copyright
@@ -53,7 +53,7 @@
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; misc function ;;;;;;;; ;;;;;;;; ;;;;;;;;
 (defun usage ()
-    (princ (format "%s <stm32cube xwmo Path>\n" elname)))
+    (princ (format "%s <S32DS Project Path>\n" elname)))
 
 (defun expand-directory (dir &rest arglist)
   (file-name-directory
@@ -65,17 +65,18 @@
             "fakefile"))))
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; arguments ;;;;;;;; ;;;;;;;; ;;;;;;;;
+(setq show-usage nil)
 (setq debug-on-error t)
 (setq make-backup-files nil)
 (defvar argc (length argv) "Count of arguments")
-(defvar stm32cube-dir nil "stm32cube path")
+(defvar s32k-prjdir nil "S32k Project path")
 (logd "%s" argv)
 (let ((options-done nil))
   (pop argv)  ; Remove the -- separator
   (while argv
     (let ((option (pop argv)))
       (cond
-       (options-done (setq stm32cube-dir option))
+       (options-done (setq s32k-prjdir option))
 
        ;; options after "--"
        ((string= option "--") (setq options-done t))
@@ -94,15 +95,15 @@
         (loge "Unknown option: %s" option)
         (kill-emacs EINVAL))
 
-       (t (setq stm32cube-dir option)))))
+       (t (setq s32k-prjdir option)))))
 
-  (unless (> (length stm32cube-dir) 0)
+  (unless (> (length s32k-prjdir) 0)
     (setq s32k-prjdir "."))
   (unless (null show-usage)
     (usage)
     (kill-emacs 0))
 
-  (logd "stm32cube-dir:%s" stm32cube-dir))
+  (logd "s32k-prjdir:%s" s32k-prjdir))
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; Path ;;;;;;;; ;;;;;;;; ;;;;;;;;
 (defvar template-dir (expand-directory elpath "template/"))
@@ -121,138 +122,42 @@
     (progn
      (loge "Can't find file:template/ivt.c.t")
      (kill-emacs ENOENT)))
-(defvar cubemx-dir (expand-directory stm32cube-dir "/cubemx/"))
-(if (not (file-exists-p cubemx-dir))
+(defvar sdk-dir (expand-directory s32k-prjdir "/SDK/"))
+(if (not (file-exists-p sdk-dir))
     (progn
-     (loge "Can't find folder:%s" cubemx-dir)
+     (loge "Can't find folder:%s" sdk-dir)
      (kill-emacs ENOENT)))
-(defvar ivt-dir (expand-directory cubemx-dir "IVT/"))
-(if (not (file-exists-p ivt-dir))
-    (make-directory ivt-dir))
-(defvar device-dir (expand-directory cubemx-dir "Drivers/CMSIS/Device/ST/"))
+(defvar device-dir (expand-directory sdk-dir "platform/devices/"))
 (if (not (file-exists-p device-dir))
     (progn
      (loge "Can't find folder:%s" device-dir)
      (kill-emacs ENOENT)))
-(defvar cubemx-makefile (expand-file-name "Makefile" cubemx-dir))
-(if (not (file-exists-p cubemx-makefile))
+(defvar s32kbsp-dir (expand-directory s32k-prjdir "/brd/bm/s32kbsp/"))
+(if (not (file-exists-p s32kbsp-dir))
     (progn
-     (loge "Can't find file:%s" cubemx-makefile)
+     (loge "Can't find folder:%s" s32kbsp-dir)
      (kill-emacs ENOENT)))
-(defvar family
+(defvar ivt-dir (expand-directory s32kbsp-dir "xwac/ivt/"))
+(if (not (file-exists-p ivt-dir))
+    (make-directory ivt-dir))
+(defvar soc
   (catch 'break
     (let ((notdot)
-          (family-list (directory-files device-dir)))
-      (while family-list
-        (setq notdot (pop family-list))
+          (soc-list (directory-files device-dir nil "S32K.+")))
+      (while soc-list
+        (setq notdot (pop soc-list))
         (if (and (not (string= notdot ".")) (not (string= notdot "..")))
             (throw 'break notdot))))))
-(defvar family-downcase (downcase family))
-(defvar family-dir (expand-directory device-dir family "/"))
-(defvar family-inc-dir (expand-directory family-dir "Include/"))
-(defvar family-h (expand-file-name (concat family-downcase ".h") family-inc-dir))
-(defvar family-sys-h (expand-file-name (concat "system_" family-downcase ".h") family-inc-dir))
-(defvar soc-h-name
-  (catch 'break
-    (let ((family-h-name (file-name-nondirectory family-h))
-          (family-sys-h-name (file-name-nondirectory family-sys-h))
-          (soc-list (directory-files family-inc-dir))
-          (soc-h-name))
-      (while soc-list
-        (setq soc-h-name (pop soc-list))
-        (if (and (not (string= soc-h-name "."))
-                 (not (string= soc-h-name ".."))
-                 (not (string= soc-h-name family-h-name))
-                 (not (string= soc-h-name family-sys-h-name)))
-            (throw 'break soc-h-name))))))
-(defvar soc-name (file-name-sans-extension soc-h-name))
-(defvar soc-h (expand-file-name soc-h-name family-inc-dir))
+(defvar soc-dir (expand-directory device-dir soc "/"))
+(defvar soc-inc-dir (expand-directory soc-dir "include/"))
+(defvar soc-h (expand-file-name (concat soc ".h") soc-inc-dir))
+
 (defvar isr-c (expand-file-name "isr.c" ivt-dir))
 (defvar isr-h (expand-file-name "isr.h" ivt-dir))
 (defvar ivt-c (expand-file-name "ivt.c" ivt-dir))
 
-(logd "soc-name:%s" soc-name)
+(logd "soc:%s" soc)
 (logd "soc-h:%s" soc-h)
-
-;;;;;;;; ;;;;;;;; ;;;;;;;; Device Macro ;;;;;;;; ;;;;;;;; ;;;;;;;;
-;; Iterate over the input buffer to remove all '\r'
-(defvar cubemx-makefile-buffer (find-file-noselect cubemx-makefile))
-(set-buffer cubemx-makefile-buffer)
-(set-buffer-multibyte t)
-(goto-char (point-min))
-(delete-trailing-whitespace)
-(catch 'break
-  (let ((iterpoint 1))
-    (goto-char (point-min))
-    (while (< iterpoint (point-max))
-      (setq iterpoint (re-search-forward "\r\n" nil t))
-      (if (null iterpoint)
-          (throw 'break nil)
-        (replace-match "\n")))))
-
-;; Get variable C_DEFS
-(defvar cdefs-list
-      (split-string
-       (let ((variable "C_DEFS")
-             (iterpoint 1)
-             (variable-beginning 1)
-             (variable-end 1)
-             (variable-content ""))
-         (set-buffer cubemx-makefile-buffer)
-         (set-buffer-multibyte t)
-         (goto-char (point-min))
-         (setq iterpoint
-               (re-search-forward (concat variable "[ :?]*=\\(.+\\)\\\\$") nil t))
-         (if (null iterpoint)
-             (progn
-               (setq iterpoint
-                     (re-search-forward (concat variable "[ :?]*=\\(.+\\)$") nil t))
-               (if (null iterpoint)
-                   (setq variable-content "")
-                 (progn
-                   (setq variable-beginning (match-beginning 0))
-                   (setq variable-end (match-end 0))
-                   (setq variable-content (match-string 1)))))
-           (progn
-             (setq variable-beginning (match-beginning 0))
-             (setq variable-content (match-string 1))
-             (setq iterpoint (line-beginning-position))
-             ;;(logd "%d:%d:%d" variable-beginning iterpoint (point-max))
-             (let ((done nil)
-                   line-beginning
-                   line-end
-                   line-content)
-               (while (and (< iterpoint (point-max)) (null done))
-                 (setq line-beginning (line-beginning-position 2))
-                 (setq line-end (line-end-position 2))
-                 (setq line-content (buffer-substring line-beginning line-end))
-                 (if (string-match-p ".+\\\\" line-content)
-                     (progn
-                       (setq line-content
-                             (replace-regexp-in-string
-                              "\\(.+\\)\\(\\\\\\)" "" line-content
-                              nil nil 2))
-                       (setq done nil))
-                   (progn
-                     (setq done t)))
-                 ;;(logd "line <%d:%d>%s" line-beginning line-end line-content)
-                 (setq variable-content (concat variable-content line-content))
-                 (setq variable-end line-end)
-                 (setq iterpoint line-beginning)
-                 (goto-char iterpoint)))))
-         ;;(logd "variable <%d:%d>%s" variable-beginning variable-end variable-content)
-         variable-content)))
-;;(logd "cdefs-list:%s" cdefs-list)
-(defvar soc-macro
-  (substring
-   (catch 'break
-     (let (element))
-     (while cdefs-list
-       (setq element (pop cdefs-list))
-       (if (string= (upcase element) (concat "-D" (upcase soc-name)))
-           (throw 'break element)))) 2 -1))
-(logd "soc-macro:%s" soc-macro)
-(kill-buffer cubemx-makefile-buffer)
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; IRQ Table ;;;;;;;; ;;;;;;;; ;;;;;;;;
 (defvar soc-h-buffer (find-file-noselect soc-h))
@@ -291,7 +196,7 @@
                (re-search-forward
                 "  \\([A-Z_a-z0-9]+\\)\\(_IRQn\\) += [0-9 ]+.+" nil t))
     (replace-match
-     "void \\1_IRQHandler(void) __xwcc_weakalias(\"MX_NOOP_IRQHandler\");" t)))
+     "void \\1_IRQHandler(void) __xwcc_weakalias(\"S32KBSP_NOOP_IRQHandler\");" t)))
 (save-buffer)
 (kill-buffer isr-c-buffer)
 

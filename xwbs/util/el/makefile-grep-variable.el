@@ -18,7 +18,8 @@
 ;; > See the License for the specific language governing permissions and
 ;; > limitations under the License.
 
-(defvar elscript (expand-file-name (nth 2 command-line-args)) "script name")
+(defvar elscript (expand-file-name (nth 2 command-line-args)) "script full path")
+(defvar elname (file-name-nondirectory elscript))
 (defvar elpath (file-name-directory elscript))
 (push elpath load-path)
 (require 'errno)
