@@ -643,13 +643,9 @@ xwer_t xwscp_tx_cmd_connect(struct xwscp * xwscp)
         xwer_t rc;
 
         xwscplogf(DEBUG, "TX connect cmd.\n");
-        rc = xwos_mtx_lock(&xwscp->tx.csmtx);
-        if (XWOK == rc) {
-                rc = xwscp_hwifal_tx(xwscp,
-                                     (xwu8_t *)xwscp_cmd_connect,
-                                     sizeof(xwscp_cmd_connect));
-                xwos_mtx_unlock(&xwscp->tx.csmtx);
-        }/* else {} */
+        rc = xwscp_hwifal_tx(xwscp,
+                             (xwu8_t *)xwscp_cmd_connect,
+                             sizeof(xwscp_cmd_connect));
         return rc;
 }
 
