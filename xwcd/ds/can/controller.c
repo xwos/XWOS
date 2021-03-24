@@ -427,6 +427,97 @@ err_canc_grab:
         return rc;
 }
 
+/******** ******** RX Queue ******** ********/
+/**
+ * @brief XWDS API：初始化接收缓冲队列
+ * @param rxq: (I) 接收缓冲队列对象指针
+ */
+__xwds_code
+void xwds_canc_rxq_init(struct xwds_canc_rxqueue * rxq)
+{
+        xwos_splk_init(&rxq->lock);
+        memset(rxq->q, 0, sizeof(rxq->q));
+        rxq->pos = 0;
+        rxq->num = 0;
+        xwos_sem_init(&rxq->sem, 0, XWDS_CANC_RXQNUM);
+}
+
+/**
+ * @brief XWDS API：发布一条消息到接收缓冲队列中
+ * @param rxq: (I) 接收缓冲队列对象指针
+ * @param msg: (I) 待发布的CAN消息结构体指针
+ */
+__xwds_code
+void xwds_canc_rxq_publish(struct xwds_canc_rxqueue * rxq,
+                           struct xwds_can_msg * msg)
+{
+        xwreg_t cpuirq;
+
+        xwos_splk_lock_cpuirqsv(&rxq->lock, &cpuirq);
+        memcpy(&rxq->q[rxq->num], msg, sizeof(struct xwds_can_msg));
+        rxq->num++;
+        if (rxq->num >= (xwssz_t)XWDS_CANC_RXQNUM) {
+                rxq->num = 0;
+        } /* else {} */
+        if (rxq->num == rxq->pos) {
+                /* Queue is overflow. Discard the oldest data */
+                rxq->pos++;
+                if (rxq->pos >= (xwssq_t)XWDS_CANC_RXQNUM) {
+                        rxq->pos = 0;
+                }/* else {} */
+                xwos_splk_unlock_cpuirqrs(&rxq->lock, cpuirq);
+        } else {
+                xwos_splk_unlock_cpuirqrs(&rxq->lock, cpuirq);
+                xwos_sem_post(&rxq->sem);
+        }
+}
+
+/**
+ * @brief XWDS API：从接收缓冲队列中获取一条消息
+ * @param rxq: (I) 接收缓冲队列对象指针
+ * @param buf: (I) 获取CAN消息结构体的缓存指针
+ * @param xwtm: 指向缓冲区的指针，此缓冲区：
+ *              (I) 作为输入时，表示期望的阻塞等待时间
+ *              (O) 作为输出时，返回剩余的期望时间
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效指针
+ * @note
+ * - 同步/异步：同步
+ * - 中断上下文：不可以使用
+ * - 中断底半部：不可以使用
+ * - 线程上下文：可以使用
+ * - 重入性：可重入
+ */
+__xwds_code
+xwer_t xwds_canc_rxq_acquire(struct xwds_canc_rxqueue * rxq,
+                             struct xwds_can_msg * buf,
+                             xwtm_t * xwtm)
+{
+        xwer_t rc;
+        xwreg_t cpuirq;
+
+        XWDS_VALIDATE(rxq, "nullptr", -EFAULT);
+        XWDS_VALIDATE(buf, "nullptr", -EFAULT);
+        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
+
+        rc = xwos_sem_timedwait(&rxq->sem, xwtm);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_sem_timedwait;
+        }
+        xwos_splk_lock_cpuirqsv(&rxq->lock, &cpuirq);
+        *buf = rxq->q[rxq->pos];
+        rxq->pos++;
+        if (rxq->pos >= (xwssq_t)XWDS_CANC_RXQNUM) {
+                rxq->pos = 0;
+        } /* else {} */
+        xwos_splk_unlock_cpuirqrs(&rxq->lock, cpuirq);
+        return XWOK;
+
+err_sem_timedwait:
+        return rc;
+}
+
 /******** ******** Callbacks for driver ******** ********/
 /**
  * @brief XWDS Driver Callback：设置“指示发送结果”的回调函数
@@ -586,7 +677,7 @@ void xwds_canc_drvcb_tx_indication(struct xwds_canc * canc, xwid_t txobjid,
 }
 
 /**
- * @brief XWDS Driver Callback：指示接收到CAN消息
+ * @brief XWDS Driver Callback：接收到CAN消息后的回调函数
  * @param canc: (I) CAN控制器对象指针
  * @param rxobjid: (I) 接收邮箱的ID
  * @param rxmsg: (O) 指向缓冲区的指针，通过此缓冲区返回接收到的CAN消息
@@ -677,94 +768,4 @@ void xwds_canc_drvcb_busoff_indication(struct xwds_canc * canc)
         if ((cbtbl) && (cbtbl->busoff_indication)) {
                 cbtbl->busoff_indication(canc);
         }/* else {} */
-}
-
-/**
- * @brief XWDS Driver Callback：初始化接收缓冲队列
- * @param rxq: (I) 接收缓冲队列对象指针
- */
-__xwds_code
-void xwds_canc_drvcb_rxq_init(struct xwds_canc_rxqueue * rxq)
-{
-        xwos_splk_init(&rxq->lock);
-        memset(rxq->q, 0, sizeof(rxq->q));
-        rxq->pos = 0;
-        rxq->num = 0;
-        xwos_sem_init(&rxq->sem, 0, XWDS_CANC_RXQNUM);
-}
-
-/**
- * @brief XWDS Driver Callback：发布一条消息到接收缓冲队列中
- * @param rxq: (I) 接收缓冲队列对象指针
- * @param msg: (I) 待发布的CAN消息结构体指针
- */
-__xwds_code
-void xwds_canc_drvcb_rxq_publish(struct xwds_canc_rxqueue * rxq,
-                                 struct xwds_can_msg * msg)
-{
-        xwreg_t cpuirq;
-
-        xwos_splk_lock_cpuirqsv(&rxq->lock, &cpuirq);
-        memcpy(&rxq->q[rxq->num], msg, sizeof(struct xwds_can_msg));
-        rxq->num++;
-        if (rxq->num >= (xwssz_t)XWDS_CANC_RXQNUM) {
-                rxq->num = 0;
-        } /* else {} */
-        if (rxq->num == rxq->pos) {
-                /* Queue is overflow. Discard the oldest data */
-                rxq->pos++;
-                if (rxq->pos >= (xwssq_t)XWDS_CANC_RXQNUM) {
-                        rxq->pos = 0;
-                }/* else {} */
-                xwos_splk_unlock_cpuirqrs(&rxq->lock, cpuirq);
-        } else {
-                xwos_splk_unlock_cpuirqrs(&rxq->lock, cpuirq);
-                xwos_sem_post(&rxq->sem);
-        }
-}
-
-/**
- * @brief XWDS Driver Callback：从接收缓冲队列中获取一条消息
- * @param rxq: (I) 接收缓冲队列对象指针
- * @param buf: (I) 获取CAN消息结构体的缓存指针
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效指针
- * @note
- * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
- * - 重入性：可重入
- */
-__xwds_code
-xwer_t xwds_canc_drvcb_rxq_acquire(struct xwds_canc_rxqueue * rxq,
-                                   struct xwds_can_msg * buf,
-                                   xwtm_t * xwtm)
-{
-        xwer_t rc;
-        xwreg_t cpuirq;
-
-        XWDS_VALIDATE(rxq, "nullptr", -EFAULT);
-        XWDS_VALIDATE(buf, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
-
-        rc = xwos_sem_timedwait(&rxq->sem, xwtm);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_sem_timedwait;
-        }
-        xwos_splk_lock_cpuirqsv(&rxq->lock, &cpuirq);
-        *buf = rxq->q[rxq->pos];
-        rxq->pos++;
-        if (rxq->pos >= (xwssq_t)XWDS_CANC_RXQNUM) {
-                rxq->pos = 0;
-        } /* else {} */
-        xwos_splk_unlock_cpuirqrs(&rxq->lock, cpuirq);
-        return XWOK;
-
-err_sem_timedwait:
-        return rc;
 }
