@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 消息队列：应用接口层
+ * @brief 消息队列：模块接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

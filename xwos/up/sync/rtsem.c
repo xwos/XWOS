@@ -12,15 +12,19 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
+#include <xwos/mm/common.h>
+#include <xwos/mm/kma.h>
+#if defined(XWUPCFG_SYNC_RTSEM_STDC_MM) && (1 == XWUPCFG_SYNC_RTSEM_STDC_MM)
+  #include <stdlib.h>
+#endif /* XWUPCFG_SYNC_RTSEM_STDC_MM */
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/up/lock/seqlock.h>
 #include <xwos/up/tt.h>
 #include <xwos/up/thd.h>
 #include <xwos/up/rtwq.h>
-#include <xwos/mm/kma.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-#include <xwos/up/sync/evt.h>
+  #include <xwos/up/sync/evt.h>
 #endif /* XWUPCFG_SYNC_EVT */
 #include <xwos/up/sync/rtsem.h>
 
@@ -358,7 +362,7 @@ xwer_t xwup_rtsem_post(struct xwup_rtsem * sem)
 
                                 evt = sem->vsem.synobj.sel.evt;
                                 if (NULL != evt) {
-                                        xwup_evt_obj_s1i(evt, &sem->vsem.synobj);
+                                        xwup_sel_obj_s1i(evt, &sem->vsem.synobj);
                                 }
                         }
 #endif /* XWUPCFG_SYNC_EVT */
@@ -420,7 +424,7 @@ xwer_t xwup_rtsem_trywait(struct xwup_rtsem * sem)
 
                         evt = sem->vsem.synobj.sel.evt;
                         if (NULL != evt) {
-                                xwup_evt_obj_c0i(evt, &sem->vsem.synobj);
+                                xwup_sel_obj_c0i(evt, &sem->vsem.synobj);
                         }
                 }
 #endif /* XWUPCFG_SYNC_EVT */
@@ -577,7 +581,7 @@ xwer_t xwup_rtsem_do_timedwait(struct xwup_rtsem * sem, struct xwup_thd * thd,
 
                         evt = sem->vsem.synobj.sel.evt;
                         if (NULL != evt) {
-                                xwup_evt_obj_c0i(evt, &sem->vsem.synobj);
+                                xwup_sel_obj_c0i(evt, &sem->vsem.synobj);
                         }
                 }
 #endif /* XWUPCFG_SYNC_EVT */
@@ -685,7 +689,7 @@ xwer_t xwup_rtsem_do_wait_unintr(struct xwup_rtsem * sem, struct xwup_thd * thd)
 
                         evt = sem->vsem.synobj.sel.evt;
                         if (NULL != evt) {
-                                xwup_evt_obj_c0i(evt, &sem->vsem.synobj);
+                                xwup_sel_obj_c0i(evt, &sem->vsem.synobj);
                         }
                 }
 #endif /* XWUPCFG_SYNC_EVT */

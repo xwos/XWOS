@@ -35,12 +35,9 @@ xwer_t xwosdl_cond_create(struct xwosdl_cond ** condbuf)
 {
         xwer_t rc;
 
-        if (NULL != condbuf) {
-                *condbuf = NULL;
-                rc = xwmp_cond_create(condbuf);
-        } else {
-                rc = -EFAULT;
-        }
+        XWOS_VALIDATE((condbuf), "nullptr", -EFAULT);
+        *condbuf = NULL;
+        rc = xwmp_cond_create(condbuf);
         return rc;
 }
 

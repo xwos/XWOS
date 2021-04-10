@@ -14,17 +14,19 @@
 #include <xwos/lib/object.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
+#include <xwos/mm/common.h>
+#include <xwos/mm/kma.h>
+#if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
+  #include <xwos/mm/memslice.h>
+#elif defined(XWMPCFG_LOCK_MTX_STDC_MM) && (1 == XWMPCFG_LOCK_MTX_STDC_MM)
+  #include <stdlib.h>
+#endif /* XWMPCFG_LOCK_MTX_STDC_MM */
 #include <xwos/ospl/irq.h>
 #include <xwos/mp/skd.h>
 #include <xwos/mp/tt.h>
 #include <xwos/mp/rtwq.h>
 #include <xwos/mp/mtxtree.h>
 #include <xwos/mp/thd.h>
-#include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
-#if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
-  #include <xwos/mm/memslice.h>
-#endif /* XWMPCFG_LOCK_MTX_MEMSLICE */
 #include <xwos/mp/lock/mtx.h>
 
 static __xwmp_code

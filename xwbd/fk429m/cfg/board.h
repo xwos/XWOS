@@ -46,7 +46,6 @@
 #define BRDCFG_XWOS_SWT_CACHE_ODR               0
 #define BRDCFG_XWOS_SEM_CACHE_ODR               0
 #define BRDCFG_XWOS_COND_CACHE_ODR              0
-#define BRDCFG_XWOS_EVT_CACHE_ODR               0
 #define BRDCFG_XWOS_MTX_CACHE_ODR               0
 
 /******** ******** ******** ******** ******** ******** ******** ********

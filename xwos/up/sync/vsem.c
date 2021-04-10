@@ -51,9 +51,9 @@ xwer_t xwup_vsem_bind(struct xwup_vsem * vsem, struct xwup_evt * evt,
         xwer_t rc;
 
         xwospl_cpuirq_save_lc(&cpuirq);
-        rc = xwup_evt_obj_bind(evt, &vsem->synobj, pos, true);
+        rc = xwup_sel_obj_bind(evt, &vsem->synobj, pos, true);
         if ((XWOK == rc) && (vsem->count > 0)) {
-                rc = xwup_evt_obj_s1i(evt, &vsem->synobj);
+                rc = xwup_sel_obj_s1i(evt, &vsem->synobj);
         }
         xwospl_cpuirq_restore_lc(cpuirq);
 
@@ -78,9 +78,9 @@ xwer_t xwup_vsem_unbind(struct xwup_vsem * vsem, struct xwup_evt * evt)
         xwer_t rc;
 
         xwospl_cpuirq_save_lc(&cpuirq);
-        rc = xwup_evt_obj_unbind(evt, &vsem->synobj, true);
+        rc = xwup_sel_obj_unbind(evt, &vsem->synobj, true);
         if (XWOK == rc) {
-                rc = xwup_evt_obj_c0i(evt, &vsem->synobj);
+                rc = xwup_sel_obj_c0i(evt, &vsem->synobj);
         }
         xwospl_cpuirq_restore_lc(cpuirq);
 
@@ -121,7 +121,7 @@ xwer_t xwup_vsem_freeze(struct xwup_vsem * vsem)
                 synobj = &vsem->synobj;
                 evt = synobj->sel.evt;
                 if (NULL != evt) {
-                        xwup_evt_obj_c0i(evt, synobj);
+                        xwup_sel_obj_c0i(evt, synobj);
                 }
 #endif /* XWUPCFG_SYNC_EVT */
         }

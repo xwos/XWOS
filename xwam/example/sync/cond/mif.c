@@ -28,15 +28,14 @@
 #include <xwos/osal/sync/cond.h>
 #include <xwam/example/sync/cond/mif.h>
 
-#define XWCONDDEMO_THD_PRIORITY                                 \
-        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+#define XWCONDDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-#define XWCONDDEMO_LOG_TAG     "cond"
-#define condlogf(lv, fmt, ...)                                  \
-        xwlogf(lv, XWCONDDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
+  #define XWCONDDEMO_LOG_TAG     "cond"
+  #define condlogf(lv, fmt, ...)                                  \
+          xwlogf(lv, XWCONDDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
 #else /* XWLIBCFG_LOG */
-#define condlogf(lv, fmt, ...)
+  #define condlogf(lv, fmt, ...)
 #endif /* !XWLIBCFG_LOG */
 
 xwer_t xwconddemo_thd_func(void * arg);
@@ -160,7 +159,6 @@ xwer_t xwconddemo_thd_func(void * arg)
         XWOS_UNUSED(arg);
 
         condlogf(INFO, "[线程] 启动。\n");
-
         condlogf(INFO, "[线程] 启动定时器。\n");
         base = xwos_skd_get_timetick_lc();
         rc = xwos_swt_start(&xwconddemo_swt, base, 1000 * XWTM_MS,
@@ -206,7 +204,6 @@ xwer_t xwconddemo_thd_func(void * arg)
                                  ts, cnt, rc);
                 }
         }
-
         condlogf(INFO, "[线程] 退出。\n");
         xwos_thd_detach(xwos_cthd_self());
         return rc;

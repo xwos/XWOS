@@ -19,7 +19,9 @@
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_SKD_THD_MEMSLICE) && (1 == XWMPCFG_SKD_THD_MEMSLICE)
   #include <xwos/mm/memslice.h>
-#endif /* XWMPCFG_SKD_THD_MEMSLICE */
+#elif defined(XWMPCFG_SKD_THD_STDC_MM) && (1 == XWMPCFG_SKD_THD_STDC_MM)
+  #include <stdlib.h>
+#endif /* XWMPCFG_SKD_THD_STDC_MM */
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/mp/rtrq.h>

@@ -34,12 +34,9 @@ xwer_t xwosdl_mtx_create(struct xwosdl_mtx ** mtxbuf, xwpr_t sprio)
 {
         xwer_t rc;
 
-        if (NULL != mtxbuf) {
-                *mtxbuf = NULL;
-                rc = xwmp_mtx_create(mtxbuf, sprio);
-        } else {
-                rc = -EFAULT;
-        }
+        XWOS_VALIDATE((mtxbuf), "nullptr", -EFAULT);
+        *mtxbuf = NULL;
+        rc = xwmp_mtx_create(mtxbuf, sprio);
         return rc;
 }
 

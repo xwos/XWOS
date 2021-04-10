@@ -12,13 +12,17 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
-#include <xwos/up/lock/seqlock.h>
+#include <xwos/mm/common.h>
+#include <xwos/mm/kma.h>
+#if defined(XWUPCFG_SYNC_COND_STDC_MM) && (1 == XWUPCFG_SYNC_COND_STDC_MM)
+  #include <stdlib.h>
+#endif /* XWUPCFG_SYNC_COND_STDC_MM */
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
+#include <xwos/up/lock/seqlock.h>
 #include <xwos/up/tt.h>
 #include <xwos/up/thd.h>
 #include <xwos/up/plwq.h>
-#include <xwos/mm/kma.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
   #include <xwos/up/sync/obj.h>
   #include <xwos/up/sync/evt.h>
@@ -218,7 +222,7 @@ xwer_t xwup_cond_bind(struct xwup_cond * cond,
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
 
         xwospl_cpuirq_save_lc(&cpuirq);
-        rc = xwup_evt_obj_bind(evt, &cond->synobj, pos, false);
+        rc = xwup_sel_obj_bind(evt, &cond->synobj, pos, false);
         xwospl_cpuirq_restore_lc(cpuirq);
         return rc;
 }
@@ -247,7 +251,7 @@ xwer_t xwup_cond_unbind(struct xwup_cond * cond, struct xwup_evt * evt)
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
 
         xwospl_cpuirq_save_lc(&cpuirq);
-        rc = xwup_evt_obj_unbind(evt, &cond->synobj, false);
+        rc = xwup_sel_obj_unbind(evt, &cond->synobj, false);
         xwospl_cpuirq_restore_lc(cpuirq);
         return rc;
 }
@@ -461,7 +465,7 @@ xwer_t xwup_cond_broadcast(struct xwup_cond * cond)
                 xwospl_cpuirq_save_lc(&cpuirq);
                 evt = synobj->sel.evt;
                 if (NULL != evt) {
-                        xwup_evt_obj_s1i(evt, synobj);
+                        xwup_sel_obj_s1i(evt, synobj);
                 }
                 xwospl_cpuirq_restore_lc(cpuirq);
         }

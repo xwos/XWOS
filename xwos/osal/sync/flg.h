@@ -97,19 +97,11 @@ typedef struct {
  */
 
 /**
- * @brief XWOS API：事件标志对象中事件的最大数量
- */
-#define XWOS_FLG_MAXNUM               XWOSDL_FLG_MAXNUM
-
-/**
- * @brief 声明事件标志对象位图
- */
-#define xwos_flg_declare_bitmap(name) xwosdl_flg_declare_bitmap(name)
-
-/**
  * @brief XWOS API：静态方式初始化事件标志对象
  * @param flg: (I) 事件标志对象的指针
- * @param initval: (I) 事件标志对象位图数组的初始值，如果为NULL，初始值全部为0
+ * @param num: (I) 事件标志中的事件数量
+ * @param bmp: (I) 事件标志用来记录事件状态的位图缓冲区
+ * @param msk: (I) 事件标志用来记录事件掩码的位图缓冲区
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -119,14 +111,16 @@ typedef struct {
  * - 重入性：对于同一个事件标志对象，不可重入
  */
 static __xwos_inline_api
-xwer_t xwos_flg_init(struct xwos_flg * flg, xwbmp_t initval[])
+xwer_t xwos_flg_init(struct xwos_flg * flg, xwsz_t num,
+                     xwbmp_t * bmp, xwbmp_t * msk)
 {
-        return xwosdl_flg_init(&flg->osflg, initval);
+        return xwosdl_flg_init(&flg->osflg, num, bmp, msk);
 }
 
 /**
  * @brief XWOS API：销毁静态方式初始化的事件标志对象
  * @param flg: (I) 事件标志对象的指针
+ * @param num: (I) 事件标志中的事件数量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -144,7 +138,7 @@ xwer_t xwos_flg_destroy(struct xwos_flg * flg)
 /**
  * @brief XWOS API：动态方式创建事件标志对象
  * @param flgbuf: (O) 指向缓冲区的指针，通过此缓冲区返回事件标志对象的指针
- * @param initval: (I) 事件标志对象位图数组的初始值，如果为NULL，初始值全部为0
+ * @param num: (I) 线程栅栏中的线程数量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -155,9 +149,9 @@ xwer_t xwos_flg_destroy(struct xwos_flg * flg)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_flg_create(struct xwos_flg ** flgbuf, xwbmp_t initval[])
+xwer_t xwos_flg_create(struct xwos_flg ** flgbuf, xwsz_t num)
 {
-        return xwosdl_flg_create((struct xwosdl_flg **)flgbuf, initval);
+        return xwosdl_flg_create((struct xwosdl_flg **)flgbuf, num);
 }
 
 /**
@@ -337,6 +331,24 @@ static __xwos_inline_api
 xwer_t xwos_flg_intr_all(struct xwos_flg * flg)
 {
         return xwosdl_flg_intr_all(&flg->osflg);
+}
+
+/**
+ * @brief XWOS API：获取事件标志中事件槽的数量
+ * @param flg: (I) 事件标志对象的指针
+ * @param numbuf: (O) 指向缓冲区的指针，通过此缓冲区返回事件槽的数量
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_flg_get_num(struct xwos_flg * flg, xwsz_t * numbuf)
+{
+        return xwosdl_flg_get_num(&flg->osflg, numbuf);
 }
 
 /**

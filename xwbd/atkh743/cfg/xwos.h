@@ -118,9 +118,8 @@
 
 #define XWMPCFG_SYNC_COND_MEMSLICE                      1
 
+#define XWMPCFG_SYNC_EVT_STDC_MM                        0
 #define XWMPCFG_SYNC_EVT                                1
-#define XWMPCFG_SYNC_EVT_MAXNUM                         32
-#define XWMPCFG_SYNC_EVT_MEMSLICE                       1
 
 /******** ******** ******** lock ******** ******** ********/
 #define XWMPCFG_LOCK_MTX_MEMSLICE                       1
@@ -152,7 +151,7 @@
 /* #define XWUPCFG_SYNC_COND                            1 */
 
 /* #define XWUPCFG_SYNC_EVT                             1 */
-/* #define XWUPCFG_SYNC_EVT_MAXNUM                      32 */
+/* #define XWUPCFG_SYNC_EVT_STDC_MM                     0 */
 
 /******** ******** ******** lock ******** ******** ********/
 /* #define XWUPCFG_LOCK_MTX                             1 */

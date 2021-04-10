@@ -13,13 +13,17 @@
 #include <xwos/standard.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
+#include <xwos/mm/common.h>
+#include <xwos/mm/kma.h>
+#if defined(XWUPCFG_LOCK_MTX_STDC_MM) && (1 == XWUPCFG_LOCK_MTX_STDC_MM)
+  #include <stdlib.h>
+#endif /* XWUPCFG_LOCK_MTX_STDC_MM */
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/up/tt.h>
 #include <xwos/up/rtwq.h>
 #include <xwos/up/mtxtree.h>
 #include <xwos/up/thd.h>
-#include <xwos/mm/kma.h>
 #include <xwos/up/lock/mtx.h>
 
 static __xwup_code

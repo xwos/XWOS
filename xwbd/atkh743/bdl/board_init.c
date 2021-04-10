@@ -27,7 +27,6 @@
   #include <xwos/mp/swt.h>
   #include <xwos/mp/sync/sem.h>
   #include <xwos/mp/sync/cond.h>
-  #include <xwos/mp/sync/evt.h>
   #include <xwos/mp/lock/mtx.h>
 #endif /* XuanWuOS_CFG_CORE__mp */
 #include <bm/stm32cube/mif.h>
@@ -146,16 +145,6 @@ xwer_t sys_mm_init(void)
                 goto err_cond_cache_init;
         }
 
-        rc = xwmm_bma_alloc(dtcmheap_bma, BRDCFG_XWOS_EVT_CACHE_ODR, &mem);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_evt_bma_alloc;
-        }
-        rc = xwmp_evt_cache_init((xwptr_t)mem,
-                                 (DTCMHEAP_BLKSZ << BRDCFG_XWOS_EVT_CACHE_ODR));
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_evt_cache_init;
-        }
-
         rc = xwmm_bma_alloc(dtcmheap_bma, BRDCFG_XWOS_MTX_CACHE_ODR, &mem);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_bma_alloc;
@@ -173,10 +162,6 @@ xwer_t sys_mm_init(void)
 err_mtx_cache_init:
         BDL_BUG();
 err_mtx_bma_alloc:
-        BDL_BUG();
-err_evt_cache_init:
-        BDL_BUG();
-err_evt_bma_alloc:
         BDL_BUG();
 err_cond_cache_init:
         BDL_BUG();

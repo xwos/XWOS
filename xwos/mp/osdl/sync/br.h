@@ -17,13 +17,12 @@
 #include <xwos/mp/sync/evt.h>
 
 #define xwosdl_br xwmp_evt
-#define XWOSDL_BR_MAXNUM        XWMP_EVT_MAXNUM
-#define xwosdl_br_declare_bitmap(name) xwmp_evt_declare_bitmap(name)
 
 static __xwcc_inline
-xwer_t xwosdl_br_init(struct xwosdl_br * br)
+xwer_t xwosdl_br_init(struct xwosdl_br * br, xwsz_t num,
+                      xwbmp_t * bmp, xwbmp_t * msk)
 {
-        return xwmp_evt_init(br, NULL, XWMP_EVT_TYPE_BR);
+        return xwmp_evt_init(br, XWMP_EVT_TYPE_BR, num, bmp, msk);
 }
 
 static __xwcc_inline
@@ -33,16 +32,13 @@ xwer_t xwosdl_br_destroy(struct xwosdl_br * br)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_br_create(struct xwosdl_br ** brbuf)
+xwer_t xwosdl_br_create(struct xwosdl_br ** brbuf, xwsz_t num)
 {
         xwer_t rc;
 
-        if (NULL != brbuf) {
-                *brbuf = NULL;
-                rc = xwmp_evt_create(brbuf, NULL, XWMP_EVT_TYPE_BR);
-        } else {
-                rc = -EFAULT;
-        }
+        XWOS_VALIDATE((brbuf), "nullptr", -EFAULT);
+        *brbuf = NULL;
+        rc = xwmp_evt_create(brbuf, XWMP_EVT_TYPE_BR, num);
         return rc;
 }
 
@@ -108,18 +104,22 @@ xwer_t xwosdl_br_intr_all(struct xwosdl_br * br)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_br_sync(struct xwosdl_br * br, xwsq_t pos,
-                      xwbmp_t msk[], xwbmp_t sync[])
+xwer_t xwosdl_br_get_num(struct xwosdl_br * br, xwsz_t * numbuf)
 {
-        return xwmp_evt_sync(br, pos, msk, sync);
+        return xwmp_evt_get_num(br, numbuf);
 }
 
 static __xwcc_inline
-xwer_t xwosdl_br_timedsync(struct xwosdl_br * br, xwsq_t pos,
-                           xwbmp_t msk[], xwbmp_t sync[],
+xwer_t xwosdl_br_sync(struct xwosdl_br * br, xwsq_t pos, xwbmp_t msk[])
+{
+        return xwmp_br_sync(br, pos, msk);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_br_timedsync(struct xwosdl_br * br, xwsq_t pos, xwbmp_t msk[],
                            xwtm_t * xwtm)
 {
-        return xwmp_evt_timedsync(br, pos, msk, sync, xwtm);
+        return xwmp_br_timedsync(br, pos, msk, xwtm);
 }
 
 #endif /* xwos/mp/osdl/sync/br.h */

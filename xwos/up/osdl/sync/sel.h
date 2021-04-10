@@ -16,14 +16,12 @@
 #include <xwos/up/sync/evt.h>
 
 #define xwosdl_sel xwup_evt
-#define XWOSDL_SEL_MAXNUM       XWUP_EVT_MAXNUM
-
-#define xwosdl_sel_declare_bitmap(name) xwup_evt_declare_bitmap(name)
 
 static __xwcc_inline
-xwer_t xwosdl_sel_init(struct xwosdl_sel * sel)
+xwer_t xwosdl_sel_init(struct xwosdl_sel * sel, xwsz_t num,
+                       xwbmp_t * bmp, xwbmp_t * msk)
 {
-        return xwup_evt_init(sel, NULL, XWUP_EVT_TYPE_SEL);
+        return xwup_evt_init(sel, XWUP_EVT_TYPE_SEL, num, bmp, msk);
 }
 
 static __xwcc_inline
@@ -33,16 +31,13 @@ xwer_t xwosdl_sel_destroy(struct xwosdl_sel * sel)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sel_create(struct xwosdl_sel ** selbuf)
+xwer_t xwosdl_sel_create(struct xwosdl_sel ** selbuf, xwsz_t num)
 {
         xwer_t rc;
 
-        if (NULL != selbuf) {
-                *selbuf = NULL;
-                rc = xwup_evt_create(selbuf, NULL, XWUP_EVT_TYPE_SEL);
-        } else {
-                rc = -EFAULT;
-        }
+        XWOS_VALIDATE((selbuf), "nullptr", -EFAULT);
+        *selbuf = NULL;
+        rc = xwup_evt_create(selbuf, XWUP_EVT_TYPE_SEL, num);
         return rc;
 }
 
@@ -109,15 +104,21 @@ xwer_t xwosdl_sel_intr_all(struct xwosdl_sel * sel)
 }
 
 static __xwcc_inline
+xwer_t xwosdl_sel_get_num(struct xwosdl_sel * sel, xwsz_t * numbuf)
+{
+        return xwup_evt_get_num(sel, numbuf);
+}
+
+static __xwcc_inline
 xwer_t xwosdl_sel_tryselect(struct xwosdl_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
 {
-        return xwup_evt_tryselect(sel, msk, trg);
+        return xwup_sel_tryselect(sel, msk, trg);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sel_select(struct xwosdl_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
 {
-        return xwup_evt_select(sel, msk, trg);
+        return xwup_sel_select(sel, msk, trg);
 }
 
 static __xwcc_inline
@@ -125,7 +126,7 @@ xwer_t xwosdl_sel_timedselect(struct xwosdl_sel * sel,
                               xwbmp_t msk[], xwbmp_t trg[],
                               xwtm_t * xwtm)
 {
-        return xwup_evt_timedselect(sel, msk, trg, xwtm);
+        return xwup_sel_timedselect(sel, msk, trg, xwtm);
 }
 
 #endif /* xwos/up/osdl/sync/sel.h */

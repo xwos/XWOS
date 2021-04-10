@@ -54,12 +54,9 @@ xwer_t xwosdl_sem_create(struct xwosdl_sem ** sembuf, xwssq_t val, xwssq_t max)
 {
         xwer_t rc;
 
-        if (NULL != sembuf) {
-                *sembuf = NULL;
-                rc = xwmp_sem_create(sembuf, XWMP_SEM_TYPE_RT, val, max);
-        } else {
-                rc = -EFAULT;
-        }
+        XWOS_VALIDATE((sembuf), "nullptr", -EFAULT);
+        *sembuf = NULL;
+        rc = xwmp_sem_create(sembuf, XWMP_SEM_TYPE_RT, val, max);
         return rc;
 }
 

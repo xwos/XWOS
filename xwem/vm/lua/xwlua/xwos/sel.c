@@ -18,10 +18,12 @@
 int xwlua_sel_new(lua_State * L)
 {
         xwer_t rc;
+        xwsz_t bitnum;
         xwlua_sel_sp * selsp;
 
+        bitnum = luaL_checkinteger(L, 1);
         selsp = lua_newuserdatauv(L, sizeof(xwlua_sel_sp), 0);
-        rc = xwos_sel_create(&selsp->sel);
+        rc = xwos_sel_create(&selsp->sel, bitnum);
         if (XWOK == rc) {
                 selsp->tik = xwos_sel_gettik(selsp->sel);
                 luaL_setmetatable(L, "xwlua_sel_sp");
@@ -31,23 +33,8 @@ int xwlua_sel_new(lua_State * L)
         return 1;
 }
 
-int xwlua_sel_bmp(lua_State * L)
-{
-        xwsz_t bmpsz;
-        xwlua_bmp_t * bmp;
-
-        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(XWOS_SEL_MAXNUM)) +
-                sizeof(xwlua_bmp_t);
-        bmp = lua_newuserdatauv(L, bmpsz, 0);
-        bmp->bits = XWOS_SEL_MAXNUM;
-        xwbmpop_c0all(bmp->bmp, bmp->bits);
-        luaL_setmetatable(L, "xwlua_bmp_t");
-        return 1;
-}
-
 const luaL_Reg xwlua_sel_libconstructor[] = {
         {"new", xwlua_sel_new},
-        {"bmp", xwlua_sel_bmp},
         {NULL, NULL},
 };
 
@@ -112,6 +99,34 @@ const luaL_Reg xwlua_selsp_metamethod[] = {
         {NULL, NULL}
 };
 
+int xwlua_selsp_bmp(lua_State * L)
+{
+        xwlua_sel_sp * selsp;
+        xwsz_t bitnum;
+        xwsz_t bmpsz;
+        xwlua_bmp_t * bmp;
+
+        selsp = (xwlua_sel_sp *)luaL_checkudata(L, 1, "xwlua_sel_sp");
+        xwos_sel_get_num(selsp->sel, &bitnum);
+        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bitnum)) + sizeof(xwlua_bmp_t);
+        bmp = lua_newuserdatauv(L, bmpsz, 0);
+        bmp->bits = bitnum;
+        xwbmpop_c0all(bmp->bmp, bmp->bits);
+        luaL_setmetatable(L, "xwlua_bmp_t");
+        return 1;
+}
+
+int xwlua_selsp_num(lua_State * L)
+{
+        xwlua_sel_sp * selsp;
+        xwsz_t bitnum;
+
+        selsp = (xwlua_sel_sp *)luaL_checkudata(L, 1, "xwlua_sel_sp");
+        xwos_sel_get_num(selsp->sel, &bitnum);
+        lua_pushinteger(L, (lua_Integer)bitnum);
+        return 1;
+}
+
 int xwlua_selsp_bind(lua_State * L)
 {
         xwlua_sel_sp * selsp;
@@ -160,6 +175,7 @@ int xwlua_selsp_wait(lua_State * L)
         xwlua_bmp_t * msk;
         xwlua_bmp_t * trg;
         xwtm_t time;
+        xwsz_t bitnum;
         xwsz_t bmpsz;
         int top;
         int opt;
@@ -169,15 +185,16 @@ int xwlua_selsp_wait(lua_State * L)
         top = lua_gettop(L);
         selsp = (xwlua_sel_sp *)luaL_checkudata(L, 1, "xwlua_sel_sp");
         msk = (xwlua_bmp_t *)luaL_checkudata(L, 2, "xwlua_bmp_t");
+        xwos_sel_get_num(selsp->sel, &bitnum);
         if (top >= 3) {
                 type = lua_type(L, 3);
                 switch (type) {
                 case LUA_TNUMBER:
                         time = (xwtm_t)luaL_checknumber(L, 3);
-                        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(XWOS_SEL_MAXNUM)) +
+                        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bitnum)) +
                                 sizeof(xwlua_bmp_t);
                         trg = lua_newuserdatauv(L, bmpsz, 0);
-                        trg->bits = XWOS_SEL_MAXNUM;
+                        trg->bits = bitnum;
                         xwbmpop_c0all(trg->bmp, trg->bits);
                         luaL_setmetatable(L, "xwlua_bmp_t");
                         rc = xwos_sel_timedselect(selsp->sel, msk->bmp, trg->bmp,
@@ -187,11 +204,10 @@ int xwlua_selsp_wait(lua_State * L)
                         opt = luaL_checkoption(L, 3, "t", xwlua_sel_opt);
                         switch (opt) {
                         case XWLUA_SEL_OPT_TRY:
-                                bmpsz = (sizeof(xwbmp_t) *
-                                         BITS_TO_BMPS(XWOS_SEL_MAXNUM)) +
+                                bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bitnum)) +
                                         sizeof(xwlua_bmp_t);
                                 trg = lua_newuserdatauv(L, bmpsz, 0);
-                                trg->bits = XWOS_SEL_MAXNUM;
+                                trg->bits = bitnum;
                                 xwbmpop_c0all(trg->bmp, trg->bits);
                                 luaL_setmetatable(L, "xwlua_bmp_t");
                                 rc = xwos_sel_tryselect(selsp->sel, msk->bmp, trg->bmp);
@@ -203,10 +219,10 @@ int xwlua_selsp_wait(lua_State * L)
                         }
                         break;
                 case LUA_TNIL:
-                        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(XWOS_SEL_MAXNUM)) +
+                        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bitnum)) +
                                 sizeof(xwlua_bmp_t);
                         trg = lua_newuserdatauv(L, bmpsz, 0);
-                        trg->bits = XWOS_SEL_MAXNUM;
+                        trg->bits = bitnum;
                         xwbmpop_c0all(trg->bmp, trg->bits);
                         luaL_setmetatable(L, "xwlua_bmp_t");
                         rc = xwos_sel_select(selsp->sel, msk->bmp, trg->bmp);
@@ -214,19 +230,19 @@ int xwlua_selsp_wait(lua_State * L)
                 default:
                         luaL_error(L, "Invalid arg type: %s", lua_typename(L, type));
                         rc = -EINVAL;
-                        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(XWOS_SEL_MAXNUM)) +
+                        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bitnum)) +
                                 sizeof(xwlua_bmp_t);
                         trg = lua_newuserdatauv(L, bmpsz, 0);
-                        trg->bits = XWOS_SEL_MAXNUM;
+                        trg->bits = bitnum;
                         xwbmpop_c0all(trg->bmp, trg->bits);
                         luaL_setmetatable(L, "xwlua_bmp_t");
                         break;
                 }
         } else {
-                bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(XWOS_SEL_MAXNUM)) +
+                bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bitnum)) +
                         sizeof(xwlua_bmp_t);
                 trg = lua_newuserdatauv(L, bmpsz, 0);
-                trg->bits = XWOS_SEL_MAXNUM;
+                trg->bits = bitnum;
                 xwbmpop_c0all(trg->bmp, trg->bits);
                 luaL_setmetatable(L, "xwlua_bmp_t");
                 rc = xwos_sel_select(selsp->sel, msk->bmp, trg->bmp);
@@ -237,6 +253,8 @@ int xwlua_selsp_wait(lua_State * L)
 }
 
 const luaL_Reg xwlua_selsp_indexmethod[] = {
+        {"bmp", xwlua_selsp_bmp},
+        {"num", xwlua_selsp_num},
         {"bind", xwlua_selsp_bind},
         {"unbind", xwlua_selsp_unbind},
         {"intr_all", xwlua_selsp_intr_all},

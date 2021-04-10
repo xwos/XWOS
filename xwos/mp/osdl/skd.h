@@ -128,18 +128,15 @@ xwer_t xwosdl_thd_create(struct xwosdl_thd ** thdbuf, const char * name,
         struct xwmp_thd * thd;
         xwer_t rc;
 
-        if (NULL != thdbuf) {
-                rc = xwmp_thd_create(&thd, name,
-                                     (xwmp_thd_f)mainfunc, arg,
-                                     stack_size,
-                                     priority, attr);
-                if (XWOK == rc) {
-                        *thdbuf = thd;
-                } else {
-                        *thdbuf = NULL;
-                }
+        XWOS_VALIDATE((thdbuf), "nullptr", -EFAULT);
+        rc = xwmp_thd_create(&thd, name,
+                             (xwmp_thd_f)mainfunc, arg,
+                             stack_size,
+                             priority, attr);
+        if (XWOK == rc) {
+                *thdbuf = thd;
         } else {
-                rc = EFAULT;
+                *thdbuf = NULL;
         }
         return rc;
 }

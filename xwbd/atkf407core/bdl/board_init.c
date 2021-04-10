@@ -123,16 +123,6 @@ xwer_t sys_mm_init(void)
                 goto err_cond_cache_init;
         }
 
-        size = sizeof(struct xwsync_evt) * 32;
-        rc = xwmm_kma_alloc(size, 8, &mem);
-        if (rc < 0) {
-                goto err_evt_bma_alloc;
-        }
-        rc = xwsync_evt_cache_init((xwptr_t)mem, size);
-        if (rc < 0) {
-                goto err_evt_cache_init;
-        }
-
         size = sizeof(struct xwsync_mtx) * 32;
         rc = xwmm_kma_alloc(size, 8, &mem);
         if (rc < 0) {
@@ -151,10 +141,6 @@ xwer_t sys_mm_init(void)
 err_mtx_cache_init:
         BDL_BUG();
 err_mtx_bma_alloc:
-        BDL_BUG();
-err_evt_cache_init:
-        BDL_BUG();
-err_evt_bma_alloc:
         BDL_BUG();
 err_cond_cache_init:
         BDL_BUG();

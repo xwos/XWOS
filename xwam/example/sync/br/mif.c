@@ -24,8 +24,7 @@
 #include <xwos/osal/sync/br.h>
 #include <xwam/example/sync/br/mif.h>
 
-#define XWBRDEMO_THD_PRIORITY                                   \
-        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+#define XWBRDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
   #define XWBRDEMO_LOG_TAG      "br"
@@ -44,7 +43,7 @@ const struct xwos_thd_desc xwbrdemo_thd_desc[] = {
                 .stack = XWOS_THD_STACK_DYNAMIC,
                 .stack_size = 2048,
                 .func = (xwos_thd_f)xwbrdemo_thd_func,
-                .arg = (void *)0,
+                .arg = (void *)0, /* 线程在线程栅栏中的的位置 */
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [1] = {
@@ -53,7 +52,7 @@ const struct xwos_thd_desc xwbrdemo_thd_desc[] = {
                 .stack = XWOS_THD_STACK_DYNAMIC,
                 .stack_size = 2048,
                 .func = (xwos_thd_f)xwbrdemo_thd_func,
-                .arg = (void *)1,
+                .arg = (void *)1, /* 线程在线程栅栏中的位置 */
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [2] = {
@@ -62,7 +61,7 @@ const struct xwos_thd_desc xwbrdemo_thd_desc[] = {
                 .stack = XWOS_THD_STACK_DYNAMIC,
                 .stack_size = 2048,
                 .func = (xwos_thd_f)xwbrdemo_thd_func,
-                .arg = (void *)2,
+                .arg = (void *)2, /* 线程在线程栅栏中的位置 */
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [3] = {
@@ -71,7 +70,7 @@ const struct xwos_thd_desc xwbrdemo_thd_desc[] = {
                 .stack = XWOS_THD_STACK_DYNAMIC,
                 .stack_size = 2048,
                 .func = (xwos_thd_f)xwbrdemo_thd_func,
-                .arg = (void *)3,
+                .arg = (void *)3, /* 线程在线程栅栏中的位置 */
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [4] = {
@@ -80,12 +79,21 @@ const struct xwos_thd_desc xwbrdemo_thd_desc[] = {
                 .stack = XWOS_THD_STACK_DYNAMIC,
                 .stack_size = 2048,
                 .func = (xwos_thd_f)xwbrdemo_thd_func,
-                .arg = (void *)4,
+                .arg = (void *)4, /* 线程在线程栅栏中的位置 */
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
 struct xwos_thd * xwbrdemo_thd[xw_array_size(xwbrdemo_thd_desc)];
 
+/**
+ * @brief 静态初始化线程栅栏所需要的位图数组缓冲区
+ */
+xwbmpop_declare(xwbrdemo_br_bmp, xw_array_size(xwbrdemo_thd_desc)) = {0,};
+xwbmpop_declare(xwbrdemo_br_msk, xw_array_size(xwbrdemo_thd_desc)) = {0,};
+
+/**
+ * @brief 静态定义的线程栅栏
+ */
 struct xwos_br xwbrdemo_br;
 
 /**
@@ -97,12 +105,13 @@ xwer_t example_br_start(void)
         xwer_t rc;
 
         /* 初始化线程屏障 */
-        rc = xwos_br_init(&xwbrdemo_br);
+        rc = xwos_br_init(&xwbrdemo_br, xw_array_size(xwbrdemo_thd_desc),
+                          xwbrdemo_br_bmp, xwbrdemo_br_msk);
         if (rc < 0) {
                 goto err_br_init;
         }
 
-        /* 创建5个线程 */
+        /* 创建线程 */
         for (i = 0; i < xw_array_size(xwbrdemo_thd_desc); i++) {
                 rc = xwos_thd_create(&xwbrdemo_thd[i],
                                      xwbrdemo_thd_desc[i].name,
@@ -115,7 +124,6 @@ xwer_t example_br_start(void)
                         goto err_thd_create;
                 }
         }
-
         return XWOK;
 
 err_thd_create:
@@ -129,26 +137,23 @@ err_br_init:
  */
 xwer_t xwbrdemo_thd_func(void * arg)
 {
-        xwos_br_declare_bitmap(msk);
         xwer_t rc;
-
         xwsq_t pos = (xwsq_t)arg; /* 获取线程的各自的位置 */
+        xwbmpop_declare(msk, xw_array_size(xwbrdemo_thd_desc));
 
         brlogf(INFO, "[线程%d] 启动。\n", pos);
-
-        xwbmpop_c0all(msk, XWOS_BR_MAXNUM);
-
-        /* 设置位图掩码 */
+        /* 设置需要同步的线程的位图掩码 */
+        xwbmpop_c0all(msk, xw_array_size(xwbrdemo_thd_desc));
         for (xwsq_t i = 0; i < xw_array_size(xwbrdemo_thd_desc); i++) {
                 xwbmpop_s1i(msk, i);
         }
 
-        /* 同步线程 */
-        rc = xwos_br_sync(&xwbrdemo_br, pos, msk, NULL);
+        /* 与位图掩码中的线程进行同步，
+           当这些线程都运行到此处时，同时解除阻塞，继续往下运行 */
+        rc = xwos_br_sync(&xwbrdemo_br, pos, msk);
         if (XWOK == rc) {
                 brlogf(INFO, "[线程%d] 同步。\n", pos);
         }
-
         brlogf(INFO, "[线程%d] 退出。\n", pos);
         xwos_thd_detach(xwos_cthd_self());
         return rc;

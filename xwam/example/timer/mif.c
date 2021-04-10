@@ -56,6 +56,10 @@ struct xwos_thd * xwswtdemo_thd;
 
 struct xwos_swt xwswtdemo_swt0;
 struct xwos_swt * xwswtdemo_swt1;
+
+#define SWTFLG_NUM      (sizeof(xwbmp_t) * BITS_PER_BYTE)
+xwbmpop_declare(swtflg_bmp, SWTFLG_NUM) = {0,};
+xwbmpop_declare(swtflg_msk, SWTFLG_NUM) = {0,};
 struct xwos_flg swtflg;
 
 /**
@@ -66,7 +70,7 @@ xwer_t example_timer_start(void)
         xwer_t rc;
 
         /* 初始化事件信号旗 */
-        rc = xwos_flg_init(&swtflg, NULL);
+        rc = xwos_flg_init(&swtflg, SWTFLG_NUM, swtflg_bmp, swtflg_msk);
         if (rc < 0) {
                 goto err_flg_init;
         }
@@ -154,13 +158,12 @@ xwer_t xwswtdemo_thd_func(void * arg)
 {
         xwtm_t base, ts;
         xwer_t rc;
-        xwos_flg_declare_bitmap(msk);
-        xwos_flg_declare_bitmap(trg);
+        xwbmpop_declare(msk, SWTFLG_NUM) = {0,};
+        xwbmpop_declare(trg, SWTFLG_NUM) = {0,};
 
         XWOS_UNUSED(arg);
 
         swtlogf(INFO, "[线程] 启动。\n");
-
         base = xwos_skd_get_timetick_lc();
 
         swtlogf(INFO, "[线程] 启动定时器0。\n");

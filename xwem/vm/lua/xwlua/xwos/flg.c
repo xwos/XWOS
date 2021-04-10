@@ -19,49 +19,23 @@
 int xwlua_flg_new(lua_State * L)
 {
         xwer_t rc;
-        xwlua_bmp_t * msk;
+        xwsz_t bitnum;
         xwlua_flg_sp * flgsp;
 
-        if (lua_isnoneornil(L, 1)) {
-                flgsp = lua_newuserdatauv(L, sizeof(xwlua_flg_sp), 0);
-                rc = xwos_flg_create(&flgsp->flg, NULL);
-                if (XWOK == rc) {
-                        flgsp->tik = xwos_flg_gettik(flgsp->flg);
-                        luaL_setmetatable(L, "xwlua_flg_sp");
-                } else {
-                        *flgsp = XWLUA_FLG_NULLSP;
-                }
+        bitnum = luaL_checkinteger(L, 1);
+        flgsp = lua_newuserdatauv(L, sizeof(xwlua_flg_sp), 0);
+        rc = xwos_flg_create(&flgsp->flg, bitnum);
+        if (XWOK == rc) {
+                flgsp->tik = xwos_flg_gettik(flgsp->flg);
+                luaL_setmetatable(L, "xwlua_flg_sp");
         } else {
-                msk = (xwlua_bmp_t *)luaL_checkudata(L, 1, "xwlua_bmp_t");
-                flgsp = lua_newuserdatauv(L, sizeof(xwlua_flg_sp), 0);
-                rc = xwos_flg_create(&flgsp->flg, msk->bmp);
-                if (XWOK == rc) {
-                        flgsp->tik = xwos_flg_gettik(flgsp->flg);
-                        luaL_setmetatable(L, "xwlua_flg_sp");
-                } else {
-                        *flgsp = XWLUA_FLG_NULLSP;
-                }
+                *flgsp = XWLUA_FLG_NULLSP;
         }
-        return 1;
-}
-
-int xwlua_flg_bmp(lua_State * L)
-{
-        xwsz_t bmpsz;
-        xwlua_bmp_t * bmp;
-
-        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(XWOS_FLG_MAXNUM)) +
-                sizeof(xwlua_bmp_t);
-        bmp = lua_newuserdatauv(L, bmpsz, 0);
-        bmp->bits = XWOS_FLG_MAXNUM;
-        xwbmpop_c0all(bmp->bmp, bmp->bits);
-        luaL_setmetatable(L, "xwlua_bmp_t");
         return 1;
 }
 
 const luaL_Reg xwlua_flg_libconstructor[] = {
         {"new", xwlua_flg_new},
-        {"bmp", xwlua_flg_bmp},
         {NULL, NULL},
 };
 
@@ -126,6 +100,34 @@ const luaL_Reg xwlua_flgsp_metamethod[] = {
         {NULL, NULL}
 };
 
+int xwlua_flgsp_bmp(lua_State * L)
+{
+        xwlua_flg_sp * flgsp;
+        xwsz_t bitnum;
+        xwsz_t bmpsz;
+        xwlua_bmp_t * bmp;
+
+        flgsp = (xwlua_flg_sp *)luaL_checkudata(L, 1, "xwlua_flg_sp");
+        xwos_flg_get_num(flgsp->flg, &bitnum);
+        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bitnum)) + sizeof(xwlua_bmp_t);
+        bmp = lua_newuserdatauv(L, bmpsz, 0);
+        bmp->bits = bitnum;
+        xwbmpop_c0all(bmp->bmp, bmp->bits);
+        luaL_setmetatable(L, "xwlua_bmp_t");
+        return 1;
+}
+
+int xwlua_flgsp_num(lua_State * L)
+{
+        xwlua_flg_sp * flgsp;
+        xwsz_t bitnum;
+
+        flgsp = (xwlua_flg_sp *)luaL_checkudata(L, 1, "xwlua_flg_sp");
+        xwos_flg_get_num(flgsp->flg, &bitnum);
+        lua_pushinteger(L, (lua_Integer)bitnum);
+        return 1;
+}
+
 int xwlua_flgsp_bind(lua_State * L)
 {
         xwlua_flg_sp * flgsp;
@@ -169,14 +171,15 @@ int xwlua_flgsp_read(lua_State * L)
 {
         xwlua_flg_sp * flgsp;
         xwlua_bmp_t * out;
+        xwsz_t bitnum;
         xwsz_t bmpsz;
         xwer_t rc;
 
         flgsp = (xwlua_flg_sp *)luaL_checkudata(L, 1, "xwlua_flg_sp");
-        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(XWOS_FLG_MAXNUM)) +
-                sizeof(xwlua_bmp_t);
+        xwos_flg_get_num(flgsp->flg, &bitnum);
+        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bitnum)) + sizeof(xwlua_bmp_t);
         out = lua_newuserdatauv(L, bmpsz, 0);
-        out->bits = XWOS_FLG_MAXNUM;
+        out->bits = bitnum;
         xwbmpop_c0all(out->bmp, out->bits);
         luaL_setmetatable(L, "xwlua_bmp_t");
         rc = xwos_flg_read(flgsp->flg, out->bmp);
@@ -344,6 +347,8 @@ int xwlua_flgsp_wait(lua_State * L)
 }
 
 const luaL_Reg xwlua_flgsp_indexmethod[] = {
+        {"bmp", xwlua_flgsp_bmp},
+        {"num", xwlua_flgsp_num},
         {"bind", xwlua_flgsp_bind},
         {"unbind", xwlua_flgsp_unbind},
         {"intr_all", xwlua_flgsp_intr_all},

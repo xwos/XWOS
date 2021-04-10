@@ -155,7 +155,6 @@ struct xwscp {
         XWMM_BMA_DEF(mempool_bma_raw, XWSCP_MEMBLK_ODR); /**< 内存池分配器的原始内存 */
         struct xwmm_bma * mempool; /**< 内存池分配器 */
 
-        /* 发送状态机 */
         struct {
                 xwu32_a cnt; /**< 发送计数器 */
                 struct xwos_mtx mtx; /**< 发送锁 */
@@ -165,9 +164,8 @@ struct xwscp {
                         xwu8_t ack; /**< 远端回复的应答 */
                         xwu8_t id; /**< 远端的消息id */
                 } remote; /**< 正在发送的帧信息 */
-        } tx; /**< 正在发送的帧信息 */
+        } tx; /**< 发送状态机 */
 
-        /* 接收状态机 */
         struct {
                 struct xwos_thd * thd; /**< 接收线程 */
                 xwu32_a cnt; /**< 接收计数器 */

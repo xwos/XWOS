@@ -22,7 +22,9 @@
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_SYNC_SEM_MEMSLICE) && (1 == XWMPCFG_SYNC_SEM_MEMSLICE)
   #include <xwos/mm/memslice.h>
-#endif /* XWMPCFG_SYNC_SEM_MEMSLICE */
+#elif defined(XWMPCFG_SYNC_SEM_STDC_MM) && (1 == XWMPCFG_SYNC_SEM_STDC_MM)
+  #include <stdlib.h>
+#endif /* XWMPCFG_SYNC_SEM_STDC_MM */
 #include <xwos/ospl/irq.h>
 #include <xwos/mp/skd.h>
 #include <xwos/mp/tt.h>
@@ -405,9 +407,9 @@ xwer_t xwmp_sem_bind(struct xwmp_sem * sem, struct xwmp_evt * evt, xwsq_t pos)
 #if defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
         case XWMP_SEM_TYPE_PIPELINE:
                 xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
-                rc = xwmp_evt_obj_bind(evt, &sem->synobj, pos, true);
+                rc = xwmp_sel_obj_bind(evt, &sem->synobj, pos, true);
                 if ((XWOK == rc) && (sem->count > 0)) {
-                        rc = xwmp_evt_obj_s1i(evt, &sem->synobj);
+                        rc = xwmp_sel_obj_s1i(evt, &sem->synobj);
                 }
                 xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
                 break;
@@ -415,9 +417,9 @@ xwer_t xwmp_sem_bind(struct xwmp_sem * sem, struct xwmp_evt * evt, xwsq_t pos)
 #if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
         case XWMP_SEM_TYPE_RT:
                 xwmp_rtwq_lock_cpuirqsv(&sem->wq.rt, &cpuirq);
-                rc = xwmp_evt_obj_bind(evt, &sem->synobj, pos, true);
+                rc = xwmp_sel_obj_bind(evt, &sem->synobj, pos, true);
                 if ((XWOK == rc) && (sem->count > 0)) {
-                        rc = xwmp_evt_obj_s1i(evt, &sem->synobj);
+                        rc = xwmp_sel_obj_s1i(evt, &sem->synobj);
                 }
                 xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
                 break;
@@ -456,9 +458,9 @@ xwer_t xwmp_sem_unbind(struct xwmp_sem * sem, struct xwmp_evt * evt)
 #if defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
         case XWMP_SEM_TYPE_PIPELINE:
                 xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
-                rc = xwmp_evt_obj_unbind(evt, &sem->synobj, true);
+                rc = xwmp_sel_obj_unbind(evt, &sem->synobj, true);
                 if (XWOK == rc) {
-                        rc = xwmp_evt_obj_c0i(evt, &sem->synobj);
+                        rc = xwmp_sel_obj_c0i(evt, &sem->synobj);
                 }
                 xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
                 break;
@@ -466,9 +468,9 @@ xwer_t xwmp_sem_unbind(struct xwmp_sem * sem, struct xwmp_evt * evt)
 #if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
         case XWMP_SEM_TYPE_RT:
                 xwmp_rtwq_lock_cpuirqsv(&sem->wq.rt, &cpuirq);
-                rc = xwmp_evt_obj_unbind(evt, &sem->synobj, true);
+                rc = xwmp_sel_obj_unbind(evt, &sem->synobj, true);
                 if (XWOK == rc) {
-                        rc = xwmp_evt_obj_c0i(evt, &sem->synobj);
+                        rc = xwmp_sel_obj_c0i(evt, &sem->synobj);
                 }
                 xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
                 break;
@@ -578,7 +580,7 @@ xwer_t xwmp_plsem_freeze(struct xwmp_sem * sem)
                         xwmb_mp_load_acquire(struct xwmp_evt *,
                                              evt, &synobj->sel.evt);
                         if (NULL != evt) {
-                                xwmp_evt_obj_c0i(evt, synobj);
+                                xwmp_sel_obj_c0i(evt, synobj);
                         }
 #endif /* XWMPCFG_SYNC_EVT */
                 }
@@ -736,7 +738,7 @@ xwer_t xwmp_plsem_post(struct xwmp_sem * sem)
                                                              evt,
                                                              &synobj->sel.evt);
                                         if (NULL != evt) {
-                                                xwmp_evt_obj_s1i(evt, synobj);
+                                                xwmp_sel_obj_s1i(evt, synobj);
                                         }
                                 }
 #endif /* XWMPCFG_SYNC_EVT */
@@ -808,7 +810,7 @@ xwer_t xwmp_plsem_trywait(struct xwmp_sem * sem)
                                                      evt,
                                                      &synobj->sel.evt);
                                 if (NULL != evt) {
-                                        xwmp_evt_obj_c0i(evt, synobj);
+                                        xwmp_sel_obj_c0i(evt, synobj);
                                 }
                         }
 #endif /* XWMPCFG_SYNC_EVT */
@@ -1009,7 +1011,7 @@ xwer_t xwmp_plsem_do_timedwait(struct xwmp_sem * sem, struct xwmp_thd * thd,
                         xwmb_mp_load_acquire(struct xwmp_evt *,
                                              evt, &synobj->sel.evt);
                         if (NULL != evt) {
-                                xwmp_evt_obj_c0i(evt, synobj);
+                                xwmp_sel_obj_c0i(evt, synobj);
                         }
                 }
 #endif /* XWMPCFG_SYNC_EVT */
@@ -1135,7 +1137,7 @@ xwer_t xwmp_plsem_do_wait_unintr(struct xwmp_sem * sem, struct xwmp_thd * thd)
                         xwmb_mp_load_acquire(struct xwmp_evt *,
                                              evt, &synobj->sel.evt);
                         if (NULL != evt) {
-                                xwmp_evt_obj_c0i(evt, synobj);
+                                xwmp_sel_obj_c0i(evt, synobj);
                         }
                 }
 #endif /* XWMPCFG_SYNC_EVT */
@@ -1278,7 +1280,7 @@ xwer_t xwmp_rtsem_freeze(struct xwmp_sem * sem)
                         xwmb_mp_load_acquire(struct xwmp_evt *,
                                              evt, &synobj->sel.evt);
                         if (NULL != evt) {
-                                xwmp_evt_obj_c0i(evt, synobj);
+                                xwmp_sel_obj_c0i(evt, synobj);
                         }
 #endif /* XWMPCFG_SYNC_EVT */
                 }
@@ -1436,7 +1438,7 @@ xwer_t xwmp_rtsem_post(struct xwmp_sem * sem)
                                                              evt,
                                                              &synobj->sel.evt);
                                         if (NULL != evt) {
-                                                xwmp_evt_obj_s1i(evt, synobj);
+                                                xwmp_sel_obj_s1i(evt, synobj);
                                         }
                                 }
 #endif /* XWMPCFG_SYNC_EVT */
@@ -1508,7 +1510,7 @@ xwer_t xwmp_rtsem_trywait(struct xwmp_sem * sem)
                                                      evt,
                                                      &synobj->sel.evt);
                                 if (NULL != evt) {
-                                        xwmp_evt_obj_c0i(evt, synobj);
+                                        xwmp_sel_obj_c0i(evt, synobj);
                                 }
                         }
 #endif /* XWMPCFG_SYNC_EVT */
@@ -1707,7 +1709,7 @@ xwer_t xwmp_rtsem_do_timedwait(struct xwmp_sem * sem, struct xwmp_thd * thd,
                         xwmb_mp_load_acquire(struct xwmp_evt *,
                                              evt, &synobj->sel.evt);
                         if (NULL != evt) {
-                                xwmp_evt_obj_c0i(evt, synobj);
+                                xwmp_sel_obj_c0i(evt, synobj);
                         }
                 }
 #endif /* XWMPCFG_SYNC_EVT */
@@ -1834,7 +1836,7 @@ xwer_t xwmp_rtsem_do_wait_unintr(struct xwmp_sem * sem, struct xwmp_thd * thd)
                         xwmb_mp_load_acquire(struct xwmp_evt *,
                                              evt, &synobj->sel.evt);
                         if (NULL != evt) {
-                                xwmp_evt_obj_c0i(evt, synobj);
+                                xwmp_sel_obj_c0i(evt, synobj);
                         }
                 }
 #endif /* XWMPCFG_SYNC_EVT */
@@ -1893,11 +1895,16 @@ xwer_t xwmp_rtsem_wait_unintr(struct xwmp_sem * sem)
 __xwmp_api
 xwer_t xwmp_sem_getvalue(struct xwmp_sem * sem, xwssq_t * sval)
 {
+        xwer_t rc;
+
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((sval), "nullptr", -EFAULT);
 
-        *sval = sem->count;
-        return XWOK;
+        rc = xwmp_sem_grab(sem);
+        if (__xwcc_likely(XWOK == rc)) {
+                *sval = sem->count;
+        }
+        return rc;
 }
 
 /**
@@ -1915,9 +1922,14 @@ xwer_t xwmp_sem_getvalue(struct xwmp_sem * sem, xwssq_t * sval)
 __xwmp_api
 xwer_t xwmp_sem_gettype(struct xwmp_sem * sem, xwid_t * type)
 {
+        xwer_t rc;
+
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((type), "nullptr", -EFAULT);
 
-        *type = sem->type;
-        return XWOK;
+        rc = xwmp_sem_grab(sem);
+        if (__xwcc_likely(XWOK == rc)) {
+                *type = sem->type;
+        }
+        return rc;
 }

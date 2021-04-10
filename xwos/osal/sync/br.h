@@ -37,16 +37,12 @@ typedef struct {
  */
 #define XWOS_BR_NILD ((xwos_br_d){NULL, 0,})
 
-#define XWOS_BR_MAXNUM XWOSDL_BR_MAXNUM /**< 线程栅栏可同步的最大线程数 */
-
-/**
- * @brief 声明线程栅栏位图
- */
-#define xwos_br_declare_bitmap(name) xwosdl_br_declare_bitmap(name)
-
 /**
  * @brief XWOS API：静态方式初始化线程栅栏
- * @param br: (I) 线程栅栏的指针
+ * @param br: (I) 线程栅栏对象的指针
+ * @param num: (I) 线程栅栏中的线程数量
+ * @param bmp: (I) 线程栅栏用来记录线程抵达事件的位图缓冲区
+ * @param msk: (I) 线程栅栏用来记录线程掩码状态的位图缓冲区
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -56,14 +52,15 @@ typedef struct {
  * - 重入性：对于同一个线程栅栏对象，不可重入
  */
 static __xwos_inline_api
-xwer_t xwos_br_init(struct xwos_br * br)
+xwer_t xwos_br_init(struct xwos_br * br, xwsz_t num,
+                    xwbmp_t * bmp, xwbmp_t * msk)
 {
-        return xwosdl_br_init(&br->osbr);
+        return xwosdl_br_init(&br->osbr, num, bmp, msk);
 }
 
 /**
  * @brief XWOS API：销毁静态方式初始化的线程栅栏
- * @param br: (I) 线程栅栏的指针
+ * @param br: (I) 线程栅栏对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -80,9 +77,8 @@ xwer_t xwos_br_destroy(struct xwos_br * br)
 
 /**
  * @brief XWOS API：动态方式创建线程栅栏
- * @param brbuf: (O) 指向缓冲区的指针，通过此缓冲区返回线程栅栏的指针
- * @param val: (I) 线程栅栏的初始值
- * @param max: (I) 线程栅栏的最大值
+ * @param brbuf: (O) 指向缓冲区的指针，通过此缓冲区返回线程栅栏对象的指针
+ * @param num: (I) 线程栅栏中的线程数量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -93,9 +89,9 @@ xwer_t xwos_br_destroy(struct xwos_br * br)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_br_create(struct xwos_br ** brbuf)
+xwer_t xwos_br_create(struct xwos_br ** brbuf, xwsz_t num)
 {
-        return xwosdl_br_create((struct xwosdl_br **)brbuf);
+        return xwosdl_br_create((struct xwosdl_br **)brbuf, num);
 }
 
 /**
@@ -280,11 +276,28 @@ xwer_t xwos_br_intr_all(struct xwos_br * br)
 }
 
 /**
+ * @brief XWOS API：获取线程栅栏中线程槽数量
+ * @param br: (I) 线程栅栏对象的指针
+ * @param numbuf: (O) 指向缓冲区的指针，通过此缓冲区返回线程槽数量
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_br_get_num(struct xwos_br * br, xwsz_t * numbuf)
+{
+        return xwosdl_br_get_num(&br->osbr, numbuf);
+}
+
+/**
  * @brief XWOS API：等待所有线程到达栅栏
  * @param br: (I) 线程栅栏对象的指针
  * @param pos: (I) 当前线程的位图位置
  * @param msk: (I) 需要同步的线程位图掩码
- * @param sync: (O) 指向缓冲区的指针，通过此缓冲区返回已经抵达栅栏的线程位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -297,9 +310,9 @@ xwer_t xwos_br_intr_all(struct xwos_br * br)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_br_sync(struct xwos_br * br, xwsq_t pos, xwbmp_t msk[], xwbmp_t sync[])
+xwer_t xwos_br_sync(struct xwos_br * br, xwsq_t pos, xwbmp_t msk[])
 {
-        return xwosdl_br_sync(&br->osbr, pos, msk, sync);
+        return xwosdl_br_sync(&br->osbr, pos, msk);
 }
 
 /**
@@ -307,7 +320,6 @@ xwer_t xwos_br_sync(struct xwos_br * br, xwsq_t pos, xwbmp_t msk[], xwbmp_t sync
  * @param br: (I) 线程栅栏对象的指针
  * @param pos: (I) 当前线程的位图位置
  * @param msk: (I) 需要同步的线程位图掩码
- * @param sync: (O) 指向缓冲区的指针，通过此缓冲区返回已经抵达栅栏的线程位图掩码
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
  *              (O) 作为输出时，返回剩余的期望时间
@@ -327,10 +339,9 @@ xwer_t xwos_br_sync(struct xwos_br * br, xwsq_t pos, xwbmp_t msk[], xwbmp_t sync
  */
 static __xwos_inline_api
 xwer_t xwos_br_timedsync(struct xwos_br * br, xwsq_t pos,
-                         xwbmp_t msk[], xwbmp_t sync[],
-                         xwtm_t * xwtm)
+                         xwbmp_t msk[], xwtm_t * xwtm)
 {
-        return xwosdl_br_timedsync(&br->osbr, pos, msk, sync, xwtm);
+        return xwosdl_br_timedsync(&br->osbr, pos, msk, xwtm);
 }
 
 #endif /* xwos/osal/sync/br.h */

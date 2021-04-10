@@ -39,12 +39,9 @@ xwer_t xwosdl_swt_create(struct xwosdl_swt ** swtbuf, const char * name, xwsq_t 
 {
         xwer_t rc;
 
-        if (NULL != swtbuf) {
-                *swtbuf = NULL;
-                rc = xwmp_swt_create(swtbuf, name, flag);
-        } else {
-                rc = -EFAULT;
-        }
+        XWOS_VALIDATE((swtbuf), "nullptr", -EFAULT);
+        *swtbuf = NULL;
+        rc = xwmp_swt_create(swtbuf, name, flag);
         return rc;
 }
 

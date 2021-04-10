@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 点对点通讯协议：应用接口层
+ * @brief 点对点通讯协议：模块接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

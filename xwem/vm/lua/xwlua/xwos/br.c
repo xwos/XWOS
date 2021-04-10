@@ -19,10 +19,12 @@
 int xwlua_br_new(lua_State * L)
 {
         xwer_t rc;
+        xwsz_t bitnum;
         xwlua_br_sp * brsp;
 
+        bitnum = luaL_checkinteger(L, 1);
         brsp = lua_newuserdatauv(L, sizeof(xwlua_br_sp), 0);
-        rc = xwos_br_create(&brsp->br);
+        rc = xwos_br_create(&brsp->br, bitnum);
         if (XWOK == rc) {
                 brsp->tik = xwos_br_gettik(brsp->br);
                 luaL_setmetatable(L, "xwlua_br_sp");
@@ -32,23 +34,8 @@ int xwlua_br_new(lua_State * L)
         return 1;
 }
 
-int xwlua_br_bmp(lua_State * L)
-{
-        xwsz_t bmpsz;
-        xwlua_bmp_t * bmp;
-
-        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(XWOS_BR_MAXNUM)) +
-                sizeof(xwlua_bmp_t);
-        bmp = lua_newuserdatauv(L, bmpsz, 0);
-        bmp->bits = XWOS_BR_MAXNUM;
-        xwbmpop_c0all(bmp->bmp, bmp->bits);
-        luaL_setmetatable(L, "xwlua_bmp_t");
-        return 1;
-}
-
 const luaL_Reg xwlua_br_libconstructor[] = {
         {"new", xwlua_br_new},
-        {"bmp", xwlua_br_bmp},
         {NULL, NULL},
 };
 
@@ -113,6 +100,34 @@ const luaL_Reg xwlua_brsp_metamethod[] = {
         {NULL, NULL}
 };
 
+int xwlua_brsp_bmp(lua_State * L)
+{
+        xwlua_br_sp * brsp;
+        xwsz_t bitnum;
+        xwsz_t bmpsz;
+        xwlua_bmp_t * bmp;
+
+        brsp = (xwlua_br_sp *)luaL_checkudata(L, 1, "xwlua_br_sp");
+        xwos_br_get_num(brsp->br, &bitnum);
+        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bitnum)) + sizeof(xwlua_bmp_t);
+        bmp = lua_newuserdatauv(L, bmpsz, 0);
+        bmp->bits = bitnum;
+        xwbmpop_c0all(bmp->bmp, bmp->bits);
+        luaL_setmetatable(L, "xwlua_bmp_t");
+        return 1;
+}
+
+int xwlua_brsp_num(lua_State * L)
+{
+        xwlua_br_sp * brsp;
+        xwsz_t bitnum;
+
+        brsp = (xwlua_br_sp *)luaL_checkudata(L, 1, "xwlua_br_sp");
+        xwos_br_get_num(brsp->br, &bitnum);
+        lua_pushinteger(L, (lua_Integer)bitnum);
+        return 1;
+}
+
 int xwlua_brsp_bind(lua_State * L)
 {
         xwlua_br_sp * brsp;
@@ -156,47 +171,37 @@ int xwlua_brsp_sync(lua_State * L)
 {
         xwlua_br_sp * brsp;
         xwlua_bmp_t * msk;
-        xwlua_bmp_t * out;
+        xwsz_t bitnum;
         xwsq_t pos;
         xwtm_t time;
-        xwsz_t bmpsz;
         int top;
         xwer_t rc;
 
         top = lua_gettop(L);
         brsp = (xwlua_br_sp *)luaL_checkudata(L, 1, "xwlua_br_sp");
-        msk = (xwlua_bmp_t *)luaL_checkudata(L, 3, "xwlua_bmp_t");
         pos = (xwsq_t)luaL_checkinteger(L, 2);
-        if ((0 == pos) || (pos > XWOS_BR_MAXNUM)) {
-                lua_pushfstring(L, "Position is out of range [1:%d]!", XWOS_BR_MAXNUM);
+        msk = (xwlua_bmp_t *)luaL_checkudata(L, 3, "xwlua_bmp_t");
+        xwos_br_get_num(brsp->br, &bitnum);
+        if ((0 == pos) || (pos > bitnum)) {
+                lua_pushfstring(L, "Position is out of range [1:%d]!", bitnum);
                 lua_error(L);
         } else {
                 pos--;
         }
         if (top >= 4) {
                 time = (xwtm_t)luaL_checknumber(L, 4);
-                bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(XWOS_BR_MAXNUM)) +
-                        sizeof(xwlua_bmp_t);
-                out = lua_newuserdatauv(L, bmpsz, 0);
-                out->bits = XWOS_BR_MAXNUM;
-                xwbmpop_c0all(out->bmp, out->bits);
-                luaL_setmetatable(L, "xwlua_bmp_t");
-                rc = xwos_br_timedsync(brsp->br, pos, msk->bmp, out->bmp, &time);
+                rc = xwos_br_timedsync(brsp->br, pos, msk->bmp, &time);
         } else {
-                bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(XWOS_BR_MAXNUM)) +
-                        sizeof(xwlua_bmp_t);
-                out = lua_newuserdatauv(L, bmpsz, 0);
-                out->bits = XWOS_BR_MAXNUM;
-                xwbmpop_c0all(out->bmp, out->bits);
-                luaL_setmetatable(L, "xwlua_bmp_t");
-                rc = xwos_br_sync(brsp->br, pos, msk->bmp, out->bmp);
+                rc = xwos_br_sync(brsp->br, pos, msk->bmp);
         }
         lua_pushinteger(L, (lua_Integer)rc);
         lua_insert(L, -2);
-        return 2;
+        return 1;
 }
 
 const luaL_Reg xwlua_brsp_indexmethod[] = {
+        {"bmp", xwlua_brsp_bmp},
+        {"num", xwlua_brsp_num},
         {"bind", xwlua_brsp_bind},
         {"unbind", xwlua_brsp_unbind},
         {"intr_all", xwlua_brsp_intr_all},

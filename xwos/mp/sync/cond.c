@@ -21,7 +21,9 @@
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
   #include <xwos/mm/memslice.h>
-#endif /* XWMPCFG_SYNC_COND_MEMSLICE */
+#elif defined(XWMPCFG_SYNC_COND_STDC_MM) && (1 == XWMPCFG_SYNC_COND_STDC_MM)
+  #include <stdlib.h>
+#endif /* XWMPCFG_SYNC_COND_STDC_MM */
 #include <xwos/ospl/irq.h>
 #include <xwos/mp/skd.h>
 #include <xwos/mp/tt.h>
@@ -388,7 +390,7 @@ xwer_t xwmp_cond_bind(struct xwmp_cond * cond,
         rc = xwmp_cond_grab(cond);
         if (__xwcc_likely(XWOK == rc)) {
                 xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
-                rc = xwmp_evt_obj_bind(evt, &cond->synobj, pos, false);
+                rc = xwmp_sel_obj_bind(evt, &cond->synobj, pos, false);
                 xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
         }
         return rc;
@@ -418,7 +420,7 @@ xwer_t xwmp_cond_unbind(struct xwmp_cond * cond, struct xwmp_evt * evt)
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
 
         xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
-        rc = xwmp_evt_obj_unbind(evt, &cond->synobj, false);
+        rc = xwmp_sel_obj_unbind(evt, &cond->synobj, false);
         xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
         if (XWOK == rc) {
                 xwmp_cond_put(cond);
@@ -663,7 +665,7 @@ xwer_t xwmp_cond_broadcast(struct xwmp_cond * cond)
                         xwmb_mp_load_acquire(struct xwmp_evt *,
                                              evt, &synobj->sel.evt);
                         if (NULL != evt) {
-                                xwmp_evt_obj_s1i(evt, synobj);
+                                xwmp_sel_obj_s1i(evt, synobj);
                         }
                         xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
                 }

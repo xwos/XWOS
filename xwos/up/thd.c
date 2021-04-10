@@ -16,6 +16,9 @@
 #include <xwos/lib/rbtree.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
+#if defined(XWUPCFG_SKD_THD_STDC_MM) && (1 == XWUPCFG_SKD_THD_STDC_MM)
+  #include <stdlib.h>
+#endif /* XWUPCFG_SKD_THD_STDC_MM */
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/up/lock/seqlock.h>

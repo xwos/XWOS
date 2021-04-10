@@ -21,9 +21,6 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
-#if defined(XWMPCFG_SYNC_SEM_MEMSLICE) && (1 == XWMPCFG_SYNC_SEM_MEMSLICE)
-#include <xwos/mm/memslice.h>
-#endif /* XWMPCFG_SYNC_SEM_MEMSLICE */
 #include <xwos/mp/irq.h>
 #include <xwos/mp/skd.h>
 #include <xwos/mp/tt.h>
@@ -34,7 +31,7 @@
 #include <xwos/mp/lock/seqlock.h>
 #include <xwos/mp/lock/mtx.h>
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
-#include <xwos/mp/sync/evt.h>
+  #include <xwos/mp/sync/evt.h>
 #endif /* XWMPCFG_SYNC_EVT */
 #include <xwos/mp/sync/obj.h>
 #include <xwos/mp/sync/sem.h>

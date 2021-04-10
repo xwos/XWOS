@@ -16,7 +16,9 @@
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_SKD_SWT_MEMSLICE) && (1 == XWMPCFG_SKD_SWT_MEMSLICE)
   #include <xwos/mm/memslice.h>
-#endif /* XWMPCFG_SKD_SWT_MEMSLICE */
+#elif defined(XWMPCFG_SKD_SWT_STDC_MM) && (1 == XWMPCFG_SKD_SWT_STDC_MM)
+  #include <stdlib.h>
+#endif /* XWMPCFG_SKD_SWT_STDC_MM */
 #include <xwos/mp/skd.h>
 #include <xwos/mp/tt.h>
 #include <xwos/mp/swt.h>
