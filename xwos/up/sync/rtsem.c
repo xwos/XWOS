@@ -65,6 +65,15 @@ xwer_t xwup_rtsem_do_wait_unintr(struct xwup_rtsem * sem, struct xwup_thd * thd)
 static __xwup_code
 struct xwup_rtsem * xwup_rtsem_alloc(void)
 {
+#if defined(XWUPCFG_SKD_RTSEM_STDC_MM) && (1 == XWUPCFG_SKD_RTSEM_STDC_MM)
+        struct xwup_rtsem * rtsem;
+
+        rtsem = malloc(sizeof(struct xwup_rtsem));
+        if (NULL == rtsem) {
+                rtsem = err_ptr(-ENOMEM);
+        }
+        return rtsem;
+#else
         union {
                 struct xwup_rtsem * sem;
                 void * anon;
@@ -76,6 +85,7 @@ struct xwup_rtsem * xwup_rtsem_alloc(void)
                 mem.sem = err_ptr(-ENOMEM);
         }/* else {} */
         return mem.sem;
+#endif
 }
 
 /**
@@ -85,7 +95,11 @@ struct xwup_rtsem * xwup_rtsem_alloc(void)
 static __xwup_code
 void xwup_rtsem_free(struct xwup_rtsem * sem)
 {
+#if defined(XWUPCFG_SKD_RTSEM_STDC_MM) && (1 == XWUPCFG_SKD_RTSEM_STDC_MM)
+        free(sem);
+#else
         xwmm_kma_free(sem);
+#endif
 }
 
 /**

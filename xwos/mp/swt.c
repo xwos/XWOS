@@ -101,7 +101,15 @@ struct xwmp_swt * xwmp_swt_alloc(void)
                 mem.swt = err_ptr(rc);
         }/* else {} */
         return mem.swt;
-#else /* XWMPCFG_SKD_SWT_MEMSLICE */
+#elif defined(XWMPCFG_SKD_SWT_STDC_MM) && (1 == XWMPCFG_SKD_SWT_STDC_MM)
+        struct xwmp_swt * swt;
+
+        swt = malloc(sizeof(struct xwmp_swt));
+        if (NULL == swt) {
+                swt = err_ptr(-ENOMEM);
+        }
+        return swt;
+#else
         union {
                 struct xwmp_swt * swt;
                 void * anon;
@@ -115,7 +123,7 @@ struct xwmp_swt * xwmp_swt_alloc(void)
                 mem.swt = err_ptr(-ENOMEM);
         }
         return mem.swt;
-#endif /* !XWMPCFG_SKD_SWT_MEMSLICE */
+#endif
 }
 
 /**
@@ -127,10 +135,13 @@ void xwmp_swt_free(struct xwmp_swt * swt)
 {
 #if defined(XWMPCFG_SKD_SWT_MEMSLICE) && (1 == XWMPCFG_SKD_SWT_MEMSLICE)
         xwmm_memslice_free(&xwmp_swt_cache, swt);
-#else /* XWMPCFG_SKD_SWT_MEMSLICE */
+#elif defined(XWMPCFG_SKD_SWT_STDC_MM) && (1 == XWMPCFG_SKD_SWT_STDC_MM)
+        xwmp_swt_destruct(swt);
+        free(swt);
+#else
         xwmp_swt_destruct(swt);
         xwmm_kma_free(swt);
-#endif /* !XWMPCFG_SKD_SWT_MEMSLICE */
+#endif
 }
 
 /**

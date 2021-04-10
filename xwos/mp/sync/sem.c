@@ -157,7 +157,15 @@ struct xwmp_sem * xwmp_sem_alloc(void)
                 mem.sem = err_ptr(rc);
         }/* else {} */
         return mem.sem;
-#else /* XWMPCFG_SYNC_SEM_MEMSLICE */
+#elif defined(XWMPCFG_SYNC_SEM_STDC_MM) && (1 == XWMPCFG_SYNC_SEM_STDC_MM)
+        struct xwmp_sem * sem;
+
+        sem = malloc(sizeof(struct xwmp_sem));
+        if (NULL == sem) {
+                sem = err_ptr(-ENOMEM);
+        }
+        return sem;
+#else
         union {
                 struct xwmp_sem * sem;
                 void * anon;
@@ -171,7 +179,7 @@ struct xwmp_sem * xwmp_sem_alloc(void)
                 mem.sem = err_ptr(-ENOMEM);
         }
         return mem.sem;
-#endif /* !XWMPCFG_SYNC_SEM_MEMSLICE */
+#endif
 }
 
 /**
@@ -183,10 +191,13 @@ void xwmp_sem_free(struct xwmp_sem * sem)
 {
 #if defined(XWMPCFG_SYNC_SEM_MEMSLICE) && (1 == XWMPCFG_SYNC_SEM_MEMSLICE)
         xwmm_memslice_free(&xwmp_sem_cache, sem);
-#else /* XWMPCFG_SYNC_SEM_MEMSLICE */
+#elif defined(XWMPCFG_SYNC_SEM_STDC_MM) && (1 == XWMPCFG_SYNC_SEM_STDC_MM)
+        xwmp_sem_destruct(sem);
+        free(sem);
+#else
         xwmp_sem_destruct(sem);
         xwmm_kma_free(sem);
-#endif /* !XWMPCFG_SYNC_SEM_MEMSLICE */
+#endif
 }
 
 /**

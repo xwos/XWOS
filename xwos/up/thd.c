@@ -89,6 +89,15 @@ xwer_t xwup_thd_stop_unlock_cb(struct xwup_thd * thd);
 static __xwup_code
 struct xwup_thd * xwup_thd_alloc(void)
 {
+#if defined(XWUPCFG_SKD_THD_STDC_MM) && (1 == XWUPCFG_SKD_THD_STDC_MM)
+        struct xwup_thd * thd;
+
+        thd = malloc(sizeof(struct xwup_thd));
+        if (NULL == thd) {
+                thd = err_ptr(-ENOMEM);
+        }
+        return thd;
+#else
         union {
                 struct xwup_thd * thd;
                 void * anon;
@@ -100,6 +109,7 @@ struct xwup_thd * xwup_thd_alloc(void)
                 mem.thd = err_ptr(-ENOMEM);
         }/* else {} */
         return mem.thd;
+#endif
 }
 
 /**
@@ -109,11 +119,16 @@ struct xwup_thd * xwup_thd_alloc(void)
 static __xwup_code
 void xwup_thd_free(struct xwup_thd * thd)
 {
+#if defined(XWUPCFG_SKD_THD_STDC_MM) && (1 == XWUPCFG_SKD_THD_STDC_MM)
+        free(thd);
+#else
         xwmm_kma_free(thd);
+#endif
 }
 
 /**
  * @brief 动态分配线程栈
+ * @param stack_size: (I) 线程栈的大小
  * @return 线程栈的首地址或指针类型的错误码或空指针
  */
 static __xwup_code
@@ -131,6 +146,14 @@ xwstk_t * xwup_thd_stack_alloc(xwsz_t stack_size)
                 mem.stkbase = err_ptr(rc);
         }/* else {} */
         return mem.stkbase;
+#elif defined(XWUPCFG_SKD_THD_STDC_MM) && (1 == XWUPCFG_SKD_THD_STDC_MM)
+        xwstk_t * stkbase;
+
+        stkbase = malloc(stack_size);
+        if (NULL == stkbase) {
+                stkbase = err_ptr(-ENOMEM);
+        }
+        return stkbase;
 #else
         union {
                 xwstk_t * stkbase;
@@ -156,6 +179,9 @@ xwer_t xwup_thd_stack_free(xwstk_t * stk)
 {
 #if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
         return bdl_thd_stack_pool_free(stk);
+#elif defined(XWUPCFG_SKD_THD_STDC_MM) && (1 == XWUPCFG_SKD_THD_STDC_MM)
+        free(stk);
+        return XWOK;
 #else
         return xwmm_kma_free(stk);
 #endif

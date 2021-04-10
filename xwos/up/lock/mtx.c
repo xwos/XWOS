@@ -70,6 +70,15 @@ xwer_t xwup_mtx_do_lock_unintr(struct xwup_mtx * mtx, struct xwup_thd * thd);
 static __xwup_code
 struct xwup_mtx * xwup_mtx_alloc(void)
 {
+#if defined(XWUPCFG_SKD_MTX_STDC_MM) && (1 == XWUPCFG_SKD_MTX_STDC_MM)
+        struct xwup_mtx * mtx;
+
+        mtx = malloc(sizeof(struct xwup_mtx));
+        if (NULL == mtx) {
+                mtx = err_ptr(-ENOMEM);
+        }
+        return mtx;
+#else
         union {
                 struct xwup_mtx * mtx;
                 void * anon;
@@ -81,6 +90,7 @@ struct xwup_mtx * xwup_mtx_alloc(void)
                 mem.mtx = err_ptr(-ENOMEM);
         }/* else {} */
         return mem.mtx;
+#endif
 }
 
 /**
@@ -90,7 +100,11 @@ struct xwup_mtx * xwup_mtx_alloc(void)
 static __xwup_code
 void xwup_mtx_free(struct xwup_mtx * mtx)
 {
+#if defined(XWUPCFG_SKD_MTX_STDC_MM) && (1 == XWUPCFG_SKD_MTX_STDC_MM)
+        free(mtx);
+#else
         xwmm_kma_free(mtx);
+#endif
 }
 
 /**

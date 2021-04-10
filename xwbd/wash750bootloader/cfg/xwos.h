@@ -97,32 +97,37 @@
 /******** ******** ******** irqc ******** ******** ********/
 
 /******** ******** ******** syshwt ******** ******** ********/
-/* #define XWMPCFG_SYSHWT_PERIOD                           ((xwtm_t)1000000) */
+/* #define XWMPCFG_SYSHWT_PERIOD                        ((xwtm_t)1000000) */
 
 /******** ******** ******** memory management ******** ******** ********/
 
 /******** ******** ******** scheduler ******** ******** ********/
-/* #define XWMPCFG_SKD_PRIORITY_RT_NUM                     (8U) */
-/* #define XWMPCFG_SKD_IDLE_STACK_SIZE                     (2048U) */
-/* #define XWMPCFG_SKD_BH                                  1 */
-/* #define XWMPCFG_SKD_BH_STACK_SIZE                       (2048U) */
-/* #define XWMPCFG_SKD_THD_MEMSLICE                        0 */
-/* #define XWMPCFG_SKD_THD_LOCAL_DATA_NUM                  (2U) */
-/* #define XWMPCFG_SKD_SWT                                 1 */
-/* #define XWMPCFG_SKD_SWT_MEMSLICE                        0 */
+/* #define XWMPCFG_SKD_PRIORITY_RT_NUM                  (8U) */
+/* #define XWMPCFG_SKD_IDLE_STACK_SIZE                  (2048U) */
+/* #define XWMPCFG_SKD_BH                               1 */
+/* #define XWMPCFG_SKD_BH_STACK_SIZE                    (2048U) */
+/* #define XWMPCFG_SKD_THD_MEMSLICE                     0 */
+/* #define XWMPCFG_SKD_THD_STDC_MM                      0 */
+/* #define XWMPCFG_SKD_THD_LOCAL_DATA_NUM               (2U) */
+/* #define XWMPCFG_SKD_SWT                              1 */
+/* #define XWMPCFG_SKD_SWT_MEMSLICE                     0 */
+/* #define XWMPCFG_SKD_SWT_STDC_MM                      0 */
 
 /******** ******** ******** sync ******** ******** ********/
-/* #define XWMPCFG_SYNC_PLSEM                              0 */
-/* #define XWMPCFG_SYNC_RTSEM                              1 */
-/* #define XWMPCFG_SYNC_SEM_MEMSLICE                       0 */
+/* #define XWMPCFG_SYNC_PLSEM                           0 */
+/* #define XWMPCFG_SYNC_RTSEM                           1 */
+/* #define XWMPCFG_SYNC_SEM_MEMSLICE                    0 */
+/* #define XWMPCFG_SYNC_SEM_STDC_MM                     0 */
 
-/* #define XWMPCFG_SYNC_COND_MEMSLICE                      0 */
+/* #define XWMPCFG_SYNC_COND_MEMSLICE                   0 */
+/* #define XWMPCFG_SYNC_COND_STDC_MM                    0 */
 
-/* #define XWMPCFG_SYNC_EVT                                1 */
+/* #define XWMPCFG_SYNC_EVT                             1 */
 /* #define XWMPCFG_SYNC_EVT_STDC_MM                     0 */
 
 /******** ******** ******** lock ******** ******** ********/
-/* #define XWMPCFG_LOCK_MTX_MEMSLICE                       0 */
+/* #define XWMPCFG_LOCK_MTX_MEMSLICE                    0 */
+/* #define XWMPCFG_LOCK_MTX_STDC_MM                     0 */
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********          UP Configurations          ******** ********
@@ -130,31 +135,37 @@
 /******** ******** ******** irqc ******** ******** ********/
 
 /******** ******** ******** syshwt ******** ******** ********/
-#define XWUPCFG_SYSHWT_PERIOD                        ((xwtm_t)1000000)
+#define XWUPCFG_SYSHWT_PERIOD                           ((xwtm_t)1000000)
 
 /******** ******** ******** memory management ******** ******** ********/
 
 /******** ******** ******** scheduler ******** ******** ********/
-#define XWUPCFG_SKD_PRIORITY_RT_NUM                  (4U)
-#define XWUPCFG_SKD_IDLE_STACK_SIZE                  (2048U)
-#define XWUPCFG_SKD_BH                               0
-#define XWUPCFG_SKD_BH_STACK_SIZE                    (2048U)
-#define XWUPCFG_SKD_PM                               0
-#define XWUPCFG_SKD_THD_LOCAL_DATA_NUM               (2U)
-#define XWUPCFG_SKD_THD_EXIT                         0
-#define XWUPCFG_SKD_SWT                              0
+#define XWUPCFG_SKD_PRIORITY_RT_NUM                     (4U)
+#define XWUPCFG_SKD_IDLE_STACK_SIZE                     (2048U)
+#define XWUPCFG_SKD_BH                                  0
+#define XWUPCFG_SKD_BH_STACK_SIZE                       (2048U)
+#define XWUPCFG_SKD_PM                                  0
+#define XWUPCFG_SKD_THD_STDC_MM                         0
+#define XWUPCFG_SKD_THD_LOCAL_DATA_NUM                  (2U)
+#define XWUPCFG_SKD_THD_EXIT                            0
+#define XWUPCFG_SKD_SWT                                 0
+#define XWUPCFG_SKD_SWT_STDC_MM                         0
 
 /******** ******** ******** sync ******** ******** ********/
-#define XWUPCFG_SYNC_PLSEM                           1
-#define XWUPCFG_SYNC_RTSEM                           0
+#define XWUPCFG_SYNC_PLSEM                              1
+#define XWUPCFG_SYNC_PLSEM_STDC_MM                      0
+#define XWUPCFG_SYNC_RTSEM                              0
+#define XWUPCFG_SYNC_RTSEM_STDC_MM                      0
 
-#define XWUPCFG_SYNC_COND                            1
+#define XWUPCFG_SYNC_COND                               1
+#define XWUPCFG_SYNC_COND_STDC_MM                       0
 
-#define XWUPCFG_SYNC_EVT                             1
+#define XWUPCFG_SYNC_EVT                                1
 #define XWUPCFG_SYNC_EVT_STDC_MM                        0
 
 /******** ******** ******** lock ******** ******** ********/
-#define XWUPCFG_LOCK_MTX                             0
-#define XWUPCFG_LOCK_FAKEMTX                         1
+#define XWUPCFG_LOCK_MTX                                0
+#define XWUPCFG_LOCK_MTX_STDC_MM                        0
+#define XWUPCFG_LOCK_FAKEMTX                            1
 
 #endif /* cfg/xwos.h */

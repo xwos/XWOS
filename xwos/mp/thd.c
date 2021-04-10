@@ -140,7 +140,15 @@ struct xwmp_thd * xwmp_thd_alloc(void)
                 mem.thd = err_ptr(rc);
         }/* else {} */
         return mem.thd;
-#else /* XWMPCFG_SKD_THD_MEMSLICE */
+#elif defined(XWMPCFG_SKD_THD_STDC_MM) && (1 == XWMPCFG_SKD_THD_STDC_MM)
+        struct xwmp_thd * thd;
+
+        thd = malloc(sizeof(struct xwmp_thd));
+        if (NULL == thd) {
+                thd = err_ptr(-ENOMEM);
+        }
+        return thd;
+#else
         union {
                 struct xwmp_thd * thd;
                 void * anon;
@@ -154,7 +162,7 @@ struct xwmp_thd * xwmp_thd_alloc(void)
                 mem.thd = err_ptr(-ENOMEM);
         }
         return mem.thd;
-#endif /* !XWMPCFG_SKD_THD_MEMSLICE */
+#endif
 }
 
 /**
@@ -166,14 +174,18 @@ void xwmp_thd_free(struct xwmp_thd * thd)
 {
 #if defined(XWMPCFG_SKD_THD_MEMSLICE) && (1 == XWMPCFG_SKD_THD_MEMSLICE)
         xwmm_memslice_free(&xwmp_thd_cache, thd);
-#else /* XWMPCFG_SKD_THD_MEMSLICE */
+#elif defined(XWMPCFG_SKD_THD_STDC_MM) && (1 == XWMPCFG_SKD_THD_STDC_MM)
+        xwmp_thd_destruct(thd);
+        free(thd);
+#else
         xwmp_thd_destruct(thd);
         xwmm_kma_free(thd);
-#endif /* !XWMPCFG_SKD_THD_MEMSLICE */
+#endif
 }
 
 /**
  * @brief 动态分配线程栈
+ * @param stack_size: (I) 线程栈的大小
  * @return 线程栈的首地址或指针类型的错误码或空指针
  */
 static __xwmp_code
@@ -191,7 +203,15 @@ xwstk_t * xwmp_thd_stack_alloc(xwsz_t stack_size)
                 mem.stkbase = err_ptr(rc);
         }/* else {} */
         return mem.stkbase;
-#else /* BRDCFG_XWSKD_THD_STACK_POOL */
+#elif defined(XWMPCFG_SKD_THD_STDC_MM) && (1 == XWMPCFG_SKD_THD_STDC_MM)
+        xwstk_t * stkbase;
+
+        stkbase = malloc(stack_size);
+        if (NULL == thd) {
+                stkbase = err_ptr(-ENOMEM);
+        }
+        return stkbase;
+#else
         union {
                 xwstk_t * stkbase;
                 void * anon;
@@ -203,7 +223,7 @@ xwstk_t * xwmp_thd_stack_alloc(xwsz_t stack_size)
                 mem.stkbase = err_ptr(rc);
         }/* else {} */
         return mem.stkbase;
-#endif /* !BRDCFG_XWSKD_THD_STACK_POOL */
+#endif
 }
 
 /**
@@ -216,9 +236,11 @@ xwer_t xwmp_thd_stack_free(xwstk_t * stk)
 {
 #if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
         return bdl_thd_stack_pool_free(stk);
-#else /* BRDCFG_XWSKD_THD_STACK_POOL */
+#elif defined(XWMPCFG_SKD_THD_STDC_MM) && (1 == XWMPCFG_SKD_THD_STDC_MM)
+        return free(stk);
+#else
         return xwmm_kma_free(stk);
-#endif /* !BRDCFG_XWSKD_THD_STACK_POOL */
+#endif
 }
 
 /**

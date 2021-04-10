@@ -44,6 +44,15 @@ void xwup_swt_ttn_cb(void * entry);
 static __xwup_code
 struct xwup_swt * xwup_swt_alloc(void)
 {
+#if defined(XWUPCFG_SKD_SWT_STDC_MM) && (1 == XWUPCFG_SKD_SWT_STDC_MM)
+        struct xwup_swt * swt;
+
+        swt = malloc(sizeof(struct xwup_swt));
+        if (NULL == swt) {
+                swt = err_ptr(-ENOMEM);
+        }
+        return swt;
+#else
         union {
                 struct xwup_swt * swt;
                 void * anon;
@@ -55,6 +64,7 @@ struct xwup_swt * xwup_swt_alloc(void)
                 mem.swt = err_ptr(-ENOMEM);
         }/* else {} */
         return mem.swt;
+#endif
 }
 
 /**
@@ -64,7 +74,11 @@ struct xwup_swt * xwup_swt_alloc(void)
 static __xwup_code
 void xwup_swt_free(struct xwup_swt * swt)
 {
+#if defined(XWUPCFG_SKD_SWT_STDC_MM) && (1 == XWUPCFG_SKD_SWT_STDC_MM)
+        free(swt);
+#else
         xwmm_kma_free(swt);
+#endif
 }
 
 /**

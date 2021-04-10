@@ -53,6 +53,15 @@ xwer_t xwup_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
 static __xwup_code
 struct xwup_cond * xwup_cond_alloc(void)
 {
+#if defined(XWUPCFG_SKD_COND_STDC_MM) && (1 == XWUPCFG_SKD_COND_STDC_MM)
+        struct xwup_cond * cond;
+
+        cond = malloc(sizeof(struct xwup_cond));
+        if (NULL == cond) {
+                cond = err_ptr(-ENOMEM);
+        }
+        return cond;
+#else
         union {
                 struct xwup_cond * cond;
                 void * anon;
@@ -64,6 +73,7 @@ struct xwup_cond * xwup_cond_alloc(void)
                 mem.cond = err_ptr(-ENOMEM);
         }/* else {} */
         return mem.cond;
+#endif
 }
 
 /**
@@ -73,7 +83,11 @@ struct xwup_cond * xwup_cond_alloc(void)
 static __xwup_code
 void xwup_cond_free(struct xwup_cond * cond)
 {
+#if defined(XWUPCFG_SKD_COND_STDC_MM) && (1 == XWUPCFG_SKD_COND_STDC_MM)
+        free(sem);
+#else
         xwmm_kma_free(cond);
+#endif
 }
 
 /**

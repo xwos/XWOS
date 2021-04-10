@@ -113,7 +113,15 @@ struct xwmp_cond * xwmp_cond_alloc(void)
                 mem.cond = err_ptr(rc);
         }/* else {} */
         return mem.cond;
-#else /* XWMPCFG_SYNC_COND_MEMSLICE */
+#elif defined(XWMPCFG_SYNC_COND_STDC_MM) && (1 == XWMPCFG_SYNC_COND_STDC_MM)
+        struct xwmp_cond * cond;
+
+        cond = malloc(sizeof(struct xwmp_cond));
+        if (NULL == cond) {
+                cond = err_ptr(-ENOMEM);
+        }
+        return cond;
+#else
         union {
                 struct xwmp_cond * cond;
                 void * anon;
@@ -127,7 +135,7 @@ struct xwmp_cond * xwmp_cond_alloc(void)
                 mem.cond = err_ptr(-ENOMEM);
         }
         return mem.cond;
-#endif /* !XWMPCFG_SYNC_COND_MEMSLICE */
+#endif
 }
 
 /**
@@ -139,6 +147,9 @@ void xwmp_cond_free(struct xwmp_cond * cond)
 {
 #if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
         xwmm_memslice_free(&xwmp_cond_cache, cond);
+#elif defined(XWMPCFG_SYNC_COND_STDC_MM) && (1 == XWMPCFG_SYNC_COND_STDC_MM)
+        xwmp_cond_destruct(cond);
+        free(cond);
 #else /* XWMPCFG_SYNC_COND_MEMSLICE */
         xwmp_cond_destruct(cond);
         xwmm_kma_free(cond);

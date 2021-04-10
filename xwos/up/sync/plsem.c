@@ -65,6 +65,15 @@ xwer_t xwup_plsem_do_wait_unintr(struct xwup_plsem * sem, struct xwup_thd * thd)
 static __xwup_code
 struct xwup_plsem * xwup_plsem_alloc(void)
 {
+#if defined(XWUPCFG_SKD_PLSEM_STDC_MM) && (1 == XWUPCFG_SKD_PLSEM_STDC_MM)
+        struct xwup_plsem * plsem;
+
+        plsem = malloc(sizeof(struct xwup_plsem));
+        if (NULL == plsem) {
+                plsem = err_ptr(-ENOMEM);
+        }
+        return plsem;
+#else
         union {
                 struct xwup_plsem * sem;
                 void * anon;
@@ -76,6 +85,7 @@ struct xwup_plsem * xwup_plsem_alloc(void)
                 mem.sem = err_ptr(-ENOMEM);
         }/* else {} */
         return mem.sem;
+#endif
 }
 
 /**
@@ -85,7 +95,11 @@ struct xwup_plsem * xwup_plsem_alloc(void)
 static __xwup_code
 void xwup_plsem_free(struct xwup_plsem * sem)
 {
+#if defined(XWUPCFG_SKD_PLSEM_STDC_MM) && (1 == XWUPCFG_SKD_PLSEM_STDC_MM)
+        free(sem);
+#else
         xwmm_kma_free(sem);
+#endif
 }
 
 /**

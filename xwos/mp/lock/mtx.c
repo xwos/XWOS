@@ -129,6 +129,14 @@ struct xwmp_mtx * xwmp_mtx_alloc(void)
                 mem.mtx = err_ptr(rc);
         }/* else {} */
         return mem.mtx;
+#elif defined(XWMPCFG_LOCK_MTX_STDC_MM) && (1 == XWMPCFG_LOCK_MTX_STDC_MM)
+        struct xwmp_mtx * mtx;
+
+        mtx = malloc(sizeof(struct xwmp_mtx));
+        if (NULL == mtx) {
+                mtx = err_ptr(-ENOMEM);
+        }
+        return mtx;
 #else
         union {
                 struct xwmp_mtx * mtx;
@@ -155,6 +163,9 @@ void xwmp_mtx_free(struct xwmp_mtx * mtx)
 {
 #if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
         xwmm_memslice_free(&xwmp_mtx_cache, mtx);
+#elif defined(XWMPCFG_LOCK_MTX_STDC_MM) && (1 == XWMPCFG_LOCK_MTX_STDC_MM)
+        xwmp_mtx_destruct(mtx);
+        free(mtx);
 #else /* XWMPCFG_LOCK_MTX_MEMSLICE */
         xwmp_mtx_destruct(mtx);
         xwmm_kma_free(mtx);
