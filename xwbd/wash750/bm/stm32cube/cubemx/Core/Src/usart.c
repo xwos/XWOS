@@ -399,8 +399,8 @@ void MX_USART1_RxHalfCpltCallback(UART_HandleTypeDef * huart)
   if (HAL_DMA_ERROR_NONE == hdma->ErrorCode) {
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
     SCB_InvalidateDCache_by_Addr((uint32_t *)huart1_drvdata.dmauartc->rxq.mem,
-                                 ALIGN(sizeof(huart1_drvdata.dmauartc->rxq.mem),
-                                       CPUCFG_L1_CACHELINE_SIZE));
+                                 XWBOP_ALIGN(sizeof(huart1_drvdata.dmauartc->rxq.mem),
+                                             CPUCFG_L1_CACHELINE_SIZE));
 #endif /* STM32CUBECFG_DCACHE */
     stm32cube_usart1_cb_rxdma_halfcplt(huart1_drvdata.dmauartc);
   } else {
@@ -415,8 +415,8 @@ void MX_USART1_RxCpltCallback(UART_HandleTypeDef * huart)
   if (HAL_DMA_ERROR_NONE == hdma->ErrorCode) {
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
     SCB_InvalidateDCache_by_Addr((uint32_t *)huart1_drvdata.dmauartc->rxq.mem,
-                                 ALIGN(sizeof(huart1_drvdata.dmauartc->rxq.mem),
-                                       CPUCFG_L1_CACHELINE_SIZE));
+                                 XWBOP_ALIGN(sizeof(huart1_drvdata.dmauartc->rxq.mem),
+                                             CPUCFG_L1_CACHELINE_SIZE));
 #endif /* STM32CUBECFG_DCACHE */
     stm32cube_usart1_cb_rxdma_cplt(huart1_drvdata.dmauartc);
   } else {
@@ -440,7 +440,7 @@ void MX_USART1_TXDMA_Prepare(const xwu8_t * mem, xwsz_t size)
   huart1_drvdata.tx.size = cpsz;
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
   SCB_CleanDCache_by_Addr((uint32_t *)huart1_drvdata.tx.mem,
-                          (int32_t)ALIGN(cpsz, CPUCFG_L1_CACHELINE_SIZE));
+                          (int32_t)XWBOP_ALIGN(cpsz, CPUCFG_L1_CACHELINE_SIZE));
 #endif /* STM32CUBECFG_DCACHE */
 }
 
@@ -509,8 +509,8 @@ void MX_USART1_ErrorCallback(UART_HandleTypeDef * huart)
     huart->ErrorCode &= ~(HAL_UART_ERROR_RTO);
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
     SCB_InvalidateDCache_by_Addr((uint32_t *)huart1_drvdata.dmauartc->rxq.mem,
-                                 ALIGN(sizeof(huart1_drvdata.dmauartc->rxq.mem),
-                                       CPUCFG_L1_CACHELINE_SIZE));
+                                 XWBOP_ALIGN(sizeof(huart1_drvdata.dmauartc->rxq.mem),
+                                             CPUCFG_L1_CACHELINE_SIZE));
 #endif /* STM32CUBECFG_DCACHE */
     stm32cube_usart1_cb_rxdma_timer(huart1_drvdata.dmauartc);
   }
@@ -567,8 +567,8 @@ void MX_USART3_RxHalfCpltCallback(UART_HandleTypeDef * huart)
   if (HAL_DMA_ERROR_NONE == hdma->ErrorCode) {
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
     SCB_InvalidateDCache_by_Addr((uint32_t *)huart3_drvdata.dmauartc->rxq.mem,
-                                 ALIGN(sizeof(huart3_drvdata.dmauartc->rxq.mem),
-                                       CPUCFG_L1_CACHELINE_SIZE));
+                                 XWBOP_ALIGN(sizeof(huart3_drvdata.dmauartc->rxq.mem),
+                                             CPUCFG_L1_CACHELINE_SIZE));
 #endif /* STM32CUBECFG_DCACHE */
     stm32cube_usart3_cb_rxdma_halfcplt(huart3_drvdata.dmauartc);
   } else {
@@ -583,8 +583,8 @@ void MX_USART3_RxCpltCallback(UART_HandleTypeDef * huart)
   if (HAL_DMA_ERROR_NONE == hdma->ErrorCode) {
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
     SCB_InvalidateDCache_by_Addr((uint32_t *)huart3_drvdata.dmauartc->rxq.mem,
-                                 ALIGN(sizeof(huart3_drvdata.dmauartc->rxq.mem),
-                                       CPUCFG_L1_CACHELINE_SIZE));
+                                 XWBOP_ALIGN(sizeof(huart3_drvdata.dmauartc->rxq.mem),
+                                             CPUCFG_L1_CACHELINE_SIZE));
 #endif /* STM32CUBECFG_DCACHE */
     stm32cube_usart3_cb_rxdma_cplt(huart3_drvdata.dmauartc);
   } else {
@@ -608,7 +608,7 @@ void MX_USART3_TXDMA_Prepare(const xwu8_t * mem, xwsz_t size)
   huart3_drvdata.tx.size = cpsz;
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
   SCB_CleanDCache_by_Addr((uint32_t *)huart3_drvdata.tx.mem,
-                          (int32_t)ALIGN(cpsz, CPUCFG_L1_CACHELINE_SIZE));
+                          (int32_t)XWBOP_ALIGN(cpsz, CPUCFG_L1_CACHELINE_SIZE));
 #endif /* STM32CUBECFG_DCACHE */
 }
 
@@ -677,8 +677,8 @@ void MX_USART3_ErrorCallback(UART_HandleTypeDef * huart)
     huart->ErrorCode &= ~(HAL_UART_ERROR_RTO);
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
     SCB_InvalidateDCache_by_Addr((uint32_t *)huart3_drvdata.dmauartc->rxq.mem,
-                                 ALIGN(sizeof(huart3_drvdata.dmauartc->rxq.mem),
-                                       CPUCFG_L1_CACHELINE_SIZE));
+                                 XWBOP_ALIGN(sizeof(huart3_drvdata.dmauartc->rxq.mem),
+                                             CPUCFG_L1_CACHELINE_SIZE));
 #endif /* STM32CUBECFG_DCACHE */
     stm32cube_usart3_cb_rxdma_timer(huart3_drvdata.dmauartc);
   }

@@ -109,11 +109,11 @@ xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t len)
         xwbmp_t msk, tmp;
         xwssq_t p;
 
-        m = BITS_TO_BMPS(len);
+        m = BITS_TO_XWBMP_T(len);
         p = -1;
         for (i = 0; i < m; i++) {
                 if (i == (m - 1)) {
-                        msk = (BIT(len % BITS_PER_XWBMP_T) - (xwbmp_t)1);
+                        msk = (XWBOP_BIT(len % BITS_PER_XWBMP_T) - (xwbmp_t)1);
                         if ((xwbmp_t)0 == msk) {
                                 msk = (~(xwbmp_t)0);
                         }/* else {} */
@@ -148,11 +148,11 @@ xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t len)
         xwssq_t p;
         xwbmp_t tmp;
 
-        m = BITS_TO_BMPS(len);
+        m = BITS_TO_XWBMP_T(len);
         p = -1;
         for (i = 0; i < m; i++) {
                 if (i == (m - 1)) {
-                        msk = ~(BIT(len % BITS_PER_XWBMP_T) - (xwbmp_t)1);
+                        msk = ~(XWBOP_BIT(len % BITS_PER_XWBMP_T) - (xwbmp_t)1);
                         if ((~(xwbmp_t)0) == msk) {
                                 msk = (xwbmp_t)0;
                         }/* else {} */
@@ -185,8 +185,8 @@ xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t len)
         xwbmp_t msk, tmp;
         xwssq_t p;
 
-        i = BITS_TO_BMPS(len);
-        msk = (BIT(len % BITS_PER_XWBMP_T) - (xwbmp_t)1);
+        i = BITS_TO_XWBMP_T(len);
+        msk = (XWBOP_BIT(len % BITS_PER_XWBMP_T) - (xwbmp_t)1);
         if ((xwbmp_t)0 == msk) {
                 msk = (~(xwbmp_t)0);
         }/* else {} */
@@ -220,8 +220,8 @@ xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t len)
         xwssq_t p;
         xwbmp_t tmp;
 
-        i = BITS_TO_BMPS(len);
-        msk = ~(BIT(len % BITS_PER_XWBMP_T) - (xwbmp_t)1);
+        i = BITS_TO_XWBMP_T(len);
+        msk = ~(XWBOP_BIT(len % BITS_PER_XWBMP_T) - (xwbmp_t)1);
         if ((~(xwbmp_t)0) == msk) {
                 msk = (xwbmp_t)0;
         }/* else {} */

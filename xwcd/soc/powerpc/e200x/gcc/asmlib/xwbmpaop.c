@@ -29,16 +29,16 @@ bool xwbmpaop_t1i(xwbmp_a * bmp, xwsq_t idx)
         bool ret;
         xwbmp_t value;
 
-        bmp = bmp + BIT_BMP(idx);
+        bmp = bmp + XWBOP_BMP(idx);
         value = xwaop_load(xwbmp, bmp, xwmb_modr_consume);
-        ret = (bool)(!!(value & BIT_BMP_MASK(idx)));
+        ret = (bool)(!!(value & XWBOP_BMP_MASK(idx)));
         return ret;
 }
 
 __xwlib_code
 xwssq_t xwbmpaop_ffs_then_c0i(xwbmp_a * bmp, xwsz_t num)
 {
-        xwsz_t total = BITS_TO_BMPS(num);
+        xwsz_t total = BITS_TO_XWBMP_T(num);
         xwsq_t i;
         xwbmp_t msk;
         xwbmp_t ov, nv, m;
@@ -50,7 +50,7 @@ xwssq_t xwbmpaop_ffs_then_c0i(xwbmp_a * bmp, xwsz_t num)
                 pos = -ENODATA;
                 do {
                         if (i == total - 1) {
-                                msk = ((xwbmp_t)BIT(num % BITS_PER_XWBMP_T) -
+                                msk = ((xwbmp_t)XWBOP_BIT(num % BITS_PER_XWBMP_T) -
                                        (xwbmp_t)1);
                                 if ((xwbmp_t)0 == msk) {
                                         msk = ~(xwbmp_t)0;
@@ -83,7 +83,7 @@ xwssq_t xwbmpaop_ffs_then_c0i(xwbmp_a * bmp, xwsz_t num)
 __xwlib_code
 xwssq_t xwbmpaop_ffz_then_s1i(xwbmp_a * bmp, xwsz_t num)
 {
-        xwsz_t total = BITS_TO_BMPS(num);
+        xwsz_t total = BITS_TO_XWBMP_T(num);
         xwsq_t i;
         xwbmp_t msk;
         xwbmp_t tmp, ov, nv, m;
@@ -95,7 +95,7 @@ xwssq_t xwbmpaop_ffz_then_s1i(xwbmp_a * bmp, xwsz_t num)
                 pos = -ENODATA;
                 do {
                         if (i == (total - 1)) {
-                                msk = ((xwbmp_t)BIT(num % BITS_PER_XWBMP_T) -
+                                msk = ((xwbmp_t)XWBOP_BIT(num % BITS_PER_XWBMP_T) -
                                        (xwbmp_t)1);
                                 if ((xwbmp_t)0 == msk) {
                                         msk = ~(xwbmp_t)0;
@@ -129,7 +129,7 @@ xwssq_t xwbmpaop_ffz_then_s1i(xwbmp_a * bmp, xwsz_t num)
 __xwlib_code
 xwssq_t xwbmpaop_fls_then_c0i(xwbmp_a * bmp, xwsz_t num)
 {
-        xwsz_t total = BITS_TO_BMPS(num);
+        xwsz_t total = BITS_TO_XWBMP_T(num);
         xwsq_t i;
         xwbmp_t msk;
         xwbmp_t ov, nv, m;
@@ -139,7 +139,7 @@ xwssq_t xwbmpaop_fls_then_c0i(xwbmp_a * bmp, xwsz_t num)
         do {
                 i = total;
                 pos = -ENODATA;
-                msk = ((xwbmp_t)BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
+                msk = ((xwbmp_t)XWBOP_BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
                 if ((xwbmp_t)0 == msk) {
                         msk = ~(xwbmp_t)0;
                 }
@@ -170,7 +170,7 @@ xwssq_t xwbmpaop_fls_then_c0i(xwbmp_a * bmp, xwsz_t num)
 __xwlib_code
 xwssq_t xwbmpaop_flz_then_s1i(xwbmp_a * bmp, xwsz_t num)
 {
-        xwsz_t total = BITS_TO_BMPS(num);
+        xwsz_t total = BITS_TO_XWBMP_T(num);
         xwsq_t i;
         xwbmp_t msk;
         xwbmp_t tmp, ov, nv, m;
@@ -180,7 +180,7 @@ xwssq_t xwbmpaop_flz_then_s1i(xwbmp_a * bmp, xwsz_t num)
         do {
                 i = total;
                 pos = -ENODATA;
-                msk = ((xwbmp_t)BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
+                msk = ((xwbmp_t)XWBOP_BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
                 if ((xwbmp_t)0 == msk) {
                         msk = ~(xwbmp_t)0;
                 }

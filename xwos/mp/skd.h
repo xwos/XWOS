@@ -19,7 +19,7 @@
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/rtrq.h>
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
-#include <xwos/mp/bh.h>
+  #include <xwos/mp/bh.h>
 #endif /* XWMPCFG_SKD_BH */
 #include <xwos/mp/tt.h>
 
@@ -33,7 +33,7 @@
 
 #define XWMP_SKD_IDLE_STK(xwskd)                (&((xwskd)->idle))
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
-#define XWMP_SKD_BH_STK(xwskd)                  (&((xwskd)->bh))
+  #define XWMP_SKD_BH_STK(xwskd)                (&((xwskd)->bh))
 #endif /* XWMPCFG_SKD_BH */
 
 struct xwmp_pmdm;
@@ -44,7 +44,7 @@ struct xwmp_thd;
  * @brief 调度策略枚举
  */
 enum xwmp_skd_policy_em {
-        XWMP_SKD_POLICY_RT = BIT(0), /**< realtime */
+        XWMP_SKD_POLICY_RT = XWBOP_BIT(0), /**< realtime */
 };
 
 /**

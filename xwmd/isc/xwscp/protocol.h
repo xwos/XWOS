@@ -41,7 +41,7 @@
 
 #define XWSCP_ID_MSK            (0x7FU)
 #define XWSCP_ID(id)            ((xwu8_t)((xwu8_t)(id) & XWSCP_ID_MSK))
-#define XWSCP_ID_ACK            BIT(7)
+#define XWSCP_ID_ACK            XWBOP_BIT(7)
 
 #define XWSCP_ECSIZE(head)      (XWSCP_FRMHEAD_SIZE((head)->headsize) - \
                                  sizeof(struct xwscp_frmhead))

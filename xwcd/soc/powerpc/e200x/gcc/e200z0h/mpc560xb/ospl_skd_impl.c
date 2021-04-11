@@ -27,7 +27,7 @@
 
 #define SOC_STKFRAME_SIZE               0x50
 
-static __xwbsp_code
+__xwbsp_code
 xwer_t soc_skd_swi(xwer_t(* swifunc)(void *, void *), void * arg0, void * arg1);
 
 static __xwbsp_code
@@ -82,40 +82,6 @@ struct xwospl_skd * soc_skd_get_lc(void)
 #else
   #error "Can't find the configuration XuanWuOS_CFG_CORE!"
 #endif
-}
-
-/**
- * @brief 触发调度软中断
- * @param swifunc: (I) 软中断中要执行的函数
- * @param arg0: (I) 参数1
- * @param arg1: (I) 参数2
- * @return 被执行的函数的返回值
- */
-static __xwbsp_code
-xwer_t soc_skd_swi(xwer_t(* swifunc)(void *, void *), void * arg0, void * arg1)
-{
-        xwer_t rc;
-        xwreg_t value;
-        xwptr_t addr;
-
-        rc = XWOK;
-        value = 0x2U;
-        addr = (xwptr_t)&INTC.SSCIR[1];
-        asm volatile(
-        "       se_mr   3, %[__arg0]\n"
-        "       se_mr   4, %[__arg1]\n"
-        "       se_mr   5, %[__swifunc]\n"
-        "       se_stb  %[__value], 0 (%[__addr])\n"
-        "       se_mr   %[__rc], 3\n"
-        : [__rc] "=&r" (rc)
-        : [__arg0] "r" (arg0),
-          [__arg1] "r" (arg1),
-          [__swifunc] "r" (swifunc),
-          [__value] "r" (value),
-          [__addr] "r" (addr)
-        : "r3", "r4", "r5", "memory"
-        );
-        return rc;
 }
 
 /**

@@ -108,7 +108,7 @@ int xwlua_selsp_bmp(lua_State * L)
 
         selsp = (xwlua_sel_sp *)luaL_checkudata(L, 1, "xwlua_sel_sp");
         xwos_sel_get_num(selsp->sel, &bitnum);
-        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bitnum)) + sizeof(xwlua_bmp_t);
+        bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bitnum)) + sizeof(xwlua_bmp_t);
         bmp = lua_newuserdatauv(L, bmpsz, 0);
         bmp->bits = bitnum;
         xwbmpop_c0all(bmp->bmp, bmp->bits);
@@ -191,7 +191,7 @@ int xwlua_selsp_wait(lua_State * L)
                 switch (type) {
                 case LUA_TNUMBER:
                         time = (xwtm_t)luaL_checknumber(L, 3);
-                        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bitnum)) +
+                        bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bitnum)) +
                                 sizeof(xwlua_bmp_t);
                         trg = lua_newuserdatauv(L, bmpsz, 0);
                         trg->bits = bitnum;
@@ -204,7 +204,7 @@ int xwlua_selsp_wait(lua_State * L)
                         opt = luaL_checkoption(L, 3, "t", xwlua_sel_opt);
                         switch (opt) {
                         case XWLUA_SEL_OPT_TRY:
-                                bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bitnum)) +
+                                bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bitnum)) +
                                         sizeof(xwlua_bmp_t);
                                 trg = lua_newuserdatauv(L, bmpsz, 0);
                                 trg->bits = bitnum;
@@ -219,7 +219,7 @@ int xwlua_selsp_wait(lua_State * L)
                         }
                         break;
                 case LUA_TNIL:
-                        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bitnum)) +
+                        bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bitnum)) +
                                 sizeof(xwlua_bmp_t);
                         trg = lua_newuserdatauv(L, bmpsz, 0);
                         trg->bits = bitnum;
@@ -230,7 +230,7 @@ int xwlua_selsp_wait(lua_State * L)
                 default:
                         luaL_error(L, "Invalid arg type: %s", lua_typename(L, type));
                         rc = -EINVAL;
-                        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bitnum)) +
+                        bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bitnum)) +
                                 sizeof(xwlua_bmp_t);
                         trg = lua_newuserdatauv(L, bmpsz, 0);
                         trg->bits = bitnum;
@@ -239,7 +239,7 @@ int xwlua_selsp_wait(lua_State * L)
                         break;
                 }
         } else {
-                bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bitnum)) +
+                bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bitnum)) +
                         sizeof(xwlua_bmp_t);
                 trg = lua_newuserdatauv(L, bmpsz, 0);
                 trg->bits = bitnum;

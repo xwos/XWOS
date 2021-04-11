@@ -195,7 +195,7 @@ xwer_t xwpcp_hwifal_rx(struct xwpcp * xwpcp, union xwpcp_slot ** slotbuf)
         ecsize = XWPCP_ECSIZE(&stream.head);
         need = sizeof(union xwpcp_slot) + ecsize + sdusize +
                XWPCP_CRC32_SIZE + XWPCP_EOF_SIZE;
-        neednum = DIV_ROUND_UP(need, XWPCP_MEMBLK_SIZE);
+        neednum = XWBOP_DIV_ROUND_UP(need, XWPCP_MEMBLK_SIZE);
         odr = xwbop_fls(xwsz_t, neednum);
         if ((odr < 0) || ((XWPCP_MEMBLK_SIZE << odr) < need)) {
                 odr++;

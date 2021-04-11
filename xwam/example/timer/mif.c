@@ -57,7 +57,7 @@ struct xwos_thd * xwswtdemo_thd;
 struct xwos_swt xwswtdemo_swt0;
 struct xwos_swt * xwswtdemo_swt1;
 
-#define SWTFLG_NUM      (sizeof(xwbmp_t) * BITS_PER_BYTE)
+#define SWTFLG_NUM      (sizeof(xwbmp_t) * BITS_PER_XWU8_T)
 xwbmpop_declare(swtflg_bmp, SWTFLG_NUM) = {0,};
 xwbmpop_declare(swtflg_msk, SWTFLG_NUM) = {0,};
 struct xwos_flg swtflg;
@@ -178,7 +178,7 @@ xwer_t xwswtdemo_thd_func(void * arg)
 
         /* 设置掩码位为bit0:1共2位 */
         memset(msk, 0, sizeof(msk));
-        msk[0] = BIT(0) | BIT(1);
+        msk[0] = XWBOP_BIT(0) | XWBOP_BIT(1);
         while (!xwos_cthd_frz_shld_stop(NULL)) {
                 /* 等待事件 */
                 rc = xwos_flg_wait(&swtflg,

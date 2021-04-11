@@ -35,8 +35,8 @@
  */
 enum xwds_lin_mode_em {
         XWDS_LIN_MODE_CLOSE = 0,
-        XWDS_LIN_MODE_TX = BIT(0),
-        XWDS_LIN_MODE_RX = BIT(1),
+        XWDS_LIN_MODE_TX = XWBOP_BIT(0),
+        XWDS_LIN_MODE_RX = XWBOP_BIT(1),
 };
 
 /**

@@ -33,16 +33,16 @@
  * @brief 外部中断标志
  */
 enum xwds_soc_ei_flag_em {
-        XWDS_SOC_EIF_TM_RISING = BIT(0), /**< 上升沿触发 */
-        XWDS_SOC_EIF_TM_FALLING = BIT(1), /**< 下降沿触发 */
+        XWDS_SOC_EIF_TM_RISING = XWBOP_BIT(0), /**< 上升沿触发 */
+        XWDS_SOC_EIF_TM_FALLING = XWBOP_BIT(1), /**< 下降沿触发 */
         XWDS_SOC_EIF_TM_EITHER = XWDS_SOC_EIF_TM_RISING |
                                  XWDS_SOC_EIF_TM_FALLING, /**< 任意边沿触发 */
-        XWDS_SOC_EIF_TM_LOW = BIT(2), /**< 低电平触发*/
-        XWDS_SOC_EIF_TM_HIGH = BIT(3), /**< 高电平触发 */
+        XWDS_SOC_EIF_TM_LOW = XWBOP_BIT(2), /**< 低电平触发*/
+        XWDS_SOC_EIF_TM_HIGH = XWBOP_BIT(3), /**< 高电平触发 */
         XWDS_SOC_EIF_TM_MASK = XWDS_SOC_EIF_TM_RISING | XWDS_SOC_EIF_TM_FALLING |
                                XWDS_SOC_EIF_TM_LOW | XWDS_SOC_EIF_TM_HIGH,
-        XWDS_SOC_EIF_WKUP = BIT(4), /**< 唤醒 */
-        XWDS_SOC_EIF_DMA = BIT(5), /**< 触发DMA */
+        XWDS_SOC_EIF_WKUP = XWBOP_BIT(4), /**< 唤醒 */
+        XWDS_SOC_EIF_DMA = XWBOP_BIT(5), /**< 触发DMA */
 };
 
 xwer_t xwds_eirq_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask,

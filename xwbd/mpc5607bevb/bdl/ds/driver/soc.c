@@ -897,7 +897,7 @@ xwer_t mpc560xb_soc_drv_gpio_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinm
                         idx = port * SOC_GPIO_PIN_NUM + (xwu32_t)pin;
                         SIU.GPDO[idx].R = pc->dout;
                         SIU.PCR[idx].R = pc->cfg.u16;
-                        xwbop_c0m(xwsq_t, &pinmask, (xwsq_t)BIT(pin));
+                        xwbop_c0m(xwsq_t, &pinmask, (xwsq_t)XWBOP_BIT(pin));
                 }
         } while (pinmask);
         return XWOK;
@@ -916,7 +916,7 @@ xwer_t mpc560xb_soc_drv_gpio_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinm
                         idx = port * SOC_GPIO_PIN_NUM + (xwu32_t)pin;
                         SIU.PCR[idx].R = SOC_GPIO_PIN_DCFG;
                         SIU.GPDO[idx].R = 0;
-                        xwbop_c0m(xwsq_t, &pinmask, (xwsq_t)BIT(pin));
+                        xwbop_c0m(xwsq_t, &pinmask, (xwsq_t)XWBOP_BIT(pin));
                 }
         } while (pinmask);
         return XWOK;
@@ -937,7 +937,7 @@ xwer_t mpc560xb_soc_drv_gpio_cfg(struct xwds_soc * soc, xwid_t port, xwsq_t pinm
                 if (pin >= 0) {
                         idx = port * SOC_GPIO_PIN_NUM + (xwu32_t)pin;
                         SIU.PCR[idx].R = pc->cfg.u16;
-                        xwbop_c0m(xwsq_t, &pinmask, (xwsq_t)BIT(pin));
+                        xwbop_c0m(xwsq_t, &pinmask, (xwsq_t)XWBOP_BIT(pin));
                 }/* else {} */
         } while (pinmask);
         return XWOK;
@@ -955,7 +955,7 @@ xwer_t mpc560xb_soc_drv_gpio_set(struct xwds_soc * soc, xwid_t port, xwsq_t pinm
                 if (pin >= 0) {
                         idx = port * SOC_GPIO_PIN_NUM + (xwu32_t)pin;
                         SIU.GPDO[idx].R = SOC_GPIO_OUT_HIGH;
-                        xwbop_c0m(xwsq_t, &pinmask, (xwsq_t)BIT(pin));
+                        xwbop_c0m(xwsq_t, &pinmask, (xwsq_t)XWBOP_BIT(pin));
                 }/* else {} */
         } while (pinmask);
         return XWOK;
@@ -973,7 +973,7 @@ xwer_t mpc560xb_soc_drv_gpio_reset(struct xwds_soc * soc, xwid_t port, xwsq_t pi
                 if (pin >= 0) {
                         idx = port * SOC_GPIO_PIN_NUM + (xwu32_t)pin;
                         SIU.GPDO[idx].R = SOC_GPIO_OUT_LOW;
-                        xwbop_c0m(xwsq_t, &pinmask, (xwsq_t)BIT(pin));
+                        xwbop_c0m(xwsq_t, &pinmask, (xwsq_t)XWBOP_BIT(pin));
                 }/* else {} */
         } while (pinmask);
         return XWOK;
@@ -1037,35 +1037,35 @@ xwer_t mpc560xb_soc_drv_eirq_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinm
 
         if (eiid <= SOC_WKUP_MAX) {
                 if (XWDS_SOC_EIF_TM_RISING & eiflag) {
-                        WKUP.WIREER.R |= BIT(eiid);
+                        WKUP.WIREER.R |= XWBOP_BIT(eiid);
                 } else {
-                        WKUP.WIREER.R &= ~BIT(eiid);
+                        WKUP.WIREER.R &= ~XWBOP_BIT(eiid);
                 }
                 if (XWDS_SOC_EIF_TM_FALLING & eiflag) {
-                        WKUP.WIFEER.R |= BIT(eiid);
+                        WKUP.WIFEER.R |= XWBOP_BIT(eiid);
                 } else {
-                        WKUP.WIFEER.R &= ~BIT(eiid);
+                        WKUP.WIFEER.R &= ~XWBOP_BIT(eiid);
                 }
-                WKUP.IRER.R |= BIT(eiid);
-                WKUP.WIFER.R |= BIT(eiid);
+                WKUP.IRER.R |= XWBOP_BIT(eiid);
+                WKUP.WIFER.R |= XWBOP_BIT(eiid);
                 if (XWDS_SOC_EIF_WKUP & eiflag) {
-                        WKUP.WRER.R |= BIT(eiid);
+                        WKUP.WRER.R |= XWBOP_BIT(eiid);
                 } else {
-                        WKUP.WRER.R &= ~BIT(eiid);
+                        WKUP.WRER.R &= ~XWBOP_BIT(eiid);
                 }
         } else {
                 eiid -= SOC_EIRQ_MIN;
                 if (XWDS_SOC_EIF_TM_RISING & eiflag) {
-                        SIU.IREER.R |= BIT(eiid);
+                        SIU.IREER.R |= XWBOP_BIT(eiid);
                 } else {
-                        SIU.IREER.R &= ~BIT(eiid);
+                        SIU.IREER.R &= ~XWBOP_BIT(eiid);
                 }
                 if (XWDS_SOC_EIF_TM_FALLING & eiflag) {
-                        SIU.IFEER.R |= BIT(eiid);
+                        SIU.IFEER.R |= XWBOP_BIT(eiid);
                 } else {
-                        SIU.IFEER.R &= ~BIT(eiid);
+                        SIU.IFEER.R &= ~XWBOP_BIT(eiid);
                 }
-                SIU.IRER.R |= BIT(eiid);
+                SIU.IRER.R |= XWBOP_BIT(eiid);
         }
         return XWOK;
 }
@@ -1079,18 +1079,18 @@ xwer_t mpc560xb_soc_drv_eirq_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinm
         XWOS_UNUSED(pinmask);
 
         if (eiid <= SOC_WKUP_MAX) {
-                WKUP.WIREER.R &= ~BIT(eiid);
-                WKUP.WIFEER.R &= ~BIT(eiid);
-                WKUP.IRER.R &= ~BIT(eiid);
-                WKUP.WIFER.R &= ~BIT(eiid);
-                WKUP.WRER.R &= ~BIT(eiid);
-                WKUP.WISR.R |= BIT(eiid); /**< clear flag once */
+                WKUP.WIREER.R &= ~XWBOP_BIT(eiid);
+                WKUP.WIFEER.R &= ~XWBOP_BIT(eiid);
+                WKUP.IRER.R &= ~XWBOP_BIT(eiid);
+                WKUP.WIFER.R &= ~XWBOP_BIT(eiid);
+                WKUP.WRER.R &= ~XWBOP_BIT(eiid);
+                WKUP.WISR.R |= XWBOP_BIT(eiid); /**< clear flag once */
         } else {
                 eiid -= SOC_EIRQ_MIN;
-                SIU.IREER.R &= ~BIT(eiid);
-                SIU.IFEER.R &= ~BIT(eiid);
-                SIU.IRER.R &= ~BIT(eiid);
-                SIU.ISR.R |= BIT(eiid); /**< clear flag once */
+                SIU.IREER.R &= ~XWBOP_BIT(eiid);
+                SIU.IFEER.R &= ~XWBOP_BIT(eiid);
+                SIU.IRER.R &= ~XWBOP_BIT(eiid);
+                SIU.ISR.R |= XWBOP_BIT(eiid); /**< clear flag once */
         }
         return XWOK;
 }
@@ -1181,7 +1181,7 @@ void mpc560xb_wkup_irq0_7_isr(void)
                                 soc->eirq.isrs[eiid](soc, (xwid_t)eiid,
                                                      soc->eirq.isrargs[eiid]);
                         }
-                        WKUP.WISR.R |= BIT(eiid);
+                        WKUP.WISR.R |= XWBOP_BIT(eiid);
                 }
         } while (1);
 }
@@ -1204,7 +1204,7 @@ void mpc560xb_wkup_irq8_15_isr(void)
                                 soc->eirq.isrs[eiid](soc, (xwid_t)eiid,
                                                      soc->eirq.isrargs[eiid]);
                         }
-                        WKUP.WISR.R |= BIT(eiid);
+                        WKUP.WISR.R |= XWBOP_BIT(eiid);
                 }
         } while (1);
 }
@@ -1227,7 +1227,7 @@ void mpc560xb_wkup_irq16_23_isr(void)
                                 soc->eirq.isrs[eiid](soc, (xwid_t)eiid,
                                                      soc->eirq.isrargs[eiid]);
                         }
-                        WKUP.WISR.R |= BIT(eiid);
+                        WKUP.WISR.R |= XWBOP_BIT(eiid);
                 }
         } while (1);
 }
@@ -1250,7 +1250,7 @@ void mpc560xb_wkup_irq24_28_isr(void)
                                 soc->eirq.isrs[eiid](soc, (xwid_t)eiid,
                                                      soc->eirq.isrargs[eiid]);
                         }
-                        WKUP.WISR.R |= BIT(eiid);
+                        WKUP.WISR.R |= XWBOP_BIT(eiid);
                 }
         } while (1);
 }
@@ -1275,7 +1275,7 @@ void mpc560xb_eirq0_7_isr(void)
                                 soc->eirq.isrs[eiid](soc, eiid,
                                                      soc->eirq.isrargs[eiid]);
                         }
-                        SIU.ISR.R |= BIT(pos);
+                        SIU.ISR.R |= XWBOP_BIT(pos);
                 }
         } while (1);
 }
@@ -1300,7 +1300,7 @@ void mpc560xb_eirq8_15_isr(void)
                                 soc->eirq.isrs[eiid](soc, eiid,
                                                      soc->eirq.isrargs[eiid]);
                         }
-                        SIU.ISR.R |= BIT(pos); /* clear flag */
+                        SIU.ISR.R |= XWBOP_BIT(pos); /* clear flag */
                 }
         } while (1);
 }
@@ -1325,7 +1325,7 @@ void mpc560xb_eirq16_23_isr(void)
                                 soc->eirq.isrs[eiid](soc, eiid,
                                                      soc->eirq.isrargs[eiid]);
                         }
-                        SIU.ISR.R |= BIT(pos);
+                        SIU.ISR.R |= XWBOP_BIT(pos);
                 }
         } while (1);
 }

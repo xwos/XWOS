@@ -30,11 +30,11 @@ xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t num)
         xwbmp_t msk, tmp;
         xwssq_t p;
 
-        m = BITS_TO_BMPS(num);
+        m = BITS_TO_XWBMP_T(num);
         p = -1;
         for (i = 0; i < m; i++) {
                 if (i == (m - 1)) {
-                        msk = (BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
+                        msk = (XWBOP_BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
                         if ((xwbmp_t)0 == msk) {
                                 msk = (~(xwbmp_t)0);
                         }/* else {} */

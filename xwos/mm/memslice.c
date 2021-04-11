@@ -46,7 +46,7 @@ xwer_t xwmm_memslice_init(struct xwmm_memslice * msa, xwptr_t origin,
 
         XWOS_VALIDATE((msa), "nullptr", -EFAULT);
 
-        card_size = ALIGN(card_size, XWMM_ALIGNMENT);
+        card_size = XWBOP_ALIGN(card_size, XWMM_ALIGNMENT);
         num_max = total_size / card_size;
         if (0 == num_max) {
                 rc = -E2SMALL;

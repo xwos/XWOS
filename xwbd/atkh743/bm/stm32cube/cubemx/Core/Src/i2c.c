@@ -291,7 +291,7 @@ xwer_t MX_I2C2_Xfer(struct xwds_i2c_msg * msg)
       memcpy(hi2c2_drvdata.mem, msg->data, msg->size);
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
       SCB_CleanDCache_by_Addr((uint32_t *)hi2c2_drvdata.mem,
-                              (int32_t)ALIGN(msg->size, CPUCFG_L1_CACHELINE_SIZE));
+                              (int32_t)XWBOP_ALIGN(msg->size, CPUCFG_L1_CACHELINE_SIZE));
 #endif /* STM32CUBECFG_DCACHE */
       if ((msg->flag & XWDS_I2C_F_START) && (msg->flag & XWDS_I2C_F_STOP)) {
         hrc = HAL_I2C_Master_Seq_Transmit_DMA(&hi2c2, msg->addr,
@@ -349,8 +349,8 @@ void MX_I2C2_MasterRxCpltCallback(I2C_HandleTypeDef * hi2c)
 {
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
   SCB_InvalidateDCache_by_Addr((uint32_t *)hi2c2_drvdata.mem,
-                               (int32_t)ALIGN(hi2c2_drvdata.size,
-                                              CPUCFG_L1_CACHELINE_SIZE));
+                               (int32_t)XWBOP_ALIGN(hi2c2_drvdata.size,
+                                                    CPUCFG_L1_CACHELINE_SIZE));
 #endif /* STM32CUBECFG_DCACHE */
   memcpy(hi2c2_drvdata.msg->data, hi2c2_drvdata.mem, hi2c2_drvdata.size);
   stm32cube_i2c2m_cb_xfercplt(hi2c2_drvdata.i2cm, XWOK);

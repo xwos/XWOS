@@ -88,7 +88,7 @@ xwer_t xwmmdemo_bma_alloc(xwsz_t memsize, void ** membuf)
         xwer_t rc;
 
         /* 计算至少需要多少个连续的单位块 */
-        stknum = DIV_ROUND_UP(memsize, XWMMDEMO_BMA_BLKSIZE);
+        stknum = XWBOP_DIV_ROUND_UP(memsize, XWMMDEMO_BMA_BLKSIZE);
         /* 单位块的数量必须为2的n次方 */
         numodr = (xwsq_t)xwbop_fls(xwsz_t, stknum);
         if (stknum & (stknum - 1U)) {

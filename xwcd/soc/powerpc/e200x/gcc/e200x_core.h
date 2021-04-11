@@ -67,84 +67,10 @@ struct e200x_context {
         xwirq_t irqn;
 };
 
-/**
- * @brief load exclusively
- */
-static __xwbsp_inline
-xwu32_t lwarx(volatile void * addr)
-{
-        xwu32_t tmp;
-
-        asm volatile(
-        "       lwarx           %[__tmp], 0, %[__addr]\n"
-        : [__tmp] "=&r" (tmp)
-        : [__addr] "r" (addr)
-        : "memory"
-        );
-        return tmp;
-}
-
-/**
- * @brief store exclusively
- * @retval 0: OK
- * @retval !0: failed
- */
-static __xwbsp_inline
-xwer_t stwcx(volatile void * addr, xwu32_t value)
-{
-        xwer_t rc;
-
-        asm volatile(
-        "       stwcx.          %[__value], 0, %[__addr]\n"
-        "       se_bne          1f\n"
-        "       se_li           %[__rc], 0\n"
-        "       se_b            2f\n"
-        "1:\n"
-        "       se_li           %[__rc], 1\n"
-        "2:\n"
-        : [__rc] "=&r" (rc)
-        : [__value] "r" (value),
-          [__addr] "r" (addr)
-        : "memory", "cc"
-        );
-        return rc;
-}
-
-/**
- * @brief 反转字节序
- * @param addr: (I) 需要反转字节序的地址
- */
-static __xwbsp_inline
-xwu32_t lwbrx(volatile xwu32_t * addr)
-{
-        xwu32_t tmp;
-
-        asm volatile(
-        "       lwbrx           %[__tmp], 0, %[__addr]\n"
-        : [__tmp] "=&r" (tmp)
-        : [__addr] "r" (addr)
-        : "memory"
-        );
-        return tmp;
-}
-
-/**
- * @brief 反转半字的字节序
- * @param addr: (I) 需要反转字节序的地址
- */
-static __xwbsp_inline
-xwu16_t lhbrx(volatile xwu16_t * addr)
-{
-        xwu16_t tmp;
-
-        asm volatile(
-        "       lhbrx           %[__tmp], 0, %[__addr]\n"
-        : [__tmp] "=&r" (tmp)
-        : [__addr] "r" (addr)
-        : "memory"
-        );
-        return tmp;
-}
+xwu32_t lwarx(volatile void * addr);
+xwer_t stwcx(volatile void * addr, xwu32_t value);
+xwu32_t lwbrx(volatile xwu32_t * addr);
+xwu16_t lhbrx(volatile xwu16_t * addr);
 
 #endif /* #ifndef __ASM__ */
 

@@ -109,7 +109,7 @@ int xwlua_flgsp_bmp(lua_State * L)
 
         flgsp = (xwlua_flg_sp *)luaL_checkudata(L, 1, "xwlua_flg_sp");
         xwos_flg_get_num(flgsp->flg, &bitnum);
-        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bitnum)) + sizeof(xwlua_bmp_t);
+        bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bitnum)) + sizeof(xwlua_bmp_t);
         bmp = lua_newuserdatauv(L, bmpsz, 0);
         bmp->bits = bitnum;
         xwbmpop_c0all(bmp->bmp, bmp->bits);
@@ -177,7 +177,7 @@ int xwlua_flgsp_read(lua_State * L)
 
         flgsp = (xwlua_flg_sp *)luaL_checkudata(L, 1, "xwlua_flg_sp");
         xwos_flg_get_num(flgsp->flg, &bitnum);
-        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bitnum)) + sizeof(xwlua_bmp_t);
+        bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bitnum)) + sizeof(xwlua_bmp_t);
         out = lua_newuserdatauv(L, bmpsz, 0);
         out->bits = bitnum;
         xwbmpop_c0all(out->bmp, out->bits);

@@ -42,7 +42,7 @@ struct xwup_thd;
  * @brief 调度策略枚举
  */
 enum xwup_skd_policy_em {
-        XWUP_SKD_POLICY_RT = BIT(0), /**< realtime */
+        XWUP_SKD_POLICY_RT = XWBOP_BIT(0), /**< realtime */
 };
 
 /**

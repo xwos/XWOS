@@ -64,7 +64,7 @@ const struct xwds_resource_gpio mpc560xb_uart0_gpio_resources[] = {
         [0] = {
                 .soc = &mpc560xb_soc_cb,
                 .port = SOC_GPIO_PORT_B,
-                .pinmask = BIT(SOC_GPIO_PIN_2) | BIT(SOC_GPIO_PIN_3),
+                .pinmask = XWBOP_BIT(SOC_GPIO_PIN_2) | XWBOP_BIT(SOC_GPIO_PIN_3),
                 .description = "rsc.gpio.linflexd.0",
         },
 };

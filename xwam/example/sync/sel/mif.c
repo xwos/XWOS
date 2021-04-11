@@ -47,7 +47,7 @@ xwer_t xwseldemo_consumer_func(void * arg);
 xwer_t xwseldemo_producer_func(void * arg);
 xwer_t xwseldemo_syncthd_func(void * arg);
 
-#define XWSELDEMO_BMP_BITNUM    (sizeof(xwbmp_t) * BITS_PER_BYTE)
+#define XWSELDEMO_BMP_BITNUM    (sizeof(xwbmp_t) * BITS_PER_XWU8_T)
 
 xwbmpop_declare(xwseldemo_sel0_bmp, XWSELDEMO_BMP_BITNUM) = {0,};
 xwbmpop_declare(xwseldemo_sel0_msk, XWSELDEMO_BMP_BITNUM) = {0,};
@@ -371,7 +371,7 @@ xwer_t xwseldemo_consumer_func(void * arg)
                                 sellogf(INFO,
                                         "[消费者] 事件标志3触发，"
                                         "时间戳：%lld 纳秒。\n", ts);
-                                flgmsk[0] = BIT(0) | BIT(1);
+                                flgmsk[0] = XWBOP_BIT(0) | XWBOP_BIT(1);
                                 rc = xwos_flg_trywait(&xwseldemo_flg3,
                                                       XWOS_FLG_TRIGGER_SET_ANY,
                                                       XWOS_FLG_ACTION_CONSUMPTION,

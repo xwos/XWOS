@@ -18,24 +18,15 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <cfg/XuanWuOS.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       macros      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-        .equ            INTC_SSCIR0_3, 0xFFF48020
+        .equ            INTC_SSCIR0, 0xFFF48020
+        .equ            INTC_SSCIR1, 0xFFF48021
+        .equ            INTC_SSCIR2, 0xFFF48022
+        .equ            INTC_SSCIR3, 0xFFF48023
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********       .data       ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
         .extern         soc_context
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********         function prototypes         ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #if defined(XuanWuOS_CFG_CORE__mp)
         .extern         xwmp_skd_post_swcx_lic
 #elif defined(XuanWuOS_CFG_CORE__up)
@@ -45,9 +36,26 @@
         .extern         _SDA_BASE_
         .extern         _SDA2_BASE_
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
+/**
+ * @brief 触发调度软中断
+ * @param swifunc: (I) 软中断中要执行的函数
+ * @param arg0: (I) 参数1
+ * @param arg1: (I) 参数2
+ * @return 被执行的函数的返回值
+ */
+        .section        .xwos.text,"ax"
+        .global         soc_skd_swi
+        .align          4
+soc_skd_swi:
+        e_lis           r6, INTC_SSCIR1@h
+        e_or2i          r6, INTC_SSCIR1@l
+        se_li           r7, 2
+        se_stb          r7, 0 (r6) /* call r3(r4, r5) */
+        se_blr
+soc_skd_swi_end:
+        .size           soc_skd_swi, soc_skd_swi - soc_skd_swi
+
+
 /**
  * @brief switch context
  * @note
@@ -104,11 +112,10 @@
 soc_skd_isr_swcx:
 /* void soc_skd_isr_swcx(void) */
         /* clear IRQ flag */
-        e_lis           r3, INTC_SSCIR0_3@h
-        e_or2i          r3, INTC_SSCIR0_3@l
-        se_lwz          r4, 0 (r3)
-        se_bseti        r4, 7
-        se_stw          r4, 0 (r3)
+        e_lis           r3, INTC_SSCIR0@h
+        e_or2i          r3, INTC_SSCIR0@l
+        se_li           r4, 1
+        se_stb          r4, 0 (r3)
 
         /* reserved stack frame for compiler */
         e_stwu          r1, -32 (r1)
@@ -158,8 +165,7 @@ soc_skd_isr_swcx:
         se_addi         r1, 32  /* delete reserved frame (used by compiler) */
         se_blr
 soc_skd_isr_swcx_end:
-        .size           soc_skd_isr_swcx, \
-                        soc_skd_isr_swcx - soc_skd_isr_swcx
+        .size           soc_skd_isr_swcx, soc_skd_isr_swcx - soc_skd_isr_swcx
 
 /**
  * @brief Local CPU starts scheduler
@@ -220,11 +226,10 @@ xwospl_skd_start_lc_end:
 soc_skd_isr_swi:
         /* clear IRQ flag */
         se_mr           r6, r4                  /* @ref eii_sysisr, r4 is used as old SP */
-        e_lis           r3, INTC_SSCIR0_3@h
-        e_or2i          r3, INTC_SSCIR0_3@l
-        se_lwz          r4, 0 (r3)
-        se_bseti        r4, 15
-        se_stw          r4, 0 (r3)
+        e_lis           r3, INTC_SSCIR1@h
+        e_or2i          r3, INTC_SSCIR1@l
+        se_li           r4, 1
+        se_stb          r4, 0 (r3)
 
         se_lwz          r3, 0x28 (r6)           /* restore r3; arg0 */
         se_lwz          r4, 0x2C (r6)           /* restore r4; arg1 */
@@ -242,5 +247,4 @@ soc_skd_isr_swi:
         se_stw          r3, 0x28 (r6)           /* save the result */
         se_blr
 soc_skd_isr_swi_end:
-        .size           soc_skd_isr_swi, \
-                        soc_skd_isr_swi_end - soc_skd_isr_swi
+        .size           soc_skd_isr_swi, soc_skd_isr_swi_end - soc_skd_isr_swi

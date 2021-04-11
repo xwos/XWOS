@@ -41,7 +41,7 @@ xwer_t bdl_thd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf)
         xwsq_t numodr;
         xwer_t rc;
 
-        stknum = DIV_ROUND_UP(stack_size, BRDCFG_MM_STKMEMPOOL_BLKSZ);
+        stknum = XWBOP_DIV_ROUND_UP(stack_size, BRDCFG_MM_STKMEMPOOL_BLKSZ);
         numodr = (xwsq_t)xwbop_fls(xwsz_t, stknum);
         if (stknum & (stknum - 1U)) {
                 numodr++;

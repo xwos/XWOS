@@ -40,7 +40,7 @@
 
 #define XWPCP_ID_MSK            (0x7FU)
 #define XWPCP_ID(id)            ((xwu8_t)((xwu8_t)(id) & XWPCP_ID_MSK))
-#define XWPCP_ID_ACK            BIT(7)
+#define XWPCP_ID_ACK            XWBOP_BIT(7)
 
 #define XWPCP_ECSIZE(head)      (XWPCP_FRMHEAD_SIZE((head)->headsize) - \
                                  sizeof(struct xwpcp_frmhead))

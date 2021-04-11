@@ -26,7 +26,7 @@
 #define XWMM_BMA_MAX_ORDER              (126) /**< 最大的阶 */
 #define XWMM_BMA_COMBINED               (127) /**< 块已被合并 */
 #define XWMM_BMA_ORDER_MASK             (0x7FU) /**< 阶的掩码 */
-#define XWMM_BMA_INUSED                 (BIT(7)) /**< 块正在使用的标记 */
+#define XWMM_BMA_INUSED                 (XWBOP_BIT(7)) /**< 块正在使用的标记 */
 
 #if defined(XWMM_BMA_LOG)
   #define xwmm_bmalogf(lv, fmt, ...) xwlogf(lv, fmt, ##__VA_ARGS__)

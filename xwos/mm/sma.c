@@ -38,9 +38,9 @@ xwer_t xwmm_sma_init(struct xwmm_sma * sa,
 {
         xwer_t rc;
 
-        origin = ALIGN(origin, XWMM_ALIGNMENT);
-        size = ROUND(size, XWMM_ALIGNMENT);
-        pos = ALIGN(pos, XWMM_ALIGNMENT);
+        origin = XWBOP_ALIGN(origin, XWMM_ALIGNMENT);
+        size = XWBOP_ROUND(size, XWMM_ALIGNMENT);
+        pos = XWBOP_ALIGN(pos, XWMM_ALIGNMENT);
         if (size < pos) {
                 rc = -EINVAL;
         } else {
@@ -95,10 +95,10 @@ xwer_t xwmm_sma_alloc(struct xwmm_sma * sa, xwsz_t size, xwsz_t aligned,
                 aligned = XWMM_ALIGNMENT;
         }/* else {} */
 
-        size = ALIGN(size, XWMM_ALIGNMENT);
+        size = XWBOP_ALIGN(size, XWMM_ALIGNMENT);
         do {
                 cpos = xwaop_load(xwsq, &sa->pos, xwmb_modr_acquire);
-                tmp = ALIGN((sa->zone.origin + cpos), aligned);
+                tmp = XWBOP_ALIGN((sa->zone.origin + cpos), aligned);
                 npos = size + tmp - sa->zone.origin;
                 if (npos > sa->zone.size) {
                         rc = -ENOMEM;

@@ -109,7 +109,7 @@ int xwlua_brsp_bmp(lua_State * L)
 
         brsp = (xwlua_br_sp *)luaL_checkudata(L, 1, "xwlua_br_sp");
         xwos_br_get_num(brsp->br, &bitnum);
-        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bitnum)) + sizeof(xwlua_bmp_t);
+        bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bitnum)) + sizeof(xwlua_bmp_t);
         bmp = lua_newuserdatauv(L, bmpsz, 0);
         bmp->bits = bitnum;
         xwbmpop_c0all(bmp->bmp, bmp->bits);

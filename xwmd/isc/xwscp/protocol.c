@@ -720,7 +720,7 @@ xwer_t xwscp_fmt_msg(struct xwscp * xwscp,
         /* 申请帧槽 */
         xwscp_encode_sdusize(sdusize, ecsdusz, &ecsize);
         need = sizeof(union xwscp_slot) + ecsize;
-        neednum = DIV_ROUND_UP(need, XWSCP_MEMBLK_SIZE);
+        neednum = XWBOP_DIV_ROUND_UP(need, XWSCP_MEMBLK_SIZE);
         odr = xwbop_fls(xwsz_t, neednum);
         if ((odr < 0) || ((XWSCP_MEMBLK_SIZE << odr) < need)) {
                 odr++;

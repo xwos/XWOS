@@ -93,8 +93,8 @@ enum xwds_uart_parity_em {
  */
 enum xwds_uart_mode_em {
         XWDS_UART_MODE_CLOSE = 0,
-        XWDS_UART_MODE_TX = BIT(0),
-        XWDS_UART_MODE_RX = BIT(1),
+        XWDS_UART_MODE_TX = XWBOP_BIT(0),
+        XWDS_UART_MODE_RX = XWBOP_BIT(1),
 };
 
 /**
@@ -102,8 +102,8 @@ enum xwds_uart_mode_em {
  */
 enum xwds_uart_hardwareflowcontrol_em {
         XWDS_UART_HFC_NONE = 0,
-        XWDS_UART_HFC_RTS = BIT(0),
-        XWDS_UART_HFC_CTS = BIT(1),
+        XWDS_UART_HFC_RTS = XWBOP_BIT(0),
+        XWDS_UART_HFC_CTS = XWBOP_BIT(1),
 };
 
 /**

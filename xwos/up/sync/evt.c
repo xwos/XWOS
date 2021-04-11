@@ -78,7 +78,7 @@ struct xwup_evt * xwup_evt_alloc(xwsz_t num)
         xwbmp_t * bmp, * msk;
         xwsz_t bmpnum, bmpsize;
 
-        bmpnum = BITS_TO_BMPS(num);
+        bmpnum = BITS_TO_XWBMP_T(num);
         bmpsize = bmpnum * sizeof(xwbmp_t);
         evt = malloc(sizeof(struct xwup_evt) + bmpsize + bmpsize);
         if (NULL == evt) {
@@ -98,7 +98,7 @@ struct xwup_evt * xwup_evt_alloc(xwsz_t num)
         xwsz_t bmpnum, bmpsize;
         xwer_t rc;
 
-        bmpnum = BITS_TO_BMPS(num);
+        bmpnum = BITS_TO_XWBMP_T(num);
         bmpsize = bmpnum * sizeof(xwbmp_t);
         rc = xwmm_kma_alloc(sizeof(struct xwup_evt) + bmpsize + bmpsize,
                             XWMM_ALIGNMENT, &mem.anon);
@@ -137,7 +137,7 @@ void xwup_evt_activate(struct xwup_evt * evt, xwsq_t type)
 {
         xwsz_t size;
 
-        size = BITS_TO_BMPS(evt->num);
+        size = BITS_TO_XWBMP_T(evt->num);
         xwup_cond_activate(&evt->cond);
         evt->type = type;
         switch (type & XWUP_EVT_TYPE_MASK) {

@@ -696,7 +696,7 @@ void mpc560xb_dmauart0_err_isr(void)
                 rxdmarsc = dmauartc->rxdmarsc;
                 ch = rxdmarsc->ch;
                 tail = (xwsq_t)(EDMA.TCD[ch].COM.DADDR - (xwu32_t)dmauartc->rxq.mem);
-                if (!(EDMA.IRQRL.R & BIT(ch))) {
+                if (!(EDMA.IRQRL.R & XWBOP_BIT(ch))) {
                         xwds_dmauartc_drvcb_rxq_pub(dmauartc, tail);
                 }/* else {} */
         }

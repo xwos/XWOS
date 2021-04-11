@@ -39,7 +39,7 @@ const struct xwos_thd_desc board_thd_desc[] = {
                 .name = "led",
                 .prio = LED_TASK_PRIORITY,
                 .stack = NULL,
-                .stack_size = 1024,
+                .stack_size = 1536,
                 .func = led_task,
                 .arg = NULL,
                 .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
@@ -105,16 +105,16 @@ xwer_t led_task(void * arg)
         xwer_t rc;
 
         XWOS_UNUSED(arg);
-        pinmask = (BIT(SOC_GPIO_PIN_12) | BIT(SOC_GPIO_PIN_13));
+        pinmask = (XWBOP_BIT(SOC_GPIO_PIN_12) | XWBOP_BIT(SOC_GPIO_PIN_13));
         rc = XWOK;
         while (!xwos_cthd_frz_shld_stop(NULL)) {
                 rc = xwds_gpio_req(&mpc560xb_soc_cb, LED_PORT, pinmask);
                 if (XWOK == rc) {
                         while (1) {
-                                pinmask = BIT(SOC_GPIO_PIN_12);
+                                pinmask = XWBOP_BIT(SOC_GPIO_PIN_12);
                                 xwds_gpio_set(&mpc560xb_soc_cb, LED_PORT,
                                               pinmask);
-                                pinmask = BIT(SOC_GPIO_PIN_13);
+                                pinmask = XWBOP_BIT(SOC_GPIO_PIN_13);
                                 xwds_gpio_reset(&mpc560xb_soc_cb, LED_PORT,
                                                 pinmask);
                                 time = 500*XWTM_MS;
@@ -122,10 +122,10 @@ xwer_t led_task(void * arg)
                                 if (__xwcc_unlikely(rc < 0)) {
                                         break;
                                 }
-                                pinmask = BIT(SOC_GPIO_PIN_12);
+                                pinmask = XWBOP_BIT(SOC_GPIO_PIN_12);
                                 xwds_gpio_reset(&mpc560xb_soc_cb, LED_PORT,
                                                 pinmask);
-                                pinmask = BIT(SOC_GPIO_PIN_13);
+                                pinmask = XWBOP_BIT(SOC_GPIO_PIN_13);
                                 xwds_gpio_set(&mpc560xb_soc_cb, LED_PORT,
                                               pinmask);
                                 time = 500*XWTM_MS;

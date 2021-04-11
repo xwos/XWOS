@@ -102,7 +102,7 @@ __xwbsp_code
 xwer_t soc_irqc_drv_enable(xwirq_t irqn)
 {
         if (irqn >= 0) {
-                INTC.PSR[irqn].R |= BIT(SOC_IRQC_ENBIT);
+                INTC.PSR[irqn].R |= XWBOP_BIT(SOC_IRQC_ENBIT);
         }
         return XWOK;
 }
@@ -111,7 +111,7 @@ __xwbsp_code
 xwer_t soc_irqc_drv_disable(xwirq_t irqn)
 {
         if (irqn >= 0) {
-                INTC.PSR[irqn].R &= ~BIT(SOC_IRQC_ENBIT);
+                INTC.PSR[irqn].R &= ~XWBOP_BIT(SOC_IRQC_ENBIT);
         }
         return XWOK;
 }
@@ -123,7 +123,7 @@ xwer_t soc_irqc_drv_save(xwirq_t irqn, xwreg_t * flag)
 
         if (irqn >= 0) {
                 *flag = (xwreg_t)INTC.PSR[irqn].R;
-                INTC.PSR[irqn].R &= ~BIT(SOC_IRQC_ENBIT);
+                INTC.PSR[irqn].R &= ~XWBOP_BIT(SOC_IRQC_ENBIT);
                 rc = XWOK;
         } else {
                 rc = -EPERM;
@@ -166,8 +166,8 @@ xwer_t soc_irqc_drv_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg)
         xwu8_t prio;
 
         if (irqn >= 0) {
-                prio = INTC.PSR[irqn].R & BIT(SOC_IRQC_ENBIT);
-                prio |= (cfg->priority & (BIT(SOC_IRQC_ENBIT) - 1));
+                prio = INTC.PSR[irqn].R & XWBOP_BIT(SOC_IRQC_ENBIT);
+                prio |= (cfg->priority & (XWBOP_BIT(SOC_IRQC_ENBIT) - 1));
                 INTC.PSR[irqn].R = prio;
                 rc = XWOK;
         } else {
@@ -182,7 +182,7 @@ xwer_t soc_irqc_drv_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
         xwer_t rc;
 
         if (irqn >= 0) {
-                cfgbuf->priority = INTC.PSR[irqn].R & (BIT(SOC_IRQC_ENBIT) - 1);
+                cfgbuf->priority = INTC.PSR[irqn].R & (XWBOP_BIT(SOC_IRQC_ENBIT) - 1);
                 rc = XWOK;
         } else {
                 rc = -EPERM;

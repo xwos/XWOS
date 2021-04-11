@@ -193,7 +193,7 @@ xwer_t xwscp_hwifal_rx(struct xwscp * xwscp, union xwscp_slot ** slotbuf)
         ecsize = XWSCP_ECSIZE(&stream.head);
         need = sizeof(union xwscp_slot) + ecsize + sdusize +
                XWSCP_CRC32_SIZE + XWSCP_EOF_SIZE;
-        neednum = DIV_ROUND_UP(need, XWSCP_MEMBLK_SIZE);
+        neednum = XWBOP_DIV_ROUND_UP(need, XWSCP_MEMBLK_SIZE);
         odr = xwbop_fls(xwsz_t, neednum);
         if ((odr < 0) || ((XWSCP_MEMBLK_SIZE << odr) < need)) {
                 odr++;

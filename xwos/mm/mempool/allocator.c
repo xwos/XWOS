@@ -293,7 +293,7 @@ xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf
                 rc = XWOK;
                 *membuf = NULL;
         } else {
-                adjsize = ALIGN(size, 8);
+                adjsize = XWBOP_ALIGN(size, 8);
                 odr = xwbop_fls(xwsz_t, adjsize);
                 if ((odr < 0) || ((1U << odr) < adjsize)) {
                         odr++;

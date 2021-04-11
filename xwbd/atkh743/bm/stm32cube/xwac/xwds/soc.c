@@ -458,7 +458,7 @@ xwer_t stm32cube_soc_drv_eirq_req(struct xwds_soc * soc,
         xwccfg = soc->xwccfg;
 
         syscfg_exti_port = port;
-        if (BIT(eiid) == pinmask) {
+        if (XWBOP_BIT(eiid) == pinmask) {
                 syscfg_exti_line = xwccfg->eirq.exti_line_map[eiid];
                 LL_SYSCFG_SetEXTISource(syscfg_exti_port, syscfg_exti_line);
                 eicfg.Line_0_31 = pinmask;

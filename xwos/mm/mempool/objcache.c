@@ -78,7 +78,7 @@ xwer_t xwmm_mempool_objcache_init(struct xwmm_mempool_objcache * oc,
  * a: alignment area
  */
 
-        objsize = ALIGN(objsize, alignment);
+        objsize = XWBOP_ALIGN(objsize, alignment);
         if (ctor) {
                 xwu8_t obj[objsize];
                 ctor((void *)obj);
@@ -375,7 +375,7 @@ xwer_t xwmm_mempool_objcache_reserve(struct xwmm_mempool_objcache * oc,
         xwreg_t flag;
         xwer_t rc;
 
-        reserved = DIV_ROUND_UP(reserved, oc->pg_objnr);
+        reserved = XWBOP_DIV_ROUND_UP(reserved, oc->pg_objnr);
         xwaop_write(xwsz, &oc->reserved, reserved, NULL);
         capacity = xwaop_load(xwsz, &oc->capacity, xwmb_modr_relaxed);
         idleness = xwaop_load(xwsz, &oc->idleness, xwmb_modr_relaxed);

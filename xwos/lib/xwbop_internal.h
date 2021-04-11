@@ -16,19 +16,19 @@
 #include <xwos/standard.h>
 #include <asmlib/xwbop.h>
 
-#define BIT(n)                  (1UL << (n))
-#define BIT_BMP_MASK(n)         ((xwbmp_t)1 << (xwbmp_t)((n) % BITS_PER_XWBMP_T))
-#define BIT_BMP(n)              ((n) / BITS_PER_XWBMP_T)
-#define BITS_PER_BYTE           8
-#define DIV_ROUND(n, d)         ((n) / (d))
-#define DIV_ROUND_UP(n, d)      (((n) + (d) - 1U) / (d))
-#define SHIFT_ROUND(n, s)       ((n) >> (s))
-#define SHIFT_ROUND_UP(n, s)    (((n) + (1U << (s)) - 1U) >> (s))
-#define BITS_TO_BYTES(n)        DIV_ROUND_UP(n, BITS_PER_BYTE)
-#define BITS_TO_BMPS(n)         DIV_ROUND_UP(n, BITS_PER_BYTE * sizeof(xwbmp_t))
-#define ROUND(x, n)             ((x) & (~((n) - 1U)))
-#define ALIGN(x, n)             (((x) + ((n) - 1U)) & (~((n) - 1U)))
-#define GETBIT(x, n)            (((x) >> (n)) & 1U)
+#define XWBOP_BIT(n)  (1UL << (n))
+#define XWBOP_BMP_MASK(n)  ((xwbmp_t)1 << (xwbmp_t)((n) % BITS_PER_XWBMP_T))
+#define XWBOP_BMP(n)  ((n) / BITS_PER_XWBMP_T)
+#define BITS_PER_XWU8_T  8
+#define XWBOP_DIV_ROUND(n, d)  ((n) / (d))
+#define XWBOP_DIV_ROUND_UP(n, d)  (((n) + (d) - 1U) / (d))
+#define XWBOP_SHIFT_ROUND(n, s)  ((n) >> (s))
+#define XWBOP_SHIFT_ROUND_UP(n, s)  (((n) + (1U << (s)) - 1U) >> (s))
+#define BITS_TO_XWU8_T(n)  XWBOP_DIV_ROUND_UP(n, BITS_PER_XWU8_T)
+#define BITS_TO_XWBMP_T(n)  XWBOP_DIV_ROUND_UP(n, BITS_PER_XWU8_T * sizeof(xwbmp_t))
+#define XWBOP_ROUND(x, n)  ((x) & (~((n) - 1U)))
+#define XWBOP_ALIGN(x, n)  (((x) + ((n) - 1U)) & (~((n) - 1U)))
+#define XWBOP_TBIT(x, n)  (((x) >> (n)) & 1U)
 
 /******** ******** 8-bit data bit-operations ******** ********/
 #if (defined(ARCHCFG_LIB_XWBOP_S1M8) && (1 == ARCHCFG_LIB_XWBOP_S1M8))

@@ -36,9 +36,9 @@ struct xwpcp_hwifal_operation {
  */
 enum xwpcp_hwifal_state_em {
         XWPCP_HWIFST_CLOSED, /**< 硬件接口已经关闭 */
-        XWPCP_HWIFST_CONNECT = BIT(0), /**< 硬件接口已经连接 */
-        XWPCP_HWIFST_RX = BIT(1), /**< 硬件接口正在接收数据 */
-        XWPCP_HWIFST_TX = BIT(2), /**< 硬件接口正在发送数据 */
+        XWPCP_HWIFST_CONNECT = XWBOP_BIT(0), /**< 硬件接口已经连接 */
+        XWPCP_HWIFST_RX = XWBOP_BIT(1), /**< 硬件接口正在接收数据 */
+        XWPCP_HWIFST_TX = XWBOP_BIT(2), /**< 硬件接口正在发送数据 */
 };
 
 /**

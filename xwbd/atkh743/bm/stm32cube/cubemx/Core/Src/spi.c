@@ -391,7 +391,7 @@ xwer_t MX_SPI1_Xfer(const xwu8_t txd[], xwu8_t * rxb, xwsz_t size)
     memcpy(hspi1_drvdata.mem.tx, txd, size);
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
     SCB_CleanDCache_by_Addr((uint32_t *)hspi1_drvdata.mem.tx,
-                            (int32_t)ALIGN(size, CPUCFG_L1_CACHELINE_SIZE));
+                            (int32_t)XWBOP_ALIGN(size, CPUCFG_L1_CACHELINE_SIZE));
 #endif /* STM32CUBECFG_DCACHE */
     hrc = HAL_SPI_TransmitReceive_DMA(&hspi1,
                                       hspi1_drvdata.mem.tx,
@@ -401,7 +401,7 @@ xwer_t MX_SPI1_Xfer(const xwu8_t txd[], xwu8_t * rxb, xwsz_t size)
     memcpy(hspi1_drvdata.mem.tx, txd, size);
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
     SCB_CleanDCache_by_Addr((uint32_t *)hspi1_drvdata.mem.tx,
-                            (int32_t)ALIGN(size, CPUCFG_L1_CACHELINE_SIZE));
+                            (int32_t)XWBOP_ALIGN(size, CPUCFG_L1_CACHELINE_SIZE));
 #endif /* STM32CUBECFG_DCACHE */
     hrc = HAL_SPI_Transmit_DMA(&hspi1, hspi1_drvdata.mem.tx, size);
   } else if (rxb) {
@@ -440,8 +440,8 @@ void MX_SPI1_RxCpltCallback(SPI_HandleTypeDef * hspi)
 {
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
   SCB_InvalidateDCache_by_Addr((uint32_t *)hspi1_drvdata.mem.rx,
-                               (int32_t)ALIGN(hspi1_drvdata.size,
-                                              CPUCFG_L1_CACHELINE_SIZE));
+                               (int32_t)XWBOP_ALIGN(hspi1_drvdata.size,
+                                                    CPUCFG_L1_CACHELINE_SIZE));
 #endif /* STM32CUBECFG_DCACHE */
   memcpy(hspi1_drvdata.rxb, hspi1_drvdata.mem.rx, hspi1_drvdata.size);
   stm32cube_spi1m_cb_xfercplt(hspi1_drvdata.spim, XWOK);
@@ -451,8 +451,8 @@ void MX_SPI1_TxRxCpltCallback(SPI_HandleTypeDef * hspi)
 {
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
   SCB_InvalidateDCache_by_Addr((uint32_t *)hspi1_drvdata.mem.rx,
-                               (int32_t)ALIGN(hspi1_drvdata.size,
-                                              CPUCFG_L1_CACHELINE_SIZE));
+                               (int32_t)XWBOP_ALIGN(hspi1_drvdata.size,
+                                                    CPUCFG_L1_CACHELINE_SIZE));
 #endif /* STM32CUBECFG_DCACHE */
   memcpy(hspi1_drvdata.rxb, hspi1_drvdata.mem.rx, hspi1_drvdata.size);
   stm32cube_spi1m_cb_xfercplt(hspi1_drvdata.spim, XWOK);
@@ -522,7 +522,7 @@ xwer_t MX_SPI2_Xfer(const xwu8_t txd[], xwu8_t * rxb, xwsz_t size)
     memcpy(hspi2_drvdata.mem.tx, txd, size);
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
     SCB_CleanDCache_by_Addr((uint32_t *)hspi2_drvdata.mem.tx,
-                            (int32_t)ALIGN(size, CPUCFG_L1_CACHELINE_SIZE));
+                            (int32_t)XWBOP_ALIGN(size, CPUCFG_L1_CACHELINE_SIZE));
 #endif /* STM32CUBECFG_DCACHE */
     hrc = HAL_SPI_TransmitReceive_DMA(&hspi2,
                                       hspi2_drvdata.mem.tx,
@@ -532,7 +532,7 @@ xwer_t MX_SPI2_Xfer(const xwu8_t txd[], xwu8_t * rxb, xwsz_t size)
     memcpy(hspi2_drvdata.mem.tx, txd, size);
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
     SCB_CleanDCache_by_Addr((uint32_t *)hspi2_drvdata.mem.tx,
-                            (int32_t)ALIGN(size, CPUCFG_L1_CACHELINE_SIZE));
+                            (int32_t)XWBOP_ALIGN(size, CPUCFG_L1_CACHELINE_SIZE));
 #endif /* STM32CUBECFG_DCACHE */
     hrc = HAL_SPI_Transmit_DMA(&hspi2, hspi2_drvdata.mem.tx, size);
   } else if (rxb) {
@@ -571,8 +571,8 @@ void MX_SPI2_RxCpltCallback(SPI_HandleTypeDef * hspi)
 {
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
   SCB_InvalidateDCache_by_Addr((uint32_t *)hspi2_drvdata.mem.rx,
-                               (int32_t)ALIGN(hspi2_drvdata.size,
-                                              CPUCFG_L1_CACHELINE_SIZE));
+                               (int32_t)XWBOP_ALIGN(hspi2_drvdata.size,
+                                                    CPUCFG_L1_CACHELINE_SIZE));
 #endif /* STM32CUBECFG_DCACHE */
   memcpy(hspi2_drvdata.rxb, hspi2_drvdata.mem.rx, hspi2_drvdata.size);
   stm32cube_spi2m_cb_xfercplt(hspi2_drvdata.spim, XWOK);
@@ -582,8 +582,8 @@ void MX_SPI2_TxRxCpltCallback(SPI_HandleTypeDef * hspi)
 {
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
   SCB_InvalidateDCache_by_Addr((uint32_t *)hspi2_drvdata.mem.rx,
-                               (int32_t)ALIGN(hspi2_drvdata.size,
-                                              CPUCFG_L1_CACHELINE_SIZE));
+                               (int32_t)XWBOP_ALIGN(hspi2_drvdata.size,
+                                                    CPUCFG_L1_CACHELINE_SIZE));
 #endif /* STM32CUBECFG_DCACHE */
   memcpy(hspi2_drvdata.rxb, hspi2_drvdata.mem.rx, hspi2_drvdata.size);
   stm32cube_spi2m_cb_xfercplt(hspi2_drvdata.spim, XWOK);

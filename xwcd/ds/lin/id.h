@@ -24,11 +24,11 @@
 #include <xwcd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
 
-#define LIN_ID_PARITY(id)       ((((~(GETBIT((id), 1U) ^ GETBIT((id), 3U) ^           \
-                                     GETBIT((id), 4U) ^ GETBIT((id), 5U))) << 7U) |   \
-                                 ((GETBIT((id), 0U) ^ GETBIT((id), 1U) ^              \
-                                   GETBIT((id), 2U) ^ GETBIT((id), 4U)) << 6U)) &     \
-                                 0xC0U)
+#define LIN_ID_PARITY(id) ((((~(XWBOP_TBIT((id), 1U) ^ XWBOP_TBIT((id), 3U) ^ \
+                                XWBOP_TBIT((id), 4U) ^ XWBOP_TBIT((id), 5U))) << 7U) | \
+                            ((XWBOP_TBIT((id), 0U) ^ XWBOP_TBIT((id), 1U) ^ \
+                              XWBOP_TBIT((id), 2U) ^ XWBOP_TBIT((id), 4U)) << 6U)) & \
+                           0xC0U)
 #define LIN_ID_PARITY_FIELD(id) (LIN_ID_PARITY(id) | ((id) & 0xFFU))
 
 extern __xwds_rodata const unsigned char xwos_linid_table[64];

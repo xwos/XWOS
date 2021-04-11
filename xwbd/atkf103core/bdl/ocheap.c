@@ -37,7 +37,7 @@ xwer_t ocheap_alloc(xwsz_t memsize, void ** membuf)
         xwsq_t numodr;
         xwer_t rc;
 
-        stknum = DIV_ROUND_UP(memsize, BRDCFG_MM_OCHEAP_BLKSZ);
+        stknum = XWBOP_DIV_ROUND_UP(memsize, BRDCFG_MM_OCHEAP_BLKSZ);
         numodr = (xwsq_t)xwbop_fls(xwsz_t, stknum);
         if (stknum & (stknum - 1U)) {
                 numodr++;

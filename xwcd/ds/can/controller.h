@@ -74,9 +74,9 @@ struct xwds_canc_bd_cfg {
  * @brief CAN对象（消息）类型
  */
 enum xwds_canc_hwobj_type_em {
-        XWDS_CANC_HWOBJ_T_ID_STD = BIT(0), /**<  标准帧 */
-        XWDS_CANC_HWOBJ_T_ID_EXT = BIT(1), /**<  扩展帧 */
-        XWDS_CANC_HWOBJ_T_ID_MIXED = BIT(0) | BIT(1), /**<  混合帧 */
+        XWDS_CANC_HWOBJ_T_ID_STD = XWBOP_BIT(0), /**<  标准帧 */
+        XWDS_CANC_HWOBJ_T_ID_EXT = XWBOP_BIT(1), /**<  扩展帧 */
+        XWDS_CANC_HWOBJ_T_ID_MIXED = XWBOP_BIT(0) | XWBOP_BIT(1), /**<  混合帧 */
 };
 
 /**

@@ -22,7 +22,7 @@ int xwlua_bmp_new(lua_State * L)
         xwlua_bmp_t * luabmp;
 
         bits = (xwsz_t)luaL_checkinteger(L, 1);
-        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(bits)) + sizeof(xwlua_bmp_t);
+        bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bits)) + sizeof(xwlua_bmp_t);
         luabmp = lua_newuserdatauv(L, bmpsz, 0);
         luabmp->bits = bits;
         xwbmpop_c0all(luabmp->bmp, luabmp->bits);
@@ -355,7 +355,7 @@ int xwlua_bmp_band(lua_State * L)
                 luaL_error(L, "Bit number is mismatched!");
                 lua_pushnil(L);
         } else {
-                bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(opd1->bits)) +
+                bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(opd1->bits)) +
                         sizeof(xwlua_bmp_t);
                 luabmp = lua_newuserdatauv(L, bmpsz, 0);
                 luabmp->bits = opd1->bits;
@@ -379,7 +379,7 @@ int xwlua_bmp_bor(lua_State * L)
                 luaL_error(L, "Bit number is mismatched!");
                 lua_pushnil(L);
         } else {
-                bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(opd1->bits)) +
+                bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(opd1->bits)) +
                         sizeof(xwlua_bmp_t);
                 luabmp = lua_newuserdatauv(L, bmpsz, 0);
                 luabmp->bits = opd1->bits;
@@ -403,7 +403,7 @@ int xwlua_bmp_bxor(lua_State * L)
                 luaL_error(L, "Bit number is mismatched!");
                 lua_pushnil(L);
         } else {
-                bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(opd1->bits)) +
+                bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(opd1->bits)) +
                         sizeof(xwlua_bmp_t);
                 luabmp = lua_newuserdatauv(L, bmpsz, 0);
                 luabmp->bits = opd1->bits;
@@ -421,7 +421,7 @@ int xwlua_bmp_bnot(lua_State * L)
         xwsz_t bmpsz;
 
         opd = (xwlua_bmp_t *)luaL_checkudata(L, 1, "xwlua_bmp_t");
-        bmpsz = (sizeof(xwbmp_t) * BITS_TO_BMPS(opd->bits)) + sizeof(xwlua_bmp_t);
+        bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(opd->bits)) + sizeof(xwlua_bmp_t);
         luabmp = lua_newuserdatauv(L, bmpsz, 0);
         luabmp->bits = opd->bits;
         luaL_setmetatable(L, "xwlua_bmp_t");
@@ -465,7 +465,7 @@ int xwlua_bmp_tostring(lua_State * L)
         xwsz_t aysz;
 
         luabmp = (xwlua_bmp_t *)luaL_checkudata(L, 1, "xwlua_bmp_t");
-        aysz = BITS_TO_BMPS(luabmp->bits);
+        aysz = BITS_TO_XWBMP_T(luabmp->bits);
         luaL_buffinit(L, &sb);
         while (aysz > 0) {
                 aysz--;

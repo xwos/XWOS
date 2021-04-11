@@ -22,7 +22,7 @@
  * @param name: (I) 符号名
  * @param bits: (I) 位图中的位数
  */
-#define xwbmpaop_declare(name, bits)    xwbmp_a name[BITS_TO_BMPS(bits)]
+#define xwbmpaop_declare(name, bits)    xwbmp_a name[BITS_TO_XWBMP_T(bits)]
 
 bool xwbmpaop_t1i(xwbmp_a * bmp, xwsq_t idx);
 
@@ -52,7 +52,7 @@ xwssq_t xwbmpaop_ffz_then_s1i(xwbmp_a * bmp, xwsz_t num);
 static __xwlib_inline
 void xwbmpaop_s1all(xwbmp_a * bmp, xwsq_t num)
 {
-        xwsz_t n = BITS_TO_BMPS(num);
+        xwsz_t n = BITS_TO_XWBMP_T(num);
         xwsz_t i;
 
         for (i = 0; i < n; i++) {
@@ -68,7 +68,7 @@ void xwbmpaop_s1all(xwbmp_a * bmp, xwsq_t num)
 static __xwlib_inline
 void xwbmpaop_c0all(xwbmp_a * bmp, xwsq_t num)
 {
-        xwsz_t n = BITS_TO_BMPS(num);
+        xwsz_t n = BITS_TO_XWBMP_T(num);
         xwsz_t i;
 
         for (i = 0; i < n; i++) {

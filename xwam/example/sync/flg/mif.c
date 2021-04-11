@@ -41,7 +41,7 @@ xwer_t xwflgdemo_producer_func(void * arg);
 /**
  * @brief 静态定义的事件标志
  */
-#define XWFLGDEMO_FLG_NUM       (sizeof(xwbmp_t) * BITS_PER_BYTE)
+#define XWFLGDEMO_FLG_NUM       (sizeof(xwbmp_t) * BITS_PER_XWU8_T)
 xwbmpop_declare(xwflgdemo_flg_bmp, XWFLGDEMO_FLG_NUM) = {0,};
 xwbmpop_declare(xwflgdemo_flg_msk, XWFLGDEMO_FLG_NUM) = {0,};
 struct xwos_flg xwflgdemo_flg;

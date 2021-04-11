@@ -25,7 +25,7 @@
 __xwlib_code
 xwssq_t xwbmpaop_ffz_then_s1i(xwbmp_a * bmp, xwsz_t num)
 {
-        xwsz_t total = BITS_TO_BMPS(num);
+        xwsz_t total = BITS_TO_XWBMP_T(num);
         xwsq_t i;
         xwbmp_t msk;
         xwbmp_t tmp, ov, nv, m;
@@ -37,7 +37,7 @@ xwssq_t xwbmpaop_ffz_then_s1i(xwbmp_a * bmp, xwsz_t num)
                 pos = -ENODATA;
                 do {
                         if (i == (total - 1)) {
-                                msk = ((xwbmp_t)BIT(num % BITS_PER_XWBMP_T) -
+                                msk = ((xwbmp_t)XWBOP_BIT(num % BITS_PER_XWBMP_T) -
                                        (xwbmp_t)1);
                                 if ((xwbmp_t)0 == msk) {
                                         msk = ~(xwbmp_t)0;

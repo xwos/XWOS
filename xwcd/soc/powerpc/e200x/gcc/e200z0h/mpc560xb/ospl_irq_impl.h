@@ -29,10 +29,10 @@
   #error "This file should be included from <xwos/ospl/irq.h>."
 #endif
 
-#define SOC_IRQC_MAX_PRIO       (0xFU) /* 0b1111 最高有效位作为onoff开关 */
-#define SOC_IRQC_OS_PRIO        (0x8U) /* 0b1000 */
+#define SOC_IRQC_MAX_PRIO       (0xFU)
+#define SOC_IRQC_OS_PRIO        (0x8U)
 #define SOC_IRQC_MIN_PRIO       (SOC_IRQC_OS_PRIO + 1U)
-#define SOC_IRQC_ENBIT          (3U) /* BIT(3) 作为onoff开关 */
+#define SOC_IRQC_ENBIT          (3U)
 
 #define SOC_SYSHWT_PRIO         (SOC_IRQC_OS_PRIO)
 
