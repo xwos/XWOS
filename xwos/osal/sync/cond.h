@@ -225,6 +225,7 @@ xwer_t xwos_cond_put(struct xwos_cond * cond)
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个条件量对象，不可重入
+ * - 绑定方式：非独占绑定
  * @note
  * - 绑定了信号选择器的条件量对象，只有广播才会向信号选择器发送信号。
  */
@@ -401,7 +402,7 @@ xwer_t xwos_cond_wait(struct xwos_cond * cond,
  * - 上下文：线程
  * - 重入性：可重入
  * @note
- * - 函数返回**-ETIMEDOUT**时，**xwtm**指向的缓冲区内的值减为0。
+ * - 函数返回*-ETIMEDOUT*时，*xwtm*指向的缓冲区内的值减为0。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_timedwait(struct xwos_cond * cond,

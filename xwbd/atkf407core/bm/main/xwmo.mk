@@ -29,7 +29,6 @@ XWMO_CSRCS += main.c xwpcp.c xwscp.c
 # 定义编译选项
 XWMO_CFLAGS :=
 XWMO_CFLAGS += -Wno-undef -Wno-unused-parameter
-XWMO_CFLAGS += $(CUBEMX_CFLAGS)
 
 # 定义头文件路径
 XWMO_INCDIRS := $(call getXwmoDir) # getXwmoDir函数可获取当前玄武模块的路径

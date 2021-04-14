@@ -36,23 +36,15 @@ struct xwup_evt;
  */
 #define XWUP_VSEM_NEGTIVE     ((xwssq_t)(-1))
 
-__xwup_code
 void xwup_vsem_activate(struct xwup_vsem * sem);
 
-__xwup_code
-xwer_t xwup_vsem_bind(struct xwup_vsem * sem, struct xwup_evt * evt,
-                      xwsq_t pos);
-
-__xwup_code
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+xwer_t xwup_vsem_bind(struct xwup_vsem * sem, struct xwup_evt * evt, xwsq_t pos);
 xwer_t xwup_vsem_unbind(struct xwup_vsem * sem, struct xwup_evt * evt);
+#endif /* XWUPCFG_SYNC_EVT */
 
-__xwup_code
 xwer_t xwup_vsem_freeze(struct xwup_vsem * sem);
-
-__xwup_code
 xwer_t xwup_vsem_thaw(struct xwup_vsem * sem);
-
-__xwup_code
 xwer_t xwup_vsem_getvalue(struct xwup_vsem * sem, xwssq_t * sval);
 
 /*

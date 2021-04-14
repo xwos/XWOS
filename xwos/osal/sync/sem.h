@@ -234,6 +234,7 @@ xwer_t xwos_sem_put(struct xwos_sem * sem)
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个信号量对象，不可重入
+ * - 绑定方式：独占绑定
  */
 static __xwos_inline_api
 xwer_t xwos_sem_bind(struct xwos_sem * sem, struct xwos_sel * sel, xwsq_t pos)
@@ -342,7 +343,7 @@ xwer_t xwos_sem_wait(struct xwos_sem * sem)
 }
 
 /**
- * @brief XWOS API：检测一下信号量对象，不会阻塞调用者
+ * @brief XWOS API：检测一下信号量对象，不会阻塞调用线程
  * @param sem: (I) 信号量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -376,7 +377,7 @@ xwer_t xwos_sem_trywait(struct xwos_sem * sem)
  * - 上下文：线程
  * - 重入性：可重入
  * @note
- * - 函数返回**-ETIMEDOUT**时，**xwtm**指向的缓冲区内的值减为0。
+ * - 函数返回*-ETIMEDOUT*时，*xwtm*指向的缓冲区内的值减为0。
  */
 static __xwos_inline_api
 xwer_t xwos_sem_timedwait(struct xwos_sem * sem, xwtm_t * xwtm)

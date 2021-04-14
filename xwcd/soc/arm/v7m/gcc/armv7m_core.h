@@ -1634,10 +1634,4 @@ void sev(void)
         __asm__ volatile("sev");
 }
 
-/**
- * @brief Set a breakpoint
- * @param val: an 8-bit value that is stored in the instruction
- */
-#define bkpt(val) __asm__ volatile("bkpt  %[__val]\n" : : [__val] "i" (val))
-
 #endif /* armv7m_core.h */

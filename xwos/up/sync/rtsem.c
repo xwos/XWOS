@@ -408,7 +408,7 @@ xwer_t xwup_rtsem_wait(struct xwup_rtsem * sem)
 }
 
 /**
- * @brief XWUP API：尝试获取实时信号量
+ * @brief XWUP API：尝试获取实时信号量，不会阻塞调用线程
  * @param sem: (I) 信号量对象的指针
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -418,7 +418,7 @@ xwer_t xwup_rtsem_wait(struct xwup_rtsem * sem)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  * @note
- * - 此函数不会阻塞调用者，此函数可在中断上下文中使用。
+ * - 此函数不会阻塞调用线程，此函数可在中断上下文中使用。
  */
 __xwup_api
 xwer_t xwup_rtsem_trywait(struct xwup_rtsem * sem)

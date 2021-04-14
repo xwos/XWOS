@@ -253,7 +253,7 @@ xwer_t xwos_mtx_lock(struct xwos_mtx * mtx)
 }
 
 /**
- * @brief XWOS API：尝试上锁互斥锁，不会阻塞调用者
+ * @brief XWOS API：尝试上锁互斥锁，不会阻塞调用线程
  * @param mtx: (I) 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -265,7 +265,7 @@ xwer_t xwos_mtx_lock(struct xwos_mtx * mtx)
  * - 上下文：线程
  * - 重入性：不可重入
  * @note
- * - 此函数虽然不会阻塞调用者，但也不可在中断上下文中使用，因为在OS中
+ * - 此函数虽然不会阻塞调用线程，但也不可在中断上下文中使用，因为在OS中
  *   互斥锁通常需要记录自己的拥有者（一般是线程对象结构体），
  *   中断上下文不存在对应的线程对象结构体。
  */
@@ -292,7 +292,7 @@ xwer_t xwos_mtx_trylock(struct xwos_mtx * mtx)
  * - 上下文：线程
  * - 重入性：不可重入
  * @note
- * - 函数返回**-ETIMEDOUT**时，**xwtm**指向的缓冲区内的值减为0。
+ * - 函数返回*-ETIMEDOUT*时，*xwtm*指向的缓冲区内的值减为0。
  */
 static __xwos_inline_api
 xwer_t xwos_mtx_timedlock(struct xwos_mtx * mtx, xwtm_t * xwtm)

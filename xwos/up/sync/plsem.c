@@ -403,7 +403,7 @@ xwer_t xwup_plsem_wait(struct xwup_plsem * sem)
 }
 
 /**
- * @brief XWUP API：尝试获取管道信号量，不会阻塞调用者
+ * @brief XWUP API：尝试获取管道信号量，不会阻塞调用线程
  * @param sem: (I) 信号量对象的指针
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -413,7 +413,7 @@ xwer_t xwup_plsem_wait(struct xwup_plsem * sem)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  * @note
- * - 此函数不会阻塞调用者，因此可以在中断上下文中使用。
+ * - 此函数不会阻塞调用线程，因此可以在中断上下文中使用。
  */
 __xwup_api
 xwer_t xwup_plsem_trywait(struct xwup_plsem * sem)

@@ -414,6 +414,11 @@ xwer_t xwmp_sem_bind(struct xwmp_sem * sem, struct xwmp_evt * evt, xwsq_t pos)
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
 
+        rc = xwmp_sem_grab(sem);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_sem_grab;
+        }
+
         switch (sem->type) {
 #if defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
         case XWMP_SEM_TYPE_PIPELINE:
@@ -437,8 +442,11 @@ xwer_t xwmp_sem_bind(struct xwmp_sem * sem, struct xwmp_evt * evt, xwsq_t pos)
 #endif /* XWMPCFG_SYNC_RTSEM */
         default:
                 rc = -ETYPE;
+                xwmp_sem_put(sem);
                 break;
         }
+
+err_sem_grab:
         return rc;
 }
 
@@ -474,6 +482,7 @@ xwer_t xwmp_sem_unbind(struct xwmp_sem * sem, struct xwmp_evt * evt)
                         rc = xwmp_sel_obj_c0i(evt, &sem->synobj);
                 }
                 xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
+                xwmp_sem_put(sem);
                 break;
 #endif /* XWMPCFG_SYNC_PLSEM */
 #if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
@@ -484,6 +493,7 @@ xwer_t xwmp_sem_unbind(struct xwmp_sem * sem, struct xwmp_evt * evt)
                         rc = xwmp_sel_obj_c0i(evt, &sem->synobj);
                 }
                 xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
+                xwmp_sem_put(sem);
                 break;
 #endif /* XWMPCFG_SYNC_RTSEM */
         default:
@@ -784,7 +794,7 @@ xwer_t xwmp_plsem_wait(struct xwmp_sem * sem)
 }
 
 /**
- * @brief XWMP API：尝试获取管道信号量，不会阻塞调用者
+ * @brief XWMP API：尝试获取管道信号量，不会阻塞调用线程
  * @param sem: (I) 信号量对象的指针
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -1484,7 +1494,7 @@ xwer_t xwmp_rtsem_wait(struct xwmp_sem * sem)
 }
 
 /**
- * @brief XWMP API：尝试获取实时信号量
+ * @brief XWMP API：尝试获取实时信号量，不会阻塞调用线程
  * @param sem: (I) 信号量对象的指针
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针

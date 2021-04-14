@@ -290,6 +290,7 @@ xwer_t xwos_flg_put(struct xwos_flg * flg)
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个事件标志对象，不可重入
+ * - 绑定方式：非独占绑定
  */
 static __xwos_inline_api
 xwer_t xwos_flg_bind(struct xwos_flg * flg, struct xwos_sel * sel, xwsq_t pos)
@@ -481,7 +482,7 @@ xwer_t xwos_flg_read(struct xwos_flg * flg, xwbmp_t out[])
 }
 
 /**
- * @brief XWOS API：检测一下事件标志对象的触发事件，不会阻塞调用者
+ * @brief XWOS API：检测一下事件标志对象的触发事件，不会阻塞调用线程
  * @param flg: (I) 事件标志对象指针
  * @param trigger: (I) 事件触发条件，取值 @ref xwos_flg_trigger_em
  * @param action: (I) 事件触发后的动作，取值 @ref xwos_flg_action_em，
@@ -605,7 +606,7 @@ xwer_t xwos_flg_wait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
  * - 上下文：线程
  * - 重入性：可重入
  * @note
- * - 函数返回返回**-ETIMEDOUT**时，**xwtm**指向的缓冲区内的期望时间会减为0。
+ * - 函数返回返回*-ETIMEDOUT*时，*xwtm*指向的缓冲区内的期望时间会减为0。
  */
 static __xwos_inline_api
 xwer_t xwos_flg_timedwait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,

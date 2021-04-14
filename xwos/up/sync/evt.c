@@ -760,7 +760,7 @@ xwer_t xwup_flg_trywait_edge(struct xwup_evt * evt, xwsq_t trigger,
 }
 
 /**
- * @brief XWUP API：检测一下事件对象中的触发信号，不会阻塞调用者，
+ * @brief XWUP API：检测一下事件对象中的触发信号，不会阻塞调用线程，
  *                  事件对象类型为XWUP_EVT_TYPE_FLG
  * @param evt: (I) 事件对象的指针
  * @param trigger: (I) 事件触发条件，取值 @ref xwup_flg_trigger_em
@@ -1201,7 +1201,7 @@ err_notconn:
  * @brief XWUP API：等待事件对象中绑定的同步对象，
  *                  事件对象类型为XWUP_EVT_TYPE_SEL
  * @param evt: (I) 事件对象的指针
- * @param msk: (I) 待触发的同步对象位图掩码
+ * @param msk: (I) 同步对象位图掩码，表示只关注掩码内的同步对象
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -1222,9 +1222,9 @@ xwer_t xwup_sel_select(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
 }
 
 /**
- * @brief XWUP API：检测一下事件对象中绑定的同步对象，不会阻塞调用者
+ * @brief XWUP API：检测一下事件对象中绑定的同步对象，不会阻塞调用线程
  * @param evt: (I) 事件对象的指针
- * @param msk: (I) 待触发的同步对象位图掩码
+ * @param msk: (I) 同步对象位图掩码，表示只关注掩码内的同步对象
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -1274,7 +1274,7 @@ xwer_t xwup_sel_tryselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
  * @brief XWUP API：限时等待事件对象中绑定的同步对象，
  *                  事件对象类型为XWUP_EVT_TYPE_SEL
  * @param evt: (I) 事件对象的指针
- * @param msk: (I) 待触发的同步对象位图掩码
+ * @param msk: (I) 同步对象位图掩码，表示只关注掩码内的同步对象
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间

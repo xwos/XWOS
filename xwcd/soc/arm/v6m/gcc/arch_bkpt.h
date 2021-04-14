@@ -29,7 +29,7 @@
 static __xwbsp_inline
 void arch_bkpt(void)
 {
-        bkpt(0);
+        __asm__ volatile("bkpt  %[__val]\n" : : [__val] "i" (0));
 }
 
 #endif /* arch_bkpt.h */

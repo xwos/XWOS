@@ -190,13 +190,6 @@ xwer_t xwosdl_sem_delete(struct xwosdl_sem * sem)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sem_bind(struct xwosdl_sem * sem, struct xwosdl_sel * sel,
-                       xwsq_t pos)
-{
-        return xwup_plsem_bind(sem, sel, pos);
-}
-
-static __xwcc_inline
 xwsq_t xwosdl_sem_gettik(struct xwosdl_sem * sem)
 {
         XWOS_UNUSED(sem);
@@ -231,6 +224,13 @@ xwer_t xwosdl_sem_put(struct xwosdl_sem * sem)
 {
         XWOS_UNUSED(sem);
         return XWOK;
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sem_bind(struct xwosdl_sem * sem, struct xwosdl_sel * sel,
+                       xwsq_t pos)
+{
+        return xwup_plsem_bind(sem, sel, pos);
 }
 
 static __xwcc_inline

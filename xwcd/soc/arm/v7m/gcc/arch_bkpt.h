@@ -21,7 +21,7 @@
 #ifndef __arch_bkpt_h__
 #define __arch_bkpt_h__
 
-#include <armv7m_core.h>
+#include <xwos/standard.h>
 
 /**
  * @brief 设置一个断点
@@ -29,7 +29,7 @@
 static __xwbsp_inline
 void arch_bkpt(void)
 {
-        bkpt(0);
+        __asm__ volatile("bkpt  %[__val]\n" : : [__val] "i" (0));
 }
 
 #endif /* arch_bkpt.h */

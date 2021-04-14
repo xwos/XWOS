@@ -41,11 +41,10 @@ void xwup_vsem_activate(struct xwup_vsem * vsem)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *vsem* ，不可重入
+ * - 重入性：对于同一个*vsem*，不可重入
  */
 __xwup_code
-xwer_t xwup_vsem_bind(struct xwup_vsem * vsem, struct xwup_evt * evt,
-                         xwsq_t pos)
+xwer_t xwup_vsem_bind(struct xwup_vsem * vsem, struct xwup_evt * evt, xwsq_t pos)
 {
         xwreg_t cpuirq;
         xwer_t rc;
@@ -69,7 +68,7 @@ xwer_t xwup_vsem_bind(struct xwup_vsem * vsem, struct xwup_evt * evt,
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *vsem* ，不可重入
+ * - 重入性：对于同一个*vsem*，不可重入
  */
 __xwup_code
 xwer_t xwup_vsem_unbind(struct xwup_vsem * vsem, struct xwup_evt * evt)

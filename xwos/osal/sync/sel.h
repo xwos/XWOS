@@ -228,7 +228,8 @@ xwer_t xwos_sel_put(struct xwos_sel * sel)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个**src**，不可重入
+ * - 重入性：对于同一个*src*，不可重入
+ * - 绑定方式：非独占绑定
  * @note
  * - 多个信号选择器可以依次绑定，形成信号传递链。源信号选择器被同步对象触发时，
  *   将触发目的信号选择器。
@@ -250,7 +251,7 @@ xwer_t xwos_sel_bind(struct xwos_sel * src, struct xwos_sel * dst, xwsq_t pos)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个**src**，不可重入
+ * - 重入性：对于同一个*src*，不可重入
  */
 static __xwos_inline_api
 xwer_t xwos_sel_unbind(struct xwos_sel * src, struct xwos_sel * dst)
@@ -294,9 +295,9 @@ xwer_t xwos_sel_get_num(struct xwos_sel * sel, xwsz_t * numbuf)
 }
 
 /**
- * @brief XWOS API：检测一下信号选择器中的触发信号，不会阻塞调用者
+ * @brief XWOS API：检测一下信号选择器中的触发信号，不会阻塞调用线程
  * @param sel: (I) 信号选择器对象的指针
- * @param msk: (I) 待触发的同步对象位图掩码
+ * @param msk: (I) 同步对象位图掩码，表示只关注掩码内的同步对象
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -316,7 +317,7 @@ xwer_t xwos_sel_tryselect(struct xwos_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
 /**
  * @brief XWOS API：等待信号选择器中的触发信号
  * @param sel: (I) 信号选择器对象的指针
- * @param msk: (I) 待触发的同步对象位图掩码
+ * @param msk: (I) 同步对象位图掩码，表示只关注掩码内的同步对象
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -337,7 +338,7 @@ xwer_t xwos_sel_select(struct xwos_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
 /**
  * @brief XWOS API：限时等待信号选择器中的信号
  * @param sel: (I) 信号选择器对象的指针
- * @param msk: (I) 待触发的同步对象位图掩码
+ * @param msk: (I) 同步对象位图掩码，表示只关注掩码内的同步对象
  * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
  * @param xwtm: 指向缓冲区的指针，此缓冲区：
  *              (I) 作为输入时，表示期望的阻塞等待时间
