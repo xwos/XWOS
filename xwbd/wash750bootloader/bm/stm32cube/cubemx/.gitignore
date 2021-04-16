@@ -3,4 +3,4 @@
 .mxproject
 .project.bak
 startup_stm32h750xx.s
-STM32H750IITx_FLASH.ld
+STM32H750VBTx_FLASH.ld
