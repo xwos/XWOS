@@ -38,6 +38,9 @@ extern const xwu8_t image_tail_lma_base[];
 extern const xwu8_t image_tail_lma_end[];
 extern const xwu8_t xwos_vctbl_lma_base[];
 
+extern const xwu8_t preinit_array_vma_base[];
+extern const xwu8_t preinit_array_vma_end[];
+
 extern const xwu8_t init_array_vma_base[];
 extern const xwu8_t init_array_vma_end[];
 
@@ -113,6 +116,12 @@ __xwbsp_init_code
 void cxx_init(void)
 {
         void (** f)();
+
+        for (f = (void (**)())preinit_array_vma_base;
+             f < (void (**)())preinit_array_vma_end;
+             ++f) {
+                (*f)();
+        }
 
         for (f = (void (**)())init_array_vma_base;
              f < (void (**)())init_array_vma_end;

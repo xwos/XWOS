@@ -63,21 +63,29 @@ SECTIONS {
         } > code_mr
 
         .preinit_array : ALIGN(8) {
+                PROVIDE_HIDDEN (__preinit_array_start = .);
                 KEEP (*(.preinit_array*))
+                PROVIDE_HIDDEN (__preinit_array_end = .);
                 preinit_array_vma_end = .;
-         } > code_mr
+        } > code_mr
         preinit_array_vma_base = ADDR(.preinit_array);
         preinit_array_lma_base = LOADADDR(.preinit_array);
 
         .init_array : ALIGN(8) {
-                KEEP (*(.init_array*))
+                PROVIDE_HIDDEN (__init_array_start = .);
+                KEEP (*(SORT_BY_INIT_PRIORITY(.init_array*)))
+                KEEP (*(SORT_BY_INIT_PRIORITY(.ctors*)))
+                PROVIDE_HIDDEN (__init_array_end = .);
                 init_array_vma_end = .;
         } > code_mr
         init_array_vma_base = ADDR(.init_array);
         init_array_lma_base = LOADADDR(.init_array);
 
         .fini_array : ALIGN(8) {
-                KEEP (*(.fini_array*))
+                PROVIDE_HIDDEN (__fini_array_start = .);
+                KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array*)))
+                KEEP (*(SORT_BY_INIT_PRIORITY(.dtors*)))
+                PROVIDE_HIDDEN (__fini_array_end = .);
                 fini_array_vma_end = .;
         } > code_mr
         fini_array_vma_base = ADDR(.fini_array);
