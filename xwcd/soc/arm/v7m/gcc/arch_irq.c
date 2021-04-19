@@ -22,11 +22,12 @@
 #include <armv7m_core.h>
 #include <armv7m_nvic.h>
 #include <arch_irq.h>
-#include <arch_xwsc.h>
 #include <arch_skd.h>
 
 #define ARCH_IRQ_FAULT_PRIO     (ARCH_IRQ_PRIO_7 | ARCH_IRQ_SUBPRIO_HIGH)
 #define ARCH_IRQ_SVC_PRIO       (ARCH_IRQ_PRIO_7 | ARCH_IRQ_SUBPRIO_LOW)
+
+xws64_t soc_xwsc_entry(xwsc_f func, xwptr_t argnum, xwptr_t * args, xwreg_t old_lr);
 
 /**
  * @brief Setup Architecture Fault
@@ -166,9 +167,9 @@ void arch_isr_dbgmon(void)
  *   + ARM内核进入handler模式时会自动将r0 ~ r3, ip,lr, pc & xpsr压栈保存；
  *     返回thread模式时会自动从栈中弹出原始值恢复这些寄存器。
  *     返回的地址被存放在[SP+24]的地址处。可以将这个内存地址中的内容改为xwsc的真正
- *     入口@ref arch_xwsc_entry()，并将原始返回地址存放在原始LR的位置[SP+20]。原始
+ *     入口@ref soc_xwsc_entry()，并将原始返回地址存放在原始LR的位置[SP+20]。原始
  *     LR的值又存放在原始R3的位置[SP+12]。原始R3在xwsc中没有使用到，因此不需要备份。
- *     当svc_sysisr()返回时，就会进入到@ref arch_xwsc_entry()函数，并且以r0 ~ r2作为
+ *     当svc_sysisr()返回时，就会进入到@ref soc_xwsc_entry()函数，并且以r0 ~ r2作为
  *     参数，函数的第四个参数（通过R3的位置传递）作为LR的原始值。
  *         ------------------------------\n
  *         | stack      | change        |\n
@@ -258,9 +259,9 @@ void arch_isr_svc(void)
         __asm__ volatile("      ldr     r1, [r0, #24]"); /* get old pc value */
         __asm__ volatile("      orr     r1, #1"); /* set lsb to 1, Thumb mode */
         __asm__ volatile("      str     r1, [r0, #20]"); /* save old pc value */
-        __asm__ volatile("      mov     r1, %[__arch_xwsc_entry]"
+        __asm__ volatile("      mov     r1, %[__soc_xwsc_entry]"
                          :
-                         : [__arch_xwsc_entry] "r" ((xwptr_t)arch_xwsc_entry)
+                         : [__soc_xwsc_entry] "r" ((xwptr_t)soc_xwsc_entry)
                          : "r0", "r1", "r2", "memory");
         __asm__ volatile("      str     r1, [r0, #24]"); /* setup xwsc entry */
         __asm__ volatile("      mrs     r0, control"); /* open privileged access */

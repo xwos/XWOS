@@ -32,9 +32,11 @@ xwer_t xwup_plsem_delete(struct xwup_plsem * sem);
 xwer_t xwup_plsem_intr(struct xwup_plsem * sem, struct xwup_wqn * wqn);
 
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-xwer_t xwup_plsem_bind(struct xwup_plsem * sem, struct xwup_evt * evt,
-                       xwsq_t pos);
+xwer_t xwup_plsem_bind(struct xwup_plsem * sem, struct xwup_evt * evt, xwsq_t pos);
 xwer_t xwup_plsem_unbind(struct xwup_plsem * sem, struct xwup_evt * evt);
+#else
+#define xwup_plsem_bind(sem, evt, pos) (-ENOSYS)
+#define xwup_plsem_unbind(sem, evt) (-ENOSYS)
 #endif /* XWUPCFG_SYNC_EVT */
 
 xwer_t xwup_plsem_post(struct xwup_plsem * sem);

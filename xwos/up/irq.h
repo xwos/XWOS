@@ -14,12 +14,9 @@
 #define __xwos_up_irq_h__
 
 #include <xwos/standard.h>
+#include <xwos/ospl/soc/irq.h>
 
 struct xwup_irqc;
-struct soc_irq_cfg;
-struct soc_irq_data;
-struct soc_isr_table;
-struct soc_isr_data_table;
 
 /**
  * @brief XWOS MP中断资源

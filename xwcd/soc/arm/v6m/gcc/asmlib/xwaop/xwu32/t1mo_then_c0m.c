@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <arch_irq.h>
-#include <xwos/lib/xwaop64.h>
+#include <xwos/lib/xwaop.h>
 
 __xwlib_code
 xwer_t xwaop__xwu32__t1mo_then_c0m(xwu32_a * a,

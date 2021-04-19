@@ -45,7 +45,7 @@
 #define __xwos_lib_compiler_h__
 
 #include <cfg/XuanWuOS.h>
-#include <arch_compiler.h>
+#include <xwos/ospl/soc/compiler.h>
 
 #ifndef __XWOS_COMPILER__
   #error "Unknown compiler!"

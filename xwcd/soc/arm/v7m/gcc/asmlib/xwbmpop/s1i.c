@@ -19,7 +19,6 @@
  */
 
 #include <xwos/standard.h>
-#include <asmlib/xwbop.h>
 
 __xwbsp_code __xwcc_naked
 void xwbmpop_s1i(__xwcc_unused xwbmp_t * addr, __xwcc_unused xwsq_t n)

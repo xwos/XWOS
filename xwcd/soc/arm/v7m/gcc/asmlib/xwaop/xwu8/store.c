@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <armv7m_core.h>
-#include <xwos/lib/xwaop8.h>
+#include <xwos/lib/xwaop.h>
 
 __xwlib_code
 xwu8_t xwaop__xwu8__store(xwu8_a * a,

@@ -14,7 +14,96 @@
 #define __xwos_lib_xwbop_h__
 
 #include <xwos/standard.h>
-#include <xwos/lib/xwbop_internal.h>
+#include <xwos/ospl/soc/xwbop.h>
+
+/******** ******** macros ******** ********/
+#define XWBOP_BIT(n)  (1UL << (n))
+#define XWBOP_BMP_MASK(n)  ((xwbmp_t)1 << (xwbmp_t)((n) % BITS_PER_XWBMP_T))
+#define XWBOP_BMP(n)  ((n) / BITS_PER_XWBMP_T)
+#define BITS_PER_XWU8_T  8
+#define XWBOP_DIV_ROUND(n, d)  ((n) / (d))
+#define XWBOP_DIV_ROUND_UP(n, d)  (((n) + (d) - 1U) / (d))
+#define XWBOP_SHIFT_ROUND(n, s)  ((n) >> (s))
+#define XWBOP_SHIFT_ROUND_UP(n, s)  (((n) + (1U << (s)) - 1U) >> (s))
+#define BITS_TO_XWU8_T(n)  XWBOP_DIV_ROUND_UP(n, BITS_PER_XWU8_T)
+#define BITS_TO_XWBMP_T(n)  XWBOP_DIV_ROUND_UP(n, BITS_PER_XWU8_T * sizeof(xwbmp_t))
+#define XWBOP_ROUND(x, n)  ((x) & (~((n) - 1U)))
+#define XWBOP_ALIGN(x, n)  (((x) + ((n) - 1U)) & (~((n) - 1U)))
+#define XWBOP_TBIT(x, n)  (((x) >> (n)) & 1U)
+
+/******** ******** 8-bit 位操作 ******** ********/
+#define xwbop_s1m8(a, mask)     *(a) |= (mask)
+#define xwbop_c0m8(a, mask)     *(a) &= (~(mask))
+#define xwbop_x1m8(a, mask)     *(a) ^= (mask)
+
+static __xwlib_inline
+xwssq_t xwbop_ffz8(xwu8_t x)
+{
+        return xwbop_ffs8((xwu8_t)(~x));
+}
+
+static __xwlib_inline
+xwssq_t xwbop_flz8(xwu8_t x)
+{
+        return xwbop_fls8((xwu8_t)(~x));
+}
+
+static __xwlib_inline
+xwu8_t xwbop_re8(xwu8_t x)
+{
+        return x;
+}
+
+/******** ******** 16-bit 位操作 ******** ********/
+#define xwbop_s1m16(a, mask)    *(a) |= (mask)
+#define xwbop_c0m16(a, mask)    *(a) &= (~(mask))
+#define xwbop_x1m16(a, mask)    *(a) ^= (mask)
+
+static __xwlib_inline
+xwssq_t xwbop_ffz16(xwu16_t x)
+{
+        return xwbop_ffs16((xwu16_t)(~x));
+}
+
+static __xwlib_inline
+xwssq_t xwbop_flz16(xwu16_t x)
+{
+        return xwbop_fls16((xwu16_t)(~x));
+}
+
+/******** ******** 32-bit 位操作 ******** ********/
+#define xwbop_s1m32(a, mask)    *(a) |= (mask)
+#define xwbop_c0m32(a, mask)    *(a) &= (~(mask))
+#define xwbop_x1m32(a, mask)    *(a) ^= (mask)
+
+static __xwlib_inline
+xwssq_t xwbop_ffz32(xwu32_t x)
+{
+        return xwbop_ffs32(~x);
+}
+
+static __xwlib_inline
+xwssq_t xwbop_flz32(xwu32_t x)
+{
+        return xwbop_fls32(~x);
+}
+
+/******** ******** 64-bit 位操作 ******** ********/
+#define xwbop_s1m64(a64, mask64)        *((xwu64_t *)a64) |= (mask64)
+#define xwbop_c0m64(a64, mask64)        *((xwu64_t *)a64) &= (~(mask64))
+#define xwbop_x1m64(a64, mask64)        *((xwu64_t *)a64) ^= (mask64)
+
+static __xwlib_inline
+xwssq_t xwbop_ffz64(xwu64_t x)
+{
+        return xwbop_ffs64(~x);
+}
+
+static __xwlib_inline
+xwssq_t xwbop_flz64(xwu64_t x)
+{
+        return xwbop_ffs64(~x);
+}
 
 /******** ******** 位操作 ******** ********/
 /**

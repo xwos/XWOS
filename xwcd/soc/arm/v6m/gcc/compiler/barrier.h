@@ -22,7 +22,6 @@
 #define __compiler_barrier_h__
 
 #include <cfg/XuanWuOS.h>
-#include <arch_type.h>
 #include <compiler/gcc.h>
 
 /******** ******** barrier ******** ********/
@@ -37,4 +36,4 @@
 #define xwmb_mp_wmb()           armv6m_dmb()
 #define xwmb_mp_ddb()           xwccmb()
 
-#endif /* barrier.h */
+#endif /* compiler/barrier.h */

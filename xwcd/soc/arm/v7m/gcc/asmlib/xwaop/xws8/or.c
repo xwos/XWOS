@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <armv7m_core.h>
-#include <xwos/lib/xwaop8.h>
+#include <xwos/lib/xwaop.h>
 
 __xwlib_code
 void xwaop__xws8__or(xws8_a * a,
@@ -31,10 +31,10 @@ void xwaop__xws8__or(xws8_a * a,
         xws8_t o;
 
         do {
-                o = (xws8_t)ldrexb(a);
+                o = (xws8_t)cm_ldrexb(a);
                 n = o | v;
                 xwmb_mp_mb();
-        } while (strexb(a, (xwu8_t)n));
+        } while (cm_strexb(a, (xwu8_t)n));
         if (nv) {
                 *nv = n;
         }

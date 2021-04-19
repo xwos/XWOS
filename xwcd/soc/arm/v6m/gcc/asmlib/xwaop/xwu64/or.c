@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <arch_irq.h>
-#include <xwos/lib/xwaop64.h>
+#include <xwos/lib/xwaop.h>
 
 __xwlib_code
 void xwaop__xwu64__or(xwu64_a *a,

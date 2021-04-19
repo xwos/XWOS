@@ -23,11 +23,6 @@
   #error "Can't find the configuration XuanWuOS_CFG_CORE!"
 #endif
 
-struct soc_irq_cfg;
-struct soc_irq_data;
-struct soc_isr_table;
-struct soc_isr_data_table;
-
 static __xwbsp_inline
 void xwospl_cpuirq_enable_lc(void);
 
@@ -57,6 +52,6 @@ xwer_t xwospl_irqc_get_cfg_irq(xwirq_t irqn, struct soc_irq_cfg * cfgbuf);
 xwer_t xwospl_irqc_get_data_irq(xwirq_t irqn, struct soc_irq_data * databuf);
 #endif /* XuanWuOS_CFG_CORE__up */
 
-#include <ospl_irq_impl.h>
+#include <xwosimpl_irq.h>
 
-#endif /* xwos/mp/ospl/irq.h */
+#endif /* xwos/ospl/irq.h */

@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <armv7m_core.h>
-#include <xwos/lib/xwaop16.h>
+#include <xwos/lib/xwaop.h>
 
 __xwlib_code
 void xwaop__xwu16__read(xwu16_a * a,

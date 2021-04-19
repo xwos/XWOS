@@ -14,10 +14,10 @@
 #define __xwos_lib_xwaop_h__
 
 #include <xwos/standard.h>
-#include <xwos/lib/xwaop8.h>
-#include <xwos/lib/xwaop16.h>
-#include <xwos/lib/xwaop32.h>
-#include <xwos/lib/xwaop64.h>
+#include <xwos/ospl/soc/xwaop8.h>
+#include <xwos/ospl/soc/xwaop16.h>
+#include <xwos/ospl/soc/xwaop32.h>
+#include <xwos/ospl/soc/xwaop64.h>
 
 /**
  * @brief 调用原子操作

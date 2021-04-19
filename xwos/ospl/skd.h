@@ -121,6 +121,6 @@ xwer_t xwospl_thd_outmigrate(struct xwospl_thd * thd, xwid_t cpuid);
 void xwospl_thd_immigrate(struct xwospl_thd * thd, xwid_t cpuid);
 #endif /* XuanWuOS_CFG_CORE__mp */
 
-#include <ospl_skd_impl.h>
+#include <xwosimpl_skd.h>
 
-#endif /* xwos/mp/ospl/skd.h */
+#endif /* xwos/ospl/skd.h */

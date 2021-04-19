@@ -14,7 +14,7 @@
 #define __xwos_lib_lfq_h__
 
 #include <xwos/standard.h>
-#include <asmlib/lfq.h>
+#include <xwos/ospl/soc/lfq.h>
 
 /**
  * @brief 初始化无锁队列节点
@@ -31,21 +31,13 @@ void xwlib_lfq_init(xwlfq_a * n)
  * @param h: (I) 无锁队列头的指针
  * @param n: (I) 入队节点的指针
  */
-static __xwlib_inline
-void xwlib_lfq_push(xwlfq_a * h, xwlfq_a * n)
-{
-        arch_lfq_push(h, n);
-}
+void xwlib_lfq_push(xwlfq_a * h, xwlfq_a * n);
 
 /**
  * @brief 弹出无锁队列中的第一个节点（栈式队列）
  * @param h: (I) 无锁队列头的指针
  * @return 被弹出的节点
  */
-static __xwlib_inline
-xwlfq_t * xwlib_lfq_pop(xwlfq_a * h)
-{
-        return arch_lfq_pop(h);
-}
+xwlfq_t * xwlib_lfq_pop(xwlfq_a * h);
 
 #endif /* xwos/lib/lfq.h */

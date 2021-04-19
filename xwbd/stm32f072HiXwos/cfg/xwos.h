@@ -35,24 +35,6 @@
 #define XWLIBCFG_XWLOG_LEVEL                            (0U)
 #define XWLIBCFG_XWLOG_BUFSIZE                          (128U)
 
-#define XWLIBCFG_XWBOP_FFS8                             1
-#define XWLIBCFG_XWBOP_FLS8                             1
-#define XWLIBCFG_XWBOP_RBIT8                            1
-#define XWLIBCFG_XWBOP_FFS16                            0
-#define XWLIBCFG_XWBOP_FLS16                            0
-#define XWLIBCFG_XWBOP_RBIT16                           0
-#define XWLIBCFG_XWBOP_RE16                             0
-#define XWLIBCFG_XWBOP_RE16S32                          0
-#define XWLIBCFG_XWBOP_FFS32                            1
-#define XWLIBCFG_XWBOP_FLS32                            1
-#define XWLIBCFG_XWBOP_RBIT32                           1
-#define XWLIBCFG_XWBOP_RE32                             0
-#define XWLIBCFG_XWBOP_RE32S64                          0
-#define XWLIBCFG_XWBOP_FFS64                            0
-#define XWLIBCFG_XWBOP_FLS64                            0
-#define XWLIBCFG_XWBOP_RBIT64                           0
-#define XWLIBCFG_XWBOP_RE64                             0
-
 #define XWLIBCFG_XWAOP8                                 1
 #define XWLIBCFG_XWAOP16                                1
 #define XWLIBCFG_XWAOP32                                1
@@ -68,6 +50,8 @@
 #define XWLIBCFG_CRC8_0X07                              1
 #define XWLIBCFG_CRC8_0X31                              1
 #define XWLIBCFG_CRC8_0X9B                              1
+
+#define XWLIBCFG_SETJMP                                 0
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   Memory Management Configurations  ******** ********

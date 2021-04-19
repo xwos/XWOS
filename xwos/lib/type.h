@@ -14,7 +14,7 @@
 #define __xwos_lib_type_h__
 
 #include <cfg/XuanWuOS.h>
-#include <arch_type.h>
+#include <xwos/ospl/soc/type.h>
 #include <stdarg.h>
 
 #ifndef NULL

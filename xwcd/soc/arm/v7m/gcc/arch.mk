@@ -28,8 +28,6 @@ ARCH_EOBJS :=
 ARCH_CSRCS :=
 ARCH_ASRCS :=
 
-ARCH_CSRCS += asmlib/lfq.c
-
 ifeq ($(ARCHCFG_LIB_XWAOP8),y)
     ARCH_CSRCS += asmlib/xwaop/xwu8/add.c
     ARCH_CSRCS += asmlib/xwaop/xwu8/and.c
@@ -529,9 +527,6 @@ ifeq ($(ARCHCFG_LIB_XWBOP_RE32S64),y)
     ARCH_CSRCS += asmlib/xwbop/re32s64.c
 endif
 
-ifeq ($(ARCHCFG_LIB_XWBOP_C0M64),y)
-    ARCH_CSRCS += asmlib/xwbop/c0m64.c
-endif
 ifeq ($(ARCHCFG_LIB_XWBOP_FFS64),y)
     ARCH_CSRCS += asmlib/xwbop/ffs64.c
 endif
@@ -569,11 +564,12 @@ endif
 ifeq ($(ARCHCFG_LIB_XWBMPOP_FLZ),y)
     ARCH_CSRCS += asmlib/xwbmpop/flz.c
 endif
-ifeq ($(ARCHCFG_LIB_JMP),y)
-    ARCH_CSRCS += asmlib/jmp.c
+ifeq ($(XWLIBCFG_SETJMP),y)
+    ARCH_CSRCS += xwosimpl_soc_setjmp.c
 endif
 
-ARCH_CSRCS += arch_init.c arch_image.c arch_irq.c arch_xwsc.c
+ARCH_CSRCS += arch_init.c
+ARCH_CSRCS += arch_image.c arch_irq.c xwosimpl_soc_lfq.c xwosimpl_soc_xwsc.c
 ARCH_CSRCS += arch_skd.c arch_systick.c
 ifeq ($(XuanWuOS_CFG_CORE),mp)
     ARCH_CSRCS += mp_nvic.c mp_nvic_drv.c

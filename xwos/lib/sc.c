@@ -11,7 +11,6 @@
  */
 
 #include <xwos/standard.h>
-#include <arch_xwsc.h>
 #include <xwos/lib/sc.h>
 
 /**
@@ -22,7 +21,7 @@
 __xwlib_code
 void xwlib_privilege_start(void)
 {
-        arch_privilege_start();
+        soc_privilege_start();
 }
 
 /**
@@ -31,5 +30,5 @@ void xwlib_privilege_start(void)
 __xwlib_code
 void xwlib_privilege_end(void)
 {
-        arch_privilege_end();
+        soc_privilege_end();
 }

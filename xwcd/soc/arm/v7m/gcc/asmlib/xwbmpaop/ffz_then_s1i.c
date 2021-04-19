@@ -45,7 +45,7 @@ xwssq_t xwbmpaop_ffz_then_s1i(xwbmp_a * bmp, xwsz_t num)
                         } else {
                                 msk = ~(xwbmp_t)0;
                         }
-                        ov = ldrex((xwu32_t *)&bmp[i]);
+                        ov = cm_ldrex((xwu32_t *)&bmp[i]);
                         tmp = (~ov) & msk;
                         if (tmp) {
                                 pos = xwbop_ffs(xwbmp_t, tmp);
@@ -62,7 +62,7 @@ xwssq_t xwbmpaop_ffz_then_s1i(xwbmp_a * bmp, xwsz_t num)
                         nv = ov | m;
                         pos += (xwssq_t)(i * BITS_PER_XWBMP_T);
                         xwmb_mp_mb();
-                        rc = strex((xwu32_t *)&bmp[i], nv);
+                        rc = cm_strex((xwu32_t *)&bmp[i], nv);
                 }
         } while (rc);
         return pos;

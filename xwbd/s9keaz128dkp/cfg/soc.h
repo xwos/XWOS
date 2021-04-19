@@ -32,4 +32,7 @@
 #define SOCCFG_RO_ISRTABLE                      1
 #define SOCCFG_NVIC_PRIO_BITNUM                 2U
 
+/******** Debug ********/
+#define SOCCFG_BKPT                             1
+
 #endif /* cfg/soc.h */

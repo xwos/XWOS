@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <armv7m_core.h>
-#include <xwos/lib/xwaop32.h>
+#include <xwos/lib/xwaop.h>
 
 __xwlib_code
 void xwaop__xwu32__or(xwu32_a * a,
@@ -31,10 +31,10 @@ void xwaop__xwu32__or(xwu32_a * a,
         xwu32_t o;
 
         do {
-                o = (xwu32_t)ldrex(a);
+                o = (xwu32_t)cm_ldrex(a);
                 n = o | v;
                 xwmb_mp_mb();
-        } while (strex(a, (xwu32_t)n));
+        } while (cm_strex(a, (xwu32_t)n));
         if (nv) {
                 *nv = n;
         }

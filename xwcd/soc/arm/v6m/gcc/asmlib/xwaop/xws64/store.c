@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <armv6m_core.h>
-#include <xwos/lib/xwaop64.h>
+#include <xwos/lib/xwaop.h>
 
 __xwlib_code
 xws64_t xwaop__xws64__store(xws64_a * a,

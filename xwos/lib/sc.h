@@ -14,9 +14,9 @@
 #define __xwos_lib_sc_h__
 
 #include <xwos/standard.h>
-#include <arch_xwsc.h>
+#include <xwos/ospl/soc/xwsc.h>
 
-#define xwsc(func, argnum, ...) arch_xwsc((func), (argnum), ##__VA_ARGS__)
+#define xwsc(func, argnum, ...) soc_xwsc((func), (argnum), ##__VA_ARGS__)
 
 void xwlib_privilege_start(void);
 void xwlib_privilege_end(void);

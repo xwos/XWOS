@@ -22,7 +22,6 @@
 #define __compiler_barrier_h__
 
 #include <cfg/XuanWuOS.h>
-#include <xwos/lib/type.h>
 #include <compiler/gcc.h>
 
 /******** ******** barrier ******** ********/
@@ -35,4 +34,4 @@
 #define xwmb_mp_wmb()           __asm__ volatile("mbar      0" : : : "memory")
 #define xwmb_mp_ddb()           xwccmb()
 
-#endif /* barrier.h */
+#endif /* compiler/barrier.h */

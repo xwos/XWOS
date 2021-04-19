@@ -27,6 +27,8 @@ void xwup_vsem_activate(struct xwup_vsem * vsem)
 {
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
         xwup_synobj_activate(&vsem->synobj);
+#else
+        XWOS_UNUSED(vsem);
 #endif /* XWUPCFG_SYNC_EVT */
 }
 

@@ -20,7 +20,6 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
-#include <asmlib/xwbop.h>
 
 __xwbsp_code
 xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t num)

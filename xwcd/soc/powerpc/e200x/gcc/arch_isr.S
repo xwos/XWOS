@@ -32,8 +32,8 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         function prototypes         ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-        .extern         arch_privilege_start_entry
-        .extern         arch_privilege_end_entry
+        .extern         soc_privilege_start_entry
+        .extern         soc_privilege_end_entry
         .extern         soc_reset_hard
         .extern         soc_skd_chk_stk
         .extern         soc_eii_isr
@@ -45,8 +45,8 @@
         .align          4
 sc_table:
         .long           sc_noop /* sc 0 */
-        .long           arch_privilege_start_entry /* sc 1 */
-        .long           arch_privilege_end_entry /* sc 2 */
+        .long           soc_privilege_start_entry /* sc 1 */
+        .long           soc_privilege_end_entry /* sc 2 */
         .long           sc_noop /* sc 3 */
         .long           sc_noop /* sc 4 */
         .long           sc_noop /* sc 5 */

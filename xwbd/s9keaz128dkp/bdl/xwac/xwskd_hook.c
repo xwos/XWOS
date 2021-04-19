@@ -26,5 +26,5 @@ __xwos_code
 void bdl_xwskd_idle_hook(struct xwos_skd * xwskd)
 {
         XWOS_UNUSED(xwskd);
-        wfi();
+        cm_wfi();
 }

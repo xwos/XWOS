@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 位操作汇编库：arch_xwbop_rbit16
+ * @brief 位操作汇编库：xwbop_rbit16
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -19,10 +19,9 @@
  */
 
 #include <xwos/standard.h>
-#include <asmlib/xwbop.h>
 
 __xwbsp_code __xwcc_naked
-xwu16_t arch_xwbop_rbit16(__xwcc_unused xwu16_t x)
+xwu16_t xwbop_rbit16(__xwcc_unused xwu16_t x)
 {
         __asm__ volatile("      rbit    r0, r0");
         __asm__ volatile("      lsr     r0, #16");

@@ -18,41 +18,34 @@
  * > limitations under the License.
  */
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      include      ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
 #include <cfg/XuanWuOS.h>
 
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********      function implementations       ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
         .section        .xwos.text,"ax"
-        .global         arch_xwbop_fls32
-/* xwssq_t arch_xwbop_fls32(xwu32_t x) */
-arch_xwbop_fls32:
+        .global         xwbop_fls32
+/* xwssq_t xwbop_fls32(xwu32_t x) */
+xwbop_fls32:
         cntlzw          r3, r3
         e_subfic        r3, r3, 31
         se_blr
-        .size           arch_xwbop_fls32, . - arch_xwbop_fls32
+        .size           xwbop_fls32, . - xwbop_fls32
 
 
         .section        .xwos.text,"ax"
-        .global         arch_xwbop_ffs32
-/* xwssq_t arch_xwbop_ffs32(xwu32_t x) */
-arch_xwbop_ffs32:
+        .global         xwbop_ffs32
+/* xwssq_t xwbop_ffs32(xwu32_t x) */
+xwbop_ffs32:
         neg             r4, r3
         se_and          r4, r3
         cntlzw          r3, r4
         e_subfic        r3, r3, 31
         se_blr
-        .size           arch_xwbop_ffs32, . - arch_xwbop_ffs32
+        .size           xwbop_ffs32, . - xwbop_ffs32
 
 
-#if (defined(ARCHCFG_LIB_XWBOP_FLS64)) && (1 == ARCHCFG_LIB_XWBOP_FLS64)
         .section        .xwos.text,"ax"
-        .global         arch_xwbop_fls64
-/* xwssq_t arch_xwbop_fls64(xwu64_t x) */
-arch_xwbop_fls64:
+        .global         xwbop_fls64
+/* xwssq_t xwbop_fls64(xwu64_t x) */
+xwbop_fls64:
         se_cmpi         r3, 0           /* if (high_word(x) != 0)       */
         se_beq          1f              /* {                            */
         cntlzw          r3, r3          /*      r3 = cntlzw(r4);        */
@@ -63,15 +56,13 @@ arch_xwbop_fls64:
         cntlzw          r3, r4          /* r3 = cntlzw(r3);             */
         e_subfic        r3, r3, 31      /* r3 = 31 - r3;                */
         se_blr                          /* return r3;                   */
-        .size           arch_xwbop_fls64, . - arch_xwbop_fls64
-#endif
+        .size           xwbop_fls64, . - xwbop_fls64
 
 
-#if (defined(ARCHCFG_LIB_XWBOP_FFS64)) && (1 == ARCHCFG_LIB_XWBOP_FFS64)
         .section        .xwos.text,"ax"
-        .global         arch_xwbop_ffs64
-/* xwssq_t arch_xwbop_ffs64(xwu64_t x) */
-arch_xwbop_ffs64:
+        .global         xwbop_ffs64
+/* xwssq_t xwbop_ffs64(xwu64_t x) */
+xwbop_ffs64:
         se_cmpi         r4, 0           /* if (low_word(x) != 0)        */
         se_beq          1f              /* {                            */
         neg             r5, r3          /*      r5 = ~r3 + 1;           */
@@ -86,5 +77,4 @@ arch_xwbop_ffs64:
         cntlzw          r3, r5          /* r3 = cntlzw(r5);             */
         e_subfic        r3, r3, 31      /* r3 = 31 - r3;                */
         se_blr                          /* return r3;                   */
-        .size           arch_xwbop_ffs64, . - arch_xwbop_ffs64
-#endif
+        .size           xwbop_ffs64, . - xwbop_ffs64

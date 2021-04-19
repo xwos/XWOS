@@ -1462,7 +1462,7 @@ void cm_reset_system(void)
  * @brief Clear exclusive
  */
 static __xwbsp_inline
-void clrex(void)
+void cm_clrex(void)
 {
         __asm__ volatile("clrex\n" : : : "memory");
 }
@@ -1473,7 +1473,7 @@ void clrex(void)
  * @return word in the address
  */
 static __xwbsp_inline
-xwu32_t ldrex(volatile void * addr)
+xwu32_t cm_ldrex(volatile void * addr)
 {
         xwu32_t tmp;
 
@@ -1495,7 +1495,7 @@ xwu32_t ldrex(volatile void * addr)
  * @retval 0: OK
  */
 static __xwbsp_inline
-xwer_t strex(volatile void * addr, xwu32_t value)
+xwer_t cm_strex(volatile void * addr, xwu32_t value)
 {
         xwer_t rc;
 
@@ -1515,7 +1515,7 @@ xwer_t strex(volatile void * addr, xwu32_t value)
  * @return byte in the address
  */
 static __xwbsp_inline
-xwu8_t ldrexb(volatile void * addr)
+xwu8_t cm_ldrexb(volatile void * addr)
 {
         xwu8_t tmp;
 
@@ -1537,7 +1537,7 @@ xwu8_t ldrexb(volatile void * addr)
  * @retval 0: OK
  */
 static __xwbsp_inline
-xwer_t strexb(volatile void * addr, xwu8_t value)
+xwer_t cm_strexb(volatile void * addr, xwu8_t value)
 {
         xwer_t rc;
 
@@ -1557,7 +1557,7 @@ xwer_t strexb(volatile void * addr, xwu8_t value)
  * @return half-word in the address
  */
 static __xwbsp_inline
-xwu16_t ldrexh(volatile void * addr)
+xwu16_t cm_ldrexh(volatile void * addr)
 {
         xwu16_t tmp;
 
@@ -1578,7 +1578,7 @@ xwu16_t ldrexh(volatile void * addr)
  * @retval 0: OK
  */
 static __xwbsp_inline
-xwer_t strexh(volatile void * addr, xwu16_t value)
+xwer_t cm_strexh(volatile void * addr, xwu16_t value)
 {
         xwer_t rc;
 
@@ -1597,7 +1597,7 @@ xwer_t strexh(volatile void * addr, xwu16_t value)
  * @param addr: (I) address
  */
 static __xwbsp_inline
-void prefetch(const volatile void * addr)
+void cm_prefetch(const volatile void * addr)
 {
         __asm__ volatile(
         "pld    [%[__addr], #0]\n"
@@ -1611,7 +1611,7 @@ void prefetch(const volatile void * addr)
  * @brief Wait for event
  */
 static __xwbsp_inline
-void wfe(void)
+void cm_wfe(void)
 {
         __asm__ volatile("wfe");
 }
@@ -1620,7 +1620,7 @@ void wfe(void)
  * @brief Wait for interrupt
  */
 static __xwbsp_inline
-void wfi(void)
+void cm_wfi(void)
 {
         __asm__ volatile("wfi");
 }
@@ -1629,7 +1629,7 @@ void wfi(void)
  * @brief Send event
  */
 static __xwbsp_inline
-void sev(void)
+void cm_sev(void)
 {
         __asm__ volatile("sev");
 }

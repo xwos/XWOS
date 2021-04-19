@@ -18,12 +18,9 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
+#include <xwos/ospl/soc/irq.h>
 
 struct xwmp_irqc;
-struct soc_irq_cfg;
-struct soc_irq_data;
-struct soc_isr_table;
-struct soc_isr_data_table;
 
 /**
  * @brief XWOS MP中断资源

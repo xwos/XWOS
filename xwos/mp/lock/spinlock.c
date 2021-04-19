@@ -13,135 +13,134 @@
 #include <xwos/standard.h>
 #include <xwos/ospl/irq.h>
 #include <xwos/mp/skd.h>
-#include <arch_spinlock.h>
 #include <xwos/mp/lock/spinlock.h>
 
 __xwmp_code
-void xwmp_rawly_lock(struct xwmp_splk * spl)
+void xwmp_rawly_lock(struct xwmp_splk * splk)
 {
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_lock(&spl->aspl);
+        soc_splk_lock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
 __xwmp_code
-xwer_t xwmp_rawly_trylock(struct xwmp_splk * spl)
+xwer_t xwmp_rawly_trylock(struct xwmp_splk * splk)
 {
         xwer_t rc;
 
         rc = XWOK;
 #if (CPUCFG_CPU_NUM > 1)
-        rc = arch_splk_trylock(&spl->aspl);
+        rc = soc_splk_trylock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
 
 __xwmp_code
-void xwmp_rawly_unlock(struct xwmp_splk * spl)
+void xwmp_rawly_unlock(struct xwmp_splk * splk)
 {
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_unlock(&spl->aspl);
+        soc_splk_unlock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
 __xwmp_code
-void xwmp_rawly_lock_cpuirq(struct xwmp_splk * spl)
+void xwmp_rawly_lock_cpuirq(struct xwmp_splk * splk)
 {
         xwospl_cpuirq_disable_lc();
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_lock(&spl->aspl);
+        soc_splk_lock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
 __xwmp_code
-xwer_t xwmp_rawly_trylock_cpuirq(struct xwmp_splk * spl)
+xwer_t xwmp_rawly_trylock_cpuirq(struct xwmp_splk * splk)
 {
         xwer_t rc;
 
         rc = XWOK;
         xwospl_cpuirq_disable_lc();
 #if (CPUCFG_CPU_NUM > 1)
-        rc = arch_splk_trylock(&spl->aspl);
+        rc = soc_splk_trylock(&splk->socsplk);
         if (rc < 0) {
                 xwospl_cpuirq_enable_lc();
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
 
 __xwmp_code
-void xwmp_rawly_unlock_cpuirq(struct xwmp_splk * spl)
+void xwmp_rawly_unlock_cpuirq(struct xwmp_splk * splk)
 {
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_unlock(&spl->aspl);
+        soc_splk_unlock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwospl_cpuirq_enable_lc();
 }
 
 __xwmp_code
-void xwmp_rawly_lock_cpuirqsv(struct xwmp_splk * spl, xwreg_t * cpuirq)
+void xwmp_rawly_lock_cpuirqsv(struct xwmp_splk * splk, xwreg_t * cpuirq)
 {
         xwospl_cpuirq_save_lc(cpuirq);
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_lock(&spl->aspl);
+        soc_splk_lock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
 __xwmp_code
-xwer_t xwmp_rawly_trylock_cpuirqsv(struct xwmp_splk * spl, xwreg_t * cpuirq)
+xwer_t xwmp_rawly_trylock_cpuirqsv(struct xwmp_splk * splk, xwreg_t * cpuirq)
 {
         xwer_t rc;
 
         rc = XWOK;
         xwospl_cpuirq_save_lc(cpuirq);
 #if (CPUCFG_CPU_NUM > 1)
-        rc = arch_splk_trylock(&spl->aspl);
+        rc = soc_splk_trylock(&splk->socsplk);
         if (rc < 0) {
                 xwospl_cpuirq_restore_lc(*cpuirq);
                 return rc;
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
 
 __xwmp_code
-void xwmp_rawly_unlock_cpuirqrs(struct xwmp_splk * spl, xwreg_t cpuirq)
+void xwmp_rawly_unlock_cpuirqrs(struct xwmp_splk * splk, xwreg_t cpuirq)
 {
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_unlock(&spl->aspl);
+        soc_splk_unlock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwospl_cpuirq_restore_lc(cpuirq);
 }
 
 __xwmp_code
-void xwmp_rawly_lock_irqs(struct xwmp_splk * spl,
+void xwmp_rawly_lock_irqs(struct xwmp_splk * splk,
                           const struct xwmp_irq_resource * irqs, xwsz_t num)
 {
         xwssz_t i;
@@ -150,15 +149,15 @@ void xwmp_rawly_lock_irqs(struct xwmp_splk * spl,
                 xwmp_irq_disable(irqs[i].irqn);
         }
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_lock(&spl->aspl);
+        soc_splk_lock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
 __xwmp_code
-xwer_t xwmp_rawly_trylock_irqs(struct xwmp_splk * spl,
+xwer_t xwmp_rawly_trylock_irqs(struct xwmp_splk * splk,
                                const struct xwmp_irq_resource * irqs, xwsz_t num)
 {
         xwer_t rc;
@@ -169,29 +168,29 @@ xwer_t xwmp_rawly_trylock_irqs(struct xwmp_splk * spl,
                 xwmp_irq_disable(irqs[i].irqn);
         }
 #if (CPUCFG_CPU_NUM > 1)
-        rc = arch_splk_trylock(&spl->aspl);
+        rc = soc_splk_trylock(&splk->socsplk);
         if (rc < 0) {
                 for (i = (xwssz_t)num - 1; i >= 0; i--) {
                         xwmp_irq_enable(irqs[i].irqn);
                 }
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
 
 __xwmp_code
-void xwmp_rawly_unlock_irqs(struct xwmp_splk * spl,
+void xwmp_rawly_unlock_irqs(struct xwmp_splk * splk,
                             const struct xwmp_irq_resource * irqs, xwsz_t num)
 {
         xwssz_t i;
 
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_unlock(&spl->aspl);
+        soc_splk_unlock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
@@ -200,7 +199,7 @@ void xwmp_rawly_unlock_irqs(struct xwmp_splk * spl,
 }
 
 __xwmp_code
-void xwmp_rawly_lock_irqssv(struct xwmp_splk * spl,
+void xwmp_rawly_lock_irqssv(struct xwmp_splk * splk,
                             const struct xwmp_irq_resource * irqs,
                             xwreg_t flags[], xwsz_t num)
 {
@@ -210,15 +209,15 @@ void xwmp_rawly_lock_irqssv(struct xwmp_splk * spl,
                 xwmp_irq_save(irqs[i].irqn, &flags[i]);
         }
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_lock(&spl->aspl);
+        soc_splk_lock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
 
 __xwmp_code
-xwer_t xwmp_rawly_trylock_irqssv(struct xwmp_splk * spl,
+xwer_t xwmp_rawly_trylock_irqssv(struct xwmp_splk * splk,
                                  const struct xwmp_irq_resource * irqs,
                                  xwreg_t flags[], xwsz_t num)
 {
@@ -230,7 +229,7 @@ xwer_t xwmp_rawly_trylock_irqssv(struct xwmp_splk * spl,
                 xwmp_irq_save(irqs[i].irqn, &flags[i]);
         }
 #if (CPUCFG_CPU_NUM > 1)
-        rc = arch_splk_trylock(&spl->aspl);
+        rc = soc_splk_trylock(&splk->socsplk);
         if (rc < 0) {
                 for (i = (xwssz_t)num - 1; i >= 0; i--) {
                         xwmp_irq_restore(irqs[i].irqn, flags[i]);
@@ -238,22 +237,22 @@ xwer_t xwmp_rawly_trylock_irqssv(struct xwmp_splk * spl,
                 return rc;
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
 }
 
 __xwmp_code
-void xwmp_rawly_unlock_irqsrs(struct xwmp_splk * spl,
+void xwmp_rawly_unlock_irqsrs(struct xwmp_splk * splk,
                               const struct xwmp_irq_resource * irqs,
                               xwreg_t flags[], xwsz_t num)
 {
         xwssz_t i;
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_unlock(&spl->aspl);
+        soc_splk_unlock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
@@ -270,9 +269,9 @@ void xwmp_rawly_unlock_irqsrs(struct xwmp_splk * spl,
  * - 重入性：不可重入
  */
 __xwmp_inline_api
-void xwmp_splk_init(struct xwmp_splk * spl)
+void xwmp_splk_init(struct xwmp_splk * splk)
 {
-        arch_splk_init(&spl->aspl);
+        soc_splk_init(&splk->socsplk);
 }
 
 /**
@@ -287,13 +286,13 @@ void xwmp_splk_init(struct xwmp_splk * spl)
  * - 此函数只会关闭本地CPU的抢占，因此只能保证其临界区在线程中是安全的。
  */
 __xwmp_api
-void xwmp_splk_lock(struct xwmp_splk * spl)
+void xwmp_splk_lock(struct xwmp_splk * splk)
 {
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_lock(&spl->aspl);
+        soc_splk_lock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
@@ -313,19 +312,19 @@ void xwmp_splk_lock(struct xwmp_splk * spl)
  * - 此函数只会关闭本地CPU的抢占，因此只能保证其临界区在线程中是安全的。
  */
 __xwmp_api
-xwer_t xwmp_splk_trylock(struct xwmp_splk * spl)
+xwer_t xwmp_splk_trylock(struct xwmp_splk * splk)
 {
         xwer_t rc;
 
         rc = XWOK;
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
-        rc = arch_splk_trylock(&spl->aspl);
+        rc = soc_splk_trylock(&splk->socsplk);
         if (rc < 0) {
                 xwmp_skd_enpmpt_lc();
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
@@ -340,12 +339,12 @@ xwer_t xwmp_splk_trylock(struct xwmp_splk * spl)
  * - 重入性：不可重入
  */
 __xwmp_api
-void xwmp_splk_unlock(struct xwmp_splk * spl)
+void xwmp_splk_unlock(struct xwmp_splk * splk)
 {
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_unlock(&spl->aspl);
+        soc_splk_unlock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwmp_skd_enpmpt_lc();
@@ -363,14 +362,14 @@ void xwmp_splk_unlock(struct xwmp_splk * spl)
  * - 此函数会关闭本地CPU的抢占与中断，因此可保证其临界区在所有上下文中都是安全的。
  */
 __xwmp_api
-void xwmp_splk_lock_cpuirq(struct xwmp_splk * spl)
+void xwmp_splk_lock_cpuirq(struct xwmp_splk * splk)
 {
         xwospl_cpuirq_disable_lc();
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_lock(&spl->aspl);
+        soc_splk_lock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
@@ -390,7 +389,7 @@ void xwmp_splk_lock_cpuirq(struct xwmp_splk * spl)
  * - 此函数会关闭本地CPU的抢占与中断，因此可保证其临界区在所有上下文中都是安全的。
  */
 __xwmp_api
-xwer_t xwmp_splk_trylock_cpuirq(struct xwmp_splk * spl)
+xwer_t xwmp_splk_trylock_cpuirq(struct xwmp_splk * splk)
 {
         xwer_t rc;
 
@@ -398,13 +397,13 @@ xwer_t xwmp_splk_trylock_cpuirq(struct xwmp_splk * spl)
         xwospl_cpuirq_disable_lc();
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
-        rc = arch_splk_trylock(&spl->aspl);
+        rc = soc_splk_trylock(&splk->socsplk);
         if (rc < 0) {
                 xwmp_skd_enpmpt_lc();
                 xwospl_cpuirq_enable_lc();
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
@@ -419,12 +418,12 @@ xwer_t xwmp_splk_trylock_cpuirq(struct xwmp_splk * spl)
  * - 重入性：不可重入
  */
 __xwmp_api
-void xwmp_splk_unlock_cpuirq(struct xwmp_splk * spl)
+void xwmp_splk_unlock_cpuirq(struct xwmp_splk * splk)
 {
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_unlock(&spl->aspl);
+        soc_splk_unlock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwmp_skd_enpmpt_lc();
@@ -444,14 +443,14 @@ void xwmp_splk_unlock_cpuirq(struct xwmp_splk * spl)
  * - 此函数会关闭本地CPU的抢占与中断，因此可保证其临界区在所有上下文中都是安全的。
  */
 __xwmp_api
-void xwmp_splk_lock_cpuirqsv(struct xwmp_splk * spl, xwreg_t * cpuirq)
+void xwmp_splk_lock_cpuirqsv(struct xwmp_splk * splk, xwreg_t * cpuirq)
 {
         xwospl_cpuirq_save_lc(cpuirq);
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_lock(&spl->aspl);
+        soc_splk_lock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
@@ -472,7 +471,7 @@ void xwmp_splk_lock_cpuirqsv(struct xwmp_splk * spl, xwreg_t * cpuirq)
  * - 此函数会关闭本地CPU的抢占与中断，因此可保证其临界区在所有上下文中都是安全的。
  */
 __xwmp_api
-xwer_t xwmp_splk_trylock_cpuirqsv(struct xwmp_splk * spl, xwreg_t * cpuirq)
+xwer_t xwmp_splk_trylock_cpuirqsv(struct xwmp_splk * splk, xwreg_t * cpuirq)
 {
         xwer_t rc;
 
@@ -480,13 +479,13 @@ xwer_t xwmp_splk_trylock_cpuirqsv(struct xwmp_splk * spl, xwreg_t * cpuirq)
         xwospl_cpuirq_save_lc(cpuirq);
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
-        rc = arch_splk_trylock(&spl->aspl);
+        rc = soc_splk_trylock(&splk->socsplk);
         if (rc < 0) {
                 xwmp_skd_enpmpt_lc();
                 xwospl_cpuirq_restore_lc(*cpuirq);
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
@@ -502,12 +501,12 @@ xwer_t xwmp_splk_trylock_cpuirqsv(struct xwmp_splk * spl, xwreg_t * cpuirq)
  * - 重入性：不可重入
  */
 __xwmp_api
-void xwmp_splk_unlock_cpuirqrs(struct xwmp_splk * spl, xwreg_t cpuirq)
+void xwmp_splk_unlock_cpuirqrs(struct xwmp_splk * splk, xwreg_t cpuirq)
 {
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_unlock(&spl->aspl);
+        soc_splk_unlock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwmp_skd_enpmpt_lc();
@@ -529,7 +528,7 @@ void xwmp_splk_unlock_cpuirqrs(struct xwmp_splk * spl, xwreg_t cpuirq)
  *   与线程上下文是安全的。
  */
 __xwmp_api
-void xwmp_splk_lock_irqs(struct xwmp_splk * spl,
+void xwmp_splk_lock_irqs(struct xwmp_splk * splk,
                          const struct xwmp_irq_resource * irqs, xwsz_t num)
 {
         xwssz_t i;
@@ -539,9 +538,9 @@ void xwmp_splk_lock_irqs(struct xwmp_splk * spl,
         }
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_lock(&spl->aspl);
+        soc_splk_lock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
@@ -564,7 +563,7 @@ void xwmp_splk_lock_irqs(struct xwmp_splk * spl,
  *   与线程上下文是安全的。
  */
 __xwmp_api
-xwer_t xwmp_splk_trylock_irqs(struct xwmp_splk * spl,
+xwer_t xwmp_splk_trylock_irqs(struct xwmp_splk * splk,
                               const struct xwmp_irq_resource * irqs, xwsz_t num)
 {
         xwer_t rc;
@@ -576,7 +575,7 @@ xwer_t xwmp_splk_trylock_irqs(struct xwmp_splk * spl,
         }
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
-        rc = arch_splk_trylock(&spl->aspl);
+        rc = soc_splk_trylock(&splk->socsplk);
         if (rc < 0) {
                 xwmp_skd_enpmpt_lc();
                 for (i = (xwssz_t)num - 1; i >= 0; i--) {
@@ -584,7 +583,7 @@ xwer_t xwmp_splk_trylock_irqs(struct xwmp_splk * spl,
                 }
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
@@ -601,15 +600,15 @@ xwer_t xwmp_splk_trylock_irqs(struct xwmp_splk * spl,
  * - 重入性：不可重入
  */
 __xwmp_api
-void xwmp_splk_unlock_irqs(struct xwmp_splk * spl,
+void xwmp_splk_unlock_irqs(struct xwmp_splk * splk,
                            const struct xwmp_irq_resource * irqs, xwsz_t num)
 {
         xwssz_t i;
 
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_unlock(&spl->aspl);
+        soc_splk_unlock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwmp_skd_enpmpt_lc();
@@ -634,7 +633,7 @@ void xwmp_splk_unlock_irqs(struct xwmp_splk * spl,
  *   与线程上下文是安全的。
  */
 __xwmp_api
-void xwmp_splk_lock_irqssv(struct xwmp_splk * spl,
+void xwmp_splk_lock_irqssv(struct xwmp_splk * splk,
                            const struct xwmp_irq_resource * irqs,
                            xwreg_t flags[], xwsz_t num)
 {
@@ -645,9 +644,9 @@ void xwmp_splk_lock_irqssv(struct xwmp_splk * spl,
         }
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_lock(&spl->aspl);
+        soc_splk_lock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
@@ -671,7 +670,7 @@ void xwmp_splk_lock_irqssv(struct xwmp_splk * spl,
  *   与线程上下文是安全的。
  */
 __xwmp_api
-xwer_t xwmp_splk_trylock_irqssv(struct xwmp_splk * spl,
+xwer_t xwmp_splk_trylock_irqssv(struct xwmp_splk * splk,
                                 const struct xwmp_irq_resource * irqs,
                                 xwreg_t flags[], xwsz_t num)
 {
@@ -684,7 +683,7 @@ xwer_t xwmp_splk_trylock_irqssv(struct xwmp_splk * spl,
         }
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
-        rc = arch_splk_trylock(&spl->aspl);
+        rc = soc_splk_trylock(&splk->socsplk);
         if (rc < 0) {
                 xwmp_skd_enpmpt_lc();
                 for (i = (xwssz_t)num - 1; i >= 0; i--) {
@@ -692,7 +691,7 @@ xwer_t xwmp_splk_trylock_irqssv(struct xwmp_splk * spl,
                 }
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
@@ -710,16 +709,16 @@ xwer_t xwmp_splk_trylock_irqssv(struct xwmp_splk * spl,
  * - 重入性：不可重入
  */
 __xwmp_api
-void xwmp_splk_unlock_irqsrs(struct xwmp_splk * spl,
+void xwmp_splk_unlock_irqsrs(struct xwmp_splk * splk,
                              const struct xwmp_irq_resource * irqs,
                              xwreg_t flags[], xwsz_t num)
 {
         xwssz_t i;
 
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_unlock(&spl->aspl);
+        soc_splk_unlock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwmp_skd_enpmpt_lc();
@@ -742,16 +741,16 @@ void xwmp_splk_unlock_irqsrs(struct xwmp_splk * spl,
  *   中断底半部中是安全的。
  */
 __xwmp_api
-void xwmp_splk_lock_bh(struct xwmp_splk * spl)
+void xwmp_splk_lock_bh(struct xwmp_splk * splk)
 {
         struct xwmp_skd * xwskd;
 
         xwskd = xwmp_skd_dspmpt_lc();
         xwmp_skd_dsbh(xwskd);
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_lock(&spl->aspl);
+        soc_splk_lock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
 }
@@ -772,7 +771,7 @@ void xwmp_splk_lock_bh(struct xwmp_splk * spl)
  *   中断底半部中是安全的。
  */
 __xwmp_api
-xwer_t xwmp_splk_trylock_bh(struct xwmp_splk * spl)
+xwer_t xwmp_splk_trylock_bh(struct xwmp_splk * splk)
 {
         struct xwmp_skd * xwskd;
         xwer_t rc;
@@ -781,13 +780,13 @@ xwer_t xwmp_splk_trylock_bh(struct xwmp_splk * spl)
         xwskd = xwmp_skd_dspmpt_lc();
         xwmp_skd_dsbh(xwskd);
 #if (CPUCFG_CPU_NUM > 1)
-        rc = arch_splk_trylock(&spl->aspl);
+        rc = soc_splk_trylock(&splk->socsplk);
         if (rc < 0) {
                 xwmp_skd_enbh(xwskd);
                 xwmp_skd_enpmpt_lc();
         }
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         return rc;
@@ -802,14 +801,14 @@ xwer_t xwmp_splk_trylock_bh(struct xwmp_splk * spl)
  * - 重入性：不可重入
  */
 __xwmp_api
-void xwmp_splk_unlock_bh(struct xwmp_splk * spl)
+void xwmp_splk_unlock_bh(struct xwmp_splk * splk)
 {
         struct xwmp_skd * xwskd;
 
 #if (CPUCFG_CPU_NUM > 1)
-        arch_splk_unlock(&spl->aspl);
+        soc_splk_unlock(&splk->socsplk);
 #else /* (CPUCFG_CPU_NUM > 1) */
-        XWOS_UNUSED(spl);
+        XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif /* !(CPUCFG_CPU_NUM > 1) */
         xwskd = xwmp_skd_enbh_lc();

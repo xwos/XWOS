@@ -30,6 +30,7 @@
 #else
   #error "Can't find the configuration of XuanWuOS_CFG_CORE!"
 #endif
+#include <armv6m_core.h>
 #include <soc.h>
 #include <soc_init.h>
 
@@ -57,7 +58,7 @@ void soc_init(void)
 #endif /* !SOCCFG_RO_ISRTABLE */
 
 #if defined(XuanWuOS_CFG_CORE__mp)
-        xwid_t id = xwmp_skd_get_id();
+        xwid_t id = xwmp_skd_id_lc();
 
         /* Interrupt controller of CPU */
         xwmp_irqc_construct(&cortexm_nvic[id]);

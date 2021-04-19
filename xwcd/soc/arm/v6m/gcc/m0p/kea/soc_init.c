@@ -35,6 +35,8 @@
 #else
   #error "Can't find the configuration of XuanWuOS_CFG_CORE!"
 #endif
+#include <armv6m_core.h>
+#include <soc.h>
 #include <soc_init.h>
 
 #if (!defined(SOCCFG_RO_ISRTABLE)) || (1 != SOCCFG_RO_ISRTABLE)

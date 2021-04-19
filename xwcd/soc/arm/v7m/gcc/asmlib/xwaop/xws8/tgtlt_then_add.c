@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <armv7m_core.h>
-#include <xwos/lib/xwaop8.h>
+#include <xwos/lib/xwaop.h>
 
 __xwlib_code
 xwer_t xwaop__xws8__tgtlt_then_add(xws8_a * a,
@@ -33,11 +33,11 @@ xwer_t xwaop__xws8__tgtlt_then_add(xws8_a * a,
         xwer_t rc;
 
         do {
-                o = (xws8_t)ldrexb(a);
+                o = (xws8_t)cm_ldrexb(a);
                 if ((o > l) && (o < r)) {
                         n = o + v;
                         xwmb_mp_mb();
-                        rc = strexb(a, (xwu8_t)n);
+                        rc = cm_strexb(a, (xwu8_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;

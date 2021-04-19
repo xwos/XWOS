@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 位操作汇编库：arch_xwbop_re64
+ * @brief 位操作汇编库：xwbop_re64
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -19,10 +19,9 @@
  */
 
 #include <xwos/standard.h>
-#include <asmlib/xwbop.h>
 
 __xwbsp_code
-xwu64_t arch_xwbop_re64(xwu64_t x)
+xwu64_t xwbop_re64(xwu64_t x)
 {
         xwu32_t * addrl;
         xwu32_t * addrh;

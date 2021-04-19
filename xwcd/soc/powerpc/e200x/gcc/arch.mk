@@ -36,12 +36,11 @@ ifeq ($(ARCHCFG_LIB_XWBMPAOP),y)
     ARCH_ASRCS += asmlib/asm_xwbmpaop.S
 endif
 
-ARCH_CSRCS += asmlib/lfq.c
 ARCH_CSRCS += asmlib/xwbop.c
 ARCH_ASRCS += asmlib/asm_xwbop.S
 ARCH_CSRCS += asmlib/asm_rw.S
 
-ARCH_CSRCS += arch_init.c arch_sc_trap.c arch_xwsc.c
+ARCH_CSRCS += arch_init.c arch_sc_trap.c xwosimpl_soc_lfq.c xwosimpl_soc_xwsc.c
 ARCH_ASRCS += startup.S
 ARCH_ASRCS += arch_isr.S
-ARCH_ASRCS += arch_spinlock.S
+ARCH_ASRCS += xwosimpl_soc_spinlock.S

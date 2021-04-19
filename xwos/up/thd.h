@@ -23,15 +23,15 @@
 #include <xwos/up/wqn.h>
 #include <xwos/up/tt.h>
 #if defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)
-#include <xwos/up/mtxtree.h>
+  #include <xwos/up/mtxtree.h>
 #endif /* XWUPCFG_LOCK_MTX */
 #if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
-#if !defined(XWUPCFG_SYNC_COND) || (1 != XWUPCFG_SYNC_COND)
-#error "XWUPCFG_SYNC_COND must be 1 if (1 == XWUPCFG_SKD_THD_EXIT) !"
-#endif /* !XWUPCFG_SYNC_COND */
+  #if !defined(XWUPCFG_SYNC_COND) || (1 != XWUPCFG_SYNC_COND)
+    #error "XWUPCFG_SYNC_COND must be 1 if (1 == XWUPCFG_SKD_THD_EXIT) !"
+  #endif /* !XWUPCFG_SYNC_COND */
 #endif /* XWUPCFG_SKD_THD_EXIT */
 #if defined(XWUPCFG_SYNC_COND) && (1 == XWUPCFG_SYNC_COND)
-#include <xwos/up/sync/cond.h>
+  #include <xwos/up/sync/cond.h>
 #endif
 
 struct xwup_skd;

@@ -20,7 +20,6 @@
 
 #include <xwos/standard.h>
 #include <e200x_core.h>
-#include <xwos/lib/xwaop32.h>
 
 __xwlib_code
 xws32_t xwaop__xws32__load(xws32_a * a,

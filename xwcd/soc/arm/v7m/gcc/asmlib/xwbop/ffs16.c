@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 位操作汇编库：arch_xwbop_ffs16
+ * @brief 位操作汇编库：xwbop_ffs16
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -19,10 +19,10 @@
  */
 
 #include <xwos/standard.h>
-#include <asmlib/xwbop.h>
+#include <xwos/lib/xwbop.h>
 
 __xwbsp_code
-xwssq_t arch_xwbop_ffs16(xwu16_t x)
+xwssq_t xwbop_ffs16(xwu16_t x)
 {
-        return arch_xwbop_ffs32((xwu32_t)(x & 0xFFFFU));
+        return xwbop_ffs32((xwu32_t)(x & 0xFFFFU));
 }

@@ -23,7 +23,7 @@ SOC_EOBJS :=
 SOC_CSRCS :=
 SOC_ASRCS :=
 
-SOC_ASRCS += soc_eii_isr.S ospl_skd_asmimpl.S
+SOC_ASRCS += soc_eii_isr.S xwosasmimpl_skd.S
 
 SOC_CSRCS += soc_init.c
 SOC_CSRCS += soc_me.c
@@ -32,9 +32,9 @@ ifeq ($(SOCCFG_FLASH_OPCODE),y)
 endif
 SOC_CSRCS += soc_wdg.c
 SOC_CSRCS += soc_reset.c
-SOC_CSRCS += ospl_irq_impl.c
-SOC_CSRCS += ospl_syshwt_impl.c
-SOC_CSRCS += ospl_skd_impl.c
+SOC_CSRCS += xwosimpl_irq.c
+SOC_CSRCS += xwosimpl_skd.c
+SOC_CSRCS += xwosimpl_syshwt.c
 
 
 ifeq ($(XuanWuOS_CFG_CORE),mp)

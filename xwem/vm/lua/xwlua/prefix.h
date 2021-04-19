@@ -12,7 +12,7 @@
 #define __xwem_vm_lua_xwlua_prefix_h__
 
 #include <xwos/standard.h>
-#include <xwos/lib/jmp.h>
+#include <xwos/lib/setjmp.h>
 
 void * xwlua_alloc(void * ud, void * ptr, size_t osize, size_t nsize);
 #define LUA_ALLOC       xwlua_alloc

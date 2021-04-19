@@ -22,7 +22,6 @@
 #define __compiler_barrier_h__
 
 #include <cfg/XuanWuOS.h>
-#include <arch_type.h>
 #include <compiler/gcc.h>
 
 /******** ******** barrier ******** ********/

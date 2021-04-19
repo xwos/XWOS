@@ -45,34 +45,22 @@
 #define ARCHCFG_CXX                             0
 
 /******** xwbop ********/
-#define ARCHCFG_LIB_XWBOP_S1M8                  0
-#define ARCHCFG_LIB_XWBOP_C0M8                  0
-#define ARCHCFG_LIB_XWBOP_X1M8                  0
 #define ARCHCFG_LIB_XWBOP_FFS8                  1
 #define ARCHCFG_LIB_XWBOP_FLS8                  1
 #define ARCHCFG_LIB_XWBOP_RBIT8                 0
 
-#define ARCHCFG_LIB_XWBOP_S1M16                 0
-#define ARCHCFG_LIB_XWBOP_C0M16                 0
-#define ARCHCFG_LIB_XWBOP_X1M16                 0
 #define ARCHCFG_LIB_XWBOP_FFS16                 1
 #define ARCHCFG_LIB_XWBOP_FLS16                 1
 #define ARCHCFG_LIB_XWBOP_RBIT16                0
 #define ARCHCFG_LIB_XWBOP_RE16                  1
 #define ARCHCFG_LIB_XWBOP_RE16S32               0
 
-#define ARCHCFG_LIB_XWBOP_S1M32                 0
-#define ARCHCFG_LIB_XWBOP_C0M32                 0
-#define ARCHCFG_LIB_XWBOP_X1M32                 0
 #define ARCHCFG_LIB_XWBOP_FFS32                 1
 #define ARCHCFG_LIB_XWBOP_FLS32                 1
 #define ARCHCFG_LIB_XWBOP_RBIT32                0
 #define ARCHCFG_LIB_XWBOP_RE32                  1
 #define ARCHCFG_LIB_XWBOP_RE32S64               0
 
-#define ARCHCFG_LIB_XWBOP_S1M64                 0
-#define ARCHCFG_LIB_XWBOP_C0M64                 0
-#define ARCHCFG_LIB_XWBOP_X1M64                 0
 #define ARCHCFG_LIB_XWBOP_FFS64                 1
 #define ARCHCFG_LIB_XWBOP_FLS64                 1
 #define ARCHCFG_LIB_XWBOP_RBIT64                0
@@ -87,15 +75,12 @@
 #define ARCHCFG_LIB_XWBMPOP_X1I                 0
 #define ARCHCFG_LIB_XWBMPOP_T1I                 0
 
-/******** atomic operations ********/
+/******** xwaop ********/
 #define ARCHCFG_LIB_XWAOP8                      0
 #define ARCHCFG_LIB_XWAOP16                     0
 #define ARCHCFG_LIB_XWAOP32                     1
 #define ARCHCFG_LIB_XWAOP64                     0
 #define ARCHCFG_LIB_XWBMPAOP                    1
-
-/******** debug ********/
-#define ARCHCFG_BKPT                            0
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********     image flag    ******** ******** ********

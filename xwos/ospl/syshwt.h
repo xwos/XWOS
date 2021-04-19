@@ -34,6 +34,6 @@ xwer_t xwospl_syshwt_start(struct xwospl_syshwt * hwt);
 xwer_t xwospl_syshwt_stop(struct xwospl_syshwt * hwt);
 xwtm_t xwospl_syshwt_get_timeconfetti(struct xwospl_syshwt * hwt);
 
-#include <ospl_syshwt_impl.h>
+#include <xwosimpl_syshwt.h>
 
-#endif /* xwos/mp/ospl/syshwt.h */
+#endif /* xwos/ospl/syshwt.h */

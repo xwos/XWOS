@@ -14,13 +14,13 @@
 #define __xwos_mp_lock_spinlock_h__
 
 #include <xwos/standard.h>
-#include <arch_spinlock.h>
+#include <xwos/ospl/soc/spinlock.h>
 
 /**
  * @brief XWOS的自旋锁
  */
 struct xwmp_splk {
-        struct arch_splk aspl; /**< 架构描述层中的自旋锁结构体 */
+        struct soc_splk socsplk; /**< 架构描述层中的自旋锁结构体 */
 };
 
 struct xwmp_irq_resource;

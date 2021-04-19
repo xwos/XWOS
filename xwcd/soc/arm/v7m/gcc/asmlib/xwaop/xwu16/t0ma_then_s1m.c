@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <armv7m_core.h>
-#include <xwos/lib/xwaop16.h>
+#include <xwos/lib/xwaop.h>
 
 __xwlib_code
 xwer_t xwaop__xwu16__t0ma_then_s1m(xwu16_a * a,
@@ -32,11 +32,11 @@ xwer_t xwaop__xwu16__t0ma_then_s1m(xwu16_a * a,
         xwer_t rc;
 
         do {
-                o = (xwu16_t)ldrexh(a);
+                o = (xwu16_t)cm_ldrexh(a);
                 if (!(o & m)) {
                         n = o | m;
                         xwmb_mp_mb();
-                        rc = strexh(a, (xwu16_t)n);
+                        rc = cm_strexh(a, (xwu16_t)n);
                 } else {
                         rc = -EACCES;
                         n = o;

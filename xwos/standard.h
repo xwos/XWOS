@@ -27,6 +27,9 @@
 #include <xwos/lib/type.h>
 #include <xwos/lib/rule.h>
 #include <xwos/lib/error.h>
+#if defined(SOCCFG_BKPT) && (1 == SOCCFG_BKPT)
+  #include <xwos/ospl/soc/bkpt.h>
+#endif
 
 /**
  * @brief 接口
@@ -46,8 +49,8 @@
 #endif
 
 #if defined(XWKNCFG_BUG) && (1 == XWKNCFG_BUG)
-  #if defined(ARCHCFG_BKPT) && (1 == ARCHCFG_BKPT)
-    #define XWOS_BUG()          arch_bkpt()
+  #if defined(SOCCFG_BKPT) && (1 == SOCCFG_BKPT)
+    #define XWOS_BUG()          soc_bkpt()
   #else
     #define XWOS_BUG()          do {} while (1)
   #endif

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 位操作汇编库：arch_xwbop_re32s64
+ * @brief 位操作汇编库：xwbop_re32s64
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -19,10 +19,9 @@
  */
 
 #include <xwos/standard.h>
-#include <asmlib/xwbop.h>
 
 __xwbsp_code
-xws64_t arch_xwbop_re32s64(xwu32_t x)
+xws64_t xwbop_re32s64(xwu32_t x)
 {
         union {
                 xws64_t q;

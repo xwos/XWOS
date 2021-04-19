@@ -30,6 +30,9 @@
 #define SOCCFG_NVIC_PRIO_BITNUM                 4U
 #define SOCCFG_NVIC_SUBPRIO_BITIDX              4U
 
+/******** Debug ********/
+#define SOCCFG_BKPT                             1
+
 /******** ******** CRC ******** ********/
 #define SOCCFG_CRC32                            1
 #define SOCCFG_CRC8                             1

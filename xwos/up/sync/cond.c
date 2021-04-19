@@ -460,7 +460,6 @@ xwer_t xwup_cond_broadcast_once(struct xwup_cond * cond, bool * retry)
 __xwup_api
 xwer_t xwup_cond_broadcast(struct xwup_cond * cond)
 {
-        xwreg_t cpuirq;
         bool retry;
         xwer_t rc;
 
@@ -472,6 +471,7 @@ xwer_t xwup_cond_broadcast(struct xwup_cond * cond)
         } while (retry);
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
         if (__xwcc_likely(XWOK == rc)) {
+                xwreg_t cpuirq;
                 struct xwup_evt * evt;
                 struct xwup_synobj * synobj;
 

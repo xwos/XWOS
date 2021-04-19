@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 位操作汇编库：arch_xwbop_fls64
+ * @brief 位操作汇编库：xwbop_fls64
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -19,10 +19,9 @@
  */
 
 #include <xwos/standard.h>
-#include <asmlib/xwbop.h>
 
 __xwbsp_code __xwcc_naked
-xwssq_t arch_xwbop_fls64(__xwcc_unused xwu64_t x)
+xwssq_t xwbop_fls64(__xwcc_unused xwu64_t x)
 {
         __asm__ volatile("      cmp     r1, #0");       /* if (high_word(x) != 0) */
         __asm__ volatile("      ittt    ne");           /* {                      */

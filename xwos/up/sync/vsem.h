@@ -41,6 +41,9 @@ void xwup_vsem_activate(struct xwup_vsem * sem);
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
 xwer_t xwup_vsem_bind(struct xwup_vsem * sem, struct xwup_evt * evt, xwsq_t pos);
 xwer_t xwup_vsem_unbind(struct xwup_vsem * sem, struct xwup_evt * evt);
+#else
+#define xwup_vsem_bind(sem, evt, pos) (-ENOSYS)
+#define xwup_vsem_unbind(sem, evt) (-ENOSYS)
 #endif /* XWUPCFG_SYNC_EVT */
 
 xwer_t xwup_vsem_freeze(struct xwup_vsem * sem);

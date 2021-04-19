@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 位操作汇编库：arch_xwbop_ffs64
+ * @brief 位操作汇编库：xwbop_ffs64
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -19,10 +19,9 @@
  */
 
 #include <xwos/standard.h>
-#include <asmlib/xwbop.h>
 
 __xwbsp_code __xwcc_naked
-xwssq_t arch_xwbop_ffs64(__xwcc_unused xwu64_t x)
+xwssq_t xwbop_ffs64(__xwcc_unused xwu64_t x)
 {
         __asm__ volatile("      rbit    r0, r0");
         __asm__ volatile("      rbit    r1, r1");

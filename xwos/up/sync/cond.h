@@ -49,6 +49,9 @@ xwer_t xwup_cond_delete(struct xwup_cond * cond);
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
 xwer_t xwup_cond_bind(struct xwup_cond * cond, struct xwup_evt * evt, xwsq_t pos);
 xwer_t xwup_cond_unbind(struct xwup_cond * cond, struct xwup_evt * evt);
+#else
+#define xwup_cond_bind(cond, evt, pos) (-ENOSYS)
+#define xwup_cond_unbind(cond, evt) (ENOSYS)
 #endif /* XWUPCFG_SYNC_EVT */
 
 xwer_t xwup_cond_freeze(struct xwup_cond * cond);

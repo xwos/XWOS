@@ -94,12 +94,21 @@ static __xwcc_inline
 xwer_t xwosdl_sem_bind(struct xwosdl_sem * sem, struct xwosdl_sel * sel,
                        xwsq_t pos)
 {
+#if !defined(XWUPCFG_SYNC_EVT) || (1 != XWUPCFG_SYNC_EVT)
+        XWOS_UNUSED(sem);
+        XWOS_UNUSED(sel);
+        XWOS_UNUSED(pos);
+#endif /* !XWUPCFG_SYNC_EVT */
         return xwup_rtsem_bind(sem, sel, pos);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_unbind(struct xwosdl_sem * sem, struct xwosdl_sel * sel)
 {
+#if !defined(XWUPCFG_SYNC_EVT) || (1 != XWUPCFG_SYNC_EVT)
+        XWOS_UNUSED(sem);
+        XWOS_UNUSED(sel);
+#endif /* !XWUPCFG_SYNC_EVT */
         return xwup_rtsem_unbind(sem, sel);
 }
 
@@ -230,12 +239,21 @@ static __xwcc_inline
 xwer_t xwosdl_sem_bind(struct xwosdl_sem * sem, struct xwosdl_sel * sel,
                        xwsq_t pos)
 {
+#if !defined(XWUPCFG_SYNC_EVT) || (1 != XWUPCFG_SYNC_EVT)
+        XWOS_UNUSED(sem);
+        XWOS_UNUSED(sel);
+        XWOS_UNUSED(pos);
+#endif /* !XWUPCFG_SYNC_EVT */
         return xwup_plsem_bind(sem, sel, pos);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_unbind(struct xwosdl_sem * sem, struct xwosdl_sel * sel)
 {
+#if !defined(XWUPCFG_SYNC_EVT) || (1 != XWUPCFG_SYNC_EVT)
+        XWOS_UNUSED(sem);
+        XWOS_UNUSED(sel);
+#endif /* !XWUPCFG_SYNC_EVT */
         return xwup_plsem_unbind(sem, sel);
 }
 

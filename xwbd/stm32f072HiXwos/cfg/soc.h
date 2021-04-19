@@ -29,6 +29,9 @@
 #define SOCCFG_RO_ISRTABLE                      1
 #define SOCCFG_NVIC_PRIO_BITNUM                 2U
 
+/******** Debug ********/
+#define SOCCFG_BKPT                             1
+
 /******** ******** CRC ******** ********/
 #define SOCCFG_CRC32                            1
 #define SOCCFG_CRC8                             0

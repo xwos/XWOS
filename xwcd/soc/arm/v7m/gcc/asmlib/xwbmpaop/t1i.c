@@ -19,7 +19,6 @@
  */
 
 #include <xwos/standard.h>
-#include <asmlib/xwbop.h>
 
 __xwlib_code __xwcc_naked
 bool xwbmpaop_t1i(__xwcc_unused xwbmp_a * bmp,

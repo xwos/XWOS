@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 位操作汇编库：arch_xwbop_re32
+ * @brief 位操作汇编库：xwbop_re32
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -19,10 +19,9 @@
  */
 
 #include <xwos/standard.h>
-#include <asmlib/xwbop.h>
 
 __xwbsp_code __xwcc_naked
-xwu32_t arch_xwbop_re32(__xwcc_unused xwu32_t x)
+xwu32_t xwbop_re32(__xwcc_unused xwu32_t x)
 {
         __asm__ volatile("      rev     r0, r0");
         __asm__ volatile("      bx      lr");
