@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内核实现层：调度
+ * @brief 玄武OS移植实现层：调度
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

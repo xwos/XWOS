@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内核移植层：SOC SPINLOCK
+ * @brief 玄武OS移植层：SOC SPINLOCK
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

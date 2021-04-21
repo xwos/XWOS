@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内核移植层：SOC BKPT
+ * @brief 玄武OS移植层：SOC BKPT
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

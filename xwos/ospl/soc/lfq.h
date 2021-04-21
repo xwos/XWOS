@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内核移植层：SOC无锁队列
+ * @brief 玄武OS移植层：SOC无锁队列
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -16,7 +16,7 @@
 #include <xwos/standard.h>
 
 void xwlib_lfq_push(xwlfq_a * h, xwlfq_a * n);
-xwlfq_t * xwlib_lfq_pop(xwlfq_a * h);;
+xwlfq_t * xwlib_lfq_pop(xwlfq_a * h);
 
 #include <xwosimpl_soc_lfq.h>
 

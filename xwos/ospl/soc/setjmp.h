@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内核移植层：SOC setjmp/longjmp
+ * @brief 玄武OS移植层：SOC setjmp/longjmp
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

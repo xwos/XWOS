@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内核实现层：系统硬件定时器
+ * @brief 玄武OS移植实现层：系统硬件定时器
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
