@@ -37,9 +37,10 @@ xwer_t xwospl_irqc_init(void)
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_request_irq(xwirq_t irqn, xwisr_f isrfunc, xwsq_t flag, void * data)
+xwer_t xwospl_irqc_request_irq(xwirq_t irqn, xwisr_f isrfunc, void * data,
+                               const struct soc_irq_cfg * cfg)
 {
-        return cortexm_nvic_drv_request(irqn, isrfunc, flag, data);
+        return cortexm_nvic_drv_request(irqn, isrfunc, data, cfg);
 }
 
 __xwbsp_code

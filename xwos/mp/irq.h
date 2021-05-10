@@ -38,8 +38,8 @@ struct xwmp_irq_resource {
 struct xwmp_irqc_driver {
         xwer_t (* probe)(struct xwmp_irqc *); /**< 探测  */
         xwer_t (* remove)(struct xwmp_irqc *); /**< 删除 */
-        xwer_t (* request)(struct xwmp_irqc *, xwirq_t, xwisr_f,
-                           xwsq_t, void *); /**< 申请中断 */
+        xwer_t (* request)(struct xwmp_irqc *, xwirq_t, xwisr_f, void *,
+                           const struct soc_irq_cfg *); /**< 申请中断 */
         xwer_t (* release)(struct xwmp_irqc *, xwirq_t); /**< 释放中断 */
         xwer_t (* enable)(struct xwmp_irqc *, xwirq_t); /**< 开启中断 */
         xwer_t (* disable)(struct xwmp_irqc *, xwirq_t); /**< 关闭中断 */
@@ -96,7 +96,8 @@ struct xwmp_irqc * xwmp_irqc_get_lc(void);
 void xwmp_irqc_set_data(struct xwmp_irqc * irqc, void * data);
 void * xwmp_irqc_get_data(struct xwmp_irqc * irqc);
 struct xwmp_irqc * xwmp_irq_get_irqc(xwirq_t irqn);
-xwer_t xwmp_irq_request(xwirq_t irqn, xwisr_f isr, xwsq_t flag, void * data);
+xwer_t xwmp_irq_request(xwirq_t irqn, xwisr_f isr, void * data,
+                        const struct soc_irq_cfg * cfg);
 xwer_t xwmp_irq_release(xwirq_t irqn);
 xwer_t xwmp_irq_enable(xwirq_t irqn);
 xwer_t xwmp_irq_disable(xwirq_t irqn);

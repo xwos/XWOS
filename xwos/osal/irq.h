@@ -42,8 +42,8 @@
  * @brief XWOS API：申请中断
  * @param irqn: (I) 中断号
  * @param isr: (I) 中断处理函数
- * @param flag: (I) 中断标志
  * @param data: (I) 中断数据
+ * @param cfg: (I) 中断配置
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ERANGE: 中断号超出范围
@@ -58,9 +58,10 @@
  * - 重入性：同一中断号，不可重入
  */
 static __xwos_inline_api
-xwer_t xwos_irq_request(xwirq_t irqn, xwisr_f isr, xwsq_t flag, void * data)
+xwer_t xwos_irq_request(xwirq_t irqn, xwisr_f isr, void * data,
+                        const struct soc_irq_cfg * cfg)
 {
-        return xwosdl_irq_request(irqn, isr, flag, data);
+        return xwosdl_irq_request(irqn, isr, data, cfg);
 }
 
 /**

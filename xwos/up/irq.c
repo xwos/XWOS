@@ -69,11 +69,12 @@ void * xwup_irqc_get_data(void)
 
 /******** ******** IRQ APIs ******** ********/
 __xwup_api
-xwer_t xwup_irq_request(xwirq_t irqn, xwisr_f isr, xwsq_t flag, void * data)
+xwer_t xwup_irq_request(xwirq_t irqn, xwisr_f isr, void * data,
+                        const struct soc_irq_cfg * cfg)
 {
         XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM), "out-of-range", -ERANGE);
 
-        return xwospl_irqc_request_irq(irqn, isr, flag, data);
+        return xwospl_irqc_request_irq(irqn, isr, data, cfg);
 }
 
 __xwup_api

@@ -39,7 +39,8 @@ xwer_t xwospl_irq_get_id(xwirq_t * irqnbuf);
 
 #if defined(XuanWuOS_CFG_CORE__up)
 xwer_t xwospl_irqc_init(void);
-xwer_t xwospl_irqc_request_irq(xwirq_t irqn, xwisr_f isrfunc, xwsq_t flag, void * data);
+xwer_t xwospl_irqc_request_irq(xwirq_t irqn, xwisr_f isrfunc, void * data,
+                               const struct soc_irq_cfg * cfg);
 xwer_t xwospl_irqc_release_irq(xwirq_t irqn);
 xwer_t xwospl_irqc_enable_irq(xwirq_t irqn);
 xwer_t xwospl_irqc_disable_irq(xwirq_t irqn);

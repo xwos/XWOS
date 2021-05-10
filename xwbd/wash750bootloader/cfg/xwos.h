@@ -35,6 +35,8 @@
 #define XWLIBCFG_XWLOG_LEVEL                            (0U)
 #define XWLIBCFG_XWLOG_BUFSIZE                          (256U)
 
+#define XWLIBCFG_SC                                     1
+
 #define XWLIBCFG_XWAOP8                                 1
 #define XWLIBCFG_XWAOP16                                1
 #define XWLIBCFG_XWAOP32                                1

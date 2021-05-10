@@ -54,11 +54,41 @@ xwer_t soc_irqc_drv_init(void)
 
 /******** ******** irq operations ******** ********/
 __xwbsp_code
-xwer_t soc_irqc_drv_request(xwirq_t irqn, xwisr_f isrfunc, xwsq_t flag, void * data)
+xwer_t soc_irqc_drv_request(xwirq_t irqn, xwisr_f isrfunc, void * data,
+                            const struct soc_irq_cfg * cfg);
+
+__xwbsp_code
+xwer_t soc_irqc_drv_release(xwirq_t irqn);
+
+__xwbsp_code
+xwer_t soc_irqc_drv_enable(xwirq_t irqn);
+
+__xwbsp_code
+xwer_t soc_irqc_drv_disable(xwirq_t irqn);
+
+__xwbsp_code
+xwer_t soc_irqc_drv_save(xwirq_t irqn, xwreg_t * flag);
+
+__xwbsp_code
+xwer_t soc_irqc_drv_restore(xwirq_t irqn, xwreg_t flag);
+
+__xwbsp_code
+xwer_t soc_irqc_drv_pend(xwirq_t irqn);
+
+__xwbsp_code
+xwer_t soc_irqc_drv_clear(xwirq_t irqn);
+
+__xwbsp_code
+xwer_t soc_irqc_drv_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg);
+
+__xwbsp_code
+xwer_t soc_irqc_drv_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf);
+
+__xwbsp_code
+xwer_t soc_irqc_drv_request(xwirq_t irqn, xwisr_f isrfunc, void * data,
+                            const struct soc_irq_cfg * cfg)
 {
-        XWOS_UNUSED(irqn);
         XWOS_UNUSED(isrfunc);
-        XWOS_UNUSED(flag);
         XWOS_UNUSED(data);
 
 #if !defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE)
@@ -75,6 +105,9 @@ xwer_t soc_irqc_drv_request(xwirq_t irqn, xwisr_f isrfunc, xwsq_t flag, void * d
                 }
         }
 #endif /* !SOCCFG_RO_ISRTABLE */
+        if (cfg) {
+                soc_irqc_drv_cfg(irqn, cfg);
+        }
 
         return XWOK;
 }

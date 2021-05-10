@@ -71,7 +71,8 @@ xwu32_t soc_irq_get_priority(xwirq_t irq)
 
 #if defined(XuanWuOS_CFG_CORE__up)
 xwer_t soc_irqc_drv_init(void);
-xwer_t soc_irqc_drv_request(xwirq_t irqn, xwisr_f isrfunc, xwsq_t flag, void * data);
+xwer_t soc_irqc_drv_request(xwirq_t irqn, xwisr_f isrfunc, void * data,
+                            const struct soc_irq_cfg * cfg);
 xwer_t soc_irqc_drv_release(xwirq_t irqn);
 xwer_t soc_irqc_drv_enable(xwirq_t irqn);
 xwer_t soc_irqc_drv_disable(xwirq_t irqn);
@@ -90,9 +91,10 @@ xwer_t xwospl_irqc_init(void)
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_request_irq(xwirq_t irqn, xwisr_f isrfunc, xwsq_t flag, void * data)
+xwer_t xwospl_irqc_request_irq(xwirq_t irqn, xwisr_f isrfunc, void * data,
+                               const struct soc_irq_cfg * cfg)
 {
-        return soc_irqc_drv_request(irqn, isrfunc, flag, data);
+        return soc_irqc_drv_request(irqn, isrfunc, data, cfg);
 }
 
 __xwbsp_code

@@ -249,8 +249,7 @@ xwer_t mpc560xb_soc_drv_start(struct xwds_device * dev)
         /* request irqs */
         for (i = 0; i < (xwssz_t)resources->irqrsc_num; i++) {
                 irqrsc = &resources->irqrsc_array[i];
-                rc = xwos_irq_request(irqrsc->irqn, irqrsc->isr,
-                                      XWOS_UNUSED_ARGUMENT, soc);
+                rc = xwos_irq_request(irqrsc->irqn, irqrsc->isr, soc, NULL);
                 if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 irqrsc = &resources->irqrsc_array[j];

@@ -30,8 +30,8 @@ __xwbsp_code
 xwer_t cortexm_nvic_drv_init(void);
 
 __xwbsp_code
-xwer_t cortexm_nvic_drv_request(xwirq_t irqn, xwisr_f isrfunc, xwsq_t flag,
-                                void * data);
+xwer_t cortexm_nvic_drv_request(xwirq_t irqn, xwisr_f isrfunc, void * data,
+                                const struct soc_irq_cfg * cfg);
 
 __xwbsp_code
 xwer_t cortexm_nvic_drv_release(xwirq_t irqn);

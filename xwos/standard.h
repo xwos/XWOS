@@ -38,7 +38,7 @@
 
 #ifndef xw_array_size
 /**
- * @brief 得到结构体数组中结构体的个数
+ * @brief 获取结构体数组中结构体的个数
  * @param ay: (I) 数组名
  */
   #define xw_array_size(ay) (sizeof(ay) / sizeof((ay)[0]))

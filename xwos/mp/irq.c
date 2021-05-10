@@ -269,8 +269,8 @@ struct xwmp_irqc * xwmp_irq_get_irqc(xwirq_t irqn)
  * @brief XWMP API：申请中断
  * @param irqn: (I) 中断号
  * @param isr: (I) 中断处理函数
- * @param flag: (I) 中断标志
  * @param data: (I) 中断数据
+ * @param cfg: (I) 中断配置
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ERANGE: 中断号超出范围
@@ -285,7 +285,8 @@ struct xwmp_irqc * xwmp_irq_get_irqc(xwirq_t irqn)
  * - 重入性：同一中断号，不可重入
  */
 __xwmp_api
-xwer_t xwmp_irq_request(xwirq_t irqn, xwisr_f isr, xwsq_t flag, void * data)
+xwer_t xwmp_irq_request(xwirq_t irqn, xwisr_f isr, void * data,
+                        const struct soc_irq_cfg * cfg)
 {
         xwer_t rc;
         struct xwmp_irqc * irqc;
@@ -300,7 +301,7 @@ xwer_t xwmp_irq_request(xwirq_t irqn, xwisr_f isr, xwsq_t flag, void * data)
         } else {
                 drv = irqc->drv;
                 if ((drv) && (drv->request)) {
-                        rc = drv->request(irqc, irqn, isr, flag, data);
+                        rc = drv->request(irqc, irqn, isr, data, cfg);
                 } else {
                         rc = -ENOSYS;
                 }

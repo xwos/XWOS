@@ -18,9 +18,10 @@
 #define xwosdl_irq_resource xwmp_irq_resource
 
 static __xwcc_inline
-xwer_t xwosdl_irq_request(xwirq_t irqn, xwisr_f isr, xwsq_t flag, void * data)
+xwer_t xwosdl_irq_request(xwirq_t irqn, xwisr_f isr, void * data,
+                          const struct soc_irq_cfg * cfg)
 {
-        return xwmp_irq_request(irqn, isr, flag, data);
+        return xwmp_irq_request(irqn, isr, data, cfg);
 }
 
 static __xwcc_inline

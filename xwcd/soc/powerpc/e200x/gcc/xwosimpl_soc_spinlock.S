@@ -23,7 +23,7 @@
 
 /**
  * @brief Lock a bit spin lock
- * @param addr: bit0 is lock.
+ * @param addr: (I) spinlock
  */
         .section        .xwos.text,"ax"
         .global         soc_splk_lock
@@ -45,7 +45,7 @@ soc_splk_lock_end:
 
 /**
  * @brief Try to lock a spinlock
- * @param addr: bit0 is lock.
+ * @param addr: (I) spinlock
  * @retval -EAGAIN: Can't acquire the lock and try again
  * @retval 0: OK
  */
@@ -74,7 +74,7 @@ soc_splk_trylock_end:
 
 /**
  * @brief Unlock a spinlock
- * @param addr: bit0 is lock.
+ * @param addr: (I) spinlock
  */
         .section        .xwos.text,"ax"
         .global         soc_splk_unlock

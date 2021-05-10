@@ -49,7 +49,8 @@ xwer_t xwup_irqc_init(const char * name, xwsz_t irqs_num,
 void xwup_irqc_set_data(void * data);
 void * xwup_irqc_get_data(void);
 
-xwer_t xwup_irq_request(xwirq_t irqn, xwisr_f isr, xwsq_t flag, void * data);
+xwer_t xwup_irq_request(xwirq_t irqn, xwisr_f isr, void * data,
+                        const struct soc_irq_cfg * cfg);
 xwer_t xwup_irq_release(xwirq_t irqn);
 xwer_t xwup_irq_enable(xwirq_t irqn);
 xwer_t xwup_irq_disable(xwirq_t irqn);

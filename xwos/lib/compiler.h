@@ -370,7 +370,7 @@
 #define xwmb_mp_load_acquire(t, v, p)           \
         do {                                    \
                 xwmb_read(t, (v), (p));         \
-                xwmb_mp_mb();                   \
+                xwmb_mp_load_acquire_mb();      \
         } while (0)
 #endif
 
@@ -386,7 +386,7 @@
  */
 #define xwmb_mp_store_release(t, p, v)          \
         do {                                    \
-                xwmb_mp_mb();                   \
+                xwmb_mp_store_release_mb();     \
                 xwmb_write(t, (p), (v));        \
         } while (0)
 #endif

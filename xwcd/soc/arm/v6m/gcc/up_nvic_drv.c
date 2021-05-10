@@ -45,10 +45,10 @@ xwer_t cortexm_nvic_drv_init(void)
 
 /******** ******** IRQ Drivers ******** ********/
 __xwbsp_code
-xwer_t cortexm_nvic_drv_request(__xwcc_unused xwirq_t irqn,
+xwer_t cortexm_nvic_drv_request(xwirq_t irqn,
                                 __xwcc_unused xwisr_f isrfunc,
-                                __xwcc_unused xwsq_t flag,
-                                __xwcc_unused void * data)
+                                __xwcc_unused void * data,
+                                const struct soc_irq_cfg * cfg)
 {
 #if (!defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE))
         struct soc_isr_table * isr_table;
@@ -62,6 +62,9 @@ xwer_t cortexm_nvic_drv_request(__xwcc_unused xwirq_t irqn,
                 isr_data_table->soc[irqn] = data;
         }
 #endif /* !SOCCFG_RO_ISRTABLE */
+        if (cfg) {
+                cortexm_nvic_drv_cfg(irqn, cfg);
+        }
         return XWOK;
 }
 

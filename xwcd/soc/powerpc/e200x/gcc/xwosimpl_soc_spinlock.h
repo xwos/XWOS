@@ -45,4 +45,4 @@ void soc_splk_lock(struct soc_splk * socsplk);
 xwer_t soc_splk_trylock(struct soc_splk * socsplk);
 void soc_splk_unlock(struct soc_splk * socsplk);
 
-#endif /* arch_spinlock.h */
+#endif /* xwosimpl_soc_spinlock.h */

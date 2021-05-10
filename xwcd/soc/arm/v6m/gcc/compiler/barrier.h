@@ -36,4 +36,7 @@
 #define xwmb_mp_wmb()           armv6m_dmb()
 #define xwmb_mp_ddb()           xwccmb()
 
+#define xwmb_mp_load_acquire_mb()       xwmb_mp_mb()
+#define xwmb_mp_store_release_mb()      xwmb_mp_mb()
+
 #endif /* compiler/barrier.h */

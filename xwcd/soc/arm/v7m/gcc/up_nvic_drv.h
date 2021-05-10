@@ -27,8 +27,8 @@ struct soc_irq_cfg;
 struct soc_irq_data;
 
 xwer_t cortexm_nvic_drv_init(void);
-xwer_t cortexm_nvic_drv_request(xwirq_t irqn, xwisr_f isrfunc, xwsq_t flag,
-                                void * data);
+xwer_t cortexm_nvic_drv_request(xwirq_t irqn, xwisr_f isrfunc, void * data,
+                                const struct soc_irq_cfg * cfg);
 xwer_t cortexm_nvic_drv_release(xwirq_t irqn);
 xwer_t cortexm_nvic_drv_enable(xwirq_t irqn);
 xwer_t cortexm_nvic_drv_disable(xwirq_t irqn);
