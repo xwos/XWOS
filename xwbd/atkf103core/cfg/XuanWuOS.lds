@@ -34,24 +34,24 @@ MEMORY {
         sram_mr (rw): org = 0x68000000, len = 1M
 
         /* 中断向量表的加载地址(LMA)区域 */
-        vctbl_lmr (rx):
+        ivt_lmr (rx):
                 org = fmw_origin,
                 len = 1024
 
         /* 中断向量表的运行地址(VMA)区域 */
-        vctbl_vmr (rw):
+        ivt_vmr (rw):
                 org = fmw_origin,
                 len = 1024
 
         /* 镜像文件的信息 */
         image_description_mr (rx):
-                org = ORIGIN(vctbl_lmr) + LENGTH(vctbl_lmr),
+                org = ORIGIN(ivt_lmr) + LENGTH(ivt_lmr),
                 len = 64
 
         /* 代码段(.text)与只读数据段(.rodata) */
         code_mr (rx):
                 org = ORIGIN(image_description_mr) + LENGTH(image_description_mr),
-                len = flash_mr_size - LENGTH(image_description_mr) - LENGTH(vctbl_lmr)
+                len = flash_mr_size - LENGTH(image_description_mr) - LENGTH(ivt_lmr)
 
         /* 数据段(.data)与未初始化的数据段(.bss) */
         data_mr (arw):

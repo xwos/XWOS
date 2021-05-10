@@ -67,6 +67,12 @@ xwer_t xwosdl_irq_clear(xwirq_t irqn)
 }
 
 static __xwcc_inline
+xwer_t xwosdl_irq_tst(xwirq_t irqn, bool * pending)
+{
+        return xwup_irq_tst(irqn, pending);
+}
+
+static __xwcc_inline
 xwer_t xwosdl_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg)
 {
         return xwup_irq_cfg(irqn, cfg);

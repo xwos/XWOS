@@ -240,23 +240,23 @@ void cm_nvic_software_trigger_irq(xwirq_t irq)
 }
 
 /**
- * @brief Get interrupt pending state
+ * @brief Test interrupt pending state
  * @param irq: (I) interrupt number.
  * @retval 0: Interrupt status is not pending.
  * @retval 1: Interrupt status is pending.
  */
 static __xwbsp_inline
-bool cm_nvic_get_irq_pending(xwirq_t irq)
+bool cm_nvic_tst_irq(xwirq_t irq)
 {
-        return (cm_scs.nvic.ispr[irq >> 5].u32 >> ((xwu32_t)irq & 0x1F));
+        return !!(cm_scs.nvic.ispr[irq >> 5].u32 >> ((xwu32_t)irq & 0x1F));
 }
 
 /**
- * @brief Set interrupt pending state
+ * @brief Pend interrupt
  * @param irq: (I) interrupt number.
  */
 static __xwbsp_inline
-void cm_nvic_set_irq_pending(xwirq_t irq)
+void cm_nvic_pend_irq(xwirq_t irq)
 {
         cm_scs.nvic.ispr[irq >> 5].u32 = (xwu32_t)(1 << ((xwu32_t)irq & 0x1F));
 }
@@ -266,7 +266,7 @@ void cm_nvic_set_irq_pending(xwirq_t irq)
  * @param irq: (I) interrupt number.
  */
 static __xwbsp_inline
-void cm_nvic_clear_irq_pending(xwirq_t irq)
+void cm_nvic_clear_irq(xwirq_t irq)
 {
         cm_scs.nvic.icpr[irq >> 5].u32 = (xwu32_t)(1 << ((xwu32_t)irq & 0x1F));
 }
@@ -346,10 +346,10 @@ void cm_nvic_clear_pendsv(void)
 }
 
 /**
- * @brief Get pendsv pending-state
+ * @brief Test pendsv pending-state
  */
 static __xwbsp_inline
-bool cm_nvic_get_pendsv_pending(void)
+bool cm_nvic_tst_pendsv(void)
 {
         return !!(cm_scs.scb.icsr.bit.pendsv_set);
 }
@@ -377,16 +377,16 @@ void cm_nvic_pend_systick(void)
  * @brief Clear systick
  */
 static __xwbsp_inline
-void cm_nvic_clear_systick_pending(void)
+void cm_nvic_clear_systick(void)
 {
         cm_scs.scb.icsr.bit.pendst_clr = 1;
 }
 
 /**
- * @brief Get systick pending-state
+ * @brief Test systick pending-state
  */
 static __xwbsp_inline
-bool cm_nvic_get_systick_pending(void)
+bool cm_nvic_tst_systick(void)
 {
         return !!(cm_scs.scb.icsr.bit.pendst_set);
 }
@@ -438,10 +438,10 @@ void cm_nvic_restore_usgfault(xwreg_t flag)
 }
 
 /**
- * @brief Get usagefault pending-state
+ * @brief Test usagefault pending-state
  */
 static __xwbsp_inline
-bool cm_nvic_get_usgfault_pending(void)
+bool cm_nvic_tst_usgfault(void)
 {
         return !!(cm_scs.scb.shcsr.bit.usgfault_pended);
 }
@@ -493,10 +493,10 @@ void cm_nvic_restore_busfault(xwreg_t flag)
 }
 
 /**
- * @brief Get busfault pending-state
+ * @brief Test busfault pending-state
  */
 static __xwbsp_inline
-bool cm_nvic_get_busfault_pending(void)
+bool cm_nvic_tst_busfault(void)
 {
         return !!(cm_scs.scb.shcsr.bit.busfault_pended);
 }
@@ -548,10 +548,10 @@ void cm_nvic_restore_memfault(xwreg_t flag)
 }
 
 /**
- * @brief Get memfault pending-state
+ * @brief Test memfault pending-state
  */
 static __xwbsp_inline
-bool cm_nvic_get_memfault_pending(void)
+bool cm_nvic_tst_memfault(void)
 {
         return !!(cm_scs.scb.shcsr.bit.memfault_pended);
 }
@@ -567,10 +567,10 @@ bool cm_nvic_get_memfault_active(void)
 
 /******** svc ********/
 /**
- * @brief Get svccall pending-state
+ * @brief Test svccall pending-state
  */
 static __xwbsp_inline
-bool cm_nvic_get_svccall_pending(void)
+bool cm_nvic_tst_svccall(void)
 {
         return !!(cm_scs.scb.shcsr.bit.svcall_pended);
 }

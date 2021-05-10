@@ -27,7 +27,7 @@
 
 extern xwu8_t xwos_stk_top[];
 
-__soc_isr_table_qualifier struct soc_isr_table soc_isr_table __xwos_vctbl = {
+__xwos_ivt __xwos_ivt_qualifier struct soc_isr_table xwospl_ivt = {
         .arch = {
                 [ARCH_SP_TOP + ARCHCFG_IRQ_NUM] = (xwisr_f)xwos_stk_top,
                 [ARCH_IRQ_RESET + ARCHCFG_IRQ_NUM] = (xwisr_f)arch_isr_reset,
@@ -110,7 +110,7 @@ __soc_isr_table_qualifier struct soc_isr_table soc_isr_table __xwos_vctbl = {
         },
 };
 
-__soc_isr_table_qualifier struct soc_isr_data_table soc_isr_data_table = {
+__xwos_ivt_qualifier struct soc_isr_data_table xwospl_idvt = {
         .arch = {
                 [ARCH_SP_TOP + ARCHCFG_IRQ_NUM] = NULL,
                 [ARCH_IRQ_RESET + ARCHCFG_IRQ_NUM] = NULL,

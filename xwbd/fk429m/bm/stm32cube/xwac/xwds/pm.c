@@ -59,5 +59,5 @@ void stm32cube_pm_wakeup(void)
 
 void stm32cube_pm_sleep(void)
 {
-        wfi();
+        cm_wfi();
 }

@@ -282,7 +282,7 @@ struct xwmp_irqc * xwmp_irq_get_irqc(xwirq_t irqn)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：同一中断号，不可重入
+ * - 重入性：可重入
  */
 __xwmp_api
 xwer_t xwmp_irq_request(xwirq_t irqn, xwisr_f isr, void * data,
@@ -322,7 +322,7 @@ xwer_t xwmp_irq_request(xwirq_t irqn, xwisr_f isr, void * data,
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：同一中断号，不可重入
+ * - 重入性：可重入
  */
 __xwmp_api
 xwer_t xwmp_irq_release(xwirq_t irqn)
@@ -356,7 +356,7 @@ xwer_t xwmp_irq_release(xwirq_t irqn)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：同一中断号，不可重入
+ * - 重入性：可重入
  */
 __xwmp_api
 xwer_t xwmp_irq_enable(xwirq_t irqn)
@@ -387,7 +387,7 @@ xwer_t xwmp_irq_enable(xwirq_t irqn)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：同一中断号，不可重入
+ * - 重入性：可重入
  */
 __xwmp_api
 xwer_t xwmp_irq_disable(xwirq_t irqn)
@@ -409,17 +409,18 @@ xwer_t xwmp_irq_disable(xwirq_t irqn)
 }
 
 /**
- * @brief XWMP API：保存中断的开关标志，然后将其关闭
+ * @brief XWMP API：保存中断的开关，然后将其关闭
  * @param irqn: (I) 中断号
- * @param flag: (O) 指向用于返回中断的开关标志的缓冲区的指针
+ * @param flag: (O) 指向缓冲区的指针，此缓冲区用于返回中断开关
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
+ * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：同一中断号，不可重入
+ * - 重入性：可重入
  */
 __xwmp_api
 xwer_t xwmp_irq_save(xwirq_t irqn, xwreg_t * flag)
@@ -442,9 +443,9 @@ xwer_t xwmp_irq_save(xwirq_t irqn, xwreg_t * flag)
 }
 
 /**
- * @brief XWMP API：恢复中断的开关标志
+ * @brief XWMP API：恢复中断的开关
  * @param irqn: (I) 中断号
- * @param flag: (I) 中断的开关标志
+ * @param flag: (I) 中断的开关
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ERANGE: 中断号超出范围
@@ -452,7 +453,7 @@ xwer_t xwmp_irq_save(xwirq_t irqn, xwreg_t * flag)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：同一中断号，不可重入
+ * - 重入性：可重入
  */
 __xwmp_api
 xwer_t xwmp_irq_restore(xwirq_t irqn, xwreg_t flag)
@@ -483,7 +484,7 @@ xwer_t xwmp_irq_restore(xwirq_t irqn, xwreg_t flag)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：同一中断号，不可重入
+ * - 重入性：可重入
  */
 __xwmp_api
 xwer_t xwmp_irq_pend(xwirq_t irqn)
@@ -514,7 +515,7 @@ xwer_t xwmp_irq_pend(xwirq_t irqn)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：同一中断号，不可重入
+ * - 重入性：可重入
  */
 __xwmp_api
 xwer_t xwmp_irq_clear(xwirq_t irqn)
@@ -536,6 +537,40 @@ xwer_t xwmp_irq_clear(xwirq_t irqn)
 }
 
 /**
+ * @brief XWMP API：测试中断是否挂起
+ * @param irqn: (I) 中断号
+ * @param pending: (O) 指向缓冲区的指针，此缓冲区用于返回中断是否挂起
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -ERANGE: 中断号超出范围
+ * @retval -ENOSYS: 没有实现此功能
+ * @retval -EFAULT: 空指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+__xwmp_api
+xwer_t xwmp_irq_tst(xwirq_t irqn, bool * pending)
+{
+        xwer_t rc;
+        struct xwmp_irqc * irqc;
+        const struct xwmp_irqc_driver * drv;
+
+        XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM), "out-of-range", -ERANGE);
+        XWOS_VALIDATE((pending), "nullptr", -EFAULT);
+
+        irqc = xwmp_irq_get_irqc(irqn);
+        drv = irqc->drv;
+        if ((drv) && (drv->tst)) {
+                rc = drv->tst(irqc, irqn, pending);
+        } else {
+                rc = -ENOSYS;
+        }
+        return rc;
+}
+
+/**
  * @brief XWMP API：配置中断
  * @param irqn: (I) 中断号
  * @param cfg: (I) CPU私有的配置结构体指针
@@ -546,7 +581,7 @@ xwer_t xwmp_irq_clear(xwirq_t irqn)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：同一中断号，不可重入
+ * - 重入性：可重入
  */
 __xwmp_api
 xwer_t xwmp_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg)
@@ -688,7 +723,7 @@ void xwmp_cpuirq_disable_lc(void)
 
 /**
  * @brief XWMP API：恢复本地CPU的中断
- * @param flag: (I) 本地CPU的中断开关标志
+ * @param flag: (I) 本地CPU的中断开关
  */
 __xwmp_api
 void xwmp_cpuirq_restore_lc(xwreg_t cpuirq)
@@ -698,7 +733,7 @@ void xwmp_cpuirq_restore_lc(xwreg_t cpuirq)
 
 /**
  * @brief XWMP API：保存然后关闭本地CPU的中断
- * @param flag: (O) 指向缓冲区的指针，此缓冲区用于返回本地CPU的中断开关标志
+ * @param flag: (O) 指向缓冲区的指针，此缓冲区用于返回本地CPU的中断开关
  */
 __xwmp_api
 void xwmp_cpuirq_save_lc(xwreg_t * cpuirq)

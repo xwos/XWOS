@@ -34,10 +34,8 @@ static __xwbsp_code
 xwer_t cortexm_nvic_drv_remove(struct xwmp_irqc * irqc);
 
 static __xwbsp_code
-xwer_t cortexm_nvic_drv_request(__xwcc_unused struct xwmp_irqc * irqc,
-                                __xwcc_unused xwirq_t irqn,
-                                __xwcc_unused xwisr_f isrfunc,
-                                __xwcc_unused void * data,
+xwer_t cortexm_nvic_drv_request(struct xwmp_irqc * irqc,
+                                xwirq_t irqn, xwisr_f isrfunc, void * data,
                                 const struct soc_irq_cfg * cfg);
 
 static __xwbsp_code
@@ -62,6 +60,9 @@ static __xwbsp_code
 xwer_t cortexm_nvic_drv_clear(struct xwmp_irqc * irqc, xwirq_t irqn);
 
 static __xwbsp_code
+xwer_t cortexm_nvic_drv_tst(struct xwmp_irqc * irqc, xwirq_t irqn, bool * pending);
+
+static __xwbsp_code
 xwer_t cortexm_nvic_drv_cfg(struct xwmp_irqc * irqc, xwirq_t irqn,
                             const struct soc_irq_cfg * cfg);
 
@@ -84,6 +85,7 @@ __xwbsp_rodata const struct xwmp_irqc_driver cortexm_nvic_drv = {
         .restore = cortexm_nvic_drv_restore,
         .pend = cortexm_nvic_drv_pend,
         .clear = cortexm_nvic_drv_clear,
+        .tst = cortexm_nvic_drv_tst,
         .cfg = cortexm_nvic_drv_cfg,
         .get_cfg = cortexm_nvic_drv_get_cfg,
         .get_data = cortexm_nvic_drv_get_data,
@@ -95,7 +97,7 @@ xwer_t cortexm_nvic_drv_probe(struct xwmp_irqc * irqc)
         const struct cortexm_nvic_cfg * irqccfg;
         irqccfg = (const struct cortexm_nvic_cfg *)irqc->soc_cfg;
 
-        cm_scs.scb.vtor.u32 = (xwu32_t)irqc->isr_table;
+        cm_scs.scb.vtor.u32 = (xwu32_t)irqc->ivt;
         cm_set_basepri(irqccfg->basepri);
         cm_nvic_set_prioritygrouping(irqccfg->subprio);
 
@@ -118,15 +120,15 @@ xwer_t cortexm_nvic_drv_request(struct xwmp_irqc * irqc,
                                 const struct soc_irq_cfg * cfg)
 {
 #if (!defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE))
-        struct soc_isr_table * isr_table;
-        struct soc_isr_data_table * isr_data_table;
+        __xwos_ivt_qualifier struct soc_isr_table * ivt;
+        __xwos_ivt_qualifier struct soc_isr_data_table * idvt;
 
-        isr_table = irqc->isr_table;
-        isr_table->soc[irqn] = isrfunc;
+        ivt = irqc->ivt;
+        ivt->soc[irqn] = isrfunc;
 
-        isr_data_table = irqc->isr_data_table;
-        if ((NULL != isr_data_table) && (NULL != data)) {
-                isr_data_table->soc[irqn] = data;
+        idvt = irqc->idvt;
+        if ((NULL != idvt) && (NULL != data)) {
+                idvt->soc[irqn] = data;
         }
 #endif /* !SOCCFG_RO_ISRTABLE */
         if (cfg) {
@@ -140,10 +142,10 @@ xwer_t cortexm_nvic_drv_release(__xwcc_unused struct xwmp_irqc * irqc,
                                 __xwcc_unused xwirq_t irqn)
 {
 #if (!defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE))
-        struct soc_isr_table * isr_table;
+        __xwos_ivt_qualifier struct soc_isr_table * ivt;
 
-        isr_table = irqc->isr_table;
-        isr_table->soc[irqn] = arch_isr_noop;
+        ivt = irqc->ivt;
+        ivt->soc[irqn] = arch_isr_noop;
 #endif /* #if (!defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE)) */
         return XWOK;
 }
@@ -253,11 +255,30 @@ xwer_t cortexm_nvic_drv_clear(__xwcc_unused struct xwmp_irqc * irqc, xwirq_t irq
 
         rc = XWOK;
         if (irqn >= 0) {
-                cm_nvic_clear_irq_pending(irqn);
+                cm_nvic_clear_irq(irqn);
         } else if (ARCH_IRQ_PENDSV == irqn) {
-                cm_nvic_clear_systick_pending();
+                cm_nvic_clear_pendsv();
         } else if (ARCH_IRQ_SYSTICK == irqn) {
-                cm_nvic_clear_systick_pending();
+                cm_nvic_clear_systick();
+        } else {
+                rc = -EPERM;
+        }
+        return rc;
+}
+
+static __xwbsp_code
+xwer_t cortexm_nvic_drv_tst(__xwcc_unused struct xwmp_irqc * irqc,
+                            xwirq_t irqn, bool * pending)
+{
+        xwer_t rc;
+
+        rc = XWOK;
+        if (irqn >= 0) {
+                *pending = cm_nvic_tst_irq(irqn);
+        } else if (ARCH_IRQ_PENDSV == irqn) {
+                *pending = cm_nvic_tst_pendsv();
+        } else if (ARCH_IRQ_SYSTICK == irqn) {
+                *pending = cm_nvic_tst_systick();
         } else {
                 rc = -EPERM;
         }
@@ -292,9 +313,9 @@ static __xwbsp_code
 xwer_t cortexm_nvic_drv_get_data(__xwcc_unused struct xwmp_irqc * irqc,
                                  xwirq_t irqn, struct soc_irq_data * databuf)
 {
-        __soc_isr_table_qualifier struct soc_isr_data_table * isr_data_table;
+        __xwos_ivt_qualifier struct soc_isr_data_table * idvt;
 
-        isr_data_table = irqc->isr_data_table;
-        databuf->data = isr_data_table->soc[irqn];
+        idvt = irqc->idvt;
+        databuf->data = idvt->soc[irqn];
         return XWOK;
 }

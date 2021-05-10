@@ -298,4 +298,6 @@ struct soc_isr_data_table {
         void * soc[SOCCFG_IRQ_NUM];
 };
 
+void soc_isr_noop(void);
+
 #endif /* xwosimpl_soc_irq.h */

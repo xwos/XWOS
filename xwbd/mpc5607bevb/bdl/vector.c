@@ -29,7 +29,7 @@
 /**
  * @brief 中断向量表
  */
-__xwos_vctbl __soc_isr_table_qualifier struct soc_isr_table soc_isr_table = {
+__xwos_ivt __xwos_ivt_qualifier struct soc_isr_table xwospl_ivt = {
         .soc = {
                 (xwisr_f)soc_skd_isr_swcx, /* Vector - 0 SWINT0 */
                 (xwisr_f)soc_skd_isr_swi, /* Vector - 1 SWINT1 */
@@ -268,7 +268,7 @@ __xwos_vctbl __soc_isr_table_qualifier struct soc_isr_table soc_isr_table = {
         },
 };
 
-__soc_isr_table_qualifier struct soc_isr_data_table soc_isr_data_table = {
+__xwos_ivt_qualifier struct soc_isr_data_table xwospl_idvt = {
         .soc = {
                 [IRQ_EDMA_CMBERR] = &mpc560xb_soc_cb,
                 [IRQ_EDMA_CH0] = &mpc560xb_soc_cb,

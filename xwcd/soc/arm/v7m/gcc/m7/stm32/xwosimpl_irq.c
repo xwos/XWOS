@@ -86,19 +86,25 @@ xwer_t xwospl_irqc_clear_irq(xwirq_t irqn)
 }
 
 __xwbsp_code
+xwer_t xwospl_irqc_tst_irq(xwirq_t irqn, bool * pending)
+{
+        return cortexm_nvic_drv_tst(irqn, pending);
+}
+
+__xwbsp_code
 xwer_t xwospl_irqc_cfg_irq(xwirq_t irqn, const struct soc_irq_cfg * cfg)
 {
         return cortexm_nvic_drv_cfg(irqn, cfg);
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_get_cfg_irq(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
+xwer_t xwospl_irqc_get_irq_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
 {
         return cortexm_nvic_drv_get_cfg(irqn, cfgbuf);
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_get_data_irq(xwirq_t irqn, struct soc_irq_data * databuf)
+xwer_t xwospl_irqc_get_irq_data(xwirq_t irqn, struct soc_irq_data * databuf)
 {
         return cortexm_nvic_drv_get_data(irqn, databuf);
 }

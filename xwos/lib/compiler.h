@@ -19,7 +19,7 @@
  *     - rodata: XWOS退出阶段的const数据
  *   - __xwos_*
  *     - code: XWOS内核的代码
- *     - vctbl: 中断向量表
+ *     - ivt: 中断向量表
  *     - isr: 中断函数
  *     - bh: 底半部函数
  *     - api: XWOS的内核API函数
@@ -67,8 +67,8 @@
   #define __xwos_exit_rodata
 #endif
 
-#ifndef __xwos_vctbl
-  #define __xwos_vctbl
+#ifndef __xwos_ivt
+  #define __xwos_ivt
 #endif
 
 #ifndef __xwos_isr
@@ -175,8 +175,8 @@
   #define __xwmp_exit_rodata    __xwos_exit_rodata
 #endif
 
-#ifndef __xwmp_vctbl
-  #define __xwmp_vctbl          __xwos_vctbl
+#ifndef __xwmp_ivt
+  #define __xwmp_ivt            __xwos_ivt
 #endif
 
 #ifndef __xwmp_isr
@@ -227,8 +227,8 @@
   #define __xwup_exit_rodata    __xwos_exit_rodata
 #endif
 
-#ifndef __xwup_vctbl
-  #define __xwup_vctbl          __xwos_vctbl
+#ifndef __xwup_ivt
+  #define __xwup_ivt            __xwos_ivt
 #endif
 
 #ifndef __xwup_isr

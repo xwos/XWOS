@@ -36,6 +36,7 @@ xwer_t cortexm_nvic_drv_save(xwirq_t irqn, xwreg_t * flag);
 xwer_t cortexm_nvic_drv_restore(xwirq_t irqn, xwreg_t flag);
 xwer_t cortexm_nvic_drv_pend(xwirq_t irqn);
 xwer_t cortexm_nvic_drv_clear(xwirq_t irqn);
+xwer_t cortexm_nvic_drv_tst(xwirq_t irqn, bool * pending);
 xwer_t cortexm_nvic_drv_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg);
 xwer_t cortexm_nvic_drv_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf);
 xwer_t cortexm_nvic_drv_get_data(xwirq_t irqn, struct soc_irq_data * databuf);

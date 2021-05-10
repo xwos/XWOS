@@ -26,22 +26,22 @@ __xwup_data struct xwup_irqc xwup_irqc;
  * @param name: (I) 名字字符串
  * @param irqs_num: (I) 中断的数量
  * @param soc_cfg: (I) SOC私有配置
- * @param isr_table: (I) 中断向量表
+ * @param ivt: (I) 中断向量表
  * @param data_table: (I) 中断数据表
  * @return 错误码
  */
 __xwup_init_code
 xwer_t xwup_irqc_init(const char * name, xwsz_t irqs_num,
-                      __soc_isr_table_qualifier struct soc_isr_table * isr_table,
-                      __soc_isr_table_qualifier struct soc_isr_data_table * data_table,
+                      __xwos_ivt_qualifier struct soc_isr_table * ivt,
+                      __xwos_ivt_qualifier struct soc_isr_data_table * idvt,
                       const void * soc_cfg)
 {
         xwer_t rc;
 
         xwup_irqc.name = name;
         xwup_irqc.irqs_num = irqs_num;
-        xwup_irqc.isr_table = isr_table;
-        xwup_irqc.isr_data_table = data_table;
+        xwup_irqc.ivt = ivt;
+        xwup_irqc.idvt = idvt;
         xwup_irqc.soc_cfg = soc_cfg;
         rc = xwospl_irqc_init();
         return rc;
@@ -134,6 +134,15 @@ xwer_t xwup_irq_clear(xwirq_t irqn)
 }
 
 __xwup_api
+xwer_t xwup_irq_tst(xwirq_t irqn, bool * pending)
+{
+        XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM), "out-of-range", -ERANGE);
+        XWOS_VALIDATE((pending), "nullptr", -EFAULT);
+
+        return xwospl_irqc_tst_irq(irqn, pending);
+}
+
+__xwup_api
 xwer_t xwup_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg)
 {
         XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM), "out-of-range", -ERANGE);
@@ -146,7 +155,7 @@ xwer_t xwup_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
 {
         XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM), "out-of-range", -ERANGE);
 
-        return xwospl_irqc_get_cfg_irq(irqn, cfgbuf);
+        return xwospl_irqc_get_irq_cfg(irqn, cfgbuf);
 }
 
 __xwup_api
@@ -154,7 +163,7 @@ xwer_t xwup_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
 {
         XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM), "out-of-range", -ERANGE);
 
-        return xwospl_irqc_get_data_irq(irqn, databuf);
+        return xwospl_irqc_get_irq_data(irqn, databuf);
 }
 
 __xwup_api

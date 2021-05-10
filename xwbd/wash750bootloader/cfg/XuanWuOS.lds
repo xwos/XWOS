@@ -30,10 +30,10 @@ MEMORY {
         sram4_mr (rwx): org = 0x38000000, len = 64k /* internal SRAM bank4 */
         bkram_mr (rw): org = 0x38800000, len = 4k /* backup SRAM */
 
-        vctbl_lmr (rx): org = 0x08000000, len = 2048 /* vectors table lma region */
-        vctbl_vmr (rw): org = 0x08000000, len = 2048 /* vectors table vma region */
+        ivt_lmr (rx): org = 0x08000000, len = 2048 /* vectors table lma region */
+        ivt_vmr (rw): org = 0x08000000, len = 2048 /* vectors table vma region */
         image_description_mr (rx): org = 0x08000800, len = 1k /* image description */
-        code_mr (rx): org = 0x08000C00, len = 125k /* .xwos.vctbl &
+        code_mr (rx): org = 0x08000C00, len = 125k /* .xwos.ivt &
                                                       .xwos.init.text &
                                                       .xwos.init.rodata &
                                                       .xwos.exit.text &

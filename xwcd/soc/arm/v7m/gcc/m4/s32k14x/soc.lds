@@ -24,12 +24,12 @@ ENTRY(arch_isr_reset)
 
 SECTIONS {
         . = 0x0;
-        .xwos.vctbl : ALIGN(8) {
-                KEEP(*(.xwos.vctbl))
-                xwos_vctbl_vma_end = .;
-        } > vctbl_vmr AT> vctbl_lmr
-        xwos_vctbl_vma_base = ADDR(.xwos.vctbl);
-        xwos_vctbl_lma_base = LOADADDR(.xwos.vctbl);
+        .xwos.ivt : ALIGN(8) {
+                KEEP(*(.xwos.ivt))
+                xwos_ivt_vma_end = .;
+        } > ivt_vmr AT> ivt_lmr
+        xwos_ivt_vma_base = ADDR(.xwos.ivt);
+        xwos_ivt_lma_base = LOADADDR(.xwos.ivt);
 
         .flash.cfg : ALIGN(4) {
                 KEEP(*(.flash.cfg))

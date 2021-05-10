@@ -26,41 +26,19 @@
 struct soc_irq_cfg;
 struct soc_irq_data;
 
-__xwbsp_code
 xwer_t cortexm_nvic_drv_init(void);
-
-__xwbsp_code
 xwer_t cortexm_nvic_drv_request(xwirq_t irqn, xwisr_f isrfunc, void * data,
                                 const struct soc_irq_cfg * cfg);
-
-__xwbsp_code
 xwer_t cortexm_nvic_drv_release(xwirq_t irqn);
-
-__xwbsp_code
 xwer_t cortexm_nvic_drv_enable(xwirq_t irqn);
-
-__xwbsp_code
 xwer_t cortexm_nvic_drv_disable(xwirq_t irqn);
-
-__xwbsp_code
 xwer_t cortexm_nvic_drv_save(xwirq_t irqn, xwreg_t * flag);
-
-__xwbsp_code
 xwer_t cortexm_nvic_drv_restore(xwirq_t irqn, xwreg_t flag);
-
-__xwbsp_code
 xwer_t cortexm_nvic_drv_pend(xwirq_t irqn);
-
-__xwbsp_code
 xwer_t cortexm_nvic_drv_clear(xwirq_t irqn);
-
-__xwbsp_code
+xwer_t cortexm_nvic_drv_tst(xwirq_t irqn, bool * pending);
 xwer_t cortexm_nvic_drv_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg);
-
-__xwbsp_code
 xwer_t cortexm_nvic_drv_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf);
-
-__xwbsp_code
 xwer_t cortexm_nvic_drv_get_data(xwirq_t irqn, struct soc_irq_data * databuf);
 
 #endif /* up_nvic_drv.h */

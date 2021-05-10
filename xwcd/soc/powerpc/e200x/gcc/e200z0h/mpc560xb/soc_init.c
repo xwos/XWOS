@@ -19,13 +19,8 @@
  */
 
 #include <xwos/standard.h>
-#if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/irq.h>
-  #include <xwos/mp/skd.h>
-#elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/irq.h>
-  #include <xwos/up/skd.h>
-#endif
+#include <xwos/ospl/irq.h>
+#include <xwos/ospl/skd.h>
 #include <soc.h>
 #include <soc_clk.h>
 #include <soc_me.h>
@@ -36,9 +31,9 @@ static __xwos_init_code
 void soc_relocate_isrtable(void);
 #endif /* !SOCCFG_RO_ISRTABLE */
 
-extern xwu8_t xwos_vctbl_lma_base[];
-extern xwu8_t xwos_vctbl_vma_base[];
-extern xwu8_t xwos_vctbl_vma_end[];
+extern xwu8_t xwos_ivt_lma_base[];
+extern xwu8_t xwos_ivt_vma_base[];
+extern xwu8_t xwos_ivt_vma_end[];
 
 extern xwu8_t bkup_vma_base[];
 extern xwu8_t bkup_vma_end[];
@@ -57,9 +52,6 @@ extern xwu32_t data_mr_size[];
 
 __xwbsp_data struct soc_reset_flags soc_reset_flags;
 __xwbsp_data struct soc_wkup_flags soc_wkup_flags;
-
-extern __soc_isr_table_qualifier struct soc_isr_table soc_isr_table;
-extern __soc_isr_table_qualifier struct soc_isr_data_table soc_isr_data_table;
 
 __xwbsp_init_code
 void soc_sysclk_init(void)
@@ -845,10 +837,10 @@ void soc_relocate_isrtable(void)
         xwu8_t * src;
         xwu8_t * dst;
 
-        src = xwos_vctbl_lma_base;
-        dst = xwos_vctbl_vma_base;
+        src = xwos_ivt_lma_base;
+        dst = xwos_ivt_vma_base;
         if (dst != src) {
-                cnt = (xwsz_t)xwos_vctbl_vma_end - (xwsz_t)xwos_vctbl_vma_base;
+                cnt = (xwsz_t)xwos_ivt_vma_end - (xwsz_t)xwos_ivt_vma_base;
                 for (i = 0; i < cnt; i++) {
                         dst[i] = src[i];
                 }
@@ -893,8 +885,8 @@ void soc_init(void)
         xwid_t id = xwmp_skd_id_lc();
 
         /* interrupt controller */
-        xwmp_irqc_construct(&soc_irqc_cb);
-        rc = xwmp_irqc_register(&soc_irqc[id], id, NULL);
+        xwmp_irqc_construct(&xwospl_irqc[id]);
+        rc = xwmp_irqc_register(&xwospl_irqc[id], id, NULL);
         XWOS_BUG_ON(rc < 0);
 
         /* init scheduler of CPU */
@@ -904,8 +896,8 @@ void soc_init(void)
         /* Init interrupt controller */
         rc = xwup_irqc_init("mpc560xb.irqc",
                             (SOCCFG_IRQ_NUM + ARCHCFG_IRQ_NUM),
-                            &soc_isr_table,
-                            &soc_isr_data_table,
+                            &xwospl_ivt,
+                            &xwospl_idvt,
                             NULL);
         XWOS_BUG_ON(rc < 0);
 

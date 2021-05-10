@@ -19,13 +19,11 @@
  */
 
 #include <xwos/standard.h>
+#include <xwos/ospl/irq.h>
+#include <xwos/ospl/skd.h>
 #if defined(XuanWuOS_CFG_CORE__mp)
   #include <mp_nvic.h>
-  #include <xwos/mp/irq.h>
-  #include <xwos/mp/skd.h>
 #elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/irq.h>
-  #include <xwos/up/skd.h>
   #include <up_nvic.h>
 #else
   #error "Can't find the configuration of XuanWuOS_CFG_CORE!"
@@ -39,9 +37,9 @@ static __xwos_init_code
 void soc_relocate_isrtable(void);
 #endif /* !SOCCFG_RO_ISRTABLE */
 
-extern xwu8_t xwos_vctbl_lma_base[];
-extern xwu8_t xwos_vctbl_vma_base[];
-extern xwu8_t xwos_vctbl_vma_end[];
+extern xwu8_t xwos_ivt_lma_base[];
+extern xwu8_t xwos_ivt_vma_base[];
+extern xwu8_t xwos_ivt_vma_end[];
 
 __xwbsp_init_code
 void soc_lowlevel_init(void)
@@ -61,8 +59,8 @@ void soc_init(void)
         xwid_t id = xwmp_skd_id_lc();
 
         /* Interrupt controller of CPU */
-        xwmp_irqc_construct(&cortexm_nvic[id]);
-        rc = xwmp_irqc_register(&cortexm_nvic[id], id, NULL);
+        xwmp_irqc_construct(&xwospl_irqc[id]);
+        rc = xwmp_irqc_register(&xwospl_irqc[id], id, NULL);
         XWOS_BUG_ON(rc < 0);
 
         /* Init scheduler of local CPU */
@@ -72,8 +70,8 @@ void soc_init(void)
         /* Init interrupt controller */
         rc = xwup_irqc_init("cortex-m.nvic",
                             (SOCCFG_IRQ_NUM + ARCHCFG_IRQ_NUM),
-                            &soc_isr_table,
-                            &soc_isr_data_table,
+                            &xwospl_ivt,
+                            &xwospl_idvt,
                             &armv6_nvic_cfg);
         XWOS_BUG_ON(rc < 0);
 
@@ -91,10 +89,10 @@ void soc_relocate_isrtable(void)
         xwu8_t * src;
         xwu8_t * dst;
 
-        src = xwos_vctbl_lma_base;
-        dst = xwos_vctbl_vma_base;
+        src = xwos_ivt_lma_base;
+        dst = xwos_ivt_vma_base;
         if (dst != src) {
-                cnt = (xwsz_t)xwos_vctbl_vma_end - (xwsz_t)xwos_vctbl_vma_base;
+                cnt = (xwsz_t)xwos_ivt_vma_end - (xwsz_t)xwos_ivt_vma_base;
                 for (i = 0; i < cnt; i++) {
                         dst[i] = src[i];
                 }

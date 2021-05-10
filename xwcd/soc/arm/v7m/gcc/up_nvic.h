@@ -22,10 +22,8 @@
 #define __up_nvic_h__
 
 #include <xwos/standard.h>
-#include <xwos/ospl/irq.h>
+#include <armv7m_nvic.h>
 
 extern __xwbsp_rodata const struct cortexm_nvic_cfg armv7_nvic_cfg;
-extern __soc_isr_table_qualifier struct soc_isr_table soc_isr_table;
-extern __soc_isr_table_qualifier struct soc_isr_data_table soc_isr_data_table;
 
 #endif /* up_nvic.h */

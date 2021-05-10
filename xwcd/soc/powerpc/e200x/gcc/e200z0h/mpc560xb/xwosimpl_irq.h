@@ -29,10 +29,6 @@
   #error "This file should be included from <xwos/ospl/irq.h>."
 #endif
 
-void soc_isr_noop(void);
-void soc_irq_set_priority(xwirq_t irq, xwu32_t priority);
-xwu32_t soc_irq_get_priority(xwirq_t irq);
-
 static __xwbsp_inline
 void xwospl_cpuirq_enable_lc(void)
 {

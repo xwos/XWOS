@@ -119,13 +119,14 @@ xwer_t xwos_irq_disable(xwirq_t irqn)
 }
 
 /**
- * @brief XWOS API：保存中断的开关标志，然后将其关闭
+ * @brief XWOS API：保存中断的开关，然后将其关闭
  * @param irqn: (I) 中断号
- * @param flag: (O) 指向用于返回中断的开关标志的缓冲区的指针
+ * @param flag: (O) 指向缓冲区的指针，此缓冲区用于返回中断开关
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
+ * @retval -EFAULT: 空指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -138,9 +139,9 @@ xwer_t xwos_irq_save(xwirq_t irqn, xwreg_t * flag)
 }
 
 /**
- * @brief XWOS API：恢复中断的开关标志
+ * @brief XWOS API：恢复中断的开关
  * @param irqn: (I) 中断号
- * @param flag: (I) 中断的开关标志
+ * @param flag: (I) 中断开关
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ERANGE: 中断号超出范围
@@ -190,6 +191,26 @@ static __xwos_inline_api
 xwer_t xwos_irq_clear(xwirq_t irqn)
 {
         return xwosdl_irq_clear(irqn);
+}
+
+/**
+ * @brief XWOS API：测试中断是否挂起
+ * @param irqn: (I) 中断号
+ * @param pending: (O) 指向缓冲区的指针，此缓冲区用于返回中断是否挂起
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -ERANGE: 中断号超出范围
+ * @retval -ENOSYS: 没有实现此功能
+ * @retval -EFAULT: 空指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_irq_tst(xwirq_t irqn, bool * pending)
+{
+        return xwosdl_irq_tst(irqn, pending);
 }
 
 /**
@@ -289,7 +310,7 @@ void xwos_cpuirq_disable_lc(void)
 
 /**
  * @brief XWOS API：恢复本地CPU的中断
- * @param flag: (I) 本地CPU的中断开关标志
+ * @param flag: (I) 本地CPU的中断开关
  */
 static __xwos_inline_api
 void xwos_cpuirq_restore_lc(xwreg_t cpuirq)
@@ -299,7 +320,7 @@ void xwos_cpuirq_restore_lc(xwreg_t cpuirq)
 
 /**
  * @brief XWOS API：保存然后关闭本地CPU的中断
- * @param flag: (O) 指向缓冲区的指针，此缓冲区用于返回本地CPU的中断开关标志
+ * @param flag: (O) 指向缓冲区的指针，此缓冲区用于返回本地CPU的中断开关
  */
 static __xwos_inline_api
 void xwos_cpuirq_save_lc(xwreg_t * cpuirq)

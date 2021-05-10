@@ -22,21 +22,18 @@
 #include <xwos/ospl/irq.h>
 #include <mp_nvic_drv.h>
 
-extern __soc_isr_table_qualifier struct soc_isr_table soc_isr_table;
-extern __soc_isr_table_qualifier struct soc_isr_data_table soc_isr_data_table;
-
 __xwbsp_rodata const struct cortexm_nvic_cfg armv7_nvic_cfg = {
         .subprio = SOCCFG_NVIC_SUBPRIO_BITIDX,
         .basepri = 0,
 };
 
-__xwbsp_data struct xwmp_irqc cortexm_nvic[CPUCFG_CPU_NUM] = {
+__xwbsp_data struct xwmp_irqc xwospl_irqc[CPUCFG_CPU_NUM] = {
         [0] = {
-                .name = "cortex-m.nvic",
+                .name = "arm.m.nvic",
                 .drv = &cortexm_nvic_drv,
                 .irqs_num = (SOCCFG_IRQ_NUM + ARCHCFG_IRQ_NUM),
-                .isr_table = &soc_isr_table,
-                .isr_data_table = &soc_isr_data_table,
+                .ivt = &xwospl_ivt,
+                .idvt = &xwospl_idvt,
                 .soc_cfg = &armv7_nvic_cfg,
                 .data = NULL,
         }

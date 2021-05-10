@@ -37,7 +37,7 @@ xwer_t cortexm_nvic_drv_init(void)
         irqc = &xwup_irqc;
         irqccfg = (const struct cortexm_nvic_cfg *)irqc->soc_cfg;
 
-        cm_scs.scb.vtor.u32 = (xwu32_t)irqc->isr_table;
+        cm_scs.scb.vtor.u32 = (xwu32_t)irqc->ivt;
         cm_set_basepri(irqccfg->basepri);
         cm_nvic_set_prioritygrouping(irqccfg->subprio);
 
@@ -52,15 +52,15 @@ xwer_t cortexm_nvic_drv_request(xwirq_t irqn,
                                 const struct soc_irq_cfg * cfg)
 {
 #if (!defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE))
-        struct soc_isr_table * isr_table;
-        struct soc_isr_data_table * isr_data_table;
+        __xwos_ivt_qualifier struct soc_isr_table * ivt;
+        __xwos_ivt_qualifier struct soc_isr_data_table * idvt;
 
-        isr_table = xwup_irqc.isr_table;
-        isr_table->soc[irqn] = isrfunc;
+        ivt = xwup_irqc.ivt;
+        ivt->soc[irqn] = isrfunc;
 
-        isr_data_table = xwup_irqc.isr_data_table;
-        if ((NULL != isr_data_table) && (NULL != data)) {
-                isr_data_table->soc[irqn] = data;
+        idvt = xwup_irqc.idvt;
+        if ((NULL != idvt) && (NULL != data)) {
+                idvt->soc[irqn] = data;
         }
 #endif /* !SOCCFG_RO_ISRTABLE */
         if (cfg) {
@@ -73,15 +73,15 @@ __xwbsp_code
 xwer_t cortexm_nvic_drv_release(__xwcc_unused xwirq_t irqn)
 {
 #if (!defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE))
-        struct soc_isr_table * isr_table;
-        struct soc_isr_data_table * isr_data_table;
+        __xwos_ivt_qualifier struct soc_isr_table * ivt;
+        __xwos_ivt_qualifier struct soc_isr_data_table * idvt;
 
-        isr_table = xwup_irqc.isr_table;
-        isr_table->soc[irqn] = arch_isr_noop;
+        ivt = xwup_irqc.ivt;
+        ivt->soc[irqn] = arch_isr_noop;
 
-        isr_data_table = xwup_irqc.isr_data_table;
-        if (NULL != isr_data_table) {
-                isr_data_table->soc[irqn] = NULL;
+        idvt = xwup_irqc.idvt;
+        if (NULL != idvt) {
+                idvt->soc[irqn] = NULL;
         }
 #endif /* !SOCCFG_RO_ISRTABLE */
         return XWOK;
@@ -187,11 +187,29 @@ xwer_t cortexm_nvic_drv_clear(xwirq_t irqn)
 
         rc = XWOK;
         if (irqn >= 0) {
-                cm_nvic_clear_irq_pending(irqn);
+                cm_nvic_clear_irq(irqn);
         } else if (ARCH_IRQ_PENDSV == irqn) {
-                cm_nvic_clear_systick_pending();
+                cm_nvic_clear_systick();
         } else if (ARCH_IRQ_SYSTICK == irqn) {
-                cm_nvic_clear_systick_pending();
+                cm_nvic_clear_systick();
+        } else {
+                rc = -EPERM;
+        }
+        return rc;
+}
+
+__xwbsp_code
+xwer_t cortexm_nvic_drv_tst(xwirq_t irqn, bool * pending)
+{
+        xwer_t rc;
+
+        rc = XWOK;
+        if (irqn >= 0) {
+                *pending = cm_nvic_tst_irq(irqn);
+        } else if (ARCH_IRQ_PENDSV == irqn) {
+                *pending = cm_nvic_tst_pendsv();
+        } else if (ARCH_IRQ_SYSTICK == irqn) {
+                *pending = cm_nvic_tst_systick();
         } else {
                 rc = -EPERM;
         }
@@ -223,9 +241,9 @@ xwer_t cortexm_nvic_drv_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
 __xwbsp_code
 xwer_t cortexm_nvic_drv_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
 {
-        __soc_isr_table_qualifier struct soc_isr_data_table * isr_data_table;
+        __xwos_ivt_qualifier struct soc_isr_data_table * idvt;
 
-        isr_data_table = xwup_irqc.isr_data_table;
-        databuf->data = isr_data_table->soc[irqn];
+        idvt = xwup_irqc.idvt;
+        databuf->data = idvt->soc[irqn];
         return XWOK;
 }

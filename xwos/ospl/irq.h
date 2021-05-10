@@ -23,21 +23,24 @@
   #error "Can't find the configuration XuanWuOS_CFG_CORE!"
 #endif
 
+extern __xwos_ivt_qualifier struct soc_isr_table xwospl_ivt;
+extern __xwos_ivt_qualifier struct soc_isr_data_table xwospl_idvt;
+
 static __xwbsp_inline
 void xwospl_cpuirq_enable_lc(void);
-
 static __xwbsp_inline
 void xwospl_cpuirq_disable_lc(void);
-
 static __xwbsp_inline
 void xwospl_cpuirq_restore_lc(xwreg_t cpuirq);
-
 static __xwbsp_inline
 void xwospl_cpuirq_save_lc(xwreg_t * cpuirq);
 
 xwer_t xwospl_irq_get_id(xwirq_t * irqnbuf);
 
-#if defined(XuanWuOS_CFG_CORE__up)
+#if defined(XuanWuOS_CFG_CORE__mp)
+extern struct xwmp_irqc xwospl_irqc[CPUCFG_CPU_NUM];
+
+#elif defined(XuanWuOS_CFG_CORE__up)
 xwer_t xwospl_irqc_init(void);
 xwer_t xwospl_irqc_request_irq(xwirq_t irqn, xwisr_f isrfunc, void * data,
                                const struct soc_irq_cfg * cfg);
@@ -48,9 +51,10 @@ xwer_t xwospl_irqc_save_irq(xwirq_t irqn, xwreg_t * flag);
 xwer_t xwospl_irqc_restore_irq(xwirq_t irqn, xwreg_t flag);
 xwer_t xwospl_irqc_pend_irq(xwirq_t irqn);
 xwer_t xwospl_irqc_clear_irq(xwirq_t irqn);
+xwer_t xwospl_irqc_tst_irq(xwirq_t irqn, bool * pending);
 xwer_t xwospl_irqc_cfg_irq(xwirq_t irqn, const struct soc_irq_cfg * cfg);
-xwer_t xwospl_irqc_get_cfg_irq(xwirq_t irqn, struct soc_irq_cfg * cfgbuf);
-xwer_t xwospl_irqc_get_data_irq(xwirq_t irqn, struct soc_irq_data * databuf);
+xwer_t xwospl_irqc_get_irq_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf);
+xwer_t xwospl_irqc_get_irq_data(xwirq_t irqn, struct soc_irq_data * databuf);
 #endif /* XuanWuOS_CFG_CORE__up */
 
 #include <xwosimpl_irq.h>

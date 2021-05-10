@@ -23,8 +23,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/mp/irq.h>
-#include <soc_irqc.h>
 
-extern const struct xwos_irqc_driver soc_irqc_drv;
+extern const struct xwmp_irqc_driver soc_irqc_drv;
 
 #endif /* soc_mp_irqc_drv.h */

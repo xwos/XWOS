@@ -49,6 +49,7 @@ struct xwmp_irqc_driver {
                            xwreg_t); /**< 恢复中断开关标志 */
         xwer_t (* pend)(struct xwmp_irqc *, xwirq_t); /**< 挂起中断标志 */
         xwer_t (* clear)(struct xwmp_irqc *, xwirq_t); /**< 清除中断标志 */
+        xwer_t (* tst)(struct xwmp_irqc *, xwirq_t, bool *); /**< 测试中断是否挂起 */
         xwer_t (* cfg)(struct xwmp_irqc *, xwirq_t,
                        const struct soc_irq_cfg *); /**< 配置中断 */
         xwer_t (* get_cfg)(struct xwmp_irqc *, xwirq_t,
@@ -66,10 +67,8 @@ struct xwmp_irqc {
         const char * name; /**< 名字 */
         const struct xwmp_irqc_driver * drv; /**< 中断控制器驱动函数集 */
         xwsz_t irqs_num; /**< 中断数量 */
-        __soc_isr_table_qualifier
-        struct soc_isr_table * isr_table; /**< 中断向量表 */
-        __soc_isr_table_qualifier
-        struct soc_isr_data_table * isr_data_table; /**< 中断数据表 */
+        __xwos_ivt_qualifier struct soc_isr_table * ivt; /**< 中断向量表 */
+        __xwos_ivt_qualifier struct soc_isr_data_table * idvt; /**< 中断数据表 */
         const void * soc_cfg; /**< SOC的私有配置 */
         void * data; /**< SOC平台的私有数据 */
 
@@ -105,6 +104,7 @@ xwer_t xwmp_irq_save(xwirq_t irqn, xwreg_t * flag);
 xwer_t xwmp_irq_restore(xwirq_t irqn, xwreg_t flag);
 xwer_t xwmp_irq_pend(xwirq_t irqn);
 xwer_t xwmp_irq_clear(xwirq_t irqn);
+xwer_t xwmp_irq_tst(xwirq_t irqn, bool * pending);
 xwer_t xwmp_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg);
 xwer_t xwmp_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf);
 xwer_t xwmp_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf);

@@ -27,10 +27,10 @@ MEMORY {
         bkram_mr (rw): org = 0x40024000, len = 4k /* BACKUP SRAM */
         sdram_mr (rw): org = 0x68000000, len = 1M /* external SRAM */
 
-        vctbl_lmr (rx): org = 0x08000000, len = 2048 /* vectors table lma region */
-        vctbl_vmr (rw): org = 0x08000000, len = 2048 /* vectors table vma region */
+        ivt_lmr (rx): org = 0x08000000, len = 2048 /* vectors table lma region */
+        ivt_vmr (rw): org = 0x08000000, len = 2048 /* vectors table vma region */
         image_description_mr (rx): org = 0x08000800, len = 1k /* image description */
-        code_mr (rx): org = 0x08000C00, len = 1021k /* .xwos.vctbl &
+        code_mr (rx): org = 0x08000C00, len = 1021k /* .xwos.ivt &
                                                        .xwos.init.text &
                                                        .xwos.init.rodata &
                                                        .xwos.exit.text &

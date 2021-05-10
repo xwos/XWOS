@@ -37,14 +37,14 @@ SECTIONS {
                 . = LENGTH(boot_hdr_mr) ;
         } > boot_hdr_mr
 
-        .xwos.vctbl : ALIGN(4) {
+        .xwos.ivt : ALIGN(4) {
                 FILL(0xFF)
-                *(.xwos.vctbl)
-                xwos_vctbl_vma_end = .;
-                . = ORIGIN(vctbl_vmr) + LENGTH(vctbl_vmr) ;
-        } > vctbl_vmr AT> vctbl_lmr
-        xwos_vctbl_vma_base = ADDR(.xwos.vctbl);
-        xwos_vctbl_lma_base = LOADADDR(.xwos.vctbl);
+                *(.xwos.ivt)
+                xwos_ivt_vma_end = .;
+                . = ORIGIN(ivt_vmr) + LENGTH(ivt_vmr) ;
+        } > ivt_vmr AT> ivt_lmr
+        xwos_ivt_vma_base = ADDR(.xwos.ivt);
+        xwos_ivt_lma_base = LOADADDR(.xwos.ivt);
 
         .image.description : ALIGN(8) {
                 KEEP(*(.image.description))

@@ -40,6 +40,4 @@ SOC_CSRCS += xwosimpl_syshwt.c
 ifeq ($(XuanWuOS_CFG_CORE),mp)
     SOC_CSRCS += soc_mp_irqc.c
     SOC_CSRCS += soc_mp_irqc_drv.c
-else
-    SOC_CSRCS += soc_up_irqc_drv.c
 endif

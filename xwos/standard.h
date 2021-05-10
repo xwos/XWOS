@@ -96,9 +96,9 @@
  * @brief 中断向量表限定词
  */
 #if defined(SOCCFG_RO_ISRTABLE) && (1 == SOCCFG_RO_ISRTABLE)
-  #define __soc_isr_table_qualifier const
+  #define __xwos_ivt_qualifier const
 #else /* SOCCFG_RO_ISRTABLE */
-  #define __soc_isr_table_qualifier
+  #define __xwos_ivt_qualifier
 #endif /* !SOCCFG_RO_ISRTABLE */
 
 /**

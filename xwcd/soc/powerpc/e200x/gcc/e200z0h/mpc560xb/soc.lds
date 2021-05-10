@@ -178,12 +178,12 @@ SECTIONS {
         sbss_vma_base = ADDR(.sbss);
         rwx_vma_end = .;
 
-        .xwos.vctbl : ALIGN(0x800) {
-                *(.xwos.vctbl)
-                xwos_vctbl_vma_end = .;
+        .xwos.ivt : ALIGN(0x800) {
+                *(.xwos.ivt)
+                xwos_ivt_vma_end = .;
         } > code_mr
-        xwos_vctbl_vma_base = ADDR(.xwos.vctbl);
-        xwos_vctbl_lma_base = LOADADDR(.xwos.vctbl);
+        xwos_ivt_vma_base = ADDR(.xwos.ivt);
+        xwos_ivt_lma_base = LOADADDR(.xwos.ivt);
 
         .arch_isrtable : ALIGN(0x1000) {
                 KEEP(*(.arch_isrtable))
