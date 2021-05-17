@@ -47,6 +47,7 @@ ifeq ($(XWMMCFG_MEMPOOL),y)
 endif
 
 ######## kernel ########
+XWOS_CSRCS += ospl/xwosplcb.c
 ifeq ($(XuanWuOS_CFG_CORE),mp)
     include xwos/mp/mp.mk
 else

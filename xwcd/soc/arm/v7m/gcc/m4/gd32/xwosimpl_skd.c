@@ -101,6 +101,6 @@ __xwbsp_code
 void xwospl_thd_immigrate(struct xwospl_thd * thd, xwid_t cpuid)
 {
         XWOS_UNUSED(cpuid);
-        xwmp_thd_immigrate_lic(thd);
+        xwosplcb_thd_immigrate_lic(thd);
 }
 #endif /* XuanWuOS_CFG_CORE__mp */

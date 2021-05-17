@@ -20,8 +20,8 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/irq.h>
-#include <arch_skd.h>
-#include <arch_systick.h>
+#include <xwos/ospl/syshwt.h>
+#include <xwos/ospl/skd.h>
 
 #if (SOCCFG_IRQ_NUM < 8) || (SOCCFG_IRQ_NUM > 240)
   #error "SOCCFG_IRQ_NUM must be between 8 and 240 inclusive"
@@ -48,8 +48,8 @@ __xwos_ivt_qualifier struct soc_isr_table xwospl_ivt __xwos_ivt = {
                 (xwisr_f)arch_isr_svc,
                 arch_isr_dbgmon,
                 arch_isr_noop,
-                arch_isr_pendsv,
-                arch_isr_systick,
+                xwospl_skd_isr_swcx,
+                xwospl_syshwt_isr,
         },
         .soc = {
                 arch_isr_noop,

@@ -17,7 +17,7 @@
 
 void soc_privilege_start(void);
 void soc_privilege_end(void);
-xws64_t soc_xwsc(xwsc_f func, xwptr_t argnum, ...);
+xws64_t soc_xwsc(xwsc_f func, xwreg_t argnum, ...);
 
 #include <xwosimpl_soc_xwsc.h>
 

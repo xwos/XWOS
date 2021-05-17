@@ -25,8 +25,6 @@
   #error "This file should be included from <xwos/ospl/soc/setjmp.h>."
 #endif
 
-#include <xwos/standard.h>
-
 #if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
   #define SOC_JMPBUF_DEPTH 32 /* 16 FP Frame + 10 Basic Frame + 6 reserved */
 #else

@@ -25,6 +25,4 @@
   #error "This file should be included from <xwos/ospl/syshwt.h>."
 #endif
 
-void soc_syshwt_isr(void);
-
 #endif /* xwosimpl_syshwt.h */

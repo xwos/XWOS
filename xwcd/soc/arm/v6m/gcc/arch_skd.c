@@ -44,29 +44,13 @@ __xwbsp_rodata const struct soc_irq_cfg cortex_m_swcx_irq_cfg = {
 
 __xwbsp_rodata const struct xwos_irq_resource cortex_m_swcx_irqrsc = {
         .irqn = ARCH_IRQ_PENDSV,
-        .isr = arch_isr_pendsv,
+        .isr = xwospl_skd_isr_swcx,
         .cfg = &cortex_m_swcx_irq_cfg,
         .description = "irq.swcx.armv6m",
 };
 
 static __xwbsp_code
 void arch_skd_report_stk_overflow(struct xwospl_skd_stack_info * stk);
-
-/**
- * @brief ADL BSP：获取调度器结构体指针
- * @return 调度器的指针
- */
-__xwbsp_code
-struct xwospl_skd * arch_skd_get_lc(void)
-{
-#if defined(XuanWuOS_CFG_CORE__mp)
-        return xwmp_skd_get_lc();
-#elif defined(XuanWuOS_CFG_CORE__up)
-        return xwup_skd_get_lc();
-#else
-  #error "Can't find the configuration XuanWuOS_CFG_CORE!"
-#endif
-}
 
 /**
  * @brief ADL BSP：初始化切换上下文中断
@@ -84,10 +68,8 @@ xwer_t arch_skd_init_pendsv(struct xwospl_skd * xwskd)
         XWOS_UNUSED(xwskd);
 
         irqrsc = &cortex_m_swcx_irqrsc;
-        rc = xwos_irq_request(irqrsc->irqn, irqrsc->isr, XWOS_UNUSED_ARGUMENT, NULL);
-        XWOS_BUG_ON(rc < 0);
-
-        rc = xwos_irq_cfg(irqrsc->irqn, irqrsc->cfg);
+        rc = xwos_irq_request(irqrsc->irqn, irqrsc->isr,
+                              XWOS_UNUSED_ARGUMENT, irqrsc->cfg);
         XWOS_BUG_ON(rc < 0);
 
         rc = xwos_irq_enable(irqrsc->irqn);
@@ -110,11 +92,7 @@ void arch_skd_init_stack(struct xwospl_skd_stack_info * stk,
         xwstk_t * stkbtn;
         xwsq_t i, stknum;
 
-#if defined(XuanWuOS_CFG_CORE__mp)
-        privileged = !!(attr & XWMP_SKDATTR_PRIVILEGED);
-#elif defined(XuanWuOS_CFG_CORE__up)
-        privileged = !!(attr & XWUP_SKDATTR_PRIVILEGED);
-#endif
+        privileged = !!(attr & XWOSPL_SKDATTR_PRIVILEGED);
 
         stkbtn = (xwstk_t *)stk->base;
         stknum = stk->size / sizeof(xwstk_t);
@@ -214,18 +192,14 @@ void arch_skd_svcsr_start(__xwcc_unused struct xwospl_skd * xwskd)
  * - 此中断为系统中最低优先级的中断。
  */
 __xwbsp_isr __xwcc_naked
-void arch_isr_pendsv(void)
+void xwospl_skd_isr_swcx(void)
 {
         /* get scheduler */
         __asm__ volatile("      push    {lr}");
         __asm__ volatile("      sub     sp, #4");
-        /* r0 = arch_skd_chk_swcx(); */
         __asm__ volatile("      bl      arch_skd_chk_swcx");
-#if defined(XuanWuOS_CFG_CORE__mp)
-        __asm__ volatile("      bl      xwmp_skd_pre_swcx_lic");
-#elif defined(XuanWuOS_CFG_CORE__up)
-        __asm__ volatile("      bl      xwup_skd_pre_swcx_lic");
-#endif
+        __asm__ volatile("      bl      xwosplcb_skd_pre_swcx_lic");
+
         /* get PSP */
         __asm__ volatile("      mrs     r2, psp");
         /* save previous context */
@@ -275,12 +249,7 @@ void arch_isr_pendsv(void)
         /* finish the progress */
         __asm__ volatile("      dsb");
         __asm__ volatile("      isb");
-        /* xwos_skd_post_swcx(r0) */
-#if defined(XuanWuOS_CFG_CORE__mp)
-        __asm__ volatile("      bl      xwmp_skd_post_swcx_lic");
-#elif defined(XuanWuOS_CFG_CORE__up)
-        __asm__ volatile("      bl      xwup_skd_post_swcx_lic");
-#endif
+        __asm__ volatile("      bl      xwosplcb_skd_post_swcx_lic");
         __asm__ volatile("      add     sp, #4");
         __asm__ volatile("      pop     {pc}");
 }
@@ -302,7 +271,7 @@ struct xwospl_skd * arch_skd_chk_swcx(void)
         xwstk_t * stkbtn;
         xwsz_t i;
 
-        xwskd = arch_skd_get_lc();
+        xwskd = xwosplcb_skd_get_lc();
         cstk = xwskd->cstk;
         stkbtn = (xwstk_t *)cstk->base;
         stk.ptr = cstk->sp;
@@ -317,7 +286,7 @@ struct xwospl_skd * arch_skd_chk_swcx(void)
         }
         return xwskd;
 #else /* XWMMCFG_STACK_CHK_SWCX */
-        return arch_skd_get_lc();
+        return xwosplcb_skd_get_lc();
 #endif /* !XWMMCFG_STACK_CHK_SWCX */
 }
 
@@ -337,7 +306,7 @@ struct xwospl_skd * arch_skd_chk_stk(void)
         xwstk_t * stkbtn;
         xwsz_t i;
 
-        xwskd = arch_skd_get_lc();
+        xwskd = xwosplcb_skd_get_lc();
         cstk = xwskd->cstk;
         stkbtn = (xwstk_t *)cstk->base;
         cm_get_psp(&stk.value);

@@ -299,5 +299,6 @@ struct soc_isr_data_table {
 };
 
 void soc_isr_noop(void);
+void soc_skd_isr_swi(void);
 
 #endif /* xwosimpl_soc_irq.h */

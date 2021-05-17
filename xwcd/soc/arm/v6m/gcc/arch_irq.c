@@ -237,11 +237,7 @@ void arch_isr_svc(void)
         __asm__ volatile("svc_5:"); /* case 5: freeze thread */
         __asm__ volatile("      push    {r0, lr}");
         __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 value: cthd */
-#if defined(XuanWuOS_CFG_CORE__mp)
-        __asm__ volatile("      bl      xwmp_thd_freeze_lic");
-#elif defined(XuanWuOS_CFG_CORE__up)
-        __asm__ volatile("      bl      xwup_thd_freeze_lic");
-#endif
+        __asm__ volatile("      bl      xwosplcb_thd_freeze_lic");
         __asm__ volatile("      mov     r2, r0");
         __asm__ volatile("      pop     {r0, r1}");
         __asm__ volatile("      str     r2, [r0, #0]"); /* save the return value */
@@ -253,11 +249,7 @@ void arch_isr_svc(void)
         __asm__ volatile("      push    {r0, lr}");
         __asm__ volatile("      ldr     r1, [r0, #4]"); /* get old r1 value */
         __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 value */
-#if defined(XuanWuOS_CFG_CORE__mp)
-        __asm__ volatile("      bl      xwmp_thd_exit_lic");
-#elif defined(XuanWuOS_CFG_CORE__up)
-        __asm__ volatile("      bl      xwup_thd_exit_lic");
-#endif
+        __asm__ volatile("      bl      xwosplcb_thd_exit_lic");
         __asm__ volatile("      mov     r2, r0");
         __asm__ volatile("      pop     {r0, r1}");
         __asm__ volatile("      str     r2, [r0, #0]"); /* save the return value */
@@ -268,11 +260,7 @@ void arch_isr_svc(void)
         __asm__ volatile("svc_9:"); /* case 9: */
         __asm__ volatile("      push    {r0, lr}");
         __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 value */
-#if defined(XuanWuOS_CFG_CORE__mp)
-        __asm__ volatile("      bl      xwmp_skd_suspend_lic");
-#elif defined(XuanWuOS_CFG_CORE__up)
-        __asm__ volatile("      bl      xwup_skd_suspend_lic");
-#endif
+        __asm__ volatile("      bl      xwosplcb_skd_suspend_lic");
         __asm__ volatile("      mov     r2, r0");
         __asm__ volatile("      pop     {r0, r1}");
         __asm__ volatile("      str     r2, [r0, #0]"); /* save the return value */
@@ -281,11 +269,7 @@ void arch_isr_svc(void)
         __asm__ volatile("svc_10:"); /* case 10: */
         __asm__ volatile("      push    {r0, lr}");
         __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 value */
-#if defined(XuanWuOS_CFG_CORE__mp)
-        __asm__ volatile("      bl      xwmp_skd_resume_lic");
-#elif defined(XuanWuOS_CFG_CORE__up)
-        __asm__ volatile("      bl      xwup_skd_resume_lic");
-#endif
+        __asm__ volatile("      bl      xwosplcb_skd_resume_lic");
         __asm__ volatile("      mov     r2, r0");
         __asm__ volatile("      pop     {r0, r1}");
         __asm__ volatile("      str     r2, [r0, #0]"); /* save the return value */

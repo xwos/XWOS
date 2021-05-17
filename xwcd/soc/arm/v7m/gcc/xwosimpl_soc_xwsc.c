@@ -48,7 +48,7 @@ void soc_privilege_end(void)
  * @return 64位的有符号整数（返回值的具体意义根据具体的函数而决定）
  */
 __xwbsp_code
-xws64_t soc_xwsc(xwsc_f func, xwptr_t argnum, ...)
+xws64_t soc_xwsc(xwsc_f func, xwreg_t argnum, ...)
 {
         xws64_t rc;
         va_list args;
@@ -123,7 +123,7 @@ xws64_t soc_xwsc_entry(__xwcc_unused xwsc_f func, __xwcc_unused xwptr_t argnum,
         __asm__ volatile("      mov     r8, #0");                       /* r8 = 0               */
         __asm__ volatile("1:");
         __asm__ volatile("      cmp     r5, #0");                       /* if (0 == argnum)     */
-        __asm__ volatile("      beq     call");                         /*     goto 2f          */
+        __asm__ volatile("      beq     call");                         /*     goto call        */
         __asm__ volatile("      sub     r5, #1");                       /* argnum--;            */
         __asm__ volatile("      ldr     sl, [r6], #4");                 /* sl = *args++;        */
         __asm__ volatile("      tbb     [pc, r9]");                     /* switch (r9) {        */

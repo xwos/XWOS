@@ -31,6 +31,5 @@ xwer_t arch_systick_init(struct xwospl_syshwt * hwt);
 xwer_t arch_systick_start(struct xwospl_syshwt * hwt);
 xwer_t arch_systick_stop(struct xwospl_syshwt * hwt);
 xwtm_t arch_systick_get_timeconfetti(struct xwospl_syshwt * hwt);
-void arch_isr_systick(void);
 
 #endif /* arch_systick.h */

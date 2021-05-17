@@ -27,7 +27,6 @@
 
 #define SOC_STKFRAME_SIZE               0x50
 
-__xwbsp_code
 xwer_t soc_skd_swi(xwer_t(* swifunc)(void *, void *), void * arg0, void * arg1);
 
 static __xwbsp_code
@@ -49,7 +48,7 @@ __xwbsp_rodata const struct soc_irq_cfg soc_skd_irq_cfg[] = {
 __xwbsp_rodata const struct xwos_irq_resource soc_skd_irqrsc[] = {
         [0] = {
                 .irqn = SOC_SWCX_IRQN,
-                .isr = soc_skd_isr_swcx,
+                .isr = xwospl_skd_isr_swcx,
                 .cfg = &soc_skd_irq_cfg[0],
                 .description = "arch_switch_context_irq",
         },
@@ -69,22 +68,6 @@ __xwbsp_data struct e200x_context soc_context = {
 };
 
 /**
- * @brief 获取调度器结构体指针
- * @return 调度器的指针
- */
-__xwbsp_code
-struct xwospl_skd * soc_skd_get_lc(void)
-{
-#if defined(XuanWuOS_CFG_CORE__mp)
-        return xwmp_skd_get_lc();
-#elif defined(XuanWuOS_CFG_CORE__up)
-        return xwup_skd_get_lc();
-#else
-  #error "Can't find the configuration XuanWuOS_CFG_CORE!"
-#endif
-}
-
-/**
  * @brief SOC Adaptation Function：初始化调度调度器
  * @param xwskd: (I) 调度器的指针
  * @return 错误码
@@ -100,10 +83,7 @@ xwer_t xwospl_skd_init(struct xwospl_skd * xwskd)
         for (i = 0; i < xw_array_size(soc_skd_irqrsc); i++) {
                 irqrsc = &soc_skd_irqrsc[i];
                 rc = xwos_irq_request(irqrsc->irqn, irqrsc->isr,
-                                      XWOS_UNUSED_ARGUMENT, NULL);
-                SDL_BUG_ON(rc < 0);
-
-                rc = xwos_irq_cfg(irqrsc->irqn, irqrsc->cfg);
+                                      XWOS_UNUSED_ARGUMENT, irqrsc->cfg);
                 SDL_BUG_ON(rc < 0);
 
                 rc = xwos_irq_enable(irqrsc->irqn);
@@ -136,11 +116,8 @@ void xwospl_skd_init_stack(struct xwospl_skd_stack_info * stk,
         xwstk_t * stkbtn;
         xwsq_t i, stknum;
 
-#if defined(XuanWuOS_CFG_CORE__mp)
-        privileged = !!(attr & XWMP_SKDATTR_PRIVILEGED);
-#elif defined(XuanWuOS_CFG_CORE__up)
-        privileged = !!(attr & XWUP_SKDATTR_PRIVILEGED);
-#endif
+        privileged = !!(attr & XWOSPL_SKDATTR_PRIVILEGED);
+
         asm volatile(
         "       mfmsr           %[__msr]"
         : [__msr] "=&r" (msr.w)
@@ -275,7 +252,7 @@ struct xwospl_skd * soc_skd_chk_swcx(void)
         xwstk_t * stkbtn;
         xwsz_t i;
 
-        xwskd = soc_skd_get_lc();
+        xwskd = xwosplcb_skd_get_lc();
         cstk = xwskd->cstk;
         stkbtn = (xwstk_t *)cstk->base;
         stk.ptr = cstk->sp;
@@ -290,7 +267,7 @@ struct xwospl_skd * soc_skd_chk_swcx(void)
         }
         return xwskd;
 #else /* XWMMCFG_STACK_CHK_SWCX */
-        return arch_skd_get_lc();
+        return xwosplcb_skd_get_lc();
 #endif /* !XWMMCFG_STACK_CHK_SWCX */
 }
 
@@ -310,7 +287,7 @@ struct xwospl_skd * soc_skd_chk_stk(void)
         xwstk_t * stkbtn;
         xwsz_t i;
 
-        xwskd = soc_skd_get_lc();
+        xwskd = xwosplcb_skd_get_lc();
         cstk = xwskd->cstk;
         stkbtn = (xwstk_t *)cstk->base;
         stk.ptr = soc_context.thd_sp;
@@ -347,13 +324,8 @@ xwer_t xwospl_skd_suspend(struct xwospl_skd * xwskd)
 {
         xwer_t rc;
 
-#if defined(XuanWuOS_CFG_CORE__mp)
-        rc = soc_skd_swi((xwer_t(*)(void *, void *))xwmp_skd_suspend_lic,
+        rc = soc_skd_swi((xwer_t(*)(void *, void *))xwosplcb_skd_suspend_lic,
                          (void *)xwskd, (void *)XWOS_UNUSED_ARGUMENT);
-#elif defined(XuanWuOS_CFG_CORE__up)
-        rc = soc_skd_swi((xwer_t(*)(void *, void *))xwup_skd_suspend_lic,
-                         (void *)xwskd, (void *)XWOS_UNUSED_ARGUMENT);
-#endif
         return rc;
 }
 
@@ -367,13 +339,8 @@ xwer_t xwospl_skd_resume(struct xwospl_skd * xwskd)
 {
         xwer_t rc;
 
-#if defined(XuanWuOS_CFG_CORE__mp)
-        rc = soc_skd_swi((xwer_t(*)(void *, void *))xwmp_skd_resume_lic,
+        rc = soc_skd_swi((xwer_t(*)(void *, void *))xwosplcb_skd_resume_lic,
                          (void *)xwskd, (void *)XWOS_UNUSED_ARGUMENT);
-#elif defined(XuanWuOS_CFG_CORE__up)
-        rc = soc_skd_swi((xwer_t(*)(void *, void *))xwup_skd_resume_lic,
-                         (void *)xwskd, (void *)XWOS_UNUSED_ARGUMENT);
-#endif
         return rc;
 }
 
@@ -385,13 +352,8 @@ xwer_t xwospl_skd_resume(struct xwospl_skd * xwskd)
 __xwbsp_code
 void xwospl_thd_exit_lc(struct xwospl_thd * thd, xwer_t rc)
 {
-#if defined(XuanWuOS_CFG_CORE__mp)
-        soc_skd_swi((xwer_t(*)(void *, void *))xwmp_thd_exit_lic,
+        soc_skd_swi((xwer_t(*)(void *, void *))xwosplcb_thd_exit_lic,
                     (void *)thd, (void *)rc);
-#elif defined(XuanWuOS_CFG_CORE__up)
-        soc_skd_swi((xwer_t(*)(void *, void *))xwup_thd_exit_lic,
-                    (void *)thd, (void *)rc);
-#endif
         while (true) {
         }
 }
@@ -405,13 +367,8 @@ xwer_t xwospl_thd_freeze_lc(struct xwospl_thd * thd)
 {
         xwer_t rc;
 
-#if defined(XuanWuOS_CFG_CORE__mp)
-        rc = soc_skd_swi((xwer_t(*)(void *, void *))xwmp_thd_freeze_lic,
+        rc = soc_skd_swi((xwer_t(*)(void *, void *))xwosplcb_thd_freeze_lic,
                          (void *)thd, (void *)XWOS_UNUSED_ARGUMENT);
-#elif defined(XuanWuOS_CFG_CORE__up)
-        rc = soc_skd_swi((xwer_t(*)(void *, void *))xwup_thd_freeze_lic,
-                         (void *)thd, (void *)XWOS_UNUSED_ARGUMENT);
-#endif
         return rc;
 }
 
@@ -427,10 +384,7 @@ xwer_t xwospl_thd_outmigrate(struct xwospl_thd * thd, xwid_t cpuid)
 {
         xwer_t rc;
 
-        XWOS_UNUSED(thd);
-        XWOS_UNUSED(cpuid);
-
-        rc = soc_skd_swi((xwer_t(*)(void *, void *))xwmp_thd_outmigrate_lic,
+        rc = soc_skd_swi((xwer_t(*)(void *, void *))xwosplcb_thd_outmigrate_lic,
                          (void *)thd, (void *)cpuid);
         return rc;
 }
@@ -444,6 +398,6 @@ __xwbsp_code
 void xwospl_thd_immigrate(struct xwospl_thd * thd, xwid_t cpuid)
 {
         XWOS_UNUSED(cpuid);
-        xwmp_thd_immigrate_lic(thd);
+        xwosplcb_thd_immigrate_lic(thd);
 }
 #endif /* XuanWuOS_CFG_CORE__mp */

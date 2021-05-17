@@ -19,16 +19,18 @@
   #include <xwos/mp/skd.h>
   #include <xwos/mp/thd.h>
 
-  #define xwospl_skd_stack_info xwmp_skd_stack_info
-  #define xwospl_skd xwmp_skd
-  #define xwospl_thd xwmp_thd
+  #define xwospl_skd_stack_info         xwmp_skd_stack_info
+  #define xwospl_skd                    xwmp_skd
+  #define xwospl_thd                    xwmp_thd
+  #define XWOSPL_SKDATTR_PRIVILEGED     XWMP_SKDATTR_PRIVILEGED
 #elif defined(XuanWuOS_CFG_CORE__up)
   #include <xwos/up/skd.h>
   #include <xwos/up/thd.h>
 
-  #define xwospl_skd_stack_info xwup_skd_stack_info
-  #define xwospl_skd xwup_skd
-  #define xwospl_thd xwup_thd
+  #define xwospl_skd_stack_info         xwup_skd_stack_info
+  #define xwospl_skd                    xwup_skd
+  #define xwospl_thd                    xwup_thd
+  #define XWOSPL_SKDATTR_PRIVILEGED     XWUP_SKDATTR_PRIVILEGED
 #else
   #error "Can't find the configuration XuanWuOS_CFG_CORE!"
 #endif
@@ -42,6 +44,16 @@
 struct xwospl_skd_stack_info;
 struct xwospl_skd;
 struct xwospl_thd;
+
+struct xwospl_skd * xwosplcb_skd_get_lc(void);
+struct xwospl_skd * xwosplcb_skd_pre_swcx_lic(struct xwospl_skd * xwskd);
+struct xwospl_skd * xwosplcb_skd_post_swcx_lic(struct xwospl_skd * xwskd);
+xwer_t xwosplcb_skd_suspend_lic(struct xwospl_skd * xwskd);
+xwer_t xwosplcb_skd_resume_lic(struct xwospl_skd * xwskd);
+xwer_t xwosplcb_thd_exit_lic(struct xwospl_thd * thd, xwer_t rc);
+xwer_t xwosplcb_thd_freeze_lic(struct xwospl_thd * thd);
+void xwosplcb_thd_immigrate_lic(struct xwospl_thd * thd);
+xwer_t xwosplcb_thd_outmigrate_lic(struct xwospl_thd * thd, xwid_t dstcpu);
 
 /**
  * @brief 玄武OS移植层：初始化调度调度器
@@ -85,11 +97,16 @@ xwer_t xwospl_skd_suspend(struct xwospl_skd * xwskd);
 xwer_t xwospl_skd_resume(struct xwospl_skd * xwskd);
 
 /**
- * @brief 玄武OS移植层：发起切换上下文的软中断
+ * @brief 玄武OS移植层：触发切换上下文的软中断
  * @param xwskd: (I) 调度器的指针
  */
 static __xwbsp_inline
 void xwospl_skd_req_swcx(struct xwospl_skd * xwskd);
+
+/**
+ * @brief 玄武OS移植层：切换上下文中断的服务函数
+ */
+void xwospl_skd_isr_swcx(void);
 
 /**
  * @brief 玄武OS移植层：本地CPU上的线程退出

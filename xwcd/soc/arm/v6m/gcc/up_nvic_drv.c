@@ -181,11 +181,11 @@ xwer_t cortexm_nvic_drv_clear(xwirq_t irqn)
 
         rc = XWOK;
         if (irqn >= 0) {
-                cm_nvic_clear_irq_pending(irqn);
+                cm_nvic_clear_irq(irqn);
         } else if (ARCH_IRQ_PENDSV == irqn) {
-                cm_nvic_clear_systick_pending();
+                cm_nvic_clear_pendsv();
         } else if (ARCH_IRQ_SYSTICK == irqn) {
-                cm_nvic_clear_systick_pending();
+                cm_nvic_clear_systick();
         } else {
                 rc = -EPERM;
         }
@@ -199,11 +199,11 @@ xwer_t cortexm_nvic_drv_tst(xwirq_t irqn, bool * pending)
 
         rc = XWOK;
         if (irqn >= 0) {
-                *pending = cm_nvic_get_irq_pending(irqn);
+                *pending = cm_nvic_tst_irq(irqn);
         } else if (ARCH_IRQ_PENDSV == irqn) {
-                *pending = cm_nvic_get_pendsv_pending();
+                *pending = cm_nvic_tst_pendsv();
         } else if (ARCH_IRQ_SYSTICK == irqn) {
-                *pending = cm_nvic_get_systick_pending();
+                *pending = cm_nvic_tst_systick();
         } else {
                 rc = -EPERM;
         }

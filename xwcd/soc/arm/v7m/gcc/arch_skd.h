@@ -29,8 +29,6 @@ void arch_skd_init_stack(struct xwospl_skd_stack_info * stk,
                          void (* exit)(xwer_t),
                          xwsq_t attr);
 void arch_skd_svcsr_start(struct xwospl_skd * xwskd);
-struct xwospl_skd * arch_skd_get_lc(void);
-void arch_isr_pendsv(void);
 struct xwospl_skd * arch_skd_chk_stk(void);
 
 #endif /* arch_skd.h */

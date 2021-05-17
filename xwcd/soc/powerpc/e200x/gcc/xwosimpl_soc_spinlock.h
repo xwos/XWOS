@@ -25,8 +25,6 @@
   #error "This file should be included from <xwos/ospl/soc/spinlock.h>."
 #endif
 
-#include <xwos/standard.h>
-
 struct soc_splk {
         xwu32_t lockval;
 };

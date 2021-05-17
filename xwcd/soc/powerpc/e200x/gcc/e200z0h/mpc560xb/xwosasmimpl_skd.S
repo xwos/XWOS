@@ -26,12 +26,8 @@
         .equ            INTC_SSCIR3, 0xFFF48023
 
         .extern         soc_context
-
-#if defined(XuanWuOS_CFG_CORE__mp)
-        .extern         xwmp_skd_post_swcx_lic
-#elif defined(XuanWuOS_CFG_CORE__up)
-        .extern         xwup_skd_post_swcx_lic
-#endif
+        .extern         xwosplcb_skd_pre_swcx_lic
+        .extern         xwosplcb_skd_post_swcx_lic
         .extern         soc_skd_chk_swcx
         .extern         _SDA_BASE_
         .extern         _SDA2_BASE_
@@ -53,7 +49,7 @@ soc_skd_swi:
         se_stb          r7, 0 (r6) /* call r3(r4, r5) */
         se_blr
 soc_skd_swi_end:
-        .size           soc_skd_swi, soc_skd_swi - soc_skd_swi
+        .size           soc_skd_swi, soc_skd_swi_end - soc_skd_swi
 
 
 /**
@@ -107,10 +103,10 @@ soc_skd_swi_end:
  *  0x00     *  GPR2     *    |
  */
         .section        .xwos.isr.text,"ax"
-        .global         soc_skd_isr_swcx
+        .global         xwospl_skd_isr_swcx
         .align          4
-soc_skd_isr_swcx:
-/* void soc_skd_isr_swcx(void) */
+xwospl_skd_isr_swcx:
+/* void xwospl_skd_isr_swcx(void) */
         /* clear IRQ flag */
         e_lis           r3, INTC_SSCIR0@h
         e_or2i          r3, INTC_SSCIR0@l
@@ -123,11 +119,7 @@ soc_skd_isr_swcx:
         se_stw          r0, 36 (r1) /* save the lr to caller stack frame */
         /* check thread stack & get xwos scheduler */
         e_bl            soc_skd_chk_swcx /* r3 = soc_skd_chk_swcx(); */
-#if defined(XuanWuOS_CFG_CORE__mp)
-        e_bl            xwmp_skd_pre_swcx_lic
-#elif defined(XuanWuOS_CFG_CORE__up)
-        e_bl            xwup_skd_pre_swcx_lic
-#endif
+        e_bl            xwosplcb_skd_pre_swcx_lic
 
         /* get thread SP */
         e_lis           r4, soc_context@h /* r4 = &soc_context; */
@@ -155,17 +147,13 @@ soc_skd_isr_swcx:
         se_stw          r5, 0x4 (r4) /* soc_context.thd_sp = r5; */
 
         /* finish the progress */
-#if defined(XuanWuOS_CFG_CORE__mp)
-        e_bl            xwmp_skd_post_swcx_lic
-#elif defined(XuanWuOS_CFG_CORE__up)
-        e_bl            xwup_skd_post_swcx_lic
-#endif
+        e_bl            xwosplcb_skd_post_swcx_lic
         se_lwz          r0, 36 (r1)
         se_mtlr         r0
         se_addi         r1, 32  /* delete reserved frame (used by compiler) */
         se_blr
-soc_skd_isr_swcx_end:
-        .size           soc_skd_isr_swcx, soc_skd_isr_swcx - soc_skd_isr_swcx
+xwospl_skd_isr_swcx_end:
+        .size           xwospl_skd_isr_swcx, xwospl_skd_isr_swcx_end - xwospl_skd_isr_swcx
 
 /**
  * @brief Local CPU starts scheduler

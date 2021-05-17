@@ -20,8 +20,8 @@
 
 #include <xwos/standard.h>
 #include <xwos/ospl/irq.h>
-#include <arch_skd.h>
-#include <arch_systick.h>
+#include <xwos/ospl/syshwt.h>
+#include <xwos/ospl/skd.h>
 #include "cubemx/IVT/isr.h"
 #include "cubemx/Core/Inc/main.h"
 
@@ -43,8 +43,8 @@ __xwos_ivt __xwos_ivt_qualifier struct soc_isr_table xwospl_ivt = {
                 [ARCH_IRQ_SVCALL + ARCHCFG_IRQ_NUM] = (xwisr_f)arch_isr_svc,
                 [ARCH_IRQ_DBGMON + ARCHCFG_IRQ_NUM] = arch_isr_dbgmon,
                 [ARCH_IRQ_RSVN3 + ARCHCFG_IRQ_NUM] = arch_isr_noop,
-                [ARCH_IRQ_PENDSV + ARCHCFG_IRQ_NUM] = arch_isr_pendsv,
-                [ARCH_IRQ_SYSTICK + ARCHCFG_IRQ_NUM] = arch_isr_systick,
+                [ARCH_IRQ_PENDSV + ARCHCFG_IRQ_NUM] = xwospl_skd_isr_swcx,
+                [ARCH_IRQ_SYSTICK + ARCHCFG_IRQ_NUM] = xwospl_syshwt_isr,
         },
         .soc = {
                 [WWDG_IRQn] = WWDG_IRQHandler,

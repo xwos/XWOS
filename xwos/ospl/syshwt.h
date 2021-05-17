@@ -17,22 +17,27 @@
 
 #if defined(XuanWuOS_CFG_CORE__mp)
   #include <xwos/mp/tt.h>
-
   #define xwospl_syshwt xwmp_syshwt
+  #define XWOSPL_SYSHWT_PERIOD  XWMPCFG_SYSHWT_PERIOD
+  #define XWOSPL_SYSHWT_HZ      (XWTM_S / XWMPCFG_SYSHWT_PERIOD)
 #elif defined(XuanWuOS_CFG_CORE__up)
   #include <xwos/up/tt.h>
-
   #define xwospl_syshwt xwup_syshwt
+  #define XWOSPL_SYSHWT_PERIOD  XWUPCFG_SYSHWT_PERIOD
+  #define XWOSPL_SYSHWT_HZ      (XWTM_S / XWUPCFG_SYSHWT_PERIOD)
 #else
   #error "Can't find the configuration XuanWuOS_CFG_CORE!"
 #endif
 
 struct xwospl_syshwt;
 
+void xwosplcb_syshwt_task(struct xwospl_syshwt * hwt);
+
 xwer_t xwospl_syshwt_init(struct xwospl_syshwt * hwt);
 xwer_t xwospl_syshwt_start(struct xwospl_syshwt * hwt);
 xwer_t xwospl_syshwt_stop(struct xwospl_syshwt * hwt);
 xwtm_t xwospl_syshwt_get_timeconfetti(struct xwospl_syshwt * hwt);
+void xwospl_syshwt_isr(void);
 
 #include <xwosimpl_syshwt.h>
 

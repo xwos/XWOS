@@ -109,6 +109,7 @@ LD_ARGS = $(strip $(LDFLAGS) $(ARCH_LDFLAGS) $(CPU_LDFLAGS) \
 all: $(LIB_OBJS) $(LIBS) $(XWMD) $(XWCD) $(XWBM) $(XWEM) $(XWAM) $(XWOEM) \
     $(XWOS_WKSPC_DIR)/$(TARGET).elf \
     $(XWOS_WKSPC_DIR)/$(TARGET).hex \
+    $(XWOS_WKSPC_DIR)/$(TARGET).smot \
     $(XWOS_WKSPC_DIR)/$(TARGET).bin
 
 ifeq ($(XuanWuOS_CFG_XWMD),y)
@@ -219,6 +220,9 @@ $(XWOS_WKSPC_DIR)/$(TARGET).elf: $(LIB_OBJS) $(LIBS) \
 %.hex: %.elf
 	$(SHOW_OBJCP) $(OBJCP) -O ihex $< $@
 
+%.smot: %.elf
+	$(SHOW_OBJCP) $(OBJCP) -O srec $< $@
+
 %.bin: %.elf
 	$(SHOW_OBJCP) $(OBJCP) -O binary -S $< $@
 
@@ -270,6 +274,7 @@ clean: $(XWMD_CLEAN) $(XWCD_CLEAN) $(XWBM_CLEAN) \
 	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).dsm
 	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).map
 	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).hex
+	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).smot
 	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).bin
 	@$(RM) -rf doc/doxygen
 
@@ -287,6 +292,7 @@ distclean: $(XWMD_DISTCLEAN) $(XWCD_DISTCLEAN) $(XWBM_DISTCLEAN) \
 	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).dsm
 	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).map
 	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).hex
+	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).smot
 	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).bin
 	@$(RM) -rf doc/doxygen
 

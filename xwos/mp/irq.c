@@ -245,8 +245,6 @@ void * xwmp_irqc_get_data(struct xwmp_irqc * irqc)
  * @brief XWMP API：从中断号获取中断控制器对象
  * @param irqn: (I) 中断号
  * @return 中断控制器结构体的指针
- * @note
- * - irqn可为负数，表示ARCH IRQ
  */
 __xwmp_api
 struct xwmp_irqc * xwmp_irq_get_irqc(xwirq_t irqn)
@@ -255,7 +253,8 @@ struct xwmp_irqc * xwmp_irq_get_irqc(xwirq_t irqn)
         xwreg_t cpuirq;
         xwid_t cpuid;
 
-        XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM), "nullptr", NULL);
+        XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM), "out-of-range", NULL);
+        XWOS_VALIDATE((irqn >= (xwirq_t)-ARCHCFG_IRQ_NUM), "out-of-range", NULL);
 
         xwmp_rawly_lock_cpuirqsv(&xwmp_irqc_subsystem.percpu_irqcslot_lock, &cpuirq);
         cpuid = xwaop_load(xwid, &xwmp_irqc_subsystem.irq.cfg.cpu[irqn].cpuid,

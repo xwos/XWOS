@@ -31,7 +31,7 @@
  */
 __xwos_ivt __xwos_ivt_qualifier struct soc_isr_table xwospl_ivt = {
         .soc = {
-                (xwisr_f)soc_skd_isr_swcx, /* Vector - 0 SWINT0 */
+                (xwisr_f)xwospl_skd_isr_swcx, /* Vector - 0 SWINT0 */
                 (xwisr_f)soc_skd_isr_swi, /* Vector - 1 SWINT1 */
                 (xwisr_f)soc_isr_noop, /* Vector - 2 SWINT2 */
                 (xwisr_f)soc_isr_noop, /* Vector - 3 SWINT3 */
@@ -90,7 +90,7 @@ __xwos_ivt __xwos_ivt_qualifier struct soc_isr_table xwospl_ivt = {
                 (xwisr_f)soc_isr_noop, /* Vector - 56 RGM */
                 (xwisr_f)soc_isr_noop, /* Vector - 57 FXOSC */
                 (xwisr_f)soc_isr_noop, /* Vector - 58 */
-                (xwisr_f)soc_syshwt_isr, /* Vector - 59 PIT0 */
+                (xwisr_f)xwospl_syshwt_isr, /* Vector - 59 PIT0 */
                 (xwisr_f)soc_isr_noop, /* Vector - 60 PIT1 */
                 (xwisr_f)soc_isr_noop, /* Vector - 61 PIT2 */
                 (xwisr_f)soc_isr_noop, /* Vector - 62 ADC0_EOC */
