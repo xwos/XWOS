@@ -68,8 +68,7 @@ SECTIONS {
                 FILL(0xFF)
                 KEEP (*(.init))
                 KEEP (*(.fini))
-                *(.text)
-                *(.text.*)
+                *(.text .text.* .gnu.linkonce.t.*)
                 *(.glue_7)      /* glue arm to thumb code */
                 *(.glue_7t)     /* glue thumb to arm code */
                 *(.eh_frame)

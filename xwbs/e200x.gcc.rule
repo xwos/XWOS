@@ -20,6 +20,7 @@
 
 CROSS_COMPILE ?= powerpc-eabivle-
 CC := $(CROSS_COMPILE)gcc
+CXX := $(CROSS_COMPILE)g++
 AS := $(CROSS_COMPILE)gcc -x assembler-with-cpp
 OBJCP := $(CROSS_COMPILE)objcopy
 OD := $(CROSS_COMPILE)objdump
@@ -56,6 +57,11 @@ CFLAGS = -mvle -mcpu=e200z0 -m$(ENDIAN) -mregnames -std=gnu11 \
          -g3 -fverbose-asm \
          -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
+CXXFLAGS = -mvle -mcpu=e200z0 -m$(ENDIAN) -mregnames -std=gnu11 \
+           -ffunction-sections -fdata-sections \
+           -g3 -fverbose-asm \
+           -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
+
 MMFLAGS = -MM -MP
 
 ifeq ($(~O),)
@@ -67,6 +73,7 @@ ifeq ($(~O),)
 endif
 
 CFLAGS += -O$(~O)
+CXXFLAGS += -O$(~O)
 
 ifeq ($(ARCHCFG_COMPILER_CLIB),n)
     CFLAGS += -fno-builtin

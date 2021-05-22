@@ -51,8 +51,7 @@ SECTIONS {
         .rx : ALIGN(8) {
                 KEEP (*(.init))
                 KEEP (*(.fini))
-                *(.text)
-                *(.text.*)
+                *(.text .text.* .gnu.linkonce.t.*)
                 *(.glue_7)      /* glue arm to thumb code */
                 *(.glue_7t)     /* glue thumb to arm code */
                 *(.eh_frame)
@@ -67,7 +66,7 @@ SECTIONS {
                 KEEP (*(.preinit_array*))
                 PROVIDE_HIDDEN (__preinit_array_end = .);
                 preinit_array_vma_end = .;
-         } > code_mr
+        } > code_mr
         preinit_array_vma_base = ADDR(.preinit_array);
         preinit_array_lma_base = LOADADDR(.preinit_array);
 

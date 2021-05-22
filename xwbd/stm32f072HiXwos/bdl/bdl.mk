@@ -18,6 +18,7 @@
 # > limitations under the License.
 #
 
+BDL_INCDIRS :=
 BDL_EOBJS :=
 
 BDL_AFLAGS :=

@@ -1,6 +1,6 @@
 #! /bin/make -f
 # @file
-# @brief 编译模块并生成.a的Makefile模板 (ARM-cortex-m-gcc)
+# @brief 编译玄武模块的Makefile
 # @author
 # + 隐星魂 (Roy.Sun) <https://xwos.tech>
 # @copyright

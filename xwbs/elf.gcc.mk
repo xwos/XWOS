@@ -1,6 +1,6 @@
 #! /bin/make -f
 # @file
-# @brief Makefile模板 (powerpc-eabivle-gcc)
+# @brief 编译ELF的Makefile
 # @author
 # + 隐星魂 (Roy.Sun) <https://xwos.tech>
 # @copyright
@@ -22,6 +22,7 @@ include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
 include xwbs/$(XuanWuOS_CFG_MK_RULE)
 include $(XWOS_BRD_DIR)/cfg/lib.mk
 
+ARCH_INCDIRS := $(addprefix $(XWOS_ARCH_DIR)/,$(ARCH_INCDIRS))
 ARCH_CSRCS := $(addprefix $(XWOS_ARCH_DIR)/,$(ARCH_CSRCS))
 ARCH_ASRCS := $(addprefix $(XWOS_ARCH_DIR)/,$(ARCH_ASRCS))
 ARCH_COBJS := $(addprefix $(XWOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(ARCH_CSRCS))))
@@ -30,6 +31,7 @@ ARCH_OBJS := $(ARCH_COBJS) $(ARCH_AOBJS)
 ARCH_OBJS_LST := $(XWOS_OBJ_DIR)/$(XWOS_ARCH_DIR)/arch-objs.txt
 ARCH_LIB := $(XWOS_OBJ_DIR)/$(XWOS_ARCH_DIR)/arch.a
 
+CPU_INCDIRS := $(addprefix $(XWOS_CPU_DIR)/,$(CPU_INCDIRS))
 CPU_CSRCS := $(addprefix $(XWOS_CPU_DIR)/,$(CPU_CSRCS))
 CPU_ASRCS := $(addprefix $(XWOS_CPU_DIR)/,$(CPU_ASRCS))
 CPU_COBJS := $(addprefix $(XWOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(CPU_CSRCS))))
@@ -38,6 +40,7 @@ CPU_OBJS := $(CPU_COBJS) $(CPU_AOBJS)
 CPU_OBJS_LST := $(XWOS_OBJ_DIR)/$(XWOS_CPU_DIR)/cpu-objs.txt
 CPU_LIB := $(XWOS_OBJ_DIR)/$(XWOS_CPU_DIR)/cpu.a
 
+SOC_INCDIRS := $(addprefix $(XWOS_SOC_DIR)/,$(SOC_INCDIRS))
 SOC_CSRCS := $(addprefix $(XWOS_SOC_DIR)/,$(SOC_CSRCS))
 SOC_ASRCS := $(addprefix $(XWOS_SOC_DIR)/,$(SOC_ASRCS))
 SOC_COBJS := $(addprefix $(XWOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(SOC_CSRCS))))
@@ -46,6 +49,7 @@ SOC_OBJS := $(SOC_COBJS) $(SOC_AOBJS)
 SOC_OBJS_LST := $(XWOS_OBJ_DIR)/$(XWOS_SOC_DIR)/soc-objs.txt
 SOC_LIB := $(XWOS_OBJ_DIR)/$(XWOS_SOC_DIR)/soc.a
 
+BDL_INCDIRS := $(addprefix $(XWOS_BDL_DIR)/,$(BDL_INCDIRS))
 BDL_CSRCS := $(addprefix $(XWOS_BDL_DIR)/,$(BDL_CSRCS))
 BDL_ASRCS := $(addprefix $(XWOS_BDL_DIR)/,$(BDL_ASRCS))
 BDL_COBJS := $(addprefix $(XWOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(BDL_CSRCS))))
@@ -77,19 +81,23 @@ LIB_OBJS += $(CPU_OBJS)
 LIB_OBJS += $(ARCH_OBJS)
 
 INCDIRS += $(if $(strip $(EINCDIRS)),$(addprefix -I,$(strip $(EINCDIRS))))
+INCDIRS += $(if $(strip $(ARCH_INCDIRS)),$(addprefix -I,$(strip $(ARCH_INCDIRS))))
+INCDIRS += $(if $(strip $(CPU_INCDIRS)),$(addprefix -I,$(strip $(CPU_INCDIRS))))
+INCDIRS += $(if $(strip $(SOC_INCDIRS)),$(addprefix -I,$(strip $(SOC_INCDIRS))))
+INCDIRS += $(if $(strip $(BDL_INCDIRS)),$(addprefix -I,$(strip $(BDL_INCDIRS))))
 
 DSMS := $(addsuffix .dsm,$(basename $(OBJS)))
 DSMS += $(addsuffix .dsm,$(basename $(LIB_OBJS)))
 
-LD_OBJS = $(strip -Wl,--start-group \
+LD_OBJS = $(strip -Wl,--whole-archive -Wl,--start-group \
                   $(XWOEM) $(XWAM) $(XWEM) $(XWBM) $(XWCD) $(XWMD) \
                   $(XWOS_LIB) $(XWOS_EOBJS) \
                   $(BDL_LIB) $(BDL_EOBJS) \
                   $(SOC_LIB) $(SOC_EOBJS) \
                   $(CPU_LIB) $(CPU_EOBJS) \
                   $(ARCH_LIB) $(ARCH_EOBJS) \
-                  -Wl,--end-group \
-                  $(ELIBS))
+                  -Wl,--end-group -Wl,--no-whole-archive \
+                  -Wl,--start-group $(ELIBS) -Wl,--end-group)
 LD_OBJS_LST := $(XWOS_OBJ_DIR)/$(TARGET)-objs.txt
 
 MM_ARGS = $(strip $(MMFLAGS))
@@ -99,6 +107,9 @@ AS_ARGS = $(strip $(INCDIRS) $(AFLAGS) $(ARCH_AFLAGS) $(CPU_AFLAGS) \
 
 CC_ARGS = $(strip $(INCDIRS) $(CFLAGS) $(ARCH_CFLAGS) $(CPU_CFLAGS) \
                   $(SOC_CFLAGS) $(BDL_CFLAGS))
+
+CXX_ARGS = $(strip $(INCDIRS) $(CXXFLAGS) $(ARCH_CXXFLAGS) $(CPU_CXXFLAGS) \
+                   $(SOC_CXXFLAGS) $(BDL_CXXFLAGS))
 
 LD_ARGS = $(strip $(LDFLAGS) $(ARCH_LDFLAGS) $(CPU_LDFLAGS) \
                   $(SOC_LDFLAGS) $(BDL_LDFLAGS))
@@ -134,23 +145,23 @@ ifneq ($(NODEP),y)
 endif
 
 $(ARCH_LIB): $(ARCH_OBJS)
-	@echo $(ARCH_OBJS) > $(ARCH_OBJS_LST)
+	$(file > $(ARCH_OBJS_LST),$(ARCH_OBJS))
 	$(SHOW_AR) $(AR) rcs $@ @$(ARCH_OBJS_LST)
 
 $(CPU_LIB): $(CPU_OBJS)
-	@echo $(CPU_OBJS) > $(CPU_OBJS_LST)
+	$(file > $(CPU_OBJS_LST),$(CPU_OBJS))
 	$(SHOW_AR) $(AR) rcs $@ @$(CPU_OBJS_LST)
 
 $(SOC_LIB): $(SOC_OBJS)
-	@echo $(SOC_OBJS) > $(SOC_OBJS_LST)
+	$(file > $(SOC_OBJS_LST),$(SOC_OBJS))
 	$(SHOW_AR) $(AR) rcs $@ @$(SOC_OBJS_LST)
 
 $(BDL_LIB): $(BDL_OBJS)
-	@echo $(BDL_OBJS) > $(BDL_OBJS_LST)
+	$(file > $(BDL_OBJS_LST),$(BDL_OBJS))
 	$(SHOW_AR) $(AR) rcs $@ @$(BDL_OBJS_LST)
 
 $(XWOS_LIB): $(XWOS_OBJS)
-	@echo $(XWOS_OBJS) > $(XWOS_OBJS_LST)
+	$(file > $(XWOS_OBJS_LST),$(XWOS_OBJS))
 	$(SHOW_AR) $(AR) rcs $@ @$(XWOS_OBJS_LST)
 
 dsm: $(DSMS) $(XWMD_DSM) $(XWCD_DSM) $(XWBM_DSM) $(XWEM_DSM) $(XWAM_DSM) $(XWOEM_DSM) \
@@ -182,9 +193,35 @@ $(XWOS_OBJ_DIR)/%.o: %.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_CC) $(CC) -c $(CC_ARGS) $< -o $@
 
-$(XWOS_WKSPC_DIR)/$(TARGET).elf: $(LIB_OBJS) $(LIBS) $(XWMD) $(XWCD) $(XWBM) $(XWEM) \
-    $(XWAM) $(XWOEM)
-	@echo $(LD_OBJS) > $(LD_OBJS_LST)
+$(XWOS_OBJ_DIR)/%.i: %.cpp
+	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
+	$(SHOW_CXX) $(CXX) -E $(CXX_ARGS) $< -o $@
+
+$(XWOS_OBJ_DIR)/%.o.d: %.cpp
+	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
+	$(SHOW_MM) $(CXX) $(MM_ARGS) $(CXX_ARGS) $< > $@;
+	@sed -i 's|\(^.*\)\.o[ :]*|$(XWOS_OBJ_DIR)/$*.o $@: \\\n |g' $@
+
+$(XWOS_OBJ_DIR)/%.o: %.cpp
+	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
+	$(SHOW_CXX) $(CXX) -c $(CXX_ARGS) $< -o $@
+
+$(XWOS_OBJ_DIR)/%.i: %.cxx
+	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
+	$(SHOW_CXX) $(CXX) -E $(CXX_ARGS) $< -o $@
+
+$(XWOS_OBJ_DIR)/%.o.d: %.cxx
+	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
+	$(SHOW_MM) $(CXX) $(MM_ARGS) $(CXX_ARGS) $< > $@;
+	@sed -i 's|\(^.*\)\.o[ :]*|$(XWOS_OBJ_DIR)/$*.o $@: \\\n |g' $@
+
+$(XWOS_OBJ_DIR)/%.o: %.cxx
+	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
+	$(SHOW_CXX) $(CXX) -c $(CXX_ARGS) $< -o $@
+
+$(XWOS_WKSPC_DIR)/$(TARGET).elf: $(LIB_OBJS) $(LIBS) \
+    $(XWMD) $(XWCD) $(XWBM) $(XWEM) $(XWAM) $(XWOEM)
+	$(file > $(LD_OBJS_LST),$(LD_OBJS))
 	$(SHOW_LD) $(LD) $(LD_ARGS) @$(LD_OBJS_LST) -o $@
 	$(SHOW_SIZE) $(SIZE) $@
 
@@ -203,8 +240,8 @@ $(XWOS_WKSPC_DIR)/$(TARGET).dsm: $(XWOS_WKSPC_DIR)/$(TARGET).elf
 %.dsm: %.o
 	$(SHOW_OD) $(OD) -D $< > $@
 
-clean: $(XWMD_CLEAN) $(XWCD_CLEAN) $(XWBM_CLEAN) $(XWEM_CLEAN) \
-    $(XWAM_CLEAN) $(XWOEM_CLEAN)
+clean: $(XWMD_CLEAN) $(XWCD_CLEAN) $(XWBM_CLEAN) \
+    $(XWEM_CLEAN) $(XWAM_CLEAN) $(XWOEM_CLEAN)
 	@echo "clean ..."
 	@$(RM) -f $(XWOS_LIB)
 	@$(RM) -f $(XWOS_OBJS)

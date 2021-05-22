@@ -24,8 +24,8 @@ ENTRY(arch_isr_reset)
 
 SECTIONS {
         . = 0x0;
-        .xwos.ivt : ALIGN(4) {
-                *(.xwos.ivt)
+        .xwos.ivt : ALIGN(8) {
+                KEEP(*(.xwos.ivt))
                 xwos_ivt_vma_end = .;
         } > ivt_vmr AT> ivt_lmr
         xwos_ivt_vma_base = ADDR(.xwos.ivt);
@@ -46,8 +46,7 @@ SECTIONS {
                 *(.xwos.isr.text)
                 *(.xwos.text)
                 *(.xwos.rodata)
-                *(.text)
-                *(.text.*)
+                *(.text .text.* .gnu.linkonce.t.*)
                 *(.glue_7)      /* glue arm to thumb code */
                 *(.glue_7t)     /* glue thumb to arm code */
                 *(.eh_frame)

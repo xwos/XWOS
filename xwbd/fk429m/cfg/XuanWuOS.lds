@@ -30,16 +30,7 @@ MEMORY {
         ivt_lmr (rx): org = 0x08000000, len = 2048 /* vectors table lma region */
         ivt_vmr (rw): org = 0x08000000, len = 2048 /* vectors table vma region */
         image_description_mr (rx): org = 0x08000800, len = 1k /* image description */
-        code_mr (rx): org = 0x08000C00, len = 2045k /* .xwos.ivt &
-                                                       .xwos.init.text &
-                                                       .xwos.init.rodata &
-                                                       .xwos.exit.text &
-                                                       .xwos.exit.rodata &
-                                                       .xwos.isr.text &
-                                                       .xwos.text &
-                                                       .xwos.rodata &
-                                                       .text &
-                                                       .rodata */
+        code_mr (rx): org = 0x08000C00, len = 2045k /* text & rodata */
         stkmempool_mr (arw): org = 0x20000000, len = 128k /* .stkmempool */
         data_mr (arw): org = 0x20020000, len = 64k /* .data, .bss & .heap */
         xwos_data_mr (arw): org = 0x10000000, len = 24k /* .xwos.data */
