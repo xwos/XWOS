@@ -75,7 +75,7 @@ struct xwcq * xwcq_alloc(xwsz_t qsize)
 
         rc = xwmm_kma_alloc(sizeof(struct xwcq) + qsize, XWMM_ALIGNMENT, &mem.anon);
         if (XWOK == rc) {
-                xwcq_construct(mem.cq, (xwu8_t *)&cq[1]);
+                xwcq_construct(mem.cq, (xwu8_t *)&mem.cq[1]);
         } else {
                 mem.cq = err_ptr(-ENOMEM);
         }
