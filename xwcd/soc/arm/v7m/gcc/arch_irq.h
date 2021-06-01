@@ -24,39 +24,6 @@
 #include <xwos/standard.h>
 #include <armv7m_nvic.h>
 
-/* high */
-#define ARCH_IRQ_PRIO_7         0x0
-#define ARCH_IRQ_PRIO_6         0x2
-#define ARCH_IRQ_PRIO_5         0x4
-#define ARCH_IRQ_PRIO_4         0x6
-#define ARCH_IRQ_PRIO_3         0x8
-#define ARCH_IRQ_PRIO_2         0xA
-#define ARCH_IRQ_PRIO_1         0xC
-#define ARCH_IRQ_PRIO_0         0xE
-/* low */
-
-#define ARCH_IRQ_SUBPRIO_HIGH   0x0
-#define ARCH_IRQ_SUBPRIO_LOW    0x1
-
-enum arch_irq_em {
-        ARCH_SP_TOP = -16, /**< initial value of stack point */
-        ARCH_IRQ_RESET = -15, /**< Reset Interrupt */
-        ARCH_IRQ_NMI = -14, /**< 2 Non Maskable Interrupt */
-        ARCH_IRQ_HARDFAULT = -13, /**< Cortex-M Hard Fault */
-        ARCH_IRQ_MMFAULT = -12, /**< Cortex-M Memory Management Fault */
-        ARCH_IRQ_BUSFAULT = -11, /**< Cortex-M Bus Fault */
-        ARCH_IRQ_USGFAULT = -10, /**< Cortex-M Usage Fault */
-        ARCH_IRQ_RSVN9 = -9,
-        ARCH_IRQ_RSVN8 = -8,
-        ARCH_IRQ_RSVN7 = -7,
-        ARCH_IRQ_RSVN6 = -6,
-        ARCH_IRQ_SVCALL = -5, /**< Cortex-M SV Call Interrupt */
-        ARCH_IRQ_DBGMON = -4, /**< Cortex-M Debug Monitor Interrupt */
-        ARCH_IRQ_RSVN3 = -3,
-        ARCH_IRQ_PENDSV = -2, /**< Cortex-M Pend SV Interrupt */
-        ARCH_IRQ_SYSTICK = -1, /**< Cortex-M System Tick Interrupt */
-};
-
 void arch_init_sysirqs(void);
 void arch_isr_reset(void);
 void arch_isr_nmi(void);
@@ -67,7 +34,6 @@ void arch_isr_usagefault(void);
 void arch_isr_dbgmon(void);
 void arch_isr_svc(void);
 void arch_isr_noop(void);
-xwer_t arch_irq_get_id(xwirq_t * irqnbuf);
 
 /**
  * @brief Enable local CPU IRQ

@@ -23,9 +23,10 @@
 #include <armv6m_nvic.h>
 #include <arch_irq.h>
 #include <arch_skd.h>
+#include <arch_nvic.h>
 
-#define ARCH_IRQ_FAULT_PRIO     (ARCH_IRQ_PRIO_HIGHEST)
-#define ARCH_IRQ_SVC_PRIO       (ARCH_IRQ_PRIO_HIGHEST)
+#define SOC_EXC_FAULT_PRIO      (SOC_IRQ_PRIO_HIGHEST)
+#define SOC_EXC_SVC_PRIO        (SOC_IRQ_PRIO_HIGHEST)
 
 /**
  * @brief Setup Architecture Fault
@@ -34,18 +35,18 @@ __xwbsp_init_code
 void arch_init_sysirqs(void)
 {
         /* init faults */
-        cm_nvic_set_sysirq_priority(ARCH_IRQ_MMFAULT, ARCH_IRQ_FAULT_PRIO);
+        cm_nvic_set_sysirq_priority(SOC_EXC_MMFAULT, SOC_EXC_FAULT_PRIO);
         cm_nvic_enable_memfault();
 
-        cm_nvic_set_sysirq_priority(ARCH_IRQ_BUSFAULT, ARCH_IRQ_FAULT_PRIO);
+        cm_nvic_set_sysirq_priority(SOC_EXC_BUSFAULT, SOC_EXC_FAULT_PRIO);
         cm_nvic_enable_busfault();
 
-        cm_nvic_set_sysirq_priority(ARCH_IRQ_USGFAULT, ARCH_IRQ_FAULT_PRIO);
+        cm_nvic_set_sysirq_priority(SOC_EXC_USGFAULT, SOC_EXC_FAULT_PRIO);
         cm_nvic_enable_usgfault();
 
         cm_nvic_enable_faults();
 
-        cm_nvic_set_sysirq_priority(ARCH_IRQ_SVCALL, ARCH_IRQ_SVC_PRIO);
+        cm_nvic_set_sysirq_priority(SOC_EXC_SVCALL, SOC_EXC_SVC_PRIO);
 }
 
 /**
@@ -165,9 +166,9 @@ void arch_isr_dbgmon(void)
  *   + ARM内核进入handler模式时会自动将r0 ~ r3, ip,lr, pc & xpsr压栈保存；
  *     返回thread模式时会自动从栈中弹出原始值恢复这些寄存器。
  *     返回的地址被存放在[SP+24]的地址处。可以将这个内存地址中的内容改为xwsc的真正
- *     入口@ref arch_xwsc_entry()，并将原始返回地址存放在原始LR的位置[SP+20]。原始
+ *     入口@ref soc_xwsc_entry()，并将原始返回地址存放在原始LR的位置[SP+20]。原始
  *     LR的值又存放在原始R3的位置[SP+12]。原始R3在xwsc中没有使用到，因此不需要备份。
- *     当svc_sysisr()返回时，就会进入到@ref arch_xwsc_entry()函数，并且以r0 ~ r2作为
+ *     当svc_sysisr()返回时，就会进入到@ref soc_xwsc_entry()函数，并且以r0 ~ r2作为
  *     参数，函数的第四个参数（通过R3的位置传递）作为LR的原始值。
  *         ------------------------------\n
  *         | stack      | change        |\n
@@ -289,30 +290,8 @@ void arch_isr_noop(void)
         __xwcc_unused xwer_t rc;
         __xwcc_unused xwirq_t irqn;
 
-        rc = arch_irq_get_id(&irqn);
+        rc = arch_nvic_irq_get_id(&irqn);
         scs = &cm_scs;
         while (true) {
         }
-}
-
-/**
- * @brief Get Current IRQ Number
- */
-__xwbsp_code
-xwer_t arch_irq_get_id(xwirq_t * irqnbuf)
-{
-        xwirq_t curr;
-        xwer_t rc;
-
-        curr = cm_scs.scb.icsr.bit.vect_active;
-        if (0 == curr) {
-                rc = -ENOTINISR;
-        } else {
-                curr -= 16;
-                rc = XWOK;
-        }
-        if (!is_err_or_null(irqnbuf)) {
-                *irqnbuf = curr;
-        }
-        return rc;
 }

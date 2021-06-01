@@ -11,7 +11,6 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/mp/irq.h>
 #include <xwos/mp/pm.h>
 #include <xwos/mp/init.h>
 
@@ -22,7 +21,6 @@ __xwmp_init_code
 xwer_t xwmp_init(void)
 {
         /* 初始化中断管理系统 */
-        xwmp_irqc_subsys_init();
         xwmp_pmdm_init();
         return XWOK;
 }

@@ -30,9 +30,6 @@
 #define ARCHCFG_32BIT                           1
 #define ARCHCFG_64BIT                           0
 
-/******** ******** ******** interrupt ******** ******** ********/
-#define ARCHCFG_IRQ_NUM                         16
-
 /******** ******** fpu ******** ********/
 #define ARCHCFG_FPU                             0
 
@@ -48,23 +45,27 @@
 #define ARCHCFG_LIB_XWBOP_FFS8                  0
 #define ARCHCFG_LIB_XWBOP_FLS8                  0
 #define ARCHCFG_LIB_XWBOP_RBIT8                 0
+#define ARCHCFG_LIB_XWBOP_WEIGHT8               0
 
 #define ARCHCFG_LIB_XWBOP_FFS16                 0
 #define ARCHCFG_LIB_XWBOP_FLS16                 0
 #define ARCHCFG_LIB_XWBOP_RBIT16                0
 #define ARCHCFG_LIB_XWBOP_RE16                  1
 #define ARCHCFG_LIB_XWBOP_RE16S32               1
+#define ARCHCFG_LIB_XWBOP_WEIGHT16              0
 
 #define ARCHCFG_LIB_XWBOP_FFS32                 0
 #define ARCHCFG_LIB_XWBOP_FLS32                 0
 #define ARCHCFG_LIB_XWBOP_RBIT32                0
 #define ARCHCFG_LIB_XWBOP_RE32                  1
 #define ARCHCFG_LIB_XWBOP_RE32S64               1
+#define ARCHCFG_LIB_XWBOP_WEIGHT32              0
 
 #define ARCHCFG_LIB_XWBOP_FFS64                 0
 #define ARCHCFG_LIB_XWBOP_FLS64                 0
 #define ARCHCFG_LIB_XWBOP_RBIT64                0
 #define ARCHCFG_LIB_XWBOP_RE64                  1
+#define ARCHCFG_LIB_XWBOP_WEIGHT64              0
 
 #define ARCHCFG_LIB_XWBMPOP_FFS                 0
 #define ARCHCFG_LIB_XWBMPOP_FFZ                 0

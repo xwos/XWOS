@@ -15,6 +15,15 @@
 
 #include <xwos/standard.h>
 
+/**
+ * @brief 中断向量表限定词
+ */
+#if defined(SOCCFG_RO_ISRTABLE) && (1 == SOCCFG_RO_ISRTABLE)
+  #define __xwos_ivt_qualifier const
+#else /* SOCCFG_RO_ISRTABLE */
+  #define __xwos_ivt_qualifier
+#endif /* !SOCCFG_RO_ISRTABLE */
+
 struct soc_irq_cfg;
 struct soc_irq_data;
 struct soc_isr_table;

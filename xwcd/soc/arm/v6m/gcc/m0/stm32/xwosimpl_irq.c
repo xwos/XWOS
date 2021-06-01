@@ -20,92 +20,83 @@
 
 #include <xwos/standard.h>
 #include <arch_irq.h>
+#include <arch_nvic.h>
 
 __xwbsp_code
 xwer_t xwospl_irq_get_id(xwirq_t * irqnbuf)
 {
-        return arch_irq_get_id(irqnbuf);
-}
-
-#if defined(XuanWuOS_CFG_CORE__up)
-#include <up_nvic_drv.h>
-
-__xwbsp_code
-xwer_t xwospl_irqc_init(void)
-{
-        return cortexm_nvic_drv_init();
+        return arch_nvic_irq_get_id(irqnbuf);
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_request_irq(xwirq_t irqn, xwisr_f isrfunc, void * data,
-                               const struct soc_irq_cfg * cfg)
+xwer_t xwospl_irq_request(xwirq_t irqn, xwisr_f isrfunc, void * data,
+                          const struct soc_irq_cfg * cfg)
 {
-        return cortexm_nvic_drv_request(irqn, isrfunc, data, cfg);
+        return arch_nvic_irq_request(irqn, isrfunc, data, cfg);
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_release_irq(xwirq_t irqn)
+xwer_t xwospl_irq_release(xwirq_t irqn)
 {
-        return cortexm_nvic_drv_release(irqn);
+        return arch_nvic_irq_release(irqn);
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_enable_irq(xwirq_t irqn)
+xwer_t xwospl_irq_enable(xwirq_t irqn)
 {
-        return cortexm_nvic_drv_enable(irqn);
+        return arch_nvic_irq_enable(irqn);
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_disable_irq(xwirq_t irqn)
+xwer_t xwospl_irq_disable(xwirq_t irqn)
 {
-        return cortexm_nvic_drv_disable(irqn);
+        return arch_nvic_irq_disable(irqn);
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_save_irq(xwirq_t irqn, xwreg_t * flag)
+xwer_t xwospl_irq_save(xwirq_t irqn, xwreg_t * flag)
 {
-        return cortexm_nvic_drv_save(irqn, flag);
+        return arch_nvic_irq_save(irqn, flag);
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_restore_irq(xwirq_t irqn, xwreg_t flag)
+xwer_t xwospl_irq_restore(xwirq_t irqn, xwreg_t flag)
 {
-        return cortexm_nvic_drv_restore(irqn, flag);
+        return arch_nvic_irq_restore(irqn, flag);
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_pend_irq(xwirq_t irqn)
+xwer_t xwospl_irq_pend(xwirq_t irqn)
 {
-        return cortexm_nvic_drv_pend(irqn);
+        return arch_nvic_irq_pend(irqn);
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_clear_irq(xwirq_t irqn)
+xwer_t xwospl_irq_clear(xwirq_t irqn)
 {
-        return cortexm_nvic_drv_clear(irqn);
+        return arch_nvic_irq_clear(irqn);
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_tst_irq(xwirq_t irqn, bool * pending)
+xwer_t xwospl_irq_tst(xwirq_t irqn, bool * pending)
 {
-        return cortexm_nvic_drv_tst(irqn, pending);
+        return arch_nvic_irq_tst(irqn, pending);
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_cfg_irq(xwirq_t irqn, const struct soc_irq_cfg * cfg)
+xwer_t xwospl_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg)
 {
-        return cortexm_nvic_drv_cfg(irqn, cfg);
+        return arch_nvic_irq_cfg(irqn, cfg);
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_get_irq_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
+xwer_t xwospl_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
 {
-        return cortexm_nvic_drv_get_cfg(irqn, cfgbuf);
+        return arch_nvic_irq_get_cfg(irqn, cfgbuf);
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_get_irq_data(xwirq_t irqn, struct soc_irq_data * databuf)
+xwer_t xwospl_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
 {
-        return cortexm_nvic_drv_get_data(irqn, databuf);
+        return arch_nvic_irq_get_data(irqn, databuf);
 }
-#endif /* XuanWuOS_CFG_CORE__up */

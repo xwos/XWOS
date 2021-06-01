@@ -29,6 +29,7 @@
 #define SOCCFG_CHIP_MPC5607B                    1
 
 /******** ******** ******** IRQ ******** ******** ********/
+#define SOCCFG_EXC_NUM                          9
 #define SOCCFG_IRQ_NUM                          256U
 #define SOCCFG_RO_ISRTABLE                      1
 

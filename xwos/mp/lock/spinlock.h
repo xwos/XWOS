@@ -23,8 +23,6 @@ struct xwmp_splk {
         struct soc_splk socsplk; /**< 架构描述层中的自旋锁结构体 */
 };
 
-struct xwmp_irq_resource;
-
 void xwmp_rawly_lock(struct xwmp_splk * spl);
 xwer_t xwmp_rawly_trylock(struct xwmp_splk * spl);
 void xwmp_rawly_unlock(struct xwmp_splk * spl);
@@ -35,19 +33,19 @@ void xwmp_rawly_lock_cpuirqsv(struct xwmp_splk * spl, xwreg_t * cpuirq);
 xwer_t xwmp_rawly_trylock_cpuirqsv(struct xwmp_splk * spl, xwreg_t * cpuirq);
 void xwmp_rawly_unlock_cpuirqrs(struct xwmp_splk * spl, xwreg_t cpuirq);
 void xwmp_rawly_lock_irqs(struct xwmp_splk * spl,
-                          const struct xwmp_irq_resource * irqs, xwsz_t num);
+                          const struct xwos_irq_resource * irqs, xwsz_t num);
 xwer_t xwmp_rawly_trylock_irqs(struct xwmp_splk * spl,
-                               const struct xwmp_irq_resource * irqs, xwsz_t num);
+                               const struct xwos_irq_resource * irqs, xwsz_t num);
 void xwmp_rawly_unlock_irqs(struct xwmp_splk * spl,
-                            const struct xwmp_irq_resource * irqs, xwsz_t num);
+                            const struct xwos_irq_resource * irqs, xwsz_t num);
 void xwmp_rawly_lock_irqssv(struct xwmp_splk * spl,
-                            const struct xwmp_irq_resource * irqs,
+                            const struct xwos_irq_resource * irqs,
                             xwreg_t flags[], xwsz_t num);
 xwer_t xwmp_rawly_trylock_irqssv(struct xwmp_splk * spl,
-                                 const struct xwmp_irq_resource * irqs,
+                                 const struct xwos_irq_resource * irqs,
                                  xwreg_t flags[], xwsz_t num);
 void xwmp_rawly_unlock_irqsrs(struct xwmp_splk * spl,
-                              const struct xwmp_irq_resource * irqs,
+                              const struct xwos_irq_resource * irqs,
                               xwreg_t flags[], xwsz_t num);
 
 void xwmp_splk_init(struct xwmp_splk * spl);
@@ -61,22 +59,22 @@ void xwmp_splk_lock_cpuirqsv(struct xwmp_splk * spl, xwreg_t * cpuirq);
 xwer_t xwmp_splk_trylock_cpuirqsv(struct xwmp_splk * spl, xwreg_t * cpuirq);
 void xwmp_splk_unlock_cpuirqrs(struct xwmp_splk * spl, xwreg_t cpuirq);
 void xwmp_splk_lock_irqs(struct xwmp_splk * spl,
-                         const struct xwmp_irq_resource * irqs,
+                         const struct xwos_irq_resource * irqs,
                          xwsz_t num);
 xwer_t xwmp_splk_trylock_irqs(struct xwmp_splk * spl,
-                              const struct xwmp_irq_resource * irqs,
+                              const struct xwos_irq_resource * irqs,
                               xwsz_t num);
 void xwmp_splk_unlock_irqs(struct xwmp_splk * spl,
-                           const struct xwmp_irq_resource * irqs,
+                           const struct xwos_irq_resource * irqs,
                            xwsz_t num);
 void xwmp_splk_lock_irqssv(struct xwmp_splk * spl,
-                           const struct xwmp_irq_resource * irqs,
+                           const struct xwos_irq_resource * irqs,
                            xwreg_t flags[], xwsz_t num);
 xwer_t xwmp_splk_trylock_irqssv(struct xwmp_splk * spl,
-                                const struct xwmp_irq_resource * irqs,
+                                const struct xwos_irq_resource * irqs,
                                 xwreg_t flags[], xwsz_t num);
 void xwmp_splk_unlock_irqsrs(struct xwmp_splk * spl,
-                             const struct xwmp_irq_resource * irqs,
+                             const struct xwos_irq_resource * irqs,
                              xwreg_t flags[], xwsz_t num);
 void xwmp_splk_lock_bh(struct xwmp_splk * spl);
 xwer_t xwmp_splk_trylock_bh(struct xwmp_splk * spl);

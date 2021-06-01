@@ -22,6 +22,7 @@
 #include <armv6m_core.h>
 #include <arch_irq.h>
 #include <arch_image.h>
+#include <arch_nvic.h>
 #include <arch_init.h>
 
 extern xwu8_t data_lma_base[];
@@ -64,6 +65,7 @@ void arch_lowlevel_init(void)
 __xwbsp_init_code
 void arch_init(void)
 {
+        arch_nvic_init();
 }
 
 /**
@@ -103,6 +105,12 @@ __xwbsp_init_code
 void cxx_init(void)
 {
         void (** f)();
+
+        for (f = (void (**)())preinit_array_vma_base;
+             f < (void (**)())preinit_array_vma_end;
+             ++f) {
+                (*f)();
+        }
 
         for (f = (void (**)())init_array_vma_base;
              f < (void (**)())init_array_vma_end;

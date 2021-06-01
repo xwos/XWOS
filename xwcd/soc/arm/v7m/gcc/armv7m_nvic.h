@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __arch_armv7m_nvic_h__
-#define __arch_armv7m_nvic_h__
+#ifndef __armv7m_nvic_h__
+#define __armv7m_nvic_h__
 
 #include <xwos/standard.h>
 #include <armv7m_core.h>
@@ -29,6 +29,41 @@
 #else
   #define CM_NVIC_PRIO_BITNUM SOCCFG_NVIC_PRIO_BITNUM
 #endif
+
+#ifndef SOCCFG_NVIC_SUBPRIO_BITIDX
+  #error "SOCCFG_NVIC_SUBPRIO_BITIDX is not defined!"
+#else
+  #define CM_NVIC_SUBPRIO_BITIDX SOCCFG_NVIC_SUBPRIO_BITIDX
+#endif
+#define CM_NVIC_PRIO_MAXBITNUM  8
+#define CM_NVIC_PRIO_SHIFT      (CM_NVIC_PRIO_MAXBITNUM - CM_NVIC_PRIO_BITNUM)
+
+#define SOC_IRQ_PRIO_MSK        (((1 << CM_NVIC_PRIO_BITNUM) - 1) << CM_NVIC_PRIO_SHIFT)
+#define SOC_IRQ_SUBPRIO_MSK     ((1 << (CM_NVIC_SUBPRIO_BITIDX + 1)) - 1)
+#define SOC_IRQ_PRIO_HIGHEST    (0x0)
+#define SOC_IRQ_PRIO_LOWEST     ((SOC_IRQ_PRIO_MSK ^ SOC_IRQ_SUBPRIO_MSK) >> \
+                                 CM_NVIC_PRIO_SHIFT)
+#define SOC_IRQ_SUBPRIO_HIGHEST (0x0)
+#define SOC_IRQ_SUBPRIO_LOWEST  (SOC_IRQ_SUBPRIO_MSK >> CM_NVIC_PRIO_SHIFT)
+
+enum soc_exc_em {
+        SOC_SP_TOP = -16, /**< initial value of stack point */
+        SOC_EXC_RESET = -15, /**< Reset Interrupt */
+        SOC_EXC_NMI = -14, /**< 2 Non Maskable Interrupt */
+        SOC_EXC_HARDFAULT = -13, /**< Cortex-M Hard Fault */
+        SOC_EXC_MMFAULT = -12, /**< Cortex-M Memory Management Fault */
+        SOC_EXC_BUSFAULT = -11, /**< Cortex-M Bus Fault */
+        SOC_EXC_USGFAULT = -10, /**< Cortex-M Usage Fault */
+        SOC_EXC_RSVN9 = -9,
+        SOC_EXC_RSVN8 = -8,
+        SOC_EXC_RSVN7 = -7,
+        SOC_EXC_RSVN6 = -6,
+        SOC_EXC_SVCALL = -5, /**< Cortex-M SV Call Interrupt */
+        SOC_EXC_DBGMON = -4, /**< Cortex-M Debug Monitor Interrupt */
+        SOC_EXC_RSVN3 = -3,
+        SOC_EXC_PENDSV = -2, /**< Cortex-M Pend SV Interrupt */
+        SOC_EXC_SYSTICK = -1, /**< Cortex-M System Tick Interrupt */
+};
 
 /******** SCB Interrupt Control State Register ********/
 #define SCB_ICSR_NMIPENDSET_POS         (31U)

@@ -141,7 +141,7 @@ void xwmp_rawly_unlock_cpuirqrs(struct xwmp_splk * splk, xwreg_t cpuirq)
 
 __xwmp_code
 void xwmp_rawly_lock_irqs(struct xwmp_splk * splk,
-                          const struct xwmp_irq_resource * irqs, xwsz_t num)
+                          const struct xwos_irq_resource * irqs, xwsz_t num)
 {
         xwssz_t i;
 
@@ -158,7 +158,7 @@ void xwmp_rawly_lock_irqs(struct xwmp_splk * splk,
 
 __xwmp_code
 xwer_t xwmp_rawly_trylock_irqs(struct xwmp_splk * splk,
-                               const struct xwmp_irq_resource * irqs, xwsz_t num)
+                               const struct xwos_irq_resource * irqs, xwsz_t num)
 {
         xwer_t rc;
         xwssz_t i;
@@ -183,7 +183,7 @@ xwer_t xwmp_rawly_trylock_irqs(struct xwmp_splk * splk,
 
 __xwmp_code
 void xwmp_rawly_unlock_irqs(struct xwmp_splk * splk,
-                            const struct xwmp_irq_resource * irqs, xwsz_t num)
+                            const struct xwos_irq_resource * irqs, xwsz_t num)
 {
         xwssz_t i;
 
@@ -200,7 +200,7 @@ void xwmp_rawly_unlock_irqs(struct xwmp_splk * splk,
 
 __xwmp_code
 void xwmp_rawly_lock_irqssv(struct xwmp_splk * splk,
-                            const struct xwmp_irq_resource * irqs,
+                            const struct xwos_irq_resource * irqs,
                             xwreg_t flags[], xwsz_t num)
 {
         xwssz_t i;
@@ -218,7 +218,7 @@ void xwmp_rawly_lock_irqssv(struct xwmp_splk * splk,
 
 __xwmp_code
 xwer_t xwmp_rawly_trylock_irqssv(struct xwmp_splk * splk,
-                                 const struct xwmp_irq_resource * irqs,
+                                 const struct xwos_irq_resource * irqs,
                                  xwreg_t flags[], xwsz_t num)
 {
         xwer_t rc;
@@ -245,7 +245,7 @@ xwer_t xwmp_rawly_trylock_irqssv(struct xwmp_splk * splk,
 
 __xwmp_code
 void xwmp_rawly_unlock_irqsrs(struct xwmp_splk * splk,
-                              const struct xwmp_irq_resource * irqs,
+                              const struct xwos_irq_resource * irqs,
                               xwreg_t flags[], xwsz_t num)
 {
         xwssz_t i;
@@ -529,7 +529,7 @@ void xwmp_splk_unlock_cpuirqrs(struct xwmp_splk * splk, xwreg_t cpuirq)
  */
 __xwmp_api
 void xwmp_splk_lock_irqs(struct xwmp_splk * splk,
-                         const struct xwmp_irq_resource * irqs, xwsz_t num)
+                         const struct xwos_irq_resource * irqs, xwsz_t num)
 {
         xwssz_t i;
 
@@ -564,7 +564,7 @@ void xwmp_splk_lock_irqs(struct xwmp_splk * splk,
  */
 __xwmp_api
 xwer_t xwmp_splk_trylock_irqs(struct xwmp_splk * splk,
-                              const struct xwmp_irq_resource * irqs, xwsz_t num)
+                              const struct xwos_irq_resource * irqs, xwsz_t num)
 {
         xwer_t rc;
         xwssz_t i;
@@ -601,7 +601,7 @@ xwer_t xwmp_splk_trylock_irqs(struct xwmp_splk * splk,
  */
 __xwmp_api
 void xwmp_splk_unlock_irqs(struct xwmp_splk * splk,
-                           const struct xwmp_irq_resource * irqs, xwsz_t num)
+                           const struct xwos_irq_resource * irqs, xwsz_t num)
 {
         xwssz_t i;
 
@@ -634,7 +634,7 @@ void xwmp_splk_unlock_irqs(struct xwmp_splk * splk,
  */
 __xwmp_api
 void xwmp_splk_lock_irqssv(struct xwmp_splk * splk,
-                           const struct xwmp_irq_resource * irqs,
+                           const struct xwos_irq_resource * irqs,
                            xwreg_t flags[], xwsz_t num)
 {
         xwssz_t i;
@@ -671,7 +671,7 @@ void xwmp_splk_lock_irqssv(struct xwmp_splk * splk,
  */
 __xwmp_api
 xwer_t xwmp_splk_trylock_irqssv(struct xwmp_splk * splk,
-                                const struct xwmp_irq_resource * irqs,
+                                const struct xwos_irq_resource * irqs,
                                 xwreg_t flags[], xwsz_t num)
 {
         xwer_t rc;
@@ -710,7 +710,7 @@ xwer_t xwmp_splk_trylock_irqssv(struct xwmp_splk * splk,
  */
 __xwmp_api
 void xwmp_splk_unlock_irqsrs(struct xwmp_splk * splk,
-                             const struct xwmp_irq_resource * irqs,
+                             const struct xwos_irq_resource * irqs,
                              xwreg_t flags[], xwsz_t num)
 {
         xwssz_t i;

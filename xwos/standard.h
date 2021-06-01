@@ -92,23 +92,4 @@
   #endif
 #endif /* !ARCHCFG_PTRSIZE */
 
-/**
- * @brief 中断向量表限定词
- */
-#if defined(SOCCFG_RO_ISRTABLE) && (1 == SOCCFG_RO_ISRTABLE)
-  #define __xwos_ivt_qualifier const
-#else /* SOCCFG_RO_ISRTABLE */
-  #define __xwos_ivt_qualifier
-#endif /* !SOCCFG_RO_ISRTABLE */
-
-/**
- * @brief 玄武OS的中断数量
- */
-#define XWOS_IRQ_NUM            (ARCHCFG_IRQ_NUM + SOCCFG_IRQ_NUM)
-
-/**
- * @brief 玄武OS的中断号
- */
-#define XWOS_IRQ(x)     ((xwirq_t)x)
-
 #endif /* xwos/standard.h */

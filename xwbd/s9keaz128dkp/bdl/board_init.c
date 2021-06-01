@@ -40,8 +40,6 @@ void board_lowlevel_init(void)
 __xwbsp_init_code
 void board_init(void)
 {
-        /* IRQC data */
-        xwup_irqc_set_data((void *)NULL);
 }
 
 static __xwbsp_init_code

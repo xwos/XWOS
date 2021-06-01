@@ -569,9 +569,4 @@ endif
 
 ARCH_CSRCS += arch_init.c
 ARCH_CSRCS += arch_image.c arch_irq.c xwosimpl_soc_lfq.c xwosimpl_soc_xwsc.c
-ARCH_CSRCS += arch_skd.c arch_systick.c
-ifeq ($(XuanWuOS_CFG_CORE),mp)
-    ARCH_CSRCS += mp_nvic.c mp_nvic_drv.c
-else
-    ARCH_CSRCS += up_nvic.c up_nvic_drv.c
-endif
+ARCH_CSRCS += arch_skd.c arch_systick.c arch_nvic.c

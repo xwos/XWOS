@@ -13,6 +13,8 @@
 #include <xwos/standard.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
+#include <xwos/lib/xwaop.h>
+#include <xwos/lib/object.h>
 #include <xwos/ospl/syshwt.h>
 #include <xwos/mp/irq.h>
 #include <xwos/mp/skd.h>

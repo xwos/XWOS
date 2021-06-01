@@ -22,7 +22,7 @@ BDL_INCDIRS :=
 BDL_EOBJS :=
 
 BDL_AFLAGS :=
-BDL_CFLAGS :=
+BDL_CFLAGS := -Wno-sign-conversion
 BDL_CXFLAGS :=
 BDL_LDFLAGS :=
 

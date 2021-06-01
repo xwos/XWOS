@@ -30,9 +30,6 @@
 #define ARCHCFG_32BIT                           1
 #define ARCHCFG_64BIT                           0
 
-/******** ******** ******** interrupt ******** ******** ********/
-#define ARCHCFG_IRQ_NUM                         9
-
 /******** ******** fpu ******** ********/
 #define ARCHCFG_FPU                             0
 

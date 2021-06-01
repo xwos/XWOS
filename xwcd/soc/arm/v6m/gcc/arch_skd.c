@@ -24,7 +24,7 @@
 #include <armv6m_core.h>
 #include <arch_skd.h>
 
-#define ARCH_IRQ_SWCX_PRIO                              (ARCH_IRQ_PRIO_LOWEST)
+#define SOC_EXC_SWCX_PRIO                               (SOC_IRQ_PRIO_LOWEST)
 
 #define XPSR_INITVAL                                    0x01000000U
 #define FPSCR_INITVAL                                   0X00000000U
@@ -38,15 +38,15 @@ extern xwstk_t xwos_stk_top[];
 
 __xwbsp_rodata const struct soc_irq_cfg cortex_m_swcx_irq_cfg = {
         .irqcfg = {
-                .priority = ARCH_IRQ_SWCX_PRIO,
+                .priority = SOC_EXC_SWCX_PRIO,
         },
 };
 
 __xwbsp_rodata const struct xwos_irq_resource cortex_m_swcx_irqrsc = {
-        .irqn = ARCH_IRQ_PENDSV,
+        .irqn = SOC_EXC_PENDSV,
         .isr = xwospl_skd_isr_swcx,
         .cfg = &cortex_m_swcx_irq_cfg,
-        .description = "irq.swcx.armv6m",
+        .description = "irq.pendsv.armv6m",
 };
 
 static __xwbsp_code

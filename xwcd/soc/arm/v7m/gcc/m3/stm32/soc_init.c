@@ -21,14 +21,8 @@
 #include <xwos/standard.h>
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
-#if defined(XuanWuOS_CFG_CORE__mp)
-  #include <mp_nvic.h>
-#elif defined(XuanWuOS_CFG_CORE__up)
-  #include <up_nvic.h>
-#else
-  #error "Can't find the configuration of XuanWuOS_CFG_CORE!"
-#endif
 #include <armv7m_core.h>
+#include <arch_nvic.h>
 #include <soc.h>
 #include <soc_init.h>
 
@@ -55,30 +49,9 @@ void soc_init(void)
         soc_relocate_isrtable();
 #endif /* !SOCCFG_RO_ISRTABLE */
 
-#if defined(XuanWuOS_CFG_CORE__mp)
-        xwid_t id = xwmp_skd_id_lc();
-
-        /* Interrupt controller of CPU */
-        xwmp_irqc_construct(&xwospl_irqc[id]);
-        rc = xwmp_irqc_register(&xwospl_irqc[id], id, NULL);
-        XWOS_BUG_ON(rc < 0);
-
         /* Init scheduler of local CPU */
-        rc = xwmp_skd_init_lc();
+        rc = xwosplcb_skd_init_lc();
         XWOS_BUG_ON(rc);
-#elif defined(XuanWuOS_CFG_CORE__up)
-        /* Init interrupt controller */
-        rc = xwup_irqc_init("cortex-m.nvic",
-                            (SOCCFG_IRQ_NUM + ARCHCFG_IRQ_NUM),
-                            &xwospl_ivt,
-                            &xwospl_idvt,
-                            &armv7_nvic_cfg);
-        XWOS_BUG_ON(rc < 0);
-
-        /* Init scheduler */
-        rc = xwup_skd_init_lc();
-        XWOS_BUG_ON(rc);
-#endif
 }
 
 #if (!defined(SOCCFG_RO_ISRTABLE)) || (1 != SOCCFG_RO_ISRTABLE)

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 架构描述层：单核系统的中断控制器配置
+ * @brief 玄武OS移植实现层：SOC中断
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,10 +18,31 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
-#include <xwos/ospl/irq.h>
+#ifndef __xwosimpl_soc_irq_h__
+#define __xwosimpl_soc_irq_h__
 
-__xwbsp_rodata const struct cortexm_nvic_cfg armv7_nvic_cfg = {
-        .subprio = SOCCFG_NVIC_SUBPRIO_BITIDX,
-        .basepri = 0,
+#ifndef __xwos_ospl_soc_irq_h__
+  #error "This file should be included from <xwos/ospl/soc/irq.h>."
+#endif
+
+#include <armv7m_nvic.h>
+
+struct soc_irq_cfg {
+        struct cortexm_nvic_irq_cfg irqcfg;
 };
+
+struct soc_irq_data {
+        void * data;
+};
+
+struct soc_ivt {
+        xwisr_f exc[SOCCFG_EXC_NUM];
+        xwisr_f irq[SOCCFG_IRQ_NUM];
+};
+
+struct soc_idvt {
+        void * exc[SOCCFG_EXC_NUM];
+        void * irq[SOCCFG_IRQ_NUM];
+};
+
+#endif /* xwosimpl_soc_irq.h */

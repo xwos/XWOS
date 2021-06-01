@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS UP内核：中断控制器
+ * @brief 玄武OS UP内核：中断
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -8,6 +8,9 @@
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * @note
+ * - EXC：异常，编号为负数，CPU私有的中断；
+ * - IRQ：中断，编号为正数或0，被所有CPU共享，默认被CPU0响应，可指定其他CPU响应。
  */
 
 #ifndef __xwos_up_irq_h__
@@ -15,37 +18,6 @@
 
 #include <xwos/standard.h>
 #include <xwos/ospl/soc/irq.h>
-
-struct xwup_irqc;
-
-/**
- * @brief XWOS MP中断资源
- */
-struct xwup_irq_resource {
-        xwirq_t irqn; /**< 中断号 */
-        xwisr_f isr; /**< 中断处理函数 */
-        const struct soc_irq_cfg * cfg; /**< 配置 */
-        const char * description; /**< 描述 */
-};
-
-/**
- * @brief XWOS UP中断控制器
- */
-struct xwup_irqc {
-        const char * name; /**< 名字 */
-        xwsz_t irqs_num; /**< 中断数量 */
-        __xwos_ivt_qualifier struct soc_isr_table * ivt; /**< 中断向量表 */
-        __xwos_ivt_qualifier struct soc_isr_data_table * idvt; /**< 中断数据表 */
-        const void * soc_cfg; /**< SOC的私有配置 */
-        void * data; /**< SOC平台的私有数据 */
-};
-
-xwer_t xwup_irqc_init(const char * name, xwsz_t irqs_num,
-                      __xwos_ivt_qualifier struct soc_isr_table * ivt,
-                      __xwos_ivt_qualifier struct soc_isr_data_table * idvt,
-                      const void * soc_cfg);
-void xwup_irqc_set_data(void * data);
-void * xwup_irqc_get_data(void);
 
 xwer_t xwup_irq_request(xwirq_t irqn, xwisr_f isr, void * data,
                         const struct soc_irq_cfg * cfg);

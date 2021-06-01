@@ -27,7 +27,7 @@ struct arch_image_description {
         void * head;
         void * tail_flag_addr;
         void * end_addr;
-        void (*entry)(void);
+        void (* entry)(void);
 };
 
 struct __xwcc_aligned(32) arch_image_tail {
@@ -35,6 +35,7 @@ struct __xwcc_aligned(32) arch_image_tail {
 };
 
 extern const struct arch_image_description arch_image_description;
+
 extern const struct arch_image_tail arch_image_tail;
 
 xwer_t arch_boot_image(void * addr);

@@ -24,15 +24,15 @@
 #include <xwos/standard.h>
 #include <e200x_core.h>
 
-#define ARCH_IRQ_CRITICAL_INPUT                 (-9)
-#define ARCH_IRQ_MACHINE_CHECK                  (-8)
-#define ARCH_IRQ_DATA_STORAGE                   (-7)
-#define ARCH_IRQ_INSTRUCTION_STORAGE            (-6)
-#define ARCH_IRQ_EXTERNAL_INPUT                 (-5)
-#define ARCH_IRQ_ALIGNMENT                      (-4)
-#define ARCH_IRQ_PROGRAM                        (-3)
-#define ARCH_IRQ_SYSTEM_CALL                    (-2)
-#define ARCH_IRQ_DEBUG                          (-1)
+#define SOC_EXC_CRITICAL_INPUT                  (-9)
+#define SOC_EXC_MACHINE_CHECK                   (-8)
+#define SOC_EXC_DATA_STORAGE                    (-7)
+#define SOC_EXC_INSTRUCTION_STORAGE             (-6)
+#define SOC_EXC_EXTERNAL_INPUT                  (-5)
+#define SOC_EXC_ALIGNMENT                       (-4)
+#define SOC_EXC_PROGRAM                         (-3)
+#define SOC_EXC_SYSTEM_CALL                     (-2)
+#define SOC_EXC_DEBUG                           (-1)
 
 #define arch_cpuirq_enable_lc()         __asm__ volatile("wrteei 1")
 #define arch_cpuirq_disable_lc()        __asm__ volatile("wrteei 0")

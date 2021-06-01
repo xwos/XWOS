@@ -15,8 +15,6 @@
 
 #include <xwos/ospl/irq.h>
 
-#define xwosdl_irq_resource xwup_irq_resource
-
 static __xwcc_inline
 xwer_t xwosdl_irq_request(xwirq_t irqn, xwisr_f isr, void * data,
                           const struct soc_irq_cfg * cfg)

@@ -851,8 +851,6 @@ void soc_relocate_isrtable(void)
 __xwbsp_init_code
 void soc_init(void)
 {
-        xwer_t rc;
-
 #if (!defined(SOCCFG_RO_ISRTABLE)) || (1 != SOCCFG_RO_ISRTABLE)
         soc_relocate_isrtable();
 #endif /* !SOCCFG_RO_ISRTABLE */
@@ -881,28 +879,6 @@ void soc_init(void)
                 WKUP.WISR.R = 0x000FFFFF;
         }
 
-#if defined(XuanWuOS_CFG_CORE__mp)
-        xwid_t id = xwmp_skd_id_lc();
-
-        /* interrupt controller */
-        xwmp_irqc_construct(&xwospl_irqc[id]);
-        rc = xwmp_irqc_register(&xwospl_irqc[id], id, NULL);
-        XWOS_BUG_ON(rc < 0);
-
-        /* init scheduler of CPU */
-        rc = xwmp_skd_init_lc();
-        XWOS_BUG_ON(rc < 0);
-#elif defined(XuanWuOS_CFG_CORE__up)
-        /* Init interrupt controller */
-        rc = xwup_irqc_init("mpc560xb.irqc",
-                            (SOCCFG_IRQ_NUM + ARCHCFG_IRQ_NUM),
-                            &xwospl_ivt,
-                            &xwospl_idvt,
-                            NULL);
-        XWOS_BUG_ON(rc < 0);
-
-        /* Init scheduler */
-        rc = xwup_skd_init_lc();
-        XWOS_BUG_ON(rc);
-#endif
+        soc_irqc_init();
+        xwosplcb_skd_init_lc();
 }

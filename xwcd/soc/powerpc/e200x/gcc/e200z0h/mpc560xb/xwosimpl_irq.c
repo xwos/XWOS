@@ -48,34 +48,13 @@ void soc_isr_noop(void)
 {
 }
 
-
-#if defined(XuanWuOS_CFG_CORE__mp)
-
-#include <soc_mp_irqc_drv.h>
-
-__xwbsp_data struct xwmp_irqc xwospl_irqc[CPUCFG_CPU_NUM] = {
-        [0] = {
-                .name = "e200z0h.irqc",
-                .drv = &soc_irqc_drv,
-                .irqs_num = (SOCCFG_IRQ_NUM + ARCHCFG_IRQ_NUM),
-                .ivt = &xwospl_ivt,
-                .idvt = &xwospl_idvt,
-                .soc_cfg = NULL,
-                .data = NULL,
-        },
-};
-
-#elif defined(XuanWuOS_CFG_CORE__up)
-
-extern struct xwup_irqc xwup_irqc;
-
 __xwbsp_code
-xwer_t xwospl_irqc_init(void)
+void soc_irqc_init(void)
 {
-        __xwos_ivt_qualifier struct soc_isr_table * ivt;
+        __xwos_ivt_qualifier struct soc_ivt * ivt;
         xwu32_t i;
 
-        ivt = xwup_irqc.ivt;
+        ivt = &xwospl_ivt;
         /* Module Control Register - MCR */
         /* Bit 26 - The vector table size for e200z0h Core is: 4 bytes */
         /* Bit 31 - The module for e200z0 Core is in Software Vector Mode */
@@ -92,55 +71,54 @@ xwer_t xwospl_irqc_init(void)
         }
 
         INTC.CPR.R = SOC_IRQC_OS_PRIO - 1;
-        return XWOK;
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_request_irq(xwirq_t irqn, xwisr_f isrfunc, void * data,
-                               const struct soc_irq_cfg * cfg)
+xwer_t xwospl_irq_request(xwirq_t irqn, xwisr_f isrfunc, void * data,
+                          const struct soc_irq_cfg * cfg)
 {
         XWOS_UNUSED(isrfunc);
         XWOS_UNUSED(data);
 
 #if !defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE)
         if (irqn >= 0) {
-                __xwos_ivt_qualifier struct soc_isr_table * ivt;
-                __xwos_ivt_qualifier struct soc_isr_data_table * idvt;
+                __xwos_ivt_qualifier struct soc_ivt * ivt;
+                __xwos_ivt_qualifier struct soc_idvt * idvt;
 
-                ivt = xwup_irqc.ivt;
-                ivt->soc[irqn] = isrfunc;
+                ivt = &xwospl_ivt;
+                ivt->irq[irqn] = isrfunc;
 
-                idvt = xwup_irqc.idvt;
+                idvt = &xwospl_idvt;
                 if ((NULL != idvt) && (NULL != data)) {
-                        idvt->soc[irqn] = data;
+                        idvt->irq[irqn] = data;
                 }
         }
 #endif /* !SOCCFG_RO_ISRTABLE */
         if (cfg) {
-                xwospl_irqc_cfg_irq(irqn, cfg);
+                xwospl_irq_cfg(irqn, cfg);
         }
         return XWOK;
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_release_irq(xwirq_t irqn)
+xwer_t xwospl_irq_release(xwirq_t irqn)
 {
         XWOS_UNUSED(irqn);
 
 #if !defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE)
 
         if (irqn >= 0) {
-                __xwos_ivt_qualifier struct soc_isr_table * ivt;
+                __xwos_ivt_qualifier struct soc_ivt * ivt;
 
-                ivt = xwup_irqc.ivt;
-                ivt->soc[irqn] = soc_isr_nop;
+                ivt = &xwospl_ivt;
+                ivt->irq[irqn] = soc_isr_noop;
         }
 #endif /* !SOCCFG_RO_ISRTABLE */
         return XWOK;
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_enable_irq(xwirq_t irqn)
+xwer_t xwospl_irq_enable(xwirq_t irqn)
 {
         if (irqn >= 0) {
                 INTC.PSR[irqn].R |= XWBOP_BIT(SOC_IRQC_ENBIT);
@@ -149,7 +127,7 @@ xwer_t xwospl_irqc_enable_irq(xwirq_t irqn)
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_disable_irq(xwirq_t irqn)
+xwer_t xwospl_irq_disable(xwirq_t irqn)
 {
         if (irqn >= 0) {
                 INTC.PSR[irqn].R &= ~XWBOP_BIT(SOC_IRQC_ENBIT);
@@ -158,7 +136,7 @@ xwer_t xwospl_irqc_disable_irq(xwirq_t irqn)
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_save_irq(xwirq_t irqn, xwreg_t * flag)
+xwer_t xwospl_irq_save(xwirq_t irqn, xwreg_t * flag)
 {
         xwer_t rc;
 
@@ -173,7 +151,7 @@ xwer_t xwospl_irqc_save_irq(xwirq_t irqn, xwreg_t * flag)
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_restore_irq(xwirq_t irqn, xwreg_t flag)
+xwer_t xwospl_irq_restore(xwirq_t irqn, xwreg_t flag)
 {
         xwer_t rc;
 
@@ -187,21 +165,21 @@ xwer_t xwospl_irqc_restore_irq(xwirq_t irqn, xwreg_t flag)
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_pend_irq(xwirq_t irqn)
+xwer_t xwospl_irq_pend(xwirq_t irqn)
 {
         XWOS_UNUSED(irqn);
         return -ENOSYS;
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_clear_irq(xwirq_t irqn)
+xwer_t xwospl_irq_clear(xwirq_t irqn)
 {
         XWOS_UNUSED(irqn);
         return -ENOSYS;
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_tst_irq(xwirq_t irqn, bool * pending)
+xwer_t xwospl_irq_tst(xwirq_t irqn, bool * pending)
 {
         XWOS_UNUSED(irqn);
         XWOS_UNUSED(pending);
@@ -209,7 +187,7 @@ xwer_t xwospl_irqc_tst_irq(xwirq_t irqn, bool * pending)
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_cfg_irq(xwirq_t irqn, const struct soc_irq_cfg * cfg)
+xwer_t xwospl_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg)
 {
         xwer_t rc;
         xwu8_t prio;
@@ -226,7 +204,7 @@ xwer_t xwospl_irqc_cfg_irq(xwirq_t irqn, const struct soc_irq_cfg * cfg)
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_get_irq_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
+xwer_t xwospl_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
 {
         xwer_t rc;
 
@@ -240,18 +218,17 @@ xwer_t xwospl_irqc_get_irq_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
 }
 
 __xwbsp_code
-xwer_t xwospl_irqc_get_irq_data(xwirq_t irqn, struct soc_irq_data * databuf)
+xwer_t xwospl_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
 {
-        __xwos_ivt_qualifier struct soc_isr_data_table * idvt;
+        __xwos_ivt_qualifier struct soc_idvt * idvt;
         xwer_t rc;
 
         if (irqn >= 0) {
-                idvt = xwup_irqc.idvt;
-                databuf->data = idvt->soc[irqn];
+                idvt = &xwospl_idvt;
+                databuf->data = idvt->irq[irqn];
                 rc = XWOK;
         } else {
                 rc = -EPERM;
         }
         return rc;
 }
-#endif /* XuanWuOS_CFG_CORE__up */

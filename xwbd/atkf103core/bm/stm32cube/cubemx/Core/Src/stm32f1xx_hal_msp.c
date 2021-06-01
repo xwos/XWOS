@@ -107,7 +107,7 @@ void HAL_MspInit(void)
 HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 {
   (void)TickPriority;
-  uwTickPrio = ARCH_IRQ_TICK_PRIO;
+  uwTickPrio = SOC_EXC_TICK_PRIO;
   return HAL_OK;
 }
 

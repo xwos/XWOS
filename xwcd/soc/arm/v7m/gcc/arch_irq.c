@@ -21,11 +21,12 @@
 #include <xwos/standard.h>
 #include <armv7m_core.h>
 #include <armv7m_nvic.h>
+#include <arch_nvic.h>
 #include <arch_irq.h>
 #include <arch_skd.h>
 
-#define ARCH_IRQ_FAULT_PRIO     (ARCH_IRQ_PRIO_7 | ARCH_IRQ_SUBPRIO_HIGH)
-#define ARCH_IRQ_SVC_PRIO       (ARCH_IRQ_PRIO_7 | ARCH_IRQ_SUBPRIO_LOW)
+#define SOC_EXC_FAULT_PRIO      (SOC_IRQ_PRIO_HIGHEST | SOC_IRQ_SUBPRIO_HIGHEST)
+#define SOC_EXC_SVC_PRIO        (SOC_IRQ_PRIO_HIGHEST | SOC_IRQ_SUBPRIO_LOWEST)
 
 xws64_t soc_xwsc_entry(xwsc_f func, xwptr_t argnum, xwptr_t * args, xwreg_t old_lr);
 
@@ -36,18 +37,18 @@ __xwbsp_init_code
 void arch_init_sysirqs(void)
 {
         /* init faults */
-        cm_nvic_set_sysirq_priority(ARCH_IRQ_MMFAULT, ARCH_IRQ_FAULT_PRIO);
+        cm_nvic_set_sysirq_priority(SOC_EXC_MMFAULT, SOC_EXC_FAULT_PRIO);
         cm_nvic_enable_memfault();
 
-        cm_nvic_set_sysirq_priority(ARCH_IRQ_BUSFAULT, ARCH_IRQ_FAULT_PRIO);
+        cm_nvic_set_sysirq_priority(SOC_EXC_BUSFAULT, SOC_EXC_FAULT_PRIO);
         cm_nvic_enable_busfault();
 
-        cm_nvic_set_sysirq_priority(ARCH_IRQ_USGFAULT, ARCH_IRQ_FAULT_PRIO);
+        cm_nvic_set_sysirq_priority(SOC_EXC_USGFAULT, SOC_EXC_FAULT_PRIO);
         cm_nvic_enable_usgfault();
 
         cm_nvic_enable_faults();
 
-        cm_nvic_set_sysirq_priority(ARCH_IRQ_SVCALL, ARCH_IRQ_SVC_PRIO);
+        cm_nvic_set_sysirq_priority(SOC_EXC_SVCALL, SOC_EXC_SVC_PRIO);
 }
 
 /**
@@ -299,30 +300,8 @@ void arch_isr_noop(void)
         __xwcc_unused xwer_t rc;
         __xwcc_unused xwirq_t irqn;
 
-        rc = arch_irq_get_id(&irqn);
+        rc = arch_nvic_irq_get_id(&irqn);
         scs = &cm_scs;
         while (true) {
         }
-}
-
-/**
- * @brief Get Current IRQ Number
- */
-__xwbsp_code
-xwer_t arch_irq_get_id(xwirq_t * irqnbuf)
-{
-        xwirq_t curr;
-        xwer_t rc;
-
-        curr = cm_scs.scb.icsr.bit.vect_active;
-        if (0 == curr) {
-                rc = -ENOTINISR;
-        } else {
-                curr -= 16;
-                rc = XWOK;
-        }
-        if (!is_err_or_null(irqnbuf)) {
-                *irqnbuf = curr;
-        }
-        return rc;
 }

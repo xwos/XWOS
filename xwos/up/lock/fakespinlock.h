@@ -88,28 +88,28 @@ void xwup_splk_unlock_cpuirqrs(struct xwup_splk * splk, xwreg_t flag)
 
 static __xwup_inline_api
 void xwup_splk_lock_irqs(struct xwup_splk * splk,
-                         const struct xwup_irq_resource * irqs, xwsz_t num)
+                         const struct xwos_irq_resource * irqs, xwsz_t num)
 {
         xwup_sqlk_wr_lock_irqs(&splk->fake, irqs, num);
 }
 
 static __xwup_inline_api
 xwer_t xwup_splk_trylock_irqs(struct xwup_splk * splk,
-                              const struct xwup_irq_resource * irqs, xwsz_t num)
+                              const struct xwos_irq_resource * irqs, xwsz_t num)
 {
         return xwup_sqlk_wr_trylock_irqs(&splk->fake, irqs, num);
 }
 
 static __xwup_inline_api
 void xwup_splk_unlock_irqs(struct xwup_splk * splk,
-                           const struct xwup_irq_resource * irqs, xwsz_t num)
+                           const struct xwos_irq_resource * irqs, xwsz_t num)
 {
         xwup_sqlk_wr_unlock_irqs(&splk->fake, irqs, num);
 }
 
 static __xwup_inline_api
 void xwup_splk_lock_irqssv(struct xwup_splk * splk,
-                           const struct xwup_irq_resource * irqs,
+                           const struct xwos_irq_resource * irqs,
                            xwreg_t flags[], xwsz_t num)
 {
         xwup_sqlk_wr_lock_irqssv(&splk->fake, irqs, flags, num);
@@ -117,7 +117,7 @@ void xwup_splk_lock_irqssv(struct xwup_splk * splk,
 
 static __xwup_inline_api
 xwer_t xwup_splk_trylock_irqssv(struct xwup_splk * splk,
-                                const struct xwup_irq_resource * irqs,
+                                const struct xwos_irq_resource * irqs,
                                 xwreg_t flags[], xwsz_t num)
 {
         return xwup_sqlk_wr_trylock_irqssv(&splk->fake, irqs, flags, num);
@@ -125,7 +125,7 @@ xwer_t xwup_splk_trylock_irqssv(struct xwup_splk * splk,
 
 static __xwup_inline_api
 void xwup_splk_unlock_irqsrs(struct xwup_splk * splk,
-                             const struct xwup_irq_resource * irqs,
+                             const struct xwos_irq_resource * irqs,
                              xwreg_t flags[], xwsz_t num)
 {
         xwup_sqlk_wr_unlock_irqsrs(&splk->fake, irqs, flags, num);

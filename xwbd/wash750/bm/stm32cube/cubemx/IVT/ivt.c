@@ -27,26 +27,26 @@
 
 extern xwu8_t xwos_stk_top[];
 
-__xwos_ivt __xwos_ivt_qualifier struct soc_isr_table xwospl_ivt = {
-        .arch = {
-                [ARCH_SP_TOP + ARCHCFG_IRQ_NUM] = (xwisr_f)xwos_stk_top,
-                [ARCH_IRQ_RESET + ARCHCFG_IRQ_NUM] = (xwisr_f)arch_isr_reset,
-                [ARCH_IRQ_NMI + ARCHCFG_IRQ_NUM] = arch_isr_nmi,
-                [ARCH_IRQ_HARDFAULT + ARCHCFG_IRQ_NUM] = arch_isr_hardfault,
-                [ARCH_IRQ_MMFAULT + ARCHCFG_IRQ_NUM] = arch_isr_mm,
-                [ARCH_IRQ_BUSFAULT + ARCHCFG_IRQ_NUM] = arch_isr_busfault,
-                [ARCH_IRQ_USGFAULT + ARCHCFG_IRQ_NUM] = arch_isr_usagefault,
-                [ARCH_IRQ_RSVN9 + ARCHCFG_IRQ_NUM] = arch_isr_noop,
-                [ARCH_IRQ_RSVN8 + ARCHCFG_IRQ_NUM] = arch_isr_noop,
-                [ARCH_IRQ_RSVN7 + ARCHCFG_IRQ_NUM] = arch_isr_noop,
-                [ARCH_IRQ_RSVN6 + ARCHCFG_IRQ_NUM] = arch_isr_noop,
-                [ARCH_IRQ_SVCALL + ARCHCFG_IRQ_NUM] = (xwisr_f)arch_isr_svc,
-                [ARCH_IRQ_DBGMON + ARCHCFG_IRQ_NUM] = arch_isr_dbgmon,
-                [ARCH_IRQ_RSVN3 + ARCHCFG_IRQ_NUM] = arch_isr_noop,
-                [ARCH_IRQ_PENDSV + ARCHCFG_IRQ_NUM] = xwospl_skd_isr_swcx,
-                [ARCH_IRQ_SYSTICK + ARCHCFG_IRQ_NUM] = xwospl_syshwt_isr,
+__xwos_ivt __xwos_ivt_qualifier struct soc_ivt xwospl_ivt = {
+        .exc = {
+                [SOC_SP_TOP + SOCCFG_EXC_NUM] = (xwisr_f)xwos_stk_top,
+                [SOC_EXC_RESET + SOCCFG_EXC_NUM] = (xwisr_f)arch_isr_reset,
+                [SOC_EXC_NMI + SOCCFG_EXC_NUM] = arch_isr_nmi,
+                [SOC_EXC_HARDFAULT + SOCCFG_EXC_NUM] = arch_isr_hardfault,
+                [SOC_EXC_MMFAULT + SOCCFG_EXC_NUM] = arch_isr_mm,
+                [SOC_EXC_BUSFAULT + SOCCFG_EXC_NUM] = arch_isr_busfault,
+                [SOC_EXC_USGFAULT + SOCCFG_EXC_NUM] = arch_isr_usagefault,
+                [SOC_EXC_RSVN9 + SOCCFG_EXC_NUM] = arch_isr_noop,
+                [SOC_EXC_RSVN8 + SOCCFG_EXC_NUM] = arch_isr_noop,
+                [SOC_EXC_RSVN7 + SOCCFG_EXC_NUM] = arch_isr_noop,
+                [SOC_EXC_RSVN6 + SOCCFG_EXC_NUM] = arch_isr_noop,
+                [SOC_EXC_SVCALL + SOCCFG_EXC_NUM] = (xwisr_f)arch_isr_svc,
+                [SOC_EXC_DBGMON + SOCCFG_EXC_NUM] = arch_isr_dbgmon,
+                [SOC_EXC_RSVN3 + SOCCFG_EXC_NUM] = arch_isr_noop,
+                [SOC_EXC_PENDSV + SOCCFG_EXC_NUM] = xwospl_skd_isr_swcx,
+                [SOC_EXC_SYSTICK + SOCCFG_EXC_NUM] = xwospl_syshwt_isr,
         },
-        .soc = {
+        .irq = {
                 [WWDG_IRQn] = WWDG_IRQHandler,
                 [PVD_AVD_IRQn] = PVD_AVD_IRQHandler,
                 [TAMP_STAMP_IRQn] = TAMP_STAMP_IRQHandler,
@@ -190,26 +190,26 @@ __xwos_ivt __xwos_ivt_qualifier struct soc_isr_table xwospl_ivt = {
         },
 };
 
-__xwos_ivt_qualifier struct soc_isr_data_table xwospl_idvt = {
-        .arch = {
-                [ARCH_SP_TOP + ARCHCFG_IRQ_NUM] = NULL,
-                [ARCH_IRQ_RESET + ARCHCFG_IRQ_NUM] = NULL,
-                [ARCH_IRQ_NMI + ARCHCFG_IRQ_NUM] = NULL,
-                [ARCH_IRQ_HARDFAULT + ARCHCFG_IRQ_NUM] = NULL,
-                [ARCH_IRQ_MMFAULT + ARCHCFG_IRQ_NUM] = NULL,
-                [ARCH_IRQ_BUSFAULT + ARCHCFG_IRQ_NUM] = NULL,
-                [ARCH_IRQ_USGFAULT + ARCHCFG_IRQ_NUM] = NULL,
-                [ARCH_IRQ_RSVN9 + ARCHCFG_IRQ_NUM] = NULL,
-                [ARCH_IRQ_RSVN8 + ARCHCFG_IRQ_NUM] = NULL,
-                [ARCH_IRQ_RSVN7 + ARCHCFG_IRQ_NUM] = NULL,
-                [ARCH_IRQ_RSVN6 + ARCHCFG_IRQ_NUM] = NULL,
-                [ARCH_IRQ_SVCALL + ARCHCFG_IRQ_NUM] = NULL,
-                [ARCH_IRQ_DBGMON + ARCHCFG_IRQ_NUM] = NULL,
-                [ARCH_IRQ_RSVN3 + ARCHCFG_IRQ_NUM] = NULL,
-                [ARCH_IRQ_PENDSV + ARCHCFG_IRQ_NUM] = NULL,
-                [ARCH_IRQ_SYSTICK + ARCHCFG_IRQ_NUM] = NULL,
+__xwos_ivt_qualifier struct soc_idvt xwospl_idvt = {
+        .exc = {
+                [SOC_SP_TOP + SOCCFG_EXC_NUM] = NULL,
+                [SOC_EXC_RESET + SOCCFG_EXC_NUM] = NULL,
+                [SOC_EXC_NMI + SOCCFG_EXC_NUM] = NULL,
+                [SOC_EXC_HARDFAULT + SOCCFG_EXC_NUM] = NULL,
+                [SOC_EXC_MMFAULT + SOCCFG_EXC_NUM] = NULL,
+                [SOC_EXC_BUSFAULT + SOCCFG_EXC_NUM] = NULL,
+                [SOC_EXC_USGFAULT + SOCCFG_EXC_NUM] = NULL,
+                [SOC_EXC_RSVN9 + SOCCFG_EXC_NUM] = NULL,
+                [SOC_EXC_RSVN8 + SOCCFG_EXC_NUM] = NULL,
+                [SOC_EXC_RSVN7 + SOCCFG_EXC_NUM] = NULL,
+                [SOC_EXC_RSVN6 + SOCCFG_EXC_NUM] = NULL,
+                [SOC_EXC_SVCALL + SOCCFG_EXC_NUM] = NULL,
+                [SOC_EXC_DBGMON + SOCCFG_EXC_NUM] = NULL,
+                [SOC_EXC_RSVN3 + SOCCFG_EXC_NUM] = NULL,
+                [SOC_EXC_PENDSV + SOCCFG_EXC_NUM] = NULL,
+                [SOC_EXC_SYSTICK + SOCCFG_EXC_NUM] = NULL,
         },
-        .soc = {
+        .irq = {
                 [0 ... (SOCCFG_IRQ_NUM - 1)] = NULL,
         },
 };

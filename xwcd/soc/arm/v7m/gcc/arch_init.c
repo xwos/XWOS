@@ -25,6 +25,7 @@
   #include <arch_fpu.h>
 #endif
 #include <arch_image.h>
+#include <arch_nvic.h>
 #include <arch_init.h>
 
 extern xwu8_t data_lma_base[];
@@ -77,6 +78,7 @@ void arch_lowlevel_init(void)
 __xwbsp_init_code
 void arch_init(void)
 {
+        arch_nvic_init();
 }
 
 /**

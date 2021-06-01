@@ -17,6 +17,12 @@
 #if defined(XuanWuOS_CFG_CORE__mp)
 /******** skd ********/
 __xwos_code
+xwer_t xwosplcb_skd_init_lc(void)
+{
+        return xwmp_skd_init_lc();
+}
+
+__xwos_code
 struct xwospl_skd * xwosplcb_skd_get_lc(void)
 {
         return xwmp_skd_get_lc();
@@ -79,6 +85,12 @@ void xwosplcb_syshwt_task(struct xwospl_syshwt * hwt)
 
 #elif defined(XuanWuOS_CFG_CORE__up)
 /******** skd ********/
+__xwos_code
+xwer_t xwosplcb_skd_init_lc(void)
+{
+        return xwup_skd_init_lc();
+}
+
 __xwos_code
 struct xwospl_skd * xwosplcb_skd_get_lc(void)
 {

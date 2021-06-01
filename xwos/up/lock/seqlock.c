@@ -288,7 +288,7 @@ void xwup_sqlk_rdex_unlock_cpuirqrs(struct xwup_sqlk * sql, xwreg_t flag)
  */
 __xwup_api
 void xwup_sqlk_rdex_lock_irqs(struct xwup_sqlk * sql,
-                              const struct xwup_irq_resource * irqs,
+                              const struct xwos_irq_resource * irqs,
                               xwsz_t num)
 {
         xwssz_t i;
@@ -319,7 +319,7 @@ void xwup_sqlk_rdex_lock_irqs(struct xwup_sqlk * sql,
  */
 __xwup_api
 xwer_t xwup_sqlk_rdex_trylock_irqs(struct xwup_sqlk * sql,
-                                   const struct xwup_irq_resource * irqs,
+                                   const struct xwos_irq_resource * irqs,
                                    xwsz_t num)
 {
         xwup_sqlk_rdex_lock_irqs(sql, irqs, num);
@@ -338,7 +338,7 @@ xwer_t xwup_sqlk_rdex_trylock_irqs(struct xwup_sqlk * sql,
  */
 __xwup_api
 void xwup_sqlk_rdex_unlock_irqs(struct xwup_sqlk * sql,
-                                const struct xwup_irq_resource * irqs,
+                                const struct xwos_irq_resource * irqs,
                                 xwsz_t num)
 {
         xwssz_t i;
@@ -367,7 +367,7 @@ void xwup_sqlk_rdex_unlock_irqs(struct xwup_sqlk * sql,
  */
 __xwup_api
 void xwup_sqlk_rdex_lock_irqssv(struct xwup_sqlk * sql,
-                                const struct xwup_irq_resource * irqs,
+                                const struct xwos_irq_resource * irqs,
                                 xwreg_t flags[], xwsz_t num)
 {
         xwssz_t i;
@@ -399,7 +399,7 @@ void xwup_sqlk_rdex_lock_irqssv(struct xwup_sqlk * sql,
  */
 __xwup_api
 xwer_t xwup_sqlk_rdex_trylock_irqssv(struct xwup_sqlk * sql,
-                                     const struct xwup_irq_resource * irqs,
+                                     const struct xwos_irq_resource * irqs,
                                      xwreg_t flags[], xwsz_t num)
 {
         xwup_sqlk_rdex_lock_irqssv(sql, irqs, flags, num);
@@ -419,7 +419,7 @@ xwer_t xwup_sqlk_rdex_trylock_irqssv(struct xwup_sqlk * sql,
  */
 __xwup_api
 void xwup_sqlk_rdex_unlock_irqsrs(struct xwup_sqlk * sql,
-                                  const struct xwup_irq_resource * irqs,
+                                  const struct xwos_irq_resource * irqs,
                                   xwreg_t flags[], xwsz_t num)
 {
         xwssz_t i;
@@ -680,7 +680,7 @@ void xwup_sqlk_wr_unlock_cpuirqrs(struct xwup_sqlk * sql, xwreg_t flag)
  */
 __xwup_api
 void xwup_sqlk_wr_lock_irqs(struct xwup_sqlk * sql,
-                            const struct xwup_irq_resource * irqs,
+                            const struct xwos_irq_resource * irqs,
                             xwsz_t num)
 {
         xwssz_t i;
@@ -712,7 +712,7 @@ void xwup_sqlk_wr_lock_irqs(struct xwup_sqlk * sql,
  */
 __xwup_api
 xwer_t xwup_sqlk_wr_trylock_irqs(struct xwup_sqlk * sql,
-                                 const struct xwup_irq_resource * irqs,
+                                 const struct xwos_irq_resource * irqs,
                                  xwsz_t num)
 {
         xwup_sqlk_wr_lock_irqs(sql, irqs, num);
@@ -731,7 +731,7 @@ xwer_t xwup_sqlk_wr_trylock_irqs(struct xwup_sqlk * sql,
  */
 __xwup_api
 void xwup_sqlk_wr_unlock_irqs(struct xwup_sqlk * sql,
-                              const struct xwup_irq_resource * irqs,
+                              const struct xwos_irq_resource * irqs,
                               xwsz_t num)
 {
         xwssz_t i;
@@ -762,7 +762,7 @@ void xwup_sqlk_wr_unlock_irqs(struct xwup_sqlk * sql,
  */
 __xwup_api
 void xwup_sqlk_wr_lock_irqssv(struct xwup_sqlk * sql,
-                              const struct xwup_irq_resource * irqs,
+                              const struct xwos_irq_resource * irqs,
                               xwreg_t flags[], xwsz_t num)
 {
         xwssz_t i;
@@ -795,7 +795,7 @@ void xwup_sqlk_wr_lock_irqssv(struct xwup_sqlk * sql,
  */
 __xwup_api
 xwer_t xwup_sqlk_wr_trylock_irqssv(struct xwup_sqlk * sql,
-                                   const struct xwup_irq_resource * irqs,
+                                   const struct xwos_irq_resource * irqs,
                                    xwreg_t flags[], xwsz_t num)
 {
         xwup_sqlk_wr_lock_irqssv(sql, irqs, flags, num);
@@ -815,7 +815,7 @@ xwer_t xwup_sqlk_wr_trylock_irqssv(struct xwup_sqlk * sql,
  */
 __xwup_api
 void xwup_sqlk_wr_unlock_irqsrs(struct xwup_sqlk * sql,
-                                const struct xwup_irq_resource * irqs,
+                                const struct xwos_irq_resource * irqs,
                                 xwreg_t flags[], xwsz_t num)
 {
         xwssz_t i;

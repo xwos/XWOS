@@ -28,6 +28,7 @@
 #define SOCCFG_CHIP_KEA128                      1
 
 /******** ******** ******** interrupt ******** ******** ********/
+#define SOCCFG_EXC_NUM                          16U
 #define SOCCFG_IRQ_NUM                          28U
 #define SOCCFG_RO_ISRTABLE                      1
 #define SOCCFG_NVIC_PRIO_BITNUM                 2U

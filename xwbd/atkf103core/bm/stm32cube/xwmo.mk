@@ -44,7 +44,7 @@ XWMO_CSRCS += xwac/xwos/hook.c
 XWMO_CSRCS += $(call getAllFileUnderXwmoDir,*.c,xwac/xwds)
 
 # 定义编译选项
-XWMO_CFLAGS := -Wno-undef -Wno-unused-parameter
+XWMO_CFLAGS := -Wno-undef -Wno-unused-parameter -Wno-sign-conversion
 XWMO_CFLAGS += $(CUBEMX_CFLAGS)
 
 # 定义头文件路径

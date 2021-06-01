@@ -290,14 +290,15 @@ struct soc_irq_data {
         void * data;
 };
 
-struct soc_isr_table {
-        xwisr_f soc[SOCCFG_IRQ_NUM];
+struct soc_ivt {
+        xwisr_f irq[SOCCFG_IRQ_NUM];
 };
 
-struct soc_isr_data_table {
-        void * soc[SOCCFG_IRQ_NUM];
+struct soc_idvt {
+        void * irq[SOCCFG_IRQ_NUM];
 };
 
+void soc_irqc_init(void);
 void soc_isr_noop(void);
 void soc_skd_isr_swi(void);
 

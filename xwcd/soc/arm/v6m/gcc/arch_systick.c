@@ -35,12 +35,12 @@
 
 __xwbsp_rodata const struct soc_irq_cfg cortex_m_systick_irqcfg = {
         .irqcfg = {
-                .priority = ARCH_IRQ_TICK_PRIO,
+                .priority = SOC_EXC_TICK_PRIO,
         },
 };
 
 __xwbsp_rodata const struct xwos_irq_resource cortex_m_systick_irqrsc = {
-        .irqn = ARCH_IRQ_SYSTICK,
+        .irqn = SOC_EXC_SYSTICK,
         .isr = xwospl_syshwt_isr,
         .cfg = &cortex_m_systick_irqcfg,
         .description = "irq.armv6m.systick",

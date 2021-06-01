@@ -12,6 +12,7 @@
 #define __xwem_vm_lua_xwlua_xwos_seqlock_h__
 
 #include <xwos/standard.h>
+#include <xwos/lib/object.h>
 #include <xwos/osal/lock/seqlock.h>
 #include "src/lauxlib.h"
 

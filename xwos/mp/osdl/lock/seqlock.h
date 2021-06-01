@@ -100,7 +100,7 @@ void xwosdl_sqlk_rdex_unlock_cpuirqrs(xwosdl_sqlk_t * ossql, xwreg_t cpuirq)
 
 static __xwcc_inline
 void xwosdl_sqlk_rdex_lock_irqs(xwosdl_sqlk_t * ossql,
-                                const struct xwosdl_irq_resource * irqs,
+                                const struct xwos_irq_resource * irqs,
                                 xwsz_t num)
 {
         xwmp_sqlk_rdex_lock_irqs(ossql, irqs, num);
@@ -108,7 +108,7 @@ void xwosdl_sqlk_rdex_lock_irqs(xwosdl_sqlk_t * ossql,
 
 static __xwcc_inline
 xwer_t xwosdl_sqlk_rdex_trylock_irqs(xwosdl_sqlk_t * ossql,
-                                     const struct xwosdl_irq_resource * irqs,
+                                     const struct xwos_irq_resource * irqs,
                                      xwsz_t num)
 {
         return xwmp_sqlk_rdex_trylock_irqs(ossql, irqs, num);
@@ -116,7 +116,7 @@ xwer_t xwosdl_sqlk_rdex_trylock_irqs(xwosdl_sqlk_t * ossql,
 
 static __xwcc_inline
 void xwosdl_sqlk_rdex_unlock_irqs(xwosdl_sqlk_t * ossql,
-                                  const struct xwosdl_irq_resource * irqs,
+                                  const struct xwos_irq_resource * irqs,
                                   xwsz_t num)
 {
         xwmp_sqlk_rdex_unlock_irqs(ossql, irqs, num);
@@ -124,7 +124,7 @@ void xwosdl_sqlk_rdex_unlock_irqs(xwosdl_sqlk_t * ossql,
 
 static __xwcc_inline
 void xwosdl_sqlk_rdex_lock_irqssv(xwosdl_sqlk_t * ossql,
-                                  const struct xwosdl_irq_resource * irqs,
+                                  const struct xwos_irq_resource * irqs,
                                   xwreg_t flags[], xwsz_t num)
 {
         xwmp_sqlk_rdex_lock_irqssv(ossql, irqs, flags, num);
@@ -132,7 +132,7 @@ void xwosdl_sqlk_rdex_lock_irqssv(xwosdl_sqlk_t * ossql,
 
 static __xwcc_inline
 xwer_t xwosdl_sqlk_rdex_trylock_irqssv(xwosdl_sqlk_t * ossql,
-                                       const struct xwosdl_irq_resource * irqs,
+                                       const struct xwos_irq_resource * irqs,
                                        xwreg_t flags[], xwsz_t num)
 {
         return xwmp_sqlk_rdex_trylock_irqssv(ossql, irqs, flags, num);
@@ -140,7 +140,7 @@ xwer_t xwosdl_sqlk_rdex_trylock_irqssv(xwosdl_sqlk_t * ossql,
 
 static __xwcc_inline
 void xwosdl_sqlk_rdex_unlock_irqsrs(xwosdl_sqlk_t * ossql,
-                                    const struct xwosdl_irq_resource * irqs,
+                                    const struct xwos_irq_resource * irqs,
                                     xwreg_t flags[], xwsz_t num)
 {
         xwmp_sqlk_rdex_unlock_irqsrs(ossql, irqs, flags, num);
@@ -221,7 +221,7 @@ void xwosdl_sqlk_wr_unlock_cpuirqrs(xwosdl_sqlk_t * ossql, xwreg_t cpuirq)
 
 static __xwcc_inline
 void xwosdl_sqlk_wr_lock_irqs(xwosdl_sqlk_t * ossql,
-                              const struct xwosdl_irq_resource * irqs,
+                              const struct xwos_irq_resource * irqs,
                               xwsz_t num)
 {
         xwmp_sqlk_wr_lock_irqs(ossql, irqs, num);
@@ -229,7 +229,7 @@ void xwosdl_sqlk_wr_lock_irqs(xwosdl_sqlk_t * ossql,
 
 static __xwcc_inline
 xwer_t xwosdl_sqlk_wr_trylock_irqs(xwosdl_sqlk_t * ossql,
-                                   const struct xwosdl_irq_resource * irqs,
+                                   const struct xwos_irq_resource * irqs,
                                    xwsz_t num)
 {
         return xwmp_sqlk_wr_trylock_irqs(ossql, irqs, num);
@@ -237,7 +237,7 @@ xwer_t xwosdl_sqlk_wr_trylock_irqs(xwosdl_sqlk_t * ossql,
 
 static __xwcc_inline
 void xwosdl_sqlk_wr_unlock_irqs(xwosdl_sqlk_t * ossql,
-                                const struct xwosdl_irq_resource * irqs,
+                                const struct xwos_irq_resource * irqs,
                                 xwsz_t num)
 {
         xwmp_sqlk_wr_unlock_irqs(ossql, irqs, num);
@@ -245,7 +245,7 @@ void xwosdl_sqlk_wr_unlock_irqs(xwosdl_sqlk_t * ossql,
 
 static __xwcc_inline
 void xwosdl_sqlk_wr_lock_irqssv(xwosdl_sqlk_t * ossql,
-                                const struct xwosdl_irq_resource * irqs,
+                                const struct xwos_irq_resource * irqs,
                                 xwreg_t flags[], xwsz_t num)
 {
         xwmp_sqlk_wr_lock_irqssv(ossql, irqs, flags, num);
@@ -253,7 +253,7 @@ void xwosdl_sqlk_wr_lock_irqssv(xwosdl_sqlk_t * ossql,
 
 static __xwcc_inline
 xwer_t xwosdl_sqlk_wr_trylock_irqssv(xwosdl_sqlk_t * ossql,
-                                     const struct xwosdl_irq_resource * irqs,
+                                     const struct xwos_irq_resource * irqs,
                                      xwreg_t flags[], xwsz_t num)
 {
         return xwmp_sqlk_wr_trylock_irqssv(ossql, irqs, flags, num);
@@ -261,7 +261,7 @@ xwer_t xwosdl_sqlk_wr_trylock_irqssv(xwosdl_sqlk_t * ossql,
 
 static __xwcc_inline
 void xwosdl_sqlk_wr_unlock_irqsrs(xwosdl_sqlk_t * ossql,
-                                  const struct xwosdl_irq_resource * irqs,
+                                  const struct xwos_irq_resource * irqs,
                                   xwreg_t flags[], xwsz_t num)
 {
         xwmp_sqlk_wr_unlock_irqsrs(ossql, irqs, flags, num);

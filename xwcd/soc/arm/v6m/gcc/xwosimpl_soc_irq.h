@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC描述层：MP IRQ controller driver
+ * @brief 玄武OS移植实现层：SOC中断
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,12 +18,31 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_mp_irqc_drv_h__
-#define __soc_mp_irqc_drv_h__
+#ifndef __xwosimpl_soc_irq_h__
+#define __xwosimpl_soc_irq_h__
 
-#include <xwos/standard.h>
-#include <xwos/mp/irq.h>
+#ifndef __xwos_ospl_soc_irq_h__
+  #error "This file should be included from <xwos/ospl/soc/irq.h>."
+#endif
 
-extern const struct xwmp_irqc_driver soc_irqc_drv;
+#include <armv6m_nvic.h>
 
-#endif /* soc_mp_irqc_drv.h */
+struct soc_irq_cfg {
+        struct cortexm_nvic_irq_cfg irqcfg;
+};
+
+struct soc_irq_data {
+        void * data;
+};
+
+struct soc_ivt {
+        xwisr_f exc[SOCCFG_EXC_NUM];
+        xwisr_f irq[SOCCFG_IRQ_NUM];
+};
+
+struct soc_idvt {
+        void * exc[SOCCFG_EXC_NUM];
+        void * irq[SOCCFG_IRQ_NUM];
+};
+
+#endif /* xwosimpl_soc_irq.h */

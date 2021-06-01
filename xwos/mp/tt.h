@@ -33,7 +33,7 @@ struct xwmp_tt;
 struct xwmp_syshwt {
         xwtm_t timetick; /**< 系统时间 */
         struct xwmp_sqlk lock; /**< 保护本结构体的锁 */
-        const struct xwmp_irq_resource * irqrsc; /**< 中断资源 */
+        const struct xwos_irq_resource * irqrsc; /**< 中断资源 */
         xwsz_t irqs_num; /**< 中断资源的数量 */
 };
 

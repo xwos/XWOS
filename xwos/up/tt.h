@@ -23,7 +23,6 @@
 
 #define XWUP_TTN_TYPE_MASK            (3UL)
 
-struct xwup_irq_resource;
 struct xwup_skd;
 struct xwup_tt;
 
@@ -33,7 +32,7 @@ struct xwup_tt;
 struct xwup_syshwt {
         xwtm_t timetick; /**< 系统时间 */
         struct xwup_sqlk lock; /**< 保护本结构体的锁 */
-        const struct xwup_irq_resource * irqrsc; /**< 中断资源 */
+        const struct xwos_irq_resource * irqrsc; /**< 中断资源 */
         xwsz_t irqs_num; /**< 中断资源的数量 */
 };
 
