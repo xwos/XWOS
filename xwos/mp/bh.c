@@ -16,7 +16,7 @@
 
 /**
  * @brief 初始化中断底半部控制块
- * @param bhcb: (I) 中断底半部控制块
+ * @param[in] bhcb: 中断底半部控制块
  */
 __xwmp_code
 void xwmp_bh_cb_init(struct xwmp_bh_cb * bhcb)
@@ -27,9 +27,9 @@ void xwmp_bh_cb_init(struct xwmp_bh_cb * bhcb)
 
 /**
  * @brief 初始化中断底半部链表节点
- * @param bhn: (I) 链表节点
- * @param func: (I) 中断底半部任务函数
- * @param arg: (I) 中断底半部任务函数的参数
+ * @param[in] bhn: 链表节点
+ * @param[in] func: 中断底半部任务函数
+ * @param[in] arg: 中断底半部任务函数的参数
  */
 __xwmp_code
 void xwmp_bh_node_init(struct xwmp_bh_node * bhn, xwmp_bh_f func, void * arg)
@@ -41,8 +41,8 @@ void xwmp_bh_node_init(struct xwmp_bh_node * bhn, xwmp_bh_f func, void * arg)
 
 /**
  * @brief 将中断底半部链表节点加入链表
- * @param bhcb: (I) 中断底半部控制块
- * @param hbn: (I) 链表节点
+ * @param[in] bhcb: 中断底半部控制块
+ * @param[in] hbn: 链表节点
  */
 __xwmp_code
 void xwmp_bh_node_eq(struct xwmp_bh_cb * bhcb, struct xwmp_bh_node * bhn)
@@ -58,8 +58,8 @@ void xwmp_bh_node_eq(struct xwmp_bh_cb * bhcb, struct xwmp_bh_node * bhn)
 
 /**
  * @brief 将中断底半部链表节点从链表中删除
- * @param bhcb: (I) 中断底半部控制块
- * @param hbn: (I) 链表节点
+ * @param[in] bhcb: 中断底半部控制块
+ * @param[in] hbn: 链表节点
  */
 __xwmp_code
 void xwmp_bh_node_dq(struct xwmp_bh_cb * bhcb, struct xwmp_bh_node * bhn)

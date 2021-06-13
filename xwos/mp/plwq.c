@@ -23,7 +23,7 @@
 
 /**
  * @brief 初始化管道等待队列
- * @param xwplwq: (I) 管道等待队列结构体指针
+ * @param[in] xwplwq: 管道等待队列结构体指针
  */
 __xwmp_code
 void xwmp_plwq_init(struct xwmp_plwq * xwplwq)
@@ -34,8 +34,8 @@ void xwmp_plwq_init(struct xwmp_plwq * xwplwq)
 
 /**
  * @brief 将等待队列节点加入到管道等待队列的头部
- * @param xwplwq: (I) 管道等待队列结构体指针
- * @param wqn: (I) 等待队列节点结构体指针
+ * @param[in] xwplwq: 管道等待队列结构体指针
+ * @param[in] wqn: 等待队列节点结构体指针
  * @note
  * - 这个函数只能在取得锁xwplwq->lock时被调用。
  */
@@ -47,8 +47,8 @@ void xwmp_plwq_add_head_locked(struct xwmp_plwq * xwplwq, struct xwmp_wqn * wqn)
 
 /**
  * @brief 将等待队列节点加入到管道等待队列的尾部
- * @param xwplwq: (I) 管道等待队列结构体指针
- * @param wqn: (I) 等待队列节点结构体指针
+ * @param[in] xwplwq: 管道等待队列结构体指针
+ * @param[in] wqn: 等待队列节点结构体指针
  * @note
  * - 这个函数只能在取得锁xwplwq->lock时被调用。
  */
@@ -60,8 +60,8 @@ void xwmp_plwq_add_tail_locked(struct xwmp_plwq * xwplwq, struct xwmp_wqn * wqn)
 
 /**
  * @brief 将等待队列节点从管道等待队列中移除
- * @param xwplwq: (I) 管道等待队列结构体指针
- * @param wqn: (I) 等待队列节点结构体指针
+ * @param[in] xwplwq: 管道等待队列结构体指针
+ * @param[in] wqn: 等待队列节点结构体指针
  * @retval XWOK: 没有错误
  * @retval -ESRCH: 没有这个节点
  * @note
@@ -83,7 +83,7 @@ xwer_t xwmp_plwq_remove_locked(struct xwmp_plwq * xwplwq, struct xwmp_wqn * wqn)
 
 /**
  * @brief 从管道等待队列中选择一个节点
- * @param xwplwq: (I) 管道等待队列结构体指针
+ * @param[in] xwplwq: 管道等待队列结构体指针
  * @return 被选择的等待队列节点结构体指针
  * @retval NULL: 没有选中任何节点（等待队列为空）
  * @note

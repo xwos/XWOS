@@ -20,12 +20,12 @@
 
 /**
  * @brief 构建内存池
- * @param mp: (I) 内存池的指针
- * @param name: (I) 名字
- * @param origin: (I) 内存区域的起始地址
- * @param size: (I) 内存区域的总大小
- * @param odrbtree: (I) 阶红黑树数组的指针
- * @param pgarray: (I) 页控制块数组的指针
+ * @param[in] mp: 内存池的指针
+ * @param[in] name: 名字
+ * @param[in] origin: 内存区域的起始地址
+ * @param[in] size: 内存区域的总大小
+ * @param[in] odrbtree: 阶红黑树数组的指针
+ * @param[in] pgarray: 页控制块数组的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -E2SMALL: 内存区域太小
@@ -191,13 +191,13 @@ err_pa_init:
 
 /**
  * @brief XWMM API：静态方式初始化内存池。
- * @param mp: (I) 内存池的指针
- * @param name: (I) 名字
- * @param origin: (I) 内存区域的起始地址
- * @param size: (I) 内存区域的总大小
- * @param odrbtree: (I) 阶红黑树数组的指针
- * @param pgarray: (I) 页控制块数组的指针
- * @param pgodr: (I) 页的数量，以2的blkodr次方形式表示
+ * @param[in] mp: 内存池的指针
+ * @param[in] name: 名字
+ * @param[in] origin: 内存区域的起始地址
+ * @param[in] size: 内存区域的总大小
+ * @param[in] odrbtree: 阶红黑树数组的指针
+ * @param[in] pgarray: 页控制块数组的指针
+ * @param[in] pgodr: 页的数量，以2的blkodr次方形式表示
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -266,9 +266,9 @@ err_size:
 
 /**
  * @brief XWMM API：从内存池中申请内存
- * @param mp: (I) 内存池的指针
- * @param size: (I) 申请的大小
- * @param membuf: (O) 指向缓冲区的指针，通过此缓冲区返回申请到的内存的首地址
+ * @param[in] mp: 内存池的指针
+ * @param[in] size: 申请的大小
+ * @param[out] membuf: 指向缓冲区的指针，通过此缓冲区返回申请到的内存的首地址
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -362,8 +362,8 @@ xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf
 
 /**
  * @brief XWMM API：释放内存
- * @param mp: (I) 内存池的指针
- * @param mem: (I) 内存的首地址
+ * @param[in] mp: 内存池的指针
+ * @param[in] mem: 内存的首地址
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -451,11 +451,11 @@ do_nothing:
 
 /**
  * @brief XWMM API：调整内存大小
- * @param mp: (I) 内存池的指针
- * @param size: (I) 申请的大小，当size == 0，realloc等价于free
- * @param membuf: 指向缓冲区的指针，此缓冲区
- *                (I) 作为输入时，当*membuf == NULL，realloc等价于malloc
- *                (O) 作为输出时，通过此缓冲区返回申请到的内存的首地址
+ * @param[in] mp: 内存池的指针
+ * @param[in] size: 申请的大小，当size == 0，realloc等价于free
+ * @param[in,out] membuf: 指向缓冲区的指针，此缓冲区
+ * + (I) 作为输入时，当*membuf == NULL，realloc等价于malloc
+ * + (O) 作为输出时，通过此缓冲区返回申请到的内存的首地址
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针

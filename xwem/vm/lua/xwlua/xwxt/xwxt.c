@@ -34,9 +34,9 @@ int xwlua_xt_function_writer(lua_State * S, const void * b, size_t size, void * 
 
 /**
  * @brief 将虚拟机S栈中的函数拷贝到虚拟机D的栈顶
- * @param S: (I) 虚拟机S
- * @param sidx: (I) 函数在虚拟机S栈中的位置
- * @param D: (I) 虚拟机D
+ * @param[in] S: 虚拟机S
+ * @param[in] sidx: 函数在虚拟机S栈中的位置
+ * @param[in] D: 虚拟机D
  * @return 目的虚拟机D的栈顶为拷贝的函数或nil
  */
 void xwlua_xt_copy_function(lua_State * S, int sidx, lua_State * D)
@@ -66,9 +66,9 @@ void xwlua_xt_copy_function(lua_State * S, int sidx, lua_State * D)
 
 /**
  * @brief 将虚拟机S中的userdata拷贝到虚拟机D的栈顶
- * @param S: (I) 源虚拟机
- * @param idx: (I) userdata在虚拟机S栈中的位置
- * @param D: (I) 目的虚拟机
+ * @param[in] S: 源虚拟机
+ * @param[in] idx: userdata在虚拟机S栈中的位置
+ * @param[in] D: 目的虚拟机
  * @return 目的虚拟机D的栈顶为拷贝的userdata或nil
  */
 void xwlua_xt_copy_ud(lua_State * S, int idx, lua_State * D)
@@ -105,10 +105,10 @@ void xwlua_xt_copy_table(lua_State * S, int sidx, lua_State * D);
 
 /**
  * @brief 将虚拟机S栈中的表元素，逐一拷贝到虚拟机D栈的表中
- * @param S: (I) 虚拟机S
- * @param sidx: (I) 源表在虚拟机S栈中的位置
- * @param D: (I) 虚拟机D
- * @param sidx: (I) 目的表在虚拟机D栈中的位置
+ * @param[in] S: 虚拟机S
+ * @param[in] sidx: 源表在虚拟机S栈中的位置
+ * @param[in] D: 虚拟机D
+ * @param[in] sidx: 目的表在虚拟机D栈中的位置
  */
 static
 void xwlua_xt_deepcopy_table(lua_State * S, int sidx, lua_State * D, int didx)
@@ -181,9 +181,9 @@ void xwlua_xt_deepcopy_table(lua_State * S, int sidx, lua_State * D, int didx)
 
 /**
  * @brief 将虚拟机S中的表拷贝到虚拟机D的栈顶
- * @param S: (I) 虚拟机S
- * @param sidx: (I) 表在虚拟机S栈中的位置
- * @param D: (I) 虚拟机D
+ * @param[in] S: 虚拟机S
+ * @param[in] sidx: 表在虚拟机S栈中的位置
+ * @param[in] D: 虚拟机D
  * @return 目的虚拟机D的栈顶为拷贝的表或nil
  * @note
  * + 本函数只会对表中索引(key)为字符串的键值对进行拷贝，其他类型的索引忽略。
@@ -232,9 +232,9 @@ void xwlua_xt_copy_table(lua_State * S, int sidx, lua_State * D)
 
 /**
  * @brief 将虚拟机S中的表元素拷贝到虚拟机D的环境_ENV中
- * @param S: (I) 虚拟机S
- * @param sidx: (I) 表在虚拟机S栈中的索引
- * @param D: (I) 虚拟机D
+ * @param[in] S: 虚拟机S
+ * @param[in] sidx: 表在虚拟机S栈中的索引
+ * @param[in] D: 虚拟机D
  * @note
  * + 本函数只会将表中索引(key)为字符串的键值对拷贝到D的_ENV中，其他类型的索引忽略。
  */

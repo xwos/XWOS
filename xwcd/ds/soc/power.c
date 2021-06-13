@@ -24,8 +24,8 @@
 
 /**
  * @brief XWDS API：申请电源
- * @param soc: (I) SOC对象指针
- * @param id: (I) 电源ID
+ * @param[in] soc: SOC对象指针
+ * @param[in] id: 电源ID
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ERANGE: 电源ID错误
@@ -68,8 +68,8 @@ err_soc_grab:
 
 /**
  * @brief XWDS API：释放电源
- * @param soc: (I) SOC对象指针
- * @param id: (I) 电源ID
+ * @param[in] soc: SOC对象指针
+ * @param[in] id: 电源ID
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ERANGE: 电源ID错误
@@ -107,11 +107,12 @@ err_drv_pwr_rls:
 
 /**
  * @brief XWDS API：获取电源电压
- * @param soc: (I) SOC对象指针
- * @param id: (I) 电源ID
- * @param buf: (O) 返回电源电压的缓冲区的指针
- * @param num: (I) 缓冲区数组的数量
- *             (O) 返回的数组的数量
+ * @param[in] soc: SOC对象指针
+ * @param[in] id: 电源ID
+ * @param[out] buf: 返回电源电压的缓冲区的指针
+ * @param[in,out] num: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示缓冲区数组的数量
+ * + (O) 作为输出时，返回实际的电压数据的数量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针

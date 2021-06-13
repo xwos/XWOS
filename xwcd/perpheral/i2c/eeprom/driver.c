@@ -116,7 +116,7 @@ xwer_t xwds_eeprom_drv_resume(struct xwds_device * dev)
 /******** ******** I2C EEPROM operations ******** ********/
 /**
  * @brief EEPROM API：开启EEPROM的电源
- * @param eeprom: (I) I2C EEPROM对象的指针
+ * @param[in] eeprom: I2C EEPROM对象的指针
  * @retrun 错误码
  */
 xwer_t xwds_eeprom_power_on(struct xwds_eeprom * eeprom)
@@ -136,7 +136,7 @@ xwer_t xwds_eeprom_power_on(struct xwds_eeprom * eeprom)
 
 /**
  * @brief EEPROM API：关闭EEPROM的电源
- * @param eeprom: (I) I2C EEPROM对象的指针
+ * @param[in] eeprom: I2C EEPROM对象的指针
  * @retrun 错误码
  */
 xwer_t xwds_eeprom_power_off(struct xwds_eeprom * eeprom)
@@ -156,7 +156,7 @@ xwer_t xwds_eeprom_power_off(struct xwds_eeprom * eeprom)
 
 /**
  * @brief EEPROM API：开启EEPROM的写保护
- * @param eeprom: (I) I2C EEPROM对象的指针
+ * @param[in] eeprom: I2C EEPROM对象的指针
  * @retrun 错误码
  */
 xwer_t xwds_eeprom_wp_enable(struct xwds_eeprom * eeprom)
@@ -176,7 +176,7 @@ xwer_t xwds_eeprom_wp_enable(struct xwds_eeprom * eeprom)
 
 /**
  * @brief EEPROM API：关闭EEPROM的写保护
- * @param eeprom: (I) I2C EEPROM对象的指针
+ * @param[in] eeprom: I2C EEPROM对象的指针
  * @retrun 错误码
  */
 xwer_t xwds_eeprom_wp_disable(struct xwds_eeprom * eeprom)
@@ -196,12 +196,12 @@ xwer_t xwds_eeprom_wp_disable(struct xwds_eeprom * eeprom)
 
 /**
  * @brief EEPROM API：写一个字节到EEPROM
- * @param eeprom: (I) I2C EEPROM对象的指针
- * @param data: (I) 数据
- * @param addr: (I) 地址
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 期望的阻塞等待时间
- *              (O) 函数返回时，剩余的期望值
+ * @param[in] eeprom: I2C EEPROM对象的指针
+ * @param[in] data: 数据
+ * @param[in] addr: 地址
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @retrun 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 设备对象不可引用
@@ -227,12 +227,12 @@ xwer_t xwds_eeprom_putc(struct xwds_eeprom * eeprom,
 
 /**
  * @brief EEPROM API：从EEPROM中读取一个字节
- * @param eeprom: (I) I2C EEPROM对象的指针
- * @param buf: (O) 指向缓冲区的指针，通过此缓冲区返回数据
- * @param addr: (I) 地址
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 期望的阻塞等待时间
- *              (O) 函数返回时，剩余的期望值
+ * @param[in] eeprom: I2C EEPROM对象的指针
+ * @param[out] buf: 指向缓冲区的指针，通过此缓冲区返回数据
+ * @param[in] addr: 地址
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @retrun 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 设备对象不可引用
@@ -258,15 +258,15 @@ xwer_t xwds_eeprom_getc(struct xwds_eeprom * eeprom,
 
 /**
  * @brief EEPROM API：写一页数据到EEPROM
- * @param eeprom: (I) I2C EEPROM对象的指针
- * @param data: (I) 待写入的数据的缓冲区
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，数据的大小
- *              (O) 作为输出时，实际写入的数据大小
- * @param pgidx: (I) 页的序号
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 期望的阻塞等待时间
- *              (O) 函数返回时，剩余的期望值
+ * @param[in] eeprom: I2C EEPROM对象的指针
+ * @param[in] data: 待写入的数据的缓冲区
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示数据的大小
+ * + (O) 作为输出时，返回实际写入的数据大小
+ * @param[in] pgidx: 页的序号
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @retrun 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 设备对象不可引用
@@ -292,15 +292,15 @@ xwer_t xwds_eeprom_pgwrite(struct xwds_eeprom * eeprom,
 
 /**
  * @brief EEPROM API：从EEPROM读一页数据
- * @param eeprom: (I) I2C EEPROM对象的指针
- * @param buf: (O) 指向缓冲区的指针，通过此缓冲区返回数据
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，缓冲区的大小
- *              (O) 作为输出时，实际读取的数据大小
- * @param pgidx: (I) 页的序号
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 期望的阻塞等待时间
- *              (O) 函数返回时，剩余的期望值
+ * @param[in] eeprom: I2C EEPROM对象的指针
+ * @param[out] buf: 指向缓冲区的指针，通过此缓冲区返回数据
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示数据的大小
+ * + (O) 作为输出时，返回实际写入的数据大小
+ * @param[in] pgidx: 页的序号
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @retrun 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 设备对象不可引用
@@ -326,9 +326,10 @@ xwer_t xwds_eeprom_pgread(struct xwds_eeprom * eeprom,
 
 /**
  * @brief EEPROM API：复位I2C EEPROM
- * @param eeprom: (I) I2C EEPROM对象的指针
- * @param xwtm: (I) 期望的阻塞等待时间
- *              (O) 函数返回时，剩余的期望值
+ * @param[in] eeprom: I2C EEPROM对象的指针
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @retrun 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 设备对象不可引用

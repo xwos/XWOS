@@ -54,7 +54,7 @@ xwer_t xwds_i2cp_ioctl(struct xwds_i2cp * i2cp, xwsq_t cmd, ...);
 
 /**
  * @brief XWDS API：增加对象的引用计数
- * @param i2cp: (I) I2C外设对象指针
+ * @param[in] i2cp: I2C外设对象指针
  * @return 错误码
  * @retval @ref xwds_device_grab()
  */
@@ -66,7 +66,7 @@ xwer_t xwds_i2cp_grab(struct xwds_i2cp * i2cp)
 
 /**
  * @brief XWDS API：减少对象的引用计数
- * @param i2cp: (I) I2C外设对象指针
+ * @param[in] i2cp: I2C外设对象指针
  * @return 错误码
  * @retval @ref xwds_device_put()
  */

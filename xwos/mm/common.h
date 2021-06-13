@@ -15,6 +15,11 @@
 
 #include <xwos/standard.h>
 
+/**
+ * @defgroup xwmm_common 通用定义
+ * @{
+ */
+
 #define XWMM_ALIGNMENT          XWMMCFG_ALIGNMENT
 #define XWMM_ALIGNMENT_MASK     (XWMM_ALIGNMENT - 1)
 
@@ -51,5 +56,9 @@ bool xwmm_in_zone(void * mem, xwptr_t origin, xwsz_t size)
         }
         return ret;
 }
+
+/**
+ * @} xwmm_common
+ */
 
 #endif /* xwos/mm/common.h */

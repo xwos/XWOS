@@ -105,7 +105,6 @@
 #define FPU_MVFR1_FTZ_MODE_POS          0
 #define FPU_MVFR1_FTZ_MODE_MSK          (0XFUL << FPU_MVFR1_FTZ_MODE_POS)
 
-__xwbsp_init_code
 void arch_fpu_init(void);
 
 #endif /* arch_fpu.h */

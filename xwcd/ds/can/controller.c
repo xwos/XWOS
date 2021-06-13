@@ -60,7 +60,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_canc_vop = {
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：CAN控制器的构造函数
- * @param canc: (I) CAN控制器对象指针
+ * @param[in] canc: CAN控制器对象指针
  */
 __xwds_api
 void xwds_canc_construct(struct xwds_canc * canc)
@@ -71,7 +71,7 @@ void xwds_canc_construct(struct xwds_canc * canc)
 
 /**
  * @brief XWDS API：CAN控制器对象的析构函数
- * @param canc: (I) CAN控制器对象指针
+ * @param[in] canc: CAN控制器对象指针
  */
 __xwds_api
 void xwds_canc_destruct(struct xwds_canc * canc)
@@ -82,7 +82,7 @@ void xwds_canc_destruct(struct xwds_canc * canc)
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测CAN控制器
- * @param canc: (I) CAN控制器对象指针
+ * @param[in] canc: CAN控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -99,7 +99,7 @@ xwer_t xwds_canc_vop_probe(struct xwds_canc * canc)
 
 /**
  * @brief XWDS VOP：移除CAN控制器
- * @param canc: (I) CAN控制器对象指针
+ * @param[in] canc: CAN控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -113,7 +113,7 @@ xwer_t xwds_canc_vop_remove(struct xwds_canc * canc)
 
 /**
  * @brief XWDS VOP：启动CAN控制器
- * @param canc: (I) CAN控制器对象指针
+ * @param[in] canc: CAN控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -127,7 +127,7 @@ xwer_t xwds_canc_vop_start(struct xwds_canc * canc)
 
 /**
  * @brief XWDS VOP：停止CAN控制器
- * @param canc: (I) CAN控制器对象指针
+ * @param[in] canc: CAN控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -143,7 +143,7 @@ xwer_t xwds_canc_vop_stop(struct xwds_canc * canc)
 /******** ******** pm ******** ********/
 /**
  * @brief XWDS VOP：暂停CAN控制器
- * @param canc: (I) CAN控制器对象指针
+ * @param[in] canc: CAN控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -157,7 +157,7 @@ xwer_t xwds_canc_vop_suspend(struct xwds_canc * canc)
 
 /**
  * @brief XWDS VOP：继续CAN控制器
- * @param canc: (I) CAN控制器对象指针
+ * @param[in] canc: CAN控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -173,9 +173,9 @@ xwer_t xwds_canc_vop_resume(struct xwds_canc * canc)
 /******** ******** ******** APIs ******** ******** ********/
 /**
  * @brief XWDS API：将一条CAN消息写入发送邮箱
- * @param canc: (I) CAN控制器对象指针
- * @param txobjid: (I) 发送邮箱的ID
- * @param msg: (I) CAN消息结构体的指针
+ * @param[in] canc: CAN控制器对象指针
+ * @param[in] txobjid: 发送邮箱的ID
+ * @param[in] msg: CAN消息结构体的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -243,7 +243,7 @@ err_canc_grab:
 
 /**
  * @brief XWDS API：开启CAN控制器的中断
- * @param canc: (I) CAN控制器对象指针
+ * @param[in] canc: CAN控制器对象指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -284,7 +284,7 @@ err_canc_grab:
 
 /**
  * @brief XWDS API：关闭CAN控制器的中断
- * @param canc: (I) CAN控制器对象指针
+ * @param[in] canc: CAN控制器对象指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -325,8 +325,8 @@ err_canc_grab:
 
 /**
  * @brief XWDS API：设置CAN控制器的模式
- * @param canc: (I) CAN控制器对象指针
- * @param mode: (I) 模式
+ * @param[in] canc: CAN控制器对象指针
+ * @param[in] mode: 模式
  * @return 错误码
  * @retval OK: 模式切换完成
  * @retval -EFAULT: 无效指针
@@ -379,8 +379,8 @@ err_canc_grab:
 
 /**
  * @brief XWDS API：设置CAN控制器的波特率
- * @param canc: (I) CAN控制器对象指针
- * @param id: (I) 波特率的ID
+ * @param[in] canc: CAN控制器对象指针
+ * @param[in] id: 波特率的ID
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -430,7 +430,7 @@ err_canc_grab:
 /******** ******** RX Queue ******** ********/
 /**
  * @brief XWDS API：初始化接收缓冲队列
- * @param rxq: (I) 接收缓冲队列对象指针
+ * @param[in] rxq: 接收缓冲队列对象指针
  */
 __xwds_code
 void xwds_canc_rxq_init(struct xwds_canc_rxqueue * rxq)
@@ -444,8 +444,8 @@ void xwds_canc_rxq_init(struct xwds_canc_rxqueue * rxq)
 
 /**
  * @brief XWDS API：发布一条消息到接收缓冲队列中
- * @param rxq: (I) 接收缓冲队列对象指针
- * @param msg: (I) 待发布的CAN消息结构体指针
+ * @param[in] rxq: 接收缓冲队列对象指针
+ * @param[in] msg: 待发布的CAN消息结构体指针
  */
 __xwds_code
 void xwds_canc_rxq_publish(struct xwds_canc_rxqueue * rxq,
@@ -474,11 +474,11 @@ void xwds_canc_rxq_publish(struct xwds_canc_rxqueue * rxq,
 
 /**
  * @brief XWDS API：从接收缓冲队列中获取一条消息
- * @param rxq: (I) 接收缓冲队列对象指针
- * @param buf: (I) 获取CAN消息结构体的缓存指针
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] rxq: 接收缓冲队列对象指针
+ * @param[in] buf: 获取CAN消息结构体的缓存指针
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -521,8 +521,8 @@ err_sem_timedwait:
 /******** ******** Callbacks for driver ******** ********/
 /**
  * @brief XWDS Driver Callback：设置“指示发送结果”的回调函数
- * @param canc: (I) CAN总线消息结构体的指针
- * @param cb: (I) 回调函数
+ * @param[in] canc: CAN总线消息结构体的指针
+ * @param[in] cb: 回调函数
  */
 __xwds_code
 void xwds_canc_setcb_tx_indication(struct xwds_canc * canc,
@@ -541,8 +541,8 @@ void xwds_canc_setcb_tx_indication(struct xwds_canc * canc,
 
 /**
  * @brief XWDS Driver Callback：设置“指示接收结果”的回调函数
- * @param canc: (I) CAN总线消息结构体的指针
- * @param cb: (I) 回调函数
+ * @param[in] canc: CAN总线消息结构体的指针
+ * @param[in] cb: 回调函数
  */
 __xwds_code
 void xwds_canc_setcb_rx_indication(struct xwds_canc * canc,
@@ -562,8 +562,8 @@ void xwds_canc_setcb_rx_indication(struct xwds_canc * canc,
 
 /**
  * @brief XWDS Driver Callback：设置“唤醒通知”回调函数
- * @param canc: (I) CAN总线消息结构体的指针
- * @param cb: (I) 回调函数
+ * @param[in] canc: CAN总线消息结构体的指针
+ * @param[in] cb: 回调函数
  */
 __xwds_code
 void xwds_canc_setcb_wakeup_notification(struct xwds_canc * canc,
@@ -581,8 +581,8 @@ void xwds_canc_setcb_wakeup_notification(struct xwds_canc * canc,
 
 /**
  * @brief XWDS Driver Callback：设置“模式切换通知”回调函数
- * @param canc: (I) CAN总线消息结构体的指针
- * @param cb: (I) 回调函数
+ * @param[in] canc: CAN总线消息结构体的指针
+ * @param[in] cb: 回调函数
  */
 __xwds_code
 void xwds_canc_setcb_mode_indication(struct xwds_canc * canc,
@@ -600,8 +600,8 @@ void xwds_canc_setcb_mode_indication(struct xwds_canc * canc,
 
 /**
  * @brief XWDS Driver Callback：设置“错误通知”回调函数
- * @param canc: (I) CAN总线消息结构体的指针
- * @param cb: (I) 回调函数
+ * @param[in] canc: CAN总线消息结构体的指针
+ * @param[in] cb: 回调函数
  */
 __xwds_code
 void xwds_canc_setcb_err_indication(struct xwds_canc * canc,
@@ -620,8 +620,8 @@ void xwds_canc_setcb_err_indication(struct xwds_canc * canc,
 
 /**
  * @brief XWDS Driver Callback：设置“BUSOFF通知”回调函数
- * @param canc: (I) CAN总线消息结构体的指针
- * @param cb: (I) 回调函数
+ * @param[in] canc: CAN总线消息结构体的指针
+ * @param[in] cb: 回调函数
  */
 __xwds_code
 void xwds_canc_setcb_busoff_indication(struct xwds_canc * canc,
@@ -639,8 +639,8 @@ void xwds_canc_setcb_busoff_indication(struct xwds_canc * canc,
 
 /**
  * @brief XWDS Driver Callback：初始化CAN总线消息结构体
- * @param msg: (I) CAN总线消息结构体的指针
- * @param sdu: (I) 数据缓冲区的指针
+ * @param[in] msg: CAN总线消息结构体的指针
+ * @param[in] sdu: 数据缓冲区的指针
  */
 __xwds_code
 void xwds_canc_drvcb_init_msg(struct xwds_can_msg * msg, xwu32_t canid,
@@ -658,9 +658,9 @@ void xwds_canc_drvcb_init_msg(struct xwds_can_msg * msg, xwu32_t canid,
 
 /**
  * @brief XWDS Driver Callback：指示发送结果
- * @param canc: (I) CAN控制器对象指针
- * @param txobjid: (I) 发送邮箱的ID
- * @param rc: (I) 发送结果
+ * @param[in] canc: CAN控制器对象指针
+ * @param[in] txobjid: 发送邮箱的ID
+ * @param[in] rc: 发送结果
  * @note
  * - 这个回调函数在中断上下文中被调用，用于通知接收结果
  */
@@ -678,9 +678,9 @@ void xwds_canc_drvcb_tx_indication(struct xwds_canc * canc, xwid_t txobjid,
 
 /**
  * @brief XWDS Driver Callback：接收到CAN消息后的回调函数
- * @param canc: (I) CAN控制器对象指针
- * @param rxobjid: (I) 接收邮箱的ID
- * @param rxmsg: (O) 指向缓冲区的指针，通过此缓冲区返回接收到的CAN消息
+ * @param[in] canc: CAN控制器对象指针
+ * @param[in] rxobjid: 接收邮箱的ID
+ * @param[out] rxmsg: 指向缓冲区的指针，通过此缓冲区返回接收到的CAN消息
  * @note
  * - 此回调函数在中断上下文中调用，用于通知接收结果；
  * - rxmsg的生命周期只在这个函数内有效，若要保存CAN数据，应在函数内部进行拷贝。
@@ -699,7 +699,7 @@ void xwds_canc_drvcb_rx_indication(struct xwds_canc * canc, xwid_t rxobjid,
 
 /**
  * @brief XWDS Driver Callback：CAN控制器的唤醒通知
- * @param canc: (I) CAN控制器对象指针
+ * @param[in] canc: CAN控制器对象指针
  * @note
  * - 这个回调函数在中断上下文中被调用，用于通知唤醒
  */
@@ -716,8 +716,8 @@ void xwds_canc_drvcb_wakeup_notification(struct xwds_canc * canc)
 
 /**
  * @brief XWDS Driver Callback：指示CAN控制器的模式已经切换
- * @param canc: (I) CAN控制器对象指针
- * @param mode: (I) 当前模式
+ * @param[in] canc: CAN控制器对象指针
+ * @param[in] mode: 当前模式
  * @note
  * - 这个回调函数在中断上下文中被调用，用于通知模式切换
  */
@@ -734,10 +734,10 @@ void xwds_canc_drvcb_mode_indication(struct xwds_canc * canc, xwsq_t mode)
 
 /**
  * @brief XWDS Driver Callback：指示CAN控制器发生错误
- * @param canc: (I) CAN控制器对象指针
- * @param errcode: (I) 错误码
- * @param tec: (I) 发送错误计数
- * @param rec: (I) 接收错误计数
+ * @param[in] canc: CAN控制器对象指针
+ * @param[in] errcode: 错误码
+ * @param[in] tec: 发送错误计数
+ * @param[in] rec: 接收错误计数
  * @note
  * - 这个回调函数在中断上下文中被调用，用于通知错误
  */
@@ -755,7 +755,7 @@ void xwds_canc_drvcb_err_indication(struct xwds_canc * canc, xwsq_t errcode,
 
 /**
  * @brief XWDS Driver Callback：指示CAN控制器发生busoff
- * @param canc: (I) CAN控制器对象指针
+ * @param[in] canc: CAN控制器对象指针
  * @note
  * - 这个回调函数在中断上下文中被调用，用于通知BUSOFF
  */

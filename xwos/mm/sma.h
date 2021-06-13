@@ -19,6 +19,11 @@
 #include <xwos/mm/common.h>
 
 /**
+ * @defgroup xwmm_sma 简单内存分配器
+ * @{
+ */
+
+/**
  * @brief 简单内存分配器
  */
 struct xwmm_sma {
@@ -33,5 +38,9 @@ xwer_t xwmm_sma_init(struct xwmm_sma * sa,
 xwer_t xwmm_sma_alloc(struct xwmm_sma * sa, xwsz_t size, xwsz_t aligned,
                       void ** membuf);
 xwer_t xwmm_sma_free(struct xwmm_sma * sa, void * mem);
+
+/**
+ * @} xwmm_sma
+ */
 
 #endif /* xwos/mm/sma.h */

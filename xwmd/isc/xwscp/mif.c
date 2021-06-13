@@ -62,12 +62,12 @@ xwer_t xwscp_tx_once(struct xwscp * xwscp,
 
 /**
  * @brief XWSCP API: 启动XWSCP
- * @param xwscp: (I) XWSCP对象的指针
- * @param name: (I) XWSCP实例的名字
- * @param hwifops: (I) 硬件接口抽象层操作函数集合
- * @param hwifcb: (I) 硬件接口控制块指针
- * @param mem: (I) 连续的内存块，大小必须为@ref XWSCP_MEMPOOL_SIZE
- * @param memsize: (I) 连续的内存块大小，值必须为@ref XWSCP_MEMPOOL_SIZE
+ * @param[in] xwscp: XWSCP对象的指针
+ * @param[in] name: XWSCP实例的名字
+ * @param[in] hwifops: 硬件接口抽象层操作函数集合
+ * @param[in] hwifcb: 硬件接口控制块指针
+ * @param[in] mem: 连续的内存块，大小必须为@ref XWSCP_MEMPOOL_SIZE
+ * @param[in] memsize: 连续的内存块大小，值必须为@ref XWSCP_MEMPOOL_SIZE
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -190,7 +190,7 @@ err_bma_init:
 
 /**
  * @brief XWSCP API: 停止XWSCP
- * @param xwscp: (I) XWSCP对象的指针
+ * @param[in] xwscp: XWSCP对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -209,7 +209,7 @@ xwer_t xwscp_stop(struct xwscp * xwscp)
 
 /**
  * @brief XWSCP的垃圾回收函数
- * @param obj: (I) XWSCP对象的指针
+ * @param[in] obj: XWSCP对象的指针
  * @return 错误码
  */
 static __xwmd_code
@@ -278,14 +278,14 @@ err_mtx_lock:
 
 /**
  * @brief XWSCP API: 连接远程端
- * @param xwscp: (I) XWSCP对象的指针
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] xwscp: XWSCP对象的指针
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
- * @retval -ENOTCONN: 远程端无回应
+ * @retval -ENETUNREACH: 远程端无回应
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -308,6 +308,7 @@ xwer_t xwscp_connect(struct xwscp * xwscp, xwtm_t * xwtm)
         } while ((-ETIMEDOUT == rc) && (*xwtm > 0));
         if ((-ETIMEDOUT == rc) && (*xwtm <= 0)) {
                 xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_NETUNREACH);
+                rc = -ENETUNREACH;
         }/* else {} */
         xwos_mtx_unlock(&xwscp->tx.mtx);
         return rc;
@@ -409,19 +410,21 @@ err_fmt_msg:
 
 /**
  * @brief XWSCP API: 发送一条报文，并在限定的时间等待回应
- * @param xwscp: (I) XWSCP对象的指针
- * @param data: (I) 数据缓冲区的指针
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示数据的字节数
- *              (O) 作为输出时，返回实际发送的字节数
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] xwscp: XWSCP对象的指针
+ * @param[in] data: 数据缓冲区的指针
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示数据的字节数
+ * + (O) 作为输出时，返回实际发送的字节数
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -E2BIG: 数据太长
- * @retval -ENOTCONN: 远程端无回应
+ * @retval -ENOTCONN: 无链接
+ * @retval -ECONNRESET: 链接被复位
+ * @retval -ENETUNREACH: 远程端无回应
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -452,17 +455,10 @@ xwer_t xwscp_tx(struct xwscp * xwscp,
                         } while ((-ETIMEDOUT == rc) && (*xwtm > 0));
                         if ((-ETIMEDOUT == rc) && (*xwtm <= 0)) {
                                 xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_NETUNREACH);
+                                rc = -ENETUNREACH;
                         }/* else {} */
                 } else {
-                        do {
-                                rc = xwscp_connect_once(xwscp, xwtm);
-                        } while ((-ETIMEDOUT == rc) && (*xwtm > 0));
-                        if ((-ETIMEDOUT == rc) && (*xwtm <= 0)) {
-                                xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_NETUNREACH);
-                        }/* else {} */
-                        if ((XWOK == rc) && (*xwtm > 0)) {
-                                rc = -EAGAIN;
-                        }
+                        rc = -ENOTCONN;
                 }
         } while ((-EAGAIN == rc) && (*xwtm > 0));
         xwos_mtx_unlock(&xwscp->tx.mtx);
@@ -474,14 +470,14 @@ err_txmtx_timedlock:
 
 /**
  * @brief XWSCP API: 接收一条报文，若接收队列为空，就限时等待
- * @param xwscp: (I) XWSCP对象的指针
- * @param buf: (I) 接收数据的缓冲区指针
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示报文的字节数
- *              (O) 作为输出时，返回实际接收的字节数
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] xwscp: XWSCP对象的指针
+ * @param[in] buf: 接收数据的缓冲区指针
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示报文的字节数
+ * + (O) 作为输出时，返回实际接收的字节数
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -522,14 +518,14 @@ err_sem_timedwait:
 
 /**
  * @brief XWSCP API: 尝试接收消息，若接收队列为空，立即返回错误码
- * @param xwscp: (I) XWSCP对象的指针
- * @param buf: (I) 接收数据的缓冲区指针
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示报文的字节数
- *              (O) 作为输出时，返回实际接收的字节数
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] xwscp: XWSCP对象的指针
+ * @param[in] buf: 接收数据的缓冲区指针
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示报文的字节数
+ * + (O) 作为输出时，返回实际接收的字节数
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针

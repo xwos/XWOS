@@ -30,9 +30,9 @@ struct xwmp_plwq {
 
 /**
  * @brief 安全地遍历管道等待队列中所有节点，以防其被删除
- * @param c: (I) 作为循环光标的等待队列节点结构体(struct xwmp_wqn)指针
- * @param n: (I) 作为临时变量的另一个等待队列节点结构体(struct xwmp_wqn)指针
- * @param xwplwq: (I) 管道等待队列的指针
+ * @param[in] c: 作为循环光标的等待队列节点结构体(struct xwmp_wqn)指针
+ * @param[in] n: 作为临时变量的另一个等待队列节点结构体(struct xwmp_wqn)指针
+ * @param[in] xwplwq: 管道等待队列的指针
  */
 #define xwmp_plwq_itr_wqn_safe(c, n, xwplwq)                            \
         xwlib_bclst_itr_next_entry_safe(c, n, &((xwplwq)->head),        \
@@ -41,8 +41,8 @@ struct xwmp_plwq {
 
 /**
  * @brief 以删除为目的，遍历管道等待队列中所有节点
- * @param c: (I) 作为循环光标的等待队列节点结构体(struct xwmp_wqn)指针
- * @param xwplwq: (I) 管道等待队列的指针
+ * @param[in] c: 作为循环光标的等待队列节点结构体(struct xwmp_wqn)指针
+ * @param[in] xwplwq: 管道等待队列的指针
  */
 #define xwmp_plwq_itr_wqn_rm(c, xwplwq)                                 \
         xwlib_bclst_itr_next_entry_del(c, &((xwplwq)->head),            \
@@ -57,7 +57,7 @@ struct xwmp_wqn * xwmp_plwq_choose_locked(struct xwmp_plwq * xwplwq);
 
 /**
  * @brief 锁住管道等待队列
- * @param xwplwq: (I) 管道等待队列结构体指针
+ * @param[in] xwplwq: 管道等待队列结构体指针
  */
 static __xwmp_inline
 void xwmp_plwq_lock(struct xwmp_plwq * xwplwq)
@@ -67,7 +67,7 @@ void xwmp_plwq_lock(struct xwmp_plwq * xwplwq)
 
 /**
  * @brief 解锁管道等待队列
- * @param xwplwq: (I) 管道等待队列结构体指针
+ * @param[in] xwplwq: 管道等待队列结构体指针
  */
 static __xwmp_inline
 void xwmp_plwq_unlock(struct xwmp_plwq * xwplwq)
@@ -77,7 +77,7 @@ void xwmp_plwq_unlock(struct xwmp_plwq * xwplwq)
 
 /**
  * @brief 锁住管道等待队列，并关闭本地CPU的中断
- * @param xwplwq: (I) 管道等待队列结构体指针
+ * @param[in] xwplwq: 管道等待队列结构体指针
  */
 static __xwmp_inline
 void xwmp_plwq_lock_cpuirq(struct xwmp_plwq * xwplwq)
@@ -87,7 +87,7 @@ void xwmp_plwq_lock_cpuirq(struct xwmp_plwq * xwplwq)
 
 /**
  * @brief 解锁管道等待队列，并开启本地CPU的中断
- * @param xwplwq: (I) 管道等待队列结构体指针
+ * @param[in] xwplwq: 管道等待队列结构体指针
  */
 static __xwmp_inline
 void xwmp_plwq_unlock_cpuirq(struct xwmp_plwq * xwplwq)
@@ -97,8 +97,8 @@ void xwmp_plwq_unlock_cpuirq(struct xwmp_plwq * xwplwq)
 
 /**
  * @brief 锁住管道等待队列，保存本地CPU的中断标志，并关闭
- * @param xwplwq: (I) 管道等待队列结构体指针
- * @param cpuirq: (O) 保存本地CPU的中断标志的缓冲区的指针
+ * @param[in] xwplwq: 管道等待队列结构体指针
+ * @param[out] cpuirq: 保存本地CPU的中断标志的缓冲区的指针
  */
 static __xwmp_inline
 void xwmp_plwq_lock_cpuirqsv(struct xwmp_plwq * xwplwq, xwreg_t * cpuirq)
@@ -108,8 +108,8 @@ void xwmp_plwq_lock_cpuirqsv(struct xwmp_plwq * xwplwq, xwreg_t * cpuirq)
 
 /**
  * @brief 解锁管道等待队列，并恢复本地CPU的中断标志
- * @param xwplwq: (I) 管道等待队列结构体指针
- * @param cpuirq: (I) 本地CPU的中断标志
+ * @param[in] xwplwq: 管道等待队列结构体指针
+ * @param[in] cpuirq: 本地CPU的中断标志
  */
 static __xwmp_inline
 void xwmp_plwq_unlock_cpuirqrs(struct xwmp_plwq * xwplwq, xwreg_t cpuirq)

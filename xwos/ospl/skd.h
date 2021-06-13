@@ -58,15 +58,15 @@ xwer_t xwosplcb_thd_outmigrate_lic(struct xwospl_thd * thd, xwid_t dstcpu);
 
 /**
  * @brief 玄武OS移植层：初始化调度调度器
- * @param xwskd: (I) 调度器的指针
+ * @param[in] xwskd: 调度器的指针
  * @return 错误码
  */
 xwer_t xwospl_skd_init(struct xwospl_skd * xwskd);
 
 /**
  * @brief 玄武OS移植层：初始化调度对象的栈
- * @param stk: (I) 栈信息结构体指针
- * @param attr: (I) 标志
+ * @param[in] stk: 栈信息结构体指针
+ * @param[in] attr: 标志
  */
 void xwospl_skd_init_stack(struct xwospl_skd_stack_info * stk,
                            void (* exit)(xwer_t),
@@ -79,27 +79,27 @@ xwid_t xwospl_skd_id_lc(void);
 
 /**
  * @brief 玄武OS移植层：启动调度器
- * @param xwskd: (I) 调度器的指针
+ * @param[in] xwskd: 调度器的指针
  */
 xwer_t xwospl_skd_start_lc(struct xwospl_skd * xwskd);
 
 /**
  * @brief 玄武OS移植层：暂停调度器，用于电源管理
- * @param xwskd: (I) 调度器的指针
+ * @param[in] xwskd: 调度器的指针
  * @return 错误码
  */
 xwer_t xwospl_skd_suspend(struct xwospl_skd * xwskd);
 
 /**
  * @brief 玄武OS移植层：继续调度器，用于电源管理
- * @param xwskd: (I) 调度器的指针
+ * @param[in] xwskd: 调度器的指针
  * @return 错误码
  */
 xwer_t xwospl_skd_resume(struct xwospl_skd * xwskd);
 
 /**
  * @brief 玄武OS移植层：触发切换上下文的软中断
- * @param xwskd: (I) 调度器的指针
+ * @param[in] xwskd: 调度器的指针
  */
 static __xwbsp_inline
 void xwospl_skd_req_swcx(struct xwospl_skd * xwskd);
@@ -111,30 +111,30 @@ void xwospl_skd_isr_swcx(void);
 
 /**
  * @brief 玄武OS移植层：本地CPU上的线程退出
- * @param thd: (I) 线程对象的指针
- * @param rc: (I) 线程退出抛出的返回值
+ * @param[in] thd: 线程对象的指针
+ * @param[in] rc: 线程退出抛出的返回值
  */
 void xwospl_thd_exit_lc(struct xwospl_thd * thd, xwer_t rc);
 
 /**
  * @brief 玄武OS移植层：冻结本地CPU中正在运行的线程
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  */
 xwer_t xwospl_thd_freeze_lc(struct xwospl_thd * thd);
 
 #if defined(XuanWuOS_CFG_CORE__mp)
 /**
  * @brief 玄武OS移植层：将线程迁出其他CPU，并准备迁入其他CPU
- * @param thd: (I) 线程对象的指针
- * @param cpuid: (I) 目的地CPU的ID
+ * @param[in] thd: 线程对象的指针
+ * @param[in] cpuid: 目的地CPU的ID
  * @return 错误码
  */
 xwer_t xwospl_thd_outmigrate(struct xwospl_thd * thd, xwid_t cpuid);
 
 /**
  * @brief 玄武OS移植层：迁移线程至目标CPU
- * @param thd: (I) 线程对象的指针
- * @param cpuid: (I) 目的地CPU的ID
+ * @param[in] thd: 线程对象的指针
+ * @param[in] cpuid: 目的地CPU的ID
  */
 void xwospl_thd_immigrate(struct xwospl_thd * thd, xwid_t cpuid);
 #endif /* XuanWuOS_CFG_CORE__mp */

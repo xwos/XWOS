@@ -30,8 +30,8 @@ struct xwup_rtwq {
 
 /**
  * @brief 以删除为目的，遍历实时等待队列中所有节点
- * @param c: (I) 作为循环光标的等待队列节点结构体(struct xwup_wqn)指针
- * @param xwrtwq: (I) 等待队列的指针
+ * @param[in] c: 作为循环光标的等待队列节点结构体(struct xwup_wqn)指针
+ * @param[in] xwrtwq: 等待队列的指针
  */
 #define xwup_rtwq_itr_thd_rm(c, xwrtwq) \
         for (c = (xwrtwq)->rightmost; c; c = (xwrtwq)->rightmost)

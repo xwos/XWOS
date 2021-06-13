@@ -25,7 +25,7 @@
 
 /**
  * @brief 初始化互斥锁树
- * @param mt: (I) 互斥锁树
+ * @param[in] mt: 互斥锁树
  */
 __xwmp_code
 void xwmp_mtxtree_init(struct xwmp_mtxtree * mt)
@@ -38,8 +38,8 @@ void xwmp_mtxtree_init(struct xwmp_mtxtree * mt)
 
 /**
  * @brief 将互斥锁加入到互斥锁树
- * @param mtx: (I) 互斥锁
- * @param mt: (I) 互斥锁树
+ * @param[in] mtx: 互斥锁
+ * @param[in] mt: 互斥锁树
  * @note
  * - 这个函数只能在获得锁mtx->rtwq.lock 与 mt->lock时调用。
  */
@@ -97,8 +97,8 @@ void xwmp_mtxtree_add_locked(struct xwmp_mtx * mtx, struct xwmp_mtxtree * mt)
 
 /**
  * @brief 将互斥锁加入到互斥锁树
- * @param mtx: (I) 互斥锁
- * @param mt: (I) 互斥锁树
+ * @param[in] mtx: 互斥锁
+ * @param[in] mt: 互斥锁树
  * @note
  * - 这个函数只能在获得锁mtx->rtwq.lock时调用。
  */
@@ -113,8 +113,8 @@ void xwmp_mtxtree_add(struct xwmp_mtx * mtx, struct xwmp_mtxtree * mt)
 
 /**
  * @brief 将互斥锁从互斥锁树中删除
- * @param mtx: (I) 互斥锁
- * @param mt: (I) 互斥锁树
+ * @param[in] mtx: 互斥锁
+ * @param[in] mt: 互斥锁树
  * @note
  * - 这个函数只能在获得锁mtx->rtwq.lock 与 mt->lock时调用。
  */
@@ -163,8 +163,8 @@ void xwmp_mtxtree_remove_locked(struct xwmp_mtx * mtx, struct xwmp_mtxtree * mt)
 
 /**
  * @brief 将互斥锁从互斥锁树中删除
- * @param mtx: (I) 互斥锁
- * @param mt: (I) 互斥锁树
+ * @param[in] mtx: 互斥锁
+ * @param[in] mt: 互斥锁树
  * @note
  * - 这个函数只能在获得锁mtx->rtwq.lock时调用。
  */

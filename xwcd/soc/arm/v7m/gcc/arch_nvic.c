@@ -23,6 +23,7 @@
 #include <xwos/ospl/irq.h>
 #include <armv7m_core.h>
 #include <armv7m_nvic.h>
+#include <arch_irq.h>
 #include <arch_nvic.h>
 
 __xwbsp_rodata const struct cortexm_nvic_cfg arch_nvic_cfg = {

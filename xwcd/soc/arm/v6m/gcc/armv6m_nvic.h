@@ -178,7 +178,7 @@ struct cortexm_nvic_irq_cfg {
 
 /**
  * @brief Set Priority Grouping
- * @param prigroup: (I) priority group is assigned to the field scb->aircr[10:8]
+ * @param[in] prigroup: priority group is assigned to the field scb->aircr[10:8]
  *                      PRIGROUP field. Only values from 0~7 are used.
  * @note
  * * The function sets the priority grouping field using the required unlock
@@ -219,7 +219,7 @@ xwu32_t cm_nvic_get_irq_num(void)
 /******** ******** ******** external interrupts ******** ******** ********/
 /**
  * @brief Enable interrupt
- * @param irq: (I) interrupt number
+ * @param[in] irq: interrupt number
  */
 static __xwbsp_inline
 void cm_nvic_enable_irq(xwirq_t irq)
@@ -229,7 +229,7 @@ void cm_nvic_enable_irq(xwirq_t irq)
 
 /**
  * @brief Disable interrupt
- * @param irq: (I) interrupt number
+ * @param[in] irq: interrupt number
  */
 static __xwbsp_inline
 void cm_nvic_disable_irq(xwirq_t irq)
@@ -239,8 +239,8 @@ void cm_nvic_disable_irq(xwirq_t irq)
 
 /**
  * @brief save interrupt flag
- * @param irq: (I) interrupt number
- * @param flag: (O) buffer to save flag
+ * @param[in] irq: interrupt number
+ * @param[out] flag: buffer to save flag
  */
 static __xwbsp_inline
 void cm_nvic_save_irq(xwirq_t irq, xwreg_t * flag)
@@ -251,8 +251,8 @@ void cm_nvic_save_irq(xwirq_t irq, xwreg_t * flag)
 
 /**
  * @brief restore interrupt flag
- * @param irqn: (I) interrupt number
- * @param flag: (I) flag to restore
+ * @param[in] irqn: interrupt number
+ * @param[in] flag: flag to restore
  */
 static __xwbsp_inline
 void cm_nvic_restore_irq(xwirq_t irq, xwreg_t flag)
@@ -268,7 +268,7 @@ void cm_nvic_restore_irq(xwirq_t irq, xwreg_t flag)
 
 /**
  * @brief Software trigger interrupt
- * @param irq: (I) interrupt number.
+ * @param[in] irq: interrupt number.
  */
 static __xwbsp_inline
 void cm_nvic_software_trigger_irq(xwirq_t irq)
@@ -278,9 +278,9 @@ void cm_nvic_software_trigger_irq(xwirq_t irq)
 
 /**
  * @brief Test interrupt pending state
- * @param irq: (I) interrupt number.
- * @retval 0: Interrupt status is not pending.
- * @retval 1: Interrupt status is pending.
+ * @param[in] irq: interrupt number.
+ * @retval false: Interrupt status is not pending.
+ * @retval true: Interrupt status is pending.
  */
 static __xwbsp_inline
 bool cm_nvic_tst_irq(xwirq_t irq)
@@ -290,7 +290,7 @@ bool cm_nvic_tst_irq(xwirq_t irq)
 
 /**
  * @brief Pend interrupt
- * @param irq: (I) interrupt number.
+ * @param[in] irq: interrupt number.
  */
 static __xwbsp_inline
 void cm_nvic_pend_irq(xwirq_t irq)
@@ -300,7 +300,7 @@ void cm_nvic_pend_irq(xwirq_t irq)
 
 /**
  * @brief Clear interrupt pending state
- * @param irq: (I) interrupt number.
+ * @param[in] irq: interrupt number.
  */
 static __xwbsp_inline
 void cm_nvic_clear_irq(xwirq_t irq)
@@ -310,9 +310,9 @@ void cm_nvic_clear_irq(xwirq_t irq)
 
 /**
  * @brief Get interrupt active state
- * @param irq: (I) interrupt number
- * @return 0: Interrupt status is not active.
- * @return 1: Interrupt status is active.
+ * @param[in] irq: interrupt number
+ * @retval false: Interrupt status is not active.
+ * @retval true: Interrupt status is active.
  */
 static __xwbsp_inline
 bool cm_nvic_get_irq_active(xwirq_t irq)
@@ -322,8 +322,8 @@ bool cm_nvic_get_irq_active(xwirq_t irq)
 
 /**
  * @brief Set interrupt priority
- * @param irq: (I) interrupt number.
- * @param priority: (I) priority to set.
+ * @param[in] irq: interrupt number.
+ * @param[in] priority: priority to set.
  */
 static __xwbsp_inline
 void cm_nvic_set_irq_priority(xwirq_t irq, xwpr_t priority)
@@ -334,7 +334,7 @@ void cm_nvic_set_irq_priority(xwirq_t irq, xwpr_t priority)
 
 /**
  * @brief Get interrupt priority
- * @param irq: (I) interrupt number
+ * @param[in] irq: interrupt number
  * @return interrupt priority
  */
 static __xwbsp_inline
@@ -633,8 +633,8 @@ bool cm_nvic_get_monitor_active(void)
 
 /**
  * @brief Set system irq priority
- * @param irq: (I) irq number
- * @param priority: (I) priority to set.
+ * @param[in] irq: irq number
+ * @param[in] priority: priority to set.
  */
 static __xwbsp_inline
 void cm_nvic_set_sysirq_priority(xwirq_t irq, xwpr_t priority)
@@ -648,7 +648,7 @@ void cm_nvic_set_sysirq_priority(xwirq_t irq, xwpr_t priority)
 
 /**
  * @brief Get system irq priority
- * @param irq: (I) irq number
+ * @param[in] irq: irq number
  * @return interrupt priority
  */
 static __xwbsp_inline

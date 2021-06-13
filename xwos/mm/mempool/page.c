@@ -63,13 +63,13 @@ xwmm_mempool_page_get_buddy(struct xwmm_mempool_page_allocator * pa,
 
 /**
  * @brief XWMM API：初始化页分配器
- * @param pa: (I) 页分配器的指针
- * @param name: (I) 名字
- * @param origin: (I) 内存区域的起始地址
- * @param size: (I) 内存区域的总大小
- * @param pgsize: (I) 单位页的大小
- * @param odrbtree: (I) 阶红黑树数组的指针
- * @param pgarray: (I) 页控制块数组的指针
+ * @param[in] pa: 页分配器的指针
+ * @param[in] name: 名字
+ * @param[in] origin: 内存区域的起始地址
+ * @param[in] size: 内存区域的总大小
+ * @param[in] pgsize: 单位页的大小
+ * @param[in] odrbtree: 阶红黑树数组的指针
+ * @param[in] pgarray: 页控制块数组的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -E2SMALL: 内存区域太小
@@ -139,9 +139,9 @@ err_mem2small:
 
 /**
  * @brief XWMM API：申请一页内存
- * @param pa: (I) 页分配器的指针
- * @param order: (I) 页数量的阶，页内存大小：((1 << order) * pa->pgsize)
- * @param pgbuf: (O) 指向缓冲区的指针，通过此缓冲区返回申请到的页控制块的指针
+ * @param[in] pa: 页分配器的指针
+ * @param[in] order: 页数量的阶，页内存大小：((1 << order) * pa->pgsize)
+ * @param[out] pgbuf: 指向缓冲区的指针，通过此缓冲区返回申请到的页控制块的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足
@@ -176,8 +176,8 @@ xwer_t xwmm_mempool_page_allocate(struct xwmm_mempool_page_allocator * pa,
 
 /**
  * @brief XWMM API：释放一页内存
- * @param pa: (I) 页分配器的指针
- * @param pg: (I) 页控制块的指针
+ * @param[in] pa: 页分配器的指针
+ * @param[in] pg: 页控制块的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EALREADY: 页内存已释放
@@ -205,10 +205,10 @@ err_already:
 
 /**
  * @brief 将大的页拆分成小的页
- * @param pa: (I) 页分配器的指针
- * @param pg: (I) 被拆分的页控制块的指针
- * @param target_odr: (I) 目标页数量的阶
- * @param ot: (I) 被拆分的页所在的阶红黑树的指针
+ * @param[in] pa: 页分配器的指针
+ * @param[in] pg: 被拆分的页控制块的指针
+ * @param[in] target_odr: 目标页数量的阶
+ * @param[in] ot: 被拆分的页所在的阶红黑树的指针
  * @note
  * - 被拆分的页已经从阶红黑树中删除，所以是私有数据。
  */
@@ -238,8 +238,8 @@ void xwmm_mempool_page_divide_page(struct xwmm_mempool_page_allocator * pa,
 
 /**
  * @brief 合并空闲的伙伴页
- * @param pa: (I) 页分配器的指针
- * @param pg: (I) 页控制块的指针
+ * @param[in] pa: 页分配器的指针
+ * @param[in] pg: 页控制块的指针
  * @note
  * - 正在合并的页不在阶红黑树中删除，所以是私有数据。
  */
@@ -280,8 +280,8 @@ void xwmm_mempool_page_combine(struct xwmm_mempool_page_allocator * pa,
 
 /**
  * @brief 增加页到阶红黑树中
- * @param ot: (I) 阶红黑树的指针
- * @param pg: (I) 页控制块的指针
+ * @param[in] ot: 阶红黑树的指针
+ * @param[in] pg: 页控制块的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EEXIST: 页已在阶红黑树中
@@ -350,8 +350,8 @@ err_exist:
 
 /**
  * @brief 从阶红黑树中删除页
- * @param ot: (I) 阶红黑树的指针
- * @param pg: (I) 页控制块的指针
+ * @param[in] ot: 阶红黑树的指针
+ * @param[in] pg: 页控制块的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ESRCH: 页不在阶红黑树中
@@ -404,7 +404,7 @@ err_odrerr:
 
 /**
  * @brief 从阶红黑树中选择一页
- * @param ot: (I) 阶红黑树的指针
+ * @param[in] ot: 阶红黑树的指针
  * @retuan 页控制块的指针或空指针
  * @note
  * - 将要被选择的页还在阶红黑树中，所以是共享数据，对pg->mapping的写只可在锁内。
@@ -448,8 +448,8 @@ err_empty:
 
 /**
  * @brief 获取页的序列值
- * @param pa: (I) 页分配器的指针
- * @param pg: (I) 页控制块的指针
+ * @param[in] pa: 页分配器的指针
+ * @param[in] pg: 页控制块的指针
  * @return 序列值
  */
 static __xwos_code
@@ -465,8 +465,8 @@ xwsq_t xwmm_mempool_page_get_seq(struct xwmm_mempool_page_allocator * pa,
 
 /**
  * @brief 从页内存地址获得其页控制块的指针
- * @param pa: (I) 页分配器的指针
- * @param mem: (I) 内存块的首地址
+ * @param[in] pa: 页分配器的指针
+ * @param[in] mem: 内存块的首地址
  * @return 页的控制块指针
  */
 static __xwos_code
@@ -485,8 +485,8 @@ xwmm_mempool_mem_to_page(struct xwmm_mempool_page_allocator * pa, void * mem)
 
 /**
  * @brief 找到页的伙伴页
- * @param pa: (I) 页分配器的指针
- * @param pg: (I) 页控制块的指针
+ * @param[in] pa: 页分配器的指针
+ * @param[in] pg: 页控制块的指针
  * @return 伙伴页控制块的指针
  */
 static __xwos_code
@@ -505,9 +505,9 @@ xwmm_mempool_page_get_buddy(struct xwmm_mempool_page_allocator * pa,
 
 /**
  * @brief 依据内存地址查找页
- * @param pa: (I) 页分配器的指针
- * @param mem: (I) 内存地址
- * @param pgbuf: (O) 指向缓冲区的指针，通过此缓冲区返回申请到的页控制块的指针
+ * @param[in] pa: 页分配器的指针
+ * @param[in] mem: 内存地址
+ * @param[out] pgbuf: 指向缓冲区的指针，通过此缓冲区返回申请到的页控制块的指针
  * @return 伙伴页控制块的指针
  * @note
  * - 被查找的页不在阶红黑树中（也即是从页分配器中已经分配出去）
@@ -528,9 +528,9 @@ xwer_t xwmm_mempool_page_find(struct xwmm_mempool_page_allocator * pa, void * me
 
 /**
  * @brief i_allocator接口函数：申请内存
- * @param this: (I) this指针(页分配器)
- * @param size: (I) 申请的大小
- * @param membuf: (O) 指向缓冲区的指针，通过此缓冲区返回申请到的内存的首地址
+ * @param[in] this: this指针(页分配器)
+ * @param[in] size: 申请的大小
+ * @param[out] membuf: 指向缓冲区的指针，通过此缓冲区返回申请到的内存的首地址
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足
@@ -560,8 +560,8 @@ xwer_t xwmm_mempool_page_i_a_malloc(void * this, xwsz_t size, void ** membuf)
 
 /**
  * @brief i_allocator接口函数：释放内存
- * @param this: (I) this指针(页分配器)
- * @param mem: (I) 内存的首地址
+ * @param[in] this: this指针(页分配器)
+ * @param[in] mem: 内存的首地址
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足

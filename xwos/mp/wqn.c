@@ -19,8 +19,8 @@
 
 /**
  * @brief 初始化等待队列节点
- * @param wqn: (I) 等待队列节点指针
- * @param owner: (I) 拥有结构体的对象的指针
+ * @param[in] wqn: 等待队列节点指针
+ * @param[in] owner: 拥有结构体的对象的指针
  */
 __xwmp_code
 void xwmp_wqn_init(struct xwmp_wqn * wqn, void * owner)

@@ -16,15 +16,25 @@
 #include <xwos/standard.h>
 
 /**
+ * @defgroup div64 64位除法
+ * @{
+ */
+
+/**
  * @brief long long类型除法
- * @param n: (I) 被除数
- *           (O) 商
- * @param divisor: (I) 除数
+ * @param[in,out] n: 指向无符号64位整数缓冲区的指针，
+ * + (I) 作为输入时，表示被除数
+ * + (O) 作为输出时，返回商
+ * @param[in] divisor: 除数
  * @return 余数
  */
 #define xwdivll(n, divisor)     xwdiv64(n, divisor)
 
 __xwlib_code
 xwu32_t xwdiv64(xwu64_t * n, xwu32_t divisor);
+
+/**
+ * @} div64
+ */
 
 #endif /* xwos/lib/div64.h */

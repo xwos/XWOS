@@ -18,6 +18,12 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/osal/lock/seqlock.h>
 #include <xwos/mm/common.h>
+
+/**
+ * @defgroup xwmm_mempool 内存池分配器
+ * @{
+ */
+
 #include <xwos/mm/mempool/i_allocator.h>
 #include <xwos/mm/mempool/page.h>
 
@@ -64,5 +70,8 @@ xwer_t xwmm_mempool_objcache_reserve(struct xwmm_mempool_objcache * oc,
 xwer_t xwmm_mempool_objcache_get_capacity(struct xwmm_mempool_objcache * oc,
                                           xwsz_t * capacity);
 
+/**
+ * @} xwmm_mempool
+ */
 
 #endif /* xwos/mm/mempool/objcache.h */

@@ -33,8 +33,8 @@ __xwmd_rodata const xwu8_t xwpcp_frm_blank[] = {
 
 /**
  * @brief 打开硬件接口
- * @param xwpcp: (I) XWPCP对象的指针
- * @param hwifcb: (I) 硬件接口控制块指针
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] hwifcb: 硬件接口控制块指针
  * @return 错误码
  */
 __xwmd_code
@@ -64,7 +64,7 @@ err_hwifops_open:
 
 /**
  * @brief 关闭硬件接口
- * @param xwpcp: (I) XWPCP对象的指针
+ * @param[in] xwpcp: XWPCP对象的指针
  * @return 错误码
  */
 __xwmd_code
@@ -99,9 +99,9 @@ err_xwpcp_clear_hwifst:
 
 /**
  * @brief 通过硬件接口发送数据
- * @param xwpcp: (I) XWPCP对象的指针
- * @param stream: (I) 数据
- * @param size: (I) 数据长度
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] stream: 数据
+ * @param[in] size: 数据长度
  * @return 错误码
  */
 __xwmd_code
@@ -115,8 +115,8 @@ xwer_t xwpcp_hwifal_tx(struct xwpcp * xwpcp, xwu8_t * stream, xwsz_t size)
 
 /**
  * @brief 通过硬件接口接收一帧
- * @param xwpcp: (I) XWPCP对象的指针
- * @param slotbuf: (O) 指向缓冲区的指针，通过此缓冲区返回union xwpcp_slot *
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[out] slotbuf: 指向缓冲区的指针，通过此缓冲区返回union xwpcp_slot *
  * @return 错误码
  */
 __xwmd_code
@@ -267,8 +267,8 @@ err_sof_ifrx:
 
 /**
  * @brief 通知来自协议层的事件到硬件接口层
- * @param xwpcp: (I) XWPCP对象的指针
- * @param evt: (I) 事件
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] evt: 事件
  */
 __xwmd_code
 void xwpcp_hwifal_notify(struct xwpcp * xwpcp, xwsq_t evt)

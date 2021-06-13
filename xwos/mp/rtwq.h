@@ -20,8 +20,8 @@
 
 /**
  * @brief 以删除为目的，遍历实时等待队列中所有节点
- * @param c: (I) 作为循环光标的等待队列节点结构体(struct xwmp_wqn)指针
- * @param xwrtwq: (I) 等待队列的指针
+ * @param[in] c: 作为循环光标的等待队列节点结构体(struct xwmp_wqn)指针
+ * @param[in] xwrtwq: 等待队列的指针
  */
 #define xwmp_rtwq_itr_thd_rm(c, xwrtwq) \
         for (c = (xwrtwq)->rightmost; c; c = (xwrtwq)->rightmost)
@@ -44,7 +44,7 @@ struct xwmp_wqn * xwmp_rtwq_choose_locked(struct xwmp_rtwq * xwrtwq);
 
 /**
  * @brief 上锁等待队列
- * @param xwrtwq: (I) 实时等待队列
+ * @param[in] xwrtwq: 实时等待队列
  */
 static __xwmp_inline
 void xwmp_rtwq_lock(struct xwmp_rtwq * xwrtwq)
@@ -54,7 +54,7 @@ void xwmp_rtwq_lock(struct xwmp_rtwq * xwrtwq)
 
 /**
  * @brief 解锁等待队列
- * @param xwrtwq: (I) 实时等待队列
+ * @param[in] xwrtwq: 实时等待队列
  */
 static __xwmp_inline
 void xwmp_rtwq_unlock(struct xwmp_rtwq * xwrtwq)
@@ -64,7 +64,7 @@ void xwmp_rtwq_unlock(struct xwmp_rtwq * xwrtwq)
 
 /**
  * @brief 上锁等待队列，并关闭本地CPU的中断
- * @param xwrtwq: (I) 实时等待队列
+ * @param[in] xwrtwq: 实时等待队列
  */
 static __xwmp_inline
 void xwmp_rtwq_lock_cpuirq(struct xwmp_rtwq * xwrtwq)
@@ -74,7 +74,7 @@ void xwmp_rtwq_lock_cpuirq(struct xwmp_rtwq * xwrtwq)
 
 /**
  * @brief 解锁等待队列，并开启本地CPU的中断
- * @param xwrtwq: (I) 实时等待队列
+ * @param[in] xwrtwq: 实时等待队列
  */
 static __xwmp_inline
 void xwmp_rtwq_unlock_cpuirq(struct xwmp_rtwq * xwrtwq)
@@ -84,7 +84,7 @@ void xwmp_rtwq_unlock_cpuirq(struct xwmp_rtwq * xwrtwq)
 
 /**
  * @brief 上锁等待队列，保存本地CPU的中断标志并关闭
- * @param xwrtwq: (I) 实时等待队列
+ * @param[in] xwrtwq: 实时等待队列
  */
 static __xwmp_inline
 void xwmp_rtwq_lock_cpuirqsv(struct xwmp_rtwq * xwrtwq, xwreg_t * cpuirq)
@@ -94,7 +94,7 @@ void xwmp_rtwq_lock_cpuirqsv(struct xwmp_rtwq * xwrtwq, xwreg_t * cpuirq)
 
 /**
  * @brief 解锁等待队列，恢复本地CPU的中断标志
- * @param xwrtwq: (I) 实时等待队列
+ * @param[in] xwrtwq: 实时等待队列
  */
 static __xwmp_inline
 void xwmp_rtwq_unlock_cpuirqrs(struct xwmp_rtwq * xwrtwq, xwreg_t cpuirq)
@@ -104,7 +104,7 @@ void xwmp_rtwq_unlock_cpuirqrs(struct xwmp_rtwq * xwrtwq, xwreg_t cpuirq)
 
 /**
  * @brief 检测等待队列是否为空
- * @param xwrtwq: (I) 实时等待队列
+ * @param[in] xwrtwq: 实时等待队列
  * @return 布尔值
  * @retval true: 空
  * @retval false: 非空

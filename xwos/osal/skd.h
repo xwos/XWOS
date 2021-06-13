@@ -17,6 +17,11 @@
 #include <xwos/osal/jack/skd.h>
 
 /**
+ * @defgroup xwos_skd 调度
+ * @{
+ */
+
+/**
  * @brief XWOS API：线程对象
  */
 struct xwos_thd {
@@ -42,7 +47,7 @@ typedef struct {
 #define XWOS_THD_NILD ((xwos_thd_d){NULL, 0,})
 
 /**
- * @defgroup xwos_skdattr_em
+ * @defgroup xwos_skdattr_em 线程属性
  * @{
  */
 /**
@@ -60,7 +65,7 @@ typedef struct {
  */
 #define XWOS_SKDATTR_JOINABLE XWOSDL_SKDATTR_JOINABLE
 /**
- * @}
+ * @} xwos_skdattr_em
  */
 
 /**
@@ -111,7 +116,7 @@ struct xwos_thd_desc {
 #define XWOS_SKD_PRIORITY_DROP(base, dec)       XWOSDL_SKD_PRIORITY_DROP(base, dec)
 
 /**
- * @defgroup xwos_skd_context_em
+ * @defgroup xwos_skd_context_em 上下文枚举
  * @{
  */
 /**
@@ -139,7 +144,7 @@ struct xwos_thd_desc {
  */
 #define XWOS_SKD_CONTEXT_IDLE           XWOSDL_SKD_CONTEXT_IDLE
 /**
- * @}
+ * @} xwos_skd_context_em
  */
 
 /**
@@ -149,7 +154,7 @@ struct xwos_thd_desc {
 
 /**
  * @brief XWOS API：检查优先级是否有效
- * @param prio: (I) 优先级
+ * @param[in] prio: 优先级
  * @return 布尔值
  * @retval true: 是
  * @retval false: 否
@@ -194,9 +199,9 @@ xwid_t xwos_skd_id_lc(void)
 
 /**
  * @brief XWOS API：获取当前上下文
- * @param ctxbuf: (O) 指向缓冲区的指针，通过此缓冲区返回当前上下文，
- *                    返回值@ref xwos_skd_context_em
- * @param irqnbuf: (O) 指向缓冲区的指针，通过此缓冲区返回中断号
+ * @param[out] ctxbuf: 指向缓冲区的指针，通过此缓冲区返回当前上下文，
+ *  返回值@ref xwos_skd_context_em
+ * @param[out] irqnbuf: 指向缓冲区的指针，通过此缓冲区返回中断号
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -278,14 +283,14 @@ void xwos_skd_enpmpt_lc(void)
 
 /**
  * @brief XWOS API：静态方式初始化线程
- * @param thd: (I) 线程对象的指针
- * @param name: (I) 线程的名字
- * @param mainfunc: (I) 线程函数的指针
- * @param arg: (I) 线程函数的参数
- * @param stack: (I) 线程栈的首地址指针
- * @param stack_size: (I) 线程栈的大小，以字节(byte)为单位
- * @param priority: (I) 线程的优先级
- * @param attr: (I) 线程属性
+ * @param[in] thd: 线程对象的指针
+ * @param[in] name: 线程的名字
+ * @param[in] mainfunc: 线程函数的指针
+ * @param[in] arg: 线程函数的参数
+ * @param[in] stack: 线程栈的首地址指针
+ * @param[in] stack_size: 线程栈的大小，以字节(byte)为单位
+ * @param[in] priority: 线程的优先级
+ * @param[in] attr: 线程属性
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -316,13 +321,13 @@ xwer_t xwos_thd_init(struct xwos_thd * thd,
 
 /**
  * @brief XWOS API：动态方式创建线程并初始化
- * @param thd: (O) 指向缓冲区的指针，通过此缓冲区返回线程对象的指针
- * @param name: (I) 线程的名字
- * @param mainfunc: (I) 线程函数的指针
- * @param arg: (I) 线程函数的参数
- * @param stack_size: (I) 线程栈的大小，以字节(byte)为单位
- * @param priority: (I) 线程的优先级
- * @param attr: (I) 线程属性
+ * @param[out] thd: 指向缓冲区的指针，通过此缓冲区返回线程对象的指针
+ * @param[in] name: 线程的名字
+ * @param[in] mainfunc: 线程函数的指针
+ * @param[in] arg: 线程函数的参数
+ * @param[in] stack_size: 线程栈的大小，以字节(byte)为单位
+ * @param[in] priority: 线程的优先级
+ * @param[in] attr: 线程属性
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -351,7 +356,7 @@ xwer_t xwos_thd_create(struct xwos_thd ** thdbuf,
 
 /**
  * @brief XWOS API：获取线程对象的标签
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  * @return 线程对象的标签
  * @note
  * - 同步/异步：同步
@@ -366,7 +371,7 @@ xwsq_t xwos_thd_gettik(struct xwos_thd * thd)
 
 /**
  * @brief XWOS API：获取线程对象的描述符
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  * @return 线程对象的描述符
  * @note
  * - 同步/异步：同步
@@ -385,7 +390,7 @@ xwos_thd_d xwos_thd_getd(struct xwos_thd * thd)
 
 /**
  * @brief XWOS API：检查线程对象的标签并增加引用计数
- * @param thdd: (I) 线程对象的描述符
+ * @param[in] thdd: 线程对象的描述符
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -403,7 +408,7 @@ xwer_t xwos_thd_acquire(xwos_thd_d thdd)
 
 /**
  * @brief XWOS API：检查对象的标签并减少引用计数
- * @param thdd: (I) 线程对象的描述符
+ * @param[in] thdd: 线程对象的描述符
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -421,7 +426,7 @@ xwer_t xwos_thd_release(xwos_thd_d thdd)
 
 /**
  * @brief XWOS API：增加线程对象的引用计数
- * @param thd: (I) 线程对象指针
+ * @param[in] thd: 线程对象指针
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -438,7 +443,7 @@ xwer_t xwos_thd_grab(struct xwos_thd * thd)
 
 /**
  * @brief XWOS API：减少线程对象的引用计数
- * @param thd: (I) 线程对象指针
+ * @param[in] thd: 线程对象指针
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -455,9 +460,9 @@ xwer_t xwos_thd_put(struct xwos_thd * thd)
 
 /**
  * @brief XWOS API：终止线程并等待它的返回值，最后回收线程资源
- * @param thd: (I) 线程对象的指针
- * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回子线程的返回值，
- *                 可为NULL，表示不需要获取返回值
+ * @param[in] thd: 线程对象的指针
+ * @param[out] trc: 指向缓冲区的指针，通过此缓冲区返回子线程的返回值，
+ *  可为NULL，表示不需要获取返回值
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -478,7 +483,7 @@ xwer_t xwos_thd_stop(struct xwos_thd * thd, xwer_t * trc)
 
 /**
  * @brief XWOS API：取消线程
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @note
@@ -500,9 +505,9 @@ xwer_t xwos_thd_cancel(struct xwos_thd * thd)
 
 /**
  * @brief XWOS API：等待线程结束并获取它的返回值，最后回收线程资源
- * @param thd: (I) 线程对象的指针
- * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回子线程的返回值，
- *                 可为NULL，表示不需要获取返回值
+ * @param[in] thd: 线程对象的指针
+ * @param[out] trc: 指向缓冲区的指针，通过此缓冲区返回子线程的返回值，
+ *  可为NULL，表示不需要获取返回值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 线程不是Joinable的
@@ -525,7 +530,7 @@ xwer_t xwos_thd_join(struct xwos_thd * thd, xwer_t * trc)
 
 /**
  * @brief XWMP API：分离线程
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @note
@@ -544,7 +549,7 @@ xwer_t xwos_thd_detach(struct xwos_thd * thd)
 
 /**
  * @brief XWOS API：中断线程的睡眠或阻塞状态
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -559,8 +564,8 @@ xwer_t xwos_thd_intr(struct xwos_thd * thd)
 
 /**
  * @brief XWOS API：将线程迁移到目标CPU
- * @param thd: (I) 线程对象的指针
- * @param dstcpu: (I) 目标CPU的ID
+ * @param[in] thd: 线程对象的指针
+ * @param[in] dstcpu: 目标CPU的ID
  * @return 错误码
  * @note
  * - 同步/异步：异步
@@ -602,7 +607,7 @@ void xwos_cthd_yield(void)
 
 /**
  * @brief XWOS API：退出当前线程
- * @param rc: (I) 线程退出时的返回值
+ * @param[in] rc: 线程退出时的返回值
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -662,7 +667,7 @@ bool xwos_cthd_shld_stop(void)
 /**
  * @brief XWOS API：判断当前线程是否可被冻结，如果是，就冻结线程，
  *                  之后再判断线程是否可以退出
- * @param frozen (O) 指向缓冲区的指针，通过此缓冲区返回线程是否被冻结过
+ * @param[out] frozen: 指向缓冲区的指针，通过此缓冲区返回线程是否被冻结过
  * @return 布尔值
  * @retval true: 可以退出
  * @retval false: 不能退出
@@ -690,17 +695,16 @@ bool xwos_cthd_frz_shld_stop(bool * frozen)
 
 /**
  * @brief XWOS API：当前线程睡眠一段时间
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的睡眠时间
+ * + (O) 作为输出时，返回剩余的睡眠时间
  * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EINTR: 睡眠过程被中断
+ * @retval XWOK: 没有错误，指针xwtm指向的缓冲区内的睡眠时间减为0
+ * @retval -EINTR: 睡眠过程被中断，指针xwtm指向的缓冲区返回剩余的时间
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
- * - 超时后将以返回值OK返回，并且**xwtm**指向缓冲区返回0。
  */
 static __xwos_inline_api
 xwer_t xwos_cthd_sleep(xwtm_t * xwtm)
@@ -710,11 +714,10 @@ xwer_t xwos_cthd_sleep(xwtm_t * xwtm)
 
 /**
  * @brief XWOS API：当前线程从一个时间起点睡眠到另一个时间点
- * @param origin: 指向缓冲区的指针，此缓冲区：
- *                (I) 作为输入时，作为时间起点
- *                (O) 作为输出时，返回线程被唤醒的时间
- *                    （可作为下一次时间起点，形成精确的周期）
- * @param inc: (I) 期望被唤醒的时间增量（相对于时间原点）
+ * @param[in,out] origin: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，作为时间起点
+ * + (O) 作为输出时，返回线程被唤醒的时间（可作为下一次时间起点，形成精确的周期）
+ * @param[in] inc: 期望被唤醒的时间增量（相对于时间原点）
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINTR: 睡眠过程被中断
@@ -746,9 +749,9 @@ xwer_t xwos_cthd_freeze(void)
 #if (XWOS_THD_LOCAL_DATA_NUM > 0U)
 /**
  * @brief XWOS API：设置线程的本地数据指针
- * @param thd: (I) 线程对象的指针
- * @param pos: (I) 数据存放位置的索引
- * @param data: (I) 数据指针
+ * @param[in] thd: 线程对象的指针
+ * @param[in] pos: 数据存放位置的索引
+ * @param[in] data: 数据指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -766,9 +769,9 @@ xwer_t xwos_thd_set_data(struct xwos_thd * thd, xwsq_t pos, void * data)
 
 /**
  * @brief XWOS API：获取线程的本地数据指针
- * @param thd: (I) 线程对象的指针
- * @param pos: (I) 数据存放位置的索引
- * @param databuf: (O) 指向缓冲区的指针，通过此缓冲区返回数据指针
+ * @param[in] thd: 线程对象的指针
+ * @param[in] pos: 数据存放位置的索引
+ * @param[out] databuf: 指向缓冲区的指针，通过此缓冲区返回数据指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -786,8 +789,8 @@ xwer_t xwos_thd_get_data(struct xwos_thd * thd, xwsq_t pos, void ** databuf)
 
 /**
  * @brief XWOS API：设置当前线程的本地数据指针
- * @param pos: (I) 数据存放位置的索引
- * @param data: (I) 数据指针
+ * @param[in] pos: 数据存放位置的索引
+ * @param[in] data: 数据指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -805,8 +808,8 @@ xwer_t xwos_cthd_set_data(xwsq_t pos, void * data)
 
 /**
  * @brief XWOS API：获取当前线程的本地数据指针
- * @param pos: (I) 数据存放位置的索引
- * @param databuf: (O) 指向缓冲区的指针，通过此缓冲区返回数据指针
+ * @param[in] pos: 数据存放位置的索引
+ * @param[out] databuf: 指向缓冲区的指针，通过此缓冲区返回数据指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -823,5 +826,9 @@ xwer_t xwos_cthd_get_data(xwsq_t pos, void ** databuf)
 
 }
 #endif /* XWOS_THD_LOCAL_DATA_NUM */
+
+/**
+ * @} xwos_skd
+ */
 
 #endif /* xwos/osal/skd.h */

@@ -47,7 +47,7 @@ void xwds_eeprom_destruct(struct xwds_eeprom * eeprom);
 
 /**
  * @brief EEPROM API：增加对象的引用计数
- * @param eeprom: (I) I2C EEPROM对象指针
+ * @param[in] eeprom: I2C EEPROM对象指针
  * @return 错误码
  * @retval @ref xwds_i2cp_grab()
  */
@@ -59,7 +59,7 @@ xwer_t xwds_eeprom_grab(struct xwds_eeprom * eeprom)
 
 /**
  * @brief EEPROM API：减少对象的引用计数
- * @param eeprom: (I) I2C EEPROM对象指针
+ * @param[in] eeprom: I2C EEPROM对象指针
  * @return 错误码
  * @retval @ref xwds_i2cp_put()
  */

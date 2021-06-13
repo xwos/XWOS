@@ -16,6 +16,11 @@
 #include <xwos/standard.h>
 
 /**
+ * @defgroup CRC32 CRC32
+ * @{
+ */
+
+/**
  * @brief 计算CRC32的移位方向枚举
  */
 enum xwlib_crc32_shift_direction_em {
@@ -28,5 +33,9 @@ xwer_t xwlib_crc32_cal(xwu32_t * crc32, xwu32_t xorout,
                        xwu32_t plynml, xwu32_t direction,
                        const xwu8_t stream[], xwsz_t * size);
 xwu32_t xwlib_crc32_calms(const xwu8_t stream[], xwsz_t * size);
+
+/**
+ * @} CRC32
+ */
 
 #endif /* xwos/lib/crc32.h */

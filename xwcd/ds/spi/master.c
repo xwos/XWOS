@@ -58,7 +58,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_spim_vop = {
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：SPI主机模式控制器对象的构造函数
- * @param spim: (I) SPI主机模式控制器对象指针
+ * @param[in] spim: SPI主机模式控制器对象指针
  */
 __xwds_api
 void xwds_spim_construct(struct xwds_spim * spim)
@@ -69,7 +69,7 @@ void xwds_spim_construct(struct xwds_spim * spim)
 
 /**
  * @brief XWDS API：SPI主机模式控制器对象的析构函数
- * @param spim: (I) SPI主机模式控制器对象指针
+ * @param[in] spim: SPI主机模式控制器对象指针
  */
 __xwds_api
 void xwds_spim_destruct(struct xwds_spim * spim)
@@ -83,7 +83,7 @@ void xwds_spim_destruct(struct xwds_spim * spim)
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测设备
- * @param spim: (I) SPI主机模式控制器对象指针
+ * @param[in] spim: SPI主机模式控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -109,7 +109,7 @@ err_xfer_apimtx_init:
 
 /**
  * @brief XWDS VOP：删除设备
- * @param spim: (I) SPI主机模式控制器对象指针
+ * @param[in] spim: SPI主机模式控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -131,7 +131,7 @@ err_dev_vop_remove:
 
 /**
  * @brief XWDS VOP：启动设备
- * @param spim: (I) SPI主机模式控制器对象指针
+ * @param[in] spim: SPI主机模式控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -145,7 +145,7 @@ xwer_t xwds_spim_vop_start(struct xwds_spim * spim)
 
 /**
  * @brief XWDS VOP：停止设备
- * @param spim: (I) SPI主机模式控制器对象指针
+ * @param[in] spim: SPI主机模式控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -161,7 +161,7 @@ xwer_t xwds_spim_vop_stop(struct xwds_spim * spim)
 /******** ******** pm ******** ********/
 /**
  * @brief XWDS VOP：暂停设备
- * @param spim: (I) SPI主机模式控制器对象指针
+ * @param[in] spim: SPI主机模式控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -175,7 +175,7 @@ xwer_t xwds_spim_vop_suspend(struct xwds_spim * spim)
 
 /**
  * @brief XWDS VOP：继续设备
- * @param spim: (I) SPI主机模式控制器对象指针
+ * @param[in] spim: SPI主机模式控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -191,11 +191,11 @@ xwer_t xwds_spim_vop_resume(struct xwds_spim * spim)
 /******** ******** ******** SPI Master Device APIs ******** ******** ********/
 /**
  * @brief XWDS API：配置总线
- * @param spim: (I) SPI主机模式控制器对象指针
- * @param cfgid: (I) 总线配置ID
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] spim: SPI主机模式控制器对象指针
+ * @param[in] cfgid: 总线配置ID
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENOSYS: 不支持配置总线操作
@@ -257,13 +257,13 @@ err_spim_grab:
 
 /**
  * @brief XWDS API：启动SPI总线传输
- * @param spim: (I) SPI主机模式控制器对象指针
- * @param txd: (I) 发送数据缓冲区，可为NULL表示不发送数据
- * @param rxb: (O) 接收数据缓冲区，可为NULL表示不接收数据
- * @param size: (I) 传输数据的大小
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] spim: SPI主机模式控制器对象指针
+ * @param[in] txd: 发送数据缓冲区，可为NULL表示不发送数据
+ * @param[out] rxb: 接收数据缓冲区，可为NULL表示不接收数据
+ * @param[in] size: 传输数据的大小
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -316,7 +316,7 @@ err_spim_grab:
 
 /**
  * @brief XWDS API：中止SPI总线传输
- * @param spim: (I) SPI主机控制器对象指针
+ * @param[in] spim: SPI主机控制器对象指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 设备对象不可引用

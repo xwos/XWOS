@@ -8,13 +8,6 @@
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * @note
- * + 版本号规则: M.m.r
- *   - M: 大版本号
- *   - m: 小版本号
- *     + 奇数：开发版
- *     + 偶数：稳定版
- *   - r: 修正号
  */
 
 #ifndef __xwos_lib_version_h__
@@ -25,15 +18,22 @@
 #endif
 
 /**
- * @defgroup XuanWuOS_Version_definition
+ * @defgroup XuanWuOS版本号
  * @{
  */
+/**
+ * @page XuanWuOS_Version XuanWuOS版本号
+ * #### 版本号规则: M.m.r
+ *   - M: 大版本号
+ *   - m: 小版本号
+ *     + 奇数：开发版
+ *     + 偶数：稳定版
+ *   - r: 修正号
+ */
+
 #define XWOS_VERSION_MAJOR              1
 #define XWOS_VERSION_MINOR              9
 #define XWOS_VERSION_REVISION           0
-/**
- * @}
- */
 
 /**
  * @brief XWOS的版本号（数值形式）
@@ -53,5 +53,9 @@
 
 #define XWOS_COPYRIGHT "玄武OS " XWOS_VER_STR \
         "  Copyright (C) 2015-2021 http://xwos.tech, Roy.Sun"
+
+/**
+ * @} XuanWuOS版本号
+ */
 
 #endif /* xwos/lib/version.h */

@@ -56,7 +56,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_i2cp_vop = {
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：I2C外设的构造函数
- * @param i2cp: (I) I2C外设对象指针
+ * @param[in] i2cp: I2C外设对象指针
  */
 __xwds_api
 void xwds_i2cp_construct(struct xwds_i2cp * i2cp)
@@ -67,7 +67,7 @@ void xwds_i2cp_construct(struct xwds_i2cp * i2cp)
 
 /**
  * @brief XWDS API：I2C外设的构造函数
- * @param i2cp: (I) I2C外设对象指针
+ * @param[in] i2cp: I2C外设对象指针
  */
 __xwds_api
 void xwds_i2cp_destruct(struct xwds_i2cp * i2cp)
@@ -78,7 +78,7 @@ void xwds_i2cp_destruct(struct xwds_i2cp * i2cp)
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测I2C外设
- * @param i2cp: (I) I2C外设对象指针
+ * @param[in] i2cp: I2C外设对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -98,7 +98,7 @@ err_dev_vop_probe:
 
 /**
  * @brief XWDS VOP：移除I2C外设
- * @param i2cp: (I) I2C外设对象指针
+ * @param[in] i2cp: I2C外设对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -120,7 +120,7 @@ err_dev_vop_remove:
 
 /**
  * @brief XWDS VOP：启动I2C外设
- * @param i2cp: (I) I2C外设对象指针
+ * @param[in] i2cp: I2C外设对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -150,7 +150,7 @@ err_i2cm_grab:
 
 /**
  * @brief XWDS VOP：停止I2C外设
- * @param i2cp: (I) I2C外设对象指针
+ * @param[in] i2cp: I2C外设对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -175,7 +175,7 @@ err_dev_vop_stop:
 /******** ******** pm ******** ********/
 /**
  * @brief XWDS VOP：暂停I2C外设
- * @param i2cp: (I) I2C外设对象指针
+ * @param[in] i2cp: I2C外设对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -198,7 +198,7 @@ err_dev_vop_suspend:
 
 /**
  * @brief XWDS VOP：继续I2C外设
- * @param i2cp: (I) I2C外设对象指针
+ * @param[in] i2cp: I2C外设对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -230,9 +230,9 @@ err_i2cm_grab:
 /******** ******** ******** APIs ******** ******** ********/
 /**
  * @brief XWDS API：I2C外设输入、输出、控制
- * @param i2cp: (I) I2C外设对象指针
- * @param cmd: (I) 命令
- * @param ...: (I) 参数表
+ * @param[in] i2cp: I2C外设对象指针
+ * @param[in] cmd: 命令
+ * @param[in] ...: 参数表
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENOSYS: 无效CMD

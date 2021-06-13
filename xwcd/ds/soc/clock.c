@@ -24,8 +24,8 @@
 
 /**
  * @brief XWDS API：申请时钟
- * @param soc: (I) SOC对象指针
- * @param id: (I) 时钟ID
+ * @param[in] soc: SOC对象指针
+ * @param[in] id: 时钟ID
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ERANGE: 时钟ID错误
@@ -68,8 +68,8 @@ err_soc_grab:
 
 /**
  * @brief XWDS API：释放时钟
- * @param soc: (I) SOC对象指针
- * @param id: (I) 时钟ID
+ * @param[in] soc: SOC对象指针
+ * @param[in] id: 时钟ID
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ERANGE: 时钟ID错误
@@ -107,11 +107,12 @@ err_drv_clk_rls:
 
 /**
  * @brief XWDS API：获取时钟频率
- * @param soc: (I) SOC对象指针
- * @param id: (I) 时钟ID
- * @param buf: (O) 返回时钟频率的缓冲区的指针
- * @param num: (I) 缓冲区数组的数量
- *             (O) 返回的数组的数量
+ * @param[in] soc: SOC对象指针
+ * @param[in] id: 时钟ID
+ * @param[out] buf: 返回时钟频率的缓冲区的指针
+ * @param[in,out] num: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示缓冲区数组的数量
+ * + (O) 作为输出时，返回实际的频率数据的数量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针

@@ -62,8 +62,8 @@ const __xwmp_rodata char xwmp_swt_cache_name[] = "xwos.mp.swt.cache";
 #if defined(XWMPCFG_SKD_SWT_MEMSLICE) && (1 == XWMPCFG_SKD_SWT_MEMSLICE)
 /**
  * @brief XWMP INIT CODE：初始化软件定时器对象缓存
- * @param zone_origin: (I) 内存区域首地址
- * @param zone_size: (I) 内存区域大小
+ * @param[in] zone_origin: 内存区域首地址
+ * @param[in] zone_size: 内存区域大小
  * @return 错误码
  * @note
  * - 重入性：只可在系统初始化时使用一次
@@ -128,7 +128,7 @@ struct xwmp_swt * xwmp_swt_alloc(void)
 
 /**
  * @brief 释放软件定时器对象
- * @param swt: (I) 软件定时器对象的指针
+ * @param[in] swt: 软件定时器对象的指针
  */
 static __xwmp_code
 void xwmp_swt_free(struct xwmp_swt * swt)
@@ -146,7 +146,7 @@ void xwmp_swt_free(struct xwmp_swt * swt)
 
 /**
  * @brief 软件定时器对象的构造函数
- * @param swt: (I) 软件定时器对象的指针
+ * @param[in] swt: 软件定时器对象的指针
  */
 static __xwmp_code
 void xwmp_swt_construct(struct xwmp_swt * swt)
@@ -163,7 +163,7 @@ void xwmp_swt_construct(struct xwmp_swt * swt)
 
 /**
  * @brief 软件定时器对象的析构函数
- * @param swt: (I) 软件定时器对象的指针
+ * @param[in] swt: 软件定时器对象的指针
  */
 static __xwmp_code
 void xwmp_swt_destruct(struct xwmp_swt * swt)
@@ -176,7 +176,7 @@ void xwmp_swt_destruct(struct xwmp_swt * swt)
 
 /**
  * @brief 软件定时器对象的垃圾回收函数
- * @param swt: (I) 软件定时器对象的指针
+ * @param[in] swt: 软件定时器对象的指针
  * @return 错误码
  */
 static __xwmp_code
@@ -186,16 +186,6 @@ xwer_t xwmp_swt_gc(void * swt)
         return XWOK;
 }
 
-/**
- * @brief XWMP API：检查软件定时器对象的标签并增加引用计数
- * @param swt: (I) 软件定时器对象指针
- * @param tik: (I) 标签
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_swt_acquire(struct xwmp_swt * swt, xwsq_t tik)
 {
@@ -203,16 +193,6 @@ xwer_t xwmp_swt_acquire(struct xwmp_swt * swt, xwsq_t tik)
         return xwos_object_acquire(&swt->xwobj, tik);
 }
 
-/**
- * @brief XWMP API：检查软件定时器对象的标签并增加引用计数
- * @param swt: (I) 软件定时器对象指针
- * @param tik: (I) 标签
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_swt_release(struct xwmp_swt * swt, xwsq_t tik)
 {
@@ -220,15 +200,6 @@ xwer_t xwmp_swt_release(struct xwmp_swt * swt, xwsq_t tik)
         return xwos_object_release(&swt->xwobj, tik);
 }
 
-/**
- * @brief XWMP API：增加软件定时器对象的引用计数
- * @param swt: (I) 软件定时器控制块对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_swt_grab(struct xwmp_swt * swt)
 {
@@ -236,15 +207,6 @@ xwer_t xwmp_swt_grab(struct xwmp_swt * swt)
         return xwos_object_grab(&swt->xwobj);
 }
 
-/**
- * @brief XWMP API：减少软件定时器对象的引用计数
- * @param swt: (I) 软件定时器控制块对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_swt_put(struct xwmp_swt * swt)
 {
@@ -254,10 +216,10 @@ xwer_t xwmp_swt_put(struct xwmp_swt * swt)
 
 /**
  * @brief 激活软件定时器对象
- * @param swt: (I) 软件定时器对象的指针
- * @param name: (I) 名字
- * @param flag: (I) 标志
- * @param gcfunc: (I) 垃圾回收函数：当对象应用计数为0，调用此函数回收资源。
+ * @param[in] swt: 软件定时器对象的指针
+ * @param[in] name: 名字
+ * @param[in] flag: 标志
+ * @param[in] gcfunc: 垃圾回收函数：当对象应用计数为0，调用此函数回收资源。
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -289,17 +251,6 @@ err_xwobj_activate:
         return rc;
 }
 
-/**
- * @brief XWMP API：静态方式初始化软件定时器
- * @param swt: (I) 软件定时器对象的指针
- * @param name: (I) 名字
- * @param flag: (I) 标志
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwmp_api
 xwer_t xwmp_swt_init(struct xwmp_swt * swt,
                      const char * name,
@@ -312,15 +263,6 @@ xwer_t xwmp_swt_init(struct xwmp_swt * swt,
         return xwmp_swt_activate(swt, name, flag, NULL);
 }
 
-/**
- * @brief XWMP API：销毁静态方式初始化的软件定时器对象
- * @param swt: (I) 软件定时器对象的指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwmp_api
 xwer_t xwmp_swt_destroy(struct xwmp_swt * swt)
 {
@@ -330,20 +272,6 @@ xwer_t xwmp_swt_destroy(struct xwmp_swt * swt)
         return xwmp_swt_put(swt);
 }
 
-/**
- * @brief XWMP API：动态创建软件定时器对象
- * @param ptrbuf: (O) 指向缓冲区的指针，此缓冲区用于返回软件定时器对象的指针
- * @param name: (I) 名字
- * @param flag: (I) 标志
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwmp_api
 xwer_t xwmp_swt_create(struct xwmp_swt ** ptrbuf,
                        const char * name,
@@ -373,17 +301,6 @@ err_swt_alloc:
         return rc;
 }
 
-/**
- * @brief XWMP API：删除动态创建的软件定时器对象
- * @param swt: (I) 软件定时器对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwmp_api
 xwer_t xwmp_swt_delete(struct xwmp_swt * swt)
 {
@@ -395,7 +312,7 @@ xwer_t xwmp_swt_delete(struct xwmp_swt * swt)
 
 /**
  * @brief 软件定时器的时间树节点回调函数
- * @param entry: (I) 软件定时器对象的指针
+ * @param[in] entry: 软件定时器对象的指针
  */
 static __xwmp_code
 void xwmp_swt_ttn_cb(void * entry)
@@ -424,22 +341,6 @@ void xwmp_swt_ttn_cb(void * entry)
         }/* else {} */
 }
 
-/**
- * @brief XWMP API：开启软件定时器
- * @param swt: (I) 软件定时器对象的指针
- * @param base: (I) 定时器初始时间
- * @param period: (I) 周期
- * @param cb: (I) 定时器回调函数
- * @param arg: (I) 定时器回调函数的参数
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EINVAL: 无效参数
- * @retval -EALREADY: 定时器已经开启
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwmp_api
 xwer_t xwmp_swt_start(struct xwmp_swt * swt,
                       xwtm_t base, xwtm_t period,
@@ -478,17 +379,6 @@ err_already:
         return rc;
 }
 
-/**
- * @brief XWMP API：停止软件定时器
- * @param swt: (I) 软件定时器对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -ESRCH: 定时器没有被开启
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwmp_api
 xwer_t xwmp_swt_stop(struct xwmp_swt * swt)
 {

@@ -67,12 +67,12 @@ xwer_t xwpcp_gc(void * obj);
 
 /**
  * @brief XWPCP API: 启动XWPCP
- * @param xwpcp: (I) XWPCP对象的指针
- * @param name: (I) XWPCP实例的名字
- * @param hwifops: (I) 硬件接口抽象层操作函数集合
- * @param hwifcb: (I) 硬件接口控制块指针
- * @param mem: (I) 连续的内存块，大小必须为@ref XWPCP_MEMPOOL_SIZE
- * @param memsize: (I) 连续的内存块大小，值必须为@ref XWPCP_MEMPOOL_SIZE
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] name: XWPCP实例的名字
+ * @param[in] hwifops: 硬件接口抽象层操作函数集合
+ * @param[in] hwifcb: 硬件接口控制块指针
+ * @param[in] mem: 连续的内存块，大小必须为@ref XWPCP_MEMPOOL_SIZE
+ * @param[in] memsize: 连续的内存块大小，值必须为@ref XWPCP_MEMPOOL_SIZE
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -233,7 +233,7 @@ err_bma_init:
 
 /**
  * @brief XWPCP API: 停止XWPCP
- * @param xwpcp: (I) XWPCP对象的指针
+ * @param[in] xwpcp: XWPCP对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -252,7 +252,7 @@ xwer_t xwpcp_stop(struct xwpcp * xwpcp)
 
 /**
  * @brief XWPCP的垃圾回收函数
- * @param obj: (I) XWPCP对象的指针
+ * @param[in] obj: XWPCP对象的指针
  * @return 错误码
  */
 static __xwmd_code
@@ -327,10 +327,10 @@ struct xwpcp_txcb_arg {
 
 /**
  * @brief 用于实现@ref xwpcp_tx()的通知发送结果的回调函数
- * @param xwpcp: (I) XWPCP对象的指针
- * @param txh: (I) 发送句柄
- * @param rc: (I) 发送结果
- * @param arg: (I) 回调函数的参数（此处用于传递struct xwpcp_txcb_arg的指针）
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] txh: 发送句柄
+ * @param[in] rc: 发送结果
+ * @param[in] arg: 回调函数的参数（此处用于传递struct xwpcp_txcb_arg的指针）
  */
 static __xwmd_code
 void xwpcp_txcb_notify(struct xwpcp * xwpcp, xwpcp_txh_t txh, xwer_t rc, void * arg)
@@ -353,17 +353,17 @@ void xwpcp_txcb_notify(struct xwpcp * xwpcp, xwpcp_txh_t txh, xwer_t rc, void * 
 /**
  * @brief XWPCP API: 在限定的时间内，将一条用户数据加入到XWPCP的发送队列中，
  *                   并等待发送结果
- * @param xwpcp: (I) XWPCP对象的指针
- * @param data: (I) 数据缓冲区的指针
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示数据长度
- *              (O) 作为输出时，返回实际发送的数据长度
- * @param pri: (I) 用户数据的优先级
- * @param port: (I) 端口
- * @param qos: (I) 服务质量
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] data: 数据缓冲区的指针
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示数据长度
+ * + (O) 作为输出时，返回实际发送的数据长度
+ * @param[in] pri: 用户数据的优先级
+ * @param[in] port: 端口
+ * @param[in] qos: 服务质量
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -456,17 +456,17 @@ err_ifnotrdy:
 
 /**
  * @brief XWPCP API: 将一条用户数据加入到XWPCP的发送队列中
- * @param xwpcp: (I) XWPCP对象的指针
- * @param data: (I) 数据缓冲区的指针
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示数据长度
- *              (O) 作为输出时，返回实际入队的数据长度
- * @param pri: (I) 优先级
- * @param port: (I) 端口
- * @param qos: (I) 服务质量
- * @param ntfcb: (I) 通知发送结果的回调函数
- * @param cbarg: (I) 调用回调函数时的用户数据
- * @param txhbuf: (O) 指向缓冲区的指针，通过此缓冲区返回发送句柄
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] data: 数据缓冲区的指针
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示数据长度
+ * + (O) 作为输出时，返回实际入队的数据长度
+ * @param[in] pri: 优先级
+ * @param[in] port: 端口
+ * @param[in] qos: 服务质量
+ * @param[in] ntfcb: 通知发送结果的回调函数
+ * @param[in] cbarg: 调用回调函数时的用户数据
+ * @param[out] txhbuf: 指向缓冲区的指针，通过此缓冲区返回发送句柄
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -518,8 +518,8 @@ err_ifnotrdy:
 
 /**
  * @brief XWPCP API: 中断发送
- * @param xwpcp: (I) XWPCP对象的指针
- * @param txh: (I) 发送句柄
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] txh: 发送句柄
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -548,7 +548,7 @@ xwer_t xwpcp_abort(struct xwpcp * xwpcp, xwpcp_txh_t txh)
 
 /**
  * @brief XWPCP API: 获取发送状态
- * @param txh: (I) 发送句柄
+ * @param[in] txh: 发送句柄
  * @return 发送状态，取值：@ref xwpcp_carrier_state_em
  * @note
  * - 同步/异步：同步
@@ -563,16 +563,16 @@ xwsq_t xwpcp_get_txstate(xwpcp_txh_t txh)
 
 /**
  * @brief XWPCP API: 接收消息，若接收队列为空，就限时等待
- * @param xwpcp: (I) XWPCP对象的指针
- * @param port: (I) 接收消息的端口
- * @param rxbuf: (O) 指向缓冲区的指针，此缓冲区用于接收消息
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示接收缓冲区的大小
- *              (O) 作为输出时，返回实际接收的消息大小
- * @param qos: (O) 指向缓冲区的指针，此缓冲区用于返回消息的QoS，可为NULL表示不关心QoS
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] port: 接收消息的端口
+ * @param[out] rxbuf: 指向缓冲区的指针，此缓冲区用于接收消息
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示接收缓冲区的大小
+ * + (O) 作为输出时，返回实际接收的消息大小
+ * @param[out] qos: 指向缓冲区的指针，此缓冲区用于返回消息的QoS，可为NULL表示不关心QoS
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -647,13 +647,13 @@ err_ifnotrdy:
 
 /**
  * @brief XWPCP API: 尝试接收消息，若接收队列为空，立即返回错误码
- * @param xwpcp: (I) XWPCP对象的指针
- * @param port: (I) 接收消息的端口
- * @param rxbuf: (O) 指向缓冲区的指针，此缓冲区用于接收消息
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示接收缓冲区的大小
- *              (O) 作为输出时，返回实际接收的消息大小
- * @param qos: (O) 指向缓冲区的指针，此缓冲区用于返回消息的QoS，可为NULL表示不关心QoS
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] port: 接收消息的端口
+ * @param[out] rxbuf: 指向缓冲区的指针，此缓冲区用于接收消息
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示接收缓冲区的大小
+ * + (O) 作为输出时，返回实际接收的消息大小
+ * @param[out] qos: 指向缓冲区的指针，此缓冲区用于返回消息的QoS，可为NULL表示不关心QoS
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针

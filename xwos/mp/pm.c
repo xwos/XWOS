@@ -25,7 +25,7 @@ __xwmp_data struct xwmp_pmdm xwmp_pmdm = {
 
 /**
  * @brief 初始化电源管理领域
- * @param pmdm: (I) 电源管理领域控制块指针
+ * @param[in] pmdm: 电源管理领域控制块指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -41,11 +41,11 @@ void xwmp_pmdm_init(void)
 
 /**
  * @brief XWMP PM API：设置电源管理领域的回调函数
- * @param resume_cb: (I) 电源管理领域从暂停模式恢复的回调函数
- * @param suspend_cb: (I) 电源管理领域进入暂停模式的回调函数
- * @param wakeup_cb: (I) 唤醒电源管理领域的回调函数
- * @param sleep_cb: (I) 电源管理领域休眠的回调函数
- * @param arg: (I) 回调函数调用时的参数
+ * @param[in] resume_cb: 电源管理领域从暂停模式恢复的回调函数
+ * @param[in] suspend_cb: 电源管理领域进入暂停模式的回调函数
+ * @param[in] wakeup_cb: 唤醒电源管理领域的回调函数
+ * @param[in] sleep_cb: 电源管理领域休眠的回调函数
+ * @param[in] arg: 回调函数调用时的参数
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -177,7 +177,7 @@ xwsq_t xwmp_pmdm_get_stage(void)
 
 /**
  * @brief 增加已暂停的调度器的数量
- * @param pmdm: (I) 电源管理领域控制块指针
+ * @param[in] pmdm: 电源管理领域控制块指针
  */
 __xwmp_code
 void xwmp_pmdm_report_xwskd_suspended(struct xwmp_pmdm * pmdm)
@@ -219,7 +219,7 @@ void xwmp_pmdm_report_xwskd_suspended(struct xwmp_pmdm * pmdm)
 
 /**
  * @brief 减少已暂停的调度器的数量
- * @param pmdm: (I) 电源管理领域控制块指针
+ * @param[in] pmdm: 电源管理领域控制块指针
  */
 __xwmp_code
 void xwmp_pmdm_report_xwskd_resuming(struct xwmp_pmdm * pmdm)

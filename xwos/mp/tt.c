@@ -38,7 +38,7 @@ void xwmp_tt_bh(struct xwmp_tt * xwtt);
 
 /**
  * @brief 初始化时间树节点
- * @param ttn: (I) 时间树节点的指针
+ * @param[in] ttn: 时间树节点的指针
  */
 __xwmp_code
 void xwmp_ttn_init(struct xwmp_ttn * ttn, xwptr_t entry, xwptr_t type)
@@ -56,7 +56,7 @@ void xwmp_ttn_init(struct xwmp_ttn * ttn, xwptr_t entry, xwptr_t type)
 
 /**
  * @brief 增加对象的引用计数
- * @param ttn: (I) 时间树节点的指针
+ * @param[in] ttn: 时间树节点的指针
  * @return 错误码
  */
 __xwmp_code
@@ -68,7 +68,7 @@ xwer_t xwmp_ttn_grab(struct xwmp_ttn * ttn)
 
 /**
  * @brief 减少对象的引用计数
- * @param ttn: (I) 时间树节点的指针
+ * @param[in] ttn: 时间树节点的指针
  * @return 错误码
  */
 __xwmp_code
@@ -80,7 +80,7 @@ xwer_t xwmp_ttn_put(struct xwmp_ttn * ttn)
 
 /**
  * @brief 初始化时间树
- * @param xwtt: (I) 时间树的指针
+ * @param[in] xwtt: 时间树的指针
  */
 __xwmp_code
 xwer_t xwmp_tt_init(struct xwmp_tt * xwtt)
@@ -101,9 +101,9 @@ xwer_t xwmp_tt_init(struct xwmp_tt * xwtt)
 
 /**
  * @brief 加入节点到时间树
- * @param xwtt: (I) 时间树的指针
- * @param ttn: (I) 时间树节点的指针
- * @param cpuirq: (I) CPU中断开关标志
+ * @param[in] xwtt: 时间树的指针
+ * @param[in] ttn: 时间树节点的指针
+ * @param[in] cpuirq: CPU中断开关标志
  * @retval XWOK: 没有错误
  * @retval -EINTR: 被中断
  * @retval -ETIMEDOUT: 超时
@@ -203,8 +203,8 @@ retry:
 
 /**
  * @brief 从时间树中删除节点（节点有伙伴）
- * @param xwtt: (I) 时间树的指针
- * @param ttn: (I) 时间树节点的指针
+ * @param[in] xwtt: 时间树的指针
+ * @param[in] ttn: 时间树节点的指针
  * @note
  * - 此函数只能在获得写锁xwtt->lock，且CPU中断被关闭时调用。
  */
@@ -224,8 +224,8 @@ void xwmp_tt_rmrbb_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn)
 
 /**
  * @brief 从时间树中删除节点（节点无伙伴）
- * @param xwtt: (I) 时间树的指针
- * @param ttn: (I) 时间树节点的指针
+ * @param[in] xwtt: 时间树的指针
+ * @param[in] ttn: 时间树节点的指针
  * @note
  * - 此函数只能在获得写锁xwtt->lock，且CPU中断被关闭时调用。
  */
@@ -256,8 +256,8 @@ void xwmp_tt_rmrbn_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn)
 
 /**
  * @brief 从时间树中删除节点
- * @param xwtt: (I) 时间树的指针
- * @param ttn: (I) 时间树节点的指针
+ * @param[in] xwtt: 时间树的指针
+ * @param[in] ttn: 时间树节点的指针
  * @retval XWOK: 没有错误
  * @retval -ESRCH: 时间树中不存在该节点
  * @note
@@ -289,7 +289,7 @@ xwer_t xwmp_tt_remove_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn)
 
 /**
  * @brief 检查时间树中的超时节点
- * @param xwtt: (I) 时间树的指针
+ * @param[in] xwtt: 时间树的指针
  */
 __xwmp_isr
 xwer_t xwmp_tt_check_deadline(struct xwmp_tt * xwtt)
@@ -314,7 +314,7 @@ xwer_t xwmp_tt_check_deadline(struct xwmp_tt * xwtt)
 
 /**
  * @brief 时间树的中断底半部
- * @param xwtt: (I) 时间树的指针
+ * @param[in] xwtt: 时间树的指针
  */
 static __xwmp_bh
 void xwmp_tt_bh(struct xwmp_tt * xwtt)
@@ -341,7 +341,7 @@ void xwmp_tt_bh(struct xwmp_tt * xwtt)
 
 /**
  * @brief 获取时间树所属的调度器
- * @param xwtt: (I) 时间树的指针
+ * @param[in] xwtt: 时间树的指针
  * @return 调度器的指针
  */
 __xwmp_code
@@ -352,7 +352,7 @@ struct xwmp_skd * xwmp_tt_get_skd(struct xwmp_tt * xwtt)
 
 /**
  * @brief 初始化硬件定时器结构体
- * @param hwt: (I) 硬件定时器结构体的指针
+ * @param[in] hwt: 硬件定时器结构体的指针
  * @return 错误码
  */
 __xwmp_code
@@ -375,7 +375,7 @@ xwer_t xwmp_syshwt_init(struct xwmp_syshwt * hwt)
 
 /**
  * @brief 开启硬件定时器
- * @param hwt: (I) 硬件定时器结构体的指针
+ * @param[in] hwt: 硬件定时器结构体的指针
  * @return 错误码
  */
 __xwmp_code
@@ -386,7 +386,7 @@ xwer_t xwmp_syshwt_start(struct xwmp_syshwt * hwt)
 
 /**
  * @brief 关闭硬件定时器
- * @param hwt: (I) 硬件定时器结构体的指针
+ * @param[in] hwt: 硬件定时器结构体的指针
  */
 __xwmp_code
 xwer_t xwmp_syshwt_stop(struct xwmp_syshwt * hwt)
@@ -396,7 +396,7 @@ xwer_t xwmp_syshwt_stop(struct xwmp_syshwt * hwt)
 
 /**
  * @brief 获取系统滴答时间
- * @param hwt: (I) 硬件定时器结构体的指针
+ * @param[in] hwt: 硬件定时器结构体的指针
  * @return 系统滴答时间
  * @note
  * - 同步/异步：同步
@@ -418,7 +418,7 @@ xwtm_t xwmp_syshwt_get_timetick(struct xwmp_syshwt * hwt)
 
 /**
  * @brief 获取系统滴答计数
- * @param hwt: (I) 硬件定时器结构体的指针
+ * @param[in] hwt: 硬件定时器结构体的指针
  * @return 系统滴答计数
  * @note
  * - 同步/异步：同步
@@ -433,7 +433,7 @@ xwu64_t xwmp_syshwt_get_tickcount(struct xwmp_syshwt * hwt)
 
 /**
  * @brief 获取系统定时器的时间戳
- * @param hwt: (I) 硬件定时器结构体的指针
+ * @param[in] hwt: 硬件定时器结构体的指针
  * @return 时间戳
  * @note
  * - 同步/异步：同步
@@ -458,7 +458,7 @@ xwtm_t xwmp_syshwt_get_timestamp(struct xwmp_syshwt * hwt)
 
 /**
  * @brief 系统滴答中断任务
- * @param hwt: (I) 硬件定时器结构体的指针
+ * @param[in] hwt: 硬件定时器结构体的指针
  */
 __xwmp_isr
 void xwmp_syshwt_task(struct xwmp_syshwt * hwt)
@@ -490,7 +490,7 @@ void xwmp_syshwt_task(struct xwmp_syshwt * hwt)
 
 /**
  * @brief 获取硬件定时器的时间树
- * @param hwt: (I) 硬件定时器结构体的指针
+ * @param[in] hwt: 硬件定时器结构体的指针
  * @return 时间树的指针
  */
 __xwmp_code

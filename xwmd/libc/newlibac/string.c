@@ -18,9 +18,9 @@ void newlibac_string_linkage_placeholder(void)
 
 /**
  * @brief fill memory with a constant byte
- * @param src: (I) the memory area
- * @param c: (I) constant byte
- * @param count: (I) bytes of the memory area
+ * @param[in] src: the memory area
+ * @param[in] c: constant byte
+ * @param[in] count: bytes of the memory area
  * @note
  * - newlib中的memset没有对齐访问内存，这会造成ARMv7m产生BUS Fault。因此
  *   重新实现memset覆盖newlib中的函数。

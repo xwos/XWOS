@@ -31,7 +31,7 @@ void xwmp_rtwq_rmrbn_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn);
 
 /**
  * @brief 初始化等待队列
- * @param xwrtwq: (I) 实时等待队列
+ * @param[in] xwrtwq: 实时等待队列
  */
 __xwmp_code
 xwer_t xwmp_rtwq_init(struct xwmp_rtwq * xwrtwq)
@@ -45,9 +45,9 @@ xwer_t xwmp_rtwq_init(struct xwmp_rtwq * xwrtwq)
 
 /**
  * @brief 将等待队列节点加入到等待队列中
- * @param xwrtwq: (I) 实时等待队列
- * @param wqn: (I) 等待队列节点结构体指针
- * @param prio: (I) 优先级
+ * @param[in] xwrtwq: 实时等待队列
+ * @param[in] wqn: 等待队列节点结构体指针
+ * @param[in] prio: 优先级
  */
 __xwmp_code
 void xwmp_rtwq_add_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn,
@@ -106,8 +106,8 @@ void xwmp_rtwq_add_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn,
 
 /**
  * @brief 将等待队列节点从实时等待队列中移除（节点有伙伴）
- * @param xwrtwq: (I) 实时等待队列
- * @param wqn: (I) 等待队列节点结构体指针
+ * @param[in] xwrtwq: 实时等待队列
+ * @param[in] wqn: 等待队列节点结构体指针
  * @note
  * - 这个函数只能在获得锁xwrtwq->lock时调用。
  */
@@ -127,8 +127,8 @@ void xwmp_rtwq_rmrbb_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn)
 
 /**
  * @brief 将等待队列节点从实时等待队列中移除（节点无伙伴）
- * @param xwrtwq: (I) 实时等待队列
- * @param wqn: (I) 等待队列节点结构体指针
+ * @param[in] xwrtwq: 实时等待队列
+ * @param[in] wqn: 等待队列节点结构体指针
  * @note
  * - 这个函数只能在获得锁xwrtwq->lock时调用。
  */
@@ -161,8 +161,8 @@ void xwmp_rtwq_rmrbn_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn)
 
 /**
  * @brief 将等待队列节点从实时等待队列中移除
- * @param xwrtwq: (I) 实时等待队列
- * @param wqn: (I) 等待队列节点结构体指针
+ * @param[in] xwrtwq: 实时等待队列
+ * @param[in] wqn: 等待队列节点结构体指针
  * @retval XWOK: 没有错误
  * @retval -ESRCH: 等待队列中不存在该节点
  * @note
@@ -191,7 +191,7 @@ xwer_t xwmp_rtwq_remove_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn)
 
 /**
  * @brief 从实时等待队列中选择一个节点
- * @param xwrtwq: (I) 实时等待队列
+ * @param[in] xwrtwq: 实时等待队列
  * @return 实时等待队列节点指针或空指针
  * @note
  * - 这个函数只能在获得锁xwrtwq->lock时调用。

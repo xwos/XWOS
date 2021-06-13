@@ -57,7 +57,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_linc_vop = {
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：LIN控制器的构造函数
- * @param linc: (I) LIN控制器对象指针
+ * @param[in] linc: LIN控制器对象指针
  */
 __xwds_code
 void xwds_linc_construct(struct xwds_linc * linc)
@@ -68,7 +68,7 @@ void xwds_linc_construct(struct xwds_linc * linc)
 
 /**
  * @brief XWDS API：LIN控制器对象的析构函数
- * @param linc: (I) LIN控制器对象指针
+ * @param[in] linc: LIN控制器对象指针
  */
 __xwds_code
 void xwds_linc_destruct(struct xwds_linc * linc)
@@ -79,7 +79,7 @@ void xwds_linc_destruct(struct xwds_linc * linc)
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测LIN控制器
- * @param linc: (I) LIN控制器对象指针
+ * @param[in] linc: LIN控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -108,7 +108,7 @@ err_mtx_init:
 
 /**
  * @brief XWDS VOP：移除LIN控制器
- * @param linc: (I) LIN控制器对象指针
+ * @param[in] linc: LIN控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -129,7 +129,7 @@ err_dev_vop_remove:
 
 /**
  * @brief XWDS VOP：启动LIN控制器
- * @param linc: (I) LIN控制器对象指针
+ * @param[in] linc: LIN控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -143,7 +143,7 @@ xwer_t xwds_linc_vop_start(struct xwds_linc * linc)
 
 /**
  * @brief XWDS VOP：停止LIN控制器
- * @param linc: (I) LIN控制器对象指针
+ * @param[in] linc: LIN控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -159,7 +159,7 @@ xwer_t xwds_linc_vop_stop(struct xwds_linc * linc)
 /******** ******** pm ******** ********/
 /**
  * @brief XWDS VOP：暂停LIN控制器
- * @param linc: (I) LIN控制器对象指针
+ * @param[in] linc: LIN控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -173,7 +173,7 @@ xwer_t xwds_linc_vop_suspend(struct xwds_linc * linc)
 
 /**
  * @brief XWDS VOP：继续LIN控制器
- * @param linc: (I) LIN控制器对象指针
+ * @param[in] linc: LIN控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -189,12 +189,12 @@ xwer_t xwds_linc_vop_resume(struct xwds_linc * linc)
 /******** ******** ******** APIs ******** ******** ********/
 /**
  * @brief XWDS API：主机节点发送一条LIN消息
- * @param linc: (I) LIN控制器对象指针
- * @param id: (I) 主机节点调度消息的ID
- * @param msg: (I) LIN消息结构体指针
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] linc: LIN控制器对象指针
+ * @param[in] id: 主机节点调度消息的ID
+ * @param[in] msg: LIN消息结构体指针
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -247,11 +247,11 @@ err_linc_grab:
 
 /**
  * @brief XWDS API：从机节点发送一条LIN消息
- * @param linc: (I) LIN控制器对象指针
- * @param msg: (I) LIN消息结构体指针
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] linc: LIN控制器对象指针
+ * @param[in] msg: LIN消息结构体指针
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -304,11 +304,11 @@ err_linc_grab:
 
 /**
  * @brief XWDS API：接收一条LIN消息
- * @param linc: (I) LIN控制器对象指针
- * @param msgbuf: 接收消息的缓冲区的指针
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] linc: LIN控制器对象指针
+ * @param[out] msgbuf: 指向接收消息缓冲区的指针
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -354,9 +354,9 @@ err_linc_grab:
 
 /**
  * @brief XWDS API：通过LIN保护ID查询消息大小
- * @param linc: (I) LIN控制器对象指针
- * @param protected_id: (I) 消息的LIN保护ID
- * @param ret: (O) 指向缓冲区的指针，通过此缓冲区返回消息大小
+ * @param[in] linc: LIN控制器对象指针
+ * @param[in] protected_id: 消息的LIN保护ID
+ * @param[out] ret: 指向缓冲区的指针，通过此缓冲区返回消息大小
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针

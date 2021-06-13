@@ -127,8 +127,8 @@ xwer_t w25qrpt_stop(struct w25qrpt * w25qrpt)
 
 /**
  * @brief 远程端读取Flash的UID
- * @param w25qrpt: (I) W25QRPT对象的指针
- * @param msg: (I) 消息
+ * @param[in] w25qrpt: W25QRPT对象的指针
+ * @param[in] msg: 消息
  * @return 错误码
  * @note
  * + 协议
@@ -199,8 +199,8 @@ xwer_t w25qrpt_rpc_read_uid(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
 
 /**
  * @brief 远程端读取Flash的MID
- * @param w25qrpt: (I) W25QRPT对象的指针
- * @param msg: (I) 消息
+ * @param[in] w25qrpt: W25QRPT对象的指针
+ * @param[in] msg: 消息
  * @return 错误码
  * @note
  * + 协议
@@ -265,8 +265,8 @@ xwer_t w25qrpt_rpc_read_mid(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
 
 /**
  * @brief 远程端读取Flash的JID
- * @param w25qrpt: (I) W25QRPT对象的指针
- * @param msg: (I) 消息
+ * @param[in] w25qrpt: W25QRPT对象的指针
+ * @param[in] msg: 消息
  * @return 错误码
  * @note
  * + 协议
@@ -333,8 +333,8 @@ xwer_t w25qrpt_rpc_read_jid(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
 
 /**
  * @brief 远程端擦除Flash
- * @param w25qrpt: (I) W25QRPT对象的指针
- * @param msg: (I) 消息
+ * @param[in] w25qrpt: W25QRPT对象的指针
+ * @param[in] msg: 消息
  * @return 错误码
  * @note
  * + 协议
@@ -416,8 +416,8 @@ xwer_t w25qrpt_rpc_erase_chip(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg
 
 /**
  * @brief 远程端擦除Flash 4K的扇区
- * @param w25qrpt: (I) W25QRPT对象的指针
- * @param msg: (I) 消息
+ * @param[in] w25qrpt: W25QRPT对象的指针
+ * @param[in] msg: 消息
  * @return 错误码
  * @note
  * + 协议
@@ -501,8 +501,8 @@ xwer_t w25qrpt_rpc_erase_sector(struct w25qrpt * w25qrpt, struct w25qrpt_msg * m
 
 /**
  * @brief 远程端擦除Flash 32K的块
- * @param w25qrpt: (I) W25QRPT对象的指针
- * @param msg: (I) 消息
+ * @param[in] w25qrpt: W25QRPT对象的指针
+ * @param[in] msg: 消息
  * @return 错误码
  * @note
  * + 协议
@@ -586,8 +586,8 @@ xwer_t w25qrpt_rpc_erase_32kblock(struct w25qrpt * w25qrpt, struct w25qrpt_msg *
 
 /**
  * @brief 远程端擦除Flash 64K的块
- * @param w25qrpt: (I) W25QRPT对象的指针
- * @param msg: (I) 消息
+ * @param[in] w25qrpt: W25QRPT对象的指针
+ * @param[in] msg: 消息
  * @return 错误码
  * @note
  * + 协议
@@ -671,8 +671,8 @@ xwer_t w25qrpt_rpc_erase_64kblock(struct w25qrpt * w25qrpt, struct w25qrpt_msg *
 
 /**
  * @brief 远程端写Flash
- * @param w25qrpt: (I) W25QRPT对象的指针
- * @param msg: (I) 消息
+ * @param[in] w25qrpt: W25QRPT对象的指针
+ * @param[in] msg: 消息
  * @return 错误码
  * @note
  * + 协议
@@ -762,8 +762,8 @@ xwer_t w25qrpt_rpc_write(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
 
 /**
  * @brief 远程端读Flash
- * @param w25qrpt: (I) W25QRPT对象的指针
- * @param msg: (I) 消息
+ * @param[in] w25qrpt: W25QRPT对象的指针
+ * @param[in] msg: 消息
  * @return 错误码
  * @note
  * + 协议
@@ -852,8 +852,8 @@ xwer_t w25qrpt_rpc_read(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
 
 /**
  * @brief W25Qxx编程器接收一条消息
- * @param w25qrpt: (I) W25QRPT对象的指针
- * @param msg: (I) 消息
+ * @param[in] w25qrpt: W25QRPT对象的指针
+ * @param[in] msg: 消息
  * @return 错误码
  */
 static
@@ -929,7 +929,7 @@ xwer_t w25qrpt_chk_msg(struct w25qrpt_msg * msg)
 
 /**
  * @brief W25Qxx编程器状态机
- * @param w25qrpt: (I) W25QRPT对象的指针
+ * @param[in] w25qrpt: W25QRPT对象的指针
  */
 xwer_t w25qrpt_fsm(struct w25qrpt * w25qrpt)
 {

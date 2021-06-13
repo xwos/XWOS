@@ -70,7 +70,7 @@ xwer_t xwds_spim_abort(struct xwds_spim * spim,
 
 /**
  * @brief XWDS API：增加对象的引用计数
- * @param spim: (I) SPI主机模式控制器对象指针
+ * @param[in] spim: SPI主机模式控制器对象指针
  * @return 错误码
  * @retval @ref xwds_device_grab()
  */
@@ -82,7 +82,7 @@ xwer_t xwds_spim_grab(struct xwds_spim * spim)
 
 /**
  * @brief XWDS API：减少对象的引用计数
- * @param spim: (I) SPI主机模式控制器对象指针
+ * @param[in] spim: SPI主机模式控制器对象指针
  * @return 错误码
  * @retval @ref xwds_device_put()
  */

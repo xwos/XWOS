@@ -14,6 +14,12 @@
 #define __xwos_lib_xwaop_h__
 
 #include <xwos/standard.h>
+
+/**
+ * @defgroup xwaop 原子操作
+ * @{
+ */
+
 #include <xwos/ospl/soc/xwaop8.h>
 #include <xwos/ospl/soc/xwaop16.h>
 #include <xwos/ospl/soc/xwaop32.h>
@@ -21,20 +27,20 @@
 
 /**
  * @brief 调用原子操作
- * @param type: (I) 原子变量的类型
- * @param op: (I) 操作函数
- * @param memorder: (I) 内存顺序
- * @param a: (I) 原子变量指针
- * @param ...: (I/O) 其他参数
+ * @param[in] type: 原子变量的类型
+ * @param[in] op: 操作函数
+ * @param[in] memorder: 内存顺序
+ * @param[in] a: 原子变量指针
+ * @param[in,out] ...: 其他参数
  */
 #define xwmoaop(type, op, a, memorder, ...) \
         xwaop__##type##__##op(a, memorder, ##__VA_ARGS__)
 
 /**
  * @brief XWOS AOPLIB：加载原子变量
- * @param type: (I) 类型
- * @param a: (I) 数据地址的指针
- * @param memorder: (I) 内存顺序
+ * @param[in] type: 类型
+ * @param[in] a: 数据地址的指针
+ * @param[in] memorder: 内存顺序
  * @return 原子变量的值
  */
 #define xwaop_load(type, a, memorder) \
@@ -42,10 +48,10 @@
 
 /**
  * @brief XWOS AOPLIB：存储原子变量
- * @param type: (I) 类型
- * @param a: (I) 原子变量地址的指针
- * @param v: (I) 新值
- * @param memorder: (I) 内存顺序
+ * @param[in] type: 类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] v: 新值
+ * @param[in] memorder: 内存顺序
  * @return 写入后，原子变量的值
  */
 #define xwaop_store(type, a, memorder, v) \
@@ -53,19 +59,19 @@
 
 /**
  * @brief 调用原子操作函数
- * @param type: (I) 原子变量的类型
- * @param op: (I) 操作函数
- * @param a: (I) 原子变量指针
- * @param ...: (I/O) 其他参数
+ * @param[in] type: 原子变量的类型
+ * @param[in] op: 操作函数
+ * @param[in] a: 原子变量指针
+ * @param[in,out] ...: 其他参数
  */
 #define xwaop(type, op, a, ...) \
         xwaop__##type##__##op(a, ##__VA_ARGS__)
 
 /**
  * @brief XWOS AOPLIB：读取原子变量的值
- * @param type: (I) 类型
- * @param a: (I) 数据地址的指针
- * @param ov: (O) 指向缓冲区的指针，此缓冲区用于返回原子变量的值
+ * @param[in] type: 类型
+ * @param[in] a: 数据地址的指针
+ * @param[out] ov: 指向缓冲区的指针，此缓冲区用于返回原子变量的值
  * @note
  * - 内存序：acquire
  */
@@ -74,10 +80,10 @@
 
 /**
  * @brief XWOS AOPLIB：读取原子变量的旧值，并将原子变量写为新值
- * @param type: (I) 类型
- * @param a: (I) 原子变量地址的指针
- * @param v: (I) 新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] v: 新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @note
  * - 内存序：acq_rel
  */
@@ -88,11 +94,11 @@
  * @brief XWOS AOPLIB：读取原子变量的值，并测试旧值是否等于测试值：
  *                     - 如果结果为真，将原子变量设置为新值，并返回原子变量的旧值；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -106,11 +112,11 @@
  * @brief XWOS AOPLIB：读取原子变量的值，并测试旧值是否不等于测试值。
  *                     - 如果结果为真，将原子变量设置为新值，并返回原子变量的旧值；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -124,11 +130,11 @@
  * @brief XWOS AOPLIB：读取原子变量的值，并测试旧值是否大于测试值。
  *                     - 如果结果为真，将原子变量设置为新值，并返回原子变量的旧值；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -142,11 +148,11 @@
  * @brief XWOS AOPLIB：读取原子变量的值，并测试旧值是否大于等于测试值。
  *                     - 如果结果为真，将原子变量设置为新值，并返回原子变量的旧值；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -160,11 +166,11 @@
  * @brief XWOS AOPLIB：读取原子变量的值，并测试旧值是否小于测试值。
  *                     - 如果结果为真，将原子变量设置为新值，并返回原子变量的旧值；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -178,11 +184,11 @@
  * @brief XWOS AOPLIB：读取原子变量的值，并测试旧值是否小于等于测试值。
  *                     - 如果结果为真，将原子变量设置为新值，并返回原子变量的旧值；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -196,12 +202,12 @@
  * @brief XWOS AOPLIB：读取原子变量的值，并测试旧值是否属于区间(l,r)。
  *                     - 如果结果为真，将原子变量设置为新值，并返回原子变量的旧值；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param l: (I) 区间的左端点
- * @param r: (I) 区间的右端点
- * @param v: (I) 新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] l: 区间的左端点
+ * @param[in] r: 区间的右端点
+ * @param[in] v: 新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -215,12 +221,12 @@
  * @brief XWOS AOPLIB：读取原子变量的值，并测试旧值是否属于区间[l,r)。
  *                     - 如果结果为真，将原子变量设置为新值，并返回原子变量的旧值；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param l: (I) 区间的左端点
- * @param r: (I) 区间的右端点
- * @param v: (I) 新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] l: 区间的左端点
+ * @param[in] r: 区间的右端点
+ * @param[in] v: 新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -234,12 +240,12 @@
  * @brief XWOS AOPLIB：读取原子变量的值，并测试旧值是否属于区间(l,r]。
  *                     - 如果结果为真，将原子变量设置为新值，并返回原子变量的旧值；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param l: (I) 区间的左端点
- * @param r: (I) 区间的右端点
- * @param v: (I) 新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] l: 区间的左端点
+ * @param[in] r: 区间的右端点
+ * @param[in] v: 新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -253,12 +259,12 @@
  * @brief XWOS AOPLIB：读取原子变量的值，并测试旧值是否属于区间[l,r]。
  *                     - 如果结果为真，将原子变量设置为新值，并返回原子变量的旧值；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param l: (I) 区间的左端点
- * @param r: (I) 区间的右端点
- * @param v: (I) 新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] l: 区间的左端点
+ * @param[in] r: 区间的右端点
+ * @param[in] v: 新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -270,11 +276,11 @@
 
 /**
  * @brief XWOS AOPLIB：读取原子变量的值，并增加加数v，结果回写到原子变量中
- * @param type: (I) 类型
- * @param a: (I) 原子变量地址的指针
- * @param v: (I) 加数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] v: 加数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @note
  * - 内存序：acq_rel
  */
@@ -285,12 +291,12 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否等于测试值t：
  *                     - 如果结果为真，旧值增加加数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 加数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 加数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -306,12 +312,12 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否不等于测试值t：
  *                     - 如果结果为真，旧值增加加数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 加数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 加数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -327,12 +333,12 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否大于测试值t：
  *                     - 如果结果为真，旧值增加加数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 加数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 加数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -348,12 +354,12 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否大于等于测试值t：
  *                     - 如果结果为真，旧值增加加数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 加数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 加数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -369,12 +375,12 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否小于测试值t：
  *                     - 如果结果为真，旧值增加加数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 加数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 加数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -390,12 +396,12 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否小于等于测试值t：
  *                     - 如果结果为真，旧值增加加数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 加数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 加数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -411,13 +417,13 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否属于区间(l,r)：
  *                     - 如果结果为真，旧值增加加数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param l: (I) 区间的左端点
- * @param r: (I) 区间的右端点
- * @param v: (I) 加数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] l: 区间的左端点
+ * @param[in] r: 区间的右端点
+ * @param[in] v: 加数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -433,13 +439,13 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否属于区间[l,r)：
  *                     - 如果结果为真，旧值增加加数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param l: (I) 区间的左端点
- * @param r: (I) 区间的右端点
- * @param v: (I) 加数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] l: 区间的左端点
+ * @param[in] r: 区间的右端点
+ * @param[in] v: 加数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -455,13 +461,13 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否属于区间(l,r]：
  *                     - 如果结果为真，旧值增加加数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param l: (I) 区间的左端点
- * @param r: (I) 区间的右端点
- * @param v: (I) 加数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] l: 区间的左端点
+ * @param[in] r: 区间的右端点
+ * @param[in] v: 加数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -477,13 +483,13 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否属于区间[l,r]：
  *                     - 如果结果为真，旧值增加加数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param l: (I) 区间的左端点
- * @param r: (I) 区间的右端点
- * @param v: (I) 加数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] l: 区间的左端点
+ * @param[in] r: 区间的右端点
+ * @param[in] v: 加数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -497,11 +503,11 @@
 
 /**
  * @brief XWOS AOPLIB：读取原子变量的旧值，并减去减数v，结果回写到原子变量中
- * @param type: (I) 类型
- * @param a: (I) 原子变量地址的指针
- * @param v: (I) 减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] v: 减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @note
  * - 内存序：acq_rel
  */
@@ -512,12 +518,12 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否等于测试值t：
  *                     - 如果结果为真，旧值减去减数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -533,12 +539,12 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否不等于测试值t：
  *                     - 如果结果为真，旧值减去减数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -554,12 +560,12 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否大于测试值t：
  *                     - 如果结果为真，旧值减去减数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -575,12 +581,12 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否大于等于测试值t：
  *                     - 如果结果为真，旧值减去减数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -596,12 +602,12 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否小于测试值t：
  *                     - 如果结果为真，旧值减去减数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -617,12 +623,12 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否小于等于测试值t：
  *                     - 如果结果为真，旧值减去减数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -638,13 +644,13 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否属于区间(l,r)：
  *                     - 如果结果为真，旧值减去减数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param l: (I) 区间的左端点
- * @param r: (I) 区间的右端点
- * @param v: (I) 减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] l: 区间的左端点
+ * @param[in] r: 区间的右端点
+ * @param[in] v: 减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -660,13 +666,13 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否属于区间[l,r)：
  *                     - 如果结果为真，旧值减去减数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param l: (I) 区间的左端点
- * @param r: (I) 区间的右端点
- * @param v: (I) 减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] l: 区间的左端点
+ * @param[in] r: 区间的右端点
+ * @param[in] v: 减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -682,13 +688,13 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否属于区间(l,r]：
  *                     - 如果结果为真，旧值减去减数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param l: (I) 区间的左端点
- * @param r: (I) 区间的右端点
- * @param v: (I) 减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] l: 区间的左端点
+ * @param[in] r: 区间的右端点
+ * @param[in] v: 减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -704,13 +710,13 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值是否属于区间[l,r]：
  *                     - 如果结果为真，旧值减去减数v，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param l: (I) 区间的左端点
- * @param r: (I) 区间的右端点
- * @param v: (I) 减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] l: 区间的左端点
+ * @param[in] r: 区间的右端点
+ * @param[in] v: 减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -725,11 +731,11 @@
 /**
  * @brief XWOS AOPLIB：读取原子变量的旧值，并执行反向减法，从被减数v中减去旧值，
  *                     结果回写到原子变量中。
- * @param type: (I) 类型
- * @param a: (I) 原子变量地址的指针
- * @param v: (I) 被减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] v: 被减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @note
  * - 内存序：acq_rel
  */
@@ -741,12 +747,12 @@
  *                     - 如果结果为真，执行反向减法，从被减数v中减去旧值，
  *                       结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 被减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 被减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -763,12 +769,12 @@
  *                     - 如果结果为真，执行反向减法，从被减数v中减去旧值，
  *                       结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 被减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 被减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -785,12 +791,12 @@
  *                     - 如果结果为真，执行反向减法，从被减数v中减去旧值，
  *                       结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 被减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 被减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -807,12 +813,12 @@
  *                     - 如果结果为真，执行反向减法，从被减数v中减去旧值，
  *                       结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 被减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 被减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -829,12 +835,12 @@
  *                     - 如果结果为真，执行反向减法，从被减数v中减去旧值，
  *                       结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 被减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 被减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -851,12 +857,12 @@
  *                     - 如果结果为真，执行反向减法，从被减数v中减去旧值，
  *                       结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量地址的指针
- * @param t: (I) 测试值
- * @param v: (I) 被减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量地址的指针
+ * @param[in] t: 测试值
+ * @param[in] v: 被减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -873,13 +879,13 @@
  *                     - 如果结果为真，执行反向减法，从被减数v中减去旧值，
  *                       结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param l: (I) 区间的左端点
- * @param r: (I) 区间的右端点
- * @param v: (I) 被减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] l: 区间的左端点
+ * @param[in] r: 区间的右端点
+ * @param[in] v: 被减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -896,13 +902,13 @@
  *                     - 如果结果为真，执行反向减法，从被减数v中减去旧值，
  *                       结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param l: (I) 区间的左端点
- * @param r: (I) 区间的右端点
- * @param v: (I) 被减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] l: 区间的左端点
+ * @param[in] r: 区间的右端点
+ * @param[in] v: 被减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -919,13 +925,13 @@
  *                     - 如果结果为真，执行反向减法，从被减数v中减去旧值，
  *                       结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param l: (I) 区间的左端点
- * @param r: (I) 区间的右端点
- * @param v: (I) 被减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] l: 区间的左端点
+ * @param[in] r: 区间的右端点
+ * @param[in] v: 被减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -942,13 +948,13 @@
  *                     - 如果结果为真，执行反向减法，从被减数v中减去旧值，
  *                       结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param l: (I) 区间的左端点
- * @param r: (I) 区间的右端点
- * @param v: (I) 被减数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] l: 区间的左端点
+ * @param[in] r: 区间的右端点
+ * @param[in] v: 被减数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -963,11 +969,11 @@
 /**
  * @brief XWOS AOPLIB：读取原子变量的旧值，并和操作数v进行与操作，
  *                     结果回写到原子变量中
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param v: (I) 操作数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] v: 操作数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @note
  * - 内存序：acq_rel
  */
@@ -977,11 +983,11 @@
 /**
  * @brief XWOS AOPLIB：读取原子变量的旧值，并和操作数v进行或操作，
  *                     结果回写到原子变量中
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param v: (I) 操作数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] v: 操作数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @note
  * - 内存序：acq_rel
  */
@@ -991,11 +997,11 @@
 /**
  * @brief XWOS AOPLIB：读取原子变量的旧值，并和操作数v进行异或操作，
  *                     结果回写到原子变量中
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param v: (I) 操作数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] v: 操作数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @note
  * - 内存序：acq_rel
  */
@@ -1005,11 +1011,11 @@
 /**
  * @brief XWOS AOPLIB：读取原子变量的旧值，并按掩码m进行置1操作，
  *                     结果回写到原子变量中
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param m: (I) 掩码位
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] m: 掩码位
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @note
  * - 内存序：acq_rel
  */
@@ -1019,11 +1025,11 @@
 /**
  * @brief XWOS AOPLIB：读取原子变量的旧值，并按掩码m进行清零操作，
  *                     结果回写到原子变量中
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param m: (I) 掩码位
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] m: 掩码位
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @note
  * - 内存序：acq_rel
  */
@@ -1033,11 +1039,11 @@
 /**
  * @brief XWOS AOPLIB：读取原子变量的旧值，并按掩码m进行位翻转操作，
  *                     结果回写到原子变量中
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param m: (I) 掩码位
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] m: 掩码位
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @note
  * - 内存序：acq_rel
  */
@@ -1049,11 +1055,11 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值中的掩码m覆盖的部分是否都为1：
  *                     - 如果结果为真，将他们全部清零，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param m: (I) 掩码
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] m: 掩码
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -1070,11 +1076,11 @@
                        是否至少有一位为1：
  *                     - 如果结果为真，将他们全部清零，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param m: (I) 掩码
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] m: 掩码
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -1090,11 +1096,11 @@
  * @brief XWOS AOPLIB：读取原子变量的旧值，并测试旧值中的掩码m覆盖的部分是否都为0：
  *                     - 如果结果为真，将他们全部置1，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param m: (I) 掩码
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] m: 掩码
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -1111,11 +1117,11 @@
                        是否至少有一位为0：
  *                     - 如果结果为真，将他们全部置1，结果回写到原子变量中；
  *                     - 如果结果为假，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param m: (I) 掩码
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] m: 掩码
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -1132,14 +1138,14 @@
  *                     - 如果结果为真或测试函数为空，使用操作函数操作修改此值，
  *                       结果回写到原子变量中；
  *                     - 如果结果为假或操作函数为空，返回原子变量的旧值。
- * @param type: (I) 原子变量的类型
- * @param a: (I) 原子变量的地址
- * @param tf: (I) 测试函数的函数指针
- * @param tfarg: (I) 测试函数的参数
- * @param of: (I) 操作函数的函数指针
- * @param ofarg: (I) 操作函数的参数
- * @param nv: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
- * @param ov: (O) 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
+ * @param[in] type: 原子变量的类型
+ * @param[in] a: 原子变量的地址
+ * @param[in] tf: 测试函数的函数指针
+ * @param[in] tfarg: 测试函数的参数
+ * @param[in] of: 操作函数的函数指针
+ * @param[in] ofarg: 操作函数的参数
+ * @param[out] nv: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作后的新值
+ * @param[out] ov: 指向缓冲区的指针，通过此缓冲区返回原子变量在原子操作前的旧值
  * @return 错误码
  * @retval OK: 测试成功或测试函数为空
  * @retval -EACCES: 测试失败
@@ -1154,8 +1160,8 @@
 /******** ******** load ******** ********/
 /**
  * @brief 定义原子操作模板：load
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_LOAD(type, btype) \
 static __xwlib_inline \
@@ -1169,8 +1175,8 @@ type##_t xwaop__##type##__load(type##_a * a, \
 /******** ******** store ******** ********/
 /**
  * @brief 定义原子操作模板：store
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_STORE(type, btype) \
 static __xwlib_inline \
@@ -1186,8 +1192,8 @@ type##_t xwaop__##type##__store(type##_a * a, \
 /******** ******** read ******** ********/
 /**
  * @brief 定义原子操作模板：read
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_READ(type, btype) \
 static __xwlib_inline \
@@ -1201,8 +1207,8 @@ void xwaop__##type##__read(type##_a * a, \
 /******** ******** write ******** ********/
 /**
  * @brief 定义原子操作模板：write
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_WRITE(type, btype) \
 static __xwlib_inline \
@@ -1217,8 +1223,8 @@ void xwaop__##type##__write(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：teq_then_write
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TEQ_THEN_WRITE(type, btype) \
 static __xwlib_inline \
@@ -1235,8 +1241,8 @@ xwer_t xwaop__##type##__teq_then_write(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tne_then_write
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TNE_THEN_WRITE(type, btype) \
 static __xwlib_inline \
@@ -1253,8 +1259,8 @@ xwer_t xwaop__##type##__tne_then_write(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgt_then_write
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGT_THEN_WRITE(type, btype) \
 static __xwlib_inline \
@@ -1271,8 +1277,8 @@ xwer_t xwaop__##type##__tgt_then_write(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tge_then_write
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGE_THEN_WRITE(type, btype) \
 static __xwlib_inline \
@@ -1289,8 +1295,8 @@ xwer_t xwaop__##type##__tge_then_write(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tlt_then_write
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TLT_THEN_WRITE(type, btype) \
 static __xwlib_inline \
@@ -1307,8 +1313,8 @@ xwer_t xwaop__##type##__tlt_then_write(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tle_then_write
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TLE_THEN_WRITE(type, btype) \
 static __xwlib_inline \
@@ -1325,8 +1331,8 @@ xwer_t xwaop__##type##__tle_then_write(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgtlt_then_write
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGTLT_THEN_WRITE(type, btype) \
 static __xwlib_inline \
@@ -1343,8 +1349,8 @@ xwer_t xwaop__##type##__tgtlt_then_write(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgelt_then_write
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGELT_THEN_WRITE(type, btype) \
 static __xwlib_inline \
@@ -1361,8 +1367,8 @@ xwer_t xwaop__##type##__tgelt_then_write(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgtle_then_write
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGTLE_THEN_WRITE(type, btype) \
 static __xwlib_inline \
@@ -1379,8 +1385,8 @@ xwer_t xwaop__##type##__tgtle_then_write(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgele_then_write
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGELE_THEN_WRITE(type, btype) \
 static __xwlib_inline \
@@ -1398,8 +1404,8 @@ xwer_t xwaop__##type##__tgele_then_write(type##_a * a, \
 /******** ******** add ******** ********/
 /**
  * @brief 定义原子操作模板：add
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_ADD(type, btype) \
 static __xwlib_inline \
@@ -1414,8 +1420,8 @@ void xwaop__##type##__add(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：teq_then_add
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TEQ_THEN_ADD(type, btype) \
 static __xwlib_inline \
@@ -1431,8 +1437,8 @@ xwer_t xwaop__##type##__teq_then_add(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tne_then_add
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TNE_THEN_ADD(type, btype) \
 static __xwlib_inline \
@@ -1449,8 +1455,8 @@ xwer_t xwaop__##type##__tne_then_add(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgt_then_add
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGT_THEN_ADD(type, btype) \
 static __xwlib_inline \
@@ -1467,8 +1473,8 @@ xwer_t xwaop__##type##__tgt_then_add(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tge_then_add
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGE_THEN_ADD(type, btype) \
 static __xwlib_inline \
@@ -1485,8 +1491,8 @@ xwer_t xwaop__##type##__tge_then_add(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tlt_then_add
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TLT_THEN_ADD(type, btype) \
 static __xwlib_inline \
@@ -1503,8 +1509,8 @@ xwer_t xwaop__##type##__tlt_then_add(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tle_then_add
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TLE_THEN_ADD(type, btype) \
 static __xwlib_inline \
@@ -1521,8 +1527,8 @@ xwer_t xwaop__##type##__tle_then_add(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgtlt_then_add
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGTLT_THEN_ADD(type, btype) \
 static __xwlib_inline \
@@ -1539,8 +1545,8 @@ xwer_t xwaop__##type##__tgtlt_then_add(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgelt_then_add
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGELT_THEN_ADD(type, btype) \
 static __xwlib_inline \
@@ -1557,8 +1563,8 @@ xwer_t xwaop__##type##__tgelt_then_add(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgtle_then_add
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGTLE_THEN_ADD(type, btype) \
 static __xwlib_inline \
@@ -1575,8 +1581,8 @@ xwer_t xwaop__##type##__tgtle_then_add(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgele_then_add
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGELE_THEN_ADD(type, btype) \
 static __xwlib_inline \
@@ -1594,8 +1600,8 @@ xwer_t xwaop__##type##__tgele_then_add(type##_a * a, \
 /******** ******** subtract ******** ********/
 /**
  * @brief 定义原子操作模板：sub
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_SUB(type, btype) \
 static __xwlib_inline \
@@ -1610,8 +1616,8 @@ void xwaop__##type##__sub(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：teq_then_sub
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TEQ_THEN_SUB(type, btype) \
 static __xwlib_inline \
@@ -1628,8 +1634,8 @@ xwer_t xwaop__##type##__teq_then_sub(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tne_then_sub
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TNE_THEN_SUB(type, btype) \
 static __xwlib_inline \
@@ -1646,8 +1652,8 @@ xwer_t xwaop__##type##__tne_then_sub(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tge_then_sub
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGT_THEN_SUB(type, btype) \
 static __xwlib_inline \
@@ -1664,8 +1670,8 @@ xwer_t xwaop__##type##__tgt_then_sub(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tge_then_sub
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGE_THEN_SUB(type, btype) \
 static __xwlib_inline \
@@ -1682,8 +1688,8 @@ xwer_t xwaop__##type##__tge_then_sub(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tlt_then_sub
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TLT_THEN_SUB(type, btype) \
 static __xwlib_inline \
@@ -1700,8 +1706,8 @@ xwer_t xwaop__##type##__tlt_then_sub(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tle_then_sub
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TLE_THEN_SUB(type, btype) \
 static __xwlib_inline \
@@ -1718,8 +1724,8 @@ xwer_t xwaop__##type##__tle_then_sub(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgtlt_then_sub
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGTLT_THEN_SUB(type, btype) \
 static __xwlib_inline \
@@ -1736,8 +1742,8 @@ xwer_t xwaop__##type##__tgtlt_then_sub(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgelt_then_sub
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGELT_THEN_SUB(type, btype) \
 static __xwlib_inline \
@@ -1754,8 +1760,8 @@ xwer_t xwaop__##type##__tgelt_then_sub(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgtle_then_sub
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGTLE_THEN_SUB(type, btype) \
 static __xwlib_inline \
@@ -1772,8 +1778,8 @@ xwer_t xwaop__##type##__tgtle_then_sub(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgele_then_sub
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGELE_THEN_SUB(type, btype) \
 static __xwlib_inline \
@@ -1791,8 +1797,8 @@ xwer_t xwaop__##type##__tgele_then_sub(type##_a * a, \
 /******** ******** reverse subtract ******** ********/
 /**
  * @brief 定义原子操作模板：rsb
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_RSB(type, btype) \
 static __xwlib_inline \
@@ -1807,8 +1813,8 @@ void xwaop__##type##__rsb(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：teq_then_rsb
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TEQ_THEN_RSB(type, btype) \
 static __xwlib_inline \
@@ -1825,8 +1831,8 @@ xwer_t xwaop__##type##__teq_then_rsb(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tne_then_rsb
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TNE_THEN_RSB(type, btype) \
 static __xwlib_inline \
@@ -1843,8 +1849,8 @@ xwer_t xwaop__##type##__tne_then_rsb(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgt_then_rsb
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGT_THEN_RSB(type, btype) \
 static __xwlib_inline \
@@ -1861,8 +1867,8 @@ xwer_t xwaop__##type##__tgt_then_rsb(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tge_then_rsb
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGE_THEN_RSB(type, btype) \
 static __xwlib_inline \
@@ -1879,8 +1885,8 @@ xwer_t xwaop__##type##__tge_then_rsb(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tle_then_rsb
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TLT_THEN_RSB(type, btype) \
 static __xwlib_inline \
@@ -1897,8 +1903,8 @@ xwer_t xwaop__##type##__tlt_then_rsb(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tle_then_rsb
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TLE_THEN_RSB(type, btype) \
 static __xwlib_inline \
@@ -1915,8 +1921,8 @@ xwer_t xwaop__##type##__tle_then_rsb(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgtlt_then_rsb
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGTLT_THEN_RSB(type, btype) \
 static __xwlib_inline \
@@ -1933,8 +1939,8 @@ xwer_t xwaop__##type##__tgtlt_then_rsb(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgelt_then_rsb
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGELT_THEN_RSB(type, btype) \
 static __xwlib_inline \
@@ -1951,8 +1957,8 @@ xwer_t xwaop__##type##__tgelt_then_rsb(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgtle_then_rsb
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGTLE_THEN_RSB(type, btype) \
 static __xwlib_inline \
@@ -1969,8 +1975,8 @@ xwer_t xwaop__##type##__tgtle_then_rsb(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：tgele_then_rsb
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TGELE_THEN_RSB(type, btype) \
 static __xwlib_inline \
@@ -1988,8 +1994,8 @@ xwer_t xwaop__##type##__tgele_then_rsb(type##_a * a, \
 /******** ******** bit operations ******** ********/
 /**
  * @brief 定义原子操作模板：or
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_OR(type, btype) \
 static __xwlib_inline \
@@ -2004,8 +2010,8 @@ void xwaop__##type##__or(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：and
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_AND(type, btype) \
 static __xwlib_inline \
@@ -2020,8 +2026,8 @@ void xwaop__##type##__and(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：xor
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_XOR(type, btype) \
 static __xwlib_inline \
@@ -2036,8 +2042,8 @@ void xwaop__##type##__xor(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：c0m
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_C0M(type, btype) \
 static __xwlib_inline \
@@ -2052,8 +2058,8 @@ void xwaop__##type##__c0m(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：t1ma_then_c0m
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_T1MA_THEN_C0M(type, btype) \
 static __xwlib_inline \
@@ -2068,8 +2074,8 @@ xwer_t xwaop__##type##__t1ma_then_c0m(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：t1mo_then_c0m
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_T1MO_THEN_C0M(type, btype) \
 static __xwlib_inline \
@@ -2084,8 +2090,8 @@ xwer_t xwaop__##type##__t1mo_then_c0m(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：t0ma_then_s1m
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_T0MA_THEN_S1M(type, btype) \
 static __xwlib_inline \
@@ -2100,8 +2106,8 @@ xwer_t xwaop__##type##__t0ma_then_s1m(type##_a * a, \
 
 /**
  * @brief 定义原子操作模板：t0mo_then_s1m
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_T0MO_THEN_S1M(type, btype) \
 static __xwlib_inline \
@@ -2117,8 +2123,8 @@ xwer_t xwaop__##type##__t0mo_then_s1m(type##_a * a, \
 /******** ******** test and operation ******** ********/
 /**
  * @brief 定义原子操作模板：tst_then_op
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP_TST_THEN_OP(type, btype) \
 static __xwlib_inline \
@@ -2135,8 +2141,8 @@ xwer_t xwaop__##type##__tst_then_op(type##_a * a, \
 
 /**
  * @brief 使用模板为某一类型定义原子操作函数集合
- * @param type: (I) 类型
- * @param btype: (I) 基础类型
+ * @param[in] type: 类型
+ * @param[in] btype: 基础类型
  */
 #define DEFINE_XWAOP(type, btype) \
         DEFINE_XWAOP_LOAD(type, btype) \
@@ -2295,5 +2301,9 @@ DEFINE_XWAOP(xwbmp, xwu64)
 #endif
 
 DEFINE_XWAOP(xwtm, xws64)
+
+/**
+ * @} xwaop
+ */
 
 #endif /* xwos/lib/xwaop.h */

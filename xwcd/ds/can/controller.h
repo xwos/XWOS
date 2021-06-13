@@ -249,7 +249,7 @@ void xwds_canc_setcb_busoff_indication(struct xwds_canc * canc,
 
 /**
  * @brief XWDS API：增加对象的引用计数
- * @param canc: (I) CAN控制器对象指针
+ * @param[in] canc: CAN控制器对象指针
  * @return 错误码
  */
 static __xwds_inline_api
@@ -260,7 +260,7 @@ xwer_t xwds_canc_grab(struct xwds_canc * canc)
 
 /**
  * @brief XWDS API：减少对象的引用计数
- * @param canc: (I) CAN控制器对象指针
+ * @param[in] canc: CAN控制器对象指针
  * @return 错误码
  */
 static __xwds_inline_api

@@ -134,7 +134,7 @@ xwer_t xwup_thd_thaw_lic(struct xwup_thd * thd);
 
 /**
  * @brief 唤醒一个阻塞/睡眠态的线程，将其加入到调度器的就绪队列
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  * @return 错误码
  */
 static __xwcc_inline

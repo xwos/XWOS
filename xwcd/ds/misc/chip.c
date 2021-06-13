@@ -55,7 +55,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_misc_vop = {
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：MISC设备的构造函数
- * @param misc: (I) MISC设备对象指针
+ * @param[in] misc: MISC设备对象指针
  */
 __xwds_api
 void xwds_misc_construct(struct xwds_misc * misc)
@@ -66,7 +66,7 @@ void xwds_misc_construct(struct xwds_misc * misc)
 
 /**
  * @brief XWDS API：MISC设备对象的析构函数
- * @param misc: (I) MISC设备对象指针
+ * @param[in] misc: MISC设备对象指针
  */
 __xwds_api
 void xwds_misc_destruct(struct xwds_misc * misc)
@@ -77,7 +77,7 @@ void xwds_misc_destruct(struct xwds_misc * misc)
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测MISC设备
- * @param misc: (I) MISC设备对象指针
+ * @param[in] misc: MISC设备对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -91,8 +91,8 @@ xwer_t xwds_misc_vop_probe(struct xwds_misc * misc)
 
 /**
  * @brief XWDS VOP：移除MISC设备
- * @param ds: (I) 设备栈控制块指针
- * @param misc: (I) MISC设备对象指针
+ * @param[in] ds: 设备栈控制块指针
+ * @param[in] misc: MISC设备对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -106,7 +106,7 @@ xwer_t xwds_misc_vop_remove(struct xwds_misc * misc)
 
 /**
  * @brief XWDS VOP：启动MISC设备
- * @param misc: (I) MISC设备对象指针
+ * @param[in] misc: MISC设备对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -120,7 +120,7 @@ xwer_t xwds_misc_vop_start(struct xwds_misc * misc)
 
 /**
  * @brief XWDS VOP：停止MISC设备
- * @param misc: (I) MISC设备对象指针
+ * @param[in] misc: MISC设备对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -136,7 +136,7 @@ xwer_t xwds_misc_vop_stop(struct xwds_misc * misc)
 /******** ******** pm ******** ********/
 /**
  * @brief XWDS VOP：暂停MISC设备
- * @param misc: (I) MISC设备对象指针
+ * @param[in] misc: MISC设备对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -150,7 +150,7 @@ xwer_t xwds_misc_vop_suspend(struct xwds_misc * misc)
 
 /**
  * @brief XWDS VOP：继续MISC设备
- * @param misc: (I) MISC设备对象指针
+ * @param[in] misc: MISC设备对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -166,9 +166,9 @@ xwer_t xwds_misc_vop_resume(struct xwds_misc * misc)
 /******** ******** ******** APIs ******** ******** ********/
 /**
  * @brief XWDS API：MISC设备输入、输出、控制
- * @param misc: (I) MISC设备对象指针
- * @param cmd: (I) 命令
- * @param ...: (I) 参数
+ * @param[in] misc: MISC设备对象指针
+ * @param[in] cmd: 命令
+ * @param[in] ...: 参数
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针

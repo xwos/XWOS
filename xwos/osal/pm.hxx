@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS移植层：SOC系统调用与系统特权
+ * @brief C++操作系统抽象层：电源管理
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -10,15 +10,17 @@
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef __xwos_ospl_soc_xwsc_h__
-#define __xwos_ospl_soc_xwsc_h__
+#ifndef __xwos_osal_pm_hxx__
+#define __xwos_osal_pm_hxx__
+#ifdef __cplusplus
 
-#include <xwos/standard.h>
+#if __cplusplus < 201103L
+  #error "Should use C++11 or later C++ standard!"
+#endif
 
-void soc_privilege_start(void);
-void soc_privilege_end(void);
-xws64_t xwsc(xwsc_f func, xwreg_t argnum, ...);
+extern "C" {
+#include <xwos/osal/pm.h>
+}
 
-#include <xwosimpl_soc_xwsc.h>
-
-#endif /* xwos/ospl/soc/xwsc.h */
+#endif /* __cplusplus */
+#endif /* xwos/osal/pm.hxx */

@@ -14,11 +14,20 @@
 #define __xwos_lib_sc_h__
 
 #include <xwos/standard.h>
+
+/**
+ * @defgroup xwsc 系统调用与系统特权
+ * @{
+ */
+
 #include <xwos/ospl/soc/xwsc.h>
 
-#define xwsc(func, argnum, ...) soc_xwsc((func), (argnum), ##__VA_ARGS__)
-
+xws64_t xwsc(xwsc_f func, xwreg_t argnum, ...);
 void xwlib_privilege_start(void);
 void xwlib_privilege_end(void);
+
+/**
+ * @} xwsc
+ */
 
 #endif /* xwos/lib/sc.h */

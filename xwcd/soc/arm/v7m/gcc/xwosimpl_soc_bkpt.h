@@ -27,9 +27,6 @@
 
 #include <compiler/gcc.h>
 
-/**
- * @brief 设置一个断点
- */
 static __xwbsp_inline
 void soc_bkpt(void)
 {

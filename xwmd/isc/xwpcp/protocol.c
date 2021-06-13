@@ -179,7 +179,7 @@ xwer_t xwpcp_doze(xwu32_t cnt);
 
 /**
  * @brief 增加XWPCP的引用计数，防止其被停止
- * @param xwpcp: (I) XWPCP对象的指针
+ * @param[in] xwpcp: XWPCP对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval <0: XWPCP已经停止运行
@@ -192,7 +192,7 @@ xwer_t xwpcp_grab(struct xwpcp * xwpcp)
 
 /**
  * @brief 减少XWPCP的引用计数
- * @param xwpcp: (I) XWPCP对象的指针
+ * @param[in] xwpcp: XWPCP对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval <0: XWPCP没有在运行
@@ -205,9 +205,9 @@ xwer_t xwpcp_put(struct xwpcp * xwpcp)
 
 /**
  * @brief 编码数据长度
- * @param sdusize: (I) 数据长度
- * @param ecsdusz: (O) 指向缓冲区的指针，此缓冲区用于输出编码后的数据数组
- * @param ecsize: (O) 指向缓冲区的指针，此缓冲区用于输出编码后的数据数组的长度
+ * @param[in] sdusize: 数据长度
+ * @param[out] ecsdusz: 指向缓冲区的指针，此缓冲区用于输出编码后的数据数组
+ * @param[out] ecsize: 指向缓冲区的指针，此缓冲区用于输出编码后的数据数组的长度
  */
 __xwmd_code
 void xwpcp_encode_sdusize(xwsz_t sdusize, xwu8_t * ecsdusz, xwu8_t * ecsize)
@@ -231,8 +231,8 @@ void xwpcp_encode_sdusize(xwsz_t sdusize, xwu8_t * ecsdusz, xwu8_t * ecsize)
 
 /**
  * @brief 解码数据长度
- * @param ecsdusz: (I) 编码的数据长度数据
- * @param sdusize: (O) 指向缓冲区的指针，解码后通过此缓冲区返回数据长度
+ * @param[in] ecsdusz: 编码的数据长度数据
+ * @param[out] sdusize: 指向缓冲区的指针，解码后通过此缓冲区返回数据长度
  */
 __xwmd_code
 void xwpcp_decode_sdusize(xwu8_t * ecsdusz, xwsz_t * sdusize)
@@ -257,8 +257,8 @@ void xwpcp_decode_sdusize(xwu8_t * ecsdusz, xwsz_t * sdusize)
 
 /**
  * @brief 计算数据流的校验和
- * @param data: (I) 数据流
- * @param size: (I) 数据流长度
+ * @param[in] data: 数据流
+ * @param[in] size: 数据流长度
  * @return 校验和
  */
 __xwmd_code
@@ -280,8 +280,8 @@ xwu8_t xwpcp_cal_head_chksum(xwu8_t data[], xwsz_t size)
 
 /**
  * @brief 校验数据流
- * @param data: (I) 数据流
- * @param size: (I) 数据流长度
+ * @param[in] data: 数据流
+ * @param[in] size: 数据流长度
  * @return 布尔值
  * @retval true: 校验通过
  * @retval false: 校验失败
@@ -304,8 +304,8 @@ bool xwpcp_chk_head(xwu8_t data[], xwsz_t size)
 
 /**
  * @brief 校验帧是否合法
- * @param xwpcp: (I) XWPCP对象的指针
- * @param slot: (I) 待校验的帧槽的指针
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] slot: 待校验的帧槽的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EBADMSG: 校验错误
@@ -338,9 +338,9 @@ xwer_t xwpcp_chk_frm(union xwpcp_slot * slot)
 
 /**
  * @brief 发布数据帧到接收队列
- * @param xwpcp: (I) XWPCP对象的指针
- * @param slot: (I) 待发布的帧槽指针
- * @param port: (I) 端口值
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] slot: 待发布的帧槽指针
+ * @param[in] port: 端口值
  */
 static __xwmd_code
 void xwpcp_rxq_pub(struct xwpcp * xwpcp,
@@ -358,8 +358,8 @@ void xwpcp_rxq_pub(struct xwpcp * xwpcp,
 
 /**
  * @brief 从接收队列中选择一条数据帧
- * @param xwpcp: (I) XWPCP对象的指针
- * @param port: (I) 端口
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] port: 端口
  * @return 帧槽的指针
  */
 __xwmd_code
@@ -379,8 +379,8 @@ union xwpcp_slot * xwpcp_rxq_choose(struct xwpcp * xwpcp, xwu8_t port)
 
 /**
  * @brief 接收同步帧
- * @param xwpcp: (I) XWPCP对象的指针
- * @param slot: (I) 接收到的帧槽指针
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] slot: 接收到的帧槽指针
  * @return 错误码
  */
 static __xwmd_code
@@ -416,8 +416,8 @@ xwer_t xwpcp_rx_cmd_connect(struct xwpcp * xwpcp, union xwpcp_slot * slot)
 
 /**
  * @brief 接收同步应答帧
- * @param xwpcp: (I) XWPCP对象的指针
- * @param slot: (I) 接收到的帧槽指针
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] slot: 接收到的帧槽指针
  * @return 错误码
  */
 static __xwmd_code
@@ -456,8 +456,8 @@ xwer_t xwpcp_rx_cmd_connect_ack(struct xwpcp * xwpcp, union xwpcp_slot * slot)
 
 /**
  * @brief 接收数据帧
- * @param xwpcp: (I) XWPCP对象的指针
- * @param slot: (I) 接收到的帧槽指针
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] slot: 接收到的帧槽指针
  * @return 错误码
  * @note
  * + 数据帧：
@@ -521,8 +521,8 @@ xwer_t xwpcp_rx_sdu(struct xwpcp * xwpcp, union xwpcp_slot * slot)
 
 /**
  * @brief 接收数据应答帧
- * @param xwpcp: (I) XWPCP对象的指针
- * @param slot: (I) 接收到的帧槽指针
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] slot: 接收到的帧槽指针
  * @return 错误码
  */
 static __xwmd_code
@@ -561,8 +561,8 @@ err_mtx_lock:
 
 /**
  * @brief 接收帧
- * @param xwpcp: (I) XWPCP对象的指针
- * @param slot: (I) 接收到的帧槽指针
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] slot: 接收到的帧槽指针
  * @return 错误码
  */
 static __xwmd_code
@@ -605,7 +605,7 @@ err_badmsg:
 
 /**
  * @brief XWPCP的接收线程状态机
- * @param xwpcp: (I) XWPCP对象的指针
+ * @param[in] xwpcp: XWPCP对象的指针
  * @return 错误码
  */
 static __xwmd_code
@@ -625,7 +625,7 @@ xwer_t xwpcp_rxfsm(struct xwpcp * xwpcp)
 
 /**
  * @brief XWPCP的接收线程
- * @param xwpcp: (I) XWPCP对象的指针
+ * @param[in] xwpcp: XWPCP对象的指针
  * @return 线程返回值
  */
 __xwmd_code
@@ -672,7 +672,7 @@ xwer_t xwpcp_rxthd(struct xwpcp * xwpcp)
 
 /**
  * @brief 申请发送装置
- * @param xwpcp: (I) XWPCP对象的指针
+ * @param[in] xwpcp: XWPCP对象的指针
  * @return 发送装置的指针
  */
 __xwmd_code
@@ -694,8 +694,8 @@ struct xwpcp_carrier * xwpcp_txq_carrier_alloc(struct xwpcp * xwpcp)
 
 /**
  * @brief 释放发送装置
- * @param xwpcp: (I) XWPCP对象的指针
- * @param car: (I) 发送装置的指针
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] car: 发送装置的指针
  */
 __xwmd_code
 void xwpcp_txq_carrier_free(struct xwpcp * xwpcp, struct xwpcp_carrier * car)
@@ -706,8 +706,8 @@ void xwpcp_txq_carrier_free(struct xwpcp * xwpcp, struct xwpcp_carrier * car)
 
 /**
  * @brief 将待发送的帧放到发送队列的头部
- * @param xwpcp: (I) XWPCP对象的指针
- * @param car: (I) 发送装置的指针
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] car: 发送装置的指针
  */
 static __xwmd_code
 void xwpcp_txq_add_head(struct xwpcp * xwpcp, struct xwpcp_carrier * car)
@@ -726,8 +726,8 @@ void xwpcp_txq_add_head(struct xwpcp * xwpcp, struct xwpcp_carrier * car)
 
 /**
  * @brief 将待发送的帧放到发送队列的尾部
- * @param xwpcp: (I) XWPCP对象的指针
- * @param car: (I) 发送装置的指针
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] car: 发送装置的指针
  */
 static __xwmd_code
 void xwpcp_txq_add_tail(struct xwpcp * xwpcp, struct xwpcp_carrier * car)
@@ -746,7 +746,7 @@ void xwpcp_txq_add_tail(struct xwpcp * xwpcp, struct xwpcp_carrier * car)
 
 /**
  * @brief 从最高优先级的发送队列中选择一个待发送的帧槽
- * @param xwpcp: (I) XWPCP对象的指针
+ * @param[in] xwpcp: XWPCP对象的指针
  * @return 发送装置的指针
  */
 __xwmd_code
@@ -770,7 +770,7 @@ struct xwpcp_carrier * xwpcp_txq_choose(struct xwpcp * xwpcp)
 
 /**
  * @brief 发送同步帧
- * @param xwpcp: (I) XWPCP对象的指针
+ * @param[in] xwpcp: XWPCP对象的指针
  * @return 错误码
  */
 static __xwmd_code
@@ -791,8 +791,8 @@ xwer_t xwpcp_tx_cmd_connect(struct xwpcp * xwpcp)
 
 /**
  * @brief 发送同步应答帧
- * @param xwpcp: (I) XWPCP对象的指针
- * @param rxcnt: (I) 应答接收计数器
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] rxcnt: 应答接收计数器
  * @return 错误码
  */
 static __xwmd_code
@@ -813,11 +813,11 @@ xwer_t xwpcp_tx_cmd_connect_ack(struct xwpcp * xwpcp)
 
 /**
  * @brief 发送数据应答帧
- * @param xwpcp: (I) XWPCP对象的指针
- * @param frm: (O) 指向缓冲区的指针，此缓冲区被用于格式化一帧
- * @param port: (I) 端口
- * @param id: (I) 应答远端消息的id
- * @param ack: (I) 应答
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[out] frm: 指向缓冲区的指针，此缓冲区被用于格式化一帧
+ * @param[in] port: 端口
+ * @param[in] id: 应答远端消息的id
+ * @param[in] ack: 应答
  * @return 错误码
  */
 __xwmd_code
@@ -858,15 +858,15 @@ xwer_t xwpcp_tx_sdu_ack(struct xwpcp * xwpcp, xwu8_t port, xwu8_t id, xwu8_t ack
 
 /**
  * @brief 格式化数据帧并加入到发送队列
- * @param xwpcp: (I) XWPCP对象的指针
- * @param sdu: (I) 数据
- * @param sdusize: (I) 数据长度
- * @param pri: (I) 优先级
- * @param port: (I) 端口
- * @param qos: (I) 服务质量
- * @param ntfcb: (I) 通知发送结果的回调函数
- * @param cbarg: (I) 调用回调函数时的用户数据
- * @param txhbuf: (O) 指向缓冲区的指针，通过此缓冲区返回发送句柄
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] sdu: 数据
+ * @param[in] sdusize: 数据长度
+ * @param[in] pri: 优先级
+ * @param[in] port: 端口
+ * @param[in] qos: 服务质量
+ * @param[in] ntfcb: 通知发送结果的回调函数
+ * @param[in] cbarg: 调用回调函数时的用户数据
+ * @param[out] txhbuf: 指向缓冲区的指针，通过此缓冲区返回发送句柄
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足
@@ -992,7 +992,7 @@ err_car_alloc:
 
 /**
  * @brief 连接远端
- * @param xwpcp: (I) XWPCP对象的指针
+ * @param[in] xwpcp: XWPCP对象的指针
  * @return 错误码
  */
 static __xwmd_code
@@ -1029,8 +1029,8 @@ xwer_t xwpcp_connect(struct xwpcp * xwpcp)
 
 /**
  * @brief 指示数据帧的发送状态
- * @param xwpcp: (I) XWPCP对象的指针
- * @param car: (I) 发送装置的指针
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] car: 发送装置的指针
  */
 static __xwmd_code
 void xwpcp_finish_tx(struct xwpcp * xwpcp, struct xwpcp_carrier * car)
@@ -1096,8 +1096,8 @@ void xwpcp_finish_tx(struct xwpcp * xwpcp, struct xwpcp_carrier * car)
 
 /**
  * @brief 发送帧
- * @param xwpcp: (I) XWPCP对象的指针
- * @param car: (I) 发送装置的指针
+ * @param[in] xwpcp: XWPCP对象的指针
+ * @param[in] car: 发送装置的指针
  * @return 错误码
  */
 static __xwmd_code
@@ -1214,7 +1214,7 @@ err_mtx_lock:
 
 /**
  * @brief XWPCP的发送线程状态机
- * @param xwpcp: (I) XWPCP对象的指针
+ * @param[in] xwpcp: XWPCP对象的指针
  * @return 错误码
  */
 static __xwmd_code
@@ -1286,7 +1286,7 @@ err_connect:
 
 /**
  * @brief XWPCP的发送线程
- * @param xwpcp: (I) XWPCP对象的指针
+ * @param[in] xwpcp: XWPCP对象的指针
  * @return 线程返回值
  */
 __xwmd_code

@@ -73,9 +73,6 @@ xwer_t xwospl_syshwt_init(struct xwospl_syshwt * hwt)
         return XWOK;
 }
 
-/**
- * @brief 硬件定时器中断服务
- */
 __xwbsp_isr
 void xwospl_syshwt_isr(void)
 {

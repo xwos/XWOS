@@ -29,10 +29,6 @@ struct soc_splk {
         xwu32_t lockval;
 };
 
-/**
- * @brief Initialize a spinlock
- * @parem socsplk: SOC Spinlock
- */
 static __xwbsp_inline
 void soc_splk_init(struct soc_splk * socsplk)
 {

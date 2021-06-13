@@ -30,8 +30,8 @@ extern xwu8_t flsopc_vma_end[];
 
 /**
  * @brief Select block of code flash
- * @param lmsmsk: (I) Low/Mid space block bit mask
- * @param lmsmsk: (I) High space block bit mask
+ * @param[in] lmsmsk: Low/Mid space block bit mask
+ * @param[in] lmsmsk: High space block bit mask
  */
 __flsopc
 void soc_cflash_select(xwsq_t lmsmsk, xwsq_t hsmsk)
@@ -59,8 +59,8 @@ void soc_cflash_select(xwsq_t lmsmsk, xwsq_t hsmsk)
 
 /**
  * @brief Erase blocks of code flash
- * @param lmsmsk: (I) Low/Mid space block bit mask
- * @param lmsmsk: (I) High space block bit mask
+ * @param[in] lmsmsk: Low/Mid space block bit mask
+ * @param[in] lmsmsk: High space block bit mask
  */
 __flsopc
 void soc_cflash_erase(xwsq_t lmsmsk, xwsq_t hsmsk)
@@ -93,9 +93,9 @@ void soc_cflash_erase(xwsq_t lmsmsk, xwsq_t hsmsk)
 
 /**
  * @brief Program code flash
- * @param addr: (I) address to program
- * @param data0: (I) data 0
- * @param data1: (I) data 1
+ * @param[in] addr: address to program
+ * @param[in] data0: data 0
+ * @param[in] data1: data 1
  */
 __flsopc
 void soc_cflash_program(xwu32_t * addr, xwu32_t data0, xwu32_t data1)
@@ -152,9 +152,9 @@ void soc_cflash_erase_shadow_block(void)
 
 /**
  * @brief Program shadow/test block of code flash
- * @param addr: (I) address to program
- * @param data0: (I) data 0
- * @param data1: (I) data 1
+ * @param[in] addr: address to program
+ * @param[in] data0: data 0
+ * @param[in] data1: data 1
  */
 __flsopc
 void soc_cflash_program_shadow_test_block(xwu32_t * addr, xwu32_t data0, xwu32_t data1)

@@ -18,8 +18,8 @@ extern xwer_t board_log_write(const char * s, xwsz_t * n);
 
 /**
  * @brief 格式化字符串并输出到日志，同printf()函数
- * @param fmt: (I) 格式的字符串
- * @param ...: (I) 需要转换位字符串的其他参数
+ * @param[in] fmt: 格式的字符串
+ * @param[in] ...: 需要转换位字符串的其他参数
  * @return 同vsnprintf()函数
  * @note
  * - 同步/异步：依据BSP中soc_log_write()或board_log_write()的实现

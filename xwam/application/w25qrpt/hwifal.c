@@ -26,7 +26,7 @@
 
 /**
  * @brief 打开硬件接口
- * @param w25qrpt: (I) W25QRPT对象的指针
+ * @param[in] w25qrpt: W25QRPT对象的指针
  * @return 错误码
  */
 xwer_t w25qrpt_hwifal_open(struct w25qrpt * w25qrpt, void * hwifcb)
@@ -47,7 +47,7 @@ xwer_t w25qrpt_hwifal_open(struct w25qrpt * w25qrpt, void * hwifcb)
 
 /**
  * @brief 关闭硬件接口
- * @param w25qrpt: (I) W25QRPT对象的指针
+ * @param[in] w25qrpt: W25QRPT对象的指针
  * @return 错误码
  */
 xwer_t w25qrpt_hwifal_close(struct w25qrpt * w25qrpt)
@@ -68,8 +68,8 @@ xwer_t w25qrpt_hwifal_close(struct w25qrpt * w25qrpt)
 
 /**
  * @brief 通过硬件接口发送消息
- * @param w25qrpt: (I) W25QRPT对象的指针
- * @param msg: (I) 指向发送帧缓冲区的指针
+ * @param[in] w25qrpt: W25QRPT对象的指针
+ * @param[in] msg: 指向发送帧缓冲区的指针
  * @return 错误码
  */
 xwer_t w25qrpt_hwifal_tx(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
@@ -132,8 +132,8 @@ xwsz_t w25qrpt_get_sdu_size(struct w25qrpt_msg * msg)
 
 /**
  * @brief 通过硬件接口接收消息
- * @param w25qrpt: (I) W25QRPT对象的指针
- * @param msgbuf: (O) 指向缓冲区的指针，通过此缓冲区返回struct w25qrpt_msg
+ * @param[in] w25qrpt: W25QRPT对象的指针
+ * @param[out] msgbuf: 指向缓冲区的指针，通过此缓冲区返回struct w25qrpt_msg
  * @return 错误码
  */
 xwer_t w25qrpt_hwifal_rx(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msgbuf)

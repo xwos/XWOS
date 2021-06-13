@@ -20,13 +20,13 @@
 
 /**
  * @brief XWMM API：静态方式初始化内存切片分配器
- * @param msa: (I) 内存切片分配器对象的指针
- * @param origin: (I) 建立内存切片分配算法的内存区域首地址
- * @param total_size: (I) 建立内存切片分配算法的内存区域大小
- * @param card_size: (I) 切片大小
- * @param name: (I) 名字
- * @param ctor: (I) 切片的构造函数
- * @param dtor: (I) 切片的析构函数
+ * @param[in] msa: 内存切片分配器对象的指针
+ * @param[in] origin: 建立内存切片分配算法的内存区域首地址
+ * @param[in] total_size: 建立内存切片分配算法的内存区域大小
+ * @param[in] card_size: 切片大小
+ * @param[in] name: 名字
+ * @param[in] ctor: 切片的构造函数
+ * @param[in] dtor: 切片的析构函数
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -E2SMALL: 内存区域太小
@@ -95,8 +95,8 @@ err_mem2small:
 
 /**
  * @brief XWMM API：申请一片内存切片
- * @param msa: (I) 内存切片分配器对象的指针
- * @param membuf: (O) 指向地址缓存的指针，通过此指针缓存返回申请到的内存的首地址
+ * @param[in] msa: 内存切片分配器对象的指针
+ * @param[out] membuf: 指向地址缓存的指针，通过此指针缓存返回申请到的内存的首地址
  * @return 错误码
  * @retval -EFAULT: 空指针
  * @retval -ENOMEM: 内存不足
@@ -131,8 +131,8 @@ err_lfq_pop:
 
 /**
  * @brief XWMM API：释放一片内存切片
- * @param msa: (I) 内存切片分配器对象的指针
- * @param mem: (I) 内存切片的首地址
+ * @param[in] msa: 内存切片分配器对象的指针
+ * @param[in] mem: 内存切片的首地址
  * @return 错误码
  * @note
  * - 同步/异步：同步

@@ -45,14 +45,14 @@ xwer_t xwmm_mempool_objcache_i_a_free(void * this, void * mem);
 
 /**
  * @brief 初始化对象缓存
- * @param oc: (I) 对象缓存的指针
- * @param pa: (I) 页分配器的指针
- * @param name: (I) 名字
- * @param objsize: (I) 对象的大小
- * @param alignment: (I) 对齐的大小
- * @param pg_order: (I) 每次申请的页的数量的阶
- * @param ctor: (I) 构造函数
- * @param dtor: (I) 析构函数
+ * @param[in] oc: 对象缓存的指针
+ * @param[in] pa: 页分配器的指针
+ * @param[in] name: 名字
+ * @param[in] objsize: 对象的大小
+ * @param[in] alignment: 对齐的大小
+ * @param[in] pg_order: 每次申请的页的数量的阶
+ * @param[in] ctor: 构造函数
+ * @param[in] dtor: 析构函数
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EALIGN: 内存区域没有对齐
@@ -113,8 +113,8 @@ xwer_t xwmm_mempool_objcache_init(struct xwmm_mempool_objcache * oc,
 
 /**
  * @brief 初始化新页
- * @param oc: (I) 对象缓存的指针
- * @param pg: (I) 页控制块的指针
+ * @param[in] oc: 对象缓存的指针
+ * @param[in] pg: 页控制块的指针
  */
 static __xwos_code
 void xwmm_mempool_objcache_page_init(struct xwmm_mempool_objcache * oc,
@@ -155,8 +155,8 @@ void xwmm_mempool_objcache_page_init(struct xwmm_mempool_objcache * oc,
 
 /**
  * @brief 释放空闲页
- * @param oc: (I) 对象缓存的指针
- * @param nr: (I) 期望释放的数量
+ * @param[in] oc: 对象缓存的指针
+ * @param[in] nr: 期望释放的数量
  * @return 实际释放的数量
  */
 static __xwos_code
@@ -189,8 +189,8 @@ xwsz_t xwmm_mempool_objcache_free_idle_page(struct xwmm_mempool_objcache * oc,
 
 /**
  * @brief 减少页的引用计数
- * @param oc: (I) 对象缓存的指针
- * @param pg: (I) 页控制块的指针
+ * @param[in] oc: 对象缓存的指针
+ * @param[in] pg: 页控制块的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval <0: 失败
@@ -217,8 +217,8 @@ void xwmm_mempool_objcache_page_put(struct xwmm_mempool_objcache * oc,
 
 /**
  * @brief 获取一页，准备从页内存中分配对象
- * @param oc: (I) 对象缓存的指针
- * @param pgbuf: (O) 指向缓冲区的指针，通过此缓冲区返回页控制块的指针
+ * @param[in] oc: 对象缓存的指针
+ * @param[out] pgbuf: 指向缓冲区的指针，通过此缓冲区返回页控制块的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足
@@ -263,8 +263,8 @@ err_pg_alloc:
 
 /**
  * @brief 从对象缓存中申请一个对象
- * @param oc: (I) 对象缓存的指针
- * @param objbuf: (O) 指向缓冲区的指针，此缓冲区被用于返回对象的指针
+ * @param[in] oc: 对象缓存的指针
+ * @param[out] objbuf: 指向缓冲区的指针，此缓冲区被用于返回对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足
@@ -307,8 +307,8 @@ err_page_get:
 
 /**
  * @brief 释放对象到对象缓存中
- * @param oc: (I) 对象缓存的指针
- * @param obj: (I) 对象的指针
+ * @param[in] oc: 对象缓存的指针
+ * @param[in] obj: 对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足
@@ -359,8 +359,8 @@ err_pg_find:
 
 /**
  * @brief 预留对象到对象缓存中
- * @param oc: (I) 对象缓存的指针
- * @param reserved: (I) 预留的数量
+ * @param[in] oc: 对象缓存的指针
+ * @param[in] reserved: 预留的数量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足
@@ -405,8 +405,8 @@ err_pg_alloc:
 
 /**
  * @brief 获取对象缓存的容量
- * @param oc: (I) 对象缓存的指针
- * @param capacity: (O) 指向缓冲区的指针，通过此缓冲区返回对象缓存的容量
+ * @param[in] oc: 对象缓存的指针
+ * @param[out] capacity: 指向缓冲区的指针，通过此缓冲区返回对象缓存的容量
  * @return 错误码
  * @retval XWOK: 没有错误
  */
@@ -420,9 +420,9 @@ xwer_t xwmm_mempool_objcache_get_capacity(struct xwmm_mempool_objcache * oc,
 
 /**
  * @brief i_allocator接口函数：申请内存
- * @param this: (I) this指针(页分配器)
- * @param size: (I) 申请的大小
- * @param membuf: (O) 指向缓冲区的指针，通过此缓冲区返回申请到的内存的首地址
+ * @param[in] this: this指针(页分配器)
+ * @param[in] size: 申请的大小
+ * @param[out] membuf: 指向缓冲区的指针，通过此缓冲区返回申请到的内存的首地址
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足
@@ -451,8 +451,8 @@ err_size:
 
 /**
  * @brief i_allocator接口函数：释放内存
- * @param this: (I) this指针(页分配器)
- * @param mem: (I) 内存的首地址
+ * @param[in] this: this指针(页分配器)
+ * @param[in] mem: 内存的首地址
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足

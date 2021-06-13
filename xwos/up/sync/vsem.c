@@ -20,7 +20,7 @@
 
 /**
  * @brief 激活信号量对象
- * @param vsem: (I) 信号量对象的指针
+ * @param[in] vsem: 信号量对象的指针
  */
 __xwup_code
 void xwup_vsem_activate(struct xwup_vsem * vsem)
@@ -35,9 +35,9 @@ void xwup_vsem_activate(struct xwup_vsem * vsem)
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
 /**
  * @brief 绑定信号量到事件对象，事件对象类型为XWUP_EVT_TYPE_SEL
- * @param vsem: (I) 信号量对象的指针
- * @param evt: (I) 事件对象的指针
- * @param pos: (I) 信号量对象映射到位图中的位置
+ * @param[in] vsem: 信号量对象的指针
+ * @param[in] evt: 事件对象的指针
+ * @param[in] pos: 信号量对象映射到位图中的位置
  * @return 错误码
  * @retval XWOK: 没有错误
  * @note
@@ -63,8 +63,8 @@ xwer_t xwup_vsem_bind(struct xwup_vsem * vsem, struct xwup_evt * evt, xwsq_t pos
 
 /**
  * @brief 从事件对象上解绑信号量，事件对象类型为XWUP_EVT_TYPE_SEL
- * @param sem: (I) 信号量对象的指针
- * @param evt: (I) 事件对象的指针
+ * @param[in] sem: 信号量对象的指针
+ * @param[in] evt: 事件对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @note
@@ -91,7 +91,7 @@ xwer_t xwup_vsem_unbind(struct xwup_vsem * vsem, struct xwup_evt * evt)
 
 /**
  * @brief 冻结信号量（值设置为负）
- * @param vsem: (I) 信号量对象的基类指针
+ * @param[in] vsem: 信号量对象的基类指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EALREADY: 信号量已为负
@@ -133,7 +133,7 @@ xwer_t xwup_vsem_freeze(struct xwup_vsem * vsem)
 
 /**
  * @brief 解冻信号量
- * @param vsem: (I) 信号量对象的基类指针
+ * @param[in] vsem: 信号量对象的基类指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 参数无效
@@ -164,8 +164,8 @@ xwer_t xwup_vsem_thaw(struct xwup_vsem * vsem)
 
 /**
  * @brief 获取信号量计数器的值
- * @param vsem: (I) 信号量对象的基类指针
- * @param sval: (O) 指向缓冲区的指针，通过此缓冲区返回信号量计数器的值
+ * @param[in] vsem: 信号量对象的基类指针
+ * @param[out] sval: 指向缓冲区的指针，通过此缓冲区返回信号量计数器的值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @note

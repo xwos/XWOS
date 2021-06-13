@@ -90,7 +90,7 @@ xwsq_t xwos_objtik_get(void)
 
 /**
  * @brief XWOS对象的构造函数
- * @param obj: (I) 对象指针
+ * @param[in] obj: 对象指针
  */
 __xwlib_code
 void xwos_object_construct(struct xwos_object * obj)
@@ -102,7 +102,7 @@ void xwos_object_construct(struct xwos_object * obj)
 
 /**
  * @brief XWOS对象的析构函数
- * @param obj: (I) 对象指针
+ * @param[in] obj: 对象指针
  */
 __xwlib_code
 void xwos_object_destruct(struct xwos_object * obj)
@@ -114,8 +114,8 @@ void xwos_object_destruct(struct xwos_object * obj)
 
 /**
  * @brief 激活一个XWOS对象（将其引用计数初始化位1）
- * @param obj: (I) 对象指针
- * @param gcfunc: (I) 垃圾回收函数：当对象应用计数为0，调用此函数回收资源。
+ * @param[in] obj: 对象指针
+ * @param[in] gcfunc: 垃圾回收函数：当对象应用计数为0，调用此函数回收资源
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EOBJACTIVE: 对象已激活
@@ -138,8 +138,8 @@ xwer_t xwos_object_activate(struct xwos_object * obj, xwobj_gc_f gcfunc)
 
 /**
  * @brief 设置XWOS对象的垃圾回收函数
- * @param obj: (I) 对象指针
- * @param gcfunc: (I) 垃圾回收函数：当对象应用计数为0，调用此函数回收资源。
+ * @param[in] obj: 对象指针
+ * @param[in] gcfunc: 垃圾回收函数：当对象应用计数为0，调用此函数回收资源
  */
 __xwlib_code
 void xwos_object_setgc(struct xwos_object * obj, xwobj_gc_f gcfunc)
@@ -183,8 +183,8 @@ void xwos_object_acquire_refaop_op(void * nv, const void * ov, void * arg)
 
 /**
  * @brief 检查对象的标签并增加引用计数
- * @param obj: (I) 对象指针
- * @param tik: (I) 标签
+ * @param[in] obj: 对象指针
+ * @param[in] tik: 标签
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EOBJDEAD: 对象无效
@@ -237,8 +237,8 @@ void xwos_object_release_refaop_op(void * nv, const void * ov, void * arg)
 
 /**
  * @brief 检查对象的标签并减少引用计数
- * @param obj: (I) 对象指针
- * @param tik: (I) 标签
+ * @param[in] obj: 对象指针
+ * @param[in] tik: 标签
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EOBJDEAD: 对象无效
@@ -267,7 +267,7 @@ xwer_t xwos_object_release(struct xwos_object * obj, xwsq_t tik)
 
 /**
  * @brief 增加对象的引用计数
- * @param obj: (I) 对象指针
+ * @param[in] obj: 对象指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EOBJDEAD: 对象已销毁
@@ -286,7 +286,7 @@ xwer_t xwos_object_grab(struct xwos_object * obj)
 
 /**
  * @brief 减少对象的引用计数
- * @param obj: (I) 对象指针
+ * @param[in] obj: 对象指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EOBJDEAD: 对象已销毁
@@ -314,7 +314,7 @@ xwer_t xwos_object_put(struct xwos_object * obj)
 
 /**
  * @brief 减少对象的引用计数，不触发垃圾回收函数
- * @param obj: (I) 对象指针
+ * @param[in] obj: 对象指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EOBJDEAD: 对象已销毁
@@ -335,7 +335,7 @@ xwer_t xwos_object_rawput(struct xwos_object * obj)
 
 /**
  * @brief 获取XWOS对象的引用计数
- * @param obj: (I) 对象指针
+ * @param[in] obj: 对象指针
  * @return 引用计数
  */
 __xwlib_code

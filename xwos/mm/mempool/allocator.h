@@ -15,6 +15,12 @@
 
 #include <xwos/standard.h>
 #include <xwos/mm/common.h>
+
+/**
+ * @defgroup xwmm_mempool 内存池分配器
+ * @{
+ */
+
 #include <xwos/mm/mempool/page.h>
 #include <xwos/mm/mempool/objcache.h>
 
@@ -47,8 +53,8 @@
 
 /**
  * @brief 定义内存池结构体的RAW内存空间，用于初始化内存池结构体
- * @param mem: (I) 内存数组名
- * @param pgodr: (I) 页的数量，以2的pgodr次方形式表示
+ * @param[in] mem: 内存数组名
+ * @param[in] pgodr: 页的数量，以2的pgodr次方形式表示
  */
 #define XWMM_MEMPOOL_DEF(mem, pgodr) \
         xwu8_t mem[sizeof(struct xwmm_mempool) + \
@@ -86,5 +92,9 @@ xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size,
 xwer_t xwmm_mempool_free(struct xwmm_mempool * mp, void * mem);
 xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size,
                             void ** membuf);
+
+/**
+ * @} xwmm_mempool
+ */
 
 #endif /* xwos/mm/mempool/allocator.h */

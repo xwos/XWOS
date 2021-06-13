@@ -145,7 +145,7 @@ xwer_t xwscp_tx_cmd_connect_ack(struct xwscp * xwscp);
 
 /**
  * @brief 增加XWSCP的引用计数，防止其被停止
- * @param xwscp: (I) XWSCP对象的指针
+ * @param[in] xwscp: XWSCP对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval <0: XWSCP已经停止运行
@@ -158,7 +158,7 @@ xwer_t xwscp_grab(struct xwscp * xwscp)
 
 /**
  * @brief 减少XWSCP的引用计数
- * @param xwscp: (I) XWSCP对象的指针
+ * @param[in] xwscp: XWSCP对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval <0: XWSCP没有在运行
@@ -171,9 +171,9 @@ xwer_t xwscp_put(struct xwscp * xwscp)
 
 /**
  * @brief 编码数据长度
- * @param sdusize: (I) 数据长度
- * @param ecsdusz: (O) 指向缓冲区的指针，此缓冲区用于输出编码后的数据数组
- * @param ecsize: (O) 指向缓冲区的指针，此缓冲区用于输出编码后的数据数组的长度
+ * @param[in] sdusize: 数据长度
+ * @param[out] ecsdusz: 指向缓冲区的指针，此缓冲区用于输出编码后的数据数组
+ * @param[out] ecsize: 指向缓冲区的指针，此缓冲区用于输出编码后的数据数组的长度
  */
 __xwmd_code
 void xwscp_encode_sdusize(xwsz_t sdusize, xwu8_t * ecsdusz, xwu8_t * ecsize)
@@ -197,8 +197,8 @@ void xwscp_encode_sdusize(xwsz_t sdusize, xwu8_t * ecsdusz, xwu8_t * ecsize)
 
 /**
  * @brief 解码数据长度
- * @param ecsdusz: (I) 编码的数据长度数据
- * @param sdusize: (O) 指向缓冲区的指针，解码后通过此缓冲区返回数据长度
+ * @param[in] ecsdusz: 编码的数据长度数据
+ * @param[out] sdusize: 指向缓冲区的指针，解码后通过此缓冲区返回数据长度
  */
 __xwmd_code
 void xwscp_decode_sdusize(xwu8_t * ecsdusz, xwsz_t * sdusize)
@@ -223,8 +223,8 @@ void xwscp_decode_sdusize(xwu8_t * ecsdusz, xwsz_t * sdusize)
 
 /**
  * @brief 计算Head的校验和
- * @param head: (I) 数据流
- * @param size: (I) 数据流长度
+ * @param[in] head: 数据流
+ * @param[in] size: 数据流长度
  * @return 校验和
  */
 __xwmd_code
@@ -246,8 +246,8 @@ xwu8_t xwscp_cal_head_chksum(xwu8_t head[], xwsz_t size)
 
 /**
  * @brief 校验Head
- * @param head: (I) 数据流
- * @param size: (I) 数据流长度
+ * @param[in] head: 数据流
+ * @param[in] size: 数据流长度
  * @return 布尔值
  * @retval true: 校验通过
  * @retval false: 校验失败
@@ -270,8 +270,8 @@ bool xwscp_chk_head(xwu8_t head[], xwsz_t size)
 
 /**
  * @brief 校验帧是否合法
- * @param xwscp: (I) XWSCP对象的指针
- * @param slot: (I) 待校验的帧槽的指针
+ * @param[in] xwscp: XWSCP对象的指针
+ * @param[in] slot: 待校验的帧槽的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EBADMSG: 校验错误
@@ -304,8 +304,8 @@ xwer_t xwscp_chk_frm(union xwscp_slot * slot)
 
 /**
  * @brief 发布数据帧到接收队列
- * @param xwscp: (I) XWSCP对象的指针
- * @param slot: (I) 待发布的数据帧
+ * @param[in] xwscp: XWSCP对象的指针
+ * @param[in] slot: 待发布的数据帧
  */
 __xwmd_code
 void xwscp_rxq_pub(struct xwscp * xwscp, union xwscp_slot * slot)
@@ -318,7 +318,7 @@ void xwscp_rxq_pub(struct xwscp * xwscp, union xwscp_slot * slot)
 
 /**
  * @brief 从接收队列中选择一条数据帧
- * @param xwscp: (I) XWSCP对象的指针
+ * @param[in] xwscp: XWSCP对象的指针
  * @return 帧槽的指针
  */
 __xwmd_code
@@ -338,8 +338,8 @@ union xwscp_slot * xwscp_rxq_choose(struct xwscp * xwscp)
 
 /**
  * @brief 接收连接命令
- * @param xwscp: (I) XWSCP对象的指针
- * @param slot: (I) 接收到的帧槽指针
+ * @param[in] xwscp: XWSCP对象的指针
+ * @param[in] slot: 接收到的帧槽指针
  * @return 错误码
  */
 static __xwmd_code
@@ -376,8 +376,8 @@ xwer_t xwscp_rx_cmd_connect(struct xwscp * xwscp, union xwscp_slot * slot)
 
 /**
  * @brief 接收连接命令应答
- * @param xwscp: (I) XWSCP对象的指针
- * @param slot: (I) 接收到的帧槽指针
+ * @param[in] xwscp: XWSCP对象的指针
+ * @param[in] slot: 接收到的帧槽指针
  * @return 错误码
  */
 static __xwmd_code
@@ -427,8 +427,8 @@ err_mtx_lock:
 
 /**
  * @brief 接收数据帧
- * @param xwscp: (I) XWSCP对象的指针
- * @param slot: (I) 接收到的帧槽指针
+ * @param[in] xwscp: XWSCP对象的指针
+ * @param[in] slot: 接收到的帧槽指针
  * @return 错误码
  * @note
  * + 数据帧：
@@ -491,8 +491,8 @@ xwer_t xwscp_rx_sdu(struct xwscp * xwscp, union xwscp_slot * slot)
 
 /**
  * @brief 接收数据应答帧
- * @param xwscp: (I) XWSCP对象的指针
- * @param slot: (I) 接收到的帧槽指针
+ * @param[in] xwscp: XWSCP对象的指针
+ * @param[in] slot: 接收到的帧槽指针
  * @return 错误码
  */
 static __xwmd_code
@@ -531,8 +531,8 @@ err_mtx_lock:
 
 /**
  * @brief 接收并处理一帧消息
- * @param xwscp: (I) XWSCP对象的指针
- * @param slot: (I) 接收到的帧槽指针
+ * @param[in] xwscp: XWSCP对象的指针
+ * @param[in] slot: 接收到的帧槽指针
  * @return 错误码
  */
 static __xwmd_code
@@ -575,7 +575,7 @@ err_badmsg:
 
 /**
  * @brief XWSCP的接收线程状态机
- * @param xwscp: (I) XWSCP对象的指针
+ * @param[in] xwscp: XWSCP对象的指针
  * @return 错误码
  */
 static __xwmd_code
@@ -595,7 +595,7 @@ xwer_t xwscp_fsm(struct xwscp * xwscp)
 
 /**
  * @brief XWSCP的接收线程
- * @param xwscp: (I) XWSCP对象的指针
+ * @param[in] xwscp: XWSCP对象的指针
  * @return 线程返回值
  */
 __xwmd_code
@@ -634,7 +634,7 @@ xwer_t xwscp_thd(struct xwscp * xwscp)
 
 /**
  * @brief 发送同步帧
- * @param xwscp: (I) XWSCP对象的指针
+ * @param[in] xwscp: XWSCP对象的指针
  * @return 错误码
  */
 __xwmd_code
@@ -651,7 +651,7 @@ xwer_t xwscp_tx_cmd_connect(struct xwscp * xwscp)
 
 /**
  * @brief 发送同步应答帧
- * @param xwscp: (I) XWSCP对象的指针
+ * @param[in] xwscp: XWSCP对象的指针
  * @return 错误码
  */
 static __xwmd_code
@@ -672,10 +672,10 @@ xwer_t xwscp_tx_cmd_connect_ack(struct xwscp * xwscp)
 
 /**
  * @brief 格式化数据帧并加入到发送队列
- * @param xwscp: (I) XWSCP对象的指针
- * @param sdu: (I) 数据
- * @param sdusize: (I) 数据长度
- * @param qos: (I) 服务质量
+ * @param[in] xwscp: XWSCP对象的指针
+ * @param[in] sdu: 数据
+ * @param[in] sdusize: 数据长度
+ * @param[in] qos: 服务质量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENOMEM: 内存不足
@@ -783,9 +783,9 @@ err_bma_alloc:
 
 /**
  * @brief 发送数据应答帧
- * @param xwscp: (I) XWSCP对象的指针
- * @param id: (I) 应答远程端的id
- * @param ack: (I) 应答码
+ * @param[in] xwscp: XWSCP对象的指针
+ * @param[in] id: 应答远程端的id
+ * @param[in] ack: 应答码
  * @return 错误码
  */
 __xwmd_code

@@ -23,7 +23,7 @@
 
 /**
  * @brief load exclusively
- * @param addr: (I) 地址
+ * @param[in] addr: 地址
  */
         .section        .xwos.text,"ax"
         .global         lwarx
@@ -39,8 +39,8 @@ lwarx_end:
 
 /**
  * @brief store exclusively
- * @param addr: (I) 地址
- * @param value: (I) 数值
+ * @param[in] addr: 地址
+ * @param[in] value: 数值
  * @return boolean
  * @retval 0: OK
  * @retval !0: FAILED
@@ -64,7 +64,7 @@ stwcx_end:
 
 /**
  * @brief 反转字节序
- * @param addr: (I) 需要反转字节序的地址
+ * @param[in] addr: 需要反转字节序的地址
  */
         .section        .xwos.text,"ax"
         .global         lwbrx
@@ -80,7 +80,7 @@ lwbrx_end:
 
 /**
  * @brief 反转半字的字节序
- * @param addr: (I) 需要反转字节序的地址
+ * @param[in] addr: 需要反转字节序的地址
  */
         .section        .xwos.text,"ax"
         .global         lhbrx

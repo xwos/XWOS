@@ -14,8 +14,14 @@
 #define __xwos_lib_type_h__
 
 #include <cfg/XuanWuOS.h>
-#include <xwos/ospl/soc/type.h>
 #include <stdarg.h>
+
+/**
+ * @defgroup type 玄武OS的基本类型定义
+ * @{
+ */
+
+#include <xwos/ospl/soc/type.h>
 
 #ifndef NULL
   #define NULL ((void *)0)
@@ -637,8 +643,8 @@ union xwos_ulock {
 #if !defined(ARCH_HAVE_XWTM_T)
 /**
  * @brief 将两个系统时间相加，并检查溢出
- * @param a: (I) 加数a
- * @param b: (I) 加数b
+ * @param[in] a: 加数a
+ * @param[in] b: 加数b
  * @return 结果
  * @note
  * - 如果结果已经溢出，返回xwtm_t的最大值。
@@ -657,9 +663,9 @@ xwtm_t xwtm_add_safely(const xwtm_t a, const xwtm_t b)
 
 /**
  * @brief 将两个系统时间相加
- * @param a: (I) 加数a
- * @param b: (I) 加数b
- * @retval 结果
+ * @param[in] a: 加数a
+ * @param[in] b: 加数b
+ * @return 结果
  */
 static __xwcc_inline
 xwtm_t xwtm_add(const xwtm_t a, const xwtm_t b)
@@ -669,9 +675,9 @@ xwtm_t xwtm_add(const xwtm_t a, const xwtm_t b)
 
 /**
  * @brief 将两个系统时间相减
- * @param a: (I) 被减数
- * @param b: (I) 减数
- * @retval 结果
+ * @param[in] a: 被减数
+ * @param[in] b: 减数
+ * @return 结果
  */
 static __xwcc_inline
 xwtm_t xwtm_sub(const xwtm_t a, const xwtm_t b)
@@ -681,8 +687,9 @@ xwtm_t xwtm_sub(const xwtm_t a, const xwtm_t b)
 
 /**
  * @brief 比较两个系统时间
- * @param a: (I) 系统时间a
- * @param b: (I) 系统时间b
+ * @param[in] a: 系统时间a
+ * @param[in] b: 系统时间b
+ * @return 结果
  * @retval <0: a < b
  * @retval ==0: a == b
  * @retval >0: a > b
@@ -702,5 +709,9 @@ xwer_t xwtm_cmp(const xwtm_t a, const xwtm_t b)
         return rc;
 }
 #endif /* #if !defined(ARCH_HAVE_XWTM_T) */
+
+/**
+ * @} type
+ */
 
 #endif /* xwos/lib/type.h */

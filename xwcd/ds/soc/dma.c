@@ -25,8 +25,8 @@
 
 /**
  * @brief XWDS API：申请DMA的通道
- * @param soc: (I) SOC对象指针
- * @param ch: (I) DMA通道
+ * @param[in] soc: SOC对象指针
+ * @param[in] ch: DMA通道
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -74,8 +74,8 @@ err_soc_grab:
 
 /**
  * @brief XWDS API：释放DMA的通道
- * @param soc: (I) SOC对象指针
- * @param ch: (I) DMA通道
+ * @param[in] soc: SOC对象指针
+ * @param[in] ch: DMA通道
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -117,11 +117,11 @@ err_notreq:
 
 /**
  * @brief XWDS API：配置DMA的通道
- * @param soc: (I) SOC对象指针
- * @param ch: (I) DMA通道
- * @param cfg: (I) SOC DMA通道配置
- * @param cb: (I) 传输结束回调函数
- * @param cfg: (I) 回调函数参数
+ * @param[in] soc: SOC对象指针
+ * @param[in] ch: DMA通道
+ * @param[in] cfg: SOC DMA通道配置
+ * @param[in] cb: 传输结束回调函数
+ * @param[in] cfg: 回调函数参数
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -181,8 +181,8 @@ err_notreq:
 
 /**
  * @brief XWDS API：打开DMA的通道
- * @param soc: (I) SOC对象指针
- * @param ch: (I) DMA通道
+ * @param[in] soc: SOC对象指针
+ * @param[in] ch: DMA通道
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -222,8 +222,8 @@ err_notreq:
 
 /**
  * @brief XWDS API：关闭DMA的通道
- * @param soc: (I) SOC对象指针
- * @param ch: (I) DMA通道
+ * @param[in] soc: SOC对象指针
+ * @param[in] ch: DMA通道
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -263,8 +263,8 @@ err_notreq:
 
 /**
  * @brief XWDS API：启动DMA的通道
- * @param soc: (I) SOC对象指针
- * @param ch: (I) DMA通道
+ * @param[in] soc: SOC对象指针
+ * @param[in] ch: DMA通道
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -304,8 +304,8 @@ err_notreq:
 
 /**
  * @brief XWDS API：停止DMA的通道
- * @param soc: (I) SOC对象指针
- * @param ch: (I) DMA通道
+ * @param[in] soc: SOC对象指针
+ * @param[in] ch: DMA通道
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针

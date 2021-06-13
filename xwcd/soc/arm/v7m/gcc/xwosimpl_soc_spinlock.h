@@ -56,10 +56,6 @@ void soc_splk_init(struct soc_splk * socsplk)
 }
 
 #if (CPUCFG_CPU_NUM > 1)
-/**
- * @brief Lock a spinlock
- * @parem socsplk: SOC Spinlock
- */
 static __xwbsp_inline
 void soc_splk_lock(struct soc_splk * socsplk)
 {
@@ -90,13 +86,6 @@ void soc_splk_lock(struct soc_splk * socsplk)
         xwmb_mp_mb();
 }
 
-/**
- * @brief Try to lock a spinlock
- * @parem socsplk: SOC Spinlock
- * @return error code
- * @retval 0: OK
- * @retval -EAGAIN: Can't acquire the lock and try again
- */
 static __xwbsp_inline
 xwer_t soc_splk_trylock(struct soc_splk * socsplk)
 {
@@ -131,10 +120,6 @@ xwer_t soc_splk_trylock(struct soc_splk * socsplk)
         }
 }
 
-/**
- * @brief Unlock a spinlock
- * @parem socsplk: SOC Spinlock
- */
 static __xwbsp_inline
 void soc_splk_unlock(struct soc_splk * socsplk)
 {

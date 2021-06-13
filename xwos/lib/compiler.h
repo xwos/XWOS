@@ -8,7 +8,15 @@
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * @note
+ */
+
+#ifndef __xwos_lib_compiler_h__
+#define __xwos_lib_compiler_h__
+
+#include <cfg/XuanWuOS.h>
+
+/**
+ * @defgroup compiler 编译器
  * + 段说明
  *   - __xwos_init_*
  *     - code: XWOS初始化阶段的代码
@@ -39,12 +47,9 @@
  *     - isr: BSP中的中断函数
  *     - rodata: BSP中的const数据
  *     - data: BSP中的数据
+ * @{
  */
 
-#ifndef __xwos_lib_compiler_h__
-#define __xwos_lib_compiler_h__
-
-#include <cfg/XuanWuOS.h>
 #include <xwos/ospl/soc/compiler.h>
 
 #ifndef __XWOS_COMPILER__
@@ -329,8 +334,8 @@
 
 /**
  * @brief: 强制从内存中访问指定类型的变量
- * @param t: (I) 类型，只能为基本类型及其typedef后的类型
- * @param v: (O) 类型为t左值，读取的值放在这个左值中
+ * @param[in] t: 类型，只能为基本类型及其typedef后的类型
+ * @param[out] v: 类型为t左值，读取的值放在这个左值中
  * @note
  * + 类型t的位宽只能是8位、16位、32位、64位。
  */
@@ -338,9 +343,9 @@
 
 /**
  * @brief: 读取地址中的指定类型的值
- * @param t: (I) 类型，只能为基本类型及其typedef后的类型
- * @param v: (O) 类型为t左值，读取的值放在这个左值中
- * @param p: (I) 类型为t *的指针，指向需要读取的地址
+ * @param[in] t: 类型，只能为基本类型及其typedef后的类型
+ * @param[out] v: 类型为t左值，读取的值放在这个左值中
+ * @param[in] p: 类型为t *的指针，指向需要读取的地址
  * @note
  * + 类型t的位宽只能是8位、16位、32位、64位。
  */
@@ -348,9 +353,9 @@
 
 /**
  * @brief 存储指定类型的值到地址中
- * @param t: (I) 类型，只能为基本类型及其typedef后的类型
- * @param p: (I) 类型为t *的指针，指向需要存储的地址
- * @param v: (I) 待存储的类型为t右值
+ * @param[in] t: 类型，只能为基本类型及其typedef后的类型
+ * @param[in] p: 类型为t *的指针，指向需要存储的地址
+ * @param[in] v: 待存储的类型为t右值
  * @note
  * + 类型t的位宽只能是8位、16位、32位、64位。
  */
@@ -361,9 +366,9 @@
 /**
  * @brief: 读取地址中的指定类型的值，并保证此处的“读”操作
  *         一定发生在之后的“读写”操作之前
- * @param t: (I) 类型，只能为基本类型及其typedef后的类型
- * @param v: (O) 类型为t左值，读取的值放在这个左值中
- * @param p: (I) 类型为t *的指针，指向需要读取的地址
+ * @param[in] t: 类型，只能为基本类型及其typedef后的类型
+ * @param[out] v: 类型为t左值，读取的值放在这个左值中
+ * @param[in] p: 类型为t *的指针，指向需要读取的地址
  * @note
  * + 类型t的位宽只能是8位、16位、32位、64位。
  */
@@ -378,9 +383,9 @@
 /**
  * @brief 存储指定类型的值到地址中，并保证此处的“写”操作
  *        一定发生在之前的“读写”操作之后
- * @param t: (I) 类型，只能为基本类型及其typedef后的类型
- * @param p: (I) 类型为t *的指针，指向需要存储的地址
- * @param v: (I) 待存储的类型为t右值
+ * @param[in] t: 类型，只能为基本类型及其typedef后的类型
+ * @param[in] p: 类型为t *的指针，指向需要存储的地址
+ * @param[in] v: 待存储的类型为t右值
  * @note
  * + 类型t的位宽只能是8位、16位、32位、64位。
  */
@@ -476,7 +481,7 @@
 
 /**
  * @brief 字符串化
- * @param x: (I) 将x变为字符串
+ * @param[in] x: 将x变为字符串
  * @note
  * C语言宏展开的规则：遇到#和##就停止展开宏。
  * 因此如果直接定义stringify(m)为#m，
@@ -502,7 +507,7 @@
 
 /**
  * @brief 显示宏的值
- * @param m: (I) 宏
+ * @param[in] m: 宏
  */
 #define __show_macro(m)                 #m ":" stringify(m)
 
@@ -510,8 +515,8 @@
 #ifndef xwcc_offsetof
 /**
  * @brief 计算某个成员在结构体中偏移量
- * @param type: (I) 结构体类型
- * @param member: (I) 成员在结构体中符号名
+ * @param[in] type: 结构体类型
+ * @param[in] member: 成员在结构体中符号名
  */
   #define xwcc_offsetof(type, member)  ((xwptr_t)&(((type *)0)->member))
 #endif
@@ -519,12 +524,16 @@
 #ifndef xwcc_baseof
 /**
  * @brief 从结构体的某个成员的地址计算出结构体的首地址
- * @param ptr: (I) 结构体某个成员的地址
- * @param type: (I) 结构体类型
- * @param member: (I) 成员在结构体中符号名
+ * @param[in] ptr: 结构体某个成员的地址
+ * @param[in] type: 结构体类型
+ * @param[in] member: 成员在结构体中符号名
  */
   #define xwcc_baseof(ptr, type, member) \
           ((type *)(((xwptr_t)(ptr)) - xwcc_offsetof(type, member)))
 #endif
+
+/**
+ * @} compiler
+ */
 
 #endif /* xwos/common/compiler.h */

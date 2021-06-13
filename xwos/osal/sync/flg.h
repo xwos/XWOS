@@ -18,6 +18,11 @@
 #include <xwos/osal/sync/sel.h>
 
 /**
+ * @defgroup xwos_flg 事件标志
+ * @{
+ */
+
+/**
  * @brief XWOS API：事件标志对象
  */
 struct xwos_flg {
@@ -98,10 +103,10 @@ typedef struct {
 
 /**
  * @brief XWOS API：静态方式初始化事件标志对象
- * @param flg: (I) 事件标志对象的指针
- * @param num: (I) 事件标志中的事件数量
- * @param bmp: (I) 事件标志用来记录事件状态的位图缓冲区
- * @param msk: (I) 事件标志用来记录事件掩码的位图缓冲区
+ * @param[in] flg: 事件标志对象的指针
+ * @param[in] num: 事件标志中的事件数量
+ * @param[in] bmp: 事件标志用来记录事件状态的位图缓冲区
+ * @param[in] msk: 事件标志用来记录事件掩码的位图缓冲区
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -119,8 +124,8 @@ xwer_t xwos_flg_init(struct xwos_flg * flg, xwsz_t num,
 
 /**
  * @brief XWOS API：销毁静态方式初始化的事件标志对象
- * @param flg: (I) 事件标志对象的指针
- * @param num: (I) 事件标志中的事件数量
+ * @param[in] flg: 事件标志对象的指针
+ * @param[in] num: 事件标志中的事件数量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -137,8 +142,8 @@ xwer_t xwos_flg_destroy(struct xwos_flg * flg)
 
 /**
  * @brief XWOS API：动态方式创建事件标志对象
- * @param flgbuf: (O) 指向缓冲区的指针，通过此缓冲区返回事件标志对象的指针
- * @param num: (I) 线程栅栏中的线程数量
+ * @param[out] flgbuf: 指向缓冲区的指针，通过此缓冲区返回事件标志对象的指针
+ * @param[in] num: 线程栅栏中的线程数量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -156,7 +161,7 @@ xwer_t xwos_flg_create(struct xwos_flg ** flgbuf, xwsz_t num)
 
 /**
  * @brief XWOS API：删除动态方式创建的事件标志对象
- * @param flg: (I) 事件标志对象指针
+ * @param[in] flg: 事件标志对象指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -173,7 +178,7 @@ xwer_t xwos_flg_delete(struct xwos_flg * flg)
 
 /**
  * @brief XWOS API：获取事件标志对象的标签
- * @param flg: (I) 事件标志对象的指针
+ * @param[in] flg: 事件标志对象的指针
  * @return 事件标志对象的标签
  * @note
  * - 同步/异步：同步
@@ -188,7 +193,7 @@ xwsq_t xwos_flg_gettik(struct xwos_flg * flg)
 
 /**
  * @brief XWOS API：获取事件标志对象的描述符
- * @param flg: (I) 事件标志对象的指针
+ * @param[in] flg: 事件标志对象的指针
  * @return 事件标志对象的描述符
  * @note
  * - 同步/异步：同步
@@ -207,7 +212,7 @@ xwos_flg_d xwos_flg_getd(struct xwos_flg * flg)
 
 /**
  * @brief XWOS API：检查事件标志对象的标签并增加引用计数
- * @param flgd: (I) 事件标志对象的描述符
+ * @param[in] flgd: 事件标志对象的描述符
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -225,7 +230,7 @@ xwer_t xwos_flg_acquire(xwos_flg_d flgd)
 
 /**
  * @brief XWOS API：检查事件标志对象的标签并减少引用计数
- * @param flgd: (I) 事件标志对象的描述符
+ * @param[in] flgd: 事件标志对象的描述符
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -243,7 +248,7 @@ xwer_t xwos_flg_release(xwos_flg_d flgd)
 
 /**
  * @brief XWOS API：增加事件标志对象的引用计数
- * @param flg: (I) 事件标志对象的指针
+ * @param[in] flg: 事件标志对象的指针
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -260,7 +265,7 @@ xwer_t xwos_flg_grab(struct xwos_flg * flg)
 
 /**
  * @brief XWOS API：减少事件标志对象的引用计数
- * @param flg: (I) 事件标志对象的指针
+ * @param[in] flg: 事件标志对象的指针
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -277,9 +282,9 @@ xwer_t xwos_flg_put(struct xwos_flg * flg)
 
 /**
  * @brief XWOS API：绑定事件标志对象到信号选择器
- * @param flg: (I) 事件标志对象的指针
- * @param sel: (I) 信号选择器的指针
- * @param pos: (I) 事件标志对象映射到位图中的位置
+ * @param[in] flg: 事件标志对象的指针
+ * @param[in] sel: 信号选择器的指针
+ * @param[in] pos: 事件标志对象映射到位图中的位置
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -300,8 +305,8 @@ xwer_t xwos_flg_bind(struct xwos_flg * flg, struct xwos_sel * sel, xwsq_t pos)
 
 /**
  * @brief XWOS API：从信号选择器上解绑事件标志对象
- * @param flg: (I) 事件标志对象的指针
- * @param sel: (I) 信号选择器的指针
+ * @param[in] flg: 事件标志对象的指针
+ * @param[in] sel: 信号选择器的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -319,7 +324,7 @@ xwer_t xwos_flg_unbind(struct xwos_flg * flg, struct xwos_sel * sel)
 
 /**
  * @brief XWOS API：中断事件标志对象等待队列中的所有节点
- * @param flg: (I) 事件标志对象指针
+ * @param[in] flg: 事件标志对象指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -336,8 +341,8 @@ xwer_t xwos_flg_intr_all(struct xwos_flg * flg)
 
 /**
  * @brief XWOS API：获取事件标志中事件槽的数量
- * @param flg: (I) 事件标志对象的指针
- * @param numbuf: (O) 指向缓冲区的指针，通过此缓冲区返回事件槽的数量
+ * @param[in] flg: 事件标志对象的指针
+ * @param[out] numbuf: 指向缓冲区的指针，通过此缓冲区返回事件槽的数量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -354,8 +359,8 @@ xwer_t xwos_flg_get_num(struct xwos_flg * flg, xwsz_t * numbuf)
 
 /**
  * @brief XWOS API：同时设置多个事件标志位
- * @param flg: (I) 事件标志对象指针
- * @param msk: (I) 事件标志对象的位图掩码
+ * @param[in] flg: 事件标志对象指针
+ * @param[in] msk: 事件标志对象的位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -372,8 +377,8 @@ xwer_t xwos_flg_s1m(struct xwos_flg * flg, xwbmp_t msk[])
 
 /**
  * @brief XWOS API：设置单个事件标志位
- * @param flg: (I) 事件标志对象指针
- * @param pos: (I) 事件的序号
+ * @param[in] flg: 事件标志对象指针
+ * @param[in] pos: 事件的序号
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -391,8 +396,8 @@ xwer_t xwos_flg_s1i(struct xwos_flg * flg, xwsq_t pos)
 
 /**
  * @brief XWOS API：同时清除多个事件标志位
- * @param flg: (I) 事件标志对象指针
- * @param msk: (I) 事件的位图掩码
+ * @param[in] flg: 事件标志对象指针
+ * @param[in] msk: 事件的位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -409,8 +414,8 @@ xwer_t xwos_flg_c0m(struct xwos_flg * flg, xwbmp_t msk[])
 
 /**
  * @brief XWOS API：清除单个事件标志位
- * @param flg: (I) 事件标志对象指针
- * @param pos: (I) 事件的序号
+ * @param[in] flg: 事件标志对象指针
+ * @param[in] pos: 事件的序号
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -428,8 +433,8 @@ xwer_t xwos_flg_c0i(struct xwos_flg * flg, xwsq_t pos)
 
 /**
  * @brief XWOS API：同时翻转多个事件标志位
- * @param flg: (I) 事件标志对象指针
- * @param msk: (I) 事件的位图掩码
+ * @param[in] flg: 事件标志对象指针
+ * @param[in] msk: 事件的位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -446,8 +451,8 @@ xwer_t xwos_flg_x1m(struct xwos_flg * flg, xwbmp_t msk[])
 
 /**
  * @brief XWOS API：翻转单个事件标志位
- * @param flg: (I) 事件标志对象指针
- * @param pos: (I) 事件的序号
+ * @param[in] flg: 事件标志对象指针
+ * @param[in] pos: 事件的序号
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -465,8 +470,8 @@ xwer_t xwos_flg_x1i(struct xwos_flg * flg, xwsq_t pos)
 
 /**
  * @brief XWOS API：读取事件标志对象中事件标志位图的值
- * @param flg: (I) 事件标志对象指针
- * @param out: (O) 指向缓冲区的指针，通过此缓冲区返回事件标志对象位图的值
+ * @param[in] flg: 事件标志对象指针
+ * @param[out] out: 指向缓冲区的指针，通过此缓冲区返回事件标志对象位图的值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -482,72 +487,33 @@ xwer_t xwos_flg_read(struct xwos_flg * flg, xwbmp_t out[])
 }
 
 /**
- * @brief XWOS API：检测一下事件标志对象的触发事件，不会阻塞调用线程
- * @param flg: (I) 事件标志对象指针
- * @param trigger: (I) 事件触发条件，取值 @ref xwos_flg_trigger_em
- * @param action: (I) 事件触发后的动作，取值 @ref xwos_flg_action_em，
- *                    仅trigger当取值
- *                    @ref XWOS_FLG_TRIGGER_SET_ALL
- *                    @ref XWOS_FLG_TRIGGER_SET_ANY
- *                    @ref XWOS_FLG_TRIGGER_CLR_ALL
- *                    @ref XWOS_FLG_TRIGGER_CLR_ALL
- *                    时有效，其他情况不使用此参数，可填 @ref XWOS_UNUSED_ARGUMENT
- * @param origin: 指向缓冲区的指针：
- *                - 当trigger取值
- *                  @ref XWOS_FLG_TRIGGER_SET_ALL
- *                  @ref XWOS_FLG_TRIGGER_SET_ANY
- *                  @ref XWOS_FLG_TRIGGER_CLR_ALL
- *                  @ref XWOS_FLG_TRIGGER_CLR_ANY
- *                  (O) 返回触发时事件对象中位图状态（action之前）
- *                - 当trigger取值
- *                  @ref XWOS_FLG_TRIGGER_TGL_ALL
- *                  @ref XWOS_FLG_TRIGGER_TGL_ANY
- *                  (I) 作为输入时，作为用于比较的初始值
- *                  (O) 作为输出时，返回事件对象中位图状态
- *                      （可作为下一次调用的初始值）
- * @param msk: (I) 事件的位图掩码，表示只关注掩码部分的事件
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效的指针或空指针
- * @retval -EINVAL: 参数无效
- * @retval -ENODATA: 没有任何事件触发
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwer_t xwos_flg_trywait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
-                        xwbmp_t origin[], xwbmp_t msk[])
-{
-        return xwosdl_flg_trywait(&flg->osflg, trigger, action, origin, msk);
-}
-
-/**
  * @brief XWOS API：等待事件标志对象的触发事件
- * @param flg: (I) 事件标志对象指针
- * @param trigger: (I) 事件触发条件，取值 @ref xwos_flg_trigger_em
- * @param action: (I) 事件触发后的动作，取值 @ref xwos_flg_action_em，
- *                    仅trigger当取值
- *                    @ref XWOS_FLG_TRIGGER_SET_ALL
- *                    @ref XWOS_FLG_TRIGGER_SET_ANY
- *                    @ref XWOS_FLG_TRIGGER_CLR_ALL
- *                    @ref XWOS_FLG_TRIGGER_CLR_ALL
- *                    时有效，其他情况不使用此参数，可填 @ref XWOS_UNUSED_ARGUMENT
- * @param origin: 指向缓冲区的指针：
- *                - 当trigger取值
- *                  @ref XWOS_FLG_TRIGGER_SET_ALL
- *                  @ref XWOS_FLG_TRIGGER_SET_ANY
- *                  @ref XWOS_FLG_TRIGGER_CLR_ALL
- *                  @ref XWOS_FLG_TRIGGER_CLR_ANY
- *                  (O) 返回触发时事件对象中位图状态（action之前）
- *                - 当trigger取值
- *                  @ref XWOS_FLG_TRIGGER_TGL_ALL
- *                  @ref XWOS_FLG_TRIGGER_TGL_ANY
- *                  (I) 作为输入时，作为用于比较的初始值
- *                  (O) 作为输出时，返回事件对象中位图状态
- *                      （可作为下一次调用的初始值）
- * @param msk: (I) 事件的位图掩码，表示只关注掩码部分的事件
+ * @param[in] flg: 事件标志对象指针
+ * @param[in] trigger: 事件触发条件，取值：
+ *   @arg XWOS_FLG_TRIGGER_SET_ALL: 掩码中的所有位同时为1
+ *   @arg XWOS_FLG_TRIGGER_SET_ANY: 掩码中的任意位为1
+ *   @arg XWOS_FLG_TRIGGER_CLR_ALL: 掩码中的所有位同时为0
+ *   @arg XWOS_FLG_TRIGGER_CLR_ANY: 掩码中的任意位为0
+ *   @arg XWOS_FLG_TRIGGER_TGL_ALL: 掩码中的所有位同时发生翻转
+ *   @arg XWOS_FLG_TRIGGER_TGL_ANY: 掩码中的任意位发生翻转
+ * @param[in] action: 事件触发后的动作，
+ * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL，
+ *   或@ref XWOS_FLG_TRIGGER_SET_ANY，或@ref XWOS_FLG_TRIGGER_CLR_ALL，
+ *   或@ref XWOS_FLG_TRIGGER_CLR_ANY时有效，取值：
+ *   @arg XWOS_FLG_ACTION_CONSUMPTION: 消费事件
+ *   @arg XWOS_FLG_ACTION_NOME: 无操作
+ * + 当@ref trigger为@ref XWOS_FLG_TRIGGER_TGL_ALL， 或@ref XWOS_FLG_TRIGGER_TGL_ANY时，
+ *   此参数没有用，可填：
+ *   @arg XWOS_UNUSED_ARGUMENT
+ * @param[in,out] origin: 指向缓冲区的指针：
+ * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL，
+ *   或@ref XWOS_FLG_TRIGGER_SET_ANY，或@ref XWOS_FLG_TRIGGER_CLR_ALL，
+ *   或@ref XWOS_FLG_TRIGGER_CLR_ANY时
+ *   - (O) 返回触发时事件对象中位图状态（action之前）
+ * + 当@ref trigger为XWOS_FLG_TRIGGER_TGL_ALL，或@ref XWOS_FLG_TRIGGER_TGL_ANY时
+ *   - (I) 作为输入时，作为用于比较的初始值
+ *   - (O) 作为输出时，返回事件对象中位图状态（可作为下一次调用的初始值）
+ * @param[in] msk: 事件的位图掩码，表示只关注掩码部分的事件
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -567,46 +533,92 @@ xwer_t xwos_flg_wait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
 }
 
 /**
- * @brief XWOS API：限时等待事件标志对象的触发事件
- * @param flg: (I) 事件标志对象指针
- * @param trigger: (I) 事件触发条件，取值 @ref xwos_flg_trigger_em
- * @param action: (I) 事件触发后的动作，取值 @ref xwos_flg_action_em，
- *                    仅trigger当取值
- *                    @ref XWOS_FLG_TRIGGER_SET_ALL
- *                    @ref XWOS_FLG_TRIGGER_SET_ANY
- *                    @ref XWOS_FLG_TRIGGER_CLR_ALL
- *                    @ref XWOS_FLG_TRIGGER_CLR_ALL
- *                    时有效，其他情况不使用此参数，可填 @ref XWOS_UNUSED_ARGUMENT
- * @param origin: 指向缓冲区的指针：
- *                - 当trigger取值
- *                  @ref XWOS_FLG_TRIGGER_SET_ALL
- *                  @ref XWOS_FLG_TRIGGER_SET_ANY
- *                  @ref XWOS_FLG_TRIGGER_CLR_ALL
- *                  @ref XWOS_FLG_TRIGGER_CLR_ANY
- *                  (O) 返回触发时事件对象中位图状态（action之前）
- *                - 当trigger取值
- *                  @ref XWOS_FLG_TRIGGER_TGL_ALL
- *                  @ref XWOS_FLG_TRIGGER_TGL_ANY
- *                  (I) 作为输入时，作为用于比较的初始值
- *                  (O) 作为输出时，返回事件对象中位图状态
- *                      （可作为下一次调用的初始值）
- * @param msk: (I) 事件的位图掩码，表示只关注掩码部分的事件
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @brief XWOS API：检测一下事件标志对象的触发事件，不会阻塞调用线程
+ * @param[in] flg: 事件标志对象指针
+ * @param[in] trigger: 事件触发条件，取值：
+ *   @arg XWOS_FLG_TRIGGER_SET_ALL: 掩码中的所有位同时为1
+ *   @arg XWOS_FLG_TRIGGER_SET_ANY: 掩码中的任意位为1
+ *   @arg XWOS_FLG_TRIGGER_CLR_ALL: 掩码中的所有位同时为0
+ *   @arg XWOS_FLG_TRIGGER_CLR_ANY: 掩码中的任意位为0
+ *   @arg XWOS_FLG_TRIGGER_TGL_ALL: 掩码中的所有位同时发生翻转
+ *   @arg XWOS_FLG_TRIGGER_TGL_ANY: 掩码中的任意位发生翻转
+ * @param[in] action: 事件触发后的动作，
+ * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL，
+ *   或@ref XWOS_FLG_TRIGGER_SET_ANY，或@ref XWOS_FLG_TRIGGER_CLR_ALL，
+ *   或@ref XWOS_FLG_TRIGGER_CLR_ANY时有效，取值：
+ *   @arg XWOS_FLG_ACTION_CONSUMPTION: 消费事件
+ *   @arg XWOS_FLG_ACTION_NOME: 无操作
+ * + 当@ref trigger为@ref XWOS_FLG_TRIGGER_TGL_ALL， 或@ref XWOS_FLG_TRIGGER_TGL_ANY时，
+ *   此参数没有用，可填：
+ *   @arg XWOS_UNUSED_ARGUMENT
+ * @param[in,out] origin: 指向缓冲区的指针：
+ * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL，
+ *   或@ref XWOS_FLG_TRIGGER_SET_ANY，或@ref XWOS_FLG_TRIGGER_CLR_ALL，
+ *   或@ref XWOS_FLG_TRIGGER_CLR_ANY时
+ *   - (O) 返回触发时事件对象中位图状态（action之前）
+ * + 当@ref trigger为XWOS_FLG_TRIGGER_TGL_ALL，或@ref XWOS_FLG_TRIGGER_TGL_ANY时
+ *   - (I) 作为输入时，作为用于比较的初始值
+ *   - (O) 作为输出时，返回事件对象中位图状态（可作为下一次调用的初始值）
+ * @param[in] msk: 事件的位图掩码，表示只关注掩码部分的事件
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -EINVAL: 参数无效
- * @retval -ETIMEDOUT: 超时
+ * @retval -ENODATA: 没有任何事件触发
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_flg_trywait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
+                        xwbmp_t origin[], xwbmp_t msk[])
+{
+        return xwosdl_flg_trywait(&flg->osflg, trigger, action, origin, msk);
+}
+
+/**
+ * @brief XWOS API：限时等待事件标志对象的触发事件
+ * @param[in] flg: 事件标志对象指针
+ * @param[in] trigger: 事件触发条件，取值：
+ *   @arg XWOS_FLG_TRIGGER_SET_ALL: 掩码中的所有位同时为1
+ *   @arg XWOS_FLG_TRIGGER_SET_ANY: 掩码中的任意位为1
+ *   @arg XWOS_FLG_TRIGGER_CLR_ALL: 掩码中的所有位同时为0
+ *   @arg XWOS_FLG_TRIGGER_CLR_ANY: 掩码中的任意位为0
+ *   @arg XWOS_FLG_TRIGGER_TGL_ALL: 掩码中的所有位同时发生翻转
+ *   @arg XWOS_FLG_TRIGGER_TGL_ANY: 掩码中的任意位发生翻转
+ * @param[in] action: 事件触发后的动作，
+ * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL，
+ *   或@ref XWOS_FLG_TRIGGER_SET_ANY，或@ref XWOS_FLG_TRIGGER_CLR_ALL，
+ *   或@ref XWOS_FLG_TRIGGER_CLR_ANY时有效，取值：
+ *   @arg XWOS_FLG_ACTION_CONSUMPTION: 消费事件
+ *   @arg XWOS_FLG_ACTION_NOME: 无操作
+ * + 当@ref trigger为@ref XWOS_FLG_TRIGGER_TGL_ALL， 或@ref XWOS_FLG_TRIGGER_TGL_ANY时，
+ *   此参数没有用，可填：
+ *   @arg XWOS_UNUSED_ARGUMENT
+ * @param[in,out] origin: 指向缓冲区的指针：
+ * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL，
+ *   或@ref XWOS_FLG_TRIGGER_SET_ANY，或@ref XWOS_FLG_TRIGGER_CLR_ALL，
+ *   或@ref XWOS_FLG_TRIGGER_CLR_ANY时
+ *   - (O) 返回触发时事件对象中位图状态（action之前）
+ * + 当@ref trigger为XWOS_FLG_TRIGGER_TGL_ALL，或@ref XWOS_FLG_TRIGGER_TGL_ANY时
+ *   - (I) 作为输入时，作为用于比较的初始值
+ *   - (O) 作为输出时，返回事件对象中位图状态（可作为下一次调用的初始值）
+ * @param[in] msk: 事件的位图掩码，表示只关注掩码部分的事件
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的指针或空指针
+ * @retval -EINVAL: 参数无效
+ * @retval -ETIMEDOUT: 超时，xwtm指向的缓冲区内的时间会减为0
  * @retval -EINTR: 等待被中断
  * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
- * @note
- * - 函数返回返回*-ETIMEDOUT*时，*xwtm*指向的缓冲区内的期望时间会减为0。
  */
 static __xwos_inline_api
 xwer_t xwos_flg_timedwait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
@@ -615,5 +627,9 @@ xwer_t xwos_flg_timedwait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
 {
         return xwosdl_flg_timedwait(&flg->osflg, trigger, action, origin, msk, xwtm);
 }
+
+/**
+ * @} xwos_flg
+ */
 
 #endif /* xwos/osal/sync/flg.h */

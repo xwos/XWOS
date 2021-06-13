@@ -25,7 +25,7 @@
 
 /**
  * @brief 循环队列对象的构造函数
- * @param cq: (I) 循环队列对象的指针
+ * @param[in] cq: 循环队列对象的指针
  */
 static __xwmd_code
 void xwcq_construct(struct xwcq * cq, xwu8_t * mem)
@@ -41,7 +41,7 @@ void xwcq_construct(struct xwcq * cq, xwu8_t * mem)
 
 /**
  * @brief 循环队列对象的析构函数
- * @param cq: (I) 循环队列对象的指针
+ * @param[in] cq: 循环队列对象的指针
  */
 static __xwmd_code
 void xwcq_destruct(struct xwcq * cq)
@@ -85,7 +85,7 @@ struct xwcq * xwcq_alloc(xwsz_t qsize)
 
 /**
  * @brief 释放循环队列对象
- * @param cq: (I) 循环队列对象的指针
+ * @param[in] cq: 循环队列对象的指针
  */
 static __xwmd_code
 void xwcq_free(struct xwcq * cq)
@@ -101,7 +101,7 @@ void xwcq_free(struct xwcq * cq)
 
 /**
  * @brief 循环队列对象的垃圾回收函数
- * @param cq: (I) 循环队列对象的指针
+ * @param[in] cq: 循环队列对象的指针
  * @return 错误码
  */
 static __xwmd_code
@@ -117,7 +117,7 @@ xwer_t xwcq_gc(void * obj)
 
 /**
  * @brief XWCQ API：获取循环队列对象的标签
- * @param cq: (I) 循环队列对象的指针
+ * @param[in] cq: 循环队列对象的指针
  * @return 循环队列对象的标签
  * @note
  * - 同步/异步：同步
@@ -138,8 +138,8 @@ xwsq_t xwcq_gettik(struct xwcq * cq)
 
 /**
  * @brief XWCQ API：检查循环队列对象的标签并增加引用计数
- * @param cq: (I) 循环队列对象指针
- * @param tik: (I) 标签
+ * @param[in] cq: 循环队列对象指针
+ * @param[in] tik: 标签
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -155,8 +155,8 @@ xwer_t xwcq_acquire(struct xwcq * cq, xwsq_t tik)
 
 /**
  * @brief XWCQ API：检查循环队列对象的标签并增加引用计数
- * @param cq: (I) 循环队列对象指针
- * @param tik: (I) 标签
+ * @param[in] cq: 循环队列对象指针
+ * @param[in] tik: 标签
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -172,7 +172,7 @@ xwer_t xwcq_release(struct xwcq * cq, xwsq_t tik)
 
 /**
  * @brief XWCQ API：增加循环队列对象的引用计数
- * @param cq: (I) 循环队列控制块对象指针
+ * @param[in] cq: 循环队列控制块对象指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -188,7 +188,7 @@ xwer_t xwcq_grab(struct xwcq * cq)
 
 /**
  * @brief XWCQ API：减少循环队列对象的引用计数
- * @param cq: (I) 循环队列控制块对象指针
+ * @param[in] cq: 循环队列控制块对象指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -204,11 +204,11 @@ xwer_t xwcq_put(struct xwcq * cq)
 
 /**
  * @brief 激活循环队列对象
- * @param cq: (I) 循环队列对象的指针
- * @param name: (I) 名字
- * @param slotsize: (I) 数据槽的大小
- * @param slotnum: (I) 数据槽的个数
- * @param gcfunc: (I) 垃圾回收函数：当对象应用计数为0，调用此函数回收资源。
+ * @param[in] cq: 循环队列对象的指针
+ * @param[in] name: 名字
+ * @param[in] slotsize: 数据槽的大小
+ * @param[in] slotnum: 数据槽的个数
+ * @param[in] gcfunc: 垃圾回收函数：当对象应用计数为0，调用此函数回收资源。
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -241,11 +241,11 @@ err_xwobj_activate:
 
 /**
  * @brief XWCQ API：静态方式初始化循环队列
- * @param cq: (I) 循环队列对象的指针
- * @param name: (I) 名字
- * @param slotsize: (I) 数据槽的大小
- * @param slotnum: (I) 数据槽的个数
- * @param mem: (I) 数据缓冲区的指针，数据缓冲区大小不能小于slotsize * slotnum
+ * @param[in] cq: 循环队列对象的指针
+ * @param[in] name: 名字
+ * @param[in] slotsize: 数据槽的大小
+ * @param[in] slotnum: 数据槽的个数
+ * @param[in] mem: 数据缓冲区的指针，数据缓冲区大小不能小于slotsize * slotnum
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -269,7 +269,7 @@ xwer_t xwcq_init(struct xwcq * cq, const char * name,
 
 /**
  * @brief XWCQ API：销毁静态方式初始化的循环队列对象
- * @param cq: (I) 循环队列对象的指针
+ * @param[in] cq: 循环队列对象的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -285,10 +285,10 @@ xwer_t xwcq_destroy(struct xwcq * cq)
 
 /**
  * @brief XWCQ API：动态创建循环队列对象
- * @param ptrbuf: (O) 指向缓冲区的指针，此缓冲区用于返回循环队列对象的指针
- * @param name: (I) 名字
- * @param slotsize: (I) 数据槽的大小
- * @param slotnum: (I) 数据槽的个数
+ * @param[out] ptrbuf: 指向缓冲区的指针，此缓冲区用于返回循环队列对象的指针
+ * @param[in] name: 名字
+ * @param[in] slotsize: 数据槽的大小
+ * @param[in] slotnum: 数据槽的个数
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -334,7 +334,7 @@ err_cq_alloc:
 
 /**
  * @brief XWCQ API：删除动态创建的循环队列对象
- * @param cq: (I) 循环队列对象的指针
+ * @param[in] cq: 循环队列对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -352,11 +352,11 @@ xwer_t xwcq_delete(struct xwcq * cq)
 
 /**
  * @brief XWCQ API：将数据放入循环队列的尾端（入队 enqueue）
- * @param cq: (I) 循环队列对象的指针
- * @param data: (I) 数据
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示待入队的数据大小
- *              (O) 作为输出时，返回实际入队的数据大小
+ * @param[in] cq: 循环队列对象的指针
+ * @param[in] data: 数据
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示待入队的数据大小
+ * + (O) 作为输出时，返回实际入队的数据大小
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -408,9 +408,9 @@ err_cq_grab:
 
 /**
  * @brief XWCQ API：将数据放入循环队列的首端（插队 jump the queue）
- * @param cq: (I) 循环队列对象的指针
- * @param data: (I) 数据
- * @param size: (I) 数据的大小
+ * @param[in] cq: 循环队列对象的指针
+ * @param[in] data: 数据
+ * @param[in] size: 数据的大小
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -463,11 +463,11 @@ err_cq_grab:
 /**
  * @brief XWCQ API: 从循环队列首端取出一份数据（离队 dequeue），
  *                  若循环队列为空，就无限等待
- * @param cq: (I) 循环队列对象的指针
- * @param buf: (O) 指向缓冲区的指针，此缓冲区用于接收数据
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示接收缓冲区的大小
- *              (O) 作为输出时，返回实际接收的数据大小
+ * @param[in] cq: 循环队列对象的指针
+ * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示接收缓冲区的大小
+ * + (O) 作为输出时，返回实际接收的数据大小
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINTR: 等待被中断
@@ -489,14 +489,14 @@ xwer_t xwcq_dq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
 /**
  * @brief XWCQ API: 从循环队列首端取出一份数据（离队 dequeue），
  *                  若循环队列为空，就限时等待
- * @param cq: (I) 循环队列对象的指针
- * @param buf: (O) 指向缓冲区的指针，此缓冲区用于接收数据
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示接收缓冲区的大小
- *              (O) 作为输出时，返回实际接收的数据大小
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] cq: 循环队列对象的指针
+ * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示接收缓冲区的大小
+ * + (O) 作为输出时，返回实际接收的数据大小
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -550,11 +550,11 @@ err_cq_grab:
 /**
  * @brief XWCQ API: 尝试从循环队列首端取出一份数据（离队 dequeue），
  *                  若循环队列为空立即返回
- * @param cq: (I) 循环队列对象的指针
- * @param buf: (O) 指向缓冲区的指针，此缓冲区用于接收数据
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示接收缓冲区的大小
- *              (O) 作为输出时，返回实际接收的数据大小
+ * @param[in] cq: 循环队列对象的指针
+ * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示接收缓冲区的大小
+ * + (O) 作为输出时，返回实际接收的数据大小
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -605,14 +605,14 @@ err_cq_grab:
 /**
  * @brief XWCQ API: 从循环队列首端拷贝一份数据（数据可被再次获取），
  *                  若循环队列为空，就限时等待
- * @param cq: (I) 循环队列对象的指针
- * @param buf: (O) 指向缓冲区的指针，此缓冲区用于接收数据
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示接收缓冲区的大小
- *              (O) 作为输出时，返回实际接收的数据大小
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] cq: 循环队列对象的指针
+ * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示接收缓冲区的大小
+ * + (O) 作为输出时，返回实际接收的数据大小
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINTR: 等待被中断
@@ -634,14 +634,14 @@ xwer_t xwcq_peek(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
 /**
  * @brief XWCQ API: 从循环队列首端拷贝一份数据（数据还可被再次获取），
  *                  若循环队列为空，就限时等待
- * @param cq: (I) 循环队列对象的指针
- * @param buf: (O) 指向缓冲区的指针，此缓冲区用于接收数据
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示接收缓冲区的大小
- *              (O) 作为输出时，返回实际接收的数据大小
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] cq: 循环队列对象的指针
+ * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示接收缓冲区的大小
+ * + (O) 作为输出时，返回实际接收的数据大小
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -692,11 +692,11 @@ err_cq_grab:
 /**
  * @brief XWCQ API: 从循环队列首端拷贝一份数据（数据可被再次获取），
  *                  若循环队列为空立即返回
- * @param cq: (I) 循环队列对象的指针
- * @param buf: (O) 指向缓冲区的指针，此缓冲区用于接收数据
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示接收缓冲区的大小
- *              (O) 作为输出时，返回实际接收的数据大小
+ * @param[in] cq: 循环队列对象的指针
+ * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示接收缓冲区的大小
+ * + (O) 作为输出时，返回实际接收的数据大小
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -744,7 +744,7 @@ err_cq_grab:
 
 /**
  * @brief XWCQ API: 清空循环队列
- * @param cq: (I) 循环队列对象的指针
+ * @param[in] cq: 循环队列对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -775,8 +775,8 @@ err_cq_grab:
 
 /**
  * @brief XWCQ API: 获取循环队列的容量
- * @param cq: (I) 循环队列对象的指针
- * @param capbuf: (O) 指向缓冲区的指针，此缓冲区用于返回容量
+ * @param[in] cq: 循环队列对象的指针
+ * @param[out] capbuf: 指向缓冲区的指针，此缓冲区用于返回容量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -805,8 +805,8 @@ err_cq_grab:
 
 /**
  * @brief XWCQ API: 获取循环队列中有效数据的数量
- * @param cq: (I) 循环队列对象的指针
- * @param szbuf: (O) 指向缓冲区的指针，此缓冲区用于返回数量
+ * @param[in] cq: 循环队列对象的指针
+ * @param[out] szbuf: 指向缓冲区的指针，此缓冲区用于返回数量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -839,8 +839,8 @@ err_cq_grab:
 
 /**
  * @brief XWCQ API: 测试循环队列是否为空
- * @param cq: (I) 循环队列对象的指针
- * @param emptybuf: (O) 指向缓冲区的指针，此缓冲区用于返回测试结果
+ * @param[in] cq: 循环队列对象的指针
+ * @param[out] emptybuf: 指向缓冲区的指针，此缓冲区用于返回测试结果
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -869,9 +869,9 @@ err_cq_grab:
 
 /**
  * @brief XWOS API：绑定循环队列对象到信号选择器
- * @param cq: (I) 循环队列对象的指针
- * @param sel: (I) 信号选择器的指针
- * @param pos: (I) 循环队列对象对象映射到位图中的位置
+ * @param[in] cq: 循环队列对象的指针
+ * @param[in] sel: 信号选择器的指针
+ * @param[in] pos: 循环队列对象对象映射到位图中的位置
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -900,8 +900,8 @@ err_cq_grab:
 
 /**
  * @brief XWOS API：从信号选择器上解绑循环队列对象
- * @param cq: (I) 循环队列对象的指针
- * @param sel: (I) 信号选择器的指针
+ * @param[in] cq: 循环队列对象的指针
+ * @param[in] sel: 信号选择器的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针

@@ -69,7 +69,7 @@ struct xwup_swt * xwup_swt_alloc(void)
 
 /**
  * @brief 释放软件定时器对象
- * @param swt: (I) 软件定时器对象的指针
+ * @param[in] swt: 软件定时器对象的指针
  */
 static __xwup_code
 void xwup_swt_free(struct xwup_swt * swt)
@@ -83,9 +83,9 @@ void xwup_swt_free(struct xwup_swt * swt)
 
 /**
  * @brief 激活软件定时器对象
- * @param swt: (I) 软件定时器对象的指针
- * @param name: (I) 名字
- * @param flag: (I) 标志
+ * @param[in] swt: 软件定时器对象的指针
+ * @param[in] name: 名字
+ * @param[in] flag: 标志
  */
 static __xwup_code
 void xwup_swt_activate(struct xwup_swt * swt,
@@ -103,9 +103,9 @@ void xwup_swt_activate(struct xwup_swt * swt,
 
 /**
  * @brief 使得软件定时器对象无效
- * @param swt: (I) 软件定时器对象的指针
- * @param name: (I) 名字
- * @param flag: (I) 标志
+ * @param[in] swt: 软件定时器对象的指针
+ * @param[in] name: 名字
+ * @param[in] flag: 标志
  */
 static __xwup_code
 void xwup_swt_deactivate(struct xwup_swt * swt)
@@ -118,19 +118,6 @@ void xwup_swt_deactivate(struct xwup_swt * swt)
         swt->flag = 0;
 }
 
-/**
- * @brief XWUP API：初始化软件定时器对象
- * @param swt: (I) 软件定时器对象的指针
- * @param name: (I) 名字
- * @param flag: (I) 标志
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *swt* ，不可重入
- */
 __xwup_api
 xwer_t xwup_swt_init(struct xwup_swt * swt,
                      const char * name,
@@ -141,19 +128,6 @@ xwer_t xwup_swt_init(struct xwup_swt * swt,
         return XWOK;
 }
 
-/**
- * @brief XWUP API：销毁软件定时器对象
- * @param swt: (I) 软件定时器对象的指针
- * @param name: (I) 名字
- * @param flag: (I) 标志
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *swt* ，不可重入
- */
 __xwup_api
 xwer_t xwup_swt_destroy(struct xwup_swt * swt)
 {
@@ -163,19 +137,6 @@ xwer_t xwup_swt_destroy(struct xwup_swt * swt)
         return XWOK;
 }
 
-/**
- * @brief XWUP API：动态创建软件定时器对象
- * @param ptrbuf: (O) 指向缓冲区的指针，通过此缓冲区返回软件定时器对象的指针
- * @param name: (I) 名字
- * @param flag: (I) 标志
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwup_api
 xwer_t xwup_swt_create(struct xwup_swt ** ptrbuf,
                        const char * name,
@@ -204,17 +165,6 @@ err_swt_alloc:
         return rc;
 }
 
-/**
- * @brief XWUP API：删除动态创建的软件定时器对象
- * @param swt: (I) 软件定时器对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *swt* ，不可重入
- */
 __xwup_api
 xwer_t xwup_swt_delete(struct xwup_swt * swt)
 {
@@ -227,7 +177,7 @@ xwer_t xwup_swt_delete(struct xwup_swt * swt)
 
 /**
  * @brief 软件定时器的时间树节点回调函数
- * @param entry: (I) 软件定时器对象的指针
+ * @param[in] entry: 软件定时器对象的指针
  */
 static __xwup_code
 void xwup_swt_ttn_cb(void * entry)
@@ -256,22 +206,6 @@ void xwup_swt_ttn_cb(void * entry)
         }
 }
 
-/**
- * @brief XWUP API：开启软件定时器
- * @param swt: (I) 软件定时器对象的指针
- * @param base: (I) 定时器初始时间
- * @param period: (I) 周期
- * @param cb: (I) 定时器回调函数
- * @param arg: (I) 定时器回调函数的参数
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EINVAL: 无效参数
- * @retval -EALREADY: 定时器已经开启
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwup_api
 xwer_t xwup_swt_start(struct xwup_swt * swt,
                       xwtm_t base, xwtm_t period,
@@ -311,17 +245,6 @@ err_already:
         return rc;
 }
 
-/**
- * @brief XWUP API：停止软件定时器
- * @param swt: (I) 软件定时器对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -ESRCH: 定时器没有被开启
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwup_api
 xwer_t xwup_swt_stop(struct xwup_swt * swt)
 {

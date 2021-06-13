@@ -17,9 +17,14 @@
 #include <xwos/lib/xwaop.h>
 
 /**
+ * @defgroup xwobj 玄武OS的对象
+ * @{
+ */
+
+/**
  * @brief 将对象强制类型转换
- * @patam type: (I) 类型
- * @param obj: (I) 对象
+ * @param[in] type: 类型
+ * @param[in] obj: 对象
  * @note
  * - 类似于C++中的关键字：static_cast<type>(obj)
  */
@@ -69,5 +74,9 @@ xwer_t xwos_object_grab(struct xwos_object * obj);
 xwer_t xwos_object_put(struct xwos_object * obj);
 xwer_t xwos_object_rawput(struct xwos_object * obj);
 xwsq_t xwos_object_get_refcnt(struct xwos_object * obj);
+
+/**
+ * @} xwobj
+ */
 
 #endif /* xwos/lib/object.h */

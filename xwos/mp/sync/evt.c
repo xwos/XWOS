@@ -71,7 +71,7 @@ xwer_t xwmp_flg_timedwait_edge(struct xwmp_evt * evt, xwsq_t trigger,
 
 /**
  * @brief 动态创建一个对象
- * @param num: (I) 事件位图中位的个数
+ * @param[in] num: 事件位图中位的个数
  * @return 事件对象的指针
  */
 static __xwmp_code
@@ -119,7 +119,7 @@ struct xwmp_evt * xwmp_evt_alloc(xwsz_t num)
 
 /**
  * @brief 释放事件对象
- * @param evt: (I) 事件对象的指针
+ * @param[in] evt: 事件对象的指针
  */
 static __xwmp_code
 void xwmp_evt_free(struct xwmp_evt * evt)
@@ -135,10 +135,10 @@ void xwmp_evt_free(struct xwmp_evt * evt)
 
 /**
  * @brief 事件对象的构造函数
- * @param evt: (I) 事件对象的指针
- * @param num: (I) 事件的数量
- * @param bmp: (I) 事件对象记录事件状态的位图数组缓冲区
- * @param msk: (I) 事件对象记录掩码状态的位图数组缓冲区
+ * @param[in] evt: 事件对象的指针
+ * @param[in] num: 事件的数量
+ * @param[in] bmp: 事件对象记录事件状态的位图数组缓冲区
+ * @param[in] msk: 事件对象记录掩码状态的位图数组缓冲区
  */
 static __xwmp_code
 void xwmp_evt_construct(struct xwmp_evt * evt, xwsz_t num,
@@ -152,7 +152,7 @@ void xwmp_evt_construct(struct xwmp_evt * evt, xwsz_t num,
 
 /**
  * @brief 事件对象的析构函数
- * @param evt: (I) 事件对象的指针
+ * @param[in] evt: 事件对象的指针
  */
 static __xwmp_code
 void xwmp_evt_destruct(struct xwmp_evt * evt)
@@ -162,7 +162,7 @@ void xwmp_evt_destruct(struct xwmp_evt * evt)
 
 /**
  * @brief 事件对象的垃圾回收函数
- * @param evt: (I) 事件对象的指针
+ * @param[in] evt: 事件对象的指针
  * @return 错误码
  */
 static __xwmp_code
@@ -174,8 +174,8 @@ xwer_t xwmp_evt_gc(void * evt)
 
 /**
  * @brief XWMP API：检查事件对象的标签并增加引用计数
- * @param evt: (I) 事件对象指针
- * @param tik: (I) 标签
+ * @param[in] evt: 事件对象指针
+ * @param[in] tik: 标签
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -191,8 +191,8 @@ xwer_t xwmp_evt_acquire(struct xwmp_evt * evt, xwsq_t tik)
 
 /**
  * @brief XWMP API：检查事件对象的标签并增加引用计数
- * @param evt: (I) 事件对象指针
- * @param tik: (I) 标签
+ * @param[in] evt: 事件对象指针
+ * @param[in] tik: 标签
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -208,7 +208,7 @@ xwer_t xwmp_evt_release(struct xwmp_evt * evt, xwsq_t tik)
 
 /**
  * @brief XWMP API：增加事件对象的引用计数
- * @param evt: (I) 事件对象指针
+ * @param[in] evt: 事件对象指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -224,7 +224,7 @@ xwer_t xwmp_evt_grab(struct xwmp_evt * evt)
 
 /**
  * @brief XWMP API：减少事件对象的引用计数
- * @param evt: (I) 事件对象指针
+ * @param[in] evt: 事件对象指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -240,9 +240,9 @@ xwer_t xwmp_evt_put(struct xwmp_evt * evt)
 
 /**
  * @brief XWMP API：激活并初始化事件对象
- * @param evt: (I) 事件对象的指针
- * @param type: (I) 事件的类型，取值 @ref xwmp_evt_type_em
- * @param gcfunc: (I) 垃圾回收函数的指针
+ * @param[in] evt: 事件对象的指针
+ * @param[in] type: 事件的类型，取值 @ref xwmp_evt_type_em
+ * @param[in] gcfunc: 垃圾回收函数的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -284,9 +284,9 @@ xwer_t xwmp_evt_activate(struct xwmp_evt * evt, xwsq_t type, xwobj_gc_f gcfunc)
 
 /**
  * @brief XWMP API：动态创建事件对象
- * @param ptrbuf: (O) 指向缓冲区的指针，通过此缓冲区返回对象的指针
- * @param type: (I) 事件的类型，取值范围 @ref xwmp_evt_type_em
- * @param num: (I) 事件的数量
+ * @param[out] ptrbuf: 指向缓冲区的指针，通过此缓冲区返回对象的指针
+ * @param[in] type: 事件的类型，取值范围 @ref xwmp_evt_type_em
+ * @param[in] num: 事件的数量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -324,7 +324,7 @@ xwer_t xwmp_evt_create(struct xwmp_evt ** ptrbuf, xwsq_t type, xwsz_t num)
 
 /**
  * @brief XWMP API：删除动态创建的事件对象
- * @param evt: (I) 事件对象的指针
+ * @param[in] evt: 事件对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -343,11 +343,11 @@ xwer_t xwmp_evt_delete(struct xwmp_evt * evt)
 
 /**
  * @brief XWMP API：静态初始化事件对象
- * @param evt: (I) 事件对象的指针
- * @param type: (I) 事件的类型，取值范围 @ref xwmp_evt_type_em
- * @param num: (I) 事件的数量
- * @param bmp: (I) 事件对象用来记录事件状态的位图缓冲区
- * @param msk: (I) 事件对象用来记录掩码状态的位图缓冲区
+ * @param[in] evt: 事件对象的指针
+ * @param[in] type: 事件的类型，取值范围 @ref xwmp_evt_type_em
+ * @param[in] num: 事件的数量
+ * @param[in] bmp: 事件对象用来记录事件状态的位图缓冲区
+ * @param[in] msk: 事件对象用来记录掩码状态的位图缓冲区
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -373,7 +373,7 @@ xwer_t xwmp_evt_init(struct xwmp_evt * evt, xwsq_t type, xwsz_t num,
 
 /**
  * @brief XWMP API：销毁静态方式初始化的事件对象
- * @param evt: (I) 事件对象的指针
+ * @param[in] evt: 事件对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -393,9 +393,9 @@ xwer_t xwmp_evt_destroy(struct xwmp_evt * evt)
 /**
  * @brief XWMP API：绑定事件对象(evt)到另一个事件对象(sel)，
  *                  另一个事件对象类型为XWMP_EVT_TYPE_SEL
- * @param evt: (I) 事件对象的指针
- * @param sel: (I) 类型为XWMP_EVT_TYPE_SEL的事件对象的指针
- * @param pos: (I) 事件对象对象映射到位图中的位置
+ * @param[in] evt: 事件对象的指针
+ * @param[in] sel: 类型为XWMP_EVT_TYPE_SEL的事件对象的指针
+ * @param[in] pos: 事件对象对象映射到位图中的位置
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -417,8 +417,8 @@ xwer_t xwmp_evt_bind(struct xwmp_evt * evt, struct xwmp_evt * sel, xwsq_t pos)
 /**
  * @brief XWMP API：从另一个事件对象(sel)上解绑事件对象(evt)，
  *                  另一个事件对象类型为XWMP_EVT_TYPE_SEL
- * @param evt: (I) 事件对象的指针
- * @param sel: (I) 类型为XWMP_EVT_TYPE_SEL的事件对象的指针
+ * @param[in] evt: 事件对象的指针
+ * @param[in] sel: 类型为XWMP_EVT_TYPE_SEL的事件对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ETYPE: 事件对象类型错误
@@ -437,7 +437,7 @@ xwer_t xwmp_evt_unbind(struct xwmp_evt * evt, struct xwmp_evt * sel)
 
 /**
  * @brief XWMP API：中断事件对象等待队列中的所有节点
- * @param evt: (I) 事件对象的指针
+ * @param[in] evt: 事件对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -457,8 +457,8 @@ xwer_t xwmp_evt_intr_all(struct xwmp_evt * evt)
 
 /**
  * @brief XWMP API：获取事件对象中事件的数量
- * @param evt: (I) 事件对象的指针
- * @param numbuf: (O) 指向缓冲区的指针，通过此缓冲区返回事件的数量
+ * @param[in] evt: 事件对象的指针
+ * @param[out] numbuf: 指向缓冲区的指针，通过此缓冲区返回事件的数量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -486,20 +486,6 @@ err_evt_grab:
 }
 
 /******** type:XWMP_EVT_TYPE_FLG ********/
-/**
- * @brief XWMP API：在事件对象中同时设置多个位图的位，
- *                  事件对象类型为XWMP_EVT_TYPE_FLG
- * @param evt: (I) 事件对象的指针
- * @param msk: (I) 事件对象的位图掩码
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_flg_s1m(struct xwmp_evt * evt, xwbmp_t msk[])
 {
@@ -526,21 +512,6 @@ err_evt_grab:
         return rc;
 }
 
-/**
- * @brief XWMP API：在事件对象中设置单个位图的位，
- *                  事件对象类型为XWMP_EVT_TYPE_FLG
- * @param evt: (I) 事件对象的指针
- * @param pos: (I) 位的序号
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ECHRNG: 位置超出范围
- * @retval -ETYPE: 事件对象类型错误
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_flg_s1i(struct xwmp_evt * evt, xwsq_t pos)
 {
@@ -572,20 +543,6 @@ err_evt_grab:
         return rc;
 }
 
-/**
- * @brief XWMP API：在事件对象中同时清除多个位图的位，
- *                  事件对象类型为XWMP_EVT_TYPE_FLG
- * @param evt: (I) 事件对象的指针
- * @param msk: (I) 事件对象的位图掩码
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_flg_c0m(struct xwmp_evt * evt, xwbmp_t msk[])
 {
@@ -612,21 +569,6 @@ err_evt_grab:
         return rc;
 }
 
-/**
- * @brief XWMP API：在事件对象中清除单个位图的位，
- *                  事件对象类型为XWMP_EVT_TYPE_FLG
- * @param evt: (I) 事件对象的指针
- * @param pos: (I) 位的序号
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ECHRNG: 位置超出范围
- * @retval -ETYPE: 事件对象类型错误
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_flg_c0i(struct xwmp_evt * evt, xwsq_t pos)
 {
@@ -658,20 +600,6 @@ err_evt_grab:
         return rc;
 }
 
-/**
- * @brief XWMP API：在事件对象中同时翻转多个位图的位，
- *                  事件对象类型为XWMP_EVT_TYPE_FLG
- * @param evt: (I) 事件对象的指针
- * @param msk: (I) 事件对象的位图掩码
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_flg_x1m(struct xwmp_evt * evt, xwbmp_t msk[])
 {
@@ -698,21 +626,6 @@ err_evt_grab:
         return rc;
 }
 
-/**
- * @brief XWMP API：在事件对象中翻转单个位图的位，
- *                  事件对象类型为XWMP_EVT_TYPE_FLG
- * @param evt: (I) 事件对象的指针
- * @param pos: (I) 位的序号
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ECHRNG: 位置超出范围
- * @retval -ETYPE: 事件对象类型错误
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_flg_x1i(struct xwmp_evt * evt, xwsq_t pos)
 {
@@ -744,18 +657,6 @@ err_evt_grab:
         return rc;
 }
 
-/**
- * @brief XWMP API：读取事件对象位图的值
- * @param evt: (I) 事件对象的指针
- * @param out: (O) 指向缓冲区的指针，通过此缓冲区返回事件对象位图的值
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_flg_read(struct xwmp_evt * evt, xwbmp_t out[])
 {
@@ -894,43 +795,6 @@ xwer_t xwmp_flg_trywait_edge(struct xwmp_evt * evt, xwsq_t trigger,
         return rc;
 }
 
-/**
- * @brief XWMP API：等待事件对象中的触发信号，事件对象类型为XWMP_EVT_TYPE_FLG
- * @param evt: (I) 事件对象的指针
- * @param trigger: (I) 事件触发条件，取值 @ref xwmp_flg_trigger_em
- * @param action: (I) 事件触发后的动作，取值 @ref xwmp_flg_action_em，
- *                    仅当trigger取值
- *                    @ref XWMP_FLG_TRIGGER_SET_ALL
- *                    @ref XWMP_FLG_TRIGGER_SET_ANY
- *                    @ref XWMP_FLG_TRIGGER_CLR_ALL
- *                    @ref XWMP_FLG_TRIGGER_CLR_ALL
- *                    时有效，其他情况不使用此参数，可填 @ref XWMP_UNUSED_ARGUMENT
- * @param origin: 指向缓冲区的指针：
- *                - 当trigger取值
- *                  @ref XWMP_FLG_TRIGGER_SET_ALL
- *                  @ref XWMP_FLG_TRIGGER_SET_ANY
- *                  @ref XWMP_FLG_TRIGGER_CLR_ALL
- *                  @ref XWMP_FLG_TRIGGER_CLR_ANY
- *                  (O) 返回触发时事件对象中的位图状态（action之前）
- *                - 当trigger取值
- *                  @ref XWMP_FLG_TRIGGER_TGL_ALL
- *                  @ref XWMP_FLG_TRIGGER_TGL_ANY
- *                  (I) 作为输入时，作为用于比较的初始值
- *                  (O) 作为输出时，返回事件对象中位图状态
- *                      （可作为下一次调用的初始值）
- * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的事件
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
- * @retval -EINVAL: 参数无效
- * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_flg_wait(struct xwmp_evt * evt,
                      xwsq_t trigger, xwsq_t action,
@@ -940,43 +804,6 @@ xwer_t xwmp_flg_wait(struct xwmp_evt * evt,
         return xwmp_flg_timedwait(evt, trigger, action, origin, msk, &expected);
 }
 
-/**
- * @brief XWMP API：检测一下事件对象中的触发信号，不会阻塞调用线程，
- *                  事件对象类型为XWMP_EVT_TYPE_FLG
- * @param evt: (I) 事件对象的指针
- * @param trigger: (I) 事件触发条件，取值 @ref xwmp_flg_trigger_em
- * @param action: (I) 事件触发后的动作，取值 @ref xwmp_flg_action_em
- *                    仅当trigger取值
- *                    @ref XWMP_FLG_TRIGGER_SET_ALL
- *                    @ref XWMP_FLG_TRIGGER_SET_ANY
- *                    @ref XWMP_FLG_TRIGGER_CLR_ALL
- *                    @ref XWMP_FLG_TRIGGER_CLR_ALL
- *                    时有效，其他情况不使用此参数，可填 @ref XWMP_UNUSED_ARGUMENT
- * @param origin: 指向缓冲区的指针：
- *                - 当trigger取值
- *                  @ref XWMP_FLG_TRIGGER_SET_ALL
- *                  @ref XWMP_FLG_TRIGGER_SET_ANY
- *                  @ref XWMP_FLG_TRIGGER_CLR_ALL
- *                  @ref XWMP_FLG_TRIGGER_CLR_ANY
- *                  (O) 返回触发时返回事件对象中的位图状态（action之前）
- *                - 当trigger取值
- *                  @ref XWMP_FLG_TRIGGER_TGL_ALL
- *                  @ref XWMP_FLG_TRIGGER_TGL_ANY
- *                  (I) 作为输入时，作为用于比较的初始值
- *                  (O) 作为输出时，返回事件对象中位图状态
- *                      （可作为下一次调用的初始值）
- * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的事件
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
- * @retval -EINVAL: 参数无效
- * @retval -ENODATA: 没有任何事件触发
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_flg_trywait(struct xwmp_evt * evt,
                         xwsq_t trigger, xwsq_t action,
@@ -1159,49 +986,6 @@ xwer_t xwmp_flg_timedwait_edge(struct xwmp_evt * evt, xwsq_t trigger,
         return rc;
 }
 
-/**
- * @brief XWMP API：限时等待事件对象中的触发信号，事件对象类型为XWMP_EVT_TYPE_FLG
- * @param evt: (I) 事件对象的指针
- * @param trigger: (I) 事件触发条件，取值 @ref xwmp_flg_trigger_em
- * @param action: (I) 事件触发后的动作，取值 @ref xwmp_flg_action_em
- *                    仅当trigger取值
- *                    @ref XWMP_FLG_TRIGGER_SET_ALL
- *                    @ref XWMP_FLG_TRIGGER_SET_ANY
- *                    @ref XWMP_FLG_TRIGGER_CLR_ALL
- *                    @ref XWMP_FLG_TRIGGER_CLR_ALL
- *                    时有效，其他情况不使用此参数，可填 @ref XWMP_UNUSED_ARGUMENT
- * @param origin: 指向缓冲区的指针：
- *                - 当trigger取值
- *                  @ref XWMP_FLG_TRIGGER_SET_ALL
- *                  @ref XWMP_FLG_TRIGGER_SET_ANY
- *                  @ref XWMP_FLG_TRIGGER_CLR_ALL
- *                  @ref XWMP_FLG_TRIGGER_CLR_ANY
- *                  (O) 返回触发时事件对象中的位图状态（action之前）
- *                - 当trigger取值
- *                  @ref XWMP_FLG_TRIGGER_TGL_ALL
- *                  @ref XWMP_FLG_TRIGGER_TGL_ANY
- *                  (I) 作为输入时，作为用于比较的初始值
- *                  (O) 作为输出时，返回事件对象中位图状态
- *                      （可作为下一次调用的初始值）
- * @param msk: (I) 事件对象的位图掩码，表示只关注掩码部分的事件
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
- * @retval -EINVAL: 参数无效
- * @retval -ETIMEDOUT: 超时
- * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- * @note
- * - 函数返回返回*-ETIMEDOUT*时，*xwtm*指向的缓冲区内的期望时间会减为0。
- */
 __xwmp_api
 xwer_t xwmp_flg_timedwait(struct xwmp_evt * evt,
                           xwsq_t trigger, xwsq_t action,
@@ -1236,10 +1020,10 @@ err_evt_grab:
 /******** type:XWMP_EVT_TYPE_SEL ********/
 /**
  * @brief 绑定同步对象到事件对象，事件对象类型为XWMP_EVT_TYPE_SEL
- * @param evt: (I) 事件对象的指针
- * @param obj: (I) 同步对象的指针
- * @param pos: (I) 同步对象映射到位图中的位置
- * @param exclusive: (I) 是否为独占绑定
+ * @param[in] evt: 事件对象的指针
+ * @param[in] obj: 同步对象的指针
+ * @param[in] pos: 同步对象映射到位图中的位置
+ * @param[in] exclusive: 是否为独占绑定
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ETYPE: 事件对象类型错误
@@ -1298,10 +1082,10 @@ err_evt_grab:
 }
 
 /**
- * @brief XWMP API：从事件对象上解绑同步对象，事件对象类型为XWMP_EVT_TYPE_SEL
- * @param evt: (I) 事件对象的指针
- * @param obj: (I) 同步对象的指针
- * @param exclusive: (I) 是否为独占绑定
+ * @brief 从事件对象上解绑同步对象，事件对象类型为XWMP_EVT_TYPE_SEL
+ * @param[in] evt: 事件对象的指针
+ * @param[in] obj: 同步对象的指针
+ * @param[in] exclusive: 是否为独占绑定
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ETYPE: 事件对象类型错误
@@ -1341,8 +1125,8 @@ err_notconn:
 
 /**
  * @brief 在事件对象上设置同步对象的标志位，事件对象类型为XWMP_EVT_TYPE_SEL
- * @param evt: (I) 事件对象的指针
- * @param obj: (I) 同步对象的指针
+ * @param[in] evt: 事件对象的指针
+ * @param[in] obj: 同步对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
@@ -1380,8 +1164,8 @@ err_evt_grab:
 
 /**
  * @brief 在事件对象上清除同步对象的标志位，事件对象类型为XWMP_EVT_TYPE_SEL
- * @param evt: (I) 事件对象的指针
- * @param obj: (I) 同步对象的指针
+ * @param[in] evt: 事件对象的指针
+ * @param[in] obj: 同步对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
@@ -1416,23 +1200,6 @@ err_evt_grab:
         return rc;
 }
 
-/**
- * @brief XWMP API：等待事件对象中绑定的同步对象，
- *                  事件对象类型为XWMP_EVT_TYPE_SEL
- * @param evt: (I) 事件对象的指针
- * @param msk: (I) 同步对象位图掩码，表示只关注掩码内的同步对象
- * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
- * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_sel_select(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
 {
@@ -1440,21 +1207,6 @@ xwer_t xwmp_sel_select(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
         return xwmp_sel_timedselect(evt, msk, trg, &expected);
 }
 
-/**
- * @brief XWMP API：检测一下事件对象中绑定的同步对象，不会阻塞调用线程
- * @param evt: (I) 事件对象的指针
- * @param msk: (I) 同步对象位图掩码，表示只关注掩码内的同步对象
- * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
- * @retval -ENODATA: 没有任何信号或事件
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_sel_tryselect(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
 {
@@ -1497,29 +1249,6 @@ err_evt_grab:
         return rc;
 }
 
-/**
- * @brief XWMP API：限时等待事件对象中绑定的同步对象，
- *                  事件对象类型为XWMP_EVT_TYPE_SEL
- * @param evt: (I) 事件对象的指针
- * @param msk: (I) 同步对象位图掩码，表示只关注掩码内的同步对象
- * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
- * @retval -ETIMEDOUT: 超时
- * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- * @note
- * - 函数返回返回*-ETIMEDOUT*时，*xwtm*指向的缓冲区内的期望时间会减为0。
- */
 __xwmp_api
 xwer_t xwmp_sel_timedselect(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
                             xwtm_t * xwtm)
@@ -1588,23 +1317,6 @@ err_evt_grab:
 }
 
 /******** type:XWMP_EVT_TYPE_BR ********/
-/**
- * @brief XWMP API：等待所有线程到达栅栏，事件对象类型为XWMP_EVT_TYPE_BR
- * @param evt: (I) 事件对象的指针
- * @param pos: (I) 当前线程的位图位置
- * @param msk: (I) 需要同步的线程位图掩码
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ECHRNG: 位置超出范围
- * @retval -ETYPE: 事件对象类型错误
- * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_br_sync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t msk[])
 {
@@ -1612,29 +1324,6 @@ xwer_t xwmp_br_sync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t msk[])
         return xwmp_br_timedsync(evt, pos, msk, &expected);
 }
 
-/**
- * @brief XWMP API：等待所有线程到达栅栏，事件对象类型为XWMP_EVT_TYPE_BR
- * @param evt: (I) 事件对象的指针
- * @param pos: (I) 当前线程的位图位置
- * @param msk: (I) 需要同步的线程位图掩码
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
- * @retval -ECHRNG: 位置超出范围
- * @retval -ETIMEDOUT: 超时
- * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- * @note
- * - 函数返回返回*-ETIMEDOUT*时，*xwtm*指向的缓冲区内的期望时间会减为0。
- */
 __xwmp_api
 xwer_t xwmp_br_timedsync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t msk[],
                          xwtm_t * xwtm)

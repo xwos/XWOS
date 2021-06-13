@@ -134,7 +134,7 @@ xwer_t xwds_linc_get_msg_size(struct xwds_linc * linc,
 
 /**
  * @brief XWDS API：增加对象的引用计数
- * @param linc: (I) LIN控制器对象指针
+ * @param[in] linc: LIN控制器对象指针
  * @return 错误码
  * @retval @ref xwds_device_grab()
  */
@@ -146,7 +146,7 @@ xwer_t xwds_linc_grab(struct xwds_linc * linc)
 
 /**
  * @brief XWDS API：减少对象的引用计数
- * @param linc: (I) LIN控制器对象指针
+ * @param[in] linc: LIN控制器对象指针
  * @return 错误码
  * @retval @ref xwds_device_put()
  */

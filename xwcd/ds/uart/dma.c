@@ -68,7 +68,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_dmauartc_vop = {
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：DMA UART控制器的构造函数
- * @param dmauartc: (I) DMA UART控制器对象指针
+ * @param[in] dmauartc: DMA UART控制器对象指针
  */
 __xwds_api
 void xwds_dmauartc_construct(struct xwds_dmauartc * dmauartc)
@@ -79,7 +79,7 @@ void xwds_dmauartc_construct(struct xwds_dmauartc * dmauartc)
 
 /**
  * @brief XWDS API：DMA UART控制器对象的析构函数
- * @param dmauartc: (I) DMA UART控制器对象指针
+ * @param[in] dmauartc: DMA UART控制器对象指针
  */
 __xwds_api
 void xwds_dmauartc_destruct(struct xwds_dmauartc * dmauartc)
@@ -90,7 +90,7 @@ void xwds_dmauartc_destruct(struct xwds_dmauartc * dmauartc)
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测DMA UART控制器
- * @param dmauartc: (I) DMA UART控制器对象指针
+ * @param[in] dmauartc: DMA UART控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -123,7 +123,7 @@ err_sem_init:
 
 /**
  * @brief XWDS VOP：移除DMA UART控制器
- * @param dmauartc: (I) DMA UART控制器对象指针
+ * @param[in] dmauartc: DMA UART控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -146,7 +146,7 @@ err_dev_vop_remove:
 
 /**
  * @brief XWDS VOP：启动DMA UART控制器
- * @param dmauartc: (I) DMA UART控制器对象指针
+ * @param[in] dmauartc: DMA UART控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -164,7 +164,7 @@ xwer_t xwds_dmauartc_vop_start(struct xwds_dmauartc * dmauartc)
 
 /**
  * @brief XWDS VOP：停止DMA UART控制器
- * @param dmauartc: (I) DMA UART控制器对象指针
+ * @param[in] dmauartc: DMA UART控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -180,7 +180,7 @@ xwer_t xwds_dmauartc_vop_stop(struct xwds_dmauartc * dmauartc)
 /******** ******** pm ******** ********/
 /**
  * @brief XWDS VOP：暂停DMA UART控制器
- * @param dmauartc: (I) DMA UART控制器对象指针
+ * @param[in] dmauartc: DMA UART控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -194,7 +194,7 @@ xwer_t xwds_dmauartc_vop_suspend(struct xwds_dmauartc * dmauartc)
 
 /**
  * @brief XWDS VOP：继续DMA UART控制器
- * @param dmauartc: (I) DMA UART控制器对象指针
+ * @param[in] dmauartc: DMA UART控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -213,14 +213,14 @@ xwer_t xwds_dmauartc_vop_resume(struct xwds_dmauartc * dmauartc)
 /******** ******** ******** DMA UART APIs ******** ******** ********/
 /**
  * @brief XWDS API：从接收队列中获取数据
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @param buf: (O) 指向缓冲区的指针，通过此缓冲区返回数据
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示缓冲区大小（单位：字节）
- *              (O) 作为输出时，返回实际读取的数据大小
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] dmauartc: DMA UART控制器对象指针
+ * @param[out] buf: 指向缓冲区的指针，通过此缓冲区返回数据
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示缓冲区大小（单位：字节）
+ * + (O) 作为输出时，返回实际读取的数据大小
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -292,11 +292,11 @@ err_dmauartc_grab:
 
 /**
  * @brief XWDS API：尝试从接收队列中获取数据
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @param buf: (O) 指向缓冲区的指针，通过此缓冲区返回数据
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示缓冲区大小（单位：字节）
- *              (O) 作为输出时，返回实际读取的数据大小
+ * @param[in] dmauartc: DMA UART控制器对象指针
+ * @param[out] buf: 指向缓冲区的指针，通过此缓冲区返回数据
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示缓冲区大小（单位：字节）
+ * + (O) 作为输出时，返回实际读取的数据大小
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -366,14 +366,14 @@ err_dmauartc_grab:
 
 /**
  * @brief XWDS API：配置UART的DMA通道发送数据
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @param data: (I) 待发送的数据的缓冲区
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望发送的数据的大小（单位：字节）
- *              (O) 作为输出时，返回实际发送的数据大小
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] dmauartc: DMA UART控制器对象指针
+ * @param[in] data: 待发送的数据的缓冲区
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望发送的数据的大小（单位：字节）
+ * + (O) 作为输出时，返回实际发送的数据大小
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -425,11 +425,11 @@ err_dmauartc_grab:
 
 /**
  * @brief XWDS API：直接发送一个字节（非DMA模式）
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @param byte: (I) 待发送的字节
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] dmauartc: DMA UART控制器对象指针
+ * @param[in] byte: 待发送的字节
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -480,8 +480,8 @@ err_dmauartc_grab:
 
 /**
  * @brief XWDS API：配置UART
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @param cfg: (I) 新的配置
+ * @param[in] dmauartc: DMA UART控制器对象指针
+ * @param[in] cfg: 新的配置
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -525,7 +525,7 @@ err_dmauartc_grab:
 /******** ******** Callbacks for driver ******** ********/
 /**
  * @brief XWDS Driver Callback：清空接收队列
- * @param dmauartc: (I) DMA UART控制器对象指针
+ * @param[in] dmauartc: DMA UART控制器对象指针
  */
 __xwds_api
 void xwds_dmauartc_drvcb_rxq_flush(struct xwds_dmauartc * dmauartc)
@@ -541,8 +541,8 @@ void xwds_dmauartc_drvcb_rxq_flush(struct xwds_dmauartc * dmauartc)
 
 /**
  * @brief XWDS Driver Callback：发布数据到接收队列
- * @param dmauartc: (I) DMA UART控制器对象指针
- * @param tail: (I) 新的数据接收位置（有效数据结尾 + 1）
+ * @param[in] dmauartc: DMA UART控制器对象指针
+ * @param[in] tail: 新的数据接收位置（有效数据结尾 + 1）
  */
 __xwds_code
 void xwds_dmauartc_drvcb_rxq_pub(struct xwds_dmauartc * dmauartc, xwsq_t tail)

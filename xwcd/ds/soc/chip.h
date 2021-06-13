@@ -217,7 +217,7 @@ xwer_t xwds_soc_ioctl(struct xwds_soc * soc, xwsq_t cmd, ...);
 
 /**
  * @brief XWDS API：增加对象的引用计数
- * @param soc: (I) SOC对象指针
+ * @param[in] soc: SOC对象指针
  * @return 错误码
  * @retval @ref xwds_device_grab()
  */
@@ -229,7 +229,7 @@ xwer_t xwds_soc_grab(struct xwds_soc * soc)
 
 /**
  * @brief XWDS API：减少对象的引用计数
- * @param soc: (I) SOC对象指针
+ * @param[in] soc: SOC对象指针
  * @return 错误码
  * @retval @ref xwds_device_put()
  */

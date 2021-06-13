@@ -101,8 +101,8 @@ const __xwmp_rodata char xwmp_thd_cache_name[] = "xwmp.mp.thd.cache";
 #if defined(XWMPCFG_SKD_THD_MEMSLICE) && (1 == XWMPCFG_SKD_THD_MEMSLICE)
 /**
  * @brief XWMP API：初始化结构体xwmp_thd的对象缓存
- * @param zone_origin: (I) 内存区域的首地址
- * @param zone_size: (I) 内存区域的大小
+ * @param[in] zone_origin: 内存区域的首地址
+ * @param[in] zone_size: 内存区域的大小
  * @return 错误码
  * @note
  * - 重入性：只可在系统初始化时使用一次
@@ -167,7 +167,7 @@ struct xwmp_thd * xwmp_thd_alloc(void)
 
 /**
  * @brief 释放线程对象
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  */
 static __xwmp_code
 void xwmp_thd_free(struct xwmp_thd * thd)
@@ -185,7 +185,7 @@ void xwmp_thd_free(struct xwmp_thd * thd)
 
 /**
  * @brief 动态分配线程栈
- * @param stack_size: (I) 线程栈的大小
+ * @param[in] stack_size: 线程栈的大小
  * @return 线程栈的首地址或指针类型的错误码或空指针
  */
 static __xwmp_code
@@ -228,7 +228,7 @@ xwstk_t * xwmp_thd_stack_alloc(xwsz_t stack_size)
 
 /**
  * @brief 释放动态分配的线程栈内存
- * @param stk: (I) 线程栈的首地址
+ * @param[in] stk: 线程栈的首地址
  * @return 错误码
  */
 static __xwmp_code
@@ -245,7 +245,7 @@ xwer_t xwmp_thd_stack_free(xwstk_t * stk)
 
 /**
  * @brief 线程对象的构造函数
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  */
 static __xwmp_code
 void xwmp_thd_construct(struct xwmp_thd * thd)
@@ -255,7 +255,7 @@ void xwmp_thd_construct(struct xwmp_thd * thd)
 
 /**
  * @brief 线程对象的析构函数
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  */
 static __xwmp_code
 void xwmp_thd_destruct(struct xwmp_thd * thd)
@@ -265,7 +265,7 @@ void xwmp_thd_destruct(struct xwmp_thd * thd)
 
 /**
  * @brief 线程对象的垃圾回收函数
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  * @return 错误码
  */
 static __xwmp_code
@@ -279,16 +279,6 @@ xwer_t xwmp_thd_gc(void * thd)
         return XWOK;
 }
 
-/**
- * @brief XWMP API：检查线程对象的标签并增加引用计数
- * @param thd: (I) 线程对象指针
- * @param tik: (I) 标签
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_thd_acquire(struct xwmp_thd * thd, xwsq_t tik)
 {
@@ -296,16 +286,6 @@ xwer_t xwmp_thd_acquire(struct xwmp_thd * thd, xwsq_t tik)
         return xwos_object_acquire(&thd->xwobj, tik);
 }
 
-/**
- * @brief XWMP API：检查线程对象的标签并增加引用计数
- * @param thd: (I) 线程对象指针
- * @param tik: (I) 标签
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_thd_release(struct xwmp_thd * thd, xwsq_t tik)
 {
@@ -313,15 +293,6 @@ xwer_t xwmp_thd_release(struct xwmp_thd * thd, xwsq_t tik)
         return xwos_object_release(&thd->xwobj, tik);
 }
 
-/**
- * @brief XWMP API：增加对象的引用计数
- * @param thd: (I) 线程对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_thd_grab(struct xwmp_thd * thd)
 {
@@ -329,15 +300,6 @@ xwer_t xwmp_thd_grab(struct xwmp_thd * thd)
         return xwos_object_grab(&thd->xwobj);
 }
 
-/**
- * @brief XWMP API：减少对象的引用计数
- * @param thd: (I) 线程对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_thd_put(struct xwmp_thd * thd)
 {
@@ -347,15 +309,15 @@ xwer_t xwmp_thd_put(struct xwmp_thd * thd)
 
 /**
  * @brief 激活线程对象
- * @param thd: (I) 线程对象的指针
- * @param name: (I) 线程的名字
- * @param mainfunc: (I) 线程函数的指针
- * @param arg: (I) 线程函数的参数
- * @param stack: (I) 线程栈首地址的指针
- * @param stack_size: (I) 线程栈的大小，以字节(byte)为单位
- * @param priority: (I) 线程的优先级
- * @param attr: (I) 线程属性，@ref xwmp_skdobj_attr_em
- * @param gcfunc: (I) 垃圾回收函数的指针
+ * @param[in] thd: 线程对象的指针
+ * @param[in] name: 线程的名字
+ * @param[in] mainfunc: 线程函数的指针
+ * @param[in] arg: 线程函数的参数
+ * @param[in] stack: 线程栈首地址的指针
+ * @param[in] stack_size: 线程栈的大小，以字节(byte)为单位
+ * @param[in] priority: 线程的优先级
+ * @param[in] attr: 线程属性，@ref xwmp_skdobj_attr_em
+ * @param[in] gcfunc: 垃圾回收函数的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -454,9 +416,9 @@ err_obj_activate:
 
 /**
  * @brief 加载就绪态的线程对象
- * @param thd: (I) 线程对象的指针
- * @param mainfunc: (I) 线程主函数
- * @param arg: (I) 线程主函数的参数
+ * @param[in] thd: 线程对象的指针
+ * @param[in] mainfunc: 线程主函数
+ * @param[in] arg: 线程主函数的参数
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 无效的参数
@@ -495,28 +457,6 @@ void xwmp_thd_launch(struct xwmp_thd * thd, xwmp_thd_f mainfunc, void * arg)
         XWOS_BUG_ON(rc < 0);
 }
 
-/**
- * @brief XWMP API：静态初始化线程对象
- * @param thd: (I) 线程对象的指针
- * @param name: (I) 线程的名字
- * @param mainfunc: (I) 线程函数的指针
- * @param arg: (I) 线程函数的参数
- * @param stack: (I) 线程栈的首地址指针
- * @param stack_size: (I) 线程栈的大小，以字节(byte)为单位
- * @param priority: (I) 线程的优先级
- * @param attr: (I) 线程属性，取值：@ref xwmp_skdobj_attr_em中的一项
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入，除非thd对象的引用计数重新为0
- * @note
- * - 静态初始化线程需预先定义线程对象和线程栈数组，通常定义为全局变量；
- * - 栈数组的首地址与大小，必须要满足CPU的ABI规则，例如ARM，就需要8字节对齐，
- *   因此在定义栈数组时需要__xwcc_aligned(8)来修饰，且大小是8的倍数。
- */
 __xwmp_api
 xwer_t xwmp_thd_init(struct xwmp_thd * thd,
                      const char * name,
@@ -539,20 +479,6 @@ xwer_t xwmp_thd_init(struct xwmp_thd * thd,
         return rc;
 }
 
-/**
- * @brief XWMP API：销毁静态方式初始化的线程
- * @param thd: (I) 线程对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：异步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- * @note
- * - 静态方式初始化线程因为没有垃圾回收函数，在线程主函数退出后，需要
- *   由用户将其销毁，释放资源。
- */
 __xwmp_api
 xwer_t xwmp_thd_destroy(struct xwmp_thd * thd)
 {
@@ -561,26 +487,6 @@ xwer_t xwmp_thd_destroy(struct xwmp_thd * thd)
         return xwmp_thd_put(thd);
 }
 
-/**
- * @brief XWMP API：动态创建线程
- * @param thdpbuf: (O) 指向缓冲区的指针，通过此缓冲区返回线程对象的指针
- * @param name: (I) 线程的名字
- * @param mainfunc: (I) 线程函数的指针
- * @param arg: (I) 线程函数的参数
- * @param stack_size: (I) 线程栈的大小，以字节(byte)为单位
- * @param priority: (I) 线程的优先级
- * @param attr: (I) 线程属性，@ref xwmp_skdobj_attr_em
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 动态创建线程采用@ref xwmp_thd_gc()作为其对象的垃圾回收函数，当线程
- *   控制块对象引用计数为0时，系统会自动调用垃圾回收函数回收其资源。
- */
 __xwmp_api
 xwer_t xwmp_thd_create(struct xwmp_thd ** thdpbuf,
                        const char * name,
@@ -628,17 +534,6 @@ err_stack_alloc:
         return rc;
 }
 
-/**
- * @brief XWMP API：删除动态创建的线程
- * @param thd: (I) 线程对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwmp_api
 xwer_t xwmp_thd_delete(struct xwmp_thd * thd)
 {
@@ -649,8 +544,8 @@ xwer_t xwmp_thd_delete(struct xwmp_thd * thd)
 
 /**
  * @brief 执行退出线程的函数
- * @param thd: (I) 线程对象的指针
- * @param rc: (I) 线程的返回值
+ * @param[in] thd: 线程对象的指针
+ * @param[in] rc: 线程的返回值
  */
 __xwmp_code
 xwer_t xwmp_thd_exit_lic(struct xwmp_thd * thd, xwer_t rc)
@@ -688,16 +583,6 @@ xwer_t xwmp_thd_exit_lic(struct xwmp_thd * thd, xwer_t rc)
         return XWOK;
 }
 
-/**
- * @brief XWMP API：当前线程退出
- * @param rc: (I) 线程退出时的返回值
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- * @note
- * - 调用的线程立即退出并抛出返回值，类似于POSIX线程库中的pthread_exit()函数。
- */
 __xwmp_api
 void xwmp_cthd_exit(xwer_t rc)
 {
@@ -709,7 +594,7 @@ void xwmp_cthd_exit(xwer_t rc)
 
 /**
  * @brief @ref xwmp_thd_stop()中使用的回调锁的解锁函数
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  * @return 错误码
  */
 static __xwmp_code
@@ -722,7 +607,7 @@ xwer_t xwmp_thd_stop_unlock_cb(struct xwmp_thd * thd)
 
 /**
  * @brief @ref xwmp_thd_stop()中使用的回调锁的上锁函数
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  * @return 错误码
  */
 static __xwmp_code
@@ -732,26 +617,6 @@ xwer_t xwmp_thd_stop_lock_cb(struct xwmp_thd * thd)
         return XWOK;
 }
 
-/**
- * @brief XWMP API：终止线程并等待它的返回值，最后回收线程资源
- * @param thd: (I) 线程对象的指针
- * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回子线程的返回值，
- *                 可为NULL，表示不需要获取返回值
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EINVAL: 线程不是Joinable的
- * @retval -EPERM: 线程不可stop自己
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- * @note
- * - 此函数由父线程调用，用于终止Joinable的子线程，父线程会一直阻塞等待子线程退出，
- *   并获取子线程的返回值，最后释放子线程资源，此函数类似于POSIX线程库
- *   中的pthread_cancel() + pthread_join()组合；
- * - 子线程收到终止信号后，并不会立即退出，退出的时机由子线程自己控制；
- * - 不可对Detached态的线程使用此函数。
- */
 __xwmp_api
 xwer_t xwmp_thd_stop(struct xwmp_thd * thd, xwer_t * trc)
 {
@@ -812,21 +677,6 @@ err_stop_self:
         return rc;
 }
 
-/**
- * @brief XWMP API：取消线程
- * @param thd: (I) 线程对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- * @note
- * - 此函数功能类似于pthread_cancel()，通知子线程退出；
- * - 此函数可中断子线程的阻塞态与睡眠态；
- * - 此函数与xwmp_thd_stop()不同，不会阻塞调用者，也不会回收子线程资源，因此
- *   可在中断中调用。
- */
 __xwmp_api
 xwer_t xwmp_thd_cancel(struct xwmp_thd * thd)
 {
@@ -854,26 +704,6 @@ err_thd_grab:
         return rc;
 }
 
-/**
- * @brief XWMP API：等待线程结束并获取它的返回值，最后回收线程资源
- * @param thd: (I) 线程对象的指针
- * @param trc: (O) 指向缓冲区的指针，通过此缓冲区返回子线程的返回值，
- *                 可为NULL，表示不需要获取返回值
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EINVAL: 线程不是Joinable的
- * @retval -EPERM: 线程不可join自己
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- * @note
- * - 此函数由父线程调用，父线程会一直阻塞等待子线程退出，
- *   并获取子线程的返回值，最后释放子线程资源，此函数类似于POSIX线程库
- *   pthread_join()函数；
- * - 不可对Detached态的线程使用此函数；
- * - 此函数与xwos_thd_stop()不同，只会等待子线程退出，不会通知子线程退出。
- */
 __xwmp_api
 xwer_t xwmp_thd_join(struct xwmp_thd * thd, xwer_t * trc)
 {
@@ -930,19 +760,6 @@ err_join_self:
         return rc;
 }
 
-/**
- * @brief XWMP API：分离线程
- * @param thd: (I) 线程对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- * @note
- * - 此函数功能类似于pthread_detach()，处于分离态的线程退出后，系统自动回收资源，
- *   不需要父线程join()或stop()。
- */
 __xwmp_api
 xwer_t xwmp_thd_detach(struct xwmp_thd * thd)
 {
@@ -973,9 +790,9 @@ err_thd_grab:
 
 /**
  * @brief 改变线程的动态优先级一次
- * @param thd: (I) 线程对象的指针
- * @param dprio: (I) 动态优先级
- * @param pmtx: (O) 指向缓冲区的指针，通过此缓冲区返回互斥锁对象的指针
+ * @param[in] thd: 线程对象的指针
+ * @param[in] dprio: 动态优先级
+ * @param[out] pmtx: 指向缓冲区的指针，通过此缓冲区返回互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ESTALE: 状态已经被其他CPU改变
@@ -1110,7 +927,7 @@ xwer_t xwmp_thd_chprio_once(struct xwmp_thd * thd, xwpr_t dprio,
 
 /**
  * @brief 重新设定线程的动态优先级
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  */
 __xwmp_code
 void xwmp_thd_chprio(struct xwmp_thd * thd)
@@ -1132,8 +949,8 @@ void xwmp_thd_chprio(struct xwmp_thd * thd)
 
 /**
  * @brief 将线程加入到调度器就绪队列的头部
- * @param thd: (I) 线程对象的指针
- * @param prio: (I) 动态优先级
+ * @param[in] thd: 线程对象的指针
+ * @param[in] prio: 动态优先级
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EEXIST: 线程已经存在
@@ -1171,8 +988,8 @@ xwer_t xwmp_thd_rq_add_head(struct xwmp_thd * thd, xwpr_t prio)
 
 /**
  * @brief 将线程加入到调度器就绪队列的尾部
- * @param thd: (I) 线程对象的指针
- * @param prio: (I) 动态优先级
+ * @param[in] thd: 线程对象的指针
+ * @param[in] prio: 动态优先级
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EEXIST: 线程已经存在
@@ -1210,7 +1027,7 @@ xwer_t xwmp_thd_rq_add_tail(struct xwmp_thd * thd, xwpr_t prio)
 
 /**
  * @brief 将线程从就绪队列中删除
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ESRCH: 没有这个线程
@@ -1237,18 +1054,6 @@ xwer_t xwmp_thd_rq_remove(struct xwmp_thd * thd)
         return rc;
 }
 
-/**
- * @brief XWMP API：中断线程的睡眠或阻塞状态
- * @param thd: (I) 线程对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EPERM: 线程不可被中断
- * @retval -EINVAL: 无效的线程态
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_thd_intr(struct xwmp_thd * thd)
 {
@@ -1345,7 +1150,7 @@ xwer_t xwmp_thd_intr(struct xwmp_thd * thd)
 
 /**
  * @brief 唤醒一个阻塞/睡眠态的线程，将其加入到调度器的就绪队列
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  * @return 错误码
  */
 __xwmp_code
@@ -1366,7 +1171,7 @@ xwer_t xwmp_thd_wakeup(struct xwmp_thd * thd)
 
 /**
  * @brief 线程的时间树节点回调函数
- * @param entry: (I) 线程对象的地址
+ * @param[in] entry: 线程对象的地址
  */
 __xwmp_code
 void xwmp_thd_ttn_callback(void * entry)
@@ -1383,10 +1188,10 @@ void xwmp_thd_ttn_callback(void * entry)
 
 /**
  * @brief 将线程加入到时间树上
- * @param thd: (I) 线程对象的指针
- * @param xwtt: (I) 时间树的指针
- * @param expected: (I) 期望被唤醒的时间
- * @param cpuirq: (I) 本地CPU的中断标志
+ * @param[in] thd: 线程对象的指针
+ * @param[in] xwtt: 时间树的指针
+ * @param[in] expected: 期望被唤醒的时间
+ * @param[in] cpuirq: 本地CPU的中断标志
  * @return 错误码
  * @note
  * - 此函数只能在取得写锁xwtt->lock以及关闭本地CPU的中断时才可调用。
@@ -1409,7 +1214,7 @@ xwer_t xwmp_thd_tt_add_locked(struct xwmp_thd * thd, struct xwmp_tt * xwtt,
 
 /**
  * @brief 线程的等待队列节点回调函数
- * @param entry: (I) 线程对象的地址
+ * @param[in] entry: 线程对象的地址
  */
 __xwmp_code
 void xwmp_thd_wqn_callback(void * entry)
@@ -1429,10 +1234,10 @@ void xwmp_thd_wqn_callback(void * entry)
 
 /**
  * @brief 将线程加入到实时（红黑树）等待队列中
- * @param thd: (I) 线程对象的指针
- * @param xwrtwq: (I) 实时（红黑树）等待队列
- * @param type: (I) 等待队列的类型
- * @param dprio: (I) 加入时线程的动态优先级
+ * @param[in] thd: 线程对象的指针
+ * @param[in] xwrtwq: 实时（红黑树）等待队列
+ * @param[in] type: 等待队列的类型
+ * @param[in] dprio: 加入时线程的动态优先级
  */
 __xwmp_code
 void xwmp_thd_eq_rtwq_locked(struct xwmp_thd * thd,
@@ -1451,9 +1256,9 @@ void xwmp_thd_eq_rtwq_locked(struct xwmp_thd * thd,
 
 /**
  * @brief 将线程加入到管道（双循环链表）等待队列中
- * @param thd: (I) 线程对象的指针
- * @param xwplwq: (I) 管道（双循环链表）等待队列
- * @param type: (I) 等待队列的类型
+ * @param[in] thd: 线程对象的指针
+ * @param[in] xwplwq: 管道（双循环链表）等待队列
+ * @param[in] type: 等待队列的类型
  */
 __xwmp_code
 void xwmp_thd_eq_plwq_locked(struct xwmp_thd * thd,
@@ -1470,16 +1275,6 @@ void xwmp_thd_eq_plwq_locked(struct xwmp_thd * thd,
         xwmp_splk_unlock(&thd->wqn.lock);
 }
 
-/**
- * @brief XWMP API：让出当前线程的CPU，调度器重新选择同优先级的其他线程运行
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- * @note
- * - 此函数只能将CPU让给优先级与当前线程相同且已经就绪的其他线程。
- *   如果当前线程已经是系统中唯一的最高优先级线程，此函数无效。
- */
 __xwmp_api
 void xwmp_cthd_yield(void)
 {
@@ -1502,13 +1297,13 @@ void xwmp_cthd_yield(void)
 
 /**
  * @brief 解锁给定类型的锁
- * @param lock: (I) 锁的地址
- * @param lktype: (I) 锁的类型
- * @param lkdata: (I) 锁的数据
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
+ * @param[in] lock: 锁的地址
+ * @param[in] lktype: 锁的类型
+ * @param[in] lkdata: 锁的数据
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
+ * @param[out] lkst: 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码
  */
 __xwmp_code
@@ -1548,13 +1343,13 @@ xwer_t xwmp_thd_do_unlock(void * lock, xwsq_t lktype, void * lkdata)
 
 /**
  * @brief 锁定给定类型的锁
- * @param lock: (I) 锁的地址
- * @param lktype: (I) 锁的类型
- * @param lkdata: (I) 锁的数据
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
+ * @param[in] lock: 锁的地址
+ * @param[in] lktype: 锁的类型
+ * @param[in] lkdata: 锁的数据
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
+ * @param[out] lkst: 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码
  */
 __xwmp_code
@@ -1598,20 +1393,6 @@ xwer_t xwmp_thd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm, void * lkdata
         return rc;
 }
 
-/**
- * @brief XWMP API：线程睡眠一段时间
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EINTR: 睡眠过程被中断
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- * - 超时后将以返回值OK返回，并且 *xwtm* 指向缓冲区返回0。
- */
 __xwmp_api
 xwer_t xwmp_cthd_sleep(xwtm_t * xwtm)
 {
@@ -1689,21 +1470,6 @@ err_xwtm:
         return rc;
 }
 
-/**
- * @brief XWMP API：当前线程从一个时间起点睡眠到另一个时间点
- * @param origin: 指向缓冲区的指针，此缓冲区：
- *                (I) 作为输入时，作为时间起点
- *                (O) 作为输出时，返回线程被唤醒的时间
- *                    （可作为下一次时间起点，形成精确的周期）
- * @param inc: (I) 期望被唤醒的时间增量（相对于时间原点）
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EINTR: 睡眠过程被中断
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_cthd_sleep_from(xwtm_t * origin, xwtm_t inc)
 {
@@ -1775,7 +1541,7 @@ err_needfrz:
 
 /**
  * @brief 申请冻结当前CPU中的线程
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EALREADY: 线程已经被冻结
@@ -1807,7 +1573,7 @@ xwer_t xwmp_thd_reqfrz_lic(struct xwmp_thd * thd)
 
 /**
  * @brief 执行冻结线程
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  * @return 错误码
  * @note
  * - 此函数只能在线程所属的CPU的调度器服务中断中执行；
@@ -1869,19 +1635,6 @@ xwer_t xwmp_thd_freeze_lic(struct xwmp_thd * thd)
         return rc;
 }
 
-/**
- * @brief XWMP API：线程自我冻结
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EPERM: 不允许冻结
- * @retval -ECANCELED: 冻结被取消
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- * @note
- * - 冻结操作，只可由线程自身执行
- */
 __xwmp_api
 xwer_t xwmp_cthd_freeze(void)
 {
@@ -1906,7 +1659,7 @@ xwer_t xwmp_cthd_freeze(void)
 
 /**
  * @brief 解冻线程
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  * @return 错误码
  * @note
  * - 此函数只能在线程所属的CPU的中断中执行。
@@ -1945,16 +1698,6 @@ xwer_t xwmp_thd_thaw_lic_pmlk(struct xwmp_thd * thd)
         return rc;
 }
 
-/**
- * @brief XWMP API：判断当前线程是否可以冻结
- * @return 布尔值
- * @retval true: 是
- * @retval false: 否
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- */
 __xwmp_api
 bool xwmp_cthd_shld_frz(void)
 {
@@ -1966,26 +1709,6 @@ bool xwmp_cthd_shld_frz(void)
         return ret;
 }
 
-/**
- * @brief XWMP API：判断当前线程是否可以退出
- * @return 布尔值
- * @retval true: 是
- * @retval false: 否
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- * @note
- * - 此函数常用在线程主循环的循环条件中。例如：
- * ```C
- * xwer_t thread_main(void * arg)
- * {
- *         while (!xwmp_cthd_shld_stop()) {
- *                 thread loop ...;
- *         }
- * }
- * ```
- */
 __xwmp_api
 bool xwmp_cthd_shld_stop(void)
 {
@@ -1995,31 +1718,6 @@ bool xwmp_cthd_shld_stop(void)
         return !!(XWMP_SKDOBJ_DST_EXITING & cthd->state);
 }
 
-/**
- * @brief XWMP API：判断当前线程是否可以冻结，如果是就冻结线程，
- *                  之后再判断线程是否可以退出
- * @param frozen (O) 指向缓冲区的指针，通过此缓冲区返回线程是否被冻结过的状态
- * @return 布尔值
- * @retval true: 是
- * @retval false: 否
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- * @note
- * - 此函数在@ref xwmp_cthd_shld_stop()的基础上增加了对冻结条件是否满足
- *   的判断，如果可以冻结，就在函数中将线程冻结。
- * - 通常线程冻结用于处理系统的低功耗事件或将线程在不同的CPU中进行迁移。
- * - 需要考虑线程的冻结，通常将线程的主循环写成：
- * ```C
- * xwer_t thread_main(void * arg)
- * {
- *         while (!xwmp_cthd_frz_shld_stop()) {
- *                 thread loop ...;
- *         }
- * }
- * ```
- */
 __xwmp_api
 bool xwmp_cthd_frz_shld_stop(bool * frozen)
 {
@@ -2043,7 +1741,7 @@ bool xwmp_cthd_frz_shld_stop(bool * frozen)
 
 /**
  * @brief 将线程迁移进目标CPU
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  * @note
  * - 此函数只能在目标CPU的中断上下文中执行；
  * - 此函数假设线程对象已经被引用，执行过程中不会成为野指针
@@ -2090,7 +1788,7 @@ void xwmp_thd_immigrate_lic(struct xwmp_thd * thd)
 
 /**
  * @brief 将线程从当前CPU中迁出
- * @param thd: (I) 线程对象的指针
+ * @param[in] thd: 线程对象的指针
  * @note
  * - 此函数只能在线程所属的CPU的中断上下文中执行；
  * - 此函数被调用时需要获得当前CPU调度器的锁pm.lock并且关闭本地CPU的中断；
@@ -2115,8 +1813,8 @@ void xwmp_thd_outmigrate_frozen_lic(struct xwmp_thd * thd)
 
 /**
  * @brief 申请冻结线程，以便将线程从本地CPU迁移到另一个CPU
- * @param thd: (I) 线程对象的指针
- * @param dstcpu: (I) 目标CPU的ID
+ * @param[in] thd: 线程对象的指针
+ * @param[in] dstcpu: 目标CPU的ID
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINPROGRESS: 线程处于迁移的过程中
@@ -2166,8 +1864,8 @@ xwer_t xwmp_thd_outmigrate_reqfrz_lic(struct xwmp_thd * thd, xwid_t dstcpu)
 
 /**
  * @brief 从本地CPU中移出线程，并准备迁移入目标CPU
- * @param thd: (I) 线程对象的指针
- * @param dstcpu: (I) 目标CPU的ID
+ * @param[in] thd: 线程对象的指针
+ * @param[in] dstcpu: 目标CPU的ID
  * @return 错误码
  * @note
  * - 此函数只能在线程所属的CPU中执行。
@@ -2186,16 +1884,6 @@ xwer_t xwmp_thd_outmigrate_lic(struct xwmp_thd * thd, xwid_t dstcpu)
         return rc;
 }
 
-/**
- * @brief XWMP API：迁移线程到其他CPU
- * @param thd: (I) 线程对象的指针
- * @param dstcpu: (I) 目标CPU的ID
- * @return 错误码
- * @note
- * - 同步/异步：异步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个thd，不可重入
- */
 __xwmp_api
 xwer_t xwmp_thd_migrate(struct xwmp_thd * thd, xwid_t dstcpu)
 {
@@ -2227,20 +1915,6 @@ err_badcpuid:
 }
 
 #if defined(XWMPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWMPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
-/**
- * @brief XWMP API：设置线程的本地数据指针
- * @param thd: (I) 线程对象的指针
- * @param pos: (I) 数据存放位置的索引
- * @param data: (I) 数据指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ECHRNG: 位置超出范围
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_thd_set_data(struct xwmp_thd * thd, xwsq_t pos, void * data)
 {
@@ -2257,20 +1931,6 @@ xwer_t xwmp_thd_set_data(struct xwmp_thd * thd, xwsq_t pos, void * data)
         return rc;
 }
 
-/**
- * @brief XWMP API：获取线程的本地数据指针
- * @param thd: (I) 线程对象的指针
- * @param pos: (I) 数据存放位置的索引
- * @param databuf: (O) 指向缓冲区的指针，通过此缓冲区返回数据指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ECHRNG: 位置超出范围
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_thd_get_data(struct xwmp_thd * thd, xwsq_t pos, void ** databuf)
 {
@@ -2289,19 +1949,6 @@ xwer_t xwmp_thd_get_data(struct xwmp_thd * thd, xwsq_t pos, void ** databuf)
         return rc;
 }
 
-/**
- * @brief XWMP API：设置当前线程的本地数据指针
- * @param pos: (I) 数据存放位置的索引
- * @param data: (I) 数据指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ECHRNG: 位置超出范围
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_cthd_set_data(xwsq_t pos, void * data)
 {
@@ -2311,19 +1958,6 @@ xwer_t xwmp_cthd_set_data(xwsq_t pos, void * data)
         return xwmp_thd_set_data(cthd, pos, data);
 }
 
-/**
- * @brief XWMP API：获取当前线程的本地数据指针
- * @param pos: (I) 数据存放位置的索引
- * @param databuf: (O) 指向缓冲区的指针，通过此缓冲区返回数据指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ECHRNG: 位置超出范围
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_cthd_get_data(xwsq_t pos, void ** databuf)
 {

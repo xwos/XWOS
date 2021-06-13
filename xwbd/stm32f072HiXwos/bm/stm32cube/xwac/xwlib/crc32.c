@@ -95,16 +95,16 @@ xwer_t stm32_crc32_ls(xwu32_t * crc32, bool refin, bool refout,
 
 /**
  * @brief 使用STM32的CRC硬件单元计算数据的CRC32校验值
- * @param crc32: 指向缓冲区的指针，此缓冲区：
- *               (I) 作为输入，表示初始值
- *               (O) 作为输出，返回计算结果
- * @param refin: (I) 是否颠倒每个字节中的位的顺序
- * @param stream: (I) 数据缓冲区
- * @param polynomial: (I) 多项式
- * @param direction: (I) 数据移位的方向
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入，表示数据长度
- *              (O) 作为输出，返回剩余未计算的数据长度
+ * @param[in,out] crc32: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示初始值
+ * + (O) 作为输出时，返回计算结果
+ * @param[in] refin: 是否颠倒每个字节中的位的顺序
+ * @param[in] stream: 数据缓冲区
+ * @param[in] polynomial: 多项式
+ * @param[in] direction: 数据移位的方向
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示数据长度
+ * + (O) 作为输出时，返回剩余未计算的数据长度
  * @return 错误码
  * @retval XWOK: 计算结果有效
  * @retval -EOPNOTSUPP: 计算失败

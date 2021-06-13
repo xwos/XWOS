@@ -18,6 +18,11 @@
 #include <xwos/osal/skd.h>
 
 /**
+ * @defgroup xwos_mtx 互斥锁
+ * @{
+ */
+
+/**
  * @brief XWOS API：互斥锁
  */
 struct xwos_mtx {
@@ -39,8 +44,8 @@ typedef struct {
 
 /**
  * @brief XWOS API：静态方式初始化互斥锁
- * @param mtx: (I) 互斥锁的指针
- * @param sprio: (I) 互斥锁的静态优先级
+ * @param[in] mtx: 互斥锁的指针
+ * @param[in] sprio: 互斥锁的静态优先级
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -58,7 +63,7 @@ xwer_t xwos_mtx_init(struct xwos_mtx * mtx, xwpr_t sprio)
 
 /**
  * @brief XWOS API：销毁静态方式初始化的互斥锁
- * @param mtx: (I) 互斥锁的指针
+ * @param[in] mtx: 互斥锁的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -75,8 +80,8 @@ xwer_t xwos_mtx_destroy(struct xwos_mtx * mtx)
 
 /**
  * @brief XWOS API：动态方式创建互斥锁
- * @param mtxbuf: (O) 指向缓冲区的指针，通过此缓冲区返回互斥锁的指针
- * @param sprio: (I) 互斥锁的静态优先级
+ * @param[out] mtxbuf: 指向缓冲区的指针，通过此缓冲区返回互斥锁的指针
+ * @param[in] sprio: 互斥锁的静态优先级
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -95,7 +100,7 @@ xwer_t xwos_mtx_create(struct xwos_mtx ** mtxbuf, xwpr_t sprio)
 
 /**
  * @brief XWOS API：删除动态方式创建的互斥锁
- * @param mtx: (I) 互斥锁指针
+ * @param[in] mtx: 互斥锁指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -112,7 +117,7 @@ xwer_t xwos_mtx_delete(struct xwos_mtx * mtx)
 
 /**
  * @brief XWOS API：获取互斥锁对象的标签
- * @param mtx: (I) 互斥锁对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
  * @return 互斥锁对象的标签
  * @note
  * - 同步/异步：同步
@@ -127,7 +132,7 @@ xwsq_t xwos_mtx_gettik(struct xwos_mtx * mtx)
 
 /**
  * @brief XWOS API：获取互斥锁对象的描述符
- * @param mtx: (I) 互斥锁对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
  * @return 互斥锁对象的描述符
  * @note
  * - 同步/异步：同步
@@ -146,7 +151,7 @@ xwos_mtx_d xwos_mtx_getd(struct xwos_mtx * mtx)
 
 /**
  * @brief XWOS API：检查互斥锁对象的标签并增加引用计数
- * @param mtxd: (I) 互斥锁对象的描述符
+ * @param[in] mtxd: 互斥锁对象的描述符
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -164,7 +169,7 @@ xwer_t xwos_mtx_acquire(xwos_mtx_d mtxd)
 
 /**
  * @brief XWOS API：检查对象的标签并减少引用计数
- * @param mtxd: (I) 互斥锁对象的描述符
+ * @param[in] mtxd: 互斥锁对象的描述符
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -182,7 +187,7 @@ xwer_t xwos_mtx_release(xwos_mtx_d mtxd)
 
 /**
  * @brief XWOS API：增加互斥锁对象的引用计数
- * @param mtx: (I) 互斥锁对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -199,7 +204,7 @@ xwer_t xwos_mtx_grab(struct xwos_mtx * mtx)
 
 /**
  * @brief XWOS API：减少互斥锁对象的引用计数
- * @param mtx: (I) 互斥锁对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -216,7 +221,7 @@ xwer_t xwos_mtx_put(struct xwos_mtx * mtx)
 
 /**
  * @brief XWOS API：解锁互斥锁
- * @param mtx: (I) 互斥锁对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -235,7 +240,7 @@ xwer_t xwos_mtx_unlock(struct xwos_mtx * mtx)
 
 /**
  * @brief XWOS API：等待上锁互斥锁
- * @param mtx: (I) 互斥锁对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -254,7 +259,7 @@ xwer_t xwos_mtx_lock(struct xwos_mtx * mtx)
 
 /**
  * @brief XWOS API：尝试上锁互斥锁，不会阻塞调用线程
- * @param mtx: (I) 互斥锁对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -277,22 +282,20 @@ xwer_t xwos_mtx_trylock(struct xwos_mtx * mtx)
 
 /**
  * @brief XWOS API：限时等待上锁互斥锁
- * @param mtx: (I) 互斥锁对象的指针
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] mtx: 互斥锁对象的指针
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -EINTR: 等待被中断
- * @retval -ETIMEDOUT: 超时
+ * @retval -ETIMEDOUT: 超时，xwtm指向的缓冲区内的时间会减为0
  * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：不可重入
- * @note
- * - 函数返回*-ETIMEDOUT*时，*xwtm*指向的缓冲区内的值减为0。
  */
 static __xwos_inline_api
 xwer_t xwos_mtx_timedlock(struct xwos_mtx * mtx, xwtm_t * xwtm)
@@ -302,7 +305,7 @@ xwer_t xwos_mtx_timedlock(struct xwos_mtx * mtx, xwtm_t * xwtm)
 
 /**
  * @brief XWOS API：等待上锁互斥锁，且等待不可被中断
- * @param mtx: (I) 互斥锁对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -320,8 +323,8 @@ xwer_t xwos_mtx_lock_unintr(struct xwos_mtx * mtx)
 
 /**
  * @brief XWOS API：获取锁的状态
- * @param mtx: (I) 互斥锁对象的指针
- * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
+ * @param[in] mtx: 互斥锁对象的指针
+ * @param[out] lkst: 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -335,5 +338,9 @@ xwer_t xwos_mtx_getlkst(struct xwos_mtx * mtx, xwsq_t * lkst)
 {
         return xwosdl_mtx_getlkst(&mtx->osmtx, lkst);
 }
+
+/**
+ * @} xwos_mtx
+ */
 
 #endif /* xwos/osal/lock/mtx.h */

@@ -117,7 +117,7 @@ struct xwmp_tt * xwmp_syshwt_get_tt(struct xwmp_syshwt * hwt);
 
 /**
  * @brief 获取时间树节点所属的对象的地址
- * @param ttn: (I) 时间树节点的指针
+ * @param[in] ttn: 时间树节点的指针
  * @return 时间树节点所属的对象的地址
  */
 static __xwmp_inline
@@ -128,7 +128,7 @@ void * xwmp_ttn_get_entry(struct xwmp_ttn * ttn)
 
 /**
  * @brief 获取时间树节点的类型
- * @param ttn: (I) 时间树节点的指针
+ * @param[in] ttn: 时间树节点的指针
  * @return 类型
  */
 static __xwmp_inline

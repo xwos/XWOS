@@ -1174,7 +1174,7 @@ struct cm_tpiu_reg {
 /******** ******** special registers ******** ********/
 /**
  * @brief Get xPSR.
- * @param xpsr: (O) buffer to return result
+ * @param[out] xpsr: buffer to return result
  */
 static __xwbsp_inline
 void cm_get_xpsr(xwu32_t * xpsr)
@@ -1189,7 +1189,7 @@ void cm_get_xpsr(xwu32_t * xpsr)
 
 /**
  * @brief Set xPSR.
- * @param xpsr: (I) new value
+ * @param[in] xpsr: new value
  */
 static __xwbsp_inline
 void cm_set_xpsr(xwu32_t xpsr)
@@ -1204,7 +1204,7 @@ void cm_set_xpsr(xwu32_t xpsr)
 
 /**
  * @brief Get APSR.
- * @param apsr: (O) buffer to return result
+ * @param[out] apsr: buffer to return result
  */
 static __xwbsp_inline
 void cm_get_apsr(xwu32_t * apsr)
@@ -1219,7 +1219,7 @@ void cm_get_apsr(xwu32_t * apsr)
 
 /**
  * @brief Set APSR.
- * @param apsr: (I) new value
+ * @param[in] apsr: new value
  */
 static __xwbsp_inline
 void cm_set_apsr(xwu32_t apsr)
@@ -1234,7 +1234,7 @@ void cm_set_apsr(xwu32_t apsr)
 
 /**
  * @brief Get IPSR.
- * @param ipsr: (O) buffer to return result
+ * @param[out] ipsr: buffer to return result
  */
 static __xwbsp_inline
 void cm_get_ipsr(xwu32_t * ipsr)
@@ -1249,7 +1249,7 @@ void cm_get_ipsr(xwu32_t * ipsr)
 
 /**
  * @brief Set IPSR.
- * @param ipsr: (I) new value
+ * @param[in] ipsr: new value
  */
 static __xwbsp_inline
 void cm_set_ipsr(xwu32_t ipsr)
@@ -1264,7 +1264,7 @@ void cm_set_ipsr(xwu32_t ipsr)
 
 /**
  * @brief Get EPSR
- * @param epsr: (O) buffer to return result
+ * @param[out] epsr: buffer to return result
  */
 static __xwbsp_inline
 void cm_get_epsr(xwu32_t * epsr)
@@ -1279,7 +1279,7 @@ void cm_get_epsr(xwu32_t * epsr)
 
 /**
  * @brief Set EPSR
- * @param epsr: (I) new value
+ * @param[in] epsr: new value
  */
 static __xwbsp_inline
 void cm_set_epsr(xwu32_t epsr)
@@ -1294,7 +1294,7 @@ void cm_set_epsr(xwu32_t epsr)
 
 /**
  * @brief Get MSP
- * @param msp: (O) buffer to return result
+ * @param[out] msp: buffer to return result
  */
 static __xwbsp_inline
 void cm_get_msp(xwptr_t * msp)
@@ -1309,7 +1309,7 @@ void cm_get_msp(xwptr_t * msp)
 
 /**
  * @brief Set MSP
- * @param msp: (I) new value
+ * @param[in] msp: new value
  */
 static __xwbsp_inline
 void cm_set_msp(xwptr_t msp)
@@ -1324,7 +1324,7 @@ void cm_set_msp(xwptr_t msp)
 
 /**
  * @brief Get PSP
- * @param psp: (O) buffer to return result
+ * @param[out] psp: buffer to return result
  */
 static __xwbsp_inline
 void cm_get_psp(xwptr_t * psp)
@@ -1339,7 +1339,7 @@ void cm_get_psp(xwptr_t * psp)
 
 /**
  * @brief Set PSP
- * @param psp: (I) new value
+ * @param[in] psp: new value
  */
 static __xwbsp_inline
 void cm_set_psp(xwptr_t psp)
@@ -1354,7 +1354,7 @@ void cm_set_psp(xwptr_t psp)
 
 /**
  * @brief Get PRIMASK
- * @param primask: (O) buffer to return result
+ * @param[out] primask: buffer to return result
  */
 static __xwbsp_inline
 void cm_get_primask(xwu32_t * primask)
@@ -1369,7 +1369,7 @@ void cm_get_primask(xwu32_t * primask)
 
 /**
  * @brief Set PRIMASK
- * @param primask: (I) new value
+ * @param[in] primask: new value
  */
 static __xwbsp_inline
 void cm_set_primask(xwu32_t primask)
@@ -1384,7 +1384,7 @@ void cm_set_primask(xwu32_t primask)
 
 /**
  * @brief Get FAULTMASK
- * @param faultmask: (O) buffer to return result
+ * @param[out] faultmask: buffer to return result
  */
 static __xwbsp_inline
 void cm_get_faultmask(xwu32_t * faultmask)
@@ -1399,7 +1399,7 @@ void cm_get_faultmask(xwu32_t * faultmask)
 
 /**
  * @brief Set FAULTMASK
- * @param faultmask: (I) new value
+ * @param[in] faultmask: new value
  */
 static __xwbsp_inline
 void cm_set_faultmask(xwu32_t faultmask)
@@ -1414,7 +1414,7 @@ void cm_set_faultmask(xwu32_t faultmask)
 
 /**
  * @brief Get BASEPRI
- * @param basepri: (O) buffer to return result
+ * @param[out] basepri: buffer to return result
  */
 static __xwbsp_inline
 void cm_get_basepri(xwu32_t * basepri)
@@ -1429,7 +1429,7 @@ void cm_get_basepri(xwu32_t * basepri)
 
 /**
  * @brief Set BASEPRI
- * @param basepri: (I) new value
+ * @param[in] basepri: new value
  */
 static __xwbsp_inline
 void cm_set_basepri(xwu32_t basepri)
@@ -1444,7 +1444,7 @@ void cm_set_basepri(xwu32_t basepri)
 
 /**
  * @brief Get CONTROL
- * @param control: (O) buffer to return result
+ * @param[out] control: buffer to return result
  */
 static __xwbsp_inline
 void cm_get_control(xwu32_t * control)
@@ -1459,7 +1459,7 @@ void cm_get_control(xwu32_t * control)
 
 /**
  * @brief Set CONTROL
- * @param control: (I) new value
+ * @param[in] control: new value
  */
 static __xwbsp_inline
 void cm_set_control(xwu32_t control)
@@ -1475,7 +1475,7 @@ void cm_set_control(xwu32_t control)
 /******** ******** ITM ******** ********/
 /**
  * @brief Send a byte to ITM port
- * @param c: (I) byte
+ * @param[in] c: byte
  */
 static __xwbsp_inline
 void cm_itm_putc(xwu32_t port, const char c)
@@ -1490,7 +1490,7 @@ void cm_itm_putc(xwu32_t port, const char c)
 
 /**
  * @brief Send a string to ITM port
- * @param s: (I) string
+ * @param[in] s: string
  */
 static __xwbsp_inline
 xwssz_t cm_itm_puts(xwu32_t port, const char * s)
@@ -1507,8 +1507,8 @@ xwssz_t cm_itm_puts(xwu32_t port, const char * s)
 
 /**
  * @brief Send a string at most n bytes to ITM port
- * @param s: (I) string
- * @param n: (I) max length
+ * @param[in] s: string
+ * @param[in] n: max length
  */
 static __xwbsp_inline
 xwssz_t cm_itm_putns(xwu32_t port, const char * s, xwsz_t n)
@@ -1557,7 +1557,7 @@ void cm_clrex(void)
 
 /**
  * @brief Load word exclusively
- * @param addr: (I) address to be load
+ * @param[in] addr: address to be load
  * @return word in the address
  */
 static __xwbsp_inline
@@ -1576,8 +1576,8 @@ xwu32_t cm_ldrex(volatile void * addr)
 
 /**
  * @brief Store word exclusively
- * @param addr: (I) address
- * @param value: (I) value to be stored
+ * @param[in] addr: address
+ * @param[in] value: value to be stored
  * @return error code
  * @retval 1: need to retry
  * @retval 0: OK
@@ -1599,7 +1599,7 @@ xwer_t cm_strex(volatile void * addr, xwu32_t value)
 
 /**
  * @brief Load byte exclusively
- * @param addr: (I) address to be load
+ * @param[in] addr: address to be load
  * @return byte in the address
  */
 static __xwbsp_inline
@@ -1618,8 +1618,8 @@ xwu8_t cm_ldrexb(volatile void * addr)
 
 /**
  * @brief Store byte exclusively
- * @param addr: (I) address
- * @param value: (I) value to be stored
+ * @param[in] addr: address
+ * @param[in] value: value to be stored
  * @return error code
  * @retval 1: need to retry
  * @retval 0: OK
@@ -1641,7 +1641,7 @@ xwer_t cm_strexb(volatile void * addr, xwu8_t value)
 
 /**
  * @brief Load half-word exclusively
- * @param addr: (I) address to be load
+ * @param[in] addr: address to be load
  * @return half-word in the address
  */
 static __xwbsp_inline
@@ -1660,8 +1660,8 @@ xwu16_t cm_ldrexh(volatile void * addr)
 
 /**
  * @brief Store half-word exclusively
- * @param addr: (I) address
- * @param value: (I) value to be stored
+ * @param[in] addr: address
+ * @param[in] value: value to be stored
  * @retval 1: need to retry
  * @retval 0: OK
  */
@@ -1682,7 +1682,7 @@ xwer_t cm_strexh(volatile void * addr, xwu16_t value)
 
 /**
  * @brief Prefetch data
- * @param addr: (I) address
+ * @param[in] addr: address
  */
 static __xwbsp_inline
 void cm_prefetch(const volatile void * addr)

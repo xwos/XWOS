@@ -69,7 +69,7 @@ xwer_t xwds_i2cm_abort(struct xwds_i2cm * i2cm,
 
 /**
  * @brief XWDS API：增加对象的引用计数
- * @param i2cm: (I) I2C主机控制器对象指针
+ * @param[in] i2cm: I2C主机控制器对象指针
  * @return 错误码
  * @retval @ref xwds_device_grab()
  */
@@ -81,7 +81,7 @@ xwer_t xwds_i2cm_grab(struct xwds_i2cm * i2cm)
 
 /**
  * @brief XWDS API：减少对象的引用计数
- * @param i2cm: (I) I2C主机控制器对象指针
+ * @param[in] i2cm: I2C主机控制器对象指针
  * @return 错误码
  * @retval @ref xwds_device_put()
  */

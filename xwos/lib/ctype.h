@@ -20,6 +20,11 @@
 #include <xwos/standard.h>
 
 /**
+ * @defgroup ctype 字符类型
+ * @{
+ */
+
+/**
  * @brief 字符类型标签
  */
 enum xwlib_ctype_flag_em {
@@ -139,7 +144,7 @@ extern __xwlib_rodata const unsigned char xwlib_ctype[];
 
 /**
  * @brief 将大写字母转换为小写字母
- * @param c: (I) 大写字母
+ * @param[in] c: 大写字母
  * @return 小写字母
  */
 static __xwlib_inline
@@ -153,7 +158,7 @@ char tolower(unsigned char c)
 
 /**
  * @brief 将小写字母转换为大写字母
- * @param c: (I) 小写字母
+ * @param[in] c: 小写字母
  * @return 大写字母
  */
 static __xwlib_inline
@@ -164,6 +169,10 @@ char toupper(unsigned char c)
         }
         return c;
 }
+
+/**
+ * @} ctype
+ */
 
 #endif /* ARCHCFG_COMPILER_CLIB */
 #endif /* xwos/lib/ctype.h */

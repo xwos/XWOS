@@ -17,6 +17,11 @@
 #include <xwos/osal/jack/sync/sel.h>
 
 /**
+ * @defgroup xwos_sel 信号选择器
+ * @{
+ */
+
+/**
  * @brief XWOS API：信号选择器对象
  */
 struct xwos_sel {
@@ -38,10 +43,10 @@ typedef struct {
 
 /**
  * @brief XWOS API：静态方式初始化信号选择器
- * @param sel: (I) 信号选择器对象的指针
- * @param num: (I) 信号选择器中信号的数量
- * @param bmp: (I) 信号选择器用来记录信号状态的位图缓冲区
- * @param msk: (I) 信号选择器用来记录掩码状态的位图缓冲区
+ * @param[in] sel: 信号选择器对象的指针
+ * @param[in] num: 信号选择器中信号的数量
+ * @param[in] bmp: 信号选择器用来记录信号状态的位图缓冲区
+ * @param[in] msk: 信号选择器用来记录掩码状态的位图缓冲区
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -59,7 +64,7 @@ xwer_t xwos_sel_init(struct xwos_sel * sel, xwsz_t num,
 
 /**
  * @brief XWOS API：销毁静态方式初始化的信号选择器
- * @param sel: (I) 信号选择器对象的指针
+ * @param[in] sel: 信号选择器对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -76,8 +81,8 @@ xwer_t xwos_sel_destroy(struct xwos_sel * sel)
 
 /**
  * @brief XWOS API：动态方式创建信号选择器
- * @param selbuf: (O) 指向缓冲区的指针，通过此缓冲区返回信号选择器对象的指针
- * @param num: (I) 信号选择器中信号的数量
+ * @param[out] selbuf: 指向缓冲区的指针，通过此缓冲区返回信号选择器对象的指针
+ * @param[in] num: 信号选择器中信号的数量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -95,7 +100,7 @@ xwer_t xwos_sel_create(struct xwos_sel ** selbuf, xwsz_t num)
 
 /**
  * @brief XWOS API：删除动态方式创建的信号选择器
- * @param sel: (I) 信号选择器对象的指针
+ * @param[in] sel: 信号选择器对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -112,7 +117,7 @@ xwer_t xwos_sel_delete(struct xwos_sel * sel)
 
 /**
  * @brief XWOS API：获取信号选择器对象的标签
- * @param sel: (I) 信号选择器对象的指针
+ * @param[in] sel: 信号选择器对象的指针
  * @return 信号选择器对象的标签
  * @note
  * - 同步/异步：同步
@@ -127,7 +132,7 @@ xwsq_t xwos_sel_gettik(struct xwos_sel * sel)
 
 /**
  * @brief XWOS API：获取信号选择器对象的描述符
- * @param sel: (I) 信号选择器对象的指针
+ * @param[in] sel: 信号选择器对象的指针
  * @return 信号选择器对象的描述符
  * @note
  * - 同步/异步：同步
@@ -146,7 +151,7 @@ xwos_sel_d xwos_sel_getd(struct xwos_sel * sel)
 
 /**
  * @brief XWOS API：检查信号选择器对象的标签并增加引用计数
- * @param seld: (I) 信号选择器对象的描述符
+ * @param[in] seld: 信号选择器对象的描述符
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -164,7 +169,7 @@ xwer_t xwos_sel_acquire(xwos_sel_d seld)
 
 /**
  * @brief XWOS API：检查对象的标签并减少引用计数
- * @param seld: (I) 信号选择器对象的描述符
+ * @param[in] seld: 信号选择器对象的描述符
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -182,7 +187,7 @@ xwer_t xwos_sel_release(xwos_sel_d seld)
 
 /**
  * @brief XWOS API：增加信号选择器对象的引用计数
- * @param sel: (I) 信号选择器对象的指针
+ * @param[in] sel: 信号选择器对象的指针
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -199,7 +204,7 @@ xwer_t xwos_sel_grab(struct xwos_sel * sel)
 
 /**
  * @brief XWOS API：减少信号选择器对象的引用计数
- * @param sel: (I) 信号选择器对象的指针
+ * @param[in] sel: 信号选择器对象的指针
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -216,9 +221,9 @@ xwer_t xwos_sel_put(struct xwos_sel * sel)
 
 /**
  * @brief XWOS API：绑定源信号选择器到目的信号选择器
- * @param src: (I) 源信号选择器对象的指针
- * @param dst: (I) 目的信号选择器对象的指针
- * @param pos: (I) 同步对象映射到位图中的位置
+ * @param[in] src: 源信号选择器对象的指针
+ * @param[in] dst: 目的信号选择器对象的指针
+ * @param[in] pos: 同步对象映射到位图中的位置
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -228,7 +233,7 @@ xwer_t xwos_sel_put(struct xwos_sel * sel)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个*src*，不可重入
+ * - 重入性：对于同一个src，不可重入
  * - 绑定方式：非独占绑定
  * @note
  * - 多个信号选择器可以依次绑定，形成信号传递链。源信号选择器被同步对象触发时，
@@ -242,8 +247,8 @@ xwer_t xwos_sel_bind(struct xwos_sel * src, struct xwos_sel * dst, xwsq_t pos)
 
 /**
  * @brief XWOS API：从目的信号选择器上解绑源信号选择器
- * @param src: (I) 源信号选择器对象的指针
- * @param dst: (I) 目的信号选择器对象的指针
+ * @param[in] src: 源信号选择器对象的指针
+ * @param[in] dst: 目的信号选择器对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -251,7 +256,7 @@ xwer_t xwos_sel_bind(struct xwos_sel * src, struct xwos_sel * dst, xwsq_t pos)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个*src*，不可重入
+ * - 重入性：对于同一个src，不可重入
  */
 static __xwos_inline_api
 xwer_t xwos_sel_unbind(struct xwos_sel * src, struct xwos_sel * dst)
@@ -261,7 +266,7 @@ xwer_t xwos_sel_unbind(struct xwos_sel * src, struct xwos_sel * dst)
 
 /**
  * @brief XWOS API：中断信号选择器等待队列中的所有节点
- * @param sel: (I) 信号选择器对象的指针
+ * @param[in] sel: 信号选择器对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -278,8 +283,8 @@ xwer_t xwos_sel_intr_all(struct xwos_sel * sel)
 
 /**
  * @brief XWOS API：获取信号选择器中的信号槽的数量
- * @param sel: (I) 信号选择器对象的指针
- * @param numbuf: (O) 指向缓冲区的指针，通过此缓冲区返回信号槽的数量
+ * @param[in] sel: 信号选择器对象的指针
+ * @param[out] numbuf: 指向缓冲区的指针，通过此缓冲区返回信号槽的数量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -295,30 +300,10 @@ xwer_t xwos_sel_get_num(struct xwos_sel * sel, xwsz_t * numbuf)
 }
 
 /**
- * @brief XWOS API：检测一下信号选择器中的触发信号，不会阻塞调用线程
- * @param sel: (I) 信号选择器对象的指针
- * @param msk: (I) 同步对象位图掩码，表示只关注掩码内的同步对象
- * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENODATA: 没有任何同步对象触发信号选择器
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwer_t xwos_sel_tryselect(struct xwos_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
-{
-        return xwosdl_sel_select(&sel->ossel, msk, trg);
-}
-
-/**
  * @brief XWOS API：等待信号选择器中的触发信号
- * @param sel: (I) 信号选择器对象的指针
- * @param msk: (I) 同步对象位图掩码，表示只关注掩码内的同步对象
- * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
+ * @param[in] sel: 信号选择器对象的指针
+ * @param[in] msk: 同步对象位图掩码，表示只关注掩码内的同步对象
+ * @param[out] trg: 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -336,25 +321,43 @@ xwer_t xwos_sel_select(struct xwos_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
 }
 
 /**
- * @brief XWOS API：限时等待信号选择器中的信号
- * @param sel: (I) 信号选择器对象的指针
- * @param msk: (I) 同步对象位图掩码，表示只关注掩码内的同步对象
- * @param trg: (O) 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @brief XWOS API：检测一下信号选择器中的触发信号，不会阻塞调用线程
+ * @param[in] sel: 信号选择器对象的指针
+ * @param[in] msk: 同步对象位图掩码，表示只关注掩码内的同步对象
+ * @param[out] trg: 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
- * @retval -ETIMEDOUT: 超时
+ * @retval -ENODATA: 没有任何同步对象触发信号选择器
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_sel_tryselect(struct xwos_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
+{
+        return xwosdl_sel_select(&sel->ossel, msk, trg);
+}
+
+/**
+ * @brief XWOS API：限时等待信号选择器中的信号
+ * @param[in] sel: 信号选择器对象的指针
+ * @param[in] msk: 同步对象位图掩码，表示只关注掩码内的同步对象
+ * @param[out] trg: 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ETIMEDOUT: 超时，xwtm指向的缓冲区内的时间会减为0
  * @retval -EINTR: 等待被中断
  * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
- * @note
- * - 函数返回返回**-ETIMEDOUT**时，**xwtm**指向的缓冲区内的期望时间会减为0。
  */
 static __xwos_inline_api
 xwer_t xwos_sel_timedselect(struct xwos_sel * sel,
@@ -363,5 +366,9 @@ xwer_t xwos_sel_timedselect(struct xwos_sel * sel,
 {
         return xwosdl_sel_timedselect(&sel->ossel, msk, trg, xwtm);
 }
+
+/**
+ * @} xwos_sel
+ */
 
 #endif /* xwos/osal/sync/sel.h */

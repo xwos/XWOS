@@ -260,7 +260,7 @@ struct xwup_thd * xwup_skd_rtrq_choose(void)
 #if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
 /**
  * @brief 删除“删除列表”中的线程
- * @param xwskd: (I) XWOS UP调度器的指针
+ * @param[in] xwskd: XWOS UP调度器的指针
  * @return 错误码
  */
 static __xwup_code
@@ -282,7 +282,7 @@ void xwup_skd_del_thd_lc(struct xwup_skd * xwskd)
 
 /**
  * @brief 空闲任务的主函数
- * @param xwskd: (I) XWOS UP调度器的指针
+ * @param[in] xwskd: XWOS UP调度器的指针
  */
 static __xwup_code
 xwer_t xwup_skd_idled(struct xwup_skd * xwskd)
@@ -334,7 +334,7 @@ void xwup_skd_init_idled(void)
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
 /**
  * @brief 中断底半部的主函数
- * @param xwskd: (I) XWOS UP调度器的指针
+ * @param[in] xwskd: XWOS UP调度器的指针
  * @return 错误码
  */
 static __xwup_code
@@ -504,14 +504,6 @@ bool xwup_skd_tst_in_bh_lc(void)
 }
 #endif /* XWUPCFG_SKD_BH */
 
-/**
- * @brief XWUP API：禁止抢占
- * @return XWOS UP调度器的指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwup_api
 struct xwup_skd * xwup_skd_dspmpt_lc(void)
 {
@@ -525,14 +517,6 @@ struct xwup_skd * xwup_skd_dspmpt_lc(void)
         return xwskd;
 }
 
-/**
- * @brief XWUP API：允许抢占
- * @return XWOS UP调度器的指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwup_api
 struct xwup_skd * xwup_skd_enpmpt_lc(void)
 {
@@ -576,8 +560,8 @@ struct xwup_skd * xwup_skd_enpmpt_lc(void)
 
 /**
  * @brief 检查是否需要抢占
- * @param xwskd: (I) XWOS UP调度器的指针
- * @param t: (I) 线程对象的指针
+ * @param[in] xwskd: XWOS UP调度器的指针
+ * @param[in] t: 线程对象的指针
  * @return 布尔值
  * @retval true: 需要抢占
  * @retval false: 不需要抢占
@@ -651,8 +635,8 @@ void xwup_skd_chkpmpt(void)
 
 /**
  * @brief 检测调度器是否需要切换上下文
- * @param t: (I) 被检测的线程对象的指针
- * @param pmthd: (O) 指向缓冲区的指针，通过此缓冲区返回抢占线程对象的指针
+ * @param[in] t: 被检测的线程对象的指针
+ * @param[out] pmthd: 指向缓冲区的指针，通过此缓冲区返回抢占线程对象的指针
  * @return 错误码
  * @retval OK: 需要切换上下文
  * @retval <0: 不需要切换上下文
@@ -687,7 +671,7 @@ xwer_t xwup_skd_check_swcx(struct xwup_thd * t, struct xwup_thd ** pmthd)
 
 /**
  * @brief 执行上下文的切换
- * @param xwskd: (I) XWOS UP调度器的指针
+ * @param[in] xwskd: XWOS UP调度器的指针
  * @retval rc: @ref xwup_skd_req_swcx()
  */
 static __xwup_code
@@ -736,7 +720,7 @@ xwer_t xwup_skd_do_swcx(void)
 
 /**
  * @brief 切换上下文之前的回调函数
- * @param xwskd: (I) XWOS UP调度器的指针
+ * @param[in] xwskd: XWOS UP调度器的指针
  */
 __xwup_code
 struct xwup_skd * xwup_skd_pre_swcx_lic(struct xwup_skd * xwskd)
@@ -749,7 +733,7 @@ struct xwup_skd * xwup_skd_pre_swcx_lic(struct xwup_skd * xwskd)
 
 /**
  * @brief 切换上下文之后的回调函数
- * @param xwskd: (I) XWOS UP调度器的指针
+ * @param[in] xwskd: XWOS UP调度器的指针
  */
 __xwup_code
 struct xwup_skd * xwup_skd_post_swcx_lic(struct xwup_skd * xwskd)
@@ -806,7 +790,7 @@ xwer_t xwup_skd_req_swcx(void)
 
 /**
  * @brief 结束上下文的切换
- * @param xwskd: (I) XWOS UP调度器的指针
+ * @param[in] xwskd: XWOS UP调度器的指针
  * @note
  * - 此函数需要在BSP切换上下文的中断的最后调用。
  */
@@ -894,7 +878,7 @@ xwer_t xwup_skd_req_swcx(void)
 
 /**
  * @brief 结束上下文的切换
- * @param xwskd: (I) XWOS UP调度器的指针
+ * @param[in] xwskd: XWOS UP调度器的指针
  * @note
  * - 此函数需在BSP切换上下文的中断的最后调用。
  */
@@ -941,11 +925,11 @@ void xwup_skd_intr_all(void)
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
 /**
  * @brief XWUP PM API：设置电源管理回调函数
- * @param resume_cb: (I) 从暂停模式恢复的回调函数
- * @param suspend_cb: (I) 进入暂停模式的回调函数
- * @param wakeup_cb: (I) 唤醒的回调函数
- * @param sleep_cb: (I) 休眠的回调函数
- * @param arg: (I) 回调函数调用时的参数
+ * @param[in] resume_cb: 从暂停模式恢复的回调函数
+ * @param[in] suspend_cb: 进入暂停模式的回调函数
+ * @param[in] wakeup_cb: 唤醒的回调函数
+ * @param[in] sleep_cb: 休眠的回调函数
+ * @param[in] arg: 回调函数调用时的参数
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -1055,7 +1039,7 @@ xwer_t xwup_skd_wakelock_unlock(void)
 
 /**
  * @brief 暂停调度器（中断中执行）
- * @param xwskd: (I) XWOS UP调度器的指针
+ * @param[in] xwskd: XWOS UP调度器的指针
  * @return 错误码
  * @note
  * - 此函数只能在CPU自身的调度器服务中断中执行，可通过@ref xwospl_skd_suspend()
@@ -1105,7 +1089,7 @@ xwer_t xwup_skd_notify_allfrz_lic(void)
 
 /**
  * @brief 通知所有线程已经冻结（空闲任务中执行的部分）
- * @param xwskd: (I) XWOS UP调度器的指针
+ * @param[in] xwskd: XWOS UP调度器的指针
  */
 static __xwup_code
 void xwup_skd_notify_allfrz_lc(struct xwup_skd * xwskd)
@@ -1134,7 +1118,7 @@ void xwup_skd_notify_allfrz_lc(struct xwup_skd * xwskd)
 
 /**
  * @brief 解冻所有线程
- * @param xwskd: (I) XWOS UP调度器的指针
+ * @param[in] xwskd: XWOS UP调度器的指针
  * @return 错误码
  */
 static __xwup_code
@@ -1177,7 +1161,7 @@ xwer_t xwup_skd_suspend(void)
 
 /**
  * @brief 继续已经暂停的调度器（在中断中执行）
- * @param xwskd: (I) XWOS UP调度器的指针
+ * @param[in] xwskd: XWOS UP调度器的指针
  * @return 错误码
  * @note
  * - 此函数只可由xwup_skd_resume()调用。
@@ -1293,16 +1277,6 @@ xwsq_t xwup_skd_get_pm_stage(void)
 }
 #endif /* !XWUPCFG_SKD_PM */
 
-/**
- * @brief XWUP API：获取当前上下文
- * @param ctxbuf: (O) 指向缓冲区的指针，通过此缓冲区返回当前上下文，
- *                    返回值@ref xwup_skd_context_em
- * @param irqnbuf: (O) 指向缓冲区的指针，通过此缓冲区返回中断号
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwup_api
 void xwup_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
 {
@@ -1336,12 +1310,6 @@ void xwup_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
         }
 }
 
-/**
- * @brief XWUP API：测试调度优先级是否合法
- * @return 布尔值
- * @retval true: 是
- * @retval false: 否
- */
 __xwup_api
 bool xwup_skd_prio_tst_valid(xwpr_t prio)
 {

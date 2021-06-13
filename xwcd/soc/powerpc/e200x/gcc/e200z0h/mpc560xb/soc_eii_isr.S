@@ -95,7 +95,7 @@ soc_eii_isr:
         se_cmpi         r4, 1                   /* if (soc_context.irq_nesting_cnt != 1) {*/
         se_bne          chmod_2                 /*      goto chmod_2; */
 chmod_1:                                        /* } */
-        se_stw          r1, 0x4 (r3)            /* soc_context.thread_sp = sp; */
+        se_stw          r1, 0x4 (r3)            /* soc_context.thd_sp = sp; */
         se_lwz          r1, 0x0 (r3)            /* sp = soc_context.sys_stack; */
         e_stwu          r1, -0x50 (r1)          /* Create reserved ISR stack frame. */
         msync
@@ -154,7 +154,7 @@ chmod_2:
 rstmod_1:                                       /* } */
         e_addi          r1, r1, 0x50            /* Del reserved ISR stack frame */
         se_stw          r1, 0x0 (r3)            /* soc_context.sys_stack = sp; */
-        se_lwz          r1, 0x4 (r3)            /* sp = soc_context.thread_sp; */
+        se_lwz          r1, 0x4 (r3)            /* sp = soc_context.thd_sp; */
         msync
         se_isync
 rstmod_2:

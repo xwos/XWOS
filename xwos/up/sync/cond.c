@@ -78,7 +78,7 @@ struct xwup_cond * xwup_cond_alloc(void)
 
 /**
  * @brief XWUP API：释放条件量对象
- * @param cond: (I) 条件量对象的指针
+ * @param[in] cond: 条件量对象的指针
  */
 static __xwup_code
 void xwup_cond_free(struct xwup_cond * cond)
@@ -92,7 +92,7 @@ void xwup_cond_free(struct xwup_cond * cond)
 
 /**
  * @brief 激活条件量对象
- * @param cond: (I) 条件量对象的指针
+ * @param[in] cond: 条件量对象的指针
  */
 __xwup_code
 void xwup_cond_activate(struct xwup_cond * cond)
@@ -106,7 +106,7 @@ void xwup_cond_activate(struct xwup_cond * cond)
 
 /**
  * @brief XWUP API：使得条件量对象无效
- * @param cond: (I) 条件量的指针
+ * @param[in] cond: 条件量的指针
  */
 __xwup_code
 void xwup_cond_deactivate(struct xwup_cond * cond)
@@ -114,17 +114,6 @@ void xwup_cond_deactivate(struct xwup_cond * cond)
         XWOS_UNUSED(cond);
 }
 
-/**
- * @brief XWUP API：静态始化成条件量
- * @param cond: (I) 条件量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个条件量对象，不可重入
- */
 __xwup_api
 xwer_t xwup_cond_init(struct xwup_cond * cond)
 {
@@ -134,17 +123,6 @@ xwer_t xwup_cond_init(struct xwup_cond * cond)
         return XWOK;
 }
 
-/**
- * @brief XWUP API：销毁静态方式初始化的条件量对象
- * @param cond: (I) 条件量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个条件量对象，不可重入
- */
 __xwup_api
 xwer_t xwup_cond_destroy(struct xwup_cond * cond)
 {
@@ -154,18 +132,6 @@ xwer_t xwup_cond_destroy(struct xwup_cond * cond)
         return XWOK;
 }
 
-/**
- * @brief XWUP API：动态创建条件量
- * @param ptrbuf: (O) 指向缓冲区的指针，通过此缓冲区返回对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwup_api
 xwer_t xwup_cond_create(struct xwup_cond ** ptrbuf)
 {
@@ -186,17 +152,6 @@ xwer_t xwup_cond_create(struct xwup_cond ** ptrbuf)
         return rc;
 }
 
-/**
- * @brief XWUP API：删除动态创建的条件量
- * @param cond: (I) 条件量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个条件量对象，不可重入
- */
 __xwup_api
 xwer_t xwup_cond_delete(struct xwup_cond * cond)
 {
@@ -208,23 +163,6 @@ xwer_t xwup_cond_delete(struct xwup_cond * cond)
 }
 
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-/**
- * @brief XWUP API：绑定条件量到事件对象，事件对象类型为XWUP_EVT_TYPE_SEL
- * @param cond: (I) 条件量对象的指针
- * @param evt: (I) 事件对象的指针
- * @param pos: (I) 条件量对象映射到位图中的位置
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
- * @retval -ECHRNG: 位置超出范围
- * @retval -EALREADY: 同步对象已经绑定到事件对象
- * @retval -EBUSY: 通道已经被其他同步对象独占
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个条件量对象，不可重入
- */
 __xwup_api
 xwer_t xwup_cond_bind(struct xwup_cond * cond,
                       struct xwup_evt * evt, xwsq_t pos)
@@ -241,20 +179,6 @@ xwer_t xwup_cond_bind(struct xwup_cond * cond,
         return rc;
 }
 
-/**
- * @brief XWUP API：从事件对象上解绑条件量，事件对象类型为XWUP_EVT_TYPE_SEL
- * @param cond: (I) 条件量对象的指针
- * @param evt: (I) 事件对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -ETYPE: 事件对象类型错误
- * @retval -EFAULT: 空指针
- * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个条件量对象，不可重入
- */
 __xwup_api
 xwer_t xwup_cond_unbind(struct xwup_cond * cond, struct xwup_evt * evt)
 {
@@ -271,21 +195,6 @@ xwer_t xwup_cond_unbind(struct xwup_cond * cond, struct xwup_evt * evt)
 }
 #endif /* XWUPCFG_SYNC_EVT */
 
-/**
- * @brief XWUP API：冻结条件量
- * @param cond: (I) 条件量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EALREADY: 条件量已被冻结
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 已冻结的条件量不允许单播或广播，但可以被等待，
- *   测试条件量的线程会加入到条件量等待队列中阻塞等待。
- */
 __xwup_api
 xwer_t xwup_cond_freeze(struct xwup_cond * cond)
 {
@@ -305,22 +214,6 @@ xwer_t xwup_cond_freeze(struct xwup_cond * cond)
         return rc;
 }
 
-/**
- * @brief XWUP API：解冻条件量
- * @param cond: (I) 条件量对象的指针
- * @param val: (I) 条件量的初始值
- * @param max: (I) 条件量的最大值
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EALREADY: 条件量未被冻结
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 此函数只对已冻结的条件量起作用。
- */
 __xwup_api
 xwer_t xwup_cond_thaw(struct xwup_cond * cond)
 {
@@ -342,8 +235,8 @@ xwer_t xwup_cond_thaw(struct xwup_cond * cond)
 
 /**
  * @brief 中断条件量等待队列中的一个节点
- * @param cond: (I) 条件量对象的指针
- * @param wqn: (I) 等待队列节点
+ * @param[in] cond: 条件量对象的指针
+ * @param[in] wqn: 等待队列节点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @note
@@ -351,7 +244,7 @@ xwer_t xwup_cond_thaw(struct xwup_cond * cond)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  */
-__xwup_api
+__xwup_code
 xwer_t xwup_cond_intr(struct xwup_cond * cond, struct xwup_wqn * wqn)
 {
         xwup_wqn_f cb;
@@ -374,17 +267,6 @@ xwer_t xwup_cond_intr(struct xwup_cond * cond, struct xwup_wqn * wqn)
         return rc;
 }
 
-/**
- * @brief XWUP API：中断条件量等待队列中的所有线程
- * @param cond: (I) 条件量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwup_api
 xwer_t xwup_cond_intr_all(struct xwup_cond * cond)
 {
@@ -443,20 +325,6 @@ xwer_t xwup_cond_broadcast_once(struct xwup_cond * cond, bool * retry)
         return rc;
 }
 
-/**
- * @brief XWUP API：广播条件量，将等待队列中的所有线程唤醒
- * @param cond: (I) 条件量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENEGATIVE: 条件量已被冻结
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 此函数只对未冻结的条件量起作用，已冻结的条件量将得到错误码-ENEGATIVE。
- */
 __xwup_api
 xwer_t xwup_cond_broadcast(struct xwup_cond * cond)
 {
@@ -518,20 +386,6 @@ xwer_t xwup_cond_do_unicast(struct xwup_cond * cond)
         return rc;
 }
 
-/**
- * @brief XWUP API：单播条件量，只会唤醒等待队列最前面的一个线程
- * @param cond: (I) 条件量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENEGATIVE: 条件量已被冻结
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 此函数只对未冻结的条件量起作用，已冻结的条件量将得到错误码-ENEGATIVE。
- */
 __xwup_api
 xwer_t xwup_cond_unicast(struct xwup_cond * cond)
 {
@@ -720,23 +574,6 @@ xwer_t xwup_cond_do_timedwait(struct xwup_cond * cond,
         return rc;
 }
 
-/**
- * @brief XWUP API：等待条件量
- * @param cond: (I) 条件量对象指针
- * @param lock: (I) 锁的地址
- * @param lktype: (I) 锁的类型，取值：@ref xwos_lock_type_em
- * @param lkdata: (I) 锁的数据
- * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EINVAL: 无效的参数
- * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- */
 __xwup_api
 xwer_t xwup_cond_wait(struct xwup_cond * cond,
                       void * lock, xwsq_t lktype, void * lkdata,
@@ -746,30 +583,6 @@ xwer_t xwup_cond_wait(struct xwup_cond * cond,
         return xwup_cond_timedwait(cond, lock, lktype, lkdata, &expected, lkst);
 }
 
-/**
- * @brief XWUP API：限时等待条件量
- * @param cond: (I) 条件量对象的指针
- * @param lock: (I) 锁的地址
- * @param lktype: (I) 锁的类型，取值：@ref xwos_lock_type_em
- * @param lkdata: (I) 锁的数据
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINVAL: 参数无效
- * @retval -ETIMEDOUT: 超时
- * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- * @note
- * - 函数返回返回-ETIMEDOUT时，**xwtm**指向的缓冲区内的期望时间会减为0。
- */
 __xwup_api
 xwer_t xwup_cond_timedwait(struct xwup_cond * cond,
                            void * lock, xwsq_t lktype, void * lkdata,

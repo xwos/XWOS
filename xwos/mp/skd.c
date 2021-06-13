@@ -266,10 +266,6 @@ xwer_t xwmp_skd_stop_syshwt_lc(void)
         return rc;
 }
 
-/**
- * @brief XWMP API：获取当前调度器的ID（CPU ID）
- * @return 当前CPU的ID
- */
 __xwmp_api
 xwid_t xwmp_skd_id_lc(void)
 {
@@ -298,8 +294,8 @@ struct xwmp_skd * xwmp_skd_get_lc(void)
 
 /**
  * @brief 得到指定ID的CPU调度器的指针
- * @param cpuid: (I) CPU ID
- * @param ptrbuf: (O) 指向缓冲区的指针，此缓冲区用于返回指定ID的CPU调度器的指针
+ * @param[in] cpuid: CPU ID
+ * @param[out] ptrbuf: 指向缓冲区的指针，此缓冲区用于返回指定ID的CPU调度器的指针
  * @return 错误码
  */
 __xwmp_code
@@ -318,7 +314,7 @@ xwer_t xwmp_skd_get_by_cpuid(xwid_t cpuid, struct xwmp_skd ** ptrbuf)
 
 /**
  * @brief 获得调度器中正在运行的线程对象的指针
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 调度器中正在运行的线程对象的指针
  */
 __xwmp_code
@@ -354,7 +350,7 @@ struct xwmp_thd * xwmp_skd_get_cthd_lc(void)
 
 /**
  * @brief 从XWMP调度器中选择一个就绪的线程
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 线程对象指针或NULL（代表空闲任务）
  * @note
  * - 此函数只能在锁xwskd->cxlock中调用。
@@ -389,7 +385,7 @@ struct xwmp_thd * xwmp_skd_rtrq_choose(struct xwmp_skd * xwskd)
 
 /**
  * @brief 删除“删除列表”中的线程
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
  */
 static __xwmp_code
@@ -410,7 +406,7 @@ void xwmp_skd_del_thd_lc(struct xwmp_skd * xwskd)
 
 /**
  * @brief 空闲任务的主函数
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
  */
 static __xwmp_code
@@ -430,7 +426,7 @@ xwer_t xwmp_skd_idled(struct xwmp_skd * xwskd)
 
 /**
  * @brief 初始化空闲线程栈
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  */
 static __xwmp_code
 void xwmp_skd_init_idled(struct xwmp_skd * xwskd)
@@ -457,7 +453,7 @@ void xwmp_skd_init_idled(struct xwmp_skd * xwskd)
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
 /**
  * @brief 中断底半部的主函数
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
  */
 static __xwmp_code
@@ -488,7 +484,7 @@ xwer_t xwmp_skd_bhd(struct xwmp_skd * xwskd)
 
 /**
  * @brief 初始化中断底半部栈
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  */
 static __xwmp_code
 void xwmp_skd_init_bhd(struct xwmp_skd * xwskd)
@@ -575,7 +571,7 @@ struct xwmp_skd * xwmp_skd_enbh_lc(void)
 
 /**
  * @brief 禁止调度器进入中断底半部
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return XWMP调度器的指针
  */
 __xwmp_code
@@ -587,7 +583,7 @@ struct xwmp_skd * xwmp_skd_dsbh(struct xwmp_skd * xwskd)
 
 /**
  * @brief 允许调度器的中断底半部
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return XWMP调度器的指针
  */
 __xwmp_code
@@ -606,7 +602,7 @@ struct xwmp_skd * xwmp_skd_enbh(struct xwmp_skd * xwskd)
 
 /**
  * @brief 切换至中断底半部上下文
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EPERM: 中断底半部已被禁止
@@ -646,7 +642,7 @@ xwer_t xwmp_skd_sw_bh(struct xwmp_skd * xwskd)
 
 /**
  * @brief 请求切至中断底半部
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码 @ref xwmp_skd_sw_bh()
  */
 __xwmp_code
@@ -658,7 +654,7 @@ xwer_t xwmp_skd_req_bh(struct xwmp_skd * xwskd)
 
 /**
  * @brief 从中断底半部上下文中返回到线程上下文
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  */
 static __xwmp_code
 void xwmp_skd_bh_yield(struct xwmp_skd * xwskd)
@@ -674,7 +670,7 @@ void xwmp_skd_bh_yield(struct xwmp_skd * xwskd)
 
 /**
  * @brief 测试调度器的当前上下文是否为中断底半部上下文
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 布尔值
  * @retval true: 是
  * @retval false: 否
@@ -701,14 +697,6 @@ bool xwmp_skd_tst_in_bh_lc(void)
 }
 #endif /* XWMPCFG_SKD_BH */
 
-/**
- * @brief XWMP API：禁止本地CPU调度器的抢占
- * @return XWOS MP调度器的指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 struct xwmp_skd * xwmp_skd_dspmpt_lc(void)
 {
@@ -737,14 +725,6 @@ struct xwmp_skd * xwmp_skd_dspmpt_lc(void)
         return xwskd;
 }
 
-/**
- * @brief XWMP API：允许本地CPU调度器的抢占
- * @return XWOS MP调度器的指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 struct xwmp_skd * xwmp_skd_enpmpt_lc(void)
 {
@@ -764,7 +744,7 @@ struct xwmp_skd * xwmp_skd_enpmpt_lc(void)
 
 /**
  * @brief 禁止调度器的抢占
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return XWMP调度器的指针
  */
 __xwmp_code
@@ -776,7 +756,7 @@ struct xwmp_skd * xwmp_skd_dspmpt(struct xwmp_skd * xwskd)
 
 /**
  * @brief 允许调度器的抢占
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return XWMP调度器的指针
  */
 __xwmp_code
@@ -796,8 +776,8 @@ struct xwmp_skd * xwmp_skd_enpmpt(struct xwmp_skd * xwskd)
 
 /**
  * @brief 检查是否需要抢占
- * @param xwskd: (I) XWOS MP调度器的指针
- * @param t: (I) 线程对象的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
+ * @param[in] t: 线程对象的指针
  * @return 布尔值
  * @retval true: 需要抢占
  * @retval false: 不需要抢占
@@ -835,7 +815,7 @@ bool xwmp_skd_do_chkpmpt(struct xwmp_skd * xwskd, struct xwmp_thd * t)
 
 /**
  * @brief 调度器检测抢占
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  */
 __xwmp_code
 void xwmp_skd_chkpmpt(struct xwmp_skd * xwskd)
@@ -889,9 +869,9 @@ void xwmp_skd_chkpmpt_all(void)
 
 /**
  * @brief 检测调度器是否需要切换上下文
- * @param xwskd: (I) XWOS MP调度器的指针
- * @param t: (I) 被检测的线程对象的指针
- * @param pmthd: (O) 指向缓冲区的指针，通过此缓冲区返回抢占线程对象的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
+ * @param[in] t: 被检测的线程对象的指针
+ * @param[out] pmthd: 指向缓冲区的指针，通过此缓冲区返回抢占线程对象的指针
  * @return 错误码
  * @retval OK: 需要切换上下文
  * @retval <0: 不需要切换上下文
@@ -937,7 +917,7 @@ xwer_t xwmp_skd_check_swcx(struct xwmp_skd * xwskd,
 
 /**
  * @brief 执行上下文的切换
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @retval rc: @ref xwmp_skd_req_swcx()
  * @note
  * - 此函数被调用时需要获得锁xwskd->cxlock并且关闭本地CPU的中断。
@@ -986,7 +966,7 @@ xwer_t xwmp_skd_do_swcx(struct xwmp_skd * xwskd)
 
 /**
  * @brief 切换上下文之前的回调函数
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  */
 __xwmp_code
 struct xwmp_skd * xwmp_skd_pre_swcx_lic(struct xwmp_skd * xwskd)
@@ -999,7 +979,7 @@ struct xwmp_skd * xwmp_skd_pre_swcx_lic(struct xwmp_skd * xwskd)
 
 /**
  * @brief 切换上下文之后的回调函数
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  */
 __xwmp_code
 struct xwmp_skd * xwmp_skd_post_swcx_lic(struct xwmp_skd * xwskd)
@@ -1014,7 +994,7 @@ struct xwmp_skd * xwmp_skd_post_swcx_lic(struct xwmp_skd * xwskd)
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
 /**
  * @brief 请求切换上下文
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
  * @retval OK: 需要触发切换上下文的中断执行切换上下文的过程
  * @retval -EBUSY: 当前上下文为中断底半部上下文
@@ -1055,7 +1035,7 @@ xwer_t xwmp_skd_req_swcx(struct xwmp_skd * xwskd)
 
 /**
  * @brief 结束上下文的切换
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @note
  * - 此函数需要在BSP切换线程上下文的中断函数的最后一步调用。
  */
@@ -1103,7 +1083,7 @@ void xwmp_skd_finish_swcx_lic(struct xwmp_skd * xwskd)
 #else /* XWMPCFG_SKD_BH */
 /**
  * @brief 请求切换上下文
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
  * @retval OK: 需要触发切换上下文的中断执行切换上下文的过程
  * @retval -EINVAL: 当前正在运行的线程状态错误
@@ -1140,7 +1120,7 @@ xwer_t xwmp_skd_req_swcx(struct xwmp_skd * xwskd)
 
 /**
  * @brief 结束上下文的切换
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @note
  * - 此函数需要在BSP切换线程上下文的中断函数的最后一步调用。
  */
@@ -1165,7 +1145,7 @@ void xwmp_skd_finish_swcx_lic(struct xwmp_skd * xwskd)
 
 /**
  * @brief 将调度器的唤醒锁计数器加1
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval <0: 当前调度器正在进入低功耗模式
@@ -1187,7 +1167,7 @@ xwer_t xwmp_skd_inc_wklkcnt(struct xwmp_skd * xwskd)
 
 /**
  * @brief 将调度器的唤醒锁计数器减1
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval <0: 当前调度器正在进入低功耗
@@ -1214,7 +1194,7 @@ xwer_t xwmp_skd_dec_wklkcnt(struct xwmp_skd * xwskd)
 
 /**
  * @brief 禁止调度器进入暂停模式
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
  */
 __xwmp_code
@@ -1225,7 +1205,7 @@ xwer_t xwmp_skd_wakelock_lock(struct xwmp_skd * xwskd)
 
 /**
  * @brief 允许调度器进入暂停模式
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
  */
 __xwmp_code
@@ -1236,7 +1216,7 @@ xwer_t xwmp_skd_wakelock_unlock(struct xwmp_skd * xwskd)
 
 /**
  * @brief 中断本地CPU中所有线程的阻塞或睡眠状态，并准备冻结
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  */
 static __xwmp_code
 void xwmp_skd_reqfrz_intr_all_lic(struct xwmp_skd * xwskd)
@@ -1259,7 +1239,7 @@ void xwmp_skd_reqfrz_intr_all_lic(struct xwmp_skd * xwskd)
 
 /**
  * @brief 通知所有线程已经冻结（中断上下文中执行的部分）
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
  */
 __xwmp_code
@@ -1283,7 +1263,7 @@ xwer_t xwmp_skd_notify_allfrz_lic(struct xwmp_skd * xwskd)
 
 /**
  * @brief 通知所有线程已经冻结（空闲任务中执行的部分）
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  */
 static __xwmp_code
 void xwmp_skd_notify_allfrz_lc(struct xwmp_skd * xwskd)
@@ -1304,7 +1284,7 @@ void xwmp_skd_notify_allfrz_lc(struct xwmp_skd * xwskd)
 
 /**
  * @brief 解冻本地CPU中的所有线程
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
  */
 static __xwmp_code
@@ -1331,7 +1311,7 @@ void xwmp_skd_thaw_allfrz_lic(struct xwmp_skd * xwskd)
 
 /**
  * @brief 暂停本地CPU的调度器
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
  * @note
  * - 此函数只能在CPU自身的调度器服务中断中执行，当电源管理的代码运行于
@@ -1359,7 +1339,7 @@ xwer_t xwmp_skd_suspend_lic(struct xwmp_skd * xwskd)
 
 /**
  * @brief XWMP API：申请暂停调度器
- * @param cpuid: (I) CPU的ID
+ * @param[in] cpuid: CPU的ID
  * @return 错误码
  * @note
  * - 同步/异步：异步
@@ -1383,7 +1363,7 @@ xwer_t xwmp_skd_suspend(xwid_t cpuid)
 
 /**
  * @brief 继续本地CPU调度器
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
  * @note
  * - 此函数只能在CPU自身的调度器服务中断中执行，因此当电源管理的代码运行在
@@ -1432,7 +1412,7 @@ xwer_t xwmp_skd_resume_lic(struct xwmp_skd * xwskd)
 
 /**
  * @brief XWMP API：从低功耗状态恢复调度器
- * @param cpuid: (I) CPU的ID
+ * @param[in] cpuid: CPU的ID
  * @return 错误码
  * @note
  * - 同步/异步：异步
@@ -1465,7 +1445,7 @@ xwer_t xwmp_skd_resume(xwid_t cpuid)
 
 /**
  * @brief XWMP API：获取调度器电源管理状态
- * @param xwskd: (I) XWOS MP调度器的指针
+ * @param[in] xwskd: XWOS MP调度器的指针
  * @return 状态值 @ref xwmp_skd_wakelock_cnt_em
  * @note
  * - 同步/异步：同步
@@ -1481,16 +1461,6 @@ xwsq_t xwmp_skd_get_pm_state(struct xwmp_skd * xwskd)
         return wklkcnt;
 }
 
-/**
- * @brief XWMP API：获取当前上下文
- * @param ctxbuf: (O) 指向缓冲区的指针，通过此缓冲区返回当前上下文，
- *                    返回值@ref xwmp_skd_context_em
- * @param irqnbuf: (O) 指向缓冲区的指针，通过此缓冲区返回中断号
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 void xwmp_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
 {
@@ -1524,12 +1494,6 @@ void xwmp_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
         }
 }
 
-/**
- * @brief XWMP API：测试优先级是否合法
- * @return 布尔值
- * @retval true: 是
- * @retval false: 否
- */
 __xwmp_api
 bool xwmp_skd_prio_tst_valid(xwpr_t prio)
 {

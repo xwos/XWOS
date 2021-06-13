@@ -23,8 +23,8 @@
 
 /**
  * @brief XWDS API：测试RAM
- * @param soc: (I) SOC对象指针
- * @param erraddr: (I) 返回错误地址的缓冲区的指针
+ * @param[in] soc: SOC对象指针
+ * @param[in] erraddr: 返回错误地址的缓冲区的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 测试错误

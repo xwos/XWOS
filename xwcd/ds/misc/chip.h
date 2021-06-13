@@ -50,7 +50,7 @@ xwer_t xwds_misc_ioctl(struct xwds_misc * misc, xwsq_t cmd, ...);
 
 /**
  * @brief XWDS API：增加对象的引用计数
- * @param misc: (I) MISC设备对象指针
+ * @param[in] misc: MISC设备对象指针
  * @return 错误码
  * @retval @ref xwds_device_grab()
  */
@@ -62,7 +62,7 @@ xwer_t xwds_misc_grab(struct xwds_misc * misc)
 
 /**
  * @brief XWDS API：减少对象的引用计数
- * @param misc: (I) MISC设备对象指针
+ * @param[in] misc: MISC设备对象指针
  * @return 错误码
  * @retval @ref xwds_device_put()
  */

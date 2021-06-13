@@ -17,6 +17,11 @@
 #include <xwos/osal/jack/pm.h>
 
 /**
+ * @defgroup xwos_pm 电源管理
+ * @{
+ */
+
+/**
  * @brief 电源管理回调函数指针类型
  * @note
  * - 定义：
@@ -49,11 +54,11 @@ typedef xwosdl_pm_cb_f xwos_pm_cb_f;
 
 /**
  * @brief XWOS API：设置电源管理的回调函数
- * @param resume_cb: (I) 从暂停模式恢复的回调函数
- * @param suspend_cb: (I) 进入暂停模式的回调函数
- * @param wakeup_cb: (I) 唤醒时回调函数
- * @param sleep_cb: (I) 休眠时的回调函数
- * @param arg: (I) 电源管理系统调用回调函数时传递的参数
+ * @param[in] resume_cb: 从暂停模式恢复的回调函数
+ * @param[in] suspend_cb: 进入暂停模式的回调函数
+ * @param[in] wakeup_cb: 唤醒时回调函数
+ * @param[in] sleep_cb: 休眠时的回调函数
+ * @param[in] arg: 电源管理系统调用回调函数时传递的参数
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -110,5 +115,9 @@ xwsq_t xwos_pm_get_stage(void)
 {
         return xwosdl_pm_get_stage();
 }
+
+/**
+ * @} xwos_pm
+ */
 
 #endif /* xwos/osal/pm.h */

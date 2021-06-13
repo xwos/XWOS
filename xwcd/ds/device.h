@@ -160,7 +160,7 @@ xwer_t xwds_device_resume_all(struct xwds * ds, bool ign_err);
 
 /**
  * @brief XWDS API：获取设备对象的标签
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 标签
  */
 static __xwds_inline_api
@@ -173,7 +173,7 @@ xwsq_t xwds_device_gettik(struct xwds_device * dev)
 
 /**
  * @brief XWDS API：增加对象的引用计数
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 错误码
  * @retval @ref xwds_obj_grab()
  */
@@ -186,7 +186,7 @@ xwer_t xwds_device_grab(struct xwds_device * dev)
 
 /**
  * @brief XWDS API：减少对象的引用计数
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 错误码
  * @retval @ref xwds_obj_put()
  */
@@ -199,7 +199,7 @@ xwer_t xwds_device_put(struct xwds_device * dev)
 
 /**
  * @brief XWDS API：得到对象的引用计数
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 引用计数
  */
 static __xwds_inline_api
@@ -212,7 +212,7 @@ xwsq_t xwds_device_get_refcnt(struct xwds_device * dev)
 
 /**
  * @brief XWDS API：增加对象的引用计数
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 错误码
  * @retval @ref xwds_obj_grab()
  */
@@ -224,7 +224,7 @@ xwer_t xwds_device_grab(struct xwds_device * dev)
 
 /**
  * @brief XWDS API：减少对象的引用计数
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 错误码
  * @retval @ref xwds_obj_put()
  */
@@ -236,7 +236,7 @@ xwer_t xwds_device_put(struct xwds_device * dev)
 
 /**
  * @brief XWDS API：得到对象的引用计数
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 引用计数
  */
 static __xwds_inline_api

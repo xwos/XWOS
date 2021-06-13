@@ -25,9 +25,9 @@
 
 /**
  * @brief XWDS API：申请GPIO
- * @param soc: (I) SOC对象指针
- * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
- * @param pinmask: (I) 引脚的掩码，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
+ * @param[in] soc: SOC对象指针
+ * @param[in] port: GPIO端口，取值：@ref xwds_gpio_port_em中的一项
+ * @param[in] pinmask: 引脚的掩码，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -76,9 +76,9 @@ err_soc_grab:
 
 /**
  * @brief XWDS API：释放GPIO
- * @param soc: (I) SOC对象指针
- * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
- * @param pinmask: (I) 引脚的掩码，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
+ * @param[in] soc: SOC对象指针
+ * @param[in] port: GPIO端口，取值：@ref xwds_gpio_port_em中的一项
+ * @param[in] pinmask: 引脚的掩码，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -124,10 +124,10 @@ err_pinsts:
 
 /**
  * @brief XWDS API：配置GPIO
- * @param soc: (I) SOC对象指针
- * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
- * @param pinmask: (I) 引脚的掩码，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
- * @param cfg: (I) GPIO配置，取值：依据不同SOC
+ * @param[in] soc: SOC对象指针
+ * @param[in] port: GPIO端口，取值：@ref xwds_gpio_port_em中的一项
+ * @param[in] pinmask: 引脚的掩码，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
+ * @param[in] cfg: GPIO配置，取值：依据不同SOC
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -175,9 +175,9 @@ err_soc_grab:
 
 /**
  * @brief XWDS API：将GPIO的PIN置为高电平
- * @param soc: (I) SOC对象指针
- * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
- * @param pinmask: (I) 引脚的掩码，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
+ * @param[in] soc: SOC对象指针
+ * @param[in] port: GPIO端口，取值：@ref xwds_gpio_port_em中的一项
+ * @param[in] pinmask: 引脚的掩码，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -230,9 +230,9 @@ err_soc_grab:
 
 /**
  * @brief XWDS API：将GPIO的PIN置为低电平
- * @param soc: (I) SOC对象指针
- * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
- * @param pinmask: (I) 引脚的掩码，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
+ * @param[in] soc: SOC对象指针
+ * @param[in] port: GPIO端口，取值：@ref xwds_gpio_port_em中的一项
+ * @param[in] pinmask: 引脚的掩码，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -285,9 +285,9 @@ err_soc_grab:
 
 /**
  * @brief XWDS API：翻转GPIO电平
- * @param soc: (I) SOC对象指针
- * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
- * @param pinmask: (I) 引脚的掩码，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
+ * @param[in] soc: SOC对象指针
+ * @param[in] port: GPIO端口，取值：@ref xwds_gpio_port_em中的一项
+ * @param[in] pinmask: 引脚的掩码，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -340,10 +340,10 @@ err_soc_grab:
 
 /**
  * @brief XWDS API：同时输出多个GPIO引脚
- * @param soc: (I) SOC对象指针
- * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
- * @param pinmask: (I) 引脚的掩码，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
- * @param out: (I) 输出值，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算），
+ * @param[in] soc: SOC对象指针
+ * @param[in] port: GPIO端口，取值：@ref xwds_gpio_port_em中的一项
+ * @param[in] pinmask: 引脚的掩码，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
+ * @param[in] out: 输出值，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算），
  *                 只有被pinmask掩码覆盖的部分有效，未覆盖的pin输出不会发生改变。
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -399,10 +399,10 @@ err_soc_grab:
 
 /**
  * @brief XWDS API：同时从GPIO端口读取多个引脚的输入值
- * @param soc: (I) SOC对象指针
- * @param port: (I) GPIO端口，取值：@ref xwds_gpio_port_em中的一项
- * @param pinmask: (I) 引脚的掩码，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
- * @param inbuf: (O) 输入缓冲区
+ * @param[in] soc: SOC对象指针
+ * @param[in] port: GPIO端口，取值：@ref xwds_gpio_port_em中的一项
+ * @param[in] pinmask: 引脚的掩码，取值：@ref xwds_gpio_pin_em中的任意项的组合（或运算）
+ * @param[out] inbuf: 输入缓冲区
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针

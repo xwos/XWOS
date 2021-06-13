@@ -27,7 +27,7 @@
 
 /**
  * @brief 初始化实时就绪队列
- * @param xwrtrq: (I) XWOS MP内核的实时就绪队列
+ * @param[in] xwrtrq: XWOS MP内核的实时就绪队列
  */
 __xwmp_code
 xwer_t xwmp_rtrq_init(struct xwmp_rtrq * xwrtrq)
@@ -45,8 +45,8 @@ xwer_t xwmp_rtrq_init(struct xwmp_rtrq * xwrtrq)
 
 /**
  * @brief 将线程加入到实时就绪队列的头部
- * @param xwrtrq: (I) XWOS MP内核的实时就绪队列
- * @param thd: (I) 线程控制块的指针
+ * @param[in] xwrtrq: XWOS MP内核的实时就绪队列
+ * @param[in] thd: 线程控制块的指针
  * @retval XWOK: 没有错误
  * @retval -EPERM: 线程没有设置状态标志@ref XWMP_SKDOBJ_DST_READY
  * @note
@@ -80,8 +80,8 @@ xwer_t xwmp_rtrq_add_head_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * th
 
 /**
  * @brief 将线程加入到实时就绪队列的尾部
- * @param xwrtrq: (I) XWOS MP内核的实时就绪队列
- * @param thd: (I) 线程控制块的指针
+ * @param[in] xwrtrq: XWOS MP内核的实时就绪队列
+ * @param[in] thd: 线程控制块的指针
  * @retval XWOK: 没有错误
  * @retval -EPERM: 线程没有设置状态标志@ref XWMP_SKDOBJ_DST_READY
  * @note
@@ -115,8 +115,8 @@ xwer_t xwmp_rtrq_add_tail_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * th
 
 /**
  * @brief 将线程从实时就绪队列中删除
- * @param xwrtrq: (I) XWOS MP内核的实时就绪队列
- * @param thd: (I) 线程控制块的指针
+ * @param[in] xwrtrq: XWOS MP内核的实时就绪队列
+ * @param[in] thd: 线程控制块的指针
  * @retval XWOK: 没有错误
  * @retval -ESRCH: 就绪队列中没有这个线程
  * @note
@@ -149,7 +149,7 @@ xwer_t xwmp_rtrq_remove_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * thd)
 
 /**
  * @brief 从实时就绪队列中选择优先级最高的线程
- * @param xwrtrq: (I) XWOS MP内核的实时就绪队列
+ * @param[in] xwrtrq: XWOS MP内核的实时就绪队列
  * @return 被选择的线程控制块的指针
  * @note
  * - 此函数必须在持有锁xwrtrq->lock时才可调用。

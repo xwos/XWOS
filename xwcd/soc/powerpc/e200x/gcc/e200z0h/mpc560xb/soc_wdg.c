@@ -25,7 +25,7 @@
 
 /**
  * @brief Init software watchdog
- * @param deadline: deadline (Unit: ms)
+ * @param[in] deadline: deadline (Unit: ms)
  */
 __xwbsp_code
 void soc_wdg_init(xwu32_t deadline)

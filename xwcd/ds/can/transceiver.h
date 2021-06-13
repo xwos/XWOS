@@ -134,7 +134,7 @@ void xwds_cantrcv_clear_wkuprs(struct xwds_cantrcv * cantrcv);
 
 /**
  * @brief XWDS API：增加对象的引用计数
- * @param cantrcv: (I) CAN接收器对象指针
+ * @param[in] cantrcv: CAN接收器对象指针
  * @return 错误码
  */
 static __xwds_inline_api
@@ -145,7 +145,7 @@ xwer_t xwds_cantrcv_grab(struct xwds_cantrcv * cantrcv)
 
 /**
  * @brief XWDS API：减少对象的引用计数
- * @param cantrcv: (I) CAN接收器对象指针
+ * @param[in] cantrcv: CAN接收器对象指针
  * @return 错误码
  */
 static __xwds_inline_api

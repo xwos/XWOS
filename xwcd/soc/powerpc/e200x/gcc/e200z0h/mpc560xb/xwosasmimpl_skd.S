@@ -34,9 +34,9 @@
 
 /**
  * @brief 触发调度软中断
- * @param swifunc: (I) 软中断中要执行的函数
- * @param arg0: (I) 参数1
- * @param arg1: (I) 参数2
+ * @param[in] swifunc: 软中断中要执行的函数
+ * @param[in] arg0: 参数1
+ * @param[in] arg1: 参数2
  * @return 被执行的函数的返回值
  */
         .section        .xwos.text,"ax"
@@ -157,7 +157,7 @@ xwospl_skd_isr_swcx_end:
 
 /**
  * @brief Local CPU starts scheduler
- * @param xwskd(r3): xwos scheduler
+ * @param[in] xwskd(r3): xwos scheduler
  */
         .section        .xwos.isr.text,"ax"
         .global         xwospl_skd_start_lc

@@ -20,7 +20,7 @@
 
 /**
  * @brief 初始化互斥锁树
- * @param mt: (I) 互斥锁树
+ * @param[in] mt: 互斥锁树
  */
 __xwup_code
 void xwup_mtxtree_init(struct xwup_mtxtree * mt)
@@ -32,8 +32,8 @@ void xwup_mtxtree_init(struct xwup_mtxtree * mt)
 
 /**
  * @brief 将互斥锁加入到互斥锁树
- * @param mtx: (I) 互斥锁
- * @param mt: (I) 互斥锁树
+ * @param[in] mtx: 互斥锁
+ * @param[in] mt: 互斥锁树
  * @note
  * - 此函数只能在临界区中调用。
  */
@@ -93,8 +93,8 @@ void xwup_mtxtree_add(struct xwup_mtxtree * mt, struct xwup_mtx * mtx)
 
 /**
  * @brief 将互斥锁从互斥锁树中删除
- * @param mtx: (I) 互斥锁
- * @param mt: (I) 互斥锁树
+ * @param[in] mtx: 互斥锁
+ * @param[in] mt: 互斥锁树
  * @note
  * - 此函数只能在临界区中调用。
  */

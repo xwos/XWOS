@@ -46,7 +46,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_dev_vop = {
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：设备的构造函数
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 错误码
  */
 __xwds_api
@@ -59,7 +59,7 @@ void xwds_device_construct(struct xwds_device * dev)
 
 /**
  * @brief XWDS API：设备的析构函数
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  */
 __xwds_api
 void xwds_device_destruct(struct xwds_device * dev)
@@ -70,7 +70,7 @@ void xwds_device_destruct(struct xwds_device * dev)
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief 设备基本操作函数：探测设备
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 错误码
  */
 __xwds_vop
@@ -90,7 +90,7 @@ xwer_t xwds_device_vop_probe(struct xwds_device * dev)
 
 /**
  * @brief 设备基本操作函数：删除设备
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 错误码
  */
 __xwds_vop
@@ -110,7 +110,7 @@ xwer_t xwds_device_vop_remove(struct xwds_device * dev)
 
 /**
  * @brief 设备基本操作函数：启动设备
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 错误码
  */
 __xwds_vop
@@ -130,7 +130,7 @@ xwer_t xwds_device_vop_start(struct xwds_device * dev)
 
 /**
  * @brief 设备基本操作函数：停止设备
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 错误码
  */
 __xwds_vop
@@ -151,7 +151,7 @@ xwer_t xwds_device_vop_stop(struct xwds_device * dev)
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 /**
  * @brief 设备基本操作函数：暂停设备
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 错误码
  */
 __xwds_vop
@@ -171,7 +171,7 @@ xwer_t xwds_device_vop_suspend(struct xwds_device * dev)
 
 /**
  * @brief 设备基本操作函数：继续设备
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 错误码
  */
 __xwds_vop
@@ -226,9 +226,9 @@ err_dev_vop_remove:
 
 /**
  * @brief XWDS API：探测设备
- * @param ds: (I) 设备栈控制块指针
- * @param dev: (I) 设备对象的指针
- * @param gcfunc: (I) 垃圾回收函数
+ * @param[in] ds: 设备栈控制块指针
+ * @param[in] dev: 设备对象的指针
+ * @param[in] gcfunc: 垃圾回收函数
  * @return 错误码
  * @retval XWOK: 没有错误发生
  * @retval -EPERM: 引用计数错误
@@ -287,7 +287,7 @@ err_obj_probe:
 
 /**
  * @brief XWDS API：删除设备
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误发生
  * @retval -EPERM: 引用计数错误
@@ -306,7 +306,7 @@ xwer_t xwds_device_remove(struct xwds_device * dev)
 
 /**
  * @brief XWDS API：启动设备
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误发生
  * @retval -EPERM: 引用计数错误
@@ -349,7 +349,7 @@ err_obj_start:
 
 /**
  * @brief XWDS API：停止设备
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -391,7 +391,7 @@ err_obj_stop:
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 /**
  * @brief XWDS API：暂停设备
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -432,7 +432,7 @@ err_obj_suspend:
 
 /**
  * @brief XWDS API：继续设备
- * @param dev: (I) 设备对象的指针
+ * @param[in] dev: 设备对象的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -473,8 +473,8 @@ err_obj_resume:
 
 /**
  * @brief XWDS API：暂停所有设备
- * @param ds: (I) 设备栈控制块指针
- * @param ign_err: (I) 是否忽略错误：若为假，发生错误时，函数会中止并返回
+ * @param[in] ds: 设备栈控制块指针
+ * @param[in] ign_err: 是否忽略错误：若为假，发生错误时，函数会中止并返回
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -510,8 +510,8 @@ xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err)
 
 /**
  * @brief XWDS API：继续所有设备
- * @param ds: (I) 设备栈控制块指针
- * @param ign_err: (I) 是否忽略错误：若为假，发生错误时，函数会中止并返回
+ * @param[in] ds: 设备栈控制块指针
+ * @param[in] ign_err: 是否忽略错误：若为假，发生错误时，函数会中止并返回
  * @return 错误码
  * @note
  * - 同步/异步：同步

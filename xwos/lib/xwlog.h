@@ -15,6 +15,11 @@
 
 #include <xwos/standard.h>
 
+/**
+ * @defgroup xwlog 日志
+ * @{
+ */
+
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
 __xwlib_code
 int xwpf(const char * fmt, ...);
@@ -86,23 +91,27 @@ int xwpf(const char * fmt, ...)
 
 /**
  * @brief 格式化日志，并输出
- * @param lv: (I) 等级，取值
- *                - VERBOSE，等级1
- *                - DEBUG，等级2
- *                - INFO，等级3
- *                - NOTICE，等级4
- *                - WARNING，等级5
- *                - ERR，等级6
- *                - CRIT，等级7
- *                - EMERG，等级8
- * @param tag: (I) 日至标签
- * @param fmt: (I) 格式的字符串
- * @param ...: (I) 需要格式化的参数
+ * @param[in] lv: 等级，取值
+ *   @arg VERBOSE，等级1
+ *   @arg DEBUG，等级2
+ *   @arg INFO，等级3
+ *   @arg NOTICE，等级4
+ *   @arg WARNING，等级5
+ *   @arg ERR，等级6
+ *   @arg CRIT，等级7
+ *   @arg EMERG，等级8
+ * @param[in] tag: 日至标签
+ * @param[in] fmt: 格式的字符串
+ * @param[in] ...: 需要格式化的参数
  * @note
  * - 同步/异步：依据BSP中soc_log_write()或board_log_write()的实现
  * - 上下文：依据BSP中soc_log_write()或board_log_write()的实现
  * - 重入性：依据BSP中soc_log_write()或board_log_write()的实现
  */
 #define xwlogf(lv, tag, fmt, ...)    XWLOGF_##lv(tag, fmt, ##__VA_ARGS__)
+
+/**
+ * @} xwlogf
+ */
 
 #endif /* xwos/lib/xwlog.h */

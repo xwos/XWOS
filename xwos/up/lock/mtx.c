@@ -95,7 +95,7 @@ struct xwup_mtx * xwup_mtx_alloc(void)
 
 /**
  * @brief 释放互斥锁对象
- * @param mtx: (I) 互斥锁对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
  */
 static __xwup_code
 void xwup_mtx_free(struct xwup_mtx * mtx)
@@ -109,8 +109,8 @@ void xwup_mtx_free(struct xwup_mtx * mtx)
 
 /**
  * @brief 激活互斥锁对象
- * @param mtx: (I) 互斥锁对象的指针
- * @param sprio: (I) 互斥锁的静态优先级
+ * @param[in] mtx: 互斥锁对象的指针
+ * @param[in] sprio: 互斥锁的静态优先级
  */
 static __xwup_code
 void xwup_mtx_activate(struct xwup_mtx * mtx, xwpr_t sprio)
@@ -131,7 +131,7 @@ void xwup_mtx_activate(struct xwup_mtx * mtx, xwpr_t sprio)
 
 /**
  * @brief 使得互斥锁对象无效
- * @param mtx: (I) 互斥锁对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
  */
 static __xwup_code
 void xwup_mtx_deactivate(struct xwup_mtx * mtx)
@@ -139,19 +139,6 @@ void xwup_mtx_deactivate(struct xwup_mtx * mtx)
         XWOS_UNUSED(mtx);
 }
 
-/**
- * @brief XWUP API：初始化互斥锁对象
- * @param mtx: (I) 互斥锁对象的指针
- * @param sprio: (I) 互斥锁的静态优先级
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINVAL: 无效参数
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个互斥锁对象，不可重入
- */
 __xwup_api
 xwer_t xwup_mtx_init(struct xwup_mtx * mtx, xwpr_t sprio)
 {
@@ -163,17 +150,6 @@ xwer_t xwup_mtx_init(struct xwup_mtx * mtx, xwpr_t sprio)
         return XWOK;
 }
 
-/**
- * @brief XWUP API：销毁互斥锁对象
- * @param mtx: (I) 互斥锁对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个互斥锁对象，不可重入
- */
 __xwup_api
 xwer_t xwup_mtx_destroy(struct xwup_mtx * mtx)
 {
@@ -183,20 +159,6 @@ xwer_t xwup_mtx_destroy(struct xwup_mtx * mtx)
         return XWOK;
 }
 
-/**
- * @brief XWUP API：动态创建互斥锁
- * @param ptrbuf: (O) 指向缓冲区的指针，通过此缓冲区返回对象指针
- * @param sprio: (I) 互斥锁的静态优先级
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINVAL: 无效参数
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwup_api
 xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio)
 {
@@ -219,17 +181,6 @@ xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio)
         return rc;
 }
 
-/**
- * @brief XWUP API：删除动态创建的互斥锁
- * @param mtx: (I) 互斥锁对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个互斥锁对象，不可重入
- */
 __xwup_api
 xwer_t xwup_mtx_delete(struct xwup_mtx * mtx)
 {
@@ -242,9 +193,9 @@ xwer_t xwup_mtx_delete(struct xwup_mtx * mtx)
 
 /**
  * @brief 修改一次互斥锁的动态优先级
- * @param mtx: (I) 互斥锁对象的指针
- * @param pthd: (O) 指向缓冲区的指针，
- *                  通过此缓冲区返回下一个需要修改动态优先级的线程控制块对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
+ * @param[out] pthd: 指向缓冲区的指针，通过此缓冲区返回下一个需要修改
+ *                   动态优先级的线程控制块对象的指针
  * @return 错误码
  */
 static __xwup_code
@@ -291,7 +242,7 @@ void xwup_mtx_chprio_once(struct xwup_mtx * mtx, struct xwup_thd ** pthd)
 
 /**
  * @brief 从互斥锁开始，修改互斥锁-线程链的动态优先级
- * @param mtx: (I) 互斥锁对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
  * @return 错误码
  */
 static __xwup_code
@@ -318,8 +269,8 @@ void xwup_mtx_chprio(struct xwup_mtx * mtx)
 
 /**
  * @brief 中断互斥锁等待队列中的一个节点
- * @param mtx: (I) 互斥锁对象的指针
- * @param thd: (I) 线程控制块对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
+ * @param[in] thd: 线程控制块对象的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -350,19 +301,6 @@ xwer_t xwup_mtx_intr(struct xwup_mtx * mtx, struct xwup_thd * thd)
         return rc;
 }
 
-/**
- * @brief XWUP API：解锁互斥锁
- * @param mtx: (I) 互斥锁对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EOWNER: 线程并没有锁定此互斥锁
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- */
 __xwup_api
 xwer_t xwup_mtx_unlock(struct xwup_mtx * mtx)
 {
@@ -433,19 +371,6 @@ xwer_t xwup_mtx_unlock(struct xwup_mtx * mtx)
         return rc;
 }
 
-/**
- * @brief XWUP API：等待并上锁互斥锁
- * @param mtx: (I) 互斥锁对象指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- */
 __xwup_api
 xwer_t xwup_mtx_lock(struct xwup_mtx * mtx)
 {
@@ -455,23 +380,6 @@ xwer_t xwup_mtx_lock(struct xwup_mtx * mtx)
         return xwup_mtx_timedlock(mtx, &expected);
 }
 
-/**
- * @brief XWUP API：尝试获取互斥锁
- * @param mtx: (I) 互斥锁对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENODATA: 获取锁失败
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- * @note
- * - 此函数虽然不会阻塞调用线程，但也不可在中断上下文中使用，
- *   因为互斥锁需要记录自己的拥有者（线程控制块对象的指针），
- *   中断上下文不存在对应的线程控制块对象。
- */
 __xwup_api
 xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx)
 {
@@ -665,30 +573,6 @@ xwer_t xwup_mtx_do_timedlock(struct xwup_mtx * mtx,
         return rc;
 }
 
-/**
- * @brief XWUP API：限时等待并上锁互斥锁
- * @param mtx: (I) 互斥锁对象的指针
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINTR: 等待被中断
- * @retval -ETIMEDOUT: 超时
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- * @note
- * - 如果线程没能获取互斥锁，会加入到互斥锁的等待队列中等待，
- *   等待超时后将以返回值-ETIMEDOUT返回。
- * - 指针参数xwtm有两个作用：
- *   + 调用函数时，作为输入，表示期望等待的时间；
- *   + 函数返回时，作为输出，表示期望等待时间的剩余值
- *     超时返回-ETIMEDOUT时，期望等待时间会减为0
- */
 __xwup_api
 xwer_t xwup_mtx_timedlock(struct xwup_mtx * mtx, xwtm_t * xwtm)
 {
@@ -775,19 +659,6 @@ xwer_t xwup_mtx_do_lock_unintr(struct xwup_mtx * mtx,
         return rc;
 }
 
-/**
- * @brief XWUP API：等待并上锁互斥锁，且等待不可被中断
- * @param mtx: (I) 互斥锁对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- * -
- */
 __xwup_api
 xwer_t xwup_mtx_lock_unintr(struct xwup_mtx * mtx)
 {
@@ -801,18 +672,6 @@ xwer_t xwup_mtx_lock_unintr(struct xwup_mtx * mtx)
         return rc;
 }
 
-/**
- * @brief XWUP API：获取锁的状态
- * @param mtx: (I) 互斥锁对象的指针
- * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwup_api
 xwer_t xwup_mtx_getlkst(struct xwup_mtx * mtx, xwsq_t * lkst)
 {

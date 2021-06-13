@@ -21,6 +21,11 @@
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/mm/common.h>
 
+/**
+ * @defgroup xwmm_bma 伙伴算法内存块分配器
+ * @{
+ */
+
 /* #define XWMM_BMA_LOG */
 
 #define XWMM_BMA_MAX_ORDER              (126) /**< 最大的阶 */
@@ -37,8 +42,8 @@
 /**
  * @brief 定义伙伴算法内存块分配器结构体的RAW内存空间，
  *        用于初始化伙伴算法内存块分配器结构体
- * @param mem: (I) 内存数组名
- * @param blkodr: (I) 伙伴算法内存块分配器中单位内存块的数量，以2的blkodr次方形式表示
+ * @param[in] mem: 内存数组名
+ * @param[in] blkodr: 伙伴算法内存块分配器中单位内存块的数量，以2的blkodr次方形式表示
  */
 #define XWMM_BMA_DEF(mem, blkodr) \
         xwu8_t mem[sizeof(struct xwmm_bma) + \
@@ -81,5 +86,9 @@ xwer_t xwmm_bma_init(struct xwmm_bma * bma, const char * name,
                      xwsz_t blksize, xwsz_t blkodr);
 xwer_t xwmm_bma_alloc(struct xwmm_bma * bma, xwsq_t order, void ** membuf);
 xwer_t xwmm_bma_free(struct xwmm_bma * bma, void * mem);
+
+/**
+ * @} xwmm_bma
+ */
 
 #endif /* xwos/mm/bma.h */

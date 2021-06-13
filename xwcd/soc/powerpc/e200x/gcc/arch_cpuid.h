@@ -23,9 +23,6 @@
 
 #include <xwos/standard.h>
 
-/**
- * @brief Get ID of current CPU
- */
 static __xwbsp_inline
 xwid_t arch_cpu_get_id(void)
 {

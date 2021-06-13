@@ -56,7 +56,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_spip_vop = {
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：SPI外设控制器对象的构造函数
- * @param spip: (I) SPI外设控制器对象指针
+ * @param[in] spip: SPI外设控制器对象指针
  */
 __xwds_api
 void xwds_spip_construct(struct xwds_spip * spip)
@@ -67,7 +67,7 @@ void xwds_spip_construct(struct xwds_spip * spip)
 
 /**
  * @brief XWDS API：SPI外设控制器对象的析构函数
- * @param spip: (I) SPI外设控制器对象指针
+ * @param[in] spip: SPI外设控制器对象指针
  */
 __xwds_api
 void xwds_spip_destruct(struct xwds_spip * spip)
@@ -78,7 +78,7 @@ void xwds_spip_destruct(struct xwds_spip * spip)
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测设备
- * @param spip: (I) SPI外设控制器对象指针
+ * @param[in] spip: SPI外设控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -98,7 +98,7 @@ err_dev_vop_probe:
 
 /**
  * @brief XWDS VOP：删除设备
- * @param spip: (I) SPI外设控制器对象指针
+ * @param[in] spip: SPI外设控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -120,7 +120,7 @@ err_dev_vop_remove:
 
 /**
  * @brief XWDS VOP：启动设备
- * @param spip: (I) SPI外设控制器对象指针
+ * @param[in] spip: SPI外设控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -150,7 +150,7 @@ err_spim_grab:
 
 /**
  * @brief XWDS VOP：停止设备
- * @param spip: (I) SPI外设控制器对象指针
+ * @param[in] spip: SPI外设控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -175,7 +175,7 @@ err_dev_vop_stop:
 /******** ******** pm ******** ********/
 /**
  * @brief XWDS VOP：暂停设备
- * @param spip: (I) SPI外设控制器对象指针
+ * @param[in] spip: SPI外设控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -198,7 +198,7 @@ err_dev_vop_suspend:
 
 /**
  * @brief XWDS VOP：继续设备
- * @param spip: (I) SPI外设控制器对象指针
+ * @param[in] spip: SPI外设控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -230,9 +230,9 @@ err_spim_grab:
 /******** ******** ******** SPI Perpheral APIs ******** ******** ********/
 /**
  * @brief XWDS API：SPI外设输入、输出、控制
- * @param spip: (I) SPI外设
- * @param cmd: (I) 命令
- * @param ...: (I) 参数
+ * @param[in] spip: SPI外设
+ * @param[in] cmd: 命令
+ * @param[in] ...: 参数
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针

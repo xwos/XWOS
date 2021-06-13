@@ -53,12 +53,12 @@ void xwmm_bma_combine(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb);
 
 /**
  * @brief XWMM API：初始化伙伴算法内存块分配器
- * @param bma: (I) 伙伴算法内存块分配器的指针
- * @param name: (I) 名字
- * @param origin: (I) 内存区域的起始地址
- * @param size: (I) 内存区域的大小
- * @param blksize: (I) 伙伴算法内存块分配器中单位内存块的大小
- * @param blkodr: (I) 伙伴算法内存块分配器中单位内存块的数量，以2的blkodr次方形式表示
+ * @param[in] bma: 伙伴算法内存块分配器的指针
+ * @param[in] name: 名字
+ * @param[in] origin: 内存区域的起始地址
+ * @param[in] size: 内存区域的大小
+ * @param[in] blksize: 伙伴算法内存块分配器中单位内存块的大小
+ * @param[in] blkodr: 伙伴算法内存块分配器中单位内存块的数量，以2的blkodr次方形式表示
  * @return 错误码
  * @retval -ESIZE: 内存区域大小不匹配
  * @note
@@ -116,8 +116,8 @@ err_size:
 
 /**
  * @brief 从内存块首地址获得其控制块的指针
- * @param bma: (I) 伙伴算法内存块分配器对象的指针
- * @param mem: (I) 内存块的首地址
+ * @param[in] bma: 伙伴算法内存块分配器对象的指针
+ * @param[in] mem: 内存块的首地址
  * @return 内存块的控制块指针或类型为指针的错误码
  */
 static __xwos_code
@@ -139,8 +139,8 @@ struct xwmm_bma_bcb * xwmm_bma_mem_to_bcb(struct xwmm_bma * bma, void * mem)
 
 /**
  * @brief 从内存块的控制块指针获得内存块的首地址
- * @param bma: (I) 伙伴算法内存块分配器对象的指针
- * @param bcb: (I) 内存块的控制块指针
+ * @param[in] bma: 伙伴算法内存块分配器对象的指针
+ * @param[in] bcb: 内存块的控制块指针
  * @return 内存块的首地址
  */
 static __xwos_code
@@ -156,8 +156,8 @@ void * xwmm_bma_bcb_to_mem(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb)
 
 /**
  * @brief 寻找内存块的伙伴
- * @param bma: (I) 伙伴算法内存块分配器对象的指针
- * @param bcb: (I) 内存块的控制块指针
+ * @param[in] bma: 伙伴算法内存块分配器对象的指针
+ * @param[in] bcb: 内存块的控制块指针
  * @return 伙伴内存块的控制块指针
  */
 static __xwos_code
@@ -175,9 +175,9 @@ struct xwmm_bma_bcb * xwmm_bma_find_buddy(struct xwmm_bma * bma,
 
 /**
  * @brief 将一块内存加入到阶链表
- * @param bma: (I) 伙伴算法内存块分配器对象的指针
- * @param ol: (I) 阶链表的指针
- * @param bcb: (I) 内存块的控制块指针
+ * @param[in] bma: 伙伴算法内存块分配器对象的指针
+ * @param[in] ol: 阶链表的指针
+ * @param[in] bcb: 内存块的控制块指针
  */
 static __xwos_code
 void xwmm_bma_orderlist_add(struct xwmm_bma * bma,
@@ -196,10 +196,10 @@ void xwmm_bma_orderlist_add(struct xwmm_bma * bma,
 
 /**
  * @brief 从阶链表中删除一块内存
- * @param bma: (I) 伙伴算法内存块分配器对象的指针
- * @param ol: (I) 阶链表的指针
- * @param odr: (I) 阶链表的阶
- * @param bcb: (I) 内存块的控制块指针
+ * @param[in] bma: 伙伴算法内存块分配器对象的指针
+ * @param[in] ol: 阶链表的指针
+ * @param[in] odr: 阶链表的阶
+ * @param[in] bcb: 内存块的控制块指针
  */
 static __xwos_code
 xwer_t xwmm_bma_orderlist_remove(struct xwmm_bma * bma,
@@ -226,8 +226,8 @@ xwer_t xwmm_bma_orderlist_remove(struct xwmm_bma * bma,
 
 /**
  * @brief 从阶链表中选择一块内存，并返回其块控制块
- * @param bma: (I) 伙伴算法内存块分配器对象的指针
- * @param ol: (I) 阶链表的指针
+ * @param[in] bma: 伙伴算法内存块分配器对象的指针
+ * @param[in] ol: 阶链表的指针
  * @return 块控制块指针或类型为指针的错误码
  * @retval -ENOENT: 阶链表为空
  */
@@ -255,10 +255,10 @@ struct xwmm_bma_bcb * xwmm_bma_orderlist_choose(struct xwmm_bma * bma,
 
 /**
  * @brief 将一个大块分割成小块
- * @param bma: (I) 伙伴算法内存块分配器对象的指针
- * @param bcb: (I) 大块的内存块的控制块的指针
- * @param target_odr: (I) 目标块数量的阶
- * @param curr_ol: (I) 当前被分割的大块所在的阶链表
+ * @param[in] bma: 伙伴算法内存块分配器对象的指针
+ * @param[in] bcb: 大块的内存块的控制块的指针
+ * @param[in] target_odr: 目标块数量的阶
+ * @param[in] curr_ol: 当前被分割的大块所在的阶链表
  */
 static __xwos_code
 void xwmm_bma_divide_block(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb,
@@ -291,9 +291,9 @@ void xwmm_bma_divide_block(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb,
 
 /**
  * @brief XWMM API：申请一块连续的内存
- * @param bma: (I) 伙伴算法内存块分配器对象的指针
- * @param order: (I) 块数量的阶，内存块大小：((1 << order) * bma->blksize)
- * @param membuf: (O) 指向地址缓存的指针，通过此指针缓存返回申请到的内存的首地址
+ * @param[in] bma: 伙伴算法内存块分配器对象的指针
+ * @param[in] order: 块数量的阶，内存块大小：((1 << order) * bma->blksize)
+ * @param[out] membuf: 指向地址缓存的指针，通过此指针缓存返回申请到的内存的首地址
  * @return 错误码
  * @retval -EFAULT: 空指针
  * @retval -ERANGE: order无效
@@ -343,8 +343,8 @@ err_nomem:
 
 /**
  * @brief 找到内存块的伙伴
- * @param bma: (I) 伙伴算法内存块分配器对象的指针
- * @param bcb: (I) 内存块的控制块的指针
+ * @param[in] bma: 伙伴算法内存块分配器对象的指针
+ * @param[in] bcb: 内存块的控制块的指针
  * @return 错误码
  */
 static __xwos_code
@@ -389,8 +389,8 @@ void xwmm_bma_combine(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb)
 
 /**
  * @brief XWMM API：释放内存块
- * @param bma: (I) 伙伴算法内存块分配器对象的指针
- * @param mem: (I) 内存块的首地址指针
+ * @param[in] bma: 伙伴算法内存块分配器对象的指针
+ * @param[in] mem: 内存块的首地址指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 参数错误

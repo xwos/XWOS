@@ -20,7 +20,7 @@
 
 /**
  * @brief 初始化实时就绪队列
- * @param xwrtrq: (I) XWOS UP内核的实时就绪队列
+ * @param[in] xwrtrq: XWOS UP内核的实时就绪队列
  */
 __xwup_code
 void xwup_rtrq_init(struct xwup_rtrq * xwrtrq)
@@ -36,8 +36,8 @@ void xwup_rtrq_init(struct xwup_rtrq * xwrtrq)
 
 /**
  * @brief 将线程加入到实时就绪队列的头部
- * @param xwrtrq: (I) XWOS UP内核的实时就绪队列
- * @param thd: (I) 线程控制块的指针
+ * @param[in] xwrtrq: XWOS UP内核的实时就绪队列
+ * @param[in] thd: 线程控制块的指针
  * @retval XWOK: 没有错误
  * @retval -EPERM: 线程没有设置状态标志@ref XWUP_SKDOBJ_DST_READY
  * @note
@@ -65,8 +65,8 @@ void xwup_rtrq_add_head(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
 
 /**
  * @brief 将线程加入到实时就绪队列的尾部
- * @param xwrtrq: (I) XWOS UP内核的实时就绪队列
- * @param thd: (I) 线程控制块的指针
+ * @param[in] xwrtrq: XWOS UP内核的实时就绪队列
+ * @param[in] thd: 线程控制块的指针
  * @retval XWOK: 没有错误
  * @retval -EPERM: 线程没有设置状态标志@ref XWUP_SKDOBJ_DST_READY
  * @note
@@ -93,8 +93,8 @@ void xwup_rtrq_add_tail(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
 
 /**
  * @brief 将线程从实时就绪队列中删除
- * @param xwrtrq: (I) XWOS UP内核的实时就绪队列
- * @param thd: (I) 线程控制块的指针
+ * @param[in] xwrtrq: XWOS UP内核的实时就绪队列
+ * @param[in] thd: 线程控制块的指针
  * @note
  * - 这个函数只能在临界区中调用。
  */
@@ -118,7 +118,7 @@ void xwup_rtrq_remove(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
 
 /**
  * @brief 从实时就绪队列中选择优先级最高的线程
- * @param xwrtrq: (I) XWOS UP内核的实时就绪队列
+ * @param[in] xwrtrq: XWOS UP内核的实时就绪队列
  * @return 被选择的线程控制块的指针
  * @note
  * - 这个函数只能在临界区中调用。

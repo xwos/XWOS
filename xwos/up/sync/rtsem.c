@@ -90,7 +90,7 @@ struct xwup_rtsem * xwup_rtsem_alloc(void)
 
 /**
  * @brief 释放实时信号量对象
- * @param sem: (I) 信号量对象的指针
+ * @param[in] sem: 信号量对象的指针
  */
 static __xwup_code
 void xwup_rtsem_free(struct xwup_rtsem * sem)
@@ -104,9 +104,9 @@ void xwup_rtsem_free(struct xwup_rtsem * sem)
 
 /**
  * @brief 激活实时信号量
- * @param sem: (I) 信号量对象的指针
- * @param val: (I) 信号量的初始值
- * @param max: (I) 信号量的最大值
+ * @param[in] sem: 信号量对象的指针
+ * @param[in] val: 信号量的初始值
+ * @param[in] max: 信号量的最大值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @note
@@ -125,7 +125,7 @@ void xwup_rtsem_activate(struct xwup_rtsem * sem, xwssq_t val, xwssq_t max)
 
 /**
  * @brief 使得实时信号量对象无效
- * @param sem: (I) 信号量对象的指针
+ * @param[in] sem: 信号量对象的指针
  */
 static __xwup_code
 void xwup_rtsem_deactivate(struct xwup_rtsem * sem)
@@ -133,20 +133,6 @@ void xwup_rtsem_deactivate(struct xwup_rtsem * sem)
         XWOS_UNUSED(sem);
 }
 
-/**
- * @brief XWUP API：初始化实时信号量
- * @param sem: (I) 信号量对象的指针
- * @param val: (I) 信号量的初始值
- * @param max: (I) 信号量的最大值
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINVAL: 无效参数
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个信号量对象，不可重入
- */
 __xwup_api
 xwer_t xwup_rtsem_init(struct xwup_rtsem * sem, xwssq_t val, xwssq_t max)
 {
@@ -158,17 +144,6 @@ xwer_t xwup_rtsem_init(struct xwup_rtsem * sem, xwssq_t val, xwssq_t max)
         return XWOK;
 }
 
-/**
- * @brief XWUP API：销毁实时信号量对象
- * @param sem: (I) 信号量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个信号量对象，不可重入
- */
 __xwup_api
 xwer_t xwup_rtsem_destroy(struct xwup_rtsem * sem)
 {
@@ -178,22 +153,6 @@ xwer_t xwup_rtsem_destroy(struct xwup_rtsem * sem)
         return XWOK;
 }
 
-/**
- * @brief XWUP API：动态创建实时信号量
- * @param ptrbuf: (O) 指向缓冲区的指针，通过此缓冲区返回对象的指针
- * @param type: (I) 信号量的类型
- * @param val: (I) 信号量的初始值
- * @param max: (I) 信号量的最大值
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINVAL: 无效参数
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwup_api
 xwer_t xwup_rtsem_create(struct xwup_rtsem ** ptrbuf, xwssq_t val, xwssq_t max)
 {
@@ -216,17 +175,6 @@ xwer_t xwup_rtsem_create(struct xwup_rtsem ** ptrbuf, xwssq_t val, xwssq_t max)
         return rc;
 }
 
-/**
- * @brief XWUP API：删除动态创建的实时信号量
- * @param sem: (I) 信号量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个信号量对象，不可重入
- */
 __xwup_api
 xwer_t xwup_rtsem_delete(struct xwup_rtsem * sem)
 {
@@ -238,23 +186,6 @@ xwer_t xwup_rtsem_delete(struct xwup_rtsem * sem)
 }
 
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-/**
- * @brief XWUP API：绑定实时信号量到事件对象，事件对象类型为XWUP_EVT_TYPE_SEL
- * @param sem: (I) 实时信号量对象的指针
- * @param evt: (I) 事件对象的指针
- * @param pos: (I) 实时信号量对象映射到位图中的位置
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
- * @retval -ECHRNG: 位置超出范围
- * @retval -EALREADY: 同步对象已经绑定到事件对象
- * @retval -EBUSY: 通道已经被其他同步对象独占
- * @note
- * - 同步/异步：异步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个信号量对象，不可重入
- */
 __xwup_api
 xwer_t xwup_rtsem_bind(struct xwup_rtsem * sem, struct xwup_evt * evt,
                        xwsq_t pos)
@@ -265,21 +196,6 @@ xwer_t xwup_rtsem_bind(struct xwup_rtsem * sem, struct xwup_evt * evt,
         return xwup_vsem_bind(&sem->vsem, evt, pos);
 }
 
-/**
- * @brief XWUP API：从事件对象上解绑实时信号量，
- *                  事件对象类型为XWUP_EVT_TYPE_SEL
- * @param sem: (I) 实时信号量对象的指针
- * @param evt: (I) 事件对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
- * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
- * @note
- * - 同步/异步：异步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个信号量对象，不可重入
- */
 __xwup_api
 xwer_t xwup_rtsem_unbind(struct xwup_rtsem * sem, struct xwup_evt * evt)
 {
@@ -292,8 +208,8 @@ xwer_t xwup_rtsem_unbind(struct xwup_rtsem * sem, struct xwup_evt * evt)
 
 /**
  * @brief 中断实时信号量等待队列中的一个节点
- * @param sem: (I) 信号量对象的指针
- * @param wqn: (I) 等待队列节点
+ * @param[in] sem: 信号量对象的指针
+ * @param[in] wqn: 等待队列节点
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -323,21 +239,6 @@ xwer_t xwup_rtsem_intr(struct xwup_rtsem * sem, struct xwup_wqn * wqn)
         return rc;
 }
 
-/**
- * @brief XWUP API：发布实时信号量
- * @param sem: (I) 实时信号量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENEGATIVE: 信号量已被冻结
- * @retval -ERANGE: 信号量的值已经最大
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 此函数只对非已冻结的信号量起作用，已冻结的信号量将得到错误码-ENEGATIVE。
- */
 __xwup_api
 xwer_t xwup_rtsem_post(struct xwup_rtsem * sem)
 {
@@ -386,20 +287,6 @@ xwer_t xwup_rtsem_post(struct xwup_rtsem * sem)
         return rc;
 }
 
-/**
- * @brief XWUP API：等待并获取实时信号量
- * @param sem: (I) 实时信号量对象指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
- */
 __xwup_api
 xwer_t xwup_rtsem_wait(struct xwup_rtsem * sem)
 {
@@ -407,19 +294,6 @@ xwer_t xwup_rtsem_wait(struct xwup_rtsem * sem)
         return xwup_rtsem_timedwait(sem, &expected);
 }
 
-/**
- * @brief XWUP API：尝试获取实时信号量，不会阻塞调用线程
- * @param sem: (I) 信号量对象的指针
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENODATA: 信号量资源不可用（信号量不可被获取）
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 此函数不会阻塞调用线程，此函数可在中断上下文中使用。
- */
 __xwup_api
 xwer_t xwup_rtsem_trywait(struct xwup_rtsem * sem)
 {
@@ -606,25 +480,6 @@ xwer_t xwup_rtsem_do_timedwait(struct xwup_rtsem * sem, struct xwup_thd * thd,
         return rc;
 }
 
-/**
- * @brief XWUP API：限时等待并获取管道信号量
- * @param sem: (I) 信号量对象的指针
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETIMEDOUT: 超时
- * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- * @note
- * - 函数返回返回-ETIMEDOUT时，*xwtm* 指向的缓冲区内的期望时间会减为0。
- */
 __xwup_api
 xwer_t xwup_rtsem_timedwait(struct xwup_rtsem * sem, xwtm_t * xwtm)
 {
@@ -713,18 +568,6 @@ xwer_t xwup_rtsem_do_wait_unintr(struct xwup_rtsem * sem, struct xwup_thd * thd)
         return rc;
 }
 
-/**
- * @brief XWUP API：等待并获取实时信号量，且等待不可被中断
- * @param sem: (I) 信号量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- */
 __xwup_api
 xwer_t xwup_rtsem_wait_unintr(struct xwup_rtsem * sem)
 {
@@ -740,21 +583,6 @@ xwer_t xwup_rtsem_wait_unintr(struct xwup_rtsem * sem)
         return rc;
 }
 
-/**
- * @brief XWUP API：冻结实时信号量（值设置为负）
- * @param sem: (I) 信号量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EALREADY: 信号量已被冻结
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 已冻结的信号量不允许增加(V操作)，但可以被测试(P操作)。
- *   测试的线程会被加入到信号量的等待队列。
- */
 __xwup_api
 xwer_t xwup_rtsem_freeze(struct xwup_rtsem * sem)
 {
@@ -763,21 +591,6 @@ xwer_t xwup_rtsem_freeze(struct xwup_rtsem * sem)
         return xwup_vsem_freeze(&sem->vsem);
 }
 
-/**
- * @brief XWUP API：解冻实时信号量
- * @param sem: (I) 信号量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINVAL: 参数无效
- * @retval -EALREADY: 信号量未被冻结
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 此函数只对已冻结的信号量起作用，对未冻结的信号量调用此函数将返回错误码。
- */
 __xwup_api
 xwer_t xwup_rtsem_thaw(struct xwup_rtsem * sem)
 {
@@ -786,18 +599,6 @@ xwer_t xwup_rtsem_thaw(struct xwup_rtsem * sem)
         return xwup_vsem_thaw(&sem->vsem);
 }
 
-/**
- * @brief XWUP API：获取实时信号量计数器的值
- * @param sem: (I) 信号量对象的指针
- * @param sval: (O) 指向缓冲区的指针，通过此缓冲区返回信号量计数器的值
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- */
 __xwup_api
 xwer_t xwup_rtsem_getvalue(struct xwup_rtsem * sem, xwssq_t * sval)
 {

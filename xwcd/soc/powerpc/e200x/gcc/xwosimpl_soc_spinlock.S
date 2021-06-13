@@ -21,10 +21,7 @@
 #include <cfg/XuanWuOS.h>
 #include <xwos/lib/errno.h>
 
-/**
- * @brief Lock a bit spin lock
- * @param addr: (I) spinlock
- */
+
         .section        .xwos.text,"ax"
         .global         soc_splk_lock
         .align          4
@@ -43,12 +40,7 @@ soc_splk_lock:
 soc_splk_lock_end:
         .size           soc_splk_lock, . - soc_splk_lock
 
-/**
- * @brief Try to lock a spinlock
- * @param addr: (I) spinlock
- * @retval -EAGAIN: Can't acquire the lock and try again
- * @retval 0: OK
- */
+
         .section        .xwos.text,"ax"
         .global         soc_splk_trylock
         .align          4
@@ -72,10 +64,7 @@ soc_splk_trylock:
 soc_splk_trylock_end:
         .size           soc_splk_trylock, . - soc_splk_trylock
 
-/**
- * @brief Unlock a spinlock
- * @param addr: (I) spinlock
- */
+
         .section        .xwos.text,"ax"
         .global         soc_splk_unlock
         .align          4

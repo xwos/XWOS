@@ -15,6 +15,29 @@
 
 #include <cfg/XuanWuOS.h>
 
+/**
+ * @mainpage XWOS通用库
+ * + @subpage XuanWuOS_Version
+ * + @subpage compiler
+ * + @subpage error
+ * + @subpage type
+ * + @subpage bclst
+ * + @subpage rbtree
+ * + @subpage map
+ * + @subpage CRC8
+ * + @subpage CRC32
+ * + @subpage xwlog
+ * + @subpage ctype
+ * + @subpage div64
+ * + @subpage xwaop
+ * + @subpage lfq
+ * + @subpage xwbop
+ * + @subpage xwbmpaop
+ * + @subpage xwobj
+ * + @subpage setjmp
+ * + @subpage xwsc
+ */
+
 #if defined(XuanWuOS_CFG_CORE__mp)
   #include <xwos/mp/rule.h>
 #elif defined(XuanWuOS_CFG_CORE__up)

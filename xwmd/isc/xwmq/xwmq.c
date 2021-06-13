@@ -23,7 +23,7 @@
 
 /**
  * @brief 消息队列对象的构造函数
- * @param mq: (I) 消息队列对象的指针
+ * @param[in] mq: 消息队列对象的指针
  */
 static __xwmd_code
 void xwmq_construct(struct xwmq * mq)
@@ -35,7 +35,7 @@ void xwmq_construct(struct xwmq * mq)
 
 /**
  * @brief 消息队列对象的析构函数
- * @param mq: (I) 消息队列对象的指针
+ * @param[in] mq: 消息队列对象的指针
  */
 static __xwmd_code
 void xwmq_destruct(struct xwmq * mq)
@@ -58,8 +58,8 @@ const __xwmd_rodata char xwmq_cache_name[] = "xwmd.mq.cache";
 #if defined(XWMDCFG_isc_xwmq_MEMSLICE) && (1 == XWMDCFG_isc_xwmq_MEMSLICE)
 /**
  * @brief XWMD INIT CODE：初始化消息队列对象缓存
- * @param zone_origin: (I) 内存区域首地址
- * @param zone_size: (I) 内存区域大小
+ * @param[in] zone_origin: 内存区域首地址
+ * @param[in] zone_size: 内存区域大小
  * @return 错误码
  * @note
  * - 重入性：只可在系统初始化时使用一次
@@ -125,7 +125,7 @@ struct xwmq * xwmq_alloc(void)
 
 /**
  * @brief 释放消息队列对象
- * @param mq: (I) 消息队列对象的指针
+ * @param[in] mq: 消息队列对象的指针
  */
 static __xwmd_code
 void xwmq_free(struct xwmq * mq)
@@ -143,7 +143,7 @@ void xwmq_free(struct xwmq * mq)
 
 /**
  * @brief 消息队列对象的垃圾回收函数
- * @param mq: (I) 消息队列对象的指针
+ * @param[in] mq: 消息队列对象的指针
  * @return 错误码
  */
 static __xwmd_code
@@ -159,7 +159,7 @@ xwer_t xwmq_gc(void * obj)
 
 /**
  * @brief XWMQ API：获取消息队列对象的标签
- * @param mq: (I) 消息队列对象的指针
+ * @param[in] mq: 消息队列对象的指针
  * @return 消息队列对象的标签
  * @note
  * - 同步/异步：同步
@@ -180,8 +180,8 @@ xwsq_t xwmq_gettik(struct xwmq * mq)
 
 /**
  * @brief XWMQ API：检查消息队列对象的标签并增加引用计数
- * @param mq: (I) 消息队列对象指针
- * @param tik: (I) 标签
+ * @param[in] mq: 消息队列对象指针
+ * @param[in] tik: 标签
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -197,8 +197,8 @@ xwer_t xwmq_acquire(struct xwmq * mq, xwsq_t tik)
 
 /**
  * @brief XWMQ API：检查消息队列对象的标签并增加引用计数
- * @param mq: (I) 消息队列对象指针
- * @param tik: (I) 标签
+ * @param[in] mq: 消息队列对象指针
+ * @param[in] tik: 标签
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -214,7 +214,7 @@ xwer_t xwmq_release(struct xwmq * mq, xwsq_t tik)
 
 /**
  * @brief XWMQ API：增加消息队列对象的引用计数
- * @param mq: (I) 消息队列控制块对象指针
+ * @param[in] mq: 消息队列控制块对象指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -230,7 +230,7 @@ xwer_t xwmq_grab(struct xwmq * mq)
 
 /**
  * @brief XWMQ API：减少消息队列对象的引用计数
- * @param mq: (I) 消息队列控制块对象指针
+ * @param[in] mq: 消息队列控制块对象指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -246,9 +246,9 @@ xwer_t xwmq_put(struct xwmq * mq)
 
 /**
  * @brief 激活消息队列对象
- * @param mq: (I) 消息队列对象的指针
- * @param name: (I) 名字
- * @param gcfunc: (I) 垃圾回收函数：当对象应用计数为0，调用此函数回收资源。
+ * @param[in] mq: 消息队列对象的指针
+ * @param[in] name: 名字
+ * @param[in] gcfunc: 垃圾回收函数：当对象应用计数为0，调用此函数回收资源。
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -275,8 +275,8 @@ err_xwobj_activate:
 
 /**
  * @brief XWMQ API：静态方式初始化消息队列
- * @param mq: (I) 消息队列对象的指针
- * @param name: (I) 名字
+ * @param[in] mq: 消息队列对象的指针
+ * @param[in] name: 名字
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -293,7 +293,7 @@ xwer_t xwmq_init(struct xwmq * mq, const char * name)
 
 /**
  * @brief XWMQ API：销毁静态方式初始化的消息队列对象
- * @param mq: (I) 消息队列对象的指针
+ * @param[in] mq: 消息队列对象的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -309,8 +309,8 @@ xwer_t xwmq_destroy(struct xwmq * mq)
 
 /**
  * @brief XWMQ API：动态创建消息队列对象
- * @param ptrbuf: (O) 指向缓冲区的指针，此缓冲区用于返回消息队列对象的指针
- * @param name: (I) 名字
+ * @param[out] ptrbuf: 指向缓冲区的指针，此缓冲区用于返回消息队列对象的指针
+ * @param[in] name: 名字
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -349,7 +349,7 @@ err_mq_alloc:
 
 /**
  * @brief XWMQ API：删除动态创建的消息队列对象
- * @param mq: (I) 消息队列对象的指针
+ * @param[in] mq: 消息队列对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -369,7 +369,7 @@ xwer_t xwmq_delete(struct xwmq * mq)
 
 /**
  * @brief 消息对象的构造函数
- * @param msg: (I) 消息对象的指针
+ * @param[in] msg: 消息对象的指针
  */
 static __xwmd_code
 void xwmq_msg_construct(struct xwmq_msg * msg)
@@ -383,7 +383,7 @@ void xwmq_msg_construct(struct xwmq_msg * msg)
 
 /**
  * @brief 消息对象的析构函数
- * @param msg: (I) 消息对象的指针
+ * @param[in] msg: 消息对象的指针
  */
 static __xwmd_code
 void xwmq_msg_destruct(struct xwmq_msg * msg)
@@ -406,8 +406,8 @@ const __xwmd_rodata char xwmq_msg_cache_name[] = "xwmd.mq.msg.cache";
 #if defined(XWMDCFG_isc_xwmq_MEMSLICE) && (1 == XWMDCFG_isc_xwmq_MEMSLICE)
 /**
  * @brief XWMD INIT CODE：初始化消息对象缓存
- * @param zone_origin: (I) 内存区域首地址
- * @param zone_size: (I) 内存区域大小
+ * @param[in] zone_origin: 内存区域首地址
+ * @param[in] zone_size: 内存区域大小
  * @return 错误码
  * @note
  * - 重入性：只可在系统初始化时使用一次
@@ -473,7 +473,7 @@ struct xwmq_msg * xwmq_msg_alloc(void)
 
 /**
  * @brief 释放消息对象
- * @param msg: (I) 消息对象的指针
+ * @param[in] msg: 消息对象的指针
  */
 static __xwmd_code
 void xwmq_msg_free(struct xwmq_msg * msg)
@@ -491,7 +491,7 @@ void xwmq_msg_free(struct xwmq_msg * msg)
 
 /**
  * @brief 消息对象的垃圾回收函数
- * @param msg: (I) 消息对象的指针
+ * @param[in] msg: 消息对象的指针
  * @return 错误码
  */
 static __xwmd_code
@@ -503,7 +503,7 @@ xwer_t xwmq_msg_gc(void * msg)
 
 /**
  * @brief XWMQ API：获取消息对象的标签
- * @param msg: (I) 消息对象的指针
+ * @param[in] msg: 消息对象的指针
  * @return 消息对象的标签
  * @note
  * - 同步/异步：同步
@@ -524,8 +524,8 @@ xwsq_t xwmq_msg_gettik(struct xwmq_msg * msg)
 
 /**
  * @brief XWMQ API：检查消息对象的标签并增加引用计数
- * @param msg: (I) 消息对象指针
- * @param tik: (I) 标签
+ * @param[in] msg: 消息对象指针
+ * @param[in] tik: 标签
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -541,8 +541,8 @@ xwer_t xwmq_msg_acquire(struct xwmq_msg * msg, xwsq_t tik)
 
 /**
  * @brief XWMQ API：检查消息对象的标签并增加引用计数
- * @param msg: (I) 消息对象指针
- * @param tik: (I) 标签
+ * @param[in] msg: 消息对象指针
+ * @param[in] tik: 标签
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -558,7 +558,7 @@ xwer_t xwmq_msg_release(struct xwmq_msg * msg, xwsq_t tik)
 
 /**
  * @brief XWMQ API：增加消息对象的引用计数
- * @param msg: (I) 消息控制块对象指针
+ * @param[in] msg: 消息控制块对象指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -574,7 +574,7 @@ xwer_t xwmq_msg_grab(struct xwmq_msg * msg)
 
 /**
  * @brief XWMQ API：减少消息对象的引用计数
- * @param msg: (I) 消息控制块对象指针
+ * @param[in] msg: 消息控制块对象指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -590,8 +590,8 @@ xwer_t xwmq_msg_put(struct xwmq_msg * msg)
 
 /**
  * @brief 激活消息对象
- * @param msg: (I) 消息对象的指针
- * @param gcfunc: (I) 垃圾回收函数：当对象应用计数为0，调用此函数回收资源。
+ * @param[in] msg: 消息对象的指针
+ * @param[in] gcfunc: 垃圾回收函数：当对象应用计数为0，调用此函数回收资源。
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -615,7 +615,7 @@ err_xwobj_activate:
 
 /**
  * @brief XWMQ API：静态方式初始化消息
- * @param msg: (I) 消息对象的指针
+ * @param[in] msg: 消息对象的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -632,7 +632,7 @@ xwer_t xwmq_msg_init(struct xwmq_msg * msg)
 
 /**
  * @brief XWMQ API：销毁静态方式初始化的消息对象
- * @param msg: (I) 消息对象的指针
+ * @param[in] msg: 消息对象的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -648,7 +648,7 @@ xwer_t xwmq_msg_destroy(struct xwmq_msg * msg)
 
 /**
  * @brief XWMQ API：动态创建消息对象
- * @param ptrbuf: (O) 指向缓冲区的指针，此缓冲区用于返回消息对象的指针
+ * @param[out] ptrbuf: 指向缓冲区的指针，此缓冲区用于返回消息对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -687,7 +687,7 @@ err_mq_alloc:
 
 /**
  * @brief XWMQ API：删除动态创建的消息对象
- * @param msg: (I) 消息对象的指针
+ * @param[in] msg: 消息对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -705,10 +705,10 @@ xwer_t xwmq_msg_delete(struct xwmq_msg * msg)
 
 /**
  * @brief XWMQ API：将消息放入到消息队列的尾端（入队）
- * @param mq: (I) 消息队列对象的指针
- * @param msg: (I) 消息对象的指针
- * @param topic: (I) 消息的标题
- * @param data: (I) 消息的数据
+ * @param[in] mq: 消息队列对象的指针
+ * @param[in] msg: 消息对象的指针
+ * @param[in] topic: 消息的标题
+ * @param[in] data: 消息的数据
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -753,10 +753,10 @@ err_mq_grab:
 
 /**
  * @brief XWMQ API：将消息放入到消息队列的首端（插队）
- * @param mq: (I) 消息队列对象的指针
- * @param msg: (I) 消息对象的指针
- * @param topic: (I) 消息的标题
- * @param data: (I) 消息的数据
+ * @param[in] mq: 消息队列对象的指针
+ * @param[in] msg: 消息对象的指针
+ * @param[in] topic: 消息的标题
+ * @param[in] data: 消息的数据
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -817,8 +817,8 @@ struct xwmq_msg * xwmq_choose(struct xwmq * mq)
 
 /**
  * @brief XWMQ API: 从消息队列头部取出一条消息，若消息队列为空，就无限等待
- * @param mq: (I) 消息队列对象的指针
- * @param ptrbuf: (O) 指向缓冲区的指针，此缓冲区用于接收消息
+ * @param[in] mq: 消息队列对象的指针
+ * @param[out] ptrbuf: 指向缓冲区的指针，此缓冲区用于接收消息
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -838,11 +838,11 @@ xwer_t xwmq_dq(struct xwmq * mq, struct xwmq_msg ** ptrbuf)
 
 /**
  * @brief XWMQ API: 从消息队列头部取出一条消息，若消息队列为空，就限时等待
- * @param mq: (I) 消息队列对象的指针
- * @param ptrbuf: (O) 指向缓冲区的指针，此缓冲区用于接收消息
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] mq: 消息队列对象的指针
+ * @param[out] ptrbuf: 指向缓冲区的指针，此缓冲区用于接收消息
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -878,8 +878,8 @@ err_sem_timedwait:
 
 /**
  * @brief XWMQ API: 尝试从消息队列头部取出一条消息，若消息队列为空，立即返回错误码
- * @param mq: (I) 消息队列对象的指针
- * @param ptrbuf: (O) 指向缓冲区的指针，此缓冲区用于接收消息
+ * @param[in] mq: 消息队列对象的指针
+ * @param[out] ptrbuf: 指向缓冲区的指针，此缓冲区用于接收消息
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针

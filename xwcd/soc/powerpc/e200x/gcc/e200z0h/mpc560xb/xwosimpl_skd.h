@@ -29,10 +29,6 @@ extern struct e200x_context soc_context;
 
 extern void soc_skd_req_swcx(struct xwospl_skd * xwskd);
 
-/**
- * @brief 玄武OS内核调度器适配函数：发起切换上下文的软中断
- * @param xwskd: (I) 调度器的指针
- */
 static __xwbsp_inline
 void xwospl_skd_req_swcx(struct xwospl_skd * xwskd)
 {

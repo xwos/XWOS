@@ -17,6 +17,11 @@
 #include <xwos/osal/jack/swt.h>
 
 /**
+ * @defgroup xwos_swt 软件定时器
+ * @{
+ */
+
+/**
  * @brief XWOS API：软件定时器
  */
 struct xwos_swt {
@@ -62,9 +67,9 @@ typedef struct {
 
 /**
  * @brief XWOS API：静态方式初始化软件定时器
- * @param swt: (I) 软件定时器的指针
- * @param name: (I) 软件定时器的名字
- * @param flag: (I) 软件定时器的标志
+ * @param[in] swt: 软件定时器的指针
+ * @param[in] name: 软件定时器的名字
+ * @param[in] flag: 软件定时器的标志
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -79,7 +84,7 @@ xwer_t xwos_swt_init(struct xwos_swt * swt, const char * name, xwsq_t flag)
 
 /**
  * @brief XWOS API：销毁静态方式初始化的软件定时器
- * @param swt: (I) 软件定时器的指针
+ * @param[in] swt: 软件定时器的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -94,9 +99,9 @@ xwer_t xwos_swt_destroy(struct xwos_swt * swt)
 
 /**
  * @brief XWOS API：动态方式创建软件定时器
- * @param swtbuf: (O) 指向缓冲区的指针，通过此缓冲区返回软件定时器的指针
- * @param name: (I) 软件定时器的名字
- * @param flag: (I) 软件定时器的标志
+ * @param[out] swtbuf: 指向缓冲区的指针，通过此缓冲区返回软件定时器的指针
+ * @param[in] name: 软件定时器的名字
+ * @param[in] flag: 软件定时器的标志
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -111,7 +116,7 @@ xwer_t xwos_swt_create(struct xwos_swt ** swtbuf, const char * name, xwsq_t flag
 
 /**
  * @brief XWOS API：删除动态方式创建的软件定时器
- * @param swt: (I) 软件定时器的指针
+ * @param[in] swt: 软件定时器的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -126,7 +131,7 @@ xwer_t xwos_swt_delete(struct xwos_swt * swt)
 
 /**
  * @brief XWOS API：获取软件定时器对象的标签
- * @param swt: (I) 软件定时器对象的指针
+ * @param[in] swt: 软件定时器对象的指针
  * @return 软件定时器对象的标签
  * @note
  * - 同步/异步：同步
@@ -141,7 +146,7 @@ xwsq_t xwos_swt_gettik(struct xwos_swt * swt)
 
 /**
  * @brief XWOS API：获取软件定时器对象的描述符
- * @param swt: (I) 软件定时器对象的指针
+ * @param[in] swt: 软件定时器对象的指针
  * @return 软件定时器对象的描述符
  * @note
  * - 同步/异步：同步
@@ -160,7 +165,7 @@ xwos_swt_d xwos_swt_getd(struct xwos_swt * swt)
 
 /**
  * @brief XWOS API：检查软件定时器对象的标签并增加引用计数
- * @param swtd: (I) 软件定时器对象的描述符
+ * @param[in] swtd: 软件定时器对象的描述符
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -178,7 +183,7 @@ xwer_t xwos_swt_acquire(xwos_swt_d swtd)
 
 /**
  * @brief XWOS API：检查对象的标签并减少引用计数
- * @param swtd: (I) 软件定时器对象的描述符
+ * @param[in] swtd: 软件定时器对象的描述符
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -196,7 +201,7 @@ xwer_t xwos_swt_release(xwos_swt_d swtd)
 
 /**
  * @brief XWOS API：增加软件定时器对象的引用计数
- * @param swt: (I) 软件定时器对象的指针
+ * @param[in] swt: 软件定时器对象的指针
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -213,7 +218,7 @@ xwer_t xwos_swt_grab(struct xwos_swt * swt)
 
 /**
  * @brief XWOS API：减少软件定时器对象的引用计数
- * @param swt: (I) 软件定时器对象的指针
+ * @param[in] swt: 软件定时器对象的指针
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -230,11 +235,11 @@ xwer_t xwos_swt_put(struct xwos_swt * swt)
 
 /**
  * @brief XWOS API：启动软件定时器
- * @param swt: (I) 软件定时器的指针
- * @param base: (I) 软件定时器的初始时间
- * @param period: (I) 软件定时器的周期时间
- * @param callback: (I) 软件定时器的回调函数
- * @param arg: (I) 回调函数的参数
+ * @param[in] swt: 软件定时器的指针
+ * @param[in] base: 软件定时器的初始时间
+ * @param[in] period: 软件定时器的周期时间
+ * @param[in] callback: 软件定时器的回调函数
+ * @param[in] arg: 回调函数的参数
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -251,7 +256,7 @@ xwer_t xwos_swt_start(struct xwos_swt * swt, xwtm_t base, xwtm_t period,
 
 /**
  * @brief XWOS API：停止软件定时器
- * @param swt: (I) 软件定时器的指针
+ * @param[in] swt: 软件定时器的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -263,5 +268,9 @@ xwer_t xwos_swt_stop(struct xwos_swt * swt)
 {
         return xwosdl_swt_stop(&swt->osswt);
 }
+
+/**
+ * @} xwos_swt
+ */
 
 #endif /* xwos/osal/swt.h */

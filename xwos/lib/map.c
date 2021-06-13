@@ -15,8 +15,8 @@
 
 /**
  * @brief 插入键值对容器
- * @param m: (I) map的指针
- * @param newmc: (I) 键值对容器的指针
+ * @param[in] m: map的指针
+ * @param[in] newmc: 键值对容器的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EEXIST: 键值对已经存在
@@ -77,8 +77,8 @@ xwer_t xwlib_map_insert(struct xwlib_map * m, struct xwlib_map_container * newmc
 
 /**
  * @brief 删除键值对容器
- * @param m: (I) map的指针
- * @param mc: (I) 键值对容器的指针
+ * @param[in] m: map的指针
+ * @param[in] mc: 键值对容器的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ESRCH: 此键值对容器不在键值对集合中
@@ -101,9 +101,9 @@ xwer_t xwlib_map_erase(struct xwlib_map * m, struct xwlib_map_container * mc)
 
 /**
  * @brief 根据“键”查找键值对容器
- * @param m: (I) map的指针
- * @param key: (I) 键值对容器的指针
- * @param mc: (O) 指向指针缓存的指针，此指针缓存用于返回查找到的键值对容器的指针
+ * @param[in] m: map的指针
+ * @param[in] key: 键值对容器的指针
+ * @param[out] mc: 指向指针缓存的指针，此指针缓存用于返回查找到的键值对容器的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ESRCH: 目标不存在

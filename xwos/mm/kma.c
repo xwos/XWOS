@@ -63,9 +63,9 @@ xwer_t xwmm_dkma_init(void)
 
 /**
  * @brief 从默认的内核内存分配器中申请内存
- * @param size: (I) 大小
- * @param aligned: (I) 申请到的内存的首地址需要对齐到的边界
- * @param membuf: (O) 指向指针缓存的指针，此指针缓存用于返回申请到的内存的首地址
+ * @param[in] size: 大小
+ * @param[in] aligned: 申请到的内存的首地址需要对齐到的边界
+ * @param[out] membuf: 指向指针缓存的指针，此指针缓存用于返回申请到的内存的首地址
  * @return 错误码
  * @retval -EFAULT: 空指针
  * @retval -EINVAL: 参数无效
@@ -83,7 +83,7 @@ xwer_t xwmm_dkma_alloc(xwsz_t size, xwsz_t aligned, void ** membuf)
 
 /**
  * @brief 释放内存到默认的内核内存分配器
- * @param mem: (I) 内存首地址指针
+ * @param[in] mem: 内存首地址指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -118,9 +118,9 @@ xwer_t xwmm_kma_exit(void)
 
 /**
  * @brief XWMM API：申请内核内存
- * @param size: (I) 大小
- * @param aligned: (I) 申请到的内存的首地址需要对齐到的边界
- * @param membuf: (O) 指向指针缓存的指针，此指针缓存用于返回申请到的内存的首地址
+ * @param[in] size: 大小
+ * @param[in] aligned: 申请到的内存的首地址需要对齐到的边界
+ * @param[out] membuf: 指向指针缓存的指针，此指针缓存用于返回申请到的内存的首地址
  * @return 错误码
  * @retval -EFAULT: 空指针
  * @retval -EINVAL: 参数无效
@@ -138,7 +138,7 @@ xwer_t xwmm_kma_alloc(xwsz_t size, xwsz_t aligned, void ** membuf)
 
 /**
  * @brief XWMM API：释放内核内存
- * @param mem: (I) 内存首地址指针
+ * @param[in] mem: 内存首地址指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针

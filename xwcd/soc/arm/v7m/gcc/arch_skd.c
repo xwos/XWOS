@@ -57,8 +57,8 @@ static __xwbsp_code
 void arch_skd_report_stk_overflow(struct xwospl_skd_stack_info * stk);
 
 /**
- * @brief ADL BSP：初始化切换上下文中断
- * @param xwskd: (I) 调度器的指针
+ * @brief 初始化切换上下文中断
+ * @param[in] xwskd: 调度器的指针
  * @return 错误码
  * @note
  * - 使用PendSV作为线程上下文切换的中断
@@ -83,9 +83,9 @@ xwer_t arch_skd_init_pendsv(struct xwospl_skd * xwskd)
 }
 
 /**
- * @brief ADL BSP：初始化调度对象的栈
- * @param stk: (I) 栈信息结构体指针
- * @param attr: (I) 调度对象属性
+ * @brief 初始化调度对象的栈
+ * @param[in] stk: 栈信息结构体指针
+ * @param[in] attr: 调度对象属性
  */
 __xwbsp_code
 void arch_skd_init_stack(struct xwospl_skd_stack_info * stk,
@@ -247,7 +247,7 @@ void arch_skd_init_stack(struct xwospl_skd_stack_info * stk,
 
 /**
  * @brief ADL ISR：启动调度器的SVC(svc 0)的处理函数
- * @param xwskd: (I) 调度器的指针
+ * @param[in] xwskd: 调度器的指针
  */
 __xwbsp_isr __xwcc_naked
 void arch_skd_svcsr_start(__xwcc_unused struct xwospl_skd * xwskd)
@@ -282,9 +282,7 @@ void arch_skd_svcsr_start(__xwcc_unused struct xwospl_skd * xwskd)
 }
 
 /**
- * @brief ADL ISR：切换上下文的中断(PendSV)的处理函数
- * @note
- * - 此中断为系统中最低优先级的中断。
+ * @brief 切换上下文的中断(PendSV)的处理函数
  */
 __xwbsp_isr __xwcc_naked
 void xwospl_skd_isr_swcx(void)
@@ -351,50 +349,41 @@ void xwospl_skd_isr_swcx(void)
 }
 
 /**
- * @brief ADL BSP：切换线程上下文时检查线程的栈溢出
+ * @brief 切换线程上下文时检查线程的栈溢出
  * @return 调度器的指针
  */
 __xwbsp_code
 struct xwospl_skd * arch_skd_chk_swcx(void)
 {
-#if defined(XWMMCFG_STACK_CHK_SWCX) && (1 == XWMMCFG_STACK_CHK_SWCX)
         struct xwospl_skd * xwskd;
-        struct xwospl_skd_stack_info * cstk;
-        union {
-                xwstk_t * ptr;
-                xwptr_t value;
-        } stk;
+#if defined(XWMMCFG_STACK_CHK_SWCX) && (1 == XWMMCFG_STACK_CHK_SWCX)
+        struct xwospl_skd_stack_info * pstk;
         xwstk_t * stkbtn;
-        xwsz_t i;
+        xwptr_t psp;
 
         xwskd = xwosplcb_skd_get_lc();
-        cstk = xwskd->cstk;
-        stkbtn = (xwstk_t *)cstk->base;
-        stk.ptr = cstk->sp;
+        pstk = xwskd->pstk;
+        stkbtn = (xwstk_t *)pstk->base;
+        cm_get_psp(&psp);
 #if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
-        if ((stk.value - (ARCH_NVFR_SIZE + ARCH_NVGR_SIZE)) <
+        if ((psp - (ARCH_NVFR_SIZE + ARCH_NVGR_SIZE)) <
             (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
-                arch_skd_report_stk_overflow(cstk);
+                arch_skd_report_stk_overflow(pstk);
         }
 #else /* ARCHCFG_FPU */
-        if ((stk.value - ARCH_NVGR_SIZE) <
+        if ((psp - ARCH_NVGR_SIZE) <
             (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
-                arch_skd_report_stk_overflow(cstk);
+                arch_skd_report_stk_overflow(pstk);
         }
 #endif /* !ARCHCFG_FPU */
-        for (i = 0; i < XWOSPL_STACK_WATERMARK; i++) {
-                if (0xFFFFFFFFU != stkbtn[i]) {
-                        arch_skd_report_stk_overflow(cstk);
-                }
-        }
-        return xwskd;
 #else /* XWMMCFG_STACK_CHK_SWCX */
-        return xwosplcb_skd_get_lc();
+        xwskd = xwosplcb_skd_get_lc();
 #endif /* !XWMMCFG_STACK_CHK_SWCX */
+        return xwskd;
 }
 
 /**
- * @brief ADL BSP：异常时检查当前线程的栈溢出
+ * @brief 异常时检查当前线程的栈溢出
  * @return 调度器的指针
  */
 __xwbsp_code
@@ -434,7 +423,7 @@ struct xwospl_skd * arch_skd_chk_stk(void)
 
 /**
  * @brief 报告栈溢出
- * @param stk: (I) 溢出的栈
+ * @param[in] stk: 溢出的栈
  */
 static __xwbsp_code
 void arch_skd_report_stk_overflow(struct xwospl_skd_stack_info * stk)

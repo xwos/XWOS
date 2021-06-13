@@ -68,8 +68,8 @@ __xwbsp_data struct e200x_context soc_context = {
 };
 
 /**
- * @brief SOC Adaptation Function：初始化调度调度器
- * @param xwskd: (I) 调度器的指针
+ * @brief 初始化调度调度器
+ * @param[in] xwskd: 调度器的指针
  * @return 错误码
  */
 __xwbsp_init_code
@@ -93,7 +93,7 @@ xwer_t xwospl_skd_init(struct xwospl_skd * xwskd)
 }
 
 /**
- * @brief 玄武OS内核调度器适配函数：获取当前CPU的ID
+ * @brief 获取当前CPU的ID
  */
 __xwbsp_code
 xwid_t xwospl_skd_id_lc(void)
@@ -102,9 +102,9 @@ xwid_t xwospl_skd_id_lc(void)
 }
 
 /**
- * @brief SOC Adaptation Function：初始化调度对象的栈
- * @param stk: (I) 栈信息结构体指针
- * @param attr: (I) 调度对象属性
+ * @brief 初始化调度对象的栈
+ * @param[in] stk: 栈信息结构体指针
+ * @param[in] attr: 调度对象属性
  */
 __xwbsp_code
 void xwospl_skd_init_stack(struct xwospl_skd_stack_info * stk,
@@ -225,8 +225,8 @@ void xwospl_skd_init_stack(struct xwospl_skd_stack_info * stk,
 }
 
 /**
- * @brief SOC Adaptation Function：触发切换上下文的软中断
- * @param xwskd: (I) XWOS调度器的指针
+ * @brief 触发切换上下文的软中断
+ * @param[in] xwskd: XWOS调度器的指针
  */
 __xwbsp_code
 void soc_skd_req_swcx(struct xwospl_skd * xwskd)
@@ -244,26 +244,17 @@ struct xwospl_skd * soc_skd_chk_swcx(void)
 {
 #if defined(XWMMCFG_STACK_CHK_SWCX) && (1 == XWMMCFG_STACK_CHK_SWCX)
         struct xwospl_skd * xwskd;
-        struct xwospl_skd_stack_info * cstk;
-        union {
-                xwstk_t * ptr;
-                xwptr_t value;
-        } stk;
+        struct xwospl_skd_stack_info * pstk;
         xwstk_t * stkbtn;
-        xwsz_t i;
+        xwptr_t sp;
 
         xwskd = xwosplcb_skd_get_lc();
-        cstk = xwskd->cstk;
-        stkbtn = (xwstk_t *)cstk->base;
-        stk.ptr = cstk->sp;
-        if ((stk.value - SOC_STKFRAME_SIZE) <
+        pstk = xwskd->pstk;
+        stkbtn = (xwstk_t *)pstk->base;
+        sp = (xwptr_t)soc_context.thd_sp;
+        if ((sp - SOC_STKFRAME_SIZE) <
             (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
-                soc_skd_report_stk_overflow(cstk);
-        }
-        for (i = 0; i < XWOSPL_STACK_WATERMARK; i++) {
-                if (0xFFFFFFFFU != stkbtn[i]) {
-                        soc_skd_report_stk_overflow(cstk);
-                }
+                soc_skd_report_stk_overflow(pstk);
         }
         return xwskd;
 #else /* XWMMCFG_STACK_CHK_SWCX */
@@ -280,18 +271,15 @@ struct xwospl_skd * soc_skd_chk_stk(void)
 {
         struct xwospl_skd * xwskd;
         struct xwospl_skd_stack_info * cstk;
-        union {
-                xwstk_t * ptr;
-                xwptr_t value;
-        } stk;
         xwstk_t * stkbtn;
+        xwptr_t sp;
         xwsz_t i;
 
         xwskd = xwosplcb_skd_get_lc();
         cstk = xwskd->cstk;
         stkbtn = (xwstk_t *)cstk->base;
-        stk.ptr = soc_context.thd_sp;
-        if ((stk.value - SOC_STKFRAME_SIZE) <
+        sp = (xwptr_t)soc_context.thd_sp;
+        if ((sp - SOC_STKFRAME_SIZE) <
             (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
                 soc_skd_report_stk_overflow(cstk);
         }
@@ -305,7 +293,7 @@ struct xwospl_skd * soc_skd_chk_stk(void)
 
 /**
  * @brief 报告栈溢出
- * @param stk: (I) 溢出的栈
+ * @param[in] stk: 溢出的栈
  */
 static __xwbsp_code
 void soc_skd_report_stk_overflow(struct xwospl_skd_stack_info * stk)
@@ -315,8 +303,8 @@ void soc_skd_report_stk_overflow(struct xwospl_skd_stack_info * stk)
 }
 
 /**
- * @brief 玄武OS内核调度器适配函数：暂停调度器
- * @param xwskd: (I) 调度器的指针
+ * @brief 暂停调度器
+ * @param[in] xwskd: 调度器的指针
  * @return 错误码
  */
 __xwbsp_code
@@ -330,8 +318,8 @@ xwer_t xwospl_skd_suspend(struct xwospl_skd * xwskd)
 }
 
 /**
- * @brief 玄武OS内核调度器适配函数：继续调度器
- * @param xwskd: (I) 调度器的指针
+ * @brief 继续调度器
+ * @param[in] xwskd: 调度器的指针
  * @return 错误码
  */
 __xwbsp_code
@@ -345,9 +333,9 @@ xwer_t xwospl_skd_resume(struct xwospl_skd * xwskd)
 }
 
 /**
- * @brief 玄武OS内核调度器适配函数：本地CPU上的线程退出
- * @param thd: (I) 线程控制块对象的指针
- * @param rc: (I) 线程退出抛出的返回值
+ * @brief 本地CPU上的线程退出
+ * @param[in] thd: 线程控制块对象的指针
+ * @param[in] rc: 线程退出抛出的返回值
  */
 __xwbsp_code
 void xwospl_thd_exit_lc(struct xwospl_thd * thd, xwer_t rc)
@@ -359,8 +347,8 @@ void xwospl_thd_exit_lc(struct xwospl_thd * thd, xwer_t rc)
 }
 
 /**
- * @brief 玄武OS内核调度器适配函数：冻结本地CPU中正在运行的线程
- * @param thd: (I) 线程控制块对象的指针
+ * @brief 冻结本地CPU中正在运行的线程
+ * @param[in] thd: 线程控制块对象的指针
  */
 __xwbsp_code
 xwer_t xwospl_thd_freeze_lc(struct xwospl_thd * thd)
@@ -374,9 +362,9 @@ xwer_t xwospl_thd_freeze_lc(struct xwospl_thd * thd)
 
 #if defined(XuanWuOS_CFG_CORE__mp)
 /**
- * @brief 玄武OS内核调度器适配函数：将线程迁出其他CPU，并准备迁入其他CPU
- * @param thd: (I) 线程控制块对象的指针
- * @param cpuid: (I) 目的地CPU的ID
+ * @brief 将线程迁出其他CPU，并准备迁入其他CPU
+ * @param[in] thd: 线程控制块对象的指针
+ * @param[in] cpuid: 目的地CPU的ID
  * @return 错误码
  */
 __xwbsp_code
@@ -390,9 +378,9 @@ xwer_t xwospl_thd_outmigrate(struct xwospl_thd * thd, xwid_t cpuid)
 }
 
 /**
- * @brief 玄武OS内核调度器适配函数：迁移线程至目标CPU
- * @param thd: (I) 线程控制块对象的指针
- * @param cpuid: (I) 目的地CPU的ID
+ * @brief 迁移线程至目标CPU
+ * @param[in] thd: 线程控制块对象的指针
+ * @param[in] cpuid: 目的地CPU的ID
  */
 __xwbsp_code
 void xwospl_thd_immigrate(struct xwospl_thd * thd, xwid_t cpuid)

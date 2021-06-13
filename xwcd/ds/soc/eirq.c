@@ -24,13 +24,13 @@
 
 /**
  * @brief XWDS API：申请外部中断
- * @param soc: (I) SOC对象指针
- * @param port: (I) GPIO端口
- * @param pinmask: (I) GPIO PIN
- * @param eiid: (I) 外部中断ID
- * @param eiflag: (I) 触发标志
- * @param isr: (I) 中断响应函数
- * @param arg: (I) 中断响应函数参数
+ * @param[in] soc: SOC对象指针
+ * @param[in] port: GPIO端口
+ * @param[in] pinmask: GPIO PIN
+ * @param[in] eiid: 外部中断ID
+ * @param[in] eiflag: 触发标志
+ * @param[in] isr: 中断响应函数
+ * @param[in] arg: 中断响应函数参数
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -96,10 +96,10 @@ err_soc_grab:
 
 /**
  * @brief XWDS API：释放外部中断
- * @param soc: (I) SOC对象指针
- * @param port: (I) GPIO端口
- * @param pinmask: (I) GPIO PIN
- * @param eiid: (I) 外部中断ID
+ * @param[in] soc: SOC对象指针
+ * @param[in] port: GPIO端口
+ * @param[in] pinmask: GPIO PIN
+ * @param[in] eiid: 外部中断ID
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针

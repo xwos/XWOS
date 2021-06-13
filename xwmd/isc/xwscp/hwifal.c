@@ -32,7 +32,7 @@ __xwmd_rodata const xwu8_t xwscp_frm_blank[] = {
 
 /**
  * @brief 打开硬件接口
- * @param xwscp: (I) XWSCP对象的指针
+ * @param[in] xwscp: XWSCP对象的指针
  * @return 错误码
  */
 __xwmd_code
@@ -62,7 +62,7 @@ err_hwifops_open:
 
 /**
  * @brief 关闭硬件接口
- * @param xwscp: (I) XWSCP对象的指针
+ * @param[in] xwscp: XWSCP对象的指针
  * @return 错误码
  */
 __xwmd_code
@@ -97,9 +97,9 @@ err_xwscp_clear_hwifst:
 
 /**
  * @brief 通过硬件接口发送数据
- * @param xwscp: (I) XWSCP对象的指针
- * @param stream: (I) 数据
- * @param size: (I) 数据长度
+ * @param[in] xwscp: XWSCP对象的指针
+ * @param[in] stream: 数据
+ * @param[in] size: 数据长度
  * @return 错误码
  */
 __xwmd_code
@@ -113,8 +113,8 @@ xwer_t xwscp_hwifal_tx(struct xwscp * xwscp, xwu8_t * stream, xwsz_t size)
 
 /**
  * @brief 通过硬件接口接收一帧
- * @param xwscp: (I) XWSCP对象的指针
- * @param slotbuf: (O) 指向缓冲区的指针，通过此缓冲区返回union xwscp_slot *
+ * @param[in] xwscp: XWSCP对象的指针
+ * @param[out] slotbuf: 指向缓冲区的指针，通过此缓冲区返回union xwscp_slot *
  * @return 错误码
  */
 __xwmd_code
@@ -263,8 +263,8 @@ err_sof_ifrx:
 
 /**
  * @brief 通知协议层的事件到硬件接口层
- * @param xwscp: (I) XWSCP对象的指针
- * @param evt: (I) 事件
+ * @param[in] xwscp: XWSCP对象的指针
+ * @param[in] evt: 事件
  */
 __xwmd_code
 void xwscp_hwifal_notify(struct xwscp * xwscp, xwsq_t evt)

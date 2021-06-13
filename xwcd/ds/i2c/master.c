@@ -57,7 +57,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_i2cm_vop = {
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：I2C主机控制器的构造函数
- * @param i2cm: (I) I2C主机控制器对象指针
+ * @param[in] i2cm: I2C主机控制器对象指针
  */
 __xwds_api
 void xwds_i2cm_construct(struct xwds_i2cm * i2cm)
@@ -68,7 +68,7 @@ void xwds_i2cm_construct(struct xwds_i2cm * i2cm)
 
 /**
  * @brief XWDS API：I2C主机控制器对象的析构函数
- * @param i2cm: (I) I2C主机控制器对象指针
+ * @param[in] i2cm: I2C主机控制器对象指针
  */
 __xwds_api
 void xwds_i2cm_destruct(struct xwds_i2cm * i2cm)
@@ -79,7 +79,7 @@ void xwds_i2cm_destruct(struct xwds_i2cm * i2cm)
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测I2C主机控制器
- * @param i2cm: (I) I2C主机控制器对象指针
+ * @param[in] i2cm: I2C主机控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -113,8 +113,8 @@ err_xfer_mtx_init:
 
 /**
  * @brief XWDS VOP：移除I2C主机控制器
- * @param ds: (I) 设备栈控制块指针
- * @param i2cm: (I) I2C主机控制器对象指针
+ * @param[in] ds: 设备栈控制块指针
+ * @param[in] i2cm: I2C主机控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -136,7 +136,7 @@ err_dev_vop_remove:
 
 /**
  * @brief XWDS VOP：启动I2C主机控制器
- * @param i2cm: (I) I2C主机控制器对象指针
+ * @param[in] i2cm: I2C主机控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -150,7 +150,7 @@ xwer_t xwds_i2cm_vop_start(struct xwds_i2cm * i2cm)
 
 /**
  * @brief XWDS VOP：停止I2C主机控制器
- * @param i2cm: (I) I2C主机控制器对象指针
+ * @param[in] i2cm: I2C主机控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -166,7 +166,7 @@ xwer_t xwds_i2cm_vop_stop(struct xwds_i2cm * i2cm)
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 /**
  * @brief XWDS VOP：暂停I2C主机控制器
- * @param i2cm: (I) I2C主机控制器对象指针
+ * @param[in] i2cm: I2C主机控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -180,7 +180,7 @@ xwer_t xwds_i2cm_vop_suspend(struct xwds_i2cm * i2cm)
 
 /**
  * @brief XWDS VOP：继续I2C主机控制器
- * @param i2cm: (I) I2C主机控制器对象指针
+ * @param[in] i2cm: I2C主机控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -196,11 +196,11 @@ xwer_t xwds_i2cm_vop_resume(struct xwds_i2cm * i2cm)
 /******** ******** ******** APIs ******** ******** ********/
 /**
  * @brief XWDS API：传输I2C消息
- * @param i2cm: (I) I2C主机控制器对象指针
- * @param msg: (I) I2C消息结构体的指针
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] i2cm: I2C主机控制器对象指针
+ * @param[in] msg: I2C消息结构体的指针
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 设备对象不可引用
@@ -255,14 +255,14 @@ err_i2cm_grab:
 
 /**
  * @brief XWDS API：中止I2C总线传输
- * @param i2cm: (I) I2C主机控制器对象指针
- * @param address: (I) I2C地址
- * @param addrmode: (I) I2C地址模式，取值：
- *                      @ref XWDS_I2C_F_7BITADDR 7位地址模式
- *                      @ref XWDS_I2C_F_10BITADDR 10位地址模式
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] i2cm: I2C主机控制器对象指针
+ * @param[in] address: I2C地址
+ * @param[in] addrmode: I2C地址模式，取值：
+ *   @arg XWDS_I2C_F_7BITADDR 7位地址模式
+ *   @arg XWDS_I2C_F_10BITADDR 10位地址模式
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 设备对象不可引用

@@ -185,7 +185,7 @@ void xwds_w25qxx_destruct(struct xwds_w25qxx * w25qxx);
 
 /**
  * @brief W25QXX API：增加对象的引用计数
- * @param w25qxx: (I) W25QXX Flash 设备指针
+ * @param[in] w25qxx: W25QXX Flash 设备指针
  * @return 错误码
  * @retval @ref xwds_spip_grab()
  */
@@ -197,7 +197,7 @@ xwer_t xwds_w25qxx_grab(struct xwds_w25qxx * w25qxx)
 
 /**
  * @brief W25QXX API：减少对象的引用计数
- * @param w25qxx: (I) W25QXX Flash 设备指针
+ * @param[in] w25qxx: W25QXX Flash 设备指针
  * @return 错误码
  * @retval @ref xwds_spip_put()
  */

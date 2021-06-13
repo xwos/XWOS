@@ -18,6 +18,12 @@
 #include <xwos/lib/rbtree.h>
 #include <xwos/osal/lock/seqlock.h>
 #include <xwos/mm/common.h>
+
+/**
+ * @defgroup xwmm_mempool 内存池分配器
+ * @{
+ */
+
 #include <xwos/mm/mempool/i_allocator.h>
 
 #define XWMM_MEMPOOL_PAGE_ORDER_CMB             (XWSQ_MAX)
@@ -96,5 +102,9 @@ xwer_t xwmm_mempool_page_allocate(struct xwmm_mempool_page_allocator * pa,
                                   struct xwmm_mempool_page ** pgbuf);
 xwer_t xwmm_mempool_page_free(struct xwmm_mempool_page_allocator * pa,
                               struct xwmm_mempool_page * pg);
+
+/**
+ * @} xwmm_mempool
+ */
 
 #endif /* xwos/mm/mempool/page.h */

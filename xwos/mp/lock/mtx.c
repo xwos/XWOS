@@ -90,8 +90,8 @@ const __xwmp_rodata char xwmp_mtx_cache_name[] = "xwos.mp.lk.mtx.cache";
 #if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
 /**
  * @brief XWMP INIT CODE：初始化结构体xwmp_mtx的对象缓存
- * @param zone_origin: (I) 内存区域的首地址
- * @param zone_size: (I) 内存区域的大小
+ * @param[in] zone_origin: 内存区域的首地址
+ * @param[in] zone_size: 内存区域的大小
  * @return 错误码
  * @note
  * - 只可在系统初始化时使用一次
@@ -156,7 +156,7 @@ struct xwmp_mtx * xwmp_mtx_alloc(void)
 
 /**
  * @brief 释放互斥锁对象
- * @param mtx: (I) 互斥锁对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
  */
 static __xwmp_code
 void xwmp_mtx_free(struct xwmp_mtx * mtx)
@@ -174,7 +174,7 @@ void xwmp_mtx_free(struct xwmp_mtx * mtx)
 
 /**
  * @brief 互斥锁对象的构造函数
- * @param mtx: (I) 互斥锁对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
  */
 static __xwmp_code
 void xwmp_mtx_construct(struct xwmp_mtx * mtx)
@@ -184,7 +184,7 @@ void xwmp_mtx_construct(struct xwmp_mtx * mtx)
 
 /**
  * @brief 互斥锁对象的析构函数
- * @param mtx: (I) 互斥锁对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
  */
 static __xwmp_code
 void xwmp_mtx_destruct(struct xwmp_mtx * mtx)
@@ -194,7 +194,7 @@ void xwmp_mtx_destruct(struct xwmp_mtx * mtx)
 
 /**
  * @brief 互斥锁对象的垃圾回收函数
- * @param mtx: (I) 互斥锁对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
  * @return 错误码
  */
 static __xwmp_code
@@ -204,16 +204,6 @@ xwer_t xwmp_mtx_gc(void * mtx)
         return XWOK;
 }
 
-/**
- * @brief XWMP API：检查互斥锁对象的标签并增加引用计数
- * @param mtx: (I) 互斥锁对象指针
- * @param tik: (I) 标签
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_mtx_acquire(struct xwmp_mtx * mtx, xwsq_t tik)
 {
@@ -221,16 +211,6 @@ xwer_t xwmp_mtx_acquire(struct xwmp_mtx * mtx, xwsq_t tik)
         return xwos_object_acquire(&mtx->xwobj, tik);
 }
 
-/**
- * @brief XWMP API：检查互斥锁对象的标签并增加引用计数
- * @param mtx: (I) 互斥锁对象指针
- * @param tik: (I) 标签
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_mtx_release(struct xwmp_mtx * mtx, xwsq_t tik)
 {
@@ -238,15 +218,6 @@ xwer_t xwmp_mtx_release(struct xwmp_mtx * mtx, xwsq_t tik)
         return xwos_object_release(&mtx->xwobj, tik);
 }
 
-/**
- * @brief XWMP API：增加互斥锁对象的引用计数
- * @param mtx: (I) 互斥锁对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_mtx_grab(struct xwmp_mtx * mtx)
 {
@@ -254,15 +225,6 @@ xwer_t xwmp_mtx_grab(struct xwmp_mtx * mtx)
         return xwos_object_grab(&mtx->xwobj);
 }
 
-/**
- * @brief XWMP API：减少互斥锁对象的引用计数
- * @param mtx: (I) 互斥锁对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_mtx_put(struct xwmp_mtx * mtx)
 {
@@ -272,9 +234,9 @@ xwer_t xwmp_mtx_put(struct xwmp_mtx * mtx)
 
 /**
  * @brief 激活互斥锁对象，并初始化
- * @param mtx: (I) 互斥锁对象的指针
- * @param sprio: (I) 互斥锁的静态优先级
- * @param gcfunc: (I) 垃圾回收函数的指针
+ * @param[in] mtx: 互斥锁对象的指针
+ * @param[in] sprio: 互斥锁的静态优先级
+ * @param[in] gcfunc: 垃圾回收函数的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 无效参数
@@ -307,19 +269,6 @@ xwer_t xwmp_mtx_activate(struct xwmp_mtx * mtx, xwpr_t sprio,
         return rc;
 }
 
-/**
- * @brief XWMP API：静态初始化互斥锁对象
- * @param mtx: (I) 互斥锁对象的指针
- * @param sprio: (I) 互斥锁的静态优先级
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINVAL: 无效参数
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个互斥锁对象，不可重入
- */
 __xwmp_api
 xwer_t xwmp_mtx_init(struct xwmp_mtx * mtx, xwpr_t sprio)
 {
@@ -329,17 +278,6 @@ xwer_t xwmp_mtx_init(struct xwmp_mtx * mtx, xwpr_t sprio)
         return xwmp_mtx_activate(mtx, sprio, NULL);
 }
 
-/**
- * @brief XWMP API：销毁静态初始化的互斥锁对象
- * @param mtx: (I) 互斥锁对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个互斥锁对象，不可重入
- */
 __xwmp_api
 xwer_t xwmp_mtx_destroy(struct xwmp_mtx * mtx)
 {
@@ -348,20 +286,6 @@ xwer_t xwmp_mtx_destroy(struct xwmp_mtx * mtx)
         return xwmp_mtx_put(mtx);
 }
 
-/**
- * @brief XWMP API：动态创建互斥锁
- * @param ptrbuf: (O) 指向缓冲区的指针，此缓冲区用于返回对象的指针
- * @param sprio: (I) 互斥锁的静态优先级
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINVAL: 无效参数
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个互斥锁对象，不可重入
- */
 __xwmp_api
 xwer_t xwmp_mtx_create(struct xwmp_mtx ** ptrbuf, xwpr_t sprio)
 {
@@ -386,17 +310,6 @@ xwer_t xwmp_mtx_create(struct xwmp_mtx ** ptrbuf, xwpr_t sprio)
         return rc;
 }
 
-/**
- * @brief XWMP API：删除动态创建的互斥锁
- * @param mtx: (I) 互斥锁对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个互斥锁对象，不可重入
- */
 __xwmp_api
 xwer_t xwmp_mtx_delete(struct xwmp_mtx * mtx)
 {
@@ -407,11 +320,11 @@ xwer_t xwmp_mtx_delete(struct xwmp_mtx * mtx)
 
 /**
  * @brief 修改一次互斥锁的动态优先级
- * @param mtx: (I) 互斥锁对象的指针
- * @param pthd: (O) 指向缓冲区的指针，通过此缓冲区返回下一个需要修改动态优先级的
- *                  线程控制块对象的指针
- * @param pseq: (O) 指向缓冲区的指针，通过此缓冲区返回线程控制块中互斥锁树中的
- *                  顺序锁的顺序值
+ * @param[in] mtx: 互斥锁对象的指针
+ * @param[out] pthd: 指向缓冲区的指针，通过此缓冲区返回下一个需要修改动态优先级的
+ *                   线程控制块对象的指针
+ * @param[out] pseq: 指向缓冲区的指针，通过此缓冲区返回线程控制块中互斥锁树中的
+ *                   顺序锁的顺序值
  * @return 错误码
  */
 static __xwmp_code
@@ -475,7 +388,7 @@ xwer_t xwmp_mtx_chprio_once(struct xwmp_mtx * mtx,
 
 /**
  * @brief 从互斥锁开始，修改互斥锁——线程链的动态优先级
- * @param mtx: (I) 互斥锁对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
  * @return 错误码
  */
 static __xwmp_code
@@ -511,8 +424,8 @@ void xwmp_mtx_chprio(struct xwmp_mtx * mtx)
 
 /**
  * @brief 中断互斥锁等待队列中的一个线程
- * @param mtx: (I) 互斥锁对象的指针
- * @param thd: (I) 线程控制块对象的指针
+ * @param[in] mtx: 互斥锁对象的指针
+ * @param[in] thd: 线程控制块对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @note
@@ -558,19 +471,6 @@ xwer_t xwmp_mtx_intr(struct xwmp_mtx * mtx, struct xwmp_thd * thd)
         return rc;
 }
 
-/**
- * @brief XWMP API：解锁互斥锁
- * @param mtx: (I) 互斥锁对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EOWNER: 线程并没有锁定此互斥锁
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- */
 __xwmp_api
 xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx)
 {
@@ -670,19 +570,6 @@ xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx)
         return rc;
 }
 
-/**
- * @brief XWMP API：等待上锁互斥锁
- * @param mtx: (I) 互斥锁对象指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- */
 __xwmp_inline_api
 xwer_t xwmp_mtx_lock(struct xwmp_mtx * mtx)
 {
@@ -692,23 +579,6 @@ xwer_t xwmp_mtx_lock(struct xwmp_mtx * mtx)
         return xwmp_mtx_timedlock(mtx, &expected);
 }
 
-/**
- * @brief XWMP API：尝试上锁互斥锁，不会阻塞调用则
- * @param mtx: (I) 互斥锁对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENODATA: 获取锁失败
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- * @note
- * - 此函数虽然不会阻塞调用者，但也不可在中断上下文中使用，
- *   因为互斥锁需要记录自己的拥有者（线程控制块对象的指针），
- *   中断上下文不存在对应的线程控制块对象。
- */
 __xwmp_api
 xwer_t xwmp_mtx_trylock(struct xwmp_mtx * mtx)
 {
@@ -952,30 +822,6 @@ xwer_t xwmp_mtx_do_timedlock(struct xwmp_mtx * mtx,
         return rc;
 }
 
-/**
- * @brief XWMP API：限时等待上锁互斥锁
- * @param mtx: (I) 互斥锁对象的指针
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINTR: 等待被中断
- * @retval -ETIMEDOUT: 超时
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- * @note
- * - 如果线程没能获取互斥锁，会加入到互斥锁的等待队列中等待，
- *   等待超时后将以返回值-ETIMEDOUT返回。
- * - 指针参数xwtm有两个作用：
- *   + 调用函数时，作为输入，表示期望等待的时间；
- *   + 函数返回时，作为输出，表示期望等待时间的剩余值
- *     超时返回-ETIMEDOUT时，期望等待时间会减为0。
- */
 __xwmp_api
 xwer_t xwmp_mtx_timedlock(struct xwmp_mtx * mtx, xwtm_t * xwtm)
 {
@@ -1084,18 +930,6 @@ xwer_t xwmp_mtx_do_lock_unintr(struct xwmp_mtx * mtx, struct xwmp_thd * thd)
         return rc;
 }
 
-/**
- * @brief XWMP API：等待上锁互斥锁，且等待不可被中断
- * @param mtx: (I) 互斥锁对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- */
 __xwmp_api
 xwer_t xwmp_mtx_lock_unintr(struct xwmp_mtx * mtx)
 {
@@ -1123,18 +957,6 @@ err_mtx_grab:
         return rc;
 }
 
-/**
- * @brief XWMP API：获取锁的状态
- * @param mtx: (I) 互斥锁对象的指针
- * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_mtx_getlkst(struct xwmp_mtx * mtx, xwsq_t * lkst)
 {

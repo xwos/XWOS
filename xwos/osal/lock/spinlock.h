@@ -18,6 +18,11 @@
 #include <xwos/osal/irq.h>
 
 /**
+ * @defgroup xwos_spinlock 自旋锁
+ * @{
+ */
+
+/**
  * @brief XWOS API：自旋锁
  */
 struct xwos_splk {
@@ -26,7 +31,7 @@ struct xwos_splk {
 
 /**
  * @brief XWOS API：初始化自旋锁
- * @param spl: (I) 自旋锁的指针
+ * @param[in] spl: 自旋锁的指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -40,7 +45,7 @@ void xwos_splk_init(struct xwos_splk * spl)
 
 /**
  * @brief XWOS API：上锁自旋锁，若自旋锁已开启临界区，就自旋等待
- * @param spl: (I) 自旋锁的指针
+ * @param[in] spl: 自旋锁的指针
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -56,7 +61,7 @@ void xwos_splk_lock(struct xwos_splk * spl)
 
 /**
  * @brief XWOS API：尝试上锁自旋锁
- * @param spl: (I) 自旋锁的指针
+ * @param[in] spl: 自旋锁的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得自旋锁失败
@@ -76,7 +81,7 @@ xwer_t xwos_splk_trylock(struct xwos_splk * spl)
 
 /**
  * @brief XWOS API：解锁自旋锁
- * @param spl: (I) 自旋锁的指针
+ * @param[in] spl: 自旋锁的指针
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -90,7 +95,7 @@ void xwos_splk_unlock(struct xwos_splk * spl)
 
 /**
  * @brief XWOS API：上锁自旋锁，并关闭本地CPU的中断
- * @param spl: (I) 自旋锁的指针
+ * @param[in] spl: 自旋锁的指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -106,7 +111,7 @@ void xwos_splk_lock_cpuirq(struct xwos_splk * spl)
 
 /**
  * @brief XWOS API：尝试上锁自旋锁，并关闭本地CPU的中断
- * @param spl: (I) 自旋锁的指针
+ * @param[in] spl: 自旋锁的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得自旋锁失败
@@ -126,7 +131,7 @@ xwer_t xwos_splk_trylock_cpuirq(struct xwos_splk * spl)
 
 /**
  * @brief XWOS API：解锁自旋锁，并开启本地CPU的中断
- * @param spl: (I) 自旋锁的指针
+ * @param[in] spl: 自旋锁的指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -140,8 +145,8 @@ void xwos_splk_unlock_cpuirq(struct xwos_splk * spl)
 
 /**
  * @brief XWOS API：上锁自旋锁，保存本地CPU的中断标志并关闭
- * @param spl: (I) 自旋锁的指针
- * @param cpuirq: (O) 缓冲区指针，用于返回本地CPU的中断标志
+ * @param[in] spl: 自旋锁的指针
+ * @param[out] cpuirq: 缓冲区指针，用于返回本地CPU的中断标志
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -157,8 +162,8 @@ void xwos_splk_lock_cpuirqsv(struct xwos_splk * spl, xwreg_t * cpuirq)
 
 /**
  * @brief XWOS API：尝试上锁自旋锁，保存本地CPU的中断标志并关闭
- * @param spl: (I) 自旋锁的指针
- * @param cpuirq: (O) 缓冲区指针，用于返回本地CPU的中断标志
+ * @param[in] spl: 自旋锁的指针
+ * @param[out] cpuirq: 缓冲区指针，用于返回本地CPU的中断标志
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得自旋锁失败
@@ -178,8 +183,8 @@ xwer_t xwos_splk_trylock_cpuirqsv(struct xwos_splk * spl, xwreg_t * cpuirq)
 
 /**
  * @brief XWOS API：解锁自旋锁，并恢复本地CPU的中断标志
- * @param spl: (I) 自旋锁的指针
- * @param cpuirq: (I) 本地CPU的中断标志
+ * @param[in] spl: 自旋锁的指针
+ * @param[in] cpuirq: 本地CPU的中断标志
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -193,9 +198,9 @@ void xwos_splk_unlock_cpuirqrs(struct xwos_splk * spl, xwreg_t cpuirq)
 
 /**
  * @brief XWOS API：上锁自旋锁，并关闭部分外部中断
- * @param spl: (I) 自旋锁的指针
- * @param irqs: (I) 外部中断资源数组指针
- * @param num: (I) 数组中元素数量
+ * @param[in] spl: 自旋锁的指针
+ * @param[in] irqs: 外部中断资源数组指针
+ * @param[in] num: 数组中元素数量
  * @note
  * - 同步/异步：同步
  * - 上下文：中断资源数组中描述的中断、线程
@@ -214,9 +219,9 @@ void xwos_splk_lock_irqs(struct xwos_splk * spl,
 
 /**
  * @brief XWOS API：尝试上锁自旋锁，并关闭部分外部中断
- * @param spl: (I) 自旋锁的指针
- * @param irqs: (I) 外部中断资源数组指针
- * @param num: (I) 数组中元素数量
+ * @param[in] spl: 自旋锁的指针
+ * @param[in] irqs: 外部中断资源数组指针
+ * @param[in] num: 数组中元素数量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得自旋锁失败
@@ -239,9 +244,9 @@ xwer_t xwos_splk_trylock_irqs(struct xwos_splk * spl,
 
 /**
  * @brief XWOS API：解锁自旋锁，并开启部分外部中断
- * @param spl: (I) 自旋锁的指针
- * @param irqs: (I) 外部中断资源数组指针
- * @param num: (I) 数组中元素数量
+ * @param[in] spl: 自旋锁的指针
+ * @param[in] irqs: 外部中断资源数组指针
+ * @param[in] num: 数组中元素数量
  * @note
  * - 同步/异步：同步
  * - 上下文：中断资源数组中描述的中断、线程
@@ -257,10 +262,10 @@ void xwos_splk_unlock_irqs(struct xwos_splk * spl,
 
 /**
  * @brief XWOS API：上锁自旋锁，保存部分外部中断的中断标志并关闭
- * @param spl: (I) 自旋锁的指针
- * @param irqs: (I) 外部中断资源数组指针
- * @param flags: (O) 缓冲区指针，用于返回部分外部中断的中断标志
- * @param num: (I) 数组中元素数量
+ * @param[in] spl: 自旋锁的指针
+ * @param[in] irqs: 外部中断资源数组指针
+ * @param[out] flags: 缓冲区指针，用于返回部分外部中断的中断标志
+ * @param[in] num: 数组中元素数量
  * @note
  * - 同步/异步：同步
  * - 上下文：中断资源数组中描述的中断、线程
@@ -279,10 +284,10 @@ void xwos_splk_lock_irqssv(struct xwos_splk * spl,
 
 /**
  * @brief XWOS API：尝试上锁自旋锁，保存部分外部中断的中断标志并关闭
- * @param spl: (I) 自旋锁的指针
- * @param irqs: (I) 外部中断资源数组指针
- * @param flags: (O) 缓冲区指针，用于返回部分外部中断的中断标志
- * @param num: (I) 数组中元素数量
+ * @param[in] spl: 自旋锁的指针
+ * @param[in] irqs: 外部中断资源数组指针
+ * @param[out] flags: 缓冲区指针，用于返回部分外部中断的中断标志
+ * @param[in] num: 数组中元素数量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得自旋锁失败
@@ -305,10 +310,10 @@ xwer_t xwos_splk_trylock_irqssv(struct xwos_splk * spl,
 
 /**
  * @brief XWOS API：解锁自旋锁，并恢复部分外部中断的中断标志
- * @param spl: (I) 自旋锁的指针
- * @param irqs: (I) 外部中断资源数组指针
- * @param flags: (I) 部分外部中断的中断标志数组
- * @param num: (I) 数组中元素数量
+ * @param[in] spl: 自旋锁的指针
+ * @param[in] irqs: 外部中断资源数组指针
+ * @param[in] flags: 部分外部中断的中断标志数组
+ * @param[in] num: 数组中元素数量
  * @note
  * - 同步/异步：同步
  * - 上下文：中断资源数组中描述的中断、线程
@@ -324,7 +329,7 @@ void xwos_splk_unlock_irqsrs(struct xwos_splk * spl,
 
 /**
  * @brief XWOS API：上锁自旋锁，关闭本地CPU的中断底半部
- * @param spl: (I) 自旋锁的指针
+ * @param[in] spl: 自旋锁的指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断底半部、线程
@@ -341,7 +346,7 @@ void xwos_splk_lock_bh(struct xwos_splk * spl)
 
 /**
  * @brief XWOS API：尝试上锁自旋锁，关闭本地CPU的中断底半部
- * @param spl: (I) 自旋锁的指针
+ * @param[in] spl: 自旋锁的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EAGAIN: 获得自旋锁失败
@@ -362,7 +367,7 @@ xwer_t xwos_splk_trylock_bh(struct xwos_splk * spl)
 
 /**
  * @brief XWOS API：解锁自旋锁，开启本地CPU的中断底半部
- * @param spl: (I) 自旋锁的指针
+ * @param[in] spl: 自旋锁的指针
  * @note
  * - 同步/异步：同步
  * - 上下文：中断底半部、线程
@@ -373,5 +378,9 @@ void xwos_splk_unlock_bh(struct xwos_splk * spl)
 {
         xwosdl_splk_unlock_bh(&spl->osspl);
 }
+
+/**
+ * @} xwos_spinlock
+ */
 
 #endif /* xwos/osal/lock/spinlock.h */

@@ -8,19 +8,23 @@
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * @note
- * > 红黑树性质:
- * > 1. 节点不是红色就是黑色；
- * > 2. 根节点是黑色；
- * > 3. 所有的叶子都是黑色；
- * > 4. 每个红色的节点，如果有子节点，必须是黑色；
- * > 5. 从任意节点到其任意子树的叶子的路径上，所包含的黑色节点数量相同。
  */
 
 #ifndef __xwos_lib_rbtree_h__
 #define __xwos_lib_rbtree_h__
 
 #include <xwos/standard.h>
+
+/**
+ * @defgroup rbtree 红黑树
+ * ## 红黑树性质
+ * -   1. 节点不是红色就是黑色；
+ * -   2. 根节点是黑色；
+ * -   3. 所有的叶子都是黑色；
+ * -   4. 每个红色的节点，如果有子节点，必须是黑色；
+ * -   5. 从任意节点到其任意子树的叶子的路径上，所包含的黑色节点数量相同。
+ * @{
+ */
 
 /**
  * @brief 红黑树节点位置枚举
@@ -67,7 +71,7 @@ struct __xwcc_alignptr xwlib_rbtree {
 
 /**
  * @brief 初始化红黑树
- * @param rbt: (I) 红黑树指针
+ * @param[in] rbt: 红黑树指针
  */
 static __xwlib_inline
 void xwlib_rbtree_init(struct xwlib_rbtree * rbt)
@@ -77,7 +81,7 @@ void xwlib_rbtree_init(struct xwlib_rbtree * rbt)
 
 /**
  * @brief 初始化红黑树节点
- * @param rbn: (I) 红黑树节点指针
+ * @param[in] rbn: 红黑树节点指针
  */
 static __xwlib_inline
 void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
@@ -89,7 +93,7 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
 
 /**
  * @brief 获取lpc信息中的link指针
- * @param lpc: (I) 链指针，位置，颜色的合并值
+ * @param[in] lpc: 链指针，位置，颜色的合并值
  * @return 链指针
  */
 #define xwlib_rbtree_get_link(lpc) \
@@ -97,21 +101,21 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
 
 /**
  * @brief 获取lpc信息中的link指针和位置信息（屏蔽颜色信息）
- * @param lpc: (I) 链指针，位置，颜色的合并值
+ * @param[in] lpc: 链指针，位置，颜色的合并值
  * @return 链指针和位置信息
  */
 #define xwlib_rbtree_get_lnpos(lpc)     ((xwptr_t)lpc & (~((xwptr_t)2UL)))
 
 /**
  * @brief 获取lpc信息中的位置信息
- * @param lpc: (I) 链指针，位置，颜色的合并值
+ * @param[in] lpc: 链指针，位置，颜色的合并值
  * @return 位置信息
  */
 #define xwlib_rbtree_get_pos(lpc)       ((xwptr_t)(((xwptr_t)(lpc)) & (xwptr_t)1UL))
 
 /**
  * @brief 测试当前lpc中的位置信息是否为右侧
- * @param lpc: (I) 链指针，位置，颜色的合并值
+ * @param[in] lpc: 链指针，位置，颜色的合并值
  * @return 布尔值
  * @retval true: 是
  * @retval false: 否
@@ -120,7 +124,7 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
 
 /**
  * @brief 测试当前lpc中的位置信息是否为左侧
- * @param lpc: (I) 链指针，位置，颜色的合并值
+ * @param[in] lpc: 链指针，位置，颜色的合并值
  * @return 布尔值
  * @retval true: 是
  * @retval false: 否
@@ -129,8 +133,8 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
 
 /**
  * @brief 生成节点左边的链指针、位置和颜色信息
- * @param n: (I) 父节点指针
- * @param color: (I) 颜色
+ * @param[in] n: 父节点指针
+ * @param[in] color: 颜色
  * @return 指向节点左边的链指针、位置和颜色信息
  */
 #define xwlib_rbtree_gen_lc(n, color) \
@@ -138,8 +142,8 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
 
 /**
  * @brief 生成节点右边的链指针、位置和颜色信息
- * @param n: (I) 父节点指针
- * @param color: (I) 颜色
+ * @param[in] n: 父节点指针
+ * @param[in] color: 颜色
  * @return 指向节点右边的链指针、位置和颜色信息
  */
 #define xwlib_rbtree_gen_rc(n, color) \
@@ -147,42 +151,42 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
 
 /**
  * @brief 生成节点左边的链指针、位置和红色信息
- * @param n: (I) 节点指针
+ * @param[in] n: 节点指针
  * @return 指向节点左边的链指针、位置和红色信息
  */
 #define xwlib_rbtree_gen_lr(n) xwlib_rbtree_gen_lc((n), XWLIB_RBTREE_COLOR_RED)
 
 /**
  * @brief 生成节点左边的链指针、位置和红色信息
- * @param n: (I) 节点指针
+ * @param[in] n: 节点指针
  * @return 指向节点左边的链指针、位置和黑色信息
  */
 #define xwlib_rbtree_gen_lb(n) xwlib_rbtree_gen_lc((n), XWLIB_RBTREE_COLOR_BLACK)
 
 /**
  * @brief 生成节点右边的链指针、位置和红色信息
- * @param n: (I) 节点指针
+ * @param[in] n: 节点指针
  * @return 指向节点右边的链指针、位置和红色信息
  */
 #define xwlib_rbtree_gen_rr(n) xwlib_rbtree_gen_rc((n), XWLIB_RBTREE_COLOR_RED)
 
 /**
  * @brief 生成节点右边的链指针、位置和红色信息
- * @param n: (I) 节点指针
+ * @param[in] n: 节点指针
  * @return 指向节点右边的链指针、位置和黑色信息
  */
 #define xwlib_rbtree_gen_rb(n) xwlib_rbtree_gen_rc((n), XWLIB_RBTREE_COLOR_BLACK)
 
 /**
  * @brief 获取lpc信息中的颜色信息
- * @param lpc: (I) 链指针，位置，颜色的合并值
+ * @param[in] lpc: 链指针，位置，颜色的合并值
  * @return 颜色信息
  */
 #define xwlib_rbtree_get_color(lpc)             (((xwptr_t)(lpc)) & (xwptr_t)2UL)
 
 /**
  * @brief 测试当前lpc中的颜色信息是否为黑色
- * @param lpc: (I) 链指针，位置，颜色的合并值
+ * @param[in] lpc: 链指针，位置，颜色的合并值
  * @retval true: 是
  * @retval false: 否
  */
@@ -190,7 +194,7 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
 
 /**
  * @brief 测试当前lpc中的颜色信息是否为红色
- * @param lpc: (I) 链指针，位置，颜色的合并值
+ * @param[in] lpc: 链指针，位置，颜色的合并值
  * @retval true: 是
  * @retval false: 否
  */
@@ -198,15 +202,15 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
 
 /**
  * @brief 从红黑树节点指针值计算出包含该节点成员的外层结构体的指针值
- * @param ptr: (I) 红黑树节点指针
- * @param type: (I) 外层结构体类型
- * @member: (I) 红黑树节点在外层结构体中的成员符号名(symbol)
+ * @param[in] ptr: 红黑树节点指针
+ * @param[in] type: 外层结构体类型
+ * @param[in] member: 红黑树节点在外层结构体中的成员符号名(symbol)
  */
 #define xwlib_rbtree_entry(ptr, type, member)   xwcc_baseof((ptr), type, member)
 
 /**
  * @brief 返回节点的父节点指针
- * @param node: (I) 子节点指针
+ * @param[in] node: 子节点指针
  * @return 父节点指针
  * @note
  * - left是struct @ref xwlib_rbtree_node的第一个成员。
@@ -228,7 +232,7 @@ struct xwlib_rbtree_node * xwlib_rbtree_get_parent(struct xwlib_rbtree_node * no
 
 /**
  * @brief 从lpc信息返回父节点指针
- * @param lpc: (I) 链指针，位置，颜色的合并值
+ * @param[in] lpc: 链指针，位置，颜色的合并值
  * @return 父节点指针
  */
 static __xwlib_inline
@@ -244,8 +248,8 @@ struct xwlib_rbtree_node * xwlib_rbtree_get_parent_from_lpc(xwptr_t lpc)
 
 /**
  * @brief 测试当前节点是否为根节点
- * @param rbt: (I) 红黑树指针
- * @param node: (I) 节点指针
+ * @param[in] rbt: 红黑树指针
+ * @param[in] node: 节点指针
  * @return 布尔值
  * @retval true: 是
  * @retval false: 否
@@ -262,8 +266,8 @@ bool xwlib_rbtree_tst_root(struct xwlib_rbtree * rbt,
 
 /**
  * @brief 测试是否连接到根节点
- * @param rbt: (I) 红黑树指针
- * @param link: (I) 链指针
+ * @param[in] rbt: 红黑树指针
+ * @param[in] link: 链指针
  * @return 布尔值
  * @retval true: 是
  * @retval false: 否
@@ -277,7 +281,7 @@ bool xwlib_rbtree_tst_link_root(struct xwlib_rbtree * rbt,
 
 /**
  * @brief 反转节点的颜色
- * @param node: (I) 红黑树节点指针
+ * @param[in] node: 红黑树节点指针
  */
 static __xwlib_inline
 void xwlib_rbtree_flip_color(struct xwlib_rbtree_node * node)
@@ -287,7 +291,7 @@ void xwlib_rbtree_flip_color(struct xwlib_rbtree_node * node)
 
 /**
  * @brief 将节点设为黑色
- * @param node: (I) 红黑树节点指针
+ * @param[in] node: 红黑树节点指针
  */
 static __xwlib_inline
 void xwlib_rbtree_set_black(struct xwlib_rbtree_node * node)
@@ -297,7 +301,7 @@ void xwlib_rbtree_set_black(struct xwlib_rbtree_node * node)
 
 /**
  * @brief 将节点设为红色
- * @param node: (I) 红黑树节点指针
+ * @param[in] node: 红黑树节点指针
  */
 static __xwlib_inline
 void xwlib_rbtree_set_red(struct xwlib_rbtree_node * node)
@@ -307,8 +311,8 @@ void xwlib_rbtree_set_red(struct xwlib_rbtree_node * node)
 
 /**
  * @brief 链接节点，并设置位置及颜色信息
- * @param node: (I) 被链接的节点指针
- * @param lpc: (I) 链指针，位置，颜色的合并值
+ * @param[in] node: 被链接的节点指针
+ * @param[in] lpc: 链指针，位置，颜色的合并值
  */
 static __xwlib_inline
 void xwlib_rbtree_link(struct xwlib_rbtree_node * node, xwptr_t lpc)
@@ -319,7 +323,7 @@ void xwlib_rbtree_link(struct xwlib_rbtree_node * node, xwptr_t lpc)
 
 /**
  * @brief 链接空（叶子）节点
- * @param link: (I) 链接的位置
+ * @param[in] link: 链接的位置
  */
 static __xwlib_inline
 void xwlib_rbtree_link_nil(struct xwlib_rbtree_node ** link)
@@ -329,7 +333,7 @@ void xwlib_rbtree_link_nil(struct xwlib_rbtree_node ** link)
 
 /**
  * @brief 返回节点的前趋节点
- * @param node: (I) 节点指针
+ * @param[in] node: 节点指针
  * @return 前趋节点指针
  */
 static __xwlib_inline
@@ -349,7 +353,7 @@ xwlib_rbtree_get_predecessor(struct xwlib_rbtree_node * node)
 
 /**
  * @brief 返回节点的后继节点
- * @param node: (I) 节点指针
+ * @param[in] node: 节点指针
  * @return 后继节点指针
  */
 static __xwlib_inline
@@ -370,8 +374,8 @@ xwlib_rbtree_get_successor(struct xwlib_rbtree_node * node)
 /**
  * @brief 用新节点代替旧节点并继承它的链指针、颜色和位置信息，
  *        但新节点并不接管旧节点的孩子节点
- * @param newd: (I) 新节点指针
- * @param oldn: (I) 旧节点指针
+ * @param[in] newd: 新节点指针
+ * @param[in] oldn: 旧节点指针
  */
 static __xwlib_inline
 void xwlib_rbtree_transplant(struct xwlib_rbtree_node * newn,
@@ -382,8 +386,8 @@ void xwlib_rbtree_transplant(struct xwlib_rbtree_node * newn,
 }
 
 /**
- * @brief 用叶子(NIL)替换一个旧节点。
- * @param oldn: (I) 旧节点指针
+ * @brief 用叶子(NIL)替换一个旧节点
+ * @param[in] oldn: 旧节点指针
  */
 static __xwlib_inline
 void xwlib_rbtree_transplant_nil(struct xwlib_rbtree_node * oldn)
@@ -392,8 +396,8 @@ void xwlib_rbtree_transplant_nil(struct xwlib_rbtree_node * oldn)
 }
 
 /**
- * @brief 测试一棵红黑树是否为空树。
- * @param t: (I) 红黑树指针
+ * @brief 测试一棵红黑树是否为空树
+ * @param[in] t: 红黑树指针
  * @retval false: 非空
  * @retval true: 空
  */
@@ -404,8 +408,8 @@ bool xwlib_rbtree_tst_empty(struct xwlib_rbtree * t)
 }
 
 /**
- * @brief 测试红黑树节点是否已经链接到红黑树中。
- * @param n: (I) 节点指针
+ * @brief 测试红黑树节点是否已经链接到红黑树中
+ * @param[in] n: 节点指针
  * @retval false: 已链接
  * @retval true: 未链接
  */
@@ -421,5 +425,9 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                          struct xwlib_rbtree_node * node);
 void xwlib_rbtree_replace(struct xwlib_rbtree_node * newn,
                           struct xwlib_rbtree_node * oldn);
+
+/**
+ * @} rbtree
+ */
 
 #endif /* xwos/lib/rbtree.h */

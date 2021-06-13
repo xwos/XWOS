@@ -21,9 +21,9 @@
 
 /**
  * @breif 定义循环队列缓冲区
- * @param name: (I) 变量名称
- * @param slotsize: (I) 数据槽的大小
- * @param slotnum: (I) 数据槽的个数
+ * @param[in] name: 变量名称
+ * @param[in] slotsize: 数据槽的大小
+ * @param[in] slotnum: 数据槽的个数
  */
 #define XWCQ_DEF_MEMPOOL(name, slotsize, slotnum) \
         __xwcc_alignl1cache xwu8_t name[(slotsize) * (slotnum)]

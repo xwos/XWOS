@@ -17,11 +17,20 @@
 #include <xwos/mm/common.h>
 
 /**
+ * @defgroup xwmm_mempool 内存池分配器
+ * @{
+ */
+
+/**
  * @brief interface：分配器
  */
 interface xwmm_mempool_i_allocator {
         xwer_t (* malloc)(void *, xwsz_t, void **);
         xwer_t (* free)(void *, void *);
 };
+
+/**
+ * @} xwmm_mempool
+ */
 
 #endif /* xwos/mm/mempool/i_allocator.h */

@@ -92,7 +92,7 @@ xwer_t xwds_uartc_cfg(struct xwds_uartc * uartc,
 
 /**
  * @brief XWDS API：增加对象的引用计数
- * @param uartc: (I) UART控制器对象指针
+ * @param[in] uartc: UART控制器对象指针
  * @return 错误码
  * @retval @ref xwds_device_grab()
  */
@@ -104,7 +104,7 @@ xwer_t xwds_uartc_grab(struct xwds_uartc * uartc)
 
 /**
  * @brief XWDS API：减少对象的引用计数
- * @param uartc: (I) UART控制器对象指针
+ * @param[in] uartc: UART控制器对象指针
  * @return 错误码
  * @retval @ref xwds_device_put()
  */

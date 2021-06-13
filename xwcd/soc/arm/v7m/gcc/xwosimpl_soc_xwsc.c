@@ -42,13 +42,13 @@ void soc_privilege_end(void)
 
 /**
  * @brief 以函数func作为系统调用
- * @param func: (I) 系统调用函数指针
- * @param argnum: (I) 函数参数的数量
- * @param ...: (I) 可变参数
+ * @param[in] func: 系统调用函数指针
+ * @param[in] argnum: 函数参数的数量
+ * @param[in] ...: 可变参数
  * @return 64位的有符号整数（返回值的具体意义根据具体的函数而决定）
  */
 __xwbsp_code
-xws64_t soc_xwsc(xwsc_f func, xwreg_t argnum, ...)
+xws64_t xwsc(xwsc_f func, xwreg_t argnum, ...)
 {
         xws64_t rc;
         va_list args;
@@ -79,10 +79,10 @@ xws64_t soc_xwsc(xwsc_f func, xwreg_t argnum, ...)
 
 /**
  * @brief 系统调用入口
- * @param func: (I) 系统调用函数的指针
- * @param argnum: (I) 函数参数的数量
- * @param args: (I) 可变参数
- * @param old_lr: (I) LR寄存器的原始值
+ * @param[in] func: 系统调用函数的指针
+ * @param[in] argnum: 函数参数的数量
+ * @param[in] args: 可变参数
+ * @param[in] old_lr: LR寄存器的原始值
  * @note
  * - 此函数返回时，会将r0,r1作为结果，并恢复LR寄存器的原始值。
  * - 此函数扩展了C语言的语法，在C语言中，可变参函数的参数个数在编译时就已经确定，

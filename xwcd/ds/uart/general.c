@@ -63,7 +63,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_uartc_vop = {
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：UART控制器的构造函数
- * @param uartc: (I) UART控制器对象指针
+ * @param[in] uartc: UART控制器对象指针
  */
 __xwds_api
 void xwds_uartc_construct(struct xwds_uartc * uartc)
@@ -74,7 +74,7 @@ void xwds_uartc_construct(struct xwds_uartc * uartc)
 
 /**
  * @brief XWDS API：UART控制器对象的析构函数
- * @param uartc: (I) UART控制器对象指针
+ * @param[in] uartc: UART控制器对象指针
  */
 __xwds_api
 void xwds_uartc_destruct(struct xwds_uartc * uartc)
@@ -85,7 +85,7 @@ void xwds_uartc_destruct(struct xwds_uartc * uartc)
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测UART控制器
- * @param uartc: (I) UART控制器对象指针
+ * @param[in] uartc: UART控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -137,7 +137,7 @@ err_rxsem_init:
 
 /**
  * @brief XWDS VOP：移除UART控制器
- * @param uartc: (I) UART控制器对象指针
+ * @param[in] uartc: UART控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -159,7 +159,7 @@ err_dev_vop_remove:
 
 /**
  * @brief XWDS VOP：启动UART控制器
- * @param uartc: (I) UART控制器对象指针
+ * @param[in] uartc: UART控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -203,7 +203,7 @@ err_dev_start:
 
 /**
  * @brief XWDS VOP：停止UART控制器
- * @param uartc: (I) UART控制器对象指针
+ * @param[in] uartc: UART控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -236,7 +236,7 @@ err_rxsem_freeze:
 /******** ******** pm ******** ********/
 /**
  * @brief XWDS VOP：暂停UART控制器
- * @param uartc: (I) UART控制器对象指针
+ * @param[in] uartc: UART控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -260,7 +260,7 @@ err_dev_suspend:
 
 /**
  * @brief XWDS VOP：继续UART控制器
- * @param uartc: (I) UART控制器对象指针
+ * @param[in] uartc: UART控制器对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -298,7 +298,7 @@ err_dev_resume:
 /******** ******** UART APIs ******** ********/
 /**
  * @brief XWDS API：清空接收队列
- * @param uartc: (I) UART控制器对象指针
+ * @param[in] uartc: UART控制器对象指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -343,8 +343,8 @@ err_uartc_grab:
 
 /**
  * @brief XWDS API：获取接收队列有效数据的大小
- * @param uartc: (I) UART控制器对象指针
- * @param ret: (O) 指向缓冲区的指针，通过此缓冲区返回接收队列中有效数据的大小
+ * @param[in] uartc: UART控制器对象指针
+ * @param[out] ret: 指向缓冲区的指针，通过此缓冲区返回接收队列中有效数据的大小
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -386,11 +386,11 @@ err_uartc_grab:
 
 /**
  * @brief XWDS API：从接收队列中获取一个字节的数据
- * @param uartc: (I) UART控制器对象指针
- * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] uartc: UART控制器对象指针
+ * @param[out] buf: 指向缓冲区的指针，此缓冲区被用于返回数据
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -435,8 +435,8 @@ err_uartc_grab:
 
 /**
  * @brief XWDS API：尝试从接收队列中获取一个字节的数据
- * @param uartc: (I) UART控制器对象指针
- * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
+ * @param[in] uartc: UART控制器对象指针
+ * @param[out] buf: 指向缓冲区的指针，此缓冲区被用于返回数据
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -480,14 +480,14 @@ err_uartc_grab:
 
 /**
  * @brief XWDS API：从接收队列中获取多个数据
- * @param uartc: (I) UART控制器对象指针
- * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示缓冲区大小（单位：字节）
- *              (O) 作为输出时，返回实际读取的数据大小
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] uartc: UART控制器对象指针
+ * @param[out] buf: 指向缓冲区的指针，此缓冲区被用于返回数据
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示缓冲区大小（单位：字节）
+ * + (O) 作为输出时，返回实际读取的数据大小
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -541,11 +541,11 @@ err_uartc_grab:
 
 /**
  * @brief XWDS API：尝试从接收队列中获取多个字节的数据
- * @param uartc: (I) UART控制器对象指针
- * @param buf: (O) 指向缓冲区的指针，此缓冲区被用于返回数据
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示缓冲区大小（单位：字节）
- *              (O) 作为输出时，返回实际读取的数据大小
+ * @param[in] uartc: UART控制器对象指针
+ * @param[out] buf: 指向缓冲区的指针，此缓冲区被用于返回数据
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示缓冲区大小（单位：字节）
+ * + (O) 作为输出时，返回实际读取的数据大小
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -596,7 +596,7 @@ err_uartc_grab:
 
 /**
  * @brief XWDS API：清空发送队列
- * @param uartc: (I) UART控制器对象指针
+ * @param[in] uartc: UART控制器对象指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -669,11 +669,11 @@ xwer_t xwds_uartc_tx_1byte(struct xwds_uartc * uartc, const xwu8_t byte)
 
 /**
  * @brief XWDS API：发送一个字节
- * @param uartc: (I) UART控制器对象指针
- * @param byte: (I) 待发送的数据
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] uartc: UART控制器对象指针
+ * @param[in] byte: 待发送的数据
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -719,14 +719,14 @@ err_uartc_grab:
 
 /**
  * @brief XWDS API：发送一些数据
- * @param uartc: (I) UART控制器对象指针
- * @param data: (I) 待发送的数据的缓冲区
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示待发送的数据的大小
- *              (O) 作为输出时，返回实际放入发送队列的数据的大小
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
+ * @param[in] uartc: UART控制器对象指针
+ * @param[in] data: 待发送的数据的缓冲区
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示待发送的数据的大小
+ * + (O) 作为输出时，返回实际放入发送队列的数据的大小
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -781,8 +781,8 @@ err_uartc_grab:
 
 /**
  * @brief XWDS API：配置UART
- * @param uartc: (I) UART控制器对象指针
- * @param cfg: (I) 新的配置
+ * @param[in] uartc: UART控制器对象指针
+ * @param[in] cfg: 新的配置
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -826,7 +826,7 @@ err_uartc_grab:
 /******** ******** Callbacks for BSP driver ******** ********/
 /**
  * @brief XWDS API：UART接收中断响应函数
- * @param uartc: (I) UART控制器对象指针
+ * @param[in] uartc: UART控制器对象指针
  */
 __xwds_api
 void xwds_uartc_drvcb_rx_isr(struct xwds_uartc * uartc)
@@ -865,7 +865,7 @@ err_drv_rx:
 
 /**
  * @brief XWDS API：UART发送中断响应函数
- * @param uartc: (I) UART控制器对象指针
+ * @param[in] uartc: UART控制器对象指针
  */
 __xwds_api
 void xwds_uartc_drvcb_tx_isr(struct xwds_uartc * uartc)

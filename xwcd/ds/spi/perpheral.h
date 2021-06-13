@@ -53,7 +53,7 @@ xwer_t xwds_spip_ioctl(struct xwds_spip * spip, xwsq_t cmd, ...);
 
 /**
  * @brief XWDS API：增加对象的引用计数
- * @param spip: (I) SPI外设控制器对象指针
+ * @param[in] spip: SPI外设控制器对象指针
  * @return 错误码
  * @retval @ref xwds_device_grab()
  */
@@ -65,7 +65,7 @@ xwer_t xwds_spip_grab(struct xwds_spip * spip)
 
 /**
  * @brief XWDS API：减少对象的引用计数
- * @param spip: (I) SPI外设控制器对象指针
+ * @param[in] spip: SPI外设控制器对象指针
  * @return 错误码
  * @retval @ref xwds_device_put()
  */

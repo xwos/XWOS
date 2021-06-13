@@ -15,6 +15,11 @@
 
 #include <xwos/standard.h>
 
+/**
+ * @defgroup xwmm_kma 内核内存分配器
+ * @{
+ */
+
 typedef xwer_t (*xwmm_kma_alloc_f)(xwsz_t, xwsz_t, void **);
 typedef xwer_t (*xwmm_kma_free_f)(void *);
 
@@ -22,5 +27,9 @@ xwer_t xwmm_kma_init(void);
 xwer_t xwmm_kma_exit(void);
 xwer_t xwmm_kma_alloc(xwsz_t size, xwsz_t aligned, void ** membuf);
 xwer_t xwmm_kma_free(void * mem);
+
+/**
+ * @} xwmm_kma
+ */
 
 #endif /* xwos/mm/kma.h */

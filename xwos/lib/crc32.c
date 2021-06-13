@@ -568,15 +568,15 @@ xwer_t xwlib_crc32_swcal(xwu32_t * crc32,
 
 /**
  * @brief 左移计算一段数据的CRC32校验值（直驱表法）
- * @param crc32: 指向缓冲区的指针，此缓冲区：
- *               (I) 作为输入，表示初始值
- *               (O) 作为输出，返回计算结果
- * @param refin: (I) 是否按位镜像翻转输入的每个字节(xwbop_rbit8)
- * @param table: (I) CRC32查询表
- * @param stream: (I) 指向数据的指针
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入，表示数据长度
- *              (O) 作为输出，返回剩余未计算的数据长度
+ * @param[in,out] crc32: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示初始值
+ * + (O) 作为输出时，返回计算结果
+ * @param[in] refin: 是否按位镜像翻转输入的每个字节(xwbop_rbit8)
+ * @param[in] table: CRC32查询表
+ * @param[in] stream: 指向数据的指针
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示数据长度
+ * + (O) 作为输出时，返回剩余未计算的数据长度
  */
 static __xwlib_code
 void xwlib_crc32_swcal_ls(xwu32_t * crc32,
@@ -602,15 +602,15 @@ void xwlib_crc32_swcal_ls(xwu32_t * crc32,
 
 /**
  * @brief 右移计算一段数据的CRC32校验值（直驱表法）
- * @param crc32: 指向缓冲区的指针，此缓冲区：
- *               (I) 作为输入，表示初始值
- *               (O) 作为输出，返回计算结果
- * @param refin: (I) 是否按位镜像翻转输入的每个字节(xwbop_rbit8)
- * @param table: (I) CRC32查询表
- * @param stream: (I) 指向数据的指针
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入，表示数据长度
- *              (O) 作为输出，返回剩余未计算的数据长度
+ * @param[in,out] crc32: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示初始值
+ * + (O) 作为输出时，返回计算结果
+ * @param[in] refin: 是否按位镜像翻转输入的每个字节(xwbop_rbit8)
+ * @param[in] table: CRC32查询表
+ * @param[in] stream: 指向数据的指针
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示数据长度
+ * + (O) 作为输出时，返回剩余未计算的数据长度
  */
 static __xwlib_code
 void xwlib_crc32_swcal_rs(xwu32_t * crc32,
@@ -636,16 +636,16 @@ void xwlib_crc32_swcal_rs(xwu32_t * crc32,
 
 /**
  * @brief 软件方式计算一段数据的CRC32校验值（直驱表法）
- * @param crc32: 指向缓冲区的指针，此缓冲区：
- *               (I) 作为输入，表示初始值
- *               (O) 作为输出，返回计算结果
- * @param refin: (I) 是否按位镜像翻转输入的每个字节(xwbop_rbit8)
- * @param plynml: (I) 多项式
- * @param direction: (I) 数据移位的方向
- * @param stream: (I) 指向数据的指针
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入，表示数据长度
- *              (O) 作为输出，返回剩余未计算的数据长度
+ * @param[in,out] crc32: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示初始值
+ * + (O) 作为输出时，返回计算结果
+ * @param[in] refin: 是否按位镜像翻转输入的每个字节(xwbop_rbit8)
+ * @param[in] plynml: 多项式
+ * @param[in] direction: 数据移位的方向
+ * @param[in] stream: 指向数据的指针
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示数据长度
+ * + (O) 作为输出时，返回剩余未计算的数据长度
  * @return 错误码
  * @retval XWOK: 没有错误，计算结果有效
  * @retval -EOPNOTSUPP: 不支持的多项式
@@ -697,19 +697,19 @@ xwer_t xwlib_crc32_swcal(xwu32_t * crc32,
 
 /**
  * @brief 计算一段数据的CRC32校验值
- * @param crc32: 指向缓冲区的指针，此缓冲区：
- *               (I) 作为输入，表示初始值
- *               (O) 作为输出，返回计算结果，当计算失败时，值不会发生改变
- * @param xorout: (I) 与结果异或的值
- * @param refin: (I) 是否按位镜像翻转输入的每个字节(xwbop_rbit8)
- * @param refout: (I) 是否按位镜像翻转输出(xwbop_rbit32)
- * @param plynml: (I) 多项式
- * @param direction: (I) 数据移位的方向
- * @param stream: (I) 指向数据的指针
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入，表示数据长度
- *              (O) 作为输出，返回剩余未计算的数据长度，当返回不为0时，
- *                  表示计算未完成，计算结果不会镜像翻转，也不会与xorout异或。
+ * @param[in,out] crc32: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示初始值
+ * + (O) 作为输出时，返回计算结果，当计算失败时，值不会发生改变
+ * @param[in] xorout: 与结果异或的值
+ * @param[in] refin: 是否按位镜像翻转输入的每个字节(xwbop_rbit8)
+ * @param[in] refout: 是否按位镜像翻转输出(xwbop_rbit32)
+ * @param[in] plynml: 多项式
+ * @param[in] direction: 数据移位的方向
+ * @param[in] stream: 指向数据的指针
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示数据长度
+ * + (O) 作为输出时，返回剩余未计算的数据长度，当返回不为0时，
+ *       表示计算未完成，计算结果不会镜像翻转，也不会与xorout异或。
  * @return 错误码
  * @retval XWOK: 没有错误，计算结果有效
  * @retval -EFAULT: 空指针
@@ -755,10 +755,10 @@ xwer_t xwlib_crc32_cal(xwu32_t * crc32, xwu32_t xorout,
 
 /**
  * @brief 用主流CRC32参数模型计算一段数据的CRC32校验值
- * @param stream: (I) 指向数据的指针
- * @param size: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入，表示数据长度
- *              (O) 作为输出，返回剩余未计算的数据长度
+ * @param[in] stream: 指向数据的指针
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示数据长度
+ * + (O) 作为输出时，返回剩余未计算的数据长度
  * @return CRC32
  * @note
  * + 主流CRC32参数模型：

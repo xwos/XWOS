@@ -56,7 +56,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_soc_vop = {
 /******** ******** ******** constructor & destructor ******** ******** ********/
 /**
  * @brief XWDS API：SOC构造函数
- * @param soc: (I) SOC对象指针
+ * @param[in] soc: SOC对象指针
  */
 __xwds_api
 void xwds_soc_construct(struct xwds_soc * soc)
@@ -67,7 +67,7 @@ void xwds_soc_construct(struct xwds_soc * soc)
 
 /**
  * @brief XWDS API：SOC对象的析构函数
- * @param soc: (I) SOC对象指针
+ * @param[in] soc: SOC对象指针
  */
 __xwds_api
 void xwds_soc_destruct(struct xwds_soc * soc)
@@ -78,7 +78,7 @@ void xwds_soc_destruct(struct xwds_soc * soc)
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测SOC
- * @param soc: (I) SOC对象指针
+ * @param[in] soc: SOC对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -94,7 +94,7 @@ xwer_t xwds_soc_vop_probe(struct xwds_soc * soc)
 
 /**
  * @brief XWDS VOP：移除SOC
- * @param soc: (I) SOC对象指针
+ * @param[in] soc: SOC对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -108,7 +108,7 @@ xwer_t xwds_soc_vop_remove(struct xwds_soc * soc)
 
 /**
  * @brief XWDS VOP：启动SOC
- * @param soc: (I) SOC对象指针
+ * @param[in] soc: SOC对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -122,7 +122,7 @@ xwer_t xwds_soc_vop_start(struct xwds_soc * soc)
 
 /**
  * @brief XWDS VOP：停止SOC
- * @param soc: (I) SOC对象指针
+ * @param[in] soc: SOC对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -138,7 +138,7 @@ xwer_t xwds_soc_vop_stop(struct xwds_soc * soc)
 /******** ******** pm ******** ********/
 /**
  * @brief XWDS VOP：暂停SOC
- * @param soc: (I) SOC对象指针
+ * @param[in] soc: SOC对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -152,7 +152,7 @@ xwer_t xwds_soc_vop_suspend(struct xwds_soc * soc)
 
 /**
  * @brief XWDS VOP：继续SOC
- * @param soc: (I) SOC对象指针
+ * @param[in] soc: SOC对象指针
  * @return 错误码
  */
 static __xwds_vop
@@ -168,9 +168,9 @@ xwer_t xwds_soc_vop_resume(struct xwds_soc * soc)
 /******** ******** ******** APIs ******** ******** ********/
 /**
  * @brief XWDS API：SOC输入、输出、控制
- * @param soc: (I) SOC对象指针
- * @param cmd: (I) 命令
- * @param ...: (I) 参数表
+ * @param[in] soc: SOC对象指针
+ * @param[in] cmd: 命令
+ * @param[in] ...: 参数表
  * @return 错误码
  * @note
  * - 同步/异步：依赖于CMD的实现

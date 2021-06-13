@@ -19,6 +19,11 @@
 #include <xwos/osal/lock/mtx.h>
 
 /**
+ * @defgroup xwos_cond 条件量
+ * @{
+ */
+
+/**
  * @brief XWOS API：条件量对象
  */
 struct xwos_cond {
@@ -40,7 +45,7 @@ typedef struct {
 
 /**
  * @brief XWOS API：静态方式初始化条件量对象
- * @param cond: (I) 条件量对象的指针
+ * @param[in] cond: 条件量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -57,7 +62,7 @@ xwer_t xwos_cond_init(struct xwos_cond * cond)
 
 /**
  * @brief XWOS API：销毁静态方式初始化的条件量对象
- * @param cond: (I) 条件量对象的指针
+ * @param[in] cond: 条件量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -74,7 +79,7 @@ xwer_t xwos_cond_destroy(struct xwos_cond * cond)
 
 /**
  * @brief XWOS API：动态方式创建条件量对象
- * @param condbuf: (O) 指向缓冲区的指针，通过此缓冲区返回条件量对象的指针
+ * @param[out] condbuf: 指向缓冲区的指针，通过此缓冲区返回条件量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -91,7 +96,7 @@ xwer_t xwos_cond_create(struct xwos_cond ** condbuf)
 
 /**
  * @brief XWOS API：删除动态方式创建的条件量对象
- * @param cond: (I) 条件量对象的指针
+ * @param[in] cond: 条件量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -108,7 +113,7 @@ xwer_t xwos_cond_delete(struct xwos_cond * cond)
 
 /**
  * @brief XWOS API：获取条件量对象的标签
- * @param cond: (I) 条件量对象的指针
+ * @param[in] cond: 条件量对象的指针
  * @return 条件量对象的标签
  * @note
  * - 同步/异步：同步
@@ -123,7 +128,7 @@ xwsq_t xwos_cond_gettik(struct xwos_cond * cond)
 
 /**
  * @brief XWOS API：获取条件量对象的描述符
- * @param cond: (I) 条件量对象的指针
+ * @param[in] cond: 条件量对象的指针
  * @return 条件量对象的描述符
  * @note
  * - 同步/异步：同步
@@ -142,7 +147,7 @@ xwos_cond_d xwos_cond_getd(struct xwos_cond * cond)
 
 /**
  * @brief XWOS API：检查条件量对象的标签并增加引用计数
- * @param condd: (I) 条件量对象的描述符
+ * @param[in] condd: 条件量对象的描述符
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -160,7 +165,7 @@ xwer_t xwos_cond_acquire(xwos_cond_d condd)
 
 /**
  * @brief XWOS API：检查对象的标签并减少引用计数
- * @param condd: (I) 条件量对象的描述符
+ * @param[in] condd: 条件量对象的描述符
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -178,7 +183,7 @@ xwer_t xwos_cond_release(xwos_cond_d condd)
 
 /**
  * @brief XWOS API：增加条件量对象的引用计数
- * @param cond: (I) 条件量对象的指针
+ * @param[in] cond: 条件量对象的指针
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -195,7 +200,7 @@ xwer_t xwos_cond_grab(struct xwos_cond * cond)
 
 /**
  * @brief XWOS API：减少条件量对象的引用计数
- * @param cond: (I) 条件量对象的指针
+ * @param[in] cond: 条件量对象的指针
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
@@ -212,9 +217,9 @@ xwer_t xwos_cond_put(struct xwos_cond * cond)
 
 /**
  * @brief XWOS API：绑定条件量对象到信号选择器
- * @param cond: (I) 条件量对象的指针
- * @param sel: (I) 信号选择器的指针
- * @param pos: (I) 条件量对象映射到位图中的位置
+ * @param[in] cond: 条件量对象的指针
+ * @param[in] sel: 信号选择器的指针
+ * @param[in] pos: 条件量对象映射到位图中的位置
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -237,8 +242,8 @@ xwer_t xwos_cond_bind(struct xwos_cond * cond, struct xwos_sel * sel, xwsq_t pos
 
 /**
  * @brief XWOS API：从信号选择器上解绑条件量对象
- * @param cond: (I) 条件量对象的指针
- * @param sel: (I) 信号选择器的指针
+ * @param[in] cond: 条件量对象的指针
+ * @param[in] sel: 信号选择器的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -256,7 +261,7 @@ xwer_t xwos_cond_unbind(struct xwos_cond * cond, struct xwos_sel * sel)
 
 /**
  * @brief XWOS API：冻结条件量对象
- * @param cond: (I) 条件量对象的指针
+ * @param[in] cond: 条件量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -277,7 +282,7 @@ xwer_t xwos_cond_freeze(struct xwos_cond * cond)
 
 /**
  * @brief XWOS API：解冻条件量对象
- * @param cond: (I) 条件量对象的指针
+ * @param[in] cond: 条件量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -297,7 +302,7 @@ xwer_t xwos_cond_thaw(struct xwos_cond * cond)
 
 /**
  * @brief XWOS API：中断条件量对象等待队列中所有线程
- * @param cond: (I) 条件量对象的指针
+ * @param[in] cond: 条件量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -316,7 +321,7 @@ xwer_t xwos_cond_intr_all(struct xwos_cond * cond)
 
 /**
  * @brief XWOS API：广播条件量对象，等待队列中的所有线程都会被唤醒
- * @param cond: (I) 条件量对象的指针
+ * @param[in] cond: 条件量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -336,7 +341,7 @@ xwer_t xwos_cond_broadcast(struct xwos_cond * cond)
 
 /**
  * @brief XWOS API：单播条件量对象，只会唤醒第一个线程
- * @param cond: (I) 条件量对象的指针
+ * @param[in] cond: 条件量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -356,11 +361,11 @@ xwer_t xwos_cond_unicast(struct xwos_cond * cond)
 
 /**
  * @brief XWOS API：等待条件量对象
- * @param cond: (I) 条件量对象的指针
- * @param lock: (I) 锁
- * @param lktype: (I) 锁的类型，取值：@ref xwos_lock_type_em
- * @param lkdata: (I) 锁的数据
- * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
+ * @param[in] cond: 条件量对象的指针
+ * @param[in] lock: 锁
+ * @param[in] lktype: 锁的类型，取值：@ref xwos_lock_type_em
+ * @param[in] lkdata: 锁的数据
+ * @param[out] lkst: 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -382,27 +387,25 @@ xwer_t xwos_cond_wait(struct xwos_cond * cond,
 
 /**
  * @brief XWOS API：限时等待条件量对象
- * @param cond: (I) 条件量对象的指针
- * @param lock: (I) 锁
- * @param lktype: (I) 锁的类型，取值：@ref xwos_lock_type_em
- * @param lkdata: (I) 锁的数据
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
+ * @param[in] cond: 条件量对象的指针
+ * @param[in] lock: 锁
+ * @param[in] lktype: 锁的类型，取值：@ref xwos_lock_type_em
+ * @param[in] lkdata: 锁的数据
+ * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示期望的阻塞等待时间
+ * + (O) 作为输出时，返回剩余的期望时间
+ * @param[out] lkst: 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -EINVAL: 参数无效
- * @retval -ETIMEDOUT: 超时
+ * @retval -ETIMEDOUT: 超时，xwtm指向的缓冲区内的时间会减为0
  * @retval -EINTR: 等待被中断
  * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
- * @note
- * - 函数返回*-ETIMEDOUT*时，*xwtm*指向的缓冲区内的值减为0。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_timedwait(struct xwos_cond * cond,
@@ -411,5 +414,9 @@ xwer_t xwos_cond_timedwait(struct xwos_cond * cond,
 {
         return xwosdl_cond_timedwait(&cond->oscond, lock, lktype, lkdata, xwtm, lkst);
 }
+
+/**
+ * @} xwos_cond
+ */
 
 #endif /* xwos/osal/sync/cond.h */

@@ -92,7 +92,7 @@ xwer_t xwds_dmauartc_cfg(struct xwds_dmauartc * dmauartc,
 
 /**
  * @brief 增加对象的引用计数
- * @param dmauartc: (I) DMA UART控制器对象指针
+ * @param[in] dmauartc: DMA UART控制器对象指针
  * @return 错误码
  * @retval @ref xwds_device_grab()
  */
@@ -104,7 +104,7 @@ xwer_t xwds_dmauartc_grab(struct xwds_dmauartc * dmauartc)
 
 /**
  * @brief 减少对象的引用计数
- * @param dmauartc: (I) DMA UART控制器对象指针
+ * @param[in] dmauartc: DMA UART控制器对象指针
  * @return 错误码
  * @retval @ref xwds_device_put()
  */

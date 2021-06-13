@@ -127,7 +127,7 @@ struct xwds_uart_cfg {
 
 /**
  * @brief 测试UART波特率是否合法
- * @param baudrate: (I) 波特率
+ * @param[in] baudrate: 波特率
  */
 static __xwcc_inline
 bool xwds_uart_tst_baudrate(xwu32_t baudrate)

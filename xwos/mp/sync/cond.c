@@ -74,8 +74,8 @@ xwer_t xwmp_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
 #if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
 /**
  * @brief XWMP INIT CODE：初始化结构体xwmp_cond的对象缓存
- * @param zone_origin: (I) 内存区域的首地址
- * @param zone_size: (I) 内存区域的大小
+ * @param[in] zone_origin: 内存区域的首地址
+ * @param[in] zone_size: 内存区域的大小
  * @return 错误码
  * @note
  * - 重入性：只可在系统初始化时使用一次
@@ -140,7 +140,7 @@ struct xwmp_cond * xwmp_cond_alloc(void)
 
 /**
  * @brief 释放条件量对象
- * @param cond: (I) 条件量对象的指针
+ * @param[in] cond: 条件量对象的指针
  */
 static __xwmp_code
 void xwmp_cond_free(struct xwmp_cond * cond)
@@ -158,7 +158,7 @@ void xwmp_cond_free(struct xwmp_cond * cond)
 
 /**
  * @brief 条件量对象的构造函数
- * @param cond: (I) 条件量对象的指针
+ * @param[in] cond: 条件量对象的指针
  */
 __xwmp_code
 void xwmp_cond_construct(struct xwmp_cond * cond)
@@ -168,7 +168,7 @@ void xwmp_cond_construct(struct xwmp_cond * cond)
 
 /**
  * @brief 条件量对象的析构函数
- * @param cond: (I) 条件量对象的指针
+ * @param[in] cond: 条件量对象的指针
  */
 __xwmp_code
 void xwmp_cond_destruct(struct xwmp_cond * cond)
@@ -178,7 +178,7 @@ void xwmp_cond_destruct(struct xwmp_cond * cond)
 
 /**
  * @brief 条件量对象的垃圾回收函数
- * @param cond: (I) 条件量对象的指针
+ * @param[in] cond: 条件量对象的指针
  * @return 错误码
  */
 static __xwmp_code
@@ -188,16 +188,6 @@ xwer_t xwmp_cond_gc(void * cond)
         return XWOK;
 }
 
-/**
- * @brief XWMP API：检查条件量对象的标签并增加引用计数
- * @param cond: (I) 条件量对象指针
- * @param tik: (I) 标签
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_cond_acquire(struct xwmp_cond * cond, xwsq_t tik)
 {
@@ -205,16 +195,6 @@ xwer_t xwmp_cond_acquire(struct xwmp_cond * cond, xwsq_t tik)
         return xwmp_synobj_acquire(&cond->synobj, tik);
 }
 
-/**
- * @brief XWMP API：检查条件量对象的标签并增加引用计数
- * @param cond: (I) 条件量对象指针
- * @param tik: (I) 标签
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_cond_release(struct xwmp_cond * cond, xwsq_t tik)
 {
@@ -222,15 +202,6 @@ xwer_t xwmp_cond_release(struct xwmp_cond * cond, xwsq_t tik)
         return xwmp_synobj_release(&cond->synobj, tik);
 }
 
-/**
- * @brief XWMP API：增加条件量对象的引用计数
- * @param cond: (I) 条件量对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_cond_grab(struct xwmp_cond * cond)
 {
@@ -238,15 +209,6 @@ xwer_t xwmp_cond_grab(struct xwmp_cond * cond)
         return xwmp_synobj_grab(&cond->synobj);
 }
 
-/**
- * @brief XWMP API：减少条件量对象的引用计数
- * @param cond: (I) 条件量对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_cond_put(struct xwmp_cond * cond)
 {
@@ -256,8 +218,8 @@ xwer_t xwmp_cond_put(struct xwmp_cond * cond)
 
 /**
  * @brief 激活条件量
- * @param cond: (I) 条件量对象的指针
- * @param gcfunc: (I) 垃圾回收函数的指针
+ * @param[in] cond: 条件量对象的指针
+ * @param[in] gcfunc: 垃圾回收函数的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @note
@@ -277,17 +239,6 @@ xwer_t xwmp_cond_activate(struct xwmp_cond * cond, xwobj_gc_f gcfunc)
         return rc;
 }
 
-/**
- * @brief XWMP API：静态始化成条件量
- * @param cond: (I) 条件量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *cond* ，不可重入
- */
 __xwmp_api
 xwer_t xwmp_cond_init(struct xwmp_cond * cond)
 {
@@ -297,17 +248,6 @@ xwer_t xwmp_cond_init(struct xwmp_cond * cond)
         return xwmp_cond_activate(cond, NULL);
 }
 
-/**
- * @brief XWMP API：销毁静态方式初始化的条件量对象
- * @param cond: (I) 条件量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *cond* ，不可重入
- */
 __xwmp_api
 xwer_t xwmp_cond_destroy(struct xwmp_cond * cond)
 {
@@ -316,18 +256,6 @@ xwer_t xwmp_cond_destroy(struct xwmp_cond * cond)
         return xwmp_cond_put(cond);
 }
 
-/**
- * @brief XWMP API：动态创建条件量
- * @param ptrbuf: (O) 指向缓冲区的指针，通过此缓冲区返回对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_cond_create(struct xwmp_cond ** ptrbuf)
 {
@@ -351,17 +279,6 @@ xwer_t xwmp_cond_create(struct xwmp_cond ** ptrbuf)
         return rc;
 }
 
-/**
- * @brief XWMP API：删除动态创建的条件量
- * @param cond: (I) 条件量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *cond* ，不可重入
- */
 __xwmp_api
 xwer_t xwmp_cond_delete(struct xwmp_cond * cond)
 {
@@ -371,23 +288,6 @@ xwer_t xwmp_cond_delete(struct xwmp_cond * cond)
 }
 
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
-/**
- * @brief XWMP API：绑定条件量到事件对象，事件对象类型为XWMP_EVT_TYPE_SEL
- * @param cond: (I) 条件量对象的指针
- * @param evt: (I) 事件对象的指针
- * @param pos: (I) 条件量对象映射到位图中的位置
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
- * @retval -ECHRNG: 位置超出范围
- * @retval -EALREADY: 同步对象已经绑定到事件对象
- * @retval -EBUSY: 通道已经被其他同步对象独占
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *cond* ，不可重入
- */
 __xwmp_api
 xwer_t xwmp_cond_bind(struct xwmp_cond * cond,
                       struct xwmp_evt * evt, xwsq_t pos)
@@ -407,20 +307,6 @@ xwer_t xwmp_cond_bind(struct xwmp_cond * cond,
         return rc;
 }
 
-/**
- * @brief XWMP API：从事件对象上解绑条件量，事件对象类型为XWMP_EVT_TYPE_SEL
- * @param cond: (I) 条件量对象的指针
- * @param evt: (I) 事件对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -ETYPE: 事件对象类型错误
- * @retval -EFAULT: 空指针
- * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个 *cond* ，不可重入
- */
 __xwmp_api
 xwer_t xwmp_cond_unbind(struct xwmp_cond * cond, struct xwmp_evt * evt)
 {
@@ -440,21 +326,6 @@ xwer_t xwmp_cond_unbind(struct xwmp_cond * cond, struct xwmp_evt * evt)
 }
 #endif /* XWMPCFG_SYNC_EVT */
 
-/**
- * @brief XWMP API：冻结条件量（值设置为负）
- * @param cond: (I) 条件量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EALREADY: 条件量已被冻结
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 已冻结的条件量不允许单播或广播，但可以被等待，
- *   测试条件量的线程会加入到条件量等待队列中阻塞等待。
- */
 __xwmp_api
 xwer_t xwmp_cond_freeze(struct xwmp_cond * cond)
 {
@@ -477,22 +348,6 @@ xwer_t xwmp_cond_freeze(struct xwmp_cond * cond)
         return rc;
 }
 
-/**
- * @brief XWMP API：解冻条件量
- * @param cond: (I) 条件量对象的指针
- * @param val: (I) 条件量的初始值
- * @param max: (I) 条件量的最大值
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EALREADY: 条件量未被冻结
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 此函数只对已冻结的条件量起作用。
- */
 __xwmp_api
 xwer_t xwmp_cond_thaw(struct xwmp_cond * cond)
 {
@@ -518,8 +373,8 @@ xwer_t xwmp_cond_thaw(struct xwmp_cond * cond)
 
 /**
  * @brief 中断条件量等待队列中的一个节点
- * @param cond: (I) 条件量对象的指针
- * @param wqn: (I) 等待队列节点
+ * @param[in] cond: 条件量对象的指针
+ * @param[in] wqn: 等待队列节点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @note
@@ -559,17 +414,6 @@ xwer_t xwmp_cond_intr(struct xwmp_cond * cond, struct xwmp_wqn * wqn)
         return rc;
 }
 
-/**
- * @brief XWMP API：中断条件量等待队列中的所有节点
- * @param cond: (I) 条件量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_cond_intr_all(struct xwmp_cond * cond)
 {
@@ -637,20 +481,6 @@ xwer_t xwmp_cond_broadcast_once(struct xwmp_cond * cond, bool * retry)
         return rc;
 }
 
-/**
- * @brief XWMP API：广播条件量，将等待队列中的所有线程唤醒
- * @param cond: (I) 条件量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENEGATIVE: 条件量已被冻结
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 此函数只对未冻结的条件量起作用，已冻结的条件量将得到错误码-ENEGATIVE。
- */
 __xwmp_api
 xwer_t xwmp_cond_broadcast(struct xwmp_cond * cond)
 {
@@ -720,20 +550,6 @@ xwer_t xwmp_cond_do_unicast(struct xwmp_cond * cond)
         return rc;
 }
 
-/**
- * @brief XWMP API：单播条件量，只会唤醒等待队列最前面的一个线程
- * @param cond: (I) 条件量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENEGATIVE: 条件量已被冻结
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 此函数只对未冻结的条件量起作用，已冻结的条件量将得到错误码-ENEGATIVE。
- */
 __xwmp_api
 xwer_t xwmp_cond_unicast(struct xwmp_cond * cond)
 {
@@ -959,23 +775,6 @@ xwer_t xwmp_cond_do_timedwait(struct xwmp_cond * cond, struct xwmp_thd * thd,
         return rc;
 }
 
-/**
- * @brief XWMP API：等待条件量
- * @param cond: (I) 条件量对象指针
- * @param lock: (I) 锁的地址
- * @param lktype: (I) 锁的类型，取值：@ref xwmp_lock_type_em
- * @param lkdata: (I) 锁的数据
- * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EINVAL: 无效的参数
- * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- */
 __xwmp_inline_api
 xwer_t xwmp_cond_wait(struct xwmp_cond * cond,
                       void * lock, xwsq_t lktype,
@@ -986,30 +785,6 @@ xwer_t xwmp_cond_wait(struct xwmp_cond * cond,
                                    &expected, lkst);
 }
 
-/**
- * @brief XWMP API：限时等待条件量
- * @param cond: (I) 条件量对象的指针
- * @param lock: (I) 锁的地址
- * @param lktype: (I) 锁的类型，取值：@ref xwmp_lock_type_em
- * @param lkdata: (I) 锁的数据
- * @param xwtm: 指向缓冲区的指针，此缓冲区：
- *              (I) 作为输入时，表示期望的阻塞等待时间
- *              (O) 作为输出时，返回剩余的期望时间
- * @param lkst: (O) 指向缓冲区的指针，通过此缓冲区返回锁的状态
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINVAL: 参数无效
- * @retval -ETIMEDOUT: 超时
- * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- * @note
- * - 函数返回返回-ETIMEDOUT时，**xwtm**指向的缓冲区内的期望时间会减为0。
- */
 __xwmp_api
 xwer_t xwmp_cond_timedwait(struct xwmp_cond * cond,
                            void * lock, xwsq_t lktype, void * lkdata,

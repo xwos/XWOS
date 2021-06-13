@@ -21,6 +21,11 @@
 #include <xwos/mm/common.h>
 
 /**
+ * @defgroup xwmm_memslice 内存切片分配器
+ * @{
+ */
+
+/**
  * @brief 内存切片分配器
  */
 struct xwmm_memslice {
@@ -46,5 +51,9 @@ xwer_t xwmm_memslice_init(struct xwmm_memslice * msa,
                           ctor_f ctor, dtor_f dtor);
 xwer_t xwmm_memslice_alloc(struct xwmm_memslice * msa, void ** membuf);
 xwer_t xwmm_memslice_free(struct xwmm_memslice * msa, void * mem);
+
+/**
+ * @} xwmm_memslice
+ */
 
 #endif /* xwos/mm/memslice.h */
