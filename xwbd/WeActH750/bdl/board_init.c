@@ -46,7 +46,7 @@ extern xwsz_t dtcmheap_mr_size[];
  * @brief AXISRAM内存池
  * @note
  * + 头文件
- *   - xwbd/wash750/bm/stm32cube/mif.h
+ *   - xwbd/WeActH750/bm/stm32cube/mif.h
  *   - xwos/mm/mempool/allocator.h
  * + API
  *   - 申请：xwmm_mempool_malloc(axisram_mempool, ...)
