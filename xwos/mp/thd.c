@@ -322,10 +322,10 @@ xwer_t xwmp_thd_put(struct xwmp_thd * thd)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入，除非thd对象的引用计数重新为0
+ * - 重入性：不可重入，除非对象的引用计数重新为0
  * @note
- * - 在简单应用中，任务线程不会退出，也不会使用动态内存管理，
- *   因此设置gcfunc为NULL，不做垃圾回收处理。
+ * - 静态初始化的对象所有资源都是由用户自己提供的，
+ *   因此当对象销毁时，垃圾回收函数也需要用户自己提供。
  */
 static __xwmp_code
 xwer_t xwmp_thd_activate(struct xwmp_thd * thd,

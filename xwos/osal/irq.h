@@ -8,9 +8,6 @@
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * @note
- * - ARCH IRQ：编号为负数，从-1开始编号
- * - CPU IRQ：编号为正数或0，从0开始编号
  */
 
 #ifndef __xwos_osal_irq_h__
@@ -21,6 +18,8 @@
 
 /**
  * @defgroup xwos_irq 中断
+ * - EXC：编号为负数，从-1开始编号
+ * - IRQ：编号为正数或0，从0开始编号
  * @{
  */
 
@@ -36,7 +35,7 @@
  * @retval -ENOSYS: 没有实现此功能
  * @note
  * - 中断号的枚举通常定义在芯片的头文件中；
- * - SOCCFG_RO_ISRTABLE配置为0时，参数isr无效，中断向量需预先写入vector.c
+ * - SOCCFG_RO_IVT配置为0时，参数isr无效，中断向量需预先写入vector.c
  *   的向量表中。
  * @note
  * - 同步/异步：同步

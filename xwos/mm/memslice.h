@@ -8,8 +8,6 @@
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * @note
- * - 此算法是在所有上下文（线程、中断、中断底半部）都是安全的。
  */
 
 #ifndef __xwos_mm_memslice_h__
@@ -22,6 +20,7 @@
 
 /**
  * @defgroup xwmm_memslice 内存切片分配器
+ * 此算法是在所有上下文（线程、中断、中断底半部）都是安全的。
  * @{
  */
 

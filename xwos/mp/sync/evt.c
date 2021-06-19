@@ -172,16 +172,6 @@ xwer_t xwmp_evt_gc(void * evt)
         return XWOK;
 }
 
-/**
- * @brief XWMP API：检查事件对象的标签并增加引用计数
- * @param[in] evt: 事件对象指针
- * @param[in] tik: 标签
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_evt_acquire(struct xwmp_evt * evt, xwsq_t tik)
 {
@@ -189,16 +179,6 @@ xwer_t xwmp_evt_acquire(struct xwmp_evt * evt, xwsq_t tik)
         return xwmp_synobj_acquire(&evt->cond.synobj, tik);
 }
 
-/**
- * @brief XWMP API：检查事件对象的标签并增加引用计数
- * @param[in] evt: 事件对象指针
- * @param[in] tik: 标签
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_evt_release(struct xwmp_evt * evt, xwsq_t tik)
 {
@@ -206,15 +186,6 @@ xwer_t xwmp_evt_release(struct xwmp_evt * evt, xwsq_t tik)
         return xwmp_synobj_release(&evt->cond.synobj, tik);
 }
 
-/**
- * @brief XWMP API：增加事件对象的引用计数
- * @param[in] evt: 事件对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_evt_grab(struct xwmp_evt * evt)
 {
@@ -222,35 +193,29 @@ xwer_t xwmp_evt_grab(struct xwmp_evt * evt)
         return xwmp_synobj_grab(&evt->cond.synobj);
 }
 
-/**
- * @brief XWMP API：减少事件对象的引用计数
- * @param[in] evt: 事件对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_evt_put(struct xwmp_evt * evt)
 {
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        return xwmp_cond_put(&evt->cond);
+        return xwmp_synobj_put(&evt->cond.synobj);
 }
 
 /**
- * @brief XWMP API：激活并初始化事件对象
+ * @brief 激活并初始化事件对象
  * @param[in] evt: 事件对象的指针
- * @param[in] type: 事件的类型，取值 @ref xwmp_evt_type_em
+ * @param[in] type: 事件的类型，取值：
+ *   @arg XWMP_EVT_TYPE_FLG: 事件标志
+ *   @arg XWMP_EVT_TYPE_SEL: 信号选择器
+ *   @arg XWMP_EVT_TYPE_BR: 线程栅栏
  * @param[in] gcfunc: 垃圾回收函数的指针
  * @return 错误码
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个事件对象，不可重入
+ * - 重入性：不可重入，除非对象的引用计数重新为0
  * @note
- * - 由于静态初始化的对象所有资源都是由用户自己提供的，
- *   因此当信号量不使用时，回收资源的函数也需要用户自己提供。
+ * - 静态初始化的对象所有资源都是由用户自己提供的，
+ *   因此当对象销毁时，垃圾回收函数也需要用户自己提供。
  */
 static __xwmp_code
 xwer_t xwmp_evt_activate(struct xwmp_evt * evt, xwsq_t type, xwobj_gc_f gcfunc)
@@ -282,21 +247,6 @@ xwer_t xwmp_evt_activate(struct xwmp_evt * evt, xwsq_t type, xwobj_gc_f gcfunc)
         return rc;
 }
 
-/**
- * @brief XWMP API：动态创建事件对象
- * @param[out] ptrbuf: 指向缓冲区的指针，通过此缓冲区返回对象的指针
- * @param[in] type: 事件的类型，取值范围 @ref xwmp_evt_type_em
- * @param[in] num: 事件的数量
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINVAL: 无效参数
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_evt_create(struct xwmp_evt ** ptrbuf, xwsq_t type, xwsz_t num)
 {
@@ -322,17 +272,6 @@ xwer_t xwmp_evt_create(struct xwmp_evt ** ptrbuf, xwsq_t type, xwsz_t num)
         return rc;
 }
 
-/**
- * @brief XWMP API：删除动态创建的事件对象
- * @param[in] evt: 事件对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个事件对象，不可重入
- */
 __xwmp_api
 xwer_t xwmp_evt_delete(struct xwmp_evt * evt)
 {
@@ -341,22 +280,6 @@ xwer_t xwmp_evt_delete(struct xwmp_evt * evt)
         return xwmp_evt_put(evt);
 }
 
-/**
- * @brief XWMP API：静态初始化事件对象
- * @param[in] evt: 事件对象的指针
- * @param[in] type: 事件的类型，取值范围 @ref xwmp_evt_type_em
- * @param[in] num: 事件的数量
- * @param[in] bmp: 事件对象用来记录事件状态的位图缓冲区
- * @param[in] msk: 事件对象用来记录掩码状态的位图缓冲区
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINVAL: 无效参数
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个事件对象，不可重入
- */
 __xwmp_api
 xwer_t xwmp_evt_init(struct xwmp_evt * evt, xwsq_t type, xwsz_t num,
                      xwbmp_t * bmp, xwbmp_t * msk)
@@ -371,17 +294,6 @@ xwer_t xwmp_evt_init(struct xwmp_evt * evt, xwsq_t type, xwsz_t num,
         return xwmp_evt_activate(evt, type, NULL);
 }
 
-/**
- * @brief XWMP API：销毁静态方式初始化的事件对象
- * @param[in] evt: 事件对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：异步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个事件对象，不可重入
- */
 __xwmp_api
 xwer_t xwmp_evt_destroy(struct xwmp_evt * evt)
 {
@@ -390,63 +302,18 @@ xwer_t xwmp_evt_destroy(struct xwmp_evt * evt)
         return xwmp_evt_put(evt);
 }
 
-/**
- * @brief XWMP API：绑定事件对象(evt)到另一个事件对象(sel)，
- *                  另一个事件对象类型为XWMP_EVT_TYPE_SEL
- * @param[in] evt: 事件对象的指针
- * @param[in] sel: 类型为XWMP_EVT_TYPE_SEL的事件对象的指针
- * @param[in] pos: 事件对象对象映射到位图中的位置
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
- * @retval -ECHRNG: 位置超出范围
- * @retval -EALREADY: 同步对象已经绑定到事件对象
- * @retval -EBUSY: 通道已经被其他同步对象独占
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个事件对象，不可重入
- */
 __xwmp_api
 xwer_t xwmp_evt_bind(struct xwmp_evt * evt, struct xwmp_evt * sel, xwsq_t pos)
 {
         return xwmp_cond_bind(&evt->cond, sel, pos);
 }
 
-/**
- * @brief XWMP API：从另一个事件对象(sel)上解绑事件对象(evt)，
- *                  另一个事件对象类型为XWMP_EVT_TYPE_SEL
- * @param[in] evt: 事件对象的指针
- * @param[in] sel: 类型为XWMP_EVT_TYPE_SEL的事件对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -ETYPE: 事件对象类型错误
- * @retval -EFAULT: 空指针
- * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个事件对象，不可重入
- */
 __xwmp_api
 xwer_t xwmp_evt_unbind(struct xwmp_evt * evt, struct xwmp_evt * sel)
 {
         return xwmp_cond_unbind(&evt->cond, sel);
 }
 
-/**
- * @brief XWMP API：中断事件对象等待队列中的所有节点
- * @param[in] evt: 事件对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 类型不匹配
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_evt_intr_all(struct xwmp_evt * evt)
 {
@@ -455,18 +322,6 @@ xwer_t xwmp_evt_intr_all(struct xwmp_evt * evt)
         return xwmp_cond_intr_all(&evt->cond);
 }
 
-/**
- * @brief XWMP API：获取事件对象中事件的数量
- * @param[in] evt: 事件对象的指针
- * @param[out] numbuf: 指向缓冲区的指针，通过此缓冲区返回事件的数量
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmp_api
 xwer_t xwmp_evt_get_num(struct xwmp_evt * evt, xwsz_t * numbuf)
 {

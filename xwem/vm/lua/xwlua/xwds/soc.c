@@ -55,6 +55,7 @@ const luaL_Reg xwlua_soc_indexmethod[] = {
 };
 
 const luaL_Reg xwlua_soc_metamethod[] = {
+        {"__index", NULL},  /* place holder */
         {"__tostring", xwlua_soc_tostring},
         {NULL, NULL}
 };

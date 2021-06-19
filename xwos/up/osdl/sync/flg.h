@@ -163,19 +163,19 @@ xwer_t xwosdl_flg_read(struct xwosdl_flg * flg, xwbmp_t out[])
 }
 
 static __xwcc_inline
-xwer_t xwosdl_flg_trywait(struct xwosdl_flg * flg,
-                          xwsq_t trigger, xwsq_t action,
-                          xwbmp_t origin[], xwbmp_t msk[])
-{
-        return xwup_flg_trywait(flg, trigger, action, origin, msk);
-}
-
-static __xwcc_inline
 xwer_t xwosdl_flg_wait(struct xwosdl_flg * flg,
                        xwsq_t trigger, xwsq_t action,
                        xwbmp_t origin[], xwbmp_t msk[])
 {
         return xwup_flg_wait(flg, trigger, action, origin, msk);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_flg_trywait(struct xwosdl_flg * flg,
+                          xwsq_t trigger, xwsq_t action,
+                          xwbmp_t origin[], xwbmp_t msk[])
+{
+        return xwup_flg_trywait(flg, trigger, action, origin, msk);
 }
 
 static __xwcc_inline

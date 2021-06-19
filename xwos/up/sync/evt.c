@@ -130,7 +130,14 @@ void xwup_evt_free(struct xwup_evt * evt)
 /**
  * @brief 激活事件对象
  * @param[in] evt: 事件对象的指针
- * @param[in] type: 事件的类型，取值 @ref xwup_evt_type_em
+ * @param[in] type: 事件的类型，取值：
+ *   @arg XWUP_EVT_TYPE_FLG: 事件标志
+ *   @arg XWUP_EVT_TYPE_SEL: 信号选择器
+ *   @arg XWUP_EVT_TYPE_BR: 线程栅栏
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
  */
 static __xwup_code
 void xwup_evt_activate(struct xwup_evt * evt, xwsq_t type)
@@ -168,21 +175,6 @@ void xwup_evt_deactivate(struct xwup_evt * evt)
         XWOS_UNUSED(evt);
 }
 
-/**
- * @brief XWUP API：动态创建事件对象
- * @param[out] ptrbuf: 指向缓冲区的指针，通过此缓冲区返回对象的指针
- * @param[in] type: 事件的类型，取值范围 @ref xwup_evt_type_em
- * @param[in] num: 事件的数量
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINVAL: 无效参数
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwup_api
 xwer_t xwup_evt_create(struct xwup_evt ** ptrbuf, xwsq_t type, xwsz_t num)
 {
@@ -205,17 +197,6 @@ xwer_t xwup_evt_create(struct xwup_evt ** ptrbuf, xwsq_t type, xwsz_t num)
         return rc;
 }
 
-/**
- * @brief XWUP API：删除动态创建的事件对象
- * @param[in] evt: 事件对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个事件对象，不可重入
- */
 __xwup_api
 xwer_t xwup_evt_delete(struct xwup_evt * evt)
 {
@@ -226,22 +207,6 @@ xwer_t xwup_evt_delete(struct xwup_evt * evt)
         return XWOK;
 }
 
-/**
- * @brief XWUP API：静态初始化事件对象
- * @param[in] evt: 事件对象的指针
- * @param[in] type: 事件的类型，取值范围 @ref xwup_evt_type_em
- * @param[in] num: 事件的数量
- * @param[in] bmp: 事件对象用来记录事件状态的位图缓冲区
- * @param[in] msk: 事件对象用来记录掩码状态的位图缓冲区
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINVAL: 无效参数
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个事件对象，不可重入
- */
 __xwup_api
 xwer_t xwup_evt_init(struct xwup_evt * evt, xwsq_t type, xwsz_t num,
                      xwbmp_t * bmp, xwbmp_t * msk)
@@ -255,17 +220,6 @@ xwer_t xwup_evt_init(struct xwup_evt * evt, xwsq_t type, xwsz_t num,
         return XWOK;
 }
 
-/**
- * @brief XWUP API：销毁静态方式初始化的事件对象
- * @param[in] evt: 事件对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：异步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个事件对象，不可重入
- */
 __xwup_api
 xwer_t xwup_evt_destroy(struct xwup_evt * evt)
 {
@@ -275,63 +229,18 @@ xwer_t xwup_evt_destroy(struct xwup_evt * evt)
         return XWOK;
 }
 
-/**
- * @brief XWUP API：绑定事件对象(evt)到另一个事件对象(sel)，
- *                  另一个事件对象类型为XWUP_EVT_TYPE_SEL
- * @param[in] evt: 事件对象的指针
- * @param[in] sel: 类型为XWUP_EVT_TYPE_SEL的事件对象的指针
- * @param[in] pos: 事件对象对象映射到位图中的位置
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 事件对象类型错误
- * @retval -ECHRNG: 位置超出范围
- * @retval -EALREADY: 同步对象已经绑定到事件对象
- * @retval -EBUSY: 通道已经被其他同步对象独占
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个事件对象，不可重入
- */
 __xwup_api
 xwer_t xwup_evt_bind(struct xwup_evt * evt, struct xwup_evt * sel, xwsq_t pos)
 {
         return xwup_cond_bind(&evt->cond, sel, pos);
 }
 
-/**
- * @brief XWUP API：从另一个事件对象(sel)上解绑事件对象(evt)，
- *                  另一个事件对象类型为XWUP_EVT_TYPE_SEL
- * @param[in] evt: 事件对象的指针
- * @param[in] sel: 类型为XWUP_EVT_TYPE_SEL的事件对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -ETYPE: 事件对象类型错误
- * @retval -EFAULT: 空指针
- * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个事件对象，不可重入
- */
 __xwup_api
 xwer_t xwup_evt_unbind(struct xwup_evt * evt, struct xwup_evt * sel)
 {
         return xwup_cond_unbind(&evt->cond, sel);
 }
 
-/**
- * @brief XWUP API：中断事件对象等待队列中的所有节点
- * @param[in] evt: 事件对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ETYPE: 类型不匹配
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwup_api
 xwer_t xwup_evt_intr_all(struct xwup_evt * evt)
 {
@@ -340,18 +249,6 @@ xwer_t xwup_evt_intr_all(struct xwup_evt * evt)
         return xwup_cond_intr_all(&evt->cond);
 }
 
-/**
- * @brief XWUP API：获取事件对象中事件的数量
- * @param[in] evt: 事件对象的指针
- * @param[out] numbuf: 指向缓冲区的指针，通过此缓冲区返回事件的数量
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwup_api
 xwer_t xwup_evt_get_num(struct xwup_evt * evt, xwsz_t * numbuf)
 {

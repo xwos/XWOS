@@ -80,7 +80,7 @@ xwer_t xwospl_irq_request(xwirq_t irqn, xwisr_f isrfunc, void * data,
         XWOS_UNUSED(isrfunc);
         XWOS_UNUSED(data);
 
-#if !defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE)
+#if !defined(SOCCFG_RO_IVT) || (1 != SOCCFG_RO_IVT)
         if (irqn >= 0) {
                 __xwos_ivt_qualifier struct soc_ivt * ivt;
                 __xwos_ivt_qualifier struct soc_idvt * idvt;
@@ -93,7 +93,7 @@ xwer_t xwospl_irq_request(xwirq_t irqn, xwisr_f isrfunc, void * data,
                         idvt->irq[irqn] = data;
                 }
         }
-#endif /* !SOCCFG_RO_ISRTABLE */
+#endif /* !SOCCFG_RO_IVT */
         if (cfg) {
                 xwospl_irq_cfg(irqn, cfg);
         }
@@ -105,7 +105,7 @@ xwer_t xwospl_irq_release(xwirq_t irqn)
 {
         XWOS_UNUSED(irqn);
 
-#if !defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE)
+#if !defined(SOCCFG_RO_IVT) || (1 != SOCCFG_RO_IVT)
 
         if (irqn >= 0) {
                 __xwos_ivt_qualifier struct soc_ivt * ivt;
@@ -113,7 +113,7 @@ xwer_t xwospl_irq_release(xwirq_t irqn)
                 ivt = &xwospl_ivt;
                 ivt->irq[irqn] = soc_isr_noop;
         }
-#endif /* !SOCCFG_RO_ISRTABLE */
+#endif /* !SOCCFG_RO_IVT */
         return XWOK;
 }
 

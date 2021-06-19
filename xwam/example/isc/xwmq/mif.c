@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：软件定时器
+ * @brief 示例：消息队列
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright

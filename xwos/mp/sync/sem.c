@@ -410,6 +410,9 @@ xwer_t xwmp_sem_unbind(struct xwmp_sem * sem, struct xwmp_evt * evt)
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：对于同一个信号量对象，不可重入
+ * @note
+ * - 静态初始化的对象所有资源都是由用户自己提供的，
+ *   因此当对象销毁时，垃圾回收函数也需要用户自己提供。
  */
 static __xwmp_code
 xwer_t xwmp_plsem_activate(struct xwmp_sem * sem, xwssq_t val, xwssq_t max,
@@ -602,7 +605,7 @@ xwer_t xwmp_plsem_post(struct xwmp_sem * sem)
         return rc;
 }
 
-__xwmp_inline_api
+__xwmp_api
 xwer_t xwmp_plsem_wait(struct xwmp_sem * sem)
 {
         xwtm_t expected = XWTM_MAX;
@@ -984,7 +987,10 @@ xwer_t xwmp_plsem_wait_unintr(struct xwmp_sem * sem)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个信号量对象，不可重入
+ * - 重入性：不可重入，除非对象的引用计数重新为0
+ * @note
+ * - 静态初始化的对象所有资源都是由用户自己提供的，
+ *   因此当对象销毁时，垃圾回收函数也需要用户自己提供。
  */
 static __xwmp_code
 xwer_t xwmp_rtsem_activate(struct xwmp_sem * sem, xwssq_t val, xwssq_t max,
@@ -1179,7 +1185,7 @@ xwer_t xwmp_rtsem_post(struct xwmp_sem * sem)
         return rc;
 }
 
-__xwmp_inline_api
+__xwmp_api
 xwer_t xwmp_rtsem_wait(struct xwmp_sem * sem)
 {
         xwtm_t expected = XWTM_MAX;

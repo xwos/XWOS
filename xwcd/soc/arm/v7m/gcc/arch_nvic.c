@@ -66,7 +66,7 @@ xwer_t arch_nvic_irq_request(xwirq_t irqn,
                              __xwcc_unused void * data,
                              const struct soc_irq_cfg * cfg)
 {
-#if (!defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE))
+#if (!defined(SOCCFG_RO_IVT) || (1 != SOCCFG_RO_IVT))
         __xwos_ivt_qualifier struct soc_ivt * ivt;
         __xwos_ivt_qualifier struct soc_idvt * idvt;
 
@@ -77,7 +77,7 @@ xwer_t arch_nvic_irq_request(xwirq_t irqn,
         if ((NULL != idvt) && (NULL != data)) {
                 idvt->irq[irqn] = data;
         }
-#endif /* !SOCCFG_RO_ISRTABLE */
+#endif /* !SOCCFG_RO_IVT */
         if (cfg) {
                 arch_nvic_irq_cfg(irqn, cfg);
         }
@@ -87,7 +87,7 @@ xwer_t arch_nvic_irq_request(xwirq_t irqn,
 __xwbsp_code
 xwer_t arch_nvic_irq_release(__xwcc_unused xwirq_t irqn)
 {
-#if (!defined(SOCCFG_RO_ISRTABLE) || (1 != SOCCFG_RO_ISRTABLE))
+#if (!defined(SOCCFG_RO_IVT) || (1 != SOCCFG_RO_IVT))
         __xwos_ivt_qualifier struct soc_ivt * ivt;
         __xwos_ivt_qualifier struct soc_idvt * idvt;
 
@@ -98,7 +98,7 @@ xwer_t arch_nvic_irq_release(__xwcc_unused xwirq_t irqn)
         if (NULL != idvt) {
                 idvt->irq[irqn] = NULL;
         }
-#endif /* !SOCCFG_RO_ISRTABLE */
+#endif /* !SOCCFG_RO_IVT */
         return XWOK;
 }
 

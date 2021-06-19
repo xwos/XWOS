@@ -26,10 +26,10 @@
 #include <soc.h>
 #include <soc_init.h>
 
-#if (!defined(SOCCFG_RO_ISRTABLE)) || (1 != SOCCFG_RO_ISRTABLE)
+#if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
 static __xwos_init_code
 void soc_relocate_isrtable(void);
-#endif /* !SOCCFG_RO_ISRTABLE */
+#endif /* !SOCCFG_RO_IVT */
 
 static __xwbsp_init_code
 void soc_relocate(void);
@@ -68,9 +68,9 @@ void soc_init(void)
 {
         xwer_t rc;
 
-#if (!defined(SOCCFG_RO_ISRTABLE)) || (1 != SOCCFG_RO_ISRTABLE)
+#if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
         soc_relocate_isrtable();
-#endif /* !SOCCFG_RO_ISRTABLE */
+#endif /* !SOCCFG_RO_IVT */
         soc_relocate();
 
         /* Init scheduler of local CPU */
@@ -78,7 +78,7 @@ void soc_init(void)
         XWOS_BUG_ON(rc);
 }
 
-#if (!defined(SOCCFG_RO_ISRTABLE)) || (1 != SOCCFG_RO_ISRTABLE)
+#if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
 static __xwos_init_code
 void soc_relocate_isrtable(void)
 {
@@ -95,7 +95,7 @@ void soc_relocate_isrtable(void)
                 }
         }
 }
-#endif /* !SOCCFG_RO_ISRTABLE */
+#endif /* !SOCCFG_RO_IVT */
 
 static __xwbsp_init_code
 void soc_relocate(void)

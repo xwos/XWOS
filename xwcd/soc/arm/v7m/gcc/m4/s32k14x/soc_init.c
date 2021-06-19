@@ -26,10 +26,10 @@
 #include <soc.h>
 #include <soc_init.h>
 
-#if (!defined(SOCCFG_RO_ISRTABLE)) || (1 != SOCCFG_RO_ISRTABLE)
+#if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
 static __xwos_init_code
 void soc_relocate_isrtable(void);
-#endif /* !SOCCFG_RO_ISRTABLE */
+#endif /* !SOCCFG_RO_IVT */
 
 extern xwu8_t xwos_ivt_lma_base[];
 extern xwu8_t xwos_ivt_vma_base[];
@@ -58,16 +58,16 @@ void soc_init(void)
 {
         xwer_t rc;
 
-#if (!defined(SOCCFG_RO_ISRTABLE)) || (1 != SOCCFG_RO_ISRTABLE)
+#if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
         soc_relocate_isrtable();
-#endif /* !SOCCFG_RO_ISRTABLE */
+#endif /* !SOCCFG_RO_IVT */
 
         /* Init scheduler of local CPU */
         rc = xwosplcb_skd_init_lc();
         XWOS_BUG_ON(rc);
 }
 
-#if (!defined(SOCCFG_RO_ISRTABLE)) || (1 != SOCCFG_RO_ISRTABLE)
+#if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
 static __xwos_init_code
 void soc_relocate_isrtable(void)
 {
@@ -84,4 +84,4 @@ void soc_relocate_isrtable(void)
                 }
         }
 }
-#endif /* !SOCCFG_RO_ISRTABLE */
+#endif /* !SOCCFG_RO_IVT */

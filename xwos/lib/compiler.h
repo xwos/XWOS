@@ -536,4 +536,4 @@
  * @} compiler
  */
 
-#endif /* xwos/common/compiler.h */
+#endif /* xwos/lib/compiler.h */

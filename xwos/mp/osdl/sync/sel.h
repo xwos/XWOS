@@ -110,15 +110,15 @@ xwer_t xwosdl_sel_get_num(struct xwosdl_sel * sel, xwsz_t * numbuf)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sel_tryselect(struct xwosdl_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
-{
-        return xwmp_sel_tryselect(sel, msk, trg);
-}
-
-static __xwcc_inline
 xwer_t xwosdl_sel_select(struct xwosdl_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
 {
         return xwmp_sel_select(sel, msk, trg);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sel_tryselect(struct xwosdl_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
+{
+        return xwmp_sel_tryselect(sel, msk, trg);
 }
 
 static __xwcc_inline

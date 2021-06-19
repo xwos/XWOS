@@ -18,11 +18,11 @@
 /**
  * @brief 中断向量表限定词
  */
-#if defined(SOCCFG_RO_ISRTABLE) && (1 == SOCCFG_RO_ISRTABLE)
+#if defined(SOCCFG_RO_IVT) && (1 == SOCCFG_RO_IVT)
   #define __xwos_ivt_qualifier const
-#else /* SOCCFG_RO_ISRTABLE */
+#else /* SOCCFG_RO_IVT */
   #define __xwos_ivt_qualifier
-#endif /* !SOCCFG_RO_ISRTABLE */
+#endif /* !SOCCFG_RO_IVT */
 
 struct soc_irq_cfg;
 struct soc_irq_data;

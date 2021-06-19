@@ -24,10 +24,10 @@
 #include <soc.h>
 #include <soc_init.h>
 
-#if (!defined(SOCCFG_RO_ISRTABLE)) || (1 != SOCCFG_RO_ISRTABLE)
+#if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
 static __xwos_init_code
 void soc_relocate_ivt(void);
-#endif /* !SOCCFG_RO_ISRTABLE */
+#endif /* !SOCCFG_RO_IVT */
 
 extern xwu8_t evt_lma_base[];
 extern xwu8_t evt_vma_base[];
@@ -46,15 +46,15 @@ void soc_lowlevel_init(void)
 __xwbsp_init_code
 void soc_init(void)
 {
-#if (!defined(SOCCFG_RO_ISRTABLE)) || (1 != SOCCFG_RO_ISRTABLE)
+#if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
         soc_relocate_ivt();
-#endif /* !SOCCFG_RO_ISRTABLE */
+#endif /* !SOCCFG_RO_IVT */
 
         soc_irqc_init();
         xwosplcb_skd_init_lc();
 }
 
-#if (!defined(SOCCFG_RO_ISRTABLE)) || (1 != SOCCFG_RO_ISRTABLE)
+#if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
 static __xwos_init_code
 void soc_relocate_ivt(void)
 {
@@ -80,4 +80,4 @@ void soc_relocate_ivt(void)
                 }
         }
 }
-#endif /* !SOCCFG_RO_ISRTABLE */
+#endif /* !SOCCFG_RO_IVT */

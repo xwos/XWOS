@@ -223,8 +223,12 @@ xwer_t xwmp_cond_put(struct xwmp_cond * cond)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @note
- * - 由于静态初始化的对象所有资源都是由用户自己提供的，
- *   因此当信号量不使用时，回收资源的函数也需要用户自己提供。
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入，除非对象的引用计数重新为0
+ * @note
+ * - 静态初始化的对象所有资源都是由用户自己提供的，
+ *   因此当对象销毁时，垃圾回收函数也需要用户自己提供。
  */
 __xwmp_code
 xwer_t xwmp_cond_activate(struct xwmp_cond * cond, xwobj_gc_f gcfunc)
@@ -775,7 +779,7 @@ xwer_t xwmp_cond_do_timedwait(struct xwmp_cond * cond, struct xwmp_thd * thd,
         return rc;
 }
 
-__xwmp_inline_api
+__xwmp_api
 xwer_t xwmp_cond_wait(struct xwmp_cond * cond,
                       void * lock, xwsq_t lktype,
                       void * lkdata, xwsq_t * lkst)

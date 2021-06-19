@@ -243,7 +243,10 @@ xwer_t xwmp_mtx_put(struct xwmp_mtx * mtx)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个互斥锁对象，不可重入
+ * - 重入性：不可重入，除非对象的引用计数重新为0
+ * @note
+ * - 静态初始化的对象所有资源都是由用户自己提供的，
+ *   因此当对象销毁时，垃圾回收函数也需要用户自己提供。
  */
 static __xwmp_code
 xwer_t xwmp_mtx_activate(struct xwmp_mtx * mtx, xwpr_t sprio,
@@ -570,7 +573,7 @@ xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx)
         return rc;
 }
 
-__xwmp_inline_api
+__xwmp_api
 xwer_t xwmp_mtx_lock(struct xwmp_mtx * mtx)
 {
         xwtm_t expected;

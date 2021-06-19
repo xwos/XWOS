@@ -112,7 +112,7 @@ void xwup_rtsem_free(struct xwup_rtsem * sem)
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个信号量对象，不可重入
+ * - 重入性：不可重入
  */
 static __xwup_code
 void xwup_rtsem_activate(struct xwup_rtsem * sem, xwssq_t val, xwssq_t max)
