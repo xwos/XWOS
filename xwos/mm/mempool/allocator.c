@@ -483,6 +483,7 @@ xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size, void ** membu
         } else {
                 struct xwmm_mempool_page * pg;
                 void * oldmem;
+                void * newmem;
 
                 oldmem = *membuf;
                 rc = xwmm_mempool_page_find(&mp->pa, oldmem, &pg);
@@ -490,18 +491,12 @@ xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size, void ** membu
                         if (size <= pg->data.value) {
                                 rc = XWOK;
                         } else {
-                                void * newmem;
-
                                 rc = xwmm_mempool_malloc(mp, size, &newmem);
                                 if (XWOK == rc) {
                                         memcpy(newmem, oldmem, pg->data.value);
                                         rc = xwmm_mempool_free(mp, oldmem);
-                                        if (XWOK == rc) {
-                                                *membuf = newmem;
-                                        } else {
-                                                xwmm_mempool_free(mp, newmem);
-                                                *membuf = NULL;
-                                        }
+                                        XWOS_BUG_ON(rc < 0);
+                                        *membuf = newmem;
                                 } else {
                                         *membuf = NULL;
                                 }

@@ -37,15 +37,7 @@ xwer_t xwosdl_swt_destroy(struct xwosdl_swt * swt)
 static __xwcc_inline
 xwer_t xwosdl_swt_create(struct xwosdl_swt ** swtbuf, const char * name, xwsq_t flag)
 {
-        xwer_t rc;
-
-        if (NULL != swtbuf) {
-                *swtbuf = NULL;
-                rc = xwup_swt_create(swtbuf, name, flag);
-        } else {
-                rc = -EFAULT;
-        }
-        return rc;
+        return xwup_swt_create(swtbuf, name, flag);
 }
 
 static __xwcc_inline

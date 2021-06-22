@@ -124,22 +124,8 @@ xwer_t xwosdl_thd_create(struct xwosdl_thd ** thdbuf, const char * name,
                          xwosdl_thd_f mainfunc, void * arg, xwsz_t stack_size,
                          xwpr_t priority, xwsq_t attr)
 {
-        struct xwup_thd * thd;
-        xwer_t rc;
-
-        if (NULL != thdbuf) {
-                rc = xwup_thd_create(&thd, name,
-                                     (xwup_thd_f)mainfunc, arg,
-                                     stack_size, priority, attr);
-                if (XWOK == rc) {
-                        *thdbuf = thd;
-                } else {
-                        *thdbuf = NULL;
-                }
-        } else {
-                rc = -EFAULT;
-        }
-        return rc;
+        return xwup_thd_create(thdbuf, name, mainfunc, arg,
+                               stack_size, priority, attr);
 }
 
 static __xwcc_inline

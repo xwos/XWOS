@@ -178,9 +178,9 @@ int xwlua_thd_call(lua_State * L)
         size_t fl;
 
         luaL_checktype(L, 1, LUA_TFUNCTION);
-        lua_pushvalue(L, 1); /* Ensure that top is the function */
         luaL_buffinit(L, &lb);
         luaL_prepbuffer(&lb);
+        lua_pushvalue(L, 1); /* Ensure that top is the function */
         rc = lua_dump(L, xwlua_xt_function_writer, &lb, true);
         lua_pop(L, 1);
         if (0 != rc) {

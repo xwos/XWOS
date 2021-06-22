@@ -36,15 +36,7 @@ xwer_t xwosdl_sem_destroy(struct xwosdl_sem * sem)
 static __xwcc_inline
 xwer_t xwosdl_sem_create(struct xwosdl_sem ** sembuf, xwssq_t val, xwssq_t max)
 {
-        xwer_t rc;
-
-        if (NULL != sembuf) {
-                *sembuf = NULL;
-                rc = xwup_rtsem_create(sembuf, val, max);
-        } else {
-                rc = -EFAULT;
-        }
-        return rc;
+        return xwup_rtsem_create(sembuf, val, max);
 }
 
 static __xwcc_inline

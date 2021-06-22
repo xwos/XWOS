@@ -34,12 +34,7 @@ xwer_t xwosdl_br_destroy(struct xwosdl_br * br)
 static __xwcc_inline
 xwer_t xwosdl_br_create(struct xwosdl_br ** brbuf, xwsz_t num)
 {
-        xwer_t rc;
-
-        XWOS_VALIDATE((brbuf), "nullptr", -EFAULT);
-        *brbuf = NULL;
-        rc = xwmp_evt_create(brbuf, XWMP_EVT_TYPE_BR, num);
-        return rc;
+        return xwmp_evt_create(brbuf, XWMP_EVT_TYPE_BR, num);
 }
 
 static __xwcc_inline

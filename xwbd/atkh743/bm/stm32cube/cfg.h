@@ -22,6 +22,6 @@
 #define __bm_stm32cube_cfg_h__
 
 #define STM32CUBECFG_DCACHE             1
-#define STM32CUBECFG_ICACHE             1
+#define STM32CUBECFG_ICACHE             0
 
 #endif /* bm/stm32cube/cfg.h */

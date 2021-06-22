@@ -204,34 +204,6 @@ xwer_t xwmp_mtx_gc(void * mtx)
         return XWOK;
 }
 
-__xwmp_api
-xwer_t xwmp_mtx_acquire(struct xwmp_mtx * mtx, xwsq_t tik)
-{
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        return xwos_object_acquire(&mtx->xwobj, tik);
-}
-
-__xwmp_api
-xwer_t xwmp_mtx_release(struct xwmp_mtx * mtx, xwsq_t tik)
-{
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        return xwos_object_release(&mtx->xwobj, tik);
-}
-
-__xwmp_api
-xwer_t xwmp_mtx_grab(struct xwmp_mtx * mtx)
-{
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        return xwos_object_grab(&mtx->xwobj);
-}
-
-__xwmp_api
-xwer_t xwmp_mtx_put(struct xwmp_mtx * mtx)
-{
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        return xwos_object_put(&mtx->xwobj);
-}
-
 /**
  * @brief 激活互斥锁对象，并初始化
  * @param[in] mtx: 互斥锁对象的指针
@@ -319,6 +291,34 @@ xwer_t xwmp_mtx_delete(struct xwmp_mtx * mtx)
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
 
         return xwmp_mtx_put(mtx);
+}
+
+__xwmp_api
+xwer_t xwmp_mtx_acquire(struct xwmp_mtx * mtx, xwsq_t tik)
+{
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+        return xwos_object_acquire(&mtx->xwobj, tik);
+}
+
+__xwmp_api
+xwer_t xwmp_mtx_release(struct xwmp_mtx * mtx, xwsq_t tik)
+{
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+        return xwos_object_release(&mtx->xwobj, tik);
+}
+
+__xwmp_api
+xwer_t xwmp_mtx_grab(struct xwmp_mtx * mtx)
+{
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+        return xwos_object_grab(&mtx->xwobj);
+}
+
+__xwmp_api
+xwer_t xwmp_mtx_put(struct xwmp_mtx * mtx)
+{
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+        return xwos_object_put(&mtx->xwobj);
 }
 
 /**

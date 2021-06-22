@@ -33,12 +33,7 @@ xwer_t xwosdl_sel_destroy(struct xwosdl_sel * sel)
 static __xwcc_inline
 xwer_t xwosdl_sel_create(struct xwosdl_sel ** selbuf, xwsz_t num)
 {
-        xwer_t rc;
-
-        XWOS_VALIDATE((selbuf), "nullptr", -EFAULT);
-        *selbuf = NULL;
-        rc = xwmp_evt_create(selbuf, XWMP_EVT_TYPE_SEL, num);
-        return rc;
+        return xwmp_evt_create(selbuf, XWMP_EVT_TYPE_SEL, num);
 }
 
 static __xwcc_inline

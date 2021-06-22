@@ -56,8 +56,8 @@ void xwlua_xt_copy_function(lua_State * S, int sidx, lua_State * D)
         size_t fl;
         int rc;
 
-        lua_pushvalue(S, sidx); /* push function */
         luaL_buffinit(S, &lb);
+        lua_pushvalue(S, sidx); /* push function */
         rc = lua_dump(S, xwlua_xt_function_writer, &lb, true);
         if (0 == rc) {
                 luaL_pushresult(&lb); /* push function string */

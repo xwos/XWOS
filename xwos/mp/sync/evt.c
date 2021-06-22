@@ -37,8 +37,10 @@ static __xwmp_code
 void xwmp_evt_free(struct xwmp_evt * evt);
 
 static __xwmp_code
-void xwmp_evt_construct(struct xwmp_evt * evt, xwsz_t num,
-                        xwbmp_t * bmp, xwbmp_t * msk);
+void xwmp_evt_construct(struct xwmp_evt * evt);
+
+static __xwmp_code
+void xwmp_evt_setup(struct xwmp_evt * evt, xwsz_t num, xwbmp_t * bmp, xwbmp_t * msk);
 
 static __xwmp_code
 void xwmp_evt_destruct(struct xwmp_evt * evt);
@@ -90,7 +92,8 @@ struct xwmp_evt * xwmp_evt_alloc(xwsz_t num)
         } else {
                 bmp = (void *)&evt[1];
                 msk = &bmp[bmpnum];
-                xwmp_evt_construct(evt, num, bmp, msk);
+                xwmp_evt_construct(evt);
+                xwmp_evt_setup(evt, num, bmp, msk);
         }
         return evt;
 #else /* XWMPCFG_SYNC_EVT_STDC_MM */
@@ -109,7 +112,8 @@ struct xwmp_evt * xwmp_evt_alloc(xwsz_t num)
         if (XWOK == rc) {
                 bmp = (void *)&mem.evt[1];
                 msk = &bmp[bmpnum];
-                xwmp_evt_construct(mem.evt, num, bmp, msk);
+                xwmp_evt_construct(mem.evt);
+                xwmp_evt_setup(mem.evt, num, bmp, msk);
         } else {
                 mem.evt = err_ptr(rc);
         }
@@ -136,15 +140,24 @@ void xwmp_evt_free(struct xwmp_evt * evt)
 /**
  * @brief 事件对象的构造函数
  * @param[in] evt: 事件对象的指针
+ */
+static __xwmp_code
+void xwmp_evt_construct(struct xwmp_evt * evt)
+{
+        xwmp_synobj_construct(&evt->cond.synobj);
+}
+
+/**
+ * @brief 为事件对象安装位图数组
+ * @param[in] evt: 事件对象的指针
  * @param[in] num: 事件的数量
  * @param[in] bmp: 事件对象记录事件状态的位图数组缓冲区
  * @param[in] msk: 事件对象记录掩码状态的位图数组缓冲区
  */
 static __xwmp_code
-void xwmp_evt_construct(struct xwmp_evt * evt, xwsz_t num,
-                        xwbmp_t * bmp, xwbmp_t * msk)
+void xwmp_evt_setup(struct xwmp_evt * evt, xwsz_t num,
+                    xwbmp_t * bmp, xwbmp_t * msk)
 {
-        xwmp_synobj_construct(&evt->cond.synobj);
         evt->num = num;
         evt->bmp = bmp;
         evt->msk = msk;
@@ -170,34 +183,6 @@ xwer_t xwmp_evt_gc(void * evt)
 {
         xwmp_evt_free((struct xwmp_evt *)evt);
         return XWOK;
-}
-
-__xwmp_api
-xwer_t xwmp_evt_acquire(struct xwmp_evt * evt, xwsq_t tik)
-{
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        return xwmp_synobj_acquire(&evt->cond.synobj, tik);
-}
-
-__xwmp_api
-xwer_t xwmp_evt_release(struct xwmp_evt * evt, xwsq_t tik)
-{
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        return xwmp_synobj_release(&evt->cond.synobj, tik);
-}
-
-__xwmp_api
-xwer_t xwmp_evt_grab(struct xwmp_evt * evt)
-{
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        return xwmp_synobj_grab(&evt->cond.synobj);
-}
-
-__xwmp_api
-xwer_t xwmp_evt_put(struct xwmp_evt * evt)
-{
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        return xwmp_synobj_put(&evt->cond.synobj);
 }
 
 /**
@@ -248,6 +233,28 @@ xwer_t xwmp_evt_activate(struct xwmp_evt * evt, xwsq_t type, xwobj_gc_f gcfunc)
 }
 
 __xwmp_api
+xwer_t xwmp_evt_init(struct xwmp_evt * evt, xwsq_t type, xwsz_t num,
+                     xwbmp_t * bmp, xwbmp_t * msk)
+{
+        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
+        XWOS_VALIDATE((bmp), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
+        XWOS_VALIDATE(((type & XWMP_EVT_TYPE_MASK) < XWMP_EVT_TYPE_MAX),
+                      "type-error", -EINVAL);
+
+        xwmp_evt_construct(evt);
+        xwmp_evt_setup(evt, num, bmp, msk);
+        return xwmp_evt_activate(evt, type, NULL);
+}
+
+__xwmp_api
+xwer_t xwmp_evt_destroy(struct xwmp_evt * evt)
+{
+        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
+        return xwmp_evt_put(evt);
+}
+
+__xwmp_api
 xwer_t xwmp_evt_create(struct xwmp_evt ** ptrbuf, xwsq_t type, xwsz_t num)
 {
         struct xwmp_evt * evt;
@@ -281,25 +288,31 @@ xwer_t xwmp_evt_delete(struct xwmp_evt * evt)
 }
 
 __xwmp_api
-xwer_t xwmp_evt_init(struct xwmp_evt * evt, xwsq_t type, xwsz_t num,
-                     xwbmp_t * bmp, xwbmp_t * msk)
+xwer_t xwmp_evt_acquire(struct xwmp_evt * evt, xwsq_t tik)
 {
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((bmp), "nullptr", -EFAULT);
-        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((type & XWMP_EVT_TYPE_MASK) < XWMP_EVT_TYPE_MAX),
-                      "type-error", -EINVAL);
-
-        xwmp_evt_construct(evt, num, bmp, msk);
-        return xwmp_evt_activate(evt, type, NULL);
+        return xwmp_synobj_acquire(&evt->cond.synobj, tik);
 }
 
 __xwmp_api
-xwer_t xwmp_evt_destroy(struct xwmp_evt * evt)
+xwer_t xwmp_evt_release(struct xwmp_evt * evt, xwsq_t tik)
 {
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
+        return xwmp_synobj_release(&evt->cond.synobj, tik);
+}
 
-        return xwmp_evt_put(evt);
+__xwmp_api
+xwer_t xwmp_evt_grab(struct xwmp_evt * evt)
+{
+        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
+        return xwmp_synobj_grab(&evt->cond.synobj);
+}
+
+__xwmp_api
+xwer_t xwmp_evt_put(struct xwmp_evt * evt)
+{
+        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
+        return xwmp_synobj_put(&evt->cond.synobj);
 }
 
 __xwmp_api

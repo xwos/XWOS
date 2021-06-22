@@ -32,12 +32,7 @@ xwer_t xwosdl_mtx_destroy(struct xwosdl_mtx * mtx)
 static __xwcc_inline
 xwer_t xwosdl_mtx_create(struct xwosdl_mtx ** mtxbuf, xwpr_t sprio)
 {
-        xwer_t rc;
-
-        XWOS_VALIDATE((mtxbuf), "nullptr", -EFAULT);
-        *mtxbuf = NULL;
-        rc = xwmp_mtx_create(mtxbuf, sprio);
-        return rc;
+        return xwmp_mtx_create(mtxbuf, sprio);
 }
 
 static __xwcc_inline

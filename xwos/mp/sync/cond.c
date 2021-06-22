@@ -188,34 +188,6 @@ xwer_t xwmp_cond_gc(void * cond)
         return XWOK;
 }
 
-__xwmp_api
-xwer_t xwmp_cond_acquire(struct xwmp_cond * cond, xwsq_t tik)
-{
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-        return xwmp_synobj_acquire(&cond->synobj, tik);
-}
-
-__xwmp_api
-xwer_t xwmp_cond_release(struct xwmp_cond * cond, xwsq_t tik)
-{
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-        return xwmp_synobj_release(&cond->synobj, tik);
-}
-
-__xwmp_api
-xwer_t xwmp_cond_grab(struct xwmp_cond * cond)
-{
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-        return xwmp_synobj_grab(&cond->synobj);
-}
-
-__xwmp_api
-xwer_t xwmp_cond_put(struct xwmp_cond * cond)
-{
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-        return xwmp_synobj_put(&cond->synobj);
-}
-
 /**
  * @brief 激活条件量
  * @param[in] cond: 条件量对象的指针
@@ -289,6 +261,34 @@ xwer_t xwmp_cond_delete(struct xwmp_cond * cond)
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
 
         return xwmp_cond_put(cond);
+}
+
+__xwmp_api
+xwer_t xwmp_cond_acquire(struct xwmp_cond * cond, xwsq_t tik)
+{
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+        return xwmp_synobj_acquire(&cond->synobj, tik);
+}
+
+__xwmp_api
+xwer_t xwmp_cond_release(struct xwmp_cond * cond, xwsq_t tik)
+{
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+        return xwmp_synobj_release(&cond->synobj, tik);
+}
+
+__xwmp_api
+xwer_t xwmp_cond_grab(struct xwmp_cond * cond)
+{
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+        return xwmp_synobj_grab(&cond->synobj);
+}
+
+__xwmp_api
+xwer_t xwmp_cond_put(struct xwmp_cond * cond)
+{
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+        return xwmp_synobj_put(&cond->synobj);
 }
 
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)

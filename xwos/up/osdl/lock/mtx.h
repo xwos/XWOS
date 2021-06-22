@@ -38,15 +38,7 @@ xwer_t xwosdl_mtx_destroy(struct xwosdl_mtx * mtx)
 static __xwcc_inline
 xwer_t xwosdl_mtx_create(struct xwosdl_mtx ** mtxbuf, xwpr_t sprio)
 {
-        xwer_t rc;
-
-        if (NULL != mtxbuf) {
-                *mtxbuf = NULL;
-                rc = xwup_mtx_create(mtxbuf, sprio);
-        } else {
-                rc = -EFAULT;
-        }
-        return rc;
+        return xwup_mtx_create(mtxbuf, sprio);
 }
 
 static __xwcc_inline

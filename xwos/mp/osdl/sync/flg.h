@@ -44,12 +44,7 @@ xwer_t xwosdl_flg_destroy(struct xwosdl_flg * flg)
 static __xwcc_inline
 xwer_t xwosdl_flg_create(struct xwosdl_flg ** flgbuf, xwsz_t num)
 {
-        xwer_t rc;
-
-        XWOS_VALIDATE((flgbuf), "nullptr", -EFAULT);
-        *flgbuf = NULL;
-        rc = xwmp_evt_create(flgbuf, XWMP_EVT_TYPE_FLG, num);
-        return rc;
+        return xwmp_evt_create(flgbuf, XWMP_EVT_TYPE_FLG, num);
 }
 
 static __xwcc_inline

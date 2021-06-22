@@ -498,7 +498,8 @@ xwer_t xwmp_thd_create(struct xwmp_thd ** thdpbuf,
         xwstk_t * stk;
         xwer_t rc;
 
-        XWOS_VALIDATE((NULL != thdpbuf), "nullptr", -EFAULT);
+        XWOS_VALIDATE((thdpbuf), "nullptr", -EFAULT);
+        XWOS_VALIDATE((mainfunc), "nullptr", -EFAULT);
 
         stk = xwmp_thd_stack_alloc(stack_size);
         if (__xwcc_unlikely(is_err(stk))) {

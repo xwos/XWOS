@@ -110,13 +110,10 @@ xwer_t xwosdl_thd_init(struct xwosdl_thd * thd, const char * name,
                        xwstk_t * stack, xwsz_t stack_size,
                        xwpr_t priority, xwsq_t attr)
 {
-        xwer_t rc;
-
-        rc = xwmp_thd_init(thd, name,
-                           (xwmp_thd_f)mainfunc, arg,
-                           stack, stack_size,
-                           priority, attr);
-        return rc;
+        return xwmp_thd_init(thd, name,
+                             (xwmp_thd_f)mainfunc, arg,
+                             stack, stack_size,
+                             priority, attr);
 }
 
 static __xwcc_inline
@@ -125,20 +122,8 @@ xwer_t xwosdl_thd_create(struct xwosdl_thd ** thdbuf, const char * name,
                          xwsz_t stack_size,
                          xwpr_t priority, xwsq_t attr)
 {
-        struct xwmp_thd * thd;
-        xwer_t rc;
-
-        XWOS_VALIDATE((thdbuf), "nullptr", -EFAULT);
-        rc = xwmp_thd_create(&thd, name,
-                             (xwmp_thd_f)mainfunc, arg,
-                             stack_size,
-                             priority, attr);
-        if (XWOK == rc) {
-                *thdbuf = thd;
-        } else {
-                *thdbuf = NULL;
-        }
-        return rc;
+        return xwmp_thd_create(thdbuf, name, mainfunc, arg,
+                               stack_size, priority, attr);
 }
 
 static __xwcc_inline

@@ -52,12 +52,7 @@ xwer_t xwosdl_sem_destroy(struct xwosdl_sem * sem)
 static __xwcc_inline
 xwer_t xwosdl_sem_create(struct xwosdl_sem ** sembuf, xwssq_t val, xwssq_t max)
 {
-        xwer_t rc;
-
-        XWOS_VALIDATE((sembuf), "nullptr", -EFAULT);
-        *sembuf = NULL;
-        rc = xwmp_sem_create(sembuf, XWMP_SEM_TYPE_RT, val, max);
-        return rc;
+        return xwmp_sem_create(sembuf, XWMP_SEM_TYPE_RT, val, max);
 }
 
 static __xwcc_inline
@@ -162,15 +157,7 @@ xwer_t xwosdl_sem_destroy(struct xwosdl_sem * sem)
 static __xwcc_inline
 xwer_t xwosdl_sem_create(struct xwosdl_sem ** sembuf, xwssq_t val, xwssq_t max)
 {
-        xwer_t rc;
-
-        if (NULL != sembuf) {
-                *sembuf = NULL;
-                rc = xwmp_sem_create(&sem, XWMP_SEM_TYPE_PIPELINE, val, max);
-        } else {
-                rc = -EFAULT;
-        }
-        return rc;
+        return xwmp_sem_create(&sem, XWMP_SEM_TYPE_PIPELINE, val, max);
 }
 
 static __xwcc_inline
@@ -222,7 +209,7 @@ xwer_t xwosdl_sem_wait_unintr(struct xwosdl_sem * sem)
 }
 
 #else /* XWMPCFG_SYNC_PLSEM */
-#error "Can't find the semaphore configuration!"
+  #error "Can't find the semaphore configuration!"
 #endif /* !XWMPCFG_SYNC_PLSEM */
 
 #endif /* xwos/mp/osdl/sync/sem.h */
