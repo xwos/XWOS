@@ -1,11 +1,21 @@
 /**
  * @file
- * @brief 玄武 Lua Lib：导出表
+ * @brief 玄武Lua库：导出表
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
  * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
- * > http://www.lua.org/license.html
+ * > Licensed under the Apache License, Version 2.0 (the "License");
+ * > you may not use this file except in compliance with the License.
+ * > You may obtain a copy of the License at
+ * >
+ * >         http://www.apache.org/licenses/LICENSE-2.0
+ * >
+ * > Unless required by applicable law or agreed to in writing, software
+ * > distributed under the License is distributed on an "AS IS" BASIS,
+ * > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * > See the License for the specific language governing permissions and
+ * > limitations under the License.
  */
 
 #include <xwos/standard.h>
@@ -19,7 +29,7 @@
 #include "xwlua/xwos/spinlock.h"
 #include "xwlua/xwos/seqlock.h"
 
-lua_State * xwlua_xt;
+lua_State * xwlua_xt = NULL;
 struct xwos_mtx xwlua_xt_lock;
 
 int xwlua_xt_function_writer(lua_State * S, const void * b, size_t size, void * ud)
@@ -486,7 +496,7 @@ const luaL_Reg xwlua_xt_metamethod[] = {
         {NULL, NULL},
 };
 
-LUAMOD_API int xwlua_open_xt(lua_State * L)
+void xwlua_init_xt(void)
 {
         xwos_mtx_init(&xwlua_xt_lock, XWOS_SKD_PRIORITY_RT_MAX);
         xwlua_xt = luaL_newstate();
@@ -498,6 +508,13 @@ LUAMOD_API int xwlua_open_xt(lua_State * L)
         /* metatable in xwxt */
         luaL_newmetatable(xwlua_xt, "xwlua_vm");
         lua_pop(xwlua_xt, 1); /* pop metatable */
+}
+
+LUAMOD_API int xwlua_open_xt(lua_State * L)
+{
+        if (NULL == xwlua_xt) {
+                xwlua_init_xt();
+        }
 
         luaL_newmetatable(L, "xwlua_xt");
         luaL_setfuncs(L, xwlua_xt_metamethod, 0); /* add metamethods */

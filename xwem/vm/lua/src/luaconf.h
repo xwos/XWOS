@@ -122,6 +122,10 @@
 #define LUA_FLOAT_DOUBLE	2
 #define LUA_FLOAT_LONGDOUBLE	3
 
+/* Default configuration ('long long' and 'double', for 64-bit Lua) */
+#define LUA_INT_DEFAULT		XWEMCFG_vm_lua_INT_TYPE
+#define LUA_FLOAT_DEFAULT	XWEMCFG_vm_lua_FLOAT_TYPE
+
 #if defined(LUA_32BITS)		/* { */
 /*
 ** 32-bit integers and 'float'
@@ -143,15 +147,12 @@
 #endif				/* } */
 
 
-/*
-** default configuration for 64-bit Lua ('long long' and 'double')
-*/
 #if !defined(LUA_INT_TYPE)
-#define LUA_INT_TYPE	LUA_INT_LONGLONG
+#define LUA_INT_TYPE	LUA_INT_DEFAULT
 #endif
 
 #if !defined(LUA_FLOAT_TYPE)
-#define LUA_FLOAT_TYPE	LUA_FLOAT_DOUBLE
+#define LUA_FLOAT_TYPE	LUA_FLOAT_DEFAULT
 #endif
 
 /* }================================================================== */
@@ -759,4 +760,3 @@
 
 
 #endif
-
