@@ -47,23 +47,14 @@ typedef struct {
 #define XWOS_SWT_NILD ((xwos_swt_d){NULL, 0,})
 
 /**
- * @brief XWOS API：软件定时器标志 —— 无
+ * @brief XWOS API：软件定时器标志 —— 无标志（默认标志）
  */
 #define XWOS_SWT_FLAG_NULL            XWOSDL_SWT_FLAG_NULL
 
 /**
  * @brief XWOS API：软件定时器标志 —— 自动重启
- * @note 不可与XWOS_SWT_FLAG_RESTART同时使用
  */
 #define XWOS_SWT_FLAG_RESTART         XWOSDL_SWT_FLAG_RESTART
-
-/**
- * @brief XWOS API：软件定时器标志 —— 自动销毁
- * @note
- * - 不可与XWOS_SWT_FLAG_RESTART同时使用
- * - 不可用于静态初始化的软件定时器
- */
-#define XWOS_SWT_FLAG_AUTORM          XWOSDL_SWT_FLAG_AUTORM
 
 /**
  * @brief XWOS API：静态方式初始化软件定时器

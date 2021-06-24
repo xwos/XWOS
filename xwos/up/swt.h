@@ -24,10 +24,9 @@ struct xwup_swt;
  * @brief 软件定时器标志枚举
  */
 enum xwup_swt_flag_em {
-        XWUP_SWT_FLAG_NULL = 0, /**< null */
-        XWUP_SWT_FLAG_RESTART = (1 << 0), /**< auto-restart */
-        XWUP_SWT_FLAG_AUTORM = (1 << 1), /**< auto-remove  */
-        XWUP_SWT_FLAG_MASK = XWUP_SWT_FLAG_RESTART | XWUP_SWT_FLAG_AUTORM,
+        XWUP_SWT_FLAG_NULL = 0, /**< 无（默认标志） */
+        XWUP_SWT_FLAG_RESTART = (1 << 0), /**< 自动重启 */
+        XWUP_SWT_FLAG_MASK = XWUP_SWT_FLAG_RESTART,
 };
 
 /**

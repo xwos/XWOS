@@ -17,7 +17,6 @@
 
 #define XWOSDL_SWT_FLAG_NULL            XWUP_SWT_FLAG_NULL
 #define XWOSDL_SWT_FLAG_RESTART         XWUP_SWT_FLAG_RESTART
-#define XWOSDL_SWT_FLAG_AUTORM          XWUP_SWT_FLAG_AUTORM
 
 #define xwosdl_swt xwup_swt
 typedef xwup_swt_f xwosdl_swt_f;

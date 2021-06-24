@@ -92,7 +92,6 @@ void xwup_swt_activate(struct xwup_swt * swt,
                        const char * name,
                        xwsq_t flag)
 {
-        flag &= (xwsq_t)(~(XWUP_SWT_FLAG_AUTORM));
         xwup_ttn_init(&swt->ttn, (xwptr_t)swt, XWUP_TTN_TYPE_SWT);
         swt->cb = NULL;
         swt->arg = NULL;
@@ -146,10 +145,6 @@ xwer_t xwup_swt_create(struct xwup_swt ** ptrbuf,
         xwer_t rc;
 
         XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
-
-        if ((flag & XWUP_SWT_FLAG_RESTART) && (flag & XWUP_SWT_FLAG_AUTORM)) {
-                flag &= (xwsq_t)(~(XWUP_SWT_FLAG_AUTORM));
-        }
 
         *ptrbuf = NULL;
         swt = xwup_swt_alloc();

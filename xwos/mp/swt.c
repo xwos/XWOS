@@ -209,9 +209,6 @@ xwer_t xwmp_swt_activate(struct xwmp_swt * swt,
 {
         xwer_t rc;
 
-        if ((flag & XWMP_SWT_FLAG_RESTART) && (flag & XWMP_SWT_FLAG_AUTORM)) {
-                flag &= (xwsq_t)(~(XWMP_SWT_FLAG_AUTORM));
-        }
         rc = xwos_object_activate(&swt->xwobj, gcfunc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwobj_activate;
@@ -233,7 +230,6 @@ xwer_t xwmp_swt_init(struct xwmp_swt * swt,
 {
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
 
-        flag &= (xwsq_t)(~(XWMP_SWT_FLAG_AUTORM));
         xwmp_swt_construct(swt);
         return xwmp_swt_activate(swt, name, flag, NULL);
 }
@@ -339,9 +335,7 @@ void xwmp_swt_ttn_cb(void * entry)
                 rc = xwmp_tt_add_locked(xwtt, &swt->ttn, cpuirq);
                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 XWOS_BUG_ON(rc < 0);
-        } else if (XWMP_SWT_FLAG_AUTORM & swt->flag) {
-                xwmp_swt_put(swt);
-        }/* else {} */
+        }
 }
 
 __xwmp_api

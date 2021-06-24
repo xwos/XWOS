@@ -61,7 +61,7 @@
   #define __xwcc_alignl1cache \
           __xwcc_aligned(CPUCFG_L1_CACHELINE_SIZE)
 #else
-  #define __xwcc_alignl1cache   __xwcc_aligned(sizeof(long))
+  #define __xwcc_alignl1cache   __xwcc_aligned(XWMMCFG_ALIGNMENT)
 #endif
 
 #define __xwcc_alignptr         __xwcc_aligned(sizeof(void *))

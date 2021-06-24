@@ -139,7 +139,7 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
                 xwpcp->txq.car[i].pri = XWPCP_INVALID_PRI;
                 xwpcp->txq.car[i].slot = NULL;
         }
-        memset(&xwpcp->txq.carbmp, 0, sizeof(xwpcp->txq.carbmp));
+        memset((void *)&xwpcp->txq.carbmp, 0, sizeof(xwpcp->txq.carbmp));
         for (i = 0; i < (xwssq_t)XWPCP_PRI_NUM; i++) {
                 xwlib_bclst_init_head(&xwpcp->txq.q[i]);
         }

@@ -38,8 +38,6 @@ xwer_t xwmm_sma_init(struct xwmm_sma * sa,
 {
         xwer_t rc;
 
-        origin = XWBOP_ALIGN(origin, XWMM_ALIGNMENT);
-        size = XWBOP_ROUND(size, XWMM_ALIGNMENT);
         pos = XWBOP_ALIGN(pos, XWMM_ALIGNMENT);
         if (size < pos) {
                 rc = -EINVAL;

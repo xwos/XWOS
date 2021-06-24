@@ -461,7 +461,7 @@ xwer_t xwscp_rx_sdu(struct xwscp * xwscp, union xwscp_slot * slot)
         xwscplogf(DEBUG,
                   "qos:0x%X, frmsize:0x%X, "
                   "Remote ID:0x%X, Local ID:0x%X\n",
-                  slot->frm.head.qos, slot->frmsize, rmtid, lclid);
+                  slot->rx.frm.head.qos, slot->rx.frmsize, rmtid, lclid);
 
         if (slot->rx.frm.head.qos & XWSCP_MSG_QOS_ACK_MSK) {
                 if (__xwcc_likely(rmtid == lclid)) {
