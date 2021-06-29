@@ -33,10 +33,9 @@ enum xwds_i2c_msgflag_em {
         XWDS_I2C_F_10BITADDR = (1U << 0U), /**< 10位外设地址 */
         XWDS_I2C_F_ADDRMSK = (1U << 0U), /**< 地址掩码 */
 
-        XWDS_I2C_F_NONE = (0U), /**< 方向：无 */
         XWDS_I2C_F_RD = (1U << 1U), /**< 方向：读 */
-        XWDS_I2C_F_WR = (2U << 1U), /**< 方向：写 */
-        XWDS_I2C_F_DIRMSK = (3U << 1U), /**< 方向掩码 */
+        XWDS_I2C_F_WR = (0U << 1U), /**< 方向：写 */
+        XWDS_I2C_F_DIRMSK = (1U << 1U), /**< 方向掩码 */
 
         XWDS_I2C_F_START = (1U << 2U), /**< 产生起始条件：
                                             + 如果传输方向发生改变，需要增加START标志，

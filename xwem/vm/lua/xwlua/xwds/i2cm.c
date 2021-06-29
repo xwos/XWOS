@@ -67,31 +67,26 @@ int xwlua_i2cm_xfer(lua_State * L)
         top = lua_gettop(L);
         luai2cm = (struct xwlua_i2cm *)luaL_checkudata(L, 1, "xwlua_i2cm");
         msg.addr = (xwu16_t)luaL_checkinteger(L, 2);
-        msg.flag = (xwu16_t)luaL_checkinteger(L, 3);
         if (msg.addr & (xwu16_t)0xFF00) {
                 msg.flag |= XWDS_I2C_F_10BITADDR;
         } else {
                 msg.flag |= XWDS_I2C_F_7BITADDR;
         }
-        msg.size = (xwsz_t)luaL_checkinteger(L, 4);
-        if (msg.flag & XWDS_I2C_F_WR) {
-                msg.data = (xwu8_t *)luaL_checklstring(L, 5, &txdsize);
-                if (msg.size > txdsize) {
-                        msg.size = txdsize;
-                }
-                if (top >= 6) {
-                        time = (xwtm_t)luaL_checknumber(L, 6);
-                } else {
-                        time = XWTM_MAX;
-                }
-                rc = xwds_i2cm_xfer(luai2cm->i2cm, &msg, &time);
-                lua_pushinteger(L, (lua_Integer)rc);
-                ret = 1;
-        } else {
+        if (lua_toboolean(L, 3)) {
+                msg.flag |= XWDS_I2C_F_START;
+        }
+        if (lua_toboolean(L, 4)) {
+                msg.flag |= XWDS_I2C_F_STOP;
+        }
+        if (lua_toboolean(L, 5)) {
+                msg.flag |= XWDS_I2C_F_RD;
+        }
+        msg.size = (xwsz_t)luaL_checkinteger(L, 6);
+        if (msg.flag & XWDS_I2C_F_RD) {
                 luaL_buffinit(L, &b);
                 msg.data = (xwu8_t *)luaL_prepbuffer(&b);
-                if (top >= 6) {
-                        time = (xwtm_t)luaL_checknumber(L, 6);
+                if (top >= 7) {
+                        time = (xwtm_t)luaL_checknumber(L, 7);
                 } else {
                         time = XWTM_MAX;
                 }
@@ -99,6 +94,19 @@ int xwlua_i2cm_xfer(lua_State * L)
                 lua_pushinteger(L, (lua_Integer)rc);
                 luaL_pushresult(&b);
                 ret = 2;
+        } else {
+                msg.data = (xwu8_t *)luaL_checklstring(L, 7, &txdsize);
+                if (msg.size > txdsize) {
+                        msg.size = txdsize;
+                }
+                if (top >= 8) {
+                        time = (xwtm_t)luaL_checknumber(L, 8);
+                } else {
+                        time = XWTM_MAX;
+                }
+                rc = xwds_i2cm_xfer(luai2cm->i2cm, &msg, &time);
+                lua_pushinteger(L, (lua_Integer)rc);
+                ret = 1;
         }
         return ret;
 }

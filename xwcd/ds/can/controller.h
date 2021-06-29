@@ -144,7 +144,7 @@ enum xwds_canc_err_em {
         CANC_ERR_STUFF, /**< stuff error */
         CANC_ERR_FORM, /**< form error */
         CANC_ERR_ACK, /**< ACK error */
-        CANC_ERR_CRC, /*  CRC Error Flag */
+        CANC_ERR_CRC, /**< CRC Error Flag */
         CANC_ERR_B1, /**< Recessive Bit Error Flag */
         CANC_ERR_B0, /**< Dominant Bit Error Flag */
         CANC_ERR_ACKDELIMITER, /**< ACK Delimiter Error Flag */

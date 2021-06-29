@@ -61,7 +61,8 @@ struct xwds_i2cm {
 
 void xwds_i2cm_construct(struct xwds_i2cm * i2cm);
 void xwds_i2cm_destruct(struct xwds_i2cm * i2cm);
-xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
+xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm,
+                      struct xwds_i2c_msg * msg,
                       xwtm_t * xwtm);
 xwer_t xwds_i2cm_abort(struct xwds_i2cm * i2cm,
                        xwu16_t address, xwu16_t addrmode,

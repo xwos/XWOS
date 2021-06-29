@@ -54,12 +54,6 @@ int xwlua_soc_tostring(lua_State * L)
         return 1;
 }
 
-int xwlua_soc_lpm(lua_State * L)
-{
-        luaL_checkudata(L, 1, "xwlua_soc");
-        return 0;
-}
-
 const luaL_Reg xwlua_soc_indexmethod[] = {
         {"pin", xwlua_gpio_pin},
         {"req", xwlua_gpio_req},
@@ -69,7 +63,6 @@ const luaL_Reg xwlua_soc_indexmethod[] = {
         {"toggle", xwlua_gpio_toggle},
         {"output", xwlua_gpio_output},
         {"input", xwlua_gpio_output},
-        {"lpm", xwlua_soc_lpm},
         {NULL, NULL},
 };
 
@@ -91,7 +84,6 @@ void xwlua_ds_init_soc(lua_State * L)
 }
 
 const luaL_Reg xwlua_soc_libconstructor[] = {
-        {"lpm", xwlua_soc_lpm},
         {NULL, NULL},
 };
 
