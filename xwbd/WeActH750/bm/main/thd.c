@@ -72,18 +72,21 @@ xwer_t led_task(void * arg)
         xwtm_t xwtm;
 
         XWOS_UNUSED(arg);
-
-        xwds_gpio_req(&stm32cube_soc_cb,
-                      XWDS_GPIO_PORT_E, XWDS_GPIO_PIN_3);
+        xwds_gpio_req(&stm32cube_soc_cb, XWDS_GPIO_PORT_E, XWDS_GPIO_PIN_3);
         while (!xwos_cthd_shld_stop()) {
                 if (xwos_cthd_shld_frz()) {
+                        xwds_gpio_reset(&stm32cube_soc_cb,
+                                        XWDS_GPIO_PORT_E, XWDS_GPIO_PIN_3);
+                        xwds_gpio_rls(&stm32cube_soc_cb,
+                                      XWDS_GPIO_PORT_E, XWDS_GPIO_PIN_3);
                         xwos_cthd_freeze();
+                        xwds_gpio_req(&stm32cube_soc_cb,
+                                      XWDS_GPIO_PORT_E, XWDS_GPIO_PIN_3);
                 }
                 xwtm = 1 * XWTM_S;
                 xwos_cthd_sleep(&xwtm);
-                xwds_gpio_toggle(&stm32cube_soc_cb,
-                                 XWDS_GPIO_PORT_E,
-                                 XWDS_GPIO_PIN_3);
+                xwds_gpio_toggle(&stm32cube_soc_cb, XWDS_GPIO_PORT_E, XWDS_GPIO_PIN_3);
         }
+        xwds_gpio_rls(&stm32cube_soc_cb, XWDS_GPIO_PORT_E, XWDS_GPIO_PIN_3);
         return XWOK;
 }

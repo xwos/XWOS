@@ -19,11 +19,13 @@
  */
 
 #include <bm/stm32cube/standard.h>
+#include <xwos/osal/pm.h>
 #include <xwcd/ds/xwds.h>
 #include <xwcd/ds/device.h>
 #include <xwcd/ds/soc/chip.h>
 #include <xwcd/ds/uart/dma.h>
 #include <bm/stm32cube/xwac/xwds/device.h>
+#include <bm/stm32cube/xwac/xwds/pm.h>
 #include <bm/stm32cube/xwac/xwds/cmif.h>
 
 /**
@@ -47,6 +49,12 @@ xwer_t stm32cube_xwds_ll_start(void)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_start;
         }
+
+        xwos_pm_set_cb(stm32cube_pm_resume,
+                       stm32cube_pm_suspend,
+                       stm32cube_pm_wakeup,
+                       stm32cube_pm_sleep,
+                       NULL);
 
         return XWOK;
 

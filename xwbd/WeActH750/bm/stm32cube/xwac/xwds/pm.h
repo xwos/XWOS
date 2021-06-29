@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 外部模块配置
+ * @brief STM32CUBE设备栈：电源管理
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,19 +18,14 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_xwem_h__
-#define __cfg_xwem_h__
+#ifndef __bm_stm32cube_xwac_xwds_pm_h__
+#define __bm_stm32cube_xwac_xwds_pm_h__
 
-#define XWEMCFG_serializing_nanopb                      1
-#define XWEMCFG_fs_fatfs                                1
-#define XWEMCFG_fs_littlefs                             0
-#define XWEMCFG_fs_spiffs                               0
-#define XWEMCFG_fs_dhara                                0
+#include <bm/stm32cube/standard.h>
 
-#define XWEMCFG_vm_lua                                  1
-#define XWEMCFG_vm_lua_INT_TYPE                         LUA_INT_LONG
-#define XWEMCFG_vm_lua_FLOAT_TYPE                       LUA_FLOAT_DOUBLE
-#define XWEMCFG_vm_lua_THD_STACK                        8192
-#define XWEMCFG_vm_lua_BRDLIBS                          1
+void stm32cube_pm_resume(void * arg);
+void stm32cube_pm_suspend(void * arg);
+void stm32cube_pm_wakeup(void * arg);
+void stm32cube_pm_sleep(void * arg);
 
-#endif /* cfg/xwem.h */
+#endif /* bm/stm32cube/xwac/xwds/pm.h */

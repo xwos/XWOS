@@ -24,6 +24,7 @@
 #include <xwem/vm/lua/mif.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/mif.h>
+#include <bm/button/mif.h>
 #include <bm/main/xwpcp.h>
 #include <bm/main/thd.h>
 
@@ -86,6 +87,11 @@ xwer_t main_task(void * arg)
                 goto err_newlibac_init;
         }
 
+        rc = bmbtn_start();
+        if (rc < 0) {
+                goto err_bmbtn_start;
+        }
+
         rc = child_thd_start();
         if (rc < 0) {
                 goto err_child_thd_start;
@@ -112,6 +118,8 @@ err_xwlua_start:
 err_xwpcp_start:
         BDL_BUG();
 err_child_thd_start:
+        BDL_BUG();
+err_bmbtn_start:
         BDL_BUG();
 err_newlibac_init:
         BDL_BUG();

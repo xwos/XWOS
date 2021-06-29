@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 外部模块配置
+ * @brief 按键模块：接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,19 +18,12 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_xwem_h__
-#define __cfg_xwem_h__
+#ifndef __bm_button_mif_h__
+#define __bm_button_mif_h__
 
-#define XWEMCFG_serializing_nanopb                      1
-#define XWEMCFG_fs_fatfs                                1
-#define XWEMCFG_fs_littlefs                             0
-#define XWEMCFG_fs_spiffs                               0
-#define XWEMCFG_fs_dhara                                0
+#include <xwos/standard.h>
 
-#define XWEMCFG_vm_lua                                  1
-#define XWEMCFG_vm_lua_INT_TYPE                         LUA_INT_LONG
-#define XWEMCFG_vm_lua_FLOAT_TYPE                       LUA_FLOAT_DOUBLE
-#define XWEMCFG_vm_lua_THD_STACK                        8192
-#define XWEMCFG_vm_lua_BRDLIBS                          1
+xwer_t bmbtn_start(void);
+xwer_t bmbtn_stop(void);
 
-#endif /* cfg/xwem.h */
+#endif /* bm/button/mif.h */
