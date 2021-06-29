@@ -30,6 +30,7 @@
 #include "xwlua/xwos/mtx.h"
 #include "xwlua/xwos/spinlock.h"
 #include "xwlua/xwos/seqlock.h"
+#include "xwlua/xwos/pm.h"
 
 const luaL_Reg xwlua_os[] = {
         {"skd", NULL},
@@ -43,6 +44,7 @@ const luaL_Reg xwlua_os[] = {
         {"mtx", NULL},
         {"splk", NULL},
         {"sqlk", NULL},
+        {"pm", NULL},
         {NULL, NULL},
 };
 
@@ -71,5 +73,7 @@ LUAMOD_API int xwlua_open_os(lua_State * L)
         lua_setfield(L, -2, "splk");
         xwlua_os_open_sqlk(L);
         lua_setfield(L, -2, "sqlk");
+        xwlua_os_open_pm(L);
+        lua_setfield(L, -2, "pm");
         return 1;
 }
