@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE模块：配置
+ * @brief STM32CUBE设备栈：电源管理
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,10 +18,14 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_cfg_h__
-#define __bm_stm32cube_cfg_h__
+#ifndef __bm_stm32cube_xwac_xwds_pm_h__
+#define __bm_stm32cube_xwac_xwds_pm_h__
 
-#define STM32CUBECFG_DCACHE             0
-#define STM32CUBECFG_ICACHE             0
+#include <bm/stm32cube/standard.h>
 
-#endif /* bm/stm32cube/cfg.h */
+void stm32cube_pm_resume(void * arg);
+void stm32cube_pm_suspend(void * arg);
+void stm32cube_pm_wakeup(void * arg);
+void stm32cube_pm_sleep(void * arg);
+
+#endif /* bm/stm32cube/xwac/xwds/pm.h */

@@ -156,6 +156,23 @@ void MX_GPIO_DeInit(void)
 {
 }
 
+void MX_GPIO_Suspend(void)
+{
+  HAL_GPIO_DeInit(GPIOB, LED1_Pin|LED0_Pin);
+}
+
+void MX_GPIO_Resume(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  /*Configure GPIO pins : PBPin PBPin */
+  GPIO_InitStruct.Pin = LED1_Pin|LED0_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+}
+
 void HAL_GPIO_EXTI_Callback(uint16_t pin)
 {
   xwssq_t idx;

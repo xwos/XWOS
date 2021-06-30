@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 电源管理模块：接口
+ * @brief 按键模块：接口
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,12 +18,12 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_xwpm_mif_h__
-#define __bm_xwpm_mif_h__
+#ifndef __bm_button_mif_h__
+#define __bm_button_mif_h__
 
 #include <xwos/standard.h>
 
-xwer_t brdpm_start(void);
-xwer_t brdpm_stop(void);
+xwer_t bmbtn_start(void);
+xwer_t bmbtn_stop(void);
 
-#endif /* bm/xwpm/mif.h */
+#endif /* bm/button/mif.h */

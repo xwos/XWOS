@@ -24,7 +24,7 @@
 #include <xwem/vm/lua/mif.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/mif.h>
-#include <bm/pm/mif.h>
+#include <bm/button/mif.h>
 #include <bm/main/xwpcp.h>
 #include <bm/main/thd.h>
 
@@ -92,9 +92,9 @@ xwer_t main_task(void * arg)
                 goto err_child_thd_start;
         }
 
-        rc = brdpm_start();
+        rc = bmbtn_start();
         if (rc < 0) {
-                goto err_brdpm_start;
+                goto err_bmbtn_start;
         }
 
         rc = bm_xwpcp_start();
@@ -117,7 +117,7 @@ err_xwlua_start:
 #endif /* XWEMCFG_vm_lua */
 err_xwpcp_start:
         BDL_BUG();
-err_brdpm_start:
+err_bmbtn_start:
         BDL_BUG();
 err_child_thd_start:
         BDL_BUG();

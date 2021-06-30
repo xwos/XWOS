@@ -292,6 +292,8 @@ static
 xwer_t stm32cube_soc_drv_suspend(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
+        MX_SDRAM_Suspend();
+        MX_GPIO_Suspend();
         return XWOK;
 }
 
@@ -299,6 +301,8 @@ static
 xwer_t stm32cube_soc_drv_resume(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
+        MX_GPIO_Resume();
+        MX_SDRAM_Resume();
         return XWOK;
 }
 #endif /* XWCDCFG_ds_PM */
