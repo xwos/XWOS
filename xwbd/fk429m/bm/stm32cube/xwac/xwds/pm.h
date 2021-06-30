@@ -23,9 +23,9 @@
 
 #include <bm/stm32cube/standard.h>
 
-void stm32cube_pm_resume(void);
-void stm32cube_pm_suspend(void);
-void stm32cube_pm_wakeup(void);
-void stm32cube_pm_sleep(void);
+void stm32cube_pm_resume(void * arg);
+void stm32cube_pm_suspend(void * arg);
+void stm32cube_pm_wakeup(void * arg);
+void stm32cube_pm_sleep(void * arg);
 
 #endif /* bm/stm32cube/xwac/xwds/pm.h */

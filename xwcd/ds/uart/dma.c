@@ -557,7 +557,6 @@ void xwds_dmauartc_drvcb_rxq_pub(struct xwds_dmauartc * dmauartc, xwsq_t tail)
         } else if (0 == dmauartc->rxq.tail) {
                 if (tail > XWDS_DMAUART_RXQ_SIZE) {
                         /* Low buffer is overflow. Discard the oldest data. */
-                        /* XWDS_BUG(); */
                         pubsz = tail - XWDS_DMAUART_RXQ_SIZE;
                         dmauartc->rxq.tail = tail;
                         dmauartc->rxq.pos = XWDS_DMAUART_RXQ_SIZE;
@@ -577,12 +576,9 @@ void xwds_dmauartc_drvcb_rxq_pub(struct xwds_dmauartc * dmauartc, xwsq_t tail)
                         }
                 }
         } else if (dmauartc->rxq.tail < XWDS_DMAUART_RXQ_SIZE) {
-                XWDS_BUG_ON((tail < dmauartc->rxq.tail) ||
-                            (tail > XWDS_DMAUART_RXQ_SIZE));
                 XWDS_BUG_ON(dmauartc->rxq.pos > dmauartc->rxq.tail);
                 if (tail > XWDS_DMAUART_RXQ_SIZE) {
                         /* Low buffer is overflow. Discard the oldest data. */
-                        /* XWDS_BUG(); */
                         dmauartc->rxq.tail = tail;
                         dmauartc->rxq.pos = XWDS_DMAUART_RXQ_SIZE;
                         pubsz = tail - XWDS_DMAUART_RXQ_SIZE;
@@ -595,7 +591,6 @@ void xwds_dmauartc_drvcb_rxq_pub(struct xwds_dmauartc * dmauartc, xwsq_t tail)
         } else if (XWDS_DMAUART_RXQ_SIZE == dmauartc->rxq.tail) {
                 if ((tail < XWDS_DMAUART_RXQ_SIZE) && (0 != tail)) {
                         /* High buffer is overflow. Discard the oldest data. */
-                        /* XWDS_BUG(); */
                         pubsz = tail;
                         dmauartc->rxq.tail = tail;
                         dmauartc->rxq.pos = 0;
@@ -623,7 +618,6 @@ void xwds_dmauartc_drvcb_rxq_pub(struct xwds_dmauartc * dmauartc, xwsq_t tail)
                 XWDS_BUG_ON(dmauartc->rxq.pos > dmauartc->rxq.tail);
                 if ((tail < dmauartc->rxq.tail) && (0 != tail)) {
                         /* High buffer is overflow. Discard the oldest data. */
-                        /* XWDS_BUG(); */
                         if (tail <= XWDS_DMAUART_RXQ_SIZE) {
                                 pubsz = tail;
                                 dmauartc->rxq.tail = tail;

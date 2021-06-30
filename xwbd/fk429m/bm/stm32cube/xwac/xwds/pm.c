@@ -19,6 +19,7 @@
  */
 
 #include <bm/stm32cube/standard.h>
+#include <xwos/osal/pm.h>
 #include <xwcd/ds/xwds.h>
 #include <stm32f4xx_ll_cortex.h>
 #include <stm32f4xx_ll_pwr.h>
@@ -29,35 +30,39 @@
 extern
 void SystemClock_Config(void);
 
-void stm32cube_pm_resume(void)
+void stm32cube_pm_resume(void * arg)
 {
         __xwcc_unused xwer_t rc;
         xwirq_t irq;
 
+        XWOS_UNUSED(arg);
         rc = xwos_irq_get_id(&irq);
         LL_PWR_SetPowerMode(LL_PWR_MODE_STOP_MAINREGU);
         xwds_pm_resume(&stm32cube_ds);
 }
 
-void stm32cube_pm_suspend(void)
+void stm32cube_pm_suspend(void * arg)
 {
         __xwcc_unused xwer_t rc;
         xwirq_t irq;
 
+        XWOS_UNUSED(arg);
         rc = xwos_irq_get_id(&irq);
         xwds_pm_suspend(&stm32cube_ds);
         LL_PWR_SetPowerMode(LL_PWR_MODE_STOP_LPREGU);
         LL_LPM_EnableDeepSleep();
 }
 
-void stm32cube_pm_wakeup(void)
+void stm32cube_pm_wakeup(void * arg)
 {
+        XWOS_UNUSED(arg);
         LL_LPM_EnableSleep();
         /* 从STOP模式恢复后，需要重新配置时钟 */
         SystemClock_Config();
 }
 
-void stm32cube_pm_sleep(void)
+void stm32cube_pm_sleep(void * arg)
 {
+        XWOS_UNUSED(arg);
         cm_wfi();
 }

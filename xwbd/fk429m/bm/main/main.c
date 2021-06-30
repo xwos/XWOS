@@ -23,7 +23,7 @@
 #include <xwem/vm/lua/mif.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/mif.h>
-#include <bm/pm/mif.h>
+#include <bm/button/mif.h>
 #include <bm/main/thd.h>
 #include <xwam/example/cxx/mif.h>
 
@@ -92,9 +92,9 @@ xwer_t main_task(void * arg)
                 goto err_child_thd_start;
         }
 
-        rc = brdpm_start();
+        rc = bmbtn_start();
         if (rc < 0) {
-                goto err_pm_start;
+                goto err_btn_start;
         }
 
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
@@ -117,7 +117,7 @@ err_example_cxx_start:
 err_xwlua_start:
 #endif /* XWEMCFG_vm_lua */
         BDL_BUG();
-err_pm_start:
+err_btn_start:
         BDL_BUG();
 err_child_thd_start:
         BDL_BUG();
