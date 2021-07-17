@@ -26,6 +26,7 @@
 #include <xwcd/ds/soc/chip.h>
 #include <xwcd/ds/uart/dma.h>
 #include <xwcd/ds/i2c/master.h>
+#include <xwcd/ds/spi/master.h>
 #include <xwcd/perpheral/i2c/eeprom/device.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/device.h>
 

@@ -24,6 +24,7 @@
 #include <xwcd/ds/device.h>
 #include <xwcd/ds/soc/chip.h>
 #include <xwcd/ds/uart/dma.h>
+#include <xwcd/ds/spi/master.h>
 #include <bm/stm32cube/xwac/xwds/device.h>
 #include <bm/stm32cube/xwac/xwds/pm.h>
 #include <bm/stm32cube/xwac/xwds/cmif.h>

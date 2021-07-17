@@ -28,6 +28,8 @@
 #include "crc.h"
 #include "dma.h"
 #include "sdmmc.h"
+#include "spi.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -100,6 +102,8 @@ int main(void)
   MX_CRC_Init();
   MX_USART3_UART_Init();
   MX_SDMMC1_SD_Init();
+  MX_SPI4_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
