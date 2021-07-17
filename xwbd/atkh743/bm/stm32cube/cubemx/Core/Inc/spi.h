@@ -45,7 +45,7 @@ extern SPI_HandleTypeDef hspi1;
 extern SPI_HandleTypeDef hspi2;
 
 /* USER CODE BEGIN Private defines */
-#define MX_SPI_MEM_MAXSIZE     256U /**< 单次最大发送的字节数 */
+#define MX_SPI_MEM_MAXSIZE     128U /**< 单次最大发送的字节数 */
 
 struct MX_SPI_MasterDriverData {
   SPI_HandleTypeDef * halhdl;
@@ -73,12 +73,12 @@ void MX_SPI2_Init(void);
 /* USER CODE BEGIN Prototypes */
 void MX_SPI1_DeInit(void);
 xwer_t MX_SPI1_ReInit(const SPI_InitTypeDef * cfg);
-xwer_t MX_SPI1_Xfer(const xwu8_t txd[], xwu8_t * rxb, xwsz_t size);
+xwer_t MX_SPI1_Xfer(const xwu8_t txd[], xwu8_t * rxb, xwsz_t * size);
 xwer_t MX_SPI1_Abort(void);
 
 void MX_SPI2_DeInit(void);
 xwer_t MX_SPI2_ReInit(const SPI_InitTypeDef * cfg);
-xwer_t MX_SPI2_Xfer(const xwu8_t txd[], xwu8_t * rxb, xwsz_t size);
+xwer_t MX_SPI2_Xfer(const xwu8_t txd[], xwu8_t * rxb, xwsz_t * size);
 xwer_t MX_SPI2_Abort(void);
 
 /* USER CODE END Prototypes */

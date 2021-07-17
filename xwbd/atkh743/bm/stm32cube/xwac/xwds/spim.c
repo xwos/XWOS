@@ -26,7 +26,7 @@
 #include <bm/stm32cube/cubemx/Core/Inc/spi.h>
 #include <bm/stm32cube/xwac/xwds/spim.h>
 
-/******** function prototypes  ********/
+/******** ******** SPI1 ******** ********/
 static
 xwer_t stm32cube_spi1m_drv_start(struct xwds_device * dev);
 
@@ -49,9 +49,8 @@ xwer_t stm32cube_spi1m_drv_buscfg(struct xwds_spim * spim,
 static
 xwer_t stm32cube_spi1m_drv_xfer(struct xwds_spim * spim,
                                const xwu8_t txd[], xwu8_t * rxb,
-                               xwsz_t size, xwtm_t * xwtm);
+                               xwsz_t * size, xwtm_t * xwtm);
 
-/******** .data ********/
 const struct xwds_spim_driver stm32cube_spi1m_drv = {
         .base = {
                 .name = "stm32cube.spim.1",
@@ -71,7 +70,7 @@ const struct xwds_spim_driver stm32cube_spi1m_drv = {
 struct xwds_spim stm32cube_spi1m_cb = {
         /* attributes */
         .dev = {
-                .name = "stm32cube.spim.1",
+                .name = "stm32cube.spim.4",
                 .id = 1,
                 .resources = NULL,
                 .drv = xwds_cast(struct xwds_driver *, &stm32cube_spi1m_drv),
@@ -81,7 +80,6 @@ struct xwds_spim stm32cube_spi1m_cb = {
         .buscfg_num = 0,
 };
 
-/******** function implementations ********/
 static
 xwer_t stm32cube_spi1m_drv_start(struct xwds_device * dev)
 {
@@ -130,15 +128,19 @@ xwer_t stm32cube_spi1m_drv_buscfg(struct xwds_spim * spim,
         XWOS_UNUSED(xwtm);
 
         buscfg = spim->buscfg;
-        cfg = buscfg[cfgid];
-        rc = MX_SPI1_ReInit(cfg);
+        if (buscfg) {
+                cfg = buscfg[cfgid];
+                rc = MX_SPI1_ReInit(cfg);
+        } else {
+                rc = -ENOSYS;
+        }
         return rc;
 }
 
 static
 xwer_t stm32cube_spi1m_drv_xfer(struct xwds_spim * spim,
                                 const xwu8_t txd[], xwu8_t * rxb,
-                                xwsz_t size, xwtm_t * xwtm)
+                                xwsz_t * size, xwtm_t * xwtm)
 {
         struct MX_SPI_MasterDriverData * drvdata;
         union xwos_ulock ulk;
@@ -159,6 +161,7 @@ xwer_t stm32cube_spi1m_drv_xfer(struct xwds_spim * spim,
                         if (XWOS_LKST_UNLOCKED == lkst) {
                                 xwos_splk_lock(&drvdata->splk);
                         }
+                        *size = hspi1_drvdata.size;
                         rc = drvdata->rc;
                 } else {
                         if (XWOS_LKST_UNLOCKED == lkst) {
@@ -188,7 +191,7 @@ void stm32cube_spi1m_cb_xfercplt(struct xwds_spim * spim, xwer_t xrc)
         xwos_cond_broadcast(&drvdata->cond);
 }
 
-/******** function prototypes  ********/
+/******** ******** SPI2 ******** ********/
 static
 xwer_t stm32cube_spi2m_drv_start(struct xwds_device * dev);
 
@@ -211,12 +214,11 @@ xwer_t stm32cube_spi2m_drv_buscfg(struct xwds_spim * spim,
 static
 xwer_t stm32cube_spi2m_drv_xfer(struct xwds_spim * spim,
                                const xwu8_t txd[], xwu8_t * rxb,
-                               xwsz_t size, xwtm_t * xwtm);
+                               xwsz_t * size, xwtm_t * xwtm);
 
-/******** .data ********/
 const struct xwds_spim_driver stm32cube_spi2m_drv = {
         .base = {
-                .name = "stm32cube.spim.2",
+                .name = "stm32cube.spim.1",
                 .probe = NULL,
                 .remove = NULL,
                 .start = stm32cube_spi2m_drv_start,
@@ -233,7 +235,7 @@ const struct xwds_spim_driver stm32cube_spi2m_drv = {
 struct xwds_spim stm32cube_spi2m_cb = {
         /* attributes */
         .dev = {
-                .name = "stm32cube.spim.2",
+                .name = "stm32cube.spim.4",
                 .id = 1,
                 .resources = NULL,
                 .drv = xwds_cast(struct xwds_driver *, &stm32cube_spi2m_drv),
@@ -243,7 +245,6 @@ struct xwds_spim stm32cube_spi2m_cb = {
         .buscfg_num = 0,
 };
 
-/******** function implementations ********/
 static
 xwer_t stm32cube_spi2m_drv_start(struct xwds_device * dev)
 {
@@ -292,15 +293,19 @@ xwer_t stm32cube_spi2m_drv_buscfg(struct xwds_spim * spim,
         XWOS_UNUSED(xwtm);
 
         buscfg = spim->buscfg;
-        cfg = buscfg[cfgid];
-        rc = MX_SPI2_ReInit(cfg);
+        if (buscfg) {
+                cfg = buscfg[cfgid];
+                rc = MX_SPI2_ReInit(cfg);
+        } else {
+                rc = -ENOSYS;
+        }
         return rc;
 }
 
 static
 xwer_t stm32cube_spi2m_drv_xfer(struct xwds_spim * spim,
                                 const xwu8_t txd[], xwu8_t * rxb,
-                                xwsz_t size, xwtm_t * xwtm)
+                                xwsz_t * size, xwtm_t * xwtm)
 {
         struct MX_SPI_MasterDriverData * drvdata;
         union xwos_ulock ulk;
@@ -321,6 +326,7 @@ xwer_t stm32cube_spi2m_drv_xfer(struct xwds_spim * spim,
                         if (XWOS_LKST_UNLOCKED == lkst) {
                                 xwos_splk_lock(&drvdata->splk);
                         }
+                        *size = hspi2_drvdata.size;
                         rc = drvdata->rc;
                 } else {
                         if (XWOS_LKST_UNLOCKED == lkst) {

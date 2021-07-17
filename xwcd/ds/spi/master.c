@@ -260,7 +260,9 @@ err_spim_grab:
  * @param[in] spim: SPI主机模式控制器对象指针
  * @param[in] txd: 发送数据缓冲区，可为NULL表示不发送数据
  * @param[out] rxb: 接收数据缓冲区，可为NULL表示不接收数据
- * @param[in] size: 传输数据的大小
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示缓冲区大小（单位：字节）
+ * + (O) 作为输出时，返回实际传输的数据大小
  * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示期望的阻塞等待时间
  * + (O) 作为输出时，返回剩余的期望时间
@@ -276,14 +278,15 @@ err_spim_grab:
 __xwds_api
 xwer_t xwds_spim_xfer(struct xwds_spim * spim,
                       const xwu8_t txd[], xwu8_t * rxb,
-                      xwsz_t size, xwtm_t * xwtm)
+                      xwsz_t * size, xwtm_t * xwtm)
 {
         const struct xwds_spim_driver * drv;
         xwer_t rc;
 
         XWDS_VALIDATE(spim, "nullptr", -EFAULT);
         XWDS_VALIDATE(((txd) || (rxb)), "invalid", -EINVAL);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
+        XWDS_VALIDATE((size), "nullptr", -EFAULT);
+        XWDS_VALIDATE((xwtm), "nullptr", -EFAULT);
 
         rc = xwds_spim_grab(spim);
         if (__xwcc_unlikely(rc < 0)) {

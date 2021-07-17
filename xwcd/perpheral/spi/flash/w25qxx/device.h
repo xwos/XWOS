@@ -19,13 +19,11 @@
  * @note
  * + SPI总线配置：
  *   - spip->bus指明是SOC中的哪条SPI总线；
- *   - spip->buscfgid指明SPI总线配置的序号，SPI主机配置列表（spip->bus->buscfg数组）
- *     中必须要有此配置；
- *   - SPI主机配置主要配置时钟频率、时钟极性、时钟相位、是否为连续的片选模式、
- *     MSB优先还是LSB优先；
+ *   - 若需要支持APIxwds_w25qxx_cfgbus()，需要在配置spip->buscfgid指明
+ *     SPI总线配置的序号，SPI主机配置列表（spip->bus->buscfg数组）
+ *     中必须要有此配置；；
  *   - SPI主机配置的结构体通常由SOC的SDK定义，例如S32K为自动生成的代码中的
  *     lpspi_master_config_t，STM32为HAL库中的SPI_InitTypeDef；
- *   - 参数：连续CS模式、mode0或mode3、CS低电平有效；
  */
 
 #ifndef __xwcd_perpheral_spi_flash_w25qxx_device_h__

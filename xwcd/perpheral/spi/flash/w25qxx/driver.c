@@ -106,7 +106,7 @@ xwer_t xwds_w25qxx_ctrl(struct xwds_w25qxx * w25qxx,
                         xwtm_t * xwtm)
 {
         xwsz_t i, j;
-        xwsz_t idx, rxofs;
+        xwsz_t idx, rxofs, xfersize;
         xwer_t rc;
 
         XWDS_VALIDATE(w25qxx, "nullptr", -EFAULT);
@@ -146,7 +146,10 @@ xwer_t xwds_w25qxx_ctrl(struct xwds_w25qxx * w25qxx,
                 }
                 idx++;
         }
-        rc = xwds_spim_xfer(w25qxx->spip.bus, w25qxx->txq, w25qxx->rxq, idx, xwtm);
+        xfersize = idx;
+        rc = xwds_spim_xfer(w25qxx->spip.bus,
+                            w25qxx->txq, w25qxx->rxq, &xfersize,
+                            xwtm);
         if (rc < 0) {
                 goto err_spim_xfer;
         }

@@ -88,13 +88,14 @@ int xwlua_spim_xfer(lua_State * L)
         } else {
                 time = XWTM_MAX;
         }
-        rc = xwds_spim_xfer(luaspim->spim, txd, rxb, size, &time);
+        rc = xwds_spim_xfer(luaspim->spim, txd, rxb, &size, &time);
         lua_pushinteger(L, (lua_Integer)rc);
+        lua_pushinteger(L, (lua_Integer)size);
         if (isrx) {
                 luaL_pushresult(&b);
-                ret = 2;
+                ret = 3;
         } else {
-                ret = 1;
+                ret = 2;
         }
         return ret;
 }
