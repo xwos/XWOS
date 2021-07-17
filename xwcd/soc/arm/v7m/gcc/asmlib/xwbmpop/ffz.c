@@ -37,7 +37,7 @@ xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t num)
                         msk = ~(XWBOP_BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
                         if ((~(xwbmp_t)0) == msk) {
                                 msk = (xwbmp_t)0;
-                        }/* else {} */
+                        }
                 } else {
                         msk = (xwbmp_t)0;
                 }

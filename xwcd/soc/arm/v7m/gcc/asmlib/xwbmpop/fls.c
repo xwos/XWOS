@@ -32,7 +32,7 @@ xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num)
         msk = (XWBOP_BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
         if ((xwbmp_t)0 == msk) {
                 msk = (~(xwbmp_t)0);
-        }/* else {} */
+        }
         do {
                 i--;
                 tmp = bmp[i] & msk;

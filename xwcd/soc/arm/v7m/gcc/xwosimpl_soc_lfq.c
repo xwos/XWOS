@@ -25,7 +25,7 @@
 __xwbsp_code
 void xwlib_lfq_push(xwlfq_a * h, xwlfq_a * n)
 {
-        xwlfq_t * next;
+        register xwlfq_t * next;
 
         do {
                 next = (xwlfq_t *)cm_ldrex(h);
@@ -37,8 +37,8 @@ void xwlib_lfq_push(xwlfq_a * h, xwlfq_a * n)
 __xwbsp_code
 xwlfq_t * xwlib_lfq_pop(xwlfq_a * h)
 {
-        xwlfq_t * top;
-        xwlfq_t * next;
+        register xwlfq_t * top;
+        register xwlfq_t * next;
         xwer_t rc;
 
         do {

@@ -506,9 +506,6 @@ endif
 ifeq ($(ARCHCFG_LIB_XWBOP_RE16),y)
     ARCH_CSRCS += asmlib/xwbop/re16.c
 endif
-ifeq ($(ARCHCFG_LIB_XWBOP_RE16S32),y)
-    ARCH_CSRCS += asmlib/xwbop/re16s32.c
-endif
 
 ifeq ($(ARCHCFG_LIB_XWBOP_FFS32),y)
     ARCH_CSRCS += asmlib/xwbop/ffs32.c
@@ -521,9 +518,6 @@ ifeq ($(ARCHCFG_LIB_XWBOP_RBIT32),y)
 endif
 ifeq ($(ARCHCFG_LIB_XWBOP_RE32),y)
     ARCH_CSRCS += asmlib/xwbop/re32.c
-endif
-ifeq ($(ARCHCFG_LIB_XWBOP_RE32S64),y)
-    ARCH_CSRCS += asmlib/xwbop/re32s64.c
 endif
 
 ifeq ($(ARCHCFG_LIB_XWBOP_C0M64),y)

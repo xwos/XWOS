@@ -24,14 +24,12 @@ xwssq_t xwbop_ffs16(xwu16_t x);
 xwssq_t xwbop_fls16(xwu16_t x);
 xwu16_t xwbop_rbit16(xwu16_t x);
 xwu16_t xwbop_re16(xwu16_t a);
-xws32_t xwbop_re16s32(xwu16_t x);
 xwsz_t xwbop_weight16(xwu16_t x);
 
 xwssq_t xwbop_ffs32(xwu32_t x);
 xwssq_t xwbop_fls32(xwu32_t x);
 xwu32_t xwbop_rbit32(xwu32_t x);
 xwu32_t xwbop_re32(xwu32_t x);
-xws64_t xwbop_re32s64(xwu32_t x);
 xwsz_t xwbop_weight32(xwu32_t x);
 
 xwssq_t xwbop_ffs64(xwu64_t x);

@@ -33,14 +33,14 @@ xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t num)
         p = -1;
         for (i = 0; i < m; i++) {
                 if (i == (m - 1)) {
-                        msk = (XWBOP_BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
+                        msk = XWBOP_BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1;
                         if ((xwbmp_t)0 == msk) {
                                 msk = (~(xwbmp_t)0);
-                        }/* else {} */
+                        }
+                        tmp = bmp[i] & msk;
                 } else {
-                        msk = (~(xwbmp_t)0);
+                        tmp = bmp[i];
                 }
-                tmp = bmp[i] & msk;
                 if (tmp) {
                         __asm__ volatile(
                         "       rbit            %[__p], %[__tmp]\n"

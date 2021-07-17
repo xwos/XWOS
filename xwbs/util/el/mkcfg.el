@@ -67,8 +67,8 @@
 (setq make-backup-files nil)
 (defvar argc (length argv) "Count of arguments")
 (defvar XuanWuOS-opt-srcpath nil "Path of XuanWuOS directory")
-(defvar cfgdir nil "Path of configurations directory")
-(defvar wkspc nil "Path of workspace directory")
+(defvar XuanWuOS-opt-cfgdir nil "Path of configurations directory")
+(defvar XuanWuOS-opt-wkspc nil "Path of workspace directory")
 (defvar XuanWuOS-cfg ".cfg" "Name of XuanWuOS.cfg")
 (logi "script path:%s" elpath)
 (logd "argv:%s" argv)
@@ -95,18 +95,18 @@
        ;; --cfgdir foo
        ;; -c foo
        ;; --cfgdir=foo
-       ((string= option "--cfgdir") (setq cfgdir (pop argv)))
-       ((string= option "-c") (setq cfgdir (pop argv)))
+       ((string= option "--cfgdir") (setq XuanWuOS-opt-cfgdir (pop argv)))
+       ((string= option "-c") (setq XuanWuOS-opt-cfgdir (pop argv)))
        ((string-match "\\`--cfgdir=\\(\\(?:.\\|\n\\)*\\)\\'" option)
-        (setq cfgdir (match-string 1 option)))
+        (setq XuanWuOS-opt-cfgdir (match-string 1 option)))
 
        ;; --wkspc foo
        ;; -w foo
        ;; --wkspc=foo
-       ((string= option "--wkspc") (setq wkspc (pop argv)))
-       ((string= option "-w") (setq wkspc (pop argv)))
+       ((string= option "--wkspc") (setq XuanWuOS-opt-wkspc (pop argv)))
+       ((string= option "-w") (setq XuanWuOS-opt-wkspc (pop argv)))
        ((string-match "\\`--wkspc=\\(\\(?:.\\|\n\\)*\\)\\'" option)
-        (setq wkspc (match-string 1 option)))
+        (setq XuanWuOS-opt-wkspc (match-string 1 option)))
 
        ;; Unknown option
        ((string-prefix-p "--" option)
@@ -123,22 +123,28 @@
   (unless (> (length XuanWuOS-opt-srcpath) 0)
     (loge "Missing argument for --XuanWuOS!")
     (kill-emacs EINVAL))
-  (unless (> (length cfgdir) 0)
+  (unless (> (length XuanWuOS-opt-cfgdir) 0)
     (loge "Missing argument for --cfgdir!")
     (kill-emacs EINVAL))
-  (unless (> (length wkspc) 0)
+  (unless (> (length XuanWuOS-opt-wkspc) 0)
     (loge "Missing argument for --wkspc!")
-    (kill-emacs EINVAL)))
+    (kill-emacs EINVAL))
+
+  (setq XuanWuOS-opt-srcpath (directory-file-name XuanWuOS-opt-srcpath))
+  (setq XuanWuOS-opt-cfgdir (directory-file-name XuanWuOS-opt-cfgdir))
+  (setq XuanWuOS-opt-wkspc (directory-file-name XuanWuOS-opt-wkspc)))
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; Get infomation ;;;;;;;; ;;;;;;;; ;;;;;;;;
 ;; Get top directory
-(setq build-path (expand-file-name "."))
-(logi "Build Path:%s" build-path)
+(setq current-path (expand-file-name "."))
+(logi "Current Path:%s" current-path)
 (setq XuanWuOS-srcpath
-      (expand-file-name XuanWuOS-opt-srcpath (file-name-as-directory build-path)))
+      (expand-file-name XuanWuOS-opt-srcpath (file-name-as-directory current-path)))
 (logi "XuanWuOS SrcPath:%s" XuanWuOS-srcpath)
-(setq XuanWuOS-rel-srcpath (file-relative-name XuanWuOS-srcpath build-path))
+(setq XuanWuOS-rel-srcpath (file-relative-name XuanWuOS-srcpath current-path))
 (logi "XuanWuOS Relative SrcPath:%s" XuanWuOS-rel-srcpath)
+(logi "XuanWuOS CfgPath:%s" XuanWuOS-opt-cfgdir)
+(logi "XuanWuOS Workspace:%s" XuanWuOS-opt-wkspc)
 (setq XuanWuOS-forward-srcpath
       (directory-file-name
        (let (result)
@@ -160,24 +166,23 @@
          result)))
 (logi "XuanWuOS Backward SrcPath:%s" XuanWuOS-backward-srcpath)
 
-(logi "Workspace:%s" wkspc)
 (logi "XuanWuOS.cfg:%s" XuanWuOS-cfg)
-(setq XuanWuOS-cfg-buffer (find-file-noselect (concat wkspc "/" XuanWuOS-cfg)))
-(setq xwos-build-mk-buffer (find-file-noselect (concat wkspc "/makefile")))
-(setq xwos-autogen-header-buffer (find-file-noselect (concat wkspc "/autogen.h")))
-(setq xwos-envrc-buffer (find-file-noselect (concat wkspc "/env.rc")))
+(setq XuanWuOS-cfg-buffer (find-file-noselect (concat XuanWuOS-opt-wkspc "/" XuanWuOS-cfg)))
+(setq xwos-build-mk-buffer (find-file-noselect (concat XuanWuOS-opt-wkspc "/makefile")))
+(setq xwos-autogen-header-buffer (find-file-noselect (concat XuanWuOS-opt-wkspc "/autogen.h")))
+(setq xwos-envrc-buffer (find-file-noselect (concat XuanWuOS-opt-wkspc "/env.rc")))
 
-(defvar XuanWuOS-cfg-h (concat cfgdir "/" "XuanWuOS.h") "Path of cfg/XuanWuOS.h")
-(defvar arch-cfg-h (concat cfgdir "/" "arch.h") "Path of cfg/arch.h")
-(defvar cpu-cfg-h (concat cfgdir "/" "cpu.h") "Path of cfg/cpu.h")
-(defvar soc-cfg-h (concat cfgdir "/" "soc.h") "Path of cfg/soc.h")
-(defvar brd-cfg-h (concat cfgdir "/" "board.h") "Path of cfg/board.h")
-(defvar xwkn-cfg-h (concat cfgdir "/" "xwos.h") "Path of cfg/xwos.h")
-(defvar xwcd-cfg-h (concat cfgdir "/" "xwcd.h") "Path of cfg/xwcd.h")
-(defvar xwmd-cfg-h (concat cfgdir "/" "xwmd.h") "Path of cfg/xwmd.h")
-(defvar xwem-cfg-h (concat cfgdir "/" "xwem.h") "Path of cfg/xwem.h")
-(defvar xwam-cfg-h (concat cfgdir "/" "xwam.h") "Path of cfg/xwam.h")
-(defvar oem-cfg-h (concat cfgdir "/" "oem.h") "Path of cfg/oem.h")
+(defvar XuanWuOS-cfg-h (concat XuanWuOS-opt-cfgdir "/" "XuanWuOS.h") "Path of cfg/XuanWuOS.h")
+(defvar arch-cfg-h (concat XuanWuOS-opt-cfgdir "/" "arch.h") "Path of cfg/arch.h")
+(defvar cpu-cfg-h (concat XuanWuOS-opt-cfgdir "/" "cpu.h") "Path of cfg/cpu.h")
+(defvar soc-cfg-h (concat XuanWuOS-opt-cfgdir "/" "soc.h") "Path of cfg/soc.h")
+(defvar brd-cfg-h (concat XuanWuOS-opt-cfgdir "/" "board.h") "Path of cfg/board.h")
+(defvar xwkn-cfg-h (concat XuanWuOS-opt-cfgdir "/" "xwos.h") "Path of cfg/xwos.h")
+(defvar xwcd-cfg-h (concat XuanWuOS-opt-cfgdir "/" "xwcd.h") "Path of cfg/xwcd.h")
+(defvar xwmd-cfg-h (concat XuanWuOS-opt-cfgdir "/" "xwmd.h") "Path of cfg/xwmd.h")
+(defvar xwem-cfg-h (concat XuanWuOS-opt-cfgdir "/" "xwem.h") "Path of cfg/xwem.h")
+(defvar xwam-cfg-h (concat XuanWuOS-opt-cfgdir "/" "xwam.h") "Path of cfg/xwam.h")
+(defvar oem-cfg-h (concat XuanWuOS-opt-cfgdir "/" "oem.h") "Path of cfg/oem.h")
 (setq XuanWuOS-cfg-h-buffer (find-file-noselect XuanWuOS-cfg-h))
 (setq arch-cfg-h-buffer (find-file-noselect arch-cfg-h))
 (setq cpu-cfg-h-buffer (find-file-noselect cpu-cfg-h))
@@ -303,7 +308,7 @@
       (cond
        ((string= (match-string 2) "1") "y")
        (t "n")))
-(logi "external:%s" XuanWuOS-cfg-xwam)
+(logi "application:%s" XuanWuOS-cfg-xwam)
 
 (goto-char (point-min))
 (let (rc)
@@ -332,16 +337,16 @@
 (logi "xwos-cpu-dir:%s" xwos-cpu-dir)
 (setq xwos-soc-dir (concat xwos-cpu-dir "/" XuanWuOS-cfg-soc))
 (logi "xwos-soc-dir:%s" xwos-soc-dir)
-(setq xwos-brd-dir (file-relative-name build-path XuanWuOS-srcpath))
+(setq xwos-brd-dir (file-relative-name current-path XuanWuOS-srcpath))
 (logi "xwos-brd-dir:%s" xwos-brd-dir)
 (setq xwos-bdl-dir (concat xwos-brd-dir "/bdl"))
 (logi "xwos-bdl-dir:%s" xwos-bdl-dir)
 (setq xwos-bm-dir (concat xwos-brd-dir "/bm"))
 (logi "xwos-bm-dir:%s" xwos-bm-dir)
 (setq xwos-wkspc-dir
-      (if (file-name-absolute-p wkspc)
-          wkspc
-          (concat xwos-brd-dir "/" wkspc)))
+      (if (file-name-absolute-p XuanWuOS-opt-wkspc)
+          XuanWuOS-opt-wkspc
+          (concat xwos-brd-dir "/" XuanWuOS-opt-wkspc)))
 (logi "xwos-wkspc-dir:%s" xwos-wkspc-dir)
 (setq xwos-obj-dir (concat xwos-wkspc-dir "/obj/" XuanWuOS-forward-srcpath))
 (logi "xwos-obj-dir:%s" xwos-obj-dir)

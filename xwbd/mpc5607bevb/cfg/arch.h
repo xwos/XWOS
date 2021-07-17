@@ -45,23 +45,25 @@
 #define ARCHCFG_LIB_XWBOP_FFS8                  1
 #define ARCHCFG_LIB_XWBOP_FLS8                  1
 #define ARCHCFG_LIB_XWBOP_RBIT8                 0
+#define ARCHCFG_LIB_XWBOP_WEIGHT8               0
 
 #define ARCHCFG_LIB_XWBOP_FFS16                 1
 #define ARCHCFG_LIB_XWBOP_FLS16                 1
 #define ARCHCFG_LIB_XWBOP_RBIT16                0
 #define ARCHCFG_LIB_XWBOP_RE16                  1
-#define ARCHCFG_LIB_XWBOP_RE16S32               0
+#define ARCHCFG_LIB_XWBOP_WEIGHT16              0
 
 #define ARCHCFG_LIB_XWBOP_FFS32                 1
 #define ARCHCFG_LIB_XWBOP_FLS32                 1
 #define ARCHCFG_LIB_XWBOP_RBIT32                0
 #define ARCHCFG_LIB_XWBOP_RE32                  1
-#define ARCHCFG_LIB_XWBOP_RE32S64               0
+#define ARCHCFG_LIB_XWBOP_WEIGHT32              0
 
 #define ARCHCFG_LIB_XWBOP_FFS64                 1
 #define ARCHCFG_LIB_XWBOP_FLS64                 1
 #define ARCHCFG_LIB_XWBOP_RBIT64                0
 #define ARCHCFG_LIB_XWBOP_RE64                  1
+#define ARCHCFG_LIB_XWBOP_WEIGHT64              0
 
 #define ARCHCFG_LIB_XWBMPOP_FFS                 1
 #define ARCHCFG_LIB_XWBMPOP_FFZ                 1
