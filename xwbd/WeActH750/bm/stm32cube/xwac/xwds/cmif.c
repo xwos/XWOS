@@ -24,6 +24,7 @@
 #include <xwcd/ds/device.h>
 #include <xwcd/ds/soc/chip.h>
 #include <xwcd/ds/uart/dma.h>
+#include <xwcd/ds/spi/master.h>
 #include <bm/stm32cube/xwac/xwds/device.h>
 #include <bm/stm32cube/xwac/xwds/pm.h>
 #include <bm/stm32cube/xwac/xwds/cmif.h>
@@ -108,8 +109,22 @@ xwer_t stm32cube_xwds_start(void)
         if (rc < 0) {
                 goto err_uart_start;
         }
+
+        rc = stm32cube_xwds_spi_start();
+        if (rc < 0) {
+                goto err_spi_start;
+        }
+
+        rc = stm32cube_xwds_st7735_start();
+        if (rc < 0) {
+                goto err_st7735_start;
+        }
         return XWOK;
 
+err_st7735_start:
+        stm32cube_xwds_spi_stop();
+err_spi_start:
+        stm32cube_xwds_uart_stop();
 err_uart_start:
         return rc;
 }
@@ -128,13 +143,25 @@ xwer_t stm32cube_xwds_stop(void)
 {
         xwer_t rc;
 
+        rc = stm32cube_xwds_st7735_stop();
+        if (rc < 0) {
+                goto err_st7735_stop;
+        }
+
+        rc = stm32cube_xwds_spi_stop();
+        if (rc < 0) {
+                goto err_spi_stop;
+        }
+
         rc = stm32cube_xwds_uart_stop();
         if (rc < 0) {
                 goto err_uart_stop;
         }
         return XWOK;
 
+err_st7735_stop:
 err_uart_stop:
+err_spi_stop:
         return rc;
 }
 
@@ -261,5 +288,110 @@ xwer_t stm32cube_xwds_uart_stop(void)
         xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_usart1_cb));
         xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_usart1_cb));
         xwds_dmauartc_destruct(&stm32cube_usart1_cb);
+        return XWOK;
+}
+
+/**
+ * @brief 启动SPI
+ * @retrun 错误码
+ * @note
+ * - 已经由@ref stm32cube_xwds_start()调用。
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：不可重入
+ */
+xwer_t stm32cube_xwds_spi_start(void)
+{
+        xwer_t rc;
+
+        /* SPI4 */
+        xwds_spim_construct(&stm32cube_spi4m_cb);
+        rc = xwds_device_probe(&stm32cube_ds,
+                               xwds_cast(struct xwds_device *, &stm32cube_spi4m_cb),
+                               NULL);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_spi4_probe;
+        }
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32cube_spi4m_cb));
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_spi4_start;
+        }
+
+        return XWOK;
+
+err_spi4_start:
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_spi4m_cb));
+err_spi4_probe:
+        xwds_spim_destruct(&stm32cube_spi4m_cb);
+        return rc;
+}
+
+/**
+ * @brief 停止SPI
+ * @retrun 错误码
+ * @note
+ * - 已经由@ref stm32cube_xwds_stop()调用。
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：不可重入
+ */
+xwer_t stm32cube_xwds_spi_stop(void)
+{
+        /* SPI4 */
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_spi4m_cb));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_spi4m_cb));
+        xwds_spim_destruct(&stm32cube_spi4m_cb);
+        return XWOK;
+}
+
+/**
+ * @brief 启动ST7735
+ * @retrun 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：不可重入
+ */
+xwer_t stm32cube_xwds_st7735_start(void)
+{
+        xwer_t rc;
+
+        /* SPI4 */
+        xwds_st7735_construct(&stm32cube_st7735_cb);
+        rc = xwds_device_probe(&stm32cube_ds,
+                               xwds_cast(struct xwds_device *, &stm32cube_st7735_cb),
+                               NULL);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_st7735_probe;
+        }
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32cube_st7735_cb));
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_st7735_start;
+        }
+
+        return XWOK;
+
+err_st7735_start:
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_st7735_cb));
+err_st7735_probe:
+        xwds_st7735_destruct(&stm32cube_st7735_cb);
+        return rc;
+}
+
+/**
+ * @brief 停止ST7735
+ * @retrun 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：不可重入
+ */
+xwer_t stm32cube_xwds_st7735_stop(void)
+{
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_st7735_cb));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_st7735_cb));
+        xwds_st7735_destruct(&stm32cube_st7735_cb);
         return XWOK;
 }

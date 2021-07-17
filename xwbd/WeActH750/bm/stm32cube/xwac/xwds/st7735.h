@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE设备栈：子模块接口
+ * @brief STM32CUBE设备栈：ST7735
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,22 +18,9 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_xwac_xwds_cmif_h__
-#define __bm_stm32cube_xwac_xwds_cmif_h__
+#ifndef __bm_stm32cube_xwac_xwds_st7735_h__
+#define __bm_stm32cube_xwac_xwds_st7735_h__
 
-#include <bm/stm32cube/xwac/xwds/device.h>
+#include "bm/stm32cube/standard.h"
 
-xwer_t stm32cube_xwds_ll_start(void);
-xwer_t stm32cube_xwds_ll_stop(void);
-xwer_t stm32cube_xwds_start(void);
-xwer_t stm32cube_xwds_stop(void);
-xwer_t stm32cube_xwds_soc_start(void);
-xwer_t stm32cube_xwds_soc_stop(void);
-xwer_t stm32cube_xwds_uart_start(void);
-xwer_t stm32cube_xwds_uart_stop(void);
-xwer_t stm32cube_xwds_spi_start(void);
-xwer_t stm32cube_xwds_spi_stop(void);
-xwer_t stm32cube_xwds_st7735_start(void);
-xwer_t stm32cube_xwds_st7735_stop(void);
-
-#endif /* bm/stm32cube/xwac/xwds/cmif.h */
+#endif /* bm/stm32cube/xwac/xwds/st7735.h */

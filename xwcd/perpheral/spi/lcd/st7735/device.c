@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE设备栈：设备
+ * @brief SPI LCD Controller ST7735 Device
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,28 +18,14 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_xwac_xwds_device_h__
-#define __bm_stm32cube_xwac_xwds_device_h__
-
-#include <bm/stm32cube/standard.h>
-#include <xwcd/ds/device.h>
-#include <xwcd/ds/soc/chip.h>
-#include <xwcd/ds/uart/dma.h>
-#include <xwcd/ds/spi/master.h>
 #include <xwcd/perpheral/spi/lcd/st7735/device.h>
 
-/******** ******** ds ******** ********/
-extern struct xwds stm32cube_ds;
+void xwds_st7735_construct(struct xwds_st7735 * st7735)
+{
+        xwds_spip_construct(&st7735->spip);
+}
 
-/******** ******** soc ******** ********/
-extern struct xwds_soc stm32cube_soc_cb;
-
-/******** ******** uart ******** ********/
-extern struct xwds_dmauartc stm32cube_usart1_cb;
-extern struct xwds_dmauartc stm32cube_usart3_cb;
-
-/******** ******** spi ******** ********/
-extern struct xwds_spim stm32cube_spi4m_cb;
-extern struct xwds_st7735 stm32cube_st7735_cb;
-
-#endif /* bm/stm32cube/xwac/xwds/device.h */
+void xwds_st7735_destruct(struct xwds_st7735 * st7735)
+{
+        xwds_spip_destruct(&st7735->spip);
+}

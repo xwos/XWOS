@@ -60,7 +60,7 @@
 #+ATTR_LATEX: :float nil :width \textwidth :options scale=1
 #+ATTR_ODT: :scale 1
 #+ATTR_HTML: :width 70%
-[[http://xwos.tech/res/figure/xwos-arch.png]]
+[[http://xwos.tech/UserManual/res/figure/xwos-arch.png]]
 
 + 编译
   - xwbs: 编译系统 (License:[[http://www.apache.org/licenses/LICENSE-2.0][ *Apache-2.0* ]])
