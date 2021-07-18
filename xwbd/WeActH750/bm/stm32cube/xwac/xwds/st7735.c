@@ -20,18 +20,13 @@
 
 #include <xwos/standard.h>
 #include <xwcd/ds/spi/perpheral.h>
+#include <xwcd/ds/soc/gpio.h>
 #include <xwcd/perpheral/spi/lcd/st7735/device.h>
 #include <xwcd/perpheral/spi/lcd/st7735/driver.h>
 #include "bm/stm32cube/standard.h"
-#include <xwcd/ds/soc/gpio.h>
 #include <bm/stm32cube/cubemx/Core/Inc/tim.h>
 #include "bm/stm32cube/xwac/xwds/device.h"
 #include "bm/stm32cube/xwac/xwds/st7735.h"
-
-#define STM32CUBE_ST7735_CS_PORT XWDS_GPIO_PORT_E
-#define STM32CUBE_ST7735_CS_PIN XWDS_GPIO_PIN_11
-#define STM32CUBE_ST7735_DC_PORT XWDS_GPIO_PORT_E
-#define STM32CUBE_ST7735_DC_PIN XWDS_GPIO_PIN_13
 
 xwer_t stm32cube_st7735_drv_start(struct xwds_device * dev);
 xwer_t stm32cube_st7735_drv_stop(struct xwds_device * dev);
@@ -138,18 +133,36 @@ err_gpio:
 
 xwer_t stm32cube_st7735_drv_stop(struct xwds_device * dev)
 {
-        return xwds_st7735_drv_stop(dev);
+        xwer_t rc;
+
+	HAL_TIMEx_PWMN_Stop(STM32CUBE_ST7735_BRIGHTNESS_TIMER,
+                            STM32CUBE_ST7735_BRIGHTNESS_TIMER_CHANNEL);
+        rc = xwds_st7735_drv_stop(dev);
+        if (rc < 0) {
+                goto err_st7735_stop;
+        }
+        MX_TIM1_DeInit();
+        xwds_gpio_rls(&stm32cube_soc_cb,
+                      STM32CUBE_ST7735_DC_PORT,
+                      STM32CUBE_ST7735_DC_PIN);
+        xwds_gpio_rls(&stm32cube_soc_cb,
+                      STM32CUBE_ST7735_CS_PORT,
+                      STM32CUBE_ST7735_CS_PIN);
+        return XWOK;
+
+err_st7735_stop:
+        return rc;
 }
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 xwer_t stm32cube_st7735_drv_resume(struct xwds_device * dev)
 {
-        return xwds_st7735_drv_resume(dev);
+        return stm32cube_st7735_drv_start(dev);
 }
 
 xwer_t stm32cube_st7735_drv_suspend(struct xwds_device * dev)
 {
-        return xwds_st7735_drv_suspend(dev);
+        return stm32cube_st7735_drv_stop(dev);
 }
 #endif /* XWCDCFG_ds_PM */
 
@@ -159,7 +172,7 @@ xwer_t stm32cube_st7735_drv_write(struct xwds_st7735 * st7735, xwu8_t reg,
                                   xwtm_t * xwtm)
 {
         xwer_t rc;
-        xwsz_t xfsz, pos;
+        xwsz_t xfsz, rest, pos;
 
         xwds_gpio_reset(&stm32cube_soc_cb,
                         STM32CUBE_ST7735_CS_PORT,
@@ -178,12 +191,14 @@ xwer_t stm32cube_st7735_drv_write(struct xwds_st7735 * st7735, xwu8_t reg,
         xfsz = *size;
         pos = 0;
         while (pos < xfsz) {
-                rc = xwds_spim_xfer(st7735->spip.bus, &data[pos], NULL, size, xwtm);
+                rest = xfsz - pos;
+                rc = xwds_spim_xfer(st7735->spip.bus, &data[pos], NULL, &rest, xwtm);
                 if (rc < 0) {
                         goto err_write_data;
                 }
-                pos += *size;
+                pos += rest;
         }
+        *size = pos;
         xwds_gpio_set(&stm32cube_soc_cb,
                       STM32CUBE_ST7735_CS_PORT,
                       STM32CUBE_ST7735_CS_PIN);
@@ -199,7 +214,7 @@ xwer_t stm32cube_st7735_drv_read(struct xwds_st7735 * st7735, xwu8_t reg,
                                  xwtm_t * xwtm)
 {
         xwer_t rc;
-        xwsz_t xfsz, pos;
+        xwsz_t xfsz, rest, pos;
 
         xwds_gpio_reset(&stm32cube_soc_cb,
                         STM32CUBE_ST7735_CS_PORT,
@@ -218,12 +233,14 @@ xwer_t stm32cube_st7735_drv_read(struct xwds_st7735 * st7735, xwu8_t reg,
         xfsz = *size;
         pos = 0;
         while (pos < xfsz) {
-                rc = xwds_spim_xfer(st7735->spip.bus, NULL, &buf[pos], size, xwtm);
+                rest = xfsz - pos;
+                rc = xwds_spim_xfer(st7735->spip.bus, NULL, &buf[pos], &rest, xwtm);
                 if (rc < 0) {
                         goto err_read_data;
                 }
-                pos += *size;
+                pos += rest;
         }
+        *size = pos;
         xwds_gpio_set(&stm32cube_soc_cb,
                       STM32CUBE_ST7735_CS_PORT,
                       STM32CUBE_ST7735_CS_PIN);
@@ -238,8 +255,8 @@ xwer_t stm32cube_st7735_drv_set_brightness(struct xwds_st7735 * st7735,
                                            xwu32_t brightness)
 {
 
-	__HAL_TIM_SetCompare(STM32CUBE_ST7735_BRIGHTNESS_TIMER,
-                             STM32CUBE_ST7735_BRIGHTNESS_TIMER_CHANNEL,
-                             brightness);
+	__HAL_TIM_SET_COMPARE(STM32CUBE_ST7735_BRIGHTNESS_TIMER,
+                              STM32CUBE_ST7735_BRIGHTNESS_TIMER_CHANNEL,
+                              brightness);
         return XWOK;
 }

@@ -85,6 +85,8 @@ void stm32cube_override_linkage_it(void);
 #define LCD_CS_GPIO_Port GPIOE
 #define LCD_DC_Pin GPIO_PIN_13
 #define LCD_DC_GPIO_Port GPIOE
+#define W25Q64_CS_Pin GPIO_PIN_6
+#define W25Q64_CS_GPIO_Port GPIOD
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

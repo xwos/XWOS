@@ -173,7 +173,6 @@ struct xwds_w25qxx {
         const struct xwds_w25qxx_cmd * cmdtbl; /**< 参数列表 */
 
         /* private */
-        struct xwos_mtx apilock; /**< API互斥锁 */
         xwu8_t txq[XWDS_W25QXX_CMD_MAX_PAYLOAD + 16]; /**< 发送缓冲区 */
         xwu8_t rxq[XWDS_W25QXX_CMD_MAX_PAYLOAD + 16]; /**< 接收缓冲区 */
 };

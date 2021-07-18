@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE设备栈：SPI主机
+ * @brief STM32CUBE设备栈：SPI Flash W25Q64JV
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,12 +18,9 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_xwac_xwds_spim_h__
-#define __bm_stm32cube_xwac_xwds_spim_h__
+#ifndef __bm_stm32cube_xwac_xwds_w25q64jv_h__
+#define __bm_stm32cube_xwac_xwds_w25q64jv_h__
 
-#include <bm/stm32cube/standard.h>
+#include "bm/stm32cube/standard.h"
 
-void stm32cube_spi1m_cb_xfercplt(struct xwds_spim * spim, xwer_t xrc);
-void stm32cube_spi4m_cb_xfercplt(struct xwds_spim * spim, xwer_t xrc);
-
-#endif /* bm/stm32cube/xwac/xwds/spim.h */
+#endif /* bm/stm32cube/xwac/xwds/w25q64jv.h */

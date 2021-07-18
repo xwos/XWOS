@@ -16,6 +16,8 @@
  * > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * > See the License for the specific language governing permissions and
  * > limitations under the License.
+ * @note
+ * - 所有API只可被单一线程访问。
  */
 
 #ifndef __xwcd_perpheral_spi_lcd_st7735_driver_h__

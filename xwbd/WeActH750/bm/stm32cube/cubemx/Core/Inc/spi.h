@@ -41,6 +41,7 @@ extern "C" {
 
 /* USER CODE END Includes */
 
+extern SPI_HandleTypeDef hspi1;
 extern SPI_HandleTypeDef hspi4;
 
 /* USER CODE BEGIN Private defines */
@@ -61,13 +62,20 @@ struct MX_SPI_MasterDriverData {
   } mem; /**< 缓冲区 */
 };
 
+extern struct MX_SPI_MasterDriverData hspi1_drvdata;
 extern struct MX_SPI_MasterDriverData hspi4_drvdata;
 
 /* USER CODE END Private defines */
 
+void MX_SPI1_Init(void);
 void MX_SPI4_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+void MX_SPI1_DeInit(void);
+xwer_t MX_SPI1_ReInit(const SPI_InitTypeDef * cfg);
+xwer_t MX_SPI1_Xfer(const xwu8_t txd[], xwu8_t * rxb, xwsz_t * size);
+xwer_t MX_SPI1_Abort(void);
+
 void MX_SPI4_DeInit(void);
 xwer_t MX_SPI4_ReInit(const SPI_InitTypeDef * cfg);
 xwer_t MX_SPI4_Xfer(const xwu8_t txd[], xwu8_t * rxb, xwsz_t * size);

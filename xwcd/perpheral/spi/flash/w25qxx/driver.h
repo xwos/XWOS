@@ -16,6 +16,8 @@
  * > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * > See the License for the specific language governing permissions and
  * > limitations under the License.
+ * @note
+ * - 所有API只可被单一线程访问。
  */
 
 #ifndef __xwcd_perpheral_spi_flash_w25qxx_driver_h__
@@ -23,6 +25,16 @@
 
 #include <xwos/standard.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/device.h>
+
+/**
+ * @brief W25QXX驱动函数表
+ */
+struct xwds_w25qxx_driver {
+        struct xwds_spip_driver spip; /**< C语言面向对象：继承struct xwds_spip_driver */
+        xwer_t (* io)(struct xwds_w25qxx * /*w25qxx*/,
+                      xwu8_t * /*txq*/, xwu8_t * /*rxq*/,
+                      xwsz_t * /*size*/, xwtm_t * /*xwtm*/);
+};
 
 extern struct xwds_w25qxx_cmd xwds_w25q64jv_cmd[XWDS_W25QXX_CMD_NUM];
 extern struct xwds_w25qxx_cmd xwds_w25q128jv_cmd[XWDS_W25QXX_CMD_NUM];

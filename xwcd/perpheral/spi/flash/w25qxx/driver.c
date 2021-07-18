@@ -21,7 +21,6 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/osal/skd.h>
-#include <xwos/osal/lock/mtx.h>
 #include <xwcd/ds/spi/perpheral.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/device.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/driver.h>
@@ -30,34 +29,29 @@
 xwer_t xwds_w25qxx_drv_start(struct xwds_device * dev)
 {
         struct xwds_w25qxx * w25qxx;
+        const struct xwds_w25qxx_driver * drv;
         const struct xwds_w25qxx_cmd * cmdtbl;
         xwer_t rc;
 
         w25qxx = xwds_cast(struct xwds_w25qxx *, dev);
+        drv = xwds_cast(struct xwds_w25qxx_driver *, dev->drv);
         cmdtbl = w25qxx->cmdtbl;
-        if ((NULL == cmdtbl) || (NULL == w25qxx->spip.bus)) {
+        if ((NULL == drv) || (NULL == drv->io) ||
+            (NULL == cmdtbl) || (NULL == w25qxx->spip.bus)) {
                 rc = -EINVAL;
                 goto err_desc_err;
-        }
-        rc = xwos_mtx_init(&w25qxx->apilock, XWOS_SKD_PRIORITY_RT_MAX);
-        if (rc < 0) {
-                goto err_mtx_init;
         }
         memset(w25qxx->txq, 0, sizeof(w25qxx->txq));
         memset(w25qxx->rxq, 0, sizeof(w25qxx->rxq));
         return XWOK;
 
-err_mtx_init:
 err_desc_err:
         return rc;
 }
 
 xwer_t xwds_w25qxx_drv_stop(struct xwds_device * dev)
 {
-        struct xwds_w25qxx * w25qxx;
-
-        w25qxx = xwds_cast(struct xwds_w25qxx *, dev);
-        xwos_mtx_destroy(&w25qxx->apilock);
+        XWOS_UNUSED(dev);
         return XWOK;
 }
 
@@ -105,8 +99,8 @@ xwer_t xwds_w25qxx_ctrl(struct xwds_w25qxx * w25qxx,
                         const xwu8_t txd[], xwu8_t * rxb, xwsz_t size,
                         xwtm_t * xwtm)
 {
-        xwsz_t i, j;
-        xwsz_t idx, rxofs, xfersize;
+        const struct xwds_w25qxx_driver * drv;
+        xwsz_t i, j, idx, rxofs, xfersize;
         xwer_t rc;
 
         XWDS_VALIDATE(w25qxx, "nullptr", -EFAULT);
@@ -116,10 +110,7 @@ xwer_t xwds_w25qxx_ctrl(struct xwds_w25qxx * w25qxx,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_w25qxx_grab;
         }
-        rc = xwos_mtx_timedlock(&w25qxx->apilock, xwtm);
-        if (rc < 0) {
-                goto err_apilock_lock;
-        }
+        drv = xwds_cast(struct xwds_w25qxx_driver *, w25qxx->spip.dev.drv);
         idx = 0;
         w25qxx->txq[idx] = instruction;
         idx++;
@@ -147,9 +138,9 @@ xwer_t xwds_w25qxx_ctrl(struct xwds_w25qxx * w25qxx,
                 idx++;
         }
         xfersize = idx;
-        rc = xwds_spim_xfer(w25qxx->spip.bus,
-                            w25qxx->txq, w25qxx->rxq, &xfersize,
-                            xwtm);
+        rc = drv->io(w25qxx,
+                     w25qxx->txq, w25qxx->rxq, &xfersize,
+                     xwtm);
         if (rc < 0) {
                 goto err_spim_xfer;
         }
@@ -158,13 +149,10 @@ xwer_t xwds_w25qxx_ctrl(struct xwds_w25qxx * w25qxx,
                         rxb[i] = w25qxx->rxq[rxofs + i];
                 }
         }
-        xwos_mtx_unlock(&w25qxx->apilock);
         xwds_w25qxx_put(w25qxx);
         return XWOK;
 
 err_spim_xfer:
-        xwos_mtx_unlock(&w25qxx->apilock);
-err_apilock_lock:
         xwds_w25qxx_put(w25qxx);
 err_w25qxx_grab:
         return rc;

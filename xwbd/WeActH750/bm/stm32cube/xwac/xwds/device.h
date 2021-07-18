@@ -26,6 +26,7 @@
 #include <xwcd/ds/soc/chip.h>
 #include <xwcd/ds/uart/dma.h>
 #include <xwcd/ds/spi/master.h>
+#include <xwcd/perpheral/spi/flash/w25qxx/device.h>
 #include <xwcd/perpheral/spi/lcd/st7735/device.h>
 
 /******** ******** ds ******** ********/
@@ -39,7 +40,9 @@ extern struct xwds_dmauartc stm32cube_usart1_cb;
 extern struct xwds_dmauartc stm32cube_usart3_cb;
 
 /******** ******** spi ******** ********/
+extern struct xwds_spim stm32cube_spi1m_cb;
 extern struct xwds_spim stm32cube_spi4m_cb;
+extern struct xwds_w25qxx stm32cube_w25q64jv_cb;
 extern struct xwds_st7735 stm32cube_st7735_cb;
 
 #endif /* bm/stm32cube/xwac/xwds/device.h */

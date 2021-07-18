@@ -25,38 +25,25 @@
 #include <xwcd/ds/soc/chip.h>
 #include <xwcd/ds/uart/dma.h>
 #include <xwcd/ds/spi/master.h>
+#include <xwcd/perpheral/spi/flash/w25qxx/device.h>
 #include <bm/stm32cube/xwac/xwds/device.h>
 #include <bm/stm32cube/xwac/xwds/pm.h>
 #include <bm/stm32cube/xwac/xwds/cmif.h>
 
-/**
- * @brief 准备启动设备栈
- * @retrun 错误码
- * @note
- * - 在初始化过程中调用此函数，此函数中只能初始化SOC的基本资源，
- *   例如：GPIO、时钟等。
- * @note
- * - 同步/异步：同步
- * - 上下文：初始化流程
- * - 重入性：不可重入
- */
 xwer_t stm32cube_xwds_ll_start(void)
 {
         xwer_t rc;
 
         xwds_init(&stm32cube_ds);
-
         rc = stm32cube_xwds_soc_start();
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_soc_start;
         }
-
         xwos_pm_set_cb(stm32cube_pm_resume,
                        stm32cube_pm_suspend,
                        stm32cube_pm_wakeup,
                        stm32cube_pm_sleep,
                        NULL);
-
         return XWOK;
 
 err_soc_start:
@@ -64,26 +51,14 @@ err_soc_start:
         return rc;
 }
 
-/**
- * @brief 准备停止设备栈
- * @retrun 错误码
- * @note
- * - 在反初始化过程中调用此函数，此函数中只能停止SOC的基本资源，
- *   例如：GPIO、时钟等。
- * @note
- * - 同步/异步：同步
- * - 上下文：反初始化流程
- * - 重入性：不可重入
- */
 xwer_t stm32cube_xwds_ll_stop(void)
 {
         xwer_t rc;
 
         rc = stm32cube_xwds_soc_stop();
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_soc_stop;
         }
-
         return XWOK;
 
 err_soc_stop:
@@ -91,16 +66,6 @@ err_soc_stop:
         return rc;
 }
 
-/**
- * @brief 启动设备栈
- * @retrun 错误码
- * @note
- * - 此函数会启动所有外设，有些外设启动流程需要延时，因此此函数只能运行在线程中。
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- */
 xwer_t stm32cube_xwds_start(void)
 {
         xwer_t rc;
@@ -109,12 +74,14 @@ xwer_t stm32cube_xwds_start(void)
         if (rc < 0) {
                 goto err_uart_start;
         }
-
         rc = stm32cube_xwds_spi_start();
         if (rc < 0) {
                 goto err_spi_start;
         }
-
+        rc = stm32cube_xwds_w25q64jv_start();
+        if (rc < 0) {
+                goto err_w25q64jv_start;
+        }
         rc = stm32cube_xwds_st7735_start();
         if (rc < 0) {
                 goto err_st7735_start;
@@ -122,6 +89,8 @@ xwer_t stm32cube_xwds_start(void)
         return XWOK;
 
 err_st7735_start:
+        stm32cube_xwds_w25q64jv_stop();
+err_w25q64jv_start:
         stm32cube_xwds_spi_stop();
 err_spi_start:
         stm32cube_xwds_uart_stop();
@@ -129,16 +98,6 @@ err_uart_start:
         return rc;
 }
 
-/**
- * @brief 停止设备栈
- * @retrun 错误码
- * @note
- * - 此函数会停止所有外设，有些外设的停止流程需要延时，因此此函数只能运行在线程中。
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- */
 xwer_t stm32cube_xwds_stop(void)
 {
         xwer_t rc;
@@ -147,12 +106,14 @@ xwer_t stm32cube_xwds_stop(void)
         if (rc < 0) {
                 goto err_st7735_stop;
         }
-
+        rc = stm32cube_xwds_w25q64jv_stop();
+        if (rc < 0) {
+                goto err_w25q64jv_stop;
+        }
         rc = stm32cube_xwds_spi_stop();
         if (rc < 0) {
                 goto err_spi_stop;
         }
-
         rc = stm32cube_xwds_uart_stop();
         if (rc < 0) {
                 goto err_uart_stop;
@@ -160,21 +121,12 @@ xwer_t stm32cube_xwds_stop(void)
         return XWOK;
 
 err_st7735_stop:
+err_w25q64jv_stop:
 err_uart_stop:
 err_spi_stop:
         return rc;
 }
 
-/**
- * @brief 启动SOC
- * @retrun 错误码
- * @note
- * - 已经由@ref stm32cube_xwds_ll_start()调用。
- * @note
- * - 同步/异步：同步
- * - 上下文：初始化流程
- * - 重入性：不可重入
- */
 xwer_t stm32cube_xwds_soc_start(void)
 {
         xwer_t rc;
@@ -199,16 +151,6 @@ err_dev_probe:
         return rc;
 }
 
-/**
- * @brief 停止SOC
- * @retrun 错误码
- * @note
- * - 已经由@ref stm32cube_xwds_ll_stop()调用。
- * @note
- * - 同步/异步：同步
- * - 上下文：反初始化流程
- * - 重入性：不可重入
- */
 xwer_t stm32cube_xwds_soc_stop(void)
 {
         xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_soc_cb));
@@ -217,16 +159,6 @@ xwer_t stm32cube_xwds_soc_stop(void)
         return XWOK;
 }
 
-/**
- * @brief 启动UART
- * @retrun 错误码
- * @note
- * - 已经由@ref stm32cube_xwds_start()调用。
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- */
 xwer_t stm32cube_xwds_uart_start(void)
 {
         xwer_t rc;
@@ -242,7 +174,6 @@ xwer_t stm32cube_xwds_uart_start(void)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_usart1_start;
         }
-
         xwds_dmauartc_construct(&stm32cube_usart3_cb);
         rc = xwds_device_probe(&stm32cube_ds,
                                xwds_cast(struct xwds_device *, &stm32cube_usart3_cb),
@@ -269,16 +200,6 @@ err_usart1_probe:
         return rc;
 }
 
-/**
- * @brief 停止UART
- * @retrun 错误码
- * @note
- * - 已经由@ref stm32cube_xwds_stop()调用。
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- */
 xwer_t stm32cube_xwds_uart_stop(void)
 {
         xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_usart3_cb));
@@ -291,19 +212,22 @@ xwer_t stm32cube_xwds_uart_stop(void)
         return XWOK;
 }
 
-/**
- * @brief 启动SPI
- * @retrun 错误码
- * @note
- * - 已经由@ref stm32cube_xwds_start()调用。
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- */
 xwer_t stm32cube_xwds_spi_start(void)
 {
         xwer_t rc;
+
+        /* SPI1 */
+        xwds_spim_construct(&stm32cube_spi1m_cb);
+        rc = xwds_device_probe(&stm32cube_ds,
+                               xwds_cast(struct xwds_device *, &stm32cube_spi1m_cb),
+                               NULL);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_spi1_probe;
+        }
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32cube_spi1m_cb));
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_spi1_start;
+        }
 
         /* SPI4 */
         xwds_spim_construct(&stm32cube_spi4m_cb);
@@ -324,41 +248,32 @@ err_spi4_start:
         xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_spi4m_cb));
 err_spi4_probe:
         xwds_spim_destruct(&stm32cube_spi4m_cb);
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_spi1m_cb));
+err_spi1_start:
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_spi1m_cb));
+err_spi1_probe:
+        xwds_spim_destruct(&stm32cube_spi1m_cb);
         return rc;
 }
 
-/**
- * @brief 停止SPI
- * @retrun 错误码
- * @note
- * - 已经由@ref stm32cube_xwds_stop()调用。
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- */
 xwer_t stm32cube_xwds_spi_stop(void)
 {
         /* SPI4 */
         xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_spi4m_cb));
         xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_spi4m_cb));
         xwds_spim_destruct(&stm32cube_spi4m_cb);
+
+        /* SPI1 */
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_spi1m_cb));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_spi1m_cb));
+        xwds_spim_destruct(&stm32cube_spi1m_cb);
         return XWOK;
 }
 
-/**
- * @brief 启动ST7735
- * @retrun 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- */
 xwer_t stm32cube_xwds_st7735_start(void)
 {
         xwer_t rc;
 
-        /* SPI4 */
         xwds_st7735_construct(&stm32cube_st7735_cb);
         rc = xwds_device_probe(&stm32cube_ds,
                                xwds_cast(struct xwds_device *, &stm32cube_st7735_cb),
@@ -380,18 +295,42 @@ err_st7735_probe:
         return rc;
 }
 
-/**
- * @brief 停止ST7735
- * @retrun 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- */
 xwer_t stm32cube_xwds_st7735_stop(void)
 {
         xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_st7735_cb));
         xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_st7735_cb));
         xwds_st7735_destruct(&stm32cube_st7735_cb);
+        return XWOK;
+}
+
+xwer_t stm32cube_xwds_w25q64jv_start(void)
+{
+        xwer_t rc;
+
+        xwds_w25qxx_construct(&stm32cube_w25q64jv_cb);
+        rc = xwds_device_probe(&stm32cube_ds,
+                               xwds_cast(struct xwds_device *, &stm32cube_w25q64jv_cb),
+                               NULL);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_w25q64jv_probe;
+        }
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32cube_w25q64jv_cb));
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_w25q64jv_start;
+        }
+        return XWOK;
+
+err_w25q64jv_start:
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_w25q64jv_cb));
+err_w25q64jv_probe:
+        xwds_w25qxx_destruct(&stm32cube_w25q64jv_cb);
+        return rc;
+}
+
+xwer_t stm32cube_xwds_w25q64jv_stop(void)
+{
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_w25q64jv_cb));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_w25q64jv_cb));
+        xwds_w25qxx_destruct(&stm32cube_w25q64jv_cb);
         return XWOK;
 }

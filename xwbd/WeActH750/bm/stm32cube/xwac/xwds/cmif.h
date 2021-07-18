@@ -35,5 +35,7 @@ xwer_t stm32cube_xwds_spi_start(void);
 xwer_t stm32cube_xwds_spi_stop(void);
 xwer_t stm32cube_xwds_st7735_start(void);
 xwer_t stm32cube_xwds_st7735_stop(void);
+xwer_t stm32cube_xwds_w25q64jv_start(void);
+xwer_t stm32cube_xwds_w25q64jv_stop(void);
 
 #endif /* bm/stm32cube/xwac/xwds/cmif.h */
