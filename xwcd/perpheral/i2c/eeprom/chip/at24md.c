@@ -57,7 +57,6 @@ const struct xwds_eeprom_driver at24md_drv = {
                         .resume =  xwds_eeprom_drv_resume,
 #endif /* XWCDCFG_ds_PM */
                 },
-                .ioctl = NULL,
         },
         .putc = at24md_putc,
         .getc = at24md_getc,

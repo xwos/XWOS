@@ -34,7 +34,6 @@ struct xwds_i2cp;
  */
 struct xwds_i2cp_driver {
         struct xwds_driver base; /**< C语言面向对象：继承struct xwds_driver */
-        xwer_t (* ioctl)(struct xwds_i2cp *, xwsq_t, va_list); /**< 输入、输出与控制 */
 };
 
 /**
@@ -50,7 +49,6 @@ struct xwds_i2cp {
 
 void xwds_i2cp_construct(struct xwds_i2cp * i2cp);
 void xwds_i2cp_destruct(struct xwds_i2cp * i2cp);
-xwer_t xwds_i2cp_ioctl(struct xwds_i2cp * i2cp, xwsq_t cmd, ...);
 
 /**
  * @brief XWDS API：增加对象的引用计数

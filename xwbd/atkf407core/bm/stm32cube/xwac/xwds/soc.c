@@ -116,8 +116,6 @@ const struct xwds_soc_driver stm32cube_soc_drv = {
 #if defined(STM32CUBECFG_SRAM) && (1 == STM32CUBECFG_SRAM)
         .eram_tst = stm32cube_soc_drv_eram_tst,
 #endif /* STM32CUBECFG_SRAM */
-
-        .ioctl = NULL,
 };
 
 struct stm32cube_soc_cfg stm32cube_soc_cfg = {

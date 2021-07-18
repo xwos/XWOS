@@ -62,7 +62,6 @@ const struct xwds_st7735_driver stm32cube_st7735_drv = {
                         .resume =  stm32cube_st7735_drv_resume,
 #endif /* XWMDCFG_ds_PM */
                 },
-                .ioctl = NULL,
         },
         .write = stm32cube_st7735_drv_write,
         .read = stm32cube_st7735_drv_read,

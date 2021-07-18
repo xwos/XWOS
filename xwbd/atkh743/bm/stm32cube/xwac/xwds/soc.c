@@ -133,8 +133,6 @@ const struct xwds_soc_driver stm32cube_soc_drv = {
         .eirq_rls = stm32cube_soc_drv_eirq_rls,
 
         .eram_tst = stm32cube_soc_drv_eram_tst,
-
-        .ioctl = NULL,
 };
 
 struct stm32cube_soc_cfg stm32cube_soc_cfg = {

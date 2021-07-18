@@ -31,7 +31,6 @@ struct xwds_misc;
  */
 struct xwds_misc_driver {
         struct xwds_driver base; /**< C语言面向对象：继承struct xwds_driver */
-        xwer_t (* ioctl)(struct xwds_misc *, xwsq_t, va_list);
 };
 
 /**
@@ -46,7 +45,6 @@ struct xwds_misc {
 
 void xwds_misc_construct(struct xwds_misc * misc);
 void xwds_misc_destruct(struct xwds_misc * misc);
-xwer_t xwds_misc_ioctl(struct xwds_misc * misc, xwsq_t cmd, ...);
 
 /**
  * @brief XWDS API：增加对象的引用计数

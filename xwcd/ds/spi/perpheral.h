@@ -33,7 +33,6 @@ struct xwds_spip;
  */
 struct xwds_spip_driver {
         struct xwds_driver base; /**< C语言面向对象：继承struct xwds_driver */
-        xwer_t (* ioctl)(struct xwds_spip *, xwsq_t, va_list); /**< 输入/输出/控制 */
 };
 
 /**
@@ -49,7 +48,6 @@ struct xwds_spip {
 
 void xwds_spip_construct(struct xwds_spip * spip);
 void xwds_spip_destruct(struct xwds_spip * spip);
-xwer_t xwds_spip_ioctl(struct xwds_spip * spip, xwsq_t cmd, ...);
 
 /**
  * @brief XWDS API：增加对象的引用计数

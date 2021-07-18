@@ -190,8 +190,6 @@ __xwbsp_rodata const struct xwds_soc_driver mpc560xb_soc_drv = {
         .dma_start = mpc560xb_soc_drv_dma_start,
         .dma_stop = mpc560xb_soc_drv_dma_stop,
 #endif /* XWCDCFG_ds_SOC_DMA */
-
-        .ioctl = NULL,
 };
 
 static __xwbsp_code

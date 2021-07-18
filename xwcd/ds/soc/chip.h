@@ -127,10 +127,6 @@ struct xwds_soc_driver {
         xwer_t (* eram_tst)(struct xwds_soc * /*soc*/,
                             xwptr_t * /*erraddr*/); /**< 测试ERAM */
 #endif /* XWCDCFG_ds_SOC_ERAM */
-
-        xwer_t (* ioctl)(struct xwds_soc * /*soc*/,
-                         xwsq_t /*cmd*/,
-                         va_list /*varg*/); /**< 输入、输出和控制 */
 };
 
 /**
@@ -213,7 +209,6 @@ struct xwds_soc {
 
 void xwds_soc_construct(struct xwds_soc * soc);
 void xwds_soc_destruct(struct xwds_soc * soc);
-xwer_t xwds_soc_ioctl(struct xwds_soc * soc, xwsq_t cmd, ...);
 
 /**
  * @brief XWDS API：增加对象的引用计数
