@@ -17,7 +17,7 @@
 
 + 安装node.js
 
-*husky* 要求 *node* 的版本 >= 10。到官网下载一个合适的版本：
+到官网下载 *LTS* 的版本node，当前测试可用的版本为14.17.3：
 [[https://nodejs.org/zh-cn/download/][https://nodejs.org/zh-cn/download/]]
 
 安装路径可以选择 */usr/local/* 或 *~/.local/* ,大部分Linux发行版的 *PATH* 环境变量
