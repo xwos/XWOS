@@ -389,7 +389,7 @@ xwer_t mpc560xb_dmauart0_drv_stop(struct xwds_device * dev)
         }
 
         drvdata = dmauartc->dev.data;
-        xwos_cond_destroy(&drvdata->tx.cond);
+        xwos_cond_fini(&drvdata->tx.cond);
         return XWOK;
 
 err_irq_rls:

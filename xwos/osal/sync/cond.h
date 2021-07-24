@@ -72,9 +72,9 @@ xwer_t xwos_cond_init(struct xwos_cond * cond)
  * - 重入性：对于同一个条件量对象，不可重入
  */
 static __xwos_inline_api
-xwer_t xwos_cond_destroy(struct xwos_cond * cond)
+xwer_t xwos_cond_fini(struct xwos_cond * cond)
 {
-        return xwosdl_cond_destroy(&cond->oscond);
+        return xwosdl_cond_fini(&cond->oscond);
 }
 
 /**

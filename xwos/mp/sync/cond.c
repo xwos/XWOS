@@ -225,7 +225,7 @@ xwer_t xwmp_cond_init(struct xwmp_cond * cond)
 }
 
 __xwmp_api
-xwer_t xwmp_cond_destroy(struct xwmp_cond * cond)
+xwer_t xwmp_cond_fini(struct xwmp_cond * cond)
 {
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
 

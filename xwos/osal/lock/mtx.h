@@ -73,9 +73,9 @@ xwer_t xwos_mtx_init(struct xwos_mtx * mtx, xwpr_t sprio)
  * - 重入性：不可重入
  */
 static __xwos_inline_api
-xwer_t xwos_mtx_destroy(struct xwos_mtx * mtx)
+xwer_t xwos_mtx_fini(struct xwos_mtx * mtx)
 {
-        return xwosdl_mtx_destroy(&mtx->osmtx);
+        return xwosdl_mtx_fini(&mtx->osmtx);
 }
 
 /**

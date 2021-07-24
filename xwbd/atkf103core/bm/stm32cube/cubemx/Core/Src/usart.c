@@ -147,7 +147,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
   if(uartHandle->Instance==USART1)
   {
   /* USER CODE BEGIN USART1_MspDeInit 0 */
-    xwos_cond_destroy(&huart1_drvdata.tx.cond);
+    xwos_cond_fini(&huart1_drvdata.tx.cond);
 
   /* USER CODE END USART1_MspDeInit 0 */
     /* Peripheral clock disable */

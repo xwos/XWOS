@@ -53,7 +53,7 @@ xwer_t xwmp_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif /* XWMPCFG_LOCK_MTX_MEMSLICE */
 
 xwer_t xwmp_mtx_init(struct xwmp_mtx * mtx, xwpr_t sprio);
-xwer_t xwmp_mtx_destroy(struct xwmp_mtx * mtx);
+xwer_t xwmp_mtx_fini(struct xwmp_mtx * mtx);
 xwer_t xwmp_mtx_create(struct xwmp_mtx ** ptrbuf, xwpr_t sprio);
 xwer_t xwmp_mtx_delete(struct xwmp_mtx * mtx);
 

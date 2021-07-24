@@ -75,9 +75,9 @@ xwer_t xwos_br_init(struct xwos_br * br, xwsz_t num,
  * - 重入性：对于同一个线程栅栏对象，不可重入
  */
 static __xwos_inline_api
-xwer_t xwos_br_destroy(struct xwos_br * br)
+xwer_t xwos_br_fini(struct xwos_br * br)
 {
-        return xwosdl_br_destroy(&br->osbr);
+        return xwosdl_br_fini(&br->osbr);
 }
 
 /**

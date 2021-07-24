@@ -325,7 +325,7 @@ xwer_t xwup_thd_init(struct xwup_thd * thd,
 }
 
 __xwup_api
-xwer_t xwup_thd_destroy(struct xwup_thd * thd)
+xwer_t xwup_thd_fini(struct xwup_thd * thd)
 {
         XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
 

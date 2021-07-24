@@ -139,7 +139,7 @@ xwer_t xwup_plsem_init(struct xwup_plsem * sem, xwssq_t val, xwssq_t max)
 }
 
 __xwup_api
-xwer_t xwup_plsem_destroy(struct xwup_plsem * sem)
+xwer_t xwup_plsem_fini(struct xwup_plsem * sem)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
 

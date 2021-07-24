@@ -83,9 +83,9 @@ xwer_t xwos_swt_init(struct xwos_swt * swt, const char * name, xwsq_t flag)
  * - 重入性：不可重入
  */
 static __xwos_inline_api
-xwer_t xwos_swt_destroy(struct xwos_swt * swt)
+xwer_t xwos_swt_fini(struct xwos_swt * swt)
 {
-        return xwosdl_swt_destroy(&swt->osswt);
+        return xwosdl_swt_fini(&swt->osswt);
 }
 
 /**

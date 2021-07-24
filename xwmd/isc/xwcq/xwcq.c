@@ -110,7 +110,7 @@ xwer_t xwcq_gc(void * obj)
         struct xwcq * cq;
 
         cq = obj;
-        xwos_sem_destroy(&cq->sem);
+        xwos_sem_fini(&cq->sem);
         xwcq_free(cq);
         return XWOK;
 }
@@ -277,7 +277,7 @@ xwer_t xwcq_init(struct xwcq * cq, const char * name,
  * - 重入性：不可重入
  */
 __xwmd_api
-xwer_t xwcq_destroy(struct xwcq * cq)
+xwer_t xwcq_fini(struct xwcq * cq)
 {
         XWOS_VALIDATE((cq), "nullptr", -EFAULT);
         return xwcq_put(cq);

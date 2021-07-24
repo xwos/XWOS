@@ -42,7 +42,7 @@ xwer_t xwup_cond_do_timedwait(struct xwup_cond * cond,
                               xwtm_t * xwtm, xwsq_t * lkst);
 
 xwer_t xwup_cond_init(struct xwup_cond * cond);
-xwer_t xwup_cond_destroy(struct xwup_cond * cond);
+xwer_t xwup_cond_fini(struct xwup_cond * cond);
 xwer_t xwup_cond_create(struct xwup_cond ** ptrbuf);
 xwer_t xwup_cond_delete(struct xwup_cond * cond);
 

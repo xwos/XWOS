@@ -282,25 +282,25 @@ err_flg3_bind:
 err_sem2_bind:
         xwos_sem_unbind(&xwseldemo_sem1, &xwseldemo_sel0);
 err_sem1_bind:
-        xwos_swt_destroy(&xwseldemo_swt1);
+        xwos_swt_fini(&xwseldemo_swt1);
 err_swt1_init:
-        xwos_swt_destroy(&xwseldemo_swt0);
+        xwos_swt_fini(&xwseldemo_swt0);
 err_swt0_init:
-        xwos_br_destroy(&xwseldemo_br7);
+        xwos_br_fini(&xwseldemo_br7);
 err_br7_init:
-        xwos_cond_destroy(&xwseldemo_cond6);
+        xwos_cond_fini(&xwseldemo_cond6);
 err_cond6_init:
-        xwos_cond_destroy(&xwseldemo_cond5);
+        xwos_cond_fini(&xwseldemo_cond5);
 err_cond5_init:
-        xwos_sel_destroy(&xwseldemo_sel4);
+        xwos_sel_fini(&xwseldemo_sel4);
 err_sel4_init:
-        xwos_flg_destroy(&xwseldemo_flg3);
+        xwos_flg_fini(&xwseldemo_flg3);
 err_flg3_init:
-        xwos_sem_destroy(&xwseldemo_sem2);
+        xwos_sem_fini(&xwseldemo_sem2);
 err_sem2_init:
-        xwos_sem_destroy(&xwseldemo_sem1);
+        xwos_sem_fini(&xwseldemo_sem1);
 err_sem1_init:
-        xwos_sel_destroy(&xwseldemo_sel0);
+        xwos_sel_fini(&xwseldemo_sel0);
 err_sel0_init:
         return rc;
 }

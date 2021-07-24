@@ -44,7 +44,7 @@ struct xwmp_evt {
 
 xwer_t xwmp_evt_init(struct xwmp_evt * evt, xwsq_t type, xwsz_t num,
                      xwbmp_t * bmp, xwbmp_t * msk);
-xwer_t xwmp_evt_destroy(struct xwmp_evt * evt);
+xwer_t xwmp_evt_fini(struct xwmp_evt * evt);
 xwer_t xwmp_evt_create(struct xwmp_evt ** ptrbuf, xwsq_t type, xwsz_t num);
 xwer_t xwmp_evt_delete(struct xwmp_evt * evt);
 

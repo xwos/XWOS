@@ -79,7 +79,7 @@ xwer_t xwmp_sem_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 xwer_t xwmp_sem_create(struct xwmp_sem ** ptrbuf, xwid_t type,
                        xwssq_t val, xwssq_t max);
 xwer_t xwmp_sem_delete(struct xwmp_sem * sem);
-xwer_t xwmp_sem_destroy(struct xwmp_sem * sem);
+xwer_t xwmp_sem_fini(struct xwmp_sem * sem);
 
 xwer_t xwmp_sem_acquire(struct xwmp_sem * sem, xwsq_t tik);
 xwer_t xwmp_sem_release(struct xwmp_sem * sem, xwsq_t tik);

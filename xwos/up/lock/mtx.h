@@ -41,7 +41,7 @@ struct xwup_mtx {
 };
 
 xwer_t xwup_mtx_init(struct xwup_mtx * mtx, xwpr_t sprio);
-xwer_t xwup_mtx_destroy(struct xwup_mtx * mtx);
+xwer_t xwup_mtx_fini(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio);
 xwer_t xwup_mtx_delete(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_intr(struct xwup_mtx * mtx, struct xwup_thd * thd);

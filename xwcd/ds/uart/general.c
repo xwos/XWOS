@@ -127,10 +127,10 @@ xwer_t xwds_uartc_vop_probe(struct xwds_uartc * uartc)
         return XWOK;
 
 err_dev_probe:
-        xwos_mtx_destroy(&uartc->txmtx);
+        xwos_mtx_fini(&uartc->txmtx);
 err_txmtx_init:
 err_rxsem_freeze:
-        xwos_sem_destroy(&uartc->rxsem);
+        xwos_sem_fini(&uartc->rxsem);
 err_rxsem_init:
         return rc;
 }
@@ -149,8 +149,8 @@ xwer_t xwds_uartc_vop_remove(struct xwds_uartc * uartc)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_vop_remove;
         }
-        xwos_mtx_destroy(&uartc->txmtx);
-        xwos_sem_destroy(&uartc->rxsem);
+        xwos_mtx_fini(&uartc->txmtx);
+        xwos_sem_fini(&uartc->rxsem);
         return XWOK;
 
 err_dev_vop_remove:

@@ -101,7 +101,7 @@ xwer_t xwds_linc_vop_probe(struct xwds_linc * linc)
         return XWOK;
 
 err_dev_vop_probe:
-        xwos_mtx_destroy(&linc->txlock);
+        xwos_mtx_fini(&linc->txlock);
 err_mtx_init:
         return rc;
 }
@@ -120,7 +120,7 @@ xwer_t xwds_linc_vop_remove(struct xwds_linc * linc)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_vop_remove;
         }
-        xwos_mtx_destroy(&linc->txlock);
+        xwos_mtx_fini(&linc->txlock);
         return XWOK;
 
 err_dev_vop_remove:

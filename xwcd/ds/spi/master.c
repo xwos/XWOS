@@ -102,7 +102,7 @@ xwer_t xwds_spim_vop_probe(struct xwds_spim * spim)
         return XWOK;
 
 err_dev_probe:
-        xwos_mtx_destroy(&spim->xfer.apimtx);
+        xwos_mtx_fini(&spim->xfer.apimtx);
 err_xfer_apimtx_init:
         return rc;
 }
@@ -121,8 +121,7 @@ xwer_t xwds_spim_vop_remove(struct xwds_spim * spim)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_vop_remove;
         }
-
-        xwos_mtx_destroy(&spim->xfer.apimtx);
+        xwos_mtx_fini(&spim->xfer.apimtx);
         return XWOK;
 
 err_dev_vop_remove:

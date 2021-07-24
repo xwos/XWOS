@@ -151,7 +151,7 @@ xwer_t xwup_mtx_init(struct xwup_mtx * mtx, xwpr_t sprio)
 }
 
 __xwup_api
-xwer_t xwup_mtx_destroy(struct xwup_mtx * mtx)
+xwer_t xwup_mtx_fini(struct xwup_mtx * mtx)
 {
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
 

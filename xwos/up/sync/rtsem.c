@@ -145,7 +145,7 @@ xwer_t xwup_rtsem_init(struct xwup_rtsem * sem, xwssq_t val, xwssq_t max)
 }
 
 __xwup_api
-xwer_t xwup_rtsem_destroy(struct xwup_rtsem * sem)
+xwer_t xwup_rtsem_fini(struct xwup_rtsem * sem)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
 
@@ -180,7 +180,7 @@ xwer_t xwup_rtsem_delete(struct xwup_rtsem * sem)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
 
-        xwup_rtsem_destroy(sem);
+        xwup_rtsem_fini(sem);
         xwup_rtsem_free(sem);
         return XWOK;
 }

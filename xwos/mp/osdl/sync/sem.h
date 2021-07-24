@@ -44,9 +44,9 @@ xwer_t xwosdl_sem_init(struct xwosdl_sem * sem, xwssq_t val, xwssq_t max)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sem_destroy(struct xwosdl_sem * sem)
+xwer_t xwosdl_sem_fini(struct xwosdl_sem * sem)
 {
-        return xwmp_sem_destroy(sem);
+        return xwmp_sem_fini(sem);
 }
 
 static __xwcc_inline
@@ -149,9 +149,9 @@ xwer_t xwosdl_sem_init(struct xwosdl_sem * sem, xwssq_t val, xwssq_t max)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sem_destroy(struct xwosdl_sem * sem)
+xwer_t xwosdl_sem_fini(struct xwosdl_sem * sem)
 {
-        return xwmp_sem_destroy(sem);
+        return xwmp_sem_fini(sem);
 }
 
 static __xwcc_inline

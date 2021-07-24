@@ -304,7 +304,7 @@ xwer_t xwmp_sem_delete(struct xwmp_sem * sem)
 }
 
 __xwmp_api
-xwer_t xwmp_sem_destroy(struct xwmp_sem * sem)
+xwer_t xwmp_sem_fini(struct xwmp_sem * sem)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         return xwmp_sem_put(sem);

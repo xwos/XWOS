@@ -74,9 +74,9 @@ xwer_t xwos_sel_init(struct xwos_sel * sel, xwsz_t num,
  * - 重入性：对于同一个信号选择器，不可重入
  */
 static __xwos_inline_api
-xwer_t xwos_sel_destroy(struct xwos_sel * sel)
+xwer_t xwos_sel_fini(struct xwos_sel * sel)
 {
-        return xwosdl_sel_destroy(&sel->ossel);
+        return xwosdl_sel_fini(&sel->ossel);
 }
 
 /**

@@ -88,7 +88,7 @@ xwer_t example_cpuirq_start(void)
         return XWOK;
 
 err_thd_create:
-        xwos_swt_destroy(&xwcpuirqdemo_swt);
+        xwos_swt_fini(&xwcpuirqdemo_swt);
 err_swt_init:
         return rc;
 }

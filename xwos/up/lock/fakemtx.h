@@ -49,9 +49,9 @@ xwer_t xwup_mtx_init(struct xwup_mtx * mtx, xwpr_t sprio)
 }
 
 static __xwup_inline_api
-xwer_t xwup_mtx_destroy(struct xwup_mtx * mtx)
+xwer_t xwup_mtx_fini(struct xwup_mtx * mtx)
 {
-        return XWUP_SEM_API(destroy, &mtx->fake);
+        return XWUP_SEM_API(fini, &mtx->fake);
 }
 
 static __xwup_inline_api

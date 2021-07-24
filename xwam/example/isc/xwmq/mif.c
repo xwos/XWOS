@@ -109,7 +109,7 @@ xwer_t example_xwmq_start(void)
 err_consumer_create:
         xwos_thd_stop(xwmqdemo_producer, NULL);
 err_producer_create:
-        xwmq_destroy(&xwmqdemo_mq);
+        xwmq_fini(&xwmqdemo_mq);
 err_xwmq_init:
         return rc;
 }
@@ -163,7 +163,7 @@ xwer_t xwmqdemo_consumer_func(void * arg)
                         mqlogf(INFO,
                                "[消费者] 接收消息{topic = %d, data = %s}。\n",
                                msg->topic, msg->data);
-                        xwmq_msg_destroy(msg);
+                        xwmq_msg_fini(msg);
                 }
         }
         mqlogf(INFO, "[消费者] 退出。\n");

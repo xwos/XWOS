@@ -104,9 +104,9 @@ xwer_t xwds_i2cm_vop_probe(struct xwds_i2cm * i2cm)
         return XWOK;
 
 err_dev_vop_probe:
-        xwos_mtx_destroy(&i2cm->abort.apimtx);
+        xwos_mtx_fini(&i2cm->abort.apimtx);
 err_abort_mtx_init:
-        xwos_mtx_destroy(&i2cm->xfer.apimtx);
+        xwos_mtx_fini(&i2cm->xfer.apimtx);
 err_xfer_mtx_init:
         return rc;
 }
@@ -126,8 +126,8 @@ xwer_t xwds_i2cm_vop_remove(struct xwds_i2cm * i2cm)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_vop_remove;
         }
-        xwos_mtx_destroy(&i2cm->abort.apimtx);
-        xwos_mtx_destroy(&i2cm->xfer.apimtx);
+        xwos_mtx_fini(&i2cm->abort.apimtx);
+        xwos_mtx_fini(&i2cm->xfer.apimtx);
         return XWOK;
 
 err_dev_vop_remove:

@@ -30,9 +30,9 @@ xwer_t xwosdl_mtx_init(struct xwosdl_mtx * mtx, xwpr_t sprio)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_mtx_destroy(struct xwosdl_mtx * mtx)
+xwer_t xwosdl_mtx_fini(struct xwosdl_mtx * mtx)
 {
-        return xwup_mtx_destroy(mtx);
+        return xwup_mtx_fini(mtx);
 }
 
 static __xwcc_inline

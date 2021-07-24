@@ -118,7 +118,7 @@ xwer_t example_flg_start(void)
 err_producer_create:
         xwos_thd_cancel(xwflgdemo_consumer);
 err_consumer_create:
-        xwos_flg_destroy(&xwflgdemo_flg);
+        xwos_flg_fini(&xwflgdemo_flg);
 err_flg_init:
         return rc;
 }

@@ -119,7 +119,7 @@ xwer_t xwmp_thd_init(struct xwmp_thd * thd,
                      xwmp_thd_f mainfunc, void * arg,
                      xwstk_t * stack, xwsz_t stack_size,
                      xwpr_t priority, xwsq_t attr);
-xwer_t xwmp_thd_destroy(struct xwmp_thd * thd);
+xwer_t xwmp_thd_fini(struct xwmp_thd * thd);
 xwer_t xwmp_thd_create(struct xwmp_thd ** thdpbuf, const char * name,
                        xwmp_thd_f manfunc, void * arg,
                        xwsz_t stack_size,

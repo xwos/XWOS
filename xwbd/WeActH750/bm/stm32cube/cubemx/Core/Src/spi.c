@@ -317,7 +317,7 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* spiHandle)
   if(spiHandle->Instance==SPI1)
   {
   /* USER CODE BEGIN SPI1_MspDeInit 0 */
-    xwos_cond_destroy(&hspi1_drvdata.cond);
+    xwos_cond_fini(&hspi1_drvdata.cond);
 
   /* USER CODE END SPI1_MspDeInit 0 */
     /* Peripheral clock disable */
@@ -345,7 +345,7 @@ void HAL_SPI_MspDeInit(SPI_HandleTypeDef* spiHandle)
   else if(spiHandle->Instance==SPI4)
   {
   /* USER CODE BEGIN SPI4_MspDeInit 0 */
-    xwos_cond_destroy(&hspi4_drvdata.cond);
+    xwos_cond_fini(&hspi4_drvdata.cond);
 
   /* USER CODE END SPI4_MspDeInit 0 */
     /* Peripheral clock disable */

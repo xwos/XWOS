@@ -114,9 +114,9 @@ xwer_t xwds_dmauartc_vop_probe(struct xwds_dmauartc * dmauartc)
         return XWOK;
 
 err_dev_probe:
-        xwos_mtx_destroy(&dmauartc->txmtx);
+        xwos_mtx_fini(&dmauartc->txmtx);
 err_txmtx_init:
-        xwos_sem_destroy(&dmauartc->rxq.sem);
+        xwos_sem_fini(&dmauartc->rxq.sem);
 err_sem_init:
         return rc;
 }
@@ -136,8 +136,8 @@ xwer_t xwds_dmauartc_vop_remove(struct xwds_dmauartc * dmauartc)
                 goto err_dev_vop_remove;
         }
 
-        xwos_mtx_destroy(&dmauartc->txmtx);
-        xwos_sem_destroy(&dmauartc->rxq.sem);
+        xwos_mtx_fini(&dmauartc->txmtx);
+        xwos_sem_fini(&dmauartc->rxq.sem);
         return XWOK;
 
 err_dev_vop_remove:

@@ -152,7 +152,7 @@ xwer_t xwmq_gc(void * obj)
         struct xwmq * mq;
 
         mq = obj;
-        xwos_sem_destroy(&mq->sem);
+        xwos_sem_fini(&mq->sem);
         xwmq_free(mq);
         return XWOK;
 }
@@ -301,7 +301,7 @@ xwer_t xwmq_init(struct xwmq * mq, const char * name)
  * - 重入性：不可重入
  */
 __xwmd_api
-xwer_t xwmq_destroy(struct xwmq * mq)
+xwer_t xwmq_fini(struct xwmq * mq)
 {
         XWOS_VALIDATE((mq), "nullptr", -EFAULT);
         return xwmq_put(mq);
@@ -640,7 +640,7 @@ xwer_t xwmq_msg_init(struct xwmq_msg * msg)
  * - 重入性：不可重入
  */
 __xwmd_api
-xwer_t xwmq_msg_destroy(struct xwmq_msg * msg)
+xwer_t xwmq_msg_fini(struct xwmq_msg * msg)
 {
         XWOS_VALIDATE((msg), "nullptr", -EFAULT);
         return xwmq_msg_put(msg);

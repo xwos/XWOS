@@ -71,15 +71,15 @@ xwer_t MX_SDMMC1_SD_Construct(void)
   return XWOK;
 
 err_cond_init:
-  xwos_mtx_destroy(&hsd1_xfer_mtx);
+  xwos_mtx_fini(&hsd1_xfer_mtx);
 err_mtx_init:
   return rc;
 }
 
 void MX_SDMMC1_SD_Destruct(void)
 {
-  xwos_cond_destroy(&hsd1_xfer_cond);
-  xwos_mtx_destroy(&hsd1_xfer_mtx);
+  xwos_cond_fini(&hsd1_xfer_cond);
+  xwos_mtx_fini(&hsd1_xfer_mtx);
 }
 
 /* USER CODE END 0 */

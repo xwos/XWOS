@@ -92,9 +92,9 @@ xwer_t example_sem_start(void)
         return XWOK;
 
 err_thd_create:
-        xwos_swt_destroy(&xwsemdemo_swt);
+        xwos_swt_fini(&xwsemdemo_swt);
 err_swt_init:
-        xwos_sem_destroy(&xwsemdemo_sem);
+        xwos_sem_fini(&xwsemdemo_sem);
 err_sem_init:
         return rc;
 }

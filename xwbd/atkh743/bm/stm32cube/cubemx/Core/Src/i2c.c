@@ -174,7 +174,7 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
   if(i2cHandle->Instance==I2C2)
   {
   /* USER CODE BEGIN I2C2_MspDeInit 0 */
-    xwos_cond_destroy(&hi2c2_drvdata.cond);
+    xwos_cond_fini(&hi2c2_drvdata.cond);
 
   /* USER CODE END I2C2_MspDeInit 0 */
     /* Peripheral clock disable */

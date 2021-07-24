@@ -49,7 +49,7 @@ struct xwup_swt {
 xwer_t xwup_swt_init(struct xwup_swt * swt,
                      const char * name,
                      xwsq_t flag);
-xwer_t xwup_swt_destroy(struct xwup_swt * swt);
+xwer_t xwup_swt_fini(struct xwup_swt * swt);
 xwer_t xwup_swt_create(struct xwup_swt ** ptrbuf,
                        const char * name,
                        xwsq_t flag);

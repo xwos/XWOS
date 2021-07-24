@@ -74,9 +74,9 @@ xwer_t xwos_sem_init(struct xwos_sem * sem, xwssq_t val, xwssq_t max)
  * - 重入性：对于同一个信号量对象，不可重入
  */
 static __xwos_inline_api
-xwer_t xwos_sem_destroy(struct xwos_sem * sem)
+xwer_t xwos_sem_fini(struct xwos_sem * sem)
 {
-        return xwosdl_sem_destroy(&sem->ossem);
+        return xwosdl_sem_fini(&sem->ossem);
 }
 
 /**

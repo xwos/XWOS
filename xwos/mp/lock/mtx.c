@@ -254,7 +254,7 @@ xwer_t xwmp_mtx_init(struct xwmp_mtx * mtx, xwpr_t sprio)
 }
 
 __xwmp_api
-xwer_t xwmp_mtx_destroy(struct xwmp_mtx * mtx)
+xwer_t xwmp_mtx_fini(struct xwmp_mtx * mtx)
 {
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
 

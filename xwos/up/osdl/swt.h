@@ -28,9 +28,9 @@ xwer_t xwosdl_swt_init(struct xwosdl_swt * swt, const char * name, xwsq_t flag)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_swt_destroy(struct xwosdl_swt * swt)
+xwer_t xwosdl_swt_fini(struct xwosdl_swt * swt)
 {
-        return xwup_swt_destroy(swt);
+        return xwup_swt_fini(swt);
 }
 
 static __xwcc_inline

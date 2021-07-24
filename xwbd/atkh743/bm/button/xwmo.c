@@ -111,7 +111,7 @@ xwer_t bmbtn_start(void)
         return XWOK;
 
 err_thd_create:
-        xwos_sem_destroy(&bmbtn_sem);
+        xwos_sem_fini(&bmbtn_sem);
 err_sem_init:
         return rc;
 }
@@ -121,7 +121,7 @@ xwer_t bmbtn_stop(void)
         xwer_t rc;
 
         rc = xwos_thd_cancel(bmbtn_thd);
-        xwos_sem_destroy(&bmbtn_sem);
+        xwos_sem_fini(&bmbtn_sem);
         return rc;
 }
 

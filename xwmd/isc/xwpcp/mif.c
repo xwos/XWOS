@@ -218,13 +218,13 @@ err_rxthd_create:
 err_hwifal_open:
 err_rxqsem_init:
         for (j = i - 1; j >= 0; j--) {
-                xwos_sem_destroy(&xwpcp->rxq.sem[j]);
+                xwos_sem_fini(&xwpcp->rxq.sem[j]);
         }
-        xwos_cond_destroy(&xwpcp->txq.cscond);
+        xwos_cond_fini(&xwpcp->txq.cscond);
 err_cscond_init:
-        xwos_mtx_destroy(&xwpcp->txq.csmtx);
+        xwos_mtx_fini(&xwpcp->txq.csmtx);
 err_csmtx_init:
-        xwos_sem_destroy(&xwpcp->txq.qsem);
+        xwos_sem_fini(&xwpcp->txq.qsem);
 err_txqsem_init:
 err_bma_init:
         xwos_object_rawput(&xwpcp->xwobj);
@@ -308,11 +308,11 @@ xwer_t xwpcp_gc(void * obj)
         }
 
         for (j = XWPCP_PORT_NUM - 1; j >= 0; j--) {
-                xwos_sem_destroy(&xwpcp->rxq.sem[j]);
+                xwos_sem_fini(&xwpcp->rxq.sem[j]);
         }
-        xwos_cond_destroy(&xwpcp->txq.cscond);
-        xwos_mtx_destroy(&xwpcp->txq.csmtx);
-        xwos_sem_destroy(&xwpcp->txq.qsem);
+        xwos_cond_fini(&xwpcp->txq.cscond);
+        xwos_mtx_fini(&xwpcp->txq.csmtx);
+        xwos_sem_fini(&xwpcp->txq.qsem);
         return XWOK;
 }
 
@@ -443,12 +443,12 @@ xwer_t xwpcp_tx(struct xwpcp * xwpcp,
                 rc = cbarg.rc;
                 xwos_splk_unlock(&cbarg.splk);
         }
-        xwos_cond_destroy(&cbarg.cond);
+        xwos_cond_fini(&cbarg.cond);
         xwpcp_put(xwpcp);
         return rc;
 
 err_xwpcp_eq:
-        xwos_cond_destroy(&cbarg.cond);
+        xwos_cond_fini(&cbarg.cond);
         xwpcp_put(xwpcp);
 err_ifnotrdy:
         return rc;

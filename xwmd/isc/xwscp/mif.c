@@ -175,13 +175,13 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
 err_rxthd_create:
         xwscp_hwifal_close(xwscp);
 err_hwifal_open:
-        xwos_sem_destroy(&xwscp->rx.sem);
+        xwos_sem_fini(&xwscp->rx.sem);
 err_rxsem_init:
-        xwos_cond_destroy(&xwscp->tx.cscond);
+        xwos_cond_fini(&xwscp->tx.cscond);
 err_cscond_init:
-        xwos_mtx_destroy(&xwscp->tx.csmtx);
+        xwos_mtx_fini(&xwscp->tx.csmtx);
 err_csmtx_init:
-        xwos_mtx_destroy(&xwscp->tx.mtx);
+        xwos_mtx_fini(&xwscp->tx.mtx);
 err_txmtx_init:
 err_bma_init:
         xwos_object_rawput(&xwscp->xwobj);
@@ -228,10 +228,10 @@ xwer_t xwscp_gc(void * obj)
         }
 
         xwscp_hwifal_close(xwscp);
-        xwos_sem_destroy(&xwscp->rx.sem);
-        xwos_cond_destroy(&xwscp->tx.cscond);
-        xwos_mtx_destroy(&xwscp->tx.csmtx);
-        xwos_mtx_destroy(&xwscp->tx.mtx);
+        xwos_sem_fini(&xwscp->rx.sem);
+        xwos_cond_fini(&xwscp->tx.cscond);
+        xwos_mtx_fini(&xwscp->tx.csmtx);
+        xwos_mtx_fini(&xwscp->tx.mtx);
         return XWOK;
 }
 

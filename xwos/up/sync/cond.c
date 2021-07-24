@@ -124,7 +124,7 @@ xwer_t xwup_cond_init(struct xwup_cond * cond)
 }
 
 __xwup_api
-xwer_t xwup_cond_destroy(struct xwup_cond * cond)
+xwer_t xwup_cond_fini(struct xwup_cond * cond)
 {
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
 

@@ -148,7 +148,7 @@ xwer_t xwup_thd_init(struct xwup_thd * thd,
                      xwup_thd_f mainfunc, void * arg,
                      xwstk_t * stack, xwsz_t stack_size,
                      xwpr_t priority, xwsq_t attr);
-xwer_t xwup_thd_destroy(struct xwup_thd * thd);
+xwer_t xwup_thd_fini(struct xwup_thd * thd);
 xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
                        const char * name,
                        xwup_thd_f manfunc, void * arg,

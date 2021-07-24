@@ -25,9 +25,9 @@ xwer_t xwosdl_cond_init(struct xwosdl_cond * cond)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_cond_destroy(struct xwosdl_cond * cond)
+xwer_t xwosdl_cond_fini(struct xwosdl_cond * cond)
 {
-        return xwmp_cond_destroy(cond);
+        return xwmp_cond_fini(cond);
 }
 
 static __xwcc_inline

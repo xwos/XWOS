@@ -127,7 +127,7 @@ xwer_t example_br_start(void)
         return XWOK;
 
 err_thd_create:
-        xwos_br_destroy(&xwbrdemo_br);
+        xwos_br_fini(&xwbrdemo_br);
 err_br_init:
         return rc;
 }

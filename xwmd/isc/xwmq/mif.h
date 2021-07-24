@@ -43,7 +43,7 @@ struct xwmq_msg {
 
 xwer_t xwmq_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 xwer_t xwmq_init(struct xwmq * mq, const char * name);
-xwer_t xwmq_destroy(struct xwmq * mq);
+xwer_t xwmq_fini(struct xwmq * mq);
 xwer_t xwmq_create(struct xwmq ** ptrbuf, const char * name);
 xwer_t xwmq_delete(struct xwmq * mq);
 xwsq_t xwmq_gettik(struct xwmq * mq);
@@ -54,7 +54,7 @@ xwer_t xwmq_put(struct xwmq * mq);
 
 xwer_t xwmq_msg_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 xwer_t xwmq_msg_init(struct xwmq_msg * msg);
-xwer_t xwmq_msg_destroy(struct xwmq_msg * msg);
+xwer_t xwmq_msg_fini(struct xwmq_msg * msg);
 xwer_t xwmq_msg_create(struct xwmq_msg ** ptrbuf);
 xwer_t xwmq_msg_delete(struct xwmq_msg * msg);
 xwsq_t xwmq_msg_gettik(struct xwmq_msg * msg);

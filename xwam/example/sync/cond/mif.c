@@ -98,9 +98,9 @@ xwer_t example_cond_start(void)
         return XWOK;
 
 err_thd_create:
-        xwos_swt_destroy(&xwconddemo_swt);
+        xwos_swt_fini(&xwconddemo_swt);
 err_swt_init:
-        xwos_cond_destroy(&xwconddemo_cond);
+        xwos_cond_fini(&xwconddemo_cond);
 err_cond_init:
         return rc;
 }

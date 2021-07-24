@@ -235,7 +235,7 @@ xwer_t xwmp_swt_init(struct xwmp_swt * swt,
 }
 
 __xwmp_api
-xwer_t xwmp_swt_destroy(struct xwmp_swt * swt)
+xwer_t xwmp_swt_fini(struct xwmp_swt * swt)
 {
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
 

@@ -36,9 +36,9 @@ xwer_t xwosdl_flg_init(struct xwosdl_flg * flg, xwsz_t num,
 }
 
 static __xwcc_inline
-xwer_t xwosdl_flg_destroy(struct xwosdl_flg * flg)
+xwer_t xwosdl_flg_fini(struct xwosdl_flg * flg)
 {
-        return xwup_evt_destroy(flg);
+        return xwup_evt_fini(flg);
 }
 
 static __xwcc_inline

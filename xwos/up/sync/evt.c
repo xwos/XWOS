@@ -221,7 +221,7 @@ xwer_t xwup_evt_init(struct xwup_evt * evt, xwsq_t type, xwsz_t num,
 }
 
 __xwup_api
-xwer_t xwup_evt_destroy(struct xwup_evt * evt)
+xwer_t xwup_evt_fini(struct xwup_evt * evt)
 {
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
 

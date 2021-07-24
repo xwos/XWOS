@@ -45,7 +45,7 @@ struct xwcq {
 
 xwer_t xwcq_init(struct xwcq * cq, const char * name,
                  xwsz_t slotsize, xwsz_t slotnum, xwu8_t * mem);
-xwer_t xwcq_destroy(struct xwcq * cq);
+xwer_t xwcq_fini(struct xwcq * cq);
 xwer_t xwcq_create(struct xwcq ** ptrbuf, const char * name,
                    xwsz_t slotsize, xwsz_t slotnum);
 xwer_t xwcq_delete(struct xwcq * cq);

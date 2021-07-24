@@ -48,8 +48,8 @@ void MX_SDIO_SD_Construct(void)
 
 void MX_SDIO_SD_Destruct(void)
 {
-  xwos_cond_destroy(&hsd_xfer_cond);
-  xwos_mtx_destroy(&hsd_xfer_mtx);
+  xwos_cond_fini(&hsd_xfer_cond);
+  xwos_mtx_fini(&hsd_xfer_mtx);
 }
 
 /* USER CODE END 0 */

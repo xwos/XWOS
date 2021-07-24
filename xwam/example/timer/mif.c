@@ -106,9 +106,9 @@ xwer_t example_timer_start(void)
 err_thd_create:
         xwos_swt_delete(xwswtdemo_swt1);
 err_swt1_create:
-        xwos_swt_destroy(&xwswtdemo_swt0);
+        xwos_swt_fini(&xwswtdemo_swt0);
 err_swt0_init:
-        xwos_flg_destroy(&swtflg);
+        xwos_flg_fini(&swtflg);
 err_flg_init:
         return rc;
 }

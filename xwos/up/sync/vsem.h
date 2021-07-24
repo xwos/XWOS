@@ -55,7 +55,7 @@ __xwup_api
 xwer_t xwup_vsem_init(struct xwup_vsem * sem, xwssq_t val, xwssq_t max) = 0;
 
 __xwup_api
-xwer_t xwup_vsem_destroy(struct xwup_vsem * sem) = 0;
+xwer_t xwup_vsem_fini(struct xwup_vsem * sem) = 0;
 
 __xwup_api
 xwer_t xwup_vsem_create(struct xwup_vsem ** ptrbuf, xwssq_t val, xwssq_t max) = 0;

@@ -480,7 +480,7 @@ xwer_t xwmp_thd_init(struct xwmp_thd * thd,
 }
 
 __xwmp_api
-xwer_t xwmp_thd_destroy(struct xwmp_thd * thd)
+xwer_t xwmp_thd_fini(struct xwmp_thd * thd)
 {
         XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
 

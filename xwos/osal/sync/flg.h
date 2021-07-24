@@ -135,9 +135,9 @@ xwer_t xwos_flg_init(struct xwos_flg * flg, xwsz_t num,
  * - 重入性：对于同一个事件标志对象，不可重入
  */
 static __xwos_inline_api
-xwer_t xwos_flg_destroy(struct xwos_flg * flg)
+xwer_t xwos_flg_fini(struct xwos_flg * flg)
 {
-        return xwosdl_flg_destroy(&flg->osflg);
+        return xwosdl_flg_fini(&flg->osflg);
 }
 
 /**

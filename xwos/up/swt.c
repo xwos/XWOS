@@ -128,7 +128,7 @@ xwer_t xwup_swt_init(struct xwup_swt * swt,
 }
 
 __xwup_api
-xwer_t xwup_swt_destroy(struct xwup_swt * swt)
+xwer_t xwup_swt_fini(struct xwup_swt * swt)
 {
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
 

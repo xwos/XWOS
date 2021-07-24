@@ -25,9 +25,9 @@ xwer_t xwosdl_sel_init(struct xwosdl_sel * sel, xwsz_t num,
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sel_destroy(struct xwosdl_sel * sel)
+xwer_t xwosdl_sel_fini(struct xwosdl_sel * sel)
 {
-        return xwmp_evt_destroy(sel);
+        return xwmp_evt_fini(sel);
 }
 
 static __xwcc_inline

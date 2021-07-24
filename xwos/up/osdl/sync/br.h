@@ -26,9 +26,9 @@ xwer_t xwosdl_br_init(struct xwosdl_br * br, xwsz_t num,
 }
 
 static __xwcc_inline
-xwer_t xwosdl_br_destroy(struct xwosdl_br * br)
+xwer_t xwosdl_br_fini(struct xwosdl_br * br)
 {
-        return xwup_evt_destroy(br);
+        return xwup_evt_fini(br);
 }
 
 static __xwcc_inline

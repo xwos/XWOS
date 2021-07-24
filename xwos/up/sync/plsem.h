@@ -26,7 +26,7 @@ struct xwup_plsem {
 };
 
 xwer_t xwup_plsem_init(struct xwup_plsem * sem, xwssq_t val, xwssq_t max);
-xwer_t xwup_plsem_destroy(struct xwup_plsem * sem);
+xwer_t xwup_plsem_fini(struct xwup_plsem * sem);
 xwer_t xwup_plsem_create(struct xwup_plsem ** ptrbuf, xwssq_t val, xwssq_t max);
 xwer_t xwup_plsem_delete(struct xwup_plsem * sem);
 xwer_t xwup_plsem_intr(struct xwup_plsem * sem, struct xwup_wqn * wqn);

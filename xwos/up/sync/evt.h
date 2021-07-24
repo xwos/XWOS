@@ -44,7 +44,7 @@ struct xwup_evt {
 
 xwer_t xwup_evt_init(struct xwup_evt * evt, xwsq_t type, xwsz_t num,
                      xwbmp_t * bmp, xwbmp_t * msk);
-xwer_t xwup_evt_destroy(struct xwup_evt * evt);
+xwer_t xwup_evt_fini(struct xwup_evt * evt);
 xwer_t xwup_evt_create(struct xwup_evt ** ptrbuf, xwsq_t type, xwsz_t num);
 xwer_t xwup_evt_delete(struct xwup_evt * evt);
 xwer_t xwup_evt_bind(struct xwup_evt * evt, struct xwup_evt * slt, xwsq_t pos);

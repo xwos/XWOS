@@ -93,7 +93,7 @@ xwer_t example_seqlock_start(void)
         return XWOK;
 
 err_thd_create:
-        xwos_swt_destroy(&xwsqlkdemo_swt);
+        xwos_swt_fini(&xwsqlkdemo_swt);
 err_swt_init:
         return rc;
 }

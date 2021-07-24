@@ -92,7 +92,7 @@ xwer_t example_spinlock_start(void)
         return XWOK;
 
 err_thd_create:
-        xwos_swt_destroy(&xwsplkdemo_swt);
+        xwos_swt_fini(&xwsplkdemo_swt);
 err_swt_init:
         return rc;
 }
