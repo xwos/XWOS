@@ -303,7 +303,7 @@ typedef struct
 
 #ifndef SDMMC_DATATIMEOUT
 #define SDMMC_DATATIMEOUT                             0x1000U
-/* #define SDMMC_DATATIMEOUT                             0xFFFFFFFFU */
+/* #define SDMMC_DATATIMEOUT                          0xFFFFFFFFU */
 #endif /* SDMMC_DATATIMEOUT */
 
 #define SDMMC_0TO7BITS                                0x000000FFU
@@ -320,11 +320,11 @@ typedef struct
   */
 #define SDIO_CCCC_ERASE                       0x00000020U
 
-#define SDIO_CMDTIMEOUT                       1000U         /* Command send and response timeout */
-/* #define SDIO_CMDTIMEOUT                       5000U */         /* Command send and response timeout */
+#define SDIO_CMDTIMEOUT                       1000U
+/* #define SDIO_CMDTIMEOUT                    5000U */      /* Command send and response timeout */
 #define SDIO_MAXERASETIMEOUT                  63000U        /* Max erase Timeout 63 s            */
-/* #define SDIO_STOPTRANSFERTIMEOUT              100000000U */    /* Timeout for STOP TRANSMISSION command */
-#define SDIO_STOPTRANSFERTIMEOUT              1000U    /* Timeout for STOP TRANSMISSION command */
+#define SDIO_STOPTRANSFERTIMEOUT              1000U
+/* #define SDIO_STOPTRANSFERTIMEOUT           100000000U */ /* Timeout for STOP TRANSMISSION command */
 
 /** @defgroup SDIO_LL_Clock_Edge Clock Edge
   * @{

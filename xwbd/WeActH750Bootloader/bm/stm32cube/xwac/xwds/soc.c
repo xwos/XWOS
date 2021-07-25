@@ -105,8 +105,6 @@ const struct xwds_soc_driver stm32cube_soc_drv = {
         .gpio_toggle = stm32cube_soc_drv_gpio_toggle,
         .gpio_output = stm32cube_soc_drv_gpio_output,
         .gpio_input = stm32cube_soc_drv_gpio_input,
-
-        .ioctl = NULL,
 };
 
 struct stm32cube_soc_cfg stm32cube_soc_cfg = {

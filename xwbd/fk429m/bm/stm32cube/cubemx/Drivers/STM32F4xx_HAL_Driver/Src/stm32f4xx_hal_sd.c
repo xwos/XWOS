@@ -1595,7 +1595,6 @@ void HAL_SD_IRQHandler(SD_HandleTypeDef *hsd)
         hsd->State = HAL_SD_STATE_READY;
 
         hsd->Context = SD_CONTEXT_NONE;
-
 #if defined (USE_HAL_SD_REGISTER_CALLBACKS) && (USE_HAL_SD_REGISTER_CALLBACKS == 1U)
         hsd->TxCpltCallback(hsd);
 #else
@@ -2495,63 +2494,34 @@ static void SD_DMATransmitCplt(DMA_HandleTypeDef *hdma)
   uint32_t errorstate;
 
   /* Send stop command in multiblock write */
-
   if(hsd->Context == (SD_CONTEXT_WRITE_MULTIPLE_BLOCK | SD_CONTEXT_DMA))
-
   {
-
     errorstate = SDMMC_CmdStopTransfer(hsd->Instance);
-
     if(errorstate != HAL_SD_ERROR_NONE)
-
     {
-
       hsd->ErrorCode |= errorstate;
-
 #if (USE_HAL_SD_REGISTER_CALLBACKS == 1)
-
       hsd->ErrorCallback(hsd);
-
 #else
-
       HAL_SD_ErrorCallback(hsd);
-
 #endif
-
     }
-
   }
 
-
-
   /* Disable the DMA transfer for transmit request by setting the DMAEN bit
-
   in the SD DCTRL register */
-
   hsd->Instance->DCTRL &= (uint32_t)~((uint32_t)SDIO_DCTRL_DMAEN);
 
-
-
   /* Clear all the static flags */
-
   __HAL_SD_CLEAR_FLAG(hsd, SDIO_STATIC_DATA_FLAGS);
 
-
-
   hsd->State = HAL_SD_STATE_READY;
-
   hsd->Context = SD_CONTEXT_NONE;
 
-
-
 #if (USE_HAL_SD_REGISTER_CALLBACKS == 1)
-
   hsd->TxCpltCallback(hsd);
-
 #else
-
   HAL_SD_TxCpltCallback(hsd);
-
 #endif
 }
 
@@ -2843,6 +2813,7 @@ static uint32_t SD_PowerON(SD_HandleTypeDef *hsd)
     /* sdtype = SDMMC_VOLTAGE_WINDOW_SD | SDMMC_HIGH_CAPACITY | SD_SWITCH_1_8V_CAPACITY; */
     sdtype = SDMMC_VOLTAGE_WINDOW_SD | SDMMC_HIGH_CAPACITY;
   }
+
   /* SD CARD */
   /* Send ACMD41 SD_APP_OP_COND with Argument sdtype */
   while((count < SDMMC_MAX_VOLT_TRIAL) && (validvoltage == 0U))

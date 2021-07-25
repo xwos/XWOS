@@ -36,7 +36,6 @@
 
 /* USER CODE END Includes */
 
-extern NAND_HandleTypeDef hnand1;
 extern SDRAM_HandleTypeDef hsdram1;
 
 /* USER CODE BEGIN Private defines */
@@ -44,8 +43,6 @@ extern SDRAM_HandleTypeDef hsdram1;
 /* USER CODE END Private defines */
 
 void MX_FMC_Init(void);
-void HAL_NAND_MspInit(NAND_HandleTypeDef* hnand);
-void HAL_NAND_MspDeInit(NAND_HandleTypeDef* hnand);
 void HAL_SDRAM_MspInit(SDRAM_HandleTypeDef* hsdram);
 void HAL_SDRAM_MspDeInit(SDRAM_HandleTypeDef* hsdram);
 
