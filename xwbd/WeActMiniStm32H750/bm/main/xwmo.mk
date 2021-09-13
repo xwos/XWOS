@@ -24,7 +24,7 @@ include $(XWBS_UTIL_MK_XWMO)
 
 # 增加源代码文件
 XWMO_CSRCS :=
-XWMO_CSRCS += main.c thd.c xwpcp.c xwscp.c
+XWMO_CSRCS += main.c thd.c xwpcp.c xwscp.c bootlogo.c
 
 # 定义编译选项
 XWMO_CFLAGS :=
