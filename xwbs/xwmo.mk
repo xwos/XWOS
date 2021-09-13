@@ -21,11 +21,11 @@
 include $(XuanWuOS_ARCH_DIR)/arch.mk
 include $(XuanWuOS_CPU_DIR)/cpu.mk
 include $(XuanWuOS_SOC_DIR)/soc.mk
-include $(XuanWuOS_BDL_DIR)/bdl.mk
+include $(XuanWuOS_BRD_DIR)/brd.mk
 include $(XuanWuOS_XWOS_DIR)/xwos.mk
+include $(XuanWuOS_BRD_DIR)/lib.mk
 include $(XWBS_UTIL_MK_XWMO)
 include xwbs/$(XuanWuOS_CFG_ARCH).$(XuanWuOS_CFG_COMPILER).rule
-include $(XuanWuOS_BRD_DIR)/cfg/lib.mk
 
 ifeq ($(XuanWuOS_CFG_COMPILER),gcc)
   XWMO_CSRCS += $(XWMO_CSRCS_gcc)
@@ -46,13 +46,13 @@ endif
 ARCH_INCDIRS := $(addprefix $(XuanWuOS_ARCH_DIR)/,$(ARCH_INCDIRS))
 CPU_INCDIRS := $(addprefix $(XuanWuOS_CPU_DIR)/,$(CPU_INCDIRS))
 SOC_INCDIRS := $(addprefix $(XuanWuOS_SOC_DIR)/,$(SOC_INCDIRS))
-BDL_INCDIRS := $(addprefix $(XuanWuOS_BDL_DIR)/,$(BDL_INCDIRS))
+BRD_INCDIRS := $(addprefix $(XuanWuOS_BRD_DIR)/,$(BRD_INCDIRS))
 
 INCDIRS += $(if $(strip $(EINCDIRS)),$(addprefix -I,$(strip $(EINCDIRS))))
 INCDIRS += $(if $(strip $(ARCH_INCDIRS)),$(addprefix -I,$(strip $(ARCH_INCDIRS))))
 INCDIRS += $(if $(strip $(CPU_INCDIRS)),$(addprefix -I,$(strip $(CPU_INCDIRS))))
 INCDIRS += $(if $(strip $(SOC_INCDIRS)),$(addprefix -I,$(strip $(SOC_INCDIRS))))
-INCDIRS += $(if $(strip $(BDL_INCDIRS)),$(addprefix -I,$(strip $(BDL_INCDIRS))))
+INCDIRS += $(if $(strip $(BRD_INCDIRS)),$(addprefix -I,$(strip $(BRD_INCDIRS))))
 
 XWMO_NAME := $(call getXwmoName)
 XWMO_DIR := $(call getXwmoDir)
@@ -71,13 +71,13 @@ XWMO_LUA2HEXCOBJS := $(addprefix $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/,$(addsuffi
 MM_ARGS = $(strip $(MMFLAGS))
 
 AS_ARGS = $(strip $(AFLAGS) $(ARCH_AFLAGS) $(CPU_AFLAGS) $(SOC_AFLAGS) \
-                  $(BDL_AFLAGS) $(XWMO_AFLAGS) $(INCDIRS) $(XWMO_INCDIRS))
+                  $(BRD_AFLAGS) $(XWMO_AFLAGS) $(INCDIRS) $(XWMO_INCDIRS))
 
 CC_ARGS = $(strip $(CFLAGS) $(ARCH_CFLAGS) $(CPU_CFLAGS) $(SOC_CFLAGS) \
-                  $(BDL_CFLAGS) $(XWMO_CFLAGS) $(INCDIRS) $(XWMO_INCDIRS))
+                  $(BRD_CFLAGS) $(XWMO_CFLAGS) $(INCDIRS) $(XWMO_INCDIRS))
 
 CXX_ARGS = $(strip $(CXXFLAGS) $(ARCH_CXXFLAGS) $(CPU_CXXFLAGS) $(SOC_CXXFLAGS) \
-                   $(BDL_CXXFLAGS) $(XWMO_CXXFLAGS) $(INCDIRS) $(XWMO_INCDIRS))
+                   $(BRD_CXXFLAGS) $(XWMO_CXXFLAGS) $(INCDIRS) $(XWMO_INCDIRS))
 
 XWMO_OBJS_LST := $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/objs.txt
 

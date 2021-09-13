@@ -25,15 +25,15 @@
 
 #define BDL_DEBUG
 
-extern void bm_reset(void);
+extern void board_reset(void);
 
 #ifdef BDL_DEBUG
-  #define BDL_BUG()             XWOS_BUG()
-  #define BDL_BUG_ON(x)         XWOS_BUG_ON(x)
+  #define BRD_BUG()             XWOS_BUG()
+  #define BRD_BUG_ON(x)         XWOS_BUG_ON(x)
 
 #else
-  #define BDL_BUG()             bm_reset()
-  #define BDL_BUG_ON(x)         if (__xwcc_unlikely(x)) BDL_BUG()
+  #define BRD_BUG()             board_reset()
+  #define BRD_BUG_ON(x)         if (__xwcc_unlikely(x)) board_reset()
 #endif
 
 #endif /* bdl/standard.h */

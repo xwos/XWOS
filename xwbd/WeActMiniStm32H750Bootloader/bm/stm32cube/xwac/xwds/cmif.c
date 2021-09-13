@@ -51,7 +51,7 @@ xwer_t stm32cube_xwds_ll_start(void)
         return XWOK;
 
 err_soc_start:
-        BDL_BUG();
+        BRD_BUG();
         return rc;
 }
 
@@ -78,7 +78,7 @@ xwer_t stm32cube_xwds_ll_stop(void)
         return XWOK;
 
 err_soc_stop:
-        BDL_BUG();
+        BRD_BUG();
         return rc;
 }
 

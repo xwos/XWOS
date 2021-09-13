@@ -23,7 +23,7 @@
 
 #include <xwos/standard.h>
 
-xwer_t bdl_thd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf);
-xwer_t bdl_thd_stack_pool_free(xwstk_t * stk);
+xwer_t board_thd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf);
+xwer_t board_thd_stack_pool_free(xwstk_t * stk);
 
 #endif /* bdl/xwac/thd_stack_mempool.h */

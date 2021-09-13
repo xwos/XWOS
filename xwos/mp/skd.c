@@ -77,14 +77,20 @@ __xwmp_data __xwcc_alignl1cache
 xwu8_t xwmp_skd_bhd_stack[CPUCFG_CPU_NUM][XWMPCFG_SKD_BH_STACK_SIZE];
 #endif /* XWMPCFG_SKD_BH */
 
+#if defined(BRDCFG_XWSKD_IDLE_HOOK) && (1 == BRDCFG_XWSKD_IDLE_HOOK)
 extern
-void bdl_xwskd_idle_hook(struct xwmp_skd * xwskd);
+void board_xwskd_idle_hook(struct xwmp_skd * xwskd);
+#endif /* BRDCFG_XWSKD_IDLE_HOOK */
 
+#if defined(BRDCFG_XWSKD_PRE_SWCX_HOOK) && (1 == BRDCFG_XWSKD_PRE_SWCX_HOOK)
 extern
-void bdl_xwskd_pre_swcx_hook(struct xwmp_skd * xwskd);
+void board_xwskd_pre_swcx_hook(struct xwmp_skd * xwskd);
+#endif /* BRDCFG_XWSKD_PRE_SWCX_HOOK */
 
+#if defined(BRDCFG_XWSKD_POST_SWCX_HOOK) && (1 == BRDCFG_XWSKD_POST_SWCX_HOOK)
 extern
-void bdl_xwskd_post_swcx_hook(struct xwmp_skd * xwskd);
+void board_xwskd_post_swcx_hook(struct xwmp_skd * xwskd);
+#endif /* BRDCFG_XWSKD_POST_SWCX_HOOK */
 
 extern __xwmp_code
 void xwmp_pmdm_report_xwskd_suspended(struct xwmp_pmdm * pmdm);
@@ -418,7 +424,7 @@ xwer_t xwmp_skd_idled(struct xwmp_skd * xwskd)
                 xwmp_skd_del_thd_lc(xwskd);
                 xwmp_skd_notify_allfrz_lc(xwskd);
 #if defined(BRDCFG_XWSKD_IDLE_HOOK) && (1 == BRDCFG_XWSKD_IDLE_HOOK)
-                bdl_xwskd_idle_hook(xwskd);
+                board_xwskd_idle_hook(xwskd);
 #endif /* BRDCFG_XWSKD_IDLE_HOOK */
         }
         return XWOK;
@@ -972,8 +978,8 @@ __xwmp_code
 struct xwmp_skd * xwmp_skd_pre_swcx_lic(struct xwmp_skd * xwskd)
 {
 #if defined(BRDCFG_XWSKD_PRE_SWCX_HOOK) && (1 == BRDCFG_XWSKD_PRE_SWCX_HOOK)
-        bdl_xwskd_pre_swcx_hook(xwskd);
-#endif
+        board_xwskd_pre_swcx_hook(xwskd);
+#endif /* BRDCFG_XWSKD_PRE_SWCX_HOOK */
         return xwskd;
 }
 
@@ -985,8 +991,8 @@ __xwmp_code
 struct xwmp_skd * xwmp_skd_post_swcx_lic(struct xwmp_skd * xwskd)
 {
 #if defined(BRDCFG_XWSKD_POST_SWCX_HOOK) && (1 == BRDCFG_XWSKD_POST_SWCX_HOOK)
-        bdl_xwskd_post_swcx_hook(xwskd);
-#endif
+        board_xwskd_post_swcx_hook(xwskd);
+#endif /* BRDCFG_XWSKD_POST_SWCX_HOOK */
         xwmp_skd_finish_swcx_lic(xwskd);
         return xwskd;
 }

@@ -36,11 +36,13 @@
 #include <xwos/mp/lock/mtx.h>
 #include <xwos/mp/thd.h>
 
+#if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
 extern __xwmp_code
-xwer_t bdl_thd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf);
+xwer_t board_thd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf);
 
 extern __xwmp_code
-xwer_t bdl_thd_stack_pool_free(xwstk_t * stk);
+xwer_t board_thd_stack_pool_free(xwstk_t * stk);
+#endif /* BRDCFG_XWSKD_THD_STACK_POOL */
 
 static __xwmp_code
 struct xwmp_thd * xwmp_thd_alloc(void);
@@ -198,7 +200,7 @@ xwstk_t * xwmp_thd_stack_alloc(xwsz_t stack_size)
         } mem;
         xwer_t rc;
 
-        rc = bdl_thd_stack_pool_alloc(stack_size, &mem.stkbase);
+        rc = board_thd_stack_pool_alloc(stack_size, &mem.stkbase);
         if (rc < 0) {
                 mem.stkbase = err_ptr(rc);
         }/* else {} */
@@ -235,7 +237,7 @@ static __xwmp_code
 xwer_t xwmp_thd_stack_free(xwstk_t * stk)
 {
 #if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
-        return bdl_thd_stack_pool_free(stk);
+        return board_thd_stack_pool_free(stk);
 #elif defined(XWMPCFG_SKD_THD_STDC_MM) && (1 == XWMPCFG_SKD_THD_STDC_MM)
         return free(stk);
 #else

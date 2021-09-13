@@ -18,30 +18,30 @@
 # > limitations under the License.
 #
 
-BDL_INCDIRS :=
-BDL_AFLAGS :=
-BDL_CFLAGS :=
-BDL_CXFLAGS :=
-BDL_LDFLAGS :=
+BRD_INCDIRS :=
+BRD_AFLAGS :=
+BRD_CFLAGS :=
+BRD_CXFLAGS :=
+BRD_LDFLAGS :=
 
-BDL_ASRCS :=
-BDL_CSRCS :=
-BDL_CXXSRCS :=
+BRD_ASRCS :=
+BRD_CSRCS :=
+BRD_CXXSRCS :=
 
-BDL_EOBJS :=
+BRD_EOBJS :=
 
-BDL_CSRCS += board_init.c
-BDL_CSRCS += vector.c
+BRD_CSRCS += bdl/board_init.c
+BRD_CSRCS += bdl/vector.c
 ifeq ($(BRDCFG_XWSKD_THD_STACK_POOL),y)
-  BDL_CSRCS += xwac/thread_stack_pool.c
+  BRD_CSRCS += bdl/xwac/thread_stack_pool.c
 endif
-BDL_CSRCS += xwac/xwskd_hook.c
-BDL_CSRCS += eirq.c
-BDL_CSRCS += bkup.c
-BDL_CSRCS += main.c
+BRD_CSRCS += bdl/xwac/xwskd_hook.c
+BRD_CSRCS += bdl/eirq.c
+BRD_CSRCS += bdl/bkup.c
+BRD_CSRCS += bdl/main.c
 
-BDL_CSRCS += ds/device.c
-BDL_CSRCS += ds/driver/soc.c
-BDL_CSRCS += ds/driver/dmauart0.c
-BDL_CSRCS += ds/description/soc_cfg.c
-BDL_CSRCS += ds/description/dmauart_cfg.c
+BRD_CSRCS += bdl/ds/device.c
+BRD_CSRCS += bdl/ds/driver/soc.c
+BRD_CSRCS += bdl/ds/driver/dmauart0.c
+BRD_CSRCS += bdl/ds/description/soc_cfg.c
+BRD_CSRCS += bdl/ds/description/dmauart_cfg.c

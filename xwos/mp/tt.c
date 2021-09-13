@@ -24,8 +24,10 @@
 #endif /* XWMPCFG_SKD_BH */
 #include <xwos/mp/tt.h>
 
+#if defined(BRDCFG_XWSKD_SYSHWT_HOOK) && (1 == BRDCFG_XWSKD_SYSHWT_HOOK)
 extern
-void bdl_xwskd_syshwt_hook(struct xwmp_skd * xwskd);
+void board_xwskd_syshwt_hook(struct xwmp_skd * xwskd);
+#endif /* BRDCFG_XWSKD_SYSHWT_HOOK */
 
 static __xwmp_code
 void xwmp_tt_rmrbb_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn);
@@ -484,7 +486,7 @@ void xwmp_syshwt_task(struct xwmp_syshwt * hwt)
         }
         xwmp_skd_chkpmpt(xwskd);
 #if defined(BRDCFG_XWSKD_SYSHWT_HOOK) && (1 == BRDCFG_XWSKD_SYSHWT_HOOK)
-        bdl_xwskd_syshwt_hook(xwskd);
+        board_xwskd_syshwt_hook(xwskd);
 #endif /* BRDCFG_XWSKD_SYSHWT_HOOK */
 }
 

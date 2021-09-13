@@ -22,8 +22,10 @@
 #include <xwos/up/lock/seqlock.h>
 #include <xwos/up/tt.h>
 
+#if defined(BRDCFG_XWSKD_SYSHWT_HOOK) && (1 == BRDCFG_XWSKD_SYSHWT_HOOK)
 extern
-void bdl_xwskd_syshwt_hook(struct xwup_skd * xwskd);
+void board_xwskd_syshwt_hook(struct xwup_skd * xwskd);
+#endif /* BRDCFG_XWSKD_SYSHWT_HOOK */
 
 static __xwup_code
 void xwup_tt_rmrbb_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn);
@@ -454,7 +456,7 @@ void xwup_syshwt_task(struct xwup_syshwt * hwt)
         }
         xwup_skd_chkpmpt();
 #if defined(BRDCFG_XWSKD_SYSHWT_HOOK) && (1 == BRDCFG_XWSKD_SYSHWT_HOOK)
-        bdl_xwskd_syshwt_hook(xwup_skd_get_lc());
+        board_xwskd_syshwt_hook(xwup_skd_get_lc());
 #endif /* BRDCFG_XWSKD_SYSHWT_HOOK */
 }
 

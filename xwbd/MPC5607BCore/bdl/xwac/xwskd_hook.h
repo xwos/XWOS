@@ -25,6 +25,6 @@
 
 struct xwos_skd;
 
-void bdl_xwskd_idle_hook(struct xwos_skd * xwskd);
+void board_xwskd_idle_hook(struct xwos_skd * xwskd);
 
 #endif /* bdl/xwac/xwskd_hook.h */

@@ -20,7 +20,6 @@
 
 #include <xwos/standard.h>
 #include <arch_image.h>
-#include <armv7m_core.h>
 #include <xwos/osal/skd.h>
 #include <xwcd/ds/soc/gpio.h>
 #include <xwmd/ramcode/mif.h>
@@ -94,9 +93,9 @@ xwer_t xwos_main(void)
         return XWOK;
 
 err_init_thd_create:
-        BDL_BUG();
+        BRD_BUG();
 err_skd_start_lc:
-        BDL_BUG();
+        BRD_BUG();
         return rc;
 }
 
@@ -106,12 +105,6 @@ xwer_t bm_ramcode_load(struct ramcode * ramcode,
                        xwtm_t * xwtm)
 {
         return xwscp_rx(ramcode->opcb, loadbuf, bufsize, xwtm);
-}
-
-void bm_reset(void)
-{
-        cm_nvic_disable_faults();
-        cm_reset_system();
 }
 
 static
@@ -152,14 +145,14 @@ xwer_t main_task(void * arg)
         return XWOK;
 
 err_ramcode_boot:
-        BDL_BUG();
+        BRD_BUG();
 err_ramcode_load:
-        BDL_BUG();
+        BRD_BUG();
 err_xwscp_connect:
-        BDL_BUG();
+        BRD_BUG();
 err_xwscp_start:
-        BDL_BUG();
+        BRD_BUG();
 err_stm32cube_start:
-        BDL_BUG();
+        BRD_BUG();
         return rc;
 }

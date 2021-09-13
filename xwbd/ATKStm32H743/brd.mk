@@ -18,20 +18,21 @@
 # > limitations under the License.
 #
 
-BDL_INCDIRS :=
-BDL_AFLAGS :=
-BDL_CFLAGS :=
-BDL_CXFLAGS :=
-BDL_LDFLAGS :=
+BRD_INCDIRS :=
+BRD_AFLAGS :=
+BRD_CFLAGS :=
+BRD_CXFLAGS :=
+BRD_LDFLAGS :=
 
-BDL_ASRCS :=
-BDL_CSRCS :=
-BDL_CXXSRCS :=
+BRD_ASRCS :=
+BRD_CSRCS :=
+BRD_CXXSRCS :=
 
-BDL_EOBJS :=
+BRD_EOBJS :=
 
-BDL_CSRCS += board_init.c
+BRD_CSRCS += bdl/board_init.c
+BRD_CSRCS += bdl/axisram.c
 ifeq ($(BRDCFG_XWSKD_THD_STACK_POOL),y)
-  BDL_CSRCS += xwac/thd_stack_mempool.c
+  BRD_CSRCS += bdl/xwac/thd_stack_mempool.c
 endif
-BDL_CSRCS += xwac/xwskd_hook.c
+BRD_CSRCS += bdl/xwac/xwskd_hook.c

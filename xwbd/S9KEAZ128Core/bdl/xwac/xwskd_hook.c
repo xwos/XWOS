@@ -23,7 +23,7 @@
 #include <bdl/xwac/xwskd_hook.h>
 
 __xwos_code
-void bdl_xwskd_idle_hook(struct xwos_skd * xwskd)
+void board_xwskd_idle_hook(struct xwos_skd * xwskd)
 {
         XWOS_UNUSED(xwskd);
         cm_wfi();

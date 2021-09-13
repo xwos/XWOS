@@ -49,14 +49,20 @@ __xwup_data __xwcc_alignl1cache
 xwu8_t xwup_skd_bhd_stack[XWUPCFG_SKD_BH_STACK_SIZE];
 #endif /* XWUPCFG_SKD_BH */
 
+#if defined(BRDCFG_XWSKD_IDLE_HOOK) && (1 == BRDCFG_XWSKD_IDLE_HOOK)
 extern
-void bdl_xwskd_idle_hook(struct xwup_skd * xwskd);
+void board_xwskd_idle_hook(struct xwup_skd * xwskd);
+#endif /* BRDCFG_XWSKD_IDLE_HOOK */
 
+#if defined(BRDCFG_XWSKD_PRE_SWCX_HOOK) && (1 == BRDCFG_XWSKD_PRE_SWCX_HOOK)
 extern
-void bdl_xwskd_pre_swcx_hook(struct xwup_skd * xwskd);
+void board_xwskd_pre_swcx_hook(struct xwup_skd * xwskd);
+#endif /* BRDCFG_XWSKD_PRE_SWCX_HOOK */
 
+#if defined(BRDCFG_XWSKD_POST_SWCX_HOOK) && (1 == BRDCFG_XWSKD_POST_SWCX_HOOK)
 extern
-void bdl_xwskd_post_swcx_hook(struct xwup_skd * xwskd);
+void board_xwskd_post_swcx_hook(struct xwup_skd * xwskd);
+#endif /* BRDCFG_XWSKD_POST_SWCX_HOOK */
 
 static __xwup_code
 struct xwup_thd * xwup_skd_rtrq_choose(void);
@@ -297,7 +303,7 @@ xwer_t xwup_skd_idled(struct xwup_skd * xwskd)
                 xwup_skd_notify_allfrz_lc(xwskd);
 #endif /* XWUPCFG_SKD_PM */
 #if (defined(BRDCFG_XWSKD_IDLE_HOOK) && (1 == BRDCFG_XWSKD_IDLE_HOOK))
-                bdl_xwskd_idle_hook(xwskd);
+                board_xwskd_idle_hook(xwskd);
 #endif /* #if (defined(BRDCFG_XWSKD_IDLE_HOOK) && (1 == BRDCFG_XWSKD_IDLE_HOOK)) */
         }
         return XWOK;
@@ -726,7 +732,7 @@ __xwup_code
 struct xwup_skd * xwup_skd_pre_swcx_lic(struct xwup_skd * xwskd)
 {
 #if defined(BRDCFG_XWSKD_PRE_SWCX_HOOK) && (1 == BRDCFG_XWSKD_PRE_SWCX_HOOK)
-        bdl_xwskd_pre_swcx_hook(xwskd);
+        board_xwskd_pre_swcx_hook(xwskd);
 #endif
         return xwskd;
 }
@@ -739,7 +745,7 @@ __xwup_code
 struct xwup_skd * xwup_skd_post_swcx_lic(struct xwup_skd * xwskd)
 {
 #if defined(BRDCFG_XWSKD_POST_SWCX_HOOK) && (1 == BRDCFG_XWSKD_POST_SWCX_HOOK)
-        bdl_xwskd_post_swcx_hook(xwskd);
+        board_xwskd_post_swcx_hook(xwskd);
 #endif
         xwup_skd_finish_swcx_lic(xwskd);
         return xwskd;

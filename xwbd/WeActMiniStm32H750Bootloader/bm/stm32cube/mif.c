@@ -97,7 +97,7 @@ void stm32cube_init(void)
         sram4_init();
 
         rc = stm32cube_xwds_ll_start();
-        BDL_BUG_ON(rc < 0);
+        BRD_BUG_ON(rc < 0);
 
         /*
            若SDRAM、QSPI Flash等可映射到内存地址上的器件未初始化完成，
