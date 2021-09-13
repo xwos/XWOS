@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <armv7m_core.h>
+#include <armv7m_isa.h>
 #include <arch_irq.h>
 #if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
 #  include <arch_fpu.h>

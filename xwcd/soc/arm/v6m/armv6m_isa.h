@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 架构描述层：ARMv7 Cortex-M
+ * @brief 架构描述层：ARMv6 Cortex-M
  * @author
  * + 隐星魂 (Roy.Sun) <https://xwos.tech>
  * @copyright
@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __armv7m_core_h__
-#define __armv7m_core_h__
+#ifndef __armv6m_isa_h__
+#define __armv6m_isa_h__
 
 #include <xwos/standard.h>
 
@@ -44,6 +44,178 @@
 
 #define SCB_AIRCR_VECTRESET_POS         (0UL)
 #define SCB_AIRCR_VECTRESET_MSK         (1UL << SCB_AIRCR_VECTRESET_POS)
+
+/******** TPI Asynchronous Clock Prescaler Register Definitions ********/
+#define TPI_ACPR_PRESCALER_POS          (0UL)
+#define TPI_ACPR_PRESCALER_MSK          (0x1FFFUL << TPI_ACPR_PRESCALER_POS)
+
+/* TPI Selected Pin Protocol Register Definitions */
+#define TPI_SPPR_TXMODE_POS             (0UL)
+#define TPI_SPPR_TXMODE_MSK             (0x3UL << TPI_SPPR_TXMODE_POS)
+#define TPI_SPPR_TXMODE_TRACEPORTMODE   (0UL)
+#define TPI_SPPR_TXMODE_MANCHESTER      (1UL)
+#define TPI_SPPR_TXMODE_NRZ             (2UL)
+
+/* TPI Formatter and Flush Status Register Definitions */
+#define TPI_FFSR_FTNONSTOP_POS          (3UL)
+#define TPI_FFSR_FTNONSTOP_MSK          (0x1UL << TPI_FFSR_FTNONSTOP_POS)
+
+#define TPI_FFSR_TCPRESENT_POS          (2UL)
+#define TPI_FFSR_TCPRESENT_MSK          (0x1UL << TPI_FFSR_TCPRESENT_POS)
+
+#define TPI_FFSR_FTSTOPPED_POS          (1UL)
+#define TPI_FFSR_FTSTOPPED_MSK          (0x1UL << TPI_FFSR_FTSTOPPED_POS)
+
+#define TPI_FFSR_FLINPROG_POS           (0UL)
+#define TPI_FFSR_FLINPROG_MSK           (0x1UL << TPI_FFSR_FLINPROG_POS)
+
+/* TPI Formatter and Flush Control Register Definitions */
+#define TPI_FFCR_TRIGIN_POS             (8UL)
+#define TPI_FFCR_TRIGIN_MSK             (0x1UL << TPI_FFCR_TRIGIN_POS)
+
+#define TPI_FFCR_ENFCONT_POS            (1UL)
+#define TPI_FFCR_ENFCONT_MSK            (0x1UL << TPI_FFCR_ENFCONT_POS)
+
+/* TPI TRIGGER Register Definitions */
+#define TPI_TRIGGER_TRIGGER_POS         (0UL)
+#define TPI_TRIGGER_TRIGGER_MSK         (0x1UL << TPI_TRIGGER_TRIGGER_POS)
+
+/* TPI Integration ETM Data Register Definitions (FIFO0) */
+#define TPI_FIFO0_ITM_ATVALID_POS       29
+#define TPI_FIFO0_ITM_ATVALID_MSK       (0x3UL << TPI_FIFO0_ITM_ATVALID_POS)
+
+#define TPI_FIFO0_ITM_BYTECOUNT_POS     27
+#define TPI_FIFO0_ITM_BYTECOUNT_MSK     (0x3UL << TPI_FIFO0_ITM_BYTECOUNT_POS)
+
+#define TPI_FIFO0_ETM_ATVALID_POS       26
+#define TPI_FIFO0_ETM_ATVALID_MSK       (0x3UL << TPI_FIFO0_ETM_ATVALID_POS)
+
+#define TPI_FIFO0_ETM_BYTECOUNT_POS     24
+#define TPI_FIFO0_ETM_BYTECOUNT_MSK     (0x3UL << TPI_FIFO0_ETM_BYTECOUNT_POS)
+
+#define TPI_FIFO0_ETM2_POS              16
+#define TPI_FIFO0_ETM2_MSK              (0xFFUL << TPI_FIFO0_ETM2_POS)
+
+#define TPI_FIFO0_ETM1_POS              8
+#define TPI_FIFO0_ETM1_MSK              (0xFFUL << TPI_FIFO0_ETM1_POS)
+
+#define TPI_FIFO0_ETM0_POS              0
+#define TPI_FIFO0_ETM0_MSK              (0xFFUL << TPI_FIFO0_ETM0_POS)
+
+/* TPI ITATBCTR2 Register Definitions */
+#define TPI_ITATBCTR2_ATREADY_POS       0
+#define TPI_ITATBCTR2_ATREADY_MSK       (0x1UL << TPI_ITATBCTR2_ATREADY_POS)
+
+/* TPI Integration ITM Data Register Definitions (FIFO1) */
+#define TPI_FIFO1_ITM_ATVALID_POS       29
+#define TPI_FIFO1_ITM_ATVALID_MSK       (0x3UL << TPI_FIFO1_ITM_ATVALID_POS)
+
+#define TPI_FIFO1_ITM_BYTECOUNT_POS     27
+#define TPI_FIFO1_ITM_BYTECOUNT_MSK     (0X3UL << TPI_FIFO1_ITM_BYTECOUNT_POS)
+
+#define TPI_FIFO1_ETM_ATVALID_POS       26
+#define TPI_FIFO1_ETM_ATVALID_MSK       (0X3UL << TPI_FIFO1_ETM_ATVALID_POS)
+
+#define TPI_FIFO1_ETM_BYTECOUNT_POS     24
+#define TPI_FIFO1_ETM_BYTECOUNT_MSK     (0X3UL << TPI_FIFO1_ETM_BYTECOUNT_POS)
+
+#define TPI_FIFO1_ITM2_POS              16
+#define TPI_FIFO1_ITM2_MSK              (0XFFUL << TPI_FIFO1_ITM2_POS)
+
+#define TPI_FIFO1_ITM1_POS              8
+#define TPI_FIFO1_ITM1_MSK              (0XFFUL << TPI_FIFO1_ITM1_POS)
+
+#define TPI_FIFO1_ITM0_POS              0
+#define TPI_FIFO1_ITM0_MSK              (0XFFUL << TPI_FIFO1_ITM0_POS)
+
+/* TPI ITATBCTR0 Register Definitions */
+#define TPI_ITATBCTR0_ATREADY_POS       0
+#define TPI_ITATBCTR0_ATREADY_MSK       (0X1UL << TPI_ITATBCTR0_ATREADY_POS)
+
+/* TPI Integration Mode Control Register Definitions */
+#define TPI_ITCTRL_MODE_POS             0
+#define TPI_ITCTRL_MODE_MSK             (0X1UL << TPI_ITCTRL_MODE_POS)
+
+/* TPI DEVID Register Definitions */
+#define TPI_DEVID_NRZVALID_POS          11
+#define TPI_DEVID_NRZVALID_MSK          (0X1UL << TPI_DEVID_NRZVALID_POS)
+
+#define TPI_DEVID_MANCVALID_POS         10
+#define TPI_DEVID_MANCVALID_MSK         (0X1UL << TPI_DEVID_MANCVALID_POS)
+
+#define TPI_DEVID_PTINVALID_POS         9
+#define TPI_DEVID_PTINVALID_MSK         (0X1UL << TPI_DEVID_PTINVALID_POS)
+
+#define TPI_DEVID_MINBUFSZ_POS          6
+#define TPI_DEVID_MINBUFSZ_MSK          (0X7UL << TPI_DEVID_MINBUFSZ_POS)
+
+#define TPI_DEVID_ASYNCLKIN_POS         5
+#define TPI_DEVID_ASYNCLKIN_MSK         (0X1UL << TPI_DEVID_ASYNCLKIN_POS)
+
+#define TPI_DEVID_NRTRACEINPUT_POS      0
+#define TPI_DEVID_NRTRACEINPUT_MSK      (0X1FUL << TPI_DEVID_NRTRACEINPUT_POS)
+
+/* TPI DEVTYPE Register Definitions */
+#define TPI_DEVTYPE_SUBTYPE_POS         0
+#define TPI_DEVTYPE_SUBTYPE_MSK         (0XFUL << TPI_DEVTYPE_SUBTYPE_POS)
+
+#define TPI_DEVTYPE_MAJORTYPE_POS       4
+#define TPI_DEVTYPE_MAJORTYPE_MSK       (0XFUL << TPI_DEVTYPE_MAJORTYPE_POS)
+
+/******** ITM Trace Control Register Definitions ********/
+/* ITM Trace Privilege Register Definitions */
+#define ITM_TPR_PRIVMASK_POS            0 /**< ITM TPR: PRIVMASK Position */
+#define ITM_TPR_PRIVMASK_MSK            (0xFUL << ITM_TPR_PRIVMASK_POS) /**< ITM TPR: PRIVMASK Mask */
+
+/* ITM Trace Control Register Definitions */
+#define ITM_TCR_BUSY_POS                23 /**< ITM TCR: BUSY Position */
+#define ITM_TCR_BUSY_MSK                (1UL << ITM_TCR_BUSY_POS) /**< ITM TCR: BUSY Mask */
+
+#define ITM_TCR_TRACEBUSID_POS          16 /**< ITM TCR: ATBID Position */
+#define ITM_TCR_TRACEBUSID_MSK          (0x7FUL << ITM_TCR_TRACEBUSID_POS) /**< ITM TCR: ATBID Mask */
+
+#define ITM_TCR_GTSFREQ_POS             10 /**< ITM TCR: Global timestamp frequency Position */
+#define ITM_TCR_GTSFREQ_MSK             (3UL << ITM_TCR_GTSFREQ_Pos) /**< ITM TCR: Global timestamp frequency Mask */
+
+#define ITM_TCR_TSPRESCALE_POS          8 /**< ITM TCR: TSPrescale Position */
+#define ITM_TCR_TSPRESCALE_MSK          (3UL << ITM_TCR_TSPRESCALE_POS) /**< ITM TCR: TSPrescale Mask */
+
+#define ITM_TCR_SWOENA_POS              4 /**< ITM TCR: SWOENA Position */
+#define ITM_TCR_SWOENA_MSK              (1UL << ITM_TCR_SWOENA_POS) /**< ITM TCR: SWOENA Mask */
+
+#define ITM_TCR_DWTENA_POS              3 /**< ITM TCR: DWTENA Position */
+#define ITM_TCR_DWTENA_MSK              (1UL << ITM_TCR_DWTENA_POS) /**< ITM TCR: DWTENA Mask */
+
+#define ITM_TCR_SYNCENA_POS             2 /**< ITM TCR: SYNCENA Position */
+#define ITM_TCR_SYNCENA_MSK             (1UL << ITM_TCR_SYNCENA_POS) /**< ITM TCR: SYNCENA Mask */
+
+#define ITM_TCR_TSENA_POS               1 /**< ITM TCR: TSENA Position */
+#define ITM_TCR_TSENA_MSK               (1UL << ITM_TCR_TSENA_POS) /**< ITM TCR: TSENA Mask */
+
+#define ITM_TCR_ITMENA_POS              0 /**< ITM TCR: ITM Enable bit Position */
+#define ITM_TCR_ITMENA_MSK              (1UL << ITM_TCR_ITMENA_POS) /**< ITM TCR: ITM Enable bit Mask */
+
+/* ITM Integration Write Register Definitions */
+#define ITM_IWR_ATVALIDM_POS            0 /**< ITM IWR: ATVALIDM Position */
+#define ITM_IWR_ATVALIDM_MSK            (1UL << ITM_IWR_ATVALIDM_POS) /**< ITM IWR: ATVALIDM Mask */
+
+/* ITM Integration Read Register Definitions */
+#define ITM_IRR_ATREADYM_POS            0 /**< ITM IRR: ATREADYM Position */
+#define ITM_IRR_ATREADYM_MSK            (1UL << ITM_IRR_ATREADYM_POS) /**< ITM IRR: ATREADYM Mask */
+
+/* ITM Integration Mode Control Register Definitions */
+#define ITM_IMCR_INTEGRATION_POS        0 /**< ITM IMCR: INTEGRATION Position */
+#define ITM_IMCR_INTEGRATION_MSK        (1UL << ITM_IMCR_INTEGRATION_POS) /**< ITM IMCR: INTEGRATION Mask */
+
+/* ITM Lock Status Register Definitions */
+#define ITM_LSR_BYTEACC_POS             2 /**< ITM LSR: ByteAcc Position */
+#define ITM_LSR_BYTEACC_MSK             (1UL << ITM_LSR_BYTEACC_POS) /**< ITM LSR: ByteAcc Mask */
+
+#define ITM_LSR_ACCESS_POS              1 /**< ITM LSR: Access Position */
+#define ITM_LSR_ACCESS_MSK              (1UL << ITM_LSR_ACCESS_POS) /**< ITM LSR: Access Mask */
+
+#define ITM_LSR_PRESENT_POS             0 /**< ITM LSR: Present Position */
+#define ITM_LSR_PRESENT_MSK             (1UL << ITM_LSR_PRESENT_POS) /**< ITM LSR: Present Mask */
 
 /**
  * @brief program status register
@@ -101,46 +273,26 @@ union cm_control_reg {
  * @brief System Control Space (offset: 0xE000E000)
  */
 struct cm_scs_reg {
-        struct {
-                union {
-                        __xw_io xwu32_t u32;
-                } mcr; /**< offset:0x000(r/w) master control register */
+        union {
+                __xw_io xwu32_t u32;
+        } mcr; /**< offset:0x000(r/w) master control register */
 
-                union {
-                        __xw_i xwu32_t u32;
-                } ictr; /**< offset:0x004(r/ ) interrupt controller type register */
+        union {
+                __xw_i xwu32_t u32;
+        } ictr; /**< offset:0x004(r/ ) interrupt controller type register */
 
-                union {
-                        __xw_io xwu32_t u32;
-                        struct {
-#ifdef XuanWuOS_CFG_CPU__m7
-                                __xw_io xwu32_t reserved0:2;
-                                __xw_io xwu32_t disfold:1;
-                                __xw_io xwu32_t reserved1:7;
-                                __xw_io xwu32_t fpexcodis:1;
-                                __xw_io xwu32_t disramode:1;
-                                __xw_io xwu32_t disitmatbflush:1;
-                                __xw_io xwu32_t disbtacread:1;
-                                __xw_io xwu32_t disbtacalloc:1;
-                                __xw_io xwu32_t discritaxirur:1;
-                                __xw_io xwu32_t disdi:5;
-                                __xw_io xwu32_t disissch1:5;
-                                __xw_io xwu32_t disdynadd:1;
-                                __xw_io xwu32_t discritaxiruw:1;
-                                __xw_io xwu32_t disfpuissopt:1;
-                                __xw_io xwu32_t reserved2:3;
-#else
-                                __xw_io xwu32_t dismcycint:1;
-                                __xw_io xwu32_t disdefwbuf:1;
-                                __xw_io xwu32_t disfold:1;
-                                __xw_io xwu32_t reserved0:5;
-                                __xw_io xwu32_t disfpca:1;
-                                __xw_io xwu32_t disoofp:1;
-                                __xw_io xwu32_t reserved1:22;
-#endif
-                        } bit;
-                } actlr; /**< offset:0x008(r/w) auxiliary control register */
-        } scnscb;
+        union {
+                __xw_io xwu32_t u32;
+                struct {
+                        __xw_io xwu32_t dismcycint:1;
+                        __xw_io xwu32_t disdefwbuf:1;
+                        __xw_io xwu32_t disfold:1;
+                        __xw_io xwu32_t reserved0:5;
+                        __xw_io xwu32_t disfpca:1;
+                        __xw_io xwu32_t disoofp:1;
+                        __xw_io xwu32_t reserved1:22;
+                } bit;
+        } actlr; /**< offset:0x008(r/w) auxiliary control register */
 
         xwu32_t reserved0; /**< offset:0x00c */
 
@@ -416,45 +568,43 @@ struct cm_scs_reg {
                         __xw_io xwu32_t u32;
                 } afsr; /**< offset:0xd3c (r/w) auxiliary fault status register */
 
-                struct {
-                        union {
-                                __xw_i xwu32_t u32;
-                        } pfr[2]; /**< offset:0xd40 (r/ ) processor feature register */
+                union {
+                        __xw_i xwu32_t u32;
+                } pfr[2]; /**< offset:0xd40 (r/ ) processor feature register */
 
-                        union {
-                                __xw_i xwu32_t u32;
-                        } dfr; /**< offset:0xd48 (r/ ) debug feature register */
+                union {
+                        __xw_i xwu32_t u32;
+                } dfr; /**< offset:0xd48 (r/ ) debug feature register */
 
-                        union {
-                                __xw_i xwu32_t u32;
-                        } afr; /**< offset:0xd4c (r/ ) auxiliary feature register */
+                union {
+                        __xw_i xwu32_t u32;
+                } afr; /**< offset:0xd4c (r/ ) auxiliary feature register */
 
-                        union {
-                                __xw_i xwu32_t u32;
-                        } mmfr[4]; /**< offset:0xd50 (r/ ) memory model feature register */
+                union {
+                        __xw_i xwu32_t u32;
+                } mmfr[4]; /**< offset:0xd50 (r/ ) memory model feature register */
 
-                        union {
-                                __xw_i xwu32_t u32;
-                        } isar[5]; /**< offset:0xd60 (r/ ) instruction set attributes register */
+                union {
+                        __xw_i xwu32_t u32;
+                } isar[5]; /**< offset:0xd60 (r/ ) instruction set attributes register */
 
-                        xwu32_t reserved0; /**< offset:0xd74 */
+                xwu32_t reserved0; /**< offset:0xd74 */
 
-                        union {
-                                __xw_i xwu32_t u32;
-                        } clidr; /* offset:0xd78 (r/ ) cache level ID register */
+                union {
+                        __xw_i xwu32_t u32;
+                } clidr; /* offset:0xd78 (r/ ) cache level ID register */
 
-                        union {
-                                __xw_i xwu32_t u32;
-                        } ctr; /* offset:0xd7C (r/ ) cache type register */
+                union {
+                        __xw_i xwu32_t u32;
+                } ctr; /* offset:0xd7C (r/ ) cache type register */
 
-                        union {
-                                __xw_i xwu32_t u32;
-                        } ccsidr; /* offset:0xd80 (r/ ) cache size ID register */
+                union {
+                        __xw_i xwu32_t u32;
+                } ccsidr; /* offset:0xd80 (r/ ) cache size ID register */
 
-                        union {
-                                __xw_i xwu32_t u32;
-                        } csselr; /* offset:0xd84 (r/ ) cache size selection register */
-                } id; /**< offset:0xd40 (r/ ) processor feature ID registers */
+                union {
+                        __xw_i xwu32_t u32;
+                } csselr; /* offset:0xd84 (r/ ) cache size selection register */
 
                 union {
                         __xw_io xwu32_t u32;
@@ -474,282 +624,220 @@ struct cm_scs_reg {
                         } bit;
                 } cpacr; /**< offset:0xd88 (r/w) coprocessor access control register */
 
-                xwu32_t reserved0; /**< offset:0xd8c */
-
-                struct {
-                        union {
-                                __xw_i  xwu32_t u32;
-                        } type; /**< offset:0xd90 (r/ ) mpu type register */
-
-                        union {
-                                __xw_io xwu32_t u32;
-                        } ctrl; /**< offset:0xd94 (r/w) mpu control register */
-
-                        union {
-                                __xw_io xwu32_t u32;
-                        } rnr; /**< offset:0xd98 (r/w) mpu region rnrber register */
-
-                        union {
-                                __xw_io xwu32_t u32;
-                        } rbar; /**< offset:0xd9c (r/w) mpu region base address register */
-
-                        union {
-                                __xw_io xwu32_t u32;
-                        } rasr; /**< offset:0xda0 (r/w) mpu region attribute and size register */
-
-                        union {
-                                __xw_io xwu32_t u32;
-                        } rbar_a1; /**< offset:0xda4 (r/w) mpu alias 1 region base address register */
-
-                        union {
-                                __xw_io xwu32_t u32;
-                        } rasr_a1; /**< offset:0xda8 (r/w) mpu alias 1 region attribute and size register */
-
-                        union {
-                                __xw_io xwu32_t u32;
-                        } rbar_a2; /**< offset:0xdac (r/w) mpu alias 2 region base address register */
-
-                        union {
-                                __xw_io xwu32_t u32;
-                        } rasr_a2; /**< offset:0xdb0 (r/w) mpu alias 2 region attribute and size register */
-
-                        union {
-                                __xw_io xwu32_t u32;
-                        } rbar_a3; /**< offset:0xdb4 (r/w) mpu alias 3 region base address register */
-
-                        union {
-                                __xw_io xwu32_t u32;
-                        } rasr_a3; /**< offset:0xdb8 (r/w) mpu alias 3 region attribute and size register */
-
-                        xwu32_t reserved0[13]; /**< offset:0xdbc */
-                } mpu; /**< offset:0xd90 */
-
-                struct {
-                        union {
-                                __xw_io xwu32_t u32;
-                                struct {
-                                        __xw_io xwu32_t c_debugen:1;
-                                        __xw_io xwu32_t c_halt:1;
-                                        __xw_io xwu32_t c_step:1;
-                                        __xw_io xwu32_t c_maskints:1;
-                                        xwu32_t reserved0:1;
-                                        __xw_io xwu32_t c_snapstall:1;
-                                        xwu32_t reserved1:10;
-                                        __xw_i xwu32_t s_regrdy:1;
-                                        __xw_i xwu32_t s_halt:1;
-                                        __xw_i xwu32_t s_sleep:1;
-                                        __xw_i xwu32_t s_lockup:1;
-                                        xwu32_t reserved2:4;
-                                        __xw_i xwu32_t s_reset_st:1;
-                                        __xw_i xwu32_t s_retire_st:1;
-                                        xwu32_t reserved3:6;
-                                } bit;
-                        } dhcsr; /**< offset:0xdf0 (r/w) debug halting control and status register */
-
-                        union {
-                                __xw_o xwu32_t u32;
-                                struct {
-                                        __xw_o xwu32_t regsel:7;
-                                        xwu32_t reserved0:9;
-                                        __xw_o xwu32_t regwnr:1;
-                                        xwu32_t reserved1:15;
-                                } bit;
-                        } dcrsr; /**< offset:0xdf4 ( /w) debug core register selector register */
-
-                        union {
-                                __xw_io xwu32_t u32;
-                        } dcrdr; /**< offset:0xdf8 (r/w) debug core register data register */
-
-                        union {
-                                __xw_io xwu32_t u32;
-                                struct {
-                                        __xw_io xwu32_t vc_corereset:1;
-                                        xwu32_t reserved0:3;
-                                        __xw_io xwu32_t vc_mmerr:1;
-                                        __xw_io xwu32_t vc_nocperr:1;
-                                        __xw_io xwu32_t vc_chkerr:1;
-                                        __xw_io xwu32_t vc_staterr:1;
-                                        __xw_io xwu32_t vc_buserr:1;
-                                        __xw_io xwu32_t vc_interr:1;
-                                        __xw_io xwu32_t vc_harderr:1;
-                                        xwu32_t reserved1:5;
-                                        __xw_io xwu32_t mon_en:1;
-                                        __xw_io xwu32_t mon_pend:1;
-                                        __xw_io xwu32_t mon_step:1;
-                                        __xw_io xwu32_t mon_req:1;
-                                        xwu32_t reserved2:4;
-                                        __xw_io xwu32_t trcena:1;
-                                        xwu32_t reserved3:7;
-                                } bit;
-                        } demcr; /**< offset:0xdfc (r/w) debug exception and monitor control register */
-
-                        xwu32_t reserved0[64]; /**< offset:0xe00 */
-                } dcb; /**< offset:0xdf0 (r/w) */
-
-                union {
-                        __xw_o xwu32_t u32;
-                } stir; /**< offset: 0xf00 ( /w) software trigger interrupt register */
-
-                xwu32_t reserved1[11]; /**< offset:0xf04 */
-
-                struct {
-                        xwu32_t reserved0;
-                        union {
-                                __xw_io xwu32_t u32;
-                                struct {
-                                        __xw_io xwu32_t lspact:1;
-                                        __xw_io xwu32_t user:1;
-                                        __xw_io xwu32_t reserved0:1;
-                                        __xw_io xwu32_t thread:1;
-                                        __xw_io xwu32_t hfrdy:1;
-                                        __xw_io xwu32_t mmrdy:1;
-                                        __xw_io xwu32_t bfrdy:1;
-                                        __xw_io xwu32_t reserved1:1;
-                                        __xw_io xwu32_t monrdy:1;
-                                        __xw_io xwu32_t reserved2:21;
-                                        __xw_io xwu32_t lspen:1;
-                                        __xw_io xwu32_t aspen:1;
-                                } bit;
-                        } fpccr; /**< offset:0xf34 (r/w) floating point context control register */
-
-                        union {
-                                __xw_io xwu32_t u32;
-                        } fpcar; /**< offset:0xf38 (r/w) floating point context address register */
-
-                        union {
-                                __xw_io xwu32_t u32;
-                                struct {
-                                        __xw_io xwu32_t reserved0:22;
-                                        __xw_io xwu32_t rmode:2;
-                                        __xw_io xwu32_t fz:1;
-                                        __xw_io xwu32_t dn:1;
-                                        __xw_io xwu32_t ahp:1;
-                                        __xw_io xwu32_t reserved1:5;
-                                } bit;
-                        } fpdscr; /**< offset:0xf3c (r/w) floating point default status control register */
-
-                        union {
-                                __xw_io xwu32_t u32;
-                        } mvfr0; /**< offset:0xf40 (r/w) media and fp feature register 0 */
-
-                        union {
-                                __xw_io xwu32_t u32;
-                        } mvfr1; /**< offset:0xf44 (r/w) media and fp feature register 1 */
-
-                        union {
-                                __xw_io xwu32_t u32;
-                        } mvfr2; /**< offset:0xf48 (r/w) media and fp feature register 2 */
-                } fpu; /**< offset:0xf30 FPU extension */
-
-                xwu32_t reserved2; /**< offset:0xf4c */
-
-                union {
-                        __xw_o xwu32_t u32;
-                } iciallu; /**< Offset: 0xf50 ( /W)  I-Cache Invalidate All to PoU */
-
-                xwu32_t reserved3[1U];
-
-                union {
-                        __xw_o xwu32_t u32;
-                } icimvau; /**< Offset: 0xf58 ( /W)  I-Cache Invalidate by MVA to PoU */
-
-                union {
-                        __xw_o xwu32_t u32;
-                } dcimvac; /**< Offset: 0xf5C ( /W)  D-Cache Invalidate by MVA to PoC */
-
-                union {
-                        __xw_o xwu32_t u32;
-                } dcisw; /**< Offset: 0xf60 ( /W)  D-Cache Invalidate by Set-way */
-
-                union {
-                        __xw_o xwu32_t u32;
-                } dccmvau; /**< Offset: 0xf64 ( /W)  D-Cache Clean by MVA to PoU */
-
-                union {
-                        __xw_o xwu32_t u32;
-                } dccmvac; /**< Offset: 0xf68 ( /W)  D-Cache Clean by MVA to PoC */
-
-                union {
-                        __xw_o xwu32_t u32;
-                } dccsw; /**< Offset: 0xf6C ( /W)  D-Cache Clean by Set-way */
-
-                union {
-                        __xw_o xwu32_t u32;
-                } dccimvac; /**< Offset: 0xf70 ( /W)  D-Cache Clean and Invalidate by MVA to PoC */
-
-                union {
-                        __xw_o xwu32_t u32;
-                } dccisw; /**< Offset: 0xf74 ( /W)  D-Cache Clean and Invalidate by Set-way */
-
-                xwu32_t reserved4[6U];
-
-                union {
-                        __xw_io xwu32_t u32;
-                        struct {
-                                __xw_io xwu32_t en:1;
-                                __xw_io xwu32_t rmw:1;
-                                __xw_io xwu32_t reten:1;
-                                __xw_i xwu32_t sz:4;
-                                __xw_io xwu32_t reserved0:25;
-                        } bit;
-                } itcmcr; /**< Offset: 0xf90 (R/W)  Instruction Tightly-Coupled Memory Control Register */
-
-                union {
-                        __xw_io xwu32_t u32;
-                        struct {
-                                __xw_io xwu32_t en:1;
-                                __xw_io xwu32_t rmw:1;
-                                __xw_io xwu32_t reten:1;
-                                __xw_i xwu32_t sz:4;
-                                __xw_io xwu32_t reserved0:25;
-                        } bit;
-                } dtcmcr; /**< Offset: 0xf94 (R/W)  Data Tightly-Coupled Memory Control Registers */
-
-                union {
-                        __xw_io xwu32_t u32;
-                        struct {
-                                __xw_io xwu32_t en:1;
-                                __xw_i xwu32_t sz:4;
-                                __xw_io xwu32_t reserved0:27;
-                        } bit;
-                } ahbpcr; /**< Offset: 0xf98 (R/W)  AHBP Control Register */
-
-                union {
-                        __xw_io xwu32_t u32;
-                        struct {
-                                __xw_io xwu32_t siwt:1;
-                                __xw_io xwu32_t eccdis:1;
-                                __xw_io xwu32_t forcewt:1;
-                                __xw_io xwu32_t reserved0:29;
-                        } bit;
-                } cacr; /**< Offset: 0xf9C (R/W)  L1 Cache Control Register */
-
-                union {
-                        __xw_io xwu32_t u32;
-                        struct {
-                                __xw_io xwu32_t ctl:2;
-                                __xw_io xwu32_t tpr1:9;
-                                __xw_io xwu32_t initcount:5;
-                                __xw_io xwu32_t reserved0:16;
-                        } bit;
-                } ahbscr; /**< Offset: 0xfA0 (R/W)  AHB Slave Control Register */
-
-                xwu32_t reserved5[1U];
-
-                union {
-                        __xw_io xwu32_t u32;
-                        struct {
-                                __xw_io xwu32_t itcm:1;
-                                __xw_io xwu32_t dtcm:1;
-                                __xw_io xwu32_t ahbp:1;
-                                __xw_io xwu32_t axim:1;
-                                __xw_io xwu32_t eppb:1;
-                                __xw_io xwu32_t reserved0:3;
-                                __xw_io xwu32_t aximtype:2;
-                                __xw_io xwu32_t reserved1:22;
-                        } bit;
-                } abfsr; /**< Offset: 0xfA8 (R/W)  Auxiliary Bus Fault Status Register */
+                xwu32_t reserved1; /**< offset:0xd8c */
         } scb; /**< offset:0xd00 (r/w) */
+
+        struct {
+                union {
+                        __xw_i  xwu32_t u32;
+                } type; /**< offset:0xd90 (r/ ) mpu type register */
+
+                union {
+                        __xw_io xwu32_t u32;
+                } ctrl; /**< offset:0xd94 (r/w) mpu control register */
+
+                union {
+                        __xw_io xwu32_t u32;
+                } rnr; /**< offset:0xd98 (r/w) mpu region rnrber register */
+
+                union {
+                        __xw_io xwu32_t u32;
+                } rbar; /**< offset:0xd9c (r/w) mpu region base address register */
+
+                union {
+                        __xw_io xwu32_t u32;
+                } rasr; /**< offset:0xda0 (r/w) mpu region attribute and size register */
+
+                union {
+                        __xw_io xwu32_t u32;
+                } rbar_a1; /**< offset:0xda4 (r/w) mpu alias 1 region base address register */
+
+                union {
+                        __xw_io xwu32_t u32;
+                } rasr_a1; /**< offset:0xda8 (r/w) mpu alias 1 region attribute and size register */
+
+                union {
+                        __xw_io xwu32_t u32;
+                } rbar_a2; /**< offset:0xdac (r/w) mpu alias 2 region base address register */
+
+                union {
+                        __xw_io xwu32_t u32;
+                } rasr_a2; /**< offset:0xdb0 (r/w) mpu alias 2 region attribute and size register */
+
+                union {
+                        __xw_io xwu32_t u32;
+                } rbar_a3; /**< offset:0xdb4 (r/w) mpu alias 3 region base address register */
+
+                union {
+                        __xw_io xwu32_t u32;
+                } rasr_a3; /**< offset:0xdb8 (r/w) mpu alias 3 region attribute and size register */
+
+                xwu32_t reserved0[13]; /**< offset:0xdbc */
+        } mpu; /**< offset:0xd90 */
+
+        struct {
+                union {
+                        __xw_io xwu32_t u32;
+                        struct {
+                                __xw_io xwu32_t c_debugen:1;
+                                __xw_io xwu32_t c_halt:1;
+                                __xw_io xwu32_t c_step:1;
+                                __xw_io xwu32_t c_maskints:1;
+                                xwu32_t reserved0:1;
+                                __xw_io xwu32_t c_snapstall:1;
+                                xwu32_t reserved1:10;
+                                __xw_i xwu32_t s_regrdy:1;
+                                __xw_i xwu32_t s_halt:1;
+                                __xw_i xwu32_t s_sleep:1;
+                                __xw_i xwu32_t s_lockup:1;
+                                xwu32_t reserved2:4;
+                                __xw_i xwu32_t s_reset_st:1;
+                                __xw_i xwu32_t s_retire_st:1;
+                                xwu32_t reserved3:6;
+                        } bit;
+                } dhcsr; /**< offset:0xdf0 (r/w) debug halting control and status register */
+
+                union {
+                        __xw_io xwu32_t u32;
+                        struct {
+                                __xw_io xwu32_t regsel:7;
+                                xwu32_t reserved0:9;
+                                __xw_io xwu32_t regwnr:1;
+                                xwu32_t reserved1:15;
+                        } bit;
+                } dcrsr; /**< offset:0xdf4 ( /w) debug core register selector register */
+
+                union {
+                        __xw_io xwu32_t u32;
+                } dcrdr; /**< offset:0xdf8 (r/w) debug core register data register */
+
+                union {
+                        __xw_io xwu32_t u32;
+                        struct {
+                                __xw_io xwu32_t vc_corereset:1;
+                                xwu32_t reserved0:3;
+                                __xw_io xwu32_t vc_mmerr:1;
+                                __xw_io xwu32_t vc_nocperr:1;
+                                __xw_io xwu32_t vc_chkerr:1;
+                                __xw_io xwu32_t vc_staterr:1;
+                                __xw_io xwu32_t vc_buserr:1;
+                                __xw_io xwu32_t vc_interr:1;
+                                __xw_io xwu32_t vc_harderr:1;
+                                xwu32_t reserved1:5;
+                                __xw_io xwu32_t mon_en:1;
+                                __xw_io xwu32_t mon_pend:1;
+                                __xw_io xwu32_t mon_step:1;
+                                __xw_io xwu32_t mon_req:1;
+                                xwu32_t reserved2:4;
+                                __xw_io xwu32_t trcena:1;
+                                xwu32_t reserved3:7;
+                        } bit;
+                } demcr; /**< offset:0xdfc (r/w) debug exception and monitor control register */
+
+                xwu32_t reserved0[64]; /**< offset:0xe00 */
+        } dcb; /**< offset:0xdf0 (r/w) */
+
+        union {
+                __xw_io xwu32_t u32;
+        } stir; /**< offset: 0xf00 ( /w) software trigger interrupt register */
+
+        xwu32_t reserved1[12]; /**< offset:0xf04 */
+
+        union {
+                __xw_io xwu32_t u32;
+                struct {
+                        __xw_io xwu32_t lspact:1;
+                        __xw_io xwu32_t user:1;
+                        __xw_io xwu32_t reserved0:1;
+                        __xw_io xwu32_t thread:1;
+                        __xw_io xwu32_t hfrdy:1;
+                        __xw_io xwu32_t mmrdy:1;
+                        __xw_io xwu32_t bfrdy:1;
+                        __xw_io xwu32_t reserved1:1;
+                        __xw_io xwu32_t monrdy:1;
+                        __xw_io xwu32_t reserved2:21;
+                        __xw_io xwu32_t lspen:1;
+                        __xw_io xwu32_t aspen:1;
+                } bit;
+        } fpccr; /**< offset:0xf34 (r/w) floating point context control register */
+
+        union {
+                __xw_io xwu32_t u32;
+        } fpcar; /**< offset:0xf38 (r/w) floating point context address register */
+
+        union {
+                __xw_io xwu32_t u32;
+                struct {
+                        __xw_io xwu32_t reserved0:22;
+                        __xw_io xwu32_t rmode:2;
+                        __xw_io xwu32_t fz:1;
+                        __xw_io xwu32_t dn:1;
+                        __xw_io xwu32_t ahp:1;
+                        __xw_io xwu32_t reserved1:5;
+                } bit;
+        } fpdscr; /**< offset:0xf3c (r/w) floating point default status control register */
+
+        union {
+                __xw_io xwu32_t u32;
+        } mvfr0; /**< offset:0xf40 (r/w) media and fp feature register 0 */
+
+        union {
+                __xw_io xwu32_t u32;
+        } mvfr1; /**< offset:0xf44 (r/w) media and fp feature register 1 */
+
+        union {
+                __xw_io xwu32_t u32;
+        } mvfr2; /**< offset:0xf48 (r/w) media and fp feature register 2 */
+
+        xwu32_t reserved2[33]; /**< offset:0xf4c */
+
+        union {
+                __xw_i xwu32_t u32;
+        } pid4; /**< offset:0xfd0 (r/ ) */
+
+        union {
+                __xw_i xwu32_t u32;
+        } pid5; /**< offset:0xfd4 (r/ ) */
+
+        union {
+                __xw_i xwu32_t u32;
+        } pid6; /**< offset:0xfd8 (r/ ) */
+
+        union {
+                __xw_i xwu32_t u32;
+        } pid7; /**< offset:0xfdc (r/ ) */
+
+        union {
+                __xw_i xwu32_t u32;
+        } pid0; /**< offset:0xfe0 (r/ ) */
+
+        union {
+                __xw_i xwu32_t u32;
+        } pid1; /**< offset:0xfe4 (r/ ) */
+
+        union {
+                __xw_i xwu32_t u32;
+        } pid2; /**< offset:0xfe8 (r/ ) */
+
+        union {
+                __xw_i xwu32_t u32;
+        } pid3; /**< offset:0xfec (r/ ) */
+
+        union {
+                __xw_i xwu32_t u32;
+        } cid0; /**< offset:0xff0 (r/ ) */
+
+        union {
+                __xw_i xwu32_t u32;
+        } cid1; /**< offset:0xff4 (r/ ) */
+
+        union {
+                __xw_i xwu32_t u32;
+        } cid2; /**< offset:0xff8 (r/ ) */
+
+        union {
+                __xw_i xwu32_t u32;
+        } cid3; /**< offset:0xffc (r/ ) */
 };
 
 /**
@@ -1073,15 +1161,15 @@ struct cm_tpiu_reg {
 };
 
 /* Memory mapping of Core Hardware */
-#define ARMv7m_SCS_BASE         (0xE000E000UL) /**< System Control Space Base Address */
-#define ARMv7m_ITM_BASE         (0xE0000000UL) /**< ITM Base Address */
-#define ARMv7m_DWT_BASE         (0xE0001000UL) /**< DWT Base Address */
-#define ARMv7m_TPI_BASE         (0xE0040000UL) /**< TPI Base Address */
+#define ARMv6m_SCS_BASE         (0xE000E000UL) /**< System Control Space Base Address */
+#define ARMv6m_ITM_BASE         (0xE0000000UL) /**< ITM Base Address */
+#define ARMv6m_DWT_BASE         (0xE0001000UL) /**< DWT Base Address */
+#define ARMv6m_TPI_BASE         (0xE0040000UL) /**< TPI Base Address */
 
-#define cm_scs                  (*((__xw_io struct cm_scs_reg *)ARMv7m_SCS_BASE))
-#define cm_itm                  (*((__xw_io struct cm_itm_reg *)ARMv7m_ITM_BASE))
-#define cm_dwt                  (*((__xw_io struct cm_dwt_reg *)ARMv7m_DWT_BASE))
-#define cm_tpiu                 (*((__xw_io struct cm_tpiu_reg *)ARMv7m_TPI_BASE))
+#define cm_scs                  (*((__xw_io struct cm_scs_reg *)ARMv6m_SCS_BASE))
+#define cm_itm                  (*((__xw_io struct cm_itm_reg *)ARMv6m_ITM_BASE))
+#define cm_dwt                  (*((__xw_io struct cm_dwt_reg *)ARMv6m_DWT_BASE))
+#define cm_tpiu                 (*((__xw_io struct cm_tpiu_reg *)ARMv6m_TPI_BASE))
 
 /******** ******** special registers ******** ********/
 /**
@@ -1325,36 +1413,6 @@ void cm_set_faultmask(xwu32_t faultmask)
 }
 
 /**
- * @brief Get BASEPRI
- * @param[out] basepri: buffer to return result
- */
-static __xwbsp_inline
-void cm_get_basepri(xwu32_t * basepri)
-{
-        __asm__ volatile(
-        "mrs    %[__basepri], basepri"
-        : [__basepri] "=&r" (*basepri)
-        :
-        : "memory", "cc"
-        );
-}
-
-/**
- * @brief Set BASEPRI
- * @param[in] basepri: new value
- */
-static __xwbsp_inline
-void cm_set_basepri(xwu32_t basepri)
-{
-        __asm__ volatile(
-        "msr    basepri, %[__basepri]"
-        :
-        : [__basepri] "r" (basepri)
-        : "memory", "cc"
-        );
-}
-
-/**
  * @brief Get CONTROL
  * @param[out] control: buffer to return result
  */
@@ -1446,14 +1504,14 @@ xwssz_t cm_itm_putns(xwu32_t port, const char * s, xwsz_t n)
 static __xwbsp_inline
 void cm_reset_system(void)
 {
-        armv7m_dsb(); /* Ensure all outstanding memory accesses
+        armv6m_dsb(); /* Ensure all outstanding memory accesses
                          included buffered write are completed before reset */
         cm_scs.scb.aircr.u32  = (xwu32_t)((0x5FA << SCB_AIRCR_VECTKEY_POS) |
                                           (cm_scs.scb.aircr.u32 &
                                            SCB_AIRCR_PRIGROUP_MSK) |
                                           SCB_AIRCR_SYSRESETREQ_MSK); /* Keep priority
                                                                          group */
-        armv7m_dsb();
+        armv6m_dsb();
         while (true) {
         }
 }
@@ -1634,4 +1692,4 @@ void cm_sev(void)
         __asm__ volatile("sev");
 }
 
-#endif /* armv7m_core.h */
+#endif /* armv6m_isa.h */

@@ -22,7 +22,7 @@
 #include <xwos/osal/irq.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/ospl/syshwt.h>
-#include <armv7m_core.h>
+#include <armv7m_isa.h>
 #include <arch_irq.h>
 #include <arch_skd.h>
 #include <arch_systick.h>

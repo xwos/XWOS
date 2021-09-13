@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/lfq.h>
-#include <armv7m_core.h>
+#include <armv7m_isa.h>
 
 __xwbsp_code
 void xwlib_lfq_push(xwlfq_a * h, xwlfq_a * n)

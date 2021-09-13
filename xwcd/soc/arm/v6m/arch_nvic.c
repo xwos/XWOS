@@ -21,7 +21,7 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/ospl/irq.h>
-#include <armv6m_core.h>
+#include <armv6m_isa.h>
 #include <armv6m_nvic.h>
 #include <arch_nvic.h>
 

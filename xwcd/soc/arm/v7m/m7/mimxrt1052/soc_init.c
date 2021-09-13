@@ -21,7 +21,7 @@
 #include <xwos/standard.h>
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
-#include <armv7m_core.h>
+#include <armv7m_isa.h>
 #include <arch_nvic.h>
 #include <soc.h>
 #include <soc_init.h>

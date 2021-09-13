@@ -25,7 +25,7 @@
 #  error "This file should be included from <xwos/ospl/soc/spinlock.h>."
 #endif
 
-#include <armv7m_core.h>
+#include <armv7m_isa.h>
 
 #define SOC_SPLK_TICKET_SHIFT          16
 

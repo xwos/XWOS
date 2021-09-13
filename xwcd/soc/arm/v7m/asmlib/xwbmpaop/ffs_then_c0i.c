@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
-#include <armv7m_core.h>
+#include <armv7m_isa.h>
 
 __xwlib_code
 xwssq_t xwbmpaop_ffs_then_c0i(xwbmp_a * bmp, xwsz_t num)

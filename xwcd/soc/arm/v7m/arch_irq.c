@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <armv7m_core.h>
+#include <armv7m_isa.h>
 #include <armv7m_nvic.h>
 #include <arch_nvic.h>
 #include <arch_irq.h>

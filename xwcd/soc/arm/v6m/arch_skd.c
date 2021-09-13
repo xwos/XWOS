@@ -21,7 +21,7 @@
 #include <xwos/standard.h>
 #include <xwos/osal/irq.h>
 #include <xwos/ospl/skd.h>
-#include <armv6m_core.h>
+#include <armv6m_isa.h>
 #include <arch_skd.h>
 
 #define SOC_EXC_SWCX_PRIO                               (SOC_IRQ_PRIO_LOWEST)

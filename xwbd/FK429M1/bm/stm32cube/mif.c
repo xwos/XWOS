@@ -20,7 +20,7 @@
 
 #include <xwos/lib/xwbop.h>
 #include <bm/stm32cube/standard.h>
-#include <armv7m_core.h>
+#include <armv7m_isa.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
 #include <bm/stm32cube/xwac/xwds/cmif.h>

@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <string.h>
-#include <armv7m_core.h>
+#include <armv7m_isa.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/bma.h>
 #include <bm/stm32cube/mif.h>

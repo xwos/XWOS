@@ -22,7 +22,7 @@
 #define __arch_armv6m_nvic_h__
 
 #include <xwos/standard.h>
-#include <armv6m_core.h>
+#include <armv6m_isa.h>
 
 #ifndef SOCCFG_NVIC_PRIO_BITNUM
 #  error "SOCCFG_NVIC_PRIO_BITNUM is not defined!"

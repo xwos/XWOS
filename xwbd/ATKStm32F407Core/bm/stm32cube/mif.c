@@ -23,7 +23,7 @@
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
 #include <bm/stm32cube/xwac/xwds/cmif.h>
 #include <bm/stm32cube/mif.h>
-#include <armv7m_core.h>
+#include <armv7m_isa.h>
 
 extern xwu8_t sram_mr_origin[];
 extern xwu8_t sram_mr_size[];

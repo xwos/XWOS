@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <armv7m_core.h>
+#include <armv7m_isa.h>
 #include <bdl/xwac/xwskd_hook.h>
 
 extern
