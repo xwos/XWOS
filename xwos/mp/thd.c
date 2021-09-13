@@ -37,11 +37,16 @@
 #include <xwos/mp/thd.h>
 
 #if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
-extern __xwmp_code
+extern
 xwer_t board_thd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf);
 
-extern __xwmp_code
+extern
 xwer_t board_thd_stack_pool_free(xwstk_t * stk);
+#endif
+
+#if defined(BRDCFG_XWSKD_THD_POSTINIT_HOOK) && (1 == BRDCFG_XWSKD_THD_POSTINIT_HOOK)
+extern
+void board_thd_postinit_hook(struct xwmp_thd * thd);
 #endif
 
 static __xwmp_code
@@ -395,6 +400,10 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
 #endif
 #if defined(XWMDCFG_libc_newlibac) && (1 == XWMDCFG_libc_newlibac)
         thd->newlib.__errno = XWOK;
+#endif
+
+#if defined(BRDCFG_XWSKD_THD_POSTINIT_HOOK) && (1 == BRDCFG_XWSKD_THD_POSTINIT_HOOK)
+        board_thd_postinit_hook(thd);
 #endif
 
         /* 加入就绪队列 */

@@ -57,6 +57,11 @@ extern __xwup_code
 xwer_t board_thd_stack_pool_free(xwstk_t * stk);
 #endif
 
+#if defined(BRDCFG_XWSKD_THD_POSTINIT_HOOK) && (1 == BRDCFG_XWSKD_THD_POSTINIT_HOOK)
+extern
+void board_thd_postinit_hook(struct xwup_thd * thd);
+#endif
+
 static __xwup_code
 struct xwup_thd * xwup_thd_alloc(void);
 
@@ -259,6 +264,10 @@ void xwup_thd_activate(struct xwup_thd * thd,
 #endif
 #if defined(XWMDCFG_libc_newlibac) && (1 == XWMDCFG_libc_newlibac)
         thd->newlib.__errno = XWOK;
+#endif
+
+#if defined(BRDCFG_XWSKD_THD_POSTINIT_HOOK) && (1 == BRDCFG_XWSKD_THD_POSTINIT_HOOK)
+        board_thd_postinit_hook(thd);
 #endif
 
         if (mainfunc) {

@@ -20,7 +20,6 @@
 
 #include <xwos/standard.h>
 #include <bdl/axisram.h>
-#include <bdl/xwac/thd_stack_mempool.h>
 
 __xwos_code
 xwer_t board_thd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf)

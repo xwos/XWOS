@@ -21,10 +21,10 @@
 #include <xwos/standard.h>
 #include <soc_me.h>
 #include <soc_wdg.h>
-#include <bdl/xwac/xwskd_hook.h>
+#include <xwos/ospl/skd.h>
 
 __xwos_code
-void board_xwskd_idle_hook(struct xwos_skd * xwskd)
+void board_xwskd_idle_hook(struct xwospl_skd * xwskd)
 {
         XWOS_UNUSED(xwskd);
         /* soc_me_enter_mode(XPC5_ME_MODE_HALT); */

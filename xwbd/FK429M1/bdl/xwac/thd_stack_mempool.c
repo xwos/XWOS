@@ -22,7 +22,6 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/bma.h>
-#include <bdl/xwac/thd_stack_mempool.h>
 
 extern struct xwmm_bma * stkmempool_bma;
 

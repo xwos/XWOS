@@ -20,20 +20,28 @@
 
 #include <xwos/standard.h>
 #include <armv7m_isa.h>
-#include <bdl/xwac/xwskd_hook.h>
+#include <xwos/ospl/skd.h>
 
-extern void stm32cube_systick_hook(void);
+extern
+void stm32cube_systick_hook(void);
 
 __xwos_code
-void board_xwskd_idle_hook(struct xwos_skd * xwskd)
+void board_xwskd_idle_hook(struct xwospl_skd * xwskd)
 {
         XWOS_UNUSED(xwskd);
         cm_wfi();
 }
 
 __xwos_code
-void board_xwskd_syshwt_hook(struct xwos_skd * xwskd)
+void board_xwskd_syshwt_hook(struct xwospl_skd * xwskd)
 {
         XWOS_UNUSED(xwskd);
         stm32cube_systick_hook();
+}
+
+__xwos_code
+void board_thd_postinit_hook(struct xwospl_thd * thd)
+{
+        XWOS_UNUSED(thd);
+        /* Add MPU code here. */
 }
