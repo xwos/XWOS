@@ -2,7 +2,7 @@
 /  FatFs Functional Configurations
 /---------------------------------------------------------------------------*/
 
-#define FFCONF_DEF	86606	/* Revision ID */
+#define FFCONF_DEF	86631	/* Revision ID */
 
 /*---------------------------------------------------------------------------/
 / Function Configurations
@@ -23,14 +23,6 @@
 /      are removed.
 /   2: f_opendir(), f_readdir() and f_closedir() are removed in addition to 1.
 /   3: f_lseek() function is removed in addition to 2. */
-
-
-#define FF_USE_STRFUNC	0
-/* This option switches string functions, f_gets(), f_putc(), f_puts() and f_printf().
-/
-/  0: Disable string functions.
-/  1: Enable without LF-CRLF conversion.
-/  2: Enable with LF-CRLF conversion. */
 
 
 #define FF_USE_FIND		0
@@ -62,6 +54,30 @@
 
 #define FF_USE_FORWARD	0
 /* This option switches f_forward() function. (0:Disable or 1:Enable) */
+
+
+#define FF_USE_STRFUNC	0
+#define FF_PRINT_LLI	0
+#define FF_PRINT_FLOAT	0
+#define FF_STRF_ENCODE	0
+/* FF_USE_STRFUNC switches string functions, f_gets(), f_putc(), f_puts() and
+/  f_printf().
+/
+/   0: Disable. FF_PRINT_LLI, FF_PRINT_FLOAT and FF_STRF_ENCODE have no effect.
+/   1: Enable without LF-CRLF conversion.
+/   2: Enable with LF-CRLF conversion.
+/
+/  FF_PRINT_LLI = 1 makes f_printf() support long long argument and FF_PRINT_FLOAT = 1/2
+   makes f_printf() support floating point argument. These features want C99 or later.
+/  When FF_LFN_UNICODE >= 1 with LFN enabled, string functions convert the character
+/  encoding in it. FF_STRF_ENCODE selects assumption of character encoding ON THE FILE
+/  to be read/written via those functions.
+/
+/   0: ANSI/OEM in current CP
+/   1: Unicode in UTF-16LE
+/   2: Unicode in UTF-16BE
+/   3: Unicode in UTF-8
+*/
 
 
 /*---------------------------------------------------------------------------/
@@ -117,7 +133,7 @@
 /  ff_memfree() exemplified in ffsystem.c, need to be added to the project. */
 
 
-#define FF_LFN_UNICODE	0
+#define FF_LFN_UNICODE	2
 /* This option switches the character encoding on the API when LFN is enabled.
 /
 /   0: ANSI/OEM in current CP (TCHAR = char)
@@ -135,19 +151,6 @@
 /  which is used to read out directory items. These values should be suffcient for
 /  the file names to read. The maximum possible length of the read file name depends
 /  on character encoding. When LFN is not enabled, these options have no effect. */
-
-
-#define FF_STRF_ENCODE	3
-/* When FF_LFN_UNICODE >= 1 with LFN enabled, string I/O functions, f_gets(),
-/  f_putc(), f_puts and f_printf() convert the character encoding in it.
-/  This option selects assumption of character encoding ON THE FILE to be
-/  read/written via those functions.
-/
-/   0: ANSI/OEM in current CP
-/   1: Unicode in UTF-16LE
-/   2: Unicode in UTF-16BE
-/   3: Unicode in UTF-8
-*/
 
 
 #define FF_FS_RPATH		2
@@ -205,8 +208,8 @@
 /  To enable the 64-bit LBA, also exFAT needs to be enabled. (FF_FS_EXFAT == 1) */
 
 
-#define FF_MIN_GPT		0x100000000
-/* Minimum number of sectors to switch GPT format to create partition in f_mkfs and
+#define FF_MIN_GPT		0x10000000
+/* Minimum number of sectors to switch GPT as partitioning format in f_mkfs and
 /  f_fdisk function. 0x100000000 max. This option has no effect when FF_LBA64 == 0. */
 
 
@@ -235,9 +238,9 @@
 
 
 #define FF_FS_NORTC		1
-#define FF_NORTC_MON	5
-#define FF_NORTC_MDAY	31
-#define FF_NORTC_YEAR	2020
+#define FF_NORTC_MON		12
+#define FF_NORTC_MDAY		31
+#define FF_NORTC_YEAR		2020
 /* The option FF_FS_NORTC switches timestamp functiton. If the system does not have
 /  any RTC function or valid timestamp is not needed, set FF_FS_NORTC = 1 to disable
 /  the timestamp function. Every object modified by FatFs will have a fixed timestamp

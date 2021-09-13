@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <bm/stm32cube/standard.h>
 #include <xwem/fs/fatfs/ff.h>
+#include <xwem/fs/fatfs/diskio.h>
 #include <bm/stm32cube/cubemx/Core/Inc/sdmmc.h>
 #include <bm/stm32cube/xwac/fatfs/cmif.h>
 
