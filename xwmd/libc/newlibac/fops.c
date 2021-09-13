@@ -581,3 +581,50 @@ int _unlink_r(struct _reent * r, const char * path)
         }
         return rc;
 }
+
+int _rename_r(struct _reent * ptr, const char * oldname, const char * newname)
+{
+        FRESULT fsrc;
+        int rc;
+
+        rc = -1;
+        fsrc = f_rename(oldname, newname);
+        switch (fsrc) {
+        case FR_OK:
+                errno = XWOK;
+                rc = 0;
+                break;
+        case FR_DISK_ERR:
+        case FR_INT_ERR:
+        case FR_NOT_ENABLED:
+        case FR_NOT_READY:
+                errno = EIO;
+                break;
+        case FR_NO_FILE:
+        case FR_NO_PATH:
+        case FR_INVALID_NAME:
+                errno = ENOENT;
+                break;
+        case FR_DENIED:
+                errno = EPERM;
+                break;
+        case FR_WRITE_PROTECTED:
+        case FR_INVALID_DRIVE:
+        case FR_NO_FILESYSTEM:
+                errno = EACCES;
+                break;
+        case FR_TIMEOUT:
+                errno = ETIMEDOUT;
+                break;
+        case FR_LOCKED:
+                errno = EBUSY;
+                break;
+        case FR_NOT_ENOUGH_CORE:
+                errno = ENOMEM;
+                break;
+        default:
+                errno = EFAULT;
+                break;
+        }
+        return rc;
+}
