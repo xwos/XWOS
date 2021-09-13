@@ -19,6 +19,7 @@ typedef void (* newlibac_init_f)(void);
 extern void __libc_init_array (void);
 extern void __libc_fini_array (void);
 
+extern void newlibac_errno_init(void);
 extern void newlibac_mem_init(void);
 extern void newlibac_fops_init(void);
 extern void newlibac_string_init(void);
@@ -30,6 +31,7 @@ extern void newlibac_lock_init(void);
  * + 此函数表同时作为静态链接占位符，可保证符号重名时优先使用此库中的符号。
  */
 const newlibac_init_f newlibac_init_table[] = {
+        newlibac_errno_init,
         newlibac_mem_init,
         newlibac_fops_init,
         newlibac_string_init,

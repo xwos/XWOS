@@ -52,7 +52,7 @@
         stringify(XWOS_VERSION_REVISION)
 
 #define XWOS_COPYRIGHT "玄武OS " XWOS_VER_STR \
-        "  Copyright (C) 2015-2021 http://xwos.tech, Roy.Sun"
+        "  Copyright (C) 2015-2021 Roy.Sun<http://xwos.tech>"
 
 /**
  * @} XuanWuOS版本号

@@ -15,9 +15,6 @@
 #include <xwos/mm/mempool/allocator.h>
 #include <string.h>
 #include <reent.h>
-#include <errno.h>
-
-#undef errno
 
 extern struct xwmm_mempool * newlibac_mempool;
 
@@ -44,7 +41,7 @@ void * newlibac_malloc(struct _reent * r, xwsz_t size)
         xwer_t rc;
 
         rc = xwmm_mempool_malloc(newlibac_mempool, size, &mem);
-        r->_errno = -rc;
+        errno = -rc;
         return mem;
 }
 
@@ -54,7 +51,7 @@ void newlibac_free(struct _reent * r, void * mem)
         xwer_t rc;
 
         rc = xwmm_mempool_free(newlibac_mempool, mem);
-        r->_errno = -rc;
+        errno = -rc;
 }
 
 static
@@ -63,7 +60,7 @@ void * newlibac_realloc(struct _reent * r, void * mem, xwsz_t size)
         xwer_t rc;
 
         rc = xwmm_mempool_realloc(newlibac_mempool, size, &mem);
-        r->_errno = -rc;
+        errno = -rc;
         return mem;
 }
 
@@ -74,7 +71,7 @@ void * newlibac_memalign(struct _reent * r, xwsz_t alignment, xwsz_t size)
         void * mem;
 
         rc = xwmm_mempool_memalign(newlibac_mempool, alignment, size, &mem);
-        r->_errno = -rc;
+        errno = -rc;
         return mem;
 }
 

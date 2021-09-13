@@ -344,33 +344,21 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_obj_activate;
         }
-        /* base info */
+
         xwmp_splk_init(&thd->stlock);
         thd->state = XWMP_SKDOBJ_DST_UNKNOWN;
         thd->attribute = attr;
         if (XWMP_SKDATTR_DETACHED & attr) {
                 thd->state |= XWMP_SKDOBJ_DST_DETACHED;
         }
-
-        /* frozen state info */
         xwlib_bclst_init_node(&thd->frznode);
-
-        /* migrating state info */
         thd->migration.dst = 0;
-
-        /* ready state info */
         xwlib_bclst_init_node(&thd->rqnode);
-
-        /* sleeping state info */
         xwmp_ttn_init(&thd->ttn, (xwptr_t)thd, XWMP_TTN_TYPE_THD);
-
-        /* blocking state info */
         xwmp_wqn_init(&thd->wqn, thd);
-
-        /* mutex tree */
         xwmp_mtxtree_init(&thd->mtxtree);
 
-        /* priority */
+        /* 优先级 */
         if (priority >= XWMP_SKD_PRIORITY_RT_NUM) {
                 priority = XWMP_SKD_PRIORITY_RT_MAX;
         } else if (priority <= XWMP_SKD_PRIORITY_INVALID) {
@@ -381,6 +369,7 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
         thd->dprio.rq = XWMP_SKD_PRIORITY_INVALID;
         thd->dprio.wq = XWMP_SKD_PRIORITY_INVALID;
 
+        /* 栈信息 */
         thd->stack.name = name;
         stack_size = (stack_size + XWMM_ALIGNMENT_MASK) & (~XWMM_ALIGNMENT_MASK);
         thd->stack.size = stack_size;
@@ -396,13 +385,19 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
 #else
 #  error "Unknown stack type!"
 #endif
-        /* init completion */
+
         xwmp_cond_init(&thd->completion);
-
-        /* init thd node */
         xwlib_bclst_init_node(&thd->thdnode);
+#if defined(XWMPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWMPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
+        for (xwsq_t i = 0; i < XWMPCFG_SKD_THD_LOCAL_DATA_NUM; i++) {
+                thd->data[i] = NULL;
+        }
+#endif
+#if defined(XWMDCFG_libc_newlibac) && (1 == XWMDCFG_libc_newlibac)
+        thd->newlib.__errno = XWOK;
+#endif
 
-        /* add to ready queue */
+        /* 加入就绪队列 */
         if (mainfunc) {
                 xwmp_thd_launch(thd, mainfunc, arg);
         } else {

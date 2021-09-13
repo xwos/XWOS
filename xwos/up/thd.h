@@ -85,13 +85,19 @@ struct xwup_thd {
 #endif
 
 #if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
-        /* thread completion */
+        /* 退出状态 */
         struct xwup_cond completion; /**< 线程退出时的事件信号量 */
 #endif
 
 #if defined(XWUPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWUPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
-        /* 线程本地数据 */
+        /* 线程私有数据 */
         void * data[XWUPCFG_SKD_THD_LOCAL_DATA_NUM];
+#endif
+
+#if defined(XWMDCFG_libc_newlibac) && (1 == XWMDCFG_libc_newlibac)
+        struct {
+                int __errno;
+        } newlib;
 #endif
 };
 

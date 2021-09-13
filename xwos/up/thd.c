@@ -207,33 +207,22 @@ void xwup_thd_activate(struct xwup_thd * thd,
                        xwstk_t * stack, xwsz_t stack_size,
                        xwpr_t priority, xwsq_t attr)
 {
-        /* base info */
         thd->state = XWUP_SKDOBJ_DST_UNKNOWN;
         thd->attribute = attr;
         if (XWUP_SKDATTR_DETACHED & attr) {
                 thd->state |= XWUP_SKDOBJ_DST_DETACHED;
         }
-
 #if (1 == XWUPRULE_SKD_THD_FREEZE)
-        /* frozen state info */
         xwlib_bclst_init_node(&thd->frznode);
 #endif
-
-        /* ready state info */
         xwlib_bclst_init_node(&thd->rqnode);
-
-        /* sleeping state info */
         xwup_ttn_init(&thd->ttn, (xwptr_t)thd, XWUP_TTN_TYPE_THD);
-
-        /* blocking state info */
         xwup_wqn_init(&thd->wqn, thd);
-
 #if defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)
-        /* mutex tree */
         xwup_mtxtree_init(&thd->mtxtree);
 #endif
 
-        /* priority */
+        /* 优先级 */
         if (priority >= XWUP_SKD_PRIORITY_RT_NUM) {
                 priority = XWUP_SKD_PRIORITY_RT_MAX;
         } else if (priority <= XWUP_SKD_PRIORITY_INVALID) {
@@ -242,7 +231,7 @@ void xwup_thd_activate(struct xwup_thd * thd,
         thd->prio.s = priority;
         thd->prio.d = priority;
 
-        /* init stack */
+        /* 栈信息 */
         thd->stack.name = name;
         stack_size = (stack_size + XWMM_ALIGNMENT_MASK) & (~XWMM_ALIGNMENT_MASK);
         thd->stack.size = stack_size;
@@ -258,15 +247,20 @@ void xwup_thd_activate(struct xwup_thd * thd,
 #else
 #  error "Unknown stack type!"
 #endif
-        /* init completion */
 #if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
         xwup_cond_init(&thd->completion);
 #endif
-
-        /* init thd node */
         xwlib_bclst_init_node(&thd->thdnode);
 
-        /* add to ready queue */
+#if defined(XWUPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWUPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
+        for (xwsq_t i = 0; i < XWUPCFG_SKD_THD_LOCAL_DATA_NUM; i++) {
+                thd->data[i] = NULL;
+        }
+#endif
+#if defined(XWMDCFG_libc_newlibac) && (1 == XWMDCFG_libc_newlibac)
+        thd->newlib.__errno = XWOK;
+#endif
+
         if (mainfunc) {
                 xwup_thd_launch(thd, mainfunc, arg);
         } else {

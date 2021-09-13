@@ -77,8 +77,14 @@ struct xwmp_thd {
         } dprio; /**< 线程的动态优先级，被<em><b>stlock</b></em>保护 */
 
 #if defined(XWMPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWMPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
-        /* 线程本地数据 */
+        /* 线程私有数据 */
         void * data[XWMPCFG_SKD_THD_LOCAL_DATA_NUM];
+#endif
+
+#if defined(XWMDCFG_libc_newlibac) && (1 == XWMDCFG_libc_newlibac)
+        struct {
+                int __errno;
+        } newlib;
 #endif
 };
 
