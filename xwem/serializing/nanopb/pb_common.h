@@ -5,7 +5,7 @@
 #ifndef PB_COMMON_H_INCLUDED
 #define PB_COMMON_H_INCLUDED
 
-#include <xwem/serializing/nanopb/pb.h>
+#include "xwem/serializing/nanopb/pb.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,6 +31,10 @@ bool pb_field_iter_next(pb_field_iter_t *iter);
 /* Advance the iterator until it points at a field with the given tag.
  * Returns false if no such field exists. */
 bool pb_field_iter_find(pb_field_iter_t *iter, uint32_t tag);
+
+/* Find a field with type PB_LTYPE_EXTENSION, or return false if not found.
+ * There can be only one extension range field per message. */
+bool pb_field_iter_find_extension(pb_field_iter_t *iter);
 
 #ifdef PB_VALIDATE_UTF8
 /* Validate UTF-8 text string */

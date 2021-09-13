@@ -23,7 +23,7 @@
 
 #define XWEMCFG_serializing_nanopb                      1
 #define XWEMCFG_fs_fatfs                                1
-#define XWEMCFG_fs_littlefs                             0
+#define XWEMCFG_fs_littlefs                             1
 #define XWEMCFG_fs_spiffs                               0
 #define XWEMCFG_fs_dhara                                0
 
