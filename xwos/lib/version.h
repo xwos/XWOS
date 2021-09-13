@@ -2,9 +2,9 @@
  * @file
  * @brief XWOS通用库：玄武OS的版本号
  * @author
- * + 隐星魂 (Roy.Sun) <https://xwos.tech>
+ * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
- * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
+ * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
  * > file, You can obtain one at http://mozilla.org/MPL/2.0/.

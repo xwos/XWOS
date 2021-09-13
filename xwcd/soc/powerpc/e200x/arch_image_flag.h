@@ -2,9 +2,9 @@
  * @file
  * @brief 架构描述层：image标记
  * @author
- * + 隐星魂 (Roy.Sun) <https://xwos.tech>
+ * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
- * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
+ * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This file is a free software and is licensed under
  * > the Apache License, Version 2.0 (the "License").
  * > You may not use this file except in compliance with the License.

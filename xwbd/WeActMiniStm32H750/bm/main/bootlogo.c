@@ -2,9 +2,9 @@
  * @file
  * @brief XWOS开机Logo
  * @author
- * + 隐星魂 (Roy.Sun) <https://xwos.tech>
+ * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
- * + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
+ * + Copyright © 2015 xwos.tech, All Rights Reserved.
  */
 
 #include <xwos/standard.h>

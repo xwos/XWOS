@@ -1,8 +1,8 @@
 #+STARTUP: showall
 #+STARTUP: hidestars
 #+TITLE: xwgitloglint-README
-#+AUTHOR: 隐星魂(Roy.Sun)
-#+EMAIL: roy.sun@starsoul.tech
+#+AUTHOR: 隐星魂 (Roy Sun)
+#+EMAIL: xwos@xwos.tech
 #+DATE:
 #+LANGUAGE: zh-CN
 #+OPTIONS: ^:{}
@@ -57,7 +57,7 @@ git commit --allow-empty -m "badtype: badsubject"
 #+BEGIN_SRC shell
 husky > commit-msg (node vX.Y.Z)
 ⧗   input: badtype: badsubject
-✖   type must be one of [feat, fix, perf, refactor, style, build, revert, docs, test, chore, milestone, release, developing, patch] [type-enum]
+✖   type must be one of [feat, fix, perf, refactor, style, build, revert, docs, test, chore, milestone, release, revision] [type-enum]
 
 ✖   found 1 problems, 0 warnings
 ⓘ   Get help: https://github.com/conventional-changelog/commitlint/#what-is-commitlint
