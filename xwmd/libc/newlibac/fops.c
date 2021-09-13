@@ -134,7 +134,7 @@ err_nomem:
 err_mdir:
         return fd;
 }
-#endif /* O_DIRECTORY */
+#endif
 
 int newlibac_fops_openfile(struct _reent * r, const char * path, int flag, int mode)
 {
@@ -269,9 +269,9 @@ int _open_r(struct _reent * r, const char * path, int flag, int mode)
         } else {
                 fd = newlibac_fops_openfile(r, path, flag, mode);
         }
-#else /* O_DIRECTORY */
+#else
         fd = newlibac_fops_openfile(r, path, flag, mode);
-#endif /* !O_DIRECTORY */
+#endif
         return fd;
 }
 
@@ -310,7 +310,7 @@ int newlibac_fops_closedir(struct _reent * r, xwsq_t idx)
         }
         return rc;
 }
-#endif /* O_DIRECTORY */
+#endif
 
 static
 int newlibac_fops_closefile(struct _reent * r, xwsq_t idx)
@@ -366,10 +366,10 @@ int _close_r(struct _reent * r, int fd)
                 } else {
                         rc = newlibac_fops_closefile(r, (xwsq_t)idx);
                 }
-#else /* O_DIRECTORY */
+#else
                 idx = fd - NEWLIBAC_FOPS_FD_OFFSET;
                 rc = newlibac_fops_closefile(r, (xwsq_t)idx);
-#endif /* !O_DIRECTORY */
+#endif
         }
         return rc;
 }

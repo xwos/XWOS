@@ -19,19 +19,19 @@
 #include <xwos/standard.h>
 #include <xwos/up/thd.h>
 #if defined(XWUPCFG_SYNC_RTSEM) && (1 == XWUPCFG_SYNC_RTSEM)
-  #include <xwos/up/sync/rtsem.h>
+#  include <xwos/up/sync/rtsem.h>
 #elif defined(XWUPCFG_SYNC_PLSEM) && (1 == XWUPCFG_SYNC_PLSEM)
-  #include <xwos/up/sync/plsem.h>
+#  include <xwos/up/sync/plsem.h>
 #else
-  #error "Can't find the configuration of semaphore!"
+#  error "Can't find the configuration of semaphore!"
 #endif
 
 #if defined(XWUPCFG_SYNC_RTSEM) && (1 == XWUPCFG_SYNC_RTSEM)
-  #define XWUP_SEM_API(api, ...) xwup_rtsem_##api(__VA_ARGS__)
-  #define xwup_sem xwup_rtsem
+#  define XWUP_SEM_API(api, ...) xwup_rtsem_##api(__VA_ARGS__)
+#  define xwup_sem xwup_rtsem
 #elif defined(XWUPCFG_SYNC_PLSEM) && (1 == XWUPCFG_SYNC_PLSEM)
-  #define XWUP_SEM_API(api, ...) xwup_plsem_##api(__VA_ARGS__)
-  #define xwup_sem xwup_plsem
+#  define XWUP_SEM_API(api, ...) xwup_plsem_##api(__VA_ARGS__)
+#  define xwup_sem xwup_plsem
 #endif
 
 /**

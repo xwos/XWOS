@@ -31,8 +31,8 @@
 #include <xwos/mp/lock/seqlock.h>
 #include <xwos/mp/lock/mtx.h>
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
-  #include <xwos/mp/sync/evt.h>
-#endif /* XWMPCFG_SYNC_EVT */
+#  include <xwos/mp/sync/evt.h>
+#endif
 #include <xwos/mp/sync/obj.h>
 #include <xwos/mp/sync/sem.h>
 
@@ -43,7 +43,7 @@ void xwmp_synobj_construct(struct xwmp_synobj * synobj)
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
         synobj->sel.evt = NULL;
         synobj->sel.pos = 0;
-#endif /* XWMPCFG_SYNC_EVT */
+#endif
 }
 
 __xwmp_code
@@ -52,7 +52,7 @@ void xwmp_synobj_destruct(struct xwmp_synobj * synobj)
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
         synobj->sel.evt = NULL;
         synobj->sel.pos = 0;
-#endif /* XWMPCFG_SYNC_EVT */
+#endif
         xwos_object_destruct(&synobj->xwobj);
 }
 

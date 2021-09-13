@@ -26,7 +26,7 @@
 #include <soc.h>
 
 #ifndef __xwos_ospl_irq_h__
-  #error "This file should be included from <xwos/ospl/irq.h>."
+#  error "This file should be included from <xwos/ospl/irq.h>."
 #endif
 
 static __xwbsp_inline

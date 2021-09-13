@@ -40,7 +40,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_dev_vop = {
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
         .suspend = xwds_device_vop_suspend,
         .resume = xwds_device_vop_resume,
-#endif /* XWCDCFG_ds_PM */
+#endif
 };
 
 /******** ******** ******** constructor & destructor ******** ******** ********/
@@ -188,7 +188,7 @@ xwer_t xwds_device_vop_resume(struct xwds_device * dev)
         }
         return rc;
 }
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 /******** ******** ******** APIs ******** ******** ********/
 __xwds_code
@@ -544,4 +544,4 @@ xwer_t xwds_device_resume_all(struct xwds * ds, bool ign_err)
         xwos_sqlk_wr_unlock_cpuirqrs(&ds->devlistlock, cpuirq);
         return rc;
 }
-#endif /* XWCDCFG_ds_PM */
+#endif

@@ -24,20 +24,11 @@
 #include <xwos/osal/skd.h>
 #include <xwam/example/thread/create/mif.h>
 
-#define THD_1_PRIORITY                                          \
-        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+#define LOGTAG "thdcrt"
+#define thdcrtlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
 
-#define THD_2_PRIORITY                                          \
-        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 2)
-
-#if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-#define EXAMPLE_THREAD_CREATE_LOG_TAG         "thdcrt"
-#define thdcrtlogf(lv, fmt, ...)                                        \
-        xwlogf(lv, EXAMPLE_THREAD_CREATE_LOG_TAG, fmt, ##__VA_ARGS__)
-#else /* XWLIBCFG_LOG */
-#define thdcrtlogf(lv, fmt, ...)
-#endif /* !XWLIBCFG_LOG */
-
+#define THD_1_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+#define THD_2_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 2)
 xwer_t thd_1_func(void * arg);
 xwer_t thd_2_func(void * arg);
 

@@ -18,8 +18,8 @@
 #include <xwos/lib/rbtree.h>
 #include <xwos/up/lock/seqlock.h>
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
-  #include <xwos/up/bh.h>
-#endif /* XWUPCFG_SKD_BH */
+#  include <xwos/up/bh.h>
+#endif
 
 #define XWUP_TTN_TYPE_MASK            (3UL)
 
@@ -49,7 +49,7 @@ struct xwup_tt {
         struct xwup_sqlk lock; /**< 保护本结构体的自旋锁 */
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
         struct xwup_bh_node bhn; /**< 中断底半部节点 */
-#endif /* XWUPCFG_SKD_BH */
+#endif
         struct xwup_syshwt hwt; /**< 硬件定时器 */
 };
 

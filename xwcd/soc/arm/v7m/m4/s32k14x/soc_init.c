@@ -29,13 +29,13 @@
 #if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
 static __xwos_init_code
 void soc_relocate_isrtable(void);
-#endif /* !SOCCFG_RO_IVT */
+#endif
 
 extern xwu8_t xwos_ivt_lma_base[];
 extern xwu8_t xwos_ivt_vma_base[];
 extern xwu8_t xwos_ivt_vma_end[];
 
-__flscfg struct soc_flash_cfgs soc_flash_cfgs = {
+__flscfg struct soc_flash_cfg soc_flash_cfg = {
         .backdoor_key = {
                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
         },
@@ -60,7 +60,7 @@ void soc_init(void)
 
 #if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
         soc_relocate_isrtable();
-#endif /* !SOCCFG_RO_IVT */
+#endif
 
         /* Init scheduler of local CPU */
         rc = xwosplcb_skd_init_lc();
@@ -84,4 +84,4 @@ void soc_relocate_isrtable(void)
                 }
         }
 }
-#endif /* !SOCCFG_RO_IVT */
+#endif

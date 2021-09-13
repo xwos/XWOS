@@ -19,8 +19,8 @@
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/rtrq.h>
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
-  #include <xwos/mp/bh.h>
-#endif /* XWMPCFG_SKD_BH */
+#  include <xwos/mp/bh.h>
+#endif
 #include <xwos/mp/tt.h>
 
 #define XWMP_CPU_NUM                            ((xwid_t)CPUCFG_CPU_NUM)
@@ -33,8 +33,8 @@
 
 #define XWMP_SKD_IDLE_STK(xwskd)                (&((xwskd)->idle))
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
-  #define XWMP_SKD_BH_STK(xwskd)                (&((xwskd)->bh))
-#endif /* XWMPCFG_SKD_BH */
+#  define XWMP_SKD_BH_STK(xwskd)                (&((xwskd)->bh))
+#endif
 
 struct xwmp_pmdm;
 struct xwmp_skd;
@@ -161,7 +161,7 @@ struct __xwcc_alignl1cache xwmp_skd {
         xwsq_a dis_bh_cnt; /**< 关闭中断底半部的计数器 */
         struct xwmp_bh_cb bhcb; /**< 中断底半部控制块 */
         struct xwmp_skd_stack_info bh; /**< 中断底半部任务的栈信息 */
-#endif /* XWMPCFG_SKD_BH */
+#endif
         struct xwmp_tt tt; /**< 时间树 */
         struct xwmp_splk cxlock; /**< 上下文切换的锁 */
         struct xwmp_skd_pm pm; /**< 调度器电源管理控制块 */
@@ -186,7 +186,7 @@ struct xwmp_skd * xwmp_skd_dsbh(struct xwmp_skd * xwskd);
 struct xwmp_skd * xwmp_skd_enbh(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_req_bh(struct xwmp_skd * xwskd);
 bool xwmp_skd_tst_in_bh(struct xwmp_skd * xwskd);
-#endif /* XWMPCFG_SKD_BH */
+#endif
 
 void xwmp_skd_chkpmpt(struct xwmp_skd * xwskd);
 void xwmp_skd_chkpmpt_all(void);
@@ -212,7 +212,7 @@ xwid_t xwmp_skd_id_lc(void);
 struct xwmp_skd * xwmp_skd_dsbh_lc(void);
 struct xwmp_skd * xwmp_skd_enbh_lc(void);
 bool xwmp_skd_tst_in_bh_lc(void);
-#endif /* XWMPCFG_SKD_BH */
+#endif
 
 struct xwmp_skd * xwmp_skd_dspmpt_lc(void);
 struct xwmp_skd * xwmp_skd_enpmpt_lc(void);

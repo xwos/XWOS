@@ -14,9 +14,9 @@
 #define __xwos_osal_jack_sync_sem_h__
 
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/osdl/sync/sem.h>
+#  include <xwos/mp/osdl/sync/sem.h>
 #elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/osdl/sync/sem.h>
+#  include <xwos/up/osdl/sync/sem.h>
 #endif
 
 #endif /* xwos/osal/jack/sync/sem.h */

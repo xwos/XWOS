@@ -48,9 +48,9 @@
 #define __xwcc_likely(x)        __builtin_expect(!!(x), 1)
 #define __xwcc_unlikely(x)      __builtin_expect(!!(x), 0)
 #if defined(CPUCFG_L1_CACHELINE_SIZE)
-  #define __xwcc_alignl1cache   __xwcc_aligned(CPUCFG_L1_CACHELINE_SIZE)
+#  define __xwcc_alignl1cache   __xwcc_aligned(CPUCFG_L1_CACHELINE_SIZE)
 #else
-  #define __xwcc_alignl1cache   __xwcc_aligned(sizeof(void *))
+#  define __xwcc_alignl1cache   __xwcc_aligned(sizeof(void *))
 #endif
 #define __xwcc_alignptr         __xwcc_aligned(sizeof(void *))
 #define xwcc_offsetof(type, member) __builtin_offsetof(type, member)

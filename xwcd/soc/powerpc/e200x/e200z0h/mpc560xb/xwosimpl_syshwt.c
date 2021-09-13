@@ -28,11 +28,11 @@
 #define SYSHWT_SRCCLK           SOCCFG_SYSHWT_SRCCLK
 
 #if (0 == SYSHWT_CH)
-  #define SYSHWT_IRQN           IRQ_PIT0
+#  define SYSHWT_IRQN           IRQ_PIT0
 #elif (1 == SYSHWT_CH)
-  #define SYSHWT_IRQN           IRQ_PIT1
+#  define SYSHWT_IRQN           IRQ_PIT1
 #elif (2 == SYSHWT_CH)
-  #define SYSHWT_IRQN           IRQ_PIT2
+#  define SYSHWT_IRQN           IRQ_PIT2
 #endif
 
 __xwbsp_rodata const struct soc_irq_cfg soc_syshwt_irq_cfg = {

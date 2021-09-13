@@ -22,8 +22,8 @@
 #define __arch_e200x_core_h__
 
 #ifndef __ASM__
-#include <xwos/standard.h>
-#endif /* #ifndef __ASM__ */
+#  include <xwos/standard.h>
+#endif
 
 #ifndef __ASM__
 /**
@@ -72,6 +72,6 @@ xwer_t stwcx(volatile void * addr, xwu32_t value);
 xwu32_t lwbrx(volatile xwu32_t * addr);
 xwu16_t lhbrx(volatile xwu16_t * addr);
 
-#endif /* #ifndef __ASM__ */
+#endif
 
 #endif /* e200x_core.h */

@@ -21,7 +21,7 @@
  */
 
 #if defined(XWLIBCFG_SETJMP) && (1 == XWLIBCFG_SETJMP)
-#include <xwos/ospl/soc/setjmp.h>
+#  include <xwos/ospl/soc/setjmp.h>
 
 /**
  * @brief 设置跳转点并保存上下文到buffer
@@ -38,15 +38,15 @@ int xwlib_setjmp(xwjmpbuf_b ctx);
  */
 __xwcc_noreturn void xwlib_longjmp(xwjmpbuf_b ctx, int val);
 
-#else /* XWLIBCFG_SETJMP */
+#else
 
-#include <setjmp.h>
+#  include <setjmp.h>
 
 typedef jmp_buf xwjmpbuf_b;
-#define xwlib_setjmp(ctx) setjmp(ctx)
-#define xwlib_longjmp(ctx, val) longjmp(ctx, val);
+#  define xwlib_setjmp(ctx) setjmp(ctx)
+#  define xwlib_longjmp(ctx, val) longjmp(ctx, val);
 
-#endif /* !XWLIBCFG_SETJMP */
+#endif
 
 /**
  * @} setjmp

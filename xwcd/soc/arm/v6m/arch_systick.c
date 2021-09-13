@@ -28,9 +28,9 @@
 #include <arch_systick.h>
 
 #ifdef BRDCFG_SYSHWT_SRCCLK
-  #define ARCH_SYSHWT_SRCCLK    BRDCFG_SYSHWT_SRCCLK
+#  define ARCH_SYSHWT_SRCCLK    BRDCFG_SYSHWT_SRCCLK
 #else
-  #define ARCH_SYSHWT_SRCCLK    BRDCFG_SYSCLK
+#  define ARCH_SYSHWT_SRCCLK    BRDCFG_SYSCLK
 #endif
 
 __xwbsp_rodata const struct soc_irq_cfg cortex_m_systick_irqcfg = {

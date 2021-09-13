@@ -270,7 +270,7 @@ xwer_t xwds_st7735_drv_suspend(struct xwds_device * dev)
 {
         return xwds_st7735_drv_stop(dev);
 }
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 /******** ******** ******** APIs ******** ******** ********/
 xwer_t xwds_st7735_cfgbus(struct xwds_st7735 * st7735, xwtm_t * xwtm)

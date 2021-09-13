@@ -33,7 +33,7 @@ xwer_t stm32cube_st7735_drv_stop(struct xwds_device * dev);
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 xwer_t stm32cube_st7735_drv_resume(struct xwds_device * dev);
 xwer_t stm32cube_st7735_drv_suspend(struct xwds_device * dev);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 xwer_t stm32cube_st7735_drv_write(struct xwds_st7735 * st7735, xwu8_t reg,
                                   const xwu8_t * data, xwsz_t * size,
@@ -55,7 +55,7 @@ const struct xwds_st7735_driver stm32cube_st7735_drv = {
 #if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
                         .suspend = stm32cube_st7735_drv_suspend,
                         .resume =  stm32cube_st7735_drv_resume,
-#endif /* XWMDCFG_ds_PM */
+#endif
                 },
         },
         .write = stm32cube_st7735_drv_write,
@@ -164,7 +164,7 @@ xwer_t stm32cube_st7735_drv_suspend(struct xwds_device * dev)
 {
         return stm32cube_st7735_drv_stop(dev);
 }
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 
 xwer_t stm32cube_st7735_drv_write(struct xwds_st7735 * st7735, xwu8_t reg,

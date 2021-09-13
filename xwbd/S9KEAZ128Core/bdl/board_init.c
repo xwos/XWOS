@@ -47,11 +47,11 @@ void bdl_clk_init(void)
 {
 #if defined(BRDCFG_ICS_OSC) && (1 == BRDCFG_ICS_OSC)
         soc_osc.cr.bit.hgo = BRDCFG_ICS_OSC_HG;
-  #if (BRDCFG_ICS_OSC_VALUE >= 4000000U)
+#  if (BRDCFG_ICS_OSC_VALUE >= 4000000U)
         soc_osc.cr.bit.range = 1;
-  #else
+#  else
         soc_osc.cr.bit.range = 0;
-  #endif
+#  endif
         soc_osc.cr.bit.oscos = BRDCFG_ICS_OSC_IS_CRYSTAL;
         soc_osc.cr.bit.oscsten = BRDCFG_ICS_OSC_STEN;
         soc_osc.cr.bit.oscen = 1;
@@ -131,7 +131,7 @@ void bdl_clk_init(void)
         soc_ics.c1.bit.irefs = 0;
         soc_ics.c1.bit.clks = 2;
 #else
-  #error "Unknown clock mode !"
+#  error "Unknown clock mode !"
 #endif
         /* clear Loss of lock sticky bit */
         soc_ics.s.bit.lols = 1;

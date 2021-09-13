@@ -22,7 +22,7 @@
 #define __xwosimpl_soc_type_h__
 
 #ifndef __xwos_ospl_soc_type_h__
-  #error "This file should be included from <xwos/ospl/soc/type.h>."
+#  error "This file should be included from <xwos/ospl/soc/type.h>."
 #endif
 
 #include <cfg/XuanWuOS.h>
@@ -106,53 +106,53 @@ typedef int32_t xwirq_t; /**< 中断号 (有符号) */
 typedef int32_t xwpr_t; /**< 优先级 (有符号) */
 
 #ifndef UCHAR_MAX
-  #define UCHAR_MAX             ((unsigned char)(~((unsigned char)0)))
+#  define UCHAR_MAX             ((unsigned char)(~((unsigned char)0)))
 #endif
 #ifndef CHAR_MAX
-  #define CHAR_MAX              ((signed char)(UCHAR_MAX >> 1))
+#  define CHAR_MAX              ((signed char)(UCHAR_MAX >> 1))
 #endif
 #ifndef CHAR_MIN
-  #define CHAR_MIN              ((signed char)(-CHAR_MAX - 1))
+#  define CHAR_MIN              ((signed char)(-CHAR_MAX - 1))
 #endif
 
 #ifndef USHRT_MAX
-  #define USHRT_MAX             ((unsigned short)(~((unsigned short)0)))
+#  define USHRT_MAX             ((unsigned short)(~((unsigned short)0)))
 #endif
 #ifndef SHRT_MAX
-  #define SHRT_MAX              ((signed short)(USHRT_MAX>>1))
+#  define SHRT_MAX              ((signed short)(USHRT_MAX>>1))
 #endif
 #ifndef SHRT_MIN
-  #define SHRT_MIN              ((signed short)(-SHRT_MAX - 1))
+#  define SHRT_MIN              ((signed short)(-SHRT_MAX - 1))
 #endif
 
 #ifndef UINT_MAX
-  #define UINT_MAX              ((unsigned int)(~((unsigned int)0)))
+#  define UINT_MAX              ((unsigned int)(~((unsigned int)0)))
 #endif
 #ifndef INT_MAX
-  #define INT_MAX               ((signed int)(UINT_MAX >> 1))
+#  define INT_MAX               ((signed int)(UINT_MAX >> 1))
 #endif
 #ifndef INT_MIN
-  #define INT_MIN               ((signed int)(-INT_MAX - 1))
+#  define INT_MIN               ((signed int)(-INT_MAX - 1))
 #endif
 
 #ifndef ULONG_MAX
-  #define ULONG_MAX             ((unsigned long)(~((unsigned long)0)))
+#  define ULONG_MAX             ((unsigned long)(~((unsigned long)0)))
 #endif
 #ifndef LONG_MAX
-  #define LONG_MAX              ((signed long)(ULONG_MAX >> 1))
+#  define LONG_MAX              ((signed long)(ULONG_MAX >> 1))
 #endif
 #ifndef LONG_MIN
-  #define LONG_MIN              ((signed long)(-LONG_MAX - 1))
+#  define LONG_MIN              ((signed long)(-LONG_MAX - 1))
 #endif
 
 #ifndef ULLONG_MAX
-  #define ULLONG_MAX            ((unsigned long long)(~((unsigned long long)0)))
+#  define ULLONG_MAX            ((unsigned long long)(~((unsigned long long)0)))
 #endif
 #ifndef LLONG_MAX
-  #define LLONG_MAX             ((signed long long)(ULLONG_MAX >> 1))
+#  define LLONG_MAX             ((signed long long)(ULLONG_MAX >> 1))
 #endif
 #ifndef LLONG_MIN
-  #define LLONG_MIN             ((signed long long)(-LLONG_MAX - 1))
+#  define LLONG_MIN             ((signed long long)(-LLONG_MAX - 1))
 #endif
 
 #define XWU8_MAX                ((xwu8_t)(~((xwu8_t)0)))
@@ -172,61 +172,61 @@ typedef int32_t xwpr_t; /**< 优先级 (有符号) */
 #define XWS64_MIN               ((xws64_t)(-XWS64_MAX - 1))
 
 #ifndef XWSZ_MAX
-  #define XWSZ_MAX              ((xwsz_t)(~((xwsz_t)0)))
+#  define XWSZ_MAX              ((xwsz_t)(~((xwsz_t)0)))
 #endif
 #ifndef XWSSZ_MAX
-  #define XWSSZ_MAX             ((xwssz_t)(XWSZ_MAX >> 1))
+#  define XWSSZ_MAX             ((xwssz_t)(XWSZ_MAX >> 1))
 #endif
 #ifndef XWSSZ_MIN
-  #define XWSSZ_MIN             ((xwssz_t)(-XWSSZ_MAX - 1))
+#  define XWSSZ_MIN             ((xwssz_t)(-XWSSZ_MAX - 1))
 #endif
 
 #ifndef XWPTR_MAX
-  #define XWPTR_MAX             ((xwptr_t)(~0UL))
+#  define XWPTR_MAX             ((xwptr_t)(~0UL))
 #endif
 
 #ifndef XWREG_MAX
-  #define XWREG_MAX             ((xwreg_t)(~((xwreg_t)0)))
+#  define XWREG_MAX             ((xwreg_t)(~((xwreg_t)0)))
 #endif
 #ifndef XWSREG_MAX
-  #define XWSREG_MAX            ((xwsreg_t)(REG_MAX >> 1))
+#  define XWSREG_MAX            ((xwsreg_t)(REG_MAX >> 1))
 #endif
 #ifndef XWSREG_MIN
-  #define XWSREG_MIN            ((xwsreg_t)(-XWSREG_MAX - 1))
+#  define XWSREG_MIN            ((xwsreg_t)(-XWSREG_MAX - 1))
 #endif
 
 #ifndef XWSQ_MAX
-  #define XWSQ_MAX              ((xwsq_t)(~((xwsq_t)0)))
+#  define XWSQ_MAX              ((xwsq_t)(~((xwsq_t)0)))
 #endif
 #ifndef XWSSQ_MAX
-  #define XWSSQ_MAX             ((xwssq_t)(XWSQ_MAX >> 1))
+#  define XWSSQ_MAX             ((xwssq_t)(XWSQ_MAX >> 1))
 #endif
 #ifndef XWSSQ_MIN
-  #define XWSSQ_MIN             ((xwssq_t)(-XWSSQ_MAX - 1))
+#  define XWSSQ_MIN             ((xwssq_t)(-XWSSQ_MAX - 1))
 #endif
 
 #ifndef XWID_MAX
-  #define XWID_MAX              ((xwid_t)(~((xwid_t)0)))
+#  define XWID_MAX              ((xwid_t)(~((xwid_t)0)))
 #endif
 #ifndef XWSID_MAX
-  #define XWSID_MAX             ((xwsid_t)(XWID_MAX >> 1))
+#  define XWSID_MAX             ((xwsid_t)(XWID_MAX >> 1))
 #endif
 #ifndef XWSID_MIN
-  #define XWSID_MIN             ((xwsid_t)(-XWSID_MAX - 1))
+#  define XWSID_MIN             ((xwsid_t)(-XWSID_MAX - 1))
 #endif
 
 #ifndef XWIRQ_MAX
-  #define XWIRQ_MAX             ((xwirq_t)((~0UL) >> 1))
+#  define XWIRQ_MAX             ((xwirq_t)((~0UL) >> 1))
 #endif
 #ifndef XWIRQ_MIN
-  #define XWIRQ_MIN             ((xwirq_t)(-XWIRQ_MAX - 1))
+#  define XWIRQ_MIN             ((xwirq_t)(-XWIRQ_MAX - 1))
 #endif
 
 #ifndef XWPR_MAX
-  #define XWPR_MAX              ((xwpr_t)((~0UL) >> 1))
+#  define XWPR_MAX              ((xwpr_t)((~0UL) >> 1))
 #endif
 #ifndef XWPR_MIN
-  #define XWPR_MIN              ((xwpr_t)(-XWPR_MAX - 1))
+#  define XWPR_MIN              ((xwpr_t)(-XWPR_MAX - 1))
 #endif
 
 #define XWU8_T__SIZE

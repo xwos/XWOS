@@ -14,9 +14,9 @@
 #define __xwos_osal_jack_pm_h__
 
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/osdl/pm.h>
+#  include <xwos/mp/osdl/pm.h>
 #elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/osdl/pm.h>
+#  include <xwos/up/osdl/pm.h>
 #endif
 
 #endif /* xwos/osal/jack/pm.h */

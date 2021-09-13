@@ -41,7 +41,7 @@ xwer_t xwds_linc_vop_suspend(struct xwds_linc * linc);
 
 static __xwds_vop
 xwer_t xwds_linc_vop_resume(struct xwds_linc * linc);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 __xwds_rodata const struct xwds_virtual_operation xwds_linc_vop = {
         .probe = (void *)xwds_linc_vop_probe,
@@ -51,7 +51,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_linc_vop = {
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
         .suspend = (void *)xwds_linc_vop_suspend,
         .resume = (void *)xwds_linc_vop_resume,
-#endif /* XWCDCFG_ds_PM */
+#endif
 };
 
 /******** ******** ******** constructor & destructor ******** ******** ********/
@@ -184,7 +184,7 @@ xwer_t xwds_linc_vop_resume(struct xwds_linc * linc)
         rc = xwds_device_vop_resume(&linc->dev);
         return rc;
 }
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 /******** ******** ******** APIs ******** ******** ********/
 /**

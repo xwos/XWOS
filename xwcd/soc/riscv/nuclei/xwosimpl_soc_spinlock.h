@@ -22,7 +22,7 @@
 #define __xwosimpl_soc_spinlock_h__
 
 #ifndef __xwos_ospl_soc_spinlock_h__
-  #error "This file should be included from <xwos/ospl/soc/spinlock.h>."
+#  error "This file should be included from <xwos/ospl/soc/spinlock.h>."
 #endif
 
 struct soc_splk {

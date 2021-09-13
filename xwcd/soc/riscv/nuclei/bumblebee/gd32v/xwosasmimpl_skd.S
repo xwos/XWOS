@@ -25,10 +25,10 @@
 #ifndef __riscv_32e
         .equ SOC_CALLER_CONTEXT_SIZE, (20 * REGBYTES)
         .equ SOC_CALLEE_CONTEXT_SIZE, (13 * REGBYTES)
-#else /* !__riscv_32e */
+#else
         .equ SOC_CALLER_CONTEXT_SIZE, (14 * REGBYTES)
         .equ SOC_CALLEE_CONTEXT_SIZE, (3 * REGBYTES)
-#endif /* __riscv_32e */
+#endif
         .equ SOC_CONTEXT_SIZE, (SOC_CALLER_CONTEXT_SIZE + SOC_CALLEE_CONTEXT_SIZE)
 
         .extern         soc_skd_chk_swcx
@@ -53,7 +53,7 @@
         STORE           s9, 10 * REGBYTES (\sp)
         STORE           s10, 11 * REGBYTES (\sp)
         STORE           s11, 12 * REGBYTES (\sp)
-#endif /* !__riscv_32e */
+#endif
         .endm
 
 /**
@@ -71,7 +71,7 @@
         LOAD            s4, 5 * REGBYTES (\sp)
         LOAD            s3, 4 * REGBYTES (\sp)
         LOAD            s2, 3 * REGBYTES (\sp)
-#endif /* !__riscv_32e */
+#endif
         LOAD            \tmp, 2 * REGBYTES (\sp)
         csrw            mstatus, \tmp
         LOAD            s1, 1 * REGBYTES (\sp)
@@ -90,7 +90,7 @@
         LOAD            t3, 16 * REGBYTES (\sp)
         LOAD            a7, 15 * REGBYTES (\sp)
         LOAD            a6, 14 * REGBYTES (\sp)
-#endif /* !__riscv_32e */
+#endif
         LOAD            \tmp, 13 * REGBYTES (\sp)
         csrw            CSR_MSUBM, \tmp
         LOAD            \tmp, 12 * REGBYTES (\sp)

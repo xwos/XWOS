@@ -15,7 +15,7 @@
 #ifdef __cplusplus
 
 #if __cplusplus < 201103L
-  #error "Should use C++11 or later C++ standard!"
+#  error "Should use C++11 or later C++ standard!"
 #endif
 
 extern "C" {

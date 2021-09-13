@@ -28,12 +28,11 @@
 #include <xwam/application/w25qrpt/hwifal.h>
 
 #if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-  #define W25QRPT_LOG_TAG       "w25qrpt"
-  #define w25qrptlogf(lv, fmt, ...) \
-        xwlogf(lv, W25QRPT_LOG_TAG, fmt, ##__VA_ARGS__)
-#else /* XWLIBCFG_LOG */
-  #define w25qrptlogf(lv, fmt, ...)
-#endif /* !XWLIBCFG_LOG */
+#  define W25QRPT_LOG_TAG "w25qrpt"
+#  define w25qrptlogf(lv, fmt, ...) xwlogf(lv, W25QRPT_LOG_TAG, fmt, ##__VA_ARGS__)
+#else
+#  define w25qrptlogf(lv, fmt, ...)
+#endif
 
 /**
  * @brief W25Qxx编程器

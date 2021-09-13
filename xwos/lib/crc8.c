@@ -52,7 +52,7 @@ __xwlib_rodata const xwu8_t xwlib_crc8tbl_0x07[256] = {
         0xDE, 0xD9, 0xD0, 0xD7, 0xC2, 0xC5, 0xCC, 0xCB,
         0xE6, 0xE1, 0xE8, 0xEF, 0xFA, 0xFD, 0xF4, 0xF3,
 };
-#endif /* XWLIBCFG_CRC8_0X07 */
+#endif
 
 #if defined(XWLIBCFG_CRC8_0X31) && (1 == XWLIBCFG_CRC8_0X31)
 /**
@@ -92,7 +92,7 @@ __xwlib_rodata const xwu8_t xwlib_crc8tbl_0x31[256] = {
         0x82, 0xB3, 0xE0, 0xD1, 0x46, 0x77, 0x24, 0x15,
         0x3B, 0x0A, 0x59, 0x68, 0xFF, 0xCE, 0x9D, 0xAC,
 };
-#endif /* XWLIBCFG_CRC8_0X31 */
+#endif
 
 #if defined(XWLIBCFG_CRC8_0X9B) && (1 == XWLIBCFG_CRC8_0X9B)
 /**
@@ -132,16 +132,16 @@ __xwlib_rodata const xwu8_t xwlib_crc8tbl_0x9B[256] = {
         0x95, 0x0E, 0x38, 0xA3, 0x54, 0xCF, 0xF9, 0x62,
         0x8C, 0x17, 0x21, 0xBA, 0x4D, 0xD6, 0xE0, 0x7B,
 };
-#endif /* XWLIBCFG_CRC8_0X31 */
+#endif
 
 #if defined(SOCCFG_CRC8) && (1 == SOCCFG_CRC8)
 extern
 xwer_t soc_crc8_cal(xwu8_t * crc8,
                     bool refin, xwu8_t polynomial,
                     const xwu8_t stream[], xwsz_t * size);
-#else /* SOCCFG_CRC8 */
-  #define soc_crc8_cal(crc8, refin, plynml, stream, size)       (-EOPNOTSUPP)
-#endif /* !SOCCFG_CRC8 */
+#else
+#  define soc_crc8_cal(crc8, refin, plynml, stream, size)       (-EOPNOTSUPP)
+#endif
 
 static __xwlib_code
 xwer_t xwlib_crc8_swcal(xwu8_t * crc8,
@@ -178,17 +178,17 @@ xwer_t xwlib_crc8_swcal(xwu8_t * crc8,
         case 0x7:
                 table = xwlib_crc8tbl_0x07;
                 break;
-#endif /* XWLIBCFG_CRC8_0X07 */
+#endif
 #if defined(XWLIBCFG_CRC8_0X31) && (1 == XWLIBCFG_CRC8_0X31)
         case 0x31:
                 table = xwlib_crc8tbl_0x31;
                 break;
-#endif /* XWLIBCFG_CRC8_0X31 */
+#endif
 #if defined(XWLIBCFG_CRC8_0X9B) && (1 == XWLIBCFG_CRC8_0X9B)
         case 0x9B:
                 table = xwlib_crc8tbl_0x9B;
                 break;
-#endif /* XWLIBCFG_CRC8_0X9B */
+#endif
         default:
                 table = NULL;
                 break;

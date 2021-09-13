@@ -22,15 +22,15 @@
 #define __xwosimpl_soc_compiler_h__
 
 #ifndef __xwos_ospl_soc_compiler_h__
-  #error "This file should be included from <xwos/ospl/soc/compiler.h>."
+#  error "This file should be included from <xwos/ospl/soc/compiler.h>."
 #endif
 
 #if defined(__llvm__)
-  #include <compiler/llvm.h>
+#  include <compiler/llvm.h>
 #elif defined(__GNUC__)
-  #include <compiler/gcc.h>
+#  include <compiler/gcc.h>
 #else
-  #error "Unknown compiler!"
+#  error "Unknown compiler!"
 #endif
 
 #endif /* xwosimpl_soc_compiler.h */

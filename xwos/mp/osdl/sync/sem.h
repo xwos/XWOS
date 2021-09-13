@@ -208,8 +208,8 @@ xwer_t xwosdl_sem_wait_unintr(struct xwosdl_sem * sem)
         return xwmp_plsem_wait_unintr(sem);
 }
 
-#else /* XWMPCFG_SYNC_PLSEM */
-  #error "Can't find the semaphore configuration!"
-#endif /* !XWMPCFG_SYNC_PLSEM */
+#else
+#  error "Can't find the semaphore configuration!"
+#endif
 
 #endif /* xwos/mp/osdl/sync/sem.h */

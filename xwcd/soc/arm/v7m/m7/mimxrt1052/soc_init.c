@@ -29,7 +29,7 @@
 #if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
 static __xwos_init_code
 void soc_relocate_isrtable(void);
-#endif /* !SOCCFG_RO_IVT */
+#endif
 
 static __xwbsp_init_code
 void soc_relocate(void);
@@ -70,7 +70,7 @@ void soc_init(void)
 
 #if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
         soc_relocate_isrtable();
-#endif /* !SOCCFG_RO_IVT */
+#endif
         soc_relocate();
 
         /* Init scheduler of local CPU */
@@ -95,7 +95,7 @@ void soc_relocate_isrtable(void)
                 }
         }
 }
-#endif /* !SOCCFG_RO_IVT */
+#endif
 
 static __xwbsp_init_code
 void soc_relocate(void)

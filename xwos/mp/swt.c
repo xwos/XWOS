@@ -15,10 +15,10 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_SKD_SWT_MEMSLICE) && (1 == XWMPCFG_SKD_SWT_MEMSLICE)
-  #include <xwos/mm/memslice.h>
+#  include <xwos/mm/memslice.h>
 #elif defined(XWMPCFG_SKD_SWT_STDC_MM) && (1 == XWMPCFG_SKD_SWT_STDC_MM)
-  #include <stdlib.h>
-#endif /* XWMPCFG_SKD_SWT_STDC_MM */
+#  include <stdlib.h>
+#endif
 #include <xwos/mp/skd.h>
 #include <xwos/mp/tt.h>
 #include <xwos/mp/swt.h>
@@ -57,7 +57,7 @@ static __xwmp_data struct xwmm_memslice xwmp_swt_cache;
  * @brief 软件定时器对象缓存的名字
  */
 const __xwmp_rodata char xwmp_swt_cache_name[] = "xwos.mp.swt.cache";
-#endif /* XWMPCFG_SKD_SWT_MEMSLICE */
+#endif
 
 #if defined(XWMPCFG_SKD_SWT_MEMSLICE) && (1 == XWMPCFG_SKD_SWT_MEMSLICE)
 /**
@@ -80,7 +80,7 @@ xwer_t xwmp_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                 (dtor_f)xwmp_swt_destruct);
         return rc;
 }
-#endif /* XWMPCFG_SKD_SWT_MEMSLICE */
+#endif
 
 /**
  * @brief 从软件定时器对象缓存中申请一个对象

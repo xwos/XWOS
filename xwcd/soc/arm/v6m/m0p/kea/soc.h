@@ -24,14 +24,15 @@
 #include <xwos/standard.h>
 
 #if (defined(SOCCFG_CHIP_KEA128) && (1 == SOCCFG_CHIP_KEA128))
-  #define KEA128
+#  define KEA128
 #elif (defined(SOCCFG_CHIP_KEA64) && (1 == SOCCFG_CHIP_KEA64))
-  #define KEA64
+#  define KEA64
 #elif (defined(SOCCFG_CHIP_KEA8) && (1 == SOCCFG_CHIP_KEA8))
-  #define KEA8
-  #error "unsupport SOC!"
+#  define KEA8
+#else
+#  error "unsupport SOC!"
 #endif
 
-#define __flscfg        __xwcc_section(".flash.cfg")
+#define __flscfg __xwcc_section(".flash.cfg")
 
 #endif /* soc.h */

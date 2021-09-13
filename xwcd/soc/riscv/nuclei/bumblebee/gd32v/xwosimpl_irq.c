@@ -165,7 +165,7 @@ xwer_t xwospl_irq_request(xwirq_t irqn, xwisr_f isrfunc, void * data,
                         idvt->exc[esri] = data;
                 }
         }
-#endif /* !SOCCFG_RO_IVT */
+#endif
         if (cfg) {
                 xwospl_irq_cfg(irqn, cfg);
         }
@@ -195,7 +195,7 @@ xwer_t xwospl_irq_release(xwirq_t irqn)
                         idvt->exc[esri] = NULL;
                 }
         }
-#endif /* !SOCCFG_RO_IVT */
+#endif
         return XWOK;
 }
 

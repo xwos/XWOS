@@ -14,9 +14,9 @@
 #define __xwos_osal_jack_lock_mtx_h__
 
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/osdl/lock/mtx.h>
+#  include <xwos/mp/osdl/lock/mtx.h>
 #elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/osdl/lock/mtx.h>
+#  include <xwos/up/osdl/lock/mtx.h>
 #endif
 
 #endif /* xwos/osal/jack/lock/mtx.h */

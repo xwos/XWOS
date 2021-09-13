@@ -22,7 +22,7 @@
 #include <armv7m_core.h>
 #include <arch_irq.h>
 #if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
-  #include <arch_fpu.h>
+#  include <arch_fpu.h>
 #endif
 #include <arch_image.h>
 #include <arch_nvic.h>
@@ -69,7 +69,7 @@ void arch_lowlevel_init(void)
         cm_scs.scb.ccr.bit.div_0_trp = 1; /* enable divide by 0 trap */
 #if (ARCHCFG_FPU == 1)
         arch_fpu_init();
-#endif /* #if (ARCHCFG_FPU == 1) */
+#endif
         arch_init_sysirqs();
 }
 

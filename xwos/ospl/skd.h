@@ -16,29 +16,29 @@
 #include <xwos/standard.h>
 
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/skd.h>
-  #include <xwos/mp/thd.h>
+#  include <xwos/mp/skd.h>
+#  include <xwos/mp/thd.h>
 
-  #define xwospl_skd_stack_info         xwmp_skd_stack_info
-  #define xwospl_skd                    xwmp_skd
-  #define xwospl_thd                    xwmp_thd
-  #define XWOSPL_SKDATTR_PRIVILEGED     XWMP_SKDATTR_PRIVILEGED
+#  define xwospl_skd_stack_info         xwmp_skd_stack_info
+#  define xwospl_skd                    xwmp_skd
+#  define xwospl_thd                    xwmp_thd
+#  define XWOSPL_SKDATTR_PRIVILEGED     XWMP_SKDATTR_PRIVILEGED
 #elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/skd.h>
-  #include <xwos/up/thd.h>
+#  include <xwos/up/skd.h>
+#  include <xwos/up/thd.h>
 
-  #define xwospl_skd_stack_info         xwup_skd_stack_info
-  #define xwospl_skd                    xwup_skd
-  #define xwospl_thd                    xwup_thd
-  #define XWOSPL_SKDATTR_PRIVILEGED     XWUP_SKDATTR_PRIVILEGED
+#  define xwospl_skd_stack_info         xwup_skd_stack_info
+#  define xwospl_skd                    xwup_skd
+#  define xwospl_thd                    xwup_thd
+#  define XWOSPL_SKDATTR_PRIVILEGED     XWUP_SKDATTR_PRIVILEGED
 #else
-  #error "Can't find the configuration XuanWuOS_CFG_CORE!"
+#  error "Can't find the configuration XuanWuOS_CFG_CORE!"
 #endif
 
 #if defined(XWMMCFG_STACK_WATERMARK)
-  #define XWOSPL_STACK_WATERMARK XWMMCFG_STACK_WATERMARK
+#  define XWOSPL_STACK_WATERMARK XWMMCFG_STACK_WATERMARK
 #else
-  #define XWOSPL_STACK_WATERMARK (8U)
+#  define XWOSPL_STACK_WATERMARK (8U)
 #endif
 
 struct xwospl_skd_stack_info;
@@ -137,7 +137,7 @@ xwer_t xwospl_thd_outmigrate(struct xwospl_thd * thd, xwid_t cpuid);
  * @param[in] cpuid: 目的地CPU的ID
  */
 void xwospl_thd_immigrate(struct xwospl_thd * thd, xwid_t cpuid);
-#endif /* XuanWuOS_CFG_CORE__mp */
+#endif
 
 #include <xwosimpl_skd.h>
 

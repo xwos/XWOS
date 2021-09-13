@@ -102,7 +102,7 @@ xwer_t main_task(void * arg)
         if (rc < 0) {
                 goto err_xwlua_start;
         }
-#endif /* XWEMCFG_vm_lua */
+#endif
 
         rc = example_cxx_start();
         if (rc < 0) {
@@ -115,7 +115,7 @@ err_example_cxx_start:
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
         BDL_BUG();
 err_xwlua_start:
-#endif /* XWEMCFG_vm_lua */
+#endif
         BDL_BUG();
 err_btn_start:
         BDL_BUG();

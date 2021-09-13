@@ -42,7 +42,7 @@ xwer_t xwds_spim_vop_suspend(struct xwds_spim * spim);
 
 static __xwds_vop
 xwer_t xwds_spim_vop_resume(struct xwds_spim * spim);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 __xwds_rodata const struct xwds_virtual_operation xwds_spim_vop = {
         .probe = (void *)xwds_spim_vop_probe,
@@ -52,7 +52,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_spim_vop = {
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
         .suspend = (void *)xwds_spim_vop_suspend,
         .resume = (void *)xwds_spim_vop_resume,
-#endif /* XWCDCFG_ds_PM */
+#endif
 };
 
 /******** ******** ******** constructor & destructor ******** ******** ********/
@@ -185,7 +185,7 @@ xwer_t xwds_spim_vop_resume(struct xwds_spim * spim)
         rc = xwds_device_vop_resume(&spim->dev);
         return rc;
 }
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 /******** ******** ******** SPI Master Device APIs ******** ******** ********/
 /**

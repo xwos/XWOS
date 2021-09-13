@@ -59,7 +59,7 @@ int xwpf(const char * fmt, ...)
                 i = (int)sz;
         }
 #else
-  #warning "Can't find the log configurations!"
+#  warning "Can't find the log configurations!"
         i = 0;
 #endif
 

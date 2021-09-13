@@ -24,16 +24,10 @@
 #include <xwos/osal/sync/br.h>
 #include <xwam/example/sync/br/mif.h>
 
+#define LOGTAG "br"
+#define brlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
+
 #define XWBRDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
-
-#if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-  #define XWBRDEMO_LOG_TAG      "br"
-  #define brlogf(lv, fmt, ...)                                  \
-          xwlogf(lv, XWBRDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
-#else /* XWLIBCFG_LOG */
-  #define brlogf(lv, fmt, ...)
-#endif /* !XWLIBCFG_LOG */
-
 xwer_t xwbrdemo_thd_func(void * arg);
 
 const struct xwos_thd_desc xwbrdemo_thd_desc[] = {

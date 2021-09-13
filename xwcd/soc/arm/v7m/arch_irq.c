@@ -25,8 +25,8 @@
 #include <arch_irq.h>
 #include <arch_skd.h>
 
-#define SOC_EXC_FAULT_PRIO      (SOC_IRQ_PRIO_HIGHEST | SOC_IRQ_SUBPRIO_HIGHEST)
-#define SOC_EXC_SVC_PRIO        (SOC_IRQ_PRIO_HIGHEST | SOC_IRQ_SUBPRIO_LOWEST)
+#define SOC_EXC_FAULT_PRIO (SOC_IRQ_PRIO_HIGHEST | SOC_IRQ_SUBPRIO_HIGHEST)
+#define SOC_EXC_SVC_PRIO (SOC_IRQ_PRIO_HIGHEST | SOC_IRQ_SUBPRIO_LOWEST)
 
 xws64_t soc_xwsc_entry(xwsc_f func, xwptr_t argnum, xwptr_t * args, xwreg_t old_lr);
 

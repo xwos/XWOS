@@ -25,8 +25,8 @@
 #include <arch_skd.h>
 #include <arch_nvic.h>
 
-#define SOC_EXC_FAULT_PRIO      (SOC_IRQ_PRIO_HIGHEST)
-#define SOC_EXC_SVC_PRIO        (SOC_IRQ_PRIO_HIGHEST)
+#define SOC_EXC_FAULT_PRIO (SOC_IRQ_PRIO_HIGHEST)
+#define SOC_EXC_SVC_PRIO (SOC_IRQ_PRIO_HIGHEST)
 
 /**
  * @brief Setup Architecture Fault

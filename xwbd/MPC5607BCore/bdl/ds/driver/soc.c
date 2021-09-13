@@ -38,8 +38,8 @@
 #include <bdl/ds/driver/soc.h>
 
 #if defined(XWCDCFG_ds_SOC_DMA) && (1 == XWCDCFG_ds_SOC_DMA)
-#if defined(MPC5607B)
-#define EDMA_CH_ISR(x)                                                  \
+#  if defined(MPC5607B)
+#    define EDMA_CH_ISR(x)                                              \
 __xwbsp_isr                                                             \
 void mpc560xb_edma_ch##x##_isr(void)                                    \
 {                                                                       \
@@ -65,8 +65,8 @@ void mpc560xb_edma_ch##x##_isr(void)                                    \
         }                                                               \
         EDMA.CIRQR.R = (xwu8_t)ch;                                      \
 }
-#endif /* MPC5607B */
-#endif /* XWCDCFG_ds_SOC_DMA */
+#  endif
+#endif
 
 static __xwbsp_code
 xwer_t mpc560xb_soc_check_desc(struct xwds_soc * soc);
@@ -153,7 +153,7 @@ xwer_t mpc560xb_soc_drv_dma_start(struct xwds_soc * soc, xwid_t ch);
 
 static __xwbsp_code
 xwer_t mpc560xb_soc_drv_dma_stop(struct xwds_soc * soc, xwid_t ch);
-#endif /* XWCDCFG_ds_SOC_DMA */
+#endif
 
 __xwbsp_rodata const struct xwds_soc_driver mpc560xb_soc_drv = {
         .base = {
@@ -189,7 +189,7 @@ __xwbsp_rodata const struct xwds_soc_driver mpc560xb_soc_drv = {
         .dma_disable = mpc560xb_soc_drv_dma_disable,
         .dma_start = mpc560xb_soc_drv_dma_start,
         .dma_stop = mpc560xb_soc_drv_dma_stop,
-#endif /* XWCDCFG_ds_SOC_DMA */
+#endif
 };
 
 static __xwbsp_code
@@ -290,7 +290,7 @@ xwer_t mpc560xb_soc_drv_start(struct xwds_device * dev)
         }
 
 #if defined(XWCDCFG_ds_SOC_DMA) && (1 == XWCDCFG_ds_SOC_DMA)
-#if defined(MPC5607B)
+#  if defined(MPC5607B)
         /* DMAC setup */
         const struct soc_dmac_private_cfg * dmaccfg;
 
@@ -299,8 +299,8 @@ xwer_t mpc560xb_soc_drv_start(struct xwds_device * dev)
         for (i = 0; i < (xwssz_t)SOC_DMAC_CHANNEL_NUM; i++) {
                 EDMA.CPR[i].R = dmaccfg->cpr[i].u8;
         }
-#endif /* MPC5607B */
-#endif /* XWCDCFG_ds_SOC_DMA */
+#  endif
+#endif
 
         /* clear all EIRQ flags */
         WKUP.WISR.R = 0x1FFFFFFFU;
@@ -459,7 +459,7 @@ xwer_t mpc560xb_soc_drv_clk_req(struct xwds_soc * soc, xwid_t id)
         case MPC560XB_CLK_ADC_1:
                 ME.PCTL[33].B.RUN_CFG = MPC5_ME_RUNPC_ACTIVE;
                 break;
-#endif /* MPC5607B */
+#endif
 
         case MPC560XB_CLK_CAN_SAMPLER:
                 ME.PCTL[60].B.RUN_CFG = MPC5_ME_RUNPC_ACTIVE;
@@ -493,7 +493,7 @@ xwer_t mpc560xb_soc_drv_clk_req(struct xwds_soc * soc, xwid_t id)
         case MPC560XB_CLK_DSPI_5:
                 ME.PCTL[9].B.RUN_CFG = MPC5_ME_RUNPC_ACTIVE;
                 break;
-#endif /* MPC5607B */
+#endif
 
         case MPC560XB_CLK_EMIOS_0:
                 ME.PCTL[72].B.RUN_CFG = MPC5_ME_RUNPC_ACTIVE;
@@ -554,7 +554,7 @@ xwer_t mpc560xb_soc_drv_clk_req(struct xwds_soc * soc, xwid_t id)
         case MPC560XB_CLK_LINFLEX_9:
                 ME.PCTL[13].B.RUN_CFG = MPC5_ME_RUNPC_ACTIVE;
                 break;
-#endif /* MPC5607B */
+#endif
 
         case MPC560XB_CLK_PIT:
                 ME.PCTL[92].B.RUN_CFG = MPC5_ME_RUNPC_ACTIVE;
@@ -629,7 +629,7 @@ xwer_t mpc560xb_soc_drv_clk_rls(struct xwds_soc * soc, xwid_t id)
         case MPC560XB_CLK_ADC_1:
                 ME.PCTL[33].B.RUN_CFG = MPC5_ME_RUNPC_FROZEN;
                 break;
-#endif /* MPC5607B */
+#endif
 
         case MPC560XB_CLK_CAN_SAMPLER:
                 ME.PCTL[60].B.RUN_CFG = MPC5_ME_RUNPC_FROZEN;
@@ -663,7 +663,7 @@ xwer_t mpc560xb_soc_drv_clk_rls(struct xwds_soc * soc, xwid_t id)
         case MPC560XB_CLK_DSPI_5:
                 ME.PCTL[9].B.RUN_CFG = MPC5_ME_RUNPC_FROZEN;
                 break;
-#endif /* MPC5607B */
+#endif
 
         case MPC560XB_CLK_EMIOS_0:
                 ME.PCTL[72].B.RUN_CFG = MPC5_ME_RUNPC_FROZEN;
@@ -724,7 +724,7 @@ xwer_t mpc560xb_soc_drv_clk_rls(struct xwds_soc * soc, xwid_t id)
         case MPC560XB_CLK_LINFLEX_9:
                 ME.PCTL[13].B.RUN_CFG = MPC5_ME_RUNPC_FROZEN;
                 break;
-#endif /* MPC5607B */
+#endif
 
         case MPC560XB_CLK_PIT:
                 ME.PCTL[92].B.RUN_CFG = MPC5_ME_RUNPC_FROZEN;
@@ -817,7 +817,7 @@ xwer_t mpc560xb_soc_drv_clk_getfqcy(struct xwds_soc * soc, xwid_t id,
         case MPC560XB_CLK_ADC_0:
 #if defined(MPC5607B)
         case MPC560XB_CLK_ADC_1:
-#endif /* MPC5607B */
+#endif
         case MPC560XB_CLK_CTU:
         case MPC560XB_CLK_EMIOS_0:
         case MPC560XB_CLK_EMIOS_1:
@@ -839,7 +839,7 @@ xwer_t mpc560xb_soc_drv_clk_getfqcy(struct xwds_soc * soc, xwid_t id,
 #if defined(MPC5607B)
         case MPC560XB_CLK_DSPI_4:
         case MPC560XB_CLK_DSPI_5:
-#endif /* MPC5607B */
+#endif
         case MPC560XB_CLK_FLEXCAN_0:
         case MPC560XB_CLK_FLEXCAN_1:
         case MPC560XB_CLK_FLEXCAN_2:
@@ -860,7 +860,7 @@ xwer_t mpc560xb_soc_drv_clk_getfqcy(struct xwds_soc * soc, xwid_t id,
         case MPC560XB_CLK_LINFLEX_7:
         case MPC560XB_CLK_LINFLEX_8:
         case MPC560XB_CLK_LINFLEX_9:
-#endif /* MPC5607B */
+#endif
                 *buf = pclk1;
                 break;
         default:
@@ -1157,7 +1157,7 @@ xwer_t mpc560xb_soc_drv_dma_stop(struct xwds_soc * soc, xwid_t ch)
         EDMA.CR.B.CX = 1;
         return XWOK;
 }
-#endif /* XWCDCFG_ds_SOC_DMA */
+#endif
 
 /******** ******** isr ******** ********/
 __xwbsp_isr
@@ -1327,8 +1327,8 @@ void mpc560xb_eirq16_23_isr(void)
         } while (1);
 }
 
-#if defined(MPC5607B)
 #if (defined(XWCDCFG_ds_SOC_DMA)) && (1 == XWCDCFG_ds_SOC_DMA)
+#  if defined(MPC5607B)
 __xwbsp_isr
 void mpc560xb_edma_cmberr_isr(void)
 {
@@ -1378,5 +1378,5 @@ EDMA_CH_ISR(12)
 EDMA_CH_ISR(13)
 EDMA_CH_ISR(14)
 EDMA_CH_ISR(15)
-#endif /* XWCDCFG_ds_SOC_DMA */
-#endif /* MPC5607B */
+#  endif
+#endif

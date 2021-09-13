@@ -51,7 +51,7 @@ struct xwmp_swt {
 
 #if defined(XWMPCFG_SKD_SWT_MEMSLICE) && (1 == XWMPCFG_SKD_SWT_MEMSLICE)
 xwer_t xwmp_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
-#endif /* XWMPCFG_SKD_SWT_MEMSLICE */
+#endif
 
 xwer_t xwmp_swt_init(struct xwmp_swt * swt,
                      const char * name,

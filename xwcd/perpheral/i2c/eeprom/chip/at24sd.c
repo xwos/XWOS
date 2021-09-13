@@ -55,7 +55,7 @@ const struct xwds_eeprom_driver at24sd_drv = {
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
                         .suspend = xwds_eeprom_drv_suspend,
                         .resume =  xwds_eeprom_drv_resume,
-#endif /* XWCDCFG_ds_PM */
+#endif
                 },
         },
         .putc = at24sd_putc,

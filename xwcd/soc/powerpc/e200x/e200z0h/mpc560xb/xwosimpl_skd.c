@@ -257,9 +257,9 @@ struct xwospl_skd * soc_skd_chk_swcx(void)
                 soc_skd_report_stk_overflow(pstk);
         }
         return xwskd;
-#else /* XWMMCFG_STACK_CHK_SWCX */
+#else
         return xwosplcb_skd_get_lc();
-#endif /* !XWMMCFG_STACK_CHK_SWCX */
+#endif
 }
 
 /**
@@ -388,4 +388,4 @@ void xwospl_thd_immigrate(struct xwospl_thd * thd, xwid_t cpuid)
         XWOS_UNUSED(cpuid);
         xwosplcb_thd_immigrate_lic(thd);
 }
-#endif /* XuanWuOS_CFG_CORE__mp */
+#endif

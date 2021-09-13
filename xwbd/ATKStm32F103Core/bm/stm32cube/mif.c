@@ -99,7 +99,7 @@ void stm32cube_init(void)
                                (xwsz_t)sram_mr_size,
                                (xwsz_t)odr);
         BDL_BUG_ON(rc < 0);
-#endif /* STM32CUBECFG_SRAM */
+#endif
 }
 
 /**

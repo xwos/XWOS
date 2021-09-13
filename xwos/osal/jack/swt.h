@@ -14,9 +14,9 @@
 #define __xwos_osal_jack_swt_h__
 
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/osdl/swt.h>
+#  include <xwos/mp/osdl/swt.h>
 #elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/osdl/swt.h>
+#  include <xwos/up/osdl/swt.h>
 #endif
 
 #endif /* xwos/osal/jack/swt.h */

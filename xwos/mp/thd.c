@@ -18,10 +18,10 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_SKD_THD_MEMSLICE) && (1 == XWMPCFG_SKD_THD_MEMSLICE)
-  #include <xwos/mm/memslice.h>
+#  include <xwos/mm/memslice.h>
 #elif defined(XWMPCFG_SKD_THD_STDC_MM) && (1 == XWMPCFG_SKD_THD_STDC_MM)
-  #include <stdlib.h>
-#endif /* XWMPCFG_SKD_THD_STDC_MM */
+#  include <stdlib.h>
+#endif
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/mp/rtrq.h>
@@ -42,7 +42,7 @@ xwer_t board_thd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf);
 
 extern __xwmp_code
 xwer_t board_thd_stack_pool_free(xwstk_t * stk);
-#endif /* BRDCFG_XWSKD_THD_STACK_POOL */
+#endif
 
 static __xwmp_code
 struct xwmp_thd * xwmp_thd_alloc(void);
@@ -98,7 +98,7 @@ static __xwmp_data struct xwmm_memslice xwmp_thd_cache;
  * @brief 结构体xwmp_thd的对象缓存的名字
  */
 const __xwmp_rodata char xwmp_thd_cache_name[] = "xwmp.mp.thd.cache";
-#endif /* XWMPCFG_SKD_THD_MEMSLICE */
+#endif
 
 #if defined(XWMPCFG_SKD_THD_MEMSLICE) && (1 == XWMPCFG_SKD_THD_MEMSLICE)
 /**
@@ -121,7 +121,7 @@ xwer_t xwmp_thd_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                 (dtor_f)xwmp_thd_destruct);
         return rc;
 }
-#endif /* XWMPCFG_SKD_THD_MEMSLICE */
+#endif
 
 /**
  * @brief 从线程对象缓存中申请一个对象
@@ -394,7 +394,7 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
 #elif (defined(XWMMCFG_EA_STACK) && (1 == XWMMCFG_EA_STACK))
         thd->stack.sp = thd->stack.base;
 #else
-#error "Unknown stack type!"
+#  error "Unknown stack type!"
 #endif
         /* init completion */
         xwmp_cond_init(&thd->completion);
@@ -908,7 +908,7 @@ xwer_t xwmp_thd_chprio_once(struct xwmp_thd * thd, xwpr_t dprio,
                                         rc = XWOK;
                                 }
                                 xwmp_sem_put(sem);
-#endif /* XWMPCFG_SYNC_RTSEM */
+#endif
                         } else {
                                 xwmp_splk_lock(&thd->stlock);
                                 thd->dprio.wq = dprio;
@@ -1092,7 +1092,7 @@ xwer_t xwmp_thd_intr(struct xwmp_thd * thd)
                         xwmp_splk_unlock_cpuirqrs(&thd->wqn.lock, cpuirq);
                         rc = xwmp_plsem_intr(sem, &thd->wqn);
                         xwmp_sem_put(sem);
-#endif /* XWMPCFG_SYNC_PLSEM */
+#endif
 #if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
                 } else if (XWMP_WQTYPE_RTSEM == thd->wqn.type) {
                         struct xwmp_sem * sem;
@@ -1102,7 +1102,7 @@ xwer_t xwmp_thd_intr(struct xwmp_thd * thd)
                         xwmp_splk_unlock_cpuirqrs(&thd->wqn.lock, cpuirq);
                         rc = xwmp_rtsem_intr(sem, &thd->wqn);
                         xwmp_sem_put(sem);
-#endif /* XWMPCFG_SYNC_RTSEM */
+#endif
                 } else if (XWMP_WQTYPE_COND == thd->wqn.type) {
                         struct xwmp_cond * cond;
 
@@ -1970,4 +1970,4 @@ xwer_t xwmp_cthd_get_data(xwsq_t pos, void ** databuf)
         return xwmp_thd_set_data(cthd, pos, databuf);
 
 }
-#endif /* XWMPCFG_SKD_THD_LOCAL_DATA_NUM */
+#endif

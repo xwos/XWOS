@@ -31,9 +31,9 @@
 #define XWOSDL_SKD_CONTEXT_IDLE                 XWUP_SKD_CONTEXT_IDLE
 
 #if defined(XWUPCFG_SKD_THD_LOCAL_DATA_NUM)
-  #define XWOSDL_THD_LOCAL_DATA_NUM             XWUPCFG_SKD_THD_LOCAL_DATA_NUM
+#  define XWOSDL_THD_LOCAL_DATA_NUM             XWUPCFG_SKD_THD_LOCAL_DATA_NUM
 #else
-  #define XWOSDL_THD_LOCAL_DATA_NUM             (0U)
+#  define XWOSDL_THD_LOCAL_DATA_NUM             (0U)
 #endif
 
 static __xwcc_inline
@@ -282,6 +282,6 @@ xwer_t xwosdl_cthd_get_data(xwsq_t pos, void ** databuf)
         return xwup_cthd_get_data(pos, databuf);
 
 }
-#endif /* XWUPCFG_SKD_THD_LOCAL_DATA_NUM */
+#endif
 
 #endif /* xwos/up/osdl/skd.h */

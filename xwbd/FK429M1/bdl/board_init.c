@@ -23,12 +23,12 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/bma.h>
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/thd.h>
-  #include <xwos/mp/swt.h>
-  #include <xwos/mp/sync/sem.h>
-  #include <xwos/mp/sync/cond.h>
-  #include <xwos/mp/lock/mtx.h>
-#endif /* XuanWuOS_CFG_CORE__mp */
+#  include <xwos/mp/thd.h>
+#  include <xwos/mp/swt.h>
+#  include <xwos/mp/sync/sem.h>
+#  include <xwos/mp/sync/cond.h>
+#  include <xwos/mp/lock/mtx.h>
+#endif
 #include <bm/stm32cube/mif.h>
 #include <bdl/standard.h>
 #include <bdl/board_init.h>
@@ -158,7 +158,7 @@ xwer_t sys_mm_init(void)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_cache_init;
         }
-#endif /* XuanWuOS_CFG_CORE__mp */
+#endif
 
         return XWOK;
 
@@ -183,7 +183,7 @@ err_thd_cache_init:
         BDL_BUG();
 err_thd_bma_alloc:
         BDL_BUG();
-#endif /* XuanWuOS_CFG_CORE__mp */
+#endif
 err_ccmheap_bma_init:
         BDL_BUG();
 err_stkmempool_bma_init:

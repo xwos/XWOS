@@ -39,7 +39,7 @@ xwer_t stm32cube_usart1_drv_suspend(struct xwds_device * dev);
 
 static
 xwer_t stm32cube_usart1_drv_resume(struct xwds_device * dev);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 static
 xwer_t stm32cube_usart1_drv_cfg(struct xwds_dmauartc * dmauartc,
@@ -64,7 +64,7 @@ const struct xwds_dmauartc_driver stm32cube_usart1_drv = {
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
                 .suspend = stm32cube_usart1_drv_suspend,
                 .resume =  stm32cube_usart1_drv_resume,
-#endif /* XWCDCFG_ds_PM */
+#endif
         },
         .cfg = stm32cube_usart1_drv_cfg,
         .tx = stm32cube_usart1_drv_tx,
@@ -131,7 +131,7 @@ xwer_t stm32cube_usart1_drv_suspend(struct xwds_device * dev)
 {
         return stm32cube_usart1_drv_stop(dev);
 }
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 static
 xwer_t stm32cube_usart1_drv_cfg(struct xwds_dmauartc * dmauartc,
@@ -250,7 +250,7 @@ xwer_t stm32cube_usart3_drv_suspend(struct xwds_device * dev);
 
 static
 xwer_t stm32cube_usart3_drv_resume(struct xwds_device * dev);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 static
 xwer_t stm32cube_usart3_drv_cfg(struct xwds_dmauartc * dmauartc,
@@ -275,7 +275,7 @@ const struct xwds_dmauartc_driver stm32cube_usart3_drv = {
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
                 .suspend = stm32cube_usart3_drv_suspend,
                 .resume =  stm32cube_usart3_drv_resume,
-#endif /* XWCDCFG_ds_PM */
+#endif
         },
         .cfg = stm32cube_usart3_drv_cfg,
         .tx = stm32cube_usart3_drv_tx,
@@ -342,7 +342,7 @@ xwer_t stm32cube_usart3_drv_suspend(struct xwds_device * dev)
 {
         return stm32cube_usart3_drv_stop(dev);
 }
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 static
 xwer_t stm32cube_usart3_drv_cfg(struct xwds_dmauartc * dmauartc,

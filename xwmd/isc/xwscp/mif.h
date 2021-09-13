@@ -16,10 +16,10 @@
 #include <xwos/standard.h>
 
 #if (XWMDCFG_isc_xwscp_MEMBLK_SIZE & (XWMDCFG_isc_xwscp_MEMBLK_SIZE - 1))
-  #error "XWMDCFG_isc_xwscp_MEMBLK_SIZE must be the power of 2!"
+#  error "XWMDCFG_isc_xwscp_MEMBLK_SIZE must be the power of 2!"
 #endif
 #if ((1 << XWMDCFG_isc_xwscp_MEMBLK_ODR) > 32768U)
-  #error "power(2, XWMDCFG_isc_xwscp_MEMBLK_ODR) must be <= 32768!"
+#  error "power(2, XWMDCFG_isc_xwscp_MEMBLK_ODR) must be <= 32768!"
 #endif
 
 #define XWSCP_RETRY_PERIOD      (XWMDCFG_isc_xwscp_PERIOD)

@@ -38,7 +38,7 @@ xwer_t stm32cube_i2c2m_drv_suspend(struct xwds_device * dev);
 
 static
 xwer_t stm32cube_i2c2m_drv_resume(struct xwds_device * dev);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 static
 xwer_t stm32cube_i2c2m_drv_xfer(struct xwds_i2cm * i2cm,
@@ -60,7 +60,7 @@ const struct xwds_i2cm_driver stm32cube_i2c2m_drv = {
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
                 .suspend = stm32cube_i2c2m_drv_suspend,
                 .resume =  stm32cube_i2c2m_drv_resume,
-#endif /* XWCDCFG_ds_PM */
+#endif
         },
         .xfer = stm32cube_i2c2m_drv_xfer,
         .abort = stm32cube_i2c2m_drv_abort,
@@ -113,7 +113,7 @@ xwer_t stm32cube_i2c2m_drv_suspend(struct xwds_device * dev)
 {
         return stm32cube_i2c2m_drv_stop(dev);
 }
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 static
 xwer_t stm32cube_i2c2m_drv_xfer(struct xwds_i2cm * i2cm,

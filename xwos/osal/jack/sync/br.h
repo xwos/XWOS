@@ -14,9 +14,9 @@
 #define __xwos_osal_jack_sync_br_h__
 
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/osdl/sync/br.h>
+#  include <xwos/mp/osdl/sync/br.h>
 #elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/osdl/sync/br.h>
+#  include <xwos/up/osdl/sync/br.h>
 #endif
 
 #endif /* xwos/osal/jack/sync/br.h */

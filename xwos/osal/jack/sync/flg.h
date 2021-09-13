@@ -14,9 +14,9 @@
 #define __xwos_osal_jack_sync_flg_h__
 
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/osdl/sync/flg.h>
+#  include <xwos/mp/osdl/sync/flg.h>
 #elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/osdl/sync/flg.h>
+#  include <xwos/up/osdl/sync/flg.h>
 #endif
 
 #endif /* xwos/osal/jack/sync/flg.h */

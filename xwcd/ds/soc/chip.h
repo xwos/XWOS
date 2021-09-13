@@ -25,15 +25,15 @@
 #include <xwcd/ds/device.h>
 
 #if defined(XWCDCFG_ds_SOC_EIRQ_ROISRT) && (1 == XWCDCFG_ds_SOC_EIRQ_ROISRT)
-  #define __xwds_soc_eirq_tbl_qualifier const
+#  define __xwds_soc_eirq_tbl_qualifier const
 #else
-  #define __xwds_soc_eirq_tbl_qualifier
+#  define __xwds_soc_eirq_tbl_qualifier
 #endif
 
 #if defined(XWCDCFG_ds_SOC_DMA_ROCBT) && (1 == XWCDCFG_ds_SOC_DMA_ROCBT)
-  #define __xwds_soc_dma_tbl_qualifier const
+#  define __xwds_soc_dma_tbl_qualifier const
 #else
-  #define __xwds_soc_dma_tbl_qualifier
+#  define __xwds_soc_dma_tbl_qualifier
 #endif
 
 struct xwds_soc;
@@ -53,7 +53,7 @@ struct xwds_soc_driver {
                                xwid_t /*id*/,
                                xwu32_t * /*buf*/,
                                xwsz_t * /*num*/); /**< 获取时钟频率 */
-#endif /* XWCDCFG_ds_SOC_CLK */
+#endif
 
 #if defined(XWCDCFG_ds_SOC_PWR) && (1 == XWCDCFG_ds_SOC_PWR)
         xwer_t (* pwr_req)(struct xwds_soc * /*soc*/,
@@ -64,7 +64,7 @@ struct xwds_soc_driver {
                                xwid_t /*id*/,
                                xwu32_t * /*buf*/,
                                xwsz_t * /*num*/); /**< 获取电源电压 */
-#endif /* XWCDCFG_ds_SOC_PWR */
+#endif
 
 #if defined(XWCDCFG_ds_SOC_GPIO) && (1 == XWCDCFG_ds_SOC_GPIO)
         xwer_t (* gpio_req)(struct xwds_soc * /*soc*/,
@@ -94,7 +94,7 @@ struct xwds_soc_driver {
                               xwid_t /*port*/,
                               xwsq_t /*pinmask*/,
                               xwsq_t * /*inbuf*/); /**< 读取GPIO上的输入 */
-#endif /* XWCDCFG_ds_SOC_GPIO */
+#endif
 
 #if defined(XWCDCFG_ds_SOC_EIRQ) && (1 == XWCDCFG_ds_SOC_EIRQ)
         xwer_t (* eirq_req)(struct xwds_soc * /*soc*/,
@@ -103,7 +103,7 @@ struct xwds_soc_driver {
         xwer_t (* eirq_rls)(struct xwds_soc * /*soc*/,
                             xwid_t /*port*/, xwsq_t /*pinmask*/,
                             xwid_t /*eiid*/); /**< 释放外部中断 */
-#endif /* XWCDCFG_ds_SOC_EIRQ */
+#endif
 
 #if defined(XWCDCFG_ds_SOC_DMA) && (1 == XWCDCFG_ds_SOC_DMA)
         xwer_t (* dma_req)(struct xwds_soc * /*soc*/,
@@ -121,12 +121,12 @@ struct xwds_soc_driver {
                              xwid_t /*ch*/); /**< 启动DMA传输 */
         xwer_t (* dma_stop)(struct xwds_soc * /*soc*/,
                             xwid_t /*ch*/); /**< 停止DMA传输 */
-#endif /* XWCDCFG_ds_SOC_DMA */
+#endif
 
 #if defined(XWCDCFG_ds_SOC_ERAM) && (1 == XWCDCFG_ds_SOC_ERAM)
         xwer_t (* eram_tst)(struct xwds_soc * /*soc*/,
                             xwptr_t * /*erraddr*/); /**< 测试ERAM */
-#endif /* XWCDCFG_ds_SOC_ERAM */
+#endif
 };
 
 /**
@@ -167,17 +167,17 @@ struct xwds_soc {
                 xwsz_t port_num; /**< GPIO端口数量 */
                 xwsz_t pin_num; /**< 每个GPIO端口中的PIN数量 */
         } gpio; /**< GPIO描述 */
-#endif /* #if (defined(XWCDCFG_ds_SOC_GPIO) && (1 == XWCDCFG_ds_SOC_GPIO)) */
+#endif
 #if (defined(XWCDCFG_ds_SOC_CLK) && (1 == XWCDCFG_ds_SOC_CLK))
         struct {
                 xwsz_t num; /**< 时钟数量 */
         } clk; /**< 时钟描述 */
-#endif /* #if (defined(XWCDCFG_ds_SOC_CLK) && (1 == XWCDCFG_ds_SOC_CLK)) */
+#endif
 #if (defined(XWCDCFG_ds_SOC_PWR) && (1 == XWCDCFG_ds_SOC_PWR))
         struct {
                 xwsz_t num; /**< 电源数量 */
         } pwr; /**< 电源描述 */
-#endif /* #if (defined(XWCDCFG_ds_SOC_PWR) && (1 == XWCDCFG_ds_SOC_PWR)) */
+#endif
 #if (defined(XWCDCFG_ds_SOC_EIRQ) && (1 == XWCDCFG_ds_SOC_EIRQ))
         struct {
                 __xwds_soc_eirq_tbl_qualifier xwds_eirq_f * isrs;
@@ -186,7 +186,7 @@ struct xwds_soc {
                                                         /**< 外部中断的参数表 */
                 xwsz_t num; /**< 外部中断的数量 */
         } eirq; /**< 外部中断的描述 */
-#endif /* #if (defined(XWCDCFG_ds_SOC_EIRQ) && (1 == XWCDCFG_ds_SOC_EIRQ)) */
+#endif
 #if (defined(XWCDCFG_ds_SOC_DMA) && (1 == XWCDCFG_ds_SOC_DMA))
         struct {
                 xwsz_t ch_num; /**< DMA通道数量 */
@@ -197,14 +197,14 @@ struct xwds_soc {
                 __xwds_soc_dma_tbl_qualifier xwds_dma_cbarg_t * chcbargs;
                                                 /**< DMA通道传输结束参数表 */
         } dma; /**< DMA描述 */
-#endif /* #if (defined(XWCDCFG_ds_SOC_DMA) && (1 == XWCDCFG_ds_SOC_DMA)) */
+#endif
 
 #if defined(XWCDCFG_ds_SOC_ERAM) && (1 == XWCDCFG_ds_SOC_ERAM)
         struct {
                 xwptr_t origin; /**< 基地址 */
                 xwsz_t size; /**< 大小 */
         } eram;
-#endif /* XWCDCFG_ds_SOC_ERAM */
+#endif
 };
 
 void xwds_soc_construct(struct xwds_soc * soc);

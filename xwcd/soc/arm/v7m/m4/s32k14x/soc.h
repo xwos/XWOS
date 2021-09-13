@@ -23,9 +23,9 @@
 
 #include <xwos/standard.h>
 
-#define __flscfg        __xwcc_section(".flash.cfg")
+#define __flscfg __xwcc_section(".flash.cfg")
 
-struct soc_flash_cfgs {
+struct soc_flash_cfg {
         xwu8_t backdoor_key[8];
         xwu8_t fprot[4];
         xwu8_t fsec;

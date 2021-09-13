@@ -13,9 +13,9 @@
 #include <xwos/standard.h>
 #include <xwos/ospl/irq.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-  #include <xwos/up/sync/obj.h>
-  #include <xwos/up/sync/evt.h>
-#endif /* XWUPCFG_SYNC_EVT */
+#  include <xwos/up/sync/obj.h>
+#  include <xwos/up/sync/evt.h>
+#endif
 #include <xwos/up/sync/vsem.h>
 
 /**
@@ -29,7 +29,7 @@ void xwup_vsem_activate(struct xwup_vsem * vsem)
         xwup_synobj_activate(&vsem->synobj);
 #else
         XWOS_UNUSED(vsem);
-#endif /* XWUPCFG_SYNC_EVT */
+#endif
 }
 
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
@@ -87,7 +87,7 @@ xwer_t xwup_vsem_unbind(struct xwup_vsem * vsem, struct xwup_evt * evt)
 
         return rc;
 }
-#endif /* XWUPCFG_SYNC_EVT */
+#endif
 
 /**
  * @brief 冻结信号量（值设置为负）
@@ -124,7 +124,7 @@ xwer_t xwup_vsem_freeze(struct xwup_vsem * vsem)
                 if (NULL != evt) {
                         xwup_sel_obj_c0i(evt, synobj);
                 }
-#endif /* XWUPCFG_SYNC_EVT */
+#endif
         }
         xwospl_cpuirq_restore_lc(cpuirq);
 

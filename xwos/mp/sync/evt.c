@@ -21,8 +21,8 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_SYNC_EVT_STDC_MM) && (1 == XWMPCFG_SYNC_EVT_STDC_MM)
-  #include <stdlib.h>
-#endif /* XWMPCFG_SYNC_EVT_STDC_MM */
+#  include <stdlib.h>
+#endif
 #include <xwos/ospl/irq.h>
 #include <xwos/mp/thd.h>
 #include <xwos/mp/lock/spinlock.h>
@@ -96,7 +96,7 @@ struct xwmp_evt * xwmp_evt_alloc(xwsz_t num)
                 xwmp_evt_setup(evt, num, bmp, msk);
         }
         return evt;
-#else /* XWMPCFG_SYNC_EVT_STDC_MM */
+#else
         union {
                 struct xwmp_evt * evt;
                 void * anon;
@@ -118,7 +118,7 @@ struct xwmp_evt * xwmp_evt_alloc(xwsz_t num)
                 mem.evt = err_ptr(rc);
         }
         return mem.evt;
-#endif /* !XWMPCFG_SYNC_EVT_STDC_MM */
+#endif
 }
 
 /**
@@ -131,10 +131,10 @@ void xwmp_evt_free(struct xwmp_evt * evt)
 #if defined(XWMPCFG_SYNC_EVT_STDC_MM) && (1 == XWMPCFG_SYNC_EVT_STDC_MM)
         xwmp_evt_destruct(evt);
         free(evt);
-#else /* XWMPCFG_SYNC_EVT_STDC_MM */
+#else
         xwmp_evt_destruct(evt);
         xwmm_kma_free(evt);
-#endif /* !XWMPCFG_SYNC_EVT_STDC_MM */
+#endif
 }
 
 /**

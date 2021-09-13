@@ -55,7 +55,7 @@ xwer_t xwds_eeprom_drv_stop(struct xwds_device * dev);
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 xwer_t xwds_eeprom_drv_resume(struct xwds_device * dev);
 xwer_t xwds_eeprom_drv_suspend(struct xwds_device * dev);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 /******** ******** I2C EEPROM APIs ******** ********/
 xwer_t xwds_eeprom_power_on(struct xwds_eeprom * eeprom);

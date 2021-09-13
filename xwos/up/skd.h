@@ -19,8 +19,8 @@
 #include <xwos/up/rtrq.h>
 #include <xwos/up/pm.h>
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
-  #include <xwos/up/bh.h>
-#endif /* XWUPCFG_SKD_BH */
+#  include <xwos/up/bh.h>
+#endif
 #include <xwos/up/tt.h>
 
 #define XWUP_SKD_PRIORITY_RT_NUM                ((xwpr_t)XWUPCFG_SKD_PRIORITY_RT_NUM)
@@ -32,8 +32,8 @@
 
 #define XWUP_SKD_IDLE_STK(xwskd)                (&((xwskd)->idle))
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
-  #define XWUP_SKD_BH_STK(xwskd)                (&((xwskd)->bh))
-#endif /* XWUPCFG_SKD_BH */
+#  define XWUP_SKD_BH_STK(xwskd)                (&((xwskd)->bh))
+#endif
 
 struct xwup_skd;
 struct xwup_thd;
@@ -131,7 +131,7 @@ struct xwup_skd_pm {
         struct xwlib_bclst_head frzlist; /**< 已冻结的线程链表 */
         struct xwup_skd_pm_callback cb; /**< 电源管理回调函数集合 */
 };
-#endif /* XWUPCFG_SKD_PM */
+#endif
 
 /**
  * @brief XWOS UP 调度器
@@ -156,11 +156,11 @@ struct xwup_skd {
         xwsq_t dis_bh_cnt; /**< 关闭中断底半部的计数器 */
         struct xwup_bh_cb bhcb; /**< 中断底半部控制块 */
         struct xwup_skd_stack_info bh; /**< 中断底半部任务的栈信息 */
-#endif /* XWUPCFG_SKD_BH */
+#endif
         struct xwup_tt tt; /**< 时间树 */
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
         struct xwup_skd_pm pm; /**< 调度器低功耗控制块 */
-#endif /* XWUPCFG_SKD_PM */
+#endif
         struct xwlib_bclst_head thdlist; /**< 本调度器中所有线程的链表头 */
         xwsz_t thd_num; /**< 本调度器中的线程数量 */
         struct xwlib_bclst_head thdelist; /**< 本调度器中所有待删除的线程的链表头 */
@@ -172,7 +172,7 @@ struct xwup_thd * xwup_skd_get_cthd_lc(void);
 
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
 xwer_t xwup_skd_req_bh(void);
-#endif /* XWUPCFG_SKD_BH */
+#endif
 
 void xwup_skd_chkpmpt(void);
 xwer_t xwup_skd_req_swcx(void);
@@ -197,7 +197,7 @@ xwer_t xwup_skd_stop_syshwt_lc(void);
 struct xwup_skd * xwup_skd_dsbh_lc(void);
 struct xwup_skd * xwup_skd_enbh_lc(void);
 bool xwup_skd_tst_in_bh_lc(void);
-#endif /* XWUPCFG_SKD_BH */
+#endif
 
 struct xwup_skd * xwup_skd_dspmpt_lc(void);
 struct xwup_skd * xwup_skd_enpmpt_lc(void);

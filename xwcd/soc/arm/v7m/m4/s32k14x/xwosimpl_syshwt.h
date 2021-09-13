@@ -22,7 +22,7 @@
 #define __xwosimpl_syshwt_h__
 
 #ifndef __xwos_ospl_syshwt_h__
-  #error "This file should be included from <xwos/ospl/syshwt.h>."
+#  error "This file should be included from <xwos/ospl/syshwt.h>."
 #endif
 
 #endif /* xwosimpl_syshwt.h */

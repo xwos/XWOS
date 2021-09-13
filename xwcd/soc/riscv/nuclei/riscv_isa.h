@@ -107,7 +107,7 @@ xwer_t rv_scd(volatile void * addr, xwu64_t value)
         );
         return rc;
 }
-#endif /* __riscv_xlen == 64 */
+#endif
 
 /**
  * @brief 等待中断

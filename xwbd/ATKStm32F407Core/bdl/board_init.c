@@ -22,13 +22,13 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/bma.h>
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/thd.h>
-  #include <xwos/mp/swt.h>
-  #include <xwos/mp/sync/sem.h>
-  #include <xwos/mp/sync/cond.h>
-  #include <xwos/mp/sync/event.h>
-  #include <xwos/mp/lock/mtx.h>
-#endif /* XuanWuOS_CFG_CORE__mp */
+#  include <xwos/mp/thd.h>
+#  include <xwos/mp/swt.h>
+#  include <xwos/mp/sync/sem.h>
+#  include <xwos/mp/sync/cond.h>
+#  include <xwos/mp/sync/event.h>
+#  include <xwos/mp/lock/mtx.h>
+#endif
 #include <bdl/board_init.h>
 #include <bm/stm32cube/mif.h>
 
@@ -133,7 +133,7 @@ xwer_t sys_mm_init(void)
                 goto err_mtx_cache_init;
         }
 
-#endif /* XuanWuOS_CFG_CORE__mp */
+#endif
 
         return XWOK;
 
@@ -158,7 +158,7 @@ err_thd_cache_init:
         BDL_BUG();
 err_thd_bma_alloc:
         BDL_BUG();
-#endif /* XuanWuOS_CFG_CORE__mp */
+#endif
 err_ocheap_bma_init:
         BDL_BUG();
         return rc;

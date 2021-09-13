@@ -28,16 +28,10 @@
 #include <xwos/osal/sync/cond.h>
 #include <xwam/example/sync/cond/mif.h>
 
+#define LOGTAG "cond"
+#define condlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
+
 #define XWCONDDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
-
-#if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-  #define XWCONDDEMO_LOG_TAG     "cond"
-  #define condlogf(lv, fmt, ...)                                  \
-          xwlogf(lv, XWCONDDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
-#else /* XWLIBCFG_LOG */
-  #define condlogf(lv, fmt, ...)
-#endif /* !XWLIBCFG_LOG */
-
 xwer_t xwconddemo_thd_func(void * arg);
 
 /**

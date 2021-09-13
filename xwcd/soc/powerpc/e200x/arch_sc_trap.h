@@ -22,14 +22,14 @@
 #define __arch_sc_trap_h__
 
 #ifndef __ASM__
-#include <xwos/standard.h>
-#endif /* #ifndef __ASM__ */
+#  include <xwos/standard.h>
+#endif
 
 #define ARCH_SC_PRIVILEGE_START                 1
 #define ARCH_SC_PRIVILEGE_END                   2
 
 #ifndef __ASM__
 xws64_t arch_systemcall(xwid_t sc_no, xwreg_t arg1, xwreg_t arg2);
-#endif /* #ifndef __ASM__ */
+#endif
 
 #endif /* arch_sc_trap.h */

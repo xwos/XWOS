@@ -28,7 +28,7 @@ struct xwmp_synobj {
                 struct xwmp_evt * evt; /**< 事件对象 */
                 xwsq_t pos; /**< 事件对象中的位图位置 */
         } sel; /**< 选择器 */
-#endif /* XWMPCFG_SYNC_EVT */
+#endif
 };
 
 void xwmp_synobj_construct(struct xwmp_synobj * synobj);

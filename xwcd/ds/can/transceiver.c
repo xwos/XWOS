@@ -42,7 +42,7 @@ xwer_t xwds_cantrcv_vop_suspend(struct xwds_cantrcv * cantrcv);
 
 static __xwds_vop
 xwer_t xwds_cantrcv_vop_resume(struct xwds_cantrcv * cantrcv);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 __xwds_rodata const struct xwds_virtual_operation xwds_cantrcv_vop = {
         .probe = (void *)xwds_cantrcv_vop_probe,
@@ -52,7 +52,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_cantrcv_vop = {
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
         .suspend = (void *)xwds_cantrcv_vop_suspend,
         .resume = (void *)xwds_cantrcv_vop_resume,
-#endif /* XWCDCFG_ds_PM */
+#endif
 };
 
 /******** ******** ******** constructor & destructor ******** ******** ********/
@@ -191,7 +191,7 @@ xwer_t xwds_cantrcv_vop_resume(struct xwds_cantrcv * cantrcv)
         rc = xwds_device_vop_resume(&cantrcv->bc.dev);
         return rc;
 }
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 /******** ******** ******** CAN operations ******** ******** ********/
 /**

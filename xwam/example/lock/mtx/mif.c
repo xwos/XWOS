@@ -25,20 +25,11 @@
 #include <xwos/osal/lock/mtx.h>
 #include <xwam/example/lock/mtx/mif.h>
 
-#define XWMTXDEMO_THD_0_PRIORITY                                \
-        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
+#define LOGTAG "mtx"
+#define mtxlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
 
-#define XWMTXDEMO_THD_1_PRIORITY                                \
-        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
-
-#if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-#define XWMTXDEMO_LOG_TAG             "mtx"
-#define mtxlogf(lv, fmt, ...)                                   \
-        xwlogf(lv, XWMTXDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
-#else /* XWLIBCFG_LOG */
-#define mtxlogf(lv, fmt, ...)
-#endif /* !XWLIBCFG_LOG */
-
+#define XWMTXDEMO_THD_0_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
+#define XWMTXDEMO_THD_1_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 xwer_t xwmtxdemo_thd_0_func(void * arg);
 xwer_t xwmtxdemo_thd_1_func(void * arg);
 

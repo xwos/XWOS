@@ -27,7 +27,7 @@
 #if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
 static __xwos_init_code
 void soc_relocate_ivt(void);
-#endif /* !SOCCFG_RO_IVT */
+#endif
 
 extern xwu8_t evt_lma_base[];
 extern xwu8_t evt_vma_base[];
@@ -48,7 +48,7 @@ void soc_init(void)
 {
 #if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
         soc_relocate_ivt();
-#endif /* !SOCCFG_RO_IVT */
+#endif
 
         soc_irqc_init();
         xwosplcb_skd_init_lc();
@@ -80,4 +80,4 @@ void soc_relocate_ivt(void)
                 }
         }
 }
-#endif /* !SOCCFG_RO_IVT */
+#endif

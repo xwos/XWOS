@@ -44,7 +44,7 @@ xwer_t xwds_canc_vop_suspend(struct xwds_canc * canc);
 
 static __xwds_vop
 xwer_t xwds_canc_vop_resume(struct xwds_canc * canc);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 __xwds_rodata const struct xwds_virtual_operation xwds_canc_vop = {
         .probe = (void *)xwds_canc_vop_probe,
@@ -54,7 +54,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_canc_vop = {
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
         .suspend = (void *)xwds_canc_vop_suspend,
         .resume = (void *)xwds_canc_vop_resume,
-#endif /* XWCDCFG_ds_PM */
+#endif
 };
 
 /******** ******** ******** constructor & destructor ******** ******** ********/
@@ -168,7 +168,7 @@ xwer_t xwds_canc_vop_resume(struct xwds_canc * canc)
         rc = xwds_device_vop_resume(&canc->bc.dev);
         return rc;
 }
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 /******** ******** ******** APIs ******** ******** ********/
 /**

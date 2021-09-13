@@ -16,11 +16,11 @@
 #include <xwos/standard.h>
 
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/irq.h>
+#  include <xwos/mp/irq.h>
 #elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/irq.h>
+#  include <xwos/up/irq.h>
 #else
-  #error "Can't find the configuration XuanWuOS_CFG_CORE!"
+#  error "Can't find the configuration XuanWuOS_CFG_CORE!"
 #endif
 
 extern __xwos_ivt_qualifier struct soc_ivt xwospl_ivt;

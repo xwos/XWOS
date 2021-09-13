@@ -22,7 +22,7 @@
 #define __xwosimpl_soc_xwsc_h__
 
 #ifndef __xwos_ospl_soc_xwsc_h__
-  #error "This file should be included from <xwos/ospl/soc/xwsc.h>."
+#  error "This file should be included from <xwos/ospl/soc/xwsc.h>."
 #endif
 
 #endif /* xwosimpl_soc_xwsc.h */

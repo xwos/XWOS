@@ -53,279 +53,279 @@
 #include <xwos/ospl/soc/compiler.h>
 
 #ifndef __xwos_init_code
-  #define __xwos_init_code
+#  define __xwos_init_code
 #endif
 
 #ifndef __xwos_init_rodata
-  #define __xwos_init_rodata
+#  define __xwos_init_rodata
 #endif
 
 #ifndef __xwos_exit_code
-  #define __xwos_exit_code
+#  define __xwos_exit_code
 #endif
 
 #ifndef __xwos_exit_rodata
-  #define __xwos_exit_rodata
+#  define __xwos_exit_rodata
 #endif
 
 #ifndef __xwos_ivt
-  #define __xwos_ivt
+#  define __xwos_ivt
 #endif
 
 #ifndef __xwos_isr
-  #define __xwos_isr
+#  define __xwos_isr
 #endif
 
 #ifndef __xwos_bh
-  #define __xwos_bh             __xwos_isr
+#  define __xwos_bh             __xwos_isr
 #endif
 
 #ifndef __xwos_inline
-  #define __xwos_inline         __xwcc_inline
+#  define __xwos_inline         __xwcc_inline
 #endif
 
 #ifndef __xwos_code
-  #define __xwos_code
+#  define __xwos_code
 #endif
 
 #ifndef __xwos_api
-  #define __xwos_api            __xwos_code
+#  define __xwos_api            __xwos_code
 #endif
 
 #ifndef __xwos_inline_api
-  #define __xwos_inline_api     __xwcc_inline
+#  define __xwos_inline_api     __xwcc_inline
 #endif
 
 #ifndef __xwos_rodata
-  #define __xwos_rodata
+#  define __xwos_rodata
 #endif
 
 #ifndef __xwos_data
-  #define __xwos_data
+#  define __xwos_data
 #endif
 
 #ifndef __xwlib_code
-  #define __xwlib_code          __xwos_code
+#  define __xwlib_code          __xwos_code
 #endif
 
 #ifndef __xwlib_inline
-  #define __xwlib_inline        __xwcc_inline
+#  define __xwlib_inline        __xwcc_inline
 #endif
 
 #ifndef __xwlib_data
-  #define __xwlib_data          __xwos_data
+#  define __xwlib_data          __xwos_data
 #endif
 
 #ifndef __xwlib_rodata
-  #define __xwlib_rodata        __xwos_rodata
+#  define __xwlib_rodata        __xwos_rodata
 #endif
 
 #ifndef __xwbsp_init_code
-  #define __xwbsp_init_code     __xwos_init_code
+#  define __xwbsp_init_code     __xwos_init_code
 #endif
 
 #ifndef __xwbsp_init_rodata
-  #define __xwbsp_init_rodata   __xwos_init_rodata
+#  define __xwbsp_init_rodata   __xwos_init_rodata
 #endif
 
 #ifndef __xwbsp_exit_code
-  #define __xwbsp_exit_code     __xwos_exit_code
+#  define __xwbsp_exit_code     __xwos_exit_code
 #endif
 
 #ifndef __xwbsp_exit_rodata
-  #define __xwbsp_exit_rodata   __xwos_exit_rodata
+#  define __xwbsp_exit_rodata   __xwos_exit_rodata
 #endif
 
 #ifndef __xwbsp_code
-  #define __xwbsp_code          __xwos_code
+#  define __xwbsp_code          __xwos_code
 #endif
 
 #ifndef __xwbsp_api
-  #define __xwbsp_api           __xwos_api
+#  define __xwbsp_api           __xwos_api
 #endif
 
 #ifndef __xwbsp_isr
-  #define __xwbsp_isr           __xwos_isr
+#  define __xwbsp_isr           __xwos_isr
 #endif
 
 #ifndef __xwbsp_inline
-  #define __xwbsp_inline        __xwcc_inline
+#  define __xwbsp_inline        __xwcc_inline
 #endif
 
 #ifndef __xwbsp_data
-  #define __xwbsp_data          __xwos_data
+#  define __xwbsp_data          __xwos_data
 #endif
 
 #ifndef __xwbsp_rodata
-  #define __xwbsp_rodata        __xwos_rodata
+#  define __xwbsp_rodata        __xwos_rodata
 #endif
 
 #ifndef __xwmp_init_code
-  #define __xwmp_init_code      __xwos_init_code
+#  define __xwmp_init_code      __xwos_init_code
 #endif
 
 #ifndef __xwmp_init_rodata
-  #define __xwmp_init_rodata    __xwos_init_rodata
+#  define __xwmp_init_rodata    __xwos_init_rodata
 #endif
 
 #ifndef __xwmp_exit_code
-  #define __xwmp_exit_code      __xwos_exit_code
+#  define __xwmp_exit_code      __xwos_exit_code
 #endif
 
 #ifndef __xwmp_exit_rodata
-  #define __xwmp_exit_rodata    __xwos_exit_rodata
+#  define __xwmp_exit_rodata    __xwos_exit_rodata
 #endif
 
 #ifndef __xwmp_ivt
-  #define __xwmp_ivt            __xwos_ivt
+#  define __xwmp_ivt            __xwos_ivt
 #endif
 
 #ifndef __xwmp_isr
-  #define __xwmp_isr            __xwos_isr
+#  define __xwmp_isr            __xwos_isr
 #endif
 
 #ifndef __xwmp_bh
-  #define __xwmp_bh             __xwos_bh
+#  define __xwmp_bh             __xwos_bh
 #endif
 
 #ifndef __xwmp_code
-  #define __xwmp_code           __xwos_code
+#  define __xwmp_code           __xwos_code
 #endif
 
 #ifndef __xwmp_api
-  #define __xwmp_api            __xwos_api
+#  define __xwmp_api            __xwos_api
 #endif
 
 #ifndef __xwmp_inline
-  #define __xwmp_inline         __xwcc_inline
+#  define __xwmp_inline         __xwcc_inline
 #endif
 
 #ifndef __xwmp_inline_api
-  #define __xwmp_inline_api     __xwos_inline_api
+#  define __xwmp_inline_api     __xwos_inline_api
 #endif
 
 #ifndef __xwmp_rodata
-  #define __xwmp_rodata         __xwos_rodata
+#  define __xwmp_rodata         __xwos_rodata
 #endif
 
 #ifndef __xwmp_data
-  #define __xwmp_data           __xwos_data
+#  define __xwmp_data           __xwos_data
 #endif
 
 #ifndef __xwup_init_code
-  #define __xwup_init_code      __xwos_init_code
+#  define __xwup_init_code      __xwos_init_code
 #endif
 
 #ifndef __xwup_init_rodata
-  #define __xwup_init_rodata    __xwos_init_rodata
+#  define __xwup_init_rodata    __xwos_init_rodata
 #endif
 
 #ifndef __xwup_exit_code
-  #define __xwup_exit_code      __xwos_exit_code
+#  define __xwup_exit_code      __xwos_exit_code
 #endif
 
 #ifndef __xwup_exit_rodata
-  #define __xwup_exit_rodata    __xwos_exit_rodata
+#  define __xwup_exit_rodata    __xwos_exit_rodata
 #endif
 
 #ifndef __xwup_ivt
-  #define __xwup_ivt            __xwos_ivt
+#  define __xwup_ivt            __xwos_ivt
 #endif
 
 #ifndef __xwup_isr
-  #define __xwup_isr            __xwos_isr
+#  define __xwup_isr            __xwos_isr
 #endif
 
 #ifndef __xwup_bh
-  #define __xwup_bh             __xwos_bh
+#  define __xwup_bh             __xwos_bh
 #endif
 
 #ifndef __xwup_code
-  #define __xwup_code           __xwos_code
+#  define __xwup_code           __xwos_code
 #endif
 
 #ifndef __xwup_api
-  #define __xwup_api            __xwos_api
+#  define __xwup_api            __xwos_api
 #endif
 
 #ifndef __xwup_inline
-  #define __xwup_inline         __xwcc_inline
+#  define __xwup_inline         __xwcc_inline
 #endif
 
 #ifndef __xwup_inline_api
-  #define __xwup_inline_api     __xwos_inline_api
+#  define __xwup_inline_api     __xwos_inline_api
 #endif
 
 #ifndef __xwup_rodata
-  #define __xwup_rodata         __xwos_rodata
+#  define __xwup_rodata         __xwos_rodata
 #endif
 
 #ifndef __xwup_data
-  #define __xwup_data           __xwos_data
+#  define __xwup_data           __xwos_data
 #endif
 
 #ifndef __xwmd_code
-  #define __xwmd_code           __xwos_code
+#  define __xwmd_code           __xwos_code
 #endif
 
 #ifndef __xwmd_api
-  #define __xwmd_api            __xwmd_code
+#  define __xwmd_api            __xwmd_code
 #endif
 
 #ifndef __xwmd_inline
-  #define __xwmd_inline         __xwcc_inline
+#  define __xwmd_inline         __xwcc_inline
 #endif
 
 #ifndef __xwmd_inline_api
-  #define __xwmd_inline_api     __xwos_inline_api
+#  define __xwmd_inline_api     __xwos_inline_api
 #endif
 
 #ifndef __xwmd_isr
-  #define __xwmd_isr            __xwmd_code
+#  define __xwmd_isr            __xwmd_code
 #endif
 
 #ifndef __xwmd_bh
-  #define __xwmd_bh             __xwmd_isr
+#  define __xwmd_bh             __xwmd_isr
 #endif
 
 #ifndef __xwmd_rodata
-  #define __xwmd_rodata         __xwos_rodata
+#  define __xwmd_rodata         __xwos_rodata
 #endif
 
 #ifndef __xwmd_data
-  #define __xwmd_data           __xwos_data
+#  define __xwmd_data           __xwos_data
 #endif
 
 #ifndef __xwcd_code
-  #define __xwcd_code           __xwos_code
+#  define __xwcd_code           __xwos_code
 #endif
 
 #ifndef __xwcd_api
-  #define __xwcd_api            __xwcd_code
+#  define __xwcd_api            __xwcd_code
 #endif
 
 #ifndef __xwcd_inline
-  #define __xwcd_inline         __xwcc_inline
+#  define __xwcd_inline         __xwcc_inline
 #endif
 
 #ifndef __xwcd_inline_api
-  #define __xwcd_inline_api     __xwos_inline_api
+#  define __xwcd_inline_api     __xwos_inline_api
 #endif
 
 #ifndef __xwcd_isr
-  #define __xwcd_isr            __xwcd_code
+#  define __xwcd_isr            __xwcd_code
 #endif
 
 #ifndef __xwcd_bh
-  #define __xwcd_bh             __xwcd_isr
+#  define __xwcd_bh             __xwcd_isr
 #endif
 
 #ifndef __xwcd_rodata
-  #define __xwcd_rodata         __xwos_rodata
+#  define __xwcd_rodata         __xwos_rodata
 #endif
 
 #ifndef __xwcd_data
-  #define __xwcd_data           __xwos_data
+#  define __xwcd_data           __xwos_data
 #endif
 
 /**
@@ -452,7 +452,7 @@
  *   + DEC Alpha这种弱内存模型的CPU，不带有数据依赖(Data dependency)，
  *     需要使用读依赖屏障
  */
-  #define xwmb_mp_ddb()                 xwccmb()
+#  define xwmb_mp_ddb()                 xwccmb()
 #endif
 
 /******** ******** compiletime check ******** ********/
@@ -461,7 +461,7 @@
  * @brief Is this type a native word size
  * @param t: something to be checked
  */
-  #define xwcc_native_word(t)                   \
+#  define xwcc_native_word(t)                   \
           (sizeof(t) == sizeof(xwu8_t) ||       \
            sizeof(t) == sizeof(xwu16_t) ||      \
            sizeof(t) == sizeof(xwu32_t) ||      \
@@ -473,7 +473,7 @@
 /**
  * @brief 定义stringify的辅助宏
  */
-  #define __stringify(m)                  #m
+#  define __stringify(m)                  #m
 
 /**
  * @brief 字符串化
@@ -498,8 +498,8 @@
  * ```
  * 因为NAME在stringify(m)中展开，此时没有遇到#或##。
  */
-  #define stringify(m)                    __stringify(m)
-#endif /* stringify */
+#  define stringify(m)                    __stringify(m)
+#endif
 
 /**
  * @brief 显示宏的值
@@ -514,7 +514,7 @@
  * @param[in] type: 结构体类型
  * @param[in] member: 成员在结构体中符号名
  */
-  #define xwcc_offsetof(type, member)  ((xwptr_t)&(((type *)0)->member))
+#  define xwcc_offsetof(type, member)  ((xwptr_t)&(((type *)0)->member))
 #endif
 
 #ifndef xwcc_baseof
@@ -524,7 +524,7 @@
  * @param[in] type: 结构体类型
  * @param[in] member: 成员在结构体中符号名
  */
-  #define xwcc_baseof(ptr, type, member) \
+#  define xwcc_baseof(ptr, type, member) \
           ((type *)(((xwptr_t)(ptr)) - xwcc_offsetof(type, member)))
 #endif
 

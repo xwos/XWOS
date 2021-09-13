@@ -45,7 +45,7 @@ xwer_t xwds_w25qxx_drv_stop(struct xwds_device * dev);
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 xwer_t xwds_w25qxx_drv_resume(struct xwds_device * dev);
 xwer_t xwds_w25qxx_drv_suspend(struct xwds_device * dev);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 /******** ******** ******** APIs ******** ******** ********/
 xwer_t xwds_w25qxx_cfgbus(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm);

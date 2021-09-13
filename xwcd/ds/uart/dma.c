@@ -52,7 +52,7 @@ xwer_t xwds_dmauartc_vop_suspend(struct xwds_dmauartc * dmauartc);
 
 static __xwds_vop
 xwer_t xwds_dmauartc_vop_resume(struct xwds_dmauartc * dmauartc);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 __xwds_rodata const struct xwds_virtual_operation xwds_dmauartc_vop = {
         .probe = (void *)xwds_dmauartc_vop_probe,
@@ -62,7 +62,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_dmauartc_vop = {
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
         .suspend = (void *)xwds_dmauartc_vop_suspend,
         .resume = (void *)xwds_dmauartc_vop_resume,
-#endif /* XWCDCFG_ds_PM */
+#endif
 };
 
 /******** ******** ******** constructor & destructor ******** ******** ********/
@@ -208,7 +208,7 @@ xwer_t xwds_dmauartc_vop_resume(struct xwds_dmauartc * dmauartc)
         rc = xwds_device_vop_resume(&dmauartc->dev);
         return rc;
 }
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 /******** ******** ******** DMA UART APIs ******** ******** ********/
 /**

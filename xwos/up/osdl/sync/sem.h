@@ -17,9 +17,9 @@
 
 #if defined(XWUPCFG_SYNC_RTSEM) && (1 == XWUPCFG_SYNC_RTSEM)
 
-#include <xwos/up/sync/rtsem.h>
+#  include <xwos/up/sync/rtsem.h>
 
-#define xwosdl_sem xwup_rtsem
+#  define xwosdl_sem xwup_rtsem
 
 static __xwcc_inline
 xwer_t xwosdl_sem_init(struct xwosdl_sem * sem, xwssq_t val, xwssq_t max)
@@ -86,21 +86,21 @@ static __xwcc_inline
 xwer_t xwosdl_sem_bind(struct xwosdl_sem * sem, struct xwosdl_sel * sel,
                        xwsq_t pos)
 {
-#if !defined(XWUPCFG_SYNC_EVT) || (1 != XWUPCFG_SYNC_EVT)
+#  if !defined(XWUPCFG_SYNC_EVT) || (1 != XWUPCFG_SYNC_EVT)
         XWOS_UNUSED(sem);
         XWOS_UNUSED(sel);
         XWOS_UNUSED(pos);
-#endif /* !XWUPCFG_SYNC_EVT */
+#  endif
         return xwup_rtsem_bind(sem, sel, pos);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_unbind(struct xwosdl_sem * sem, struct xwosdl_sel * sel)
 {
-#if !defined(XWUPCFG_SYNC_EVT) || (1 != XWUPCFG_SYNC_EVT)
+#  if !defined(XWUPCFG_SYNC_EVT) || (1 != XWUPCFG_SYNC_EVT)
         XWOS_UNUSED(sem);
         XWOS_UNUSED(sel);
-#endif /* !XWUPCFG_SYNC_EVT */
+#  endif
         return xwup_rtsem_unbind(sem, sel);
 }
 
@@ -154,9 +154,9 @@ xwer_t xwosdl_sem_getvalue(struct xwosdl_sem * sem, xwssq_t * sval)
 
 #elif defined(XWUPCFG_SYNC_PLSEM) && (1 == XWUPCFG_SYNC_PLSEM)
 
-#include <xwos/up/sync/plsem.h>
+#  include <xwos/up/sync/plsem.h>
 
-#define xwosdl_sem xwup_plsem
+#  define xwosdl_sem xwup_plsem
 
 static __xwcc_inline
 xwer_t xwosdl_sem_init(struct xwosdl_sem * sem, xwssq_t val, xwssq_t max)
@@ -231,21 +231,21 @@ static __xwcc_inline
 xwer_t xwosdl_sem_bind(struct xwosdl_sem * sem, struct xwosdl_sel * sel,
                        xwsq_t pos)
 {
-#if !defined(XWUPCFG_SYNC_EVT) || (1 != XWUPCFG_SYNC_EVT)
+#  if !defined(XWUPCFG_SYNC_EVT) || (1 != XWUPCFG_SYNC_EVT)
         XWOS_UNUSED(sem);
         XWOS_UNUSED(sel);
         XWOS_UNUSED(pos);
-#endif /* !XWUPCFG_SYNC_EVT */
+#  endif
         return xwup_plsem_bind(sem, sel, pos);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_unbind(struct xwosdl_sem * sem, struct xwosdl_sel * sel)
 {
-#if !defined(XWUPCFG_SYNC_EVT) || (1 != XWUPCFG_SYNC_EVT)
+#  if !defined(XWUPCFG_SYNC_EVT) || (1 != XWUPCFG_SYNC_EVT)
         XWOS_UNUSED(sem);
         XWOS_UNUSED(sel);
-#endif /* !XWUPCFG_SYNC_EVT */
+#  endif
         return xwup_plsem_unbind(sem, sel);
 }
 
@@ -297,8 +297,8 @@ xwer_t xwosdl_sem_getvalue(struct xwosdl_sem * sem, xwssq_t * sval)
         return xwup_plsem_getvalue(sem, sval);
 }
 
-#else /* XWUPCFG_SYNC_PLSEM */
-  #error "Can't find the semaphore configuration !"
-#endif /* !XWUPCFG_SYNC_PLSEM */
+#else
+#  error "Can't find the semaphore configuration !"
+#endif
 
 #endif /* xwos/up/osdl/sync/sem.h */

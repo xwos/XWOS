@@ -277,9 +277,9 @@ struct xwospl_skd * arch_skd_chk_swcx(void)
             (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
                 arch_skd_report_stk_overflow(pstk);
         }/* else {} */
-#else /* XWMMCFG_STACK_CHK_SWCX */
+#else
         xwskd = xwosplcb_skd_get_lc();
-#endif /* !XWMMCFG_STACK_CHK_SWCX */
+#endif
         return xwskd;
 }
 

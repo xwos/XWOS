@@ -35,9 +35,9 @@ xwer_t xwup_rtsem_intr(struct xwup_rtsem * sem, struct xwup_wqn * wqn);
 xwer_t xwup_rtsem_bind(struct xwup_rtsem * sem, struct xwup_evt * evt, xwsq_t pos);
 xwer_t xwup_rtsem_unbind(struct xwup_rtsem * sem, struct xwup_evt * evt);
 #else
-#define xwup_rtsem_bind(sem, evt, pos) (-ENOSYS)
-#define xwup_rtsem_unbind(sem, evt) (-ENOSYS)
-#endif /* XWUPCFG_SYNC_EVT */
+#  define xwup_rtsem_bind(sem, evt, pos) (-ENOSYS)
+#  define xwup_rtsem_unbind(sem, evt) (-ENOSYS)
+#endif
 
 xwer_t xwup_rtsem_post(struct xwup_rtsem * sem);
 xwer_t xwup_rtsem_wait(struct xwup_rtsem * sem);

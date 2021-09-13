@@ -50,7 +50,7 @@ xwer_t xwmp_mtx_intr(struct xwmp_mtx * mtx, struct xwmp_thd * thd);
 
 #if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
 xwer_t xwmp_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
-#endif /* XWMPCFG_LOCK_MTX_MEMSLICE */
+#endif
 
 xwer_t xwmp_mtx_init(struct xwmp_mtx * mtx, xwpr_t sprio);
 xwer_t xwmp_mtx_fini(struct xwmp_mtx * mtx);

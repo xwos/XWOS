@@ -39,7 +39,7 @@ xwer_t xwds_misc_vop_suspend(struct xwds_misc * misc);
 
 static __xwds_vop
 xwer_t xwds_misc_vop_resume(struct xwds_misc * misc);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 __xwds_rodata const struct xwds_virtual_operation xwds_misc_vop = {
         .probe = (void *)xwds_misc_vop_probe,
@@ -49,7 +49,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_misc_vop = {
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
         .suspend = (void *)xwds_misc_vop_suspend,
         .resume = (void *)xwds_misc_vop_resume,
-#endif /* XWCDCFG_ds_PM */
+#endif
 };
 
 /******** ******** ******** constructor & destructor ******** ******** ********/
@@ -161,4 +161,4 @@ xwer_t xwds_misc_vop_resume(struct xwds_misc * misc)
         rc = xwds_device_vop_resume(&misc->dev);
         return rc;
 }
-#endif /* XWCDCFG_ds_PM */
+#endif

@@ -19,8 +19,8 @@
 #include <xwos/mp/irq.h>
 #include <xwos/mp/lock/seqlock.h>
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
-  #include <xwos/mp/bh.h>
-#endif /* XWMPCFG_SKD_BH */
+#  include <xwos/mp/bh.h>
+#endif
 
 #define XWMP_TTN_TYPE_MASK            (3UL)
 
@@ -50,7 +50,7 @@ struct xwmp_tt {
         struct xwmp_sqlk lock; /**< 保护本结构体的自旋锁 */
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
         struct xwmp_bh_node bhn; /**< 中断底半部节点 */
-#endif /* XWMPCFG_SKD_BH */
+#endif
         struct xwmp_syshwt hwt; /**< 硬件定时器 */
 };
 

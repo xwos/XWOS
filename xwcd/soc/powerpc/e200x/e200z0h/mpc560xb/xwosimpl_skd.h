@@ -22,7 +22,7 @@
 #define __xwosimpl_skd_h__
 
 #ifndef __xwos_ospl_skd_h__
-  #error "This file should be included from <xwos/ospl/skd.h>."
+#  error "This file should be included from <xwos/ospl/skd.h>."
 #endif
 
 extern struct e200x_context soc_context;

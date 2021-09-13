@@ -227,7 +227,7 @@ void xwup_sqlk_rdex_unlock_bh(struct xwup_sqlk * sql)
         xwup_skd_enbh_lc();
         xwup_skd_enpmpt_lc();
 }
-#endif /* XWUPCFG_SKD_BH */
+#endif
 
 __xwup_api
 void xwup_sqlk_wr_lock(struct xwup_sqlk * sql)
@@ -405,4 +405,4 @@ void xwup_sqlk_wr_unlock_bh(struct xwup_sqlk * sql)
         xwup_skd_enbh_lc();
         xwup_skd_enpmpt_lc();
 }
-#endif /* XWUPCFG_SKD_BH */
+#endif

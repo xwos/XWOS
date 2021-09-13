@@ -87,7 +87,7 @@ xwer_t xwosdl_cond_bind(struct xwosdl_cond * cond, struct xwosdl_sel * sel,
         XWOS_UNUSED(cond);
         XWOS_UNUSED(sel);
         XWOS_UNUSED(pos);
-#endif /* !XWUPCFG_SYNC_EVT */
+#endif
         return xwup_cond_bind(cond, sel, pos);
 }
 
@@ -97,7 +97,7 @@ xwer_t xwosdl_cond_unbind(struct xwosdl_cond * cond, struct xwosdl_sel * sel)
 #if !defined(XWUPCFG_SYNC_EVT) || (1 != XWUPCFG_SYNC_EVT)
         XWOS_UNUSED(cond);
         XWOS_UNUSED(sel);
-#endif /* !XWUPCFG_SYNC_EVT */
+#endif
         return xwup_cond_unbind(cond, sel);
 }
 

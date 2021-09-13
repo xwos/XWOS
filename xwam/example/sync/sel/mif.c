@@ -30,16 +30,12 @@
 #include <xwos/osal/sync/sel.h>
 #include <xwam/example/sync/sel/mif.h>
 
+#define LOGTAG "sel"
+#define sellogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
+
 #define XWSELDEMO_CONSUMER_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 #define XWSELDEMO_PRODUCER_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 2)
 #define XWSELDEMO_BRTHD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
-
-#if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-  #define XWSELDEMO_LOG_TAG "sel"
-  #define sellogf(lv, fmt, ...) xwlogf(lv, XWSELDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
-#else /* XWLIBCFG_LOG */
-  #define sellogf(lv, fmt, ...)
-#endif /* !XWLIBCFG_LOG */
 
 void xwseldemo_swt0_callback(struct xwos_swt * swt, void * arg);
 void xwseldemo_swt1_callback(struct xwos_swt * swt, void * arg);
@@ -47,7 +43,7 @@ xwer_t xwseldemo_consumer_func(void * arg);
 xwer_t xwseldemo_producer_func(void * arg);
 xwer_t xwseldemo_syncthd_func(void * arg);
 
-#define XWSELDEMO_BMP_BITNUM    (sizeof(xwbmp_t) * BITS_PER_XWU8_T)
+#define XWSELDEMO_BMP_BITNUM (sizeof(xwbmp_t) * BITS_PER_XWU8_T)
 
 xwbmpop_declare(xwseldemo_sel0_bmp, XWSELDEMO_BMP_BITNUM) = {0,};
 xwbmpop_declare(xwseldemo_sel0_msk, XWSELDEMO_BMP_BITNUM) = {0,};

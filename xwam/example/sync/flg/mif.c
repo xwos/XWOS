@@ -25,23 +25,18 @@
 #include <xwos/osal/sync/flg.h>
 #include <xwam/example/sync/flg/mif.h>
 
+#define LOGTAG "flag"
+#define flglogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
+
 #define XWFLGDEMO_CONSUMER_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 2)
 #define XWFLGDEMO_PRODUCER_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
-
-#if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-  #define XWFLGDEMO_LOG_TAG             "flag"
-  #define flglogf(lv, fmt, ...) xwlogf(lv, XWFLGDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
-#else /* XWLIBCFG_LOG */
-  #define flglogf(lv, fmt, ...)
-#endif /* !XWLIBCFG_LOG */
-
 xwer_t xwflgdemo_consumer_func(void * arg);
 xwer_t xwflgdemo_producer_func(void * arg);
 
 /**
  * @brief 静态定义的事件标志
  */
-#define XWFLGDEMO_FLG_NUM       (sizeof(xwbmp_t) * BITS_PER_XWU8_T)
+#define XWFLGDEMO_FLG_NUM (sizeof(xwbmp_t) * BITS_PER_XWU8_T)
 xwbmpop_declare(xwflgdemo_flg_bmp, XWFLGDEMO_FLG_NUM) = {0,};
 xwbmpop_declare(xwflgdemo_flg_msk, XWFLGDEMO_FLG_NUM) = {0,};
 struct xwos_flg xwflgdemo_flg;

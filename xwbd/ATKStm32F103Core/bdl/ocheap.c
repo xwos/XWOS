@@ -27,7 +27,7 @@
 extern struct xwmm_bma * ocheap_bma;
 
 #if ((BRDCFG_MM_OCHEAP_BLKSZ % XWMMCFG_STACK_ALIGNMENT) != 0)
-  #error BRDCFG_MM_OCHEAP_BLKSZ is not aligned to XWMMCFG_STACK_ALIGNMENT!
+#  error BRDCFG_MM_OCHEAP_BLKSZ is not aligned to XWMMCFG_STACK_ALIGNMENT!
 #endif
 
 __xwos_code

@@ -14,9 +14,9 @@
 #define __xwos_osal_jack_skd_h__
 
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/osdl/skd.h>
+#  include <xwos/mp/osdl/skd.h>
 #elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/osdl/skd.h>
+#  include <xwos/up/osdl/skd.h>
 #endif
 
 #endif /* xwos/osal/jack/skd.h */

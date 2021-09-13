@@ -24,18 +24,10 @@
 #include <xwos/osal/skd.h>
 #include <xwam/example/thread/exit/mif.h>
 
-#define XWEXITDEMO_THD_PRIORITY                                 \
-        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+#define LOGTAG "thdexit"
+#define thdexitlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
 
-#if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-#define EXAMPLE_THREAD_EXIT_LOG_TAG        "thdexit"
-#define thdexitlogf(lv, fmt, ...)                               \
-        xwlogf(lv, EXAMPLE_THREAD_EXIT_LOG_TAG, "<%lld>" fmt,   \
-               xwos_skd_get_timetick_lc(), ##__VA_ARGS__)
-#else /* XWLIBCFG_LOG */
-#define thdexitlogf(lv, fmt, ...)
-#endif /* !XWLIBCFG_LOG */
-
+#define XWEXITDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 xwer_t xwexitdemo_detached_thd0_func(void * arg);
 xwer_t xwexitdemo_detached_thd1_func(void * arg);
 xwer_t xwexitdemo_parent_thd_func(void * arg);

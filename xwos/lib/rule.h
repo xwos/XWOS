@@ -39,11 +39,11 @@
  */
 
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/rule.h>
+#  include <xwos/mp/rule.h>
 #elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/rule.h>
+#  include <xwos/up/rule.h>
 #else
-  #error "Can't find the configuration XuanWuOS_CFG_CORE!"
+#  error "Can't find the configuration XuanWuOS_CFG_CORE!"
 #endif
 
 #endif /* xwos/lib/rule.h */

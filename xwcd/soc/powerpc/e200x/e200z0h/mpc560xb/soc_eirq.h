@@ -51,7 +51,7 @@ enum soc_eirq_em {
         SOC_WKUP_19,
 #if defined(MPC5604B)
         SOC_WKUP_MAX = SOC_WKUP_19,
-#endif /* #if defined(MPC5604B) */
+#endif
 #if defined(MPC5607B)
         SOC_WKUP_20,
         SOC_WKUP_21,
@@ -63,7 +63,7 @@ enum soc_eirq_em {
         SOC_WKUP_27,
         SOC_WKUP_28,
         SOC_WKUP_MAX = SOC_WKUP_28,
-#endif /* #if defined(MPC5607B) */
+#endif
         SOC_WKUP_NUM,
         SOC_EIRQ_MIN = SOC_WKUP_MAX + 1,
         SOC_EIRQ_0 = SOC_EIRQ_MIN,

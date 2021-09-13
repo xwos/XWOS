@@ -105,11 +105,11 @@ void stm32cube_init(void)
          */
 #if defined(STM32CUBECFG_ICACHE) && (1 == STM32CUBECFG_ICACHE)
         SCB_EnableICache();
-#endif /* STM32CUBECFG_ICACHE */
+#endif
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
         SCB_EnableDCache();
         SCB_CleanInvalidateDCache();
-#endif /* STM32CUBECFG_DCACHE */
+#endif
 
         stm32cube_crc_init();
 }

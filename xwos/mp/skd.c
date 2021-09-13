@@ -54,8 +54,8 @@
 #include <xwos/mp/rtrq.h>
 #include <xwos/mp/tt.h>
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
-  #include <xwos/mp/bh.h>
-#endif /* XWMPCFG_SKD_BH */
+#  include <xwos/mp/bh.h>
+#endif
 
 /**
  * @brief 每CPU的调度器
@@ -75,22 +75,22 @@ xwu8_t xwmp_skd_idled_stack[CPUCFG_CPU_NUM][XWMPCFG_SKD_IDLE_STACK_SIZE];
  */
 __xwmp_data __xwcc_alignl1cache
 xwu8_t xwmp_skd_bhd_stack[CPUCFG_CPU_NUM][XWMPCFG_SKD_BH_STACK_SIZE];
-#endif /* XWMPCFG_SKD_BH */
+#endif
 
 #if defined(BRDCFG_XWSKD_IDLE_HOOK) && (1 == BRDCFG_XWSKD_IDLE_HOOK)
 extern
 void board_xwskd_idle_hook(struct xwmp_skd * xwskd);
-#endif /* BRDCFG_XWSKD_IDLE_HOOK */
+#endif
 
 #if defined(BRDCFG_XWSKD_PRE_SWCX_HOOK) && (1 == BRDCFG_XWSKD_PRE_SWCX_HOOK)
 extern
 void board_xwskd_pre_swcx_hook(struct xwmp_skd * xwskd);
-#endif /* BRDCFG_XWSKD_PRE_SWCX_HOOK */
+#endif
 
 #if defined(BRDCFG_XWSKD_POST_SWCX_HOOK) && (1 == BRDCFG_XWSKD_POST_SWCX_HOOK)
 extern
 void board_xwskd_post_swcx_hook(struct xwmp_skd * xwskd);
-#endif /* BRDCFG_XWSKD_POST_SWCX_HOOK */
+#endif
 
 extern __xwmp_code
 void xwmp_pmdm_report_xwskd_suspended(struct xwmp_pmdm * pmdm);
@@ -122,7 +122,7 @@ xwer_t xwmp_skd_sw_bh(struct xwmp_skd * xwskd);
 
 static __xwmp_code
 void xwmp_skd_bh_yield(struct xwmp_skd * xwskd);
-#endif /* XWMPCFG_SKD_BH */
+#endif
 
 static __xwmp_code
 bool xwmp_skd_do_chkpmpt(struct xwmp_skd * xwskd, struct xwmp_thd * t);
@@ -175,7 +175,7 @@ xwer_t xwmp_skd_init_lc(void)
         xwskd->dis_bh_cnt = 0;
         xwmp_bh_cb_init(&xwskd->bhcb);
         xwmp_skd_init_bhd(xwskd);
-#endif /* XWMPCFG_SKD_BH */
+#endif
         xwmp_splk_init(&xwskd->cxlock);
         xwmp_splk_init(&xwskd->thdlistlock);
         xwlib_bclst_init_head(&xwskd->thdlist);
@@ -425,7 +425,7 @@ xwer_t xwmp_skd_idled(struct xwmp_skd * xwskd)
                 xwmp_skd_notify_allfrz_lc(xwskd);
 #if defined(BRDCFG_XWSKD_IDLE_HOOK) && (1 == BRDCFG_XWSKD_IDLE_HOOK)
                 board_xwskd_idle_hook(xwskd);
-#endif /* BRDCFG_XWSKD_IDLE_HOOK */
+#endif
         }
         return XWOK;
 }
@@ -701,7 +701,7 @@ bool xwmp_skd_tst_in_bh_lc(void)
         xwskd = xwmp_skd_get_lc();
         return !!(XWMP_SKD_BH_STK(xwskd) == xwskd->cstk);
 }
-#endif /* XWMPCFG_SKD_BH */
+#endif
 
 __xwmp_api
 struct xwmp_skd * xwmp_skd_dspmpt_lc(void)
@@ -800,7 +800,7 @@ bool xwmp_skd_do_chkpmpt(struct xwmp_skd * xwskd, struct xwmp_thd * t)
         XWOS_BUG_ON(&t->stack == &xwskd->idle);
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
         XWOS_BUG_ON(&t->stack == &xwskd->bh);
-#endif /* XWMPCFG_SKD_BH */
+#endif
         xwmp_rawly_lock(&xwrtrq->lock);
         xwmp_rawly_lock(&t->stlock);
         if (XWMP_SKDOBJ_DST_RUNNING & t->state) {
@@ -841,9 +841,9 @@ void xwmp_skd_chkpmpt(struct xwmp_skd * xwskd)
                 } else {
                         cstk = xwskd->cstk;
                 }
-#else /* XWMPCFG_SKD_BH */
+#else
                 cstk = xwskd->cstk;
-#endif /* !XWMPCFG_SKD_BH */
+#endif
                 if (XWMP_SKD_IDLE_STK(xwskd) != cstk) {
                         t = xwcc_baseof(cstk, struct xwmp_thd, stack);
                         sched = xwmp_skd_do_chkpmpt(xwskd, t);
@@ -979,7 +979,7 @@ struct xwmp_skd * xwmp_skd_pre_swcx_lic(struct xwmp_skd * xwskd)
 {
 #if defined(BRDCFG_XWSKD_PRE_SWCX_HOOK) && (1 == BRDCFG_XWSKD_PRE_SWCX_HOOK)
         board_xwskd_pre_swcx_hook(xwskd);
-#endif /* BRDCFG_XWSKD_PRE_SWCX_HOOK */
+#endif
         return xwskd;
 }
 
@@ -992,7 +992,7 @@ struct xwmp_skd * xwmp_skd_post_swcx_lic(struct xwmp_skd * xwskd)
 {
 #if defined(BRDCFG_XWSKD_POST_SWCX_HOOK) && (1 == BRDCFG_XWSKD_POST_SWCX_HOOK)
         board_xwskd_post_swcx_hook(xwskd);
-#endif /* BRDCFG_XWSKD_POST_SWCX_HOOK */
+#endif
         xwmp_skd_finish_swcx_lic(xwskd);
         return xwskd;
 }
@@ -1086,7 +1086,7 @@ void xwmp_skd_finish_swcx_lic(struct xwmp_skd * xwskd)
                 }
         }
 }
-#else /* XWMPCFG_SKD_BH */
+#else
 /**
  * @brief 请求切换上下文
  * @param[in] xwskd: XWOS MP调度器的指针
@@ -1147,7 +1147,7 @@ void xwmp_skd_finish_swcx_lic(struct xwmp_skd * xwskd)
                 xwmp_rawly_unlock_cpuirqrs(&xwskd->cxlock, cpuirq);
         }
 }
-#endif /* !XWMPCFG_SKD_BH */
+#endif
 
 /**
  * @brief 将调度器的唤醒锁计数器加1

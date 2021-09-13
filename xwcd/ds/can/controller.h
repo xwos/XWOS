@@ -28,9 +28,9 @@
 #include <xwos/osal/sync/sem.h>
 
 #if defined(XWCDCFG_ds_CAN_CONTROLLER_ROCBT) && (1 == XWCDCFG_ds_CAN_CONTROLLER_ROCBT)
-  #define __xwds_canc_cbtbl_qualifier const
+#  define __xwds_canc_cbtbl_qualifier const
 #else
-  #define __xwds_canc_cbtbl_qualifier
+#  define __xwds_canc_cbtbl_qualifier
 #endif
 
 #define XWDS_CANC_RXQNUM        (XWCDCFG_ds_CAN_CONTROLLER_RXQNUM)

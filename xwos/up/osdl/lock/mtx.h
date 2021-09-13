@@ -14,11 +14,11 @@
 #define __xwos_up_osdl_lock_mtx_h__
 
 #if defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)
-  #include <xwos/up/lock/mtx.h>
+#  include <xwos/up/lock/mtx.h>
 #elif defined(XWUPCFG_LOCK_FAKEMTX) && (1 == XWUPCFG_LOCK_FAKEMTX)
-  #include <xwos/up/lock/fakemtx.h>
+#  include <xwos/up/lock/fakemtx.h>
 #else
-  #error "Can't find the mtx configuration!"
+#  error "Can't find the mtx configuration!"
 #endif
 
 #define xwosdl_mtx xwup_mtx

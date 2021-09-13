@@ -29,7 +29,7 @@
 #if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
 static __xwos_init_code
 void soc_relocate_isrtable(void);
-#endif /* !SOCCFG_RO_IVT */
+#endif
 
 extern xwu8_t xwos_ivt_lma_base[];
 extern xwu8_t xwos_ivt_vma_base[];
@@ -281,7 +281,7 @@ void soc_ram_init(void)
                         }
                 }
         }
-#else /* SOCCFG_BKUP */
+#else
         /* fill zero. */
         src = (xwu32_t *)bkup_mr_origin;
         cnt = (xwu32_t)bkup_mr_size;
@@ -302,7 +302,7 @@ void soc_ram_init(void)
                         rlc_src++;
                 }
         }
-#endif /* !SOCCFG_BKUP */
+#endif
 
         /* Init standby mode wakeup entry */
         src = (xwu32_t *)stdby_wkup_mr_origin;
@@ -623,7 +623,7 @@ void soc_me_init(void)
         /* Peripheral Operation in Debug mode: Disabled */
         /* Low-Power Mode Peripheral Configuration: MPC5_ME_LPPC_FROZEN */
         /* RUN Mode Peripheral Configuration: MPC5_ME_RUNPC_FROZEN */
-#endif /* #if defined(MPC5607B) */
+#endif
 
         /* FlexCAN_0 Control */
         ME.PCTL[16].R = 0x00;
@@ -679,7 +679,7 @@ void soc_me_init(void)
         /* Peripheral Operation in Debug mode: Disabled */
         /* Low-Power Mode Peripheral Configuration: MPC5_ME_LPPC_FROZEN */
         /* RUN Mode Peripheral Configuration: MPC5_ME_RUNPC_FROZEN */
-#endif /* #if defined(MPC5607B) */
+#endif
 
         /* I2C Control */
         ME.PCTL[44].R = 0x00;
@@ -735,7 +735,7 @@ void soc_me_init(void)
         /* Peripheral Operation in Debug mode: Disabled */
         /* Low-Power Mode Peripheral Configuration: MPC5_ME_LPPC_FROZEN */
         /* RUN Mode Peripheral Configuration: MPC5_ME_RUNPC_FROZEN */
-#endif /* #if defined(MPC5607B) */
+#endif
 
         /* CTU Control */
         ME.PCTL[57].R = 0x00;
@@ -846,14 +846,14 @@ void soc_relocate_isrtable(void)
                 }
         }
 }
-#endif /* !SOCCFG_RO_IVT */
+#endif
 
 __xwbsp_init_code
 void soc_init(void)
 {
 #if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
         soc_relocate_isrtable();
-#endif /* !SOCCFG_RO_IVT */
+#endif
 
         soc_reset_flags.fes = 0;
         soc_reset_flags.des = 0;

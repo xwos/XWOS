@@ -23,20 +23,20 @@
 
 #include <xwos/standard.h>
 #if ((defined(SOCCFG_CHIP_MPC5602D)) && (1 == SOCCFG_CHIP_MPC5602D))
-  #include <mpc5602d.h>
-  #define MPC5602D
+#  include <mpc5602d.h>
+#  define MPC5602D
 #elif ((defined(SOCCFG_CHIP_MPC5602B)) && (1 == SOCCFG_CHIP_MPC5602B))
-  #include <mpc5602b.h>
-  #define MPC5602B
+#  include <mpc5602b.h>
+#  define MPC5602B
 #elif ((defined(SOCCFG_CHIP_MPC5604B)) && (1 == SOCCFG_CHIP_MPC5604B))
-  #include <mpc5604b.h>
-  #define MPC5604B
+#  include <mpc5604b.h>
+#  define MPC5604B
 #elif ((defined(SOCCFG_CHIP_MPC5606B)) && (1 == SOCCFG_CHIP_MPC5606B))
-  #include <mpc5606b.h>
-  #define MPC5606B
+#  include <mpc5606b.h>
+#  define MPC5606B
 #elif ((defined(SOCCFG_CHIP_MPC5607B)) && (1 == SOCCFG_CHIP_MPC5607B))
-  #include <mpc5607b.h>
-  #define MPC5607B
+#  include <mpc5607b.h>
+#  define MPC5607B
 #endif
 
 /**

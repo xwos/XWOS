@@ -22,7 +22,7 @@
 #define __xwosimpl_soc_irq_h__
 
 #ifndef __xwos_ospl_soc_irq_h__
-  #error "This file should be included from <xwos/ospl/soc/irq.h>."
+#  error "This file should be included from <xwos/ospl/soc/irq.h>."
 #endif
 
 /**

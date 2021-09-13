@@ -15,8 +15,8 @@
 
 #include <xwos/standard.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-  #include <xwos/up/sync/obj.h>
-#endif /* XWUPCFG_SYNC_EVT */
+#  include <xwos/up/sync/obj.h>
+#endif
 
 struct xwup_evt;
 
@@ -26,7 +26,7 @@ struct xwup_evt;
 /* abstract */ struct xwup_vsem {
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
         struct xwup_synobj synobj; /**< C语言面向对象：继承struct xwup_synobj */
-#endif /* XWUPCFG_SYNC_EVT */
+#endif
         xwssq_t count; /**< 信号量计数器：如果这个成员的值<0，信号量处于负状态。*/
         xwssq_t max; /**< 信号量计数器的最大值 */
 };
@@ -42,9 +42,9 @@ void xwup_vsem_activate(struct xwup_vsem * sem);
 xwer_t xwup_vsem_bind(struct xwup_vsem * sem, struct xwup_evt * evt, xwsq_t pos);
 xwer_t xwup_vsem_unbind(struct xwup_vsem * sem, struct xwup_evt * evt);
 #else
-#define xwup_vsem_bind(sem, evt, pos) (-ENOSYS)
-#define xwup_vsem_unbind(sem, evt) (-ENOSYS)
-#endif /* XWUPCFG_SYNC_EVT */
+#  define xwup_vsem_bind(sem, evt, pos) (-ENOSYS)
+#  define xwup_vsem_unbind(sem, evt) (-ENOSYS)
+#endif
 
 xwer_t xwup_vsem_freeze(struct xwup_vsem * sem);
 xwer_t xwup_vsem_thaw(struct xwup_vsem * sem);

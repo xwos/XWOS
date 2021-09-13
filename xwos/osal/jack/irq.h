@@ -14,9 +14,9 @@
 #define __xwos_osal_jack_irq_h__
 
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/osdl/irq.h>
+#  include <xwos/mp/osdl/irq.h>
 #elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/osdl/irq.h>
+#  include <xwos/up/osdl/irq.h>
 #endif
 
 #endif /* xwos/osal/jack/irq.h */

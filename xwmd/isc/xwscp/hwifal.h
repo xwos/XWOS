@@ -16,10 +16,10 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 
-#define XWSCP_HWIFAL_SOF                        ((xwu8_t)'S')
-#define XWSCP_HWIFAL_EOF                        ((xwu8_t)(XWSCP_HWIFAL_SOF ^ 0xFF))
-#define XWSCP_HWIFAL_SOF_SIZE                   (1U)
-#define XWSCP_HWIFAL_EOF_SIZE                   (1U)
+#define XWSCP_HWIFAL_SOF        ((xwu8_t)'S')
+#define XWSCP_HWIFAL_EOF        ((xwu8_t)(XWSCP_HWIFAL_SOF ^ 0xFF))
+#define XWSCP_HWIFAL_SOF_SIZE   (1U)
+#define XWSCP_HWIFAL_EOF_SIZE   (1U)
 
 struct xwscp;
 union xwscp_slot;

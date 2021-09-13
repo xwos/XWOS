@@ -27,17 +27,10 @@
 #include <xwos/osal/lock/spinlock.h>
 #include <xwam/example/lock/spinlock/mif.h>
 
-#define XWSPLKDEMO_THD_PRIORITY                                 \
-        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+#define LOGTAG "swt"
+#define swtlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
 
-#if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-#define XWSPLKDEMO_LOG_TAG     "swt"
-#define swtlogf(lv, fmt, ...)                                   \
-        xwlogf(lv, XWSPLKDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
-#else /* XWLIBCFG_LOG */
-#define swtlogf(lv, fmt, ...)
-#endif /* !XWLIBCFG_LOG */
-
+#define XWSPLKDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 void xwsplkdemo_swt_callback(struct xwos_swt * swt, void * arg);
 xwer_t xwsplkdemo_thd_func(void * arg);
 

@@ -46,7 +46,7 @@ xwer_t stm32cube_soc_drv_suspend(struct xwds_device * dev);
 
 static
 xwer_t stm32cube_soc_drv_resume(struct xwds_device * dev);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 static
 xwer_t stm32cube_soc_drv_gpio_req(struct xwds_soc * soc,
@@ -86,7 +86,7 @@ xwer_t stm32cube_soc_drv_gpio_input(struct xwds_soc * soc,
 #if defined(STM32CUBECFG_SRAM) && (1 == STM32CUBECFG_SRAM)
 static
 xwer_t stm32cube_soc_drv_eram_tst(struct xwds_soc * soc, xwptr_t * erraddr);
-#endif /* STM32CUBECFG_SRAM */
+#endif
 
 extern xwu8_t sram_mr_origin[];
 extern xwu8_t sram_mr_size[];
@@ -101,7 +101,7 @@ const struct xwds_soc_driver stm32cube_soc_drv = {
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
                 .suspend = stm32cube_soc_drv_suspend,
                 .resume = stm32cube_soc_drv_resume,
-#endif /* XWCDCFG_ds_PM */
+#endif
         },
 
         .gpio_req = stm32cube_soc_drv_gpio_req,
@@ -115,7 +115,7 @@ const struct xwds_soc_driver stm32cube_soc_drv = {
 
 #if defined(STM32CUBECFG_SRAM) && (1 == STM32CUBECFG_SRAM)
         .eram_tst = stm32cube_soc_drv_eram_tst,
-#endif /* STM32CUBECFG_SRAM */
+#endif
 };
 
 struct stm32cube_soc_cfg stm32cube_soc_cfg = {
@@ -163,7 +163,7 @@ struct xwds_soc stm32cube_soc_cb = {
                 .origin = (xwptr_t)sram_mr_origin,
                 .size = (xwsz_t)sram_mr_size,
         },
-#endif /* STM32CUBECFG_SRAM */
+#endif
 };
 
 /******** ******** base driver ******** ********/
@@ -177,7 +177,7 @@ xwer_t stm32cube_soc_drv_start(struct xwds_device * dev)
         MX_DMA_Init();
 #if defined(STM32CUBECFG_SRAM) && (1 == STM32CUBECFG_SRAM)
         MX_FSMC_Init();
-#endif /* STM32CUBECFG_SRAM */
+#endif
 
         return XWOK;
 }
@@ -189,7 +189,7 @@ xwer_t stm32cube_soc_drv_stop(struct xwds_device * dev)
 
 #if defined(STM32CUBECFG_SRAM) && (1 == STM32CUBECFG_SRAM)
         MX_FSMC_DeInit();
-#endif /* STM32CUBECFG_SRAM */
+#endif
         MX_DMA_DeInit();
         MX_GPIO_DeInit();
 
@@ -210,7 +210,7 @@ xwer_t stm32cube_soc_drv_resume(struct xwds_device * dev)
         XWOS_UNUSED(dev);
         return XWOK;
 }
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 /******** ******** gpio operation driver ******** ********/
 static
@@ -375,4 +375,4 @@ xwer_t stm32cube_soc_drv_eram_tst(struct xwds_soc * soc, xwptr_t * erraddr)
         }
         return rc;
 }
-#endif /* STM32CUBECFG_SRAM */
+#endif

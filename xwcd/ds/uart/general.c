@@ -44,7 +44,7 @@ xwer_t xwds_uartc_vop_suspend(struct xwds_uartc * uartc);
 
 static __xwds_vop
 xwer_t xwds_uartc_vop_resume(struct xwds_uartc * uartc);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 static __xwds_code
 xwer_t xwds_uartc_tx_1byte(struct xwds_uartc * uartc, const xwu8_t byte);
@@ -57,7 +57,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_uartc_vop = {
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
         .suspend = (void *)xwds_uartc_vop_suspend,
         .resume = (void *)xwds_uartc_vop_resume,
-#endif /* XWCDCFG_ds_PM */
+#endif
 };
 
 /******** ******** ******** constructor & destructor ******** ******** ********/
@@ -293,7 +293,7 @@ xwer_t xwds_uartc_vop_resume(struct xwds_uartc * uartc)
 err_dev_resume:
         return rc;
 }
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 /******** ******** UART APIs ******** ********/
 /**

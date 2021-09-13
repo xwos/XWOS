@@ -24,8 +24,8 @@
 #include <xwos/ospl/skd.h>
 
 #if (SOCCFG_IRQ_NUM < 8) || (SOCCFG_IRQ_NUM > 240)
-  #error "SOCCFG_IRQ_NUM must be between 8 and 240 inclusive"
-#endif /* #if (SOCCFG_IRQ_NUM < 8) || (SOCCFG_IRQ_NUM > 240) */
+#  error "SOCCFG_IRQ_NUM must be between 8 and 240 inclusive"
+#endif
 
 extern xwu8_t xwos_stk_top[];
 

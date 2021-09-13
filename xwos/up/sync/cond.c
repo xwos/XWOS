@@ -15,8 +15,8 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWUPCFG_SYNC_COND_STDC_MM) && (1 == XWUPCFG_SYNC_COND_STDC_MM)
-  #include <stdlib.h>
-#endif /* XWUPCFG_SYNC_COND_STDC_MM */
+#  include <stdlib.h>
+#endif
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/up/lock/seqlock.h>
@@ -24,9 +24,9 @@
 #include <xwos/up/thd.h>
 #include <xwos/up/plwq.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-  #include <xwos/up/sync/obj.h>
-  #include <xwos/up/sync/evt.h>
-#endif /* XWUPCFG_SYNC_EVT */
+#  include <xwos/up/sync/obj.h>
+#  include <xwos/up/sync/evt.h>
+#endif
 #include <xwos/up/sync/cond.h>
 
 static __xwup_code
@@ -99,7 +99,7 @@ void xwup_cond_activate(struct xwup_cond * cond)
 {
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
         xwup_synobj_activate(&cond->synobj);
-#endif /* XWUPCFG_SYNC_EVT */
+#endif
         xwup_plwq_init(&cond->wq);
         cond->neg = false;
 }
@@ -193,7 +193,7 @@ xwer_t xwup_cond_unbind(struct xwup_cond * cond, struct xwup_evt * evt)
         xwospl_cpuirq_restore_lc(cpuirq);
         return rc;
 }
-#endif /* XWUPCFG_SYNC_EVT */
+#endif
 
 __xwup_api
 xwer_t xwup_cond_freeze(struct xwup_cond * cond)
@@ -351,7 +351,7 @@ xwer_t xwup_cond_broadcast(struct xwup_cond * cond)
                 }
                 xwospl_cpuirq_restore_lc(cpuirq);
         }
-#endif /* XWUPCFG_SYNC_EVT */
+#endif
         return rc;
 }
 
@@ -443,11 +443,11 @@ xwer_t xwup_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
         xwospl_cpuirq_enable_lc();
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
         xwup_skd_wakelock_unlock();
-#endif /* XWUPCFG_SKD_PM */
+#endif
         xwup_skd_req_swcx();
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
         xwup_skd_wakelock_lock();
-#endif /* XWUPCFG_SKD_PM */
+#endif
         xwospl_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
@@ -562,7 +562,7 @@ xwer_t xwup_cond_do_timedwait(struct xwup_cond * cond,
                 xwospl_cpuirq_restore_lc(cpuirq);
                 rc = -EINTR;
         } else {
-#endif /* XWUPCFG_SKD_PM */
+#endif
                 rc = xwup_cond_do_timedblkthd_unlkwq_cpuirqrs(cond, thd,
                                                               lock, lktype, lkdata,
                                                               xwtm, lkst,
@@ -570,7 +570,7 @@ xwer_t xwup_cond_do_timedwait(struct xwup_cond * cond,
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
                 xwup_skd_wakelock_unlock();
         }
-#endif /* XWUPCFG_SKD_PM */
+#endif
         return rc;
 }
 

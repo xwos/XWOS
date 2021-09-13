@@ -38,6 +38,6 @@ void xwds_init(struct xwds * ds);
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 xwer_t xwds_pm_suspend(struct xwds * ds);
 xwer_t xwds_pm_resume(struct xwds * ds);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 #endif /* xwcd/ds/xwds.h */

@@ -24,7 +24,7 @@
 #include <armv7m_core.h>
 #include <arch_skd.h>
 
-#define SOC_EXC_SWCX_PRIO       (SOC_IRQ_PRIO_LOWEST | SOC_IRQ_SUBPRIO_LOWEST)
+#define SOC_EXC_SWCX_PRIO (SOC_IRQ_PRIO_LOWEST | SOC_IRQ_SUBPRIO_LOWEST)
 
 #define XPSR_INITVAL                                    0x01000000U
 #define FPSCR_INITVAL                                   0X00000000U
@@ -142,7 +142,7 @@ void arch_skd_init_stack(struct xwospl_skd_stack_info * stk,
         *(stk->sp) = (xwstk_t)0; /* s1 */
         stk->sp--;
         *(stk->sp) = (xwstk_t)0; /* s0 */
-#endif /* ARCHCFG_FPU */
+#endif
 
         /* volatile registers */
         stk->sp--;
@@ -196,16 +196,16 @@ void arch_skd_init_stack(struct xwospl_skd_stack_info * stk,
         *(stk->sp) = (xwstk_t)0; /* s17 */
         stk->sp--;
         *(stk->sp) = (xwstk_t)0; /* s16 */
-#endif /* ARCHCFG_FPU */
+#endif
 
         /* return code */
 #if (defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU))
         stk->sp--;
         *(stk->sp) = EXC_RETURN_THREAD_MODE_PSP_FPUEXTENDED; /* lr */
-#else /* ARCHCFG_FPU */
+#else
         stk->sp--;
         *(stk->sp) = EXC_RETURN_THREAD_MODE_PSP_BASIC; /* lr */
-#endif /* #if (defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)) #else */
+#endif
 
         /* non-volatile registers */
         stk->sp--;
@@ -230,18 +230,18 @@ void arch_skd_init_stack(struct xwospl_skd_stack_info * stk,
 #if (defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU))
                 stk->sp--;
                 *(stk->sp) = (xwstk_t)0x6; /* CONTROL: privileged access, psp, FPCA */
-#else /* ARCHCFG_FPU */
+#else
                 stk->sp--;
                 *(stk->sp) = (xwstk_t)0x2; /* CONTROL reg: privileged access, psp */
-#endif /* !ARCHCFG_FPU */
+#endif
         } else {
 #if (defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU))
                 stk->sp--;
                 *(stk->sp) = (xwstk_t)0x7; /* CONTROL: unprivileged access, psp, FPCA */
-#else /* ARCHCFG_FPU */
+#else
                 stk->sp--;
                 *(stk->sp) = (xwstk_t)0x3; /* CONTROL: unprivileged access, psp */
-#endif /* !ARCHCFG_FPU */
+#endif
         }
 }
 
@@ -269,7 +269,7 @@ void arch_skd_svcsr_start(__xwcc_unused struct xwospl_skd * xwskd)
                          :
                          :[__nvfr] "I" (ARCH_NVFR_SIZE)
                          :);
-#endif /* ARCHCFG_FPU */
+#endif
         /* set PSP */
         __asm__ volatile("      msr     psp, r2");
         __asm__ volatile("      dsb");
@@ -309,7 +309,7 @@ void xwospl_skd_isr_swcx(void)
                          :[__nvfr] "I" (ARCH_NVFR_SIZE)
                          :);
         __asm__ volatile("      vstmia  r2, {s16-s31}");
-#endif /* ARCHCFG_FPU */
+#endif
         /* save non-volatile registers: lr, r11-r4 */
         __asm__ volatile("      stmfd   r2!, {r4-r11, lr}");
         /* save control reg */
@@ -335,7 +335,7 @@ void xwospl_skd_isr_swcx(void)
                          :
                          :[__nvfr] "I" (ARCH_NVFR_SIZE)
                          :);
-#endif /* ARCHCFG_FPU */
+#endif
         /* set PSP */
         __asm__ volatile("      msr     psp, r2");
         __asm__ volatile("      dsb");
@@ -367,20 +367,20 @@ struct xwospl_skd * arch_skd_chk_swcx(void)
         pstk = xwskd->pstk;
         stkbtn = (xwstk_t *)pstk->base;
         cm_get_psp(&psp);
-#if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
+#  if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
         if ((psp - (ARCH_NVFR_SIZE + ARCH_NVGR_SIZE)) <
             (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
                 arch_skd_report_stk_overflow(pstk);
         }
-#else /* ARCHCFG_FPU */
+#  else
         if ((psp - ARCH_NVGR_SIZE) <
             (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
                 arch_skd_report_stk_overflow(pstk);
         }
-#endif /* !ARCHCFG_FPU */
-#else /* XWMMCFG_STACK_CHK_SWCX */
+#  endif
+#else
         xwskd = xwosplcb_skd_get_lc();
-#endif /* !XWMMCFG_STACK_CHK_SWCX */
+#endif
         return xwskd;
 }
 
@@ -409,12 +409,12 @@ struct xwospl_skd * arch_skd_chk_stk(void)
             (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
                 arch_skd_report_stk_overflow(cstk);
         }
-#else /* ARCHCFG_FPU */
+#else
         if ((stk.value - ARCH_NVGR_SIZE) <
             (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
                 arch_skd_report_stk_overflow(cstk);
         }
-#endif /* !ARCHCFG_FPU */
+#endif
         for (i = 0; i < XWOSPL_STACK_WATERMARK; i++) {
                 if (0xFFFFFFFFU != stkbtn[i]) {
                         arch_skd_report_stk_overflow(cstk);

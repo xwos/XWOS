@@ -22,7 +22,7 @@
 #define __xwosimpl_soc_xwbop_h__
 
 #ifndef __xwos_ospl_soc_xwbop_h__
-  #error "This file should be included from <xwos/ospl/soc/xwbop.h>."
+#  error "This file should be included from <xwos/ospl/soc/xwbop.h>."
 #endif
 
 #endif /* xwosimpl_soc_xwbop.h */

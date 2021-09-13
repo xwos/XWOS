@@ -16,8 +16,8 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMDCFG_isc_xwcq_STDC_MM) && (1 == XWMDCFG_isc_xwcq_STDC_MM)
-  #include <stdlib.h>
-#endif /* XWMDCFG_isc_xwcq_STDC_MM */
+#  include <stdlib.h>
+#endif
 #include <xwos/lib/bclst.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/sem.h>
@@ -66,7 +66,7 @@ struct xwcq * xwcq_alloc(xwsz_t qsize)
                 xwcq_construct(cq, (xwu8_t *)&cq[1]);
         }
         return cq;
-#else /* XWMDCFG_isc_xwcq_STDC_MM */
+#else
         union {
                 struct xwcq * cq;
                 void * anon;
@@ -80,7 +80,7 @@ struct xwcq * xwcq_alloc(xwsz_t qsize)
                 mem.cq = err_ptr(-ENOMEM);
         }
         return mem.cq;
-#endif /* !XWMDCFG_isc_xwcq_STDC_MM */
+#endif
 }
 
 /**
@@ -93,10 +93,10 @@ void xwcq_free(struct xwcq * cq)
 #if defined(XWMDCFG_isc_xwcq_STDC_MM) && (1 == XWMDCFG_isc_xwcq_STDC_MM)
         xwcq_destruct(cq);
         free(cq);
-#else /* XWMDCFG_isc_xwcq_MEMSLICE */
+#else
         xwcq_destruct(cq);
         xwmm_kma_free(cq);
-#endif /* !XWMDCFG_isc_xwcq_MEMSLICE */
+#endif
 }
 
 /**

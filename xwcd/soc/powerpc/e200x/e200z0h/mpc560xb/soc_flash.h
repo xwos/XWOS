@@ -53,7 +53,6 @@ void soc_cflash_program(xwu32_t * addr, xwu32_t data0, xwu32_t data1);
 void soc_cflash_erase_shadow_block(void);
 void soc_cflash_program_shadow_test_block(xwu32_t * addr, xwu32_t data0, xwu32_t data1);
 #endif
-/* #if defined(SOCCFG_FLASH_SHADOW_BLOCK) && (1 == SOCCFG_FLASH_SHADOW_BLOCK) */
 
 void soc_cflash_lock(void);
 void soc_flsopc_relocate(void);

@@ -23,13 +23,8 @@
 #include <xwos/lib/crc8.h>
 #include <xwos/lib/crc32.h>
 
-#if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-  #define XWCRCDEMO_LOG_TAG     "crc"
-  #define crclogf(lv, fmt, ...) \
-        xwlogf(lv, XWCRCDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
-#else /* XWLIBCFG_LOG */
-  #define crclogf(lv, fmt, ...)
-#endif /* !XWLIBCFG_LOG */
+#define LOGTAG "crc"
+#define crclogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
 
 /**
  * @brief 模块的加载函数

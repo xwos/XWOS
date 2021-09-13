@@ -14,9 +14,9 @@
 #define __xwos_osal_jack_sync_cond_h__
 
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/osdl/sync/cond.h>
+#  include <xwos/mp/osdl/sync/cond.h>
 #elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/osdl/sync/cond.h>
+#  include <xwos/up/osdl/sync/cond.h>
 #endif
 
 #endif /* xwos/osal/jack/sync/cond.h */

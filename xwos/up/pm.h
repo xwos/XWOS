@@ -54,6 +54,6 @@ void xwup_skd_set_pm_cb(xwup_skd_pm_cb_f resume_cb,
 xwer_t xwup_skd_suspend(void);
 xwer_t xwup_skd_resume(void);
 xwsq_t xwup_skd_get_pm_stage(void);
-#endif /* XWUPCFG_SKD_PM */
+#endif
 
 #endif /* xwos/up/pm.h */

@@ -15,8 +15,8 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWUPCFG_SYNC_PLSEM_STDC_MM) && (1 == XWUPCFG_SYNC_PLSEM_STDC_MM)
-  #include <stdlib.h>
-#endif /* XWUPCFG_SYNC_PLSEM_STDC_MM */
+#  include <stdlib.h>
+#endif
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/up/lock/seqlock.h>
@@ -24,8 +24,8 @@
 #include <xwos/up/thd.h>
 #include <xwos/up/plwq.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-  #include <xwos/up/sync/evt.h>
-#endif /* XWUPCFG_SYNC_EVT */
+#  include <xwos/up/sync/evt.h>
+#endif
 #include <xwos/up/sync/plsem.h>
 
 static __xwup_code
@@ -198,7 +198,7 @@ xwer_t xwup_plsem_unbind(struct xwup_plsem * sem, struct xwup_evt * evt)
 
         return xwup_vsem_unbind(&sem->vsem, evt);
 }
-#endif /* XWUPCFG_SYNC_EVT */
+#endif
 
 /**
  * @brief 中断管道信号量等待队列中的一个节点
@@ -274,7 +274,7 @@ xwer_t xwup_plsem_post(struct xwup_plsem * sem)
                                         xwup_sel_obj_s1i(evt, &sem->vsem.synobj);
                                 }
                         }
-#endif /* XWUPCFG_SYNC_EVT */
+#endif
                         xwospl_cpuirq_restore_lc(flag);
                 }
         }
@@ -309,7 +309,7 @@ xwer_t xwup_plsem_trywait(struct xwup_plsem * sem)
                                 xwup_sel_obj_c0i(evt, &sem->vsem.synobj);
                         }
                 }
-#endif /* XWUPCFG_SYNC_EVT */
+#endif
         } else {
                 rc = -ENODATA;
         }
@@ -355,11 +355,11 @@ xwer_t xwup_plsem_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_plsem * sem,
         xwospl_cpuirq_enable_lc();
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
         xwup_skd_wakelock_unlock();
-#endif /* XWUPCFG_SKD_PM */
+#endif
         xwup_skd_req_swcx();
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
         xwup_skd_wakelock_lock();
-#endif /* XWUPCFG_SKD_PM */
+#endif
         xwospl_cpuirq_restore_lc(flag);
 
         /* 判断唤醒原因 */
@@ -448,7 +448,7 @@ xwer_t xwup_plsem_do_timedwait(struct xwup_plsem * sem, struct xwup_thd * thd,
                         xwospl_cpuirq_restore_lc(flag);
                         rc = -EINTR;
                 } else {
-#endif /* XWUPCFG_SKD_PM */
+#endif
                         rc = xwup_plsem_do_timedblkthd_unlkwq_cpuirqrs(sem,
                                                                        thd,
                                                                        xwtm,
@@ -456,7 +456,7 @@ xwer_t xwup_plsem_do_timedwait(struct xwup_plsem * sem, struct xwup_thd * thd,
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
                         xwup_skd_wakelock_unlock();
                 }
-#endif /* XWUPCFG_SKD_PM */
+#endif
         } else {
                 sem->vsem.count--;
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
@@ -468,7 +468,7 @@ xwer_t xwup_plsem_do_timedwait(struct xwup_plsem * sem, struct xwup_thd * thd,
                                 xwup_sel_obj_c0i(evt, &sem->vsem.synobj);
                         }
                 }
-#endif /* XWUPCFG_SYNC_EVT */
+#endif
                 xwospl_cpuirq_restore_lc(flag);
                 rc = XWOK;
         }
@@ -555,7 +555,7 @@ xwer_t xwup_plsem_do_wait_unintr(struct xwup_plsem * sem, struct xwup_thd * thd)
                                 xwup_sel_obj_c0i(evt, &sem->vsem.synobj);
                         }
                 }
-#endif /* XWUPCFG_SYNC_EVT */
+#endif
                 xwospl_cpuirq_restore_lc(flag);
                 rc = XWOK;
         }

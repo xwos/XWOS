@@ -22,7 +22,7 @@
 #define __xwosimpl_soc_xwaop64_h__
 
 #ifndef __xwos_ospl_soc_xwaop64_h__
-  #error "This file should be included from <xwos/ospl/soc/xwaop64.h>."
+#  error "This file should be included from <xwos/ospl/soc/xwaop64.h>."
 #endif
 
 #endif /* xwosimpl_soc_xwaop64.h */

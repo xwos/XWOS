@@ -27,7 +27,7 @@
 extern struct xwmm_bma * axisram_bma;
 
 #if ((BRDCFG_MM_AXISRAM_BLKSZ % XWMMCFG_STACK_ALIGNMENT) != 0)
-  #error BRDCFG_MM_AXISRAM_BLKSZ is not aligned to XWMMCFG_STACK_ALIGNMENT!
+#  error BRDCFG_MM_AXISRAM_BLKSZ is not aligned to XWMMCFG_STACK_ALIGNMENT!
 #endif
 
 __xwos_code

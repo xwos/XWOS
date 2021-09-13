@@ -29,7 +29,7 @@ void xwds_pm_report_devices_suspending(struct xwds * ds, xwer_t rc);
 
 static __xwds_code
 void xwds_pm_report_devices_resuming(struct xwds * ds, xwer_t rc);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 /**
  * @brief XWDS API：初始化设备栈
@@ -106,4 +106,4 @@ void xwds_pm_report_devices_resuming(struct xwds * ds, xwer_t rc)
         XWOS_UNUSED(ds);
         XWDS_BUG_ON(rc < 0);
 }
-#endif /* XWCDCFG_ds_PM */
+#endif

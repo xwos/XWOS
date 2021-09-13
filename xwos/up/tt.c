@@ -17,15 +17,15 @@
 #include <xwos/up/irq.h>
 #include <xwos/up/skd.h>
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
-  #include <xwos/up/bh.h>
-#endif /* XWUPCFG_SKD_BH */
+#  include <xwos/up/bh.h>
+#endif
 #include <xwos/up/lock/seqlock.h>
 #include <xwos/up/tt.h>
 
 #if defined(BRDCFG_XWSKD_SYSHWT_HOOK) && (1 == BRDCFG_XWSKD_SYSHWT_HOOK)
 extern
 void board_xwskd_syshwt_hook(struct xwup_skd * xwskd);
-#endif /* BRDCFG_XWSKD_SYSHWT_HOOK */
+#endif
 
 static __xwup_code
 void xwup_tt_rmrbb_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn);
@@ -69,7 +69,7 @@ xwer_t xwup_tt_init(struct xwup_tt * xwtt)
         xwlib_bclst_init_head(&xwtt->timeout);
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
         xwup_bh_node_init(&xwtt->bhn, (xwup_bh_f)xwup_tt_bh, xwtt);
-#endif /* XWUPCFG_SKD_BH */
+#endif
         rc = xwup_syshwt_init(&xwtt->hwt);
         return rc;
 }
@@ -450,14 +450,14 @@ void xwup_syshwt_task(struct xwup_syshwt * hwt)
                 xwskd = xwup_tt_get_skd(xwtt);
                 xwup_bh_node_eq(&xwskd->bhcb, &xwtt->bhn);
                 xwup_skd_req_bh();
-#else /* XWUPCFG_SKD_BH */
+#else
                 xwup_tt_bh(xwtt);
-#endif /* !XWUPCFG_SKD_BH */
+#endif
         }
         xwup_skd_chkpmpt();
 #if defined(BRDCFG_XWSKD_SYSHWT_HOOK) && (1 == BRDCFG_XWSKD_SYSHWT_HOOK)
         board_xwskd_syshwt_hook(xwup_skd_get_lc());
-#endif /* BRDCFG_XWSKD_SYSHWT_HOOK */
+#endif
 }
 
 /**

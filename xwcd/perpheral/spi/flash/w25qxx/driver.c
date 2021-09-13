@@ -65,7 +65,7 @@ xwer_t xwds_w25qxx_drv_suspend(struct xwds_device * dev)
 {
         return xwds_w25qxx_drv_stop(dev);
 }
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 /******** ******** ******** APIs ******** ******** ********/
 xwer_t xwds_w25qxx_cfgbus(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)

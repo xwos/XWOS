@@ -98,7 +98,7 @@ struct xwds_virtual_operation {
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
         xwer_t (* suspend)(struct xwds_device *); /**< 暂停 */
         xwer_t (* resume)(struct xwds_device *); /**< 继续 */
-#endif /* XWCDCFG_ds_PM */
+#endif
 };
 
 /**
@@ -140,7 +140,7 @@ xwer_t xwds_device_vop_stop(struct xwds_device * dev);
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 xwer_t xwds_device_vop_suspend(struct xwds_device * dev);
 xwer_t xwds_device_vop_resume(struct xwds_device * dev);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 void xwds_device_construct(struct xwds_device * dev);
 void xwds_device_destruct(struct xwds_device * dev);
@@ -156,7 +156,7 @@ xwer_t xwds_device_suspend(struct xwds_device * dev);
 xwer_t xwds_device_resume(struct xwds_device * dev);
 xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err);
 xwer_t xwds_device_resume_all(struct xwds * ds, bool ign_err);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 /**
  * @brief XWDS API：获取设备对象的标签
@@ -208,7 +208,7 @@ xwsq_t xwds_device_get_refcnt(struct xwds_device * dev)
         return xwds_obj_get_refcnt(&dev->obj);
 }
 
-#else /* XWCDCFG_ds_LITE */
+#else
 
 /**
  * @brief XWDS API：增加对象的引用计数
@@ -244,6 +244,6 @@ xwsq_t xwds_device_get_refcnt(struct xwds_device * dev)
 {
         return xwds_obj_get_refcnt(&dev->obj);
 }
-#endif /* !XWCDCFG_ds_LITE */
+#endif
 
 #endif /* xwcd/ds/device.h */

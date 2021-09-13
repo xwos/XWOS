@@ -42,7 +42,7 @@ xwer_t xwmp_cond_do_timedwait(struct xwmp_cond * cond, struct xwmp_thd * thd,
 
 #if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
 xwer_t xwmp_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
-#endif /* XWMPCFG_SYNC_COND_MEMSLICE */
+#endif
 
 xwer_t xwmp_cond_create(struct xwmp_cond ** ptrbuf);
 xwer_t xwmp_cond_delete(struct xwmp_cond * cond);
@@ -59,7 +59,7 @@ xwer_t xwmp_cond_bind(struct xwmp_cond * cond,
                       struct xwmp_evt * evt, xwsq_t pos);
 xwer_t xwmp_cond_unbind(struct xwmp_cond * cond,
                         struct xwmp_evt * evt);
-#endif /* XWMPCFG_SYNC_EVT */
+#endif
 
 xwer_t xwmp_cond_freeze(struct xwmp_cond * cond);
 xwer_t xwmp_cond_thaw(struct xwmp_cond * cond);

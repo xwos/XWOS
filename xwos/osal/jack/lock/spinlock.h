@@ -14,9 +14,9 @@
 #define __xwos_osal_jack_lock_spinlock_h__
 
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/osdl/lock/spinlock.h>
+#  include <xwos/mp/osdl/lock/spinlock.h>
 #elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/osdl/lock/spinlock.h>
+#  include <xwos/up/osdl/lock/spinlock.h>
 #endif
 
 #endif /* xwos/osal/jack/lock/spinlock.h */

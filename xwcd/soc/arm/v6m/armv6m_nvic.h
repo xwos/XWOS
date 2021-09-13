@@ -25,9 +25,9 @@
 #include <armv6m_core.h>
 
 #ifndef SOCCFG_NVIC_PRIO_BITNUM
-  #error "SOCCFG_NVIC_PRIO_BITNUM is not defined!"
+#  error "SOCCFG_NVIC_PRIO_BITNUM is not defined!"
 #else
-  #define CM_NVIC_PRIO_BITNUM SOCCFG_NVIC_PRIO_BITNUM
+#  define CM_NVIC_PRIO_BITNUM SOCCFG_NVIC_PRIO_BITNUM
 #endif
 
 #define CM_NVIC_PRIO_MAXBITNUM  8

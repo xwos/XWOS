@@ -20,10 +20,10 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
-  #include <xwos/mm/memslice.h>
+#  include <xwos/mm/memslice.h>
 #elif defined(XWMPCFG_SYNC_COND_STDC_MM) && (1 == XWMPCFG_SYNC_COND_STDC_MM)
-  #include <stdlib.h>
-#endif /* XWMPCFG_SYNC_COND_STDC_MM */
+#  include <stdlib.h>
+#endif
 #include <xwos/ospl/irq.h>
 #include <xwos/mp/skd.h>
 #include <xwos/mp/tt.h>
@@ -49,7 +49,7 @@ static __xwmp_data struct xwmm_memslice xwmp_cond_cache;
  * @brief 结构体xwmp_cond的对象缓存的名字
  */
 const __xwmp_rodata char xwmp_cond_cache_name[] = "xwos.mp.sync.cond.cache";
-#endif /* XWMPCFG_SYNC_COND_MEMSLICE */
+#endif
 
 static __xwmp_code
 struct xwmp_cond * xwmp_cond_alloc(void);
@@ -92,7 +92,7 @@ xwer_t xwmp_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                 (dtor_f)xwmp_cond_destruct);
         return rc;
 }
-#endif /* XWMPCFG_SYNC_COND_MEMSLICE */
+#endif
 
 /**
  * @brief 从条件量对象缓存中申请对象
@@ -150,10 +150,10 @@ void xwmp_cond_free(struct xwmp_cond * cond)
 #elif defined(XWMPCFG_SYNC_COND_STDC_MM) && (1 == XWMPCFG_SYNC_COND_STDC_MM)
         xwmp_cond_destruct(cond);
         free(cond);
-#else /* XWMPCFG_SYNC_COND_MEMSLICE */
+#else
         xwmp_cond_destruct(cond);
         xwmm_kma_free(cond);
-#endif /* !XWMPCFG_SYNC_COND_MEMSLICE */
+#endif
 }
 
 /**
@@ -328,7 +328,7 @@ xwer_t xwmp_cond_unbind(struct xwmp_cond * cond, struct xwmp_evt * evt)
         }
         return rc;
 }
-#endif /* XWMPCFG_SYNC_EVT */
+#endif
 
 __xwmp_api
 xwer_t xwmp_cond_freeze(struct xwmp_cond * cond)
@@ -514,7 +514,7 @@ xwer_t xwmp_cond_broadcast(struct xwmp_cond * cond)
                         }
                         xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
                 }
-#endif /* XWMPCFG_SYNC_EVT */
+#endif
                 xwmp_cond_put(cond);
         }/* else {} */
         return rc;

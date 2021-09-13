@@ -54,11 +54,11 @@
 #define XWPCP_FRM_MINSIZE       (sizeof(struct xwpcp_frmhead) + 1 + XWPCP_CRC32_SIZE)
 
 #if defined(XWMDCFG_isc_xwpcp_LOG) && (1 == XWMDCFG_isc_xwpcp_LOG)
-  #define XWPCP_LOG_TAG                 "xwpcp"
-  #define xwpcplogf(lv, fmt, ...)       xwlogf(lv, XWPCP_LOG_TAG, fmt, ##__VA_ARGS__)
-#else /* XWMDCFG_isc_xwpcp_LOG */
-  #define xwpcplogf(lv, fmt, ...)
-#endif /* !XWMDCFG_isc_xwpcp_LOG */
+#  define XWPCP_LOG_TAG                 "xwpcp"
+#  define xwpcplogf(lv, fmt, ...)       xwlogf(lv, XWPCP_LOG_TAG, fmt, ##__VA_ARGS__)
+#else
+#  define xwpcplogf(lv, fmt, ...)
+#endif
 
 #define XWPCP_BUG()     XWOS_BUG()
 #define XWPCP_BUG_ON(x) XWOS_BUG_ON(x)
@@ -68,9 +68,9 @@
         if (__xwcc_unlikely(!(exp))) {          \
             return __VA_ARGS__;                 \
         }
-#else /* XWMDCFG_CHECK_PARAMETERS */
-  #define XWPCP_VALIDATE(exp, errstr, ...)
-#endif /* !XWMDCFG_CHECK_PARAMETERS */
+#else
+#  define XWPCP_VALIDATE(exp, errstr, ...)
+#endif
 
 #define XWPCP_VALIDATE_FORCE(exp, errstr, ...)  \
         if (__xwcc_unlikely(!(exp))) {          \

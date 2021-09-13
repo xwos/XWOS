@@ -276,7 +276,7 @@ __xwlib_rodata const xwu32_t xwlib_crc32tbl_0x04c11db7[256] = {
         [254] = 0xB5365D03,
         [255] = 0xB1F740B4,
 };
-#endif /* XWLIBCFG_CRC32_0X04C11DB7 */
+#endif
 
 #if defined(XWLIBCFG_CRC32_0XEDB88320) && (1 == XWLIBCFG_CRC32_0XEDB88320)
 /**
@@ -540,16 +540,16 @@ __xwlib_rodata const xwu32_t xwlib_crc32tbl_0xedb88320[256] = {
         [254] = 0x5A05DF1B,
         [255] = 0x2D02EF8D,
 };
-#endif /* XWLIBCFG_CRC32_0XEDB88320 */
+#endif
 
 #if defined(SOCCFG_CRC32) && (1 == SOCCFG_CRC32)
 extern
 xwer_t soc_crc32_cal(xwu32_t * crc32,
                      bool refin, xwu32_t plynml, xwu32_t direction,
                      const xwu8_t stream[], xwsz_t * size);
-#else /* SOCCFG_CRC32 */
-#define soc_crc32_cal(crc32, refin, plynml, direction, stream, size)    (-EOPNOTSUPP)
-#endif /* !SOCCFG_CRC32 */
+#else
+#  define soc_crc32_cal(crc32, refin, plynml, direction, stream, size) (-EOPNOTSUPP)
+#endif
 
 static __xwlib_code
 void xwlib_crc32_swcal_ls(xwu32_t * crc32,
@@ -669,7 +669,7 @@ xwer_t xwlib_crc32_swcal(xwu32_t * crc32,
                 }
                 rc = XWOK;
                 break;
-#endif /* XWLIBCFG_CRC32_0X04C11DB7 */
+#endif
 
 #if defined(XWLIBCFG_CRC32_0XEDB88320) && (1 == XWLIBCFG_CRC32_0XEDB88320)
         case 0xEDB88320:
@@ -682,7 +682,7 @@ xwer_t xwlib_crc32_swcal(xwu32_t * crc32,
                 }
                 rc = XWOK;
                 break;
-#endif /* XWLIBCFG_CRC32_0XEDB8832 */
+#endif
         default:
                 XWOS_UNUSED(crc32);
                 XWOS_UNUSED(refin);

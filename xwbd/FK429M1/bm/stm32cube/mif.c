@@ -73,7 +73,7 @@ void stm32cube_lowlevel_init(void)
         SystemInit();
 #if defined(STM32CUBECFG_DISDEFWBUF) && (1 == STM32CUBECFG_DISDEFWBUF)
         cm_scs.scnscb.actlr.bit.disdefwbuf = 1;
-#endif /* STM32CUBECFG_DISDEFWBUF */
+#endif
 }
 
 /**

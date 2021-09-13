@@ -33,10 +33,10 @@
 #define XWMM_BMA_INUSED                 (XWBOP_BIT(7)) /**< 块正在使用的标记 */
 
 #if defined(XWMM_BMA_LOG)
-  #define xwmm_bmalogf(lv, fmt, ...) xwlogf(lv, fmt, ##__VA_ARGS__)
-#else /* XWMM_BMA_LOG */
-  #define xwmm_bmalogf(lv, fmt, ...)
-#endif /* !XWMM_BMA_LOG */
+#  define xwmm_bmalogf(lv, fmt, ...) xwlogf(lv, fmt, ##__VA_ARGS__)
+#else
+#  define xwmm_bmalogf(lv, fmt, ...)
+#endif
 
 /**
  * @brief 定义伙伴算法内存块分配器结构体的RAW内存空间，

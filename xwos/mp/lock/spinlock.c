@@ -20,10 +20,10 @@ void xwmp_rawly_lock(struct xwmp_splk * splk)
 {
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_lock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
 }
 
 __xwmp_code
@@ -34,10 +34,10 @@ xwer_t xwmp_rawly_trylock(struct xwmp_splk * splk)
         rc = XWOK;
 #if (CPUCFG_CPU_NUM > 1)
         rc = soc_splk_trylock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         return rc;
 }
 
@@ -46,10 +46,10 @@ void xwmp_rawly_unlock(struct xwmp_splk * splk)
 {
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_unlock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
 }
 
 __xwmp_code
@@ -58,10 +58,10 @@ void xwmp_rawly_lock_cpuirq(struct xwmp_splk * splk)
         xwospl_cpuirq_disable_lc();
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_lock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
 }
 
 __xwmp_code
@@ -76,10 +76,10 @@ xwer_t xwmp_rawly_trylock_cpuirq(struct xwmp_splk * splk)
         if (rc < 0) {
                 xwospl_cpuirq_enable_lc();
         }
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         return rc;
 }
 
@@ -88,10 +88,10 @@ void xwmp_rawly_unlock_cpuirq(struct xwmp_splk * splk)
 {
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_unlock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         xwospl_cpuirq_enable_lc();
 }
 
@@ -101,10 +101,10 @@ void xwmp_rawly_lock_cpuirqsv(struct xwmp_splk * splk, xwreg_t * cpuirq)
         xwospl_cpuirq_save_lc(cpuirq);
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_lock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
 }
 
 __xwmp_code
@@ -120,10 +120,10 @@ xwer_t xwmp_rawly_trylock_cpuirqsv(struct xwmp_splk * splk, xwreg_t * cpuirq)
                 xwospl_cpuirq_restore_lc(*cpuirq);
                 return rc;
         }
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         return rc;
 }
 
@@ -132,10 +132,10 @@ void xwmp_rawly_unlock_cpuirqrs(struct xwmp_splk * splk, xwreg_t cpuirq)
 {
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_unlock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         xwospl_cpuirq_restore_lc(cpuirq);
 }
 
@@ -150,10 +150,10 @@ void xwmp_rawly_lock_irqs(struct xwmp_splk * splk,
         }
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_lock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
 }
 
 __xwmp_code
@@ -174,10 +174,10 @@ xwer_t xwmp_rawly_trylock_irqs(struct xwmp_splk * splk,
                         xwmp_irq_enable(irqs[i].irqn);
                 }
         }
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         return rc;
 }
 
@@ -189,10 +189,10 @@ void xwmp_rawly_unlock_irqs(struct xwmp_splk * splk,
 
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_unlock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
                 xwmp_irq_enable(irqs[i].irqn);
         }
@@ -210,10 +210,10 @@ void xwmp_rawly_lock_irqssv(struct xwmp_splk * splk,
         }
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_lock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
 }
 
 __xwmp_code
@@ -236,10 +236,10 @@ xwer_t xwmp_rawly_trylock_irqssv(struct xwmp_splk * splk,
                 }
                 return rc;
         }
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         return rc;
 }
 
@@ -251,10 +251,10 @@ void xwmp_rawly_unlock_irqsrs(struct xwmp_splk * splk,
         xwssz_t i;
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_unlock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
                 xwmp_irq_restore(irqs[i].irqn, flags[i]);
         }
@@ -272,10 +272,10 @@ void xwmp_splk_lock(struct xwmp_splk * splk)
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_lock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
 }
 
 __xwmp_api
@@ -290,10 +290,10 @@ xwer_t xwmp_splk_trylock(struct xwmp_splk * splk)
         if (rc < 0) {
                 xwmp_skd_enpmpt_lc();
         }
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         return rc;
 }
 
@@ -302,10 +302,10 @@ void xwmp_splk_unlock(struct xwmp_splk * splk)
 {
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_unlock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         xwmp_skd_enpmpt_lc();
 }
 
@@ -316,10 +316,10 @@ void xwmp_splk_lock_cpuirq(struct xwmp_splk * splk)
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_lock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
 }
 
 __xwmp_api
@@ -336,10 +336,10 @@ xwer_t xwmp_splk_trylock_cpuirq(struct xwmp_splk * splk)
                 xwmp_skd_enpmpt_lc();
                 xwospl_cpuirq_enable_lc();
         }
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         return rc;
 }
 
@@ -348,10 +348,10 @@ void xwmp_splk_unlock_cpuirq(struct xwmp_splk * splk)
 {
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_unlock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         xwmp_skd_enpmpt_lc();
         xwospl_cpuirq_enable_lc();
 }
@@ -363,10 +363,10 @@ void xwmp_splk_lock_cpuirqsv(struct xwmp_splk * splk, xwreg_t * cpuirq)
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_lock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
 }
 
 __xwmp_api
@@ -383,10 +383,10 @@ xwer_t xwmp_splk_trylock_cpuirqsv(struct xwmp_splk * splk, xwreg_t * cpuirq)
                 xwmp_skd_enpmpt_lc();
                 xwospl_cpuirq_restore_lc(*cpuirq);
         }
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         return rc;
 }
 
@@ -395,10 +395,10 @@ void xwmp_splk_unlock_cpuirqrs(struct xwmp_splk * splk, xwreg_t cpuirq)
 {
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_unlock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         xwmp_skd_enpmpt_lc();
         xwospl_cpuirq_restore_lc(cpuirq);
 }
@@ -415,10 +415,10 @@ void xwmp_splk_lock_irqs(struct xwmp_splk * splk,
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_lock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
 }
 
 __xwmp_api
@@ -441,10 +441,10 @@ xwer_t xwmp_splk_trylock_irqs(struct xwmp_splk * splk,
                         xwmp_irq_enable(irqs[i].irqn);
                 }
         }
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         return rc;
 }
 
@@ -456,10 +456,10 @@ void xwmp_splk_unlock_irqs(struct xwmp_splk * splk,
 
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_unlock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         xwmp_skd_enpmpt_lc();
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
                 xwmp_irq_enable(irqs[i].irqn);
@@ -479,10 +479,10 @@ void xwmp_splk_lock_irqssv(struct xwmp_splk * splk,
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_lock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
 }
 
 __xwmp_api
@@ -506,10 +506,10 @@ xwer_t xwmp_splk_trylock_irqssv(struct xwmp_splk * splk,
                         xwmp_irq_restore(irqs[i].irqn, flags[i]);
                 }
         }
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         return rc;
 }
 
@@ -522,10 +522,10 @@ void xwmp_splk_unlock_irqsrs(struct xwmp_splk * splk,
 
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_unlock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#endif
         xwmp_skd_enpmpt_lc();
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
                 xwmp_irq_restore(irqs[i].irqn, flags[i]);
@@ -540,12 +540,12 @@ void xwmp_splk_lock_bh(struct xwmp_splk * splk)
 
         xwskd = xwmp_skd_dspmpt_lc();
         xwmp_skd_dsbh(xwskd);
-#if (CPUCFG_CPU_NUM > 1)
+#  if (CPUCFG_CPU_NUM > 1)
         soc_splk_lock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#  else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#  endif
 }
 
 __xwmp_api
@@ -557,16 +557,16 @@ xwer_t xwmp_splk_trylock_bh(struct xwmp_splk * splk)
         rc = XWOK;
         xwskd = xwmp_skd_dspmpt_lc();
         xwmp_skd_dsbh(xwskd);
-#if (CPUCFG_CPU_NUM > 1)
+#  if (CPUCFG_CPU_NUM > 1)
         rc = soc_splk_trylock(&splk->socsplk);
         if (rc < 0) {
                 xwmp_skd_enbh(xwskd);
                 xwmp_skd_enpmpt_lc();
         }
-#else /* (CPUCFG_CPU_NUM > 1) */
+#  else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#  endif
         return rc;
 }
 
@@ -575,13 +575,13 @@ void xwmp_splk_unlock_bh(struct xwmp_splk * splk)
 {
         struct xwmp_skd * xwskd;
 
-#if (CPUCFG_CPU_NUM > 1)
+#  if (CPUCFG_CPU_NUM > 1)
         soc_splk_unlock(&splk->socsplk);
-#else /* (CPUCFG_CPU_NUM > 1) */
+#  else
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
-#endif /* !(CPUCFG_CPU_NUM > 1) */
+#  endif
         xwskd = xwmp_skd_enbh_lc();
         xwmp_skd_enpmpt(xwskd);
 }
-#endif /* XWMPCFG_SKD_BH */
+#endif

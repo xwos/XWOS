@@ -14,10 +14,9 @@
 #define __xwos_lib_ctype_h__
 
 #if defined(ARCHCFG_COMPILER_CLIB) && (1 == ARCHCFG_COMPILER_CLIB)
-  #include <ctype.h>
+#  include <ctype.h>
 #else
-
-#include <xwos/standard.h>
+#  include <xwos/standard.h>
 
 /**
  * @defgroup ctype 字符类型
@@ -43,12 +42,12 @@ extern __xwlib_rodata const unsigned char xwlib_ctype[];
 /**
  * @brief 查询字符的标签
  */
-#define xwlib_ctype_flag(x)             (xwlib_ctype[(int)(unsigned char)(x)])
+#  define xwlib_ctype_flag(x) (xwlib_ctype[(int)(unsigned char)(x)])
 
 /**
  * @brief 查询字符是否为字母或数字
  */
-#define isalnum(c)                      \
+#  define isalnum(c)                    \
         ((xwlib_ctype_flag(c) &         \
           (XWLIB_CTYPE_FLAG_UPPER |     \
            XWLIB_CTYPE_FLAG_LOWER |     \
@@ -57,7 +56,7 @@ extern __xwlib_rodata const unsigned char xwlib_ctype[];
 /**
  * @brief 查询字符是否为字母
  */
-#define isalpha(c)                      \
+#  define isalpha(c)                    \
         ((xwlib_ctype_flag(c) &         \
           (XWLIB_CTYPE_FLAG_UPPER |     \
            XWLIB_CTYPE_FLAG_LOWER)) != 0)
@@ -65,19 +64,19 @@ extern __xwlib_rodata const unsigned char xwlib_ctype[];
 /**
  * @brief 查询字符是否为控制字符
  */
-#define iscntrl(c)                      \
+#  define iscntrl(c)                    \
         ((xwlib_ctype_flag(c) & (XWLIB_CTYPE_FLAG_CTRL)) != 0)
 
 /**
  * @brief 查询字符是否为数字
  */
-#define isdigit(c)                      \
+#  define isdigit(c)                    \
         ((xwlib_ctype_flag(c) & (XWLIB_CTYPE_FLAG_DIGIT)) != 0)
 
 /**
  * @brief 查询字符是否为可显示字符（不包括空白字符）
  */
-#define isgraph(c)                      \
+#  define isgraph(c)                    \
         ((xwlib_ctype_flag(c) &         \
           (XWLIB_CTYPE_FLAG_PUNCT |     \
            XWLIB_CTYPE_FLAG_UPPER |     \
@@ -87,19 +86,19 @@ extern __xwlib_rodata const unsigned char xwlib_ctype[];
 /**
  * @brief 查询字符是否为小写字母
  */
-#define islower(c)                      \
+#  define islower(c)                    \
         ((xwlib_ctype_flag(c) & (XWLIB_CTYPE_FLAG_LOWER)) != 0)
 
 /**
  * @brief 查询字符是否为大写字母
  */
-#define isupper(c)                      \
+#  define isupper(c)                    \
         ((xwlib_ctype_flag(c) & (XWLIB_CTYPE_FLAG_UPPER)) != 0)
 
 /**
  * @brief 查询字符是否为可显示字符（包括空白字符）
  */
-#define isprint(c)                      \
+#  define isprint(c)                    \
         ((xwlib_ctype_flag(c) &         \
           (XWLIB_CTYPE_FLAG_PUNCT |     \
            XWLIB_CTYPE_FLAG_UPPER |     \
@@ -110,19 +109,19 @@ extern __xwlib_rodata const unsigned char xwlib_ctype[];
 /**
  * @brief 查询字符是否为标点
  */
-#define ispunct(c)                      \
+#  define ispunct(c)                    \
         ((xwlib_ctype_flag(c) & (XWLIB_CTYPE_FLAG_PUNCT)) != 0)
 
 /**
  * @brief 查询字符是否为空白字符
  */
-#define isspace(c)                      \
+#  define isspace(c)                    \
         ((xwlib_ctype_flag(c) & (XWLIB_CTYPE_FLAG_WSPC)) != 0)
 
 /**
  * @brief 查询字符是否为十六进制数字字符
  */
-#define isxdigit(c)                     \
+#  define isxdigit(c)                   \
         ((xwlib_ctype_flag(c) &         \
           (XWLIB_CTYPE_FLAG_DIGIT |     \
            XWLIB_CTYPE_FLAG_HEX)) != 0)
@@ -130,17 +129,17 @@ extern __xwlib_rodata const unsigned char xwlib_ctype[];
 /**
  * @brief 查询字符是否为八进制数字字符
  */
-#define isodigit(c)     (((c) >= '0') && ((c) <= '7'))
+#  define isodigit(c) (((c) >= '0') && ((c) <= '7'))
 
 /**
  * @brief 查询字符是否为ASCII表内字符
  */
-#define isascii(c)      (((unsigned char)(c)) <= (unsigned char)0x7f)
+#  define isascii(c) (((unsigned char)(c)) <= (unsigned char)0x7f)
 
 /**
  * @brief 将字符转换为ASCII表内字符
  */
-#define toascii(c)      (((unsigned char)(c)) & (unsigned char)0x7f)
+#  define toascii(c) (((unsigned char)(c)) & (unsigned char)0x7f)
 
 /**
  * @brief 将大写字母转换为小写字母
@@ -174,5 +173,6 @@ char toupper(unsigned char c)
  * @} ctype
  */
 
-#endif /* ARCHCFG_COMPILER_CLIB */
+#endif
+
 #endif /* xwos/lib/ctype.h */

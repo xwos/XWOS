@@ -22,7 +22,7 @@
 #define __xwosimpl_soc_spinlock_h__
 
 #ifndef __xwos_ospl_soc_spinlock_h__
-  #error "This file should be included from <xwos/ospl/soc/spinlock.h>."
+#  error "This file should be included from <xwos/ospl/soc/spinlock.h>."
 #endif
 
 #include <armv7m_core.h>
@@ -36,10 +36,10 @@ struct soc_splk {
 #if defined(ARCHCFG_LITTLE_ENDIAN) && (1 == ARCHCFG_LITTLE_ENDIAN)
                         xwu16_t curr; /**< current owner */
                         xwu16_t next; /**< next owner */
-#else /* ARCHCFG_LITTLE_ENDIAN */
+#else
                         xwu16_t next; /**< next owner */
                         xwu16_t curr; /**< current owner */
-#endif /* !ARCHCFG_LITTLE_ENDIAN */
+#endif
                 } tickets;
         } v;
 };
@@ -128,6 +128,6 @@ void soc_splk_unlock(struct soc_splk * socsplk)
         armv7m_dsb();
         cm_sev();
 }
-#endif /* (CPUCFG_CPU_NUM > 1) */
+#endif
 
 #endif /* xwosimpl_soc_spinlock.h */

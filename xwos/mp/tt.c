@@ -20,14 +20,14 @@
 #include <xwos/mp/skd.h>
 #include <xwos/mp/lock/seqlock.h>
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
-  #include <xwos/mp/bh.h>
-#endif /* XWMPCFG_SKD_BH */
+#  include <xwos/mp/bh.h>
+#endif
 #include <xwos/mp/tt.h>
 
 #if defined(BRDCFG_XWSKD_SYSHWT_HOOK) && (1 == BRDCFG_XWSKD_SYSHWT_HOOK)
 extern
 void board_xwskd_syshwt_hook(struct xwmp_skd * xwskd);
-#endif /* BRDCFG_XWSKD_SYSHWT_HOOK */
+#endif
 
 static __xwmp_code
 void xwmp_tt_rmrbb_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn);
@@ -96,7 +96,7 @@ xwer_t xwmp_tt_init(struct xwmp_tt * xwtt)
         xwlib_bclst_init_head(&xwtt->timeout);
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
         xwmp_bh_node_init(&xwtt->bhn, (xwmp_bh_f)xwmp_tt_bh, xwtt);
-#endif /* XWMPCFG_SKD_BH */
+#endif
         rc = xwmp_syshwt_init(&xwtt->hwt);
         return rc;
 }
@@ -480,14 +480,14 @@ void xwmp_syshwt_task(struct xwmp_syshwt * hwt)
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
                 xwmp_bh_node_eq(&xwskd->bhcb, &xwtt->bhn);
                 xwmp_skd_req_bh(xwskd);
-#else /* !XWMPCFG_SKD_BH */
+#else
                 xwmp_tt_bh(xwtt);
-#endif /* XWMPCFG_SKD_BH */
+#endif
         }
         xwmp_skd_chkpmpt(xwskd);
 #if defined(BRDCFG_XWSKD_SYSHWT_HOOK) && (1 == BRDCFG_XWSKD_SYSHWT_HOOK)
         board_xwskd_syshwt_hook(xwskd);
-#endif /* BRDCFG_XWSKD_SYSHWT_HOOK */
+#endif
 }
 
 /**

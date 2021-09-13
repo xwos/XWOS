@@ -107,14 +107,14 @@ xwer_t main_task(void * arg)
         if (rc < 0) {
                 goto err_xwlua_start;
         }
-#endif /* XWEMCFG_vm_lua */
+#endif
 
         return XWOK;
 
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
 err_xwlua_start:
         BDL_BUG();
-#endif /* XWEMCFG_vm_lua */
+#endif
 err_xwpcp_start:
         BDL_BUG();
 err_child_thd_start:

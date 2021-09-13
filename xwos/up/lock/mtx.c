@@ -16,8 +16,8 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWUPCFG_LOCK_MTX_STDC_MM) && (1 == XWUPCFG_LOCK_MTX_STDC_MM)
-  #include <stdlib.h>
-#endif /* XWUPCFG_LOCK_MTX_STDC_MM */
+#  include <stdlib.h>
+#endif
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/up/tt.h>
@@ -449,12 +449,12 @@ xwer_t xwup_mtx_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_mtx * mtx,
         xwospl_cpuirq_enable_lc();
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
         xwup_skd_wakelock_unlock();
-#endif /* XWUPCFG_SKD_PM */
+#endif
         xwup_skd_enpmpt_lc();
         xwup_skd_req_swcx();
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
         xwup_skd_wakelock_lock();
-#endif /* XWUPCFG_SKD_PM */
+#endif
         xwospl_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
@@ -556,13 +556,13 @@ xwer_t xwup_mtx_do_timedlock(struct xwup_mtx * mtx,
                         xwup_skd_enpmpt_lc();
                         rc = -EINTR;
                 } else {
-#endif /* XWUPCFG_SKD_PM */
+#endif
                         rc = xwup_mtx_do_timedblkthd_unlkwq_cpuirqrs(mtx, xwskd, thd,
                                                                      xwtm, cpuirq);
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
                         xwup_skd_wakelock_unlock();
                 }
-#endif /* XWUPCFG_SKD_PM */
+#endif
         } else {
                 xwup_mtxtree_add(mt, mtx);
                 xwup_thd_chprio(thd);

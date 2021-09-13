@@ -22,8 +22,7 @@
 #include <xwos/osal/skd.h>
 #include <xwam/example/cxx/mif.h>
 
-#define CXX_TASK_PRIORITY \
-        (XWOS_SKD_PRIORITY_RAISE(XWOS_SKD_PRIORITY_RT_MIN, 1))
+#define CXX_TASK_PRIORITY (XWOS_SKD_PRIORITY_RAISE(XWOS_SKD_PRIORITY_RT_MIN, 1))
 
 extern xwer_t cxx_thd_main(void * arg);
 

@@ -27,17 +27,10 @@
 #include <xwos/osal/sync/flg.h>
 #include <xwam/example/timer/mif.h>
 
-#define XWSWTDEMO_THD_PRIORITY                                  \
-        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+#define LOGTAG "swt"
+#define swtlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
 
-#if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-#define XWSWTDEMO_LOG_TAG     "swt"
-#define swtlogf(lv, fmt, ...)                                   \
-        xwlogf(lv, XWSWTDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
-#else /* XWLIBCFG_LOG */
-#define swtlogf(lv, fmt, ...)
-#endif /* !XWLIBCFG_LOG */
-
+#define XWSWTDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 xwer_t xwswtdemo_thd_func(void * arg);
 
 /**

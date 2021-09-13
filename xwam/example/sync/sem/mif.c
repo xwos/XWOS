@@ -27,17 +27,10 @@
 #include <xwos/osal/sync/sem.h>
 #include <xwam/example/sync/sem/mif.h>
 
-#define XWSEMDEMO_THD_PRIORITY                                  \
-        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+#define LOGTAG "sem"
+#define semlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
 
-#if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-#define XWSEMDEMO_LOG_TAG     "sem"
-#define semlogf(lv, fmt, ...)                                   \
-        xwlogf(lv, XWSEMDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
-#else /* XWLIBCFG_LOG */
-#define semlogf(lv, fmt, ...)
-#endif /* !XWLIBCFG_LOG */
-
+#define XWSEMDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 xwer_t xwsemdemo_thd_func(void * arg);
 
 /**

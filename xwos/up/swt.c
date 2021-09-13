@@ -14,8 +14,8 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWUPCFG_SKD_SWT_STDC_MM) && (1 == XWUPCFG_SKD_SWT_STDC_MM)
-  #include <stdlib.h>
-#endif /* XWUPCFG_SKD_SWT_STDC_MM */
+#  include <stdlib.h>
+#endif
 #include <xwos/up/skd.h>
 #include <xwos/up/tt.h>
 #include <xwos/up/swt.h>

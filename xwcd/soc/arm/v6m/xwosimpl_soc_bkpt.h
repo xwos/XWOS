@@ -22,7 +22,7 @@
 #define __xwosimpl_soc_bkpt_h__
 
 #ifndef __xwos_ospl_soc_bkpt_h__
-  #error "This file should be included from <xwos/ospl/soc/bkpt.h>."
+#  error "This file should be included from <xwos/ospl/soc/bkpt.h>."
 #endif
 
 #include <xwos/ospl/soc/compiler.h>

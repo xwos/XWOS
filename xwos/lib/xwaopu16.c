@@ -1743,4 +1743,4 @@ xwer_t xwaop__xwu16__tst_then_op(xwu16_a * a,
         return rc;
 }
 
-#endif /* __STDC_VERSION__ >= 201112L */
+#endif

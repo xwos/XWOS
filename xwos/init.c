@@ -12,11 +12,11 @@
 
 #include <xwos/standard.h>
 #if defined(XuanWuOS_CFG_CORE__mp)
-  #include <xwos/mp/init.h>
+#  include <xwos/mp/init.h>
 #elif defined(XuanWuOS_CFG_CORE__up)
-  #include <xwos/up/init.h>
+#  include <xwos/up/init.h>
 #else
-  #error "Can't find the configuration XuanWuOS_CFG_CORE!"
+#  error "Can't find the configuration XuanWuOS_CFG_CORE!"
 #endif
 #include <xwos/lib/object.h>
 #include <xwos/mm/kma.h>
@@ -46,7 +46,7 @@ void xwos_relocate(void)
                 }
         }
 }
-#endif /* XWKNCFG_RELOCATE_DATA */
+#endif
 
 /**
  * @brief 初始化XWOS内核
@@ -57,7 +57,7 @@ void xwos_init(void)
 #if defined(XWKNCFG_RELOCATE_DATA) && (1 == XWKNCFG_RELOCATE_DATA)
         /* 将数据(.xwos.data)从flash中重定向到内存 */
         xwos_relocate();
-#endif /* XWKNCFG_RELOCATE_DATA */
+#endif
 
         /* 初始化对象标签分配器 */
         xwos_objtik_init();

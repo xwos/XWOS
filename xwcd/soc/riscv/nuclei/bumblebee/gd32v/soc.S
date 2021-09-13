@@ -36,10 +36,10 @@
 #ifndef __riscv_32e
         .equ SOC_CALLER_CONTEXT_SIZE, (20 * REGBYTES)
         .equ SOC_CALLEE_CONTEXT_SIZE, (13 * REGBYTES)
-#else /* !__riscv_32e */
+#else
         .equ SOC_CALLER_CONTEXT_SIZE, (14 * REGBYTES)
         .equ SOC_CALLEE_CONTEXT_SIZE, (3 * REGBYTES)
-#endif /* __riscv_32e */
+#endif
         .equ SOC_CONTEXT_SIZE, (SOC_CALLER_CONTEXT_SIZE + SOC_CALLEE_CONTEXT_SIZE)
 
         .extern         __global_pointer$
@@ -154,7 +154,7 @@ soc_boot_end:
         STORE           t4, 17 * REGBYTES (sp)
         STORE           t5, 18 * REGBYTES (sp)
         STORE           t6, 19 * REGBYTES (sp)
-#endif /* !__riscv_32e */
+#endif
         .endm
 
 /**
@@ -168,7 +168,7 @@ soc_boot_end:
         LOAD            t3, 16 * REGBYTES (sp)
         LOAD            a7, 15 * REGBYTES (sp)
         LOAD            a6, 14 * REGBYTES (sp)
-#endif /* !__riscv_32e */
+#endif
         LOAD            a5, 9 * REGBYTES (sp)
         LOAD            a4, 8 * REGBYTES (sp)
         LOAD            a3, 7 * REGBYTES (sp)
@@ -193,7 +193,7 @@ soc_boot_end:
         LOAD            t3, 16 * REGBYTES (sp)
         LOAD            a7, 15 * REGBYTES (sp)
         LOAD            a6, 14 * REGBYTES (sp)
-#endif /* !__riscv_32e */
+#endif
         LOAD            a5, 9 * REGBYTES (sp)
         LOAD            a4, 8 * REGBYTES (sp)
         LOAD            a3, 7 * REGBYTES (sp)

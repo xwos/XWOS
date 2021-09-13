@@ -25,12 +25,12 @@
 #include <soc.h>
 
 #ifndef __riscv_32e
-  #define SOC_CALLER_CONTEXT_SIZE (20 * REGBYTES)
-  #define SOC_CALLEE_CONTEXT_SIZE (13 * REGBYTES)
-#else /* !__riscv_32e */
-  #define SOC_CALLER_CONTEXT_SIZE (14 * REGBYTES)
-  #define SOC_CALLEE_CONTEXT_SIZE (3 * REGBYTES)
-#endif /* __riscv_32e */
+#  define SOC_CALLER_CONTEXT_SIZE (20 * REGBYTES)
+#  define SOC_CALLEE_CONTEXT_SIZE (13 * REGBYTES)
+#else
+#  define SOC_CALLER_CONTEXT_SIZE (14 * REGBYTES)
+#  define SOC_CALLEE_CONTEXT_SIZE (3 * REGBYTES)
+#endif
 #define SOC_CONTEXT_SIZE (SOC_CALLER_CONTEXT_SIZE + SOC_CALLEE_CONTEXT_SIZE)
 
 extern xwu8_t xwos_stk_top[];
@@ -142,7 +142,7 @@ void xwospl_skd_init_stack(struct xwospl_skd_stack_info * stk,
         *(stk->sp) = (xwstk_t)0; /* x17 (a7) */
         stk->sp--;
         *(stk->sp) = (xwstk_t)0; /* x16 (a6) */
-#endif /* !__riscv_32e */
+#endif
         /* MSUBM */
         stk->sp--;
         *(stk->sp) = (xwstk_t)(1 << 6); /* ptyp:0, typ:1 */
@@ -204,7 +204,7 @@ void xwospl_skd_init_stack(struct xwospl_skd_stack_info * stk,
         *(stk->sp) = (xwstk_t)0; /* x19 (s3) */
         stk->sp--;
         *(stk->sp) = (xwstk_t)0; /* x18 (s2) */
-#endif /* !__riscv_32e */
+#endif
         /* MSTATUS */
         if (privileged) {
                 csr = (xwstk_t)MSTATUS_MPP | MSTATUS_MPIE;
@@ -213,7 +213,7 @@ void xwospl_skd_init_stack(struct xwospl_skd_stack_info * stk,
         }
 #if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
         csr |= MSTATUS_FS;
-#endif /* ARCHCFG_FPU */
+#endif
         stk->sp--;
         *(stk->sp) = csr;
         stk->sp--;
@@ -274,9 +274,9 @@ struct xwospl_skd * soc_skd_chk_swcx(void)
             (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
                 soc_skd_report_stk_overflow(pstk);
         }
-#else /* XWMMCFG_STACK_CHK_SWCX */
+#else
         xwskd = xwosplcb_skd_get_lc();
-#endif /* !XWMMCFG_STACK_CHK_SWCX */
+#endif
         SysTimer_ClearSWIRQ();
         return xwskd;
 }
@@ -364,4 +364,4 @@ void xwospl_thd_immigrate(struct xwospl_thd * thd, xwid_t cpuid)
         XWOS_UNUSED(cpuid);
         xwosplcb_thd_immigrate_lic(thd);
 }
-#endif /* XuanWuOS_CFG_CORE__mp */
+#endif

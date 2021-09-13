@@ -47,7 +47,7 @@ xwer_t stm32cube_soc_drv_suspend(struct xwds_device * dev);
 
 static
 xwer_t stm32cube_soc_drv_resume(struct xwds_device * dev);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 static
 xwer_t stm32cube_soc_drv_gpio_req(struct xwds_soc * soc,
@@ -94,7 +94,7 @@ const struct xwds_soc_driver stm32cube_soc_drv = {
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
                 .suspend = stm32cube_soc_drv_suspend,
                 .resume = stm32cube_soc_drv_resume,
-#endif /* XWCDCFG_ds_PM */
+#endif
         },
 
         .gpio_req = stm32cube_soc_drv_gpio_req,
@@ -197,7 +197,7 @@ xwer_t stm32cube_soc_drv_resume(struct xwds_device * dev)
         XWOS_UNUSED(dev);
         return XWOK;
 }
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 /******** ******** gpio operation driver ******** ********/
 static

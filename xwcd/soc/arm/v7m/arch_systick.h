@@ -25,7 +25,7 @@
 #include <xwos/ospl/syshwt.h>
 #include <arch_irq.h>
 
-#define SOC_EXC_TICK_PRIO       (SOC_IRQ_PRIO_LOWEST | SOC_IRQ_SUBPRIO_HIGHEST)
+#define SOC_EXC_TICK_PRIO (SOC_IRQ_PRIO_LOWEST | SOC_IRQ_SUBPRIO_HIGHEST)
 
 xwer_t arch_systick_init(struct xwospl_syshwt * hwt);
 xwer_t arch_systick_start(struct xwospl_syshwt * hwt);

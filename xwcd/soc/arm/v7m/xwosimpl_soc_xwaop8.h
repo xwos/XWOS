@@ -22,7 +22,7 @@
 #define __xwosimpl_soc_xwaop8_h__
 
 #ifndef __xwos_ospl_soc_xwaop8_h__
-  #error "This file should be included from <xwos/ospl/soc/xwaop8.h>."
+#  error "This file should be included from <xwos/ospl/soc/xwaop8.h>."
 #endif
 
 #endif /* xwosimpl_soc_xwaop8.h */

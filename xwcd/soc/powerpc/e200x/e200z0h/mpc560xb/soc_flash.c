@@ -176,7 +176,6 @@ void soc_cflash_program_shadow_test_block(xwu32_t * addr, xwu32_t data0, xwu32_t
         CFLASH.MCR.B.PEAS = 0;
 }
 #endif
-/* #if defined(SOCCFG_FLASH_SHADOW_BLOCK) && (1 == SOCCFG_FLASH_SHADOW_BLOCK) */
 
 /**
  * @brief Lock code flash

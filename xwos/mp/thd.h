@@ -79,7 +79,7 @@ struct xwmp_thd {
 #if defined(XWMPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWMPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
         /* 线程本地数据 */
         void * data[XWMPCFG_SKD_THD_LOCAL_DATA_NUM];
-#endif /* XWMPCFG_SKD_THD_LOCAL_DATA_NUM */
+#endif
 };
 
 xwer_t xwmp_thd_chprio_once(struct xwmp_thd * thd, xwpr_t dprio,
@@ -112,7 +112,7 @@ xwer_t xwmp_thd_outmigrate_lic(struct xwmp_thd * thd, xwid_t dstcpu);
 
 #if defined(XWMPCFG_SKD_THD_MEMSLICE) && (1 == XWMPCFG_SKD_THD_MEMSLICE)
 xwer_t xwmp_thd_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
-#endif /* XWMPCFG_SKD_THD_MEMSLICE */
+#endif
 
 xwer_t xwmp_thd_init(struct xwmp_thd * thd,
                      const char * name,
@@ -149,6 +149,6 @@ xwer_t xwmp_thd_set_data(struct xwmp_thd * thd, xwsq_t pos, void * data);
 xwer_t xwmp_thd_get_data(struct xwmp_thd * thd, xwsq_t pos, void ** databuf);
 xwer_t xwmp_cthd_set_data(xwsq_t pos, void * data);
 xwer_t xwmp_cthd_get_data(xwsq_t pos, void ** databuf);
-#endif /* XWMPCFG_SKD_THD_LOCAL_DATA_NUM */
+#endif
 
 #endif /* xwos/mp/thd.h */

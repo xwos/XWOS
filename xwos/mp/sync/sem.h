@@ -24,9 +24,9 @@
 #define XWMP_SEM_NEGTIVE              ((xwssq_t)(-1))
 
 #if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
-  #define XWMP_SEM_API(api, ...) xwmp_rtsem_##api(__VA_ARGS__)
+#  define XWMP_SEM_API(api, ...) xwmp_rtsem_##api(__VA_ARGS__)
 #elif defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
-  #define XWMP_SEM_API(api, ...) xwmp_plsem_##api(__VA_ARGS__)
+#  define XWMP_SEM_API(api, ...) xwmp_plsem_##api(__VA_ARGS__)
 #endif
 
 struct xwmp_evt;
@@ -39,11 +39,11 @@ enum xwmp_sem_type_em {
 
 #if defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
         XWMP_SEM_TYPE_PIPELINE, /**< 管道信号量：先进先出 */
-#endif /* XWMPCFG_SYNC_PLSEM */
+#endif
 
 #if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
         XWMP_SEM_TYPE_RT, /**< 实时信号量：高优先级先出 */
-#endif /* XWMPCFG_SYNC_RTSEM */
+#endif
 };
 
 /**
@@ -57,24 +57,24 @@ struct xwmp_sem {
         union {
 #if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
                 struct xwmp_rtwq rt; /**< 实时信号量的等待队列 */
-#endif /* XWMPCFG_SYNC_RTSEM */
+#endif
 #if defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
                 struct xwmp_plwq pl; /**< 管道信号量的等待队列 */
-#endif /* XWMPCFG_SYNC_PLSEM */
+#endif
         } wq; /**< 等待队列 */
 };
 
 #if defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
 xwer_t xwmp_plsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn);
-#endif /* XWMPCFG_SYNC_PLSEM */
+#endif
 
 #if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
 xwer_t xwmp_rtsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn);
-#endif /* XWMPCFG_SYNC_RTSEM */
+#endif
 
 #if defined(XWMPCFG_SYNC_SEM_MEMSLICE) && (1 == XWMPCFG_SYNC_SEM_MEMSLICE)
 xwer_t xwmp_sem_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
-#endif /* XWMPCFG_SYNC_SEM_MEMSLICE */
+#endif
 
 xwer_t xwmp_sem_create(struct xwmp_sem ** ptrbuf, xwid_t type,
                        xwssq_t val, xwssq_t max);
@@ -89,7 +89,7 @@ xwer_t xwmp_sem_put(struct xwmp_sem * sem);
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
 xwer_t xwmp_sem_bind(struct xwmp_sem * sem, struct xwmp_evt * evt, xwsq_t pos);
 xwer_t xwmp_sem_unbind(struct xwmp_sem * sem, struct xwmp_evt * evt);
-#endif /* XWMPCFG_SYNC_EVT */
+#endif
 
 #if defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
 xwer_t xwmp_plsem_init(struct xwmp_sem * sem, xwssq_t val, xwssq_t max);
@@ -100,7 +100,7 @@ xwer_t xwmp_plsem_wait(struct xwmp_sem * sem);
 xwer_t xwmp_plsem_trywait(struct xwmp_sem * sem);
 xwer_t xwmp_plsem_timedwait(struct xwmp_sem * sem, xwtm_t * xwtm);
 xwer_t xwmp_plsem_wait_unintr(struct xwmp_sem * sem);
-#endif /* XWMPCFG_SYNC_PLSEM */
+#endif
 
 #if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
 xwer_t xwmp_rtsem_init(struct xwmp_sem * sem, xwssq_t val, xwssq_t max);
@@ -111,7 +111,7 @@ xwer_t xwmp_rtsem_wait(struct xwmp_sem * sem);
 xwer_t xwmp_rtsem_trywait(struct xwmp_sem * sem);
 xwer_t xwmp_rtsem_timedwait(struct xwmp_sem * sem, xwtm_t * xwtm);
 xwer_t xwmp_rtsem_wait_unintr(struct xwmp_sem * sem);
-#endif /* XWMPCFG_SYNC_RTSEM */
+#endif
 
 xwer_t xwmp_sem_getvalue(struct xwmp_sem * sem, xwssq_t * sval);
 xwer_t xwmp_sem_gettype(struct xwmp_sem * sem, xwid_t * type);

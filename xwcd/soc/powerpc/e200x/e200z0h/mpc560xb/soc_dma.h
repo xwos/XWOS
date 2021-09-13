@@ -25,7 +25,7 @@
 #include <soc.h>
 
 #if ((defined(SOCCFG_CHIP_MPC5607B)) && (1 == SOCCFG_CHIP_MPC5607B))
-  #define SOC_DMAC_CHANNEL_NUM          (16U)
+#  define SOC_DMAC_CHANNEL_NUM          (16U)
 #endif
 
 #define SOC_DMA_TCD_CFG_NULL            (0)

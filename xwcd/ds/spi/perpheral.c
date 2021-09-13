@@ -40,7 +40,7 @@ xwer_t xwds_spip_vop_suspend(struct xwds_spip * spip);
 
 static __xwds_vop
 xwer_t xwds_spip_vop_resume(struct xwds_spip * spip);
-#endif /* XWCDCFG_ds_PM */
+#endif
 
 __xwds_rodata const struct xwds_virtual_operation xwds_spip_vop = {
         .probe = (void *)xwds_spip_vop_probe,
@@ -50,7 +50,7 @@ __xwds_rodata const struct xwds_virtual_operation xwds_spip_vop = {
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
         .suspend = (void *)xwds_spip_vop_suspend,
         .resume = (void *)xwds_spip_vop_resume,
-#endif /* XWCDCFG_ds_PM */
+#endif
 };
 
 /******** ******** ******** constructor & destructor ******** ******** ********/
@@ -225,4 +225,4 @@ err_dev_vop_resume:
 err_spim_grab:
         return rc;
 }
-#endif /* XWCDCFG_ds_PM */
+#endif

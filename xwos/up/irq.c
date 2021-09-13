@@ -164,7 +164,7 @@ xwer_t xwup_irq_get_id(xwirq_t * irqnbuf)
                 }
 #else
                 rc = -EINTHD;
-#endif /* XWUPCFG_SKD_BH */
+#endif
         }
         return rc;
 }

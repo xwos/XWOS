@@ -16,16 +16,16 @@
 #include <xwos/standard.h>
 
 #if (XWMDCFG_isc_xwpcp_MEMBLK_SIZE & (XWMDCFG_isc_xwpcp_MEMBLK_SIZE - 1))
-  #error "XWMDCFG_isc_xwpcp_MEMBLK_SIZE must be the power of 2!"
+#  error "XWMDCFG_isc_xwpcp_MEMBLK_SIZE must be the power of 2!"
 #endif
 #if ((1 << XWMDCFG_isc_xwpcp_MEMBLK_ODR) > 32768U)
-  #error "power(2, XWMDCFG_isc_xwpcp_MEMBLK_ODR) must be <= 32768!"
+#  error "power(2, XWMDCFG_isc_xwpcp_MEMBLK_ODR) must be <= 32768!"
 #endif
 #if (XWMDCFG_isc_xwpcp_PORT_NUM > 256)
-  #error "XWPCP Only supports 256 ports (0 ~ 255)!"
+#  error "XWPCP Only supports 256 ports (0 ~ 255)!"
 #endif
 #if (XWMDCFG_isc_xwpcp_PRI_NUM > 64)
-  #error "XWPCP Only supports 64 priorities!"
+#  error "XWPCP Only supports 64 priorities!"
 #endif
 
 #define XWPCP_VERSION           ("3.0.0")

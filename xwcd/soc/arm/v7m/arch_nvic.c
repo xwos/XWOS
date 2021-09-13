@@ -77,7 +77,7 @@ xwer_t arch_nvic_irq_request(xwirq_t irqn,
         if ((NULL != idvt) && (NULL != data)) {
                 idvt->irq[irqn] = data;
         }
-#endif /* !SOCCFG_RO_IVT */
+#endif
         if (cfg) {
                 arch_nvic_irq_cfg(irqn, cfg);
         }
@@ -98,7 +98,7 @@ xwer_t arch_nvic_irq_release(__xwcc_unused xwirq_t irqn)
         if (NULL != idvt) {
                 idvt->irq[irqn] = NULL;
         }
-#endif /* !SOCCFG_RO_IVT */
+#endif
         return XWOK;
 }
 

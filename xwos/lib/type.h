@@ -24,7 +24,7 @@
 #include <xwos/ospl/soc/type.h>
 
 #ifndef NULL
-  #define NULL ((void *)0)
+#  define NULL ((void *)0)
 #endif
 #define NIL  NULL
 
@@ -327,165 +327,165 @@ union xwos_ulock {
 };
 
 #ifndef UCHAR_MAX
-  #define UCHAR_MAX     ((unsigned char)(~((unsigned char)0)))
+#  define UCHAR_MAX     ((unsigned char)(~((unsigned char)0)))
 #endif
 #ifndef CHAR_MAX
-  #define CHAR_MAX      ((signed char)(UCHAR_MAX >> (unsigned char)1))
+#  define CHAR_MAX      ((signed char)(UCHAR_MAX >> (unsigned char)1))
 #endif
 #ifndef CHAR_MIN
-  #define CHAR_MIN      ((signed char)(-CHAR_MAX - (signed char)1))
+#  define CHAR_MIN      ((signed char)(-CHAR_MAX - (signed char)1))
 #endif
 
 #ifndef USHRT_MAX
-  #define USHRT_MAX     ((unsigned short)(~((unsigned short)0)))
+#  define USHRT_MAX     ((unsigned short)(~((unsigned short)0)))
 #endif
 #ifndef SHRT_MAX
-  #define SHRT_MAX      ((signed short)(USHRT_MAX >> (unsigned short)1))
+#  define SHRT_MAX      ((signed short)(USHRT_MAX >> (unsigned short)1))
 #endif
 #ifndef SHRT_MIN
-  #define SHRT_MIN      ((signed short)(-SHRT_MAX - (signed short)1))
+#  define SHRT_MIN      ((signed short)(-SHRT_MAX - (signed short)1))
 #endif
 
 #ifndef UINT_MAX
-  #define UINT_MAX      ((unsigned int)(~((unsigned int)0)))
+#  define UINT_MAX      ((unsigned int)(~((unsigned int)0)))
 #endif
 #ifndef INT_MAX
-  #define INT_MAX       ((signed int)(UINT_MAX >> (unsigned int)1))
+#  define INT_MAX       ((signed int)(UINT_MAX >> (unsigned int)1))
 #endif
 #ifndef INT_MIN
-  #define INT_MIN       ((signed int)(-INT_MAX - (signed int)1))
+#  define INT_MIN       ((signed int)(-INT_MAX - (signed int)1))
 #endif
 
 #ifndef ULONG_MAX
-  #define ULONG_MAX     ((unsigned long)(~((unsigned long)0)))
+#  define ULONG_MAX     ((unsigned long)(~((unsigned long)0)))
 #endif
 #ifndef LONG_MAX
-  #define LONG_MAX      ((signed long)(ULONG_MAX >> (unsigned long)1))
+#  define LONG_MAX      ((signed long)(ULONG_MAX >> (unsigned long)1))
 #endif
 #ifndef LONG_MIN
-  #define LONG_MIN      ((signed long)(-LONG_MAX - (signed long)1))
+#  define LONG_MIN      ((signed long)(-LONG_MAX - (signed long)1))
 #endif
 
 #ifndef ULLONG_MAX
-  #define ULLONG_MAX    ((unsigned long long)(~((unsigned long long)0)))
+#  define ULLONG_MAX    ((unsigned long long)(~((unsigned long long)0)))
 #endif
 #ifndef LLONG_MAX
-  #define LLONG_MAX     ((signed long long)(ULLONG_MAX >> (unsigned long long)1))
+#  define LLONG_MAX     ((signed long long)(ULLONG_MAX >> (unsigned long long)1))
 #endif
 #ifndef LLONG_MIN
-  #define LLONG_MIN     ((signed long long)(-LLONG_MAX - (signed long long)1))
+#  define LLONG_MIN     ((signed long long)(-LLONG_MAX - (signed long long)1))
 #endif
 
 #ifndef XWU8_MAX
-  #define XWU8_MAX      ((xwu8_t)(~((xwu8_t)0)))
+#  define XWU8_MAX      ((xwu8_t)(~((xwu8_t)0)))
 #endif
 #ifndef XWS8_MAX
-  #define XWS8_MAX      ((xws8_t)(XWU8_MAX >> (xwu8_t)1))
+#  define XWS8_MAX      ((xws8_t)(XWU8_MAX >> (xwu8_t)1))
 #endif
 #ifndef XWS8_MIN
-  #define XWS8_MIN      ((xws8_t)(-XWS8_MAX - (xws8_t)1))
+#  define XWS8_MIN      ((xws8_t)(-XWS8_MAX - (xws8_t)1))
 #endif
 
 #ifndef XWU16_MAX
-  #define XWU16_MAX     ((xwu16_t)(~((xwu16_t)0)))
+#  define XWU16_MAX     ((xwu16_t)(~((xwu16_t)0)))
 #endif
 #ifndef XWS16_MAX
-  #define XWS16_MAX     ((xws16_t)(XWU16_MAX >> (xwu16_t)1))
+#  define XWS16_MAX     ((xws16_t)(XWU16_MAX >> (xwu16_t)1))
 #endif
 #ifndef XWS16_MIN
-  #define XWS16_MIN     ((xws16_t)(-XWS16_MAX - (xws16_t)1))
+#  define XWS16_MIN     ((xws16_t)(-XWS16_MAX - (xws16_t)1))
 #endif
 
 #ifndef XWU32_MAX
-  #define XWU32_MAX     ((xwu32_t)(~((xwu32_t)0)))
+#  define XWU32_MAX     ((xwu32_t)(~((xwu32_t)0)))
 #endif
 #ifndef XWS32_MAX
-  #define XWS32_MAX     ((xws32_t)(XWU32_MAX >> (xwu32_t)1))
+#  define XWS32_MAX     ((xws32_t)(XWU32_MAX >> (xwu32_t)1))
 #endif
 #ifndef XWS32_MIN
-  #define XWS32_MIN     ((xws32_t)(-XWS32_MAX - (xws32_t)1))
+#  define XWS32_MIN     ((xws32_t)(-XWS32_MAX - (xws32_t)1))
 #endif
 
 #ifndef XWU64_MAX
-  #define XWU64_MAX     ((xwu64_t)(~((xwu64_t)0)))
+#  define XWU64_MAX     ((xwu64_t)(~((xwu64_t)0)))
 #endif
 #ifndef XWS64_MAX
-  #define XWS64_MAX     ((xws64_t)(XWU64_MAX >> (xwu64_t)1))
+#  define XWS64_MAX     ((xws64_t)(XWU64_MAX >> (xwu64_t)1))
 #endif
 #ifndef XWS64_MIN
-  #define XWS64_MIN     ((xws64_t)(-XWS64_MAX - (xws64_t)1))
+#  define XWS64_MIN     ((xws64_t)(-XWS64_MAX - (xws64_t)1))
 #endif
 
 #ifndef XWSZ_MAX
-  #define XWSZ_MAX      ((xwsz_t)(~((xwsz_t)0)))
+#  define XWSZ_MAX      ((xwsz_t)(~((xwsz_t)0)))
 #endif
 #ifndef XWSSZ_MAX
-  #define XWSSZ_MAX     ((xwssz_t)(XWSZ_MAX >> (xwsz_t)1))
+#  define XWSSZ_MAX     ((xwssz_t)(XWSZ_MAX >> (xwsz_t)1))
 #endif
 #ifndef XWSSZ_MIN
-  #define XWSSZ_MIN     ((xwssz_t)(-XWSSZ_MAX - (xwssz_t)1))
+#  define XWSSZ_MIN     ((xwssz_t)(-XWSSZ_MAX - (xwssz_t)1))
 #endif
 
 #ifndef XWPTR_MAX
-  #define XWPTR_MAX     ((xwptr_t)(~(xwptr_t)0))
+#  define XWPTR_MAX     ((xwptr_t)(~(xwptr_t)0))
 #endif
 
 #ifndef XWREG_MAX
-  #define XWREG_MAX     ((xwreg_t)(~((xwreg_t)0)))
+#  define XWREG_MAX     ((xwreg_t)(~((xwreg_t)0)))
 #endif
 #ifndef XWSREG_MAX
-  #define XWSREG_MAX    ((xwsreg_t)(XWREG_MAX >> (xwreg_t)1))
+#  define XWSREG_MAX    ((xwsreg_t)(XWREG_MAX >> (xwreg_t)1))
 #endif
 #ifndef XWSREG_MIN
-  #define XWSREG_MIN    ((xwsreg_t)(-XWSREG_MAX - (xwsreg_t)1))
+#  define XWSREG_MIN    ((xwsreg_t)(-XWSREG_MAX - (xwsreg_t)1))
 #endif
 
 #ifndef XWER_MAX
-  #define XWER_MAX      ((xwer_t)OK)
+#  define XWER_MAX      ((xwer_t)OK)
 #endif
 #ifndef XWER_MIN
-  #define XWER_MIN      ((xwer_t)(-MAX_ERRNO))
+#  define XWER_MIN      ((xwer_t)(-MAX_ERRNO))
 #endif
 
 #ifndef XWSQ_MAX
-  #define XWSQ_MAX      ((xwsq_t)(~((xwsq_t)0)))
+#  define XWSQ_MAX      ((xwsq_t)(~((xwsq_t)0)))
 #endif
 #ifndef XWSSQ_MAX
-  #define XWSSQ_MAX     ((xwssq_t)(XWSQ_MAX >> (xwsq_t)1))
+#  define XWSSQ_MAX     ((xwssq_t)(XWSQ_MAX >> (xwsq_t)1))
 #endif
 #ifndef XWSSQ_MIN
-  #define XWSSQ_MIN     ((xwssq_t)(-XWSSQ_MAX - (xwssq_t)1))
+#  define XWSSQ_MIN     ((xwssq_t)(-XWSSQ_MAX - (xwssq_t)1))
 #endif
 
 #ifndef XWID_MAX
-  #define XWID_MAX      ((xwid_t)(~((xwid_t)0)))
+#  define XWID_MAX      ((xwid_t)(~((xwid_t)0)))
 #endif
 #ifndef XWSID_MAX
-  #define XWSID_MAX     ((xwsid_t)(XWID_MAX >> (xwid_t)1))
+#  define XWSID_MAX     ((xwsid_t)(XWID_MAX >> (xwid_t)1))
 #endif
 #ifndef XWSID_MIN
-  #define XWSID_MIN     ((xwsid_t)(-XWSID_MAX - (xwsid_t)1))
+#  define XWSID_MIN     ((xwsid_t)(-XWSID_MAX - (xwsid_t)1))
 #endif
 
 #ifndef XWIRQ_MAX
-  #define XWIRQ_MAX     ((xwirq_t)((~(xwu32_t)0) >> (xwu32_t)1))
+#  define XWIRQ_MAX     ((xwirq_t)((~(xwu32_t)0) >> (xwu32_t)1))
 #endif
 #ifndef XWIRQ_MIN
-  #define XWIRQ_MIN     ((xwirq_t)(-XWIRQ_MAX - (xwirq_t)1))
+#  define XWIRQ_MIN     ((xwirq_t)(-XWIRQ_MAX - (xwirq_t)1))
 #endif
 
 #ifndef XWPR_MAX
-  #define XWPR_MAX      ((xwpr_t)((~(xwu32_t)0) >> (xwu32_t)1))
+#  define XWPR_MAX      ((xwpr_t)((~(xwu32_t)0) >> (xwu32_t)1))
 #endif
 #ifndef XWPR_MIN
-  #define XWPR_MIN      ((xwpr_t)(-XWPR_MAX - (xwpr_t)1))
+#  define XWPR_MIN      ((xwpr_t)(-XWPR_MAX - (xwpr_t)1))
 #endif
 
 #ifndef XWTM_MAX
-  #define XWTM_MAX      ((xwtm_t)((~(xwu64_t)0) >> 1))
+#  define XWTM_MAX      ((xwtm_t)((~(xwu64_t)0) >> 1))
 #endif
 #ifndef XWTM_MIN
-  #define XWTM_MIN      ((xwtm_t)(-XWTM_MAX - (xwtm_t)1))
+#  define XWTM_MIN      ((xwtm_t)(-XWTM_MAX - (xwtm_t)1))
 #endif
 
 #define XWTM_NS         (1LL)
@@ -494,150 +494,150 @@ union xwos_ulock {
 #define XWTM_S          (1000000000LL)
 
 #ifndef XWU8_T__SIZE
-  #define BITS_PER_XWU8_T       8
-  #define XWU8_T_SHIFT          3
+#  define BITS_PER_XWU8_T       8
+#  define XWU8_T_SHIFT          3
 #endif
 #ifndef XWS8_T__SIZE
-  #define BITS_PER_XWS8_T       8
-  #define XWS8_T_SHIFT          3
+#  define BITS_PER_XWS8_T       8
+#  define XWS8_T_SHIFT          3
 #endif
 
 #ifndef XWU16_T__SIZE
-  #define BITS_PER_XWU16_T      16
-  #define XWU16_T_SHIFT         4
+#  define BITS_PER_XWU16_T      16
+#  define XWU16_T_SHIFT         4
 #endif
 #ifndef XWS16_T__SIZE
-  #define BITS_PER_XWS16_T      16
-  #define XWS16_T_SHIFT         4
+#  define BITS_PER_XWS16_T      16
+#  define XWS16_T_SHIFT         4
 #endif
 
 #ifndef XWU32_T__SIZE
-  #define BITS_PER_XWU32_T      32
-  #define XWU32_T_SHIFT         5
+#  define BITS_PER_XWU32_T      32
+#  define XWU32_T_SHIFT         5
 #endif
 #ifndef XWS32_T__SIZE
-  #define BITS_PER_XWS32_T      32
-  #define XWS32_T_SHIFT         5
+#  define BITS_PER_XWS32_T      32
+#  define XWS32_T_SHIFT         5
 #endif
 
 #ifndef XWU64_T__SIZE
-  #define BITS_PER_XWU64_T      64
-  #define XWU64_T_SHIFT         6
+#  define BITS_PER_XWU64_T      64
+#  define XWU64_T_SHIFT         6
 #endif
 #ifndef XWS64_T__SIZE
-  #define BITS_PER_XWS64_T      64
-  #define XWS64_T_SHIFT         6
+#  define BITS_PER_XWS64_T      64
+#  define XWS64_T_SHIFT         6
 #endif
 
 #ifndef CHAR__SIZE
-  #define BITS_PER_CHAR         8
-  #define CHAR_SHIFT            3
+#  define BITS_PER_CHAR         8
+#  define CHAR_SHIFT            3
 #endif
 #ifndef UCHAR__SIZE
-  #define BITS_PER_UCHAR        8
-  #define UCHAR_SHIFT           3
+#  define BITS_PER_UCHAR        8
+#  define UCHAR_SHIFT           3
 #endif
 
 #ifndef SHORT__SIZE
-  #define BITS_PER_SHORT        16
-  #define SHORT_SHIFT           4
+#  define BITS_PER_SHORT        16
+#  define SHORT_SHIFT           4
 #endif
 #ifndef USHORT__SIZE
-  #define BITS_PER_USHORT       16
-  #define USHORT_SHIFT          4
+#  define BITS_PER_USHORT       16
+#  define USHORT_SHIFT          4
 #endif
 
 #ifndef INT__SIZE
-  #define BITS_PER_INT          32
-  #define INT_SHIFT             5
+#  define BITS_PER_INT          32
+#  define INT_SHIFT             5
 #endif
 #ifndef UINT__SIZE
-  #define BITS_PER_UINT         32
-  #define UINT_SHIFT            5
+#  define BITS_PER_UINT         32
+#  define UINT_SHIFT            5
 #endif
 
 #ifndef LONG__SIZE
-  #define BITS_PER_LONG         32
-  #define LONG_SHIFT            5
+#  define BITS_PER_LONG         32
+#  define LONG_SHIFT            5
 #endif
 #ifndef ULONG__SIZE
-  #define BITS_PER_ULONG        32
-  #define LONG_SHIFT            5
+#  define BITS_PER_ULONG        32
+#  define LONG_SHIFT            5
 #endif
 
 #ifndef LONGLONG__SIZE
-  #define BITS_PER_LONGLONG     64
-  #define LONGLONG_SHIFT        6
+#  define BITS_PER_LONGLONG     64
+#  define LONGLONG_SHIFT        6
 #endif
 #ifndef ULONGLONG__SIZE
-  #define BITS_PER_ULONGLONG    64
-  #define ULONGLONG_SHIFT       6
+#  define BITS_PER_ULONGLONG    64
+#  define ULONGLONG_SHIFT       6
 #endif
 
 #ifndef FLOAT__SIZE
-  #define BITS_PER_FLOAT        32
-  #define FLOAT_SHIFT           5
+#  define BITS_PER_FLOAT        32
+#  define FLOAT_SHIFT           5
 #endif
 
 #ifndef DOUBLE__SIZE
-  #define BITS_PER_DOUBLE       64
-  #define DOUBLE_SHIFT          6
+#  define BITS_PER_DOUBLE       64
+#  define DOUBLE_SHIFT          6
 #endif
 
 #ifndef XWBMP_T__SIZE
-  #define BITS_PER_XWBMP_T      BITS_PER_LONG
-  #define XWBMP_T_SHIFT         LONG_SHIFT
+#  define BITS_PER_XWBMP_T      BITS_PER_LONG
+#  define XWBMP_T_SHIFT         LONG_SHIFT
 #endif
 
 #ifndef XWSZ_T__SIZE
-  #define BITS_PER_XWSZ_T       BITS_PER_LONG
-  #define XWSZ_T_SHIFT          LONG_SHIFT
+#  define BITS_PER_XWSZ_T       BITS_PER_LONG
+#  define XWSZ_T_SHIFT          LONG_SHIFT
 #endif
 #ifndef XWSSZ_T__SIZE
-  #define BITS_PER_XWSSZ_T      BITS_PER_LONG
-  #define XWSSZ_T_SHIFT         LONG_SHIFT
+#  define BITS_PER_XWSSZ_T      BITS_PER_LONG
+#  define XWSSZ_T_SHIFT         LONG_SHIFT
 #endif
 
 #ifndef XWPTR_T__SIZE
-  #define BITS_PER_XWPTR_T      BITS_PER_LONG
-  #define XWPTR_T_SHIFT         LONG_SHIFT
+#  define BITS_PER_XWPTR_T      BITS_PER_LONG
+#  define XWPTR_T_SHIFT         LONG_SHIFT
 #endif
 
 #ifndef XWER_T__SIZE
-  #define BITS_PER_XWER_T       BITS_PER_INT
-  #define XWER_T_SHIFT          INT_SHIFT
+#  define BITS_PER_XWER_T       BITS_PER_INT
+#  define XWER_T_SHIFT          INT_SHIFT
 #endif
 
 #ifndef XWSID_T__SIZE
-  #define BITS_PER_XWSID_T      BITS_PER_LONG
-  #define XWSID_T_SHIFT         LONG_SHIFT
+#  define BITS_PER_XWSID_T      BITS_PER_LONG
+#  define XWSID_T_SHIFT         LONG_SHIFT
 #endif
 #ifndef XWID_T__SIZE
-  #define BITS_PER_XWID_T       BITS_PER_LONG
-  #define XWID_T_SHIFT          LONG_SHIFT
+#  define BITS_PER_XWID_T       BITS_PER_LONG
+#  define XWID_T_SHIFT          LONG_SHIFT
 #endif
 
 #ifndef XWREG_T__SIZE
-  #define BITS_PER_XWREG_T      BITS_PER_LONG
-  #define XWREG_T_SHIFT         LONG_SHIFT
+#  define BITS_PER_XWREG_T      BITS_PER_LONG
+#  define XWREG_T_SHIFT         LONG_SHIFT
 #endif
 #ifndef XWSREG_T__SIZE
-  #define BITS_PER_XWSREG_T     BITS_PER_LONG
-  #define XWSREG_T_SHIFT        LONG_SHIFT
+#  define BITS_PER_XWSREG_T     BITS_PER_LONG
+#  define XWSREG_T_SHIFT        LONG_SHIFT
 #endif
 
 #ifndef XWSQ_T__SIZE
-  #define BITS_PER_XWSQ_T       BITS_PER_LONG
-  #define XWSQ_T_SHIFT          LONG_SHIFT
+#  define BITS_PER_XWSQ_T       BITS_PER_LONG
+#  define XWSQ_T_SHIFT          LONG_SHIFT
 #endif
 #ifndef XWSSQ_T__SIZE
-  #define BITS_PER_XWSSQ_T      BITS_PER_LONG
-  #define XWSSQ_T_SHIFT         LONG_SHIFT
+#  define BITS_PER_XWSSQ_T      BITS_PER_LONG
+#  define XWSSQ_T_SHIFT         LONG_SHIFT
 #endif
 
 #ifndef XWTM_T__SIZE
-  #define BITS_PER_XWTM_T       BITS_PER_LONGLONG
-  #define XWTM_T_SHIFT          LONGLONG_SHIFT
+#  define BITS_PER_XWTM_T       BITS_PER_LONGLONG
+#  define XWTM_T_SHIFT          LONGLONG_SHIFT
 #endif
 
 #if !defined(ARCH_HAVE_XWTM_T)
@@ -708,7 +708,7 @@ xwer_t xwtm_cmp(const xwtm_t a, const xwtm_t b)
         }
         return rc;
 }
-#endif /* #if !defined(ARCH_HAVE_XWTM_T) */
+#endif
 
 /**
  * @} type

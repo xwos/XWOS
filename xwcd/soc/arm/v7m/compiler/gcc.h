@@ -44,18 +44,18 @@
 #define __xwcc_used             __attribute__((used))
 #define __xwcc_hot              __attribute__((hot))
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-  #define __xwcc_atomic         _Atomic
-  #define __xwcc_noreturn       _Noreturn
+#  define __xwcc_atomic         _Atomic
+#  define __xwcc_noreturn       _Noreturn
 #else
-  #define __xwcc_atomic         volatile
-  #define __xwcc_noreturn       __attribute__((noreturn))
+#  define __xwcc_atomic         volatile
+#  define __xwcc_noreturn       __attribute__((noreturn))
 #endif
 #define __xwcc_likely(x)        __builtin_expect(!!(x), 1)
 #define __xwcc_unlikely(x)      __builtin_expect(!!(x), 0)
 #if defined(CPUCFG_L1_CACHELINE_SIZE)
-  #define __xwcc_alignl1cache   __xwcc_aligned(CPUCFG_L1_CACHELINE_SIZE)
+#  define __xwcc_alignl1cache   __xwcc_aligned(CPUCFG_L1_CACHELINE_SIZE)
 #else
-  #define __xwcc_alignl1cache   __xwcc_aligned(sizeof(void *))
+#  define __xwcc_alignl1cache   __xwcc_aligned(sizeof(void *))
 #endif
 #define __xwcc_alignptr         __xwcc_aligned(sizeof(void *))
 #define xwcc_offsetof(type, member) __builtin_offsetof(type, member)

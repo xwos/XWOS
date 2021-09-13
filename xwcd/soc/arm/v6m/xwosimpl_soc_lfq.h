@@ -22,7 +22,7 @@
 #define __xwosimpl_soc_lfq_h__
 
 #ifndef __xwos_ospl_soc_lfq_h__
-  #error "This file should be included from <xwos/ospl/soc/lfq.h>."
+#  error "This file should be included from <xwos/ospl/soc/lfq.h>."
 #endif
 
 #endif /* xwosimpl_soc_lfq.h */

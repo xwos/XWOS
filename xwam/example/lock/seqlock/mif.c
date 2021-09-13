@@ -27,18 +27,10 @@
 #include <xwos/osal/swt.h>
 #include <xwam/example/lock/seqlock/mif.h>
 
-#define XWSQLKDEMO_THD_PRIORITY                                 \
-        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+#define LOGTAG "swt"
+#define swtlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
 
-#if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-#define XWSQLKDEMO_LOG_TAG     "swt"
-#define swtlogf(lv, fmt, ...)                                   \
-        xwlogf(lv, XWSQLKDEMO_LOG_TAG, fmt, ##__VA_ARGS__)
-#else /* XWLIBCFG_LOG */
-#define swtlogf(lv, fmt, ...)
-#endif /* !XWLIBCFG_LOG */
-
-
+#define XWSQLKDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 void xwsqlkdemo_swt_callback(struct xwos_swt * swt, void * arg);
 xwer_t xwsqlkdemo_thd_func(void * arg);
 

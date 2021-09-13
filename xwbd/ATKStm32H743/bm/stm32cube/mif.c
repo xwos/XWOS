@@ -129,11 +129,11 @@ void stm32cube_init(void)
          */
 #if defined(STM32CUBECFG_ICACHE) && (1 == STM32CUBECFG_ICACHE)
         SCB_EnableICache();
-#endif /* STM32CUBECFG_ICACHE */
+#endif
 #if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
         SCB_EnableDCache();
         SCB_CleanInvalidateDCache();
-#endif /* STM32CUBECFG_DCACHE */
+#endif
 
         odr = xwbop_fls(xwsz_t, (xwsz_t)sdram_mr_size / XWMM_MEMPOOL_PAGE_SIZE);
         rc = xwmm_mempool_init(sdram_mempool, "SDRAM",

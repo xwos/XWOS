@@ -49,7 +49,7 @@
 #define XWMM_MEMPOOL_OC_2048_PAGE_ODR   (1U) /**< 2048字节分配器所使用的页的阶数 */
 
 #if (XWMM_MEMPOOL_PAGE_SIZE & XWMM_ALIGNMENT_MASK)
-  #error "Page size must be aligned to XWMM_ALIGNMENT!"
+#  error "Page size must be aligned to XWMM_ALIGNMENT!"
 #endif
 
 /**

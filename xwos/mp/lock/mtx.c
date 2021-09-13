@@ -17,10 +17,10 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
-  #include <xwos/mm/memslice.h>
+#  include <xwos/mm/memslice.h>
 #elif defined(XWMPCFG_LOCK_MTX_STDC_MM) && (1 == XWMPCFG_LOCK_MTX_STDC_MM)
-  #include <stdlib.h>
-#endif /* XWMPCFG_LOCK_MTX_STDC_MM */
+#  include <stdlib.h>
+#endif
 #include <xwos/ospl/irq.h>
 #include <xwos/mp/skd.h>
 #include <xwos/mp/tt.h>
@@ -85,7 +85,7 @@ static __xwmp_data struct xwmm_memslice xwmp_mtx_cache;
  * @brief 结构体xwmp_mtx的对象缓存的名字
  */
 const __xwmp_rodata char xwmp_mtx_cache_name[] = "xwos.mp.lk.mtx.cache";
-#endif /* XWMPCFG_LOCK_MTX_MEMSLICE */
+#endif
 
 #if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
 /**
@@ -108,7 +108,7 @@ xwer_t xwmp_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                 (dtor_f)xwmp_mtx_destruct);
         return rc;
 }
-#endif /* XWMPCFG_LOCK_MTX_MEMSLICE */
+#endif
 
 /**
  * @brief 从互斥锁对象缓存中申请对象
@@ -166,10 +166,10 @@ void xwmp_mtx_free(struct xwmp_mtx * mtx)
 #elif defined(XWMPCFG_LOCK_MTX_STDC_MM) && (1 == XWMPCFG_LOCK_MTX_STDC_MM)
         xwmp_mtx_destruct(mtx);
         free(mtx);
-#else /* XWMPCFG_LOCK_MTX_MEMSLICE */
+#else
         xwmp_mtx_destruct(mtx);
         xwmm_kma_free(mtx);
-#endif /* !XWMPCFG_LOCK_MTX_MEMSLICE */
+#endif
 }
 
 /**

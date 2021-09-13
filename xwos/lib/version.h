@@ -14,7 +14,7 @@
 #define __xwos_lib_version_h__
 
 #ifndef __xwos_standard_h__
-  #error "This file should be included from <xwos/standard.h>."
+#  error "This file should be included from <xwos/standard.h>."
 #endif
 
 /**

@@ -23,6 +23,6 @@
 
 #include <xwos/standard.h>
 
-#define __data4         __xwcc_section(".data4")
+#define __data4 __xwcc_section(".data4")
 
 #endif /* soc.h */

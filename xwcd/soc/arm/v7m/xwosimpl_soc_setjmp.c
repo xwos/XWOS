@@ -30,7 +30,7 @@ int xwlib_setjmp(__xwcc_unused xwjmpbuf_b ctx)
         __asm__ volatile("      stmia   r0!, {r4-r12, lr}");
 #if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
         __asm__ volatile("      vstmia  r0!, {s16-s31}");
-#endif /* ARCHCFG_FPU */
+#endif
         __asm__ volatile("      mov     r0, #0");
         __asm__ volatile("      bx      lr");
 }
@@ -43,7 +43,7 @@ void xwlib_longjmp(__xwcc_unused xwjmpbuf_b ctx, __xwcc_unused int val)
         __asm__ volatile("      mov     sp, ip");
 #if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
         __asm__ volatile("      vldmia  r0!, {s16-s31}");
-#endif /* ARCHCFG_FPU */
+#endif
         __asm__ volatile("      movs	r0, r1");
         __asm__ volatile("      it	eq\n"
                          "      moveq	r0, #1");

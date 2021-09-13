@@ -104,7 +104,7 @@ const struct soc_irq_cfg mpc560xb_soc_irq_cfgs[] = {
         [23] = {
                 .priority = BDL_IRQ_PRIO_LOW,
         },
-#endif /* #if defined(MPC5607B) */
+#endif
 };
 
 const struct xwos_irq_resource mpc560xb_soc_irq_resources[] = {
@@ -253,7 +253,7 @@ const struct xwos_irq_resource mpc560xb_soc_irq_resources[] = {
                 .cfg = &mpc560xb_soc_irq_cfgs[23],
                 .description = "rsc.irq.edma.ch15",
         },
-#endif /* #if defined(MPC5607B) */
+#endif
 };
 
 const struct xwds_resources mpc560xb_soc_resources = {
@@ -2195,7 +2195,7 @@ xwds_eirq_f mpc560xb_eirq_isrs[SOC_WKUP_NUM + SOC_EIRQ_NUM] = {
         [SOC_WKUP_26] = NULL,
         [SOC_WKUP_27] = NULL,
         [SOC_WKUP_28] = NULL,
-#endif /* #if defined(MPC5607B) */
+#endif
         [SOC_EIRQ_0] = NULL,
         [SOC_EIRQ_1] = NULL,
         [SOC_EIRQ_2] = NULL,
@@ -2246,7 +2246,7 @@ xwds_eirq_arg_t mpc560xb_eirq_isrargs[SOC_WKUP_NUM + SOC_EIRQ_NUM] = {
         [SOC_WKUP_26] = NULL,
         [SOC_WKUP_27] = NULL,
         [SOC_WKUP_28] = NULL,
-#endif /* #if defined(MPC5607B) */
+#endif
         [SOC_EIRQ_0] = NULL,
         [SOC_EIRQ_1] = NULL,
         [SOC_EIRQ_2] = NULL,

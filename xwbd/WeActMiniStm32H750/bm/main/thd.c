@@ -25,8 +25,7 @@
 #include <bm/stm32cube/mif.h>
 #include <bm/main/thd.h>
 
-#define LED_TASK_PRIORITY                                       \
-        (XWOS_SKD_PRIORITY_RAISE(XWOS_SKD_PRIORITY_RT_MIN, 1))
+#define LED_TASK_PRIORITY (XWOS_SKD_PRIORITY_RAISE(XWOS_SKD_PRIORITY_RT_MIN, 1))
 
 xwer_t led_task(void * arg);
 

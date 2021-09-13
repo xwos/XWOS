@@ -350,7 +350,7 @@ xwer_t MX_SDMMC1_SD_Read(uint8_t * buf, uint32_t blkaddr,
     SCB_InvalidateDCache_by_Addr((uint32_t *)mem,
                                  (int32_t)XWBOP_ALIGN((nrblk * BLOCKSIZE),
                                                       CPUCFG_L1_CACHELINE_SIZE));
-#endif /* STM32CUBECFG_DCACHE */
+#endif
     if (mem != buf) {
       memcpy(buf, mem, nrblk * BLOCKSIZE);
     }
@@ -389,7 +389,7 @@ xwer_t MX_SDMMC1_SD_Write(uint8_t * data, uint32_t blkaddr,
   SCB_CleanDCache_by_Addr((uint32_t *)mem,
                           (int32_t)XWBOP_ALIGN((nrblk * BLOCKSIZE),
                                                CPUCFG_L1_CACHELINE_SIZE));
-#endif /* STM32CUBECFG_DCACHE */
+#endif
   rc = xwos_mtx_lock(&hsd1_xfer_mtx);
   if (rc < 0) {
     goto err_mtx_lock;

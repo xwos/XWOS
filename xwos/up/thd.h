@@ -23,26 +23,26 @@
 #include <xwos/up/wqn.h>
 #include <xwos/up/tt.h>
 #if defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)
-  #include <xwos/up/mtxtree.h>
-#endif /* XWUPCFG_LOCK_MTX */
+#  include <xwos/up/mtxtree.h>
+#endif
 #if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
-  #if !defined(XWUPCFG_SYNC_COND) || (1 != XWUPCFG_SYNC_COND)
-    #error "XWUPCFG_SYNC_COND must be 1 if (1 == XWUPCFG_SKD_THD_EXIT) !"
-  #endif /* !XWUPCFG_SYNC_COND */
-#endif /* XWUPCFG_SKD_THD_EXIT */
+#  if !defined(XWUPCFG_SYNC_COND) || (1 != XWUPCFG_SYNC_COND)
+#    error "XWUPCFG_SYNC_COND must be 1 if (1 == XWUPCFG_SKD_THD_EXIT) !"
+#  endif
+#endif
 #if defined(XWUPCFG_SYNC_COND) && (1 == XWUPCFG_SYNC_COND)
-  #include <xwos/up/sync/cond.h>
+#  include <xwos/up/sync/cond.h>
 #endif
 
 struct xwup_skd;
 
 #if (1 == XWUPRULE_SKD_WQ_RT)
 struct xwup_rtwq;
-#endif /* (1 == XWUPRULE_SKD_WQ_RT) */
+#endif
 
 #if (1 == XWUPRULE_SKD_WQ_PL)
 struct xwup_plwq;
-#endif /* (1 == XWUPRULE_SKD_WQ_PL) */
+#endif
 
 /**
  * @brief XWOS UP线程对象
@@ -57,7 +57,7 @@ struct xwup_thd {
 #if (1 == XWUPRULE_SKD_THD_FREEZE)
         /* 冻结状态信息 */
         struct xwlib_bclst_node frznode; /**< 冻结链表节点 */
-#endif /* (1 == XWUPRULE_SKD_THD_FREEZE) */
+#endif
 
         /* 就绪态信息 */
         struct xwlib_bclst_node rqnode; /**< 就绪队列节点，
@@ -77,29 +77,29 @@ struct xwup_thd {
                 xwpr_t s; /**< 线程的固有优先级 */
                 xwpr_t d; /**< 线程的动态优先级 */
         } prio; /**< 线程的优先级 */
-#else /* XWUPCFG_LOCK_MTX */
+#else
         union {
                 xwpr_t s; /**< 线程的固有优先级 */
                 xwpr_t d; /**< 线程的动态优先级 */
         } prio; /**< 线程的优先级 */
-#endif /* !XWUPCFG_LOCK_MTX */
+#endif
 
 #if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
         /* thread completion */
         struct xwup_cond completion; /**< 线程退出时的事件信号量 */
-#endif /* XWUPCFG_SKD_THD_EXIT */
+#endif
 
 #if defined(XWUPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWUPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
         /* 线程本地数据 */
         void * data[XWUPCFG_SKD_THD_LOCAL_DATA_NUM];
-#endif /* XWUPCFG_SKD_THD_LOCAL_DATA_NUM */
+#endif
 };
 
 #if (defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX))
 void xwup_thd_chprio_once(struct xwup_thd * thd, xwpr_t dprio,
                           struct xwup_mtx ** pmtx);
 void xwup_thd_chprio(struct xwup_thd * thd);
-#endif /* XWUPCFG_LOCK_MTX */
+#endif
 
 xwer_t xwup_thd_exit_lic(struct xwup_thd * thd, xwer_t rc);
 xwer_t xwup_thd_rq_add_head(struct xwup_thd * thd);
@@ -113,21 +113,21 @@ void xwup_thd_wqn_callback(void * entry);
 #if (1 == XWUPRULE_SKD_WQ_RT)
 void xwup_thd_eq_rtwq(struct xwup_thd * thd, struct xwup_rtwq * xwrtwq,
                       xwu16_t type);
-#endif /* (1 == XWUPRULE_SKD_WQ_RT) */
+#endif
 
 #if (1 == XWUPRULE_SKD_WQ_PL)
 void xwup_thd_eq_plwq(struct xwup_thd * thd, struct xwup_plwq * xwplwq,
                       xwu16_t type);
-#endif /* (1 == XWUPRULE_SKD_WQ_PL) */
+#endif
 
 #if (1 == XWUPRULE_SKD_THD_DO_UNLOCK)
 xwer_t xwup_thd_do_unlock(void * lock, xwsq_t lktype, void * lkdata);
-#endif /* (1 == XWUPRULE_SKD_THD_DO_UNLOCK) */
+#endif
 
 #if (1 == XWUPRULE_SKD_THD_DO_LOCK)
 xwer_t xwup_thd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm,
                         void * lkdata);
-#endif /* (1 == XWUPRULE_SKD_THD_DO_LOCK) */
+#endif
 
 xwer_t xwup_thd_freeze_lic(struct xwup_thd * thd);
 xwer_t xwup_thd_thaw_lic(struct xwup_thd * thd);
@@ -174,6 +174,6 @@ xwer_t xwup_thd_set_data(struct xwup_thd * thd, xwsq_t pos, void * data);
 xwer_t xwup_thd_get_data(struct xwup_thd * thd, xwsq_t pos, void ** databuf);
 xwer_t xwup_cthd_set_data(xwsq_t pos, void * data);
 xwer_t xwup_cthd_get_data(xwsq_t pos, void ** databuf);
-#endif /* XWUPCFG_SKD_THD_LOCAL_DATA_NUM */
+#endif
 
 #endif /* xwos/up/thd.h */

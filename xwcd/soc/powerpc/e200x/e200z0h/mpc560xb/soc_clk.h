@@ -37,7 +37,7 @@ enum mpc560xb_clk_em {
         MPC560XB_CLK_ADC_0,
 #if defined(MPC5607B)
         MPC560XB_CLK_ADC_1,
-#endif /* #if defined(MPC5607B) */
+#endif
         MPC560XB_CLK_CAN_SAMPLER,
         MPC560XB_CLK_CMU,
         MPC560XB_CLK_CTU,
@@ -49,7 +49,7 @@ enum mpc560xb_clk_em {
 #if defined(MPC5607B)
         MPC560XB_CLK_DSPI_4,
         MPC560XB_CLK_DSPI_5,
-#endif /* #if defined(MPC5607B) */
+#endif
         MPC560XB_CLK_EMIOS_0,
         MPC560XB_CLK_EMIOS_1,
         MPC560XB_CLK_FLEXCAN_0,
@@ -70,7 +70,7 @@ enum mpc560xb_clk_em {
         MPC560XB_CLK_LINFLEX_7,
         MPC560XB_CLK_LINFLEX_8,
         MPC560XB_CLK_LINFLEX_9,
-#endif /* #if defined(MPC5607B) */
+#endif
         MPC560XB_CLK_PIT,
         MPC560XB_CLK_RTC,
         MPC560XB_CLK_SIUL,

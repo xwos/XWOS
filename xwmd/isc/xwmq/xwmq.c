@@ -15,10 +15,10 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWMDCFG_isc_xwmq_MEMSLICE) && (1 == XWMDCFG_isc_xwmq_MEMSLICE)
-  #include <xwos/mm/memslice.h>
+#  include <xwos/mm/memslice.h>
 #elif defined(XWMDCFG_isc_xwmq_STDC_MM) && (1 == XWMDCFG_isc_xwmq_STDC_MM)
-  #include <stdlib.h>
-#endif /* XWMDCFG_isc_xwmq_MEMSLICE */
+#  include <stdlib.h>
+#endif
 #include <xwmd/isc/xwmq/mif.h>
 
 /**
@@ -53,7 +53,7 @@ static __xwmd_data struct xwmm_memslice xwmq_cache;
  * @brief 消息队列对象缓存的名字
  */
 const __xwmd_rodata char xwmq_cache_name[] = "xwmd.mq.cache";
-#endif /* XWMDCFG_isc_xwmq_MEMSLICE */
+#endif
 
 #if defined(XWMDCFG_isc_xwmq_MEMSLICE) && (1 == XWMDCFG_isc_xwmq_MEMSLICE)
 /**
@@ -76,7 +76,7 @@ xwer_t xwmq_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                 (dtor_f)xwmq_destruct);
         return rc;
 }
-#endif /* XWMDCFG_isc_xwmq_MEMSLICE */
+#endif
 
 /**
  * @brief 从消息队列对象缓存中申请一个对象
@@ -106,7 +106,7 @@ struct xwmq * xwmq_alloc(void)
         }
         xwmq_construct(mq);
         return mq;
-#else /* !XWMDCFG_isc_xwmq_STDC_MM */
+#else
         union {
                 struct xwmq * mq;
                 void * anon;
@@ -120,7 +120,7 @@ struct xwmq * xwmq_alloc(void)
                 mem.mq = err_ptr(-ENOMEM);
         }
         return mem.mq;
-#endif /* XWMDCFG_isc_xwmq_MEMSLICE */
+#endif
 }
 
 /**
@@ -135,10 +135,10 @@ void xwmq_free(struct xwmq * mq)
 #elif defined(XWMDCFG_isc_xwmq_STDC_MM) && (1 == XWMDCFG_isc_xwmq_STDC_MM)
         xwmq_destruct(mq);
         free(mq);
-#else /* XWMDCFG_isc_xwmq_MEMSLICE */
+#else
         xwmq_destruct(mq);
         xwmm_kma_free(mq);
-#endif /* !XWMDCFG_isc_xwmq_MEMSLICE */
+#endif
 }
 
 /**
@@ -401,7 +401,7 @@ static __xwmd_data struct xwmm_memslice xwmq_msg_cache;
  * @brief 消息对象缓存的名字
  */
 const __xwmd_rodata char xwmq_msg_cache_name[] = "xwmd.mq.msg.cache";
-#endif /* XWMDCFG_isc_xwmq_MEMSLICE */
+#endif
 
 #if defined(XWMDCFG_isc_xwmq_MEMSLICE) && (1 == XWMDCFG_isc_xwmq_MEMSLICE)
 /**
@@ -424,7 +424,7 @@ xwer_t xwmq_msg_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                 (dtor_f)xwmq_msg_destruct);
         return rc;
 }
-#endif /* XWMDCFG_isc_xwmq_MEMSLICE */
+#endif
 
 /**
  * @brief 从消息对象缓存中申请一个对象

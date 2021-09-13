@@ -15,8 +15,8 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #if defined(XWUPCFG_SYNC_RTSEM_STDC_MM) && (1 == XWUPCFG_SYNC_RTSEM_STDC_MM)
-  #include <stdlib.h>
-#endif /* XWUPCFG_SYNC_RTSEM_STDC_MM */
+#  include <stdlib.h>
+#endif
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/up/lock/seqlock.h>
@@ -24,8 +24,8 @@
 #include <xwos/up/thd.h>
 #include <xwos/up/rtwq.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-  #include <xwos/up/sync/evt.h>
-#endif /* XWUPCFG_SYNC_EVT */
+#  include <xwos/up/sync/evt.h>
+#endif
 #include <xwos/up/sync/rtsem.h>
 
 static __xwup_code
@@ -204,7 +204,7 @@ xwer_t xwup_rtsem_unbind(struct xwup_rtsem * sem, struct xwup_evt * evt)
 
         return xwup_vsem_unbind(&sem->vsem, evt);
 }
-#endif /* XWUPCFG_SYNC_EVT */
+#endif
 
 /**
  * @brief 中断实时信号量等待队列中的一个节点
@@ -280,7 +280,7 @@ xwer_t xwup_rtsem_post(struct xwup_rtsem * sem)
                                         xwup_sel_obj_s1i(evt, &sem->vsem.synobj);
                                 }
                         }
-#endif /* XWUPCFG_SYNC_EVT */
+#endif
                         xwospl_cpuirq_restore_lc(flag);
                 }
         }
@@ -315,7 +315,7 @@ xwer_t xwup_rtsem_trywait(struct xwup_rtsem * sem)
                                 xwup_sel_obj_c0i(evt, &sem->vsem.synobj);
                         }
                 }
-#endif /* XWUPCFG_SYNC_EVT */
+#endif
         } else {
                 rc = -ENODATA;
         }
@@ -361,11 +361,11 @@ xwer_t xwup_rtsem_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_rtsem * sem,
         xwospl_cpuirq_enable_lc();
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
         xwup_skd_wakelock_unlock();
-#endif /* XWUPCFG_SKD_PM */
+#endif
         xwup_skd_req_swcx();
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
         xwup_skd_wakelock_lock();
-#endif /* XWUPCFG_SKD_PM */
+#endif
         xwospl_cpuirq_restore_lc(flag);
 
         /* 判断唤醒原因 */
@@ -454,13 +454,13 @@ xwer_t xwup_rtsem_do_timedwait(struct xwup_rtsem * sem, struct xwup_thd * thd,
                         xwospl_cpuirq_restore_lc(flag);
                         rc = -EINTR;
                 } else {
-#endif /* XWUPCFG_SKD_PM */
+#endif
                         rc = xwup_rtsem_do_timedblkthd_unlkwq_cpuirqrs(sem, thd,
                                                                        xwtm, flag);
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
                         xwup_skd_wakelock_unlock();
                 }
-#endif /* XWUPCFG_SKD_PM */
+#endif
         } else {
                 sem->vsem.count--;
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
@@ -472,7 +472,7 @@ xwer_t xwup_rtsem_do_timedwait(struct xwup_rtsem * sem, struct xwup_thd * thd,
                                 xwup_sel_obj_c0i(evt, &sem->vsem.synobj);
                         }
                 }
-#endif /* XWUPCFG_SYNC_EVT */
+#endif
                 xwospl_cpuirq_restore_lc(flag);
                 rc = XWOK;
         }
@@ -561,7 +561,7 @@ xwer_t xwup_rtsem_do_wait_unintr(struct xwup_rtsem * sem, struct xwup_thd * thd)
                                 xwup_sel_obj_c0i(evt, &sem->vsem.synobj);
                         }
                 }
-#endif /* XWUPCFG_SYNC_EVT */
+#endif
                 xwospl_cpuirq_restore_lc(flag);
                 rc = XWOK;
         }
