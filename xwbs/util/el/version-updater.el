@@ -65,12 +65,6 @@
                 (setq result (concat result elt))))
             "fakefile"))))
 
-(defun oddp (num)
-  (if (= (% num 2) 0) nil t))
-
-(defun evenp (num)
-  (if (= (% num 2) 0) t nil))
-
 ;;;;;;;; ;;;;;;;; ;;;;;;;; arguments ;;;;;;;; ;;;;;;;; ;;;;;;;;
 (setq debug-on-error t)
 (setq make-backup-files nil)
@@ -147,7 +141,7 @@
 
 (if opt-reset
   ;; then
-  (let (recent-git-commit vnum-major vnum-minor vnum-revision vstr)
+  (let (recent-git-commit vnum-major vnum-minor vnum-revision vstr bvstr)
     (setq recent-git-commit
           (with-temp-buffer
             (call-process "git" nil t nil "log" "-1")
@@ -158,18 +152,23 @@
     (setq vstr (concat XuanWuOS-version-major "."
                        XuanWuOS-version-minor "."
                        XuanWuOS-version-revision))
+    (setq bvstr (concat XuanWuOS-version-major "." XuanWuOS-version-minor))
     (cond
-     ((or (string-match "patch: :bookmark:" recent-git-commit)
-          (string-match "release: :bookmark:" recent-git-commit)
-          (string-match "developing: :construction:" recent-git-commit)
+     ((or (string-match "release: :bookmark:" recent-git-commit)
           (string-match "milestone: :bookmark:" recent-git-commit))
-      (call-process "git" nil nil nil "tag" "-d" (concat "XuanWuOS-V" vstr))
+      (call-process "git" nil nil nil "branch" "-D" (concat "XWOS-V" bvstr))
+      (call-process "git" nil nil nil "tag" "-d" (concat "XWOS-V" vstr))
+      (call-process "git" nil nil nil "reset" "HEAD^")
+      (call-process "git" nil nil nil "checkout" XuanWuOS-version-file)
+      (logi "Reset version .... [OK]"))
+     ((string-match "revision: :bookmark:" recent-git-commit)
+      (call-process "git" nil nil nil "tag" "-d" (concat "XWOS-V" vstr))
       (call-process "git" nil nil nil "reset" "HEAD^")
       (call-process "git" nil nil nil "checkout" XuanWuOS-version-file)
       (logi "Reset version .... [OK]"))
      (t (loge "[FAILED] The recent git commit is not a version update!"))))
   ;; else
-  (let (vnum-major vnum-minor vnum-revision vstr)
+  (let (vnum-major vnum-minor vnum-revision vstr bvstr)
     (setq vnum-major (string-to-number XuanWuOS-version-major))
     (setq vnum-minor (string-to-number XuanWuOS-version-minor))
     (setq vnum-revision (string-to-number XuanWuOS-version-revision))
@@ -181,6 +180,7 @@
       (setq vstr (concat XuanWuOS-version-major "."
                          XuanWuOS-version-minor "."
                          XuanWuOS-version-revision))
+      (setq bvstr (concat XuanWuOS-version-major "." XuanWuOS-version-minor))
       (set-buffer version-file-buffer)
       (set-buffer-multibyte t)
       (goto-char (point-min))
@@ -200,10 +200,9 @@
         (replace-match (concat "\\1" XuanWuOS-version-revision)))
       (save-buffer)
       (call-process "git" nil nil nil "add" XuanWuOS-version-file)
-      (call-process "git" nil nil nil
-                    "commit" "-m" (concat "milestone: :bookmark: 玄武OS-V" vstr))
-      (call-process "git" nil nil nil "tag" "-a"
-                    "-m" (concat "XuanWuOS-" vstr) (concat "XuanWuOS-V" vstr))
+      (call-process "git" nil nil nil "commit" "-m" (concat "milestone: :bookmark: XWOS-V" vstr))
+      (call-process "git" nil nil nil "tag" "-a" "-m" (concat "XWOS-V" vstr) (concat "XWOS-V" vstr))
+      (call-process "git" nil nil nil "branch" (concat "XWOS-V" bvstr))
       (logi "next version: V%s" vstr))
      (opt-minor ;; case opt-minor
       (set-buffer version-file-buffer)
@@ -214,6 +213,7 @@
       (setq vstr (concat XuanWuOS-version-major "."
                          XuanWuOS-version-minor "."
                          XuanWuOS-version-revision))
+      (setq bvstr (concat XuanWuOS-version-major "." XuanWuOS-version-minor))
       (goto-char (point-min))
       (while (re-search-forward
               "^\\(#define[ \t]+XWOS_VERSION_MINOR[ \t]+\\)\\(.+\\)"
@@ -226,15 +226,9 @@
         (replace-match (concat "\\1" XuanWuOS-version-revision)))
       (save-buffer)
       (call-process "git" nil nil nil "add" XuanWuOS-version-file)
-      (if (evenp vnum-minor)
-          (progn
-            (call-process "git" nil nil nil
-                          "commit" "-m" (concat "release: :bookmark: 玄武OS-V" vstr))
-            (call-process "git" nil nil nil "tag" "-a"
-                        "-m" (concat "XuanWuOS-" vstr) (concat "XuanWuOS-V" vstr)))
-          (progn
-            (call-process "git" nil nil nil
-                      "commit" "-m" (concat "developing: :construction: 玄武OS-V" vstr))))
+      (call-process "git" nil nil nil "commit" "-m" (concat "release: :bookmark: XWOS-V" vstr))
+      (call-process "git" nil nil nil "tag" "-a" "-m" (concat "XWOS-V" vstr) (concat "XWOS-V" vstr))
+      (call-process "git" nil nil nil "branch" (concat "XWOS-V" bvstr))
       (logi "next version: V%s" vstr))
      (opt-revision ;; case opt-revision
       (setq XuanWuOS-version-revision (number-to-string (+ vnum-revision 1)))
@@ -250,11 +244,8 @@
         (replace-match (concat "\\1" XuanWuOS-version-revision)))
       (save-buffer)
       (call-process "git" nil nil nil "add" XuanWuOS-version-file)
-      (call-process "git" nil nil nil
-                    "commit" "-m" (concat "patch: :bookmark: 玄武OS-V" vstr))
-      (if (evenp vnum-minor)
-          (call-process "git" nil nil nil "tag" "-a"
-                        "-m" (concat "XuanWuOS-" vstr) (concat "XuanWuOS-V" vstr)))
+      (call-process "git" nil nil nil "commit" "-m" (concat "revision: :bookmark: XWOS-V" vstr))
+      (call-process "git" nil nil nil "tag" "-a" "-m" (concat "XWOS-V" vstr) (concat "XWOS-V" vstr))
       (logi "next version: V%s" vstr)))))
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; exit ;;;;;;;; ;;;;;;;; ;;;;;;;;
