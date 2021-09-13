@@ -1,0 +1,203 @@
+#! /bin/make -f
+# @file
+# @brief Makefile规则 (ARM-cortex-m-clang)
+# @author
+# + 隐星魂 (Roy.Sun) <https://xwos.tech>
+# @copyright
+# + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
+# > Licensed under the Apache License, Version 2.0 (the "License");
+# > you may not use this file except in compliance with the License.
+# > You may obtain a copy of the License at
+# >
+# >         http://www.apache.org/licenses/LICENSE-2.0
+# >
+# > Unless required by applicable law or agreed to in writing, software
+# > distributed under the License is distributed on an "AS IS" BASIS,
+# > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# > See the License for the specific language governing permissions and
+# > limitations under the License.
+#
+
+XWTOOL ?= $(shell xwtoolwd)
+ARMLLVM = $(XWTOOL)/armllvm
+SYSROOT ?= $(ARMLLVM)/lib/clang-runtimes/$(SYSROOT_llvm)
+CC := $(ARMLLVM)/bin/clang
+CXX := $(ARMLLVM)/bin/clang++
+AS := $(CC) -x assembler-with-cpp
+OBJCOPY := arm-none-eabi-objcopy
+OD := $(ARMLLVM)/bin/llvm-objdump
+AR := $(ARMLLVM)/bin/llvm-ar
+LD := $(CC)
+SIZE := $(ARMLLVM)/bin/llvm-size
+LUA2HEX := python3 xwbs/util/py/lua2hex.py
+CP := cp
+RM := -rm
+
+ARCH_INCDIRS += $(ARCH_INCDIRS_llvm)
+ARCH_AFLAGS += $(ARCH_AFLAGS_llvm)
+ARCH_CFLAGS += $(ARCH_CFLAGS_llvm)
+ARCH_CXXFLAGS += $(ARCH_CXXFLAGS_llvm)
+ARCH_LDFLAGS += $(ARCH_LDFLAGS_llvm)
+ARCH_ASRCS += $(ARCH_ASRCS_llvm)
+ARCH_CSRCS += $(ARCH_CSRCS_llvm)
+ARCH_CXXSRCS += $(ARCH_CXXSRCS_llvm)
+ARCH_EOBJS += $(ARCH_EOBJS_llvm)
+
+CPU_INCDIRS += $(CPU_INCDIRS_llvm)
+CPU_AFLAGS += $(CPU_AFLAGS_llvm)
+CPU_CFLAGS += $(CPU_CFLAGS_llvm)
+CPU_CXXFLAGS += $(CPU_CXXFLAGS_llvm)
+CPU_LDFLAGS += $(CPU_LDFLAGS_llvm)
+CPU_ASRCS += $(CPU_ASRCS_llvm)
+CPU_CSRCS += $(CPU_CSRCS_llvm)
+CPU_CXXSRCS += $(CPU_CXXSRCS_llvm)
+CPU_EOBJS += $(CPU_EOBJS_llvm)
+
+SOC_INCDIRS += $(SOC_INCDIRS_llvm)
+SOC_AFLAGS += $(SOC_AFLAGS_llvm)
+SOC_CFLAGS += $(SOC_CFLAGS_llvm)
+SOC_CXXFLAGS += $(SOC_CXXFLAGS_llvm)
+SOC_LDFLAGS += $(SOC_LDFLAGS_llvm)
+SOC_ASRCS += $(SOC_ASRCS_llvm)
+SOC_CSRCS += $(SOC_CSRCS_llvm)
+SOC_CXXSRCS += $(SOC_CXXSRCS_llvm)
+SOC_EOBJS += $(SOC_EOBJS_llvm)
+
+BRD_INCDIRS += $(BRD_INCDIRS_llvm)
+BRD_AFLAGS += $(BRD_AFLAGS_llvm)
+BRD_CFLAGS += $(BRD_CFLAGS_llvm)
+BRD_CXXFLAGS += $(BRD_CXXFLAGS_llvm)
+BRD_LDFLAGS += $(BRD_LDFLAGS_llvm)
+BRD_ASRCS += $(BRD_ASRCS_llvm)
+BRD_CSRCS += $(BRD_CSRCS_llvm)
+BRD_CXXSRCS += $(BRD_CXXSRCS_llvm)
+BRD_EOBJS += $(BRD_EOBJS_llvm)
+
+EINCDIRS += $(EINCDIRS_llvm)
+ELIBS += $(ELIBS_llvm)
+
+ifeq ($(ARCHCFG_LITTLE_ENDIAN),y)
+  ENDIAN := little-endian
+else
+  ENDIAN := big-endian
+endif
+~D ?= 1
+WARN := -Wall -Wextra -Werror -Wundef -Wsign-conversion
+WARN += -Wno-incompatible-pointer-types
+INCDIRS = -I. \
+          -I$(XuanWuOS_ARCH_DIR) \
+          -I$(XuanWuOS_CPU_DIR) \
+          -I$(XuanWuOS_SOC_DIR) \
+          -I$(XuanWuOS_BRD_DIR) \
+          -I$(XuanWuOS_WKSPC_DIR)
+
+PERDEF = -D__XuanWuOS__
+
+AFLAGS = -mabi=aapcs -m$(ENDIAN) -mthumb \
+         -nostdinc -nostdlib -mno-unaligned-access \
+         -ffunction-sections -fdata-sections \
+         -g -g3 -gdwarf-4 \
+         $(WARN) $(PERDEF)
+
+CFLAGS = -mabi=aapcs -mthumb -std=gnu11 --sysroot=$(SYSROOT) \
+         -m$(ENDIAN) -mno-unaligned-access \
+         -fomit-frame-pointer -ffunction-sections -fdata-sections \
+         -g -g3 -gdwarf-4 -fverbose-asm \
+         $(WARN) $(PERDEF)
+
+CXXFLAGS = -mabi=aapcs -mthumb -std=gnu++14 --sysroot=$(SYSROOT) \
+           -m$(ENDIAN) -mno-unaligned-access \
+           -fomit-frame-pointer -ffunction-sections -fdata-sections \
+           -g -g3 -gdwarf-4 -fverbose-asm \
+           $(WARN) $(PERDEF)
+
+MMFLAGS = -MM -MP
+
+ifeq ($(~O),)
+  ifeq ($(~D),0)
+    ~O := 1
+  else
+    ~O := g
+  endif
+endif
+
+CFLAGS += -O$(~O)
+CXXFLAGS += -O$(~O)
+
+ifeq ($(ARCHCFG_COMPILER_CLIB),n)
+  CFLAGS += -fno-builtin
+endif
+
+LDFLAGS = -mthumb -mabi=aapcs -m$(ENDIAN) --sysroot=$(SYSROOT) -nostdlib \
+          -L$(XuanWuOS_SOC_DIR) -T$(XuanWuOS_BRD_DIR)/$(XuanWuOS_CFG_LDSCRIPT) \
+          -Wl,--gc-sections \
+          -Wl,-Map=$(XuanWuOS_WKSPC_DIR)/$(TARGET).map,--cref
+
+# colorfully build
+SHOW_CPP =
+SHOW_CC =
+SHOW_CXX =
+SHOW_APP =
+SHOW_AS =
+SHOW_OD =
+SHOW_OBJCOPY =
+SHOW_MM =
+SHOW_AR =
+SHOW_LD =
+SHOW_SIZE =
+SHOW_LUA2HEX =
+SHOW_CP =
+
+ifeq ($(XuanWuOS_CFG_HOSTOS),gnu/linux)
+  ifneq ($(~V),1)
+    SHOW_CPP = @echo -e "\e[1m\e[44;38m[cc -E] "$<" -> "$@" \e[0m";
+    SHOW_CC = @echo -e "\e[1m\e[44;38m[cc] "$<" -> "$@" \e[0m";
+    SHOW_CXX = @echo -e "\e[1m\e[44;38m[c++] "$<" -> "$@" \e[0m";
+    SHOW_APP = @echo -e "\e[1m\e[44;38m[as -E] "$<" -> "$@" \e[0m";
+    SHOW_AS = @echo -e "\e[1m\e[44;38m[as] "$<" -> "$@" \e[0m";
+    SHOW_OD = @echo -e "\e[1m\e[40;38m[od] "$<" -> "$@" \e[0m";
+    SHOW_OBJCOPY = @echo -e "\e[1m\e[47;34m[objcopy] "$<" -> "$@" \e[0m";
+    SHOW_MM = @echo -e "\e[1m\e[46;38m[mm] "$<" -> "$@" \e[0m";
+    SHOW_AR = @echo -e "\e[1m\e[42;38m[ar] "$@" \e[0m";
+    SHOW_LD = @echo -e "\e[1m\e[47;34m[ld] "$@" \e[0m";
+    SHOW_SIZE = @echo -e "\e[1m\e[47;34m[size] "$@" \e[0m";
+    SHOW_LUA2HEX = @echo -e "\e[1m\e[47;34m[lua2hex] "$@" \e[0m";
+    SHOW_CP = @echo -e "\e[1m\e[47;34m[cp] "$<" -> "$@" \e[0m";
+  endif
+endif
+
+ifeq ($(XuanWuOS_CFG_HOSTOS),darwin)
+  ifneq ($(~V),1)
+    SHOW_CPP = @echo -e "\e[1m\e[44;38m[cc -E] "$<" -> "$@" \e[0m";
+    SHOW_CC = @echo -e "\e[1m\e[44;38m[cc] "$<" -> "$@" \e[0m";
+    SHOW_CXX = @echo -e "\e[1m\e[44;38m[c++] "$<" -> "$@" \e[0m";
+    SHOW_APP = @echo -e "\e[1m\e[44;38m[as -E] "$<" -> "$@" \e[0m";
+    SHOW_AS = @echo -e "\e[1m\e[44;38m[as] "$<" -> "$@" \e[0m";
+    SHOW_OD = @echo -e "\e[1m\e[40;38m[od] "$<" -> "$@" \e[0m";
+    SHOW_OBJCOPY = @echo -e "\e[1m\e[47;34m[objcopy] "$<" -> "$@" \e[0m";
+    SHOW_MM = @echo -e "\e[1m\e[46;38m[mm] "$<" -> "$@" \e[0m";
+    SHOW_AR = @echo -e "\e[1m\e[42;38m[ar] "$@" \e[0m";
+    SHOW_LD = @echo -e "\e[1m\e[47;34m[ld] "$@" \e[0m";
+    SHOW_SIZE = @echo -e "\e[1m\e[47;34m[size] "$@" \e[0m";
+    SHOW_LUA2HEX = @echo -e "\e[1m\e[47;34m[lua2hex] "$@" \e[0m";
+    SHOW_CP = @echo -e "\e[1m\e[47;34m[cp] "$<" -> "$@" \e[0m";
+  endif
+endif
+
+ifeq ($(XuanWuOS_CFG_HOSTOS),windows-nt)
+  ifneq ($(~V),1)
+    SHOW_CPP = @echo -e "[cc -E] "$<" -> "$@;
+    SHOW_CC = @echo -e "[cc] "$<" -> "$@;
+    SHOW_CXX = @echo -e "[c++] "$<" -> "$@;
+    SHOW_APP = @echo -e "[as -E] "$<" -> "$@;
+    SHOW_AS = @echo -e "[as] "$<" -> "$@;
+    SHOW_OD = @echo -e "[od] "$<" -> "$@;
+    SHOW_OBJCOPY = @echo -e "[objcopy] "$<" -> "$@;
+    SHOW_MM = @echo -e "[mm] "$<" -> "$@;
+    SHOW_AR = @echo -e "[ar] "$@;
+    SHOW_LD = @echo -e "[ld] "$@;
+    SHOW_SIZE = @echo -e "[size] "$@;
+    SHOW_LUA2HEX = @echo -e "[lua2hex] "$@;
+    SHOW_CP = @echo -e "[cp] "$@;
+  endif
+endif

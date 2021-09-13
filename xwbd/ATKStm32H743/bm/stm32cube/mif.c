@@ -47,7 +47,7 @@ extern xwu8_t data4_vma_end[];
  * @brief SDRAM内存池
  * @note
  * + 头文件
- *   - xwbd/atkh743/bm/stm32cube/mif.h
+ *   - xwbd/ATKStm32H743/bm/stm32cube/mif.h
  *   - xwos/mm/mempool/allocator.h
  * + API
  *   - 申请：xwmm_mempool_malloc(sdram_mempool, ...)

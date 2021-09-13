@@ -40,7 +40,7 @@
 #define XWLIBCFG_XWAOP8                                 1
 #define XWLIBCFG_XWAOP16                                1
 #define XWLIBCFG_XWAOP32                                1
-#define XWLIBCFG_XWAOP64                                1
+#define XWLIBCFG_XWAOP64                                0
 #define XWLIBCFG_XWBMPAOP                               1
 
 #define XWLIBCFG_MAP                                    1

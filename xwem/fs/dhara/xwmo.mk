@@ -18,11 +18,12 @@
 # > limitations under the License.
 #
 
-include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
+include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
 XWMO_CSRCS := error.c journal.c map.c
 XWMO_CFLAGS := -Wno-sign-conversion -Wno-undef -Wno-type-limits
 XWMO_CFLAGS += -Wno-unused-parameter -Wno-sign-compare
+XWMO_CFLAGS_llvm := -Wno-unused-function
 XWMO_INCDIRS := $(call getXwmoDir)
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)

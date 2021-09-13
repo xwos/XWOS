@@ -21,22 +21,22 @@
 #ifndef __cfg_xwam_h__
 #define __cfg_xwam_h__
 
-#define XWAMCFG_example_thread_create           1
+#define XWAMCFG_example_thread_create           0
 #define XWAMCFG_example_thread_exit             0
-#define XWAMCFG_example_thread_sleep            1
-#define XWAMCFG_example_timer                   1
-#define XWAMCFG_example_lock_cpuirq             1
-#define XWAMCFG_example_lock_mtx                1
-#define XWAMCFG_example_lock_spinlock           1
-#define XWAMCFG_example_lock_seqlock            1
-#define XWAMCFG_example_sync_sem                1
-#define XWAMCFG_example_sync_cond               1
-#define XWAMCFG_example_sync_br                 1
-#define XWAMCFG_example_sync_flg                1
-#define XWAMCFG_example_sync_sel                1
-#define XWAMCFG_example_mm_sma                  1
-#define XWAMCFG_example_mm_memslice             1
-#define XWAMCFG_example_mm_bma                  1
+#define XWAMCFG_example_thread_sleep            0
+#define XWAMCFG_example_timer                   0
+#define XWAMCFG_example_lock_cpuirq             0
+#define XWAMCFG_example_lock_mtx                0
+#define XWAMCFG_example_lock_spinlock           0
+#define XWAMCFG_example_lock_seqlock            0
+#define XWAMCFG_example_sync_sem                0
+#define XWAMCFG_example_sync_cond               0
+#define XWAMCFG_example_sync_br                 0
+#define XWAMCFG_example_sync_flg                0
+#define XWAMCFG_example_sync_sel                0
+#define XWAMCFG_example_mm_sma                  0
+#define XWAMCFG_example_mm_memslice             0
+#define XWAMCFG_example_mm_bma                  0
 #define XWAMCFG_example_xwlib_crc               0
 #define XWAMCFG_example_cxx                     0
 #define XWAMCFG_example_isc_xwmq                0

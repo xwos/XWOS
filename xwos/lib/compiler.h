@@ -52,10 +52,6 @@
 
 #include <xwos/ospl/soc/compiler.h>
 
-#ifndef __XWOS_COMPILER__
-  #error "Unknown compiler!"
-#endif
-
 #ifndef __xwos_init_code
   #define __xwos_init_code
 #endif

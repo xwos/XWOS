@@ -19,9 +19,14 @@
 #
 
 EINCDIRS :=
-
 ELIBS :=
+
 ifeq ($(ARCHCFG_COMPILER_CLIB),y)
-    ELIBS += -lm -lc -lnosys
+  ELIBS_gcc += -lm -lc -lnosys
 endif
-ELIBS += -lgcc
+ELIBS_gcc += -lgcc
+
+ifeq ($(ARCHCFG_COMPILER_CLIB),y)
+  ELIBS_llvm += -lm -lc -lnosys
+endif
+ELIBS_llvm += -lclang_rt.builtins-armv7m

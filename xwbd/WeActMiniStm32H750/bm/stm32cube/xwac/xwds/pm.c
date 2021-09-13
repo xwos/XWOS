@@ -33,7 +33,8 @@ void stm32cube_pm_resume(void * arg)
         __xwcc_unused xwer_t rc;
         xwirq_t irq;
 
-        rc = xwos_irq_get_id(&irq);
+        rc = xwos_irq_get_id(&irq); /* 获取中断号，用于调试 */
+        /* 恢复stm32cube中的所有设备 */
         xwds_pm_resume(&stm32cube_ds);
 }
 
@@ -42,8 +43,15 @@ void stm32cube_pm_suspend(void * arg)
         __xwcc_unused xwer_t rc;
         xwirq_t irq;
 
-        rc = xwos_irq_get_id(&irq);
+        rc = xwos_irq_get_id(&irq); /* 获取中断号或上下文，用于调试 */
+        /* 暂停stm32cube：
+           + 暂停所有设备
+           + 配置GPIO */
         xwds_pm_suspend(&stm32cube_ds);
+
+        /* 设置休眠方式为STOP模式：
+           STOP模式下寄存器与内部RAM数据不丢失，
+           因此休眠方式为SuspendToRAM，唤醒后运行状态可恢复。*/
         LL_PWR_SetRegulModeDS(LL_PWR_REGU_DSMODE_LOW_POWER);
         LL_PWR_EnableFlashPowerDown();
         LL_PWR_CPU_SetD1PowerMode(LL_PWR_CPU_MODE_D1STOP);
@@ -54,9 +62,8 @@ void stm32cube_pm_suspend(void * arg)
 
 void stm32cube_pm_wakeup(void * arg)
 {
-        LL_LPM_EnableSleep();
-        /* 从STOP模式恢复后，需要重新配置时钟 */
-        SystemClock_Config();
+        LL_LPM_EnableSleep(); /* 清除DEEPSLEEP位 */
+        SystemClock_Config(); /* 从STOP模式恢复后，需要重新配置时钟 */
 }
 
 void stm32cube_pm_sleep(void * arg)

@@ -1,0 +1,153 @@
+#! /bin/make -f
+# @file
+# @brief Makefile规则 (powerpc-eabivle-gcc)
+# @author
+# + 隐星魂 (Roy.Sun) <https://xwos.tech>
+# @copyright
+# + (c) 2015 隐星魂 (Roy.Sun) <https://xwos.tech>
+# > Licensed under the Apache License, Version 2.0 (the "License");
+# > you may not use this file except in compliance with the License.
+# > You may obtain a copy of the License at
+# >
+# >         http://www.apache.org/licenses/LICENSE-2.0
+# >
+# > Unless required by applicable law or agreed to in writing, software
+# > distributed under the License is distributed on an "AS IS" BASIS,
+# > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# > See the License for the specific language governing permissions and
+# > limitations under the License.
+#
+
+CROSS_COMPILE ?= powerpc-eabivle-
+CC := $(CROSS_COMPILE)gcc
+CXX := $(CROSS_COMPILE)g++
+AS := $(CROSS_COMPILE)gcc -x assembler-with-cpp
+OBJCOPY := $(CROSS_COMPILE)objcopy
+OD := $(CROSS_COMPILE)objdump
+AR := $(CROSS_COMPILE)ar
+LD := $(CROSS_COMPILE)gcc
+SIZE := $(CROSS_COMPILE)size
+LUA2HEX := python3 xwbs/util/py/lua2hex.py
+CP := cp
+RM := -rm
+
+ifeq ($(ARCHCFG_LITTLE_ENDIAN),y)
+  ENDIAN := little
+else
+  ENDIAN := big
+endif
+~D ?= 1
+WARN := -Wall -Wextra -Wundef -Wsign-conversion -Werror
+WARN += -Wno-cast-function-type
+INCDIRS = -I. \
+          -I$(XuanWuOS_ARCH_DIR) \
+          -I$(XuanWuOS_CPU_DIR) \
+          -I$(XuanWuOS_SOC_DIR) \
+          -I$(XuanWuOS_BRD_DIR) \
+          -I$(XuanWuOS_WKSPC_DIR)
+
+PERDEF = -D__XuanWuOS__
+
+AFLAGS = -mvle -mcpu=e200z0 -m$(ENDIAN) -mregnames -nostdinc -nostdlib \
+         -ffunction-sections -fdata-sections \
+         -g3 \
+         -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
+
+CFLAGS = -mvle -mcpu=e200z0 -m$(ENDIAN) -mregnames -std=gnu11 \
+         -ffunction-sections -fdata-sections \
+         -g3 -fverbose-asm \
+         -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
+
+CXXFLAGS = -mvle -mcpu=e200z0 -m$(ENDIAN) -mregnames -std=gnu11 \
+           -ffunction-sections -fdata-sections \
+           -g3 -fverbose-asm \
+           -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
+
+MMFLAGS = -MM -MP
+
+ifeq ($(~O),)
+  ifeq ($(~D),0)
+    ~O := 1
+  else
+    ~O := g
+  endif
+endif
+
+CFLAGS += -O$(~O)
+CXXFLAGS += -O$(~O)
+
+ifeq ($(ARCHCFG_COMPILER_CLIB),n)
+  CFLAGS += -fno-builtin
+endif
+
+LDFLAGS = -mcpu=e200z0 -mhard-float \
+          -L$(XuanWuOS_SOC_DIR) -T$(XuanWuOS_BRD_DIR)/$(XuanWuOS_CFG_LDSCRIPT) \
+          -Wl,--gc-sections \
+          -Wl,-Map=$(XuanWuOS_WKSPC_DIR)/$(TARGET).map,--cref
+
+# colorfully build
+SHOW_CPP =
+SHOW_CC =
+SHOW_CXX =
+SHOW_APP =
+SHOW_AS =
+SHOW_OD =
+SHOW_OBJCOPY =
+SHOW_MM =
+SHOW_AR =
+SHOW_LD =
+SHOW_SIZE =
+SHOW_LUA2HEX =
+SHOW_CP =
+
+ifeq ($(XuanWuOS_CFG_HOSTOS),gnu/linux)
+  ifneq ($(~V),1)
+    SHOW_CPP = @echo -e "\e[1m\e[44;38m[cc -E] "$<" -> "$@" \e[0m";
+    SHOW_CC = @echo -e "\e[1m\e[44;38m[cc] "$<" -> "$@" \e[0m";
+    SHOW_CXX = @echo -e "\e[1m\e[44;38m[c++] "$<" -> "$@" \e[0m";
+    SHOW_APP = @echo -e "\e[1m\e[44;38m[as -E] "$<" -> "$@" \e[0m";
+    SHOW_AS = @echo -e "\e[1m\e[44;38m[as] "$<" -> "$@" \e[0m";
+    SHOW_OD = @echo -e "\e[1m\e[40;38m[od] "$<" -> "$@" \e[0m";
+    SHOW_OBJCOPY = @echo -e "\e[1m\e[47;34m[objcopy] "$<" -> "$@" \e[0m";
+    SHOW_MM = @echo -e "\e[1m\e[46;38m[mm] "$<" -> "$@" \e[0m";
+    SHOW_AR = @echo -e "\e[1m\e[42;38m[ar] "$@" \e[0m";
+    SHOW_LD = @echo -e "\e[1m\e[47;34m[ld] "$@" \e[0m";
+    SHOW_SIZE = @echo -e "\e[1m\e[47;34m[size] "$@" \e[0m";
+    SHOW_LUA2HEX = @echo -e "\e[1m\e[47;34m[lua2hex] "$@" \e[0m";
+    SHOW_CP = @echo -e "\e[1m\e[47;34m[cp] "$<" -> "$@" \e[0m";
+  endif
+endif
+
+ifeq ($(XuanWuOS_CFG_HOSTOS),darwin)
+  ifneq ($(~V),1)
+    SHOW_CPP = @echo -e "\e[1m\e[44;38m[cc -E] "$<" -> "$@" \e[0m";
+    SHOW_CC = @echo -e "\e[1m\e[44;38m[cc] "$<" -> "$@" \e[0m";
+    SHOW_CXX = @echo -e "\e[1m\e[44;38m[c++] "$<" -> "$@" \e[0m";
+    SHOW_APP = @echo -e "\e[1m\e[44;38m[as -E] "$<" -> "$@" \e[0m";
+    SHOW_AS = @echo -e "\e[1m\e[44;38m[as] "$<" -> "$@" \e[0m";
+    SHOW_OD = @echo -e "\e[1m\e[40;38m[od] "$<" -> "$@" \e[0m";
+    SHOW_OBJCOPY = @echo -e "\e[1m\e[47;34m[objcopy] "$<" -> "$@" \e[0m";
+    SHOW_MM = @echo -e "\e[1m\e[46;38m[mm] "$<" -> "$@" \e[0m";
+    SHOW_AR = @echo -e "\e[1m\e[42;38m[ar] "$@" \e[0m";
+    SHOW_LD = @echo -e "\e[1m\e[47;34m[ld] "$@" \e[0m";
+    SHOW_SIZE = @echo -e "\e[1m\e[47;34m[size] "$@" \e[0m";
+    SHOW_LUA2HEX = @echo -e "\e[1m\e[47;34m[lua2hex] "$@" \e[0m";
+    SHOW_CP = @echo -e "\e[1m\e[47;34m[cp] "$<" -> "$@" \e[0m";
+  endif
+endif
+
+ifeq ($(XuanWuOS_CFG_HOSTOS),windows-nt)
+  SHOW_CPP = @echo -e "[cc -E] "$<" -> "$@;
+  SHOW_CC = @echo -e "[cc] "$<" -> "$@;
+  SHOW_CXX = @echo -e "[c++] "$<" -> "$@;
+  SHOW_APP = @echo -e "[as -E] "$<" -> "$@;
+  SHOW_AS = @echo -e "[as] "$<" -> "$@;
+  SHOW_OD = @echo -e "[od] "$<" -> "$@;
+  SHOW_OBJCOPY = @echo -e "[objcopy] "$<" -> "$@;
+  SHOW_MM = @echo -e "[mm] "$<" -> "$@;
+  SHOW_AR = @echo -e "[ar] "$@;
+  SHOW_LD = @echo -e "[ld] "$@;
+  SHOW_SIZE = @echo -e "[size] "$@;
+  SHOW_LUA2HEX = @echo -e "[lua2hex] "$@;
+  SHOW_CP = @echo -e "[cp] "$<" -> "$@;
+endif

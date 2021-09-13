@@ -44,10 +44,6 @@
   #define xw_array_size(ay) (sizeof(ay) / sizeof((ay)[0]))
 #endif
 
-#ifndef __XWOS_COMPILER__
-  #error "Can't find the configure of compilier."
-#endif
-
 #if defined(XWKNCFG_BUG) && (1 == XWKNCFG_BUG)
   #if defined(SOCCFG_BKPT) && (1 == SOCCFG_BKPT)
     #define XWOS_BUG()          soc_bkpt()

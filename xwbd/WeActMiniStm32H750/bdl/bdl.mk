@@ -19,18 +19,19 @@
 #
 
 BDL_INCDIRS :=
-BDL_EOBJS :=
-
 BDL_AFLAGS :=
 BDL_CFLAGS :=
 BDL_CXFLAGS :=
 BDL_LDFLAGS :=
 
-BDL_CSRCS :=
 BDL_ASRCS :=
+BDL_CSRCS :=
+BDL_CXXSRCS :=
+
+BDL_EOBJS :=
 
 BDL_CSRCS += board_init.c
 ifeq ($(BRDCFG_XWSKD_THD_STACK_POOL),y)
-    BDL_CSRCS += xwac/thd_stack_mempool.c
+  BDL_CSRCS += xwac/thd_stack_mempool.c
 endif
 BDL_CSRCS += xwac/xwskd_hook.c

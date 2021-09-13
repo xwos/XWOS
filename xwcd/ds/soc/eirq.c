@@ -68,7 +68,7 @@ xwer_t xwds_eirq_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask,
                 rc = -EBUSY;
                 goto err_perm;
         }
-        soc->eirq.isrs[eiid] = isr ? isr : err_ptr(-EBUSY);
+        soc->eirq.isrs[eiid] = isr ? isr : (xwds_eirq_f)err_ptr(-EBUSY);
         soc->eirq.isrargs[eiid] = arg;
 #endif
 

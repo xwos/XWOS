@@ -198,6 +198,7 @@ xwer_t xwds_obj_del(struct xwds * ds, struct xwds_object * obj)
         } else {
                 xwlib_bclst_del_init(&obj->node); /* LIFO */
                 obj->ds = NULL;
+                rc = XWOK;
         }
         xwos_sqlk_wr_unlock_cpuirqrs(&ds->devlistlock, cpuirq);
         return rc;

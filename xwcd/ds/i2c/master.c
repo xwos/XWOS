@@ -198,19 +198,23 @@ xwer_t xwds_i2cm_vop_resume(struct xwds_i2cm * i2cm)
  * @brief XWDS API：传输I2C消息
  * @param[in] i2cm: I2C主机控制器对象指针
  * @param[in,out] msg: I2C消息结构体的指针
- * + addr: 地址
- * + flag: 地址，取值：
- *   - 地址标志:
+ * + (I) addr: 地址，只作为输入
+ * + (I) flag: 传输标志，只作为输入，取值：
+ *   - 地址标志：
  *     + XWDS_I2C_F_7BITADDR: 7位地址
  *     + XWDS_I2C_F_10BITADDR: 10位地址
- *   - 方向标志:
+ *   - 方向标志：
  *     + XWDS_I2C_F_RD: 读
  *     + XWDS_I2C_F_WR: 写
- *   - 开始/停止条件标志:
+ *   - 开始/停止条件标志：
  *     + XWDS_I2C_F_START: 产生开始条件
  *     + XWDS_I2C_F_STOP: 产生结束条件
- * + data: 数据缓冲区
+ * + data: 数据缓冲区：
+ *   - (I) 当方向标志为读时，只作为输入缓冲区
+ *   - (O) 当方向标志为写时，只作为输出缓冲区
  * + size: 传输的字节数
+ *   - (I) 当作为输入时，表示缓冲区的大小
+ *   - (O) 当作为输出时，返回实际传输的数据大小
  * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示期望的阻塞等待时间
  * + (O) 作为输出时，返回剩余的期望时间

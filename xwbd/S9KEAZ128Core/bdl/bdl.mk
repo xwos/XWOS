@@ -19,15 +19,16 @@
 #
 
 BDL_INCDIRS :=
-BDL_EOBJS :=
-
 BDL_AFLAGS :=
 BDL_CFLAGS := -Wno-sign-conversion
 BDL_CXFLAGS :=
 BDL_LDFLAGS :=
 
-BDL_CSRCS :=
 BDL_ASRCS :=
+BDL_CSRCS :=
+BDL_CXXSRCS :=
+
+BDL_EOBJS :=
 
 BDL_CSRCS += board_init.c
 BDL_CSRCS += xwac/xwskd_hook.c

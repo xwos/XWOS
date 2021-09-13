@@ -18,11 +18,11 @@
 # > limitations under the License.
 #
 
-include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
+include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
 XWMO_CSRCS := spiffs_nucleus.c spiffs_gc.c spiffs_hydrogen.c spiffs_cache.c spiffs_check.c
-XWMO_CFLAGS := -DCONFIG_BUILD_SPIFFS -Wno-sign-conversion -Wno-undef -Wno-stringop-truncation
-XWMO_CFLAGS += -Wno-error=maybe-uninitialized
+XWMO_CFLAGS := -DCONFIG_BUILD_SPIFFS -Wno-sign-conversion -Wno-undef
+XWMO_CFLAGS_gcc := -Wno-stringop-truncation -Wno-error=maybe-uninitialized
 XWMO_INCDIRS := $(call getXwmoDir)
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)

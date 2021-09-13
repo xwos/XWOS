@@ -17,7 +17,7 @@
 # > See the License for the specific language governing permissions and
 # > limitations under the License.
 
-include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
+include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
 $(eval $(call XwmoReqCfg,XWLIBCFG_CRC32,y))

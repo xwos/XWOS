@@ -19,7 +19,7 @@
 #
 
 # 引入配置
-include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
+include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
 # 增加源代码文件

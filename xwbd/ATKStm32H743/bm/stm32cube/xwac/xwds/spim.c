@@ -48,8 +48,8 @@ xwer_t stm32cube_spi1m_drv_buscfg(struct xwds_spim * spim,
 
 static
 xwer_t stm32cube_spi1m_drv_xfer(struct xwds_spim * spim,
-                               const xwu8_t txd[], xwu8_t * rxb,
-                               xwsz_t * size, xwtm_t * xwtm);
+                                const xwu8_t txd[], xwu8_t * rxb,
+                                xwsz_t * size, xwtm_t * xwtm);
 
 const struct xwds_spim_driver stm32cube_spi1m_drv = {
         .base = {

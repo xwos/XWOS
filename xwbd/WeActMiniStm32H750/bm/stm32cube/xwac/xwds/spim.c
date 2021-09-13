@@ -26,7 +26,7 @@
 #include <bm/stm32cube/cubemx/Core/Inc/spi.h>
 #include <bm/stm32cube/xwac/xwds/spim.h>
 
-/******* ******* SPI1 ******* *******/
+/******** ******** SPI1 ******** ********/
 static
 xwer_t stm32cube_spi1m_drv_start(struct xwds_device * dev);
 
@@ -191,7 +191,7 @@ void stm32cube_spi1m_cb_xfercplt(struct xwds_spim * spim, xwer_t xrc)
         xwos_cond_broadcast(&drvdata->cond);
 }
 
-/******* ******* SPI4 ******* *******/
+/******** ******** SPI4 ******** ********/
 static
 xwer_t stm32cube_spi4m_drv_start(struct xwds_device * dev);
 

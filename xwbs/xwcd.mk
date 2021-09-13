@@ -20,36 +20,36 @@
 
 include xwbs/util/mk/xwmo.mk
 
-XWCD_LIST := $(shell test -d $(XWOS_CD_DIR) && \
-                     find $(XWOS_CD_DIR) -type f -name "xwmo.mk" -exec dirname {} \;)
+XWCD_LIST := $(shell test -d $(XuanWuOS_XWCD_DIR) && \
+                     find $(XuanWuOS_XWCD_DIR) -type f -name "xwmo.mk" -exec dirname {} \;)
 
 define findXwcdTarget
-ifeq ($$(XWCDCFG$(call xwmoPathToName,$(1),$(XWOS_CD_DIR))),y)
-    XWCD += $(1)/xwcd$(call xwmoPathToName,$(1),$(XWOS_CD_DIR)).a
-    XWCD_DSM += $(1)/xwcd$(call xwmoPathToName,$(1),$(XWOS_CD_DIR)).a.dsm
-    XWCD_CLEAN += $(1)/xwcd$(call xwmoPathToName,$(1),$(XWOS_CD_DIR)).a.clean
-    XWCD_DISTCLEAN += $(1)/xwcd$(call xwmoPathToName,$(1),$(XWOS_CD_DIR)).a.distclean
-endif
+  ifeq ($$(XWCDCFG$(call xwmoPathToName,$(1),$(XuanWuOS_XWCD_DIR))),y)
+    XWCD += $(1)/xwcd$(call xwmoPathToName,$(1),$(XuanWuOS_XWCD_DIR)).a
+    XWCD_DSM += $(1)/xwcd$(call xwmoPathToName,$(1),$(XuanWuOS_XWCD_DIR)).a.dsm
+    XWCD_CLEAN += $(1)/xwcd$(call xwmoPathToName,$(1),$(XuanWuOS_XWCD_DIR)).a.clean
+    XWCD_DISTCLEAN += $(1)/xwcd$(call xwmoPathToName,$(1),$(XuanWuOS_XWCD_DIR)).a.distclean
+  endif
 endef
 
 $(foreach xwcd,$(XWCD_LIST),$(eval $(call findXwcdTarget,$(xwcd))))
-XWCD := $(addprefix $(XWOS_OBJ_DIR)/,$(XWCD))
-XWCD_DSM := $(addprefix $(XWOS_OBJ_DIR)/,$(XWCD_DSM))
-XWCD_CLEAN := $(addprefix $(XWOS_OBJ_DIR)/,$(XWCD_CLEAN))
-XWCD_DISTCLEAN := $(addprefix $(XWOS_OBJ_DIR)/,$(XWCD_DISTCLEAN))
+XWCD := $(addprefix $(XuanWuOS_OBJ_DIR)/,$(XWCD))
+XWCD_DSM := $(addprefix $(XuanWuOS_OBJ_DIR)/,$(XWCD_DSM))
+XWCD_CLEAN := $(addprefix $(XuanWuOS_OBJ_DIR)/,$(XWCD_CLEAN))
+XWCD_DISTCLEAN := $(addprefix $(XuanWuOS_OBJ_DIR)/,$(XWCD_DISTCLEAN))
 
 $(XWCD):
 	@echo "building $@ ..."
-	$(MAKE) -C $(XWOS_PATH) -f $(subst $(XWOS_OBJ_DIR)/,,$(@D))/xwmo.mk XWOS_BRD_DIR=$(XWOS_BRD_DIR)
+	$(MAKE) -C $(XuanWuOS_PATH) -f $(subst $(XuanWuOS_OBJ_DIR)/,,$(@D))/xwmo.mk XuanWuOS_BRD_DIR=$(XuanWuOS_BRD_DIR)
 
 $(XWCD_DSM):
-	$(MAKE) -C $(XWOS_PATH) -f $(subst $(XWOS_OBJ_DIR)/,,$(@D))/xwmo.mk XWOS_BRD_DIR=$(XWOS_BRD_DIR) NODEP=y dsm
+	$(MAKE) -C $(XuanWuOS_PATH) -f $(subst $(XuanWuOS_OBJ_DIR)/,,$(@D))/xwmo.mk XuanWuOS_BRD_DIR=$(XuanWuOS_BRD_DIR) NODEP=y dsm
 
 $(XWCD_CLEAN):
-	$(MAKE) -C $(XWOS_PATH) -f $(subst $(XWOS_OBJ_DIR)/,,$(@D))/xwmo.mk XWOS_BRD_DIR=$(XWOS_BRD_DIR) NODEP=y clean
+	$(MAKE) -C $(XuanWuOS_PATH) -f $(subst $(XuanWuOS_OBJ_DIR)/,,$(@D))/xwmo.mk XuanWuOS_BRD_DIR=$(XuanWuOS_BRD_DIR) NODEP=y clean
 
 $(XWCD_DISTCLEAN):
-	$(MAKE) -C $(XWOS_PATH) -f $(subst $(XWOS_OBJ_DIR)/,,$(@D))/xwmo.mk XWOS_BRD_DIR=$(XWOS_BRD_DIR) NODEP=y distclean
+	$(MAKE) -C $(XuanWuOS_PATH) -f $(subst $(XuanWuOS_OBJ_DIR)/,,$(@D))/xwmo.mk XuanWuOS_BRD_DIR=$(XuanWuOS_BRD_DIR) NODEP=y distclean
 
 xwcd.mk.dbg:
 	@echo XWCD_LIST:$(XWCD_LIST)

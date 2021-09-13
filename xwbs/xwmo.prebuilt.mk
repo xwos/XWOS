@@ -18,21 +18,21 @@
 # > limitations under the License.
 #
 
-include xwbs/$(XuanWuOS_CFG_MK_RULE)
+include xwbs/$(XuanWuOS_CFG_ARCH).$(XuanWuOS_CFG_COMPILER).rule
 
 XWMO_NAME := $(call getXwmoName)
 XWMO_DIR := $(call getXwmoDir)
 XWMO_OBJ_DIR ?= $(XWMO_DIR)
 XWMO_PREBUILT := $(firstword $(XWMO_PREBUILT))
 
-$(XWOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/$(XWMO_NAME): $(XWMO_DIR)/$(XWMO_PREBUILT)
+$(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/$(XWMO_NAME): $(XWMO_DIR)/$(XWMO_PREBUILT)
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_CP) $(CP) $< $@
 
 clean:
-	@$(RM) -f $(XWOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/$(XWMO_NAME)
+	@$(RM) -f $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/$(XWMO_NAME)
 
 distclean:
-	$(RM) -rf $(XWOS_OBJ_DIR)/$(XWMO_OBJ_DIR)
+	$(RM) -rf $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)
 
 .PHONY: dsm clean distclean

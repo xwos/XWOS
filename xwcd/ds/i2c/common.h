@@ -46,8 +46,7 @@ enum xwds_i2c_msgflag_em {
                                               - 传输方向由写变为读；
                                               - 传输方向由读变为写。
                                             + I2C外设驱动需要自己管理START标志，
-                                              xwds/i2cm框架不保证能纠正标志错误。
-                                             */
+                                              xwds/i2cm框架不保证能纠正标志错误。 */
         XWDS_I2C_F_STOP = (1U << 3U), /**< 产生结束条件 */
 };
 
@@ -56,11 +55,11 @@ enum xwds_i2c_msgflag_em {
  */
 struct xwds_i2c_msg {
         xwu16_t addr; /**< 外设地址，
-                           + 7位地址使用bit[1:7]，bit[0]默认为0；
-                           + 10位地址使用bit[0:9] */
-        xwu16_t flag; /**< 消息标志 */
-        xwu8_t * data; /**< 消息数据缓存的指针 */
-        xwsz_t size; /** 消息数据大小 */
+                           + 7位地址模式，使用bit[1:7]，bit[0]默认为0；
+                           + 10位地址模式，使用bit[0:9] */
+        xwu16_t flag; /**< 传输标志 */
+        xwu8_t * data; /**< 数据缓存区的指针 */
+        xwsz_t size; /** 数据缓存区的大小 */
 };
 
 #endif /* xwcd/ds/i2c/common.h */

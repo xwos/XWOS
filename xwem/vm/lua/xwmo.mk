@@ -18,7 +18,7 @@
 # > limitations under the License.
 #
 
-include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
+include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
 $(eval $(call XwmoReqCfg,XuanWuOS_CFG_CORE,mp))
@@ -35,7 +35,10 @@ LUA_PORT += $(call getAllFileUnderXwmoDir,*.c,xwlua/xwlib)
 LUA_PORT += $(call getAllFileUnderXwmoDir,*.c,xwlua/xwos)
 LUA_PORT += $(call getAllFileUnderXwmoDir,*.c,xwlua/xwds)
 
-XWMO_CSRCS = $(LUA_CORE) $(LUA_LIB) $(LUA_PORT)
-XWMO_CFLAGS = -Wno-sign-conversion
-XWMO_INCDIRS = $(call getXwmoDir) $(call getXwmoDir)/src
+XWMO_CSRCS := $(LUA_CORE) $(LUA_LIB) $(LUA_PORT)
+XWMO_CFLAGS := -Wno-sign-conversion
+XWMO_INCDIRS := $(call getXwmoDir) $(call getXwmoDir)/src
+
+XWMO_CFLAGS_llvm := -Wno-format
+
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)

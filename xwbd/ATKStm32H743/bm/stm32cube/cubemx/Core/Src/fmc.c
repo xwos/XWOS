@@ -63,9 +63,9 @@ xwer_t MX_SDRAM_Send_Cmd(uint32_t cmd,
   sdram_cmd.ModeRegisterDefinition = modreg;
 
   if (HAL_SDRAM_SendCommand(&hsdram1, &sdram_cmd, 0x1000) == HAL_OK) {
-          rc = XWOK;
+    rc = XWOK;
   } else {
-          rc = -EIO;
+    rc = -EIO;
   }
   return rc;
 }

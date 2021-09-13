@@ -36,9 +36,9 @@ MEMORY {
         code_mr (rx): org = 0x90000C00, len = 8189k /* text & rodata */
         xwos_data_mr (arw): org = 0x800, len = 54k /* .xwos.data */
         data_mr (arw): org = 0x30000000, len = 288k /* .data, .bss & .heap */
-        data4_mr (rw): org = 0x38000000, len = 64k /* .data4 for D3 Domain */
+        data4_mr (arw): org = 0x38000000, len = 64k /* .data4 for D3 Domain */
         dtcmheap_mr (arw): org = 0x20000000, len = 128k /* .dtcmheap */
-        xwos_stk_mr (rw): org = 0x0000E000, len = 8k /* xwos stack */
+        xwos_stk_mr (arw): org = 0x0000E000, len = 8k /* xwos stack */
 }
 
 dtcmheap_mr_origin = ORIGIN(dtcmheap_mr);

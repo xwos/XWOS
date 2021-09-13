@@ -28,9 +28,8 @@
 #define XuanWuOS_CFG_SUBARCH                            v6m
 #define XuanWuOS_CFG_COMPILER                           gcc
 #define XuanWuOS_CFG_LDSCRIPT                           cfg/XuanWuOS.lds
-#define XuanWuOS_CFG_MK_RULE                            arm-cortex-m.gcc.rule
-#define XuanWuOS_CFG_ELF_MK                             elf.gcc.mk
-#define XuanWuOS_CFG_XWMO_MK                            xwmo.gcc.mk
+#define XuanWuOS_CFG_ELF_MK                             elf.mk
+#define XuanWuOS_CFG_XWMO_MK                            xwmo.mk
 #define XuanWuOS_CFG_XWMO_PREBUILT_MK                   xwmo.prebuilt.mk
 #include <cfg/arch.h>
 

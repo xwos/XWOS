@@ -23,32 +23,32 @@ getXwmoDir = $(shell dirname $(firstword $(MAKEFILE_LIST)))
 
 xwmoPathToName = $(subst -,_,$(subst .,_,$(subst /,_,$(subst _,__,$(subst $(2),,$(1))))))
 
-getXwmdName = xwmd$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_MD_DIR)).a
+getXwmdName = xwmd$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XuanWuOS_XWMD_DIR)).a
 
-getXwcdName = xwcd$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_CD_DIR)).a
+getXwcdName = xwcd$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XuanWuOS_XWCD_DIR)).a
 
-getXwbmName = xwbm$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_BM_DIR)).a
+getXwemName = xwem$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XuanWuOS_XWEM_DIR)).a
 
-getXwemName = xwem$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_EM_DIR)).a
+getXwamName = xwam$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XuanWuOS_XWAM_DIR)).a
 
-getXwamName = xwam$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_AM_DIR)).a
+getBmName = bm$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XuanWuOS_BM_DIR)).a
 
-getXwoemName = xwoem$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XWOS_OEM_DIR)).a
+getOemName = oem$(call xwmoPathToName,$(shell dirname $(firstword $(MAKEFILE_LIST))),$(XuanWuOS_OEM_DIR)).a
 
 define getXwmoName
 $(strip
-  $(if $(findstring $(XWOS_MD_DIR),$(call getXwmoDir)),\
+  $(if $(findstring $(XuanWuOS_XWMD_DIR),$(call getXwmoDir)),\
       $(call getXwmdName),\
-      $(if $(findstring $(XWOS_CD_DIR),$(call getXwmoDir)),\
+      $(if $(findstring $(XuanWuOS_XWCD_DIR),$(call getXwmoDir)),\
           $(call getXwcdName),\
-          $(if $(findstring $(XWOS_BM_DIR),$(call getXwmoDir)),\
-	      $(call getXwbmName),\
-              $(if $(findstring $(XWOS_EM_DIR),$(call getXwmoDir)),\
+          $(if $(findstring $(XuanWuOS_BM_DIR),$(call getXwmoDir)),\
+	      $(call getBmName),\
+              $(if $(findstring $(XuanWuOS_XWEM_DIR),$(call getXwmoDir)),\
                   $(call getXwemName),\
-                  $(if $(findstring $(XWOS_AM_DIR),$(call getXwmoDir)),\
+                  $(if $(findstring $(XuanWuOS_XWAM_DIR),$(call getXwmoDir)),\
                       $(call getXwamName),\
-		      $(if $(findstring $(XWOS_OEM_DIR),$(call getXwmoDir)),\
-			  $(call getXwoemName),\
+		      $(if $(findstring $(XuanWuOS_OEM_DIR),$(call getXwmoDir)),\
+			  $(call getOemName),\
 			  "")))))))
 endef
 

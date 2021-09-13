@@ -65,26 +65,26 @@
             "fakefile"))))
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; arguments ;;;;;;;; ;;;;;;;; ;;;;;;;;
-(setq show-usage nil)
 (setq debug-on-error t)
 (setq make-backup-files nil)
 (defvar argc (length argv) "Count of arguments")
-(defvar s32k-prjdir nil "S32k Project path")
+(defvar opt-s32k-prjdir nil "S32k Project path")
+(defvar opt-show-usage nil "print usage")
 (logd "%s" argv)
 (let ((options-done nil))
   (pop argv)  ; Remove the -- separator
   (while argv
     (let ((option (pop argv)))
       (cond
-       (options-done (setq s32k-prjdir option))
+       (options-done (setq opt-s32k-prjdir option))
 
        ;; options after "--"
        ((string= option "--") (setq options-done t))
 
        ;; --help
        ;; -h
-       ((string= option "--help") (setq show-usage t))
-       ((string= option "-h") (setq show-usage t))
+       ((string= option "--help") (setq opt-show-usage t))
+       ((string= option "-h") (setq opt-show-usage t))
 
        ;; Unknown options
        ((string-prefix-p "--" option)
@@ -95,15 +95,15 @@
         (loge "Unknown option: %s" option)
         (kill-emacs EINVAL))
 
-       (t (setq s32k-prjdir option)))))
+       (t (setq opt-s32k-prjdir option)))))
 
-  (unless (> (length s32k-prjdir) 0)
-    (setq s32k-prjdir "."))
-  (unless (null show-usage)
+  (unless (> (length opt-s32k-prjdir) 0)
+    (setq opt-s32k-prjdir "."))
+  (unless (null opt-show-usage)
     (usage)
     (kill-emacs 0))
 
-  (logd "s32k-prjdir:%s" s32k-prjdir))
+  (logd "opt-s32k-prjdir:%s" opt-s32k-prjdir))
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; Path ;;;;;;;; ;;;;;;;; ;;;;;;;;
 (defvar template-dir (expand-directory elpath "template/"))
@@ -122,7 +122,7 @@
     (progn
      (loge "Can't find file:template/ivt.c.t")
      (kill-emacs ENOENT)))
-(defvar sdk-dir (expand-directory s32k-prjdir "/SDK/"))
+(defvar sdk-dir (expand-directory opt-s32k-prjdir "/SDK/"))
 (if (not (file-exists-p sdk-dir))
     (progn
      (loge "Can't find folder:%s" sdk-dir)
@@ -132,7 +132,7 @@
     (progn
      (loge "Can't find folder:%s" device-dir)
      (kill-emacs ENOENT)))
-(defvar s32kbsp-dir (expand-directory s32k-prjdir "/brd/bm/s32kbsp/"))
+(defvar s32kbsp-dir (expand-directory opt-s32k-prjdir "/brd/bm/s32kbsp/"))
 (if (not (file-exists-p s32kbsp-dir))
     (progn
      (loge "Can't find folder:%s" s32kbsp-dir)

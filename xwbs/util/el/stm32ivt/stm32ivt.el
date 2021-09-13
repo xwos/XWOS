@@ -68,22 +68,23 @@
 (setq debug-on-error t)
 (setq make-backup-files nil)
 (defvar argc (length argv) "Count of arguments")
-(defvar stm32cube-dir nil "stm32cube path")
+(defvar opt-stm32cube-dir nil "stm32cube path")
+(defvar opt-show-usage nil "print usage")
 (logd "%s" argv)
 (let ((options-done nil))
   (pop argv)  ; Remove the -- separator
   (while argv
     (let ((option (pop argv)))
       (cond
-       (options-done (setq stm32cube-dir option))
+       (options-done (setq opt-stm32cube-dir option))
 
        ;; options after "--"
        ((string= option "--") (setq options-done t))
 
        ;; --help
        ;; -h
-       ((string= option "--help") (setq show-usage t))
-       ((string= option "-h") (setq show-usage t))
+       ((string= option "--help") (setq opt-show-usage t))
+       ((string= option "-h") (setq opt-show-usage t))
 
        ;; Unknown options
        ((string-prefix-p "--" option)
@@ -94,15 +95,15 @@
         (loge "Unknown option: %s" option)
         (kill-emacs EINVAL))
 
-       (t (setq stm32cube-dir option)))))
+       (t (setq opt-stm32cube-dir option)))))
 
-  (unless (> (length stm32cube-dir) 0)
-    (setq s32k-prjdir "."))
-  (unless (null show-usage)
+  (unless (> (length opt-stm32cube-dir) 0)
+    (setq opt-stm32cube-dir "."))
+  (unless (null opt-show-usage)
     (usage)
     (kill-emacs 0))
 
-  (logd "stm32cube-dir:%s" stm32cube-dir))
+  (logd "opt-stm32cube-dir:%s" opt-stm32cube-dir))
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; Path ;;;;;;;; ;;;;;;;; ;;;;;;;;
 (defvar template-dir (expand-directory elpath "template/"))
@@ -121,7 +122,7 @@
     (progn
      (loge "Can't find file:template/ivt.c.t")
      (kill-emacs ENOENT)))
-(defvar cubemx-dir (expand-directory stm32cube-dir "/cubemx/"))
+(defvar cubemx-dir (expand-directory opt-stm32cube-dir "/cubemx/"))
 (if (not (file-exists-p cubemx-dir))
     (progn
      (loge "Can't find folder:%s" cubemx-dir)

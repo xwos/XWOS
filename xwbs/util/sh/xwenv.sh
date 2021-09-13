@@ -21,26 +21,26 @@
 function xwmc()
 {
   local cpath=$(pwd)
-  echo ${XWOS_OEM_DIR}
+  echo ${XuanWuOS_OEM_DIR}
   local rpath=
   local prefix=
-  if [[ ${cpath} =~ ${XWOS_MD_DIR} ]] ; then
-    rpath=${cpath#*${XWOS_MD_DIR}}
+  if [[ ${cpath} =~ ${XuanWuOS_XWMD_DIR} ]] ; then
+    rpath=${cpath#*${XuanWuOS_XWMD_DIR}}
     prefix=XWMDCFG
-  elif [[ ${cpath} =~ ${XWOS_CD_DIR} ]] ; then
-    rpath=${cpath#*${XWOS_CD_DIR}}
+  elif [[ ${cpath} =~ ${XuanWuOS_XWCD_DIR} ]] ; then
+    rpath=${cpath#*${XuanWuOS_XWCD_DIR}}
     prefix=XWCDCFG
-  elif [[ ${cpath} =~ ${XWOS_EM_DIR} ]] ; then
-    rpath=${cpath#*${XWOS_EM_DIR}}
+  elif [[ ${cpath} =~ ${XuanWuOS_XWEM_DIR} ]] ; then
+    rpath=${cpath#*${XuanWuOS_XWEM_DIR}}
     prefix=XWEMCFG
-  elif [[ ${cpath} =~ ${XWOS_AM_DIR} ]] ; then
-    rpath=${cpath#*${XWOS_AM_DIR}}
+  elif [[ ${cpath} =~ ${XuanWuOS_XWAM_DIR} ]] ; then
+    rpath=${cpath#*${XuanWuOS_XWAM_DIR}}
     prefix=XWAMCFG
-  elif [[ ${cpath} =~ ${XWOS_BM_DIR} ]] ; then
-    rpath=${cpath#*${XWOS_BM_DIR}}
+  elif [[ ${cpath} =~ ${XuanWuOS_BM_DIR} ]] ; then
+    rpath=${cpath#*${XuanWuOS_BM_DIR}}
     prefix=BMCFG
-  elif [[ ${cpath} =~ ${XWOS_OEM_DIR} ]] ; then
-    rpath=${cpath#*${XWOS_OEM_DIR}}
+  elif [[ ${cpath} =~ ${XuanWuOS_OEM_DIR} ]] ; then
+    rpath=${cpath#*${XuanWuOS_OEM_DIR}}
     prefix=OEMCFG
   fi
   local cfg=${rpath//_/__}
@@ -55,24 +55,24 @@ function xwmn()
   local cpath=$(pwd)
   local rpath=
   local prefix=
-  if [[ ${cpath} =~ ${XWOS_MD_DIR} ]] ; then
-    rpath=${cpath#*${XWOS_MD_DIR}}
+  if [[ ${cpath} =~ ${XuanWuOS_XWMD_DIR} ]] ; then
+    rpath=${cpath#*${XuanWuOS_XWMD_DIR}}
     prefix=xwmd
-  elif [[ ${cpath} =~ ${XWOS_CD_DIR} ]] ; then
-    rpath=${cpath#*${XWOS_CD_DIR}}
+  elif [[ ${cpath} =~ ${XuanWuOS_XWCD_DIR} ]] ; then
+    rpath=${cpath#*${XuanWuOS_XWCD_DIR}}
     prefix=xwcd
-  elif [[ ${cpath} =~ ${XWOS_BM_DIR} ]] ; then
-    rpath=${cpath#*${XWOS_BM_DIR}}
-    prefix=xwbm
-  elif [[ ${cpath} =~ ${XWOS_EM_DIR} ]] ; then
-    rpath=${cpath#*${XWOS_EM_DIR}}
+  elif [[ ${cpath} =~ ${XuanWuOS_XWEM_DIR} ]] ; then
+    rpath=${cpath#*${XuanWuOS_XWEM_DIR}}
     prefix=xwem
-  elif [[ ${cpath} =~ ${XWOS_AM_DIR} ]] ; then
-    rpath=${cpath#*${XWOS_AM_DIR}}
+  elif [[ ${cpath} =~ ${XuanWuOS_XWAM_DIR} ]] ; then
+    rpath=${cpath#*${XuanWuOS_XWAM_DIR}}
     prefix=xwam
-  elif [[ ${cpath} =~ ${XWOS_OEM_DIR} ]] ; then
-    rpath=${cpath#*${XWOS_OEM_DIR}}
-    prefix=xwoem
+  elif [[ ${cpath} =~ ${XuanWuOS_BM_DIR} ]] ; then
+    rpath=${cpath#*${XuanWuOS_BM_DIR}}
+    prefix=bm
+  elif [[ ${cpath} =~ ${XuanWuOS_OEM_DIR} ]] ; then
+    rpath=${cpath#*${XuanWuOS_OEM_DIR}}
+    prefix=oem
   fi
   local name=${rpath//_/__}
   local name=${rpath//./_}

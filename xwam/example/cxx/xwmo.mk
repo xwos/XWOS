@@ -18,15 +18,18 @@
 # > limitations under the License.
 #
 
-include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
+include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
 XWMO_CSRCS := mif.c
+
 XWMO_CFLAGS :=
 
 XWMO_CXXSRCS := task.cxx
 XWMO_CXXSRCS += test/literal.cxx test/vector.cxx
-XWMO_CXXFLAGS := -Wno-unused-value -Wno-literal-suffix
+XWMO_CXXFLAGS := -Wno-unused-value
+
+XWMO_CXXFLAGS_llvm += -Wno-error=gnu-string-literal-operator-template
 
 XWMO_INCDIRS := $(call getXwmoDir)
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)

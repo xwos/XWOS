@@ -18,7 +18,7 @@
 # > limitations under the License.
 #
 
-include $(XWOS_WKSPC_DIR)/XuanWuOS.cfg
+include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
 $(eval $(call XwmoReqCfg,XWLIBCFG_CRC8,y))
@@ -27,6 +27,6 @@ $(eval $(call XwmoReqCfg,XWLIBCFG_CRC8_0X31,y))
 $(eval $(call XwmoReqCfg,XWLIBCFG_CRC8_0X9B,y))
 
 XWMO_CSRCS := mif.c
-XWMO_CFLAGS := -Wno-unused-value -Wno-unused-but-set-variable
+XWMO_CFLAGS := -Wno-unused-value
 XWMO_INCDIRS :=
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)
