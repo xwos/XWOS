@@ -66,9 +66,6 @@ void arch_isr_reset(void)
         __asm__ volatile("      bl      cpu_init");
         __asm__ volatile("      bl      soc_init");
         __asm__ volatile("      bl      board_init");
-#if defined(ARCHCFG_CXX) && (1 == ARCHCFG_CXX)
-        __asm__ volatile("      bl      cxx_init");
-#endif /* ARCHCFG_CXX */
         __asm__ volatile("      bl      xwos_main");
 }
 

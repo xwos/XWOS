@@ -59,7 +59,6 @@
  ******** ********   Memory Management Configurations  ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** common ********/
-#define XWMMCFG_ALIGNMENT                               (8U)
 #define XWMMCFG_STACK_ALIGNMENT                         (8U)
 #define XWMMCFG_STACK_WATERMARK                         (8U)
 #define XWMMCFG_STACK_CHK_SWCX                          1

@@ -281,7 +281,6 @@ err_size:
 __xwos_api
 xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf)
 {
-        xwsz_t szp2, adjsize;
         interface xwmm_mempool_i_allocator * ia;
         xwssq_t odr;
         xwer_t rc;
@@ -293,14 +292,14 @@ xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf
                 rc = XWOK;
                 *membuf = NULL;
         } else {
-                adjsize = XWBOP_ALIGN(size, 8);
-                odr = xwbop_fls(xwsz_t, adjsize);
-                if ((odr < 0) || ((1U << odr) < adjsize)) {
+                size = XWBOP_ALIGN(size, XWMM_ALIGNMENT);
+                odr = xwbop_fls(xwsz_t, size);
+                if ((1U << odr) < size) {
                         odr++;
                 }
-                szp2 = 1U << odr;
+                size = 1U << odr;
 
-                switch (szp2) {
+                switch (size) {
                 case 8:
                         ia = (void *)&mp->oc_8;
                         break;
@@ -314,32 +313,32 @@ xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf
                         ia = (void *)&mp->oc_64;
                         break;
                 case 128:
-                        if (adjsize <= 96) {
+                        if (size <= 96) {
                                 ia = (void *)&mp->oc_96;
                         } else {
                                 ia = (void *)&mp->oc_128;
                         }
                         break;
                 case 256:
-                        if (adjsize <= 160) {
+                        if (size <= 160) {
                                 ia = (void *)&mp->oc_160;
-                        } else if (adjsize <= 192) {
+                        } else if (size <= 192) {
                                 ia = (void *)&mp->oc_192;
                         } else {
                                 ia = (void *)&mp->oc_256;
                         }
                         break;
                 case 512:
-                        if (adjsize <= 320) {
+                        if (size <= 320) {
                                 ia = (void *)&mp->oc_320;
-                        } else if (adjsize <= 384) {
+                        } else if (size <= 384) {
                                 ia = (void *)&mp->oc_384;
                         } else {
                                 ia = (void *)&mp->oc_512;
                         }
                         break;
                 case 1024:
-                        if (adjsize <= 768) {
+                        if (size <= 768) {
                                 ia = (void *)&mp->oc_768;
                         } else {
                                 ia = (void *)&mp->oc_1024;
@@ -352,7 +351,7 @@ xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf
                         ia = (void *)&mp->pa;
                         break;
                 }
-                rc = ia->malloc(ia, adjsize, membuf);
+                rc = ia->malloc(ia, size, membuf);
                 if (rc < 0) {
                         *membuf = NULL;
                 }
@@ -505,5 +504,100 @@ xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size, void ** membu
                         *membuf = NULL;
                 }
         }
+        return rc;
+}
+
+/**
+ * @brief XWMM API：从内存池中申请对齐的内存
+ * @param[in] mp: 内存池的指针
+ * @param[in] alignment: 内存的起始地址对齐的字节数
+ * @param[in] size: 申请的大小
+ * @param[out] membuf: 指向缓冲区的指针，通过此缓冲区返回申请到的内存的首地址
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ENOMEM: 内存不足
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ * - 此API类似于C11标准中的aligned_alloc()函数，alignment只能是2的n次方，
+ *   若size小于alignment，size会被扩大为alignment，
+ *   若size大于alignment，size会被继续扩大，直到为alignment的整数倍。
+ */
+__xwos_api
+xwer_t xwmm_mempool_memalign(struct xwmm_mempool * mp,
+                             xwsz_t alignment, xwsz_t size,
+                             void ** membuf)
+{
+        interface xwmm_mempool_i_allocator * ia;
+        xwssq_t p2;
+        xwer_t rc;
+
+        XWOS_VALIDATE((mp), "nullptr", -EFAULT);
+        XWOS_VALIDATE((membuf), "nullptr", -EFAULT);
+
+        if (alignment < XWMM_ALIGNMENT) {
+                alignment = XWMM_ALIGNMENT;
+        }
+        p2 = xwbop_fls(xwsz_t, alignment);
+        if ((1U << p2) != alignment) {
+                rc = -EINVAL;
+                goto err_notp2;
+        }
+        if (0 == size) {
+                rc = XWOK;
+                *membuf = NULL;
+                goto nothing;
+        }
+        if (size <= alignment) {
+                size = alignment;
+        } else {
+                p2 = xwbop_fls(xwsz_t, size);
+                if ((1U << p2) < size) {
+                        p2++;
+                }
+                size = 1U << p2;
+        }
+
+        switch (size) {
+        case 8:
+                ia = (void *)&mp->oc_8;
+                break;
+        case 16:
+                ia = (void *)&mp->oc_16;
+                break;
+        case 32:
+                ia = (void *)&mp->oc_32;
+                break;
+        case 64:
+                ia = (void *)&mp->oc_64;
+                break;
+        case 128:
+                ia = (void *)&mp->oc_128;
+                break;
+        case 256:
+                ia = (void *)&mp->oc_256;
+                break;
+        case 512:
+                ia = (void *)&mp->oc_512;
+                break;
+        case 1024:
+                ia = (void *)&mp->oc_1024;
+                break;
+        case 2048:
+                ia = (void *)&mp->oc_2048;
+                break;
+        default:
+                ia = (void *)&mp->pa;
+                break;
+        }
+        rc = ia->malloc(ia, size, membuf);
+        if (rc < 0) {
+                *membuf = NULL;
+        }
+
+nothing:
+err_notp2:
         return rc;
 }

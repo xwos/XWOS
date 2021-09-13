@@ -15,6 +15,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/xwaop.h>
+#include <xwos/mm/common.h>
 
 /**
  * @defgroup xwobj 玄武OS的对象
@@ -45,7 +46,7 @@ typedef xwer_t (* xwobj_gc_f)(void *);
  *   并且它们的初始值都为0。memslice可以将这个初始值备份起来，当结构体被分配
  *   出去时使用备份值恢复原内容。
  */
-struct __xwcc_aligned(XWMMCFG_ALIGNMENT) xwos_object {
+struct __xwcc_aligned(XWMM_ALIGNMENT) xwos_object {
         xwsq_t tik; /**< 对象的标签，用于防止ABA问题与野指针问题 */
         xwsq_t magic; /**< 对象的幻数，用于防止ABA问题与野指针问题 */
         xwsq_a refcnt; /**< + 引用计数:

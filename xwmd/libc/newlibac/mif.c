@@ -12,34 +12,38 @@
 
 #include <xwos/standard.h>
 #include <xwmd/libc/newlibac/mif.h>
+#include <stdlib.h>
 
-typedef void (*newlibac_linkage_f)(void);
+typedef void (* newlibac_init_f)(void);
 
-extern void newlibac_mem_linkage_placeholder(void);
-extern void newlibac_fops_linkage_placeholder(void);
-extern void newlibac_string_linkage_placeholder(void);
-extern void newlibac_lock_linkage_placeholder(void);
-extern void newlibac_exit_linkage_placeholder(void);
+extern void __libc_init_array (void);
+extern void __libc_fini_array (void);
+
+extern void newlibac_mem_init(void);
+extern void newlibac_fops_init(void);
+extern void newlibac_string_init(void);
+extern void newlibac_lock_init(void);
 
 /**
- * @brief 连接占位符
+ * @brief 初始化列表
  * @note
- * + 静态连接时，强制链接此静态库。
+ * + 此函数表同时作为静态链接占位符，可保证符号重名时优先使用此库中的符号。
  */
-const newlibac_linkage_f newlibac_linkage_table[] = {
-        newlibac_mem_linkage_placeholder,
-        newlibac_fops_linkage_placeholder,
-        newlibac_string_linkage_placeholder,
-        newlibac_lock_linkage_placeholder,
-        newlibac_exit_linkage_placeholder,
+const newlibac_init_f newlibac_init_table[] = {
+        newlibac_mem_init,
+        newlibac_fops_init,
+        newlibac_string_init,
+        newlibac_lock_init,
 };
 
 xwer_t newlibac_init(void)
 {
-        const newlibac_linkage_f * f = newlibac_linkage_table;
-        xwsz_t sz = xw_array_size(newlibac_linkage_table);
+        const newlibac_init_f * f = newlibac_init_table;
+        xwsz_t sz = xw_array_size(newlibac_init_table);
         xwsz_t i;
 
+        atexit(__libc_fini_array);
+        __libc_init_array();
         for (i = 0; i < sz; i++) {
                 f[i]();
         }

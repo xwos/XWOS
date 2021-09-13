@@ -38,9 +38,6 @@
 #define ARCHCFG_COMPILER_CLIB                   1
 #define ARCHCFG_COMPILER_ERRNO                  1
 
-/******** C++ ********/
-#define ARCHCFG_CXX                             1
-
 /******** xwbop ********/
 #define ARCHCFG_LIB_XWBOP_FFS8                  1
 #define ARCHCFG_LIB_XWBOP_FLS8                  1

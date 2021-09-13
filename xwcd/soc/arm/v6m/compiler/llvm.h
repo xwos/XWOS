@@ -27,7 +27,7 @@
 #define __xw_o  volatile       /**< 'write only' structure member permissions */
 #define __xw_io volatile       /**< 'read/write' structure member permissions */
 
-#define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 
 #define __xwcc_section(s)       __attribute__((__section__(s)))
 #define __xwcc_aligned(x)       __attribute__((aligned(x)))
@@ -55,7 +55,7 @@
 #if defined(CPUCFG_L1_CACHELINE_SIZE)
   #define __xwcc_alignl1cache   __xwcc_aligned(CPUCFG_L1_CACHELINE_SIZE)
 #else
-  #define __xwcc_alignl1cache   __xwcc_aligned(XWMMCFG_ALIGNMENT)
+  #define __xwcc_alignl1cache   __xwcc_aligned(sizeof(void *))
 #endif
 #define __xwcc_alignptr         __xwcc_aligned(sizeof(void *))
 #define xwcc_offsetof(type, member) __builtin_offsetof(type, member)

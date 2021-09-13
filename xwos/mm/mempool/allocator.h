@@ -93,6 +93,9 @@ xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size,
 xwer_t xwmm_mempool_free(struct xwmm_mempool * mp, void * mem);
 xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size,
                             void ** membuf);
+xwer_t xwmm_mempool_memalign(struct xwmm_mempool * mp,
+                             xwsz_t alignment, xwsz_t size,
+                             void ** membuf);
 
 /**
  * @} xwmm_mempool

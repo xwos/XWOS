@@ -67,6 +67,5 @@
  ******** ********            C/C++ Runtime            ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWMDCFG_libc_newlibac                                   1
-#define XWMDCFG_cxx                                             1
 
 #endif /* cfg/xwmd.h */

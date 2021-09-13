@@ -97,26 +97,3 @@ void arch_relocate(void)
                 dst++;
         }
 }
-
-#if defined(ARCHCFG_CXX) && (1 == ARCHCFG_CXX)
-/**
- * @brief Init C++ runtime
- */
-__xwbsp_init_code
-void cxx_init(void)
-{
-        void (** f)();
-
-        for (f = (void (**)())preinit_array_vma_base;
-             f < (void (**)())preinit_array_vma_end;
-             ++f) {
-                (*f)();
-        }
-
-        for (f = (void (**)())init_array_vma_base;
-             f < (void (**)())init_array_vma_end;
-             ++f) {
-                (*f)();
-        }
-}
-#endif /* ARCHCFG_CXX */

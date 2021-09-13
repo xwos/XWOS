@@ -320,6 +320,7 @@ xwer_t xwmm_mempool_objcache_free(struct xwmm_mempool_objcache * oc, void * obj)
         struct xwmm_mempool_page * pg;
         xwsz_t reserved;
         xwsz_t idleness;
+        xwptr_t offset, origin;
         xwer_t rc;
 
         rc = xwmm_mempool_page_find(oc->pa, obj, &pg);
@@ -327,10 +328,9 @@ xwer_t xwmm_mempool_objcache_free(struct xwmm_mempool_objcache * oc, void * obj)
                 goto err_pg_find;
         }
 
-        if (((xwptr_t)obj - pg->mapping) % oc->objsize != 0) {
-                rc = -EALIGN;
-                goto err_not_aligned;
-        }
+        offset = ((xwptr_t)obj - pg->mapping) % oc->objsize;
+        origin = (xwptr_t)obj - offset;
+        obj = (void *)origin;
 
         if (oc->dtor) {
                 oc->dtor(obj);
@@ -352,7 +352,6 @@ xwer_t xwmm_mempool_objcache_free(struct xwmm_mempool_objcache * oc, void * obj)
 
         return XWOK;
 
-err_not_aligned:
 err_pg_find:
         return rc;
 }

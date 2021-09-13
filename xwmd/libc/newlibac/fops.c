@@ -11,11 +11,14 @@
  */
 
 #include <xwos/standard.h>
+#include <xwos/lib/errno.h>
 #include <xwos/lib/xwbop.h>
 #include <xwem/fs/fatfs/ff.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <errno.h>
 
+#undef errno
 #define NEWLIBAC_FOPS_FD_NUM         32
 #define NEWLIBAC_FOPS_FD_OFFSET      3 /* 0,1,2 分别代表 stdin, stdout, stderr. */
 
@@ -28,19 +31,17 @@ xwssz_t newlibac_fops_write_stdout(int fd, const void * data, size_t cnt);
 extern
 xwssz_t newlibac_fops_write_stderr(int fd, const void * data, size_t cnt);
 
-extern int errno;
-
 xwbmpop_declare(newlibac_fops_node_bmp, NEWLIBAC_FOPS_FD_NUM) = {0};
 xwbmpop_declare(newlibac_fops_nodetype_bmp, NEWLIBAC_FOPS_FD_NUM) = {0};
 void * newlibac_fops_fatfs_node[NEWLIBAC_FOPS_FD_NUM] = {NULL};
 
-void newlibac_fops_linkage_placeholder(void)
+void newlibac_fops_init(void)
 {
 }
 
 #ifdef O_DIRECTORY
 static
-int newlibac_fops_opendir(const char * path, int flag, int mode)
+int newlibac_fops_opendir(struct _reent * r, const char * path, int flag, int mode)
 {
         int fd;
         FRESULT fsrc;
@@ -52,13 +53,13 @@ int newlibac_fops_opendir(const char * path, int flag, int mode)
 
         idx = xwbmpop_ffz(newlibac_fops_node_bmp, NEWLIBAC_FOPS_FD_NUM);
         if (idx < 0) {
-                errno = EMFILE;
+                r->_errno = EMFILE;
                 fd = -1;
                 goto err_mdir;
         }
         dp = malloc(sizeof(DIR));
         if (NULL == dp) {
-                errno = ENOMEM;
+                r->_errno = ENOMEM;
                 fd = -1;
                 goto err_nomem;
         }
@@ -70,58 +71,58 @@ int newlibac_fops_opendir(const char * path, int flag, int mode)
                 xwbmpop_s1i(newlibac_fops_nodetype_bmp, (xwsq_t)idx);
                 newlibac_fops_fatfs_node[idx] = dp;
                 fd = idx + NEWLIBAC_FOPS_FD_OFFSET;
-                errno = 0;
+                r->_errno = 0;
                 break;
         case FR_NO_FILE:
         case FR_NO_PATH:
-                errno = ENOENT;
+                r->_errno = ENOENT;
                 fd = -1;
                 break;
         case FR_INVALID_NAME:
         case FR_INVALID_OBJECT:
         case FR_INVALID_PARAMETER:
-                errno = EINVAL;
+                r->_errno = EINVAL;
                 fd = -1;
                 break;
         case FR_DENIED:
         case FR_LOCKED:
-                errno = EACCES;
+                r->_errno = EACCES;
                 fd = -1;
                 break;
         case FR_EXIST:
-                errno = EEXIST;
+                r->_errno = EEXIST;
                 fd = -1;
                 break;
         case FR_WRITE_PROTECTED:
-                errno = EROFS;
+                r->_errno = EROFS;
                 fd = -1;
                 break;
         case FR_NOT_ENABLED:
-                errno = ENOSPC;
+                r->_errno = ENOSPC;
                 fd = -1;
                 break;
         case FR_NO_FILESYSTEM:
         case FR_INVALID_DRIVE:
-                errno = ENODEV;
+                r->_errno = ENODEV;
                 fd = -1;
                 break;
         case FR_TIMEOUT:
-                errno = EINTR;
+                r->_errno = EINTR;
                 fd = -1;
                 break;
         case FR_NOT_ENOUGH_CORE:
-                errno = ENOMEM;
+                r->_errno = ENOMEM;
                 fd = -1;
                 break;
         case FR_TOO_MANY_OPEN_FILES:
-                errno = EMFILE;
+                r->_errno = EMFILE;
                 fd = -1;
                 break;
         case FR_DISK_ERR:
         case FR_INT_ERR:
         case FR_NOT_READY:
         default:
-                errno = EIO;
+                r->_errno = EIO;
                 fd = -1;
                 break;
         }
@@ -135,7 +136,7 @@ err_mdir:
 }
 #endif /* O_DIRECTORY */
 
-int newlibac_fops_openfile(const char * path, int flag, int mode)
+int newlibac_fops_openfile(struct _reent * r, const char * path, int flag, int mode)
 {
         int fd;
         FRESULT fsrc;
@@ -147,13 +148,13 @@ int newlibac_fops_openfile(const char * path, int flag, int mode)
 
         idx = xwbmpop_ffz(newlibac_fops_node_bmp, NEWLIBAC_FOPS_FD_NUM);
         if (idx < 0) {
-                errno = EMFILE;
+                r->_errno = EMFILE;
                 fd = -1;
                 goto err_mfile;
         }
         fp = malloc(sizeof(FIL));
         if (NULL == fp) {
-                errno = ENOMEM;
+                r->_errno = ENOMEM;
                 fd = -1;
                 goto err_nomem;
         }
@@ -194,58 +195,58 @@ int newlibac_fops_openfile(const char * path, int flag, int mode)
                 xwbmpop_c0i(newlibac_fops_nodetype_bmp, (xwsq_t)idx);
                 newlibac_fops_fatfs_node[idx] = fp;
                 fd = idx + NEWLIBAC_FOPS_FD_OFFSET;
-                errno = 0;
+                r->_errno = 0;
                 break;
         case FR_NO_FILE:
         case FR_NO_PATH:
-                errno = ENOENT;
+                r->_errno = ENOENT;
                 fd = -1;
                 break;
         case FR_INVALID_NAME:
         case FR_INVALID_OBJECT:
         case FR_INVALID_PARAMETER:
-                errno = EINVAL;
+                r->_errno = EINVAL;
                 fd = -1;
                 break;
         case FR_DENIED:
         case FR_LOCKED:
-                errno = EACCES;
+                r->_errno = EACCES;
                 fd = -1;
                 break;
         case FR_EXIST:
-                errno = EEXIST;
+                r->_errno = EEXIST;
                 fd = -1;
                 break;
         case FR_WRITE_PROTECTED:
-                errno = EROFS;
+                r->_errno = EROFS;
                 fd = -1;
                 break;
         case FR_NOT_ENABLED:
-                errno = ENOSPC;
+                r->_errno = ENOSPC;
                 fd = -1;
                 break;
         case FR_NO_FILESYSTEM:
         case FR_INVALID_DRIVE:
-                errno = ENODEV;
+                r->_errno = ENODEV;
                 fd = -1;
                 break;
         case FR_TIMEOUT:
-                errno = EINTR;
+                r->_errno = EINTR;
                 fd = -1;
                 break;
         case FR_NOT_ENOUGH_CORE:
-                errno = ENOMEM;
+                r->_errno = ENOMEM;
                 fd = -1;
                 break;
         case FR_TOO_MANY_OPEN_FILES:
-                errno = EMFILE;
+                r->_errno = EMFILE;
                 fd = -1;
                 break;
         case FR_DISK_ERR:
         case FR_INT_ERR:
         case FR_NOT_READY:
         default:
-                errno = EIO;
+                r->_errno = EIO;
                 fd = -1;
                 break;
         }
@@ -258,25 +259,25 @@ err_mfile:
         return fd;
 }
 
-int _open(const char * path, int flag, int mode)
+int _open_r(struct _reent * r, const char * path, int flag, int mode)
 {
-        int rc;
+        int fd;
 
 #ifdef O_DIRECTORY
         if (mode & O_DIRECTORY) {
-                rc = newlibac_fops_opendir(path, flag, mode);
+                fd = newlibac_fops_opendir(r, path, flag, mode);
         } else {
-                rc = newlibac_fops_openfile(path, flag, mode);
+                fd = newlibac_fops_openfile(r, path, flag, mode);
         }
 #else /* O_DIRECTORY */
-        rc = newlibac_fops_openfile(path, flag, mode);
+        fd = newlibac_fops_openfile(r, path, flag, mode);
 #endif /* !O_DIRECTORY */
-        return rc;
+        return fd;
 }
 
 #ifdef O_DIRECTORY
 static
-int newlibac_fops_closedir(xwsq_t idx)
+int newlibac_fops_closedir(struct _reent * r, xwsq_t idx)
 {
         int rc;
         FRESULT fsrc;
@@ -289,21 +290,21 @@ int newlibac_fops_closedir(xwsq_t idx)
                 free(dp);
                 newlibac_fops_fatfs_node[idx] = NULL;
                 xwbmpop_c0i(newlibac_fops_node_bmp, (xwsq_t)idx);
-                errno = XWOK;
+                r->_errno = XWOK;
                 rc = 0;
                 break;
         case FR_INVALID_OBJECT:
-                errno = EINVAL;
+                r->_errno = EINVAL;
                 rc = -1;
                 break;
         case FR_TIMEOUT:
-                errno = EINTR;
+                r->_errno = EINTR;
                 rc = -1;
                 break;
         case FR_DISK_ERR:
         case FR_INT_ERR:
         default:
-                errno = EIO;
+                r->_errno = EIO;
                 rc = -1;
                 break;
         }
@@ -312,7 +313,7 @@ int newlibac_fops_closedir(xwsq_t idx)
 #endif /* O_DIRECTORY */
 
 static
-int newlibac_fops_closefile(xwsq_t idx)
+int newlibac_fops_closefile(struct _reent * r, xwsq_t idx)
 {
         int rc;
         FRESULT fsrc;
@@ -325,34 +326,34 @@ int newlibac_fops_closefile(xwsq_t idx)
                 free(fp);
                 newlibac_fops_fatfs_node[idx] = NULL;
                 xwbmpop_c0i(newlibac_fops_node_bmp, idx);
-                errno = XWOK;
+                r->_errno = XWOK;
                 rc = 0;
                 break;
         case FR_INVALID_OBJECT:
-                errno = EINVAL;
+                r->_errno = EINVAL;
                 rc = -1;
                 break;
         case FR_TIMEOUT:
-                errno = EINTR;
+                r->_errno = EINTR;
                 rc = -1;
                 break;
         case FR_DISK_ERR:
         case FR_INT_ERR:
         default:
-                errno = EIO;
+                r->_errno = EIO;
                 rc = -1;
                 break;
         }
         return rc;
 }
 
-int _close(int fd)
+int _close_r(struct _reent * r, int fd)
 {
         int rc;
         xwssq_t idx;
 
         if ((fd <= 2) || (fd >= NEWLIBAC_FOPS_FD_NUM)) {
-                errno = ENFILE;
+                r->_errno = ENFILE;
                 rc = -1;
         } else {
 #ifdef O_DIRECTORY
@@ -361,20 +362,20 @@ int _close(int fd)
                 idx = fd - NEWLIBAC_FOPS_FD_OFFSET;
                 dir = xwbmpop_t1i(newlibac_fops_nodetype_bmp, (xwsq_t)idx);
                 if (dir) {
-                        rc = newlibac_fops_closedir((xwsq_t)idx);
+                        rc = newlibac_fops_closedir(r, (xwsq_t)idx);
                 } else {
-                        rc = newlibac_fops_closefile((xwsq_t)idx);
+                        rc = newlibac_fops_closefile(r, (xwsq_t)idx);
                 }
 #else /* O_DIRECTORY */
                 idx = fd - NEWLIBAC_FOPS_FD_OFFSET;
-                rc = newlibac_fops_closefile((xwsq_t)idx);
+                rc = newlibac_fops_closefile(r, (xwsq_t)idx);
 #endif /* !O_DIRECTORY */
         }
         return rc;
 }
 
 static
-xwssz_t newlibac_fops_read_file(int fd, void * buf, size_t cnt)
+xwssz_t newlibac_fops_read_file(struct _reent * r, int fd, void * buf, size_t cnt)
 {
         xwssz_t rdsz;
         xwssq_t idx;
@@ -387,48 +388,49 @@ xwssz_t newlibac_fops_read_file(int fd, void * buf, size_t cnt)
         fsrc = f_read(fp, buf, cnt, &fsrd);
         switch (fsrc) {
         case FR_OK:
-                errno = 0;
+                r->_errno = 0;
                 rdsz = (xwssz_t)fsrd;
                 break;
         case FR_INVALID_OBJECT:
-                errno = EINVAL;
+                r->_errno = EINVAL;
                 rdsz = -1;
                 break;
         case FR_TIMEOUT:
-                errno = EINTR;
+                r->_errno = EINTR;
                 rdsz = -1;
                 break;
         case FR_DENIED:
-                errno = EACCES;
+                r->_errno = EACCES;
                 rdsz = -1;
                 break;
         case FR_DISK_ERR:
         case FR_INT_ERR:
         default:
-                errno = EIO;
+                r->_errno = EIO;
                 rdsz = -1;
                 break;
         }
         return rdsz;
 }
 
-int _read(int fd, void * buf, size_t cnt)
+_ssize_t _read_r(struct _reent * r, int fd, void * buf, size_t cnt)
 {
         int ret;
 
         if (0 == fd) {
                 ret = (int)newlibac_fops_read_stdin(fd, buf, cnt);
         } else if ((fd <= 2) || (fd >= NEWLIBAC_FOPS_FD_NUM)) {
-                errno = EPERM;
+                r->_errno = EPERM;
                 ret = -1;
         } else {
-                ret = (int)newlibac_fops_read_file(fd, buf, cnt);
+                ret = (int)newlibac_fops_read_file(r, fd, buf, cnt);
         }
         return ret;
 }
 
 static
-xwssz_t newlibac_fops_write_file(int fd, const void * data, size_t cnt)
+xwssz_t newlibac_fops_write_file(struct _reent * r,
+                                 int fd, const void * data, size_t cnt)
 {
         xwssz_t wrsz;
         xwssq_t idx;
@@ -441,32 +443,32 @@ xwssz_t newlibac_fops_write_file(int fd, const void * data, size_t cnt)
         fsrc = f_write(fp, data, cnt, &fswr);
         switch (fsrc) {
         case FR_OK:
-                errno = 0;
+                r->_errno = 0;
                 wrsz = (xwssz_t)fswr;
                 break;
         case FR_INVALID_OBJECT:
-                errno = EINVAL;
+                r->_errno = EINVAL;
                 wrsz = -1;
                 break;
         case FR_TIMEOUT:
-                errno = EINTR;
+                r->_errno = EINTR;
                 wrsz = -1;
                 break;
         case FR_DENIED:
-                errno = EACCES;
+                r->_errno = EACCES;
                 wrsz = -1;
                 break;
         case FR_DISK_ERR:
         case FR_INT_ERR:
         default:
-                errno = EIO;
+                r->_errno = EIO;
                 wrsz = -1;
                 break;
         }
         return wrsz;
 }
 
-int _write(int fd, const void * data, size_t cnt)
+_ssize_t _write_r(struct _reent * r, int fd, const void * data, size_t cnt)
 {
         int ret;
 
@@ -475,15 +477,15 @@ int _write(int fd, const void * data, size_t cnt)
         } else if (2 == fd) {
                 ret = (int)newlibac_fops_write_stderr(fd, data, cnt);
         } else if ((fd <= 2) || (fd >= NEWLIBAC_FOPS_FD_NUM)) {
-                errno = EPERM;
+                r->_errno = EPERM;
                 ret = -1;
         } else {
-                ret = (int)newlibac_fops_write_file(fd, data, cnt);
+                ret = (int)newlibac_fops_write_file(r, fd, data, cnt);
         }
         return ret;
 }
 
-int _lseek(int fd, int pos, int whence)
+_off_t _lseek_r(struct _reent * r, int fd, _off_t pos, int whence)
 {
         xwssq_t idx;
         FRESULT fsrc;
@@ -491,7 +493,7 @@ int _lseek(int fd, int pos, int whence)
         int curpos;
 
         if ((fd <= 2) || (fd >= NEWLIBAC_FOPS_FD_NUM)) {
-                errno = EPERM;
+                r->_errno = EPERM;
                 curpos = -1;
         } else {
                 idx = fd - NEWLIBAC_FOPS_FD_OFFSET;
@@ -513,24 +515,71 @@ int _lseek(int fd, int pos, int whence)
                 switch (fsrc) {
                 case FR_OK:
                         curpos = (int)f_tell(fp);
-                        errno = 0;
+                        r->_errno = 0;
                         break;
                 case FR_INVALID_PARAMETER:
                 case FR_INVALID_OBJECT:
                         curpos = -1;
-                        errno = EINVAL;
+                        r->_errno = EINVAL;
                         break;
                 case FR_TIMEOUT:
                         curpos = -1;
-                        errno = EINTR;
+                        r->_errno = EINTR;
                         break;
                 case FR_DISK_ERR:
                 case FR_INT_ERR:
                 default:
                         curpos = -1;
-                        errno = EIO;
+                        r->_errno = EIO;
                         break;
                 }
         }
         return curpos;
+}
+
+int _unlink_r(struct _reent * r, const char * path)
+{
+        FRESULT fsrc;
+        int rc;
+
+        rc = -1;
+        fsrc = f_unlink(path);
+        switch (fsrc) {
+        case FR_OK:
+                r->_errno = XWOK;
+                rc = 0;
+                break;
+        case FR_DISK_ERR:
+        case FR_INT_ERR:
+        case FR_NOT_ENABLED:
+        case FR_NOT_READY:
+                r->_errno = EIO;
+                break;
+        case FR_NO_FILE:
+        case FR_NO_PATH:
+        case FR_INVALID_NAME:
+                r->_errno = ENOENT;
+                break;
+        case FR_DENIED:
+                r->_errno = EPERM;
+                break;
+        case FR_WRITE_PROTECTED:
+        case FR_INVALID_DRIVE:
+        case FR_NO_FILESYSTEM:
+                r->_errno = EACCES;
+                break;
+        case FR_TIMEOUT:
+                r->_errno = ETIMEDOUT;
+                break;
+        case FR_LOCKED:
+                r->_errno = EBUSY;
+                break;
+        case FR_NOT_ENOUGH_CORE:
+                r->_errno = ENOMEM;
+                break;
+        default:
+                r->_errno = EFAULT;
+                break;
+        }
+        return rc;
 }

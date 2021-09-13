@@ -11,57 +11,81 @@
  */
 
 #include <xwos/standard.h>
+#include <xwos/lib/errno.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <string.h>
 #include <reent.h>
+#include <errno.h>
 
-static
-void * newlibac_malloc(xwsz_t size);
-
-static
-void newlibac_mfree(void * mem);
-
-static
-void * newlibac_mrealloc(void * mem, xwsz_t size);
+#undef errno
 
 extern struct xwmm_mempool * newlibac_mempool;
 
-void newlibac_mem_linkage_placeholder(void)
+static
+void * newlibac_malloc(struct _reent * r, xwsz_t size);
+
+static
+void newlibac_free(struct _reent * r, void * mem);
+
+static
+void * newlibac_realloc(struct _reent * r, void * mem, xwsz_t size);
+
+static
+void * newlibac_memalign(struct _reent * r, xwsz_t alignment, xwsz_t size);
+
+void newlibac_mem_init(void)
 {
 }
 
 static
-void * newlibac_malloc(xwsz_t size)
+void * newlibac_malloc(struct _reent * r, xwsz_t size)
 {
         void * mem;
+        xwer_t rc;
 
-        xwmm_mempool_malloc(newlibac_mempool, size, &mem);
+        rc = xwmm_mempool_malloc(newlibac_mempool, size, &mem);
+        r->_errno = -rc;
         return mem;
 }
 
 static
-void newlibac_mfree(void * mem)
+void newlibac_free(struct _reent * r, void * mem)
 {
-        xwmm_mempool_free(newlibac_mempool, mem);
+        xwer_t rc;
+
+        rc = xwmm_mempool_free(newlibac_mempool, mem);
+        r->_errno = -rc;
 }
 
 static
-void * newlibac_mrealloc(void * mem, xwsz_t size)
+void * newlibac_realloc(struct _reent * r, void * mem, xwsz_t size)
 {
-        xwmm_mempool_realloc(newlibac_mempool, size, &mem);
+        xwer_t rc;
+
+        rc = xwmm_mempool_realloc(newlibac_mempool, size, &mem);
+        r->_errno = -rc;
+        return mem;
+}
+
+static
+void * newlibac_memalign(struct _reent * r, xwsz_t alignment, xwsz_t size)
+{
+        xwer_t rc;
+        void * mem;
+
+        rc = xwmm_mempool_memalign(newlibac_mempool, alignment, size, &mem);
+        r->_errno = -rc;
         return mem;
 }
 
 void * _malloc_r(struct _reent * r, size_t n)
 {
-        XWOS_UNUSED(r);
-        return newlibac_malloc(n);
+        return newlibac_malloc(r, n);
 }
 
 void * _realloc_r(struct _reent * r, void * p, size_t n)
 {
-        XWOS_UNUSED(r);
-        return newlibac_mrealloc(p, n);
+        return newlibac_realloc(r, p, n);
 }
 
 void * _calloc_r(struct _reent * r, size_t elem_nr, size_t elem_sz)
@@ -69,17 +93,30 @@ void * _calloc_r(struct _reent * r, size_t elem_nr, size_t elem_sz)
         xwsz_t total;
         void * mem;
 
-        XWOS_UNUSED(r);
         total = elem_nr * elem_sz;
-        mem = newlibac_malloc(total);
+        mem = newlibac_malloc(r, total);
         if (NULL != mem) {
                 memset(mem, 0, total);
         }
         return mem;
 }
 
+void * _memalign_r(struct _reent * r, size_t alignment, size_t n)
+{
+        return newlibac_memalign(r, alignment, n);
+}
+
+void * _valloc_r(struct _reent * r, size_t n)
+{
+        return _memalign_r(r, XWMM_MEMPOOL_PAGE_SIZE, n);
+}
+
+void * _pvalloc_r(struct _reent * r, size_t n)
+{
+        return _memalign_r(r, XWMM_MEMPOOL_PAGE_SIZE, n);
+}
+
 void _free_r(struct _reent * r, void * p)
 {
-        XWOS_UNUSED(r);
-        newlibac_mfree(p);
+        newlibac_free(r, p);
 }

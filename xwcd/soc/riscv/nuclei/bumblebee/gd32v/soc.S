@@ -126,11 +126,6 @@ soc_boot_vma:
         call            cpu_init
         call            soc_init
         call            board_init
-#if defined(ARCHCFG_CXX) && (1 == ARCHCFG_CXX)
-        la              a0, __libc_fini_array
-        call            atexit
-        call            __libc_init_array
-#endif /* ARCHCFG_CXX */
         call            xwos_main
         .endfunc
 soc_boot_end:

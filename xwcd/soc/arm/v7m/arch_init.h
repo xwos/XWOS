@@ -27,8 +27,4 @@ void arch_lowlevel_init(void);
 void arch_init(void);
 void arch_relocate(void);
 
-#if defined(ARCHCFG_CXX) && (1 == ARCHCFG_CXX)
-void cxx_init(void);
-#endif /* ARCHCFG_CXX */
-
 #endif /* arch_init.h */

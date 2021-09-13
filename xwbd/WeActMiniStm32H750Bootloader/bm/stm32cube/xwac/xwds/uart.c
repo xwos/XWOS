@@ -26,7 +26,7 @@
 #include <bm/stm32cube/xwac/xwds/device.h>
 #include <bm/stm32cube/xwac/xwds/uart.h>
 
-/******** function prototypes ********/
+/******** USART1 ********/
 static
 xwer_t stm32cube_usart1_drv_start(struct xwds_device * dev);
 
@@ -53,7 +53,6 @@ static
 xwer_t stm32cube_usart1_drv_putc(struct xwds_dmauartc * dmauartc,
                                  const xwu8_t byte);
 
-/******** .data ********/
 const struct xwds_dmauartc_driver stm32cube_usart1_drv = {
         .base = {
                 .name = "stm32cube.usart.1",
@@ -83,7 +82,6 @@ struct xwds_dmauartc stm32cube_usart1_cb = {
         .cfg = NULL,
 };
 
-/******** function implementations ********/
 static
 xwer_t stm32cube_usart1_drv_start(struct xwds_device * dev)
 {
@@ -237,7 +235,7 @@ void stm32cube_usart1_cb_rxdma_timer(struct xwds_dmauartc * dmauartc)
         }
 }
 
-/******** function prototypes ********/
+/******** USART3 ********/
 static
 xwer_t stm32cube_usart3_drv_start(struct xwds_device * dev);
 
@@ -264,7 +262,6 @@ static
 xwer_t stm32cube_usart3_drv_putc(struct xwds_dmauartc * dmauartc,
                                  const xwu8_t byte);
 
-/******** .data ********/
 const struct xwds_dmauartc_driver stm32cube_usart3_drv = {
         .base = {
                 .name = "stm32cube.usart.1",
@@ -294,7 +291,6 @@ struct xwds_dmauartc stm32cube_usart3_cb = {
         .cfg = NULL,
 };
 
-/******** function implementations ********/
 static
 xwer_t stm32cube_usart3_drv_start(struct xwds_device * dev)
 {

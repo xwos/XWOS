@@ -12,7 +12,7 @@
 
 #include <xwos/standard.h>
 
-void newlibac_string_linkage_placeholder(void)
+void newlibac_string_init(void)
 {
 }
 

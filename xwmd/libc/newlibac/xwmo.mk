@@ -24,7 +24,7 @@ include $(XWBS_UTIL_MK_XWMO)
 $(eval $(call XwmoReqCfg,XWEMCFG_fs_fatfs,y))
 $(eval $(call XwmoReqCfg,XWMMCFG_MEMPOOL,y))
 
-XWMO_CSRCS := mif.c mem.c string.c fops.c lock.c exit.c
+XWMO_CSRCS := mif.c mem.c string.c fops.c lock.c
 XWMO_CFLAGS := -Wno-unused-value
 XWMO_INCDIRS :=
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)

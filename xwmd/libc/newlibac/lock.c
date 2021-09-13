@@ -29,7 +29,7 @@ struct __lock __lock___tz_mutex;
 struct __lock __lock___dd_hash_mutex;
 struct __lock __lock___arc4random_mutex;
 
-void newlibac_lock_linkage_placeholder(void)
+void newlibac_lock_init(void)
 {
         xwos_mtx_init(&__lock___sinit_recursive_mutex.xwmtx, XWOS_SKD_PRIORITY_RT_MAX);
         xwos_mtx_init(&__lock___sfp_recursive_mutex.xwmtx, XWOS_SKD_PRIORITY_RT_MAX);
