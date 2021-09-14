@@ -20,7 +20,7 @@
 
 XuanWuOS ?= ../..
 WKSPC ?= wkspc
-TARGET ?= XuanWuOS
+TARGET ?= XWOS
 
 MKCFG := ${XuanWuOS}/xwbs/util/el/mkcfg.el
 
