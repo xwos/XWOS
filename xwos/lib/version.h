@@ -18,11 +18,11 @@
 #endif
 
 /**
- * @defgroup XuanWuOS版本号
+ * @defgroup XWOS版本号
  * @{
  */
 /**
- * @page XuanWuOS_Version XuanWuOS版本号
+ * @page XWOS_Version XWOS版本号
  * #### 版本号规则: M.m.r
  *   - M: 大版本号
  *   - m: 小版本号
@@ -51,11 +51,11 @@
         stringify(XWOS_VERSION_MINOR) "." \
         stringify(XWOS_VERSION_REVISION)
 
-#define XWOS_COPYRIGHT "玄武OS " XWOS_VER_STR \
-        "  Copyright (C) 2015-2021 Roy.Sun<roy.sun@starsoul.tech>"
+#define XWOS_COPYRIGHT "XWOS " XWOS_VER_STR \
+        "  Copyright (C) 2015 xwos.tech, All Rights Reserved."
 
 /**
- * @} XuanWuOS版本号
+ * @} XWOS版本号
  */
 
 #endif /* xwos/lib/version.h */
