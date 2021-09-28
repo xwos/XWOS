@@ -25,16 +25,21 @@
 #include <xwos/ospl/soc/xwbmpaop.h>
 
 /**
- * @brief XWOS BOPLIB：声明位图
+ * @brief XWOS BOPLIB：声明原子位图
  * @param[in] name: 符号名
  * @param[in] bits: 位图中的位数
  */
 #define xwbmpaop_declare(name, bits)    xwbmp_a name[BITS_TO_XWBMP_T(bits)]
 
 /**
- * @brief XWOS AOPLIB：测试位图中的某位是否被置位
+ * @brief XWOS AOPLIB：测试位图中的某位是否被置1
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] n: 被测试的位的序号
+ * @return 布尔值
+ * @retval true: 置位
+ * @retval false: 复位
+ * @note
+ * - 内存序：consume
  */
 bool xwbmpaop_t1i(xwbmp_a * bmp, xwsq_t idx);
 
@@ -42,6 +47,8 @@ bool xwbmpaop_t1i(xwbmp_a * bmp, xwsq_t idx);
  * @brief XWOS AOPLIB：将位图中某位置1
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] n: 被置1的位的序号
+ * @note
+ * - 内存序：acq_rel
  */
 void xwbmpaop_s1i(xwbmp_a * bmp, xwsq_t idx);
 
@@ -49,6 +56,8 @@ void xwbmpaop_s1i(xwbmp_a * bmp, xwsq_t idx);
  * @brief XWOS AOPLIB：将位图中某位清0
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] n: 被清0的位的序号
+ * @note
+ * - 内存序：acq_rel
  */
 void xwbmpaop_c0i(xwbmp_a * bmp, xwsq_t idx);
 
@@ -56,67 +65,89 @@ void xwbmpaop_c0i(xwbmp_a * bmp, xwsq_t idx);
  * @brief XWOS AOPLIB：将位图中某位翻转
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] n: 被翻转的位的序号
+ * @note
+ * - 内存序：acq_rel
  */
 void xwbmpaop_x1i(xwbmp_a * bmp, xwsq_t idx);
 
 /**
- * @brief XWOS AOPLIB：测试位图中某位是否为0。如果是，就将它置1。
+ * @brief XWOS AOPLIB：测试位图中某位是否为0，如果是，就将它置1
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] i: 被测试位的序号
+ * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
+ * @note
+ * - 内存序：测试成功，acq_rel；测试失败，consume；
  */
 xwer_t xwbmpaop_t0i_then_s1i(xwbmp_a * bmp, xwsq_t idx);
 
 /**
- * @brief XWOS AOPLIB：测试位图中某位是否为1。如果是，就将它清0。
+ * @brief XWOS AOPLIB：测试位图中某位是否为1，如果是，就将它清0
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] n: 被测试位的序号
+ * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
+ * @note
+ * - 内存序：测试成功，acq_rel；测试失败，consume；
  */
 xwer_t xwbmpaop_t1i_then_c0i(xwbmp_a * bmp, xwsq_t idx);
 
 /**
- * @brief XWOS AOPLIB：从最高位起找到位图中第一个为1的位并将它清0
+ * @brief XWOS AOPLIB：从最高位起查找位图中第一个为1的位并将它清0
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] num: 位图中总的位数
+ * @return 错误码
  * @retval >=0: 位的序号
  * @retval -ENODATA: 没有任何一个位为1
+ * @note
+ * - 内存序：测试成功，acq_rel；测试失败，consume；
  */
 xwssq_t xwbmpaop_fls_then_c0i(xwbmp_a * bmp, xwsz_t num);
 
 /**
- * @brief XWOS AOPLIB：从最高位起找到位图中第一个为0的位并将它置1
+ * @brief XWOS AOPLIB：从最高位起查找位图中第一个为0的位并将它置1
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] num: 位图中总的位数
+ * @return 错误码
  * @retval >=0: 位的序号
  * @retval -ENODATA: 没有任何一个位为0
+ * @note
+ * - 内存序：测试成功，acq_rel；测试失败，consume；
  */
 xwssq_t xwbmpaop_flz_then_s1i(xwbmp_a * bmp, xwsz_t num);
 
 /**
- * @brief XWOS AOPLIB：从最低位起找到位图中第一个为1的位并将它清0
+ * @brief XWOS AOPLIB：从最低位起查找位图中第一个为1的位并将它清0
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] num: 位图中总的位数
+ * @return 错误码
  * @retval >=0: 位的序号
  * @retval -ENODATA: 没有任何一个位为1
+ * @note
+ * - 内存序：测试成功，acq_rel；测试失败，consume；
  */
 xwssq_t xwbmpaop_ffs_then_c0i(xwbmp_a * bmp, xwsz_t num);
 
 /**
- * @brief XWOS AOPLIB：从最低位起找到位图中第一个为0的位并将它置1
+ * @brief XWOS AOPLIB：从最低位起查找位图中第一个为0的位并将它置1
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] num: 位图中总的位数
+ * @return 错误码
  * @retval >=0: 位的序号
  * @retval -ENODATA: 没有任何一个位为0
+ * @note
+ * - 内存序：测试成功，acq_rel；测试失败，consume；
  */
 xwssq_t xwbmpaop_ffz_then_s1i(xwbmp_a * bmp, xwsz_t num);
 
 /**
- * @brief XWOS AOPLIB：将位图所有位设为1
+ * @brief XWOS AOPLIB：将位图所有位置1
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] num: 位图中总的位数
+ * @note
+ * - 内存序：acq_rel
  */
 static __xwlib_inline
 void xwbmpaop_s1all(xwbmp_a * bmp, xwsq_t num)
@@ -130,9 +161,11 @@ void xwbmpaop_s1all(xwbmp_a * bmp, xwsq_t num)
 }
 
 /**
- * @brief XWOS AOPLIB：清除位图中所有位
+ * @brief XWOS AOPLIB：将位图所有位清0
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] num: 位图中总的位数
+ * @note
+ * - 内存序：acq_rel
  */
 static __xwlib_inline
 void xwbmpaop_c0all(xwbmp_a * bmp, xwsq_t num)

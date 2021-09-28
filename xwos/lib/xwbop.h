@@ -437,7 +437,7 @@ DEFINE_XWBOP(xwbmp_t, 64)
 void xwbmpop_assign(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 
 /**
- * @brief XWOS BOPLIB：从最高字节开始比较两个位图的数值大小
+ * @brief XWOS BOPLIB：从数组最高元素开始比较两个位图的数值大小
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] opd: 操作数
  * @param[in] num: 位图中总的位数
@@ -529,7 +529,7 @@ bool xwbmpop_t1i(xwbmp_t * bmp, xwsq_t n);
 bool xwbmpop_t1ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief XWOS BOPLIB：测试位图中掩码部分是否全部为1，如果是，就将掩码位全部清0。
+ * @brief XWOS BOPLIB：测试位图中掩码部分是否全部为1，如果是，就将掩码部分全部清0
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] msk: 掩码
  * @param[in] num: 掩码的有效位数
@@ -540,7 +540,7 @@ bool xwbmpop_t1ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 bool xwbmpop_t1ma_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief XWOS BOPLIB：测试位图中掩码位是否至少有一位为1
+ * @brief XWOS BOPLIB：测试位图中掩码部分是否至少有一位为1
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] msk: 掩码
  * @param[in] num: 掩码的有效位数
@@ -551,7 +551,7 @@ bool xwbmpop_t1ma_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 bool xwbmpop_t1mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief XWOS BOPLIB：测试位图中掩码位是否至少有一位为1，如果是，就将掩码位全部清0。
+ * @brief XWOS BOPLIB：测试位图中掩码部分是否至少有一位为1，如果是，就将掩码部分全部清0
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] msk: 掩码
  * @param[in] num: 掩码的有效位数
@@ -562,7 +562,7 @@ bool xwbmpop_t1mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 bool xwbmpop_t1mo_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief XWOS BOPLIB：测试位图中掩码位是否全部为0
+ * @brief XWOS BOPLIB：测试位图中掩码部分是否全部为0
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] msk: 掩码
  * @param[in] num: 掩码的有效位数
@@ -573,7 +573,7 @@ bool xwbmpop_t1mo_then_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 bool xwbmpop_t0ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief XWOS BOPLIB：测试位图中掩码位是否全部为0，如果是，就将掩码位全部置1。
+ * @brief XWOS BOPLIB：测试位图中掩码部分是否全部为0，如果是，就将掩码部分全部置1
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] msk: 掩码
  * @param[in] num: 掩码的有效位数
@@ -584,7 +584,7 @@ bool xwbmpop_t0ma(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 bool xwbmpop_t0ma_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief XWOS BOPLIB：测试位图中掩码位是否至少有一位为0
+ * @brief XWOS BOPLIB：测试位图中掩码部分是否至少有一位为0
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] msk: 掩码
  * @param[in] num: 掩码的有效位数
@@ -595,7 +595,7 @@ bool xwbmpop_t0ma_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 bool xwbmpop_t0mo(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief XWOS BOPLIB：测试位图中掩码位是否至少有一位为0，如果是，就将掩码位全部置1。
+ * @brief XWOS BOPLIB：测试位图中掩码部分是否至少有一位为0，如果是，就将掩码部分全部置1
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] msk: 掩码
  * @param[in] num: 掩码的有效位数
@@ -613,7 +613,7 @@ bool xwbmpop_t0mo_then_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 void xwbmpop_not(xwbmp_t * bmp, xwsz_t num);
 
 /**
- * @brief XWOS BOPLIB：将位图与操作数进行逐位“与”操作
+ * @brief XWOS BOPLIB：将位图与操作数进行逐位“与”运算
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] opd: 操作数
  * @param[in] num: 掩码的有效位数
@@ -621,7 +621,7 @@ void xwbmpop_not(xwbmp_t * bmp, xwsz_t num);
 void xwbmpop_and(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 
 /**
- * @brief XWOS BOPLIB：将位图与操作数进行逐位“或”操作
+ * @brief XWOS BOPLIB：将位图与操作数进行逐位“或”运算
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] opd: 操作数
  * @param[in] num: 掩码的有效位数
@@ -629,7 +629,7 @@ void xwbmpop_and(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 void xwbmpop_or(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
 
 /**
- * @brief XWOS BOPLIB：将位图与操作数进行逐位“异或”操作
+ * @brief XWOS BOPLIB：将位图与操作数进行逐位“异或”运算
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] opd: 操作数
  * @param[in] num: 掩码的有效位数

@@ -32,5 +32,5 @@ BRD_EOBJS :=
 
 BRD_CSRCS += bdl/board_init.c
 BRD_CSRCS += bdl/xwac/xwskd_hook.c
-BRD_CSRCS += bdl/vector.c
+BRD_CSRCS += bdl/ivt.c
 BRD_CSRCS += bdl/main.c

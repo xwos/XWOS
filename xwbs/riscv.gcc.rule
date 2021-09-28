@@ -84,7 +84,7 @@ INCDIRS = -I. \
           -I$(XuanWuOS_BRD_DIR) \
           -I$(XuanWuOS_WKSPC_DIR)
 
-PERDEF = -D__XuanWuOS__
+PERDEF = -D__XWOS__
 
 AFLAGS = -nostdinc -nostdlib \
          -ffunction-sections -fdata-sections -fno-common \

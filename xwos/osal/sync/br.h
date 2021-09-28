@@ -47,7 +47,8 @@ typedef struct {
  * @param[in] br: 线程栅栏对象的指针
  * @param[in] num: 线程栅栏中的线程数量
  * @param[in] bmp: 线程栅栏用来记录线程抵达事件的位图缓冲区
- * @param[in] msk: 线程栅栏用来记录线程掩码状态的位图缓冲区
+ * @param[in] msk: 与bmp大小相同的另一位图缓冲区，在线程栅栏中无作用，仅作为预留，
+ *                 线程栅栏基于事件对象实现，因此msk缓冲区不可被省略
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
