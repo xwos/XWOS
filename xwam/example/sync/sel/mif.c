@@ -63,8 +63,6 @@ struct xwos_sel xwseldemo_sel4;
 struct xwos_cond xwseldemo_cond5;
 struct xwos_cond xwseldemo_cond6;
 
-xwbmpop_declare(xwseldemo_br7_bmp, XWSELDEMO_BMP_BITNUM) = {0,};
-xwbmpop_declare(xwseldemo_br7_msk, XWSELDEMO_BMP_BITNUM) = {0,};
 struct xwos_br xwseldemo_br7;
 
 const struct xwos_thd_desc xwseldemo_consumer_thd_desc = {
@@ -113,6 +111,8 @@ const struct xwos_thd_desc xwseldemo_sync_thd_desc[] = {
         },
 };
 struct xwos_thd * xwseldemo_syncthd[xw_array_size(xwseldemo_sync_thd_desc)];
+xwbmpop_declare(xwseldemo_br7_bmp, xw_array_size(xwseldemo_sync_thd_desc)) = {0,};
+xwbmpop_declare(xwseldemo_br7_msk, xw_array_size(xwseldemo_sync_thd_desc)) = {0,};
 
 /**
  * @brief 测试模块的启动函数
@@ -161,7 +161,8 @@ xwer_t example_sel_start(void)
                 goto err_cond6_init;
         }
         /* 初始化线程屏障7 */
-        rc = xwos_br_init(&xwseldemo_br7, XWSELDEMO_BMP_BITNUM,
+        xwbmpop_c0all(xwseldemo_br7_msk, xw_array_size(xwseldemo_sync_thd_desc));
+        rc = xwos_br_init(&xwseldemo_br7, xw_array_size(xwseldemo_sync_thd_desc),
                           xwseldemo_br7_bmp, xwseldemo_br7_msk);
         if (rc < 0) {
                 goto err_br7_init;
@@ -542,25 +543,21 @@ xwer_t xwseldemo_producer_func(void * arg)
  */
 xwer_t xwseldemo_syncthd_func(void * arg)
 {
-        xwbmpop_declare(brmsk, XWSELDEMO_BMP_BITNUM);
         xwtm_t sleep;
-        xwsq_t pos = (xwsq_t)arg; /* 获取线程的各自的位置 */
+        xwsq_t pos = (xwsq_t)arg;
         xwer_t rc;
 
         sellogf(INFO, "[同步线程%d] 启动。\n", pos);
-        xwbmpop_c0all(brmsk, XWSELDEMO_BMP_BITNUM);
 
-        /* 设置位图掩码 */
-        for (xwsq_t i = 0; i < xw_array_size(xwseldemo_sync_thd_desc); i++) {
-                xwbmpop_s1i(brmsk, i);
-        }
+        /* 睡眠一段时间 */
         sleep = (pos + 1) * XWTM_S;
         xwos_cthd_sleep(&sleep);
 
         /* 同步线程 */
-        rc = xwos_br_sync(&xwseldemo_br7, pos, brmsk);
+        sellogf(INFO, "[同步线程%d] 已就位。\n", pos);
+        rc = xwos_br_wait(&xwseldemo_br7);
         if (XWOK == rc) {
-                sellogf(INFO, "[同步线程%d] 已就位。\n", pos);
+                sellogf(INFO, "[同步线程%d] 开始运行。\n", pos);
         }
 
         sellogf(INFO, "[同步线程%d] 退出。\n", pos);

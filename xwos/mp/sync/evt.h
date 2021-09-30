@@ -116,8 +116,7 @@ xwer_t xwmp_sel_timedselect(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
                             xwtm_t * xwtm);
 
 /******** type:XWMP_EVT_TYPE_BR ********/
-xwer_t xwmp_br_sync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t msk[]);
-xwer_t xwmp_br_timedsync(struct xwmp_evt * evt, xwsq_t pos, xwbmp_t msk[],
-                         xwtm_t * xwtm);
+xwer_t xwmp_br_wait(struct xwmp_evt * evt);
+xwer_t xwmp_br_timedwait(struct xwmp_evt * evt, xwtm_t * xwtm);
 
 #endif /* xwos/mp/sync/evt.h */

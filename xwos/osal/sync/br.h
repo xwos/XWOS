@@ -47,8 +47,7 @@ typedef struct {
  * @param[in] br: 线程栅栏对象的指针
  * @param[in] num: 线程栅栏中的线程数量
  * @param[in] bmp: 线程栅栏用来记录线程抵达事件的位图缓冲区
- * @param[in] msk: 与bmp大小相同的另一位图缓冲区，在线程栅栏中无作用，仅作为预留，
- *                 线程栅栏基于事件对象实现，因此msk缓冲区不可被省略
+ * @param[in] msk: 线程栅栏用来记录线程掩码状态的位图缓冲区，长度应与bmp一致
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -317,16 +316,14 @@ xwer_t xwos_br_get_num(struct xwos_br * br, xwsz_t * numbuf)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_br_sync(struct xwos_br * br, xwsq_t pos, xwbmp_t msk[])
+xwer_t xwos_br_wait(struct xwos_br * br)
 {
-        return xwosdl_br_sync(&br->osbr, pos, msk);
+        return xwosdl_br_wait(&br->osbr);
 }
 
 /**
  * @brief XWOS API：限时等待所有线程到达栅栏
  * @param[in] br: 线程栅栏对象的指针
- * @param[in] pos: 当前线程的位图位置
- * @param[in] msk: 需要同步的线程位图掩码
  * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示期望的阻塞等待时间
  * + (O) 作为输出时，返回剩余的期望时间
@@ -343,10 +340,9 @@ xwer_t xwos_br_sync(struct xwos_br * br, xwsq_t pos, xwbmp_t msk[])
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_br_timedsync(struct xwos_br * br, xwsq_t pos,
-                         xwbmp_t msk[], xwtm_t * xwtm)
+xwer_t xwos_br_timedwait(struct xwos_br * br, xwtm_t * xwtm)
 {
-        return xwosdl_br_timedsync(&br->osbr, pos, msk, xwtm);
+        return xwosdl_br_timedwait(&br->osbr, xwtm);
 }
 
 /**

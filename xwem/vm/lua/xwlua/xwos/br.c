@@ -177,35 +177,22 @@ int xwlua_brsp_intr_all(lua_State * L)
         return 1;
 }
 
-int xwlua_brsp_sync(lua_State * L)
+int xwlua_brsp_wait(lua_State * L)
 {
         xwlua_br_sp * brsp;
-        xwlua_bmp_t * msk;
-        xwsz_t bitnum;
-        xwsq_t pos;
         xwtm_t time;
         int top;
         xwer_t rc;
 
         top = lua_gettop(L);
         brsp = (xwlua_br_sp *)luaL_checkudata(L, 1, "xwlua_br_sp");
-        pos = (xwsq_t)luaL_checkinteger(L, 2);
-        msk = (xwlua_bmp_t *)luaL_checkudata(L, 3, "xwlua_bmp_t");
-        xwos_br_get_num(brsp->br, &bitnum);
-        if ((0 == pos) || (pos > bitnum)) {
-                lua_pushfstring(L, "Position is out of range [1:%d]!", bitnum);
-                lua_error(L);
+        if (top >= 2) {
+                time = (xwtm_t)luaL_checknumber(L, 2);
+                rc = xwos_br_timedwait(brsp->br, &time);
         } else {
-                pos--;
-        }
-        if (top >= 4) {
-                time = (xwtm_t)luaL_checknumber(L, 4);
-                rc = xwos_br_timedsync(brsp->br, pos, msk->bmp, &time);
-        } else {
-                rc = xwos_br_sync(brsp->br, pos, msk->bmp);
+                rc = xwos_br_wait(brsp->br);
         }
         lua_pushinteger(L, (lua_Integer)rc);
-        lua_insert(L, -2);
         return 1;
 }
 
@@ -215,7 +202,7 @@ const luaL_Reg xwlua_brsp_indexmethod[] = {
         {"bind", xwlua_brsp_bind},
         {"unbind", xwlua_brsp_unbind},
         {"intr_all", xwlua_brsp_intr_all},
-        {"sync", xwlua_brsp_sync},
+        {"wait", xwlua_brsp_wait},
         {NULL, NULL},
 };
 

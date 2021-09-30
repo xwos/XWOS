@@ -37,7 +37,7 @@ const struct xwos_thd_desc xwbrdemo_thd_desc[] = {
                 .stack = XWOS_THD_STACK_DYNAMIC,
                 .stack_size = 2048,
                 .func = (xwos_thd_f)xwbrdemo_thd_func,
-                .arg = (void *)0, /* 线程在线程栅栏中的的位置 */
+                .arg = (void *)0,
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [1] = {
@@ -46,7 +46,7 @@ const struct xwos_thd_desc xwbrdemo_thd_desc[] = {
                 .stack = XWOS_THD_STACK_DYNAMIC,
                 .stack_size = 2048,
                 .func = (xwos_thd_f)xwbrdemo_thd_func,
-                .arg = (void *)1, /* 线程在线程栅栏中的位置 */
+                .arg = (void *)1,
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [2] = {
@@ -55,7 +55,7 @@ const struct xwos_thd_desc xwbrdemo_thd_desc[] = {
                 .stack = XWOS_THD_STACK_DYNAMIC,
                 .stack_size = 2048,
                 .func = (xwos_thd_f)xwbrdemo_thd_func,
-                .arg = (void *)2, /* 线程在线程栅栏中的位置 */
+                .arg = (void *)2,
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [3] = {
@@ -64,7 +64,7 @@ const struct xwos_thd_desc xwbrdemo_thd_desc[] = {
                 .stack = XWOS_THD_STACK_DYNAMIC,
                 .stack_size = 2048,
                 .func = (xwos_thd_f)xwbrdemo_thd_func,
-                .arg = (void *)3, /* 线程在线程栅栏中的位置 */
+                .arg = (void *)3,
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [4] = {
@@ -73,7 +73,7 @@ const struct xwos_thd_desc xwbrdemo_thd_desc[] = {
                 .stack = XWOS_THD_STACK_DYNAMIC,
                 .stack_size = 2048,
                 .func = (xwos_thd_f)xwbrdemo_thd_func,
-                .arg = (void *)4, /* 线程在线程栅栏中的位置 */
+                .arg = (void *)4,
                 .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
@@ -98,7 +98,9 @@ xwer_t example_br_start(void)
         xwsq_t i;
         xwer_t rc;
 
+        /* 设置需要同步的线程的位图掩码 */
         /* 初始化线程屏障 */
+        xwbmpop_c0all(xwbrdemo_br_msk, xw_array_size(xwbrdemo_thd_desc));
         rc = xwos_br_init(&xwbrdemo_br, xw_array_size(xwbrdemo_thd_desc),
                           xwbrdemo_br_bmp, xwbrdemo_br_msk);
         if (rc < 0) {
@@ -132,23 +134,15 @@ err_br_init:
 xwer_t xwbrdemo_thd_func(void * arg)
 {
         xwer_t rc;
-        xwsq_t pos = (xwsq_t)arg; /* 获取线程的各自的位置 */
-        xwbmpop_declare(msk, xw_array_size(xwbrdemo_thd_desc));
 
-        brlogf(INFO, "[线程%d] 启动。\n", pos);
-        /* 设置需要同步的线程的位图掩码 */
-        xwbmpop_c0all(msk, xw_array_size(xwbrdemo_thd_desc));
-        for (xwsq_t i = 0; i < xw_array_size(xwbrdemo_thd_desc); i++) {
-                xwbmpop_s1i(msk, i);
-        }
-
+        brlogf(INFO, "[线程%d] 启动。\n", (xwsq_t)arg);
         /* 与位图掩码中的线程进行同步，
            当这些线程都运行到此处时，同时解除阻塞，继续往下运行 */
-        rc = xwos_br_sync(&xwbrdemo_br, pos, msk);
+        rc = xwos_br_wait(&xwbrdemo_br);
         if (XWOK == rc) {
-                brlogf(INFO, "[线程%d] 同步。\n", pos);
+                brlogf(INFO, "[线程%d] 开始运行。\n", (xwsq_t)arg);
         }
-        brlogf(INFO, "[线程%d] 退出。\n", pos);
+        brlogf(INFO, "[线程%d] 退出。\n", (xwsq_t)arg);
         xwos_thd_detach(xwos_cthd_self());
         return rc;
 }

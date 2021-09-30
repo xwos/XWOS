@@ -143,20 +143,22 @@ static __xwup_code
 void xwup_evt_activate(struct xwup_evt * evt, xwsq_t type)
 {
         xwsz_t size;
+        xwsq_t i;
 
         size = BITS_TO_XWBMP_T(evt->num);
         xwup_cond_activate(&evt->cond);
         evt->type = type;
         switch (type & XWUP_EVT_TYPE_MASK) {
-        case XWUP_EVT_TYPE_FLG:
-                memset(evt->msk, 0xFF, size);
-                break;
         case XWUP_EVT_TYPE_BR:
                 memset(evt->msk, 0, size);
+                for (i = 0; i < evt->num; i++) {
+                        xwbmpop_s1i(evt->msk, i);
+                }
                 break;
         case XWUP_EVT_TYPE_SEL:
                 memset(evt->msk, 0, size);
                 break;
+        case XWUP_EVT_TYPE_FLG:
         default:
                 memset(evt->msk, 0xFF, size);
                 break;
@@ -620,7 +622,7 @@ xwer_t xwup_flg_timedwait_level(struct xwup_evt * evt,
                                 if (XWOS_LKST_LOCKED == lkst) {
                                         xwup_splk_unlock(&evt->lock);
                                 }
-                                xwospl_cpuirq_restore_lc(cpuirq);
+                                xwup_cpuirq_restore_lc(cpuirq);
                                 break;
                         }
                 }
@@ -686,7 +688,7 @@ xwer_t xwup_flg_timedwait_edge(struct xwup_evt * evt, xwsq_t trigger,
                                 if (XWOS_LKST_LOCKED == lkst) {
                                         xwup_splk_unlock(&evt->lock);
                                 }
-                                xwospl_cpuirq_restore_lc(cpuirq);
+                                xwup_cpuirq_restore_lc(cpuirq);
                                 break;
                         }
                 }
@@ -967,7 +969,7 @@ xwer_t xwup_sel_timedselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
                                 if (XWOS_LKST_LOCKED == lkst) {
                                         xwup_splk_unlock(&evt->lock);
                                 }
-                                xwospl_cpuirq_restore_lc(cpuirq);
+                                xwup_cpuirq_restore_lc(cpuirq);
                                 if (NULL != trg) {
                                         xwbmpop_c0all(trg, evt->num);
                                 }
@@ -980,38 +982,38 @@ xwer_t xwup_sel_timedselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
 
 /******** type:XWUP_EVT_TYPE_BR ********/
 __xwup_api
-xwer_t xwup_br_sync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t msk[])
+xwer_t xwup_br_wait(struct xwup_evt * evt)
 {
         xwtm_t expected = XWTM_MAX;
-        return xwup_br_timedsync(evt, pos, msk, &expected);
+        return xwup_br_timedwait(evt, &expected);
 }
 
 __xwup_api
-xwer_t xwup_br_timedsync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t msk[],
-                         xwtm_t * xwtm)
+xwer_t xwup_br_timedwait(struct xwup_evt * evt, xwtm_t * xwtm)
 {
         xwreg_t cpuirq;
+        xwssq_t pos;
         bool triggered;
         xwsq_t lkst;
         xwer_t rc;
 
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE(((evt->type & XWUP_EVT_TYPE_MASK) == XWUP_EVT_TYPE_BR),
                       "type-error", -ETYPE);
         XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
         XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)),
                       "not-in-thd", -ENOTINTHD);
 
-        if (pos >= evt->num) {
+        xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        pos = xwbmpop_ffz(evt->bmp, evt->num);
+        if ((pos < 0) || (pos >= (xwssq_t)evt->num)) {
                 rc = -ECHRNG;
                 goto err_pos_range;
         }
-        xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        xwbmpop_s1i(evt->bmp, pos);
-        triggered = xwbmpop_t1ma(evt->bmp, msk, evt->num);
+        xwbmpop_s1i(evt->bmp, (xwsq_t)pos);
+        triggered = xwbmpop_t1ma(evt->bmp, evt->msk, evt->num);
         if (triggered) {
-                xwbmpop_c0i(evt->bmp, pos);
+                xwbmpop_c0i(evt->bmp, (xwsq_t)pos);
                 xwup_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                 xwup_cond_broadcast(&evt->cond);
                 xwup_cthd_yield();
@@ -1023,7 +1025,7 @@ xwer_t xwup_br_timedsync(struct xwup_evt * evt, xwsq_t pos, xwbmp_t msk[],
                 if (XWOS_LKST_UNLOCKED == lkst) {
                         xwup_splk_lock(&evt->lock);
                 }
-                xwbmpop_c0i(evt->bmp, pos);
+                xwbmpop_c0i(evt->bmp, (xwsq_t)pos);
                 xwup_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         }
         return XWOK;

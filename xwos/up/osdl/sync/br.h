@@ -105,16 +105,15 @@ xwer_t xwosdl_br_get_num(struct xwosdl_br * br, xwsz_t * numbuf)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_br_sync(struct xwosdl_br * br, xwsq_t pos, xwbmp_t msk[])
+xwer_t xwosdl_br_wait(struct xwosdl_br * br)
 {
-        return xwup_br_sync(br, pos, msk);
+        return xwup_br_wait(br);
 }
 
 static __xwcc_inline
-xwer_t xwosdl_br_timedsync(struct xwosdl_br * br, xwsq_t pos, xwbmp_t msk[],
-                           xwtm_t * xwtm)
+xwer_t xwosdl_br_timedwait(struct xwosdl_br * br, xwtm_t * xwtm)
 {
-        return xwup_br_timedsync(br, pos, msk, xwtm);
+        return xwup_br_timedwait(br, xwtm);
 }
 
 #endif /* xwos/up/osdl/sync/br.h */
