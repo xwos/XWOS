@@ -20,9 +20,15 @@ extern void __libc_init_array (void);
 extern void __libc_fini_array (void);
 
 extern void newlibac_errno_init(void);
-extern void newlibac_mem_init(void);
-extern void newlibac_fops_init(void);
+#if defined(XWMDCFG_libc_newlibac_string) && (1 == XWMDCFG_libc_newlibac_string)
 extern void newlibac_string_init(void);
+#endif
+#if defined(XWMDCFG_libc_newlibac_mem) && (1 == XWMDCFG_libc_newlibac_mem)
+extern void newlibac_mem_init(void);
+#endif
+#if defined(XWMDCFG_libc_newlibac_fops) && (1 == XWMDCFG_libc_newlibac_fops)
+extern void newlibac_fops_init(void);
+#endif
 extern void newlibac_lock_init(void);
 
 /**
@@ -32,9 +38,15 @@ extern void newlibac_lock_init(void);
  */
 const newlibac_init_f newlibac_init_table[] = {
         newlibac_errno_init,
-        newlibac_mem_init,
-        newlibac_fops_init,
+#if defined(XWMDCFG_libc_newlibac_string) && (1 == XWMDCFG_libc_newlibac_string)
         newlibac_string_init,
+#endif
+#if defined(XWMDCFG_libc_newlibac_mem) && (1 == XWMDCFG_libc_newlibac_mem)
+        newlibac_mem_init,
+#endif
+#if defined(XWMDCFG_libc_newlibac_fops) && (1 == XWMDCFG_libc_newlibac_fops)
+        newlibac_fops_init,
+#endif
         newlibac_lock_init,
 };
 

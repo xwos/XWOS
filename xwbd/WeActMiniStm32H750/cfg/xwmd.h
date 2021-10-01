@@ -67,6 +67,9 @@
  ******** ********            C/C++ Runtime            ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWMDCFG_libc_newlibac                                   1
+#define XWMDCFG_libc_newlibac_string                            1
+#define XWMDCFG_libc_newlibac_mem                               1
+#define XWMDCFG_libc_newlibac_fops                              1
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********               RAMCode               ******** ********
