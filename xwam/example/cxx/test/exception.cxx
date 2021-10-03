@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：C++测试线程
+ * @brief C++ Exception Test
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,34 +18,30 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.hxx>
-#include <xwos/osal/skd.hxx>
-#include <vector>
-#include "test/literal.hxx"
-#include "test/vector.hxx"
-#if !defined(__clang__)
-#  include "test/exception.hxx"
-#endif
-#include "task.hxx"
+#include <xwos/lib/xwlog.hxx>
+#include <stdexcept>
+#include "test/exception.hxx"
 
-xwer_t cxx_thd_main(void * arg)
+#undef LOGTAG
+#undef cxxlogf
+#define LOGTAG "C++Except"
+#define cxxlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
+
+void throwFunc(std::out_of_range * e)
 {
-  xwtm_t xwtm;
-  xwer_t rc;
+  throw e;
+}
 
-  XWOS_UNUSED(arg);
-
-  testLiteralOperator();
-  testStdVector();
-#if !defined(__clang__)
-  testStdExcept(1);
-#endif
-
-  rc = XWOK;
-  while (!xwos_cthd_frz_shld_stop(NULL)) {
-    xwtm = 2000 * XWTM_MS;
-    xwos_cthd_sleep(&xwtm);
+void testStdExcept(int a)
+{
+  try {
+    if (a > 100) {
+      throwFunc(new std::out_of_range("GT 100"));
+    } else {
+      throwFunc(new std::out_of_range("LE 100"));
+    }
+  } catch (std::out_of_range * e) {
+    cxxlogf(INFO, "throw exception:%s\n", e->what());
+    delete e;
   }
-  xwos_thd_detach(xwos_cthd_self());
-  return rc;
 }

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：C++测试线程
+ * @brief C++ Exception Test
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,34 +18,9 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.hxx>
-#include <xwos/osal/skd.hxx>
-#include <vector>
-#include "test/literal.hxx"
-#include "test/vector.hxx"
-#if !defined(__clang__)
-#  include "test/exception.hxx"
-#endif
-#include "task.hxx"
+#ifndef __bm_cxx_test_exception_hxx__
+#define __bm_cxx_test_exception_hxx__
 
-xwer_t cxx_thd_main(void * arg)
-{
-  xwtm_t xwtm;
-  xwer_t rc;
+void testStdExcept(int a);
 
-  XWOS_UNUSED(arg);
-
-  testLiteralOperator();
-  testStdVector();
-#if !defined(__clang__)
-  testStdExcept(1);
-#endif
-
-  rc = XWOK;
-  while (!xwos_cthd_frz_shld_stop(NULL)) {
-    xwtm = 2000 * XWTM_MS;
-    xwos_cthd_sleep(&xwtm);
-  }
-  xwos_thd_detach(xwos_cthd_self());
-  return rc;
-}
+#endif /* bm/cxx/test/exception.hxx */

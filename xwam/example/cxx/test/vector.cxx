@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief C++ Vector Operator Test
+ * @brief C++ Vector Test
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

@@ -18,16 +18,14 @@
  * > limitations under the License.
  */
 
-#ifndef __compiler_gcc_h__
-#define __compiler_gcc_h__
+#ifndef __compiler_llvm_h__
+#define __compiler_llvm_h__
 
 #include <cfg/XuanWuOS.h>
 
 #define __xw_i  volatile const /**< 'read only' structure member permissions */
 #define __xw_o  volatile       /**< 'write only' structure member permissions */
 #define __xw_io volatile       /**< 'read/write' structure member permissions */
-
-#define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 
 #define __xwcc_section(s)       __attribute__((__section__(s)))
 #define __xwcc_aligned(x)       __attribute__((aligned(x)))
@@ -95,4 +93,4 @@
 #define xwmb_mp_load_acquire_mb()       xwmb_mp_mb()
 #define xwmb_mp_store_release_mb()      xwmb_mp_mb()
 
-#endif /* gcc.h */
+#endif /* compiler/llvm.h */
