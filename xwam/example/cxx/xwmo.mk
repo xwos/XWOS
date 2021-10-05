@@ -29,6 +29,7 @@ XWMO_CXXSRCS += test/literal.cxx test/vector.cxx
 XWMO_CXXSRCS_gcc += test/exception.cxx
 
 XWMO_CXXFLAGS := -Wno-unused-value
+XWMO_CXXFLAGS_gcc += -fexceptions
 XWMO_CXXFLAGS_llvm += -Wno-error=gnu-string-literal-operator-template
 
 XWMO_INCDIRS := $(call getXwmoDir)

@@ -2,7 +2,7 @@
 
 _G.null = false
 
-print("Hello, I'm XuanWuOS!\n")
+print("XWLUA Test Script\n")
 mythdsp = xwos.cthd.sp()
 print("Thread strong pointer:", mythdsp)
 print("pi =", math.pi)

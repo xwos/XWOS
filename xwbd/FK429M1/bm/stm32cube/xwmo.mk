@@ -43,7 +43,6 @@ XWMO_CSRCS += xwac/fatfs/sdcard.c
 XWMO_CSRCS += xwac/newlib/mem.c
 XWMO_CSRCS += xwac/newlib/stdio.c
 XWMO_CSRCS += xwac/lua/mem.c
-XWMO_CSRCS += xwac/cxx/mem.c
 
 XWMO_CSRCS += $(call getAllFileUnderXwmoDir,*.c,xwac/xwds)
 
