@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS通用库：玄武OS的编译器宏定义
+ * @brief 玄武OS通用库：XWOS的编译器宏定义
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -358,6 +358,14 @@
 #define xwmb_write(t, p, v)     (*(volatile t * )(p)) = (v)
 
 /******** ******** MP primitives ******** ********/
+#ifndef xwmb_mp_load_acquire_mb
+#  define xwmb_mp_load_acquire_mb()     xwmb_mp_mb()
+#endif
+
+#ifndef xwmb_mp_store_release_mb
+#  define xwmb_mp_store_release_mb()    xwmb_mp_mb()
+#endif
+
 #ifndef xwmb_mp_load_acquire
 /**
  * @brief: 读取地址中的指定类型的值，并保证此处的“读”操作

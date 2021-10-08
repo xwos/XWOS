@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS通用库：玄武OS的基本类型定义
+ * @brief 玄武OS通用库：XWOS的基本类型定义
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -17,7 +17,7 @@
 #include <stdarg.h>
 
 /**
- * @defgroup type 玄武OS的基本类型定义
+ * @defgroup type XWOS的基本类型定义
  * @{
  */
 

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS通用库：玄武OS的对象
+ * @brief 玄武OS通用库：XWOS的对象
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,7 +18,7 @@
 #include <xwos/mm/common.h>
 
 /**
- * @defgroup xwobj 玄武OS的对象
+ * @defgroup xwobj XWOS的对象
  * @{
  */
 
@@ -31,7 +31,7 @@
  */
 #define xwos_cast(type, obj)    ((type)(obj))
 
-#define XWOS_OBJ_MAGIC  0x58574F53U /**< 所有玄武OS的对象都有相同的幻数 */
+#define XWOS_OBJ_MAGIC  0x58574F53U /**< 所有XWOS的对象都有相同的幻数 */
 
 /**
  * @brief 垃圾回收函数指针类型

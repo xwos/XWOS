@@ -14,11 +14,11 @@
 *.pyc
 wkspc
 XuanWuOS.cfg
+xwbs/util/js/xwgml/node_modules
+xwbs/util/js/xwgml/package-lock.json
 doxygen
 GTAGS
 GRTAGS
 GPATH
-xwbs/util/js/xwgitloglint/node_modules
-xwbs/util/js/xwgitloglint/package-lock.json
 compile_commands.json
 .cache

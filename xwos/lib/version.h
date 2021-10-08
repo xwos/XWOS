@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS通用库：玄武OS的版本号
+ * @brief 玄武OS通用库：XWOS的版本号
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,11 +18,11 @@
 #endif
 
 /**
- * @defgroup XWOS版本号
+ * @defgroup XWOS_Version XWOS的版本号
  * @{
  */
 /**
- * @page XWOS_Version XWOS版本号
+ * @page XWOS_Version_Page XWOS的版本号
  * #### 版本号规则: M.m.r
  *   - M: 大版本号
  *   - m: 小版本号
@@ -36,9 +36,14 @@
 #define XWOS_VERSION_REVISION           0
 
 /**
+ * @brief XWOS的版本阶段
+ */
+#define XWOS_VERSION_PHASE              alpha
+
+/**
  * @brief XWOS的版本号（数值形式）
  */
-#define XWOS_VER_NUM \
+#define XWOS_VERSION_CODE \
         (((XWOS_VERSION_MAJOR) << 24) | \
          ((XWOS_VERSION_MINOR) << 16) | \
          ((XWOS_VERSION_REVISION) << 0))
@@ -46,16 +51,17 @@
 /**
  * @brief XWOS的版本号（字符串形式）
  */
-#define XWOS_VER_STR \
+#define XWOS_VERSION \
         stringify(XWOS_VERSION_MAJOR) "." \
         stringify(XWOS_VERSION_MINOR) "." \
-        stringify(XWOS_VERSION_REVISION)
+        stringify(XWOS_VERSION_REVISION) "." \
+        stringify(XWOS_VERSION_PHASE)
 
-#define XWOS_COPYRIGHT "XWOS " XWOS_VER_STR \
+#define XWOS_COPYRIGHT "XWOS " XWOS_VERSION \
         "  Copyright (C) 2015 xwos.tech, All Rights Reserved."
 
 /**
- * @} XWOS版本号
+ * @} XWOS_Version
  */
 
 #endif /* xwos/lib/version.h */

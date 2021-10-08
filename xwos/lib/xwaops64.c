@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS通用库：有符号64位原子操作函数库
+ * @brief 玄武OS通用库：有符号64位原子操作函数库
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

@@ -1,6 +1,6 @@
 #! /bin/make -f
 # @file
-# @brief xwlib的编译规则
+# @brief 玄武OS通用库的编译规则
 # @author
 # + 隐星魂 (Roy Sun) <xwos@xwos.tech>
 # @copyright

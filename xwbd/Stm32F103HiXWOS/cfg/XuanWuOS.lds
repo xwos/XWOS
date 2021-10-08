@@ -57,7 +57,7 @@ MEMORY {
                 org = ocram_mr_origin,
                 len = 18k
 
-        /* 玄武OS的内核栈 */
+        /* XWOS的内核栈 */
         xwos_stk_mr (rw):
                 org = ORIGIN(data_mr) + LENGTH(data_mr),
                 len = ocram_mr_size - LENGTH(data_mr)

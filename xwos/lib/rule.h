@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS通用库：玄武OS内核的编译规则
+ * @brief 玄武OS通用库：编译规则
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -17,7 +17,7 @@
 
 /**
  * @mainpage XWOS通用库
- * + @subpage XuanWuOS_Version
+ * + @subpage version
  * + @subpage compiler
  * + @subpage error
  * + @subpage type

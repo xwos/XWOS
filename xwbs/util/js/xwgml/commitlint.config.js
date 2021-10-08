@@ -5,7 +5,7 @@ module.exports = {
   rules: {
     'type-enum': [2, 'always', [
       "feat", "fix", "perf", "refactor", "style", "build", "revert", "docs", "test",
-      "chore", "milestone", "release", "revision"
+        "chore", "milestone", "release", "revision", "alpha", "beta", "rc"
     ]]
   }
 };

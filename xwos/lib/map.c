@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS通用库：键值对容器
+ * @brief 玄武OS通用库：键值对容器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
