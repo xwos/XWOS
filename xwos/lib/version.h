@@ -31,8 +31,8 @@
  *   - r: 修正号
  */
 
-#define XWOS_VERSION_MAJOR              1
-#define XWOS_VERSION_MINOR              9
+#define XWOS_VERSION_MAJOR              2
+#define XWOS_VERSION_MINOR              0
 #define XWOS_VERSION_REVISION           0
 
 /**
