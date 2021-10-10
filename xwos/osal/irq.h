@@ -18,6 +18,7 @@
 
 /**
  * @defgroup xwos_irq 中断
+ * @ingroup xwos
  * - EXC：编号为负数，从-1开始编号
  * - IRQ：编号为正数或0，从0开始编号
  * @{

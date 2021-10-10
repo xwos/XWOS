@@ -16,18 +16,26 @@
 #include <xwos/standard.h>
 
 /**
- * @defgroup xwsc 系统调用与系统特权
+ * @defgroup xwos_lib_xwsc 系统调用与系统特权
+ * @ingroup xwos_lib
  * @{
  */
 
 #include <xwos/ospl/soc/xwsc.h>
 
+/**
+ * @brief 以特权方式调用函数
+ * @param[in] func: 函数
+ * @param[in] argnum: 函数参数的个数
+ * @param[in] ...: 函数参数列表
+ */
 xws64_t xwsc(xwsc_f func, xwreg_t argnum, ...);
+
 void xwlib_privilege_start(void);
 void xwlib_privilege_end(void);
 
 /**
- * @} xwsc
+ * @} xwos_lib_xwsc
  */
 
 #endif /* xwos/lib/sc.h */

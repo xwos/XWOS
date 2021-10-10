@@ -149,7 +149,7 @@ void xwos_object_setgc(struct xwos_object * obj, xwobj_gc_f gcfunc)
         }
 }
 
-__xwlib_code
+static __xwlib_code
 xwer_t xwos_object_acquire_refaop_tst(const void * ov, void * arg)
 {
         const xwsq_t * o;
@@ -169,7 +169,7 @@ xwer_t xwos_object_acquire_refaop_tst(const void * ov, void * arg)
         return rc;
 }
 
-__xwlib_code
+static __xwlib_code
 void xwos_object_acquire_refaop_op(void * nv, const void * ov, void * arg)
 {
         xwsq_t * n;

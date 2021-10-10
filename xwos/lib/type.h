@@ -17,7 +17,8 @@
 #include <stdarg.h>
 
 /**
- * @defgroup type XWOS的基本类型定义
+ * @defgroup xwos_lib_type XWOS的基本类型
+ * @ingroup xwos_lib
  * @{
  */
 
@@ -711,7 +712,7 @@ xwer_t xwtm_cmp(const xwtm_t a, const xwtm_t b)
 #endif
 
 /**
- * @} type
+ * @} xwos_lib_type
  */
 
 #endif /* xwos/lib/type.h */

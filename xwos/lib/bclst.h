@@ -16,7 +16,8 @@
 #include <xwos/standard.h>
 
 /**
- * @defgroup bclst 双循环链表
+ * @defgroup xwos_lib_bclst 双循环链表
+ * @ingroup xwos_lib
  * @{
  */
 
@@ -33,11 +34,18 @@ struct xwlib_bclst_node {
  */
 #define xwlib_bclst_head        xwlib_bclst_node
 
+/**
+ * @brief 双循环链表头的初始化结构体
+ */
 #define XWLIB_BCLST_HEAD_INIT(n) (struct xwlib_bclst_head){&(n), &(n)}
+
+/**
+ * @brief 双循环链表节点的初始化结构体
+ */
 #define XWLIB_BCLST_NODE_INIT(n) (struct xwlib_bclst_node){&(n), &(n)}
 
 /**
- * @brief 从一个链表节点的指针值计算出包含该节点成员的外层结构体的指针值。
+ * @brief 从一个链表节点的指针值计算出包含此节点成员的外层结构体的指针值。
  * @param[in] ptr: 节点指针
  * @param[in] type: 外层结构体类型
  * @param[in] member: 节点在外层结构体中的成员符号名(symbol)
@@ -117,7 +125,7 @@ struct xwlib_bclst_node {
  * @brief 向后遍历(iterate over)整个链表，并防止因遍历到的节点被删除而造成的错误。
  * @param[in] p: 光标指针，指向当前遍历到的节点
  * @param[in] n: 暂存光标指针所指向的节点的prev指针，
- *               防止该节点被删除后取到错误的prev指针。
+ *               防止此节点被删除后取到错误的prev指针。
  * @param[in] head: 链表头指针
  */
 #define xwlib_bclst_itr_prev_safe(p, n, head) \
@@ -186,7 +194,7 @@ struct xwlib_bclst_node {
  *        同时将节点指针转化为包含它们的外层结构体指针。
  * @param[in] p: 光标指针，指向当前遍历到的节点所对应的外层结构体
  * @param[in] n: 暂存光标指针所指向的节点的prev指针所对应的外层结构体指针，
- *               防止该节点被删除后取到错误的prev指针
+ *               防止此节点被删除后取到错误的prev指针
  * @param[in] head: 链表头指针
  * @param[in] type: 外层结构体类型
  * @param[in] member: 节点在外层结构体中的成员符号名(symbol)
@@ -537,7 +545,7 @@ void xwlib_bclst_insseg_tail(struct xwlib_bclst_head * head,
 }
 
 /**
- * @} bclst
+ * @} xwos_lib_bclst
  */
 
 #endif /* xwos/lib/bclst.h */

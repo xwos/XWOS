@@ -18,6 +18,7 @@
 
 /**
  * @defgroup xwos_pm 电源管理
+ * @ingroup xwos
  * @{
  */
 
@@ -37,7 +38,7 @@
 typedef xwosdl_pm_cb_f xwos_pm_cb_f;
 
 /**
- * @defgroup xwos_pm_stage_em
+ * @defgroup xwos_pm_stage_em 电源管理阶段枚举
  * @{
  */
 
@@ -75,7 +76,7 @@ void xwos_pm_set_cb(xwos_pm_cb_f resume_cb,
 }
 
 /**
- * @brief XWOS API：暂停玄武OS，并将系统切换为低功耗状态
+ * @brief XWOS API：暂停XWOS，并将系统切换为低功耗状态
  * @return 错误码
  * @note
  * - 同步/异步：同步
@@ -89,7 +90,7 @@ xwer_t xwos_pm_suspend(void)
 }
 
 /**
- * @brief XWOS API：唤醒系统，并继续运行玄武OS
+ * @brief XWOS API：唤醒系统，并继续运行XWOS
  * @return 错误码
  * @note
  * - 同步/异步：同步

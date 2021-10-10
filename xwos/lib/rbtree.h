@@ -16,13 +16,17 @@
 #include <xwos/standard.h>
 
 /**
- * @defgroup rbtree 红黑树
+ * @defgroup xwos_lib_rbtree 红黑树
+ * @ingroup xwos_lib
  * ## 红黑树性质
  * -   1. 节点不是红色就是黑色；
  * -   2. 根节点是黑色；
  * -   3. 所有的叶子都是黑色；
  * -   4. 每个红色的节点，如果有子节点，必须是黑色；
  * -   5. 从任意节点到其任意子树的叶子的路径上，所包含的黑色节点数量相同。
+ * ## 算法特点
+ * -   红黑树节点的内存地址必须按4字节对齐，其地址信息的低两位必须为0，
+ *     算法使用这两个空闲的位存放位置(pos)和颜色(color)信息。
  * @{
  */
 
@@ -44,12 +48,6 @@ enum xwlib_rbtree_color_em {
 
 /**
  * @brief 红黑树节点
- * @note
- * > - 别使用位定义，因为在大端机器（PowerPC）和小端机器(ARM/X86)中，位的编号方式不同。
- * > - 此结构体的内存地址必须按4字节对齐，其地址信息的低两位必须为0。
- * >   这份代码实现的红黑树算法使用这两位分别存放位置(pos)和颜色(color)信息。
- * - 当位置为XWLIB_RBTREE_POS_RIGHT，当前节点为右孩子，其link指针指向父节点的right。
- * - 当位置为XWLIB_RBTREE_POS_LEFT，当前节点为左孩子，其link指针指向父节点的left。
  */
 struct __xwcc_alignptr xwlib_rbtree_node {
         struct xwlib_rbtree_node * left; /**< 指向左孩子 */
@@ -427,7 +425,7 @@ void xwlib_rbtree_replace(struct xwlib_rbtree_node * newn,
                           struct xwlib_rbtree_node * oldn);
 
 /**
- * @} rbtree
+ * @} xwos_lib_rbtree
  */
 
 #endif /* xwos/lib/rbtree.h */

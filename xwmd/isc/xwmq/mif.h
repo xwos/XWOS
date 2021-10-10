@@ -20,11 +20,17 @@
 #include <xwos/osal/sync/sel.h>
 
 /**
+ * @defgroup xwmd_isc_xwmq 消息队列
+ * @ingroup xwmd_isc
+ * @{
+ */
+
+/**
  * @breif 消息队列对象
  */
 struct xwmq {
         struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
-        const char * name;
+        const char * name; /**< 名称 */
         struct xwlib_bclst_head head; /**< 链表头 */
         struct xwos_splk lock; /**< 保护接收队列的自旋锁 */
         struct xwos_sem sem; /**< 接收队列的信号量 */
@@ -76,5 +82,9 @@ xwer_t xwmq_select(struct xwos_sel * sel,
                    struct xwmq * mqs[], xwsz_t * mqsz);
 xwer_t xwmq_tryselect(struct xwos_sel * sel,
                       struct xwmq * mqs[], xwsz_t * mqsz);
+
+/**
+ * @} xwmd_isc_xwmq
+ */
 
 #endif /* xwmd/isc/xwmq/mif.h */

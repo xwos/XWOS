@@ -18,7 +18,8 @@
 #include <xwos/osal/sync/sel.h>
 
 /**
- * @defgroup xwos_sem 信号量
+ * @defgroup xwos_sync_sem 信号量
+ * @ingroup xwos_sync
  * @{
  */
 
@@ -425,7 +426,7 @@ xwer_t xwos_sem_getvalue(struct xwos_sem * sem, xwssq_t * sval)
 }
 
 /**
- * @} xwos_sem
+ * @} xwos_sync_sem
  */
 
 #endif /* xwos/osal/sync/sem.h */

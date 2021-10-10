@@ -18,6 +18,7 @@
 
 /**
  * @defgroup xwos_swt 软件定时器
+ * @ingroup xwos
  * @{
  */
 

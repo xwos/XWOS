@@ -16,7 +16,8 @@
 #include <xwos/standard.h>
 
 /**
- * @defgroup xwmm_common 通用定义
+ * @defgroup xwmm_common XWOS内存管理通用定义
+ * @ingroup xwmm
  * @{
  */
 
@@ -24,7 +25,7 @@
 #define XWMM_ALIGNMENT_MASK     (XWMM_ALIGNMENT - 1)
 
 /**
- * @brief memory management zone
+ * @brief XWOS内存区域
  */
 struct xwmm_zone {
         xwptr_t origin; /**< origin address */
@@ -54,7 +55,7 @@ bool xwmm_in_zone(void * mem, xwptr_t origin, xwsz_t size)
 }
 
 /**
- * @} xwmm_common
+ * @} xwmm
  */
 
 #endif /* xwos/mm/common.h */

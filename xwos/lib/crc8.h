@@ -16,7 +16,8 @@
 #include <xwos/standard.h>
 
 /**
- * @defgroup CRC8 CRC8
+ * @defgroup xwos_lib_crc8 CRC8
+ * @ingroup xwos_lib
  * @{
  */
 
@@ -26,7 +27,7 @@ xwer_t xwlib_crc8_cal(xwu8_t * crc8,
 xwu8_t xwlib_crc8_calms(const xwu8_t stream[], xwsz_t * size);
 
 /**
- * @} CRC8
+ * @} xwos_lib_crc8
  */
 
 #endif /* xwos/lib/crc8.h */

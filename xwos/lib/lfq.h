@@ -16,7 +16,8 @@
 #include <xwos/standard.h>
 
 /**
- * @defgroup lfq 无锁队列
+ * @defgroup xwos_lib_lfq 无锁队列
+ * @ingroup xwos_lib
  * @{
  */
 
@@ -47,7 +48,7 @@ void xwlib_lfq_push(xwlfq_a * h, xwlfq_a * n);
 xwlfq_t * xwlib_lfq_pop(xwlfq_a * h);
 
 /**
- * @} lfq
+ * @} xwos_lib_lfq
  */
 
 #endif /* xwos/lib/lfq.h */

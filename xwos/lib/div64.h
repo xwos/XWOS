@@ -16,7 +16,8 @@
 #include <xwos/standard.h>
 
 /**
- * @defgroup div64 64位除法
+ * @defgroup xwos_lib_div64 64位除法
+ * @ingroup xwos_lib
  * @{
  */
 
@@ -34,7 +35,7 @@ __xwlib_code
 xwu32_t xwdiv64(xwu64_t * n, xwu32_t divisor);
 
 /**
- * @} div64
+ * @} xwos_lib_div64
  */
 
 #endif /* xwos/lib/div64.h */

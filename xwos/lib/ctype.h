@@ -19,7 +19,8 @@
 #  include <xwos/standard.h>
 
 /**
- * @defgroup ctype 字符类型
+ * @defgroup xwos_lib_ctype 字符类型
+ * @ingroup xwos_lib
  * @{
  */
 
@@ -170,7 +171,7 @@ char toupper(unsigned char c)
 }
 
 /**
- * @} ctype
+ * @} xwos_lib_ctype
  */
 
 #endif

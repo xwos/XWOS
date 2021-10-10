@@ -18,7 +18,8 @@
 #include <xwos/lib/xwaop.h>
 
 /**
- * @defgroup xwbmpaop 位图原子操作
+ * @defgroup xwos_lib_xwbmpaop 位图原子操作
+ * @ingroup xwos_lib
  * @{
  */
 
@@ -179,7 +180,7 @@ void xwbmpaop_c0all(xwbmp_a * bmp, xwsq_t num)
 }
 
 /**
- * @} xwbmpaop
+ * @} xwos_lib_xwbmpaop
  */
 
 #endif /* xwos/lib/xwbmpaop.h */

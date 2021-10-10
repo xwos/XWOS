@@ -18,7 +18,8 @@
 #include <xwos/mm/common.h>
 
 /**
- * @defgroup xwobj XWOS的对象
+ * @defgroup xwos_lib_xwobj XWOS的对象
+ * @ingroup xwos_lib
  * @{
  */
 
@@ -77,7 +78,7 @@ xwer_t xwos_object_rawput(struct xwos_object * obj);
 xwsq_t xwos_object_get_refcnt(struct xwos_object * obj);
 
 /**
- * @} xwobj
+ * @} xwos_lib_xwobj
  */
 
 #endif /* xwos/lib/object.h */

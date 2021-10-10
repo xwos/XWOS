@@ -18,7 +18,8 @@
 #include <xwos/osal/sync/sel.h>
 
 /**
- * @defgroup xwos_flg 事件标志
+ * @defgroup xwos_sync_flg 事件标志
+ * @ingroup xwos_sync
  * @{
  */
 
@@ -43,7 +44,7 @@ typedef struct {
 #define XWOS_FLG_NILD ((xwos_flg_d){NULL, 0,})
 
 /**
- * @defgroup xwos_flg_trigger_em
+ * @defgroup xwos_flg_trigger_em 事件标志触发条件枚举
  * @{
  */
 
@@ -79,7 +80,7 @@ typedef struct {
  */
 
 /**
- * @defgroup xwos_flg_action_em
+ * @defgroup xwos_flg_action_em 事件标志触发后操作枚举
  * @{
  */
 /**
@@ -629,7 +630,7 @@ xwer_t xwos_flg_timedwait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
 }
 
 /**
- * @} xwos_flg
+ * @} xwos_sync_flg
  */
 
 #endif /* xwos/osal/sync/flg.h */

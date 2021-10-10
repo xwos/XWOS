@@ -20,6 +20,12 @@
 #include <xwos/osal/sync/sel.h>
 
 /**
+ * @defgroup xwmd_isc_xwcq 循环队列
+ * @ingroup xwmd_isc
+ * @{
+ */
+
+/**
  * @breif 定义循环队列缓冲区
  * @param[in] name: 变量名称
  * @param[in] slotsize: 数据槽的大小
@@ -69,5 +75,9 @@ xwer_t xwcq_get_size(struct xwcq * cq, xwsz_t * szbuf);
 xwer_t xwcq_tst_empty(struct xwcq * cq, bool * emptybuf);
 xwer_t xwcq_bind(struct xwcq * cq, struct xwos_sel * sel, xwsq_t pos);
 xwer_t xwcq_unbind(struct xwcq * cq, struct xwos_sel * sel);
+
+/**
+ * @} xwmd_isc_xwcq
+ */
 
 #endif /* xwmd/isc/xwcq/mif.h */

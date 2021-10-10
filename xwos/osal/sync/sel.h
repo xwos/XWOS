@@ -17,7 +17,8 @@
 #include <xwos/osal/jack/sync/sel.h>
 
 /**
- * @defgroup xwos_sel 信号选择器
+ * @defgroup xwos_sync_sel 信号选择器
+ * @ingroup xwos_sync
  * @{
  */
 
@@ -368,7 +369,7 @@ xwer_t xwos_sel_timedselect(struct xwos_sel * sel,
 }
 
 /**
- * @} xwos_sel
+ * @} xwos_sync_sel
  */
 
 #endif /* xwos/osal/sync/sel.h */

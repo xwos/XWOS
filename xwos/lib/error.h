@@ -16,14 +16,21 @@
 #include <xwos/lib/type.h>
 
 /**
- * @defgroup error 错误
+ * @defgroup xwos_lib_error 错误
+ * @ingroup xwos_lib
  * @{
  */
 
 #include <xwos/lib/errno.h>
 
+/**
+ * @brief 错误码的最大值
+ */
 #define MAX_ERRNO       4095
 
+/**
+ * @brief 判断指针的数值是否为错误码
+ */
 #define IS_ERR_VALUE(x) (((xwptr_t)(x)) >= (xwptr_t)(-MAX_ERRNO))
 
 /**
@@ -73,7 +80,7 @@ bool __xwcc_must_check is_err_or_null(const void * ptr)
 }
 
 /**
- * @} error
+ * @} xwos_lib_error
  */
 
 #endif /* xwos/lib/error.h */

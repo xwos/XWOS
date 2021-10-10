@@ -17,6 +17,7 @@
 
 /**
  * @defgroup xwmm_kma 内核内存分配器
+ * @ingroup xwmm
  * @{
  */
 

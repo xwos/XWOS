@@ -16,7 +16,8 @@
 #include <xwos/standard.h>
 
 /**
- * @defgroup xwbop 位操作
+ * @defgroup xwos_lib_xwbop 位操作
+ * @ingroup xwos_lib
  * @{
  */
 
@@ -693,7 +694,7 @@ xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t num);
 xwsz_t xwbmpop_weight(xwbmp_t * bmp, xwsz_t num);
 
 /**
- * @} xwbop
+ * @} xwos_lib_xwbop
  */
 
 #endif /* xwos/lib/xwbop.h */

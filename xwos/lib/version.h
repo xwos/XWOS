@@ -18,25 +18,35 @@
 #endif
 
 /**
- * @defgroup XWOS_Version XWOS的版本号
+ * @defgroup xwos_lib_version XWOS的版本号
+ * @ingroup xwos_lib
  * @{
  */
 /**
- * @page XWOS_Version_Page XWOS的版本号
+ * @page xwos_version_page XWOS的版本号
  * #### 版本号规则: M.m.r
  *   - M: 大版本号
  *   - m: 小版本号
  *     + 奇数：开发版
  *     + 偶数：稳定版
- *   - r: 修正号
+ *   - r: 修订号
  */
 
+/**
+ * @brief XWOS的大版本号
+ */
 #define XWOS_VERSION_MAJOR              2
+/**
+ * @brief XWOS的小版本号
+ */
 #define XWOS_VERSION_MINOR              0
+/**
+ * @brief XWOS的修订号
+ */
 #define XWOS_VERSION_REVISION           0
 
 /**
- * @brief XWOS的版本阶段
+ * @brief XWOS的版本开发阶段
  */
 #define XWOS_VERSION_PHASE              alpha
 
@@ -61,7 +71,7 @@
         "  Copyright (C) 2015 xwos.tech, All Rights Reserved."
 
 /**
- * @} XWOS_Version
+ * @} xwos_lib_version
  */
 
 #endif /* xwos/lib/version.h */

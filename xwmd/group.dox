@@ -1,0 +1,8 @@
+/**
+ * @defgroup xwmd XWOS中间件
+ */
+
+/**
+ * @defgroup xwmd_isc XWOS的通讯机制
+ * @ingroup xwmd
+ */

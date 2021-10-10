@@ -16,7 +16,8 @@
 #include <cfg/XuanWuOS.h>
 
 /**
- * @defgroup compiler 编译器
+ * @defgroup xwos_lib_compiler 编译器
+ * @ingroup xwos_lib
  * + 段说明
  *   - __xwos_init_*
  *     - code: XWOS初始化阶段的代码
@@ -47,10 +48,92 @@
  *     - isr: BSP中的中断函数
  *     - rodata: BSP中的const数据
  *     - data: BSP中的数据
+ *   - __image_description:
+ *   - __image_tail:
  * @{
  */
 
 #include <xwos/ospl/soc/compiler.h>
+
+#ifndef __xwcc_section
+#  define __xwcc_section(s)
+#endif
+#ifndef __xwcc_aligned
+#  define __xwcc_aligned(x) __attribute__((aligned(x)))
+#endif
+#ifndef __xwcc_weak
+#  define __xwcc_weak __attribute__((weak))
+#endif
+#ifndef __xwcc_weakref
+#  define __xwcc_weakref(x) __attribute__((weakref(s)))
+#endif
+#ifndef __xwcc_alias
+#  define __xwcc_alias(s) __attribute__((alias(s)))
+#endif
+#ifndef __xwcc_weakalias
+#  define __xwcc_weakalias(s) __attribute__((weak, alias(s)))
+#endif
+#ifndef __xwcc_inline
+#  define __xwcc_inline inline
+#endif
+#ifndef __xwcc_pure
+#  define __xwcc_pure
+#endif
+#ifndef __xwcc_packed
+#  define __xwcc_packed __attribute__((packed))
+#endif
+#ifndef __xwcc_must_check
+#  define __xwcc_must_check __attribute__((warn_unused_result))
+#endif
+#ifndef __xwcc_naked
+#define __xwcc_naked __attribute__((naked))
+#endif
+#ifndef __xwcc_unused
+#  define __xwcc_unused __attribute__((unused))
+#endif
+#ifndef __xwcc_used
+#  define __xwcc_used __attribute__((used))
+#endif
+#ifndef __xwcc_hot
+#  define __xwcc_hot __attribute__((hot))
+#endif
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#  ifndef __xwcc_atomic
+#    define __xwcc_atomic _Atomic
+#  endif
+#  ifndef __xwcc_noreturn
+#    define __xwcc_noreturn _Noreturn
+#  endif
+#else
+#  ifndef __xwcc_atomic
+#    define __xwcc_atomic volatile
+#  endif
+#  ifndef __xwcc_noreturn
+#    define __xwcc_noreturn __attribute__((noreturn))
+#  endif
+#endif
+#ifndef __xwcc_likely
+#  define __xwcc_likely(x) __builtin_expect(!!(x), 1)
+#endif
+#ifndef __xwcc_unlikely
+#  define __xwcc_unlikely(x) __builtin_expect(!!(x), 0)
+#endif
+#ifndef __xwcc_alignl1cache
+#  if defined(CPUCFG_L1_CACHELINE_SIZE)
+#    define __xwcc_alignl1cache   __xwcc_aligned(CPUCFG_L1_CACHELINE_SIZE)
+#  else
+#    define __xwcc_alignl1cache   __xwcc_aligned(sizeof(void *))
+#  endif
+#endif
+#ifndef __xwcc_alignptr
+#  define __xwcc_alignptr __xwcc_aligned(sizeof(void *))
+#endif
+#ifndef __xwcc_warning
+#  define __xwcc_warning(message) __attribute__((warning(message)))
+#endif
+#ifndef __xwcc_error
+#  define __xwcc_error(message) __attribute__((error(message)))
+#endif
 
 #ifndef __xwos_init_code
 #  define __xwos_init_code
@@ -102,6 +185,14 @@
 
 #ifndef __xwos_data
 #  define __xwos_data
+#endif
+
+#ifndef __image_description
+#  define __image_description
+#endif
+
+#ifndef __image_tail
+#  define __image_tail
 #endif
 
 #ifndef __xwlib_code
@@ -357,12 +448,53 @@
  */
 #define xwmb_write(t, p, v)     (*(volatile t * )(p)) = (v)
 
+#ifndef xwccmb
+/**
+ * @brief 编译器内存屏障
+ */
+#  define xwccmb()
+#endif
+
+#ifndef xwmb_mp_mb
+/**
+ * @brief 多核系统内存屏障
+ */
+#  define xwmb_mp_mb()
+#endif
+
+#ifndef xwmb_mp_rmb
+/**
+ * @brief 多核系统读内存屏障
+ */
+#  define xwmb_mp_rmb()
+#endif
+
+#ifndef xwmb_mp_wmb
+/**
+ * @brief 多核写内存屏障
+ */
+#  define xwmb_mp_wmb()
+#endif
+
+#ifndef xwmb_mp_ddb
+/**
+ * @brief 多核系统数据依赖屏障
+ */
+#  define xwmb_mp_ddb()
+#endif
+
 /******** ******** MP primitives ******** ********/
 #ifndef xwmb_mp_load_acquire_mb
+/**
+ * @brief 多核系统“加载-获取”屏障
+ */
 #  define xwmb_mp_load_acquire_mb()     xwmb_mp_mb()
 #endif
 
 #ifndef xwmb_mp_store_release_mb
+/**
+ * @brief 多核系统“存储-释放”屏障
+ */
 #  define xwmb_mp_store_release_mb()    xwmb_mp_mb()
 #endif
 
@@ -537,7 +669,7 @@
 #endif
 
 /**
- * @} compiler
+ * @} xwos_lib_compiler
  */
 
 #endif /* xwos/lib/compiler.h */

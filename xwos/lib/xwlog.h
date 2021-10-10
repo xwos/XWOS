@@ -16,7 +16,8 @@
 #include <xwos/standard.h>
 
 /**
- * @defgroup xwlog 日志
+ * @defgroup xwos_lib_xwlog 日志
+ * @ingroup xwos_lib
  * @{
  */
 
@@ -103,7 +104,7 @@ int xwpf(const char * fmt, ...)
 #define xwlogf(lv, tag, fmt, ...) XWLOGF_##lv(tag, fmt, ##__VA_ARGS__)
 
 /**
- * @} xwlogf
+ * @} xwos_lib_xwlog
  */
 
 #endif /* xwos/lib/xwlog.h */

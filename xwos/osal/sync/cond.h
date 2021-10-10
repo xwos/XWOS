@@ -19,7 +19,8 @@
 #include <xwos/osal/lock/mtx.h>
 
 /**
- * @defgroup xwos_cond 条件量
+ * @defgroup xwos_sync_cond 条件量
+ * @ingroup xwos_sync
  * @{
  */
 
@@ -416,7 +417,7 @@ xwer_t xwos_cond_timedwait(struct xwos_cond * cond,
 }
 
 /**
- * @} xwos_cond
+ * @} xwos_sync_cond
  */
 
 #endif /* xwos/osal/sync/cond.h */

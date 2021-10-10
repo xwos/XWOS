@@ -18,6 +18,7 @@
 
 /**
  * @defgroup xwmm_mempool 内存池分配器
+ * @ingroup xwmm
  * 此算法是在所有上下文（线程、中断、中断底半部）都是安全的。
  * @{
  */

@@ -18,7 +18,8 @@
 #include <xwos/osal/skd.h>
 
 /**
- * @defgroup xwos_mtx 互斥锁
+ * @defgroup xwos_lock_mtx 互斥锁
+ * @ingroup xwos_lock
  * @{
  */
 
@@ -340,7 +341,7 @@ xwer_t xwos_mtx_getlkst(struct xwos_mtx * mtx, xwsq_t * lkst)
 }
 
 /**
- * @} xwos_mtx
+ * @} xwos_lock_mtx
  */
 
 #endif /* xwos/osal/lock/mtx.h */

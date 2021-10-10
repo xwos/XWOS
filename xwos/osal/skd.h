@@ -17,7 +17,8 @@
 #include <xwos/osal/jack/skd.h>
 
 /**
- * @defgroup xwos_skd 调度
+ * @defgroup xwos_skd 线程与调度
+ * @ingroup xwos
  * @{
  */
 

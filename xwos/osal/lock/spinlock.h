@@ -18,7 +18,8 @@
 #include <xwos/osal/irq.h>
 
 /**
- * @defgroup xwos_spinlock 自旋锁
+ * @defgroup xwos_lock_spinlock 自旋锁
+ * @ingroup xwos_lock
  * @{
  */
 
@@ -380,7 +381,7 @@ void xwos_splk_unlock_bh(struct xwos_splk * spl)
 }
 
 /**
- * @} xwos_spinlock
+ * @} xwos_lock_spinlock
  */
 
 #endif /* xwos/osal/lock/spinlock.h */

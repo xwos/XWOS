@@ -1,0 +1,11 @@
+/**
+ * @defgroup xwos XWOS内核
+ */
+
+/**
+ * @defgroup xwos_sync XWOS的同步机制
+ */
+
+/**
+ * @defgroup xwos_lock XWOS的锁
+ */

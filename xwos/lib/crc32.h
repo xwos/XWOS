@@ -16,7 +16,8 @@
 #include <xwos/standard.h>
 
 /**
- * @defgroup CRC32 CRC32
+ * @defgroup xwos_lib_crc32 CRC32
+ * @ingroup xwos_lib
  * @{
  */
 
@@ -35,7 +36,7 @@ xwer_t xwlib_crc32_cal(xwu32_t * crc32, xwu32_t xorout,
 xwu32_t xwlib_crc32_calms(const xwu8_t stream[], xwsz_t * size);
 
 /**
- * @} CRC32
+ * @} xwos_lib_crc32
  */
 
 #endif /* xwos/lib/crc32.h */

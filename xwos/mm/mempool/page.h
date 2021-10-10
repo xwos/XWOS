@@ -21,6 +21,7 @@
 
 /**
  * @defgroup xwmm_mempool 内存池分配器
+ * @ingroup xwmm
  * @{
  */
 

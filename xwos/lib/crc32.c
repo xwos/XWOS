@@ -16,7 +16,7 @@
 
 #if defined(XWLIBCFG_CRC32_0X04C11DB7) && (1 == XWLIBCFG_CRC32_0X04C11DB7)
 /**
- * @brief 多项式0x04C11DB7的查询表
+ * @brief CRC32多项式0x04C11DB7的查询表
  */
 __xwlib_rodata const xwu32_t xwlib_crc32tbl_0x04c11db7[256] = {
         [0] = 0x0,
@@ -280,7 +280,7 @@ __xwlib_rodata const xwu32_t xwlib_crc32tbl_0x04c11db7[256] = {
 
 #if defined(XWLIBCFG_CRC32_0XEDB88320) && (1 == XWLIBCFG_CRC32_0XEDB88320)
 /**
- * @brief 多项式0XEDB88320的查询表
+ * @brief CRC32多项式0XEDB88320的查询表
  */
 __xwlib_rodata const xwu32_t xwlib_crc32tbl_0xedb88320[256] = {
         [0] = 0x0,
@@ -703,7 +703,9 @@ xwer_t xwlib_crc32_swcal(xwu32_t * crc32,
  * @param[in] xorout: 与结果异或的值
  * @param[in] refin: 是否按位镜像翻转输入的每个字节(xwbop_rbit8)
  * @param[in] refout: 是否按位镜像翻转输出(xwbop_rbit32)
- * @param[in] plynml: 多项式
+ * @param[in] plynml: 多项式，取值：
+ *   @arg 0x04C11DB7
+ *   @arg 0xEDB88320
  * @param[in] direction: 数据移位的方向
  * @param[in] stream: 指向数据的指针
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：

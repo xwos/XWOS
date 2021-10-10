@@ -16,7 +16,8 @@
 #include <xwos/standard.h>
 
 /**
- * @defgroup xwaop 原子操作
+ * @defgroup xwos_lib_xwaop 原子操作
+ * @ingroup xwos_lib
  * @{
  */
 
@@ -26,7 +27,7 @@
 #include <xwos/ospl/soc/xwaop64.h>
 
 /**
- * @brief 调用原子操作
+ * @brief 调用原子操作函数
  * @param[in] type: 原子变量的类型
  * @param[in] op: 操作函数
  * @param[in] memorder: 内存顺序
@@ -2303,7 +2304,7 @@ DEFINE_XWAOP(xwbmp, xwu64)
 DEFINE_XWAOP(xwtm, xws64)
 
 /**
- * @} xwaop
+ * @} xwos_lib_xwaop
  */
 
 #endif /* xwos/lib/xwaop.h */

@@ -21,7 +21,8 @@
 #include <xwos/lib/bclst.h>
 
 /**
- * @defgroup map 键值对容器
+ * @defgroup xwos_lib_map 键值对容器
+ * @ingroup xwos_lib
  * @{
  */
 
@@ -38,7 +39,7 @@ struct __xwcc_alignptr xwlib_map_container {
 /**
  * @brief 键比较函数类型
  */
-typedef xwssq_t (*xwlib_map_cmp_f)(void *, void *);
+typedef xwssq_t (* xwlib_map_cmp_f)(void *, void *);
 
 /**
  * @brief 键值对集合
@@ -123,7 +124,7 @@ xwer_t xwlib_map_find(struct xwlib_map * m, void * key,
                       struct xwlib_map_container ** mcbuf);
 
 /**
- * @} map
+ * @} xwos_lib_map
  */
 
 #endif /* xwos/lib/map.h */

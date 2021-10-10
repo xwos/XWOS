@@ -18,7 +18,8 @@
 #include <xwos/osal/irq.h>
 
 /**
- * @defgroup xwos_seqlock 顺序锁
+ * @defgroup xwos_lock_seqlock 顺序锁
+ * @ingroup xwos_lock
  * @{
  */
 
@@ -774,7 +775,7 @@ void xwos_sqlk_wr_unlock_bh(struct xwos_sqlk * sql)
 }
 
 /**
- * @} xwos_seqlock
+ * @} xwos_lock_seqlock
  */
 
 #endif /* xwos/osal/lock/seqlock.h */

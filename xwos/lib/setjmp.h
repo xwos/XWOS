@@ -16,7 +16,8 @@
 #include <xwos/standard.h>
 
 /**
- * @defgroup setjmp setjmp/longjmp
+ * @defgroup xwos_lib_longjmp setjmp/longjmp
+ * @ingroup xwos_lib
  * @{
  */
 
@@ -49,7 +50,7 @@ typedef jmp_buf xwjmpbuf_b;
 #endif
 
 /**
- * @} setjmp
+ * @} xwos_lib_longjmp
  */
 
 #endif /* xwos/lib/setjmp.h */

@@ -15,6 +15,12 @@
 
 #include <xwos/standard.h>
 
+/**
+ * @defgroup xwmd_isc_xwpcp 点对点通讯协议
+ * @ingroup xwmd_isc
+ * @{
+ */
+
 #if (XWMDCFG_isc_xwpcp_MEMBLK_SIZE & (XWMDCFG_isc_xwpcp_MEMBLK_SIZE - 1))
 #  error "XWMDCFG_isc_xwpcp_MEMBLK_SIZE must be the power of 2!"
 #endif
@@ -107,5 +113,9 @@ xwer_t xwpcp_rx(struct xwpcp * xwpcp, xwu8_t port,
                 xwtm_t * xwtm);
 xwer_t xwpcp_try_rx(struct xwpcp * xwpcp, xwu8_t port,
                     xwu8_t rxbuf[], xwsz_t * size, xwu8_t * qos);
+
+/**
+ * @} xwmd_isc_xwpcp
+ */
 
 #endif /* xwmd/isc/xwpcp/mif.h */

@@ -18,7 +18,8 @@
 #include <xwos/osal/sync/sel.h>
 
 /**
- * @defgroup xwos_br 线程栅栏
+ * @defgroup xwos_sync_br 线程栅栏
+ * @ingroup xwos_sync
  * @{
  */
 
@@ -346,7 +347,7 @@ xwer_t xwos_br_timedwait(struct xwos_br * br, xwtm_t * xwtm)
 }
 
 /**
- * @} xwos_br
+ * @} xwos_sync_br
  */
 
 #endif /* xwos/osal/sync/br.h */
