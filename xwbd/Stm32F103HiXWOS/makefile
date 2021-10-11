@@ -18,11 +18,11 @@
 # > limitations under the License.
 #
 
-XuanWuOS ?= ../..
+XWOS ?= ../..
 WKSPC ?= wkspc
 TARGET ?= XWOS
 
-MKCFG := ${XuanWuOS}/xwbs/util/el/mkcfg.el
+MKCFG := ${XWOS}/xwbs/util/el/mkcfg.el
 
 ifeq ($(FMW),y)
     BDL_LDFLAGS = -Wl,--defsym=fmw=0x0800C000
@@ -48,7 +48,7 @@ cfg: $(WKSPC) $(WKSPC)/XuanWuOS.cfg
 
 $(WKSPC)/XuanWuOS.cfg: cfg/*.h
 	@[ -x ${MKCFG} ] || chmod +x ${MKCFG}
-	@${MKCFG} --XuanWuOS=$(XuanWuOS) --cfgdir=cfg --wkspc=$(WKSPC) -- $(@F)
+	@${MKCFG} --XWOS=$(XWOS) --cfgdir=cfg --wkspc=$(WKSPC) -- $(@F)
 
 dbgcfg: cfg/dbg/debug.gdb cfg/dbg/program.gdb cfg/dbg/erase.gdb
 

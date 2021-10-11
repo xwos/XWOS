@@ -18,11 +18,11 @@
 # > limitations under the License.
 #
 
-XuanWuOS ?= ../..
+XWOS ?= ../..
 WKSPC ?= wkspc
 TARGET ?= XWOS
 
-MKCFG := ${XuanWuOS}/xwbs/util/el/mkcfg.el
+MKCFG := ${XWOS}/xwbs/util/el/mkcfg.el
 
 all: $(WKSPC) cfg
 	$(MAKE) -C $(WKSPC) TARGET=$(TARGET)
@@ -34,7 +34,7 @@ cfg: $(WKSPC) $(WKSPC)/XuanWuOS.cfg
 
 $(WKSPC)/XuanWuOS.cfg: cfg/*.h
 	@[ -x ${MKCFG} ] || chmod +x ${MKCFG}
-	@${MKCFG} --XuanWuOS=$(XuanWuOS) --cfgdir=cfg --wkspc=$(WKSPC) -- $(@F)
+	@${MKCFG} --XWOS=$(XWOS) --cfgdir=cfg --wkspc=$(WKSPC) -- $(@F)
 
 c clean: cfg
 	$(MAKE) -C $(WKSPC) TARGET=$(TARGET) NODEP=y clean

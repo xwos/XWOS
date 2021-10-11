@@ -73,6 +73,7 @@
 (defvar opt-minor nil "increase minor")
 (defvar opt-revision nil "increase revision")
 (defvar opt-phase "alpha" "version phase")
+(defvar opt-phase-p nil "Is version phase setting?")
 (defvar opt-reset nil "Reset change")
 ;;(logi "argv:%s" argv)
 
@@ -99,10 +100,15 @@
        ;; -p foo
        ;; --phase foo
        ;; --phase=foo
-       ((string= option "--phase") (setq opt-phase (pop argv)))
-       ((string= option "-p") (setq opt-phase (pop argv)))
+       ((string= option "--phase")
+        (setq opt-phase (pop argv))
+        (setq opt-phase-p t))
+       ((string= option "-p")
+        (setq opt-phase (pop argv))
+        (setq opt-phase-p t))
        ((string-match "\\`--phase=\\(\\(?:.\\|\n\\)*\\)\\'" option)
-        (setq opt-phase (match-string 1 option)))
+        (setq opt-phase (match-string 1 option))
+        (setq opt-phase-p t))
        ;; -r
        ;; --reset
        ((string= option "--reset") (setq opt-reset t))
@@ -290,7 +296,23 @@
       (call-process "git" nil nil nil "add" XWOS-version-file)
       (call-process "git" nil nil nil "commit" "-m" (concat "revision: :bookmark: XWOS-V" vstr))
       (call-process "git" nil nil nil "tag" "-a" "-m" (concat "XWOS-V" vstr) (concat "XWOS-V" vstr))
-      (logi "update version: V%s" vstr)))))
+      (logi "update version: V%s" vstr))
+     (opt-phase-p ;; case opt-phase-p
+      (setq XWOS-version-phase opt-phase)
+      (setq vstr (concat XWOS-version-major "."
+                         XWOS-version-minor "."
+                         XWOS-version-revision))
+      (set-buffer version-file-buffer)
+      (set-buffer-multibyte t)
+      (goto-char (point-min))
+      (while (re-search-forward
+              "^\\(#define[ \t]+XWOS_VERSION_PHASE[ \t]+\\)\\(.+\\)"
+              nil t)
+        (replace-match (concat "\\1" XWOS-version-phase)))
+      (save-buffer)
+      (call-process "git" nil nil nil "add" XWOS-version-file)
+      (call-process "git" nil nil nil "commit" "-m" (concat opt-phase ": :bookmark: XWOS-V" vstr))
+      (logi "update phase: %s" XWOS-version-phase)))))
 
 ;;;;;;;; ;;;;;;;; ;;;;;;;; exit ;;;;;;;; ;;;;;;;; ;;;;;;;;
 (kill-emacs 0)
