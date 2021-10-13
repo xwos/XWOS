@@ -122,8 +122,8 @@ xwer_t stm32cube_xwds_stop(void)
 
 err_st7735_stop:
 err_w25q64jv_stop:
-err_uart_stop:
 err_spi_stop:
+err_uart_stop:
         return rc;
 }
 
