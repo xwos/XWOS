@@ -48,7 +48,7 @@
 /**
  * @brief XWOS的版本开发阶段
  */
-#define XWOS_VERSION_PHASE              alpha
+#define XWOS_VERSION_PHASE              beta
 
 /**
  * @brief XWOS的版本号（数值形式）
