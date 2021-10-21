@@ -296,7 +296,7 @@ void xwos_cpuirq_disable_lc(void)
 
 /**
  * @brief XWOS API：恢复本地CPU的中断
- * @param[in] flag: 本地CPU的中断开关
+ * @param[in] cpuirq: 本地CPU的中断开关
  */
 static __xwos_inline_api
 void xwos_cpuirq_restore_lc(xwreg_t cpuirq)
@@ -306,7 +306,7 @@ void xwos_cpuirq_restore_lc(xwreg_t cpuirq)
 
 /**
  * @brief XWOS API：保存然后关闭本地CPU的中断
- * @param[out] flag: 指向缓冲区的指针，此缓冲区用于返回本地CPU的中断开关
+ * @param[out] cpuirq: 指向缓冲区的指针，此缓冲区用于返回本地CPU的中断开关
  */
 static __xwos_inline_api
 void xwos_cpuirq_save_lc(xwreg_t * cpuirq)

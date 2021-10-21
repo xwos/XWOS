@@ -262,7 +262,7 @@ struct xwos_irq_resource {
 };
 
 /**
- * @breif XWOS的锁类型枚举
+ * @brief XWOS的锁类型枚举
  */
 enum xwos_lock_type_em {
         XWOS_LK_NONE, /**< 无 */
@@ -276,7 +276,7 @@ enum xwos_lock_type_em {
 };
 
 /**
- * @breif 类型为XWOS_LK_CALLBACK时的抽象锁函数
+ * @brief 类型为XWOS_LK_CALLBACK时的抽象锁函数
  */
 struct xwos_cblk {
         xwer_t (* lock)(void * /*arg*/); /**< 加锁函数 */
@@ -284,7 +284,7 @@ struct xwos_cblk {
 };
 
 /**
- * @breif XWOS锁状态
+ * @brief XWOS锁状态
  */
 enum xwos_lkst_em {
         XWOS_LKST_LOCKED = 0, /**< 锁定 */
@@ -302,7 +302,7 @@ struct xwmp_splk;
 struct xwmp_sqlk;
 
 /**
- * @breif 所有锁的联合
+ * @brief 所有锁的联合
  * @note
  * - 此联合只是一个指针数值，使用联合是为了避免强制类型转换。
  */

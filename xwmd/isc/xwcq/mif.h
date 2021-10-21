@@ -26,7 +26,7 @@
  */
 
 /**
- * @breif 定义循环队列缓冲区
+ * @brief 定义循环队列缓冲区
  * @param[in] name: 变量名称
  * @param[in] slotsize: 数据槽的大小
  * @param[in] slotnum: 数据槽的个数
@@ -35,7 +35,7 @@
         __xwcc_alignl1cache xwu8_t name[(slotsize) * (slotnum)]
 
 /**
- * @breif 循环队列对象
+ * @brief 循环队列对象
  */
 struct xwcq {
         struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */

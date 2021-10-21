@@ -30,7 +30,7 @@ struct w25qrpt;
 struct w25qrpt_msg;
 
 /**
- * @breif 硬件接口抽象层操作函数集
+ * @brief 硬件接口抽象层操作函数集
  */
 struct w25qrpt_hwifal_operations {
         xwer_t (* open)(struct w25qrpt *); /**< 打开硬件接口 */
@@ -45,7 +45,7 @@ struct w25qrpt_hwifal_operations {
 };
 
 /**
- * @breif 硬件接口状态
+ * @brief 硬件接口状态
  */
 enum w25qrpt_hwifal_state_em {
         W25QRPT_HWIFST_CLOSED, /**< 硬件接口已经关闭 */

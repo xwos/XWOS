@@ -25,7 +25,7 @@ struct xwscp;
 union xwscp_slot;
 
 /**
- * @breif 硬件接口抽象层操作函数集
+ * @brief 硬件接口抽象层操作函数集
  */
 struct xwscp_hwifal_operations {
         xwer_t (* open)(struct xwscp *); /**< 打开硬件接口 */

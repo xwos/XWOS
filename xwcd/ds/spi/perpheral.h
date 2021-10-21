@@ -29,14 +29,14 @@
 struct xwds_spip;
 
 /**
- * @breif BSP中需要提供的SPI外设控制器驱动函数表
+ * @brief BSP中需要提供的SPI外设控制器驱动函数表
  */
 struct xwds_spip_driver {
         struct xwds_driver base; /**< C语言面向对象：继承struct xwds_driver */
 };
 
 /**
- * @breif SPI外设控制器
+ * @brief SPI外设控制器
  */
 struct xwds_spip {
         struct xwds_device dev; /**< 继承struct xwds_device */

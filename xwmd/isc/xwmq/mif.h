@@ -26,7 +26,7 @@
  */
 
 /**
- * @breif 消息队列对象
+ * @brief 消息队列对象
  */
 struct xwmq {
         struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
@@ -37,7 +37,7 @@ struct xwmq {
 };
 
 /**
- * @breif XWMQ消息对象
+ * @brief XWMQ消息对象
  */
 struct xwmq_msg {
         struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */

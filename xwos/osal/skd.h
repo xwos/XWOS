@@ -303,7 +303,7 @@ void xwos_skd_enpmpt_lc(void)
  *   例如ARM，就需要8字节对齐。因此在定义栈数组时需要使用__xwcc_aligned(8)来修饰，
  *   且大小是8的倍数。
  * - attr参数的作用由OS而决定，在XWOS中，它的作用是设置线程的一些属性，取值为
- *   @ref xwos_skdattr_em中的一项。
+ *   @ref xwos_skdattr_em 中的一项。
  *   attr参数的类型是xwsq_t，此类型定义成与指针一样长，因此也可传递一个指针。
  */
 static __xwos_inline_api
@@ -322,7 +322,7 @@ xwer_t xwos_thd_init(struct xwos_thd * thd,
 
 /**
  * @brief XWOS API：动态方式创建线程并初始化
- * @param[out] thd: 指向缓冲区的指针，通过此缓冲区返回线程对象的指针
+ * @param[out] thdbuf: 指向缓冲区的指针，通过此缓冲区返回线程对象的指针
  * @param[in] name: 线程的名字
  * @param[in] mainfunc: 线程函数的指针
  * @param[in] arg: 线程函数的参数

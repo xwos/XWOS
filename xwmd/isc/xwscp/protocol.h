@@ -51,9 +51,7 @@
                                  XWSCP_FRMHEAD_SIZE((slot)->frm.head.headsize) - \
                                  XWSCP_CRC32_SIZE - XWSCP_SOF_SIZE - XWSCP_EOF_SIZE)
 #define XWSCP_CRC32_SIZE        (4U)
-
 #define XWSCP_SDU_MAX_SIZE      (XWSCP_MEMPOOL_SIZE / 8)
-#define XWSCP_FRM_MINSIZE       (sizeof(struct xwscp_frmhead) + 1 + XWSCP_CRC32_SIZE)
 
 /**
  * @brief 调试XWSCP的日志函数
@@ -142,7 +140,7 @@ union __xwcc_aligned(XWMM_ALIGNMENT) xwscp_slot {
 };
 
 /**
- * @breif XWSCP对象
+ * @brief XWSCP对象
  */
 struct xwscp {
         /* 基本信息 */

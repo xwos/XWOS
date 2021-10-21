@@ -126,7 +126,6 @@ xwer_t xwos_flg_init(struct xwos_flg * flg, xwsz_t num,
 /**
  * @brief XWOS API：销毁静态方式初始化的事件标志对象
  * @param[in] flg: 事件标志对象的指针
- * @param[in] num: 事件标志中的事件数量
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -498,20 +497,20 @@ xwer_t xwos_flg_read(struct xwos_flg * flg, xwbmp_t out[])
  *   @arg XWOS_FLG_TRIGGER_TGL_ALL: 掩码中的所有位同时发生翻转
  *   @arg XWOS_FLG_TRIGGER_TGL_ANY: 掩码中的任意位发生翻转
  * @param[in] action: 事件触发后的动作，
- * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL，
- *   或@ref XWOS_FLG_TRIGGER_SET_ANY，或@ref XWOS_FLG_TRIGGER_CLR_ALL，
- *   或@ref XWOS_FLG_TRIGGER_CLR_ANY时有效，取值：
+ * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL ，
+ *   或@ref XWOS_FLG_TRIGGER_SET_ANY ，或@ref XWOS_FLG_TRIGGER_CLR_ALL ，
+ *   或@ref XWOS_FLG_TRIGGER_CLR_ANY 时有效，取值：
  *   @arg XWOS_FLG_ACTION_CONSUMPTION: 消费事件
  *   @arg XWOS_FLG_ACTION_NOME: 无操作
- * + 当@ref trigger为@ref XWOS_FLG_TRIGGER_TGL_ALL， 或@ref XWOS_FLG_TRIGGER_TGL_ANY时，
+ * + 当trigger为@ref XWOS_FLG_TRIGGER_TGL_ALL ，或@ref XWOS_FLG_TRIGGER_TGL_ANY 时，
  *   此参数没有用，可填：
  *   @arg XWOS_UNUSED_ARGUMENT
  * @param[in,out] origin: 指向缓冲区的指针：
- * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL，
- *   或@ref XWOS_FLG_TRIGGER_SET_ANY，或@ref XWOS_FLG_TRIGGER_CLR_ALL，
- *   或@ref XWOS_FLG_TRIGGER_CLR_ANY时
+ * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL ，
+ *   或@ref XWOS_FLG_TRIGGER_SET_ANY ，或@ref XWOS_FLG_TRIGGER_CLR_ALL ，
+ *   或@ref XWOS_FLG_TRIGGER_CLR_ANY 时
  *   - (O) 返回触发时事件对象中位图状态（action之前）
- * + 当@ref trigger为XWOS_FLG_TRIGGER_TGL_ALL，或@ref XWOS_FLG_TRIGGER_TGL_ANY时
+ * + 当trigger为@ref XWOS_FLG_TRIGGER_TGL_ALL ，或@ref XWOS_FLG_TRIGGER_TGL_ANY 时
  *   - (I) 作为输入时，作为用于比较的初始值
  *   - (O) 作为输出时，返回事件对象中位图状态（可作为下一次调用的初始值）
  * @param[in] msk: 事件的位图掩码，表示只关注掩码部分的事件
@@ -544,20 +543,20 @@ xwer_t xwos_flg_wait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
  *   @arg XWOS_FLG_TRIGGER_TGL_ALL: 掩码中的所有位同时发生翻转
  *   @arg XWOS_FLG_TRIGGER_TGL_ANY: 掩码中的任意位发生翻转
  * @param[in] action: 事件触发后的动作，
- * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL，
- *   或@ref XWOS_FLG_TRIGGER_SET_ANY，或@ref XWOS_FLG_TRIGGER_CLR_ALL，
- *   或@ref XWOS_FLG_TRIGGER_CLR_ANY时有效，取值：
+ * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL ，
+ *   或@ref XWOS_FLG_TRIGGER_SET_ANY ，或@ref XWOS_FLG_TRIGGER_CLR_ALL ，
+ *   或@ref XWOS_FLG_TRIGGER_CLR_ANY 时有效，取值：
  *   @arg XWOS_FLG_ACTION_CONSUMPTION: 消费事件
  *   @arg XWOS_FLG_ACTION_NOME: 无操作
- * + 当@ref trigger为@ref XWOS_FLG_TRIGGER_TGL_ALL， 或@ref XWOS_FLG_TRIGGER_TGL_ANY时，
+ * + 当trigger为@ref XWOS_FLG_TRIGGER_TGL_ALL ，或@ref XWOS_FLG_TRIGGER_TGL_ANY 时，
  *   此参数没有用，可填：
  *   @arg XWOS_UNUSED_ARGUMENT
  * @param[in,out] origin: 指向缓冲区的指针：
- * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL，
- *   或@ref XWOS_FLG_TRIGGER_SET_ANY，或@ref XWOS_FLG_TRIGGER_CLR_ALL，
- *   或@ref XWOS_FLG_TRIGGER_CLR_ANY时
+ * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL ，
+ *   或@ref XWOS_FLG_TRIGGER_SET_ANY ，或@ref XWOS_FLG_TRIGGER_CLR_ALL ，
+ *   或@ref XWOS_FLG_TRIGGER_CLR_ANY 时
  *   - (O) 返回触发时事件对象中位图状态（action之前）
- * + 当@ref trigger为XWOS_FLG_TRIGGER_TGL_ALL，或@ref XWOS_FLG_TRIGGER_TGL_ANY时
+ * + 当trigger为@ref XWOS_FLG_TRIGGER_TGL_ALL ，或@ref XWOS_FLG_TRIGGER_TGL_ANY 时
  *   - (I) 作为输入时，作为用于比较的初始值
  *   - (O) 作为输出时，返回事件对象中位图状态（可作为下一次调用的初始值）
  * @param[in] msk: 事件的位图掩码，表示只关注掩码部分的事件
@@ -589,20 +588,20 @@ xwer_t xwos_flg_trywait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
  *   @arg XWOS_FLG_TRIGGER_TGL_ALL: 掩码中的所有位同时发生翻转
  *   @arg XWOS_FLG_TRIGGER_TGL_ANY: 掩码中的任意位发生翻转
  * @param[in] action: 事件触发后的动作，
- * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL，
- *   或@ref XWOS_FLG_TRIGGER_SET_ANY，或@ref XWOS_FLG_TRIGGER_CLR_ALL，
- *   或@ref XWOS_FLG_TRIGGER_CLR_ANY时有效，取值：
+ * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL ，
+ *   或@ref XWOS_FLG_TRIGGER_SET_ANY ，或@ref XWOS_FLG_TRIGGER_CLR_ALL ，
+ *   或@ref XWOS_FLG_TRIGGER_CLR_ANY 时有效 ，取值：
  *   @arg XWOS_FLG_ACTION_CONSUMPTION: 消费事件
  *   @arg XWOS_FLG_ACTION_NOME: 无操作
- * + 当@ref trigger为@ref XWOS_FLG_TRIGGER_TGL_ALL， 或@ref XWOS_FLG_TRIGGER_TGL_ANY时，
+ * + 当trigger为@ref XWOS_FLG_TRIGGER_TGL_ALL ，或@ref XWOS_FLG_TRIGGER_TGL_ANY 时，
  *   此参数没有用，可填：
  *   @arg XWOS_UNUSED_ARGUMENT
  * @param[in,out] origin: 指向缓冲区的指针：
- * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL，
- *   或@ref XWOS_FLG_TRIGGER_SET_ANY，或@ref XWOS_FLG_TRIGGER_CLR_ALL，
- *   或@ref XWOS_FLG_TRIGGER_CLR_ANY时
+ * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL ，
+ *   或@ref XWOS_FLG_TRIGGER_SET_ANY ，或@ref XWOS_FLG_TRIGGER_CLR_ALL ，
+ *   或@ref XWOS_FLG_TRIGGER_CLR_ANY 时
  *   - (O) 返回触发时事件对象中位图状态（action之前）
- * + 当@ref trigger为XWOS_FLG_TRIGGER_TGL_ALL，或@ref XWOS_FLG_TRIGGER_TGL_ANY时
+ * + 当trigger为XWOS_FLG_TRIGGER_TGL_ALL ，或@ref XWOS_FLG_TRIGGER_TGL_ANY 时
  *   - (I) 作为输入时，作为用于比较的初始值
  *   - (O) 作为输出时，返回事件对象中位图状态（可作为下一次调用的初始值）
  * @param[in] msk: 事件的位图掩码，表示只关注掩码部分的事件

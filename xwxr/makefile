@@ -36,7 +36,7 @@ cfg: $(WKSPC) $(WKSPC)/XuanWuOS.cfg
 
 $(WKSPC)/XuanWuOS.cfg: fakeboard/cfg/*.h
 	@[ -x ${MKCFG} ] || chmod +x ${MKCFG}
-	@${MKCFG} --XuanWuOS=$(XWOS) --cfgdir=$(<D) --wkspc=$(WKSPC) -- $(@F)
+	@${MKCFG} --XWOS=$(XWOS) --cfgdir=$(<D) --wkspc=$(WKSPC) -- $(@F)
 
 c clean d distclean: cfg
 	@rm -rf $(WKSPC)

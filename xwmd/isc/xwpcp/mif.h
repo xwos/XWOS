@@ -34,21 +34,26 @@
 #  error "XWPCP Only supports 64 priorities!"
 #endif
 
-#define XWPCP_VERSION           ("3.0.0")
-#define XWPCP_VERSION_MAJOR     3U
-#define XWPCP_VERSION_MINOR     0U
-#define XWPCP_VERSION_REVISION  0U
+#define XWPCP_VERSION           ("3.0.0") /**< XWPCP的版本号字符串 */
+#define XWPCP_VERSION_MAJOR     3U /**< XWPCP的大版本号 */
+#define XWPCP_VERSION_MINOR     0U /**< XWPCP的小版本号 */
+#define XWPCP_VERSION_REVISION  0U /**< XWPCP的修订版本号 */
 
-#define XWPCP_PRI_NUM           (XWMDCFG_isc_xwpcp_PRI_NUM)
-#define XWPCP_INVALID_PRI       (0xFFU)
-#define XWPCP_MAX_PRI           (XWPCP_PRI_NUM - 1)
-#define XWPCP_PORT_NUM          (XWMDCFG_isc_xwpcp_PORT_NUM)
-#define XWPCP_RETRY_PERIOD      (XWMDCFG_isc_xwpcp_RETRY_PERIOD)
-#define XWPCP_RETRY_NUM         (XWMDCFG_isc_xwpcp_RETRY_NUM)
-#define XWPCP_MEMBLK_SIZE       (XWMDCFG_isc_xwpcp_MEMBLK_SIZE)
-#define XWPCP_MEMBLK_ODR        (XWMDCFG_isc_xwpcp_MEMBLK_ODR)
-#define XWPCP_MEMBLK_NUM        (1 << XWPCP_MEMBLK_ODR)
-#define XWPCP_MEMPOOL_SIZE      (XWPCP_MEMBLK_SIZE * XWPCP_MEMBLK_NUM)
+#define XWPCP_PRI_NUM           (XWMDCFG_isc_xwpcp_PRI_NUM) /**< 优先级数量 */
+#define XWPCP_INVALID_PRI       (0xFFU) /**< 无效优先级 */
+#define XWPCP_MAX_PRI           (XWPCP_PRI_NUM - 1) /**< XWPCP的大版本号 */
+#define XWPCP_PORT_NUM          (XWMDCFG_isc_xwpcp_PORT_NUM) /**< 端口号 */
+#define XWPCP_RETRY_PERIOD      (XWMDCFG_isc_xwpcp_RETRY_PERIOD) /**< 重试发送的周期 */
+#define XWPCP_RETRY_NUM         (XWMDCFG_isc_xwpcp_RETRY_NUM) /**< 重试发送的次数 */
+#define XWPCP_MEMBLK_SIZE       (XWMDCFG_isc_xwpcp_MEMBLK_SIZE) /**< 单位内存块的大小 */
+#define XWPCP_MEMBLK_ODR        (XWMDCFG_isc_xwpcp_MEMBLK_ODR) /**< 内存块数量的阶，内存块数量等于1左移“阶”次 */
+#define XWPCP_MEMBLK_NUM        (1 << XWPCP_MEMBLK_ODR) /**< 内存块的数量 */
+#define XWPCP_MEMPOOL_SIZE      (XWPCP_MEMBLK_SIZE * XWPCP_MEMBLK_NUM) /**< 内存池的总大小 */
+
+/**
+ * @brief 定义内存池
+ * @param[in] name: 数值名
+ */
 #define XWPCP_DEF_MEMPOOL(name) __xwcc_alignl1cache xwu8_t name[XWPCP_MEMPOOL_SIZE]
 
 struct xwpcp;

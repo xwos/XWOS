@@ -71,18 +71,18 @@ xwer_t xwpcp_gc(void * obj);
  * @param[in] name: XWPCP实例的名字
  * @param[in] hwifops: 硬件接口抽象层操作函数集合
  * @param[in] hwifcb: 硬件接口控制块指针
- * @param[in] mem: 连续的内存块，大小必须为@ref XWPCP_MEMPOOL_SIZE
- * @param[in] memsize: 连续的内存块大小，值必须为@ref XWPCP_MEMPOOL_SIZE
+ * @param[in] mem: 连续的内存块
+ * @param[in] memsize: 连续的内存块大小，值必须为 @ref XWPCP_MEMPOOL_SIZE
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval --ENOMEM: 内存池台小
  * @retval -EPERM: XWPCP未初始化
  * @note
- * + 参数**mem**作为xwpcp发送和接收缓冲区，用户可以
+ * + 参数```mem```作为xwpcp发送和接收缓冲区，用户可以
  *   使用```xwu8_t xwpcp_mem[XWPCP_MEMPOOL_SIZE];```定义，也可增加修饰符
  *   将这段内存定义在DMA区域，并对齐到L1CacheLine，以便提高整体效率；
- * + 参数**memsize**作用是提醒用户**mem**的大小必须为@ref XWPCP_MEMPOOL_SIZE，
+ * + 参数```memsize```作用是提醒用户```mem```的大小必须为 @ref XWPCP_MEMPOOL_SIZE ，
  *   API内部会做检查。
  * @note
  * + 同步/异步：同步
@@ -317,7 +317,7 @@ xwer_t xwpcp_gc(void * obj)
 }
 
 /**
- * @brief 用于实现@ref xwpcp_tx()的回调函数参数结构体
+ * @brief 用于实现 @ref xwpcp_tx() 的回调函数参数结构体
  */
 struct xwpcp_txcb_arg {
         struct xwos_splk splk;
@@ -326,7 +326,7 @@ struct xwpcp_txcb_arg {
 };
 
 /**
- * @brief 用于实现@ref xwpcp_tx()的通知发送结果的回调函数
+ * @brief 用于实现 @ref xwpcp_tx() 的通知发送结果的回调函数
  * @param[in] xwpcp: XWPCP对象的指针
  * @param[in] txh: 发送句柄
  * @param[in] rc: 发送结果
@@ -360,7 +360,7 @@ void xwpcp_txcb_notify(struct xwpcp * xwpcp, xwpcp_txh_t txh, xwer_t rc, void * 
  * + (O) 作为输出时，返回实际发送的数据长度
  * @param[in] pri: 用户数据的优先级
  * @param[in] port: 端口
- * @param[in] qos: 服务质量
+ * @param[in] qos: 服务质量，取值范围： @ref xwpcp_msg_qos_em
  * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示期望的阻塞等待时间
  * + (O) 作为输出时，返回剩余的期望时间
@@ -549,7 +549,7 @@ xwer_t xwpcp_abort(struct xwpcp * xwpcp, xwpcp_txh_t txh)
 /**
  * @brief XWPCP API: 获取发送状态
  * @param[in] txh: 发送句柄
- * @return 发送状态，取值：@ref xwpcp_carrier_state_em
+ * @return 发送状态，取值： @ref xwpcp_carrier_state_em
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程

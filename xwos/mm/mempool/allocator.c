@@ -195,8 +195,6 @@ err_pa_init:
  * @param[in] name: 名字
  * @param[in] origin: 内存区域的起始地址
  * @param[in] size: 内存区域的总大小
- * @param[in] odrbtree: 阶红黑树数组的指针
- * @param[in] pgarray: 页控制块数组的指针
  * @param[in] pgodr: 页的数量，以2的blkodr次方形式表示
  * @return 错误码
  * @retval XWOK: 没有错误

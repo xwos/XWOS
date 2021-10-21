@@ -26,6 +26,7 @@
 /**
  * @brief 循环队列对象的构造函数
  * @param[in] cq: 循环队列对象的指针
+ * @param[in] mem: 数据缓冲区
  */
 static __xwmd_code
 void xwcq_construct(struct xwcq * cq, xwu8_t * mem)
@@ -101,7 +102,7 @@ void xwcq_free(struct xwcq * cq)
 
 /**
  * @brief 循环队列对象的垃圾回收函数
- * @param[in] cq: 循环队列对象的指针
+ * @param[in] obj: 循环队列对象的指针
  * @return 错误码
  */
 static __xwmd_code
@@ -610,9 +611,6 @@ err_cq_grab:
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示接收缓冲区的大小
  * + (O) 作为输出时，返回实际接收的数据大小
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINTR: 等待被中断

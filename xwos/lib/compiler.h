@@ -617,26 +617,26 @@
 
 /**
  * @brief 字符串化
- * @param[in] x: 将x变为字符串
+ * @param[in] m: 将m变为字符串
  * @note
- * C语言宏展开的规则：遇到#和##就停止展开宏。
- * 因此如果直接定义stringify(m)为#m，
+ * C语言宏展开的规则：遇到```#```和```##```就停止展开。
+ * 因此如果直接定义```stringify(m)```为```#m```，
  * 遇到下面的代码将不能正常工作：
- * ```C
+ * ``` C
  * #define stringify(m)       #m
  * #define NAME               Roy
  * const char my_name[] = stringify(NAME);
  * // 结果是 my_name[] = "NAME";
  * ```
  * 正确的定义方法应该是：
- * ```C
- * __stringify(m)             #m
+ * ``` C
+ * #define __stringify(m)     #m
  * #define stringify(m)       __stringify(m)
  * #define NAME               Roy
  * const char my_name[] = stringify(NAME);
  * // 结果是 my_name[] = "Roy";
  * ```
- * 因为NAME在stringify(m)中展开，此时没有遇到#或##。
+ * 因为```NAME```在```stringify(m)```中展开，没有遇到```#```或```##```。
  */
 #  define stringify(m)                    __stringify(m)
 #endif

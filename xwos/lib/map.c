@@ -15,14 +15,14 @@
 
 /**
  * @brief 插入键值对容器
- * @param[in] m: map的指针
+ * @param[in] map: map的指针
  * @param[in] newmc: 键值对容器的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EEXIST: 键值对已经存在
  */
 __xwlib_code
-xwer_t xwlib_map_insert(struct xwlib_map * m, struct xwlib_map_container * newmc)
+xwer_t xwlib_map_insert(struct xwlib_map * map, struct xwlib_map_container * newmc)
 {
         struct xwlib_rbtree_node ** pos;
         struct xwlib_rbtree_node * rbn;
@@ -32,13 +32,13 @@ xwer_t xwlib_map_insert(struct xwlib_map * m, struct xwlib_map_container * newmc
         xwssq_t cmprc;
         xwer_t rc;
 
-        pos = &m->rbtree.root;
+        pos = &map->rbtree.root;
         lpc = (xwptr_t)pos;
 
         rbn = *pos;
         while (rbn) {
                 mc = xwlib_rbtree_entry(rbn, struct xwlib_map_container, rbn);
-                cmprc = m->cmp(newmc->key, mc->key);
+                cmprc = map->cmp(newmc->key, mc->key);
                 if (cmprc < 0) {
                         pos = &rbn->left;
                         lpc = (xwptr_t)pos;
@@ -53,9 +53,9 @@ xwer_t xwlib_map_insert(struct xwlib_map * m, struct xwlib_map_container * newmc
                 }
         }
         if (lpc) {
-                if (xwlib_rbtree_tst_link_root(&m->rbtree,
+                if (xwlib_rbtree_tst_link_root(&map->rbtree,
                                                xwlib_rbtree_get_link(lpc))) {
-                        xwlib_bclst_add_head(&m->bclh, &newmc->bcln);
+                        xwlib_bclst_add_head(&map->bclh, &newmc->bcln);
                 } else {
                         rbn = xwlib_rbtree_get_parent_from_lpc(lpc);
                         parent = xwlib_rbtree_entry(rbn, struct xwlib_map_container,
@@ -67,7 +67,7 @@ xwer_t xwlib_map_insert(struct xwlib_map * m, struct xwlib_map_container * newmc
                         }
                 }
                 xwlib_rbtree_link(&newmc->rbn, lpc);
-                xwlib_rbtree_insert_color(&m->rbtree, &newmc->rbn);
+                xwlib_rbtree_insert_color(&map->rbtree, &newmc->rbn);
                 rc = XWOK;
         } else {
                 rc = -EEXIST;
@@ -77,21 +77,21 @@ xwer_t xwlib_map_insert(struct xwlib_map * m, struct xwlib_map_container * newmc
 
 /**
  * @brief 删除键值对容器
- * @param[in] m: map的指针
+ * @param[in] map: map的指针
  * @param[in] mc: 键值对容器的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ESRCH: 此键值对容器不在键值对集合中
  */
 __xwlib_code
-xwer_t xwlib_map_erase(struct xwlib_map * m, struct xwlib_map_container * mc)
+xwer_t xwlib_map_erase(struct xwlib_map * map, struct xwlib_map_container * mc)
 {
         xwer_t rc;
 
         if (xwlib_rbtree_tst_node_unlinked(&mc->rbn)) {
                 rc = -ESRCH;
         } else {
-                xwlib_rbtree_remove(&m->rbtree, &mc->rbn);
+                xwlib_rbtree_remove(&map->rbtree, &mc->rbn);
                 xwlib_rbtree_init_node(&mc->rbn);
                 xwlib_bclst_del_init(&mc->bcln);
                 rc = XWOK;
@@ -101,15 +101,15 @@ xwer_t xwlib_map_erase(struct xwlib_map * m, struct xwlib_map_container * mc)
 
 /**
  * @brief 根据“键”查找键值对容器
- * @param[in] m: map的指针
+ * @param[in] map: map的指针
  * @param[in] key: 键值对容器的指针
- * @param[out] mc: 指向指针缓存的指针，此指针缓存用于返回查找到的键值对容器的指针
+ * @param[out] mcbuf: 指向指针缓存的指针，此指针缓存用于返回查找到的键值对容器的指针
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ESRCH: 目标不存在
  */
 __xwlib_code
-xwer_t xwlib_map_find(struct xwlib_map * m, void * key,
+xwer_t xwlib_map_find(struct xwlib_map * map, void * key,
                       struct xwlib_map_container ** mcbuf)
 {
         struct xwlib_rbtree_node * rbn;
@@ -117,10 +117,10 @@ xwer_t xwlib_map_find(struct xwlib_map * m, void * key,
         xwssq_t cmprc;
         xwer_t rc;
 
-        rbn = m->rbtree.root;
+        rbn = map->rbtree.root;
         while (rbn) {
                 mc = xwlib_rbtree_entry(rbn, struct xwlib_map_container, rbn);
-                cmprc = m->cmp(key, mc->key);
+                cmprc = map->cmp(key, mc->key);
                 if (cmprc < 0) {
                         rbn = rbn->left;
                 } else if (cmprc > 0) {

@@ -49,9 +49,7 @@
                                  XWPCP_FRMHEAD_SIZE((slot)->frm.head.headsize) - \
                                  XWPCP_CRC32_SIZE - XWPCP_SOF_SIZE - XWPCP_EOF_SIZE)
 #define XWPCP_CRC32_SIZE        (4U)
-
 #define XWPCP_SDU_MAX_SIZE      (XWPCP_MEMPOOL_SIZE / 8)
-#define XWPCP_FRM_MINSIZE       (sizeof(struct xwpcp_frmhead) + 1 + XWPCP_CRC32_SIZE)
 
 #if defined(XWMDCFG_isc_xwpcp_LOG) && (1 == XWMDCFG_isc_xwpcp_LOG)
 #  define XWPCP_LOG_TAG                 "xwpcp"
@@ -137,7 +135,7 @@ union xwpcp_slot {
 };
 
 /**
- * @breif 包含待发送帧的“发送装置”
+ * @brief 包含待发送帧的“发送装置”
  */
 struct xwpcp_carrier {
         struct xwlib_bclst_node node; /**< 链表节点 */
@@ -148,7 +146,7 @@ struct xwpcp_carrier {
 };
 
 /**
- * @breif XWPCP对象
+ * @brief XWPCP对象
  */
 struct xwpcp {
         /* 基本信息 */

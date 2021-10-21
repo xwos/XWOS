@@ -35,7 +35,7 @@
 /**
  * @brief XWOS AOPLIB：测试位图中的某位是否被置1
  * @param[in] bmp: 位图的起始地址指针
- * @param[in] n: 被测试的位的序号
+ * @param[in] idx: 被测试的位的序号
  * @return 布尔值
  * @retval true: 置位
  * @retval false: 复位
@@ -47,7 +47,7 @@ bool xwbmpaop_t1i(xwbmp_a * bmp, xwsq_t idx);
 /**
  * @brief XWOS AOPLIB：将位图中某位置1
  * @param[in] bmp: 位图的起始地址指针
- * @param[in] n: 被置1的位的序号
+ * @param[in] idx: 被置1的位的序号
  * @note
  * - 内存序：acq_rel
  */
@@ -56,7 +56,7 @@ void xwbmpaop_s1i(xwbmp_a * bmp, xwsq_t idx);
 /**
  * @brief XWOS AOPLIB：将位图中某位清0
  * @param[in] bmp: 位图的起始地址指针
- * @param[in] n: 被清0的位的序号
+ * @param[in] idx: 被清0的位的序号
  * @note
  * - 内存序：acq_rel
  */
@@ -65,7 +65,7 @@ void xwbmpaop_c0i(xwbmp_a * bmp, xwsq_t idx);
 /**
  * @brief XWOS AOPLIB：将位图中某位翻转
  * @param[in] bmp: 位图的起始地址指针
- * @param[in] n: 被翻转的位的序号
+ * @param[in] idx: 被翻转的位的序号
  * @note
  * - 内存序：acq_rel
  */
@@ -74,7 +74,7 @@ void xwbmpaop_x1i(xwbmp_a * bmp, xwsq_t idx);
 /**
  * @brief XWOS AOPLIB：测试位图中某位是否为0，如果是，就将它置1
  * @param[in] bmp: 位图的起始地址指针
- * @param[in] i: 被测试位的序号
+ * @param[in] idx: 被测试位的序号
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败
@@ -86,7 +86,7 @@ xwer_t xwbmpaop_t0i_then_s1i(xwbmp_a * bmp, xwsq_t idx);
 /**
  * @brief XWOS AOPLIB：测试位图中某位是否为1，如果是，就将它清0
  * @param[in] bmp: 位图的起始地址指针
- * @param[in] n: 被测试位的序号
+ * @param[in] idx: 被测试位的序号
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EACCES: 测试失败

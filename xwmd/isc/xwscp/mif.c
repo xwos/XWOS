@@ -66,18 +66,18 @@ xwer_t xwscp_tx_once(struct xwscp * xwscp,
  * @param[in] name: XWSCP实例的名字
  * @param[in] hwifops: 硬件接口抽象层操作函数集合
  * @param[in] hwifcb: 硬件接口控制块指针
- * @param[in] mem: 连续的内存块，大小必须为@ref XWSCP_MEMPOOL_SIZE
- * @param[in] memsize: 连续的内存块大小，值必须为@ref XWSCP_MEMPOOL_SIZE
+ * @param[in] mem: 连续的内存块
+ * @param[in] memsize: 连续的内存块大小，值必须为 @ref XWSCP_MEMPOOL_SIZE
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval --ENOMEM: 内存池台小
  * @retval -EPERM: XWSCP未初始化
  * @note
- * + 参数**mem**作为xwscp发送和接收缓冲区，用户可以
+ * + 参数```mem```作为xwscp发送和接收缓冲区，用户可以
  *   使用```xwu8_t xwscp_mem[XWSCP_MEMPOOL_SIZE];```定义，也可增加修饰符
  *   将这段内存定义在DMA区域，并对齐到L1CacheLine，以便提高整体效率；
- * + 参数**memsize**作用是提醒用户**mem**的大小必须为@ref XWSCP_MEMPOOL_SIZE，
+ * + 参数```memsize```作用是提醒用户```mem```的大小必须为 @ref XWSCP_MEMPOOL_SIZE ，
  *   API内部会做检查。
  * @note
  * + 同步/异步：同步
@@ -415,6 +415,7 @@ err_fmt_msg:
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示数据的字节数
  * + (O) 作为输出时，返回实际发送的字节数
+ * @param[in] qos: 服务质量，取值范围： @ref xwscp_msg_qos_em
  * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示期望的阻塞等待时间
  * + (O) 作为输出时，返回剩余的期望时间
@@ -432,7 +433,7 @@ err_fmt_msg:
  */
 __xwmd_api
 xwer_t xwscp_tx(struct xwscp * xwscp,
-                const xwu8_t msg[], xwsz_t * size,
+                const xwu8_t data[], xwsz_t * size,
                 xwu8_t qos, xwtm_t * xwtm)
 {
         xwsq_t hwifst;
@@ -451,7 +452,7 @@ xwer_t xwscp_tx(struct xwscp * xwscp,
                 xwaop_read(xwsq, &xwscp->hwifst, &hwifst);
                 if (XWSCP_HWIFST_CONNECT & hwifst) {
                         do {
-                                rc = xwscp_tx_once(xwscp, msg, size, qos, xwtm);
+                                rc = xwscp_tx_once(xwscp, data, size, qos, xwtm);
                         } while ((-ETIMEDOUT == rc) && (*xwtm > 0));
                         if ((-ETIMEDOUT == rc) && (*xwtm <= 0)) {
                                 xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_NETUNREACH);
@@ -523,9 +524,6 @@ err_sem_timedwait:
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示报文的字节数
  * + (O) 作为输出时，返回实际接收的字节数
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针

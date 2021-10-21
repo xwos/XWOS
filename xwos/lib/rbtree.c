@@ -1011,7 +1011,7 @@ black_sibling:
 
 /**
  * @brief 用一个新节点代替旧节点，继承它的颜色、位置信息并接管它的子孙。
- * @param[in] newd: 新节点的指针
+ * @param[in] newn: 新节点的指针
  * @param[in] oldn: 旧节点的指针
  */
 __xwlib_code __xwcc_hot

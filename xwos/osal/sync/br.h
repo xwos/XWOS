@@ -303,8 +303,6 @@ xwer_t xwos_br_get_num(struct xwos_br * br, xwsz_t * numbuf)
 /**
  * @brief XWOS API：等待所有线程到达栅栏
  * @param[in] br: 线程栅栏对象的指针
- * @param[in] pos: 当前线程的位图位置
- * @param[in] msk: 需要同步的线程位图掩码
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针

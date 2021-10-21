@@ -143,7 +143,7 @@ void xwmq_free(struct xwmq * mq)
 
 /**
  * @brief 消息队列对象的垃圾回收函数
- * @param[in] mq: 消息队列对象的指针
+ * @param[in] obj: 消息队列对象的指针
  * @return 错误码
  */
 static __xwmd_code

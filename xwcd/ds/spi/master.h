@@ -29,7 +29,7 @@
 struct xwds_spim;
 
 /**
- * @breif BSP中需要提供的SPI主机模式控制器驱动函数表
+ * @brief BSP中需要提供的SPI主机模式控制器驱动函数表
  */
 struct xwds_spim_driver {
         struct xwds_driver base; /**< C语言面向对象：继承struct xwds_driver */
@@ -44,7 +44,7 @@ struct xwds_spim_driver {
 };
 
 /**
- * @breif SPI主机模式控制器
+ * @brief SPI主机模式控制器
  */
 struct xwds_spim {
         struct xwds_device dev; /**< 继承struct xwds_device */

@@ -211,7 +211,7 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
  * @param[in] node: 子节点指针
  * @return 父节点指针
  * @note
- * - left是struct @ref xwlib_rbtree_node的第一个成员。
+ * - left是@ref xwlib_rbtree_node 的第一个成员。
  * - &parent->left与&parent在数值上是相等的（指针就是一个位数等于CPU位宽的无符号整数）。
  *   因此当link指向parent->left时，其数值也等于parent的地址；
  *   当link指向parent->right时，其数值减去sizeof(指针)后可获取parent地址。
@@ -372,7 +372,7 @@ xwlib_rbtree_get_successor(struct xwlib_rbtree_node * node)
 /**
  * @brief 用新节点代替旧节点并继承它的链指针、颜色和位置信息，
  *        但新节点并不接管旧节点的孩子节点
- * @param[in] newd: 新节点指针
+ * @param[in] newn: 新节点指针
  * @param[in] oldn: 旧节点指针
  */
 static __xwlib_inline

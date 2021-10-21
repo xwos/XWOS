@@ -28,7 +28,7 @@
  * @param[in] type: 类型
  * @param[in] obj: 对象
  * @note
- * - 类似于C++中的关键字：static_cast<type>(obj)
+ * - 类似于C++中的关键字：```static_cast<type>(obj)```
  */
 #define xwos_cast(type, obj)    ((type)(obj))
 

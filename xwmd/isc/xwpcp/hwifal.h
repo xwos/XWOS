@@ -21,7 +21,7 @@ union xwpcp_slot;
 struct xwpcp_frm;
 
 /**
- * @breif 硬件接口抽象层操作函数集
+ * @brief 硬件接口抽象层操作函数集
  */
 struct xwpcp_hwifal_operation {
         xwer_t (* open)(struct xwpcp *); /**< 打开硬件接口 */
@@ -32,7 +32,7 @@ struct xwpcp_hwifal_operation {
 };
 
 /**
- * @breif 硬件接口抽象层状态枚举
+ * @brief 硬件接口抽象层状态枚举
  */
 enum xwpcp_hwifal_state_em {
         XWPCP_HWIFST_CLOSED, /**< 硬件接口已经关闭 */
@@ -42,7 +42,7 @@ enum xwpcp_hwifal_state_em {
 };
 
 /**
- * @breif 硬件接口层事件枚举
+ * @brief 硬件接口层事件枚举
  */
 enum xwpcp_hwifal_notification_em {
         XWPCP_HWIFNTF_CONNECT = 0, /**< 与远程端链接 */

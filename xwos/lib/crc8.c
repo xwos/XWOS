@@ -225,7 +225,6 @@ xwer_t xwlib_crc8_swcal(xwu8_t * crc8,
  *   @arg 0x07
  *   @arg 0x31
  *   @arg 0X9B
- * @param[in] direction: 数据移位的方向
  * @param[in] stream: 指向数据的指针
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示数据长度
