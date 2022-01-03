@@ -1,0 +1,12 @@
+#!/bin/sh
+
+script=${0}
+script_basename=$(basename ${script})
+script_dirname=$(dirname ${script})
+
+source "${script_dirname}/_/husky.sh"
+if [ -f .git/hooks/commit-msg ] ; then
+  .git/hooks/commit-msg "$@"
+fi
+cd ${script_dirname}/..
+npx --no-install commitlint --edit "$1"

@@ -1,0 +1,16 @@
+{
+  "name": "xwhusky",
+  "version": "1.0.0",
+  "description": "XWOS all git hooks",
+  "main": "index.js",
+  "scripts": {
+    "prepare": "cd ../../../.. && husky install xwbs/util/js/xwhusky/.husky"
+  },
+  "author": "Roy Sun",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@commitlint/cli": "^16.0.1",
+    "@commitlint/config-conventional": "^16.0.0",
+    "husky": "^7.0.4"
+  }
+}

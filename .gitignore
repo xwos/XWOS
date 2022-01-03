@@ -14,8 +14,8 @@
 *.pyc
 wkspc
 XuanWuOS.cfg
-xwbs/util/js/xwgml/node_modules
-xwbs/util/js/xwgml/package-lock.json
+node_modules
+package-lock.json
 xwdx/wkspc
 GTAGS
 GRTAGS

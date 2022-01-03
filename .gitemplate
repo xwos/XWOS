@@ -16,6 +16,6 @@
 #
 # [脚注] <token:> <text>
 # - 问题的ID或链接
-# - BREAKING CHANGE（破坏性修改）
+# - BREAKING-CHANGE（破坏性修改）
 # - 每行总长度不超过72个字符（中文字符计2个字符）
 #
