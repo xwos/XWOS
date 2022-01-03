@@ -48,7 +48,7 @@
 /**
  * @brief XWOS的版本开发阶段
  */
-#define XWOS_VERSION_PHASE              rc
+#define XWOS_VERSION_PHASE              milestone
 
 /**
  * @brief XWOS的版本号（数值形式）
