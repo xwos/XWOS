@@ -29,3 +29,5 @@ CPU_CSRCS := cpu_init.c
 CPU_CXXSRCS :=
 
 CPU_EOBJS :=
+
+RUST_TARGET := thumbv6m-none-eabi

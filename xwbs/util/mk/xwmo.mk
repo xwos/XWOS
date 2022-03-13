@@ -18,7 +18,7 @@
 # > limitations under the License.
 #
 
-# Don't use the function `$(dir ...)' in make, because the result has the tailing '/'
+# Don't use the function `$(dir ...)', because the result has the tailing '/'
 getXwmoDir = $(shell dirname $(firstword $(MAKEFILE_LIST)))
 
 xwmoPathToName = $(subst -,_,$(subst .,_,$(subst /,_,$(subst _,__,$(subst $(2),,$(1))))))

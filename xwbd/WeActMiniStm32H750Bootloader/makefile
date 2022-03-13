@@ -40,6 +40,7 @@ c clean: cfg
 	$(MAKE) -C $(WKSPC) TARGET=$(TARGET) NODEP=y clean
 
 d distclean: cfg
+	$(MAKE) -C $(WKSPC) TARGET=$(TARGET) NODEP=y distclean
 	@rm -rf $(WKSPC)
 
 .DEFAULT:

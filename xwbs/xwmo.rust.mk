@@ -1,6 +1,6 @@
 #! /bin/make -f
 # @file
-# @brief 集成预先编译好的模块的Makefile
+# @brief 编译RUST玄武模块的Makefile
 # @author
 # + 隐星魂 (Roy Sun) <xwos@xwos.tech>
 # @copyright
@@ -18,21 +18,42 @@
 # > limitations under the License.
 #
 
+include $(XuanWuOS_ARCH_DIR)/arch.mk
+include $(XuanWuOS_CPU_DIR)/cpu.mk
+include $(XuanWuOS_SOC_DIR)/soc.mk
+include $(XuanWuOS_BRD_DIR)/brd.mk
+include $(XuanWuOS_XWOS_DIR)/xwos.mk
+include $(XuanWuOS_BRD_DIR)/lib.mk
+include $(XWBS_UTIL_MK_XWMO)
 include xwbs/$(XuanWuOS_CFG_ARCH).$(XuanWuOS_CFG_COMPILER).rule
 
 XWMO_NAME := $(call getXwmoName)
 XWMO_DIR := $(call getXwmoDir)
 XWMO_OBJ_DIR ?= $(XWMO_DIR)
-XWMO_PREBUILT := $(firstword $(XWMO_PREBUILT))
+XWMO_RUSTLIB_NAME := lib$(notdir $(XWMO_DIR)).a
 
-$(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/$(XWMO_NAME): $(XWMO_DIR)/$(XWMO_PREBUILT)
-	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
+ifeq ($(~D),0)
+  CARGO_BUILD_FLAGS += --release
+  XWMO_RUSTLIB := $(XWMO_DIR)/target/$(RUST_TARGET)/release/$(XWMO_RUSTLIB_NAME)
+else
+  XWMO_RUSTLIB := $(XWMO_DIR)/target/$(RUST_TARGET)/debug/$(XWMO_RUSTLIB_NAME)
+endif
+
+$(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/$(XWMO_NAME): $(XWMO_RUSTLIB) $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)
 	$(SHOW_CP) $(CP) $< $@
+
+$(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR):
+	@[ ! -d $@ ] && mkdir -p $@ || true
+
+$(XWMO_RUSTLIB):
+	cd $(XWMO_DIR); cargo +nightly build $(CARGO_BUILD_FLAGS) --target=$(RUST_TARGET)
 
 clean:
 	@$(RM) -f $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/$(XWMO_NAME)
+	@cd $(XWMO_DIR); cargo clean
 
 distclean:
 	$(RM) -rf $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)
+	@cd $(XWMO_DIR); cargo clean
 
-.PHONY: dsm clean distclean
+.PHONY: dsm clean distclean $(XWMO_RUSTLIB)

@@ -35,3 +35,5 @@ CPU_CFLAGS_llvm := --target=armv7m-none-eabi
 CPU_CXXFLAGS_llvm := --target=armv7m-none-eabi
 CPU_LDFLAGS_llvm := --target=armv7m-none-eabi
 SYSROOT_llvm := armv7m_soft_nofp
+
+RUST_TARGET := thumbv7m-none-eabi

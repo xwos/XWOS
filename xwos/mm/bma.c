@@ -254,7 +254,7 @@ struct xwmm_bma_bcb * xwmm_bma_orderlist_choose(struct xwmm_bma * bma,
 }
 
 /**
- * @brief 将一个大块分割成小块
+ * @brief 将大内存块分割成小块
  * @param[in] bma: 伙伴算法内存块分配器对象的指针
  * @param[in] bcb: 大块的内存块的控制块的指针
  * @param[in] target_odr: 目标块数量的阶
@@ -342,7 +342,7 @@ err_nomem:
 }
 
 /**
- * @brief 找到内存块的伙伴
+ * @brief 合并内存块
  * @param[in] bma: 伙伴算法内存块分配器对象的指针
  * @param[in] bcb: 内存块的控制块的指针
  * @return 错误码

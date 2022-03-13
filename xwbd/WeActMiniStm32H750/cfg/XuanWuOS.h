@@ -26,11 +26,12 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XuanWuOS_CFG_ARCH                               arm
 #define XuanWuOS_CFG_SUBARCH                            v7m
-#define XuanWuOS_CFG_COMPILER                           llvm
+#define XuanWuOS_CFG_COMPILER                           gcc
 #define XuanWuOS_CFG_LDSCRIPT                           cfg/XuanWuOS.lds
 #define XuanWuOS_CFG_ELF_MK                             elf.mk
 #define XuanWuOS_CFG_XWMO_MK                            xwmo.mk
 #define XuanWuOS_CFG_XWMO_PREBUILT_MK                   xwmo.prebuilt.mk
+#define XuanWuOS_CFG_XWMO_RUST_MK                       xwmo.rust.mk
 #include <cfg/arch.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********

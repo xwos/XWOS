@@ -28,8 +28,9 @@ AR := $(CROSS_COMPILE)ar
 LD := $(CROSS_COMPILE)gcc
 SIZE := $(CROSS_COMPILE)size
 LUA2HEX := python3 xwbs/util/py/lua2hex.py
-CP := cp
+CP := cp -ap
 RM := -rm
+MSG := echo -e
 
 ARCH_INCDIRS += $(ARCH_INCDIRS_gcc)
 ARCH_AFLAGS += $(ARCH_AFLAGS_gcc)
@@ -145,52 +146,52 @@ SHOW_CP =
 
 ifeq ($(XuanWuOS_CFG_HOSTOS),gnu/linux)
   ifneq ($(~V),1)
-    SHOW_CPP = @echo -e "\e[1m\e[44;38m[cc -E] "$<" -> "$@" \e[0m";
-    SHOW_CC = @echo -e "\e[1m\e[44;38m[cc] "$<" -> "$@" \e[0m";
-    SHOW_CXX = @echo -e "\e[1m\e[44;38m[c++] "$<" -> "$@" \e[0m";
-    SHOW_APP = @echo -e "\e[1m\e[44;38m[as -E] "$<" -> "$@" \e[0m";
-    SHOW_AS = @echo -e "\e[1m\e[44;38m[as] "$<" -> "$@" \e[0m";
-    SHOW_OD = @echo -e "\e[1m\e[40;38m[od] "$<" -> "$@" \e[0m";
-    SHOW_OBJCOPY = @echo -e "\e[1m\e[47;34m[objcopy] "$<" -> "$@" \e[0m";
-    SHOW_MM = @echo -e "\e[1m\e[46;38m[mm] "$<" -> "$@" \e[0m";
-    SHOW_AR = @echo -e "\e[1m\e[42;38m[ar] "$@" \e[0m";
-    SHOW_LD = @echo -e "\e[1m\e[47;34m[ld] "$@" \e[0m";
-    SHOW_SIZE = @echo -e "\e[1m\e[47;34m[size] "$@" \e[0m";
-    SHOW_LUA2HEX = @echo -e "\e[1m\e[47;34m[lua2hex] "$@" \e[0m";
-    SHOW_CP = @echo -e "\e[1m\e[47;34m[cp] "$<" -> "$@" \e[0m";
+    SHOW_CPP = @$(MSG) "\e[1m\e[44;38m[cc -E] "$<" -> "$@" \e[0m";
+    SHOW_CC = @$(MSG) "\e[1m\e[44;38m[cc] "$<" -> "$@" \e[0m";
+    SHOW_CXX = @$(MSG) "\e[1m\e[44;38m[c++] "$<" -> "$@" \e[0m";
+    SHOW_APP = @$(MSG) "\e[1m\e[44;38m[as -E] "$<" -> "$@" \e[0m";
+    SHOW_AS = @$(MSG) "\e[1m\e[44;38m[as] "$<" -> "$@" \e[0m";
+    SHOW_OD = @$(MSG) "\e[1m\e[40;38m[od] "$<" -> "$@" \e[0m";
+    SHOW_OBJCOPY = @$(MSG) "\e[1m\e[47;34m[objcopy] "$<" -> "$@" \e[0m";
+    SHOW_MM = @$(MSG) "\e[1m\e[46;38m[mm] "$<" -> "$@" \e[0m";
+    SHOW_AR = @$(MSG) "\e[1m\e[42;38m[ar] "$@" \e[0m";
+    SHOW_LD = @$(MSG) "\e[1m\e[47;34m[ld] "$@" \e[0m";
+    SHOW_SIZE = @$(MSG) "\e[1m\e[47;34m[size] "$@" \e[0m";
+    SHOW_LUA2HEX = @$(MSG) "\e[1m\e[47;34m[lua2hex] "$@" \e[0m";
+    SHOW_CP = @$(MSG) "\e[1m\e[47;34m[cp] "$<" -> "$@" \e[0m";
   endif
 endif
 
 ifeq ($(XuanWuOS_CFG_HOSTOS),darwin)
   ifneq ($(~V),1)
-    SHOW_CPP = @echo -e "\e[1m\e[44;38m[cc -E] "$<" -> "$@" \e[0m";
-    SHOW_CC = @echo -e "\e[1m\e[44;38m[cc] "$<" -> "$@" \e[0m";
-    SHOW_CXX = @echo -e "\e[1m\e[44;38m[c++] "$<" -> "$@" \e[0m";
-    SHOW_APP = @echo -e "\e[1m\e[44;38m[as -E] "$<" -> "$@" \e[0m";
-    SHOW_AS = @echo -e "\e[1m\e[44;38m[as] "$<" -> "$@" \e[0m";
-    SHOW_OD = @echo -e "\e[1m\e[40;38m[od] "$<" -> "$@" \e[0m";
-    SHOW_OBJCOPY = @echo -e "\e[1m\e[47;34m[objcopy] "$<" -> "$@" \e[0m";
-    SHOW_MM = @echo -e "\e[1m\e[46;38m[mm] "$<" -> "$@" \e[0m";
-    SHOW_AR = @echo -e "\e[1m\e[42;38m[ar] "$@" \e[0m";
-    SHOW_LD = @echo -e "\e[1m\e[47;34m[ld] "$@" \e[0m";
-    SHOW_SIZE = @echo -e "\e[1m\e[47;34m[size] "$@" \e[0m";
-    SHOW_LUA2HEX = @echo -e "\e[1m\e[47;34m[lua2hex] "$@" \e[0m";
-    SHOW_CP = @echo -e "\e[1m\e[47;34m[cp] "$<" -> "$@" \e[0m";
+    SHOW_CPP = @$(MSG) "\e[1m\e[44;38m[cc -E] "$<" -> "$@" \e[0m";
+    SHOW_CC = @$(MSG) "\e[1m\e[44;38m[cc] "$<" -> "$@" \e[0m";
+    SHOW_CXX = @$(MSG) "\e[1m\e[44;38m[c++] "$<" -> "$@" \e[0m";
+    SHOW_APP = @$(MSG) "\e[1m\e[44;38m[as -E] "$<" -> "$@" \e[0m";
+    SHOW_AS = @$(MSG) "\e[1m\e[44;38m[as] "$<" -> "$@" \e[0m";
+    SHOW_OD = @$(MSG) "\e[1m\e[40;38m[od] "$<" -> "$@" \e[0m";
+    SHOW_OBJCOPY = @$(MSG) "\e[1m\e[47;34m[objcopy] "$<" -> "$@" \e[0m";
+    SHOW_MM = @$(MSG) "\e[1m\e[46;38m[mm] "$<" -> "$@" \e[0m";
+    SHOW_AR = @$(MSG) "\e[1m\e[42;38m[ar] "$@" \e[0m";
+    SHOW_LD = @$(MSG) "\e[1m\e[47;34m[ld] "$@" \e[0m";
+    SHOW_SIZE = @$(MSG) "\e[1m\e[47;34m[size] "$@" \e[0m";
+    SHOW_LUA2HEX = @$(MSG) "\e[1m\e[47;34m[lua2hex] "$@" \e[0m";
+    SHOW_CP = @$(MSG) "\e[1m\e[47;34m[cp] "$<" -> "$@" \e[0m";
   endif
 endif
 
 ifeq ($(XuanWuOS_CFG_HOSTOS),windows-nt)
-  SHOW_CPP = @echo -e "[cc -E] "$<" -> "$@;
-  SHOW_CC = @echo -e "[cc] "$<" -> "$@;
-  SHOW_CXX = @echo -e "[c++] "$<" -> "$@;
-  SHOW_APP = @echo -e "[as -E] "$<" -> "$@;
-  SHOW_AS = @echo -e "[as] "$<" -> "$@;
-  SHOW_OD = @echo -e "[od] "$<" -> "$@;
-  SHOW_OBJCOPY = @echo -e "[objcopy] "$<" -> "$@;
-  SHOW_MM = @echo -e "[mm] "$<" -> "$@;
-  SHOW_AR = @echo -e "[ar] "$@;
-  SHOW_LD = @echo -e "[ld] "$@;
-  SHOW_SIZE = @echo -e "[size] "$@;
-  SHOW_LUA2HEX = @echo -e "[lua2hex] "$@;
-  SHOW_CP = @echo -e "[cp] "$<" -> "$@;
+  SHOW_CPP = @$(MSG) "[cc -E] "$<" -> "$@;
+  SHOW_CC = @$(MSG) "[cc] "$<" -> "$@;
+  SHOW_CXX = @$(MSG) "[c++] "$<" -> "$@;
+  SHOW_APP = @$(MSG) "[as -E] "$<" -> "$@;
+  SHOW_AS = @$(MSG) "[as] "$<" -> "$@;
+  SHOW_OD = @$(MSG) "[od] "$<" -> "$@;
+  SHOW_OBJCOPY = @$(MSG) "[objcopy] "$<" -> "$@;
+  SHOW_MM = @$(MSG) "[mm] "$<" -> "$@;
+  SHOW_AR = @$(MSG) "[ar] "$@;
+  SHOW_LD = @$(MSG) "[ld] "$@;
+  SHOW_SIZE = @$(MSG) "[size] "$@;
+  SHOW_LUA2HEX = @$(MSG) "[lua2hex] "$@;
+  SHOW_CP = @$(MSG) "[cp] "$<" -> "$@;
 endif
