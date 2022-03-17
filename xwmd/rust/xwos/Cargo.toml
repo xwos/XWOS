@@ -10,3 +10,6 @@ name = "xwos"
 crate-type = ["staticlib"]
 
 [dependencies]
+libc = "0.2"
+newlib-alloc = "0.1"
+libc-print = "0.1"
