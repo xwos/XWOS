@@ -32,6 +32,12 @@ XWMO_DIR := $(call getXwmoDir)
 XWMO_OBJ_DIR ?= $(XWMO_DIR)
 XWMO_RUSTLIB_NAME := lib$(notdir $(XWMO_DIR)).a
 
+ifeq ($(XuanWuOS_CFG_HOSTOS),windows-nt)
+  RUST_TOOLCHAIN := +nightly-x86_64-pc-windows-gnu
+else
+  RUST_TOOLCHAIN := +nightly
+endif
+
 ifeq ($(~D),0)
   CARGO_BUILD_FLAGS += --release
   XWMO_RUSTLIB := $(XWMO_DIR)/target/$(RUST_TARGET)/release/$(XWMO_RUSTLIB_NAME)
@@ -46,14 +52,14 @@ $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR):
 	@[ ! -d $@ ] && mkdir -p $@ || true
 
 $(XWMO_RUSTLIB):
-	cd $(XWMO_DIR); cargo +nightly build $(CARGO_BUILD_FLAGS) --target=$(RUST_TARGET)
+	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) build $(CARGO_BUILD_FLAGS) --target=$(RUST_TARGET)
 
 clean:
 	@$(RM) -f $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/$(XWMO_NAME)
-	@cd $(XWMO_DIR); cargo clean
+	@cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) clean
 
 distclean:
 	$(RM) -rf $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)
-	@cd $(XWMO_DIR); cargo clean
+	@cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) clean
 
 .PHONY: dsm clean distclean $(XWMO_RUSTLIB)

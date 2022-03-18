@@ -27,7 +27,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "xwos"
+name = "xwrust"
 version = "1.0.0"
 dependencies = [
  "libc",

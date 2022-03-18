@@ -73,7 +73,7 @@ err_skd_start_lc:
 }
 
 extern const xwu8_t bootlogo[25600];
-extern void rust_main(void);
+extern void xwrust_main(void);
 
 xwer_t main_task(void * arg)
 {
@@ -116,7 +116,7 @@ xwer_t main_task(void * arg)
                 goto err_xwlua_start;
         }
 #endif
-        rust_main();
+        xwrust_main();
 
         return XWOK;
 
