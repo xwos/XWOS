@@ -93,6 +93,7 @@ void HAL_MspInit(void)
   /* Peripheral interrupt init */
   /* PVD_AVD_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(PVD_AVD_IRQn, 1, 0);
+  /* PVD_AVD_IRQn interrupt configuration */
   HAL_NVIC_EnableIRQ(PVD_AVD_IRQn);
 
   /* USER CODE BEGIN MspInit 1 */
@@ -112,5 +113,3 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 }
 
 /* USER CODE END 1 */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

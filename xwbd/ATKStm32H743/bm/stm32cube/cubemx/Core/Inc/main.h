@@ -114,5 +114,3 @@ void stm32cube_override_linkage_it(void);
 #endif
 
 #endif /* __MAIN_H */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

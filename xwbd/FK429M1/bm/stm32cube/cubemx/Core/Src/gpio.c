@@ -1,27 +1,23 @@
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    gpio.c
   * @brief   This file provides code for the configuration
   *          of all used GPIO pins.
   ******************************************************************************
-  * @author
-  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
-  * @copyright
-  * + Copyright © 2015 xwos.tech, All Rights Reserved.
-  * > Licensed under the Apache License, Version 2.0 (the "License");
-  * > you may not use this file except in compliance with the License.
-  * > You may obtain a copy of the License at
-  * >
-  * >         http://www.apache.org/licenses/LICENSE-2.0
-  * >
-  * > Unless required by applicable law or agreed to in writing, software
-  * > distributed under the License is distributed on an "AS IS" BASIS,
-  * > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * > See the License for the specific language governing permissions and
-  * > limitations under the License.
+  * @attention
+  *
+  * Copyright (c) 2022 STMicroelectronics.
+  * Copyright (c) 2022 xwos.tech.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
@@ -160,5 +156,3 @@ void MX_GPIO_Resume(void)
 }
 
 /* USER CODE END 2 */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

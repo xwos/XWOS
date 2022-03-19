@@ -18,10 +18,10 @@
 # > limitations under the License.
 #
 
-echo XuanWuOS GDB script\n
+echo XWOS GDB script\n
 target remote localhost:3333
 set remote hardware-breakpoint-limit 6
 set remote hardware-watchpoint-limit 4
 # mon adapter_khz 2000
-file ##DIR##/XuanWuOS.elf
+file ##DIR##/XWOS.elf
 display/i $pc

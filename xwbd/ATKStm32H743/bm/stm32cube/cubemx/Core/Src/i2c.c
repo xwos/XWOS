@@ -1,28 +1,23 @@
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file    i2c.c
   * @brief   This file provides code for the configuration
   *          of the I2C instances.
   ******************************************************************************
-  * @author
-  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
-  * @copyright
-  * + Copyright © 2015 xwos.tech, All Rights Reserved.
-  * > Licensed under the Apache License, Version 2.0 (the "License");
-  * > you may not use this file except in compliance with the License.
-  * > You may obtain a copy of the License at
-  * >
-  * >         http://www.apache.org/licenses/LICENSE-2.0
-  * >
-  * > Unless required by applicable law or agreed to in writing, software
-  * > distributed under the License is distributed on an "AS IS" BASIS,
-  * > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * > See the License for the specific language governing permissions and
-  * > limitations under the License.
+  * @attention
+  *
+  * Copyright (c) 2022 STMicroelectronics.
+  * Copyright (c) 2022 xwos.tech.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
-
+/* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "i2c.h"
 
@@ -63,12 +58,14 @@ void MX_I2C2_Init(void)
   {
     Error_Handler();
   }
+
   /** Configure Analogue filter
   */
   if (HAL_I2CEx_ConfigAnalogFilter(&hi2c2, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
   {
     Error_Handler();
   }
+
   /** Configure Digital filter
   */
   if (HAL_I2CEx_ConfigDigitalFilter(&hi2c2, 0) != HAL_OK)
@@ -91,6 +88,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
   /* USER CODE BEGIN I2C2_MspInit 0 */
 
   /* USER CODE END I2C2_MspInit 0 */
+
   /** Initializes the peripherals clock
   */
     PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_I2C2;
@@ -408,5 +406,3 @@ void HAL_I2C_AbortCpltCallback(I2C_HandleTypeDef * hi2c)
 }
 
 /* USER CODE END 1 */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
