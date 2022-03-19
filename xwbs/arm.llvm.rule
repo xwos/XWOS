@@ -18,8 +18,8 @@
 # > limitations under the License.
 #
 
-XWTOOL ?= $(shell xwtoolwd)
-ARMLLVM = $(XWTOOL)/armllvm
+XWTC ?= $(shell xwtcwd)
+ARMLLVM = $(XWTC)/armllvm
 SYSROOT ?= $(ARMLLVM)/lib/clang-runtimes/$(SYSROOT_llvm)
 CC := $(ARMLLVM)/bin/clang
 CXX := $(ARMLLVM)/bin/clang++
