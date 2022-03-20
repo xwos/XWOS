@@ -21,7 +21,6 @@
 function xwmc()
 {
   local cpath=$(pwd)
-  echo ${XuanWuOS_OEM_DIR}
   local rpath=
   local prefix=
   if [[ ${cpath} =~ ${XuanWuOS_XWMD_DIR} ]] ; then
@@ -101,9 +100,9 @@ function xwm()
   done
 
   if [[ ${opt_b} = true ]] ; then
-    make -C ${XWOS_BRD_DIR} clean
+    make -C ${XuanWuOS_BRD_DIR} clean
   fi
-  make -C ${XWOS_BRD_DIR} ${opt_target}
+  make -C ${XuanWuOS_BRD_DIR} ${opt_target}
 }
 
 function xwmm()
@@ -124,11 +123,11 @@ function xwmm()
   done
 
   local cpath=$(pwd)
-  local rpath=${cpath#*${XWOS_PATH}/}
+  local rpath=${cpath#*${XuanWuOS_PATH}/}
   if [[ ${opt_b} = true ]] ; then
-    make -C ${XWOS_PATH} -f ${rpath}/xwmo.mk XWOS_BRD_DIR=${XWOS_BRD_DIR} clean
+    make -C ${XuanWuOS_PATH} -f ${rpath}/xwmo.mk XuanWuOS_BRD_DIR=${XuanWuOS_BRD_DIR} clean
   fi
-  make -C ${XWOS_PATH} -f ${rpath}/xwmo.mk XWOS_BRD_DIR=${XWOS_BRD_DIR}
+  make -C ${XuanWuOS_PATH} -f ${rpath}/xwmo.mk XuanWuOS_BRD_DIR=${XuanWuOS_BRD_DIR}
 }
 
 function xwmmm()
@@ -152,17 +151,17 @@ function xwmmm()
 
   local rpath=${opt_mo}
   if [[ ${opt_b} = true ]] ; then
-    make -C ${XWOS_PATH} -f ${rpath}/xwmo.mk XWOS_BRD_DIR=${XWOS_BRD_DIR} clean
+    make -C ${XuanWuOS_PATH} -f ${rpath}/xwmo.mk XuanWuOS_BRD_DIR=${XuanWuOS_BRD_DIR} clean
   fi
-  make -C ${XWOS_PATH} -f ${rpath}/xwmo.mk XWOS_BRD_DIR=${XWOS_BRD_DIR}
+  make -C ${XuanWuOS_PATH} -f ${rpath}/xwmo.mk XuanWuOS_BRD_DIR=${XuanWuOS_BRD_DIR}
 }
 
 function xwcroot()
 {
-  cd ${XWOS_PATH}
+  cd ${XuanWuOS_PATH}
 }
 
 function xwcbd()
 {
-  cd ${XWOS_PATH}/${XWOS_BRD_DIR}
+  cd ${XuanWuOS_PATH}/${XuanWuOS_BRD_DIR}
 }
