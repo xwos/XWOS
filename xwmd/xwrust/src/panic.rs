@@ -10,17 +10,21 @@
 //! > file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //!
 
-extern crate core;
-use core::alloc::{GlobalAlloc, Layout};
+use core::panic::PanicInfo;
+use core::sync::atomic::{self, Ordering};
 
-pub struct Allocator;
-
-unsafe impl GlobalAlloc for Allocator {
-    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        libc::memalign(layout.align(), layout.size()) as *mut _
+#[inline(never)]
+#[alloc_error_handler]
+pub fn xwrust_alloc_error_handler(_layout: core::alloc::Layout) -> ! {
+    loop {
+        atomic::compiler_fence(Ordering::SeqCst);
     }
+}
 
-    unsafe fn dealloc(&self, ptr: *mut u8, _layout: Layout) {
-        libc::free(ptr as *mut _);
+#[inline(never)]
+#[panic_handler]
+pub fn xwrust_panic(_info: &PanicInfo) -> ! {
+    loop {
+        atomic::compiler_fence(Ordering::SeqCst);
     }
 }

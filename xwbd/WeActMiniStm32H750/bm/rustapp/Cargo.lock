@@ -9,12 +9,29 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "efaa7b300f3b5fe8eb6bf21ce3895e1751d9665086af2d64b42f19701015ff4f"
 
 [[package]]
+name = "libc-print"
+version = "0.1.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4580c894695923468a80b039d7e552739c79612fe4d32beb0f20175de1985d6d"
+dependencies = [
+ "libc",
+]
+
+[[package]]
 name = "newlib-alloc"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7ca3abd6d23c70f63ea85deea80a6a16252967156e5220e0bb8a9d5a7de42119"
 dependencies = [
  "libc",
+]
+
+[[package]]
+name = "rustapp"
+version = "0.1.0"
+dependencies = [
+ "libc-print",
+ "xwrust",
 ]
 
 [[package]]

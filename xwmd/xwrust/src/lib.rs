@@ -13,29 +13,6 @@
 #![no_std]
 #![feature(alloc_error_handler)]
 
+pub mod panic;
 pub mod xwos;
-pub mod xwlib;
 pub mod xwmm;
-
-use core::panic::PanicInfo;
-#[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    loop {}
-}
-
-extern crate alloc;
-use alloc::vec::Vec;
-use libc_print::std_name::println;
-
-#[no_mangle]
-pub unsafe extern "C" fn xwrust_main() {
-    let mut v = Vec::new();
-    v.push(1);
-    v.push(2);
-    v.push(3);
-    v.push(4);
-    println!("RUST XWOS!");
-    for x in v.iter() {
-        println!("x: {}", x);
-    }
-}

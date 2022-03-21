@@ -11,7 +11,6 @@
 //!
 
 pub struct XwosThd {
-    tid: u32,
 }
 
 unsafe impl Send for XwosThd {}
