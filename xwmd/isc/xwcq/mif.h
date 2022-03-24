@@ -14,6 +14,7 @@
 #define __xwmd_isc_xwcq_mif_h__
 
 #include <xwos/standard.h>
+#include <xwos/lib/object.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/sem.h>
