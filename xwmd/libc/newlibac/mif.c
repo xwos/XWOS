@@ -56,10 +56,10 @@ xwer_t newlibac_init(void)
         xwsz_t sz = xw_array_size(newlibac_init_table);
         xwsz_t i;
 
-        atexit(__libc_fini_array);
-        __libc_init_array();
         for (i = 0; i < sz; i++) {
                 f[i]();
         }
+        __libc_init_array();
+        atexit(__libc_fini_array);
         return XWOK;
 }

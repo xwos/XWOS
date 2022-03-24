@@ -83,7 +83,7 @@ void __retarget_lock_acquire(_LOCK_T lock)
                 xwos_skd_get_context_lc(&ctx, NULL);
                 if (XWOS_SKD_CONTEXT_THD == ctx) {
                         xwos_mtx_lock_unintr(&lock->xwmtx);
-                } else if (XWMP_SKD_CONTEXT_INIT_EXIT == ctx) {
+                } else if (XWOS_SKD_CONTEXT_INIT_EXIT == ctx) {
                 } else {
                         XWOS_BUG();
                 }
@@ -105,7 +105,7 @@ int __retarget_lock_try_acquire(_LOCK_T lock)
                 xwos_skd_get_context_lc(&ctx, NULL);
                 if (XWOS_SKD_CONTEXT_THD == ctx) {
                         rc = xwos_mtx_trylock(&lock->xwmtx);
-                } else if (XWMP_SKD_CONTEXT_INIT_EXIT == ctx) {
+                } else if (XWOS_SKD_CONTEXT_INIT_EXIT == ctx) {
                         rc = XWOK;
                 } else {
                         rc = -ENOTINTHD;
@@ -129,7 +129,7 @@ void __retarget_lock_release(_LOCK_T lock)
                 xwos_skd_get_context_lc(&ctx, NULL);
                 if (XWOS_SKD_CONTEXT_THD == ctx) {
                         xwos_mtx_unlock(&lock->xwmtx);
-                } else if (XWMP_SKD_CONTEXT_INIT_EXIT == ctx) {
+                } else if (XWOS_SKD_CONTEXT_INIT_EXIT == ctx) {
                 } else {
                         XWOS_BUG();
                 }
