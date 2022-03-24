@@ -45,14 +45,27 @@ struct xwup_plwq;
 #endif
 
 /**
+ * @brief XWOS UP线程属性
+ */
+struct xwup_thd_attr {
+        const char * name; /**< 线程名称 */
+        xwstk_t * stack; /**< 栈内存的基地址 */
+        xwsz_t stack_size; /**< 线程栈的大小，以字节(byte)为单位，
+                                注意与CPU的ABI接口规定的内存边界对齐 */
+        xwsz_t stack_guard_size; /**< 栈内存警戒线 */
+        xwpr_t priority; /**< 优先级 */
+        bool detached; /**< 是否为分离态 */
+        bool privileged; /**< 是否为特权线程 */
+};
+
+/**
  * @brief XWOS UP线程对象
  */
 struct xwup_thd {
-        struct xwup_skd_stack_info stack; /**< 栈 */
+        struct xwup_skdobj_stack stack; /**< 栈 */
         struct xwlib_bclst_node thdnode; /**< 调度器线程链表中的节点 */
 
         xwsq_t state; /**< 线程状态 */
-        xwsq_t attribute; /**< 线程属性 */
 
 #if (1 == XWUPRULE_SKD_THD_FREEZE)
         /* 冻结状态信息 */
@@ -149,17 +162,14 @@ void xwup_thd_wakeup(struct xwup_thd * thd)
         xwup_thd_rq_add_tail(thd);
 }
 
+void xwup_thd_attr_init(struct xwup_thd_attr * attr);
 xwer_t xwup_thd_init(struct xwup_thd * thd,
-                     const char * name,
-                     xwup_thd_f mainfunc, void * arg,
-                     xwstk_t * stack, xwsz_t stack_size,
-                     xwpr_t priority, xwsq_t attr);
+                     const struct xwup_thd_attr * inattr,
+                     xwup_thd_f mainfunc, void * arg);
 xwer_t xwup_thd_fini(struct xwup_thd * thd);
 xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
-                       const char * name,
-                       xwup_thd_f manfunc, void * arg,
-                       xwsz_t stack_size, xwpr_t priority,
-                       xwsq_t attr);
+                       const struct xwup_thd_attr * inattr,
+                       xwup_thd_f manfunc, void * arg);
 xwer_t xwup_thd_delete(struct xwup_thd * thd);
 void xwup_cthd_yield(void);
 void xwup_cthd_exit(xwer_t rc);

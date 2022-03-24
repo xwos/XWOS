@@ -452,9 +452,11 @@ void xwmp_skd_init_idled(struct xwmp_skd * xwskd)
 #elif (defined(XWMMCFG_EA_STACK) && (1 == XWMMCFG_EA_STACK))
         xwskd->idle.sp = xwskd->idle.base;
 #else
-#error "Unknown stack type!"
+#  error "Unknown stack type!"
 #endif
-        xwospl_skd_init_stack(&xwskd->idle, xwmp_cthd_exit, XWMP_SKDATTR_PRIVILEGED);
+        xwskd->idle.guard = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
+        xwskd->idle.flag = XWMP_SKDOBJ_FLAG_PRIVILEGED;
+        xwospl_skd_init_stack(&xwskd->idle, xwmp_cthd_exit);
 }
 
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
@@ -510,9 +512,11 @@ void xwmp_skd_init_bhd(struct xwmp_skd * xwskd)
 #elif defined(XWMMCFG_EA_STACK) && (1 == XWMMCFG_EA_STACK)
         xwskd->bh.sp = xwskd->bh.base;
 #else
-#error "Unknown stack type!"
+#  error "Unknown stack type!"
 #endif
-        xwospl_skd_init_stack(&xwskd->bh, xwmp_cthd_exit, XWMP_SKDATTR_PRIVILEGED);
+        xwskd->bh.guard = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
+        xwskd->bh.flag = XWMP_SKDOBJ_FLAG_PRIVILEGED;
+        xwospl_skd_init_stack(&xwskd->bh, xwmp_cthd_exit);
 }
 
 /**
@@ -828,7 +832,7 @@ __xwmp_code
 void xwmp_skd_chkpmpt(struct xwmp_skd * xwskd)
 {
         struct xwmp_thd * t;
-        struct xwmp_skd_stack_info * cstk;
+        struct xwmp_skdobj_stack * cstk;
         xwreg_t cpuirq;
         bool sched;
 

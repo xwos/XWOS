@@ -32,49 +32,69 @@ xwer_t xwbrdemo_thd_func(void * arg);
 
 const struct xwos_thd_desc xwbrdemo_thd_desc[] = {
         [0] = {
-                .name = "example.br.thd.0",
-                .prio = XWBRDEMO_THD_PRIORITY,
-                .stack = XWOS_THD_STACK_DYNAMIC,
-                .stack_size = 2048,
+                .attr = {
+                        .name = "example.br.thd.0",
+                        .stack = NULL,
+                        .stack_size = 2048,
+                        .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                        .priority = XWBRDEMO_THD_PRIORITY,
+                        .detached = false,
+                        .privileged = true,
+                },
                 .func = (xwos_thd_f)xwbrdemo_thd_func,
                 .arg = (void *)0,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [1] = {
-                .name = "example.br.thd.1",
-                .prio = XWBRDEMO_THD_PRIORITY,
-                .stack = XWOS_THD_STACK_DYNAMIC,
-                .stack_size = 2048,
+                .attr = {
+                        .name = "example.br.thd.1",
+                        .stack = NULL,
+                        .stack_size = 2048,
+                        .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                        .priority = XWBRDEMO_THD_PRIORITY,
+                        .detached = false,
+                        .privileged = true,
+                },
                 .func = (xwos_thd_f)xwbrdemo_thd_func,
                 .arg = (void *)1,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [2] = {
-                .name = "example.br.thd.2",
-                .prio = XWBRDEMO_THD_PRIORITY,
-                .stack = XWOS_THD_STACK_DYNAMIC,
-                .stack_size = 2048,
+                .attr = {
+                        .name = "example.br.thd.2",
+                        .stack = NULL,
+                        .stack_size = 2048,
+                        .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                        .priority = XWBRDEMO_THD_PRIORITY,
+                        .detached = false,
+                        .privileged = true,
+                },
                 .func = (xwos_thd_f)xwbrdemo_thd_func,
                 .arg = (void *)2,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [3] = {
-                .name = "example.br.thd.3",
-                .prio = XWBRDEMO_THD_PRIORITY,
-                .stack = XWOS_THD_STACK_DYNAMIC,
-                .stack_size = 2048,
+                .attr = {
+                        .name = "example.br.thd.3",
+                        .stack = NULL,
+                        .stack_size = 2048,
+                        .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                        .priority = XWBRDEMO_THD_PRIORITY,
+                        .detached = false,
+                        .privileged = true,
+                },
                 .func = (xwos_thd_f)xwbrdemo_thd_func,
                 .arg = (void *)3,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [4] = {
-                .name = "example.br.thd.4",
-                .prio = XWBRDEMO_THD_PRIORITY,
-                .stack = XWOS_THD_STACK_DYNAMIC,
-                .stack_size = 2048,
+                .attr = {
+                        .name = "example.br.thd.4",
+                        .stack = NULL,
+                        .stack_size = 2048,
+                        .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                        .priority = XWBRDEMO_THD_PRIORITY,
+                        .detached = false,
+                        .privileged = true,
+                },
                 .func = (xwos_thd_f)xwbrdemo_thd_func,
                 .arg = (void *)4,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
 struct xwos_thd * xwbrdemo_thd[xw_array_size(xwbrdemo_thd_desc)];
@@ -110,12 +130,9 @@ xwer_t example_br_start(void)
         /* 创建线程 */
         for (i = 0; i < xw_array_size(xwbrdemo_thd_desc); i++) {
                 rc = xwos_thd_create(&xwbrdemo_thd[i],
-                                     xwbrdemo_thd_desc[i].name,
+                                     &xwbrdemo_thd_desc[i].attr,
                                      xwbrdemo_thd_desc[i].func,
-                                     xwbrdemo_thd_desc[i].arg,
-                                     xwbrdemo_thd_desc[i].stack_size,
-                                     xwbrdemo_thd_desc[i].prio,
-                                     xwbrdemo_thd_desc[i].attr);
+                                     xwbrdemo_thd_desc[i].arg);
                 if (rc < 0) {
                         goto err_thd_create;
                 }

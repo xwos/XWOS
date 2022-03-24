@@ -25,40 +25,6 @@
 #define XWPCP_TXTHD_PRIORITY XWMDCFG_isc_xwpcp_TXTHD_PRIORITY
 #define XWPCP_RXTHD_PRIORITY XWMDCFG_isc_xwpcp_RXTHD_PRIORITY
 
-/**
- * @brief 发送线程的描述
- */
-static __xwmd_rodata
-const struct xwos_thd_desc xwpcp_rxthd_desc = {
-        .name = "xwmd.isc.xwpcp.rxthd",
-        .prio = XWPCP_RXTHD_PRIORITY,
-        .stack = XWOS_THD_STACK_DYNAMIC,
-        .stack_size = 2048,
-        .func = (xwos_thd_f)xwpcp_rxthd,
-        .arg = NULL, /* TBD */
-        .attr = XWOS_SKDATTR_PRIVILEGED,
-};
-
-/**
- * @brief 发送线程的描述
- */
-static __xwmd_rodata
-const struct xwos_thd_desc xwpcp_txthd_desc = {
-        .name = "xwmd.isc.xwpcp.txthd",
-        .prio = XWPCP_TXTHD_PRIORITY,
-        .stack = XWOS_THD_STACK_DYNAMIC,
-        .stack_size = 2048,
-        .func = (xwos_thd_f)xwpcp_txthd,
-        .arg = NULL, /* TBD */
-        .attr = XWOS_SKDATTR_PRIVILEGED,
-};
-
-/**
- * @brief 内存池名字
- */
-static __xwmd_rodata
-const char xwpcp_mempool_name[] = "xwpcp.mempool";
-
 static __xwmd_code
 void xwpcp_txcb_notify(struct xwpcp * xwpcp, xwpcp_txh_t txh, xwer_t rc, void * arg);
 
@@ -94,6 +60,7 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
                    const struct xwpcp_hwifal_operation * hwifops, void * hwifcb,
                    xwu8_t * mem, xwsz_t memsize)
 {
+        struct xwos_thd_attr attr;
         xwer_t rc;
         xwssq_t i, j;
 
@@ -121,7 +88,7 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
 
         /* 创建内存池 */
         xwpcp->mempool = (struct xwmm_bma *)&xwpcp->mempool_bma_raw;
-        rc = xwmm_bma_init(xwpcp->mempool, xwpcp_mempool_name,
+        rc = xwmm_bma_init(xwpcp->mempool, "xwpcp.mempool",
                            (xwptr_t)mem, memsize,
                            XWPCP_MEMBLK_SIZE, XWPCP_MEMBLK_ODR);
         if (__xwcc_unlikely(rc < 0)) {
@@ -185,24 +152,26 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         }
 
         /* 创建线程 */
-        rc = xwos_thd_create(&xwpcp->rxthd,
-                             xwpcp_rxthd_desc.name,
-                             xwpcp_rxthd_desc.func,
-                             xwpcp,
-                             xwpcp_rxthd_desc.stack_size,
-                             xwpcp_rxthd_desc.prio,
-                             xwpcp_rxthd_desc.attr);
+        xwos_thd_attr_init(&attr);
+        attr.name = "xwmd.isc.xwpcp.rxthd";
+        attr.stack = NULL;
+        attr.stack_size = 2048;
+        attr.priority = XWPCP_RXTHD_PRIORITY;
+        attr.detached = false;
+        attr.privileged = true;
+        rc = xwos_thd_create(&xwpcp->rxthd, &attr, (xwos_thd_f)xwpcp_rxthd, xwpcp);
         if (rc < 0) {
                 goto err_rxthd_create;
         }
 
-        rc = xwos_thd_create(&xwpcp->txthd,
-                             xwpcp_txthd_desc.name,
-                             xwpcp_txthd_desc.func,
-                             xwpcp,
-                             xwpcp_txthd_desc.stack_size,
-                             xwpcp_txthd_desc.prio,
-                             xwpcp_txthd_desc.attr);
+        xwos_thd_attr_init(&attr);
+        attr.name = "xwmd.isc.xwpcp.txthd";
+        attr.stack = NULL;
+        attr.stack_size = 2048;
+        attr.priority = XWPCP_TXTHD_PRIORITY;
+        attr.detached = false;
+        attr.privileged = true;
+        rc = xwos_thd_create(&xwpcp->txthd, &attr, (xwos_thd_f)xwpcp_txthd, xwpcp);
         if (rc < 0) {
                 goto err_txthd_create;
         }

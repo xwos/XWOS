@@ -42,7 +42,7 @@
 #define XWCDCFG_ds_SOC_EIRQ_ROISRT                              1
 #define XWCDCFG_ds_SOC_DMA                                      0
 #define XWCDCFG_ds_SOC_DMA_ROCBT                                1
-#define XWCDCFG_ds_ERAM                                         0
+#define XWCDCFG_ds_SOC_ERAM                                     0
 
 /******** ******** UART ******** ********/
 #define XWCDCFG_ds_UART                                         0
@@ -88,6 +88,7 @@
  ******** ******** ********   SPI perpheral   ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWCDCFG_perpheral_spi_flash_w25qxx                      0
+#define XWCDCFG_perpheral_spi_lcd_st7735                        0
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********  CAN transceiver  ******** ******** ********

@@ -33,20 +33,7 @@
 #define XWSWTDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 xwer_t xwswtdemo_thd_func(void * arg);
 
-/**
- * @brief 线程描述表
- */
-const struct xwos_thd_desc xwswtdemo_thd_desc = {
-        .name = "xwswtdemo.thd",
-        .prio = XWSWTDEMO_THD_PRIORITY,
-        .stack = XWOS_THD_STACK_DYNAMIC,
-        .stack_size = 2048,
-        .func = (xwos_thd_f)xwswtdemo_thd_func,
-        .arg = NULL,
-        .attr = XWOS_SKDATTR_PRIVILEGED,
-};
 struct xwos_thd * xwswtdemo_thd;
-
 struct xwos_swt xwswtdemo_swt0;
 struct xwos_swt * xwswtdemo_swt1;
 
@@ -60,6 +47,7 @@ struct xwos_flg swtflg;
  */
 xwer_t example_timer_start(void)
 {
+        struct xwos_thd_attr attr;
         xwer_t rc;
 
         /* 初始化事件信号旗 */
@@ -83,13 +71,14 @@ xwer_t example_timer_start(void)
         }
 
         /* 创建线程 */
-        rc = xwos_thd_create(&xwswtdemo_thd,
-                             xwswtdemo_thd_desc.name,
-                             xwswtdemo_thd_desc.func,
-                             xwswtdemo_thd_desc.arg,
-                             xwswtdemo_thd_desc.stack_size,
-                             xwswtdemo_thd_desc.prio,
-                             xwswtdemo_thd_desc.attr);
+        xwos_thd_attr_init(&attr);
+        attr.name = "xwswtdemo.thd";
+        attr.stack = NULL;
+        attr.stack_size = 2048;
+        attr.priority = XWSWTDEMO_THD_PRIORITY;
+        attr.detached = false;
+        attr.privileged = true;
+        rc = xwos_thd_create(&xwswtdemo_thd, &attr, xwswtdemo_thd_func, NULL);
         if (rc < 0) {
                 goto err_thd_create;
         }

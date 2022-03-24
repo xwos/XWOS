@@ -15,9 +15,7 @@
 
 #include <xwos/mp/skd.h>
 
-#define XWOSDL_SKDATTR_PRIVILEGED               XWMP_SKDATTR_PRIVILEGED
-#define XWOSDL_SKDATTR_DETACHED                 XWMP_SKDATTR_DETACHED
-#define XWOSDL_SKDATTR_JOINABLE                 XWMP_SKDATTR_JOINABLE
+#define XWOSDL_SKDOBJ_FLAG_PRIVILEGED           XWMP_SKDOBJ_FLAG_PRIVILEGED
 #define XWOSDL_SKD_PRIORITY_RT_MIN              XWMP_SKD_PRIORITY_RT_MIN
 #define XWOSDL_SKD_PRIORITY_RT_MAX              XWMP_SKD_PRIORITY_RT_MAX
 #define XWOSDL_SKD_PRIORITY_INVALID             XWMP_SKD_PRIORITY_INVALID
@@ -101,29 +99,30 @@ void xwosdl_skd_enpmpt_lc(void)
 
 #include <xwos/mp/thd.h>
 
+#define xwosdl_thd_attr xwmp_thd_attr
 #define xwosdl_thd xwmp_thd
 typedef xwmp_thd_f xwosdl_thd_f;
 
 static __xwcc_inline
-xwer_t xwosdl_thd_init(struct xwosdl_thd * thd, const char * name,
-                       xwosdl_thd_f mainfunc, void * arg,
-                       xwstk_t * stack, xwsz_t stack_size,
-                       xwpr_t priority, xwsq_t attr)
+void xwosdl_thd_attr_init(struct xwosdl_thd_attr * attr)
 {
-        return xwmp_thd_init(thd, name,
-                             (xwmp_thd_f)mainfunc, arg,
-                             stack, stack_size,
-                             priority, attr);
+        xwmp_thd_attr_init(attr);
 }
 
 static __xwcc_inline
-xwer_t xwosdl_thd_create(struct xwosdl_thd ** thdbuf, const char * name,
-                         xwosdl_thd_f mainfunc, void * arg,
-                         xwsz_t stack_size,
-                         xwpr_t priority, xwsq_t attr)
+xwer_t xwosdl_thd_init(struct xwosdl_thd * thd,
+                       const struct xwosdl_thd_attr * inattr,
+                       xwosdl_thd_f mainfunc, void * arg)
 {
-        return xwmp_thd_create(thdbuf, name, mainfunc, arg,
-                               stack_size, priority, attr);
+        return xwmp_thd_init(thd, inattr, mainfunc, arg);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_thd_create(struct xwosdl_thd ** thdbuf,
+                         const struct xwosdl_thd_attr * inattr,
+                         xwosdl_thd_f mainfunc, void * arg)
+{
+        return xwmp_thd_create(thdbuf, inattr, mainfunc, arg);
 }
 
 static __xwcc_inline

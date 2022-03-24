@@ -335,7 +335,9 @@ void xwup_skd_init_idled(void)
 #else
 #  error "Unknown stack type!"
 #endif
-        xwospl_skd_init_stack(&xwskd->idle, xwup_cthd_exit, XWUP_SKDATTR_PRIVILEGED);
+        xwskd->idle.guard = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
+        xwskd->idle.flag = XWUP_SKDOBJ_FLAG_PRIVILEGED;
+        xwospl_skd_init_stack(&xwskd->idle, xwup_cthd_exit);
 }
 
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
@@ -398,7 +400,9 @@ void xwup_skd_init_bhd(void)
 #else
 #  error "Unknown stack type!"
 #endif
-        xwospl_skd_init_stack(&xwskd->bh, xwup_cthd_exit, XWUP_SKDATTR_PRIVILEGED);
+        xwskd->bh.guard = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
+        xwskd->bh.flag = XWUP_SKDOBJ_FLAG_PRIVILEGED;
+        xwospl_skd_init_stack(&xwskd->bh, xwup_cthd_exit);
 }
 
 /**
@@ -538,7 +542,7 @@ struct xwup_skd * xwup_skd_enpmpt_lc(void)
         xwskd->dis_pmpt_cnt--;
         if (0 == xwskd->dis_pmpt_cnt) {
                 if (0 != xwskd->req_chkpmpt_cnt) {
-                        struct xwup_skd_stack_info * cstk;
+                        struct xwup_skdobj_stack * cstk;
 
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
                         if (XWUP_SKD_BH_STK(xwskd) == xwskd->cstk) {
@@ -605,7 +609,7 @@ __xwup_code
 void xwup_skd_chkpmpt(void)
 {
         struct xwup_skd * xwskd;
-        struct xwup_skd_stack_info * cstk;
+        struct xwup_skdobj_stack * cstk;
         struct xwup_thd * t;
         xwreg_t cpuirq;
         bool sched;

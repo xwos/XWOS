@@ -32,23 +32,9 @@
 #include <xwam/application/w25qrpt/protocol.h>
 #include <xwam/application/w25qrpt/mif.h>
 
-#define W25QRPT_THD_PRIORITY \
-        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+#define W25QRPT_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 xwer_t w25qrpt_thd_func(void * arg);
-
-/**
- * @brief 线程描述表
- */
-const struct xwos_thd_desc w25qrpt_tbd = {
-        .name = "w25qrpt.thd",
-        .prio = W25QRPT_THD_PRIORITY,
-        .stack = XWOS_THD_STACK_DYNAMIC,
-        .stack_size = 4096,
-        .func = (xwos_thd_f)w25qrpt_thd_func,
-        .arg = NULL, /* TBD */
-        .attr = XWOS_SKDATTR_PRIVILEGED,
-};
 
 /**
  * @brief 启动W25Qxx编程器模块
@@ -61,6 +47,7 @@ xwer_t w25qrpt_start(struct w25qrpt * w25qrpt,
 {
         xwer_t rc;
         xwtm_t timeout;
+        struct xwos_thd_attr attr;
 
         XWOS_VALIDATE((w25qrpt), "nullptr", -EFAULT);
         XWOS_VALIDATE((w25qrpt), "flash", -EFAULT);
@@ -91,13 +78,14 @@ xwer_t w25qrpt_start(struct w25qrpt * w25qrpt,
                 goto err_hwifal_open;
         }
 
-        rc = xwos_thd_create(&w25qrpt->thd,
-                             w25qrpt_tbd.name,
-                             w25qrpt_tbd.func,
-                             w25qrpt,
-                             w25qrpt_tbd.stack_size,
-                             w25qrpt_tbd.prio,
-                             w25qrpt_tbd.attr);
+        xwos_thd_attr_init(&attr);
+        attr.name = "w25qrpt.thd";
+        attr.stack = NULL;
+        attr.stack_size = 4096;
+        attr.priority = W25QRPT_THD_PRIORITY;
+        attr.detached = false;
+        attr.privileged = true;
+        rc = xwos_thd_create(&w25qrpt->thd, &attr, w25qrpt_thd_func, w25qrpt);
         if (rc < 0) {
                 goto err_thd_create;
         }

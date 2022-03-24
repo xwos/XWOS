@@ -37,13 +37,17 @@ static
 xwer_t led_task(void);
 
 const struct xwos_thd_desc main_thd_desc = {
-        .name = "main.thd",
-        .prio = MAIN_THD_PRIORITY,
-        .stack = XWOS_THD_STACK_DYNAMIC,
-        .stack_size = 2048,
+        .attr = {
+                .name = "main.thd",
+                .stack = NULL,
+                .stack_size = 2048,
+                .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                .priority = MAIN_THD_PRIORITY,
+                .detached = true,
+                .privileged = true,
+        },
         .func = main_task,
         .arg = NULL,
-        .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
 };
 struct xwos_thd * main_thd;
 
@@ -52,12 +56,9 @@ xwer_t xwos_main(void)
         xwer_t rc;
 
         rc = xwos_thd_create(&main_thd,
-                             main_thd_desc.name,
+                             &main_thd_desc.attr,
                              main_thd_desc.func,
-                             main_thd_desc.arg,
-                             main_thd_desc.stack_size,
-                             main_thd_desc.prio,
-                             main_thd_desc.attr);
+                             main_thd_desc.arg);
         if (rc < 0) {
                 goto err_init_thd_create;
         }

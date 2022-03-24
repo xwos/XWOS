@@ -70,21 +70,13 @@ void bmbtn_eirq_btn_isr(struct xwds_soc * soc, xwid_t id, xwds_eirq_arg_t arg);
 static
 xwer_t bmbtn_task(void * arg);
 
-const struct xwos_thd_desc bmbtn_thd_desc = {
-        .name = "bm.btn.thd",
-        .prio = BMBTN_THD_PRIORITY,
-        .stack = XWOS_THD_STACK_DYNAMIC,
-        .stack_size = 2048,
-        .func = bmbtn_task,
-        .arg = NULL,
-        .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
-};
 struct xwos_thd * bmbtn_thd;
 
 struct xwos_sem bmbtn_sem;
 
 xwer_t bmbtn_start(void)
 {
+        struct xwos_thd_attr attr;
         xwer_t rc;
 
         rc = xwos_sem_init(&bmbtn_sem, 0, 1);
@@ -92,13 +84,14 @@ xwer_t bmbtn_start(void)
                 goto err_sem_init;
         }
 
-        rc = xwos_thd_create(&bmbtn_thd,
-                             bmbtn_thd_desc.name,
-                             bmbtn_thd_desc.func,
-                             bmbtn_thd_desc.arg,
-                             bmbtn_thd_desc.stack_size,
-                             bmbtn_thd_desc.prio,
-                             bmbtn_thd_desc.attr);
+        xwos_thd_attr_init(&attr);
+        attr.name = "bm.btn.thd";
+        attr.stack = NULL,
+        attr.stack_size = 2048;
+        attr.priority = BMBTN_THD_PRIORITY;
+        attr.detached = true;
+        attr.privileged = true;
+        rc = xwos_thd_create(&bmbtn_thd, &attr, bmbtn_task, NULL);
         if (rc < 0) {
                 goto err_thd_create;
         }

@@ -33,67 +33,36 @@ xwer_t thd_1_func(void * arg);
 xwer_t thd_2_func(void * arg);
 
 /**
- * @brief 动态创建的线程描述表
+ * @brief 动态创建的线程
  */
-const struct xwos_thd_desc dynamic_thd_desc[] = {
-        [0] = {
-                .name = "Thread-1",
-                .prio = THD_1_PRIORITY,
-                .stack = XWOS_THD_STACK_DYNAMIC,
-                .stack_size = 2048,
-                .func = (xwos_thd_f)thd_1_func,
-                .arg = (void *)3,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
-        },
-};
-struct xwos_thd * dynamic_thd[xw_array_size(dynamic_thd_desc)];
+struct xwos_thd * dynamic_thd;
 
 /**
  * @brief 静态初始化的线程的栈内存
  */
-xwstk_t __xwcc_aligned(8) static_thd_stack[1][512]; /* 大小 == sizeof(xwstk_t) * 256 */
+xwstk_t __xwcc_aligned(8) static_thd_stack[512];
 
 /**
- * @brief 静态初始化的线程描述表
+ * @brief 静态初始化的线程
  */
-const struct xwos_thd_desc static_thd_desc[] = {
-        [0] = {
-                .name = "Thread-2",
-                .prio = THD_2_PRIORITY,
-                .stack = static_thd_stack[0],
-                .stack_size = sizeof(static_thd_stack[0]),
-                .func = (xwos_thd_f)thd_2_func,
-                .arg = (void *)6,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
-        },
-};
-struct xwos_thd static_thd[xw_array_size(static_thd_desc)];
+struct xwos_thd static_thd;
 
 /**
  * @brief 模块的加载函数
  */
 xwer_t example_thread_create_start(void)
 {
+        struct xwos_thd_attr attr;
         xwer_t rc;
-        xwsq_t i;
 
-        /* 建立dynamic_thd_desc中的线程 */
-        for (i = 0; i < xw_array_size(dynamic_thd_desc); i++) {
-                rc = xwos_thd_create(&dynamic_thd[i],
-                                     dynamic_thd_desc[i].name,
-                                     dynamic_thd_desc[i].func,
-                                     dynamic_thd_desc[i].arg,
-                                     dynamic_thd_desc[i].stack_size,
-                                     dynamic_thd_desc[i].prio,
-                                     dynamic_thd_desc[i].attr);
-                if (rc < 0) {
-                        goto err_thd_create;
-                }
-        }
-
-        return XWOK;
-
-err_thd_create:
+        xwos_thd_attr_init(&attr);
+        attr.name = "dynamic.thd";
+        attr.stack = NULL;
+        attr.stack_size = 2048;
+        attr.priority = THD_1_PRIORITY;
+        attr.detached = false;
+        attr.privileged = true;
+        rc = xwos_thd_create(&dynamic_thd, &attr, thd_1_func, (void *)3);
         return rc;
 }
 
@@ -102,28 +71,25 @@ err_thd_create:
  */
 xwer_t thd_1_func(void * arg)
 {
+        struct xwos_thd_attr attr;
         xwtm_t time;
         xwer_t rc = XWOK;
         xwer_t childrc;
         xwsq_t argv = (xwsq_t)arg; /* 获取创建线程时提供的参数 */
-        xwsq_t i;
 
         thdcrtlogf(INFO, "[线程1] 开始运行。\n");
 
-        /* 初始化static_thd_desc中的线程 */
-        for (i = 0; i < xw_array_size(static_thd_desc); i++) {
-                rc = xwos_thd_init(&static_thd[i],
-                                   static_thd_desc[i].name,
-                                   static_thd_desc[i].func,
-                                   static_thd_desc[i].arg,
-                                   static_thd_desc[i].stack,
-                                   static_thd_desc[i].stack_size,
-                                   static_thd_desc[i].prio,
-                                   static_thd_desc[i].attr);
-                if (rc < 0) {
-                        thdcrtlogf(INFO, "[线程1] 初始化[%s]失败。\n",
-                                   static_thd_desc[i].name);
-                }
+        /* 初始化static线程 */
+        xwos_thd_attr_init(&attr);
+        attr.name = "static.thd";
+        attr.stack = static_thd_stack;
+        attr.stack_size = sizeof(static_thd_stack);
+        attr.priority = THD_2_PRIORITY;
+        attr.detached = false;
+        attr.privileged = true;
+        rc = xwos_thd_init(&static_thd, &attr, thd_2_func, (void *)6);
+        if (rc < 0) {
+                thdcrtlogf(INFO, "[线程1] 初始化[%s]失败。\n", attr.name);
         }
 
         /* 循环argv次 */
@@ -138,19 +104,12 @@ xwer_t thd_1_func(void * arg)
         }
 
         /* 结束刚创建的线程2 */
-        for (i = 0; i < xw_array_size(static_thd_desc); i++) {
-                /* 等待线程2结束，并从childrc中获取线程2的返回值 */
-                rc = xwos_thd_stop(&static_thd[i], &childrc);
-                if (rc < 0) {
-                        thdcrtlogf(ERR, "[线程1] 终止线程 [%s] 失败，rc:%d。\n",
-                                   static_thd_desc[i].name, rc);
-                } else {
-                        thdcrtlogf(INFO,
-                                   "[%s] 返回 %d (%s)。\n",
-                                   static_thd_desc[i].name,
-                                   childrc,
-                                   strerror(-childrc));
-                }
+        rc = xwos_thd_stop(&static_thd, &childrc);
+        if (rc < 0) {
+                thdcrtlogf(ERR, "[线程1] 终止线程2失败，rc:%d。\n", rc);
+        } else {
+                thdcrtlogf(INFO, "终止线程2返回 %d (%s)。\n",
+                           childrc, strerror(-childrc));
         }
 
         thdcrtlogf(INFO, "[线程1] 退出，argv：%d。\n", argv);

@@ -45,13 +45,17 @@ struct xwos_flg xwflgdemo_flg;
  * @brief 消费线程
  */
 const struct xwos_thd_desc xwflgdemo_consumer_thd_desc = {
-        .name = "example.flag.consumer",
-        .prio = XWFLGDEMO_CONSUMER_PRIORITY,
-        .stack = XWOS_THD_STACK_DYNAMIC,
-        .stack_size = 4096,
+        .attr = {
+                .name = "example.flag.consumer",
+                .stack = NULL,
+                .stack_size = 4096,
+                .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                .priority = XWFLGDEMO_CONSUMER_PRIORITY,
+                .detached = false,
+                .privileged = true,
+        },
         .func = (xwos_thd_f)xwflgdemo_consumer_func,
         .arg = NULL,
-        .attr = XWOS_SKDATTR_PRIVILEGED,
 };
 struct xwos_thd * xwflgdemo_consumer;
 
@@ -59,13 +63,17 @@ struct xwos_thd * xwflgdemo_consumer;
  * @brief 生产线程
  */
 const struct xwos_thd_desc xwflgdemo_producer_thd_desc = {
-        .name = "example.flag.producer",
-        .prio = XWFLGDEMO_PRODUCER_PRIORITY,
-        .stack = XWOS_THD_STACK_DYNAMIC,
-        .stack_size = 4096,
+        .attr = {
+                .name = "example.flag.producer",
+                .stack = NULL,
+                .stack_size = 4096,
+                .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                .priority = XWFLGDEMO_PRODUCER_PRIORITY,
+                .detached = false,
+                .privileged = true,
+        },
         .func = (xwos_thd_f)xwflgdemo_producer_func,
         .arg = NULL,
-        .attr = XWOS_SKDATTR_PRIVILEGED,
 };
 struct xwos_thd * xwflgdemo_producer;
 
@@ -85,24 +93,18 @@ xwer_t example_flg_start(void)
 
         /* 创建等待事件标志的线程 */
         rc = xwos_thd_create(&xwflgdemo_consumer,
-                             xwflgdemo_consumer_thd_desc.name,
+                             &xwflgdemo_consumer_thd_desc.attr,
                              xwflgdemo_consumer_thd_desc.func,
-                             xwflgdemo_consumer_thd_desc.arg,
-                             xwflgdemo_consumer_thd_desc.stack_size,
-                             xwflgdemo_consumer_thd_desc.prio,
-                             xwflgdemo_consumer_thd_desc.attr);
+                             xwflgdemo_consumer_thd_desc.arg);
         if (rc < 0) {
                 goto err_consumer_create;
         }
 
         /* 创建发布事件标志的线程 */
         rc = xwos_thd_create(&xwflgdemo_producer,
-                             xwflgdemo_producer_thd_desc.name,
+                             &xwflgdemo_producer_thd_desc.attr,
                              xwflgdemo_producer_thd_desc.func,
-                             xwflgdemo_producer_thd_desc.arg,
-                             xwflgdemo_producer_thd_desc.stack_size,
-                             xwflgdemo_producer_thd_desc.prio,
-                             xwflgdemo_producer_thd_desc.attr);
+                             xwflgdemo_producer_thd_desc.arg);
         if (rc < 0) {
                 goto err_producer_create;
         }

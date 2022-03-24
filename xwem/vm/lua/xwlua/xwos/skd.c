@@ -93,6 +93,7 @@ xwer_t xwlua_thd_script_main(void * arg)
 
 int xwlua_thd_dofile(lua_State * L)
 {
+        struct xwos_thd_attr attr;
         xwer_t rc;
         const char * arg;
         xwlua_thd_sp * thdsp;
@@ -105,9 +106,14 @@ int xwlua_thd_dofile(lua_State * L)
                 xwlua_openlibs(thdl);
                 luaL_loadfile(thdl, arg);
                 arg = lua_pushstring(thdl, arg);
-                rc = xwos_thd_create(&thdsp->thd, arg,
-                                     xwlua_thd_script_main, thdl, XWLUA_THD_STACK,
-                                     XWLUA_SCRIPT_PRIORITY, XWOS_SKDATTR_PRIVILEGED);
+                xwos_thd_attr_init(&attr);
+                attr.name = arg;
+                attr.stack = NULL;
+                attr.stack_size = XWLUA_THD_STACK_SIZE;
+                attr.priority = XWLUA_SCRIPT_PRIORITY;
+                attr.detached = false;
+                attr.privileged = true;
+                rc = xwos_thd_create(&thdsp->thd, &attr, xwlua_thd_script_main, thdl);
                 if (XWOK == rc) {
                         xwos_thd_grab(thdsp->thd); /* 增加对象的强引用 */
                         thdsp->tik = xwos_thd_gettik(thdsp->thd);
@@ -129,6 +135,7 @@ int xwlua_thd_dofile(lua_State * L)
 
 int xwlua_thd_dostring(lua_State * L)
 {
+        struct xwos_thd_attr attr;
         xwer_t rc;
         const char * arg;
         const char * name;
@@ -143,9 +150,14 @@ int xwlua_thd_dostring(lua_State * L)
                 xwlua_openlibs(thdl);
                 luaL_loadbufferx(thdl, arg, sl, "main", NULL);
                 name = lua_pushstring(thdl, "main");
-                rc = xwos_thd_create(&thdsp->thd, name,
-                                     xwlua_thd_script_main, thdl, XWLUA_THD_STACK,
-                                     XWLUA_SCRIPT_PRIORITY, XWOS_SKDATTR_PRIVILEGED);
+                xwos_thd_attr_init(&attr);
+                attr.name = name;
+                attr.stack = NULL;
+                attr.stack_size = XWLUA_THD_STACK_SIZE;
+                attr.priority = XWLUA_SCRIPT_PRIORITY;
+                attr.detached = false;
+                attr.privileged = true;
+                rc = xwos_thd_create(&thdsp->thd, &attr, xwlua_thd_script_main, thdl);
                 if (XWOK == rc) {
                         xwos_thd_grab(thdsp->thd); /* 增加对象的强引用 */
                         thdsp->tik = xwos_thd_gettik(thdsp->thd);
@@ -169,6 +181,7 @@ int xwlua_xt_function_writer(lua_State * L, const void * b, size_t size, void * 
 
 int xwlua_thd_call(lua_State * L)
 {
+        struct xwos_thd_attr attr;
         xwer_t rc;
         luaL_Buffer lb;
         xwlua_thd_sp * thdsp;
@@ -195,9 +208,14 @@ int xwlua_thd_call(lua_State * L)
                 xwlua_openlibs(thdl);
                 luaL_loadbufferx(thdl, func, fl, "main", "bt");
                 name = lua_pushstring(thdl, "main");
-                rc = xwos_thd_create(&thdsp->thd, name,
-                                     xwlua_thd_script_main, thdl, XWLUA_THD_STACK,
-                                     XWLUA_SCRIPT_PRIORITY, XWOS_SKDATTR_PRIVILEGED);
+                xwos_thd_attr_init(&attr);
+                attr.name = name;
+                attr.stack = NULL;
+                attr.stack_size = XWLUA_THD_STACK_SIZE;
+                attr.priority = XWLUA_SCRIPT_PRIORITY;
+                attr.detached = false;
+                attr.privileged = true;
+                rc = xwos_thd_create(&thdsp->thd, &attr, xwlua_thd_script_main, thdl);
                 if (XWOK == rc) {
                         xwos_thd_grab(thdsp->thd); /* 增加对象的强引用 */
                         thdsp->tik = xwos_thd_gettik(thdsp->thd);

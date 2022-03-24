@@ -34,26 +34,34 @@ xwer_t xwmtxdemo_thd_0_func(void * arg);
 xwer_t xwmtxdemo_thd_1_func(void * arg);
 
 /**
- * @brief 动态创建的线程描述表
+ * @brief 线程描述表
  */
 const struct xwos_thd_desc xwmtxdemo_thd_desc[] = {
         [0] = {
-                .name = "xwmtxdemo.thd.0",
-                .prio = XWMTXDEMO_THD_0_PRIORITY,
-                .stack = XWOS_THD_STACK_DYNAMIC,
-                .stack_size = 2048,
+                .attr = {
+                        .name = "xwmtxdemo.thd.0",
+                        .stack = NULL,
+                        .stack_size = 2048,
+                        .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                        .priority = XWMTXDEMO_THD_0_PRIORITY,
+                        .detached = false,
+                        .privileged = true,
+                },
                 .func = (xwos_thd_f)xwmtxdemo_thd_0_func,
                 .arg = NULL,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [1] = {
-                .name = "xwmtxdemo.thd.1",
-                .prio = XWMTXDEMO_THD_1_PRIORITY,
-                .stack = XWOS_THD_STACK_DYNAMIC,
-                .stack_size = 2048,
+                .attr = {
+                        .name = "xwmtxdemo.thd.1",
+                        .stack = NULL,
+                        .stack_size = 2048,
+                        .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                        .priority = XWMTXDEMO_THD_1_PRIORITY,
+                        .detached = false,
+                        .privileged = true,
+                },
                 .func = (xwos_thd_f)xwmtxdemo_thd_1_func,
                 .arg = (void *)3,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
 struct xwos_thd * xwmtxdemo_thd[xw_array_size(xwmtxdemo_thd_desc)];
@@ -76,12 +84,9 @@ xwer_t example_mtx_start(void)
 
         for (i = 0; i < xw_array_size(xwmtxdemo_thd_desc); i++) {
                 rc = xwos_thd_create(&xwmtxdemo_thd[i],
-                                     xwmtxdemo_thd_desc[i].name,
+                                     &xwmtxdemo_thd_desc[i].attr,
                                      xwmtxdemo_thd_desc[i].func,
-                                     xwmtxdemo_thd_desc[i].arg,
-                                     xwmtxdemo_thd_desc[i].stack_size,
-                                     xwmtxdemo_thd_desc[i].prio,
-                                     xwmtxdemo_thd_desc[i].attr);
+                                     xwmtxdemo_thd_desc[i].arg);
                 if (rc < 0) {
                         goto err_thd_create;
                 }

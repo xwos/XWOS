@@ -33,17 +33,29 @@ struct xwmp_skd;
 struct xwmp_thd;
 
 /**
+ * @brief XWOS MP线程属性
+ */
+struct xwmp_thd_attr {
+        const char * name; /**< 线程名称 */
+        xwstk_t * stack; /**< 栈内存的基地址 */
+        xwsz_t stack_size; /**< 线程栈的大小 */
+        xwsz_t stack_guard_size; /**< 栈内存警戒线 */
+        xwpr_t priority; /**< 优先级 */
+        bool detached; /**< 是否为分离态 */
+        bool privileged; /**< 是否为特权线程 */
+};
+
+/**
  * @brief XWOS MP线程对象
  */
 struct xwmp_thd {
         struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
         struct xwmp_skd * xwskd; /**< 当前线程所属于的调度器 */
-        struct xwmp_skd_stack_info stack; /**< 栈 */
+        struct xwmp_skdobj_stack stack; /**< 栈 */
         struct xwlib_bclst_node thdnode; /**< 调度器线程链表中的节点 */
 
         struct xwmp_splk stlock; /**< 保护状态state的自旋锁 */
         xwsq_t state; /**< 线程状态 */
-        xwsq_t attribute; /**< 线程属性 */
 
         /* 冻结状态 */
         struct xwlib_bclst_node frznode; /**< 冻结链表节点 */
@@ -120,16 +132,14 @@ xwer_t xwmp_thd_outmigrate_lic(struct xwmp_thd * thd, xwid_t dstcpu);
 xwer_t xwmp_thd_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
 
+void xwmp_thd_attr_init(struct xwmp_thd_attr * attr);
 xwer_t xwmp_thd_init(struct xwmp_thd * thd,
-                     const char * name,
-                     xwmp_thd_f mainfunc, void * arg,
-                     xwstk_t * stack, xwsz_t stack_size,
-                     xwpr_t priority, xwsq_t attr);
+                     const struct xwmp_thd_attr * inattr,
+                     xwmp_thd_f mainfunc, void * arg);
 xwer_t xwmp_thd_fini(struct xwmp_thd * thd);
-xwer_t xwmp_thd_create(struct xwmp_thd ** thdpbuf, const char * name,
-                       xwmp_thd_f manfunc, void * arg,
-                       xwsz_t stack_size,
-                       xwpr_t priority, xwsq_t attr);
+xwer_t xwmp_thd_create(struct xwmp_thd ** thdpbuf,
+                       const struct xwmp_thd_attr * inattr,
+                       xwmp_thd_f manfunc, void * arg);
 xwer_t xwmp_thd_delete(struct xwmp_thd * thd);
 xwer_t xwmp_thd_acquire(struct xwmp_thd * thd, xwsq_t tik);
 xwer_t xwmp_thd_release(struct xwmp_thd * thd, xwsq_t tik);

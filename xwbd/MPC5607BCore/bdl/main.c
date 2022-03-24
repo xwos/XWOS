@@ -36,22 +36,30 @@ xwer_t uart_task(void * arg);
 
 const struct xwos_thd_desc board_thd_desc[] = {
         [0] = {
-                .name = "led",
-                .prio = LED_TASK_PRIORITY,
-                .stack = NULL,
-                .stack_size = 1536,
+                .attr = {
+                        .name = "led",
+                        .stack = NULL,
+                        .stack_size = 1536,
+                        .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                        .priority = LED_TASK_PRIORITY,
+                        .detached = true,
+                        .privileged = true,
+                },
                 .func = led_task,
                 .arg = NULL,
-                .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
         },
         [1] = {
-                .name = "uart",
-                .prio = UART_TASK_PRIORITY,
-                .stack = NULL,
-                .stack_size = 2048,
+                .attr = {
+                        .name = "uart",
+                        .stack = NULL,
+                        .stack_size = 2048,
+                        .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                        .priority = UART_TASK_PRIORITY,
+                        .detached = true,
+                        .privileged = true,
+                },
                 .func = uart_task,
                 .arg = NULL,
-                .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
         },
 };
 
@@ -147,12 +155,9 @@ xwer_t xwos_main(void)
 
         for (i = 0; i < xw_array_size(board_thd_desc); i++) {
                 rc = xwos_thd_create(&board_thd[i],
-                                     board_thd_desc[i].name,
+                                     &board_thd_desc[i].attr,
                                      board_thd_desc[i].func,
-                                     board_thd_desc[i].arg,
-                                     board_thd_desc[i].stack_size,
-                                     board_thd_desc[i].prio,
-                                     board_thd_desc[i].attr);
+                                     board_thd_desc[i].arg);
                 BDL_BUG_ON(rc);
         }
         rc = xwos_skd_start_lc();

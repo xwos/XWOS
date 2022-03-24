@@ -71,4 +71,9 @@
 #define XWMDCFG_libc_newlibac_mem                               1
 #define XWMDCFG_libc_newlibac_fops                              1
 
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********               RAMCode               ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#define XWMDCFG_ramcode                                         0
+
 #endif /* cfg/xwmd.h */

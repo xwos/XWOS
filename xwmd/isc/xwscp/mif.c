@@ -29,26 +29,6 @@
 
 extern __xwmd_rodata const xwer_t xwscp_callback_rc[XWSCP_ACK_NUM];
 
-/**
- * @brief 接收线程的描述
- */
-static __xwmd_rodata
-const struct xwos_thd_desc xwscp_thd_desc = {
-        .name = "xwmd.isc.xwscp.thd",
-        .prio = XWSCP_THD_PRIORITY,
-        .stack = XWOS_THD_STACK_DYNAMIC,
-        .stack_size = 2048,
-        .func = (xwos_thd_f)xwscp_thd,
-        .arg = NULL, /* TBD */
-        .attr = XWOS_SKDATTR_PRIVILEGED,
-};
-
-/**
- * @brief 内存池名字
- */
-static __xwmd_rodata
-const char xwscp_mempool_name[] = "xwscp.mempool";
-
 static __xwmd_code
 xwer_t xwscp_gc(void * obj);
 
@@ -89,6 +69,7 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
                    const struct xwscp_hwifal_operations * hwifops, void * hwifcb,
                    xwu8_t * mem, xwsz_t memsize)
 {
+        struct xwos_thd_attr attr;
         xwer_t rc;
 
         XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
@@ -114,7 +95,7 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
 
         /* 创建内存池 */
         xwscp->mempool = (struct xwmm_bma *)&xwscp->mempool_bma_raw;
-        rc = xwmm_bma_init(xwscp->mempool, xwscp_mempool_name,
+        rc = xwmm_bma_init(xwscp->mempool, "xwscp.mempool",
                            (xwptr_t)mem, memsize,
                            XWSCP_MEMBLK_SIZE, XWSCP_MEMBLK_ODR);
         if (__xwcc_unlikely(rc < 0)) {
@@ -159,13 +140,14 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
         }
 
         /* 创建线程 */
-        rc = xwos_thd_create(&xwscp->rx.thd,
-                             xwscp_thd_desc.name,
-                             xwscp_thd_desc.func,
-                             xwscp,
-                             xwscp_thd_desc.stack_size,
-                             xwscp_thd_desc.prio,
-                             xwscp_thd_desc.attr);
+        xwos_thd_attr_init(&attr);
+        attr.name = "xwmd.isc.xwscp.thd";
+        attr.stack = NULL;
+        attr.stack_size = 2048;
+        attr.priority = XWSCP_THD_PRIORITY;
+        attr.detached = false;
+        attr.privileged = true;
+        rc = xwos_thd_create(&xwscp->rx.thd, &attr, (xwos_thd_f)xwscp_thd, xwscp);
         if (rc < 0) {
                 goto err_rxthd_create;
         }

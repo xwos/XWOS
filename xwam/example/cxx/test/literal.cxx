@@ -19,14 +19,14 @@
  */
 
 #include <string>
+#include <iostream>
 #include <cstring>
 #include "test/literal.hxx"
 
 void testLiteralOperator(void)
 {
-  char cstr[64];
-  ::std::string cxxstr;
+  std::string cxxstr;
 
-  cxxstr = "XuanWuOS"_s;
-  strcpy(cstr, cxxstr.data());
+  cxxstr = "XWOS"_s;
+  std::cout << "LiteralOpreator \"s\":" << cxxstr << std::endl;
 }

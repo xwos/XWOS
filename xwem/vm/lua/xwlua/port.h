@@ -42,7 +42,7 @@ xwer_t xwlua_task(void * arg);
 #define XWLUA_OS_NAME           "xwos"
 #define XWLUA_DS_NAME           "xwds"
 #define XWLUA_XT_NAME           "xwxt"
-#define XWLUA_THD_STACK         XWEMCFG_vm_lua_THD_STACK
+#define XWLUA_THD_STACK_SIZE    XWEMCFG_vm_lua_THD_STACK_SIZE
 
 LUAMOD_API int xwlua_open_lib(lua_State * L);
 LUAMOD_API int xwlua_open_xt(lua_State * L);

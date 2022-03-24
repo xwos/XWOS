@@ -39,22 +39,30 @@ xwer_t xwexitdemo_child1_thd_func(void * arg);
  */
 const struct xwos_thd_desc xwexitdemo_detached_thd_desc[] = {
         [0] = {
-                .name = "xwexitdemo.detached.thd.0",
-                .prio = XWEXITDEMO_THD_PRIORITY,
-                .stack = XWOS_THD_STACK_DYNAMIC,
-                .stack_size = 2048,
+                .attr = {
+                        .name = "xwexitdemo.detached.thd.0",
+                        .stack = NULL,
+                        .stack_size = 2048,
+                        .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                        .priority = XWEXITDEMO_THD_PRIORITY,
+                        .detached = true,
+                        .privileged = true,
+                },
                 .func = (xwos_thd_f)xwexitdemo_detached_thd0_func,
                 .arg = NULL,
-                .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
         },
         [1] = {
-                .name = "xwexitdemo.detached.thd.1",
-                .prio = XWEXITDEMO_THD_PRIORITY,
-                .stack = XWOS_THD_STACK_DYNAMIC,
-                .stack_size = 2048,
+                .attr = {
+                        .name = "xwexitdemo.detached.thd.1",
+                        .stack = NULL,
+                        .stack_size = 2048,
+                        .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                        .priority = XWEXITDEMO_THD_PRIORITY,
+                        .detached = false,
+                        .privileged = true,
+                },
                 .func = (xwos_thd_f)xwexitdemo_detached_thd1_func,
                 .arg = NULL,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
 struct xwos_thd * xwexitdemo_detached_thd[xw_array_size(xwexitdemo_detached_thd_desc)];
@@ -64,31 +72,43 @@ struct xwos_thd * xwexitdemo_detached_thd[xw_array_size(xwexitdemo_detached_thd_
  */
 const struct xwos_thd_desc xwexitdemo_joinable_thd_desc[] = {
         [0] = {
-                .name = "xwexitdemo.parent.thd",
-                .prio = XWEXITDEMO_THD_PRIORITY,
-                .stack = XWOS_THD_STACK_DYNAMIC,
-                .stack_size = 2048,
+                .attr = {
+                        .name = "xwexitdemo.parent.thd",
+                        .stack = NULL,
+                        .stack_size = 2048,
+                        .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                        .priority = XWEXITDEMO_THD_PRIORITY,
+                        .detached = false,
+                        .privileged = true,
+                },
                 .func = (xwos_thd_f)xwexitdemo_parent_thd_func,
                 .arg = NULL,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [1] = {
-                .name = "xwexitdemo.child.thd.0",
-                .prio = XWEXITDEMO_THD_PRIORITY,
-                .stack = XWOS_THD_STACK_DYNAMIC,
-                .stack_size = 2048,
+                .attr = {
+                        .name = "xwexitdemo.child.thd.0",
+                        .stack = NULL,
+                        .stack_size = 2048,
+                        .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                        .priority = XWEXITDEMO_THD_PRIORITY,
+                        .detached = false,
+                        .privileged = true,
+                },
                 .func = (xwos_thd_f)xwexitdemo_child0_thd_func,
                 .arg = NULL,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [2] = {
-                .name = "xwexitdemo.child.thd.1",
-                .prio = XWEXITDEMO_THD_PRIORITY,
-                .stack = XWOS_THD_STACK_DYNAMIC,
-                .stack_size = 2048,
+                .attr = {
+                        .name = "xwexitdemo.child.thd.1",
+                        .stack = NULL,
+                        .stack_size = 2048,
+                        .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                        .priority = XWEXITDEMO_THD_PRIORITY,
+                        .detached = false,
+                        .privileged = true,
+                },
                 .func = (xwos_thd_f)xwexitdemo_child1_thd_func,
                 .arg = NULL,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
 struct xwos_thd * xwexitdemo_parent_thd;
@@ -106,24 +126,18 @@ xwer_t example_thread_exit_start(void)
 
         for (i = 0; i < xw_array_size(xwexitdemo_detached_thd_desc); i++) {
                 rc = xwos_thd_create(&xwexitdemo_detached_thd[i],
-                                     xwexitdemo_detached_thd_desc[i].name,
+                                     &xwexitdemo_detached_thd_desc[i].attr,
                                      xwexitdemo_detached_thd_desc[i].func,
-                                     xwexitdemo_detached_thd_desc[i].arg,
-                                     xwexitdemo_detached_thd_desc[i].stack_size,
-                                     xwexitdemo_detached_thd_desc[i].prio,
-                                     xwexitdemo_detached_thd_desc[i].attr);
+                                     xwexitdemo_detached_thd_desc[i].arg);
                 if (rc < 0) {
                         goto err_thd_create;
                 }
         }
 
         rc = xwos_thd_create(&xwexitdemo_parent_thd,
-                             xwexitdemo_joinable_thd_desc[0].name,
+                             &xwexitdemo_joinable_thd_desc[0].attr,
                              xwexitdemo_joinable_thd_desc[0].func,
-                             xwexitdemo_joinable_thd_desc[0].arg,
-                             xwexitdemo_joinable_thd_desc[0].stack_size,
-                             xwexitdemo_joinable_thd_desc[0].prio,
-                             xwexitdemo_joinable_thd_desc[0].attr);
+                             xwexitdemo_joinable_thd_desc[0].arg);
         if (rc < 0) {
                 goto err_thd_create;
         }
@@ -188,12 +202,9 @@ xwer_t xwexitdemo_parent_thd_func(void * arg)
         xwos_cthd_sleep(&time);
 
         rc = xwos_thd_create(&xwexitdemo_child0_thd,
-                             xwexitdemo_joinable_thd_desc[1].name,
+                             &xwexitdemo_joinable_thd_desc[1].attr,
                              xwexitdemo_joinable_thd_desc[1].func,
-                             xwexitdemo_joinable_thd_desc[1].arg,
-                             xwexitdemo_joinable_thd_desc[1].stack_size,
-                             xwexitdemo_joinable_thd_desc[1].prio,
-                             xwexitdemo_joinable_thd_desc[1].attr);
+                             xwexitdemo_joinable_thd_desc[1].arg);
         if (XWOK == rc) {
                 thdexitlogf(INFO, "[Joinable][父线程] join(子线程0) ...\n");
                 rc = xwos_thd_join(xwexitdemo_child0_thd, &childrc);
@@ -201,12 +212,9 @@ xwer_t xwexitdemo_parent_thd_func(void * arg)
         }
 
         rc = xwos_thd_create(&xwexitdemo_child1_thd,
-                             xwexitdemo_joinable_thd_desc[2].name,
+                             &xwexitdemo_joinable_thd_desc[2].attr,
                              xwexitdemo_joinable_thd_desc[2].func,
-                             xwexitdemo_joinable_thd_desc[2].arg,
-                             xwexitdemo_joinable_thd_desc[2].stack_size,
-                             xwexitdemo_joinable_thd_desc[2].prio,
-                             xwexitdemo_joinable_thd_desc[2].attr);
+                             xwexitdemo_joinable_thd_desc[2].arg);
         if (XWOK == rc) {
                 thdexitlogf(INFO, "[Joinable][父线程] sleep(1s) ...\n");
                 time = 1 * XWTM_S;
@@ -217,12 +225,9 @@ xwer_t xwexitdemo_parent_thd_func(void * arg)
         }
 
         rc = xwos_thd_create(&xwexitdemo_child1_thd,
-                             xwexitdemo_joinable_thd_desc[2].name,
+                             &xwexitdemo_joinable_thd_desc[2].attr,
                              xwexitdemo_joinable_thd_desc[2].func,
-                             xwexitdemo_joinable_thd_desc[2].arg,
-                             xwexitdemo_joinable_thd_desc[2].stack_size,
-                             xwexitdemo_joinable_thd_desc[2].prio,
-                             xwexitdemo_joinable_thd_desc[2].attr);
+                             xwexitdemo_joinable_thd_desc[2].arg);
         if (XWOK == rc) {
                 thdexitlogf(INFO, "[Joinable][父线程] sleep(1s) ...\n");
                 time = 1 * XWTM_S;

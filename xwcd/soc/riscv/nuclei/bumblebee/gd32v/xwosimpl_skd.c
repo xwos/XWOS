@@ -110,16 +110,15 @@ xwer_t xwospl_skd_init(struct xwospl_skd * xwskd)
  *  __callee-saved (non-volatile) context__
  */
 __xwbsp_code
-void xwospl_skd_init_stack(struct xwospl_skd_stack_info * stk,
-                           void (* exit)(xwer_t),
-                           xwsq_t attr)
+void xwospl_skd_init_stack(struct xwospl_skdobj_stack * stk,
+                           void (* exit)(xwer_t))
 {
         bool privileged;
         xwstk_t * stkbtn;
         xwsq_t i, stknum;
         xwreg_t csr;
 
-        privileged = !!(attr & XWOSPL_SKDATTR_PRIVILEGED);
+        privileged = !!(stk->flag & XWOSPL_SKDOBJ_FLAG_PRIVILEGED);
 
         /* Fill all stack memory bits to 1 */
         stkbtn = (xwstk_t *)stk->base;
@@ -244,7 +243,7 @@ void soc_skd_req_swcx(struct xwospl_skd * xwskd)
  * @param[in] stk: 溢出的栈
  */
 static __xwbsp_code
-void soc_skd_report_stk_overflow(struct xwospl_skd_stack_info * stk)
+void soc_skd_report_stk_overflow(struct xwospl_skdobj_stack * stk)
 {
         XWOS_UNUSED(stk);
         XWOS_BUG();
@@ -259,19 +258,20 @@ struct xwospl_skd * soc_skd_chk_swcx(void)
 {
         struct xwospl_skd * xwskd;
 #if defined(XWMMCFG_STACK_CHK_SWCX) && (1 == XWMMCFG_STACK_CHK_SWCX)
-        struct xwospl_skd_stack_info * pstk;
+        struct xwospl_skdobj_stack * pstk;
         union {
                 xwstk_t * ptr;
                 xwptr_t value;
         } stk;
         xwstk_t * stkbtn;
+        xwsz_t guard;
 
         xwskd = xwosplcb_skd_get_lc();
         pstk = xwskd->pstk;
         stkbtn = (xwstk_t *)pstk->base;
+        guard = pstk->guard;
         stk.ptr = pstk->sp;
-        if ((stk.value - SOC_CALLEE_CONTEXT_SIZE) <
-            (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
+        if ((stk.value - SOC_CALLEE_CONTEXT_SIZE) < ((xwptr_t)stkbtn + guard)) {
                 soc_skd_report_stk_overflow(pstk);
         }
 #else
@@ -289,23 +289,24 @@ __xwbsp_code
 struct xwospl_skd * soc_skd_chk_stk(void)
 {
         struct xwospl_skd * xwskd;
-        struct xwospl_skd_stack_info * cstk;
+        struct xwospl_skdobj_stack * cstk;
         union {
                 xwstk_t * ptr;
                 xwptr_t value;
         } stk;
         xwstk_t * stkbtn;
+        xwsz_t guard;
         xwsz_t i;
 
         xwskd = xwosplcb_skd_get_lc();
         cstk = xwskd->cstk;
         stkbtn = (xwstk_t *)cstk->base;
+        guard = cstk->guard;
         stk.ptr = cstk->sp;
-        if ((stk.value - SOC_CALLEE_CONTEXT_SIZE) <
-            (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
+        if ((stk.value - SOC_CALLEE_CONTEXT_SIZE) < ((xwptr_t)stkbtn + guard)) {
                 soc_skd_report_stk_overflow(cstk);
         }
-        for (i = 0; i < XWOSPL_STACK_WATERMARK; i++) {
+        for (i = 0; i < (guard / sizeof(xwstk_t)); i++) {
                 if (0xFFFFFFFFU != stkbtn[i]) {
                         soc_skd_report_stk_overflow(cstk);
                 }

@@ -76,10 +76,8 @@ xwer_t xwup_thd_stack_free(xwstk_t * stk);
 
 static __xwup_code
 void xwup_thd_activate(struct xwup_thd * thd,
-                       const char * name,
-                       xwup_thd_f mainfunc, void * arg,
-                       xwstk_t * stack, xwsz_t stack_size,
-                       xwpr_t priority, xwsq_t attr);
+                       struct xwup_thd_attr * attr,
+                       xwup_thd_f mainfunc, void * arg);
 
 static __xwup_code
 void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f mainfunc, void * arg);
@@ -197,24 +195,21 @@ xwer_t xwup_thd_stack_free(xwstk_t * stk)
 /**
  * @brief 激活线程对象
  * @param[in] thd: 线程对象的指针
- * @param[in] name: 线程的名字
+ * @param[in] attr: 线程属性
  * @param[in] mainfunc: 线程函数的指针
  * @param[in] arg: 线程函数的参数
- * @param[in] stack: 线程栈的首地址指针
- * @param[in] stack_size: 线程栈的大小，以字节(byte)为单位
- * @param[in] priority: 线程的优先级
- * @param[in] attr: 线程属性，取值：@ref xwup_skdobj_attr_em中的一项
  */
 static __xwup_code
 void xwup_thd_activate(struct xwup_thd * thd,
-                       const char * name,
-                       xwup_thd_f mainfunc, void * arg,
-                       xwstk_t * stack, xwsz_t stack_size,
-                       xwpr_t priority, xwsq_t attr)
+                       struct xwup_thd_attr * attr,
+                       xwup_thd_f mainfunc, void * arg)
 {
         thd->state = XWUP_SKDOBJ_DST_UNKNOWN;
-        thd->attribute = attr;
-        if (XWUP_SKDATTR_DETACHED & attr) {
+        thd->stack.flag = 0;
+        if (attr->privileged) {
+                thd->stack.flag |= XWUP_SKDOBJ_FLAG_PRIVILEGED;
+        }
+        if (attr->detached) {
                 thd->state |= XWUP_SKDOBJ_DST_DETACHED;
         }
 #if (1 == XWUPRULE_SKD_THD_FREEZE)
@@ -228,23 +223,24 @@ void xwup_thd_activate(struct xwup_thd * thd,
 #endif
 
         /* 优先级 */
-        if (priority >= XWUP_SKD_PRIORITY_RT_NUM) {
-                priority = XWUP_SKD_PRIORITY_RT_MAX;
-        } else if (priority <= XWUP_SKD_PRIORITY_INVALID) {
-                priority = XWUP_SKD_PRIORITY_RT_MIN;
+        if (attr->priority > XWUP_SKD_PRIORITY_RT_MAX) {
+                attr->priority = XWUP_SKD_PRIORITY_RT_MAX;
+        } else if (attr->priority < XWUP_SKD_PRIORITY_RT_MIN) {
+                attr->priority = XWUP_SKD_PRIORITY_RT_MIN;
         }
-        thd->prio.s = priority;
-        thd->prio.d = priority;
+        thd->prio.s = attr->priority;
+        thd->prio.d = attr->priority;
 
         /* 栈信息 */
-        thd->stack.name = name;
-        stack_size = (stack_size + XWMM_ALIGNMENT_MASK) & (~XWMM_ALIGNMENT_MASK);
-        thd->stack.size = stack_size;
-        thd->stack.base = stack;
+        thd->stack.name = attr->name;
+        attr->stack_size = (attr->stack_size + XWMM_ALIGNMENT_MASK) &
+                           (~XWMM_ALIGNMENT_MASK);
+        thd->stack.size = attr->stack_size;
+        thd->stack.base = attr->stack;
 #if defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK)
-        thd->stack.sp = thd->stack.base + (stack_size / sizeof(xwstk_t));
+        thd->stack.sp = thd->stack.base + (attr->stack_size / sizeof(xwstk_t));
 #elif defined(XWMMCFG_ED_STACK) && (1 == XWMMCFG_ED_STACK)
-        thd->stack.sp = thd->stack.base + (stack_size / sizeof(xwstk_t)) - 1;
+        thd->stack.sp = thd->stack.base + (attr->stack_size / sizeof(xwstk_t)) - 1;
 #elif defined(XWMMCFG_FA_STACK) && (1 == XWMMCFG_FA_STACK)
         thd->stack.sp = thd->stack.base - 1;
 #elif defined(XWMMCFG_EA_STACK) && (1 == XWMMCFG_EA_STACK)
@@ -252,11 +248,12 @@ void xwup_thd_activate(struct xwup_thd * thd,
 #else
 #  error "Unknown stack type!"
 #endif
+        thd->stack.guard = attr->stack_guard_size;
+
 #if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
         xwup_cond_init(&thd->completion);
 #endif
         xwlib_bclst_init_node(&thd->thdnode);
-
 #if defined(XWUPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWUPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
         for (xwsq_t i = 0; i < XWUPCFG_SKD_THD_LOCAL_DATA_NUM; i++) {
                 thd->data[i] = NULL;
@@ -303,7 +300,7 @@ void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f mainfunc, void * arg)
         xwskd = xwup_skd_get_lc();
         thd->stack.main = mainfunc;
         thd->stack.arg = arg;
-        xwospl_skd_init_stack(&thd->stack, xwup_cthd_exit, thd->attribute);
+        xwospl_skd_init_stack(&thd->stack, xwup_cthd_exit);
         xwospl_cpuirq_save_lc(&cpuirq);
         xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_STANDBY);
         xwup_thd_rq_add_tail(thd);
@@ -313,19 +310,33 @@ void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f mainfunc, void * arg)
 }
 
 __xwup_api
-xwer_t xwup_thd_init(struct xwup_thd * thd,
-                     const char * name,
-                     xwup_thd_f mainfunc, void * arg,
-                     xwstk_t * stack, xwsz_t stack_size,
-                     xwpr_t priority, xwsq_t attr)
+void xwup_thd_attr_init(struct xwup_thd_attr * attr)
 {
-        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
-        XWOS_VALIDATE((NULL != stack), "nullptr", -EFAULT);
+        if (attr) {
+                attr->name = NULL;
+                attr->stack = NULL;
+                attr->stack_size = XWMMCFG_STACK_SIZE_DEFAULT;
+                attr->stack_guard_size = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
+                attr->priority = XWUP_SKD_PRIORITY_RT_MIN;
+                attr->detached = false;
+                attr->privileged = XWUPCFG_SKD_THD_PRIVILEGED_DEFAULT;
+        }
+}
 
-        xwup_thd_activate(thd, name,
-                          mainfunc, arg,
-                          stack, stack_size,
-                          priority, attr);
+__xwup_api
+xwer_t xwup_thd_init(struct xwup_thd * thd,
+                     const struct xwup_thd_attr * inattr,
+                     xwup_thd_f mainfunc, void * arg)
+{
+        struct xwup_thd_attr attr;
+
+        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
+        XWOS_VALIDATE((NULL != inattr), "nullptr", -EFAULT);
+        XWOS_VALIDATE((NULL != inattr->stack), "nullptr", -EFAULT);
+
+        attr = *inattr;
+        thd->stack.flag = 0;
+        xwup_thd_activate(thd, &attr, mainfunc, arg);
         return XWOK;
 }
 
@@ -340,22 +351,48 @@ xwer_t xwup_thd_fini(struct xwup_thd * thd)
 
 __xwup_api
 xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
-                       const char * name,
-                       xwup_thd_f mainfunc, void * arg,
-                       xwsz_t stack_size, xwpr_t priority,
-                       xwsq_t attr)
+                       const struct xwup_thd_attr * inattr,
+                       xwup_thd_f mainfunc, void * arg)
 {
         struct xwup_thd * thd;
-        xwstk_t * stk;
+        struct xwup_thd_attr attr;
+        bool allocated_stack;
         xwer_t rc;
 
         XWOS_VALIDATE((thdpbuf), "nullptr", -EFAULT);
         XWOS_VALIDATE((mainfunc), "nullptr", -EFAULT);
 
-        stk = xwup_thd_stack_alloc(stack_size);
-        if (__xwcc_unlikely(is_err(stk))) {
-                rc = ptr_err(stk);
-                goto err_stack_alloc;
+        if (inattr) {
+                attr = *inattr;
+                if (0 == attr.stack_size) {
+                        attr.stack_size = XWMMCFG_STACK_SIZE_DEFAULT;
+                }
+                if (NULL == attr.stack) {
+                        attr.stack = xwup_thd_stack_alloc(attr.stack_size);
+                        if (__xwcc_unlikely(is_err(attr.stack))) {
+                                rc = ptr_err(attr.stack);
+                                goto err_stack_alloc;
+                        }
+                        allocated_stack = true;
+                } else {
+                        allocated_stack = false;
+                }
+                if (0 == attr.stack_guard_size) {
+                        attr.stack_guard_size = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
+                }
+        } else {
+                attr.name = NULL;
+                attr.stack_size = XWMMCFG_STACK_SIZE_DEFAULT;
+                attr.stack = xwup_thd_stack_alloc(attr.stack_size);
+                if (__xwcc_unlikely(is_err(attr.stack))) {
+                        rc = ptr_err(attr.stack);
+                        goto err_stack_alloc;
+                }
+                allocated_stack = true;
+                attr.stack_guard_size = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
+                attr.priority = XWUP_SKD_PRIORITY_RT_MIN;
+                attr.detached = false;
+                attr.privileged = XWUPCFG_SKD_THD_PRIVILEGED_DEFAULT;
         }
 
         thd = xwup_thd_alloc();
@@ -364,15 +401,20 @@ xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
                 goto err_thd_alloc;
         }
 
-        xwup_thd_activate(thd, name,
-                          mainfunc, arg,
-                          stk, stack_size,
-                          priority, attr);
+        if (allocated_stack) {
+                thd->stack.flag = XWUP_SKDOBJ_FLAG_ALLOCATED_STACK;
+        } else {
+                thd->stack.flag = 0;
+        }
+
+        xwup_thd_activate(thd, &attr, mainfunc, arg);
         *thdpbuf = thd;
         return XWOK;
 
 err_thd_alloc:
-        xwup_thd_stack_free(stk);
+        if (allocated_stack) {
+                xwup_thd_stack_free(attr.stack);
+        }
 err_stack_alloc:
         *thdpbuf = NULL;
         return rc;
@@ -386,8 +428,10 @@ xwer_t xwup_thd_delete(struct xwup_thd * thd)
         XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
 
         xwup_thd_deactivate(thd);
-        base = ((struct xwup_thd *)thd)->stack.base;
-        xwup_thd_stack_free(base);
+        if (XWUP_SKDOBJ_FLAG_ALLOCATED_STACK & thd->stack.flag) {
+                base = ((struct xwup_thd *)thd)->stack.base;
+                xwup_thd_stack_free(base);
+        }
         xwup_thd_free(thd);
         return XWOK;
 }
@@ -421,6 +465,7 @@ xwer_t xwup_thd_exit_lic(struct xwup_thd * thd, xwer_t rc)
 {
 #if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
         struct xwup_skd * xwskd;
+        bool detached;
         xwreg_t cpuirq;
 
         xwskd = xwup_skd_get_lc();
@@ -429,12 +474,13 @@ xwer_t xwup_thd_exit_lic(struct xwup_thd * thd, xwer_t rc)
                   XWUP_SKDOBJ_DST_RUNNING | XWUP_SKDOBJ_DST_EXITING);
         xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_STANDBY);
         thd->stack.arg = err_ptr(rc);
+        detached = !!(XWUP_SKDOBJ_DST_DETACHED & thd->state);
         xwospl_cpuirq_restore_lc(cpuirq);
         xwup_cond_broadcast(&thd->completion);
         xwospl_cpuirq_disable_lc();
         xwlib_bclst_del_init(&thd->thdnode);
         xwskd->thd_num--;
-        if (XWUP_SKDATTR_DETACHED & thd->attribute) {
+        if (detached) {
                 xwlib_bclst_add_tail(&xwskd->thdelist, &thd->thdnode);
         }
 #  if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
@@ -600,7 +646,6 @@ xwer_t xwup_thd_detach(struct xwup_thd * thd)
                 xwospl_cpuirq_restore_lc(cpuirq);
                 xwup_thd_delete(thd);
         } else {
-                thd->attribute |= XWUP_SKDATTR_DETACHED;
                 xwospl_cpuirq_restore_lc(cpuirq);
         }
         return XWOK;
@@ -1249,7 +1294,7 @@ xwer_t xwup_thd_freeze_lic(struct xwup_thd * thd)
         struct xwup_skd * xwskd;
         xwreg_t cpuirq;
 
-        XWOS_BUG_ON(XWUP_SKDOBJ_DST_RUNNING != (thd->state & (XWUP_SKDOBJ_DST_MASK)));
+        XWOS_BUG_ON(!(XWUP_SKDOBJ_DST_RUNNING & thd->state));
         xwskd = xwup_skd_get_lc();
         xwospl_cpuirq_save_lc(&cpuirq);
         xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_RUNNING);

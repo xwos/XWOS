@@ -37,22 +37,30 @@ xwer_t memtst_task(void * arg);
 
 const struct xwos_thd_desc child_thd_desc[] = {
         [0] = {
-                .name = "task.led",
-                .prio = LED_TASK_PRIORITY,
-                .stack = NULL,
-                .stack_size = 4096,
+                .attr = {
+                        .name = "led.thd",
+                        .stack = NULL,
+                        .stack_size = 4096,
+                        .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                        .priority = LED_TASK_PRIORITY,
+                        .detached = true,
+                        .privileged = true,
+                },
                 .func = led_task,
                 .arg = NULL,
-                .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
         },
         [1] = {
-                .name = "task.memtst",
-                .prio = MEMTST_TASK_PRIORITY,
-                .stack = NULL,
-                .stack_size = 2048,
+                .attr = {
+                        .name = "memtst.thd",
+                        .stack = NULL,
+                        .stack_size = 2048,
+                        .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                        .priority = MEMTST_TASK_PRIORITY,
+                        .detached = true,
+                        .privileged = true,
+                },
                 .func = memtst_task,
                 .arg = NULL,
-                .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
         },
 };
 struct xwos_thd * child_thd[xw_array_size(child_thd_desc)];
@@ -64,12 +72,9 @@ xwer_t child_thd_start(void)
 
         for (i = 0; i < xw_array_size(child_thd_desc); i++) {
                 rc = xwos_thd_create(&child_thd[i],
-                                     child_thd_desc[i].name,
+                                     &child_thd_desc[i].attr,
                                      child_thd_desc[i].func,
-                                     child_thd_desc[i].arg,
-                                     child_thd_desc[i].stack_size,
-                                     child_thd_desc[i].prio,
-                                     child_thd_desc[i].attr);
+                                     child_thd_desc[i].arg);
                 if (rc < 0) {
                         goto err_thd_create;
                 }

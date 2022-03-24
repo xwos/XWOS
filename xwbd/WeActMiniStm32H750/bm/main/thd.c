@@ -29,40 +29,27 @@
 
 xwer_t led_task(void * arg);
 
-const struct xwos_thd_desc child_thd_desc[] = {
-        [0] = {
-                .name = "task.led",
-                .prio = LED_TASK_PRIORITY,
-                .stack = NULL,
-                .stack_size = 4096,
-                .func = led_task,
-                .arg = NULL,
-                .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
-        },
-};
-struct xwos_thd * child_thd[xw_array_size(child_thd_desc)];
+struct xwos_thd * led_thd;
 
 xwer_t child_thd_start(void)
 {
         xwer_t rc;
-        xwsq_t i;
+        struct xwos_thd_attr attr;
 
-        for (i = 0; i < xw_array_size(child_thd_desc); i++) {
-                rc = xwos_thd_create(&child_thd[i],
-                                     child_thd_desc[i].name,
-                                     child_thd_desc[i].func,
-                                     child_thd_desc[i].arg,
-                                     child_thd_desc[i].stack_size,
-                                     child_thd_desc[i].prio,
-                                     child_thd_desc[i].attr);
-                if (rc < 0) {
-                        goto err_thd_create;
-                }
+        xwos_thd_attr_init(&attr);
+        attr.name = "led.thd";
+        attr.stack = NULL;
+        attr.stack_size = 2048;
+        attr.priority = LED_TASK_PRIORITY;
+        attr.detached = true;
+        attr.privileged = true;
+        rc = xwos_thd_create(&led_thd, &attr, led_task, NULL);
+        if (rc < 0) {
+                goto err_thd_create;
         }
         return XWOK;
 
 err_thd_create:
-        BDL_BUG();
         return rc;
 }
 

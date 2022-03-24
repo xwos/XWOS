@@ -28,13 +28,17 @@ static
 xwer_t sysmgr_thd_main(void *arg);
 
 const struct xwos_thd_desc sysmgr_thd_desc = {
-        .name = "sys.mgr",
-        .prio = SYSMGR_THD_PRIORITY,
-        .stack = NULL,
-        .stack_size = 1024,
+        .attr = {
+                .name = "sysmgr.thd",
+                .stack = NULL,
+                .stack_size = 1024,
+                .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                .priority = SYSMGR_THD_PRIORITY,
+                .detached = true,
+                .privileged = true,
+        },
         .func = sysmgr_thd_main,
         .arg = NULL,
-        .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
 };
 struct xwos_thd * sysmgr_thd;
 
@@ -43,12 +47,9 @@ xwer_t xwos_main(void)
         xwer_t rc;
 
         rc = xwos_thd_create(&sysmgr_thd,
-                             sysmgr_thd_desc.name,
+                             &sysmgr_thd_desc.attr,
                              sysmgr_thd_desc.func,
-                             sysmgr_thd_desc.arg,
-                             sysmgr_thd_desc.stack_size,
-                             sysmgr_thd_desc.prio,
-                             sysmgr_thd_desc.attr);
+                             sysmgr_thd_desc.arg);
         if (XWOK == rc) {
                 rc = xwos_skd_start_lc();
         }

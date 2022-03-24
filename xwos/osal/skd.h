@@ -48,49 +48,53 @@ typedef struct {
 #define XWOS_THD_NILD ((xwos_thd_d){NULL, 0,})
 
 /**
- * @defgroup xwos_skdattr_em 线程属性
- * @{
+ * @brief XWOS API：线程属性
  */
-/**
- * @brief XWOS API：线程属性，超级权限
- */
-#define XWOS_SKDATTR_PRIVILEGED XWOSDL_SKDATTR_PRIVILEGED
-
-/**
- * @brief XWOS API：线程属性，DETACHED态
- */
-#define XWOS_SKDATTR_DETACHED XWOSDL_SKDATTR_DETACHED
-
-/**
- * @brief XWOS API：线程属性，JOINABLE态
- */
-#define XWOS_SKDATTR_JOINABLE XWOSDL_SKDATTR_JOINABLE
-/**
- * @} xwos_skdattr_em
- */
-
-/**
- * @brief XWOS API：线程描述表
- */
-struct xwos_thd_desc {
+struct xwos_thd_attr {
         const char * name; /**< 线程的名字 */
-        xwpr_t prio; /**< 线程的优先级 */
         xwstk_t * stack; /**< 线程栈的首地址指针：
-                              - 静态创建线程时必须指定；
-                              - 动态创建也可指定，若不指定，栈内存也采取
-                                动态内存申请。*/
+                              + 静态初始化的线程，必须指定；
+                              + 动态创建的线程，可指定也可不指定，
+                                若不指定，栈内存采取动态申请的方式创建。*/
         xwsz_t stack_size; /**< 线程栈的大小，以字节(byte)为单位，
                                 注意与CPU的ABI接口规定的内存边界对齐 */
-        xwos_thd_f func; /**< 线程函数的指针 */
-        void * arg; /**< 线程函数的参数 */
-        xwsq_t attr; /**< 与具体操作系统相关的一些数据 */
+        xwsz_t stack_guard_size; /**< 栈内存警戒线 */
+        xwpr_t priority; /**< 优先级 */
+        bool detached; /**< 是否为分离态 */
+        bool privileged; /**< 是否为特权线程 */
 };
 
 /**
- * @brief XWOS API：栈内存动态方式创建
+ * @brief XWOS API：线程描述
  */
-#define XWOS_THD_STACK_DYNAMIC (NULL)
+struct xwos_thd_desc {
+        struct xwos_thd_attr attr; /**< 线程属性 */
+        xwos_thd_f func; /**< 线程函数的指针 */
+        void * arg; /**< 线程函数的参数 */
+};
 
+/**
+ * @defgroup xwos_skd_stack 栈
+ * @{
+ */
+/**
+ * @brief XWOS API：默认的栈大小
+ */
+#define XWOS_STACK_SIZE_DEFAULT         XWMMCFG_STACK_SIZE_DEFAULT
+
+/**
+ * @brief XWOS API：默认的栈警戒线
+ */
+#define XWOS_STACK_GUARD_SIZE_DEFAULT   XWMMCFG_STACK_GUARD_SIZE_DEFAULT
+
+/**
+ * @} xwos_skd_stack
+ */
+
+/**
+ * @defgroup xwos_skd_priority 优先级
+ * @{
+ */
 /**
  * @brief XWOS API：最小实时优先级
  */
@@ -115,6 +119,10 @@ struct xwos_thd_desc {
  * @brief XWOS API：优先级在base基础上降低dec
  */
 #define XWOS_SKD_PRIORITY_DROP(base, dec)       XWOSDL_SKD_PRIORITY_DROP(base, dec)
+
+/**
+ * @} xwos_skd_priority
+ */
 
 /**
  * @defgroup xwos_skd_context_em 上下文枚举
@@ -283,76 +291,74 @@ void xwos_skd_enpmpt_lc(void)
 }
 
 /**
+ * @brief XWOS API：初始化线程属性结构体
+ * @param[in] attr: 线程属性
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ * @note
+ * - 此API类似于pthread_attr_init()。
+ */
+static __xwos_inline_api
+void xwos_thd_attr_init(struct xwos_thd_attr * attr)
+{
+        xwosdl_thd_attr_init((struct xwosdl_thd_attr *)attr);
+}
+
+/**
  * @brief XWOS API：静态方式初始化线程
  * @param[in] thd: 线程对象的指针
- * @param[in] name: 线程的名字
+ * @param[in] attr: 线程属性
  * @param[in] mainfunc: 线程函数的指针
  * @param[in] arg: 线程函数的参数
- * @param[in] stack: 线程栈的首地址指针
- * @param[in] stack_size: 线程栈的大小，以字节(byte)为单位
- * @param[in] priority: 线程的优先级
- * @param[in] attr: 线程属性
  * @return 错误码
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：不可重入
  * @note
- * - 静态初始化线程需预先定义线程对象和线程栈数组，通常定义为全局变量。
- * - 栈数组的首地址与大小，必须要满足CPU的ABI规则，
+ * - attr参数类似于pthread_attr_t，但静态初始化线程时不可为空，必须用来传递线程栈内存；
+ * - 静态初始化线程必须传递预先定义的内存作为线程栈；
+ * - 栈内存的首地址与大小，必须要满足CPU的ABI规则，
  *   例如ARM，就需要8字节对齐。因此在定义栈数组时需要使用__xwcc_aligned(8)来修饰，
  *   且大小是8的倍数。
- * - attr参数的作用由OS而决定，在XWOS中，它的作用是设置线程的一些属性，取值为
- *   @ref xwos_skdattr_em 中的一项。
- *   attr参数的类型是xwsq_t，此类型定义成与指针一样长，因此也可传递一个指针。
  */
 static __xwos_inline_api
 xwer_t xwos_thd_init(struct xwos_thd * thd,
-                     const char * name,
-                     xwos_thd_f mainfunc, void * arg,
-                     xwstk_t * stack, xwsz_t stack_size,
-                     xwpr_t priority, xwsq_t attr)
+                     const struct xwos_thd_attr * attr,
+                     xwos_thd_f mainfunc, void * arg)
 {
         return xwosdl_thd_init(&thd->osthd,
-                               name,
-                               (xwosdl_thd_f)mainfunc, arg,
-                               stack, stack_size,
-                               priority, attr);
+                               (const struct xwosdl_thd_attr *)attr,
+                               (xwosdl_thd_f)mainfunc, arg);
 }
 
 /**
  * @brief XWOS API：动态方式创建线程并初始化
  * @param[out] thdbuf: 指向缓冲区的指针，通过此缓冲区返回线程对象的指针
- * @param[in] name: 线程的名字
+ * @param[in] attr: 线程属性
  * @param[in] mainfunc: 线程函数的指针
  * @param[in] arg: 线程函数的参数
- * @param[in] stack_size: 线程栈的大小，以字节(byte)为单位
- * @param[in] priority: 线程的优先级
- * @param[in] attr: 线程属性
  * @return 错误码
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  * @note
- * - 动态创建线程采用的是操作系统提供的动态内存分配的接口创建线程对象和线程
- *   的栈；
- * - attr参数的作用由OS而决定，在XWOS中，它的作用是设置线程的一些属性。
- *   此参数的类型是xwsq_t，此类型定义成与unsigned long一样长，也就是
- *   和指针类型一样长，因此也可传递一个指针。
+ * - attr参数类似于pthread_attr_t，动态创建线程时可为NULL，将采用默认属性；
+ * - 若通过attr->stack指定内存作为栈，其首地址与大小，必须要满足CPU的ABI规则，
+ *   例如ARM，就需要8字节对齐。因此在定义栈数组时需要使用__xwcc_aligned(8)来修饰，
+ *   且大小是8的倍数。
  */
 static __xwos_inline_api
 xwer_t xwos_thd_create(struct xwos_thd ** thdbuf,
-                       const char * name,
-                       xwos_thd_f mainfunc, void * arg,
-                       xwsz_t stack_size,
-                       xwpr_t priority, xwsq_t attr)
+                       const struct xwos_thd_attr * attr,
+                       xwos_thd_f mainfunc, void * arg)
 {
         return xwosdl_thd_create((struct xwosdl_thd **)thdbuf,
-                                 name,
-                                 (xwosdl_thd_f)mainfunc, arg,
-                                 stack_size,
-                                 priority, attr);
+                                 (const struct xwosdl_thd_attr *)attr,
+                                 (xwosdl_thd_f)mainfunc, arg);
 }
 
 /**

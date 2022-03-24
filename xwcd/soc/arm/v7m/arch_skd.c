@@ -54,7 +54,7 @@ __xwbsp_rodata const struct xwos_irq_resource cortex_m_swcx_irqrsc = {
 };
 
 static __xwbsp_code
-void arch_skd_report_stk_overflow(struct xwospl_skd_stack_info * stk);
+void arch_skd_report_stk_overflow(struct xwospl_skdobj_stack * stk);
 
 /**
  * @brief 初始化切换上下文中断
@@ -85,18 +85,17 @@ xwer_t arch_skd_init_pendsv(struct xwospl_skd * xwskd)
 /**
  * @brief 初始化调度对象的栈
  * @param[in] stk: 栈信息结构体指针
- * @param[in] attr: 调度对象属性
+ * @param[in] exit: 退出函数
  */
 __xwbsp_code
-void arch_skd_init_stack(struct xwospl_skd_stack_info * stk,
-                         void (* exit)(xwer_t),
-                         xwsq_t attr)
+void arch_skd_init_stack(struct xwospl_skdobj_stack * stk,
+                         void (* exit)(xwer_t))
 {
         bool privileged;
         xwstk_t * stkbtn;
         xwsq_t i, stknum;
 
-        privileged = !!(attr & XWOSPL_SKDATTR_PRIVILEGED);
+        privileged = !!(stk->flag & XWOSPL_SKDOBJ_FLAG_PRIVILEGED);
 
         stkbtn = (xwstk_t *)stk->base;
         stknum = stk->size / sizeof(xwstk_t);
@@ -246,7 +245,7 @@ void arch_skd_init_stack(struct xwospl_skd_stack_info * stk,
 }
 
 /**
- * @brief ADL ISR：启动调度器的SVC(svc 0)的处理函数
+ * @brief 启动调度器的SVC(svc 0)的处理函数
  * @param[in] xwskd: 调度器的指针
  */
 __xwbsp_isr __xwcc_naked
@@ -284,6 +283,8 @@ void arch_skd_svcsr_start(__xwcc_unused struct xwospl_skd * xwskd)
 
 /**
  * @brief 切换上下文的中断(PendSV)的处理函数
+ * @note
+ * - 此中断为系统中最低优先级的中断。
  */
 __xwbsp_isr __xwcc_naked
 void xwospl_skd_isr_swcx(void)
@@ -359,22 +360,22 @@ struct xwospl_skd * arch_skd_chk_swcx(void)
 {
         struct xwospl_skd * xwskd;
 #if defined(XWMMCFG_STACK_CHK_SWCX) && (1 == XWMMCFG_STACK_CHK_SWCX)
-        struct xwospl_skd_stack_info * pstk;
+        struct xwospl_skdobj_stack * pstk;
         xwstk_t * stkbtn;
+        xwsz_t guard;
         xwptr_t psp;
 
         xwskd = xwosplcb_skd_get_lc();
         pstk = xwskd->pstk;
         stkbtn = (xwstk_t *)pstk->base;
+        guard = pstk->guard;
         cm_get_psp(&psp);
 #  if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
-        if ((psp - (ARCH_NVFR_SIZE + ARCH_NVGR_SIZE)) <
-            (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
+        if ((psp - (ARCH_NVFR_SIZE + ARCH_NVGR_SIZE)) < ((xwptr_t)stkbtn + guard)) {
                 arch_skd_report_stk_overflow(pstk);
         }
 #  else
-        if ((psp - ARCH_NVGR_SIZE) <
-            (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
+        if ((psp - ARCH_NVGR_SIZE) < (((xwptr_t)stkbtn) + guard)) {
                 arch_skd_report_stk_overflow(pstk);
         }
 #  endif
@@ -392,30 +393,31 @@ __xwbsp_code
 struct xwospl_skd * arch_skd_chk_stk(void)
 {
         struct xwospl_skd * xwskd;
-        struct xwospl_skd_stack_info * cstk;
+        struct xwospl_skdobj_stack * cstk;
         union {
                 xwstk_t * ptr;
                 xwptr_t value;
         } stk;
         xwstk_t * stkbtn;
+        xwsz_t guard;
         xwsz_t i;
 
         xwskd = xwosplcb_skd_get_lc();
         cstk = xwskd->cstk;
         stkbtn = (xwstk_t *)cstk->base;
+        guard = cstk->guard;
         cm_get_psp(&stk.value);
 #if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
         if ((stk.value - (ARCH_NVFR_SIZE + ARCH_NVGR_SIZE)) <
-            (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
+            ((xwptr_t)stkbtn + guard)) {
                 arch_skd_report_stk_overflow(cstk);
         }
 #else
-        if ((stk.value - ARCH_NVGR_SIZE) <
-            (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
+        if ((stk.value - ARCH_NVGR_SIZE) < ((xwptr_t)stkbtn + guard)) {
                 arch_skd_report_stk_overflow(cstk);
         }
 #endif
-        for (i = 0; i < XWOSPL_STACK_WATERMARK; i++) {
+        for (i = 0; i < (guard / sizeof(xwstk_t)); i++) {
                 if (0xFFFFFFFFU != stkbtn[i]) {
                         arch_skd_report_stk_overflow(cstk);
                 }
@@ -428,7 +430,7 @@ struct xwospl_skd * arch_skd_chk_stk(void)
  * @param[in] stk: 溢出的栈
  */
 static __xwbsp_code
-void arch_skd_report_stk_overflow(struct xwospl_skd_stack_info * stk)
+void arch_skd_report_stk_overflow(struct xwospl_skdobj_stack * stk)
 {
         XWOS_UNUSED(stk);
         XWOS_BUG();

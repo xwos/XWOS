@@ -72,17 +72,16 @@ enum xwmp_skdobj_state_em {
                                 XWMP_SKDOBJ_DST_FROZEN |
                                 XWMP_SKDOBJ_DST_EXITING |
                                 XWMP_SKDOBJ_DST_MIGRATING |
+                                XWMP_SKDOBJ_DST_DETACHED |
                                 XWMP_SKDOBJ_DST_UNINTERRUPTED),
 };
 
 /**
- * @brief 调度对象属性
+ * @brief 调度对象标签
  */
-enum xwmp_skdattr_em {
-        XWMP_SKDATTR_PRIVILEGED = (1U << 0U), /**< 拥有超级权限 */
-
-        XWMP_SKDATTR_DETACHED = (1U << 1U), /**< DETACHED态，类似于pthread的DETACHED */
-        XWMP_SKDATTR_JOINABLE = 0, /**< JOINABLE态，类似于pthread的JOINABLE */
+enum xwmp_skdobj_flag_em {
+        XWMP_SKDOBJ_FLAG_PRIVILEGED = (1U << 0U), /**< 拥有超级权限 */
+        XWMP_SKDOBJ_FLAG_ALLOCATED_STACK = (1U << 1U), /**< 动态申请的栈 */
 };
 
 /**
@@ -93,13 +92,15 @@ typedef xwer_t (* xwmp_thd_f)(void *);
 /**
  * @brief 线程栈信息
  */
-struct xwmp_skd_stack_info {
+struct xwmp_skdobj_stack {
         xwstk_t * sp; /**< 栈指针 */
-        xwstk_t * base; /**< 栈基地址 */
-        xwsz_t size; /**< 栈大小，单位：字节 */
+        xwstk_t * base; /**< 栈内存的基地址 */
+        xwsz_t size; /**< 栈内存的大小，单位：字节 */
+        xwsz_t guard; /**< 栈内存警戒线，单位：字节 */
         xwmp_thd_f main; /**< 主函数 */
         void * arg; /**< 主函数的参数 */
         const char * name; /**< 名字字符串 */
+        xwsq_t flag; /**< 标签，取值 @ref xwmp_skdobj_flag_em */
 };
 
 /**
@@ -130,7 +131,7 @@ enum xwmp_skd_wakelock_cnt_em {
  * @brief 调度器电源管理控制块
  */
 struct xwmp_skd_pm {
-        xwsq_a wklkcnt; /**< 唤醒锁，取值@ref xwmp_skd_wakelock_cnt_em */
+        xwsq_a wklkcnt; /**< 唤醒锁，取值 @ref xwmp_skd_wakelock_cnt_em */
         xwsz_t frz_thd_cnt; /**< 已冻结的线程计数器 */
         struct xwlib_bclst_head frzlist; /**< 已冻结的线程链表 */
         struct xwmp_splk lock; /**< 保护链表和计数器的锁 */
@@ -141,18 +142,18 @@ struct xwmp_skd_pm {
  * @brief XWOS MP 调度器
  */
 struct __xwcc_alignl1cache xwmp_skd {
-        struct xwmp_skd_stack_info * cstk; /**< 当前正在运行的线程的栈信息的指针
-                                                偏移：0，
-                                                汇编代码中会使用这个成员 */
-        struct xwmp_skd_stack_info * pstk; /**< 前一个线程的栈信息的指针
-                                                偏移：sizeof(long)，
-                                                汇编代码中会使用这个成员 */
+        struct xwmp_skdobj_stack * cstk; /**< 当前正在运行的线程的栈信息的指针
+                                              偏移：0，
+                                              汇编代码中会使用这个成员 */
+        struct xwmp_skdobj_stack * pstk; /**< 前一个线程的栈信息的指针
+                                              偏移：sizeof(long)，
+                                              汇编代码中会使用这个成员 */
         xwid_t id; /**< CPU ID */
         bool state; /**< 调度器状态 */
         struct {
                 struct xwmp_rtrq rt; /**< 实时就绪队列 */
         } rq; /**< 就绪队列 */
-        struct xwmp_skd_stack_info idle; /**< 空闲任务的栈信息 */
+        struct xwmp_skdobj_stack idle; /**< 空闲任务的栈信息 */
         xwsq_t req_schedule_cnt; /**< 请求调度的计数器 */
         xwsq_a req_chkpmpt_cnt; /**< 请求检查抢占的计数器 */
         xwsq_a dis_pmpt_cnt; /**< 关闭抢占的计数器 */
@@ -160,7 +161,7 @@ struct __xwcc_alignl1cache xwmp_skd {
         xwsq_a req_bh_cnt; /**< 请求进入中断底半部的计数器 */
         xwsq_a dis_bh_cnt; /**< 关闭中断底半部的计数器 */
         struct xwmp_bh_cb bhcb; /**< 中断底半部控制块 */
-        struct xwmp_skd_stack_info bh; /**< 中断底半部任务的栈信息 */
+        struct xwmp_skdobj_stack bh; /**< 中断底半部任务的栈信息 */
 #endif
         struct xwmp_tt tt; /**< 时间树 */
         struct xwmp_splk cxlock; /**< 上下文切换的锁 */

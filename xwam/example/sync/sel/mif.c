@@ -66,24 +66,32 @@ struct xwos_cond xwseldemo_cond6;
 struct xwos_br xwseldemo_br7;
 
 const struct xwos_thd_desc xwseldemo_consumer_thd_desc = {
-        .name = "xwseldemo.consumer",
-        .prio = XWSELDEMO_CONSUMER_PRIORITY,
-        .stack = XWOS_THD_STACK_DYNAMIC,
-        .stack_size = 4096,
+        .attr = {
+                .name = "xwseldemo.consumer",
+                .stack = NULL,
+                .stack_size = 4096,
+                .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                .priority = XWSELDEMO_CONSUMER_PRIORITY,
+                .detached = false,
+                .privileged = true,
+        },
         .func = (xwos_thd_f)xwseldemo_consumer_func,
         .arg = NULL,
-        .attr = XWOS_SKDATTR_PRIVILEGED,
 };
 struct xwos_thd * xwseldemo_consumer;
 
 const struct xwos_thd_desc xwseldemo_producer_thd_desc = {
-        .name = "xwseldemo.producer",
-        .prio = XWSELDEMO_PRODUCER_PRIORITY,
-        .stack = XWOS_THD_STACK_DYNAMIC,
-        .stack_size = 2048,
+        .attr = {
+                .name = "xwseldemo.producer",
+                .stack = NULL,
+                .stack_size = 2048,
+                .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                .priority = XWSELDEMO_PRODUCER_PRIORITY,
+                .detached = false,
+                .privileged = true,
+        },
         .func = (xwos_thd_f)xwseldemo_producer_func,
         .arg = NULL,
-        .attr = XWOS_SKDATTR_PRIVILEGED,
 };
 struct xwos_thd * xwseldemo_producer;
 
@@ -92,22 +100,30 @@ struct xwos_swt xwseldemo_swt1;
 
 const struct xwos_thd_desc xwseldemo_sync_thd_desc[] = {
         [0] = {
-                .name = "xwseldemo.syncthd.0",
-                .prio = XWSELDEMO_BRTHD_PRIORITY,
-                .stack = XWOS_THD_STACK_DYNAMIC,
-                .stack_size = 2048,
+                .attr = {
+                        .name = "xwseldemo.syncthd.0",
+                        .stack = NULL,
+                        .stack_size = 2048,
+                        .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                        .priority = XWSELDEMO_BRTHD_PRIORITY,
+                        .detached = false,
+                        .privileged = true,
+                },
                 .func = (xwos_thd_f)xwseldemo_syncthd_func,
                 .arg = (void *)0,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
         },
         [1] = {
-                .name = "xwseldemo.syncthd.1",
-                .prio = XWSELDEMO_BRTHD_PRIORITY,
-                .stack = XWOS_THD_STACK_DYNAMIC,
-                .stack_size = 2048,
+                .attr = {
+                        .name = "xwseldemo.syncthd.1",
+                        .stack = NULL,
+                        .stack_size = 2048,
+                        .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                        .priority = XWSELDEMO_BRTHD_PRIORITY,
+                        .detached = false,
+                        .privileged = true,
+                },
                 .func = (xwos_thd_f)xwseldemo_syncthd_func,
                 .arg = (void *)1,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
         },
 };
 struct xwos_thd * xwseldemo_syncthd[xw_array_size(xwseldemo_sync_thd_desc)];
@@ -222,24 +238,18 @@ xwer_t example_sel_start(void)
 
         /* 创建等待同步对象的线程 */
         rc = xwos_thd_create(&xwseldemo_consumer,
-                             xwseldemo_consumer_thd_desc.name,
+                             &xwseldemo_consumer_thd_desc.attr,
                              xwseldemo_consumer_thd_desc.func,
-                             xwseldemo_consumer_thd_desc.arg,
-                             xwseldemo_consumer_thd_desc.stack_size,
-                             xwseldemo_consumer_thd_desc.prio,
-                             xwseldemo_consumer_thd_desc.attr);
+                             xwseldemo_consumer_thd_desc.arg);
         if (rc < 0) {
                 goto err_consumer_create;
         }
 
         /* 建立发布同步对象的线程 */
         rc = xwos_thd_create(&xwseldemo_producer,
-                             xwseldemo_producer_thd_desc.name,
+                             &xwseldemo_producer_thd_desc.attr,
                              xwseldemo_producer_thd_desc.func,
-                             xwseldemo_producer_thd_desc.arg,
-                             xwseldemo_producer_thd_desc.stack_size,
-                             xwseldemo_producer_thd_desc.prio,
-                             xwseldemo_producer_thd_desc.attr);
+                             xwseldemo_producer_thd_desc.arg);
         if (rc < 0) {
                 goto err_producer_create;
         }
@@ -247,12 +257,9 @@ xwer_t example_sel_start(void)
         /* 创建同步线程 */
         for (i = 0; i < xw_array_size(xwseldemo_sync_thd_desc); i++) {
                 rc = xwos_thd_create(&xwseldemo_syncthd[i],
-                                     xwseldemo_sync_thd_desc[i].name,
+                                     &xwseldemo_sync_thd_desc[i].attr,
                                      xwseldemo_sync_thd_desc[i].func,
-                                     xwseldemo_sync_thd_desc[i].arg,
-                                     xwseldemo_sync_thd_desc[i].stack_size,
-                                     xwseldemo_sync_thd_desc[i].prio,
-                                     xwseldemo_sync_thd_desc[i].attr);
+                                     xwseldemo_sync_thd_desc[i].arg);
                 if (rc < 0) {
                         goto err_syncthd_create;
                 }

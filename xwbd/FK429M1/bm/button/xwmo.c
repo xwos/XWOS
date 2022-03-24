@@ -76,13 +76,17 @@ static
 xwer_t bmbtn_task(void * arg);
 
 const struct xwos_thd_desc bmbtn_thd_desc = {
-        .name = "bm.btn.thd",
-        .prio = BMBTN_THD_PRIORITY,
-        .stack = XWOS_THD_STACK_DYNAMIC,
-        .stack_size = 2048,
+        .attr = {
+                .name = "bm.btn.thd",
+                .stack = NULL,
+                .stack_size = 2048,
+                .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                .priority = BMBTN_THD_PRIORITY,
+                .detached = true,
+                .privileged = true,
+        },
         .func = bmbtn_task,
         .arg = NULL,
-        .attr = XWOS_SKDATTR_PRIVILEGED | XWOS_SKDATTR_DETACHED,
 };
 struct xwos_thd * bmbtn_thd;
 
@@ -98,12 +102,9 @@ xwer_t bmbtn_start(void)
         }
 
         rc = xwos_thd_create(&bmbtn_thd,
-                             bmbtn_thd_desc.name,
+                             &bmbtn_thd_desc.attr,
                              bmbtn_thd_desc.func,
-                             bmbtn_thd_desc.arg,
-                             bmbtn_thd_desc.stack_size,
-                             bmbtn_thd_desc.prio,
-                             bmbtn_thd_desc.attr);
+                             bmbtn_thd_desc.arg);
         if (rc < 0) {
                 goto err_thd_create;
         }

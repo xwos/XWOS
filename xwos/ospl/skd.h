@@ -19,29 +19,23 @@
 #  include <xwos/mp/skd.h>
 #  include <xwos/mp/thd.h>
 
-#  define xwospl_skd_stack_info         xwmp_skd_stack_info
+#  define xwospl_skdobj_stack           xwmp_skdobj_stack
 #  define xwospl_skd                    xwmp_skd
 #  define xwospl_thd                    xwmp_thd
-#  define XWOSPL_SKDATTR_PRIVILEGED     XWMP_SKDATTR_PRIVILEGED
+#  define XWOSPL_SKDOBJ_FLAG_PRIVILEGED XWMP_SKDOBJ_FLAG_PRIVILEGED
 #elif defined(XuanWuOS_CFG_CORE__up)
 #  include <xwos/up/skd.h>
 #  include <xwos/up/thd.h>
 
-#  define xwospl_skd_stack_info         xwup_skd_stack_info
+#  define xwospl_skdobj_stack           xwup_skdobj_stack
 #  define xwospl_skd                    xwup_skd
 #  define xwospl_thd                    xwup_thd
-#  define XWOSPL_SKDATTR_PRIVILEGED     XWUP_SKDATTR_PRIVILEGED
+#  define XWOSPL_SKDOBJ_FLAG_PRIVILEGED XWUP_SKDOBJ_FLAG_PRIVILEGED
 #else
 #  error "Can't find the configuration XuanWuOS_CFG_CORE!"
 #endif
 
-#if defined(XWMMCFG_STACK_WATERMARK)
-#  define XWOSPL_STACK_WATERMARK XWMMCFG_STACK_WATERMARK
-#else
-#  define XWOSPL_STACK_WATERMARK (8U)
-#endif
-
-struct xwospl_skd_stack_info;
+struct xwospl_skdobj_stack;
 struct xwospl_skd;
 struct xwospl_thd;
 
@@ -68,9 +62,8 @@ xwer_t xwospl_skd_init(struct xwospl_skd * xwskd);
  * @param[in] stk: 栈信息结构体指针
  * @param[in] attr: 标志
  */
-void xwospl_skd_init_stack(struct xwospl_skd_stack_info * stk,
-                           void (* exit)(xwer_t),
-                           xwsq_t attr);
+void xwospl_skd_init_stack(struct xwospl_skdobj_stack * stk,
+                           void (* exit)(xwer_t));
 
 /**
  * @brief 玄武OS移植层：获取当前CPU的ID

@@ -30,11 +30,9 @@ xwer_t xwospl_skd_init(struct xwospl_skd * xwskd)
 }
 
 __xwbsp_code
-void xwospl_skd_init_stack(struct xwospl_skd_stack_info * stk,
-                           void (* exit)(xwer_t),
-                           xwsq_t attr)
+void xwospl_skd_init_stack(struct xwospl_skdobj_stack * stk, void (* exit)(xwer_t))
 {
-        arch_skd_init_stack(stk, exit, attr);
+        arch_skd_init_stack(stk, exit);
 }
 
 __xwbsp_code

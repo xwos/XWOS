@@ -38,13 +38,17 @@ xwer_t xwconddemo_thd_func(void * arg);
  * @brief 线程描述表
  */
 const struct xwos_thd_desc xwconddemo_thd_desc = {
-        .name = "xwconddemo.thd",
-        .prio = XWCONDDEMO_THD_PRIORITY,
-        .stack = XWOS_THD_STACK_DYNAMIC,
-        .stack_size = 2048,
+        .attr = {
+                .name = "xwconddemo.thd",
+                .stack = NULL,
+                .stack_size = 2048,
+                .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
+                .priority = XWCONDDEMO_THD_PRIORITY,
+                .detached = false,
+                .privileged = true,
+        },
         .func = (xwos_thd_f)xwconddemo_thd_func,
         .arg = NULL,
-        .attr = XWOS_SKDATTR_PRIVILEGED,
 };
 struct xwos_thd * xwconddemo_thd;
 
@@ -79,12 +83,9 @@ xwer_t example_cond_start(void)
 
         /* 创建线程 */
         rc = xwos_thd_create(&xwconddemo_thd,
-                             xwconddemo_thd_desc.name,
+                             &xwconddemo_thd_desc.attr,
                              xwconddemo_thd_desc.func,
-                             xwconddemo_thd_desc.arg,
-                             xwconddemo_thd_desc.stack_size,
-                             xwconddemo_thd_desc.prio,
-                             xwconddemo_thd_desc.attr);
+                             xwconddemo_thd_desc.arg);
         if (rc < 0) {
                 goto err_thd_create;
         }

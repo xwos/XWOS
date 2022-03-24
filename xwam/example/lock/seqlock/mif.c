@@ -34,22 +34,8 @@
 void xwsqlkdemo_swt_callback(struct xwos_swt * swt, void * arg);
 xwer_t xwsqlkdemo_thd_func(void * arg);
 
-/**
- * @brief 线程描述表
- */
-const struct xwos_thd_desc xwsqlkdemo_thd_desc = {
-        .name = "xwsqlkdemo.thd",
-        .prio = XWSQLKDEMO_THD_PRIORITY,
-        .stack = XWOS_THD_STACK_DYNAMIC,
-        .stack_size = 2048,
-        .func = (xwos_thd_f)xwsqlkdemo_thd_func,
-        .arg = NULL,
-        .attr = XWOS_SKDATTR_PRIVILEGED,
-};
 struct xwos_thd * xwsqlkdemo_thd;
-
 struct xwos_swt xwsqlkdemo_swt;
-
 struct xwos_sqlk xwsqlkdemo_lock;
 xwsq_t xwsqlkdemo_shared_count = 0;
 
@@ -58,6 +44,7 @@ xwsq_t xwsqlkdemo_shared_count = 0;
  */
 xwer_t example_seqlock_start(void)
 {
+        struct xwos_thd_attr attr;
         xwer_t rc;
 
         /* 初始化自旋锁 */
@@ -71,13 +58,14 @@ xwer_t example_seqlock_start(void)
         }
 
         /* 创建线程 */
-        rc = xwos_thd_create(&xwsqlkdemo_thd,
-                             xwsqlkdemo_thd_desc.name,
-                             xwsqlkdemo_thd_desc.func,
-                             xwsqlkdemo_thd_desc.arg,
-                             xwsqlkdemo_thd_desc.stack_size,
-                             xwsqlkdemo_thd_desc.prio,
-                             xwsqlkdemo_thd_desc.attr);
+        xwos_thd_attr_init(&attr);
+        attr.name = "xwsqlkdemo.thd";
+        attr.stack = NULL;
+        attr.stack_size = 2048;
+        attr.priority = XWSQLKDEMO_THD_PRIORITY;
+        attr.detached = false;
+        attr.privileged = true;
+        rc = xwos_thd_create(&xwsqlkdemo_thd, &attr, xwsqlkdemo_thd_func, NULL);
         if (rc < 0) {
                 goto err_thd_create;
         }

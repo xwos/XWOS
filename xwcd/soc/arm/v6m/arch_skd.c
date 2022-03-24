@@ -50,7 +50,7 @@ __xwbsp_rodata const struct xwos_irq_resource cortex_m_swcx_irqrsc = {
 };
 
 static __xwbsp_code
-void arch_skd_report_stk_overflow(struct xwospl_skd_stack_info * stk);
+void arch_skd_report_stk_overflow(struct xwospl_skdobj_stack * stk);
 
 /**
  * @brief 初始化切换上下文中断
@@ -81,18 +81,16 @@ xwer_t arch_skd_init_pendsv(struct xwospl_skd * xwskd)
 /**
  * @brief 初始化调度对象的栈
  * @param[in] stk: 栈信息结构体指针
- * @param[in] attr: 调度对象属性
+ * @param[in] exit: 退出函数
  */
 __xwbsp_code
-void arch_skd_init_stack(struct xwospl_skd_stack_info * stk,
-                         void (* exit)(xwer_t),
-                         xwsq_t attr)
+void arch_skd_init_stack(struct xwospl_skdobj_stack * stk, void (* exit)(xwer_t))
 {
         bool privileged;
         xwstk_t * stkbtn;
         xwsq_t i, stknum;
 
-        privileged = !!(attr & XWOSPL_SKDATTR_PRIVILEGED);
+        privileged = !!(stk->flag & XWOSPL_SKDOBJ_FLAG_PRIVILEGED);
 
         stkbtn = (xwstk_t *)stk->base;
         stknum = stk->size / sizeof(xwstk_t);
@@ -265,18 +263,19 @@ struct xwospl_skd * arch_skd_chk_swcx(void)
 {
         struct xwospl_skd * xwskd;
 #if defined(XWMMCFG_STACK_CHK_SWCX) && (1 == XWMMCFG_STACK_CHK_SWCX)
-        struct xwospl_skd_stack_info * pstk;
+        struct xwospl_skdobj_stack * pstk;
         xwstk_t * stkbtn;
+        xwsz_t guard;
         xwptr_t psp;
 
         xwskd = xwosplcb_skd_get_lc();
         pstk = xwskd->pstk;
         stkbtn = (xwstk_t *)pstk->base;
+        guard = pstk->guard;
         cm_get_psp(&psp);
-        if ((psp - ARCH_NVGR_SIZE) <
-            (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
+        if ((psp - ARCH_NVGR_SIZE) < ((xwptr_t)stkbtn + guard)) {
                 arch_skd_report_stk_overflow(pstk);
-        }/* else {} */
+        }
 #else
         xwskd = xwosplcb_skd_get_lc();
 #endif
@@ -291,23 +290,24 @@ __xwbsp_code
 struct xwospl_skd * arch_skd_chk_stk(void)
 {
         struct xwospl_skd * xwskd;
-        struct xwospl_skd_stack_info * cstk;
+        struct xwospl_skdobj_stack * cstk;
         union {
                 xwstk_t * ptr;
                 xwptr_t value;
         } stk;
         xwstk_t * stkbtn;
+        xwsz_t guard;
         xwsz_t i;
 
         xwskd = xwosplcb_skd_get_lc();
         cstk = xwskd->cstk;
         stkbtn = (xwstk_t *)cstk->base;
+        guard = cstk->guard;
         cm_get_psp(&stk.value);
-        if ((stk.value - ARCH_NVGR_SIZE) <
-            (((xwptr_t)stkbtn) + ((XWOSPL_STACK_WATERMARK) * sizeof(xwstk_t)))) {
+        if ((stk.value - ARCH_NVGR_SIZE) < ((xwptr_t)stkbtn + guard)) {
                 arch_skd_report_stk_overflow(cstk);
-        }/* else {} */
-        for (i = 0; i < XWOSPL_STACK_WATERMARK; i++) {
+        }
+        for (i = 0; i < (guard / sizeof(xwstk_t)); i++) {
                 if (0xFFFFFFFFU != stkbtn[i]) {
                         arch_skd_report_stk_overflow(cstk);
                 }
@@ -320,7 +320,7 @@ struct xwospl_skd * arch_skd_chk_stk(void)
  * @param[in] stk: 溢出的栈
  */
 static __xwbsp_code
-void arch_skd_report_stk_overflow(struct xwospl_skd_stack_info * stk)
+void arch_skd_report_stk_overflow(struct xwospl_skdobj_stack * stk)
 {
         XWOS_UNUSED(stk);
         XWOS_BUG();

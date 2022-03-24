@@ -26,36 +26,20 @@
 
 extern xwer_t cxx_thd_main(void * arg);
 
-const struct xwos_thd_desc cxx_thd_desc[] = {
-        [0] = {
-                .name = "task.cxx",
-                .prio = CXX_TASK_PRIORITY,
-                .stack = NULL,
-                .stack_size = 4096,
-                .func = cxx_thd_main,
-                .arg = NULL,
-                .attr = XWOS_SKDATTR_PRIVILEGED,
-        },
-};
-
-struct xwos_thd * cxx_thd[xw_array_size(cxx_thd_desc)];
+struct xwos_thd * cxx_thd;
 
 xwer_t example_cxx_start(void)
 {
+        struct xwos_thd_attr attr;
         xwer_t rc;
-        xwsq_t i;
 
-        for (i = 0; i < xw_array_size(cxx_thd_desc); i++) {
-                rc = xwos_thd_create(&cxx_thd[i],
-                                     cxx_thd_desc[i].name,
-                                     cxx_thd_desc[i].func,
-                                     cxx_thd_desc[i].arg,
-                                     cxx_thd_desc[i].stack_size,
-                                     cxx_thd_desc[i].prio,
-                                     cxx_thd_desc[i].attr);
-                if (rc < 0) {
-                        break;
-                }
-        }
+        xwos_thd_attr_init(&attr);
+        attr.name = "cxx.thd";
+        attr.stack = NULL;
+        attr.stack_size = 4096;
+        attr.priority = CXX_TASK_PRIORITY;
+        attr.detached = false;
+        attr.privileged = true;
+        rc = xwos_thd_create(&cxx_thd, &attr, cxx_thd_main, NULL);
         return rc;
 }

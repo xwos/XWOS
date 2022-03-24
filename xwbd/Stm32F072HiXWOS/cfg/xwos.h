@@ -60,7 +60,8 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** common ********/
 #define XWMMCFG_STACK_ALIGNMENT                         (8U)
-#define XWMMCFG_STACK_WATERMARK                         (4U)
+#define XWMMCFG_STACK_SIZE_DEFAULT                      (2048U)
+#define XWMMCFG_STACK_GUARD_SIZE_DEFAULT                (64U)
 #define XWMMCFG_STACK_CHK_SWCX                          1
 #define XWMMCFG_FD_STACK                                1
 #define XWMMCFG_ED_STACK                                0
@@ -91,6 +92,7 @@
 /* #define XWMPCFG_SKD_IDLE_STACK_SIZE                  (2048U) */
 /* #define XWMPCFG_SKD_BH                               1 */
 /* #define XWMPCFG_SKD_BH_STACK_SIZE                    (2048U) */
+/* #define XWMPCFG_SKD_THD_PRIVILEGED_DEFAULT           1 */
 /* #define XWMPCFG_SKD_THD_MEMSLICE                     1 */
 /* #define XWMPCFG_SKD_THD_STDC_MM                      0 */
 /* #define XWMPCFG_SKD_THD_LOCAL_DATA_NUM               (2U) */
@@ -130,6 +132,7 @@
 #define XWUPCFG_SKD_BH                                  0
 #define XWUPCFG_SKD_BH_STACK_SIZE                       (2048U)
 #define XWUPCFG_SKD_PM                                  1
+#define XWUPCFG_SKD_THD_PRIVILEGED_DEFAULT              1
 #define XWUPCFG_SKD_THD_STDC_MM                         0
 #define XWUPCFG_SKD_THD_LOCAL_DATA_NUM                  (0U)
 #define XWUPCFG_SKD_THD_EXIT                            1
