@@ -272,11 +272,12 @@ struct xwup_thd * xwup_skd_rtrq_choose(void)
 static __xwup_code
 void xwup_skd_del_thd_lc(struct xwup_skd * xwskd)
 {
-        if (xwlib_bclst_tst_empty(&xwskd->thdelist)) {
+        if (!xwlib_bclst_tst_empty(&xwskd->thdelist)) {
                 struct xwup_thd * thd;
                 xwospl_cpuirq_disable_lc();
                 xwlib_bclst_itr_next_entry_del(thd, &xwskd->thdelist,
                                                struct xwup_thd, thdnode) {
+                        xwlib_bclst_del_init(&thd->thdnode);
                         xwospl_cpuirq_enable_lc();
                         xwup_thd_delete(thd);
                         xwospl_cpuirq_disable_lc();

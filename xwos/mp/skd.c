@@ -397,11 +397,12 @@ struct xwmp_thd * xwmp_skd_rtrq_choose(struct xwmp_skd * xwskd)
 static __xwmp_code
 void xwmp_skd_del_thd_lc(struct xwmp_skd * xwskd)
 {
-        if (xwlib_bclst_tst_empty(&xwskd->thdelist)) {
+        if (!xwlib_bclst_tst_empty(&xwskd->thdelist)) {
                 struct xwmp_thd * thd;
                 xwmp_splk_lock_cpuirq(&xwskd->thdlistlock);
                 xwlib_bclst_itr_next_entry_del(thd, &xwskd->thdelist,
                                                struct xwmp_thd, thdnode) {
+                        xwlib_bclst_del_init(&thd->thdnode);
                         xwmp_splk_unlock_cpuirq(&xwskd->thdlistlock);
                         xwmp_thd_delete(thd);
                         xwmp_splk_lock_cpuirq(&xwskd->thdlistlock);
