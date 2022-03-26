@@ -35,11 +35,11 @@
 /**
  * @brief XWOS的大版本号
  */
-#define XWOS_VERSION_MAJOR              2
+#define XWOS_VERSION_MAJOR              3
 /**
  * @brief XWOS的小版本号
  */
-#define XWOS_VERSION_MINOR              1
+#define XWOS_VERSION_MINOR              0
 /**
  * @brief XWOS的修订号
  */
