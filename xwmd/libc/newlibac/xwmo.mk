@@ -36,6 +36,8 @@ ifeq ($(XWMDCFG_libc_newlibac_fops),y)
   XWMO_CSRCS += fops.c
 endif
 
+XWMO_CSRCS += $(call getAllFileUnderXwmoDir,*.c,posix)
+
 XWMO_CFLAGS := -Wno-unused-value -Wno-unused-parameter
 XWMO_INCDIRS :=
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)

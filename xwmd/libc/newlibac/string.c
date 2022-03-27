@@ -25,7 +25,7 @@ void newlibac_string_init(void)
  * - newlib中的memset没有对齐访问内存，这会造成ARMv7m产生BUS Fault。因此
  *   重新实现memset覆盖newlib中的函数。
  */
-void * memset(void * src, int c, xwsz_t count)
+void * memset(void * src, int c, size_t count)
 {
         char * m = src;
 
@@ -35,7 +35,7 @@ void * memset(void * src, int c, xwsz_t count)
         return src;
 }
 
-void * memcpy(void * restrict dst, const void * restrict src, xwsz_t count)
+void * memcpy(void * restrict dst, const void * restrict src, size_t count)
 {
         char * tmp = dst;
         const char * s = src;
@@ -48,7 +48,7 @@ void * memcpy(void * restrict dst, const void * restrict src, xwsz_t count)
         return dst;
 }
 
-void * memmove(void * dst, const void * src, xwsz_t count)
+void * memmove(void * dst, const void * src, size_t count)
 {
         char * tmp;
         const char * s;

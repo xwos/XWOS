@@ -11,6 +11,7 @@
  */
 
 #include <xwos/standard.h>
+#include <stdio.h>
 #include <xwos/lib/xwlog.h>
 
 extern xwer_t soc_log_write(const char * s, xwsz_t * n);

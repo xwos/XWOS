@@ -14,6 +14,7 @@
 #include <xwos/lib/errno.h>
 #include <xwos/lib/xwbop.h>
 #include <xwem/fs/fatfs/ff.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
 

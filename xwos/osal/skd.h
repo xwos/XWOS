@@ -31,6 +31,8 @@ struct xwos_thd {
 
 /**
  * @brief XWOS API：线程函数指针类型
+ * @note
+ * + typedef xwer_t (* xwos_thd_f)(void *);
  */
 typedef xwosdl_thd_f xwos_thd_f;
 
@@ -78,9 +80,14 @@ struct xwos_thd_desc {
  * @{
  */
 /**
- * @brief XWOS API：默认的栈大小
+ * @brief XWOS API：栈内存的默认大小
  */
 #define XWOS_STACK_SIZE_DEFAULT         XWMMCFG_STACK_SIZE_DEFAULT
+
+/**
+ * @brief XWOS API：栈内存大小的最小值
+ */
+#define XWOS_STACK_SIZE_MIN             XWMMCFG_STACK_SIZE_MIN
 
 /**
  * @brief XWOS API：默认的栈警戒线

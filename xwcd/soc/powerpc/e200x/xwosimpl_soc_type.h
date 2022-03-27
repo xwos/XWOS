@@ -25,20 +25,10 @@
 #  error "This file should be included from <xwos/ospl/soc/type.h>."
 #endif
 
+#include <cfg/XuanWuOS.h>
 #include <inttypes.h>
-#include <stdint.h>
-#include <stddef.h>
 #include <stdbool.h>
 #include <limits.h>
-
-typedef uint8_t arch_uint8_t;
-typedef int8_t arch_int8_t;
-typedef uint16_t arch_uint16_t;
-typedef int16_t arch_int16_t;
-typedef uint32_t arch_uint32_t;
-typedef int32_t arch_int32_t;
-typedef uint64_t arch_uint64_t;
-typedef int64_t arch_int64_t;
 
 /* Use 32-bit data on PowerPC because of atomic operations */
 #define ARCH_HAVE_XWU8_T        1
@@ -66,10 +56,10 @@ typedef uint64_t xwu64_t;
 typedef int64_t xws64_t;
 
 #define ARCH_HAVE_XWSZ_T        1
-typedef unsigned long xwsz_t; /**< 大小值 (无符号) */
+typedef unsigned int xwsz_t; /**< 大小值 (无符号) */
 
 #define ARCH_HAVE_XWSSZ_T       1
-typedef long xwssz_t; /**< 大小值 (有符号) */
+typedef int xwssz_t; /**< 大小值 (有符号) */
 
 #define ARCH_HAVE_XWSTK_T       1
 typedef unsigned long xwstk_t; /**< 栈槽 */

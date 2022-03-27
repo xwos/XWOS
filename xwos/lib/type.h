@@ -14,7 +14,6 @@
 #define __xwos_lib_type_h__
 
 #include <cfg/XuanWuOS.h>
-#include <stdarg.h>
 
 /**
  * @defgroup xwos_lib_type XWOS的基本类型
@@ -23,6 +22,7 @@
  */
 
 #include <xwos/ospl/soc/type.h>
+#include <stdarg.h>
 
 #ifndef NULL
 #  define NULL ((void *)0)
@@ -30,7 +30,7 @@
 #define NIL  NULL
 
 #if !defined(ARCH_HAVE_XWU8_T)
-typedef arch_uint8_t xwu8_t;
+typedef uint8_t xwu8_t;
 #endif
 
 #if !defined(ARCH_HAVE_XWU8_A)
@@ -38,7 +38,7 @@ typedef __xwcc_atomic xwu8_t xwu8_a;
 #endif
 
 #if !defined(ARCH_HAVE_XWS8_T)
-typedef arch_int8_t xws8_t;
+typedef int8_t xws8_t;
 #endif
 
 #if !defined(ARCH_HAVE_XWS8_A)
@@ -46,7 +46,7 @@ typedef __xwcc_atomic xws8_t xws8_a;
 #endif
 
 #if !defined(ARCH_HAVE_XWU16_T)
-typedef arch_uint16_t xwu16_t;
+typedef uint16_t xwu16_t;
 #endif
 
 #if !defined(ARCH_HAVE_XWU16_A)
@@ -54,7 +54,7 @@ typedef __xwcc_atomic xwu16_t xwu16_a;
 #endif
 
 #if !defined(ARCH_HAVE_XWS16_T)
-typedef arch_int16_t xws16_t;
+typedef int16_t xws16_t;
 #endif
 
 #if !defined(ARCH_HAVE_XWS16_A)
@@ -62,7 +62,7 @@ typedef __xwcc_atomic xws16_t xws16_a;
 #endif
 
 #if !defined(ARCH_HAVE_XWU32_T)
-typedef arch_uint32_t xwu32_t;
+typedef uint32_t xwu32_t;
 #endif
 
 #if !defined(ARCH_HAVE_XWU32_A)
@@ -70,7 +70,7 @@ typedef __xwcc_atomic xwu32_t xwu32_a;
 #endif
 
 #if !defined(ARCH_HAVE_XWS32_T)
-typedef arch_int32_t xws32_t;
+typedef int32_t xws32_t;
 #endif
 
 #if !defined(ARCH_HAVE_XWS32_A)
@@ -78,7 +78,7 @@ typedef __xwcc_atomic xws32_t xws32_a;
 #endif
 
 #if !defined(ARCH_HAVE_XWU64_T)
-typedef arch_uint64_t xwu64_t;
+typedef uint64_t xwu64_t;
 #endif
 
 #if !defined(ARCH_HAVE_XWU64_A)
@@ -86,7 +86,7 @@ typedef __xwcc_atomic xwu64_t xwu64_a;
 #endif
 
 #if !defined(ARCH_HAVE_XWS64_T)
-typedef arch_int64_t xws64_t;
+typedef int64_t xws64_t;
 #endif
 
 #if !defined(ARCH_HAVE_XWS64_A)
@@ -94,7 +94,7 @@ typedef __xwcc_atomic xws64_t xws64_a;
 #endif
 
 #if !defined(ARCH_HAVE_XWSZ_T)
-typedef arch_size_t xwsz_t; /**< 大小值 (无符号) */
+typedef unsigned long xwsz_t; /**< 大小值 (无符号) */
 #endif
 
 #if !defined(ARCH_HAVE_XWSZ_A)
@@ -102,7 +102,7 @@ typedef __xwcc_atomic xwsz_t xwsz_a; /**< 大小值 (无符号，原子的) */
 #endif
 
 #if !defined(ARCH_HAVE_XWSSZ_T)
-typedef arch_ssize_t xwssz_t; /**< 大小值 (有符号) */
+typedef long xwssz_t; /**< 大小值 (有符号) */
 #endif
 
 #if !defined(ARCH_HAVE_XWSSZ_A)
@@ -139,14 +139,6 @@ typedef signed long xwsreg_t; /**< 寄存器数值 (有符号) */
 
 #if !defined(ARCH_HAVE_XWSREG_A)
 typedef __xwcc_atomic xwsreg_t xwsreg_a; /**< 寄存器数值 (有符号，原子的) */
-#endif
-
-#if !defined(ARCH_HAVE_XWER_T)
-typedef signed int xwer_t; /**< 错误码 (有符号) */
-#endif
-
-#if !defined(ARCH_HAVE_XWER_A)
-typedef __xwcc_atomic xwer_t xwer_a; /**< 错误码 (有符号，原子的) */
 #endif
 
 #if !defined(ARCH_HAVE_XWSQ_T)
@@ -195,6 +187,14 @@ typedef signed int xwpr_t; /**< 优先级 (有符号) */
 
 #if !defined(ARCH_HAVE_XWPR_A)
 typedef __xwcc_atomic xwpr_t xwpr_a; /**< 优先级 (有符号，原子的) */
+#endif
+
+#if !defined(ARCH_HAVE_XWER_T)
+typedef xwssq_t xwer_t; /**< 错误码 (有符号) */
+#endif
+
+#if !defined(ARCH_HAVE_XWER_A)
+typedef __xwcc_atomic xwer_t xwer_a; /**< 错误码 (有符号，原子的) */
 #endif
 
 #if !defined(ARCH_HAVE_XWBMP_T)

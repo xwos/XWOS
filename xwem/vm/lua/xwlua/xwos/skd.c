@@ -122,7 +122,7 @@ int xwlua_thd_dofile(lua_State * L)
                         *thdsp = XWLUA_THD_NULLSP;
                         lua_pop(L, 1);
                         lua_pushnil(L);
-                        lua_writestringerror("Cannot create thread: %d.", rc);
+                        lua_writestringerror("Cannot create thread: %d.", (int)rc);
                 }
         } else {
                 *thdsp = XWLUA_THD_NULLSP;
@@ -166,7 +166,7 @@ int xwlua_thd_dostring(lua_State * L)
                         *thdsp = XWLUA_THD_NULLSP;
                         lua_pop(L, 1);
                         lua_pushnil(L);
-                        lua_writestringerror("Cannot create thread: %d.", rc);
+                        lua_writestringerror("Cannot create thread: %d.", (int)rc);
                 }
         } else {
                 *thdsp = XWLUA_THD_NULLSP;
@@ -224,7 +224,7 @@ int xwlua_thd_call(lua_State * L)
                         *thdsp = XWLUA_THD_NULLSP;
                         lua_pop(L, 1);
                         lua_pushnil(L);
-                        lua_writestringerror("Cannot create thread: %d.", rc);
+                        lua_writestringerror("Cannot create thread: %d.", (int)rc);
                 }
         } else {
                 *thdsp = XWLUA_THD_NULLSP;

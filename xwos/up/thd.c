@@ -335,6 +335,9 @@ xwer_t xwup_thd_init(struct xwup_thd * thd,
         XWOS_VALIDATE((NULL != inattr->stack), "nullptr", -EFAULT);
 
         attr = *inattr;
+        if (attr.stack_size < XWMMCFG_STACK_SIZE_MIN) {
+                attr.stack_size = XWMMCFG_STACK_SIZE_MIN;
+        }
         thd->stack.flag = 0;
         xwup_thd_activate(thd, &attr, mainfunc, arg);
         return XWOK;
@@ -366,6 +369,8 @@ xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
                 attr = *inattr;
                 if (0 == attr.stack_size) {
                         attr.stack_size = XWMMCFG_STACK_SIZE_DEFAULT;
+                } else if (attr.stack_size < XWMMCFG_STACK_SIZE_MIN) {
+                        attr.stack_size = XWMMCFG_STACK_SIZE_MIN;
                 }
                 if (NULL == attr.stack) {
                         attr.stack = xwup_thd_stack_alloc(attr.stack_size);

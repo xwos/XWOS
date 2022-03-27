@@ -178,7 +178,7 @@
 #define EIOCBQUEUED 529 /**< @brief iocb queued, will get completion event */
 #define ERECALLCONFLICT 530 /**< @brief conflict with recalled state */
 
-/* XuanWuOS扩展的错误码 */
+/* XWOS扩展的错误码 */
 #define XWOK            0 /**< @brief no error */
 #define EEMPTY          1080 /**< @brief is empty */
 #define ETYPE           1081 /**< @brief type error */
