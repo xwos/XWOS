@@ -50,10 +50,10 @@ typedef xwer_t (* xwobj_gc_f)(void *);
 struct __xwcc_aligned(XWMM_ALIGNMENT) xwos_object {
         xwsq_t tik; /**< 对象的标签，用于防止ABA问题与野指针问题 */
         xwsq_t magic; /**< 对象的幻数，用于防止ABA问题与野指针问题 */
-        xwsq_a refcnt; /**< + 引用计数:
-                              - 0: 对象可以被销毁；
-                              - 1: 对象就绪；
-                              - >1: 对象正在被引用。*/
+        atomic_xwsq_t refcnt; /**< 引用计数:
+                                   - 0: 对象可以被销毁；
+                                   - 1: 对象就绪；
+                                   - > 1: 对象正在被引用。*/
         xwobj_gc_f gcfunc; /**< 垃圾回收函数 */
 };
 

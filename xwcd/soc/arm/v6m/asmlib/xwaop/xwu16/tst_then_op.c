@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库：xwaop__xwu16__tst_then_op
+ * @brief 原子操作库：xwaop__xwu16_t__tst_then_op
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -23,10 +23,10 @@
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code
-xwer_t xwaop__xwu16__tst_then_op(xwu16_a * a,
-                                 xwaop_tst_f tst, void * tst_args,
-                                 xwaop_op_f op, void * op_args,
-                                 xwu16_t * nv, xwu16_t * ov)
+xwer_t xwaop__xwu16_t__tst_then_op(atomic_xwu16_t * a,
+                                   xwaop_tst_f tst, void * tst_args,
+                                   xwaop_op_f op, void * op_args,
+                                   xwu16_t * nv, xwu16_t * ov)
 {
         xwu16_t n;
         xwu16_t o;

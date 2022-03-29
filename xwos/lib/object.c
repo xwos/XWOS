@@ -21,12 +21,12 @@
 /**
  * @brief 对象标签分配器，每次分配XWOS_OBJTIK_CHUNK个ID给CPU
  */
-__xwlib_data xwsq_a xwos_objtik_dispatcher = (CPUCFG_CPU_NUM * XWOS_OBJTIK_CHUNK);
+__xwlib_data atomic_xwsq_t xwos_objtik_dispatcher = (CPUCFG_CPU_NUM * XWOS_OBJTIK_CHUNK);
 
 /**
  * @brief 每CPU的对象标签分配器
  */
-__xwlib_data xwsq_a xwos_objtik[CPUCFG_CPU_NUM] __xwcc_alignl1cache = {0};
+__xwlib_data atomic_xwsq_t xwos_objtik[CPUCFG_CPU_NUM] __xwcc_alignl1cache = {0};
 
 /**
  * @brief 初始化对象标签分配器
@@ -55,27 +55,27 @@ __xwlib_code
 xwsq_t xwos_objtik_get(void)
 {
         xwid_t cpu;
-        xwsq_a * objtik;
+        atomic_xwsq_t * objtik;
         xwsq_t curr, max, ov;
         xwer_t rc;
 
         cpu = xwos_skd_id_lc();
         objtik = &xwos_objtik[cpu];
         while (true) {
-                curr = xwaop_load(xwsq, objtik, xwmb_modr_relaxed);
+                curr = xwaop_load(xwsq_t, objtik, xwmb_modr_relaxed);
                 max = (curr & (~XWOS_OBJTIK_CHUNK_MSK)) + XWOS_OBJTIK_CHUNK_MSK;
-                rc = xwaop_tlt_then_add(xwsq, objtik, max, 1, NULL, &ov);
+                rc = xwaop_tlt_then_add(xwsq_t, objtik, max, 1, NULL, &ov);
                 if (rc < 0) {
                         xwreg_t cpuirq;
                         xwsq_t chunk;
 
                         xwos_cpuirq_save_lc(&cpuirq);
-                        curr = xwaop_load(xwsq, objtik, xwmb_modr_relaxed);
+                        curr = xwaop_load(xwsq_t, objtik, xwmb_modr_relaxed);
                         if (curr == max) {
                                 ov = curr;
-                                xwaop_add(xwsq, &xwos_objtik_dispatcher,
+                                xwaop_add(xwsq_t, &xwos_objtik_dispatcher,
                                           XWOS_OBJTIK_CHUNK, NULL, &chunk);
-                                xwaop_store(xwsq, objtik, xwmb_modr_relaxed, chunk);
+                                xwaop_store(xwsq_t, objtik, xwmb_modr_relaxed, chunk);
                                 xwos_cpuirq_restore_lc(cpuirq);
                                 break;
                         } else {
@@ -125,7 +125,7 @@ xwer_t xwos_object_activate(struct xwos_object * obj, xwobj_gc_f gcfunc)
 {
         xwer_t rc;
 
-        rc = xwaop_teq_then_add(xwsq, &obj->refcnt, 0, 1, NULL, NULL);
+        rc = xwaop_teq_then_add(xwsq_t, &obj->refcnt, 0, 1, NULL, NULL);
         if (__xwcc_likely(XWOK == rc)) {
                 obj->tik = xwos_objtik_get();
                 obj->magic = XWOS_OBJ_MAGIC;
@@ -196,7 +196,7 @@ xwer_t xwos_object_acquire(struct xwos_object * obj, xwsq_t tik)
         xwobj_d objd = {obj, tik};
         xwer_t rc;
 
-        rc = xwaop_tst_then_op(xwsq, &obj->refcnt,
+        rc = xwaop_tst_then_op(xwsq_t, &obj->refcnt,
                                xwos_object_acquire_refaop_tst, &objd,
                                xwos_object_acquire_refaop_op, &objd,
                                NULL, NULL);
@@ -251,7 +251,7 @@ xwer_t xwos_object_release(struct xwos_object * obj, xwsq_t tik)
         xwsq_t nv;
         xwer_t rc;
 
-        rc = xwaop_tst_then_op(xwsq, &obj->refcnt,
+        rc = xwaop_tst_then_op(xwsq_t, &obj->refcnt,
                                xwos_object_release_refaop_tst, &objd,
                                xwos_object_release_refaop_op, &objd,
                                &nv, NULL);
@@ -277,7 +277,7 @@ xwer_t xwos_object_grab(struct xwos_object * obj)
 {
         xwer_t rc;
 
-        rc = xwaop_tge_then_add(xwsq, &obj->refcnt, 1, 1, NULL, NULL);
+        rc = xwaop_tge_then_add(xwsq_t, &obj->refcnt, 1, 1, NULL, NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 rc = -EOBJDEAD;
         }/* else {} */
@@ -297,7 +297,7 @@ xwer_t xwos_object_put(struct xwos_object * obj)
         xwer_t rc;
         xwsq_t nv;
 
-        rc = xwaop_tgt_then_sub(xwsq, &obj->refcnt,
+        rc = xwaop_tgt_then_sub(xwsq_t, &obj->refcnt,
                                 0, 1,
                                 &nv, NULL);
         if (__xwcc_likely(XWOK == rc)) {
@@ -324,7 +324,7 @@ xwer_t xwos_object_rawput(struct xwos_object * obj)
 {
         xwer_t rc;
 
-        rc = xwaop_tgt_then_sub(xwsq, &obj->refcnt,
+        rc = xwaop_tgt_then_sub(xwsq_t, &obj->refcnt,
                                 0, 1,
                                 NULL, NULL);
         if (rc < 0) {
@@ -341,5 +341,5 @@ xwer_t xwos_object_rawput(struct xwos_object * obj)
 __xwlib_code
 xwsq_t xwos_object_get_refcnt(struct xwos_object * obj)
 {
-        return xwaop_load(xwsq, &obj->refcnt, xwmb_modr_relaxed);
+        return xwaop_load(xwsq_t, &obj->refcnt, xwmb_modr_relaxed);
 }

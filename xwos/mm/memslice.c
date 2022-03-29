@@ -82,8 +82,8 @@ xwer_t xwmm_memslice_init(struct xwmm_memslice * msa, xwptr_t origin,
         nm = num_max;
         for (n = 0; n < nm; n++) {
                 next += card_size;
-                xwlib_lfq_init((xwlfq_a *)curr);
-                xwlib_lfq_push(&msa->free_list, (xwlfq_a *)curr);
+                xwlib_lfq_init((atomic_xwlfq_t *)curr);
+                xwlib_lfq_push(&msa->free_list, (atomic_xwlfq_t *)curr);
                 curr = next;
         }
 
@@ -120,7 +120,7 @@ xwer_t xwmm_memslice_alloc(struct xwmm_memslice * msa, void ** membuf)
                 *membuf = NULL;
                 goto err_lfq_pop;
         }
-        xwaop_sub(xwsz, &msa->num_free, 1, NULL, NULL);
+        xwaop_sub(xwsz_t, &msa->num_free, 1, NULL, NULL);
         *(xwptr_t *)card = msa->backup; /* restore original data */
         *membuf = card;
         return XWOK;
@@ -143,7 +143,7 @@ __xwos_api
 xwer_t xwmm_memslice_free(struct xwmm_memslice * msa, void * mem)
 {
         xwer_t rc;
-        xwlfq_a * card;
+        atomic_xwlfq_t * card;
 
         XWOS_VALIDATE((msa), "nullptr", -EFAULT);
         XWOS_VALIDATE((mem), "nullptr", -EFAULT);
@@ -155,9 +155,9 @@ xwer_t xwmm_memslice_free(struct xwmm_memslice * msa, void * mem)
                 if (msa->dtor) {
                         msa->dtor(mem);
                 }/* else {} */
-                card = (xwlfq_a *)mem;
+                card = (atomic_xwlfq_t *)mem;
                 xwlib_lfq_push(&msa->free_list, card);
-                xwaop_add(xwsz, &msa->num_free, 1, NULL, NULL);
+                xwaop_add(xwsz_t, &msa->num_free, 1, NULL, NULL);
                 rc = XWOK;
         }
 

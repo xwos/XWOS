@@ -15,8 +15,8 @@
 
 #include <xwos/standard.h>
 
-void xwlib_lfq_push(xwlfq_a * h, xwlfq_a * n);
-xwlfq_t * xwlib_lfq_pop(xwlfq_a * h);
+void xwlib_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n);
+xwlfq_t * xwlib_lfq_pop(atomic_xwlfq_t * h);
 
 #include <xwosimpl_soc_lfq.h>
 

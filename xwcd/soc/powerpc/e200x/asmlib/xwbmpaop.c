@@ -25,19 +25,19 @@
 #include <e200x_core.h>
 
 __xwlib_code
-bool xwbmpaop_t1i(xwbmp_a * bmp, xwsq_t idx)
+bool xwbmpaop_t1i(atomic_xwbmp_t * bmp, xwsq_t idx)
 {
         bool ret;
         xwbmp_t value;
 
         bmp = bmp + XWBOP_BMP(idx);
-        value = xwaop_load(xwbmp, bmp, xwmb_modr_consume);
+        value = xwaop_load(xwbmp_t, bmp, xwmb_modr_consume);
         ret = (bool)(!!(value & XWBOP_BMP_MASK(idx)));
         return ret;
 }
 
 __xwlib_code
-xwssq_t xwbmpaop_ffs_then_c0i(xwbmp_a * bmp, xwsz_t num)
+xwssq_t xwbmpaop_ffs_then_c0i(atomic_xwbmp_t * bmp, xwsz_t num)
 {
         xwsz_t total = BITS_TO_XWBMP_T(num);
         xwsq_t i;
@@ -82,7 +82,7 @@ xwssq_t xwbmpaop_ffs_then_c0i(xwbmp_a * bmp, xwsz_t num)
 }
 
 __xwlib_code
-xwssq_t xwbmpaop_ffz_then_s1i(xwbmp_a * bmp, xwsz_t num)
+xwssq_t xwbmpaop_ffz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num)
 {
         xwsz_t total = BITS_TO_XWBMP_T(num);
         xwsq_t i;
@@ -128,7 +128,7 @@ xwssq_t xwbmpaop_ffz_then_s1i(xwbmp_a * bmp, xwsz_t num)
 }
 
 __xwlib_code
-xwssq_t xwbmpaop_fls_then_c0i(xwbmp_a * bmp, xwsz_t num)
+xwssq_t xwbmpaop_fls_then_c0i(atomic_xwbmp_t * bmp, xwsz_t num)
 {
         xwsz_t total = BITS_TO_XWBMP_T(num);
         xwsq_t i;
@@ -169,7 +169,7 @@ xwssq_t xwbmpaop_fls_then_c0i(xwbmp_a * bmp, xwsz_t num)
 }
 
 __xwlib_code
-xwssq_t xwbmpaop_flz_then_s1i(xwbmp_a * bmp, xwsz_t num)
+xwssq_t xwbmpaop_flz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num)
 {
         xwsz_t total = BITS_TO_XWBMP_T(num);
         xwsq_t i;

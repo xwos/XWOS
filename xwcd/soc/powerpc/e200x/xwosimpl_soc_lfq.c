@@ -23,7 +23,7 @@
 #include <xwos/lib/lfq.h>
 
 __xwbsp_code
-void xwlib_lfq_push(xwlfq_a * h, xwlfq_a * n)
+void xwlib_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
 {
         xwlfq_t * next;
 
@@ -35,7 +35,7 @@ void xwlib_lfq_push(xwlfq_a * h, xwlfq_a * n)
 }
 
 __xwbsp_code
-xwlfq_t * xwlib_lfq_pop(xwlfq_a * h)
+xwlfq_t * xwlib_lfq_pop(atomic_xwlfq_t * h)
 {
         xwlfq_t * top;
         xwlfq_t * next;

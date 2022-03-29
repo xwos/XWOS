@@ -139,7 +139,7 @@ union xwpcp_slot {
  */
 struct xwpcp_carrier {
         struct xwlib_bclst_node node; /**< 链表节点 */
-        xwu32_a state; /**< 状态 */
+        atomic_xwu32_t state; /**< 状态 */
         xwu16_t idx; /**< 序号 */
         xwu8_t pri; /**< 优先级 */
         union xwpcp_slot * slot;
@@ -152,7 +152,7 @@ struct xwpcp {
         /* 基本信息 */
         struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
         const char * name;
-        xwsq_a hwifst; /**< 硬件层状态 */
+        atomic_xwsq_t hwifst; /**< 硬件层状态 */
         const struct xwpcp_hwifal_operation * hwifops; /**< 硬件接口抽象层操作函数 */
         void * hwifcb; /**< 接口硬件 */
 
@@ -163,7 +163,7 @@ struct xwpcp {
         /* 发送状态机 */
         struct xwos_thd * txthd; /**< 发送线程 */
         struct {
-                xwu32_a cnt; /**< 发送计数器 */
+                atomic_xwu32_t cnt; /**< 发送计数器 */
                 struct xwpcp_carrier car[XWPCP_MEMBLK_NUM]; /**< 包含待发送帧的“发送装置” */
                 xwbmpaop_declare(carbmp, XWPCP_MEMBLK_NUM); /**< “发送装置” 的索引位图 */
                 struct xwlib_bclst_head q[XWPCP_PRI_NUM]; /**< 每优先级发送队列 */
@@ -183,7 +183,7 @@ struct xwpcp {
         /* 接收状态机 */
         struct xwos_thd * rxthd; /**< 接收线程的描述符 */
         struct {
-                xwu32_a cnt; /**< 接收计数器 */
+                atomic_xwu32_t cnt; /**< 接收计数器 */
                 struct xwlib_bclst_head q[XWPCP_PORT_NUM]; /**< 每个端口的接收队列 */
                 struct xwos_splk lock[XWPCP_PORT_NUM]; /**< 保护每个接收队列的锁 */
                 struct xwos_sem sem[XWPCP_PORT_NUM]; /**< 每个接收队列的信号量 */

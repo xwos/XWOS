@@ -29,7 +29,7 @@
 struct xwmm_sma {
         struct xwmm_zone zone; /**< 内存区域 */
         const char * name; /**< 名字 */
-        xwsq_a pos; /**< 当前位置指针 */
+        atomic_xwsq_t pos; /**< 当前位置指针 */
 };
 
 xwer_t xwmm_sma_init(struct xwmm_sma * sa,

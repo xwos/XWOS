@@ -508,7 +508,7 @@ xwer_t xwpcp_abort(struct xwpcp * xwpcp, xwpcp_txh_t txh)
 
         XWOS_UNUSED(xwpcp);
 
-        rc = xwaop_teq_then_write(xwu32, &txh->state,
+        rc = xwaop_teq_then_write(xwu32_t, &txh->state,
                                   XWPCP_CRS_READY,
                                   XWPCP_CRS_ABORT,
                                   NULL);

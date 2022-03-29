@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库: xwaop__xws16__tle_then_add
+ * @brief 原子操作库: xwaop__xws16_t__tle_then_add
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -23,10 +23,10 @@
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code
-xwer_t xwaop__xws16__tle_then_add(xws16_a * a,
-                                  xws16_t t,
-                                  xws16_t v,
-                                  xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16_t__tle_then_add(atomic_xws16_t * a,
+                                    xws16_t t,
+                                    xws16_t v,
+                                    xws16_t * nv, xws16_t * ov)
 {
         xws16_t n;
         xws16_t o;

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库: xwaop__xws32__rsb
+ * @brief 原子操作库: xwaop__xws32_t__rsb
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -23,9 +23,9 @@
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code
-void xwaop__xws32__rsb(xws32_a * a,
-                       xws32_t v,
-                       xws32_t * nv, xws32_t * ov)
+void xwaop__xws32_t__rsb(atomic_xws32_t * a,
+                         xws32_t v,
+                         xws32_t * nv, xws32_t * ov)
 {
         xws32_t n;
         xws32_t o;

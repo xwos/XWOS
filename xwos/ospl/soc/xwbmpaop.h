@@ -15,18 +15,18 @@
 
 #include <xwos/standard.h>
 
-bool xwbmpaop_t1i(xwbmp_a * bmp, xwsq_t idx);
-void xwbmpaop_s1i(xwbmp_a * bmp, xwsq_t idx);
-void xwbmpaop_c0i(xwbmp_a * bmp, xwsq_t idx);
-void xwbmpaop_x1i(xwbmp_a * bmp, xwsq_t idx);
+bool xwbmpaop_t1i(atomic_xwbmp_t * bmp, xwsq_t idx);
+void xwbmpaop_s1i(atomic_xwbmp_t * bmp, xwsq_t idx);
+void xwbmpaop_c0i(atomic_xwbmp_t * bmp, xwsq_t idx);
+void xwbmpaop_x1i(atomic_xwbmp_t * bmp, xwsq_t idx);
 
-xwer_t xwbmpaop_t0i_then_s1i(xwbmp_a * bmp, xwsq_t idx);
-xwer_t xwbmpaop_t1i_then_c0i(xwbmp_a * bmp, xwsq_t idx);
+xwer_t xwbmpaop_t0i_then_s1i(atomic_xwbmp_t * bmp, xwsq_t idx);
+xwer_t xwbmpaop_t1i_then_c0i(atomic_xwbmp_t * bmp, xwsq_t idx);
 
-xwssq_t xwbmpaop_fls_then_c0i(xwbmp_a * bmp, xwsz_t num);
-xwssq_t xwbmpaop_flz_then_s1i(xwbmp_a * bmp, xwsz_t num);
-xwssq_t xwbmpaop_ffs_then_c0i(xwbmp_a * bmp, xwsz_t num);
-xwssq_t xwbmpaop_ffz_then_s1i(xwbmp_a * bmp, xwsz_t num);
+xwssq_t xwbmpaop_fls_then_c0i(atomic_xwbmp_t * bmp, xwsz_t num);
+xwssq_t xwbmpaop_flz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num);
+xwssq_t xwbmpaop_ffs_then_c0i(atomic_xwbmp_t * bmp, xwsz_t num);
+xwssq_t xwbmpaop_ffz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num);
 
 #include <xwosimpl_soc_xwbmpaop.h>
 

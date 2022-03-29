@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS移植实现层：SOC自旋锁
+ * @brief XWOS移植实现层：SOC自旋锁
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -26,7 +26,7 @@
 #endif
 
 struct soc_splk {
-        xwu32_a lockval;
+        atomic_xwu32_t lockval;
 };
 
 static __xwbsp_inline

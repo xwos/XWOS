@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库：xwaop__xws64__or
+ * @brief 原子操作库：xwaop__xws64_t__or
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -23,9 +23,9 @@
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code
-void xwaop__xws64__or(xws64_a *a,
-                      xws64_t v,
-                      xws64_t * nv, xws64_t * ov)
+void xwaop__xws64_t__or(atomic_xws64_t * a,
+                        xws64_t v,
+                        xws64_t * nv, xws64_t * ov)
 {
         xws64_t n;
         xws64_t o;

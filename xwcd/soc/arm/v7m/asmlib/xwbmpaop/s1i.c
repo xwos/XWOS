@@ -21,7 +21,7 @@
 #include <xwos/standard.h>
 
 __xwlib_code __xwcc_naked
-void xwbmpaop_s1i(__xwcc_unused xwbmp_a * bmp,
+void xwbmpaop_s1i(__xwcc_unused atomic_xwbmp_t * bmp,
                   __xwcc_unused xwsq_t idx)
 {
         __asm__ volatile("      lsr     r2, r1, #5");           /* r2 = n / 32; (BIC low 5 bits) */

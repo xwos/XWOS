@@ -230,7 +230,7 @@ xwer_t xwscp_connect_once(struct xwscp * xwscp, xwtm_t * xwtm)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_lock;
         }
-        xwaop_c0m(xwsq, &xwscp->hwifst, XWSCP_HWIFST_CONNECT, NULL, NULL);
+        xwaop_c0m(xwsq_t, &xwscp->hwifst, XWSCP_HWIFST_CONNECT, NULL, NULL);
         rc = xwscp_tx_cmd_connect(xwscp);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_tx;
@@ -242,8 +242,8 @@ xwer_t xwscp_connect_once(struct xwscp * xwscp, xwtm_t * xwtm)
                                  &time, &lkst);
         if (__xwcc_likely(XWOK == rc)) {
                 xwos_mtx_unlock(&xwscp->tx.csmtx);
-                xwaop_write(xwu32, &xwscp->tx.cnt, 0, NULL);
-                xwaop_s1m(xwsq, &xwscp->hwifst, XWSCP_HWIFST_CONNECT, NULL, NULL);
+                xwaop_write(xwu32_t, &xwscp->tx.cnt, 0, NULL);
+                xwaop_s1m(xwsq_t, &xwscp->hwifst, XWSCP_HWIFST_CONNECT, NULL, NULL);
                 xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_CONNECT);
                 *xwtm -= time;
         } else if (-ETIMEDOUT == rc) {
@@ -310,21 +310,21 @@ xwer_t xwscp_finish_tx(struct xwscp * xwscp, union xwscp_slot * slot)
         rmtid = xwscp->tx.remote.id;
 
         if (rmtid != slot->tx.frm.head.id) {
-                xwaop_c0m(xwsq, &xwscp->hwifst, XWSCP_HWIFST_CONNECT, NULL, NULL);
+                xwaop_c0m(xwsq_t, &xwscp->hwifst, XWSCP_HWIFST_CONNECT, NULL, NULL);
                 xwscplogf(DEBUG, "[txthd] Remote ACK ID error!\n");
                 rc = -ECONNRESET;
         } else {
                 switch (ack) {
                 case XWSCP_ACK_OK:
                         rc = xwscp_callback_rc[ack];
-                        xwaop_add(xwu32, &xwscp->tx.cnt, 1, NULL, NULL);
+                        xwaop_add(xwu32_t, &xwscp->tx.cnt, 1, NULL, NULL);
                         break;
                 case XWSCP_ACK_EALREADY:
                         rc = xwscp_callback_rc[XWSCP_ACK_OK];
-                        xwaop_add(xwu32, &xwscp->tx.cnt, 1, NULL, NULL);
+                        xwaop_add(xwu32_t, &xwscp->tx.cnt, 1, NULL, NULL);
                         break;
                 case XWSCP_ACK_ECONNRESET:
-                        xwaop_c0m(xwsq, &xwscp->hwifst, XWSCP_HWIFST_CONNECT,
+                        xwaop_c0m(xwsq_t, &xwscp->hwifst, XWSCP_HWIFST_CONNECT,
                                   NULL, NULL);
                         rc = -ECONNRESET;
                         break;
@@ -361,7 +361,7 @@ xwer_t xwscp_tx_once(struct xwscp * xwscp,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_lock;
         }
-        xwaop_s1m(xwsq, &xwscp->hwifst, XWSCP_HWIFST_TX, NULL, NULL);
+        xwaop_s1m(xwsq_t, &xwscp->hwifst, XWSCP_HWIFST_TX, NULL, NULL);
         rc = xwscp_hwifal_tx(xwscp, (xwu8_t *)&slot->tx.frm, slot->tx.frmsize);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_iftx;
@@ -376,10 +376,10 @@ xwer_t xwscp_tx_once(struct xwscp * xwscp,
                 rc = xwscp_finish_tx(xwscp, slot);
                 *xwtm -= time;
         } else if (-ETIMEDOUT == rc) {
-                xwaop_c0m(xwsq, &xwscp->hwifst, XWSCP_HWIFST_TX, NULL, NULL);
+                xwaop_c0m(xwsq_t, &xwscp->hwifst, XWSCP_HWIFST_TX, NULL, NULL);
                 *xwtm -= period;
         } else {
-                xwaop_c0m(xwsq, &xwscp->hwifst, XWSCP_HWIFST_TX, NULL, NULL);
+                xwaop_c0m(xwsq_t, &xwscp->hwifst, XWSCP_HWIFST_TX, NULL, NULL);
         }
         return rc;
 
@@ -431,7 +431,7 @@ xwer_t xwscp_tx(struct xwscp * xwscp,
                 goto err_txmtx_timedlock;
         }
         do {
-                xwaop_read(xwsq, &xwscp->hwifst, &hwifst);
+                xwaop_read(xwsq_t, &xwscp->hwifst, &hwifst);
                 if (XWSCP_HWIFST_CONNECT & hwifst) {
                         do {
                                 rc = xwscp_tx_once(xwscp, data, size, qos, xwtm);

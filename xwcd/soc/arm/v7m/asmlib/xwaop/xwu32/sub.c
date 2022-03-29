@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库: xwaop__xwu32__sub
+ * @brief 原子操作库: xwaop__xwu32_t__sub
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -23,9 +23,9 @@
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code
-void xwaop__xwu32__sub(xwu32_a * a,
-                       xwu32_t v,
-                       xwu32_t * nv, xwu32_t * ov)
+void xwaop__xwu32_t__sub(atomic_xwu32_t * a,
+                         xwu32_t v,
+                         xwu32_t * nv, xwu32_t * ov)
 {
         xwu32_t n;
         xwu32_t o;

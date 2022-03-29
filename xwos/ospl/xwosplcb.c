@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS MP内核：调度器的时间树
+ * @brief 玄武OS移植层：回调
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

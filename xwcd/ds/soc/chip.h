@@ -163,7 +163,7 @@ struct xwds_soc {
 #if (defined(XWCDCFG_ds_SOC_GPIO) && (1 == XWCDCFG_ds_SOC_GPIO))
         struct {
                 void * cfg; /**< GPIO配置 */
-                xwsq_a * pins; /**< GPIO PIN状态图数组 */
+                atomic_xwsq_t * pins; /**< GPIO PIN状态图数组 */
                 xwsz_t port_num; /**< GPIO端口数量 */
                 xwsz_t pin_num; /**< 每个GPIO端口中的PIN数量 */
         } gpio; /**< GPIO描述 */
@@ -191,7 +191,7 @@ struct xwds_soc {
         struct {
                 xwsz_t ch_num; /**< DMA通道数量 */
                 void * ccfg; /**< SOC DMA控制器配置 */
-                xwbmp_a * chstatus; /**< DMA通道状态图 */
+                atomic_xwbmp_t * chstatus; /**< DMA通道状态图 */
                 __xwds_soc_dma_tbl_qualifier xwds_dma_f * chcbs;
                                                 /**< DMA通道传输结束回调函数表 */
                 __xwds_soc_dma_tbl_qualifier xwds_dma_cbarg_t * chcbargs;

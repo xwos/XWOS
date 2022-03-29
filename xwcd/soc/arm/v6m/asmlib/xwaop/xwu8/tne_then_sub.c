@@ -23,7 +23,7 @@
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code
-xwer_t xwaop__xwu8__tne_then_sub(xwu8_a * a,
+xwer_t xwaop__xwu8__tne_then_sub(atomic_xwu8_t * a,
                                  xwu8_t t,
                                  xwu8_t v,
                                  xwu8_t * nv, xwu8_t * ov)

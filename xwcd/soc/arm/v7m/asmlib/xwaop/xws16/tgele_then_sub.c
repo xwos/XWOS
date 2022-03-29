@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库: xwaop__xws16__tgele_then_sub
+ * @brief 原子操作库: xwaop__xws16_t__tgele_then_sub
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -23,10 +23,10 @@
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code
-xwer_t xwaop__xws16__tgele_then_sub(xws16_a * a,
-                                    xws16_t l, xws16_t r,
-                                    xws16_t v,
-                                    xws16_t * nv, xws16_t * ov)
+xwer_t xwaop__xws16_t__tgele_then_sub(atomic_xws16_t * a,
+                                      xws16_t l, xws16_t r,
+                                      xws16_t v,
+                                      xws16_t * nv, xws16_t * ov)
 {
         xws16_t n;
         xws16_t o;

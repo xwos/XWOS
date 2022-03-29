@@ -329,7 +329,7 @@ void xwmp_swt_ttn_cb(void * entry)
                 expected = xwtm_add_safely(swt->ttn.wkup_xwtm, swt->period);
                 xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
                 swt->ttn.wkup_xwtm = expected;
-                xwaop_store(xwsq, &swt->ttn.wkuprs,
+                xwaop_store(xwsq_t, &swt->ttn.wkuprs,
                             xwmb_modr_release, XWMP_TTN_WKUPRS_UNKNOWN);
                 swt->ttn.cb = xwmp_swt_ttn_cb;
                 rc = xwmp_tt_add_locked(xwtt, &swt->ttn, cpuirq);
@@ -365,7 +365,7 @@ xwer_t xwmp_swt_start(struct xwmp_swt * swt,
         swt->period = period;
         /* 加入时间树 */
         swt->ttn.wkup_xwtm = expected;
-        xwaop_store(xwsq, &swt->ttn.wkuprs,
+        xwaop_store(xwsq_t, &swt->ttn.wkuprs,
                     xwmb_modr_release, XWMP_TTN_WKUPRS_UNKNOWN);
         swt->ttn.xwtt = xwtt;
         swt->ttn.cb = xwmp_swt_ttn_cb;

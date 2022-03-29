@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS Ramcode Image：模块接口
+ * @brief XWOS Ramcode：模块接口
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

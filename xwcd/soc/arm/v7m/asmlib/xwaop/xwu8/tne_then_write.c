@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库: xwaop__xwu8__tne_then_write
+ * @brief 原子操作库: xwaop__xwu8_t__tne_then_write
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -23,10 +23,10 @@
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code
-xwer_t xwaop__xwu8__tne_then_write(xwu8_a * a,
-                                   xwu8_t t,
-                                   xwu8_t v,
-                                   xwu8_t * ov)
+xwer_t xwaop__xwu8_t__tne_then_write(atomic_xwu8_t * a,
+                                     xwu8_t t,
+                                     xwu8_t v,
+                                     xwu8_t * ov)
 {
         xwu8_t o;
         xwer_t rc;

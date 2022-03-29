@@ -50,7 +50,7 @@ xwer_t xwscp_hwifal_open(struct xwscp * xwscp, void * hwifcb)
                 goto err_hwifops_open;
         }
 
-        xwaop_write(xwsq, &xwscp->hwifst, XWSCP_HWIFST_RX, NULL);
+        xwaop_write(xwsq_t, &xwscp->hwifst, XWSCP_HWIFST_RX, NULL);
         xwscplogf(INFO, "Open HWIF ... [OK]\n");
         return rc;
 
@@ -70,7 +70,7 @@ xwer_t xwscp_hwifal_close(struct xwscp * xwscp)
 {
         xwer_t rc;
 
-        rc = xwaop_t1ma_then_c0m(xwsq, &xwscp->hwifst, XWSCP_HWIFST_RX,
+        rc = xwaop_t1ma_then_c0m(xwsq_t, &xwscp->hwifst, XWSCP_HWIFST_RX,
                                  NULL, NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwscp_clear_hwifst;
@@ -89,7 +89,7 @@ xwer_t xwscp_hwifal_close(struct xwscp * xwscp)
         return XWOK;
 
 err_hwifops_close:
-        xwaop_s1m(xwsq, &xwscp->hwifst, XWSCP_HWIFST_RX, NULL, NULL);
+        xwaop_s1m(xwsq_t, &xwscp->hwifst, XWSCP_HWIFST_RX, NULL, NULL);
 err_xwscp_clear_hwifst:
         xwscplogf(INFO, "Open HWIF ... [rc:%d]\n", rc);
         return rc;

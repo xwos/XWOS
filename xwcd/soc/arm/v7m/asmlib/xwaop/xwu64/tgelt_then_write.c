@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库：xwaop__xwu64__tgelt_then_write
+ * @brief 原子操作库：xwaop__xwu64_t__tgelt_then_write
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -23,10 +23,10 @@
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code
-xwer_t xwaop__xwu64__tgelt_then_write(xwu64_a * a,
-                                      xwu64_t l, xwu64_t r,
-                                      xwu64_t v,
-                                      xwu64_t * ov)
+xwer_t xwaop__xwu64_t__tgelt_then_write(atomic_xwu64_t * a,
+                                        xwu64_t l, xwu64_t r,
+                                        xwu64_t v,
+                                        xwu64_t * ov)
 {
         xwu64_t o;
         xwer_t rc;

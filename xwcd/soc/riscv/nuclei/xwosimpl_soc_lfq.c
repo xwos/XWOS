@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS移植实现层：SOC无锁队列
+ * @brief XWOS移植实现层：SOC无锁队列
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -23,7 +23,7 @@
 #include <xwos/lib/lfq.h>
 
 __xwbsp_code
-void soc_lfq_push(xwlfq_a * h, xwlfq_a * n)
+void soc_lfq_push(atomic_xwlfq_t * h, atomic_xwlfq_t * n)
 {
         xwlfq_t * next;
 
@@ -35,7 +35,7 @@ void soc_lfq_push(xwlfq_a * h, xwlfq_a * n)
 }
 
 __xwbsp_code
-xwlfq_t * soc_lfq_pop(xwlfq_a * h)
+xwlfq_t * soc_lfq_pop(atomic_xwlfq_t * h)
 {
         xwlfq_t * top;
         xwlfq_t * next;

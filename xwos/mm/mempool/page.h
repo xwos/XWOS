@@ -49,7 +49,7 @@ struct xwmm_mempool_page {
                 } free; /**< 空闲页 */
                 struct {
                         struct xwlib_bclst_node node; /**< 页链表节点 */
-                        xwlfq_a objhead; /**< 空闲对象无锁队列头 */
+                        atomic_xwlfq_t objhead; /**< 空闲对象无锁队列头 */
                         xwsq_t refcnt; /**< 页的引用计数（aka: 已被使用的对象数量）
                                             被xwmm_mempool_objcache.page_list.lock
                                             保护。 */

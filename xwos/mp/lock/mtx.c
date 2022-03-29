@@ -451,7 +451,7 @@ xwer_t xwmp_mtx_intr(struct xwmp_mtx * mtx, struct xwmp_thd * thd)
                 if (XWOK == rc) {
                         thd->wqn.wq = NULL;
                         thd->wqn.type = XWMP_WQTYPE_UNKNOWN;
-                        xwaop_store(xwsq, &thd->wqn.reason,
+                        xwaop_store(xwsq_t, &thd->wqn.reason,
                                     xwmb_modr_release, XWMP_WQN_REASON_INTR);
                         thd->wqn.cb = NULL;
                         xwmp_splk_unlock(&thd->wqn.lock);
@@ -512,7 +512,7 @@ xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx)
                         /* Case 1: 等待队列中有线程正在等待互斥锁 */
                         wqn->wq = NULL;
                         wqn->type = XWMP_WQTYPE_UNKNOWN;
-                        xwaop_store(xwsq, &wqn->reason,
+                        xwaop_store(xwsq_t, &wqn->reason,
                                     xwmb_modr_release, XWMP_WQN_REASON_UP);
                         wqn->cb = NULL;
                         xwmp_splk_unlock(&wqn->lock);
@@ -688,8 +688,8 @@ xwer_t xwmp_mtx_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
         /* 判断唤醒原因 */
         xwmb_mp_rmb();
         /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
-        reason = xwaop_load(xwsq, &thd->wqn.reason, xwmb_modr_relaxed);
-        wkuprs = xwaop_load(xwsq, &thd->ttn.wkuprs, xwmb_modr_relaxed);
+        reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwmb_modr_relaxed);
+        wkuprs = xwaop_load(xwsq_t, &thd->ttn.wkuprs, xwmb_modr_relaxed);
         if (XWMP_WQN_REASON_INTR == reason) {
                 xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 rc = xwmp_tt_remove_locked(xwtt, &thd->ttn);
@@ -717,7 +717,7 @@ xwer_t xwmp_mtx_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
                 if (XWOK == rc) {
                         thd->wqn.wq = NULL;
                         thd->wqn.type = XWMP_WQTYPE_UNKNOWN;
-                        xwaop_store(xwsq, &thd->wqn.reason,
+                        xwaop_store(xwsq_t, &thd->wqn.reason,
                                     xwmb_modr_release, XWMP_WQN_REASON_INTR);
                         thd->wqn.cb = NULL;
                         xwmp_splk_unlock(&thd->wqn.lock);
@@ -731,7 +731,7 @@ xwer_t xwmp_mtx_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
                 } else {
                         xwmp_splk_unlock(&thd->wqn.lock);
                         xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
-                        reason = xwaop_load(xwsq, &thd->wqn.reason,
+                        reason = xwaop_load(xwsq_t, &thd->wqn.reason,
                                             xwmb_modr_relaxed);
                         if (XWMP_WQN_REASON_INTR == reason) {
                                 rc = -EINTR;
@@ -749,7 +749,7 @@ xwer_t xwmp_mtx_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
                 if (XWOK == rc) {
                         thd->wqn.wq = NULL;
                         thd->wqn.type = XWMP_WQTYPE_UNKNOWN;
-                        xwaop_store(xwsq, &thd->wqn.reason,
+                        xwaop_store(xwsq_t, &thd->wqn.reason,
                                     xwmb_modr_release, XWMP_WQN_REASON_INTR);
                         thd->wqn.cb = NULL;
                         xwmp_splk_unlock(&thd->wqn.lock);
@@ -763,7 +763,7 @@ xwer_t xwmp_mtx_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
                 } else {
                         xwmp_splk_unlock(&thd->wqn.lock);
                         xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
-                        reason = xwaop_load(xwsq, &thd->wqn.reason,
+                        reason = xwaop_load(xwsq_t, &thd->wqn.reason,
                                             xwmb_modr_relaxed);
                         if (XWMP_WQN_REASON_INTR == reason) {
                                 rc = -EINTR;
@@ -893,7 +893,7 @@ xwer_t xwmp_mtx_do_blkthd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
         /* 判断唤醒原因 */
         xwmb_mp_rmb();
         /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
-        reason = xwaop_load(xwsq, &thd->wqn.reason, xwmb_modr_relaxed);
+        reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwmb_modr_relaxed);
         if (XWMP_WQN_REASON_UP == reason) {
                 rc = XWOK;
         } else {

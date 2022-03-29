@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库: xwaop__xwu16__read
+ * @brief 原子操作库: xwaop__xwu16_t__read
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -23,11 +23,11 @@
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code
-void xwaop__xwu16__read(xwu16_a * a,
-                        xwu16_t * ov)
+void xwaop__xwu16_t__read(atomic_xwu16_t * a,
+                          xwu16_t * ov)
 {
         xwu16_t o;
-        o = xwaop__xwu16__load(a, xwmb_modr_acquire);
+        o = xwaop__xwu16_t__load(a, xwmb_modr_acquire);
         if (ov) {
                 *ov = o;
         }

@@ -125,7 +125,7 @@ struct stm32cube_soc_cfg stm32cube_soc_cfg = {
         },
 };
 
-xwsq_a stm32cube_gpio_pin_state[] = {
+atomic_xwsq_t stm32cube_gpio_pin_state[] = {
         [XWDS_GPIO_PORT_A] = 0,
         [XWDS_GPIO_PORT_B] = 0,
         [XWDS_GPIO_PORT_C] = 0,

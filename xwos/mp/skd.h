@@ -131,7 +131,7 @@ enum xwmp_skd_wakelock_cnt_em {
  * @brief 调度器电源管理控制块
  */
 struct xwmp_skd_pm {
-        xwsq_a wklkcnt; /**< 唤醒锁，取值 @ref xwmp_skd_wakelock_cnt_em */
+        atomic_xwsq_t wklkcnt; /**< 唤醒锁，取值 @ref xwmp_skd_wakelock_cnt_em */
         xwsz_t frz_thd_cnt; /**< 已冻结的线程计数器 */
         struct xwlib_bclst_head frzlist; /**< 已冻结的线程链表 */
         struct xwmp_splk lock; /**< 保护链表和计数器的锁 */
@@ -155,11 +155,11 @@ struct __xwcc_alignl1cache xwmp_skd {
         } rq; /**< 就绪队列 */
         struct xwmp_skdobj_stack idle; /**< 空闲任务的栈信息 */
         xwsq_t req_schedule_cnt; /**< 请求调度的计数器 */
-        xwsq_a req_chkpmpt_cnt; /**< 请求检查抢占的计数器 */
-        xwsq_a dis_pmpt_cnt; /**< 关闭抢占的计数器 */
+        atomic_xwsq_t req_chkpmpt_cnt; /**< 请求检查抢占的计数器 */
+        atomic_xwsq_t dis_pmpt_cnt; /**< 关闭抢占的计数器 */
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
-        xwsq_a req_bh_cnt; /**< 请求进入中断底半部的计数器 */
-        xwsq_a dis_bh_cnt; /**< 关闭中断底半部的计数器 */
+        atomic_xwsq_t req_bh_cnt; /**< 请求进入中断底半部的计数器 */
+        atomic_xwsq_t dis_bh_cnt; /**< 关闭中断底半部的计数器 */
         struct xwmp_bh_cb bhcb; /**< 中断底半部控制块 */
         struct xwmp_skdobj_stack bh; /**< 中断底半部任务的栈信息 */
 #endif

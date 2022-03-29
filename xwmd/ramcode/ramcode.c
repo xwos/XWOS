@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS Ramcode Image
+ * @brief XWOS Ramcode
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

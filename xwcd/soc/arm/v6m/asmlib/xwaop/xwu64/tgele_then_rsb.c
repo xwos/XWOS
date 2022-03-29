@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库：xwaop__xwu64__tgele_then_rsb
+ * @brief 原子操作库：xwaop__xwu64_t__tgele_then_rsb
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -23,10 +23,10 @@
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code
-xwer_t xwaop__xwu64__tgele_then_rsb(xwu64_a * a,
-                                    xwu64_t l, xwu64_t r,
-                                    xwu64_t v,
-                                    xwu64_t * nv, xwu64_t * ov)
+xwer_t xwaop__xwu64_t__tgele_then_rsb(atomic_xwu64_t * a,
+                                      xwu64_t l, xwu64_t r,
+                                      xwu64_t v,
+                                      xwu64_t * nv, xwu64_t * ov)
 {
         xwu64_t n;
         xwu64_t o;

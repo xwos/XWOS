@@ -65,7 +65,7 @@ xwer_t xwds_obj_remove(struct xwds_object * obj)
 {
         xwer_t rc;
 
-        rc = xwaop_teq_then_sub(xwsq, &obj->xwobj.refcnt,
+        rc = xwaop_teq_then_sub(xwsq_t, &obj->xwobj.refcnt,
                                 XWDS_OBJ_REF_SHUTDOWN, 1,
                                 NULL, NULL);
         if (XWOK == rc) {
@@ -83,7 +83,7 @@ xwer_t xwds_obj_start(struct xwds_object * obj)
 {
         xwer_t rc;
 
-        rc = xwaop_teq_then_add(xwsq, &obj->xwobj.refcnt,
+        rc = xwaop_teq_then_add(xwsq_t, &obj->xwobj.refcnt,
                                 XWDS_OBJ_REF_SHUTDOWN, 2,
                                 NULL, NULL);
         if (rc < 0) {
@@ -97,7 +97,7 @@ xwer_t xwds_obj_stop(struct xwds_object * obj)
 {
         xwer_t rc;
 
-        rc = xwaop_teq_then_sub(xwsq, &obj->xwobj.refcnt,
+        rc = xwaop_teq_then_sub(xwsq_t, &obj->xwobj.refcnt,
                                 XWDS_OBJ_REF_RUNNING, 2,
                                 NULL, NULL);
         if (rc < 0) {
@@ -111,7 +111,7 @@ xwer_t xwds_obj_suspend(struct xwds_object * obj)
 {
         xwer_t rc;
 
-        rc = xwaop_teq_then_sub(xwsq, &obj->xwobj.refcnt,
+        rc = xwaop_teq_then_sub(xwsq_t, &obj->xwobj.refcnt,
                                 XWDS_OBJ_REF_RUNNING, 1,
                                 NULL, NULL);
         if (rc < 0) {
@@ -125,7 +125,7 @@ xwer_t xwds_obj_resume(struct xwds_object * obj)
 {
         xwer_t rc;
 
-        rc = xwaop_teq_then_add(xwsq, &obj->xwobj.refcnt,
+        rc = xwaop_teq_then_add(xwsq_t, &obj->xwobj.refcnt,
                                 XWDS_OBJ_REF_SUSPEND, 1,
                                 NULL, NULL);
         if (rc < 0) {
@@ -139,7 +139,7 @@ xwer_t xwds_obj_grab(struct xwds_object * obj)
 {
         xwer_t rc;
 
-        rc = xwaop_tge_then_add(xwsq, &obj->xwobj.refcnt,
+        rc = xwaop_tge_then_add(xwsq_t, &obj->xwobj.refcnt,
                                 XWDS_OBJ_REF_RUNNING, 1,
                                 NULL, NULL);
         if (__xwcc_unlikely(rc < 0)) {
@@ -153,7 +153,7 @@ xwer_t xwds_obj_put(struct xwds_object * obj)
 {
         xwer_t rc;
 
-        rc = xwaop_tgt_then_sub(xwsq, &obj->xwobj.refcnt,
+        rc = xwaop_tgt_then_sub(xwsq_t, &obj->xwobj.refcnt,
                                 XWDS_OBJ_REF_RUNNING, 1,
                                 NULL, NULL);
         if (rc < 0) {

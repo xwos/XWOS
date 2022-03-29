@@ -23,7 +23,7 @@
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code
-void xwaop__xwu8__write(xwu8_a * a,
+void xwaop__xwu8__write(atomic_xwu8_t * a,
                         xwu8_t v,
                         xwu8_t * ov)
 {

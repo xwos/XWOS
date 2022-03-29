@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 原子操作库: xwaop__xws32__load
+ * @brief 原子操作库: xwaop__xws32_t__load
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -23,8 +23,8 @@
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code
-xws32_t xwaop__xws32__load(xws32_a * a,
-                           const enum xwmb_memory_order_em mo)
+xws32_t xwaop__xws32_t__load(atomic_xws32_t * a,
+                             const enum xwmb_memory_order_em mo)
 {
         xws32_t v;
 

@@ -22,7 +22,7 @@
 
         .section        .xwos.text,"ax"
         .global         xwbmpaop_c0i
-/* void xwbmpaop_c0i(xwbmp_a * bmp, xwsq_t n) */
+/* void xwbmpaop_c0i(atomic_xwbmp_t * bmp, xwsq_t n) */
 xwbmpaop_c0i:
         e_andi          r6, r4, 31      /* r6 = r4 & 0x1F; */
         se_li           r5, 1           /* r5 = 1; */
@@ -40,7 +40,7 @@ xwbmpaop_c0i:
 
         .section        .xwos.text,"ax"
         .global         xwbmpaop_s1i
-/* void xwbmpaop_s1i(xwbmp_a * bmp, xwsq_t n) */
+/* void xwbmpaop_s1i(atomic_xwbmp_t * bmp, xwsq_t n) */
 xwbmpaop_s1i:
         e_andi          r6, r4, 31      /* r6 = r4 & 0x1F; */
         se_li           r5, 1           /* r5 = 1; */
@@ -58,7 +58,7 @@ xwbmpaop_s1i:
 
         .section        .xwos.text,"ax"
         .global         xwbmpaop_x1i
-/* void xwbmpaop_x1i(xwbmp_a * bmp, xwsq_t n) */
+/* void xwbmpaop_x1i(atomic_xwbmp_t * bmp, xwsq_t n) */
 xwbmpaop_x1i:
         e_andi          r6, r4, 31      /* r6 = r4 & 0x1F; */
         se_li           r5, 1           /* r5 = 1; */
@@ -76,7 +76,7 @@ xwbmpaop_x1i:
 
         .section        .xwos.text,"ax"
         .global         xwbmpaop_t0i_then_s1i
-/* xwssq_t xwbmpaop_t0i_then_s1i(xwbmp_a * bmp, xwsq_t n) */
+/* xwssq_t xwbmpaop_t0i_then_s1i(atomic_xwbmp_t * bmp, xwsq_t n) */
 xwbmpaop_t0i_then_s1i:
         e_andi          r6, r4, 31      /* r6 = r4 & 0x1F; */
         se_li           r5, 1           /* r5 = 1; */
@@ -105,7 +105,7 @@ xwbmpaop_t0i_then_s1i:
 
         .section        .xwos.text,"ax"
         .global         xwbmpaop_t1i_then_c0i
-/* xwssq_t xwbmpaop_t1i_then_c0i(xwbmp_a * bmp, xwsq_t n) */
+/* xwssq_t xwbmpaop_t1i_then_c0i(atomic_xwbmp_t * bmp, xwsq_t n) */
 xwbmpaop_t1i_then_c0i:
         e_andi          r6, r4, 31      /* r6 = r4 & 0x1F; */
         se_li           r5, 1           /* r5 = 1; */

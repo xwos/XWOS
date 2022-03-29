@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS通用库：XWOS的版本号
+ * @brief 玄武OS通用库：版本号
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

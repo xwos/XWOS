@@ -23,7 +23,7 @@
 #include <xwos/lib/xwaop.h>
 
 __xwlib_code
-xwer_t xwaop__xwu8__tst_then_op(xwu8_a * a,
+xwer_t xwaop__xwu8__tst_then_op(atomic_xwu8_t * a,
                                 xwaop_tst_f tst, void * tst_args,
                                 xwaop_op_f op, void * op_args,
                                 xwu8_t * nv, xwu8_t * ov)

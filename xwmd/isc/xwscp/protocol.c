@@ -365,7 +365,7 @@ xwer_t xwscp_rx_cmd_connect(struct xwscp * xwscp, union xwscp_slot * slot)
             (XWSCP_VERSION_REVISION == sdupos[7])) {
                 rc = xwscp_tx_cmd_connect_ack(xwscp);
                 if (XWOK == rc) {
-                        xwaop_write(xwu32, &xwscp->rx.cnt, 0, NULL);
+                        xwaop_write(xwu32_t, &xwscp->rx.cnt, 0, NULL);
                 }/* else {} */
         } else {
                 rc = -EPERM;
@@ -403,7 +403,7 @@ xwer_t xwscp_rx_cmd_connect_ack(struct xwscp * xwscp, union xwscp_slot * slot)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_lock;
         }
-        xwaop_read(xwsq, &xwscp->hwifst, &hwifst);
+        xwaop_read(xwsq_t, &xwscp->hwifst, &hwifst);
         if (!(XWSCP_HWIFST_CONNECT & hwifst)) {
                 if ((0 == strcmp(proto, "XWSCP")) &&
                     (XWSCP_VERSION_MAJOR == sdupos[5]) &&
@@ -455,7 +455,7 @@ xwer_t xwscp_rx_sdu(struct xwscp * xwscp, union xwscp_slot * slot)
         xwu8_t rmtid, lclid;
         xwer_t rc;
 
-        xwaop_read(xwu32, &xwscp->rx.cnt, &rxcnt);
+        xwaop_read(xwu32_t, &xwscp->rx.cnt, &rxcnt);
         lclid = XWSCP_ID(rxcnt);
         rmtid = slot->rx.frm.head.id;
         xwscplogf(DEBUG,
@@ -468,7 +468,7 @@ xwer_t xwscp_rx_sdu(struct xwscp * xwscp, union xwscp_slot * slot)
                         /* 收到数据 */
                         rc = xwscp_tx_sdu_ack(xwscp, rmtid, XWSCP_ACK_OK);
                         if (XWOK == rc) {
-                                xwaop_add(xwu32, &xwscp->rx.cnt, 1, NULL, NULL);
+                                xwaop_add(xwu32_t, &xwscp->rx.cnt, 1, NULL, NULL);
                                 xwscp_rxq_pub(xwscp, slot);
                         } else {
                                 xwmm_bma_free(xwscp->mempool, slot);
@@ -512,11 +512,11 @@ xwer_t xwscp_rx_sdu_ack(struct xwscp * xwscp, union xwscp_slot * slot)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_mtx_lock;
         }
-        xwaop_read(xwsq, &xwscp->hwifst, &hwifst);
+        xwaop_read(xwsq_t, &xwscp->hwifst, &hwifst);
         if (XWSCP_HWIFST_TX & hwifst) {
                 xwscp->tx.remote.ack = ack;
                 xwscp->tx.remote.id = rmtid;
-                xwaop_c0m(xwsq, &xwscp->hwifst, XWSCP_HWIFST_TX, NULL, NULL);
+                xwaop_c0m(xwsq_t, &xwscp->hwifst, XWSCP_HWIFST_TX, NULL, NULL);
                 xwos_mtx_unlock(&xwscp->tx.csmtx);
                 xwos_cond_broadcast(&xwscp->tx.cscond);
         } else {
@@ -737,7 +737,7 @@ xwer_t xwscp_fmt_msg(struct xwscp * xwscp,
         /* SOF */
         memset(slot->tx.frm.sof, XWSCP_SOF, XWSCP_SOF_SIZE);
         /* Head */
-        xwaop_read(xwu32, &xwscp->tx.cnt, &txcnt);
+        xwaop_read(xwu32_t, &xwscp->tx.cnt, &txcnt);
         id = XWSCP_ID(txcnt);
         frmheadsz = sizeof(struct xwscp_frmhead) + ecsize;
         frmheadszmir = xwbop_rbit(xwu8_t, frmheadsz);

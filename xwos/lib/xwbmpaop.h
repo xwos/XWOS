@@ -30,7 +30,7 @@
  * @param[in] name: 符号名
  * @param[in] bits: 位图中的位数
  */
-#define xwbmpaop_declare(name, bits)    xwbmp_a name[BITS_TO_XWBMP_T(bits)]
+#define xwbmpaop_declare(name, bits) atomic_xwbmp_t name[BITS_TO_XWBMP_T(bits)]
 
 /**
  * @brief XWOS AOPLIB：测试位图中的某位是否被置1
@@ -42,7 +42,7 @@
  * @note
  * - 内存序：consume
  */
-bool xwbmpaop_t1i(xwbmp_a * bmp, xwsq_t idx);
+bool xwbmpaop_t1i(atomic_xwbmp_t * bmp, xwsq_t idx);
 
 /**
  * @brief XWOS AOPLIB：将位图中某位置1
@@ -51,7 +51,7 @@ bool xwbmpaop_t1i(xwbmp_a * bmp, xwsq_t idx);
  * @note
  * - 内存序：acq_rel
  */
-void xwbmpaop_s1i(xwbmp_a * bmp, xwsq_t idx);
+void xwbmpaop_s1i(atomic_xwbmp_t * bmp, xwsq_t idx);
 
 /**
  * @brief XWOS AOPLIB：将位图中某位清0
@@ -60,7 +60,7 @@ void xwbmpaop_s1i(xwbmp_a * bmp, xwsq_t idx);
  * @note
  * - 内存序：acq_rel
  */
-void xwbmpaop_c0i(xwbmp_a * bmp, xwsq_t idx);
+void xwbmpaop_c0i(atomic_xwbmp_t * bmp, xwsq_t idx);
 
 /**
  * @brief XWOS AOPLIB：将位图中某位翻转
@@ -69,7 +69,7 @@ void xwbmpaop_c0i(xwbmp_a * bmp, xwsq_t idx);
  * @note
  * - 内存序：acq_rel
  */
-void xwbmpaop_x1i(xwbmp_a * bmp, xwsq_t idx);
+void xwbmpaop_x1i(atomic_xwbmp_t * bmp, xwsq_t idx);
 
 /**
  * @brief XWOS AOPLIB：测试位图中某位是否为0，如果是，就将它置1
@@ -81,7 +81,7 @@ void xwbmpaop_x1i(xwbmp_a * bmp, xwsq_t idx);
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume；
  */
-xwer_t xwbmpaop_t0i_then_s1i(xwbmp_a * bmp, xwsq_t idx);
+xwer_t xwbmpaop_t0i_then_s1i(atomic_xwbmp_t * bmp, xwsq_t idx);
 
 /**
  * @brief XWOS AOPLIB：测试位图中某位是否为1，如果是，就将它清0
@@ -93,7 +93,7 @@ xwer_t xwbmpaop_t0i_then_s1i(xwbmp_a * bmp, xwsq_t idx);
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume；
  */
-xwer_t xwbmpaop_t1i_then_c0i(xwbmp_a * bmp, xwsq_t idx);
+xwer_t xwbmpaop_t1i_then_c0i(atomic_xwbmp_t * bmp, xwsq_t idx);
 
 /**
  * @brief XWOS AOPLIB：从最高位起查找位图中第一个为1的位并将它清0
@@ -105,7 +105,7 @@ xwer_t xwbmpaop_t1i_then_c0i(xwbmp_a * bmp, xwsq_t idx);
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume；
  */
-xwssq_t xwbmpaop_fls_then_c0i(xwbmp_a * bmp, xwsz_t num);
+xwssq_t xwbmpaop_fls_then_c0i(atomic_xwbmp_t * bmp, xwsz_t num);
 
 /**
  * @brief XWOS AOPLIB：从最高位起查找位图中第一个为0的位并将它置1
@@ -117,7 +117,7 @@ xwssq_t xwbmpaop_fls_then_c0i(xwbmp_a * bmp, xwsz_t num);
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume；
  */
-xwssq_t xwbmpaop_flz_then_s1i(xwbmp_a * bmp, xwsz_t num);
+xwssq_t xwbmpaop_flz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num);
 
 /**
  * @brief XWOS AOPLIB：从最低位起查找位图中第一个为1的位并将它清0
@@ -129,7 +129,7 @@ xwssq_t xwbmpaop_flz_then_s1i(xwbmp_a * bmp, xwsz_t num);
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume；
  */
-xwssq_t xwbmpaop_ffs_then_c0i(xwbmp_a * bmp, xwsz_t num);
+xwssq_t xwbmpaop_ffs_then_c0i(atomic_xwbmp_t * bmp, xwsz_t num);
 
 /**
  * @brief XWOS AOPLIB：从最低位起查找位图中第一个为0的位并将它置1
@@ -141,7 +141,7 @@ xwssq_t xwbmpaop_ffs_then_c0i(xwbmp_a * bmp, xwsz_t num);
  * @note
  * - 内存序：测试成功，acq_rel；测试失败，consume；
  */
-xwssq_t xwbmpaop_ffz_then_s1i(xwbmp_a * bmp, xwsz_t num);
+xwssq_t xwbmpaop_ffz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num);
 
 /**
  * @brief XWOS AOPLIB：将位图所有位置1
@@ -151,13 +151,13 @@ xwssq_t xwbmpaop_ffz_then_s1i(xwbmp_a * bmp, xwsz_t num);
  * - 内存序：acq_rel
  */
 static __xwlib_inline
-void xwbmpaop_s1all(xwbmp_a * bmp, xwsq_t num)
+void xwbmpaop_s1all(atomic_xwbmp_t * bmp, xwsq_t num)
 {
         xwsz_t n = BITS_TO_XWBMP_T(num);
         xwsz_t i;
 
         for (i = 0; i < n; i++) {
-                xwaop_s1m(xwbmp, &bmp[i], (xwbmp_t)(~0), NULL, NULL);
+                xwaop_s1m(xwbmp_t, &bmp[i], (xwbmp_t)(~0), NULL, NULL);
         }
 }
 
@@ -169,13 +169,13 @@ void xwbmpaop_s1all(xwbmp_a * bmp, xwsq_t num)
  * - 内存序：acq_rel
  */
 static __xwlib_inline
-void xwbmpaop_c0all(xwbmp_a * bmp, xwsq_t num)
+void xwbmpaop_c0all(atomic_xwbmp_t * bmp, xwsq_t num)
 {
         xwsz_t n = BITS_TO_XWBMP_T(num);
         xwsz_t i;
 
         for (i = 0; i < n; i++) {
-                xwaop_c0m(xwbmp, &bmp[i], (xwbmp_t)(~0), NULL, NULL);
+                xwaop_c0m(xwbmp_t, &bmp[i], (xwbmp_t)(~0), NULL, NULL);
         }
 }
 
