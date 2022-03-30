@@ -597,11 +597,11 @@ xwer_t xwmp_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
                      XWMP_SKDOBJ_DST_READY | XWMP_SKDOBJ_DST_STANDBY |
                      XWMP_SKDOBJ_DST_FROZEN | XWMP_SKDOBJ_DST_MIGRATING)
                     & thd->state);
-        if (XWMP_SKDOBJ_DST_FREEZABLE & thd->state) {
+        if ((XWMP_SKDOBJ_DST_FREEZABLE | XWMP_SKDOBJ_DST_EXITING) & thd->state) {
                 xwmp_splk_unlock(&thd->stlock);
                 xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
                 rc = -EINTR;
-                goto err_needfrz;
+                goto err_intr;
         }
         dprio = thd->dprio.r;
         xwbop_c0m(xwsq_t, &thd->state, XWMP_SKDOBJ_DST_RUNNING);
@@ -750,7 +750,7 @@ xwer_t xwmp_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         }
         currtick = xwmp_syshwt_get_timetick(hwt);
         *xwtm = xwtm_sub(expected, currtick);
-err_needfrz:
+err_intr:
         return rc;
 }
 

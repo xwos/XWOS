@@ -1474,28 +1474,26 @@ xwer_t xwmp_cthd_sleep(xwtm_t * xwtm)
                 /* 当前CPU调度器处于休眠态，线程需要被冻结，
                    阻塞/睡眠函数将返回-EINTR。*/
                 rc = -EINTR;
-                goto err_needfrz;
+                goto err_intr;
         }
         xwmp_splk_lock(&cthd->stlock);
         XWOS_BUG_ON((XWMP_SKDOBJ_DST_SLEEPING | XWMP_SKDOBJ_DST_READY |
                      XWMP_SKDOBJ_DST_STANDBY | XWMP_SKDOBJ_DST_FROZEN |
                      XWMP_SKDOBJ_DST_MIGRATING)
                     & cthd->state);
-        if (XWMP_SKDOBJ_DST_FREEZABLE & cthd->state) {
+        if ((XWMP_SKDOBJ_DST_FREEZABLE | XWMP_SKDOBJ_DST_EXITING) & cthd->state) {
                 xwmp_splk_unlock(&cthd->stlock);
                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 xwmp_skd_wakelock_unlock(xwskd);
                 rc = -EINTR;
-                goto err_needfrz;
+                goto err_intr;
         }
-        /* set sleeping state */
+        /* 设置线程的睡眠态 */
         xwbop_c0m(xwsq_t, &cthd->state, XWMP_SKDOBJ_DST_RUNNING);
         cthd->dprio.r = XWMP_SKD_PRIORITY_INVALID;
         xwbop_s1m(xwsq_t, &cthd->state, XWMP_SKDOBJ_DST_SLEEPING);
         xwmp_splk_unlock(&cthd->stlock);
-        /* add to time tree */
         xwmp_thd_tt_add_locked(cthd, xwtt, expected, cpuirq);
-        /* enable local CPU IRQ to enable schedule */
         xwmp_sqlk_wr_unlock_cpuirq(&xwtt->lock);
         xwmp_skd_wakelock_unlock(xwskd);
         xwmp_skd_req_swcx(xwskd);
@@ -1516,7 +1514,7 @@ xwer_t xwmp_cthd_sleep(xwtm_t * xwtm)
         currtick = xwmp_syshwt_get_timetick(hwt);
         *xwtm = xwtm_sub(expected, currtick);
 
-err_needfrz:
+err_intr:
 err_xwtm:
         return rc;
 }
@@ -1545,28 +1543,26 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * origin, xwtm_t inc)
                 /* 当前CPU调度器处于休眠态，线程需要被冻结，
                    阻塞/睡眠函数将返回-EINTR。*/
                 rc = -EINTR;
-                goto err_needfrz;
+                goto err_intr;
         }
         xwmp_splk_lock(&cthd->stlock);
         XWOS_BUG_ON((XWMP_SKDOBJ_DST_SLEEPING | XWMP_SKDOBJ_DST_READY |
                      XWMP_SKDOBJ_DST_STANDBY | XWMP_SKDOBJ_DST_FROZEN |
                      XWMP_SKDOBJ_DST_MIGRATING)
                     & cthd->state);
-        if (XWMP_SKDOBJ_DST_FREEZABLE & cthd->state) {
+        if ((XWMP_SKDOBJ_DST_FREEZABLE | XWMP_SKDOBJ_DST_EXITING) & cthd->state) {
                 xwmp_splk_unlock(&cthd->stlock);
                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 xwmp_skd_wakelock_unlock(xwskd);
                 rc = -EINTR;
-                goto err_needfrz;
+                goto err_intr;
         }
-        /* set the sleeping state */
+        /* 设置线程的睡眠态 */
         xwbop_c0m(xwsq_t, &cthd->state, XWMP_SKDOBJ_DST_RUNNING);
         cthd->dprio.r = XWMP_SKD_PRIORITY_INVALID;
         xwbop_s1m(xwsq_t, &cthd->state, XWMP_SKDOBJ_DST_SLEEPING);
         xwmp_splk_unlock(&cthd->stlock);
-        /* add to time tree */
         xwmp_thd_tt_add_locked(cthd, xwtt, expected, cpuirq);
-        /* enable local CPU IRQ to enable schedule */
         xwmp_sqlk_wr_unlock_cpuirq(&xwtt->lock);
         xwmp_skd_wakelock_unlock(xwskd);
         xwmp_skd_req_swcx(xwskd);
@@ -1586,7 +1582,7 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * origin, xwtm_t inc)
         }
         *origin = xwmp_syshwt_get_timetick(hwt);
 
-err_needfrz:
+err_intr:
         return rc;
 }
 
