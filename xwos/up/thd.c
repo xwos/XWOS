@@ -1114,51 +1114,59 @@ xwer_t xwup_cthd_sleep(xwtm_t * xwtm)
 
         if (__xwcc_unlikely(xwtm_cmp(*xwtm, 0) <= 0)) {
                 rc = -ETIMEDOUT;
-        } else {
-                cthd = xwup_skd_get_cthd_lc();
-                xwskd = xwup_skd_get_lc();
-                xwtt = &xwskd->tt;
-                hwt = &xwtt->hwt;
-                currtick = xwup_syshwt_get_timetick(hwt);
-                expected = xwtm_add_safely(currtick, *xwtm);
-                xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
-                rc = xwup_skd_wakelock_lock();
-                if (__xwcc_unlikely(rc < 0)) {
-                        xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                        /* The skd is in hibernation state. Current thread need to
-                           be frozen. So the blocking state needs to be interrupted. */
-                        rc = -EINTR;
-                } else
-#endif
-                {
-                        XWOS_BUG_ON((XWUP_SKDOBJ_DST_SLEEPING | XWUP_SKDOBJ_DST_READY |
-                                     XWUP_SKDOBJ_DST_STANDBY | XWUP_SKDOBJ_DST_FROZEN)
-                                    & cthd->state);
-                        /* set sleeping state */
-                        xwbop_c0m(xwsq_t, &cthd->state, XWUP_SKDOBJ_DST_RUNNING);
-                        xwbop_s1m(xwsq_t, &cthd->state, XWUP_SKDOBJ_DST_SLEEPING);
-                        /* add to time tree */
-                        xwup_thd_tt_add_locked(cthd, xwtt, expected, cpuirq);
-                        /* enable local CPU IRQ to enable schedule */
-                        xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
-                        xwup_skd_wakelock_unlock();
-#endif
-                        xwup_skd_req_swcx();
-                        xwospl_cpuirq_restore_lc(cpuirq);
-                        if (XWUP_TTN_WKUPRS_TIMEDOUT == cthd->ttn.wkuprs) {
-                                rc = XWOK;
-                        } else if (XWUP_TTN_WKUPRS_INTR == cthd->ttn.wkuprs) {
-                                rc = -EINTR;
-                        } else {
-                                XWOS_BUG();
-                                rc = -EBUG;
-                        }
-                }
-                currtick = xwup_syshwt_get_timetick(hwt);
-                *xwtm = xwtm_sub(expected, currtick);
+                goto err_xwtm;
         }
+        cthd = xwup_skd_get_cthd_lc();
+        xwskd = xwup_skd_get_lc();
+        xwtt = &xwskd->tt;
+        hwt = &xwtt->hwt;
+        currtick = xwup_syshwt_get_timetick(hwt);
+        expected = xwtm_add_safely(currtick, *xwtm);
+        xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+        rc = xwup_skd_wakelock_lock();
+        if (__xwcc_unlikely(rc < 0)) {
+                xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                /* 当前CPU调度器处于休眠态，线程需要被冻结，
+                   阻塞/睡眠函数将返回-EINTR。*/
+                rc = -EINTR;
+                goto err_intr;
+        }
+#endif
+        XWOS_BUG_ON((XWUP_SKDOBJ_DST_SLEEPING | XWUP_SKDOBJ_DST_READY |
+                     XWUP_SKDOBJ_DST_STANDBY | XWUP_SKDOBJ_DST_FROZEN)
+                    & cthd->state);
+        if (XWUP_SKDOBJ_DST_EXITING & cthd->state) {
+                xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+                xwup_skd_wakelock_unlock();
+#endif
+                rc = -EINTR;
+                goto err_intr;
+        }
+        /* 设置线程的睡眠态 */
+        xwbop_c0m(xwsq_t, &cthd->state, XWUP_SKDOBJ_DST_RUNNING);
+        xwbop_s1m(xwsq_t, &cthd->state, XWUP_SKDOBJ_DST_SLEEPING);
+        xwup_thd_tt_add_locked(cthd, xwtt, expected, cpuirq);
+        xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
+#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+        xwup_skd_wakelock_unlock();
+#endif
+        xwup_skd_req_swcx();
+        xwospl_cpuirq_restore_lc(cpuirq);
+        if (XWUP_TTN_WKUPRS_TIMEDOUT == cthd->ttn.wkuprs) {
+                rc = XWOK;
+        } else if (XWUP_TTN_WKUPRS_INTR == cthd->ttn.wkuprs) {
+                rc = -EINTR;
+        } else {
+                XWOS_BUG();
+                rc = -EBUG;
+        }
+        currtick = xwup_syshwt_get_timetick(hwt);
+        *xwtm = xwtm_sub(expected, currtick);
+
+err_intr:
+err_xwtm:
         return rc;
 }
 
@@ -1188,34 +1196,41 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * origin, xwtm_t inc)
                 /* 当前CPU调度器处于休眠态，线程需要被冻结，
                    阻塞/睡眠函数将返回-EINTR。*/
                 rc = -EINTR;
-        } else
+                goto err_intr;
+        }
 #endif
-        {
-                XWOS_BUG_ON((XWUP_SKDOBJ_DST_SLEEPING | XWUP_SKDOBJ_DST_READY |
-                             XWUP_SKDOBJ_DST_STANDBY | XWUP_SKDOBJ_DST_FROZEN)
-                            & cthd->state);
-                /* set the sleeping state */
-                xwbop_c0m(xwsq_t, &cthd->state, XWUP_SKDOBJ_DST_RUNNING);
-                xwbop_s1m(xwsq_t, &cthd->state, XWUP_SKDOBJ_DST_SLEEPING);
-                /* add to time tree */
-                xwup_thd_tt_add_locked(cthd, xwtt, expected, cpuirq);
-                /* enable local CPU IRQ to enable schedule */
-                xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
+        XWOS_BUG_ON((XWUP_SKDOBJ_DST_SLEEPING | XWUP_SKDOBJ_DST_READY |
+                     XWUP_SKDOBJ_DST_STANDBY | XWUP_SKDOBJ_DST_FROZEN)
+                    & cthd->state);
+        if (XWUP_SKDOBJ_DST_EXITING & cthd->state) {
+                xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
                 xwup_skd_wakelock_unlock();
 #endif
-                xwup_skd_req_swcx();
-                xwospl_cpuirq_restore_lc(cpuirq);
-                if (XWUP_TTN_WKUPRS_TIMEDOUT == cthd->ttn.wkuprs) {
-                        rc = XWOK;
-                } else if (XWUP_TTN_WKUPRS_INTR == cthd->ttn.wkuprs) {
-                        rc = -EINTR;
-                } else {
-                        XWOS_BUG();
-                        rc = -EBUG;
-                }
-                *origin = xwup_syshwt_get_timetick(hwt);
+                rc = -EINTR;
+                goto err_intr;
         }
+        /* 设置线程的睡眠态 */
+        xwbop_c0m(xwsq_t, &cthd->state, XWUP_SKDOBJ_DST_RUNNING);
+        xwbop_s1m(xwsq_t, &cthd->state, XWUP_SKDOBJ_DST_SLEEPING);
+        xwup_thd_tt_add_locked(cthd, xwtt, expected, cpuirq);
+        xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
+#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+        xwup_skd_wakelock_unlock();
+#endif
+        xwup_skd_req_swcx();
+        xwospl_cpuirq_restore_lc(cpuirq);
+        if (XWUP_TTN_WKUPRS_TIMEDOUT == cthd->ttn.wkuprs) {
+                rc = XWOK;
+        } else if (XWUP_TTN_WKUPRS_INTR == cthd->ttn.wkuprs) {
+                rc = -EINTR;
+        } else {
+                XWOS_BUG();
+                rc = -EBUG;
+        }
+        *origin = xwup_syshwt_get_timetick(hwt);
+
+err_intr:
         return rc;
 }
 

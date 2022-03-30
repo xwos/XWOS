@@ -422,6 +422,11 @@ xwer_t xwup_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
                     & thd->state);
 
         /* 加入等待队列 */
+        if (XWUP_SKDOBJ_DST_EXITING & thd->state) {
+                xwospl_cpuirq_restore_lc(cpuirq);
+                rc = -EINTR;
+                goto err_intr;
+        }
         xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_RUNNING);
         xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_BLOCKING);
         xwup_thd_eq_plwq(thd, &cond->wq, XWUP_WQTYPE_COND);
@@ -542,6 +547,7 @@ xwer_t xwup_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
         }
         currtick = xwup_syshwt_get_timetick(hwt);
         *xwtm = xwtm_sub(expected, currtick);
+err_intr:
         return rc;
 }
 
