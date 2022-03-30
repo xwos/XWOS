@@ -1,7 +1,7 @@
 #! /usr/bin/lua
 ---
 -- @file
--- @brief Lua示例脚本：线程睡眠
+-- @brief Lua示例脚本：信号量
 -- @author
 -- + 隐星魂 (Roy Sun) <xwos@xwos.tech>
 -- @copyright
@@ -19,19 +19,20 @@
 -- > limitations under the License.
 --
 
-_G.us = 1000
-_G.ms = 1000000
-_G.s = 1000000000
-
-print("XWOS Sleep() TEST!\n")
-mythdsp = xwos.cthd.sp()
-print("Thread strong pointer:", mythdsp)
-tt = xwos.skd.tt()
-print(string.format("Current timetick:%f ms", tt / ms))
-print("sleep 1s...\n")
-xwos.cthd.sleep(1 * s)
-tt = xwos.skd.tt()
-print(string.format("Sleep 1s from %f ms\n", tt / ms))
-xwos.cthd.sleepFrom(tt, 1 * s)
-tt = xwos.skd.tt()
-print(string.format("Current Timetick:%f ms", tt /ms))
+tstsem = xwos.sem.new(0, -1)
+xwxt["tstsem"] = tstsem
+function semthd_main()
+  rc = xwxt.tstsem:wait()
+  if (rc == 0) then
+    print("Wait semaphore ... OK")
+  else
+    print("Wait semaphore ... error:", rc)
+  end
+end
+semthd = xwos.thd.call(semthd_main)
+tstsem:post()
+semthd:stop()
+xwxt.tstsem = nil
+xwxt.gc()
+tstsem = nil
+collectgarbage()

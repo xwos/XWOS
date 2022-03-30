@@ -1,7 +1,7 @@
 #! /usr/bin/lua
 ---
 -- @file
--- @brief Lua示例脚本：线程睡眠
+-- @brief Lua示例脚本：互斥锁
 -- @author
 -- + 隐星魂 (Roy Sun) <xwos@xwos.tech>
 -- @copyright
@@ -19,19 +19,21 @@
 -- > limitations under the License.
 --
 
-_G.us = 1000
-_G.ms = 1000000
-_G.s = 1000000000
-
-print("XWOS Sleep() TEST!\n")
-mythdsp = xwos.cthd.sp()
-print("Thread strong pointer:", mythdsp)
-tt = xwos.skd.tt()
-print(string.format("Current timetick:%f ms", tt / ms))
-print("sleep 1s...\n")
-xwos.cthd.sleep(1 * s)
-tt = xwos.skd.tt()
-print(string.format("Sleep 1s from %f ms\n", tt / ms))
-xwos.cthd.sleepFrom(tt, 1 * s)
-tt = xwos.skd.tt()
-print(string.format("Current Timetick:%f ms", tt /ms))
+tstmtx = xwos.mtx.new()
+tstmtx:lock()
+xwxt["tstmtx"] = tstmtx
+function mtxthd_main()
+  rc = xwxt.tstmtx:lock(10000000000)
+  if (rc == 0) then
+    print("Wait mutex ... OK")
+  else
+    print("Wait mutex ... error:", rc)
+  end
+end
+mtxthd = xwos.thd.call(mtxthd_main)
+tstmtx:unlock()
+mtxthd:stop()
+xwxt.tstmtx = nil
+xwxt.gc()
+tstmtx = nil
+collectgarbage()
