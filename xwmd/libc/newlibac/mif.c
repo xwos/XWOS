@@ -30,7 +30,6 @@ extern void newlibac_mem_init(void);
 extern void newlibac_fops_init(void);
 #endif
 extern void newlibac_lock_init(void);
-extern void newlibac_posix_init(void);
 
 /**
  * @brief 初始化列表
@@ -49,7 +48,6 @@ const newlibac_init_f newlibac_init_table[] = {
         newlibac_fops_init,
 #endif
         newlibac_lock_init,
-        newlibac_posix_init,
 };
 
 xwer_t newlibac_init(void)
