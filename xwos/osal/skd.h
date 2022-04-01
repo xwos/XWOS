@@ -584,21 +584,6 @@ xwer_t xwos_thd_detach(struct xwos_thd * thd)
 }
 
 /**
- * @brief XWOS API：中断线程的睡眠或阻塞状态
- * @param[in] thd: 线程对象的指针
- * @return 错误码
- * @note
- * - 同步/异步：异步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwer_t xwos_thd_intr(struct xwos_thd * thd)
-{
-        return xwosdl_thd_intr(&thd->osthd);
-}
-
-/**
  * @brief XWOS API：将线程迁移到目标CPU
  * @param[in] thd: 线程对象的指针
  * @param[in] dstcpu: 目标CPU的ID

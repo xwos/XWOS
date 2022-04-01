@@ -187,12 +187,6 @@ xwer_t xwosdl_thd_detach(struct xwosdl_thd * thd)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_thd_intr(struct xwosdl_thd * thd)
-{
-        return xwmp_thd_intr(thd);
-}
-
-static __xwcc_inline
 xwer_t xwosdl_thd_migrate(struct xwosdl_thd * thd, xwid_t dstcpu)
 {
         return xwmp_thd_migrate(thd, dstcpu);
