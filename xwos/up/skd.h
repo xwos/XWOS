@@ -61,15 +61,6 @@ enum xwup_skdobj_state_em {
         XWUP_SKDOBJ_DST_RESERVED8 = (1U << 8U), /**< 保留位8 */
         XWUP_SKDOBJ_DST_DETACHED = (1U << 9U), /**< 分离态 */
         XWUP_SKDOBJ_DST_UNINTERRUPTED = (1U << 15U), /**< 阻塞态不可中断 */
-        XWUP_SKDOBJ_DST_MASK = (XWUP_SKDOBJ_DST_STANDBY |
-                                XWUP_SKDOBJ_DST_RUNNING |
-                                XWUP_SKDOBJ_DST_READY |
-                                XWUP_SKDOBJ_DST_SLEEPING |
-                                XWUP_SKDOBJ_DST_BLOCKING |
-                                XWUP_SKDOBJ_DST_FROZEN |
-                                XWUP_SKDOBJ_DST_EXITING |
-                                XWUP_SKDOBJ_DST_DETACHED |
-                                XWUP_SKDOBJ_DST_UNINTERRUPTED),
 };
 
 /**
@@ -96,7 +87,7 @@ struct xwup_skdobj_stack {
         xwup_thd_f main; /**< 主函数 */
         void * arg; /**< 主函数的参数 */
         const char * name; /**< 名字字符串 */
-        xwsq_t flag; /**< 标签，取值 @ref xwup_skdobj_flag_em */
+        atomic_xwsq_t flag; /**< 标签，取值 @ref xwup_skdobj_flag_em */
 };
 
 /**

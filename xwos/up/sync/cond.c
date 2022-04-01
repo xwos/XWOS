@@ -421,12 +421,13 @@ xwer_t xwup_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
                      XWUP_SKDOBJ_DST_FROZEN)
                     & thd->state);
 
-        /* 加入等待队列 */
+        /* 检查是否被中断 */
         if (XWUP_SKDOBJ_DST_EXITING & thd->state) {
                 xwospl_cpuirq_restore_lc(cpuirq);
                 rc = -EINTR;
                 goto err_intr;
         }
+        /* 加入等待队列 */
         xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_RUNNING);
         xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_BLOCKING);
         xwup_thd_eq_plwq(thd, &cond->wq, XWUP_WQTYPE_COND);
@@ -436,7 +437,7 @@ xwer_t xwup_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
         rc = xwup_thd_do_unlock(lock, lktype, lkdata);
         if (XWOK == rc) {
                 *lkst = XWOS_LKST_UNLOCKED;
-        }/* else {} */
+        }
 
         /* 加入时间树 */
         xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
@@ -547,6 +548,8 @@ xwer_t xwup_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
         }
         currtick = xwup_syshwt_get_timetick(hwt);
         *xwtm = xwtm_sub(expected, currtick);
+        return rc;
+
 err_intr:
         return rc;
 }

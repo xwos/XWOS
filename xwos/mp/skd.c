@@ -456,7 +456,7 @@ void xwmp_skd_init_idled(struct xwmp_skd * xwskd)
 #endif
         xwskd->idle.guard = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
         xwskd->idle.flag = XWMP_SKDOBJ_FLAG_PRIVILEGED;
-        xwospl_skd_init_stack(&xwskd->idle, xwmp_cthd_exit);
+        xwospl_skd_init_stack(&xwskd->idle, xwmp_cthd_return);
 }
 
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
@@ -516,7 +516,7 @@ void xwmp_skd_init_bhd(struct xwmp_skd * xwskd)
 #endif
         xwskd->bh.guard = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
         xwskd->bh.flag = XWMP_SKDOBJ_FLAG_PRIVILEGED;
-        xwospl_skd_init_stack(&xwskd->bh, xwmp_cthd_exit);
+        xwospl_skd_init_stack(&xwskd->bh, xwmp_cthd_return);
 }
 
 /**

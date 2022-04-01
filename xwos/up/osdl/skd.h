@@ -163,15 +163,15 @@ xwer_t xwosdl_thd_put(struct xwosdl_thd * thd)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_thd_stop(struct xwosdl_thd * thd, xwer_t * rc)
+xwer_t xwosdl_thd_quit(struct xwosdl_thd * thd)
 {
-        return xwup_thd_stop(thd, rc);
+        return xwup_thd_quit(thd);
 }
 
 static __xwcc_inline
-xwer_t xwosdl_thd_cancel(struct xwosdl_thd * thd)
+xwer_t xwosdl_thd_stop(struct xwosdl_thd * thd, xwer_t * rc)
 {
-        return xwup_thd_cancel(thd);
+        return xwup_thd_stop(thd, rc);
 }
 
 static __xwos_inline_api

@@ -57,25 +57,25 @@ struct xwmp_thd {
         struct xwmp_splk stlock; /**< 保护状态state的自旋锁 */
         xwsq_t state; /**< 线程状态 */
 
-        /* 冻结状态 */
+        /* 冻结态 */
         struct xwlib_bclst_node frznode; /**< 冻结链表节点 */
 
-        /* 迁移状态 */
+        /* 迁移态 */
         struct {
                 xwid_t dst; /**< 目的CPU的ID */
         } migration; /**< 迁移状态成员 */
 
-        /* 就绪状态 */
+        /* 就绪态 */
         struct xwlib_bclst_node rqnode; /**< 就绪队列节点，
                                              此成员被锁rtrq->lock保护 */
 
-        /* 睡眠状态 */
+        /* 睡眠态 */
         struct xwmp_ttn ttn; /**< 继承：时间树节点, 被锁tt->lock保护 */
 
-        /* 阻塞状态 */
+        /* 阻塞态 */
         struct xwmp_wqn wqn; /**< 等待队列 */
 
-        /* 退出状态 */
+        /* 退出态 */
         struct xwmp_cond completion; /**< 线程退出时的事件信号量 */
 
         /* 线程优先级 */
@@ -124,6 +124,7 @@ xwer_t xwmp_thd_reqfrz_lic(struct xwmp_thd * thd);
 xwer_t xwmp_thd_thaw_lic_pmlk(struct xwmp_thd * thd);
 
 xwer_t xwmp_thd_exit_lic(struct xwmp_thd * thd, xwer_t rc);
+void xwmp_cthd_return(xwer_t rc);
 xwer_t xwmp_thd_freeze_lic(struct xwmp_thd * thd);
 void xwmp_thd_immigrate_lic(struct xwmp_thd * thd);
 xwer_t xwmp_thd_outmigrate_lic(struct xwmp_thd * thd, xwid_t dstcpu);
@@ -147,8 +148,8 @@ xwer_t xwmp_thd_grab(struct xwmp_thd * thd);
 xwer_t xwmp_thd_put(struct xwmp_thd * thd);
 void xwmp_cthd_yield(void);
 void xwmp_cthd_exit(xwer_t rc);
+xwer_t xwmp_thd_quit(struct xwmp_thd * thd);
 xwer_t xwmp_thd_stop(struct xwmp_thd * thd, xwer_t * trc);
-xwer_t xwmp_thd_cancel(struct xwmp_thd * thd);
 xwer_t xwmp_thd_join(struct xwmp_thd * thd, xwer_t * trc);
 xwer_t xwmp_thd_detach(struct xwmp_thd * thd);
 xwer_t xwmp_thd_intr(struct xwmp_thd * thd);

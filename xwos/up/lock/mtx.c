@@ -433,6 +433,11 @@ xwer_t xwup_mtx_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_mtx * mtx,
         expected = xwtm_add_safely(currtick, *xwtm);
 
         /* 加入等待队列 */
+        XWOS_BUG_ON((XWUP_SKDOBJ_DST_BLOCKING | XWUP_SKDOBJ_DST_SLEEPING |
+                     XWUP_SKDOBJ_DST_READY | XWUP_SKDOBJ_DST_STANDBY |
+                     XWUP_SKDOBJ_DST_FROZEN) & thd->state);
+
+        /* 检查是否被中断 */
         if (XWUP_SKDOBJ_DST_EXITING & thd->state) {
                 xwospl_cpuirq_restore_lc(cpuirq);
                 rc = -EINTR;

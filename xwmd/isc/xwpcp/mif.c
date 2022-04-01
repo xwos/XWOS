@@ -179,8 +179,8 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         return XWOK;
 
 err_txthd_create:
-        xwos_thd_cancel(xwpcp->rxthd);
         xwos_thd_detach(xwpcp->rxthd);
+        xwos_thd_quit(xwpcp->rxthd);
         xwpcp->rxthd = NULL;
 err_rxthd_create:
         xwpcp_hwifal_close(xwpcp);

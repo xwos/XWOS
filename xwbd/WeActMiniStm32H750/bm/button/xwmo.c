@@ -107,7 +107,7 @@ xwer_t bmbtn_stop(void)
 {
         xwer_t rc;
 
-        rc = xwos_thd_cancel(bmbtn_thd);
+        rc = xwos_thd_quit(bmbtn_thd);
         xwos_sem_fini(&bmbtn_sem);
         return rc;
 }

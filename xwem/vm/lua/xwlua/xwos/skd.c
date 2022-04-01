@@ -430,13 +430,13 @@ int xwlua_thdsp_stop(lua_State * L)
         return 2;
 }
 
-int xwlua_thdsp_cancel(lua_State * L)
+int xwlua_thdsp_quit(lua_State * L)
 {
         xwlua_thd_sp * thdsp;
         xwer_t rc;
 
         thdsp = (xwlua_thd_sp *)luaL_checkudata(L, 1, "xwlua_thd_sp");
-        rc = xwos_thd_cancel(thdsp->thd);
+        rc = xwos_thd_quit(thdsp->thd);
         lua_pushinteger(L, (lua_Integer)rc);
         return 1;
 }
@@ -484,7 +484,7 @@ int xwlua_thdsp_migrate(lua_State * L)
 
 const luaL_Reg xwlua_thdsp_indexmethod[] = {
         {"stop", xwlua_thdsp_stop},
-        {"cancel", xwlua_thdsp_cancel},
+        {"quit", xwlua_thdsp_quit},
         {"join", xwlua_thdsp_join},
         {"detach", xwlua_thdsp_detach},
         {"migrate", xwlua_thdsp_migrate},

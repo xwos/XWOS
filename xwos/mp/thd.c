@@ -13,6 +13,7 @@
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
 #include <xwos/lib/xwbop.h>
+#include <xwos/lib/lfq.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
 #include <xwos/mm/common.h>
@@ -347,7 +348,8 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
         xwmp_splk_init(&thd->stlock);
         thd->state = XWMP_SKDOBJ_DST_UNKNOWN;
         if (attr->privileged) {
-                thd->stack.flag |= XWMP_SKDOBJ_FLAG_PRIVILEGED;
+                xwaop_s1m(xwsq_t, &thd->stack.flag, XWMP_SKDOBJ_FLAG_PRIVILEGED,
+                          NULL, NULL);
         }
         if (attr->detached) {
                 thd->state |= XWMP_SKDOBJ_DST_DETACHED;
@@ -451,7 +453,7 @@ void xwmp_thd_launch(struct xwmp_thd * thd, xwmp_thd_f mainfunc, void * arg)
         xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
         thd->stack.main = mainfunc;
         thd->stack.arg = arg;
-        xwospl_skd_init_stack(&thd->stack, xwmp_cthd_exit);
+        xwospl_skd_init_stack(&thd->stack, xwmp_cthd_return);
         xwmp_splk_lock_cpuirqsv(&thd->stlock, &cpuirq);
         xwbop_c0m(xwsq_t, &thd->state, XWMP_SKDOBJ_DST_STANDBY);
         xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
@@ -593,7 +595,7 @@ xwer_t xwmp_thd_delete(struct xwmp_thd * thd)
 }
 
 /**
- * @brief 执行退出线程的函数
+ * @brief 执行退出线程的本地中断函数
  * @param[in] thd: 线程对象的指针
  * @param[in] rc: 线程的返回值
  */
@@ -635,6 +637,19 @@ xwer_t xwmp_thd_exit_lic(struct xwmp_thd * thd, xwer_t rc)
         return XWOK;
 }
 
+/**
+ * @brief 线程主函数返回后的入口
+ * @param[in] rc: 线程的返回值
+ */
+__xwmp_code
+void xwmp_cthd_return(xwer_t rc)
+{
+        struct xwmp_thd * cthd;
+
+        cthd = xwmp_skd_get_cthd_lc();
+        xwospl_thd_exit_lc((struct xwospl_thd *)cthd, rc);
+}
+
 __xwmp_api
 void xwmp_cthd_exit(xwer_t rc)
 {
@@ -642,6 +657,33 @@ void xwmp_cthd_exit(xwer_t rc)
 
         cthd = xwmp_skd_get_cthd_lc();
         xwospl_thd_exit_lc((struct xwospl_thd *)cthd, rc);
+}
+
+__xwmp_api
+xwer_t xwmp_thd_quit(struct xwmp_thd * thd)
+{
+        xwreg_t cpuirq;
+        xwer_t rc;
+
+        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
+
+        rc = xwmp_thd_grab(thd);
+        if (rc < 0) {
+                goto err_thd_grab;
+        }
+        xwmp_splk_lock_cpuirqsv(&thd->stlock, &cpuirq);
+        if (XWMP_SKDOBJ_DST_STANDBY & thd->state) {
+                xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
+                rc = XWOK;
+        } else {
+                xwbop_s1m(xwsq_t, &thd->state, XWMP_SKDOBJ_DST_EXITING);
+                xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
+                xwmp_thd_intr(thd);
+        }
+        xwmp_thd_put(thd);
+
+err_thd_grab:
+        return rc;
 }
 
 /**
@@ -726,33 +768,6 @@ xwer_t xwmp_thd_stop(struct xwmp_thd * thd, xwer_t * trc)
 
 err_thd_grab:
 err_stop_self:
-        return rc;
-}
-
-__xwmp_api
-xwer_t xwmp_thd_cancel(struct xwmp_thd * thd)
-{
-        xwreg_t cpuirq;
-        xwer_t rc;
-
-        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
-
-        rc = xwmp_thd_grab(thd);
-        if (rc < 0) {
-                goto err_thd_grab;
-        }
-        xwmp_splk_lock_cpuirqsv(&thd->stlock, &cpuirq);
-        if (XWMP_SKDOBJ_DST_STANDBY & thd->state) {
-                xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
-                rc = XWOK;
-        } else {
-                xwbop_s1m(xwsq_t, &thd->state, XWMP_SKDOBJ_DST_EXITING);
-                xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
-                xwmp_thd_intr(thd);
-        }
-        xwmp_thd_put(thd);
-
-err_thd_grab:
         return rc;
 }
 
@@ -1468,11 +1483,12 @@ xwer_t xwmp_cthd_sleep(xwtm_t * xwtm)
         currtick = xwmp_syshwt_get_timetick(hwt);
         expected = xwtm_add_safely(currtick, *xwtm);
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+
+        /* 检查是否被中断 */
         rc = xwmp_skd_wakelock_lock(xwskd);
         if (__xwcc_unlikely(rc < 0)) {
                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                /* 当前CPU调度器处于休眠态，线程需要被冻结，
-                   阻塞/睡眠函数将返回-EINTR。*/
+                /* 当前CPU调度器处于休眠态，线程需要被冻结，返回-EINTR。*/
                 rc = -EINTR;
                 goto err_intr;
         }
@@ -1513,6 +1529,7 @@ xwer_t xwmp_cthd_sleep(xwtm_t * xwtm)
         }
         currtick = xwmp_syshwt_get_timetick(hwt);
         *xwtm = xwtm_sub(expected, currtick);
+        return rc;
 
 err_intr:
 err_xwtm:
@@ -1537,11 +1554,12 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * origin, xwtm_t inc)
         hwt = &xwtt->hwt;
         expected = xwtm_add_safely(*origin, inc);
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+
+        /* 检查是否被中断 */
         rc = xwmp_skd_wakelock_lock(xwskd);
         if (__xwcc_unlikely(rc < 0)) {
                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                /* 当前CPU调度器处于休眠态，线程需要被冻结，
-                   阻塞/睡眠函数将返回-EINTR。*/
+                /* 当前CPU调度器处于休眠态，线程需要被冻结，返回-EINTR。*/
                 rc = -EINTR;
                 goto err_intr;
         }
@@ -1581,6 +1599,7 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * origin, xwtm_t inc)
                 rc = -EBUG;
         }
         *origin = xwmp_syshwt_get_timetick(hwt);
+        return rc;
 
 err_intr:
         return rc;

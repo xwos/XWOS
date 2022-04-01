@@ -12,6 +12,8 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
+#include <xwos/lib/xwaop.h>
+#include <xwos/lib/lfq.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
 #include <xwos/mm/common.h>
@@ -207,7 +209,8 @@ void xwup_thd_activate(struct xwup_thd * thd,
         thd->state = XWUP_SKDOBJ_DST_UNKNOWN;
         thd->stack.flag = 0;
         if (attr->privileged) {
-                thd->stack.flag |= XWUP_SKDOBJ_FLAG_PRIVILEGED;
+                xwaop_s1m(xwsq_t, &thd->stack.flag, XWUP_SKDOBJ_FLAG_PRIVILEGED,
+                          NULL, NULL);
         }
         if (attr->detached) {
                 thd->state |= XWUP_SKDOBJ_DST_DETACHED;
@@ -300,7 +303,7 @@ void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f mainfunc, void * arg)
         xwskd = xwup_skd_get_lc();
         thd->stack.main = mainfunc;
         thd->stack.arg = arg;
-        xwospl_skd_init_stack(&thd->stack, xwup_cthd_exit);
+        xwospl_skd_init_stack(&thd->stack, xwup_cthd_return);
         xwospl_cpuirq_save_lc(&cpuirq);
         xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_STANDBY);
         xwup_thd_rq_add_tail(thd);
@@ -441,25 +444,6 @@ xwer_t xwup_thd_delete(struct xwup_thd * thd)
         return XWOK;
 }
 
-__xwup_api
-void xwup_cthd_exit(xwer_t rc)
-{
-#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
-        struct xwup_thd * cthd;
-
-        cthd = xwup_skd_get_cthd_lc();
-        xwospl_thd_exit_lc(cthd, rc);
-#else
-        xwtm_t time;
-
-        XWOS_UNUSED(rc);
-        time = XWTM_MAX;
-        while (true) {
-                xwup_cthd_sleep(&time);
-        }
-#endif
-}
-
 /**
  * @brief 执行退出线程
  * @param[in] thd: 线程对象的指针
@@ -507,7 +491,62 @@ xwer_t xwup_thd_exit_lic(struct xwup_thd * thd, xwer_t rc)
         return XWOK;
 }
 
+/**
+ * @brief 线程主函数返回后的入口
+ * @param[in] rc: 线程的返回值
+ */
+__xwup_code
+void xwup_cthd_return(xwer_t rc)
+{
 #if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
+        struct xwup_thd * cthd;
+
+        cthd = xwup_skd_get_cthd_lc();
+        xwospl_thd_exit_lc((struct xwospl_thd *)cthd, rc);
+#else
+        XWOS_UNUSED(rc);
+        while (true) {
+        }
+#endif
+}
+
+__xwup_api
+void xwup_cthd_exit(xwer_t rc)
+{
+#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
+        struct xwup_thd * cthd;
+
+        cthd = xwup_skd_get_cthd_lc();
+        xwospl_thd_exit_lc((struct xwospl_thd *)cthd, rc);
+#else
+        XWOS_UNUSED(rc);
+        while (true) {
+        }
+#endif
+}
+
+#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
+__xwup_api
+xwer_t xwup_thd_quit(struct xwup_thd * thd)
+{
+        xwreg_t cpuirq;
+        xwer_t rc;
+
+        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
+
+        xwospl_cpuirq_save_lc(&cpuirq);
+        if (XWUP_SKDOBJ_DST_STANDBY & thd->state) {
+                xwospl_cpuirq_restore_lc(cpuirq);
+                rc = XWOK;
+        } else {
+                xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_EXITING);
+                xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_thd_intr(thd);
+                rc = XWOK;
+        }
+        return rc;
+}
+
 /**
  * @brief @ref xwup_thd_stop()中使用的回调锁的解锁函数
  * @param[in] thd: 线程对象的指针
@@ -568,27 +607,6 @@ xwer_t xwup_thd_stop(struct xwup_thd * thd, xwer_t * trc)
         }
 
 err_stop_self:
-        return rc;
-}
-
-__xwup_api
-xwer_t xwup_thd_cancel(struct xwup_thd * thd)
-{
-        xwreg_t cpuirq;
-        xwer_t rc;
-
-        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
-
-        xwospl_cpuirq_save_lc(&cpuirq);
-        if (XWUP_SKDOBJ_DST_STANDBY & thd->state) {
-                xwospl_cpuirq_restore_lc(cpuirq);
-                rc = XWOK;
-        } else {
-                xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_EXITING);
-                xwospl_cpuirq_restore_lc(cpuirq);
-                xwup_thd_intr(thd);
-                rc = XWOK;
-        }
         return rc;
 }
 
@@ -656,19 +674,20 @@ xwer_t xwup_thd_detach(struct xwup_thd * thd)
         return XWOK;
 }
 
-#else
+#else /* !XWUPCFG_SKD_THD_EXIT */
+
+__xwup_api
+xwer_t xwup_thd_quit(struct xwup_thd * thd)
+{
+        XWOS_UNUSED(thd);
+        return -ENOSYS;
+}
+
 __xwup_api
 xwer_t xwup_thd_stop(struct xwup_thd * thd, xwer_t * trc)
 {
         XWOS_UNUSED(thd);
         XWOS_UNUSED(trc);
-        return -ENOSYS;
-}
-
-__xwup_api
-xwer_t xwup_thd_cancel(struct xwup_thd * thd)
-{
-        XWOS_UNUSED(thd);
         return -ENOSYS;
 }
 
@@ -1173,12 +1192,13 @@ xwer_t xwup_cthd_sleep(xwtm_t * xwtm)
         currtick = xwup_syshwt_get_timetick(hwt);
         expected = xwtm_add_safely(currtick, *xwtm);
         xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+
+        /* 检查是否被中断 */
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
         rc = xwup_skd_wakelock_lock();
         if (__xwcc_unlikely(rc < 0)) {
                 xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                /* 当前CPU调度器处于休眠态，线程需要被冻结，
-                   阻塞/睡眠函数将返回-EINTR。*/
+                /* 调度器处于休眠态，线程需要被冻结，返回-EINTR。*/
                 rc = -EINTR;
                 goto err_intr;
         }
@@ -1204,6 +1224,8 @@ xwer_t xwup_cthd_sleep(xwtm_t * xwtm)
 #endif
         xwup_skd_req_swcx();
         xwospl_cpuirq_restore_lc(cpuirq);
+
+        /* 判断唤醒原因 */
         if (XWUP_TTN_WKUPRS_TIMEDOUT == cthd->ttn.wkuprs) {
                 rc = XWOK;
         } else if (XWUP_TTN_WKUPRS_INTR == cthd->ttn.wkuprs) {
@@ -1214,6 +1236,7 @@ xwer_t xwup_cthd_sleep(xwtm_t * xwtm)
         }
         currtick = xwup_syshwt_get_timetick(hwt);
         *xwtm = xwtm_sub(expected, currtick);
+        return rc;
 
 err_intr:
 err_xwtm:
@@ -1239,6 +1262,8 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * origin, xwtm_t inc)
         hwt = &xwtt->hwt;
         expected = xwtm_add_safely(*origin, inc);
         xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+
+        /* 检查是否被中断 */
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
         rc = xwup_skd_wakelock_lock();
         if (__xwcc_unlikely(rc < 0)) {
@@ -1270,6 +1295,8 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * origin, xwtm_t inc)
 #endif
         xwup_skd_req_swcx();
         xwospl_cpuirq_restore_lc(cpuirq);
+
+        /* 判断唤醒原因 */
         if (XWUP_TTN_WKUPRS_TIMEDOUT == cthd->ttn.wkuprs) {
                 rc = XWOK;
         } else if (XWUP_TTN_WKUPRS_INTR == cthd->ttn.wkuprs) {
@@ -1279,6 +1306,7 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * origin, xwtm_t inc)
                 rc = -EBUG;
         }
         *origin = xwup_syshwt_get_timetick(hwt);
+        return rc;
 
 err_intr:
         return rc;

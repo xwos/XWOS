@@ -268,9 +268,9 @@ xwer_t example_sel_start(void)
         return XWOK;
 
 err_syncthd_create:
-        xwos_thd_cancel(xwseldemo_producer);
+        xwos_thd_quit(xwseldemo_producer);
 err_producer_create:
-        xwos_thd_cancel(xwseldemo_consumer);
+        xwos_thd_quit(xwseldemo_consumer);
 err_consumer_create:
         xwos_br_unbind(&xwseldemo_br7, &xwseldemo_sel4);
 err_br7_bind:

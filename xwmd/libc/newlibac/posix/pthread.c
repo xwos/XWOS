@@ -224,29 +224,3 @@ int pthread_equal(pthread_t thd1, pthread_t thd2)
 {
         return !!((thd1.thd == thd2.thd) && (thd1.tik) == (thd2.tik));
 }
-
-int pthread_cancel(pthread_t thd)
-{
-        xwer_t rc;
-
-        rc = xwos_thd_acquire(thd);
-        if (XWOK == rc) {
-                rc = xwos_thd_cancel(thd.thd);
-                xwos_thd_put(thd.thd);
-        } else {
-                rc = -ESRCH;
-        }
-        return (int)rc;
-}
-
-/* int pthread_setcancelstate(int state, int * oldstate) */
-/* { */
-/* } */
-
-/* int pthread_setcanceltype(int type, int * oldtype) */
-/* { */
-/* } */
-
-/* void pthread_testcancel(void) */
-/* { */
-/* } */

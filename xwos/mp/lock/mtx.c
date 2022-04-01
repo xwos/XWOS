@@ -547,7 +547,6 @@ xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx)
                                 }/* else {} */
                         }/* else {} */
                         xwmp_mtx_put(mtx);
-                        /* change the priority of old owner */
                         xwmp_thd_chprio(cthd);
                         xwmp_skd_enpmpt(local);
                         /* 如果函数在xwmpsyn_cond_timedwait()中被调用，
@@ -645,18 +644,19 @@ xwer_t xwmp_mtx_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
         currtick = xwmp_syshwt_get_timetick(hwt);
         expected = xwtm_add_safely(currtick, *xwtm);
 
-        /* 加入等待队列 */
         xwmp_splk_lock(&thd->stlock);
         XWOS_BUG_ON((XWMP_SKDOBJ_DST_BLOCKING | XWMP_SKDOBJ_DST_SLEEPING |
                      XWMP_SKDOBJ_DST_READY | XWMP_SKDOBJ_DST_STANDBY |
                      XWMP_SKDOBJ_DST_FROZEN | XWMP_SKDOBJ_DST_MIGRATING)
                     & thd->state);
+        /* 检查是否被中断 */
         if ((XWMP_SKDOBJ_DST_FREEZABLE | XWMP_SKDOBJ_DST_EXITING) & thd->state) {
                 xwmp_splk_unlock(&thd->stlock);
                 xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
                 rc = -EINTR;
                 goto err_intr;
         }
+        /* 加入等待队列 */
         dprio = thd->dprio.r;
         xwbop_c0m(xwsq_t, &thd->state, XWMP_SKDOBJ_DST_RUNNING);
         thd->dprio.r = XWMP_SKD_PRIORITY_INVALID;
@@ -780,6 +780,8 @@ xwer_t xwmp_mtx_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
         }
         currtick = xwmp_syshwt_get_timetick(hwt);
         *xwtm = xwtm_sub(expected, currtick);
+        return rc;
+
 err_intr:
         return rc;
 }

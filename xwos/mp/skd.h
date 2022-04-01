@@ -61,19 +61,8 @@ enum xwmp_skdobj_state_em {
         XWMP_SKDOBJ_DST_FROZEN = (1U << 6U), /**< 已经被冻结 */
         XWMP_SKDOBJ_DST_EXITING = (1U << 7U), /**< 正在退出 */
         XWMP_SKDOBJ_DST_MIGRATING = (1U << 8U), /**< 正在迁移 */
-        XWMP_SKDOBJ_DST_DETACHED = (1U << 9U), /**< 分离态 */
+        XWMP_SKDOBJ_DST_DETACHED = (1U << 9U), /**< 分离 */
         XWMP_SKDOBJ_DST_UNINTERRUPTED = (1U << 15U), /**< 阻塞态不可中断 */
-        XWMP_SKDOBJ_DST_MASK = (XWMP_SKDOBJ_DST_STANDBY |
-                                XWMP_SKDOBJ_DST_RUNNING |
-                                XWMP_SKDOBJ_DST_READY |
-                                XWMP_SKDOBJ_DST_SLEEPING |
-                                XWMP_SKDOBJ_DST_BLOCKING |
-                                XWMP_SKDOBJ_DST_FREEZABLE |
-                                XWMP_SKDOBJ_DST_FROZEN |
-                                XWMP_SKDOBJ_DST_EXITING |
-                                XWMP_SKDOBJ_DST_MIGRATING |
-                                XWMP_SKDOBJ_DST_DETACHED |
-                                XWMP_SKDOBJ_DST_UNINTERRUPTED),
 };
 
 /**
@@ -100,7 +89,7 @@ struct xwmp_skdobj_stack {
         xwmp_thd_f main; /**< 主函数 */
         void * arg; /**< 主函数的参数 */
         const char * name; /**< 名字字符串 */
-        xwsq_t flag; /**< 标签，取值 @ref xwmp_skdobj_flag_em */
+        atomic_xwsq_t flag; /**< 标签，取值 @ref xwmp_skdobj_flag_em */
 };
 
 /**

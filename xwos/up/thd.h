@@ -68,21 +68,21 @@ struct xwup_thd {
         xwsq_t state; /**< 线程状态 */
 
 #if (1 == XWUPRULE_SKD_THD_FREEZE)
-        /* 冻结状态信息 */
+        /* 冻结态 */
         struct xwlib_bclst_node frznode; /**< 冻结链表节点 */
 #endif
 
-        /* 就绪态信息 */
+        /* 就绪态 */
         struct xwlib_bclst_node rqnode; /**< 就绪队列节点，
                                              此成员被锁rtrq->lock保护 */
 
-        /* 睡眠状态信息 */
+        /* 睡眠态 */
         struct xwup_ttn ttn; /**< 时间树节点, 被锁tt->lock保护 */
 
-        /* 等待状态信息 */
+        /* 等待态 */
         struct xwup_wqn wqn; /**< 等待队列 */
 
-        /* 线程优先级信息 */
+        /* 线程优先级 */
 #if defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)
         struct xwup_mtxtree mtxtree; /**< 互斥锁树：线程已经获得的所有互斥锁都
                                           需要加入到互斥锁树 */
@@ -98,7 +98,7 @@ struct xwup_thd {
 #endif
 
 #if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
-        /* 退出状态 */
+        /* 退出态 */
         struct xwup_cond completion; /**< 线程退出时的事件信号量 */
 #endif
 
@@ -121,6 +121,7 @@ void xwup_thd_chprio(struct xwup_thd * thd);
 #endif
 
 xwer_t xwup_thd_exit_lic(struct xwup_thd * thd, xwer_t rc);
+void xwup_cthd_return(xwer_t rc);
 xwer_t xwup_thd_rq_add_head(struct xwup_thd * thd);
 xwer_t xwup_thd_rq_add_tail(struct xwup_thd * thd);
 void xwup_thd_rq_remove(struct xwup_thd * thd);
@@ -173,8 +174,8 @@ xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
 xwer_t xwup_thd_delete(struct xwup_thd * thd);
 void xwup_cthd_yield(void);
 void xwup_cthd_exit(xwer_t rc);
+xwer_t xwup_thd_quit(struct xwup_thd * thd);
 xwer_t xwup_thd_stop(struct xwup_thd * thd, xwer_t * trc);
-xwer_t xwup_thd_cancel(struct xwup_thd * thd);
 xwer_t xwup_thd_join(struct xwup_thd * thd, xwer_t * trc);
 xwer_t xwup_thd_detach(struct xwup_thd * thd);
 xwer_t xwup_thd_intr(struct xwup_thd * thd);

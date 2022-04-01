@@ -232,8 +232,8 @@ xwer_t xwexitdemo_parent_thd_func(void * arg)
                 thdexitlogf(INFO, "[Joinable][父线程] sleep(1s) ...\n");
                 time = 1 * XWTM_S;
                 xwos_cthd_sleep(&time);
-                thdexitlogf(INFO, "[Joinable][父线程] cancel(子线程1) ...\n");
-                rc = xwos_thd_cancel(xwexitdemo_child1_thd);
+                thdexitlogf(INFO, "[Joinable][父线程] quit(子线程1) ...\n");
+                rc = xwos_thd_quit(xwexitdemo_child1_thd);
                 if (XWOK == rc) {
                         thdexitlogf(INFO, "[Joinable][父线程] join(子线程1) ...\n");
                         rc = xwos_thd_join(xwexitdemo_child1_thd, &childrc);
