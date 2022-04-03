@@ -48,7 +48,7 @@ struct xwup_plwq;
  * @brief XWOS UP线程属性
  */
 struct xwup_thd_attr {
-        const char * name; /**< 线程名称 */
+        const char * name; /**< 线程的名字 */
         xwstk_t * stack; /**< 栈内存的基地址 */
         xwsz_t stack_size; /**< 线程栈的大小，以字节(byte)为单位，
                                 注意与CPU的ABI接口规定的内存边界对齐 */

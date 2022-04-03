@@ -36,7 +36,7 @@ struct xwmp_thd;
  * @brief XWOS MP线程属性
  */
 struct xwmp_thd_attr {
-        const char * name; /**< 线程名称 */
+        const char * name; /**< 线程的名字 */
         xwstk_t * stack; /**< 栈内存的基地址 */
         xwsz_t stack_size; /**< 线程栈的大小 */
         xwsz_t stack_guard_size; /**< 栈内存警戒线 */

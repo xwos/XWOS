@@ -11,4 +11,5 @@ name = "xwrust"
 
 [dependencies]
 libc = "0.2"
-newlib-alloc = "0.1"
+cstr_core = "0.2"
+cty = "0.2"

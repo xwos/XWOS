@@ -8,5 +8,6 @@ name = "rustapp"
 crate-type = ["staticlib"]
 
 [dependencies]
+cortex-m = "0.7"
 xwrust = {path = "../../../../xwmd/xwrust"}
 libc-print = "0.1"

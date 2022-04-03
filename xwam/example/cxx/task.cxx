@@ -21,9 +21,9 @@
 #include <xwos/standard.hxx>
 #include <xwos/osal/skd.hxx>
 #include <vector>
-#include "test/literal.hxx"
 #include "test/vector.hxx"
 #if !defined(__clang__)
+#  include "test/literal.hxx"
 #  include "test/exception.hxx"
 #endif
 #include "task.hxx"
@@ -35,7 +35,9 @@ xwer_t cxx_thd_main(void * arg)
 
   XWOS_UNUSED(arg);
 
+#if !defined(__clang__)
   testLiteralOperator();
+#endif
   testStdVector();
 #if !defined(__clang__)
   testStdExcept(1);

@@ -20,16 +20,7 @@
 
 include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
-
-XWMO_CSRCS := mif.c
-XWMO_CFLAGS :=
-
-XWMO_CXXSRCS := task.cxx
-XWMO_CXXSRCS += test/vector.cxx
-XWMO_CXXSRCS_gcc += test/literal.cxx test/exception.cxx
-
-XWMO_CXXFLAGS := -Wno-unused-value
-XWMO_CXXFLAGS_gcc += -fexceptions
-
-XWMO_INCDIRS := $(call getXwmoDir)
+XWMO_CSRCS := skd.c
+XWMO_CFLAGS := -Wno-unused-function
+XWMO_INCDIRS :=
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)

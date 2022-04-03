@@ -110,6 +110,7 @@ function xwmm()
   local argv=$(getopt -o B -n "${0}" -- "$@")
   eval set -- "${argv}"
   local opt_b=false
+  local opt_target=
   while true ; do
     case "$1" in
       -B)
@@ -117,6 +118,7 @@ function xwmm()
         shift 1
         ;;
       --)
+        opt_target=$2
         break
         ;;
     esac
@@ -127,7 +129,7 @@ function xwmm()
   if [[ ${opt_b} = true ]] ; then
     make -C ${XuanWuOS_PATH} -f ${rpath}/xwmo.mk XuanWuOS_BRD_DIR=${XuanWuOS_BRD_DIR} clean
   fi
-  make -C ${XuanWuOS_PATH} -f ${rpath}/xwmo.mk XuanWuOS_BRD_DIR=${XuanWuOS_BRD_DIR}
+  make -C ${XuanWuOS_PATH} -f ${rpath}/xwmo.mk XuanWuOS_BRD_DIR=${XuanWuOS_BRD_DIR} ${opt_target}
 }
 
 function xwmmm()
@@ -165,3 +167,11 @@ function xwcbd()
 {
   cd ${XuanWuOS_PATH}/${XuanWuOS_BRD_DIR}
 }
+
+echo -e "\e[1m\e[47;34m初始化完成 Y(^_^)Y \e[0m"
+echo -e "\e[1m\e[44;32m[常用命令索引]\e[0m"
+echo -e "\e[1m\e[49;34mxwcbd            切换到电路板工程目录\e[0m"
+echo -e "\e[1m\e[49;34mxwcroot          切换到根目录\e[0m"
+echo -e "\e[1m\e[49;34mxwm              编译整个工程\e[0m"
+echo -e "\e[1m\e[49;34mxwmm             编译当前路径下的玄武模块\e[0m"
+echo -e "\e[1m\e[49;34mxwmmm PATH       编译指定路径下的玄武模块\e[0m"

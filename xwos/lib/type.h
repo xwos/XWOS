@@ -102,7 +102,7 @@ typedef __xwcc_atomic xwsz_t atomic_xwsz_t; /**< 大小值 (无符号，原子�
 #endif
 
 #if !defined(ARCH_HAVE_XWSSZ_T)
-typedef long xwssz_t; /**< 大小值 (有符号) */
+typedef signed long xwssz_t; /**< 大小值 (有符号) */
 #endif
 
 #if !defined(ARCH_HAVE_ATOMIC_XWSSZ_T)
@@ -190,7 +190,7 @@ typedef __xwcc_atomic xwpr_t atomic_xwpr_t; /**< 优先级 (有符号，原子�
 #endif
 
 #if !defined(ARCH_HAVE_XWER_T)
-typedef xwssq_t xwer_t; /**< 错误码 (有符号) */
+typedef signed long xwer_t; /**< 错误码 (有符号) */
 #endif
 
 #if !defined(ARCH_HAVE_ATOMIC_XWER_T)

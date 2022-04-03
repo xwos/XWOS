@@ -53,7 +53,7 @@ typedef struct {
  * @brief XWOS API：线程属性
  */
 struct xwos_thd_attr {
-        const char * name; /**< 线程的名字，字符串不可通过动态内存申请的方式创建 */
+        const char * name; /**< 线程的名字 */
         xwstk_t * stack; /**< 线程栈的首地址指针：
                               + 静态初始化的线程，必须指定；
                               + 动态创建的线程，可指定也可不指定，

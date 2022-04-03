@@ -54,12 +54,15 @@ $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR):
 $(XWMO_RUSTLIB):
 	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) build $(CARGO_BUILD_FLAGS) --target=$(RUST_TARGET)
 
+doc:
+	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) doc $(CARGO_BUILD_FLAGS) --target=$(RUST_TARGET)
+
 clean:
 	@$(RM) -f $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/$(XWMO_NAME)
 	@cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) clean
 
 distclean:
 	$(RM) -rf $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)
-	@cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) clean
+	@cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) clean; rm -rf $(XWMO_DIR)/target
 
 .PHONY: dsm clean distclean $(XWMO_RUSTLIB)
