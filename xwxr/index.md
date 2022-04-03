@@ -24,7 +24,6 @@
     +   @subpage xwos_lib_crc8
     +   @subpage xwos_lib_crc32
     +   @subpage xwos_lib_xwlog
-    +   @subpage xwos_lib_ctype
     +   @subpage xwos_lib_div64
     +   @subpage xwos_lib_xwaop
     +   @subpage xwos_lib_lfq
