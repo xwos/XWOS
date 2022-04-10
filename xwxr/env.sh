@@ -26,4 +26,4 @@ fi
 cd $(dirname ${BASH_SOURCE[0]})
 make cfg
 source wkspc/env.rc
-xwcroot
+xwcbd

@@ -24,25 +24,26 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********  ARCH & compiler  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_ARCH                               dox
-#define XuanWuOS_CFG_SUBARCH                            dox
-#define XuanWuOS_CFG_COMPILER                           llvm
+#define XuanWuOS_CFG_ARCH                               arm
+#define XuanWuOS_CFG_SUBARCH                            v7m
+#define XuanWuOS_CFG_COMPILER                           gcc
 #define XuanWuOS_CFG_LDSCRIPT                           cfg/XuanWuOS.lds
 #define XuanWuOS_CFG_ELF_MK                             elf.mk
 #define XuanWuOS_CFG_XWMO_MK                            xwmo.mk
 #define XuanWuOS_CFG_XWMO_PREBUILT_MK                   xwmo.prebuilt.mk
+#define XuanWuOS_CFG_XWMO_RUST_MK                       xwmo.rust.mk
 #include <cfg/arch.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********        CPU        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_CPU                                dox
+#define XuanWuOS_CFG_CPU                                m7
 #include <cfg/cpu.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********        SOC        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_SOC                                dox
+#define XuanWuOS_CFG_SOC                                stm32
 #include <cfg/soc.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -84,7 +85,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********     OEM module    ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_OEMPATH                            ../oem
+#define XuanWuOS_CFG_OEMPATH                            fakeboard
 #include <cfg/oem.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********

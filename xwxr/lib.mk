@@ -1,6 +1,6 @@
-#! /bin/bash
+#! /bin/make -f
 # @file
-# @brief environment-setup shell script
+# @brief 外部静态库列表
 # @author
 # + 隐星魂 (Roy Sun) <xwos@xwos.tech>
 # @copyright
@@ -18,12 +18,5 @@
 # > limitations under the License.
 #
 
-if [[ ${BASH_SOURCE[0]} = ${0} ]] ;then
-  echo -e "\033[33;1mThis script must be sourced by bash!\033[0m"
-  exit 0
-fi
-
-cd $(dirname ${BASH_SOURCE[0]})
-make cfg
-source wkspc/env.rc
-xwcroot
+EINCDIRS :=
+ELIBS :=

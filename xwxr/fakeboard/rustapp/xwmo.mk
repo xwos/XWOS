@@ -1,6 +1,6 @@
-#! /bin/bash
+#! /bin/make -f
 # @file
-# @brief environment-setup shell script
+# @brief XWOS模块的编译规则
 # @author
 # + 隐星魂 (Roy Sun) <xwos@xwos.tech>
 # @copyright
@@ -18,12 +18,6 @@
 # > limitations under the License.
 #
 
-if [[ ${BASH_SOURCE[0]} = ${0} ]] ;then
-  echo -e "\033[33;1mThis script must be sourced by bash!\033[0m"
-  exit 0
-fi
-
-cd $(dirname ${BASH_SOURCE[0]})
-make cfg
-source wkspc/env.rc
-xwcroot
+include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
+include $(XWBS_UTIL_MK_XWMO)
+include xwbs/$(XuanWuOS_CFG_XWMO_RUST_MK)

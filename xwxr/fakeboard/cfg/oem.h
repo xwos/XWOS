@@ -21,4 +21,6 @@
 #ifndef __cfg_oem_h__
 #define __cfg_oem_h__
 
+#define OEMCFG_rustapp                          1
+
 #endif /* cfg/oem.h */

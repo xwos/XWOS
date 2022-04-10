@@ -19,8 +19,8 @@
 #
 
 if [[ ${BASH_SOURCE[0]} = ${0} ]] ;then
-	echo -e "\033[33;1mThis script must be sourced by bash!\033[0m"
-	exit 0
+  echo -e "\033[33;1mThis script must be sourced by bash!\033[0m"
+  exit 0
 fi
 
 cd $(dirname ${BASH_SOURCE[0]})

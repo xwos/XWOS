@@ -57,6 +57,9 @@ $(XWMO_RUSTLIB):
 doc:
 	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) doc $(CARGO_BUILD_FLAGS) --target=$(RUST_TARGET)
 
+rustdoc:
+	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) rustdoc $(CARGO_BUILD_FLAGS) --target=$(RUST_TARGET)
+
 clean:
 	@$(RM) -f $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/$(XWMO_NAME)
 	@cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) clean

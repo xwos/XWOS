@@ -1,0 +1,12 @@
+[package]
+name = "rustapp"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "rustapp"
+crate-type = ["staticlib"]
+
+[dependencies]
+xwrust = {path = "../../../xwmd/xwrust"}
+libc-print = "0.1"
