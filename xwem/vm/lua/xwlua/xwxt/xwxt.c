@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：导出表
+ * @brief 玄武Lua库：全局导出表
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

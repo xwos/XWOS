@@ -43,7 +43,8 @@ int xwlua_mtx_new(lua_State * L)
                 mtxsp->tik = xwos_mtx_gettik(mtxsp->mtx);
                 luaL_setmetatable(L, "xwlua_mtx_sp");
         } else {
-                *mtxsp = XWLUA_MTX_NULLSP;
+                lua_pop(L, 1);
+                lua_pushnil(L);
         }
         return 1;
 }

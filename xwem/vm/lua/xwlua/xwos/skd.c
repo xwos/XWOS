@@ -26,6 +26,15 @@
 #include "xwlua/xwos/skd.h"
 
 /******** xwos.skd ********/
+int xwlua_skd_id_lc(lua_State * L)
+{
+        xwid_t id;
+
+        id = xwos_skd_id_lc();
+        lua_pushnumber(L, (lua_Number)id);
+        return 1;
+}
+
 int xwlua_skd_get_timetick_lc(lua_State * L)
 {
         xwtm_t timetick;
@@ -53,10 +62,27 @@ int xwlua_skd_get_timestamp_lc(lua_State * L)
         return 1;
 }
 
+int xwlua_skd_get_dspmpt_lc(lua_State * L)
+{
+        XWOS_UNUSED(L);
+        xwos_skd_dspmpt_lc();
+        return 0;
+}
+
+int xwlua_skd_get_enpmpt_lc(lua_State * L)
+{
+        XWOS_UNUSED(L);
+        xwos_skd_enpmpt_lc();
+        return 0;
+}
+
 const luaL_Reg xwlua_skd_libconstructor[] = {
+        {"id", xwlua_skd_id_lc},
         {"tt", xwlua_skd_get_timetick_lc},
         {"tc", xwlua_skd_get_tickcount_lc},
         {"ts", xwlua_skd_get_timestamp_lc},
+        {"dspmpt", xwlua_skd_get_dspmpt_lc},
+        {"enpmpt", xwlua_skd_get_enpmpt_lc},
         {NULL, NULL},
 };
 
@@ -119,13 +145,11 @@ int xwlua_thd_dofile(lua_State * L)
                         thdsp->tik = xwos_thd_gettik(thdsp->thd);
                         luaL_setmetatable(L, "xwlua_thd_sp");
                 } else {
-                        *thdsp = XWLUA_THD_NULLSP;
                         lua_pop(L, 1);
                         lua_pushnil(L);
                         lua_writestringerror("Cannot create thread: %d.", (int)rc);
                 }
         } else {
-                *thdsp = XWLUA_THD_NULLSP;
                 lua_pop(L, 1);
                 lua_pushnil(L);
                 lua_writestringerror("%s", "Cannot create VM: not enough memory");
@@ -163,13 +187,11 @@ int xwlua_thd_dostring(lua_State * L)
                         thdsp->tik = xwos_thd_gettik(thdsp->thd);
                         luaL_setmetatable(L, "xwlua_thd_sp");
                 } else {
-                        *thdsp = XWLUA_THD_NULLSP;
                         lua_pop(L, 1);
                         lua_pushnil(L);
                         lua_writestringerror("Cannot create thread: %d.", (int)rc);
                 }
         } else {
-                *thdsp = XWLUA_THD_NULLSP;
                 lua_pop(L, 1);
                 lua_pushnil(L);
                 lua_writestringerror("%s", "Cannot create VM: not enough memory");
@@ -221,13 +243,11 @@ int xwlua_thd_call(lua_State * L)
                         thdsp->tik = xwos_thd_gettik(thdsp->thd);
                         luaL_setmetatable(L, "xwlua_thd_sp");
                 } else {
-                        *thdsp = XWLUA_THD_NULLSP;
                         lua_pop(L, 1);
                         lua_pushnil(L);
                         lua_writestringerror("Cannot create thread: %d.", (int)rc);
                 }
         } else {
-                *thdsp = XWLUA_THD_NULLSP;
                 lua_pop(L, 1);
                 lua_pushnil(L);
                 lua_writestringerror("%s", "Cannot create VM: not enough memory");
@@ -336,10 +356,11 @@ int xwlua_cthd_frz_shld_stop(lua_State * L)
 
 int xwlua_cthd_freeze(lua_State * L)
 {
-        XWOS_UNUSED(L);
+        xwer_t rc;
 
-        xwos_cthd_freeze();
-        return 0;
+        rc = xwos_cthd_freeze();
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
 }
 
 const luaL_Reg xwcthdlib[] = {
@@ -348,9 +369,9 @@ const luaL_Reg xwcthdlib[] = {
         {"sleepFrom", xwlua_cthd_sleep_from},
         {"yield", xwlua_cthd_yield},
         {"exit", xwlua_cthd_exit},
-        {"shldFrz", xwlua_cthd_shld_frz},
         {"shldStop", xwlua_cthd_shld_stop},
         {"frzShldStop", xwlua_cthd_frz_shld_stop},
+        {"shldFrz", xwlua_cthd_shld_frz},
         {"frz", xwlua_cthd_freeze},
         {NULL, NULL},
 };

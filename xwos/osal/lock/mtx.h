@@ -226,6 +226,7 @@ xwer_t xwos_mtx_put(struct xwos_mtx * mtx)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
+ + @retval -EOBJDEAD 互斥锁对象无效
  * @retval -EOWNER: 线程并没有锁定此互斥锁
  * @retval -ENOTINTHD: 不在线程上下文中
  * @note
@@ -245,6 +246,7 @@ xwer_t xwos_mtx_unlock(struct xwos_mtx * mtx)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
+ + @retval -EOBJDEAD 互斥锁对象无效
  * @retval -EINTR: 等待被中断
  * @retval -ENOTINTHD: 不在线程上下文中
  * @note
@@ -264,6 +266,7 @@ xwer_t xwos_mtx_lock(struct xwos_mtx * mtx)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
+ + @retval -EOBJDEAD 互斥锁对象无效
  * @retval -ENODATA: 获取锁失败
  * @retval -ENOTINTHD: 不在线程上下文中
  * @note
@@ -290,6 +293,7 @@ xwer_t xwos_mtx_trylock(struct xwos_mtx * mtx)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
+ + @retval -EOBJDEAD 互斥锁对象无效
  * @retval -EINTR: 等待被中断
  * @retval -ETIMEDOUT: 超时，xwtm指向的缓冲区内的时间会减为0
  * @retval -ENOTINTHD: 不在线程上下文中
@@ -310,6 +314,7 @@ xwer_t xwos_mtx_timedlock(struct xwos_mtx * mtx, xwtm_t * xwtm)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
+ + @retval -EOBJDEAD 互斥锁对象无效
  * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步
@@ -329,6 +334,7 @@ xwer_t xwos_mtx_lock_unintr(struct xwos_mtx * mtx)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
+ + @retval -EOBJDEAD 互斥锁对象无效
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程

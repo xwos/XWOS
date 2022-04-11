@@ -39,7 +39,8 @@ int xwlua_flg_new(lua_State * L)
                 flgsp->tik = xwos_flg_gettik(flgsp->flg);
                 luaL_setmetatable(L, "xwlua_flg_sp");
         } else {
-                *flgsp = XWLUA_FLG_NULLSP;
+                lua_pop(L, 1);
+                lua_pushnil(L);
         }
         return 1;
 }

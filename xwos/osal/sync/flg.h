@@ -323,7 +323,7 @@ xwer_t xwos_flg_unbind(struct xwos_flg * flg, struct xwos_sel * sel)
 }
 
 /**
- * @brief XWOS API：中断事件标志对象等待队列中的所有节点
+ * @brief XWOS API：中断事件标志对象等待队列中的所有线程
  * @param[in] flg: 事件标志对象指针
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -533,7 +533,7 @@ xwer_t xwos_flg_wait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
 }
 
 /**
- * @brief XWOS API：检测一下事件标志对象的触发事件，不会阻塞调用线程
+ * @brief XWOS API：检查事件标志，立即返回，不会等待
  * @param[in] flg: 事件标志对象指针
  * @param[in] trigger: 事件触发条件，取值：
  *   @arg XWOS_FLG_TRIGGER_SET_ALL: 掩码中的所有位同时为1

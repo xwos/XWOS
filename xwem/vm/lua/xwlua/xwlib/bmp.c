@@ -95,7 +95,7 @@ int xwlua_bmp_ffs(lua_State * L)
         xwsq_t idx;
 
         luabmp = (xwlua_bmp_t *)luaL_checkudata(L, 1, "xwlua_bmp_t");
-        idx = xwbmpop_ffs(luabmp->bmp, luabmp->bits) + 1;
+        idx = xwbmpop_ffs(luabmp->bmp, luabmp->bits);
         lua_pushinteger(L, idx);
         return 1;
 }
@@ -106,7 +106,7 @@ int xwlua_bmp_ffz(lua_State * L)
         xwsq_t idx;
 
         luabmp = (xwlua_bmp_t *)luaL_checkudata(L, 1, "xwlua_bmp_t");
-        idx = xwbmpop_ffz(luabmp->bmp, luabmp->bits) + 1;
+        idx = xwbmpop_ffz(luabmp->bmp, luabmp->bits);
         lua_pushinteger(L, idx);
         return 1;
 }
@@ -117,7 +117,7 @@ int xwlua_bmp_fls(lua_State * L)
         xwsq_t idx;
 
         luabmp = (xwlua_bmp_t *)luaL_checkudata(L, 1, "xwlua_bmp_t");
-        idx = xwbmpop_fls(luabmp->bmp, luabmp->bits) + 1;
+        idx = xwbmpop_fls(luabmp->bmp, luabmp->bits);
         lua_pushinteger(L, idx);
         return 1;
 }
@@ -128,7 +128,7 @@ int xwlua_bmp_flz(lua_State * L)
         xwsq_t idx;
 
         luabmp = (xwlua_bmp_t *)luaL_checkudata(L, 1, "xwlua_bmp_t");
-        idx = xwbmpop_flz(luabmp->bmp, luabmp->bits) + 1;
+        idx = xwbmpop_flz(luabmp->bmp, luabmp->bits);
         lua_pushinteger(L, idx);
         return 1;
 }
@@ -143,10 +143,9 @@ int xwlua_bmp_s1i(lua_State * L)
         top = lua_gettop(L);
         for (i = 2; i <= top; i++) {
                 idx = (xwsq_t)luaL_checkinteger(L, i);
-                if ((0 == idx) || (idx > luabmp->bits)) {
+                if (idx >= luabmp->bits) {
                         luaL_error(L, "Bit index is out of range!");
                 } else {
-                        idx--;
                         xwbmpop_s1i(luabmp->bmp, idx);
                 }
         }
@@ -178,10 +177,9 @@ int xwlua_bmp_c0i(lua_State * L)
         top = lua_gettop(L);
         for (i = 2; i <= top; i++) {
                 idx = (xwsq_t)luaL_checkinteger(L, i);
-                if ((0 == idx) || (idx > luabmp->bits)) {
+                if (idx >= luabmp->bits) {
                         luaL_error(L, "Bit index is out of range!");
                 } else {
-                        idx--;
                         xwbmpop_c0i(luabmp->bmp, idx);
                 }
         }
@@ -213,10 +211,9 @@ int xwlua_bmp_x1i(lua_State * L)
         top = lua_gettop(L);
         for (i = 2; i <= top; i++) {
                 idx = luaL_checkinteger(L, i);
-                if ((0 == idx) || (idx > luabmp->bits)) {
+                if (idx >= luabmp->bits) {
                         luaL_error(L, "Bit index is out of range!");
                 } else {
-                        idx--;
                         xwbmpop_x1i(luabmp->bmp, idx);
                 }
         }
@@ -246,11 +243,10 @@ int xwlua_bmp_t1i(lua_State * L)
 
         luabmp = (xwlua_bmp_t *)luaL_checkudata(L, 1, "xwlua_bmp_t");
         idx = luaL_checkinteger(L, 2);
-        if ((0 == idx) || (idx > luabmp->bits)) {
+        if (idx >= luabmp->bits) {
                 luaL_error(L, "Bit index is out of range!");
                 lua_pushnil(L);
         } else {
-                idx--;
                 res = xwbmpop_t1i(luabmp->bmp, idx);
                 lua_pushboolean(L, (int)res);
         }
@@ -490,6 +486,27 @@ int xwlua_bmp_tostring(lua_State * L)
         return 1;
 }
 
+int xwlua_bmp_copy(lua_State * L)
+{
+        xwlua_bmp_t * luabmp;
+        xwlua_bmp_t * newluabmp;
+        lua_State * D;
+        xwsz_t bmpsz;
+
+        luabmp = (xwlua_bmp_t *)luaL_checkudata(L, 1, "xwlua_bmp_t");
+        D = (lua_State *)luaL_checkudata(L, 2, "xwlua_vm");
+        if (D) {
+                bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(luabmp->bits)) + sizeof(xwlua_bmp_t);
+                newluabmp = lua_newuserdatauv(D, bmpsz, 0);
+                newluabmp->bits = luabmp->bits;
+                luaL_setmetatable(D, "xwlua_bmp_t");
+                xwbmpop_assign(newluabmp->bmp, luabmp->bmp, luabmp->bits);
+        } else {
+                luaL_error(L, "Destination lua_State is NULL!");
+        }
+        return 0;
+}
+
 const luaL_Reg xwlua_bmp_metamethod[] = {
         {"__band", xwlua_bmp_band},
         {"__bor", xwlua_bmp_bor},
@@ -498,6 +515,7 @@ const luaL_Reg xwlua_bmp_metamethod[] = {
         {"__len", xwlua_bmp_len},
         {"__eq", xwlua_bmp_eq},
         {"__tostring", xwlua_bmp_tostring},
+        {"__copy", xwlua_bmp_copy},
         {"__index", NULL},  /* place holder */
         {NULL, NULL}
 };

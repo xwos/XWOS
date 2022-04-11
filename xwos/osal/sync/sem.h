@@ -349,7 +349,7 @@ xwer_t xwos_sem_wait(struct xwos_sem * sem)
 }
 
 /**
- * @brief XWOS API：检测一下信号量对象，不会阻塞调用线程
+ * @brief XWOS API：检查信号量对象，立即返回，不会阻塞调用线程
  * @param[in] sem: 信号量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误

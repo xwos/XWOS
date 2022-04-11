@@ -1,0 +1,180 @@
+--[[--------
+XWLUA类：互斥锁对象强指针
+
+互斥锁对象强指针是Lua语言中的一种 `userdata` ，用于**强引用**XWOS的互斥锁对象。
+
+**强引用**表示会增加XWOS的互斥锁对象的**引用计数**。
+
+@classmod mtxsp
+]]
+
+
+--[[--------
+元方法：__copy<br>
+<br>
+
+将互斥锁对象强指针拷贝到全局导出表 `xwxt` 中。
+
+此元方法意味着互斥锁对象的强引用多了一个，**引用计数**加1。
+
+@within MetaMethods
+@function mtxsp:metatable.__copy
+
+@tparam userdata mtxsp (**in**) 互斥锁对象强指针<br>
+<br>
+
+@tparam userdata vm (**in**) 目标虚拟机<br>
+<br>
+
+@usage
+mtxsp = ... -- 创建互斥锁的代码（省略）
+xwxt.somemtx = mtxsp -- 互斥锁对象的引用计数加1
+mtxsp2 = xwxt.somemtx -- 互斥锁对象的引用计数加1
+xwxt.somemtx = nil -- 互斥锁对象的引用计数减1
+]]
+
+
+--[[--------
+元方法：__gc<br>
+<br>
+
+互斥锁对象强指针的垃圾回收方法。
+
+此元方法意味着互斥锁对象的强引用少了一个，**引用计数**减1。
+
+如果互斥锁对象被销毁时还处于上锁状态，将自动被解锁。
+
+@within MetaMethods
+@function mtxsp:metatable.__gc
+
+@tparam userdata mtxsp (**in**) 互斥锁对象强指针<br>
+<br>
+
+@usage
+mtxsp = nil -- 删除引用
+collectgarbage() -- 强制垃圾回收，将调用__gc()函数
+]]
+
+
+--[[--------
+元方法：__close<br>
+<br>
+
+互斥锁对象强指针的**to-be-close**特性函数。
+
+当互斥锁对象强指针离开其作用域时，将自动解锁关联的互斥锁。
+
+@within MetaMethods
+@function mtxsp:metatable.__close
+
+@tparam userdata mtxsp (**in**) 互斥锁对象强指针<br>
+<br>
+
+@usage
+mymtx = xwos.mtx.new()
+function test()
+  local scopelock<close> = mymtx
+  rc = scopelock:lock()
+  if (rc == 0) then
+    -- 临界区
+  end
+end -- 自动解锁互斥锁
+]]
+
+
+--[[--------
+元方法：__tostring<br>
+<br>
+
+将互斥锁对象强指针格式化成字符串，可用于终端打印调试。
+
+@within MetaMethods
+@function mtxsp:metatable.__tostring
+
+@tparam userdata mtxsp (**in**) 互斥锁对象强指针<br>
+<br>
+
+@usage
+print(mtxsp)
+]]
+
+
+--[[--------
+上锁互斥锁<br>
+<br>
+
+如果互斥锁无法上锁，就会阻塞当前线程。
+
+@tparam userdata mtxsp (**in**) 互斥锁对象强指针<br>
+<br>
+
+@tparam string t (**optional**) (**in**)<br>
+..● **"t"** 尝试上锁互斥锁，若无法上锁互斥锁，立即返回，不会等待<br>
+<br>
+
+@tparam number time (**optional**) (**in**) 期望的阻塞等待时间<br>
+<br>
+
+@treturn number
++ ● **rc** 返回值
+  + ○ **0** 没有错误
+  + ○ **-EINTR** 等待被中断
+  + ○ **-ENOTINTHD** 不在线程上下文中
+  + ○ **-ETIMEDOUT** 超时，仅当存在可选参数 **time** 时才会出现此错误值
+  + ○ **-ENODATA** 尝试上锁失败，仅当存在可选参数 **"t"** 时才会出现此错误值
+
+@usage
+lock = xwos.mtx.new()
+rc = lock:lock()
+if (rc == 0) then
+  -- 临界区
+  lock:unlock()
+end
+
+@usage
+lock = xwos.mtx.new()
+rc = lock:lock(1000000000) -- 最多等待互斥锁1s，超时返回-ETIMEDOUT
+if (rc == 0) then
+  -- 临界区
+  lock:unlock()
+elseif (rc == -116) then
+  print("Timeout!")
+end
+
+@usage
+lock = xwos.mtx.new()
+rc = lock:lock("t") -- 尝试获取互斥锁，失败直接返回-ENODATA
+if (rc == 0) then
+  -- 临界区
+  lock:unlock()
+elseif (rc == -61) then
+  print("Can't lock!")
+end
+]]
+function mtxsp:lock(mtxsp, t, time)
+end
+
+
+--[[--------
+解锁互斥锁<br>
+<br>
+
+@tparam userdata mtxsp (**in**) 互斥锁对象强指针<br>
+<br>
+
+@treturn number
++ ● **rc** 返回值
+  + ○ **0** 没有错误
+  + ○ **-EOWNER** 线程并没有锁定此互斥锁
+  + ○ **-ENOTINTHD** 不在线程上下文中
+
+@usage
+lock = xwos.mtx.new()
+rc = lock:lock()
+if (rc == 0) then
+  -- 临界区
+  lock:unlock()
+end
+]]
+function mtxsp:unlock(mtxsp)
+end

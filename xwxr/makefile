@@ -24,7 +24,7 @@ TARGET ?= XWOS
 
 MKCFG := ${XWOS}/xwbs/util/el/mkcfg.el
 
-all: $(WKSPC) cfg html rustdoc
+all: $(WKSPC) cfg html rustdoc luadoc
 
 html: cfg
 	cd .. && doxygen -d Preprocessor xwxr/doxyfile
@@ -33,6 +33,9 @@ rustdoc: cfg
 	cd fakeboard/rustapp; cargo +nightly clean --target=thumbv7em-none-eabihf
 	cd fakeboard/rustapp; cargo +nightly doc --target=thumbv7em-none-eabihf
 	cp -ap fakeboard/rustapp/target/thumbv7em-none-eabihf/doc wkspc/rustdoc
+
+luadoc: cfg
+	cd fakeboard/xwlua; ldoc .
 
 $(WKSPC):
 	@mkdir -p $@

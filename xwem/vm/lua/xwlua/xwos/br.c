@@ -39,7 +39,8 @@ int xwlua_br_new(lua_State * L)
                 brsp->tik = xwos_br_gettik(brsp->br);
                 luaL_setmetatable(L, "xwlua_br_sp");
         } else {
-                *brsp = XWLUA_BR_NULLSP;
+                lua_pop(L, 1);
+                lua_pushnil(L);
         }
         return 1;
 }

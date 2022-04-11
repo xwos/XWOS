@@ -38,7 +38,8 @@ int xwlua_sel_new(lua_State * L)
                 selsp->tik = xwos_sel_gettik(selsp->sel);
                 luaL_setmetatable(L, "xwlua_sel_sp");
         } else {
-                *selsp = XWLUA_SEL_NULLSP;
+                lua_pop(L, 1);
+                lua_pushnil(L);
         }
         return 1;
 }

@@ -76,19 +76,22 @@ int xwlua_spim_xfer(lua_State * L)
                 txd = NULL;
         }
         isrx = lua_toboolean(L, 3);
+        size = (xwsz_t)luaL_checkinteger(L, 4);
         if (isrx) {
                 luaL_buffinit(L, &b);
-                rxb = (xwu8_t *)luaL_prepbuffer(&b);
+                rxb = (xwu8_t *)luaL_prepbuffsize(&b, size);
         } else {
                 rxb = NULL;
         }
-        size = (xwsz_t)luaL_checkinteger(L, 4);
         if (top >= 5) {
                 time = (xwtm_t)luaL_checknumber(L, 5);
         } else {
                 time = XWTM_MAX;
         }
         rc = xwds_spim_xfer(luaspim->spim, txd, rxb, &size, &time);
+        if (isrx) {
+                luaL_addsize(&b, size);
+        }
         lua_pushinteger(L, (lua_Integer)rc);
         lua_pushinteger(L, (lua_Integer)size);
         if (isrx) {

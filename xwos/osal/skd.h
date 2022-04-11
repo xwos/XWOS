@@ -493,8 +493,8 @@ xwer_t xwos_thd_put(struct xwos_thd * thd)
  * - 重入性：可重入
  * @details
  * 此函数```xwos_thd_quit()```用于线程A向另一个线程B设置<b>退出</b>状态。
- * 此函数只会对线程B设置一个<b>退出</b>状态，线程B是否要退出，什么时候退出，由线程B自己决定。
- * 线程B可以是Joinable的，也可以是Detached的。调用此函数的线程A也不会等待子线程退出。
+ * 调用此函数的线程A也不会等待子线程退出。线程B是否要退出，什么时候退出，由线程B自己决定。
+ * 线程B可以是Joinable的，也可以是Detached的。
  *
  * 此函数可被重复调用，线程B的<b>退出</b>状态一旦被设置，不可被清除。
  *
@@ -573,7 +573,7 @@ xwer_t xwos_thd_join(struct xwos_thd * thd, xwer_t * trc)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：不可重入
  * @details
- * 此函数```xwos_thd_detach()```功能类似于```pthread_detach()```，将线程设置为<b>分离态</b>
+ * 此函数```xwos_thd_detach()```功能类似于```pthread_detach()```，将线程设置为<b>分离态</b>。
  * 处于<b>分离态</b>的线程退出后，系统将自动回收其内存资源，
  * 不需要另一个线程调用```xwos_thd_join()```来回收其内存资源。
  */
@@ -726,13 +726,14 @@ bool xwos_cthd_frz_shld_stop(bool * frozen)
 }
 
 /**
- * @brief XWOS API：调用的线程睡眠一段时间
+ * @brief XWOS API：当前线程睡眠一段时间
  * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示期望的睡眠时间
  * + (O) 作为输出时，返回剩余的睡眠时间
  * @return 错误码
  * @retval XWOK: 没有错误，指针```xwtm```指向的缓冲区的时间减为0
  * @retval -EINTR: 睡眠过程被中断，指针xwtm指向的缓冲区返回剩余的时间
+ * @retval -ETIMEDOUT: 输入的时间为负数
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -745,7 +746,7 @@ xwer_t xwos_cthd_sleep(xwtm_t * xwtm)
 }
 
 /**
- * @brief XWOS API：调用的线程从一个时间起点睡眠到另一个时间点
+ * @brief XWOS API：当前线程从一个时间起点睡眠到另一个时间点
  * @param[in,out] origin: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，作为时间起点
  * + (O) 作为输出时，返回线程被唤醒的时间（可作为下一次时间起点，形成精确的周期）

@@ -84,13 +84,14 @@ int xwlua_i2cm_xfer(lua_State * L)
         msg.size = (xwsz_t)luaL_checkinteger(L, 6);
         if (msg.flag & XWDS_I2C_F_RD) {
                 luaL_buffinit(L, &b);
-                msg.data = (xwu8_t *)luaL_prepbuffer(&b);
+                msg.data = (xwu8_t *)luaL_prepbuffsize(&b, msg.size);
                 if (top >= 7) {
                         time = (xwtm_t)luaL_checknumber(L, 7);
                 } else {
                         time = XWTM_MAX;
                 }
                 rc = xwds_i2cm_xfer(luai2cm->i2cm, &msg, &time);
+                luaL_addsize(&b, msg.size);
                 lua_pushinteger(L, (lua_Integer)rc);
                 luaL_pushresult(&b);
                 ret = 2;

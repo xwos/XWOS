@@ -322,7 +322,7 @@ xwer_t xwos_sel_select(struct xwos_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
 }
 
 /**
- * @brief XWOS API：检测一下信号选择器中的触发信号，不会阻塞调用线程
+ * @brief XWOS API：检测信号选择器中是否有同步信号触发，立即返回，不会等待
  * @param[in] sel: 信号选择器对象的指针
  * @param[in] msk: 同步对象位图掩码，表示只关注掩码内的同步对象
  * @param[out] trg: 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
@@ -342,7 +342,7 @@ xwer_t xwos_sel_tryselect(struct xwos_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
 }
 
 /**
- * @brief XWOS API：限时等待信号选择器中的信号
+ * @brief XWOS API：限时等待信号选择器中的同步信号
  * @param[in] sel: 信号选择器对象的指针
  * @param[in] msk: 同步对象位图掩码，表示只关注掩码内的同步对象
  * @param[out] trg: 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码

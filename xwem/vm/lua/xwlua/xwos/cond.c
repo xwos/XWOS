@@ -39,7 +39,8 @@ int xwlua_cond_new(lua_State * L)
                 condsp->tik = xwos_cond_gettik(condsp->cond);
                 luaL_setmetatable(L, "xwlua_cond_sp");
         } else {
-                *condsp = XWLUA_COND_NULLSP;
+                lua_pop(L, 1);
+                lua_pushnil(L);
         }
         return 1;
 }
