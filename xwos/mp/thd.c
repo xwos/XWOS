@@ -1901,9 +1901,15 @@ xwer_t xwmp_thd_outmigrate_reqfrz_lic(struct xwmp_thd * thd, xwid_t dstcpu)
         srccpu = xwskd->id;
         xwmp_splk_lock_cpuirqsv(&xwskd->pm.lock, &cpuirq);
         xwmp_splk_lock(&thd->stlock);
-        if (XWMP_SKDOBJ_DST_MIGRATING & thd->state) {
+        if (XWMP_SKDOBJ_DST_STANDBY & thd->state) {
                 xwmp_splk_unlock(&thd->stlock);
                 xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
+                xwmp_thd_put(thd);
+                rc = -ESHUTDOWN;
+        } else if (XWMP_SKDOBJ_DST_MIGRATING & thd->state) {
+                xwmp_splk_unlock(&thd->stlock);
+                xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
+                xwmp_thd_put(thd);
                 rc = -EINPROGRESS;
         } else {
                 xwbop_s1m(xwsq_t, &thd->state, XWMP_SKDOBJ_DST_MIGRATING);
@@ -1912,6 +1918,7 @@ xwer_t xwmp_thd_outmigrate_reqfrz_lic(struct xwmp_thd * thd, xwid_t dstcpu)
                         thd->migration.dst = dstcpu;
                         xwmp_thd_outmigrate_frozen_lic(thd);
                         xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
+                        xwmp_thd_put(thd);
                         if (srccpu == dstcpu) {
                                 xwmp_thd_immigrate_lic(thd);
                         } else {
@@ -1922,6 +1929,7 @@ xwer_t xwmp_thd_outmigrate_reqfrz_lic(struct xwmp_thd * thd, xwid_t dstcpu)
                         xwmp_splk_unlock(&thd->stlock);
                         thd->migration.dst = dstcpu;
                         xwmp_splk_unlock_cpuirqrs(&xwskd->pm.lock, cpuirq);
+                        xwmp_thd_put(thd);
                 }
                 rc = XWOK;
         }
@@ -1956,11 +1964,21 @@ xwer_t xwmp_thd_migrate(struct xwmp_thd * thd, xwid_t dstcpu)
         struct xwmp_skd * xwskd;
         xwid_t srccpu;
         xwid_t localcpu;
+        xwsq_t state;
         xwer_t rc;
 
         if (__xwcc_unlikely(dstcpu >= CPUCFG_CPU_NUM)) {
                 rc = -ENODEV;
                 goto err_badcpuid;
+        }
+        rc = xwmp_thd_grab(thd);
+        if (rc < 0) {
+                goto err_thd_grab;
+        }
+        xwmb_mp_load_acquire(xwsq_t, state, &thd->state);
+        if (XWMP_SKDOBJ_DST_STANDBY & state) {
+                rc = -ESHUTDOWN;
+                goto err_thd_standby;
         }
 
         localcpu = xwmp_skd_id_lc();
@@ -1975,7 +1993,11 @@ xwer_t xwmp_thd_migrate(struct xwmp_thd * thd, xwid_t dstcpu)
         } else {
                 rc = xwospl_thd_outmigrate((struct xwospl_thd *)thd, dstcpu);
         }
+        return rc;
 
+err_thd_standby:
+        xwmp_thd_put(thd);
+err_thd_grab:
 err_badcpuid:
         return rc;
 }
