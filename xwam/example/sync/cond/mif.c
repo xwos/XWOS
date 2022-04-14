@@ -22,7 +22,7 @@
 #include <string.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwos/osal/swt.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/cond.h>
@@ -145,7 +145,7 @@ void xwconddemo_swt_callback(struct xwos_swt * swt, void * arg)
 xwer_t xwconddemo_thd_func(void * arg)
 {
         xwer_t rc;
-        xwtm_t base, ts;
+        xwtm_t now;
         xwreg_t cpuirq;
         xwsq_t lkst;
         union xwos_ulock ulk;
@@ -155,8 +155,8 @@ xwer_t xwconddemo_thd_func(void * arg)
 
         condlogf(INFO, "[线程] 启动。\n");
         condlogf(INFO, "[线程] 启动定时器。\n");
-        base = xwos_skd_get_timetick_lc();
-        rc = xwos_swt_start(&xwconddemo_swt, base, 1000 * XWTM_MS,
+        now = xwtm_now();
+        rc = xwos_swt_start(&xwconddemo_swt, now, 1000 * XWTM_MS,
                             xwconddemo_swt_callback, NULL);
 
         while (!xwos_cthd_frz_shld_stop(NULL)) {
@@ -166,12 +166,11 @@ xwer_t xwconddemo_thd_func(void * arg)
                         is_updated = false;
                         cnt = xwconddemo_shared_count;
                 } else {
-                        ts = 500 * XWTM_MS;
                         ulk.osal.splk = &xwconddemo_lock;
                         /* 等待条件量，同时解锁自旋锁 */
-                        rc = xwos_cond_timedwait(&xwconddemo_cond,
-                                                 ulk, XWOS_LK_SPLK,
-                                                 NULL, &ts, &lkst);
+                        rc = xwos_cond_wait_to(&xwconddemo_cond,
+                                               ulk, XWOS_LK_SPLK, NULL,
+                                               xwtm_ft(500 * XWTM_MS), &lkst);
                         if (XWOK == rc) {
                                 /* 等待到条件量，自旋锁自动上锁 */
                                 is_updated = false;
@@ -186,17 +185,17 @@ xwer_t xwconddemo_thd_func(void * arg)
                 xwos_splk_unlock_cpuirqrs(&xwconddemo_lock, cpuirq);
 
                 if (XWOK == rc) {
-                        ts = xwos_skd_get_timestamp_lc();
+                        now = xwtm_nowts();
                         condlogf(INFO,
                                  "[线程] 定时器唤醒，时间戳：%lld 纳秒，"
                                  "计数器：%d。\n",
-                                 ts, cnt);
+                                 now, cnt);
                 } else if (-ETIMEDOUT == rc) {
-                        ts = xwos_skd_get_timestamp_lc();
+                        now = xwtm_nowts();
                         condlogf(INFO,
                                  "[线程] 等待超时，时间戳：%lld 纳秒，"
                                  "计数器：%d，错误码：%d。\n",
-                                 ts, cnt, rc);
+                                 now, cnt, rc);
                 }
         }
         condlogf(INFO, "[线程] 退出。\n");

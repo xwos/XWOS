@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_mp_osdl_sync_flg_h__
@@ -171,11 +171,11 @@ xwer_t xwosdl_flg_trywait(struct xwosdl_flg * flg, xwsq_t trigger, xwsq_t action
 }
 
 static __xwcc_inline
-xwer_t xwosdl_flg_timedwait(struct xwosdl_flg * flg, xwsq_t trigger, xwsq_t action,
-                            xwbmp_t origin[], xwbmp_t msk[],
-                            xwtm_t * xwtm)
+xwer_t xwosdl_flg_wait_to(struct xwosdl_flg * flg, xwsq_t trigger, xwsq_t action,
+                          xwbmp_t origin[], xwbmp_t msk[],
+                          xwtm_t to)
 {
-        return xwmp_flg_timedwait(flg, trigger, action, origin, msk, xwtm);
+        return xwmp_flg_wait_to(flg, trigger, action, origin, msk, to);
 }
 
 #endif /* xwos/mp/osdl/sync/flg.h */

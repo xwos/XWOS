@@ -18,7 +18,7 @@
  * > limitations under the License.
  */
 
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwcd/ds/soc/gpio.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/mif.h>
@@ -103,8 +103,6 @@ err_stm32cube_start:
 static
 xwer_t led_task(void)
 {
-        xwtm_t xwtm;
-
         xwds_gpio_req(&stm32cube_soc_cb,
                       XWDS_GPIO_PORT_F,
                       XWDS_GPIO_PIN_9);
@@ -115,8 +113,7 @@ xwer_t led_task(void)
                 if (xwos_cthd_shld_frz()) {
                         xwos_cthd_freeze();
                 }
-                xwtm = 1 * XWTM_S;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(1 * XWTM_S);
                 xwds_gpio_toggle(&stm32cube_soc_cb,
                                  XWDS_GPIO_PORT_F,
                                  XWDS_GPIO_PIN_9);

@@ -874,7 +874,8 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = xwxr/index.md xwos/osal xwos/mm xwos/lib xwmd/group.dox \
+INPUT                  = xwxr/index.md xwos/standard.h xwos/standard.hxx xwos/osal \
+                         xwos/mm xwos/lib xwmd/group.dox \
                          xwmd/isc/xwcq xwmd/isc/xwmq \
                          xwmd/isc/xwpcp/mif.h xwmd/isc/xwpcp/mif.c \
                          xwmd/isc/xwscp/mif.h xwmd/isc/xwscp/mif.c
@@ -1234,7 +1235,7 @@ HTML_HEADER            = xwxr/theme/header.html
 # that doxygen normally uses.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_FOOTER            = 
+HTML_FOOTER            =
 
 # The HTML_STYLESHEET tag can be used to specify a user-defined cascading style
 # sheet that is used by each HTML page. It can be used to fine-tune the look of

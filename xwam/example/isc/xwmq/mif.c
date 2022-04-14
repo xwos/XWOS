@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwmd/isc/xwmq/mif.h>
 #include <xwam/example/isc/xwmq/mif.h>
 
@@ -91,7 +91,6 @@ err_xwmq_init:
 xwer_t xwmqdemo_producer_func(void * arg)
 {
         xwer_t rc;
-        xwtm_t sleep;
         int topic;
         struct xwmq_msg * msg;
 
@@ -109,8 +108,7 @@ xwer_t xwmqdemo_producer_func(void * arg)
                                        topic++, "Message Content");
                         }
                 }
-                sleep = 1 * XWTM_S;
-                xwos_cthd_sleep(&sleep);
+                xwos_cthd_sleep(1 * XWTM_S);
         }
         mqlogf(INFO, "[生产者] 退出。\n");
         xwos_thd_detach(xwos_cthd_self());

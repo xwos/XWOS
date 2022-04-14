@@ -21,7 +21,7 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwos/osal/lock/mtx.h>
 #include <xwam/example/lock/mtx/mif.h>
 
@@ -105,21 +105,20 @@ err_mtx_create:
  */
 xwer_t xwmtxdemo_thd_0_func(void * arg)
 {
-        xwtm_t time;
+        xwtm_t ts;
         xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
         mtxlogf(INFO, "[线程0] 启动。\n");
 
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                time = 500 * XWTM_MS;
-                xwos_cthd_sleep(&time);
+                xwos_cthd_sleep(500 * XWTM_MS);
                 rc = xwos_mtx_lock(xwmtxdemo_mtx);
                 if (XWOK == rc) {
-                        time = xwos_skd_get_timestamp_lc();
+                        ts = xwtm_nowts();
                         mtxlogf(INFO,
                                 "[线程0] 计数器：%d, 时间戳：%lld 纳秒。\n",
-                                xwmtxdemo_shared_count, time);
+                                xwmtxdemo_shared_count, ts);
                         xwmtxdemo_shared_count++;
                         xwos_mtx_unlock(xwmtxdemo_mtx);
                 }
@@ -134,21 +133,20 @@ xwer_t xwmtxdemo_thd_0_func(void * arg)
  */
 xwer_t xwmtxdemo_thd_1_func(void * arg)
 {
-        xwtm_t time;
+        xwtm_t ts;
         xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
         mtxlogf(INFO, "[线程1] 开始。\n");
 
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                time = 500 * XWTM_MS;
-                xwos_cthd_sleep(&time);
+                xwos_cthd_sleep(500 * XWTM_MS);
                 rc = xwos_mtx_lock(xwmtxdemo_mtx);
                 if (XWOK == rc) {
-                        time = xwos_skd_get_timestamp_lc();
+                        ts = xwtm_nowts();
                         mtxlogf(INFO,
                                 "[线程1] 计数器：%d, 时间戳：%lld 纳秒。\n",
-                                xwmtxdemo_shared_count, time);
+                                xwmtxdemo_shared_count, ts);
                         xwmtxdemo_shared_count++;
                         xwos_mtx_unlock(xwmtxdemo_mtx);
                 }

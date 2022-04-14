@@ -18,7 +18,7 @@
  * > limitations under the License.
  */
 
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwmd/libc/newlibac/mif.h>
 #include <xwem/vm/lua/mif.h>
 #include <bdl/standard.h>

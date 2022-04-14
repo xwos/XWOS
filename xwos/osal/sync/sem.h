@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_osal_sync_sem_h__
@@ -15,6 +15,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/jack/sync/sem.h>
+#include <xwos/osal/time.h>
 #include <xwos/osal/sync/sel.h>
 
 /**
@@ -369,9 +370,7 @@ xwer_t xwos_sem_trywait(struct xwos_sem * sem)
 /**
  * @brief XWOS API：限时等待并获取信号量对象
  * @param[in] sem: 信号量对象的指针
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] xwtm: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -382,11 +381,13 @@ xwer_t xwos_sem_trywait(struct xwos_sem * sem)
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 static __xwos_inline_api
-xwer_t xwos_sem_timedwait(struct xwos_sem * sem, xwtm_t * xwtm)
+xwer_t xwos_sem_wait_to(struct xwos_sem * sem, xwtm_t to)
 {
-        return xwosdl_sem_timedwait(&sem->ossem, xwtm);
+        return xwosdl_sem_wait_to(&sem->ossem, to);
 }
 
 /**

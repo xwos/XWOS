@@ -35,7 +35,7 @@ xwer_t stm32cube_w25q64jv_drv_suspend(struct xwds_device * dev);
 
 xwer_t stm32cube_w25q64jv_drv_io(struct xwds_w25qxx * w25qxx,
                                  xwu8_t * txq, xwu8_t * rxq,
-                                 xwsz_t * size, xwtm_t * xwtm);
+                                 xwsz_t * size, xwtm_t to);
 
 const struct xwds_w25qxx_driver stm32cube_w25q64jv_drv = {
         .spip = {
@@ -135,7 +135,7 @@ xwer_t stm32cube_w25q64jv_drv_suspend(struct xwds_device * dev)
 
 xwer_t stm32cube_w25q64jv_drv_io(struct xwds_w25qxx * w25qxx,
                                  xwu8_t * txq, xwu8_t * rxq,
-                                 xwsz_t * size, xwtm_t * xwtm)
+                                 xwsz_t * size, xwtm_t to)
 {
         xwer_t rc;
         xwsz_t xfsz, rest, pos;
@@ -149,7 +149,7 @@ xwer_t stm32cube_w25q64jv_drv_io(struct xwds_w25qxx * w25qxx,
                 rest = xfsz - pos;
                 rc = xwds_spim_xfer(w25qxx->spip.bus,
                                     &txq[pos], &rxq[pos], &rest,
-                                    xwtm);
+                                    to);
                 if (rc < 0) {
                         goto err_write_data;
                 }

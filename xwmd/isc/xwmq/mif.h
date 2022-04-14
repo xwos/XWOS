@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwmd_isc_xwmq_mif_h__
@@ -73,14 +73,14 @@ xwer_t xwmq_msg_put(struct xwmq_msg * msg);
 xwer_t xwmq_eq(struct xwmq * mq, struct xwmq_msg * msg, int topic, void * data);
 xwer_t xwmq_jq(struct xwmq * mq, struct xwmq_msg * msg, int topic, void * data);
 xwer_t xwmq_dq(struct xwmq * mq, struct xwmq_msg ** ptrbuf);
-xwer_t xwmq_timedq(struct xwmq * mq, struct xwmq_msg ** ptrbuf, xwtm_t * xwtm);
+xwer_t xwmq_dq_to(struct xwmq * mq, struct xwmq_msg ** ptrbuf, xwtm_t to);
 xwer_t xwmq_trydq(struct xwmq * mq, struct xwmq_msg ** ptrbuf);
 
-xwer_t xwmq_timedselect(struct xwos_sel * sel,
-                        struct xwmq * mqs[], xwsz_t * mqsz,
-                        xwtm_t * xwtm);
 xwer_t xwmq_select(struct xwos_sel * sel,
                    struct xwmq * mqs[], xwsz_t * mqsz);
+xwer_t xwmq_select_to(struct xwos_sel * sel,
+                      struct xwmq * mqs[], xwsz_t * mqsz,
+                      xwtm_t to);
 xwer_t xwmq_tryselect(struct xwos_sel * sel,
                       struct xwmq * mqs[], xwsz_t * mqsz);
 

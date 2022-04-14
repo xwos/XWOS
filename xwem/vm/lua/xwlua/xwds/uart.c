@@ -93,7 +93,7 @@ int xwlua_uart_rx(lua_State * L)
         luaL_buffinit(L, &b);
         rxb = (xwu8_t *)luaL_prepbuffsize(&b, size);
         if (time) {
-                rc = xwds_dmauartc_rx(luart->dmauartc, rxb, &size, &time);
+                rc = xwds_dmauartc_rx(luart->dmauartc, rxb, &size, time);
         } else {
                 rc = xwds_dmauartc_try_rx(luart->dmauartc, rxb, &size);
         }
@@ -130,7 +130,7 @@ int xwlua_uart_tx(lua_State * L)
         } else {
                 time = XWTM_MAX;
         }
-        rc = xwds_dmauartc_tx(luart->dmauartc, txd, &size, &time);
+        rc = xwds_dmauartc_tx(luart->dmauartc, txd, &size, time);
         lua_pushinteger(L, (lua_Integer)rc);
         lua_pushinteger(L, (lua_Integer)size);
         return 1;

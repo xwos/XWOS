@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_osal_sync_sel_h__
@@ -15,6 +15,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/jack/sync/sel.h>
+#include <xwos/osal/time.h>
 
 /**
  * @defgroup xwos_sync_sel 信号选择器
@@ -346,9 +347,7 @@ xwer_t xwos_sel_tryselect(struct xwos_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
  * @param[in] sel: 信号选择器对象的指针
  * @param[in] msk: 同步对象位图掩码，表示只关注掩码内的同步对象
  * @param[out] trg: 指向缓冲区的指针，通过此缓冲区返回已触发的同步对象位图掩码
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -359,13 +358,15 @@ xwer_t xwos_sel_tryselect(struct xwos_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 static __xwos_inline_api
-xwer_t xwos_sel_timedselect(struct xwos_sel * sel,
-                            xwbmp_t msk[], xwbmp_t trg[],
-                            xwtm_t * xwtm)
+xwer_t xwos_sel_select_to(struct xwos_sel * sel,
+                          xwbmp_t msk[], xwbmp_t trg[],
+                          xwtm_t to)
 {
-        return xwosdl_sel_timedselect(&sel->ossel, msk, trg, xwtm);
+        return xwosdl_sel_select_to(&sel->ossel, msk, trg, to);
 }
 
 /**

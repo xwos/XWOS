@@ -137,7 +137,7 @@ int xwlua_mtxsp_lock(lua_State * L)
         int top;
         int type;
         int lkopt;
-        xwtm_t time;
+        xwtm_t to;
         xwer_t rc;
 
         top = lua_gettop(L);
@@ -146,8 +146,8 @@ int xwlua_mtxsp_lock(lua_State * L)
                 type = lua_type(L, 2);
                 switch (type) {
                 case LUA_TNUMBER:
-                        time = (xwtm_t)lua_tonumber(L, 2);
-                        rc = xwos_mtx_timedlock(mtxsp->mtx, &time);
+                        to = (xwtm_t)lua_tonumber(L, 2);
+                        rc = xwos_mtx_lock_to(mtxsp->mtx, to);
                         break;
                 case LUA_TSTRING:
                         lkopt = luaL_checkoption(L, 2, "t", xwlua_mtx_lkopt);

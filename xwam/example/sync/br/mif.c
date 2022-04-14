@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwos/osal/sync/br.h>
 #include <xwam/example/sync/br/mif.h>
 

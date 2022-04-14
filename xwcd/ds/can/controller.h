@@ -275,7 +275,7 @@ void xwds_canc_rxq_publish(struct xwds_canc_rxqueue * rxq,
                            struct xwds_can_msg * msg);
 xwer_t xwds_canc_rxq_acquire(struct xwds_canc_rxqueue * rxq,
                              struct xwds_can_msg * buf,
-                             xwtm_t * xwtm);
+                             xwtm_t to);
 
 /******** ******** Callbacks for driver ******** ********/
 void xwds_canc_drvcb_init_msg(struct xwds_can_msg * msg, xwu32_t canid,

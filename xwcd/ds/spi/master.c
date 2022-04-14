@@ -20,7 +20,6 @@
 
 #include <xwcd/ds/standard.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/osal/skd.h>
 #include <xwos/osal/lock/mtx.h>
 #include <xwcd/ds/spi/master.h>
 
@@ -192,9 +191,7 @@ xwer_t xwds_spim_vop_resume(struct xwds_spim * spim)
  * @brief XWDS API：配置总线
  * @param[in] spim: SPI主机模式控制器对象指针
  * @param[in] cfgid: 总线配置ID
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENOSYS: 不支持配置总线操作
@@ -204,15 +201,16 @@ xwer_t xwds_spim_vop_resume(struct xwds_spim * spim)
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
-xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t * xwtm)
+xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t to)
 {
         const struct xwds_spim_driver * drv;
         xwer_t rc;
 
         XWDS_VALIDATE(spim, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_spim_grab(spim);
         if (__xwcc_unlikely(rc < 0)) {
@@ -227,13 +225,13 @@ xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t * xwtm)
                 goto err_chrng;
         }
 
-        rc = xwos_mtx_timedlock(&spim->xfer.apimtx, xwtm);
+        rc = xwos_mtx_lock_to(&spim->xfer.apimtx, to);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spim_lock;
         }
         drv = xwds_cast(const struct xwds_spim_driver *, spim->dev.drv);
         if (__xwcc_likely((drv) && (drv->buscfg))) {
-                rc = drv->buscfg(spim, cfgid, xwtm);
+                rc = drv->buscfg(spim, cfgid, to);
         } else {
                 rc = -ENOSYS;
         }
@@ -262,9 +260,7 @@ err_spim_grab:
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示缓冲区大小（单位：字节）
  * + (O) 作为输出时，返回实际传输的数据大小
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -273,11 +269,13 @@ err_spim_grab:
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_spim_xfer(struct xwds_spim * spim,
-                      const xwu8_t txd[], xwu8_t * rxb,
-                      xwsz_t * size, xwtm_t * xwtm)
+                      const xwu8_t txd[], xwu8_t * rxb, xwsz_t * size,
+                      xwtm_t to)
 {
         const struct xwds_spim_driver * drv;
         xwer_t rc;
@@ -285,19 +283,18 @@ xwer_t xwds_spim_xfer(struct xwds_spim * spim,
         XWDS_VALIDATE(spim, "nullptr", -EFAULT);
         XWDS_VALIDATE(((txd) || (rxb)), "invalid", -EINVAL);
         XWDS_VALIDATE((size), "nullptr", -EFAULT);
-        XWDS_VALIDATE((xwtm), "nullptr", -EFAULT);
 
         rc = xwds_spim_grab(spim);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spim_grab;
         }
-        rc = xwos_mtx_timedlock(&spim->xfer.apimtx, xwtm);
+        rc = xwos_mtx_lock_to(&spim->xfer.apimtx, to);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spim_lock;
         }
         drv = xwds_cast(const struct xwds_spim_driver *, spim->dev.drv);
         if (__xwcc_likely((drv) && (drv->xfer))) {
-                rc = drv->xfer(spim, txd, rxb, size, xwtm);
+                rc = drv->xfer(spim, txd, rxb, size, to);
         } else {
                 rc = -ENOSYS;
         }
@@ -319,6 +316,7 @@ err_spim_grab:
 /**
  * @brief XWDS API：中止SPI总线传输
  * @param[in] spim: SPI主机控制器对象指针
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 设备对象不可引用
@@ -327,15 +325,16 @@ err_spim_grab:
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
-xwer_t xwds_spim_abort(struct xwds_spim * spim, xwtm_t * xwtm)
+xwer_t xwds_spim_abort(struct xwds_spim * spim, xwtm_t to)
 {
         const struct xwds_spim_driver * drv;
         xwer_t rc;
 
         XWDS_VALIDATE(spim, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_spim_grab(spim);
         if (__xwcc_unlikely(rc < 0)) {
@@ -343,7 +342,7 @@ xwer_t xwds_spim_abort(struct xwds_spim * spim, xwtm_t * xwtm)
         }
         drv = xwds_cast(const struct xwds_spim_driver *, spim->dev.drv);
         if (__xwcc_likely((drv) && (drv->abort))) {
-                rc = drv->abort(spim, xwtm);
+                rc = drv->abort(spim, to);
         } else {
                 rc = -ENOSYS;
         }

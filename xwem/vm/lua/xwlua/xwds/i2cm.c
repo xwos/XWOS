@@ -90,7 +90,7 @@ int xwlua_i2cm_xfer(lua_State * L)
                 } else {
                         time = XWTM_MAX;
                 }
-                rc = xwds_i2cm_xfer(luai2cm->i2cm, &msg, &time);
+                rc = xwds_i2cm_xfer(luai2cm->i2cm, &msg, time);
                 luaL_addsize(&b, msg.size);
                 lua_pushinteger(L, (lua_Integer)rc);
                 luaL_pushresult(&b);
@@ -105,7 +105,7 @@ int xwlua_i2cm_xfer(lua_State * L)
                 } else {
                         time = XWTM_MAX;
                 }
-                rc = xwds_i2cm_xfer(luai2cm->i2cm, &msg, &time);
+                rc = xwds_i2cm_xfer(luai2cm->i2cm, &msg, time);
                 lua_pushinteger(L, (lua_Integer)rc);
                 ret = 1;
         }

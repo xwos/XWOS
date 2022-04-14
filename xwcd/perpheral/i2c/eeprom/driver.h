@@ -34,16 +34,16 @@ struct xwds_eeprom_driver {
         struct xwds_i2cp_driver i2cp; /**< C语言面向对象：继承struct xwds_i2cp_driver */
         xwer_t (* putc)(struct xwds_eeprom * /*eeprom*/,
                         xwu8_t /*data*/, xwptr_t /*addr*/,
-                        xwtm_t * /*xwtm*/);
+                        xwtm_t /*to*/);
         xwer_t (* getc)(struct xwds_eeprom * /*eeprom*/,
                         xwu8_t * /*buf*/, xwptr_t /*addr*/,
-                        xwtm_t * /*xwtm*/);
+                        xwtm_t /*to*/);
         xwer_t (* pgwrite)(struct xwds_eeprom * /*eeprom*/,
                            xwu8_t * /*data*/, xwsz_t * /*size*/, xwsq_t /*pgidx*/,
-                           xwtm_t * /*xwtm*/);
+                           xwtm_t /*to*/);
         xwer_t (* pgread)(struct xwds_eeprom * /*eeprom*/,
                           xwu8_t * /*buf*/, xwsz_t * /*size*/, xwsq_t /*pgidx*/,
-                          xwtm_t * /*xwtm*/);
+                          xwtm_t /*to*/);
 };
 
 extern const struct xwds_eeprom_driver at24sd_drv;
@@ -64,16 +64,16 @@ xwer_t xwds_eeprom_wp_enable(struct xwds_eeprom * eeprom);
 xwer_t xwds_eeprom_wp_disable(struct xwds_eeprom * eeprom);
 xwer_t xwds_eeprom_putc(struct xwds_eeprom * eeprom,
                         xwu8_t data, xwptr_t addr,
-                        xwtm_t * xwtm);
+                        xwtm_t to);
 xwer_t xwds_eeprom_getc(struct xwds_eeprom * eeprom,
                         xwu8_t * buf, xwptr_t addr,
-                        xwtm_t * xwtm);
+                        xwtm_t to);
 xwer_t xwds_eeprom_pgwrite(struct xwds_eeprom * eeprom,
                            xwu8_t * data, xwsz_t * size, xwsq_t pgidx,
-                           xwtm_t * xwtm);
+                           xwtm_t to);
 xwer_t xwds_eeprom_pgread(struct xwds_eeprom * eeprom,
                           xwu8_t * buf, xwsz_t * size, xwsq_t pgidx,
-                          xwtm_t * xwtm);
-xwer_t xwds_eeprom_reset(struct xwds_eeprom * eeprom, xwtm_t * xwtm);
+                          xwtm_t to);
+xwer_t xwds_eeprom_reset(struct xwds_eeprom * eeprom, xwtm_t to);
 
 #endif /* xwcd/perpheral/i2c/eeprom/driver.h */

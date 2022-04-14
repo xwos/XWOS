@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  * @note
  * XWOS中所有.c文件的顶级头文件，此头文件中包含了一些基本定义：
  * - 配置
@@ -32,6 +32,12 @@
 #endif
 
 /**
+ * @defgroup xwos_standard XWOS标准头文件
+ * @ingroup xwos
+ * @{
+ */
+
+/**
  * @brief 接口
  */
 #define interface struct
@@ -46,20 +52,27 @@
 
 #if defined(XWKNCFG_BUG) && (1 == XWKNCFG_BUG)
 #  if defined(SOCCFG_BKPT) && (1 == SOCCFG_BKPT)
-#    define XWOS_BUG()          soc_bkpt()
+#    define XWOS_BUG()          soc_bkpt() /**< 报告BUG */
 #  else
-#    define XWOS_BUG()          do {} while (1)
+#    define XWOS_BUG()          do {} while (1) /**< 报告BUG */
 #  endif
-#  define XWOS_BUG_ON(x)        if (__xwcc_unlikely(x)) XWOS_BUG()
+#  define XWOS_BUG_ON(x)        if (__xwcc_unlikely(x)) XWOS_BUG() /**< 当条件x成立时报告BUG */
 #else
-#  define XWOS_BUG()
-#  define XWOS_BUG_ON(x)
+#  define XWOS_BUG() /**< 报告BUG */
+#  define XWOS_BUG_ON(x) /**< 当条件x成立时报告BUG */
 #endif
 
-#define XWOS_UNUSED_ARGUMENT    0
+#define XWOS_UNUSED_ARGUMENT    0 /**< 未使用的参数的占位符 */
 
 #define XWOS_UNUSED(x)          ((void)(x))     /**< 去除未使用变量的警告 */
 
+
+/**
+ * @brief 检查函数参数是否有效
+ * @param[in] exp: 条件表达式
+ * @param[in] errstr: 条件表达式为假时的错误信息
+ * @param[in] ...: 返回值
+ */
 #if defined(XWKNCFG_CHECK_PARAMETERS) && (1 == XWKNCFG_CHECK_PARAMETERS)
 #  define XWOS_VALIDATE(exp, errstr, ...)       \
           if (__xwcc_unlikely((!(exp)))) {      \
@@ -69,23 +82,22 @@
 #  define XWOS_VALIDATE(exp, errstr, ...)
 #endif
 
-#define XWOS_VALIDATE_FORCE(exp, errstr, ...)   \
-        if (__xwcc_unlikely((!(exp)))) {        \
-                return __VA_ARGS__;             \
-        }
-
 #if defined(ARCHCFG_PTRSIZE)
-#  define XWOS_PTRSIZE          (ARCHCFG_PTRSIZE)
+#  define XWOS_PTRSIZE          (ARCHCFG_PTRSIZE) /**< 指针的长度 */
 #else
 #  if (1 == ARCHCFG_16BIT)
-#    define XWOS_PTRSIZE        4
+#    define XWOS_PTRSIZE        4 /**< 指针的长度 */
 #  elif (1 == ARCHCFG_32BIT)
-#    define XWOS_PTRSIZE        4
+#    define XWOS_PTRSIZE        4 /**< 指针的长度 */
 #  elif (1 == ARCHCFG_64BIT)
-#    define XWOS_PTRSIZE        8
+#    define XWOS_PTRSIZE        8 /**< 指针的长度 */
 #  else
 #    error "Unkown CPU bits!"
 #  endif
 #endif
+
+/**
+ * @} xwos_standard
+ */
 
 #endif /* xwos/standard.h */

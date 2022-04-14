@@ -182,7 +182,7 @@ const char * const xwlua_sem_opt[] = {"t", NULL};
 int xwlua_semsp_wait(lua_State * L)
 {
         xwlua_sem_sp * semsp;
-        xwtm_t time;
+        xwtm_t to;
         int opt;
         int type;
         int top;
@@ -194,8 +194,8 @@ int xwlua_semsp_wait(lua_State * L)
                 type = lua_type(L, 2);
                 switch (type) {
                 case LUA_TNUMBER:
-                        time = (xwtm_t)lua_tonumber(L, 2);
-                        rc = xwos_sem_timedwait(semsp->sem, &time);
+                        to = (xwtm_t)lua_tonumber(L, 2);
+                        rc = xwos_sem_wait_to(semsp->sem, to);
                         break;
                 case LUA_TSTRING:
                         opt = luaL_checkoption(L, 2, "t", xwlua_sem_opt);

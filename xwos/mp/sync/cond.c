@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  * @note
  * - 锁的顺序：同级的锁不可同时获得
  *   + ① 等待队列的锁（plwq->lock）
@@ -64,12 +64,19 @@ static __xwmp_code
 xwer_t xwmp_cond_broadcast_once(struct xwmp_cond * cond, bool * retry);
 
 static __xwmp_code
-xwer_t xwmp_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
-                                                struct xwmp_thd * thd,
-                                                void * lock, xwsq_t lktype,
-                                                void * lkdata,
-                                                xwtm_t * xwtm, xwsq_t * lkst,
-                                                xwreg_t cpuirq);
+xwer_t xwmp_cond_test(struct xwmp_cond * cond,
+                      struct xwmp_skd * xwskd, struct xwmp_thd * thd,
+                      void * lock, xwsq_t lktype, void * lkdata,
+                      xwtm_t to, xwsq_t * lkst);
+
+static __xwmp_code
+xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
+                                           struct xwmp_skd * xwskd,
+                                           struct xwmp_thd * thd,
+                                           void * lock, xwsq_t lktype,
+                                           void * lkdata,
+                                           xwtm_t to, xwsq_t * lkst,
+                                           xwreg_t cpuirq);
 
 #if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
 /**
@@ -494,40 +501,50 @@ xwer_t xwmp_cond_broadcast(struct xwmp_cond * cond)
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
 
         rc = xwmp_cond_grab(cond);
-        if (__xwcc_likely(XWOK == rc)) {
-                retry = false;
-                do {
-                        rc = xwmp_cond_broadcast_once(cond, &retry);
-                } while (retry);
-#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
-                if (__xwcc_likely(XWOK == rc)) {
-                        struct xwmp_evt * evt;
-                        struct xwmp_synobj * synobj;
-                        xwreg_t cpuirq;
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_cond_grab;
+        }
 
-                        synobj = &cond->synobj;
-                        xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
-                        xwmb_mp_load_acquire(struct xwmp_evt *,
-                                             evt, &synobj->sel.evt);
-                        if (NULL != evt) {
-                                xwmp_sel_obj_s1i(evt, synobj);
-                        }
-                        xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
+        retry = false;
+        do {
+                rc = xwmp_cond_broadcast_once(cond, &retry);
+        } while (retry);
+#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+        if (__xwcc_likely(XWOK == rc)) {
+                struct xwmp_evt * evt;
+                struct xwmp_synobj * synobj;
+                xwreg_t cpuirq;
+
+                synobj = &cond->synobj;
+                xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
+                xwmb_mp_load_acquire(struct xwmp_evt *, evt, &synobj->sel.evt);
+                if (NULL != evt) {
+                        xwmp_sel_obj_s1i(evt, synobj);
                 }
+                xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
+        }
 #endif
-                xwmp_cond_put(cond);
-        }/* else {} */
+        xwmp_cond_put(cond);
+        return rc;
+
+err_cond_grab:
         return rc;
 }
 
-__xwmp_code
-xwer_t xwmp_cond_do_unicast(struct xwmp_cond * cond)
+__xwmp_api
+xwer_t xwmp_cond_unicast(struct xwmp_cond * cond)
 {
         struct xwmp_wqn * wqn;
         xwmp_wqn_f cb;
         xwreg_t cpuirq;
         xwer_t rc;
 
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+
+        rc = xwmp_cond_grab(cond);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_cond_grab;
+        }
         xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
         if (__xwcc_unlikely(cond->count < 0)) {
                 xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
@@ -548,48 +565,32 @@ xwer_t xwmp_cond_do_unicast(struct xwmp_cond * cond)
                         cb(wqn->owner);
                 } else {
                         xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
+                        xwmp_cond_put(cond);
                 }
                 rc = XWOK;
         }
         return rc;
-}
 
-__xwmp_api
-xwer_t xwmp_cond_unicast(struct xwmp_cond * cond)
-{
-        xwer_t rc;
-
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-
-        rc = xwmp_cond_grab(cond);
-        if (__xwcc_likely(XWOK == rc)) {
-                rc = xwmp_cond_do_unicast(cond);
-        }/* else {} */
+err_cond_grab:
         return rc;
 }
 
 static __xwmp_code
-xwer_t xwmp_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
-                                                struct xwmp_thd * thd,
-                                                void * lock, xwsq_t lktype,
-                                                void * lkdata,
-                                                xwtm_t * xwtm, xwsq_t * lkst,
-                                                xwreg_t cpuirq)
+xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
+                                           struct xwmp_skd * xwskd,
+                                           struct xwmp_thd * thd,
+                                           void * lock, xwsq_t lktype,
+                                           void * lkdata,
+                                           xwtm_t to, xwsq_t * lkst,
+                                           xwreg_t cpuirq)
 {
         xwer_t rc;
         xwpr_t dprio;
         xwsq_t wkuprs;
         xwsq_t reason;
-        xwtm_t expected, currtick;
-        struct xwmp_skd * xwskd;
         struct xwmp_tt * xwtt;
-        struct xwmp_syshwt * hwt;
 
-        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &thd->xwskd);
         xwtt = &xwskd->tt;
-        hwt = &xwtt->hwt;
-        currtick = xwmp_syshwt_get_timetick(hwt);
-        expected = xwtm_add_safely(currtick, *xwtm);
 
         xwmp_splk_lock(&thd->stlock);
         XWOS_BUG_ON((XWMP_SKDOBJ_DST_BLOCKING | XWMP_SKDOBJ_DST_SLEEPING |
@@ -624,7 +625,7 @@ xwer_t xwmp_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         xwmp_splk_lock(&thd->stlock);
         xwbop_s1m(xwsq_t, &thd->state, XWMP_SKDOBJ_DST_SLEEPING);
         xwmp_splk_unlock(&thd->stlock);
-        xwmp_thd_tt_add_locked(thd, xwtt, expected, cpuirq);
+        xwmp_thd_tt_add_locked(thd, xwtt, to, cpuirq);
         xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
 
         /* 调度 */
@@ -659,9 +660,7 @@ xwer_t xwmp_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
                 }/* else {} */
                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 if (__xwcc_likely(XWOS_LKST_UNLOCKED == *lkst)) {
-                        currtick = xwmp_syshwt_get_timetick(hwt);
-                        *xwtm = xwtm_sub(expected, currtick);
-                        rc = xwmp_thd_do_lock(lock, lktype, xwtm, lkdata);
+                        rc = xwmp_thd_do_lock(lock, lktype, to, lkdata);
                         if (XWOK == rc) {
                                 *lkst = XWOS_LKST_LOCKED;
                         }/* else {} */
@@ -693,13 +692,10 @@ xwer_t xwmp_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
                                 rc = -EINTR;
                         } else if (XWMP_WQN_REASON_UP == reason) {
                                 if (__xwcc_likely(XWOS_LKST_UNLOCKED == *lkst)) {
-                                        currtick = xwmp_syshwt_get_timetick(hwt);
-                                        *xwtm = xwtm_sub(expected, currtick);
-                                        rc = xwmp_thd_do_lock(lock, lktype, xwtm,
-                                                              lkdata);
+                                        rc = xwmp_thd_do_lock(lock, lktype, to, lkdata);
                                         if (XWOK == rc) {
                                                 *lkst = XWOS_LKST_LOCKED;
-                                        }/* else {} */
+                                        }
                                 }/* else {} */
                                 rc = XWOK;
                         } else {
@@ -731,10 +727,7 @@ xwer_t xwmp_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
                                 rc = -EINTR;
                         } else if (XWMP_WQN_REASON_UP == reason) {
                                 if (__xwcc_likely(XWOS_LKST_UNLOCKED == *lkst)) {
-                                        currtick = xwmp_syshwt_get_timetick(hwt);
-                                        *xwtm = xwtm_sub(expected, currtick);
-                                        rc = xwmp_thd_do_lock(lock, lktype, xwtm,
-                                                              lkdata);
+                                        rc = xwmp_thd_do_lock(lock, lktype, to, lkdata);
                                         if (XWOK == rc) {
                                                 *lkst = XWOS_LKST_LOCKED;
                                         }
@@ -749,8 +742,6 @@ xwer_t xwmp_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
                 XWOS_BUG();
                 rc = -EBUG;
         }
-        currtick = xwmp_syshwt_get_timetick(hwt);
-        *xwtm = xwtm_sub(expected, currtick);
         return rc;
 
 err_intr:
@@ -758,15 +749,14 @@ err_intr:
 }
 
 __xwmp_code
-xwer_t xwmp_cond_do_timedwait(struct xwmp_cond * cond, struct xwmp_thd * thd,
-                              void * lock, xwsq_t lktype, void * lkdata,
-                              xwtm_t * xwtm, xwsq_t * lkst)
+xwer_t xwmp_cond_test(struct xwmp_cond * cond,
+                      struct xwmp_skd * xwskd, struct xwmp_thd * thd,
+                      void * lock, xwsq_t lktype, void * lkdata,
+                      xwtm_t to, xwsq_t * lkst)
 {
-        struct xwmp_skd * xwskd;
         xwreg_t cpuirq;
         xwer_t rc;
 
-        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &thd->xwskd);
         xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
         rc = xwmp_skd_wakelock_lock(xwskd);
         if (__xwcc_unlikely(rc < 0)) {
@@ -774,9 +764,9 @@ xwer_t xwmp_cond_do_timedwait(struct xwmp_cond * cond, struct xwmp_thd * thd,
                 xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
                 rc = -EINTR;
         } else {
-                rc = xwmp_cond_do_timedblkthd_unlkwq_cpuirqrs(cond, thd,
-                                                              lock, lktype, lkdata,
-                                                              xwtm, lkst, cpuirq);
+                rc = xwmp_cond_blkthd_to_unlkwq_cpuirqrs(cond, xwskd, thd,
+                                                         lock, lktype, lkdata,
+                                                         to, lkst, cpuirq);
                 xwmp_skd_wakelock_unlock(xwskd);
         }
         return rc;
@@ -787,45 +777,48 @@ xwer_t xwmp_cond_wait(struct xwmp_cond * cond,
                       void * lock, xwsq_t lktype,
                       void * lkdata, xwsq_t * lkst)
 {
-        xwtm_t expected = XWTM_MAX;
-        return xwmp_cond_timedwait(cond, lock, lktype, lkdata,
-                                   &expected, lkst);
+        return xwmp_cond_wait_to(cond, lock, lktype, lkdata, XWTM_MAX, lkst);
 }
 
 __xwmp_api
-xwer_t xwmp_cond_timedwait(struct xwmp_cond * cond,
-                           void * lock, xwsq_t lktype, void * lkdata,
-                           xwtm_t * xwtm, xwsq_t * lkst)
+xwer_t xwmp_cond_wait_to(struct xwmp_cond * cond,
+                         void * lock, xwsq_t lktype, void * lkdata,
+                         xwtm_t to, xwsq_t * lkst)
 {
         struct xwmp_thd * cthd;
+        struct xwmp_skd * xwskd;
+        struct xwmp_syshwt * hwt;
+        xwtm_t now;
         xwer_t rc;
 
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-        XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
         XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
-        XWOS_VALIDATE((xwtm_cmp(*xwtm, 0) >= 0), "out-of-time", -ETIMEDOUT);
         XWOS_VALIDATE((lktype < XWOS_LK_NUM), "invalid-type", -EINVAL);
         XWOS_VALIDATE((((NULL == lock) && (XWOS_LK_NONE == lktype)) ||
                        ((lock) && (lktype > XWOS_LK_NONE))),
                       "invalid-lock", -EINVAL);
-        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)),
-                      "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
 
         *lkst = XWOS_LKST_LOCKED;
         cthd = xwmp_skd_get_cthd_lc();
-        if (__xwcc_unlikely(0 == xwtm_cmp(*xwtm, 0))) {
+        xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
+        hwt = &xwskd->tt.hwt;
+        now = xwmp_syshwt_get_timetick(hwt);
+        if (__xwcc_unlikely(xwtm_cmp(to, now) < 0)) {
+                rc = -ETIMEDOUT;
+        } else if (__xwcc_unlikely(xwtm_cmp(to, now) == 0)) {
                 rc = xwmp_thd_do_unlock(lock, lktype, lkdata);
                 if (XWOK == rc) {
                         *lkst = XWOS_LKST_UNLOCKED;
-                }/* else {} */
+                }
                 rc = -ETIMEDOUT;
         } else {
                 rc = xwmp_cond_grab(cond);
                 if (__xwcc_likely(XWOK == rc)) {
-                        rc = xwmp_cond_do_timedwait(cond, cthd, lock, lktype, lkdata,
-                                                    xwtm, lkst);
+                        rc = xwmp_cond_test(cond, xwskd, cthd,
+                                            lock, lktype, lkdata, to, lkst);
                         xwmp_cond_put(cond);
-                }/* else {} */
+                }
         }
         return rc;
 }

@@ -28,7 +28,6 @@
 
 #include <xwcd/ds/standard.h>
 #include <string.h>
-#include <xwos/osal/skd.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/lock/mtx.h>
 #include <xwos/osal/sync/sem.h>
@@ -218,9 +217,7 @@ xwer_t xwds_dmauartc_vop_resume(struct xwds_dmauartc * dmauartc)
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示缓冲区大小（单位：字节）
  * + (O) 作为输出时，返回实际读取的数据大小
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -228,11 +225,13 @@ xwer_t xwds_dmauartc_vop_resume(struct xwds_dmauartc * dmauartc)
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
                         xwu8_t * buf, xwsz_t * size,
-                        xwtm_t * xwtm)
+                        xwtm_t to)
 {
         xwsz_t available, real, cp, rest_buffer_size;
         xwsq_t pos;
@@ -242,7 +241,6 @@ xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
         XWDS_VALIDATE(dmauartc, "nullptr", -EFAULT);
         XWDS_VALIDATE(buf, "nullptr", -EFAULT);
         XWDS_VALIDATE(size, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         pos = 0;
         rc = xwds_dmauartc_grab(dmauartc);
@@ -251,9 +249,9 @@ xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
         }
         rest_buffer_size = *size;
         while (rest_buffer_size) {
-                rc = xwos_sem_timedwait(&dmauartc->rxq.sem, xwtm);
+                rc = xwos_sem_wait_to(&dmauartc->rxq.sem, to);
                 if (__xwcc_unlikely(rc < 0)) {
-                        goto err_sem_timedwait;
+                        goto err_sem_wait_to;
                 }
                 xwos_splk_lock_cpuirqsv(&dmauartc->rxq.lock, &cpuirq);
                 if (dmauartc->rxq.tail >= dmauartc->rxq.pos) {
@@ -283,7 +281,7 @@ xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
         *size = pos;
         return XWOK;
 
-err_sem_timedwait:
+err_sem_wait_to:
         xwds_dmauartc_put(dmauartc);
 err_dmauartc_grab:
         *size = pos;
@@ -371,9 +369,7 @@ err_dmauartc_grab:
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示期望发送的数据的大小（单位：字节）
  * + (O) 作为输出时，返回实际发送的数据大小
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -381,14 +377,16 @@ err_dmauartc_grab:
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
                         const xwu8_t * data, xwsz_t * size,
-                        xwtm_t * xwtm)
+                        xwtm_t to)
 {
-        xwer_t rc;
         const struct xwds_dmauartc_driver * drv;
+        xwer_t rc;
 
         XWDS_VALIDATE(dmauartc, "nullptr", -EFAULT);
         XWDS_VALIDATE(data, "nullptr", -EFAULT);
@@ -398,13 +396,13 @@ xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmauartc_grab;
         }
-        rc = xwos_mtx_timedlock(&dmauartc->txmtx, xwtm);
+        rc = xwos_mtx_lock_to(&dmauartc->txmtx, to);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmauartc_lock;
         }
         drv = xwds_cast(const struct xwds_dmauartc_driver *, dmauartc->dev.drv);
         if ((drv) && (drv->tx)) {
-                rc = drv->tx(dmauartc, data, size, xwtm);
+                rc = drv->tx(dmauartc, data, size, to);
         } else {
                 rc = -ENOSYS;
         }
@@ -427,9 +425,7 @@ err_dmauartc_grab:
  * @brief XWDS API：直接发送一个字节（非DMA模式）
  * @param[in] dmauartc: DMA UART控制器对象指针
  * @param[in] byte: 待发送的字节
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -437,23 +433,24 @@ err_dmauartc_grab:
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_dmauartc_putc(struct xwds_dmauartc * dmauartc,
                           const xwu8_t byte,
-                          xwtm_t * xwtm)
+                          xwtm_t to)
 {
         xwer_t rc;
         const struct xwds_dmauartc_driver * drv;
 
         XWDS_VALIDATE(dmauartc, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_dmauartc_grab(dmauartc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmauartc_grab;
         }
-        rc = xwos_mtx_timedlock(&dmauartc->txmtx, xwtm);
+        rc = xwos_mtx_lock_to(&dmauartc->txmtx, to);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmauartc_lock;
         }

@@ -196,7 +196,7 @@ int xwlua_condsp_wait(lua_State * L)
         int top;
         xwsq_t lktype;
         xwsq_t lkst;
-        xwtm_t time;
+        xwtm_t to;
         int isnum;
         xwer_t rc;
 
@@ -205,11 +205,11 @@ int xwlua_condsp_wait(lua_State * L)
         if (1 == top) {
                 lktype = XWOS_LK_NONE;
                 ulock.anon = NULL;
-                time = XWTM_MAX;
+                to = XWTM_MAX;
         } else if (LUA_TNIL == lua_type(L, 2)) {
                 lktype = XWOS_LK_NONE;
                 ulock.anon = NULL;
-                time = XWTM_MAX;
+                to = XWTM_MAX;
         } else {
                 do {
                         ulualksp.ud = luaL_testudata(L, 2, "xwlua_mtx_sp");
@@ -254,12 +254,12 @@ int xwlua_condsp_wait(lua_State * L)
                         lktype = XWOS_LK_NONE;
                         ulock.anon = NULL;
                 } while (false);
-                time = (xwtm_t)lua_tonumberx(L, 3, &isnum);
+                to = (xwtm_t)lua_tonumberx(L, 3, &isnum);
                 if (!isnum) {
-                        time = XWTM_MAX;
+                        to = XWTM_MAX;
                 }
         }
-        rc = xwos_cond_timedwait(condsp->cond, ulock, lktype, NULL, &time, &lkst);
+        rc = xwos_cond_wait_to(condsp->cond, ulock, lktype, NULL, to, &lkst);
         lua_pushinteger(L, (lua_Integer)rc);
         return 1;
 }

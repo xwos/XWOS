@@ -43,7 +43,7 @@ struct xwds_dmauartc_driver {
                        const struct xwds_uart_cfg * /*cfg*/); /**< 配置UART控制器 */
         xwer_t (* tx)(struct xwds_dmauartc * /*dmauartc*/,
                       const xwu8_t * /*data*/, xwsz_t * /*size*/,
-                      xwtm_t * /*xwtm*/); /**< 配置DMA通道并发送 */
+                      xwtm_t /*to*/); /**< 配置DMA通道并发送 */
         xwer_t (* putc)(struct xwds_dmauartc * /*dmauartc*/,
                         const xwu8_t /*byte*/); /**< 发送一个字节 */
 };
@@ -78,15 +78,15 @@ void xwds_dmauartc_destruct(struct xwds_dmauartc * dmauartc);
 
 xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
                         xwu8_t * buf, xwsz_t * size,
-                        xwtm_t * xwtm);
+                        xwtm_t to);
 xwer_t xwds_dmauartc_try_rx(struct xwds_dmauartc * dmauartc,
                             xwu8_t * buf, xwsz_t * size);
 xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
                         const xwu8_t * data, xwsz_t * size,
-                        xwtm_t * xwtm);
+                        xwtm_t to);
 xwer_t xwds_dmauartc_putc(struct xwds_dmauartc * dmauartc,
                           const xwu8_t byte,
-                          xwtm_t * xwtm);
+                          xwtm_t to);
 xwer_t xwds_dmauartc_cfg(struct xwds_dmauartc * dmauartc,
                          const struct xwds_uart_cfg * cfg);
 

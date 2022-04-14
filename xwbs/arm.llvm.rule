@@ -131,7 +131,7 @@ endif
 
 LDFLAGS = -mthumb -mabi=aapcs -m$(ENDIAN) --sysroot=$(SYSROOT) -nostdlib \
           -L$(XuanWuOS_SOC_DIR) -T$(XuanWuOS_BRD_DIR)/$(XuanWuOS_CFG_LDSCRIPT) \
-          -Wl,--gc-sections \
+          -Wl,--gc-sections -Wl,-z,norelro \
           -Wl,-Map=$(XuanWuOS_WKSPC_DIR)/$(TARGET).map,--cref
 
 # colorfully build

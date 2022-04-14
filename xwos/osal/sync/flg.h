@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_osal_sync_flg_h__
@@ -15,6 +15,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/jack/sync/flg.h>
+#include <xwos/osal/time.h>
 #include <xwos/osal/sync/sel.h>
 
 /**
@@ -605,9 +606,7 @@ xwer_t xwos_flg_trywait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
  *   - (I) 作为输入时，作为用于比较的初始值
  *   - (O) 作为输出时，返回事件对象中位图状态（可作为下一次调用的初始值）
  * @param[in] msk: 事件的位图掩码，表示只关注掩码部分的事件
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -619,13 +618,15 @@ xwer_t xwos_flg_trywait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 static __xwos_inline_api
-xwer_t xwos_flg_timedwait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
-                          xwbmp_t origin[], xwbmp_t msk[],
-                          xwtm_t * xwtm)
+xwer_t xwos_flg_wait_to(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
+                        xwbmp_t origin[], xwbmp_t msk[],
+                        xwtm_t to)
 {
-        return xwosdl_flg_timedwait(&flg->osflg, trigger, action, origin, msk, xwtm);
+        return xwosdl_flg_wait_to(&flg->osflg, trigger, action, origin, msk, to);
 }
 
 /**

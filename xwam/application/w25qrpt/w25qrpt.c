@@ -24,7 +24,7 @@
 #include <xwos/lib/crc32.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/mm/common.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/device.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/driver.h>
 #include <xwam/application/w25qrpt/w25qrpt.h>
@@ -46,7 +46,6 @@ xwer_t w25qrpt_start(struct w25qrpt * w25qrpt,
                      void * hwifcb)
 {
         xwer_t rc;
-        xwtm_t timeout;
         struct xwos_thd_attr attr;
 
         XWOS_VALIDATE((w25qrpt), "nullptr", -EFAULT);
@@ -60,14 +59,12 @@ xwer_t w25qrpt_start(struct w25qrpt * w25qrpt,
         w25qrpt->name = name;
         w25qrpt->hwifops = hwifops;
 
-        timeout = XWTM_MAX;
-        rc = xwds_w25qxx_reset(flash, &timeout);
+        rc = xwds_w25qxx_reset(flash, XWTM_MAX);
         if (rc < 0) {
                 goto err_flash_reset;
         }
 
-        timeout = XWTM_MAX;
-        rc = xwds_w25qxx_init_parameter(flash, &timeout);
+        rc = xwds_w25qxx_init_parameter(flash, XWTM_MAX);
         if (rc < 0) {
                 goto err_flash_init_parameter;
         }
@@ -344,7 +341,6 @@ static
 xwer_t w25qrpt_rpc_erase_chip(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
 {
         struct xwds_w25qxx * w25qxx;
-        xwtm_t timeout;
         xwsq_t i;
         xwer_t rc;
         xwu8_t oprc;
@@ -356,8 +352,7 @@ xwer_t w25qrpt_rpc_erase_chip(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg
 
         w25qxx = w25qrpt->flash;
         sdusize = 0;
-        timeout = 300 * XWTM_S;
-        rc = xwds_w25qxx_erase_chip(w25qxx, &timeout);
+        rc = xwds_w25qxx_erase_chip(w25qxx, xwtm_ft(300 * XWTM_S));
         switch (rc) {
         case XWOK:
                 oprc = W25QRPT_ERR_NONE;
@@ -427,7 +422,6 @@ static
 xwer_t w25qrpt_rpc_erase_sector(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
 {
         struct xwds_w25qxx * w25qxx;
-        xwtm_t timeout;
         xwsq_t i;
         xwer_t rc;
         xwu32_t address;
@@ -443,8 +437,7 @@ xwer_t w25qrpt_rpc_erase_sector(struct w25qrpt * w25qrpt, struct w25qrpt_msg * m
         address |= ((xwu32_t)msg->address[1] << 16U);
         address |= ((xwu32_t)msg->address[2] << 8U);
         address |= ((xwu32_t)msg->address[3] << 0U);
-        timeout = 2 * XWTM_S;
-        rc = xwds_w25qxx_erase_sector(w25qxx, address, &timeout);
+        rc = xwds_w25qxx_erase_sector(w25qxx, address, xwtm_ft(2 * XWTM_S));
         switch (rc) {
         case XWOK:
                 oprc = W25QRPT_ERR_NONE;
@@ -512,7 +505,6 @@ static
 xwer_t w25qrpt_rpc_erase_32kblock(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
 {
         struct xwds_w25qxx * w25qxx;
-        xwtm_t timeout;
         xwsq_t i;
         xwer_t rc;
         xwu32_t address;
@@ -528,8 +520,7 @@ xwer_t w25qrpt_rpc_erase_32kblock(struct w25qrpt * w25qrpt, struct w25qrpt_msg *
         address |= ((xwu32_t)msg->address[1] << 16U);
         address |= ((xwu32_t)msg->address[2] << 8U);
         address |= ((xwu32_t)msg->address[3] << 0U);
-        timeout = 8 * XWTM_S;
-        rc = xwds_w25qxx_erase_32kblk(w25qxx, address, &timeout);
+        rc = xwds_w25qxx_erase_32kblk(w25qxx, address, xwtm_ft(8 * XWTM_S));
         switch (rc) {
         case XWOK:
                 oprc = W25QRPT_ERR_NONE;
@@ -597,7 +588,6 @@ static
 xwer_t w25qrpt_rpc_erase_64kblock(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
 {
         struct xwds_w25qxx * w25qxx;
-        xwtm_t timeout;
         xwsq_t i;
         xwer_t rc;
         xwu32_t address;
@@ -613,8 +603,7 @@ xwer_t w25qrpt_rpc_erase_64kblock(struct w25qrpt * w25qrpt, struct w25qrpt_msg *
         address |= ((xwu32_t)msg->address[1] << 16U);
         address |= ((xwu32_t)msg->address[2] << 8U);
         address |= ((xwu32_t)msg->address[3] << 0U);
-        timeout = 16 * XWTM_S;
-        rc = xwds_w25qxx_erase_64kblk(w25qxx, address, &timeout);
+        rc = xwds_w25qxx_erase_64kblk(w25qxx, address, xwtm_ft(16 * XWTM_S));
         switch (rc) {
         case XWOK:
                 oprc = W25QRPT_ERR_NONE;
@@ -682,7 +671,6 @@ static
 xwer_t w25qrpt_rpc_write(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
 {
         struct xwds_w25qxx * w25qxx;
-        xwtm_t timeout;
         xwsq_t i;
         xwer_t rc;
         xwu32_t address;
@@ -700,8 +688,8 @@ xwer_t w25qrpt_rpc_write(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
         address |= ((xwu32_t)msg->address[2] << 8U);
         address |= ((xwu32_t)msg->address[3] << 0U);
         wrsz = w25qrpt_get_sdu_size(msg);
-        timeout = 1000 * XWTM_MS;
-        rc = xwds_w25qxx_write(w25qxx, address, msg->sdu, &wrsz, &timeout);
+        rc = xwds_w25qxx_write(w25qxx, address, msg->sdu, &wrsz,
+                               xwtm_ft(1000 * XWTM_MS));
         switch (rc) {
         case XWOK:
                 oprc = W25QRPT_ERR_NONE;
@@ -773,7 +761,6 @@ static
 xwer_t w25qrpt_rpc_read(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
 {
         struct xwds_w25qxx * w25qxx;
-        xwtm_t timeout;
         xwsq_t i;
         xwer_t rc;
         xwu32_t address;
@@ -794,8 +781,8 @@ xwer_t w25qrpt_rpc_read(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
         rdsz |= ((xwu32_t)msg->sdu[1] << 16U);
         rdsz |= ((xwu32_t)msg->sdu[2] << 8U);
         rdsz |= ((xwu32_t)msg->sdu[3] << 0U);
-        timeout = 1000 * XWTM_MS;
-        rc = xwds_w25qxx_read(w25qxx, address, msg->sdu, &rdsz, &timeout);
+        rc = xwds_w25qxx_read(w25qxx, address, msg->sdu, &rdsz,
+                              xwtm_ft(1000 * XWTM_MS));
         switch (rc) {
         case XWOK:
                 oprc = W25QRPT_ERR_NONE;

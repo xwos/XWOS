@@ -21,7 +21,7 @@
 #include <xwcd/ds/standard.h>
 #include <string.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/lock/mtx.h>
 #include <xwos/osal/lock/seqlock.h>
 #include <xwos/osal/sync/sem.h>
 #include <xwcd/ds/uart/general.h>
@@ -388,9 +388,7 @@ err_uartc_grab:
  * @brief XWDS API：从接收队列中获取一个字节的数据
  * @param[in] uartc: UART控制器对象指针
  * @param[out] buf: 指向缓冲区的指针，此缓冲区被用于返回数据
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -398,24 +396,25 @@ err_uartc_grab:
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
-xwer_t xwds_uartc_getc(struct xwds_uartc * uartc, xwu8_t * buf, xwtm_t * xwtm)
+xwer_t xwds_uartc_getc(struct xwds_uartc * uartc, xwu8_t * buf, xwtm_t to)
 {
         xwer_t rc;
         xwreg_t cpuirq;
 
         XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
         XWDS_VALIDATE(buf, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
-        rc = xwos_sem_timedwait(&uartc->rxsem, xwtm);
+        rc = xwos_sem_wait_to(&uartc->rxsem, to);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_sem_timedwait;
+                goto err_sem_wait_to;
         }
         xwos_sqlk_wr_lock_cpuirqsv(&uartc->rxseqlock, &cpuirq);
         *buf = uartc->rxq[uartc->rxpos];
@@ -427,7 +426,7 @@ xwer_t xwds_uartc_getc(struct xwds_uartc * uartc, xwu8_t * buf, xwtm_t * xwtm)
         xwds_uartc_put(uartc);
         return XWOK;
 
-err_sem_timedwait:
+err_sem_wait_to:
         xwds_uartc_put(uartc);
 err_uartc_grab:
         return rc;
@@ -485,9 +484,7 @@ err_uartc_grab:
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示缓冲区大小（单位：字节）
  * + (O) 作为输出时，返回实际读取的数据大小
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -495,11 +492,13 @@ err_uartc_grab:
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
                      void * buf, xwsz_t * size,
-                     xwtm_t * xwtm)
+                     xwtm_t to)
 {
         xwsz_t i;
         xwer_t rc;
@@ -508,7 +507,6 @@ xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
         XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
         XWDS_VALIDATE(buf, "nullptr", -EFAULT);
         XWDS_VALIDATE(size, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
         if (__xwcc_unlikely(rc < 0)) {
@@ -516,10 +514,10 @@ xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
                 goto err_uartc_grab;
         }
         for (i = 0; i < *size; i++) {
-                rc = xwos_sem_timedwait(&uartc->rxsem, xwtm);
+                rc = xwos_sem_wait_to(&uartc->rxsem, to);
                 if (__xwcc_unlikely(rc < 0)) {
                         *size = i;
-                        goto err_sem_timedwait;
+                        goto err_sem_wait_to;
                 }
                 xwos_sqlk_wr_lock_cpuirqsv(&uartc->rxseqlock, &cpuirq);
                 ((xwu8_t *)buf)[i] = uartc->rxq[uartc->rxpos];
@@ -533,7 +531,7 @@ xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
         *size = i;
         return XWOK;
 
-err_sem_timedwait:
+err_sem_wait_to:
         xwds_uartc_put(uartc);
 err_uartc_grab:
         return rc;
@@ -671,9 +669,7 @@ xwer_t xwds_uartc_tx_1byte(struct xwds_uartc * uartc, const xwu8_t byte)
  * @brief XWDS API：发送一个字节
  * @param[in] uartc: UART控制器对象指针
  * @param[in] byte: 待发送的数据
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -682,22 +678,23 @@ xwer_t xwds_uartc_tx_1byte(struct xwds_uartc * uartc, const xwu8_t byte)
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_uartc_putc(struct xwds_uartc * uartc,
                        const xwu8_t byte,
-                       xwtm_t * xwtm)
+                       xwtm_t to)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_grab;
         }
-        rc = xwos_mtx_timedlock(&uartc->txmtx, xwtm);
+        rc = xwos_mtx_lock_to(&uartc->txmtx, to);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_uartc_lock;
         }
@@ -724,9 +721,7 @@ err_uartc_grab:
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示待发送的数据的大小
  * + (O) 作为输出时，返回实际放入发送队列的数据的大小
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -734,11 +729,13 @@ err_uartc_grab:
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
                      const xwu8_t * data, xwsz_t * size,
-                     xwtm_t * xwtm)
+                     xwtm_t to)
 {
         xwsz_t i;
         xwer_t rc;
@@ -746,14 +743,13 @@ xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
         XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
         XWDS_VALIDATE(data, "nullptr", -EFAULT);
         XWDS_VALIDATE(size, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
         if (__xwcc_unlikely(rc < 0)) {
                 *size = 0;
                 goto err_uartc_grab;
         }
-        rc = xwos_mtx_timedlock(&uartc->txmtx, xwtm);
+        rc = xwos_mtx_lock_to(&uartc->txmtx, to);
         if (__xwcc_unlikely(rc < 0)) {
                 *size = 0;
                 goto err_uartc_lock;

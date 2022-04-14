@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwmd_isc_xwscp_mif_h__
@@ -66,15 +66,12 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
                    const struct xwscp_hwifal_operations * hwifops, void * hwifcb,
                    xwu8_t * mem, xwsz_t memsize);
 xwer_t xwscp_stop(struct xwscp * xwscp);
-xwer_t xwscp_connect(struct xwscp * xwscp, xwtm_t * xwtm);
+xwer_t xwscp_connect(struct xwscp * xwscp, xwtm_t to);
 xwer_t xwscp_tx(struct xwscp * xwscp,
                 const xwu8_t data[], xwsz_t * size, xwu8_t qos,
-                xwtm_t * xwtm);
-xwer_t xwscp_rx(struct xwscp * xwscp,
-                xwu8_t buf[], xwsz_t * size,
-                xwtm_t * xwtm);
-xwer_t xwscp_try_rx(struct xwscp * xwscp,
-                    xwu8_t buf[], xwsz_t * size);
+                xwtm_t to);
+xwer_t xwscp_rx(struct xwscp * xwscp, xwu8_t buf[], xwsz_t * size, xwtm_t to);
+xwer_t xwscp_try_rx(struct xwscp * xwscp, xwu8_t buf[], xwsz_t * size);
 
 /**
  * @} xwmd_isc_xwscp

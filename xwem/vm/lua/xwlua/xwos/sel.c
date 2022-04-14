@@ -185,7 +185,7 @@ int xwlua_selsp_wait(lua_State * L)
         xwlua_sel_sp * selsp;
         xwlua_bmp_t * msk;
         xwlua_bmp_t * trg;
-        xwtm_t time;
+        xwtm_t to;
         xwsz_t bitnum;
         xwsz_t bmpsz;
         int top;
@@ -201,15 +201,14 @@ int xwlua_selsp_wait(lua_State * L)
                 type = lua_type(L, 3);
                 switch (type) {
                 case LUA_TNUMBER:
-                        time = (xwtm_t)luaL_checknumber(L, 3);
+                        to = (xwtm_t)luaL_checknumber(L, 3);
                         bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bitnum)) +
                                 sizeof(xwlua_bmp_t);
                         trg = lua_newuserdatauv(L, bmpsz, 0);
                         trg->bits = bitnum;
                         xwbmpop_c0all(trg->bmp, trg->bits);
                         luaL_setmetatable(L, "xwlua_bmp_t");
-                        rc = xwos_sel_timedselect(selsp->sel, msk->bmp, trg->bmp,
-                                                  &time);
+                        rc = xwos_sel_select_to(selsp->sel, msk->bmp, trg->bmp, to);
                         break;
                 case LUA_TSTRING:
                         opt = luaL_checkoption(L, 3, "t", xwlua_sel_opt);

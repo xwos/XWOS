@@ -35,30 +35,50 @@ int xwlua_skd_id_lc(lua_State * L)
         return 1;
 }
 
-int xwlua_skd_get_timetick_lc(lua_State * L)
+int xwlua_xwtm_now(lua_State * L)
 {
-        xwtm_t timetick;
+        xwtm_t now;
 
-        timetick = xwos_skd_get_timetick_lc();
-        lua_pushnumber(L, (lua_Number)timetick);
+        now = xwtm_now();
+        lua_pushnumber(L, (lua_Number)now);
         return 1;
 }
 
-int xwlua_skd_get_tickcount_lc(lua_State * L)
+int xwlua_xwtm_ft(lua_State * L)
 {
-        xwtm_t tickcount;
+        xwtm_t time;
 
-        tickcount = xwos_skd_get_tickcount_lc();
-        lua_pushnumber(L, (lua_Number)tickcount);
+        time = (xwtm_t)luaL_checknumber(L, 1);
+        time = xwtm_ft(time);
+        lua_pushnumber(L, (lua_Number)time);
         return 1;
 }
 
-int xwlua_skd_get_timestamp_lc(lua_State * L)
+int xwlua_xwtm_nowts(lua_State * L)
 {
-        xwtm_t timestamp;
+        xwtm_t nowts;
 
-        timestamp = xwos_skd_get_timestamp_lc();
-        lua_pushnumber(L, (lua_Number)timestamp);
+        nowts = xwtm_nowts();
+        lua_pushnumber(L, (lua_Number)nowts);
+        return 1;
+}
+
+int xwlua_xwtm_fts(lua_State * L)
+{
+        xwtm_t time;
+
+        time = (xwtm_t)luaL_checknumber(L, 1);
+        time = xwtm_fts(time);
+        lua_pushnumber(L, (lua_Number)time);
+        return 1;
+}
+
+int xwlua_xwtm_nowtc(lua_State * L)
+{
+        xwtm_t nowtc;
+
+        nowtc = xwtm_nowtc();
+        lua_pushnumber(L, (lua_Number)nowtc);
         return 1;
 }
 
@@ -78,9 +98,11 @@ int xwlua_skd_get_enpmpt_lc(lua_State * L)
 
 const luaL_Reg xwlua_skd_libconstructor[] = {
         {"id", xwlua_skd_id_lc},
-        {"tt", xwlua_skd_get_timetick_lc},
-        {"tc", xwlua_skd_get_tickcount_lc},
-        {"ts", xwlua_skd_get_timestamp_lc},
+        {"now", xwlua_xwtm_now},
+        {"ft", xwlua_xwtm_ft},
+        {"nowts", xwlua_xwtm_nowts},
+        {"fts", xwlua_xwtm_fts},
+        {"nowtc", xwlua_xwtm_nowtc},
         {"dspmpt", xwlua_skd_get_dspmpt_lc},
         {"enpmpt", xwlua_skd_get_enpmpt_lc},
         {NULL, NULL},
@@ -290,7 +312,7 @@ int xwlua_cthd_sleep(lua_State * L)
         xwer_t rc;
 
         time = (xwtm_t)luaL_checknumber(L, 1);
-        rc = xwosdl_cthd_sleep(&time);
+        rc = xwos_cthd_sleep(time);
         lua_pushinteger(L, (lua_Integer)rc);
         return 1;
 }
@@ -302,7 +324,7 @@ int xwlua_cthd_sleep_from(lua_State * L)
 
         origin = (xwtm_t)luaL_checknumber(L, 1);
         inc = (xwtm_t)luaL_checknumber(L, 2);
-        rc = xwosdl_cthd_sleep_from(&origin, inc);
+        rc = xwos_cthd_sleep_from(&origin, inc);
         lua_pushinteger(L, (lua_Integer)rc);
         lua_pushnumber(L, (lua_Number)origin);
         return 2;

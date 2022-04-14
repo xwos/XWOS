@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #include <xwos/standard.h>
@@ -180,7 +180,7 @@ void xwup_swt_ttn_cb(void * entry)
         struct xwup_swt * swt;
         struct xwup_skd * xwskd;
         struct xwup_tt * xwtt;
-        xwtm_t expected;
+        xwtm_t to;
         xwreg_t cpuirq;
         xwer_t rc;
 
@@ -189,9 +189,9 @@ void xwup_swt_ttn_cb(void * entry)
         xwtt = &xwskd->tt;
         swt->cb(swt, swt->arg);
         if (XWUP_SWT_FLAG_RESTART & swt->flag) {
-                expected = xwtm_add_safely(swt->ttn.wkup_xwtm, swt->period);
+                to = xwtm_add_safely(swt->ttn.wkup_xwtm, swt->period);
                 xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
-                swt->ttn.wkup_xwtm = expected;
+                swt->ttn.wkup_xwtm = to;
                 swt->ttn.wkuprs = XWUP_TTN_WKUPRS_UNKNOWN;
                 swt->ttn.cb = xwup_swt_ttn_cb;
                 rc = xwup_tt_add_locked(xwtt, &swt->ttn, cpuirq);
@@ -208,7 +208,7 @@ xwer_t xwup_swt_start(struct xwup_swt * swt,
 {
         struct xwup_skd * xwskd;
         struct xwup_tt * xwtt;
-        xwtm_t expected;
+        xwtm_t to;
         xwer_t rc;
         xwreg_t cpuirq;
 
@@ -223,13 +223,13 @@ xwer_t xwup_swt_start(struct xwup_swt * swt,
         }
         xwskd = xwup_skd_get_lc();
         xwtt = &xwskd->tt;
-        expected = xwtm_add_safely(base, period);
+        to = xwtm_add_safely(base, period);
         swt->cb = cb;
         swt->arg = arg;
         swt->period = period;
         xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         /* add to time tree */
-        swt->ttn.wkup_xwtm = expected;
+        swt->ttn.wkup_xwtm = to;
         swt->ttn.wkuprs = XWUP_TTN_WKUPRS_UNKNOWN;
         swt->ttn.cb = xwup_swt_ttn_cb;
         swt->ttn.xwtt = xwtt;

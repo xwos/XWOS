@@ -21,7 +21,7 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwam/example/thread/exit/mif.h>
 
 #define LOGTAG "thdexit"
@@ -153,14 +153,11 @@ err_thd_create:
  */
 xwer_t xwexitdemo_detached_thd0_func(void * arg)
 {
-        xwtm_t time;
-
         XWOS_UNUSED(arg);
 
         thdexitlogf(INFO, "[Detached][线程0]启动\n");
         thdexitlogf(INFO, "[Detached][线程0] sleep(1s) ...\n");
-        time = 1 * XWTM_S;
-        xwos_cthd_sleep(&time);
+        xwos_cthd_sleep(1 * XWTM_S);
         thdexitlogf(INFO, "[Detached][线程0] 退出 ...\n");
         xwos_cthd_exit(XWOK);
         return XWOK;
@@ -171,16 +168,13 @@ xwer_t xwexitdemo_detached_thd0_func(void * arg)
  */
 xwer_t xwexitdemo_detached_thd1_func(void * arg)
 {
-        xwtm_t time;
-
         XWOS_UNUSED(arg);
 
         thdexitlogf(INFO, "[Detached][线程1] 启动\n");
         thdexitlogf(INFO, "[Detached][线程1] Detech\n");
         xwos_thd_detach(xwos_cthd_self());
         thdexitlogf(INFO, "[Detached][线程1] sleep(2s) ...\n");
-        time = 2 * XWTM_S;
-        xwos_cthd_sleep(&time);
+        xwos_cthd_sleep(2 * XWTM_S);
         thdexitlogf(INFO, "[Detached][线程1] 退出 ...\n");
         return XWOK;
 }
@@ -191,15 +185,12 @@ xwer_t xwexitdemo_detached_thd1_func(void * arg)
 xwer_t xwexitdemo_parent_thd_func(void * arg)
 {
         xwer_t rc, childrc;
-        xwtm_t time;
 
         XWOS_UNUSED(arg);
 
         thdexitlogf(INFO, "[Joinable][父线程] 启动\n");
-
         thdexitlogf(INFO, "[Joinable][父线程] sleep(3s)\n");
-        time = 3 * XWTM_S;
-        xwos_cthd_sleep(&time);
+        xwos_cthd_sleep(3 * XWTM_S);
 
         rc = xwos_thd_create(&xwexitdemo_child0_thd,
                              &xwexitdemo_joinable_thd_desc[1].attr,
@@ -217,8 +208,7 @@ xwer_t xwexitdemo_parent_thd_func(void * arg)
                              xwexitdemo_joinable_thd_desc[2].arg);
         if (XWOK == rc) {
                 thdexitlogf(INFO, "[Joinable][父线程] sleep(1s) ...\n");
-                time = 1 * XWTM_S;
-                xwos_cthd_sleep(&time);
+                xwos_cthd_sleep(1 * XWTM_S);
                 thdexitlogf(INFO, "[Joinable][父线程] stop(子线程1) ...\n");
                 rc = xwos_thd_stop(xwexitdemo_child1_thd, &childrc);
                 thdexitlogf(INFO, "[Joinable][父线程] 子线程返回值：%d\n", childrc);
@@ -230,8 +220,7 @@ xwer_t xwexitdemo_parent_thd_func(void * arg)
                              xwexitdemo_joinable_thd_desc[2].arg);
         if (XWOK == rc) {
                 thdexitlogf(INFO, "[Joinable][父线程] sleep(1s) ...\n");
-                time = 1 * XWTM_S;
-                xwos_cthd_sleep(&time);
+                xwos_cthd_sleep(1 * XWTM_S);
                 thdexitlogf(INFO, "[Joinable][父线程] quit(子线程1) ...\n");
                 rc = xwos_thd_quit(xwexitdemo_child1_thd);
                 if (XWOK == rc) {
@@ -252,14 +241,11 @@ xwer_t xwexitdemo_parent_thd_func(void * arg)
  */
 xwer_t xwexitdemo_child0_thd_func(void * arg)
 {
-        xwtm_t time;
-
         XWOS_UNUSED(arg);
 
         thdexitlogf(INFO, "[Joinable][子线程0] 启动\n");
         thdexitlogf(INFO, "[Joinable][子线程0] sleep(4s) ...\n");
-        time = 4 * XWTM_S;
-        xwos_cthd_sleep(&time);
+        xwos_cthd_sleep(4 * XWTM_S);
         return -ECHILD;
 }
 
@@ -268,7 +254,6 @@ xwer_t xwexitdemo_child0_thd_func(void * arg)
  */
 xwer_t xwexitdemo_child1_thd_func(void * arg)
 {
-        xwtm_t time;
         xwer_t rc;
 
         XWOS_UNUSED(arg);
@@ -277,8 +262,7 @@ xwer_t xwexitdemo_child1_thd_func(void * arg)
         thdexitlogf(INFO, "[Joinable][子线程1] 启动\n");
         while (!xwos_cthd_shld_stop()) {
                 thdexitlogf(INFO, "[Joinable][子线程1] sleep(2s) ...\n");
-                time = 2 * XWTM_S;
-                rc = xwos_cthd_sleep(&time);
+                rc = xwos_cthd_sleep(2 * XWTM_S);
         }
         return rc;
 }

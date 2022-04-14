@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  * @note
  * - 锁的顺序：
  *   + ① plwq.lock
@@ -61,15 +61,15 @@ xwer_t xwmp_flg_trywait_edge(struct xwmp_evt * evt, xwsq_t trigger,
                              xwbmp_t origin[], xwbmp_t msk[]);
 
 static __xwmp_code
-xwer_t xwmp_flg_timedwait_level(struct xwmp_evt * evt,
-                                xwsq_t trigger, xwsq_t action,
-                                xwbmp_t origin[], xwbmp_t msk[],
-                                xwtm_t * xwtm);
+xwer_t xwmp_flg_wait_to_level(struct xwmp_evt * evt,
+                              xwsq_t trigger, xwsq_t action,
+                              xwbmp_t origin[], xwbmp_t msk[],
+                              xwtm_t to);
 
 static __xwmp_code
-xwer_t xwmp_flg_timedwait_edge(struct xwmp_evt * evt, xwsq_t trigger,
-                               xwbmp_t origin[], xwbmp_t msk[],
-                               xwtm_t * xwtm);
+xwer_t xwmp_flg_wait_to_edge(struct xwmp_evt * evt, xwsq_t trigger,
+                             xwbmp_t origin[], xwbmp_t msk[],
+                             xwtm_t to);
 
 /**
  * @brief 动态创建一个对象
@@ -670,8 +670,7 @@ xwer_t xwmp_flg_wait(struct xwmp_evt * evt,
                      xwsq_t trigger, xwsq_t action,
                      xwbmp_t origin[], xwbmp_t msk[])
 {
-        xwtm_t expected = XWTM_MAX;
-        return xwmp_flg_timedwait(evt, trigger, action, origin, msk, &expected);
+        return xwmp_flg_wait_to(evt, trigger, action, origin, msk, XWTM_MAX);
 }
 
 __xwmp_api
@@ -703,10 +702,10 @@ err_evt_grab:
 }
 
 static __xwmp_code
-xwer_t xwmp_flg_timedwait_level(struct xwmp_evt * evt,
-                                xwsq_t trigger, xwsq_t action,
-                                xwbmp_t origin[], xwbmp_t msk[],
-                                xwtm_t * xwtm)
+xwer_t xwmp_flg_wait_to_level(struct xwmp_evt * evt,
+                              xwsq_t trigger, xwsq_t action,
+                              xwbmp_t origin[], xwbmp_t msk[],
+                              xwtm_t to)
 {
         xwreg_t cpuirq;
         bool triggered;
@@ -771,9 +770,9 @@ xwer_t xwmp_flg_timedwait_level(struct xwmp_evt * evt,
                         xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                         break;
                 } else {
-                        rc = xwmp_cond_timedwait(&evt->cond,
-                                                 &evt->lock, XWOS_LK_SPLK, NULL,
-                                                 xwtm, &lkst);
+                        rc = xwmp_cond_wait_to(&evt->cond,
+                                               &evt->lock, XWOS_LK_SPLK, NULL,
+                                               to, &lkst);
                         if (XWOK == rc) {
                                 if (XWOS_LKST_UNLOCKED == lkst) {
                                         xwmp_splk_lock(&evt->lock);
@@ -791,9 +790,9 @@ xwer_t xwmp_flg_timedwait_level(struct xwmp_evt * evt,
 }
 
 static __xwmp_code
-xwer_t xwmp_flg_timedwait_edge(struct xwmp_evt * evt, xwsq_t trigger,
-                               xwbmp_t origin[], xwbmp_t msk[],
-                               xwtm_t * xwtm)
+xwer_t xwmp_flg_wait_to_edge(struct xwmp_evt * evt, xwsq_t trigger,
+                             xwbmp_t origin[], xwbmp_t msk[],
+                             xwtm_t to)
 {
         xwreg_t cpuirq;
         xwsq_t lkst;
@@ -837,9 +836,9 @@ xwer_t xwmp_flg_timedwait_edge(struct xwmp_evt * evt, xwsq_t trigger,
                         xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                         break;
                 } else {
-                        rc = xwmp_cond_timedwait(&evt->cond,
-                                                 &evt->lock, XWOS_LK_SPLK, NULL,
-                                                 xwtm, &lkst);
+                        rc = xwmp_cond_wait_to(&evt->cond,
+                                               &evt->lock, XWOS_LK_SPLK, NULL,
+                                               to, &lkst);
                         if (XWOK == rc) {
                                 if (XWOS_LKST_UNLOCKED == lkst) {
                                         xwmp_splk_lock(&evt->lock);
@@ -857,10 +856,10 @@ xwer_t xwmp_flg_timedwait_edge(struct xwmp_evt * evt, xwsq_t trigger,
 }
 
 __xwmp_api
-xwer_t xwmp_flg_timedwait(struct xwmp_evt * evt,
-                          xwsq_t trigger, xwsq_t action,
-                          xwbmp_t origin[], xwbmp_t msk[],
-                          xwtm_t * xwtm)
+xwer_t xwmp_flg_wait_to(struct xwmp_evt * evt,
+                        xwsq_t trigger, xwsq_t action,
+                        xwbmp_t origin[], xwbmp_t msk[],
+                        xwtm_t to)
 {
         xwer_t rc;
 
@@ -868,18 +867,16 @@ xwer_t xwmp_flg_timedwait(struct xwmp_evt * evt,
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_FLG),
                       "type-error", -ETYPE);
-        XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)),
-                      "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
 
         rc = xwmp_evt_grab(evt);
         if (rc < 0) {
                 goto err_evt_grab;
         }
         if (trigger <= XWMP_FLG_TRIGGER_CLR_ANY) {
-                rc = xwmp_flg_timedwait_level(evt, trigger, action, origin, msk, xwtm);
+                rc = xwmp_flg_wait_to_level(evt, trigger, action, origin, msk, to);
         } else {
-                rc = xwmp_flg_timedwait_edge(evt, trigger, origin, msk, xwtm);
+                rc = xwmp_flg_wait_to_edge(evt, trigger, origin, msk, to);
         }
         xwmp_evt_put(evt);
 
@@ -1073,8 +1070,7 @@ err_evt_grab:
 __xwmp_api
 xwer_t xwmp_sel_select(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
 {
-        xwtm_t expected = XWTM_MAX;
-        return xwmp_sel_timedselect(evt, msk, trg, &expected);
+        return xwmp_sel_select_to(evt, msk, trg, XWTM_MAX);
 }
 
 __xwmp_api
@@ -1120,8 +1116,8 @@ err_evt_grab:
 }
 
 __xwmp_api
-xwer_t xwmp_sel_timedselect(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
-                            xwtm_t * xwtm)
+xwer_t xwmp_sel_select_to(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
+                          xwtm_t to)
 {
         xwer_t rc;
         xwreg_t cpuirq;
@@ -1132,9 +1128,7 @@ xwer_t xwmp_sel_timedselect(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_SEL),
                       "type-error", -ETYPE);
-        XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)),
-                      "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
 
         rc = xwmp_evt_grab(evt);
         if (rc < 0) {
@@ -1160,9 +1154,9 @@ xwer_t xwmp_sel_timedselect(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
                 } else {
                         /* Clear non-exclusive bits */
                         xwbmpop_and(evt->bmp, evt->msk, evt->num);
-                        rc = xwmp_cond_timedwait(&evt->cond,
-                                                 &evt->lock, XWOS_LK_SPLK, NULL,
-                                                 xwtm, &lkst);
+                        rc = xwmp_cond_wait_to(&evt->cond,
+                                               &evt->lock, XWOS_LK_SPLK, NULL,
+                                               to, &lkst);
                         if (XWOK == rc) {
                                 if (XWOS_LKST_UNLOCKED == lkst) {
                                         xwmp_splk_lock(&evt->lock);
@@ -1190,12 +1184,11 @@ err_evt_grab:
 __xwmp_api
 xwer_t xwmp_br_wait(struct xwmp_evt * evt)
 {
-        xwtm_t expected = XWTM_MAX;
-        return xwmp_br_timedwait(evt, &expected);
+        return xwmp_br_wait_to(evt, XWTM_MAX);
 }
 
 __xwmp_api
-xwer_t xwmp_br_timedwait(struct xwmp_evt * evt, xwtm_t * xwtm)
+xwer_t xwmp_br_wait_to(struct xwmp_evt * evt, xwtm_t to)
 {
         xwreg_t cpuirq;
         xwssq_t pos;
@@ -1206,9 +1199,7 @@ xwer_t xwmp_br_timedwait(struct xwmp_evt * evt, xwtm_t * xwtm)
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
         XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_BR),
                       "type-error", -ETYPE);
-        XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)),
-                      "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
 
         rc = xwmp_evt_grab(evt);
         if (__xwcc_unlikely(rc < 0)) {
@@ -1229,9 +1220,9 @@ xwer_t xwmp_br_timedwait(struct xwmp_evt * evt, xwtm_t * xwtm)
                 xwmp_cthd_yield();
                 rc = XWOK;
         } else {
-                rc = xwmp_cond_timedwait(&evt->cond,
-                                         &evt->lock, XWOS_LK_SPLK, NULL,
-                                         xwtm, &lkst);
+                rc = xwmp_cond_wait_to(&evt->cond,
+                                       &evt->lock, XWOS_LK_SPLK, NULL,
+                                       to, &lkst);
                 if (XWOS_LKST_UNLOCKED == lkst) {
                         xwmp_splk_lock(&evt->lock);
                 }

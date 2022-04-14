@@ -21,7 +21,7 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwam/example/thread/sleep/mif.h>
 
 #define LOGTAG "thdsleep"
@@ -55,25 +55,21 @@ xwer_t example_thread_sleep_start(void)
  */
 xwer_t xwslpdemo_thd_func(void * arg)
 {
-        xwtm_t tk, ts;
-        xwer_t rc = XWOK;
+        xwtm_t ts;
 
         XWOS_UNUSED(arg);
 
         thdslplogf(INFO, "[线程] 启动。\n");
-
         thdslplogf(INFO, "[线程] 睡眠1秒 ...\n");
-        tk = 1 * XWTM_S;
-        xwos_cthd_sleep(&tk);
+        xwos_cthd_sleep(1 * XWTM_S);
 
-        tk = xwos_skd_get_timetick_lc();
+        ts = xwtm_now();
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                xwos_cthd_sleep_from(&tk, 500 * XWTM_MS);
-                ts = xwos_skd_get_timestamp_lc();
+                xwos_cthd_sleep_from(&ts, 500 * XWTM_MS);
+                ts = xwtm_nowts();
                 thdslplogf(INFO, "[线程] 时间戳：%lld 纳秒。\n", ts);
         }
-
         thdslplogf(INFO, "[线程] 退出。\n");
         xwos_thd_detach(xwos_cthd_self());
-        return rc;
+        return XWOK;
 }

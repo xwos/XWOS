@@ -431,6 +431,10 @@ err_canc_grab:
 /**
  * @brief XWDS API：初始化接收缓冲队列
  * @param[in] rxq: 接收缓冲队列对象指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
  */
 __xwds_code
 void xwds_canc_rxq_init(struct xwds_canc_rxqueue * rxq)
@@ -446,6 +450,10 @@ void xwds_canc_rxq_init(struct xwds_canc_rxqueue * rxq)
  * @brief XWDS API：发布一条消息到接收缓冲队列中
  * @param[in] rxq: 接收缓冲队列对象指针
  * @param[in] msg: 待发布的CAN消息结构体指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
  */
 __xwds_code
 void xwds_canc_rxq_publish(struct xwds_canc_rxqueue * rxq,
@@ -476,34 +484,31 @@ void xwds_canc_rxq_publish(struct xwds_canc_rxqueue * rxq,
  * @brief XWDS API：从接收缓冲队列中获取一条消息
  * @param[in] rxq: 接收缓冲队列对象指针
  * @param[in] buf: 获取CAN消息结构体的缓存指针
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
  * - 同步/异步：同步
- * - 中断上下文：不可以使用
- * - 中断底半部：不可以使用
- * - 线程上下文：可以使用
+ * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_code
 xwer_t xwds_canc_rxq_acquire(struct xwds_canc_rxqueue * rxq,
                              struct xwds_can_msg * buf,
-                             xwtm_t * xwtm)
+                             xwtm_t to)
 {
         xwer_t rc;
         xwreg_t cpuirq;
 
         XWDS_VALIDATE(rxq, "nullptr", -EFAULT);
         XWDS_VALIDATE(buf, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-        rc = xwos_sem_timedwait(&rxq->sem, xwtm);
+        rc = xwos_sem_wait_to(&rxq->sem, to);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_sem_timedwait;
+                goto err_sem_wait_to;
         }
         xwos_splk_lock_cpuirqsv(&rxq->lock, &cpuirq);
         *buf = rxq->q[rxq->pos];
@@ -514,7 +519,7 @@ xwer_t xwds_canc_rxq_acquire(struct xwds_canc_rxqueue * rxq,
         xwos_splk_unlock_cpuirqrs(&rxq->lock, cpuirq);
         return XWOK;
 
-err_sem_timedwait:
+err_sem_wait_to:
         return rc;
 }
 

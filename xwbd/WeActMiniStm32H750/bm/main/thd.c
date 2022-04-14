@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwcd/ds/soc/gpio.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/mif.h>
@@ -55,8 +55,6 @@ err_thd_create:
 
 xwer_t led_task(void * arg)
 {
-        xwtm_t xwtm;
-
         XWOS_UNUSED(arg);
         xwds_gpio_req(&stm32cube_soc_cb, XWDS_GPIO_PORT_E, XWDS_GPIO_PIN_3);
         while (!xwos_cthd_shld_stop()) {
@@ -69,8 +67,7 @@ xwer_t led_task(void * arg)
                         xwds_gpio_req(&stm32cube_soc_cb,
                                       XWDS_GPIO_PORT_E, XWDS_GPIO_PIN_3);
                 }
-                xwtm = 1 * XWTM_S;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(1 * XWTM_S);
                 xwds_gpio_toggle(&stm32cube_soc_cb, XWDS_GPIO_PORT_E, XWDS_GPIO_PIN_3);
         }
         xwds_gpio_rls(&stm32cube_soc_cb, XWDS_GPIO_PORT_E, XWDS_GPIO_PIN_3);

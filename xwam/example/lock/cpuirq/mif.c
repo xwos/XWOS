@@ -22,7 +22,7 @@
 #include <string.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwos/osal/irq.h>
 #include <xwos/osal/swt.h>
 #include <xwam/example/lock/cpuirq/mif.h>
@@ -113,7 +113,7 @@ xwer_t xwcpuirqdemo_thd_func(void * arg)
 
         swtlogf(INFO, "[线程] 启动。\n");
 
-        ts = xwos_skd_get_timetick_lc();
+        ts = xwtm_now();
 
         swtlogf(INFO, "[线程] 启动定时器。\n");
         rc = xwos_swt_start(&xwcpuirqdemo_swt,
@@ -121,19 +121,17 @@ xwer_t xwcpuirqdemo_thd_func(void * arg)
                             xwcpuirqdemo_swt_callback, NULL);
 
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                ts = 1 * XWTM_S;
-                xwos_cthd_sleep(&ts);
+                xwos_cthd_sleep(1 * XWTM_S);
 
                 xwos_cpuirq_disable_lc();
                 /* 临界区 */
                 cnt = xwcpuirqdemo_shared_count;
                 xwos_cpuirq_enable_lc();
 
-                ts = xwos_skd_get_timestamp_lc();
+                ts = xwtm_nowts();
                 swtlogf(INFO,
                         "[线程] 时间戳：%lld 纳秒，计数器：%d。\n",
                         ts, cnt);
-
         }
 
         swtlogf(INFO, "[线程] 退出。\n");

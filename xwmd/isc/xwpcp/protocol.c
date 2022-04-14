@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #include <xwos/standard.h>
@@ -18,7 +18,7 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/crc32.h>
 #include <xwos/mm/bma.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/lock/mtx.h>
 #include <xwos/osal/sync/sem.h>
@@ -1106,7 +1106,6 @@ xwer_t xwpcp_tx_frm(struct xwpcp * xwpcp, struct xwpcp_carrier * car)
         xwu32_t txcnt;
         xwu8_t id;
         xwsz_t calsz;
-        xwtm_t xwtm;
         xwsz_t cnt;
         xwsq_t lkst;
         union xwos_ulock ulk;
@@ -1145,10 +1144,9 @@ xwer_t xwpcp_tx_frm(struct xwpcp * xwpcp, struct xwpcp_carrier * car)
                                 xwos_mtx_unlock(&xwpcp->txq.csmtx);
                                 goto err_if_tx;
                         }
-                        xwtm = XWPCP_RETRY_PERIOD;
-                        rc = xwos_cond_timedwait(&xwpcp->txq.cscond,
-                                                 ulk, XWOS_LK_MTX, NULL,
-                                                 &xwtm, &lkst);
+                        rc = xwos_cond_wait_to(&xwpcp->txq.cscond,
+                                               ulk, XWOS_LK_MTX, NULL,
+                                               xwtm_ft(XWPCP_RETRY_PERIOD), &lkst);
                         if (XWOK == rc) {
                                 xwos_mtx_unlock(&xwpcp->txq.csmtx);
                                 xwpcp_finish_tx(xwpcp, car);
@@ -1332,14 +1330,11 @@ xwer_t xwpcp_txthd(struct xwpcp * xwpcp)
 }
 
 /**
- * @brief 短暂停止一下XWPCP的线程
+ * @brief 短暂暂停一下XWPCP的线程
  * @return 错误码
  */
 static __xwmd_code
 xwer_t xwpcp_doze(xwu32_t cnt)
 {
-        xwtm_t sleep;
-
-        sleep = XWPCP_RETRY_PERIOD * cnt;
-        return xwos_cthd_sleep(&sleep);
+        return xwos_cthd_sleep(XWPCP_RETRY_PERIOD * cnt);
 }

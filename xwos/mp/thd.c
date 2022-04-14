@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #include <xwos/standard.h>
@@ -1256,7 +1256,7 @@ void xwmp_thd_ttn_callback(void * entry)
  * @brief 将线程加入到时间树上
  * @param[in] thd: 线程对象的指针
  * @param[in] xwtt: 时间树的指针
- * @param[in] expected: 期望被唤醒的时间
+ * @param[in] to: 期望唤醒的时间点
  * @param[in] cpuirq: 本地CPU的中断标志
  * @return 错误码
  * @note
@@ -1264,12 +1264,12 @@ void xwmp_thd_ttn_callback(void * entry)
  */
 __xwmp_code
 xwer_t xwmp_thd_tt_add_locked(struct xwmp_thd * thd, struct xwmp_tt * xwtt,
-                              xwtm_t expected, xwreg_t cpuirq)
+                              xwtm_t to, xwreg_t cpuirq)
 {
         xwer_t rc;
 
         /* add to time tree */
-        thd->ttn.wkup_xwtm = expected;
+        thd->ttn.wkup_xwtm = to;
         xwaop_store(xwsq_t, &thd->ttn.wkuprs,
                     xwmb_modr_release, XWMP_TTN_WKUPRS_UNKNOWN);
         thd->ttn.xwtt = xwtt;
@@ -1412,14 +1412,12 @@ xwer_t xwmp_thd_do_unlock(void * lock, xwsq_t lktype, void * lkdata)
  * @param[in] lock: 锁的地址
  * @param[in] lktype: 锁的类型
  * @param[in] lkdata: 锁的数据
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in,out] to: 期望唤醒的时间点
  * @param[out] lkst: 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码
  */
 __xwmp_code
-xwer_t xwmp_thd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm, void * lkdata)
+xwer_t xwmp_thd_do_lock(void * lock, xwsq_t lktype, xwtm_t to, void * lkdata)
 {
         xwer_t rc;
         union xwos_ulock ulk;
@@ -1429,11 +1427,7 @@ xwer_t xwmp_thd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm, void * lkdata
         rc = XWOK;
         switch (lktype) {
         case XWOS_LK_MTX:
-                if (xwtm) {
-                        rc = xwmp_mtx_timedlock(ulk.xwmp.mtx, xwtm);
-                } else {
-                        rc = xwmp_mtx_lock(ulk.xwmp.mtx);
-                }
+                rc = xwmp_mtx_lock_to(ulk.xwmp.mtx, to);
                 break;
         case XWOS_LK_MTX_UNINTR:
                 rc = xwmp_mtx_lock_unintr(ulk.xwmp.mtx);
@@ -1460,30 +1454,31 @@ xwer_t xwmp_thd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm, void * lkdata
 }
 
 __xwmp_api
-xwer_t xwmp_cthd_sleep(xwtm_t * xwtm)
+xwer_t xwmp_cthd_sleep_to(xwtm_t to)
 {
         struct xwmp_skd * xwskd;
         struct xwmp_tt * xwtt;
         struct xwmp_syshwt * hwt;
         struct xwmp_thd * cthd;
-        xwtm_t expected, currtick;
+        xwtm_t now;
         xwer_t rc;
         xwsq_t wkuprs;
         xwreg_t cpuirq;
-
-        if (__xwcc_unlikely(xwtm_cmp(*xwtm, 0) <= 0)) {
-                rc = -ETIMEDOUT;
-                goto err_xwtm;
-        }
 
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
         xwtt = &xwskd->tt;
         hwt = &xwtt->hwt;
-        currtick = xwmp_syshwt_get_timetick(hwt);
-        expected = xwtm_add_safely(currtick, *xwtm);
-        xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+        now = xwmp_syshwt_get_timetick(hwt);
+        if (__xwcc_unlikely(xwtm_cmp(to, now) < 0)) {
+                rc = -ETIMEDOUT;
+                goto err_timedout;
+        } else if (__xwcc_unlikely(xwtm_cmp(to, now) == 0)) {
+                rc = XWOK;
+                goto err_timedout;
+        }
 
+        xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         /* 检查是否被中断 */
         rc = xwmp_skd_wakelock_lock(xwskd);
         if (__xwcc_unlikely(rc < 0)) {
@@ -1509,7 +1504,7 @@ xwer_t xwmp_cthd_sleep(xwtm_t * xwtm)
         cthd->dprio.r = XWMP_SKD_PRIORITY_INVALID;
         xwbop_s1m(xwsq_t, &cthd->state, XWMP_SKDOBJ_DST_SLEEPING);
         xwmp_splk_unlock(&cthd->stlock);
-        xwmp_thd_tt_add_locked(cthd, xwtt, expected, cpuirq);
+        xwmp_thd_tt_add_locked(cthd, xwtt, to, cpuirq);
         xwmp_sqlk_wr_unlock_cpuirq(&xwtt->lock);
         xwmp_skd_wakelock_unlock(xwskd);
         xwmp_skd_req_swcx(xwskd);
@@ -1527,12 +1522,10 @@ xwer_t xwmp_cthd_sleep(xwtm_t * xwtm)
                 XWOS_BUG();
                 rc = -EBUG;
         }
-        currtick = xwmp_syshwt_get_timetick(hwt);
-        *xwtm = xwtm_sub(expected, currtick);
         return rc;
 
 err_intr:
-err_xwtm:
+err_timedout:
         return rc;
 }
 
@@ -1543,7 +1536,7 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * origin, xwtm_t inc)
         struct xwmp_tt * xwtt;
         struct xwmp_syshwt * hwt;
         struct xwmp_thd * cthd;
-        xwtm_t expected;
+        xwtm_t to;
         xwreg_t cpuirq;
         xwsq_t wkuprs;
         xwer_t rc;
@@ -1552,7 +1545,7 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * origin, xwtm_t inc)
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
         xwtt = &xwskd->tt;
         hwt = &xwtt->hwt;
-        expected = xwtm_add_safely(*origin, inc);
+        to = xwtm_add_safely(*origin, inc);
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
 
         /* 检查是否被中断 */
@@ -1580,7 +1573,7 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * origin, xwtm_t inc)
         cthd->dprio.r = XWMP_SKD_PRIORITY_INVALID;
         xwbop_s1m(xwsq_t, &cthd->state, XWMP_SKDOBJ_DST_SLEEPING);
         xwmp_splk_unlock(&cthd->stlock);
-        xwmp_thd_tt_add_locked(cthd, xwtt, expected, cpuirq);
+        xwmp_thd_tt_add_locked(cthd, xwtt, to, cpuirq);
         xwmp_sqlk_wr_unlock_cpuirq(&xwtt->lock);
         xwmp_skd_wakelock_unlock(xwskd);
         xwmp_skd_req_swcx(xwskd);

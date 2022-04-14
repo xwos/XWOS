@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #include <xwos/standard.h>
@@ -57,19 +57,13 @@ xwer_t xwscpif_uart_close(struct xwscp * xwscp)
 static __xwmd_code
 xwer_t xwscpif_uart_tx(struct xwscp * xwscp, const xwu8_t * data, xwsz_t size)
 {
-        xwtm_t desired;
-
-        desired = XWTM_MAX;
-        return xwds_dmauartc_tx(xwscp->hwifcb, data, &size, &desired);
+        return xwds_dmauartc_tx(xwscp->hwifcb, data, &size, XWTM_MAX);
 }
 
 static __xwmd_code
 xwer_t xwscpif_uart_rx(struct xwscp * xwscp, xwu8_t * buf, xwsz_t * size)
 {
-        xwtm_t desired;
-
-        desired = XWTM_MAX;
-	return xwds_dmauartc_rx(xwscp->hwifcb, buf, size, &desired);
+	return xwds_dmauartc_rx(xwscp->hwifcb, buf, size, XWTM_MAX);
 }
 
 static __xwmd_code

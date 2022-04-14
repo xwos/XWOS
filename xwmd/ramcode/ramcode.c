@@ -5,17 +5,9 @@
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
- * > Licensed under the Apache License, Version 2.0 (the "License");
- * > you may not use this file except in compliance with the License.
- * > You may obtain a copy of the License at
- * >
- * >         http://www.apache.org/licenses/LICENSE-2.0
- * >
- * > Unless required by applicable law or agreed to in writing, software
- * > distributed under the License is distributed on an "AS IS" BASIS,
- * > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * > See the License for the specific language governing permissions and
- * > limitations under the License.
+ * > This Source Code Form is subject to the terms of the Mozilla Public
+ * > License, v. 2.0. If a copy of the MPL was not distributed with this
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #include <xwos/standard.h>
@@ -39,7 +31,6 @@ xwer_t ramcode_load(struct ramcode * ramcode)
         xwer_t rc;
         xwssz_t rest;
         xwsz_t size;
-        xwtm_t xwtm;
         xwu32_t crc32;
 
         if ((NULL == ramcode->op) || (NULL == ramcode->op->load)) {
@@ -47,19 +38,17 @@ xwer_t ramcode_load(struct ramcode * ramcode)
                 goto err_op;
         }
         size = sizeof(struct ramcode_info);
-        xwtm = XWTM_MAX;
         rc = ramcode->op->load(ramcode->opcb,
-                               (xwu8_t *)&ramcode->info, &size, &xwtm);
+                               (xwu8_t *)&ramcode->info, &size, XWTM_MAX);
         if ((rc < 0) || (size <= 0)) {
                 goto err_info;
         }
         rest = (xwssz_t)ramcode->info.size;
-        xwtm = XWTM_MAX;
         while (rest > 0) {
                 size = (xwsz_t)rest;
                 rc = ramcode->op->load(ramcode->opcb,
                                        (xwu8_t *)ramcode->info.origin, &size,
-                                       &xwtm);
+                                       XWTM_MAX);
                 if (XWOK == rc) {
                         rest -= (xwssz_t)size;
                 }

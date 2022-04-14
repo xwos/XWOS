@@ -21,7 +21,7 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwos/osal/swt.h>
 #include <xwos/osal/sync/sem.h>
 #include <xwos/osal/sync/cond.h>
@@ -318,19 +318,19 @@ xwer_t xwseldemo_consumer_func(void * arg)
         xwbmpop_declare(trg, XWSELDEMO_BMP_BITNUM);
         xwbmpop_declare(flgmsk, XWSELDEMO_BMP_BITNUM);
         xwbmpop_declare(flgtrg, XWSELDEMO_BMP_BITNUM);
-        xwtm_t ts;
+        xwtm_t now;
         xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
 
         sellogf(INFO, "[消费者] 启动。\n");
         sellogf(INFO, "[消费者] 启动定时器0。\n");
-        ts = xwos_skd_get_timetick_lc();
-        rc = xwos_swt_start(&xwseldemo_swt0, ts, 500 * XWTM_MS,
+        now = xwtm_now();
+        rc = xwos_swt_start(&xwseldemo_swt0, now, 500 * XWTM_MS,
                             xwseldemo_swt0_callback, NULL);
 
         sellogf(INFO, "[消费者] 启动定时器1。\n");
-        rc = xwos_swt_start(&xwseldemo_swt1, ts, 800 * XWTM_MS,
+        rc = xwos_swt_start(&xwseldemo_swt1, now, 800 * XWTM_MS,
                             xwseldemo_swt1_callback, NULL);
 
         memset(selmsk, 0, sizeof(selmsk));
@@ -338,96 +338,96 @@ xwer_t xwseldemo_consumer_func(void * arg)
         while (!xwos_cthd_frz_shld_stop(NULL)) {
                 /* 设置掩码位为bit1 ~ bit7共7位 */
                 selmsk[0] = 0xFF;
-                ts = xwos_skd_get_timestamp_lc();
+                now = xwtm_nowts();
                 sellogf(INFO,
                         "[消费者] 等待信号：0x%X，时间戳：%lld 纳秒...\n",
-                        selmsk[0], ts);
-                ts = 1 * XWTM_S;
-                rc = xwos_sel_timedselect(&xwseldemo_sel0, selmsk, trg, &ts);
+                        selmsk[0], now);
+                rc = xwos_sel_select_to(&xwseldemo_sel0, selmsk, trg,
+                                        xwtm_ft(1 * XWTM_S));
                 if (XWOK == rc) {
-                        ts = xwos_skd_get_timestamp_lc();
+                        now = xwtm_nowts();
                         sellogf(INFO,
                                 "[消费者] 唤醒，触发信号：0x%X，时间戳：%lld 纳秒。\n",
-                                trg[0], ts);
+                                trg[0], now);
 
                         if (xwbmpop_t1i(trg, 1)) {
                                 rc = xwos_sem_trywait(&xwseldemo_sem1);
                                 if (XWOK == rc) {
-                                        ts = xwos_skd_get_timestamp_lc();
+                                        now = xwtm_nowts();
                                         sellogf(INFO,
                                                 "[消费者] 信号量1触发，"
-                                                "时间戳：%lld 纳秒。\n", ts);
+                                                "时间戳：%lld 纳秒。\n", now);
                                 }
                         }
 
                         if (xwbmpop_t1i(trg, 2)) {
                                 rc = xwos_sem_trywait(&xwseldemo_sem2);
                                 if (XWOK == rc) {
-                                        ts = xwos_skd_get_timestamp_lc();
+                                        now = xwtm_nowts();
                                         sellogf(INFO,
                                                 "[消费者] 信号量2触发，"
-                                                "时间戳：%lld 纳秒。\n", ts);
+                                                "时间戳：%lld 纳秒。\n", now);
                                 }
                         }
 
                         if (xwbmpop_t1i(trg, 3)) {
-                                ts = xwos_skd_get_timestamp_lc();
+                                now = xwtm_nowts();
                                 sellogf(INFO,
                                         "[消费者] 事件标志3触发，"
-                                        "时间戳：%lld 纳秒。\n", ts);
+                                        "时间戳：%lld 纳秒。\n", now);
                                 flgmsk[0] = XWBOP_BIT(0) | XWBOP_BIT(1);
                                 rc = xwos_flg_trywait(&xwseldemo_flg3,
                                                       XWOS_FLG_TRIGGER_SET_ANY,
                                                       XWOS_FLG_ACTION_CONSUMPTION,
                                                       flgtrg, flgmsk);
                                 if (XWOK == rc) {
-                                        ts = xwos_skd_get_timestamp_lc();
+                                        now = xwtm_nowts();
                                         if (xwbmpop_t1i(flgtrg, 0)) {
                                                 sellogf(INFO,
                                                         "[消费者] 定时器0触发，"
-                                                        "时间戳：%lld 纳秒。\n", ts);
+                                                        "时间戳：%lld 纳秒。\n", now);
                                         }
                                         if (xwbmpop_t1i(flgtrg, 1)) {
                                                 sellogf(INFO,
                                                         "[消费者] 定时器1触发，"
-                                                        "时间戳：%lld 纳秒。\n", ts);
+                                                        "时间戳：%lld 纳秒。\n", now);
                                         }
                                 }
                         }
 
                         if (xwbmpop_t1i(trg, 4)) {
-                                ts = xwos_skd_get_timestamp_lc();
+                                now = xwtm_nowts();
                                 sellogf(INFO,
                                         "[消费者] 选择器4触发，"
-                                        "时间戳：%lld 纳秒。\n", ts);
+                                        "时间戳：%lld 纳秒。\n", now);
                                 /* 第4位为子信号选择器4，再次测试 */
                                 rc = xwos_sel_tryselect(&xwseldemo_sel4, selmsk, trg);
                                 if (XWOK == rc) {
-                                        ts = xwos_skd_get_timestamp_lc();
+                                        now = xwtm_nowts();
                                         if (xwbmpop_t1i(trg, 5)) {
                                                 sellogf(INFO,
                                                         "[消费者] 条件量5触发，"
-                                                        "时间戳：%lld 纳秒。\n", ts);
+                                                        "时间戳：%lld 纳秒。\n", now);
                                         }
                                         if (xwbmpop_t1i(trg, 6)) {
                                                 sellogf(INFO,
                                                         "[消费者] 条件量6触发，"
-                                                        "时间戳：%lld 纳秒。\n", ts);
+                                                        "时间戳：%lld 纳秒。\n", now);
                                         }
                                         if (xwbmpop_t1i(trg, 7)) {
                                                 sellogf(INFO,
                                                         "[消费者] 线程栅栏7触发，"
-                                                        "时间戳：%lld 纳秒。\n", ts);
+                                                        "时间戳：%lld 纳秒。\n", now);
                                         }
                                 }
                         }
 
                         sellogf(INFO, "\n");
                 } else {
-                        ts = xwos_skd_get_timestamp_lc();
+                        now = xwtm_nowts();
                         sellogf(ERR,
                                 "[消费者] 错误，时间戳：%lld 纳秒，错误码：%d。\n\n",
-                                ts, rc);
+                                now, rc);
                 }
         }
         return rc;
@@ -476,7 +476,7 @@ void xwseldemo_swt1_callback(struct xwos_swt * swt, void * arg)
  */
 xwer_t xwseldemo_producer_func(void * arg)
 {
-        xwtm_t ts;
+        xwtm_t now;
         xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
@@ -484,60 +484,56 @@ xwer_t xwseldemo_producer_func(void * arg)
         while (!xwos_cthd_frz_shld_stop(NULL)) {
                 rc = xwos_sem_post(&xwseldemo_sem1);
                 if (XWOK == rc) {
-                        ts = xwos_skd_get_timestamp_lc();
+                        now = xwtm_nowts();
                         sellogf(INFO,
-                                "[生产者] 发布信号量1，时间戳：%lld 纳秒\n", ts);
+                                "[生产者] 发布信号量1，时间戳：%lld 纳秒\n", now);
                 } else {
-                        ts = xwos_skd_get_timestamp_lc();
+                        now = xwtm_nowts();
                         sellogf(ERR,
                                 "[生产者] 错误，时间戳：%lld 纳秒，错误码：%d。\n\n",
-                                ts, rc);
+                                now, rc);
                 }
 
-                ts = 1000 * XWTM_MS;
-                xwos_cthd_sleep(&ts);
+                xwos_cthd_sleep(1000 * XWTM_MS);
 
                 rc = xwos_sem_post(&xwseldemo_sem2);
                 if (XWOK == rc) {
-                        ts = xwos_skd_get_timestamp_lc();
+                        now = xwtm_nowts();
                         sellogf(INFO,
-                                "[生产者] 发布信号量2，时间戳：%lld 纳秒\n", ts);
+                                "[生产者] 发布信号量2，时间戳：%lld 纳秒\n", now);
                 } else {
-                        ts = xwos_skd_get_timestamp_lc();
+                        now = xwtm_nowts();
                         sellogf(ERR,
                                 "[生产者] 错误，时间戳：%lld 纳秒，错误码：%d。\n\n",
-                                ts, rc);
+                                now, rc);
                 }
-                ts = 1000 * XWTM_MS;
-                xwos_cthd_sleep(&ts);
+                xwos_cthd_sleep(1000 * XWTM_MS);
 
                 rc = xwos_cond_broadcast(&xwseldemo_cond5);
                 if (XWOK == rc) {
-                        ts = xwos_skd_get_timestamp_lc();
+                        now = xwtm_nowts();
                         sellogf(INFO,
-                                "[生产者] 发布条件量5，时间戳：%lld 纳秒\n", ts);
+                                "[生产者] 发布条件量5，时间戳：%lld 纳秒\n", now);
                 } else {
-                        ts = xwos_skd_get_timestamp_lc();
+                        now = xwtm_nowts();
                         sellogf(ERR,
                                 "[生产者] 错误，时间戳：%lld 纳秒，错误码：%d。\n\n",
-                                ts, rc);
+                                now, rc);
                 }
-                ts = 1000 * XWTM_MS;
-                xwos_cthd_sleep(&ts);
+                xwos_cthd_sleep(1000 * XWTM_MS);
 
                 rc = xwos_cond_broadcast(&xwseldemo_cond6);
                 if (XWOK == rc) {
-                        ts = xwos_skd_get_timestamp_lc();
+                        now = xwtm_nowts();
                         sellogf(INFO,
-                                "[生产者] 发布条件量6，时间戳：%lld 纳秒\n", ts);
+                                "[生产者] 发布条件量6，时间戳：%lld 纳秒\n", now);
                 } else {
-                        ts = xwos_skd_get_timestamp_lc();
+                        now = xwtm_nowts();
                         sellogf(ERR,
                                 "[生产者] 错误，时间戳：%lld 纳秒，错误码：%d。\n\n",
-                                ts, rc);
+                                now, rc);
                 }
-                ts = 1000 * XWTM_MS;
-                xwos_cthd_sleep(&ts);
+                xwos_cthd_sleep(1000 * XWTM_MS);
         }
 
         sellogf(INFO, "[生产者] 退出。\n");
@@ -558,7 +554,7 @@ xwer_t xwseldemo_syncthd_func(void * arg)
 
         /* 睡眠一段时间 */
         sleep = (pos + 1) * XWTM_S;
-        xwos_cthd_sleep(&sleep);
+        xwos_cthd_sleep(sleep);
 
         /* 同步线程 */
         sellogf(INFO, "[同步线程%d] 已就位。\n", pos);

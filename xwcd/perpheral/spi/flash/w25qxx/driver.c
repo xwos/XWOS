@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <string.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwcd/ds/spi/perpheral.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/device.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/driver.h>
@@ -68,18 +68,17 @@ xwer_t xwds_w25qxx_drv_suspend(struct xwds_device * dev)
 #endif
 
 /******** ******** ******** APIs ******** ******** ********/
-xwer_t xwds_w25qxx_cfgbus(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
+xwer_t xwds_w25qxx_cfgbus(struct xwds_w25qxx * w25qxx, xwtm_t to)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(w25qxx, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_w25qxx_grab(w25qxx);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_w25qxx_grab;
         }
-        rc = xwds_spim_buscfg(w25qxx->spip.bus, w25qxx->spip.buscfgid, xwtm);
+        rc = xwds_spim_buscfg(w25qxx->spip.bus, w25qxx->spip.buscfgid, to);
         if (rc < 0) {
                 goto err_spim_buscfg;
         }
@@ -97,14 +96,13 @@ xwer_t xwds_w25qxx_ctrl(struct xwds_w25qxx * w25qxx,
                         xwu8_t address_size, xwu32_t address,
                         xwu32_t dummy_cycles,
                         const xwu8_t txd[], xwu8_t * rxb, xwsz_t size,
-                        xwtm_t * xwtm)
+                        xwtm_t to)
 {
         const struct xwds_w25qxx_driver * drv;
         xwsz_t i, j, idx, rxofs, xfersize;
         xwer_t rc;
 
         XWDS_VALIDATE(w25qxx, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_w25qxx_grab(w25qxx);
         if (__xwcc_unlikely(rc < 0)) {
@@ -140,7 +138,7 @@ xwer_t xwds_w25qxx_ctrl(struct xwds_w25qxx * w25qxx,
         xfersize = idx;
         rc = drv->io(w25qxx,
                      w25qxx->txq, w25qxx->rxq, &xfersize,
-                     xwtm);
+                     to);
         if (rc < 0) {
                 goto err_spim_xfer;
         }
@@ -158,13 +156,12 @@ err_w25qxx_grab:
         return rc;
 }
 
-xwer_t xwds_w25qxx_reset(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
+xwer_t xwds_w25qxx_reset(struct xwds_w25qxx * w25qxx, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
         xwer_t rc;
 
         XWDS_VALIDATE(w25qxx, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         cmd = w25qxx->cmdtbl[XWDS_W25QXX_CMD_ENABLE_RESET];
         if (cmd.existing) {
@@ -172,7 +169,7 @@ xwer_t xwds_w25qxx_reset(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
                                       cmd.instruction,
                                       cmd.address_size, cmd.address,
                                       cmd.dummy_cycles,
-                                      NULL, NULL, 0, xwtm);
+                                      NULL, NULL, 0, to);
                 if (rc < 0) {
                         goto err_w25qxx_ctrl;
                 }
@@ -183,7 +180,7 @@ xwer_t xwds_w25qxx_reset(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
                                       cmd.instruction,
                                       cmd.address_size, cmd.address,
                                       cmd.dummy_cycles,
-                                      NULL, NULL, 0, xwtm);
+                                      NULL, NULL, 0, to);
                 if (rc < 0) {
                         goto err_w25qxx_ctrl;
                 }
@@ -194,22 +191,22 @@ err_w25qxx_ctrl:
         return rc;
 }
 
-xwer_t xwds_w25qxx_init_parameter(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
+xwer_t xwds_w25qxx_init_parameter(struct xwds_w25qxx * w25qxx, xwtm_t to)
 {
         xwu64_t uid;
         xwu32_t jid;
         xwu16_t mid;
         xwer_t rc;
 
-        rc = xwds_w25qxx_read_uid(w25qxx, &uid, xwtm);
+        rc = xwds_w25qxx_read_uid(w25qxx, &uid, to);
         if (rc < 0) {
                 goto err_read_uid;
         }
-        rc = xwds_w25qxx_read_mid(w25qxx, &mid, xwtm);
+        rc = xwds_w25qxx_read_mid(w25qxx, &mid, to);
         if (rc < 0) {
                 goto err_read_mid;
         }
-        rc = xwds_w25qxx_read_jid(w25qxx, &jid, xwtm);
+        rc = xwds_w25qxx_read_jid(w25qxx, &jid, to);
         if (rc < 0) {
                 goto err_read_jid;
         }
@@ -243,14 +240,13 @@ err_read_uid:
         return rc;
 }
 
-xwer_t xwds_w25qxx_write_enable(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
+xwer_t xwds_w25qxx_write_enable(struct xwds_w25qxx * w25qxx, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
         xwer_t rc;
         xwu8_t sr1;
 
         XWDS_VALIDATE(w25qxx, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         cmd = w25qxx->cmdtbl[XWDS_W25QXX_CMD_WRITE_ENABLE];
         if (1 != cmd.existing) {
@@ -261,13 +257,13 @@ xwer_t xwds_w25qxx_write_enable(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
                               cmd.instruction,
                               cmd.address_size, cmd.address,
                               cmd.dummy_cycles,
-                              NULL, NULL, 0, xwtm);
+                              NULL, NULL, 0, to);
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
         rc = xwds_w25qxx_read_sr(w25qxx,
                                  XWDS_W25QXX_SR_1, &sr1,
-                                 xwtm);
+                                 to);
         if (rc < 0) {
                 goto err_chk_wel;
         }
@@ -283,13 +279,12 @@ err_not_support:
         return rc;
 }
 
-xwer_t xwds_w25qxx_write_disable(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
+xwer_t xwds_w25qxx_write_disable(struct xwds_w25qxx * w25qxx, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
         xwer_t rc;
 
         XWDS_VALIDATE(w25qxx, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         cmd = w25qxx->cmdtbl[XWDS_W25QXX_CMD_WRITE_DISABLE];
         if (cmd.existing) {
@@ -300,7 +295,7 @@ xwer_t xwds_w25qxx_write_disable(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
                               cmd.instruction,
                               cmd.address_size, cmd.address,
                               cmd.dummy_cycles,
-                              NULL, NULL, 0, xwtm);
+                              NULL, NULL, 0, to);
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
@@ -313,14 +308,13 @@ err_not_support:
 
 xwer_t xwds_w25qxx_read_sr(struct xwds_w25qxx * w25qxx,
                            xwu32_t sridx, xwu8_t * srbuf,
-                           xwtm_t * xwtm)
+                           xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
         xwer_t rc;
 
         XWDS_VALIDATE(w25qxx, "nullptr", -EFAULT);
         XWDS_VALIDATE((sridx < XWDS_W25QXX_SR_NUM), "out-of-range", -ECHRNG);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         switch (sridx) {
         case XWDS_W25QXX_SR_2:
@@ -342,7 +336,7 @@ xwer_t xwds_w25qxx_read_sr(struct xwds_w25qxx * w25qxx,
                               cmd.instruction,
                               cmd.address_size, cmd.address,
                               cmd.dummy_cycles,
-                              NULL, srbuf, 1, xwtm);
+                              NULL, srbuf, 1, to);
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
@@ -353,14 +347,14 @@ err_not_support:
         return rc;
 }
 
-xwer_t xwds_w25qxx_check_idle(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
+xwer_t xwds_w25qxx_check_idle(struct xwds_w25qxx * w25qxx, xwtm_t to)
 {
         xwer_t rc;
         xwu8_t sr1;
 
         rc = xwds_w25qxx_read_sr(w25qxx,
                                  XWDS_W25QXX_SR_1, &sr1,
-                                 xwtm);
+                                 to);
         if (XWOK == rc) {
                 if (sr1 & XWDS_W25QXX_SR1_BUSY) {
                         rc = -EBUSY;
@@ -369,38 +363,31 @@ xwer_t xwds_w25qxx_check_idle(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
         return rc;
 }
 
-xwer_t xwds_w25qxx_wait_idle(struct xwds_w25qxx * w25qxx, xwtm_t period,
-                             xwtm_t * xwtm)
+xwer_t xwds_w25qxx_wait_idle(struct xwds_w25qxx * w25qxx, xwtm_t period, xwtm_t to)
 {
         xwer_t rc;
-        xwtm_t sleep, desired, tmp;
+        xwtm_t from, sleepto;
 
-        rc = xwds_w25qxx_check_idle(w25qxx, xwtm);
-        desired = *xwtm;
-        sleep = (desired > period) ? period : desired;
-        while ((sleep > 0) && (-EBUSY == rc)) {
-                tmp = sleep;
-                rc = xwos_cthd_sleep(&tmp);
-                desired = desired - sleep;
+        rc = xwds_w25qxx_check_idle(w25qxx, to);
+        from = xwtm_now();
+        while ((-EBUSY == rc) && (xwtm_cmp(to, from) > 0)) {
+                sleepto = xwtm_add_safely(from, period);
+                sleepto = xwtm_cmp(sleepto, to) > 0 ? to : sleepto;
+                rc = xwos_cthd_sleep_to(sleepto);
                 if (XWOK == rc) {
-                        rc = xwds_w25qxx_check_idle(w25qxx, xwtm);
-                        sleep = (desired > period) ? period : desired;
-                } else {
-                        desired = desired + tmp;
+                        rc = xwds_w25qxx_check_idle(w25qxx, to);
+                        from = xwtm_now();
                 }
         }
-        *xwtm = desired;
         return rc;
 }
 
-xwer_t xwds_w25qxx_read_uid(struct xwds_w25qxx * w25qxx, xwu64_t * uidbuf,
-                            xwtm_t * xwtm)
+xwer_t xwds_w25qxx_read_uid(struct xwds_w25qxx * w25qxx, xwu64_t * uidbuf, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
         xwer_t rc;
 
         XWDS_VALIDATE(w25qxx, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         cmd = w25qxx->cmdtbl[XWDS_W25QXX_CMD_UNIQUE_ID];
         if (1 != cmd.existing) {
@@ -411,7 +398,7 @@ xwer_t xwds_w25qxx_read_uid(struct xwds_w25qxx * w25qxx, xwu64_t * uidbuf,
                               cmd.instruction,
                               cmd.address_size, cmd.address,
                               cmd.dummy_cycles,
-                              NULL, (xwu8_t *)uidbuf, 8, xwtm);
+                              NULL, (xwu8_t *)uidbuf, 8, to);
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
@@ -424,14 +411,12 @@ err_not_support:
         return rc;
 }
 
-xwer_t xwds_w25qxx_read_mid(struct xwds_w25qxx * w25qxx, xwu16_t * midbuf,
-                            xwtm_t * xwtm)
+xwer_t xwds_w25qxx_read_mid(struct xwds_w25qxx * w25qxx, xwu16_t * midbuf, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
         xwer_t rc;
 
         XWDS_VALIDATE(w25qxx, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         cmd = w25qxx->cmdtbl[XWDS_W25QXX_CMD_MANUFACTURER_DEVICE_ID];
         if (1 != cmd.existing) {
@@ -442,7 +427,7 @@ xwer_t xwds_w25qxx_read_mid(struct xwds_w25qxx * w25qxx, xwu16_t * midbuf,
                               cmd.instruction,
                               cmd.address_size, cmd.address,
                               cmd.dummy_cycles,
-                              NULL, (xwu8_t *)midbuf, 2, xwtm);
+                              NULL, (xwu8_t *)midbuf, 2, to);
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
@@ -455,14 +440,12 @@ err_not_support:
         return rc;
 }
 
-xwer_t xwds_w25qxx_read_jid(struct xwds_w25qxx * w25qxx, xwu32_t * jidbuf,
-                            xwtm_t * xwtm)
+xwer_t xwds_w25qxx_read_jid(struct xwds_w25qxx * w25qxx, xwu32_t * jidbuf, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
         xwer_t rc;
 
         XWDS_VALIDATE(w25qxx, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         cmd = w25qxx->cmdtbl[XWDS_W25QXX_CMD_JEDEC_DEVICE_ID];
         if (1 != cmd.existing) {
@@ -473,7 +456,7 @@ xwer_t xwds_w25qxx_read_jid(struct xwds_w25qxx * w25qxx, xwu32_t * jidbuf,
                               cmd.instruction,
                               cmd.address_size, cmd.address,
                               cmd.dummy_cycles,
-                              NULL, (xwu8_t *)jidbuf, 3, xwtm);
+                              NULL, (xwu8_t *)jidbuf, 3, to);
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
@@ -488,7 +471,7 @@ err_not_support:
 }
 
 xwer_t xwds_w25qxx_read(struct xwds_w25qxx * w25qxx, xwu32_t address,
-                        xwu8_t * rxb, xwsz_t * size, xwtm_t * xwtm)
+                        xwu8_t * rxb, xwsz_t * size, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
         xwsz_t xfsize;
@@ -497,7 +480,6 @@ xwer_t xwds_w25qxx_read(struct xwds_w25qxx * w25qxx, xwu32_t address,
         XWDS_VALIDATE(w25qxx, "nullptr", -EFAULT);
         XWDS_VALIDATE(rxb, "nullptr", -EFAULT);
         XWDS_VALIDATE(size, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         xfsize = *size;
         cmd = w25qxx->cmdtbl[XWDS_W25QXX_CMD_FAST_READ_DATA];
@@ -509,7 +491,7 @@ xwer_t xwds_w25qxx_read(struct xwds_w25qxx * w25qxx, xwu32_t address,
                               cmd.instruction,
                               cmd.address_size, address,
                               cmd.dummy_cycles,
-                              NULL, rxb, xfsize, xwtm);
+                              NULL, rxb, xfsize, to);
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
@@ -522,7 +504,7 @@ err_not_support:
 }
 
 xwer_t xwds_w25qxx_write(struct xwds_w25qxx * w25qxx, xwu32_t address,
-                         xwu8_t * txb, xwsz_t * size, xwtm_t * xwtm)
+                         xwu8_t * txb, xwsz_t * size, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
         xwsz_t xfsize;
@@ -531,13 +513,12 @@ xwer_t xwds_w25qxx_write(struct xwds_w25qxx * w25qxx, xwu32_t address,
         XWDS_VALIDATE(w25qxx, "nullptr", -EFAULT);
         XWDS_VALIDATE(txb, "nullptr", -EFAULT);
         XWDS_VALIDATE(size, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-        rc = xwds_w25qxx_write_enable(w25qxx, xwtm);
+        rc = xwds_w25qxx_write_enable(w25qxx, to);
         if (rc < 0) {
                 goto err_we;
         }
-        rc = xwds_w25qxx_wait_idle(w25qxx, 1 * XWTM_MS, xwtm);
+        rc = xwds_w25qxx_wait_idle(w25qxx, 1 * XWTM_MS, to);
         if (rc < 0) {
                 goto err_wait_idle;
         }
@@ -551,7 +532,7 @@ xwer_t xwds_w25qxx_write(struct xwds_w25qxx * w25qxx, xwu32_t address,
                               cmd.instruction,
                               cmd.address_size, address,
                               cmd.dummy_cycles,
-                              txb, NULL, xfsize, xwtm);
+                              txb, NULL, xfsize, to);
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
@@ -561,21 +542,19 @@ xwer_t xwds_w25qxx_write(struct xwds_w25qxx * w25qxx, xwu32_t address,
 err_w25qxx_ctrl:
 err_not_support:
 err_wait_idle:
-        xwds_w25qxx_write_disable(w25qxx, xwtm);
+        xwds_w25qxx_write_disable(w25qxx, to);
 err_we:
         return rc;
 }
 
-xwer_t xwds_w25qxx_erase_sector(struct xwds_w25qxx * w25qxx, xwu32_t address,
-                                xwtm_t * xwtm)
+xwer_t xwds_w25qxx_erase_sector(struct xwds_w25qxx * w25qxx, xwu32_t address, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
         xwer_t rc;
 
         XWDS_VALIDATE(w25qxx, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-        rc = xwds_w25qxx_write_enable(w25qxx, xwtm);
+        rc = xwds_w25qxx_write_enable(w25qxx, to);
         if (rc < 0) {
                 goto err_we;
         }
@@ -588,11 +567,11 @@ xwer_t xwds_w25qxx_erase_sector(struct xwds_w25qxx * w25qxx, xwu32_t address,
                               cmd.instruction,
                               cmd.address_size, address,
                               cmd.dummy_cycles,
-                              NULL, NULL, 0, xwtm);
+                              NULL, NULL, 0, to);
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
-        rc = xwds_w25qxx_wait_idle(w25qxx, 400 * XWTM_MS, xwtm);
+        rc = xwds_w25qxx_wait_idle(w25qxx, 400 * XWTM_MS, to);
         if (rc < 0) {
                 goto err_chk_idle;
         }
@@ -601,21 +580,19 @@ xwer_t xwds_w25qxx_erase_sector(struct xwds_w25qxx * w25qxx, xwu32_t address,
 err_chk_idle:
 err_w25qxx_ctrl:
 err_not_support:
-        xwds_w25qxx_write_disable(w25qxx, xwtm);
+        xwds_w25qxx_write_disable(w25qxx, to);
 err_we:
         return rc;
 }
 
-xwer_t xwds_w25qxx_erase_32kblk(struct xwds_w25qxx * w25qxx, xwu32_t address,
-                                xwtm_t * xwtm)
+xwer_t xwds_w25qxx_erase_32kblk(struct xwds_w25qxx * w25qxx, xwu32_t address, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
         xwer_t rc;
 
         XWDS_VALIDATE(w25qxx, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-        rc = xwds_w25qxx_write_enable(w25qxx, xwtm);
+        rc = xwds_w25qxx_write_enable(w25qxx, to);
         if (rc < 0) {
                 goto err_we;
         }
@@ -628,11 +605,11 @@ xwer_t xwds_w25qxx_erase_32kblk(struct xwds_w25qxx * w25qxx, xwu32_t address,
                               cmd.instruction,
                               cmd.address_size, address,
                               cmd.dummy_cycles,
-                              NULL, NULL, 0, xwtm);
+                              NULL, NULL, 0, to);
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
-        rc = xwds_w25qxx_wait_idle(w25qxx, 1600 * XWTM_MS, xwtm);
+        rc = xwds_w25qxx_wait_idle(w25qxx, 1600 * XWTM_MS, to);
         if (rc < 0) {
                 goto err_chk_idle;
         }
@@ -641,21 +618,19 @@ xwer_t xwds_w25qxx_erase_32kblk(struct xwds_w25qxx * w25qxx, xwu32_t address,
 err_chk_idle:
 err_w25qxx_ctrl:
 err_not_support:
-        xwds_w25qxx_write_disable(w25qxx, xwtm);
+        xwds_w25qxx_write_disable(w25qxx, to);
 err_we:
         return rc;
 }
 
-xwer_t xwds_w25qxx_erase_64kblk(struct xwds_w25qxx * w25qxx, xwu32_t address,
-                                xwtm_t * xwtm)
+xwer_t xwds_w25qxx_erase_64kblk(struct xwds_w25qxx * w25qxx, xwu32_t address, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
         xwer_t rc;
 
         XWDS_VALIDATE(w25qxx, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-        rc = xwds_w25qxx_write_enable(w25qxx, xwtm);
+        rc = xwds_w25qxx_write_enable(w25qxx, to);
         if (rc < 0) {
                 goto err_we;
         }
@@ -668,11 +643,11 @@ xwer_t xwds_w25qxx_erase_64kblk(struct xwds_w25qxx * w25qxx, xwu32_t address,
                               cmd.instruction,
                               cmd.address_size, address,
                               cmd.dummy_cycles,
-                              NULL, NULL, 0, xwtm);
+                              NULL, NULL, 0, to);
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
-        rc = xwds_w25qxx_wait_idle(w25qxx, 2000 * XWTM_MS, xwtm);
+        rc = xwds_w25qxx_wait_idle(w25qxx, 2000 * XWTM_MS, to);
         if (rc < 0) {
                 goto err_chk_idle;
         }
@@ -681,20 +656,19 @@ xwer_t xwds_w25qxx_erase_64kblk(struct xwds_w25qxx * w25qxx, xwu32_t address,
 err_chk_idle:
 err_w25qxx_ctrl:
 err_not_support:
-        xwds_w25qxx_write_disable(w25qxx, xwtm);
+        xwds_w25qxx_write_disable(w25qxx, to);
 err_we:
         return rc;
 }
 
-xwer_t xwds_w25qxx_erase_chip(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
+xwer_t xwds_w25qxx_erase_chip(struct xwds_w25qxx * w25qxx, xwtm_t to)
 {
         struct xwds_w25qxx_cmd cmd;
         xwer_t rc;
 
         XWDS_VALIDATE(w25qxx, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-        rc = xwds_w25qxx_write_enable(w25qxx, xwtm);
+        rc = xwds_w25qxx_write_enable(w25qxx, to);
         if (rc < 0) {
                 goto err_we;
         }
@@ -707,11 +681,11 @@ xwer_t xwds_w25qxx_erase_chip(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
                               cmd.instruction,
                               cmd.address_size, cmd.address,
                               cmd.dummy_cycles,
-                              NULL, NULL, 0, xwtm);
+                              NULL, NULL, 0, to);
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
-        rc = xwds_w25qxx_wait_idle(w25qxx, 2000 * XWTM_MS, xwtm);
+        rc = xwds_w25qxx_wait_idle(w25qxx, 2000 * XWTM_MS, to);
         if (rc < 0) {
                 goto err_chk_idle;
         }
@@ -720,7 +694,7 @@ xwer_t xwds_w25qxx_erase_chip(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm)
 err_chk_idle:
 err_w25qxx_ctrl:
 err_not_support:
-        xwds_w25qxx_write_disable(w25qxx, xwtm);
+        xwds_w25qxx_write_disable(w25qxx, to);
 err_we:
         return rc;
 }

@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwmd_isc_xwcq_mif_h__
@@ -65,10 +65,10 @@ xwer_t xwcq_put(struct xwcq * cq);
 xwer_t xwcq_eq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
 xwer_t xwcq_jq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
 xwer_t xwcq_dq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
-xwer_t xwcq_timedq(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t * xwtm);
+xwer_t xwcq_dq_to(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t to);
 xwer_t xwcq_trydq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
 xwer_t xwcq_peek(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
-xwer_t xwcq_timedpeek(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t * xwtm);
+xwer_t xwcq_peek_to(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t to);
 xwer_t xwcq_trypeek(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
 xwer_t xwcq_flush(struct xwcq * cq);
 xwer_t xwcq_get_capacity(struct xwcq * cq, xwsz_t * capbuf);

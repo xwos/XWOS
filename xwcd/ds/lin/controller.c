@@ -19,7 +19,6 @@
  */
 
 #include <xwcd/ds/standard.h>
-#include <xwos/osal/skd.h>
 #include <xwos/osal/lock/mtx.h>
 #include <xwcd/ds/lin/controller.h>
 
@@ -192,9 +191,7 @@ xwer_t xwds_linc_vop_resume(struct xwds_linc * linc)
  * @param[in] linc: LIN控制器对象指针
  * @param[in] id: 主机节点调度消息的ID
  * @param[in] msg: LIN消息结构体指针
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -203,30 +200,31 @@ xwer_t xwds_linc_vop_resume(struct xwds_linc * linc)
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_linc_msttx(struct xwds_linc * linc,
                        xwu8_t id, struct xwds_lin_msg * msg,
-                       xwtm_t * xwtm)
+                       xwtm_t to)
 {
         xwer_t rc;
         const struct xwds_linc_driver * drv;
 
         XWDS_VALIDATE(linc, "nullptr", -EFAULT);
         XWDS_VALIDATE(msg, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_linc_grab(linc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_linc_grab;
         }
-        rc = xwos_mtx_timedlock(&linc->txlock, xwtm);
+        rc = xwos_mtx_lock_to(&linc->txlock, to);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_linc_txlock;
         }
         drv = xwds_cast(const struct xwds_linc_driver *, linc->dev.drv);
         if ((drv) && (drv->msttx)) {
-                rc = drv->msttx(linc, id, msg, xwtm);
+                rc = drv->msttx(linc, id, msg, to);
         } else {
                 rc = -ENOSYS;
         }
@@ -249,9 +247,7 @@ err_linc_grab:
  * @brief XWDS API：从机节点发送一条LIN消息
  * @param[in] linc: LIN控制器对象指针
  * @param[in] msg: LIN消息结构体指针
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in,out] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -260,30 +256,31 @@ err_linc_grab:
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_linc_slvtx(struct xwds_linc * linc,
                        struct xwds_lin_msg * msg,
-                       xwtm_t * xwtm)
+                       xwtm_t to)
 {
         xwer_t rc;
         const struct xwds_linc_driver * drv;
 
         XWDS_VALIDATE(linc, "nullptr", -EFAULT);
         XWDS_VALIDATE(msg, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_linc_grab(linc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_linc_grab;
         }
-        rc = xwos_mtx_timedlock(&linc->txlock, xwtm);
+        rc = xwos_mtx_lock_to(&linc->txlock, to);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_linc_txlock;
         }
         drv = xwds_cast(const struct xwds_linc_driver *, linc->dev.drv);
         if (__xwcc_likely((drv) && (drv->slvtx))) {
-                rc = drv->slvtx(linc, msg, xwtm);
+                rc = drv->slvtx(linc, msg, to);
         } else {
                 rc = -ENOSYS;
         }
@@ -306,9 +303,7 @@ err_linc_grab:
  * @brief XWDS API：接收一条LIN消息
  * @param[in] linc: LIN控制器对象指针
  * @param[out] msgbuf: 指向接收消息缓冲区的指针
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in,out] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
@@ -317,18 +312,19 @@ err_linc_grab:
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_linc_rx(struct xwds_linc * linc,
                     struct xwds_lin_msg * msgbuf,
-                    xwtm_t * xwtm)
+                    xwtm_t to)
 {
         xwer_t rc;
         const struct xwds_linc_driver * drv;
 
         XWDS_VALIDATE(linc, "nullptr", -EFAULT);
         XWDS_VALIDATE(msgbuf, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_linc_grab(linc);
         if (__xwcc_unlikely(rc < 0)) {
@@ -336,7 +332,7 @@ xwer_t xwds_linc_rx(struct xwds_linc * linc,
         }
         drv = xwds_cast(const struct xwds_linc_driver *, linc->dev.drv);
         if (__xwcc_likely((drv) && (drv->rx))) {
-                rc = drv->rx(linc, msgbuf, xwtm);
+                rc = drv->rx(linc, msgbuf, to);
         } else {
                 rc = -ENOSYS;
         }

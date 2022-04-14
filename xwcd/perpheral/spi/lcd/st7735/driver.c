@@ -28,23 +28,23 @@
 static
 xwer_t xwds_st7735_write(struct xwds_st7735 * st7735, xwu8_t reg,
                          const xwu8_t * data, xwsz_t size,
-                         xwtm_t * xwtm)
+                         xwtm_t to)
 {
         struct xwds_st7735_driver * drv;
 
         drv = xwds_cast(struct xwds_st7735_driver *, st7735->spip.dev.drv);
-        return drv->write(st7735, reg, data, &size, xwtm);
+        return drv->write(st7735, reg, data, &size, to);
 }
 
 static
 xwer_t xwds_st7735_read(struct xwds_st7735 * st7735, xwu8_t reg,
                         xwu8_t * buf, xwsz_t size,
-                        xwtm_t * xwtm)
+                        xwtm_t to)
 {
         struct xwds_st7735_driver * drv;
 
         drv = xwds_cast(struct xwds_st7735_driver *, st7735->spip.dev.drv);
-        return drv->read(st7735, reg, buf, &size, xwtm);
+        return drv->read(st7735, reg, buf, &size, to);
 }
 
 /******** ******** base driver ******** ********/
@@ -107,7 +107,7 @@ xwer_t xwds_st7735_drv_start(struct xwds_device * dev)
         const struct xwds_st7735_cmd_table * init;
         xwu8_t buffer[4];
         xwsq_t i;
-        xwtm_t xwtm;
+        xwtm_t to;
         xwer_t rc;
 
         st7735 = xwds_cast(struct xwds_st7735 *, dev);
@@ -142,11 +142,11 @@ xwer_t xwds_st7735_drv_start(struct xwds_device * dev)
         }
 
         /* Init process */
-        xwtm = XWTM_MAX;
+        to = XWTM_MAX;
         for (i = 0; i < xw_array_size(xwds_st7735_init_table); i++) {
                 rc = xwds_st7735_write(st7735,
                                        init[i].reg, init[i].data, init[i].size,
-                                       &xwtm);
+                                       to);
                 if (rc < 0) {
                         goto err_write;
                 }
@@ -156,7 +156,7 @@ xwer_t xwds_st7735_drv_start(struct xwds_device * dev)
         buffer[0] = param->pixelformat;
         rc = xwds_st7735_write(st7735,
                                XWDS_ST7735_COLMOD, buffer, 1,
-                               &xwtm);
+                               to);
         if (rc < 0) {
                 goto err_write;
         }
@@ -165,11 +165,11 @@ xwer_t xwds_st7735_drv_start(struct xwds_device * dev)
         if (XWDS_ST7735_INVERSION_ON == param->inversion) {
                 rc = xwds_st7735_write(st7735,
                                        XWDS_ST7735_INVON, NULL, 0,
-                                       &xwtm);
+                                       to);
         } else {
                 rc = xwds_st7735_write(st7735,
                                        XWDS_ST7735_INVOFF, NULL, 0,
-                                       &xwtm);
+                                       to);
         }
         if (rc < 0) {
                 goto err_write;
@@ -179,7 +179,7 @@ xwer_t xwds_st7735_drv_start(struct xwds_device * dev)
         buffer[0] = param->orientation | param->rgbseq;
         rc = xwds_st7735_write(st7735,
                                XWDS_ST7735_MADCTL, buffer, 1,
-                               &xwtm);
+                               to);
         if (rc < 0) {
                 goto err_write;
         }
@@ -191,7 +191,7 @@ xwer_t xwds_st7735_drv_start(struct xwds_device * dev)
         buffer[3] = param->width + param->width_offset - 1;
         rc = xwds_st7735_write(st7735,
                                XWDS_ST7735_CASET, buffer, 4,
-                               &xwtm);
+                               to);
         if (rc < 0) {
                 goto err_write;
         }
@@ -203,7 +203,7 @@ xwer_t xwds_st7735_drv_start(struct xwds_device * dev)
         buffer[3] = param->height + param->height_offset - 1;
         rc = xwds_st7735_write(st7735,
                                XWDS_ST7735_RASET, buffer, 4,
-                               &xwtm);
+                               to);
         if (rc < 0) {
                 goto err_write;
         }
@@ -211,7 +211,7 @@ xwer_t xwds_st7735_drv_start(struct xwds_device * dev)
         /* Display On */
         rc = xwds_st7735_write(st7735,
                                XWDS_ST7735_DISPON, NULL, 0,
-                               &xwtm);
+                               to);
         if (rc < 0) {
                 goto err_write;
         }
@@ -240,16 +240,16 @@ xwer_t xwds_st7735_drv_stop(struct xwds_device * dev)
         struct xwds_st7735 * st7735;
         const struct xwds_st7735_cmd_table * deinit;
         xwsq_t i;
-        xwtm_t xwtm;
+        xwtm_t to;
         xwer_t rc;
 
         st7735 = xwds_cast(struct xwds_st7735 *, dev);
         deinit = xwds_st7735_deinit_table;
-        xwtm = XWTM_MAX;
+        to = XWTM_MAX;
         for (i = 0; i < xw_array_size(xwds_st7735_deinit_table); i++) {
                 rc = xwds_st7735_write(st7735,
                                        deinit[i].reg, deinit[i].data, deinit[i].size,
-                                       &xwtm);
+                                       to);
                 if (rc < 0) {
                         goto err_write;
                 }
@@ -273,18 +273,17 @@ xwer_t xwds_st7735_drv_suspend(struct xwds_device * dev)
 #endif
 
 /******** ******** ******** APIs ******** ******** ********/
-xwer_t xwds_st7735_cfgbus(struct xwds_st7735 * st7735, xwtm_t * xwtm)
+xwer_t xwds_st7735_cfgbus(struct xwds_st7735 * st7735, xwtm_t to)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_st7735_grab(st7735);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_st7735_grab;
         }
-        rc = xwds_spim_buscfg(st7735->spip.bus, st7735->spip.buscfgid, xwtm);
+        rc = xwds_spim_buscfg(st7735->spip.bus, st7735->spip.buscfgid, to);
         if (rc < 0) {
                 goto err_spim_buscfg;
         }
@@ -297,19 +296,18 @@ err_st7735_grab:
         return rc;
 }
 
-xwer_t xwds_st7735_read_id(struct xwds_st7735 * st7735, xwu32_t * id, xwtm_t * xwtm)
+xwer_t xwds_st7735_read_id(struct xwds_st7735 * st7735, xwu32_t * id, xwtm_t to)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
         XWDS_VALIDATE(id, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_st7735_grab(st7735);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_st7735_grab;
         }
-        rc = xwds_st7735_read(st7735, XWDS_ST7735_RDDID, (xwu8_t *)id, 4, xwtm);
+        rc = xwds_st7735_read(st7735, XWDS_ST7735_RDDID, (xwu8_t *)id, 4, to);
         xwds_st7735_put(st7735);
         return XWOK;
 
@@ -319,19 +317,18 @@ err_st7735_grab:
 
 xwer_t xwds_st7735_read_status(struct xwds_st7735 * st7735,
                                xwu8_t st[5],
-                               xwtm_t * xwtm)
+                               xwtm_t to)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
         XWDS_VALIDATE(id, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_st7735_grab(st7735);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_st7735_grab;
         }
-        rc = xwds_st7735_read(st7735, XWDS_ST7735_RDDST, st, 5, xwtm);
+        rc = xwds_st7735_read(st7735, XWDS_ST7735_RDDST, st, 5, to);
         xwds_st7735_put(st7735);
         return XWOK;
 
@@ -341,19 +338,18 @@ err_st7735_grab:
 
 xwer_t xwds_st7735_read_madctl(struct xwds_st7735 * st7735,
                                xwu8_t madctl[2],
-                               xwtm_t * xwtm)
+                               xwtm_t to)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
         XWDS_VALIDATE(id, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_st7735_grab(st7735);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_st7735_grab;
         }
-        rc = xwds_st7735_read(st7735, XWDS_ST7735_RDDMADCTL, madctl, 2, xwtm);
+        rc = xwds_st7735_read(st7735, XWDS_ST7735_RDDMADCTL, madctl, 2, to);
         xwds_st7735_put(st7735);
         return XWOK;
 
@@ -363,19 +359,18 @@ err_st7735_grab:
 
 xwer_t xwds_st7735_read_colmod(struct xwds_st7735 * st7735,
                                xwu8_t colmod[2],
-                               xwtm_t * xwtm)
+                               xwtm_t to)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
         XWDS_VALIDATE(id, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_st7735_grab(st7735);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_st7735_grab;
         }
-        rc = xwds_st7735_read(st7735, XWDS_ST7735_RDDCOLMOD, colmod, 2, xwtm);
+        rc = xwds_st7735_read(st7735, XWDS_ST7735_RDDCOLMOD, colmod, 2, to);
         xwds_st7735_put(st7735);
         return XWOK;
 
@@ -383,24 +378,22 @@ err_st7735_grab:
         return rc;
 }
 
-xwer_t xwds_st7735_display_on(struct xwds_st7735 * st7735, xwtm_t * xwtm)
+xwer_t xwds_st7735_display_on(struct xwds_st7735 * st7735, xwtm_t to)
 {
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         return xwds_st7735_write(st7735,
                                  XWDS_ST7735_DISPON, NULL, 0,
-                                 xwtm);
+                                 to);
 }
 
-xwer_t xwds_st7735_display_off(struct xwds_st7735 * st7735, xwtm_t * xwtm)
+xwer_t xwds_st7735_display_off(struct xwds_st7735 * st7735, xwtm_t to)
 {
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         return xwds_st7735_write(st7735,
                                  XWDS_ST7735_DISPOFF, NULL, 0,
-                                 xwtm);
+                                 to);
 }
 
 xwer_t xwds_st7735_set_brightness(struct xwds_st7735 * st7735, xwu32_t brightness)
@@ -431,14 +424,13 @@ void xwds_st7735_get_brightness(struct xwds_st7735 * st7735, xwu32_t * brightnes
 }
 
 xwer_t xwds_st7735_set_orientation(struct xwds_st7735 * st7735,
-                                   xwu8_t orientation, xwtm_t * xwtm)
+                                   xwu8_t orientation, xwtm_t to)
 {
         struct xwds_st7735_parameter * param;
         xwu8_t tmp;
         xwer_t rc;
 
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         XWDS_VALIDATE(((XWDS_ST7735_ORIENTATION_PORTRAIT == orientation) ||
                        (XWDS_ST7735_ORIENTATION_LANDSCAPE_ROT180 == orientation) ||
@@ -450,7 +442,7 @@ xwer_t xwds_st7735_set_orientation(struct xwds_st7735 * st7735,
         tmp = orientation;
         rc = xwds_st7735_write(st7735,
                                XWDS_ST7735_MADCTL, &tmp, 1,
-                               xwtm);
+                               to);
         if (rc < 0) {
                 goto err_write;
         }
@@ -494,14 +486,13 @@ void xwds_st7735_get_orientation(struct xwds_st7735 * st7735, xwu8_t * orientati
 
 static
 xwer_t xwds_st7735_set_cursor(struct xwds_st7735 * st7735, xwu8_t x, xwu8_t y,
-                              xwtm_t * xwtm)
+                              xwtm_t to)
 {
         struct xwds_st7735_parameter * param;
         xwu8_t buffer[4];
         xwer_t rc;
 
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         param = &st7735->parameter;
 
@@ -515,7 +506,7 @@ xwer_t xwds_st7735_set_cursor(struct xwds_st7735 * st7735, xwu8_t x, xwu8_t y,
         buffer[3] = param->width + param->width_offset - 1;
         rc = xwds_st7735_write(st7735,
                                XWDS_ST7735_CASET, buffer, 4,
-                               xwtm);
+                               to);
         if (rc < 0) {
                 goto err_write;
         }
@@ -527,7 +518,7 @@ xwer_t xwds_st7735_set_cursor(struct xwds_st7735 * st7735, xwu8_t x, xwu8_t y,
         buffer[3] = param->height + param->height_offset - 1;
         rc = xwds_st7735_write(st7735,
                                XWDS_ST7735_RASET, buffer, 4,
-                               xwtm);
+                               to);
         if (rc < 0) {
                 goto err_write;
         }
@@ -540,14 +531,13 @@ err_write:
 static
 xwer_t xwds_st7735_set_window(struct xwds_st7735 * st7735,
                               xwu8_t x, xwu8_t y, xwu8_t width, xwu8_t height,
-                              xwtm_t * xwtm)
+                              xwtm_t to)
 {
         struct xwds_st7735_parameter * param;
         xwu8_t buffer[4];
         xwer_t rc;
 
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
         XWDS_VALIDATE((x < width), "nullptr", -ERANGE);
         XWDS_VALIDATE((y < height), "nullptr", -ERANGE);
 
@@ -563,7 +553,7 @@ xwer_t xwds_st7735_set_window(struct xwds_st7735 * st7735,
         buffer[3] = width + param->width_offset - 1;
         rc = xwds_st7735_write(st7735,
                                XWDS_ST7735_CASET, buffer, 4,
-                               xwtm);
+                               to);
         if (rc < 0) {
                 goto err_write;
         }
@@ -575,7 +565,7 @@ xwer_t xwds_st7735_set_window(struct xwds_st7735 * st7735,
         buffer[3] = height + param->height_offset - 1;
         rc = xwds_st7735_write(st7735,
                                XWDS_ST7735_RASET, buffer, 4,
-                               xwtm);
+                               to);
         if (rc < 0) {
                 goto err_write;
         }
@@ -585,36 +575,34 @@ err_write:
         return rc;
 }
 
-xwer_t xwds_st7735_invert_color(struct xwds_st7735 * st7735, bool inv, xwtm_t * xwtm)
+xwer_t xwds_st7735_invert_color(struct xwds_st7735 * st7735, bool inv, xwtm_t to)
 {
         xwer_t rc;
 
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         if (inv) {
                 rc = xwds_st7735_write(st7735,
                                        XWDS_ST7735_INVON, NULL, 0,
-                                       xwtm);
+                                       to);
         } else {
                 rc = xwds_st7735_write(st7735,
                                        XWDS_ST7735_INVOFF, NULL, 0,
-                                       xwtm);
+                                       to);
         }
         return rc;
 }
 
 xwer_t xwds_st7735_set_pixel(struct xwds_st7735 * st7735,
                              xwu8_t x, xwu8_t y,
-                             xwu16_t color, xwtm_t * xwtm)
+                             xwu16_t color, xwtm_t to)
 {
         xwu8_t buffer[2];
         xwer_t rc;
 
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-        rc = xwds_st7735_set_cursor(st7735, x, y, xwtm);
+        rc = xwds_st7735_set_cursor(st7735, x, y, to);
         if (rc < 0) {
                 goto err_set_cursor;
         }
@@ -622,7 +610,7 @@ xwer_t xwds_st7735_set_pixel(struct xwds_st7735 * st7735,
         buffer[1] = color & 0xFF;
         rc = xwds_st7735_write(st7735,
                                XWDS_ST7735_RAMWR, buffer, 2,
-                               xwtm);
+                               to);
 
 err_set_cursor:
         return rc;
@@ -630,7 +618,7 @@ err_set_cursor:
 
 xwer_t xwds_st7735_fill_rect(struct xwds_st7735 * st7735,
                              xwu8_t x, xwu8_t y, xwu8_t width, xwu8_t height,
-                             xwu16_t color, xwtm_t * xwtm)
+                             xwu16_t color, xwtm_t to)
 {
         xwer_t rc;
         xwsz_t i, total, wrsz;
@@ -638,7 +626,6 @@ xwer_t xwds_st7735_fill_rect(struct xwds_st7735 * st7735,
         xwu8_t colorh, colorl;
 
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         colorh = color >> 8;
         colorl = color & 0xFF;
@@ -646,7 +633,7 @@ xwer_t xwds_st7735_fill_rect(struct xwds_st7735 * st7735,
                 fb[i] = colorh;
                 fb[i + 1] = colorl;
         }
-        rc = xwds_st7735_set_window(st7735, x, y, width, height, xwtm);
+        rc = xwds_st7735_set_window(st7735, x, y, width, height, to);
         if (rc < 0) {
                 goto err_set_window;
         }
@@ -660,7 +647,7 @@ xwer_t xwds_st7735_fill_rect(struct xwds_st7735 * st7735,
                 }
                 rc = xwds_st7735_write(st7735,
                                        XWDS_ST7735_RAMWR, fb, i,
-                                       xwtm);
+                                       to);
                 if (rc < 0) {
                         goto err_write;
                 }
@@ -675,16 +662,15 @@ err_set_window:
 
 xwer_t xwds_st7735_draw(struct xwds_st7735 * st7735,
                         xwu8_t x, xwu8_t y, xwu8_t width, xwu8_t height,
-                        const xwu8_t img[], xwtm_t * xwtm)
+                        const xwu8_t img[], xwtm_t to)
 {
         xwer_t rc;
         xwsz_t total;
 
         XWDS_VALIDATE(st7735, "nullptr", -EFAULT);
         XWDS_VALIDATE(image, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
-        rc = xwds_st7735_set_window(st7735, x, y, width, height, xwtm);
+        rc = xwds_st7735_set_window(st7735, x, y, width, height, to);
         if (rc < 0) {
                 goto err_set_window;
         }
@@ -692,7 +678,7 @@ xwer_t xwds_st7735_draw(struct xwds_st7735 * st7735,
         total = (xwsz_t)width * (xwsz_t)height * (xwsz_t)2;
         rc = xwds_st7735_write(st7735,
                                XWDS_ST7735_RAMWR, img, total,
-                               xwtm);
+                               to);
 
 err_set_window:
         return rc;

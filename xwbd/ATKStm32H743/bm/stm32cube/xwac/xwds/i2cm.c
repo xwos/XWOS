@@ -43,12 +43,12 @@ xwer_t stm32cube_i2c2m_drv_resume(struct xwds_device * dev);
 static
 xwer_t stm32cube_i2c2m_drv_xfer(struct xwds_i2cm * i2cm,
                                 struct xwds_i2c_msg * msg,
-                                xwtm_t * xwtm);
+                                xwtm_t to);
 
 static
 xwer_t stm32cube_i2c2m_drv_abort(struct xwds_i2cm * i2cm,
                                  xwu16_t address, xwu16_t addrmode,
-                                 xwtm_t * xwtm);
+                                 xwtm_t to);
 
 const struct xwds_i2cm_driver stm32cube_i2c2m_drv = {
         .base = {
@@ -118,7 +118,7 @@ xwer_t stm32cube_i2c2m_drv_suspend(struct xwds_device * dev)
 static
 xwer_t stm32cube_i2c2m_drv_xfer(struct xwds_i2cm * i2cm,
                                 struct xwds_i2c_msg * msg,
-                                xwtm_t * xwtm)
+                                xwtm_t to)
 {
         struct MX_I2C_MasterDriverData * drvdata;
         xwu32_t addm;
@@ -138,9 +138,9 @@ xwer_t stm32cube_i2c2m_drv_xfer(struct xwds_i2cm * i2cm,
         drvdata->msg = msg;
         rc = MX_I2C2_Xfer(msg);
         if (XWOK == rc) {
-                rc = xwos_cond_timedwait(&drvdata->cond,
-                                         ulk, XWOS_LK_SPLK, NULL,
-                                         xwtm, &lkst);
+                rc = xwos_cond_wait_to(&drvdata->cond,
+                                       ulk, XWOS_LK_SPLK, NULL,
+                                       to, &lkst);
                 if (XWOK == rc) {
                         if (XWOS_LKST_UNLOCKED == lkst) {
                                 xwos_splk_lock(&drvdata->splk);
@@ -162,12 +162,12 @@ xwer_t stm32cube_i2c2m_drv_xfer(struct xwds_i2cm * i2cm,
 static
 xwer_t stm32cube_i2c2m_drv_abort(struct xwds_i2cm * i2cm,
                                  xwu16_t address, xwu16_t addrmode,
-                                 xwtm_t * xwtm)
+                                 xwtm_t to)
 {
         xwu32_t addm;
         xwer_t rc;
 
-        XWOS_UNUSED(xwtm);
+        XWOS_UNUSED(to);
 
         addm = MX_I2C2_GetAddressingMode();
         if ((addrmode & XWDS_I2C_F_ADDRMSK) != addm) {

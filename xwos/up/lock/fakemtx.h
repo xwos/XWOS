@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  * @note
  * - 单核(UP)系统中并不需要自旋锁，为了满足xwosal中API的风格，
  *   源码中实现的自旋锁是虚假的。
@@ -101,9 +101,9 @@ xwer_t xwup_mtx_lock(struct xwup_mtx * mtx)
 }
 
 static __xwup_inline_api
-xwer_t xwup_mtx_timedlock(struct xwup_mtx * mtx, xwtm_t * xwtm)
+xwer_t xwup_mtx_lock_to(struct xwup_mtx * mtx, xwtm_t to)
 {
-        return XWUP_SEM_API(timedwait, &mtx->fake, xwtm);
+        return XWUP_SEM_API(lock_to, &mtx->fake, to);
 }
 
 static __xwup_inline_api

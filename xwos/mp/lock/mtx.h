@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_mp_lock_mtx_h__
@@ -30,7 +30,6 @@ struct xwmp_mtxtree;
  */
 struct xwmp_mtx {
         struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
-
         struct xwmp_mtxtree * ownertree; /**< 获得此互斥锁的线程的互斥锁树：
                                               如果为空(NULL)，互斥锁处于未加锁状态。
                                               此成员被锁rtwq.lock保护。*/
@@ -65,7 +64,7 @@ xwer_t xwmp_mtx_put(struct xwmp_mtx * mtx);
 xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx);
 xwer_t xwmp_mtx_lock(struct xwmp_mtx * mtx);
 xwer_t xwmp_mtx_trylock(struct xwmp_mtx * mtx);
-xwer_t xwmp_mtx_timedlock(struct xwmp_mtx * mtx, xwtm_t * xwtm);
+xwer_t xwmp_mtx_lock_to(struct xwmp_mtx * mtx, xwtm_t to);
 xwer_t xwmp_mtx_lock_unintr(struct xwmp_mtx * mtx);
 xwer_t xwmp_mtx_getlkst(struct xwmp_mtx * mtx, xwsq_t * lkst);
 

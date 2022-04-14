@@ -301,7 +301,7 @@ int xwlua_flgsp_wait(lua_State * L)
         xwsq_t action;
         xwlua_bmp_t * origin;
         xwlua_bmp_t * msk;
-        xwtm_t time;
+        xwtm_t to;
         int top;
         int opt;
         int type;
@@ -323,9 +323,9 @@ int xwlua_flgsp_wait(lua_State * L)
                 type = lua_type(L, 6);
                 switch (type) {
                 case LUA_TNUMBER:
-                        time = (xwtm_t)luaL_checknumber(L, 6);
-                        rc = xwos_flg_timedwait(flgsp->flg, trigger, action,
-                                                origin->bmp, msk->bmp, &time);
+                        to = (xwtm_t)luaL_checknumber(L, 6);
+                        rc = xwos_flg_wait_to(flgsp->flg, trigger, action,
+                                              origin->bmp, msk->bmp, to);
                         break;
                 case LUA_TSTRING:
                         opt = luaL_checkoption(L, 6, "t", xwlua_flg_opt);

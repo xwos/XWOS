@@ -33,7 +33,7 @@ struct xwds_w25qxx_driver {
         struct xwds_spip_driver spip; /**< C语言面向对象：继承struct xwds_spip_driver */
         xwer_t (* io)(struct xwds_w25qxx * /*w25qxx*/,
                       xwu8_t * /*txq*/, xwu8_t * /*rxq*/,
-                      xwsz_t * /*size*/, xwtm_t * /*xwtm*/);
+                      xwsz_t * /*size*/, xwtm_t /*to*/);
 };
 
 extern struct xwds_w25qxx_cmd xwds_w25q64jv_cmd[XWDS_W25QXX_CMD_NUM];
@@ -48,39 +48,39 @@ xwer_t xwds_w25qxx_drv_suspend(struct xwds_device * dev);
 #endif
 
 /******** ******** ******** APIs ******** ******** ********/
-xwer_t xwds_w25qxx_cfgbus(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm);
+xwer_t xwds_w25qxx_cfgbus(struct xwds_w25qxx * w25qxx, xwtm_t to);
 xwer_t xwds_w25qxx_ctrl(struct xwds_w25qxx * w25qxx,
                         xwu8_t instruction,
                         xwu8_t address_size, xwu32_t address,
                         xwu32_t dummy_cycles,
                         const xwu8_t txd[], xwu8_t * rxb, xwsz_t size,
-                        xwtm_t * xwtm);
-xwer_t xwds_w25qxx_reset(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm);
-xwer_t xwds_w25qxx_init_parameter(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm);
-xwer_t xwds_w25qxx_write_enable(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm);
-xwer_t xwds_w25qxx_write_disable(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm);
+                        xwtm_t to);
+xwer_t xwds_w25qxx_reset(struct xwds_w25qxx * w25qxx, xwtm_t to);
+xwer_t xwds_w25qxx_init_parameter(struct xwds_w25qxx * w25qxx, xwtm_t to);
+xwer_t xwds_w25qxx_write_enable(struct xwds_w25qxx * w25qxx, xwtm_t to);
+xwer_t xwds_w25qxx_write_disable(struct xwds_w25qxx * w25qxx, xwtm_t to);
 xwer_t xwds_w25qxx_read_sr(struct xwds_w25qxx * w25qxx,
                            xwu32_t sridx, xwu8_t * srbuf,
-                           xwtm_t * xwtm);
-xwer_t xwds_w25qxx_check_idle(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm);
+                           xwtm_t to);
+xwer_t xwds_w25qxx_check_idle(struct xwds_w25qxx * w25qxx, xwtm_t to);
 xwer_t xwds_w25qxx_wait_idle(struct xwds_w25qxx * w25qxx, xwtm_t period,
-                             xwtm_t * xwtm);
+                             xwtm_t to);
 xwer_t xwds_w25qxx_read_uid(struct xwds_w25qxx * w25qxx, xwu64_t * uidbuf,
-                            xwtm_t * xwtm);
+                            xwtm_t to);
 xwer_t xwds_w25qxx_read_mid(struct xwds_w25qxx * w25qxx, xwu16_t * midbuf,
-                            xwtm_t * xwtm);
+                            xwtm_t to);
 xwer_t xwds_w25qxx_read_jid(struct xwds_w25qxx * w25qxx, xwu32_t * jidbuf,
-                            xwtm_t * xwtm);
+                            xwtm_t to);
 xwer_t xwds_w25qxx_read(struct xwds_w25qxx * w25qxx, xwu32_t address,
-                        xwu8_t * rxb, xwsz_t * size, xwtm_t * xwtm);
+                        xwu8_t * rxb, xwsz_t * size, xwtm_t to);
 xwer_t xwds_w25qxx_write(struct xwds_w25qxx * w25qxx, xwu32_t address,
-                         xwu8_t * txb, xwsz_t * size, xwtm_t * xwtm);
+                         xwu8_t * txb, xwsz_t * size, xwtm_t to);
 xwer_t xwds_w25qxx_erase_sector(struct xwds_w25qxx * w25qxx, xwu32_t address,
-                                xwtm_t * xwtm);
+                                xwtm_t to);
 xwer_t xwds_w25qxx_erase_32kblk(struct xwds_w25qxx * w25qxx, xwu32_t address,
-                                xwtm_t * xwtm);
+                                xwtm_t to);
 xwer_t xwds_w25qxx_erase_64kblk(struct xwds_w25qxx * w25qxx, xwu32_t address,
-                                xwtm_t * xwtm);
-xwer_t xwds_w25qxx_erase_chip(struct xwds_w25qxx * w25qxx, xwtm_t * xwtm);
+                                xwtm_t to);
+xwer_t xwds_w25qxx_erase_chip(struct xwds_w25qxx * w25qxx, xwtm_t to);
 
 #endif /* xwcd/perpheral/spi/flash/w25qxx/driver.h */

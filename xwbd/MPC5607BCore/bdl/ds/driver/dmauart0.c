@@ -62,7 +62,7 @@ void mpc560xb_dmauart0_tx_cb(struct xwds_soc * soc, xwid_t ch, xwu32_t rc,
 static __xwbsp_code
 xwer_t mpc560xb_dmauart0_drv_tx(struct xwds_dmauartc * dmauartc,
                                 const xwu8_t * srcmem, xwsz_t * size,
-                                xwtm_t * xwtm);
+                                xwtm_t to);
 
 static __xwbsp_code
 void mpc560xb_dmauart0_rxdma_cb(struct xwds_soc * soc, xwid_t ch, xwu32_t res,
@@ -564,7 +564,7 @@ void mpc560xb_dmauart0_tx_cb(struct xwds_soc * soc, xwid_t ch, xwu32_t rc,
 static __xwbsp_code
 xwer_t mpc560xb_dmauart0_drv_tx(struct xwds_dmauartc * dmauartc,
                                 const xwu8_t * srcmem, xwsz_t * size,
-                                xwtm_t * xwtm)
+                                xwtm_t to)
 {
         union xwos_ulock ulk;
         struct mpc560xb_dmauart0_drvdata * drvdata;
@@ -596,9 +596,9 @@ xwer_t mpc560xb_dmauart0_drv_tx(struct xwds_dmauartc * dmauartc,
         drvdata->tx.rc = -EINPROGRESS;
         rc = xwds_dma_enable(txdmarsc->soc, txdmarsc->ch);
         if (XWOK == rc) {
-                rc = xwos_cond_timedwait(&drvdata->tx.cond,
-                                         ulk, XWOS_LK_SPLK, NULL,
-                                         xwtm, &lkst);
+                rc = xwos_cond_wait_to(&drvdata->tx.cond,
+                                       ulk, XWOS_LK_SPLK, NULL,
+                                       to, &lkst);
                 if (XWOK == rc) {
                         if (XWOS_LKST_UNLOCKED == lkst) {
                                 xwos_splk_lock(&drvdata->tx.splk);

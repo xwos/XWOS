@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <arch_image.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwcd/ds/soc/gpio.h>
 #include <xwmd/ramcode/mif.h>
 #include <bdl/standard.h>
@@ -38,7 +38,7 @@
 static
 xwer_t bm_ramcode_load(struct ramcode * ramcode,
                        xwu8_t * loadbuf, xwsz_t * bufsize,
-                       xwtm_t * xwtm);
+                       xwtm_t to);
 
 static
 xwer_t main_task(void * arg);
@@ -103,16 +103,15 @@ err_skd_start_lc:
 static
 xwer_t bm_ramcode_load(struct ramcode * ramcode,
                        xwu8_t * loadbuf, xwsz_t * bufsize,
-                       xwtm_t * xwtm)
+                       xwtm_t to)
 {
-        return xwscp_rx(ramcode->opcb, loadbuf, bufsize, xwtm);
+        return xwscp_rx(ramcode->opcb, loadbuf, bufsize, to);
 }
 
 static
 xwer_t main_task(void * arg)
 {
         xwer_t rc;
-        xwtm_t xwtm;
 
         XWOS_UNUSED(arg);
 
@@ -127,8 +126,7 @@ xwer_t main_task(void * arg)
         if (rc < 0) {
                 goto err_xwscp_start;
         }
-        xwtm = XWTM_MAX;
-        rc = xwscp_connect(&bm_xwscp, &xwtm);
+        rc = xwscp_connect(&bm_xwscp, XWTM_MAX);
         if (rc < 0) {
                 goto err_xwscp_connect;
         }

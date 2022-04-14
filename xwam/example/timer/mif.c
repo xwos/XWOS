@@ -22,7 +22,7 @@
 #include <string.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwos/osal/swt.h>
 #include <xwos/osal/sync/flg.h>
 #include <xwam/example/timer/mif.h>
@@ -138,7 +138,7 @@ void xwswtdemo_swt1_callback(struct xwos_swt * swt, void * arg)
  */
 xwer_t xwswtdemo_thd_func(void * arg)
 {
-        xwtm_t base, ts;
+        xwtm_t ts;
         xwer_t rc;
         xwbmpop_declare(msk, SWTFLG_NUM) = {0,};
         xwbmpop_declare(trg, SWTFLG_NUM) = {0,};
@@ -146,16 +146,15 @@ xwer_t xwswtdemo_thd_func(void * arg)
         XWOS_UNUSED(arg);
 
         swtlogf(INFO, "[线程] 启动。\n");
-        base = xwos_skd_get_timetick_lc();
-
         swtlogf(INFO, "[线程] 启动定时器0。\n");
+        ts = xwtm_now();
         rc = xwos_swt_start(&xwswtdemo_swt0,
-                            base, 500 * XWTM_MS,
+                            ts, 500 * XWTM_MS,
                             xwswtdemo_swt0_callback, NULL);
 
         swtlogf(INFO, "[线程] 启动定时器1。\n");
         rc = xwos_swt_start(xwswtdemo_swt1,
-                            base, 800 * XWTM_MS,
+                            ts, 800 * XWTM_MS,
                             xwswtdemo_swt1_callback, NULL);
 
         /* 设置掩码位为bit0:1共2位 */
@@ -170,7 +169,7 @@ xwer_t xwswtdemo_thd_func(void * arg)
                 if (XWOK == rc) {
                         /* 测试第0位是否被置1 */
                         if (xwbmpop_t1i(trg, 0)) {
-                                ts = xwos_skd_get_timestamp_lc();
+                                ts = xwtm_nowts();
                                 swtlogf(INFO,
                                         "[线程] 定时器0唤醒，时间戳：%lld 纳秒。\n",
                                         ts);
@@ -178,13 +177,13 @@ xwer_t xwswtdemo_thd_func(void * arg)
 
                         /* 测试第1位是否被置1 */
                         if (xwbmpop_t1i(trg, 1)) {
-                                ts = xwos_skd_get_timestamp_lc();
+                                ts = xwtm_nowts();
                                 swtlogf(INFO,
                                         "[线程] 定时器1唤醒，时间戳：%lld 纳秒。\n",
                                         ts);
                         }
                 } else {
-                        ts = xwos_skd_get_timestamp_lc();
+                        ts = xwtm_nowts();
                         swtlogf(ERR,
                                 "[线程] 错误，时间戳：%lld 纳秒，错误码：%d。\n",
                                 ts, rc);

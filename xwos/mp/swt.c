@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #include <xwos/standard.h>
@@ -318,7 +318,7 @@ void xwmp_swt_ttn_cb(void * entry)
 {
         struct xwmp_swt * swt;
         struct xwmp_tt * xwtt;
-        xwtm_t expected;
+        xwtm_t to;
         xwreg_t cpuirq;
         xwer_t rc;
 
@@ -326,9 +326,9 @@ void xwmp_swt_ttn_cb(void * entry)
         xwtt = &swt->xwskd->tt;
         swt->cb(swt, swt->arg);
         if (XWMP_SWT_FLAG_RESTART & swt->flag) {
-                expected = xwtm_add_safely(swt->ttn.wkup_xwtm, swt->period);
+                to = xwtm_add_safely(swt->ttn.wkup_xwtm, swt->period);
                 xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
-                swt->ttn.wkup_xwtm = expected;
+                swt->ttn.wkup_xwtm = to;
                 xwaop_store(xwsq_t, &swt->ttn.wkuprs,
                             xwmb_modr_release, XWMP_TTN_WKUPRS_UNKNOWN);
                 swt->ttn.cb = xwmp_swt_ttn_cb;
@@ -344,7 +344,7 @@ xwer_t xwmp_swt_start(struct xwmp_swt * swt,
                       xwmp_swt_f cb, void * arg)
 {
         struct xwmp_tt * xwtt;
-        xwtm_t expected;
+        xwtm_t to;
         xwer_t rc;
         xwreg_t cpuirq;
 
@@ -354,7 +354,7 @@ xwer_t xwmp_swt_start(struct xwmp_swt * swt,
                       "out-of-time", -EINVAL);
 
         xwtt = &swt->xwskd->tt;
-        expected = xwtm_add_safely(base, period);
+        to = xwtm_add_safely(base, period);
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         if (__xwcc_unlikely(NULL != swt->ttn.cb)) {
                 rc = -EALREADY;
@@ -364,7 +364,7 @@ xwer_t xwmp_swt_start(struct xwmp_swt * swt,
         swt->arg = arg;
         swt->period = period;
         /* 加入时间树 */
-        swt->ttn.wkup_xwtm = expected;
+        swt->ttn.wkup_xwtm = to;
         xwaop_store(xwsq_t, &swt->ttn.wkuprs,
                     xwmb_modr_release, XWMP_TTN_WKUPRS_UNKNOWN);
         swt->ttn.xwtt = xwtt;

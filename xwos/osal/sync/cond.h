@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_osal_sync_cond_h__
@@ -15,6 +15,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/jack/sync/cond.h>
+#include <xwos/osal/time.h>
 #include <xwos/osal/sync/sel.h>
 #include <xwos/osal/lock/mtx.h>
 
@@ -392,9 +393,7 @@ xwer_t xwos_cond_wait(struct xwos_cond * cond,
  * @param[in] lock: 锁
  * @param[in] lktype: 锁的类型，取值：@ref xwos_lock_type_em
  * @param[in] lkdata: 锁的数据
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @param[out] lkst: 指向缓冲区的指针，通过此缓冲区返回锁的状态
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -407,13 +406,15 @@ xwer_t xwos_cond_wait(struct xwos_cond * cond,
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 static __xwos_inline_api
-xwer_t xwos_cond_timedwait(struct xwos_cond * cond,
-                           union xwos_ulock lock, xwsq_t lktype, void * lkdata,
-                           xwtm_t * xwtm, xwsq_t * lkst)
+xwer_t xwos_cond_wait_to(struct xwos_cond * cond,
+                         union xwos_ulock lock, xwsq_t lktype, void * lkdata,
+                         xwtm_t to, xwsq_t * lkst)
 {
-        return xwosdl_cond_timedwait(&cond->oscond, lock, lktype, lkdata, xwtm, lkst);
+        return xwosdl_cond_wait_to(&cond->oscond, lock, lktype, lkdata, to, lkst);
 }
 
 /**

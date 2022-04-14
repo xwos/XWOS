@@ -18,7 +18,7 @@
  * > limitations under the License.
  */
 
-#include <xwos/osal/skd.h>
+#include <xwos/standard.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/cond.h>
 #include <xwcd/ds/spi/master.h>
@@ -44,12 +44,12 @@ xwer_t stm32cube_spi1m_drv_resume(struct xwds_device * dev);
 static
 xwer_t stm32cube_spi1m_drv_buscfg(struct xwds_spim * spim,
                                  xwid_t cfgid,
-                                 xwtm_t * xwtm);
+                                 xwtm_t to);
 
 static
 xwer_t stm32cube_spi1m_drv_xfer(struct xwds_spim * spim,
                                 const xwu8_t txd[], xwu8_t * rxb,
-                                xwsz_t * size, xwtm_t * xwtm);
+                                xwsz_t * size, xwtm_t to);
 
 const struct xwds_spim_driver stm32cube_spi1m_drv = {
         .base = {
@@ -119,13 +119,13 @@ xwer_t stm32cube_spi1m_drv_suspend(struct xwds_device * dev)
 static
 xwer_t stm32cube_spi1m_drv_buscfg(struct xwds_spim * spim,
                                   xwid_t cfgid,
-                                  xwtm_t * xwtm)
+                                  xwtm_t to)
 {
         const SPI_InitTypeDef ** buscfg;
         const SPI_InitTypeDef * cfg;
         xwer_t rc;
 
-        XWOS_UNUSED(xwtm);
+        XWOS_UNUSED(to);
 
         buscfg = spim->buscfg;
         if (buscfg) {
@@ -140,7 +140,7 @@ xwer_t stm32cube_spi1m_drv_buscfg(struct xwds_spim * spim,
 static
 xwer_t stm32cube_spi1m_drv_xfer(struct xwds_spim * spim,
                                 const xwu8_t txd[], xwu8_t * rxb,
-                                xwsz_t * size, xwtm_t * xwtm)
+                                xwsz_t * size, xwtm_t to)
 {
         struct MX_SPI_MasterDriverData * drvdata;
         union xwos_ulock ulk;
@@ -154,9 +154,9 @@ xwer_t stm32cube_spi1m_drv_xfer(struct xwds_spim * spim,
         drvdata->rc = -EINPROGRESS;
         rc = MX_SPI1_Xfer(txd, rxb, size);
         if (XWOK == rc) {
-                rc = xwos_cond_timedwait(&drvdata->cond,
-                                         ulk, XWOS_LK_SPLK, NULL,
-                                         xwtm, &lkst);
+                rc = xwos_cond_wait_to(&drvdata->cond,
+                                       ulk, XWOS_LK_SPLK, NULL,
+                                       to, &lkst);
                 if (XWOK == rc) {
                         if (XWOS_LKST_UNLOCKED == lkst) {
                                 xwos_splk_lock(&drvdata->splk);
@@ -209,12 +209,12 @@ xwer_t stm32cube_spi2m_drv_resume(struct xwds_device * dev);
 static
 xwer_t stm32cube_spi2m_drv_buscfg(struct xwds_spim * spim,
                                  xwid_t cfgid,
-                                 xwtm_t * xwtm);
+                                 xwtm_t to);
 
 static
 xwer_t stm32cube_spi2m_drv_xfer(struct xwds_spim * spim,
                                const xwu8_t txd[], xwu8_t * rxb,
-                               xwsz_t * size, xwtm_t * xwtm);
+                               xwsz_t * size, xwtm_t to);
 
 const struct xwds_spim_driver stm32cube_spi2m_drv = {
         .base = {
@@ -284,13 +284,13 @@ xwer_t stm32cube_spi2m_drv_suspend(struct xwds_device * dev)
 static
 xwer_t stm32cube_spi2m_drv_buscfg(struct xwds_spim * spim,
                                   xwid_t cfgid,
-                                  xwtm_t * xwtm)
+                                  xwtm_t to)
 {
         const SPI_InitTypeDef ** buscfg;
         const SPI_InitTypeDef * cfg;
         xwer_t rc;
 
-        XWOS_UNUSED(xwtm);
+        XWOS_UNUSED(to);
 
         buscfg = spim->buscfg;
         if (buscfg) {
@@ -305,7 +305,7 @@ xwer_t stm32cube_spi2m_drv_buscfg(struct xwds_spim * spim,
 static
 xwer_t stm32cube_spi2m_drv_xfer(struct xwds_spim * spim,
                                 const xwu8_t txd[], xwu8_t * rxb,
-                                xwsz_t * size, xwtm_t * xwtm)
+                                xwsz_t * size, xwtm_t to)
 {
         struct MX_SPI_MasterDriverData * drvdata;
         union xwos_ulock ulk;
@@ -319,9 +319,9 @@ xwer_t stm32cube_spi2m_drv_xfer(struct xwds_spim * spim,
         drvdata->rc = -EINPROGRESS;
         rc = MX_SPI2_Xfer(txd, rxb, size);
         if (XWOK == rc) {
-                rc = xwos_cond_timedwait(&drvdata->cond,
-                                         ulk, XWOS_LK_SPLK, NULL,
-                                         xwtm, &lkst);
+                rc = xwos_cond_wait_to(&drvdata->cond,
+                                       ulk, XWOS_LK_SPLK, NULL,
+                                       to, &lkst);
                 if (XWOK == rc) {
                         if (XWOS_LKST_UNLOCKED == lkst) {
                                 xwos_splk_lock(&drvdata->splk);

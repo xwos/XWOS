@@ -181,15 +181,15 @@ int xwlua_brsp_intr_all(lua_State * L)
 int xwlua_brsp_wait(lua_State * L)
 {
         xwlua_br_sp * brsp;
-        xwtm_t time;
+        xwtm_t to;
         int top;
         xwer_t rc;
 
         top = lua_gettop(L);
         brsp = (xwlua_br_sp *)luaL_checkudata(L, 1, "xwlua_br_sp");
         if (top >= 2) {
-                time = (xwtm_t)luaL_checknumber(L, 2);
-                rc = xwos_br_timedwait(brsp->br, &time);
+                to = (xwtm_t)luaL_checknumber(L, 2);
+                rc = xwos_br_wait_to(brsp->br, to);
         } else {
                 rc = xwos_br_wait(brsp->br);
         }

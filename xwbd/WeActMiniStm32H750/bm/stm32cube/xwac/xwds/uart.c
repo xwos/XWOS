@@ -47,7 +47,7 @@ xwer_t stm32cube_usart1_drv_cfg(struct xwds_dmauartc * dmauartc,
 static
 xwer_t stm32cube_usart1_drv_tx(struct xwds_dmauartc * dmauartc,
                                const xwu8_t * data, xwsz_t * size,
-                               xwtm_t * xwtm);
+                               xwtm_t to);
 
 static
 xwer_t stm32cube_usart1_drv_putc(struct xwds_dmauartc * dmauartc,
@@ -145,7 +145,7 @@ xwer_t stm32cube_usart1_drv_cfg(struct xwds_dmauartc * dmauartc,
 static
 xwer_t stm32cube_usart1_drv_tx(struct xwds_dmauartc * dmauartc,
                                const xwu8_t * data, xwsz_t * size,
-                               xwtm_t * xwtm)
+                               xwtm_t to)
 {
         struct MX_UART_DriverData * drvdata;
         xwreg_t cpuirq;
@@ -162,9 +162,9 @@ xwer_t stm32cube_usart1_drv_tx(struct xwds_dmauartc * dmauartc,
         drvdata->tx.rc = -EINPROGRESS;
         rc = MX_USART1_TXDMA_Start();
         if (XWOK == rc) {
-                rc = xwos_cond_timedwait(&drvdata->tx.cond,
-                                         ulk, XWOS_LK_SPLK, NULL,
-                                         xwtm, &lkst);
+                rc = xwos_cond_wait_to(&drvdata->tx.cond,
+                                       ulk, XWOS_LK_SPLK, NULL,
+                                       to, &lkst);
                 if (XWOK == rc) {
                         if (XWOS_LKST_UNLOCKED == lkst) {
                                 xwos_splk_lock(&drvdata->tx.splk);
@@ -258,7 +258,7 @@ xwer_t stm32cube_usart3_drv_cfg(struct xwds_dmauartc * dmauartc,
 static
 xwer_t stm32cube_usart3_drv_tx(struct xwds_dmauartc * dmauartc,
                                const xwu8_t * data, xwsz_t * size,
-                               xwtm_t * xwtm);
+                               xwtm_t to);
 
 static
 xwer_t stm32cube_usart3_drv_putc(struct xwds_dmauartc * dmauartc,
@@ -356,7 +356,7 @@ xwer_t stm32cube_usart3_drv_cfg(struct xwds_dmauartc * dmauartc,
 static
 xwer_t stm32cube_usart3_drv_tx(struct xwds_dmauartc * dmauartc,
                                const xwu8_t * data, xwsz_t * size,
-                               xwtm_t * xwtm)
+                               xwtm_t to)
 {
         struct MX_UART_DriverData * drvdata;
         xwreg_t cpuirq;
@@ -373,9 +373,9 @@ xwer_t stm32cube_usart3_drv_tx(struct xwds_dmauartc * dmauartc,
         drvdata->tx.rc = -EINPROGRESS;
         rc = MX_USART3_TXDMA_Start();
         if (XWOK == rc) {
-                rc = xwos_cond_timedwait(&drvdata->tx.cond,
-                                         ulk, XWOS_LK_SPLK, NULL,
-                                         xwtm, &lkst);
+                rc = xwos_cond_wait_to(&drvdata->tx.cond,
+                                       ulk, XWOS_LK_SPLK, NULL,
+                                       to, &lkst);
                 if (XWOK == rc) {
                         if (XWOS_LKST_UNLOCKED == lkst) {
                                 xwos_splk_lock(&drvdata->tx.splk);

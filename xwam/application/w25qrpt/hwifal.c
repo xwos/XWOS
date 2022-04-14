@@ -75,13 +75,11 @@ xwer_t w25qrpt_hwifal_close(struct w25qrpt * w25qrpt)
 xwer_t w25qrpt_hwifal_tx(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
 {
         xwsz_t txsize;
-        xwtm_t xwtm;
 
         txsize = W25QRPT_SOF_SIZE + W25QRPT_HEAD_SIZE + W25QRPT_ADDRESS_SIZE +
                  w25qrpt_get_sdu_size(msg) + W25QRPT_CHKSUM_SIZE +
                  W25QRPT_EOF_SIZE;
-        xwtm = XWTM_MAX;
-        return w25qrpt->hwifops->tx(w25qrpt, (const xwu8_t *)msg, &txsize, &xwtm);
+        return w25qrpt->hwifops->tx(w25qrpt, (const xwu8_t *)msg, &txsize, XWTM_MAX);
 }
 
 void w25qrpt_fill_msg_parity(struct w25qrpt_msg * msg)
@@ -150,7 +148,6 @@ xwer_t w25qrpt_hwifal_rx(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msgbuf)
                         xwu8_t sdusize[2];
                 } head;
         } stream;
-        xwtm_t xwtm;
         xwsz_t sofcnt;
         xwu8_t * eofpos;
         xwsz_t rxsize;
@@ -160,12 +157,11 @@ xwer_t w25qrpt_hwifal_rx(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msgbuf)
         xwsq_t i;
         xwer_t rc;
 
-        xwtm = XWTM_MAX;
         /* 接收帧首定界符 */
         sofcnt = 0;
         do {
                 rxsize = 1;
-                rc = w25qrpt->hwifops->rx(w25qrpt, delimiter.sof, &rxsize, &xwtm);
+                rc = w25qrpt->hwifops->rx(w25qrpt, delimiter.sof, &rxsize, XWTM_MAX);
                 if (__xwcc_unlikely(rc < 0)) {
                         goto err_sof_ifrx;
                 }
@@ -191,7 +187,7 @@ xwer_t w25qrpt_hwifal_rx(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msgbuf)
                 rxsize = (xwsz_t)rest;
                 rc = w25qrpt->hwifops->rx(w25qrpt,
                                           &stream.data[total - rxsize],
-                                          &rxsize, &xwtm);
+                                          &rxsize, XWTM_MAX);
                 if (__xwcc_unlikely(rc < 0)) {
                         goto err_head_ifrx;
                 }
@@ -219,7 +215,7 @@ xwer_t w25qrpt_hwifal_rx(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msgbuf)
                 rxsize = (xwsz_t)rest;
                 rc = w25qrpt->hwifops->rx(w25qrpt,
                                           &msgbuf->address[total - rxsize],
-                                          &rxsize, &xwtm);
+                                          &rxsize, XWTM_MAX);
                 if (__xwcc_unlikely(rc < 0)) {
                         goto err_body_ifrx;
                 }
@@ -231,7 +227,7 @@ xwer_t w25qrpt_hwifal_rx(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msgbuf)
         rest = (xwssz_t)total;
         do {
                 rxsize = (xwsz_t)rest;
-                rc = w25qrpt->hwifops->rx(w25qrpt, delimiter.eof, &rxsize, &xwtm);
+                rc = w25qrpt->hwifops->rx(w25qrpt, delimiter.eof, &rxsize, XWTM_MAX);
                 if (__xwcc_unlikely(rc < 0)) {
                         goto err_eof_ifrx;
                 }

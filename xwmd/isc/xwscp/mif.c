@@ -7,13 +7,13 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/lib/xwaop.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwos/osal/lock/mtx.h>
 #include <xwos/osal/sync/sem.h>
 #include <xwos/osal/sync/cond.h>
@@ -33,12 +33,12 @@ static __xwmd_code
 xwer_t xwscp_gc(void * obj);
 
 static __xwmd_code
-xwer_t xwscp_connect_once(struct xwscp * xwscp, xwtm_t * xwtm);
+xwer_t xwscp_connect_once(struct xwscp * xwscp, xwtm_t to);
 
 static __xwmd_code
 xwer_t xwscp_tx_once(struct xwscp * xwscp,
                      const xwu8_t data[], xwsz_t * size, xwu8_t qos,
-                     xwtm_t * xwtm);
+                     xwtm_t to);
 
 /**
  * @brief XWSCP API: 启动XWSCP
@@ -218,52 +218,54 @@ xwer_t xwscp_gc(void * obj)
 }
 
 static __xwmd_code
-xwer_t xwscp_connect_once(struct xwscp * xwscp, xwtm_t * xwtm)
+xwer_t xwscp_connect_once(struct xwscp * xwscp, xwtm_t to)
 {
         union xwos_ulock ulk;
         xwsq_t lkst;
-        xwtm_t period, time;
+        xwtm_t next;
         xwer_t rc;
 
         ulk.osal.mtx = &xwscp->tx.csmtx;
-        rc = xwos_mtx_lock(&xwscp->tx.csmtx);
+        rc = xwos_mtx_lock_to(&xwscp->tx.csmtx, to);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_mtx_lock;
+                goto err_mtx_lock_to;
         }
         xwaop_c0m(xwsq_t, &xwscp->hwifst, XWSCP_HWIFST_CONNECT, NULL, NULL);
         rc = xwscp_tx_cmd_connect(xwscp);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_tx;
         }
-        period = *xwtm > XWSCP_RETRY_PERIOD ? XWSCP_RETRY_PERIOD : *xwtm;
-        time = period;
-        rc = xwos_cond_timedwait(&xwscp->tx.cscond,
-                                 ulk, XWOS_LK_MTX, NULL,
-                                 &time, &lkst);
+        next = xwtm_ft(XWSCP_RETRY_PERIOD);
+        if (xwtm_cmp(to, next) > 0) {
+                rc = xwos_cond_wait_to(&xwscp->tx.cscond,
+                                       ulk, XWOS_LK_MTX, NULL,
+                                       next, &lkst);
+                if (-ETIMEDOUT == rc) {
+                        rc = -EAGAIN;
+                }
+        } else {
+                rc = xwos_cond_wait_to(&xwscp->tx.cscond,
+                                       ulk, XWOS_LK_MTX, NULL,
+                                       to, &lkst);
+        }
         if (__xwcc_likely(XWOK == rc)) {
                 xwos_mtx_unlock(&xwscp->tx.csmtx);
                 xwaop_write(xwu32_t, &xwscp->tx.cnt, 0, NULL);
                 xwaop_s1m(xwsq_t, &xwscp->hwifst, XWSCP_HWIFST_CONNECT, NULL, NULL);
                 xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_CONNECT);
-                *xwtm -= time;
-        } else if (-ETIMEDOUT == rc) {
-                *xwtm -= period;
-        } else {
         }
         return rc;
 
 err_tx:
         xwos_mtx_unlock(&xwscp->tx.csmtx);
-err_mtx_lock:
+err_mtx_lock_to:
         return rc;
 }
 
 /**
  * @brief XWSCP API: 连接远程端
  * @param[in] xwscp: XWSCP对象的指针
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -272,30 +274,31 @@ err_mtx_lock:
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwmd_api
-xwer_t xwscp_connect(struct xwscp * xwscp, xwtm_t * xwtm)
+xwer_t xwscp_connect(struct xwscp * xwscp, xwtm_t to)
 {
         xwer_t rc;
 
         XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
-        XWSCP_VALIDATE((xwtm), "nullptr", -EFAULT);
 
-        rc = xwos_mtx_timedlock(&xwscp->tx.mtx, xwtm);
+        rc = xwos_mtx_lock_to(&xwscp->tx.mtx, to);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_txmtx_timedlock;
+                goto err_txmtx_lock_to;
         }
         do {
-                rc = xwscp_connect_once(xwscp, xwtm);
-        } while ((-ETIMEDOUT == rc) && (*xwtm > 0));
-        if ((-ETIMEDOUT == rc) && (*xwtm <= 0)) {
+                rc = xwscp_connect_once(xwscp, to);
+        } while (-EAGAIN == rc);
+        if (-ETIMEDOUT == rc) {
                 xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_NETUNREACH);
                 rc = -ENETUNREACH;
-        }/* else {} */
+        }
         xwos_mtx_unlock(&xwscp->tx.mtx);
         return rc;
 
-err_txmtx_timedlock:
+err_txmtx_lock_to:
         return rc;
 }
 
@@ -344,12 +347,12 @@ xwer_t xwscp_finish_tx(struct xwscp * xwscp, union xwscp_slot * slot)
 static __xwmd_code
 xwer_t xwscp_tx_once(struct xwscp * xwscp,
                      const xwu8_t data[], xwsz_t * size, xwu8_t qos,
-                     xwtm_t * xwtm)
+                     xwtm_t to)
 {
         union xwos_ulock ulk;
         union xwscp_slot * slot;
         xwsq_t lkst;
-        xwtm_t period, time;
+        xwtm_t next;
         xwer_t rc;
 
         rc = xwscp_fmt_msg(xwscp, data, *size, qos, &slot);
@@ -357,27 +360,31 @@ xwer_t xwscp_tx_once(struct xwscp * xwscp,
                 goto err_fmt_msg;
         }
         ulk.osal.mtx = &xwscp->tx.csmtx;
-        rc = xwos_mtx_lock(&xwscp->tx.csmtx);
+        rc = xwos_mtx_lock_to(&xwscp->tx.csmtx, to);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_mtx_lock;
+                goto err_mtx_lock_to;
         }
         xwaop_s1m(xwsq_t, &xwscp->hwifst, XWSCP_HWIFST_TX, NULL, NULL);
         rc = xwscp_hwifal_tx(xwscp, (xwu8_t *)&slot->tx.frm, slot->tx.frmsize);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_iftx;
         }
-        period = *xwtm > XWSCP_RETRY_PERIOD ? XWSCP_RETRY_PERIOD : *xwtm;
-        time = period;
-        rc = xwos_cond_timedwait(&xwscp->tx.cscond,
-                                 ulk, XWOS_LK_MTX, NULL,
-                                 &time, &lkst);
+        next = xwtm_ft(XWSCP_RETRY_PERIOD);
+        if (xwtm_cmp(to, next) > 0) {
+                rc = xwos_cond_wait_to(&xwscp->tx.cscond,
+                                       ulk, XWOS_LK_MTX, NULL,
+                                       next, &lkst);
+                if (-ETIMEDOUT == rc) {
+                        rc = -EAGAIN;
+                }
+        } else {
+                rc = xwos_cond_wait_to(&xwscp->tx.cscond,
+                                       ulk, XWOS_LK_MTX, NULL,
+                                       to, &lkst);
+        }
         if (__xwcc_likely(XWOK == rc)) {
                 xwos_mtx_unlock(&xwscp->tx.csmtx);
                 rc = xwscp_finish_tx(xwscp, slot);
-                *xwtm -= time;
-        } else if (-ETIMEDOUT == rc) {
-                xwaop_c0m(xwsq_t, &xwscp->hwifst, XWSCP_HWIFST_TX, NULL, NULL);
-                *xwtm -= period;
         } else {
                 xwaop_c0m(xwsq_t, &xwscp->hwifst, XWSCP_HWIFST_TX, NULL, NULL);
         }
@@ -385,7 +392,7 @@ xwer_t xwscp_tx_once(struct xwscp * xwscp,
 
 err_iftx:
         xwos_mtx_unlock(&xwscp->tx.csmtx);
-err_mtx_lock:
+err_mtx_lock_to:
 err_fmt_msg:
         return rc;
 }
@@ -398,9 +405,7 @@ err_fmt_msg:
  * + (I) 作为输入时，表示数据的字节数
  * + (O) 作为输出时，返回实际发送的字节数
  * @param[in] qos: 服务质量，取值范围： @ref xwscp_msg_qos_em
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -412,42 +417,41 @@ err_fmt_msg:
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwmd_api
 xwer_t xwscp_tx(struct xwscp * xwscp,
                 const xwu8_t data[], xwsz_t * size,
-                xwu8_t qos, xwtm_t * xwtm)
+                xwu8_t qos, xwtm_t to)
 {
         xwsq_t hwifst;
         xwer_t rc;
 
         XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
         XWSCP_VALIDATE((size), "nullptr", -EFAULT);
-        XWSCP_VALIDATE((xwtm), "nullptr", -EFAULT);
         XWSCP_VALIDATE((*size <= XWSCP_SDU_MAX_SIZE), "msg2long", -E2BIG);
 
-        rc = xwos_mtx_timedlock(&xwscp->tx.mtx, xwtm);
+        rc = xwos_mtx_lock_to(&xwscp->tx.mtx, to);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_txmtx_timedlock;
+                goto err_txmtx_lock_to;
         }
-        do {
-                xwaop_read(xwsq_t, &xwscp->hwifst, &hwifst);
-                if (XWSCP_HWIFST_CONNECT & hwifst) {
-                        do {
-                                rc = xwscp_tx_once(xwscp, data, size, qos, xwtm);
-                        } while ((-ETIMEDOUT == rc) && (*xwtm > 0));
-                        if ((-ETIMEDOUT == rc) && (*xwtm <= 0)) {
-                                xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_NETUNREACH);
-                                rc = -ENETUNREACH;
-                        }/* else {} */
-                } else {
-                        rc = -ENOTCONN;
+        xwaop_read(xwsq_t, &xwscp->hwifst, &hwifst);
+        if (XWSCP_HWIFST_CONNECT & hwifst) {
+                do {
+                        rc = xwscp_tx_once(xwscp, data, size, qos, to);
+                } while (-EAGAIN == rc);
+                if (-ETIMEDOUT == rc) {
+                        xwscp_hwifal_notify(xwscp, XWSCP_HWIFNTF_NETUNREACH);
+                        rc = -ENETUNREACH;
                 }
-        } while ((-EAGAIN == rc) && (*xwtm > 0));
+        } else {
+                rc = -ENOTCONN;
+        }
         xwos_mtx_unlock(&xwscp->tx.mtx);
         return rc;
 
-err_txmtx_timedlock:
+err_txmtx_lock_to:
         return rc;
 }
 
@@ -458,9 +462,7 @@ err_txmtx_timedlock:
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示报文的字节数
  * + (O) 作为输出时，返回实际接收的字节数
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -468,9 +470,11 @@ err_txmtx_timedlock:
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwmd_api
-xwer_t xwscp_rx(struct xwscp * xwscp, xwu8_t buf[], xwsz_t * size, xwtm_t * xwtm)
+xwer_t xwscp_rx(struct xwscp * xwscp, xwu8_t buf[], xwsz_t * size, xwtm_t to)
 {
         xwer_t rc;
         union xwscp_slot * slot;
@@ -480,11 +484,10 @@ xwer_t xwscp_rx(struct xwscp * xwscp, xwu8_t buf[], xwsz_t * size, xwtm_t * xwtm
 
         XWSCP_VALIDATE((xwscp), "nullptr", -EFAULT);
         XWSCP_VALIDATE((size), "nullptr", -EFAULT);
-        XWSCP_VALIDATE((xwtm), "nullptr", -EFAULT);
 
-        rc = xwos_sem_timedwait(&xwscp->rx.sem, xwtm);
+        rc = xwos_sem_wait_to(&xwscp->rx.sem, to);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_sem_timedwait;
+                goto err_sem_wait_to;
         }
         slot = xwscp_rxq_choose(xwscp);
         sdupos = XWSCP_SDUPOS(&slot->rx.frm.head);
@@ -495,7 +498,7 @@ xwer_t xwscp_rx(struct xwscp * xwscp, xwu8_t buf[], xwsz_t * size, xwtm_t * xwtm
         *size = realsize;
         return XWOK;
 
-err_sem_timedwait:
+err_sem_wait_to:
         return rc;
 }
 

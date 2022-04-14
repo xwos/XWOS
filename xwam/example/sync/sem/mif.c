@@ -22,7 +22,7 @@
 #include <string.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwos/osal/swt.h>
 #include <xwos/osal/sync/sem.h>
 #include <xwam/example/sync/sem/mif.h>
@@ -117,7 +117,7 @@ void xwsemdemo_swt_callback(struct xwos_swt * swt, void * arg)
  */
 xwer_t xwsemdemo_thd_func(void * arg)
 {
-        xwtm_t base, ts;
+        xwtm_t now;
         xwer_t rc;
 
         XWOS_UNUSED(arg);
@@ -125,23 +125,22 @@ xwer_t xwsemdemo_thd_func(void * arg)
         semlogf(INFO, "[线程] 启动。\n");
 
         semlogf(INFO, "[线程] 启动定时器。\n");
-        base = xwos_skd_get_timetick_lc();
-        rc = xwos_swt_start(&xwsemdemo_swt, base, 1000 * XWTM_MS,
+        now = xwtm_now();
+        rc = xwos_swt_start(&xwsemdemo_swt, now, 1000 * XWTM_MS,
                             xwsemdemo_swt_callback, NULL);
 
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                ts = 500 * XWTM_MS;
-                rc = xwos_sem_timedwait(&xwsemdemo_sem, &ts);
+                rc = xwos_sem_wait_to(&xwsemdemo_sem, xwtm_ft(500 * XWTM_MS));
                 if (XWOK == rc) {
-                        ts = xwos_skd_get_timestamp_lc();
+                        now = xwtm_nowts();
                         semlogf(INFO,
                                 "[线程] 定时器唤醒，时间戳：%lld 纳秒。\n",
-                                ts);
+                                now);
                 } else if (-ETIMEDOUT == rc) {
-                        ts = xwos_skd_get_timestamp_lc();
+                        now = xwtm_nowts();
                         semlogf(INFO,
                                 "[线程] 等待超时，时间戳：%lld 纳秒。\n",
-                                ts);
+                                now);
                 }
         }
 

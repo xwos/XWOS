@@ -147,7 +147,7 @@ use crate::types::*;
 
 /// XWOS线程的属性
 ///
-/// 完全等价于C语言头文件 `xwos/osal/skd.h` 中的 `struct xwos_thd_attr`
+/// 完全等价于C语言头文件 `xwos/osal/thd.h` 中的 `struct xwos_thd_attr`
 #[repr(C)]
 pub struct ThdAttr {
     /// 线程的名字
@@ -168,7 +168,7 @@ pub struct ThdAttr {
 
 /// XWOS的线程
 pub struct Thd {
-    /// XWOS的线程的结构体的指针
+    /// XWOS线程结构体的指针
     thd: *mut c_void,
     /// XWOS的线程的标签
     tik: XwSq,
@@ -178,14 +178,6 @@ unsafe impl Send for Thd {}
 unsafe impl Sync for Thd {}
 
 extern "C" {
-    fn xwrustffi_skd_get_context_lc(
-        ctxbuf: *mut XwSq,
-        irqnbuf: *mut XwIrq);
-    fn xwrustffi_skd_get_timetick_lc() -> XwTm;
-    fn xwrustffi_skd_get_tickcount_lc() -> u64;
-    fn xwrustffi_skd_get_timestamp_lc() -> XwTm;
-    fn xwrustffi_skd_dspmpt_lc();
-    fn xwrustffi_skd_enpmpt_lc();
     fn xwrustffi_thd_stack_size_default() -> XwSz;
     fn xwrustffi_thd_attr_init(attr: *mut ThdAttr);
     fn xwrustffi_thd_create(thd: *mut *mut c_void,
@@ -211,7 +203,8 @@ extern "C" {
     fn xwrustffi_cthd_shld_frz() -> bool;
     fn xwrustffi_cthd_shld_stop() -> bool;
     fn xwrustffi_cthd_frz_shld_stop(frozen: *mut bool) -> bool;
-    fn xwrustffi_cthd_sleep(time: *mut XwTm) -> XwEr;
+    fn xwrustffi_cthd_sleep(time: XwTm) -> XwEr;
+    fn xwrustffi_cthd_sleep_to(to: XwTm) -> XwEr;
     fn xwrustffi_cthd_sleep_from(origin: *mut XwTm,
                                  inc: XwTm) -> XwEr;
     fn xwrustffi_cthd_freeze(time: *mut XwTm) -> XwEr;
@@ -227,8 +220,8 @@ impl Thd {
             drop(Box::from_raw(f));
             Err(rc)
         } else {
-            let xwostik = xwrustffi_thd_gettik(thd);
-            Ok(Thd {thd: thd, tik: xwostik})
+            let tik = xwrustffi_thd_gettik(thd);
+            Ok(Thd {thd: thd, tik: tik})
         };
 
         extern "C" fn xwrust_thd_entry(main: *mut c_void) -> XwEr {

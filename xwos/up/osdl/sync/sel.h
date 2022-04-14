@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_up_osdl_sync_sel_h__
@@ -117,11 +117,11 @@ xwer_t xwosdl_sel_tryselect(struct xwosdl_sel * sel, xwbmp_t msk[], xwbmp_t trg[
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sel_timedselect(struct xwosdl_sel * sel,
-                              xwbmp_t msk[], xwbmp_t trg[],
-                              xwtm_t * xwtm)
+xwer_t xwosdl_sel_select_to(struct xwosdl_sel * sel,
+                            xwbmp_t msk[], xwbmp_t trg[],
+                            xwtm_t to)
 {
-        return xwup_sel_timedselect(sel, msk, trg, xwtm);
+        return xwup_sel_select_to(sel, msk, trg, to);
 }
 
 #endif /* xwos/up/osdl/sync/sel.h */

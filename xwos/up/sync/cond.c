@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #include <xwos/standard.h>
@@ -38,13 +38,19 @@ void xwup_cond_free(struct xwup_cond * cond);
 static __xwup_code
 xwer_t xwup_cond_broadcast_once(struct xwup_cond * cond, bool * retry);
 
+xwer_t xwup_cond_test(struct xwup_cond * cond,
+                      struct xwup_skd * xwskd, struct xwup_thd * thd,
+                      void * lock, xwsq_t lktype, void * lkdata,
+                      xwtm_t to, xwsq_t * lkst);
+
 static __xwup_code
-xwer_t xwup_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
-                                                struct xwup_thd * thd,
-                                                void * lock, xwsq_t lktype,
-                                                void * lkdata,
-                                                xwtm_t * xwtm, xwsq_t * lkst,
-                                                xwreg_t cpuirq);
+xwer_t xwup_cond_blkthd_to_unlkwq_cpuirqrs(struct xwup_cond * cond,
+                                           struct xwup_skd * xwskd,
+                                           struct xwup_thd * thd,
+                                           void * lock, xwsq_t lktype,
+                                           void * lkdata,
+                                           xwtm_t to, xwsq_t * lkst,
+                                           xwreg_t cpuirq);
 
 /**
  * @brief 申请条件量对象
@@ -355,13 +361,15 @@ xwer_t xwup_cond_broadcast(struct xwup_cond * cond)
         return rc;
 }
 
-__xwup_code
-xwer_t xwup_cond_do_unicast(struct xwup_cond * cond)
+__xwup_api
+xwer_t xwup_cond_unicast(struct xwup_cond * cond)
 {
         struct xwup_wqn * wqn;
         xwup_wqn_f cb;
         xwreg_t cpuirq;
         xwer_t rc;
+
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
 
         rc = XWOK;
         xwospl_cpuirq_save_lc(&cpuirq);
@@ -386,36 +394,19 @@ xwer_t xwup_cond_do_unicast(struct xwup_cond * cond)
         return rc;
 }
 
-__xwup_api
-xwer_t xwup_cond_unicast(struct xwup_cond * cond)
-{
-        xwer_t rc;
-
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-
-        rc = xwup_cond_do_unicast(cond);
-        return rc;
-}
-
 static __xwup_code
-xwer_t xwup_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
-                                                struct xwup_thd * thd,
-                                                void * lock, xwsq_t lktype,
-                                                void * lkdata,
-                                                xwtm_t * xwtm, xwsq_t * lkst,
-                                                xwreg_t cpuirq)
+xwer_t xwup_cond_blkthd_to_unlkwq_cpuirqrs(struct xwup_cond * cond,
+                                           struct xwup_skd * xwskd,
+                                           struct xwup_thd * thd,
+                                           void * lock, xwsq_t lktype,
+                                           void * lkdata,
+                                           xwtm_t to, xwsq_t * lkst,
+                                           xwreg_t cpuirq)
 {
-        xwer_t rc;
-        xwtm_t expected, currtick;
-        struct xwup_skd * xwskd;
         struct xwup_tt * xwtt;
-        struct xwup_syshwt * hwt;
+        xwer_t rc;
 
-        xwskd = xwup_skd_get_lc();
         xwtt = &xwskd->tt;
-        hwt = &xwtt->hwt;
-        currtick = xwup_syshwt_get_timetick(hwt);
-        expected = xwtm_add_safely(currtick, *xwtm);
         XWOS_BUG_ON((XWUP_SKDOBJ_DST_BLOCKING | XWUP_SKDOBJ_DST_SLEEPING |
                      XWUP_SKDOBJ_DST_READY | XWUP_SKDOBJ_DST_STANDBY |
                      XWUP_SKDOBJ_DST_FROZEN)
@@ -442,7 +433,7 @@ xwer_t xwup_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
         /* 加入时间树 */
         xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
         xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_DST_SLEEPING);
-        xwup_thd_tt_add_locked(thd, xwtt, expected, cpuirq);
+        xwup_thd_tt_add_locked(thd, xwtt, to, cpuirq);
         xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
 
         /* 调度 */
@@ -473,9 +464,7 @@ xwer_t xwup_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
                 }/* else {} */
                 xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 if (__xwcc_likely(XWOS_LKST_UNLOCKED == *lkst)) {
-                        currtick = xwup_syshwt_get_timetick(hwt);
-                        *xwtm = xwtm_sub(expected, currtick);
-                        rc = xwup_thd_do_lock(lock, lktype, xwtm, lkdata);
+                        rc = xwup_thd_do_lock(lock, lktype, to, lkdata);
                         if (XWOK == rc) {
                                 *lkst = XWOS_LKST_LOCKED;
                         }/* else {} */
@@ -498,10 +487,7 @@ xwer_t xwup_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
                                 rc = -EINTR;
                         } else if (XWUP_WQN_REASON_UP == thd->wqn.reason) {
                                 if (__xwcc_likely(XWOS_LKST_UNLOCKED == *lkst)) {
-                                        currtick = xwup_syshwt_get_timetick(hwt);
-                                        *xwtm = xwtm_sub(expected, currtick);
-                                        rc = xwup_thd_do_lock(lock, lktype, xwtm,
-                                                              lkdata);
+                                        rc = xwup_thd_do_lock(lock, lktype, to, lkdata);
                                         if (XWOK == rc)
                                                 *lkst = XWOS_LKST_LOCKED;
                                 }
@@ -528,10 +514,7 @@ xwer_t xwup_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
                                 rc = -EINTR;
                         } else if (XWUP_WQN_REASON_UP == thd->wqn.reason) {
                                 if (__xwcc_likely(XWOS_LKST_UNLOCKED == *lkst)) {
-                                        currtick = xwup_syshwt_get_timetick(hwt);
-                                        *xwtm = xwtm_sub(expected, currtick);
-                                        rc = xwup_thd_do_lock(lock, lktype, xwtm,
-                                                              lkdata);
+                                        rc = xwup_thd_do_lock(lock, lktype, to, lkdata);
                                         if (XWOK == rc) {
                                                 *lkst = XWOS_LKST_LOCKED;
                                         }/* else {} */
@@ -546,8 +529,6 @@ xwer_t xwup_cond_do_timedblkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
                 XWOS_BUG();
                 rc = -EBUG;
         }
-        currtick = xwup_syshwt_get_timetick(hwt);
-        *xwtm = xwtm_sub(expected, currtick);
         return rc;
 
 err_intr:
@@ -555,10 +536,10 @@ err_intr:
 }
 
 __xwup_code
-xwer_t xwup_cond_do_timedwait(struct xwup_cond * cond,
-                              struct xwup_thd * thd,
-                              void * lock, xwsq_t lktype, void * lkdata,
-                              xwtm_t * xwtm, xwsq_t * lkst)
+xwer_t xwup_cond_test(struct xwup_cond * cond,
+                      struct xwup_skd * xwskd, struct xwup_thd * thd,
+                      void * lock, xwsq_t lktype, void * lkdata,
+                      xwtm_t to, xwsq_t * lkst)
 {
         xwreg_t cpuirq;
         xwer_t rc;
@@ -572,10 +553,10 @@ xwer_t xwup_cond_do_timedwait(struct xwup_cond * cond,
                 rc = -EINTR;
         } else {
 #endif
-                rc = xwup_cond_do_timedblkthd_unlkwq_cpuirqrs(cond, thd,
-                                                              lock, lktype, lkdata,
-                                                              xwtm, lkst,
-                                                              cpuirq);
+                rc = xwup_cond_blkthd_to_unlkwq_cpuirqrs(cond, xwskd, thd,
+                                                         lock, lktype, lkdata,
+                                                         to, lkst,
+                                                         cpuirq);
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
                 xwup_skd_wakelock_unlock();
         }
@@ -588,40 +569,43 @@ xwer_t xwup_cond_wait(struct xwup_cond * cond,
                       void * lock, xwsq_t lktype, void * lkdata,
                       xwsq_t * lkst)
 {
-        xwtm_t expected = XWTM_MAX;
-        return xwup_cond_timedwait(cond, lock, lktype, lkdata, &expected, lkst);
+        return xwup_cond_wait_to(cond, lock, lktype, lkdata, XWTM_MAX, lkst);
 }
 
 __xwup_api
-xwer_t xwup_cond_timedwait(struct xwup_cond * cond,
-                           void * lock, xwsq_t lktype, void * lkdata,
-                           xwtm_t * xwtm, xwsq_t * lkst)
+xwer_t xwup_cond_wait_to(struct xwup_cond * cond,
+                         void * lock, xwsq_t lktype, void * lkdata,
+                         xwtm_t to, xwsq_t * lkst)
 {
         struct xwup_thd * cthd;
+        struct xwup_skd * xwskd;
+        struct xwup_syshwt * hwt;
+        xwtm_t now;
         xwer_t rc;
 
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-        XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
         XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
-        XWOS_VALIDATE((xwtm_cmp(*xwtm, 0) >= 0), "out-of-time", -ETIMEDOUT);
         XWOS_VALIDATE((lktype < XWOS_LK_NUM), "invalid-type", -EINVAL);
         XWOS_VALIDATE((((NULL == lock) && (XWOS_LK_NONE == lktype)) ||
                        ((lock) && (lktype > XWOS_LK_NONE))),
                       "invalid-lock", -EINVAL);
-        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)),
-                      "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
 
         *lkst = XWOS_LKST_LOCKED;
         cthd = xwup_skd_get_cthd_lc();
-        if (__xwcc_unlikely(0 == xwtm_cmp(*xwtm, 0))) {
+        xwskd = xwup_skd_get_lc();
+        hwt = &xwskd->tt.hwt;
+        now = xwup_syshwt_get_timetick(hwt);
+        if (__xwcc_unlikely(xwtm_cmp(to, now) < 0)) {
+                rc = -ETIMEDOUT;
+        } else if (__xwcc_unlikely(xwtm_cmp(to, now) == 0)) {
                 rc = xwup_thd_do_unlock(lock, lktype, lkdata);
                 if (XWOK == rc) {
                         *lkst = XWOS_LKST_UNLOCKED;
                 }/* else {} */
                 rc = -ETIMEDOUT;
         } else {
-                rc = xwup_cond_do_timedwait(cond, cthd, lock, lktype, lkdata,
-                                            xwtm, lkst);
+                rc = xwup_cond_test(cond, xwskd, cthd, lock, lktype, lkdata, to, lkst);
         }
         return rc;
 }

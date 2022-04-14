@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  * @note
  * - XWOS MP的调度器是一个每CPU变量，为了提高程序的效率，减少cache miss，
  *   通常只由CPU才可访问自己的调度器控制块结构体。其他CPU需要操作当前

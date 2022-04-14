@@ -18,7 +18,7 @@
  * > limitations under the License.
  */
 
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <bm/stm32cube/standard.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
 #include <bm/stm32cube/cubemx/Core/Inc/gpio.h>
@@ -97,11 +97,8 @@ err_stm32cube_start:
 
 xwer_t led_task(void)
 {
-        xwtm_t xwtm;
-
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                xwtm = 1 * XWTM_S;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(1 * XWTM_S);
                 LL_GPIO_TogglePin(LED_GPIO_PORT, LED_GPIO_PIN);
         }
         return XWOK;

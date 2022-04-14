@@ -21,7 +21,7 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
 #include <string.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <soc_gpio.h>
 #include <xwcd/ds/soc/gpio.h>
 #include <bdl/standard.h>
@@ -70,10 +70,8 @@ static __xwos_code
 xwer_t bdl_iftx(const xwu8_t * str, xwsz_t size)
 {
         xwer_t rc;
-        xwtm_t time;
 
-        time = XWTM_MAX;
-        rc = xwds_dmauartc_tx(&mpc560xb_uart0_cb, str, &size, &time);
+        rc = xwds_dmauartc_tx(&mpc560xb_uart0_cb, str, &size, XWTM_MAX);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmatx;
         }
@@ -86,17 +84,14 @@ err_dmatx:
 xwer_t uart_task(void * arg)
 {
         xwsz_t size;
-        xwtm_t time;
         xwer_t rc = XWOK;
 
         XWOS_UNUSED(arg);
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                time = XWTM_MAX;
                 size = sizeof(rxbuffer);
-                rc = xwds_dmauartc_rx(&mpc560xb_uart0_cb, rxbuffer, &size, &time);
+                rc = xwds_dmauartc_rx(&mpc560xb_uart0_cb, rxbuffer, &size, XWTM_MAX);
                 if ((XWOK == rc) && (size > 0)) {
-                        time = 5 * XWTM_S;
-                        xwos_cthd_sleep(&time);
+                        xwos_cthd_sleep(5 * XWTM_S);
                         rc = bdl_iftx(rxbuffer, size >> 1);
                         if (XWOK == rc) {
                                 rc = bdl_iftx(&rxbuffer[size >> 1], size >> 1);
@@ -108,7 +103,6 @@ xwer_t uart_task(void * arg)
 
 xwer_t led_task(void * arg)
 {
-        xwtm_t time;
         xwsq_t pinmask;
         xwer_t rc;
 
@@ -125,8 +119,7 @@ xwer_t led_task(void * arg)
                                 pinmask = XWBOP_BIT(SOC_GPIO_PIN_13);
                                 xwds_gpio_reset(&mpc560xb_soc_cb, LED_PORT,
                                                 pinmask);
-                                time = 500*XWTM_MS;
-                                rc = xwos_cthd_sleep(&time);
+                                rc = xwos_cthd_sleep(500 * XWTM_MS);
                                 if (__xwcc_unlikely(rc < 0)) {
                                         break;
                                 }
@@ -136,8 +129,7 @@ xwer_t led_task(void * arg)
                                 pinmask = XWBOP_BIT(SOC_GPIO_PIN_13);
                                 xwds_gpio_set(&mpc560xb_soc_cb, LED_PORT,
                                               pinmask);
-                                time = 500*XWTM_MS;
-                                rc = xwos_cthd_sleep(&time);
+                                rc = xwos_cthd_sleep(500 * XWTM_MS);
                                 if (__xwcc_unlikely(rc < 0)) {
                                         break;
                                 }

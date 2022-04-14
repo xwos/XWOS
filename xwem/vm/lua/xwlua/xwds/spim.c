@@ -88,7 +88,7 @@ int xwlua_spim_xfer(lua_State * L)
         } else {
                 time = XWTM_MAX;
         }
-        rc = xwds_spim_xfer(luaspim->spim, txd, rxb, &size, &time);
+        rc = xwds_spim_xfer(luaspim->spim, txd, rxb, &size, time);
         if (isrx) {
                 luaL_addsize(&b, size);
         }

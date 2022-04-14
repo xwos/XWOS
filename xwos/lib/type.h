@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_lib_type_h__
@@ -489,11 +489,6 @@ union xwos_ulock {
 #  define XWTM_MIN      ((xwtm_t)(-XWTM_MAX - (xwtm_t)1))
 #endif
 
-#define XWTM_NS         (1LL)
-#define XWTM_US         (1000LL)
-#define XWTM_MS         (1000000LL)
-#define XWTM_S          (1000000000LL)
-
 #ifndef XWU8_T__SIZE
 #  define BITS_PER_XWU8_T       8
 #  define XWU8_T_SHIFT          3
@@ -641,8 +636,54 @@ union xwos_ulock {
 #  define XWTM_T_SHIFT          LONGLONG_SHIFT
 #endif
 
+/** @} */ // xwos_lib_type
+
+
+/**
+ * @ingroup xwos_time
+ * @brief 系统时间的单位：纳秒
+ */
+#define XWTM_NS         (1LL)
+
+/**
+ * @ingroup xwos_time
+ * @brief 系统时间的单位：微秒
+ */
+#define XWTM_US         (1000LL)
+
+/**
+ * @ingroup xwos_time
+ * @brief 系统时间的单位：毫秒
+ */
+#define XWTM_MS         (1000000LL)
+
+/**
+ * @ingroup xwos_time
+ * @brief 系统时间的单位：秒
+ */
+#define XWTM_S          (1000000000LL)
+
+/**
+ * @ingroup xwos_time
+ * @brief 系统时间的单位：分
+ */
+#define XWTM_M          (60 * XWTM_S)
+
+/**
+ * @ingroup xwos_time
+ * @brief 系统时间的单位：时
+ */
+#define XWTM_H          (60 * XWTM_M)
+
+/**
+ * @ingroup xwos_time
+ * @brief 系统时间的单位：天
+ */
+#define XWTM_D          (24 * XWTM_H)
+
 #if !defined(ARCH_HAVE_XWTM_T)
 /**
+ * @ingroup xwos_time
  * @brief 将两个系统时间相加，并检查溢出
  * @param[in] a: 加数a
  * @param[in] b: 加数b
@@ -663,6 +704,7 @@ xwtm_t xwtm_add_safely(const xwtm_t a, const xwtm_t b)
 }
 
 /**
+ * @ingroup xwos_time
  * @brief 将两个系统时间相加
  * @param[in] a: 加数a
  * @param[in] b: 加数b
@@ -675,6 +717,7 @@ xwtm_t xwtm_add(const xwtm_t a, const xwtm_t b)
 }
 
 /**
+ * @ingroup xwos_time
  * @brief 将两个系统时间相减
  * @param[in] a: 被减数
  * @param[in] b: 减数
@@ -687,6 +730,7 @@ xwtm_t xwtm_sub(const xwtm_t a, const xwtm_t b)
 }
 
 /**
+ * @ingroup xwos_time
  * @brief 比较两个系统时间
  * @param[in] a: 系统时间a
  * @param[in] b: 系统时间b
@@ -709,10 +753,90 @@ xwer_t xwtm_cmp(const xwtm_t a, const xwtm_t b)
         }
         return rc;
 }
-#endif
 
 /**
- * @} xwos_lib_type
+ * @ingroup xwos_time
+ * @brief 返回以纳秒为单位的系统时间
+ * @param[in] ns: 纳秒
+ * @return 系统时间
  */
+static __xwcc_inline
+xwtm_t xwtm_ns(xwtm_t ns)
+{
+        return ns * XWTM_NS;
+}
+
+/**
+ * @ingroup xwos_time
+ * @brief 返回以微秒为单位的系统时间
+ * @param[in] us: 微秒
+ * @return 系统时间
+ */
+static __xwcc_inline
+xwtm_t xwtm_us(xwtm_t us)
+{
+        return us * XWTM_US;
+}
+
+/**
+ * @ingroup xwos_time
+ * @brief 返回以毫秒为单位的系统时间
+ * @param[in] ms: 毫秒
+ * @return 系统时间
+ */
+static __xwcc_inline
+xwtm_t xwtm_ms(xwtm_t ms)
+{
+        return ms * XWTM_MS;
+}
+
+/**
+ * @ingroup xwos_time
+ * @brief 返回以秒为单位的系统时间
+ * @param[in] s: 秒
+ * @return 系统时间
+ */
+static __xwcc_inline
+xwtm_t xwtm_s(xwtm_t s)
+{
+        return s * XWTM_S;
+}
+
+/**
+ * @ingroup xwos_time
+ * @brief 返回以分为单位的系统时间
+ * @param[in] m: 分
+ * @return 系统时间
+ */
+static __xwcc_inline
+xwtm_t xwtm_m(xwtm_t m)
+{
+        return m * XWTM_M;
+}
+
+/**
+ * @ingroup xwos_time
+ * @brief 返回以时为单位的系统时间
+ * @param[in] h: 时
+ * @return 系统时间
+ */
+static __xwcc_inline
+xwtm_t xwtm_h(xwtm_t h)
+{
+        return h * XWTM_H;
+}
+
+/**
+ * @ingroup xwos_time
+ * @brief 返回以天为单位的系统时间
+ * @param[in] d: 天
+ * @return 系统时间
+ */
+static __xwcc_inline
+xwtm_t xwtm_d(xwtm_t d)
+{
+        return d * XWTM_D;
+}
+#endif
 
 #endif /* xwos/lib/type.h */

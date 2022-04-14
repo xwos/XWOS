@@ -74,19 +74,19 @@ void xwds_uartc_destruct(struct xwds_uartc * uartc);
 xwer_t xwds_uartc_clear_rxq(struct xwds_uartc * uartc);
 xwer_t xwds_uartc_get_rxq_datasize(struct xwds_uartc * uartc, xwsz_t *ret);
 xwer_t xwds_uartc_getc(struct xwds_uartc * uartc,
-                       xwu8_t * buf, xwtm_t * xwtm);
+                       xwu8_t * buf, xwtm_t to);
 xwer_t xwds_uartc_try_getc(struct xwds_uartc * uartc, xwu8_t * buf);
 xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
                      void * buf, xwsz_t * size,
-                     xwtm_t * xwtm);
+                     xwtm_t to);
 xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc, void * buf, xwsz_t * size);
 xwer_t xwds_uartc_clear_txq(struct xwds_uartc * uartc);
 xwer_t xwds_uartc_putc(struct xwds_uartc * uartc,
                        const xwu8_t byte,
-                       xwtm_t * xwtm);
+                       xwtm_t to);
 xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
                      const xwu8_t * data, xwsz_t * size,
-                     xwtm_t * xwtm);
+                     xwtm_t to);
 xwer_t xwds_uartc_cfg(struct xwds_uartc * uartc,
                       const struct xwds_uart_cfg * cfg);
 

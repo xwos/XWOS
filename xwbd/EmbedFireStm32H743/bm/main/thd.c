@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwcd/ds/soc/gpio.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/mif.h>
@@ -81,8 +81,7 @@ xwer_t led_task(void * arg)
                 if (xwos_cthd_shld_frz()) {
                         xwos_cthd_freeze();
                 }
-                xwtm = 1 * XWTM_S;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(1 * XWTM_S);
                 xwds_gpio_toggle(&stm32cube_soc_cb, LED_Blue_GPIO_Port, LED_Blue_Pin);
         }
         return XWOK;

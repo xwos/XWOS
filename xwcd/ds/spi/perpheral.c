@@ -19,7 +19,6 @@
  */
 
 #include <xwcd/ds/standard.h>
-#include <xwos/osal/skd.h>
 #include <xwcd/ds/spi/perpheral.h>
 
 static __xwds_vop

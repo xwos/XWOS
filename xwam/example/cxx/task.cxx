@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.hxx>
-#include <xwos/osal/skd.hxx>
+#include <xwos/osal/thd.hxx>
 #include <vector>
 #include "test/vector.hxx"
 #if !defined(__clang__)
@@ -30,7 +30,6 @@
 
 xwer_t cxx_thd_main(void * arg)
 {
-  xwtm_t xwtm;
   xwer_t rc;
 
   XWOS_UNUSED(arg);
@@ -45,8 +44,7 @@ xwer_t cxx_thd_main(void * arg)
 
   rc = XWOK;
   while (!xwos_cthd_frz_shld_stop(NULL)) {
-    xwtm = 2000 * XWTM_MS;
-    xwos_cthd_sleep(&xwtm);
+    xwos_cthd_sleep(2000 * XWTM_MS);
   }
   xwos_thd_detach(xwos_cthd_self());
   return rc;

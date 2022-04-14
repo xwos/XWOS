@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #include <string.h>
@@ -481,10 +481,7 @@ err_cq_grab:
 __xwmd_api
 xwer_t xwcq_dq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
 {
-        xwtm_t expected;
-
-        expected = XWTM_MAX;
-        return xwcq_timedq(cq, buf, size, &expected);
+        return xwcq_dq_to(cq, buf, size, XWTM_MAX);
 }
 
 /**
@@ -495,9 +492,7 @@ xwer_t xwcq_dq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示接收缓冲区的大小
  * + (O) 作为输出时，返回实际接收的数据大小
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -507,9 +502,11 @@ xwer_t xwcq_dq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwmd_api
-xwer_t xwcq_timedq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t * xwtm)
+xwer_t xwcq_dq_to(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t to)
 {
         xwreg_t cpuirq;
         xwsz_t bufsz;
@@ -519,7 +516,6 @@ xwer_t xwcq_timedq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t * xwtm)
         XWOS_VALIDATE(cq, "nullptr", -EFAULT);
         XWOS_VALIDATE(buf, "nullptr", -EFAULT);
         XWOS_VALIDATE(size, "nullptr", -EFAULT);
-        XWOS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwcq_grab(cq);
         if (rc < 0) {
@@ -527,9 +523,9 @@ xwer_t xwcq_timedq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t * xwtm)
         }
         bufsz = *size;
         cpsz = bufsz > cq->slotsize? cq->slotsize : bufsz;
-        rc = xwos_sem_timedwait(&cq->sem, xwtm);
+        rc = xwos_sem_wait_to(&cq->sem, to);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_sem_timedwait;
+                goto err_sem_wait_to;
         }
         xwos_splk_lock_cpuirqsv(&cq->lock, &cpuirq);
         memcpy(buf, &cq->q[(xwsz_t)cq->front * cq->slotsize], cpsz);
@@ -542,7 +538,7 @@ xwer_t xwcq_timedq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t * xwtm)
         *size = cpsz;
         return XWOK;
 
-err_sem_timedwait:
+err_sem_wait_to:
         xwcq_put(cq);
 err_cq_grab:
         return rc;
@@ -623,10 +619,7 @@ err_cq_grab:
 __xwmd_api
 xwer_t xwcq_peek(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
 {
-        xwtm_t expected;
-
-        expected = XWTM_MAX;
-        return xwcq_timedpeek(cq, buf, size, &expected);
+        return xwcq_peek_to(cq, buf, size, XWTM_MAX);
 }
 
 /**
@@ -637,9 +630,7 @@ xwer_t xwcq_peek(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示接收缓冲区的大小
  * + (O) 作为输出时，返回实际接收的数据大小
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -649,9 +640,11 @@ xwer_t xwcq_peek(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwmd_api
-xwer_t xwcq_timedpeek(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t * xwtm)
+xwer_t xwcq_peek_to(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t to)
 {
         xwreg_t cpuirq;
         xwsz_t bufsz;
@@ -661,7 +654,6 @@ xwer_t xwcq_timedpeek(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t * xw
         XWOS_VALIDATE(cq, "nullptr", -EFAULT);
         XWOS_VALIDATE(buf, "nullptr", -EFAULT);
         XWOS_VALIDATE(size, "nullptr", -EFAULT);
-        XWOS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwcq_grab(cq);
         if (rc < 0) {
@@ -669,9 +661,9 @@ xwer_t xwcq_timedpeek(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t * xw
         }
         bufsz = *size;
         cpsz = bufsz > cq->slotsize? cq->slotsize : bufsz;
-        rc = xwos_sem_timedwait(&cq->sem, xwtm);
+        rc = xwos_sem_wait_to(&cq->sem, to);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_sem_timedwait;
+                goto err_sem_wait_to;
         }
         xwos_splk_lock_cpuirqsv(&cq->lock, &cpuirq);
         memcpy(buf, &cq->q[(xwsz_t)cq->front * cq->slotsize], cpsz);
@@ -681,7 +673,7 @@ xwer_t xwcq_timedpeek(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t * xw
         *size = cpsz;
         return XWOK;
 
-err_sem_timedwait:
+err_sem_wait_to:
         xwcq_put(cq);
 err_cq_grab:
         return rc;

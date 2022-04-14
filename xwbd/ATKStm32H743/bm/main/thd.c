@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/mm/mempool/allocator.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwcd/ds/soc/gpio.h>
 #include <xwcd/perpheral/i2c/eeprom/driver.h>
 #include <bdl/standard.h>
@@ -89,26 +89,26 @@ err_thd_create:
 xwer_t eeprom_task(void)
 {
         xwer_t rc;
-        xwtm_t xwtm;
+        xwtm_t to;
         xwsz_t size;
         xwu8_t eedata[8] = {0};
 
-        xwtm = 1 * XWTM_S;
-        rc = xwds_eeprom_reset(&stm32cube_at24c02_cb, &xwtm);
+        to = xwtm_ft(1 * XWTM_S);
+        rc = xwds_eeprom_reset(&stm32cube_at24c02_cb, to);
         if (rc < 0) {
                 goto err_eeprom_reset;
         }
 
         size = 8;
-        xwtm = 1 * XWTM_S;
-        rc = xwds_eeprom_pgread(&stm32cube_at24c02_cb, eedata, &size, 0, &xwtm);
+        to = xwtm_ft(1 * XWTM_S);
+        rc = xwds_eeprom_pgread(&stm32cube_at24c02_cb, eedata, &size, 0, to);
         if (rc < 0) {
                 goto err_eeprom_read;
         }
 
         size = 8;
-        xwtm = 1 * XWTM_S;
-        rc = xwds_eeprom_pgread(&stm32cube_at24c02_cb, eedata, &size, 1, &xwtm);
+        to = xwtm_ft(1 * XWTM_S);
+        rc = xwds_eeprom_pgread(&stm32cube_at24c02_cb, eedata, &size, 1, to);
         if (rc < 0) {
                 goto err_eeprom_read;
         }
@@ -122,7 +122,6 @@ err_eeprom_reset:
 xwer_t led_task(void * arg)
 {
         xwer_t rc;
-        xwtm_t xwtm;
 
         XWOS_UNUSED(arg);
 
@@ -137,8 +136,7 @@ xwer_t led_task(void * arg)
                 if (xwos_cthd_shld_frz()) {
                         xwos_cthd_freeze();
                 }
-                xwtm = 1 * XWTM_S;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(1 * XWTM_S);
                 xwds_gpio_toggle(&stm32cube_soc_cb,
                                  XWDS_GPIO_PORT_B,
                                  XWDS_GPIO_PIN_0);
@@ -157,101 +155,101 @@ xwer_t memtst_task(void * arg)
         rc = XWOK;
         while ((!xwos_cthd_frz_shld_stop(NULL)) && (running)) {
                 xwtm = 2 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_malloc(sdram_mempool, 8, &mem);
                 xwtm = 10 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_free(sdram_mempool, mem);
 
                 xwtm = 3 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_malloc(sdram_mempool, 16, &mem);
                 xwtm = 6 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_free(sdram_mempool, mem);
 
                 xwtm = 8 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_malloc(sdram_mempool, 32, &mem);
                 xwtm = 12 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_free(sdram_mempool, mem);
 
                 xwtm = 4 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_malloc(sdram_mempool, 64, &mem);
                 xwtm = 9 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_free(sdram_mempool, mem);
 
                 xwtm = 15 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_malloc(sdram_mempool, 128, &mem);
                 xwtm = 8 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_free(sdram_mempool, mem);
 
                 xwtm = 15 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_malloc(sdram_mempool, 192, &mem);
                 xwtm = 8 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_free(sdram_mempool, mem);
 
                 xwtm = 18 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_malloc(sdram_mempool, 256, &mem);
                 xwtm = 6 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_free(sdram_mempool, mem);
 
                 xwtm = 15 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_malloc(sdram_mempool, 384, &mem);
                 xwtm = 8 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_free(sdram_mempool, mem);
 
                 xwtm = 1 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_malloc(sdram_mempool, 512, &mem);
                 xwtm = 1 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_free(sdram_mempool, mem);
 
                 xwtm = 15 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_malloc(sdram_mempool, 768, &mem);
                 xwtm = 8 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_free(sdram_mempool, mem);
 
                 xwtm = 3 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_malloc(sdram_mempool, 1024, &mem);
                 xwtm = 11 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_free(sdram_mempool, mem);
 
                 xwtm = 8 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_malloc(sdram_mempool, 2048, &mem);
                 xwtm = 3 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_free(sdram_mempool, mem);
 
                 xwtm = 7 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_malloc(sdram_mempool, 4096, &mem);
                 xwtm = 5 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_free(sdram_mempool, mem);
 
                 xwtm = 3 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_malloc(sdram_mempool, 8192, &mem);
                 xwtm = 2 * XWTM_MS;
-                xwos_cthd_sleep(&xwtm);
+                xwos_cthd_sleep(xwtm);
                 rc = xwmm_mempool_free(sdram_mempool, mem);
         }
         return rc;

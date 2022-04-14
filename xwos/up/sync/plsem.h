@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_up_sync_plsem_h__
@@ -42,7 +42,7 @@ xwer_t xwup_plsem_unbind(struct xwup_plsem * sem, struct xwup_evt * evt);
 xwer_t xwup_plsem_post(struct xwup_plsem * sem);
 xwer_t xwup_plsem_wait(struct xwup_plsem * sem);
 xwer_t xwup_plsem_trywait(struct xwup_plsem * sem);
-xwer_t xwup_plsem_timedwait(struct xwup_plsem * sem, xwtm_t * xwtm);
+xwer_t xwup_plsem_wait_to(struct xwup_plsem * sem, xwtm_t xwtm);
 xwer_t xwup_plsem_wait_unintr(struct xwup_plsem * sem);
 xwer_t xwup_plsem_freeze(struct xwup_plsem * sem);
 xwer_t xwup_plsem_thaw(struct xwup_plsem * sem);

@@ -22,11 +22,11 @@ EINCDIRS :=
 ELIBS :=
 
 ifeq ($(ARCHCFG_COMPILER_CLIB),y)
-  ELIBS_gcc += -lstdc++ -lm -lc -lnosys
+  ELIBS_gcc += -lstdc++ -lsupc++ -lm -lc -lnosys
 endif
 ELIBS_gcc += -lgcc
 
 ifeq ($(ARCHCFG_COMPILER_CLIB),y)
-  ELIBS_llvm += -lc++ -lc++abi -lm -lc -lnosys
+  ELIBS_llvm += -lunwind -lc++ -lc++abi -lm -lc -lnosys
 endif
 ELIBS_llvm += -lclang_rt.builtins-armv7em

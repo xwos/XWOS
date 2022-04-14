@@ -21,7 +21,7 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwam/example/thread/create/mif.h>
 
 #define LOGTAG "thdcrt"
@@ -72,7 +72,6 @@ xwer_t example_thread_create_start(void)
 xwer_t thd_1_func(void * arg)
 {
         struct xwos_thd_attr attr;
-        xwtm_t time;
         xwer_t rc = XWOK;
         xwer_t childrc;
         xwsq_t argv = (xwsq_t)arg; /* 获取创建线程时提供的参数 */
@@ -94,8 +93,7 @@ xwer_t thd_1_func(void * arg)
 
         /* 循环argv次 */
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                time = 1 * XWTM_S;
-                xwos_cthd_sleep(&time);
+                xwos_cthd_sleep(1 * XWTM_S);
                 thdcrtlogf(INFO, "[线程1] %d\n", argv);
                 argv--;
                 if (0 == argv) {
@@ -123,15 +121,13 @@ xwer_t thd_1_func(void * arg)
 xwer_t thd_2_func(void * arg)
 {
         xwer_t rc;
-        xwtm_t time;
         xwsq_t argv = (xwsq_t)arg; /* 获取初始化线程时提供的参数 */
 
         thdcrtlogf(INFO, "[线程2] 开始运行。\n");
 
         /* 循环argv次 */
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                time = 1 * XWTM_S;
-                rc = xwos_cthd_sleep(&time);
+                rc = xwos_cthd_sleep(1 * XWTM_S);
                 thdcrtlogf(INFO, "[线程2] %d\n", argv);
                 argv--;
                 if (0 == argv) {

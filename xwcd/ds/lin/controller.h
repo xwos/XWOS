@@ -88,11 +88,11 @@ struct xwds_linc;
 struct xwds_linc_driver {
         struct xwds_driver base; /**< C语言面向对象：继承struct xwds_driver */
         xwer_t (* msttx)(struct xwds_linc *, xwu8_t, struct xwds_lin_msg *,
-                         xwtm_t *); /**< 主机节点发送 */
+                         xwtm_t /*to*/); /**< 主机节点发送 */
         xwer_t (* slvtx)(struct xwds_linc *, struct xwds_lin_msg *,
-                         xwtm_t *); /**< 从机节点发送 */
+                         xwtm_t /*to*/); /**< 从机节点发送 */
         xwer_t (* rx)(struct xwds_linc *, struct xwds_lin_msg *,
-                      xwtm_t *); /**< 接收 */
+                      xwtm_t /*to*/); /**< 接收 */
 };
 
 /**
@@ -121,13 +121,13 @@ void xwds_linc_destruct(struct xwds_linc * linc);
 
 xwer_t xwds_linc_msttx(struct xwds_linc * linc,
                        xwu8_t id, struct xwds_lin_msg * msg,
-                       xwtm_t * xwtm);
+                       xwtm_t to);
 xwer_t xwds_linc_slvtx(struct xwds_linc * linc,
                        struct xwds_lin_msg * msg,
-                       xwtm_t * xwtm);
+                       xwtm_t to);
 xwer_t xwds_linc_rx(struct xwds_linc * linc,
                     struct xwds_lin_msg * msgbuf,
-                    xwtm_t * xwtm);
+                    xwtm_t to);
 xwer_t xwds_linc_get_msg_size(struct xwds_linc * linc,
                               xwu8_t protected_id,
                               xwu8_t * ret);

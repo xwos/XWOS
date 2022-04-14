@@ -19,7 +19,6 @@
  */
 
 #include <xwcd/ds/standard.h>
-#include <xwos/osal/skd.h>
 #include <xwos/osal/lock/mtx.h>
 #include <xwcd/ds/i2c/master.h>
 
@@ -215,9 +214,7 @@ xwer_t xwds_i2cm_vop_resume(struct xwds_i2cm * i2cm)
  * + size: 传输的字节数
  *   - (I) 当作为输入时，表示缓冲区的大小
  *   - (O) 当作为输出时，返回实际传输的数据大小
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 设备对象不可引用
@@ -228,10 +225,11 @@ xwer_t xwds_i2cm_vop_resume(struct xwds_i2cm * i2cm)
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
-xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
-                      xwtm_t * xwtm)
+xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg, xwtm_t to)
 {
         xwer_t rc;
         const struct xwds_i2cm_driver * drv;
@@ -239,19 +237,18 @@ xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg,
         XWDS_VALIDATE(i2cm, "nullptr", -EFAULT);
         XWDS_VALIDATE(msg, "nullptr", -EFAULT);
         XWDS_VALIDATE((msg->flag & XWDS_I2C_F_DIRMSK), "no-direction", -EINVAL);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_i2cm_grab(i2cm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_i2cm_grab;
         }
-        rc = xwos_mtx_timedlock(&i2cm->xfer.apimtx, xwtm);
+        rc = xwos_mtx_lock_to(&i2cm->xfer.apimtx, to);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_i2cm_lock;
         }
         drv = xwds_cast(const struct xwds_i2cm_driver *, i2cm->dev.drv);
         if ((drv) && (drv->xfer)) {
-                rc = drv->xfer(i2cm, msg, xwtm);
+                rc = drv->xfer(i2cm, msg, to);
         } else {
                 rc = -ENOSYS;
         }
@@ -277,9 +274,7 @@ err_i2cm_grab:
  * @param[in] addrmode: I2C地址模式，取值：
  *   @arg XWDS_I2C_F_7BITADDR 7位地址模式
  *   @arg XWDS_I2C_F_10BITADDR 10位地址模式
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 设备对象不可引用
@@ -290,29 +285,30 @@ err_i2cm_grab:
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_i2cm_abort(struct xwds_i2cm * i2cm,
                        xwu16_t address, xwu16_t addrmode,
-                       xwtm_t * xwtm)
+                       xwtm_t to)
 {
         xwer_t rc;
         const struct xwds_i2cm_driver * drv;
 
         XWDS_VALIDATE(i2cm, "nullptr", -EFAULT);
-        XWDS_VALIDATE(xwtm, "nullptr", -EFAULT);
 
         rc = xwds_i2cm_grab(i2cm);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_i2cm_grab;
         }
-        rc = xwos_mtx_timedlock(&i2cm->abort.apimtx, xwtm);
+        rc = xwos_mtx_lock_to(&i2cm->abort.apimtx, to);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_i2cm_lock;
         }
         drv = xwds_cast(const struct xwds_i2cm_driver *, i2cm->dev.drv);
         if ((drv) && (drv->abort)) {
-                rc = drv->abort(i2cm, address, addrmode, xwtm);
+                rc = drv->abort(i2cm, address, addrmode, to);
         } else {
                 rc = -ENOSYS;
         }

@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_up_sync_evt_h__
@@ -88,10 +88,10 @@ xwer_t xwup_flg_wait(struct xwup_evt * evt,
 xwer_t xwup_flg_trywait(struct xwup_evt * evt,
                         xwsq_t trigger, xwsq_t action,
                         xwbmp_t origin[], xwbmp_t msk[]);
-xwer_t xwup_flg_timedwait(struct xwup_evt * evt,
-                          xwsq_t trigger, xwsq_t action,
-                          xwbmp_t origin[], xwbmp_t msk[],
-                          xwtm_t * xwtm);
+xwer_t xwup_flg_wait_to(struct xwup_evt * evt,
+                        xwsq_t trigger, xwsq_t action,
+                        xwbmp_t origin[], xwbmp_t msk[],
+                        xwtm_t to);
 
 /******** type:XWUP_EVT_TYPE_SEL ********/
 xwer_t xwup_sel_obj_bind(struct xwup_evt * evt,
@@ -105,11 +105,11 @@ xwer_t xwup_sel_obj_s1i(struct xwup_evt * evt, struct xwup_synobj * synobj);
 xwer_t xwup_sel_obj_c0i(struct xwup_evt * evt, struct xwup_synobj * synobj);
 xwer_t xwup_sel_select(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[]);
 xwer_t xwup_sel_tryselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[]);
-xwer_t xwup_sel_timedselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
-                            xwtm_t * xwtm);
+xwer_t xwup_sel_select_to(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
+                          xwtm_t to);
 
 /******** type:XWUP_EVT_TYPE_BR ********/
 xwer_t xwup_br_wait(struct xwup_evt * evt);
-xwer_t xwup_br_timedwait(struct xwup_evt * evt, xwtm_t * xwtm);
+xwer_t xwup_br_wait_to(struct xwup_evt * evt, xwtm_t to);
 
 #endif /* xwos/up/sync/evt.h */

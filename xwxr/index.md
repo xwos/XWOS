@@ -1,6 +1,9 @@
 +   @subpage xwos
+    +   @subpage xwos_standard
+    +   @subpage xwos_time
     +   @subpage xwos_irq
     +   @subpage xwos_skd
+    +   @subpage xwos_thd
     +   @subpage xwos_swt
     +   @subpage xwos_pm
 +   @subpage xwos_lock

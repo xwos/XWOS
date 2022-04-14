@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_mp_sync_sem_h__
@@ -98,7 +98,7 @@ xwer_t xwmp_plsem_freeze(struct xwmp_sem * sem);
 xwer_t xwmp_plsem_post(struct xwmp_sem * sem);
 xwer_t xwmp_plsem_wait(struct xwmp_sem * sem);
 xwer_t xwmp_plsem_trywait(struct xwmp_sem * sem);
-xwer_t xwmp_plsem_timedwait(struct xwmp_sem * sem, xwtm_t * xwtm);
+xwer_t xwmp_plsem_wait_to(struct xwmp_sem * sem, xwtm_t xwtm);
 xwer_t xwmp_plsem_wait_unintr(struct xwmp_sem * sem);
 #endif
 
@@ -109,7 +109,7 @@ xwer_t xwmp_rtsem_freeze(struct xwmp_sem * sem);
 xwer_t xwmp_rtsem_post(struct xwmp_sem * sem);
 xwer_t xwmp_rtsem_wait(struct xwmp_sem * sem);
 xwer_t xwmp_rtsem_trywait(struct xwmp_sem * sem);
-xwer_t xwmp_rtsem_timedwait(struct xwmp_sem * sem, xwtm_t * xwtm);
+xwer_t xwmp_rtsem_wait_to(struct xwmp_sem * sem, xwtm_t xwtm);
 xwer_t xwmp_rtsem_wait_unintr(struct xwmp_sem * sem);
 #endif
 

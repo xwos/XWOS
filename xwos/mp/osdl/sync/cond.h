@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_mp_osdl_sync_cond_h__
@@ -133,13 +133,13 @@ xwer_t xwosdl_cond_wait(struct xwosdl_cond * cond,
 }
 
 static __xwcc_inline
-xwer_t xwosdl_cond_timedwait(struct xwosdl_cond * cond,
-                             union xwos_ulock lock, xwsq_t lktype, void * lkdata,
-                             xwtm_t * xwtm, xwsq_t * lkst)
+xwer_t xwosdl_cond_wait_to(struct xwosdl_cond * cond,
+                           union xwos_ulock lock, xwsq_t lktype, void * lkdata,
+                           xwtm_t to, xwsq_t * lkst)
 {
-        return xwmp_cond_timedwait(cond,
-                                   lock.anon, lktype, lkdata,
-                                   xwtm, lkst);
+        return xwmp_cond_wait_to(cond,
+                                 lock.anon, lktype, lkdata,
+                                 to, lkst);
 }
 
 #endif /* xwos/mp/osdl/sync/cond.h */

@@ -21,7 +21,7 @@
 #include <xwos/standard.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include "lua.h"
 
 #define LUA_MAXINPUT		512

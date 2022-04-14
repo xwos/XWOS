@@ -37,10 +37,10 @@ xwer_t stm32cube_st7735_drv_suspend(struct xwds_device * dev);
 
 xwer_t stm32cube_st7735_drv_write(struct xwds_st7735 * st7735, xwu8_t reg,
                                   const xwu8_t * data, xwsz_t * size,
-                                  xwtm_t * xwtm);
+                                  xwtm_t to);
 xwer_t stm32cube_st7735_drv_read(struct xwds_st7735 * st7735, xwu8_t reg,
                                  xwu8_t * buf, xwsz_t * size,
-                                 xwtm_t * xwtm);
+                                 xwtm_t to);
 xwer_t stm32cube_st7735_drv_set_brightness(struct xwds_st7735 * st7735,
                                            xwu32_t brightness);
 
@@ -166,10 +166,9 @@ xwer_t stm32cube_st7735_drv_suspend(struct xwds_device * dev)
 }
 #endif
 
-
 xwer_t stm32cube_st7735_drv_write(struct xwds_st7735 * st7735, xwu8_t reg,
                                   const xwu8_t * data, xwsz_t * size,
-                                  xwtm_t * xwtm)
+                                  xwtm_t to)
 {
         xwer_t rc;
         xwsz_t xfsz, rest, pos;
@@ -181,7 +180,7 @@ xwer_t stm32cube_st7735_drv_write(struct xwds_st7735 * st7735, xwu8_t reg,
         xwds_gpio_reset(&stm32cube_soc_cb,
                         STM32CUBE_ST7735_DC_PORT,
                         STM32CUBE_ST7735_DC_PIN);
-        rc = xwds_spim_xfer(st7735->spip.bus, &reg, NULL, &xfsz, xwtm);
+        rc = xwds_spim_xfer(st7735->spip.bus, &reg, NULL, &xfsz, to);
         if (rc < 0) {
                 goto err_write_cmd;
         }
@@ -192,7 +191,7 @@ xwer_t stm32cube_st7735_drv_write(struct xwds_st7735 * st7735, xwu8_t reg,
         pos = 0;
         while (pos < xfsz) {
                 rest = xfsz - pos;
-                rc = xwds_spim_xfer(st7735->spip.bus, &data[pos], NULL, &rest, xwtm);
+                rc = xwds_spim_xfer(st7735->spip.bus, &data[pos], NULL, &rest, to);
                 if (rc < 0) {
                         goto err_write_data;
                 }
@@ -211,7 +210,7 @@ err_write_cmd:
 
 xwer_t stm32cube_st7735_drv_read(struct xwds_st7735 * st7735, xwu8_t reg,
                                  xwu8_t * buf, xwsz_t * size,
-                                 xwtm_t * xwtm)
+                                 xwtm_t to)
 {
         xwer_t rc;
         xwsz_t xfsz, rest, pos;
@@ -223,7 +222,7 @@ xwer_t stm32cube_st7735_drv_read(struct xwds_st7735 * st7735, xwu8_t reg,
         xwds_gpio_reset(&stm32cube_soc_cb,
                         STM32CUBE_ST7735_DC_PORT,
                         STM32CUBE_ST7735_DC_PIN);
-        rc = xwds_spim_xfer(st7735->spip.bus, &reg, NULL, &xfsz, xwtm);
+        rc = xwds_spim_xfer(st7735->spip.bus, &reg, NULL, &xfsz, to);
         if (rc < 0) {
                 goto err_write_cmd;
         }
@@ -234,7 +233,7 @@ xwer_t stm32cube_st7735_drv_read(struct xwds_st7735 * st7735, xwu8_t reg,
         pos = 0;
         while (pos < xfsz) {
                 rest = xfsz - pos;
-                rc = xwds_spim_xfer(st7735->spip.bus, NULL, &buf[pos], &rest, xwtm);
+                rc = xwds_spim_xfer(st7735->spip.bus, NULL, &buf[pos], &rest, to);
                 if (rc < 0) {
                         goto err_read_data;
                 }

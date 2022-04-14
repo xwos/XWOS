@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwcd/perpheral/spi/lcd/st7735/driver.h>
 #include <xwmd/libc/newlibac/mif.h>
 #include <xwem/vm/lua/mif.h>
@@ -74,7 +74,6 @@ extern void xwrust_main(void);
 xwer_t main_task(void * arg)
 {
         xwer_t rc;
-        xwtm_t xwtm;
 
         XWOS_UNUSED(arg);
 
@@ -83,8 +82,7 @@ xwer_t main_task(void * arg)
                 goto err_stm32cube_start;
         }
 
-        xwtm = XWTM_MAX;
-        xwds_st7735_draw(&stm32cube_st7735_cb, 0, 0, 160, 80, bootlogo, &xwtm);
+        xwds_st7735_draw(&stm32cube_st7735_cb, 0, 0, 160, 80, bootlogo, XWTM_MAX);
 
         rc = newlibac_init();
         if (rc < 0) {

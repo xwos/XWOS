@@ -22,7 +22,7 @@
 #include <string.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwos/osal/swt.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwam/example/lock/spinlock/mif.h>
@@ -114,28 +114,24 @@ xwer_t xwsplkdemo_thd_func(void * arg)
         XWOS_UNUSED(arg);
 
         swtlogf(INFO, "[线程] 启动。\n");
-
-        ts = xwos_skd_get_timetick_lc();
-
         swtlogf(INFO, "[线程] 启动定时器。\n");
+        ts = xwtm_now();
         rc = xwos_swt_start(&xwsplkdemo_swt,
                             ts, 500 * XWTM_MS,
                             xwsplkdemo_swt_callback, NULL);
 
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                ts = 1 * XWTM_S;
-                xwos_cthd_sleep(&ts);
+                xwos_cthd_sleep(1 * XWTM_S);
 
                 xwos_splk_lock_cpuirq(&xwsplkdemo_lock);
                 /* 临界区 */
                 cnt = xwsplkdemo_shared_count;
                 xwos_splk_unlock_cpuirq(&xwsplkdemo_lock);
 
-                ts = xwos_skd_get_timestamp_lc();
+                ts = xwtm_nowts();
                 swtlogf(INFO,
                         "[线程] 时间戳：%lld 纳秒，计数器：%d。\n",
                         ts, cnt);
-
         }
 
         swtlogf(INFO, "[线程] 退出。\n");

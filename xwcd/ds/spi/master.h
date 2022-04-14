@@ -35,12 +35,12 @@ struct xwds_spim_driver {
         struct xwds_driver base; /**< C语言面向对象：继承struct xwds_driver */
         xwer_t (* buscfg)(struct xwds_spim * /*spim*/,
                           xwid_t /*cfgid*/,
-                          xwtm_t * /*xwtm*/); /**< 配置总线参数 */
+                          xwtm_t /*to*/); /**< 配置总线参数 */
         xwer_t (* xfer)(struct xwds_spim * /*spim*/,
                         const xwu8_t[] /*txd*/, xwu8_t * /*rxb*/,
-                        xwsz_t * /*size*/, xwtm_t * /*xwtm*/); /**< 传输消息 */
+                        xwsz_t * /*size*/, xwtm_t /*to*/); /**< 传输消息 */
         xwer_t (* abort)(struct xwds_spim * /*spim*/,
-                         xwtm_t * /*xwtm*/); /**< 中止传输 */
+                         xwtm_t /*to*/); /**< 中止传输 */
 };
 
 /**
@@ -61,12 +61,11 @@ struct xwds_spim {
 
 void xwds_spim_construct(struct xwds_spim * spim);
 void xwds_spim_destruct(struct xwds_spim * spim);
-xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t * xwtm);
+xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t to);
 xwer_t xwds_spim_xfer(struct xwds_spim * spim,
-                      const xwu8_t txd[], xwu8_t * rxb,
-                      xwsz_t * size, xwtm_t * xwtm);
-xwer_t xwds_spim_abort(struct xwds_spim * spim,
-                       xwtm_t * xwtm);
+                      const xwu8_t txd[], xwu8_t * rxb, xwsz_t * size,
+                      xwtm_t to);
+xwer_t xwds_spim_abort(struct xwds_spim * spim, xwtm_t to);
 
 /**
  * @brief XWDS API：增加对象的引用计数

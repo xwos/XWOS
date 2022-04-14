@@ -35,10 +35,10 @@ struct xwds_i2cm_driver {
         struct xwds_driver base; /**< C语言面向对象：继承struct xwds_driver */
         xwer_t (* xfer)(struct xwds_i2cm * /*i2cm*/,
                         struct xwds_i2c_msg * /*msg*/,
-                        xwtm_t * /*xwtm*/); /**< 传输 */
+                        xwtm_t /*to*/); /**< 传输 */
         xwer_t (* abort)(struct xwds_i2cm * /*i2cm*/,
                          xwu16_t /*address*/, xwu16_t /*addrmode*/,
-                         xwtm_t * /*xwtm*/); /**< 中止传输 */
+                         xwtm_t /*to*/); /**< 中止传输 */
 };
 
 /**
@@ -63,10 +63,10 @@ void xwds_i2cm_construct(struct xwds_i2cm * i2cm);
 void xwds_i2cm_destruct(struct xwds_i2cm * i2cm);
 xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm,
                       struct xwds_i2c_msg * msg,
-                      xwtm_t * xwtm);
+                      xwtm_t to);
 xwer_t xwds_i2cm_abort(struct xwds_i2cm * i2cm,
                        xwu16_t address, xwu16_t addrmode,
-                       xwtm_t * xwtm);
+                       xwtm_t to);
 
 /**
  * @brief XWDS API：增加对象的引用计数

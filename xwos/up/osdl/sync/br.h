@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_up_osdl_sync_br_h__
@@ -111,9 +111,9 @@ xwer_t xwosdl_br_wait(struct xwosdl_br * br)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_br_timedwait(struct xwosdl_br * br, xwtm_t * xwtm)
+xwer_t xwosdl_br_wait_to(struct xwosdl_br * br, xwtm_t to)
 {
-        return xwup_br_timedwait(br, xwtm);
+        return xwup_br_wait_to(br, to);
 }
 
 #endif /* xwos/up/osdl/sync/br.h */

@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/mm/mempool/allocator.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwem/vm/lua/xwlua/port.h>
 #include <xwem/vm/lua/mif.h>
 

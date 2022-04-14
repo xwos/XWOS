@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #include <xwos/standard.h>
@@ -16,7 +16,7 @@
 #include <xwos/lib/xwbmpaop.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/bma.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwmd/isc/xwpcp/hwifal.h>
 #include <xwmd/isc/xwpcp/protocol.h>
@@ -330,9 +330,7 @@ void xwpcp_txcb_notify(struct xwpcp * xwpcp, xwpcp_txh_t txh, xwer_t rc, void * 
  * @param[in] pri: 用户数据的优先级
  * @param[in] port: 端口
  * @param[in] qos: 服务质量，取值范围： @ref xwpcp_msg_qos_em
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -346,12 +344,14 @@ void xwpcp_txcb_notify(struct xwpcp * xwpcp, xwpcp_txh_t txh, xwer_t rc, void * 
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwmd_api
 xwer_t xwpcp_tx(struct xwpcp * xwpcp,
                 const xwu8_t data[], xwsz_t * size,
                 xwu8_t pri, xwu8_t port, xwu8_t qos,
-                xwtm_t * xwtm)
+                xwtm_t to)
 {
         struct xwpcp_txcb_arg cbarg;
         union xwos_ulock ulk;
@@ -367,7 +367,6 @@ xwer_t xwpcp_tx(struct xwpcp * xwpcp,
         XWPCP_VALIDATE((port > XWPCP_PORT_CMD), "port0-not-permitted", -ENXIO);
         XWPCP_VALIDATE((port < XWPCP_PORT_NUM), "no-such-port", -ENODEV);
         XWPCP_VALIDATE((qos < XWPCP_MSG_QOS_NUM), "qos-invalid", -EINVAL);
-        XWPCP_VALIDATE((xwtm), "nullptr", -EFAULT);
 
         rc = xwpcp_grab(xwpcp);
         if (__xwcc_unlikely(rc < 0)) {
@@ -388,8 +387,7 @@ xwer_t xwpcp_tx(struct xwpcp * xwpcp,
         ulk.osal.splk = &cbarg.splk;
         xwos_splk_lock(&cbarg.splk);
         if (-EINPROGRESS == cbarg.rc) {
-                rc = xwos_cond_timedwait(&cbarg.cond, ulk, XWOS_LK_SPLK, NULL,
-                                         xwtm, &lkst);
+                rc = xwos_cond_wait_to(&cbarg.cond, ulk, XWOS_LK_SPLK, NULL, to, &lkst);
                 if (XWOK == rc) {
                         rc = cbarg.rc;
                         xwos_splk_unlock(&cbarg.splk);
@@ -539,9 +537,7 @@ xwsq_t xwpcp_get_txstate(xwpcp_txh_t txh)
  * + (I) 作为输入时，表示接收缓冲区的大小
  * + (O) 作为输出时，返回实际接收的消息大小
  * @param[out] qos: 指向缓冲区的指针，此缓冲区用于返回消息的QoS，可为NULL表示不关心QoS
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -553,11 +549,13 @@ xwsq_t xwpcp_get_txstate(xwpcp_txh_t txh)
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwmd_api
 xwer_t xwpcp_rx(struct xwpcp * xwpcp, xwu8_t port,
                 xwu8_t rxbuf[], xwsz_t * size, xwu8_t * qos,
-                xwtm_t * xwtm)
+                xwtm_t to)
 {
         union xwpcp_slot * slot;
         xwu8_t * sdupos;
@@ -571,7 +569,6 @@ xwer_t xwpcp_rx(struct xwpcp * xwpcp, xwu8_t port,
         XWPCP_VALIDATE((size), "nullptr", -EFAULT);
         XWPCP_VALIDATE((port > XWPCP_PORT_CMD), "port0-not-permitted", -ENXIO);
         XWPCP_VALIDATE((port < XWPCP_PORT_NUM), "no-such-port", -ENODEV);
-        XWPCP_VALIDATE((xwtm), "nullptr", -EFAULT);
 
         rc = xwpcp_grab(xwpcp);
         if (__xwcc_unlikely(rc < 0)) {
@@ -581,9 +578,9 @@ xwer_t xwpcp_rx(struct xwpcp * xwpcp, xwu8_t port,
 
         bufsize = *size;
         xwpcplogf(DEBUG, "port:%d, buffer size:0x%X\n", port, bufsize);
-        rc = xwos_sem_timedwait(&xwpcp->rxq.sem[port], xwtm);
+        rc = xwos_sem_wait_to(&xwpcp->rxq.sem[port], to);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_sem_timedwait;
+                goto err_sem_wait_to;
         }
 
         slot = xwpcp_rxq_choose(xwpcp, port);
@@ -608,7 +605,7 @@ xwer_t xwpcp_rx(struct xwpcp * xwpcp, xwu8_t port,
         xwpcp_put(xwpcp);
         return XWOK;
 
-err_sem_timedwait:
+err_sem_wait_to:
         xwpcp_put(xwpcp);
 err_ifnotrdy:
         return rc;

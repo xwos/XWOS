@@ -34,10 +34,10 @@ struct xwds_st7735_driver {
         struct xwds_spip_driver spip; /**< C语言面向对象：继承struct xwds_spip_driver */
         xwer_t (* write)(struct xwds_st7735 * /*st7735*/, xwu8_t /*reg*/,
                          const xwu8_t * /*data*/, xwsz_t * /*size*/,
-                         xwtm_t * /*xwtm*/);
+                         xwtm_t /*to*/);
         xwer_t (* read)(struct xwds_st7735 * /*st7735*/, xwu8_t /*reg*/,
                         xwu8_t * /*buf*/, xwsz_t * /*size*/,
-                        xwtm_t * /*xwtm*/);
+                        xwtm_t /*to*/);
         xwer_t (* set_brightness)(struct xwds_st7735 * /*st7735*/,
                                   xwu32_t /*brightness*/);
 };
@@ -53,32 +53,32 @@ xwer_t xwds_st7735_drv_suspend(struct xwds_device * dev);
 /******** ******** ******** APIs ******** ******** ********/
 xwer_t xwds_st7735_read_id(struct xwds_st7735 * st7735,
                            xwu32_t * id,
-                           xwtm_t * xwtm);
+                           xwtm_t to);
 xwer_t xwds_st7735_read_status(struct xwds_st7735 * st7735,
                                xwu8_t st[5],
-                               xwtm_t * xwtm);
+                               xwtm_t to);
 xwer_t xwds_st7735_read_madctl(struct xwds_st7735 * st7735,
                                xwu8_t madctl[2],
-                               xwtm_t * xwtm);
+                               xwtm_t to);
 xwer_t xwds_st7735_read_colmod(struct xwds_st7735 * st7735,
                                xwu8_t colmod[2],
-                               xwtm_t * xwtm);
-xwer_t xwds_st7735_display_on(struct xwds_st7735 * st7735, xwtm_t * xwtm);
-xwer_t xwds_st7735_display_off(struct xwds_st7735 * st7735, xwtm_t * xwtm);
+                               xwtm_t to);
+xwer_t xwds_st7735_display_on(struct xwds_st7735 * st7735, xwtm_t to);
+xwer_t xwds_st7735_display_off(struct xwds_st7735 * st7735, xwtm_t to);
 xwer_t xwds_st7735_set_brightness(struct xwds_st7735 * st7735, xwu32_t brightness);
 void xwds_st7735_get_brightness(struct xwds_st7735 * st7735, xwu32_t * brightness);
 xwer_t xwds_st7735_set_orientation(struct xwds_st7735 * st7735,
-                                   xwu8_t orientation, xwtm_t * xwtm);
+                                   xwu8_t orientation, xwtm_t to);
 void xwds_st7735_get_orientation(struct xwds_st7735 * st7735, xwu8_t * orientation);
-xwer_t xwds_st7735_invert_color(struct xwds_st7735 * st7735, bool inv, xwtm_t * xwtm);
+xwer_t xwds_st7735_invert_color(struct xwds_st7735 * st7735, bool inv, xwtm_t to);
 xwer_t xwds_st7735_set_pixel(struct xwds_st7735 * st7735,
                              xwu8_t x, xwu8_t y,
-                             xwu16_t color, xwtm_t * xwtm);
+                             xwu16_t color, xwtm_t to);
 xwer_t xwds_st7735_fill_rect(struct xwds_st7735 * st7735,
                              xwu8_t x, xwu8_t y, xwu8_t width, xwu8_t height,
-                             xwu16_t color, xwtm_t * xwtm);
+                             xwu16_t color, xwtm_t to);
 xwer_t xwds_st7735_draw(struct xwds_st7735 * st7735,
                         xwu8_t x, xwu8_t y, xwu8_t width, xwu8_t height,
-                        const xwu8_t img[], xwtm_t * xwtm);
+                        const xwu8_t img[], xwtm_t to);
 
 #endif /* xwcd/perpheral/spi/lcd/st7735/driver.h */

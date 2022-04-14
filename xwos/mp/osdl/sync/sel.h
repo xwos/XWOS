@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_mp_osdl_sync_sel_h__
@@ -80,8 +80,7 @@ xwer_t xwosdl_sel_put(struct xwosdl_sel * sel)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sel_bind(struct xwosdl_sel * src, struct xwosdl_sel * dst,
-                       xwsq_t pos)
+xwer_t xwosdl_sel_bind(struct xwosdl_sel * src, struct xwosdl_sel * dst, xwsq_t pos)
 {
         return xwmp_evt_bind(src, dst, pos);
 }
@@ -117,11 +116,11 @@ xwer_t xwosdl_sel_tryselect(struct xwosdl_sel * sel, xwbmp_t msk[], xwbmp_t trg[
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sel_timedselect(struct xwosdl_sel * sel,
-                              xwbmp_t msk[], xwbmp_t trg[],
-                              xwtm_t * xwtm)
+xwer_t xwosdl_sel_select_to(struct xwosdl_sel * sel,
+                            xwbmp_t msk[], xwbmp_t trg[],
+                            xwtm_t to)
 {
-        return xwmp_sel_timedselect(sel, msk, trg, xwtm);
+        return xwmp_sel_select_to(sel, msk, trg, to);
 }
 
 #endif /* xwos/mp/osdl/sync/sel.h */

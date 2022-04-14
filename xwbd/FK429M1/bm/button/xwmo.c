@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwos/osal/pm.h>
 #include <xwos/osal/sync/sem.h>
 #include <xwcd/ds/soc/gpio.h>
@@ -145,15 +145,13 @@ xwer_t bmbtn_get_btn_evt(xwsq_t * evt)
         xwer_t rc;
         xwsq_t in;
         xwsq_t cnt;
-        xwtm_t time;
 
         rc = xwos_sem_wait(&bmbtn_sem);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_sem_wait;
         }
 
-        time = BMBTN_DEBOUNCING_DELAY;
-        rc = xwos_cthd_sleep(&time);
+        rc = xwos_cthd_sleep(BMBTN_DEBOUNCING_DELAY);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_sleep;
         }
@@ -168,8 +166,7 @@ xwer_t bmbtn_get_btn_evt(xwsq_t * evt)
                         goto err_gpio_input;
                 }
                 cnt++;
-                time = BMBTN_DEBOUNCING_DELAY;
-                rc = xwos_cthd_sleep(&time);
+                rc = xwos_cthd_sleep(BMBTN_DEBOUNCING_DELAY);
                 if (__xwcc_unlikely(rc < 0)) {
                         goto err_sleep;
                 }
@@ -245,31 +242,25 @@ void bmbtn_rls_btn_irq(void)
 static
 void bmbtn_led_blink(void)
 {
-        xwtm_t time;
+        xwds_gpio_toggle(&stm32cube_soc_cb,
+                         BMBTN_LED_GPIO_PORT,
+                         BMBTN_LED_GPIO_PIN);
+        xwos_cthd_sleep(500 * XWTM_MS);
 
         xwds_gpio_toggle(&stm32cube_soc_cb,
                          BMBTN_LED_GPIO_PORT,
                          BMBTN_LED_GPIO_PIN);
-        time = 500 * XWTM_MS;
-        xwos_cthd_sleep(&time);
+        xwos_cthd_sleep(500 * XWTM_MS);
 
         xwds_gpio_toggle(&stm32cube_soc_cb,
                          BMBTN_LED_GPIO_PORT,
                          BMBTN_LED_GPIO_PIN);
-        time = 500 * XWTM_MS;
-        xwos_cthd_sleep(&time);
+        xwos_cthd_sleep(500 * XWTM_MS);
 
         xwds_gpio_toggle(&stm32cube_soc_cb,
                          BMBTN_LED_GPIO_PORT,
                          BMBTN_LED_GPIO_PIN);
-        time = 500 * XWTM_MS;
-        xwos_cthd_sleep(&time);
-
-        xwds_gpio_toggle(&stm32cube_soc_cb,
-                         BMBTN_LED_GPIO_PORT,
-                         BMBTN_LED_GPIO_PIN);
-        time = 500 * XWTM_MS;
-        xwos_cthd_sleep(&time);
+        xwos_cthd_sleep(500 * XWTM_MS);
 }
 
 static

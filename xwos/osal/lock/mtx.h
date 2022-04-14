@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_osal_lock_mtx_h__
@@ -15,6 +15,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/jack/lock/mtx.h>
+#include <xwos/osal/time.h>
 #include <xwos/osal/skd.h>
 
 /**
@@ -287,9 +288,7 @@ xwer_t xwos_mtx_trylock(struct xwos_mtx * mtx)
 /**
  * @brief XWOS API：限时等待上锁互斥锁
  * @param[in] mtx: 互斥锁对象的指针
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -301,11 +300,13 @@ xwer_t xwos_mtx_trylock(struct xwos_mtx * mtx)
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：不可重入
+ * @details
+ * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 static __xwos_inline_api
-xwer_t xwos_mtx_timedlock(struct xwos_mtx * mtx, xwtm_t * xwtm)
+xwer_t xwos_mtx_lock_to(struct xwos_mtx * mtx, xwtm_t to)
 {
-        return xwosdl_mtx_timedlock(&mtx->osmtx, xwtm);
+        return xwosdl_mtx_lock_to(&mtx->osmtx, to);
 }
 
 /**

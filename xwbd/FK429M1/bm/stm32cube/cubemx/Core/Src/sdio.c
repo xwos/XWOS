@@ -22,7 +22,7 @@
 #include "sdio.h"
 
 /* USER CODE BEGIN 0 */
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <xwos/osal/lock/mtx.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/cond.h>
@@ -253,12 +253,10 @@ xwer_t MX_SDIO_SD_TrimClk(xwsq_t cnt)
   xwu8_t __xwcc_aligned(4) buf[512];
   xwer_t rc;
   xwsq_t i;
-  xwtm_t time;
 
   rc = XWOK;
   for (i = 0; i < cnt; i++) {
-    time = 1 * XWTM_MS;
-    xwos_cthd_sleep(&time);
+    xwos_cthd_sleep(1 * XWTM_MS);
     rc = MX_SDIO_SD_Read(buf, i, 1);
     if (XWOK == rc) {
     } else if (-EIO == rc) {

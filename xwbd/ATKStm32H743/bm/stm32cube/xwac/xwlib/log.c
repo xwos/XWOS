@@ -23,12 +23,10 @@
 
 xwer_t board_log_write(const char * s, xwsz_t * n)
 {
-        xwtm_t desired;
         xwer_t rc;
 
-        desired = XWTM_MAX;
         rc = xwds_dmauartc_tx(&stm32cube_usart1_cb,
                               (const xwu8_t *)s, n,
-                              &desired);
+                              XWTM_MAX);
         return rc;
 }

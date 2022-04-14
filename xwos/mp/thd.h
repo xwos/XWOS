@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_mp_thd_h__
@@ -110,7 +110,7 @@ xwer_t xwmp_thd_wakeup(struct xwmp_thd * thd);
 void xwmp_thd_ttn_callback(void * entry);
 void xwmp_thd_wqn_callback(void * entry);
 xwer_t xwmp_thd_tt_add_locked(struct xwmp_thd * thd, struct xwmp_tt * xwtt,
-                              xwtm_t expected, xwreg_t cpuirq);
+                              xwtm_t to, xwreg_t cpuirq);
 void xwmp_thd_eq_rtwq_locked(struct xwmp_thd * thd,
                              struct xwmp_rtwq * xwrtwq,
                              xwu16_t type,
@@ -119,7 +119,7 @@ void xwmp_thd_eq_plwq_locked(struct xwmp_thd * thd,
                              struct xwmp_plwq * xwplwq,
                              xwu16_t type);
 xwer_t xwmp_thd_do_unlock(void * lock, xwsq_t lktype, void * lkdata);
-xwer_t xwmp_thd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm, void * lkdata);
+xwer_t xwmp_thd_do_lock(void * lock, xwsq_t lktype, xwtm_t to, void * lkdata);
 xwer_t xwmp_thd_reqfrz_lic(struct xwmp_thd * thd);
 xwer_t xwmp_thd_thaw_lic_pmlk(struct xwmp_thd * thd);
 
@@ -153,7 +153,7 @@ xwer_t xwmp_thd_stop(struct xwmp_thd * thd, xwer_t * trc);
 xwer_t xwmp_thd_join(struct xwmp_thd * thd, xwer_t * trc);
 xwer_t xwmp_thd_detach(struct xwmp_thd * thd);
 xwer_t xwmp_thd_intr(struct xwmp_thd * thd);
-xwer_t xwmp_cthd_sleep(xwtm_t * xwtm);
+xwer_t xwmp_cthd_sleep_to(xwtm_t to);
 xwer_t xwmp_cthd_sleep_from(xwtm_t * origin, xwtm_t inc);
 xwer_t xwmp_cthd_freeze(void);
 bool xwmp_cthd_shld_frz(void);

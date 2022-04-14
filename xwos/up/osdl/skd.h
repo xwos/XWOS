@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_up_osdl_skd_h__
@@ -15,7 +15,6 @@
 
 #include <xwos/up/skd.h>
 
-#define XWOSDL_SKDOBJ_FLAG_PRIVILEGED           XWUP_SKDOBJ_FLAG_PRIVILEGED
 #define XWOSDL_SKD_PRIORITY_RT_MIN              XWUP_SKD_PRIORITY_RT_MIN
 #define XWOSDL_SKD_PRIORITY_RT_MAX              XWUP_SKD_PRIORITY_RT_MAX
 #define XWOSDL_SKD_PRIORITY_INVALID             XWUP_SKD_PRIORITY_INVALID
@@ -231,9 +230,9 @@ bool xwosdl_cthd_frz_shld_stop(bool * frozen)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_cthd_sleep(xwtm_t * xwtm)
+xwer_t xwosdl_cthd_sleep_to(xwtm_t to)
 {
-        return xwup_cthd_sleep(xwtm);
+        return xwup_cthd_sleep_to(to);
 }
 
 static __xwcc_inline

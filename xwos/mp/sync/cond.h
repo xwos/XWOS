@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_mp_sync_cond_h__
@@ -35,10 +35,6 @@ void xwmp_cond_construct(struct xwmp_cond * cond);
 void xwmp_cond_destruct(struct xwmp_cond * cond);
 xwer_t xwmp_cond_activate(struct xwmp_cond * cond, xwobj_gc_f gcfunc);
 xwer_t xwmp_cond_intr(struct xwmp_cond * cond, struct xwmp_wqn * wqn);
-xwer_t xwmp_cond_do_unicast(struct xwmp_cond * cond);
-xwer_t xwmp_cond_do_timedwait(struct xwmp_cond * cond, struct xwmp_thd * thd,
-                              void * lock, xwsq_t lktype, void * lkdata,
-                              xwtm_t * xwtm, xwsq_t * lkst);
 
 #if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
 xwer_t xwmp_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
@@ -69,8 +65,8 @@ xwer_t xwmp_cond_unicast(struct xwmp_cond * cond);
 xwer_t xwmp_cond_wait(struct xwmp_cond * cond,
                       void * lock, xwsq_t lktype,
                       void * lkdata, xwsq_t * lkst);
-xwer_t xwmp_cond_timedwait(struct xwmp_cond * cond,
-                           void * lock, xwsq_t lktype, void * lkdata,
-                           xwtm_t * xwtm, xwsq_t * lkst);
+xwer_t xwmp_cond_wait_to(struct xwmp_cond * cond,
+                         void * lock, xwsq_t lktype, void * lkdata,
+                         xwtm_t to, xwsq_t * lkst);
 
 #endif /* xwos/mp/sync/cond.h */

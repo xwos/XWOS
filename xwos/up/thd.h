@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_up_thd_h__
@@ -127,7 +127,7 @@ xwer_t xwup_thd_rq_add_tail(struct xwup_thd * thd);
 void xwup_thd_rq_remove(struct xwup_thd * thd);
 void xwup_thd_ttn_callback(void * entry);
 xwer_t xwup_thd_tt_add_locked(struct xwup_thd * thd, struct xwup_tt * xwtt,
-                              xwtm_t expected, xwreg_t flag);
+                              xwtm_t to, xwreg_t flag);
 void xwup_thd_wqn_callback(void * entry);
 
 #if (1 == XWUPRULE_SKD_WQ_RT)
@@ -145,8 +145,7 @@ xwer_t xwup_thd_do_unlock(void * lock, xwsq_t lktype, void * lkdata);
 #endif
 
 #if (1 == XWUPRULE_SKD_THD_DO_LOCK)
-xwer_t xwup_thd_do_lock(void * lock, xwsq_t lktype, xwtm_t * xwtm,
-                        void * lkdata);
+xwer_t xwup_thd_do_lock(void * lock, xwsq_t lktype, xwtm_t to, void * lkdata);
 #endif
 
 xwer_t xwup_thd_freeze_lic(struct xwup_thd * thd);
@@ -179,7 +178,7 @@ xwer_t xwup_thd_stop(struct xwup_thd * thd, xwer_t * trc);
 xwer_t xwup_thd_join(struct xwup_thd * thd, xwer_t * trc);
 xwer_t xwup_thd_detach(struct xwup_thd * thd);
 xwer_t xwup_thd_intr(struct xwup_thd * thd);
-xwer_t xwup_cthd_sleep(xwtm_t * xwtm);
+xwer_t xwup_cthd_sleep_to(xwtm_t to);
 xwer_t xwup_cthd_sleep_from(xwtm_t * origin, xwtm_t inc);
 xwer_t xwup_cthd_freeze(void);
 bool xwup_cthd_shld_frz(void);

@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include <bdl/standard.h>
 
 #define SYSMGR_THD_PRIORITY   XWOS_SKD_PRIORITY_RT_MIN
@@ -59,15 +59,10 @@ xwer_t xwos_main(void)
 
 xwer_t sysmgr_thd_main(void *arg)
 {
-        xwtm_t time;
-        xwer_t rc;
-
         XWOS_UNUSED(arg);
+
         while (true) {
-                time = 300 * XWTM_MS;
-                xwos_cthd_sleep(&time);
-                time = 300 * XWTM_MS;
-                xwos_cthd_sleep(&time);
+                xwos_cthd_sleep(300 * XWTM_MS);
         }
-        return rc;
+        return XWOK;
 }

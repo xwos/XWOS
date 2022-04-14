@@ -32,11 +32,11 @@ xwer_t w25qrptif_uart_close(struct w25qrpt * w25qrpt);
 
 static
 xwer_t w25qrptif_uart_tx(struct w25qrpt * w25qrpt, const xwu8_t * data,
-                         xwsz_t * size, xwtm_t * xwtm);
+                         xwsz_t * size, xwtm_t to);
 
 static
 xwer_t w25qrptif_uart_rx(struct w25qrpt * w25qrpt, xwu8_t * buf,
-                         xwsz_t * size, xwtm_t * xwtm);
+                         xwsz_t * size, xwtm_t to);
 
 const struct w25qrpt_hwifal_operations w25qrptif_uart_ops = {
         .open = w25qrptif_uart_open,
@@ -61,14 +61,14 @@ xwer_t w25qrptif_uart_close(struct w25qrpt * w25qrpt)
 
 static
 xwer_t w25qrptif_uart_tx(struct w25qrpt * w25qrpt, const xwu8_t * data,
-                         xwsz_t *size, xwtm_t * xwtm)
+                         xwsz_t *size, xwtm_t to)
 {
-        return xwds_dmauartc_tx(w25qrpt->hwifcb, data, size, xwtm);
+        return xwds_dmauartc_tx(w25qrpt->hwifcb, data, size, to);
 }
 
 static
 xwer_t w25qrptif_uart_rx(struct w25qrpt * w25qrpt, xwu8_t * buf,
-                         xwsz_t * size, xwtm_t * xwtm)
+                         xwsz_t * size, xwtm_t to)
 {
-	return xwds_dmauartc_rx(w25qrpt->hwifcb, buf, size, xwtm);
+	return xwds_dmauartc_rx(w25qrpt->hwifcb, buf, size, to);
 }

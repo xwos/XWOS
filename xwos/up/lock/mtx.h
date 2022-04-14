@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_up_lock_mtx_h__
@@ -48,7 +48,7 @@ xwer_t xwup_mtx_intr(struct xwup_mtx * mtx, struct xwup_thd * thd);
 xwer_t xwup_mtx_unlock(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_lock(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx);
-xwer_t xwup_mtx_timedlock(struct xwup_mtx * mtx, xwtm_t * xwtm);
+xwer_t xwup_mtx_lock_to(struct xwup_mtx * mtx, xwtm_t to);
 xwer_t xwup_mtx_lock_unintr(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_getlkst(struct xwup_mtx * mtx, xwsq_t * lkst);
 

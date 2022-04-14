@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwmd_isc_xwpcp_mif_h__
@@ -105,7 +105,7 @@ xwer_t xwpcp_stop(struct xwpcp * xwpcp);
 xwer_t xwpcp_tx(struct xwpcp * xwpcp,
                 const xwu8_t data[], xwsz_t * size,
                 xwu8_t pri, xwu8_t port, xwu8_t qos,
-                xwtm_t * xwtm);
+                xwtm_t to);
 xwer_t xwpcp_eq(struct xwpcp * xwpcp,
                 const xwu8_t data[], xwsz_t * size,
                 xwu8_t pri, xwu8_t port, xwu8_t qos,
@@ -115,7 +115,7 @@ xwer_t xwpcp_abort(struct xwpcp * xwpcp, xwpcp_txh_t txh);
 xwsq_t xwpcp_get_txstate(xwpcp_txh_t txh);
 xwer_t xwpcp_rx(struct xwpcp * xwpcp, xwu8_t port,
                 xwu8_t rxbuf[], xwsz_t * size, xwu8_t * qos,
-                xwtm_t * xwtm);
+                xwtm_t to);
 xwer_t xwpcp_try_rx(struct xwpcp * xwpcp, xwu8_t port,
                     xwu8_t rxbuf[], xwsz_t * size, xwu8_t * qos);
 

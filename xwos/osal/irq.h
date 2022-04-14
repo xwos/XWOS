@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #ifndef __xwos_osal_irq_h__
@@ -36,7 +36,7 @@
  * @retval -ENOSYS: 没有实现此功能
  * @note
  * - 中断号的枚举通常定义在芯片的头文件中；
- * - SOCCFG_RO_IVT配置为0时，参数isr无效，中断向量需预先写入vector.c
+ * - SOCCFG_RO_IVT配置为0时，参数isr无效，中断向量需预先写入中断向量表
  *   的向量表中。
  * @note
  * - 同步/异步：同步

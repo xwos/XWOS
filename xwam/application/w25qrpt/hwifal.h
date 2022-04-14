@@ -33,15 +33,15 @@ struct w25qrpt_msg;
  * @brief 硬件接口抽象层操作函数集
  */
 struct w25qrpt_hwifal_operations {
-        xwer_t (* open)(struct w25qrpt *); /**< 打开硬件接口 */
-        xwer_t (* close)(struct w25qrpt *); /**< 关闭硬件接口 */
-        xwer_t (* tx)(struct w25qrpt *,
-                      const xwu8_t *, xwsz_t *,
-                      xwtm_t *); /**< 发送数据 */
-        xwer_t (* rx)(struct w25qrpt *,
-                      xwu8_t *, xwsz_t *,
-                      xwtm_t *); /**< 接收数据 */
-        void (* notify)(struct w25qrpt *, xwsq_t); /**< 通知事件 */
+        xwer_t (* open)(struct w25qrpt * /*w25qrpt*/); /**< 打开硬件接口 */
+        xwer_t (* close)(struct w25qrpt * /*w25qrpt*/); /**< 关闭硬件接口 */
+        xwer_t (* tx)(struct w25qrpt * /*w25qrpt*/,
+                      const xwu8_t * /*data*/, xwsz_t * /*size*/,
+                      xwtm_t /*to*/); /**< 发送数据 */
+        xwer_t (* rx)(struct w25qrpt * /*w25qrpt*/,
+                      xwu8_t * /*buf*/, xwsz_t * /*size*/,
+                      xwtm_t /*to*/); /**< 接收数据 */
+        void (* notify)(struct w25qrpt * /*w25qrpt*/, xwsq_t /*event*/); /**< 通知事件 */
 };
 
 /**

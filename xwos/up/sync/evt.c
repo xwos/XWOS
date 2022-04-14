@@ -7,7 +7,7 @@
  * + Copyright © 2015 xwos.tech, All Rights Reserved.
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
- * > file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
 #include <xwos/standard.h>
@@ -47,15 +47,15 @@ xwer_t xwup_flg_trywait_edge(struct xwup_evt * evt, xwsq_t trigger,
                              xwbmp_t origin[], xwbmp_t msk[]);
 
 static __xwup_code
-xwer_t xwup_flg_timedwait_level(struct xwup_evt * evt,
-                                xwsq_t trigger, xwsq_t action,
-                                xwbmp_t origin[], xwbmp_t msk[],
-                                xwtm_t * xwtm);
+xwer_t xwup_flg_wait_to_level(struct xwup_evt * evt,
+                              xwsq_t trigger, xwsq_t action,
+                              xwbmp_t origin[], xwbmp_t msk[],
+                              xwtm_t to);
 
 static __xwup_code
-xwer_t xwup_flg_timedwait_edge(struct xwup_evt * evt, xwsq_t trigger,
-                               xwbmp_t origin[], xwbmp_t msk[],
-                               xwtm_t * xwtm);
+xwer_t xwup_flg_wait_to_edge(struct xwup_evt * evt, xwsq_t trigger,
+                             xwbmp_t origin[], xwbmp_t msk[],
+                             xwtm_t to);
 
 static __xwup_code
 void xwup_evt_setup(struct xwup_evt * evt, xwsz_t num,
@@ -403,8 +403,7 @@ xwer_t xwup_flg_wait(struct xwup_evt * evt,
                      xwsq_t trigger, xwsq_t action,
                      xwbmp_t origin[], xwbmp_t msk[])
 {
-        xwtm_t expected = XWTM_MAX;
-        return xwup_flg_timedwait(evt, trigger, action, origin, msk, &expected);
+        return xwup_flg_wait_to(evt, trigger, action, origin, msk, XWTM_MAX);
 }
 
 static __xwup_code
@@ -543,10 +542,10 @@ xwer_t xwup_flg_trywait(struct xwup_evt * evt,
 }
 
 static __xwup_code
-xwer_t xwup_flg_timedwait_level(struct xwup_evt * evt,
-                                xwsq_t trigger, xwsq_t action,
-                                xwbmp_t origin[], xwbmp_t msk[],
-                                xwtm_t * xwtm)
+xwer_t xwup_flg_wait_to_level(struct xwup_evt * evt,
+                              xwsq_t trigger, xwsq_t action,
+                              xwbmp_t origin[], xwbmp_t msk[],
+                              xwtm_t to)
 {
         xwreg_t cpuirq;
         bool triggered;
@@ -611,9 +610,9 @@ xwer_t xwup_flg_timedwait_level(struct xwup_evt * evt,
                         xwup_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                         break;
                 } else {
-                        rc = xwup_cond_timedwait(&evt->cond,
-                                                 &evt->lock, XWOS_LK_SPLK, NULL,
-                                                 xwtm, &lkst);
+                        rc = xwup_cond_wait_to(&evt->cond,
+                                               &evt->lock, XWOS_LK_SPLK, NULL,
+                                               to, &lkst);
                         if (XWOK == rc) {
                                 if (XWOS_LKST_UNLOCKED == lkst) {
                                         xwup_splk_lock(&evt->lock);
@@ -631,9 +630,9 @@ xwer_t xwup_flg_timedwait_level(struct xwup_evt * evt,
 }
 
 static __xwup_code
-xwer_t xwup_flg_timedwait_edge(struct xwup_evt * evt, xwsq_t trigger,
-                               xwbmp_t origin[], xwbmp_t msk[],
-                               xwtm_t * xwtm)
+xwer_t xwup_flg_wait_to_edge(struct xwup_evt * evt, xwsq_t trigger,
+                             xwbmp_t origin[], xwbmp_t msk[],
+                             xwtm_t to)
 {
         xwreg_t cpuirq;
         xwsq_t lkst;
@@ -677,9 +676,9 @@ xwer_t xwup_flg_timedwait_edge(struct xwup_evt * evt, xwsq_t trigger,
                         xwup_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
                         break;
                 } else {
-                        rc = xwup_cond_timedwait(&evt->cond,
-                                                 &evt->lock, XWOS_LK_SPLK, NULL,
-                                                 xwtm, &lkst);
+                        rc = xwup_cond_wait_to(&evt->cond,
+                                               &evt->lock, XWOS_LK_SPLK, NULL,
+                                               to, &lkst);
                         if (XWOK == rc) {
                                 if (XWOS_LKST_UNLOCKED == lkst) {
                                         xwup_splk_lock(&evt->lock);
@@ -697,10 +696,10 @@ xwer_t xwup_flg_timedwait_edge(struct xwup_evt * evt, xwsq_t trigger,
 }
 
 __xwup_api
-xwer_t xwup_flg_timedwait(struct xwup_evt * evt,
-                          xwsq_t trigger, xwsq_t action,
-                          xwbmp_t origin[], xwbmp_t msk[],
-                          xwtm_t * xwtm)
+xwer_t xwup_flg_wait_to(struct xwup_evt * evt,
+                        xwsq_t trigger, xwsq_t action,
+                        xwbmp_t origin[], xwbmp_t msk[],
+                        xwtm_t to)
 {
         xwer_t rc;
 
@@ -708,14 +707,12 @@ xwer_t xwup_flg_timedwait(struct xwup_evt * evt,
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE(((evt->type & XWUP_EVT_TYPE_MASK) == XWUP_EVT_TYPE_FLG),
                       "type-error", -ETYPE);
-        XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)),
-                      "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
 
         if (trigger <= XWUP_FLG_TRIGGER_CLR_ANY) {
-                rc = xwup_flg_timedwait_level(evt, trigger, action, origin, msk, xwtm);
+                rc = xwup_flg_wait_to_level(evt, trigger, action, origin, msk, to);
         } else {
-                rc = xwup_flg_timedwait_edge(evt, trigger, origin, msk, xwtm);
+                rc = xwup_flg_wait_to_edge(evt, trigger, origin, msk, to);
         }
         return rc;
 }
@@ -883,8 +880,7 @@ err_notconn:
 __xwup_api
 xwer_t xwup_sel_select(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
 {
-        xwtm_t expected = XWTM_MAX;
-        return xwup_sel_timedselect(evt, msk, trg, &expected);
+        return xwup_sel_select_to(evt, msk, trg, XWTM_MAX);
 }
 
 __xwup_api
@@ -922,8 +918,8 @@ xwer_t xwup_sel_tryselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
 }
 
 __xwup_api
-xwer_t xwup_sel_timedselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
-                            xwtm_t * xwtm)
+xwer_t xwup_sel_select_to(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
+                          xwtm_t to)
 {
         xwer_t rc;
         xwreg_t cpuirq;
@@ -934,9 +930,7 @@ xwer_t xwup_sel_timedselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE(((evt->type & XWUP_EVT_TYPE_MASK) == XWUP_EVT_TYPE_SEL),
                       "type-error", -ETYPE);
-        XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)),
-                      "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
 
         xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         while (true) {
@@ -958,9 +952,9 @@ xwer_t xwup_sel_timedselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
                 } else {
                         /* Clear non-exclusive bits */
                         xwbmpop_and(evt->bmp, evt->msk, evt->num);
-                        rc = xwup_cond_timedwait(&evt->cond,
-                                                 &evt->lock, XWOS_LK_SPLK, NULL,
-                                                 xwtm, &lkst);
+                        rc = xwup_cond_wait_to(&evt->cond,
+                                               &evt->lock, XWOS_LK_SPLK, NULL,
+                                               to, &lkst);
                         if (XWOK == rc) {
                                 if (XWOS_LKST_UNLOCKED == lkst) {
                                         xwup_splk_lock(&evt->lock);
@@ -984,12 +978,11 @@ xwer_t xwup_sel_timedselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
 __xwup_api
 xwer_t xwup_br_wait(struct xwup_evt * evt)
 {
-        xwtm_t expected = XWTM_MAX;
-        return xwup_br_timedwait(evt, &expected);
+        return xwup_br_wait_to(evt, XWTM_MAX);
 }
 
 __xwup_api
-xwer_t xwup_br_timedwait(struct xwup_evt * evt, xwtm_t * xwtm)
+xwer_t xwup_br_wait_to(struct xwup_evt * evt, xwtm_t to)
 {
         xwreg_t cpuirq;
         xwssq_t pos;
@@ -1000,9 +993,7 @@ xwer_t xwup_br_timedwait(struct xwup_evt * evt, xwtm_t * xwtm)
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
         XWOS_VALIDATE(((evt->type & XWUP_EVT_TYPE_MASK) == XWUP_EVT_TYPE_BR),
                       "type-error", -ETYPE);
-        XWOS_VALIDATE((xwtm), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)),
-                      "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
 
         xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         pos = xwbmpop_ffz(evt->bmp, evt->num);
@@ -1019,9 +1010,9 @@ xwer_t xwup_br_timedwait(struct xwup_evt * evt, xwtm_t * xwtm)
                 xwup_cthd_yield();
                 rc = XWOK;
         } else {
-                rc = xwup_cond_timedwait(&evt->cond,
-                                         &evt->lock, XWOS_LK_SPLK, NULL,
-                                         xwtm, &lkst);
+                rc = xwup_cond_wait_to(&evt->cond,
+                                       &evt->lock, XWOS_LK_SPLK, NULL,
+                                       to, &lkst);
                 if (XWOS_LKST_UNLOCKED == lkst) {
                         xwup_splk_lock(&evt->lock);
                 }
