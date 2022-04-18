@@ -43,8 +43,8 @@ xwer_t stm32cube_spi1m_drv_resume(struct xwds_device * dev);
 
 static
 xwer_t stm32cube_spi1m_drv_buscfg(struct xwds_spim * spim,
-                                 xwid_t cfgid,
-                                 xwtm_t to);
+                                  xwid_t cfgid,
+                                  xwtm_t to);
 
 static
 xwer_t stm32cube_spi1m_drv_xfer(struct xwds_spim * spim,
@@ -208,13 +208,13 @@ xwer_t stm32cube_spi2m_drv_resume(struct xwds_device * dev);
 
 static
 xwer_t stm32cube_spi2m_drv_buscfg(struct xwds_spim * spim,
-                                 xwid_t cfgid,
-                                 xwtm_t to);
+                                  xwid_t cfgid,
+                                  xwtm_t to);
 
 static
 xwer_t stm32cube_spi2m_drv_xfer(struct xwds_spim * spim,
-                               const xwu8_t txd[], xwu8_t * rxb,
-                               xwsz_t * size, xwtm_t to);
+                                const xwu8_t txd[], xwu8_t * rxb,
+                                xwsz_t * size, xwtm_t to);
 
 const struct xwds_spim_driver stm32cube_spi2m_drv = {
         .base = {

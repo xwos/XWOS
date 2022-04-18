@@ -488,7 +488,7 @@ xwer_t xwos_flg_read(struct xwos_flg * flg, xwbmp_t out[])
 }
 
 /**
- * @brief XWOS API：等待事件标志对象的触发事件
+ * @brief XWOS API：等待触发事件
  * @param[in] flg: 事件标志对象指针
  * @param[in] trigger: 事件触发条件，取值：
  *   @arg XWOS_FLG_TRIGGER_SET_ALL: 掩码中的所有位同时为1
@@ -534,7 +534,7 @@ xwer_t xwos_flg_wait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
 }
 
 /**
- * @brief XWOS API：检查事件标志，立即返回，不会等待
+ * @brief XWOS API：检查事件标志
  * @param[in] flg: 事件标志对象指针
  * @param[in] trigger: 事件触发条件，取值：
  *   @arg XWOS_FLG_TRIGGER_SET_ALL: 掩码中的所有位同时为1
@@ -570,6 +570,8 @@ xwer_t xwos_flg_wait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
+ * @details
+ * 若事件没有触发，立即返回，不会等待
  */
 static __xwos_inline_api
 xwer_t xwos_flg_trywait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,

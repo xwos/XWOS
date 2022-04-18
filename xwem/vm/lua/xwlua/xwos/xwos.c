@@ -22,6 +22,7 @@
 #include "src/lauxlib.h"
 #include "xwlua/port.h"
 #include "xwlua/xwos/skd.h"
+#include "xwlua/xwos/thd.h"
 #include "xwlua/xwos/sem.h"
 #include "xwlua/xwos/cond.h"
 #include "xwlua/xwos/flg.h"

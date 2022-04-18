@@ -49,18 +49,18 @@ enum xwup_skd_policy_em {
  * @brief 调度对象状态
  */
 enum xwup_skdobj_state_em {
-        XWUP_SKDOBJ_DST_UNKNOWN = 0U, /**< 未知状态 */
-        XWUP_SKDOBJ_DST_STANDBY = (1U << 0U), /**< 待机 */
-        XWUP_SKDOBJ_DST_RUNNING = (1U << 1U), /**< 运行 */
-        XWUP_SKDOBJ_DST_READY = (1U << 2U), /**< 就绪 */
-        XWUP_SKDOBJ_DST_SLEEPING = (1U << 3U), /**< 睡眠 */
-        XWUP_SKDOBJ_DST_BLOCKING = (1U << 4U), /**< 阻塞 */
-        XWUP_SKDOBJ_DST_RESERVED5 = (1U << 5U), /**< 保留位5 */
-        XWUP_SKDOBJ_DST_FROZEN = (1U << 6U), /**< 已经被冻结 */
-        XWUP_SKDOBJ_DST_EXITING = (1U << 7U), /**< 正在退出 */
-        XWUP_SKDOBJ_DST_RESERVED8 = (1U << 8U), /**< 保留位8 */
-        XWUP_SKDOBJ_DST_DETACHED = (1U << 9U), /**< 分离态 */
-        XWUP_SKDOBJ_DST_UNINTERRUPTED = (1U << 15U), /**< 阻塞态不可中断 */
+        XWUP_SKDOBJ_ST_UNKNOWN = 0U, /**< 未知状态 */
+        XWUP_SKDOBJ_ST_STANDBY = (1U << 0U), /**< 待机 */
+        XWUP_SKDOBJ_ST_RUNNING = (1U << 1U), /**< 运行 */
+        XWUP_SKDOBJ_ST_READY = (1U << 2U), /**< 就绪 */
+        XWUP_SKDOBJ_ST_SLEEPING = (1U << 3U), /**< 睡眠 */
+        XWUP_SKDOBJ_ST_BLOCKING = (1U << 4U), /**< 阻塞 */
+        XWUP_SKDOBJ_ST_RESERVED5 = (1U << 5U), /**< 保留位5 */
+        XWUP_SKDOBJ_ST_FROZEN = (1U << 6U), /**< 已经被冻结 */
+        XWUP_SKDOBJ_ST_EXITING = (1U << 7U), /**< 正在退出 */
+        XWUP_SKDOBJ_ST_RESERVED8 = (1U << 8U), /**< 保留位8 */
+        XWUP_SKDOBJ_ST_DETACHED = (1U << 9U), /**< 分离态 */
+        XWUP_SKDOBJ_ST_UNINTERRUPTED = (1U << 15U), /**< 阻塞态不可中断 */
 };
 
 /**

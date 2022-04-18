@@ -23,7 +23,7 @@ tstmtx = xwos.mtx.new()
 tstmtx:lock()
 xwxt["tstmtx"] = tstmtx
 function mtxthd_main()
-  rc = xwxt.tstmtx:lock(10000000000)
+  rc = xwxt.tstmtx:lock()
   if (rc == 0) then
     print("Wait mutex ... OK")
   else

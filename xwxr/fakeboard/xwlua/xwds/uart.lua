@@ -67,7 +67,7 @@ print(thdsp)
 
 
 --[[--------
-接收数据<br>
+从接收队列中获取数据<br>
 <br>
 
 @tparam userdata uart (**in**) C代码中注册的UART控制器<br>
@@ -76,11 +76,7 @@ print(thdsp)
 @tparam number size (**in**) 申请的缓冲区大小<br>
 <br>
 
-@tparam string t (**optional**) (**in**)<br>
-..● **"t"** 尝试接收数据（立即返回，不会等待。）<br>
-<br>
-
-@tparam number time (**optional**) (**in**) 期望的阻塞等待时间<br>
+@tparam number time (**in**) 期望的阻塞等待时间<br>
 <br>
 
 @treturn {number,number,string}
@@ -88,16 +84,42 @@ print(thdsp)
   + ○ **0** 没有错误
   + ○ **-EINTR** 等待被中断
   + ○ **-ENOTINTHD** 不在线程上下文中
-  + ○ **-ETIMEDOUT** 超时，仅当存在可选参数 **time** 时才会出现此错误值
-  + ○ **-ENODATA** 尝试失败，仅当存在可选参数 **"t"** 时才会出现此错误值
+  + ○ **-ETIMEDOUT** 超时
 + ● **rxsize** 实际接受的大小
 + ● **rxd** 接收的数据
 
 @usage
--- 从usart1接收数据，接收10个字节，最多等待时间2s
-rc, rxsize, rxd = uart3:rx(10, 2000000000)
+-- 从uart3接收数据，接收10个字节，最多等待时间2s
+rc, rxsize, rxd = uart3:rx(10, xwtm.ft(xwtm.s(2)))
 ]]
-function rx(uart, size, t, time)
+function rx(uart, size, time)
+end
+
+
+--[[--------
+尝试从接收队列中获取数据<br>
+<br>
+
+@tparam userdata uart (**in**) C代码中注册的UART控制器<br>
+<br>
+
+@tparam number size (**in**) 申请的缓冲区大小<br>
+<br>
+
+@treturn {number,number,string}
++ ● **rc** 此方法的返回值
+  + ○ **0** 没有错误
+  + ○ **-EINTR** 等待被中断
+  + ○ **-ENOTINTHD** 不在线程上下文中
+  + ○ **-ENODATA** 尝试失败
++ ● **rxsize** 实际接受的大小
++ ● **rxd** 接收的数据
+
+@usage
+-- 尝试从uart3接收数据，接收10个字节
+rc, rxsize, rxd = uart3:try_rx(10)
+]]
+function try_rx(uart, size)
 end
 
 
@@ -111,10 +133,6 @@ end
 @tparam string data (**in**) 待发送的数据<br>
 <br>
 
-@tparam string t (**optional**) (**in**)<br>
-..● **"t"** 尝试发送数据（立即返回，不会等待。）<br>
-<br>
-
 @tparam number time (**optional**) (**in**) 期望的阻塞等待时间<br>
 <br>
 
@@ -123,15 +141,14 @@ end
   + ○ **0** 没有错误
   + ○ **-EINTR** 等待被中断
   + ○ **-ENOTINTHD** 不在线程上下文中
-  + ○ **-ETIMEDOUT** 超时，仅当存在可选参数 **time** 时才会出现此错误值
-  + ○ **-ENODATA** 尝试失败，仅当存在可选参数 **"t"** 时才会出现此错误值
+  + ○ **-ETIMEDOUT** 超时
 + ● **txsize** 实际发送的大小
 
 @usage
 -- 打包{88, 87, 79, 83}
 txd = string.pack("BBBB", 88, 87, 79, 83)
 -- 发送打包数据，期望等待时间2s
-rc, txsize = uart3:tx(txd, 2000000000)
+rc, txsize = uart3:tx(txd, xwtm.ft(xwtm.s(2)))
 ]]
-function tx(uart, data, t, time)
+function tx(uart, data, time)
 end

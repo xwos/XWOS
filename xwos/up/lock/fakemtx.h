@@ -103,7 +103,7 @@ xwer_t xwup_mtx_lock(struct xwup_mtx * mtx)
 static __xwup_inline_api
 xwer_t xwup_mtx_lock_to(struct xwup_mtx * mtx, xwtm_t to)
 {
-        return XWUP_SEM_API(lock_to, &mtx->fake, to);
+        return XWUP_SEM_API(wait_to, &mtx->fake, to);
 }
 
 static __xwup_inline_api

@@ -39,12 +39,12 @@ void xwup_rtrq_init(struct xwup_rtrq * xwrtrq)
  * @param[in] xwrtrq: XWOS UP内核的实时就绪队列
  * @param[in] thd: 线程控制块的指针
  * @retval XWOK: 没有错误
- * @retval -EPERM: 线程没有设置状态标志@ref XWUP_SKDOBJ_DST_READY
+ * @retval -EPERM: 线程没有设置状态标志@ref XWUP_SKDOBJ_ST_READY
  * @note
  * - 当线程加入到就绪队列时，它不应该拥有下面的状态：
- *   XWUP_SKDOBJ_DST_RUNNING | XWUP_SKDOBJ_DST_FROZEN | XWUP_SKDOBJ_DST_STANDBY
+ *   XWUP_SKDOBJ_ST_RUNNING | XWUP_SKDOBJ_ST_FROZEN | XWUP_SKDOBJ_ST_STANDBY
  * - 当线程加入到就绪队列时, 它不应该*同时*拥有下面的状态：
- *   XWUP_SKDOBJ_DST_BLOCKING & XWUP_SKDOBJ_DST_SLEEPING
+ *   XWUP_SKDOBJ_ST_BLOCKING & XWUP_SKDOBJ_ST_SLEEPING
  * - 这个函数只能在临界区中调用。
  */
 __xwup_code
@@ -68,12 +68,12 @@ void xwup_rtrq_add_head(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
  * @param[in] xwrtrq: XWOS UP内核的实时就绪队列
  * @param[in] thd: 线程控制块的指针
  * @retval XWOK: 没有错误
- * @retval -EPERM: 线程没有设置状态标志@ref XWUP_SKDOBJ_DST_READY
+ * @retval -EPERM: 线程没有设置状态标志@ref XWUP_SKDOBJ_ST_READY
  * @note
  * - 当线程加入到就绪队列时，它不应该拥有下面的状态：
- *   XWUP_SKDOBJ_DST_RUNNING | XWUP_SKDOBJ_DST_FROZEN | XWUP_SKDOBJ_DST_STANDBY
+ *   XWUP_SKDOBJ_ST_RUNNING | XWUP_SKDOBJ_ST_FROZEN | XWUP_SKDOBJ_ST_STANDBY
  * - 当线程加入到就绪队列时, 它不应该*同时*拥有下面的状态：
- *   XWUP_SKDOBJ_DST_BLOCKING & XWUP_SKDOBJ_DST_SLEEPING
+ *   XWUP_SKDOBJ_ST_BLOCKING & XWUP_SKDOBJ_ST_SLEEPING
  * - 这个函数只能在临界区中调用。
  */
 __xwup_code

@@ -72,8 +72,6 @@ err_thd_create:
 
 xwer_t led_task(void * arg)
 {
-        xwtm_t xwtm;
-
         XWOS_UNUSED(arg);
 
         xwds_gpio_req(&stm32cube_soc_cb, LED_Blue_GPIO_Port, LED_Blue_Pin);

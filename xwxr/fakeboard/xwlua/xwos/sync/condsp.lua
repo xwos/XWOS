@@ -229,16 +229,12 @@ end
 ..● **mtxsp** 互斥锁<br>
 <br>
 
-@tparam number time (**optional**) (**in**) 期望的阻塞等待时间<br>
-<br>
-
 @treturn number
 + ● **rc** 返回值
   + ○ **0** 没有错误
   + ○ **-EINVAL** 参数错误
   + ○ **-EINTR** 等待被中断
   + ○ **-ENOTINTHD** 不在线程上下文中
-  + ○ **-ETIMEDOUT** 超时，仅当存在可选参数 **time** 时才会出现此错误值
 
 @usage
 cond = xwos.cond.new()
@@ -248,10 +244,38 @@ if (rc == 0) then
 else
   -- 错误发生
 end
+]]
+function condsp:wait(condsp, lock)
+end
+
+
+--[[--------
+限时等待条件量对象<br>
+<br>
+
+@tparam userdata condsp (**in**) 条件量对象强指针<br>
+<br>
+
+@tparam userdata lock (**in**) 锁对象的强引用指针<br>
+..● **splksp** 自旋锁<br>
+..● **sqlksp** 顺序锁<br>
+..● **mtxsp** 互斥锁<br>
+<br>
+
+@tparam number to (**in**) 期望的阻塞等待时间<br>
+<br>
+
+@treturn number
++ ● **rc** 返回值
+  + ○ **0** 没有错误
+  + ○ **-EINVAL** 参数错误
+  + ○ **-EINTR** 等待被中断
+  + ○ **-ENOTINTHD** 不在线程上下文中
+  + ○ **-ETIMEDOUT** 超时
 
 @usage
 cond = xwos.cond.new()
-rc = cond:wait(1000000000) -- 最多等待1s
+rc = cond:wait(xwtm.ft(xwt,.s(1))) -- 最多等待1s
 if (rc == 0) then
   -- 获取到一个信号
 elseif (rc == -116) then
@@ -260,5 +284,5 @@ else
   -- 错误发生
 end
 ]]
-function condsp:wait(condsp, lock, time)
+function condsp:wait_to(condsp, lock, to)
 end

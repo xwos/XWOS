@@ -128,47 +128,37 @@ const luaL_Reg xwlua_mtxsp_metamethod[] = {
         {NULL, NULL}
 };
 
-#define XWLUA_MTX_OPT_TRY               0
-const char * const xwlua_mtx_lkopt[] = {"t", NULL};
-
 int xwlua_mtxsp_lock(lua_State * L)
 {
         xwlua_mtx_sp * mtxsp;
-        int top;
-        int type;
-        int lkopt;
+        xwer_t rc;
+
+        mtxsp = (xwlua_mtx_sp *)luaL_checkudata(L, 1, "xwlua_mtx_sp");
+        rc = xwos_mtx_lock(mtxsp->mtx);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
+}
+
+int xwlua_mtxsp_trylock(lua_State * L)
+{
+        xwlua_mtx_sp * mtxsp;
+        xwer_t rc;
+
+        mtxsp = (xwlua_mtx_sp *)luaL_checkudata(L, 1, "xwlua_mtx_sp");
+        rc = xwos_mtx_trylock(mtxsp->mtx);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
+}
+
+int xwlua_mtxsp_lock_to(lua_State * L)
+{
+        xwlua_mtx_sp * mtxsp;
         xwtm_t to;
         xwer_t rc;
 
-        top = lua_gettop(L);
         mtxsp = (xwlua_mtx_sp *)luaL_checkudata(L, 1, "xwlua_mtx_sp");
-        if (top >= 2) {
-                type = lua_type(L, 2);
-                switch (type) {
-                case LUA_TNUMBER:
-                        to = (xwtm_t)lua_tonumber(L, 2);
-                        rc = xwos_mtx_lock_to(mtxsp->mtx, to);
-                        break;
-                case LUA_TSTRING:
-                        lkopt = luaL_checkoption(L, 2, "t", xwlua_mtx_lkopt);
-                        switch (lkopt) {
-                        case XWLUA_MTX_OPT_TRY:
-                                rc = xwos_mtx_trylock(mtxsp->mtx);
-                                break;
-                        default:
-                                luaL_error(L, "Invalid arg: %s", lua_tostring(L, 2));
-                                rc = -EINVAL;
-                                break;
-                        }
-                        break;
-                default:
-                        luaL_error(L, "Invalid arg type: %s", lua_typename(L, type));
-                        rc = -EINVAL;
-                        break;
-                }
-        } else {
-                rc = xwos_mtx_lock(mtxsp->mtx);
-        }
+        to = (xwtm_t)lua_tonumber(L, 2);
+        rc = xwos_mtx_lock_to(mtxsp->mtx, to);
         lua_pushinteger(L, (lua_Integer)rc);
         return 1;
 }
@@ -176,6 +166,8 @@ int xwlua_mtxsp_lock(lua_State * L)
 const luaL_Reg xwlua_mtxsp_indexmethod[] = {
         {"unlock", xwlua_mtxsp_unlock},
         {"lock", xwlua_mtxsp_lock},
+        {"trylock", xwlua_mtxsp_trylock},
+        {"lock_to", xwlua_mtxsp_lock_to},
         {NULL, NULL},
 };
 

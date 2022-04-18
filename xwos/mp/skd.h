@@ -51,18 +51,18 @@ enum xwmp_skd_policy_em {
  * @brief 调度对象状态
  */
 enum xwmp_skdobj_state_em {
-        XWMP_SKDOBJ_DST_UNKNOWN = 0U, /**< 未知状态 */
-        XWMP_SKDOBJ_DST_STANDBY = (1U << 0U), /**< 待机 */
-        XWMP_SKDOBJ_DST_RUNNING = (1U << 1U), /**< 运行 */
-        XWMP_SKDOBJ_DST_READY = (1U << 2U), /**< 就绪 */
-        XWMP_SKDOBJ_DST_SLEEPING = (1U << 3U), /**< 睡眠 */
-        XWMP_SKDOBJ_DST_BLOCKING = (1U << 4U), /**< 阻塞 */
-        XWMP_SKDOBJ_DST_FREEZABLE = (1U << 5U), /**< 可被冻结 */
-        XWMP_SKDOBJ_DST_FROZEN = (1U << 6U), /**< 已经被冻结 */
-        XWMP_SKDOBJ_DST_EXITING = (1U << 7U), /**< 正在退出 */
-        XWMP_SKDOBJ_DST_MIGRATING = (1U << 8U), /**< 正在迁移 */
-        XWMP_SKDOBJ_DST_DETACHED = (1U << 9U), /**< 分离 */
-        XWMP_SKDOBJ_DST_UNINTERRUPTED = (1U << 15U), /**< 阻塞态不可中断 */
+        XWMP_SKDOBJ_ST_UNKNOWN = 0U, /**< 未知状态 */
+        XWMP_SKDOBJ_ST_STANDBY = (1U << 0U), /**< 待机 */
+        XWMP_SKDOBJ_ST_RUNNING = (1U << 1U), /**< 运行 */
+        XWMP_SKDOBJ_ST_READY = (1U << 2U), /**< 就绪 */
+        XWMP_SKDOBJ_ST_SLEEPING = (1U << 3U), /**< 睡眠 */
+        XWMP_SKDOBJ_ST_BLOCKING = (1U << 4U), /**< 阻塞 */
+        XWMP_SKDOBJ_ST_FREEZABLE = (1U << 5U), /**< 可被冻结 */
+        XWMP_SKDOBJ_ST_FROZEN = (1U << 6U), /**< 已经被冻结 */
+        XWMP_SKDOBJ_ST_EXITING = (1U << 7U), /**< 正在退出 */
+        XWMP_SKDOBJ_ST_MIGRATING = (1U << 8U), /**< 正在迁移 */
+        XWMP_SKDOBJ_ST_DETACHED = (1U << 9U), /**< 分离 */
+        XWMP_SKDOBJ_ST_UNINTERRUPTED = (1U << 15U), /**< 阻塞态不可中断 */
 };
 
 /**

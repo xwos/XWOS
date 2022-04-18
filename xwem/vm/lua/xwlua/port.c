@@ -37,6 +37,7 @@ const luaL_Reg xwlua_loadedlibs[] = {
         {LUA_MATHLIBNAME, luaopen_math},
         {LUA_UTF8LIBNAME, luaopen_utf8},
         {LUA_DBLIBNAME, luaopen_debug},
+        {XWLUA_TM_NAME, xwlua_open_tm},
         {XWLUA_LIB_NAME, xwlua_open_lib},
         {XWLUA_OS_NAME, xwlua_open_os},
         {XWLUA_DS_NAME, xwlua_open_ds},

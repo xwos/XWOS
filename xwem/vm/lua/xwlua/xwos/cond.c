@@ -196,6 +196,79 @@ int xwlua_condsp_wait(lua_State * L)
         int top;
         xwsq_t lktype;
         xwsq_t lkst;
+        xwer_t rc;
+
+        top = lua_gettop(L);
+        condsp = (xwlua_cond_sp *)luaL_checkudata(L, 1, "xwlua_cond_sp");
+        if (1 == top) {
+                lktype = XWOS_LK_NONE;
+                ulock.anon = NULL;
+        } else if (LUA_TNIL == lua_type(L, 2)) {
+                lktype = XWOS_LK_NONE;
+                ulock.anon = NULL;
+        } else {
+                do {
+                        ulualksp.ud = luaL_testudata(L, 2, "xwlua_mtx_sp");
+                        if (ulualksp.ud) {
+                                ulock.osal.mtx = ulualksp.mtxsp->mtx;
+                                xwos_mtx_getlkst(ulualksp.mtxsp->mtx, &lkst);
+                                if (XWOS_LKST_UNLOCKED == lkst) {
+                                        lktype = XWOS_LK_NONE;
+                                } else {
+                                        lktype = XWOS_LK_MTX;
+                                }
+                                break;
+                        }
+                        ulualksp.ud = luaL_testudata(L, 2, "xwlua_splk_sp");
+                        if (ulualksp.ud) {
+                                ulock.osal.splk = &ulualksp.splksp->luasplk->ossplk;
+                                lkst = ulualksp.splksp->luasplk->lkst;
+                                if (XWLUA_SPLK_LKST_LOCK == lkst) {
+                                        lktype = XWOS_LK_SPLK;
+                                } else {
+                                        lktype = XWOS_LK_NONE;
+                                }
+                                break;
+                        }
+                        ulualksp.ud = luaL_testudata(L, 2, "xwlua_sqlk_sp");
+                        if (ulualksp.ud) {
+                                ulock.osal.sqlk = &ulualksp.sqlksp->luasqlk->ossqlk;
+                                lkst = ulualksp.sqlksp->luasqlk->lkst;
+                                switch (lkst) {
+                                case XWLUA_SQLK_LKST_RDEX_LOCK:
+                                        lktype = XWOS_LK_SQLK_RDEX;
+                                        break;
+                                case XWLUA_SQLK_LKST_WR_LOCK:
+                                        lktype = XWOS_LK_SQLK_WR;
+                                        break;
+                                default:
+                                        lktype = XWOS_LK_NONE;
+                                        break;
+                                }
+                                break;
+                        }
+                        lktype = XWOS_LK_NONE;
+                        ulock.anon = NULL;
+                } while (false);
+        }
+        rc = xwos_cond_wait(condsp->cond, ulock, lktype, NULL, &lkst);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
+}
+
+int xwlua_condsp_wait_to(lua_State * L)
+{
+        xwlua_cond_sp * condsp;
+        union {
+                void * ud;
+                xwlua_mtx_sp * mtxsp;
+                xwlua_splk_sp * splksp;
+                xwlua_sqlk_sp * sqlksp;
+        } ulualksp;
+        union xwos_ulock ulock;
+        int top;
+        xwsq_t lktype;
+        xwsq_t lkst;
         xwtm_t to;
         int isnum;
         xwer_t rc;
@@ -272,6 +345,7 @@ const luaL_Reg xwlua_condsp_indexmethod[] = {
         {"unicast", xwlua_condsp_unicast},
         {"broadcast", xwlua_condsp_broadcast},
         {"wait", xwlua_condsp_wait},
+        {"wait_to", xwlua_condsp_wait_to},
         {NULL, NULL},
 };
 

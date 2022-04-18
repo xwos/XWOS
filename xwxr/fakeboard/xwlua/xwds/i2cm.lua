@@ -106,7 +106,7 @@ print(thdsp)
 -- 向EEPROM的0地址写入4字节数据，打包{地址0, 88, 87, 79, 83}
 txd = string.pack("BBBBB", 0, 88, 87, 79, 83)
 -- 写入地址和数据，最多等待2s
-rc = i2c2m:xfer(0xA0, true, true, false, #txd, txd, 2000000000)
+rc = i2c2m:xfer(0xA0, true, true, false, #txd, txd, xwtm.ft(xwtm.s(2)))
 
 @usage
 -- 从EEPROM的0地址读出4字节数据，打包{地址0}

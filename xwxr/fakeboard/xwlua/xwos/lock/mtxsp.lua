@@ -100,7 +100,7 @@ print(mtxsp)
 
 
 --[[--------
-上锁互斥锁<br>
+等待上锁互斥锁<br>
 <br>
 
 如果互斥锁无法上锁，就会阻塞当前线程。
@@ -108,20 +108,11 @@ print(mtxsp)
 @tparam userdata mtxsp (**in**) 互斥锁对象强指针<br>
 <br>
 
-@tparam string t (**optional**) (**in**)<br>
-..● **"t"** 尝试上锁互斥锁，若无法上锁互斥锁，立即返回，不会等待<br>
-<br>
-
-@tparam number time (**optional**) (**in**) 期望的阻塞等待时间<br>
-<br>
-
 @treturn number
 + ● **rc** 返回值
   + ○ **0** 没有错误
   + ○ **-EINTR** 等待被中断
   + ○ **-ENOTINTHD** 不在线程上下文中
-  + ○ **-ETIMEDOUT** 超时，仅当存在可选参数 **time** 时才会出现此错误值
-  + ○ **-ENODATA** 尝试上锁失败，仅当存在可选参数 **"t"** 时才会出现此错误值
 
 @usage
 lock = xwos.mtx.new()
@@ -130,20 +121,30 @@ if (rc == 0) then
   -- 临界区
   lock:unlock()
 end
-
-@usage
-lock = xwos.mtx.new()
-rc = lock:lock(1000000000) -- 最多等待互斥锁1s，超时返回-ETIMEDOUT
-if (rc == 0) then
-  -- 临界区
-  lock:unlock()
-elseif (rc == -116) then
-  print("Timeout!")
+]]
+function mtxsp:lock(mtxsp)
 end
 
+
+--[[--------
+尝试上锁互斥锁<br>
+<br>
+
+如果互斥锁无法上锁，不会阻塞调用线程。
+
+@tparam userdata mtxsp (**in**) 互斥锁对象强指针<br>
+<br>
+
+@treturn number
++ ● **rc** 返回值
+  + ○ **0** 没有错误
+  + ○ **-EINTR** 等待被中断
+  + ○ **-ENOTINTHD** 不在线程上下文中
+  + ○ **-ENODATA** 尝试上锁失败
+
 @usage
 lock = xwos.mtx.new()
-rc = lock:lock("t") -- 尝试获取互斥锁，失败直接返回-ENODATA
+rc = lock:trylock() -- 尝试获取互斥锁，失败直接返回-ENODATA
 if (rc == 0) then
   -- 临界区
   lock:unlock()
@@ -151,7 +152,40 @@ elseif (rc == -61) then
   print("Can't lock!")
 end
 ]]
-function mtxsp:lock(mtxsp, t, time)
+function mtxsp:trylock(mtxsp)
+end
+
+
+--[[--------
+限时等待上锁互斥锁<br>
+<br>
+
+如果互斥锁无法上锁，就会阻塞当前线程。
+
+@tparam userdata mtxsp (**in**) 互斥锁对象强指针<br>
+<br>
+
+@tparam number to (**in**) 期望唤醒的时间点<br>
+<br>
+
+@treturn number
++ ● **rc** 返回值
+  + ○ **0** 没有错误
+  + ○ **-EINTR** 等待被中断
+  + ○ **-ENOTINTHD** 不在线程上下文中
+  + ○ **-ETIMEDOUT** 超时
+
+@usage
+lock = xwos.mtx.new()
+rc = lock:lock_to(xwtm.ft(xwtm.s(1))) -- 最多等待互斥锁1s，超时返回-ETIMEDOUT
+if (rc == 0) then
+  -- 临界区
+  lock:unlock()
+elseif (rc == -116) then
+  print("Timeout!")
+end
+]]
+function mtxsp:lock_to(mtxsp, to)
 end
 
 

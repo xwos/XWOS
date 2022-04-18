@@ -19,19 +19,15 @@
 -- > limitations under the License.
 --
 
-_G.us = 1000
-_G.ms = 1000000
-_G.s = 1000000000
-
 print("XWOS Sleep() TEST!\n")
 mythdsp = xwos.cthd.sp()
 print("Thread strong pointer:", mythdsp)
 now = xwos.skd.now()
 print(string.format("Current timetick:%f ms", now / ms))
 print("sleep 1s...\n")
-xwos.cthd.sleep(1 * s)
+xwos.cthd.sleep(xwtm.s(1))
 now = xwos.skd.now()
 print(string.format("Sleep 1s from %f ms\n", now / ms))
-xwos.cthd.sleepFrom(now, 1 * s)
+xwos.cthd.sleep_from(now, xwtm.s(1))
 now = xwos.skd.now()
 print(string.format("Current Timetick:%f ms", now /ms))

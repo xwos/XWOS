@@ -181,18 +181,23 @@ int xwlua_brsp_intr_all(lua_State * L)
 int xwlua_brsp_wait(lua_State * L)
 {
         xwlua_br_sp * brsp;
-        xwtm_t to;
-        int top;
         xwer_t rc;
 
-        top = lua_gettop(L);
         brsp = (xwlua_br_sp *)luaL_checkudata(L, 1, "xwlua_br_sp");
-        if (top >= 2) {
-                to = (xwtm_t)luaL_checknumber(L, 2);
-                rc = xwos_br_wait_to(brsp->br, to);
-        } else {
-                rc = xwos_br_wait(brsp->br);
-        }
+        rc = xwos_br_wait(brsp->br);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
+}
+
+int xwlua_brsp_wait_to(lua_State * L)
+{
+        xwlua_br_sp * brsp;
+        xwtm_t to;
+        xwer_t rc;
+
+        brsp = (xwlua_br_sp *)luaL_checkudata(L, 1, "xwlua_br_sp");
+        to = (xwtm_t)luaL_checknumber(L, 2);
+        rc = xwos_br_wait_to(brsp->br, to);
         lua_pushinteger(L, (lua_Integer)rc);
         return 1;
 }
@@ -204,6 +209,7 @@ const luaL_Reg xwlua_brsp_indexmethod[] = {
         {"unbind", xwlua_brsp_unbind},
         {"intr_all", xwlua_brsp_intr_all},
         {"wait", xwlua_brsp_wait},
+        {"wait_to", xwlua_brsp_wait_to},
         {NULL, NULL},
 };
 

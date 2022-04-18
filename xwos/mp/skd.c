@@ -377,9 +377,9 @@ struct xwmp_thd * xwmp_skd_rtrq_choose(struct xwmp_skd * xwskd)
                 XWOS_BUG_ON(rc);
                 xwmp_rawly_lock(&t->stlock);
                 prio = t->dprio.rq;
-                xwbop_c0m(xwsq_t, &t->state, XWMP_SKDOBJ_DST_READY);
+                xwbop_c0m(xwsq_t, &t->state, XWMP_SKDOBJ_ST_READY);
                 t->dprio.rq = XWMP_SKD_PRIORITY_INVALID;
-                xwbop_s1m(xwsq_t, &t->state, XWMP_SKDOBJ_DST_RUNNING);
+                xwbop_s1m(xwsq_t, &t->state, XWMP_SKDOBJ_ST_RUNNING);
                 t->dprio.r = prio;
                 xwmp_rawly_unlock(&t->stlock);
                 xwmp_rawly_unlock(&xwrtrq->lock);
@@ -808,7 +808,7 @@ bool xwmp_skd_do_chkpmpt(struct xwmp_skd * xwskd, struct xwmp_thd * t)
 #endif
         xwmp_rawly_lock(&xwrtrq->lock);
         xwmp_rawly_lock(&t->stlock);
-        if (XWMP_SKDOBJ_DST_RUNNING & t->state) {
+        if (XWMP_SKDOBJ_ST_RUNNING & t->state) {
                 if (t->dprio.r >= xwrtrq->top) {
                         sched = false;
                 } else {
@@ -901,14 +901,14 @@ xwer_t xwmp_skd_check_swcx(struct xwmp_skd * xwskd,
         xwrtrq = &xwskd->rq.rt;
         xwmp_rawly_lock(&xwrtrq->lock);
         xwmp_rawly_lock(&t->stlock);
-        if (XWMP_SKDOBJ_DST_RUNNING & t->state) {
+        if (XWMP_SKDOBJ_ST_RUNNING & t->state) {
                 if (t->dprio.r >= xwrtrq->top) {
                         xwmp_rawly_unlock(&t->stlock);
                         xwmp_rawly_unlock(&xwrtrq->lock);
                         rc = -EPERM;
                 } else {
                         prio = t->dprio.r;
-                        xwbop_c0m(xwsq_t, &t->state, XWMP_SKDOBJ_DST_RUNNING);
+                        xwbop_c0m(xwsq_t, &t->state, XWMP_SKDOBJ_ST_RUNNING);
                         t->dprio.r = XWMP_SKD_PRIORITY_INVALID;
                         xwmp_rawly_unlock(&t->stlock);
                         xwmp_rawly_unlock(&xwrtrq->lock);
@@ -956,7 +956,7 @@ xwer_t xwmp_skd_do_swcx(struct xwmp_skd * xwskd)
                                 /* 当前线程的状态可能在中断或其他CPU中被改变，
                                    并又被加入到就绪队列中，然后在此处又被重新选择。
                                    这种情况下，调度器只需要恢复此线程的
-                                   @ref XWMP_SKDOBJ_DST_RUNNING状态，
+                                   @ref XWMP_SKDOBJ_ST_RUNNING状态，
                                    并不需要切换线程上下文。*/
                                 rc = -EAGAIN;
                         } else {

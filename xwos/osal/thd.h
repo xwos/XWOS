@@ -170,7 +170,7 @@ xwer_t xwos_thd_init(struct xwos_thd * thd,
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  * @details
- * 参数```attr```类似于```pthread_attr_t```，可为```NULL```，将采用默认属性创建线程。
+ * 参数```attr```类似于```pthread_attr_t```，可为```NULL```，表示采用默认属性创建线程。
  * 若通过attr->stack指定内存作为栈，栈内存的首地址与大小，必须要满足CPU的ABI规则，
  * 例如ARM，就需要8字节对齐，且大小是8的倍数。
  * 因此在定义栈数组时需要使用```__xwcc_aligned(8)```来修饰。
@@ -545,7 +545,7 @@ bool xwos_cthd_frz_shld_stop(bool * frozen)
  * - 上下文：线程
  * - 重入性：可重入
  * @details
- * 调用此函数的线程会睡眠 ```xwtm``` ，也即是线程会在时间点 ```但前时间点 + xwtm``` 被唤醒。
+ * 调用此函数的线程会睡眠 ```xwtm``` ，也即是线程会在 ```但前时间点 + xwtm``` 时被唤醒。
  */
 static __xwos_inline_api
 xwer_t xwos_cthd_sleep(xwtm_t xwtm)

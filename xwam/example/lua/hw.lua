@@ -36,7 +36,7 @@ t2 = {6, 7}
 t2["a"] = "a"
 t2["c"] = "c"
 
-function tblAdd(t1, t2)
+function tbl_add(t1, t2)
   local t = {}
   for k, v in pairs(t1) do
     if (type(k) == "number") then
@@ -56,7 +56,7 @@ function tblAdd(t1, t2)
 end
 
 TblMetatable = {
-  ["__add"] = tblAdd
+  ["__add"] = tbl_add
 }
 
 setmetatable(t2, TblMetatable)

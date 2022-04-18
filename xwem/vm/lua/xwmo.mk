@@ -31,6 +31,7 @@ LIB_O := $(shell xwbs/util/el/makefile-grep-variable.el -a LIB_O $(call getXwmoD
 LUA_LIB := $(addprefix src/,$(addsuffix .c,$(basename $(LIB_O))))
 LUA_PORT := xwlua/port.c xwlua/readline.c xwlua/lua.c mif.c
 LUA_PORT += $(call getAllFileUnderXwmoDir,*.c,xwlua/xwxt)
+LUA_PORT += $(call getAllFileUnderXwmoDir,*.c,xwlua/xwtm)
 LUA_PORT += $(call getAllFileUnderXwmoDir,*.c,xwlua/xwlib)
 LUA_PORT += $(call getAllFileUnderXwmoDir,*.c,xwlua/xwos)
 LUA_PORT += $(call getAllFileUnderXwmoDir,*.c,xwlua/xwds)

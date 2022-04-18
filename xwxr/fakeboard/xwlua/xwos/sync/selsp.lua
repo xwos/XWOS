@@ -178,7 +178,7 @@ end
 
 
 --[[--------
-等待信号选择器中的同步信号<br>
+等待信号选择器中的触发信号<br>
 <br>
 
 @tparam userdata selsp (**in**) 信号选择器对象强指针<br>
@@ -187,11 +187,40 @@ end
 @tparam userdata msk (**in**) 待触发的同步对象位图掩码<br>
 <br>
 
-@tparam string t (**optional**) (**in**)<br>
-..● **"t"** 检测信号选择器中是否有同步信号触发（立即返回，不会等待。）<br>
+@treturn number
++ ● **rc** 返回值
+  + ○ **0** 没有错误
+  + ○ **-EINVAL** 参数错误
+  + ○ **-EINTR** 等待被中断
+  + ○ **-ENOTINTHD** 不在线程上下文中
+
+@usage
+sel = xwos.sel.new(32)
+-- 绑定操作...
+msk = sel:bmp();
+msk:zero();
+msk:s1i(0, 1, 2, 3, 4, 5, 6, 7) -- 掩码：0xFF
+rc = sel:select(msk)
+if (rc == 0) then
+  -- 同步对象1,2,3,4,5,6,7,8中至少有一个触发了同步信号
+else
+  -- 错误发生
+end
+]]
+function selsp:select(selsp, msk)
+end
+
+
+--[[--------
+检测信号选择器中是否有同步信号触发<br>
 <br>
 
-@tparam number time (**optional**) (**in**) 期望的阻塞等待时间<br>
+若没有同步信号触发，立即返回，不会等待。
+
+@tparam userdata selsp (**in**) 信号选择器对象强指针<br>
+<br>
+
+@tparam userdata msk (**in**) 待触发的同步对象位图掩码<br>
 <br>
 
 @treturn number
@@ -200,8 +229,7 @@ end
   + ○ **-EINVAL** 参数错误
   + ○ **-EINTR** 等待被中断
   + ○ **-ENOTINTHD** 不在线程上下文中
-  + ○ **-ETIMEDOUT** 超时，仅当存在可选参数 **time** 时才会出现此错误值
-  + ○ **-ENODATA** 尝试失败，仅当存在可选参数 **"t"** 时才会出现此错误值
+  + ○ **-ENODATA** 尝试失败
 
 @usage
 sel = xwos.sel.new(32)
@@ -209,20 +237,7 @@ sel = xwos.sel.new(32)
 msk = sel:bmp();
 msk:zero();
 msk:s1i(0, 1, 2, 3, 4, 5, 6, 7) -- 掩码：0xFF
-rc = sel:wait(msk)
-if (rc == 0) then
-  -- 同步对象1,2,3,4,5,6,7,8中至少有一个触发了同步信号
-else
-  -- 错误发生
-end
-
-@usage
-sel = xwos.sel.new(32)
--- 绑定操作...
-msk = sel:bmp();
-msk:zero();
-msk:s1i(0, 1, 2, 3, 4, 5, 6, 7) -- 掩码：0xFF
-rc = sel:wait(msk, "t") -- 检测信号选择器中是否有同步信号触发，立即返回，不会等待
+rc = sel:tryselect(msk) -- 检测信号选择器中是否有同步信号触发，立即返回，不会等待
 if (rc == 0) then
   -- 同步对象1,2,3,4,5,6,7,8中至少有一个触发了同步信号
 elseif (rc == -61)
@@ -230,6 +245,31 @@ elseif (rc == -61)
 else
   -- 错误发生
 end
+]]
+function selsp:tryselect(selsp, msk)
+end
+
+
+--[[--------
+限时等待信号选择器中的同步信号<br>
+<br>
+
+@tparam userdata selsp (**in**) 信号选择器对象强指针<br>
+<br>
+
+@tparam userdata msk (**in**) 待触发的同步对象位图掩码<br>
+<br>
+
+@tparam number to (**in**) 期望的阻塞等待时间<br>
+<br>
+
+@treturn number
++ ● **rc** 返回值
+  + ○ **0** 没有错误
+  + ○ **-EINVAL** 参数错误
+  + ○ **-EINTR** 等待被中断
+  + ○ **-ENOTINTHD** 不在线程上下文中
+  + ○ **-ETIMEDOUT** 超时
 
 @usage
 sel = xwos.sel.new(32)
@@ -237,7 +277,7 @@ sel = xwos.sel.new(32)
 msk = sel:bmp();
 msk:zero();
 msk:s1i(0, 1, 2, 3, 4, 5, 6, 7) -- 掩码：0xFF
-rc = sel:wait(msk, 1000000000) -- 最多等待1s
+rc = sel:select_to(msk, xwtm.ft(xwtm.s(1))) -- 最多等待1s
 if (rc == 0) then
   -- 同步对象1,2,3,4,5,6,7,8中至少有一个触发了同步信号
 elseif (rc == -116)
@@ -246,5 +286,5 @@ else
   -- 错误发生
 end
 ]]
-function selsp:wait(selsp, msk, t, time)
+function selsp:select_to(selsp, msk, to)
 end

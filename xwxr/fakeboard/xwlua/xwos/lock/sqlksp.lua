@@ -160,45 +160,104 @@ end
 
 
 --[[--------
-上锁顺序锁<br>
+开启写临界区<br>
 <br>
 
-如果顺序锁无法上锁，就会阻塞当前线程。
+若顺序锁无法上锁，就自旋等待。
 
 @tparam userdata sqlksp (**in**) 顺序锁对象强指针<br>
-<br>
-
-@tparam string locktype (**in**) 上锁方式<br>
-○ **"wr"** 写锁<br>
-○ **"rdex"** 独占读锁<br>
-<br>
-
-@tparam string t (**optional**) (**in**)<br>
-○ **"t"** 尝试上锁顺序锁，若无法上锁顺序锁，立即返回，不会自旋<br>
 <br>
 
 @treturn number
 + ● **rc** 返回值
   + ○ **0** 没有错误
   + ○ **-EINVAL** 参数错误
-  + ○ **-EAGAIN** 尝试上锁失败，仅当存在可选参数"t"时才会出现此错误值
 
 @usage
 lock = xwos.sqlk.new()
-lock:lock("wr")
+lock:wr_lock()
 -- 独占写临界区
 lock:unlock()
+]]
+function sqlksp:wr_lock(sqlksp)
+end
+
+
+--[[--------
+尝试开启写临界区<br>
+<br>
+
+若顺序锁无法上锁，不会自旋等待。
+
+@tparam userdata sqlksp (**in**) 顺序锁对象强指针<br>
+<br>
+
+@treturn number
++ ● **rc** 返回值
+  + ○ **0** 没有错误
+  + ○ **-EINVAL** 参数错误
+  + ○ **-EAGAIN** 尝试上锁失败
 
 @usage
 lock = xwos.sqlk.new()
-rc = lock:lock("wr", "t")
+rc = lock:wr_trylock()
 if (rc == 0) then
   -- 独占写临界区
   lock:unlock()
-
 end
 ]]
-function sqlksp:lock(sqlksp, locktype, t)
+function sqlksp:wr_trylock(sqlksp)
+end
+
+
+--[[--------
+开启独占读临界区<br>
+<br>
+
+若顺序锁无法上锁，就自旋等待。
+
+@tparam userdata sqlksp (**in**) 顺序锁对象强指针<br>
+<br>
+
+@treturn number
++ ● **rc** 返回值
+  + ○ **0** 没有错误
+  + ○ **-EINVAL** 参数错误
+
+@usage
+lock = xwos.sqlk.new()
+lock:rdex_lock()
+-- 独占读临界区
+lock:unlock()
+]]
+function sqlksp:rdex_lock(sqlksp)
+end
+
+
+--[[--------
+尝试开启独占读临界区<br>
+<br>
+
+若顺序锁无法上锁，不会自旋等待。
+
+@tparam userdata sqlksp (**in**) 顺序锁对象强指针<br>
+<br>
+
+@treturn number
++ ● **rc** 返回值
+  + ○ **0** 没有错误
+  + ○ **-EINVAL** 参数错误
+  + ○ **-EAGAIN** 尝试上锁失败
+
+@usage
+lock = xwos.sqlk.new()
+rc = lock:rdex_trylock()
+if (rc == 0) then
+  -- 独占读临界区
+  lock:unlock()
+end
+]]
+function sqlksp:rdex_trylock(sqlksp)
 end
 
 
@@ -213,13 +272,13 @@ end
 
 @usage
 lock = xwos.sqlk.new()
-lock:lock("rdex")
--- 独占读临界区
+lock:wr_lock()
+-- 独占写临界区
 lock:unlock()
 
 @usage
 lock = xwos.sqlk.new()
-rc = lock:lock("rdex", "t")
+rc = lock:rdex_trylock()
 if (rc == 0) then
   -- 独占读临界区
   lock:unlock()

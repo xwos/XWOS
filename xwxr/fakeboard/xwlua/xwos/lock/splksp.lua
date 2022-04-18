@@ -99,36 +99,49 @@ print(splksp)
 上锁自旋锁<br>
 <br>
 
-如果自旋锁无法上锁，就会阻塞当前线程。
+若自旋锁无法上锁，会自旋等待。
 
 @tparam userdata splksp (**in**) 自旋锁对象强指针<br>
-<br>
-
-@tparam string t (**optional**) (**in**)<br>
-○ **"t"** 尝试上锁自旋锁，若无法上锁自旋锁，立即返回，不会自旋<br>
 <br>
 
 @treturn number
 + ● **rc** 返回值
   + ○ **0** 没有错误
   + ○ **-EINVAL** 参数错误
-  + ○ **-EAGAIN** 尝试上锁失败，仅当存在可选参数"t"时才会出现此错误值
 
 @usage
 lock = xwos.splk.new()
 lock:lock()
 -- 临界区
 lock:unlock()
+]]
+function splksp:lock(splksp)
+end
+
+--[[--------
+尝试上锁自旋锁<br>
+<br>
+
+若自旋锁无法上锁，不会自旋等待。
+
+@tparam userdata splksp (**in**) 自旋锁对象强指针<br>
+<br>
+
+@treturn number
++ ● **rc** 返回值
+  + ○ **0** 没有错误
+  + ○ **-EINVAL** 参数错误
+  + ○ **-EAGAIN** 尝试上锁失败
 
 @usage
 lock = xwos.splk.new()
-rc = lock:lock("t")
+rc = lock:trylock()
 if (rc == 0) then
   -- 临界区
   lock:unlock()
 end
 ]]
-function splksp:lock(splksp, t)
+function splksp:trylock(splksp)
 end
 
 
@@ -141,13 +154,7 @@ end
 
 @usage
 lock = xwos.splk.new()
-lock:lock()
--- 临界区
-lock:unlock()
-
-@usage
-lock = xwos.splk.new()
-rc = lock:lock("t")
+rc = lock:trylock()
 if (rc == 0) then
   -- 临界区
   lock:unlock()

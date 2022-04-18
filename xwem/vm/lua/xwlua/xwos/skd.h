@@ -22,14 +22,8 @@
 #define __xwem_vm_lua_xwlua_xwos_skd_h__
 
 #include <xwos/standard.h>
-#include <xwos/osal/thd.h>
 #include "src/lauxlib.h"
 
-typedef xwos_thd_d xwlua_thd_sp; /**< 线程的强指针 */
-#define XWLUA_THD_NULLSP XWOS_THD_NILD
-
 void xwlua_os_open_skd(lua_State * L);
-void xwlua_os_open_thd(lua_State * L);
-void xwlua_os_open_cthd(lua_State * L);
 
 #endif /* xwem/vm/lua/xwlua/xwos/skd.h */

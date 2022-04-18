@@ -30,20 +30,43 @@ end
 当前线程睡眠一段时间<br>
 <br>
 
-@tparam number time (**in**) 需要睡眠的时间，单位：纳秒<br>
+调用此函数的线程会睡眠**xwtm** ，也即是线程会在**但前时间点 + xwtm**时被唤醒。
+
+@tparam number xwtm (**in**) 需要睡眠的时间<br>
 <br>
 
 @treturn number
-+ ● **rc** 错误马
++ ● **rc** 错误码
   + ○ 0 没有错误
   + ○ -EINTR 睡眠过程被中断
   + ○ -ETIMEDOUT 输入的时间为负数
 
 @usage
-rc = xwos.cthd.sleep(1000000000) -- 睡眠1s
+rc = xwos.cthd.sleep(xwtm.s(1)) -- 睡眠1s
 ]]
-function sleep(time)
+function sleep(xwtm)
 end
+
+
+--[[--------
+当前线程睡眠到一个时间点<br>
+<br>
+
+@tparam number to (**in**) 期望唤醒的时间点<br>
+<br>
+
+@treturn number
++ ● **rc** 错误码
+  + ○ 0 没有错误
+  + ○ -EINTR 睡眠过程被中断
+  + ○ -ETIMEDOUT 输入的时间为负数
+
+@usage
+rc = xwos.cthd.sleep_to(xwtm.ft(xwtm.s(1))) -- 从现在开始1s后唤醒
+]]
+function sleep_to(to)
+end
+
 
 --[[--------
 当前线程从一个时间起点睡眠到另一个时间点<br>
@@ -53,7 +76,7 @@ end
 此方法每次返回时都会将当前的系统滴答时间返回，可以用作下一次调用的时间起点。
 若时间增量 `inc` 保持不变，不断循环调用此方法，可形成较精确的周期性唤醒。
 
-@tparam number origin (**in**) 时间起点，单位：纳秒<br>
+@tparam number origin (**in**) 时间起点<br>
 <br>
 
 @tparam number inc (**in**) 期望被唤醒的时间相对于起点的增量，单位：纳秒<br>
@@ -66,13 +89,13 @@ end
 + ● **origin** (**userdata**) 下一次调用的时间起点
 @usage
 origin = xwos.skd.tt()
-cnt = 30
+cnt = 30 -- 重复30次
 repeat
-  rc, origin = xwos.cthd.sleepFrom(origin, 1000000000) -- 睡眠1s
+  rc, origin = xwos.cthd.sleep_from(origin, xwtm.s(1)) -- 睡眠1s
   cnt = cnt - 1
-until (cnt == 0) -- 重复30次
+until (cnt == 0)
 ]]
-function sleepFrom(origin, inc)
+function sleep_from(origin, inc)
 end
 
 
@@ -111,10 +134,10 @@ end
 @usage
 repeat
   threadLoop() -- 线程的功能逻辑
-  shldstop = xwos.cthd.shldStop()
+  shldstop = xwos.cthd.shld_stop()
 until (shldstop)
 ]]
-function shldStop()
+function shld_stop()
 end
 
 
@@ -129,10 +152,10 @@ end
 @usage
 repeat
   threadLoop() -- 线程的功能逻辑
-  shldstop, froze = xwos.cthd.frzShldStop()
+  shldstop, froze = xwos.cthd.frz_shld_stop()
 until (shldstop)
 ]]
-function frzShldStop()
+function frz_shld_stop()
 end
 
 
@@ -145,16 +168,16 @@ end
 
 @usage
 repeat
-  if (xwos.cthd.shldFrz()) then
+  if (xwos.cthd.shld_frz()) then
     clean_before_freezing() -- 冻结前清理资源
     xwos.cthd.frz() -- 冻结
     setup_after_frozen() -- 解冻后重新获取资源
   end
   threadLoop() -- 线程的功能逻辑
-  shldstop = xwos.cthd.shldStop()
+  shldstop = xwos.cthd.shld_stop()
 until (shldstop)
 ]]
-function shldFrz()
+function shld_frz()
 end
 
 --[[--------
@@ -169,13 +192,13 @@ end
 
 @usage
 repeat
-  if (xwos.cthd.shldFrz()) then
+  if (xwos.cthd.shld_frz()) then
     clean_before_freezing() -- 冻结前清理资源
     xwos.cthd.frz() -- 冻结
     setup_after_frozen() -- 解冻后重新获取资源
   end
   threadLoop() -- 线程的功能逻辑
-  shldstop = xwos.cthd.shldStop()
+  shldstop = xwos.cthd.shld_stop()
 until (shldstop)
 ]]
 function frz()

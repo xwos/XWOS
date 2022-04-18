@@ -11,9 +11,10 @@ full_description = [[
 format = 'discount'
 backtick_references = true
 file = {
+'xwtm.lua',
+'xwxt.lua',
 'xwlib/bmp.lua',
 'xwos/skd.lua', 'xwos/thd.lua', 'xwos/cthd.lua', 'xwos/thdsp.lua',
-'xwos/xwxt.lua',
 'xwos/lock/mtx.lua', 'xwos/lock/mtxsp.lua',
 'xwos/lock/splk.lua', 'xwos/lock/splksp.lua',
 'xwos/lock/sqlk.lua', 'xwos/lock/sqlksp.lua',

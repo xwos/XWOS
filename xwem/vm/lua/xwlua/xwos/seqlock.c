@@ -284,87 +284,42 @@ int xwlua_sqlksp_get_seq(lua_State * L)
         return 1;
 }
 
-#define XWLUA_SQLK_LKTYPE_WR    0
-#define XWLUA_SQLK_LKTYPE_RDEX  1
-const char * const xwlua_sqlk_lktype[] = {"wr", "rdex", NULL};
-
-#define XWLUA_SQLK_LKOPT_TRY             0
-const char * const xwlua_sqlk_lkopt[] = {"t", NULL};
-
-int xwlua_sqlksp_lock(lua_State * L)
+int xwlua_sqlksp_wr_lock(lua_State * L)
 {
         xwlua_sqlk_sp * sqlksp;
-        int lktype;
-        int lkopt;
-        int top;
-        int type;
+
+        sqlksp = (xwlua_sqlk_sp *)luaL_checkudata(L, 1, "xwlua_sqlk_sp");
+        xwlua_sqlk_wr_lock(sqlksp->luasqlk);
+        return 1;
+}
+
+int xwlua_sqlksp_wr_trylock(lua_State * L)
+{
+        xwlua_sqlk_sp * sqlksp;
         xwer_t rc;
 
-        top = lua_gettop(L);
         sqlksp = (xwlua_sqlk_sp *)luaL_checkudata(L, 1, "xwlua_sqlk_sp");
-        lktype = luaL_checkoption(L, 2, "wr", xwlua_sqlk_lktype);
-        switch (lktype) {
-        case XWLUA_SQLK_LKTYPE_WR:
-                if (top >= 3) {
-                        type = lua_type(L, 3);
-                        switch (type) {
-                        case LUA_TSTRING:
-                                lkopt = luaL_checkoption(L, 3, "t", xwlua_sqlk_lkopt);
-                                switch (lkopt) {
-                                case XWLUA_SQLK_LKOPT_TRY:
-                                        rc = xwlua_sqlk_wr_trylock(sqlksp->luasqlk);
-                                        break;
-                                default:
-                                        luaL_error(L, "Invalid arg: %s",
-                                                   lua_tostring(L, 3));
-                                        rc = -EINVAL;
-                                        break;
-                                }
-                                break;
-                        default:
-                                luaL_error(L, "Invalid arg type: %s",
-                                           lua_typename(L, type));
-                                rc = -EINVAL;
-                                break;
-                        }
-                } else {
-                        xwlua_sqlk_wr_lock(sqlksp->luasqlk);
-                        rc = XWOK;
-                }
-                break;
-        case XWLUA_SQLK_LKTYPE_RDEX:
-                if (top >= 3) {
-                        type = lua_type(L, 3);
-                        switch (type) {
-                        case LUA_TSTRING:
-                                lkopt = luaL_checkoption(L, 3, "t", xwlua_sqlk_lkopt);
-                                switch (lkopt) {
-                                case XWLUA_SQLK_LKOPT_TRY:
-                                        rc = xwlua_sqlk_rdex_trylock(sqlksp->luasqlk);
-                                        break;
-                                default:
-                                        luaL_error(L, "Invalid arg: %s",
-                                                   lua_tostring(L, 3));
-                                        rc = -EINVAL;
-                                        break;
-                                }
-                                break;
-                        default:
-                                luaL_error(L, "Invalid arg type: %s",
-                                           lua_typename(L, type));
-                                rc = -EINVAL;
-                                break;
-                        }
-                } else {
-                        xwlua_sqlk_rdex_lock(sqlksp->luasqlk);
-                        rc = XWOK;
-                }
-                break;
-        default:
-                luaL_error(L, "Invalid arg: %s", lua_tostring(L, 2));
-                rc = -EINVAL;
-                break;
-        }
+        rc = xwlua_sqlk_wr_trylock(sqlksp->luasqlk);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
+}
+
+int xwlua_sqlksp_rdex_lock(lua_State * L)
+{
+        xwlua_sqlk_sp * sqlksp;
+
+        sqlksp = (xwlua_sqlk_sp *)luaL_checkudata(L, 1, "xwlua_sqlk_sp");
+        xwlua_sqlk_rdex_lock(sqlksp->luasqlk);
+        return 0;
+}
+
+int xwlua_sqlksp_rdex_trylock(lua_State * L)
+{
+        xwlua_sqlk_sp * sqlksp;
+        xwer_t rc;
+
+        sqlksp = (xwlua_sqlk_sp *)luaL_checkudata(L, 1, "xwlua_sqlk_sp");
+        rc = xwlua_sqlk_rdex_trylock(sqlksp->luasqlk);
         lua_pushinteger(L, (lua_Integer)rc);
         return 1;
 }
@@ -374,7 +329,10 @@ const luaL_Reg xwlua_sqlksp_indexmethod[] = {
         {"rd_retry", xwlua_sqlksp_rd_retry},
         {"get_seq", xwlua_sqlksp_get_seq},
         {"unlock", xwlua_sqlksp_unlock},
-        {"lock", xwlua_sqlksp_lock},
+        {"wr_lock", xwlua_sqlksp_wr_lock},
+        {"wr_trylock", xwlua_sqlksp_wr_trylock},
+        {"rdex_lock", xwlua_sqlksp_rdex_lock},
+        {"rdex_trylock", xwlua_sqlksp_rdex_trylock},
         {NULL, NULL},
 };
 

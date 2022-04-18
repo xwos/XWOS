@@ -257,8 +257,8 @@ struct xwup_thd * xwup_skd_rtrq_choose(void)
         t = xwup_rtrq_choose(xwrtrq);
         if (__xwcc_likely(NULL != t)) {
                 xwup_rtrq_remove(xwrtrq, t);
-                xwbop(xwsq_t, c0m, &t->state, XWUP_SKDOBJ_DST_READY);
-                xwbop(xwsq_t, s1m, &t->state, XWUP_SKDOBJ_DST_RUNNING);
+                xwbop(xwsq_t, c0m, &t->state, XWUP_SKDOBJ_ST_READY);
+                xwbop(xwsq_t, s1m, &t->state, XWUP_SKDOBJ_ST_RUNNING);
         }/* else {} */
         return t;
 }
@@ -588,7 +588,7 @@ bool xwup_skd_do_chkpmpt(struct xwup_thd * t)
 
         xwskd = &xwup_skd;
         xwrtrq = &xwskd->rq.rt;
-        if (XWUP_SKDOBJ_DST_RUNNING & t->state) {
+        if (XWUP_SKDOBJ_ST_RUNNING & t->state) {
                 if (t->prio.d >= xwrtrq->top) {
                         sched = false;
                 } else {
@@ -663,11 +663,11 @@ xwer_t xwup_skd_check_swcx(struct xwup_thd * t, struct xwup_thd ** pmthd)
 
         xwskd = &xwup_skd;
         xwrtrq = &xwskd->rq.rt;
-        if (XWUP_SKDOBJ_DST_RUNNING & t->state) {
+        if (XWUP_SKDOBJ_ST_RUNNING & t->state) {
                 if (t->prio.d >= xwrtrq->top) {
                         rc = -EPERM;
                 } else {
-                        xwbop(xwsq_t, c0m, &t->state, XWUP_SKDOBJ_DST_RUNNING);
+                        xwbop(xwsq_t, c0m, &t->state, XWUP_SKDOBJ_ST_RUNNING);
                         rc = xwup_thd_rq_add_head(t);
                         XWOS_BUG_ON(rc < 0);
                         *pmthd = xwup_skd_rtrq_choose();
@@ -710,7 +710,7 @@ xwer_t xwup_skd_do_swcx(void)
                                 /* 当前线程的状态可能在中断中被改变，
                                    并被加入到就绪队列，然后在这里又被重新选择。
                                    这种情况下，调度器只需要恢复这个线程的
-                                   @ref XWUP_SKDOBJ_DST_RUNNING 状态，
+                                   @ref XWUP_SKDOBJ_ST_RUNNING 状态，
                                    并不需要切换线程上下文。*/
                                 rc = -EAGAIN;
                         } else {

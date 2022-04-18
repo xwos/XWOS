@@ -177,10 +177,53 @@ int xwlua_selsp_intr_all(lua_State * L)
         return 1;
 }
 
-#define XWLUA_SEL_OPT_TRY       0
-const char * const xwlua_sel_opt[] = {"t", NULL};
+int xwlua_selsp_select(lua_State * L)
+{
+        xwlua_sel_sp * selsp;
+        xwlua_bmp_t * msk;
+        xwlua_bmp_t * trg;
+        xwsz_t bitnum;
+        xwsz_t bmpsz;
+        xwer_t rc;
 
-int xwlua_selsp_wait(lua_State * L)
+        selsp = (xwlua_sel_sp *)luaL_checkudata(L, 1, "xwlua_sel_sp");
+        msk = (xwlua_bmp_t *)luaL_checkudata(L, 2, "xwlua_bmp_t");
+        xwos_sel_get_num(selsp->sel, &bitnum);
+        bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bitnum)) + sizeof(xwlua_bmp_t);
+        trg = lua_newuserdatauv(L, bmpsz, 0);
+        trg->bits = bitnum;
+        xwbmpop_c0all(trg->bmp, trg->bits);
+        luaL_setmetatable(L, "xwlua_bmp_t");
+        rc = xwos_sel_select(selsp->sel, msk->bmp, trg->bmp);
+        lua_pushinteger(L, (lua_Integer)rc);
+        lua_insert(L, -2);
+        return 2;
+}
+
+int xwlua_selsp_tryselect(lua_State * L)
+{
+        xwlua_sel_sp * selsp;
+        xwlua_bmp_t * msk;
+        xwlua_bmp_t * trg;
+        xwsz_t bitnum;
+        xwsz_t bmpsz;
+        xwer_t rc;
+
+        selsp = (xwlua_sel_sp *)luaL_checkudata(L, 1, "xwlua_sel_sp");
+        msk = (xwlua_bmp_t *)luaL_checkudata(L, 2, "xwlua_bmp_t");
+        xwos_sel_get_num(selsp->sel, &bitnum);
+        bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bitnum)) + sizeof(xwlua_bmp_t);
+        trg = lua_newuserdatauv(L, bmpsz, 0);
+        trg->bits = bitnum;
+        xwbmpop_c0all(trg->bmp, trg->bits);
+        luaL_setmetatable(L, "xwlua_bmp_t");
+        rc = xwos_sel_tryselect(selsp->sel, msk->bmp, trg->bmp);
+        lua_pushinteger(L, (lua_Integer)rc);
+        lua_insert(L, -2);
+        return 2;
+}
+
+int xwlua_selsp_select_to(lua_State * L)
 {
         xwlua_sel_sp * selsp;
         xwlua_bmp_t * msk;
@@ -188,75 +231,18 @@ int xwlua_selsp_wait(lua_State * L)
         xwtm_t to;
         xwsz_t bitnum;
         xwsz_t bmpsz;
-        int top;
-        int opt;
-        int type;
         xwer_t rc;
 
-        top = lua_gettop(L);
         selsp = (xwlua_sel_sp *)luaL_checkudata(L, 1, "xwlua_sel_sp");
         msk = (xwlua_bmp_t *)luaL_checkudata(L, 2, "xwlua_bmp_t");
         xwos_sel_get_num(selsp->sel, &bitnum);
-        if (top >= 3) {
-                type = lua_type(L, 3);
-                switch (type) {
-                case LUA_TNUMBER:
-                        to = (xwtm_t)luaL_checknumber(L, 3);
-                        bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bitnum)) +
-                                sizeof(xwlua_bmp_t);
-                        trg = lua_newuserdatauv(L, bmpsz, 0);
-                        trg->bits = bitnum;
-                        xwbmpop_c0all(trg->bmp, trg->bits);
-                        luaL_setmetatable(L, "xwlua_bmp_t");
-                        rc = xwos_sel_select_to(selsp->sel, msk->bmp, trg->bmp, to);
-                        break;
-                case LUA_TSTRING:
-                        opt = luaL_checkoption(L, 3, "t", xwlua_sel_opt);
-                        switch (opt) {
-                        case XWLUA_SEL_OPT_TRY:
-                                bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bitnum)) +
-                                        sizeof(xwlua_bmp_t);
-                                trg = lua_newuserdatauv(L, bmpsz, 0);
-                                trg->bits = bitnum;
-                                xwbmpop_c0all(trg->bmp, trg->bits);
-                                luaL_setmetatable(L, "xwlua_bmp_t");
-                                rc = xwos_sel_tryselect(selsp->sel, msk->bmp, trg->bmp);
-                                break;
-                        default:
-                                luaL_error(L, "Invalid arg: %s", lua_tostring(L, 3));
-                                rc = -EINVAL;
-                                break;
-                        }
-                        break;
-                case LUA_TNIL:
-                        bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bitnum)) +
-                                sizeof(xwlua_bmp_t);
-                        trg = lua_newuserdatauv(L, bmpsz, 0);
-                        trg->bits = bitnum;
-                        xwbmpop_c0all(trg->bmp, trg->bits);
-                        luaL_setmetatable(L, "xwlua_bmp_t");
-                        rc = xwos_sel_select(selsp->sel, msk->bmp, trg->bmp);
-                        break;
-                default:
-                        luaL_error(L, "Invalid arg type: %s", lua_typename(L, type));
-                        rc = -EINVAL;
-                        bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bitnum)) +
-                                sizeof(xwlua_bmp_t);
-                        trg = lua_newuserdatauv(L, bmpsz, 0);
-                        trg->bits = bitnum;
-                        xwbmpop_c0all(trg->bmp, trg->bits);
-                        luaL_setmetatable(L, "xwlua_bmp_t");
-                        break;
-                }
-        } else {
-                bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bitnum)) +
-                        sizeof(xwlua_bmp_t);
-                trg = lua_newuserdatauv(L, bmpsz, 0);
-                trg->bits = bitnum;
-                xwbmpop_c0all(trg->bmp, trg->bits);
-                luaL_setmetatable(L, "xwlua_bmp_t");
-                rc = xwos_sel_select(selsp->sel, msk->bmp, trg->bmp);
-        }
+        to = (xwtm_t)luaL_checknumber(L, 3);
+        bmpsz = (sizeof(xwbmp_t) * BITS_TO_XWBMP_T(bitnum)) + sizeof(xwlua_bmp_t);
+        trg = lua_newuserdatauv(L, bmpsz, 0);
+        trg->bits = bitnum;
+        xwbmpop_c0all(trg->bmp, trg->bits);
+        luaL_setmetatable(L, "xwlua_bmp_t");
+        rc = xwos_sel_select_to(selsp->sel, msk->bmp, trg->bmp, to);
         lua_pushinteger(L, (lua_Integer)rc);
         lua_insert(L, -2);
         return 2;
@@ -268,7 +254,9 @@ const luaL_Reg xwlua_selsp_indexmethod[] = {
         {"bind", xwlua_selsp_bind},
         {"unbind", xwlua_selsp_unbind},
         {"intr_all", xwlua_selsp_intr_all},
-        {"wait", xwlua_selsp_wait},
+        {"select", xwlua_selsp_select},
+        {"tryselect", xwlua_selsp_tryselect},
+        {"select_to", xwlua_selsp_select_to},
         {NULL, NULL},
 };
 

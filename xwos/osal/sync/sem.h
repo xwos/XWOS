@@ -310,7 +310,7 @@ xwer_t xwos_sem_thaw(struct xwos_sem * sem)
 }
 
 /**
- * @brief XWOS API：发布信号量对象
+ * @brief XWOS API：发布信号量
  * @param[in] sem: 信号量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -331,7 +331,7 @@ xwer_t xwos_sem_post(struct xwos_sem * sem)
 }
 
 /**
- * @brief XWOS API：等待并获取信号量对象
+ * @brief XWOS API：等待并获取信号
  * @param[in] sem: 信号量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -350,7 +350,7 @@ xwer_t xwos_sem_wait(struct xwos_sem * sem)
 }
 
 /**
- * @brief XWOS API：检查信号量对象，立即返回，不会阻塞调用线程
+ * @brief XWOS API：检查信号量对象
  * @param[in] sem: 信号量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -360,6 +360,8 @@ xwer_t xwos_sem_wait(struct xwos_sem * sem)
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
+ * @details
+ * 若没有检测到信号，立即返回，不会阻塞调用线程。
  */
 static __xwos_inline_api
 xwer_t xwos_sem_trywait(struct xwos_sem * sem)
@@ -368,7 +370,7 @@ xwer_t xwos_sem_trywait(struct xwos_sem * sem)
 }
 
 /**
- * @brief XWOS API：限时等待并获取信号量对象
+ * @brief XWOS API：限时等待并获取信号量
  * @param[in] sem: 信号量对象的指针
  * @param[in] xwtm: 期望唤醒的时间点
  * @return 错误码
@@ -391,7 +393,7 @@ xwer_t xwos_sem_wait_to(struct xwos_sem * sem, xwtm_t to)
 }
 
 /**
- * @brief XWOS API：等待并获取信号量对象，且等待不可被中断
+ * @brief XWOS API：等待并获取信号量，且等待不可被中断
  * @param[in] sem: 信号量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误

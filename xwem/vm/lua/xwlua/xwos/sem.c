@@ -176,50 +176,37 @@ int xwlua_semsp_post(lua_State * L)
         return 1;
 }
 
-#define XWLUA_SEM_OPT_TRY       0
-const char * const xwlua_sem_opt[] = {"t", NULL};
-
 int xwlua_semsp_wait(lua_State * L)
 {
         xwlua_sem_sp * semsp;
-        xwtm_t to;
-        int opt;
-        int type;
-        int top;
         xwer_t rc;
 
-        top = lua_gettop(L);
         semsp = (xwlua_sem_sp *)luaL_checkudata(L, 1, "xwlua_sem_sp");
-        if (top >= 2) {
-                type = lua_type(L, 2);
-                switch (type) {
-                case LUA_TNUMBER:
-                        to = (xwtm_t)lua_tonumber(L, 2);
-                        rc = xwos_sem_wait_to(semsp->sem, to);
-                        break;
-                case LUA_TSTRING:
-                        opt = luaL_checkoption(L, 2, "t", xwlua_sem_opt);
-                        switch (opt) {
-                        case XWLUA_SEM_OPT_TRY:
-                                rc = xwos_sem_trywait(semsp->sem);
-                                break;
-                        default:
-                                luaL_error(L, "Invalid arg: %s", lua_tostring(L, 2));
-                                rc = -EINVAL;
-                                break;
-                        }
-                        break;
-                case LUA_TNIL:
-                        rc = xwos_sem_wait(semsp->sem);
-                        break;
-                default:
-                        luaL_error(L, "Invalid arg type: %s", lua_typename(L, type));
-                        rc = -EINVAL;
-                        break;
-                }
-        } else {
-                rc = xwos_sem_wait(semsp->sem);
-        }
+        rc = xwos_sem_wait(semsp->sem);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
+}
+
+int xwlua_semsp_trywait(lua_State * L)
+{
+        xwlua_sem_sp * semsp;
+        xwer_t rc;
+
+        semsp = (xwlua_sem_sp *)luaL_checkudata(L, 1, "xwlua_sem_sp");
+        rc = xwos_sem_trywait(semsp->sem);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
+}
+
+int xwlua_semsp_wait_to(lua_State * L)
+{
+        xwlua_sem_sp * semsp;
+        xwtm_t to;
+        xwer_t rc;
+
+        semsp = (xwlua_sem_sp *)luaL_checkudata(L, 1, "xwlua_sem_sp");
+        to = (xwtm_t)lua_tonumber(L, 2);
+        rc = xwos_sem_wait_to(semsp->sem, to);
         lua_pushinteger(L, (lua_Integer)rc);
         return 1;
 }
@@ -242,6 +229,8 @@ const luaL_Reg xwlua_semsp_indexmethod[] = {
         {"thaw", xwlua_semsp_thaw},
         {"post", xwlua_semsp_post},
         {"wait", xwlua_semsp_wait},
+        {"trywait", xwlua_semsp_trywait},
+        {"wait_to", xwlua_semsp_wait_to},
         {"getvalue", xwlua_semsp_getvalue},
         {NULL, NULL},
 };

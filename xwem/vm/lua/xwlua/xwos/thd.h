@@ -18,45 +18,17 @@
  * > limitations under the License.
  */
 
+#ifndef __xwem_vm_lua_xwlua_xwos_thd_h__
+#define __xwem_vm_lua_xwlua_xwos_thd_h__
+
 #include <xwos/standard.h>
-#include <string.h>
-#include <xwos/osal/skd.h>
+#include <xwos/osal/thd.h>
 #include "src/lauxlib.h"
-#include "xwlua/port.h"
-#include "xwlua/xwos/skd.h"
 
-/******** xwos.skd ********/
-int xwlua_skd_id_lc(lua_State * L)
-{
-        xwid_t id;
+typedef xwos_thd_d xwlua_thd_sp; /**< 线程的强指针 */
+#define XWLUA_THD_NULLSP XWOS_THD_NILD
 
-        id = xwos_skd_id_lc();
-        lua_pushnumber(L, (lua_Number)id);
-        return 1;
-}
+void xwlua_os_open_thd(lua_State * L);
+void xwlua_os_open_cthd(lua_State * L);
 
-int xwlua_skd_get_dspmpt_lc(lua_State * L)
-{
-        XWOS_UNUSED(L);
-        xwos_skd_dspmpt_lc();
-        return 0;
-}
-
-int xwlua_skd_get_enpmpt_lc(lua_State * L)
-{
-        XWOS_UNUSED(L);
-        xwos_skd_enpmpt_lc();
-        return 0;
-}
-
-const luaL_Reg xwlua_skd_libconstructor[] = {
-        {"id", xwlua_skd_id_lc},
-        {"dspmpt", xwlua_skd_get_dspmpt_lc},
-        {"enpmpt", xwlua_skd_get_enpmpt_lc},
-        {NULL, NULL},
-};
-
-void xwlua_os_open_skd(lua_State * L)
-{
-        luaL_newlib(L, xwlua_skd_libconstructor);
-}
+#endif /* xwem/vm/lua/xwlua/xwos/thd.h */

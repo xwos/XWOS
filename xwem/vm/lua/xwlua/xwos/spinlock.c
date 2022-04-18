@@ -228,43 +228,22 @@ const luaL_Reg xwlua_splksp_metamethod[] = {
         {NULL, NULL}
 };
 
-#define XWLUA_SPLK_LKOPT_TRY             0
-const char * const xwlua_splk_lkopt[] = {"t", NULL};
-
 int xwlua_splksp_lock(lua_State * L)
 {
         xwlua_splk_sp * splksp;
-        int lkopt;
-        int top;
-        int type;
+
+        splksp = (xwlua_splk_sp *)luaL_checkudata(L, 1, "xwlua_splk_sp");
+        xwlua_splk_lock(splksp->luasplk);
+        return 0;
+}
+
+int xwlua_splksp_trylock(lua_State * L)
+{
+        xwlua_splk_sp * splksp;
         xwer_t rc;
 
-        top = lua_gettop(L);
         splksp = (xwlua_splk_sp *)luaL_checkudata(L, 1, "xwlua_splk_sp");
-        if (top >= 2) {
-                type = lua_type(L, 2);
-                switch (type) {
-                case LUA_TSTRING:
-                        lkopt = luaL_checkoption(L, 2, "t", xwlua_splk_lkopt);
-                        switch (lkopt) {
-                        case XWLUA_SPLK_LKOPT_TRY:
-                                rc = xwlua_splk_trylock(splksp->luasplk);
-                                break;
-                        default:
-                                luaL_error(L, "Invalid arg: %s", lua_tostring(L, 2));
-                                rc = -EINVAL;
-                                break;
-                        }
-                        break;
-                default:
-                        luaL_error(L, "Invalid arg type: %s", lua_typename(L, type));
-                        rc = -EINVAL;
-                        break;
-                }
-        } else {
-                xwlua_splk_lock(splksp->luasplk);
-                rc = XWOK;
-        }
+        rc = xwlua_splk_trylock(splksp->luasplk);
         lua_pushinteger(L, (lua_Integer)rc);
         return 1;
 }
@@ -272,6 +251,7 @@ int xwlua_splksp_lock(lua_State * L)
 const luaL_Reg xwlua_splksp_indexmethod[] = {
         {"unlock", xwlua_splksp_unlock},
         {"lock", xwlua_splksp_lock},
+        {"trylock", xwlua_splksp_trylock},
         {NULL, NULL},
 };
 

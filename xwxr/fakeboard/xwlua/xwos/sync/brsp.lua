@@ -184,16 +184,12 @@ end
 @tparam userdata brsp (**in**) 线程栅栏对象强指针<br>
 <br>
 
-@tparam number time (**optional**) (**in**) 期望的阻塞等待时间<br>
-<br>
-
 @treturn number
 + ● **rc** 返回值
   + ○ **0** 没有错误
   + ○ **-EINVAL** 参数错误
   + ○ **-EINTR** 等待被中断
   + ○ **-ENOTINTHD** 不在线程上下文中
-  + ○ **-ETIMEDOUT** 超时，仅当存在可选参数 **time** 时才会出现此错误值
 
 @usage
 br = xwos.br.new(4) -- 同步4个线程
@@ -204,11 +200,33 @@ if (rc == 0) then
 else
   -- 错误发生
 end
+]]
+function brsp:wait(brsp)
+end
+
+
+--[[--------
+限时等待所有线程到达栅栏<br>
+<br>
+
+@tparam userdata brsp (**in**) 线程栅栏对象强指针<br>
+<br>
+
+@tparam number to (**in**) 期望的阻塞等待时间<br>
+<br>
+
+@treturn number
++ ● **rc** 返回值
+  + ○ **0** 没有错误
+  + ○ **-EINVAL** 参数错误
+  + ○ **-EINTR** 等待被中断
+  + ○ **-ENOTINTHD** 不在线程上下文中
+  + ○ **-ETIMEDOUT** 超时
 
 @usage
 br = xwos.br.new(4) -- 同步4个线程
 -- ...省略...
-rc = br:wait(1000000000) -- 最多等待1s
+rc = br:wait_to(xwtm.ft(xwtm.s(1))) -- 最多等待1s
 if (rc == 0) then
   -- 线程全部到达线程栅栏
 elseif (rc == -116)
@@ -217,5 +235,5 @@ else
   -- 错误发生
 end
 ]]
-function brsp:sync(brsp, time)
+function brsp:wait_to(brsp, to)
 end

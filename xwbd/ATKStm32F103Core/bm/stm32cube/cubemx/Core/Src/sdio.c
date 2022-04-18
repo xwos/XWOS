@@ -228,7 +228,6 @@ xwer_t MX_SDIO_SD_TrimClk(xwsq_t cnt)
   xwu8_t buf[512] __xwcc_aligned(4);
   xwer_t rc;
   xwsq_t i;
-  xwtm_t time;
 
   rc = XWOK;
   for (i = 0; i < cnt; i++) {

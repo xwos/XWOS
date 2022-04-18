@@ -54,9 +54,6 @@ int xwlua_uart_tostring(lua_State * L)
         return 1;
 }
 
-#define XWLUA_UART_RX_OPT_TRY   0
-const char * const xwlua_uart_rx_opt[] = {"t", NULL};
-
 int xwlua_uart_rx(lua_State * L)
 {
         int top;
@@ -64,39 +61,41 @@ int xwlua_uart_rx(lua_State * L)
         xwsz_t size;
         luaL_Buffer b;
         xwu8_t * rxb;
-        xwtm_t time;
+        xwtm_t to;
         xwer_t rc;
 
         top = lua_gettop(L);
         luart = (struct xwlua_uart *)luaL_checkudata(L, 1, "xwlua_uart");
         size = (xwsz_t)luaL_checkinteger(L, 2);
         if (top >= 3) {
-                int type = lua_type(L, 3);
-                switch (type) {
-                case LUA_TNUMBER:
-                        time = (xwtm_t)luaL_checknumber(L, 3);
-                        break;
-                case LUA_TSTRING:
-                        time = luaL_checkoption(L, 3, "t", xwlua_uart_rx_opt);
-                        break;
-                case LUA_TNIL:
-                        time = XWTM_MAX;
-                        break;
-                default:
-                        luaL_error(L, "Invalid arg type: %s", lua_typename(L, type));
-                        time = 0;
-                        break;
-                }
+                to = (xwtm_t)luaL_checknumber(L, 3);
         } else {
-                time = XWTM_MAX;
+                to = XWTM_MAX;
         }
         luaL_buffinit(L, &b);
         rxb = (xwu8_t *)luaL_prepbuffsize(&b, size);
-        if (time) {
-                rc = xwds_dmauartc_rx(luart->dmauartc, rxb, &size, time);
-        } else {
-                rc = xwds_dmauartc_try_rx(luart->dmauartc, rxb, &size);
-        }
+        rc = xwds_dmauartc_rx(luart->dmauartc, rxb, &size, to);
+        luaL_addsize(&b, size);
+        lua_pushinteger(L, (lua_Integer)rc);
+        lua_pushinteger(L, (lua_Integer)size);
+        luaL_pushresult(&b);
+        return 3;
+}
+
+
+int xwlua_uart_try_rx(lua_State * L)
+{
+        struct xwlua_uart * luart;
+        xwsz_t size;
+        luaL_Buffer b;
+        xwu8_t * rxb;
+        xwer_t rc;
+
+        luart = (struct xwlua_uart *)luaL_checkudata(L, 1, "xwlua_uart");
+        size = (xwsz_t)luaL_checkinteger(L, 2);
+        luaL_buffinit(L, &b);
+        rxb = (xwu8_t *)luaL_prepbuffsize(&b, size);
+        rc = xwds_dmauartc_try_rx(luart->dmauartc, rxb, &size);
         luaL_addsize(&b, size);
         lua_pushinteger(L, (lua_Integer)rc);
         lua_pushinteger(L, (lua_Integer)size);
@@ -111,26 +110,18 @@ int xwlua_uart_tx(lua_State * L)
         xwsz_t size;
         xwsz_t txdsize;
         const xwu8_t * txd;
-        xwtm_t time;
+        xwtm_t to;
         xwer_t rc;
 
         top = lua_gettop(L);
         luart = (struct xwlua_uart *)luaL_checkudata(L, 1, "xwlua_uart");
         txd = (const xwu8_t *)luaL_checklstring(L, 2, &txdsize);
         if (top >= 3) {
-                size = (xwsz_t)luaL_checkinteger(L, 3);
-                if (size > txdsize) {
-                        size = txdsize;
-                }
+                to = (xwtm_t)luaL_checknumber(L, 3);
         } else {
-                size = txdsize;
+                to = XWTM_MAX;
         }
-        if (top >= 4) {
-                time = (xwtm_t)luaL_checknumber(L, 4);
-        } else {
-                time = XWTM_MAX;
-        }
-        rc = xwds_dmauartc_tx(luart->dmauartc, txd, &size, time);
+        rc = xwds_dmauartc_tx(luart->dmauartc, txd, &size, to);
         lua_pushinteger(L, (lua_Integer)rc);
         lua_pushinteger(L, (lua_Integer)size);
         return 1;
@@ -138,6 +129,7 @@ int xwlua_uart_tx(lua_State * L)
 
 const luaL_Reg xwlua_uart_indexmethod[] = {
         {"rx", xwlua_uart_rx},
+        {"try_rx", xwlua_uart_try_rx},
         {"tx", xwlua_uart_tx},
         {NULL, NULL},
 };

@@ -48,12 +48,12 @@ xwer_t xwmp_rtrq_init(struct xwmp_rtrq * xwrtrq)
  * @param[in] xwrtrq: XWOS MP内核的实时就绪队列
  * @param[in] thd: 线程控制块的指针
  * @retval XWOK: 没有错误
- * @retval -EPERM: 线程没有设置状态标志@ref XWMP_SKDOBJ_DST_READY
+ * @retval -EPERM: 线程没有设置状态标志@ref XWMP_SKDOBJ_ST_READY
  * @note
  * - 当线程加入到就绪队列时，它不应该拥有下面的状态：
- *   XWMP_SKDOBJ_DST_RUNNING | XWMP_SKDOBJ_DST_FROZEN | XWMP_SKDOBJ_DST_STANDBY
+ *   XWMP_SKDOBJ_ST_RUNNING | XWMP_SKDOBJ_ST_FROZEN | XWMP_SKDOBJ_ST_STANDBY
  * - 当线程加入到就绪队列时, 它不应该*同时*拥有下面的状态：
- *   XWMP_SKDOBJ_DST_BLOCKING & XWMP_SKDOBJ_DST_SLEEPING
+ *   XWMP_SKDOBJ_ST_BLOCKING & XWMP_SKDOBJ_ST_SLEEPING
  * - 此函数必须在持有锁xwrtrq->lock时才可调用。
  */
 __xwmp_code
@@ -62,7 +62,7 @@ xwer_t xwmp_rtrq_add_head_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * th
         xwpr_t prio;
         xwer_t rc;
 
-        if (!(XWMP_SKDOBJ_DST_READY & thd->state)) {
+        if (!(XWMP_SKDOBJ_ST_READY & thd->state)) {
                 rc = -EPERM;
         } else {
                 prio = thd->dprio.rq;
@@ -83,12 +83,12 @@ xwer_t xwmp_rtrq_add_head_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * th
  * @param[in] xwrtrq: XWOS MP内核的实时就绪队列
  * @param[in] thd: 线程控制块的指针
  * @retval XWOK: 没有错误
- * @retval -EPERM: 线程没有设置状态标志@ref XWMP_SKDOBJ_DST_READY
+ * @retval -EPERM: 线程没有设置状态标志@ref XWMP_SKDOBJ_ST_READY
  * @note
  * - 当线程加入到就绪队列时，它不应该拥有下面的状态：
- *   XWMP_SKDOBJ_DST_RUNNING | XWMP_SKDOBJ_DST_FROZEN | XWMP_SKDOBJ_DST_STANDBY
+ *   XWMP_SKDOBJ_ST_RUNNING | XWMP_SKDOBJ_ST_FROZEN | XWMP_SKDOBJ_ST_STANDBY
  * - 当线程加入到就绪队列时, 它不应该*同时*拥有下面的状态：
- *   XWMP_SKDOBJ_DST_BLOCKING & XWMP_SKDOBJ_DST_SLEEPING
+ *   XWMP_SKDOBJ_ST_BLOCKING & XWMP_SKDOBJ_ST_SLEEPING
  * - 此函数必须在持有锁xwrtrq->lock时才可调用。
  */
 __xwmp_code
@@ -97,7 +97,7 @@ xwer_t xwmp_rtrq_add_tail_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * th
         xwpr_t prio;
         xwer_t rc;
 
-        if (!(XWMP_SKDOBJ_DST_READY & thd->state)) {
+        if (!(XWMP_SKDOBJ_ST_READY & thd->state)) {
                 rc = -EPERM;
         } else {
                 prio = thd->dprio.rq;
@@ -128,7 +128,7 @@ xwer_t xwmp_rtrq_remove_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * thd)
         xwpr_t prio;
         xwer_t rc;
 
-        if (!(XWMP_SKDOBJ_DST_READY & thd->state)) {
+        if (!(XWMP_SKDOBJ_ST_READY & thd->state)) {
                 rc = -ESRCH;
         } else {
                 prio = thd->dprio.rq;

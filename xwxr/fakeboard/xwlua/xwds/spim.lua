@@ -98,17 +98,17 @@ print(thdsp)
 -- 打包{88, 87, 79, 83}
 txd = string.pack("BBBB", 88, 87, 79, 83)
 -- 发送数据，返回接收到的数据，期望等待时间2s
-rc, size, rxd = spim1:xfer(spi1m, txd, true, #txd, 2000000000)
+rc, size, rxd = spim1:xfer(spi1m, txd, true, #txd, xwtm.ft(xwtm.s(2)))
 
 @usage
 -- 打包{88, 87, 79, 83}
 txd = string.pack("BBBB", 88, 87, 79, 83)
 -- 发送数据，不接收数据，期望等待时间2s
-rc, size = spim1:xfer(spi1m, txd, false, #txd, 2000000000)
+rc, size = spim1:xfer(spi1m, txd, false, #txd, xwtm.ft(xwtm.s(2)))
 
 @usage
 -- 不发送数据，接收数据，接收缓冲区8字节，期望等待时间2s
-rc, size, rxd = spim1:xfer(spi1m, nil, true, 8, 2000000000)
+rc, size, rxd = spim1:xfer(spi1m, nil, true, 8, xwtm.ft(xwtm.s(2)))
 ]]
 function xfer(spim, txd, rx, size, time)
 end

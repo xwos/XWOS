@@ -289,9 +289,6 @@ const xwsq_t xwlua_flg_trigger[] = {
         XWOS_FLG_TRIGGER_TGL_ANY,
 };
 
-#define XWLUA_FLG_OPT_TRY       0
-const char * const xwlua_flg_opt[] = {"t", NULL};
-
 int xwlua_flgsp_wait(lua_State * L)
 {
         xwlua_flg_sp * flgsp;
@@ -301,13 +298,8 @@ int xwlua_flgsp_wait(lua_State * L)
         xwsq_t action;
         xwlua_bmp_t * origin;
         xwlua_bmp_t * msk;
-        xwtm_t to;
-        int top;
-        int opt;
-        int type;
         xwer_t rc;
 
-        top = lua_gettop(L);
         flgsp = (xwlua_flg_sp *)luaL_checkudata(L, 1, "xwlua_flg_sp");
         tgidx = luaL_checkoption(L, 2, NULL, xwlua_flg_trigger_opt);
         trigger = xwlua_flg_trigger[tgidx];
@@ -319,40 +311,63 @@ int xwlua_flgsp_wait(lua_State * L)
         }
         origin = (xwlua_bmp_t *)luaL_checkudata(L, 4, "xwlua_bmp_t");
         msk = (xwlua_bmp_t *)luaL_checkudata(L, 5, "xwlua_bmp_t");
-        if (top >= 6) {
-                type = lua_type(L, 6);
-                switch (type) {
-                case LUA_TNUMBER:
-                        to = (xwtm_t)luaL_checknumber(L, 6);
-                        rc = xwos_flg_wait_to(flgsp->flg, trigger, action,
-                                              origin->bmp, msk->bmp, to);
-                        break;
-                case LUA_TSTRING:
-                        opt = luaL_checkoption(L, 6, "t", xwlua_flg_opt);
-                        switch (opt) {
-                        case XWLUA_FLG_OPT_TRY:
-                                rc = xwos_flg_trywait(flgsp->flg, trigger, action,
-                                                      origin->bmp, msk->bmp);
-                                break;
-                        default:
-                                luaL_error(L, "Invalid arg: %s", lua_tostring(L, 6));
-                                rc = -EINVAL;
-                                break;
-                        }
-                        break;
-                case LUA_TNIL:
-                        rc = xwos_flg_wait(flgsp->flg, trigger, action,
-                                           origin->bmp, msk->bmp);
-                        break;
-                default:
-                        luaL_error(L, "Invalid arg type: %s", lua_typename(L, type));
-                        rc = -EINVAL;
-                        break;
-                }
+        rc = xwos_flg_wait(flgsp->flg, trigger, action, origin->bmp, msk->bmp);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
+}
+
+int xwlua_flgsp_trywait(lua_State * L)
+{
+        xwlua_flg_sp * flgsp;
+        xwsq_t tgidx;
+        xwsq_t trigger;
+        bool consumption;
+        xwsq_t action;
+        xwlua_bmp_t * origin;
+        xwlua_bmp_t * msk;
+        xwer_t rc;
+
+        flgsp = (xwlua_flg_sp *)luaL_checkudata(L, 1, "xwlua_flg_sp");
+        tgidx = luaL_checkoption(L, 2, NULL, xwlua_flg_trigger_opt);
+        trigger = xwlua_flg_trigger[tgidx];
+        consumption = lua_toboolean(L, 3);
+        if (consumption) {
+                action = XWOS_FLG_ACTION_CONSUMPTION;
         } else {
-                rc = xwos_flg_wait(flgsp->flg, trigger, action,
-                                   origin->bmp, msk->bmp);
+                action = XWOS_FLG_ACTION_NONE;
         }
+        origin = (xwlua_bmp_t *)luaL_checkudata(L, 4, "xwlua_bmp_t");
+        msk = (xwlua_bmp_t *)luaL_checkudata(L, 5, "xwlua_bmp_t");
+        rc = xwos_flg_trywait(flgsp->flg, trigger, action, origin->bmp, msk->bmp);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
+}
+
+int xwlua_flgsp_wait_to(lua_State * L)
+{
+        xwlua_flg_sp * flgsp;
+        xwsq_t tgidx;
+        xwsq_t trigger;
+        bool consumption;
+        xwsq_t action;
+        xwlua_bmp_t * origin;
+        xwlua_bmp_t * msk;
+        xwtm_t to;
+        xwer_t rc;
+
+        flgsp = (xwlua_flg_sp *)luaL_checkudata(L, 1, "xwlua_flg_sp");
+        tgidx = luaL_checkoption(L, 2, NULL, xwlua_flg_trigger_opt);
+        trigger = xwlua_flg_trigger[tgidx];
+        consumption = lua_toboolean(L, 3);
+        if (consumption) {
+                action = XWOS_FLG_ACTION_CONSUMPTION;
+        } else {
+                action = XWOS_FLG_ACTION_NONE;
+        }
+        origin = (xwlua_bmp_t *)luaL_checkudata(L, 4, "xwlua_bmp_t");
+        msk = (xwlua_bmp_t *)luaL_checkudata(L, 5, "xwlua_bmp_t");
+        to = (xwtm_t)luaL_checknumber(L, 6);
+        rc = xwos_flg_wait_to(flgsp->flg, trigger, action, origin->bmp, msk->bmp, to);
         lua_pushinteger(L, (lua_Integer)rc);
         return 1;
 }
@@ -371,6 +386,8 @@ const luaL_Reg xwlua_flgsp_indexmethod[] = {
         {"x1i", xwlua_flgsp_x1i},
         {"x1m", xwlua_flgsp_x1m},
         {"wait", xwlua_flgsp_wait},
+        {"trywait", xwlua_flgsp_trywait},
+        {"wait_to", xwlua_flgsp_wait_to},
         {NULL, NULL},
 };
 

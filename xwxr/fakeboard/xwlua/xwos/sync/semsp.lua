@@ -166,7 +166,7 @@ end
 
 
 --[[--------
-发布信号量对象<br>
+发布信号量<br>
 <br>
 
 @tparam userdata semsp (**in**) 信号量对象强指针<br>
@@ -186,17 +186,10 @@ end
 
 
 --[[--------
-等待并获取信号量<br>
+等待并获取信号<br>
 <br>
 
 @tparam userdata semsp (**in**) 信号量对象强指针<br>
-<br>
-
-@tparam string t (**optional**) (**in**)<br>
-..● **"t"** 检查信号量（立即返回，不会等待。）<br>
-<br>
-
-@tparam number time (**optional**) (**in**) 期望的阻塞等待时间<br>
 <br>
 
 @treturn number
@@ -205,8 +198,6 @@ end
   + ○ **-EINVAL** 参数错误
   + ○ **-EINTR** 等待被中断
   + ○ **-ENOTINTHD** 不在线程上下文中
-  + ○ **-ETIMEDOUT** 超时，仅当存在可选参数 **time** 时才会出现此错误值
-  + ○ **-ENODATA** 尝试失败，仅当存在可选参数 **"t"** 时才会出现此错误值
 
 @usage
 sem = xwos.sem.new(0, 0)
@@ -216,10 +207,64 @@ if (rc == 0) then
 else
   -- 错误发生
 end
+]]
+function semsp:wait(semsp)
+end
+
+
+--[[--------
+检查信号量对象<br>
+<br>
+
+若没有检测到信号，立即返回，不会阻塞调用线程。
+
+@tparam userdata semsp (**in**) 信号量对象强指针<br>
+<br>
+
+@treturn number
++ ● **rc** 返回值
+  + ○ **0** 没有错误
+  + ○ **-EINVAL** 参数错误
+  + ○ **-EINTR** 等待被中断
+  + ○ **-ENOTINTHD** 不在线程上下文中
+  + ○ **-ENODATA** 尝试失败
 
 @usage
 sem = xwos.sem.new(0, 0)
-rc = sem:wait(1000000000) -- 最多等待1s
+rc = sem:trywait() -- 最多等待1s
+if (rc == 0) then
+  -- 获取到一个信号
+elseif (rc == -61) then
+  -- 没有检测到信号
+else
+  -- 错误发生
+end
+]]
+function semsp:trywait(semsp)
+end
+
+
+--[[--------
+限时等待并获取信号量<br>
+<br>
+
+@tparam userdata semsp (**in**) 信号量对象强指针<br>
+<br>
+
+@tparam number to (**in**) 期望的阻塞等待时间<br>
+<br>
+
+@treturn number
++ ● **rc** 返回值
+  + ○ **0** 没有错误
+  + ○ **-EINVAL** 参数错误
+  + ○ **-EINTR** 等待被中断
+  + ○ **-ENOTINTHD** 不在线程上下文中
+  + ○ **-ETIMEDOUT** 超时
+
+@usage
+sem = xwos.sem.new(0, 0)
+rc = sem:wait(xwtm.ft(xwtm.s(1))) -- 最多等待1s
 if (rc == 0) then
   -- 获取到一个信号
 elseif (rc == -116) then
@@ -228,5 +273,5 @@ else
   -- 错误发生
 end
 ]]
-function semsp:wait(semsp, t, time)
+function semsp:wait_to(semsp, to)
 end

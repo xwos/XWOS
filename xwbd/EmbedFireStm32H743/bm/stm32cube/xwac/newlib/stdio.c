@@ -25,16 +25,15 @@ extern int errno;
 
 xwssz_t newlibac_fops_read_stdin(int fd, void * buf, size_t cnt)
 {
-        xwtm_t desired;
         xwssz_t rdsz;
         xwsz_t bufsz = cnt;
         xwer_t rc;
 
         XWOS_UNUSED(fd);
         do {
-                desired = 20 * XWTM_MS;
                 cnt = bufsz;
-                rc = xwds_dmauartc_rx(&stm32cube_usart1_cb, buf, &cnt, &desired);
+                rc = xwds_dmauartc_rx(&stm32cube_usart1_cb, buf, &cnt,
+                                      xwtm_ft(20 * XWTM_MS));
                 if (-ETIMEDOUT == rc) {
                         rdsz = (xwssz_t)cnt;
                         errno = 0;
