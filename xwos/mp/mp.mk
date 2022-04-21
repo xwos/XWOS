@@ -45,3 +45,6 @@ XWOS_CSRCS += mp/sync/cond.c
 ifeq ($(XWMPCFG_SYNC_EVT),y)
     XWOS_CSRCS += mp/sync/evt.c
 endif
+
+######## ######## ######## ######## osdl ######## ######## ######## ########
+XWOS_CSRCS += mp/osdl/thd.c

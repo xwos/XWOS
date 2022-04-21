@@ -59,7 +59,8 @@ enum xwup_skdobj_state_em {
         XWUP_SKDOBJ_ST_FROZEN = (1U << 6U), /**< 已经被冻结 */
         XWUP_SKDOBJ_ST_EXITING = (1U << 7U), /**< 正在退出 */
         XWUP_SKDOBJ_ST_RESERVED8 = (1U << 8U), /**< 保留位8 */
-        XWUP_SKDOBJ_ST_DETACHED = (1U << 9U), /**< 分离态 */
+        XWUP_SKDOBJ_ST_DETACHED = (1U << 9U), /**< 已分离 */
+        XWUP_SKDOBJ_ST_JOINED = (1U << 10U), /**< 已连接 */
         XWUP_SKDOBJ_ST_UNINTERRUPTED = (1U << 15U), /**< 阻塞态不可中断 */
 };
 

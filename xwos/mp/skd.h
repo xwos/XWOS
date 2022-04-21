@@ -61,7 +61,8 @@ enum xwmp_skdobj_state_em {
         XWMP_SKDOBJ_ST_FROZEN = (1U << 6U), /**< 已经被冻结 */
         XWMP_SKDOBJ_ST_EXITING = (1U << 7U), /**< 正在退出 */
         XWMP_SKDOBJ_ST_MIGRATING = (1U << 8U), /**< 正在迁移 */
-        XWMP_SKDOBJ_ST_DETACHED = (1U << 9U), /**< 分离 */
+        XWMP_SKDOBJ_ST_DETACHED = (1U << 9U), /**< 已分离 */
+        XWMP_SKDOBJ_ST_JOINED = (1U << 10U), /**< 已连接 */
         XWMP_SKDOBJ_ST_UNINTERRUPTED = (1U << 15U), /**< 阻塞态不可中断 */
 };
 

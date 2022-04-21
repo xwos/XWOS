@@ -14,6 +14,7 @@
 #define __xwos_osal_thd_h__
 
 #include <xwos/standard.h>
+#include <xwos/osal/jack/thd.h>
 #include <xwos/osal/time.h>
 #include <xwos/osal/skd.h>
 
@@ -316,6 +317,37 @@ xwer_t xwos_thd_quit(struct xwos_thd * thd)
 }
 
 /**
+ * @brief XWOS API：等待线程结束，回收线程内存资源，抛出它的返回值
+ * @param[in] thd: 线程对象的指针
+ * @param[out] trc: 指向缓冲区的指针，通过此缓冲区返回线程的返回值，可为NULL，表示不需要获取返回值
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EOBJDEAD: 线程对象无效
+ * @retval -EINVAL: 线程不是Joinable的
+ * @retval -EPERM; 不允许线程join自己
+ * @retval -EALREADY: 线程已被连接
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：不可重入
+ * @details
+ * 此函数```xwos_thd_join()```类似于POSIX线程库的```pthread_join()```函数，用于等待另一个线程退出。
+ *
+ * 线程A调用此函数时，会阻塞等待线程B退出。线程B退出后，此函数会释放线程B的内存资源，
+ * 并通过```trc```将线程B的返回值返回给线程A。
+ *
+ * 此函数只能对Joinable的线程B使用。
+ *
+ * 不允许多个线程对同一个线程进行 ```xwos_thd_join()``` 或 ```xwos_thd_stop()``` ，此函数检测到
+ * 此错误时会返回 ```-EALREADY``` 。
+ */
+static __xwos_inline_api
+xwer_t xwos_thd_join(struct xwos_thd * thd, xwer_t * trc)
+{
+        return xwosdl_thd_join(&thd->osthd, trc);
+}
+
+/**
  * @brief XWOS API：终止线程并等待它退出，回收线程内存资源，并抛出线程的返回值
  * @param[in] thd: 线程对象的指针
  * @param[out] trc: 指向缓冲区的指针，通过此缓冲区返回线程的返回值，可为NULL，表示不需要获取返回值
@@ -323,6 +355,8 @@ xwer_t xwos_thd_quit(struct xwos_thd * thd)
  * @retval XWOK: 没有错误
  * @retval -EOBJDEAD: 线程对象无效
  * @retval -EINVAL: 线程不是Joinable的
+ * @retval -EPERM; 不允许线程stop自己
+ * @retval -EALREADY: 线程已连接
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -337,6 +371,9 @@ xwer_t xwos_thd_quit(struct xwos_thd * thd)
  * 当线程B退出后，此函数会释放线程B的内存资源，然后通过```trc```将线程B的返回值返回给线程A。
  *
  * 此函数等价于```xwos_thd_quit() + xwos_thd_join()```的组合。
+ *
+ * 不允许多个线程对同一个线程进行 ```xwos_thd_join()``` 或 ```xwos_thd_stop()``` ，此函数检测到
+ * 此错误时会返回 ```-EALREADY``` 。
  */
 static __xwos_inline_api
 xwer_t xwos_thd_stop(struct xwos_thd * thd, xwer_t * trc)
@@ -345,36 +382,11 @@ xwer_t xwos_thd_stop(struct xwos_thd * thd, xwer_t * trc)
 }
 
 /**
- * @brief XWOS API：等待线程结束，回收线程内存资源，抛出它的返回值
- * @param[in] thd: 线程对象的指针
- * @param[out] trc: 指向缓冲区的指针，通过此缓冲区返回线程的返回值，可为NULL，表示不需要获取返回值
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EOBJDEAD: 线程对象无效
- * @retval -EINVAL: 线程不是Joinable的
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- * @details
- * 此函数```xwos_thd_join()```类似于POSIX线程库的```pthread_join()```函数，用于等待另一个线程退出。
- *
- * 线程A调用此函数时，会阻塞等待线程B退出。线程B退出后，此函数会释放线程B的内存资源，
- * 并通过```trc```将线程B的返回值返回给线程A。
- *
- * 此函数只能对Joinable的线程B使用。
- */
-static __xwos_inline_api
-xwer_t xwos_thd_join(struct xwos_thd * thd, xwer_t * trc)
-{
-        return xwosdl_thd_join(&thd->osthd, trc);
-}
-
-/**
  * @brief XWMP API：分离线程
  * @param[in] thd: 线程对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -EINVAL: 线程已经被连接
  * @retval -EOBJDEAD: 线程对象无效
  * @note
  * - 同步/异步：同步
@@ -535,7 +547,7 @@ bool xwos_cthd_frz_shld_stop(bool * frozen)
 
 /**
  * @brief XWOS API：当前线程睡眠一段时间
- * @param[in] xwtm: 期望睡眠的时间
+ * @param[in] dur: 期望睡眠的时间
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINTR: 睡眠过程被中断
@@ -545,12 +557,12 @@ bool xwos_cthd_frz_shld_stop(bool * frozen)
  * - 上下文：线程
  * - 重入性：可重入
  * @details
- * 调用此函数的线程会睡眠 ```xwtm``` ，也即是线程会在 ```但前时间点 + xwtm``` 时被唤醒。
+ * 调用此函数的线程会睡眠 ```dur``` ，也即是线程会在 ```但前时间点 + dur``` 时被唤醒。
  */
 static __xwos_inline_api
-xwer_t xwos_cthd_sleep(xwtm_t xwtm)
+xwer_t xwos_cthd_sleep(xwtm_t dur)
 {
-        return xwosdl_cthd_sleep_to(xwtm_ft(xwtm));
+        return xwosdl_cthd_sleep_to(xwtm_ft(dur));
 }
 
 /**
@@ -576,10 +588,10 @@ xwer_t xwos_cthd_sleep_to(xwtm_t to)
 
 /**
  * @brief XWOS API：当前线程从一个时间起点睡眠到另一个时间点
- * @param[in,out] origin: 指向缓冲区的指针，此缓冲区：
+ * @param[in,out] from: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，作为时间起点
  * + (O) 作为输出时，返回线程被唤醒的时间（可作为下一次时间起点，形成精确的周期）
- * @param[in] inc: 期望被唤醒的时间增量（相对于时间原点）
+ * @param[in] dur: 期望被唤醒的时间增量（相对于时间原点）
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINTR: 睡眠过程被中断
@@ -588,16 +600,16 @@ xwer_t xwos_cthd_sleep_to(xwtm_t to)
  * - 上下文：线程
  * - 重入性：可重入
  * @details
- * 调用此函数前，需要先确定一个时间起点，可以通过 `xwtm_now()` 获取当前的系统滴答时间作为起点。
- * 通过指针 ```origin``` 将时间起点的地址传递给函数， ```inc``` 表示唤醒时间为 ```*origin + inc```。
+ * 调用此函数前，需要先确定一个时间起点，可以通过 `xwtm_now()` 获取当前的系统时间作为起点。
+ * 通过指针 ```from``` 将时间起点的地址传递给函数， ```dur``` 表示唤醒时间为 ```*from + dur```。
  *
- * 当线程被唤醒时，```*origin + inc```会覆盖到指针```origin```指向的地址中，此时```*origin```又可作为下次调用此函数的时间起点。
- * 由此周而复始，可以形成周期为```inc```，相对于 `xwos_thd_sleep()` 更为精确的周期性睡眠唤醒。
+ * 当线程被唤醒时，```*from + dur```会覆盖到指针```from```指向的地址中，此时```*from```又可作为下次调用此函数的时间起点。
+ * 由此周而复始，可以形成周期为```dur```，相对于 `xwos_thd_sleep()` 更为精确的周期性睡眠唤醒。
  */
 static __xwos_inline_api
-xwer_t xwos_cthd_sleep_from(xwtm_t * origin, xwtm_t inc)
+xwer_t xwos_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
 {
-        return xwosdl_cthd_sleep_from(origin, inc);
+        return xwosdl_cthd_sleep_from(from, dur);
 }
 
 /**
@@ -618,7 +630,7 @@ xwer_t xwos_cthd_sleep_from(xwtm_t * origin, xwtm_t inc)
  * 此函数```xwos_cthd_freeze()```由线程自己调用，并冻结自身。
  * 但线程并不能随时冻结自身，必须满足下列条件之一：
  *
- * - 系统已经开始准备进入低功耗了（调用了函数```xwos_pm_suspend()```）;
+ * - 系统已经开始准备进入低功耗（调用了函数```xwos_pm_suspend()```）;
  * - 线程正准备开始迁移（调用了函数```xwos_thd_migrate()```）。
  *
  * 可以通过```xwos_cthd_shld_frz()```来判断是否可以冻结。

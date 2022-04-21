@@ -99,3 +99,6 @@ endif
 ifeq ($(XWUPCFG_SYNC_EVT),y)
     XWOS_CSRCS += up/sync/evt.c
 endif
+
+######## ######## ######## ######## osdl ######## ######## ######## ########
+XWOS_CSRCS += up/osdl/thd.c

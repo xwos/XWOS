@@ -43,7 +43,7 @@ xwtm_t xwtm_now()
 }
 
 /**
- * @brief XWOS API：获取当前CPU的未来系统时间点
+ * @brief XWOS API：获取当前CPU的未来**系统时间**点
  * @param[in] xwtm: 从现在开始到未来的时间
  * @return 未来时间点
  * @note
@@ -64,7 +64,7 @@ xwtm_t xwtm_ft(xwtm_t xwtm)
 }
 
 /**
- * @brief XWOS API：获取当前CPU的系统时间戳
+ * @brief XWOS API：获取当前CPU的**系统时间戳**
  * @return 当前系统时间戳
  * @note
  * - 同步/异步：同步
@@ -86,7 +86,7 @@ xwtm_t xwtm_nowts()
 }
 
 /**
- * @brief XWOS API：获取当前CPU的未来系统时间戳
+ * @brief XWOS API：获取当前CPU的未来**系统时间戳**
  * @param[in] xwtm: 从现在开始到未来的时间
  * @return 未来时间
  * @note
