@@ -27,14 +27,6 @@
 #  endif
 #endif
 
-#if defined(XWUPCFG_SYNC_COND) && (1 == XWUPCFG_SYNC_COND)
-#  define XWUPRULE_SKD_THD_DO_LOCK              1
-#  define XWUPRULE_SKD_THD_DO_UNLOCK            1
-#else
-#  define XWUPRULE_SKD_THD_DO_LOCK              0
-#  define XWUPRULE_SKD_THD_DO_UNLOCK            0
-#endif
-
 #if (defined(XWUPCFG_SYNC_PLSEM) && (1 == XWUPCFG_SYNC_PLSEM))
 #  define XWUPRULE_SKD_WQ_PL                    1
 #elif (defined(XWUPCFG_SYNC_COND) && (1 == XWUPCFG_SYNC_COND))

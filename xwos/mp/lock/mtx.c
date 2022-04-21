@@ -589,8 +589,7 @@ xwer_t xwmp_mtx_trylock(struct xwmp_mtx * mtx)
         xwer_t rc;
 
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)),
-                      "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
 
         rc = xwmp_mtx_grab(mtx);
         if (__xwcc_unlikely(rc < 0)) {

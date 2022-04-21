@@ -81,8 +81,8 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
         xwpcp->hwifcb = NULL;
         xwpcp->name = name;
         xwpcp->hwifops = hwifops;
-        xwpcp->txthd = NULL;
-        xwpcp->rxthd = NULL;
+        xwpcp->txthd = XWOS_THD_NILD;
+        xwpcp->rxthd = XWOS_THD_NILD;
         xwpcp->mempool = NULL;
         xwos_object_activate(&xwpcp->xwobj, xwpcp_gc);
 
@@ -181,7 +181,7 @@ xwer_t xwpcp_start(struct xwpcp * xwpcp, const char * name,
 err_txthd_create:
         xwos_thd_detach(xwpcp->rxthd);
         xwos_thd_quit(xwpcp->rxthd);
-        xwpcp->rxthd = NULL;
+        xwpcp->rxthd = XWOS_THD_NILD;
 err_rxthd_create:
         xwpcp_hwifal_close(xwpcp);
 err_hwifal_open:
@@ -234,18 +234,18 @@ xwer_t xwpcp_gc(void * obj)
         xwssq_t j;
 
         xwpcp = obj;
-        if (xwpcp->txthd) {
+        if (xwpcp->txthd.thd) {
                 rc = xwos_thd_stop(xwpcp->txthd, &childrc);
                 if (XWOK == rc) {
-                        xwpcp->txthd = NULL;
+                        xwpcp->txthd = XWOS_THD_NILD;
                         xwpcplogf(INFO, "Stop XWPCP TX thread... [OK]\n");
                 }
         }
 
-        if (xwpcp->rxthd) {
+        if (xwpcp->rxthd.thd) {
                 rc = xwos_thd_stop(xwpcp->rxthd, &childrc);
                 if (XWOK == rc) {
-                        xwpcp->rxthd = NULL;
+                        xwpcp->rxthd = XWOS_THD_NILD;
                         xwpcplogf(INFO, "Stop XWPCP RX thread... [OK]\n");
                 }
         }

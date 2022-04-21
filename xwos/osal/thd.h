@@ -33,10 +33,8 @@ struct xwos_thd {
 
 /**
  * @brief XWOS API：线程函数指针类型
- * @note
- * + typedef xwer_t (* xwos_thd_f)(void *);
  */
-typedef xwosdl_thd_f xwos_thd_f;
+typedef xwer_t (* xwos_thd_f)(void *);
 
 /**
  * @brief XWOS API：线程对象描述符
@@ -127,7 +125,8 @@ void xwos_thd_attr_init(struct xwos_thd_attr * attr)
 
 /**
  * @brief XWOS API：静态方式初始化线程
- * @param[in] thd: 线程对象的指针
+ * @param[in] thd: 指向构造线程对象内存的指针
+ * @param[out] thdd: 指向缓冲区的指针，通过此缓冲区返回线程对象描述符
  * @param[in] attr: 线程属性
  * @param[in] mainfunc: 线程函数的指针
  * @param[in] arg: 线程函数的参数
@@ -150,18 +149,18 @@ void xwos_thd_attr_init(struct xwos_thd_attr * attr)
  * 因此在定义栈数组时需要使用```__xwcc_aligned(8)```来修饰。
  */
 static __xwos_inline_api
-xwer_t xwos_thd_init(struct xwos_thd * thd,
+xwer_t xwos_thd_init(struct xwos_thd * thd, xwos_thd_d * thdd,
                      const struct xwos_thd_attr * attr,
                      xwos_thd_f mainfunc, void * arg)
 {
-        return xwosdl_thd_init(&thd->osthd,
+        return xwosdl_thd_init(&thd->osthd, (xwosdl_thd_d *)thdd,
                                (const struct xwosdl_thd_attr *)attr,
                                (xwosdl_thd_f)mainfunc, arg);
 }
 
 /**
  * @brief XWOS API：使用动态申请内存方式创建线程并初始化
- * @param[out] thdbuf: 指向缓冲区的指针，通过此缓冲区返回线程对象的指针
+ * @param[out] thdd: 指向缓冲区的指针，通过此缓冲区返回线程对象描述符
  * @param[in] attr: 线程属性
  * @param[in] mainfunc: 线程函数的指针
  * @param[in] arg: 线程函数的参数
@@ -177,52 +176,18 @@ xwer_t xwos_thd_init(struct xwos_thd * thd,
  * 因此在定义栈数组时需要使用```__xwcc_aligned(8)```来修饰。
  */
 static __xwos_inline_api
-xwer_t xwos_thd_create(struct xwos_thd ** thdbuf,
+xwer_t xwos_thd_create(xwos_thd_d * thdd,
                        const struct xwos_thd_attr * attr,
                        xwos_thd_f mainfunc, void * arg)
 {
-        return xwosdl_thd_create((struct xwosdl_thd **)thdbuf,
+        return xwosdl_thd_create((xwosdl_thd_d *)thdd,
                                  (const struct xwosdl_thd_attr *)attr,
                                  (xwosdl_thd_f)mainfunc, arg);
 }
 
 /**
- * @brief XWOS API：获取线程对象的标签
- * @param[in] thd: 线程对象的指针
- * @return 线程对象的标签
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwsq_t xwos_thd_gettik(struct xwos_thd * thd)
-{
-        return xwosdl_thd_gettik(&thd->osthd);
-}
-
-/**
- * @brief XWOS API：获取线程对象的描述符
- * @param[in] thd: 线程对象的指针
- * @return 线程对象的描述符
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwos_thd_d xwos_thd_getd(struct xwos_thd * thd)
-{
-        xwos_thd_d thdd;
-
-        thdd.thd = thd;
-        thdd.tik = xwosdl_thd_gettik(&thd->osthd);
-        return thdd;
-}
-
-/**
  * @brief XWOS API：检查线程对象的标签并增加引用计数
- * @param[in] thdd: 线程对象的描述符
+ * @param[in] thdd: 线程对象描述符
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 线程对象无效
@@ -240,7 +205,7 @@ xwer_t xwos_thd_acquire(xwos_thd_d thdd)
 
 /**
  * @brief XWOS API：检查对象的标签并减少引用计数
- * @param[in] thdd: 线程对象的描述符
+ * @param[in] thdd: 线程对象描述符
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 线程对象无效
@@ -258,7 +223,7 @@ xwer_t xwos_thd_release(xwos_thd_d thdd)
 
 /**
  * @brief XWOS API：增加线程对象的引用计数
- * @param[in] thd: 线程对象指针
+ * @param[in] thdd: 线程对象描述符
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 线程对象无效
@@ -268,14 +233,14 @@ xwer_t xwos_thd_release(xwos_thd_d thdd)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_thd_grab(struct xwos_thd * thd)
+xwer_t xwos_thd_grab(xwos_thd_d thdd)
 {
-        return xwosdl_thd_grab(&thd->osthd);
+        return xwosdl_thd_grab(&thdd.thd->osthd);
 }
 
 /**
  * @brief XWOS API：减少线程对象的引用计数
- * @param[in] thd: 线程对象指针
+ * @param[in] thdd: 线程对象描述符
  * @return 错误码
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 线程对象无效
@@ -285,14 +250,14 @@ xwer_t xwos_thd_grab(struct xwos_thd * thd)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_thd_put(struct xwos_thd * thd)
+xwer_t xwos_thd_put(xwos_thd_d thdd)
 {
-        return xwosdl_thd_put(&thd->osthd);
+        return xwosdl_thd_put(&thdd.thd->osthd);
 }
 
 /**
  * @brief XWOS API：通知线程退出
- * @param[in] thd: 线程对象的指针
+ * @param[in] thdd: 线程对象描述符
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EOBJDEAD: 线程对象无效
@@ -307,18 +272,18 @@ xwer_t xwos_thd_put(struct xwos_thd * thd)
  *
  * 此函数可被重复调用，线程B的<b>退出</b>状态一旦被设置，不可被清除。
  *
- * 在XWOS-V2.0以前，此函数被命名为```xwos_thd_cancel()```，其名称类似于```pthread_cacnel()```，
+ * 在XWOS-V2.0以前，此函数被命名为```xwos_thd_cancel()```，名称类似于```pthread_cacnel()```，
  * 但功能差异较大。为避免迷惑，将其改名为```xwos_thd_quit()```。
  */
 static __xwos_inline_api
-xwer_t xwos_thd_quit(struct xwos_thd * thd)
+xwer_t xwos_thd_quit(xwos_thd_d thdd)
 {
-        return xwosdl_thd_quit(&thd->osthd);
+        return xwosdl_thd_quit(&thdd.thd->osthd, thdd.tik);
 }
 
 /**
  * @brief XWOS API：等待线程结束，回收线程内存资源，抛出它的返回值
- * @param[in] thd: 线程对象的指针
+ * @param[in] thdd: 线程对象描述符
  * @param[out] trc: 指向缓冲区的指针，通过此缓冲区返回线程的返回值，可为NULL，表示不需要获取返回值
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -342,14 +307,14 @@ xwer_t xwos_thd_quit(struct xwos_thd * thd)
  * 此错误时会返回 ```-EALREADY``` 。
  */
 static __xwos_inline_api
-xwer_t xwos_thd_join(struct xwos_thd * thd, xwer_t * trc)
+xwer_t xwos_thd_join(xwos_thd_d thdd, xwer_t * trc)
 {
-        return xwosdl_thd_join(&thd->osthd, trc);
+        return xwosdl_thd_join(&thdd.thd->osthd, thdd.tik, trc);
 }
 
 /**
  * @brief XWOS API：终止线程并等待它退出，回收线程内存资源，并抛出线程的返回值
- * @param[in] thd: 线程对象的指针
+ * @param[in] thdd: 线程对象描述符
  * @param[out] trc: 指向缓冲区的指针，通过此缓冲区返回线程的返回值，可为NULL，表示不需要获取返回值
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -376,14 +341,14 @@ xwer_t xwos_thd_join(struct xwos_thd * thd, xwer_t * trc)
  * 此错误时会返回 ```-EALREADY``` 。
  */
 static __xwos_inline_api
-xwer_t xwos_thd_stop(struct xwos_thd * thd, xwer_t * trc)
+xwer_t xwos_thd_stop(xwos_thd_d thdd, xwer_t * trc)
 {
-        return xwosdl_thd_stop(&thd->osthd, trc);
+        return xwosdl_thd_stop(&thdd.thd->osthd, thdd.tik, trc);
 }
 
 /**
  * @brief XWMP API：分离线程
- * @param[in] thd: 线程对象的指针
+ * @param[in] thdd: 线程对象描述符
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 线程已经被连接
@@ -398,14 +363,14 @@ xwer_t xwos_thd_stop(struct xwos_thd * thd, xwer_t * trc)
  * 不需要另一个线程调用```xwos_thd_join()```来回收其内存资源。
  */
 static __xwos_inline_api
-xwer_t xwos_thd_detach(struct xwos_thd * thd)
+xwer_t xwos_thd_detach(xwos_thd_d thdd)
 {
-        return xwosdl_thd_detach(&thd->osthd);
+        return xwosdl_thd_detach(&thdd.thd->osthd, thdd.tik);
 }
 
 /**
  * @brief XWOS API：将线程迁移到目标CPU
- * @param[in] thd: 线程对象的指针
+ * @param[in] thdd: 线程对象描述符
  * @param[in] dstcpu: 目标CPU的ID
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -416,27 +381,30 @@ xwer_t xwos_thd_detach(struct xwos_thd * thd)
  * - 上下文：中断、中断底半部、线程
  * - 重入性：不可重入
  * @details
- * 此函数```xwos_thd_migrate()```用于将线程```thd```迁移到另一个CPU```dstcpu```上。
+ * 此函数```xwos_thd_migrate()```用于将线程```thdd.thd```迁移到另一个CPU```dstcpu```上。
  * 此函数只会发起一个申请就返回，不会等待迁移过程完成。线程的迁移由内核在恰当的时机完成。
  */
 static __xwos_inline_api
-xwer_t xwos_thd_migrate(struct xwos_thd * thd, xwid_t dstcpu)
+xwer_t xwos_thd_migrate(xwos_thd_d thdd, xwid_t dstcpu)
 {
-        return xwosdl_thd_migrate(&thd->osthd, dstcpu);
+        return xwosdl_thd_migrate(&thdd.thd->osthd, thdd.tik, dstcpu);
 }
 
 /**
- * @brief XWOS API：获取当前线程的对象指针
- * @return 线程对象指针
+ * @brief XWOS API：获取当前线程的对象描述符
+ * @return 线程对象描述符
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
  */
 static __xwos_inline_api
-struct xwos_thd * xwos_cthd_self(void)
+xwos_thd_d xwos_cthd_self(void)
 {
-        return (struct xwos_thd *)xwosdl_cthd_self();
+        xwosdl_thd_d thdd;
+
+        thdd = xwosdl_cthd_self();
+        return (xwos_thd_d){(struct xwos_thd *)thdd.thd, thdd.tik};
 }
 
 /**
@@ -645,7 +613,7 @@ xwer_t xwos_cthd_freeze(void)
 #if (XWOS_THD_LOCAL_DATA_NUM > 0U)
 /**
  * @brief XWOS API：设置线程的本地数据指针
- * @param[in] thd: 线程对象的指针
+ * @param[in] thdd: 线程对象描述符
  * @param[in] pos: 数据存放位置的索引
  * @param[in] data: 数据指针
  * @return 错误码
@@ -658,14 +626,14 @@ xwer_t xwos_cthd_freeze(void)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_thd_set_data(struct xwos_thd * thd, xwsq_t pos, void * data)
+xwer_t xwos_thd_set_data(xwos_thd_d thdd, xwsq_t pos, void * data)
 {
-        return xwosdl_thd_set_data(&thd->osthd, pos, data);
+        return xwosdl_thd_set_data(&thdd.thd->osthd, thdd.tik, pos, data);
 }
 
 /**
  * @brief XWOS API：获取线程的本地数据指针
- * @param[in] thd: 线程对象的指针
+ * @param[in] thdd: 线程对象描述符
  * @param[in] pos: 数据存放位置的索引
  * @param[out] databuf: 指向缓冲区的指针，通过此缓冲区返回数据指针
  * @return 错误码
@@ -678,9 +646,9 @@ xwer_t xwos_thd_set_data(struct xwos_thd * thd, xwsq_t pos, void * data)
  * - 重入性：可重入
  */
 static __xwos_inline_api
-xwer_t xwos_thd_get_data(struct xwos_thd * thd, xwsq_t pos, void ** databuf)
+xwer_t xwos_thd_get_data(xwos_thd_d thdd, xwsq_t pos, void ** databuf)
 {
-        return xwosdl_thd_get_data(&thd->osthd, pos, databuf);
+        return xwosdl_thd_get_data(&thdd.thd->osthd, thdd.tik, pos, databuf);
 }
 
 /**

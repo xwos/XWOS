@@ -14,11 +14,67 @@
 #include <xwos/up/osdl/thd.h>
 
 __xwup_code
-xwer_t xwosdl_thd_stop(struct xwosdl_thd * thd, xwer_t * trc)
+xwer_t xwosdl_thd_init(struct xwosdl_thd * thd, xwosdl_thd_d * thdd,
+                       const struct xwosdl_thd_attr * inattr,
+                       xwosdl_thd_f mainfunc, void * arg)
 {
         xwer_t rc;
+
+        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
+        XWOS_VALIDATE((NULL != thdd), "nullptr", -EFAULT);
+        XWOS_VALIDATE((NULL != inattr), "nullptr", -EFAULT);
+        XWOS_VALIDATE((NULL != inattr->stack), "nullptr", -EFAULT);
+        XWOS_VALIDATE((mainfunc), "nullptr", -EFAULT);
+
+        rc = xwup_thd_init(thd, inattr, mainfunc, arg);
+        if (XWOK == rc) {
+                thdd->thd = thd;
+                thdd->tik = 0;
+        } else {
+                *thdd = XWOSDL_THD_NILD;
+        }
+        return rc;
+}
+
+__xwup_code
+xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd,
+                         const struct xwosdl_thd_attr * attr,
+                         xwosdl_thd_f mainfunc, void * arg)
+{
+        xwer_t rc;
+        struct xwosdl_thd * thd;
+
+        XWOS_VALIDATE((thdd), "nullptr", -EFAULT);
+        XWOS_VALIDATE((mainfunc), "nullptr", -EFAULT);
+
+        rc = xwup_thd_create(&thd, attr, mainfunc, arg);
+        if (XWOK == rc) {
+                thdd->thd = thd;
+                thdd->tik = 0;
+        } else {
+                *thdd = XWOSDL_THD_NILD;
+        }
+        return rc;
+}
+
+__xwup_code
+xwer_t xwosdl_thd_stop(struct xwosdl_thd * thd, xwsq_t tik, xwer_t * trc)
+{
+        xwer_t rc;
+
+        XWOS_VALIDATE((NULL != thd), "nild", -EBADOBJD);
+        XWOS_UNUSED(tik);
 
         xwup_thd_quit(thd);
         rc = xwup_thd_join(thd, trc);
         return rc;
+}
+
+xwosdl_thd_d xwosdl_cthd_self(void)
+{
+        xwosdl_thd_d thdd;
+
+        thdd.thd = xwup_skd_get_cthd_lc();
+        thdd.tik = 0;
+        return thdd;
 }

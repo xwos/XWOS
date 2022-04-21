@@ -34,7 +34,7 @@
 void xwsqlkdemo_swt_callback(struct xwos_swt * swt, void * arg);
 xwer_t xwsqlkdemo_thd_func(void * arg);
 
-struct xwos_thd * xwsqlkdemo_thd;
+xwos_thd_d xwsqlkdemo_thd;
 struct xwos_swt xwsqlkdemo_swt;
 struct xwos_sqlk xwsqlkdemo_lock;
 xwsq_t xwsqlkdemo_shared_count = 0;

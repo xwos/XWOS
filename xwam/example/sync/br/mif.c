@@ -97,7 +97,7 @@ const struct xwos_thd_desc xwbrdemo_thd_desc[] = {
                 .arg = (void *)4,
         },
 };
-struct xwos_thd * xwbrdemo_thd[xw_array_size(xwbrdemo_thd_desc)];
+xwos_thd_d xwbrdemo_thd[xw_array_size(xwbrdemo_thd_desc)];
 
 /**
  * @brief 静态初始化线程栅栏所需要的位图数组缓冲区

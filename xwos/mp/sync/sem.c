@@ -839,18 +839,6 @@ xwer_t xwmp_plsem_test(struct xwmp_sem * sem, struct xwmp_skd * xwskd,
         return rc;
 }
 
-/* __xwmp_api */
-/* xwer_t xwmp_plsem_timedwait(struct xwmp_sem * sem, xwtm_t xwtm) */
-/* { */
-/*         xwtm_t from, ro; */
-/*         xwer_t rc; */
-
-/*         from = xwmp_syshwt_get_timetick(hwt); */
-/*         to = xwtm_add_safely(from, xwtm); */
-/*         rc = xwmp_plsem_wait_to(sem, to); */
-/*         return rc; */
-/* } */
-
 __xwmp_api
 xwer_t xwmp_plsem_wait_to(struct xwmp_sem * sem, xwtm_t to)
 {
@@ -1422,18 +1410,6 @@ xwer_t xwmp_rtsem_test(struct xwmp_sem * sem, struct xwmp_skd * xwskd,
 
         return rc;
 }
-
-/* __xwmp_api */
-/* xwer_t xwmp_rtsem_timedwait(struct xwmp_sem * sem, xwtm_t xwtm) */
-/* { */
-/*         xwtm_t from, ro; */
-/*         xwer_t rc; */
-
-/*         from = xwmp_syshwt_get_timetick(hwt); */
-/*         to = xwtm_add_safely(from, xwtm); */
-/*         rc = xwmp_rtsem_wait_to(sem, to); */
-/*         return rc; */
-/* } */
 
 __xwmp_api
 xwer_t xwmp_rtsem_wait_to(struct xwmp_sem * sem, xwtm_t to)

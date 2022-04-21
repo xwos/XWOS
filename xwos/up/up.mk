@@ -14,14 +14,6 @@ XWOS_EOBJS :=
 ######## ######## ######## ######## ******** ######## ######## ######## ########
 ######## ######## ######## ########   rules  ######## ######## ######## ########
 ######## ######## ######## ######## ******** ######## ######## ######## ########
-ifeq ($(XWUPCFG_SYNC_COND),y)
-    XWUPRULE_SKD_THD_DO_LOCK := y
-    XWUPRULE_SKD_THD_DO_UNLOCK := y
-else
-    XWUPRULE_SKD_THD_DO_LOCK := n
-    XWUPRULE_SKD_THD_DO_UNLOCK := n
-endif
-
 ifeq ($(XWUPCFG_SYNC_PLSEM),y)
     XWUPRULE_SKD_WQ_PL := y
 else

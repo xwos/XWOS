@@ -88,7 +88,7 @@ const struct xwos_thd_desc bmbtn_thd_desc = {
         .func = bmbtn_task,
         .arg = NULL,
 };
-struct xwos_thd * bmbtn_thd;
+xwos_thd_d bmbtn_thd;
 
 struct xwos_sem bmbtn_sem;
 

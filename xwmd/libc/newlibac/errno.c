@@ -20,6 +20,6 @@ void newlibac_errno_init(void)
 
 int * __errno()
 {
-        struct xwos_thd * thd = xwos_cthd_self();
-        return &thd->osthd.newlib.__errno;
+        xwos_thd_d thdd = xwos_cthd_self();
+        return &thdd.thd->osthd.newlib.__errno;
 }

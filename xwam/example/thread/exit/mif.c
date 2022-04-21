@@ -65,7 +65,7 @@ const struct xwos_thd_desc xwexitdemo_detached_thd_desc[] = {
                 .arg = NULL,
         },
 };
-struct xwos_thd * xwexitdemo_detached_thd[xw_array_size(xwexitdemo_detached_thd_desc)];
+xwos_thd_d xwexitdemo_detached_thd[xw_array_size(xwexitdemo_detached_thd_desc)];
 
 /**
  * @brief Joinable线程描述表
@@ -111,9 +111,9 @@ const struct xwos_thd_desc xwexitdemo_joinable_thd_desc[] = {
                 .arg = NULL,
         },
 };
-struct xwos_thd * xwexitdemo_parent_thd;
-struct xwos_thd * xwexitdemo_child0_thd;
-struct xwos_thd * xwexitdemo_child1_thd;
+xwos_thd_d xwexitdemo_parent_thd;
+xwos_thd_d xwexitdemo_child0_thd;
+xwos_thd_d xwexitdemo_child1_thd;
 
 /**
  * @brief 模块的加载函数

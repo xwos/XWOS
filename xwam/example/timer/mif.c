@@ -33,7 +33,7 @@
 #define XWSWTDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 xwer_t xwswtdemo_thd_func(void * arg);
 
-struct xwos_thd * xwswtdemo_thd;
+xwos_thd_d xwswtdemo_thd;
 struct xwos_swt xwswtdemo_swt0;
 struct xwos_swt * xwswtdemo_swt1;
 

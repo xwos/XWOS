@@ -26,7 +26,7 @@
 
 extern xwer_t cxx_thd_main(void * arg);
 
-struct xwos_thd * cxx_thd;
+xwos_thd_d cxx_thd;
 
 xwer_t example_cxx_start(void)
 {

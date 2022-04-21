@@ -57,7 +57,7 @@ const struct xwos_thd_desc xwflgdemo_consumer_thd_desc = {
         .func = (xwos_thd_f)xwflgdemo_consumer_func,
         .arg = NULL,
 };
-struct xwos_thd * xwflgdemo_consumer;
+xwos_thd_d xwflgdemo_consumer;
 
 /**
  * @brief 生产线程
@@ -75,7 +75,7 @@ const struct xwos_thd_desc xwflgdemo_producer_thd_desc = {
         .func = (xwos_thd_f)xwflgdemo_producer_func,
         .arg = NULL,
 };
-struct xwos_thd * xwflgdemo_producer;
+xwos_thd_d xwflgdemo_producer;
 
 /**
  * @brief 测试模块的启动函数

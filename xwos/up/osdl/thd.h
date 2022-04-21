@@ -25,34 +25,26 @@
 #define xwosdl_thd xwup_thd
 typedef xwup_thd_f xwosdl_thd_f;
 
+typedef struct {
+        struct xwosdl_thd * thd;
+        xwsq_t tik;
+} xwosdl_thd_d;
+
+#define XWOSDL_THD_NILD ((xwosdl_thd_d){NULL, 0,})
+
 static __xwcc_inline
 void xwosdl_thd_attr_init(struct xwosdl_thd_attr * attr)
 {
         xwup_thd_attr_init(attr);
 }
 
-static __xwcc_inline
-xwer_t xwosdl_thd_init(struct xwosdl_thd * thd,
-                       const struct xwosdl_thd_attr * attr,
-                       xwosdl_thd_f mainfunc, void * arg)
-{
-        return xwup_thd_init(thd, attr, mainfunc, arg);
-}
+xwer_t xwosdl_thd_init(struct xwosdl_thd * thd, xwosdl_thd_d * thdd,
+                       const struct xwosdl_thd_attr * inattr,
+                       xwosdl_thd_f mainfunc, void * arg);
 
-static __xwcc_inline
-xwer_t xwosdl_thd_create(struct xwosdl_thd ** thdbuf,
+xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd,
                          const struct xwosdl_thd_attr * attr,
-                         xwosdl_thd_f mainfunc, void * arg)
-{
-        return xwup_thd_create(thdbuf, attr, mainfunc, arg);
-}
-
-static __xwcc_inline
-xwsq_t xwosdl_thd_gettik(struct xwosdl_thd * thd)
-{
-        XWOS_UNUSED(thd);
-        return 0;
-}
+                         xwosdl_thd_f mainfunc, void * arg);
 
 static __xwcc_inline
 xwer_t xwosdl_thd_acquire(struct xwosdl_thd * thd, xwsq_t tik)
@@ -85,38 +77,41 @@ xwer_t xwosdl_thd_put(struct xwosdl_thd * thd)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_thd_quit(struct xwosdl_thd * thd)
+xwer_t xwosdl_thd_quit(struct xwosdl_thd * thd, xwsq_t tik)
 {
-        return xwup_thd_quit(thd);
+        XWOS_UNUSED(tik);
+        xwup_thd_quit(thd);
+        return XWOK;
 }
 
 static __xwos_inline_api
-xwer_t xwosdl_thd_join(struct xwosdl_thd * thd, xwer_t * trc)
+xwer_t xwosdl_thd_join(struct xwosdl_thd * thd, xwsq_t tik, xwer_t * trc)
 {
+        XWOS_VALIDATE((NULL != thd), "nild", -EBADOBJD);
+        XWOS_UNUSED(tik);
         return xwup_thd_join(thd, trc);
 }
 
-xwer_t xwosdl_thd_stop(struct xwosdl_thd * thd, xwer_t * rc);
+xwer_t xwosdl_thd_stop(struct xwosdl_thd * thd, xwsq_t tik, xwer_t * rc);
 
 static __xwcc_inline
-xwer_t xwosdl_thd_detach(struct xwosdl_thd * thd)
+xwer_t xwosdl_thd_detach(struct xwosdl_thd * thd, xwsq_t tik)
 {
+        XWOS_VALIDATE((NULL != thd), "nild", -EBADOBJD);
+        XWOS_UNUSED(tik);
         return xwup_thd_detach(thd);
 }
 
 static __xwcc_inline
-xwer_t xwosdl_thd_migrate(struct xwosdl_thd * thd, xwid_t dstcpu)
+xwer_t xwosdl_thd_migrate(struct xwosdl_thd * thd, xwsq_t tik, xwid_t dstcpu)
 {
         XWOS_UNUSED(thd);
+        XWOS_UNUSED(tik);
         XWOS_UNUSED(dstcpu);
         return XWOK;
 }
 
-static __xwcc_inline
-struct xwosdl_thd * xwosdl_cthd_self(void)
-{
-        return xwup_skd_get_cthd_lc();
-}
+xwosdl_thd_d xwosdl_cthd_self(void);
 
 static __xwcc_inline
 void xwosdl_cthd_yield(void)
@@ -168,14 +163,20 @@ xwer_t xwosdl_cthd_freeze(void)
 
 #if defined(XWUPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWUPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
 static __xwos_inline_api
-xwer_t xwosdl_thd_set_data(struct xwosdl_thd * thd, xwsq_t pos, void * data)
+xwer_t xwosdl_thd_set_data(struct xwosdl_thd * thd, xwsq_t tik,
+                           xwsq_t pos, void * data)
 {
+        XWOS_VALIDATE((NULL != thd), "nild", -EBADOBJD);
+        XWOS_UNUSED(tik);
         return xwup_thd_set_data(thd, pos, data);
 }
 
 static __xwos_inline_api
-xwer_t xwosdl_thd_get_data(struct xwosdl_thd * thd, xwsq_t pos, void ** databuf)
+xwer_t xwosdl_thd_get_data(struct xwosdl_thd * thd, xwsq_t tik,
+                           xwsq_t pos, void ** databuf)
 {
+        XWOS_VALIDATE((NULL != thd), "nild", -EBADOBJD);
+        XWOS_UNUSED(tik);
         return xwup_thd_get_data(thd, pos, databuf);
 }
 

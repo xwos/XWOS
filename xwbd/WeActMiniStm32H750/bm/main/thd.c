@@ -29,7 +29,7 @@
 
 xwer_t led_task(void * arg);
 
-struct xwos_thd * led_thd;
+xwos_thd_d led_thd;
 
 xwer_t child_thd_start(void)
 {

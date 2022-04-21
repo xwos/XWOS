@@ -35,7 +35,7 @@ xwer_t thd_2_func(void * arg);
 /**
  * @brief 动态创建的线程
  */
-struct xwos_thd * dynamic_thd;
+xwos_thd_d dynamic_thdd;
 
 /**
  * @brief 静态初始化的线程的栈内存
@@ -43,9 +43,14 @@ struct xwos_thd * dynamic_thd;
 xwstk_t __xwcc_aligned(8) static_thd_stack[512];
 
 /**
- * @brief 静态初始化的线程
+ * @brief 初始化为线程对象的内存
  */
 struct xwos_thd static_thd;
+
+/**
+ * @brief 静态初始化的线程对象描述符
+ */
+xwos_thd_d static_thdd;
 
 /**
  * @brief 模块的加载函数
@@ -62,7 +67,7 @@ xwer_t example_thread_create_start(void)
         attr.priority = THD_1_PRIORITY;
         attr.detached = false;
         attr.privileged = true;
-        rc = xwos_thd_create(&dynamic_thd, &attr, thd_1_func, (void *)3);
+        rc = xwos_thd_create(&dynamic_thdd, &attr, thd_1_func, (void *)3);
         return rc;
 }
 
@@ -86,7 +91,7 @@ xwer_t thd_1_func(void * arg)
         attr.priority = THD_2_PRIORITY;
         attr.detached = false;
         attr.privileged = true;
-        rc = xwos_thd_init(&static_thd, &attr, thd_2_func, (void *)6);
+        rc = xwos_thd_init(&static_thd, &static_thdd, &attr, thd_2_func, (void *)6);
         if (rc < 0) {
                 thdcrtlogf(INFO, "[线程1] 初始化[%s]失败。\n", attr.name);
         }
@@ -102,7 +107,7 @@ xwer_t thd_1_func(void * arg)
         }
 
         /* 结束刚创建的线程2 */
-        rc = xwos_thd_stop(&static_thd, &childrc);
+        rc = xwos_thd_stop(static_thdd, &childrc);
         if (rc < 0) {
                 thdcrtlogf(ERR, "[线程1] 终止线程2失败，rc:%d。\n", rc);
         } else {
@@ -141,6 +146,5 @@ xwer_t thd_2_func(void * arg)
         }
 
         thdcrtlogf(INFO, "[线程2] 退出，argv：%d。\n", argv);
-        xwos_thd_detach(xwos_cthd_self());
         return rc; /* 抛出返回值 */
 }

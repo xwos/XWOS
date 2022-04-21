@@ -24,64 +24,61 @@ void xwrustffi_thd_attr_init(struct xwos_thd_attr * attr)
         xwos_thd_attr_init(attr);
 }
 
-xwer_t xwrustffi_thd_create(struct xwos_thd ** thdbuf,
+xwer_t xwrustffi_thd_create(struct xwos_thd ** thd, xwsq_t * tik,
                             const struct xwos_thd_attr * attr,
                             xwos_thd_f mainfunc, void * arg)
 {
-        return xwos_thd_create(thdbuf, attr, mainfunc, arg);
-}
+        xwos_thd_d thdd;
+        xwer_t rc;
 
-xwsq_t xwrustffi_thd_gettik(struct xwos_thd * thd)
-{
-        return xwos_thd_gettik(thd);
+        rc = xwos_thd_create(&thdd, attr, mainfunc, arg);
+        *thd = thdd.thd;
+        *tik = thdd.tik;
+        return rc;
 }
 
 xwer_t xwrustffi_thd_acquire(struct xwos_thd * thd, xwsq_t tik)
 {
-        xwos_thd_d thdd = {
-                .thd = thd,
-                .tik = tik,
-        };
-        return xwos_thd_acquire(thdd);
+        return xwos_thd_acquire((xwos_thd_d){thd, tik});
 }
 
 xwer_t xwrustffi_thd_release(struct xwos_thd * thd, xwsq_t tik)
 {
-        xwos_thd_d thdd = {
-                .thd = thd,
-                .tik = tik,
-        };
-        return xwos_thd_release(thdd);
+        return xwos_thd_release((xwos_thd_d){thd, tik});
 }
 
-xwer_t xwrustffi_thd_quit(struct xwos_thd * thd)
+xwer_t xwrustffi_thd_quit(struct xwos_thd * thd, xwsq_t tik)
 {
-        return xwos_thd_quit(thd);
+        return xwos_thd_quit((xwos_thd_d){thd, tik});
 }
 
-xwer_t xwrustffi_thd_stop(struct xwos_thd * thd, xwer_t * trc)
+xwer_t xwrustffi_thd_stop(struct xwos_thd * thd, xwsq_t tik, xwer_t * trc)
 {
-        return xwos_thd_stop(thd, trc);
+        return xwos_thd_stop((xwos_thd_d){thd, tik}, trc);
 }
 
-xwer_t xwrustffi_thd_join(struct xwos_thd * thd, xwer_t * trc)
+xwer_t xwrustffi_thd_join(struct xwos_thd * thd, xwsq_t tik, xwer_t * trc)
 {
-        return xwos_thd_join(thd, trc);
+        return xwos_thd_join((xwos_thd_d){thd, tik}, trc);
 }
 
-xwer_t xwrustffi_thd_detach(struct xwos_thd * thd)
+xwer_t xwrustffi_thd_detach(struct xwos_thd * thd, xwsq_t tik)
 {
-        return xwos_thd_detach(thd);
+        return xwos_thd_detach((xwos_thd_d){thd, tik});
 }
 
-xwer_t xwrustffi_thd_migrate(struct xwos_thd * thd, xwid_t dstcpu)
+xwer_t xwrustffi_thd_migrate(struct xwos_thd * thd, xwsq_t tik, xwid_t dstcpu)
 {
-        return xwos_thd_migrate(thd, dstcpu);
+        return xwos_thd_migrate((xwos_thd_d){thd, tik}, dstcpu);
 }
 
-struct xwos_thd * xwrustffi_cthd_self(void)
+void xwrustffi_cthd_self(struct xwos_thd ** thd, xwsq_t * tik)
 {
-        return xwos_cthd_self();
+        xwos_thd_d thdd;
+
+        thdd = xwos_cthd_self();
+        *thd = thdd.thd;
+        *tik = thdd.tik;
 }
 
 void xwrustffi_cthd_yield(void)

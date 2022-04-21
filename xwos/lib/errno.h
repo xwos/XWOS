@@ -190,7 +190,7 @@
 #define ENOTINISR       1087 /**< @brief not in ISR */
 #define EBUG            1088 /**< @brief is a BUG */
 #define EEXIT           1089 /**< @brief need to exit */
-#define EBADID          1090 /**< @brief bad ID */
+#define EBADOBJD        1090 /**< @brief bad Object Descriptor */
 #define EOBJDEAD        1091 /**< @brief object dead */
 #define EOBJACTIVE      1092 /**< @brief object active */
 #define ENEGATIVE       1093 /**< @brief negative resource */

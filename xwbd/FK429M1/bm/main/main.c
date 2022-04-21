@@ -44,7 +44,7 @@ const struct xwos_thd_desc main_thd_desc = {
         .func = main_task,
         .arg = NULL,
 };
-struct xwos_thd * main_thd;
+xwos_thd_d main_thd;
 
 xwer_t xwos_main(void)
 {

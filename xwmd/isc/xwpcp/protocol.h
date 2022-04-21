@@ -20,6 +20,7 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/mm/bma.h>
+#include <xwos/osal/thd.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/lock/mtx.h>
 #include <xwos/osal/sync/sem.h>
@@ -161,7 +162,7 @@ struct xwpcp {
         struct xwmm_bma * mempool; /**< 内存池分配器 */
 
         /* 发送状态机 */
-        struct xwos_thd * txthd; /**< 发送线程 */
+        xwos_thd_d txthd; /**< 发送线程 */
         struct {
                 atomic_xwu32_t cnt; /**< 发送计数器 */
                 struct xwpcp_carrier car[XWPCP_MEMBLK_NUM]; /**< 包含待发送帧的“发送装置” */
@@ -181,7 +182,7 @@ struct xwpcp {
         } txq; /**< 发送队列 */
 
         /* 接收状态机 */
-        struct xwos_thd * rxthd; /**< 接收线程的描述符 */
+        xwos_thd_d rxthd; /**< 接收线程的描述符 */
         struct {
                 atomic_xwu32_t cnt; /**< 接收计数器 */
                 struct xwlib_bclst_head q[XWPCP_PORT_NUM]; /**< 每个端口的接收队列 */

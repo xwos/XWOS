@@ -78,7 +78,7 @@ const struct xwos_thd_desc xwseldemo_consumer_thd_desc = {
         .func = (xwos_thd_f)xwseldemo_consumer_func,
         .arg = NULL,
 };
-struct xwos_thd * xwseldemo_consumer;
+xwos_thd_d xwseldemo_consumer;
 
 const struct xwos_thd_desc xwseldemo_producer_thd_desc = {
         .attr = {
@@ -93,7 +93,7 @@ const struct xwos_thd_desc xwseldemo_producer_thd_desc = {
         .func = (xwos_thd_f)xwseldemo_producer_func,
         .arg = NULL,
 };
-struct xwos_thd * xwseldemo_producer;
+xwos_thd_d xwseldemo_producer;
 
 struct xwos_swt xwseldemo_swt0;
 struct xwos_swt xwseldemo_swt1;
@@ -126,7 +126,7 @@ const struct xwos_thd_desc xwseldemo_sync_thd_desc[] = {
                 .arg = (void *)1,
         },
 };
-struct xwos_thd * xwseldemo_syncthd[xw_array_size(xwseldemo_sync_thd_desc)];
+xwos_thd_d xwseldemo_syncthd[xw_array_size(xwseldemo_sync_thd_desc)];
 xwbmpop_declare(xwseldemo_br7_bmp, xw_array_size(xwseldemo_sync_thd_desc)) = {0,};
 xwbmpop_declare(xwseldemo_br7_msk, xw_array_size(xwseldemo_sync_thd_desc)) = {0,};
 

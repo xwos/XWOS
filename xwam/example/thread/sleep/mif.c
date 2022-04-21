@@ -29,7 +29,7 @@
 
 #define XWSLPDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 xwer_t xwslpdemo_thd_func(void * arg);
-struct xwos_thd * xwslpdemo_thd;
+xwos_thd_d xwslpdemo_thd;
 
 /**
  * @brief 模块的加载函数

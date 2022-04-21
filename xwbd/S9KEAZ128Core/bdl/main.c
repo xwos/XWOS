@@ -40,7 +40,7 @@ const struct xwos_thd_desc sysmgr_thd_desc = {
         .func = sysmgr_thd_main,
         .arg = NULL,
 };
-struct xwos_thd * sysmgr_thd;
+xwos_thd_d sysmgr_thd;
 
 xwer_t xwos_main(void)
 {

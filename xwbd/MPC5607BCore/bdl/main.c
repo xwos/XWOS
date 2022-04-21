@@ -63,7 +63,7 @@ const struct xwos_thd_desc board_thd_desc[] = {
         },
 };
 
-struct xwos_thd * board_thd[xw_array_size(board_thd_desc)];
+xwos_thd_d board_thd[xw_array_size(board_thd_desc)];
 xwu8_t rxbuffer[4096];
 
 static __xwos_code

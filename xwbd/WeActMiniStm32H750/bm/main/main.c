@@ -33,7 +33,7 @@
 
 xwer_t main_task(void * arg);
 
-struct xwos_thd * main_thd;
+xwos_thd_d main_thd;
 
 xwer_t xwos_main(void)
 {

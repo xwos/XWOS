@@ -19,6 +19,7 @@
 #include <xwos/lib/xwaop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/xwlog.h>
+#include <xwos/osal/thd.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/lock/mtx.h>
 #include <xwos/osal/sync/sem.h>
@@ -166,7 +167,7 @@ struct xwscp {
         } tx; /**< 发送状态机 */
 
         struct {
-                struct xwos_thd * thd; /**< 接收线程 */
+                xwos_thd_d thd; /**< 接收线程 */
                 atomic_xwu32_t cnt; /**< 接收计数器 */
                 struct xwlib_bclst_head head; /**< 链表头 */
                 struct xwos_splk lock; /**< 保护接收队列的自旋锁 */

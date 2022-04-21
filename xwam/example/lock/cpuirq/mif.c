@@ -34,7 +34,7 @@
 void xwcpuirqdemo_swt_callback(struct xwos_swt * swt, void * arg);
 xwer_t xwcpuirqdemo_thd_func(void * arg);
 
-struct xwos_thd * xwcpuirqdemo_thd;
+xwos_thd_d xwcpuirqdemo_thd;
 
 struct xwos_swt xwcpuirqdemo_swt;
 

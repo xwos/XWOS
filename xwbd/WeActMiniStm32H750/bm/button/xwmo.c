@@ -70,7 +70,7 @@ void bmbtn_eirq_btn_isr(struct xwds_soc * soc, xwid_t id, xwds_eirq_arg_t arg);
 static
 xwer_t bmbtn_task(void * arg);
 
-struct xwos_thd * bmbtn_thd;
+xwos_thd_d bmbtn_thd;
 
 struct xwos_sem bmbtn_sem;
 

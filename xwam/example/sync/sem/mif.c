@@ -49,7 +49,7 @@ const struct xwos_thd_desc xwsemdemo_thd_desc = {
         .func = (xwos_thd_f)xwsemdemo_thd_func,
         .arg = NULL,
 };
-struct xwos_thd * xwsemdemo_thd;
+xwos_thd_d xwsemdemo_thd;
 
 struct xwos_swt xwsemdemo_swt;
 struct xwos_sem xwsemdemo_sem;

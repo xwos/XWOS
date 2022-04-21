@@ -56,6 +56,7 @@ int xwlua_thd_dofile(lua_State * L)
         struct xwos_thd_attr attr;
         xwer_t rc;
         const char * arg;
+        xwos_thd_d thdd;
         xwlua_thd_sp * thdsp;
         lua_State * thdl;
 
@@ -73,10 +74,10 @@ int xwlua_thd_dofile(lua_State * L)
                 attr.priority = XWLUA_SCRIPT_PRIORITY;
                 attr.detached = false;
                 attr.privileged = true;
-                rc = xwos_thd_create(&thdsp->thd, &attr, xwlua_thd_script_main, thdl);
+                rc = xwos_thd_create(&thdd, &attr, xwlua_thd_script_main, thdl);
                 if (XWOK == rc) {
-                        xwos_thd_grab(thdsp->thd); /* 增加对象的强引用 */
-                        thdsp->tik = xwos_thd_gettik(thdsp->thd);
+                        *thdsp = thdd;
+                        xwos_thd_grab(thdd); /* 增加对象的强引用 */
                         luaL_setmetatable(L, "xwlua_thd_sp");
                 } else {
                         lua_pop(L, 1);
@@ -97,6 +98,7 @@ int xwlua_thd_dostring(lua_State * L)
         xwer_t rc;
         const char * arg;
         const char * name;
+        xwos_thd_d thdd;
         xwlua_thd_sp * thdsp;
         lua_State * thdl;
         size_t sl;
@@ -115,10 +117,10 @@ int xwlua_thd_dostring(lua_State * L)
                 attr.priority = XWLUA_SCRIPT_PRIORITY;
                 attr.detached = false;
                 attr.privileged = true;
-                rc = xwos_thd_create(&thdsp->thd, &attr, xwlua_thd_script_main, thdl);
+                rc = xwos_thd_create(&thdd, &attr, xwlua_thd_script_main, thdl);
                 if (XWOK == rc) {
-                        xwos_thd_grab(thdsp->thd); /* 增加对象的强引用 */
-                        thdsp->tik = xwos_thd_gettik(thdsp->thd);
+                        *thdsp = thdd;
+                        xwos_thd_grab(thdd); /* 增加对象的强引用 */
                         luaL_setmetatable(L, "xwlua_thd_sp");
                 } else {
                         lua_pop(L, 1);
@@ -140,6 +142,7 @@ int xwlua_thd_call(lua_State * L)
         struct xwos_thd_attr attr;
         xwer_t rc;
         luaL_Buffer lb;
+        xwos_thd_d thdd;
         xwlua_thd_sp * thdsp;
         lua_State * thdl;
         const char * name;
@@ -171,10 +174,10 @@ int xwlua_thd_call(lua_State * L)
                 attr.priority = XWLUA_SCRIPT_PRIORITY;
                 attr.detached = false;
                 attr.privileged = true;
-                rc = xwos_thd_create(&thdsp->thd, &attr, xwlua_thd_script_main, thdl);
+                rc = xwos_thd_create(&thdd, &attr, xwlua_thd_script_main, thdl);
                 if (XWOK == rc) {
-                        xwos_thd_grab(thdsp->thd); /* 增加对象的强引用 */
-                        thdsp->tik = xwos_thd_gettik(thdsp->thd);
+                        *thdsp = thdd;
+                        xwos_thd_grab(thdd); /* 增加对象的强引用 */
                         luaL_setmetatable(L, "xwlua_thd_sp");
                 } else {
                         lua_pop(L, 1);
@@ -206,14 +209,14 @@ void xwlua_os_open_thd(lua_State * L)
 /******** xwos.cthd ********/
 int xwlua_cthd_sp(lua_State * L)
 {
-        xwlua_thd_sp thdsp;
+        xwos_thd_d thdd;
         xwlua_thd_sp * out;
 
-        thdsp = xwos_thd_getd(xwos_cthd_self());
+        thdd = xwos_cthd_self();
         out = lua_newuserdatauv(L, sizeof(xwlua_thd_sp), 0);
-        out->thd = thdsp.thd;
-        out->tik = thdsp.tik;
-        xwos_thd_grab(out->thd); /* 增加对象的强引用 */
+        out->thd = thdd.thd;
+        out->tik = thdd.tik;
+        xwos_thd_grab(thdd); /* 增加对象的强引用 */
         luaL_setmetatable(L, "xwlua_thd_sp");
         return 1;
 }
@@ -386,7 +389,7 @@ int xwlua_thdsp_stop(lua_State * L)
         xwer_t rc, trc;
 
         thdsp = (xwlua_thd_sp *)luaL_checkudata(L, 1, "xwlua_thd_sp");
-        rc = xwos_thd_stop(thdsp->thd, &trc);
+        rc = xwos_thd_stop(*thdsp, &trc);
         if (XWOK == rc) {
                 lua_pushinteger(L, (lua_Integer)rc);
                 lua_pushinteger(L, (lua_Integer)trc);
@@ -403,7 +406,7 @@ int xwlua_thdsp_quit(lua_State * L)
         xwer_t rc;
 
         thdsp = (xwlua_thd_sp *)luaL_checkudata(L, 1, "xwlua_thd_sp");
-        rc = xwos_thd_quit(thdsp->thd);
+        rc = xwos_thd_quit(*thdsp);
         lua_pushinteger(L, (lua_Integer)rc);
         return 1;
 }
@@ -414,7 +417,7 @@ int xwlua_thdsp_join(lua_State * L)
         xwer_t rc, trc;
 
         thdsp = (xwlua_thd_sp *)luaL_checkudata(L, 1, "xwlua_thd_sp");
-        rc = xwos_thd_join(thdsp->thd, &trc);
+        rc = xwos_thd_join(*thdsp, &trc);
         if (XWOK == rc) {
                 lua_pushinteger(L, (lua_Integer)rc);
                 lua_pushinteger(L, (lua_Integer)trc);
@@ -431,7 +434,7 @@ int xwlua_thdsp_detach(lua_State * L)
         xwer_t rc;
 
         thdsp = (xwlua_thd_sp *)luaL_checkudata(L, 1, "xwlua_thd_sp");
-        rc = xwos_thd_detach(thdsp->thd);
+        rc = xwos_thd_detach(*thdsp);
         lua_pushinteger(L, (lua_Integer)rc);
         return 1;
 }
@@ -444,7 +447,7 @@ int xwlua_thdsp_migrate(lua_State * L)
 
         thdsp = (xwlua_thd_sp *)luaL_checkudata(L, 1, "xwlua_thd_sp");
         cpu = luaL_checkinteger(L, 2);
-        rc = xwos_thd_migrate(thdsp->thd, cpu);
+        rc = xwos_thd_migrate(*thdsp, cpu);
         lua_pushinteger(L, (lua_Integer)rc);
         return 1;
 }

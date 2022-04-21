@@ -30,10 +30,10 @@
 #define XWMQDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 xwer_t xwmqdemo_producer_func(void * arg);
-struct xwos_thd * xwmqdemo_producer;
+xwos_thd_d xwmqdemo_producer;
 
 xwer_t xwmqdemo_consumer_func(void * arg);
-struct xwos_thd * xwmqdemo_consumer;
+xwos_thd_d xwmqdemo_consumer;
 
 struct xwmq xwmqdemo_mq;
 

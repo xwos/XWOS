@@ -140,14 +140,6 @@ void xwup_thd_eq_plwq(struct xwup_thd * thd, struct xwup_plwq * xwplwq,
                       xwu16_t type);
 #endif
 
-#if (1 == XWUPRULE_SKD_THD_DO_UNLOCK)
-xwer_t xwup_thd_do_unlock(void * lock, xwsq_t lktype, void * lkdata);
-#endif
-
-#if (1 == XWUPRULE_SKD_THD_DO_LOCK)
-xwer_t xwup_thd_do_lock(void * lock, xwsq_t lktype, xwtm_t to, void * lkdata);
-#endif
-
 xwer_t xwup_thd_freeze_lic(struct xwup_thd * thd);
 xwer_t xwup_thd_thaw_lic(struct xwup_thd * thd);
 
@@ -173,7 +165,7 @@ xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
 xwer_t xwup_thd_delete(struct xwup_thd * thd);
 void xwup_cthd_yield(void);
 void xwup_cthd_exit(xwer_t rc);
-xwer_t xwup_thd_quit(struct xwup_thd * thd);
+void xwup_thd_quit(struct xwup_thd * thd);
 xwer_t xwup_thd_join(struct xwup_thd * thd, xwer_t * trc);
 xwer_t xwup_thd_detach(struct xwup_thd * thd);
 xwer_t xwup_thd_intr(struct xwup_thd * thd);

@@ -56,7 +56,7 @@ const struct xwos_thd_desc main_thd_desc = {
         .func = main_task,
         .arg = NULL,
 };
-struct xwos_thd * main_thd;
+xwos_thd_d main_thd;
 
 extern uint8_t qspiflash_mr_origin[];
 

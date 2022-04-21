@@ -34,7 +34,7 @@
 void xwsplkdemo_swt_callback(struct xwos_swt * swt, void * arg);
 xwer_t xwsplkdemo_thd_func(void * arg);
 
-struct xwos_thd * xwsplkdemo_thd;
+xwos_thd_d xwsplkdemo_thd;
 struct xwos_swt xwsplkdemo_swt;
 struct xwos_splk xwsplkdemo_lock;
 xwsq_t xwsplkdemo_shared_count = 0;

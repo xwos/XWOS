@@ -118,8 +118,6 @@ void xwmp_thd_eq_rtwq_locked(struct xwmp_thd * thd,
 void xwmp_thd_eq_plwq_locked(struct xwmp_thd * thd,
                              struct xwmp_plwq * xwplwq,
                              xwu16_t type);
-xwer_t xwmp_thd_do_unlock(void * lock, xwsq_t lktype, void * lkdata);
-xwer_t xwmp_thd_do_lock(void * lock, xwsq_t lktype, xwtm_t to, void * lkdata);
 xwer_t xwmp_thd_reqfrz_lic(struct xwmp_thd * thd);
 xwer_t xwmp_thd_thaw_lic_pmlk(struct xwmp_thd * thd);
 
@@ -148,7 +146,7 @@ xwer_t xwmp_thd_grab(struct xwmp_thd * thd);
 xwer_t xwmp_thd_put(struct xwmp_thd * thd);
 void xwmp_cthd_yield(void);
 void xwmp_cthd_exit(xwer_t rc);
-xwer_t xwmp_thd_quit(struct xwmp_thd * thd);
+void xwmp_thd_quit(struct xwmp_thd * thd);
 xwer_t xwmp_thd_join(struct xwmp_thd * thd, xwer_t * trc);
 xwer_t xwmp_thd_detach(struct xwmp_thd * thd);
 xwer_t xwmp_thd_intr(struct xwmp_thd * thd);

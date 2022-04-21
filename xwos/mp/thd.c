@@ -479,10 +479,6 @@ xwer_t xwmp_thd_init(struct xwmp_thd * thd,
         xwer_t rc;
         struct xwmp_thd_attr attr;
 
-        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
-        XWOS_VALIDATE((NULL != inattr), "nullptr", -EFAULT);
-        XWOS_VALIDATE((NULL != inattr->stack), "nullptr", -EFAULT);
-
         xwmp_thd_construct(thd);
         attr = *inattr;
         if (attr.stack_size < XWMMCFG_STACK_SIZE_MIN) {
@@ -510,9 +506,6 @@ xwer_t xwmp_thd_create(struct xwmp_thd ** thdpbuf,
         struct xwmp_thd_attr attr;
         bool allocated_stack;
         xwer_t rc;
-
-        XWOS_VALIDATE((thdpbuf), "nullptr", -EFAULT);
-        XWOS_VALIDATE((mainfunc), "nullptr", -EFAULT);
 
         if (inattr) {
                 attr = *inattr;
@@ -654,17 +647,10 @@ void xwmp_cthd_exit(xwer_t rc)
 }
 
 __xwmp_api
-xwer_t xwmp_thd_quit(struct xwmp_thd * thd)
+void xwmp_thd_quit(struct xwmp_thd * thd)
 {
         xwreg_t cpuirq;
-        xwer_t rc;
 
-        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
-
-        rc = xwmp_thd_grab(thd);
-        if (rc < 0) {
-                goto err_thd_grab;
-        }
         xwmp_splk_lock_cpuirqsv(&thd->stlock, &cpuirq);
         if (XWMP_SKDOBJ_ST_STANDBY & thd->state) {
                 xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
@@ -673,10 +659,6 @@ xwer_t xwmp_thd_quit(struct xwmp_thd * thd)
                 xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
                 xwmp_thd_intr(thd);
         }
-        xwmp_thd_put(thd);
-
-err_thd_grab:
-        return rc;
 }
 
 __xwmp_api
@@ -687,25 +669,17 @@ xwer_t xwmp_thd_join(struct xwmp_thd * thd, xwer_t * trc)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
-
         cthd = xwmp_skd_get_cthd_lc();
         if (thd == cthd) {
                 rc = -EPERM;
                 goto err_join_self;
         }
-        rc = xwmp_thd_grab(thd);
-        if (rc < 0) {
-                goto err_thd_grab;
-        }
         xwmp_splk_lock_cpuirqsv(&thd->stlock, &cpuirq);
         if (XWMP_SKDOBJ_ST_DETACHED & thd->state) {
                 xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
-                xwmp_thd_put(thd);
                 rc = -EINVAL;
         } else if (XWMP_SKDOBJ_ST_JOINED & thd->state) {
                 xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
-                xwmp_thd_put(thd);
                 rc = -EALREADY;
         } else if (XWMP_SKDOBJ_ST_STANDBY & thd->state) {
                 xwbop_s1m(xwsq_t, &thd->state, XWMP_SKDOBJ_ST_JOINED);
@@ -713,7 +687,6 @@ xwer_t xwmp_thd_join(struct xwmp_thd * thd, xwer_t * trc)
                 if (!is_err_or_null(trc)) {
                         *trc = (xwer_t)thd->stack.arg;
                 }
-                xwmp_thd_put(thd);
                 rc = xwmp_thd_delete(thd);
                 XWOS_BUG_ON(rc < 0);
         } else {
@@ -726,17 +699,15 @@ xwer_t xwmp_thd_join(struct xwmp_thd * thd, xwer_t * trc)
                         if (!is_err_or_null(trc)) {
                                 *trc = (xwer_t)thd->stack.arg;
                         }
-                        xwmp_thd_put(thd);
-                        xwmp_thd_delete(thd);
+                        rc = xwmp_thd_delete(thd);
+                        XWOS_BUG_ON(rc < 0);
                 } else {
                         xwmp_splk_lock(&thd->stlock);
                         xwbop_c0m(xwsq_t, &thd->state, XWMP_SKDOBJ_ST_JOINED);
                         xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
-                        xwmp_thd_put(thd);
                 }
         }
 
-err_thd_grab:
 err_join_self:
         return rc;
 }
@@ -747,30 +718,20 @@ xwer_t xwmp_thd_detach(struct xwmp_thd * thd)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
-
-        rc = xwmp_thd_grab(thd);
-        if (rc < 0) {
-                goto err_thd_grab;
-        }
         xwmp_splk_lock_cpuirqsv(&thd->stlock, &cpuirq);
         if (XWMP_SKDOBJ_ST_JOINED & thd->state) {
                 xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
-                xwmp_thd_put(thd);
                 rc = -EINVAL;
         } else {
                 xwbop_s1m(xwsq_t, &thd->state, XWMP_SKDOBJ_ST_DETACHED);
                 if (XWMP_SKDOBJ_ST_STANDBY & thd->state) {
                         xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
-                        xwmp_thd_put(thd);
                         xwmp_thd_delete(thd);
                 } else {
                         xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
-                        xwmp_thd_put(thd);
                 }
+                rc = XWOK;
         }
-
-err_thd_grab:
         return rc;
 }
 
@@ -1281,97 +1242,7 @@ void xwmp_cthd_yield(void)
         xwospl_cpuirq_restore_lc(cpuirq);
 }
 
-/**
- * @brief 解锁给定类型的锁
- * @param[in] lock: 锁的地址
- * @param[in] lktype: 锁的类型
- * @param[in] lkdata: 锁的数据
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
- * @param[out] lkst: 指向缓冲区的指针，通过此缓冲区返回锁的状态
- * @return 错误码
- */
-__xwmp_code
-xwer_t xwmp_thd_do_unlock(void * lock, xwsq_t lktype, void * lkdata)
-{
-        xwer_t rc;
-        union xwos_ulock ulk;
 
-        ulk.anon = lock;
-
-        rc = XWOK;
-        switch (lktype) {
-        case XWOS_LK_MTX:
-        case XWOS_LK_MTX_UNINTR:
-                rc = xwmp_mtx_unlock(ulk.xwmp.mtx);
-                break;
-        case XWOS_LK_SPLK:
-                xwmp_splk_unlock(ulk.xwmp.splk);
-                break;
-        case XWOS_LK_SQLK_WR:
-                xwmp_sqlk_wr_unlock(ulk.xwmp.sqlk);
-                break;
-        case XWOS_LK_SQLK_RDEX:
-                xwmp_sqlk_rdex_unlock(ulk.xwmp.sqlk);
-                break;
-        case XWOS_LK_CALLBACK:
-                if (ulk.cb->unlock) {
-                        rc = ulk.cb->unlock(lkdata);
-                }
-                break;
-        case XWOS_LK_NONE:
-        default:
-                break;
-        }
-        return rc;
-}
-
-/**
- * @brief 锁定给定类型的锁
- * @param[in] lock: 锁的地址
- * @param[in] lktype: 锁的类型
- * @param[in] lkdata: 锁的数据
- * @param[in,out] to: 期望唤醒的时间点
- * @param[out] lkst: 指向缓冲区的指针，通过此缓冲区返回锁的状态
- * @return 错误码
- */
-__xwmp_code
-xwer_t xwmp_thd_do_lock(void * lock, xwsq_t lktype, xwtm_t to, void * lkdata)
-{
-        xwer_t rc;
-        union xwos_ulock ulk;
-
-        ulk.anon = lock;
-
-        rc = XWOK;
-        switch (lktype) {
-        case XWOS_LK_MTX:
-                rc = xwmp_mtx_lock_to(ulk.xwmp.mtx, to);
-                break;
-        case XWOS_LK_MTX_UNINTR:
-                rc = xwmp_mtx_lock_unintr(ulk.xwmp.mtx);
-                break;
-        case XWOS_LK_SPLK:
-                xwmp_splk_lock(ulk.xwmp.splk);
-                break;
-        case XWOS_LK_SQLK_WR:
-                xwmp_sqlk_wr_lock(ulk.xwmp.sqlk);
-                break;
-        case XWOS_LK_SQLK_RDEX:
-                xwmp_sqlk_rdex_lock(ulk.xwmp.sqlk);
-                break;
-        case XWOS_LK_CALLBACK:
-                if (ulk.cb->lock) {
-                        rc = ulk.cb->lock(lkdata);
-                }
-                break;
-        case XWOS_LK_NONE:
-        default:
-                break;
-        }
-        return rc;
-}
 
 __xwmp_api
 xwer_t xwmp_cthd_sleep_to(xwtm_t to)
@@ -1921,8 +1792,6 @@ __xwmp_api
 xwer_t xwmp_thd_set_data(struct xwmp_thd * thd, xwsq_t pos, void * data)
 {
         xwer_t rc;
-
-        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
 
         if (pos < XWMPCFG_SKD_THD_LOCAL_DATA_NUM) {
                 thd->data[pos] = data;

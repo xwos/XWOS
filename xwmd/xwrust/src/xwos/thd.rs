@@ -180,24 +180,18 @@ unsafe impl Sync for Thd {}
 extern "C" {
     fn xwrustffi_thd_stack_size_default() -> XwSz;
     fn xwrustffi_thd_attr_init(attr: *mut ThdAttr);
-    fn xwrustffi_thd_create(thd: *mut *mut c_void,
+    fn xwrustffi_thd_create(thd: *mut *mut c_void, tik: *mut XwSq,
                             attr: *const ThdAttr,
                             mainfunc: extern "C" fn(*mut c_void) -> XwEr,
                             arg: *mut c_void) -> XwEr;
-    fn xwrustffi_thd_gettik(thd: *mut c_void) -> XwSq;
-    fn xwrustffi_thd_acquire(thd: *mut c_void,
-                             tik: XwSq) -> XwEr;
-    fn xwrustffi_thd_release(thd: *mut c_void,
-                             tik: XwSq) -> XwEr;
-    fn xwrustffi_thd_quit(thd: *mut c_void) -> XwEr;
-    fn xwrustffi_thd_stop(thd: *mut c_void,
-                          trc: *mut XwEr) -> XwEr;
-    fn xwrustffi_thd_join(thd: *mut c_void,
-                          trc: *mut XwEr) -> XwEr;
-    fn xwrustffi_thd_detach(thd: *mut c_void) -> XwEr;
-    fn xwrustffi_thd_migrate(thd: *mut c_void,
-                             cpuid: XwId) -> XwEr;
-    fn xwrustffi_cthd_self() -> *mut c_void;
+    fn xwrustffi_thd_acquire(thd: *mut c_void, tik: XwSq) -> XwEr;
+    fn xwrustffi_thd_release(thd: *mut c_void, tik: XwSq) -> XwEr;
+    fn xwrustffi_thd_quit(thd: *mut c_void, tik: XwSq) -> XwEr;
+    fn xwrustffi_thd_stop(thd: *mut c_void, tik: XwSq, trc: *mut XwEr) -> XwEr;
+    fn xwrustffi_thd_join(thd: *mut c_void, tik: XwSq, trc: *mut XwEr) -> XwEr;
+    fn xwrustffi_thd_detach(thd: *mut c_void, tik: XwSq) -> XwEr;
+    fn xwrustffi_thd_migrate(thd: *mut c_void, tik: XwSq, cpuid: XwId) -> XwEr;
+    fn xwrustffi_cthd_self(thd: *mut *mut c_void, tik: *mut XwSq);
     fn xwrustffi_cthd_yield();
     fn xwrustffi_cthd_exit(rc: XwEr);
     fn xwrustffi_cthd_shld_frz() -> bool;
@@ -205,8 +199,7 @@ extern "C" {
     fn xwrustffi_cthd_frz_shld_stop(frozen: *mut bool) -> bool;
     fn xwrustffi_cthd_sleep(time: XwTm) -> XwEr;
     fn xwrustffi_cthd_sleep_to(to: XwTm) -> XwEr;
-    fn xwrustffi_cthd_sleep_from(origin: *mut XwTm,
-                                 inc: XwTm) -> XwEr;
+    fn xwrustffi_cthd_sleep_from(origin: *mut XwTm, inc: XwTm) -> XwEr;
     fn xwrustffi_cthd_freeze(time: *mut XwTm) -> XwEr;
 }
 
@@ -215,12 +208,12 @@ impl Thd {
         let boxfunc = Box::new(func);
         let f = Box::into_raw(boxfunc);
         let mut thd: *mut c_void = ptr::null_mut();
-        let rc = xwrustffi_thd_create(&mut thd, attr, xwrust_thd_entry, f as *mut _);
+        let mut tik: XwSq = 0;
+        let rc = xwrustffi_thd_create(&mut thd, &mut tik, attr, xwrust_thd_entry, f as *mut _);
         return if rc < 0 {
             drop(Box::from_raw(f));
             Err(rc)
         } else {
-            let tik = xwrustffi_thd_gettik(thd);
             Ok(Thd {thd: thd, tik: tik})
         };
 
@@ -234,7 +227,7 @@ impl Thd {
 
     pub fn join(self) {
         unsafe {
-            let _rc = xwrustffi_thd_join(self.thd, ptr::null_mut());
+            let _rc = xwrustffi_thd_join(self.thd, self.tik, ptr::null_mut());
             mem::forget(self);
         }
     }
@@ -242,7 +235,7 @@ impl Thd {
 
 impl Drop for Thd {
     fn drop(&mut self) {
-        let _rc = unsafe { xwrustffi_thd_detach(self.thd) };
+        unsafe { xwrustffi_thd_detach(self.thd, self.tik) };
     }
 }
 

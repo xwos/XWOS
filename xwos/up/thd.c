@@ -328,10 +328,6 @@ xwer_t xwup_thd_init(struct xwup_thd * thd,
 {
         struct xwup_thd_attr attr;
 
-        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
-        XWOS_VALIDATE((NULL != inattr), "nullptr", -EFAULT);
-        XWOS_VALIDATE((NULL != inattr->stack), "nullptr", -EFAULT);
-
         attr = *inattr;
         if (attr.stack_size < XWMMCFG_STACK_SIZE_MIN) {
                 attr.stack_size = XWMMCFG_STACK_SIZE_MIN;
@@ -344,8 +340,6 @@ xwer_t xwup_thd_init(struct xwup_thd * thd,
 __xwup_api
 xwer_t xwup_thd_fini(struct xwup_thd * thd)
 {
-        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
-
         xwup_thd_deactivate(thd);
         return XWOK;
 }
@@ -359,9 +353,6 @@ xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
         struct xwup_thd_attr attr;
         bool allocated_stack;
         xwer_t rc;
-
-        XWOS_VALIDATE((thdpbuf), "nullptr", -EFAULT);
-        XWOS_VALIDATE((mainfunc), "nullptr", -EFAULT);
 
         if (inattr) {
                 attr = *inattr;
@@ -427,8 +418,6 @@ __xwup_api
 xwer_t xwup_thd_delete(struct xwup_thd * thd)
 {
         xwstk_t * base;
-
-        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
 
         xwup_thd_deactivate(thd);
         if (XWUP_SKDOBJ_FLAG_ALLOCATED_STACK & thd->stack.flag) {
@@ -522,11 +511,9 @@ void xwup_cthd_exit(xwer_t rc)
 
 #if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
 __xwup_api
-xwer_t xwup_thd_quit(struct xwup_thd * thd)
+void xwup_thd_quit(struct xwup_thd * thd)
 {
         xwreg_t cpuirq;
-
-        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
 
         xwospl_cpuirq_save_lc(&cpuirq);
         if (XWUP_SKDOBJ_ST_STANDBY & thd->state) {
@@ -536,7 +523,6 @@ xwer_t xwup_thd_quit(struct xwup_thd * thd)
                 xwospl_cpuirq_restore_lc(cpuirq);
                 xwup_thd_intr(thd);
         }
-        return XWOK;
 }
 
 __xwup_api
@@ -546,8 +532,6 @@ xwer_t xwup_thd_join(struct xwup_thd * thd, xwer_t * trc)
         xwsq_t lkst;
         xwreg_t cpuirq;
         xwer_t rc;
-
-        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
 
         cthd = xwup_skd_get_cthd_lc();
         if (thd == cthd) {
@@ -596,8 +580,6 @@ xwer_t xwup_thd_detach(struct xwup_thd * thd)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
-
         xwospl_cpuirq_save_lc(&cpuirq);
         if (XWUP_SKDOBJ_ST_JOINED & thd->state) {
                 xwospl_cpuirq_restore_lc(cpuirq);
@@ -618,10 +600,9 @@ xwer_t xwup_thd_detach(struct xwup_thd * thd)
 #else /* !XWUPCFG_SKD_THD_EXIT */
 
 __xwup_api
-xwer_t xwup_thd_quit(struct xwup_thd * thd)
+void xwup_thd_quit(struct xwup_thd * thd)
 {
         XWOS_UNUSED(thd);
-        return -ENOSYS;
 }
 
 __xwup_api
@@ -987,112 +968,6 @@ void xwup_cthd_yield(void)
         xwup_skd_req_swcx();
         xwospl_cpuirq_restore_lc(cpuirq);
 }
-
-#if (1 == XWUPRULE_SKD_THD_DO_UNLOCK)
-/**
- * @brief 解锁给定类型的锁
- * @param[in] lock: 锁的地址
- * @param[in] lktype: 锁的类型
- * @param[in] lkdata: 锁的数据
- * @param[in,out] xwtm: 指向缓冲区的指针，此缓冲区：
- * + (I) 作为输入时，表示期望的阻塞等待时间
- * + (O) 作为输出时，返回剩余的期望时间
- * @param[out] lkst: 指向缓冲区的指针，通过此缓冲区返回锁的状态
- * @return 错误码
- */
-__xwup_code
-xwer_t xwup_thd_do_unlock(void * lock, xwsq_t lktype, void * lkdata)
-{
-        xwer_t rc;
-        union xwos_ulock ulk;
-
-        ulk.anon = lock;
-
-        rc = XWOK;
-        switch (lktype) {
-        case XWOS_LK_MTX:
-        case XWOS_LK_MTX_UNINTR:
-#if ((defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)) || \
-     (defined(XWUPCFG_LOCK_FAKEMTX) && (1 == XWUPCFG_LOCK_FAKEMTX)))
-                rc = xwup_mtx_unlock(ulk.xwup.mtx);
-#endif
-                break;
-        case XWOS_LK_SPLK:
-                xwup_splk_unlock(ulk.xwup.splk);
-                break;
-        case XWOS_LK_SQLK_WR:
-                xwup_sqlk_wr_unlock(ulk.xwup.sqlk);
-                break;
-        case XWOS_LK_SQLK_RDEX:
-                xwup_sqlk_rdex_unlock(ulk.xwup.sqlk);
-                break;
-        case XWOS_LK_CALLBACK:
-                if (ulk.cb->unlock) {
-                        rc = ulk.cb->unlock(lkdata);
-                }
-                break;
-        case XWOS_LK_NONE:
-        default:
-                break;
-        }
-        return rc;
-}
-#endif
-
-#if (1 == XWUPRULE_SKD_THD_DO_LOCK)
-/**
- * @brief 锁定给定类型的锁
- * @param[in] lock: 锁的地址
- * @param[in] lktype: 锁的类型
- * @param[in] lkdata: 锁的数据
- * @param[in,out] to: 期望唤醒的时间点
- * @param[out] lkst: 指向缓冲区的指针，通过此缓冲区返回锁的状态
- * @return 错误码
- */
-__xwup_code
-xwer_t xwup_thd_do_lock(void * lock, xwsq_t lktype, xwtm_t to, void * lkdata)
-{
-        xwer_t rc;
-        union xwos_ulock ulk;
-
-        ulk.anon = lock;
-
-        rc = XWOK;
-        switch (lktype) {
-        case XWOS_LK_MTX:
-#if ((defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)) || \
-     (defined(XWUPCFG_LOCK_FAKEMTX) && (1 == XWUPCFG_LOCK_FAKEMTX)))
-                rc = xwup_mtx_lock_to(ulk.xwup.mtx, to);
-#endif
-                break;
-        case XWOS_LK_MTX_UNINTR:
-#if ((defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)) || \
-     (defined(XWUPCFG_LOCK_FAKEMTX) && (1 == XWUPCFG_LOCK_FAKEMTX)))
-                rc = xwup_mtx_lock_unintr(ulk.xwup.mtx);
-#endif
-                break;
-        case XWOS_LK_SPLK:
-                xwup_splk_lock(ulk.xwup.splk);
-                break;
-        case XWOS_LK_SQLK_WR:
-                xwup_sqlk_wr_lock(ulk.xwup.sqlk);
-                break;
-        case XWOS_LK_SQLK_RDEX:
-                xwup_sqlk_rdex_lock(ulk.xwup.sqlk);
-                break;
-        case XWOS_LK_CALLBACK:
-                if (ulk.cb->lock) {
-                        rc = ulk.cb->lock(lkdata);
-                }
-                break;
-        case XWOS_LK_NONE:
-        default:
-                XWOS_UNUSED(to);
-                break;
-        }
-        return rc;
-}
-#endif
 
 __xwup_api
 xwer_t xwup_cthd_sleep_to(xwtm_t to)

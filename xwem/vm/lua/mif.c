@@ -36,7 +36,7 @@ struct xwlua_arg xwlua_arg = {
         .argv = xwlua_argv,
 };
 
-struct xwos_thd * xwlua_thd;
+xwos_thd_d xwlua_thd;
 
 xwer_t xwlua_start(void)
 {

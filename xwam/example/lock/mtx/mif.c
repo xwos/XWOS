@@ -64,7 +64,7 @@ const struct xwos_thd_desc xwmtxdemo_thd_desc[] = {
                 .arg = (void *)3,
         },
 };
-struct xwos_thd * xwmtxdemo_thd[xw_array_size(xwmtxdemo_thd_desc)];
+xwos_thd_d xwmtxdemo_thd[xw_array_size(xwmtxdemo_thd_desc)];
 
 struct xwos_mtx * xwmtxdemo_mtx;
 xwsq_t xwmtxdemo_shared_count = 0;

@@ -44,7 +44,7 @@ const struct xwos_thd_desc child_thd_desc[] = {
                 .arg = NULL,
         },
 };
-struct xwos_thd * child_thd[xw_array_size(child_thd_desc)];
+xwos_thd_d child_thd[xw_array_size(child_thd_desc)];
 
 xwer_t child_thd_start(void)
 {

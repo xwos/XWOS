@@ -89,7 +89,7 @@ xwer_t xwscp_start(struct xwscp * xwscp, const char * name,
         xwscp->hwifst = XWSCP_HWIFST_CLOSED;
         xwscp->name = name;
         xwscp->hwifops = hwifops;
-        xwscp->rx.thd = NULL;
+        xwscp->rx.thd = XWOS_THD_NILD;
         xwscp->mempool = NULL;
         xwos_object_activate(&xwscp->xwobj, xwscp_gc);
 
@@ -201,10 +201,10 @@ xwer_t xwscp_gc(void * obj)
         xwer_t rc, childrc;
 
         xwscp = obj;
-        if (xwscp->rx.thd) {
+        if (xwscp->rx.thd.thd) {
                 rc = xwos_thd_stop(xwscp->rx.thd, &childrc);
                 if (XWOK == rc) {
-                        xwscp->rx.thd = NULL;
+                        xwscp->rx.thd = XWOS_THD_NILD;
                         xwscplogf(INFO, "Stop XWSCP RX thread... [OK]\n");
                 }
         }
