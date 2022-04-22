@@ -596,7 +596,7 @@ xwer_t xwos_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
  * - 线程从一个CPU迁移到另一个CPU之前的准备工作。
  *
  * 此函数```xwos_cthd_freeze()```由线程自己调用，并冻结自身。
- * 但线程并不能随时冻结自身，必须满足下列条件之一：
+ * 但线程并不能随时冻结，必须满足下列条件之一：
  *
  * - 系统已经开始准备进入低功耗（调用了函数```xwos_pm_suspend()```）;
  * - 线程正准备开始迁移（调用了函数```xwos_thd_migrate()```）。

@@ -339,9 +339,6 @@ void xwospl_skd_isr_swcx(void)
 #endif
         /* set PSP */
         __asm__ volatile("      msr     psp, r2");
-        __asm__ volatile("      dsb");
-        __asm__ volatile("      isb");
-        __asm__ volatile("      clrex");
 
         /* finish the progress */
         __asm__ volatile("      push    {lr}");
@@ -349,6 +346,11 @@ void xwospl_skd_isr_swcx(void)
         __asm__ volatile("      bl      xwosplcb_skd_post_swcx_lic");
         __asm__ volatile("      add     sp, #4");
         __asm__ volatile("      pop     {pc}");
+
+        /* return */
+        __asm__ volatile("      clrex");
+        __asm__ volatile("      dsb");
+        __asm__ volatile("      isb");
 }
 
 /**

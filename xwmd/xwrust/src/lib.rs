@@ -49,6 +49,7 @@
 
 pub mod types;
 pub mod panic;
+pub mod xwtm;
 #[allow(dead_code)]
 pub mod xwos;
 pub mod xwmm;

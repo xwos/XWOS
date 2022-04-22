@@ -61,6 +61,7 @@
 #  define XWOS_BUG() /**< 报告BUG */
 #  define XWOS_BUG_ON(x) /**< 当条件x成立时报告BUG */
 #endif
+#define XWOS_LOOP_ON(x)         do {} while (__xwcc_unlikely(x)) /**< 当条件x成立时循环 */
 
 #define XWOS_UNUSED_ARGUMENT    0 /**< 未使用的参数的占位符 */
 

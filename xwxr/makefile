@@ -32,6 +32,7 @@ html: cfg
 rustdoc: cfg
 	cd fakeboard/rustapp; cargo +nightly clean --target=thumbv7em-none-eabihf
 	cd fakeboard/rustapp; cargo +nightly doc --target=thumbv7em-none-eabihf
+	rm -rf wkspc/rustdoc
 	cp -ap fakeboard/rustapp/target/thumbv7em-none-eabihf/doc wkspc/rustdoc
 
 luadoc: cfg
@@ -46,7 +47,11 @@ $(WKSPC)/XuanWuOS.cfg: fakeboard/cfg/*.h
 	@[ -x ${MKCFG} ] || chmod +x ${MKCFG}
 	@${MKCFG} --XWOS=$(XWOS) --cfgdir=$(<D) --wkspc=$(WKSPC) -- $(@F)
 
-c clean d distclean: cfg
+c clean : cfg
+	$(MAKE) -C $(WKSPC) TARGET=$(TARGET) NODEP=y clean
+
+d distclean: cfg
+	$(MAKE) -C $(WKSPC) TARGET=$(TARGET) NODEP=y distclean
 	@rm -rf $(WKSPC)
 
 .PHONY : all cfg c clean d distclean

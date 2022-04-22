@@ -31,14 +31,14 @@ MEMORY {
         bkram_mr (rw): org = 0x38800000, len = 4k /* backup SRAM */
 
         ivt_lmr (rx): org = 0x90000000, len = 2048 /* vectors table lma region */
-        ivt_vmr (rw): org = 0x00000000, len = 2048 /* vectors table vma region */
+        ivt_vmr (rw): org = 0x20000000, len = 2048 /* vectors table vma region */
         image_description_mr (rx): org = 0x90000800, len = 1k /* image description */
         code_mr (rx): org = 0x90000C00, len = 8189k /* text & rodata */
-        xwos_data_mr (arw): org = 0x800, len = 54k /* .xwos.data */
+        xwos_data_mr (arw): org = 0x20000800, len = 54k /* .xwos.data */
         data_mr (arw): org = 0x30000000, len = 288k /* .data, .bss & .heap */
         data4_mr (arw): org = 0x38000000, len = 64k /* .data4 for D3 Domain */
-        dtcmheap_mr (arw): org = 0x20000000, len = 128k /* .dtcmheap */
-        xwos_stk_mr (arw): org = 0x0000E000, len = 8k /* xwos stack */
+        dtcmheap_mr (arw): org = 0x20010000, len = 64k /* .dtcmheap */
+        xwos_stk_mr (arw): org = 0x2000E000, len = 8k /* xwos stack */
 }
 
 dtcmheap_mr_origin = ORIGIN(dtcmheap_mr);

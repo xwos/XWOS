@@ -43,7 +43,7 @@ xwer_t xwos_main(void)
         xwos_thd_attr_init(&attr);
         attr.name = "main.thd";
         attr.stack = NULL;
-        attr.stack_size = 4096;
+        attr.stack_size = 8192;
         attr.priority = MAIN_THD_PRIORITY;
         attr.detached = true;
         attr.privileged = true;

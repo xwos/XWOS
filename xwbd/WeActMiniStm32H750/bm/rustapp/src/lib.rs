@@ -18,6 +18,8 @@ use cortex_m::asm;
 use libc_print::std_name::println;
 
 use xwrust::xwos::thd;
+use xwrust::xwos::cthd;
+use xwrust::xwtm;
 
 #[global_allocator]
 pub static ALLOCATOR: xwrust::xwmm::Allocator = xwrust::xwmm::Allocator;
@@ -34,21 +36,58 @@ pub unsafe extern "C" fn xwrust_main() {
         println!("x: {}", x);
     }
 
-    let child1_builder = thd::Builder::new().name("child".into());
-    let child1 = child1_builder.spawn(|ele| {
-        println!("Thread name: {}", ele.name().unwrap());
-        3
-    }).unwrap();
-    let rc1 = child1.join().unwrap();
-    println!("rc: {}", rc1);
-
-    let ref2 = &1;
-    let f = move |_| {
-        ref2
-    };
-    let child2 = thd::spawn(f).unwrap();
-    let rc2 = child2.join().unwrap();
-    println!("rc: {}", rc2);
+    println!("[main] thd: {:?}", cthd::i());
+    println!("[main] now: {} ms", xwtm::nowtc());
+    match thd::Builder::new()
+        .name("child".into())
+        .spawn(|ele| {
+            // 子线程闭包
+            println!("[child] name: {}", ele.name().unwrap());
+            println!("[child] thd: {:?}", cthd::i());
+            println!("[child] now: {} ms", xwtm::nowtc());
+            let mut count = 0;
+            loop {
+                cthd::sleep(xwtm::s(1));
+                count += 1;
+                println!("[child] count: {}, now: {} ms", count, xwtm::nowtc());
+                if cthd::shld_frz() { // 判断是否要冻结子线程
+                    cthd::freeze();
+                }
+                if cthd::shld_stop() { // 判断是否要退出子线程
+                    break;
+                }
+            }
+            "OK"
+        }) {
+            Ok(h) => { // 新建子线程成功
+                let mut child = h;
+                loop {
+                    println!("[main] sleep 3s ...");
+                    cthd::sleep(xwtm::s(3)); // 主线程睡眠3s
+                    println!("[main] now: {} ms", xwtm::nowtc());
+                    println!("[main] stop child ...");
+                    match child.stop() { // stop() = quit() + join()
+                        Ok(r) => {
+                            println!("[main] Child thread return: {}, now: {} ms", r, xwtm::nowtc());
+                            break;
+                        },
+                        Err(e) => {
+                            println!("[main] Failed to stop child thread: {}, now: {} ms", e.join_state(), xwtm::nowtc());
+                            child = e;
+                        },
+                    }
+                    if cthd::shld_frz() { // 判断是否要冻结主线程
+                        cthd::freeze();
+                    }
+                    if cthd::shld_stop() { // 判断是否要退出主线程
+                        break;
+                    }
+                }
+            },
+            Err(rc) => { // 新建子线程失败
+                println!("[main] Failed to spawn child thread: {}, now: {} ms", rc, xwtm::nowtc());
+            },
+        };
 }
 
 #[no_mangle]
