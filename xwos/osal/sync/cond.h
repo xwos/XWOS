@@ -399,7 +399,7 @@ xwer_t xwos_cond_wait(struct xwos_cond * cond,
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -EINVAL: 参数无效
- * @retval -ETIMEDOUT: 超时，xwtm指向的缓冲区内的时间会减为0
+ * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
  * @retval -ENOTINTHD: 不在线程上下文中
  * @note

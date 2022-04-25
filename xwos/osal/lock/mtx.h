@@ -242,7 +242,7 @@ xwer_t xwos_mtx_unlock(struct xwos_mtx * mtx)
 }
 
 /**
- * @brief XWOS API：等待上锁互斥锁
+ * @brief XWOS API：获取互斥锁
  * @param[in] mtx: 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -254,6 +254,10 @@ xwer_t xwos_mtx_unlock(struct xwos_mtx * mtx)
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：不可重入
+ * @details
+ * 若线程无法获取互斥锁，就阻塞等待，直到能获得锁为之。
+ *
+ * 线程的阻塞等待可能被中断，此时，API返回 ```-EINTR``` 。
  */
 static __xwos_inline_api
 xwer_t xwos_mtx_lock(struct xwos_mtx * mtx)
@@ -262,7 +266,7 @@ xwer_t xwos_mtx_lock(struct xwos_mtx * mtx)
 }
 
 /**
- * @brief XWOS API：尝试上锁互斥锁，不会阻塞调用线程
+ * @brief XWOS API：尝试获取互斥锁，不会阻塞调用线程
  * @param[in] mtx: 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -294,7 +298,7 @@ xwer_t xwos_mtx_trylock(struct xwos_mtx * mtx)
  * @retval -EFAULT: 无效的指针或空指针
  + @retval -EOBJDEAD 互斥锁对象无效
  * @retval -EINTR: 等待被中断
- * @retval -ETIMEDOUT: 超时，xwtm指向的缓冲区内的时间会减为0
+ * @retval -ETIMEDOUT: 超时
  * @retval -ENOTINTHD: 不在线程上下文中
  * @note
  * - 同步/异步：同步

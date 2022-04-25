@@ -226,9 +226,9 @@ pub struct ThdAttr {
 ///
 /// 用于调用XWOS-CAPI
 pub struct ThdD {
-    /// XWOS线程结构体的指针
+    /// XWOS线程对象的指针
     pub(crate) thd: *mut c_void,
-    /// XWOS的线程的标签
+    /// XWOS线程对象的标签
     pub(crate) tik: XwSq,
 }
 
@@ -273,7 +273,7 @@ impl ThdD {
         }
     }
 
-    /// 通知线程退出
+    /// 通知线程退出。
     pub fn quit(&self) -> XwEr {
         unsafe {
             xwrustffi_thd_quit(self.thd, self.tik)
@@ -296,7 +296,7 @@ impl ThdD {
         unsafe { xwrustffi_thd_detach(self.thd, self.tik) }
     }
 
-    /// 将线程迁移到目标CPU
+    /// 将线程迁移到目标CPU。
     pub fn migrate(&self, cpuid: XwId) -> XwEr {
         unsafe {
             xwrustffi_thd_migrate(self.thd, self.tik, cpuid)
@@ -317,13 +317,11 @@ impl fmt::Debug for ThdD {
 // 工厂模式
 ////////////////////////////////////////////////////////////////////////////////
 
-/// 线程的工厂模式结构体，可用于配置新线程的属性
+/// 线程的工厂模式结构体，可用于配置新线程的属性。
 ///
-/// 有三种种配置可供选择：
-///
-/// - [`name`]: 设置[线程的名字][线程的名称]
-/// - [`stack_size`]: 设置[线程的栈大小][线程的栈大小]
-/// - [`privileged`]: 设置[线程的系统权限][线程的系统权限]
+/// + [`name`] 设置线程的名字
+/// + [`stack_size`] 设置线程的栈大小
+/// + [`privileged`] 设置线程的系统权限
 ///
 /// [`spawn`] 方法将获取构建器的所有权，并使用给定的配置创建线程，返回 [`core::result::Result`] 。
 ///
@@ -359,8 +357,7 @@ pub struct Builder {
 }
 
 impl Builder {
-    /// 新建用于创建线程的工厂
-    ///
+    /// 新建用于创建线程的工厂。
     ///
     /// # 示例
     ///
@@ -385,8 +382,7 @@ impl Builder {
         }
     }
 
-    /// 设置线程的名称
-    ///
+    /// 设置线程的名称。
     ///
     /// # 示例
     ///
@@ -408,8 +404,7 @@ impl Builder {
         self
     }
 
-    /// 设置线程栈的大小
-    ///
+    /// 设置线程栈的大小。
     ///
     /// # 示例
     ///
@@ -429,8 +424,7 @@ impl Builder {
         self
     }
 
-    /// 设置线程栈的系统权限
-    ///
+    /// 设置线程栈的系统权限。
     ///
     /// # 示例
     ///
@@ -450,16 +444,16 @@ impl Builder {
         self
     }
 
-    /// 转移 `Builder` 的所有权，并产生一个新线程
+    /// 转移 `Builder` 的所有权，并新建一个线程：
     ///
     /// + 创建线程成功，返回一个包含 [`ThdHandle`] 的 [`core::result::Result`] ；
     /// + 创建线程失败，返回一个包含 [`XwEr`] 的 [`core::result::Result`] ， [`XwEr`] 指示错误的原因。
     ///
     /// 方法的签名：
     ///
-    /// + `'static` 约束是因为新建的线程可能比调用者的生命周期更长，因此线程的闭包和返回值的生命周期限定为静态生命周期；
-    /// + [`Send`] 约束是因为闭包和返回值需要在线程之间进行转移。
-    ///
+    /// + [`'static`] 约束是因为新建的线程可能比调用者的生命周期更长，因此线程的闭包和返回值的生命周期限定为静态生命周期；
+    /// + [`Send`] 约束是因为闭包和返回值需要在线程之间进行转移。并且被移动到 [`Send`] 约束的闭包的变量也必须是 [`Send`] 的，否则编译器会报错。
+    ///   RUSTC是通过 [`Send`] 约束来区分闭包是不是另一线程的代码的。
     ///
     /// # 示例
     ///
@@ -491,6 +485,8 @@ impl Builder {
     /// };
     /// ```
     /// [`core::result::Result`]: https://doc.rust-lang.org/core/result/enum.Result.html
+    /// [`'static`]: https://doc.rust-lang.org/std/keyword.static.html
+    /// [`Send`]: https://doc.rust-lang.org/core/marker/trait.Send.html
     pub fn spawn<F, R>(self, f: F) -> Result<ThdHandle<R>, XwEr>
     where
         F: FnOnce(Arc<ThdElement>) -> R,
@@ -500,13 +496,12 @@ impl Builder {
         unsafe { self.spawn_unchecked(f) }
     }
 
-    /// 转移 `Builder` 的所有权，并产生一个新线程
+    /// 转移 `Builder` 的所有权，并产生一个新线程：
     ///
     /// + 创建线程成功，返回一个包含 [`ThdHandle`] 的 [`core::result::Result`] ；
     /// + 创建线程失败，返回一个包含 [`XwEr`] 的 [`core::result::Result`] ， [`XwEr`] 指示错误的原因。
     ///
     /// 此方法只要求闭包 `F` 和 返回值 `R` 的生命周期一样长，然后不做其他限制，因此是 `unsafe` 的。
-    ///
     ///
     /// # 示例
     ///
@@ -595,19 +590,20 @@ impl Builder {
     }
 }
 
-/// 产生一个新线程
+/// 新建一个线程：
 ///
 /// + 创建线程成功，返回一个包含 [`ThdHandle`] 的 [`core::result::Result`] ；
 /// + 创建线程失败，返回一个包含 [`XwEr`] 的 [`core::result::Result`] ， [`XwEr`] 指示错误的原因。
 ///
 /// 此方法使用默认的线程工厂创建线程。
 ///
-/// 当[`ThdHandle`]被 [`drop()`] 时，新建的线程会变成 **detached（分离的）** 。此时，新建的线程不能再被 [`join()`] 。
+/// 当 [`ThdHandle`] 被 [`drop()`] 时，新建的线程会变成 **detached（分离的）** 。此时，新建的线程不能再被 [`join()`] 。
 ///
 /// 方法的签名：
 ///
-/// + `'static` 约束是因为新建的线程可能比调用者的生命周期更长，因此线程的闭包和返回值的生命周期限定为静态生命周期；
-/// + [`Send`] 约束是因为闭包和返回值需要在线程之间进行转移。
+/// + [`'static`] 约束是因为新建的线程可能比调用者的生命周期更长，因此线程的闭包和返回值的生命周期限定为静态生命周期；
+/// + [`Send`] 约束是因为闭包和返回值需要在线程之间进行转移。并且被移动到 [`Send`] 约束的闭包的变量也必须是 [`Send`] 的，否则编译器会报错。
+///   RUSTC是通过 [`Send`] 约束来区分闭包是不是另一线程的代码的。
 ///
 /// # 示例
 ///
@@ -637,6 +633,8 @@ impl Builder {
 /// [`core::result::Result`]: https://doc.rust-lang.org/core/result/enum.Result.html
 /// [`drop()`]: https://doc.rust-lang.org/core/ops/trait.Drop.html#tymethod.drop
 /// [`join()`]: ThdHandle::join
+/// [`'static`]: https://doc.rust-lang.org/std/keyword.static.html
+/// [`Send`]: https://doc.rust-lang.org/core/marker/trait.Send.html
 pub fn spawn<F, R>(f: F) -> Result<ThdHandle<R>, XwEr>
 where
     F: FnOnce(Arc<ThdElement>) -> R,
@@ -648,7 +646,7 @@ where
 
 /// 线程的元素
 ///
-/// 线程的元素中的数据需跨线程共享，因此在定义时需要使用 [`Arc`] 封装
+/// 线程的元素中的数据需跨线程共享，因此在定义时需要使用 [`Arc`] 进行封装。
 ///
 /// [`Arc`]: https://doc.rust-lang.org/alloc/sync/struct.Arc.html
 pub struct ThdElement {
@@ -694,7 +692,7 @@ impl fmt::Debug for ThdElement {
 
 /// 线程的返回值
 ///
-/// 线程的返回值中的数据需跨线程共享，因此在定义时需要使用 [`Arc`] 封装
+/// 线程的返回值中的数据需跨线程共享，因此在定义时需要使用 [`Arc`] 进行封装。
 ///
 /// [`Arc`]: https://doc.rust-lang.org/alloc/sync/struct.Arc.html
 struct ThdReturnValue<R> {
@@ -772,18 +770,18 @@ unsafe impl<R> Send for ThdHandle<R> {}
 unsafe impl<R> Sync for ThdHandle<R> {}
 
 impl<R> ThdHandle<R> {
-    /// 返回XWOS的线程对象描述符，用于与C语言交互
+    /// 返回XWOS的线程对象描述符。线程对象描述符用于与C语言交互。
     pub fn thdd(&self) -> &ThdD {
         &self.inner.thdd
     }
 
-    /// 返回线程的元素
+    /// 返回线程的元素。
     pub fn element(&self) -> &ThdElement {
         &self.inner.element
     }
 
 
-    /// 通知线程退出
+    /// 通知线程退出。
     ///
     /// 此方法用于向另一个新建线程设置<b>退出</b>状态。
     ///
@@ -795,7 +793,7 @@ impl<R> ThdHandle<R> {
     }
 
 
-    /// 等待线程运行至退出，并返回线程的返回值
+    /// 等待线程运行至退出，并返回线程的返回值。
     ///
     /// 如果线程已经提前运行完成，此方法立即返回。
     ///
@@ -837,7 +835,7 @@ impl<R> ThdHandle<R> {
         }
     }
 
-    /// 终止线程并等待线程运行至退出，并返回线程的返回值
+    /// 终止线程并等待线程运行至退出，并返回线程的返回值。
     ///
     /// 如果线程已经提前运行完成，此方法立即返回。
     ///
@@ -883,12 +881,12 @@ impl<R> ThdHandle<R> {
         }
     }
 
-    /// 返回join()失败时的错误码
+    /// 返回join()失败时的错误码。
     pub fn join_state(&self) -> XwEr {
         self.inner.join_state
     }
 
-    /// 检查关联的线程是否运行结束
+    /// 检查关联的线程是否运行结束。
     ///
     /// 此方法不会阻塞调用者。
     pub fn finished(&self) -> bool {

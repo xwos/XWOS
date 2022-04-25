@@ -28,7 +28,7 @@
  * @ingroup xwos_lib
  * @{
  */
-#    define EPERM 1 /**< @brief Not owner */
+#    define EPERM 1 /**< @brief Operation not permitted */
 #    define ENOENT 2 /**< @brief No such file or directory */
 #    define ESRCH 3 /**< @brief No such process */
 #    define EINTR 4 /**< @brief Interrupted system call */

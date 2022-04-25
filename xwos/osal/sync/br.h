@@ -329,7 +329,7 @@ xwer_t xwos_br_wait(struct xwos_br * br)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -ECHRNG: 位置超出范围
- * @retval -ETIMEDOUT: 超时，xwtm指向的缓冲区内的时间会减为0
+ * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
  * @retval -ENOTINTHD：不在线程上下文中
  * @note

@@ -12,39 +12,77 @@ use core::panic::PanicInfo;
 extern crate alloc;
 use alloc::vec::Vec;
 use alloc::boxed::Box;
+use alloc::sync::Arc;
 
-use cortex_m::asm;
-
-use libc_print::std_name::println;
-
+use xwrust::xwtm;
 use xwrust::xwos::thd;
 use xwrust::xwos::cthd;
-use xwrust::xwtm;
+use xwrust::xwos::lock::mtx::*;
+
+use cortex_m::asm;
+use libc_print::std_name::println;
 
 #[global_allocator]
 pub static ALLOCATOR: xwrust::xwmm::Allocator = xwrust::xwmm::Allocator;
 
+static GLOBAL_LOCK: StaticMutex<u32> = StaticMutex::new(0);
+
 #[no_mangle]
 pub unsafe extern "C" fn xwrust_main() {
+    println!("XWOS RUST");
     let mut v = Vec::with_capacity(16);
     v.push(1);
     v.push(2);
     v.push(3);
     v.push(4);
-    println!("XWOS RUST");
     for x in v.iter() {
         println!("x: {}", x);
     }
+    GLOBAL_LOCK.init();
+    match GLOBAL_LOCK.lock() {
+        Ok(mut guard) => {
+            *guard = 1;
+        }
+        Err(mtxerr) => {
+            println!("[main] failed to lock: {:?}", mtxerr);
+        }
+    }
+
+    let lock: Arc<DynamicMutex<u32>> = Arc::new(DynamicMutex::new(10));
+    let lock_child = lock.clone();
 
     println!("[main] thd: {:?}", cthd::i());
     println!("[main] now: {} ms", xwtm::nowtc());
     match thd::Builder::new()
         .name("child".into())
-        .spawn(|ele| {
+        .spawn(move |ele| {
             // 子线程闭包
             println!("[child] name: {}", ele.name().unwrap());
             println!("[child] thd: {:?}", cthd::i());
             println!("[child] now: {} ms", xwtm::nowtc());
+
+            match GLOBAL_LOCK.lock() {
+                Ok(mut guard) => {
+                    *guard += 1;
+                    let value = *guard;
+                    println!("[child] locked, value: {}", value);
+                }
+                Err(mtxerr) => {
+                    println!("[child] failed to lock: {:?}", mtxerr);
+                }
+            }
+
+            match lock_child.lock() {
+                Ok(mut guard) => {
+                    *guard += 1;
+                    let value = *guard;
+                    println!("[child] locked, value: {}", value);
+                }
+                Err(mtxerr) => {
+                    println!("[child] failed to lock: {:?}", mtxerr);
+                }
+            }
+
             let mut count = 0;
             loop {
                 cthd::sleep(xwtm::s(1));
@@ -62,17 +100,42 @@ pub unsafe extern "C" fn xwrust_main() {
             Ok(h) => { // 新建子线程成功
                 let mut child = h;
                 loop {
-                    println!("[main] sleep 3s ...");
-                    cthd::sleep(xwtm::s(3)); // 主线程睡眠3s
+                    println!("[main] sleep 1s ...");
+                    cthd::sleep(xwtm::s(1));
+                    match GLOBAL_LOCK.lock() {
+                        Ok(mut guard) => {
+                            *guard += 1;
+                            let value = *guard;
+                            println!("[main] locked, value {}", value);
+                        }
+                        Err(mtxerr) => {
+                            println!("[main] failed to lock: {:?}", mtxerr);
+                        }
+                    }
+                    match lock.lock() {
+                        Ok(mut guard) => {
+                            *guard += 1;
+                            let value = *guard;
+                            println!("[main] locked, value {}", value);
+                        }
+                        Err(mtxerr) => {
+                            println!("[main] failed to lock: {:?}", mtxerr);
+                        }
+                    }
+
+                    println!("[main] sleep 2s ...");
+                    cthd::sleep(xwtm::s(2));
                     println!("[main] now: {} ms", xwtm::nowtc());
                     println!("[main] stop child ...");
                     match child.stop() { // stop() = quit() + join()
                         Ok(r) => {
-                            println!("[main] Child thread return: {}, now: {} ms", r, xwtm::nowtc());
+                            println!("[main] Child thread return: {}, now: {} ms",
+                                     r, xwtm::nowtc());
                             break;
                         },
                         Err(e) => {
-                            println!("[main] Failed to stop child thread: {}, now: {} ms", e.join_state(), xwtm::nowtc());
+                            println!("[main] Failed to stop child thread: {}, now: {} ms",
+                                     e.join_state(), xwtm::nowtc());
                             child = e;
                         },
                     }
@@ -84,8 +147,9 @@ pub unsafe extern "C" fn xwrust_main() {
                     }
                 }
             },
-            Err(rc) => { // 新建子线程失败
-                println!("[main] Failed to spawn child thread: {}, now: {} ms", rc, xwtm::nowtc());
+            Err(e) => { // 新建子线程失败
+                println!("[main] Failed to spawn child thread: {}, now: {} ms",
+                         e, xwtm::nowtc());
             },
         };
 }

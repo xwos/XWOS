@@ -46,10 +46,20 @@
 #![no_std]
 #![feature(alloc_error_handler)]
 #![feature(core_ffi_c)]
+#![feature(negative_impls)]
+
+#[macro_use]
+pub mod macros;
 
 pub mod types;
+
+pub mod errno;
+
 pub mod panic;
+
 pub mod xwtm;
+
 #[allow(dead_code)]
 pub mod xwos;
+
 pub mod xwmm;
