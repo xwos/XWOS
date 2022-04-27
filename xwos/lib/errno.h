@@ -179,26 +179,28 @@
 #define ERECALLCONFLICT 530 /**< @brief conflict with recalled state */
 
 /* XWOS扩展的错误码 */
-#define XWOK            0 /**< @brief no error */
-#define EEMPTY          1080 /**< @brief is empty */
-#define ETYPE           1081 /**< @brief type error */
-#define EINTHD          1082 /**< @brief in Thread mode */
-#define ENOTINTHD       1083 /**< @brief not in Thread mode */
-#define EINBH           1084 /**< @brief in Bottom Half */
-#define ENOTINBH        1085 /**< @brief not in Bottom Half */
-#define EINISR          1086 /**< @brief in ISR */
-#define ENOTINISR       1087 /**< @brief not in ISR */
-#define EBUG            1088 /**< @brief is a BUG */
-#define EEXIT           1089 /**< @brief need to exit */
-#define EBADOBJD        1090 /**< @brief bad Object Descriptor */
-#define EOBJDEAD        1091 /**< @brief object dead */
-#define EOBJACTIVE      1092 /**< @brief object active */
-#define ENEGATIVE       1093 /**< @brief negative resource */
-#define ESIZE           1094 /**< @brief size error */
-#define E2SMALL         1095 /**< @brief too small */
-#define EOOR            1096 /**< @brief out of range */
-#define EALIGN          1097 /**< @brief not aligned */
-#define EOWNER          1098 /**< @brief owner error */
+#define XWOK            0 /**< @brief No error */
+
+#define ETHDCTX         800 /**< @brief Thread context */
+#define ENOTTHDCTX      801 /**< @brief Not thread context */
+#define EBHCTX          802 /**< @brief Bottom half context */
+#define ENOTBHCTX       803 /**< @brief Not bottom half context */
+#define EISRCTX         804 /**< @brief ISR context */
+#define ENOTISRCTX      805 /**< @brief Not ISR context */
+
+#define ENILOBJD        880 /**< @brief Nil object descriptor */
+#define EOBJDEAD        884 /**< @brief Object dead */
+#define EOBJACTIVE      885 /**< @brief Object active */
+
+#define EEXIT           814 /**< @brief Need to exit */
+#define EBUG            860 /**< @brief BUG */
+#define ETYPE           830 /**< @brief Type error */
+#define EEMPTY          831 /**< @brief Empty error */
+#define ENEGATIVE       832 /**< @brief Negative state */
+#define ESIZE           833 /**< @brief Size error */
+#define E2SMALL         835 /**< @brief Too small */
+#define EALIGN          836 /**< @brief Not aligned */
+#define EOWNER          837 /**< @brief Owner error */
 
 /**
  * @} xwos_lib_errno

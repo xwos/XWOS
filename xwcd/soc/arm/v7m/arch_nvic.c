@@ -49,7 +49,7 @@ xwer_t arch_nvic_irq_get_id(xwirq_t * irqnbuf)
 
         curr = cm_scs.scb.icsr.bit.vect_active;
         if (0 == curr) {
-                rc = -ENOTINISR;
+                rc = -ENOTISRCTX;
         } else {
                 curr -= 16;
                 rc = XWOK;

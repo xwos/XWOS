@@ -70,12 +70,14 @@ xwer_t xwosdl_sel_release(struct xwosdl_sel * sel, xwsq_t tik)
 static __xwcc_inline
 xwer_t xwosdl_sel_grab(struct xwosdl_sel * sel)
 {
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
         return xwmp_evt_grab(sel);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sel_put(struct xwosdl_sel * sel)
 {
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
         return xwmp_evt_put(sel);
 }
 

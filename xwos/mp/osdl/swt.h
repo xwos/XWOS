@@ -73,12 +73,14 @@ xwer_t xwosdl_swt_release(struct xwosdl_swt * swt, xwsq_t tik)
 static __xwcc_inline
 xwer_t xwosdl_swt_grab(struct xwosdl_swt * swt)
 {
+        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
         return xwmp_swt_grab(swt);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_swt_put(struct xwosdl_swt * swt)
 {
+        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
         return xwmp_swt_put(swt);
 }
 

@@ -292,28 +292,24 @@ xwer_t xwmp_evt_delete(struct xwmp_evt * evt)
 __xwmp_api
 xwer_t xwmp_evt_acquire(struct xwmp_evt * evt, xwsq_t tik)
 {
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
         return xwmp_synobj_acquire(&evt->cond.synobj, tik);
 }
 
 __xwmp_api
 xwer_t xwmp_evt_release(struct xwmp_evt * evt, xwsq_t tik)
 {
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
         return xwmp_synobj_release(&evt->cond.synobj, tik);
 }
 
 __xwmp_api
 xwer_t xwmp_evt_grab(struct xwmp_evt * evt)
 {
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
         return xwmp_synobj_grab(&evt->cond.synobj);
 }
 
 __xwmp_api
 xwer_t xwmp_evt_put(struct xwmp_evt * evt)
 {
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
         return xwmp_synobj_put(&evt->cond.synobj);
 }
 
@@ -867,7 +863,7 @@ xwer_t xwmp_flg_wait_to(struct xwmp_evt * evt,
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_FLG),
                       "type-error", -ETYPE);
-        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         rc = xwmp_evt_grab(evt);
         if (rc < 0) {
@@ -1128,7 +1124,7 @@ xwer_t xwmp_sel_select_to(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_SEL),
                       "type-error", -ETYPE);
-        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         rc = xwmp_evt_grab(evt);
         if (rc < 0) {
@@ -1199,7 +1195,7 @@ xwer_t xwmp_br_wait_to(struct xwmp_evt * evt, xwtm_t to)
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
         XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_BR),
                       "type-error", -ETYPE);
-        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         rc = xwmp_evt_grab(evt);
         if (__xwcc_unlikely(rc < 0)) {

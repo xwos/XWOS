@@ -108,7 +108,7 @@ int __retarget_lock_try_acquire(_LOCK_T lock)
                 } else if (XWOS_SKD_CONTEXT_INIT_EXIT == ctx) {
                         rc = XWOK;
                 } else {
-                        rc = -ENOTINTHD;
+                        rc = -ENOTTHDCTX;
                 }
         } else {
                 rc = -EFAULT;

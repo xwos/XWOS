@@ -1228,7 +1228,6 @@ xwer_t xwup_skd_resume_lic(struct xwup_skd * xwskd)
  * @brief XWUP API：继续已经暂停的调度器
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ENOTINISR: 不在中断中
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -1305,7 +1304,7 @@ void xwup_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
         } else {
                 xwskd = xwup_skd_get_lc();
                 if (xwskd->state) {
-                        if (-EINBH == rc) {
+                        if (-EBHCTX == rc) {
                                 ctx = XWUP_SKD_CONTEXT_BH;
                         } else if (XWUP_SKD_IDLE_STK(xwskd) == xwskd->cstk) {
                                 ctx = XWUP_SKD_CONTEXT_IDLE;

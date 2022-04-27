@@ -18,6 +18,11 @@ xwer_t xwrustffi_mtx_init(struct xwos_mtx * mtx)
         return xwos_mtx_init(mtx, XWOS_SKD_PRIORITY_RT_MAX);
 }
 
+xwer_t xwrustffi_mtx_fini(struct xwos_mtx * mtx)
+{
+        return xwos_mtx_fini(mtx);
+}
+
 xwer_t xwrustffi_mtx_grab(struct xwos_mtx * mtx)
 {
         return xwos_mtx_grab(mtx);
@@ -31,6 +36,11 @@ xwer_t xwrustffi_mtx_put(struct xwos_mtx * mtx)
 xwer_t xwrustffi_mtx_create(struct xwos_mtx ** mtxbuf)
 {
         return xwos_mtx_create(mtxbuf, XWOS_SKD_PRIORITY_RT_MAX);
+}
+
+xwer_t xwrustffi_mtx_delete(struct xwos_mtx * mtx)
+{
+        return xwos_mtx_delete(mtx);
 }
 
 xwsq_t xwrustffi_mtx_gettik(struct xwos_mtx * mtx)

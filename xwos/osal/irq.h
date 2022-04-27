@@ -263,8 +263,8 @@ xwer_t xwos_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
  * + 可为NULL，表示不需要返回中断号
  * @return 错误码
  * @retval OK: 当前上下文为中断
- * @retval -EINTHD: 当前上下文为线程
- * @retval -EINBH: 当前上下文为中断底半部
+ * @retval -ETHDCTX: 当前上下文为线程
+ * @retval -EBHCTX: 当前上下文为中断底半部
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程

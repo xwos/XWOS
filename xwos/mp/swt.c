@@ -284,28 +284,24 @@ xwer_t xwmp_swt_delete(struct xwmp_swt * swt)
 __xwmp_api
 xwer_t xwmp_swt_acquire(struct xwmp_swt * swt, xwsq_t tik)
 {
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
         return xwos_object_acquire(&swt->xwobj, tik);
 }
 
 __xwmp_api
 xwer_t xwmp_swt_release(struct xwmp_swt * swt, xwsq_t tik)
 {
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
         return xwos_object_release(&swt->xwobj, tik);
 }
 
 __xwmp_api
 xwer_t xwmp_swt_grab(struct xwmp_swt * swt)
 {
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
         return xwos_object_grab(&swt->xwobj);
 }
 
 __xwmp_api
 xwer_t xwmp_swt_put(struct xwmp_swt * swt)
 {
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
         return xwos_object_put(&swt->xwobj);
 }
 

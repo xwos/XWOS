@@ -70,12 +70,14 @@ xwer_t xwosdl_cond_release(struct xwosdl_cond * cond, xwsq_t tik)
 static __xwcc_inline
 xwer_t xwosdl_cond_grab(struct xwosdl_cond * cond)
 {
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         return xwmp_cond_grab(cond);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_cond_put(struct xwosdl_cond * cond)
 {
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         return xwmp_cond_put(cond);
 }
 

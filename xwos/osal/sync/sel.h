@@ -156,6 +156,7 @@ xwos_sel_d xwos_sel_getd(struct xwos_sel * sel)
  * @param[in] seld: 信号选择器对象的描述符
  * @return 错误码
  * @retval XWOK: OK
+ * @retval -ENILOBJD: 空的对象描述符
  * @retval -EOBJDEAD: 对象无效
  * @retval -EACCES: 对象标签检查失败
  * @note
@@ -174,6 +175,7 @@ xwer_t xwos_sel_acquire(xwos_sel_d seld)
  * @param[in] seld: 信号选择器对象的描述符
  * @return 错误码
  * @retval XWOK: OK
+ * @retval -ENILOBJD: 空的对象描述符
  * @retval -EOBJDEAD: 对象无效
  * @retval -EACCES: 对象标签检查失败
  * @note
@@ -197,6 +199,9 @@ xwer_t xwos_sel_release(xwos_sel_d seld)
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
+ * @details
+ * 此函数主要用于管理**静态对象**的引用计数。
+ * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
  */
 static __xwos_inline_api
 xwer_t xwos_sel_grab(struct xwos_sel * sel)
@@ -214,6 +219,9 @@ xwer_t xwos_sel_grab(struct xwos_sel * sel)
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
+ * @details
+ * 此函数主要用于管理**静态对象**的引用计数。
+ * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
  */
 static __xwos_inline_api
 xwer_t xwos_sel_put(struct xwos_sel * sel)
@@ -310,7 +318,7 @@ xwer_t xwos_sel_get_num(struct xwos_sel * sel, xwsz_t * numbuf)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
+ * @retval -ENOTTHDCTX: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -355,7 +363,7 @@ xwer_t xwos_sel_tryselect(struct xwos_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
  * @retval -EFAULT: 空指针
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
+ * @retval -ENOTTHDCTX: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程

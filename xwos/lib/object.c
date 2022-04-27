@@ -187,6 +187,7 @@ void xwos_object_acquire_refaop_op(void * nv, const void * ov, void * arg)
  * @param[in] tik: 标签
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -ENILOBJD: 空的对象描述符
  * @retval -EOBJDEAD: 对象无效
  * @retval -EACCES: 对象标签检查失败
  */
@@ -196,10 +197,14 @@ xwer_t xwos_object_acquire(struct xwos_object * obj, xwsq_t tik)
         xwobj_d objd = {obj, tik};
         xwer_t rc;
 
-        rc = xwaop_tst_then_op(xwsq_t, &obj->refcnt,
-                               xwos_object_acquire_refaop_tst, &objd,
-                               xwos_object_acquire_refaop_op, &objd,
-                               NULL, NULL);
+        if ((NULL == obj) || (0 == tik)) {
+                rc = -ENILOBJD;
+        } else {
+                rc = xwaop_tst_then_op(xwsq_t, &obj->refcnt,
+                                       xwos_object_acquire_refaop_tst, &objd,
+                                       xwos_object_acquire_refaop_op, &objd,
+                                       NULL, NULL);
+        }
         return rc;
 }
 
@@ -241,6 +246,7 @@ void xwos_object_release_refaop_op(void * nv, const void * ov, void * arg)
  * @param[in] tik: 标签
  * @return 错误码
  * @retval XWOK: 没有错误
+ * @retval -ENILOBJD: 空的对象描述符
  * @retval -EOBJDEAD: 对象无效
  * @retval -EACCES: 对象标签检查失败
  */
@@ -251,17 +257,21 @@ xwer_t xwos_object_release(struct xwos_object * obj, xwsq_t tik)
         xwsq_t nv;
         xwer_t rc;
 
-        rc = xwaop_tst_then_op(xwsq_t, &obj->refcnt,
-                               xwos_object_release_refaop_tst, &objd,
-                               xwos_object_release_refaop_op, &objd,
-                               &nv, NULL);
-        if (__xwcc_likely(XWOK == rc)) {
-                if (__xwcc_unlikely(0 == nv)) {
-                        if (obj->gcfunc) {
-                                rc = obj->gcfunc(obj);
+        if ((NULL == obj) || (0 == tik)) {
+                rc = -ENILOBJD;
+        } else {
+                rc = xwaop_tst_then_op(xwsq_t, &obj->refcnt,
+                                       xwos_object_release_refaop_tst, &objd,
+                                       xwos_object_release_refaop_op, &objd,
+                                       &nv, NULL);
+                if (__xwcc_likely(XWOK == rc)) {
+                        if (__xwcc_unlikely(0 == nv)) {
+                                if (obj->gcfunc) {
+                                        rc = obj->gcfunc(obj);
+                                }/* else {} */
                         }/* else {} */
                 }/* else {} */
-        }/* else {} */
+        }
         return rc;
 }
 
@@ -329,7 +339,7 @@ xwer_t xwos_object_rawput(struct xwos_object * obj)
                                 NULL, NULL);
         if (rc < 0) {
                 rc = -EOBJDEAD;
-        }
+        }/* else {} */
         return rc;
 }
 

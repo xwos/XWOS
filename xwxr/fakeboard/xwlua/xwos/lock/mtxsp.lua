@@ -112,7 +112,7 @@ print(mtxsp)
 + ● **rc** 返回值
   + ○ **0** 没有错误
   + ○ **-EINTR** 等待被中断
-  + ○ **-ENOTINTHD** 不在线程上下文中
+  + ○ **-ENOTTHDCTX** 不在线程上下文中
 
 @usage
 lock = xwos.mtx.new()
@@ -139,7 +139,7 @@ end
 + ● **rc** 返回值
   + ○ **0** 没有错误
   + ○ **-EINTR** 等待被中断
-  + ○ **-ENOTINTHD** 不在线程上下文中
+  + ○ **-ENOTTHDCTX** 不在线程上下文中
   + ○ **-ENODATA** 尝试上锁失败
 
 @usage
@@ -172,7 +172,7 @@ end
 + ● **rc** 返回值
   + ○ **0** 没有错误
   + ○ **-EINTR** 等待被中断
-  + ○ **-ENOTINTHD** 不在线程上下文中
+  + ○ **-ENOTTHDCTX** 不在线程上下文中
   + ○ **-ETIMEDOUT** 超时
 
 @usage
@@ -200,7 +200,7 @@ end
 + ● **rc** 返回值
   + ○ **0** 没有错误
   + ○ **-EOWNER** 线程并没有锁定此互斥锁
-  + ○ **-ENOTINTHD** 不在线程上下文中
+  + ○ **-ENOTTHDCTX** 不在线程上下文中
 
 @usage
 lock = xwos.mtx.new()

@@ -49,36 +49,51 @@ xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd,
 static __xwcc_inline
 xwer_t xwosdl_thd_acquire(struct xwosdl_thd * thd, xwsq_t tik)
 {
-        XWOS_UNUSED(thd);
+        xwer_t rc;
+
         XWOS_UNUSED(tik);
-        return XWOK;
+
+        if (NULL == thd) {
+                rc = -ENILOBJD;
+        } else {
+                rc = XWOK;
+        }
+        return rc;
 }
 
 static __xwcc_inline
 xwer_t xwosdl_thd_release(struct xwosdl_thd * thd, xwsq_t tik)
 {
-        XWOS_UNUSED(thd);
+        xwer_t rc;
+
         XWOS_UNUSED(tik);
-        return XWOK;
+
+        if (NULL == thd) {
+                rc = -ENILOBJD;
+        } else {
+                rc = XWOK;
+        }
+        return rc;
 }
 
 static __xwcc_inline
 xwer_t xwosdl_thd_grab(struct xwosdl_thd * thd)
 {
-        XWOS_UNUSED(thd);
+        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
         return XWOK;
 }
 
 static __xwcc_inline
 xwer_t xwosdl_thd_put(struct xwosdl_thd * thd)
 {
-        XWOS_UNUSED(thd);
+        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
         return XWOK;
 }
 
 static __xwcc_inline
 xwer_t xwosdl_thd_quit(struct xwosdl_thd * thd, xwsq_t tik)
 {
+        XWOS_VALIDATE((NULL != thd), "nild", -ENILOBJD);
         XWOS_UNUSED(tik);
         xwup_thd_quit(thd);
         return XWOK;
@@ -87,7 +102,7 @@ xwer_t xwosdl_thd_quit(struct xwosdl_thd * thd, xwsq_t tik)
 static __xwos_inline_api
 xwer_t xwosdl_thd_join(struct xwosdl_thd * thd, xwsq_t tik, xwer_t * trc)
 {
-        XWOS_VALIDATE((NULL != thd), "nild", -EBADOBJD);
+        XWOS_VALIDATE((NULL != thd), "nild", -ENILOBJD);
         XWOS_UNUSED(tik);
         return xwup_thd_join(thd, trc);
 }
@@ -97,7 +112,7 @@ xwer_t xwosdl_thd_stop(struct xwosdl_thd * thd, xwsq_t tik, xwer_t * rc);
 static __xwcc_inline
 xwer_t xwosdl_thd_detach(struct xwosdl_thd * thd, xwsq_t tik)
 {
-        XWOS_VALIDATE((NULL != thd), "nild", -EBADOBJD);
+        XWOS_VALIDATE((NULL != thd), "nild", -ENILOBJD);
         XWOS_UNUSED(tik);
         return xwup_thd_detach(thd);
 }
@@ -105,7 +120,7 @@ xwer_t xwosdl_thd_detach(struct xwosdl_thd * thd, xwsq_t tik)
 static __xwcc_inline
 xwer_t xwosdl_thd_migrate(struct xwosdl_thd * thd, xwsq_t tik, xwid_t dstcpu)
 {
-        XWOS_UNUSED(thd);
+        XWOS_VALIDATE((NULL != thd), "nild", -ENILOBJD);
         XWOS_UNUSED(tik);
         XWOS_UNUSED(dstcpu);
         return XWOK;
@@ -166,7 +181,7 @@ static __xwos_inline_api
 xwer_t xwosdl_thd_set_data(struct xwosdl_thd * thd, xwsq_t tik,
                            xwsq_t pos, void * data)
 {
-        XWOS_VALIDATE((NULL != thd), "nild", -EBADOBJD);
+        XWOS_VALIDATE((NULL != thd), "nild", -ENILOBJD);
         XWOS_UNUSED(tik);
         return xwup_thd_set_data(thd, pos, data);
 }
@@ -175,7 +190,7 @@ static __xwos_inline_api
 xwer_t xwosdl_thd_get_data(struct xwosdl_thd * thd, xwsq_t tik,
                            xwsq_t pos, void ** databuf)
 {
-        XWOS_VALIDATE((NULL != thd), "nild", -EBADOBJD);
+        XWOS_VALIDATE((NULL != thd), "nild", -ENILOBJD);
         XWOS_UNUSED(tik);
         return xwup_thd_get_data(thd, pos, databuf);
 }

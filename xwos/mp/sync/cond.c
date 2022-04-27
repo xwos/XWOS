@@ -279,28 +279,24 @@ xwer_t xwmp_cond_delete(struct xwmp_cond * cond)
 __xwmp_api
 xwer_t xwmp_cond_acquire(struct xwmp_cond * cond, xwsq_t tik)
 {
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         return xwmp_synobj_acquire(&cond->synobj, tik);
 }
 
 __xwmp_api
 xwer_t xwmp_cond_release(struct xwmp_cond * cond, xwsq_t tik)
 {
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         return xwmp_synobj_release(&cond->synobj, tik);
 }
 
 __xwmp_api
 xwer_t xwmp_cond_grab(struct xwmp_cond * cond)
 {
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         return xwmp_synobj_grab(&cond->synobj);
 }
 
 __xwmp_api
 xwer_t xwmp_cond_put(struct xwmp_cond * cond)
 {
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         return xwmp_synobj_put(&cond->synobj);
 }
 
@@ -890,7 +886,7 @@ xwer_t xwmp_cond_wait_to(struct xwmp_cond * cond,
         XWOS_VALIDATE((((NULL == lock) && (XWOS_LK_NONE == lktype)) ||
                        ((lock) && (lktype > XWOS_LK_NONE))),
                       "invalid-lock", -EINVAL);
-        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         *lkst = XWOS_LKST_LOCKED;
         cthd = xwmp_skd_get_cthd_lc();

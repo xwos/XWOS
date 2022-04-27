@@ -141,10 +141,8 @@ xwer_t xwup_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
 __xwup_api
 xwer_t xwup_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
 {
-        XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM),
-                      "out-of-range", -ERANGE);
-        XWOS_VALIDATE((irqn >= (0 - (xwirq_t)SOCCFG_EXC_NUM)),
-                      "out-of-range", -ERANGE);
+        XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM), "out-of-range", -ERANGE);
+        XWOS_VALIDATE((irqn >= (0 - (xwirq_t)SOCCFG_EXC_NUM)), "out-of-range", -ERANGE);
 
         return xwospl_irq_get_data(irqn, databuf);
 }
@@ -158,12 +156,12 @@ xwer_t xwup_irq_get_id(xwirq_t * irqnbuf)
         if (rc < 0) {
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
                 if (xwup_skd_tst_in_bh_lc()) {
-                        rc = -EINBH;
+                        rc = -EBHCTX;
                 } else {
-                        rc = -EINTHD;
+                        rc = -ETHDCTX;
                 }
 #else
-                rc = -EINTHD;
+                rc = -ETHDCTX;
 #endif
         }
         return rc;

@@ -698,7 +698,7 @@ xwer_t xwup_cond_wait_to(struct xwup_cond * cond,
         XWOS_VALIDATE((((NULL == lock) && (XWOS_LK_NONE == lktype)) ||
                        ((lock) && (lktype > XWOS_LK_NONE))),
                       "invalid-lock", -EINVAL);
-        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         *lkst = XWOS_LKST_LOCKED;
         cthd = xwup_skd_get_cthd_lc();

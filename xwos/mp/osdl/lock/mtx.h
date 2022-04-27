@@ -69,12 +69,14 @@ xwer_t xwosdl_mtx_release(struct xwosdl_mtx * mtx, xwsq_t tik)
 static __xwcc_inline
 xwer_t xwosdl_mtx_grab(struct xwosdl_mtx * mtx)
 {
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
         return xwmp_mtx_grab(mtx);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_mtx_put(struct xwosdl_mtx * mtx)
 {
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
         return xwmp_mtx_put(mtx);
 }
 

@@ -81,12 +81,14 @@ xwer_t xwosdl_flg_release(struct xwosdl_flg * flg, xwsq_t tik)
 static __xwcc_inline
 xwer_t xwosdl_flg_grab(struct xwosdl_flg * flg)
 {
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
         return xwmp_evt_grab(flg);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_flg_put(struct xwosdl_flg * flg)
 {
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
         return xwmp_evt_put(flg);
 }
 

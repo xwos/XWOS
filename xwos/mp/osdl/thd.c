@@ -24,7 +24,6 @@ xwer_t xwosdl_thd_init(struct xwosdl_thd * thd, xwosdl_thd_d * thdd,
         XWOS_VALIDATE((NULL != thdd), "nullptr", -EFAULT);
         XWOS_VALIDATE((NULL != inattr), "nullptr", -EFAULT);
         XWOS_VALIDATE((NULL != inattr->stack), "nullptr", -EFAULT);
-        XWOS_VALIDATE((mainfunc), "nullptr", -EFAULT);
 
         rc = xwmp_thd_init(thd, inattr, mainfunc, arg);
         if (XWOK == rc) {
@@ -37,6 +36,20 @@ xwer_t xwosdl_thd_init(struct xwosdl_thd * thd, xwosdl_thd_d * thdd,
 }
 
 __xwmp_code
+xwer_t xwosdl_thd_grab(struct xwosdl_thd * thd)
+{
+        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
+        return xwmp_thd_grab(thd);
+}
+
+__xwmp_code
+xwer_t xwosdl_thd_put(struct xwosdl_thd * thd)
+{
+        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
+        return xwmp_thd_put(thd);
+}
+
+__xwmp_code
 xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd,
                          const struct xwosdl_thd_attr * inattr,
                          xwosdl_thd_f mainfunc, void * arg)
@@ -45,7 +58,6 @@ xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd,
         struct xwosdl_thd * thd;
 
         XWOS_VALIDATE((thdd), "nullptr", -EFAULT);
-        XWOS_VALIDATE((mainfunc), "nullptr", -EFAULT);
 
         rc = xwmp_thd_create(&thd, inattr, mainfunc, arg);
         if (XWOK == rc) {
@@ -62,9 +74,6 @@ xwer_t xwosdl_thd_quit(struct xwosdl_thd * thd, xwsq_t tik)
 {
         xwer_t rc;
 
-        XWOS_VALIDATE((NULL != thd), "nild", -EBADOBJD);
-        XWOS_VALIDATE((0 != tik), "nild", -EBADOBJD);
-
         rc = xwmp_thd_acquire(thd, tik);
         if (XWOK == rc) {
                 xwmp_thd_quit(thd);
@@ -78,9 +87,6 @@ xwer_t xwosdl_thd_join(struct xwosdl_thd * thd, xwsq_t tik, xwer_t * trc)
 {
         xwer_t rc;
 
-        XWOS_VALIDATE((NULL != thd), "nild", -EBADOBJD);
-        XWOS_VALIDATE((0 != tik), "nild", -EBADOBJD);
-
         rc = xwmp_thd_acquire(thd, tik);
         if (XWOK == rc) {
                 rc = xwmp_thd_join(thd, trc);
@@ -93,9 +99,6 @@ __xwmp_code
 xwer_t xwosdl_thd_stop(struct xwosdl_thd * thd, xwsq_t tik, xwer_t * trc)
 {
         xwer_t rc;
-
-        XWOS_VALIDATE((NULL != thd), "nild", -EBADOBJD);
-        XWOS_VALIDATE((0 != tik), "nild", -EBADOBJD);
 
         rc = xwmp_thd_acquire(thd, tik);
         if (XWOK == rc) {
@@ -111,9 +114,6 @@ xwer_t xwosdl_thd_detach(struct xwosdl_thd * thd, xwsq_t tik)
 {
         xwer_t rc;
 
-        XWOS_VALIDATE((NULL != thd), "nild", -EBADOBJD);
-        XWOS_VALIDATE((0 != tik), "nild", -EBADOBJD);
-
         rc = xwmp_thd_acquire(thd, tik);
         if (XWOK == rc) {
                 rc = xwmp_thd_detach(thd);
@@ -127,9 +127,6 @@ xwer_t xwosdl_thd_migrate(struct xwosdl_thd * thd, xwsq_t tik, xwid_t dstcpu)
 {
 
         xwer_t rc;
-
-        XWOS_VALIDATE((NULL != thd), "nild", -EBADOBJD);
-        XWOS_VALIDATE((0 != tik), "nild", -EBADOBJD);
 
         rc = xwmp_thd_acquire(thd, tik);
         if (XWOK == rc) {
@@ -156,9 +153,6 @@ xwer_t xwosdl_thd_set_data(struct xwosdl_thd * thd, xwsq_t tik,
 {
         xwer_t rc;
 
-        XWOS_VALIDATE((NULL != thd), "nild", -EBADOBJD);
-        XWOS_VALIDATE((0 != tik), "nild", -EBADOBJD);
-
         rc = xwmp_thd_acquire(thd, tik);
         if (XWOK == rc) {
                 rc = xwmp_thd_set_data(thd, pos, data);
@@ -172,9 +166,6 @@ xwer_t xwosdl_thd_get_data(struct xwosdl_thd * thd, xwsq_t tik,
                            xwsq_t pos, void ** databuf)
 {
         xwer_t rc;
-
-        XWOS_VALIDATE((NULL != thd), "nild", -EBADOBJD);
-        XWOS_VALIDATE((0 != tik), "nild", -EBADOBJD);
 
         rc = xwmp_thd_acquire(thd, tik);
         if (XWOK == rc) {

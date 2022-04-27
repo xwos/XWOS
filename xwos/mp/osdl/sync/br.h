@@ -71,12 +71,14 @@ xwer_t xwosdl_br_release(struct xwosdl_br * br, xwsq_t tik)
 static __xwcc_inline
 xwer_t xwosdl_br_grab(struct xwosdl_br * br)
 {
+        XWOS_VALIDATE((br), "nullptr", -EFAULT);
         return xwmp_evt_grab(br);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_br_put(struct xwosdl_br * br)
 {
+        XWOS_VALIDATE((br), "nullptr", -EFAULT);
         return xwmp_evt_put(br);
 }
 

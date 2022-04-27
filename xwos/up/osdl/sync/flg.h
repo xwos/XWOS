@@ -63,30 +63,44 @@ xwsq_t xwosdl_flg_gettik(struct xwosdl_flg * flg)
 static __xwcc_inline
 xwer_t xwosdl_flg_acquire(struct xwosdl_flg * flg, xwsq_t tik)
 {
-        XWOS_UNUSED(flg);
+        xwer_t rc;
+
         XWOS_UNUSED(tik);
-        return XWOK;
+
+        if (NULL == flg) {
+                rc = -ENILOBJD;
+        } else {
+                rc = XWOK;
+        }
+        return rc;
 }
 
 static __xwcc_inline
 xwer_t xwosdl_flg_release(struct xwosdl_flg * flg, xwsq_t tik)
 {
-        XWOS_UNUSED(flg);
+        xwer_t rc;
+
         XWOS_UNUSED(tik);
-        return XWOK;
+
+        if (NULL == flg) {
+                rc = -ENILOBJD;
+        } else {
+                rc = XWOK;
+        }
+        return rc;
 }
 
 static __xwcc_inline
 xwer_t xwosdl_flg_grab(struct xwosdl_flg * flg)
 {
-        XWOS_UNUSED(flg);
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
         return XWOK;
 }
 
 static __xwcc_inline
 xwer_t xwosdl_flg_put(struct xwosdl_flg * flg)
 {
-        XWOS_UNUSED(flg);
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
         return XWOK;
 }
 

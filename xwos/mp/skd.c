@@ -1489,7 +1489,7 @@ void xwmp_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
         } else {
                 xwskd = xwmp_skd_get_lc();
                 if (xwskd->state) {
-                        if (-EINBH == rc) {
+                        if (-EBHCTX == rc) {
                                 ctx = XWMP_SKD_CONTEXT_BH;
                         } else if (XWMP_SKD_IDLE_STK(xwskd) == xwskd->cstk) {
                                 ctx = XWMP_SKD_CONTEXT_IDLE;

@@ -707,7 +707,7 @@ xwer_t xwup_flg_wait_to(struct xwup_evt * evt,
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE(((evt->type & XWUP_EVT_TYPE_MASK) == XWUP_EVT_TYPE_FLG),
                       "type-error", -ETYPE);
-        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         if (trigger <= XWUP_FLG_TRIGGER_CLR_ANY) {
                 rc = xwup_flg_wait_to_level(evt, trigger, action, origin, msk, to);
@@ -930,7 +930,7 @@ xwer_t xwup_sel_select_to(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE(((evt->type & XWUP_EVT_TYPE_MASK) == XWUP_EVT_TYPE_SEL),
                       "type-error", -ETYPE);
-        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         while (true) {
@@ -993,7 +993,7 @@ xwer_t xwup_br_wait_to(struct xwup_evt * evt, xwtm_t to)
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
         XWOS_VALIDATE(((evt->type & XWUP_EVT_TYPE_MASK) == XWUP_EVT_TYPE_BR),
                       "type-error", -ETYPE);
-        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         pos = xwbmpop_ffz(evt->bmp, evt->num);

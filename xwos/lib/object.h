@@ -65,6 +65,11 @@ typedef struct {
         xwsq_t tik;
 } xwobj_d;
 
+/**
+ * @brief 空的XWOS对象对象描述符
+ */
+#define XWOBJ_NILD ((xwobj_d){NULL, 0,})
+
 void xwos_objtik_init(void);
 void xwos_object_construct(struct xwos_object * obj);
 void xwos_object_destruct(struct xwos_object * obj);

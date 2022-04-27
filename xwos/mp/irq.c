@@ -19,10 +19,8 @@ __xwmp_api
 xwer_t xwmp_irq_request(xwirq_t irqn, xwisr_f isr, void * data,
                         const struct soc_irq_cfg * cfg)
 {
-        XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM),
-                      "out-of-range", -ERANGE);
-        XWOS_VALIDATE((irqn >= (0 - (xwirq_t)SOCCFG_EXC_NUM)),
-                      "out-of-range", -ERANGE);
+        XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM), "out-of-range", -ERANGE);
+        XWOS_VALIDATE((irqn >= (0 - (xwirq_t)SOCCFG_EXC_NUM)), "out-of-range", -ERANGE);
 
         return xwospl_irq_request(irqn, isr, data, cfg);
 }
@@ -158,12 +156,12 @@ xwer_t xwmp_irq_get_id(xwirq_t * irqnbuf)
         if (rc < 0) {
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
                 if (xwmp_skd_tst_in_bh_lc()) {
-                        rc = -EINBH;
+                        rc = -EBHCTX;
                 } else {
-                        rc = -EINTHD;
+                        rc = -ETHDCTX;
                 }
 #else
-                rc = -EINTHD;
+                rc = -ETHDCTX;
 #endif
         }
         return rc;

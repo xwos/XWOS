@@ -189,7 +189,7 @@ end
   + ○ **0** 没有错误
   + ○ **-EINVAL** 参数错误
   + ○ **-EINTR** 等待被中断
-  + ○ **-ENOTINTHD** 不在线程上下文中
+  + ○ **-ENOTTHDCTX** 不在线程上下文中
 
 @usage
 br = xwos.br.new(4) -- 同步4个线程
@@ -220,7 +220,7 @@ end
   + ○ **0** 没有错误
   + ○ **-EINVAL** 参数错误
   + ○ **-EINTR** 等待被中断
-  + ○ **-ENOTINTHD** 不在线程上下文中
+  + ○ **-ENOTTHDCTX** 不在线程上下文中
   + ○ **-ETIMEDOUT** 超时
 
 @usage

@@ -370,7 +370,7 @@ end
   + ○ **0** 没有错误
   + ○ **-EINVAL** 参数错误
   + ○ **-EINTR** 等待被中断
-  + ○ **-ENOTINTHD** 不在线程上下文中
+  + ○ **-ENOTTHDCTX** 不在线程上下文中
 
 @usage
 flg = xwos.flg.new(32)
@@ -508,7 +508,7 @@ end
   + ○ **0** 没有错误
   + ○ **-EINVAL** 参数错误
   + ○ **-EINTR** 等待被中断
-  + ○ **-ENOTINTHD** 不在线程上下文中
+  + ○ **-ENOTTHDCTX** 不在线程上下文中
   + ○ **-ENODATA** 尝试失败
 
 @usage
@@ -574,7 +574,7 @@ end
   + ○ **0** 没有错误
   + ○ **-EINVAL** 参数错误
   + ○ **-EINTR** 等待被中断
-  + ○ **-ENOTINTHD** 不在线程上下文中
+  + ○ **-ENOTTHDCTX** 不在线程上下文中
   + ○ **-ETIMEDOUT** 超时
 
 @usage

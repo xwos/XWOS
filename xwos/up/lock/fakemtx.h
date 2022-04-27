@@ -91,7 +91,11 @@ xwer_t xwup_mtx_unlock(struct xwup_mtx * mtx)
 static __xwup_inline_api
 xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx)
 {
-        return XWUP_SEM_API(trywait, &mtx->fake);
+        xwer_t rc;
+        rc = XWUP_SEM_API(trywait, &mtx->fake);
+        if (rc == -ENODATA) {
+                rc = -EWOULDBLOCK;
+        }
 }
 
 static __xwup_inline_api

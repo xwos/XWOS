@@ -307,22 +307,20 @@ pub const ERECALLCONFLICT: XwEr = 530;
 pub const XWOK: XwEr = 0;
 
 /// Thread context
-pub const EINTHD: XwEr = 800;
+pub const ETHDCTX: XwEr = 800;
 /// Not thread context
-pub const ENOTINTHD: XwEr = 801;
+pub const ENOTTHDCTX: XwEr = 801;
 /// Bottom half context
-pub const EINBH: XwEr = 802;
+pub const EBHCTX: XwEr = 802;
 /// Not bottom half context
-pub const ENOTINBH: XwEr = 803;
+pub const ENOTBHCTX: XwEr = 803;
 /// ISR context
-pub const EINISR: XwEr = 804;
+pub const EISRCTX: XwEr = 804;
 /// Not ISR context
-pub const ENOTINISR: XwEr = 805;
+pub const ENOTISRCTX: XwEr = 805;
 
 /// Nil object descriptor
 pub const ENILOBJD: XwEr = 880;
-/// Bad object descriptor
-pub const EBADOBJD: XwEr = 881;
 /// Object dead
 pub const EOBJDEAD: XwEr = 884;
 /// Object active
@@ -340,8 +338,6 @@ pub const EEMPTY: XwEr = 831;
 pub const ENEGATIVE: XwEr = 832;
 /// Size error
 pub const ESIZE: XwEr = 833;
-/// Out of range
-pub const EOOR: XwEr = 834;
 /// Too small
 pub const E2SMALL: XwEr = 835;
 /// Not aligned

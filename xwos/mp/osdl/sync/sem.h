@@ -89,12 +89,14 @@ xwer_t xwosdl_sem_release(struct xwosdl_sem * sem, xwsq_t tik)
 static __xwcc_inline
 xwer_t xwosdl_sem_grab(struct xwosdl_sem * sem)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         return xwmp_sem_grab(sem);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_put(struct xwosdl_sem * sem)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         return xwmp_sem_put(sem);
 }
 

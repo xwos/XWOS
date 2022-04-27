@@ -157,6 +157,7 @@ xwos_br_d xwos_br_getd(struct xwos_br * br)
  * @param[in] brd: 线程栅栏对象的描述符
  * @return 错误码
  * @retval XWOK: OK
+ * @retval -ENILOBJD: 空的对象描述符
  * @retval -EOBJDEAD: 对象无效
  * @retval -EACCES: 对象标签检查失败
  * @note
@@ -175,6 +176,7 @@ xwer_t xwos_br_acquire(xwos_br_d brd)
  * @param[in] brd: 线程栅栏对象的描述符
  * @return 错误码
  * @retval XWOK: OK
+ * @retval -ENILOBJD: 空的对象描述符
  * @retval -EOBJDEAD: 对象无效
  * @retval -EACCES: 对象标签检查失败
  * @note
@@ -198,6 +200,9 @@ xwer_t xwos_br_release(xwos_br_d brd)
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
+ * @details
+ * 此函数主要用于管理**静态对象**的引用计数。
+ * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
  */
 static __xwos_inline_api
 xwer_t xwos_br_grab(struct xwos_br * br)
@@ -215,6 +220,9 @@ xwer_t xwos_br_grab(struct xwos_br * br)
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
+ * @details
+ * 此函数主要用于管理**静态对象**的引用计数。
+ * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
  */
 static __xwos_inline_api
 xwer_t xwos_br_put(struct xwos_br * br)
@@ -309,7 +317,7 @@ xwer_t xwos_br_get_num(struct xwos_br * br, xwsz_t * numbuf)
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -ECHRNG: 位置超出范围
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD：不在线程上下文中
+ * @retval -ENOTTHDCTX：不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -331,7 +339,7 @@ xwer_t xwos_br_wait(struct xwos_br * br)
  * @retval -ECHRNG: 位置超出范围
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD：不在线程上下文中
+ * @retval -ENOTTHDCTX：不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程

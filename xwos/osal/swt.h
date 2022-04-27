@@ -160,6 +160,7 @@ xwos_swt_d xwos_swt_getd(struct xwos_swt * swt)
  * @param[in] swtd: 软件定时器对象的描述符
  * @return 错误码
  * @retval XWOK: OK
+ * @retval -ENILOBJD: 空的对象描述符
  * @retval -EOBJDEAD: 对象无效
  * @retval -EACCES: 对象标签检查失败
  * @note
@@ -178,6 +179,7 @@ xwer_t xwos_swt_acquire(xwos_swt_d swtd)
  * @param[in] swtd: 软件定时器对象的描述符
  * @return 错误码
  * @retval XWOK: OK
+ * @retval -ENILOBJD: 空的对象描述符
  * @retval -EOBJDEAD: 对象无效
  * @retval -EACCES: 对象标签检查失败
  * @note
@@ -201,6 +203,9 @@ xwer_t xwos_swt_release(xwos_swt_d swtd)
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
+ * @details
+ * 此函数主要用于管理**静态对象**的引用计数。
+ * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
  */
 static __xwos_inline_api
 xwer_t xwos_swt_grab(struct xwos_swt * swt)
@@ -218,6 +223,9 @@ xwer_t xwos_swt_grab(struct xwos_swt * swt)
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
+ * @details
+ * 此函数主要用于管理**静态对象**的引用计数。
+ * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
  */
 static __xwos_inline_api
 xwer_t xwos_swt_put(struct xwos_swt * swt)

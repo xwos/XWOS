@@ -116,9 +116,11 @@ use crate::errno::*;
 
 extern "C" {
     fn xwrustffi_mtx_init(mtx: *mut XwosMtxMem) -> XwEr;
+    fn xwrustffi_mtx_fini(mtx: *mut XwosMtxMem) -> XwEr;
     fn xwrustffi_mtx_grab(mtx: *mut XwosMtxMem) -> XwEr;
     fn xwrustffi_mtx_put(mtx: *mut XwosMtxMem) -> XwEr;
     fn xwrustffi_mtx_create(mtx: *mut *mut c_void) -> XwEr;
+    fn xwrustffi_mtx_delete(mtx: *mut c_void) -> XwEr;
     fn xwrustffi_mtx_gettik(mtx: *mut c_void) -> XwSq;
     fn xwrustffi_mtx_acquire(mtx: *mut c_void, tik: XwSq) -> XwEr;
     fn xwrustffi_mtx_release(mtx: *mut c_void, tik: XwSq) -> XwEr;
@@ -278,7 +280,7 @@ impl<'a, T: Sized + 'a> StaticMutex<'a, T> {
                     Ok(StaticMutexGuard::new(self))
                 } else if -EINTR == rc {
                     Err(MutexError::Interrupt)
-                } else if -ENOTINTHD == rc {
+                } else if -ENOTTHDCTX == rc {
                     Err(MutexError::NotThreadContext)
                 } else {
                     Err(MutexError::Unknown(rc))
@@ -329,7 +331,7 @@ impl<'a, T: Sized + 'a> StaticMutex<'a, T> {
                     Ok(StaticMutexGuard::new(self))
                 } else if -EWOULDBLOCK == rc {
                     Err(MutexError::WouldBlock)
-                } else if -ENOTINTHD == rc {
+                } else if -ENOTTHDCTX == rc {
                     Err(MutexError::NotThreadContext)
                 } else {
                     Err(MutexError::Unknown(rc))
@@ -386,7 +388,7 @@ impl<'a, T: Sized + 'a> StaticMutex<'a, T> {
                     Err(MutexError::Interrupt)
                 } else if -ETIMEDOUT == rc {
                     Err(MutexError::Timedout)
-                } else if -ENOTINTHD == rc {
+                } else if -ENOTTHDCTX == rc {
                     Err(MutexError::NotThreadContext)
                 } else {
                     Err(MutexError::Unknown(rc))
@@ -435,7 +437,7 @@ impl<'a, T: Sized + 'a> StaticMutex<'a, T> {
                 let rc = xwrustffi_mtx_lock_unintr(self.smtx.get() as _);
                 if 0 == rc {
                     Ok(StaticMutexGuard::new(self))
-                } else if -ENOTINTHD == rc {
+                } else if -ENOTTHDCTX == rc {
                     Err(MutexError::NotThreadContext)
                 } else {
                     Err(MutexError::Unknown(rc))
@@ -500,7 +502,7 @@ impl<'a, T: Default + 'a> Default for StaticMutex<'a, T> {
 impl<T> Drop for StaticMutex<'_, T> {
     fn drop(&mut self) {
         unsafe {
-            xwrustffi_mtx_put(self.smtx.get());
+            xwrustffi_mtx_fini(self.smtx.get());
         }
     }
 }
@@ -666,7 +668,7 @@ impl Default for MtxD {
 impl Drop for MtxD {
     fn drop(&mut self) {
         unsafe {
-            xwrustffi_mtx_release(self.mtx, self.tik);
+            xwrustffi_mtx_delete(self.mtx);
         }
     }
 }
@@ -759,7 +761,7 @@ impl<T: ?Sized> DynamicMutex<T> {
             Err(MutexError::NilMtxD)
         } else if -EINTR == rc {
             Err(MutexError::Interrupt)
-        } else if -ENOTINTHD == rc {
+        } else if -ENOTTHDCTX == rc {
             Err(MutexError::NotThreadContext)
         } else {
             Err(MutexError::Unknown(rc))
@@ -805,7 +807,7 @@ impl<T: ?Sized> DynamicMutex<T> {
             Err(MutexError::NilMtxD)
         } else if -EWOULDBLOCK == rc {
             Err(MutexError::WouldBlock)
-        } else if -ENOTINTHD == rc {
+        } else if -ENOTTHDCTX == rc {
             Err(MutexError::NotThreadContext)
         } else {
             Err(MutexError::Unknown(rc))
@@ -857,7 +859,7 @@ impl<T: ?Sized> DynamicMutex<T> {
             Err(MutexError::Interrupt)
         } else if -ETIMEDOUT == rc {
             Err(MutexError::Timedout)
-        } else if -ENOTINTHD == rc {
+        } else if -ENOTTHDCTX == rc {
             Err(MutexError::NotThreadContext)
         } else {
             Err(MutexError::Unknown(rc))
@@ -901,7 +903,7 @@ impl<T: ?Sized> DynamicMutex<T> {
             Ok(DynamicMutexGuard::new(self))
         } else if -ENILOBJD == rc {
             Err(MutexError::NilMtxD)
-        } else if -ENOTINTHD == rc {
+        } else if -ENOTTHDCTX == rc {
             Err(MutexError::NotThreadContext)
         } else {
             Err(MutexError::Unknown(rc))

@@ -55,30 +55,44 @@ xwsq_t xwosdl_sem_gettik(struct xwosdl_sem * sem)
 static __xwcc_inline
 xwer_t xwosdl_sem_acquire(struct xwosdl_sem * sem, xwsq_t tik)
 {
-        XWOS_UNUSED(sem);
+        xwer_t rc;
+
         XWOS_UNUSED(tik);
-        return XWOK;
+
+        if (NULL == sem) {
+                rc = -ENILOBJD;
+        } else {
+                rc = XWOK;
+        }
+        return rc;
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_release(struct xwosdl_sem * sem, xwsq_t tik)
 {
-        XWOS_UNUSED(sem);
+        xwer_t rc;
+
         XWOS_UNUSED(tik);
-        return XWOK;
+
+        if (NULL == sem) {
+                rc = -ENILOBJD;
+        } else {
+                rc = XWOK;
+        }
+        return rc;
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_grab(struct xwosdl_sem * sem)
 {
-        XWOS_UNUSED(sem);
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         return XWOK;
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_put(struct xwosdl_sem * sem)
 {
-        XWOS_UNUSED(sem);
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         return XWOK;
 }
 

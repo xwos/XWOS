@@ -58,17 +58,9 @@ xwer_t xwosdl_thd_release(struct xwosdl_thd * thd, xwsq_t tik)
         return xwmp_thd_release(thd, tik);
 }
 
-static __xwcc_inline
-xwer_t xwosdl_thd_grab(struct xwosdl_thd * thd)
-{
-        return xwmp_thd_grab(thd);
-}
+xwer_t xwosdl_thd_grab(struct xwosdl_thd * thd);
 
-static __xwcc_inline
-xwer_t xwosdl_thd_put(struct xwosdl_thd * thd)
-{
-        return xwmp_thd_put(thd);
-}
+xwer_t xwosdl_thd_put(struct xwosdl_thd * thd);
 
 xwer_t xwosdl_thd_quit(struct xwosdl_thd * thd, xwsq_t tik);
 

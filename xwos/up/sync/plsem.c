@@ -486,7 +486,7 @@ xwer_t xwup_plsem_wait_to(struct xwup_plsem * sem, xwtm_t to)
         xwer_t rc;
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         cthd = xwup_skd_get_cthd_lc();
         xwskd = xwup_skd_get_lc();
@@ -575,8 +575,7 @@ xwer_t xwup_plsem_wait_unintr(struct xwup_plsem * sem)
         xwer_t rc;
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)),
-                      "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         cthd = xwup_skd_get_cthd_lc();
         rc = xwup_plsem_test_unintr(sem, cthd);

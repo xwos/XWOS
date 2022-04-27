@@ -231,6 +231,9 @@ xwer_t xwos_thd_release(xwos_thd_d thdd)
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
+ * @details
+ * 此函数主要用于管理**静态对象**的引用计数。
+ * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
  */
 static __xwos_inline_api
 xwer_t xwos_thd_grab(xwos_thd_d thdd)
@@ -248,6 +251,9 @@ xwer_t xwos_thd_grab(xwos_thd_d thdd)
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
+ * @details
+ * 此函数主要用于管理**静态对象**的引用计数。
+ * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
  */
 static __xwos_inline_api
 xwer_t xwos_thd_put(xwos_thd_d thdd)

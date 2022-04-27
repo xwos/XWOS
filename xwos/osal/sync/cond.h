@@ -152,6 +152,7 @@ xwos_cond_d xwos_cond_getd(struct xwos_cond * cond)
  * @param[in] condd: 条件量对象的描述符
  * @return 错误码
  * @retval XWOK: OK
+ * @retval -ENILOBJD: 空的对象描述符
  * @retval -EOBJDEAD: 对象无效
  * @retval -EACCES: 对象标签检查失败
  * @note
@@ -170,6 +171,7 @@ xwer_t xwos_cond_acquire(xwos_cond_d condd)
  * @param[in] condd: 条件量对象的描述符
  * @return 错误码
  * @retval XWOK: OK
+ * @retval -ENILOBJD: 空的对象描述符
  * @retval -EOBJDEAD: 对象无效
  * @retval -EACCES: 对象标签检查失败
  * @note
@@ -193,6 +195,9 @@ xwer_t xwos_cond_release(xwos_cond_d condd)
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
+ * @details
+ * 此函数主要用于管理**静态对象**的引用计数。
+ * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_grab(struct xwos_cond * cond)
@@ -210,6 +215,9 @@ xwer_t xwos_cond_grab(struct xwos_cond * cond)
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
  * - 重入性：可重入
+ * @details
+ * 此函数主要用于管理**静态对象**的引用计数。
+ * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_put(struct xwos_cond * cond)
@@ -373,7 +381,7 @@ xwer_t xwos_cond_unicast(struct xwos_cond * cond)
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -EINVAL: 参数无效
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
+ * @retval -ENOTTHDCTX: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -401,7 +409,7 @@ xwer_t xwos_cond_wait(struct xwos_cond * cond,
  * @retval -EINVAL: 参数无效
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
- * @retval -ENOTINTHD: 不在线程上下文中
+ * @retval -ENOTTHDCTX: 不在线程上下文中
  * @note
  * - 同步/异步：同步
  * - 上下文：线程

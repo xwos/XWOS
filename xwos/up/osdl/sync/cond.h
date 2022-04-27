@@ -52,30 +52,44 @@ xwsq_t xwosdl_cond_gettik(struct xwosdl_cond * cond)
 static __xwcc_inline
 xwer_t xwosdl_cond_acquire(struct xwosdl_cond * cond, xwsq_t tik)
 {
-        XWOS_UNUSED(cond);
+        xwer_t rc;
+
         XWOS_UNUSED(tik);
-        return XWOK;
+
+        if (NULL == cond) {
+                rc = -ENILOBJD;
+        } else {
+                rc = XWOK;
+        }
+        return rc;
 }
 
 static __xwcc_inline
 xwer_t xwosdl_cond_release(struct xwosdl_cond * cond, xwsq_t tik)
 {
-        XWOS_UNUSED(cond);
+        xwer_t rc;
+
         XWOS_UNUSED(tik);
-        return XWOK;
+
+        if (NULL == cond) {
+                rc = -ENILOBJD;
+        } else {
+                rc = XWOK;
+        }
+        return rc;
 }
 
 static __xwcc_inline
 xwer_t xwosdl_cond_grab(struct xwosdl_cond * cond)
 {
-        XWOS_UNUSED(cond);
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         return XWOK;
 }
 
 static __xwcc_inline
 xwer_t xwosdl_cond_put(struct xwosdl_cond * cond)
 {
-        XWOS_UNUSED(cond);
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         return XWOK;
 }
 

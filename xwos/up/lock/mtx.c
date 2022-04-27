@@ -310,8 +310,7 @@ xwer_t xwup_mtx_unlock(struct xwup_mtx * mtx)
         xwreg_t cpuirq;
 
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)),
-                      "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         rc = XWOK;
         xwup_skd_dspmpt_lc();
@@ -385,8 +384,7 @@ xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx)
         xwer_t rc;
 
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)),
-                      "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         rc = XWOK;
         xwup_skd_dspmpt_lc();
@@ -399,7 +397,7 @@ xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx)
                 xwup_skd_enpmpt_lc();
         } else if (mtx->ownertree) {
                 xwospl_cpuirq_restore_lc(cpuirq);
-                rc = -ENODATA;
+                rc = -EWOULDBLOCK;
                 xwup_skd_enpmpt_lc();
         } else {
                 xwup_mtxtree_add(mt, mtx);
@@ -582,7 +580,7 @@ xwer_t xwup_mtx_lock_to(struct xwup_mtx * mtx, xwtm_t to)
         xwer_t rc;
 
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-EINTHD == xwup_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         cthd = xwup_skd_get_cthd_lc();
         xwskd = xwup_skd_get_lc();

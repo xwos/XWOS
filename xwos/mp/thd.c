@@ -298,14 +298,12 @@ xwer_t xwmp_thd_release(struct xwmp_thd * thd, xwsq_t tik)
 __xwmp_api
 xwer_t xwmp_thd_grab(struct xwmp_thd * thd)
 {
-        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
         return xwos_object_grab(&thd->xwobj);
 }
 
 __xwmp_api
 xwer_t xwmp_thd_put(struct xwmp_thd * thd)
 {
-        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
         return xwos_object_put(&thd->xwobj);
 }
 

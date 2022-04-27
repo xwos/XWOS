@@ -237,28 +237,24 @@ xwer_t xwmp_sem_gc(void * sem)
 __xwmp_api
 xwer_t xwmp_sem_acquire(struct xwmp_sem * sem, xwsq_t tik)
 {
-        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         return xwmp_synobj_acquire(&sem->synobj, tik);
 }
 
 __xwmp_api
 xwer_t xwmp_sem_release(struct xwmp_sem * sem, xwsq_t tik)
 {
-        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         return xwmp_synobj_release(&sem->synobj, tik);
 }
 
 __xwmp_api
 xwer_t xwmp_sem_grab(struct xwmp_sem * sem)
 {
-        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         return xwmp_synobj_grab(&sem->synobj);
 }
 
 __xwmp_api
 xwer_t xwmp_sem_put(struct xwmp_sem * sem)
 {
-        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         return xwmp_synobj_put(&sem->synobj);
 }
 
@@ -850,7 +846,7 @@ xwer_t xwmp_plsem_wait_to(struct xwmp_sem * sem, xwtm_t to)
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWMP_SEM_TYPE_PIPELINE == sem->type), "type-error", -ETYPE);
-        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
@@ -957,8 +953,7 @@ xwer_t xwmp_plsem_wait_unintr(struct xwmp_sem * sem)
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWMP_SEM_TYPE_PIPELINE == sem->type), "type-error", -ETYPE);
-        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)),
-                      "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         rc = xwmp_sem_grab(sem);
         if (__xwcc_likely(XWOK == rc)) {
@@ -1422,7 +1417,7 @@ xwer_t xwmp_rtsem_wait_to(struct xwmp_sem * sem, xwtm_t to)
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWMP_SEM_TYPE_RT == sem->type), "type-error", -ETYPE);
-        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)), "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
@@ -1530,8 +1525,7 @@ xwer_t xwmp_rtsem_wait_unintr(struct xwmp_sem * sem)
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWMP_SEM_TYPE_RT == sem->type), "type-error", -ETYPE);
-        XWOS_VALIDATE((-EINTHD == xwmp_irq_get_id(NULL)),
-                      "not-in-thd", -ENOTINTHD);
+        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         rc = xwmp_sem_grab(sem);
         if (__xwcc_likely(XWOK == rc)) {

@@ -31,7 +31,7 @@ xwer_t xwospl_irq_get_id(xwirq_t * irqnbuf)
         xwirq_t irq;
 
         if (SOC_IRQN_NIL == soc_context.irqn) {
-                rc = -ENOTINISR;
+                rc = -ENOTISRCTX;
                 irq = 0;
         } else {
                 rc = XWOK;
