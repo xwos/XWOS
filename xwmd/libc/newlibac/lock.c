@@ -44,16 +44,15 @@ void newlibac_lock_init(void)
 
 void __retarget_lock_init(_LOCK_T * lock)
 {
-        _LOCK_T mtx;
+        xwos_mtx_d mtxd;
         xwer_t rc;
 
         if (NULL != lock) {
-                rc = xwos_mtx_create((struct xwos_mtx **)&mtx,
-                                     XWOS_SKD_PRIORITY_RT_MAX);
+                rc = xwos_mtx_create(&mtxd, XWOS_SKD_PRIORITY_RT_MAX);
                 if (rc < 0) {
                         *lock = (_LOCK_T)NULL;
                 } else {
-                        *lock = mtx;
+                        *lock = (_LOCK_T)mtxd.mtx;
                 }
         }
 }
@@ -65,8 +64,12 @@ void __retarget_lock_init_recursive(_LOCK_T * lock)
 
 void __retarget_lock_close(_LOCK_T lock)
 {
+        xwos_mtx_d mtxd;
+
         if (NULL != lock) {
-                xwos_mtx_delete(&lock->xwmtx);
+                mtxd.mtx = &lock->xwmtx;
+                mtxd.tik = xwos_mtx_gettik(&lock->xwmtx);
+                xwos_mtx_delete(mtxd);
         }
 }
 

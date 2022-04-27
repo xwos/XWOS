@@ -264,14 +264,12 @@ xwer_t xwmp_mtx_fini(struct xwmp_mtx * mtx)
 }
 
 __xwmp_api
-xwer_t xwmp_mtx_create(struct xwmp_mtx ** ptrbuf, xwpr_t sprio)
+xwer_t xwmp_mtx_create(struct xwmp_mtx ** mtxbuf, xwpr_t sprio)
 {
         struct xwmp_mtx * mtx;
         xwer_t rc;
 
-        XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
-
-        *ptrbuf = NULL;
+        *mtxbuf = NULL;
         mtx = xwmp_mtx_alloc();
         if (__xwcc_unlikely(is_err(mtx))) {
                 rc = ptr_err(mtx);
@@ -281,18 +279,16 @@ xwer_t xwmp_mtx_create(struct xwmp_mtx ** ptrbuf, xwpr_t sprio)
                         xwmp_mtx_free(mtx);
                         mtx = err_ptr(rc);
                 } else {
-                        *ptrbuf = mtx;
+                        *mtxbuf = mtx;
                 }
         }
         return rc;
 }
 
 __xwmp_api
-xwer_t xwmp_mtx_delete(struct xwmp_mtx * mtx)
+xwer_t xwmp_mtx_delete(struct xwmp_mtx * mtx, xwsq_t tik)
 {
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-
-        return xwmp_mtx_put(mtx);
+        return xwmp_mtx_release(mtx, tik);
 }
 
 __xwmp_api

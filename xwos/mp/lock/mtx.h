@@ -53,8 +53,8 @@ xwer_t xwmp_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 
 xwer_t xwmp_mtx_init(struct xwmp_mtx * mtx, xwpr_t sprio);
 xwer_t xwmp_mtx_fini(struct xwmp_mtx * mtx);
-xwer_t xwmp_mtx_create(struct xwmp_mtx ** ptrbuf, xwpr_t sprio);
-xwer_t xwmp_mtx_delete(struct xwmp_mtx * mtx);
+xwer_t xwmp_mtx_create(struct xwmp_mtx ** mtxbuf, xwpr_t sprio);
+xwer_t xwmp_mtx_delete(struct xwmp_mtx * mtx, xwsq_t tik);
 
 xwer_t xwmp_mtx_acquire(struct xwmp_mtx * mtx, xwsq_t tik);
 xwer_t xwmp_mtx_release(struct xwmp_mtx * mtx, xwsq_t tik);

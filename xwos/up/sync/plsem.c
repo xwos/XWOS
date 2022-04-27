@@ -174,11 +174,16 @@ xwer_t xwup_plsem_create(struct xwup_plsem ** ptrbuf, xwssq_t val, xwssq_t max)
 __xwup_api
 xwer_t xwup_plsem_delete(struct xwup_plsem * sem)
 {
-        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        xwer_t rc;
 
-        xwup_plsem_deactivate(sem);
-        xwup_plsem_free(sem);
-        return XWOK;
+        if (sem) {
+                xwup_plsem_deactivate(sem);
+                xwup_plsem_free(sem);
+                rc = XWOK;
+        } else {
+                rc = -ENILOBJD;
+        }
+        return rc;
 }
 
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)

@@ -159,6 +159,46 @@ xwer_t xwos_thd_init(struct xwos_thd * thd, xwos_thd_d * thdd,
 }
 
 /**
+ * @brief XWOS API：增加线程对象的引用计数
+ * @param[in] thdd: 线程对象描述符
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -EOBJDEAD: 线程对象无效
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ * @details
+ * 此函数主要用于管理**静态对象**的引用计数。
+ * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
+ */
+static __xwos_inline_api
+xwer_t xwos_thd_grab(xwos_thd_d thdd)
+{
+        return xwosdl_thd_grab(&thdd.thd->osthd);
+}
+
+/**
+ * @brief XWOS API：减少线程对象的引用计数
+ * @param[in] thdd: 线程对象描述符
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -EOBJDEAD: 线程对象无效
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ * @details
+ * 此函数主要用于管理**静态对象**的引用计数。
+ * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
+ */
+static __xwos_inline_api
+xwer_t xwos_thd_put(xwos_thd_d thdd)
+{
+        return xwosdl_thd_put(&thdd.thd->osthd);
+}
+
+/**
  * @brief XWOS API：使用动态申请内存方式创建线程并初始化
  * @param[out] thdd: 指向缓冲区的指针，通过此缓冲区返回线程对象描述符
  * @param[in] attr: 线程属性
@@ -219,46 +259,6 @@ static __xwos_inline_api
 xwer_t xwos_thd_release(xwos_thd_d thdd)
 {
         return xwosdl_thd_release(&thdd.thd->osthd, thdd.tik);
-}
-
-/**
- * @brief XWOS API：增加线程对象的引用计数
- * @param[in] thdd: 线程对象描述符
- * @return 错误码
- * @retval XWOK: OK
- * @retval -EOBJDEAD: 线程对象无效
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @details
- * 此函数主要用于管理**静态对象**的引用计数。
- * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
- */
-static __xwos_inline_api
-xwer_t xwos_thd_grab(xwos_thd_d thdd)
-{
-        return xwosdl_thd_grab(&thdd.thd->osthd);
-}
-
-/**
- * @brief XWOS API：减少线程对象的引用计数
- * @param[in] thdd: 线程对象描述符
- * @return 错误码
- * @retval XWOK: OK
- * @retval -EOBJDEAD: 线程对象无效
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @details
- * 此函数主要用于管理**静态对象**的引用计数。
- * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
- */
-static __xwos_inline_api
-xwer_t xwos_thd_put(xwos_thd_d thdd)
-{
-        return xwosdl_thd_put(&thdd.thd->osthd);
 }
 
 /**

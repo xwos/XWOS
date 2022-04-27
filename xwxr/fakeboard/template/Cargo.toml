@@ -1,10 +1,10 @@
 [package]
-name = "rustapp"
+name = "template"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "rustapp"
+name = "template"
 crate-type = ["staticlib"]
 
 [dependencies]

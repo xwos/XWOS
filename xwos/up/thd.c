@@ -417,15 +417,21 @@ err_stack_alloc:
 __xwup_api
 xwer_t xwup_thd_delete(struct xwup_thd * thd)
 {
+        xwer_t rc;
         xwstk_t * base;
 
-        xwup_thd_deactivate(thd);
-        if (XWUP_SKDOBJ_FLAG_ALLOCATED_STACK & thd->stack.flag) {
-                base = ((struct xwup_thd *)thd)->stack.base;
-                xwup_thd_stack_free(base);
+        if (thd) {
+                xwup_thd_deactivate(thd);
+                if (XWUP_SKDOBJ_FLAG_ALLOCATED_STACK & thd->stack.flag) {
+                        base = ((struct xwup_thd *)thd)->stack.base;
+                        xwup_thd_stack_free(base);
+                }
+                xwup_thd_free(thd);
+                rc = XWOK;
+        } else {
+                rc = -ENILOBJD;
         }
-        xwup_thd_free(thd);
-        return XWOK;
+        return rc;
 }
 
 /**

@@ -271,7 +271,7 @@ xwer_t xwos_object_release(struct xwos_object * obj, xwsq_t tik)
                                 }/* else {} */
                         }/* else {} */
                 }/* else {} */
-        }
+        }/* else {} */
         return rc;
 }
 

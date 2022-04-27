@@ -18,6 +18,13 @@
 
 #define xwosdl_br xwup_evt
 
+typedef struct {
+        struct xwosdl_br * br;
+        xwsq_t tik;
+} xwosdl_br_d;
+
+#define XWOSDL_BR_NILD ((xwosdl_br_d){NULL, 0,})
+
 static __xwcc_inline
 xwer_t xwosdl_br_init(struct xwosdl_br * br, xwsz_t num,
                       xwbmp_t * bmp, xwbmp_t * msk)
@@ -32,55 +39,6 @@ xwer_t xwosdl_br_fini(struct xwosdl_br * br)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_br_create(struct xwosdl_br ** brbuf, xwsz_t num)
-{
-        return xwup_evt_create(brbuf, XWUP_EVT_TYPE_BR, num);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_br_delete(struct xwosdl_br * br)
-{
-        return xwup_evt_delete(br);
-}
-
-static __xwcc_inline
-xwsq_t xwosdl_br_gettik(struct xwosdl_br * br)
-{
-        XWOS_UNUSED(br);
-        return 0;
-}
-
-static __xwcc_inline
-xwer_t xwosdl_br_acquire(struct xwosdl_br * br, xwsq_t tik)
-{
-        xwer_t rc;
-
-        XWOS_UNUSED(tik);
-
-        if (NULL == br) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
-        }
-        return rc;
-}
-
-static __xwcc_inline
-xwer_t xwosdl_br_release(struct xwosdl_br * br, xwsq_t tik)
-{
-        xwer_t rc;
-
-        XWOS_UNUSED(tik);
-
-        if (NULL == br) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
-        }
-        return rc;
-}
-
-static __xwcc_inline
 xwer_t xwosdl_br_grab(struct xwosdl_br * br)
 {
         XWOS_VALIDATE((br), "nullptr", -EFAULT);
@@ -92,6 +50,26 @@ xwer_t xwosdl_br_put(struct xwosdl_br * br)
 {
         XWOS_VALIDATE((br), "nullptr", -EFAULT);
         return XWOK;
+}
+
+xwer_t xwosdl_br_create(xwosdl_br_d * brd, xwsz_t num);
+
+static __xwcc_inline
+xwer_t xwosdl_br_delete(struct xwosdl_br * br, xwsq_t tik)
+{
+        XWOS_UNUSED(tik);
+        return xwup_evt_delete(br);
+}
+
+xwer_t xwosdl_br_acquire(struct xwosdl_br * br, xwsq_t tik);
+
+xwer_t xwosdl_br_release(struct xwosdl_br * br, xwsq_t tik);
+
+static __xwcc_inline
+xwsq_t xwosdl_br_gettik(struct xwosdl_br * br)
+{
+        XWOS_UNUSED(br);
+        return 0;
 }
 
 static __xwcc_inline

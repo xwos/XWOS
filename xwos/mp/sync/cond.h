@@ -40,15 +40,15 @@ xwer_t xwmp_cond_intr(struct xwmp_cond * cond, struct xwmp_wqn * wqn);
 xwer_t xwmp_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
 
-xwer_t xwmp_cond_create(struct xwmp_cond ** ptrbuf);
-xwer_t xwmp_cond_delete(struct xwmp_cond * cond);
 xwer_t xwmp_cond_init(struct xwmp_cond * cond);
 xwer_t xwmp_cond_fini(struct xwmp_cond * cond);
-
-xwer_t xwmp_cond_acquire(struct xwmp_cond * cond, xwsq_t tik);
-xwer_t xwmp_cond_release(struct xwmp_cond * cond, xwsq_t tik);
 xwer_t xwmp_cond_grab(struct xwmp_cond * cond);
 xwer_t xwmp_cond_put(struct xwmp_cond * cond);
+
+xwer_t xwmp_cond_create(struct xwmp_cond ** condbuf);
+xwer_t xwmp_cond_delete(struct xwmp_cond * cond, xwsq_t tik);
+xwer_t xwmp_cond_acquire(struct xwmp_cond * cond, xwsq_t tik);
+xwer_t xwmp_cond_release(struct xwmp_cond * cond, xwsq_t tik);
 
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
 xwer_t xwmp_cond_bind(struct xwmp_cond * cond,

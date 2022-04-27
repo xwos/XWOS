@@ -34,9 +34,8 @@ int xwlua_cond_new(lua_State * L)
         xwlua_cond_sp * condsp;
 
         condsp = lua_newuserdatauv(L, sizeof(xwlua_cond_sp), 0);
-        rc = xwos_cond_create(&condsp->cond);
+        rc = xwos_cond_create(condsp);
         if (XWOK == rc) {
-                condsp->tik = xwos_cond_gettik(condsp->cond);
                 luaL_setmetatable(L, "xwlua_cond_sp");
         } else {
                 lua_pop(L, 1);

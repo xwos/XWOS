@@ -18,6 +18,49 @@
 
 #define xwosdl_sem xwmp_sem
 
+typedef struct {
+        struct xwosdl_sem * sem;
+        xwsq_t tik;
+} xwosdl_sem_d;
+
+#define XWOSDL_SEM_NILD ((xwosdl_sem_d){NULL, 0,})
+
+static __xwcc_inline
+xwer_t xwosdl_sem_fini(struct xwosdl_sem * sem)
+{
+        return xwmp_sem_fini(sem);
+}
+
+xwer_t xwosdl_sem_grab(struct xwosdl_sem * sem);
+
+xwer_t xwosdl_sem_put(struct xwosdl_sem * sem);
+
+xwer_t xwosdl_sem_create(xwosdl_sem_d * semd, xwssq_t val, xwssq_t max);
+
+static __xwcc_inline
+xwer_t xwosdl_sem_delete(struct xwosdl_sem * sem, xwsq_t tik)
+{
+        return xwmp_sem_delete(sem, tik);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sem_acquire(struct xwosdl_sem * sem, xwsq_t tik)
+{
+        return xwmp_sem_acquire(sem, tik);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sem_release(struct xwosdl_sem * sem, xwsq_t tik)
+{
+        return xwmp_sem_release(sem, tik);
+}
+
+static __xwcc_inline
+xwsq_t xwosdl_sem_gettik(struct xwosdl_sem * sem)
+{
+        return sem ? sem->synobj.xwobj.tik : 0;
+}
+
 static __xwcc_inline
 xwer_t xwosdl_sem_getvalue(struct xwosdl_sem * sem, xwssq_t * sval)
 {
@@ -41,63 +84,6 @@ static __xwcc_inline
 xwer_t xwosdl_sem_init(struct xwosdl_sem * sem, xwssq_t val, xwssq_t max)
 {
         return xwmp_rtsem_init(sem, val, max);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_sem_fini(struct xwosdl_sem * sem)
-{
-        return xwmp_sem_fini(sem);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_sem_create(struct xwosdl_sem ** sembuf, xwssq_t val, xwssq_t max)
-{
-        return xwmp_sem_create(sembuf, XWMP_SEM_TYPE_RT, val, max);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_sem_delete(struct xwosdl_sem * sem)
-{
-        return xwmp_sem_delete(sem);
-}
-
-static __xwcc_inline
-xwsq_t xwosdl_sem_gettik(struct xwosdl_sem * sem)
-{
-        xwsq_t tik;
-
-        if (sem) {
-                tik = sem->synobj.xwobj.tik;
-        } else {
-                tik = 0;
-        }
-        return tik;
-}
-
-static __xwcc_inline
-xwer_t xwosdl_sem_acquire(struct xwosdl_sem * sem, xwsq_t tik)
-{
-        return xwmp_sem_acquire(sem, tik);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_sem_release(struct xwosdl_sem * sem, xwsq_t tik)
-{
-        return xwmp_sem_release(sem, tik);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_sem_grab(struct xwosdl_sem * sem)
-{
-        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        return xwmp_sem_grab(sem);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_sem_put(struct xwosdl_sem * sem)
-{
-        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        return xwmp_sem_put(sem);
 }
 
 static __xwcc_inline
@@ -148,24 +134,6 @@ static __xwcc_inline
 xwer_t xwosdl_sem_init(struct xwosdl_sem * sem, xwssq_t val, xwssq_t max)
 {
         return xwmp_plsem_init(sem, val, max);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_sem_fini(struct xwosdl_sem * sem)
-{
-        return xwmp_sem_fini(sem);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_sem_create(struct xwosdl_sem ** sembuf, xwssq_t val, xwssq_t max)
-{
-        return xwmp_sem_create(&sem, XWMP_SEM_TYPE_PIPELINE, val, max);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_sem_delete(struct xwosdl_sem * sem)
-{
-        return xwmp_sem_delete(sem);
 }
 
 static __xwcc_inline

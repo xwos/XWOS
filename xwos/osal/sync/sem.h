@@ -82,116 +82,6 @@ xwer_t xwos_sem_fini(struct xwos_sem * sem)
 }
 
 /**
- * @brief XWOS API：动态方式创建信号量对象
- * @param[out] sembuf: 指向缓冲区的指针，通过此缓冲区返回信号量对象指针
- * @param[in] val: 信号量的初始值
- * @param[in] max: 信号量的最大值
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINVAL: 无效参数
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwer_t xwos_sem_create(struct xwos_sem ** sembuf, xwssq_t val, xwssq_t max)
-{
-        return xwosdl_sem_create((struct xwosdl_sem **)sembuf, val, max);
-}
-
-/**
- * @brief XWOS API：删除动态方式创建的信号量对象
- * @param[in] sem: 信号量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个信号量对象，不可重入
- */
-static __xwos_inline_api
-xwer_t xwos_sem_delete(struct xwos_sem * sem)
-{
-        return xwosdl_sem_delete(&sem->ossem);
-}
-
-/**
- * @brief XWOS API：获取信号量对象的标签
- * @param[in] sem: 信号量对象的指针
- * @return 信号量对象的标签
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwsq_t xwos_sem_gettik(struct xwos_sem * sem)
-{
-        return xwosdl_sem_gettik(&sem->ossem);
-}
-
-/**
- * @brief XWOS API：获取信号量对象的描述符
- * @param[in] sem: 信号量对象的指针
- * @return 信号量对象的描述符
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwos_sem_d xwos_sem_getd(struct xwos_sem * sem)
-{
-        xwos_sem_d semd;
-
-        semd.sem = sem;
-        semd.tik = xwosdl_sem_gettik(&sem->ossem);
-        return semd;
-}
-
-/**
- * @brief XWOS API：检查信号量对象的标签并增加引用计数
- * @param[in] semd: 信号量对象的描述符
- * @return 错误码
- * @retval XWOK: OK
- * @retval -ENILOBJD: 空的对象描述符
- * @retval -EOBJDEAD: 对象无效
- * @retval -EACCES: 对象标签检查失败
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwer_t xwos_sem_acquire(xwos_sem_d semd)
-{
-        return xwosdl_sem_acquire(&semd.sem->ossem, semd.tik);
-}
-
-/**
- * @brief XWOS API：检查对象的标签并减少引用计数
- * @param[in] semd: 信号量对象的描述符
- * @return 错误码
- * @retval XWOK: OK
- * @retval -ENILOBJD: 空的对象描述符
- * @retval -EOBJDEAD: 对象无效
- * @retval -EACCES: 对象标签检查失败
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwer_t xwos_sem_release(xwos_sem_d semd)
-{
-        return xwosdl_sem_release(&semd.sem->ossem, semd.tik);
-}
-
-/**
  * @brief XWOS API：增加信号量对象的引用计数
  * @param[in] sem: 信号量对象的指针
  * @return 错误码
@@ -231,6 +121,116 @@ static __xwos_inline_api
 xwer_t xwos_sem_put(struct xwos_sem * sem)
 {
         return xwosdl_sem_put(&sem->ossem);
+}
+
+/**
+ * @brief XWOS API：动态方式创建信号量对象
+ * @param[out] semd: 指向缓冲区的指针，通过此缓冲区返回信号量对象描述符
+ * @param[in] val: 信号量的初始值
+ * @param[in] max: 信号量的最大值
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -EINVAL: 无效参数
+ * @retval -ENOMEM: 内存不足
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_sem_create(xwos_sem_d * semd, xwssq_t val, xwssq_t max)
+{
+        return xwosdl_sem_create((xwosdl_sem_d *)semd, val, max);
+}
+
+/**
+ * @brief XWOS API：删除动态方式创建的信号量对象
+ * @param[in] semd: 信号量对象描述符
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：对于同一个信号量对象，不可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_sem_delete(xwos_sem_d semd)
+{
+        return xwosdl_sem_delete(&semd.sem->ossem, semd.tik);
+}
+
+/**
+ * @brief XWOS API：检查信号量对象的标签并增加引用计数
+ * @param[in] semd: 信号量对象描述符
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -ENILOBJD: 空的对象描述符
+ * @retval -EOBJDEAD: 对象无效
+ * @retval -EACCES: 对象标签检查失败
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_sem_acquire(xwos_sem_d semd)
+{
+        return xwosdl_sem_acquire(&semd.sem->ossem, semd.tik);
+}
+
+/**
+ * @brief XWOS API：检查对象的标签并减少引用计数
+ * @param[in] semd: 信号量对象描述符
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -ENILOBJD: 空的对象描述符
+ * @retval -EOBJDEAD: 对象无效
+ * @retval -EACCES: 对象标签检查失败
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_sem_release(xwos_sem_d semd)
+{
+        return xwosdl_sem_release(&semd.sem->ossem, semd.tik);
+}
+
+/**
+ * @brief XWOS API：获取信号量对象的标签
+ * @param[in] sem: 信号量对象的指针
+ * @return 信号量对象的标签
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwsq_t xwos_sem_gettik(struct xwos_sem * sem)
+{
+        return xwosdl_sem_gettik(&sem->ossem);
+}
+
+/**
+ * @brief XWOS API：获取信号量对象描述符
+ * @param[in] sem: 信号量对象的指针
+ * @return 信号量对象描述符
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwos_sem_d xwos_sem_getd(struct xwos_sem * sem)
+{
+        xwos_sem_d semd;
+
+        semd.sem = sem;
+        semd.tik = xwosdl_sem_gettik(&sem->ossem);
+        return semd;
 }
 
 /**

@@ -33,14 +33,24 @@ xwer_t xwrustffi_mtx_put(struct xwos_mtx * mtx)
         return xwos_mtx_put(mtx);
 }
 
-xwer_t xwrustffi_mtx_create(struct xwos_mtx ** mtxbuf)
+xwer_t xwrustffi_mtx_create(struct xwos_mtx ** mtxbuf, xwsq_t * tik)
 {
-        return xwos_mtx_create(mtxbuf, XWOS_SKD_PRIORITY_RT_MAX);
+        xwos_mtx_d mtxd;
+        xwer_t rc;
+
+        rc = xwos_mtx_create(&mtxd, XWOS_SKD_PRIORITY_RT_MAX);
+        *mtxbuf = mtxd.mtx;
+        *tik = mtxd.tik;
+        return rc;
 }
 
-xwer_t xwrustffi_mtx_delete(struct xwos_mtx * mtx)
+xwer_t xwrustffi_mtx_delete(struct xwos_mtx * mtx, xwsq_t tik)
 {
-        return xwos_mtx_delete(mtx);
+        xwos_mtx_d mtxd = {
+                .mtx = mtx,
+                .tik = tik,
+        };
+        return xwos_mtx_delete(mtxd);
 }
 
 xwsq_t xwrustffi_mtx_gettik(struct xwos_mtx * mtx)

@@ -76,15 +76,15 @@ xwer_t xwmp_rtsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn);
 xwer_t xwmp_sem_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
 
-xwer_t xwmp_sem_create(struct xwmp_sem ** ptrbuf, xwid_t type,
-                       xwssq_t val, xwssq_t max);
-xwer_t xwmp_sem_delete(struct xwmp_sem * sem);
 xwer_t xwmp_sem_fini(struct xwmp_sem * sem);
-
-xwer_t xwmp_sem_acquire(struct xwmp_sem * sem, xwsq_t tik);
-xwer_t xwmp_sem_release(struct xwmp_sem * sem, xwsq_t tik);
 xwer_t xwmp_sem_grab(struct xwmp_sem * sem);
 xwer_t xwmp_sem_put(struct xwmp_sem * sem);
+
+xwer_t xwmp_sem_create(struct xwmp_sem ** sembuf, xwid_t type,
+                       xwssq_t val, xwssq_t max);
+xwer_t xwmp_sem_delete(struct xwmp_sem * sem, xwsq_t tik);
+xwer_t xwmp_sem_acquire(struct xwmp_sem * sem, xwsq_t tik);
+xwer_t xwmp_sem_release(struct xwmp_sem * sem, xwsq_t tik);
 
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
 xwer_t xwmp_sem_bind(struct xwmp_sem * sem, struct xwmp_evt * evt, xwsq_t pos);

@@ -38,9 +38,8 @@ int xwlua_mtx_new(lua_State * L)
         xwlua_mtx_sp * mtxsp;
 
         mtxsp = lua_newuserdatauv(L, sizeof(xwlua_mtx_sp), 0);
-        rc = xwos_mtx_create(&mtxsp->mtx, XWOS_SKD_PRIORITY_RT_MAX);
+        rc = xwos_mtx_create(mtxsp, XWOS_SKD_PRIORITY_RT_MAX);
         if (XWOK == rc) {
-                mtxsp->tik = xwos_mtx_gettik(mtxsp->mtx);
                 luaL_setmetatable(L, "xwlua_mtx_sp");
         } else {
                 lua_pop(L, 1);

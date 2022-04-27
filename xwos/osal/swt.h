@@ -90,110 +90,6 @@ xwer_t xwos_swt_fini(struct xwos_swt * swt)
 }
 
 /**
- * @brief XWOS API：动态方式创建软件定时器
- * @param[out] swtbuf: 指向缓冲区的指针，通过此缓冲区返回软件定时器的指针
- * @param[in] name: 软件定时器的名字
- * @param[in] flag: 软件定时器的标志
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
-static __xwos_inline_api
-xwer_t xwos_swt_create(struct xwos_swt ** swtbuf, const char * name, xwsq_t flag)
-{
-        return xwosdl_swt_create((struct xwosdl_swt **)swtbuf, name, flag);
-}
-
-/**
- * @brief XWOS API：删除动态方式创建的软件定时器
- * @param[in] swt: 软件定时器的指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
-static __xwos_inline_api
-xwer_t xwos_swt_delete(struct xwos_swt * swt)
-{
-        return xwosdl_swt_delete(&swt->osswt);
-}
-
-/**
- * @brief XWOS API：获取软件定时器对象的标签
- * @param[in] swt: 软件定时器对象的指针
- * @return 软件定时器对象的标签
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwsq_t xwos_swt_gettik(struct xwos_swt * swt)
-{
-        return xwosdl_swt_gettik(&swt->osswt);
-}
-
-/**
- * @brief XWOS API：获取软件定时器对象的描述符
- * @param[in] swt: 软件定时器对象的指针
- * @return 软件定时器对象的描述符
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwos_swt_d xwos_swt_getd(struct xwos_swt * swt)
-{
-        xwos_swt_d swtd;
-
-        swtd.swt = swt;
-        swtd.tik = xwosdl_swt_gettik(&swt->osswt);
-        return swtd;
-}
-
-/**
- * @brief XWOS API：检查软件定时器对象的标签并增加引用计数
- * @param[in] swtd: 软件定时器对象的描述符
- * @return 错误码
- * @retval XWOK: OK
- * @retval -ENILOBJD: 空的对象描述符
- * @retval -EOBJDEAD: 对象无效
- * @retval -EACCES: 对象标签检查失败
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwer_t xwos_swt_acquire(xwos_swt_d swtd)
-{
-        return xwosdl_swt_acquire(&swtd.swt->osswt, swtd.tik);
-}
-
-/**
- * @brief XWOS API：检查对象的标签并减少引用计数
- * @param[in] swtd: 软件定时器对象的描述符
- * @return 错误码
- * @retval XWOK: OK
- * @retval -ENILOBJD: 空的对象描述符
- * @retval -EOBJDEAD: 对象无效
- * @retval -EACCES: 对象标签检查失败
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwer_t xwos_swt_release(xwos_swt_d swtd)
-{
-        return xwosdl_swt_release(&swtd.swt->osswt, swtd.tik);
-}
-
-/**
  * @brief XWOS API：增加软件定时器对象的引用计数
  * @param[in] swt: 软件定时器对象的指针
  * @return 错误码
@@ -231,6 +127,110 @@ static __xwos_inline_api
 xwer_t xwos_swt_put(struct xwos_swt * swt)
 {
         return xwosdl_swt_put(&swt->osswt);
+}
+
+/**
+ * @brief XWOS API：动态方式创建软件定时器
+ * @param[out] swtd: 指向缓冲区的指针，通过此缓冲区返回软件定时器对象描述符
+ * @param[in] name: 软件定时器的名字
+ * @param[in] flag: 软件定时器的标志
+ * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_swt_create(xwos_swt_d * swtd, const char * name, xwsq_t flag)
+{
+        return xwosdl_swt_create((xwosdl_swt_d *)swtd, name, flag);
+}
+
+/**
+ * @brief XWOS API：删除动态方式创建的软件定时器
+ * @param[in] swtd: 软件定时器对象描述符
+ * @return 错误码
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：不可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_swt_delete(xwos_swt_d swtd)
+{
+        return xwosdl_swt_delete(&swtd.swt->osswt, swtd.tik);
+}
+
+/**
+ * @brief XWOS API：检查软件定时器对象的标签并增加引用计数
+ * @param[in] swtd: 软件定时器对象描述符
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -ENILOBJD: 空的对象描述符
+ * @retval -EOBJDEAD: 对象无效
+ * @retval -EACCES: 对象标签检查失败
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_swt_acquire(xwos_swt_d swtd)
+{
+        return xwosdl_swt_acquire(&swtd.swt->osswt, swtd.tik);
+}
+
+/**
+ * @brief XWOS API：检查对象的标签并减少引用计数
+ * @param[in] swtd: 软件定时器对象描述符
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -ENILOBJD: 空的对象描述符
+ * @retval -EOBJDEAD: 对象无效
+ * @retval -EACCES: 对象标签检查失败
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_swt_release(xwos_swt_d swtd)
+{
+        return xwosdl_swt_release(&swtd.swt->osswt, swtd.tik);
+}
+
+/**
+ * @brief XWOS API：获取软件定时器对象的标签
+ * @param[in] swt: 软件定时器对象的指针
+ * @return 软件定时器对象的标签
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwsq_t xwos_swt_gettik(struct xwos_swt * swt)
+{
+        return xwosdl_swt_gettik(&swt->osswt);
+}
+
+/**
+ * @brief XWOS API：获取软件定时器对象描述符
+ * @param[in] swt: 软件定时器对象的指针
+ * @return 软件定时器对象描述符
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwos_swt_d xwos_swt_getd(struct xwos_swt * swt)
+{
+        xwos_swt_d swtd;
+
+        swtd.swt = swt;
+        swtd.tik = xwosdl_swt_gettik(&swt->osswt);
+        return swtd;
 }
 
 /**

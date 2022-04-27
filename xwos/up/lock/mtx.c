@@ -183,11 +183,16 @@ xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio)
 __xwup_api
 xwer_t xwup_mtx_delete(struct xwup_mtx * mtx)
 {
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+        xwer_t rc;
 
-        xwup_mtx_deactivate(mtx);
-        xwup_mtx_free(mtx);
-        return XWOK;
+        if (mtx) {
+                xwup_mtx_deactivate(mtx);
+                xwup_mtx_free(mtx);
+                rc = XWOK;
+        } else {
+                rc = -ENILOBJD;
+        }
+        return rc;
 }
 
 /**

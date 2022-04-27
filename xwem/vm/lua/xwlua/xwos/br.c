@@ -34,9 +34,8 @@ int xwlua_br_new(lua_State * L)
 
         bitnum = luaL_checkinteger(L, 1);
         brsp = lua_newuserdatauv(L, sizeof(xwlua_br_sp), 0);
-        rc = xwos_br_create(&brsp->br, bitnum);
+        rc = xwos_br_create(brsp, bitnum);
         if (XWOK == rc) {
-                brsp->tik = xwos_br_gettik(brsp->br);
                 luaL_setmetatable(L, "xwlua_br_sp");
         } else {
                 lua_pop(L, 1);

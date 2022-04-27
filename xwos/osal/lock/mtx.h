@@ -122,7 +122,7 @@ xwer_t xwos_mtx_put(struct xwos_mtx * mtx)
 
 /**
  * @brief XWOS API：动态方式创建互斥锁
- * @param[out] mtxbuf: 指向缓冲区的指针，通过此缓冲区返回互斥锁的指针
+ * @param[out] mtxd: 指向缓冲区的指针，通过此缓冲区返回互斥锁对象描述符
  * @param[in] sprio: 互斥锁的静态优先级
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -135,14 +135,14 @@ xwer_t xwos_mtx_put(struct xwos_mtx * mtx)
  * - 重入性：不可重入
  */
 static __xwos_inline_api
-xwer_t xwos_mtx_create(struct xwos_mtx ** mtxbuf, xwpr_t sprio)
+xwer_t xwos_mtx_create(xwos_mtx_d * mtxd, xwpr_t sprio)
 {
-        return xwosdl_mtx_create((struct xwosdl_mtx **)mtxbuf, sprio);
+        return xwosdl_mtx_create((xwosdl_mtx_d *)mtxd, sprio);
 }
 
 /**
  * @brief XWOS API：删除动态方式创建的互斥锁
- * @param[in] mtx: 互斥锁指针
+ * @param[in] mtxd: 互斥锁对象描述符
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -152,9 +152,47 @@ xwer_t xwos_mtx_create(struct xwos_mtx ** mtxbuf, xwpr_t sprio)
  * - 重入性：不可重入
  */
 static __xwos_inline_api
-xwer_t xwos_mtx_delete(struct xwos_mtx * mtx)
+xwer_t xwos_mtx_delete(xwos_mtx_d mtxd)
 {
-        return xwosdl_mtx_delete(&mtx->osmtx);
+        return xwosdl_mtx_delete(&mtxd.mtx->osmtx, mtxd.tik);
+}
+
+/**
+ * @brief XWOS API：检查互斥锁对象的标签并增加引用计数
+ * @param[in] mtxd: 互斥锁对象描述符
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -ENILOBJD: 空的对象描述符
+ * @retval -EOBJDEAD: 对象无效
+ * @retval -EACCES: 对象标签检查失败
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_mtx_acquire(xwos_mtx_d mtxd)
+{
+        return xwosdl_mtx_acquire(&mtxd.mtx->osmtx, mtxd.tik);
+}
+
+/**
+ * @brief XWOS API：检查对象的标签并减少引用计数
+ * @param[in] mtxd: 互斥锁对象描述符
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -ENILOBJD: 空的对象描述符
+ * @retval -EOBJDEAD: 对象无效
+ * @retval -EACCES: 对象标签检查失败
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_mtx_release(xwos_mtx_d mtxd)
+{
+        return xwosdl_mtx_release(&mtxd.mtx->osmtx, mtxd.tik);
 }
 
 /**
@@ -189,44 +227,6 @@ xwos_mtx_d xwos_mtx_getd(struct xwos_mtx * mtx)
         mtxd.mtx = mtx;
         mtxd.tik = xwosdl_mtx_gettik(&mtx->osmtx);
         return mtxd;
-}
-
-/**
- * @brief XWOS API：检查互斥锁对象的标签并增加引用计数
- * @param[in] mtxd: 互斥锁对象的描述符
- * @return 错误码
- * @retval XWOK: OK
- * @retval -ENILOBJD: 空的对象描述符
- * @retval -EOBJDEAD: 对象无效
- * @retval -EACCES: 对象标签检查失败
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwer_t xwos_mtx_acquire(xwos_mtx_d mtxd)
-{
-        return xwosdl_mtx_acquire(&mtxd.mtx->osmtx, mtxd.tik);
-}
-
-/**
- * @brief XWOS API：检查对象的标签并减少引用计数
- * @param[in] mtxd: 互斥锁对象的描述符
- * @return 错误码
- * @retval XWOK: OK
- * @retval -ENILOBJD: 空的对象描述符
- * @retval -EOBJDEAD: 对象无效
- * @retval -EACCES: 对象标签检查失败
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwer_t xwos_mtx_release(xwos_mtx_d mtxd)
-{
-        return xwosdl_mtx_release(&mtxd.mtx->osmtx, mtxd.tik);
 }
 
 /**

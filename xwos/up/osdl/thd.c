@@ -56,6 +56,36 @@ xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd,
 }
 
 __xwup_code
+xwer_t xwosdl_thd_acquire(struct xwosdl_thd * thd, xwsq_t tik)
+{
+        xwer_t rc;
+
+        XWOS_UNUSED(tik);
+
+        if (NULL == thd) {
+                rc = -ENILOBJD;
+        } else {
+                rc = XWOK;
+        }
+        return rc;
+}
+
+__xwup_code
+xwer_t xwosdl_thd_release(struct xwosdl_thd * thd, xwsq_t tik)
+{
+        xwer_t rc;
+
+        XWOS_UNUSED(tik);
+
+        if (NULL == thd) {
+                rc = -ENILOBJD;
+        } else {
+                rc = XWOK;
+        }
+        return rc;
+}
+
+__xwup_code
 xwer_t xwosdl_thd_stop(struct xwosdl_thd * thd, xwsq_t tik, xwer_t * trc)
 {
         xwer_t rc;

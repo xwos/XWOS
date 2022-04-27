@@ -23,6 +23,13 @@
 
 #define xwosdl_mtx xwup_mtx
 
+typedef struct {
+        struct xwosdl_mtx * mtx;
+        xwsq_t tik;
+} xwosdl_mtx_d;
+
+#define XWOSDL_MTX_NILD ((xwosdl_mtx_d){NULL, 0,})
+
 static __xwcc_inline
 xwer_t xwosdl_mtx_init(struct xwosdl_mtx * mtx, xwpr_t sprio)
 {
@@ -33,55 +40,6 @@ static __xwcc_inline
 xwer_t xwosdl_mtx_fini(struct xwosdl_mtx * mtx)
 {
         return xwup_mtx_fini(mtx);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_mtx_create(struct xwosdl_mtx ** mtxbuf, xwpr_t sprio)
-{
-        return xwup_mtx_create(mtxbuf, sprio);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_mtx_delete(struct xwosdl_mtx * mtx)
-{
-        return xwup_mtx_delete(mtx);
-}
-
-static __xwcc_inline
-xwsq_t xwosdl_mtx_gettik(struct xwosdl_mtx * mtx)
-{
-        XWOS_UNUSED(mtx);
-        return 0;
-}
-
-static __xwcc_inline
-xwer_t xwosdl_mtx_acquire(struct xwosdl_mtx * mtx, xwsq_t tik)
-{
-        xwer_t rc;
-
-        XWOS_UNUSED(tik);
-
-        if (NULL == mtx) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
-        }
-        return rc;
-}
-
-static __xwcc_inline
-xwer_t xwosdl_mtx_release(struct xwosdl_mtx * mtx, xwsq_t tik)
-{
-        xwer_t rc;
-
-        XWOS_UNUSED(tik);
-
-        if (NULL == mtx) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
-        }
-        return rc;
 }
 
 static __xwcc_inline
@@ -96,6 +54,26 @@ xwer_t xwosdl_mtx_put(struct xwosdl_mtx * mtx)
 {
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
         return XWOK;
+}
+
+xwer_t xwosdl_mtx_create(xwosdl_mtx_d * mtxd, xwpr_t sprio);
+
+static __xwcc_inline
+xwer_t xwosdl_mtx_delete(struct xwosdl_mtx * mtx, xwsq_t tik)
+{
+        XWOS_UNUSED(tik);
+        return xwup_mtx_delete(mtx);
+}
+
+xwer_t xwosdl_mtx_acquire(struct xwosdl_mtx * mtx, xwsq_t tik);
+
+xwer_t xwosdl_mtx_release(struct xwosdl_mtx * mtx, xwsq_t tik);
+
+static __xwcc_inline
+xwsq_t xwosdl_mtx_gettik(struct xwosdl_mtx * mtx)
+{
+        XWOS_UNUSED(mtx);
+        return 0;
 }
 
 static __xwcc_inline

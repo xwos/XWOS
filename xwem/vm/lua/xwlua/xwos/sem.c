@@ -38,9 +38,8 @@ int xwlua_sem_new(lua_State * L)
                 max = XWSSQ_MAX;
         }
         semsp = lua_newuserdatauv(L, sizeof(xwlua_sem_sp), 0);
-        rc = xwos_sem_create(&semsp->sem, val, max);
+        rc = xwos_sem_create(semsp, val, max);
         if (XWOK == rc) {
-                semsp->tik = xwos_sem_gettik(semsp->sem);
                 luaL_setmetatable(L, "xwlua_sem_sp");
         } else {
                 lua_pop(L, 1);

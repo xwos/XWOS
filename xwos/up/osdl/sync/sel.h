@@ -17,6 +17,13 @@
 
 #define xwosdl_sel xwup_evt
 
+typedef struct {
+        struct xwosdl_sel * sel;
+        xwsq_t tik;
+} xwosdl_sel_d;
+
+#define XWOSDL_SEL_NILD ((xwosdl_sel_d){NULL, 0,})
+
 static __xwcc_inline
 xwer_t xwosdl_sel_init(struct xwosdl_sel * sel, xwsz_t num,
                        xwbmp_t * bmp, xwbmp_t * msk)
@@ -31,55 +38,6 @@ xwer_t xwosdl_sel_fini(struct xwosdl_sel * sel)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sel_create(struct xwosdl_sel ** selbuf, xwsz_t num)
-{
-        return xwup_evt_create(selbuf, XWUP_EVT_TYPE_SEL, num);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_sel_delete(struct xwosdl_sel * sel)
-{
-        return xwup_evt_delete(sel);
-}
-
-static __xwcc_inline
-xwsq_t xwosdl_sel_gettik(struct xwosdl_sel * sel)
-{
-        XWOS_UNUSED(sel);
-        return 0;
-}
-
-static __xwcc_inline
-xwer_t xwosdl_sel_acquire(struct xwosdl_sel * sel, xwsq_t tik)
-{
-        xwer_t rc;
-
-        XWOS_UNUSED(tik);
-
-        if (NULL == sel) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
-        }
-        return rc;
-}
-
-static __xwcc_inline
-xwer_t xwosdl_sel_release(struct xwosdl_sel * sel, xwsq_t tik)
-{
-        xwer_t rc;
-
-        XWOS_UNUSED(tik);
-
-        if (NULL == sel) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
-        }
-        return rc;
-}
-
-static __xwcc_inline
 xwer_t xwosdl_sel_grab(struct xwosdl_sel * sel)
 {
         XWOS_VALIDATE((sel), "nullptr", -EFAULT);
@@ -91,6 +49,26 @@ xwer_t xwosdl_sel_put(struct xwosdl_sel * sel)
 {
         XWOS_VALIDATE((sel), "nullptr", -EFAULT);
         return XWOK;
+}
+
+xwer_t xwosdl_sel_create(xwosdl_sel_d * seld, xwsz_t num);
+
+static __xwcc_inline
+xwer_t xwosdl_sel_delete(struct xwosdl_sel * sel, xwsq_t tik)
+{
+        XWOS_UNUSED(tik);
+        return xwup_evt_delete(sel);
+}
+
+xwer_t xwosdl_sel_acquire(struct xwosdl_sel * sel, xwsq_t tik);
+
+xwer_t xwosdl_sel_release(struct xwosdl_sel * sel, xwsq_t tik);
+
+static __xwcc_inline
+xwsq_t xwosdl_sel_gettik(struct xwosdl_sel * sel)
+{
+        XWOS_UNUSED(sel);
+        return 0;
 }
 
 static __xwcc_inline

@@ -119,8 +119,8 @@ extern "C" {
     fn xwrustffi_mtx_fini(mtx: *mut XwosMtxMem) -> XwEr;
     fn xwrustffi_mtx_grab(mtx: *mut XwosMtxMem) -> XwEr;
     fn xwrustffi_mtx_put(mtx: *mut XwosMtxMem) -> XwEr;
-    fn xwrustffi_mtx_create(mtx: *mut *mut c_void) -> XwEr;
-    fn xwrustffi_mtx_delete(mtx: *mut c_void) -> XwEr;
+    fn xwrustffi_mtx_create(mtx: *mut *mut c_void, tik: *mut XwSq) -> XwEr;
+    fn xwrustffi_mtx_delete(mtx: *mut c_void, tik: XwSq) -> XwEr;
     fn xwrustffi_mtx_gettik(mtx: *mut c_void) -> XwSq;
     fn xwrustffi_mtx_acquire(mtx: *mut c_void, tik: XwSq) -> XwEr;
     fn xwrustffi_mtx_release(mtx: *mut c_void, tik: XwSq) -> XwEr;
@@ -572,13 +572,13 @@ unsafe impl Sync for MtxD {}
 
 impl MtxD {
     fn new() -> MtxD {
-        let mut mtx: *mut c_void = ptr::null_mut();
         unsafe {
-            let rc = xwrustffi_mtx_create(&mut mtx);
+            let mut mtx: *mut c_void = ptr::null_mut();
+            let mut tik: XwSq = 0;
+            let rc = xwrustffi_mtx_create(&mut mtx, &mut tik);
             if rc < 0 {
                 MtxD {mtx: ptr::null_mut(), tik: 0}
             } else {
-                let tik = xwrustffi_mtx_gettik(mtx);
                 MtxD {mtx: mtx, tik: tik}
             }
         }
@@ -668,7 +668,7 @@ impl Default for MtxD {
 impl Drop for MtxD {
     fn drop(&mut self) {
         unsafe {
-            xwrustffi_mtx_delete(self.mtx);
+            xwrustffi_mtx_delete(self.mtx, self.tik);
         }
     }
 }

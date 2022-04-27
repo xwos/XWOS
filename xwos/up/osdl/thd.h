@@ -42,40 +42,6 @@ xwer_t xwosdl_thd_init(struct xwosdl_thd * thd, xwosdl_thd_d * thdd,
                        const struct xwosdl_thd_attr * inattr,
                        xwosdl_thd_f mainfunc, void * arg);
 
-xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd,
-                         const struct xwosdl_thd_attr * attr,
-                         xwosdl_thd_f mainfunc, void * arg);
-
-static __xwcc_inline
-xwer_t xwosdl_thd_acquire(struct xwosdl_thd * thd, xwsq_t tik)
-{
-        xwer_t rc;
-
-        XWOS_UNUSED(tik);
-
-        if (NULL == thd) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
-        }
-        return rc;
-}
-
-static __xwcc_inline
-xwer_t xwosdl_thd_release(struct xwosdl_thd * thd, xwsq_t tik)
-{
-        xwer_t rc;
-
-        XWOS_UNUSED(tik);
-
-        if (NULL == thd) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
-        }
-        return rc;
-}
-
 static __xwcc_inline
 xwer_t xwosdl_thd_grab(struct xwosdl_thd * thd)
 {
@@ -89,6 +55,14 @@ xwer_t xwosdl_thd_put(struct xwosdl_thd * thd)
         XWOS_VALIDATE((thd), "nullptr", -EFAULT);
         return XWOK;
 }
+
+xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd,
+                         const struct xwosdl_thd_attr * attr,
+                         xwosdl_thd_f mainfunc, void * arg);
+
+xwer_t xwosdl_thd_acquire(struct xwosdl_thd * thd, xwsq_t tik);
+
+xwer_t xwosdl_thd_release(struct xwosdl_thd * thd, xwsq_t tik);
 
 static __xwcc_inline
 xwer_t xwosdl_thd_quit(struct xwosdl_thd * thd, xwsq_t tik)

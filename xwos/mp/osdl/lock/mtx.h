@@ -17,6 +17,13 @@
 
 #define xwosdl_mtx xwmp_mtx
 
+typedef struct {
+        struct xwosdl_mtx * mtx;
+        xwsq_t tik;
+} xwosdl_mtx_d;
+
+#define XWOSDL_MTX_NILD ((xwosdl_mtx_d){NULL, 0,})
+
 static __xwcc_inline
 xwer_t xwosdl_mtx_init(struct xwosdl_mtx * mtx, xwpr_t sprio)
 {
@@ -29,29 +36,16 @@ xwer_t xwosdl_mtx_fini(struct xwosdl_mtx * mtx)
         return xwmp_mtx_fini(mtx);
 }
 
-static __xwcc_inline
-xwer_t xwosdl_mtx_create(struct xwosdl_mtx ** mtxbuf, xwpr_t sprio)
-{
-        return xwmp_mtx_create(mtxbuf, sprio);
-}
+xwer_t xwosdl_mtx_grab(struct xwosdl_mtx * mtx);
+
+xwer_t xwosdl_mtx_put(struct xwosdl_mtx * mtx);
+
+xwer_t xwosdl_mtx_create(xwosdl_mtx_d * mtxd, xwpr_t sprio);
 
 static __xwcc_inline
-xwer_t xwosdl_mtx_delete(struct xwosdl_mtx * mtx)
+xwer_t xwosdl_mtx_delete(struct xwosdl_mtx * mtx, xwsq_t tik)
 {
-        return xwmp_mtx_delete(mtx);
-}
-
-static __xwcc_inline
-xwsq_t xwosdl_mtx_gettik(struct xwosdl_mtx * mtx)
-{
-        xwsq_t tik;
-
-        if (mtx) {
-                tik = mtx->xwobj.tik;
-        } else {
-                tik = 0;
-        }
-        return tik;
+        return xwmp_mtx_delete(mtx, tik);
 }
 
 static __xwcc_inline
@@ -67,17 +61,9 @@ xwer_t xwosdl_mtx_release(struct xwosdl_mtx * mtx, xwsq_t tik)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_mtx_grab(struct xwosdl_mtx * mtx)
+xwsq_t xwosdl_mtx_gettik(struct xwosdl_mtx * mtx)
 {
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        return xwmp_mtx_grab(mtx);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_mtx_put(struct xwosdl_mtx * mtx)
-{
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        return xwmp_mtx_put(mtx);
+        return mtx ? mtx->xwobj.tik : 0;
 }
 
 static __xwcc_inline

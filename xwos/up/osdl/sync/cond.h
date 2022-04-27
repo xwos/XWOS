@@ -18,6 +18,13 @@
 
 #define xwosdl_cond xwup_cond
 
+typedef struct {
+        struct xwosdl_cond * cond;
+        xwsq_t tik;
+} xwosdl_cond_d;
+
+#define XWOSDL_COND_NILD ((xwosdl_cond_d){NULL, 0,})
+
 static __xwcc_inline
 xwer_t xwosdl_cond_init(struct xwosdl_cond * cond)
 {
@@ -28,55 +35,6 @@ static __xwcc_inline
 xwer_t xwosdl_cond_fini(struct xwosdl_cond * cond)
 {
         return xwup_cond_fini(cond);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_cond_create(struct xwosdl_cond ** condbuf)
-{
-        return xwup_cond_create(condbuf);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_cond_delete(struct xwosdl_cond * cond)
-{
-        return xwup_cond_delete(cond);
-}
-
-static __xwcc_inline
-xwsq_t xwosdl_cond_gettik(struct xwosdl_cond * cond)
-{
-        XWOS_UNUSED(cond);
-        return 0;
-}
-
-static __xwcc_inline
-xwer_t xwosdl_cond_acquire(struct xwosdl_cond * cond, xwsq_t tik)
-{
-        xwer_t rc;
-
-        XWOS_UNUSED(tik);
-
-        if (NULL == cond) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
-        }
-        return rc;
-}
-
-static __xwcc_inline
-xwer_t xwosdl_cond_release(struct xwosdl_cond * cond, xwsq_t tik)
-{
-        xwer_t rc;
-
-        XWOS_UNUSED(tik);
-
-        if (NULL == cond) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
-        }
-        return rc;
 }
 
 static __xwcc_inline
@@ -91,6 +49,26 @@ xwer_t xwosdl_cond_put(struct xwosdl_cond * cond)
 {
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         return XWOK;
+}
+
+xwer_t xwosdl_cond_create(xwosdl_cond_d * condd);
+
+static __xwcc_inline
+xwer_t xwosdl_cond_delete(struct xwosdl_cond * cond, xwsq_t tik)
+{
+        XWOS_UNUSED(tik);
+        return xwup_cond_delete(cond);
+}
+
+xwer_t xwosdl_cond_acquire(struct xwosdl_cond * cond, xwsq_t tik);
+
+xwer_t xwosdl_cond_release(struct xwosdl_cond * cond, xwsq_t tik);
+
+static __xwcc_inline
+xwsq_t xwosdl_cond_gettik(struct xwosdl_cond * cond)
+{
+        XWOS_UNUSED(cond);
+        return 0;
 }
 
 static __xwcc_inline

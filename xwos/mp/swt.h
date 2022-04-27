@@ -57,10 +57,10 @@ xwer_t xwmp_swt_init(struct xwmp_swt * swt,
                      const char * name,
                      xwsq_t flag);
 xwer_t xwmp_swt_fini(struct xwmp_swt * swt);
-xwer_t xwmp_swt_create(struct xwmp_swt ** ptrbuf,
+xwer_t xwmp_swt_create(struct xwmp_swt ** swtbuf,
                        const char * name,
                        xwsq_t flag);
-xwer_t xwmp_swt_delete(struct xwmp_swt * swt);
+xwer_t xwmp_swt_delete(struct xwmp_swt * swt, xwsq_t tik);
 
 xwer_t xwmp_swt_acquire(struct xwmp_swt * swt, xwsq_t tik);
 xwer_t xwmp_swt_release(struct xwmp_swt * swt, xwsq_t tik);

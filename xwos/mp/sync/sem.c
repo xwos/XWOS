@@ -259,15 +259,13 @@ xwer_t xwmp_sem_put(struct xwmp_sem * sem)
 }
 
 __xwmp_api
-xwer_t xwmp_sem_create(struct xwmp_sem ** ptrbuf, xwid_t type,
+xwer_t xwmp_sem_create(struct xwmp_sem ** sembuf, xwid_t type,
                        xwssq_t val, xwssq_t max)
 {
         struct xwmp_sem * sem;
         xwer_t rc;
 
-        XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
-
-        *ptrbuf = NULL;
+        *sembuf = NULL;
         sem = xwmp_sem_alloc();
         if (__xwcc_unlikely(is_err(sem))) {
                 rc = ptr_err(sem);
@@ -288,17 +286,16 @@ xwer_t xwmp_sem_create(struct xwmp_sem ** ptrbuf, xwid_t type,
                 if (__xwcc_unlikely(rc < 0)) {
                         xwmp_sem_free(sem);
                 } else {
-                        *ptrbuf = sem;
+                        *sembuf = sem;
                 }
         }
         return rc;
 }
 
 __xwmp_api
-xwer_t xwmp_sem_delete(struct xwmp_sem * sem)
+xwer_t xwmp_sem_delete(struct xwmp_sem * sem, xwsq_t tik)
 {
-        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        return xwmp_sem_put(sem);
+        return xwmp_sem_release(sem, tik);
 }
 
 __xwmp_api
@@ -448,29 +445,25 @@ xwer_t xwmp_plsem_freeze(struct xwmp_sem * sem)
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWMP_SEM_TYPE_PIPELINE == sem->type), "type-error", -ETYPE);
-
-        rc = xwmp_sem_grab(sem);
-        if (__xwcc_likely(XWOK == rc)) {
-                xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
-                if (__xwcc_unlikely(sem->count < 0)) {
-                        rc = -EALREADY;
-                } else {
-                        sem->count = XWMP_SEM_NEGTIVE;
+        rc = XWOK;
+        xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
+        if (__xwcc_unlikely(sem->count < 0)) {
+                rc = -EALREADY;
+        } else {
+                sem->count = XWMP_SEM_NEGTIVE;
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
-                        struct xwmp_evt * evt;
-                        struct xwmp_synobj * synobj;
+                struct xwmp_evt * evt;
+                struct xwmp_synobj * synobj;
 
-                        synobj = &sem->synobj;
-                        xwmb_mp_load_acquire(struct xwmp_evt *,
-                                             evt, &synobj->sel.evt);
-                        if (NULL != evt) {
-                                xwmp_sel_obj_c0i(evt, synobj);
-                        }
-#endif
+                synobj = &sem->synobj;
+                xwmb_mp_load_acquire(struct xwmp_evt *,
+                                     evt, &synobj->sel.evt);
+                if (NULL != evt) {
+                        xwmp_sel_obj_c0i(evt, synobj);
                 }
-                xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
-                xwmp_sem_put(sem);
-        }/* else {} */
+#endif
+        }
+        xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
         return rc;
 }
 
@@ -482,20 +475,15 @@ xwer_t xwmp_plsem_thaw(struct xwmp_sem * sem)
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWMP_SEM_TYPE_PIPELINE == sem->type), "type-error", -ETYPE);
-
-        rc = xwmp_sem_grab(sem);
-        if (__xwcc_likely(XWOK == rc)) {
-                xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
-                if (__xwcc_unlikely(sem->count >= 0)) {
-                        rc = -EALREADY;
-                } else {
-                        sem->type = XWMP_SEM_TYPE_PIPELINE;
-                        sem->count = 0;
-                        rc = XWOK;
-                }
-                xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
-                xwmp_sem_put(sem);
-        }/* else {} */
+        rc = XWOK;
+        xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
+        if (__xwcc_unlikely(sem->count >= 0)) {
+                rc = -EALREADY;
+        } else {
+                sem->type = XWMP_SEM_TYPE_PIPELINE;
+                sem->count = 0;
+        }
+        xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
         return rc;
 }
 
@@ -519,28 +507,23 @@ xwer_t xwmp_plsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        rc = xwmp_sem_grab(sem);
-        if (__xwcc_likely(XWOK == rc)) {
-                xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
-                xwmp_splk_lock(&wqn->lock);
-                rc = xwmp_plwq_remove_locked(&sem->wq.pl, wqn);
-                if (XWOK == rc) {
-                        wqn->wq = NULL;
-                        wqn->type = XWMP_WQTYPE_UNKNOWN;
-                        xwaop_store(xwsq_t, &wqn->reason,
-                                    xwmb_modr_release, XWMP_WQN_REASON_INTR);
-                        cb = wqn->cb;
-                        wqn->cb = NULL;
-                        xwmp_splk_unlock(&wqn->lock);
-                        xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
-                        xwmp_sem_put(sem);
-                        cb(wqn->owner);
-                } else {
-                        xwmp_splk_unlock(&wqn->lock);
-                        xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
-                        xwmp_sem_put(sem);
-                }
-        }/* else {} */
+        xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
+        xwmp_splk_lock(&wqn->lock);
+        rc = xwmp_plwq_remove_locked(&sem->wq.pl, wqn);
+        if (XWOK == rc) {
+                wqn->wq = NULL;
+                wqn->type = XWMP_WQTYPE_UNKNOWN;
+                xwaop_store(xwsq_t, &wqn->reason,
+                            xwmb_modr_release, XWMP_WQN_REASON_INTR);
+                cb = wqn->cb;
+                wqn->cb = NULL;
+                xwmp_splk_unlock(&wqn->lock);
+                xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
+                cb(wqn->owner);
+        } else {
+                xwmp_splk_unlock(&wqn->lock);
+                xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
+        }
         return rc;
 }
 
@@ -554,52 +537,47 @@ xwer_t xwmp_plsem_post(struct xwmp_sem * sem)
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWMP_SEM_TYPE_PIPELINE == sem->type), "type-error", -ETYPE);
-
-        rc = xwmp_sem_grab(sem);
-        if (__xwcc_likely(XWOK == rc)) {
-                xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
-                if (sem->count < 0) {
+        xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
+        if (sem->count < 0) {
+                xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
+                rc = -ENEGATIVE;
+        } else {
+                wqn = xwmp_plwq_choose_locked(&sem->wq.pl);
+                if (wqn) {
+                        wqn->wq = NULL;
+                        wqn->type = XWMP_WQTYPE_UNKNOWN;
+                        xwaop_store(xwsq_t, &wqn->reason,
+                                    xwmb_modr_release, XWMP_WQN_REASON_UP);
+                        cb = wqn->cb;
+                        wqn->cb = NULL;
+                        xwmp_splk_unlock(&wqn->lock);
                         xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
-                        xwmp_sem_put(sem);
-                        rc = -ENEGATIVE;
+                        cb(wqn->owner);
+                        rc = XWOK;
                 } else {
-                        wqn = xwmp_plwq_choose_locked(&sem->wq.pl);
-                        if (wqn) {
-                                wqn->wq = NULL;
-                                wqn->type = XWMP_WQTYPE_UNKNOWN;
-                                xwaop_store(xwsq_t, &wqn->reason,
-                                            xwmb_modr_release, XWMP_WQN_REASON_UP);
-                                cb = wqn->cb;
-                                wqn->cb = NULL;
-                                xwmp_splk_unlock(&wqn->lock);
-                                xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
-                                xwmp_sem_put(sem);
-                                cb(wqn->owner);
+                        if (sem->count < sem->max) {
+                                sem->count++;
+                                rc = XWOK;
                         } else {
-                                if (sem->count < sem->max) {
-                                        sem->count++;
-                                } else {
-                                        rc = -ERANGE;
-                                }
-#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
-                                if (sem->count > 0) {
-                                        struct xwmp_evt * evt;
-                                        struct xwmp_synobj * synobj;
-
-                                        synobj = &sem->synobj;
-                                        xwmb_mp_load_acquire(struct xwmp_evt *,
-                                                             evt,
-                                                             &synobj->sel.evt);
-                                        if (NULL != evt) {
-                                                xwmp_sel_obj_s1i(evt, synobj);
-                                        }
-                                }
-#endif
-                                xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
-                                xwmp_sem_put(sem);
+                                rc = -ERANGE;
                         }
+#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+                        if (sem->count > 0) {
+                                struct xwmp_evt * evt;
+                                struct xwmp_synobj * synobj;
+
+                                synobj = &sem->synobj;
+                                xwmb_mp_load_acquire(struct xwmp_evt *,
+                                                     evt,
+                                                     &synobj->sel.evt);
+                                if (NULL != evt) {
+                                        xwmp_sel_obj_s1i(evt, synobj);
+                                }
+                        }
+#endif
+                        xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
                 }
-        }/* else {} */
+        }
         return rc;
 }
 
@@ -617,32 +595,28 @@ xwer_t xwmp_plsem_trywait(struct xwmp_sem * sem)
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWMP_SEM_TYPE_PIPELINE == sem->type), "type-error", -ETYPE);
-
-        rc = xwmp_sem_grab(sem);
-        if (__xwcc_likely(XWOK == rc)) {
-                xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
-                if (sem->count > 0) {
-                        sem->count--;
+        rc = XWOK;
+        xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
+        if (sem->count > 0) {
+                sem->count--;
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
-                        if (0 == sem->count) {
-                                struct xwmp_evt * evt;
-                                struct xwmp_synobj * synobj;
+                if (0 == sem->count) {
+                        struct xwmp_evt * evt;
+                        struct xwmp_synobj * synobj;
 
-                                synobj = &sem->synobj;
-                                xwmb_mp_load_acquire(struct xwmp_evt *,
-                                                     evt,
-                                                     &synobj->sel.evt);
-                                if (NULL != evt) {
-                                        xwmp_sel_obj_c0i(evt, synobj);
-                                }
+                        synobj = &sem->synobj;
+                        xwmb_mp_load_acquire(struct xwmp_evt *,
+                                             evt,
+                                             &synobj->sel.evt);
+                        if (NULL != evt) {
+                                xwmp_sel_obj_c0i(evt, synobj);
                         }
-#endif
-                } else {
-                        rc = -ENODATA;
                 }
-                xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
-                xwmp_sem_put(sem);
-        }/* else {} */
+#endif
+        } else {
+                rc = -ENODATA;
+        }
+        xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
         return rc;
 }
 
@@ -847,7 +821,6 @@ xwer_t xwmp_plsem_wait_to(struct xwmp_sem * sem, xwtm_t to)
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWMP_SEM_TYPE_PIPELINE == sem->type), "type-error", -ETYPE);
         XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
-
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
         hwt = &xwskd->tt.hwt;
@@ -862,11 +835,7 @@ xwer_t xwmp_plsem_wait_to(struct xwmp_sem * sem, xwtm_t to)
                         }
                 }
         } else {
-                rc = xwmp_sem_grab(sem);
-                if (__xwcc_likely(XWOK == rc)) {
-                        rc = xwmp_plsem_test(sem, xwskd, cthd, to);
-                        xwmp_sem_put(sem);
-                }
+                rc = xwmp_plsem_test(sem, xwskd, cthd, to);
         }
         return rc;
 }
@@ -954,13 +923,8 @@ xwer_t xwmp_plsem_wait_unintr(struct xwmp_sem * sem)
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWMP_SEM_TYPE_PIPELINE == sem->type), "type-error", -ETYPE);
         XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
-
-        rc = xwmp_sem_grab(sem);
-        if (__xwcc_likely(XWOK == rc)) {
-                cthd = xwmp_skd_get_cthd_lc();
-                rc = xwmp_plsem_test_unintr(sem, cthd);
-                xwmp_sem_put(sem);
-        }/* else {} */
+        cthd = xwmp_skd_get_cthd_lc();
+        rc = xwmp_plsem_test_unintr(sem, cthd);
         return rc;
 }
 #endif
@@ -1021,29 +985,26 @@ xwer_t xwmp_rtsem_freeze(struct xwmp_sem * sem)
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWMP_SEM_TYPE_RT == sem->type), "type-error", -ETYPE);
-
-        rc = xwmp_sem_grab(sem);
-        if (__xwcc_likely(XWOK == rc)) {
-                xwmp_rtwq_lock_cpuirqsv(&sem->wq.rt, &cpuirq);
-                if (__xwcc_unlikely(sem->count < 0)) {
-                        rc = -EALREADY;
-                } else {
-                        sem->count = XWMP_SEM_NEGTIVE;
+        rc = XWOK;
+        xwmp_rtwq_lock_cpuirqsv(&sem->wq.rt, &cpuirq);
+        if (__xwcc_unlikely(sem->count < 0)) {
+                rc = -EALREADY;
+        } else {
+                sem->count = XWMP_SEM_NEGTIVE;
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
-                        struct xwmp_evt * evt;
-                        struct xwmp_synobj * synobj;
+                struct xwmp_evt * evt;
+                struct xwmp_synobj * synobj;
 
-                        synobj = &sem->synobj;
-                        xwmb_mp_load_acquire(struct xwmp_evt *,
-                                             evt, &synobj->sel.evt);
-                        if (NULL != evt) {
-                                xwmp_sel_obj_c0i(evt, synobj);
-                        }
-#endif
+                synobj = &sem->synobj;
+                xwmb_mp_load_acquire(struct xwmp_evt *,
+                                     evt, &synobj->sel.evt);
+                if (NULL != evt) {
+                        xwmp_sel_obj_c0i(evt, synobj);
                 }
-                xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
-                xwmp_sem_put(sem);
-        }/* else {} */
+#endif
+        }
+        xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
+
         return rc;
 }
 
@@ -1055,20 +1016,15 @@ xwer_t xwmp_rtsem_thaw(struct xwmp_sem * sem)
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWMP_SEM_TYPE_RT == sem->type), "type-error", -ETYPE);
-
-        rc = xwmp_sem_grab(sem);
-        if (__xwcc_likely(XWOK == rc)) {
-                xwmp_rtwq_lock_cpuirqsv(&sem->wq.rt, &cpuirq);
-                if (__xwcc_unlikely(sem->count >= 0)) {
-                        rc = -EALREADY;
-                } else {
-                        sem->type = XWMP_SEM_TYPE_RT;
-                        sem->count = 0;
-                        rc = XWOK;
-                }
-                xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
-                xwmp_sem_put(sem);
-        }/* else {} */
+        rc = XWOK;
+        xwmp_rtwq_lock_cpuirqsv(&sem->wq.rt, &cpuirq);
+        if (__xwcc_unlikely(sem->count >= 0)) {
+                rc = -EALREADY;
+        } else {
+                sem->type = XWMP_SEM_TYPE_RT;
+                sem->count = 0;
+        }
+        xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
         return rc;
 }
 
@@ -1092,28 +1048,23 @@ xwer_t xwmp_rtsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        rc = xwmp_sem_grab(sem);
-        if (__xwcc_likely(XWOK == rc)) {
-                xwmp_rtwq_lock_cpuirqsv(&sem->wq.rt, &cpuirq);
-                xwmp_splk_lock(&wqn->lock);
-                rc = xwmp_rtwq_remove_locked(&sem->wq.rt, wqn);
-                if (XWOK == rc) {
-                        wqn->wq = NULL;
-                        wqn->type = XWMP_WQTYPE_UNKNOWN;
-                        xwaop_store(xwsq_t, &wqn->reason,
-                                    xwmb_modr_release, XWMP_WQN_REASON_INTR);
-                        cb = wqn->cb;
-                        wqn->cb = NULL;
-                        xwmp_splk_unlock(&wqn->lock);
-                        xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
-                        xwmp_sem_put(sem);
-                        cb(wqn->owner);
-                } else {
-                        xwmp_splk_unlock(&wqn->lock);
-                        xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
-                        xwmp_sem_put(sem);
-                }
-        }/* else {} */
+        xwmp_rtwq_lock_cpuirqsv(&sem->wq.rt, &cpuirq);
+        xwmp_splk_lock(&wqn->lock);
+        rc = xwmp_rtwq_remove_locked(&sem->wq.rt, wqn);
+        if (XWOK == rc) {
+                wqn->wq = NULL;
+                wqn->type = XWMP_WQTYPE_UNKNOWN;
+                xwaop_store(xwsq_t, &wqn->reason,
+                            xwmb_modr_release, XWMP_WQN_REASON_INTR);
+                cb = wqn->cb;
+                wqn->cb = NULL;
+                xwmp_splk_unlock(&wqn->lock);
+                xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
+                cb(wqn->owner);
+        } else {
+                xwmp_splk_unlock(&wqn->lock);
+                xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
+        }
         return rc;
 }
 
@@ -1127,52 +1078,47 @@ xwer_t xwmp_rtsem_post(struct xwmp_sem * sem)
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWMP_SEM_TYPE_RT == sem->type), "type-error", -ETYPE);
-
-        rc = xwmp_sem_grab(sem);
-        if (__xwcc_likely(XWOK == rc)) {
-                xwmp_rtwq_lock_cpuirqsv(&sem->wq.rt, &cpuirq);
-                if (__xwcc_unlikely(sem->count < 0)) {
+        xwmp_rtwq_lock_cpuirqsv(&sem->wq.rt, &cpuirq);
+        if (__xwcc_unlikely(sem->count < 0)) {
+                xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
+                rc = -ENEGATIVE;
+        } else {
+                wqn = xwmp_rtwq_choose_locked(&sem->wq.rt);
+                if (wqn) {
+                        wqn->wq = NULL;
+                        wqn->type = XWMP_WQTYPE_UNKNOWN;
+                        xwaop_store(xwsq_t, &wqn->reason,
+                                    xwmb_modr_release, XWMP_WQN_REASON_UP);
+                        cb = wqn->cb;
+                        wqn->cb = NULL;
+                        xwmp_splk_unlock(&wqn->lock);
                         xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
-                        xwmp_sem_put(sem);
-                        rc = -ENEGATIVE;
+                        cb(wqn->owner);
+                        rc = XWOK;
                 } else {
-                        wqn = xwmp_rtwq_choose_locked(&sem->wq.rt);
-                        if (wqn) {
-                                wqn->wq = NULL;
-                                wqn->type = XWMP_WQTYPE_UNKNOWN;
-                                xwaop_store(xwsq_t, &wqn->reason,
-                                            xwmb_modr_release, XWMP_WQN_REASON_UP);
-                                cb = wqn->cb;
-                                wqn->cb = NULL;
-                                xwmp_splk_unlock(&wqn->lock);
-                                xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
-                                xwmp_sem_put(sem);
-                                cb(wqn->owner);
+                        if (sem->count < sem->max) {
+                                sem->count++;
+                                rc = XWOK;
                         } else {
-                                if (sem->count < sem->max) {
-                                        sem->count++;
-                                } else {
-                                        rc = -ERANGE;
-                                }
-#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
-                                if (sem->count > 0) {
-                                        struct xwmp_evt * evt;
-                                        struct xwmp_synobj * synobj;
-
-                                        synobj = &sem->synobj;
-                                        xwmb_mp_load_acquire(struct xwmp_evt *,
-                                                             evt,
-                                                             &synobj->sel.evt);
-                                        if (NULL != evt) {
-                                                xwmp_sel_obj_s1i(evt, synobj);
-                                        }
-                                }
-#endif
-                                xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
-                                xwmp_sem_put(sem);
+                                rc = -ERANGE;
                         }
+#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+                        if (sem->count > 0) {
+                                struct xwmp_evt * evt;
+                                struct xwmp_synobj * synobj;
+
+                                synobj = &sem->synobj;
+                                xwmb_mp_load_acquire(struct xwmp_evt *,
+                                                     evt,
+                                                     &synobj->sel.evt);
+                                if (NULL != evt) {
+                                        xwmp_sel_obj_s1i(evt, synobj);
+                                }
+                        }
+#endif
+                        xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
                 }
-        }/* else {} */
+        }
         return rc;
 }
 
@@ -1190,32 +1136,28 @@ xwer_t xwmp_rtsem_trywait(struct xwmp_sem * sem)
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWMP_SEM_TYPE_RT == sem->type), "type-error", -ETYPE);
-
-        rc = xwmp_sem_grab(sem);
-        if (__xwcc_likely(XWOK == rc)) {
-                xwmp_rtwq_lock_cpuirqsv(&sem->wq.rt, &cpuirq);
-                if (sem->count > 0) {
-                        sem->count--;
+        rc = XWOK;
+        xwmp_rtwq_lock_cpuirqsv(&sem->wq.rt, &cpuirq);
+        if (sem->count > 0) {
+                sem->count--;
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
-                        if (0 == sem->count) {
-                                struct xwmp_evt * evt;
-                                struct xwmp_synobj * synobj;
+                if (0 == sem->count) {
+                        struct xwmp_evt * evt;
+                        struct xwmp_synobj * synobj;
 
-                                synobj = &sem->synobj;
-                                xwmb_mp_load_acquire(struct xwmp_evt *,
-                                                     evt,
-                                                     &synobj->sel.evt);
-                                if (NULL != evt) {
-                                        xwmp_sel_obj_c0i(evt, synobj);
-                                }
+                        synobj = &sem->synobj;
+                        xwmb_mp_load_acquire(struct xwmp_evt *,
+                                             evt,
+                                             &synobj->sel.evt);
+                        if (NULL != evt) {
+                                xwmp_sel_obj_c0i(evt, synobj);
                         }
-#endif
-                } else {
-                        rc = -ENODATA;
                 }
-                xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
-                xwmp_sem_put(sem);
-        }/* else {} */
+#endif
+        } else {
+                rc = -ENODATA;
+        }
+        xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
         return rc;
 }
 
@@ -1418,7 +1360,6 @@ xwer_t xwmp_rtsem_wait_to(struct xwmp_sem * sem, xwtm_t to)
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWMP_SEM_TYPE_RT == sem->type), "type-error", -ETYPE);
         XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
-
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
         hwt = &xwskd->tt.hwt;
@@ -1433,11 +1374,7 @@ xwer_t xwmp_rtsem_wait_to(struct xwmp_sem * sem, xwtm_t to)
                         }
                 }
         } else {
-                rc = xwmp_sem_grab(sem);
-                if (__xwcc_likely(XWOK == rc)) {
-                        rc = xwmp_rtsem_test(sem, xwskd, cthd, to);
-                        xwmp_sem_put(sem);
-                }/* else {} */
+                rc = xwmp_rtsem_test(sem, xwskd, cthd, to);
         }
         return rc;
 }
@@ -1526,13 +1463,8 @@ xwer_t xwmp_rtsem_wait_unintr(struct xwmp_sem * sem)
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWMP_SEM_TYPE_RT == sem->type), "type-error", -ETYPE);
         XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
-
-        rc = xwmp_sem_grab(sem);
-        if (__xwcc_likely(XWOK == rc)) {
-                cthd = xwmp_skd_get_cthd_lc();
-                rc = xwmp_rtsem_test_unintr(sem, cthd);
-                xwmp_sem_put(sem);
-        }/* else {} */
+        cthd = xwmp_skd_get_cthd_lc();
+        rc = xwmp_rtsem_test_unintr(sem, cthd);
         return rc;
 }
 #endif
@@ -1544,11 +1476,7 @@ xwer_t xwmp_sem_getvalue(struct xwmp_sem * sem, xwssq_t * sval)
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((sval), "nullptr", -EFAULT);
-
-        rc = xwmp_sem_grab(sem);
-        if (__xwcc_likely(XWOK == rc)) {
-                *sval = sem->count;
-        }
+        *sval = sem->count;
         return rc;
 }
 
@@ -1571,10 +1499,6 @@ xwer_t xwmp_sem_gettype(struct xwmp_sem * sem, xwid_t * type)
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((type), "nullptr", -EFAULT);
-
-        rc = xwmp_sem_grab(sem);
-        if (__xwcc_likely(XWOK == rc)) {
-                *type = sem->type;
-        }
+        *type = sem->type;
         return rc;
 }

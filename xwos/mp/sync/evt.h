@@ -45,13 +45,13 @@ struct xwmp_evt {
 xwer_t xwmp_evt_init(struct xwmp_evt * evt, xwsq_t type, xwsz_t num,
                      xwbmp_t * bmp, xwbmp_t * msk);
 xwer_t xwmp_evt_fini(struct xwmp_evt * evt);
-xwer_t xwmp_evt_create(struct xwmp_evt ** ptrbuf, xwsq_t type, xwsz_t num);
-xwer_t xwmp_evt_delete(struct xwmp_evt * evt);
-
-xwer_t xwmp_evt_acquire(struct xwmp_evt * evt, xwsq_t tik);
-xwer_t xwmp_evt_release(struct xwmp_evt * evt, xwsq_t tik);
 xwer_t xwmp_evt_grab(struct xwmp_evt * evt);
 xwer_t xwmp_evt_put(struct xwmp_evt * evt);
+
+xwer_t xwmp_evt_create(struct xwmp_evt ** evtbuf, xwsq_t type, xwsz_t num);
+xwer_t xwmp_evt_delete(struct xwmp_evt * evt, xwsq_t tik);
+xwer_t xwmp_evt_acquire(struct xwmp_evt * evt, xwsq_t tik);
+xwer_t xwmp_evt_release(struct xwmp_evt * evt, xwsq_t tik);
 
 xwer_t xwmp_evt_bind(struct xwmp_evt * evt, struct xwmp_evt * slt, xwsq_t pos);
 xwer_t xwmp_evt_unbind(struct xwmp_evt * evt, struct xwmp_evt * slt);

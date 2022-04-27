@@ -35,7 +35,7 @@ xwer_t xwswtdemo_thd_func(void * arg);
 
 xwos_thd_d xwswtdemo_thd;
 struct xwos_swt xwswtdemo_swt0;
-struct xwos_swt * xwswtdemo_swt1;
+xwos_swt_d xwswtdemo_swt1_d;
 
 #define SWTFLG_NUM      (sizeof(xwbmp_t) * BITS_PER_XWU8_T)
 xwbmpop_declare(swtflg_bmp, SWTFLG_NUM) = {0,};
@@ -64,7 +64,7 @@ xwer_t example_timer_start(void)
         }
 
         /* 创建定时器1 */
-        rc = xwos_swt_create(&xwswtdemo_swt1, "xwswtdemo_swt1",
+        rc = xwos_swt_create(&xwswtdemo_swt1_d, "xwswtdemo_swt1",
                              XWOS_SWT_FLAG_RESTART);
         if (rc < 0) {
                 goto err_swt1_create;
@@ -86,7 +86,7 @@ xwer_t example_timer_start(void)
         return XWOK;
 
 err_thd_create:
-        xwos_swt_delete(xwswtdemo_swt1);
+        xwos_swt_delete(xwswtdemo_swt1_d);
 err_swt1_create:
         xwos_swt_fini(&xwswtdemo_swt0);
 err_swt0_init:
@@ -153,7 +153,7 @@ xwer_t xwswtdemo_thd_func(void * arg)
                             xwswtdemo_swt0_callback, NULL);
 
         swtlogf(INFO, "[线程] 启动定时器1。\n");
-        rc = xwos_swt_start(xwswtdemo_swt1,
+        rc = xwos_swt_start(xwswtdemo_swt1_d.swt,
                             ts, 800 * XWTM_MS,
                             xwswtdemo_swt1_callback, NULL);
 

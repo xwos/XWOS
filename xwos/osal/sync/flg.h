@@ -142,114 +142,6 @@ xwer_t xwos_flg_fini(struct xwos_flg * flg)
 }
 
 /**
- * @brief XWOS API：动态方式创建事件标志对象
- * @param[out] flgbuf: 指向缓冲区的指针，通过此缓冲区返回事件标志对象的指针
- * @param[in] num: 线程栅栏中的线程数量
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效的指针或空指针
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwer_t xwos_flg_create(struct xwos_flg ** flgbuf, xwsz_t num)
-{
-        return xwosdl_flg_create((struct xwosdl_flg **)flgbuf, num);
-}
-
-/**
- * @brief XWOS API：删除动态方式创建的事件标志对象
- * @param[in] flg: 事件标志对象指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效的指针或空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个事件标志对象，不可重入
- */
-static __xwos_inline_api
-xwer_t xwos_flg_delete(struct xwos_flg * flg)
-{
-        return xwosdl_flg_delete(&flg->osflg);
-}
-
-/**
- * @brief XWOS API：获取事件标志对象的标签
- * @param[in] flg: 事件标志对象的指针
- * @return 事件标志对象的标签
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwsq_t xwos_flg_gettik(struct xwos_flg * flg)
-{
-        return xwosdl_flg_gettik(&flg->osflg);
-}
-
-/**
- * @brief XWOS API：获取事件标志对象的描述符
- * @param[in] flg: 事件标志对象的指针
- * @return 事件标志对象的描述符
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwos_flg_d xwos_flg_getd(struct xwos_flg * flg)
-{
-        xwos_flg_d flgd;
-
-        flgd.flg = flg;
-        flgd.tik = xwosdl_flg_gettik(&flg->osflg);
-        return flgd;
-}
-
-/**
- * @brief XWOS API：检查事件标志对象的标签并增加引用计数
- * @param[in] flgd: 事件标志对象的描述符
- * @return 错误码
- * @retval XWOK: OK
- * @retval -ENILOBJD: 空的对象描述符
- * @retval -EOBJDEAD: 对象无效
- * @retval -EACCES: 对象标签检查失败
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwer_t xwos_flg_acquire(xwos_flg_d flgd)
-{
-        return xwosdl_flg_acquire(&flgd.flg->osflg, flgd.tik);
-}
-
-/**
- * @brief XWOS API：检查事件标志对象的标签并减少引用计数
- * @param[in] flgd: 事件标志对象的描述符
- * @return 错误码
- * @retval XWOK: OK
- * @retval -ENILOBJD: 空的对象描述符
- * @retval -EOBJDEAD: 对象无效
- * @retval -EACCES: 对象标签检查失败
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwer_t xwos_flg_release(xwos_flg_d flgd)
-{
-        return xwosdl_flg_release(&flgd.flg->osflg, flgd.tik);
-}
-
-/**
  * @brief XWOS API：增加事件标志对象的引用计数
  * @param[in] flg: 事件标志对象的指针
  * @return 错误码
@@ -287,6 +179,114 @@ static __xwos_inline_api
 xwer_t xwos_flg_put(struct xwos_flg * flg)
 {
         return xwosdl_flg_put(&flg->osflg);
+}
+
+/**
+ * @brief XWOS API：动态方式创建事件标志对象
+ * @param[out] flgd: 指向缓冲区的指针，通过此缓冲区返回事件标志对象描述符
+ * @param[in] num: 线程栅栏中的线程数量
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的指针或空指针
+ * @retval -ENOMEM: 内存不足
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_flg_create(xwos_flg_d * flgd, xwsz_t num)
+{
+        return xwosdl_flg_create((xwosdl_flg_d *)flgd, num);
+}
+
+/**
+ * @brief XWOS API：删除动态方式创建的事件标志对象
+ * @param[in] flgd: 事件标志对象描述符
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的指针或空指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：对于同一个事件标志对象，不可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_flg_delete(xwos_flg_d flgd)
+{
+        return xwosdl_flg_delete(&flgd.flg->osflg, flgd.tik);
+}
+
+/**
+ * @brief XWOS API：检查事件标志对象的标签并增加引用计数
+ * @param[in] flgd: 事件标志对象描述符
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -ENILOBJD: 空的对象描述符
+ * @retval -EOBJDEAD: 对象无效
+ * @retval -EACCES: 对象标签检查失败
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_flg_acquire(xwos_flg_d flgd)
+{
+        return xwosdl_flg_acquire(&flgd.flg->osflg, flgd.tik);
+}
+
+/**
+ * @brief XWOS API：检查事件标志对象的标签并减少引用计数
+ * @param[in] flgd: 事件标志对象描述符
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -ENILOBJD: 空的对象描述符
+ * @retval -EOBJDEAD: 对象无效
+ * @retval -EACCES: 对象标签检查失败
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_flg_release(xwos_flg_d flgd)
+{
+        return xwosdl_flg_release(&flgd.flg->osflg, flgd.tik);
+}
+
+/**
+ * @brief XWOS API：获取事件标志对象的标签
+ * @param[in] flg: 事件标志对象的指针
+ * @return 事件标志对象的标签
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwsq_t xwos_flg_gettik(struct xwos_flg * flg)
+{
+        return xwosdl_flg_gettik(&flg->osflg);
+}
+
+/**
+ * @brief XWOS API：获取事件标志对象描述符
+ * @param[in] flg: 事件标志对象的指针
+ * @return 事件标志对象描述符
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwos_flg_d xwos_flg_getd(struct xwos_flg * flg)
+{
+        xwos_flg_d flgd;
+
+        flgd.flg = flg;
+        flgd.tik = xwosdl_flg_gettik(&flg->osflg);
+        return flgd;
 }
 
 /**

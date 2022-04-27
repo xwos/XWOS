@@ -17,6 +17,13 @@
 
 #define xwosdl_sel xwmp_evt
 
+typedef struct {
+        struct xwosdl_sel * sel;
+        xwsq_t tik;
+} xwosdl_sel_d;
+
+#define XWOSDL_SEL_NILD ((xwosdl_sel_d){NULL, 0,})
+
 static __xwcc_inline
 xwer_t xwosdl_sel_init(struct xwosdl_sel * sel, xwsz_t num,
                        xwbmp_t * bmp, xwbmp_t * msk)
@@ -30,29 +37,16 @@ xwer_t xwosdl_sel_fini(struct xwosdl_sel * sel)
         return xwmp_evt_fini(sel);
 }
 
-static __xwcc_inline
-xwer_t xwosdl_sel_create(struct xwosdl_sel ** selbuf, xwsz_t num)
-{
-        return xwmp_evt_create(selbuf, XWMP_EVT_TYPE_SEL, num);
-}
+xwer_t xwosdl_sel_grab(struct xwosdl_sel * sel);
+
+xwer_t xwosdl_sel_put(struct xwosdl_sel * sel);
+
+xwer_t xwosdl_sel_create(xwosdl_sel_d * seld, xwsz_t num);
 
 static __xwcc_inline
-xwer_t xwosdl_sel_delete(struct xwosdl_sel * sel)
+xwer_t xwosdl_sel_delete(struct xwosdl_sel * sel, xwsq_t tik)
 {
-        return xwmp_evt_delete(sel);
-}
-
-static __xwcc_inline
-xwsq_t xwosdl_sel_gettik(struct xwosdl_sel * sel)
-{
-        xwsq_t tik;
-
-        if (sel) {
-                tik = sel->cond.synobj.xwobj.tik;
-        } else {
-                tik = 0;
-        }
-        return tik;
+        return xwmp_evt_delete(sel, tik);
 }
 
 static __xwcc_inline
@@ -68,17 +62,9 @@ xwer_t xwosdl_sel_release(struct xwosdl_sel * sel, xwsq_t tik)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sel_grab(struct xwosdl_sel * sel)
+xwsq_t xwosdl_sel_gettik(struct xwosdl_sel * sel)
 {
-        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
-        return xwmp_evt_grab(sel);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_sel_put(struct xwosdl_sel * sel)
-{
-        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
-        return xwmp_evt_put(sel);
+        return sel ? sel->cond.synobj.xwobj.tik : 0;
 }
 
 static __xwcc_inline

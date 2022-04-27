@@ -244,16 +244,14 @@ xwer_t xwmp_swt_fini(struct xwmp_swt * swt)
 }
 
 __xwmp_api
-xwer_t xwmp_swt_create(struct xwmp_swt ** ptrbuf,
+xwer_t xwmp_swt_create(struct xwmp_swt ** swtbuf,
                        const char * name,
                        xwsq_t flag)
 {
         struct xwmp_swt * swt;
         xwer_t rc;
 
-        XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
-
-        *ptrbuf = NULL;
+        *swtbuf = NULL;
         swt = xwmp_swt_alloc();
         if (is_err(swt)) {
                 rc = ptr_err(swt);
@@ -263,7 +261,7 @@ xwer_t xwmp_swt_create(struct xwmp_swt ** ptrbuf,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_swt_activate;
         }
-        *ptrbuf = swt;
+        *swtbuf = swt;
         return XWOK;
 
 err_swt_activate:
@@ -273,12 +271,10 @@ err_swt_alloc:
 }
 
 __xwmp_api
-xwer_t xwmp_swt_delete(struct xwmp_swt * swt)
+xwer_t xwmp_swt_delete(struct xwmp_swt * swt, xwsq_t tik)
 {
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
-
         xwmp_swt_stop(swt);
-        return xwmp_swt_put(swt);
+        return xwmp_swt_release(swt, tik);
 }
 
 __xwmp_api
@@ -348,7 +344,6 @@ xwer_t xwmp_swt_start(struct xwmp_swt * swt,
         XWOS_VALIDATE((cb), "nullptr", -EFAULT);
         XWOS_VALIDATE(((xwtm_cmp(base, 0) > 0) && (xwtm_cmp(period, 0) > 0)),
                       "out-of-time", -EINVAL);
-
         xwtt = &swt->xwskd->tt;
         to = xwtm_add_safely(base, period);
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
@@ -380,7 +375,6 @@ xwer_t xwmp_swt_stop(struct xwmp_swt * swt)
         struct xwmp_tt * xwtt;
 
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
-
         xwtt = &swt->xwskd->tt;
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         rc = xwmp_tt_remove_locked(xwtt, &swt->ttn);

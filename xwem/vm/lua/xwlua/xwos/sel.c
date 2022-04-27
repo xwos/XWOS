@@ -33,9 +33,8 @@ int xwlua_sel_new(lua_State * L)
 
         bitnum = luaL_checkinteger(L, 1);
         selsp = lua_newuserdatauv(L, sizeof(xwlua_sel_sp), 0);
-        rc = xwos_sel_create(&selsp->sel, bitnum);
+        rc = xwos_sel_create(selsp, bitnum);
         if (XWOK == rc) {
-                selsp->tik = xwos_sel_gettik(selsp->sel);
                 luaL_setmetatable(L, "xwlua_sel_sp");
         } else {
                 lua_pop(L, 1);

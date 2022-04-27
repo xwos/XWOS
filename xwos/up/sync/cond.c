@@ -157,7 +157,6 @@ xwer_t xwup_cond_create(struct xwup_cond ** ptrbuf)
         xwer_t rc;
 
         XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
-
         *ptrbuf = NULL;
         cond = xwup_cond_alloc();
         if (__xwcc_unlikely(is_err(cond))) {
@@ -173,11 +172,16 @@ xwer_t xwup_cond_create(struct xwup_cond ** ptrbuf)
 __xwup_api
 xwer_t xwup_cond_delete(struct xwup_cond * cond)
 {
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+        xwer_t rc;
 
-        xwup_cond_deactivate(cond);
-        xwup_cond_free(cond);
-        return XWOK;
+        if (cond) {
+                xwup_cond_deactivate(cond);
+                xwup_cond_free(cond);
+                rc = XWOK;
+        } else {
+                rc = -ENILOBJD;
+        }
+        return rc;
 }
 
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
@@ -190,7 +194,6 @@ xwer_t xwup_cond_bind(struct xwup_cond * cond,
 
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-
         xwospl_cpuirq_save_lc(&cpuirq);
         rc = xwup_sel_obj_bind(evt, &cond->synobj, pos, false);
         xwospl_cpuirq_restore_lc(cpuirq);
@@ -205,7 +208,6 @@ xwer_t xwup_cond_unbind(struct xwup_cond * cond, struct xwup_evt * evt)
 
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-
         xwospl_cpuirq_save_lc(&cpuirq);
         rc = xwup_sel_obj_unbind(evt, &cond->synobj, false);
         xwospl_cpuirq_restore_lc(cpuirq);
@@ -220,7 +222,6 @@ xwer_t xwup_cond_freeze(struct xwup_cond * cond)
         xwreg_t cpuirq;
 
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-
         rc = XWOK;
         xwospl_cpuirq_save_lc(&cpuirq);
         if (__xwcc_unlikely(cond->neg)) {
@@ -239,7 +240,6 @@ xwer_t xwup_cond_thaw(struct xwup_cond * cond)
         xwreg_t cpuirq;
 
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-
         rc = XWOK;
         xwospl_cpuirq_save_lc(&cpuirq);
         if (__xwcc_likely(cond->neg)) {
@@ -350,7 +350,6 @@ xwer_t xwup_cond_broadcast(struct xwup_cond * cond)
         xwer_t rc;
 
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-
         retry = false;
         do {
                 rc = xwup_cond_broadcast_once(cond, &retry);
@@ -382,7 +381,6 @@ xwer_t xwup_cond_unicast(struct xwup_cond * cond)
         xwer_t rc;
 
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-
         rc = XWOK;
         xwospl_cpuirq_save_lc(&cpuirq);
         if (__xwcc_unlikely(cond->neg)) {
@@ -420,7 +418,6 @@ xwer_t xwup_cond_unlock(void * lock, xwsq_t lktype, void * lkdata)
         union xwos_ulock ulk;
 
         ulk.anon = lock;
-
         rc = XWOK;
         switch (lktype) {
         case XWOS_LK_MTX:
@@ -466,7 +463,6 @@ xwer_t xwup_cond_lock(void * lock, xwsq_t lktype, xwtm_t to, void * lkdata)
         union xwos_ulock ulk;
 
         ulk.anon = lock;
-
         rc = XWOK;
         switch (lktype) {
         case XWOS_LK_MTX:
@@ -699,7 +695,6 @@ xwer_t xwup_cond_wait_to(struct xwup_cond * cond,
                        ((lock) && (lktype > XWOS_LK_NONE))),
                       "invalid-lock", -EINVAL);
         XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
-
         *lkst = XWOS_LKST_LOCKED;
         cthd = xwup_skd_get_cthd_lc();
         xwskd = xwup_skd_get_lc();
@@ -711,7 +706,7 @@ xwer_t xwup_cond_wait_to(struct xwup_cond * cond,
                 rc = xwup_cond_unlock(lock, lktype, lkdata);
                 if (XWOK == rc) {
                         *lkst = XWOS_LKST_UNLOCKED;
-                }/* else {} */
+                }
                 rc = -ETIMEDOUT;
         } else {
                 rc = xwup_cond_test(cond, xwskd, cthd, lock, lktype, lkdata, to, lkst);

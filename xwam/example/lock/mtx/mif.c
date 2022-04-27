@@ -66,7 +66,7 @@ const struct xwos_thd_desc xwmtxdemo_thd_desc[] = {
 };
 xwos_thd_d xwmtxdemo_thd[xw_array_size(xwmtxdemo_thd_desc)];
 
-struct xwos_mtx * xwmtxdemo_mtx;
+xwos_mtx_d dymtx;
 xwsq_t xwmtxdemo_shared_count = 0;
 
 /**
@@ -77,7 +77,7 @@ xwer_t example_mtx_start(void)
         xwer_t rc;
         xwsq_t i;
 
-        rc = xwos_mtx_create(&xwmtxdemo_mtx, XWOS_SKD_PRIORITY_RT_MAX);
+        rc = xwos_mtx_create(&dymtx, XWOS_SKD_PRIORITY_RT_MAX);
         if (rc < 0) {
                 goto err_mtx_create;
         }
@@ -95,7 +95,7 @@ xwer_t example_mtx_start(void)
         return XWOK;
 
 err_thd_create:
-        xwos_mtx_delete(xwmtxdemo_mtx);
+        xwos_mtx_delete(dymtx);
 err_mtx_create:
         return rc;
 }
@@ -113,14 +113,14 @@ xwer_t xwmtxdemo_thd_0_func(void * arg)
 
         while (!xwos_cthd_frz_shld_stop(NULL)) {
                 xwos_cthd_sleep(500 * XWTM_MS);
-                rc = xwos_mtx_lock(xwmtxdemo_mtx);
+                rc = xwos_mtx_lock(dymtx.mtx);
                 if (XWOK == rc) {
                         ts = xwtm_nowts();
                         mtxlogf(INFO,
                                 "[线程0] 计数器：%d, 时间戳：%lld 纳秒。\n",
                                 xwmtxdemo_shared_count, ts);
                         xwmtxdemo_shared_count++;
-                        xwos_mtx_unlock(xwmtxdemo_mtx);
+                        xwos_mtx_unlock(dymtx.mtx);
                 }
         }
         mtxlogf(INFO, "[线程0] 退出。\n");
@@ -141,14 +141,14 @@ xwer_t xwmtxdemo_thd_1_func(void * arg)
 
         while (!xwos_cthd_frz_shld_stop(NULL)) {
                 xwos_cthd_sleep(500 * XWTM_MS);
-                rc = xwos_mtx_lock(xwmtxdemo_mtx);
+                rc = xwos_mtx_lock(dymtx.mtx);
                 if (XWOK == rc) {
                         ts = xwtm_nowts();
                         mtxlogf(INFO,
                                 "[线程1] 计数器：%d, 时间戳：%lld 纳秒。\n",
                                 xwmtxdemo_shared_count, ts);
                         xwmtxdemo_shared_count++;
-                        xwos_mtx_unlock(xwmtxdemo_mtx);
+                        xwos_mtx_unlock(dymtx.mtx);
                 }
         }
         mtxlogf(INFO, "[线程1] 退出。\n");

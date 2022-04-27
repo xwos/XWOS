@@ -18,6 +18,13 @@
 
 #define xwosdl_cond xwmp_cond
 
+typedef struct {
+        struct xwosdl_cond * cond;
+        xwsq_t tik;
+} xwosdl_cond_d;
+
+#define XWOSDL_COND_NILD ((xwosdl_cond_d){NULL, 0,})
+
 static __xwcc_inline
 xwer_t xwosdl_cond_init(struct xwosdl_cond * cond)
 {
@@ -30,29 +37,16 @@ xwer_t xwosdl_cond_fini(struct xwosdl_cond * cond)
         return xwmp_cond_fini(cond);
 }
 
-static __xwcc_inline
-xwer_t xwosdl_cond_create(struct xwosdl_cond ** condbuf)
-{
-        return xwmp_cond_create(condbuf);
-}
+xwer_t xwosdl_cond_grab(struct xwosdl_cond * cond);
+
+xwer_t xwosdl_cond_put(struct xwosdl_cond * cond);
+
+xwer_t xwosdl_cond_create(xwosdl_cond_d * condd);
 
 static __xwcc_inline
-xwer_t xwosdl_cond_delete(struct xwosdl_cond * cond)
+xwer_t xwosdl_cond_delete(struct xwosdl_cond * cond, xwsq_t tik)
 {
-        return xwmp_cond_delete(cond);
-}
-
-static __xwcc_inline
-xwsq_t xwosdl_cond_gettik(struct xwosdl_cond * cond)
-{
-        xwsq_t tik;
-
-        if (cond) {
-                tik = cond->synobj.xwobj.tik;
-        } else {
-                tik = 0;
-        }
-        return tik;
+        return xwmp_cond_delete(cond, tik);
 }
 
 static __xwcc_inline
@@ -68,22 +62,13 @@ xwer_t xwosdl_cond_release(struct xwosdl_cond * cond, xwsq_t tik)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_cond_grab(struct xwosdl_cond * cond)
+xwsq_t xwosdl_cond_gettik(struct xwosdl_cond * cond)
 {
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-        return xwmp_cond_grab(cond);
+        return cond ? cond->synobj.xwobj.tik : 0;
 }
 
 static __xwcc_inline
-xwer_t xwosdl_cond_put(struct xwosdl_cond * cond)
-{
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-        return xwmp_cond_put(cond);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_cond_bind(struct xwosdl_cond * cond, struct xwosdl_sel * sel,
-                        xwsq_t pos)
+xwer_t xwosdl_cond_bind(struct xwosdl_cond * cond, struct xwosdl_sel * sel, xwsq_t pos)
 {
         return xwmp_cond_bind(cond, sel, pos);
 }

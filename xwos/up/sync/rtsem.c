@@ -180,11 +180,16 @@ xwer_t xwup_rtsem_create(struct xwup_rtsem ** ptrbuf, xwssq_t val, xwssq_t max)
 __xwup_api
 xwer_t xwup_rtsem_delete(struct xwup_rtsem * sem)
 {
-        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        xwer_t rc;
 
-        xwup_rtsem_fini(sem);
-        xwup_rtsem_free(sem);
-        return XWOK;
+        if (sem) {
+                xwup_rtsem_fini(sem);
+                xwup_rtsem_free(sem);
+                rc = XWOK;
+        } else {
+                rc = -ENILOBJD;
+        }
+        return rc;
 }
 
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)

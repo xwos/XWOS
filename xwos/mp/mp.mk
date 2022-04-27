@@ -48,3 +48,10 @@ endif
 
 ######## ######## ######## ######## osdl ######## ######## ######## ########
 XWOS_CSRCS += mp/osdl/thd.c
+XWOS_CSRCS += mp/osdl/swt.c
+XWOS_CSRCS += mp/osdl/lock/mtx.c
+XWOS_CSRCS += mp/osdl/sync/sem.c
+XWOS_CSRCS += mp/osdl/sync/cond.c
+XWOS_CSRCS += mp/osdl/sync/flg.c
+XWOS_CSRCS += mp/osdl/sync/sel.c
+XWOS_CSRCS += mp/osdl/sync/br.c

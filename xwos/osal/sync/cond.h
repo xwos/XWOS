@@ -80,112 +80,6 @@ xwer_t xwos_cond_fini(struct xwos_cond * cond)
 }
 
 /**
- * @brief XWOS API：动态方式创建条件量对象
- * @param[out] condbuf: 指向缓冲区的指针，通过此缓冲区返回条件量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效的指针或空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwer_t xwos_cond_create(struct xwos_cond ** condbuf)
-{
-        return xwosdl_cond_create((struct xwosdl_cond **)condbuf);
-}
-
-/**
- * @brief XWOS API：删除动态方式创建的条件量对象
- * @param[in] cond: 条件量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效的指针或空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个条件量对象，不可重入
- */
-static __xwos_inline_api
-xwer_t xwos_cond_delete(struct xwos_cond * cond)
-{
-        return xwosdl_cond_delete(&cond->oscond);
-}
-
-/**
- * @brief XWOS API：获取条件量对象的标签
- * @param[in] cond: 条件量对象的指针
- * @return 条件量对象的标签
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwsq_t xwos_cond_gettik(struct xwos_cond * cond)
-{
-        return xwosdl_cond_gettik(&cond->oscond);
-}
-
-/**
- * @brief XWOS API：获取条件量对象的描述符
- * @param[in] cond: 条件量对象的指针
- * @return 条件量对象的描述符
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwos_cond_d xwos_cond_getd(struct xwos_cond * cond)
-{
-        xwos_cond_d condd;
-
-        condd.cond = cond;
-        condd.tik = xwosdl_cond_gettik(&cond->oscond);
-        return condd;
-}
-
-/**
- * @brief XWOS API：检查条件量对象的标签并增加引用计数
- * @param[in] condd: 条件量对象的描述符
- * @return 错误码
- * @retval XWOK: OK
- * @retval -ENILOBJD: 空的对象描述符
- * @retval -EOBJDEAD: 对象无效
- * @retval -EACCES: 对象标签检查失败
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwer_t xwos_cond_acquire(xwos_cond_d condd)
-{
-        return xwosdl_cond_acquire(&condd.cond->oscond, condd.tik);
-}
-
-/**
- * @brief XWOS API：检查对象的标签并减少引用计数
- * @param[in] condd: 条件量对象的描述符
- * @return 错误码
- * @retval XWOK: OK
- * @retval -ENILOBJD: 空的对象描述符
- * @retval -EOBJDEAD: 对象无效
- * @retval -EACCES: 对象标签检查失败
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
-static __xwos_inline_api
-xwer_t xwos_cond_release(xwos_cond_d condd)
-{
-        return xwosdl_cond_release(&condd.cond->oscond, condd.tik);
-}
-
-/**
  * @brief XWOS API：增加条件量对象的引用计数
  * @param[in] cond: 条件量对象的指针
  * @return 错误码
@@ -223,6 +117,112 @@ static __xwos_inline_api
 xwer_t xwos_cond_put(struct xwos_cond * cond)
 {
         return xwosdl_cond_put(&cond->oscond);
+}
+
+/**
+ * @brief XWOS API：动态方式创建条件量对象
+ * @param[out] condd: 指向缓冲区的指针，通过此缓冲区返回条件量对象描述符
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的指针或空指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_cond_create(xwos_cond_d * condd)
+{
+        return xwosdl_cond_create((xwosdl_cond_d *)condd);
+}
+
+/**
+ * @brief XWOS API：删除动态方式创建的条件量对象
+ * @param[in] condd: 条件量对象描述符
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的指针或空指针
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：对于同一个条件量对象，不可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_cond_delete(xwos_cond_d condd)
+{
+        return xwosdl_cond_delete(&condd.cond->oscond, condd.tik);
+}
+
+/**
+ * @brief XWOS API：检查条件量对象的标签并增加引用计数
+ * @param[in] condd: 条件量对象描述符
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -ENILOBJD: 空的对象描述符
+ * @retval -EOBJDEAD: 对象无效
+ * @retval -EACCES: 对象标签检查失败
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_cond_acquire(xwos_cond_d condd)
+{
+        return xwosdl_cond_acquire(&condd.cond->oscond, condd.tik);
+}
+
+/**
+ * @brief XWOS API：检查对象的标签并减少引用计数
+ * @param[in] condd: 条件量对象描述符
+ * @return 错误码
+ * @retval XWOK: OK
+ * @retval -ENILOBJD: 空的对象描述符
+ * @retval -EOBJDEAD: 对象无效
+ * @retval -EACCES: 对象标签检查失败
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_cond_release(xwos_cond_d condd)
+{
+        return xwosdl_cond_release(&condd.cond->oscond, condd.tik);
+}
+
+/**
+ * @brief XWOS API：获取条件量对象的标签
+ * @param[in] cond: 条件量对象的指针
+ * @return 条件量对象的标签
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwsq_t xwos_cond_gettik(struct xwos_cond * cond)
+{
+        return xwosdl_cond_gettik(&cond->oscond);
+}
+
+/**
+ * @brief XWOS API：获取条件量对象描述符
+ * @param[in] cond: 条件量对象的指针
+ * @return 条件量对象描述符
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwos_cond_d xwos_cond_getd(struct xwos_cond * cond)
+{
+        xwos_cond_d condd;
+
+        condd.cond = cond;
+        condd.tik = xwosdl_cond_gettik(&cond->oscond);
+        return condd;
 }
 
 /**

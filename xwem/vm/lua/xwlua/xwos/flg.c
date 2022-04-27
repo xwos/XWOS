@@ -34,9 +34,8 @@ int xwlua_flg_new(lua_State * L)
 
         bitnum = luaL_checkinteger(L, 1);
         flgsp = lua_newuserdatauv(L, sizeof(xwlua_flg_sp), 0);
-        rc = xwos_flg_create(&flgsp->flg, bitnum);
+        rc = xwos_flg_create(flgsp, bitnum);
         if (XWOK == rc) {
-                flgsp->tik = xwos_flg_gettik(flgsp->flg);
                 luaL_setmetatable(L, "xwlua_flg_sp");
         } else {
                 lua_pop(L, 1);

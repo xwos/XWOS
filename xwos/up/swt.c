@@ -163,11 +163,16 @@ err_swt_alloc:
 __xwup_api
 xwer_t xwup_swt_delete(struct xwup_swt * swt)
 {
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
+        xwer_t rc;
 
-        xwup_swt_deactivate(swt);
-        xwup_swt_free(swt);
-        return XWOK;
+        if (swt) {
+                xwup_swt_deactivate(swt);
+                xwup_swt_free(swt);
+                rc = XWOK;
+        } else {
+                rc = -ENILOBJD;
+        }
+        return rc;
 }
 
 /**
