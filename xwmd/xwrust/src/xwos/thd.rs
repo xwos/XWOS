@@ -33,7 +33,7 @@
 //!
 //! [`join()`] 方法会返回 [`thd::Result<R>`] ， **R** 是返回值的类型，并放在 [`Ok`] 中。
 //!
-//! ## 与[`std::thread`]的区别
+//! ## 与 [`std::thread`] 的区别
 //!
 //! #### 闭包原型不同
 //!
@@ -129,6 +129,12 @@
 //!     };
 //! ```
 //!
+//! #### 子线程 [`panic!()`] 的处理方式不同
+//!
+//! + [`std::thread`] 可捕获子线程的 [`panic!()`] 。
+//! + `xwrust::xwos::thd` 的子线程 [`panic!()`] 后会导致整个代码 **halt** 。
+//! 目前 **#!\[no_std\]** 环境的 **unwind** 支持还不完善，暂时无法实现类似于 [`std::thread`] 的机制。
+//!
 //! # 线程的工厂模式
 //!
 //! 可以通过线程工厂设置线程属性后，再创建线程：
@@ -171,13 +177,13 @@
 //! 线程的句柄 [`ThdHandle`] 功能类似于 [`std::thread::JoinHandle`] ，可通过 [`join()`] 方法等待线程结束。
 //!
 //!
-//! [`std::thread`]: https://doc.rust-lang.org/std/thread/index.html
-//! [`std::thread::JoinHandle`]: https://doc.rust-lang.org/std/thread/struct.JoinHandle.html
-//! [`panic!()`]: https://doc.rust-lang.org/std/macro.panic.html
+//! [`std::thread`]: <https://doc.rust-lang.org/std/thread/index.html>
+//! [`std::thread::JoinHandle`]: <https://doc.rust-lang.org/std/thread/struct.JoinHandle.html>
+//! [`panic!()`]: <https://doc.rust-lang.org/std/macro.panic.html>
 //! [`join()`]: ThdHandle::join
 //! [`thd::Result<R>`]: Result<R>
-//! [`Ok`]: https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok
-//! [`Err`]: https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err
+//! [`Ok`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
+//! [`Err`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
 //! [`ele.name()`]: ThdElement::name
 //!
 
@@ -346,7 +352,7 @@ impl fmt::Debug for ThdD {
 /// [`privileged`]: Builder::privileged
 /// [`spawn`]: Builder::spawn
 /// [`thd::spawn`]: spawn
-/// [`core::result::Result`]: https://doc.rust-lang.org/core/result/enum.Result.html
+/// [`core::result::Result`]: <https://doc.rust-lang.org/core/result/enum.Result.html>
 pub struct Builder {
     /// 线程的名字
     name: Option<String>,
@@ -484,9 +490,9 @@ impl Builder {
     ///     }
     /// };
     /// ```
-    /// [`core::result::Result`]: https://doc.rust-lang.org/core/result/enum.Result.html
-    /// [`'static`]: https://doc.rust-lang.org/std/keyword.static.html
-    /// [`Send`]: https://doc.rust-lang.org/core/marker/trait.Send.html
+    /// [`core::result::Result`]: <https://doc.rust-lang.org/core/result/enum.Result.html>
+    /// [`'static`]: <https://doc.rust-lang.org/std/keyword.static.html>
+    /// [`Send`]: <https://doc.rust-lang.org/core/marker/trait.Send.html>
     pub fn spawn<F, R>(self, f: F) -> Result<ThdHandle<R>, XwEr>
     where
         F: FnOnce(Arc<ThdElement>) -> R,
@@ -532,7 +538,7 @@ impl Builder {
     ///     }
     /// };
     /// ```
-    /// [`core::result::Result`]: https://doc.rust-lang.org/core/result/enum.Result.html
+    /// [`core::result::Result`]: <https://doc.rust-lang.org/core/result/enum.Result.html>
     pub unsafe fn spawn_unchecked<'a, F, R>(self, f: F) -> Result<ThdHandle<R>, XwEr>
     where
         F: FnOnce(Arc<ThdElement>) -> R,
@@ -630,11 +636,11 @@ impl Builder {
 ///     },
 /// };
 /// ```
-/// [`core::result::Result`]: https://doc.rust-lang.org/core/result/enum.Result.html
-/// [`drop()`]: https://doc.rust-lang.org/core/ops/trait.Drop.html#tymethod.drop
+/// [`core::result::Result`]: <https://doc.rust-lang.org/core/result/enum.Result.html>
+/// [`drop()`]: <https://doc.rust-lang.org/core/ops/trait.Drop.html#tymethod.drop>
 /// [`join()`]: ThdHandle::join
-/// [`'static`]: https://doc.rust-lang.org/std/keyword.static.html
-/// [`Send`]: https://doc.rust-lang.org/core/marker/trait.Send.html
+/// [`'static`]: <https://doc.rust-lang.org/std/keyword.static.html>
+/// [`Send`]: <https://doc.rust-lang.org/core/marker/trait.Send.html>
 pub fn spawn<F, R>(f: F) -> Result<ThdHandle<R>, XwEr>
 where
     F: FnOnce(Arc<ThdElement>) -> R,
@@ -648,7 +654,7 @@ where
 ///
 /// 线程的元素中的数据需跨线程共享，因此在定义时需要使用 [`Arc`] 进行封装。
 ///
-/// [`Arc`]: https://doc.rust-lang.org/alloc/sync/struct.Arc.html
+/// [`Arc`]: <https://doc.rust-lang.org/alloc/sync/struct.Arc.html>
 pub struct ThdElement {
     /// 线程的名称
     name: Option<CString>,
@@ -694,7 +700,7 @@ impl fmt::Debug for ThdElement {
 ///
 /// 线程的返回值中的数据需跨线程共享，因此在定义时需要使用 [`Arc`] 进行封装。
 ///
-/// [`Arc`]: https://doc.rust-lang.org/alloc/sync/struct.Arc.html
+/// [`Arc`]: <https://doc.rust-lang.org/alloc/sync/struct.Arc.html>
 struct ThdReturnValue<R> {
     result: UnsafeCell<Option<R>>,
 }

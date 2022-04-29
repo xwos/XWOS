@@ -25,7 +25,7 @@ use libc_print::std_name::println;
 #[global_allocator]
 pub static ALLOCATOR: xwrust::xwmm::Allocator = xwrust::xwmm::Allocator;
 
-static GLOBAL_LOCK: StaticMutex<u32> = StaticMutex::new(0);
+static GLOBAL_MUTEX: Mutex<[u32; 8]> = Mutex::new([0; 8]);
 
 #[no_mangle]
 pub unsafe extern "C" fn xwrust_main() {
@@ -38,17 +38,19 @@ pub unsafe extern "C" fn xwrust_main() {
     for x in v.iter() {
         println!("x: {}", x);
     }
-    GLOBAL_LOCK.init();
-    match GLOBAL_LOCK.lock() {
+
+    GLOBAL_MUTEX.init();
+    match GLOBAL_MUTEX.lock() {
         Ok(mut guard) => {
-            *guard = 1;
+            guard[0] = 1;
         }
         Err(mtxerr) => {
             println!("[main] failed to lock: {:?}", mtxerr);
         }
     }
 
-    let lock: Arc<DynamicMutex<u32>> = Arc::new(DynamicMutex::new(10));
+    let lock: Arc<Mutex<u32>> = Arc::new(Mutex::new(10));
+    lock.init();
     let lock_child = lock.clone();
 
     println!("[main] thd: {:?}", cthd::i());
@@ -61,10 +63,10 @@ pub unsafe extern "C" fn xwrust_main() {
             println!("[child] thd: {:?}", cthd::i());
             println!("[child] now: {} ms", xwtm::nowtc());
 
-            match GLOBAL_LOCK.lock() {
+            match GLOBAL_MUTEX.lock() {
                 Ok(mut guard) => {
-                    *guard += 1;
-                    let value = *guard;
+                    guard[0] += 1;
+                    let value = guard[0];
                     println!("[child] locked, value: {}", value);
                 }
                 Err(mtxerr) => {
@@ -102,10 +104,10 @@ pub unsafe extern "C" fn xwrust_main() {
                 loop {
                     println!("[main] sleep 1s ...");
                     cthd::sleep(xwtm::s(1));
-                    match GLOBAL_LOCK.lock() {
+                    match GLOBAL_MUTEX.lock() {
                         Ok(mut guard) => {
-                            *guard += 1;
-                            let value = *guard;
+                            guard[0] += 1;
+                            let value = guard[0];
                             println!("[main] locked, value {}", value);
                         }
                         Err(mtxerr) => {
