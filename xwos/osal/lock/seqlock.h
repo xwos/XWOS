@@ -50,7 +50,7 @@ void xwos_sqlk_init(struct xwos_sqlk * sql)
 }
 
 /**
- * @brief XWOS API：开启读临界区
+ * @brief XWOS API：开启共享读临界区
  * @param[in] sql: 顺序锁的指针
  * @return 当前顺序值
  * @note
@@ -67,7 +67,7 @@ xwsq_t xwos_sqlk_rd_begin(struct xwos_sqlk * sql)
 }
 
 /**
- * @brief XWOS API：结束读临界区
+ * @brief XWOS API：关闭共享读临界区，并检查是否需要重试
  * @param[in] sql: 顺序锁的指针
  * @param[in] start: @ref xwos_sqlk_rd_begin() 返回的顺序值，用于测试顺序值是否发生改变
  * @retval true: 顺序值发生了改变，需要重试

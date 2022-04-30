@@ -3,4 +3,5 @@
 //!
 
 pub mod spinlock;
+pub mod seqlock;
 pub mod mtx;

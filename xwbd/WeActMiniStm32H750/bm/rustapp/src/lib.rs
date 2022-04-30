@@ -19,6 +19,7 @@ use xwrust::xwos::thd;
 use xwrust::xwos::cthd;
 use xwrust::xwos::lock::mtx::*;
 use xwrust::xwos::lock::spinlock::*;
+use xwrust::xwos::lock::seqlock::*;
 
 use cortex_m::asm;
 use libc_print::std_name::println;
@@ -28,6 +29,7 @@ pub static ALLOCATOR: xwrust::xwmm::Allocator = xwrust::xwmm::Allocator;
 
 static GLOBAL_MUTEX: Mutex<[u32; 8]> = Mutex::new([0; 8]);
 static GLOBAL_SPINLOCK: Spinlock<u32> = Spinlock::new(0);
+static GLOBAL_SEQLOCK: Seqlock<u32> = Seqlock::new(0);
 
 #[no_mangle]
 pub unsafe extern "C" fn xwrust_main() {
@@ -61,7 +63,15 @@ pub unsafe extern "C" fn xwrust_main() {
         }
     }
 
-
+    GLOBAL_SEQLOCK.init();
+    match GLOBAL_SEQLOCK.lock(SeqlockMode::WriteLockCpuirqSave(0)) {
+        Ok(mut guard) => {
+            *guard = 1;
+        }
+        Err(sqlkerr) => {
+            println!("[main] failed to lock: {:?}", sqlkerr);
+        }
+    }
 
     let lock: Arc<Mutex<u32>> = Arc::new(Mutex::new(10));
     lock.init();
