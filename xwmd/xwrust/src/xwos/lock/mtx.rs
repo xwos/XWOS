@@ -35,7 +35,7 @@
 //!     // ...省略...
 //!     thd::Builder::new()
 //!         .name("child".into())
-//!         .spawn(|_|) {
+//!         .spawn(move |_| {
 //!             // 子线程闭包
 //!             match GLOBAL_MUTEX.lock() {
 //!                 Ok(mut guard) => { // 子线程上锁成功
@@ -44,7 +44,7 @@
 //!                 Err(e) => { // 子线程上锁失败
 //!                 }
 //!             }
-//!         }
+//!         });
 //! }
 //! ```
 //!
@@ -73,7 +73,7 @@
 //!     // ...省略...
 //!     thd::Builder::new()
 //!         .name("child".into())
-//!         .spawn(|_|) {
+//!         .spawn(move |_| {
 //!             // 子线程闭包
 //!             match lock_child.lock() {
 //!                 Ok(mut guard) => { // 子线程上锁成功
@@ -82,10 +82,9 @@
 //!                 Err(e) => { // 子线程上锁失败
 //!                 }
 //!             }
-//!         }
+//!         });
 //! }
 //! ```
-//!
 //!
 //! # 与 [`std::sync::Mutex`] 的区别
 //!

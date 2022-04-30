@@ -18,6 +18,7 @@ use xwrust::xwtm;
 use xwrust::xwos::thd;
 use xwrust::xwos::cthd;
 use xwrust::xwos::lock::mtx::*;
+use xwrust::xwos::lock::spinlock::*;
 
 use cortex_m::asm;
 use libc_print::std_name::println;
@@ -26,6 +27,7 @@ use libc_print::std_name::println;
 pub static ALLOCATOR: xwrust::xwmm::Allocator = xwrust::xwmm::Allocator;
 
 static GLOBAL_MUTEX: Mutex<[u32; 8]> = Mutex::new([0; 8]);
+static GLOBAL_SPINLOCK: Spinlock<u32> = Spinlock::new(0);
 
 #[no_mangle]
 pub unsafe extern "C" fn xwrust_main() {
@@ -48,6 +50,18 @@ pub unsafe extern "C" fn xwrust_main() {
             println!("[main] failed to lock: {:?}", mtxerr);
         }
     }
+
+    GLOBAL_SPINLOCK.init();
+    match GLOBAL_SPINLOCK.lock(SpinlockMode::LockCpuirqSave(0)) {
+        Ok(mut guard) => {
+            *guard = 1;
+        }
+        Err(splkerr) => {
+            println!("[main] failed to lock: {:?}", splkerr);
+        }
+    }
+
+
 
     let lock: Arc<Mutex<u32>> = Arc::new(Mutex::new(10));
     lock.init();

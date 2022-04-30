@@ -2,4 +2,5 @@
 //! ========
 //!
 
+pub mod spinlock;
 pub mod mtx;
