@@ -265,7 +265,7 @@ struct xwos_irq_resource {
  * @brief XWOS的锁类型枚举
  */
 enum xwos_lock_type_em {
-        XWOS_LK_NONE, /**< 无 */
+        XWOS_LK_NONE = 0, /**< 无 */
         XWOS_LK_MTX, /**< 互斥锁 */
         XWOS_LK_MTX_UNINTR, /**< 不可中断的互斥锁 */
         XWOS_LK_SPLK, /**< 自旋锁 */

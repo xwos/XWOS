@@ -10,5 +10,10 @@ crate-type = ["staticlib"]
 [dependencies]
 cortex-m = "0.7"
 xwrust = {path = "../../../../xwmd/xwrust"}
+xwrust_example_vector = {path = "../../../../xwam/xwrust-example/xwrust_example_vector"}
+xwrust_example_thd = {path = "../../../../xwam/xwrust-example/xwrust_example_thd"}
+xwrust_example_mutex = {path = "../../../../xwam/xwrust-example/xwrust_example_mutex"}
+xwrust_example_spinlock = {path = "../../../../xwam/xwrust-example/xwrust_example_spinlock"}
+xwrust_example_cond = {path = "../../../../xwam/xwrust-example/xwrust_example_cond"}
 libc-print = "0.1"
 # lazy_static = { version = "1.4", features = ["spin_no_std"] }

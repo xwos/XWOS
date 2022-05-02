@@ -98,6 +98,11 @@ dependencies = [
  "cortex-m",
  "libc-print",
  "xwrust",
+ "xwrust_example_cond",
+ "xwrust_example_mutex",
+ "xwrust_example_spinlock",
+ "xwrust_example_thd",
+ "xwrust_example_vector",
 ]
 
 [[package]]
@@ -152,4 +157,44 @@ dependencies = [
  "cstr_core",
  "cty",
  "libc",
+]
+
+[[package]]
+name = "xwrust_example_cond"
+version = "0.1.0"
+dependencies = [
+ "libc-print",
+ "xwrust",
+]
+
+[[package]]
+name = "xwrust_example_mutex"
+version = "0.1.0"
+dependencies = [
+ "libc-print",
+ "xwrust",
+]
+
+[[package]]
+name = "xwrust_example_spinlock"
+version = "0.1.0"
+dependencies = [
+ "libc-print",
+ "xwrust",
+]
+
+[[package]]
+name = "xwrust_example_thd"
+version = "0.1.0"
+dependencies = [
+ "libc-print",
+ "xwrust",
+]
+
+[[package]]
+name = "xwrust_example_vector"
+version = "0.1.0"
+dependencies = [
+ "libc-print",
+ "xwrust",
 ]

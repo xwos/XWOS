@@ -14,7 +14,7 @@
 //! + 当临界区只被多个线程访问时，需使用关闭抢占的模式： [`SeqlockMode::WriteLock`]
 //! + 当临界区被中断底半部访问时，需使用关闭中断底半部的模式： [`SeqlockMode::WriteLockBh`]
 //! + 当临界区被多个线程和单一中断访问时，需使用关闭中断的模式： [`SeqlockMode::WriteLockCpuirq`]
-//! + 当临界区被多个中断上下文访问时，需使用保存中断标志的模式： [`SeqlockMode::WriteLockCpuirqSave`]
+//! + 当临界区被多个中断上下文访问时，需使用保存中断标志的模式： [`SeqlockMode::WriteLockCpuirqSave(None)`]
 //!
 //! #### 非独占读
 //!
@@ -36,7 +36,7 @@
 //! + 当临界区只被多个线程访问时，需使用关闭抢占的模式： [`SeqlockMode::ReadExclusiveLock`]
 //! + 当临界区被中断底半部访问时，需使用关闭中断底半部的模式： [`SeqlockMode::ReadExclusiveLockBh`]
 //! + 当临界区被多个线程和单一中断访问时，需使用关闭中断的模式： [`SeqlockMode::ReadExclusiveLockCpuirq`]
-//! + 当临界区被多个中断上下文访问时，需使用保存中断标志的模式： [`SeqlockMode::ReadExclusiveLockCpuirqSave`]
+//! + 当临界区被多个中断上下文访问时，需使用保存中断标志的模式： [`SeqlockMode::ReadExclusiveLockCpuirqSave(None)`]
 //!
 //!
 //! # 创建方法
@@ -82,6 +82,8 @@
 //! }
 //! ```
 //!
+//! [`SeqlockMode::WriteLockCpuirqSave(None)`]: SeqlockMode::WriteLockCpuirqSave
+//! [`SeqlockMode::ReadExclusiveLockCpuirqSave(None)`]: SeqlockMode::ReadExclusiveLockCpuirqSave
 //! [`'static`]: https://doc.rust-lang.org/std/keyword.static.html
 //! [`alloc::sync::Arc`]: <https://doc.rust-lang.org/alloc/sync/struct.Arc.html>
 
@@ -89,14 +91,17 @@ extern crate core;
 use core::cell::UnsafeCell;
 use core::result::Result;
 use core::default::Default;
+use core::option::Option;
 use core::ops::Drop;
 use core::ops::Deref;
 use core::ops::DerefMut;
 use core::sync::atomic::*;
+use core::ptr;
 
 use crate::types::*;
 use crate::errno::*;
 
+use crate::xwos::sync::cond::*;
 
 extern "C" {
     fn xwrustffi_sqlk_init(sqlk: *mut XwosSqlk);
@@ -151,7 +156,7 @@ pub enum SeqlockMode {
     /// 写，关闭抢占、中断底半部和中断
     WriteLockCpuirq,
     /// 写，关闭抢占、中断底半部和中断，并保存之前的中断标志
-    WriteLockCpuirqSave(XwReg),
+    WriteLockCpuirqSave(Option<XwReg>),
     /// 独占读，关闭抢占
     ReadExclusiveLock,
     /// 独占读，关闭抢占、中断底半部
@@ -159,7 +164,7 @@ pub enum SeqlockMode {
     /// 独占读，关闭抢占、中断底半部和中断
     ReadExclusiveLockCpuirq,
     /// 独占读，关闭抢占、中断底半部和中断，并保存之前的中断标志
-    ReadExclusiveLockCpuirqSave(XwReg),
+    ReadExclusiveLockCpuirqSave(Option<XwReg>),
 }
 
 ////////////////////////////////////////////////////////////////
@@ -294,14 +299,14 @@ impl<T: ?Sized> Seqlock<T> {
     ///
     /// # 锁模式 **mode**
     ///
-    /// [`SeqlockMode::WriteLock`] 写，关闭抢占
-    /// [`SeqlockMode::WriteLockBh`] 写，关闭抢占、中断底半部
-    /// [`SeqlockMode::WriteLockCpuirq`] 写，关闭抢占、中断底半部和中断
-    /// [`SeqlockMode::WriteLockCpuirqSave(XwReg)`] 写，关闭抢占、中断底半部和中断，并保存之前的中断标志
-    /// [`SeqlockMode::ReadExclusiveLock`] 独占读，关闭抢占
-    /// [`SeqlockMode::ReadExclusiveLockBh`] 独占读，关闭抢占、中断底半部
-    /// [`SeqlockMode::ReadExclusiveLockCpuirq`] 独占读，关闭抢占、中断底半部和中断
-    /// [`SeqlockMode::ReadExclusiveLockCpuirqSave(XwReg)`] 独占读，关闭抢占、中断底半部和中断，并保存之前的中断标志
+    /// + [`SeqlockMode::WriteLock`] 写，关闭抢占
+    /// + [`SeqlockMode::WriteLockBh`] 写，关闭抢占、中断底半部
+    /// + [`SeqlockMode::WriteLockCpuirq`] 写，关闭抢占、中断底半部和中断
+    /// + [`SeqlockMode::WriteLockCpuirqSave(None)`] 写，关闭抢占、中断底半部和中断，并保存之前的中断标志
+    /// + [`SeqlockMode::ReadExclusiveLock`] 独占读，关闭抢占
+    /// + [`SeqlockMode::ReadExclusiveLockBh`] 独占读，关闭抢占、中断底半部
+    /// + [`SeqlockMode::ReadExclusiveLockCpuirq`] 独占读，关闭抢占、中断底半部和中断
+    /// + [`SeqlockMode::ReadExclusiveLockCpuirqSave(None)`] 独占读，关闭抢占、中断底半部和中断，并保存之前的中断标志
     ///
     /// # 错误码
     ///
@@ -316,7 +321,7 @@ impl<T: ?Sized> Seqlock<T> {
     /// pub unsafe extern "C" fn xwrust_main() {
     ///     // ...省略...
     ///     GLOBAL_SEQLOCK.init();
-    ///     match GLOBAL_SEQLOCK.lock(SeqlockMode::ReadExclusiveLockCpuirqSave(0)) {
+    ///     match GLOBAL_SEQLOCK.lock(SeqlockMode::ReadExclusiveLockCpuirqSave(None)) {
     ///         Ok(mut guard) => { // 上锁成功
     ///             *guard = 1; // 写共享变量
     ///         } // guard 生命周期结束，自动解锁，并恢复中断标志
@@ -327,6 +332,8 @@ impl<T: ?Sized> Seqlock<T> {
     /// }
     /// ```
     ///
+    /// [`SeqlockMode::WriteLockCpuirqSave(None)`]: SeqlockMode::WriteLockCpuirqSave
+    /// [`SeqlockMode::ReadExclusiveLockCpuirqSave(None)`]: SeqlockMode::ReadExclusiveLockCpuirqSave
     /// [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
     pub fn lock(&self, mode: SeqlockMode) -> Result<SeqlockGuard<'_, T>, SeqlockError> {
         if self.init.load(Ordering::Acquire) {
@@ -343,7 +350,7 @@ impl<T: ?Sized> Seqlock<T> {
                     SeqlockMode::ReadExclusiveLockCpuirqSave(_) => {
                         let mut cpuirq: XwReg = 0;
                         xwrustffi_sqlk_rdex_lock_cpuirqsv(self.sqlk.get(), &mut cpuirq);
-                        *self.mode.get() = SeqlockMode::ReadExclusiveLockCpuirqSave(cpuirq);
+                        *self.mode.get() = SeqlockMode::ReadExclusiveLockCpuirqSave(Some(cpuirq));
                     },
                     SeqlockMode::ReadExclusiveLockBh => {
                         xwrustffi_sqlk_rdex_lock_bh(self.sqlk.get());
@@ -362,7 +369,7 @@ impl<T: ?Sized> Seqlock<T> {
                     SeqlockMode::WriteLockCpuirqSave(_) => {
                         let mut cpuirq: XwReg = 0;
                         xwrustffi_sqlk_wr_lock_cpuirqsv(self.sqlk.get(), &mut cpuirq);
-                        *self.mode.get() = SeqlockMode::WriteLockCpuirqSave(cpuirq);
+                        *self.mode.get() = SeqlockMode::WriteLockCpuirqSave(Some(cpuirq));
                     },
                     SeqlockMode::WriteLockBh => {
                         xwrustffi_sqlk_wr_lock_bh(self.sqlk.get());
@@ -384,14 +391,14 @@ impl<T: ?Sized> Seqlock<T> {
     ///
     /// # 锁模式 **mode**
     ///
-    /// [`SeqlockMode::WriteLock`] 写，关闭抢占
-    /// [`SeqlockMode::WriteLockBh`] 写，关闭抢占、中断底半部
-    /// [`SeqlockMode::WriteLockCpuirq`] 写，关闭抢占、中断底半部和中断
-    /// [`SeqlockMode::WriteLockCpuirqSave(XwReg)`] 写，关闭抢占、中断底半部和中断，并保存之前的中断标志
-    /// [`SeqlockMode::ReadExclusiveLock`] 独占读，关闭抢占
-    /// [`SeqlockMode::ReadExclusiveLockBh`] 独占读，关闭抢占、中断底半部
-    /// [`SeqlockMode::ReadExclusiveLockCpuirq`] 独占读，关闭抢占、中断底半部和中断
-    /// [`SeqlockMode::ReadExclusiveLockCpuirqSave(XwReg)`] 独占读，关闭抢占、中断底半部和中断，并保存之前的中断标志
+    /// + [`SeqlockMode::WriteLock`] 写，关闭抢占
+    /// + [`SeqlockMode::WriteLockBh`] 写，关闭抢占、中断底半部
+    /// + [`SeqlockMode::WriteLockCpuirq`] 写，关闭抢占、中断底半部和中断
+    /// + [`SeqlockMode::WriteLockCpuirqSave(None)`] 写，关闭抢占、中断底半部和中断，并保存之前的中断标志
+    /// + [`SeqlockMode::ReadExclusiveLock`] 独占读，关闭抢占
+    /// + [`SeqlockMode::ReadExclusiveLockBh`] 独占读，关闭抢占、中断底半部
+    /// + [`SeqlockMode::ReadExclusiveLockCpuirq`] 独占读，关闭抢占、中断底半部和中断
+    /// + [`SeqlockMode::ReadExclusiveLockCpuirqSave(None)`] 独占读，关闭抢占、中断底半部和中断，并保存之前的中断标志
     ///
     /// # 错误码
     ///
@@ -417,6 +424,8 @@ impl<T: ?Sized> Seqlock<T> {
     /// }
     /// ```
     ///
+    /// [`SeqlockMode::WriteLockCpuirqSave(None)`]: SeqlockMode::WriteLockCpuirqSave
+    /// [`SeqlockMode::ReadExclusiveLockCpuirqSave(None)`]: SeqlockMode::ReadExclusiveLockCpuirqSave
     /// [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
     pub fn trylock(&self, mode: SeqlockMode) -> Result<SeqlockGuard<'_, T>, SeqlockError> {
         if self.init.load(Ordering::Acquire) {
@@ -449,7 +458,7 @@ impl<T: ?Sized> Seqlock<T> {
                         let mut cpuirq: XwReg = 0;
                         rc = xwrustffi_sqlk_rdex_trylock_cpuirqsv(self.sqlk.get(), &mut cpuirq);
                         if 0 == rc {
-                            *self.mode.get() = SeqlockMode::ReadExclusiveLockCpuirqSave(cpuirq);
+                            *self.mode.get() = SeqlockMode::ReadExclusiveLockCpuirqSave(Some(cpuirq));
                             Ok(SeqlockGuard::new(self))
                         } else if -EAGAIN == rc {
                             Err(SeqlockError::Again)
@@ -495,7 +504,7 @@ impl<T: ?Sized> Seqlock<T> {
                         let mut cpuirq: XwReg = 0;
                         rc = xwrustffi_sqlk_wr_trylock_cpuirqsv(self.sqlk.get(), &mut cpuirq);
                         if 0 == rc {
-                            *self.mode.get() = SeqlockMode::WriteLockCpuirqSave(cpuirq);
+                            *self.mode.get() = SeqlockMode::WriteLockCpuirqSave(Some(cpuirq));
                             Ok(SeqlockGuard::new(self))
                         } else if -EAGAIN == rc {
                             Err(SeqlockError::Again)
@@ -654,6 +663,140 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
     fn new(lock: &'a Seqlock<T>) -> SeqlockGuard<'a, T> {
         SeqlockGuard { lock: lock }
     }
+
+    fn lock(&self) {
+        unsafe {
+            let mode = &*self.lock.mode.get();
+            match mode {
+                SeqlockMode::WriteLock |
+                SeqlockMode::WriteLockBh |
+                SeqlockMode::WriteLockCpuirq |
+                SeqlockMode::WriteLockCpuirqSave(_) => {
+                    xwrustffi_sqlk_wr_lock(self.lock.sqlk.get());
+                },
+                SeqlockMode::ReadExclusiveLock |
+                SeqlockMode::ReadExclusiveLockBh |
+                SeqlockMode::ReadExclusiveLockCpuirq |
+                SeqlockMode::ReadExclusiveLockCpuirqSave(_) => {
+                    xwrustffi_sqlk_rdex_lock(self.lock.sqlk.get());
+                },
+            }
+        }
+    }
+
+    fn unlock(&self) {
+        unsafe {
+            let mode = &*self.lock.mode.get();
+            match mode {
+                SeqlockMode::WriteLock |
+                SeqlockMode::WriteLockBh |
+                SeqlockMode::WriteLockCpuirq |
+                SeqlockMode::WriteLockCpuirqSave(_) => {
+                    xwrustffi_sqlk_wr_unlock(self.lock.sqlk.get());
+                },
+                SeqlockMode::ReadExclusiveLock |
+                SeqlockMode::ReadExclusiveLockBh |
+                SeqlockMode::ReadExclusiveLockCpuirq |
+                SeqlockMode::ReadExclusiveLockCpuirqSave(_) => {
+                    xwrustffi_sqlk_rdex_unlock(self.lock.sqlk.get());
+                },
+            }
+        }
+    }
+
+    pub fn wait(self, cond: &Cond) -> Result<SeqlockGuard<'a, T>, CondError> {
+        unsafe {
+            let mut rc = xwrustffi_cond_acquire(cond.cond.get(), *cond.tik.get());
+            if rc == 0 {
+                let lktype = match &*self.lock.mode.get() {
+                    SeqlockMode::WriteLock |
+                    SeqlockMode::WriteLockBh |
+                    SeqlockMode::WriteLockCpuirq |
+                    SeqlockMode::WriteLockCpuirqSave(_) => {
+                        XWOS_LK_SQLK_WR
+                    },
+                    SeqlockMode::ReadExclusiveLock |
+                    SeqlockMode::ReadExclusiveLockBh |
+                    SeqlockMode::ReadExclusiveLockCpuirq |
+                    SeqlockMode::ReadExclusiveLockCpuirqSave(_) => {
+                        XWOS_LK_SQLK_RDEX
+                    },
+                };
+                let mut lkst = 0;
+                rc = xwrustffi_cond_wait(cond.cond.get(),
+                                         self.lock.sqlk.get() as _, lktype, ptr::null_mut(),
+                                         &mut lkst);
+                xwrustffi_cond_put(cond.cond.get());
+                if 0 == rc {
+                    Ok(self)
+                } else if -EINTR == rc {
+                    self.lock();
+                    drop(self);
+                    Err(CondError::Interrupt)
+                } else if -ENOTTHDCTX == rc {
+                    self.lock();
+                    drop(self);
+                    Err(CondError::NotThreadContext)
+                } else {
+                    self.lock();
+                    drop(self);
+                    Err(CondError::Unknown(rc))
+                }
+            } else {
+                drop(self);
+                Err(CondError::NotInit)
+            }
+        }
+    }
+
+    pub fn wait_to(self, cond: &Cond, to: XwTm) -> Result<SeqlockGuard<'a, T>, CondError> {
+        unsafe {
+            let mut rc = xwrustffi_cond_acquire(cond.cond.get(), *cond.tik.get());
+            if rc == 0 {
+                let lktype = match &*self.lock.mode.get() {
+                    SeqlockMode::WriteLock |
+                    SeqlockMode::WriteLockBh |
+                    SeqlockMode::WriteLockCpuirq |
+                    SeqlockMode::WriteLockCpuirqSave(_) => {
+                        XWOS_LK_SQLK_WR
+                    },
+                    SeqlockMode::ReadExclusiveLock |
+                    SeqlockMode::ReadExclusiveLockBh |
+                    SeqlockMode::ReadExclusiveLockCpuirq |
+                    SeqlockMode::ReadExclusiveLockCpuirqSave(_) => {
+                        XWOS_LK_SQLK_RDEX
+                    },
+                };
+                let mut lkst = 0;
+                rc = xwrustffi_cond_wait_to(cond.cond.get(),
+                                            self.lock.sqlk.get() as _, lktype, ptr::null_mut(),
+                                            to, &mut lkst);
+                xwrustffi_cond_put(cond.cond.get());
+                if 0 == rc {
+                    Ok(self)
+                } else if -EINTR == rc {
+                    self.lock();
+                    drop(self);
+                    Err(CondError::Interrupt)
+                } else if -ETIMEDOUT == rc {
+                    self.lock();
+                    drop(self);
+                    Err(CondError::Timedout)
+                } else if -ENOTTHDCTX == rc {
+                    self.lock();
+                    drop(self);
+                    Err(CondError::NotThreadContext)
+                } else {
+                    self.lock();
+                    drop(self);
+                    Err(CondError::Unknown(rc))
+                }
+            } else {
+                drop(self);
+                Err(CondError::NotInit)
+            }
+        }
+    }
 }
 
 impl<T: ?Sized> Deref for SeqlockGuard<'_, T> {
@@ -681,7 +824,7 @@ impl<T: ?Sized> Drop for SeqlockGuard<'_, T> {
                     xwrustffi_sqlk_rdex_unlock_cpuirq(self.lock.sqlk.get());
                 },
                 SeqlockMode::ReadExclusiveLockCpuirqSave(cpuirq) => {
-                    xwrustffi_sqlk_rdex_unlock_cpuirqrs(self.lock.sqlk.get(), cpuirq);
+                    xwrustffi_sqlk_rdex_unlock_cpuirqrs(self.lock.sqlk.get(), cpuirq.unwrap_unchecked());
                 },
                 SeqlockMode::ReadExclusiveLockBh => {
                     xwrustffi_sqlk_rdex_unlock_bh(self.lock.sqlk.get());
@@ -694,7 +837,7 @@ impl<T: ?Sized> Drop for SeqlockGuard<'_, T> {
                     xwrustffi_sqlk_wr_unlock_cpuirq(self.lock.sqlk.get());
                 },
                 SeqlockMode::WriteLockCpuirqSave(cpuirq) => {
-                    xwrustffi_sqlk_wr_unlock_cpuirqrs(self.lock.sqlk.get(), cpuirq);
+                    xwrustffi_sqlk_wr_unlock_cpuirqrs(self.lock.sqlk.get(), cpuirq.unwrap_unchecked());
                 },
                 SeqlockMode::WriteLockBh => {
                     xwrustffi_sqlk_wr_unlock_bh(self.lock.sqlk.get());

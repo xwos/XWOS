@@ -16,7 +16,7 @@
 //! + 当临界区只被多个线程访问时，需使用关闭抢占的模式： [`SpinlockMode::Lock`]
 //! + 当临界区被中断底半部访问时，需使用关闭中断底半部的模式： [`SpinlockMode::LockBh`]
 //! + 当临界区被多个线程和单一中断访问时，需使用关闭中断的模式： [`SpinlockMode::LockCpuirq`]
-//! + 当临界区被多个中断上下文访问时，需使用保存中断标志的模式： [`SpinlockMode::LockCpuirqSave`]
+//! + 当临界区被多个中断上下文访问时，需使用保存中断标志的模式： [`SpinlockMode::LockCpuirqSave(None)`]
 //!
 //!
 //! # 创建方法
@@ -92,6 +92,7 @@
 //! }
 //! ```
 //!
+//! [`SpinlockMode::LockCpuirqSave(None)`]: SpinlockMode::LockCpuirqSave
 //! [`'static`]: https://doc.rust-lang.org/std/keyword.static.html
 //! [`alloc::sync::Arc`]: <https://doc.rust-lang.org/alloc/sync/struct.Arc.html>
 
@@ -99,14 +100,17 @@ extern crate core;
 use core::cell::UnsafeCell;
 use core::result::Result;
 use core::default::Default;
+use core::option::Option;
 use core::ops::Drop;
 use core::ops::Deref;
 use core::ops::DerefMut;
 use core::sync::atomic::*;
+use core::ptr;
 
 use crate::types::*;
 use crate::errno::*;
 
+use crate::xwos::sync::cond::*;
 
 extern "C" {
     fn xwrustffi_splk_init(splk: *mut XwosSplk);
@@ -144,7 +148,7 @@ pub enum SpinlockMode {
     /// 关闭抢占、中断底半部和中断
     LockCpuirq,
     /// 关闭抢占、中断底半部和中断，并保存之前的中断标志
-    LockCpuirqSave(XwReg),
+    LockCpuirqSave(Option<XwReg>),
 }
 
 ////////////////////////////////////////////////////////////////
@@ -244,7 +248,7 @@ impl<T: ?Sized> Spinlock<T> {
     /// + [`SpinlockMode::Lock`] 关闭抢占
     /// + [`SpinlockMode::LockBh`] 关闭抢占、中断底半部
     /// + [`SpinlockMode::LockCpuirq`] 关闭抢占、中断底半部和中断
-    /// + [`SpinlockMode::LockCpuirqSave`] 关闭抢占、中断底半部和中断，并保存之前的中断标志
+    /// + [`SpinlockMode::LockCpuirqSave(None)`] 关闭抢占、中断底半部和中断，并保存之前的中断标志
     ///
     /// # 错误码
     ///
@@ -270,6 +274,7 @@ impl<T: ?Sized> Spinlock<T> {
     /// }
     /// ```
     ///
+    /// [`SpinlockMode::LockCpuirqSave(None)`]: SpinlockMode::LockCpuirqSave
     /// [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
     pub fn lock(&self, mode: SpinlockMode) -> Result<SpinlockGuard<'_, T>, SpinlockError> {
         if self.init.load(Ordering::Acquire) {
@@ -286,7 +291,7 @@ impl<T: ?Sized> Spinlock<T> {
                     SpinlockMode::LockCpuirqSave(_) => {
                         let mut cpuirq: XwReg = 0;
                         xwrustffi_splk_lock_cpuirqsv(self.splk.get(), &mut cpuirq);
-                        *self.mode.get() = SpinlockMode::LockCpuirqSave(cpuirq);
+                        *self.mode.get() = SpinlockMode::LockCpuirqSave(Some(cpuirq));
                     },
                     SpinlockMode::LockBh => {
                         xwrustffi_splk_lock_bh(self.splk.get());
@@ -311,7 +316,7 @@ impl<T: ?Sized> Spinlock<T> {
     /// + [`SpinlockMode::Lock`] 关闭抢占
     /// + [`SpinlockMode::LockBh`] 关闭抢占、中断底半部
     /// + [`SpinlockMode::LockCpuirq`] 关闭抢占、中断底半部和中断
-    /// + [`SpinlockMode::LockCpuirqSave`] 关闭抢占、中断底半部和中断，并保存之前的中断标志
+    /// + [`SpinlockMode::LockCpuirqSave(None)`] 关闭抢占、中断底半部和中断，并保存之前的中断标志
     ///
     /// # 错误码
     ///
@@ -337,6 +342,7 @@ impl<T: ?Sized> Spinlock<T> {
     /// }
     /// ```
     ///
+    /// [`SpinlockMode::LockCpuirqSave(None)`]: SpinlockMode::LockCpuirqSave
     /// [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
     pub fn trylock(&self, mode: SpinlockMode) -> Result<SpinlockGuard<'_, T>, SpinlockError> {
         if self.init.load(Ordering::Acquire) {
@@ -369,7 +375,7 @@ impl<T: ?Sized> Spinlock<T> {
                         let mut cpuirq: XwReg = 0;
                         rc = xwrustffi_splk_trylock_cpuirqsv(self.splk.get(), &mut cpuirq);
                         if 0 == rc {
-                            *self.mode.get() = SpinlockMode::LockCpuirqSave(cpuirq);
+                            *self.mode.get() = SpinlockMode::LockCpuirqSave(Some(cpuirq));
                             Ok(SpinlockGuard::new(self))
                         } else if -EAGAIN == rc {
                             Err(SpinlockError::Again)
@@ -472,6 +478,84 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
     fn new(lock: &'a Spinlock<T>) -> SpinlockGuard<'a, T> {
         SpinlockGuard { lock: lock }
     }
+
+    fn lock(&self) {
+        unsafe {
+            xwrustffi_splk_lock(self.lock.splk.get());
+        }
+    }
+
+    fn unlock(&self) {
+        unsafe {
+            xwrustffi_splk_unlock(self.lock.splk.get());
+        }
+    }
+
+    pub fn wait(self, cond: &Cond) -> Result<SpinlockGuard<'a, T>, CondError> {
+        unsafe {
+            let mut rc = xwrustffi_cond_acquire(cond.cond.get(), *cond.tik.get());
+            if rc == 0 {
+                let mut lkst = 0;
+                rc = xwrustffi_cond_wait(cond.cond.get(),
+                                         self.lock.splk.get() as _, XWOS_LK_SPLK, ptr::null_mut(),
+                                         &mut lkst);
+                xwrustffi_cond_put(cond.cond.get());
+                if 0 == rc {
+                    Ok(self)
+                } else if -EINTR == rc {
+                    self.lock();
+                    drop(self);
+                    Err(CondError::Interrupt)
+                } else if -ENOTTHDCTX == rc {
+                    self.lock();
+                    drop(self);
+                    Err(CondError::NotThreadContext)
+                } else {
+                    self.lock();
+                    drop(self);
+                    Err(CondError::Unknown(rc))
+                }
+            } else {
+                drop(self);
+                Err(CondError::NotInit)
+            }
+        }
+    }
+
+    pub fn wait_to(self, cond: &Cond, to: XwTm) -> Result<SpinlockGuard<'a, T>, CondError> {
+        unsafe {
+            let mut rc = xwrustffi_cond_acquire(cond.cond.get(), *cond.tik.get());
+            if rc == 0 {
+                let mut lkst = 0;
+                rc = xwrustffi_cond_wait_to(cond.cond.get(),
+                                            self.lock.splk.get() as _, XWOS_LK_SPLK, ptr::null_mut(),
+                                            to, &mut lkst);
+                xwrustffi_cond_put(cond.cond.get());
+                if 0 == rc {
+                    Ok(self)
+                } else if -EINTR == rc {
+                    self.lock();
+                    drop(self);
+                    Err(CondError::Interrupt)
+                } else if -ETIMEDOUT == rc {
+                    self.lock();
+                    drop(self);
+                    Err(CondError::Timedout)
+                } else if -ENOTTHDCTX == rc {
+                    self.lock();
+                    drop(self);
+                    Err(CondError::NotThreadContext)
+                } else {
+                    self.lock();
+                    drop(self);
+                    Err(CondError::Unknown(rc))
+                }
+            } else {
+                drop(self);
+                Err(CondError::NotInit)
+            }
+        }
+    }
 }
 
 impl<T: ?Sized> Deref for SpinlockGuard<'_, T> {
@@ -499,7 +583,7 @@ impl<T: ?Sized> Drop for SpinlockGuard<'_, T> {
                     xwrustffi_splk_unlock_cpuirq(self.lock.splk.get());
                 },
                 SpinlockMode::LockCpuirqSave(cpuirq) => {
-                    xwrustffi_splk_unlock_cpuirqrs(self.lock.splk.get(), cpuirq);
+                    xwrustffi_splk_unlock_cpuirqrs(self.lock.splk.get(), cpuirq.unwrap_unchecked());
                 },
                 SpinlockMode::LockBh => {
                     xwrustffi_splk_unlock_bh(self.lock.splk.get());
