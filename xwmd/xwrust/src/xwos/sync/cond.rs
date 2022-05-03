@@ -76,6 +76,12 @@ pub(crate) const XWOS_LK_SQLK_RDEX: XwSq = 5;
 /// 锁类型：抽象回调锁
 pub(crate) const XWOS_LK_CALLBACK: XwSq = 6;
 
+
+/// 锁状态：锁定
+pub(crate) const XWOS_LKST_LOCKED: XwSq = 0;
+/// 锁状态：未锁定
+pub(crate) const XWOS_LKST_UNLOCKED: XwSq = 1;
+
 /// XWOS条件量对象占用的内存大小
 pub const SIZEOF_XWOS_COND: usize = 48;
 

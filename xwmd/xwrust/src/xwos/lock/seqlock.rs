@@ -730,18 +730,20 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
                 xwrustffi_cond_put(cond.cond.get());
                 if 0 == rc {
                     Ok(self)
-                } else if -EINTR == rc {
-                    self.lock();
-                    drop(self);
-                    Err(CondError::Interrupt)
-                } else if -ENOTTHDCTX == rc {
-                    self.lock();
-                    drop(self);
-                    Err(CondError::NotThreadContext)
                 } else {
-                    self.lock();
-                    drop(self);
-                    Err(CondError::Unknown(rc))
+                    if XWOS_LKST_LOCKED == lkst {
+                        drop(self);
+                    } else {
+                        self.lock();
+                        drop(self);
+                    }
+                    if -EINTR == rc {
+                        Err(CondError::Interrupt)
+                    } else if -ENOTTHDCTX == rc {
+                        Err(CondError::NotThreadContext)
+                    } else {
+                        Err(CondError::Unknown(rc))
+                    }
                 }
             } else {
                 drop(self);
@@ -775,22 +777,22 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
                 xwrustffi_cond_put(cond.cond.get());
                 if 0 == rc {
                     Ok(self)
-                } else if -EINTR == rc {
-                    self.lock();
-                    drop(self);
-                    Err(CondError::Interrupt)
-                } else if -ETIMEDOUT == rc {
-                    self.lock();
-                    drop(self);
-                    Err(CondError::Timedout)
-                } else if -ENOTTHDCTX == rc {
-                    self.lock();
-                    drop(self);
-                    Err(CondError::NotThreadContext)
                 } else {
-                    self.lock();
-                    drop(self);
-                    Err(CondError::Unknown(rc))
+                    if XWOS_LKST_LOCKED == lkst {
+                        drop(self);
+                    } else {
+                        self.lock();
+                        drop(self);
+                    }
+                    if -EINTR == rc {
+                        Err(CondError::Interrupt)
+                    } else if -ETIMEDOUT == rc {
+                        Err(CondError::Timedout)
+                    } else if -ENOTTHDCTX == rc {
+                        Err(CondError::NotThreadContext)
+                    } else {
+                        Err(CondError::Unknown(rc))
+                    }
                 }
             } else {
                 drop(self);

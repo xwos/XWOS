@@ -576,7 +576,7 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
     /// 当条件成立，线程被唤醒，会在条件量内部上锁互斥锁，并重新返回互斥锁的守卫(Guard)。
     ///
     /// + 当返回互斥锁的守卫 [`MutexGuard`] 时，互斥锁已经被重新上锁；
-    /// + 当返回 [`Err`] 时，互斥锁，未被上锁。
+    /// + 当返回 [`Err`] 时，互斥锁未被上锁。
     ///
     /// # 错误码
     ///
@@ -634,15 +634,19 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
                 xwrustffi_cond_put(cond.cond.get());
                 if 0 == rc {
                     Ok(self)
-                } else if -EINTR == rc {
-                    mem::forget(self);
-                    Err(CondError::Interrupt)
-                } else if -ENOTTHDCTX == rc {
-                    mem::forget(self);
-                    Err(CondError::NotThreadContext)
                 } else {
-                    mem::forget(self);
-                    Err(CondError::Unknown(rc))
+                    if XWOS_LKST_LOCKED == lkst {
+                        drop(self);
+                    } else {
+                        mem::forget(self);
+                    }
+                    if -EINTR == rc {
+                        Err(CondError::Interrupt)
+                    } else if -ENOTTHDCTX == rc {
+                        Err(CondError::NotThreadContext)
+                    } else {
+                        Err(CondError::Unknown(rc))
+                    }
                 }
             } else {
                 drop(self);
@@ -658,7 +662,7 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
     /// 当超时后，将返回错误。
     ///
     /// + 当返回互斥锁的守卫 [`MutexGuard`] 时，互斥锁已经被重新上锁；
-    /// + 当返回 [`Err`] 时，互斥锁，未被上锁。
+    /// + 当返回 [`Err`] 时，互斥锁未被上锁。
     ///
     /// # 错误码
     ///
@@ -679,18 +683,21 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
                 xwrustffi_cond_put(cond.cond.get());
                 if 0 == rc {
                     Ok(self)
-                } else if -EINTR == rc {
-                    mem::forget(self);
-                    Err(CondError::Interrupt)
-                } else if -ETIMEDOUT == rc {
-                    mem::forget(self);
-                    Err(CondError::Timedout)
-                } else if -ENOTTHDCTX == rc {
-                    mem::forget(self);
-                    Err(CondError::NotThreadContext)
                 } else {
-                    mem::forget(self);
-                    Err(CondError::Unknown(rc))
+                    if XWOS_LKST_LOCKED == lkst {
+                        drop(self);
+                    } else {
+                        mem::forget(self);
+                    }
+                    if -EINTR == rc {
+                        Err(CondError::Interrupt)
+                    } else if -ETIMEDOUT == rc {
+                        Err(CondError::Timedout)
+                    } else if -ENOTTHDCTX == rc {
+                        Err(CondError::NotThreadContext)
+                    } else {
+                        Err(CondError::Unknown(rc))
+                    }
                 }
             } else {
                 drop(self);
