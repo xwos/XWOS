@@ -80,5 +80,5 @@ pub fn xwrust_example_seqlock() {
         }
     }
     cthd::sleep(xwtm::ms(900));
-    let _ = handle.stop();
+    handle.quit();
 }

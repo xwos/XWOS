@@ -434,6 +434,7 @@ xwer_t xwup_mtx_blkthd_to_unlkwq_cpuirqrs(struct xwup_mtx * mtx,
         /* 检查是否被中断 */
         if (XWUP_SKDOBJ_ST_EXITING & thd->state) {
                 xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_skd_enpmpt_lc();
                 rc = -EINTR;
                 goto err_intr;
         }

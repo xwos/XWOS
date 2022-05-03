@@ -636,6 +636,7 @@ xwer_t xwmp_mtx_blkthd_to_unlkwq_cpuirqrs(struct xwmp_mtx * mtx,
         if ((XWMP_SKDOBJ_ST_FREEZABLE | XWMP_SKDOBJ_ST_EXITING) & thd->state) {
                 xwmp_splk_unlock(&thd->stlock);
                 xwmp_rtwq_unlock_cpuirqrs(&mtx->rtwq, cpuirq);
+                xwmp_skd_enpmpt(xwskd);
                 rc = -EINTR;
                 goto err_intr;
         }
