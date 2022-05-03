@@ -14,26 +14,11 @@ use xwrust::xwos::lock::spinlock::*;
 
 use libc_print::std_name::println;
 
-static GLOBAL_SPINLOCK: Spinlock<[u32; 8]> = Spinlock::new([0; 8]);
-
 pub fn xwrust_example_spinlock() {
     println!("XWOS RUST Example: Spinlock");
     println!("[主线程] thd: {:?}", cthd::i());
 
-    println!("[主线程] 初始化全局互斥锁。");
-    GLOBAL_SPINLOCK.init();
-    let result = GLOBAL_SPINLOCK.lock(SpinlockMode::LockCpuirqSave(None));
-    match result {
-        Ok(mut guard) => {
-            guard[0] = 1;
-            println!("[主线程] 获取全局互斥锁成功。写全局数据[0]: {}", guard[0]);
-        }
-        Err(e) => {
-            println!("[主线程] 获取全局互斥锁失败：{:?}", e);
-        }
-    }
-
-    println!("[主线程] 创建局部数据并初始化局部互斥锁。");
+    println!("[主线程] 创建局部数据并初始化局部自旋锁。");
     let local_spinlock: Arc<Spinlock<u32>> = Arc::new(Spinlock::new(10));
     local_spinlock.init();
     let local_spinlock_child = local_spinlock.clone();
@@ -43,25 +28,17 @@ pub fn xwrust_example_spinlock() {
         .spawn(move |_| {
             // 子线程闭包
             println!("[子线程] thd: {:?}", cthd::i());
-            let result = GLOBAL_SPINLOCK.lock(SpinlockMode::LockCpuirqSave(None));
-            match result {
-                Ok(mut guard) => {
-                    guard[0] += 1;
-                    println!("[子线程] 获取全局互斥锁成功。写全局数据[0]: {}", guard[0]);
-                }
-                Err(e) => {
-                    println!("[子线程] 获取全局互斥锁失败：{:?}", e);
-                }
-            }
-
             let result = local_spinlock_child.lock(SpinlockMode::LockCpuirqSave(None));
             match result {
                 Ok(mut guard) => {
                     *guard += 1;
-                    println!("[子线程] 获取局部互斥锁成功。写局部数据: {}", *guard);
+                    let val = *guard;
+                    drop(guard);
+                    // 不可在自旋锁临界区内使用会阻塞/睡眠的方法
+                    println!("[子线程] 获取局部自旋锁成功。写局部数据: {}", val);
                 }
                 Err(e) => {
-                    println!("[子线程] 获取局部互斥锁失败：{:?}", e);
+                    println!("[子线程] 获取局部自旋锁失败：{:?}", e);
                 }
             }
             "OK"
@@ -73,27 +50,18 @@ pub fn xwrust_example_spinlock() {
             },
         }
 
-    println!("[主线程] 睡眠 1s ...");
-    cthd::sleep(xwtm::s(1));
-    let result = GLOBAL_SPINLOCK.lock(SpinlockMode::LockCpuirqSave(None));
-    match result {
-        Ok(mut guard) => {
-            guard[0] += 1;
-            println!("[主线程] 获取全局互斥锁成功。写全局数据[0]: {}", guard[0]);
-        }
-        Err(e) => {
-            println!("[主线程] 获取全局互斥锁失败：{:?}", e);
-        }
-    }
-
+    cthd::sleep(xwtm::ms(500));
     let result = local_spinlock.lock(SpinlockMode::LockCpuirqSave(None));
     match result {
         Ok(mut guard) => {
             *guard += 1;
-            println!("[主线程] 获取局部互斥锁成功。写局部数据: {}", *guard);
+            let val = *guard;
+            drop(guard);
+            // 不可在自旋锁临界区内使用会阻塞/睡眠的方法
+            println!("[主线程] 获取局部自旋锁成功。写局部数据: {}", val);
         }
         Err(e) => {
-            println!("[主线程] 获取局部互斥锁失败：{:?}", e);
+            println!("[主线程] 获取局部自旋锁失败：{:?}", e);
         }
     }
 }

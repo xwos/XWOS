@@ -166,15 +166,17 @@ xwer_t stm32cube_usart1_drv_tx(struct xwds_dmauartc * dmauartc,
                                        ulk, XWOS_LK_SPLK, NULL,
                                        to, &lkst);
                 if (XWOK == rc) {
-                        if (XWOS_LKST_UNLOCKED == lkst) {
-                                xwos_splk_lock(&drvdata->tx.splk);
-                        }
+                        XWOS_BUG_ON(XWOS_LKST_UNLOCKED == lkst);
                         rc = drvdata->tx.rc;
                 } else {
                         if (XWOS_LKST_UNLOCKED == lkst) {
                                 xwos_splk_lock(&drvdata->tx.splk);
                         }
-                        drvdata->tx.rc = -ECANCELED;
+                        if (-EINPROGRESS == drvdata->tx.rc) {
+                                drvdata->tx.rc = -ECANCELED;
+                        } else {
+                                rc = drvdata->tx.rc;
+                        }
                 }
         } else {
                 drvdata->tx.rc = -ECANCELED;

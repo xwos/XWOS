@@ -73,8 +73,7 @@ pub fn xwrust_example_mutex() {
             },
         }
 
-    println!("[主线程] 睡眠 1s ...");
-    cthd::sleep(xwtm::s(1));
+    cthd::sleep(xwtm::ms(500));
     let result = GLOBAL_MUTEX.lock();
     match result {
         Ok(mut guard) => {

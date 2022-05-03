@@ -261,7 +261,8 @@ impl<T: ?Sized> Seqlock<T> {
     ///
     /// ```rust
     /// loop {
-    ///     match sqlk.read_begin() {
+    ///     let res = sqlk.read_begin();
+    ///     match res {
     ///         Ok(guard) => {
     ///             let val = *guard; // 读值
     ///             if !guard.read_retry() {

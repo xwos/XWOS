@@ -26,8 +26,6 @@ pub const MINUTE: XwTm = 60000000000;
 pub const HOUR: XwTm = 3600000000000;
 /// 1天
 pub const DAY: XwTm = 86400000000000;
-/// 最大值
-pub const MAX: XwTm = i64::MAX;
 
 
 /// 获取当前CPU的**系统时间**点
