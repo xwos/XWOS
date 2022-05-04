@@ -8,7 +8,6 @@ extern crate alloc;
 use alloc::sync::Arc;
 
 use xwrust::xwtm;
-use xwrust::errno::*;
 use xwrust::types::*;
 use xwrust::xwos::thd;
 use xwrust::xwos::cthd;
@@ -39,9 +38,12 @@ pub fn xwrust_example_sem() {
             },
         };
     let rc = sema.wait();
-    if XWOK == rc {
-        println!("[main] 获取信号量。");
-    } else {
-        println!("[main] 等待信号量失败：{}。", rc);
-    }
+    match rc {
+        SemError::Ok => {
+            println!("[main] 获取信号量。");
+        },
+        _ => {
+            println!("[main] 等待信号量失败：{:?}。", rc);
+        },
+    };
 }

@@ -33,26 +33,6 @@ xwer_t xwrustffi_cond_put(struct xwos_cond * cond)
         return xwos_cond_put(cond);
 }
 
-xwer_t xwrustffi_cond_create(struct xwos_cond ** condbuf, xwsq_t * tik)
-{
-        xwos_cond_d condd;
-        xwer_t rc;
-
-        rc = xwos_cond_create(&condd);
-        *condbuf = condd.cond;
-        *tik = condd.tik;
-        return rc;
-}
-
-xwer_t xwrustffi_cond_delete(struct xwos_cond * cond, xwsq_t tik)
-{
-        xwos_cond_d condd = {
-                .cond = cond,
-                .tik = tik,
-        };
-        return xwos_cond_delete(condd);
-}
-
 xwsq_t xwrustffi_cond_gettik(struct xwos_cond * cond)
 {
         return xwos_cond_gettik(cond);
@@ -84,11 +64,6 @@ xwer_t xwrustffi_cond_freeze(struct xwos_cond * cond)
 xwer_t xwrustffi_cond_thaw(struct xwos_cond * cond)
 {
         return xwos_cond_thaw(cond);
-}
-
-xwer_t xwrustffi_cond_intr_all(struct xwos_cond * cond)
-{
-        return xwos_cond_intr_all(cond);
 }
 
 xwer_t xwrustffi_cond_broadcast(struct xwos_cond * cond)

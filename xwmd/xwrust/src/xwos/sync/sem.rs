@@ -7,6 +7,7 @@ extern crate core;
 use core::cell::UnsafeCell;
 
 use crate::types::*;
+use crate::errno::*;
 
 
 extern "C" {
@@ -30,14 +31,22 @@ extern "C" {
 /// 信号量的错误码
 #[derive(Debug)]
 pub enum SemError {
+    /// 没有错误
+    Ok,
     /// 信号量没有初始化
     NotInit,
+    /// 信号量已被冻结
+    AlreadyFrozen,
+    /// 信号量已解冻
+    AlreadyThawed,
     /// 等待被中断
     Interrupt,
     /// 等待超时
     Timedout,
     /// 不在线程上下文内
     NotThreadContext,
+    /// 信号量不可用
+    NoData,
     /// 未知错误
     Unknown(XwEr),
 }
@@ -128,11 +137,9 @@ impl Sem {
     ///
     /// # 错误码
     ///
-    /// + XWOK: 没有错误
-    /// + -ENILOBJD: 空的对象描述符（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EOBJDEAD: 对象无效（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EACCES: 对象标签检查失败（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EALREADY: 信号量对象已被冻结
+    /// + [`SemError::Ok`] 没有错误
+    /// + [`SemError::NotInit`] 信号量没有初始化
+    /// + [`SemError::AlreadyFrozen`] 信号量已被冻结
     ///
     /// # 示例
     ///
@@ -143,20 +150,26 @@ impl Sem {
     ///
     /// pub unsafe extern "C" fn xwrust_main() {
     ///     // ...省略...
-    ///     semvar: Sem = Sem::new();
-    ///     semvar.init(0, XwSsq::max);
-    ///     semvar.freeze();
+    ///     sema: Sem = Sem::new();
+    ///     sema.init(0, XwSsq::max);
+    ///     sema.freeze();
     /// }
     /// ```
-    pub fn freeze(&self) -> XwEr {
+    pub fn freeze(&self) -> SemError {
         unsafe {
             let mut rc = xwrustffi_sem_acquire(self.sem.get(), *self.tik.get());
             if rc == 0 {
                 rc = xwrustffi_sem_freeze(self.sem.get());
                 xwrustffi_sem_put(self.sem.get());
-                rc
+                if XWOK == rc {
+                    SemError::Ok
+                } else if -EALREADY == rc {
+                    SemError::AlreadyFrozen
+                } else {
+                    SemError::Unknown(rc)
+                }
             } else {
-                rc
+                SemError::NotInit
             }
         }
     }
@@ -167,11 +180,9 @@ impl Sem {
     ///
     /// # 错误码
     ///
-    /// + XWOK: 没有错误
-    /// + -ENILOBJD: 空的对象描述符（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EOBJDEAD: 对象无效（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EACCES: 对象标签检查失败（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EALREADY: 信号量对象未被冻结
+    /// + [`SemError::Ok`] 没有错误
+    /// + [`SemError::NotInit`] 信号量没有初始化
+    /// + [`SemError::AlreadyThawed`] 信号量已解冻
     ///
     /// # 示例
     ///
@@ -182,22 +193,28 @@ impl Sem {
     ///
     /// pub unsafe extern "C" fn xwrust_main() {
     ///     // ...省略...
-    ///     semvar: Sem = Sem::new();
-    ///     semvar.init(0, XwSsq::max);
-    ///     semvar.freeze(); // 冻结
+    ///     sema: Sem = Sem::new();
+    ///     sema.init(0, XwSsq::max);
+    ///     sema.freeze(); // 冻结
     ///     // ...省略...
-    ///     semvar.thaw(); // 解冻
+    ///     sema.thaw(); // 解冻
     /// }
     /// ```
-    pub fn thaw(&self) -> XwEr {
+    pub fn thaw(&self) -> SemError {
         unsafe {
             let mut rc = xwrustffi_sem_acquire(self.sem.get(), *self.tik.get());
             if rc == 0 {
                 rc = xwrustffi_sem_thaw(self.sem.get());
                 xwrustffi_sem_put(self.sem.get());
-                rc
+                if XWOK == rc {
+                    SemError::Ok
+                } else if -EALREADY == rc {
+                    SemError::AlreadyThawed
+                } else {
+                    SemError::Unknown(rc)
+                }
             } else {
-                rc
+                SemError::NotInit
             }
         }
     }
@@ -206,12 +223,9 @@ impl Sem {
     ///
     /// # 错误码
     ///
-    /// + XWOK: 没有错误
-    /// + -ENILOBJD: 空的对象描述符（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EOBJDEAD: 对象无效（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EACCES: 对象标签检查失败（没有调用 [`Sem::init()`] 初始化？）
-    /// + -ENEGATIVE: 信号量对象已被冻结
-    /// + -ERANGE: 信号量对象的值已经最大
+    /// + [`SemError::Ok`] 没有错误
+    /// + [`SemError::NotInit`] 信号量没有初始化
+    /// + [`SemError::AlreadyFrozen`] 信号量已被冻结
     ///
     /// # 示例
     ///
@@ -228,27 +242,32 @@ impl Sem {
     ///     sem.post();
     /// }
     /// ```
-    pub fn post(&self) -> XwEr {
+    pub fn post(&self) -> SemError {
         unsafe {
             let mut rc = xwrustffi_sem_acquire(self.sem.get(), *self.tik.get());
             if rc == 0 {
                 rc = xwrustffi_sem_post(self.sem.get());
                 xwrustffi_sem_put(self.sem.get());
-                rc
+                if XWOK == rc {
+                    SemError::Ok
+                } else if -ENEGATIVE == rc {
+                    SemError::AlreadyFrozen
+                } else {
+                    SemError::Unknown(rc)
+                }
             } else {
-                rc
+                SemError::NotInit
             }
         }
     }
 
     /// 获取信号量对象计数器的值。
     ///
+    /// 成功将在 [`Ok()`] 中返回信号量对象计数器的值。
+    ///
     /// # 错误码
     ///
-    /// + XWOK: 没有错误
-    /// + -ENILOBJD: 空的对象描述符（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EOBJDEAD: 对象无效（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EACCES: 对象标签检查失败（没有调用 [`Sem::init()`] 初始化？）
+    /// + Err([`SemError::NotInit`]) 信号量没有初始化
     ///
     /// # 示例
     ///
@@ -267,13 +286,15 @@ impl Sem {
     ///         Ok(val) => {
     ///             // 返回信号量的值
     ///         },
-    ///         Err(rc) => {
+    ///         Err(e) => {
     ///             // 返回错误码
     ///         },
     ///     };
     /// }
     /// ```
-    pub fn getvalue(&self) -> Result<XwSsq, XwEr> {
+    ///
+    /// [`Ok()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
+    pub fn getvalue(&self) -> Result<XwSsq, SemError> {
         unsafe {
             let rc = xwrustffi_sem_acquire(self.sem.get(), *self.tik.get());
             if rc == 0 {
@@ -282,7 +303,7 @@ impl Sem {
                 xwrustffi_sem_put(self.sem.get());
                 Ok(val)
             } else {
-                Err(rc)
+                Err(SemError::NotInit)
             }
         }
     }
@@ -293,12 +314,10 @@ impl Sem {
     ///
     /// # 错误码
     ///
-    /// + XWOK: 没有错误
-    /// + -ENILOBJD: 空的对象描述符（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EOBJDEAD: 对象无效（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EACCES: 对象标签检查失败（没有调用 [`Sem::init()`] 初始化？）
-    /// + -ENOTTHDCTX: 不在线程上下文中
-    /// + -EINTR: 等待被中断
+    /// + [`SemError::Ok`] 没有错误
+    /// + [`SemError::NotInit`] 信号量没有初始化
+    /// + [`SemError::Interrupt`] 等待被中断
+    /// + [`SemError::NotThreadContext`] 不在线程上下文内
     ///
     /// # 示例
     ///
@@ -313,22 +332,33 @@ impl Sem {
     ///     sem.init(0, XwSsq::max);
     ///     // ...省略...
     ///     let rc = sem.wait();
-    ///     if rc == XWOK {
-    ///         // 获取信号量
-    ///     } else {
-    ///         // 等待信号量失败
-    ///     }
+    ///     match rc {
+    ///         SemError::Ok => {
+    ///             // 获取信号量
+    ///         },
+    ///         _ => {
+    ///             // 等待信号量失败
+    ///         },
+    ///     };
     /// }
     /// ```
-    pub fn wait(&self) -> XwEr {
+    pub fn wait(&self) -> SemError {
         unsafe {
             let mut rc = xwrustffi_sem_acquire(self.sem.get(), *self.tik.get());
             if rc == 0 {
                 rc = xwrustffi_sem_wait(self.sem.get());
                 xwrustffi_sem_put(self.sem.get());
-                rc
+                if XWOK == rc {
+                    SemError::Ok
+                } else if  -EINTR == rc {
+                    SemError::Interrupt
+                } else if -ENOTTHDCTX == rc {
+                    SemError::NotThreadContext
+                } else {
+                    SemError::Unknown(rc)
+                }
             } else {
-                rc
+                SemError::NotInit
             }
         }
     }
@@ -339,11 +369,9 @@ impl Sem {
     ///
     /// # 错误码
     ///
-    /// + XWOK: 没有错误
-    /// + -ENILOBJD: 空的对象描述符（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EOBJDEAD: 对象无效（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EACCES: 对象标签检查失败（没有调用 [`Sem::init()`] 初始化？）
-    /// + -ENODATA: 信号量对象资源不可用（信号量对象无法被获取）
+    /// + [`SemError::Ok`] 没有错误
+    /// + [`SemError::NotInit`] 信号量没有初始化
+    /// + [`SemError::NoData`] 信号量不可用
     ///
     /// # 示例
     ///
@@ -358,22 +386,31 @@ impl Sem {
     ///     sem.init(0, XwSsq::max);
     ///     // ...省略...
     ///     let rc = sem.trywait();
-    ///     if rc == XWOK {
-    ///         // 获取信号量
-    ///     } else {
-    ///         // 等待信号量失败
-    ///     }
+    ///     match rc {
+    ///         SemError::Ok => {
+    ///             // 获取信号量
+    ///         },
+    ///         _ => {
+    ///             // 等待信号量失败
+    ///         },
+    ///     };
     /// }
     /// ```
-    pub fn trywait(&self) -> XwEr {
+    pub fn trywait(&self) -> SemError {
         unsafe {
             let mut rc = xwrustffi_sem_acquire(self.sem.get(), *self.tik.get());
             if rc == 0 {
                 rc = xwrustffi_sem_trywait(self.sem.get());
                 xwrustffi_sem_put(self.sem.get());
-                rc
+                if XWOK == rc {
+                    SemError::Ok
+                } else if  -ENODATA == rc {
+                    SemError::NoData
+                } else {
+                    SemError::Unknown(rc)
+                }
             } else {
-                rc
+                SemError::NotInit
             }
         }
     }
@@ -384,13 +421,11 @@ impl Sem {
     ///
     /// # 错误码
     ///
-    /// + XWOK: 没有错误
-    /// + -ENILOBJD: 空的对象描述符（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EOBJDEAD: 对象无效（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EACCES: 对象标签检查失败（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EINTR: 等待被中断
-    /// + -ETIMEDOUT: 超时
-    /// + -ENOTTHDCTX: 不在线程上下文中
+    /// + [`SemError::Ok`] 没有错误
+    /// + [`SemError::NotInit`] 信号量没有初始化
+    /// + [`SemError::Interrupt`] 等待被中断
+    /// + [`SemError::Timedout`] 等待超时
+    /// + [`SemError::NotThreadContext`] 不在线程上下文内
     ///
     /// # 示例
     ///
@@ -405,22 +440,35 @@ impl Sem {
     ///     sem.init(0, XwSsq::max);
     ///     // ...省略...
     ///     let rc = sem.wait_to(xwtm::ft(xwtm::s(1))); // 最多等待1s
-    ///     if rc == XWOK {
-    ///         // 获取信号量
-    ///     } else {
-    ///         // 等待信号量失败
-    ///     }
+    ///     match rc {
+    ///         SemError::Ok => {
+    ///             // 获取信号量
+    ///         },
+    ///         _ => {
+    ///             // 等待信号量失败
+    ///         },
+    ///     };
     /// }
     /// ```
-    pub fn wait_to(&self, to: XwTm) -> XwEr {
+    pub fn wait_to(&self, to: XwTm) -> SemError {
         unsafe {
             let mut rc = xwrustffi_sem_acquire(self.sem.get(), *self.tik.get());
             if rc == 0 {
                 rc = xwrustffi_sem_wait_to(self.sem.get(), to);
                 xwrustffi_sem_put(self.sem.get());
-                rc
+                if XWOK == rc {
+                    SemError::Ok
+                } else if  -EINTR == rc {
+                    SemError::Interrupt
+                } else if  -ETIMEDOUT == rc {
+                    SemError::Timedout
+                } else if -ENOTTHDCTX == rc {
+                    SemError::NotThreadContext
+                } else {
+                    SemError::Unknown(rc)
+                }
             } else {
-                rc
+                SemError::NotInit
             }
         }
     }
@@ -431,11 +479,9 @@ impl Sem {
     ///
     /// # 错误码
     ///
-    /// + XWOK: 没有错误
-    /// + -ENILOBJD: 空的对象描述符（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EOBJDEAD: 对象无效（没有调用 [`Sem::init()`] 初始化？）
-    /// + -EACCES: 对象标签检查失败（没有调用 [`Sem::init()`] 初始化？）
-    /// + -ENOTTHDCTX: 不在线程上下文中
+    /// + [`SemError::Ok`] 没有错误
+    /// + [`SemError::NotInit`] 信号量没有初始化
+    /// + [`SemError::NotThreadContext`] 不在线程上下文内
     ///
     /// # 示例
     ///
@@ -450,22 +496,31 @@ impl Sem {
     ///     sem.init(0, XwSsq::max);
     ///     // ...省略...
     ///     let rc = sem.wait_unintr();
-    ///     if rc == XWOK {
-    ///         // 获取信号量
-    ///     } else {
-    ///         // 等待信号量失败
-    ///     }
+    ///     match rc {
+    ///         SemError::Ok => {
+    ///             // 获取信号量
+    ///         },
+    ///         _ => {
+    ///             // 等待信号量失败
+    ///         },
+    ///     };
     /// }
     /// ```
-    pub fn wait_unintr(&self) -> XwEr {
+    pub fn wait_unintr(&self) -> SemError {
         unsafe {
             let mut rc = xwrustffi_sem_acquire(self.sem.get(), *self.tik.get());
             if rc == 0 {
                 rc = xwrustffi_sem_wait_unintr(self.sem.get());
                 xwrustffi_sem_put(self.sem.get());
-                rc
+                if XWOK == rc {
+                    SemError::Ok
+                } else if -ENOTTHDCTX == rc {
+                    SemError::NotThreadContext
+                } else {
+                    SemError::Unknown(rc)
+                }
             } else {
-                rc
+                SemError::NotInit
             }
         }
     }

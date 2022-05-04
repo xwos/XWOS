@@ -23,6 +23,7 @@ use core::ffi::*;
 use core::cell::UnsafeCell;
 
 use crate::types::*;
+use crate::errno::*;
 
 
 extern "C" {
@@ -35,7 +36,6 @@ extern "C" {
     pub(crate) fn xwrustffi_cond_release(cond: *mut XwosCond, tik: XwSq) -> XwEr;
     pub(crate) fn xwrustffi_cond_freeze(cond: *mut XwosCond) -> XwEr;
     pub(crate) fn xwrustffi_cond_thaw(cond: *mut XwosCond) -> XwEr;
-    pub(crate) fn xwrustffi_cond_intr_all(cond: *mut XwosCond) -> XwEr;
     pub(crate) fn xwrustffi_cond_broadcast(cond: *mut XwosCond) -> XwEr;
     pub(crate) fn xwrustffi_cond_unicast(cond: *mut XwosCond) -> XwEr;
     pub(crate) fn xwrustffi_cond_wait(cond: *mut XwosCond,
@@ -52,8 +52,14 @@ extern "C" {
 /// 条件量的错误码
 #[derive(Debug)]
 pub enum CondError {
+    /// 没有错误
+    Ok,
     /// 条件量没有初始化
     NotInit,
+    /// 条件量已被冻结
+    AlreadyFrozen,
+    /// 条件量已解冻
+    AlreadyThawed,
     /// 等待被中断
     Interrupt,
     /// 等待超时
@@ -165,6 +171,12 @@ impl Cond {
     ///
     /// 条件量被冻结后，可被线程等待，但被能被单播 [`Cond::unicast()`] 或广播 [`Cond::broadcast()`] 。
     ///
+    /// # 错误码
+    ///
+    /// + [`CondError::Ok`] 没有错误
+    /// + [`CondError::NotInit`] 条件量没有初始化
+    /// + [`CondError::AlreadyFrozen`] 条件量已被冻结
+    ///
     /// # 示例
     ///
     /// ```rust
@@ -177,15 +189,21 @@ impl Cond {
     ///     condvar.freeze();
     /// }
     /// ```
-    pub fn freeze(&self) -> XwEr {
+    pub fn freeze(&self) -> CondError {
         unsafe {
             let mut rc = xwrustffi_cond_acquire(self.cond.get(), *self.tik.get());
             if rc == 0 {
                 rc = xwrustffi_cond_freeze(self.cond.get());
                 xwrustffi_cond_put(self.cond.get());
-                rc
+                if XWOK == rc {
+                    CondError::Ok
+                } else if -EALREADY == rc {
+                    CondError::AlreadyFrozen
+                } else {
+                    CondError::Unknown(rc)
+                }
             } else {
-                rc
+                CondError::NotInit
             }
         }
     }
@@ -193,6 +211,12 @@ impl Cond {
     /// 解冻条件量。
     ///
     /// 被冻结的条件量解冻后，可被单播 [`Cond::unicast()`] 或广播 [`Cond::broadcast()`] 。
+    ///
+    /// # 错误码
+    ///
+    /// + [`CondError::Ok`] 没有错误
+    /// + [`CondError::NotInit`] 条件量没有初始化
+    /// + [`CondError::AlreadyThawed`] 条件量已解冻
     ///
     /// # 示例
     ///
@@ -208,15 +232,21 @@ impl Cond {
     ///     condvar.thaw(); // 解冻
     /// }
     /// ```
-    pub fn thaw(&self) -> XwEr {
+    pub fn thaw(&self) -> CondError {
         unsafe {
             let mut rc = xwrustffi_cond_acquire(self.cond.get(), *self.tik.get());
             if rc == 0 {
                 rc = xwrustffi_cond_thaw(self.cond.get());
                 xwrustffi_cond_put(self.cond.get());
-                rc
+                if XWOK == rc {
+                    CondError::Ok
+                } else if -EALREADY == rc {
+                    CondError::AlreadyThawed
+                } else {
+                    CondError::Unknown(rc)
+                }
             } else {
-                rc
+                CondError::NotInit
             }
         }
     }
@@ -224,6 +254,12 @@ impl Cond {
     /// 单播条件量对象。
     ///
     /// 只会唤醒第一个线程，阻塞线程的队列使用的是先进先出(FIFO)算法 。
+    ///
+    /// # 错误码
+    ///
+    /// + [`CondError::Ok`] 没有错误
+    /// + [`CondError::NotInit`] 条件量没有初始化
+    /// + [`CondError::AlreadyFrozen`] 条件量已被冻结
     ///
     /// # 示例
     ///
@@ -238,22 +274,34 @@ impl Cond {
     ///     condvar.unicast();
     /// }
     /// ```
-    pub fn unicast(&self) -> XwEr {
+    pub fn unicast(&self) -> CondError {
         unsafe {
             let mut rc = xwrustffi_cond_acquire(self.cond.get(), *self.tik.get());
             if rc == 0 {
                 rc = xwrustffi_cond_unicast(self.cond.get());
                 xwrustffi_cond_put(self.cond.get());
-                rc
+                if XWOK == rc {
+                    CondError::Ok
+                } else if -ENEGATIVE == rc {
+                    CondError::AlreadyFrozen
+                } else {
+                    CondError::Unknown(rc)
+                }
             } else {
-                rc
+                CondError::NotInit
             }
         }
     }
 
     /// 广播条件量。
     ///
-    /// 阻塞队列中的线程会全部被唤醒 。
+    /// 阻塞队列中的线程会全部被唤醒。
+    ///
+    /// # 错误码
+    ///
+    /// + [`CondError::Ok`] 没有错误
+    /// + [`CondError::NotInit`] 条件量没有初始化
+    /// + [`CondError::AlreadyFrozen`] 条件量已被冻结
     ///
     /// # 示例
     ///
@@ -268,15 +316,21 @@ impl Cond {
     ///     condvar.broadcast();
     /// }
     /// ```
-    pub fn broadcast(&self) -> XwEr {
+    pub fn broadcast(&self) -> CondError {
         unsafe {
             let mut rc = xwrustffi_cond_acquire(self.cond.get(), *self.tik.get());
             if rc == 0 {
                 rc = xwrustffi_cond_broadcast(self.cond.get());
                 xwrustffi_cond_put(self.cond.get());
-                rc
+                if XWOK == rc {
+                    CondError::Ok
+                } else if -ENEGATIVE == rc {
+                    CondError::AlreadyFrozen
+                } else {
+                    CondError::Unknown(rc)
+                }
             } else {
-                rc
+                CondError::NotInit
             }
         }
     }
