@@ -68,5 +68,8 @@ xwer_t xwmp_cond_wait(struct xwmp_cond * cond,
 xwer_t xwmp_cond_wait_to(struct xwmp_cond * cond,
                          void * lock, xwsq_t lktype, void * lkdata,
                          xwtm_t to, xwsq_t * lkst);
+xwer_t xwmp_cond_wait_unintr(struct xwmp_cond * cond,
+                             void * lock, xwsq_t lktype,
+                             void * lkdata, xwsq_t * lkst);
 
 #endif /* xwos/mp/sync/cond.h */

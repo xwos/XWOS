@@ -44,6 +44,9 @@ extern "C" {
     pub(crate) fn xwrustffi_cond_wait_to(cond: *mut XwosCond,
                                          lock: *mut c_void, lktype: XwSq, lkdata: *mut c_void,
                                          to: XwTm, lkst: *mut XwSq) -> XwEr;
+    pub(crate) fn xwrustffi_cond_wait_unintr(cond: *mut XwosCond,
+                                             lock: *mut c_void, lktype: XwSq, lkdata: *mut c_void,
+                                             lkst: *mut XwSq) -> XwEr;
 }
 
 /// 条件量的错误码
@@ -65,16 +68,14 @@ pub enum CondError {
 pub(crate) const XWOS_LK_NONE: XwSq = 0;
 /// 锁类型：互斥锁
 pub(crate) const XWOS_LK_MTX: XwSq = 1;
-/// 锁类型：不可中断的互斥锁
-pub(crate) const XWOS_LK_MTX_UNINTR: XwSq = 2;
 /// 锁类型：自旋锁
-pub(crate) const XWOS_LK_SPLK: XwSq = 3;
+pub(crate) const XWOS_LK_SPLK: XwSq = 2;
 /// 锁类型：顺序写锁
-pub(crate) const XWOS_LK_SQLK_WR: XwSq = 4;
+pub(crate) const XWOS_LK_SQLK_WR: XwSq = 3;
 /// 锁类型：独占顺序读锁
-pub(crate) const XWOS_LK_SQLK_RDEX: XwSq = 5;
+pub(crate) const XWOS_LK_SQLK_RDEX: XwSq = 4;
 /// 锁类型：抽象回调锁
-pub(crate) const XWOS_LK_CALLBACK: XwSq = 6;
+pub(crate) const XWOS_LK_CALLBACK: XwSq = 5;
 
 
 /// 锁状态：锁定

@@ -105,7 +105,8 @@ xwer_t xwrustffi_cond_wait(struct xwos_cond * cond,
                            void * lock, xwsq_t lktype, void * lkdata,
                            xwsq_t * lkst)
 {
-        return xwos_cond_wait(cond, *((union xwos_ulock *)&lock), lktype, lkdata, lkst);
+        return xwos_cond_wait(cond, *((union xwos_ulock *)&lock), lktype,
+                              lkdata, lkst);
 }
 
 xwer_t xwrustffi_cond_wait_to(struct xwos_cond * cond,
@@ -115,4 +116,12 @@ xwer_t xwrustffi_cond_wait_to(struct xwos_cond * cond,
         return xwos_cond_wait_to(cond,
                                  *((union xwos_ulock *)&lock), lktype, lkdata,
                                  to, lkst);
+}
+
+xwer_t xwrustffi_cond_wait_unintr(struct xwos_cond * cond,
+                                  void * lock, xwsq_t lktype, void * lkdata,
+                                  xwsq_t * lkst)
+{
+        return xwos_cond_wait_unintr(cond, *((union xwos_ulock *)&lock), lktype,
+                                     lkdata, lkst);
 }

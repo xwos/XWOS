@@ -60,5 +60,8 @@ xwer_t xwup_cond_wait(struct xwup_cond * cond,
 xwer_t xwup_cond_wait_to(struct xwup_cond * cond,
                          void * lock, xwsq_t lktype, void * lkdata,
                          xwtm_t to, xwsq_t * lkst);
+xwer_t xwup_cond_wait_unintr(struct xwup_cond * cond,
+                             void * lock, xwsq_t lktype, void * lkdata,
+                             xwsq_t * lkst);
 
 #endif /* xwos/up/sync/cond.h */

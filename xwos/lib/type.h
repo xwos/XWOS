@@ -267,7 +267,6 @@ struct xwos_irq_resource {
 enum xwos_lock_type_em {
         XWOS_LK_NONE = 0, /**< 无 */
         XWOS_LK_MTX, /**< 互斥锁 */
-        XWOS_LK_MTX_UNINTR, /**< 不可中断的互斥锁 */
         XWOS_LK_SPLK, /**< 自旋锁 */
         XWOS_LK_SQLK_WR, /**< 顺序写锁 */
         XWOS_LK_SQLK_RDEX, /**< 顺序读锁 */

@@ -143,4 +143,14 @@ xwer_t xwosdl_cond_wait_to(struct xwosdl_cond * cond,
                                  to, lkst);
 }
 
+static __xwcc_inline
+xwer_t xwosdl_cond_wait_unintr(struct xwosdl_cond * cond,
+                               union xwos_ulock lock, xwsq_t lktype, void * lkdata,
+                               xwsq_t * lkst)
+{
+        return xwup_cond_wait_unintr(cond,
+                                     lock.anon, lktype, lkdata,
+                                     lkst);
+}
+
 #endif /* xwos/up/osdl/sync/cond.h */

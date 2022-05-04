@@ -220,6 +220,9 @@ end
 等待并获取条件量<br>
 <br>
 
++ 当等待成功返回0时，将自动获得锁；
++ 当等待失败返回错误码时，将不会获得锁。
+
 @tparam userdata condsp (**in**) 条件量对象强指针<br>
 <br>
 
@@ -250,8 +253,11 @@ end
 
 
 --[[--------
-限时等待条件量对象<br>
+限时阻塞当前线程，直到被条件量唤醒<br>
 <br>
+
++ 当等待成功返回0时，将自动获得锁；
++ 当等待失败返回错误码时，将不会获得锁。
 
 @tparam userdata condsp (**in**) 条件量对象强指针<br>
 <br>
@@ -285,4 +291,41 @@ else
 end
 ]]
 function condsp:wait_to(condsp, lock, to)
+end
+
+
+--[[--------
+阻塞当前线程，直到被条件量唤醒，且阻塞不可被中断<br>
+<br>
+
++ 当等待成功返回0时，将自动获得锁；
++ 当等待失败返回错误码时，将不会获得锁。
+
+@tparam userdata condsp (**in**) 条件量对象强指针<br>
+<br>
+
+@tparam userdata lock (**in**) 锁对象的强引用指针<br>
+..● **splksp** 自旋锁<br>
+..● **sqlksp** 顺序锁<br>
+..● **mtxsp** 互斥锁<br>
+<br>
+
+@treturn number
++ ● **rc** 返回值
+  + ○ **0** 没有错误
+  + ○ **-EINVAL** 参数错误
+  + ○ **-ENOTTHDCTX** 不在线程上下文中
+
+@usage
+cond = xwos.cond.new()
+rc = cond:wait(xwtm.ft(xwt,.s(1))) -- 最多等待1s
+if (rc == 0) then
+  -- 获取到一个信号
+elseif (rc == -116) then
+  -- 超时
+else
+  -- 错误发生
+end
+]]
+function condsp:wait_unintr(condsp, lock)
 end

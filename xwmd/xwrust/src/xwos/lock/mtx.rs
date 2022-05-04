@@ -594,31 +594,45 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
     /// use alloc::sync::Arc;
     ///
     /// pub unsafe extern "C" fn xwrust_main() {
-    ///     let pair = Arc::new(Mutex::new(false), Cond::new())
-    ///     let lock: Arc<Mutex<u32>> = Arc::new(Mutex::new(0));
-    ///     let lock_child = lock.clone();
+    ///     let pair = Arc::new((Mutex::new(true), Cond::new()));
+    ///     pair.0.init();
+    ///     pair.1.init();
+    ///     let pair_c = pair.clone();
     ///
-    ///     match lock.lock() {
-    ///         Ok(mut guard) => { // 主线程上锁成功
-    ///             *guard = 1; // 访问共享变量
-    ///         }
-    ///         Err(e) => {
-    ///             // 主线程上锁失败
-    ///         }
-    ///     }
-    ///     // ...省略...
     ///     thd::Builder::new()
     ///         .name("child".into())
-    ///         .spawn(move |_| {
-    ///             // 子线程闭包
+    ///         .spawn(move |_| { // 子线程闭包
+    ///             cthd::sleep(xwtm::ms(500));
+    ///             let (lock, cvar) = &*pair_c;
     ///             match lock_child.lock() {
-    ///                 Ok(mut guard) => { // 子线程上锁成功
-    ///                     *guard += 1;
-    ///                 }
+    ///                 Ok(mut guard) => {
+    ///                     *guard = false; // 设置共享数据
+    ///                     drop(guard); // 先解锁再触发条件可提高效率
+    ///                     cvar.broadcast();
+    ///                 },
     ///                 Err(e) => { // 子线程上锁失败
-    ///                 }
+    ///                 },
     ///             }
     ///         });
+    ///     let (lock, cvar) = &*pair;
+    ///     let mut guard;
+    ///     match lock.lock() {
+    ///         Ok(g) => {
+    ///             guard = g;
+    ///             while *guard {
+    ///                 match guard.wait(cvar) {
+    ///                     Ok(g) => { // 唤醒
+    ///                         guard = g;
+    ///                     },
+    ///                     Err(e) => { // 等待条件量失败
+    ///                         break;
+    ///                     },
+    ///                 }
+    ///             }
+    ///         },
+    ///         Err(e) => { // 上锁失败
+    ///         },
+    ///     }
     /// }
     /// ```
     ///
@@ -671,6 +685,58 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
     /// + [`CondError::Timedout`] 等待超时
     /// + [`CondError::NotThreadContext`] 不在线程上下文中
     ///
+    /// # 示例
+    ///
+    /// ```rust
+    /// use xwrust::xwos::thd;
+    /// use xwrust::xwos::lock::mtx::*;
+    /// use xwrust::xwos::sync::cond::*;
+    /// extern crate alloc;
+    /// use alloc::sync::Arc;
+    ///
+    /// pub unsafe extern "C" fn xwrust_main() {
+    ///     let pair = Arc::new((Mutex::new(true), Cond::new()));
+    ///     pair.0.init();
+    ///     pair.1.init();
+    ///     let pair_c = pair.clone();
+    ///
+    ///     thd::Builder::new()
+    ///         .name("child".into())
+    ///         .spawn(move |_| { // 子线程闭包
+    ///             cthd::sleep(xwtm::ms(500));
+    ///             let (lock, cvar) = &*pair_c;
+    ///             match lock_child.lock() {
+    ///                 Ok(mut guard) => {
+    ///                     *guard = false; // 设置共享数据
+    ///                     drop(guard); // 先解锁再触发条件可提高效率
+    ///                     cvar.broadcast();
+    ///                 },
+    ///                 Err(e) => { // 子线程上锁失败
+    ///                 },
+    ///             }
+    ///         });
+    ///     let (lock, cvar) = &*pair;
+    ///     let mut guard;
+    ///     match lock.lock() {
+    ///         Ok(g) => {
+    ///             guard = g;
+    ///             while *guard {
+    ///                 match guard.wait_to(cvar, xwtm::ft(xwtm::s(2))) {
+    ///                     Ok(g) => { // 唤醒
+    ///                         guard = g;
+    ///                     },
+    ///                     Err(e) => { // 等待条件量失败
+    ///                         break;
+    ///                     },
+    ///                 }
+    ///             }
+    ///         },
+    ///         Err(e) => { // 上锁失败
+    ///         },
+    ///     }
+    /// }
+    /// ```
+    ///
     /// [`Err`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
     pub fn wait_to(self, cond: &Cond, to: XwTm) -> Result<MutexGuard<'a, T>, CondError> {
         unsafe {
@@ -694,6 +760,102 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
                     } else if -ETIMEDOUT == rc {
                         Err(CondError::Timedout)
                     } else if -ENOTTHDCTX == rc {
+                        Err(CondError::NotThreadContext)
+                    } else {
+                        Err(CondError::Unknown(rc))
+                    }
+                }
+            } else {
+                drop(self);
+                Err(CondError::NotInit)
+            }
+        }
+    }
+
+    /// 阻塞当前线程，直到被条件量唤醒，且阻塞不可被中断。
+    ///
+    /// 此方法会消费互斥锁的守卫(Guard)，并当线程阻塞时，在条件量内部释放互斥锁。
+    /// 当条件成立，线程被唤醒，会在条件量内部上锁互斥锁，并重新返回互斥锁的守卫(Guard)。
+    ///
+    /// + 当返回互斥锁的守卫 [`MutexGuard`] 时，互斥锁已经被重新上锁；
+    /// + 当返回 [`Err`] 时，互斥锁未被上锁。
+    ///
+    /// # 错误码
+    ///
+    /// + [`CondError::NotInit`] 条件量未被初始化
+    /// + [`CondError::NotThreadContext`] 不在线程上下文中
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    /// use xwrust::xwos::thd;
+    /// use xwrust::xwos::lock::mtx::*;
+    /// use xwrust::xwos::sync::cond::*;
+    /// extern crate alloc;
+    /// use alloc::sync::Arc;
+    ///
+    /// pub unsafe extern "C" fn xwrust_main() {
+    ///     let pair = Arc::new((Mutex::new(true), Cond::new()));
+    ///     pair.0.init();
+    ///     pair.1.init();
+    ///     let pair_c = pair.clone();
+    ///
+    ///     thd::Builder::new()
+    ///         .name("child".into())
+    ///         .spawn(move |_| { // 子线程闭包
+    ///             cthd::sleep(xwtm::ms(500));
+    ///             let (lock, cvar) = &*pair_c;
+    ///             match lock_child.lock() {
+    ///                 Ok(mut guard) => {
+    ///                     *guard = false; // 设置共享数据
+    ///                     drop(guard); // 先解锁再触发条件可提高效率
+    ///                     cvar.broadcast();
+    ///                 },
+    ///                 Err(e) => { // 子线程上锁失败
+    ///                 },
+    ///             }
+    ///         });
+    ///     let (lock, cvar) = &*pair;
+    ///     let mut guard;
+    ///     match lock.lock() {
+    ///         Ok(g) => {
+    ///             guard = g;
+    ///             while *guard {
+    ///                 match guard.wait_unintr(cvar) {
+    ///                     Ok(g) => { // 唤醒
+    ///                         guard = g;
+    ///                     },
+    ///                     Err(e) => { // 等待条件量失败
+    ///                         break;
+    ///                     },
+    ///                 }
+    ///             }
+    ///         },
+    ///         Err(e) => { // 上锁失败
+    ///         },
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// [`Err`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
+    pub fn wait_unintr(self, cond: &Cond) -> Result<MutexGuard<'a, T>, CondError> {
+        unsafe {
+            let mut rc = xwrustffi_cond_acquire(cond.cond.get(), *cond.tik.get());
+            if rc == 0 {
+                let mut lkst = 0;
+                rc = xwrustffi_cond_wait_unintr(cond.cond.get(),
+                                                self.lock.mtx.get() as _, XWOS_LK_MTX, ptr::null_mut(),
+                                                &mut lkst);
+                xwrustffi_cond_put(cond.cond.get());
+                if 0 == rc {
+                    Ok(self)
+                } else {
+                    if XWOS_LKST_LOCKED == lkst {
+                        drop(self);
+                    } else {
+                        mem::forget(self);
+                    }
+                    if -ENOTTHDCTX == rc {
                         Err(CondError::NotThreadContext)
                     } else {
                         Err(CondError::Unknown(rc))

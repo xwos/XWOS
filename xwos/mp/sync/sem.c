@@ -991,7 +991,7 @@ xwer_t xwmp_rtsem_freeze(struct xwmp_sem * sem)
                 rc = -EALREADY;
         } else {
                 sem->count = XWMP_SEM_NEGTIVE;
-#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#  if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
                 struct xwmp_evt * evt;
                 struct xwmp_synobj * synobj;
 
@@ -1001,7 +1001,7 @@ xwer_t xwmp_rtsem_freeze(struct xwmp_sem * sem)
                 if (NULL != evt) {
                         xwmp_sel_obj_c0i(evt, synobj);
                 }
-#endif
+#  endif
         }
         xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
 
@@ -1102,7 +1102,7 @@ xwer_t xwmp_rtsem_post(struct xwmp_sem * sem)
                         } else {
                                 rc = -ERANGE;
                         }
-#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#  if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
                         if (sem->count > 0) {
                                 struct xwmp_evt * evt;
                                 struct xwmp_synobj * synobj;
@@ -1115,7 +1115,7 @@ xwer_t xwmp_rtsem_post(struct xwmp_sem * sem)
                                         xwmp_sel_obj_s1i(evt, synobj);
                                 }
                         }
-#endif
+#  endif
                         xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
                 }
         }
@@ -1140,7 +1140,7 @@ xwer_t xwmp_rtsem_trywait(struct xwmp_sem * sem)
         xwmp_rtwq_lock_cpuirqsv(&sem->wq.rt, &cpuirq);
         if (sem->count > 0) {
                 sem->count--;
-#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#  if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
                 if (0 == sem->count) {
                         struct xwmp_evt * evt;
                         struct xwmp_synobj * synobj;
@@ -1153,7 +1153,7 @@ xwer_t xwmp_rtsem_trywait(struct xwmp_sem * sem)
                                 xwmp_sel_obj_c0i(evt, synobj);
                         }
                 }
-#endif
+#  endif
         } else {
                 rc = -ENODATA;
         }
@@ -1329,7 +1329,7 @@ xwer_t xwmp_rtsem_test(struct xwmp_sem * sem, struct xwmp_skd * xwskd,
                 }
         } else {
                 sem->count--;
-#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#  if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
                 if (0 == sem->count) {
                         struct xwmp_evt * evt;
                         struct xwmp_synobj * synobj;
@@ -1340,7 +1340,7 @@ xwer_t xwmp_rtsem_test(struct xwmp_sem * sem, struct xwmp_skd * xwskd,
                                 xwmp_sel_obj_c0i(evt, synobj);
                         }
                 }
-#endif
+#  endif
                 xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
                 rc = XWOK;
         }
@@ -1435,19 +1435,18 @@ xwer_t xwmp_rtsem_test_unintr(struct xwmp_sem * sem, struct xwmp_thd * thd)
                 rc = xwmp_rtsem_blkthd_unlkwq_cpuirqrs(sem, thd, cpuirq);
         } else {
                 sem->count--;
-#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#  if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
                 if (0 == sem->count) {
                         struct xwmp_evt * evt;
                         struct xwmp_synobj * synobj;
 
                         synobj = &sem->synobj;
-                        xwmb_mp_load_acquire(struct xwmp_evt *,
-                                             evt, &synobj->sel.evt);
+                        xwmb_mp_load_acquire(struct xwmp_evt *, evt, &synobj->sel.evt);
                         if (NULL != evt) {
                                 xwmp_sel_obj_c0i(evt, synobj);
                         }
                 }
-#endif
+#  endif
                 xwmp_rtwq_unlock_cpuirqrs(&sem->wq.rt, cpuirq);
                 rc = XWOK;
         }

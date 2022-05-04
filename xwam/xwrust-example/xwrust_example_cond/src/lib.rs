@@ -48,7 +48,7 @@ pub fn xwrust_example_cond() {
                 println!("[main] 创建子线程失败：{:?}", e);
                 return;
             },
-        }
+        };
 
     let (lock, cvar) = &*pair;
     let mut guard;

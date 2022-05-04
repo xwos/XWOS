@@ -114,9 +114,7 @@ xwer_t xwosdl_cond_wait(struct xwosdl_cond * cond,
                         union xwos_ulock lock, xwsq_t lktype, void * lkdata,
                         xwsq_t * lkst)
 {
-        return xwmp_cond_wait(cond,
-                              lock.anon, lktype, lkdata,
-                              lkst);
+        return xwmp_cond_wait(cond, lock.anon, lktype, lkdata, lkst);
 }
 
 static __xwcc_inline
@@ -124,9 +122,15 @@ xwer_t xwosdl_cond_wait_to(struct xwosdl_cond * cond,
                            union xwos_ulock lock, xwsq_t lktype, void * lkdata,
                            xwtm_t to, xwsq_t * lkst)
 {
-        return xwmp_cond_wait_to(cond,
-                                 lock.anon, lktype, lkdata,
-                                 to, lkst);
+        return xwmp_cond_wait_to(cond, lock.anon, lktype, lkdata, to, lkst);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_cond_wait_unintr(struct xwosdl_cond * cond,
+                               union xwos_ulock lock, xwsq_t lktype, void * lkdata,
+                               xwsq_t * lkst)
+{
+        return xwmp_cond_wait_unintr(cond, lock.anon, lktype, lkdata, lkst);
 }
 
 #endif /* xwos/mp/osdl/sync/cond.h */

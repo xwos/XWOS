@@ -370,7 +370,7 @@ xwer_t xwos_cond_unicast(struct xwos_cond * cond)
 }
 
 /**
- * @brief XWOS API：等待条件量对象
+ * @brief XWOS API：阻塞当前线程，直到被条件量唤醒
  * @param[in] cond: 条件量对象的指针
  * @param[in] lock: 锁
  * @param[in] lktype: 锁的类型，取值：@ref xwos_lock_type_em
@@ -396,7 +396,7 @@ xwer_t xwos_cond_wait(struct xwos_cond * cond,
 }
 
 /**
- * @brief XWOS API：限时等待条件量对象
+ * @brief XWOS API：限时阻塞当前线程，直到被条件量唤醒
  * @param[in] cond: 条件量对象的指针
  * @param[in] lock: 锁
  * @param[in] lktype: 锁的类型，取值：@ref xwos_lock_type_em
@@ -423,6 +423,32 @@ xwer_t xwos_cond_wait_to(struct xwos_cond * cond,
                          xwtm_t to, xwsq_t * lkst)
 {
         return xwosdl_cond_wait_to(&cond->oscond, lock, lktype, lkdata, to, lkst);
+}
+
+/**
+ * @brief XWOS API：阻塞当前线程，直到被条件量唤醒，且阻塞不可被中断
+ * @param[in] cond: 条件量对象的指针
+ * @param[in] lock: 锁
+ * @param[in] lktype: 锁的类型，取值：@ref xwos_lock_type_em
+ * @param[in] lkdata: 锁的数据
+ * @param[out] lkst: 指向缓冲区的指针，通过此缓冲区返回锁的状态
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的指针或空指针
+ * @retval -EINVAL: 参数无效
+ * @retval -EINTR: 等待被中断
+ * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @note
+ * - 同步/异步：同步
+ * - 上下文：线程
+ * - 重入性：可重入
+ */
+static __xwos_inline_api
+xwer_t xwos_cond_wait_unintr(struct xwos_cond * cond,
+                             union xwos_ulock lock, xwsq_t lktype, void * lkdata,
+                             xwsq_t * lkst)
+{
+        return xwosdl_cond_wait_unintr(&cond->oscond, lock, lktype, lkdata, lkst);
 }
 
 /**
