@@ -62,7 +62,7 @@ xwer_t sysmgr_thd_main(void *arg)
         XWOS_UNUSED(arg);
 
         while (true) {
-                xwos_cthd_sleep(300 * XWTM_MS);
+                xwos_cthd_sleep(XWTM_MS(300));
         }
         return XWOK;
 }

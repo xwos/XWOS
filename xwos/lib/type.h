@@ -641,44 +641,51 @@ union xwos_ulock {
 /**
  * @ingroup xwos_time
  * @brief 系统时间的单位：纳秒
+ * @param[in] ns: 纳秒
  */
-#define XWTM_NS         (1LL)
+#define XWTM_NS(ns)     ((ns) * 1LL)
 
 /**
  * @ingroup xwos_time
  * @brief 系统时间的单位：微秒
+ * @param[in] us: 微秒
  */
-#define XWTM_US         (1000LL)
+#define XWTM_US(us)     ((us) * 1000LL)
 
 /**
  * @ingroup xwos_time
  * @brief 系统时间的单位：毫秒
+ * @param[in] ms: 毫秒
  */
-#define XWTM_MS         (1000000LL)
+#define XWTM_MS(ms)     ((ms) * 1000000LL)
 
 /**
  * @ingroup xwos_time
  * @brief 系统时间的单位：秒
+ * @param[in] s: 秒
  */
-#define XWTM_S          (1000000000LL)
+#define XWTM_S(s)       ((s) * 1000000000LL)
 
 /**
  * @ingroup xwos_time
  * @brief 系统时间的单位：分
+ * @param[in] m: 分
  */
-#define XWTM_M          (60 * XWTM_S)
+#define XWTM_M(m)       ((m) * XWTM_S(60))
 
 /**
  * @ingroup xwos_time
  * @brief 系统时间的单位：时
+ * @param[in] h: 时
  */
-#define XWTM_H          (60 * XWTM_M)
+#define XWTM_H(h)       ((h) * XWTM_M(60))
 
 /**
  * @ingroup xwos_time
  * @brief 系统时间的单位：天
+ * @param[in] d: 天
  */
-#define XWTM_D          (24 * XWTM_H)
+#define XWTM_D(d)       ((d) * XWTM_H(24))
 
 #if !defined(ARCH_HAVE_XWTM_T)
 /**
@@ -762,7 +769,7 @@ xwer_t xwtm_cmp(const xwtm_t a, const xwtm_t b)
 static __xwcc_inline
 xwtm_t xwtm_ns(xwtm_t ns)
 {
-        return ns * XWTM_NS;
+        return XWTM_NS(ns);
 }
 
 /**
@@ -774,7 +781,7 @@ xwtm_t xwtm_ns(xwtm_t ns)
 static __xwcc_inline
 xwtm_t xwtm_us(xwtm_t us)
 {
-        return us * XWTM_US;
+        return XWTM_US(us);
 }
 
 /**
@@ -786,7 +793,7 @@ xwtm_t xwtm_us(xwtm_t us)
 static __xwcc_inline
 xwtm_t xwtm_ms(xwtm_t ms)
 {
-        return ms * XWTM_MS;
+        return XWTM_MS(ms);
 }
 
 /**
@@ -798,7 +805,7 @@ xwtm_t xwtm_ms(xwtm_t ms)
 static __xwcc_inline
 xwtm_t xwtm_s(xwtm_t s)
 {
-        return s * XWTM_S;
+        return XWTM_S(s);
 }
 
 /**
@@ -810,7 +817,7 @@ xwtm_t xwtm_s(xwtm_t s)
 static __xwcc_inline
 xwtm_t xwtm_m(xwtm_t m)
 {
-        return m * XWTM_M;
+        return XWTM_M(m);
 }
 
 /**
@@ -822,7 +829,7 @@ xwtm_t xwtm_m(xwtm_t m)
 static __xwcc_inline
 xwtm_t xwtm_h(xwtm_t h)
 {
-        return h * XWTM_H;
+        return XWTM_H(h);
 }
 
 /**
@@ -834,7 +841,7 @@ xwtm_t xwtm_h(xwtm_t h)
 static __xwcc_inline
 xwtm_t xwtm_d(xwtm_t d)
 {
-        return d * XWTM_D;
+        return XWTM_D(d);
 }
 #endif
 

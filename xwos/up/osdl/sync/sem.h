@@ -43,6 +43,7 @@ xwer_t xwosdl_sem_fini(struct xwosdl_sem * sem)
 static __xwcc_inline
 xwer_t xwosdl_sem_grab(struct xwosdl_sem * sem)
 {
+        XWOS_UNUSED(sem);
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         return XWOK;
 }
@@ -50,6 +51,7 @@ xwer_t xwosdl_sem_grab(struct xwosdl_sem * sem)
 static __xwcc_inline
 xwer_t xwosdl_sem_put(struct xwosdl_sem * sem)
 {
+        XWOS_UNUSED(sem);
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         return XWOK;
 }

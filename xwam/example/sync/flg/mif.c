@@ -289,7 +289,7 @@ xwer_t xwflgdemo_producer_func(void * arg)
         flglogf(INFO, "[触发线程] 启动。\n");
         while (!xwos_cthd_frz_shld_stop(NULL)) {
                 /* 休眠1000ms，让出CPU使用权 */
-                xwos_cthd_sleep(1000 * XWTM_MS);
+                xwos_cthd_sleep(XWTM_MS(1000));
 
                 msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
                 /* 将事件位图掩码部分全部置1 */
@@ -309,7 +309,7 @@ xwer_t xwflgdemo_producer_func(void * arg)
                 }
 
                 /* 休眠1000ms，让出CPU使用权 */
-                xwos_cthd_sleep(1000 * XWTM_MS);
+                xwos_cthd_sleep(XWTM_MS(1000));
 
                 /* 将事件位图的第3位置1 */
                 rc = xwos_flg_s1i(&xwflgdemo_flg, 3);
@@ -328,7 +328,7 @@ xwer_t xwflgdemo_producer_func(void * arg)
                 }
 
                 /* 休眠1000ms，让出CPU使用权 */
-                xwos_cthd_sleep(1000 * XWTM_MS);
+                xwos_cthd_sleep(XWTM_MS(1000));
 
                 msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
                 /* 将事件位图掩码部分全部清0 */
@@ -348,7 +348,7 @@ xwer_t xwflgdemo_producer_func(void * arg)
                 }
 
                 /* 休眠1000ms，让出CPU使用权 */
-                xwos_cthd_sleep(1000 * XWTM_MS);
+                xwos_cthd_sleep(XWTM_MS(1000));
 
                 /* 将事件位图的第7位清0 */
                 rc = xwos_flg_c0i(&xwflgdemo_flg, 7);
@@ -367,7 +367,7 @@ xwer_t xwflgdemo_producer_func(void * arg)
                 }
 
                 /* 休眠1000ms，让出CPU使用权 */
-                xwos_cthd_sleep(1000 * XWTM_MS);
+                xwos_cthd_sleep(XWTM_MS(1000));
 
                 msk[0] = 0xFF; /* 设置事件位的掩码bit0~bit7共8位 */
                 /* 将事件位图掩码部分全部翻转 */
@@ -387,7 +387,7 @@ xwer_t xwflgdemo_producer_func(void * arg)
                 }
 
                 /* 休眠1000ms，让出CPU使用权 */
-                xwos_cthd_sleep(1000 * XWTM_MS);
+                xwos_cthd_sleep(XWTM_MS(1000));
 
                 /* 将事件位图的第5位翻转 */
                 rc = xwos_flg_x1i(&xwflgdemo_flg, 5);

@@ -45,6 +45,7 @@ xwer_t xwosdl_mtx_fini(struct xwosdl_mtx * mtx)
 static __xwcc_inline
 xwer_t xwosdl_mtx_grab(struct xwosdl_mtx * mtx)
 {
+        XWOS_UNUSED(mtx);
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
         return XWOK;
 }
@@ -52,6 +53,7 @@ xwer_t xwosdl_mtx_grab(struct xwosdl_mtx * mtx)
 static __xwcc_inline
 xwer_t xwosdl_mtx_put(struct xwosdl_mtx * mtx)
 {
+        XWOS_UNUSED(mtx);
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
         return XWOK;
 }

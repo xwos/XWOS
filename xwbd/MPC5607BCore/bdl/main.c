@@ -91,7 +91,7 @@ xwer_t uart_task(void * arg)
                 size = sizeof(rxbuffer);
                 rc = xwds_dmauartc_rx(&mpc560xb_uart0_cb, rxbuffer, &size, XWTM_MAX);
                 if ((XWOK == rc) && (size > 0)) {
-                        xwos_cthd_sleep(5 * XWTM_S);
+                        xwos_cthd_sleep(XWTM_S(5));
                         rc = bdl_iftx(rxbuffer, size >> 1);
                         if (XWOK == rc) {
                                 rc = bdl_iftx(&rxbuffer[size >> 1], size >> 1);
@@ -119,7 +119,7 @@ xwer_t led_task(void * arg)
                                 pinmask = XWBOP_BIT(SOC_GPIO_PIN_13);
                                 xwds_gpio_reset(&mpc560xb_soc_cb, LED_PORT,
                                                 pinmask);
-                                rc = xwos_cthd_sleep(500 * XWTM_MS);
+                                rc = xwos_cthd_sleep(XWTM_MS(500));
                                 if (__xwcc_unlikely(rc < 0)) {
                                         break;
                                 }
@@ -129,7 +129,7 @@ xwer_t led_task(void * arg)
                                 pinmask = XWBOP_BIT(SOC_GPIO_PIN_13);
                                 xwds_gpio_set(&mpc560xb_soc_cb, LED_PORT,
                                               pinmask);
-                                rc = xwos_cthd_sleep(500 * XWTM_MS);
+                                rc = xwos_cthd_sleep(XWTM_MS(500));
                                 if (__xwcc_unlikely(rc < 0)) {
                                         break;
                                 }

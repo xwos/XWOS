@@ -112,7 +112,7 @@ xwer_t xwmtxdemo_thd_0_func(void * arg)
         mtxlogf(INFO, "[线程0] 启动。\n");
 
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                xwos_cthd_sleep(500 * XWTM_MS);
+                xwos_cthd_sleep(XWTM_MS(500));
                 rc = xwos_mtx_lock(dymtx.mtx);
                 if (XWOK == rc) {
                         ts = xwtm_nowts();
@@ -140,7 +140,7 @@ xwer_t xwmtxdemo_thd_1_func(void * arg)
         mtxlogf(INFO, "[线程1] 开始。\n");
 
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                xwos_cthd_sleep(500 * XWTM_MS);
+                xwos_cthd_sleep(XWTM_MS(500));
                 rc = xwos_mtx_lock(dymtx.mtx);
                 if (XWOK == rc) {
                         ts = xwtm_nowts();

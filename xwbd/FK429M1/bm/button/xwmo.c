@@ -31,7 +31,7 @@
 
 #define BMBTN_GPIO_PORT XWDS_GPIO_PORT_I
 #define BMBTN_GPIO_PIN XWDS_GPIO_PIN_8
-#define BMBTN_DEBOUNCING_DELAY (20 * XWTM_MS)
+#define BMBTN_DEBOUNCING_DELAY (XWTM_MS(20))
 #define BMBTN_LONGPRESS_CNT (100)
 
 #define BMBTN_LED_GPIO_PORT XWDS_GPIO_PORT_G
@@ -245,22 +245,22 @@ void bmbtn_led_blink(void)
         xwds_gpio_toggle(&stm32cube_soc_cb,
                          BMBTN_LED_GPIO_PORT,
                          BMBTN_LED_GPIO_PIN);
-        xwos_cthd_sleep(500 * XWTM_MS);
+        xwos_cthd_sleep(XWTM_MS(500));
 
         xwds_gpio_toggle(&stm32cube_soc_cb,
                          BMBTN_LED_GPIO_PORT,
                          BMBTN_LED_GPIO_PIN);
-        xwos_cthd_sleep(500 * XWTM_MS);
+        xwos_cthd_sleep(XWTM_MS(500));
 
         xwds_gpio_toggle(&stm32cube_soc_cb,
                          BMBTN_LED_GPIO_PORT,
                          BMBTN_LED_GPIO_PIN);
-        xwos_cthd_sleep(500 * XWTM_MS);
+        xwos_cthd_sleep(XWTM_MS(500));
 
         xwds_gpio_toggle(&stm32cube_soc_cb,
                          BMBTN_LED_GPIO_PORT,
                          BMBTN_LED_GPIO_PIN);
-        xwos_cthd_sleep(500 * XWTM_MS);
+        xwos_cthd_sleep(XWTM_MS(500));
 }
 
 static

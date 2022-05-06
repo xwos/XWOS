@@ -51,6 +51,7 @@ xwer_t xwosdl_flg_fini(struct xwosdl_flg * flg)
 static __xwcc_inline
 xwer_t xwosdl_flg_grab(struct xwosdl_flg * flg)
 {
+        XWOS_UNUSED(flg);
         XWOS_VALIDATE((flg), "nullptr", -EFAULT);
         return XWOK;
 }
@@ -58,6 +59,7 @@ xwer_t xwosdl_flg_grab(struct xwosdl_flg * flg)
 static __xwcc_inline
 xwer_t xwosdl_flg_put(struct xwosdl_flg * flg)
 {
+        XWOS_UNUSED(flg);
         XWOS_VALIDATE((flg), "nullptr", -EFAULT);
         return XWOK;
 }

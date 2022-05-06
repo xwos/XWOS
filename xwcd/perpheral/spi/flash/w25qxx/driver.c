@@ -518,7 +518,7 @@ xwer_t xwds_w25qxx_write(struct xwds_w25qxx * w25qxx, xwu32_t address,
         if (rc < 0) {
                 goto err_we;
         }
-        rc = xwds_w25qxx_wait_idle(w25qxx, 1 * XWTM_MS, to);
+        rc = xwds_w25qxx_wait_idle(w25qxx, XWTM_MS(1), to);
         if (rc < 0) {
                 goto err_wait_idle;
         }
@@ -571,7 +571,7 @@ xwer_t xwds_w25qxx_erase_sector(struct xwds_w25qxx * w25qxx, xwu32_t address, xw
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
-        rc = xwds_w25qxx_wait_idle(w25qxx, 400 * XWTM_MS, to);
+        rc = xwds_w25qxx_wait_idle(w25qxx, XWTM_MS(400), to);
         if (rc < 0) {
                 goto err_chk_idle;
         }
@@ -609,7 +609,7 @@ xwer_t xwds_w25qxx_erase_32kblk(struct xwds_w25qxx * w25qxx, xwu32_t address, xw
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
-        rc = xwds_w25qxx_wait_idle(w25qxx, 1600 * XWTM_MS, to);
+        rc = xwds_w25qxx_wait_idle(w25qxx, XWTM_MS(1600), to);
         if (rc < 0) {
                 goto err_chk_idle;
         }
@@ -647,7 +647,7 @@ xwer_t xwds_w25qxx_erase_64kblk(struct xwds_w25qxx * w25qxx, xwu32_t address, xw
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
-        rc = xwds_w25qxx_wait_idle(w25qxx, 2000 * XWTM_MS, to);
+        rc = xwds_w25qxx_wait_idle(w25qxx, XWTM_MS(2000), to);
         if (rc < 0) {
                 goto err_chk_idle;
         }
@@ -685,7 +685,7 @@ xwer_t xwds_w25qxx_erase_chip(struct xwds_w25qxx * w25qxx, xwtm_t to)
         if (rc < 0) {
                 goto err_w25qxx_ctrl;
         }
-        rc = xwds_w25qxx_wait_idle(w25qxx, 2000 * XWTM_MS, to);
+        rc = xwds_w25qxx_wait_idle(w25qxx, XWTM_MS(2000), to);
         if (rc < 0) {
                 goto err_chk_idle;
         }

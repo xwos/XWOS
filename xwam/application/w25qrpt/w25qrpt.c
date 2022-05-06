@@ -352,7 +352,7 @@ xwer_t w25qrpt_rpc_erase_chip(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg
 
         w25qxx = w25qrpt->flash;
         sdusize = 0;
-        rc = xwds_w25qxx_erase_chip(w25qxx, xwtm_ft(300 * XWTM_S));
+        rc = xwds_w25qxx_erase_chip(w25qxx, xwtm_ft(XWTM_S(300)));
         switch (rc) {
         case XWOK:
                 oprc = W25QRPT_ERR_NONE;
@@ -437,7 +437,7 @@ xwer_t w25qrpt_rpc_erase_sector(struct w25qrpt * w25qrpt, struct w25qrpt_msg * m
         address |= ((xwu32_t)msg->address[1] << 16U);
         address |= ((xwu32_t)msg->address[2] << 8U);
         address |= ((xwu32_t)msg->address[3] << 0U);
-        rc = xwds_w25qxx_erase_sector(w25qxx, address, xwtm_ft(2 * XWTM_S));
+        rc = xwds_w25qxx_erase_sector(w25qxx, address, xwtm_ft(XWTM_S(2)));
         switch (rc) {
         case XWOK:
                 oprc = W25QRPT_ERR_NONE;
@@ -520,7 +520,7 @@ xwer_t w25qrpt_rpc_erase_32kblock(struct w25qrpt * w25qrpt, struct w25qrpt_msg *
         address |= ((xwu32_t)msg->address[1] << 16U);
         address |= ((xwu32_t)msg->address[2] << 8U);
         address |= ((xwu32_t)msg->address[3] << 0U);
-        rc = xwds_w25qxx_erase_32kblk(w25qxx, address, xwtm_ft(8 * XWTM_S));
+        rc = xwds_w25qxx_erase_32kblk(w25qxx, address, xwtm_ft(XWTM_S(8)));
         switch (rc) {
         case XWOK:
                 oprc = W25QRPT_ERR_NONE;
@@ -603,7 +603,7 @@ xwer_t w25qrpt_rpc_erase_64kblock(struct w25qrpt * w25qrpt, struct w25qrpt_msg *
         address |= ((xwu32_t)msg->address[1] << 16U);
         address |= ((xwu32_t)msg->address[2] << 8U);
         address |= ((xwu32_t)msg->address[3] << 0U);
-        rc = xwds_w25qxx_erase_64kblk(w25qxx, address, xwtm_ft(16 * XWTM_S));
+        rc = xwds_w25qxx_erase_64kblk(w25qxx, address, xwtm_ft(XWTM_S(16)));
         switch (rc) {
         case XWOK:
                 oprc = W25QRPT_ERR_NONE;
@@ -689,7 +689,7 @@ xwer_t w25qrpt_rpc_write(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
         address |= ((xwu32_t)msg->address[3] << 0U);
         wrsz = w25qrpt_get_sdu_size(msg);
         rc = xwds_w25qxx_write(w25qxx, address, msg->sdu, &wrsz,
-                               xwtm_ft(1000 * XWTM_MS));
+                               xwtm_ft(XWTM_MS(1000)));
         switch (rc) {
         case XWOK:
                 oprc = W25QRPT_ERR_NONE;
@@ -782,7 +782,7 @@ xwer_t w25qrpt_rpc_read(struct w25qrpt * w25qrpt, struct w25qrpt_msg * msg)
         rdsz |= ((xwu32_t)msg->sdu[2] << 8U);
         rdsz |= ((xwu32_t)msg->sdu[3] << 0U);
         rc = xwds_w25qxx_read(w25qxx, address, msg->sdu, &rdsz,
-                              xwtm_ft(1000 * XWTM_MS));
+                              xwtm_ft(XWTM_MS(1000)));
         switch (rc) {
         case XWOK:
                 oprc = W25QRPT_ERR_NONE;

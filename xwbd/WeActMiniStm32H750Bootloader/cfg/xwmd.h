@@ -34,7 +34,7 @@
 #define XWMDCFG_isc_xwpcp_LOG                                   0
 #define XWMDCFG_isc_xwpcp_PORT_NUM                              (12U)
 #define XWMDCFG_isc_xwpcp_PRI_NUM                               (4U)
-#define XWMDCFG_isc_xwpcp_RETRY_PERIOD                          (1 * XWTM_S)
+#define XWMDCFG_isc_xwpcp_RETRY_PERIOD                          (XWTM_S(1))
 #define XWMDCFG_isc_xwpcp_RETRY_NUM                             (8U)
 #define XWMDCFG_isc_xwpcp_MEMBLK_SIZE                           (64U)
 #define XWMDCFG_isc_xwpcp_MEMBLK_ODR                            (6U)
@@ -46,7 +46,7 @@
 /******** ******** simple communication protocol ******** ********/
 #define XWMDCFG_isc_xwscp                                       1
 #define XWMDCFG_isc_xwscp_LOG                                   0
-#define XWMDCFG_isc_xwscp_PERIOD                                (1 * XWTM_S)
+#define XWMDCFG_isc_xwscp_PERIOD                                (XWTM_S(1))
 #define XWMDCFG_isc_xwscp_MEMBLK_SIZE                           (64U)
 #define XWMDCFG_isc_xwscp_MEMBLK_ODR                            (6U)
 #define XWMDCFG_isc_xwscp_THD_PRIORITY                          \

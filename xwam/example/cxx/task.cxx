@@ -44,7 +44,7 @@ xwer_t cxx_thd_main(void * arg)
 
   rc = XWOK;
   while (!xwos_cthd_frz_shld_stop(NULL)) {
-    xwos_cthd_sleep(2000 * XWTM_MS);
+    xwos_cthd_sleep(XWTM_MS(2000));
   }
   xwos_thd_detach(xwos_cthd_self());
   return rc;

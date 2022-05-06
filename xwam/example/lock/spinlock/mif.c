@@ -117,11 +117,11 @@ xwer_t xwsplkdemo_thd_func(void * arg)
         swtlogf(INFO, "[线程] 启动定时器。\n");
         ts = xwtm_now();
         rc = xwos_swt_start(&xwsplkdemo_swt,
-                            ts, 500 * XWTM_MS,
+                            ts, XWTM_MS(500),
                             xwsplkdemo_swt_callback, NULL);
 
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                xwos_cthd_sleep(1 * XWTM_S);
+                xwos_cthd_sleep(XWTM_S(1));
 
                 xwos_splk_lock_cpuirq(&xwsplkdemo_lock);
                 /* 临界区 */

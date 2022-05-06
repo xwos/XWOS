@@ -326,11 +326,11 @@ xwer_t xwseldemo_consumer_func(void * arg)
         sellogf(INFO, "[消费者] 启动。\n");
         sellogf(INFO, "[消费者] 启动定时器0。\n");
         now = xwtm_now();
-        rc = xwos_swt_start(&xwseldemo_swt0, now, 500 * XWTM_MS,
+        rc = xwos_swt_start(&xwseldemo_swt0, now, XWTM_MS(500),
                             xwseldemo_swt0_callback, NULL);
 
         sellogf(INFO, "[消费者] 启动定时器1。\n");
-        rc = xwos_swt_start(&xwseldemo_swt1, now, 800 * XWTM_MS,
+        rc = xwos_swt_start(&xwseldemo_swt1, now, XWTM_MS(800),
                             xwseldemo_swt1_callback, NULL);
 
         memset(selmsk, 0, sizeof(selmsk));
@@ -343,7 +343,7 @@ xwer_t xwseldemo_consumer_func(void * arg)
                         "[消费者] 等待信号：0x%X，时间戳：%lld 纳秒...\n",
                         selmsk[0], now);
                 rc = xwos_sel_select_to(&xwseldemo_sel0, selmsk, trg,
-                                        xwtm_ft(1 * XWTM_S));
+                                        xwtm_ft(XWTM_S(1)));
                 if (XWOK == rc) {
                         now = xwtm_nowts();
                         sellogf(INFO,
@@ -494,7 +494,7 @@ xwer_t xwseldemo_producer_func(void * arg)
                                 now, rc);
                 }
 
-                xwos_cthd_sleep(1000 * XWTM_MS);
+                xwos_cthd_sleep(XWTM_MS(1000));
 
                 rc = xwos_sem_post(&xwseldemo_sem2);
                 if (XWOK == rc) {
@@ -507,7 +507,7 @@ xwer_t xwseldemo_producer_func(void * arg)
                                 "[生产者] 错误，时间戳：%lld 纳秒，错误码：%d。\n\n",
                                 now, rc);
                 }
-                xwos_cthd_sleep(1000 * XWTM_MS);
+                xwos_cthd_sleep(XWTM_MS(1000));
 
                 rc = xwos_cond_broadcast(&xwseldemo_cond5);
                 if (XWOK == rc) {
@@ -520,7 +520,7 @@ xwer_t xwseldemo_producer_func(void * arg)
                                 "[生产者] 错误，时间戳：%lld 纳秒，错误码：%d。\n\n",
                                 now, rc);
                 }
-                xwos_cthd_sleep(1000 * XWTM_MS);
+                xwos_cthd_sleep(XWTM_MS(1000));
 
                 rc = xwos_cond_broadcast(&xwseldemo_cond6);
                 if (XWOK == rc) {
@@ -533,7 +533,7 @@ xwer_t xwseldemo_producer_func(void * arg)
                                 "[生产者] 错误，时间戳：%lld 纳秒，错误码：%d。\n\n",
                                 now, rc);
                 }
-                xwos_cthd_sleep(1000 * XWTM_MS);
+                xwos_cthd_sleep(XWTM_MS(1000));
         }
 
         sellogf(INFO, "[生产者] 退出。\n");
@@ -553,7 +553,7 @@ xwer_t xwseldemo_syncthd_func(void * arg)
         sellogf(INFO, "[同步线程%d] 启动。\n", pos);
 
         /* 睡眠一段时间 */
-        sleep = (pos + 1) * XWTM_S;
+        sleep = XWTM_S(pos + 1);
         xwos_cthd_sleep(sleep);
 
         /* 同步线程 */

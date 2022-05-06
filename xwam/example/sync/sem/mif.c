@@ -126,11 +126,11 @@ xwer_t xwsemdemo_thd_func(void * arg)
 
         semlogf(INFO, "[线程] 启动定时器。\n");
         now = xwtm_now();
-        rc = xwos_swt_start(&xwsemdemo_swt, now, 1000 * XWTM_MS,
+        rc = xwos_swt_start(&xwsemdemo_swt, now, XWTM_MS(1000),
                             xwsemdemo_swt_callback, NULL);
 
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                rc = xwos_sem_wait_to(&xwsemdemo_sem, xwtm_ft(500 * XWTM_MS));
+                rc = xwos_sem_wait_to(&xwsemdemo_sem, xwtm_ft(XWTM_MS(500)));
                 if (XWOK == rc) {
                         now = xwtm_nowts();
                         semlogf(INFO,

@@ -149,12 +149,12 @@ xwer_t xwswtdemo_thd_func(void * arg)
         swtlogf(INFO, "[线程] 启动定时器0。\n");
         ts = xwtm_now();
         rc = xwos_swt_start(&xwswtdemo_swt0,
-                            ts, 500 * XWTM_MS,
+                            ts, XWTM_MS(500),
                             xwswtdemo_swt0_callback, NULL);
 
         swtlogf(INFO, "[线程] 启动定时器1。\n");
         rc = xwos_swt_start(xwswtdemo_swt1_d.swt,
-                            ts, 800 * XWTM_MS,
+                            ts, XWTM_MS(800),
                             xwswtdemo_swt1_callback, NULL);
 
         /* 设置掩码位为bit0:1共2位 */

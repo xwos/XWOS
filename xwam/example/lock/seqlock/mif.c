@@ -118,11 +118,11 @@ xwer_t xwsqlkdemo_thd_func(void * arg)
 
         ts = xwtm_now();
         rc = xwos_swt_start(&xwsqlkdemo_swt,
-                            ts, 500 * XWTM_MS,
+                            ts, XWTM_MS(500),
                             xwsqlkdemo_swt_callback, NULL);
 
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                xwos_cthd_sleep(1 * XWTM_S);
+                xwos_cthd_sleep(XWTM_S(1));
 
                 do {
                         lkseq = xwos_sqlk_rd_begin(&xwsqlkdemo_lock);

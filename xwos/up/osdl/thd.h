@@ -46,6 +46,7 @@ static __xwcc_inline
 xwer_t xwosdl_thd_grab(struct xwosdl_thd * thd)
 {
         XWOS_VALIDATE((thd), "nullptr", -EFAULT);
+        XWOS_UNUSED(thd);
         return XWOK;
 }
 
@@ -53,6 +54,7 @@ static __xwcc_inline
 xwer_t xwosdl_thd_put(struct xwosdl_thd * thd)
 {
         XWOS_VALIDATE((thd), "nullptr", -EFAULT);
+        XWOS_UNUSED(thd);
         return XWOK;
 }
 
@@ -95,6 +97,7 @@ static __xwcc_inline
 xwer_t xwosdl_thd_migrate(struct xwosdl_thd * thd, xwsq_t tik, xwid_t dstcpu)
 {
         XWOS_VALIDATE((NULL != thd), "nild", -ENILOBJD);
+        XWOS_UNUSED(thd);
         XWOS_UNUSED(tik);
         XWOS_UNUSED(dstcpu);
         return XWOK;

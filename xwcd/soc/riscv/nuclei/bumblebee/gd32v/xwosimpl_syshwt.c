@@ -95,6 +95,6 @@ xwtm_t xwospl_syshwt_get_timeconfetti(struct xwospl_syshwt * hwt)
 
         XWOS_UNUSED(hwt);
         delta = SysTimer_GetCompareValue() - SysTimer_GetLoadValue();
-        confetti = delta / (SYSHWT_SRCCLK / XWTM_MS) * XWTM_US;
+        confetti = delta / (SYSHWT_SRCCLK / XWTM_MS(1)) * XWTM_US(1);
         return (xwtm_t)confetti;
 }

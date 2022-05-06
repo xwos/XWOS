@@ -113,7 +113,7 @@ xwer_t led_task(void)
                 if (xwos_cthd_shld_frz()) {
                         xwos_cthd_freeze();
                 }
-                xwos_cthd_sleep(1 * XWTM_S);
+                xwos_cthd_sleep(XWTM_S(1));
                 xwds_gpio_toggle(&stm32cube_soc_cb,
                                  XWDS_GPIO_PORT_B,
                                  XWDS_GPIO_PIN_5);

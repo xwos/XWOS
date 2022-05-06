@@ -61,11 +61,11 @@ xwer_t xwslpdemo_thd_func(void * arg)
 
         thdslplogf(INFO, "[线程] 启动。\n");
         thdslplogf(INFO, "[线程] 睡眠1秒 ...\n");
-        xwos_cthd_sleep(1 * XWTM_S);
+        xwos_cthd_sleep(XWTM_S(1));
 
         ts = xwtm_now();
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                xwos_cthd_sleep_from(&ts, 500 * XWTM_MS);
+                xwos_cthd_sleep_from(&ts, XWTM_MS(500));
                 ts = xwtm_nowts();
                 thdslplogf(INFO, "[线程] 时间戳：%lld 纳秒。\n", ts);
         }

@@ -40,6 +40,7 @@ xwer_t xwosdl_cond_fini(struct xwosdl_cond * cond)
 static __xwcc_inline
 xwer_t xwosdl_cond_grab(struct xwosdl_cond * cond)
 {
+        XWOS_UNUSED(cond);
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         return XWOK;
 }
@@ -47,6 +48,7 @@ xwer_t xwosdl_cond_grab(struct xwosdl_cond * cond)
 static __xwcc_inline
 xwer_t xwosdl_cond_put(struct xwosdl_cond * cond)
 {
+        XWOS_UNUSED(cond);
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         return XWOK;
 }

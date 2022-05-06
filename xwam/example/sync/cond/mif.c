@@ -156,7 +156,7 @@ xwer_t xwconddemo_thd_func(void * arg)
         condlogf(INFO, "[线程] 启动。\n");
         condlogf(INFO, "[线程] 启动定时器。\n");
         now = xwtm_now();
-        rc = xwos_swt_start(&xwconddemo_swt, now, 1000 * XWTM_MS,
+        rc = xwos_swt_start(&xwconddemo_swt, now, XWTM_MS(1000),
                             xwconddemo_swt_callback, NULL);
 
         while (!xwos_cthd_frz_shld_stop(NULL)) {
@@ -170,7 +170,7 @@ xwer_t xwconddemo_thd_func(void * arg)
                         /* 等待条件量，同时解锁自旋锁 */
                         rc = xwos_cond_wait_to(&xwconddemo_cond,
                                                ulk, XWOS_LK_SPLK, NULL,
-                                               xwtm_ft(500 * XWTM_MS), &lkst);
+                                               xwtm_ft(XWTM_MS(500)), &lkst);
                         if (XWOK == rc) {
                                 /* 等待到条件量，自旋锁自动上锁 */
                                 is_updated = false;

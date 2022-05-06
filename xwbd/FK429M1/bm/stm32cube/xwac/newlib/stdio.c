@@ -33,7 +33,7 @@ xwssz_t newlibac_fops_read_stdin(int fd, void * buf, size_t cnt)
         do {
                 cnt = bufsz;
                 rc = xwds_dmauartc_rx(&stm32cube_usart1_cb, buf, &cnt,
-                                      xwtm_ft(20 * XWTM_MS));
+                                      xwtm_ft(XWTM_MS(20)));
                 if (-ETIMEDOUT == rc) {
                         rdsz = (xwssz_t)cnt;
                         errno = 0;

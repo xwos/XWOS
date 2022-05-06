@@ -98,7 +98,7 @@ xwer_t thd_1_func(void * arg)
 
         /* 循环argv次 */
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                xwos_cthd_sleep(1 * XWTM_S);
+                xwos_cthd_sleep(XWTM_S(1));
                 thdcrtlogf(INFO, "[线程1] %d\n", argv);
                 argv--;
                 if (0 == argv) {
@@ -132,7 +132,7 @@ xwer_t thd_2_func(void * arg)
 
         /* 循环argv次 */
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                rc = xwos_cthd_sleep(1 * XWTM_S);
+                rc = xwos_cthd_sleep(XWTM_S(1));
                 thdcrtlogf(INFO, "[线程2] %d\n", argv);
                 argv--;
                 if (0 == argv) {

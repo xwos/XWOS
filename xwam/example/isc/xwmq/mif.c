@@ -115,7 +115,7 @@ xwer_t xwmqdemo_producer_main(void * arg)
                                        topic++, "Message Content");
                         }
                 }
-                xwos_cthd_sleep(1 * XWTM_S);
+                xwos_cthd_sleep(XWTM_S(1));
         }
         mqlogf(INFO, "[生产者] 退出。\n");
         xwos_thd_detach(xwos_cthd_self());

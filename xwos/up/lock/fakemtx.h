@@ -96,6 +96,7 @@ xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx)
         if (rc == -ENODATA) {
                 rc = -EWOULDBLOCK;
         }
+        return rc;
 }
 
 static __xwup_inline_api

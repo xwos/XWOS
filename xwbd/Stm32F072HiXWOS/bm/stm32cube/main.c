@@ -102,7 +102,7 @@ err_stm32cube_start:
 xwer_t led_task(void)
 {
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                xwos_cthd_sleep(1 * XWTM_S);
+                xwos_cthd_sleep(XWTM_S(1));
                 LL_GPIO_TogglePin(LED_GPIO_PORT, LED_GPIO_PIN);
         }
         return XWOK;

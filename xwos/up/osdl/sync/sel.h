@@ -40,6 +40,7 @@ xwer_t xwosdl_sel_fini(struct xwosdl_sel * sel)
 static __xwcc_inline
 xwer_t xwosdl_sel_grab(struct xwosdl_sel * sel)
 {
+        XWOS_UNUSED(sel);
         XWOS_VALIDATE((sel), "nullptr", -EFAULT);
         return XWOK;
 }
@@ -47,6 +48,7 @@ xwer_t xwosdl_sel_grab(struct xwosdl_sel * sel)
 static __xwcc_inline
 xwer_t xwosdl_sel_put(struct xwosdl_sel * sel)
 {
+        XWOS_UNUSED(sel);
         XWOS_VALIDATE((sel), "nullptr", -EFAULT);
         return XWOK;
 }

@@ -41,6 +41,7 @@ xwer_t xwosdl_br_fini(struct xwosdl_br * br)
 static __xwcc_inline
 xwer_t xwosdl_br_grab(struct xwosdl_br * br)
 {
+        XWOS_UNUSED(br);
         XWOS_VALIDATE((br), "nullptr", -EFAULT);
         return XWOK;
 }
@@ -48,6 +49,7 @@ xwer_t xwosdl_br_grab(struct xwosdl_br * br)
 static __xwcc_inline
 xwer_t xwosdl_br_put(struct xwosdl_br * br)
 {
+        XWOS_UNUSED(br);
         XWOS_VALIDATE((br), "nullptr", -EFAULT);
         return XWOK;
 }

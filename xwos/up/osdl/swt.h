@@ -63,6 +63,7 @@ xwsq_t xwosdl_swt_gettik(struct xwosdl_swt * swt)
 static __xwcc_inline
 xwer_t xwosdl_swt_grab(struct xwosdl_swt * swt)
 {
+        XWOS_UNUSED(swt);
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
         return XWOK;
 }
@@ -70,6 +71,7 @@ xwer_t xwosdl_swt_grab(struct xwosdl_swt * swt)
 static __xwcc_inline
 xwer_t xwosdl_swt_put(struct xwosdl_swt * swt)
 {
+        XWOS_UNUSED(swt);
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
         return XWOK;
 }

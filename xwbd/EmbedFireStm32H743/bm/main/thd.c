@@ -79,7 +79,7 @@ xwer_t led_task(void * arg)
                 if (xwos_cthd_shld_frz()) {
                         xwos_cthd_freeze();
                 }
-                xwos_cthd_sleep(1 * XWTM_S);
+                xwos_cthd_sleep(XWTM_S(1));
                 xwds_gpio_toggle(&stm32cube_soc_cb, LED_Blue_GPIO_Port, LED_Blue_Pin);
         }
         return XWOK;
