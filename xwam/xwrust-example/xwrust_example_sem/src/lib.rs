@@ -27,8 +27,8 @@ pub fn xwrust_example_sem() {
         .spawn(move |_| { // 子线程闭包
             println!("[child] thd: {:?}", cthd::i());
             cthd::sleep(xwtm::ms(500));
-            sema_c.post();
             println!("[child]<{} ms> 发布信号量。", xwtm::nowtc());
+            sema_c.post();
             "OK"
         }) {
             Ok(_) => {},

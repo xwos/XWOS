@@ -29,23 +29,25 @@
 
 #define XWMQDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
-xwer_t xwmqdemo_producer_func(void * arg);
+xwer_t xwmqdemo_producer_main(void * arg);
 xwos_thd_d xwmqdemo_producer;
 
-xwer_t xwmqdemo_consumer_func(void * arg);
+xwer_t xwmqdemo_consumer_main(void * arg);
 xwos_thd_d xwmqdemo_consumer;
 
 struct xwmq xwmqdemo_mq;
+struct xwmq_msg xwmqdemo_mq_txq[16];
 
 /**
  * @brief 模块的加载函数
  */
-xwer_t example_xwmq_start(void)
+xwer_t xwos_example_xwmq(void)
 {
         struct xwos_thd_attr attr;
         xwer_t rc;
 
-        rc = xwmq_init(&xwmqdemo_mq, "demo.xwmq");
+        rc = xwmq_init(&xwmqdemo_mq, "demo.xwmq",
+                       xwmqdemo_mq_txq, xw_array_size(xwmqdemo_mq_txq));
         if (rc < 0) {
                 goto err_xwmq_init;
         }
@@ -58,7 +60,8 @@ xwer_t example_xwmq_start(void)
         attr.priority = XWMQDEMO_THD_PRIORITY;
         attr.detached = false;
         attr.privileged = true;
-        rc = xwos_thd_create(&xwmqdemo_producer, &attr, xwmqdemo_producer_func, NULL);
+        rc = xwos_thd_create(&xwmqdemo_producer, &attr, xwmqdemo_producer_main,
+                             &xwmqdemo_mq);
         if (rc < 0) {
                 goto err_producer_create;
         }
@@ -70,10 +73,15 @@ xwer_t example_xwmq_start(void)
         attr.priority = XWMQDEMO_THD_PRIORITY;
         attr.detached = false;
         attr.privileged = true;
-        rc = xwos_thd_create(&xwmqdemo_consumer, &attr, xwmqdemo_consumer_func, NULL);
+        rc = xwos_thd_create(&xwmqdemo_consumer, &attr, xwmqdemo_consumer_main,
+                             &xwmqdemo_mq);
         if (rc < 0) {
                 goto err_consumer_create;
         }
+
+        mqlogf(INFO,
+               "sizeof(struct xwmq): %d, sizeof(struct xwmq_msg): %d\n",
+               sizeof(struct xwmq), sizeof(struct xwmq_msg));
 
         return XWOK;
 
@@ -88,20 +96,19 @@ err_xwmq_init:
 /**
  * @brief 生产者线程的主函数
  */
-xwer_t xwmqdemo_producer_func(void * arg)
+xwer_t xwmqdemo_producer_main(void * arg)
 {
         xwer_t rc;
-        int topic;
-        struct xwmq_msg * msg;
+        xwsq_t topic;
+        struct xwmq * mq;
 
-        XWOS_UNUSED(arg);
+        mq = arg;
         rc = XWOK;
         mqlogf(INFO, "[生产者] 启动。\n");
         topic = 0;
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                rc = xwmq_msg_create(&msg);
                 if (XWOK == rc) {
-                        rc = xwmq_eq(&xwmqdemo_mq, msg, topic, "Message Content");
+                        rc = xwmq_eq(mq, topic, "Message Content");
                         if (XWOK == rc) {
                                 mqlogf(INFO,
                                        "[生产者] 发送消息{topic = %d, data = %s}。\n",
@@ -118,21 +125,22 @@ xwer_t xwmqdemo_producer_func(void * arg)
 /**
  * @brief 消费者线程的主函数
  */
-xwer_t xwmqdemo_consumer_func(void * arg)
+xwer_t xwmqdemo_consumer_main(void * arg)
 {
         xwer_t rc;
-        struct xwmq_msg * msg;
+        char * msg;
+        xwsq_t topic;
+        struct xwmq * mq;
 
-        XWOS_UNUSED(arg);
+        mq = arg;
         rc = XWOK;
         mqlogf(INFO, "[消费者] 启动。\n");
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                rc = xwmq_dq(&xwmqdemo_mq, &msg);
+                rc = xwmq_dq(mq, &topic, (void **)&msg);
                 if (XWOK == rc) {
                         mqlogf(INFO,
                                "[消费者] 接收消息{topic = %d, data = %s}。\n",
-                               msg->topic, msg->data);
-                        xwmq_msg_fini(msg);
+                               topic, msg);
                 }
         }
         mqlogf(INFO, "[消费者] 退出。\n");
