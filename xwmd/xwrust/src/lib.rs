@@ -47,6 +47,8 @@
 #![feature(alloc_error_handler)]
 #![feature(core_ffi_c)]
 #![feature(negative_impls)]
+#![feature(generic_const_exprs)]
+#![allow(incomplete_features)]
 
 #[macro_use]
 pub mod macros;
@@ -61,5 +63,8 @@ pub mod xwtm;
 
 #[allow(dead_code)]
 pub mod xwos;
+
+#[allow(dead_code)]
+pub mod xwmd;
 
 pub mod xwmm;

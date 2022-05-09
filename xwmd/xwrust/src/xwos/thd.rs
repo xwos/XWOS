@@ -265,7 +265,7 @@ impl ThdD {
         let mut tik: XwSq = 0;
         let rc = xwrustffi_thd_create(&mut thd, &mut tik, attr, xwrust_thd_entry, f as *mut _);
         return if rc < 0 {
-            drop(Box::from_raw(f)); // 创建失败，需要消费掉f
+            drop(Box::from_raw(f)); // 创建失败，需要释放f
             Err(rc)
         } else {
             Ok(ThdD {thd: thd, tik: tik})

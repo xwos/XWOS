@@ -105,6 +105,7 @@ dependencies = [
  "xwrust_example_spinlock",
  "xwrust_example_thd",
  "xwrust_example_vector",
+ "xwrust_example_xwmq",
 ]
 
 [[package]]
@@ -211,6 +212,14 @@ dependencies = [
 
 [[package]]
 name = "xwrust_example_vector"
+version = "0.1.0"
+dependencies = [
+ "libc-print",
+ "xwrust",
+]
+
+[[package]]
+name = "xwrust_example_xwmq"
 version = "0.1.0"
 dependencies = [
  "libc-print",

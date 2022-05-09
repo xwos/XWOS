@@ -22,7 +22,6 @@ static __xwmd_code
 void xwmq_construct(struct xwmq * mq)
 {
         xwos_object_construct(&mq->xwobj);
-        mq->name = NULL;
 }
 
 static __xwmd_code
@@ -131,7 +130,7 @@ xwer_t xwmq_put(struct xwmq * mq)
 const __xwmd_rodata char xwmq_txq_name[] = "xwmq.txq";
 
 static __xwmd_code
-xwer_t xwmq_activate(struct xwmq * mq, const char * name,
+xwer_t xwmq_activate(struct xwmq * mq,
                      struct xwmq_msg * txq, xwsz_t num,
                      xwobj_gc_f gcfunc)
 {
@@ -141,7 +140,6 @@ xwer_t xwmq_activate(struct xwmq * mq, const char * name,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwobj_activate;
         }
-        mq->name = name;
         xwmm_memslice_init(&mq->txq,
                            (xwptr_t)txq, sizeof(struct xwmq_msg) * num,
                            sizeof(struct xwmq_msg), xwmq_txq_name,
@@ -159,7 +157,6 @@ err_xwobj_activate:
 /**
  * @brief XWMQ API：静态方式初始化消息队列
  * @param[in] mq: 消息队列对象的指针
- * @param[in] name: 名字
  * @param[in] txq: 消息槽内存池
  * @param[in] num: 消息槽数量
  * @return 错误码
@@ -169,13 +166,12 @@ err_xwobj_activate:
  * - 重入性：不可重入
  */
 __xwmd_api
-xwer_t xwmq_init(struct xwmq * mq, const char * name,
-                 struct xwmq_msg * txq, xwsz_t num)
+xwer_t xwmq_init(struct xwmq * mq, struct xwmq_msg * txq, xwsz_t num)
 {
         XWOS_VALIDATE((mq), "nullptr", -EFAULT);
         XWOS_VALIDATE((txq), "nullptr", -EFAULT);
         xwmq_construct(mq);
-        return xwmq_activate(mq, name, txq, num, xwmq_gc);
+        return xwmq_activate(mq, txq, num, xwmq_gc);
 }
 
 /**

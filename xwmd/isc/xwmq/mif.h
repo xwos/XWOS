@@ -49,8 +49,7 @@ struct xwmq {
         struct xwos_sem rxqsem; /**< 接收队列的信号量 */
 };
 
-xwer_t xwmq_init(struct xwmq * mq, const char * name,
-                 struct xwmq_msg * txq, xwsz_t num);
+xwer_t xwmq_init(struct xwmq * mq, struct xwmq_msg * txq, xwsz_t num);
 xwer_t xwmq_fini(struct xwmq * mq);
 xwsq_t xwmq_gettik(struct xwmq * mq);
 xwer_t xwmq_acquire(struct xwmq * mq, xwsq_t tik);

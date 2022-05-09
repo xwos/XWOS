@@ -4,6 +4,7 @@
 //!
 
 extern crate core;
+use core::result::Result;
 use core::cell::UnsafeCell;
 
 use crate::types::*;
@@ -350,7 +351,7 @@ impl Sem {
                 xwrustffi_sem_put(self.sem.get());
                 if XWOK == rc {
                     SemError::Ok
-                } else if  -EINTR == rc {
+                } else if -EINTR == rc {
                     SemError::Interrupt
                 } else if -ENOTTHDCTX == rc {
                     SemError::NotThreadContext
@@ -404,7 +405,7 @@ impl Sem {
                 xwrustffi_sem_put(self.sem.get());
                 if XWOK == rc {
                     SemError::Ok
-                } else if  -ENODATA == rc {
+                } else if -ENODATA == rc {
                     SemError::NoData
                 } else {
                     SemError::Unknown(rc)
@@ -458,9 +459,9 @@ impl Sem {
                 xwrustffi_sem_put(self.sem.get());
                 if XWOK == rc {
                     SemError::Ok
-                } else if  -EINTR == rc {
+                } else if -EINTR == rc {
                     SemError::Interrupt
-                } else if  -ETIMEDOUT == rc {
+                } else if -ETIMEDOUT == rc {
                     SemError::Timedout
                 } else if -ENOTTHDCTX == rc {
                     SemError::NotThreadContext

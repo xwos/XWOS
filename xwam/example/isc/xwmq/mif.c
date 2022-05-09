@@ -46,8 +46,7 @@ xwer_t xwos_example_xwmq(void)
         struct xwos_thd_attr attr;
         xwer_t rc;
 
-        rc = xwmq_init(&xwmqdemo_mq, "demo.xwmq",
-                       xwmqdemo_mq_txq, xw_array_size(xwmqdemo_mq_txq));
+        rc = xwmq_init(&xwmqdemo_mq, xwmqdemo_mq_txq, xw_array_size(xwmqdemo_mq_txq));
         if (rc < 0) {
                 goto err_xwmq_init;
         }
