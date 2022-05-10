@@ -272,14 +272,18 @@ xwer_t xwos_thd_release(xwos_thd_d thdd)
  * - 上下文：线程
  * - 重入性：可重入
  * @details
- * 此函数```xwos_thd_quit()```用于线程A向另一个线程B设置<b>退出</b>状态。
- * 调用此函数的线程A也不会等待子线程退出。线程B是否要退出，什么时候退出，由线程B自己决定。
- * 线程B可以是Joinable的，也可以是Detached的。
+ * 此函数```xwos_thd_quit()```用于父线程A向另一个子线程B设置 **退出状态** 。
  *
- * 此函数可被重复调用，线程B的<b>退出</b>状态一旦被设置，不可被清除。
+ * + 调用此函数的父线程A不会等待子线程B退出。
+ * + 子线程B可以是Joinable的，也可以是Detached的。
+ * + 此函数可被重复调用，子线程B **退出状态** 一旦被设置，不可被清除。
+ * + 此函数会中断子线程B的 **阻塞状态** 和 **睡眠状态** ，阻塞和睡眠的函数将以错误码 ```-EINTR``` 退出。
+ * + 如果子线程B的 **阻塞状态** 是不可被中断的，中断将不会发生。
+ * + 子线程B可以通过 ```xwos_cthd_shld_stop()``` 检测 **退出状态** ，并以此作为线程循环的退出条件。
  *
- * 在XWOS-V2.0以前，此函数被命名为```xwos_thd_cancel()```，名称类似于```pthread_cacnel()```，
- * 但功能差异较大。为避免迷惑，将其改名为```xwos_thd_quit()```。
+ *
+ * 在XWOS-V2.0以前，此函数被命名为 ```xwos_thd_cancel()``` ，名称类似于 ```pthread_cacnel()``` ，
+ * 但功能差异较大。为避免迷惑，将其改名为 ```xwos_thd_quit()``` 。
  */
 static __xwos_inline_api
 xwer_t xwos_thd_quit(xwos_thd_d thdd)
@@ -302,15 +306,16 @@ xwer_t xwos_thd_quit(xwos_thd_d thdd)
  * - 上下文：线程
  * - 重入性：不可重入
  * @details
- * 此函数```xwos_thd_join()```类似于POSIX线程库的```pthread_join()```函数，用于等待另一个线程退出。
+ * 此函数 ```xwos_thd_join()``` 类似于POSIX线程库的 ```pthread_join()``` 函数，用于等待另一个线程退出。
  *
- * 线程A调用此函数时，会阻塞等待线程B退出。线程B退出后，此函数会释放线程B的内存资源，
- * 并通过```trc```将线程B的返回值返回给线程A。
+ * 父线程A调用此函数时，会阻塞等待子线程B退出。子线程B退出后，此函数会释放子线程B的内存资源，并通过 ```trc``` 将子线程B的返回值返回给父线程A。
  *
- * 此函数只能对Joinable的线程B使用。
+ * + 父线程A的阻塞状态可被中断。
+ * + 如果子线程B已经提前运行至退出，此函数可立即返回子线程B的返回值。
+ * + 此函数只能对Joinable的子线程B使用。对Detached的子线程B调用此函数会得到错误码 ```-EINVAL``` 。
+ * + 不允许多个线程对同一个线程进行 ```xwos_thd_join()``` 或 ```xwos_thd_stop()``` ，此函数检测到此错误时会返回 ```-EALREADY``` 。
+ * + 父线程A不可对自己调用此函数，此函数检测到此错误时会返回 ```-EPERM``` 。
  *
- * 不允许多个线程对同一个线程进行 ```xwos_thd_join()``` 或 ```xwos_thd_stop()``` ，此函数检测到
- * 此错误时会返回 ```-EALREADY``` 。
  */
 static __xwos_inline_api
 xwer_t xwos_thd_join(xwos_thd_d thdd, xwer_t * trc)
@@ -333,18 +338,9 @@ xwer_t xwos_thd_join(xwos_thd_d thdd, xwer_t * trc)
  * - 上下文：线程
  * - 重入性：不可重入
  * @details
- * 此函数```xwos_thd_stop()```用于线程A停止另一个线程B。
- * 与```xwos_thd_quit()```不同，此函数只能对Joinable的线程B使用。
+ * 此函数 ```xwos_thd_stop()``` 用于父线程A停止另一个子线程B。
  *
- * 线程A调用此函数时，会对线程B设置一个<b>退出</b>状态，然后一直阻塞等待线程B退出。
- * 线程B是否要退出，什么时候退出，由线程B自己决定。
- *
- * 当线程B退出后，此函数会释放线程B的内存资源，然后通过```trc```将线程B的返回值返回给线程A。
- *
- * 此函数等价于```xwos_thd_quit() + xwos_thd_join()```的组合。
- *
- * 不允许多个线程对同一个线程进行 ```xwos_thd_join()``` 或 ```xwos_thd_stop()``` ，此函数检测到
- * 此错误时会返回 ```-EALREADY``` 。
+ * 此函数等价于 ```xwos_thd_quit() + xwos_thd_join()``` 。
  */
 static __xwos_inline_api
 xwer_t xwos_thd_stop(xwos_thd_d thdd, xwer_t * trc)

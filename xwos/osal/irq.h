@@ -19,6 +19,7 @@
 /**
  * @defgroup xwos_irq 中断
  * @ingroup xwos
+ * @details
  * - EXC：编号为负数，从-1开始编号
  * - IRQ：编号为正数或0，从0开始编号
  * @{
@@ -35,13 +36,12 @@
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
- * - 中断号的枚举通常定义在芯片的头文件中；
- * - SOCCFG_RO_IVT配置为0时，参数isr无效，中断向量需预先写入中断向量表
- *   的向量表中。
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：同一中断号，不可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：同一中断号，不可重入
+ * @details
+ * **申请中断** 用于向中断向量表安装中断处理函数(ISR)。中断号的枚举通常定义在芯片的头文件中。
+ * 当```SOCCFG_RO_IVT```配置为 **0** 时，参数 **isr** 与 **data** 无效，中断向量需预先写入中断向量表的向量表中。
  */
 static __xwos_inline_api
 xwer_t xwos_irq_request(xwirq_t irqn, xwisr_f isr, void * data,
@@ -278,6 +278,8 @@ xwer_t xwos_irq_get_id(xwirq_t * irqnbuf)
 
 /**
  * @brief XWOS API：开启本地CPU的中断
+ * @details
+ * 此函数运行在哪个CPU上，开启的就是哪个CPU的中断。
  */
 static __xwos_inline_api
 void xwos_cpuirq_enable_lc(void)
@@ -287,6 +289,8 @@ void xwos_cpuirq_enable_lc(void)
 
 /**
  * @brief XWOS API：关闭本地CPU的中断
+ * @details
+ * 此函数运行在哪个CPU上，关闭的就是哪个CPU的中断。
  */
 static __xwos_inline_api
 void xwos_cpuirq_disable_lc(void)
@@ -297,6 +301,8 @@ void xwos_cpuirq_disable_lc(void)
 /**
  * @brief XWOS API：恢复本地CPU的中断
  * @param[in] cpuirq: 本地CPU的中断开关
+ * @details
+ * 此函数运行在哪个CPU上，恢复的就是哪个CPU的中断。
  */
 static __xwos_inline_api
 void xwos_cpuirq_restore_lc(xwreg_t cpuirq)
@@ -307,6 +313,8 @@ void xwos_cpuirq_restore_lc(xwreg_t cpuirq)
 /**
  * @brief XWOS API：保存然后关闭本地CPU的中断
  * @param[out] cpuirq: 指向缓冲区的指针，此缓冲区用于返回本地CPU的中断开关
+ * @details
+ * 此函数运行在哪个CPU上，保存然后关闭的就是哪个CPU的中断。
  */
 static __xwos_inline_api
 void xwos_cpuirq_save_lc(xwreg_t * cpuirq)

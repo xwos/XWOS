@@ -1,7 +1,116 @@
 //! XWOS RUST：XWOS的信号量
 //! ========
 //!
+//! 信号量是操作系统比较底层的同步机制，可以同时阻塞一个或多个线程。
 //!
+//! 当信号量的值大于等于0时，信号量可以唤醒一个正在等待的线程。线程被唤醒时会取走一个值，信号量的值减少1。
+//!
+//! 信号量常常用于在中断中唤醒一个线程，并将耗时较长的操作放在线程中执行。可减少中断上下文的执行时间，增加中断吞吐量，降低中断延迟。
+//!
+//!
+//! # 创建
+//!
+//! XWOS RUST的信号量可使用 [`Sem::new()`] 创建。
+//!
+//! + 可以创建具有静态生命周期 [`'static`] 约束的全局变量：
+//!
+//! ```rust
+//! use xwrust::xwos::sync::sem::*;
+//!
+//! static GLOBAL_SEM: Sem  = Sem::new();
+//! ```
+//!
+//! + 也可以使用 [`alloc::sync::Arc`] 在heap中创建：
+//!
+//! ```rust
+//! extern crate alloc;
+//! use alloc::sync::Arc;
+//!
+//! use xwrust::xwos::sync::sem::*;
+//!
+//! pub fn xwrust_example_sem() {
+//!     let sema = Arc::new(Sem::new());
+//! }
+//! ```
+//!
+//!
+//! # 初始化
+//!
+//! 无论以何种方式创建的信号量，都必须在使用前调用 [`Sem::init()`] 进行初始化：
+//!
+//! ```rust
+//! pub fn xwrust_example_sem() {
+//!     GLOBAL_SEM.init(0, XwSsq::MAX);
+//!     sema.init(0, XwSsq::MAX);
+//! }
+//! ```
+//!
+//!
+//! # 增加信号量
+//!
+//! [`Sem::post()`] 方法可用来增加信号量的值。此方法可在 **任意** 上下文使用。
+//!
+//!
+//! # 冻结与解冻
+//!
+//! ## 冻结
+//!
+//! XWOS RUST的信号量可以使用方法 [`Sem::freeze()`] 进行 **冻结** 操作，被冻结的信号量的值为负数，不影响对信号量的 **等待** 操作。
+//! 但不能再增加信号量的值。
+//!
+//! ## 解冻
+//!
+//! [`Sem::thaw()`] 方法是**冻结** 操作的逆操作，可将信号量的值重置为0，此时可重新增加信号量的值。
+//!
+//!
+//! # 等待
+//!
+//! XWOS RUST的信号量有4种等待方式：
+//!
+//! ## 普通等待
+//!
+//! [`Sem::wait()`] 方法只可在 **线程** 上下文中使用：
+//!
+//! + 若信号量的值小于等于0，线程会阻塞等待。
+//! + 当信号量的值大于0时，线程被唤醒，并取走一个值（信号量的值减少1），然后返回 [`SemError::Ok`] 。
+//! + 当线程阻塞等待被中断时，返回 [`SemError::Interrupt`] 。
+//!
+//! ## 超时等待
+//!
+//! [`Sem::wait_to()`] 方法只可在 **线程** 上下文中使用：
+//!
+//! + 若信号量的值小于等于0，线程会阻塞等待，等待时会指定一个唤醒时间点。
+//! + 当信号量的值大于0时，线程被唤醒，并取走一个值（信号量的值减少1），然后返回 [`SemError::Ok`] 。
+//! + 当线程阻塞等待被中断时，返回 [`SemError::Interrupt`] 。
+//! + 当到达指定的唤醒时间点，线程被唤醒，并返回 [`SemError::Timedout`] 。
+//!
+//! ## 不可中断等待
+//!
+//! [`Sem::wait_unintr()`] 方法只可在 **线程** 上下文中使用：
+//!
+//! + 若信号量的值小于等于0，线程会阻塞等待，且不可被中断，也不会超时。
+//! + 当信号量的值大于0时，线程被唤醒，并取走一个值（信号量的值减少1），然后返回 [`SemError::Ok`] 。
+//!
+//! ## 尝试等待
+//!
+//! [`Sem::trywait()`] 方法可在 **任意** 上下文中使用，不会阻塞，只会检测信号量的值：
+//!
+//! + 当信号量的值大于0时，就取走一个值（信号量的值减少1），然后返回 [`SemError::Ok`] 。
+//! + 当信号量的值小于等于0时，立即返回 [`SemError::NoData`] 。
+//!
+//!
+//! # 获取信号量值
+//!
+//! 可以通过方法 [`Sem::getvalue()`] 获取信号量的值，此方法只是读取值，不会 **消费** 信号量。
+//!
+//!
+//! # 示例
+//!
+//! [XWOS/xwam/xwrust-example/xwrust_example_sem](https://gitee.com/xwos/XWOS/blob/main/xwam/xwrust-example/xwrust_example_sem/src/lib.rs)
+//!
+//!
+//! [`'static`]: <https://doc.rust-lang.org/std/keyword.static.html>
+//! [`alloc::sync::Arc`]: <https://doc.rust-lang.org/alloc/sync/struct.Arc.html>
 
 extern crate core;
 use core::result::Result;
@@ -81,14 +190,26 @@ pub struct Sem {
 impl Sem {
     /// 新建信号量对象。
     ///
-    /// 此方法是编译期方法，可用于新建 [`'static`] 约束的全局变量。
+    /// 此方法是编译期方法。
     ///
     /// # 示例
+    ///
+    /// + 具有 [`'static`] 约束的全局变量全局变量：
     ///
     /// ```rust
     /// use xwrust::xwos::sync::sem::*;
     ///
     /// static GLOBAL_SEM: Sem  = Sem::new();
+    /// ```
+    ///
+    /// + 在heap中创建：
+    ///
+    /// ```rust
+    /// use alloc::sync::Arc;
+    ///
+    /// pub fn xwrust_example_sem() {
+    ///     let sema = Arc::new(Sem::new());
+    /// }
     /// ```
     ///
     /// [`'static`]: https://doc.rust-lang.org/std/keyword.static.html
@@ -98,9 +219,7 @@ impl Sem {
             tik: UnsafeCell::new(0),
         }
     }
-}
 
-impl Sem {
     /// 初始化信号量对象。
     ///
     /// 信号量对象必须调用此方法一次，方可正常使用。
@@ -109,12 +228,11 @@ impl Sem {
     ///
     /// ```rust
     /// use xwrust::types::*;
-    /// use xwrust::errno::*;
     /// use xwrust::xwos::sync::sem::*;
     ///
     /// static GLOBAL_SEM: Sem = Sem::new();
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_sem() {
     ///     // ...省略...
     ///     GLOBAL_SEM.init(0, XwSsq::max);
     ///     // 从此处开始 GLOBAL_SEM 可正常使用
@@ -149,7 +267,7 @@ impl Sem {
     /// use xwrust::errno::*;
     /// use xwrust::xwos::sync::sem::*;
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_sem() {
     ///     // ...省略...
     ///     sema: Sem = Sem::new();
     ///     sema.init(0, XwSsq::max);
@@ -192,7 +310,7 @@ impl Sem {
     /// use xwrust::errno::*;
     /// use xwrust::xwos::sync::sem::*;
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_sem() {
     ///     // ...省略...
     ///     sema: Sem = Sem::new();
     ///     sema.init(0, XwSsq::max);
@@ -235,7 +353,7 @@ impl Sem {
     /// use xwrust::errno::*;
     /// use xwrust::xwos::sync::sem::*;
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_sem() {
     ///     // ...省略...
     ///     sem: Sem = Sem::new();
     ///     sem.init(0, XwSsq::max);
@@ -277,7 +395,7 @@ impl Sem {
     /// use xwrust::errno::*;
     /// use xwrust::xwos::sync::sem::*;
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_sem() {
     ///     // ...省略...
     ///     sem: Sem = Sem::new();
     ///     sem.init(0, XwSsq::MAX);
@@ -324,10 +442,9 @@ impl Sem {
     ///
     /// ```rust
     /// use xwrust::types::*;
-    /// use xwrust::errno::*;
     /// use xwrust::xwos::sync::sem::*;
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_sem() {
     ///     // ...省略...
     ///     sem: Sem = Sem::new();
     ///     sem.init(0, XwSsq::max);
@@ -381,7 +498,7 @@ impl Sem {
     /// use xwrust::errno::*;
     /// use xwrust::xwos::sync::sem::*;
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_sem() {
     ///     // ...省略...
     ///     sem: Sem = Sem::new();
     ///     sem.init(0, XwSsq::max);
@@ -435,7 +552,7 @@ impl Sem {
     /// use xwrust::errno::*;
     /// use xwrust::xwos::sync::sem::*;
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_sem() {
     ///     // ...省略...
     ///     sem: Sem = Sem::new();
     ///     sem.init(0, XwSsq::max);
@@ -491,7 +608,7 @@ impl Sem {
     /// use xwrust::errno::*;
     /// use xwrust::xwos::sync::sem::*;
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_sem() {
     ///     // ...省略...
     ///     sem: Sem = Sem::new();
     ///     sem.init(0, XwSsq::max);

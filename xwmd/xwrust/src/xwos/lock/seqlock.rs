@@ -39,48 +39,73 @@
 //! + 当临界区被多个中断上下文访问时，需使用保存中断标志的模式： [`SeqlockMode::ReadExclusiveLockCpuirqSave(None)`]
 //!
 //!
-//! # 创建方法
+//! # 创建
 //!
-//! **顺序锁** 具有编译期新建的方法，即其 [`Seqlock::new()`] 方法具有 **const fn** 约束。
+//! XWOS RUST的互斥锁可使用 [`Seqlock::new()`] 创建。
 //!
-//! + 可用于定义 [`'static`] 约束的全局共享变量：
+//! + 可以创建具有静态生命周期 [`'static`] 约束的全局变量：
 //!
 //! ```rust
 //! use xwrust::xwos::lock::seqlock::*;
+//!
 //! static GLOBAL_SEQLOCK: Seqlock<u32> = Seqlock::new(0);
-//!
-//! pub unsafe extern "C" fn xwrust_main() {
-//!     // ...省略...
-//!     GLOBAL_SEQLOCK.init();
-//!     // ...省略...
-//! }
 //! ```
 //!
-//! + 也可以通过 [`alloc::sync::Arc`] 在堆上动态创建顺序锁。
+//! + 也可以使用 [`alloc::sync::Arc`] 在heap中创建：
 //!
 //! ```rust
+//! extern crate alloc;
+//! use alloc::sync::Arc;
+//!
 //! use xwrust::xwos::lock::seqlock::*;
 //!
-//! pub unsafe extern "C" fn xwrust_main() {
-//!     // ...省略...
-//!     let lock: Arc<Seqlock<u32>> = Arc::new(Seqlock::new(0));
-//!     lock.init();
-//!     let lock_child = lock.clone();
-//!
-//!     // ...省略...
-//!     thd::Builder::new()
-//!         .name("child".into())
-//!         .spawn(move |_| {
-//!             // 子线程闭包
-//!            lock_child.lock(SeqlockMode::WriteLock) {
-//!                 Ok(mut guard) => { // 子线程上锁成功
-//!                 }
-//!                 Err(e) => { // 子线程上锁失败
-//!                 }
-//!             }
-//!         });
+//! pub fn xwrust_example_seqlock() {
+//!     let seqlock: Arc<Seqlock<u32>> = Arc::new(Seqlock::new(0));
 //! }
 //! ```
+//!
+//!
+//! # 初始化
+//!
+//! 无论以何种方式创建的自旋锁，都必须在使用前调用 [`Seqlock::init()`] 进行初始化：
+//!
+//! ```rust
+//! pub fn xwrust_example_seqlock() {
+//!     GLOBAL_SEQLOCK.init();
+//!     seqlock.init();
+//! }
+//! ```
+//!
+//!
+//! # 解锁
+//!
+//! 上锁后返回的 [`SeqlockGuard`] 。 [`SeqlockGuard`] 的生命周期结束时，会自动解锁。
+//! 也可调用 [`Seqlock::unlock()`] 主动消费掉 [`SeqlockGuard`] 来解锁。
+//!
+//!
+//! # 上锁
+//!
+//! 上锁的方法 [`Seqlock::lock()`] 除了 **自旋** 等待，改变顺序值外，还会根据上锁模式增加额外操作：
+//!
+//! + 只关闭抢占的模式： [`SeqlockMode::WriteLock`] 以及 [`SeqlockMode::ReadExclusiveLock`]
+//! + 关闭中断底半部的模式： [`SeqlockMode::WriteLockBh`] 以及 [`SeqlockMode::ReadExclusiveLockBh`]
+//! + 关闭全局中断的模式： [`SeqlockMode::WriteLockCpuirq`] 以及 [`SeqlockMode::ReadExclusiveLockCpuirq`]
+//! + 保存中断全局标志并关闭全局中断的模式： [`SeqlockMode::WriteLockCpuirqSave(None)`] 以及 [`SeqlockMode::ReadExclusiveLockCpuirqSave(None)`]
+//!
+//!
+//! # 尝试上锁
+//!
+//! 尝试上锁的方法 [`Seqlock::trylock()`] 只会测试一下锁，不会 **自旋** 等待，上锁成功后还会根据上锁模式增加额外操作：
+//!
+//! + 只关闭抢占的模式： [`SeqlockMode::WriteLock`] 以及 [`SeqlockMode::ReadExclusiveLock`]
+//! + 关闭中断底半部的模式： [`SeqlockMode::WriteLockBh`] 以及 [`SeqlockMode::ReadExclusiveLockBh`]
+//! + 关闭全局中断的模式： [`SeqlockMode::WriteLockCpuirq`] 以及 [`SeqlockMode::ReadExclusiveLockCpuirq`]
+//! + 保存中断全局标志并关闭全局中断的模式： [`SeqlockMode::WriteLockCpuirqSave(None)`] 以及 [`SeqlockMode::ReadExclusiveLockCpuirqSave(None)`]
+//!
+//!
+//! # 示例
+//!
+//! [XWOS/xwam/xwrust-example/xwrust_example_seqlock](https://gitee.com/xwos/XWOS/blob/main/xwam/xwrust-example/xwrust_example_seqlock/src/lib.rs)
 //!
 //! [`SeqlockMode::WriteLockCpuirqSave(None)`]: SeqlockMode::WriteLockCpuirqSave
 //! [`SeqlockMode::ReadExclusiveLockCpuirqSave(None)`]: SeqlockMode::ReadExclusiveLockCpuirqSave
@@ -237,7 +262,7 @@ impl<T: ?Sized> Seqlock<T> {
     ///
     /// static GLOBAL_SEQLOCK: Seqlock<u32>  = Seqlock::new(0);
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_seqlock() {
     ///     // ...省略...
     ///     GLOBAL_SEQLOCK.init();
     ///     // 从此处开始 GLOBAL_SEQLOCK 可正常使用
@@ -319,7 +344,7 @@ impl<T: ?Sized> Seqlock<T> {
     /// use xwrust::xwos::lock::seqlock::*;
     /// static GLOBAL_SEQLOCK: Seqlock<u32> = Seqlock::new(0);
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_seqlock() {
     ///     // ...省略...
     ///     GLOBAL_SEQLOCK.init();
     ///     match GLOBAL_SEQLOCK.lock(SeqlockMode::ReadExclusiveLockCpuirqSave(None)) {
@@ -411,7 +436,7 @@ impl<T: ?Sized> Seqlock<T> {
     /// use xwrust::xwos::lock::seqlock::*;
     /// static GLOBAL_SEQLOCK: Seqlock<u32> = Seqlock::new(0);
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_seqlock() {
     ///     // ...省略...
     ///     GLOBAL_SEQLOCK.init();
     ///     match GLOBAL_SEQLOCK.trylock(SeqlockMode::ReadExclusiveLockCpuirq) {
@@ -539,7 +564,7 @@ impl<T: ?Sized> Seqlock<T> {
     /// use xwrust::xwos::lock::seqlock::*;
     /// static GLOBAL_SEQLOCK: Seqlock<u32> = Seqlock::new(0);
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_seqlock() {
     ///     // ...省略...
     ///     GLOBAL_SEQLOCK.init();
     ///     match GLOBAL_SEQLOCK.lock() {
@@ -707,11 +732,11 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
 
     /// 阻塞当前线程，直到被条件量唤醒。
     ///
-    /// 此方法会消费互斥锁的守卫(Guard)，并当线程阻塞时，在条件量内部释放互斥锁。
-    /// 当条件成立，线程被唤醒，会在条件量内部上锁互斥锁，并重新返回互斥锁的守卫(Guard)。
+    /// 此方法会消费顺序锁的守卫(Guard)，并当线程阻塞时，在条件量内部释放顺序锁。
+    /// 当条件成立，线程被唤醒，会在条件量内部上锁顺序锁，并重新返回顺序锁的守卫(Guard)。
     ///
-    /// + 当返回互斥锁的守卫 [`SeqlockGuard`] 时，互斥锁已经被重新上锁；
-    /// + 当返回 [`Err`] 时，互斥锁未被上锁。
+    /// + 当返回顺序锁的守卫 [`SeqlockGuard`] 时，顺序锁已经被重新上锁；
+    /// + 当返回 [`Err`] 时，顺序锁未被上锁。
     ///
     /// # 错误码
     ///
@@ -728,7 +753,7 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
     /// extern crate alloc;
     /// use alloc::sync::Arc;
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_seqlock() {
     ///     let pair = Arc::new((Seqlock::new(true), Cond::new()));
     ///     pair.0.init();
     ///     pair.1.init();
@@ -821,12 +846,12 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
 
     /// 限时阻塞当前线程，直到被条件量唤醒。
     ///
-    /// 此方法会消费互斥锁的守卫(Guard)，并当线程阻塞时，在条件量内部释放互斥锁。
-    /// 当条件成立，线程被唤醒，会在条件量内部上锁互斥锁，并重新返回互斥锁的守卫(Guard)。
+    /// 此方法会消费顺序锁的守卫(Guard)，并当线程阻塞时，在条件量内部释放顺序锁。
+    /// 当条件成立，线程被唤醒，会在条件量内部上锁顺序锁，并重新返回顺序锁的守卫(Guard)。
     /// 当超时后，将返回错误。
     ///
-    /// + 当返回互斥锁的守卫 [`SeqlockGuard`] 时，互斥锁已经被重新上锁；
-    /// + 当返回 [`Err`] 时，互斥锁未被上锁。
+    /// + 当返回顺序锁的守卫 [`SeqlockGuard`] 时，顺序锁已经被重新上锁；
+    /// + 当返回 [`Err`] 时，顺序锁未被上锁。
     ///
     /// # 错误码
     ///
@@ -844,7 +869,7 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
     /// extern crate alloc;
     /// use alloc::sync::Arc;
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_seqlock() {
     ///     let pair = Arc::new((Seqlock::new(true), Cond::new()));
     ///     pair.0.init();
     ///     pair.1.init();
@@ -939,11 +964,11 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
 
     /// 阻塞当前线程，直到被条件量唤醒，且阻塞不可被中断。
     ///
-    /// 此方法会消费互斥锁的守卫(Guard)，并当线程阻塞时，在条件量内部释放互斥锁。
-    /// 当条件成立，线程被唤醒，会在条件量内部上锁互斥锁，并重新返回互斥锁的守卫(Guard)。
+    /// 此方法会消费顺序锁的守卫(Guard)，并当线程阻塞时，在条件量内部释放顺序锁。
+    /// 当条件成立，线程被唤醒，会在条件量内部上锁顺序锁，并重新返回顺序锁的守卫(Guard)。
     ///
-    /// + 当返回互斥锁的守卫 [`SeqlockGuard`] 时，互斥锁已经被重新上锁；
-    /// + 当返回 [`Err`] 时，互斥锁未被上锁。
+    /// + 当返回顺序锁的守卫 [`SeqlockGuard`] 时，顺序锁已经被重新上锁；
+    /// + 当返回 [`Err`] 时，顺序锁未被上锁。
     ///
     /// # 错误码
     ///
@@ -959,7 +984,7 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
     /// extern crate alloc;
     /// use alloc::sync::Arc;
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_seqlock() {
     ///     let pair = Arc::new((Seqlock::new(true), Cond::new()));
     ///     pair.0.init();
     ///     pair.1.init();

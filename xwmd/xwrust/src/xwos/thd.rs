@@ -15,10 +15,10 @@
 //! });
 //! ```
 //!
-//! 在上述代码中，线程是自动“分离的(detached)”，此线程运行结束后，其资源会被操作系统自动回收。
+//! 在上述代码中，线程是自动 **分离的(detached)** ，此线程运行结束后，其资源会被操作系统自动回收。
 //!
-//! 线程也可以是“可连接的(joinable)”，另一线程可以获取创建线程时返回的 [`ThdHandle`] ，
-//! 然后通过 [`join()`] 方法等待线程运行结束：
+//! 线程也可以是 **可连接的(joinable)** ，另一线程可以获取创建线程时返回的 [`ThdHandle`] ，
+//! 然后通过 [`ThdHandle::join()`] 方法等待线程运行结束：
 //!
 //! ```rust
 //! use xwrust::xwos::thd;
@@ -31,9 +31,9 @@
 //! let rc = handler.join().unwrap(); // 等待线程结束，并获取其返回值，unwrap()不安全
 //! ```
 //!
-//! [`join()`] 方法会返回 [`thd::Result<R>`] ， **R** 是返回值的类型，并放在 [`Ok`] 中。
+//! [`ThdHandle::join()`] 方法会返回 [`thd::Result<R>`] ， **R** 是返回值的类型，并放在 [`Ok`] 中。
 //!
-//! ## 与 [`std::thread`] 的区别
+//! ## 对比 [`std::thread`]
 //!
 //! #### 闭包原型不同
 //!
@@ -75,56 +75,19 @@
 //! #### **spawn()** 失败时的处理方式不同
 //!
 //! + [`std::thread`] **spawn()** 失败时，会直接 [`panic!()`] ；
-//! + XWOS是RTOS，常常运行在MCU上， [`panic!()`] 意味着死机，因此需要处理 [`Err`] ，正确的写法：
+//! + XWOS是RTOS，常常运行在MCU上， [`panic!()`] 意味着死机，因此需要处理 [`Err`] ；
 //!
 //! ```rust
-//! use libc_print::std_name::println;
 //! use xwrust::xwos::thd;
-//! use xwrust::xwos::cthd;
-//! use xwrust::xwtm;
 //!
 //! match thd::Builder::new()
 //!     .name("child".into())
 //!     .spawn(|ele| {
 //!         // 子线程闭包
-//!         println!("Child thread name: {}", ele.name().unwrap());
-//!         let mut count = 0;
-//!         loop {
-//!             cthd::sleep(xwtm::s(1));
-//!             count += 1;
-//!             println!("[child] count: {}", count);
-//!             if cthd::shld_frz() { // 判断是否要冻结子线程
-//!                 cthd::freeze();
-//!             }
-//!             if cthd::shld_stop() { // 判断是否要退出子线程
-//!                 break;
-//!             }
-//!         }
-//!         "OK"
 //!     }) {
 //!         Ok(h) => { // 新建子线程成功
-//!             let mut child = h;
-//!             loop {
-//!                 match child.stop() { // stop() = quit() + join()
-//!                     Ok(r) => {
-//!                         println!("Child thread return: {}", r);
-//!                         break;
-//!                     },
-//!                     Err(e) => {
-//!                         println!("Failed to stop child thread: {}", e.join_state());
-//!                         child = e;
-//!                     },
-//!                 }
-//!                 if cthd::shld_frz() { // 判断是否要冻结主线程
-//!                     cthd::freeze();
-//!                 }
-//!                 if cthd::shld_stop() { // 判断是否要退出主线程
-//!                     break;
-//!                 }
-//!             }
 //!         },
 //!         Err(rc) => { // 新建子线程失败
-//!             println!("Failed to spawn child thread: {}", rc);
 //!         },
 //!     };
 //! ```
@@ -134,6 +97,7 @@
 //! + [`std::thread`] 可捕获子线程的 [`panic!()`] 。
 //! + `xwrust::xwos::thd` 的子线程 [`panic!()`] 后会导致整个代码 **halt** 。
 //! 目前 **#!\[no_std\]** 环境的 **unwind** 支持还不完善，暂时无法实现类似于 [`std::thread`] 的机制。
+//!
 //!
 //! # 线程的工厂模式
 //!
@@ -169,23 +133,65 @@
 //!
 //! # 线程的元素
 //!
-//! 线程的元素 [`ThdElement`] 是存放与线程相关的某些数据的内存空间，例如线程的名称 。
+//! 线程的元素 [`ThdElement`] 是存放与线程相关的私有数据的内存空间，例如线程的名称 。
 //!
 //!
 //! # 线程的句柄
 //!
-//! 线程的句柄 [`ThdHandle`] 功能类似于 [`std::thread::JoinHandle`] ，可通过 [`join()`] 方法等待线程结束。
+//! 线程的句柄 [`ThdHandle`] 功能类似于 [`std::thread::JoinHandle`] ，可用于结束线程。
+//!
+//! ## 通知线程退出
+//!
+//! 方法 [`ThdHandle::quit()`] 可用于父线程通知子线程退出。此方法不会等待子线程退出。
+//! 方法 [`ThdHandle::quit()`] 会为子线程设置 **退出状态** ，并中断 **阻塞状态** 和 **睡眠状态**。
+//! 阻塞和睡眠的方法将以返回值负的 [`EINTR`] 退出。错误码 [`EINTR`] 会被转换为各个可阻塞线程的操作系统对象的错误码：
+//!
+//! + [`MutexError::Interrupt`]
+//! + [`SemError::Interrupt`]
+//! + [`CondError::Interrupt`]
+//!
+//! 但是，当子线程的 **阻塞状态** 是不可被中断的，方法 [`ThdHandle::quit()`] 只会为子线程设置 **退出状态** ，不会发生中断。
+//!
+//! 子线程可以通过 [`cthd::shld_stop()`] 判断是否被设置了 **退出状态** ，可以作为结束线程循环的条件。
+//!
+//! ## 等待线程退出
+//!
+//! 当父线程需要等待子线程退出，并捕获其返回值，需要使用方法 [`ThdHandle::join()`] 。
+//!
+//! + 如果子线程还在运行，此方法会阻塞父线程直到子线程退出。父线程的阻塞状态可被中断；
+//! + 如果子线程已经提前运行至退出，此方法可立即返回子线程的返回值。
+//!
+//! 此方法会消费 [`ThdHandle`] ：
+//!
+//! + 如果此方法执行成功，会消费掉 [`ThdHandle`] ，并将子线程的返回值放在 [`Ok`] 中返回，因为线程已经结束，其 [`ThdHandle`] 的生命周期也应该结束；
+//! + 如果此方法执行失败，会重新在 [`Err`] 中返回 [`ThdHandle`] ，并可通过 [`ThdHandle::join_state()`] 方法获取失败的原因。
+//!
+//! ## 通知并等待线程退出
+//!
+//! 方法 [`ThdHandle::stop()`] 等价于 [`ThdHandle::quit()`] + [`ThdHandle::join()`]
+//!
+//! # 只作用于线程自身的方法
+//!
+//! XWOS RUST有一组方法，只会对调用线程自身起作用，被实现在 [`xwrust::xwos::cthd`] 。命名中的 **c** 是 **current** 的意思。
+//!
+//! # 示例
+//!
+//! [XWOS/xwam/xwrust-example/xwrust_example_thd](https://gitee.com/xwos/XWOS/blob/main/xwam/xwrust-example/xwrust_example_thd/src/lib.rs)
 //!
 //!
 //! [`std::thread`]: <https://doc.rust-lang.org/std/thread/index.html>
 //! [`std::thread::JoinHandle`]: <https://doc.rust-lang.org/std/thread/struct.JoinHandle.html>
 //! [`panic!()`]: <https://doc.rust-lang.org/std/macro.panic.html>
-//! [`join()`]: ThdHandle::join
 //! [`thd::Result<R>`]: Result<R>
 //! [`Ok`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
 //! [`Err`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
 //! [`ele.name()`]: ThdElement::name
-//!
+//! [`EINTR`]: crate::errno::EINTR
+//! [`MutexError::Interrupt`]: crate::xwos::lock::mtx::MutexError::Interrupt
+//! [`SemError::Interrupt`]: crate::xwos::sync::sem::SemError::Interrupt
+//! [`CondError::Interrupt`]: crate::xwos::sync::cond::CondError::Interrupt
+//! [`cthd::shld_stop()`]: crate::xwos::cthd::shld_stop
+//! [`xwrust::xwos::cthd`]: crate::xwos::cthd
 
 extern crate core;
 use core::ffi::*;
@@ -801,13 +807,13 @@ impl<R> ThdHandle<R> {
 
     /// 等待线程运行至退出，并返回线程的返回值。
     ///
-    /// 如果线程已经提前运行完成，此方法立即返回。
+    /// + 如果子线程还在运行，此方法会阻塞父线程直到子线程退出。父线程的阻塞状态可被中断；
+    /// + 如果子线程已经提前运行至退出，此方法可立即返回子线程的返回值。
     ///
+    /// 此方法会消费 [`self`] ：
     ///
-    /// 此方法会转移 [`self`] 的所有权：
-    ///
-    /// + 如果此方法执行成功，会消费掉 [`self`] ，因为线程已经结束，其 [`ThdHandle<R>`] 的生命周期也应该结束；
-    /// + 如果此方法执行失败，会重新返回 [`self`] ，可在后续重新执行此方法。
+    /// + 如果此方法执行成功，会消费掉 [`self`] ，并将子线程的返回值放在 [`Ok`] 中返回，因为线程已经结束，其 [`ThdHandle`] 的生命周期也应该结束；
+    /// + 如果此方法执行失败，会重新在 [`Err`] 中返回 [`self`] ，并可通过 [`ThdHandle::join_state()`] 方法获取失败的原因。
     ///
     /// # 示例
     ///
@@ -834,6 +840,9 @@ impl<R> ThdHandle<R> {
     ///     },
     /// };
     /// ```
+    ///
+    /// [`Ok`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
+    /// [`Err`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
     pub fn join(self) -> Result<R, Self> {
         match self.inner.join() {
             Ok(r) => Ok(r),
@@ -843,15 +852,16 @@ impl<R> ThdHandle<R> {
 
     /// 终止线程并等待线程运行至退出，并返回线程的返回值。
     ///
-    /// 如果线程已经提前运行完成，此方法立即返回。
+    /// + 如果子线程还在运行，此方法会阻塞父线程直到子线程退出。父线程的阻塞状态可被中断；
+    /// + 如果子线程已经提前运行至退出，此方法可立即返回子线程的返回值。
     ///
-    /// 此方法 = [`quit()`] + [`join()`]
+    /// 此方法 = [`ThdHandle::quit()`] + [`ThdHandle::join()`]
     ///
     ///
-    /// 此方法会转移 [`self`] 的所有权：
+    /// 此方法会消费 [`self`] ：
     ///
-    /// + 如果此方法执行成功，会消费掉 [`self`] ，因为线程已经结束，其 [`ThdHandle<R>`] 的生命周期也应该结束；
-    /// + 如果此方法执行失败，会重新返回 [`self`] ，可在后续重新执行此方法。
+    /// + 如果此方法执行成功，会消费掉 [`self`] ，并将子线程的返回值放在 [`Ok`] 中返回，因为线程已经结束，其 [`ThdHandle`] 的生命周期也应该结束；
+    /// + 如果此方法执行失败，会重新在 [`Err`] 中返回 [`self`] ，并可通过 [`ThdHandle::join_state()`] 方法获取失败的原因。
     ///
     /// # 示例
     ///
@@ -878,8 +888,9 @@ impl<R> ThdHandle<R> {
     ///     },
     /// };
     /// ```
-    /// [`quit()`]: ThdHandle<R>::quit
-    /// [`join()`]: ThdHandle<R>::join
+    ///
+    /// [`Ok`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
+    /// [`Err`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
     pub fn stop(self) -> Result<R, Self> {
         match self.inner.stop() {
             Ok(r) => Ok(r),

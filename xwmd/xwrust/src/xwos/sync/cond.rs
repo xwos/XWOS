@@ -17,6 +17,131 @@
 //!   + 顺序锁的独占读锁
 //!   + 顺序锁的写锁
 //!
+//!
+//! # 创建
+//!
+//! XWOS RUST的条件量可使用 [`Cond::new()`] 创建。
+//!
+//! + 可以创建具有静态生命周期 [`'static`] 约束的全局变量：
+//!
+//! ```rust
+//! use xwrust::xwos::sync::cond::*;
+//!
+//! static GLOBAL_COND: Cond  = Cond::new();
+//! ```
+//!
+//! + 也可以使用 [`alloc::sync::Arc`] 在heap中创建：
+//!
+//! ```rust
+//! extern crate alloc;
+//! use alloc::sync::Arc;
+//!
+//! use xwrust::xwos::sync::cond::*;
+//!
+//! pub fn xwrust_example_cond() {
+//!     let cond = Arc::new(Cond::new());
+//!     let cond_c = cond.clone();
+//! }
+//! ```
+//!
+//!
+//! # 初始化
+//!
+//! 无论以何种方式创建的条件量，都必须在使用前调用 [`Cond::init()`] 进行初始化：
+//!
+//! ```rust
+//! pub fn xwrust_example_cond() {
+//!     GLOBAL_COND.init();
+//!     cond.init();
+//! }
+//! ```
+//!
+//!
+//! # 单播
+//!
+//! [`Cond::unicast()`] 方法可用来使得条件量的条件成立，但只唤醒一个线程。此方法可在 **任意** 上下文使用。
+//!
+//!
+//! # 广播
+//!
+//! [`Cond::broadcast()`] 方法可用来使得条件量的条件成立，并唤醒全部线程。此方法可在 **任意** 上下文使用。
+//!
+//!
+//! # 冻结与解冻
+//!
+//! ## 冻结
+//!
+//! XWOS RUST的条件量可以使用方法 [`Cond::freeze()`] 进行 **冻结** 操作，被冻结的条件量不能再进行 **单薄** 和 **广播** 操作。
+//!
+//! ## 解冻
+//!
+//! [`Cond::thaw()`] 方法是**冻结** 操作的逆操作。条件量解冻后，可重新进行 **单薄** 和 **广播** 操作。
+//!
+//!
+//! # 等待
+//!
+//! 等待操作需要在获得锁的情况下进行，因此 **等待** 的方法实现在锁的 **守卫(Guard)** 内部，以便区分锁的类型：
+//!
+//! ## 普通等待
+//!
+//! **普通等待** 的方法只可在 **线程** 上下文中使用，会 **消费** 锁的 **守卫(Guard)** ，然后线程阻塞等待条件量：
+//!
+//! + 通过 **单播** 或 **广播** 可唤醒线程，线程唤醒后，会进行获得锁的操作。当锁是互斥锁时，线程可能又会因无法获得锁而被阻塞。
+//! + 当线程的阻塞等待被中断时，会在 [`Err`] 中返回 [`CondError::Interrupt`] 。
+//! + 获得锁后，会在 [`Ok`] 中重新返回锁的 **守卫(Guard)** 。
+//! + 当发生错误，返回 [`Err`] 时，锁的 **守卫(Guard)** 被 **消费** ，生命周期结束，不再可用。
+//!
+//! 各种锁的 **等待** 条件量的方法：
+//!
+//! + 互斥锁： [`crate::xwos::lock::mtx::MutexGuard::wait()`]
+//! + 自旋锁： [`crate::xwos::lock::spinlock::SpinlockGuard::wait()`]
+//! + 顺序锁的独占读锁： [`crate::xwos::lock::seqlock::SeqlockGuard::wait()`]
+//! + 顺序锁的写锁： [`crate::xwos::lock::seqlock::SeqlockGuard::wait()`]
+//!
+//! ## 超时等待
+//!
+//! **超时等待** 的方法只可在 **线程** 上下文中使用，会 **消费** 锁的 **守卫(Guard)** ，然后线程阻塞等待条件量，等待时会指定一个唤醒时间点：
+//!
+//! + 通过 **单播** 或 **广播** 可唤醒线程，线程唤醒后，会进行获得锁的操作。
+//!   当锁是互斥锁时，线程可能又会因无法获得锁而被阻塞，但到指定的唤醒时间点时一定会超时唤醒。
+//! + 当线程的阻塞等待被中断时，会在 [`Err`] 中返回 [`CondError::Interrupt`] 。
+//! + 当到达指定的唤醒时间点，线程被唤醒，并返回 [`CondError::Timedout`] 。
+//! + 获得锁后，会在 [`Ok`] 中重新返回锁的 **守卫(Guard)** 。
+//! + 当发生错误，返回 [`Err`] 时，锁的 **守卫(Guard)** 被 **消费** ，生命周期结束，不再可用。
+//!
+//! 各种锁的 **等待** 条件量的方法：
+//!
+//! + 互斥锁： [`crate::xwos::lock::mtx::MutexGuard::wait_to()`]
+//! + 自旋锁： [`crate::xwos::lock::spinlock::SpinlockGuard::wait_to()`]
+//! + 顺序锁的独占读锁： [`crate::xwos::lock::seqlock::SeqlockGuard::wait_to()`]
+//! + 顺序锁的写锁： [`crate::xwos::lock::seqlock::SeqlockGuard::wait_to()`]
+//!
+//! ## 不可中断等待
+//!
+//! **不可中断等待** 的方法只可在 **线程** 上下文中使用，会 **消费** 锁的 **守卫(Guard)** ，然后线程阻塞等待条件量，并且不可被中断：
+//!
+//! + 通过 **单播** 或 **广播** 可唤醒线程，线程唤醒后，会进行获得锁的操作。
+//!   当锁是互斥锁时，线程可能又会因无法获得锁而被阻塞，互斥锁的阻塞等待同样是不可被中断的。
+//! + 获得锁后，会在 [`Ok`] 中重新返回锁的 **守卫(Guard)** 。
+//! + 当发生错误，返回 [`Err`] 时，锁的 **守卫(Guard)** 被 **消费** ，生命周期结束，不再可用。
+//!
+//! 各种锁的 **等待** 条件量的方法：
+//!
+//! + 互斥锁： [`crate::xwos::lock::mtx::MutexGuard::wait_unintr()`]
+//! + 自旋锁： [`crate::xwos::lock::spinlock::SpinlockGuard::wait_unintr()`]
+//! + 顺序锁的独占读锁： [`crate::xwos::lock::seqlock::SeqlockGuard::wait_unintr()`]
+//! + 顺序锁的写锁： [`crate::xwos::lock::seqlock::SeqlockGuard::wait_unintr()`]
+//!
+//!
+//! # 示例
+//!
+//! [XWOS/xwam/xwrust-example/xwrust_example_cond](https://gitee.com/xwos/XWOS/blob/main/xwam/xwrust-example/xwrust_example_cond/src/lib.rs)
+//!
+//!
+//! [`'static`]: <https://doc.rust-lang.org/std/keyword.static.html>
+//! [`alloc::sync::Arc`]: <https://doc.rust-lang.org/alloc/sync/struct.Arc.html>
+//! [`Ok`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
+//! [`Err`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
 
 extern crate core;
 use core::ffi::*;
@@ -122,10 +247,22 @@ impl Cond {
     ///
     /// # 示例
     ///
+    /// + 具有 [`'static`] 约束的全局变量全局变量：
+    ///
     /// ```rust
     /// use xwrust::xwos::sync::cond::*;
     ///
     /// static GLOBAL_COND: Cond  = Cond::new();
+    /// ```
+    ///
+    /// + 在heap中创建：
+    ///
+    /// ```rust
+    /// use alloc::sync::Arc;
+    ///
+    /// pub fn xwrust_example_cond() {
+    ///     let cond = Arc::new(Cond::new());
+    /// }
     /// ```
     ///
     /// [`'static`]: https://doc.rust-lang.org/std/keyword.static.html

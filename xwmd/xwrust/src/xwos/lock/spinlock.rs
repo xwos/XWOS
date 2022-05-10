@@ -15,82 +15,78 @@
 //!
 //! + 当临界区只被多个线程访问时，需使用关闭抢占的模式： [`SpinlockMode::Lock`]
 //! + 当临界区被中断底半部访问时，需使用关闭中断底半部的模式： [`SpinlockMode::LockBh`]
-//! + 当临界区被多个线程和单一中断访问时，需使用关闭中断的模式： [`SpinlockMode::LockCpuirq`]
-//! + 当临界区被多个中断上下文访问时，需使用保存中断标志的模式： [`SpinlockMode::LockCpuirqSave(None)`]
+//! + 当临界区被多个线程和单一中断访问时，需使用关闭全局中断的模式： [`SpinlockMode::LockCpuirq`]
+//! + 当临界区被多个中断上下文访问时，需使用保存中断全局标志并关闭全局中断的模式： [`SpinlockMode::LockCpuirqSave(None)`]
 //!
 //!
-//! # 创建方法
+//! # 创建
 //!
-//! **自旋锁** 具有编译期新建的方法，即其 [`Spinlock::new()`] 方法具有 **const fn** 约束。
+//! XWOS RUST的互斥锁可使用 [`Spinlock::new()`] 创建：
 //!
-//! + 可用于定义 [`'static`] 约束的全局共享变量：
+//! + 可以创建具有静态生命周期 [`'static`] 约束的全局变量：
 //!
 //! ```rust
 //! use xwrust::xwos::lock::spinlock::*;
+//!
 //! static GLOBAL_SPINLOCK: Spinlock<u32> = Spinlock::new(0);
-//!
-//! pub unsafe extern "C" fn xwrust_main() {
-//!     // ...省略...
-//!     GLOBAL_SPINLOCK.init();
-//!     match GLOBAL_SPINLOCK.lock() {
-//!         Ok(mut guard) => { // 主线程上锁成功
-//!             *guard = 1; // 访问共享变量
-//!         }
-//!         Err(e) => {
-//!             // 主线程上锁失败
-//!         }
-//!     }
-//!     // ...省略...
-//!     thd::Builder::new()
-//!         .name("child".into())
-//!         .spawn(move |_| {
-//!             // 子线程闭包
-//!             match GLOBAL_SPINLOCK.lock() {
-//!                 Ok(mut guard) => { // 子线程上锁成功
-//!                     *guard += 1;
-//!                 }
-//!                 Err(e) => { // 子线程上锁失败
-//!                 }
-//!             }
-//!         });
-//! }
 //! ```
 //!
-//! + 也可以通过 [`alloc::sync::Arc`] 在堆上动态创建自旋锁。
-//!
+//! + 也可以使用 [`alloc::sync::Arc`] 在heap中创建：
 //!
 //! ```rust
+//! extern crate alloc;
+//! use alloc::sync::Arc;
+//!
 //! use xwrust::xwos::lock::spinlock::*;
 //!
-//! pub unsafe extern "C" fn xwrust_main() {
-//!     // ...省略...
-//!     let lock: Arc<Spinlock<u32>> = Arc::new(Spinlock::new(0));
-//!     lock.init();
-//!     let lock_child = lock.clone();
-//!
-//!     match lock.lock() {
-//!         Ok(mut guard) => { // 主线程上锁成功
-//!             *guard = 1; // 访问共享变量
-//!         }
-//!         Err(e) => {
-//!             // 主线程上锁失败
-//!         }
-//!     }
-//!     // ...省略...
-//!     thd::Builder::new()
-//!         .name("child".into())
-//!         .spawn(move |_| {
-//!             // 子线程闭包
-//!             match lock_child.lock() {
-//!                 Ok(mut guard) => { // 子线程上锁成功
-//!                     *guard += 1;
-//!                 }
-//!                 Err(e) => { // 子线程上锁失败
-//!                 }
-//!             }
-//!         });
+//! pub fn xwrust_example_spinlock() {
+//!     let spinlock: Arc<Spinlock<u32>> = Arc::new(Spinlock::new(0));
 //! }
 //! ```
+//!
+//!
+//! # 初始化
+//!
+//! 无论以何种方式创建的自旋锁，都必须在使用前调用 [`Spinlock::init()`] 进行初始化：
+//!
+//! ```rust
+//! pub fn xwrust_example_spinlock() {
+//!     GLOBAL_SPINLOCK.init();
+//!     spinlock.init();
+//! }
+//! ```
+//!
+//!
+//! # 解锁
+//!
+//! 上锁后返回的 [`SpinlockGuard`] 。 [`SpinlockGuard`] 的生命周期结束时，会自动解锁。
+//! 也可调用 [`Spinlock::unlock()`] 主动消费掉 [`SpinlockGuard`] 来解锁。
+//!
+//!
+//! # 上锁
+//!
+//! 上锁的方法 [`Spinlock::lock()`] 除了 **自旋** 等待，还会根据上锁模式增加额外操作：
+//!
+//! + 只关闭抢占的模式： [`SpinlockMode::Lock`]
+//! + 关闭中断底半部的模式： [`SpinlockMode::LockBh`]
+//! + 关闭全局中断的模式： [`SpinlockMode::LockCpuirq`]
+//! + 保存中断全局标志并关闭全局中断的模式： [`SpinlockMode::LockCpuirqSave(None)`]
+//!
+//!
+//! # 尝试上锁
+//!
+//! 尝试上锁的方法 [`Spinlock::trylock()`] 只会测试一下锁，不会 **自旋** 等待，上锁成功后还会根据上锁模式增加额外操作：
+//!
+//! + 只关闭抢占的模式： [`SpinlockMode::Lock`]
+//! + 关闭中断底半部的模式： [`SpinlockMode::LockBh`]
+//! + 关闭全局中断的模式： [`SpinlockMode::LockCpuirq`]
+//! + 保存中断全局标志并关闭全局中断的模式： [`SpinlockMode::LockCpuirqSave(None)`]
+//!
+//!
+//! # 示例
+//!
+//! [XWOS/xwam/xwrust-example/xwrust_example_spinlock](https://gitee.com/xwos/XWOS/blob/main/xwam/xwrust-example/xwrust_example_spinlock/src/lib.rs)
+//!
 //!
 //! [`SpinlockMode::LockCpuirqSave(None)`]: SpinlockMode::LockCpuirqSave
 //! [`'static`]: https://doc.rust-lang.org/std/keyword.static.html
@@ -221,7 +217,7 @@ impl<T: ?Sized> Spinlock<T> {
     ///
     /// static GLOBAL_SPINLOCK: Spinlock<u32>  = Spinlock::new(0);
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_spinlock() {
     ///     // ...省略...
     ///     GLOBAL_SPINLOCK.init();
     ///     // 从此处开始 GLOBAL_SPINLOCK 可正常使用
@@ -260,7 +256,7 @@ impl<T: ?Sized> Spinlock<T> {
     /// use xwrust::xwos::lock::spinlock::*;
     /// static GLOBAL_SPINLOCK: Spinlock<u32> = Spinlock::new(0);
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_spinlock() {
     ///     // ...省略...
     ///     GLOBAL_SPINLOCK.init();
     ///     match GLOBAL_SPINLOCK.lock() {
@@ -328,7 +324,7 @@ impl<T: ?Sized> Spinlock<T> {
     /// use xwrust::xwos::lock::spinlock::*;
     /// static GLOBAL_SPINLOCK: Spinlock<u32> = Spinlock::new(0);
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_spinlock() {
     ///     // ...省略...
     ///     GLOBAL_SPINLOCK.init();
     ///     match GLOBAL_SPINLOCK.trylock() {
@@ -409,7 +405,7 @@ impl<T: ?Sized> Spinlock<T> {
     /// use xwrust::xwos::lock::spinlock::*;
     /// static GLOBAL_SPINLOCK: Spinlock<u32> = Spinlock::new(0);
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_spinlock() {
     ///     // ...省略...
     ///     GLOBAL_SPINLOCK.init();
     ///     match GLOBAL_SPINLOCK.lock() {
@@ -493,11 +489,11 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
 
     /// 阻塞当前线程，直到被条件量唤醒。
     ///
-    /// 此方法会消费互斥锁的守卫(Guard)，并当线程阻塞时，在条件量内部释放互斥锁。
-    /// 当条件成立，线程被唤醒，会在条件量内部上锁互斥锁，并重新返回互斥锁的守卫(Guard)。
+    /// 此方法会消费自旋锁的守卫(Guard)，并当线程阻塞时，在条件量内部释放自旋锁。
+    /// 当条件成立，线程被唤醒，会在条件量内部上锁自旋锁，并重新返回自旋锁的守卫(Guard)。
     ///
-    /// + 当返回互斥锁的守卫 [`SpinlockGuard`] 时，互斥锁已经被重新上锁；
-    /// + 当返回 [`Err`] 时，互斥锁未被上锁。
+    /// + 当返回自旋锁的守卫 [`SpinlockGuard`] 时，自旋锁已经被重新上锁；
+    /// + 当返回 [`Err`] 时，自旋锁未被上锁。
     ///
     /// # 错误码
     ///
@@ -514,7 +510,7 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
     /// extern crate alloc;
     /// use alloc::sync::Arc;
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_spinlock() {
     ///     let pair = Arc::new((Spinlock::new(true), Cond::new()));
     ///     pair.0.init();
     ///     pair.1.init();
@@ -593,12 +589,12 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
 
     /// 限时阻塞当前线程，直到被条件量唤醒。
     ///
-    /// 此方法会消费互斥锁的守卫(Guard)，并当线程阻塞时，在条件量内部释放互斥锁。
-    /// 当条件成立，线程被唤醒，会在条件量内部上锁互斥锁，并重新返回互斥锁的守卫(Guard)。
+    /// 此方法会消费自旋锁的守卫(Guard)，并当线程阻塞时，在条件量内部释放自旋锁。
+    /// 当条件成立，线程被唤醒，会在条件量内部上锁自旋锁，并重新返回自旋锁的守卫(Guard)。
     /// 当超时后，将返回错误。
     ///
-    /// + 当返回互斥锁的守卫 [`SpinlockGuard`] 时，互斥锁已经被重新上锁；
-    /// + 当返回 [`Err`] 时，互斥锁未被上锁。
+    /// + 当返回自旋锁的守卫 [`SpinlockGuard`] 时，自旋锁已经被重新上锁；
+    /// + 当返回 [`Err`] 时，自旋锁未被上锁。
     ///
     /// # 错误码
     ///
@@ -616,7 +612,7 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
     /// extern crate alloc;
     /// use alloc::sync::Arc;
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_spinlock() {
     ///     let pair = Arc::new((Spinlock::new(true), Cond::new()));
     ///     pair.0.init();
     ///     pair.1.init();
@@ -697,11 +693,11 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
 
     /// 阻塞当前线程，直到被条件量唤醒，且阻塞不可被中断。
     ///
-    /// 此方法会消费互斥锁的守卫(Guard)，并当线程阻塞时，在条件量内部释放互斥锁。
-    /// 当条件成立，线程被唤醒，会在条件量内部上锁互斥锁，并重新返回互斥锁的守卫(Guard)。
+    /// 此方法会消费自旋锁的守卫(Guard)，并当线程阻塞时，在条件量内部释放自旋锁。
+    /// 当条件成立，线程被唤醒，会在条件量内部上锁自旋锁，并重新返回自旋锁的守卫(Guard)。
     ///
-    /// + 当返回互斥锁的守卫 [`SpinlockGuard`] 时，互斥锁已经被重新上锁；
-    /// + 当返回 [`Err`] 时，互斥锁未被上锁。
+    /// + 当返回自旋锁的守卫 [`SpinlockGuard`] 时，自旋锁已经被重新上锁；
+    /// + 当返回 [`Err`] 时，自旋锁未被上锁。
     ///
     /// # 错误码
     ///
@@ -717,7 +713,7 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
     /// extern crate alloc;
     /// use alloc::sync::Arc;
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_spinlock() {
     ///     let pair = Arc::new((Spinlock::new(true), Cond::new()));
     ///     pair.0.init();
     ///     pair.1.init();

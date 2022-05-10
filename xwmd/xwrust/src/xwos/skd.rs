@@ -13,9 +13,7 @@ pub enum Context {
 }
 
 extern "C" {
-    fn xwrustffi_skd_get_context_lc(
-        ctxbuf: *mut XwSq,
-        irqnbuf: *mut XwIrq);
+    fn xwrustffi_skd_get_context_lc(ctxbuf: *mut XwSq, irqnbuf: *mut XwIrq);
     fn xwrustffi_skd_dspmpt_lc();
     fn xwrustffi_skd_enpmpt_lc();
 }

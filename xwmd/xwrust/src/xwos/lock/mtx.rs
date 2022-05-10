@@ -10,46 +10,96 @@
 //! 互斥锁上锁后，可返回一个 **守卫** [`MutexGuard`] ，用于提供 **Scoped Lock** 机制：即只负责上锁，不用管解锁。
 //! 解锁会由 [`MutexGuard`] 在其生命周期结束后自动触发。
 //!
-//! # 创建方法
+//! # 创建
 //!
-//! **互斥锁**具有编译期新建的方法，即其 [`Mutex::new()`] 方法具有 **const fn** 约束。
+//! XWOS RUST的互斥锁可使用 [`Mutex::new()`] 创建。
 //!
-//! + 可用于定义 [`'static`] 约束的全局共享变量：
+//! + 可以创建具有静态生命周期 [`'static`] 约束的全局变量：
 //!
 //! ```rust
-//! use xwrust::xwos::thd;
 //! use xwrust::xwos::lock::mtx::*;
-//! static GLOBAL_MUTEX: Mutex<u32> = Mutex::new(0);
 //!
-//! pub unsafe extern "C" fn xwrust_main() {
-//!     // ...省略...
-//!     GLOBAL_MUTEX.init();
-//!     match GLOBAL_MUTEX.lock() {
-//!         Ok(mut guard) => { // 主线程上锁成功
-//!             *guard = 1; // 访问共享变量
-//!         }
-//!         Err(e) => {
-//!             // 主线程上锁失败
-//!         }
-//!     }
-//!     // ...省略...
-//!     thd::Builder::new()
-//!         .name("child".into())
-//!         .spawn(move |_| {
-//!             // 子线程闭包
-//!             match GLOBAL_MUTEX.lock() {
-//!                 Ok(mut guard) => { // 子线程上锁成功
-//!                     *guard += 1;
-//!                 }
-//!                 Err(e) => { // 子线程上锁失败
-//!                 }
-//!             }
-//!         });
+//! static GLOBAL_MUTEX: Mutex<u32> = Mutex::new(0);
+//! ```
+//!
+//! + 也可以使用 [`alloc::sync::Arc`] 在heap中创建：
+//!
+//!
+//! ```rust
+//! extern crate alloc;
+//! use alloc::sync::Arc;
+//!
+//! use xwrust::xwos::lock::mtx::*;
+//!
+//! pub fn xwrust_example_mutex() {
+//!     let mutex: Arc<Mutex<u32>> = Arc::new(Mutex::new(0));
 //! }
 //! ```
 //!
-//! + 也可以通过 [`alloc::sync::Arc`] 在堆上动态创建互斥锁对象。
 //!
+//! # 初始化
+//!
+//! 无论以何种方式创建的互斥锁，都必须在使用前调用 [`Mutex::init()`] 进行初始化：
+//!
+//! ```rust
+//! pub fn xwrust_example_mutex() {
+//!     GLOBAL_MUTEX.init();
+//!     mutex.init();
+//! }
+//! ```
+//!
+//!
+//! # 解锁
+//!
+//! 上锁后返回的 [`MutexGuard`] 。 [`MutexGuard`] 的生命周期结束时，会自动解锁。
+//! 也可调用 [`Mutex::unlock()`] 主动消费掉 [`MutexGuard`] 来解锁。
+//!
+//!
+//! # 上锁
+//!
+//! ## 普通等待上锁
+//!
+//! [`Mutex::lock()`] 方法只可在 **线程** 上下文中使用：
+//!
+//! + 若线程无法获得锁，会阻塞等待。
+//! + 当锁的占用者解锁时，锁会唤醒优先级最高的线程，并让此线程获得锁。
+//! + 线程获得锁后返回 [`Ok()`] ，并在其中包含锁的守卫 [`MutexGuard`] 。
+//! + 当线程阻塞等待被中断时，会在 [`Err()`] 中返回 [`MutexError::Interrupt`] 。
+//!
+//! ## 超时等待上锁
+//!
+//! [`Mutex::lock_to()`] 方法只可在 **线程** 上下文中使用：
+//!
+//! + 若线程无法获得锁，会阻塞等待，等待时会指定一个唤醒时间点。
+//! + 当锁的占用者解锁时，锁会唤醒优先级最高的线程，并让此线程获得锁。
+//! + 线程获得锁后返回 [`Ok()`] ，并在其中包含锁的守卫 [`MutexGuard`] 。
+//! + 当线程阻塞等待被中断时，会在 [`Err()`] 中返回 [`MutexError::Interrupt`] 。
+//! + 当到达指定的唤醒时间点，线程被唤醒，并返回 [`MutexError::Timedout`] 。
+//!
+//! ## 不可中断等待上锁
+//!
+//! [`Mutex::lock_unintr()`] 方法只可在 **线程** 上下文中使用：
+//!
+//! + 若线程无法获得锁，会阻塞等待，且不可被中断，也不会超时。
+//! + 当锁的占用者解锁时，锁会唤醒优先级最高的线程，并让此线程获得锁。
+//! + 线程获得锁后返回 [`Ok()`] ，并在其中包含锁的守卫 [`MutexGuard`] 。
+//!
+//! ## 尝试等待上锁
+//!
+//! [`Mutex::trylock()`] 方法只可在 **线程** 上下文中使用，不会阻塞线程，只会检测锁是否可被获取：
+//!
+//! + 若线程可获得锁，立即获得锁并在 [`Ok()`] 中返回锁的守卫 [`MutexGuard`] 。
+//! + 若线程无法获得锁，立即在 [`Err()`] 中返回 [`MutexError::WouldBlock`] 。
+//!
+//!
+//! # 示例
+//!
+//! [XWOS/xwam/xwrust-example/xwrust_example_mutex](https://gitee.com/xwos/XWOS/blob/main/xwam/xwrust-example/xwrust_example_mutex/src/lib.rs)
+//!
+//!
+//! # 对比 [`std::sync::Mutex`]
+//!
+//! + XWOS RUST
 //!
 //! ```rust
 //! use xwrust::xwos::thd;
@@ -57,7 +107,7 @@
 //! extern crate alloc;
 //! use alloc::sync::Arc;
 //!
-//! pub unsafe extern "C" fn xwrust_main() {
+//! pub fn xwrust_example_mutex() {
 //!     // ...省略...
 //!     let lock: Arc<Mutex<u32>> = Arc::new(Mutex::new(0));
 //!     let lock_child = lock.clone();
@@ -86,9 +136,7 @@
 //! }
 //! ```
 //!
-//! # 与 [`std::sync::Mutex`] 的区别
-//!
-//! 对比 [`std::sync::Mutex`] 中的例子
+//! + [`std::sync::Mutex`]
 //!
 //! ```rust
 //! use std::sync::{Arc, Mutex};
@@ -121,14 +169,14 @@
 //! ### 构建全局变量的方式
 //!
 //! + [`std::sync::Mutex`] 没有编译期构造函数，因此只能借助宏 [`lazy_static!`] 创建 [`'static`] 约束的全局变量；
-//! + `xwrust::xwos::lock::mtx` 则可以直接在函数外部定义。
+//! + [`xwrust::xwos::lock::mtx`] 则可以直接在函数外部定义。
 //!
 //! ### 中毒锁机制
 //!
 //! + [`std::sync::Mutex`] 提供了 **Poisoned Mutex** 机制。
 //! 当通过 [`std::thread::spawn()`] 创建的子线程在持有 **互斥锁** 时，发生了 [`panic!()`] ，
 //! 此时 **互斥锁** 的状态被称为 **中毒(Poisoned)** 。 [`std::sync::Mutex`] 可在父线程中检测到此错误状态，并尝试恢复。
-//! + `xwrust::xwos::lock::mtx` 不提供此机制，用户必须处理 [`Ok`] 与 [`Err`] ，不可使用 [`unwrap()`]。
+//! + [`xwrust::xwos::lock::mtx`] 不提供此机制，用户必须处理 [`Ok()`] 与 [`Err()`] ，不可使用 [`unwrap()`]。
 //! 因为此机制需要依赖 **unwind** 机制 ，目前 **unwind** 在MCU上还不成熟：
 //!   + Gcc可以在MCU C++中使用 **try-catch**；
 //!   + LLVM（Clan++）还无法支持在MCU C++中使用 **try-catch**；
@@ -140,9 +188,10 @@
 //! [`lazy_static!`]: <https://lib.rs/crates/lazy_static>
 //! [`std::thread::spawn()`]: <https://doc.rust-lang.org/std/thread/fn.spawn.html>
 //! [`panic!()`]: <https://doc.rust-lang.org/core/macro.panic.html>
-//! [`Ok`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
-//! [`Err`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
+//! [`Ok()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
+//! [`Err()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
 //! [`unwrap()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#method.unwrap>
+//! [`xwrust::xwos::lock::mtx`]: crate::xwos::lock::mtx
 
 extern crate core;
 use core::cell::UnsafeCell;
@@ -254,7 +303,7 @@ impl<T: ?Sized> Mutex<T> {
     ///
     /// static GLOBAL_MUTEX: Mutex<u32> = Mutex::new(0);
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_mutex() {
     ///     // ...省略...
     ///     GLOBAL_MUTEX.init();
     ///     // 从此处开始 GLOBAL_MUTEX 可正常使用
@@ -290,7 +339,7 @@ impl<T: ?Sized> Mutex<T> {
     /// use xwrust::xwos::lock::mtx::*;
     /// static GLOBAL_MUTEX: Mutex<u32> = Mutex::new(0);
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_mutex() {
     ///     // ...省略...
     ///     GLOBAL_MUTEX.init();
     ///     match GLOBAL_MUTEX.lock() {
@@ -343,7 +392,7 @@ impl<T: ?Sized> Mutex<T> {
     /// use xwrust::xwos::lock::mtx::*;
     /// static GLOBAL_MUTEX: Mutex<u32> = Mutex::new(0);
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_mutex() {
     ///     // ...省略...
     ///     GLOBAL_MUTEX.init();
     ///     match GLOBAL_MUTEX.trylock() {
@@ -399,7 +448,7 @@ impl<T: ?Sized> Mutex<T> {
     /// use xwrust::xwos::lock::mtx::*;
     /// static GLOBAL_MUTEX: Mutex<u32> = Mutex::new(0);
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_mutex() {
     ///     // ...省略...
     ///     GLOBAL_MUTEX.init();
     ///     match GLOBAL_MUTEX.lock_to(xwtm::ft(xwtm::s(10))) { // 最多等待10s
@@ -453,7 +502,7 @@ impl<T: ?Sized> Mutex<T> {
     /// use xwrust::xwos::lock::mtx::*;
     /// static GLOBAL_MUTEX: Mutex<u32> = Mutex::new(0);
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_mutex() {
     ///     // ...省略...
     ///     GLOBAL_MUTEX.init();
     ///     match GLOBAL_MUTEX.lock_unintr() {
@@ -498,7 +547,7 @@ impl<T: ?Sized> Mutex<T> {
     /// use xwrust::xwos::lock::mtx::*;
     /// static GLOBAL_MUTEX: Mutex<u32> = Mutex::new(0);
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_mutex() {
     ///     // ...省略...
     ///     GLOBAL_MUTEX.init();
     ///     match GLOBAL_MUTEX.lock() {
@@ -576,7 +625,7 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
     /// 当条件成立，线程被唤醒，会在条件量内部上锁互斥锁，并重新返回互斥锁的守卫(Guard)。
     ///
     /// + 当返回互斥锁的守卫 [`MutexGuard`] 时，互斥锁已经被重新上锁；
-    /// + 当返回 [`Err`] 时，互斥锁未被上锁。
+    /// + 当返回 [`Err()`] 时，互斥锁未被上锁。
     ///
     /// # 错误码
     ///
@@ -593,7 +642,7 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
     /// extern crate alloc;
     /// use alloc::sync::Arc;
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_mutex() {
     ///     let pair = Arc::new((Mutex::new(true), Cond::new()));
     ///     pair.0.init();
     ///     pair.1.init();
@@ -636,7 +685,7 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
     /// }
     /// ```
     ///
-    /// [`Err`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
+    /// [`Err()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
     pub fn wait(self, cond: &Cond) -> Result<MutexGuard<'a, T>, CondError> {
         unsafe {
             let mut rc = xwrustffi_cond_acquire(cond.cond.get(), *cond.tik.get());
@@ -676,7 +725,7 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
     /// 当超时后，将返回错误。
     ///
     /// + 当返回互斥锁的守卫 [`MutexGuard`] 时，互斥锁已经被重新上锁；
-    /// + 当返回 [`Err`] 时，互斥锁未被上锁。
+    /// + 当返回 [`Err()`] 时，互斥锁未被上锁。
     ///
     /// # 错误码
     ///
@@ -694,7 +743,7 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
     /// extern crate alloc;
     /// use alloc::sync::Arc;
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_mutex() {
     ///     let pair = Arc::new((Mutex::new(true), Cond::new()));
     ///     pair.0.init();
     ///     pair.1.init();
@@ -737,7 +786,7 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
     /// }
     /// ```
     ///
-    /// [`Err`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
+    /// [`Err()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
     pub fn wait_to(self, cond: &Cond, to: XwTm) -> Result<MutexGuard<'a, T>, CondError> {
         unsafe {
             let mut rc = xwrustffi_cond_acquire(cond.cond.get(), *cond.tik.get());
@@ -778,7 +827,7 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
     /// 当条件成立，线程被唤醒，会在条件量内部上锁互斥锁，并重新返回互斥锁的守卫(Guard)。
     ///
     /// + 当返回互斥锁的守卫 [`MutexGuard`] 时，互斥锁已经被重新上锁；
-    /// + 当返回 [`Err`] 时，互斥锁未被上锁。
+    /// + 当返回 [`Err()`] 时，互斥锁未被上锁。
     ///
     /// # 错误码
     ///
@@ -794,7 +843,7 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
     /// extern crate alloc;
     /// use alloc::sync::Arc;
     ///
-    /// pub unsafe extern "C" fn xwrust_main() {
+    /// pub fn xwrust_example_mutex() {
     ///     let pair = Arc::new((Mutex::new(true), Cond::new()));
     ///     pair.0.init();
     ///     pair.1.init();
@@ -837,7 +886,7 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
     /// }
     /// ```
     ///
-    /// [`Err`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
+    /// [`Err()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
     pub fn wait_unintr(self, cond: &Cond) -> Result<MutexGuard<'a, T>, CondError> {
         unsafe {
             let mut rc = xwrustffi_cond_acquire(cond.cond.get(), *cond.tik.get());
