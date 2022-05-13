@@ -27,7 +27,7 @@ void xwaop__xwu64_t__read(atomic_xwu64_t * a,
                           xwu64_t * ov)
 {
         xwu64_t o;
-        o = xwaop__xwu64_t__load(a, xwmb_modr_acquire);
+        o = xwaop__xwu64_t__load(a, xwaop_mo_acquire);
         if (ov) {
                 *ov = o;
         }

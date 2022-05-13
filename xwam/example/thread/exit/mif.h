@@ -23,6 +23,6 @@
 
 #include <xwos/standard.h>
 
-xwer_t example_thread_exit_start(void);
+xwer_t xwos_example_thd_exit(void);
 
 #endif /* xwam/example/thread/exit/mif.h */

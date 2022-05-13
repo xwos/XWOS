@@ -49,7 +49,7 @@ void xwmp_ttn_init(struct xwmp_ttn * ttn, xwptr_t entry, xwptr_t type)
         xwlib_rbtree_init_node(&ttn->rbn);
         ttn->wkup_xwtm = 0;
         xwaop_store(xwsq_t, &ttn->wkuprs,
-                    xwmb_modr_release, XWMP_TTN_WKUPRS_UNKNOWN);
+                    xwaop_mo_release, XWMP_TTN_WKUPRS_UNKNOWN);
         ttn->cb = NULL;
         ttn->xwtt = NULL;
         ttn->entry.addr = entry & (~XWMP_TTN_TYPE_MASK);
@@ -282,7 +282,7 @@ xwer_t xwmp_tt_remove_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn)
                 }
                 ttn->xwtt = NULL;
                 xwaop_store(xwsq_t, &ttn->wkuprs,
-                            xwmb_modr_release, XWMP_TTN_WKUPRS_INTR);
+                            xwaop_mo_release, XWMP_TTN_WKUPRS_INTR);
                 ttn->cb = NULL;
                 rc = XWOK;
         }
@@ -331,7 +331,7 @@ void xwmp_tt_bh(struct xwmp_tt * xwtt)
                 xwlib_bclst_del_init(&ttn->rbb);
                 cb = ttn->cb;
                 xwaop_store(xwsq_t, &ttn->wkuprs,
-                            xwmb_modr_release, XWMP_TTN_WKUPRS_TIMEDOUT);
+                            xwaop_mo_release, XWMP_TTN_WKUPRS_TIMEDOUT);
                 ttn->cb = NULL;
                 xwmp_sqlk_wr_unlock_cpuirq(&xwtt->lock);
                 cb(xwmp_ttn_get_entry(ttn));

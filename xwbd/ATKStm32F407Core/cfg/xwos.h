@@ -130,7 +130,7 @@
 /******** ******** ******** scheduler ******** ******** ********/
 #define XWUPCFG_SKD_PRIORITY_RT_NUM                     (4U)
 #define XWUPCFG_SKD_IDLE_STACK_SIZE                     (2048U)
-#define XWUPCFG_SKD_BH                                  0
+#define XWUPCFG_SKD_BH                                  1
 #define XWUPCFG_SKD_BH_STACK_SIZE                       (2048U)
 #define XWUPCFG_SKD_PM                                  1
 #define XWUPCFG_SKD_THD_PRIVILEGED_DEFAULT              1

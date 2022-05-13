@@ -28,7 +28,7 @@ void xwaop__xwu8_t__read(atomic_xwu8_t * a,
 {
         xwu8_t o;
 
-        o = xwaop__xwu8_t__load(a, xwmb_modr_acquire);
+        o = xwaop__xwu8_t__load(a, xwaop_mo_acquire);
         if (ov) {
                 *ov = o;
         }

@@ -357,7 +357,7 @@ xwer_t xwup_mtx_unlock(struct xwup_mtx * mtx)
                         xwospl_cpuirq_restore_lc(cpuirq);
                         xwup_skd_enpmpt_lc();
                         /* 如果函数在xwsync_cond_wait_to()中被调用，
-                           当前线程已经不是`XWUP_SKDOBJ_ST_RUNNING'状态，
+                           当前线程已经不是`XWUP_SKDOBJ_ST_RUNNING`状态，
                            xwup_skd_chkpmpt()不起作用。 */
                         xwup_skd_chkpmpt();
                 } else {
@@ -601,6 +601,12 @@ xwer_t xwup_mtx_lock_to(struct xwup_mtx * mtx, xwtm_t to)
                                 rc = -ETIMEDOUT;
                         }/* else {} */
                 }/* else {} */
+        } else if (!xwup_skd_tstpmpt_lc()) {
+                rc = -ECANNOTPMPT;
+#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+        } else if (!xwup_skd_tstbh_lc()) {
+                rc = -ECANNOTBH;
+#endif/* XWUPCFG_SKD_BH */
         } else {
                 rc = xwup_mtx_test(mtx, cthd, to);
         }
@@ -673,8 +679,16 @@ xwer_t xwup_mtx_lock_unintr(struct xwup_mtx * mtx)
 
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
 
-        cthd = xwup_skd_get_cthd_lc();
-        rc = xwup_mtx_test_unintr(mtx, cthd);
+        if (!xwup_skd_tstpmpt_lc()) {
+                rc = -ECANNOTPMPT;
+#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+        } else if (!xwup_skd_tstbh_lc()) {
+                rc = -ECANNOTBH;
+#endif/* XWUPCFG_SKD_BH */
+        } else {
+                cthd = xwup_skd_get_cthd_lc();
+                rc = xwup_mtx_test_unintr(mtx, cthd);
+        }
         return rc;
 }
 

@@ -242,13 +242,13 @@ typedef void (* xwaop_op_f)(void * /* nv */,
 /**
  * @brief 原子操作内存模型
  */
-enum xwmb_memory_order_em {
-        xwmb_modr_relaxed = 0,
-        xwmb_modr_consume,
-        xwmb_modr_acquire,
-        xwmb_modr_release,
-        xwmb_modr_acq_rel,
-        xwmb_modr_seq_cst,
+enum xwaop_memory_order_em {
+        xwaop_mo_relaxed = 0,
+        xwaop_mo_consume,
+        xwaop_mo_acquire,
+        xwaop_mo_release,
+        xwaop_mo_acq_rel,
+        xwaop_mo_seq_cst,
 };
 
 /**

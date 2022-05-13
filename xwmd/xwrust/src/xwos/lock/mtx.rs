@@ -236,6 +236,10 @@ pub enum MutexError {
     Timedout,
     /// 不在线程上下文内
     NotThreadContext,
+    /// 抢占被关闭
+    CannotPmpt,
+    /// 中断底半部被关闭
+    CannotBh,
     /// 未知错误
     Unknown(XwEr),
 }
@@ -332,6 +336,8 @@ impl<T: ?Sized> Mutex<T> {
     /// + [`MutexError::NotInit`] 互斥锁未被初始化
     /// + [`MutexError::Interrupt`] 等待被中断
     /// + [`MutexError::NotThreadContext`] 不在线程上下文中
+    /// + [`MutexError::CannotPmpt`] 抢占被关闭
+    /// + [`MutexError::CannotBh`] 中断底半部被关闭
     ///
     /// # 示例
     ///
@@ -366,6 +372,10 @@ impl<T: ?Sized> Mutex<T> {
                     Err(MutexError::Interrupt)
                 } else if -ENOTTHDCTX == rc {
                     Err(MutexError::NotThreadContext)
+                } else if -ECANNOTPMPT == rc {
+                    Err(MutexError::CannotPmpt)
+                } else if -ECANNOTBH == rc {
+                    Err(MutexError::CannotBh)
                 } else {
                     Err(MutexError::Unknown(rc))
                 }
@@ -440,6 +450,8 @@ impl<T: ?Sized> Mutex<T> {
     /// + [`MutexError::Interrupt`] 等待被中断
     /// + [`MutexError::Timedout`] 等待超时
     /// + [`MutexError::NotThreadContext`] 不在线程上下文中
+    /// + [`MutexError::CannotPmpt`] 抢占被关闭
+    /// + [`MutexError::CannotBh`] 中断底半部被关闭
     ///
     /// # 示例
     ///
@@ -477,6 +489,10 @@ impl<T: ?Sized> Mutex<T> {
                     Err(MutexError::Timedout)
                 } else if -ENOTTHDCTX == rc {
                     Err(MutexError::NotThreadContext)
+                } else if -ECANNOTPMPT == rc {
+                    Err(MutexError::CannotPmpt)
+                } else if -ECANNOTBH == rc {
+                    Err(MutexError::CannotBh)
                 } else {
                     Err(MutexError::Unknown(rc))
                 }
@@ -496,6 +512,8 @@ impl<T: ?Sized> Mutex<T> {
     ///
     /// + [`MutexError::NotInit`] 互斥锁未被初始化
     /// + [`MutexError::NotThreadContext`] 不在线程上下文中
+    /// + [`MutexError::CannotPmpt`] 抢占被关闭
+    /// + [`MutexError::CannotBh`] 中断底半部被关闭
     ///
     /// # 示例
     /// ```rust
@@ -529,6 +547,10 @@ impl<T: ?Sized> Mutex<T> {
                     Err(MutexError::WouldBlock)
                 } else if -ENOTTHDCTX == rc {
                     Err(MutexError::NotThreadContext)
+                } else if -ECANNOTPMPT == rc {
+                    Err(MutexError::CannotPmpt)
+                } else if -ECANNOTBH == rc {
+                    Err(MutexError::CannotBh)
                 } else {
                     Err(MutexError::Unknown(rc))
                 }

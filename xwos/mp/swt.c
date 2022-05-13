@@ -193,13 +193,6 @@ xwer_t xwmp_swt_gc(void * swt)
  * @param[in] flag: 标志
  * @param[in] gcfunc: 垃圾回收函数：当对象应用计数为0，调用此函数回收资源
  * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- * @note
- * - 静态初始化的对象所有资源都是由用户自己提供的，
- *   因此当对象销毁时，垃圾回收函数也需要用户自己提供。
  */
 static __xwmp_code
 xwer_t xwmp_swt_activate(struct xwmp_swt * swt,
@@ -322,7 +315,7 @@ void xwmp_swt_ttn_cb(void * entry)
                 xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
                 swt->ttn.wkup_xwtm = to;
                 xwaop_store(xwsq_t, &swt->ttn.wkuprs,
-                            xwmb_modr_release, XWMP_TTN_WKUPRS_UNKNOWN);
+                            xwaop_mo_release, XWMP_TTN_WKUPRS_UNKNOWN);
                 swt->ttn.cb = xwmp_swt_ttn_cb;
                 rc = xwmp_tt_add_locked(xwtt, &swt->ttn, cpuirq);
                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
@@ -344,6 +337,7 @@ xwer_t xwmp_swt_start(struct xwmp_swt * swt,
         XWOS_VALIDATE((cb), "nullptr", -EFAULT);
         XWOS_VALIDATE(((xwtm_cmp(base, 0) > 0) && (xwtm_cmp(period, 0) > 0)),
                       "out-of-time", -EINVAL);
+
         xwtt = &swt->xwskd->tt;
         to = xwtm_add_safely(base, period);
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
@@ -354,10 +348,9 @@ xwer_t xwmp_swt_start(struct xwmp_swt * swt,
         swt->cb = cb;
         swt->arg = arg;
         swt->period = period;
-        /* 加入时间树 */
         swt->ttn.wkup_xwtm = to;
         xwaop_store(xwsq_t, &swt->ttn.wkuprs,
-                    xwmb_modr_release, XWMP_TTN_WKUPRS_UNKNOWN);
+                    xwaop_mo_release, XWMP_TTN_WKUPRS_UNKNOWN);
         swt->ttn.xwtt = xwtt;
         swt->ttn.cb = xwmp_swt_ttn_cb;
         rc = xwmp_tt_add_locked(xwtt, &swt->ttn, cpuirq);

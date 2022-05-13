@@ -506,6 +506,12 @@ xwer_t xwup_plsem_wait_to(struct xwup_plsem * sem, xwtm_t to)
                                 rc = -ETIMEDOUT;
                         }
                 }
+        } else if (!xwup_skd_tstpmpt_lc()) {
+                rc = -ECANNOTPMPT;
+#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+        } else if (!xwup_skd_tstbh_lc()) {
+                rc = -ECANNOTBH;
+#endif/* XWUPCFG_SKD_BH */
         } else {
                 rc = xwup_plsem_test(sem, xwskd, cthd, to);
         }
@@ -582,8 +588,16 @@ xwer_t xwup_plsem_wait_unintr(struct xwup_plsem * sem)
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
-        cthd = xwup_skd_get_cthd_lc();
-        rc = xwup_plsem_test_unintr(sem, cthd);
+        if (!xwup_skd_tstpmpt_lc()) {
+                rc = -ECANNOTPMPT;
+#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+        } else if (!xwup_skd_tstbh_lc()) {
+                rc = -ECANNOTBH;
+#endif/* XWUPCFG_SKD_BH */
+        } else {
+                cthd = xwup_skd_get_cthd_lc();
+                rc = xwup_plsem_test_unintr(sem, cthd);
+        }
         return rc;
 }
 

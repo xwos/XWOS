@@ -258,6 +258,8 @@ xwer_t xwos_mtx_unlock(struct xwos_mtx * mtx)
  + @retval -EOBJDEAD 互斥锁对象无效
  * @retval -EINTR: 等待被中断
  * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @retval -EDSPMPT: 抢占被关闭
+ * @retval -EDSBH: 中断底半部被关闭
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -308,6 +310,8 @@ xwer_t xwos_mtx_trylock(struct xwos_mtx * mtx)
  * @retval -EINTR: 等待被中断
  * @retval -ETIMEDOUT: 超时
  * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @retval -EDSPMPT: 抢占被关闭
+ * @retval -EDSBH: 中断底半部被关闭
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -329,6 +333,8 @@ xwer_t xwos_mtx_lock_to(struct xwos_mtx * mtx, xwtm_t to)
  * @retval -EFAULT: 无效的指针或空指针
  + @retval -EOBJDEAD 互斥锁对象无效
  * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @retval -EDSPMPT: 抢占被关闭
+ * @retval -EDSBH: 中断底半部被关闭
  * @note
  * - 同步/异步：同步
  * - 上下文：线程

@@ -95,7 +95,7 @@ xwer_t xwmm_sma_alloc(struct xwmm_sma * sa, xwsz_t size, xwsz_t aligned,
 
         size = XWBOP_ALIGN(size, XWMM_ALIGNMENT);
         do {
-                cpos = xwaop_load(xwsq_t, &sa->pos, xwmb_modr_acquire);
+                cpos = xwaop_load(xwsq_t, &sa->pos, xwaop_mo_acquire);
                 tmp = XWBOP_ALIGN((sa->zone.origin + cpos), aligned);
                 npos = size + tmp - sa->zone.origin;
                 if (npos > sa->zone.size) {

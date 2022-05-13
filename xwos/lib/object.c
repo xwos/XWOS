@@ -62,7 +62,7 @@ xwsq_t xwos_objtik_get(void)
         cpu = xwos_skd_id_lc();
         objtik = &xwos_objtik[cpu];
         while (true) {
-                curr = xwaop_load(xwsq_t, objtik, xwmb_modr_relaxed);
+                curr = xwaop_load(xwsq_t, objtik, xwaop_mo_relaxed);
                 max = (curr & (~XWOS_OBJTIK_CHUNK_MSK)) + XWOS_OBJTIK_CHUNK_MSK;
                 rc = xwaop_tlt_then_add(xwsq_t, objtik, max, 1, NULL, &ov);
                 if (rc < 0) {
@@ -70,12 +70,12 @@ xwsq_t xwos_objtik_get(void)
                         xwsq_t chunk;
 
                         xwos_cpuirq_save_lc(&cpuirq);
-                        curr = xwaop_load(xwsq_t, objtik, xwmb_modr_relaxed);
+                        curr = xwaop_load(xwsq_t, objtik, xwaop_mo_relaxed);
                         if (curr == max) {
                                 ov = curr;
                                 xwaop_add(xwsq_t, &xwos_objtik_dispatcher,
                                           XWOS_OBJTIK_CHUNK, NULL, &chunk);
-                                xwaop_store(xwsq_t, objtik, xwmb_modr_relaxed, chunk);
+                                xwaop_store(xwsq_t, objtik, xwaop_mo_relaxed, chunk);
                                 xwos_cpuirq_restore_lc(cpuirq);
                                 break;
                         } else {
@@ -351,5 +351,5 @@ xwer_t xwos_object_rawput(struct xwos_object * obj)
 __xwlib_code
 xwsq_t xwos_object_get_refcnt(struct xwos_object * obj)
 {
-        return xwaop_load(xwsq_t, &obj->refcnt, xwmb_modr_relaxed);
+        return xwaop_load(xwsq_t, &obj->refcnt, xwaop_mo_relaxed);
 }

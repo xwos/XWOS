@@ -55,7 +55,7 @@ xwos_thd_d static_thdd;
 /**
  * @brief 模块的加载函数
  */
-xwer_t example_thread_create_start(void)
+xwer_t xwso_example_thd_create(void)
 {
         struct xwos_thd_attr attr;
         xwer_t rc;

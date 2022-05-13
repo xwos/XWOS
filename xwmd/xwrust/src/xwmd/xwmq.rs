@@ -393,6 +393,7 @@ where
     /// pub fn xwrust_example_xwmq() {
     ///     let (tx, rx) = MQ.init();
     /// }
+    /// ```
     pub fn init(&self) -> (XwmqTx<N, T>, XwmqRx<N, T>) {
         unsafe {
             xwmq_init(self.mq.get(), self.pool.get() as _, N);

@@ -28,7 +28,7 @@ void xwaop__xws16_t__read(atomic_xws16_t * a,
 {
         xws16_t o;
 
-        o = xwaop__xws16_t__load(a, xwmb_modr_acquire);
+        o = xwaop__xws16_t__load(a, xwaop_mo_acquire);
         if (ov) {
                 *ov = o;
         }

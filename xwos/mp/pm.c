@@ -171,7 +171,7 @@ xwsq_t xwmp_pmdm_get_stage(void)
 {
         xwsq_t stage;
 
-        stage = xwaop_load(xwsq_t, &xwmp_pmdm.stage, xwmb_modr_relaxed);
+        stage = xwaop_load(xwsq_t, &xwmp_pmdm.stage, xwaop_mo_relaxed);
         return stage;
 }
 
@@ -208,8 +208,7 @@ void xwmp_pmdm_report_xwskd_suspended(struct xwmp_pmdm * pmdm)
                                 if (pmdm->cb.sleep) {
                                         pmdm->cb.sleep(pmdm->cb.arg);
                                 }/* else {} */
-                                nv = xwaop_load(xwsq_t, &pmdm->stage,
-                                                xwmb_modr_relaxed);
+                                nv = xwaop_load(xwsq_t, &pmdm->stage, xwaop_mo_relaxed);
                         }
                 } else {
                         xwmp_splk_unlock_cpuirqrs(&pmdm->rslock, cpuirq);

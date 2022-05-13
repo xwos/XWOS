@@ -100,7 +100,7 @@ xwer_t xwds_gpio_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         XWDS_VALIDATE((port < soc->gpio.port_num), "out-of-range", -ERANGE);
 
         pinmask &= XWDS_GPIO_PIN_MASK(soc->gpio.pin_num);
-        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
+        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwaop_mo_relaxed);
         if (__xwcc_unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
                 goto err_pinsts;
@@ -204,7 +204,7 @@ xwer_t xwds_gpio_set(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
+        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwaop_mo_relaxed);
         if (__xwcc_unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
                 goto err_pinsts;
@@ -259,7 +259,7 @@ xwer_t xwds_gpio_reset(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
+        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwaop_mo_relaxed);
         if (__xwcc_unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
                 goto err_pinsts;
@@ -314,7 +314,7 @@ xwer_t xwds_gpio_toggle(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
+        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwaop_mo_relaxed);
         if (__xwcc_unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
                 goto err_pinsts;
@@ -373,7 +373,7 @@ xwer_t xwds_gpio_output(struct xwds_soc * soc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
+        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwaop_mo_relaxed);
         if (__xwcc_unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
                 goto err_pinsts;
@@ -431,7 +431,7 @@ xwer_t xwds_gpio_input(struct xwds_soc * soc,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_soc_grab;
         }
-        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwmb_modr_relaxed);
+        pinsts = xwaop_load(xwsq_t, &soc->gpio.pins[port], xwaop_mo_relaxed);
         if (__xwcc_unlikely(pinmask & (~pinsts))) {
                 rc = -EPERM;
                 goto err_pinsts;

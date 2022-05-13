@@ -1339,7 +1339,7 @@
 #define DEFINE_XWAOP_LOAD(type, btype) \
 static __xwlib_inline \
 type xwaop__##type##__load(atomic_##type * a, \
-                           const enum xwmb_memory_order_em mo) \
+                           const enum xwaop_memory_order_em mo) \
 { \
         return (type)xwaop__##btype##__load((atomic_##btype *)a, mo); \
 }
@@ -1353,7 +1353,7 @@ type xwaop__##type##__load(atomic_##type * a, \
 #define DEFINE_XWAOP_STORE(type, btype) \
 static __xwlib_inline \
 type xwaop__##type##__store(atomic_##type * a, \
-                            const enum xwmb_memory_order_em mo, \
+                            const enum xwaop_memory_order_em mo, \
                             type v) \
 { \
         return (type)xwaop__##btype##__store((atomic_##btype *)a, mo, (btype)v); \

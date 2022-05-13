@@ -29,11 +29,11 @@
  * ``` C
  * void (* xwos_pmdm_cb_f)(void * arg);
  * ```
- * - 电源管理要求用户定义四个回调函数，通过API @ref xwos_pm_set_cb()指定：
- *   - resume_cb: 从暂停模式恢复的回调函数
- *   - suspend_cb: 进入暂停模式的回调函数
- *   - wakeup_cb: 唤醒时回调函数
- *   - sleep_cb: 休眠时的回调函数
+ * + 电源管理要求用户定义四个回调函数，通过API @ref xwos_pm_set_cb()指定：
+ *   + resume_cb: 从暂停模式恢复的回调函数
+ *   + suspend_cb: 进入暂停模式的回调函数
+ *   + wakeup_cb: 唤醒时回调函数
+ *   + sleep_cb: 休眠时的回调函数
  */
 typedef xwosdl_pm_cb_f xwos_pm_cb_f;
 
@@ -61,9 +61,7 @@ typedef xwosdl_pm_cb_f xwos_pm_cb_f;
  * @param[in] sleep_cb: 休眠时的回调函数
  * @param[in] arg: 电源管理系统调用回调函数时传递的参数
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 void xwos_pm_set_cb(xwos_pm_cb_f resume_cb,
@@ -79,9 +77,7 @@ void xwos_pm_set_cb(xwos_pm_cb_f resume_cb,
  * @brief XWOS API：暂停XWOS，并将系统切换为低功耗状态
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_pm_suspend(void)
@@ -93,9 +89,7 @@ xwer_t xwos_pm_suspend(void)
  * @brief XWOS API：唤醒系统，并继续运行XWOS
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断
- * - 重入性：不可重入
+ * + 上下文：中断
  */
 static __xwos_inline_api
 xwer_t xwos_pm_resume(void)
@@ -107,9 +101,7 @@ xwer_t xwos_pm_resume(void)
  * @brief XWOS API：获取当前电源管理阶段
  * @return 电源管理阶段 @ref xwos_pm_stage_em
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwsq_t xwos_pm_get_stage(void)

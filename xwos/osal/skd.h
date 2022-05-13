@@ -55,9 +55,9 @@
  */
 
 /**
- * @brief XWOS API：上下文：初始化与反初始化
+ * @brief XWOS API：上下文：启动
  */
-#define XWOS_SKD_CONTEXT_INIT_EXIT      XWOSDL_SKD_CONTEXT_INIT_EXIT
+#define XWOS_SKD_CONTEXT_BOOT           XWOSDL_SKD_CONTEXT_BOOT
 
 /**
  * @brief XWOS API：上下文：线程

@@ -23,6 +23,6 @@
 
 #include <xwos/standard.h>
 
-xwer_t example_thread_create_start(void);
+xwer_t xwso_example_thd_create(void);
 
 #endif /* xwam/example/thread/create/mif.h */

@@ -97,7 +97,7 @@ struct xwmp_skdobj_stack {
  * @brief 调度器上下文枚举
  */
 enum xwmp_skd_context_em {
-        XWMP_SKD_CONTEXT_INIT_EXIT = 0, /**< 初始化与反初始化 */
+        XWMP_SKD_CONTEXT_BOOT = 0, /**< 启动 */
         XWMP_SKD_CONTEXT_THD, /**< 线程 */
         XWMP_SKD_CONTEXT_ISR, /**< 中断 */
         XWMP_SKD_CONTEXT_BH, /**< 中断底半部 */
@@ -171,10 +171,16 @@ struct xwmp_thd * xwmp_skd_get_cthd(struct xwmp_skd * xwskd);
 struct xwmp_thd * xwmp_skd_get_cthd_lc(void);
 struct xwmp_skd * xwmp_skd_dspmpt(struct xwmp_skd * xwskd);
 struct xwmp_skd * xwmp_skd_enpmpt(struct xwmp_skd * xwskd);
+struct xwmp_skd * xwmp_skd_svpmpt(struct xwmp_skd * xwskd, xwsq_t * dis_pmpt_cnt);
+struct xwmp_skd * xwmp_skd_rspmpt(struct xwmp_skd * xwskd, xwsq_t dis_pmpt_cnt);
+bool xwmp_skd_tstpmpt(struct xwmp_skd * xwskd);
 
 #if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
 struct xwmp_skd * xwmp_skd_dsbh(struct xwmp_skd * xwskd);
 struct xwmp_skd * xwmp_skd_enbh(struct xwmp_skd * xwskd);
+struct xwmp_skd * xwmp_skd_svbh(struct xwmp_skd * xwskd, xwsq_t * dis_bh_cnt);
+struct xwmp_skd * xwmp_skd_rsbh(struct xwmp_skd * xwskd, xwsq_t dis_bh_cnt);
+bool xwmp_skd_tstbh(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_req_bh(struct xwmp_skd * xwskd);
 bool xwmp_skd_tst_in_bh(struct xwmp_skd * xwskd);
 #endif

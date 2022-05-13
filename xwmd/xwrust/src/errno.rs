@@ -318,6 +318,10 @@ pub const ENOTBHCTX: XwEr = 803;
 pub const EISRCTX: XwEr = 804;
 /// Not ISR context
 pub const ENOTISRCTX: XwEr = 805;
+/// Cannot preemption
+pub const ECANNOTPMPT: XwEr = 806;
+/// Cannot enter BH
+pub const ECANNOTBH: XwEr = 807;
 
 /// Nil object descriptor
 pub const ENILOBJD: XwEr = 880;
