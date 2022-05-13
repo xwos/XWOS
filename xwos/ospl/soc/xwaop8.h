@@ -17,10 +17,10 @@
 
 /******** ******** ******** ******** unsigned ******** ******** ******** ********/
 xwu8_t xwaop__xwu8_t__load(atomic_xwu8_t * a,
-                           const enum xwmb_memory_order_em mo);
+                           const enum xwaop_memory_order_em mo);
 
 xwu8_t xwaop__xwu8_t__store(atomic_xwu8_t * a,
-                            const enum xwmb_memory_order_em mo,
+                            const enum xwaop_memory_order_em mo,
                             xwu8_t v);
 
 void xwaop__xwu8_t__read(atomic_xwu8_t * a,
@@ -282,10 +282,10 @@ xwer_t xwaop__xwu8_t__tst_then_op(atomic_xwu8_t * a,
 
 /******** ******** ******** ******** signed ******** ******** ******** ********/
 xws8_t xwaop__xws8_t__load(atomic_xws8_t * a,
-                           const enum xwmb_memory_order_em mo);
+                           const enum xwaop_memory_order_em mo);
 
 xws8_t xwaop__xws8_t__store(atomic_xws8_t * a,
-                            const enum xwmb_memory_order_em mo,
+                            const enum xwaop_memory_order_em mo,
                             xws8_t v);
 
 void xwaop__xws8_t__read(atomic_xws8_t * a,

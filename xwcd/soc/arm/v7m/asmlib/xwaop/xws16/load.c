@@ -24,30 +24,30 @@
 
 __xwlib_code
 xws16_t xwaop__xws16_t__load(atomic_xws16_t * a,
-                             const enum xwmb_memory_order_em mo)
+                             const enum xwaop_memory_order_em mo)
 {
         xws16_t v;
 
         switch (mo) {
-        case xwmb_modr_relaxed:
+        case xwaop_mo_relaxed:
                 v = *a;
                 break;
-        case xwmb_modr_consume:
+        case xwaop_mo_consume:
                 v = *a;
                 xwmb_mp_ddb();
                 break;
-        case xwmb_modr_acquire:
+        case xwaop_mo_acquire:
                 v = *a;
                 xwmb_mp_mb();
                 break;
-        case xwmb_modr_release:
+        case xwaop_mo_release:
                 v = *a;
                 break;
-        case xwmb_modr_acq_rel:
+        case xwaop_mo_acq_rel:
                 v = *a;
                 xwmb_mp_mb();
                 break;
-        case xwmb_modr_seq_cst:
+        case xwaop_mo_seq_cst:
                 xwmb_mp_mb();
                 v = *a;
                 xwmb_mp_mb();

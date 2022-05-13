@@ -22,7 +22,7 @@ bool xwbmpaop_t1i(atomic_xwbmp_t * bmp, xwsq_t idx)
         xwbmp_t value;
 
         bmp = bmp + XWBOP_BMP(idx);
-        value = xwaop_load(xwbmp_t, bmp, xwmb_modr_consume);
+        value = xwaop_load(xwbmp_t, bmp, xwaop_mo_consume);
         ret = (bool)(!!(value & XWBOP_BMP_MASK(idx)));
         return ret;
 }
@@ -63,7 +63,7 @@ xwer_t xwbmpaop_t0i_then_s1i(atomic_xwbmp_t * bmp, xwsq_t idx)
         xwer_t rc;
 
         do {
-                o = xwaop_load(xwbmp_t, &bmp[i], xwmb_modr_consume);
+                o = xwaop_load(xwbmp_t, &bmp[i], xwaop_mo_consume);
                 if (!(o & m)) {
                         n = o | m;
                         rc = XWOK;
@@ -84,7 +84,7 @@ xwer_t xwbmpaop_t1i_then_c0i(atomic_xwbmp_t * bmp, xwsq_t idx)
         xwer_t rc;
 
         do {
-                o = xwaop_load(xwbmp_t, &bmp[i], xwmb_modr_consume);
+                o = xwaop_load(xwbmp_t, &bmp[i], xwaop_mo_consume);
                 if (o & m) {
                         n = o & (xwbmp_t)(~m);
                         rc = XWOK;
@@ -114,7 +114,7 @@ xwssq_t xwbmpaop_fls_then_c0i(atomic_xwbmp_t * bmp, xwsz_t num)
                 }
                 do {
                         i--;
-                        o = xwaop_load(xwbmp_t, &bmp[i], xwmb_modr_consume);
+                        o = xwaop_load(xwbmp_t, &bmp[i], xwaop_mo_consume);
                         o &= msk;
                         if (o) {
                                 pos = xwbop_fls(xwbmp_t, o);
@@ -152,7 +152,7 @@ xwssq_t xwbmpaop_flz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num)
                 }
                 do {
                         i--;
-                        o = xwaop_load(xwbmp_t, &bmp[i], xwmb_modr_consume);
+                        o = xwaop_load(xwbmp_t, &bmp[i], xwaop_mo_consume);
                         tmp = (xwbmp_t)(~o) & msk;
                         if (tmp) {
                                 pos = xwbop_fls(xwbmp_t, tmp);
@@ -194,7 +194,7 @@ xwssq_t xwbmpaop_ffs_then_c0i(atomic_xwbmp_t * bmp, xwsz_t num)
                         } else {
                                 msk = (xwbmp_t)(~(xwbmp_t)0);
                         }
-                        o = xwaop_load(xwbmp_t, &bmp[i], xwmb_modr_consume);
+                        o = xwaop_load(xwbmp_t, &bmp[i], xwaop_mo_consume);
                         o &= msk;
                         if (o) {
                                 pos = xwbop_ffs(xwbmp_t, o);
@@ -236,7 +236,7 @@ xwssq_t xwbmpaop_ffz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num)
                         } else {
                                 msk = (xwbmp_t)(~(xwbmp_t)0);
                         }
-                        o = xwaop_load(xwbmp_t, &bmp[i], xwmb_modr_consume);
+                        o = xwaop_load(xwbmp_t, &bmp[i], xwaop_mo_consume);
                         tmp = (xwbmp_t)(~o) & msk;
                         if (tmp) {
                                 pos = xwbop_ffs(xwbmp_t, tmp);

@@ -125,7 +125,7 @@ void xwmp_skd_bh_yield(struct xwmp_skd * xwskd);
 #endif
 
 static __xwmp_code
-bool xwmp_skd_do_chkpmpt(struct xwmp_skd * xwskd, struct xwmp_thd * t);
+bool xwmp_skd_chkpmpt_thd(struct xwmp_skd * xwskd, struct xwmp_thd * t);
 
 static __xwmp_code
 xwer_t xwmp_skd_check_swcx(struct xwmp_skd * xwskd,
@@ -133,7 +133,7 @@ xwer_t xwmp_skd_check_swcx(struct xwmp_skd * xwskd,
                            struct xwmp_thd ** pmthd);
 
 static __xwmp_code
-xwer_t xwmp_skd_do_swcx(struct xwmp_skd * xwskd);
+xwer_t xwmp_skd_swcx(struct xwmp_skd * xwskd);
 
 static __xwmp_code
 void xwmp_skd_finish_swcx_lic(struct xwmp_skd * xwskd);
@@ -503,17 +503,17 @@ void xwmp_skd_init_bhd(struct xwmp_skd * xwskd)
         xwskd->bh.arg = xwskd;
         xwskd->bh.size = XWMPCFG_SKD_BH_STACK_SIZE;
         xwskd->bh.base = (xwstk_t *)xwmp_skd_bhd_stack[xwskd->id];
-#if defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK)
+#  if defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK)
         xwskd->bh.sp = xwskd->bh.base + (xwskd->bh.size / sizeof(xwstk_t));
-#elif defined(XWMMCFG_ED_STACK) && (1 == XWMMCFG_ED_STACK)
+#  elif defined(XWMMCFG_ED_STACK) && (1 == XWMMCFG_ED_STACK)
         xwskd->bh.sp = xwskd->bh.base + (xwskd->bh.size / sizeof(xwstk_t)) - 1;
-#elif defined(XWMMCFG_FA_STACK) && (1 == XWMMCFG_FA_STACK)
+#  elif defined(XWMMCFG_FA_STACK) && (1 == XWMMCFG_FA_STACK)
         xwskd->bh.sp = xwskd->bh.base - 1;
-#elif defined(XWMMCFG_EA_STACK) && (1 == XWMMCFG_EA_STACK)
+#  elif defined(XWMMCFG_EA_STACK) && (1 == XWMMCFG_EA_STACK)
         xwskd->bh.sp = xwskd->bh.base;
-#else
-#  error "Unknown stack type!"
-#endif
+#  else
+#    error "Unknown stack type!"
+#  endif
         xwskd->bh.guard = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
         xwskd->bh.flag = XWMP_SKDOBJ_FLAG_PRIVILEGED;
         xwospl_skd_init_stack(&xwskd->bh, xwmp_cthd_return);
@@ -531,28 +531,9 @@ __xwmp_api
 struct xwmp_skd * xwmp_skd_dsbh_lc(void)
 {
         struct xwmp_skd * xwskd;
-        xwid_t cpuid;
-        bool retry;
 
-        cpuid = xwmp_skd_id_lc();
-        xwmb_mp_ddb();
-        do {
-                xwskd = &xwmp_skd[cpuid];
-                xwaop_add(xwsq_t, &xwskd->dis_bh_cnt, 1, NULL, NULL);
-                cpuid = xwmp_skd_id_lc();
-                xwmb_mp_ddb();
-                if (__xwcc_unlikely(xwskd->id != cpuid)) {
-                        xwaop_sub(xwsq_t, &xwskd->dis_bh_cnt, 1, NULL, NULL);
-                        if ((!xwmp_skd_tst_in_bh(xwskd)) &&
-                            (0 != xwaop_load(xwsq_t, &xwskd->req_bh_cnt,
-                                             xwmb_modr_acquire))) {
-                                xwmp_skd_sw_bh(xwskd);
-                        }/* else {} */
-                        retry = true;
-                } else {
-                        retry = false;
-                }
-        } while (retry);
+        xwskd = xwmp_skd_get_lc();
+        xwmp_skd_dsbh(xwskd);
         return xwskd;
 }
 
@@ -568,22 +549,16 @@ __xwmp_api
 struct xwmp_skd * xwmp_skd_enbh_lc(void)
 {
         struct xwmp_skd * xwskd;
-        xwsq_t nv;
 
         xwskd = xwmp_skd_get_lc();
-        xwaop_sub(xwsq_t, &xwskd->dis_bh_cnt, 1, &nv, NULL);
-        if (0 == nv) {
-                if (0 != xwaop_load(xwsq_t, &xwskd->req_bh_cnt, xwmb_modr_acquire)) {
-                        xwmp_skd_sw_bh(xwskd);
-                }/* else {} */
-        }
+        xwmp_skd_enbh(xwskd);
         return xwskd;
 }
 
 /**
- * @brief 禁止调度器进入中断底半部
+ * @brief 关闭调度器进入中断底半部
  * @param[in] xwskd: XWOS MP调度器的指针
- * @return XWMP调度器的指针
+ * @return XWOS MP调度器的指针
  */
 __xwmp_code
 struct xwmp_skd * xwmp_skd_dsbh(struct xwmp_skd * xwskd)
@@ -593,9 +568,9 @@ struct xwmp_skd * xwmp_skd_dsbh(struct xwmp_skd * xwskd)
 }
 
 /**
- * @brief 允许调度器的中断底半部
+ * @brief 开启调度器的中断底半部
  * @param[in] xwskd: XWOS MP调度器的指针
- * @return XWMP调度器的指针
+ * @return XWOS MP调度器的指针
  */
 __xwmp_code
 struct xwmp_skd * xwmp_skd_enbh(struct xwmp_skd * xwskd)
@@ -604,11 +579,57 @@ struct xwmp_skd * xwmp_skd_enbh(struct xwmp_skd * xwskd)
 
         xwaop_sub(xwsq_t, &xwskd->dis_bh_cnt, 1, &nv, NULL);
         if (0 == nv) {
-                if (0 != xwaop_load(xwsq_t, &xwskd->req_bh_cnt, xwmb_modr_acquire)) {
+                if (0 != xwaop_load(xwsq_t, &xwskd->req_bh_cnt, xwaop_mo_acquire)) {
                         xwmp_skd_sw_bh(xwskd);
                 }/* else {} */
         }
         return xwskd;
+}
+
+/**
+ * @brief 保存禁止计数，然后关闭调度器的中断底半部
+ * @param[in] xwskd: XWOS MP调度器的指针
+ * @param[out] dis_bh_cnt: 指向缓冲区的指针，此缓冲区用于返回禁止中断底半部计数
+ * @return XWOS MP调度器的指针
+ */
+__xwmp_code
+struct xwmp_skd * xwmp_skd_svbh(struct xwmp_skd * xwskd, xwsq_t * dis_bh_cnt)
+{
+        xwaop_add(xwsq_t, &xwskd->dis_bh_cnt, 1, NULL, dis_bh_cnt);
+        return xwskd;
+}
+
+/**
+ * @brief 恢复调度器的中断底半部禁止计数
+ * @param[in] xwskd: XWOS MP调度器的指针
+ * @param[in] dis_bh_cnt: 禁止中断底半部计数
+ * @return XWOS MP调度器的指针
+ */
+__xwmp_code
+struct xwmp_skd * xwmp_skd_rsbh(struct xwmp_skd * xwskd, xwsq_t dis_bh_cnt)
+{
+        xwaop_write(xwsq_t, &xwskd->dis_bh_cnt, dis_bh_cnt, NULL);
+        if (0 == dis_bh_cnt) {
+                if (0 != xwaop_load(xwsq_t, &xwskd->req_bh_cnt, xwaop_mo_acquire)) {
+                        xwmp_skd_sw_bh(xwskd);
+                }/* else {} */
+        }
+        return xwskd;
+}
+
+/**
+ * @brief 测试调度器是否允许中断底半部
+ * @param[in] xwskd: XWOS MP调度器的指针
+ * @retval true: 允许
+ * @retval false: 禁止
+ */
+__xwmp_code
+bool xwmp_skd_tstbh(struct xwmp_skd * xwskd)
+{
+        xwsq_t cnt;
+
+        cnt = xwaop_load(xwsq_t, &xwskd->dis_bh_cnt, xwaop_mo_acquire);
+        return (0 == cnt);
 }
 
 /**
@@ -619,10 +640,6 @@ struct xwmp_skd * xwmp_skd_enbh(struct xwmp_skd * xwskd)
  * @retval -EPERM: 中断底半部已被禁止
  * @retval -EINPROGRESS: 切换上下文的过程正在进行中
  * @retval -EALREADY: 当前上下文已经是中断底半部上下文
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
  */
 static __xwmp_code
 xwer_t xwmp_skd_sw_bh(struct xwmp_skd * xwskd)
@@ -630,7 +647,7 @@ xwer_t xwmp_skd_sw_bh(struct xwmp_skd * xwskd)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        if (0 == xwaop_load(xwsq_t, &xwskd->dis_bh_cnt, xwmb_modr_relaxed)) {
+        if (0 == xwaop_load(xwsq_t, &xwskd->dis_bh_cnt, xwaop_mo_relaxed)) {
                 xwmp_rawly_lock_cpuirqsv(&xwskd->cxlock, &cpuirq);
                 if (__xwcc_unlikely(NULL != xwskd->pstk)) {
                         xwmp_rawly_unlock_cpuirqrs(&xwskd->cxlock, cpuirq);
@@ -706,33 +723,15 @@ bool xwmp_skd_tst_in_bh_lc(void)
         xwskd = xwmp_skd_get_lc();
         return !!(XWMP_SKD_BH_STK(xwskd) == xwskd->cstk);
 }
-#endif
+#endif /* XWMPCFG_SKD_BH */
 
 __xwmp_api
 struct xwmp_skd * xwmp_skd_dspmpt_lc(void)
 {
         struct xwmp_skd * xwskd;
-        xwid_t cpuid;
-        bool retry;
 
-        cpuid = xwmp_skd_id_lc();
-        xwmb_mp_ddb();
-        do {
-                xwskd = &xwmp_skd[cpuid];
-                xwaop_add(xwsq_t, &xwskd->dis_pmpt_cnt, 1, NULL, NULL);
-                cpuid = xwmp_skd_id_lc();
-                xwmb_mp_ddb();
-                if (__xwcc_unlikely(xwskd->id != cpuid)) {
-                        xwaop_sub(xwsq_t, &xwskd->dis_pmpt_cnt, 1, NULL, NULL);
-                        if (0 != xwaop_load(xwsq_t, &xwskd->req_chkpmpt_cnt,
-                                            xwmb_modr_acquire)) {
-                                xwmp_skd_chkpmpt(xwskd);
-                        }/* else {} */
-                        retry = true;
-                } else {
-                        retry = false;
-                }
-        } while (retry);
+        xwskd = xwmp_skd_get_lc();
+        xwmp_skd_dspmpt(xwskd);
         return xwskd;
 }
 
@@ -740,23 +739,16 @@ __xwmp_api
 struct xwmp_skd * xwmp_skd_enpmpt_lc(void)
 {
         struct xwmp_skd * xwskd;
-        xwsq_t nv;
 
         xwskd = xwmp_skd_get_lc();
-        xwaop_sub(xwsq_t, &xwskd->dis_pmpt_cnt, 1, &nv, NULL);
-        if (0 == nv) {
-                if (0 != xwaop_load(xwsq_t, &xwskd->req_chkpmpt_cnt,
-                                    xwmb_modr_acquire)) {
-                        xwmp_skd_chkpmpt(xwskd);
-                }/* else {} */
-        }
+        xwmp_skd_enpmpt(xwskd);
         return xwskd;
 }
 
 /**
- * @brief 禁止调度器的抢占
+ * @brief 关闭调度器的抢占
  * @param[in] xwskd: XWOS MP调度器的指针
- * @return XWMP调度器的指针
+ * @return XWOS MP调度器的指针
  */
 __xwmp_code
 struct xwmp_skd * xwmp_skd_dspmpt(struct xwmp_skd * xwskd)
@@ -766,9 +758,9 @@ struct xwmp_skd * xwmp_skd_dspmpt(struct xwmp_skd * xwskd)
 }
 
 /**
- * @brief 允许调度器的抢占
+ * @brief 开启调度器的抢占
  * @param[in] xwskd: XWOS MP调度器的指针
- * @return XWMP调度器的指针
+ * @return XWOS MP调度器的指针
  */
 __xwmp_code
 struct xwmp_skd * xwmp_skd_enpmpt(struct xwmp_skd * xwskd)
@@ -778,11 +770,58 @@ struct xwmp_skd * xwmp_skd_enpmpt(struct xwmp_skd * xwskd)
         xwaop_sub(xwsq_t, &xwskd->dis_pmpt_cnt, 1, &nv, NULL);
         if (0 == nv) {
                 if (0 != xwaop_load(xwsq_t, &xwskd->req_chkpmpt_cnt,
-                                    xwmb_modr_acquire)) {
+                                    xwaop_mo_acquire)) {
                         xwmp_skd_chkpmpt(xwskd);
                 }/* else {} */
         }
         return xwskd;
+}
+
+/**
+ * @brief 保存禁止计数，并关闭调度器的抢占
+ * @param[in] xwskd: XWOS MP调度器的指针
+ * @param[out] dis_pmpt_cnt: 指向缓冲区的指针，此缓冲区用于返回禁止抢占计数
+ * @return XWOS MP调度器的指针
+ */
+__xwmp_code
+struct xwmp_skd * xwmp_skd_svpmpt(struct xwmp_skd * xwskd, xwsq_t * dis_pmpt_cnt)
+{
+        xwaop_add(xwsq_t, &xwskd->dis_pmpt_cnt, 1, NULL, dis_pmpt_cnt);
+        return xwskd;
+}
+
+/**
+ * @brief 恢复调度器的抢占禁止计数
+ * @param[in] xwskd: XWOS MP调度器的指针
+ * @param[in] dis_pmpt_cnt: 禁止抢占计数
+ * @return XWOS MP调度器的指针
+ */
+__xwmp_code
+struct xwmp_skd * xwmp_skd_rspmpt(struct xwmp_skd * xwskd, xwsq_t dis_pmpt_cnt)
+{
+        xwaop_write(xwsq_t, &xwskd->dis_pmpt_cnt, dis_pmpt_cnt, NULL);
+        if (0 == dis_pmpt_cnt) {
+                if (0 != xwaop_load(xwsq_t, &xwskd->req_chkpmpt_cnt,
+                                    xwaop_mo_acquire)) {
+                        xwmp_skd_chkpmpt(xwskd);
+                }/* else {} */
+        }
+        return xwskd;
+}
+
+/**
+ * @brief 测试调度器是否允许抢占
+ * @param[in] xwskd: XWOS MP调度器的指针
+ * @retval true: 允许
+ * @retval false: 禁止
+ */
+__xwmp_code
+bool xwmp_skd_tstpmpt(struct xwmp_skd * xwskd)
+{
+        xwsq_t cnt;
+
+        cnt = xwaop_load(xwsq_t, &xwskd->dis_pmpt_cnt, xwaop_mo_acquire);
+        return (0 == cnt);
 }
 
 /**
@@ -796,7 +835,7 @@ struct xwmp_skd * xwmp_skd_enpmpt(struct xwmp_skd * xwskd)
  * - 此函数被调用时需要获得锁xwskd->cxlock并且关闭本地CPU的中断。
  */
 static __xwmp_code
-bool xwmp_skd_do_chkpmpt(struct xwmp_skd * xwskd, struct xwmp_thd * t)
+bool xwmp_skd_chkpmpt_thd(struct xwmp_skd * xwskd, struct xwmp_thd * t)
 {
         struct xwmp_rtrq * xwrtrq;
         bool sched;
@@ -836,7 +875,7 @@ void xwmp_skd_chkpmpt(struct xwmp_skd * xwskd)
         xwreg_t cpuirq;
         bool sched;
 
-        if (0 != xwaop_load(xwsq_t, &xwskd->dis_pmpt_cnt, xwmb_modr_acquire)) {
+        if (0 != xwaop_load(xwsq_t, &xwskd->dis_pmpt_cnt, xwaop_mo_acquire)) {
                 xwaop_add(xwsq_t, &xwskd->req_chkpmpt_cnt, 1, NULL, NULL);
         } else {
                 xwmp_rawly_lock_cpuirqsv(&xwskd->cxlock, &cpuirq);
@@ -851,7 +890,7 @@ void xwmp_skd_chkpmpt(struct xwmp_skd * xwskd)
 #endif
                 if (XWMP_SKD_IDLE_STK(xwskd) != cstk) {
                         t = xwcc_baseof(cstk, struct xwmp_thd, stack);
-                        sched = xwmp_skd_do_chkpmpt(xwskd, t);
+                        sched = xwmp_skd_chkpmpt_thd(xwskd, t);
                 } else {
                         sched = true;
                 }
@@ -934,7 +973,7 @@ xwer_t xwmp_skd_check_swcx(struct xwmp_skd * xwskd,
  * - 此函数被调用时需要获得锁xwskd->cxlock并且关闭本地CPU的中断。
  */
 static __xwmp_code
-xwer_t xwmp_skd_do_swcx(struct xwmp_skd * xwskd)
+xwer_t xwmp_skd_swcx(struct xwmp_skd * xwskd)
 {
         struct xwmp_thd * swthd, * cthd;
         xwer_t rc;
@@ -1007,15 +1046,11 @@ struct xwmp_skd * xwmp_skd_post_swcx_lic(struct xwmp_skd * xwskd)
  * @brief 请求切换上下文
  * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
- * @retval OK: 需要触发切换上下文的中断执行切换上下文的过程
+ * @retval XWOK: 需要触发切换上下文的中断执行切换上下文的过程
  * @retval -EBUSY: 当前上下文为中断底半部上下文
  * @retval -EINVAL: 当前正在运行的线程状态错误
  * @retval -EAGAIN: 不需要切换上下文
  * @retval -EEINPROGRESS: 切换上下文的过程正在进行
- * @note
- * - 同步/异步：异步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
  */
 __xwmp_code
 xwer_t xwmp_skd_req_swcx(struct xwmp_skd * xwskd)
@@ -1033,7 +1068,7 @@ xwer_t xwmp_skd_req_swcx(struct xwmp_skd * xwskd)
                 rc = -EBUSY;
         } else {
                 xwskd->pstk = err_ptr(-EINVAL); /* Invalidate other caller. */
-                rc = xwmp_skd_do_swcx(xwskd);
+                rc = xwmp_skd_swcx(xwskd);
                 xwmp_rawly_unlock_cpuirqrs(&xwskd->cxlock, cpuirq);
                 if (XWOK == rc) {
                         xwospl_skd_req_swcx(xwskd);
@@ -1063,7 +1098,7 @@ void xwmp_skd_finish_swcx_lic(struct xwmp_skd * xwskd)
         } else if (XWMP_SKD_BH_STK(xwskd) == xwskd->pstk) {
                 /* Finish switching context from BH to thread */
                 xwskd->pstk = NULL;
-                rbc = xwaop_load(xwsq_t, &xwskd->req_bh_cnt, xwmb_modr_relaxed);
+                rbc = xwaop_load(xwsq_t, &xwskd->req_bh_cnt, xwaop_mo_relaxed);
                 if (rbc >= 1) {
                         xwmp_rawly_unlock_cpuirqrs(&xwskd->cxlock, cpuirq);
                         xwmp_skd_sw_bh(xwskd);
@@ -1078,7 +1113,7 @@ void xwmp_skd_finish_swcx_lic(struct xwmp_skd * xwskd)
                 /* Finish switching context from thread to thread */
                 xwskd->pstk = NULL;
                 xwskd->req_schedule_cnt--;
-                rbc = xwaop_load(xwsq_t, &xwskd->req_bh_cnt, xwmb_modr_relaxed);
+                rbc = xwaop_load(xwsq_t, &xwskd->req_bh_cnt, xwaop_mo_relaxed);
                 if (rbc >= 1) {
                         xwmp_rawly_unlock_cpuirqrs(&xwskd->cxlock, cpuirq);
                         xwmp_skd_sw_bh(xwskd);
@@ -1096,14 +1131,10 @@ void xwmp_skd_finish_swcx_lic(struct xwmp_skd * xwskd)
  * @brief 请求切换上下文
  * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
- * @retval OK: 需要触发切换上下文的中断执行切换上下文的过程
+ * @retval XWOK: 需要触发切换上下文的中断执行切换上下文的过程
  * @retval -EINVAL: 当前正在运行的线程状态错误
  * @retval -EAGAIN: 不需要切换上下文
  * @retval -EEINPROGRESS: 切换上下文的过程正在进行
- * @note
- * - 同步/异步：异步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
  */
 __xwmp_code
 xwer_t xwmp_skd_req_swcx(struct xwmp_skd * xwskd)
@@ -1118,7 +1149,7 @@ xwer_t xwmp_skd_req_swcx(struct xwmp_skd * xwskd)
                 rc = -EINPROGRESS;
         } else {
                 xwskd->pstk = err_ptr(-EINVAL); /* Invalidate other caller. */
-                rc = xwmp_skd_do_swcx(xwskd);
+                rc = xwmp_skd_swcx(xwskd);
                 xwmp_rawly_unlock_cpuirqrs(&xwskd->cxlock, cpuirq);
                 if (XWOK == rc) {
                         xwospl_skd_req_swcx(xwskd);
@@ -1160,10 +1191,6 @@ void xwmp_skd_finish_swcx_lic(struct xwmp_skd * xwskd)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval <0: 当前调度器正在进入低功耗模式
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
  */
 __xwmp_code
 xwer_t xwmp_skd_inc_wklkcnt(struct xwmp_skd * xwskd)
@@ -1182,10 +1209,6 @@ xwer_t xwmp_skd_inc_wklkcnt(struct xwmp_skd * xwskd)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval <0: 当前调度器正在进入低功耗
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
  */
 __xwmp_code
 xwer_t xwmp_skd_dec_wklkcnt(struct xwmp_skd * xwskd)
@@ -1468,7 +1491,7 @@ xwsq_t xwmp_skd_get_pm_state(struct xwmp_skd * xwskd)
 {
         xwsq_t wklkcnt;
 
-        wklkcnt = xwaop_load(xwsq_t, &xwskd->pm.wklkcnt, xwmb_modr_acquire);
+        wklkcnt = xwaop_load(xwsq_t, &xwskd->pm.wklkcnt, xwaop_mo_acquire);
         return wklkcnt;
 }
 
@@ -1497,7 +1520,7 @@ void xwmp_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
                                 ctx = XWMP_SKD_CONTEXT_THD;
                         }
                 } else {
-                        ctx = XWMP_SKD_CONTEXT_INIT_EXIT;
+                        ctx = XWMP_SKD_CONTEXT_BOOT;
                 }
         }
         if (ctxbuf) {

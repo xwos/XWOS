@@ -31,7 +31,7 @@ bool xwbmpaop_t1i(atomic_xwbmp_t * bmp, xwsq_t idx)
         xwbmp_t value;
 
         bmp = bmp + XWBOP_BMP(idx);
-        value = xwaop_load(xwbmp_t, bmp, xwmb_modr_consume);
+        value = xwaop_load(xwbmp_t, bmp, xwaop_mo_consume);
         ret = (bool)(!!(value & XWBOP_BMP_MASK(idx)));
         return ret;
 }

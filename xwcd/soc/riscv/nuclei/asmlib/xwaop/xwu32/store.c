@@ -24,28 +24,28 @@
 
 __xwlib_code
 xwu32_t xwaop__xwu32_t__store(atomic_xwu32_t * a,
-                              const enum xwmb_memory_order_em mo,
+                              const enum xwaop_memory_order_em mo,
                               xwu32_t v)
 {
         switch (mo) {
-        case xwmb_modr_relaxed:
+        case xwaop_mo_relaxed:
                 *a = v;
                 break;
-        case xwmb_modr_consume:
+        case xwaop_mo_consume:
                 *a = v;
                 break;
-        case xwmb_modr_acquire:
+        case xwaop_mo_acquire:
                 *a = v;
                 break;
-        case xwmb_modr_release:
+        case xwaop_mo_release:
                 xwmb_mp_mb();
                 *a = v;
                 break;
-        case xwmb_modr_acq_rel:
+        case xwaop_mo_acq_rel:
                 xwmb_mp_mb();
                 *a = v;
                 break;
-        case xwmb_modr_seq_cst:
+        case xwaop_mo_seq_cst:
                 xwmb_mp_mb();
                 *a = v;
                 xwmb_mp_mb();

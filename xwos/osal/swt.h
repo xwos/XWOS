@@ -64,9 +64,8 @@ typedef struct {
  * @param[in] flag: 软件定时器的标志
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：任意
+ * + 重入性：不可重入
  */
 static __xwos_inline_api
 xwer_t xwos_swt_init(struct xwos_swt * swt, const char * name, xwsq_t flag)
@@ -79,9 +78,8 @@ xwer_t xwos_swt_init(struct xwos_swt * swt, const char * name, xwsq_t flag)
  * @param[in] swt: 软件定时器的指针
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：任意
+ * + 重入性：不可重入
  */
 static __xwos_inline_api
 xwer_t xwos_swt_fini(struct xwos_swt * swt)
@@ -96,12 +94,11 @@ xwer_t xwos_swt_fini(struct xwos_swt * swt)
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
+ * + 重入性：可重入
  * @details
- * 此函数主要用于管理**静态对象**的引用计数。
- * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
+ * 此函数主要用于管理 **静态对象** 的引用计数。
+ * 若用于 **动态对象** ，需要确保对象的指针一定不是野指针。
  */
 static __xwos_inline_api
 xwer_t xwos_swt_grab(struct xwos_swt * swt)
@@ -116,12 +113,11 @@ xwer_t xwos_swt_grab(struct xwos_swt * swt)
  * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
+ * + 重入性：可重入
  * @details
- * 此函数主要用于管理**静态对象**的引用计数。
- * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
+ * 此函数主要用于管理 **静态对象** 的引用计数。
+ * 若用于 **动态对象** ，需要确保对象的指针一定不是野指针。
  */
 static __xwos_inline_api
 xwer_t xwos_swt_put(struct xwos_swt * swt)
@@ -136,9 +132,8 @@ xwer_t xwos_swt_put(struct xwos_swt * swt)
  * @param[in] flag: 软件定时器的标志
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：任意
+ * + 重入性：可重入
  */
 static __xwos_inline_api
 xwer_t xwos_swt_create(xwos_swt_d * swtd, const char * name, xwsq_t flag)
@@ -151,9 +146,8 @@ xwer_t xwos_swt_create(xwos_swt_d * swtd, const char * name, xwsq_t flag)
  * @param[in] swtd: 软件定时器对象描述符
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：任意
+ * + 重入性：可重入
  */
 static __xwos_inline_api
 xwer_t xwos_swt_delete(xwos_swt_d swtd)
@@ -170,9 +164,8 @@ xwer_t xwos_swt_delete(xwos_swt_d swtd)
  * @retval -EOBJDEAD: 对象无效
  * @retval -EACCES: 对象标签检查失败
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
+ * + 重入性：可重入
  */
 static __xwos_inline_api
 xwer_t xwos_swt_acquire(xwos_swt_d swtd)
@@ -189,9 +182,8 @@ xwer_t xwos_swt_acquire(xwos_swt_d swtd)
  * @retval -EOBJDEAD: 对象无效
  * @retval -EACCES: 对象标签检查失败
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
+ * + 重入性：可重入
  */
 static __xwos_inline_api
 xwer_t xwos_swt_release(xwos_swt_d swtd)
@@ -204,9 +196,8 @@ xwer_t xwos_swt_release(xwos_swt_d swtd)
  * @param[in] swt: 软件定时器对象的指针
  * @return 软件定时器对象的标签
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
+ * + 重入性：可重入
  */
 static __xwos_inline_api
 xwsq_t xwos_swt_gettik(struct xwos_swt * swt)
@@ -219,9 +210,8 @@ xwsq_t xwos_swt_gettik(struct xwos_swt * swt)
  * @param[in] swt: 软件定时器对象的指针
  * @return 软件定时器对象描述符
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
+ * + 重入性：可重入
  */
 static __xwos_inline_api
 xwos_swt_d xwos_swt_getd(struct xwos_swt * swt)
@@ -242,9 +232,8 @@ xwos_swt_d xwos_swt_getd(struct xwos_swt * swt)
  * @param[in] arg: 回调函数的参数
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：任意
+ * + 重入性：可重入
  */
 static __xwos_inline_api
 xwer_t xwos_swt_start(struct xwos_swt * swt, xwtm_t base, xwtm_t period,
@@ -259,9 +248,8 @@ xwer_t xwos_swt_start(struct xwos_swt * swt, xwtm_t base, xwtm_t period,
  * @param[in] swt: 软件定时器的指针
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：任意
+ * + 重入性：可重入
  */
 static __xwos_inline_api
 xwer_t xwos_swt_stop(struct xwos_swt * swt)

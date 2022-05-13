@@ -34,7 +34,7 @@ xwos_thd_d xwslpdemo_thd;
 /**
  * @brief 模块的加载函数
  */
-xwer_t example_thread_sleep_start(void)
+xwer_t xwos_example_thd_sleep(void)
 {
         struct xwos_thd_attr attr;
         xwer_t rc;

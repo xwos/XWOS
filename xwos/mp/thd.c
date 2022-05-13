@@ -1019,7 +1019,7 @@ xwer_t xwmp_thd_intr(struct xwmp_thd * thd)
                         thd->wqn.wq = NULL;
                         thd->wqn.type = XWMP_WQTYPE_UNKNOWN;
                         xwaop_store(xwsq_t, &thd->wqn.reason,
-                                    xwmb_modr_release, XWMP_WQN_REASON_INTR);
+                                    xwaop_mo_release, XWMP_WQN_REASON_INTR);
                         cb = thd->wqn.cb;
                         thd->wqn.cb = NULL;
                         xwmp_splk_unlock_cpuirqrs(&thd->wqn.lock, cpuirq);
@@ -1150,7 +1150,7 @@ xwer_t xwmp_thd_tt_add_locked(struct xwmp_thd * thd, struct xwmp_tt * xwtt,
         /* add to time tree */
         thd->ttn.wkup_xwtm = to;
         xwaop_store(xwsq_t, &thd->ttn.wkuprs,
-                    xwmb_modr_release, XWMP_TTN_WKUPRS_UNKNOWN);
+                    xwaop_mo_release, XWMP_TTN_WKUPRS_UNKNOWN);
         thd->ttn.xwtt = xwtt;
         thd->ttn.cb = xwmp_thd_ttn_callback;
         rc = xwmp_tt_add_locked(xwtt, &thd->ttn, cpuirq);
@@ -1193,7 +1193,7 @@ void xwmp_thd_eq_rtwq_locked(struct xwmp_thd * thd,
         thd->wqn.wq = xwrtwq;
         thd->wqn.type = type;
         xwaop_store(xwsq_t, &thd->wqn.reason,
-                    xwmb_modr_release, XWMP_WQN_REASON_UNKNOWN);
+                    xwaop_mo_release, XWMP_WQN_REASON_UNKNOWN);
         thd->wqn.cb = xwmp_thd_wqn_callback;
         xwmp_rtwq_add_locked(xwrtwq, &thd->wqn, dprio);
         xwmp_splk_unlock(&thd->wqn.lock);
@@ -1214,7 +1214,7 @@ void xwmp_thd_eq_plwq_locked(struct xwmp_thd * thd,
         thd->wqn.wq = xwplwq;
         thd->wqn.type = type;
         xwaop_store(xwsq_t, &thd->wqn.reason,
-                    xwmb_modr_release, XWMP_WQN_REASON_UNKNOWN);
+                    xwaop_mo_release, XWMP_WQN_REASON_UNKNOWN);
         thd->wqn.cb = xwmp_thd_wqn_callback;
         xwmp_plwq_add_tail_locked(xwplwq, &thd->wqn);
         xwmp_splk_unlock(&thd->wqn.lock);
@@ -1240,8 +1240,6 @@ void xwmp_cthd_yield(void)
         xwospl_cpuirq_restore_lc(cpuirq);
 }
 
-
-
 __xwmp_api
 xwer_t xwmp_cthd_sleep_to(xwtm_t to)
 {
@@ -1265,6 +1263,14 @@ xwer_t xwmp_cthd_sleep_to(xwtm_t to)
         } else if (__xwcc_unlikely(xwtm_cmp(to, now) == 0)) {
                 rc = XWOK;
                 goto err_timedout;
+        } else if (!xwmp_skd_tstpmpt(xwskd)) {
+                rc = -ECANNOTPMPT;
+                goto err_cannot;
+#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+        } else if (!xwmp_skd_tstbh(xwskd)) {
+                rc = -ECANNOTBH;
+                goto err_cannot;
+#endif/* XWMPCFG_SKD_BH */
         }
 
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
@@ -1302,7 +1308,7 @@ xwer_t xwmp_cthd_sleep_to(xwtm_t to)
         /* 判断唤醒原因 */
         xwmb_mp_rmb();
         /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
-        wkuprs = xwaop_load(xwsq_t, &cthd->ttn.wkuprs, xwmb_modr_relaxed);
+        wkuprs = xwaop_load(xwsq_t, &cthd->ttn.wkuprs, xwaop_mo_relaxed);
         if (XWMP_TTN_WKUPRS_TIMEDOUT == wkuprs) {
                 rc = XWOK;
         } else if (XWMP_TTN_WKUPRS_INTR == wkuprs) {
@@ -1314,6 +1320,7 @@ xwer_t xwmp_cthd_sleep_to(xwtm_t to)
         return rc;
 
 err_intr:
+err_cannot:
 err_timedout:
         return rc;
 }
@@ -1330,13 +1337,25 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         xwsq_t wkuprs;
         xwer_t rc;
 
+        XWOS_VALIDATE((NULL != from), "nullptr", -EFAULT);
+
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
         xwtt = &xwskd->tt;
         hwt = &xwtt->hwt;
         to = xwtm_add_safely(*from, dur);
-        xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
 
+        if (!xwmp_skd_tstpmpt(xwskd)) {
+                rc = -ECANNOTPMPT;
+                goto err_cannot;
+#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+        } else if (!xwmp_skd_tstbh(xwskd)) {
+                rc = -ECANNOTBH;
+                goto err_cannot;
+#endif/* XWMPCFG_SKD_BH */
+        }
+
+        xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         /* 检查是否被中断 */
         rc = xwmp_skd_wakelock_lock(xwskd);
         if (__xwcc_unlikely(rc < 0)) {
@@ -1371,7 +1390,7 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         /* 判断唤醒原因 */
         xwmb_mp_rmb();
         /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
-        wkuprs = xwaop_load(xwsq_t, &cthd->ttn.wkuprs, xwmb_modr_relaxed);
+        wkuprs = xwaop_load(xwsq_t, &cthd->ttn.wkuprs, xwaop_mo_relaxed);
         if (XWMP_TTN_WKUPRS_TIMEDOUT == wkuprs) {
                 rc = XWOK;
         } else if (XWMP_TTN_WKUPRS_INTR == wkuprs) {
@@ -1385,6 +1404,7 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
 
 err_intr:
         *from = xwmp_syshwt_get_timetick(hwt);
+err_cannot:
         return rc;
 }
 

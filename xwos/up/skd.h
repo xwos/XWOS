@@ -95,7 +95,7 @@ struct xwup_skdobj_stack {
  * @brief 调度器上下文枚举
  */
 enum xwup_skd_context_em {
-        XWUP_SKD_CONTEXT_INIT_EXIT = 0, /**< 初始化与反初始化 */
+        XWUP_SKD_CONTEXT_BOOT = 0, /**< 初始化与反初始化 */
         XWUP_SKD_CONTEXT_THD, /**< 线程 */
         XWUP_SKD_CONTEXT_ISR, /**< 中断 */
         XWUP_SKD_CONTEXT_BH, /**< 中断底半部 */
@@ -188,11 +188,17 @@ xwer_t xwup_skd_stop_syshwt_lc(void);
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
 struct xwup_skd * xwup_skd_dsbh_lc(void);
 struct xwup_skd * xwup_skd_enbh_lc(void);
+struct xwup_skd * xwup_skd_svbh_lc(xwsq_t * dis_bh_cnt);
+struct xwup_skd * xwup_skd_rsbh_lc(xwsq_t dis_bh_cnt);
+bool xwup_skd_tstbh_lc(void);
 bool xwup_skd_tst_in_bh_lc(void);
 #endif
 
 struct xwup_skd * xwup_skd_dspmpt_lc(void);
 struct xwup_skd * xwup_skd_enpmpt_lc(void);
+struct xwup_skd * xwup_skd_svpmpt_lc(xwsq_t * dis_pmpt_cnt);
+struct xwup_skd * xwup_skd_rspmpt_lc(xwsq_t dis_pmpt_cnt);
+bool xwup_skd_tstpmpt_lc(void);
 void xwup_skd_get_context_lc(xwsq_t * ctx, xwirq_t * irqn);
 bool xwup_skd_prio_tst_valid(xwpr_t prio);
 

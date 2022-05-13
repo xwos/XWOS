@@ -19,7 +19,7 @@
 
 __xwlib_code
 xwu8_t xwaop__xwu8_t__load(atomic_xwu8_t * a,
-                           const enum xwmb_memory_order_em mo)
+                           const enum xwaop_memory_order_em mo)
 {
         xwu8_t v;
 
@@ -29,7 +29,7 @@ xwu8_t xwaop__xwu8_t__load(atomic_xwu8_t * a,
 
 __xwlib_code
 xwu8_t xwaop__xwu8_t__store(atomic_xwu8_t * a,
-                            const enum xwmb_memory_order_em mo,
+                            const enum xwaop_memory_order_em mo,
                             xwu8_t v)
 {
         atomic_store_explicit(a, v, (int)mo);

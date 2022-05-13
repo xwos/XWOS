@@ -527,6 +527,10 @@ xwer_t xwup_cond_blkthd_to_unlkwq_cpuirqrs(struct xwup_cond * cond,
                                            xwreg_t cpuirq)
 {
         struct xwup_tt * xwtt;
+        xwsq_t pmpt;
+#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+        xwsq_t bh;
+#endif
         xwer_t rc;
 
         xwtt = &xwskd->tt;
@@ -560,6 +564,12 @@ xwer_t xwup_cond_blkthd_to_unlkwq_cpuirqrs(struct xwup_cond * cond,
         xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
 
         /* 调度 */
+        xwup_skd_svpmpt_lc(&pmpt);
+        xwup_skd_rspmpt_lc(0);
+#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+        xwup_skd_svbh_lc(&bh);
+        xwup_skd_rsbh_lc(0);
+#endif
         xwospl_cpuirq_enable_lc();
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
         xwup_skd_wakelock_unlock();
@@ -569,6 +579,10 @@ xwer_t xwup_cond_blkthd_to_unlkwq_cpuirqrs(struct xwup_cond * cond,
         xwup_skd_wakelock_lock();
 #endif
         xwospl_cpuirq_restore_lc(cpuirq);
+#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+        xwup_skd_rsbh_lc(bh);
+#endif
+        xwup_skd_rspmpt_lc(pmpt);
 
         /* 判断唤醒原因 */
         if (XWUP_WQN_REASON_INTR == thd->wqn.reason) {
@@ -743,6 +757,10 @@ xwer_t xwup_cond_blkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
                                         xwreg_t cpuirq)
 {
         xwer_t rc;
+        xwsq_t pmpt;
+#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+        xwsq_t bh;
+#endif
 
         XWOS_BUG_ON((XWUP_SKDOBJ_ST_BLOCKING | XWUP_SKDOBJ_ST_SLEEPING |
                      XWUP_SKDOBJ_ST_READY | XWUP_SKDOBJ_ST_STANDBY |
@@ -761,9 +779,19 @@ xwer_t xwup_cond_blkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
         }
 
         /* 调度 */
+        xwup_skd_svpmpt_lc(&pmpt);
+        xwup_skd_rspmpt_lc(0);
+#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+        xwup_skd_svbh_lc(&bh);
+        xwup_skd_rsbh_lc(0);
+#endif
         xwospl_cpuirq_enable_lc();
         xwup_skd_req_swcx();
         xwospl_cpuirq_restore_lc(cpuirq);
+#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+        xwup_skd_rsbh_lc(bh);
+#endif
+        xwup_skd_rspmpt_lc(pmpt);
 
         /* 判断唤醒原因 */
         if (XWUP_WQN_REASON_UP == thd->wqn.reason) {
@@ -812,6 +840,7 @@ xwer_t xwup_cond_wait_unintr(struct xwup_cond * cond,
                        ((lock) && (lktype > XWOS_LK_NONE))),
                       "invalid-lock", -EINVAL);
         XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+
         *lkst = XWOS_LKST_LOCKED;
         cthd = xwup_skd_get_cthd_lc();
         rc = xwup_cond_test_unintr(cond, cthd, lock, lktype, lkdata, lkst);

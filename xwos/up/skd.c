@@ -87,13 +87,13 @@ void xwup_skd_init_bhd(void);
 #endif
 
 static __xwup_code
-bool xwup_skd_do_chkpmpt(struct xwup_thd * t);
+bool xwup_skd_chkpmpt_thd(struct xwup_thd * t);
 
 static __xwup_code
 xwer_t xwup_skd_check_swcx(struct xwup_thd * t, struct xwup_thd ** pmthd);
 
 static __xwup_code
-xwer_t xwup_skd_do_swcx(void);
+xwer_t xwup_skd_swcx(void);
 
 static __xwup_code
 void xwup_skd_finish_swcx_lic(struct xwup_skd * xwskd);
@@ -462,6 +462,71 @@ struct xwup_skd * xwup_skd_enbh_lc(void)
 }
 
 /**
+ * @brief 保存调度器的中断底半部
+ * @param[out] dis_bh_cnt: 指向缓冲区的指针，此缓冲区用于返回禁止中断底半部计数
+ * @return XWOS UP调度器的指针
+ */
+__xwup_code
+struct xwup_skd * xwup_skd_svbh_lc(xwsq_t * dis_bh_cnt)
+{
+        struct xwup_skd * xwskd;
+        xwreg_t cpuirq;
+
+        xwskd = &xwup_skd;
+        xwospl_cpuirq_save_lc(&cpuirq);
+        *dis_bh_cnt = xwskd->dis_bh_cnt;
+        xwskd->dis_bh_cnt++;
+        xwospl_cpuirq_restore_lc(cpuirq);
+        return xwskd;
+}
+
+/**
+ * @brief 恢复调度器的中断底半部
+ * @param[in] dis_bh_cnt: 禁止中断底半部计数
+ * @return XWOS UP调度器的指针
+ */
+__xwup_code
+struct xwup_skd * xwup_skd_rsbh_lc(xwsq_t dis_bh_cnt)
+{
+        struct xwup_skd * xwskd;
+        xwreg_t cpuirq;
+        bool sched;
+
+        sched = false;
+        xwskd = &xwup_skd;
+        xwospl_cpuirq_save_lc(&cpuirq);
+        xwskd->dis_bh_cnt = dis_bh_cnt;
+        if (0 == xwskd->dis_bh_cnt) {
+                if (0 != xwskd->req_bh_cnt) {
+                        if (!xwup_skd_tst_in_bh_lc()) {
+                                xwskd->pstk = xwskd->cstk;
+                                xwskd->cstk = XWUP_SKD_BH_STK(xwskd);
+                                sched = true;
+                        }/* else {} */
+                }/* else {} */
+        }
+        xwospl_cpuirq_restore_lc(cpuirq);
+        if (sched) {
+                xwospl_skd_req_swcx(xwskd);
+        }/* else {} */
+        return xwskd;
+}
+
+/**
+ * @brief 测试调度器是否允许中断底半部
+ * @retval true: 允许
+ * @retval false: 禁止
+ */
+__xwup_code
+bool xwup_skd_tstbh_lc(void)
+{
+        struct xwup_skd * xwskd;
+
+        xwskd = &xwup_skd;
+        return (0 == xwskd->dis_bh_cnt);
+}
+
+/**
  * @brief 请求切换至中断底半部
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -555,7 +620,7 @@ struct xwup_skd * xwup_skd_enpmpt_lc(void)
 #endif
                         if (XWUP_SKD_IDLE_STK(xwskd) != cstk) {
                                 t = xwcc_baseof(cstk, struct xwup_thd, stack);
-                                sched = xwup_skd_do_chkpmpt(t);
+                                sched = xwup_skd_chkpmpt_thd(t);
                         } else {
                                 sched = true;
                         }
@@ -570,6 +635,85 @@ struct xwup_skd * xwup_skd_enpmpt_lc(void)
 }
 
 /**
+ * @brief 保存调度器的抢占
+ * @param[out] dis_pmpt_cnt: 指向缓冲区的指针，此缓冲区用于返回禁止抢占计数
+ * @return XWOS UP调度器的指针
+ */
+__xwup_api
+struct xwup_skd * xwup_skd_svpmpt_lc(xwsq_t * dis_pmpt_cnt)
+{
+        struct xwup_skd * xwskd;
+        xwreg_t cpuirq;
+
+        xwskd = &xwup_skd;
+        xwospl_cpuirq_save_lc(&cpuirq);
+        *dis_pmpt_cnt = xwskd->dis_pmpt_cnt;
+        xwskd->dis_pmpt_cnt++;
+        xwospl_cpuirq_restore_lc(cpuirq);
+        return xwskd;
+}
+
+/**
+ * @brief 恢复调度器的抢占
+ * @param[in] dis_pmpt_cnt: 禁止抢占计数
+ * @return XWOS UP调度器的指针
+ */
+__xwup_code
+struct xwup_skd * xwup_skd_rspmpt_lc(xwsq_t dis_pmpt_cnt)
+{
+        struct xwup_skd * xwskd;
+        struct xwup_thd * t;
+        bool sched;
+        xwreg_t cpuirq;
+
+        sched = false;
+        xwskd = &xwup_skd;
+        xwospl_cpuirq_save_lc(&cpuirq);
+        xwskd->dis_pmpt_cnt = dis_pmpt_cnt;
+        if (0 == xwskd->dis_pmpt_cnt) {
+                if (0 != xwskd->req_chkpmpt_cnt) {
+                        struct xwup_skdobj_stack * cstk;
+
+#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+                        if (XWUP_SKD_BH_STK(xwskd) == xwskd->cstk) {
+                                cstk = xwskd->pstk;
+                        } else {
+                                cstk = xwskd->cstk;
+                        }
+#else
+                        cstk = xwskd->cstk;
+#endif
+                        if (XWUP_SKD_IDLE_STK(xwskd) != cstk) {
+                                t = xwcc_baseof(cstk, struct xwup_thd, stack);
+                                sched = xwup_skd_chkpmpt_thd(t);
+                        } else {
+                                sched = true;
+                        }
+                        xwskd->req_chkpmpt_cnt = 0;
+                }
+        }
+        xwospl_cpuirq_restore_lc(cpuirq);
+        if (sched) {
+                xwup_skd_req_swcx();
+        }/* else {} */
+        return xwskd;
+}
+
+/**
+ * @brief 测试调度器是否允许抢占
+ * @retval true: 允许
+ * @retval false: 禁止
+ */
+__xwup_code
+bool xwup_skd_tstpmpt_lc(void)
+{
+        struct xwup_skd * xwskd;
+
+        xwskd = &xwup_skd;
+        return (0 == xwskd->dis_pmpt_cnt);
+}
+
+/**
  * @brief 检查是否需要抢占
  * @param[in] xwskd: XWOS UP调度器的指针
  * @param[in] t: 线程对象的指针
@@ -580,7 +724,7 @@ struct xwup_skd * xwup_skd_enpmpt_lc(void)
  * - 此函数被调用时需要关闭本地CPU的中断。
  */
 static __xwup_code
-bool xwup_skd_do_chkpmpt(struct xwup_thd * t)
+bool xwup_skd_chkpmpt_thd(struct xwup_thd * t)
 {
         struct xwup_skd * xwskd;
         struct xwup_rtrq * xwrtrq;
@@ -631,7 +775,7 @@ void xwup_skd_chkpmpt(void)
 #endif
                 if (XWUP_SKD_IDLE_STK(xwskd) != cstk) {
                         t = xwcc_baseof(cstk, struct xwup_thd, stack);
-                        sched = xwup_skd_do_chkpmpt(t);
+                        sched = xwup_skd_chkpmpt_thd(t);
                 } else {
                         sched = true;
                 }
@@ -649,7 +793,7 @@ void xwup_skd_chkpmpt(void)
  * @param[in] t: 被检测的线程对象的指针
  * @param[out] pmthd: 指向缓冲区的指针，通过此缓冲区返回抢占线程对象的指针
  * @return 错误码
- * @retval OK: 需要切换上下文
+ * @retval XWOK: 需要切换上下文
  * @retval <0: 不需要切换上下文
  * @note
  * - 此函数被调用时需要关闭本地CPU的中断。
@@ -686,7 +830,7 @@ xwer_t xwup_skd_check_swcx(struct xwup_thd * t, struct xwup_thd ** pmthd)
  * @retval rc: @ref xwup_skd_req_swcx()
  */
 static __xwup_code
-xwer_t xwup_skd_do_swcx(void)
+xwer_t xwup_skd_swcx(void)
 {
         struct xwup_skd * xwskd;
         struct xwup_thd * swt, * cthd;
@@ -765,10 +909,6 @@ struct xwup_skd * xwup_skd_post_swcx_lic(struct xwup_skd * xwskd)
  * @retval -EINVAL: 正在运行的线程状态错误
  * @retval -EAGAIN: 不需要切换上下文
  * @retval -EEINPROGRESS: 切换上下文的过程正在进行
- * @note
- * - 同步/异步：异步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
  */
 __xwup_code
 xwer_t xwup_skd_req_swcx(void)
@@ -788,7 +928,7 @@ xwer_t xwup_skd_req_swcx(void)
                 rc = -EBUSY;
         } else {
                 xwskd->pstk = err_ptr(-EINVAL); /* invalidate other caller. */
-                rc = xwup_skd_do_swcx();
+                rc = xwup_skd_swcx();
                 xwospl_cpuirq_restore_lc(cpuirq);
                 if (XWOK == rc) {
                         xwospl_skd_req_swcx(xwskd);
@@ -856,10 +996,6 @@ void xwup_skd_finish_swcx_lic(struct xwup_skd * xwskd)
  * @retval -EINVAL: 当前正在运行的线程状态错误
  * @retval -EAGAIN: 不需要切换上下文
  * @retval -EEINPROGRESS: 切换上下文的过程正在进行
- * @note
- * - 同步/异步：异步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
  */
 __xwup_code
 xwer_t xwup_skd_req_swcx(void)
@@ -876,7 +1012,7 @@ xwer_t xwup_skd_req_swcx(void)
                 rc = -EINPROGRESS;
         } else {
                 xwskd->pstk = err_ptr(-EINVAL); /* invalidate other caller. */
-                rc = xwup_skd_do_swcx();
+                rc = xwup_skd_swcx();
                 xwospl_cpuirq_restore_lc(cpuirq);
                 if (XWOK == rc) {
                         xwospl_skd_req_swcx(xwskd);
@@ -967,10 +1103,6 @@ void xwup_skd_set_pm_cb(xwup_skd_pm_cb_f resume_cb,
  * @brief 将调度器的唤醒锁计数器加1
  * @retval XWOK: 没有错误
  * @retval <0: 当前调度器正在进入低功耗
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
  */
 __xwup_code
 xwer_t xwup_skd_inc_wklkcnt(void)
@@ -996,10 +1128,6 @@ xwer_t xwup_skd_inc_wklkcnt(void)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval <0: 当前调度器正在进入低功耗
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
  */
 __xwup_code
 xwer_t xwup_skd_dec_wklkcnt(void)
@@ -1312,7 +1440,7 @@ void xwup_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
                                 ctx = XWUP_SKD_CONTEXT_THD;
                         }
                 } else {
-                        ctx = XWUP_SKD_CONTEXT_INIT_EXIT;
+                        ctx = XWUP_SKD_CONTEXT_BOOT;
                 }
         }
         if (ctxbuf) {

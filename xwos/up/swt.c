@@ -233,7 +233,6 @@ xwer_t xwup_swt_start(struct xwup_swt * swt,
         swt->arg = arg;
         swt->period = period;
         xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
-        /* add to time tree */
         swt->ttn.wkup_xwtm = to;
         swt->ttn.wkuprs = XWUP_TTN_WKUPRS_UNKNOWN;
         swt->ttn.cb = xwup_swt_ttn_cb;

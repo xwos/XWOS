@@ -997,6 +997,14 @@ xwer_t xwup_cthd_sleep_to(xwtm_t to)
         } else if (__xwcc_unlikely(xwtm_cmp(to, now) == 0)) {
                 rc = XWOK;
                 goto err_timedout;
+        } else if (!xwup_skd_tstpmpt_lc()) {
+                rc = -ECANNOTPMPT;
+                goto err_cannot;
+#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+        } else if (!xwup_skd_tstbh_lc()) {
+                rc = -ECANNOTBH;
+                goto err_cannot;
+#endif/* XWUPCFG_SKD_BH */
         }
 
         xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
@@ -1044,6 +1052,7 @@ xwer_t xwup_cthd_sleep_to(xwtm_t to)
         return rc;
 
 err_intr:
+err_cannot:
 err_timedout:
         return rc;
 }
@@ -1066,8 +1075,18 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         xwtt = &xwskd->tt;
         hwt = &xwtt->hwt;
         to = xwtm_add_safely(*from, dur);
-        xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
 
+        if (!xwup_skd_tstpmpt_lc()) {
+                rc = -ECANNOTPMPT;
+                goto err_cannot;
+#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+        } else if (!xwup_skd_tstbh_lc()) {
+                rc = -ECANNOTBH;
+                goto err_cannot;
+#endif/* XWUPCFG_SKD_BH */
+        }
+
+        xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         /* 检查是否被中断 */
 #if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
         rc = xwup_skd_wakelock_lock();
@@ -1114,6 +1133,7 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         return rc;
 
 err_intr:
+err_cannot:
         *from = xwup_syshwt_get_timetick(hwt);
         return rc;
 }

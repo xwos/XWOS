@@ -345,6 +345,8 @@ xwer_t xwos_sem_post(struct xwos_sem * sem)
  * @retval -EFAULT: 空指针
  * @retval -EINTR: 等待被中断
  * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @retval -EDSPMPT: 抢占被关闭
+ * @retval -EDSBH: 中断底半部被关闭
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -386,6 +388,8 @@ xwer_t xwos_sem_trywait(struct xwos_sem * sem)
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
  * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @retval -EDSPMPT: 抢占被关闭
+ * @retval -EDSBH: 中断底半部被关闭
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
@@ -406,6 +410,8 @@ xwer_t xwos_sem_wait_to(struct xwos_sem * sem, xwtm_t to)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @retval -EDSPMPT: 抢占被关闭
+ * @retval -EDSBH: 中断底半部被关闭
  * @note
  * - 同步/异步：同步
  * - 上下文：线程

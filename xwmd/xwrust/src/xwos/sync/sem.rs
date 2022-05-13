@@ -155,6 +155,10 @@ pub enum SemError {
     Timedout,
     /// 不在线程上下文内
     NotThreadContext,
+    /// 抢占被关闭
+    CannotPmpt,
+    /// 中断底半部被关闭
+    CannotBh,
     /// 信号量不可用
     NoData,
     /// 未知错误
@@ -437,6 +441,8 @@ impl Sem {
     /// + [`SemError::NotInit`] 信号量没有初始化
     /// + [`SemError::Interrupt`] 等待被中断
     /// + [`SemError::NotThreadContext`] 不在线程上下文内
+    /// + [`SemError::CannotPmpt`] 抢占被关闭
+    /// + [`SemError::CannotBh`] 中断底半部被关闭
     ///
     /// # 示例
     ///
@@ -472,6 +478,10 @@ impl Sem {
                     SemError::Interrupt
                 } else if -ENOTTHDCTX == rc {
                     SemError::NotThreadContext
+                } else if -ECANNOTPMPT == rc {
+                    SemError::CannotPmpt
+                } else if -ECANNOTBH == rc {
+                    SemError::CannotBh
                 } else {
                     SemError::Unknown(rc)
                 }
@@ -544,6 +554,8 @@ impl Sem {
     /// + [`SemError::Interrupt`] 等待被中断
     /// + [`SemError::Timedout`] 等待超时
     /// + [`SemError::NotThreadContext`] 不在线程上下文内
+    /// + [`SemError::CannotPmpt`] 抢占被关闭
+    /// + [`SemError::CannotBh`] 中断底半部被关闭
     ///
     /// # 示例
     ///
@@ -582,6 +594,10 @@ impl Sem {
                     SemError::Timedout
                 } else if -ENOTTHDCTX == rc {
                     SemError::NotThreadContext
+                } else if -ECANNOTPMPT == rc {
+                    SemError::CannotPmpt
+                } else if -ECANNOTBH == rc {
+                    SemError::CannotBh
                 } else {
                     SemError::Unknown(rc)
                 }
@@ -600,6 +616,8 @@ impl Sem {
     /// + [`SemError::Ok`] 没有错误
     /// + [`SemError::NotInit`] 信号量没有初始化
     /// + [`SemError::NotThreadContext`] 不在线程上下文内
+    /// + [`SemError::CannotPmpt`] 抢占被关闭
+    /// + [`SemError::CannotBh`] 中断底半部被关闭
     ///
     /// # 示例
     ///
@@ -634,6 +652,10 @@ impl Sem {
                     SemError::Ok
                 } else if -ENOTTHDCTX == rc {
                     SemError::NotThreadContext
+                } else if -ECANNOTPMPT == rc {
+                    SemError::CannotPmpt
+                } else if -ECANNOTBH == rc {
+                    SemError::CannotBh
                 } else {
                     SemError::Unknown(rc)
                 }

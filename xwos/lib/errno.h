@@ -187,6 +187,8 @@
 #define ENOTBHCTX       803 /**< @brief Not bottom half context */
 #define EISRCTX         804 /**< @brief ISR context */
 #define ENOTISRCTX      805 /**< @brief Not ISR context */
+#define ECANNOTPMPT     806 /**< @brief Cannot preemption */
+#define ECANNOTBH       807 /**< @brief Cannot enter BH */
 
 #define ENILOBJD        880 /**< @brief Nil object descriptor */
 #define EOBJDEAD        884 /**< @brief Object dead */

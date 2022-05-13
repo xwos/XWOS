@@ -410,7 +410,7 @@ xwer_t xwmp_cond_intr(struct xwmp_cond * cond, struct xwmp_wqn * wqn)
                 wqn->wq = NULL;
                 wqn->type = XWMP_WQTYPE_UNKNOWN;
                 xwaop_store(xwsq_t, &wqn->reason,
-                            xwmb_modr_release, XWMP_WQN_REASON_INTR);
+                            xwaop_mo_release, XWMP_WQN_REASON_INTR);
                 cb = wqn->cb;
                 wqn->cb = NULL;
                 xwmp_splk_unlock(&wqn->lock);
@@ -470,7 +470,7 @@ xwer_t xwmp_cond_broadcast_once(struct xwmp_cond * cond, bool * retry)
                         wqn->wq = NULL;
                         wqn->type = XWMP_WQTYPE_UNKNOWN;
                         xwaop_store(xwsq_t, &wqn->reason,
-                                    xwmb_modr_release, XWMP_WQN_REASON_UP);
+                                    xwaop_mo_release, XWMP_WQN_REASON_UP);
                         cb = wqn->cb;
                         wqn->cb = NULL;
                         xwmp_splk_unlock(&wqn->lock);
@@ -533,7 +533,7 @@ xwer_t xwmp_cond_unicast(struct xwmp_cond * cond)
                         wqn->wq = NULL;
                         wqn->type = XWMP_WQTYPE_UNKNOWN;
                         xwaop_store(xwsq_t, &wqn->reason,
-                                    xwmb_modr_release, XWMP_WQN_REASON_UP);
+                                    xwaop_mo_release, XWMP_WQN_REASON_UP);
                         cb = wqn->cb;
                         wqn->cb = NULL;
                         xwmp_splk_unlock(&wqn->lock);
@@ -649,6 +649,10 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         xwpr_t dprio;
         xwsq_t wkuprs;
         xwsq_t reason;
+        xwsq_t pmpt;
+#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+        xwsq_t bh;
+#endif
         struct xwmp_tt * xwtt;
 
         xwtt = &xwskd->tt;
@@ -689,17 +693,27 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
 
         /* 调度 */
+        xwmp_skd_svpmpt(xwskd, &pmpt);
+        xwmp_skd_rspmpt(xwskd, 0);
+#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+        xwmp_skd_svbh(xwskd, &bh);
+        xwmp_skd_rsbh(xwskd, 0);
+#endif
         xwospl_cpuirq_enable_lc();
         xwmp_skd_wakelock_unlock(xwskd);
         xwmp_skd_req_swcx(xwskd);
         xwmp_skd_wakelock_lock(xwskd);
         xwospl_cpuirq_restore_lc(cpuirq);
+#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+        xwmp_skd_rsbh(xwskd, bh);
+#endif
+        xwmp_skd_rspmpt(xwskd, pmpt);
 
         /* 判断唤醒原因 */
         xwmb_mp_rmb();
         /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
-        reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwmb_modr_relaxed);
-        wkuprs = xwaop_load(xwsq_t, &thd->ttn.wkuprs, xwmb_modr_relaxed);
+        reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
+        wkuprs = xwaop_load(xwsq_t, &thd->ttn.wkuprs, xwaop_mo_relaxed);
         if (XWMP_WQN_REASON_INTR == reason) {
                 xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
                 rc = xwmp_tt_remove_locked(xwtt, &thd->ttn);
@@ -734,7 +748,7 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
                         thd->wqn.wq = NULL;
                         thd->wqn.type = XWMP_WQTYPE_UNKNOWN;
                         xwaop_store(xwsq_t, &thd->wqn.reason,
-                                    xwmb_modr_release, XWMP_WQN_REASON_INTR);
+                                    xwaop_mo_release, XWMP_WQN_REASON_INTR);
                         thd->wqn.cb = NULL;
                         xwmp_splk_unlock(&thd->wqn.lock);
                         xwmp_splk_lock(&thd->stlock);
@@ -746,8 +760,7 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
                 } else {
                         xwmp_splk_unlock(&thd->wqn.lock);
                         xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
-                        reason = xwaop_load(xwsq_t, &thd->wqn.reason,
-                                            xwmb_modr_relaxed);
+                        reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
                         if (XWMP_WQN_REASON_INTR == reason) {
                                 rc = -EINTR;
                         } else if (XWMP_WQN_REASON_UP == reason) {
@@ -772,7 +785,7 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
                         thd->wqn.wq = NULL;
                         thd->wqn.type = XWMP_WQTYPE_UNKNOWN;
                         xwaop_store(xwsq_t, &thd->wqn.reason,
-                                    xwmb_modr_release, XWMP_WQN_REASON_INTR);
+                                    xwaop_mo_release, XWMP_WQN_REASON_INTR);
                         thd->wqn.cb = NULL;
                         xwmp_splk_unlock(&thd->wqn.lock);
                         xwmp_splk_lock(&thd->stlock);
@@ -891,6 +904,10 @@ xwer_t xwmp_cond_blkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         struct xwmp_skd * xwskd;
         xwpr_t dprio;
         xwsq_t reason;
+        xwsq_t pmpt;
+#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+        xwsq_t bh;
+#endif
         xwer_t rc;
 
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &thd->xwskd);
@@ -917,14 +934,24 @@ xwer_t xwmp_cond_blkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         }/* else {} */
 
         /* 调度 */
+        xwmp_skd_svpmpt(xwskd, &pmpt);
+        xwmp_skd_rspmpt(xwskd, 0);
+#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+        xwmp_skd_svbh(xwskd, &bh);
+        xwmp_skd_rsbh(xwskd, 0);
+#endif
         xwospl_cpuirq_enable_lc();
         xwmp_skd_req_swcx(xwskd);
         xwospl_cpuirq_restore_lc(cpuirq);
+#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+        xwmp_skd_rsbh(xwskd, bh);
+#endif
+        xwmp_skd_rspmpt(xwskd, pmpt);
 
         /* 判断唤醒原因 */
         xwmb_mp_rmb();
         /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
-        reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwmb_modr_relaxed);
+        reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
         if (XWMP_WQN_REASON_UP == reason) {
                 if (__xwcc_likely(XWOS_LKST_UNLOCKED == *lkst)) {
                         rc = xwmp_cond_lock(lock, lktype, 0, true, lkdata);
