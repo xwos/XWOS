@@ -30,22 +30,22 @@
 #define LOGTAG "swt"
 #define swtlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
 
-#define XWSWTDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
-xwer_t xwswtdemo_thd_func(void * arg);
+#define SWTDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+xwer_t swtdemo_thd_func(void * arg);
 
-xwos_thd_d xwswtdemo_thd;
-struct xwos_swt xwswtdemo_swt0;
-xwos_swt_d xwswtdemo_swt1_d;
+xwos_thd_d swtdemo_thd;
+struct xwos_swt swtdemo_swt0;
+xwos_swt_d swtdemo_swt1_d;
 
 #define SWTFLG_NUM      (sizeof(xwbmp_t) * BITS_PER_XWU8_T)
-xwbmpop_declare(swtflg_bmp, SWTFLG_NUM) = {0,};
-xwbmpop_declare(swtflg_msk, SWTFLG_NUM) = {0,};
+xwbmpop_define(swtflg_bmp, SWTFLG_NUM) = {0,};
+xwbmpop_define(swtflg_msk, SWTFLG_NUM) = {0,};
 struct xwos_flg swtflg;
 
 /**
  * @brief 模块的加载函数
  */
-xwer_t example_timer_start(void)
+xwer_t xwos_example_timer(void)
 {
         struct xwos_thd_attr attr;
         xwer_t rc;
@@ -57,28 +57,26 @@ xwer_t example_timer_start(void)
         }
 
         /* 初始化定时器0 */
-        rc = xwos_swt_init(&xwswtdemo_swt0, "xwswtdemo_swt0",
-                           XWOS_SWT_FLAG_RESTART);
+        rc = xwos_swt_init(&swtdemo_swt0, "swtdemo_swt0", XWOS_SWT_FLAG_RESTART);
         if (rc < 0) {
                 goto err_swt0_init;
         }
 
         /* 创建定时器1 */
-        rc = xwos_swt_create(&xwswtdemo_swt1_d, "xwswtdemo_swt1",
-                             XWOS_SWT_FLAG_RESTART);
+        rc = xwos_swt_create(&swtdemo_swt1_d, "swtdemo_swt1", XWOS_SWT_FLAG_RESTART);
         if (rc < 0) {
                 goto err_swt1_create;
         }
 
         /* 创建线程 */
         xwos_thd_attr_init(&attr);
-        attr.name = "xwswtdemo.thd";
+        attr.name = "swtdemo.thd";
         attr.stack = NULL;
         attr.stack_size = 2048;
-        attr.priority = XWSWTDEMO_THD_PRIORITY;
+        attr.priority = SWTDEMO_THD_PRIORITY;
         attr.detached = false;
         attr.privileged = true;
-        rc = xwos_thd_create(&xwswtdemo_thd, &attr, xwswtdemo_thd_func, NULL);
+        rc = xwos_thd_create(&swtdemo_thd, &attr, swtdemo_thd_func, NULL);
         if (rc < 0) {
                 goto err_thd_create;
         }
@@ -86,9 +84,9 @@ xwer_t example_timer_start(void)
         return XWOK;
 
 err_thd_create:
-        xwos_swt_delete(xwswtdemo_swt1_d);
+        xwos_swt_delete(swtdemo_swt1_d);
 err_swt1_create:
-        xwos_swt_fini(&xwswtdemo_swt0);
+        xwos_swt_fini(&swtdemo_swt0);
 err_swt0_init:
         xwos_flg_fini(&swtflg);
 err_flg_init:
@@ -106,7 +104,7 @@ err_flg_init:
  *   - 当配置(XWMPCFG_SKD_BH == 0)，此函数运行在中断上下文；
  * - 此函数中不可调用会导致线程睡眠或阻塞的函数。
  */
-void xwswtdemo_swt0_callback(struct xwos_swt * swt, void * arg)
+void swtdemo_swt0_callback(struct xwos_swt * swt, void * arg)
 {
         XWOS_UNUSED(swt);
         XWOS_UNUSED(arg);
@@ -125,7 +123,7 @@ void xwswtdemo_swt0_callback(struct xwos_swt * swt, void * arg)
  *   - 当配置(XWMPCFG_SKD_BH == 0)，此函数运行在中断上下文；
  * - 此函数中不可调用会导致线程睡眠或阻塞的函数。
  */
-void xwswtdemo_swt1_callback(struct xwos_swt * swt, void * arg)
+void swtdemo_swt1_callback(struct xwos_swt * swt, void * arg)
 {
         XWOS_UNUSED(swt);
         XWOS_UNUSED(arg);
@@ -136,26 +134,26 @@ void xwswtdemo_swt1_callback(struct xwos_swt * swt, void * arg)
 /**
  * @brief 线程1的主函数
  */
-xwer_t xwswtdemo_thd_func(void * arg)
+xwer_t swtdemo_thd_func(void * arg)
 {
         xwtm_t ts;
         xwer_t rc;
-        xwbmpop_declare(msk, SWTFLG_NUM) = {0,};
-        xwbmpop_declare(trg, SWTFLG_NUM) = {0,};
+        xwbmpop_define(msk, SWTFLG_NUM) = {0,};
+        xwbmpop_define(trg, SWTFLG_NUM) = {0,};
 
         XWOS_UNUSED(arg);
 
         swtlogf(INFO, "[线程] 启动。\n");
         swtlogf(INFO, "[线程] 启动定时器0。\n");
         ts = xwtm_now();
-        rc = xwos_swt_start(&xwswtdemo_swt0,
+        rc = xwos_swt_start(&swtdemo_swt0,
                             ts, XWTM_MS(500),
-                            xwswtdemo_swt0_callback, NULL);
+                            swtdemo_swt0_callback, NULL);
 
         swtlogf(INFO, "[线程] 启动定时器1。\n");
-        rc = xwos_swt_start(xwswtdemo_swt1_d.swt,
+        rc = xwos_swt_start(swtdemo_swt1_d.swt,
                             ts, XWTM_MS(800),
-                            xwswtdemo_swt1_callback, NULL);
+                            swtdemo_swt1_callback, NULL);
 
         /* 设置掩码位为bit0:1共2位 */
         memset(msk, 0, sizeof(msk));

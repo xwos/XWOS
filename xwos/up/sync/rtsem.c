@@ -112,9 +112,7 @@ void xwup_rtsem_free(struct xwup_rtsem * sem)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：任意
  */
 static __xwup_code
 void xwup_rtsem_activate(struct xwup_rtsem * sem, xwssq_t val, xwssq_t max)
@@ -219,9 +217,7 @@ xwer_t xwup_rtsem_unbind(struct xwup_rtsem * sem, struct xwup_evt * evt)
  * @param[in] wqn: 等待队列节点
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：任意
  */
 __xwup_code
 xwer_t xwup_rtsem_intr(struct xwup_rtsem * sem, struct xwup_wqn * wqn)

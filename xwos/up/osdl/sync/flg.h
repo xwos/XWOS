@@ -98,12 +98,6 @@ xwer_t xwosdl_flg_unbind(struct xwosdl_flg * flg, struct xwosdl_sel * sel)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_flg_intr_all(struct xwosdl_flg * flg)
-{
-        return xwup_evt_intr_all(flg);
-}
-
-static __xwcc_inline
 xwer_t xwosdl_flg_get_num(struct xwosdl_flg * flg, xwsz_t * numbuf)
 {
         return xwup_evt_get_num(flg, numbuf);

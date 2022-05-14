@@ -94,9 +94,7 @@
  * @retval true: 是
  * @retval false: 否
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 bool xwos_skd_prio_tst_valid(xwpr_t prio)
@@ -108,9 +106,9 @@ bool xwos_skd_prio_tst_valid(xwpr_t prio)
  * @brief XWOS API：启动当前CPU的调度器
  * @return 此函数不会返回
  * @note
- * - 同步/异步：同步
- * - 上下文：只可在系统复位后初始化流程中调用
- * - 重入性：只可调用一次
+ * + 上下文：启动
+ * @details
+ * 此函数调用后，调度器将开始调度，且不会返回，上下文(Context)也从 **启动** 切换为 **线程** 。
  */
 static __xwos_inline_api
 xwer_t xwos_skd_start_lc(void)
@@ -122,9 +120,7 @@ xwer_t xwos_skd_start_lc(void)
  * @brief XWOS API：获取当前CPU的ID
  * @return 当前CPU的ID
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：线程、中断、中断底半部、空闲任务
  */
 static __xwos_inline_api
 xwid_t xwos_skd_id_lc(void)
@@ -138,9 +134,7 @@ xwid_t xwos_skd_id_lc(void)
  *  返回值 @ref xwos_skd_context_em
  * @param[out] irqnbuf: 指向缓冲区的指针，通过此缓冲区返回中断号
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 void xwos_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
@@ -151,9 +145,7 @@ void xwos_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
 /**
  * @brief XWOS API：关闭本地CPU调度器的抢占
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：线程、中断、中断底半部、空闲任务
  */
 static __xwos_inline_api
 void xwos_skd_dspmpt_lc(void)
@@ -164,9 +156,7 @@ void xwos_skd_dspmpt_lc(void)
 /**
  * @brief XWOS API：开启本地CPU调度器的抢占
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：线程、中断、中断底半部、空闲任务
  */
 static __xwos_inline_api
 void xwos_skd_enpmpt_lc(void)

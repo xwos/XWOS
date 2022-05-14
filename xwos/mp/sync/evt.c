@@ -539,8 +539,8 @@ xwer_t xwmp_flg_trywait_edge(struct xwmp_evt * evt, xwsq_t trigger,
         xwssq_t cmprc;
         bool triggered;
         xwer_t rc;
-        xwbmpop_declare(cur, evt->num);
-        xwbmpop_declare(tmp, evt->num);
+        xwbmpop_define(cur, evt->num);
+        xwbmpop_define(tmp, evt->num);
 
         XWOS_VALIDATE((origin), "nullptr", -EFAULT);
 
@@ -706,8 +706,8 @@ xwer_t xwmp_flg_wait_to_edge(struct xwmp_evt * evt, xwsq_t trigger,
         xwssq_t cmprc;
         bool triggered;
         xwer_t rc;
-        xwbmpop_declare(cur, evt->num);
-        xwbmpop_declare(tmp, evt->num);
+        xwbmpop_define(cur, evt->num);
+        xwbmpop_define(tmp, evt->num);
 
         XWOS_VALIDATE((origin), "nullptr", -EFAULT);
         xwbmpop_and(origin, msk, evt->num);

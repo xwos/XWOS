@@ -37,8 +37,8 @@ xwer_t xwflgdemo_producer_func(void * arg);
  * @brief 静态定义的事件标志
  */
 #define XWFLGDEMO_FLG_NUM (sizeof(xwbmp_t) * BITS_PER_XWU8_T)
-xwbmpop_declare(xwflgdemo_flg_bmp, XWFLGDEMO_FLG_NUM) = {0,};
-xwbmpop_declare(xwflgdemo_flg_msk, XWFLGDEMO_FLG_NUM) = {0,};
+xwbmpop_define(xwflgdemo_flg_bmp, XWFLGDEMO_FLG_NUM) = {0,};
+xwbmpop_define(xwflgdemo_flg_msk, XWFLGDEMO_FLG_NUM) = {0,};
 struct xwos_flg xwflgdemo_flg;
 
 /**
@@ -127,9 +127,9 @@ xwer_t xwflgdemo_consumer_func(void * arg)
 {
         xwtm_t now;
         xwer_t rc = XWOK;
-        xwbmpop_declare(msk, XWFLGDEMO_FLG_NUM) = {0,};
-        xwbmpop_declare(org, XWFLGDEMO_FLG_NUM) = {0,};
-        xwbmpop_declare(tgevt, XWFLGDEMO_FLG_NUM) = {0,};
+        xwbmpop_define(msk, XWFLGDEMO_FLG_NUM) = {0,};
+        xwbmpop_define(org, XWFLGDEMO_FLG_NUM) = {0,};
+        xwbmpop_define(tgevt, XWFLGDEMO_FLG_NUM) = {0,};
 
         XWOS_UNUSED(arg);
         flglogf(INFO, "[等待线程] 启动。\n");
@@ -280,8 +280,8 @@ xwer_t xwflgdemo_consumer_func(void * arg)
  */
 xwer_t xwflgdemo_producer_func(void * arg)
 {
-        xwbmpop_declare(org, XWFLGDEMO_FLG_NUM) = {0,};
-        xwbmpop_declare(msk, XWFLGDEMO_FLG_NUM) = {0,};
+        xwbmpop_define(org, XWFLGDEMO_FLG_NUM) = {0,};
+        xwbmpop_define(msk, XWFLGDEMO_FLG_NUM) = {0,};
         xwtm_t now;
         xwer_t rc = XWOK;
 

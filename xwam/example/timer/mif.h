@@ -23,6 +23,6 @@
 
 #include <xwos/standard.h>
 
-xwer_t example_timer_start(void);
+xwer_t xwos_example_timer(void);
 
 #endif /* xwam/example/timer/mif.h */

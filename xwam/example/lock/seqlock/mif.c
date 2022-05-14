@@ -27,31 +27,31 @@
 #include <xwos/osal/swt.h>
 #include <xwam/example/lock/seqlock/mif.h>
 
-#define LOGTAG "swt"
-#define swtlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
+#define LOGTAG "sqlk"
+#define sqlkdemo(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
 
-#define XWSQLKDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
-void xwsqlkdemo_swt_callback(struct xwos_swt * swt, void * arg);
-xwer_t xwsqlkdemo_thd_func(void * arg);
+#define SQLKDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+void sqlkdemo_swt_callback(struct xwos_swt * swt, void * arg);
+xwer_t sqlkdemo_thd_func(void * arg);
 
-xwos_thd_d xwsqlkdemo_thd;
-struct xwos_swt xwsqlkdemo_swt;
-struct xwos_sqlk xwsqlkdemo_lock;
-xwsq_t xwsqlkdemo_shared_count = 0;
+xwos_thd_d sqlkdemo_thd;
+struct xwos_swt sqlkdemo_swt;
+struct xwos_sqlk sqlkdemo_lock;
+xwsq_t sqlkdemo_shared_count = 0;
 
 /**
  * @brief 模块的加载函数
  */
-xwer_t example_seqlock_start(void)
+xwer_t xwos_example_seqlock(void)
 {
         struct xwos_thd_attr attr;
         xwer_t rc;
 
         /* 初始化自旋锁 */
-        xwos_sqlk_init(&xwsqlkdemo_lock);
+        xwos_sqlk_init(&sqlkdemo_lock);
 
         /* 初始化定时器 */
-        rc = xwos_swt_init(&xwsqlkdemo_swt, "xwsqlkdemo_swt",
+        rc = xwos_swt_init(&sqlkdemo_swt, "sqlkdemo_swt",
                            XWOS_SWT_FLAG_RESTART);
         if (rc < 0) {
                 goto err_swt_init;
@@ -59,13 +59,13 @@ xwer_t example_seqlock_start(void)
 
         /* 创建线程 */
         xwos_thd_attr_init(&attr);
-        attr.name = "xwsqlkdemo.thd";
+        attr.name = "sqlkdemo.thd";
         attr.stack = NULL;
         attr.stack_size = 2048;
-        attr.priority = XWSQLKDEMO_THD_PRIORITY;
+        attr.priority = SQLKDEMO_THD_PRIORITY;
         attr.detached = false;
         attr.privileged = true;
-        rc = xwos_thd_create(&xwsqlkdemo_thd, &attr, xwsqlkdemo_thd_func, NULL);
+        rc = xwos_thd_create(&sqlkdemo_thd, &attr, sqlkdemo_thd_func, NULL);
         if (rc < 0) {
                 goto err_thd_create;
         }
@@ -73,7 +73,7 @@ xwer_t example_seqlock_start(void)
         return XWOK;
 
 err_thd_create:
-        xwos_swt_fini(&xwsqlkdemo_swt);
+        xwos_swt_fini(&sqlkdemo_swt);
 err_swt_init:
         return rc;
 }
@@ -89,23 +89,23 @@ err_swt_init:
  *   - 当配置(XWMPCFG_SKD_BH == 0)，此函数运行在中断上下文；
  * - 此函数中不可调用会导致线程睡眠或阻塞的函数。
  */
-void xwsqlkdemo_swt_callback(struct xwos_swt * swt, void * arg)
+void sqlkdemo_swt_callback(struct xwos_swt * swt, void * arg)
 {
         xwreg_t cpuirq;
 
         XWOS_UNUSED(swt);
         XWOS_UNUSED(arg);
 
-        xwos_sqlk_wr_lock_cpuirqsv(&xwsqlkdemo_lock, &cpuirq);
+        xwos_sqlk_wr_lock_cpuirqsv(&sqlkdemo_lock, &cpuirq);
         /* 写临界区 */
-        xwsqlkdemo_shared_count++;
-        xwos_sqlk_wr_unlock_cpuirqrs(&xwsqlkdemo_lock, cpuirq);
+        sqlkdemo_shared_count++;
+        xwos_sqlk_wr_unlock_cpuirqrs(&sqlkdemo_lock, cpuirq);
 }
 
 /**
  * @brief 线程的主函数
  */
-xwer_t xwsqlkdemo_thd_func(void * arg)
+xwer_t sqlkdemo_thd_func(void * arg)
 {
         xwtm_t ts;
         xwsq_t cnt, lkseq;
@@ -113,30 +113,30 @@ xwer_t xwsqlkdemo_thd_func(void * arg)
 
         XWOS_UNUSED(arg);
 
-        swtlogf(INFO, "[线程] 启动。\n");
-        swtlogf(INFO, "[线程] 启动定时器。\n");
+        sqlkdemo(INFO, "[线程] 启动。\n");
+        sqlkdemo(INFO, "[线程] 启动定时器。\n");
 
         ts = xwtm_now();
-        rc = xwos_swt_start(&xwsqlkdemo_swt,
+        rc = xwos_swt_start(&sqlkdemo_swt,
                             ts, XWTM_MS(500),
-                            xwsqlkdemo_swt_callback, NULL);
+                            sqlkdemo_swt_callback, NULL);
 
         while (!xwos_cthd_frz_shld_stop(NULL)) {
                 xwos_cthd_sleep(XWTM_S(1));
 
                 do {
-                        lkseq = xwos_sqlk_rd_begin(&xwsqlkdemo_lock);
+                        lkseq = xwos_sqlk_rd_begin(&sqlkdemo_lock);
                         /* 读临界区 */
-                        cnt = xwsqlkdemo_shared_count;
-                } while (xwos_sqlk_rd_retry(&xwsqlkdemo_lock, lkseq));
+                        cnt = sqlkdemo_shared_count;
+                } while (xwos_sqlk_rd_retry(&sqlkdemo_lock, lkseq));
 
                 ts = xwtm_nowts();
-                swtlogf(INFO,
+                sqlkdemo(INFO,
                         "[线程] 时间戳：%lld 纳秒，计数器：%d。\n",
                         ts, cnt);
         }
 
-        swtlogf(INFO, "[线程] 退出。\n");
+        sqlkdemo(INFO, "[线程] 退出。\n");
         xwos_thd_detach(xwos_cthd_self());
         return rc;
 }

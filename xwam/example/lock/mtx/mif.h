@@ -23,6 +23,6 @@
 
 #include <xwos/standard.h>
 
-xwer_t example_mtx_start(void);
+xwer_t xwos_example_mtx(void);
 
 #endif /* xwam/example/lock/mtx/mif.h */

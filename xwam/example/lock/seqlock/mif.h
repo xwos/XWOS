@@ -23,6 +23,6 @@
 
 #include <xwos/standard.h>
 
-xwer_t example_seqlock_start(void);
+xwer_t xwos_example_seqlock(void);
 
 #endif /* xwam/example/lock/seqlock/mif.h */

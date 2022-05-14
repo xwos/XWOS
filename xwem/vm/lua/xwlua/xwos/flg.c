@@ -166,17 +166,6 @@ int xwlua_flgsp_unbind(lua_State * L)
         return 1;
 }
 
-int xwlua_flgsp_intr_all(lua_State * L)
-{
-        xwlua_flg_sp * flgsp;
-        xwer_t rc;
-
-        flgsp = (xwlua_flg_sp *)luaL_checkudata(L, 1, "xwlua_flg_sp");
-        rc = xwos_flg_intr_all(flgsp->flg);
-        lua_pushinteger(L, (lua_Integer)rc);
-        return 1;
-}
-
 int xwlua_flgsp_read(lua_State * L)
 {
         xwlua_flg_sp * flgsp;
@@ -376,7 +365,6 @@ const luaL_Reg xwlua_flgsp_indexmethod[] = {
         {"num", xwlua_flgsp_num},
         {"bind", xwlua_flgsp_bind},
         {"unbind", xwlua_flgsp_unbind},
-        {"intr_all", xwlua_flgsp_intr_all},
         {"read", xwlua_flgsp_read},
         {"s1i", xwlua_flgsp_s1i},
         {"s1m", xwlua_flgsp_s1m},

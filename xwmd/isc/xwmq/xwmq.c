@@ -41,15 +41,6 @@ xwer_t xwmq_gc(void * obj)
         return XWOK;
 }
 
-/**
- * @brief XWMQ API：获取消息队列对象的标签
- * @param[in] mq: 消息队列对象的指针
- * @return 消息队列对象的标签
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmd_api
 xwsq_t xwmq_gettik(struct xwmq * mq)
 {
@@ -63,63 +54,26 @@ xwsq_t xwmq_gettik(struct xwmq * mq)
         return tik;
 }
 
-/**
- * @brief XWMQ API：检查消息队列对象的标签并增加引用计数
- * @param[in] mq: 消息队列对象指针
- * @param[in] tik: 标签
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmd_api
 xwer_t xwmq_acquire(struct xwmq * mq, xwsq_t tik)
 {
         return xwos_object_acquire(&mq->xwobj, tik);
 }
 
-/**
- * @brief XWMQ API：检查消息队列对象的标签并增加引用计数
- * @param[in] mq: 消息队列对象指针
- * @param[in] tik: 标签
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmd_api
 xwer_t xwmq_release(struct xwmq * mq, xwsq_t tik)
 {
         return xwos_object_release(&mq->xwobj, tik);
 }
 
-/**
- * @brief XWMQ API：增加消息队列对象的引用计数
- * @param[in] mq: 消息队列控制块对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmd_api
 xwer_t xwmq_grab(struct xwmq * mq)
 {
         XWOS_VALIDATE((mq), "nullptr", -EFAULT);
+
         return xwos_object_grab(&mq->xwobj);
 }
 
-/**
- * @brief XWMQ API：减少消息队列对象的引用计数
- * @param[in] mq: 消息队列控制块对象指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwmd_api
 xwer_t xwmq_put(struct xwmq * mq)
 {
@@ -127,6 +81,7 @@ xwer_t xwmq_put(struct xwmq * mq)
         return xwos_object_put(&mq->xwobj);
 }
 
+__xwmd_rodata
 const __xwmd_rodata char xwmq_txq_name[] = "xwmq.txq";
 
 static __xwmd_code
@@ -154,35 +109,16 @@ err_xwobj_activate:
         return rc;
 }
 
-/**
- * @brief XWMQ API：静态方式初始化消息队列
- * @param[in] mq: 消息队列对象的指针
- * @param[in] txq: 消息槽内存池
- * @param[in] num: 消息槽数量
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwmd_api
 xwer_t xwmq_init(struct xwmq * mq, struct xwmq_msg * txq, xwsz_t num)
 {
         XWOS_VALIDATE((mq), "nullptr", -EFAULT);
         XWOS_VALIDATE((txq), "nullptr", -EFAULT);
+
         xwmq_construct(mq);
         return xwmq_activate(mq, txq, num, xwmq_gc);
 }
 
-/**
- * @brief XWMQ API：销毁静态方式初始化的消息队列对象
- * @param[in] mq: 消息队列对象的指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwmd_api
 xwer_t xwmq_fini(struct xwmq * mq)
 {
@@ -190,21 +126,23 @@ xwer_t xwmq_fini(struct xwmq * mq)
         return xwmq_put(mq);
 }
 
-/******** ******** xwmq_msg ******** ********/
-
 /**
- * @brief 消息对象的构造函数
- * @param[in] msg: 消息对象的指针
+ * @brief 消息槽的构造函数
+ * @param[in] msg: 消息槽的指针
  */
 static __xwmd_code
 void xwmq_msg_construct(void * obj)
 {
         struct xwmq_msg * msg = obj;
+
         xwlib_bclst_init_node(&msg->node);
         msg->topic = 0;
         msg->data = NULL;
 }
 
+/**
+ * @brief 获取一个消息槽
+ */
 static __xwmd_code
 struct xwmq_msg * xwmq_msg_get(struct xwmq * mq)
 {
@@ -217,55 +155,21 @@ struct xwmq_msg * xwmq_msg_get(struct xwmq * mq)
         return mem.msg;
 }
 
+/**
+ * @brief 释放一个消息槽
+ */
 static __xwmd_code
 void xwmq_msg_put(struct xwmq * mq, struct xwmq_msg * msg)
 {
         xwmm_memslice_free(&mq->txq, msg);
 }
 
-/**
- * @brief XWMQ API：将消息放入到消息队列的尾端（入队）
- * @param[in] mq: 消息队列对象的指针
- * @param[in] topic: 消息的标题
- * @param[in] data: 消息的数据
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINTR: 等待被中断
- * @retval -ENOTTHDCTX: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- * @details
- * 若消息槽队列中没有空闲的消息槽，就阻塞发送线程，直到有空闲的消息槽或被中断。
- */
 __xwmd_api
 xwer_t xwmq_eq(struct xwmq * mq, xwsq_t topic, void * data)
 {
         return xwmq_eq_to(mq, topic, data, XWTM_MAX);
 }
 
-/**
- * @brief XWMQ API：限时将消息放入到消息队列的尾端（入队）
- * @param[in] mq: 消息队列对象的指针
- * @param[in] topic: 消息的标题
- * @param[in] data: 消息的数据
- * @param[in] to: 期望唤醒的时间点
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINTR: 等待被中断
- * @retval -ETIMEDOUT: 超时
- * @retval -ENOTTHDCTX: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- * @details
- * 若消息槽队列中没有空闲的消息槽，就阻塞发送线程，直到有空闲的消息槽或被中断或超时。
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
- */
 __xwmd_api
 xwer_t xwmq_eq_to(struct xwmq * mq, xwsq_t topic, void * data, xwtm_t to)
 {
@@ -293,22 +197,6 @@ err_sem_wait_to:
         return rc;
 }
 
-/**
- * @brief XWMQ API：尝试将消息放入到消息队列的尾端（入队）
- * @param[in] mq: 消息队列对象的指针
- * @param[in] topic: 消息的标题
- * @param[in] data: 消息的数据
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENODATA: 接收队列为空
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- * @details
- * 若消息槽队列中没有空闲的消息槽，就立即返回```-ENODATA```，因此可在中断中使用。
- */
 __xwmd_api
 xwer_t xwmq_tryeq(struct xwmq * mq, xwsq_t topic, void * data)
 {
@@ -336,49 +224,12 @@ err_sem_trywait:
         return rc;
 }
 
-/**
- * @brief XWMQ API：将消息放入到消息队列的首端（插队）
- * @param[in] mq: 消息队列对象的指针
- * @param[in] topic: 消息的标题
- * @param[in] data: 消息的数据
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINTR: 等待被中断
- * @retval -ENOTTHDCTX: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- * @details
- * 若消息槽队列中没有空闲的消息槽，就阻塞发送线程，直到有空闲的消息槽或被中断。
- */
 __xwmd_api
 xwer_t xwmq_jq(struct xwmq * mq, xwsq_t topic, void * data)
 {
         return xwmq_jq_to(mq, topic, data, XWTM_MAX);
 }
 
-/**
- * @brief XWMQ API：限时将消息放入到消息队列的首端（插队）
- * @param[in] mq: 消息队列对象的指针
- * @param[in] topic: 消息的标题
- * @param[in] data: 消息的数据
- * @param[in] to: 期望唤醒的时间点
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINTR: 等待被中断
- * @retval -ETIMEDOUT: 超时
- * @retval -ENOTTHDCTX: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- * @details
- * 若消息槽队列中没有空闲的消息槽，就阻塞发送线程，直到有空闲的消息槽或被中断或超时。
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
- */
 __xwmd_api
 xwer_t xwmq_jq_to(struct xwmq * mq, xwsq_t topic, void * data, xwtm_t to)
 {
@@ -406,22 +257,6 @@ err_sem_wait_to:
         return rc;
 }
 
-/**
- * @brief XWMQ API：尝试将消息放入到消息队列的首端（插队）
- * @param[in] mq: 消息队列对象的指针
- * @param[in] topic: 消息的标题
- * @param[in] data: 消息的数据
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENODATA: 接收队列为空
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- * @details
- * 若消息槽队列中没有空闲的消息槽，就立即返回```-ENODATA```，因此可在中断中使用。
- */
 __xwmd_api
 xwer_t xwmq_tryjq(struct xwmq * mq, xwsq_t topic, void * data)
 {
@@ -449,6 +284,10 @@ err_sem_trywait:
         return rc;
 }
 
+/**
+ * @brief 从消息接收队列中选择一条消息
+ * @param[in] mq: 消息队列对象的指针
+ */
 static __xwmd_code
 struct xwmq_msg * xwmq_choose(struct xwmq * mq)
 {
@@ -464,49 +303,13 @@ struct xwmq_msg * xwmq_choose(struct xwmq * mq)
         return msg;
 }
 
-/**
- * @brief XWMQ API: 从消息队列头部取出一条消息，若消息队列为空，就无限等待
- * @param[in] mq: 消息队列对象的指针
- * @param[out] :data 指向缓冲区的指针，通过此缓冲区返回接收消息的数据
- * @param[out] :topic 指向缓冲区的指针，通过此缓冲区返回接收消息的标题
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINTR: 等待被中断
- * @retval -ENOTTHDCTX: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- * @details
- * 若接收队列中没有消息，就阻塞接收线程，直到有新的消息槽或被中断。
- */
+
 __xwmd_api
 xwer_t xwmq_dq(struct xwmq * mq, xwsq_t * topic, void ** databuf)
 {
         return xwmq_dq_to(mq, topic, databuf, XWTM_MAX);
 }
 
-/**
- * @brief XWMQ API: 限时从消息接收队列前端取出一条消息，若消息队列为空，就限时等待
- * @param[in] mq: 消息队列对象的指针
- * @param[out] :data 指向缓冲区的指针，通过此缓冲区返回接收消息的数据
- * @param[out] :topic 指向缓冲区的指针，通过此缓冲区返回接收消息的标题
- * @param[in] to: 期望唤醒的时间点
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -EINTR: 等待被中断
- * @retval -ETIMEDOUT: 超时
- * @retval -ENOTTHDCTX: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
- * @details
- * 若接收队列中没有消息，就阻塞接收线程，直到新的消息槽或被中断或超时。
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
- */
 __xwmd_api
 xwer_t xwmq_dq_to(struct xwmq * mq, xwsq_t * topic, void ** databuf, xwtm_t to)
 {
@@ -533,21 +336,6 @@ err_sem_wait_to:
         return rc;
 }
 
-/**
- * @brief XWMQ API: 尝试从消息队列头部取出一条消息，若消息队列为空，立即返回
- * @param[in] mq: 消息队列对象的指针
- * @param[out] ptrbuf: 指向缓冲区的指针，此缓冲区用于接收消息
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENODATA: 接收队列为空
- * @note
- * - 同步/异步：同步
- * - 上下文：线程、中断、中断底半部
- * - 重入性：可重入
- * @details
- * 若接收队列中没有新的消息，就立即返回```-ENODATA```，因此可在中断中使用。
- */
 __xwmd_api
 xwer_t xwmq_trydq(struct xwmq * mq, xwsq_t * topic, void ** databuf)
 {

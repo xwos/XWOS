@@ -128,24 +128,6 @@ end
 
 
 --[[--------
-中断阻塞在信号选择器中的所有线程<br>
-<br>
-
-@tparam userdata selsp (**in**) 信号选择器对象强指针<br>
-<br>
-
-@treturn number
-+ ● **rc** 返回值
-  + ○ **0** 没有错误
-
-@usage
-rc = flg:intr_all()
-]]
-function selsp:intr_all(selsp)
-end
-
-
---[[--------
 新建位图，位的数量与信号选择器中的信号槽数量相等<br>
 <br>
 

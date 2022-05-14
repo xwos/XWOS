@@ -30,7 +30,7 @@
  * @param[in] name: 符号名
  * @param[in] bits: 位图中的位数
  */
-#define xwbmpaop_declare(name, bits) atomic_xwbmp_t name[BITS_TO_XWBMP_T(bits)]
+#define xwbmpaop_define(name, bits) atomic_xwbmp_t name[BITS_TO_XWBMP_T(bits)]
 
 /**
  * @brief XWOS AOPLIB：测试位图中的某位是否被置1

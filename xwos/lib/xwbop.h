@@ -427,7 +427,7 @@ DEFINE_XWBOP(xwbmp_t, 64)
  * @param[in] name: 符号名
  * @param[in] bits: 位图中的位数
  */
-#define xwbmpop_declare(name, bits)  xwbmp_t name[BITS_TO_XWBMP_T(bits)]
+#define xwbmpop_define(name, bits)  xwbmp_t name[BITS_TO_XWBMP_T(bits)]
 
 /**
  * @brief XWOS BOPLIB：赋值操作数到位图

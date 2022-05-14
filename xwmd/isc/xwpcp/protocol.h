@@ -166,9 +166,9 @@ struct xwpcp {
         struct {
                 atomic_xwu32_t cnt; /**< 发送计数器 */
                 struct xwpcp_carrier car[XWPCP_MEMBLK_NUM]; /**< 包含待发送帧的“发送装置” */
-                xwbmpaop_declare(carbmp, XWPCP_MEMBLK_NUM); /**< “发送装置” 的索引位图 */
+                xwbmpaop_define(carbmp, XWPCP_MEMBLK_NUM); /**< “发送装置” 的索引位图 */
                 struct xwlib_bclst_head q[XWPCP_PRI_NUM]; /**< 每优先级发送队列 */
-                xwbmpop_declare(qnebmp, XWPCP_PRI_NUM); /**< 发送队列非空的索引位图 */
+                xwbmpop_define(qnebmp, XWPCP_PRI_NUM); /**< 发送队列非空的索引位图 */
                 struct xwos_splk qlock; /**< 保护发送队列的自旋锁 */
                 struct xwos_sem qsem; /**< 指示待发送帧的数量的信号量 */
                 struct xwos_mtx csmtx; /**< 保护发送和接收线程的共享数据的锁 */

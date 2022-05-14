@@ -179,24 +179,6 @@ end
 
 
 --[[--------
-中断阻塞在事件标志中的所有线程<br>
-<br>
-
-@tparam userdata flgsp (**in**) 事件标志对象强指针<br>
-<br>
-
-@treturn number
-+ ● **rc** 返回值
-  + ○ **0** 没有错误
-
-@usage
-rc = flg:intr_all()
-]]
-function flgsp:intr_all(flgsp)
-end
-
-
---[[--------
 同时设置多个事件标志位<br>
 <br>
 

@@ -52,9 +52,7 @@ typedef struct {
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个条件量对象，不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_cond_init(struct xwos_cond * cond)
@@ -69,9 +67,7 @@ xwer_t xwos_cond_init(struct xwos_cond * cond)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个条件量对象，不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_cond_fini(struct xwos_cond * cond)
@@ -83,15 +79,14 @@ xwer_t xwos_cond_fini(struct xwos_cond * cond)
  * @brief XWOS API：增加条件量对象的引用计数
  * @param[in] cond: 条件量对象的指针
  * @return 错误码
- * @retval XWOK: OK
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
  * @retval -EOBJDEAD: 对象无效
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  * @details
- * 此函数主要用于管理**静态对象**的引用计数。
- * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
+ * 此函数主要用于管理 **静态对象** 的引用计数。
+ * 若用于 **动态对象** ，需要确保对象的指针一定不是野指针。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_grab(struct xwos_cond * cond)
@@ -103,15 +98,14 @@ xwer_t xwos_cond_grab(struct xwos_cond * cond)
  * @brief XWOS API：减少条件量对象的引用计数
  * @param[in] cond: 条件量对象的指针
  * @return 错误码
- * @retval XWOK: OK
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
  * @retval -EOBJDEAD: 对象无效
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  * @details
- * 此函数主要用于管理**静态对象**的引用计数。
- * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
+ * 此函数主要用于管理 **静态对象** 的引用计数。
+ * 若用于 **动态对象** ，需要确保对象的指针一定不是野指针。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_put(struct xwos_cond * cond)
@@ -126,9 +120,7 @@ xwer_t xwos_cond_put(struct xwos_cond * cond)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_cond_create(xwos_cond_d * condd)
@@ -143,9 +135,7 @@ xwer_t xwos_cond_create(xwos_cond_d * condd)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个条件量对象，不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_cond_delete(xwos_cond_d condd)
@@ -157,14 +147,12 @@ xwer_t xwos_cond_delete(xwos_cond_d condd)
  * @brief XWOS API：检查条件量对象的标签并增加引用计数
  * @param[in] condd: 条件量对象描述符
  * @return 错误码
- * @retval XWOK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENILOBJD: 空的对象描述符
  * @retval -EOBJDEAD: 对象无效
  * @retval -EACCES: 对象标签检查失败
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_cond_acquire(xwos_cond_d condd)
@@ -176,14 +164,12 @@ xwer_t xwos_cond_acquire(xwos_cond_d condd)
  * @brief XWOS API：检查对象的标签并减少引用计数
  * @param[in] condd: 条件量对象描述符
  * @return 错误码
- * @retval XWOK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENILOBJD: 空的对象描述符
  * @retval -EOBJDEAD: 对象无效
  * @retval -EACCES: 对象标签检查失败
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_cond_release(xwos_cond_d condd)
@@ -196,9 +182,7 @@ xwer_t xwos_cond_release(xwos_cond_d condd)
  * @param[in] cond: 条件量对象的指针
  * @return 条件量对象的标签
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwsq_t xwos_cond_gettik(struct xwos_cond * cond)
@@ -211,9 +195,7 @@ xwsq_t xwos_cond_gettik(struct xwos_cond * cond)
  * @param[in] cond: 条件量对象的指针
  * @return 条件量对象描述符
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwos_cond_d xwos_cond_getd(struct xwos_cond * cond)
@@ -237,12 +219,9 @@ xwos_cond_d xwos_cond_getd(struct xwos_cond * cond)
  * @retval -EALREADY: 同步对象已经绑定到事件对象
  * @retval -EBUSY: 通道已经被其他同步对象独占
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个条件量对象，不可重入
- * - 绑定方式：非独占绑定
- * @note
- * - 绑定了信号选择器的条件量对象，只有广播才会向信号选择器发送信号。
+ * + 上下文：任意
+ * + 绑定方式：非独占绑定
+ * + 绑定了信号选择器的条件量对象，只有 **广播** 才会向信号选择器发送信号。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_bind(struct xwos_cond * cond, struct xwos_sel * sel, xwsq_t pos)
@@ -259,9 +238,7 @@ xwer_t xwos_cond_bind(struct xwos_cond * cond, struct xwos_sel * sel, xwsq_t pos
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个条件量对象，不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_cond_unbind(struct xwos_cond * cond, struct xwos_sel * sel)
@@ -277,12 +254,12 @@ xwer_t xwos_cond_unbind(struct xwos_cond * cond, struct xwos_sel * sel)
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -EALREADY: 条件量对象已被冻结
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 已冻结的条件量对象不允许单播或广播，但可以被等待，
- *   测试条件量对象的线程会加入到条件量对象的等待队列中阻塞等待。
+ * + 上下文：任意
+ * @details
+ * 已冻结的条件量对象不允许单播或广播，但可以被等待，
+ * 测试条件量对象的线程会加入到条件量对象的等待队列中阻塞等待。
+ *
+ * 对已经冻结的条件量再次冻结，将返回 `-EALREADY` 。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_freeze(struct xwos_cond * cond)
@@ -298,35 +275,14 @@ xwer_t xwos_cond_freeze(struct xwos_cond * cond)
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -EALREADY: 条件量对象未被冻结
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 此函数只对已冻结的条件量对象起作用，对未冻结的条件量对象调用此函数将返回错误码。
+ * + 上下文：任意
+ * @details
+ * 此函数只对已冻结的条件量对象起作用，对未冻结的条件量对象调用此函数将返回错误码 `-EALREADY` 。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_thaw(struct xwos_cond * cond)
 {
         return xwosdl_cond_thaw(&cond->oscond);
-}
-
-/**
- * @brief XWOS API：中断条件量对象等待队列中所有线程
- * @param[in] cond: 条件量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效的指针或空指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 此函数会将等待队列中的所有线程中断。
- */
-static __xwos_inline_api
-xwer_t xwos_cond_intr_all(struct xwos_cond * cond)
-{
-        return xwosdl_cond_intr_all(&cond->oscond);
 }
 
 /**
@@ -337,11 +293,9 @@ xwer_t xwos_cond_intr_all(struct xwos_cond * cond)
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -ENEGATIVE: 条件量对象已被冻结
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 此函数只对未冻结的条件量对象起作用，已冻结的条件量对象将得到错误码**-ENEGATIVE**。
+ * + 上下文：任意
+ * @details
+ * 此函数只对未冻结的条件量对象起作用，已冻结的条件量对象将得到错误码 `-ENEGATIVE` 。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_broadcast(struct xwos_cond * cond)
@@ -357,11 +311,9 @@ xwer_t xwos_cond_broadcast(struct xwos_cond * cond)
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -ENEGATIVE: 条件量对象已被冻结
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 此函数只对未冻结的条件量对象起作用，已冻结的条件量对象将得到错误码**-ENEGATIVE**。
+ * + 上下文：任意
+ * @details
+ * 此函数只对未冻结的条件量对象起作用，已冻结的条件量对象将得到错误码 `-ENEGATIVE` 。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_unicast(struct xwos_cond * cond)
@@ -376,6 +328,8 @@ xwer_t xwos_cond_unicast(struct xwos_cond * cond)
  * @param[in] lktype: 锁的类型，取值：@ref xwos_lock_type_em
  * @param[in] lkdata: 锁的数据
  * @param[out] lkst: 指向缓冲区的指针，通过此缓冲区返回锁的状态
+ *   @arg `XWOS_LKST_LOCKED` ：已上锁
+ *   @arg `XWOS_LKST_UNLOCKED` ：未上锁
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -383,9 +337,26 @@ xwer_t xwos_cond_unicast(struct xwos_cond * cond)
  * @retval -EINTR: 等待被中断
  * @retval -ENOTTHDCTX: 不在线程上下文中
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 上下文：线程
+ * @details
+ * + 所有锁统一使用 `union xwlk_ulock` 指代，此联合中包含所有锁的定义，实际只是一个指针，有些锁还需要伴生数据 `lkdata` ，具体意义由 `xwsq_t lktype` 决定：
+ *   + `XWOS_LK_MTX` ：互斥锁
+ *     + `lock` ：代表互斥锁（访问方式： `lock.osal.mtx` ）；
+ *     + `lockdata` ：无作用，设置为 `NULL` 即可；
+ *   + `XWOS_LK_SPLK` ：自旋锁
+ *     + `lock` ：代表自旋锁的指针（访问方式： `lock.osal.splk` ）；
+ *     + `lockdata` ：无作用，设置为 `NULL` 即可；
+ *   + `XWOS_LK_SQLK_WR` ：顺序写锁
+ *     + `lock` ：代表顺序锁的指针（访问方式： `lock.osal.sqlk` ）；
+ *     + `lockdata` ：无作用，设置为 `NULL` 即可；
+ *   + `XWOS_LK_SQLK_RDEX` ：顺序独占读锁
+ *     + `lock` ：代表顺序锁的指针（访问方式： `lock.osal.sqlk` ）；
+ *     + `lockdata` ：无作用，设置为 `NULL` 即可；
+ *   + `XWOS_LK_CALLBACK` ：自定义的加锁与解锁函数
+ *     + `lock` ：代表指向 `struct xwlk_cblk` 的指针（访问方式： `lock.cb` ）；
+ *     + `lockdata` ：传递给 `struct xwlk_cblk` 中的 `lock` 与 `unlock` 函数的参数；
+ * + `lkst` 是用来返回锁的状态。XWOS的条件量在返回 `XWOK` 时，锁状态一定是是 **已上锁**，
+ *   但若返回错误码时，锁的状态不确定。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_wait(struct xwos_cond * cond,
@@ -403,6 +374,8 @@ xwer_t xwos_cond_wait(struct xwos_cond * cond,
  * @param[in] lkdata: 锁的数据
  * @param[in] to: 期望唤醒的时间点
  * @param[out] lkst: 指向缓冲区的指针，通过此缓冲区返回锁的状态
+ *   @arg `XWOS_LKST_LOCKED` ：已上锁
+ *   @arg `XWOS_LKST_UNLOCKED` ：未上锁
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -411,11 +384,27 @@ xwer_t xwos_cond_wait(struct xwos_cond * cond,
  * @retval -EINTR: 等待被中断
  * @retval -ENOTTHDCTX: 不在线程上下文中
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 上下文：线程
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * + 所有锁统一使用 `union xwlk_ulock` 指代，此联合中包含所有锁的定义，实际只是一个指针，有些锁还需要伴生数据 `lkdata` ，具体意义由 `xwsq_t lktype` 决定：
+ *   + `XWOS_LK_MTX` ：互斥锁
+ *     + `lock` ：代表互斥锁（访问方式： `lock.osal.mtx` ）；
+ *     + `lockdata` ：无作用，设置为 `NULL` 即可；
+ *   + `XWOS_LK_SPLK` ：自旋锁
+ *     + `lock` ：代表自旋锁的指针（访问方式： `lock.osal.splk` ）；
+ *     + `lockdata` ：无作用，设置为 `NULL` 即可；
+ *   + `XWOS_LK_SQLK_WR` ：顺序写锁
+ *     + `lock` ：代表顺序锁的指针（访问方式： `lock.osal.sqlk` ）；
+ *     + `lockdata` ：无作用，设置为 `NULL` 即可；
+ *   + `XWOS_LK_SQLK_RDEX` ：顺序独占读锁
+ *     + `lock` ：代表顺序锁的指针（访问方式： `lock.osal.sqlk` ）；
+ *     + `lockdata` ：无作用，设置为 `NULL` 即可；
+ *   + `XWOS_LK_CALLBACK` ：自定义的加锁与解锁函数
+ *     + `lock` ：代表指向 `struct xwlk_cblk` 的指针（访问方式： `lock.cb` ）；
+ *     + `lockdata` ：传递给 `struct xwlk_cblk` 中的 `lock` 与 `unlock` 函数的参数；
+ * + `lkst` 是用来返回锁的状态。XWOS的条件量在返回 `XWOK` 时，锁状态一定是是 **已上锁**，
+ *   但若返回错误码时，锁的状态不确定。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_wait_to(struct xwos_cond * cond,
@@ -432,6 +421,8 @@ xwer_t xwos_cond_wait_to(struct xwos_cond * cond,
  * @param[in] lktype: 锁的类型，取值：@ref xwos_lock_type_em
  * @param[in] lkdata: 锁的数据
  * @param[out] lkst: 指向缓冲区的指针，通过此缓冲区返回锁的状态
+ *   @arg `XWOS_LKST_LOCKED` ：已上锁
+ *   @arg `XWOS_LKST_UNLOCKED` ：未上锁
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
@@ -439,9 +430,26 @@ xwer_t xwos_cond_wait_to(struct xwos_cond * cond,
  * @retval -EINTR: 等待被中断
  * @retval -ENOTTHDCTX: 不在线程上下文中
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 上下文：线程
+ * @details
+ * + 所有锁统一使用 `union xwlk_ulock` 指代，此联合中包含所有锁的定义，实际只是一个指针，有些锁还需要伴生数据 `lkdata` ，具体意义由 `xwsq_t lktype` 决定：
+ *   + `XWOS_LK_MTX` ：互斥锁
+ *     + `lock` ：代表互斥锁（访问方式： `lock.osal.mtx` ）；
+ *     + `lockdata` ：无作用，设置为 `NULL` 即可；
+ *   + `XWOS_LK_SPLK` ：自旋锁
+ *     + `lock` ：代表自旋锁的指针（访问方式： `lock.osal.splk` ）；
+ *     + `lockdata` ：无作用，设置为 `NULL` 即可；
+ *   + `XWOS_LK_SQLK_WR` ：顺序写锁
+ *     + `lock` ：代表顺序锁的指针（访问方式： `lock.osal.sqlk` ）；
+ *     + `lockdata` ：无作用，设置为 `NULL` 即可；
+ *   + `XWOS_LK_SQLK_RDEX` ：顺序独占读锁
+ *     + `lock` ：代表顺序锁的指针（访问方式： `lock.osal.sqlk` ）；
+ *     + `lockdata` ：无作用，设置为 `NULL` 即可；
+ *   + `XWOS_LK_CALLBACK` ：自定义的加锁与解锁函数
+ *     + `lock` ：代表指向 `struct xwlk_cblk` 的指针（访问方式： `lock.cb` ）；
+ *     + `lockdata` ：传递给 `struct xwlk_cblk` 中的 `lock` 与 `unlock` 函数的参数；
+ * + `lkst` 是用来返回锁的状态。XWOS的条件量在返回 `XWOK` 时，锁状态一定是是 **已上锁**，
+ *   但若返回错误码时，锁的状态不确定。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_wait_unintr(struct xwos_cond * cond,

@@ -53,9 +53,7 @@ typedef struct {
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -EINVAL: 无效参数
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_mtx_init(struct xwos_mtx * mtx, xwpr_t sprio)
@@ -70,9 +68,7 @@ xwer_t xwos_mtx_init(struct xwos_mtx * mtx, xwpr_t sprio)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_mtx_fini(struct xwos_mtx * mtx)
@@ -84,15 +80,14 @@ xwer_t xwos_mtx_fini(struct xwos_mtx * mtx)
  * @brief XWOS API：增加互斥锁对象的引用计数
  * @param[in] mtx: 互斥锁对象的指针
  * @return 错误码
- * @retval XWOK: OK
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
  * @retval -EOBJDEAD: 对象无效
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  * @details
- * 此函数主要用于管理**静态对象**的引用计数。
- * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
+ * 此函数主要用于管理 **静态对象** 的引用计数。
+ * 若用于 **动态对象** ，需要确保对象的指针一定不是野指针。
  */
 static __xwos_inline_api
 xwer_t xwos_mtx_grab(struct xwos_mtx * mtx)
@@ -104,15 +99,14 @@ xwer_t xwos_mtx_grab(struct xwos_mtx * mtx)
  * @brief XWOS API：减少互斥锁对象的引用计数
  * @param[in] mtx: 互斥锁对象的指针
  * @return 错误码
- * @retval XWOK: OK
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
  * @retval -EOBJDEAD: 对象无效
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  * @details
- * 此函数主要用于管理**静态对象**的引用计数。
- * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
+ * 此函数主要用于管理 **静态对象** 的引用计数。
+ * 若用于 **动态对象** ，需要确保对象的指针一定不是野指针。
  */
 static __xwos_inline_api
 xwer_t xwos_mtx_put(struct xwos_mtx * mtx)
@@ -130,9 +124,7 @@ xwer_t xwos_mtx_put(struct xwos_mtx * mtx)
  * @retval -EINVAL: 无效参数
  * @retval -ENOMEM: 内存不足
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_mtx_create(xwos_mtx_d * mtxd, xwpr_t sprio)
@@ -147,9 +139,7 @@ xwer_t xwos_mtx_create(xwos_mtx_d * mtxd, xwpr_t sprio)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_mtx_delete(xwos_mtx_d mtxd)
@@ -161,14 +151,12 @@ xwer_t xwos_mtx_delete(xwos_mtx_d mtxd)
  * @brief XWOS API：检查互斥锁对象的标签并增加引用计数
  * @param[in] mtxd: 互斥锁对象描述符
  * @return 错误码
- * @retval XWOK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENILOBJD: 空的对象描述符
  * @retval -EOBJDEAD: 对象无效
  * @retval -EACCES: 对象标签检查失败
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_mtx_acquire(xwos_mtx_d mtxd)
@@ -180,14 +168,12 @@ xwer_t xwos_mtx_acquire(xwos_mtx_d mtxd)
  * @brief XWOS API：检查对象的标签并减少引用计数
  * @param[in] mtxd: 互斥锁对象描述符
  * @return 错误码
- * @retval XWOK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENILOBJD: 空的对象描述符
  * @retval -EOBJDEAD: 对象无效
  * @retval -EACCES: 对象标签检查失败
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_mtx_release(xwos_mtx_d mtxd)
@@ -200,9 +186,7 @@ xwer_t xwos_mtx_release(xwos_mtx_d mtxd)
  * @param[in] mtx: 互斥锁对象的指针
  * @return 互斥锁对象的标签
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwsq_t xwos_mtx_gettik(struct xwos_mtx * mtx)
@@ -215,9 +199,7 @@ xwsq_t xwos_mtx_gettik(struct xwos_mtx * mtx)
  * @param[in] mtx: 互斥锁对象的指针
  * @return 互斥锁对象的描述符
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwos_mtx_d xwos_mtx_getd(struct xwos_mtx * mtx)
@@ -239,9 +221,7 @@ xwos_mtx_d xwos_mtx_getd(struct xwos_mtx * mtx)
  * @retval -EOWNER: 线程并没有锁定此互斥锁
  * @retval -ENOTTHDCTX: 不在线程上下文中
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
+ * + 上下文：线程
  */
 static __xwos_inline_api
 xwer_t xwos_mtx_unlock(struct xwos_mtx * mtx)
@@ -250,7 +230,7 @@ xwer_t xwos_mtx_unlock(struct xwos_mtx * mtx)
 }
 
 /**
- * @brief XWOS API：获取互斥锁
+ * @brief XWOS API：等待并获取互斥锁
  * @param[in] mtx: 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -261,42 +241,16 @@ xwer_t xwos_mtx_unlock(struct xwos_mtx * mtx)
  * @retval -EDSPMPT: 抢占被关闭
  * @retval -EDSBH: 中断底半部被关闭
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
+ * + 上下文：线程
  * @details
  * 若线程无法获取互斥锁，就阻塞等待，直到能获得锁为之。
  *
- * 线程的阻塞等待可能被中断，此时，API返回 ```-EINTR``` 。
+ * 线程的阻塞等待可能被中断，此时，API返回 `-EINTR` 。
  */
 static __xwos_inline_api
 xwer_t xwos_mtx_lock(struct xwos_mtx * mtx)
 {
         return xwosdl_mtx_lock(&mtx->osmtx);
-}
-
-/**
- * @brief XWOS API：尝试获取互斥锁，不会阻塞调用线程
- * @param[in] mtx: 互斥锁对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 无效的指针或空指针
- + @retval -EOBJDEAD 互斥锁对象无效
- * @retval -EWOULDBLOCK: 尝试获取锁失败
- * @retval -ENOTTHDCTX: 不在线程上下文中
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
- * @note
- * - 此函数虽然不会阻塞调用线程，但也不可在中断上下文中使用，因为在OS中
- *   互斥锁通常需要记录自己的拥有者（一般是线程对象结构体），
- *   中断上下文不存在对应的线程对象结构体。
- */
-static __xwos_inline_api
-xwer_t xwos_mtx_trylock(struct xwos_mtx * mtx)
-{
-        return xwosdl_mtx_trylock(&mtx->osmtx);
 }
 
 /**
@@ -313,11 +267,9 @@ xwer_t xwos_mtx_trylock(struct xwos_mtx * mtx)
  * @retval -EDSPMPT: 抢占被关闭
  * @retval -EDSBH: 中断底半部被关闭
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
+ * + 上下文：线程
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 static __xwos_inline_api
 xwer_t xwos_mtx_lock_to(struct xwos_mtx * mtx, xwtm_t to)
@@ -326,7 +278,7 @@ xwer_t xwos_mtx_lock_to(struct xwos_mtx * mtx, xwtm_t to)
 }
 
 /**
- * @brief XWOS API：等待上锁互斥锁，且等待不可被中断
+ * @brief XWOS API：等待并获取互斥锁，且等待不可被中断
  * @param[in] mtx: 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -336,14 +288,34 @@ xwer_t xwos_mtx_lock_to(struct xwos_mtx * mtx, xwtm_t to)
  * @retval -EDSPMPT: 抢占被关闭
  * @retval -EDSBH: 中断底半部被关闭
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
+ * + 上下文：线程
  */
 static __xwos_inline_api
 xwer_t xwos_mtx_lock_unintr(struct xwos_mtx * mtx)
 {
         return xwosdl_mtx_lock_unintr(&mtx->osmtx);
+}
+
+/**
+ * @brief XWOS API：尝试获取互斥锁，不会阻塞调用线程
+ * @param[in] mtx: 互斥锁对象的指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 无效的指针或空指针
+ + @retval -EOBJDEAD 互斥锁对象无效
+ * @retval -EWOULDBLOCK: 尝试获取锁失败
+ * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @note
+ * + 上下文：线程
+ * @note
+ * - 此函数虽然不会阻塞调用线程，但也不可在中断上下文中使用，
+ *   因为在OS中互斥锁通常需要记录自己的拥有者（一般是线程对象结构体），
+ *   中断上下文不存在对应的线程对象结构体。
+ */
+static __xwos_inline_api
+xwer_t xwos_mtx_trylock(struct xwos_mtx * mtx)
+{
+        return xwosdl_mtx_trylock(&mtx->osmtx);
 }
 
 /**
@@ -355,9 +327,7 @@ xwer_t xwos_mtx_lock_unintr(struct xwos_mtx * mtx)
  * @retval -EFAULT: 空指针
  + @retval -EOBJDEAD 互斥锁对象无效
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_mtx_getlkst(struct xwos_mtx * mtx, xwsq_t * lkst)

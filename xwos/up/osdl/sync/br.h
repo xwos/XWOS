@@ -87,12 +87,6 @@ xwer_t xwosdl_br_unbind(struct xwosdl_br * br, struct xwosdl_sel * sel)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_br_intr_all(struct xwosdl_br * br)
-{
-        return xwup_evt_intr_all(br);
-}
-
-static __xwcc_inline
 xwer_t xwosdl_br_get_num(struct xwosdl_br * br, xwsz_t * numbuf)
 {
         return xwup_evt_get_num(br, numbuf);

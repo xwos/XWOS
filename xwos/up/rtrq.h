@@ -27,7 +27,7 @@ struct xwup_thd;
  */
 struct xwup_rtrq {
         struct xwlib_bclst_head q[XWUP_RTRQ_QNUM];
-        xwbmpop_declare(bmp, XWUP_RTRQ_QNUM);
+        xwbmpop_define(bmp, XWUP_RTRQ_QNUM);
         xwpr_t top;
 };
 

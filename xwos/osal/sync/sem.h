@@ -54,9 +54,7 @@ typedef struct {
  * @retval -EFAULT: 空指针
  * @retval -EINVAL: 无效参数
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个信号量对象，不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_sem_init(struct xwos_sem * sem, xwssq_t val, xwssq_t max)
@@ -71,9 +69,7 @@ xwer_t xwos_sem_init(struct xwos_sem * sem, xwssq_t val, xwssq_t max)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个信号量对象，不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_sem_fini(struct xwos_sem * sem)
@@ -85,16 +81,14 @@ xwer_t xwos_sem_fini(struct xwos_sem * sem)
  * @brief XWOS API：增加信号量对象的引用计数
  * @param[in] sem: 信号量对象的指针
  * @return 错误码
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
- * @retval XWOK: OK
  * @retval -EOBJDEAD: 对象无效
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  * @details
- * 此函数主要用于管理**静态对象**的引用计数。
- * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
+ * 此函数主要用于管理 **静态对象** 的引用计数。
+ * 若用于 **动态对象** ，需要确保对象的指针一定不是野指针。
  */
 static __xwos_inline_api
 xwer_t xwos_sem_grab(struct xwos_sem * sem)
@@ -106,16 +100,14 @@ xwer_t xwos_sem_grab(struct xwos_sem * sem)
  * @brief XWOS API：减少信号量对象的引用计数
  * @param[in] sem: 信号量对象的指针
  * @return 错误码
- * @retval XWOK: OK
+ * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EOBJDEAD: 对象无效
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  * @details
- * 此函数主要用于管理**静态对象**的引用计数。
- * 若用于**动态对象**，需要确保对象的指针一定不是野指针。
+ * 此函数主要用于管理 **静态对象** 的引用计数。
+ * 若用于 **动态对象** ，需要确保对象的指针一定不是野指针。
  */
 static __xwos_inline_api
 xwer_t xwos_sem_put(struct xwos_sem * sem)
@@ -134,9 +126,7 @@ xwer_t xwos_sem_put(struct xwos_sem * sem)
  * @retval -EINVAL: 无效参数
  * @retval -ENOMEM: 内存不足
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_sem_create(xwos_sem_d * semd, xwssq_t val, xwssq_t max)
@@ -151,9 +141,7 @@ xwer_t xwos_sem_create(xwos_sem_d * semd, xwssq_t val, xwssq_t max)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个信号量对象，不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_sem_delete(xwos_sem_d semd)
@@ -165,14 +153,12 @@ xwer_t xwos_sem_delete(xwos_sem_d semd)
  * @brief XWOS API：检查信号量对象的标签并增加引用计数
  * @param[in] semd: 信号量对象描述符
  * @return 错误码
- * @retval XWOK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENILOBJD: 空的对象描述符
  * @retval -EOBJDEAD: 对象无效
  * @retval -EACCES: 对象标签检查失败
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_sem_acquire(xwos_sem_d semd)
@@ -184,14 +170,12 @@ xwer_t xwos_sem_acquire(xwos_sem_d semd)
  * @brief XWOS API：检查对象的标签并减少引用计数
  * @param[in] semd: 信号量对象描述符
  * @return 错误码
- * @retval XWOK: OK
+ * @retval XWOK: 没有错误
  * @retval -ENILOBJD: 空的对象描述符
  * @retval -EOBJDEAD: 对象无效
  * @retval -EACCES: 对象标签检查失败
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_sem_release(xwos_sem_d semd)
@@ -204,9 +188,7 @@ xwer_t xwos_sem_release(xwos_sem_d semd)
  * @param[in] sem: 信号量对象的指针
  * @return 信号量对象的标签
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwsq_t xwos_sem_gettik(struct xwos_sem * sem)
@@ -219,9 +201,7 @@ xwsq_t xwos_sem_gettik(struct xwos_sem * sem)
  * @param[in] sem: 信号量对象的指针
  * @return 信号量对象描述符
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwos_sem_d xwos_sem_getd(struct xwos_sem * sem)
@@ -245,9 +225,7 @@ xwos_sem_d xwos_sem_getd(struct xwos_sem * sem)
  * @retval -EALREADY: 同步对象已经绑定到事件对象
  * @retval -EBUSY: 通道已经被其他同步对象独占
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个信号量对象，不可重入
+ * + 上下文：任意
  * - 绑定方式：独占绑定
  */
 static __xwos_inline_api
@@ -265,9 +243,7 @@ xwer_t xwos_sem_bind(struct xwos_sem * sem, struct xwos_sel * sel, xwsq_t pos)
  * @retval -EFAULT: 空指针
  * @retval -ENOTCONN: 同步对象没有绑定到事件对象上
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个信号量对象，不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_sem_unbind(struct xwos_sem * sem, struct xwos_sel * sel)
@@ -280,15 +256,15 @@ xwer_t xwos_sem_unbind(struct xwos_sem * sem, struct xwos_sel * sel)
  * @param[in] sem: 信号量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -EALREADY: 信号量对象已被冻结
  * @retval -EFAULT: 空指针
+ * @retval -EALREADY: 信号量对象已被冻结
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 被冻结的信号量对象不允许增加(V操作)，但可以被测试(P操作)，
- *   测试信号量对象的线程会被加入到信号量对象的等待队列。
+ * + 上下文：任意
+ * @details
+ * 被冻结的信号量对象不允许增加(V操作)，但可以被测试(P操作)。
+ * 测试信号量对象的线程会被加入到信号量对象的等待队列。
+ *
+ * 对已经冻结的信号量再次冻结，将返回 `-EALREADY` 。
  */
 static __xwos_inline_api
 xwer_t xwos_sem_freeze(struct xwos_sem * sem)
@@ -301,14 +277,12 @@ xwer_t xwos_sem_freeze(struct xwos_sem * sem)
  * @param[in] sem: 信号量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -EALREADY: 信号量对象未被冻结
  * @retval -EFAULT: 空指针
+ * @retval -EALREADY: 信号量对象未被冻结
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 此函数只对已冻结的信号量对象起作用，对未冻结的信号量对象调用此函数将返回错误码。
+ * + 上下文：任意
+ * @details
+ * 此函数只对已冻结的信号量对象起作用，对未冻结的信号量对象调用此函数将返回错误码 `-EALREADY` 。
  */
 static __xwos_inline_api
 xwer_t xwos_sem_thaw(struct xwos_sem * sem)
@@ -325,11 +299,9 @@ xwer_t xwos_sem_thaw(struct xwos_sem * sem)
  * @retval -ENEGATIVE: 信号量对象已被冻结
  * @retval -ERANGE: 信号量对象的值已经最大
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @note
- * - 此函数只对未冻结的信号量对象起作用，已冻结的信号量对象将得到错误码-ENEGATIVE。
+ * + 上下文：任意
+ * @details
+ * 此函数只对未冻结的信号量对象起作用，已冻结的信号量对象将得到错误码 `-ENEGATIVE` 。
  */
 static __xwos_inline_api
 xwer_t xwos_sem_post(struct xwos_sem * sem)
@@ -348,34 +320,12 @@ xwer_t xwos_sem_post(struct xwos_sem * sem)
  * @retval -EDSPMPT: 抢占被关闭
  * @retval -EDSBH: 中断底半部被关闭
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 上下文：线程
  */
 static __xwos_inline_api
 xwer_t xwos_sem_wait(struct xwos_sem * sem)
 {
         return xwosdl_sem_wait(&sem->ossem);
-}
-
-/**
- * @brief XWOS API：检查信号量对象
- * @param[in] sem: 信号量对象的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EFAULT: 空指针
- * @retval -ENODATA: 信号量对象资源不可用（信号量对象无法被获取）
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * @details
- * 若没有检测到信号，立即返回，不会阻塞调用线程。
- */
-static __xwos_inline_api
-xwer_t xwos_sem_trywait(struct xwos_sem * sem)
-{
-        return xwosdl_sem_trywait(&sem->ossem);
 }
 
 /**
@@ -391,11 +341,9 @@ xwer_t xwos_sem_trywait(struct xwos_sem * sem)
  * @retval -EDSPMPT: 抢占被关闭
  * @retval -EDSBH: 中断底半部被关闭
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 上下文：线程
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 static __xwos_inline_api
 xwer_t xwos_sem_wait_to(struct xwos_sem * sem, xwtm_t to)
@@ -413,9 +361,7 @@ xwer_t xwos_sem_wait_to(struct xwos_sem * sem, xwtm_t to)
  * @retval -EDSPMPT: 抢占被关闭
  * @retval -EDSBH: 中断底半部被关闭
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 上下文：线程
  */
 static __xwos_inline_api
 xwer_t xwos_sem_wait_unintr(struct xwos_sem * sem)
@@ -424,16 +370,32 @@ xwer_t xwos_sem_wait_unintr(struct xwos_sem * sem)
 }
 
 /**
- * @brief XWOS API：获取信号量对象计数器的值
+ * @brief XWOS API：尝试获取信号量
+ * @param[in] sem: 信号量对象的指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ENODATA: 信号量对象资源不可用（信号量对象无法被获取）
+ * @note
+ * + 上下文：任意
+ * @details
+ * 若没有检测到信号，立即返回错误码 `-ENODATA` ，不会阻塞。
+ */
+static __xwos_inline_api
+xwer_t xwos_sem_trywait(struct xwos_sem * sem)
+{
+        return xwosdl_sem_trywait(&sem->ossem);
+}
+
+/**
+ * @brief XWOS API：读取信号量对象计数器的值
  * @param[in] sem: 信号量对象的指针
  * @param[out] sval: 指向缓冲区的指针，通过此缓冲区返回信号量对象计数器的值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_sem_getvalue(struct xwos_sem * sem, xwssq_t * sval)

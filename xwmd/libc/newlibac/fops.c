@@ -30,8 +30,8 @@ xwssz_t newlibac_fops_write_stdout(int fd, const void * data, size_t cnt);
 extern
 xwssz_t newlibac_fops_write_stderr(int fd, const void * data, size_t cnt);
 
-xwbmpop_declare(newlibac_fops_node_bmp, NEWLIBAC_FOPS_FD_NUM) = {0};
-xwbmpop_declare(newlibac_fops_nodetype_bmp, NEWLIBAC_FOPS_FD_NUM) = {0};
+xwbmpop_define(newlibac_fops_node_bmp, NEWLIBAC_FOPS_FD_NUM) = {0};
+xwbmpop_define(newlibac_fops_nodetype_bmp, NEWLIBAC_FOPS_FD_NUM) = {0};
 void * newlibac_fops_fatfs_node[NEWLIBAC_FOPS_FD_NUM] = {NULL};
 
 void newlibac_fops_init(void)

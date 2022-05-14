@@ -127,24 +127,6 @@ end
 
 
 --[[--------
-中断阻塞在条件量中的所有线程<br>
-<br>
-
-@tparam userdata condsp (**in**) 条件量对象强指针<br>
-<br>
-
-@treturn number
-+ ● **rc** 返回值
-  + ○ **0** 没有错误
-
-@usage
-rc = flg:intr_all()
-]]
-function condsp:intr_all(condsp)
-end
-
-
---[[--------
 冻结条件量<br>
 <br>
 

@@ -28,51 +28,51 @@
 #define LOGTAG "mtx"
 #define mtxlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
 
-#define XWMTXDEMO_THD_0_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
-#define XWMTXDEMO_THD_1_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
-xwer_t xwmtxdemo_thd_0_func(void * arg);
-xwer_t xwmtxdemo_thd_1_func(void * arg);
+#define MTXDEMO_THD_0_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
+#define MTXDEMO_THD_1_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+xwer_t mtxdemo_thd_0_func(void * arg);
+xwer_t mtxdemo_thd_1_func(void * arg);
 
 /**
  * @brief 线程描述表
  */
-const struct xwos_thd_desc xwmtxdemo_thd_desc[] = {
+const struct xwos_thd_desc mtxdemo_thd_desc[] = {
         [0] = {
                 .attr = {
-                        .name = "xwmtxdemo.thd.0",
+                        .name = "mtxdemo.thd.0",
                         .stack = NULL,
                         .stack_size = 2048,
                         .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
-                        .priority = XWMTXDEMO_THD_0_PRIORITY,
+                        .priority = MTXDEMO_THD_0_PRIORITY,
                         .detached = false,
                         .privileged = true,
                 },
-                .func = (xwos_thd_f)xwmtxdemo_thd_0_func,
+                .func = (xwos_thd_f)mtxdemo_thd_0_func,
                 .arg = NULL,
         },
         [1] = {
                 .attr = {
-                        .name = "xwmtxdemo.thd.1",
+                        .name = "mtxdemo.thd.1",
                         .stack = NULL,
                         .stack_size = 2048,
                         .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
-                        .priority = XWMTXDEMO_THD_1_PRIORITY,
+                        .priority = MTXDEMO_THD_1_PRIORITY,
                         .detached = false,
                         .privileged = true,
                 },
-                .func = (xwos_thd_f)xwmtxdemo_thd_1_func,
+                .func = (xwos_thd_f)mtxdemo_thd_1_func,
                 .arg = (void *)3,
         },
 };
-xwos_thd_d xwmtxdemo_thd[xw_array_size(xwmtxdemo_thd_desc)];
+xwos_thd_d mtxdemo_thd[xw_array_size(mtxdemo_thd_desc)];
 
 xwos_mtx_d dymtx;
-xwsq_t xwmtxdemo_shared_count = 0;
+xwsq_t mtxdemo_shared_count = 0;
 
 /**
  * @brief 模块的加载函数
  */
-xwer_t example_mtx_start(void)
+xwer_t xwos_example_mtx(void)
 {
         xwer_t rc;
         xwsq_t i;
@@ -82,11 +82,11 @@ xwer_t example_mtx_start(void)
                 goto err_mtx_create;
         }
 
-        for (i = 0; i < xw_array_size(xwmtxdemo_thd_desc); i++) {
-                rc = xwos_thd_create(&xwmtxdemo_thd[i],
-                                     &xwmtxdemo_thd_desc[i].attr,
-                                     xwmtxdemo_thd_desc[i].func,
-                                     xwmtxdemo_thd_desc[i].arg);
+        for (i = 0; i < xw_array_size(mtxdemo_thd_desc); i++) {
+                rc = xwos_thd_create(&mtxdemo_thd[i],
+                                     &mtxdemo_thd_desc[i].attr,
+                                     mtxdemo_thd_desc[i].func,
+                                     mtxdemo_thd_desc[i].arg);
                 if (rc < 0) {
                         goto err_thd_create;
                 }
@@ -103,7 +103,7 @@ err_mtx_create:
 /**
  * @brief 线程0的主函数
  */
-xwer_t xwmtxdemo_thd_0_func(void * arg)
+xwer_t mtxdemo_thd_0_func(void * arg)
 {
         xwtm_t ts;
         xwer_t rc = XWOK;
@@ -118,8 +118,8 @@ xwer_t xwmtxdemo_thd_0_func(void * arg)
                         ts = xwtm_nowts();
                         mtxlogf(INFO,
                                 "[线程0] 计数器：%d, 时间戳：%lld 纳秒。\n",
-                                xwmtxdemo_shared_count, ts);
-                        xwmtxdemo_shared_count++;
+                                mtxdemo_shared_count, ts);
+                        mtxdemo_shared_count++;
                         xwos_mtx_unlock(dymtx.mtx);
                 }
         }
@@ -131,7 +131,7 @@ xwer_t xwmtxdemo_thd_0_func(void * arg)
 /**
  * @brief 线程1的主函数
  */
-xwer_t xwmtxdemo_thd_1_func(void * arg)
+xwer_t mtxdemo_thd_1_func(void * arg)
 {
         xwtm_t ts;
         xwer_t rc = XWOK;
@@ -146,8 +146,8 @@ xwer_t xwmtxdemo_thd_1_func(void * arg)
                         ts = xwtm_nowts();
                         mtxlogf(INFO,
                                 "[线程1] 计数器：%d, 时间戳：%lld 纳秒。\n",
-                                xwmtxdemo_shared_count, ts);
-                        xwmtxdemo_shared_count++;
+                                mtxdemo_shared_count, ts);
+                        mtxdemo_shared_count++;
                         xwos_mtx_unlock(dymtx.mtx);
                 }
         }
