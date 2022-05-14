@@ -27,45 +27,44 @@
 #include <xwos/osal/lock/spinlock.h>
 #include <xwam/example/lock/spinlock/mif.h>
 
-#define LOGTAG "swt"
-#define swtlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
+#define LOGTAG "splk"
+#define splklogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
 
-#define XWSPLKDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
-void xwsplkdemo_swt_callback(struct xwos_swt * swt, void * arg);
-xwer_t xwsplkdemo_thd_func(void * arg);
+#define SPLKDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+void splkdemo_swt_callback(struct xwos_swt * swt, void * arg);
+xwer_t splkdemo_thd_func(void * arg);
 
-xwos_thd_d xwsplkdemo_thd;
-struct xwos_swt xwsplkdemo_swt;
-struct xwos_splk xwsplkdemo_lock;
-xwsq_t xwsplkdemo_shared_count = 0;
+xwos_thd_d splkdemo_thd;
+struct xwos_swt splkdemo_swt;
+struct xwos_splk splkdemo_lock;
+xwsq_t splkdemo_shared_count = 0;
 
 /**
  * @brief 模块的加载函数
  */
-xwer_t example_spinlock_start(void)
+xwer_t xwos_example_spinlock(void)
 {
         struct xwos_thd_attr attr;
         xwer_t rc;
 
         /* 初始化自旋锁 */
-        xwos_splk_init(&xwsplkdemo_lock);
+        xwos_splk_init(&splkdemo_lock);
 
         /* 初始化定时器 */
-        rc = xwos_swt_init(&xwsplkdemo_swt, "xwsplkdemo_swt",
-                           XWOS_SWT_FLAG_RESTART);
+        rc = xwos_swt_init(&splkdemo_swt, "splkdemo_swt", XWOS_SWT_FLAG_RESTART);
         if (rc < 0) {
                 goto err_swt_init;
         }
 
         /* 创建线程 */
         xwos_thd_attr_init(&attr);
-        attr.name = "xwsplkdemo.thd";
+        attr.name = "splkdemo.thd";
         attr.stack = NULL;
         attr.stack_size = 2048;
-        attr.priority = XWSPLKDEMO_THD_PRIORITY;
+        attr.priority = SPLKDEMO_THD_PRIORITY;
         attr.detached = false;
         attr.privileged = true;
-        rc = xwos_thd_create(&xwsplkdemo_thd, &attr, xwsplkdemo_thd_func, NULL);
+        rc = xwos_thd_create(&splkdemo_thd, &attr, splkdemo_thd_func, NULL);
         if (rc < 0) {
                 goto err_thd_create;
         }
@@ -73,7 +72,7 @@ xwer_t example_spinlock_start(void)
         return XWOK;
 
 err_thd_create:
-        xwos_swt_fini(&xwsplkdemo_swt);
+        xwos_swt_fini(&splkdemo_swt);
 err_swt_init:
         return rc;
 }
@@ -89,23 +88,23 @@ err_swt_init:
  *   - 当配置(XWMPCFG_SKD_BH == 0)，此函数运行在中断上下文；
  * - 此函数中不可调用会导致线程睡眠或阻塞的函数。
  */
-void xwsplkdemo_swt_callback(struct xwos_swt * swt, void * arg)
+void splkdemo_swt_callback(struct xwos_swt * swt, void * arg)
 {
         xwreg_t cpuirq;
 
         XWOS_UNUSED(swt);
         XWOS_UNUSED(arg);
 
-        xwos_splk_lock_cpuirqsv(&xwsplkdemo_lock, &cpuirq);
+        xwos_splk_lock_cpuirqsv(&splkdemo_lock, &cpuirq);
         /* 临界区 */
-        xwsplkdemo_shared_count++;
-        xwos_splk_unlock_cpuirqrs(&xwsplkdemo_lock, cpuirq);
+        splkdemo_shared_count++;
+        xwos_splk_unlock_cpuirqrs(&splkdemo_lock, cpuirq);
 }
 
 /**
  * @brief 线程的主函数
  */
-xwer_t xwsplkdemo_thd_func(void * arg)
+xwer_t splkdemo_thd_func(void * arg)
 {
         xwtm_t ts;
         xwsq_t cnt;
@@ -113,28 +112,28 @@ xwer_t xwsplkdemo_thd_func(void * arg)
 
         XWOS_UNUSED(arg);
 
-        swtlogf(INFO, "[线程] 启动。\n");
-        swtlogf(INFO, "[线程] 启动定时器。\n");
+        splklogf(INFO, "[线程] 启动。\n");
+        splklogf(INFO, "[线程] 启动定时器。\n");
         ts = xwtm_now();
-        rc = xwos_swt_start(&xwsplkdemo_swt,
+        rc = xwos_swt_start(&splkdemo_swt,
                             ts, XWTM_MS(500),
-                            xwsplkdemo_swt_callback, NULL);
+                            splkdemo_swt_callback, NULL);
 
         while (!xwos_cthd_frz_shld_stop(NULL)) {
                 xwos_cthd_sleep(XWTM_S(1));
 
-                xwos_splk_lock_cpuirq(&xwsplkdemo_lock);
+                xwos_splk_lock_cpuirq(&splkdemo_lock);
                 /* 临界区 */
-                cnt = xwsplkdemo_shared_count;
-                xwos_splk_unlock_cpuirq(&xwsplkdemo_lock);
+                cnt = splkdemo_shared_count;
+                xwos_splk_unlock_cpuirq(&splkdemo_lock);
 
                 ts = xwtm_nowts();
-                swtlogf(INFO,
+                splklogf(INFO,
                         "[线程] 时间戳：%lld 纳秒，计数器：%d。\n",
                         ts, cnt);
         }
 
-        swtlogf(INFO, "[线程] 退出。\n");
+        splklogf(INFO, "[线程] 退出。\n");
         xwos_thd_detach(xwos_cthd_self());
         return rc;
 }

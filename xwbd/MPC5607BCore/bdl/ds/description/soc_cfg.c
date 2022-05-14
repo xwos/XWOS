@@ -2381,7 +2381,7 @@ const struct soc_dmac_private_cfg mpc560xb_dmac_cfg = {
         },
 };
 
-xwbmpop_declare(mpc560xb_dma_channel_status, SOC_DMAC_CHANNEL_NUM) = {
+xwbmpop_define(mpc560xb_dma_channel_status, SOC_DMAC_CHANNEL_NUM) = {
         [0] = 0,
 };
 

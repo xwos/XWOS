@@ -213,9 +213,7 @@ xwer_t xwup_plsem_unbind(struct xwup_plsem * sem, struct xwup_evt * evt)
  * @param[in] wqn: 等待队列节点
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 __xwup_code
 xwer_t xwup_plsem_intr(struct xwup_plsem * sem, struct xwup_wqn * wqn)

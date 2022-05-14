@@ -516,6 +516,7 @@ impl<T: ?Sized> Mutex<T> {
     /// + [`MutexError::CannotBh`] 中断底半部被关闭
     ///
     /// # 示例
+    ///
     /// ```rust
     /// use xwrust::xwos::lock::mtx::*;
     /// static GLOBAL_MUTEX: Mutex<u32> = Mutex::new(0);

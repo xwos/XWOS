@@ -108,12 +108,6 @@ xwer_t xwosdl_cond_thaw(struct xwosdl_cond * cond)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_cond_intr_all(struct xwosdl_cond * cond)
-{
-        return xwup_cond_intr_all(cond);
-}
-
-static __xwcc_inline
 xwer_t xwosdl_cond_broadcast(struct xwosdl_cond * cond)
 {
         return xwup_cond_broadcast(cond);

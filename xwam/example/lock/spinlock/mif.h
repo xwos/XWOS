@@ -23,6 +23,6 @@
 
 #include <xwos/standard.h>
 
-xwer_t example_spinlock_start(void);
+xwer_t xwos_example_spinlock(void);
 
 #endif /* xwam/example/lock/spinlock/mif.h */

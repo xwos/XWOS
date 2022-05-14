@@ -130,9 +130,10 @@ void xwos_thd_attr_init(struct xwos_thd_attr * attr)
  * @param[in] mainfunc: 线程函数的指针
  * @param[in] arg: 线程函数的参数
  * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
  * @note
  * + 上下文：任意
- * + 重入性：同一线程对象，不可重入
  * @details
  * 此函数用于不使用任何动态内存申请的方式创建线程，所有需要的内存（线程对象结构体，栈内存数组）
  * 都需要在调用前预先定义，并且用户需要保证其生命周期在线程运行期间始终有效（通常最简单的方法是
@@ -160,11 +161,11 @@ xwer_t xwos_thd_init(struct xwos_thd * thd, xwos_thd_d * thdd,
  * @brief XWOS API：增加线程对象的引用计数
  * @param[in] thdd: 线程对象描述符
  * @return 错误码
- * @retval XWOK: OK
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
  * @retval -EOBJDEAD: 线程对象无效
  * @note
  * + 上下文：任意
- * + 重入性：可重入
  * @details
  * 此函数主要用于管理 **静态对象** 的引用计数。
  * 若用于 **动态对象** ，需要确保对象的指针一定不是野指针。
@@ -179,11 +180,11 @@ xwer_t xwos_thd_grab(xwos_thd_d thdd)
  * @brief XWOS API：减少线程对象的引用计数
  * @param[in] thdd: 线程对象描述符
  * @return 错误码
- * @retval XWOK: OK
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
  * @retval -EOBJDEAD: 线程对象无效
  * @note
  * + 上下文：任意
- * + 重入性：可重入
  * @details
  * 此函数主要用于管理 **静态对象** 的引用计数。
  * 若用于 **动态对象** ，需要确保对象的指针一定不是野指针。
@@ -203,7 +204,6 @@ xwer_t xwos_thd_put(xwos_thd_d thdd)
  * @return 错误码
  * @note
  * + 上下文：任意
- * + 重入性：可重入
  * @details
  * + 参数 `attr` 类似于 `pthread_attr_t` ，可为 `NULL` ，表示采用默认属性创建线程。
  * + 若通过 `attr->stack` 指定内存作为栈，栈内存的首地址与大小，必须要满足CPU的ABI规则，
@@ -225,12 +225,11 @@ xwer_t xwos_thd_create(xwos_thd_d * thdd,
  * @brief XWOS API：检查线程对象的标签并增加引用计数
  * @param[in] thdd: 线程对象描述符
  * @return 错误码
- * @retval XWOK: OK
+ * @retval XWOK: 没有错误
  * @retval -EOBJDEAD: 线程对象无效
  * @retval -EACCES: 对象标签检查失败
  * @note
  * + 上下文：任意
- * + 重入性：可重入
  */
 static __xwos_inline_api
 xwer_t xwos_thd_acquire(xwos_thd_d thdd)
@@ -242,12 +241,11 @@ xwer_t xwos_thd_acquire(xwos_thd_d thdd)
  * @brief XWOS API：检查对象的标签并减少引用计数
  * @param[in] thdd: 线程对象描述符
  * @return 错误码
- * @retval XWOK: OK
+ * @retval XWOK: 没有错误
  * @retval -EOBJDEAD: 线程对象无效
  * @retval -EACCES: 对象标签检查失败
  * @note
  * + 上下文：任意
- * + 重入性：可重入
  */
 static __xwos_inline_api
 xwer_t xwos_thd_release(xwos_thd_d thdd)
@@ -262,8 +260,7 @@ xwer_t xwos_thd_release(xwos_thd_d thdd)
  * @retval XWOK: 没有错误
  * @retval -EOBJDEAD: 线程对象无效
  * @note
- * + 上下文：任意
- * + 重入性：可重入
+ * + 上下文：线程、中断、中断底半部、空闲任务
  * @details
  * 此函数用于父线程A向另一个子线程B设置 **退出状态** 。
  *
@@ -297,7 +294,6 @@ xwer_t xwos_thd_quit(xwos_thd_d thdd)
  * @retval -EALREADY: 线程已被连接
  * @note
  * + 上下文：线程
- * + 重入性：不可重入
  * @details
  * 此函数类似于POSIX线程库的 `pthread_join()` 函数，用于等待另一个线程退出。
  *
@@ -328,7 +324,6 @@ xwer_t xwos_thd_join(xwos_thd_d thdd, xwer_t * trc)
  * @retval -EALREADY: 线程已连接
  * @note
  * + 上下文：线程
- * + 重入性：不可重入
  * @details
  * 此函数等价于 `xwos_thd_quit()` + `xwos_thd_join()` 。
  */
@@ -347,11 +342,12 @@ xwer_t xwos_thd_stop(xwos_thd_d thdd, xwer_t * trc)
  * @retval -EOBJDEAD: 线程对象无效
  * @note
  * + 上下文：任意
- * + 重入性：同一个线程对象，不可重复调用
  * @details
  * 此函数功能类似于 `pthread_detach()` ，将线程设置为 **分离状态** 。
  * 处于 **分离状态** 的线程退出后，系统会自动回收其内存资源，
  * 不需要另一个线程调用 `xwos_thd_join()` 来回收其内存资源。
+ *
+ * 同一个线程对象，可重复调用此函数。
  */
 static __xwos_inline_api
 xwer_t xwos_thd_detach(xwos_thd_d thdd)
@@ -369,7 +365,6 @@ xwer_t xwos_thd_detach(xwos_thd_d thdd)
  * @retval -EOBJDEAD: 线程对象无效
  * @note
  * + 上下文：任意
- * + 重入性：对于同一个线程对象，不可重复调用
  * @details
  * 此函数用于将线程 `thdd.thd` 迁移到另一个CPU `dstcpu` 上。
  * 此函数只会发起一个申请就返回，不会等待迁移过程完成。线程的迁移由内核在恰当的时机完成。

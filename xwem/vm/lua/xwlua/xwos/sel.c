@@ -165,17 +165,6 @@ int xwlua_selsp_unbind(lua_State * L)
         return 1;
 }
 
-int xwlua_selsp_intr_all(lua_State * L)
-{
-        xwlua_sel_sp * selsp;
-        xwer_t rc;
-
-        selsp = (xwlua_sel_sp *)luaL_checkudata(L, 1, "xwlua_sel_sp");
-        rc = xwos_sel_intr_all(selsp->sel);
-        lua_pushinteger(L, (lua_Integer)rc);
-        return 1;
-}
-
 int xwlua_selsp_select(lua_State * L)
 {
         xwlua_sel_sp * selsp;
@@ -252,7 +241,6 @@ const luaL_Reg xwlua_selsp_indexmethod[] = {
         {"num", xwlua_selsp_num},
         {"bind", xwlua_selsp_bind},
         {"unbind", xwlua_selsp_unbind},
-        {"intr_all", xwlua_selsp_intr_all},
         {"select", xwlua_selsp_select},
         {"tryselect", xwlua_selsp_tryselect},
         {"select_to", xwlua_selsp_select_to},

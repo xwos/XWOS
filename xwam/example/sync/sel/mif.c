@@ -45,19 +45,19 @@ xwer_t xwseldemo_syncthd_func(void * arg);
 
 #define XWSELDEMO_BMP_BITNUM (sizeof(xwbmp_t) * BITS_PER_XWU8_T)
 
-xwbmpop_declare(xwseldemo_sel0_bmp, XWSELDEMO_BMP_BITNUM) = {0,};
-xwbmpop_declare(xwseldemo_sel0_msk, XWSELDEMO_BMP_BITNUM) = {0,};
+xwbmpop_define(xwseldemo_sel0_bmp, XWSELDEMO_BMP_BITNUM) = {0,};
+xwbmpop_define(xwseldemo_sel0_msk, XWSELDEMO_BMP_BITNUM) = {0,};
 struct xwos_sel xwseldemo_sel0;
 
 struct xwos_sem xwseldemo_sem1;
 struct xwos_sem xwseldemo_sem2;
 
-xwbmpop_declare(xwseldemo_flg3_bmp, XWSELDEMO_BMP_BITNUM) = {0,};
-xwbmpop_declare(xwseldemo_flg3_msk, XWSELDEMO_BMP_BITNUM) = {0,};
+xwbmpop_define(xwseldemo_flg3_bmp, XWSELDEMO_BMP_BITNUM) = {0,};
+xwbmpop_define(xwseldemo_flg3_msk, XWSELDEMO_BMP_BITNUM) = {0,};
 struct xwos_flg xwseldemo_flg3;
 
-xwbmpop_declare(xwseldemo_sel4_bmp, XWSELDEMO_BMP_BITNUM) = {0,};
-xwbmpop_declare(xwseldemo_sel4_msk, XWSELDEMO_BMP_BITNUM) = {0,};
+xwbmpop_define(xwseldemo_sel4_bmp, XWSELDEMO_BMP_BITNUM) = {0,};
+xwbmpop_define(xwseldemo_sel4_msk, XWSELDEMO_BMP_BITNUM) = {0,};
 struct xwos_sel xwseldemo_sel4;
 
 struct xwos_cond xwseldemo_cond5;
@@ -127,8 +127,8 @@ const struct xwos_thd_desc xwseldemo_sync_thd_desc[] = {
         },
 };
 xwos_thd_d xwseldemo_syncthd[xw_array_size(xwseldemo_sync_thd_desc)];
-xwbmpop_declare(xwseldemo_br7_bmp, xw_array_size(xwseldemo_sync_thd_desc)) = {0,};
-xwbmpop_declare(xwseldemo_br7_msk, xw_array_size(xwseldemo_sync_thd_desc)) = {0,};
+xwbmpop_define(xwseldemo_br7_bmp, xw_array_size(xwseldemo_sync_thd_desc)) = {0,};
+xwbmpop_define(xwseldemo_br7_msk, xw_array_size(xwseldemo_sync_thd_desc)) = {0,};
 
 /**
  * @brief 测试模块的启动函数
@@ -314,10 +314,10 @@ err_sel0_init:
  */
 xwer_t xwseldemo_consumer_func(void * arg)
 {
-        xwbmpop_declare(selmsk, XWSELDEMO_BMP_BITNUM);
-        xwbmpop_declare(trg, XWSELDEMO_BMP_BITNUM);
-        xwbmpop_declare(flgmsk, XWSELDEMO_BMP_BITNUM);
-        xwbmpop_declare(flgtrg, XWSELDEMO_BMP_BITNUM);
+        xwbmpop_define(selmsk, XWSELDEMO_BMP_BITNUM);
+        xwbmpop_define(trg, XWSELDEMO_BMP_BITNUM);
+        xwbmpop_define(flgmsk, XWSELDEMO_BMP_BITNUM);
+        xwbmpop_define(flgtrg, XWSELDEMO_BMP_BITNUM);
         xwtm_t now;
         xwer_t rc = XWOK;
 

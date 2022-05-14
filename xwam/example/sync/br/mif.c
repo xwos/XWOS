@@ -102,8 +102,8 @@ xwos_thd_d xwbrdemo_thd[xw_array_size(xwbrdemo_thd_desc)];
 /**
  * @brief 静态初始化线程栅栏所需要的位图数组缓冲区
  */
-xwbmpop_declare(xwbrdemo_br_bmp, xw_array_size(xwbrdemo_thd_desc)) = {0,};
-xwbmpop_declare(xwbrdemo_br_msk, xw_array_size(xwbrdemo_thd_desc)) = {0,};
+xwbmpop_define(xwbrdemo_br_bmp, xw_array_size(xwbrdemo_thd_desc)) = {0,};
+xwbmpop_define(xwbrdemo_br_msk, xw_array_size(xwbrdemo_thd_desc)) = {0,};
 
 /**
  * @brief 静态定义的线程栅栏

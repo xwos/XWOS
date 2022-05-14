@@ -23,6 +23,6 @@
 
 #include <xwos/standard.h>
 
-xwer_t example_cpuirq_start(void);
+xwer_t xwos_example_cpuirq(void);
 
 #endif /* xwam/example/lock/cpuirq/mif.h */

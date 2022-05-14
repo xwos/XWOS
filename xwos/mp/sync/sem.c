@@ -405,12 +405,7 @@ xwer_t xwmp_sem_unbind(struct xwmp_sem * sem, struct xwmp_evt * evt)
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 无效参数
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：对于同一个信号量对象，不可重入
- * @note
- * - 静态初始化的对象所有资源都是由用户自己提供的，
- *   因此当对象销毁时，垃圾回收函数也需要用户自己提供。
+ * + 上下文：任意。
  */
 static __xwmp_code
 xwer_t xwmp_plsem_activate(struct xwmp_sem * sem, xwssq_t val, xwssq_t max,
@@ -448,6 +443,7 @@ xwer_t xwmp_plsem_freeze(struct xwmp_sem * sem)
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWMP_SEM_TYPE_PIPELINE == sem->type), "type-error", -ETYPE);
+
         rc = XWOK;
         xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
         if (__xwcc_unlikely(sem->count < 0)) {
@@ -478,6 +474,7 @@ xwer_t xwmp_plsem_thaw(struct xwmp_sem * sem)
 
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((XWMP_SEM_TYPE_PIPELINE == sem->type), "type-error", -ETYPE);
+
         rc = XWOK;
         xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
         if (__xwcc_unlikely(sem->count >= 0)) {
@@ -499,9 +496,7 @@ xwer_t xwmp_plsem_thaw(struct xwmp_sem * sem)
  * @retval -EFAULT: 空指针
  * @retval -ETYPE: 类型不匹配
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 __xwmp_code
 xwer_t xwmp_plsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn)
@@ -959,12 +954,7 @@ xwer_t xwmp_plsem_wait_unintr(struct xwmp_sem * sem)
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 无效参数
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入，除非对象的引用计数重新为0
- * @note
- * - 静态初始化的对象所有资源都是由用户自己提供的，
- *   因此当对象销毁时，垃圾回收函数也需要用户自己提供。
+ * + 上下文：任意
  */
 static __xwmp_code
 xwer_t xwmp_rtsem_activate(struct xwmp_sem * sem, xwssq_t val, xwssq_t max,
@@ -1056,9 +1046,7 @@ xwer_t xwmp_rtsem_thaw(struct xwmp_sem * sem)
  * @retval -ETYPE: 类型不匹配
  * @retval -EFAULT: 空指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 __xwmp_code
 xwer_t xwmp_rtsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn)
@@ -1521,9 +1509,7 @@ xwer_t xwmp_sem_getvalue(struct xwmp_sem * sem, xwssq_t * sval)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 __xwmp_api
 xwer_t xwmp_sem_gettype(struct xwmp_sem * sem, xwid_t * type)

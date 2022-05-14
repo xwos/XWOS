@@ -36,9 +36,7 @@
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
- * + 同步/异步：同步
- * + 上下文：中断、中断底半部、线程
- * + 重入性：同一中断号，不可重入
+ * + 上下文：任意
  * @details
  * **申请中断** 用于向中断向量表安装中断处理函数(ISR)。中断号的枚举通常定义在芯片的头文件中。
  * 当```SOCCFG_RO_IVT```配置为 **0** 时，参数 **isr** 与 **data** 无效，中断向量需预先写入中断向量表的向量表中。
@@ -58,9 +56,7 @@ xwer_t xwos_irq_request(xwirq_t irqn, xwisr_f isr, void * data,
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：同一中断号，不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_irq_release(xwirq_t irqn)
@@ -76,9 +72,7 @@ xwer_t xwos_irq_release(xwirq_t irqn)
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：同一中断号，不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_irq_enable(xwirq_t irqn)
@@ -94,9 +88,7 @@ xwer_t xwos_irq_enable(xwirq_t irqn)
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：同一中断号，不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_irq_disable(xwirq_t irqn)
@@ -114,9 +106,7 @@ xwer_t xwos_irq_disable(xwirq_t irqn)
  * @retval -ENOSYS: 没有实现此功能
  * @retval -EFAULT: 空指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：同一中断号，不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_irq_save(xwirq_t irqn, xwreg_t * flag)
@@ -133,9 +123,7 @@ xwer_t xwos_irq_save(xwirq_t irqn, xwreg_t * flag)
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：同一中断号，不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_irq_restore(xwirq_t irqn, xwreg_t flag)
@@ -151,9 +139,7 @@ xwer_t xwos_irq_restore(xwirq_t irqn, xwreg_t flag)
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：同一中断号，不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_irq_pend(xwirq_t irqn)
@@ -169,9 +155,7 @@ xwer_t xwos_irq_pend(xwirq_t irqn)
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：同一中断号，不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_irq_clear(xwirq_t irqn)
@@ -189,9 +173,7 @@ xwer_t xwos_irq_clear(xwirq_t irqn)
  * @retval -ENOSYS: 没有实现此功能
  * @retval -EFAULT: 空指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_irq_tst(xwirq_t irqn, bool * pending)
@@ -208,9 +190,7 @@ xwer_t xwos_irq_tst(xwirq_t irqn, bool * pending)
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：同一中断号，不可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg)
@@ -227,9 +207,7 @@ xwer_t xwos_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg)
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
@@ -246,9 +224,7 @@ xwer_t xwos_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
  * @retval -ERANGE: 中断号超出范围
  * @retval -ENOSYS: 没有实现此功能
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
@@ -266,9 +242,7 @@ xwer_t xwos_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
  * @retval -ETHDCTX: 当前上下文为线程
  * @retval -EBHCTX: 当前上下文为中断底半部
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 static __xwos_inline_api
 xwer_t xwos_irq_get_id(xwirq_t * irqnbuf)
@@ -278,6 +252,8 @@ xwer_t xwos_irq_get_id(xwirq_t * irqnbuf)
 
 /**
  * @brief XWOS API：开启本地CPU的中断
+ * @note
+ * + 上下文：任意
  * @details
  * 此函数运行在哪个CPU上，开启的就是哪个CPU的中断。
  */
@@ -289,6 +265,8 @@ void xwos_cpuirq_enable_lc(void)
 
 /**
  * @brief XWOS API：关闭本地CPU的中断
+ * @note
+ * + 上下文：任意
  * @details
  * 此函数运行在哪个CPU上，关闭的就是哪个CPU的中断。
  */
@@ -301,6 +279,8 @@ void xwos_cpuirq_disable_lc(void)
 /**
  * @brief XWOS API：恢复本地CPU的中断
  * @param[in] cpuirq: 本地CPU的中断开关
+ * @note
+ * + 上下文：任意
  * @details
  * 此函数运行在哪个CPU上，恢复的就是哪个CPU的中断。
  */
@@ -313,6 +293,8 @@ void xwos_cpuirq_restore_lc(xwreg_t cpuirq)
 /**
  * @brief XWOS API：保存然后关闭本地CPU的中断
  * @param[out] cpuirq: 指向缓冲区的指针，此缓冲区用于返回本地CPU的中断开关
+ * @note
+ * + 上下文：任意
  * @details
  * 此函数运行在哪个CPU上，保存然后关闭的就是哪个CPU的中断。
  */

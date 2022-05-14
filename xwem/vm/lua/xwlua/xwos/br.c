@@ -166,17 +166,6 @@ int xwlua_brsp_unbind(lua_State * L)
         return 1;
 }
 
-int xwlua_brsp_intr_all(lua_State * L)
-{
-        xwlua_br_sp * brsp;
-        xwer_t rc;
-
-        brsp = (xwlua_br_sp *)luaL_checkudata(L, 1, "xwlua_br_sp");
-        rc = xwos_br_intr_all(brsp->br);
-        lua_pushinteger(L, (lua_Integer)rc);
-        return 1;
-}
-
 int xwlua_brsp_wait(lua_State * L)
 {
         xwlua_br_sp * brsp;
@@ -206,7 +195,6 @@ const luaL_Reg xwlua_brsp_indexmethod[] = {
         {"num", xwlua_brsp_num},
         {"bind", xwlua_brsp_bind},
         {"unbind", xwlua_brsp_unbind},
-        {"intr_all", xwlua_brsp_intr_all},
         {"wait", xwlua_brsp_wait},
         {"wait_to", xwlua_brsp_wait_to},
         {NULL, NULL},

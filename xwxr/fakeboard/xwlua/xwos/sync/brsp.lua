@@ -128,24 +128,6 @@ end
 
 
 --[[--------
-中断阻塞在线程栅栏中的所有线程<br>
-<br>
-
-@tparam userdata brsp (**in**) 线程栅栏对象强指针<br>
-<br>
-
-@treturn number
-+ ● **rc** 返回值
-  + ○ **0** 没有错误
-
-@usage
-rc = flg:intr_all()
-]]
-function brsp:intr_all(brsp)
-end
-
-
---[[--------
 新建位图，位的数量与线程栅栏中的线程槽数量相等<br>
 <br>
 
