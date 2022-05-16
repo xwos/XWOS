@@ -1,4 +1,4 @@
-//! XWOS RUST：XWOS的信号量
+//! XWOS RUST：信号量
 //! ========
 //!
 //! 信号量是操作系统比较底层的同步机制，可以同时阻塞一个或多个线程。
@@ -19,7 +19,7 @@
 //! ```rust
 //! use xwrust::xwos::sync::sem::*;
 //!
-//! static GLOBAL_SEM: Sem  = Sem::new();
+//! static GLOBAL_SEM: Sem = Sem::new();
 //! ```
 //!
 //! + 也可以使用 [`alloc::sync::Arc`] 在heap中创建：
@@ -61,7 +61,7 @@
 //!
 //! ## 等待并获取信号量
 //!
-//! [`Sem::wait()`] 方法只可在 **线程** 上下文中使用：
+//! [`Sem::wait()`] 方法可用于等待并获取信号量：
 //!
 //! + 若信号量的值小于等于0，线程会阻塞等待。
 //! + 当信号量的值大于0时，线程被唤醒，并取走一个值（信号量的值减少1），然后返回 [`SemError::Ok`] 。
@@ -69,7 +69,7 @@
 //!
 //! ## 限时等待并获取信号量
 //!
-//! [`Sem::wait_to()`] 方法只可在 **线程** 上下文中使用：
+//! [`Sem::wait_to()`] 方法可用来限时等待并获取信号量：
 //!
 //! + 若信号量的值小于等于0，线程会阻塞等待，等待时会指定一个唤醒时间点。
 //! + 当信号量的值大于0时，线程被唤醒，并取走一个值（信号量的值减少1），然后返回 [`SemError::Ok`] 。
@@ -78,14 +78,14 @@
 //!
 //! ## 不可中断等待并获取信号量
 //!
-//! [`Sem::wait_unintr()`] 方法只可在 **线程** 上下文中使用：
+//! [`Sem::wait_unintr()`] 方法可用来不可中断等待并获取信号量：
 //!
 //! + 若信号量的值小于等于0，线程会阻塞等待，且不可被中断，也不会超时。
 //! + 当信号量的值大于0时，线程被唤醒，并取走一个值（信号量的值减少1），然后返回 [`SemError::Ok`] 。
 //!
 //! ## 尝试获取信号量
 //!
-//! [`Sem::trywait()`] 方法可在 **任意** 上下文中使用，不会阻塞，只会检测信号量的值：
+//! [`Sem::trywait()`] 方法可用来尝试获取信号量：
 //!
 //! + 当信号量的值大于0时，就取走一个值（信号量的值减少1），然后返回 [`SemError::Ok`] 。
 //! + 当信号量的值小于等于0时，立即返回 [`SemError::NoData`] 。
@@ -176,7 +176,7 @@ xwos_struct! {
     /// 用于构建信号量的内存数组类型
     pub struct XwosSem {
         #[doc(hidden)]
-        mem: [u8; SIZEOF_XWOS_SEM],
+        obj: [u8; SIZEOF_XWOS_SEM],
     }
 }
 
@@ -184,7 +184,7 @@ xwos_struct! {
 ///
 /// 此常量的作用是告诉编译器信号量对象需要多大的内存。
 pub const XWOS_SEM_INITIALIZER: XwosSem = XwosSem {
-    mem: [0; SIZEOF_XWOS_SEM],
+    obj: [0; SIZEOF_XWOS_SEM],
 };
 
 /// 信号量对象结构体
@@ -194,6 +194,9 @@ pub struct Sem {
     /// 信号量对象的标签
     pub(crate) tik: UnsafeCell<XwSq>,
 }
+
+unsafe impl Send for Sem {}
+unsafe impl Sync for Sem {}
 
 impl Sem {
     /// 新建信号量对象。
@@ -232,6 +235,10 @@ impl Sem {
     ///
     /// 信号量对象必须调用此方法一次，方可正常使用。
     ///
+    /// # 上下文
+    ///
+    /// + 任意
+    ///
     /// # 示例
     ///
     /// ```rust
@@ -261,6 +268,10 @@ impl Sem {
     /// 冻结信号量。
     ///
     /// 信号量被冻结后，可被线程等待，但被能被单播 [`Sem::post()`] 。
+    ///
+    /// # 上下文
+    ///
+    /// + 任意
     ///
     /// # 错误码
     ///
@@ -305,6 +316,10 @@ impl Sem {
     ///
     /// 被冻结的信号量解冻后，可被单播 [`Sem::post()`] 。
     ///
+    /// # 上下文
+    ///
+    /// + 任意
+    ///
     /// # 错误码
     ///
     /// + [`SemError::Ok`] 没有错误
@@ -347,6 +362,10 @@ impl Sem {
     }
 
     /// 发布信号量。
+    ///
+    /// # 上下文
+    ///
+    /// + 任意
     ///
     /// # 错误码
     ///
@@ -435,9 +454,15 @@ impl Sem {
         }
     }
 
-    /// 等待并获取信号。
+    /// 等待并获取信号量。
     ///
-    /// 若信号量不可用，调用的线程会阻塞等待，且可被中断。
+    /// + 若信号量的值小于等于0，线程会阻塞等待。
+    /// + 当信号量的值大于0时，线程被唤醒，并取走一个值（信号量的值减少1），然后返回 [`SemError::Ok`] 。
+    /// + 当线程阻塞等待被中断时，返回 [`SemError::Interrupt`] 。
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
     ///
     /// # 错误码
     ///
@@ -495,61 +520,17 @@ impl Sem {
         }
     }
 
-    /// 检查信号量对象。
-    ///
-    /// 若没有检测到信号，立即返回，不会阻塞调用线程。
-    ///
-    /// # 错误码
-    ///
-    /// + [`SemError::Ok`] 没有错误
-    /// + [`SemError::NotInit`] 信号量没有初始化
-    /// + [`SemError::NoData`] 信号量不可用
-    ///
-    /// # 示例
-    ///
-    /// ```rust
-    /// use xwrust::types::*;
-    /// use xwrust::errno::*;
-    /// use xwrust::xwos::sync::sem::*;
-    ///
-    /// pub fn xwrust_example_sem() {
-    ///     // ...省略...
-    ///     sem: Sem = Sem::new();
-    ///     sem.init(0, XwSsq::max);
-    ///     // ...省略...
-    ///     let rc = sem.trywait();
-    ///     match rc {
-    ///         SemError::Ok => {
-    ///             // 获取信号量
-    ///         },
-    ///         _ => {
-    ///             // 等待信号量失败
-    ///         },
-    ///     };
-    /// }
-    /// ```
-    pub fn trywait(&self) -> SemError {
-        unsafe {
-            let mut rc = xwrustffi_sem_acquire(self.sem.get(), *self.tik.get());
-            if rc == 0 {
-                rc = xwrustffi_sem_trywait(self.sem.get());
-                xwrustffi_sem_put(self.sem.get());
-                if XWOK == rc {
-                    SemError::Ok
-                } else if -ENODATA == rc {
-                    SemError::NoData
-                } else {
-                    SemError::Unknown(rc)
-                }
-            } else {
-                SemError::NotInit
-            }
-        }
-    }
-
     /// 限时等待并获取信号量。
     ///
-    /// 若信号量不可用，调用的线程会阻塞等待，且可被中断，超时亦会返回。
+    /// + 若信号量的值小于等于0，线程会阻塞等待，等待时会指定一个唤醒时间点。
+    /// + 当信号量的值大于0时，线程被唤醒，并取走一个值（信号量的值减少1），然后返回 [`SemError::Ok`] 。
+    /// + 当线程阻塞等待被中断时，返回 [`SemError::Interrupt`] 。
+    /// + 当到达指定的唤醒时间点，线程被唤醒，并返回 [`SemError::Timedout`] 。
+    /// + 如果 `to` 是过去的时间点，将直接返回 [`SemError::Timedout`] 。
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
     ///
     /// # 错误码
     ///
@@ -611,9 +592,14 @@ impl Sem {
         }
     }
 
-    /// 等待并获取信号量，且不可被中断。
+    /// 等待并获取信号量，且等待不可被中断。
     ///
-    /// 若信号量不可用，调用的线程会阻塞等待，且不可被中断。
+    /// + 若信号量的值小于等于0，线程会阻塞等待，且不可被中断，也不会超时。
+    /// + 当信号量的值大于0时，线程被唤醒，并取走一个值（信号量的值减少1），然后返回 [`SemError::Ok`] 。
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
     ///
     /// # 错误码
     ///
@@ -668,7 +654,61 @@ impl Sem {
             }
         }
     }
-}
 
-unsafe impl Send for Sem {}
-unsafe impl Sync for Sem {}
+    /// 尝试获取信号量。
+    ///
+    /// + 当信号量的值大于0时，就取走一个值（信号量的值减少1），然后返回 [`SemError::Ok`] 。
+    /// + 当信号量的值小于等于0时，立即返回 [`SemError::NoData`] 。
+    ///
+    /// # 上下文
+    ///
+    /// + 任意
+    ///
+    /// # 错误码
+    ///
+    /// + [`SemError::Ok`] 没有错误
+    /// + [`SemError::NotInit`] 信号量没有初始化
+    /// + [`SemError::NoData`] 信号量不可用
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    /// use xwrust::types::*;
+    /// use xwrust::errno::*;
+    /// use xwrust::xwos::sync::sem::*;
+    ///
+    /// pub fn xwrust_example_sem() {
+    ///     // ...省略...
+    ///     sem: Sem = Sem::new();
+    ///     sem.init(0, XwSsq::max);
+    ///     // ...省略...
+    ///     let rc = sem.trywait();
+    ///     match rc {
+    ///         SemError::Ok => {
+    ///             // 获取信号量
+    ///         },
+    ///         _ => {
+    ///             // 等待信号量失败
+    ///         },
+    ///     };
+    /// }
+    /// ```
+    pub fn trywait(&self) -> SemError {
+        unsafe {
+            let mut rc = xwrustffi_sem_acquire(self.sem.get(), *self.tik.get());
+            if rc == 0 {
+                rc = xwrustffi_sem_trywait(self.sem.get());
+                xwrustffi_sem_put(self.sem.get());
+                if XWOK == rc {
+                    SemError::Ok
+                } else if -ENODATA == rc {
+                    SemError::NoData
+                } else {
+                    SemError::Unknown(rc)
+                }
+            } else {
+                SemError::NotInit
+            }
+        }
+    }
+}

@@ -310,7 +310,7 @@ xwer_t xwos_sem_post(struct xwos_sem * sem)
 }
 
 /**
- * @brief XWOS API：等待并获取信号
+ * @brief XWOS API：等待并获取信号量
  * @param[in] sem: 信号量对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误

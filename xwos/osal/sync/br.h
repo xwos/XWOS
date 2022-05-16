@@ -220,7 +220,7 @@ xwos_br_d xwos_br_getd(struct xwos_br * br)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
- * @retval -ECHRNG: 位置超出范围
+ * @retval -ECHRNG: 线程数量超出范围
  * @retval -EALREADY: 同步对象已经绑定到事件对象
  * @retval -EBUSY: 通道已经被其他同步对象独占
  * @note
@@ -274,7 +274,7 @@ xwer_t xwos_br_get_num(struct xwos_br * br, xwsz_t * numbuf)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
- * @retval -ECHRNG: 位置超出范围
+ * @retval -ECHRNG: 线程数量超出范围
  * @retval -EINTR: 等待被中断
  * @retval -ENOTTHDCTX：不在线程上下文中
  * @note
@@ -293,7 +293,7 @@ xwer_t xwos_br_wait(struct xwos_br * br)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
- * @retval -ECHRNG: 位置超出范围
+ * @retval -ECHRNG: 线程数量超出范围
  * @retval -ETIMEDOUT: 超时
  * @retval -EINTR: 等待被中断
  * @retval -ENOTTHDCTX：不在线程上下文中

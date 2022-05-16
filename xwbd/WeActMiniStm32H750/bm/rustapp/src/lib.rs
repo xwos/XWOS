@@ -22,6 +22,7 @@ use xwrust_example_spinlock::xwrust_example_spinlock;
 use xwrust_example_seqlock::xwrust_example_seqlock;
 use xwrust_example_sem::xwrust_example_sem;
 use xwrust_example_cond::xwrust_example_cond;
+use xwrust_example_br::xwrust_example_br;
 use xwrust_example_xwmq::xwrust_example_xwmq;
 
 #[global_allocator]
@@ -37,6 +38,7 @@ pub unsafe extern "C" fn xwrust_main() {
     xwrust_example_seqlock();
     xwrust_example_sem();
     xwrust_example_cond();
+    xwrust_example_br();
     xwrust_example_xwmq();
 }
 

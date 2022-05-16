@@ -98,6 +98,7 @@ dependencies = [
  "cortex-m",
  "libc-print",
  "xwrust",
+ "xwrust_example_br",
  "xwrust_example_cond",
  "xwrust_example_mutex",
  "xwrust_example_sem",
@@ -160,6 +161,14 @@ dependencies = [
  "cstr_core",
  "cty",
  "libc",
+]
+
+[[package]]
+name = "xwrust_example_br"
+version = "0.1.0"
+dependencies = [
+ "libc-print",
+ "xwrust",
 ]
 
 [[package]]

@@ -1,4 +1,4 @@
-//! XWOS RUST：XWOS的条件量
+//! XWOS RUST：条件量
 //! ========
 //!
 //! 条件量是操作系统比较底层的同步机制，可以同时阻塞多个线程。当条件成立，条件量可以唤醒一个或所有正在等待的线程。
@@ -27,7 +27,7 @@
 //! ```rust
 //! use xwrust::xwos::sync::cond::*;
 //!
-//! static GLOBAL_COND: Cond  = Cond::new();
+//! static GLOBAL_COND: Cond = Cond::new();
 //! ```
 //!
 //! + 也可以使用 [`alloc::sync::Arc`] 在heap中创建：
@@ -221,7 +221,7 @@ xwos_struct! {
     /// 用于构建条件量的内存数组类型
     pub struct XwosCond {
         #[doc(hidden)]
-        mem: [u8; SIZEOF_XWOS_COND],
+        obj: [u8; SIZEOF_XWOS_COND],
     }
 }
 
@@ -229,7 +229,7 @@ xwos_struct! {
 ///
 /// 此常量的作用是告诉编译器条件量对象需要多大的内存。
 pub const XWOS_COND_INITIALIZER: XwosCond = XwosCond {
-    mem: [0; SIZEOF_XWOS_COND],
+    obj: [0; SIZEOF_XWOS_COND],
 };
 
 /// 条件量对象结构体
@@ -239,6 +239,9 @@ pub struct Cond {
     /// 条件量对象的标签
     pub(crate) tik: UnsafeCell<XwSq>,
 }
+
+unsafe impl Send for Cond {}
+unsafe impl Sync for Cond {}
 
 impl Cond {
     /// 新建条件量对象。
@@ -279,6 +282,10 @@ impl Cond {
     ///
     /// 条件量对象必须调用此方法一次，方可正常使用。
     ///
+    /// # 上下文
+    ///
+    /// + 任意
+    ///
     /// # 示例
     ///
     /// ```rust
@@ -307,6 +314,10 @@ impl Cond {
     /// 冻结条件量。
     ///
     /// 条件量被冻结后，可被线程等待，但被能被单播 [`Cond::unicast()`] 或广播 [`Cond::broadcast()`] 。
+    ///
+    /// # 上下文
+    ///
+    /// + 任意
     ///
     /// # 错误码
     ///
@@ -348,6 +359,10 @@ impl Cond {
     /// 解冻条件量。
     ///
     /// 被冻结的条件量解冻后，可被单播 [`Cond::unicast()`] 或广播 [`Cond::broadcast()`] 。
+    ///
+    /// # 上下文
+    ///
+    /// + 任意
     ///
     /// # 错误码
     ///
@@ -392,6 +407,10 @@ impl Cond {
     ///
     /// 只会唤醒第一个线程，阻塞线程的队列使用的是先进先出(FIFO)算法 。
     ///
+    /// # 上下文
+    ///
+    /// + 任意
+    ///
     /// # 错误码
     ///
     /// + [`CondError::Ok`] 没有错误
@@ -434,6 +453,10 @@ impl Cond {
     ///
     /// 阻塞队列中的线程会全部被唤醒。
     ///
+    /// # 上下文
+    ///
+    /// + 任意
+    ///
     /// # 错误码
     ///
     /// + [`CondError::Ok`] 没有错误
@@ -472,6 +495,3 @@ impl Cond {
         }
     }
 }
-
-unsafe impl Send for Cond {}
-unsafe impl Sync for Cond {}

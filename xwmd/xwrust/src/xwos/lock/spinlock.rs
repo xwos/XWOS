@@ -157,7 +157,7 @@ xwos_struct! {
     /// 用于构建自旋锁的内存数组类型
     pub struct XwosSplk {
         #[doc(hidden)]
-        mem: [u8; SIZEOF_XWOS_SPLK],
+        obj: [u8; SIZEOF_XWOS_SPLK],
     }
 }
 
@@ -165,7 +165,7 @@ xwos_struct! {
 ///
 /// 此常量的作用是告诉编译器自旋锁需要多大的内存。
 pub const XWOS_SPLK_INITIALIZER: XwosSplk = XwosSplk {
-    mem: [0; SIZEOF_XWOS_SPLK],
+    obj: [0; SIZEOF_XWOS_SPLK],
 };
 
 
