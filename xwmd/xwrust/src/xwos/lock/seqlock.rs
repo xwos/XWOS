@@ -202,7 +202,7 @@ xwos_struct! {
     /// 用于构建顺序锁的内存数组类型
     pub struct XwosSqlk {
         #[doc(hidden)]
-        mem: [u8; SIZEOF_XWOS_SQLK],
+        obj: [u8; SIZEOF_XWOS_SQLK],
     }
 }
 
@@ -210,7 +210,7 @@ xwos_struct! {
 ///
 /// 此常量的作用是告诉编译器顺序锁需要多大的内存。
 pub const XWOS_SQLK_INITIALIZER: XwosSqlk = XwosSqlk {
-    mem: [0; SIZEOF_XWOS_SQLK],
+    obj: [0; SIZEOF_XWOS_SQLK],
 };
 
 

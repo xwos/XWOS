@@ -296,7 +296,7 @@ xwos_struct! {
     /// 用于构建消息队列的内存数组类型
     pub struct XwmdXwmq {
         #[doc(hidden)]
-        mem: [u8; SIZEOF_XWMQ],
+        obj: [u8; SIZEOF_XWMQ],
     }
 }
 
@@ -309,14 +309,14 @@ where
     [u8; N * SIZEOF_XWMQ_MSG]: Sized
 {
     #[doc(hidden)]
-    mem: [u8; N * SIZEOF_XWMQ_MSG],
+    obj: [u8; N * SIZEOF_XWMQ_MSG],
 }
 
 /// 用于构建消息队列的内存数组常量
 ///
 /// 此常量的作用是告诉编译器消息队列对象需要多大的内存。
 pub const XWMQ_INITIALIZER: XwmdXwmq = XwmdXwmq {
-    mem: [0; SIZEOF_XWMQ],
+    obj: [0; SIZEOF_XWMQ],
 };
 
 /// 消息队列对象结构体
@@ -376,7 +376,7 @@ where
     pub const fn new() -> Self {
         Self {
             mq: UnsafeCell::new(XWMQ_INITIALIZER),
-            pool: UnsafeCell::new(XwmdXwmqMsg { mem: [0; N * SIZEOF_XWMQ_MSG] }),
+            pool: UnsafeCell::new(XwmdXwmqMsg { obj: [0; N * SIZEOF_XWMQ_MSG] }),
             tik: UnsafeCell::new(0),
             phantom: PhantomData,
         }

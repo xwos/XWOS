@@ -1,6 +1,5 @@
-//! XWOS RUST：内核库
+//! XWOS RUST：中间件
 //! ========
 //!
 
-#[macro_use]
 pub mod xwmq;

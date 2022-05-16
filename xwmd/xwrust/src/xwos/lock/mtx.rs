@@ -251,7 +251,7 @@ xwos_struct! {
     /// 用于构建互斥锁的内存数组类型
     pub struct XwosMtx {
         #[doc(hidden)]
-        mem: [u8; SIZEOF_XWOS_MTX],
+        obj: [u8; SIZEOF_XWOS_MTX],
     }
 }
 
@@ -259,7 +259,7 @@ xwos_struct! {
 ///
 /// 此常量的作用是告诉编译器互斥锁对象需要多大的内存。
 pub const XWOS_MTX_INITIALIZER: XwosMtx = XwosMtx {
-    mem: [0; SIZEOF_XWOS_MTX],
+    obj: [0; SIZEOF_XWOS_MTX],
 };
 
 /// 互斥锁对象结构体
@@ -300,6 +300,10 @@ impl<T: ?Sized> Mutex<T> {
     ///
     /// 互斥锁对象必须调用此方法一次，方可正常使用。
     ///
+    /// # 上下文
+    ///
+    /// + 任意
+    ///
     /// # 示例
     ///
     /// ```rust
@@ -330,6 +334,10 @@ impl<T: ?Sized> Mutex<T> {
     /// + 若成功获取互斥锁，将返回 **RAII Guard** ： [`MutexGuard`] ，用于提供 **Scoped Lock** 机制。
     ///   + [`MutexGuard`] 中包含 [`Mutex`] 的引用， 当 [`MutexGuard`] 生命周期结束时，会在 [`drop()`] 方法中自动解锁互斥锁。
     /// + 若失败，将返回错误码 [`MutexError`] 。
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
     ///
     /// # 错误码
     ///
@@ -391,6 +399,10 @@ impl<T: ?Sized> Mutex<T> {
     ///   + [`MutexGuard`] 中包含 [`Mutex`] 的引用， 当 [`MutexGuard`] 生命周期结束时，会在 [`drop()`] 方法中自动解锁互斥锁。
     /// + 若失败，将返回错误码 [`MutexError`] 。
     ///
+    /// # 上下文
+    ///
+    /// + 线程
+    ///
     /// # 错误码
     ///
     /// + [`MutexError::NotInit`] 互斥锁未被初始化
@@ -443,6 +455,10 @@ impl<T: ?Sized> Mutex<T> {
     /// + 若成功获取互斥锁，将返回 **RAII Guard** ： [`MutexGuard`] ，用于提供 **Scoped Lock** 机制。
     ///   + [`MutexGuard`] 中包含 [`Mutex`] 的引用， 当 [`MutexGuard`] 生命周期结束时，会在 [`drop()`] 方法中自动解锁互斥锁。
     /// + 若失败，将返回错误码 [`MutexError`] 。
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
     ///
     /// # 错误码
     ///
@@ -508,6 +524,10 @@ impl<T: ?Sized> Mutex<T> {
     ///   + [`MutexGuard`] 中包含 [`Mutex`] 的引用， 当 [`MutexGuard`] 生命周期结束时，会在 [`drop()`] 方法中自动解锁互斥锁。
     /// + 若失败，将返回错误码 [`MutexError`] 。
     ///
+    /// # 上下文
+    ///
+    /// + 线程
+    ///
     /// # 错误码
     ///
     /// + [`MutexError::NotInit`] 互斥锁未被初始化
@@ -563,6 +583,10 @@ impl<T: ?Sized> Mutex<T> {
 
 
     /// 释放 [`MutexGuard`]，并在 [`drop()`] 方法中解锁互斥锁。
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
     ///
     /// # 示例
     ///
@@ -649,6 +673,10 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
     ///
     /// + 当返回互斥锁的守卫 [`MutexGuard`] 时，互斥锁已经被重新上锁；
     /// + 当返回 [`Err()`] 时，互斥锁未被上锁。
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
     ///
     /// # 错误码
     ///
@@ -749,6 +777,10 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
     ///
     /// + 当返回互斥锁的守卫 [`MutexGuard`] 时，互斥锁已经被重新上锁；
     /// + 当返回 [`Err()`] 时，互斥锁未被上锁。
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
     ///
     /// # 错误码
     ///
@@ -851,6 +883,10 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
     ///
     /// + 当返回互斥锁的守卫 [`MutexGuard`] 时，互斥锁已经被重新上锁；
     /// + 当返回 [`Err()`] 时，互斥锁未被上锁。
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
     ///
     /// # 错误码
     ///
