@@ -68,6 +68,13 @@
 //! 可以通过方法 [`Br::get_num()`] 获取线程栅栏中线程槽的数量。
 //!
 //!
+//! # 绑定到信号选择器
+//!
+//! 线程栅栏是 **同步对象** ，可以通过方法 [`Br::bind()`] 将线程栅栏绑定到信号选择器 [`Sel<M>`] 上，通过 [`Sel<M>`] ，单一线程可以同时等待多个不同的 **同步对象** 。
+//!
+//! 线程栅栏采用 **非独占** 的方式进行绑定。
+//!
+//!
 //! # 示例
 //!
 //! [XWOS/xwam/xwrust-example/xwrust_example_br](https://gitee.com/xwos/XWOS/blob/main/xwam/xwrust-example/xwrust_example_br/src/lib.rs)
@@ -75,6 +82,7 @@
 //!
 //! [`'static`]: <https://doc.rust-lang.org/std/keyword.static.html>
 //! [`alloc::sync::Arc`]: <https://doc.rust-lang.org/alloc/sync/struct.Arc.html>
+//! [`Sel<M>`]: super::sel::Sel
 
 extern crate core;
 use core::ffi::*;
@@ -82,6 +90,8 @@ use core::cell::UnsafeCell;
 
 use crate::types::*;
 use crate::errno::*;
+use crate::xwbmp::*;
+use crate::xwos::sync::sel::*;
 
 
 extern "C" {
@@ -92,16 +102,18 @@ extern "C" {
     pub(crate) fn xwrustffi_br_gettik(br: *mut c_void) -> XwSq;
     pub(crate) fn xwrustffi_br_acquire(br: *mut c_void, tik: XwSq) -> XwEr;
     pub(crate) fn xwrustffi_br_release(br: *mut c_void, tik: XwSq) -> XwEr;
+    pub(crate) fn xwrustffi_br_bind(br: *mut c_void, sel: *mut c_void, pos: XwSq) -> XwEr;
+    pub(crate) fn xwrustffi_br_unbind(br: *mut c_void, sel: *mut c_void) -> XwEr;
     pub(crate) fn xwrustffi_br_wait(br: *mut c_void) -> XwEr;
     pub(crate) fn xwrustffi_br_wait_to(br: *mut c_void, to: XwTm) -> XwEr;
 }
 
-/// 条件量的错误码
+/// 线程栅栏的错误码
 #[derive(Debug)]
 pub enum BrError {
     /// 没有错误
     Ok,
-    /// 条件量没有初始化
+    /// 线程栅栏没有初始化
     NotInit,
     /// 线程数量超出范围
     OutOfRange,
@@ -115,18 +127,24 @@ pub enum BrError {
     CannotPmpt,
     /// 中断底半部被关闭
     CannotBh,
+    /// 信号选择器的位置超出范围
+    OutOfSelPos,
+    /// 信号量已经绑定
+    AlreadyBound,
+    /// 信号选择器的位置被占用
+    SelPosBusy,
     /// 未知错误
     Unknown(XwEr),
 }
 
-/// XWOS条件量对象占用的内存大小
+/// XWOS线程栅栏对象占用的内存大小
 pub const SIZEOF_XWOS_BR: usize = 64;
 
-/// 用于构建条件量的内存数组类型
+/// 用于构建线程栅栏的内存数组类型
 #[repr(C)]
 #[cfg_attr(target_pointer_width = "32", repr(align(8)))]
 #[cfg_attr(target_pointer_width = "64", repr(align(16)))]
-pub struct XwosBr<const N: XwSz>
+pub(crate) struct XwosBr<const N: XwSz>
 where
     [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
 {
@@ -134,17 +152,18 @@ where
     obj: [u8; SIZEOF_XWOS_BR],
     #[doc(hidden)]
     bmp: [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
+    #[doc(hidden)]
     msk: [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
 }
 
-/// 条件量对象结构体
+/// 线程栅栏对象结构体
 pub struct Br<const N: XwSz>
 where
     [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
 {
-    /// 用于初始化XWOS条件量对象的内存空间
+    /// 用于初始化XWOS线程栅栏对象的内存空间
     pub(crate) br: UnsafeCell<XwosBr<N>>,
-    /// 条件量对象的标签
+    /// 线程栅栏对象的标签
     pub(crate) tik: UnsafeCell<XwSq>,
 }
 
@@ -157,6 +176,17 @@ unsafe impl<const N: XwSz> Sync for Br<N>
 where
     [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
 {}
+
+impl<const N: XwSz> Drop for Br<N>
+where
+    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+{
+    fn drop(&mut self) {
+        unsafe {
+            xwrustffi_br_fini(self.br.get() as _);
+        }
+    }
+}
 
 impl<const N: XwSz> Br<N>
 where
@@ -373,5 +403,160 @@ where
                 BrError::NotInit
             }
         }
+    }
+
+    /// 绑定线程栅栏对象到信号选择器。
+    ///
+    /// + 线程栅栏绑定到信号选择器上时，采用 **非独占** 的方式进行绑定。
+    /// + 绑定成功，通过 [`Ok()`] 返回 [`BrSel<'a, N, M>`] 。
+    /// + 如果位置已被其他 **同步对象** 以 **独占** 的方式占领，通过 [`Err()`] 返回 [`BrError::SelPosBusy`] 。
+    /// + 当指定的位置超出范围（例如 [`Sel<M>`] 只有8个位置，用户偏偏要绑定到位置9 ），通过 [`Err()`] 返回 [`BrError::OutOfSelPos`] 。
+    /// + 重复绑定，通过 [`Err()`] 返回 [`BrError::AlreadyBound`] 。
+    ///
+    /// [`BrSel<'a, N, M>`] 中包含线程栅栏的绑定信息。 [`BrSel<'a, N, M>`] 与 [`Br<N>`] 与 [`Sel<M>`] 具有相同的生命周期约束 `'a` 。
+    /// [`BrSel::selected()`] 可用来判断线程栅栏是否被选择。当 [`BrSel<'a, N, M>`] [`drop()`] 时，会自动解绑。
+    ///
+    /// # 上下文
+    ///
+    /// + 任意
+    ///
+    /// # 错误码
+    ///
+    /// + [`BrError::OutOfSelPos`] 信号选择器的位置超出范围
+    /// + [`BrError::AlreadyBound`] 线程栅栏已经绑定
+    /// + [`BrError::SelPosBusy`] 信号选择器的位置被占用
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    /// pub fn xwrust_example_sel() {
+    ///     // ...省略...
+    ///     let br0 = Arc::new(Br::new());
+    ///     br0.init();
+    ///     let br0sel = match br0.bind(&sel, 0) {
+    ///         Ok(s) => { // 绑定成功，`s` 为 `BrSel`
+    ///             s
+    ///         },
+    ///         Err(e) => { // 绑定失败，`e` 为 `SelError`
+    ///             return;
+    ///         }
+    ///     };
+    ///     // ...省略...
+    /// }
+    /// ```
+    ///
+    /// [`BrSel<'a, N, M>`]: BrSel
+    /// [`Ok()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
+    /// [`Err()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
+    /// [`Sel<M>`]: super::sel::Sel
+    /// [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
+    pub fn bind<'a, const M: XwSz>(&'a self, sel: &'a Sel<M>, pos: XwSq) ->
+                                   Result<BrSel<'a, N, M>, BrError>
+    where
+        [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    {
+        unsafe {
+            let mut rc = xwrustffi_br_acquire(self.br.get() as _, *self.tik.get());
+            if rc == 0 {
+                rc = xwrustffi_br_bind(self.br.get() as _, sel.sel.get() as _, pos);
+                if XWOK == rc {
+                    Ok(BrSel {
+                        br: self,
+                        sel: sel,
+                        pos: pos,
+                    })
+                } else if -ECHRNG == rc {
+                    Err(BrError::OutOfSelPos)
+                } else if -EALREADY == rc {
+                    Err(BrError::AlreadyBound)
+                } else if -EBUSY == rc {
+                    Err(BrError::SelPosBusy)
+                } else {
+                    Err(BrError::Unknown(rc))
+                }
+            } else {
+                Err(BrError::NotInit)
+            }
+        }
+    }
+}
+
+/// 线程栅栏的选择子
+///
+/// `BrSel<'a, N, M>` 与 [`Br<N>`] 与 [`Sel<M>`] 具有相同的生命周期约束 `'a` 。因为 `BrSel<'a, N, M>` 中包含了 [`Br<N>`] 与 [`Sel<M>`] 的引用。
+///
+/// `BrSel<'a, N, M>` 中包含了绑定的位置信息，线程栅栏采用 **非独占** 的方式进行绑定。
+///
+/// [`BrSel::selected()`] 可用来判断线程栅栏是否被选择。
+///
+/// 当 `BrSel<'a, N, M>` 被 [`drop()`] 时，会自动将 [`Br<N>`] 从 [`Sel<M>`] 解绑。
+///
+/// [`Sel<M>`]: super::sel::Sel
+/// [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
+pub struct BrSel<'a, const N: XwSz, const M: XwSz>
+where
+    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized,
+    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+{
+    /// 线程栅栏
+    pub br: &'a Br<N>,
+    /// 信号选择器
+    pub sel: &'a Sel<M>,
+    /// 位置
+    pub pos: XwSq,
+}
+
+unsafe impl<'a, const N: XwSz, const M: XwSz> Send for BrSel<'a, N, M>
+where
+    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized,
+    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+{}
+
+unsafe impl<'a, const N: XwSz, const M: XwSz> Sync for BrSel<'a, N, M>
+where
+    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized,
+    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+{}
+
+impl<'a, const N: XwSz, const M: XwSz> Drop for BrSel<'a, N, M>
+where
+    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized,
+    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+{
+    fn drop(&mut self) {
+        unsafe {
+            xwrustffi_br_unbind(self.br.br.get() as _, self.br.br.get() as _);
+            xwrustffi_br_put(self.br.br.get() as _);
+        }
+    }
+}
+
+impl<'a, const N: XwSz, const M: XwSz> BrSel<'a, N, M>
+where
+    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized,
+    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+{
+    /// 判断触发的 **选择信号** 是否包括此线程栅栏
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    ///     let msk = Bmp::<8>::new(); // 8位位图
+    ///     msk.s1all(); // 掩码为0xFF
+    ///     loop {
+    ///         let res = sel.select(&msk);
+    ///         match res {
+    ///             Ok(t) => { // 信号选择器上有 **选择信号** ， `t` 为 **选择信号** 的位图。
+    ///                 if br0sel.selected(&t) { // 线程栅栏被选择到
+    ///                 }
+    ///             },
+    ///             Err(e) => { // 等待信号选择器失败，`e` 为 `SelError`
+    ///                 break;
+    ///             },
+    ///         }
+    ///     }
+    /// ```
+    pub fn selected(&self, trg: &Bmp<M>) -> bool {
+        trg.t1i(self.pos)
     }
 }

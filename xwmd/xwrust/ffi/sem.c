@@ -56,6 +56,16 @@ xwer_t xwrustffi_sem_release(struct xwos_sem * sem, xwsq_t tik)
         return xwos_sem_release(semd);
 }
 
+xwer_t xwrustffi_sem_bind(struct xwos_sem * sem, struct xwos_sel * sel, xwsq_t pos)
+{
+        return xwos_sem_bind(sem, sel, pos);
+}
+
+xwer_t xwrustffi_sem_unbind(struct xwos_sem * sem, struct xwos_sel * sel)
+{
+        return xwos_sem_unbind(sem, sel);
+}
+
 xwer_t xwrustffi_sem_freeze(struct xwos_sem * sem)
 {
         return xwos_sem_freeze(sem);

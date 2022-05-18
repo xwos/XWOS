@@ -11,7 +11,7 @@
 
 include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
-XWMO_CSRCS := xwtm.c skd.c thd.c mtx.c spinlock.c seqlock.c sem.c cond.c br.c
+XWMO_CSRCS := xwtm.c skd.c thd.c mtx.c spinlock.c seqlock.c sem.c cond.c br.c sel.c
 XWMO_CFLAGS := -Wno-unused-function
 XWMO_INCDIRS :=
 include xwbs/$(XuanWuOS_CFG_XWMO_MK)

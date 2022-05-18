@@ -59,6 +59,9 @@ pub mod errno;
 
 pub mod panic;
 
+#[allow(dead_code)]
+pub mod xwbmp;
+
 pub mod xwtm;
 
 #[allow(dead_code)]

@@ -133,6 +133,13 @@
 //! + 顺序锁的写锁： [`crate::xwos::lock::seqlock::SeqlockGuard::wait_unintr()`]
 //!
 //!
+//! # 绑定到信号选择器
+//!
+//! 条件量是 **同步对象** ，可以通过方法 [`Cond::bind()`] 将条件量绑定到信号选择器 [`Sel<M>`] 上，通过 [`Sel<M>`] ，单一线程可以同时等待多个不同的 **同步对象** 。
+//!
+//! 条件量采用 **非独占** 的方式进行绑定。
+//!
+//!
 //! # 示例
 //!
 //! [XWOS/xwam/xwrust-example/xwrust_example_cond](https://gitee.com/xwos/XWOS/blob/main/xwam/xwrust-example/xwrust_example_cond/src/lib.rs)
@@ -142,6 +149,7 @@
 //! [`alloc::sync::Arc`]: <https://doc.rust-lang.org/alloc/sync/struct.Arc.html>
 //! [`Ok`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
 //! [`Err`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
+//! [`Sel<M>`]: super::sel::Sel
 
 extern crate core;
 use core::ffi::*;
@@ -149,6 +157,8 @@ use core::cell::UnsafeCell;
 
 use crate::types::*;
 use crate::errno::*;
+use crate::xwbmp::*;
+use crate::xwos::sync::sel::*;
 
 
 extern "C" {
@@ -159,6 +169,8 @@ extern "C" {
     pub(crate) fn xwrustffi_cond_gettik(cond: *mut XwosCond) -> XwSq;
     pub(crate) fn xwrustffi_cond_acquire(cond: *mut XwosCond, tik: XwSq) -> XwEr;
     pub(crate) fn xwrustffi_cond_release(cond: *mut XwosCond, tik: XwSq) -> XwEr;
+    pub(crate) fn xwrustffi_cond_bind(cond: *mut XwosCond, sel: *mut c_void, pos: XwSq) -> XwEr;
+    pub(crate) fn xwrustffi_cond_unbind(cond: *mut XwosCond, sel: *mut c_void) -> XwEr;
     pub(crate) fn xwrustffi_cond_freeze(cond: *mut XwosCond) -> XwEr;
     pub(crate) fn xwrustffi_cond_thaw(cond: *mut XwosCond) -> XwEr;
     pub(crate) fn xwrustffi_cond_broadcast(cond: *mut XwosCond) -> XwEr;
@@ -191,6 +203,12 @@ pub enum CondError {
     Timedout,
     /// 不在线程上下文内
     NotThreadContext,
+    /// 信号选择器的位置超出范围
+    OutOfSelPos,
+    /// 条件量已经绑定
+    AlreadyBound,
+    /// 信号选择器的位置被占用
+    SelPosBusy,
     /// 未知错误
     Unknown(XwEr),
 }
@@ -242,6 +260,14 @@ pub struct Cond {
 
 unsafe impl Send for Cond {}
 unsafe impl Sync for Cond {}
+
+impl Drop for Cond {
+    fn drop(&mut self) {
+        unsafe {
+            xwrustffi_cond_fini(self.cond.get());
+        }
+    }
+}
 
 impl Cond {
     /// 新建条件量对象。
@@ -493,5 +519,154 @@ impl Cond {
                 CondError::NotInit
             }
         }
+    }
+
+    /// 绑定条件量对象到信号选择器。
+    ///
+    /// + 条件量绑定到信号选择器上时，采用 **非独占** 的方式进行绑定。
+    /// + 绑定成功，通过 [`Ok()`] 返回 [`CondSel<'a, M>`] 。
+    /// + 如果位置已被其他 **同步对象** 以 **独占** 的方式占领，通过 [`Err()`] 返回 [`CondError::SelPosBusy`] 。
+    /// + 当指定的位置超出范围（例如 [`Sel<M>`] 只有8个位置，用户偏偏要绑定到位置9 ），通过 [`Err()`] 返回 [`CondError::OutOfSelPos`] 。
+    /// + 重复绑定，通过 [`Err()`] 返回 [`CondError::AlreadyBound`] 。
+    ///
+    /// [`CondSel<'a, M>`] 中包含条件量的绑定信息。 [`CondSel<'a, M>`] 与 [`Cond`] 与 [`Sel<M>`] 具有相同的生命周期约束 `'a` 。
+    /// [`CondSel::selected()`] 可用来判断条件量是否被选择。当 [`CondSel<'a, M>`] [`drop()`] 时，会自动解绑。
+    ///
+    /// # 上下文
+    ///
+    /// + 任意
+    ///
+    /// # 错误码
+    ///
+    /// + [`CondError::OutOfSelPos`] 信号选择器的位置超出范围
+    /// + [`CondError::AlreadyBound`] 条件量已经绑定
+    /// + [`CondError::SelPosBusy`] 信号选择器的位置被占用
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    /// pub fn xwrust_example_sel() {
+    ///     // ...省略...
+    ///     let cond0 = Arc::new(Cond::new());
+    ///     cond0.init();
+    ///     let cond0sel = match cond0.bind(&sel, 0) {
+    ///         Ok(s) => { // 绑定成功，`s` 为 `CondSel`
+    ///             s
+    ///         },
+    ///         Err(e) => { // 绑定失败，`e` 为 `SelError`
+    ///             return;
+    ///         }
+    ///     };
+    ///     // ...省略...
+    /// }
+    /// ```
+    ///
+    /// [`CondSel<'a, M>`]: CondSel
+    /// [`Ok()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
+    /// [`Err()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
+    /// [`Sel<M>`]: super::sel::Sel
+    /// [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
+    pub fn bind<'a, const M: XwSz>(&'a self, sel: &'a Sel<M>, pos: XwSq)
+                                   -> Result<CondSel<'a, M>, CondError>
+    where
+        [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    {
+        unsafe {
+            let mut rc = xwrustffi_cond_acquire(self.cond.get(), *self.tik.get());
+            if rc == 0 {
+                rc = xwrustffi_cond_bind(self.cond.get(), sel.sel.get() as _, pos);
+                if XWOK == rc {
+                    Ok(CondSel {
+                        cond: self,
+                        sel: sel,
+                        pos: pos,
+                    })
+                } else if -ECHRNG == rc {
+                    Err(CondError::OutOfSelPos)
+                } else if -EALREADY == rc {
+                    Err(CondError::AlreadyBound)
+                } else if -EBUSY == rc {
+                    Err(CondError::SelPosBusy)
+                } else {
+                    Err(CondError::Unknown(rc))
+                }
+            } else {
+                Err(CondError::NotInit)
+            }
+        }
+    }
+}
+
+/// 条件量的选择子
+///
+/// `CondSel<'a, M>` 与 [`Cond`] 与 [`Sel<M>`] 具有相同的生命周期约束 `'a` 。因为 `CondSel<'a, M>` 中包含了 [`Cond`] 与 [`Sel<M>`] 的引用。
+///
+/// `CondSel<'a, M>` 中包含了绑定的位置信息，条件量采用 **非独占** 的方式进行绑定。
+///
+/// [`CondSel::selected()`] 可用来判断条件量是否被选择。
+///
+/// 当 `CondSel<'a, M>` 被 [`drop()`] 时，会自动将 [`Cond`] 从 [`Sel<M>`] 解绑。
+///
+/// [`Sel<M>`]: super::sel::Sel
+/// [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
+pub struct CondSel<'a, const M: XwSz>
+where
+    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+{
+    cond: &'a Cond,
+    sel: &'a Sel<M>,
+    pos: XwSq,
+}
+
+unsafe impl<'a, const M: XwSz> Send for CondSel<'a, M>
+where
+    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+{}
+
+unsafe impl<'a, const M: XwSz> Sync for CondSel<'a, M>
+where
+    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+{}
+
+impl<'a, const M: XwSz> Drop for CondSel<'a, M>
+where
+    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+{
+    fn drop(&mut self) {
+        unsafe {
+            xwrustffi_cond_unbind(self.cond.cond.get(), self.sel.sel.get() as _);
+            xwrustffi_cond_put(self.cond.cond.get());
+        }
+    }
+}
+
+impl<'a, const M: XwSz> CondSel<'a, M>
+where
+    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+{
+    /// 判断触发的 **选择信号** 是否包括此条件量
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    ///     let msk = Bmp::<8>::new(); // 8位位图
+    ///     msk.s1all(); // 掩码为0xFF
+    ///     loop {
+    ///         let res = sel.select(&msk);
+    ///         match res {
+    ///             Ok(t) => { // 信号选择器上有 **选择信号** ， `t` 为 **选择信号** 的位图。
+    ///                 if cond0sel.selected(&t) { // 条件量0被选择到
+    ///                 }
+    ///                 if cond1sel.selected(&t) { // 条件量1被选择到
+    ///                 }
+    ///             },
+    ///             Err(e) => { // 等待信号选择器失败，`e` 为 `SelError`
+    ///                 break;
+    ///             },
+    ///         }
+    ///     }
+    /// ```
+    pub fn selected(&self, trg: &Bmp<M>) -> bool {
+        trg.t1i(self.pos)
     }
 }

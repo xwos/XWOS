@@ -645,7 +645,7 @@ void xwbmpop_xor(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num);
  * @retval >=0: 位的序号
  * @retval -1: 没有任何一个位为1
  * @note
- * - 返回的序号是从0开始编号的，与C标准库中ffs()函数返回值不同。
+ * - 返回的序号是从0开始编号的，与C标准库中 `ffs()` 函数返回值不同。
  */
 xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t num);
 
@@ -657,7 +657,7 @@ xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t num);
  * @retval >=0: 位的序号
  * @retval -1: 没有任何一个位被清0
  * @note
- * - 返回的序号是从0开始编号的，与C标准库中ffs()函数返回值不同。
+ * - 返回的序号是从0开始编号的，与C标准库中 `ffs()` 函数返回值不同。
  */
 xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t num);
 
@@ -669,7 +669,7 @@ xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t num);
  * @retval >=0: 位的序号
  * @retval -1: 没有任何一个位为1
  * @note
- * - 返回的序号是从0开始编号的，与C标准库中ffs()函数返回值不同。
+ * - 返回的序号是从0开始编号的，与C标准库中 `ffs()` 函数返回值不同。
  */
 xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num);
 
@@ -681,7 +681,7 @@ xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num);
  * @retval >=0: 位的序号
  * @retval -1: 没有任何一个位为0
  * @note
- * - 返回的序号是从0开始编号的，与C标准库中ffs()函数返回值不同。
+ * - 返回的序号是从0开始编号的，与C标准库中 `ffs()` 函数返回值不同。
  */
 xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t num);
 

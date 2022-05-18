@@ -23,10 +23,10 @@ pub fn xwrust_example_br() {
         let c = br.clone();
         let _ = thd::spawn(move |_| {
             // 子线程闭包
-            cthd::sleep(xwtm::ft(xwtm::ms(idx * 100)));
+            cthd::sleep(xwtm::ms(idx * 100));
             println!("[thd{}] {:?}", idx, cthd::i());
             c.wait();
-            cthd::sleep(xwtm::ft(xwtm::ms(idx * 100)));
+            cthd::sleep(xwtm::ms(idx * 100));
             println!("[thd{}]<{} ms> 开始运行", idx, xwtm::nowtc());
             "OK"
         });
