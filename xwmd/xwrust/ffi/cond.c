@@ -56,6 +56,16 @@ xwer_t xwrustffi_cond_release(struct xwos_cond * cond, xwsq_t tik)
         return xwos_cond_release(condd);
 }
 
+xwer_t xwrustffi_cond_bind(struct xwos_cond * cond, struct xwos_sel * sel, xwsq_t pos)
+{
+        return xwos_cond_bind(cond, sel, pos);
+}
+
+xwer_t xwrustffi_cond_unbind(struct xwos_cond * cond, struct xwos_sel * sel)
+{
+        return xwos_cond_unbind(cond, sel);
+}
+
 xwer_t xwrustffi_cond_freeze(struct xwos_cond * cond)
 {
         return xwos_cond_freeze(cond);

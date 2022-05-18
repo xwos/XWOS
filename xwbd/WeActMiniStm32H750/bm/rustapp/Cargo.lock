@@ -101,6 +101,7 @@ dependencies = [
  "xwrust_example_br",
  "xwrust_example_cond",
  "xwrust_example_mutex",
+ "xwrust_example_sel",
  "xwrust_example_sem",
  "xwrust_example_seqlock",
  "xwrust_example_spinlock",
@@ -181,6 +182,14 @@ dependencies = [
 
 [[package]]
 name = "xwrust_example_mutex"
+version = "0.1.0"
+dependencies = [
+ "libc-print",
+ "xwrust",
+]
+
+[[package]]
+name = "xwrust_example_sel"
 version = "0.1.0"
 dependencies = [
  "libc-print",

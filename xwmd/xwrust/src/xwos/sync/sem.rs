@@ -31,7 +31,7 @@
 //! use xwrust::xwos::sync::sem::*;
 //!
 //! pub fn xwrust_example_sem() {
-//!     let sema = Arc::new(Sem::new());
+//!     let sem = Arc::new(Sem::new());
 //! }
 //! ```
 //!
@@ -43,7 +43,7 @@
 //! ```rust
 //! pub fn xwrust_example_sem() {
 //!     GLOBAL_SEM.init(0, XwSsq::MAX);
-//!     sema.init(0, XwSsq::MAX);
+//!     sem.init(0, XwSsq::MAX);
 //! }
 //! ```
 //!
@@ -108,6 +108,13 @@
 //! 可以通过方法 [`Sem::getvalue()`] 获取信号量的值，此方法只是读取值，不会 **消费** 信号量。
 //!
 //!
+//! # 绑定到信号选择器
+//!
+//! 信号量是 **同步对象** ，可以通过方法 [`Sem::bind()`] 将信号量绑定到信号选择器 [`Sel<M>`] 上，通过 [`Sel<M>`] ，单一线程可以同时等待多个不同的 **同步对象** 。
+//!
+//! 信号量采用 **独占** 的方式进行绑定。
+//!
+//!
 //! # 示例
 //!
 //! [XWOS/xwam/xwrust-example/xwrust_example_sem](https://gitee.com/xwos/XWOS/blob/main/xwam/xwrust-example/xwrust_example_sem/src/lib.rs)
@@ -115,13 +122,17 @@
 //!
 //! [`'static`]: <https://doc.rust-lang.org/std/keyword.static.html>
 //! [`alloc::sync::Arc`]: <https://doc.rust-lang.org/alloc/sync/struct.Arc.html>
+//! [`Sel<M>`]: super::sel::Sel
 
 extern crate core;
-use core::result::Result;
+use core::ffi::*;
 use core::cell::UnsafeCell;
+use core::result::Result;
 
 use crate::types::*;
 use crate::errno::*;
+use crate::xwbmp::*;
+use crate::xwos::sync::sel::*;
 
 
 extern "C" {
@@ -132,6 +143,8 @@ extern "C" {
     fn xwrustffi_sem_gettik(sem: *mut XwosSem) -> XwSq;
     fn xwrustffi_sem_acquire(sem: *mut XwosSem, tik: XwSq) -> XwEr;
     fn xwrustffi_sem_release(sem: *mut XwosSem, tik: XwSq) -> XwEr;
+    fn xwrustffi_sem_bind(sem: *mut XwosSem, sel: *mut c_void, pos: XwSq) -> XwEr;
+    fn xwrustffi_sem_unbind(sem: *mut XwosSem, sel: *mut c_void) -> XwEr;
     fn xwrustffi_sem_freeze(sem: *mut XwosSem) -> XwEr;
     fn xwrustffi_sem_thaw(sem: *mut XwosSem) -> XwEr;
     fn xwrustffi_sem_post(sem: *mut XwosSem) -> XwEr;
@@ -165,6 +178,12 @@ pub enum SemError {
     CannotBh,
     /// 信号量不可用
     NoData,
+    /// 信号选择器的位置超出范围
+    OutOfSelPos,
+    /// 信号量已经绑定
+    AlreadyBound,
+    /// 信号选择器的位置被占用
+    SelPosBusy,
     /// 未知错误
     Unknown(XwEr),
 }
@@ -198,6 +217,14 @@ pub struct Sem {
 unsafe impl Send for Sem {}
 unsafe impl Sync for Sem {}
 
+impl Drop for Sem {
+    fn drop(&mut self) {
+        unsafe {
+            xwrustffi_sem_fini(self.sem.get());
+        }
+    }
+}
+
 impl Sem {
     /// 新建信号量对象。
     ///
@@ -219,7 +246,7 @@ impl Sem {
     /// use alloc::sync::Arc;
     ///
     /// pub fn xwrust_example_sem() {
-    ///     let sema = Arc::new(Sem::new());
+    ///     let sem = Arc::new(Sem::new());
     /// }
     /// ```
     ///
@@ -288,9 +315,9 @@ impl Sem {
     ///
     /// pub fn xwrust_example_sem() {
     ///     // ...省略...
-    ///     sema: Sem = Sem::new();
-    ///     sema.init(0, XwSsq::max);
-    ///     sema.freeze();
+    ///     let sem: Sem = Sem::new();
+    ///     sem.init(0, XwSsq::max);
+    ///     sem.freeze();
     /// }
     /// ```
     pub fn freeze(&self) -> SemError {
@@ -335,11 +362,11 @@ impl Sem {
     ///
     /// pub fn xwrust_example_sem() {
     ///     // ...省略...
-    ///     sema: Sem = Sem::new();
-    ///     sema.init(0, XwSsq::max);
-    ///     sema.freeze(); // 冻结
+    ///     let sem: Sem = Sem::new();
+    ///     sem.init(0, XwSsq::max);
+    ///     sem.freeze(); // 冻结
     ///     // ...省略...
-    ///     sema.thaw(); // 解冻
+    ///     sem.thaw(); // 解冻
     /// }
     /// ```
     pub fn thaw(&self) -> SemError {
@@ -382,7 +409,7 @@ impl Sem {
     ///
     /// pub fn xwrust_example_sem() {
     ///     // ...省略...
-    ///     sem: Sem = Sem::new();
+    ///     let sem: Sem = Sem::new();
     ///     sem.init(0, XwSsq::max);
     ///     // ...省略...
     ///     sem.post();
@@ -424,7 +451,7 @@ impl Sem {
     ///
     /// pub fn xwrust_example_sem() {
     ///     // ...省略...
-    ///     sem: Sem = Sem::new();
+    ///     let sem: Sem = Sem::new();
     ///     sem.init(0, XwSsq::MAX);
     ///     // ...省略...
     ///     let res = sem.getvalue();
@@ -481,7 +508,7 @@ impl Sem {
     ///
     /// pub fn xwrust_example_sem() {
     ///     // ...省略...
-    ///     sem: Sem = Sem::new();
+    ///     let sem: Sem = Sem::new();
     ///     sem.init(0, XwSsq::max);
     ///     // ...省略...
     ///     let rc = sem.wait();
@@ -551,7 +578,7 @@ impl Sem {
     ///
     /// pub fn xwrust_example_sem() {
     ///     // ...省略...
-    ///     sem: Sem = Sem::new();
+    ///     let sem: Sem = Sem::new();
     ///     sem.init(0, XwSsq::max);
     ///     // ...省略...
     ///     let rc = sem.wait_to(xwtm::ft(xwtm::s(1))); // 最多等待1s
@@ -618,7 +645,7 @@ impl Sem {
     ///
     /// pub fn xwrust_example_sem() {
     ///     // ...省略...
-    ///     sem: Sem = Sem::new();
+    ///     let sem: Sem = Sem::new();
     ///     sem.init(0, XwSsq::max);
     ///     // ...省略...
     ///     let rc = sem.wait_unintr();
@@ -679,7 +706,7 @@ impl Sem {
     ///
     /// pub fn xwrust_example_sem() {
     ///     // ...省略...
-    ///     sem: Sem = Sem::new();
+    ///     let sem: Sem = Sem::new();
     ///     sem.init(0, XwSsq::max);
     ///     // ...省略...
     ///     let rc = sem.trywait();
@@ -710,5 +737,156 @@ impl Sem {
                 SemError::NotInit
             }
         }
+    }
+
+    /// 绑定信号量对象到信号选择器。
+    ///
+    /// + 信号量绑定到信号选择器上时， **独占** 一个位置。
+    /// + 绑定成功，通过 [`Ok()`] 返回 [`SemSel<'a, M>`] 。
+    /// + 如果位置已被占领，通过 [`Err()`] 返回 [`SemError::SelPosBusy`] 。
+    /// + 当指定的位置超出范围（例如 [`Sel<M>`] 只有8个位置，用户偏偏要绑定到位置9 ），通过 [`Err()`] 返回 [`SemError::OutOfSelPos`] 。
+    /// + 重复绑定，通过 [`Err()`] 返回 [`SemError::AlreadyBound`] 。
+    ///
+    /// [`SemSel<'a, M>`] 中包含信号量的绑定信息。 [`SemSel<'a, M>`] 与 [`Sem`] 与 [`Sel<M>`] 具有相同的生命周期约束 `'a` 。
+    /// [`SemSel::selected()`] 可用来判断信号量是否被选择。当 [`SemSel<'a, M>`] [`drop()`] 时，会自动解绑。
+    ///
+    /// # 上下文
+    ///
+    /// + 任意
+    ///
+    /// # 错误码
+    ///
+    /// + [`SemError::OutOfSelPos`] 信号选择器的位置超出范围
+    /// + [`SemError::AlreadyBound`] 信号量已经绑定
+    /// + [`SemError::SelPosBusy`] 信号选择器的位置被占用
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    /// pub fn xwrust_example_sel() {
+    ///     // ...省略...
+    ///     let sem0 = Arc::new(Sem::new());
+    ///     sem0.init(0, XwSsq::MAX);
+    ///     let sem0sel = match sem0.bind(&sel, 0) {
+    ///         Ok(s) => { // 绑定成功，`s` 为 `SemSel`
+    ///             s
+    ///         },
+    ///         Err(e) => { // 绑定失败，`e` 为 `SelError`
+    ///             return;
+    ///         }
+    ///     };
+    ///     // ...省略...
+    /// }
+    /// ```
+    ///
+    /// [`SemSel<'a, M>`]: SemSel
+    /// [`Ok()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
+    /// [`Err()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
+    /// [`Sel<M>`]: super::sel::Sel
+    /// [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
+    pub fn bind<'a, const M: XwSz>(&'a self, sel: &'a Sel<M>, pos: XwSq)
+                                   -> Result<SemSel<'a, M>, SemError>
+    where
+        [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    {
+        unsafe {
+            let mut rc = xwrustffi_sem_acquire(self.sem.get(), *self.tik.get());
+            if rc == 0 {
+                rc = xwrustffi_sem_bind(self.sem.get(), sel.sel.get() as _, pos);
+                if XWOK == rc {
+                    Ok(SemSel {
+                        sem: self,
+                        sel: sel,
+                        pos: pos,
+                    })
+                } else if -ECHRNG == rc {
+                    Err(SemError::OutOfSelPos)
+                } else if -EALREADY == rc {
+                    Err(SemError::AlreadyBound)
+                } else if -EBUSY == rc {
+                    Err(SemError::SelPosBusy)
+                } else {
+                    Err(SemError::Unknown(rc))
+                }
+            } else {
+                Err(SemError::NotInit)
+            }
+        }
+    }
+}
+
+/// 信号量的选择子
+///
+/// `SemSel<'a, M>` 与 [`Sem`] 与 [`Sel<M>`] 具有相同的生命周期约束 `'a` 。因为 `SemSel<'a, M>` 中包含了 [`Sem`] 与 [`Sel<M>`] 的引用。
+///
+/// `SemSel<'a, M>` 中包含了绑定的位置，信号量 **独占** 一个位置。
+///
+/// [`SemSel::selected()`] 可用来判断信号量是否被选择。
+///
+/// 当 `SemSel<'a, M>` 被 [`drop()`] 时，会自动将 [`Sem`] 从 [`Sel<M>`] 解绑。
+///
+/// [`Sel<M>`]: super::sel::Sel
+/// [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
+pub struct SemSel<'a, const M: XwSz>
+where
+    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+{
+    sem: &'a Sem,
+    sel: &'a Sel<M>,
+    pos: XwSq,
+}
+
+unsafe impl<'a, const M: XwSz> Send for SemSel<'a, M>
+where
+    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+{}
+
+unsafe impl<'a, const M: XwSz> Sync for SemSel<'a, M>
+where
+    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+{}
+
+impl<'a, const M: XwSz> Drop for SemSel<'a, M>
+where
+    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+{
+    fn drop(&mut self) {
+        unsafe {
+            xwrustffi_sem_unbind(self.sem.sem.get(), self.sel.sel.get() as _);
+            xwrustffi_sem_put(self.sem.sem.get());
+        }
+    }
+}
+
+impl<'a, const M: XwSz> SemSel<'a, M>
+where
+    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+{
+    /// 判断触发的 **选择信号** 是否包括此信号量
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    ///     let msk = Bmp::<8>::new(); // 8位位图
+    ///     msk.s1all(); // 掩码为0xFF
+    ///     loop {
+    ///         let res = sel.select(&msk);
+    ///         match res {
+    ///             Ok(t) => { // 信号选择器上有 **选择信号** ， `t` 为 **选择信号** 的位图。
+    ///                 if sem0sel.selected(&t) { // 信号量0被选择到
+    ///                     sem0.trywait();
+    ///                 }
+    ///                 if sem1sel.selected(&t) { // 信号量1被选择到
+    ///                     sem1.trywait();
+    ///                 }
+    ///             },
+    ///             Err(e) => { // 等待信号选择器失败，`e` 为 `SelError`
+    ///                 break;
+    ///             },
+    ///         }
+    ///     }
+    /// ```
+    pub fn selected(&self, trg: &Bmp<M>) -> bool {
+        trg.t1i(self.pos)
     }
 }

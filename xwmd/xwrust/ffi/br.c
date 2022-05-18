@@ -57,6 +57,16 @@ xwer_t xwrustffi_br_release(struct xwos_br * br, xwsq_t tik)
         return xwos_br_release(brd);
 }
 
+xwer_t xwrustffi_br_bind(struct xwos_br * br, struct xwos_sel * sel, xwsq_t pos)
+{
+        return xwos_br_bind(br, sel, pos);
+}
+
+xwer_t xwrustffi_br_unbind(struct xwos_br * br, struct xwos_sel * sel)
+{
+        return xwos_br_unbind(br, sel);
+}
+
 xwer_t xwrustffi_br_wait(struct xwos_br * br)
 {
         return xwos_br_wait(br);
