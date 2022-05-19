@@ -169,6 +169,12 @@
 //! [`Bmp`]: crate::xwbmp::Bmp
 //! [`Sem::post()`]: super::sem::Sem::post
 //! [`Cond::broadcast`]: super::cond::Cond::broadcast
+//! [`Flg::s1m`]: super::flg::Flg::s1m
+//! [`Flg::s1i`]: super::flg::Flg::s1i
+//! [`Flg::c0m`]: super::flg::Flg::c0m
+//! [`Flg::c0i`]: super::flg::Flg::c0i
+//! [`Flg::x1m`]: super::flg::Flg::x1m
+//! [`Flg::x1i`]: super::flg::Flg::x1i
 //! [`'static`]: <https://doc.rust-lang.org/std/keyword.static.html>
 //! [`alloc::sync::Arc`]: <https://doc.rust-lang.org/alloc/sync/struct.Arc.html>
 //! [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
@@ -213,8 +219,6 @@ pub enum SelError {
     Ok,
     /// 条件量没有初始化
     NotInit,
-    /// 同步对象的位置超出范围
-    OutOfRange,
     /// 等待被中断
     Interrupt,
     /// 等待超时
@@ -223,10 +227,6 @@ pub enum SelError {
     NoSignal,
     /// 不在线程上下文内
     NotThreadContext,
-    /// 抢占被关闭
-    CannotPmpt,
-    /// 中断底半部被关闭
-    CannotBh,
     /// 信号选择器的位置超出范围
     OutOfSelPos,
     /// 信号量已经绑定
@@ -384,8 +384,6 @@ where
     /// + [`SelError::NotInit`] 信号量没有初始化
     /// + [`SelError::Interrupt`] 等待被中断
     /// + [`SelError::NotThreadContext`] 不在线程上下文内
-    /// + [`SelError::CannotPmpt`] 抢占被关闭
-    /// + [`SelError::CannotBh`] 中断底半部被关闭
     ///
     /// # 示例
     ///
@@ -422,10 +420,6 @@ where
                     Err(SelError::Interrupt)
                 } else if -ENOTTHDCTX == rc {
                     Err(SelError::NotThreadContext)
-                } else if -ECANNOTPMPT == rc {
-                    Err(SelError::CannotPmpt)
-                } else if -ECANNOTBH == rc {
-                    Err(SelError::CannotBh)
                 } else {
                     Err(SelError::Unknown(rc))
                 }
@@ -452,8 +446,6 @@ where
     /// + [`SelError::Interrupt`] 等待被中断
     /// + [`SelError::Timedout`] 等待超时
     /// + [`SelError::NotThreadContext`] 不在线程上下文内
-    /// + [`SelError::CannotPmpt`] 抢占被关闭
-    /// + [`SelError::CannotBh`] 中断底半部被关闭
     ///
     /// # 示例
     ///
@@ -493,10 +485,6 @@ where
                     Err(SelError::Timedout)
                 } else if -ENOTTHDCTX == rc {
                     Err(SelError::NotThreadContext)
-                } else if -ECANNOTPMPT == rc {
-                    Err(SelError::CannotPmpt)
-                } else if -ECANNOTBH == rc {
-                    Err(SelError::CannotBh)
                 } else {
                     Err(SelError::Unknown(rc))
                 }

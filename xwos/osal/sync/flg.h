@@ -22,6 +22,32 @@
  * @defgroup xwos_sync_flg 事件标志
  * @ingroup xwos_sync
  * @{
+ * @section trigger 触发条件
+ *
+ * 事件的触发方式可通过参数 `trigger` 设置。事件的触发方式分为两类。
+ *
+ * @subsection level_trigger 电平触发
+ *
+ * + @ref XWOS_FLG_TRIGGER_SET_ALL : 掩码中的所有位同时为1
+ * + @ref XWOS_FLG_TRIGGER_SET_ANY : 掩码中的任意位为1
+ * + @ref XWOS_FLG_TRIGGER_CLR_ALL : 掩码中的所有位同时为0
+ * + @ref XWOS_FLG_TRIGGER_CLR_ANY : 掩码中的任意位为0
+ *
+ * **电平触发** 时，若参数 `action` 取值 @ref XWOS_FLG_ACTION_CONSUMPTION ，表示线程在读取事件位图后，会 **清除** 事件。
+ * **电平触发** 时，参数 `origin` 用于返回事件发生时的位图状态。
+ *
+ * @subsection edge_trigger 边沿触发
+ *
+ * + @ref XWOS_FLG_TRIGGER_TGL_ALL : 掩码中的所有位同时发生翻转
+ * + @ref XWOS_FLG_TRIGGER_TGL_ANY : 掩码中的任意位发生翻转
+ *
+ * **边沿触发** 时，参数 `action` 没有作用，取值 `XWOS_FLG_ACTION_NONE` 即可。
+ * **边沿触发** 时，必须要有一个初始状态，就像数字电路一样：
+ *
+ * + 当位的初始值为 **0** (低电平)，然后跳变到 **1** (高电平)的瞬间被称为上升沿。此时触发的事件被称为上升沿触发。
+ * + 当位的初始值为 **1** (高电平)，然后跳变到 **0** (低电平)的瞬间被称为下降沿。此时触发的事件被称为下降沿触发。
+ *
+ * 初始值就由参数 `origin` 指明，触发后，事件位发生跳变，跳变后的结果还是由 参数 `origin` 返回。
  */
 
 /**
@@ -334,6 +360,12 @@ xwer_t xwos_flg_get_num(struct xwos_flg * flg, xwsz_t * numbuf)
  * @retval -EFAULT: 无效的指针或空指针
  * @note
  * + 上下文：任意
+ * @details
+ * 此方法会将事件标志位图中，被掩码 `msk` 覆盖的位全部设置为 **1** 。
+ *
+ * 此函数除了会修改事件标志位图的状态，还会通过 **广播** 唤醒所有正在等待的线程。
+ * 然后，线程通过比对位图状态，确定事件是否已经满足触发条件。
+ * 若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
  */
 static __xwos_inline_api
 xwer_t xwos_flg_s1m(struct xwos_flg * flg, xwbmp_t msk[])
@@ -351,6 +383,12 @@ xwer_t xwos_flg_s1m(struct xwos_flg * flg, xwbmp_t msk[])
  * @retval -ECHRNG: 位置超出范围
  * @note
  * + 上下文：任意
+ * @details
+ * 此方法会将事件标志位图中，序号为 `pos` 的单个位设置为 **1** 。
+ *
+ * 此函数除了会修改事件标志位图的状态，还会通过 **广播** 唤醒所有正在等待的线程。
+ * 然后，线程通过比对位图状态，确定事件是否已经满足触发条件。
+ * 若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
  */
 static __xwos_inline_api
 xwer_t xwos_flg_s1i(struct xwos_flg * flg, xwsq_t pos)
@@ -367,6 +405,12 @@ xwer_t xwos_flg_s1i(struct xwos_flg * flg, xwsq_t pos)
  * @retval -EFAULT: 无效的指针或空指针
  * @note
  * + 上下文：任意
+ * @details
+ * 此方法会将事件标志位图中，被掩码 `msk` 覆盖的位全部清 **0** 。
+ *
+ * 此函数除了会修改事件标志位图的状态，还会通过 **广播** 唤醒所有正在等待的线程。
+ * 然后，线程通过比对位图状态，确定事件是否已经满足触发条件。
+ * 若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
  */
 static __xwos_inline_api
 xwer_t xwos_flg_c0m(struct xwos_flg * flg, xwbmp_t msk[])
@@ -384,6 +428,12 @@ xwer_t xwos_flg_c0m(struct xwos_flg * flg, xwbmp_t msk[])
  * @retval -ECHRNG: 位置超出范围
  * @note
  * + 上下文：任意
+ * @details
+ * 此方法会将事件标志位图中，序号为 `pos` 的单个位清 **0** 。
+ *
+ * 此函数除了会修改事件标志位图的状态，还会通过 **广播** 唤醒所有正在等待的线程。
+ * 然后，线程通过比对位图状态，确定事件是否已经满足触发条件。
+ * 若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
  */
 static __xwos_inline_api
 xwer_t xwos_flg_c0i(struct xwos_flg * flg, xwsq_t pos)
@@ -400,6 +450,12 @@ xwer_t xwos_flg_c0i(struct xwos_flg * flg, xwsq_t pos)
  * @retval -EFAULT: 无效的指针或空指针
  * @note
  * + 上下文：任意
+ * @details
+ * 此方法会将事件标志位图中，被掩码 `msk` 覆盖的位全部翻转。
+ *
+ * 此函数除了会修改事件标志位图的状态，还会通过 **广播** 唤醒所有正在等待的线程。
+ * 然后，线程通过比对位图状态，确定事件是否已经满足触发条件。
+ * 若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
  */
 static __xwos_inline_api
 xwer_t xwos_flg_x1m(struct xwos_flg * flg, xwbmp_t msk[])
@@ -417,6 +473,12 @@ xwer_t xwos_flg_x1m(struct xwos_flg * flg, xwbmp_t msk[])
  * @retval -ECHRNG: 位置超出范围
  * @note
  * + 上下文：任意
+ * @details
+ * 此方法会将事件标志位图中，序号为 `pos` 的单个位翻转。
+ *
+ * 此函数除了会修改事件标志位图的状态，还会通过 **广播** 唤醒所有正在等待的线程。
+ * 然后，线程通过比对位图状态，确定事件是否已经满足触发条件。
+ * 若满足触发条件，就退出等待；若未满足触发条件，重新进入阻塞等待状态。
  */
 static __xwos_inline_api
 xwer_t xwos_flg_x1i(struct xwos_flg * flg, xwsq_t pos)
@@ -425,7 +487,7 @@ xwer_t xwos_flg_x1i(struct xwos_flg * flg, xwsq_t pos)
 }
 
 /**
- * @brief XWOS API：读取事件标志对象中事件标志位图的值
+ * @brief XWOS API：读取事件标志位图的值
  * @param[in] flg: 事件标志对象指针
  * @param[out] out: 指向缓冲区的指针，通过此缓冲区返回事件标志对象位图的值
  * @return 错误码
@@ -441,32 +503,28 @@ xwer_t xwos_flg_read(struct xwos_flg * flg, xwbmp_t out[])
 }
 
 /**
- * @brief XWOS API：等待触发事件
+ * @brief XWOS API：等待事件
  * @param[in] flg: 事件标志对象指针
  * @param[in] trigger: 事件触发条件，取值：
- *   @arg XWOS_FLG_TRIGGER_SET_ALL: 掩码中的所有位同时为1
- *   @arg XWOS_FLG_TRIGGER_SET_ANY: 掩码中的任意位为1
- *   @arg XWOS_FLG_TRIGGER_CLR_ALL: 掩码中的所有位同时为0
- *   @arg XWOS_FLG_TRIGGER_CLR_ANY: 掩码中的任意位为0
- *   @arg XWOS_FLG_TRIGGER_TGL_ALL: 掩码中的所有位同时发生翻转
- *   @arg XWOS_FLG_TRIGGER_TGL_ANY: 掩码中的任意位发生翻转
+ * + [电平触发](@ref level_trigger)
+ *   @arg @ref XWOS_FLG_TRIGGER_SET_ALL : 掩码中的所有位同时为1
+ *   @arg @ref XWOS_FLG_TRIGGER_SET_ANY : 掩码中的任意位为1
+ *   @arg @ref XWOS_FLG_TRIGGER_CLR_ALL : 掩码中的所有位同时为0
+ *   @arg @ref XWOS_FLG_TRIGGER_CLR_ANY : 掩码中的任意位为0
+ * + [边沿触发](@ref edge_trigger)
+ *   @arg @ref XWOS_FLG_TRIGGER_TGL_ALL : 掩码中的所有位同时发生翻转
+ *   @arg @ref XWOS_FLG_TRIGGER_TGL_ANY : 掩码中的任意位发生翻转
  * @param[in] action: 事件触发后的动作，
- * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL ，
- *   或@ref XWOS_FLG_TRIGGER_SET_ANY ，或@ref XWOS_FLG_TRIGGER_CLR_ALL ，
- *   或@ref XWOS_FLG_TRIGGER_CLR_ANY 时有效，取值：
- *   @arg XWOS_FLG_ACTION_CONSUMPTION: 消费事件
- *   @arg XWOS_FLG_ACTION_NOME: 无操作
- * + 当trigger为@ref XWOS_FLG_TRIGGER_TGL_ALL ，或@ref XWOS_FLG_TRIGGER_TGL_ANY 时，
- *   此参数没有用，可填：
- *   @arg XWOS_UNUSED_ARGUMENT
+ * + 当trigger为 [电平触发](@ref level_trigger) 时，取值：
+ *   @arg @ref XWOS_FLG_ACTION_CONSUMPTION : 消费事件
+ *   @arg @ref XWOS_FLG_ACTION_NONE : 无操作
+ * + 当trigger为 [边沿触发](@ref edge_trigger) 时，此参数没有用，可填 `XWOS_FLG_ACTION_NONE`
  * @param[in,out] origin: 指向缓冲区的指针：
- * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL ，
- *   或@ref XWOS_FLG_TRIGGER_SET_ANY ，或@ref XWOS_FLG_TRIGGER_CLR_ALL ，
- *   或@ref XWOS_FLG_TRIGGER_CLR_ANY 时
- *   - (O) 返回触发时事件对象中位图状态（action之前）
- * + 当trigger为@ref XWOS_FLG_TRIGGER_TGL_ALL ，或@ref XWOS_FLG_TRIGGER_TGL_ANY 时
- *   - (I) 作为输入时，作为用于比较的初始值
- *   - (O) 作为输出时，返回事件对象中位图状态（可作为下一次调用的初始值）
+ * + 当 `trigger` 为 [电平触发](@ref level_trigger) 时
+ *   + (O) 返回事件发生时的位图的状态
+ * + 当trigger为 [边沿触发](@ref edge_trigger) 时
+ *   + (I) 作为输入时，作为比较的初始状态
+ *   + (O) 作为输出时，返回触发后的事件位图状态（常作为下一次调用的初始值）
  * @param[in] msk: 事件的位图掩码，表示只关注掩码部分的事件
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -476,6 +534,10 @@ xwer_t xwos_flg_read(struct xwos_flg * flg, xwbmp_t out[])
  * @retval -ENOTTHDCTX: 不在线程上下文中
  * @note
  * + 上下文：线程
+ * @details
+ * + 当没有检测到事件时，线程会阻塞等待。
+ * + 当检测到事件时，线程被唤醒，然后返回 `XWOK` 。
+ * + 当线程阻塞等待被中断时，返回 `-EINTR` 。
  */
 static __xwos_inline_api
 xwer_t xwos_flg_wait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
@@ -488,29 +550,25 @@ xwer_t xwos_flg_wait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
  * @brief XWOS API：限时等待触发事件
  * @param[in] flg: 事件标志对象指针
  * @param[in] trigger: 事件触发条件，取值：
- *   @arg XWOS_FLG_TRIGGER_SET_ALL: 掩码中的所有位同时为1
- *   @arg XWOS_FLG_TRIGGER_SET_ANY: 掩码中的任意位为1
- *   @arg XWOS_FLG_TRIGGER_CLR_ALL: 掩码中的所有位同时为0
- *   @arg XWOS_FLG_TRIGGER_CLR_ANY: 掩码中的任意位为0
- *   @arg XWOS_FLG_TRIGGER_TGL_ALL: 掩码中的所有位同时发生翻转
- *   @arg XWOS_FLG_TRIGGER_TGL_ANY: 掩码中的任意位发生翻转
+ * + [电平触发](@ref level_trigger)
+ *   @arg @ref XWOS_FLG_TRIGGER_SET_ALL : 掩码中的所有位同时为1
+ *   @arg @ref XWOS_FLG_TRIGGER_SET_ANY : 掩码中的任意位为1
+ *   @arg @ref XWOS_FLG_TRIGGER_CLR_ALL : 掩码中的所有位同时为0
+ *   @arg @ref XWOS_FLG_TRIGGER_CLR_ANY : 掩码中的任意位为0
+ * + [电平触发](@ref level_trigger)
+ *   @arg @ref XWOS_FLG_TRIGGER_TGL_ALL : 掩码中的所有位同时发生翻转
+ *   @arg @ref XWOS_FLG_TRIGGER_TGL_ANY : 掩码中的任意位发生翻转
  * @param[in] action: 事件触发后的动作，
- * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL ，
- *   或@ref XWOS_FLG_TRIGGER_SET_ANY ，或@ref XWOS_FLG_TRIGGER_CLR_ALL ，
- *   或@ref XWOS_FLG_TRIGGER_CLR_ANY 时有效 ，取值：
- *   @arg XWOS_FLG_ACTION_CONSUMPTION: 消费事件
- *   @arg XWOS_FLG_ACTION_NOME: 无操作
- * + 当trigger为@ref XWOS_FLG_TRIGGER_TGL_ALL ，或@ref XWOS_FLG_TRIGGER_TGL_ANY 时，
- *   此参数没有用，可填：
- *   @arg XWOS_UNUSED_ARGUMENT
+ * + 当trigger为 [电平触发](@ref level_trigger) 时，取值：
+ *   @arg @ref XWOS_FLG_ACTION_CONSUMPTION : 消费事件
+ *   @arg @ref XWOS_FLG_ACTION_NONE : 无操作
+ * + 当trigger为 [边沿触发](@ref edge_trigger) 时，此参数没有用，可填 `XWOS_FLG_ACTION_NONE`
  * @param[in,out] origin: 指向缓冲区的指针：
- * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL ，
- *   或@ref XWOS_FLG_TRIGGER_SET_ANY ，或@ref XWOS_FLG_TRIGGER_CLR_ALL ，
- *   或@ref XWOS_FLG_TRIGGER_CLR_ANY 时
- *   - (O) 返回触发时事件对象中位图状态（action之前）
- * + 当trigger为XWOS_FLG_TRIGGER_TGL_ALL ，或@ref XWOS_FLG_TRIGGER_TGL_ANY 时
- *   - (I) 作为输入时，作为用于比较的初始值
- *   - (O) 作为输出时，返回事件对象中位图状态（可作为下一次调用的初始值）
+ * + 当 `trigger` 为 [电平触发](@ref level_trigger) 时
+ *   + (O) 返回事件发生时的位图的状态
+ * + 当trigger为 [边沿触发](@ref edge_trigger) 时
+ *   + (I) 作为输入时，作为比较的初始状态
+ *   + (O) 作为输出时，返回触发后的事件位图状态（常作为下一次调用的初始值）
  * @param[in] msk: 事件的位图掩码，表示只关注掩码部分的事件
  * @param[in] to: 期望唤醒的时间点
  * @return 错误码
@@ -523,7 +581,11 @@ xwer_t xwos_flg_wait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
  * @note
  * + 上下文：线程
  * @details
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * + 当没有检测到事件，线程会阻塞等待，等待时会指定一个唤醒时间点 `to` 。
+ * + 当检测到事件，线程被唤醒，然后返回 `XWOK` 。
+ * + 当线程阻塞等待被中断时，返回 `-EINTR` 。
+ * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * + 当到达指定的唤醒时间点时，线程被唤醒，并返回 `-ETIMEDOUT` 。
  */
 static __xwos_inline_api
 xwer_t xwos_flg_wait_to(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
@@ -537,29 +599,25 @@ xwer_t xwos_flg_wait_to(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
  * @brief XWOS API：检查触发事件
  * @param[in] flg: 事件标志对象指针
  * @param[in] trigger: 事件触发条件，取值：
- *   @arg XWOS_FLG_TRIGGER_SET_ALL: 掩码中的所有位同时为1
- *   @arg XWOS_FLG_TRIGGER_SET_ANY: 掩码中的任意位为1
- *   @arg XWOS_FLG_TRIGGER_CLR_ALL: 掩码中的所有位同时为0
- *   @arg XWOS_FLG_TRIGGER_CLR_ANY: 掩码中的任意位为0
- *   @arg XWOS_FLG_TRIGGER_TGL_ALL: 掩码中的所有位同时发生翻转
- *   @arg XWOS_FLG_TRIGGER_TGL_ANY: 掩码中的任意位发生翻转
+ * + [电平触发](@ref level_trigger)
+ *   @arg @ref XWOS_FLG_TRIGGER_SET_ALL : 掩码中的所有位同时为1
+ *   @arg @ref XWOS_FLG_TRIGGER_SET_ANY : 掩码中的任意位为1
+ *   @arg @ref XWOS_FLG_TRIGGER_CLR_ALL : 掩码中的所有位同时为0
+ *   @arg @ref XWOS_FLG_TRIGGER_CLR_ANY : 掩码中的任意位为0
+ * + [电平触发](@ref level_trigger)
+ *   @arg @ref XWOS_FLG_TRIGGER_TGL_ALL : 掩码中的所有位同时发生翻转
+ *   @arg @ref XWOS_FLG_TRIGGER_TGL_ANY : 掩码中的任意位发生翻转
  * @param[in] action: 事件触发后的动作，
- * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL ，
- *   或@ref XWOS_FLG_TRIGGER_SET_ANY ，或@ref XWOS_FLG_TRIGGER_CLR_ALL ，
- *   或@ref XWOS_FLG_TRIGGER_CLR_ANY 时有效，取值：
- *   @arg XWOS_FLG_ACTION_CONSUMPTION: 消费事件
- *   @arg XWOS_FLG_ACTION_NOME: 无操作
- * + 当trigger为@ref XWOS_FLG_TRIGGER_TGL_ALL ，或@ref XWOS_FLG_TRIGGER_TGL_ANY 时，
- *   此参数没有用，可填：
- *   @arg XWOS_UNUSED_ARGUMENT
+ * + 当trigger为 [电平触发](@ref level_trigger) 时，取值：
+ *   @arg @ref XWOS_FLG_ACTION_CONSUMPTION : 消费事件
+ *   @arg @ref XWOS_FLG_ACTION_NONE : 无操作
+ * + 当trigger为 [边沿触发](@ref edge_trigger) 时，此参数没有用，可填 `XWOS_FLG_ACTION_NONE`
  * @param[in,out] origin: 指向缓冲区的指针：
- * + 当trigger为@ref XWOS_FLG_TRIGGER_SET_ALL ，
- *   或@ref XWOS_FLG_TRIGGER_SET_ANY ，或@ref XWOS_FLG_TRIGGER_CLR_ALL ，
- *   或@ref XWOS_FLG_TRIGGER_CLR_ANY 时
- *   - (O) 返回触发时事件对象中位图状态（action之前）
- * + 当trigger为@ref XWOS_FLG_TRIGGER_TGL_ALL ，或@ref XWOS_FLG_TRIGGER_TGL_ANY 时
- *   - (I) 作为输入时，作为用于比较的初始值
- *   - (O) 作为输出时，返回事件对象中位图状态（可作为下一次调用的初始值）
+ * + 当 `trigger` 为 [电平触发](@ref level_trigger) 时
+ *   + (O) 返回事件发生时的位图的状态
+ * + 当trigger为 [边沿触发](@ref edge_trigger) 时
+ *   + (I) 作为输入时，作为比较的初始状态
+ *   + (O) 作为输出时，返回触发后的事件位图状态（常作为下一次调用的初始值）
  * @param[in] msk: 事件的位图掩码，表示只关注掩码部分的事件
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -569,7 +627,8 @@ xwer_t xwos_flg_wait_to(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
  * @note
  * + 上下文：任意
  * @details
- * 若事件没有触发，立即返回错误码 `-ENODATA` ，不会等待
+ * + 当检测到事件，立即返回 `XWOK` 。
+ * + 当没有检测到事件，立即返回 `-ENODATA` 。
  */
 static __xwos_inline_api
 xwer_t xwos_flg_trywait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,

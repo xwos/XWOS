@@ -17,6 +17,7 @@ xwrust_example_spinlock = {path = "../../../../xwam/xwrust-example/xwrust_exampl
 xwrust_example_seqlock = {path = "../../../../xwam/xwrust-example/xwrust_example_seqlock"}
 xwrust_example_sem = {path = "../../../../xwam/xwrust-example/xwrust_example_sem"}
 xwrust_example_cond = {path = "../../../../xwam/xwrust-example/xwrust_example_cond"}
+xwrust_example_flg = {path = "../../../../xwam/xwrust-example/xwrust_example_flg"}
 xwrust_example_br = {path = "../../../../xwam/xwrust-example/xwrust_example_br"}
 xwrust_example_sel = {path = "../../../../xwam/xwrust-example/xwrust_example_sel"}
 xwrust_example_xwmq = {path = "../../../../xwam/xwrust-example/xwrust_example_xwmq"}

@@ -14,6 +14,7 @@ use xwrust::xwos::thd;
 use xwrust::xwos::cthd;
 use xwrust::xwos::sync::sem::*;
 use xwrust::xwos::sync::cond::*;
+use xwrust::xwos::sync::flg::*;
 use xwrust::xwos::sync::br::*;
 use xwrust::xwos::sync::sel::*;
 
@@ -80,6 +81,20 @@ pub fn xwrust_example_sel() {
         }
     };
 
+    // 事件标志4
+    let flg4 = Arc::new(Flg::<8>::new());
+    flg4.init();
+    let cflg4 = flg4.clone();
+    let flg4sel = match flg4.bind(&sel0, 4) {
+        Ok(s) => {
+            s
+        },
+        Err(e) => {
+            println!("[child] flg4 绑定失败：{:?}", e);
+            return;
+        }
+    };
+
     // 创建发送 **选择信号** 的子线程
     let _ = thd::spawn(move |_| { // 子线程闭包
         // 信号量1
@@ -90,7 +105,6 @@ pub fn xwrust_example_sel() {
         // 条件量2
         println!("[child] cond2 广播");
         ccond2.broadcast();
-        cthd::sleep(xwtm::ms(200));
         // 线程栅栏3
         for idx in 0..2 {
             let c = cbr3.clone();
@@ -99,6 +113,9 @@ pub fn xwrust_example_sel() {
                 c.wait();
             });
         }
+        cthd::sleep(xwtm::ms(200));
+        println!("[child] flg4.s1i(0)");
+        cflg4.s1i(0);
         "OK"
     });
 
@@ -123,6 +140,15 @@ pub fn xwrust_example_sel() {
                             }
                             if br3sel.selected(&t0) {
                                 println!("[main]<{} ms> 获取 br3", xwtm::nowtc());
+                            }
+                            if flg4sel.selected(&t0) {
+                                let mut tg = Bmp::<8>::new();
+                                let msk = Bmp::<8>::new();
+                                msk.s1all();
+                                let _ = flg4.trywait(Trigger::SetAny,
+                                                     Action::Consumption,
+                                                     &mut tg, &msk);
+                                println!("[main]<{} ms> 事件 {:?}", xwtm::nowtc(), tg);
                             }
                         },
                         Err(e) => {
