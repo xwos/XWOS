@@ -8,6 +8,7 @@ use core::ffi::*;
 use core::cmp::{PartialOrd, Ordering};
 use core::cell::UnsafeCell;
 use core::ops::*;
+use core::fmt;
 
 use crate::types::*;
 
@@ -81,6 +82,10 @@ where
                 array: [0; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
             }),
         }
+    }
+
+    pub const fn bits(&self) -> XwSz {
+        N
     }
 
     pub fn weight(&self) -> XwSz {
@@ -319,6 +324,20 @@ where
         unsafe {
             xwbmpop_not(self.bmp.get() as _, N);
             self
+        }
+    }
+}
+
+impl<const N: XwSz> fmt::Debug for Bmp<N>
+where
+    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        unsafe {
+            f.debug_struct("Bmp")
+                .field("bits", &self.bits())
+                .field("array", &(*(self.bmp.get())).array)
+                .finish()
         }
     }
 }

@@ -460,6 +460,7 @@ xwer_t xwmp_flg_read(struct xwmp_evt * evt, xwbmp_t out[])
 
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
         XWOS_VALIDATE((out), "nullptr", -EFAULT);
+
         xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         xwbmpop_assign(out, evt->bmp, evt->num);
         xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
@@ -600,6 +601,7 @@ xwer_t xwmp_flg_trywait(struct xwmp_evt * evt,
         XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_FLG),
                       "type-error", -ETYPE);
+
         if (trigger <= XWMP_FLG_TRIGGER_CLR_ANY) {
                 rc = xwmp_flg_trywait_level(evt, trigger, action, origin, msk);
         } else {
@@ -710,6 +712,7 @@ xwer_t xwmp_flg_wait_to_edge(struct xwmp_evt * evt, xwsq_t trigger,
         xwbmpop_define(tmp, evt->num);
 
         XWOS_VALIDATE((origin), "nullptr", -EFAULT);
+
         xwbmpop_and(origin, msk, evt->num);
         xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         while (true) {
@@ -774,6 +777,7 @@ xwer_t xwmp_flg_wait_to(struct xwmp_evt * evt,
         XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_FLG),
                       "type-error", -ETYPE);
         XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+
         if (trigger <= XWMP_FLG_TRIGGER_CLR_ANY) {
                 rc = xwmp_flg_wait_to_level(evt, trigger, action, origin, msk, to);
         } else {

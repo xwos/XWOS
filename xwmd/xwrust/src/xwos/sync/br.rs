@@ -123,10 +123,6 @@ pub enum BrError {
     Timedout,
     /// 不在线程上下文内
     NotThreadContext,
-    /// 抢占被关闭
-    CannotPmpt,
-    /// 中断底半部被关闭
-    CannotBh,
     /// 信号选择器的位置超出范围
     OutOfSelPos,
     /// 信号量已经绑定
@@ -286,8 +282,6 @@ where
     /// + [`BrError::OutOfRange`] 线程数量超出范围
     /// + [`BrError::Interrupt`] 等待被中断
     /// + [`BrError::NotThreadContext`] 不在线程上下文内
-    /// + [`BrError::CannotPmpt`] 抢占被关闭
-    /// + [`BrError::CannotBh`] 中断底半部被关闭
     ///
     /// # 示例
     ///
@@ -322,10 +316,6 @@ where
                     BrError::Interrupt
                 } else if -ENOTTHDCTX == rc {
                     BrError::NotThreadContext
-                } else if -ECANNOTPMPT == rc {
-                    BrError::CannotPmpt
-                } else if -ECANNOTBH == rc {
-                    BrError::CannotBh
                 } else {
                     BrError::Unknown(rc)
                 }
@@ -354,8 +344,6 @@ where
     /// + [`BrError::Interrupt`] 等待被中断
     /// + [`BrError::Timedout`] 等待超时
     /// + [`BrError::NotThreadContext`] 不在线程上下文内
-    /// + [`BrError::CannotPmpt`] 抢占被关闭
-    /// + [`BrError::CannotBh`] 中断底半部被关闭
     ///
     /// # 示例
     ///
@@ -392,10 +380,6 @@ where
                     BrError::Timedout
                 } else if -ENOTTHDCTX == rc {
                     BrError::NotThreadContext
-                } else if -ECANNOTPMPT == rc {
-                    BrError::CannotPmpt
-                } else if -ECANNOTBH == rc {
-                    BrError::CannotBh
                 } else {
                     BrError::Unknown(rc)
                 }
