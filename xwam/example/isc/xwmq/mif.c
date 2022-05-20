@@ -41,7 +41,7 @@ struct xwmq_msg xwmqdemo_mq_txq[16];
 /**
  * @brief 模块的加载函数
  */
-xwer_t xwos_example_xwmq(void)
+xwer_t xwmd_example_xwmq(void)
 {
         struct xwos_thd_attr attr;
         xwer_t rc;

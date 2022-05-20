@@ -23,7 +23,7 @@
 
 #include <xwos/standard.h>
 
-xwer_t example_bma_start(void);
+xwer_t xwmm_example_bma(void);
 xwer_t xwmmdemo_bma_alloc(xwsz_t memsize, void ** membuf);
 xwer_t xwmmdemo_bma_free(void * mem);
 

@@ -21,10 +21,10 @@
 #ifndef __cfg_xwam_h__
 #define __cfg_xwam_h__
 
-#define XWAMCFG_example_thread_create           0
-#define XWAMCFG_example_thread_exit             0
-#define XWAMCFG_example_thread_sleep            0
-#define XWAMCFG_example_timer                   0
+#define XWAMCFG_example_thd_new                 0
+#define XWAMCFG_example_thd_exit                0
+#define XWAMCFG_example_thd_sleep               0
+#define XWAMCFG_example_swt                     0
 #define XWAMCFG_example_lock_cpuirq             0
 #define XWAMCFG_example_lock_mtx                0
 #define XWAMCFG_example_lock_spinlock           0

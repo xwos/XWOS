@@ -41,7 +41,7 @@ struct xwmm_bma * xwmmdemo_bma = (struct xwmm_bma *)xwmmdemo_bma_raw;
 /**
  * @brief 模块的加载函数
  */
-xwer_t example_bma_start(void)
+xwer_t xwmm_example_bma(void)
 {
         xwer_t rc;
         void * mem;

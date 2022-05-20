@@ -29,7 +29,7 @@
 /**
  * @brief 模块的加载函数
  */
-xwer_t example_crc_start(void)
+xwer_t xwos_example_crc(void)
 {
         xwu8_t data[] = {'X', 'u', 'a', 'n', 'W', 'u', 'O', 'S', '\0',};
         xwu32_t crc32;

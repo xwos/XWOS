@@ -102,7 +102,7 @@
 #define XWMPCFG_SKD_SWT_STDC_MM                         0
 
 /******** ******** ******** sync ******** ******** ********/
-#define XWMPCFG_SYNC_PLSEM                              0
+#define XWMPCFG_SYNC_PLSEM                              1
 #define XWMPCFG_SYNC_RTSEM                              1
 #define XWMPCFG_SYNC_SEM_MEMSLICE                       1
 #define XWMPCFG_SYNC_SEM_STDC_MM                        0

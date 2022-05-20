@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：线程退出
+ * @brief 示例：线程睡眠
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_example_thread_exit_mif_h__
-#define __xwam_example_thread_exit_mif_h__
+#ifndef __xwam_example_thd_sleep_mif_h__
+#define __xwam_example_thd_sleep_mif_h__
 
 #include <xwos/standard.h>
 
-xwer_t xwos_example_thd_exit(void);
+xwer_t xwos_example_thd_sleep(void);
 
-#endif /* xwam/example/thread/exit/mif.h */
+#endif /* xwam/example/thd/sleep/mif.h */

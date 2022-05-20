@@ -23,6 +23,6 @@
 
 #include <xwos/standard.h>
 
-xwer_t example_memslice_start(void);
+xwer_t xwmm_example_memslice(void);
 
 #endif /* xwam/example/mm/memslice/mif.h */

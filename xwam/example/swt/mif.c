@@ -25,7 +25,7 @@
 #include <xwos/osal/thd.h>
 #include <xwos/osal/swt.h>
 #include <xwos/osal/sync/flg.h>
-#include <xwam/example/timer/mif.h>
+#include <xwam/example/swt/mif.h>
 
 #define LOGTAG "swt"
 #define swtlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
@@ -45,7 +45,7 @@ struct xwos_flg swtflg;
 /**
  * @brief 模块的加载函数
  */
-xwer_t xwos_example_timer(void)
+xwer_t xwos_example_swt(void)
 {
         struct xwos_thd_attr attr;
         xwer_t rc;

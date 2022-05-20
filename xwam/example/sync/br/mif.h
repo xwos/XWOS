@@ -23,6 +23,6 @@
 
 #include <xwos/standard.h>
 
-xwer_t example_br_start(void);
+xwer_t xwos_example_br(void);
 
 #endif /* xwam/example/sync/br/mif.h */

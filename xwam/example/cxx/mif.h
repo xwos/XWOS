@@ -23,6 +23,6 @@
 
 #include <xwos/standard.h>
 
-xwer_t example_cxx_start(void);
+xwer_t xwos_example_cxx(void);
 
 #endif /* example/cxx/mif.h */

@@ -23,6 +23,6 @@
 
 #include <xwos/standard.h>
 
-xwer_t example_crc_start(void);
+xwer_t xwos_example_crc(void);
 
 #endif /* xwam/example/xwlib/crc/mif.h */

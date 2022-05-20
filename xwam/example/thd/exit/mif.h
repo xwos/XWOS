@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：软件定时器
+ * @brief 示例：线程退出
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_example_timer_mif_h__
-#define __xwam_example_timer_mif_h__
+#ifndef __xwam_example_thd_exit_mif_h__
+#define __xwam_example_thd_exit_mif_h__
 
 #include <xwos/standard.h>
 
-xwer_t xwos_example_timer(void);
+xwer_t xwos_example_thd_exit(void);
 
-#endif /* xwam/example/timer/mif.h */
+#endif /* xwam/example/thd/exit/mif.h */

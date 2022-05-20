@@ -30,55 +30,55 @@
 #define LOGTAG "sem"
 #define semlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
 
-#define XWSEMDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
-xwer_t xwsemdemo_thd_func(void * arg);
+#define SEMDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+xwer_t semdemo_thd_func(void * arg);
 
 /**
  * @brief 线程描述表
  */
-const struct xwos_thd_desc xwsemdemo_thd_desc = {
+const struct xwos_thd_desc semdemo_thd_desc = {
         .attr = {
-                .name = "xwsemdemo.thd",
+                .name = "semdemo.thd",
                 .stack = NULL,
                 .stack_size = 2048,
                 .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
-                .priority = XWSEMDEMO_THD_PRIORITY,
+                .priority = SEMDEMO_THD_PRIORITY,
                 .detached = false,
                 .privileged = true,
         },
-        .func = (xwos_thd_f)xwsemdemo_thd_func,
+        .func = (xwos_thd_f)semdemo_thd_func,
         .arg = NULL,
 };
-xwos_thd_d xwsemdemo_thd;
+xwos_thd_d semdemo_thd;
 
-struct xwos_swt xwsemdemo_swt;
-struct xwos_sem xwsemdemo_sem;
+struct xwos_swt semdemo_swt;
+struct xwos_sem semdemo_sem;
 
 /**
  * @brief 模块的加载函数
  */
-xwer_t example_sem_start(void)
+xwer_t xwos_example_sem(void)
 {
         xwer_t rc;
 
         /* 初始化信号量 */
-        rc = xwos_sem_init(&xwsemdemo_sem, 0, XWSSQ_MAX);
+        rc = xwos_sem_init(&semdemo_sem, 0, XWSSQ_MAX);
         if (rc < 0) {
                 goto err_sem_init;
         }
 
         /* 初始化定时器 */
-        rc = xwos_swt_init(&xwsemdemo_swt, "xwsemdemo_swt",
+        rc = xwos_swt_init(&semdemo_swt, "semdemo_swt",
                            XWOS_SWT_FLAG_RESTART);
         if (rc < 0) {
                 goto err_swt_init;
         }
 
         /* 创建线程 */
-        rc = xwos_thd_create(&xwsemdemo_thd,
-                             &xwsemdemo_thd_desc.attr,
-                             xwsemdemo_thd_desc.func,
-                             xwsemdemo_thd_desc.arg);
+        rc = xwos_thd_create(&semdemo_thd,
+                             &semdemo_thd_desc.attr,
+                             semdemo_thd_desc.func,
+                             semdemo_thd_desc.arg);
         if (rc < 0) {
                 goto err_thd_create;
         }
@@ -86,9 +86,9 @@ xwer_t example_sem_start(void)
         return XWOK;
 
 err_thd_create:
-        xwos_swt_fini(&xwsemdemo_swt);
+        xwos_swt_fini(&semdemo_swt);
 err_swt_init:
-        xwos_sem_fini(&xwsemdemo_sem);
+        xwos_sem_fini(&semdemo_sem);
 err_sem_init:
         return rc;
 }
@@ -104,18 +104,18 @@ err_sem_init:
  *   - 当配置(XWMPCFG_SKD_BH == 0)，此函数运行在中断上下文；
  * - 此函数中不可调用会导致线程睡眠或阻塞的函数。
  */
-void xwsemdemo_swt_callback(struct xwos_swt * swt, void * arg)
+void semdemo_swt_callback(struct xwos_swt * swt, void * arg)
 {
         XWOS_UNUSED(swt);
         XWOS_UNUSED(arg);
 
-        xwos_sem_post(&xwsemdemo_sem);
+        xwos_sem_post(&semdemo_sem);
 }
 
 /**
  * @brief 线程1的主函数
  */
-xwer_t xwsemdemo_thd_func(void * arg)
+xwer_t semdemo_thd_func(void * arg)
 {
         xwtm_t now;
         xwer_t rc;
@@ -126,11 +126,11 @@ xwer_t xwsemdemo_thd_func(void * arg)
 
         semlogf(INFO, "[线程] 启动定时器。\n");
         now = xwtm_now();
-        rc = xwos_swt_start(&xwsemdemo_swt, now, XWTM_MS(1000),
-                            xwsemdemo_swt_callback, NULL);
+        rc = xwos_swt_start(&semdemo_swt, now, XWTM_MS(1000),
+                            semdemo_swt_callback, NULL);
 
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                rc = xwos_sem_wait_to(&xwsemdemo_sem, xwtm_ft(XWTM_MS(500)));
+                rc = xwos_sem_wait_to(&semdemo_sem, xwtm_ft(XWTM_MS(500)));
                 if (XWOK == rc) {
                         now = xwtm_nowts();
                         semlogf(INFO,

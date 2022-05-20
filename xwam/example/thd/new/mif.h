@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：线程的创建与退出
+ * @brief 示例：线程的创建
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_example_thread_create_mif_h__
-#define __xwam_example_thread_create_mif_h__
+#ifndef __xwam_example_thd_new_mif_h__
+#define __xwam_example_thd_new_mif_h__
 
 #include <xwos/standard.h>
 
-xwer_t xwos_example_thd_create(void);
+xwer_t xwos_example_thd_new(void);
 
-#endif /* xwam/example/thread/create/mif.h */
+#endif /* xwam/example/thd/new/mif.h */

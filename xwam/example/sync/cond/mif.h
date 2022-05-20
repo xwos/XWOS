@@ -23,6 +23,6 @@
 
 #include <xwos/standard.h>
 
-xwer_t example_cond_start(void);
+xwer_t xwos_example_cond(void);
 
 #endif /* xwam/example/sync/cond/mif.h */
