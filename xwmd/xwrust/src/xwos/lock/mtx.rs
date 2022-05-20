@@ -245,7 +245,12 @@ pub enum MutexError {
 }
 
 /// XWOS互斥锁对象占用的内存大小
-pub const SIZEOF_XWOS_MTX: usize = 80;
+#[cfg(target_pointer_width = "32")]
+pub const SIZEOF_XWOS_MTX: usize = 96;
+
+/// XWOS互斥锁对象占用的内存大小
+#[cfg(target_pointer_width = "64")]
+pub const SIZEOF_XWOS_MTX: usize = 192;
 
 xwos_struct! {
     /// 用于构建互斥锁的内存数组类型

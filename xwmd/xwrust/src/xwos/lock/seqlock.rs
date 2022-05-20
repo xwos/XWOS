@@ -192,10 +192,12 @@ pub enum SeqlockMode {
     ReadExclusiveLockCpuirqSave(Option<XwReg>),
 }
 
-////////////////////////////////////////////////////////////////
-// 顺序锁
-////////////////////////////////////////////////////////////////
 /// XWOS顺序锁占用的内存大小
+#[cfg(target_pointer_width = "32")]
+pub const SIZEOF_XWOS_SQLK: usize = 8;
+
+/// XWOS顺序锁占用的内存大小
+#[cfg(target_pointer_width = "64")]
 pub const SIZEOF_XWOS_SQLK: usize = 16;
 
 xwos_struct! {

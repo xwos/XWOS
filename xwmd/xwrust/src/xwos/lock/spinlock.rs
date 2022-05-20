@@ -147,10 +147,12 @@ pub enum SpinlockMode {
     LockCpuirqSave(Option<XwReg>),
 }
 
-////////////////////////////////////////////////////////////////
-// 自旋锁
-////////////////////////////////////////////////////////////////
 /// XWOS自旋锁占用的内存大小
+#[cfg(target_pointer_width = "32")]
+pub const SIZEOF_XWOS_SPLK: usize = 8;
+
+/// XWOS自旋锁占用的内存大小
+#[cfg(target_pointer_width = "64")]
 pub const SIZEOF_XWOS_SPLK: usize = 8;
 
 xwos_struct! {

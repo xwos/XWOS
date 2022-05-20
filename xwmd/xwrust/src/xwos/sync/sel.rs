@@ -238,7 +238,12 @@ pub enum SelError {
 }
 
 /// XWOS条件量对象占用的内存大小
+#[cfg(target_pointer_width = "32")]
 pub const SIZEOF_XWOS_SEL: usize = 64;
+
+/// XWOS条件量对象占用的内存大小
+#[cfg(target_pointer_width = "64")]
+pub const SIZEOF_XWOS_SEL: usize = 128;
 
 /// 用于构建条件量的内存数组类型
 #[repr(C)]
@@ -301,6 +306,7 @@ where
     /// + 具有 [`'static`] 约束的全局变量全局变量：
     ///
     /// ```rust
+    /// extern crate alloc;
     /// use xwrust::xwos::sync::sel::*;
     ///
     /// static GLOBAL_SEL: Sel<8> = Sel::new();

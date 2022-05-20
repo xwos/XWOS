@@ -189,7 +189,12 @@ pub enum SemError {
 }
 
 /// XWOS信号量对象占用的内存大小
+#[cfg(target_pointer_width = "32")]
 pub const SIZEOF_XWOS_SEM: usize = 64;
+
+/// XWOS信号量对象占用的内存大小
+#[cfg(target_pointer_width = "64")]
+pub const SIZEOF_XWOS_SEM: usize = 128;
 
 xwos_struct! {
     /// 用于构建信号量的内存数组类型
@@ -243,6 +248,7 @@ impl Sem {
     /// + 在heap中创建：
     ///
     /// ```rust
+    /// extern crate alloc;
     /// use alloc::sync::Arc;
     ///
     /// pub fn xwrust_example_sem() {

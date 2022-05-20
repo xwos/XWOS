@@ -22,22 +22,46 @@
 //! 在编写XWOS RUST时，作者充分阅读并参考了RUST的std库的代码，
 //! 尽量仿照std库的形式提供API。使得熟悉RUST语言的朋友可以很快掌握如何使用XWOS RUST。
 //!
-//! 就像RUST程序的入口是`main.rs`的`fn main()`一样，
-//! XWOS RUST的入口是`pub unsafe extern "C" fn xwrust_main()` 。
-//! 需要用户在工程目录（例如电路板模块文件夹bm或OEM文件）建立一个独立的玄武模块来定义此函数。
-//! XWOS会创建一个线程来调用 `xwrust_main()` 。
-//! 但是因为需要与C语言编写的内核进行静态链接，用户应该创建的是基于`lib.rs`的静态库而非`main.rs`。
+//!
+//! 就像RUST程序的入口是 `main.rs` 的 `fn main()` 一样，
+//! XWOS RUST的入口是 `pub unsafe extern "C" fn xwrust_main()` 。
+//! 用户需要在工程目录（例如电路板模块 `bm` 文件夹 或 `OEM` 文件夹）建立一个独立的 **玄武模块** 来定义此函数。
 //!
 //! ```rust
 //! // bm/rustapp/src/lib.rs
 //! // crate-type = ["staticlib"]
 //! #![no_std]
+//!
 //! #[no_mangle]
 //! pub unsafe extern "C" fn xwrust_main() {
 //!     // 主线程的代码
 //! }
 //! ```
 //!
+//! 然后在XWOS的C语言入口 `xwos_main()` 中创建一个线程来调用 `xwrust_main()` 。
+//!
+//! ```C
+//! extern void xwrust_main(void);
+//!
+//! // 独立的RUST线程
+//! xwer_t xwrust_task(void * arg)
+//! {
+//!         xwrust_main();
+//! }
+//! ```
+//!
+//! 因为需要与C语言编写的内核进行静态链接，用户应该创建的是基于 `lib.rs` 的静态库而非 `main.rs` 。
+//!
+//! ```toml
+//! [package]
+//! name = "rustapp"
+//! version = "0.1.0"
+//! edition = "2021"
+//!
+//! [lib]
+//! name = "rustapp"
+//! crate-type = ["staticlib"]
+//! ```
 //!
 //! # 返回XWOS首页
 //!

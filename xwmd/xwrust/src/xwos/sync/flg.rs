@@ -220,7 +220,12 @@ pub enum Action {
 }
 
 /// XWOS事件标志对象占用的内存大小
+#[cfg(target_pointer_width = "32")]
 pub const SIZEOF_XWOS_FLG: usize = 64;
+
+/// XWOS事件标志对象占用的内存大小
+#[cfg(target_pointer_width = "64")]
+pub const SIZEOF_XWOS_FLG: usize = 128;
 
 /// 用于构建事件标志的内存数组类型
 #[repr(C)]
@@ -291,6 +296,7 @@ where
     /// + 在heap中创建：
     ///
     /// ```rust
+    /// extern crate alloc;
     /// use alloc::sync::Arc;
     ///
     /// pub fn xwrust_example_flg() {

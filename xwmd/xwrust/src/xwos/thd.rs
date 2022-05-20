@@ -265,13 +265,14 @@ extern "C" {
 
 impl ThdD {
     unsafe fn new(attr: &ThdAttr, func: Box<dyn FnOnce()>) -> Result<ThdD, XwEr> {
-        let boxfunc = Box::new(func);
-        let f = Box::into_raw(boxfunc);
+        let boxboxfunc = Box::new(func);
+        let rawboxfunc = Box::into_raw(boxboxfunc);
         let mut thd: *mut c_void = ptr::null_mut();
         let mut tik: XwSq = 0;
-        let rc = xwrustffi_thd_create(&mut thd, &mut tik, attr, xwrust_thd_entry, f as *mut _);
+        let rc = xwrustffi_thd_create(&mut thd, &mut tik, attr,
+                                      xwrust_thd_entry, rawboxfunc as *mut _);
         return if rc < 0 {
-            drop(Box::from_raw(f)); // 创建失败，需要释放f
+            drop(Box::from_raw(rawboxfunc)); // 创建失败，需要释放f
             Err(rc)
         } else {
             Ok(ThdD {thd: thd, tik: tik})
@@ -279,7 +280,8 @@ impl ThdD {
 
         extern "C" fn xwrust_thd_entry(main: *mut c_void) -> XwEr {
             unsafe {
-                Box::from_raw(main as *mut Box<dyn FnOnce()>)();
+                let func = Box::from_raw(main as *mut Box<dyn FnOnce()>);
+                func();
             }
             0
         }
@@ -554,10 +556,7 @@ impl Builder {
         Ok(ThdHandle{inner: self.spawn_unchecked_(f)?})
     }
 
-    unsafe fn spawn_unchecked_<'a, F, R>(
-        self,
-        f: F,
-    ) -> Result<ThdHandleInner<R>, XwEr>
+    unsafe fn spawn_unchecked_<'a, F, R>(self, f: F) -> Result<ThdHandleInner<R>, XwEr>
     where
         F: FnOnce(Arc<ThdElement>) -> R,
         F: Send + 'a,
@@ -593,8 +592,7 @@ impl Builder {
 
         Ok(ThdHandleInner {
             thdd: ThdD::new(&attr,
-                          mem::transmute::<Box<dyn FnOnce() + 'a>, Box<dyn FnOnce() + 'static>>(
-                              Box::new(main)))?,
+                            mem::transmute::<Box<dyn FnOnce() + 'a>, Box<dyn FnOnce() + 'static>>(Box::new(main)))?,
             join_state: STATE_JOINABLE,
             element: element,
             rv: retval,
