@@ -38,7 +38,7 @@ struct xwmm_memslice xwmmdemo_memslice;
 /**
  * @brief 模块的加载函数
  */
-xwer_t example_memslice_start(void)
+xwer_t xwmm_example_memslice(void)
 {
         xwer_t rc;
         void * mem;

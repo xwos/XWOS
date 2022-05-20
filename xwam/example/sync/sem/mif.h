@@ -23,6 +23,6 @@
 
 #include <xwos/standard.h>
 
-xwer_t example_sem_start(void);
+xwer_t xwos_example_sem(void);
 
 #endif /* xwam/example/sync/sem/mif.h */

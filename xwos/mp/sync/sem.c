@@ -848,7 +848,6 @@ xwer_t xwmp_plsem_blkthd_unlkwq_cpuirqrs(struct xwmp_sem * sem,
                                          struct xwmp_skd * xwskd,
                                          xwreg_t cpuirq)
 {
-        struct xwmp_skd * xwskd;
         xwpr_t dprio;
         xwsq_t reason;
         xwer_t rc;

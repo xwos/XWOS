@@ -22,14 +22,14 @@
 #include <string.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/thd.h>
-#include <xwam/example/thread/sleep/mif.h>
+#include <xwam/example/thd/sleep/mif.h>
 
 #define LOGTAG "thdsleep"
 #define thdslplogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
 
-#define XWSLPDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
-xwer_t xwslpdemo_thd_func(void * arg);
-xwos_thd_d xwslpdemo_thd;
+#define SLEEPDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+xwer_t sleepdemo_thd_func(void * arg);
+xwos_thd_d sleepdemo_thd;
 
 /**
  * @brief 模块的加载函数
@@ -40,20 +40,20 @@ xwer_t xwos_example_thd_sleep(void)
         xwer_t rc;
 
         xwos_thd_attr_init(&attr);
-        attr.name = "xwslpdemo.thd";
+        attr.name = "sleepdemo.thd";
         attr.stack = NULL;
         attr.stack_size = 2048;
-        attr.priority = XWSLPDEMO_THD_PRIORITY;
+        attr.priority = SLEEPDEMO_THD_PRIORITY;
         attr.detached = false;
         attr.privileged = true;
-        rc = xwos_thd_create(&xwslpdemo_thd, &attr, xwslpdemo_thd_func, NULL);
+        rc = xwos_thd_create(&sleepdemo_thd, &attr, sleepdemo_thd_func, NULL);
         return rc;
 }
 
 /**
  * @brief 线程的主函数
  */
-xwer_t xwslpdemo_thd_func(void * arg)
+xwer_t sleepdemo_thd_func(void * arg)
 {
         xwtm_t ts;
 

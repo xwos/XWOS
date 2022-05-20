@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：线程的创建与退出
+ * @brief 示例：线程的创建
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -22,7 +22,7 @@
 #include <string.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/thd.h>
-#include <xwam/example/thread/create/mif.h>
+#include <xwam/example/thd/new/mif.h>
 
 #define LOGTAG "thdcrt"
 #define thdcrtlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
@@ -55,7 +55,7 @@ xwos_thd_d static_thdd;
 /**
  * @brief 模块的加载函数
  */
-xwer_t xwos_example_thd_create(void)
+xwer_t xwos_example_thd_new(void)
 {
         struct xwos_thd_attr attr;
         xwer_t rc;

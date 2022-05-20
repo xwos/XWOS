@@ -22,7 +22,7 @@
 #include <string.h>
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/thd.h>
-#include <xwam/example/thread/exit/mif.h>
+#include <xwam/example/thd/exit/mif.h>
 
 #define LOGTAG "thdexit"
 #define thdexitlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)

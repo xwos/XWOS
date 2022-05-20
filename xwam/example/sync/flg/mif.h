@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：事件信号旗
+ * @brief 示例：事件标志
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -23,6 +23,6 @@
 
 #include <xwos/standard.h>
 
-xwer_t example_flg_start(void);
+xwer_t xwos_example_flg(void);
 
 #endif /* xwam/example/sync/flg/mif.h */

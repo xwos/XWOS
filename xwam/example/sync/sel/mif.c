@@ -33,233 +33,233 @@
 #define LOGTAG "sel"
 #define sellogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
 
-#define XWSELDEMO_CONSUMER_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
-#define XWSELDEMO_PRODUCER_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 2)
-#define XWSELDEMO_BRTHD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+#define SELDEMO_CONSUMER_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+#define SELDEMO_PRODUCER_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 2)
+#define SELDEMO_BRTHD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
-void xwseldemo_swt0_callback(struct xwos_swt * swt, void * arg);
-void xwseldemo_swt1_callback(struct xwos_swt * swt, void * arg);
-xwer_t xwseldemo_consumer_func(void * arg);
-xwer_t xwseldemo_producer_func(void * arg);
-xwer_t xwseldemo_syncthd_func(void * arg);
+void seldemo_swt0_callback(struct xwos_swt * swt, void * arg);
+void seldemo_swt1_callback(struct xwos_swt * swt, void * arg);
+xwer_t seldemo_consumer_func(void * arg);
+xwer_t seldemo_producer_func(void * arg);
+xwer_t seldemo_syncthd_func(void * arg);
 
-#define XWSELDEMO_BMP_BITNUM (sizeof(xwbmp_t) * BITS_PER_XWU8_T)
+#define SELDEMO_BMP_BITNUM (sizeof(xwbmp_t) * BITS_PER_XWU8_T)
 
-xwbmpop_define(xwseldemo_sel0_bmp, XWSELDEMO_BMP_BITNUM) = {0,};
-xwbmpop_define(xwseldemo_sel0_msk, XWSELDEMO_BMP_BITNUM) = {0,};
-struct xwos_sel xwseldemo_sel0;
+xwbmpop_define(seldemo_sel0_bmp, SELDEMO_BMP_BITNUM) = {0,};
+xwbmpop_define(seldemo_sel0_msk, SELDEMO_BMP_BITNUM) = {0,};
+struct xwos_sel seldemo_sel0;
 
-struct xwos_sem xwseldemo_sem1;
-struct xwos_sem xwseldemo_sem2;
+struct xwos_sem seldemo_sem1;
+struct xwos_sem seldemo_sem2;
 
-xwbmpop_define(xwseldemo_flg3_bmp, XWSELDEMO_BMP_BITNUM) = {0,};
-xwbmpop_define(xwseldemo_flg3_msk, XWSELDEMO_BMP_BITNUM) = {0,};
-struct xwos_flg xwseldemo_flg3;
+xwbmpop_define(seldemo_flg3_bmp, SELDEMO_BMP_BITNUM) = {0,};
+xwbmpop_define(seldemo_flg3_msk, SELDEMO_BMP_BITNUM) = {0,};
+struct xwos_flg seldemo_flg3;
 
-xwbmpop_define(xwseldemo_sel4_bmp, XWSELDEMO_BMP_BITNUM) = {0,};
-xwbmpop_define(xwseldemo_sel4_msk, XWSELDEMO_BMP_BITNUM) = {0,};
-struct xwos_sel xwseldemo_sel4;
+xwbmpop_define(seldemo_sel4_bmp, SELDEMO_BMP_BITNUM) = {0,};
+xwbmpop_define(seldemo_sel4_msk, SELDEMO_BMP_BITNUM) = {0,};
+struct xwos_sel seldemo_sel4;
 
-struct xwos_cond xwseldemo_cond5;
-struct xwos_cond xwseldemo_cond6;
+struct xwos_cond seldemo_cond5;
+struct xwos_cond seldemo_cond6;
 
-struct xwos_br xwseldemo_br7;
+struct xwos_br seldemo_br7;
 
-const struct xwos_thd_desc xwseldemo_consumer_thd_desc = {
+const struct xwos_thd_desc seldemo_consumer_thd_desc = {
         .attr = {
-                .name = "xwseldemo.consumer",
+                .name = "seldemo.consumer",
                 .stack = NULL,
                 .stack_size = 4096,
                 .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
-                .priority = XWSELDEMO_CONSUMER_PRIORITY,
+                .priority = SELDEMO_CONSUMER_PRIORITY,
                 .detached = false,
                 .privileged = true,
         },
-        .func = (xwos_thd_f)xwseldemo_consumer_func,
+        .func = (xwos_thd_f)seldemo_consumer_func,
         .arg = NULL,
 };
-xwos_thd_d xwseldemo_consumer;
+xwos_thd_d seldemo_consumer;
 
-const struct xwos_thd_desc xwseldemo_producer_thd_desc = {
+const struct xwos_thd_desc seldemo_producer_thd_desc = {
         .attr = {
-                .name = "xwseldemo.producer",
+                .name = "seldemo.producer",
                 .stack = NULL,
                 .stack_size = 2048,
                 .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
-                .priority = XWSELDEMO_PRODUCER_PRIORITY,
+                .priority = SELDEMO_PRODUCER_PRIORITY,
                 .detached = false,
                 .privileged = true,
         },
-        .func = (xwos_thd_f)xwseldemo_producer_func,
+        .func = (xwos_thd_f)seldemo_producer_func,
         .arg = NULL,
 };
-xwos_thd_d xwseldemo_producer;
+xwos_thd_d seldemo_producer;
 
-struct xwos_swt xwseldemo_swt0;
-struct xwos_swt xwseldemo_swt1;
+struct xwos_swt seldemo_swt0;
+struct xwos_swt seldemo_swt1;
 
-const struct xwos_thd_desc xwseldemo_sync_thd_desc[] = {
+const struct xwos_thd_desc seldemo_sync_thd_desc[] = {
         [0] = {
                 .attr = {
-                        .name = "xwseldemo.syncthd.0",
+                        .name = "seldemo.syncthd.0",
                         .stack = NULL,
                         .stack_size = 2048,
                         .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
-                        .priority = XWSELDEMO_BRTHD_PRIORITY,
+                        .priority = SELDEMO_BRTHD_PRIORITY,
                         .detached = false,
                         .privileged = true,
                 },
-                .func = (xwos_thd_f)xwseldemo_syncthd_func,
+                .func = (xwos_thd_f)seldemo_syncthd_func,
                 .arg = (void *)0,
         },
         [1] = {
                 .attr = {
-                        .name = "xwseldemo.syncthd.1",
+                        .name = "seldemo.syncthd.1",
                         .stack = NULL,
                         .stack_size = 2048,
                         .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
-                        .priority = XWSELDEMO_BRTHD_PRIORITY,
+                        .priority = SELDEMO_BRTHD_PRIORITY,
                         .detached = false,
                         .privileged = true,
                 },
-                .func = (xwos_thd_f)xwseldemo_syncthd_func,
+                .func = (xwos_thd_f)seldemo_syncthd_func,
                 .arg = (void *)1,
         },
 };
-xwos_thd_d xwseldemo_syncthd[xw_array_size(xwseldemo_sync_thd_desc)];
-xwbmpop_define(xwseldemo_br7_bmp, xw_array_size(xwseldemo_sync_thd_desc)) = {0,};
-xwbmpop_define(xwseldemo_br7_msk, xw_array_size(xwseldemo_sync_thd_desc)) = {0,};
+xwos_thd_d seldemo_syncthd[xw_array_size(seldemo_sync_thd_desc)];
+xwbmpop_define(seldemo_br7_bmp, xw_array_size(seldemo_sync_thd_desc)) = {0,};
+xwbmpop_define(seldemo_br7_msk, xw_array_size(seldemo_sync_thd_desc)) = {0,};
 
 /**
  * @brief 测试模块的启动函数
  */
-xwer_t example_sel_start(void)
+xwer_t xwos_example_sel(void)
 {
         xwer_t rc;
         xwsq_t i;
 
         /* 初始化信号选择器0 */
-        rc = xwos_sel_init(&xwseldemo_sel0, XWSELDEMO_BMP_BITNUM,
-                           xwseldemo_sel0_bmp, xwseldemo_sel0_msk);
+        rc = xwos_sel_init(&seldemo_sel0, SELDEMO_BMP_BITNUM,
+                           seldemo_sel0_bmp, seldemo_sel0_msk);
         if (rc < 0) {
                 goto err_sel0_init;
         }
         /* 初始化信号量1 */
-        rc = xwos_sem_init(&xwseldemo_sem1, 0, XWSSQ_MAX);
+        rc = xwos_sem_init(&seldemo_sem1, 0, XWSSQ_MAX);
         if (rc < 0) {
                 goto err_sem1_init;
         }
         /* 初始化信号量2 */
-        rc = xwos_sem_init(&xwseldemo_sem2, 0, XWSSQ_MAX);
+        rc = xwos_sem_init(&seldemo_sem2, 0, XWSSQ_MAX);
         if (rc < 0) {
                 goto err_sem2_init;
         }
         /* 初始化事件标志3 */
-        rc = xwos_flg_init(&xwseldemo_flg3, XWSELDEMO_BMP_BITNUM,
-                           xwseldemo_flg3_bmp, xwseldemo_flg3_msk);
+        rc = xwos_flg_init(&seldemo_flg3, SELDEMO_BMP_BITNUM,
+                           seldemo_flg3_bmp, seldemo_flg3_msk);
         if (rc < 0) {
                 goto err_flg3_init;
         }
         /* 初始化信号选择器4 */
-        rc = xwos_sel_init(&xwseldemo_sel4, XWSELDEMO_BMP_BITNUM,
-                           xwseldemo_sel4_bmp, xwseldemo_sel4_msk);
+        rc = xwos_sel_init(&seldemo_sel4, SELDEMO_BMP_BITNUM,
+                           seldemo_sel4_bmp, seldemo_sel4_msk);
         if (rc < 0) {
                 goto err_sel4_init;
         }
         /* 初始化条件量5 */
-        rc = xwos_cond_init(&xwseldemo_cond5);
+        rc = xwos_cond_init(&seldemo_cond5);
         if (rc < 0) {
                 goto err_cond5_init;
         }
         /* 初始化条件量6 */
-        rc = xwos_cond_init(&xwseldemo_cond6);
+        rc = xwos_cond_init(&seldemo_cond6);
         if (rc < 0) {
                 goto err_cond6_init;
         }
         /* 初始化线程屏障7 */
-        xwbmpop_c0all(xwseldemo_br7_msk, xw_array_size(xwseldemo_sync_thd_desc));
-        rc = xwos_br_init(&xwseldemo_br7, xw_array_size(xwseldemo_sync_thd_desc),
-                          xwseldemo_br7_bmp, xwseldemo_br7_msk);
+        xwbmpop_c0all(seldemo_br7_msk, xw_array_size(seldemo_sync_thd_desc));
+        rc = xwos_br_init(&seldemo_br7, xw_array_size(seldemo_sync_thd_desc),
+                          seldemo_br7_bmp, seldemo_br7_msk);
         if (rc < 0) {
                 goto err_br7_init;
         }
 
         /* 初始化定时器0 */
-        rc = xwos_swt_init(&xwseldemo_swt0, "xwseldemo_swt0",
+        rc = xwos_swt_init(&seldemo_swt0, "seldemo_swt0",
                            XWOS_SWT_FLAG_RESTART);
         if (rc < 0) {
                 goto err_swt0_init;
         }
 
         /* 初始化定时器1 */
-        rc = xwos_swt_init(&xwseldemo_swt1, "xwseldemo_swt1",
+        rc = xwos_swt_init(&seldemo_swt1, "seldemo_swt1",
                            XWOS_SWT_FLAG_RESTART);
         if (rc < 0) {
                 goto err_swt1_init;
         }
 
         /* 绑定信号量1到信号选择器0的位置为1 */
-        rc = xwos_sem_bind(&xwseldemo_sem1, &xwseldemo_sel0, 1);
+        rc = xwos_sem_bind(&seldemo_sem1, &seldemo_sel0, 1);
         if (rc < 0) {
                 goto err_sem1_bind;
         }
         /* 绑定信号量2到信号选择器0的位置为2 */
-        rc = xwos_sem_bind(&xwseldemo_sem2, &xwseldemo_sel0, 2);
+        rc = xwos_sem_bind(&seldemo_sem2, &seldemo_sel0, 2);
         if (rc < 0) {
                 goto err_sem2_bind;
         }
         /* 绑定事件标志3到信号选择器0的位置为3 */
-        rc = xwos_flg_bind(&xwseldemo_flg3, &xwseldemo_sel0, 3);
+        rc = xwos_flg_bind(&seldemo_flg3, &seldemo_sel0, 3);
         if (rc < 0) {
                 goto err_flg3_bind;
         }
 
         /* 绑定信号选择器4到信号选择器0的位置为4 */
-        rc = xwos_sel_bind(&xwseldemo_sel4, &xwseldemo_sel0, 4);
+        rc = xwos_sel_bind(&seldemo_sel4, &seldemo_sel0, 4);
         if (rc < 0) {
                 goto err_sel4_bind;
         }
 
         /* 绑定条件量5到信号选择器4的位置为5 */
-        rc = xwos_cond_bind(&xwseldemo_cond5, &xwseldemo_sel4, 5);
+        rc = xwos_cond_bind(&seldemo_cond5, &seldemo_sel4, 5);
         if (rc < 0) {
                 goto err_cond5_bind;
         }
         /* 绑定条件量6到信号选择器4的位置为6 */
-        rc = xwos_cond_bind(&xwseldemo_cond6, &xwseldemo_sel4, 6);
+        rc = xwos_cond_bind(&seldemo_cond6, &seldemo_sel4, 6);
         if (rc < 0) {
                 goto err_cond6_bind;
         }
         /* 绑定线程屏障7到信号选择器4的位置7 */
-        rc = xwos_br_bind(&xwseldemo_br7, &xwseldemo_sel4, 7);
+        rc = xwos_br_bind(&seldemo_br7, &seldemo_sel4, 7);
         if (rc < 0) {
                 goto err_br7_bind;
         }
 
         /* 创建等待同步对象的线程 */
-        rc = xwos_thd_create(&xwseldemo_consumer,
-                             &xwseldemo_consumer_thd_desc.attr,
-                             xwseldemo_consumer_thd_desc.func,
-                             xwseldemo_consumer_thd_desc.arg);
+        rc = xwos_thd_create(&seldemo_consumer,
+                             &seldemo_consumer_thd_desc.attr,
+                             seldemo_consumer_thd_desc.func,
+                             seldemo_consumer_thd_desc.arg);
         if (rc < 0) {
                 goto err_consumer_create;
         }
 
         /* 建立发布同步对象的线程 */
-        rc = xwos_thd_create(&xwseldemo_producer,
-                             &xwseldemo_producer_thd_desc.attr,
-                             xwseldemo_producer_thd_desc.func,
-                             xwseldemo_producer_thd_desc.arg);
+        rc = xwos_thd_create(&seldemo_producer,
+                             &seldemo_producer_thd_desc.attr,
+                             seldemo_producer_thd_desc.func,
+                             seldemo_producer_thd_desc.arg);
         if (rc < 0) {
                 goto err_producer_create;
         }
 
         /* 创建同步线程 */
-        for (i = 0; i < xw_array_size(xwseldemo_sync_thd_desc); i++) {
-                rc = xwos_thd_create(&xwseldemo_syncthd[i],
-                                     &xwseldemo_sync_thd_desc[i].attr,
-                                     xwseldemo_sync_thd_desc[i].func,
-                                     xwseldemo_sync_thd_desc[i].arg);
+        for (i = 0; i < xw_array_size(seldemo_sync_thd_desc); i++) {
+                rc = xwos_thd_create(&seldemo_syncthd[i],
+                                     &seldemo_sync_thd_desc[i].attr,
+                                     seldemo_sync_thd_desc[i].func,
+                                     seldemo_sync_thd_desc[i].arg);
                 if (rc < 0) {
                         goto err_syncthd_create;
                 }
@@ -268,43 +268,43 @@ xwer_t example_sel_start(void)
         return XWOK;
 
 err_syncthd_create:
-        xwos_thd_quit(xwseldemo_producer);
+        xwos_thd_quit(seldemo_producer);
 err_producer_create:
-        xwos_thd_quit(xwseldemo_consumer);
+        xwos_thd_quit(seldemo_consumer);
 err_consumer_create:
-        xwos_br_unbind(&xwseldemo_br7, &xwseldemo_sel4);
+        xwos_br_unbind(&seldemo_br7, &seldemo_sel4);
 err_br7_bind:
-        xwos_cond_unbind(&xwseldemo_cond6, &xwseldemo_sel4);
+        xwos_cond_unbind(&seldemo_cond6, &seldemo_sel4);
 err_cond6_bind:
-        xwos_cond_unbind(&xwseldemo_cond5, &xwseldemo_sel4);
+        xwos_cond_unbind(&seldemo_cond5, &seldemo_sel4);
 err_cond5_bind:
-        xwos_sel_unbind(&xwseldemo_sel4, &xwseldemo_sel0);
+        xwos_sel_unbind(&seldemo_sel4, &seldemo_sel0);
 err_sel4_bind:
-        xwos_flg_unbind(&xwseldemo_flg3, &xwseldemo_sel0);
+        xwos_flg_unbind(&seldemo_flg3, &seldemo_sel0);
 err_flg3_bind:
-        xwos_sem_unbind(&xwseldemo_sem2, &xwseldemo_sel0);
+        xwos_sem_unbind(&seldemo_sem2, &seldemo_sel0);
 err_sem2_bind:
-        xwos_sem_unbind(&xwseldemo_sem1, &xwseldemo_sel0);
+        xwos_sem_unbind(&seldemo_sem1, &seldemo_sel0);
 err_sem1_bind:
-        xwos_swt_fini(&xwseldemo_swt1);
+        xwos_swt_fini(&seldemo_swt1);
 err_swt1_init:
-        xwos_swt_fini(&xwseldemo_swt0);
+        xwos_swt_fini(&seldemo_swt0);
 err_swt0_init:
-        xwos_br_fini(&xwseldemo_br7);
+        xwos_br_fini(&seldemo_br7);
 err_br7_init:
-        xwos_cond_fini(&xwseldemo_cond6);
+        xwos_cond_fini(&seldemo_cond6);
 err_cond6_init:
-        xwos_cond_fini(&xwseldemo_cond5);
+        xwos_cond_fini(&seldemo_cond5);
 err_cond5_init:
-        xwos_sel_fini(&xwseldemo_sel4);
+        xwos_sel_fini(&seldemo_sel4);
 err_sel4_init:
-        xwos_flg_fini(&xwseldemo_flg3);
+        xwos_flg_fini(&seldemo_flg3);
 err_flg3_init:
-        xwos_sem_fini(&xwseldemo_sem2);
+        xwos_sem_fini(&seldemo_sem2);
 err_sem2_init:
-        xwos_sem_fini(&xwseldemo_sem1);
+        xwos_sem_fini(&seldemo_sem1);
 err_sem1_init:
-        xwos_sel_fini(&xwseldemo_sel0);
+        xwos_sel_fini(&seldemo_sel0);
 err_sel0_init:
         return rc;
 }
@@ -312,12 +312,12 @@ err_sel0_init:
 /**
  * @brief 消费者线程
  */
-xwer_t xwseldemo_consumer_func(void * arg)
+xwer_t seldemo_consumer_func(void * arg)
 {
-        xwbmpop_define(selmsk, XWSELDEMO_BMP_BITNUM);
-        xwbmpop_define(trg, XWSELDEMO_BMP_BITNUM);
-        xwbmpop_define(flgmsk, XWSELDEMO_BMP_BITNUM);
-        xwbmpop_define(flgtrg, XWSELDEMO_BMP_BITNUM);
+        xwbmpop_define(selmsk, SELDEMO_BMP_BITNUM);
+        xwbmpop_define(trg, SELDEMO_BMP_BITNUM);
+        xwbmpop_define(flgmsk, SELDEMO_BMP_BITNUM);
+        xwbmpop_define(flgtrg, SELDEMO_BMP_BITNUM);
         xwtm_t now;
         xwer_t rc = XWOK;
 
@@ -326,12 +326,12 @@ xwer_t xwseldemo_consumer_func(void * arg)
         sellogf(INFO, "[消费者] 启动。\n");
         sellogf(INFO, "[消费者] 启动定时器0。\n");
         now = xwtm_now();
-        rc = xwos_swt_start(&xwseldemo_swt0, now, XWTM_MS(500),
-                            xwseldemo_swt0_callback, NULL);
+        rc = xwos_swt_start(&seldemo_swt0, now, XWTM_MS(500),
+                            seldemo_swt0_callback, NULL);
 
         sellogf(INFO, "[消费者] 启动定时器1。\n");
-        rc = xwos_swt_start(&xwseldemo_swt1, now, XWTM_MS(800),
-                            xwseldemo_swt1_callback, NULL);
+        rc = xwos_swt_start(&seldemo_swt1, now, XWTM_MS(800),
+                            seldemo_swt1_callback, NULL);
 
         memset(selmsk, 0, sizeof(selmsk));
         memset(flgmsk, 0, sizeof(flgmsk));
@@ -342,7 +342,7 @@ xwer_t xwseldemo_consumer_func(void * arg)
                 sellogf(INFO,
                         "[消费者] 等待信号：0x%X，时间戳：%lld 纳秒...\n",
                         selmsk[0], now);
-                rc = xwos_sel_select_to(&xwseldemo_sel0, selmsk, trg,
+                rc = xwos_sel_select_to(&seldemo_sel0, selmsk, trg,
                                         xwtm_ft(XWTM_S(1)));
                 if (XWOK == rc) {
                         now = xwtm_nowts();
@@ -351,7 +351,7 @@ xwer_t xwseldemo_consumer_func(void * arg)
                                 trg[0], now);
 
                         if (xwbmpop_t1i(trg, 1)) {
-                                rc = xwos_sem_trywait(&xwseldemo_sem1);
+                                rc = xwos_sem_trywait(&seldemo_sem1);
                                 if (XWOK == rc) {
                                         now = xwtm_nowts();
                                         sellogf(INFO,
@@ -361,7 +361,7 @@ xwer_t xwseldemo_consumer_func(void * arg)
                         }
 
                         if (xwbmpop_t1i(trg, 2)) {
-                                rc = xwos_sem_trywait(&xwseldemo_sem2);
+                                rc = xwos_sem_trywait(&seldemo_sem2);
                                 if (XWOK == rc) {
                                         now = xwtm_nowts();
                                         sellogf(INFO,
@@ -376,7 +376,7 @@ xwer_t xwseldemo_consumer_func(void * arg)
                                         "[消费者] 事件标志3触发，"
                                         "时间戳：%lld 纳秒。\n", now);
                                 flgmsk[0] = XWBOP_BIT(0) | XWBOP_BIT(1);
-                                rc = xwos_flg_trywait(&xwseldemo_flg3,
+                                rc = xwos_flg_trywait(&seldemo_flg3,
                                                       XWOS_FLG_TRIGGER_SET_ANY,
                                                       XWOS_FLG_ACTION_CONSUMPTION,
                                                       flgtrg, flgmsk);
@@ -401,7 +401,7 @@ xwer_t xwseldemo_consumer_func(void * arg)
                                         "[消费者] 选择器4触发，"
                                         "时间戳：%lld 纳秒。\n", now);
                                 /* 第4位为子信号选择器4，再次测试 */
-                                rc = xwos_sel_tryselect(&xwseldemo_sel4, selmsk, trg);
+                                rc = xwos_sel_tryselect(&seldemo_sel4, selmsk, trg);
                                 if (XWOK == rc) {
                                         now = xwtm_nowts();
                                         if (xwbmpop_t1i(trg, 5)) {
@@ -444,12 +444,12 @@ xwer_t xwseldemo_consumer_func(void * arg)
  *   - 当配置(XWMPCFG_SKD_BH == 0)，此函数运行在中断上下文；
  * - 此函数中不可调用会导致线程睡眠或阻塞的函数。
  */
-void xwseldemo_swt0_callback(struct xwos_swt * swt, void * arg)
+void seldemo_swt0_callback(struct xwos_swt * swt, void * arg)
 {
         XWOS_UNUSED(swt);
         XWOS_UNUSED(arg);
 
-        xwos_flg_s1i(&xwseldemo_flg3, 0);
+        xwos_flg_s1i(&seldemo_flg3, 0);
 }
 
 /**
@@ -463,18 +463,18 @@ void xwseldemo_swt0_callback(struct xwos_swt * swt, void * arg)
  *   - 当配置(XWMPCFG_SKD_BH == 0)，此函数运行在中断上下文；
  * - 此函数中不可调用会导致线程睡眠或阻塞的函数。
  */
-void xwseldemo_swt1_callback(struct xwos_swt * swt, void * arg)
+void seldemo_swt1_callback(struct xwos_swt * swt, void * arg)
 {
         XWOS_UNUSED(swt);
         XWOS_UNUSED(arg);
 
-        xwos_flg_s1i(&xwseldemo_flg3, 1);
+        xwos_flg_s1i(&seldemo_flg3, 1);
 }
 
 /**
  * @brief 生产者线程
  */
-xwer_t xwseldemo_producer_func(void * arg)
+xwer_t seldemo_producer_func(void * arg)
 {
         xwtm_t now;
         xwer_t rc = XWOK;
@@ -482,7 +482,7 @@ xwer_t xwseldemo_producer_func(void * arg)
         XWOS_UNUSED(arg);
         sellogf(INFO, "[生产者] 启动。\n");
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                rc = xwos_sem_post(&xwseldemo_sem1);
+                rc = xwos_sem_post(&seldemo_sem1);
                 if (XWOK == rc) {
                         now = xwtm_nowts();
                         sellogf(INFO,
@@ -496,7 +496,7 @@ xwer_t xwseldemo_producer_func(void * arg)
 
                 xwos_cthd_sleep(XWTM_MS(1000));
 
-                rc = xwos_sem_post(&xwseldemo_sem2);
+                rc = xwos_sem_post(&seldemo_sem2);
                 if (XWOK == rc) {
                         now = xwtm_nowts();
                         sellogf(INFO,
@@ -509,7 +509,7 @@ xwer_t xwseldemo_producer_func(void * arg)
                 }
                 xwos_cthd_sleep(XWTM_MS(1000));
 
-                rc = xwos_cond_broadcast(&xwseldemo_cond5);
+                rc = xwos_cond_broadcast(&seldemo_cond5);
                 if (XWOK == rc) {
                         now = xwtm_nowts();
                         sellogf(INFO,
@@ -522,7 +522,7 @@ xwer_t xwseldemo_producer_func(void * arg)
                 }
                 xwos_cthd_sleep(XWTM_MS(1000));
 
-                rc = xwos_cond_broadcast(&xwseldemo_cond6);
+                rc = xwos_cond_broadcast(&seldemo_cond6);
                 if (XWOK == rc) {
                         now = xwtm_nowts();
                         sellogf(INFO,
@@ -544,7 +544,7 @@ xwer_t xwseldemo_producer_func(void * arg)
 /**
  * @brief 竞赛线程
  */
-xwer_t xwseldemo_syncthd_func(void * arg)
+xwer_t seldemo_syncthd_func(void * arg)
 {
         xwtm_t sleep;
         xwsq_t pos = (xwsq_t)arg;
@@ -558,7 +558,7 @@ xwer_t xwseldemo_syncthd_func(void * arg)
 
         /* 同步线程 */
         sellogf(INFO, "[同步线程%d] 已就位。\n", pos);
-        rc = xwos_br_wait(&xwseldemo_br7);
+        rc = xwos_br_wait(&seldemo_br7);
         if (XWOK == rc) {
                 sellogf(INFO, "[同步线程%d] 开始运行。\n", pos);
         }

@@ -34,7 +34,7 @@ struct xwmm_sma xwmmdemo_sma;
 /**
  * @brief 模块的加载函数
  */
-xwer_t example_sma_start(void)
+xwer_t xwmm_sma_memslice(void)
 {
         xwer_t rc;
         void * mem;

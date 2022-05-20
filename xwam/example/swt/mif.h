@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 示例：线程睡眠
+ * @brief 示例：软件定时器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __xwam_example_thread_sleep_mif_h__
-#define __xwam_example_thread_sleep_mif_h__
+#ifndef __xwam_example_swt_mif_h__
+#define __xwam_example_swt_mif_h__
 
 #include <xwos/standard.h>
 
-xwer_t xwos_example_thd_sleep(void);
+xwer_t xwos_example_swt(void);
 
-#endif /* xwam/example/thread/sleep/mif.h */
+#endif /* xwam/example/swt/mif.h */

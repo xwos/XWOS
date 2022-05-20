@@ -28,7 +28,7 @@ extern xwer_t cxx_thd_main(void * arg);
 
 xwos_thd_d cxx_thd;
 
-xwer_t example_cxx_start(void)
+xwer_t xwos_example_cxx(void)
 {
         struct xwos_thd_attr attr;
         xwer_t rc;

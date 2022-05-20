@@ -23,6 +23,6 @@
 
 #include <xwos/standard.h>
 
-xwer_t xwos_example_xwmq(void);
+xwer_t xwmd_example_xwmq(void);
 
 #endif /* xwam/example/isc/xwmq/mif.h */

@@ -25,7 +25,7 @@ struct xwmp_evt;
  */
 struct xwmp_cond {
         struct xwmp_synobj synobj; /**< C语言面向对象：继承struct xwmp_synobj */
-        xwssq_t count; /**< 计数器：<0，条件量处于负状态；*/
+        xwssq_t count; /**< 计数器：<0，条件量处于冻结状态；*/
         union {
                 struct xwmp_plwq pl; /**< 管道的等待队列 */
         } wq; /**< 条件量的等待队列 */

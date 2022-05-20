@@ -31,61 +31,61 @@
 #define LOGTAG "cond"
 #define condlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
 
-#define XWCONDDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
-xwer_t xwconddemo_thd_func(void * arg);
+#define CONDDEMO_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
+xwer_t conddemo_thd_func(void * arg);
 
 /**
  * @brief 线程描述表
  */
-const struct xwos_thd_desc xwconddemo_thd_desc = {
+const struct xwos_thd_desc conddemo_thd_desc = {
         .attr = {
-                .name = "xwconddemo.thd",
+                .name = "conddemo.thd",
                 .stack = NULL,
                 .stack_size = 2048,
                 .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
-                .priority = XWCONDDEMO_THD_PRIORITY,
+                .priority = CONDDEMO_THD_PRIORITY,
                 .detached = false,
                 .privileged = true,
         },
-        .func = (xwos_thd_f)xwconddemo_thd_func,
+        .func = (xwos_thd_f)conddemo_thd_func,
         .arg = NULL,
 };
-xwos_thd_d xwconddemo_thd;
+xwos_thd_d conddemo_thd;
 
-struct xwos_swt xwconddemo_swt;
-struct xwos_cond xwconddemo_cond;
-struct xwos_splk xwconddemo_lock;
-xwsq_t xwconddemo_shared_count = 0;
+struct xwos_swt conddemo_swt;
+struct xwos_cond conddemo_cond;
+struct xwos_splk conddemo_lock;
+xwsq_t conddemo_shared_count = 0;
 bool is_updated = false;
 
 /**
  * @brief 模块的加载函数
  */
-xwer_t example_cond_start(void)
+xwer_t xwos_example_cond(void)
 {
         xwer_t rc;
 
         /* 初始化自旋锁 */
-        xwos_splk_init(&xwconddemo_lock);
+        xwos_splk_init(&conddemo_lock);
 
         /* 初始化条件量 */
-        rc = xwos_cond_init(&xwconddemo_cond);
+        rc = xwos_cond_init(&conddemo_cond);
         if (rc < 0) {
                 goto err_cond_init;
         }
 
         /* 初始化定时器 */
-        rc = xwos_swt_init(&xwconddemo_swt, "xwconddemo_swt",
+        rc = xwos_swt_init(&conddemo_swt, "conddemo_swt",
                            XWOS_SWT_FLAG_RESTART);
         if (rc < 0) {
                 goto err_swt_init;
         }
 
         /* 创建线程 */
-        rc = xwos_thd_create(&xwconddemo_thd,
-                             &xwconddemo_thd_desc.attr,
-                             xwconddemo_thd_desc.func,
-                             xwconddemo_thd_desc.arg);
+        rc = xwos_thd_create(&conddemo_thd,
+                             &conddemo_thd_desc.attr,
+                             conddemo_thd_desc.func,
+                             conddemo_thd_desc.arg);
         if (rc < 0) {
                 goto err_thd_create;
         }
@@ -93,9 +93,9 @@ xwer_t example_cond_start(void)
         return XWOK;
 
 err_thd_create:
-        xwos_swt_fini(&xwconddemo_swt);
+        xwos_swt_fini(&conddemo_swt);
 err_swt_init:
-        xwos_cond_fini(&xwconddemo_cond);
+        xwos_cond_fini(&conddemo_cond);
 err_cond_init:
         return rc;
 }
@@ -115,7 +115,7 @@ err_cond_init:
  *   此处的定时器回调运行在CPU0，而下文中的线程运行在CPU1，传统的关闭中断做法
  *   无法保证共享数据的安全性，此时只能使用自旋锁已经其派生锁。
  */
-void xwconddemo_swt_callback(struct xwos_swt * swt, void * arg)
+void conddemo_swt_callback(struct xwos_swt * swt, void * arg)
 {
         xwreg_t cpuirq;
         bool ntf;
@@ -124,25 +124,25 @@ void xwconddemo_swt_callback(struct xwos_swt * swt, void * arg)
         XWOS_UNUSED(arg);
 
         /* xwos_cpuirq_save_lc(&cpuirq); */ /* 传统RTOS方法，不推荐 */
-        xwos_splk_lock_cpuirqsv(&xwconddemo_lock, &cpuirq); /* 多核OS的方法，推荐 */
+        xwos_splk_lock_cpuirqsv(&conddemo_lock, &cpuirq); /* 多核OS的方法，推荐 */
         if (false == is_updated) {
-                xwconddemo_shared_count++;
+                conddemo_shared_count++;
                 is_updated = true;
                 ntf = is_updated;
         } else {
                 ntf = is_updated;
         }
-        xwos_splk_unlock_cpuirqrs(&xwconddemo_lock, cpuirq); /* 多核OS的方法，推荐 */
+        xwos_splk_unlock_cpuirqrs(&conddemo_lock, cpuirq); /* 多核OS的方法，推荐 */
         /* xwos_cpuirq_restore_lc(cpuirq); */ /* 传统RTOS做法，不推荐 */
         if (ntf) {
-                xwos_cond_broadcast(&xwconddemo_cond);
+                xwos_cond_broadcast(&conddemo_cond);
         }
 }
 
 /**
  * @brief 线程1的主函数
  */
-xwer_t xwconddemo_thd_func(void * arg)
+xwer_t conddemo_thd_func(void * arg)
 {
         xwer_t rc;
         xwtm_t now;
@@ -156,19 +156,19 @@ xwer_t xwconddemo_thd_func(void * arg)
         condlogf(INFO, "[线程] 启动。\n");
         condlogf(INFO, "[线程] 启动定时器。\n");
         now = xwtm_now();
-        rc = xwos_swt_start(&xwconddemo_swt, now, XWTM_MS(1000),
-                            xwconddemo_swt_callback, NULL);
+        rc = xwos_swt_start(&conddemo_swt, now, XWTM_MS(1000),
+                            conddemo_swt_callback, NULL);
 
         while (!xwos_cthd_frz_shld_stop(NULL)) {
-                xwos_splk_lock_cpuirqsv(&xwconddemo_lock, &cpuirq);
+                xwos_splk_lock_cpuirqsv(&conddemo_lock, &cpuirq);
                 if (is_updated) {
                         rc = XWOK;
                         is_updated = false;
-                        cnt = xwconddemo_shared_count;
+                        cnt = conddemo_shared_count;
                 } else {
-                        ulk.osal.splk = &xwconddemo_lock;
+                        ulk.osal.splk = &conddemo_lock;
                         /* 等待条件量，同时解锁自旋锁 */
-                        rc = xwos_cond_wait_to(&xwconddemo_cond,
+                        rc = xwos_cond_wait_to(&conddemo_cond,
                                                ulk, XWOS_LK_SPLK, NULL,
                                                xwtm_ft(XWTM_MS(500)), &lkst);
                         if (XWOK == rc) {
@@ -177,12 +177,12 @@ xwer_t xwconddemo_thd_func(void * arg)
                         } else {
                                 /* 错误返回，自旋锁不会自动上锁 */
                                 if (XWOS_LKST_UNLOCKED == lkst) {
-                                        xwos_splk_lock(&xwconddemo_lock);
+                                        xwos_splk_lock(&conddemo_lock);
                                 }
                         }
-                        cnt = xwconddemo_shared_count;
+                        cnt = conddemo_shared_count;
                 }
-                xwos_splk_unlock_cpuirqrs(&xwconddemo_lock, cpuirq);
+                xwos_splk_unlock_cpuirqrs(&conddemo_lock, cpuirq);
 
                 if (XWOK == rc) {
                         now = xwtm_nowts();
