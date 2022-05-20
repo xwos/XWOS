@@ -464,7 +464,7 @@ void xwbmpop_s1all(xwbmp_t * bmp, xwsq_t num);
 void xwbmpop_c0all(xwbmp_t * bmp, xwsq_t num);
 
 /**
- * @brief XWOS BOPLIB：将位图中某位置1
+ * @brief XWOS BOPLIB：将位图中单个位置1
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] n: 位的序号
  */
@@ -479,7 +479,7 @@ void xwbmpop_s1i(xwbmp_t * bmp, xwsq_t n);
 void xwbmpop_s1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief XWOS BOPLIB：将位图中某位清0
+ * @brief XWOS BOPLIB：将位图中单个位清0
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] n: 被清0的位的序号
  */
@@ -494,7 +494,7 @@ void xwbmpop_c0i(xwbmp_t * bmp, xwsq_t n);
 void xwbmpop_c0m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief XWOS BOPLIB：将位图中某位翻转
+ * @brief XWOS BOPLIB：将位图中单个位翻转
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] n: 被翻转的位的序号
  */
@@ -509,7 +509,7 @@ void xwbmpop_x1i(xwbmp_t * bmp, xwsq_t n);
 void xwbmpop_x1m(xwbmp_t * bmp, xwbmp_t msk[], xwsz_t num);
 
 /**
- * @brief XWOS BOPLIB：测试位图中的某位是否为1
+ * @brief XWOS BOPLIB：测试位图中的单个位是否为1
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] n: 被测试的位的序号
  * @return 布尔值
@@ -686,7 +686,7 @@ xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num);
 xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t num);
 
 /**
- * @brief XWOS BOPLIB：在位图中统计1的个数
+ * @brief XWOS BOPLIB：在位图中统计被置1的位的个数
  * @param[in] bmp: 位图的起始地址指针
  * @param[in] num: 位图中总的位数
  * @return 数据中1的个数

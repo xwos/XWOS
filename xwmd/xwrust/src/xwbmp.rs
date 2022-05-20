@@ -54,6 +54,8 @@ where
 }
 
 /// 位图类型
+///
+/// 常数 `N` 表示有多少位。
 pub struct Bmp<const N: XwSz>
 where
     [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
@@ -76,6 +78,45 @@ impl<const N: XwSz> Bmp<N>
 where
     [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
 {
+    /// 新建位图
+    ///
+    /// 此方法是编译期方法。
+    ///
+    /// # 示例
+    ///
+    /// + 具有 [`'static`] 约束的全局变量全局变量：
+    ///
+    /// ```rust
+    /// use xwrust::xwbmp::*;
+    ///
+    /// static GLOBAL_BMP = Bmp::<8>::new();
+    /// ```
+    ///
+    /// + 在函数中创建：
+    ///
+    /// ```rust
+    /// extern crate alloc;
+    /// use alloc::sync::Arc;
+    /// use xwrust::xwbmp::*;
+    ///
+    /// pub fn some_function() {
+    ///     let msk = Bmp::<8>::new();
+    /// }
+    /// ```
+    ///
+    /// + 在heap上创建：
+    ///
+    /// ```rust
+    /// extern crate alloc;
+    /// use alloc::sync::Arc;
+    /// use xwrust::xwbmp::*;
+    ///
+    /// pub fn some_function() {
+    ///     let msk = Arc::new(Bmp::<8>::new());
+    /// }
+    /// ```
+    ///
+    /// [`'static`]: https://doc.rust-lang.org/std/keyword.static.html
     pub const fn new() -> Self {
         Self {
             bmp: UnsafeCell::new(BmpArray {
@@ -84,124 +125,145 @@ where
         }
     }
 
+    /// 获取位图位的数量
     pub const fn bits(&self) -> XwSz {
         N
     }
 
+    /// 在位图中统计被置 **1** 的位的个数
     pub fn weight(&self) -> XwSz {
         unsafe {
             xwbmpop_weight(self.bmp.get() as _ , N)
         }
     }
 
+    /// 将位图中所有位置 **1**
     pub fn s1all(&self) {
         unsafe {
             xwbmpop_s1all(self.bmp.get() as _ , N);
         }
     }
 
+    /// 将位图中所有位清 **0**
     pub fn c0all(&self) {
         unsafe {
             xwbmpop_c0all(self.bmp.get() as _ , N);
         }
     }
 
+    /// 将位图中单个位置 **1**
     pub fn s1i(&self, n: XwSq) {
         unsafe {
             xwbmpop_s1i(self.bmp.get() as _ , n);
         }
     }
 
+    /// 将位图中掩码部分置1
     pub fn s1m(&self, msk: &Self) {
         unsafe {
             xwbmpop_s1m(self.bmp.get() as _ , msk.bmp.get() as _, N);
         }
     }
 
+    /// 将位图中单个位清0
     pub fn c0i(&self, n: XwSq) {
         unsafe {
             xwbmpop_c0i(self.bmp.get() as _ , n);
         }
     }
 
+    /// 将位图中掩码部分清0
     pub fn c0m(&self, msk: &Self) {
         unsafe {
             xwbmpop_c0m(self.bmp.get() as _ , msk.bmp.get() as _, N);
         }
     }
 
+    /// 将位图中单个位翻转
     pub fn x1i(&self, n: XwSq) {
         unsafe {
             xwbmpop_x1i(self.bmp.get() as _ , n);
         }
     }
 
+    /// 将位图中掩码部分翻转
     pub fn x1m(&self, msk: &Self) {
         unsafe {
             xwbmpop_x1m(self.bmp.get() as _ , msk.bmp.get() as _, N);
         }
     }
 
+    /// 测试位图中的单个位是否为1
     pub fn t1i(&self, n: XwSq) -> bool {
         unsafe {
             xwbmpop_t1i(self.bmp.get() as _ , n)
         }
     }
 
+    /// 测试位图中掩码部分是否全部为1
     pub fn t1ma(&self, msk: &Self) -> bool {
         unsafe {
             xwbmpop_t1ma(self.bmp.get() as _ , msk.bmp.get() as _, N)
         }
     }
 
+    /// 测试位图中掩码部分是否至少有一位为1
     pub fn t1mo(&self, msk: &Self) -> bool {
         unsafe {
             xwbmpop_t1mo(self.bmp.get() as _ , msk.bmp.get() as _, N)
         }
     }
 
+    /// 测试位图中掩码部分是否全部为1，如果是，就将掩码部分全部清0
     pub fn t1ma_then_c0m(&self, msk: &Self) -> bool {
         unsafe {
             xwbmpop_t1ma_then_c0m(self.bmp.get() as _ , msk.bmp.get() as _, N)
         }
     }
 
+    /// 测试位图中掩码部分是否至少有一位为1，如果是，就将掩码部分全部清0
     pub fn t1mo_then_c0m(&self, msk: &Self) -> bool {
         unsafe {
             xwbmpop_t1mo_then_c0m(self.bmp.get() as _ , msk.bmp.get() as _, N)
         }
     }
 
+    /// 测试位图中掩码部分是否全部为0，如果是，就将掩码部分全部置1
     pub fn t0ma_then_s1m(&self, msk: &Self) -> bool {
         unsafe {
             xwbmpop_t0ma_then_s1m(self.bmp.get() as _ , msk.bmp.get() as _, N)
         }
     }
 
+    /// 测试位图中掩码部分是否至少有一位为0，如果是，就将掩码部分全部置1
     pub fn t0mo_then_s1m(&self, msk: &Self) -> bool {
         unsafe {
             xwbmpop_t0mo_then_s1m(self.bmp.get() as _ , msk.bmp.get() as _, N)
         }
     }
 
+    /// 在位图中从最低位起查找第一个被置1的位
     pub fn ffs(&self) -> XwSsq {
         unsafe {
             xwbmpop_ffs(self.bmp.get() as _ , N)
         }
     }
 
+    /// 在位图中从最低位起查找第一个被清0的位
     pub fn ffz(&self) -> XwSsq {
         unsafe {
             xwbmpop_ffz(self.bmp.get() as _ , N)
         }
     }
 
+    /// 在位图中从最高位起查找第一个被置1的位
     pub fn fls(&self) -> XwSsq {
         unsafe {
             xwbmpop_fls(self.bmp.get() as _ , N)
         }
     }
 
+    /// 在位图中从最高位起查找第一个被清0的位
     pub fn flz(&self) -> XwSsq {
         unsafe {
             xwbmpop_flz(self.bmp.get() as _ , N)

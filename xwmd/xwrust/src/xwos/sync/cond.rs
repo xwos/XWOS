@@ -233,7 +233,12 @@ pub(crate) const XWOS_LKST_LOCKED: XwSq = 0;
 pub(crate) const XWOS_LKST_UNLOCKED: XwSq = 1;
 
 /// XWOS条件量对象占用的内存大小
-pub const SIZEOF_XWOS_COND: usize = 48;
+#[cfg(target_pointer_width = "32")]
+pub const SIZEOF_XWOS_COND: usize = 64;
+
+/// XWOS条件量对象占用的内存大小
+#[cfg(target_pointer_width = "64")]
+pub const SIZEOF_XWOS_COND: usize = 128;
 
 xwos_struct! {
     /// 用于构建条件量的内存数组类型
@@ -287,6 +292,7 @@ impl Cond {
     /// + 在heap中创建：
     ///
     /// ```rust
+    /// extern crate alloc;
     /// use alloc::sync::Arc;
     ///
     /// pub fn xwrust_example_cond() {

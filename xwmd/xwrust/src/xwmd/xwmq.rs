@@ -287,10 +287,20 @@ pub enum XwmqError {
 }
 
 /// 消息队列对象占用的内存大小
+#[cfg(target_pointer_width = "32")]
 pub const SIZEOF_XWMQ: usize = 200;
 
 /// 消息占用的内存大小
+#[cfg(target_pointer_width = "32")]
 pub const SIZEOF_XWMQ_MSG: usize = 16;
+
+/// 消息队列对象占用的内存大小
+#[cfg(target_pointer_width = "64")]
+pub const SIZEOF_XWMQ: usize = 400;
+
+/// 消息占用的内存大小
+#[cfg(target_pointer_width = "64")]
+pub const SIZEOF_XWMQ_MSG: usize = 32;
 
 xwos_struct! {
     /// 用于构建消息队列的内存数组类型

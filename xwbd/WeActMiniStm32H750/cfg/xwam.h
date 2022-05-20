@@ -21,6 +21,7 @@
 #ifndef __cfg_xwam_h__
 #define __cfg_xwam_h__
 
+#define XWAMCFG_example_xwobj                   1
 #define XWAMCFG_example_thd_new                 1
 #define XWAMCFG_example_thd_exit                1
 #define XWAMCFG_example_thd_sleep               1
