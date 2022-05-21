@@ -19,7 +19,6 @@
  */
 
 #include <xwos/osal/thd.h>
-#include <xwam/example/sync/flg/mif.h>
 #include <xwcd/ds/soc/gpio.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/mif.h>
@@ -85,16 +84,9 @@ xwer_t main_task(void * arg)
                 goto err_stm32cube_start;
         }
 
-        rc = example_flg_start();
-        if (rc < 0) {
-                goto err_example_flg_start;
-        }
-
         rc = led_task();
         return rc;
 
-err_example_flg_start:
-        BDL_BUG();
 err_stm32cube_start:
         BDL_BUG();
         return rc;

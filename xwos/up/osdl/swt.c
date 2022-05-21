@@ -14,6 +14,20 @@
 #include <xwos/up/osdl/swt.h>
 
 __xwup_code
+xwer_t xwosdl_swt_grab(struct xwosdl_swt * swt)
+{
+        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
+        return xwup_swt_grab(swt);
+}
+
+__xwup_code
+xwer_t xwosdl_swt_put(struct xwosdl_swt * swt)
+{
+        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
+        return xwup_swt_put(swt);
+}
+
+__xwup_code
 xwer_t xwosdl_swt_create(xwosdl_swt_d * swtd, const char * name, xwsq_t flag)
 {
         xwer_t rc;
@@ -37,11 +51,10 @@ xwer_t xwosdl_swt_acquire(struct xwosdl_swt * swt, xwsq_t tik)
         xwer_t rc;
 
         XWOS_UNUSED(tik);
-
         if (NULL == swt) {
                 rc = -ENILOBJD;
         } else {
-                rc = XWOK;
+                rc = xwup_swt_grab(swt);
         }
         return rc;
 }
@@ -52,11 +65,10 @@ xwer_t xwosdl_swt_release(struct xwosdl_swt * swt, xwsq_t tik)
         xwer_t rc;
 
         XWOS_UNUSED(tik);
-
         if (NULL == swt) {
                 rc = -ENILOBJD;
         } else {
-                rc = XWOK;
+                rc = xwup_swt_put(swt);
         }
         return rc;
 }

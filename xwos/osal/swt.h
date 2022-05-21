@@ -101,6 +101,10 @@ xwer_t xwos_swt_fini(struct xwos_swt * swt)
  * @details
  * 此函数主要用于管理 **静态对象** 的引用计数。
  * 若用于 **动态对象** ，需要确保对象的指针一定不是野指针。
+ *
+ *
+ * 增加引用计数会导致 @ref XWOS_SWT_FLAG_RESTART 的软件定时器无法停止，
+ * 停止操作 @ref xwos_swt_stop() 不会取消，而是被挂起，直到引用计数减少回来后生效。
  */
 static __xwos_inline_api
 xwer_t xwos_swt_grab(struct xwos_swt * swt)
@@ -165,6 +169,9 @@ xwer_t xwos_swt_delete(xwos_swt_d swtd)
  * @retval -EACCES: 对象标签检查失败
  * @note
  * + 上下文：任意
+ * @details
+ * 增加引用计数会导致 @ref XWOS_SWT_FLAG_RESTART 的软件定时器无法停止，
+ * 停止操作 @ref xwos_swt_stop() 不会取消，而是被挂起，直到引用计数减少回来后生效。
  */
 static __xwos_inline_api
 xwer_t xwos_swt_acquire(xwos_swt_d swtd)
@@ -222,7 +229,7 @@ xwos_swt_d xwos_swt_getd(struct xwos_swt * swt)
 /**
  * @brief XWOS API：启动软件定时器
  * @param[in] swt: 软件定时器的指针
- * @param[in] base: 软件定时器的初始时间
+ * @param[in] origin: 软件定时器的初始时间
  * @param[in] period: 软件定时器的周期时间
  * @param[in] callback: 软件定时器的回调函数
  * @param[in] arg: 回调函数的参数
@@ -231,10 +238,10 @@ xwos_swt_d xwos_swt_getd(struct xwos_swt * swt)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwer_t xwos_swt_start(struct xwos_swt * swt, xwtm_t base, xwtm_t period,
+xwer_t xwos_swt_start(struct xwos_swt * swt, xwtm_t origin, xwtm_t period,
                       xwos_swt_f callback, void * arg)
 {
-        return xwosdl_swt_start(&swt->osswt, base, period,
+        return xwosdl_swt_start(&swt->osswt, origin, period,
                                 (xwosdl_swt_f)callback, arg);
 }
 

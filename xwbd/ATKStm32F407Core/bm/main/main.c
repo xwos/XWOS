@@ -22,7 +22,6 @@
 #include <xwcd/ds/soc/gpio.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/mif.h>
-#include <xwam/example/sync/flg/mif.h>
 
 #define MAIN_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
 
@@ -85,16 +84,9 @@ xwer_t main_task(void * arg)
                 goto err_stm32cube_start;
         }
 
-        rc = example_flg_start();
-        if (rc < 0) {
-                goto err_example_flg_start;
-        }
-
         rc = led_task();
         return rc;
 
-err_example_flg_start:
-        BDL_BUG();
 err_stm32cube_start:
         BDL_BUG();
         return rc;

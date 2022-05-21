@@ -48,8 +48,7 @@ void xwmp_ttn_init(struct xwmp_ttn * ttn, xwptr_t entry, xwptr_t type)
         xwlib_bclst_init_node(&ttn->rbb);
         xwlib_rbtree_init_node(&ttn->rbn);
         ttn->wkup_xwtm = 0;
-        xwaop_store(xwsq_t, &ttn->wkuprs,
-                    xwaop_mo_release, XWMP_TTN_WKUPRS_UNKNOWN);
+        xwaop_write(xwsq_t, &ttn->wkuprs, XWMP_TTN_WKUPRS_UNKNOWN, NULL);
         ttn->cb = NULL;
         ttn->xwtt = NULL;
         ttn->entry.addr = entry & (~XWMP_TTN_TYPE_MASK);
@@ -113,8 +112,7 @@ xwer_t xwmp_tt_init(struct xwmp_tt * xwtt)
  * - 此函数只能在获得写锁xwtt->lock，且CPU中断被关闭时调用。
  */
 __xwmp_code
-xwer_t xwmp_tt_add_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn,
-                          xwreg_t cpuirq)
+xwer_t xwmp_tt_add_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn, xwreg_t cpuirq)
 {
         struct xwlib_rbtree_node ** pos;
         struct xwlib_rbtree_node * rbn;
@@ -281,8 +279,7 @@ xwer_t xwmp_tt_remove_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn)
                         xwmp_tt_rmrbn_locked(xwtt, ttn);
                 }
                 ttn->xwtt = NULL;
-                xwaop_store(xwsq_t, &ttn->wkuprs,
-                            xwaop_mo_release, XWMP_TTN_WKUPRS_INTR);
+                xwaop_write(xwsq_t, &ttn->wkuprs, XWMP_TTN_WKUPRS_INTR, NULL);
                 ttn->cb = NULL;
                 rc = XWOK;
         }
@@ -330,8 +327,7 @@ void xwmp_tt_bh(struct xwmp_tt * xwtt)
         xwlib_bclst_itr_prev_entry_del(ttn, &xwtt->timeout, struct xwmp_ttn, rbb) {
                 xwlib_bclst_del_init(&ttn->rbb);
                 cb = ttn->cb;
-                xwaop_store(xwsq_t, &ttn->wkuprs,
-                            xwaop_mo_release, XWMP_TTN_WKUPRS_TIMEDOUT);
+                xwaop_write(xwsq_t, &ttn->wkuprs, XWMP_TTN_WKUPRS_TIMEDOUT, NULL);
                 ttn->cb = NULL;
                 xwmp_sqlk_wr_unlock_cpuirq(&xwtt->lock);
                 cb(xwmp_ttn_get_entry(ttn));

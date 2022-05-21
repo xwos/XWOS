@@ -16,6 +16,7 @@
 #if defined(XWUPCFG_SKD_SWT_STDC_MM) && (1 == XWUPCFG_SKD_SWT_STDC_MM)
 #  include <stdlib.h>
 #endif
+#include <xwos/lib/xwaop.h>
 #include <xwos/up/skd.h>
 #include <xwos/up/tt.h>
 #include <xwos/up/swt.h>
@@ -27,12 +28,16 @@ static __xwup_code
 void xwup_swt_free(struct xwup_swt * swt);
 
 static __xwup_code
-void xwup_swt_activate(struct xwup_swt * swt,
-                       const char * name,
-                       xwsq_t flag);
+void xwup_swt_construct(struct xwup_swt * swt,
+                        const char * name,
+                        xwsq_t flag,
+                        xwup_swt_gc_f gc);
 
 static __xwup_code
-void xwup_swt_deactivate(struct xwup_swt * swt);
+void xwup_swt_destruct(struct xwup_swt * swt);
+
+static __xwup_code
+void xwup_swt_gc(struct xwup_swt * swt);
 
 static __xwup_code
 void xwup_swt_ttn_cb(void * entry);
@@ -86,11 +91,13 @@ void xwup_swt_free(struct xwup_swt * swt)
  * @param[in] swt: 软件定时器对象的指针
  * @param[in] name: 名字
  * @param[in] flag: 标志
+ * @param[in] gc: 垃圾回收函数
  */
 static __xwup_code
-void xwup_swt_activate(struct xwup_swt * swt,
-                       const char * name,
-                       xwsq_t flag)
+void xwup_swt_construct(struct xwup_swt * swt,
+                        const char * name,
+                        xwsq_t flag,
+                        xwup_swt_gc_f gc)
 {
         xwup_ttn_init(&swt->ttn, (xwptr_t)swt, XWUP_TTN_TYPE_SWT);
         swt->cb = NULL;
@@ -98,23 +105,54 @@ void xwup_swt_activate(struct xwup_swt * swt,
         swt->period = 0;
         swt->name = name;
         swt->flag = flag;
+        xwaop_write(xwsq_t, &swt->refcnt, 1, NULL);
+        swt->gc = gc;
 }
 
-/**
- * @brief 使得软件定时器对象无效
- * @param[in] swt: 软件定时器对象的指针
- * @param[in] name: 名字
- * @param[in] flag: 标志
- */
 static __xwup_code
-void xwup_swt_deactivate(struct xwup_swt * swt)
+void xwup_swt_destruct(struct xwup_swt * swt)
 {
-        xwup_swt_stop(swt);
-        swt->cb = NULL;
-        swt->arg = NULL;
         swt->period = 0;
         swt->name = NULL;
         swt->flag = 0;
+}
+
+static __xwup_code
+void xwup_swt_gc(struct xwup_swt * swt)
+{
+        xwup_swt_destruct(swt);
+        xwup_swt_free(swt);
+}
+
+__xwup_api
+xwer_t xwup_swt_grab(struct xwup_swt * swt)
+{
+        xwer_t rc;
+
+        rc = xwaop_tge_then_add(xwsq_t, &swt->refcnt, 1, 1, NULL, NULL);
+        if (__xwcc_unlikely(rc < 0)) {
+                rc = -EOBJDEAD;
+        }
+        return rc;
+}
+
+__xwup_api
+xwer_t xwup_swt_put(struct xwup_swt * swt)
+{
+        xwer_t rc;
+        xwsq_t nv;
+
+        rc = xwaop_tgt_then_sub(xwsq_t, &swt->refcnt,
+                                0, 1,
+                                &nv, NULL);
+        if (XWOK == rc) {
+                if (0 == nv) {
+                        swt->gc(swt);
+                }
+        } else {
+                rc = -EOBJDEAD;
+        }
+        return rc;
 }
 
 __xwup_api
@@ -123,7 +161,7 @@ xwer_t xwup_swt_init(struct xwup_swt * swt,
                      xwsq_t flag)
 {
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
-        xwup_swt_activate(swt, name, flag);
+        xwup_swt_construct(swt, name, flag, xwup_swt_destruct);
         return XWOK;
 }
 
@@ -132,8 +170,7 @@ xwer_t xwup_swt_fini(struct xwup_swt * swt)
 {
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
 
-        xwup_swt_deactivate(swt);
-        return XWOK;
+        return xwup_swt_put(swt);
 }
 
 __xwup_api
@@ -152,7 +189,7 @@ xwer_t xwup_swt_create(struct xwup_swt ** ptrbuf,
                 rc = ptr_err(swt);
                 goto err_swt_alloc;
         }
-        xwup_swt_activate(swt, name, flag);
+        xwup_swt_construct(swt, name, flag, xwup_swt_gc);
         *ptrbuf = swt;
         return XWOK;
 
@@ -166,9 +203,7 @@ xwer_t xwup_swt_delete(struct xwup_swt * swt)
         xwer_t rc;
 
         if (swt) {
-                xwup_swt_deactivate(swt);
-                xwup_swt_free(swt);
-                rc = XWOK;
+                rc = xwup_swt_put(swt);
         } else {
                 rc = -ENILOBJD;
         }
@@ -187,7 +222,6 @@ void xwup_swt_ttn_cb(void * entry)
         struct xwup_tt * xwtt;
         xwtm_t to;
         xwreg_t cpuirq;
-        xwer_t rc;
 
         swt = entry;
         xwskd = xwup_skd_get_lc();
@@ -196,19 +230,26 @@ void xwup_swt_ttn_cb(void * entry)
         if (XWUP_SWT_FLAG_RESTART & swt->flag) {
                 to = xwtm_add_safely(swt->ttn.wkup_xwtm, swt->period);
                 xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
-                swt->ttn.wkup_xwtm = to;
-                swt->ttn.wkuprs = XWUP_TTN_WKUPRS_UNKNOWN;
-                swt->ttn.cb = xwup_swt_ttn_cb;
-                rc = xwup_tt_add_locked(xwtt, &swt->ttn, cpuirq);
-                xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                if (__xwcc_unlikely(rc < 0)) {
+                if (swt->refcnt >= 3) {
+                        swt->ttn.wkup_xwtm = to;
+                        swt->ttn.wkuprs = XWUP_TTN_WKUPRS_UNKNOWN;
+                        swt->ttn.cb = xwup_swt_ttn_cb;
+                        xwup_swt_grab(swt);
+                        xwup_tt_add_locked(xwtt, &swt->ttn, cpuirq);
+                        xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                        xwup_swt_put(swt);
+                } else {
+                        xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                        xwup_swt_put(swt);
                 }
+        } else {
+                xwup_swt_put(swt);
         }
 }
 
 __xwup_api
 xwer_t xwup_swt_start(struct xwup_swt * swt,
-                      xwtm_t base, xwtm_t period,
+                      xwtm_t origin, xwtm_t period,
                       xwup_swt_f cb, void * arg)
 {
         struct xwup_skd * xwskd;
@@ -219,28 +260,46 @@ xwer_t xwup_swt_start(struct xwup_swt * swt,
 
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
         XWOS_VALIDATE((cb), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((xwtm_cmp(base, 0) > 0) && (xwtm_cmp(period, 0) > 0)),
+        XWOS_VALIDATE(((xwtm_cmp(origin, 0) > 0) && (xwtm_cmp(period, 0) > 0)),
                       "out-of-time", -EINVAL);
 
-        if (__xwcc_unlikely(swt->ttn.cb)) {
-                rc = -EALREADY;
-                goto err_already;
+        rc = xwup_swt_grab(swt);
+        if (rc < 0) {
+                goto err_swt_grab;
         }
         xwskd = xwup_skd_get_lc();
         xwtt = &xwskd->tt;
-        to = xwtm_add_safely(base, period);
+        to = xwtm_add_safely(origin, period);
         swt->cb = cb;
         swt->arg = arg;
         swt->period = period;
         xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
+        if (__xwcc_unlikely(swt->ttn.cb)) {
+                rc = -EALREADY;
+                goto err_already;
+        }
+        if (XWUP_SWT_FLAG_RESTART & swt->flag) {
+                xwup_swt_grab(swt);
+        }
         swt->ttn.wkup_xwtm = to;
         swt->ttn.wkuprs = XWUP_TTN_WKUPRS_UNKNOWN;
         swt->ttn.cb = xwup_swt_ttn_cb;
         swt->ttn.xwtt = xwtt;
         rc = xwup_tt_add_locked(xwtt, &swt->ttn, cpuirq);
+        if (rc < 0) {
+                goto err_add;
+        }
         xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        return XWOK;
 
+err_add:
+        if (XWUP_SWT_FLAG_RESTART & swt->flag) {
+                xwup_swt_put(swt);
+        }
 err_already:
+        xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        xwup_swt_put(swt);
+err_swt_grab:
         return rc;
 }
 
@@ -258,6 +317,12 @@ xwer_t xwup_swt_stop(struct xwup_swt * swt)
         xwtt = &xwskd->tt;
         xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         rc = xwup_tt_remove_locked(xwtt, &swt->ttn);
+        if (XWUP_SWT_FLAG_RESTART & swt->flag) {
+                xwup_swt_put(swt);
+        }
         xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        if (XWOK == rc) {
+                xwup_swt_put(swt);
+        }
         return rc;
 }
