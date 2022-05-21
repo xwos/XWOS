@@ -71,10 +71,10 @@ xwsq_t xwosdl_swt_gettik(struct xwosdl_swt * swt)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_swt_start(struct xwosdl_swt * swt, xwtm_t base, xwtm_t period,
+xwer_t xwosdl_swt_start(struct xwosdl_swt * swt, xwtm_t origin, xwtm_t period,
                         xwosdl_swt_f callback, void * arg)
 {
-        return xwmp_swt_start(swt, base, period, (xwmp_swt_f)callback, arg);
+        return xwmp_swt_start(swt, origin, period, (xwmp_swt_f)callback, arg);
 }
 
 static __xwcc_inline

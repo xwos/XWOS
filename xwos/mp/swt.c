@@ -232,7 +232,6 @@ xwer_t xwmp_swt_fini(struct xwmp_swt * swt)
 {
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
 
-        xwmp_swt_stop(swt);
         return xwmp_swt_put(swt);
 }
 
@@ -266,7 +265,6 @@ err_swt_alloc:
 __xwmp_api
 xwer_t xwmp_swt_delete(struct xwmp_swt * swt, xwsq_t tik)
 {
-        xwmp_swt_stop(swt);
         return xwmp_swt_release(swt, tik);
 }
 
@@ -303,29 +301,54 @@ void xwmp_swt_ttn_cb(void * entry)
 {
         struct xwmp_swt * swt;
         struct xwmp_tt * xwtt;
+        xwsq_t refcnt;
         xwtm_t to;
         xwreg_t cpuirq;
-        xwer_t rc;
 
         swt = entry;
         xwtt = &swt->xwskd->tt;
         swt->cb(swt, swt->arg);
         if (XWMP_SWT_FLAG_RESTART & swt->flag) {
                 to = xwtm_add_safely(swt->ttn.wkup_xwtm, swt->period);
+                /* 若此时，其他CPU调用 `xwmp_swt_stop()` ，会失败，
+                   `xwmp_swt_stop()` 只会减少一次引用计数。
+                   引用计数的值一定小于3，本地CPU可由此获知需要停止重启软件定时器。*/
                 xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
-                swt->ttn.wkup_xwtm = to;
-                xwaop_store(xwsq_t, &swt->ttn.wkuprs,
-                            xwaop_mo_release, XWMP_TTN_WKUPRS_UNKNOWN);
-                swt->ttn.cb = xwmp_swt_ttn_cb;
-                rc = xwmp_tt_add_locked(xwtt, &swt->ttn, cpuirq);
-                xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                XWOS_BUG_ON(rc < 0);
+                refcnt = xwos_object_get_refcnt(&swt->xwobj);
+                if (refcnt >= 3) {
+                        swt->ttn.wkup_xwtm = to;
+                        xwaop_write(xwsq_t, &swt->ttn.wkuprs,
+                                    XWMP_TTN_WKUPRS_UNKNOWN, NULL);
+                        swt->ttn.cb = xwmp_swt_ttn_cb;
+                        /* 在本地CPU执行 `xwmp_tt_add_locked()` 的过程中，其他CPU可能会执行
+                           `xwmp_swt_stop() + xwmp_swt_delete()` ，导致 `swt` 成为野指针。
+                           因此，需要在 `xwmp_tt_add_locked()` 之前增加对 `swt` 的引用。
+                           + 如果[本地CPU] `xwmp_tt_add_locked()` 在
+                             [其他CPU] `xwmp_swt_stop()` 之后执行成功，软件定时器将在下一次
+                             进入回调函数后彻底停止。
+                           + 如果[本地CPU] `xwmp_tt_add_locked()` 执行失败，
+                             软件定时器立即停止。
+                           + 如果[本地CPU] `xwmp_tt_add_locked()` 执行成功之后，
+                             [其他CPU] `xwmp_swt_stop()` 也执行成功，
+                             软件定时器不会进入下一次的回调函数。 */
+                        xwmp_swt_grab(swt);
+                        xwmp_tt_add_locked(xwtt, &swt->ttn, cpuirq);
+                        xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                        xwmp_swt_put(swt);
+                } else {
+                        xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+                        xwmp_swt_put(swt);
+                }
+        } else {
+                /* 若此时，其他CPU调用 `xwmp_swt_stop()` ，会失败，
+                   `xwmp_swt_stop()` 中减少引用计数的代码不会执行。 */
+                xwmp_swt_put(swt);
         }
 }
 
 __xwmp_api
 xwer_t xwmp_swt_start(struct xwmp_swt * swt,
-                      xwtm_t base, xwtm_t period,
+                      xwtm_t origin, xwtm_t period,
                       xwmp_swt_f cb, void * arg)
 {
         struct xwmp_tt * xwtt;
@@ -335,28 +358,46 @@ xwer_t xwmp_swt_start(struct xwmp_swt * swt,
 
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
         XWOS_VALIDATE((cb), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((xwtm_cmp(base, 0) > 0) && (xwtm_cmp(period, 0) > 0)),
+        XWOS_VALIDATE(((xwtm_cmp(origin, 0) > 0) && (xwtm_cmp(period, 0) > 0)),
                       "out-of-time", -EINVAL);
 
+        rc = xwmp_swt_grab(swt);
+        if (rc < 0) {
+                goto err_swt_grab;
+        }
         xwtt = &swt->xwskd->tt;
-        to = xwtm_add_safely(base, period);
+        to = xwtm_add_safely(origin, period);
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         if (__xwcc_unlikely(NULL != swt->ttn.cb)) {
                 rc = -EALREADY;
                 goto err_already;
         }
+        if (XWMP_SWT_FLAG_RESTART & swt->flag) {
+                /* 多增加一次引用计数作为继续重启定时器的依据。 */
+                xwmp_swt_grab(swt);
+        }
         swt->cb = cb;
         swt->arg = arg;
         swt->period = period;
         swt->ttn.wkup_xwtm = to;
-        xwaop_store(xwsq_t, &swt->ttn.wkuprs,
-                    xwaop_mo_release, XWMP_TTN_WKUPRS_UNKNOWN);
+        xwaop_write(xwsq_t, &swt->ttn.wkuprs, XWMP_TTN_WKUPRS_UNKNOWN, NULL);
         swt->ttn.xwtt = xwtt;
         swt->ttn.cb = xwmp_swt_ttn_cb;
         rc = xwmp_tt_add_locked(xwtt, &swt->ttn, cpuirq);
+        if (rc < 0) {
+                goto err_swt_add;
+        }
+        xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        return XWOK;
 
+err_swt_add:
+        if (XWMP_SWT_FLAG_RESTART & swt->flag) {
+                xwmp_swt_put(swt);
+        }
 err_already:
         xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        xwmp_swt_put(swt);
+err_swt_grab:
         return rc;
 }
 
@@ -368,9 +409,18 @@ xwer_t xwmp_swt_stop(struct xwmp_swt * swt)
         struct xwmp_tt * xwtt;
 
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
+
         xwtt = &swt->xwskd->tt;
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         rc = xwmp_tt_remove_locked(xwtt, &swt->ttn);
+        if (XWMP_SWT_FLAG_RESTART & swt->flag) {
+                xwmp_swt_put(swt);
+        }
         xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
+        if (XWOK == rc) {
+                /* 从时间树上删除成功，回调函数不可能再被执行。
+                   回调函数中减少引用计数的代码也不会执行 */
+                xwmp_swt_put(swt);
+        }
         return rc;
 }

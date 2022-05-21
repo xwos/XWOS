@@ -68,7 +68,7 @@ xwer_t xwmp_swt_grab(struct xwmp_swt * swt);
 xwer_t xwmp_swt_put(struct xwmp_swt * swt);
 
 xwer_t xwmp_swt_start(struct xwmp_swt * swt,
-                      xwtm_t base, xwtm_t period,
+                      xwtm_t origin, xwtm_t period,
                       xwmp_swt_f cb, void * arg);
 xwer_t xwmp_swt_stop(struct xwmp_swt * swt);
 

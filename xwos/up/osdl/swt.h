@@ -60,27 +60,15 @@ xwsq_t xwosdl_swt_gettik(struct xwosdl_swt * swt)
         return 0;
 }
 
-static __xwcc_inline
-xwer_t xwosdl_swt_grab(struct xwosdl_swt * swt)
-{
-        XWOS_UNUSED(swt);
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
-        return XWOK;
-}
+xwer_t xwosdl_swt_grab(struct xwosdl_swt * swt);
+
+xwer_t xwosdl_swt_put(struct xwosdl_swt * swt);
 
 static __xwcc_inline
-xwer_t xwosdl_swt_put(struct xwosdl_swt * swt)
-{
-        XWOS_UNUSED(swt);
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
-        return XWOK;
-}
-
-static __xwcc_inline
-xwer_t xwosdl_swt_start(struct xwosdl_swt * swt, xwtm_t base, xwtm_t period,
+xwer_t xwosdl_swt_start(struct xwosdl_swt * swt, xwtm_t origin, xwtm_t period,
                         xwosdl_swt_f callback, void * arg)
 {
-        return xwup_swt_start(swt, base, period, (xwup_swt_f)callback, arg);
+        return xwup_swt_start(swt, origin, period, (xwup_swt_f)callback, arg);
 }
 
 static __xwcc_inline

@@ -35,6 +35,11 @@ enum xwup_swt_flag_em {
 typedef void (* xwup_swt_f)(struct xwup_swt *, void *);
 
 /**
+ * @brief 垃圾回收函数
+ */
+typedef void (* xwup_swt_gc_f)(struct xwup_swt *);
+
+/**
  * @brief 软件定时器控制块
  */
 struct xwup_swt {
@@ -44,6 +49,8 @@ struct xwup_swt {
         xwup_swt_f cb; /**< 回调函数 */
         void * arg; /**< 回调函数参数 */
         xwtm_t period; /**< 周期 */
+        atomic_xwsq_t refcnt; /**< 引用计数 */
+        xwup_swt_gc_f gc; /**< 垃圾回收函数 */
 };
 
 xwer_t xwup_swt_init(struct xwup_swt * swt,
@@ -54,8 +61,10 @@ xwer_t xwup_swt_create(struct xwup_swt ** ptrbuf,
                        const char * name,
                        xwsq_t flag);
 xwer_t xwup_swt_delete(struct xwup_swt * swt);
+xwer_t xwup_swt_grab(struct xwup_swt * swt);
+xwer_t xwup_swt_put(struct xwup_swt * swt);
 xwer_t xwup_swt_start(struct xwup_swt * swt,
-                      xwtm_t base, xwtm_t period,
+                      xwtm_t origin, xwtm_t period,
                       xwup_swt_f cb, void * arg);
 xwer_t xwup_swt_stop(struct xwup_swt * swt);
 
