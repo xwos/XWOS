@@ -21,29 +21,29 @@ pub fn xwrust_example_sem() {
     sema.init(0, XwSsq::MAX);
     let sema_c = sema.clone();
 
-    println!("[main] thd: {:?}", cthd::i());
+    println!("[主线程] thd: {:?}", cthd::i());
     match thd::Builder::new()
         .name("child".into())
         .spawn(move |_| { // 子线程闭包
-            println!("[child] thd: {:?}", cthd::i());
+            println!("[子线程] thd: {:?}", cthd::i());
             cthd::sleep(xwtm::ms(500));
-            println!("[child]<{} ms> 发布信号量。", xwtm::nowtc());
+            println!("[子线程]<{} ms> 发布信号量。", xwtm::nowtc());
             sema_c.post();
             "OK"
         }) {
             Ok(_) => {},
             Err(e) => {
-                println!("[main] 创建子线程失败：{:?}。", e);
+                println!("[主线程] 创建子线程失败：{:?}。", e);
                 return;
             },
         };
     let rc = sema.wait();
     match rc {
         SemError::Ok => {
-            println!("[main] 获取信号量。");
+            println!("[主线程] 获取信号量。");
         },
         _ => {
-            println!("[main] 等待信号量失败：{:?}。", rc);
+            println!("[主线程] 等待信号量失败：{:?}。", rc);
         },
     };
 }

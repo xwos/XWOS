@@ -252,29 +252,29 @@ pub const SIZEOF_XWOS_MTX: usize = 96;
 #[cfg(target_pointer_width = "64")]
 pub const SIZEOF_XWOS_MTX: usize = 192;
 
-xwos_struct! {
-    /// 用于构建互斥锁的内存数组类型
-    pub struct XwosMtx {
-        #[doc(hidden)]
-        obj: [u8; SIZEOF_XWOS_MTX],
-    }
+/// 用于构建互斥锁的内存数组类型
+#[repr(C)]
+#[cfg_attr(target_pointer_width = "32", repr(align(8)))]
+#[cfg_attr(target_pointer_width = "64", repr(align(16)))]
+pub(crate) struct XwosMtx {
+    pub(crate) obj: [u8; SIZEOF_XWOS_MTX],
 }
 
 /// 用于构建互斥锁的内存数组常量
 ///
 /// 此常量的作用是告诉编译器互斥锁对象需要多大的内存。
-pub const XWOS_MTX_INITIALIZER: XwosMtx = XwosMtx {
+pub(crate) const XWOS_MTX_INITIALIZER: XwosMtx = XwosMtx {
     obj: [0; SIZEOF_XWOS_MTX],
 };
 
 /// 互斥锁对象结构体
 pub struct Mutex<T: ?Sized> {
     /// 用于初始化XWOS互斥锁对象的内存空间
-    mtx: UnsafeCell<XwosMtx>,
+    pub(crate) mtx: UnsafeCell<XwosMtx>,
     /// 互斥锁对象的标签
-    tik: UnsafeCell<XwSq>,
+    pub(crate) tik: UnsafeCell<XwSq>,
     /// 用户数据
-    pub data: UnsafeCell<T>,
+    pub(crate) data: UnsafeCell<T>,
 }
 
 impl<T> Mutex<T> {

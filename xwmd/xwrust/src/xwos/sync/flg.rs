@@ -235,12 +235,9 @@ pub(crate) struct XwosFlg<const N: XwSz>
 where
     [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
 {
-    #[doc(hidden)]
-    obj: [u8; SIZEOF_XWOS_FLG],
-    #[doc(hidden)]
-    bmp: [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
-    #[doc(hidden)]
-    msk: [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
+    pub(crate) obj: [u8; SIZEOF_XWOS_FLG],
+    pub(crate) bmp: [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
+    pub(crate) msk: [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
 }
 
 /// 事件标志对象结构体

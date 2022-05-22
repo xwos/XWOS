@@ -149,12 +149,9 @@ pub(crate) struct XwosBr<const N: XwSz>
 where
     [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
 {
-    #[doc(hidden)]
-    obj: [u8; SIZEOF_XWOS_BR],
-    #[doc(hidden)]
-    bmp: [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
-    #[doc(hidden)]
-    msk: [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
+    pub(crate) obj: [u8; SIZEOF_XWOS_BR],
+    pub(crate) bmp: [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
+    pub(crate) msk: [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
 }
 
 /// 线程栅栏对象结构体
