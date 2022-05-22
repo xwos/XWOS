@@ -75,8 +75,7 @@ xwer_t xwos_example_cond(void)
         }
 
         /* 初始化定时器 */
-        rc = xwos_swt_init(&conddemo_swt, "conddemo_swt",
-                           XWOS_SWT_FLAG_RESTART);
+        rc = xwos_swt_init(&conddemo_swt, XWOS_SWT_FLAG_RESTART);
         if (rc < 0) {
                 goto err_swt_init;
         }

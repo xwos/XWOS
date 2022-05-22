@@ -49,8 +49,7 @@ xwer_t xwos_example_cpuirq(void)
         xwer_t rc;
 
         /* 初始化定时器 */
-        rc = xwos_swt_init(&cpuirqdemo_swt, "cpuirqdemo_swt",
-                           XWOS_SWT_FLAG_RESTART);
+        rc = xwos_swt_init(&cpuirqdemo_swt, XWOS_SWT_FLAG_RESTART);
         if (rc < 0) {
                 goto err_swt_init;
         }

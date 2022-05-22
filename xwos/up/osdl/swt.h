@@ -29,9 +29,9 @@ typedef struct {
 #define XWOSDL_SWT_NILD ((xwosdl_swt_d){NULL, 0,})
 
 static __xwcc_inline
-xwer_t xwosdl_swt_init(struct xwosdl_swt * swt, const char * name, xwsq_t flag)
+xwer_t xwosdl_swt_init(struct xwosdl_swt * swt, xwsq_t flag)
 {
-        return xwup_swt_init(swt, name, flag);
+        return xwup_swt_init(swt, flag);
 }
 
 static __xwcc_inline
@@ -40,7 +40,7 @@ xwer_t xwosdl_swt_fini(struct xwosdl_swt * swt)
         return xwup_swt_fini(swt);
 }
 
-xwer_t xwosdl_swt_create(xwosdl_swt_d * swtd, const char * name, xwsq_t flag);
+xwer_t xwosdl_swt_create(xwosdl_swt_d * swtd, xwsq_t flag);
 
 static __xwcc_inline
 xwer_t xwosdl_swt_delete(struct xwosdl_swt * swt, xwsq_t tik)

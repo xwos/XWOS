@@ -40,7 +40,6 @@ typedef void (* xwmp_swt_f)(struct xwmp_swt *, void *);
  */
 struct xwmp_swt {
         struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
-        const char * name; /**< 名字 */
         struct xwmp_skd * xwskd; /**< 调度器 */
         xwsq_t flag; /**< 标志 */
         struct xwmp_ttn ttn; /**< 继承：时间树节点，被锁tt->lock保护 */
@@ -53,13 +52,9 @@ struct xwmp_swt {
 xwer_t xwmp_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
 
-xwer_t xwmp_swt_init(struct xwmp_swt * swt,
-                     const char * name,
-                     xwsq_t flag);
+xwer_t xwmp_swt_init(struct xwmp_swt * swt, xwsq_t flag);
 xwer_t xwmp_swt_fini(struct xwmp_swt * swt);
-xwer_t xwmp_swt_create(struct xwmp_swt ** swtbuf,
-                       const char * name,
-                       xwsq_t flag);
+xwer_t xwmp_swt_create(struct xwmp_swt ** swtbuf, xwsq_t flag);
 xwer_t xwmp_swt_delete(struct xwmp_swt * swt, xwsq_t tik);
 
 xwer_t xwmp_swt_acquire(struct xwmp_swt * swt, xwsq_t tik);

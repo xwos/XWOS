@@ -60,7 +60,6 @@ typedef struct {
 /**
  * @brief XWOS API：静态方式初始化软件定时器
  * @param[in] swt: 软件定时器的指针
- * @param[in] name: 软件定时器的名字
  * @param[in] flag: 软件定时器的标志
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -69,9 +68,9 @@ typedef struct {
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwer_t xwos_swt_init(struct xwos_swt * swt, const char * name, xwsq_t flag)
+xwer_t xwos_swt_init(struct xwos_swt * swt, xwsq_t flag)
 {
-        return xwosdl_swt_init(&swt->osswt, name, flag);
+        return xwosdl_swt_init(&swt->osswt, flag);
 }
 
 /**
@@ -134,16 +133,15 @@ xwer_t xwos_swt_put(struct xwos_swt * swt)
 /**
  * @brief XWOS API：动态方式创建软件定时器
  * @param[out] swtd: 指向缓冲区的指针，通过此缓冲区返回软件定时器对象描述符
- * @param[in] name: 软件定时器的名字
  * @param[in] flag: 软件定时器的标志
  * @return 错误码
  * @note
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwer_t xwos_swt_create(xwos_swt_d * swtd, const char * name, xwsq_t flag)
+xwer_t xwos_swt_create(xwos_swt_d * swtd, xwsq_t flag)
 {
-        return xwosdl_swt_create((xwosdl_swt_d *)swtd, name, flag);
+        return xwosdl_swt_create((xwosdl_swt_d *)swtd, flag);
 }
 
 /**
