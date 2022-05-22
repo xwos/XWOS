@@ -302,30 +302,29 @@ pub const SIZEOF_XWMQ: usize = 400;
 #[cfg(target_pointer_width = "64")]
 pub const SIZEOF_XWMQ_MSG: usize = 32;
 
-xwos_struct! {
-    /// 用于构建消息队列的内存数组类型
-    pub struct XwmdXwmq {
-        #[doc(hidden)]
-        obj: [u8; SIZEOF_XWMQ],
-    }
+/// 用于构建消息队列的内存数组类型
+#[repr(C)]
+#[cfg_attr(target_pointer_width = "32", repr(align(8)))]
+#[cfg_attr(target_pointer_width = "64", repr(align(16)))]
+pub(crate) struct XwmdXwmq {
+    pub(crate) obj: [u8; SIZEOF_XWMQ],
 }
 
 /// 用于构建消息槽的内存数组类型
 #[repr(C)]
 #[cfg_attr(target_pointer_width = "32", repr(align(8)))]
 #[cfg_attr(target_pointer_width = "64", repr(align(16)))]
-pub struct XwmdXwmqMsg<const N: XwSz>
+pub(crate) struct XwmdXwmqMsg<const N: XwSz>
 where
     [u8; N * SIZEOF_XWMQ_MSG]: Sized
 {
-    #[doc(hidden)]
-    obj: [u8; N * SIZEOF_XWMQ_MSG],
+    pub(crate) obj: [u8; N * SIZEOF_XWMQ_MSG],
 }
 
 /// 用于构建消息队列的内存数组常量
 ///
 /// 此常量的作用是告诉编译器消息队列对象需要多大的内存。
-pub const XWMQ_INITIALIZER: XwmdXwmq = XwmdXwmq {
+pub(crate) const XWMQ_INITIALIZER: XwmdXwmq = XwmdXwmq {
     obj: [0; SIZEOF_XWMQ],
 };
 

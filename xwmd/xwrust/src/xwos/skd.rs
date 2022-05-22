@@ -4,11 +4,17 @@
 
 use crate::types::*;
 
+/// 上下文枚举
 pub enum Context {
-    InitExit,
+    /// 启动
+    Boot,
+    /// 线程
     Thd,
+    /// 中断（中断号）
     Isr(XwIrq),
+    /// 中断底半部
     Bh,
+    /// 空闲任务
     Idle,
 }
 
@@ -35,7 +41,7 @@ pub fn context() -> Context
 
     unsafe { xwrustffi_skd_get_context_lc(&mut ctx, &mut irq); }
     match ctx {
-        0 => Context::InitExit,
+        0 => Context::Boot,
         1 => Context::Thd,
         2 => Context::Isr(irq),
         3 => Context::Bh,

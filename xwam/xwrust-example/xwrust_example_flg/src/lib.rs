@@ -22,7 +22,7 @@ pub fn xwrust_example_flg() {
     let cflg = flg.clone();
     let _ = thd::spawn(move |_| { // 子线程闭包
         cthd::sleep(xwtm::ms(200));
-        println!("[child]<{} ms> 设置事件", xwtm::nowtc());
+        println!("[子线程]<{} ms> 设置事件", xwtm::nowtc());
         cflg.s1i(0);
         "OK"
     });
@@ -33,10 +33,10 @@ pub fn xwrust_example_flg() {
     let res = flg.wait(Trigger::SetAny, Action::Consumption, &mut tg, &msk);
     match res {
         FlgError::Ok => {
-            println!("[main]<{} ms> 事件发生 {:?}", xwtm::nowtc(), tg);
+            println!("[主线程]<{} ms> 事件发生 {:?}", xwtm::nowtc(), tg);
         },
         _ => {
-            println!("[main]<{} ms> 等待事件失败 {:?}", xwtm::nowtc(), res);
+            println!("[主线程]<{} ms> 等待事件失败 {:?}", xwtm::nowtc(), res);
         },
     };
 

@@ -34,7 +34,7 @@ pub fn xwrust_example_sel() {
             s
         },
         Err(e) => {
-            println!("[child] sel0 绑定失败：{:?}", e);
+            println!("[子线程] sel0 绑定失败：{:?}", e);
             return;
         }
     };
@@ -48,7 +48,7 @@ pub fn xwrust_example_sel() {
             s
         },
         Err(e) => {
-            println!("[child] sem1 绑定失败：{:?}", e);
+            println!("[子线程] sem1 绑定失败：{:?}", e);
             return;
         }
     };
@@ -62,7 +62,7 @@ pub fn xwrust_example_sel() {
             s
         },
         Err(e) => {
-            println!("[child] cond2 绑定失败：{:?}", e);
+            println!("[子线程] cond2 绑定失败：{:?}", e);
             return;
         }
     };
@@ -76,7 +76,7 @@ pub fn xwrust_example_sel() {
             s
         },
         Err(e) => {
-            println!("[child] br3 绑定失败：{:?}", e);
+            println!("[子线程] br3 绑定失败：{:?}", e);
             return;
         }
     };
@@ -90,7 +90,7 @@ pub fn xwrust_example_sel() {
             s
         },
         Err(e) => {
-            println!("[child] flg4 绑定失败：{:?}", e);
+            println!("[子线程] flg4 绑定失败：{:?}", e);
             return;
         }
     };
@@ -99,11 +99,11 @@ pub fn xwrust_example_sel() {
     let _ = thd::spawn(move |_| { // 子线程闭包
         // 信号量1
         cthd::sleep(xwtm::ms(200));
-        println!("[child] sem1 发布");
+        println!("[子线程] sem1 发布");
         csem1.post();
         cthd::sleep(xwtm::ms(200));
         // 条件量2
-        println!("[child] cond2 广播");
+        println!("[子线程] cond2 广播");
         ccond2.broadcast();
         // 线程栅栏3
         for idx in 0..2 {
@@ -114,7 +114,7 @@ pub fn xwrust_example_sel() {
             });
         }
         cthd::sleep(xwtm::ms(200));
-        println!("[child] flg4.s1i(0)");
+        println!("[子线程] flg4.s1i(0)");
         cflg4.s1i(0);
         "OK"
     });
@@ -126,20 +126,20 @@ pub fn xwrust_example_sel() {
         match res {
             Ok(t) => {
                 if sel0sel.selected(&t) {
-                    println!("[main]<{} ms> 获取 sel0", xwtm::nowtc());
+                    println!("[主线程]<{} ms> 获取 sel0", xwtm::nowtc());
                     let msk0 = Bmp::<32>::new();
                     msk0.s1all();
                     match sel0.tryselect(&msk0) {
                         Ok(t0) => {
                             if sem1sel.selected(&t0) {
                                 sem1.trywait();
-                                println!("[main]<{} ms> 获取 sem1", xwtm::nowtc());
+                                println!("[主线程]<{} ms> 获取 sem1", xwtm::nowtc());
                             }
                             if cond2sel.selected(&t0) {
-                                println!("[main]<{} ms> 获取 cond2", xwtm::nowtc());
+                                println!("[主线程]<{} ms> 获取 cond2", xwtm::nowtc());
                             }
                             if br3sel.selected(&t0) {
-                                println!("[main]<{} ms> 获取 br3", xwtm::nowtc());
+                                println!("[主线程]<{} ms> 获取 br3", xwtm::nowtc());
                             }
                             if flg4sel.selected(&t0) {
                                 let mut tg = Bmp::<8>::new();
@@ -148,17 +148,17 @@ pub fn xwrust_example_sel() {
                                 let _ = flg4.trywait(Trigger::SetAny,
                                                      Action::Consumption,
                                                      &mut tg, &msk);
-                                println!("[main]<{} ms> 事件 {:?}", xwtm::nowtc(), tg);
+                                println!("[主线程]<{} ms> 事件 {:?}", xwtm::nowtc(), tg);
                             }
                         },
                         Err(e) => {
-                            println!("[main]<{} ms> 测试sel0失败 ... {:?}", xwtm::nowtc(), e);
+                            println!("[主线程]<{} ms> 测试sel0失败 ... {:?}", xwtm::nowtc(), e);
                         },
                     }
                 }
             },
             Err(e) => {
-                println!("[main]<{} ms> 等待sel失败 ... {:?}", xwtm::nowtc(), e);
+                println!("[主线程]<{} ms> 等待sel失败 ... {:?}", xwtm::nowtc(), e);
                 break;
             },
         }

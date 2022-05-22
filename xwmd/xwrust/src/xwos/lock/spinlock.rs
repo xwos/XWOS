@@ -155,18 +155,18 @@ pub const SIZEOF_XWOS_SPLK: usize = 8;
 #[cfg(target_pointer_width = "64")]
 pub const SIZEOF_XWOS_SPLK: usize = 8;
 
-xwos_struct! {
-    /// 用于构建自旋锁的内存数组类型
-    pub struct XwosSplk {
-        #[doc(hidden)]
-        obj: [u8; SIZEOF_XWOS_SPLK],
-    }
+/// 用于构建自旋锁的内存数组类型
+#[repr(C)]
+#[cfg_attr(target_pointer_width = "32", repr(align(8)))]
+#[cfg_attr(target_pointer_width = "64", repr(align(16)))]
+pub(crate) struct XwosSplk {
+    pub(crate) obj: [u8; SIZEOF_XWOS_SPLK],
 }
 
 /// 用于构建自旋锁的内存数组常量
 ///
 /// 此常量的作用是告诉编译器自旋锁需要多大的内存。
-pub const XWOS_SPLK_INITIALIZER: XwosSplk = XwosSplk {
+pub(crate) const XWOS_SPLK_INITIALIZER: XwosSplk = XwosSplk {
     obj: [0; SIZEOF_XWOS_SPLK],
 };
 
@@ -174,11 +174,11 @@ pub const XWOS_SPLK_INITIALIZER: XwosSplk = XwosSplk {
 /// 自旋锁结构体
 pub struct Spinlock<T: ?Sized> {
     /// 用于初始化XWOS自旋锁的内存空间
-    splk: UnsafeCell<XwosSplk>,
+    pub(crate) splk: UnsafeCell<XwosSplk>,
     /// 初始化完成标记
-    init: AtomicBool,
+    pub(crate) init: AtomicBool,
     /// 上锁方式
-    mode: UnsafeCell<SpinlockMode>,
+    pub(crate) mode: UnsafeCell<SpinlockMode>,
     /// 用户数据
     pub data: UnsafeCell<T>,
 }

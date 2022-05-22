@@ -22,19 +22,19 @@ pub fn xwrust_example_xwmq() {
     let (tx, rx) = MQ.init();
     let tx1 = tx.clone();
 
-    println!("[main] thd: {:?}", cthd::i());
+    println!("[主线程] thd: {:?}", cthd::i());
     match thd::Builder::new()
         .name("child0".into())
         .spawn(move |_| { // 子线程闭包
             cthd::sleep(xwtm::ms(200));
-            println!("[child0] thd: {:?}", cthd::i());
-            println!("[child0] 发送消息");
+            println!("[子线程0] thd: {:?}", cthd::i());
+            println!("[子线程0] 发送消息");
             tx.eq("child0 message".to_string());
             "OK"
         }) {
             Ok(_) => {},
             Err(e) => {
-                println!("[main] 创建子线程失败：{:?}。", e);
+                println!("[主线程] 创建子线程失败：{:?}。", e);
                 return;
             },
         };
@@ -43,14 +43,14 @@ pub fn xwrust_example_xwmq() {
         .name("child1".into())
         .spawn(move |_| { // 子线程闭包
             cthd::sleep(xwtm::ms(500));
-            println!("[child1] thd: {:?}", cthd::i());
-            println!("[child1] 发送消息");
+            println!("[子线程1] thd: {:?}", cthd::i());
+            println!("[子线程1] 发送消息");
             tx1.eq("child1 Message".to_string());
             "OK"
         }) {
             Ok(_) => {},
             Err(e) => {
-                println!("[main] 创建子线程失败：{:?}。", e);
+                println!("[主线程] 创建子线程失败：{:?}。", e);
                 return;
             },
         };
@@ -59,10 +59,10 @@ pub fn xwrust_example_xwmq() {
         let rc = rx.dq_to(xwtm::ft(xwtm::s(1)));
         match rc {
             Ok(d) => {
-                println!("[main] 收到消息：{:?}", d);
+                println!("[主线程] 收到消息：{:?}", d);
             },
             Err(e) => {
-                println!("[main] 等待消息失败：{:?}。", e);
+                println!("[主线程] 等待消息失败：{:?}。", e);
                 break;
             },
         };

@@ -213,40 +213,6 @@ use cstr_core::CStr;
 
 use crate::types::*;
 
-/// XWOS线程的属性
-///
-/// 完全等价于C语言头文件 `xwos/osal/thd.h` 中的 `struct xwos_thd_attr`
-#[repr(C)]
-pub struct ThdAttr {
-    /// 线程的名字
-    name: *const cty::c_char,
-    /// 线程栈的首地址
-    stack: *mut XwStk,
-    /// 线程栈的大小，以字节(byte)为单位
-    stack_size: XwSz,
-    /// 栈内存警戒线位置
-    stack_guard_size: XwSz,
-    /// 优先级
-    priority: XwPr,
-    /// 是否为分离态
-    detached: bool,
-    /// 是否为特权线程
-    privileged: bool,
-}
-
-/// XWOS的线程对象描述符
-///
-/// 用于调用XWOS-CAPI
-pub struct ThdD {
-    /// XWOS线程对象的指针
-    pub(crate) thd: *mut c_void,
-    /// XWOS线程对象的标签
-    pub(crate) tik: XwSq,
-}
-
-unsafe impl Send for ThdD {}
-unsafe impl Sync for ThdD {}
-
 extern "C" {
     fn xwrustffi_thd_stack_size_default() -> XwSz;
     fn xwrustffi_thd_attr_init(attr: *mut ThdAttr);
@@ -262,6 +228,40 @@ extern "C" {
     fn xwrustffi_thd_detach(thd: *mut c_void, tik: XwSq) -> XwEr;
     fn xwrustffi_thd_migrate(thd: *mut c_void, tik: XwSq, cpuid: XwId) -> XwEr;
 }
+
+/// XWOS线程的属性
+///
+/// 完全等价于C语言头文件 `xwos/osal/thd.h` 中的 `struct xwos_thd_attr`
+#[repr(C)]
+pub(crate) struct ThdAttr {
+    /// 线程的名字
+    pub(crate) name: *const cty::c_char,
+    /// 线程栈的首地址
+    pub(crate) stack: *mut XwStk,
+    /// 线程栈的大小，以字节(byte)为单位
+    pub(crate) stack_size: XwSz,
+    /// 栈内存警戒线位置
+    pub(crate) stack_guard_size: XwSz,
+    /// 优先级
+    pub(crate) priority: XwPr,
+    /// 是否为分离态
+    pub(crate) detached: bool,
+    /// 是否为特权线程
+    pub(crate) privileged: bool,
+}
+
+/// XWOS的线程对象描述符
+///
+/// 用于调用XWOS-CAPI
+pub struct ThdD {
+    /// XWOS线程对象的指针
+    pub thd: *mut c_void,
+    /// XWOS线程对象的标签
+    pub tik: XwSq,
+}
+
+unsafe impl Send for ThdD {}
+unsafe impl Sync for ThdD {}
 
 impl ThdD {
     unsafe fn new(attr: &ThdAttr, func: Box<dyn FnOnce()>) -> Result<ThdD, XwEr> {
@@ -600,7 +600,7 @@ impl Builder {
     }
 }
 
-/// 新建一个线程：
+/// 新建一个线程。
 ///
 /// + 创建线程成功，返回一个包含 [`ThdHandle`] 的 [`core::result::Result`] ；
 /// + 创建线程失败，返回一个包含 [`XwEr`] 的 [`core::result::Result`] ， [`XwEr`] 指示错误的原因。

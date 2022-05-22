@@ -200,18 +200,18 @@ pub const SIZEOF_XWOS_SQLK: usize = 8;
 #[cfg(target_pointer_width = "64")]
 pub const SIZEOF_XWOS_SQLK: usize = 16;
 
-xwos_struct! {
-    /// 用于构建顺序锁的内存数组类型
-    pub struct XwosSqlk {
-        #[doc(hidden)]
-        obj: [u8; SIZEOF_XWOS_SQLK],
-    }
+/// 用于构建顺序锁的内存数组类型
+#[repr(C)]
+#[cfg_attr(target_pointer_width = "32", repr(align(8)))]
+#[cfg_attr(target_pointer_width = "64", repr(align(16)))]
+pub(crate) struct XwosSqlk {
+    pub(crate) obj: [u8; SIZEOF_XWOS_SQLK],
 }
 
 /// 用于构建顺序锁的内存数组常量
 ///
 /// 此常量的作用是告诉编译器顺序锁需要多大的内存。
-pub const XWOS_SQLK_INITIALIZER: XwosSqlk = XwosSqlk {
+pub(crate) const XWOS_SQLK_INITIALIZER: XwosSqlk = XwosSqlk {
     obj: [0; SIZEOF_XWOS_SQLK],
 };
 
@@ -219,11 +219,11 @@ pub const XWOS_SQLK_INITIALIZER: XwosSqlk = XwosSqlk {
 /// 顺序锁结构体
 pub struct Seqlock<T: ?Sized> {
     /// 用于初始化XWOS顺序锁的内存空间
-    sqlk: UnsafeCell<XwosSqlk>,
+    pub(crate) sqlk: UnsafeCell<XwosSqlk>,
     /// 初始化完成标记
-    init: AtomicBool,
+    pub(crate) init: AtomicBool,
     /// 上锁方式
-    mode: UnsafeCell<SeqlockMode>,
+    pub(crate) mode: UnsafeCell<SeqlockMode>,
     /// 用户数据
     pub data: UnsafeCell<T>,
 }

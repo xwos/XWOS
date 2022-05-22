@@ -196,18 +196,18 @@ pub const SIZEOF_XWOS_SEM: usize = 64;
 #[cfg(target_pointer_width = "64")]
 pub const SIZEOF_XWOS_SEM: usize = 128;
 
-xwos_struct! {
-    /// 用于构建信号量的内存数组类型
-    pub struct XwosSem {
-        #[doc(hidden)]
-        obj: [u8; SIZEOF_XWOS_SEM],
-    }
+/// 用于构建信号量的内存数组类型
+#[repr(C)]
+#[cfg_attr(target_pointer_width = "32", repr(align(8)))]
+#[cfg_attr(target_pointer_width = "64", repr(align(16)))]
+pub(crate) struct XwosSem {
+    pub(crate) obj: [u8; SIZEOF_XWOS_SEM],
 }
 
 /// 用于构建信号量的内存数组常量
 ///
 /// 此常量的作用是告诉编译器信号量对象需要多大的内存。
-pub const XWOS_SEM_INITIALIZER: XwosSem = XwosSem {
+pub(crate) const XWOS_SEM_INITIALIZER: XwosSem = XwosSem {
     obj: [0; SIZEOF_XWOS_SEM],
 };
 
