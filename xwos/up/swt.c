@@ -28,10 +28,7 @@ static __xwup_code
 void xwup_swt_free(struct xwup_swt * swt);
 
 static __xwup_code
-void xwup_swt_construct(struct xwup_swt * swt,
-                        const char * name,
-                        xwsq_t flag,
-                        xwup_swt_gc_f gc);
+void xwup_swt_construct(struct xwup_swt * swt, xwsq_t flag, xwup_swt_gc_f gc);
 
 static __xwup_code
 void xwup_swt_destruct(struct xwup_swt * swt);
@@ -89,13 +86,11 @@ void xwup_swt_free(struct xwup_swt * swt)
 /**
  * @brief 激活软件定时器对象
  * @param[in] swt: 软件定时器对象的指针
- * @param[in] name: 名字
  * @param[in] flag: 标志
  * @param[in] gc: 垃圾回收函数
  */
 static __xwup_code
 void xwup_swt_construct(struct xwup_swt * swt,
-                        const char * name,
                         xwsq_t flag,
                         xwup_swt_gc_f gc)
 {
@@ -103,7 +98,6 @@ void xwup_swt_construct(struct xwup_swt * swt,
         swt->cb = NULL;
         swt->arg = NULL;
         swt->period = 0;
-        swt->name = name;
         swt->flag = flag;
         xwaop_write(xwsq_t, &swt->refcnt, 1, NULL);
         swt->gc = gc;
@@ -113,7 +107,6 @@ static __xwup_code
 void xwup_swt_destruct(struct xwup_swt * swt)
 {
         swt->period = 0;
-        swt->name = NULL;
         swt->flag = 0;
 }
 
@@ -156,12 +149,10 @@ xwer_t xwup_swt_put(struct xwup_swt * swt)
 }
 
 __xwup_api
-xwer_t xwup_swt_init(struct xwup_swt * swt,
-                     const char * name,
-                     xwsq_t flag)
+xwer_t xwup_swt_init(struct xwup_swt * swt, xwsq_t flag)
 {
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
-        xwup_swt_construct(swt, name, flag, xwup_swt_destruct);
+        xwup_swt_construct(swt, flag, xwup_swt_destruct);
         return XWOK;
 }
 
@@ -169,27 +160,23 @@ __xwup_api
 xwer_t xwup_swt_fini(struct xwup_swt * swt)
 {
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
-
         return xwup_swt_put(swt);
 }
 
 __xwup_api
-xwer_t xwup_swt_create(struct xwup_swt ** ptrbuf,
-                       const char * name,
-                       xwsq_t flag)
+xwer_t xwup_swt_create(struct xwup_swt ** ptrbuf, xwsq_t flag)
 {
         struct xwup_swt * swt;
         xwer_t rc;
 
         XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
-
         *ptrbuf = NULL;
         swt = xwup_swt_alloc();
         if (is_err(swt)) {
                 rc = ptr_err(swt);
                 goto err_swt_alloc;
         }
-        xwup_swt_construct(swt, name, flag, xwup_swt_gc);
+        xwup_swt_construct(swt, flag, xwup_swt_gc);
         *ptrbuf = swt;
         return XWOK;
 

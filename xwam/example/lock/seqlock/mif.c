@@ -51,8 +51,7 @@ xwer_t xwos_example_seqlock(void)
         xwos_sqlk_init(&sqlkdemo_lock);
 
         /* 初始化定时器 */
-        rc = xwos_swt_init(&sqlkdemo_swt, "sqlkdemo_swt",
-                           XWOS_SWT_FLAG_RESTART);
+        rc = xwos_swt_init(&sqlkdemo_swt, XWOS_SWT_FLAG_RESTART);
         if (rc < 0) {
                 goto err_swt_init;
         }

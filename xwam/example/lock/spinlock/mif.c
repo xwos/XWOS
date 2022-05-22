@@ -51,7 +51,7 @@ xwer_t xwos_example_spinlock(void)
         xwos_splk_init(&splkdemo_lock);
 
         /* 初始化定时器 */
-        rc = xwos_swt_init(&splkdemo_swt, "splkdemo_swt", XWOS_SWT_FLAG_RESTART);
+        rc = xwos_swt_init(&splkdemo_swt, XWOS_SWT_FLAG_RESTART);
         if (rc < 0) {
                 goto err_swt_init;
         }

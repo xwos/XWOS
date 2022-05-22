@@ -57,13 +57,13 @@ xwer_t xwos_example_swt(void)
         }
 
         /* 初始化定时器0 */
-        rc = xwos_swt_init(&swtdemo_swt0, "swtdemo_swt0", XWOS_SWT_FLAG_RESTART);
+        rc = xwos_swt_init(&swtdemo_swt0, XWOS_SWT_FLAG_RESTART);
         if (rc < 0) {
                 goto err_swt0_init;
         }
 
         /* 创建定时器1 */
-        rc = xwos_swt_create(&swtdemo_swt1_d, "swtdemo_swt1", XWOS_SWT_FLAG_RESTART);
+        rc = xwos_swt_create(&swtdemo_swt1_d, XWOS_SWT_FLAG_RESTART);
         if (rc < 0) {
                 goto err_swt1_create;
         }

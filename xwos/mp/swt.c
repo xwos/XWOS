@@ -36,10 +36,7 @@ static __xwmp_code
 void xwmp_swt_destruct(struct xwmp_swt * swt);
 
 static __xwmp_code
-xwer_t xwmp_swt_activate(struct xwmp_swt * swt,
-                         const char * name,
-                         xwsq_t flag,
-                         xwobj_gc_f gcfunc);
+xwer_t xwmp_swt_activate(struct xwmp_swt * swt, xwsq_t flag, xwobj_gc_f gcfunc);
 
 static __xwmp_code
 xwer_t xwmp_swt_gc(void * swt);
@@ -152,7 +149,6 @@ static __xwmp_code
 void xwmp_swt_construct(struct xwmp_swt * swt)
 {
         xwos_object_construct(&swt->xwobj);
-        swt->name = NULL;
         swt->xwskd = NULL;
         swt->flag = 0;
         xwmp_ttn_init(&swt->ttn, (xwptr_t)swt, XWMP_TTN_TYPE_SWT);
@@ -168,7 +164,6 @@ void xwmp_swt_construct(struct xwmp_swt * swt)
 static __xwmp_code
 void xwmp_swt_destruct(struct xwmp_swt * swt)
 {
-        swt->name = NULL;
         swt->xwskd = NULL;
         swt->flag = 0;
         xwos_object_destruct(&swt->xwobj);
@@ -189,14 +184,12 @@ xwer_t xwmp_swt_gc(void * swt)
 /**
  * @brief 激活软件定时器对象
  * @param[in] swt: 软件定时器对象的指针
- * @param[in] name: 名字
  * @param[in] flag: 标志
  * @param[in] gcfunc: 垃圾回收函数：当对象应用计数为0，调用此函数回收资源
  * @return 错误码
  */
 static __xwmp_code
 xwer_t xwmp_swt_activate(struct xwmp_swt * swt,
-                         const char * name,
                          xwsq_t flag,
                          xwobj_gc_f gcfunc)
 {
@@ -208,7 +201,6 @@ xwer_t xwmp_swt_activate(struct xwmp_swt * swt,
         }
 
         swt->xwskd = xwmp_skd_get_lc();
-        swt->name = name;
         swt->flag = flag;
         return XWOK;
 
@@ -217,14 +209,12 @@ err_xwobj_activate:
 }
 
 __xwmp_api
-xwer_t xwmp_swt_init(struct xwmp_swt * swt,
-                     const char * name,
-                     xwsq_t flag)
+xwer_t xwmp_swt_init(struct xwmp_swt * swt, xwsq_t flag)
 {
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
 
         xwmp_swt_construct(swt);
-        return xwmp_swt_activate(swt, name, flag, NULL);
+        return xwmp_swt_activate(swt, flag, NULL);
 }
 
 __xwmp_api
@@ -236,9 +226,7 @@ xwer_t xwmp_swt_fini(struct xwmp_swt * swt)
 }
 
 __xwmp_api
-xwer_t xwmp_swt_create(struct xwmp_swt ** swtbuf,
-                       const char * name,
-                       xwsq_t flag)
+xwer_t xwmp_swt_create(struct xwmp_swt ** swtbuf, xwsq_t flag)
 {
         struct xwmp_swt * swt;
         xwer_t rc;
@@ -249,7 +237,7 @@ xwer_t xwmp_swt_create(struct xwmp_swt ** swtbuf,
                 rc = ptr_err(swt);
                 goto err_swt_alloc;
         }
-        rc = xwmp_swt_activate(swt, name, flag, xwmp_swt_gc);
+        rc = xwmp_swt_activate(swt, flag, xwmp_swt_gc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_swt_activate;
         }

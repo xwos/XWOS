@@ -28,14 +28,14 @@ xwer_t xwosdl_swt_put(struct xwosdl_swt * swt)
 }
 
 __xwup_code
-xwer_t xwosdl_swt_create(xwosdl_swt_d * swtd, const char * name, xwsq_t flag)
+xwer_t xwosdl_swt_create(xwosdl_swt_d * swtd, xwsq_t flag)
 {
         xwer_t rc;
         struct xwup_swt * swt;
 
         XWOS_VALIDATE((swtd), "nullptr", -EFAULT);
 
-        rc = xwup_swt_create(&swt, name, flag);
+        rc = xwup_swt_create(&swt, flag);
         if (XWOK == rc) {
                 swtd->swt = swt;
                 swtd->tik = 0;

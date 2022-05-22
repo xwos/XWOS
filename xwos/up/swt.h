@@ -43,7 +43,6 @@ typedef void (* xwup_swt_gc_f)(struct xwup_swt *);
  * @brief 软件定时器控制块
  */
 struct xwup_swt {
-        const char * name; /**< 名字 */
         xwsq_t flag; /**< 标志 */
         struct xwup_ttn ttn; /**< 时间树节点 */
         xwup_swt_f cb; /**< 回调函数 */
@@ -53,13 +52,9 @@ struct xwup_swt {
         xwup_swt_gc_f gc; /**< 垃圾回收函数 */
 };
 
-xwer_t xwup_swt_init(struct xwup_swt * swt,
-                     const char * name,
-                     xwsq_t flag);
+xwer_t xwup_swt_init(struct xwup_swt * swt, xwsq_t flag);
 xwer_t xwup_swt_fini(struct xwup_swt * swt);
-xwer_t xwup_swt_create(struct xwup_swt ** ptrbuf,
-                       const char * name,
-                       xwsq_t flag);
+xwer_t xwup_swt_create(struct xwup_swt ** ptrbuf, xwsq_t flag);
 xwer_t xwup_swt_delete(struct xwup_swt * swt);
 xwer_t xwup_swt_grab(struct xwup_swt * swt);
 xwer_t xwup_swt_put(struct xwup_swt * swt);
