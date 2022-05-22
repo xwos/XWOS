@@ -404,7 +404,7 @@ void xwmp_skd_del_thd_lc(struct xwmp_skd * xwskd)
                                                struct xwmp_thd, thdnode) {
                         xwlib_bclst_del_init(&thd->thdnode);
                         xwmp_splk_unlock_cpuirq(&xwskd->thdlistlock);
-                        xwmp_thd_delete(thd);
+                        xwmp_thd_put(thd);
                         xwmp_splk_lock_cpuirq(&xwskd->thdlistlock);
                 }
                 xwmp_splk_unlock_cpuirq(&xwskd->thdlistlock);

@@ -396,9 +396,10 @@ xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
         }
 
         if (allocated_stack) {
-                thd->stack.flag = XWUP_SKDOBJ_FLAG_ALLOCATED_STACK;
+                thd->stack.flag = XWUP_SKDOBJ_FLAG_ALLOCATED_STACK |
+                                  XWUP_SKDOBJ_FLAG_ALLOCATED_OBJ;
         } else {
-                thd->stack.flag = 0;
+                thd->stack.flag = XWUP_SKDOBJ_FLAG_ALLOCATED_OBJ;
         }
 
         xwup_thd_activate(thd, &attr, mainfunc, arg);
@@ -433,6 +434,20 @@ xwer_t xwup_thd_delete(struct xwup_thd * thd)
         }
         return rc;
 }
+
+__xwup_code
+xwer_t xwup_thd_drop(struct xwup_thd * thd)
+{
+        xwer_t rc;
+
+        if (XWUP_SKDOBJ_FLAG_ALLOCATED_OBJ & thd->stack.flag) {
+                rc = xwup_thd_delete(thd);
+        } else {
+                rc = xwup_thd_fini(thd);
+        }
+        return rc;
+}
+
 
 /**
  * @brief 执行退出线程
