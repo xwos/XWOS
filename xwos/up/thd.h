@@ -142,6 +142,7 @@ void xwup_thd_eq_plwq(struct xwup_thd * thd, struct xwup_plwq * xwplwq,
 
 xwer_t xwup_thd_freeze_lic(struct xwup_thd * thd);
 xwer_t xwup_thd_thaw_lic(struct xwup_thd * thd);
+xwer_t xwup_thd_drop(struct xwup_thd * thd);
 
 /**
  * @brief 唤醒一个阻塞/睡眠态的线程，将其加入到调度器的就绪队列
@@ -153,6 +154,7 @@ void xwup_thd_wakeup(struct xwup_thd * thd)
 {
         xwup_thd_rq_add_tail(thd);
 }
+
 
 void xwup_thd_attr_init(struct xwup_thd_attr * attr);
 xwer_t xwup_thd_init(struct xwup_thd * thd,

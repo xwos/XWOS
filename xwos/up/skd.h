@@ -70,6 +70,7 @@ enum xwup_skdobj_state_em {
 enum xwup_skdobj_flag_em {
         XWUP_SKDOBJ_FLAG_PRIVILEGED = (1U << 0U), /**< 拥有超级权限 */
         XWUP_SKDOBJ_FLAG_ALLOCATED_STACK = (1U << 1U), /**< 动态申请的栈 */
+        XWUP_SKDOBJ_FLAG_ALLOCATED_OBJ = (1U << 2U), /**< 动态申请的结构体 */
 };
 
 /**
