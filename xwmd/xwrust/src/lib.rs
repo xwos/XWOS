@@ -1,22 +1,9 @@
 //! XWOS Rust Framework
 //! ========
 //!
-//! # author
-//!
-//! + 隐星魂 (Roy Sun) <xwos@xwos.tech>
-//!
-//!
-//! # copyright
-//!
-//! + © 2015 xwos.tech, All Rights Reserved.
-//! > This Source Code Form is subject to the terms of the Mozilla Public
-//! > License, v. 2.0. If a copy of the MPL was not distributed with this
-//! > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
-//!
-//!
 //! # 简介
 //!
-//! XWOS是纯C语言实现的RTOS内核。XWOS RUST基于XWOS的C-API编写的RUST语言no_std环境中的框架代码，
+//! XWOS是纯C语言实现的RTOS内核。XWOS RUST基于XWOS的C-API编写的RUST语言 `#![no_std]` 环境中的框架代码，
 //! 可让XWOS从C语言的RTOS进化成RUST语言的RTOS。
 //!
 //! 在编写XWOS RUST时，作者充分阅读并参考了RUST的std库的代码，
@@ -62,6 +49,30 @@
 //! name = "rustapp"
 //! crate-type = ["staticlib"]
 //! ```
+//!
+//! # XWOS RUST 的功能
+//!
+//! XWOS RUST提供了RTOS的基本功能：
+//!
+//! + [线程](crate::xwos::thd)
+//! + [软件定时器](crate::xwos::swt)
+//! + [锁](crate::xwos::lock)
+//!   + [互斥锁](crate::xwos::lock::mtx)
+//!   + [自旋锁](crate::xwos::lock::spinlock)
+//!   + [顺序锁](crate::xwos::lock::seqlock)
+//! + [同步机制](crate::xwos::sync)
+//!   + [信号量](crate::xwos::sync::sem)
+//!   + [条件量](crate::xwos::sync::cond)
+//!   + [事件标志](crate::xwos::sync::flg)
+//!   + [线程栅栏](crate::xwos::sync::br)
+//!   + [信号选择器](crate::xwos::sync::sel)
+//! + [消息队列](crate::xwmd::xwmq)
+//! + 其他
+//!   + [时间](crate::xwtm)
+//!   + [类型](crate::types)
+//!   + [错误码](crate::errno)
+//!   + [位图](crate::xwbmp)
+//!
 //!
 //! # 返回XWOS首页
 //!

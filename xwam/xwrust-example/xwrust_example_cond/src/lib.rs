@@ -8,7 +8,7 @@ extern crate alloc;
 use alloc::sync::Arc;
 
 use xwrust::xwtm;
-use xwrust::xwos::thd;
+use xwrust::xwos::thd::*;
 use xwrust::xwos::cthd;
 use xwrust::xwos::lock::mtx::*;
 use xwrust::xwos::sync::cond::*;
@@ -23,7 +23,7 @@ pub fn xwrust_example_cond() {
     let pair_c = pair.clone();
 
     println!("[主线程] thd: {:?}", cthd::i());
-    match thd::Builder::new()
+    match DThdBuilder::new()
         .name("child".into())
         .spawn(move |_| {
             // 子线程闭包

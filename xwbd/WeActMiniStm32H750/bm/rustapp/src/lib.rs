@@ -19,7 +19,8 @@ use xwrust::xwtm;
 use xwrust::xwos::cthd;
 
 use xwrust_example_vector::xwrust_example_vector;
-use xwrust_example_thd::xwrust_example_thd;
+use xwrust_example_dthd::xwrust_example_dthd;
+use xwrust_example_sthd::xwrust_example_sthd;
 use xwrust_example_swt::xwrust_example_swt;
 use xwrust_example_mutex::xwrust_example_mutex;
 use xwrust_example_spinlock::xwrust_example_spinlock;
@@ -39,7 +40,9 @@ pub unsafe extern "C" fn xwrust_main() {
     println!("XWOS RUST App");
     xwrust_example_vector();
     cthd::sleep(xwtm::ms(300));
-    xwrust_example_thd();
+    xwrust_example_dthd();
+    cthd::sleep(xwtm::ms(300));
+    xwrust_example_sthd();
     cthd::sleep(xwtm::ms(300));
     xwrust_example_swt();
     cthd::sleep(xwtm::ms(300));

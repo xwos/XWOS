@@ -23,7 +23,7 @@
 //!
 //! # 判断当前线程是否可退出
 //!
-//! 线程可通过方法 [`shld_stop()`] 判断是否被设置了 **退出状态** ，**退出状态** 是其他线程通过 [`ThdHandle::stop()`] 方法设置的。
+//! 线程可通过方法 [`shld_stop()`] 判断是否被设置了 **退出状态** ，**退出状态** 是其他线程通过 [`DThdHandle::stop()`] 方法设置的。
 //!
 //! # 线程睡眠
 //!
@@ -44,7 +44,7 @@
 //! 当线程通过方法 [`shld_frz()`] 判断出需要冻结时，可通过方法 [`freeze()`] 冻结自身。冻结之前需要释放掉所有资源。
 //!
 //!
-//! [`ThdHandle::stop()`]: crate::xwos::thd::ThdHandle::stop
+//! [`DThdHandle::stop()`]: crate::xwos::thd::DThdHandle::stop
 
 extern crate core;
 use core::ffi::*;

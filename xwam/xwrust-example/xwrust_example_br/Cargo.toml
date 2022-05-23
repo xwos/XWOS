@@ -3,7 +3,7 @@ name = "xwrust_example_br"
 version = "0.1.0"
 edition = "2021"
 authors = ["Roy Sun <xwos@xwos.tech>"]
-description = "XWOS RUST Barrier Example"
+description = "XWOS RUST Thread Barrier Example"
 license = "Apache-2.0"
 
 [lib]
