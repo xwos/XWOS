@@ -16,7 +16,7 @@
 //!
 //! XWOS RUST的事件标志可使用 [`Flg::new()`] 创建。
 //!
-//! + 可以创建具有静态生命周期 [`'static`] 约束的全局变量：
+//! + 可以创建具有静态生命周期 [`static`] 约束的全局变量：
 //!
 //! ```rust
 //! use xwrust::xwos::sync::flg::*;
@@ -129,7 +129,7 @@
 //! [XWOS/xwam/xwrust-example/xwrust_example_flg](https://gitee.com/xwos/XWOS/blob/main/xwam/xwrust-example/xwrust_example_flg/src/lib.rs)
 //!
 //!
-//! [`'static`]: <https://doc.rust-lang.org/std/keyword.static.html>
+//! [`static`]: <https://doc.rust-lang.org/std/keyword.static.html>
 //! [`alloc::sync::Arc`]: <https://doc.rust-lang.org/alloc/sync/struct.Arc.html>
 //! [`Sel<M>`]: super::sel::Sel
 
@@ -282,7 +282,7 @@ where
     ///
     /// # 示例
     ///
-    /// + 具有 [`'static`] 约束的全局变量全局变量：
+    /// + 具有 [`static`] 约束的全局变量全局变量：
     ///
     /// ```rust
     /// use xwrust::xwos::sync::flg::*;
@@ -301,7 +301,7 @@ where
     /// }
     /// ```
     ///
-    /// [`'static`]: https://doc.rust-lang.org/std/keyword.static.html
+    /// [`static`]: https://doc.rust-lang.org/std/keyword.static.html
     pub const fn new() -> Self {
         Self {
             flg: UnsafeCell::new(XwosFlg {

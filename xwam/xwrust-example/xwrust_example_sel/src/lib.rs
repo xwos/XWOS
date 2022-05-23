@@ -161,6 +161,6 @@ pub fn xwrust_example_sel() {
                 println!("[主线程]<{} ms> 等待sel失败 ... {:?}", xwtm::nowtc(), e);
                 break;
             },
-        }
+        };
     }
 }

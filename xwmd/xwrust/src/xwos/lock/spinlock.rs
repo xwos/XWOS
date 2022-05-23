@@ -23,7 +23,7 @@
 //!
 //! XWOS RUST的互斥锁可使用 [`Spinlock::new()`] 创建：
 //!
-//! + 可以创建具有静态生命周期 [`'static`] 约束的全局变量：
+//! + 可以创建具有静态生命周期 [`static`] 约束的全局变量：
 //!
 //! ```rust
 //! use xwrust::xwos::lock::spinlock::*;
@@ -89,7 +89,7 @@
 //!
 //!
 //! [`SpinlockMode::LockCpuirqSave(None)`]: SpinlockMode::LockCpuirqSave
-//! [`'static`]: https://doc.rust-lang.org/std/keyword.static.html
+//! [`static`]: https://doc.rust-lang.org/std/keyword.static.html
 //! [`alloc::sync::Arc`]: <https://doc.rust-lang.org/alloc/sync/struct.Arc.html>
 
 extern crate core;
@@ -186,7 +186,7 @@ pub struct Spinlock<T: ?Sized> {
 impl<T> Spinlock<T> {
     /// 新建自旋锁。
     ///
-    /// 此方法是编译期方法，可用于新建 [`'static`] 约束的全局变量。
+    /// 此方法是编译期方法，可用于新建 [`static`] 约束的全局变量。
     ///
     /// # 示例
     ///
@@ -196,7 +196,7 @@ impl<T> Spinlock<T> {
     /// static GLOBAL_SPINLOCK: Spinlock<u32>  = Spinlock::new(0);
     /// ```
     ///
-    /// [`'static`]: https://doc.rust-lang.org/std/keyword.static.html
+    /// [`static`]: https://doc.rust-lang.org/std/keyword.static.html
     pub const fn new(t: T) -> Self {
         Self {
             splk: UnsafeCell::new(XWOS_SPLK_INITIALIZER),

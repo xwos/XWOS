@@ -71,7 +71,7 @@ pub fn xwrust_example_mutex() {
             Err(e) => { // 新建子线程失败
                 println!("[主线程] 创建子线程失败: {}", e);
             },
-        }
+        };
 
     cthd::sleep(xwtm::ms(500));
     let result = GLOBAL_MUTEX.lock();
@@ -83,7 +83,7 @@ pub fn xwrust_example_mutex() {
         Err(e) => {
             println!("[主线程] 获取全局互斥锁失败：{:?}", e);
         }
-    }
+    };
 
     let result = local_mutex.lock();
     match result {
@@ -94,5 +94,5 @@ pub fn xwrust_example_mutex() {
         Err(e) => {
             println!("[主线程] 获取局部互斥锁失败：{:?}", e);
         }
-    }
+    };
 }

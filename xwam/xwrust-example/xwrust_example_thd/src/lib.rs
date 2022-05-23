@@ -18,7 +18,7 @@ pub fn xwrust_example_thd() {
         .name("child".into())
         .spawn(move |ele| {
             // 子线程闭包
-            println!("[子线程]<{} ms> name: {}, thd: {:?}", xwtm::nowtc(), ele.name().unwrap(), cthd::i());
+            println!("[子线程]<{} ms> name: {}, thd: {:?}", xwtm::nowtc(), ele.name(), cthd::i());
 
             let mut count = 0;
             loop {
@@ -47,8 +47,8 @@ pub fn xwrust_example_thd() {
                             break;
                         },
                         Err(e) => {
-                            println!("[主线程]<{} ms> 停止子线程失败: {}",
-                                     xwtm::nowtc(), e.join_state());
+                            println!("[主线程]<{} ms> 停止子线程失败: {:?}",
+                                     xwtm::nowtc(), e.state());
                             child = e;
                         },
                     }
@@ -63,5 +63,5 @@ pub fn xwrust_example_thd() {
             Err(e) => { // 新建子线程失败
                 println!("[主线程]<{} ms> 创建子线程失败: {}", xwtm::nowtc(), e);
             },
-        }
+        };
 }

@@ -48,7 +48,7 @@ pub fn xwrust_example_spinlock() {
             Err(e) => { // 新建子线程失败
                 println!("[主线程] 创建子线程失败: {}", e);
             },
-        }
+        };
 
     cthd::sleep(xwtm::ms(500));
     let result = local_spinlock.lock(SpinlockMode::LockCpuirqSave(None));
@@ -63,5 +63,5 @@ pub fn xwrust_example_spinlock() {
         Err(e) => {
             println!("[主线程] 获取局部自旋锁失败：{:?}", e);
         }
-    }
+    };
 }

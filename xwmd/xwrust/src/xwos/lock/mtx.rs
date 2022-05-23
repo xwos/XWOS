@@ -14,7 +14,7 @@
 //!
 //! XWOS RUST的互斥锁可使用 [`Mutex::new()`] 创建。
 //!
-//! + 可以创建具有静态生命周期 [`'static`] 约束的全局变量：
+//! + 可以创建具有静态生命周期 [`static`] 约束的全局变量：
 //!
 //! ```rust
 //! use xwrust::xwos::lock::mtx::*;
@@ -168,7 +168,7 @@
 //!
 //! ### 构建全局变量的方式
 //!
-//! + [`std::sync::Mutex`] 没有编译期构造函数，因此只能借助宏 [`lazy_static!`] 创建 [`'static`] 约束的全局变量；
+//! + [`std::sync::Mutex`] 没有编译期构造函数，因此只能借助宏 [`lazy_static!`] 创建 [`static`] 约束的全局变量；
 //! + [`xwrust::xwos::lock::mtx`] 则可以直接在函数外部定义。
 //!
 //! ### 中毒锁机制
@@ -183,7 +183,7 @@
 //!   + Rust目前在MCU上还无法使用 **panic_unwind** 的 feature。
 //!
 //! [`std::sync::Mutex`]: <https://doc.rust-lang.org/std/sync/struct.Mutex.html>
-//! [`'static`]: <https://doc.rust-lang.org/std/keyword.static.html>
+//! [`static`]: <https://doc.rust-lang.org/std/keyword.static.html>
 //! [`alloc::sync::Arc`]: <https://doc.rust-lang.org/alloc/sync/struct.Arc.html>
 //! [`lazy_static!`]: <https://lib.rs/crates/lazy_static>
 //! [`std::thread::spawn()`]: <https://doc.rust-lang.org/std/thread/fn.spawn.html>
@@ -280,7 +280,7 @@ pub struct Mutex<T: ?Sized> {
 impl<T> Mutex<T> {
     /// 新建互斥锁对象。
     ///
-    /// 此方法是编译期方法，可用于新建 [`'static`] 约束的全局变量。
+    /// 此方法是编译期方法，可用于新建 [`static`] 约束的全局变量。
     ///
     /// # 示例
     ///
@@ -290,7 +290,7 @@ impl<T> Mutex<T> {
     /// static GLOBAL_MUTEX: Mutex<u32> = Mutex::new(0);
     /// ```
     ///
-    /// [`'static`]: https://doc.rust-lang.org/std/keyword.static.html
+    /// [`static`]: https://doc.rust-lang.org/std/keyword.static.html
     pub const fn new(t: T) -> Self {
         Self {
             mtx: UnsafeCell::new(XWOS_MTX_INITIALIZER),

@@ -1,11 +1,13 @@
-//! XWOS RUST：线程
+//! XWOS RUST：动态线程
 //! ========
 //!
-//! # 线程模型
+//! # 动态线程模型
 //!
-//! XWOS RUST框架可让用户在Rust的代码中创建XWOS的线程，与C语言的线程一样，每个线程都有独立的名字和栈空间。
+//! XWOS RUST框架可让用户在Rust的代码中创建 **动态线程** 。
 //!
-//! XWOS RUST框架的线程库是仿照 [`std::thread`] 的来编写的，以降低熟悉Rust的朋友的学习代价。
+//! 动态线程的对象结构体、栈、线程闭包等资源都是通过内存申请的接口动态创建的。
+//!
+//! XWOS RUST框架的动态线程库是仿照 [`std::thread`] 的来编写的，以降低熟悉Rust的朋友的学习代价。
 //!
 //! ```rust
 //! use xwrust::xwos::thd;
@@ -26,12 +28,12 @@
 //! let handler = thd::spawn(|_| {
 //!     // 线程代码;
 //!     // 返回值
-//! }).unwrap(); // unwrap()不安全
+//! }).unwrap(); // unwrap()在 #![no_std] 环境不安全
 //!
-//! let rc = handler.join().unwrap(); // 等待线程结束，并获取其返回值，unwrap()不安全
+//! let rc = handler.join().unwrap(); // 等待线程结束，并获取其返回值
 //! ```
 //!
-//! [`ThdHandle::join()`] 方法会返回 [`thd::Result<R>`] ， **R** 是返回值的类型，并放在 [`Ok`] 中。
+//! [`ThdHandle::join()`] 方法会返回 [`thd::Result<R>`] ， `R` 是返回值的类型，并放在 [`Ok()`] 中。
 //!
 //! ## 对比 [`std::thread`]
 //!
@@ -66,7 +68,7 @@
 //! thd::Builder::new()
 //!     .name("foo".into())
 //!     .spawn(|ele| {
-//!         println!("Thread name: {}", ele.name().unwrap());
+//!         println!("Thread name: {}", ele.name());
 //!     });
 //! ```
 //!
@@ -75,7 +77,7 @@
 //! #### **spawn()** 失败时的处理方式不同
 //!
 //! + [`std::thread`] **spawn()** 失败时，会直接 [`panic!()`] ；
-//! + XWOS是RTOS，常常运行在MCU上， [`panic!()`] 意味着死机，因此需要处理 [`Err`] ；
+//! + XWOS是RTOS，运行在 `#![no_std]` 上， [`panic!()`] 意味着死机，因此需要处理 [`Err()`] ；
 //!
 //! ```rust
 //! use xwrust::xwos::thd;
@@ -96,7 +98,7 @@
 //!
 //! + [`std::thread`] 可捕获子线程的 [`panic!()`] 。
 //! + `xwrust::xwos::thd` 的子线程 [`panic!()`] 后会导致整个代码 **halt** 。
-//! 目前 **#!\[no_std\]** 环境的 **unwind** 支持还不完善，暂时无法实现类似于 [`std::thread`] 的机制。
+//! 目前 `#![no_std]` 环境的 **unwind** 支持还不完善，暂时无法实现类似于 [`std::thread`] 的机制。
 //!
 //!
 //! # 线程的工厂模式
@@ -133,7 +135,7 @@
 //!
 //! # 线程的元素
 //!
-//! 线程的元素 [`ThdElement`] 是存放与线程相关的私有数据的内存空间，例如线程的名称 。
+//! 线程的元素 [`ThdElement`] 是存放与线程相关的私有数据的内存空间，例如线程的名称、栈大小信息、权限配置等 。
 //!
 //!
 //! # 线程的句柄
@@ -163,8 +165,8 @@
 //!
 //! 此方法会消费 [`ThdHandle`] ：
 //!
-//! + 如果此方法执行成功，会消费掉 [`ThdHandle`] ，并将子线程的返回值放在 [`Ok`] 中返回，因为线程已经结束，其 [`ThdHandle`] 的生命周期也应该结束；
-//! + 如果此方法执行失败，会重新在 [`Err`] 中返回 [`ThdHandle`] ，并可通过 [`ThdHandle::join_state()`] 方法获取失败的原因。
+//! + 如果此方法执行成功，会消费掉 [`ThdHandle`] ，并将子线程的返回值放在 [`Ok()`] 中返回，因为线程已经结束，其 [`ThdHandle`] 的生命周期也应该结束；
+//! + 如果此方法执行失败，会重新在 [`Err()`] 中返回 [`ThdHandle`] ，并可通过 [`ThdHandle::state()`] 方法获取失败的原因。
 //!
 //! ## 通知并等待线程退出
 //!
@@ -183,8 +185,8 @@
 //! [`std::thread::JoinHandle`]: <https://doc.rust-lang.org/std/thread/struct.JoinHandle.html>
 //! [`panic!()`]: <https://doc.rust-lang.org/std/macro.panic.html>
 //! [`thd::Result<R>`]: Result<R>
-//! [`Ok`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
-//! [`Err`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
+//! [`Ok()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
+//! [`Err()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
 //! [`ele.name()`]: ThdElement::name
 //! [`EINTR`]: crate::errno::EINTR
 //! [`MutexError::Interrupt`]: crate::xwos::lock::mtx::MutexError::Interrupt
@@ -208,16 +210,13 @@ use alloc::boxed::Box;
 use alloc::string::String;
 use alloc::sync::Arc;
 
-use cstr_core::CString;
-use cstr_core::CStr;
-
 use crate::types::*;
 
 extern "C" {
     fn xwrustffi_thd_stack_size_default() -> XwSz;
     fn xwrustffi_thd_attr_init(attr: *mut ThdAttr);
     fn xwrustffi_thd_create(thd: *mut *mut c_void, tik: *mut XwSq,
-                            attr: *const ThdAttr,
+                            attr: *mut ThdAttr,
                             mainfunc: extern "C" fn(*mut c_void) -> XwEr,
                             arg: *mut c_void) -> XwEr;
     fn xwrustffi_thd_acquire(thd: *mut c_void, tik: XwSq) -> XwEr;
@@ -235,7 +234,7 @@ extern "C" {
 #[repr(C)]
 pub(crate) struct ThdAttr {
     /// 线程的名字
-    pub(crate) name: *const cty::c_char,
+    pub(crate) name: *const c_char,
     /// 线程栈的首地址
     pub(crate) stack: *mut XwStk,
     /// 线程栈的大小，以字节(byte)为单位
@@ -264,7 +263,7 @@ unsafe impl Send for ThdD {}
 unsafe impl Sync for ThdD {}
 
 impl ThdD {
-    unsafe fn new(attr: &ThdAttr, func: Box<dyn FnOnce()>) -> Result<ThdD, XwEr> {
+    unsafe fn new(attr: &mut ThdAttr, func: Box<dyn FnOnce()>) -> Result<ThdD, XwEr> {
         let boxboxfunc = Box::new(func);
         let rawboxfunc = Box::into_raw(boxboxfunc);
         let mut thd: *mut c_void = ptr::null_mut();
@@ -307,7 +306,9 @@ impl ThdD {
     }
 
     fn detach(&mut self) -> XwEr {
-        unsafe { xwrustffi_thd_detach(self.thd, self.tik) }
+        unsafe {
+            xwrustffi_thd_detach(self.thd, self.tik)
+        }
     }
 
     /// 将线程迁移到目标CPU。
@@ -365,7 +366,7 @@ pub struct Builder {
     /// 线程的名字
     name: Option<String>,
     /// 线程栈的大小，以字节(byte)为单位
-    stack_size: Option<usize>,
+    stack_size: Option<XwSz>,
     /// 是否为特权线程
     privileged: Option<bool>,
 }
@@ -433,7 +434,7 @@ impl Builder {
     ///     // 返回值
     /// });
     /// ```
-    pub fn stack_size(mut self, size: usize) -> Builder {
+    pub fn stack_size(mut self, size: XwSz) -> Builder {
         self.stack_size = Some(size);
         self
     }
@@ -488,10 +489,10 @@ impl Builder {
     ///                 // r 是线程闭包的返回值。
     ///             },
     ///             Err(e) => {
-    ///                 // join() 失败的错误码可通过 e.join_state() 获取。
+    ///                 // join() 失败的错误码可通过 e.state() 获取。
     ///                 // e 是 ThdHandle<R> ，重新被返回。
     ///             },
-    ///         }
+    ///         };
     ///     },
     ///     Err(rc) => {
     ///         // rc 是 spawn() 失败时的错误码。
@@ -536,10 +537,10 @@ impl Builder {
     ///                 // r 是线程闭包的返回值。
     ///             },
     ///             Err(e) => {
-    ///                 // join() 失败时的错误码可通过 e.join_state() 获取。
+    ///                 // join() 失败时的错误码可通过 e.state() 获取。
     ///                 // e 是 ThdHandle<R> ，重新被返回。
     ///             },
-    ///         }
+    ///         };
     ///     },
     ///     Err(rc) => {
     ///         // rc 是 spawn() 失败时的错误码。
@@ -564,22 +565,12 @@ impl Builder {
     {
         let mut attr: ThdAttr = mem::zeroed();
         xwrustffi_thd_attr_init(&mut attr);
-        attr.privileged = self.privileged.unwrap_or(true);
+        let name = self.name.unwrap_or("anon".into());
         attr.stack_size = self.stack_size.unwrap_or(xwrustffi_thd_stack_size_default());
+        attr.privileged = self.privileged.unwrap_or(true);
         let element: Arc<ThdElement> =
-            Arc::new(ThdElement::new(self.name.map(|name| {
-            match CString::new(name) {
-                Ok(n) => n,
-                Err(_e) => {
-                    CString::new("InvalidName").unwrap()
-                },
-            }
-            })));
+            Arc::new(ThdElement::new(name, attr.stack_size, attr.privileged));
         let thd_element = element.clone();
-        attr.name = match element.cname() {
-            Some(s) => s.as_ptr(),
-            None => ptr::null(),
-        };
 
         let retval: Arc<ThdReturnValue<R>> =
             Arc::new(ThdReturnValue { result: UnsafeCell::new(None) });
@@ -591,9 +582,9 @@ impl Builder {
         };
 
         Ok(ThdHandleInner {
-            thdd: ThdD::new(&attr,
+            thdd: ThdD::new(&mut attr,
                             mem::transmute::<Box<dyn FnOnce() + 'a>, Box<dyn FnOnce() + 'static>>(Box::new(main)))?,
-            join_state: STATE_JOINABLE,
+            state: ThdJoinState::Joinable,
             element: element,
             rv: retval,
         })
@@ -630,10 +621,10 @@ impl Builder {
 ///                 // r 是线程闭包的返回值。
 ///             },
 ///             Err(e) => {
-///                 // join() 失败时的错误码可通过 e.join_state() 获取。
+///                 // join() 失败时的错误码可通过 e.state() 获取。
 ///                 // e 是 ThdHandle<R> ，重新被返回。
 ///             },
-///         }
+///         };
 ///     },
 ///     Err(rc) => {
 ///         // rc 是 spawn() 失败时的错误码。
@@ -660,16 +651,26 @@ where
 ///
 /// [`Arc`]: <https://doc.rust-lang.org/alloc/sync/struct.Arc.html>
 pub struct ThdElement {
-    /// 线程的名称
-    name: Option<CString>,
+    /// 线程的名字
+    name: String,
+    /// 线程栈的大小，以字节(byte)为单位
+    stack_size: XwSz,
+    /// 是否为特权线程
+    privileged: bool,
 }
 
 impl ThdElement {
-    pub(crate) fn new(name: Option<CString>) -> ThdElement {
-        ThdElement { name }
+    pub(crate) fn new(name: String,
+                      stack_size: XwSz,
+                      privileged: bool) -> ThdElement {
+        ThdElement {
+            name,
+            stack_size,
+            privileged
+        }
     }
 
-    /// 返回名字字符串的引用
+    /// 返回线程名字字符串的引用
     ///
     /// # 示例
     ///
@@ -680,15 +681,46 @@ impl ThdElement {
     /// let handler = thd::Builder::new()
     ///     .name("foo".into())
     ///     .spawn(|ele| {
-    ///         println!("Thread name: {}", ele.name().unwrap());
+    ///         println!("Thread name: {}", ele.name());
     ///     });
     /// ```
-    pub fn name(&self) -> Option<&str> {
-        self.cname().map(|s| unsafe { str::from_utf8_unchecked(s.to_bytes()) })
+    pub fn name(&self) -> &str {
+        &self.name
     }
 
-    fn cname(&self) -> Option<&CStr> {
-        self.name.as_deref()
+    /// 返回线程的栈大小
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    /// use xwrust::xwos::thd;
+    /// use libc_print::std_name::println;
+    ///
+    /// let handler = thd::Builder::new()
+    ///     .spawn(|ele| {
+    ///         println!("Thread stack size: {}", ele.stack_size()); // 将返回默认线程大小
+    ///     });
+    /// ```
+    pub fn stack_size(&self) -> XwSz {
+        self.stack_size
+    }
+
+    /// 返回线程是否具有特权
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    /// use xwrust::xwos::thd;
+    /// use libc_print::std_name::println;
+    ///
+    /// let handler = thd::Builder::new()
+    ///     .privileged(true);
+    ///     .spawn(|ele| {
+    ///         println!("Thread is privileged: {} .", ele.privileged());
+    ///     });
+    /// ```
+    pub fn privileged(&self) -> bool {
+        self.privileged
     }
 }
 
@@ -711,14 +743,22 @@ struct ThdReturnValue<R> {
 
 unsafe impl<R: Sync> Sync for ThdReturnValue<R> {}
 
-pub const STATE_JOINED: XwEr = 0;
-pub const STATE_JOINABLE: XwEr = 1;
+/// 线程的 `join()/stop()` 状态
+#[derive(Debug)]
+pub enum ThdJoinState {
+    /// 已经被连接
+    Joined,
+    /// 可被连接的
+    Joinable,
+    /// 连接错误
+    JoinErr(XwEr),
+}
 
 struct ThdHandleInner<R> {
     /// XWOS线程的描述符
     thdd: ThdD,
-    /// join()/stop()失败时返回值
-    join_state: XwEr,
+    /// 线程的 `join()/stop()` 状态
+    state: ThdJoinState,
     /// 线程的元素
     element: Arc<ThdElement>,
     /// 线程的返回值
@@ -733,10 +773,10 @@ impl<R> ThdHandleInner<R> {
     fn join(mut self) -> Result<R, Self> {
         let rc = self.thdd.join();
         if rc == 0 {
-            self.join_state = STATE_JOINED;
+            self.state = ThdJoinState::Joined;
             Ok(Arc::get_mut(&mut self.rv).unwrap().result.get_mut().take().unwrap())
         } else {
-            self.join_state = rc;
+            self.state = ThdJoinState::JoinErr(rc);
             Err(self)
         }
     }
@@ -744,10 +784,10 @@ impl<R> ThdHandleInner<R> {
     fn stop(mut self) -> Result<R, Self> {
         let rc = self.thdd.stop();
         if rc == 0 {
-            self.join_state = STATE_JOINED;
+            self.state = ThdJoinState::Joined;
             Ok(Arc::get_mut(&mut self.rv).unwrap().result.get_mut().take().unwrap())
         } else {
-            self.join_state = rc;
+            self.state = ThdJoinState::JoinErr(rc);
             Err(self)
         }
     }
@@ -755,8 +795,12 @@ impl<R> ThdHandleInner<R> {
 
 impl<R> Drop for ThdHandleInner<R> {
     fn drop(&mut self) {
-        if self.join_state != STATE_JOINED {
-            self.thdd.detach();
+        match self.state {
+            ThdJoinState::Joined => {
+            },
+            _ => {
+                self.thdd.detach();
+            },
         }
     }
 }
@@ -765,7 +809,7 @@ impl<R> fmt::Debug for ThdHandleInner<R> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ThdHandleInner")
             .field("thdd", &self.thdd)
-            .field("join_state", &self.join_state)
+            .field("state", &self.state)
             .field("element", &self.element)
             .finish_non_exhaustive()
     }
@@ -815,8 +859,8 @@ impl<R> ThdHandle<R> {
     ///
     /// 此方法会消费 [`self`] ：
     ///
-    /// + 如果此方法执行成功，会消费掉 [`self`] ，并将子线程的返回值放在 [`Ok`] 中返回，因为线程已经结束，其 [`ThdHandle`] 的生命周期也应该结束；
-    /// + 如果此方法执行失败，会重新在 [`Err`] 中返回 [`self`] ，并可通过 [`ThdHandle::join_state()`] 方法获取失败的原因。
+    /// + 如果此方法执行成功，会消费掉 [`self`] ，并将子线程的返回值放在 [`Ok()`] 中返回，因为线程已经结束，其 [`ThdHandle`] 的生命周期也应该结束；
+    /// + 如果此方法执行失败，会重新在 [`Err()`] 中返回 [`self`] ，并可通过 [`ThdHandle::state()`] 方法获取失败的原因。
     ///
     /// # 上下文
     ///
@@ -837,10 +881,10 @@ impl<R> ThdHandle<R> {
     ///                 // r 是线程闭包的返回值。
     ///             },
     ///             Err(e) => {
-    ///                 // join() 失败时的错误码可通过 e.join_state() 获取。
+    ///                 // join() 失败时的错误码可通过 e.state() 获取。
     ///                 // e 是 ThdHandle<R> ，重新被返回。
     ///             },
-    ///         }
+    ///         };
     ///     },
     ///     Err(rc) => {
     ///         // rc 是 spawn() 失败时的错误码。
@@ -848,8 +892,8 @@ impl<R> ThdHandle<R> {
     /// };
     /// ```
     ///
-    /// [`Ok`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
-    /// [`Err`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
+    /// [`Ok()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
+    /// [`Err()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
     pub fn join(self) -> Result<R, Self> {
         match self.inner.join() {
             Ok(r) => Ok(r),
@@ -867,8 +911,8 @@ impl<R> ThdHandle<R> {
     ///
     /// 此方法会消费 [`self`] ：
     ///
-    /// + 如果此方法执行成功，会消费掉 [`self`] ，并将子线程的返回值放在 [`Ok`] 中返回，因为线程已经结束，其 [`ThdHandle`] 的生命周期也应该结束；
-    /// + 如果此方法执行失败，会重新在 [`Err`] 中返回 [`self`] ，并可通过 [`ThdHandle::join_state()`] 方法获取失败的原因。
+    /// + 如果此方法执行成功，会消费掉 [`self`] ，并将子线程的返回值放在 [`Ok()`] 中返回，因为线程已经结束，其 [`ThdHandle`] 的生命周期也应该结束；
+    /// + 如果此方法执行失败，会重新在 [`Err()`] 中返回 [`self`] ，并可通过 [`ThdHandle::state()`] 方法获取失败的原因。
     ///
     /// # 上下文
     ///
@@ -889,10 +933,10 @@ impl<R> ThdHandle<R> {
     ///                 // r 是线程闭包的返回值。
     ///             },
     ///             Err(e) => {
-    ///                 // stop() 失败时的错误码可通过 e.join_state() 获取。
+    ///                 // stop() 失败时的错误码可通过 e.state() 获取。
     ///                 // e 是 ThdHandle<R> ，重新被返回。
     ///             },
-    ///         }
+    ///         };
     ///     },
     ///     Err(rc) => {
     ///         // rc 是 spawn() 失败时的错误码。
@@ -900,8 +944,8 @@ impl<R> ThdHandle<R> {
     /// };
     /// ```
     ///
-    /// [`Ok`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
-    /// [`Err`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
+    /// [`Ok()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
+    /// [`Err()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
     pub fn stop(self) -> Result<R, Self> {
         match self.inner.stop() {
             Ok(r) => Ok(r),
@@ -909,9 +953,9 @@ impl<R> ThdHandle<R> {
         }
     }
 
-    /// 返回join()失败时的错误码。
-    pub fn join_state(&self) -> XwEr {
-        self.inner.join_state
+    /// 返回线程的 `join()/stop()` 状态。
+    pub fn state<'a>(&'a self) -> &'a ThdJoinState {
+        &self.inner.state
     }
 
     /// 检查关联的线程是否运行结束。

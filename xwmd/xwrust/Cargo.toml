@@ -11,5 +11,3 @@ name = "xwrust"
 
 [dependencies]
 libc = "0.2"
-cstr_core = "0.2"
-cty = "0.2"
