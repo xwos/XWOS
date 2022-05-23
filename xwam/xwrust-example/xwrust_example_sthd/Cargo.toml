@@ -1,13 +1,13 @@
 [package]
-name = "xwrust_example_thd"
+name = "xwrust_example_sthd"
 version = "0.1.0"
 edition = "2021"
 authors = ["Roy Sun <xwos@xwos.tech>"]
-description = "XWOS RUST Condition Example"
+description = "XWOS RUST Static Thread Example"
 license = "Apache-2.0"
 
 [lib]
-name = "xwrust_example_thd"
+name = "xwrust_example_sthd"
 
 [dependencies]
 xwrust = {path = "../../../xwmd/xwrust"}

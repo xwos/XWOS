@@ -9,7 +9,7 @@ use alloc::sync::Arc;
 
 use xwrust::xwtm;
 use xwrust::types::*;
-use xwrust::xwos::thd;
+use xwrust::xwos::thd::*;
 use xwrust::xwos::cthd;
 use xwrust::xwos::sync::sem::*;
 
@@ -22,7 +22,7 @@ pub fn xwrust_example_sem() {
     let sema_c = sema.clone();
 
     println!("[主线程] thd: {:?}", cthd::i());
-    match thd::Builder::new()
+    match DThdBuilder::new()
         .name("child".into())
         .spawn(move |_| { // 子线程闭包
             println!("[子线程] thd: {:?}", cthd::i());

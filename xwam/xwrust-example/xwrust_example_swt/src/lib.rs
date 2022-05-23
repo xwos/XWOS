@@ -1,4 +1,4 @@
-//! XWOS RUST Example: Swt
+//! XWOS RUST Example: Software Timer
 //! ========
 //!
 
@@ -15,7 +15,7 @@ use libc_print::std_name::println;
 static SWT: Swt<Spinlock<skd::Context>> = Swt::new(Spinlock::new(skd::Context::Boot));
 
 pub fn xwrust_example_swt() {
-    println!("XWOS RUST Example: Swt");
+    println!("XWOS RUST Example: Software Timer");
 
     SWT.as_ref().init(); // 初始化自选锁
     SWT.once(xwtm::now(), xwtm::ms(200), |swt| {

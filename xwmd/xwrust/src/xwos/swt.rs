@@ -42,7 +42,7 @@
 //!
 //! # 回调函数
 //!
-//! 软件定时器的 **回调函数** 的形式为 `fn(&'static Swt)` ，其中 `&'static Self` 是指向软件定时器自己的一个引用。
+//! 软件定时器的 **回调函数** 的形式为 `fn(&Swt)` ，其中 `&Swt` 是指向软件定时器自己的一个引用。
 //! 通过此应用，可以访问定时器携带的数据。
 //!
 //! [`Swt::as_ref()`] 可以获取定时器内部数据 `T` 的引用。
@@ -118,34 +118,22 @@ pub(crate) const XWOS_SWT_INITIALIZER: XwosSwt = XwosSwt {
 };
 
 /// 软件定时器对象结构体
-pub struct Swt<T>
-where
-    T: 'static
-{
+pub struct Swt<T> {
     /// 用于初始化XWOS软件定时器对象的内存空间
     pub(crate) swt: UnsafeCell<XwosSwt>,
     /// 软件定时器对象的标签
     pub(crate) tik: UnsafeCell<XwSq>,
     /// 回调函数
-    pub(crate) cb: UnsafeCell<Option<fn(&'static Self)>>,
+    pub(crate) cb: UnsafeCell<Option<fn(&Self)>>,
     /// 数据
     pub(crate) data: UnsafeCell<T>,
 }
 
-impl<T> !Send for Swt<T>
-where
-    T: 'static
-{}
+impl<T> !Send for Swt<T> {}
 
-unsafe impl<T> Sync for Swt<T>
-where
-    T: 'static
-{}
+unsafe impl<T> Sync for Swt<T> {}
 
-impl<T> Swt<T>
-where
-    T: 'static
-{
+impl<T> Swt<T> {
     /// 新建软件定时器对象。
     ///
     /// 此方法是编译期方法。
@@ -201,7 +189,7 @@ where
     /// [`println!()`]: <https://docs.rs/libc-print/latest/libc_print/macro.libc_print.html>
     pub fn once(&'static self,
                 origin: XwTm, period: XwTm,
-                cb: fn(&'static Swt<T>)) {
+                cb: fn(&Swt<T>)) {
         unsafe {
             *self.cb.get() = Some(cb);
             let _ = xwrustffi_swt_once(self.swt.get(),
@@ -244,7 +232,7 @@ where
     /// [`println!()`]: <https://docs.rs/libc-print/latest/libc_print/macro.libc_print.html>
     pub fn repeat(&'static self,
                   origin: XwTm, period: XwTm,
-                  cb: fn(&'static Swt<T>)) {
+                  cb: fn(&Swt<T>)) {
         unsafe {
             *self.cb.get() = Some(cb);
             let _ = xwrustffi_swt_repeat(self.swt.get(),
@@ -256,7 +244,7 @@ where
 
     extern "C" fn xwrustffi_swt_callback_entry(_: *mut XwosSwt, arg: *mut c_void) {
         unsafe {
-            let swt: &'static Swt<T> = &*(arg as *const Swt<T>);
+            let swt: &Swt<T> = &*(arg as *const Swt<T>);
             let cb = (*swt.cb.get()).unwrap();
             cb(swt);
             *swt.cb.get() = Some(cb);
@@ -273,10 +261,7 @@ where
     }
 }
 
-impl<T> AsRef<T> for Swt<T>
-where
-    T: 'static
-{
+impl<T> AsRef<T> for Swt<T> {
     fn as_ref(&self) -> &T {
         unsafe {
             &*self.data.get()
@@ -284,10 +269,7 @@ where
     }
 }
 
-impl<T> AsMut<T> for Swt<T>
-where
-    T: 'static
-{
+impl<T> AsMut<T> for Swt<T> {
     fn as_mut(&mut self) -> &mut T {
         unsafe {
             &mut *self.data.get()

@@ -23,7 +23,7 @@ pub fn xwrust_example_xwmq() {
     let tx1 = tx.clone();
 
     println!("[主线程] thd: {:?}", cthd::i());
-    match thd::Builder::new()
+    match thd::DThdBuilder::new()
         .name("child0".into())
         .spawn(move |_| { // 子线程闭包
             cthd::sleep(xwtm::ms(200));
@@ -39,7 +39,7 @@ pub fn xwrust_example_xwmq() {
             },
         };
 
-    match thd::Builder::new()
+    match thd::DThdBuilder::new()
         .name("child1".into())
         .spawn(move |_| { // 子线程闭包
             cthd::sleep(xwtm::ms(500));

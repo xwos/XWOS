@@ -8,7 +8,7 @@ extern crate alloc;
 use alloc::sync::Arc;
 
 use xwrust::xwtm;
-use xwrust::xwos::thd;
+use xwrust::xwos::thd::*;
 use xwrust::xwos::cthd;
 use xwrust::xwos::lock::mtx::*;
 
@@ -38,7 +38,7 @@ pub fn xwrust_example_mutex() {
     local_mutex.init();
     let local_mutex_child = local_mutex.clone();
 
-    match thd::Builder::new()
+    match DThdBuilder::new()
         .name("child".into())
         .spawn(move |_| {
             // 子线程闭包

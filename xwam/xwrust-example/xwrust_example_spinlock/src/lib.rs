@@ -8,7 +8,7 @@ extern crate alloc;
 use alloc::sync::Arc;
 
 use xwrust::xwtm;
-use xwrust::xwos::thd;
+use xwrust::xwos::thd::*;
 use xwrust::xwos::cthd;
 use xwrust::xwos::lock::spinlock::*;
 
@@ -23,7 +23,7 @@ pub fn xwrust_example_spinlock() {
     local_spinlock.init();
     let local_spinlock_child = local_spinlock.clone();
 
-    match thd::Builder::new()
+    match DThdBuilder::new()
         .name("child".into())
         .spawn(move |_| {
             // 子线程闭包

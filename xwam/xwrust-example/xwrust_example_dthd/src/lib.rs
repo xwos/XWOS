@@ -1,20 +1,20 @@
-//! XWOS RUST Example: Thread
+//! XWOS RUST Example: Dynamic Thread
 //! ========
 //!
 
 #![no_std]
 
 use xwrust::xwtm;
-use xwrust::xwos::thd;
+use xwrust::xwos::thd::*;
 use xwrust::xwos::cthd;
 
 use libc_print::std_name::println;
 
-pub fn xwrust_example_thd() {
-    println!("XWOS RUST Example: Thread");
+pub fn xwrust_example_dthd() {
+    println!("XWOS RUST Example: Dynamic Thread");
 
     println!("[主线程]<{} ms> thd: {:?}", xwtm::nowtc(), cthd::i());
-    match thd::Builder::new()
+    match DThdBuilder::new()
         .name("child".into())
         .spawn(move |ele| {
             // 子线程闭包

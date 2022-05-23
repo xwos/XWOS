@@ -1,13 +1,13 @@
 [package]
-name = "xwrust_example_swt"
+name = "xwrust_example_dthd"
 version = "0.1.0"
 edition = "2021"
 authors = ["Roy Sun <xwos@xwos.tech>"]
-description = "XWOS RUST Software Timer Example"
+description = "XWOS RUST Dynamic Thread Example"
 license = "Apache-2.0"
 
 [lib]
-name = "xwrust_example_swt"
+name = "xwrust_example_dthd"
 
 [dependencies]
 xwrust = {path = "../../../xwmd/xwrust"}

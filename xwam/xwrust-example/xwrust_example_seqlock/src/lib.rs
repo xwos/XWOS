@@ -7,7 +7,7 @@
 extern crate alloc;
 
 use xwrust::xwtm;
-use xwrust::xwos::thd;
+use xwrust::xwos::thd::*;
 use xwrust::xwos::cthd;
 use xwrust::xwos::lock::seqlock::*;
 
@@ -22,7 +22,7 @@ pub fn xwrust_example_seqlock() {
     println!("[主线程] 初始化全局顺序锁。");
     GLOBAL_SEQLOCK.init();
 
-    let res = thd::Builder::new()
+    let res = DThdBuilder::new()
         .name("child".into())
         .spawn(move |_| {
             // 子线程闭包

@@ -40,6 +40,19 @@ xwer_t xwrustffi_thd_create(struct xwos_thd ** thd, xwsq_t * tik,
         return rc;
 }
 
+xwer_t xwrustffi_thd_init(struct xwos_thd * thd, xwsq_t * tik,
+                          struct xwos_thd_attr * attr,
+                          xwos_thd_f mainfunc, void * arg)
+{
+        xwos_thd_d thdd;
+        xwer_t rc;
+
+        attr->name = xwrustffi_thd_name;
+        rc = xwos_thd_init(thd, &thdd, attr, mainfunc, arg);
+        *tik = thdd.tik;
+        return rc;
+}
+
 xwer_t xwrustffi_thd_acquire(struct xwos_thd * thd, xwsq_t tik)
 {
         return xwos_thd_acquire((xwos_thd_d){thd, tik});
