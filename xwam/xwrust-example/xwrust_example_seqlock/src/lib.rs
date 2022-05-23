@@ -78,7 +78,7 @@ pub fn xwrust_example_seqlock() {
         Err(e) => {
             println!("[主线程] 进入写临界区失败：{:?}", e);
         }
-    }
+    };
     cthd::sleep(xwtm::ms(900));
     handle.quit();
 }

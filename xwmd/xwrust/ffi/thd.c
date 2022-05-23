@@ -24,13 +24,16 @@ void xwrustffi_thd_attr_init(struct xwos_thd_attr * attr)
         xwos_thd_attr_init(attr);
 }
 
+const char xwrustffi_thd_name[] = "xwrust.xwos.thd";
+
 xwer_t xwrustffi_thd_create(struct xwos_thd ** thd, xwsq_t * tik,
-                            const struct xwos_thd_attr * attr,
+                            struct xwos_thd_attr * attr,
                             xwos_thd_f mainfunc, void * arg)
 {
         xwos_thd_d thdd;
         xwer_t rc;
 
+        attr->name = xwrustffi_thd_name;
         rc = xwos_thd_create(&thdd, attr, mainfunc, arg);
         *thd = thdd.thd;
         *tik = thdd.tik;

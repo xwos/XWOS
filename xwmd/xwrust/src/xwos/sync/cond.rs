@@ -22,7 +22,7 @@
 //!
 //! XWOS RUST的条件量可使用 [`Cond::new()`] 创建。
 //!
-//! + 可以创建具有静态生命周期 [`'static`] 约束的全局变量：
+//! + 可以创建具有静态生命周期 [`static`] 约束的全局变量：
 //!
 //! ```rust
 //! use xwrust::xwos::sync::cond::*;
@@ -145,7 +145,7 @@
 //! [XWOS/xwam/xwrust-example/xwrust_example_cond](https://gitee.com/xwos/XWOS/blob/main/xwam/xwrust-example/xwrust_example_cond/src/lib.rs)
 //!
 //!
-//! [`'static`]: <https://doc.rust-lang.org/std/keyword.static.html>
+//! [`static`]: <https://doc.rust-lang.org/std/keyword.static.html>
 //! [`alloc::sync::Arc`]: <https://doc.rust-lang.org/alloc/sync/struct.Arc.html>
 //! [`Ok`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
 //! [`Err`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
@@ -277,11 +277,11 @@ impl Drop for Cond {
 impl Cond {
     /// 新建条件量对象。
     ///
-    /// 此方法是编译期方法，可用于新建 [`'static`] 约束的全局变量。
+    /// 此方法是编译期方法。
     ///
     /// # 示例
     ///
-    /// + 具有 [`'static`] 约束的全局变量全局变量：
+    /// + 具有 [`static`] 约束的全局变量全局变量：
     ///
     /// ```rust
     /// use xwrust::xwos::sync::cond::*;
@@ -300,7 +300,7 @@ impl Cond {
     /// }
     /// ```
     ///
-    /// [`'static`]: https://doc.rust-lang.org/std/keyword.static.html
+    /// [`static`]: https://doc.rust-lang.org/std/keyword.static.html
     pub const fn new() -> Self {
         Self {
             cond: UnsafeCell::new(XWOS_COND_INITIALIZER),

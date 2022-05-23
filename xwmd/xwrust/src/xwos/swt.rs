@@ -254,21 +254,21 @@ where
         }
     }
 
-    /// 停止软件定时器。
-    ///
-    /// 若软件定时器未到达超时时间，回调函数不会被调用。
-    pub fn stop(&'static self) {
-        unsafe {
-            xwrustffi_swt_stop(self.swt.get());
-        }
-    }
-
     extern "C" fn xwrustffi_swt_callback_entry(_: *mut XwosSwt, arg: *mut c_void) {
         unsafe {
             let swt: &'static Swt<T> = &*(arg as *const Swt<T>);
             let cb = (*swt.cb.get()).unwrap();
             cb(swt);
             *swt.cb.get() = Some(cb);
+        }
+    }
+
+    /// 停止软件定时器。
+    ///
+    /// 若软件定时器未到达超时时间，回调函数不会被调用。
+    pub fn stop(&'static self) {
+        unsafe {
+            xwrustffi_swt_stop(self.swt.get());
         }
     }
 }

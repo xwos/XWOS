@@ -92,7 +92,7 @@
 //! XWOS RUST的信号量可使用 [`Sel::new()`] 创建。
 //! 创建时需要指明泛型中的常量 `N` ，表示信号选择器中有个多少个位置可以绑定。
 //!
-//! + 可以创建具有静态生命周期 [`'static`] 约束的全局变量：
+//! + 可以创建具有静态生命周期 [`static`] 约束的全局变量：
 //!
 //! ```rust
 //! use xwrust::xwos::sync::sel::*;
@@ -175,7 +175,7 @@
 //! [`Flg::c0i`]: super::flg::Flg::c0i
 //! [`Flg::x1m`]: super::flg::Flg::x1m
 //! [`Flg::x1i`]: super::flg::Flg::x1i
-//! [`'static`]: <https://doc.rust-lang.org/std/keyword.static.html>
+//! [`static`]: <https://doc.rust-lang.org/std/keyword.static.html>
 //! [`alloc::sync::Arc`]: <https://doc.rust-lang.org/alloc/sync/struct.Arc.html>
 //! [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
 //! [`Sem::bind()`]: super::sem::Sem::bind
@@ -300,7 +300,7 @@ where
     ///
     /// # 示例
     ///
-    /// + 具有 [`'static`] 约束的全局变量全局变量：
+    /// + 具有 [`static`] 约束的全局变量全局变量：
     ///
     /// ```rust
     /// extern crate alloc;
@@ -319,7 +319,7 @@ where
     /// }
     /// ```
     ///
-    /// [`'static`]: https://doc.rust-lang.org/std/keyword.static.html
+    /// [`static`]: https://doc.rust-lang.org/std/keyword.static.html
     pub const fn new() -> Self {
         Self {
             sel: UnsafeCell::new(XwosSel {

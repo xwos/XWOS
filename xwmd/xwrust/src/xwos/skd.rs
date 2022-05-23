@@ -5,6 +5,7 @@
 use crate::types::*;
 
 /// 上下文枚举
+#[derive(Debug, Clone, Copy)]
 pub enum Context {
     /// 启动
     Boot,
