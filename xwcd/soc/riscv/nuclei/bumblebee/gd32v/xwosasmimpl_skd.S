@@ -3,10 +3,8 @@
  * @brief 玄武OS移植实现层：调度器汇编代码
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
- * Copyright (c) 2019 Nuclei Limited. All rights reserved.
  * @copyright
  * + (c) 2021 隐星魂 (Roy Sun) <xwos@xwos.tech>
- * + (c) 2019 Nuclei Limited. All rights reserved.
  * > Licensed under the Apache License, Version 2.0 (the "License");
  * > you may not use this file except in compliance with the License.
  * > You may obtain a copy of the License at
