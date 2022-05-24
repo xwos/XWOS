@@ -3,10 +3,8 @@
  * @brief SOC描述层：SOC汇编代码
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
- * Copyright (c) 2019 Nuclei Limited. All rights reserved.
  * @copyright
  * + (c) 2021 隐星魂 (Roy Sun) <xwos@xwos.tech>
- * + (c) 2019 Nuclei Limited. All rights reserved.
  * > Licensed under the Apache License, Version 2.0 (the "License");
  * > you may not use this file except in compliance with the License.
  * > You may obtain a copy of the License at
@@ -135,7 +133,6 @@ soc_boot_end:
  * @brief Macro to save caller x-registers
  */
         .macro SOC_SAVE_CALLER_X_CONTEXT
-        /* Allocate stack space for context saving */
         addi            sp, sp, -(SOC_CALLER_CONTEXT_SIZE)
         STORE           ra, 0 * REGBYTES (sp)
         STORE           t0, 1 * REGBYTES (sp)

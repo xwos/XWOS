@@ -124,20 +124,28 @@ xwer_t soc_irqc_init(void)
 __xwbsp_code
 xwer_t xwospl_irq_get_id(xwirq_t * irqnbuf)
 {
+        CSR_MSUBM_Type msubm;
         CSR_MCAUSE_Type mcause;
         xwirq_t code;
+        xwer_t rc;
 
-        mcause.d = __RV_CSR_READ(CSR_MCAUSE);
-        code = mcause.b.exccode;
-        if (0 == mcause.b.interrupt) {
-                if (SOC_EXCode_NMI == code) {
-                        code = -1;
-                } else {
-                        code -= SOCCFG_EXC_NUM;
+        msubm.d = __RV_CSR_READ(CSR_MSUBM);
+        if (msubm.b.typ) {
+                mcause.d = __RV_CSR_READ(CSR_MCAUSE);
+                code = mcause.b.exccode;
+                if (0 == mcause.b.interrupt) {
+                        if (SOC_EXCode_NMI == code) {
+                                code = -1;
+                        } else {
+                                code -= SOCCFG_EXC_NUM;
+                        }
                 }
+                *irqnbuf = code;
+                rc = XWOK;
+        } else {
+                rc = -ENOTISRCTX;
         }
-        *irqnbuf = code;
-        return XWOK;
+        return rc;
 }
 
 __xwbsp_code
