@@ -66,8 +66,8 @@ xwer_t xwos_example_xwobj(void)
                   sizeof(struct xwos_sel));
         xwobjlogf(INFO, "sizeof(struct xwcq): %d\n",
                   sizeof(struct xwcq));
-        xwobjlogf(INFO, "sizeof(struct xwmq): %d\n",
-                  sizeof(struct xwmq));
+        xwobjlogf(INFO, "sizeof(struct xwmq): %d, sizeof(struct xwmq_msg): %d\n",
+                  sizeof(struct xwmq), sizeof(struct xwmq_msg));
         xwobjlogf(INFO, "sizeof(struct xwpcp): %d\n",
                   sizeof(struct xwpcp));
         xwobjlogf(INFO, "sizeof(struct xwscp): %d\n",

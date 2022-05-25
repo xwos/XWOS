@@ -150,6 +150,8 @@ xwer_t xwmq_release(struct xwmq * mq, xwsq_t tik);
  * + 上下文：线程
  * @details
  * 若消息槽队列中没有空闲的消息槽，就阻塞发送线程，直到有空闲的消息槽或被中断。
+ *
+ * 如果等待被中断，此CAPI将返回 `-EINTR` 。
  */
 xwer_t xwmq_eq(struct xwmq * mq, xwsq_t topic, void * data);
 
@@ -171,7 +173,10 @@ xwer_t xwmq_eq(struct xwmq * mq, xwsq_t topic, void * data);
  * + 上下文：线程
  * @details
  * 若消息槽队列中没有空闲的消息槽，就阻塞发送线程，直到有空闲的消息槽或被中断或超时。
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ *
+ * 如果等待被中断，此CAPI将返回 `-EINTR` 。
+ *
+ * 如果 `to` 是过去的时间点，此CAPI将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwmq_eq_to(struct xwmq * mq, xwsq_t topic, void * data, xwtm_t to);
 
@@ -207,6 +212,8 @@ xwer_t xwmq_tryeq(struct xwmq * mq, xwsq_t topic, void * data);
  * + 上下文：线程
  * @details
  * 若消息槽队列中没有空闲的消息槽，就阻塞发送线程，直到有空闲的消息槽或被中断。
+ *
+ * 如果等待被中断，此CAPI将返回 `-EINTR` 。
  */
 xwer_t xwmq_jq(struct xwmq * mq, xwsq_t topic, void * data);
 
@@ -228,7 +235,10 @@ xwer_t xwmq_jq(struct xwmq * mq, xwsq_t topic, void * data);
  * + 上下文：线程
  * @details
  * 若消息槽队列中没有空闲的消息槽，就阻塞发送线程，直到有空闲的消息槽或被中断或超时。
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ *
+ * 如果等待被中断，此CAPI将返回 `-EINTR` 。
+ *
+ * 如果 `to` 是过去的时间点，此CAPI将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwmq_jq_to(struct xwmq * mq, xwsq_t topic, void * data, xwtm_t to);
 
@@ -264,6 +274,8 @@ xwer_t xwmq_tryjq(struct xwmq * mq, xwsq_t topic, void * data);
  * + 上下文：线程
  * @details
  * 若接收队列中没有消息，就阻塞接收线程，直到有新的消息槽或被中断。
+ *
+ * 如果等待被中断，此CAPI将返回 `-EINTR` 。
  */
 xwer_t xwmq_dq(struct xwmq * mq, xwsq_t * topic, void ** databuf);
 
@@ -285,7 +297,10 @@ xwer_t xwmq_dq(struct xwmq * mq, xwsq_t * topic, void ** databuf);
  * + 上下文：线程
  * @details
  * 若接收队列中没有消息，就阻塞接收线程，直到新的消息槽或被中断或超时。
- * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ *
+ * 如果等待被中断，此CAPI将返回 `-EINTR` 。
+ *
+ * 如果 `to` 是过去的时间点，此CAPI将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwmq_dq_to(struct xwmq * mq, xwsq_t * topic, void ** databuf, xwtm_t to);
 

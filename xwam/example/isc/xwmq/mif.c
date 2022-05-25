@@ -78,10 +78,6 @@ xwer_t xwmd_example_xwmq(void)
                 goto err_consumer_create;
         }
 
-        mqlogf(INFO,
-               "sizeof(struct xwmq): %d, sizeof(struct xwmq_msg): %d\n",
-               sizeof(struct xwmq), sizeof(struct xwmq_msg));
-
         return XWOK;
 
 err_consumer_create:

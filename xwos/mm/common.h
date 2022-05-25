@@ -21,8 +21,8 @@
  * @{
  */
 
-#define XWMM_ALIGNMENT          8U
-#define XWMM_ALIGNMENT_MASK     (XWMM_ALIGNMENT - 1)
+#define XWMM_ALIGNMENT XWMMCFG_ALIGNMENT
+#define XWMM_ALIGNMENT_MASK (XWMM_ALIGNMENT - 1)
 
 /**
  * @brief XWOS内存区域
