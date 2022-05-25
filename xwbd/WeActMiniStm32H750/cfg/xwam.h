@@ -41,6 +41,7 @@
 #define XWAMCFG_example_xwlib_crc               1
 #define XWAMCFG_example_cxx                     1
 #define XWAMCFG_example_isc_xwmq                1
+#define XWAMCFG_example_isc_xwcq                1
 
 #define XWAMCFG_application_w25qrpt             1
 

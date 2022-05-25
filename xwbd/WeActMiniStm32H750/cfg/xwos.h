@@ -59,6 +59,7 @@
  ******** ********   Memory Management Configurations  ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 /******** common ********/
+#define XWMMCFG_ALIGNMENT                               (8U)
 #define XWMMCFG_STACK_ALIGNMENT                         (8U)
 #define XWMMCFG_STACK_SIZE_DEFAULT                      (4096U)
 #define XWMMCFG_STACK_SIZE_MIN                          (1024U)
