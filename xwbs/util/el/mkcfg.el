@@ -412,6 +412,17 @@
       (setq loopflg nil))))
 (set-buffer XuanWuOS-cfg-buffer)
 (insert "## ******** ******** ******** ******** CPU ******** ******** ******** ******** ##\n")
+
+(set-buffer cpu-cfg-h-buffer)
+(goto-char (point-min))
+(let ((rc))
+  (setq rc (re-search-forward "^#define[ \t]+CPUCFG_L1_CACHELINE_SIZE[ \t]+(*\\([0-9]+\\))*" nil t))
+  (if (not (null rc))
+      (progn
+        (setq cpucfg-l1-cacheline-size (match-string 1))
+        (set-buffer XuanWuOS-cfg-buffer)
+        (insert (concat "CPUCFG_L1_CACHELINE_SIZE := " cpucfg-l1-cacheline-size "\n")))))
+
 (let (item cfg (loopflg t) (iterpoint 1))
   (set-buffer cpu-cfg-h-buffer)
   (while loopflg
@@ -484,6 +495,17 @@
       (setq loopflg nil))))
 (set-buffer XuanWuOS-cfg-buffer)
 (insert "## ******** ******** ******** ******** XWOS Kernel ******** ******** ******** ******** ##\n")
+
+(set-buffer xwkn-cfg-h-buffer)
+(goto-char (point-min))
+(let ((rc))
+  (setq rc (re-search-forward "^#define[ \t]+XWMMCFG_ALIGNMENT[ \t]+(*\\([0-9]+\\))*" nil t))
+  (if (not (null rc))
+      (progn
+        (setq xwmmcfg-alignment (match-string 1))
+        (set-buffer XuanWuOS-cfg-buffer)
+        (insert (concat "XWMMCFG_ALIGNMENT := " xwmmcfg-alignment "\n")))))
+
 (let (item cfg (loopflg t) (iterpoint 1))
   (set-buffer xwkn-cfg-h-buffer)
   (while loopflg

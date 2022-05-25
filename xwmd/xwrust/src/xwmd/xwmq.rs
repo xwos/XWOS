@@ -344,11 +344,13 @@ where
 
 unsafe impl<const N: XwSz, T> Send for Xwmq<N, T>
 where
-    [u8; N * SIZEOF_XWMQ_MSG]: Sized {}
+    [u8; N * SIZEOF_XWMQ_MSG]: Sized
+{}
 
 unsafe impl<const N: XwSz, T> Sync for Xwmq<N, T>
 where
-    [u8; N * SIZEOF_XWMQ_MSG]: Sized {}
+    [u8; N * SIZEOF_XWMQ_MSG]: Sized
+{}
 
 impl<const N: XwSz, T> Xwmq<N, T>
 where

@@ -24,7 +24,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********        cpu        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define CPUCFG_CPU_NUM                          1U
-#define CPUCFG_L1_CACHELINE_SIZE                32U
+#define CPUCFG_CPU_NUM                          (1U)
+#define CPUCFG_L1_CACHELINE_SIZE                (32U)
 
 #endif /* cfg/cpu.h */
