@@ -30,6 +30,7 @@ use xwrust_example_cond::xwrust_example_cond;
 use xwrust_example_flg::xwrust_example_flg;
 use xwrust_example_br::xwrust_example_br;
 use xwrust_example_sel::xwrust_example_sel;
+use xwrust_example_xwcq::xwrust_example_xwcq;
 use xwrust_example_xwmq::xwrust_example_xwmq;
 
 #[global_allocator]
@@ -63,6 +64,8 @@ pub unsafe extern "C" fn xwrust_main() {
     xwrust_example_sel();
     cthd::sleep(xwtm::ms(300));
     xwrust_example_xwmq();
+    cthd::sleep(xwtm::ms(300));
+    xwrust_example_xwcq();
 }
 
 #[no_mangle]

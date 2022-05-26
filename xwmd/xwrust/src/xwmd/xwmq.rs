@@ -3,20 +3,26 @@
 //!
 //! XWOS RUST的消息队列是仿照 [`std::sync::mpsc`]  编写的。可以有多个发送者，但只能有一个接收者。
 //!
-//! XWOS RUST的消息队列是一个先进先进（FIFO）队列。接收时，从队列的头部开始取走消息；发送时，可以将消息发送到队列尾部（入队 [`XwmqTx::eq()`] ），
-//! 也可将消息发送到队列的头部（插队 [`XwmqTx::jq()`] ）。
+//! XWOS RUST的消息队列是一个先进先进（FIFO）队列。
+//!
+//! 消息队列在创建时，需要指定一个类型 `T` ，发送和接收的数据只能是类型 `T` 的数据。
+//! 发送时，消息队列会通过 [`Box`] 将类型 `T` 的数据存入堆内存中。然后将 `Box<T>` 的裸指针发送到队列。
+//! 可以发送到尾部（入队 [`XwmqTx::eq()`] ），也可将消息发送到队列的头部（插队 [`XwmqTx::jq()`] ）。
+//!
+//! 接收时，会从队列中取出 `T` 的裸指针，然后恢复成 `Box<T>` 后返回，由于 [`Box`] 能自动释放内存，因此用户不需要关心内存释放的问题。
+//! 接收消息可以从头部接收，也可以从尾部接收。
 //!
 //!
 //! # 创建
 //!
 //! XWOS RUST的消息队列可使用 [`Xwmq::new()`] 创建。创建时需要指定两个类型参数：发送消息槽的个数以及消息数据的类型。
 //!
-//! + 可以创建具有静态生命周期 [`'static`] 约束的全局变量：
+//! + 可以创建具有静态生命周期 [`static`] 约束的全局变量：
 //!
 //! ```rust
 //! use xwrust::xwmd::xwmq::*;
 //!
-//! pub static MQ: Xwmq<16, String> = Xwmq::new(); // 16个消息槽，数据类型为String
+//! static MQ: Xwmq<16, String> = Xwmq::new(); // 16个消息槽，数据类型为String
 //! ```
 //!
 //! + 也可以使用 [`alloc::sync::Arc`] 在heap中创建：
@@ -28,7 +34,7 @@
 //! use xwrust::xwmd::xwmq::*;
 //!
 //! pub fn xwrust_example_xwmq() {
-//!     let mq: Arc<Xwmq<16, String>> = Arc::new(Xwmq::new()); // 16个消息槽，数据类型为String
+//!     let mq: Arc<Xwmq<16, String>> = Arc::new(Xwmq::new()); // 16个消息槽，数据类型为 `String`
 //! }
 //! ```
 //!
@@ -161,7 +167,7 @@
 //! use xwrust::xwos::thd;
 //! use xwrust::xwmd::xwmq::*;
 //!
-//! pub static MQ: Xwmq<16, u32> = Xwmq::new();
+//! static MQ: Xwmq<16, u32> = Xwmq::new();
 //!
 //! pub fn xwrust_example_xwmq() {
 //!     println!("XWOS RUST Example: XWMQ");
@@ -198,7 +204,7 @@
 //!
 //! ### 构建全局变量的方式
 //!
-//! + [`std::sync::mpsc`] 没有编译期构造函数，因此只能借助宏 [`lazy_static!`] 创建 [`'static`] 约束的全局变量；
+//! + [`std::sync::mpsc`] 没有编译期构造函数，因此只能借助宏 [`lazy_static!`] 创建全局变量；
 //! + [`xwrust::xwmd::xwmq`] 则可以直接在函数外部定义。
 //!
 //!
@@ -215,7 +221,7 @@
 //! [`std::sync::mpsc`]: <https://doc.rust-lang.org/std/sync/mpsc/index.html>
 //! [`std::sync::mpsc::channel()`]: <https://doc.rust-lang.org/std/sync/mpsc/fn.channel.html>
 //! [`std::sync::mpsc::sync_channel()`]: <https://doc.rust-lang.org/std/sync/mpsc/fn.sync_channel.html>
-//! [`'static`]: <https://doc.rust-lang.org/std/keyword.static.html>
+//! [`static`]: <https://doc.rust-lang.org/std/keyword.static.html>
 //! [`alloc::sync::Arc`]: <https://doc.rust-lang.org/alloc/sync/struct.Arc.html>
 //! [`Send`]: <https://doc.rust-lang.org/core/marker/trait.Send.html>
 //! [`Sync`]: <https://doc.rust-lang.org/core/marker/trait.Sync.html>
@@ -362,12 +368,12 @@ where
     ///
     /// # 示例
     ///
-    /// + 具有 [`'static`] 约束的全局变量全局变量：
+    /// + 具有 [`static`] 约束的全局变量全局变量：
     ///
     /// ```rust
     /// use xwrust::xwmd::xwmq::*;
     ///
-    /// pub static MQ: Xwmq<16, String> = Xwmq::new(); // 16个消息槽，数据类型为String
+    /// static MQ: Xwmq<16, String> = Xwmq::new(); // 16个消息槽，数据类型为String
     /// ```
     ///
     /// + 在heap中创建：
@@ -383,7 +389,7 @@ where
     /// }
     /// ```
     ///
-    /// [`'static`]: https://doc.rust-lang.org/std/keyword.static.html
+    /// [`static`]: https://doc.rust-lang.org/std/keyword.static.html
     pub const fn new() -> Self {
         Self {
             mq: UnsafeCell::new(XWMQ_INITIALIZER),
@@ -403,18 +409,18 @@ where
     /// ```rust
     /// use xwrust::xwmd::xwmq::*;
     ///
-    /// pub static MQ: Xwmq<16, String> = Xwmq::new();
+    /// static MQ: Xwmq<16, String> = Xwmq::new();
     ///
     /// pub fn xwrust_example_xwmq() {
     ///     let (tx, rx) = MQ.init();
     /// }
     /// ```
-    pub fn init(&self) -> (XwmqTx<N, T>, XwmqRx<N, T>) {
+    pub fn init<'a>(&'a self) -> (XwmqTx<'a, N, T>, XwmqRx<'a, N, T>) {
         unsafe {
             xwmq_init(self.mq.get(), self.pool.get() as _, N);
             *self.tik.get() = xwmq_gettik(self.mq.get());
         }
-        (XwmqTx {xwmq: &self}, XwmqRx {xwmq: &self}, )
+        (XwmqTx {xwmq: &self}, XwmqRx {xwmq: &self})
     }
 }
 
@@ -486,7 +492,7 @@ where
     ///
     /// use xwrust::xwmd::xwmq::*;
     ///
-    /// pub static MQ: Xwmq<16, String> = Xwmq::new();
+    /// static MQ: Xwmq<16, String> = Xwmq::new();
     ///
     /// pub fn xwrust_example_xwmq() {
     ///     let (tx, rx) = MQ.init();
@@ -556,7 +562,7 @@ where
     /// use xwrust::xwtm;
     /// use xwrust::xwmd::xwmq::*;
     ///
-    /// pub static MQ: Xwmq<16, String> = Xwmq::new();
+    /// static MQ: Xwmq<16, String> = Xwmq::new();
     ///
     /// pub fn xwrust_example_xwmq() {
     ///     let (tx, rx) = MQ.init();
@@ -621,7 +627,7 @@ where
     ///
     /// use xwrust::xwmd::xwmq::*;
     ///
-    /// pub static MQ: Xwmq<16, String> = Xwmq::new();
+    /// static MQ: Xwmq<16, String> = Xwmq::new();
     ///
     /// pub fn xwrust_example_xwmq() {
     ///     let (tx, rx) = MQ.init();
@@ -682,7 +688,7 @@ where
     ///
     /// use xwrust::xwmd::xwmq::*;
     ///
-    /// pub static MQ: Xwmq<16, String> = Xwmq::new();
+    /// static MQ: Xwmq<16, String> = Xwmq::new();
     ///
     /// pub fn xwrust_example_xwmq() {
     ///     let (tx, rx) = MQ.init();
@@ -752,7 +758,7 @@ where
     /// use xwrust::xwtm;
     /// use xwrust::xwmd::xwmq::*;
     ///
-    /// pub static MQ: Xwmq<16, String> = Xwmq::new();
+    /// static MQ: Xwmq<16, String> = Xwmq::new();
     ///
     /// pub fn xwrust_example_xwmq() {
     ///     let (tx, rx) = MQ.init();
@@ -817,7 +823,7 @@ where
     ///
     /// use xwrust::xwmd::xwmq::*;
     ///
-    /// pub static MQ: Xwmq<16, String> = Xwmq::new();
+    /// static MQ: Xwmq<16, String> = Xwmq::new();
     ///
     /// pub fn xwrust_example_xwmq() {
     ///     let (tx, rx) = MQ.init();
@@ -883,7 +889,7 @@ where
     ///
     /// use xwrust::xwmd::xwmq::*;
     ///
-    /// pub static MQ: Xwmq<16, String> = Xwmq::new();
+    /// static MQ: Xwmq<16, String> = Xwmq::new();
     ///
     /// pub fn xwrust_example_xwmq() {
     ///     let (tx, rx) = MQ.init();
@@ -963,7 +969,7 @@ where
     /// use xwrust::xwtm;
     /// use xwrust::xwmd::xwmq::*;
     ///
-    /// pub static MQ: Xwmq<16, String> = Xwmq::new();
+    /// static MQ: Xwmq<16, String> = Xwmq::new();
     ///
     /// pub fn xwrust_example_xwmq() {
     ///     let (tx, rx) = MQ.init();
@@ -1038,7 +1044,7 @@ where
     ///
     /// use xwrust::xwmd::xwmq::*;
     ///
-    /// pub static MQ: Xwmq<16, String> = Xwmq::new();
+    /// static MQ: Xwmq<16, String> = Xwmq::new();
     ///
     /// pub fn xwrust_example_xwmq() {
     ///     let (tx, rx) = MQ.init();

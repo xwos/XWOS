@@ -15,7 +15,7 @@ use xwrust::xwmd::xwmq::*;
 
 use libc_print::std_name::println;
 
-pub static MQ: Xwmq<16, String> = Xwmq::new();
+static MQ: Xwmq<16, String> = Xwmq::new();
 
 pub fn xwrust_example_xwmq() {
     println!("XWOS RUST Example: XWMQ");

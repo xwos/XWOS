@@ -22,6 +22,7 @@ xwrust_example_cond = {path = "../../../../xwam/xwrust-example/xwrust_example_co
 xwrust_example_flg = {path = "../../../../xwam/xwrust-example/xwrust_example_flg"}
 xwrust_example_br = {path = "../../../../xwam/xwrust-example/xwrust_example_br"}
 xwrust_example_sel = {path = "../../../../xwam/xwrust-example/xwrust_example_sel"}
+xwrust_example_xwcq = {path = "../../../../xwam/xwrust-example/xwrust_example_xwcq"}
 xwrust_example_xwmq = {path = "../../../../xwam/xwrust-example/xwrust_example_xwmq"}
 libc-print = "0.1"
 # lazy_static = { version = "1.4", features = ["spin_no_std"] }

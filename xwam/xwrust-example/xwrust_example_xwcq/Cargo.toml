@@ -1,0 +1,14 @@
+[package]
+name = "xwrust_example_xwcq"
+version = "0.1.0"
+edition = "2021"
+authors = ["Roy Sun <xwos@xwos.tech>"]
+description = "XWOS RUST XWCQ Example"
+license = "Apache-2.0"
+
+[lib]
+name = "xwrust_example_xwcq"
+
+[dependencies]
+xwrust = {path = "../../../xwmd/xwrust"}
+libc-print = "0.1"
