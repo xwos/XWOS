@@ -3,16 +3,16 @@
 //!
 //! # 简介
 //!
-//! XWOS是纯C语言实现的RTOS内核。XWOS RUST基于XWOS的C-API编写的RUST语言 `#![no_std]` 环境中的框架代码，
+//! XWOS RUST是基于XWOS的CAPI编写的RUST语言 `#![no_std]` 环境的框架，
 //! 可让XWOS从C语言的RTOS进化成RUST语言的RTOS。
 //!
 //! 在编写XWOS RUST时，作者充分阅读并参考了RUST的std库的代码，
-//! 尽量仿照std库的形式提供API。使得熟悉RUST语言的朋友可以很快掌握如何使用XWOS RUST。
+//! 尽量仿照std库的形式提供API。使得熟悉RUST语言的朋友更容易掌握如何使用XWOS RUST。
 //!
 //!
-//! 就像RUST程序的入口是 `main.rs` 的 `fn main()` 一样，
+//! 传统RUST程序的入口是 `main.rs` 的 `fn main()` ，
 //! XWOS RUST的入口是 `pub unsafe extern "C" fn xwrust_main()` 。
-//! 用户需要在工程目录（例如电路板模块 `bm` 文件夹 或 `OEM` 文件夹）建立一个独立的 **玄武模块** 来定义此函数。
+//! 用户需要在工程目录（例如电路板模块 `bm` 文件夹 或 `OEM` 文件夹）建立一个独立的 [**玄武模块**](../../docs/user-manual/build-system/#玄武模块) 来定义此函数。
 //!
 //! ```rust
 //! // bm/rustapp/src/lib.rs
@@ -66,7 +66,9 @@
 //!   + [事件标志](crate::xwos::sync::flg)
 //!   + [线程栅栏](crate::xwos::sync::br)
 //!   + [信号选择器](crate::xwos::sync::sel)
-//! + [消息队列](crate::xwmd::xwmq)
+//! + 线程间通讯
+//!   + [消息队列](crate::xwmd::xwmq)
+//!   + [循环队列](crate::xwmd::xwcq)
 //! + 其他
 //!   + [时间](crate::xwtm)
 //!   + [类型](crate::types)

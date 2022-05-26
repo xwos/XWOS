@@ -101,8 +101,8 @@ xwer_t xwcq_init(struct xwcq * cq, xwsz_t slotsize, xwsz_t slotnum, xwu8_t * mem
         XWOS_VALIDATE((cq), "nullptr", -EFAULT);
         XWOS_VALIDATE((mem), "nullptr", -EFAULT);
         XWOS_VALIDATE((slotsize > 0), "zero-size", -ESIZE);
-        XWOS_VALIDATE(!(slotsize & XWMM_ALIGNMENT_MASK), "size-not-aligned", -EALIGN);
         XWOS_VALIDATE((slotnum > 0), "zero-num", -ESIZE);
+        XWOS_VALIDATE(!(slotsize & XWMM_ALIGNMENT_MASK), "size-not-aligned", -EALIGN);
 
         xwcq_construct(cq, mem);
         return xwcq_activate(cq, slotsize, slotnum, xwcq_gc);
@@ -130,14 +130,12 @@ xwsq_t xwcq_gettik(struct xwcq * cq)
 __xwmd_api
 xwer_t xwcq_acquire(struct xwcq * cq, xwsq_t tik)
 {
-        XWOS_VALIDATE((cq), "nullptr", -EFAULT);
         return xwos_object_acquire(&cq->xwobj, tik);
 }
 
 __xwmd_api
 xwer_t xwcq_release(struct xwcq * cq, xwsq_t tik)
 {
-        XWOS_VALIDATE((cq), "nullptr", -EFAULT);
         return xwos_object_release(&cq->xwobj, tik);
 }
 
@@ -357,13 +355,13 @@ err_sem_trywait:
 }
 
 __xwmd_api
-xwer_t xwcq_peek(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
+xwer_t xwcq_pfq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
 {
-        return xwcq_peek_to(cq, buf, size, XWTM_MAX);
+        return xwcq_pfq_to(cq, buf, size, XWTM_MAX);
 }
 
 __xwmd_api
-xwer_t xwcq_peek_to(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t to)
+xwer_t xwcq_pfq_to(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t to)
 {
         xwreg_t cpuirq;
         xwsz_t bufsz;
@@ -392,7 +390,7 @@ err_sem_wait_to:
 }
 
 __xwmd_api
-xwer_t xwcq_trypeek(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
+xwer_t xwcq_trypfq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
 {
         xwreg_t cpuirq;
         xwsz_t bufsz;
@@ -411,6 +409,80 @@ xwer_t xwcq_trypeek(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
         }
         xwos_splk_lock_cpuirqsv(&cq->lock, &cpuirq);
         memcpy(buf, &cq->q[(xwsz_t)cq->front * cq->slotsize], cpsz);
+        xwos_splk_unlock_cpuirqrs(&cq->lock, cpuirq);
+        xwos_sem_post(&cq->sem);
+        *size = cpsz;
+        return XWOK;
+
+err_sem_trywait:
+        return rc;
+}
+
+__xwmd_api
+xwer_t xwcq_prq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
+{
+        return xwcq_prq_to(cq, buf, size, XWTM_MAX);
+}
+
+__xwmd_api
+xwer_t xwcq_prq_to(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t to)
+{
+        xwreg_t cpuirq;
+        xwssz_t rear;
+        xwsz_t bufsz;
+        xwsz_t cpsz;
+        xwer_t rc;
+
+        XWOS_VALIDATE(cq, "nullptr", -EFAULT);
+        XWOS_VALIDATE(buf, "nullptr", -EFAULT);
+        XWOS_VALIDATE(size, "nullptr", -EFAULT);
+
+        bufsz = *size;
+        cpsz = bufsz > cq->slotsize? cq->slotsize : bufsz;
+        rc = xwos_sem_wait_to(&cq->sem, to);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_sem_wait_to;
+        }
+        xwos_splk_lock_cpuirqsv(&cq->lock, &cpuirq);
+        rear = cq->rear - 1;
+        if (rear < 0) {
+                rear = (xwssz_t)cq->slotnum - 1;
+        }
+        memcpy(buf, &cq->q[(xwsz_t)rear * cq->slotsize], cpsz);
+        xwos_splk_unlock_cpuirqrs(&cq->lock, cpuirq);
+        xwos_sem_post(&cq->sem);
+        *size = cpsz;
+        return XWOK;
+
+err_sem_wait_to:
+        return rc;
+}
+
+__xwmd_api
+xwer_t xwcq_tryprq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
+{
+        xwreg_t cpuirq;
+        xwssz_t rear;
+        xwsz_t bufsz;
+        xwsz_t cpsz;
+        xwer_t rc;
+
+        XWOS_VALIDATE(cq, "nullptr", -EFAULT);
+        XWOS_VALIDATE(buf, "nullptr", -EFAULT);
+        XWOS_VALIDATE(size, "nullptr", -EFAULT);
+
+        bufsz = *size;
+        cpsz = bufsz > cq->slotsize? cq->slotsize : bufsz;
+        rc = xwos_sem_trywait(&cq->sem);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_sem_trywait;
+        }
+        xwos_splk_lock_cpuirqsv(&cq->lock, &cpuirq);
+        rear = cq->rear - 1;
+        if (rear < 0) {
+                rear = (xwssz_t)cq->slotnum - 1;
+        }
+        memcpy(buf, &cq->q[(xwsz_t)rear * cq->slotsize], cpsz);
         xwos_splk_unlock_cpuirqrs(&cq->lock, cpuirq);
         xwos_sem_post(&cq->sem);
         *size = cpsz;
@@ -445,20 +517,20 @@ xwer_t xwcq_get_size(struct xwcq * cq, xwsz_t * szbuf)
         XWOS_VALIDATE(cq, "nullptr", -EFAULT);
         XWOS_VALIDATE(szbuf, "nullptr", -EFAULT);
 
-        if (cq->rear >= cq->front) {
-                *szbuf = (xwsz_t)cq->rear - (xwsz_t)cq->front;
-        } else {
-                *szbuf = cq->slotnum - (xwsz_t)cq->front + (xwsz_t)cq->rear;
-        }
+        *szbuf = cq->slotsize;
         return XWOK;
 }
 
-xwer_t xwcq_tst_empty(struct xwcq * cq, bool * emptybuf)
+xwer_t xwcq_get_availability(struct xwcq * cq, xwsz_t * avbbuf)
 {
         XWOS_VALIDATE(cq, "nullptr", -EFAULT);
-        XWOS_VALIDATE(emptybuf, "nullptr", -EFAULT);
+        XWOS_VALIDATE(avbbuf, "nullptr", -EFAULT);
 
-        *emptybuf = !!(cq->rear == cq->front);
+        if (cq->rear >= cq->front) {
+                *avbbuf = (xwsz_t)cq->rear - (xwsz_t)cq->front;
+        } else {
+                *avbbuf = cq->slotnum - (xwsz_t)cq->front + (xwsz_t)cq->rear;
+        }
         return XWOK;
 }
 
