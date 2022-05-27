@@ -428,10 +428,10 @@ xwer_t xwmp_cond_intr_all(struct xwmp_cond * cond)
 {
         struct xwmp_wqn * c;
         xwmp_wqn_f cb;
-        xwer_t rc;
         xwreg_t cpuirq;
 
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+
         xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
         xwmp_plwq_itr_wqn_rm(c, &cond->wq.pl) {
                 xwmp_splk_lock(&c->lock);
@@ -447,7 +447,7 @@ xwer_t xwmp_cond_intr_all(struct xwmp_cond * cond)
                 xwmp_plwq_lock_cpuirq(&cond->wq.pl);
         }
         xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
-        return rc;
+        return XWOK;
 }
 
 static __xwmp_code
