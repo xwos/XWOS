@@ -25,7 +25,6 @@
 #include <bm/stm32cube/mif.h>
 #include <bm/button/mif.h>
 #include <bm/main/thd.h>
-#include <xwam/example/cxx/mif.h>
 
 #define MAIN_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
 
@@ -72,6 +71,8 @@ err_skd_start_lc:
         return rc;
 }
 
+extern void xwrust_main(void);
+
 xwer_t main_task(void * arg)
 {
         xwer_t rc;
@@ -105,14 +106,10 @@ xwer_t main_task(void * arg)
         }
 #endif
 
-        rc = example_cxx_start();
-        if (rc < 0) {
-                goto err_example_cxx_start;
-        }
+        xwrust_main();
 
         return XWOK;
 
-err_example_cxx_start:
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
         BDL_BUG();
 err_xwlua_start:
