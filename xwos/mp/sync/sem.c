@@ -1492,12 +1492,11 @@ xwer_t xwmp_rtsem_wait_unintr(struct xwmp_sem * sem)
 __xwmp_api
 xwer_t xwmp_sem_getvalue(struct xwmp_sem * sem, xwssq_t * sval)
 {
-        xwer_t rc;
-
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((sval), "nullptr", -EFAULT);
+
         *sval = sem->count;
-        return rc;
+        return XWOK;
 }
 
 /**
@@ -1513,10 +1512,9 @@ xwer_t xwmp_sem_getvalue(struct xwmp_sem * sem, xwssq_t * sval)
 __xwmp_api
 xwer_t xwmp_sem_gettype(struct xwmp_sem * sem, xwid_t * type)
 {
-        xwer_t rc;
-
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((type), "nullptr", -EFAULT);
+
         *type = sem->type;
-        return rc;
+        return XWOK;
 }
