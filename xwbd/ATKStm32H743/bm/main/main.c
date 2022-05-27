@@ -111,6 +111,7 @@ xwer_t main_task(void * arg)
                 goto err_xwlua_start;
         }
 #endif
+
         xwrust_main();
 
         return XWOK;

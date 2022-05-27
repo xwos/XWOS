@@ -38,3 +38,10 @@ void board_xwskd_syshwt_hook(struct xwospl_skd * xwskd)
         XWOS_UNUSED(xwskd);
         stm32cube_systick_hook();
 }
+
+__xwos_code
+void board_thd_postinit_hook(struct xwospl_thd * thd)
+{
+        XWOS_UNUSED(thd);
+        /* Add MPU code here. */
+}

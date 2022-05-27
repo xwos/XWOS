@@ -70,6 +70,8 @@ err_skd_start_lc:
         return rc;
 }
 
+extern void xwrust_main(void);
+
 xwer_t main_task(void * arg)
 {
         xwer_t rc;
@@ -97,6 +99,8 @@ xwer_t main_task(void * arg)
                 goto err_xwlua_start;
         }
 #endif
+
+        xwrust_main();
 
         return XWOK;
 

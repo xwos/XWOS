@@ -61,8 +61,8 @@
 /******** common ********/
 #define XWMMCFG_ALIGNMENT                               (8U)
 #define XWMMCFG_STACK_ALIGNMENT                         (8U)
-#define XWMMCFG_STACK_SIZE_DEFAULT                      (2048U)
-#define XWMMCFG_STACK_SIZE_MIN                          (512U)
+#define XWMMCFG_STACK_SIZE_DEFAULT                      (4096U)
+#define XWMMCFG_STACK_SIZE_MIN                          (1024U)
 #define XWMMCFG_STACK_GUARD_SIZE_DEFAULT                (64U)
 #define XWMMCFG_STACK_CHK_SWCX                          1
 #define XWMMCFG_FD_STACK                                1
@@ -129,7 +129,7 @@
 /******** ******** ******** memory management ******** ******** ********/
 
 /******** ******** ******** scheduler ******** ******** ********/
-/* #define XWUPCFG_SKD_PRIORITY_RT_NUM                  (4U) */
+/* #define XWUPCFG_SKD_PRIORITY_RT_NUM                  (8U) */
 /* #define XWUPCFG_SKD_IDLE_STACK_SIZE                  (2048U) */
 /* #define XWUPCFG_SKD_BH                               1 */
 /* #define XWUPCFG_SKD_BH_STACK_SIZE                    (2048U) */
