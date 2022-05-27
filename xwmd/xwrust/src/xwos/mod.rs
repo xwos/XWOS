@@ -3,6 +3,7 @@
 //!
 
 pub mod skd;
+pub mod pm;
 pub mod thd;
 pub mod cthd;
 pub mod swt;

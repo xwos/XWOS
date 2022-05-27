@@ -74,10 +74,14 @@ void xwos_pm_set_cb(xwos_pm_cb_f resume_cb,
 }
 
 /**
- * @brief XWOS API：暂停XWOS，并将系统切换为低功耗状态
+ * @brief XWOS API：将系统切换为低功耗状态
  * @return 错误码
+ * @retval XWOK: 成功
+ * @retval -EACCES: 系统不是运行状态
  * @note
  * + 上下文：任意
+ * @details
+ * 调用此方法后，所有线程都将开始冻结。冻结完成后，系统开始进入低功耗状态。
  */
 static __xwos_inline_api
 xwer_t xwos_pm_suspend(void)
@@ -86,10 +90,14 @@ xwer_t xwos_pm_suspend(void)
 }
 
 /**
- * @brief XWOS API：唤醒系统，并继续运行XWOS
+ * @brief XWOS API：唤醒系统
  * @return 错误码
+ * @retval XWOK: 成功
+ * @retval -EALREADY: 系统正在运行
  * @note
  * + 上下文：中断
+ * @details
+ * 只可在唤醒中断中调用。
  */
 static __xwos_inline_api
 xwer_t xwos_pm_resume(void)
