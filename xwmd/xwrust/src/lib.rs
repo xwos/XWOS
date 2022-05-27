@@ -54,6 +54,8 @@
 //!
 //! XWOS RUST提供了RTOS的基本功能：
 //!
+//! + [调度器](crate::xwos::skd)
+//! + [电源管理](crate::xwos::pm)
 //! + [线程](crate::xwos::thd)
 //! + [软件定时器](crate::xwos::swt)
 //! + [锁](crate::xwos::lock)
