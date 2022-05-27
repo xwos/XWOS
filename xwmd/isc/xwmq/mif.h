@@ -280,7 +280,7 @@ xwer_t xwmq_tryjq(struct xwmq * mq, xwsq_t topic, void * data);
 xwer_t xwmq_dq(struct xwmq * mq, xwsq_t * topic, void ** databuf);
 
 /**
- * @brief XWMQ API: 限时等待从消息接收队列前端取出一条消息
+ * @brief XWMQ API: 限时等待从消息接收队列头部取出一条消息
  * @param[in] mq: 消息队列对象的指针
  * @param[out] :data 指向缓冲区的指针，通过此缓冲区返回接收消息的数据
  * @param[out] :topic 指向缓冲区的指针，通过此缓冲区返回接收消息的标题
@@ -318,6 +318,67 @@ xwer_t xwmq_dq_to(struct xwmq * mq, xwsq_t * topic, void ** databuf, xwtm_t to);
  * 若接收队列中没有新的消息，就立即返回 `-ENODATA` ，因此可在中断中使用。
  */
 xwer_t xwmq_trydq(struct xwmq * mq, xwsq_t * topic, void ** databuf);
+
+/**
+ * @brief XWMQ API: 等待从消息队列尾部取出一条消息
+ * @param[in] mq: 消息队列对象的指针
+ * @param[out] :data 指向缓冲区的指针，通过此缓冲区返回接收消息的数据
+ * @param[out] :topic 指向缓冲区的指针，通过此缓冲区返回接收消息的标题
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -EINTR: 等待被中断
+ * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @retval -EDSPMPT: 抢占被关闭
+ * @retval -EDSBH: 中断底半部被关闭
+ * @note
+ * + 上下文：线程
+ * @details
+ * 若接收队列中没有消息，就阻塞接收线程，直到有新的消息槽或被中断。
+ *
+ * 如果等待被中断，此CAPI将返回 `-EINTR` 。
+ */
+xwer_t xwmq_rq(struct xwmq * mq, xwsq_t * topic, void ** databuf);
+
+/**
+ * @brief XWMQ API: 限时等待从消息接收队列尾部取出一条消息
+ * @param[in] mq: 消息队列对象的指针
+ * @param[out] :data 指向缓冲区的指针，通过此缓冲区返回接收消息的数据
+ * @param[out] :topic 指向缓冲区的指针，通过此缓冲区返回接收消息的标题
+ * @param[in] to: 期望唤醒的时间点
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -EINTR: 等待被中断
+ * @retval -ETIMEDOUT: 超时
+ * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @retval -EDSPMPT: 抢占被关闭
+ * @retval -EDSBH: 中断底半部被关闭
+ * @note
+ * + 上下文：线程
+ * @details
+ * 若接收队列中没有消息，就阻塞接收线程，直到新的消息槽或被中断或超时。
+ *
+ * 如果等待被中断，此CAPI将返回 `-EINTR` 。
+ *
+ * 如果 `to` 是过去的时间点，此CAPI将直接返回 `-ETIMEDOUT` 。
+ */
+xwer_t xwmq_rq_to(struct xwmq * mq, xwsq_t * topic, void ** databuf, xwtm_t to);
+
+/**
+ * @brief XWMQ API: 尝试从消息队列尾部取出一条消息
+ * @param[in] mq: 消息队列对象的指针
+ * @param[out] ptrbuf: 指向缓冲区的指针，此缓冲区用于接收消息
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ENODATA: 接收队列为空
+ * @note
+ * + 上下文：任意
+ * @details
+ * 若接收队列中没有新的消息，就立即返回 `-ENODATA` ，因此可在中断中使用。
+ */
+xwer_t xwmq_tryrq(struct xwmq * mq, xwsq_t * topic, void ** databuf);
 
 /**
  * @} xwmd_isc_xwmq
