@@ -158,21 +158,21 @@ where
         }
     }
 
-    /// 将位图中掩码部分置1
+    /// 将位图中掩码部分置 **1**
     pub fn s1m(&self, msk: &Self) {
         unsafe {
             xwbmpop_s1m(self.bmp.get() as _ , msk.bmp.get() as _, N);
         }
     }
 
-    /// 将位图中单个位清0
+    /// 将位图中单个位清 **0**
     pub fn c0i(&self, n: XwSq) {
         unsafe {
             xwbmpop_c0i(self.bmp.get() as _ , n);
         }
     }
 
-    /// 将位图中掩码部分清0
+    /// 将位图中掩码部分清 **0**
     pub fn c0m(&self, msk: &Self) {
         unsafe {
             xwbmpop_c0m(self.bmp.get() as _ , msk.bmp.get() as _, N);
@@ -193,77 +193,77 @@ where
         }
     }
 
-    /// 测试位图中的单个位是否为1
+    /// 测试位图中的单个位是否为 **1**
     pub fn t1i(&self, n: XwSq) -> bool {
         unsafe {
             xwbmpop_t1i(self.bmp.get() as _ , n)
         }
     }
 
-    /// 测试位图中掩码部分是否全部为1
+    /// 测试位图中掩码部分是否全部为 **1**
     pub fn t1ma(&self, msk: &Self) -> bool {
         unsafe {
             xwbmpop_t1ma(self.bmp.get() as _ , msk.bmp.get() as _, N)
         }
     }
 
-    /// 测试位图中掩码部分是否至少有一位为1
+    /// 测试位图中掩码部分是否至少有一位为 **1**
     pub fn t1mo(&self, msk: &Self) -> bool {
         unsafe {
             xwbmpop_t1mo(self.bmp.get() as _ , msk.bmp.get() as _, N)
         }
     }
 
-    /// 测试位图中掩码部分是否全部为1，如果是，就将掩码部分全部清0
+    /// 测试位图中掩码部分是否全部为 **1** ，如果是，就将掩码部分全部清 **0**
     pub fn t1ma_then_c0m(&self, msk: &Self) -> bool {
         unsafe {
             xwbmpop_t1ma_then_c0m(self.bmp.get() as _ , msk.bmp.get() as _, N)
         }
     }
 
-    /// 测试位图中掩码部分是否至少有一位为1，如果是，就将掩码部分全部清0
+    /// 测试位图中掩码部分是否至少有一位为 **1** ，如果是，就将掩码部分全部清 **0**
     pub fn t1mo_then_c0m(&self, msk: &Self) -> bool {
         unsafe {
             xwbmpop_t1mo_then_c0m(self.bmp.get() as _ , msk.bmp.get() as _, N)
         }
     }
 
-    /// 测试位图中掩码部分是否全部为0，如果是，就将掩码部分全部置1
+    /// 测试位图中掩码部分是否全部为 **0** ，如果是，就将掩码部分全部置 **1**
     pub fn t0ma_then_s1m(&self, msk: &Self) -> bool {
         unsafe {
             xwbmpop_t0ma_then_s1m(self.bmp.get() as _ , msk.bmp.get() as _, N)
         }
     }
 
-    /// 测试位图中掩码部分是否至少有一位为0，如果是，就将掩码部分全部置1
+    /// 测试位图中掩码部分是否至少有一位为 **0** ，如果是，就将掩码部分全部置 **1**
     pub fn t0mo_then_s1m(&self, msk: &Self) -> bool {
         unsafe {
             xwbmpop_t0mo_then_s1m(self.bmp.get() as _ , msk.bmp.get() as _, N)
         }
     }
 
-    /// 在位图中从最低位起查找第一个被置1的位
+    /// 在位图中从最低位起查找第一个被置 **1** 的位
     pub fn ffs(&self) -> XwSsq {
         unsafe {
             xwbmpop_ffs(self.bmp.get() as _ , N)
         }
     }
 
-    /// 在位图中从最低位起查找第一个被清0的位
+    /// 在位图中从最低位起查找第一个被清 **0** 的位
     pub fn ffz(&self) -> XwSsq {
         unsafe {
             xwbmpop_ffz(self.bmp.get() as _ , N)
         }
     }
 
-    /// 在位图中从最高位起查找第一个被置1的位
+    /// 在位图中从最高位起查找第一个被置 **1** 的位
     pub fn fls(&self) -> XwSsq {
         unsafe {
             xwbmpop_fls(self.bmp.get() as _ , N)
         }
     }
 
-    /// 在位图中从最高位起查找第一个被清0的位
+    /// 在位图中从最高位起查找第一个被清 **0** 的位
     pub fn flz(&self) -> XwSsq {
         unsafe {
             xwbmpop_flz(self.bmp.get() as _ , N)
