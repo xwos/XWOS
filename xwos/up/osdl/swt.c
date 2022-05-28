@@ -38,7 +38,7 @@ xwer_t xwosdl_swt_create(xwosdl_swt_d * swtd, xwsq_t flag)
         rc = xwup_swt_create(&swt, flag);
         if (XWOK == rc) {
                 swtd->swt = swt;
-                swtd->tik = 0;
+                swtd->tik = 1;
         } else {
                 *swtd = XWOSDL_SWT_NILD;
         }
@@ -50,8 +50,7 @@ xwer_t xwosdl_swt_acquire(struct xwosdl_swt * swt, xwsq_t tik)
 {
         xwer_t rc;
 
-        XWOS_UNUSED(tik);
-        if (NULL == swt) {
+        if ((NULL == swt) || (0 == tik)) {
                 rc = -ENILOBJD;
         } else {
                 rc = xwup_swt_grab(swt);
@@ -64,8 +63,7 @@ xwer_t xwosdl_swt_release(struct xwosdl_swt * swt, xwsq_t tik)
 {
         xwer_t rc;
 
-        XWOS_UNUSED(tik);
-        if (NULL == swt) {
+        if ((NULL == swt) || (0 == tik)) {
                 rc = -ENILOBJD;
         } else {
                 rc = xwup_swt_put(swt);

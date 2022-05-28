@@ -57,7 +57,7 @@ static __xwcc_inline
 xwsq_t xwosdl_swt_gettik(struct xwosdl_swt * swt)
 {
         XWOS_UNUSED(swt);
-        return 0;
+        return 1;
 }
 
 xwer_t xwosdl_swt_grab(struct xwosdl_swt * swt);

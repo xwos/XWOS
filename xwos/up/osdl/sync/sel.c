@@ -24,7 +24,7 @@ xwer_t xwosdl_sel_create(xwosdl_sel_d * seld, xwsz_t num)
         rc = xwup_evt_create(&sel, XWUP_EVT_TYPE_SEL, num);
         if (XWOK == rc) {
                 seld->sel = sel;
-                seld->tik = 0;
+                seld->tik = 1;
         } else {
                 *seld = XWOSDL_SEL_NILD;
         }
@@ -36,9 +36,7 @@ xwer_t xwosdl_sel_acquire(struct xwosdl_sel * sel, xwsq_t tik)
 {
         xwer_t rc;
 
-        XWOS_UNUSED(tik);
-
-        if (NULL == sel) {
+        if ((NULL == sel) || (0 == tik)) {
                 rc = -ENILOBJD;
         } else {
                 rc = XWOK;
@@ -51,9 +49,7 @@ xwer_t xwosdl_sel_release(struct xwosdl_sel * sel, xwsq_t tik)
 {
         xwer_t rc;
 
-        XWOS_UNUSED(tik);
-
-        if (NULL == sel) {
+        if ((NULL == sel) || (0 == tik)) {
                 rc = -ENILOBJD;
         } else {
                 rc = XWOK;

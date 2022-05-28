@@ -24,7 +24,7 @@ xwer_t xwosdl_br_create(xwosdl_br_d * brd, xwsz_t num)
         rc = xwup_evt_create(&br, XWUP_EVT_TYPE_BR, num);
         if (XWOK == rc) {
                 brd->br = br;
-                brd->tik = 0;
+                brd->tik = 1;
         } else {
                 *brd = XWOSDL_BR_NILD;
         }
@@ -36,9 +36,7 @@ xwer_t xwosdl_br_acquire(struct xwosdl_br * br, xwsq_t tik)
 {
         xwer_t rc;
 
-        XWOS_UNUSED(tik);
-
-        if (NULL == br) {
+        if ((NULL == br) || (0 == tik)) {
                 rc = -ENILOBJD;
         } else {
                 rc = XWOK;
@@ -51,9 +49,7 @@ xwer_t xwosdl_br_release(struct xwosdl_br * br, xwsq_t tik)
 {
         xwer_t rc;
 
-        XWOS_UNUSED(tik);
-
-        if (NULL == br) {
+        if ((NULL == br) || (0 == tik)) {
                 rc = -ENILOBJD;
         } else {
                 rc = XWOK;

@@ -70,7 +70,7 @@ static __xwcc_inline
 xwsq_t xwosdl_sel_gettik(struct xwosdl_sel * sel)
 {
         XWOS_UNUSED(sel);
-        return 0;
+        return 1;
 }
 
 static __xwcc_inline

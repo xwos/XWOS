@@ -75,7 +75,7 @@ static __xwcc_inline
 xwsq_t xwosdl_mtx_gettik(struct xwosdl_mtx * mtx)
 {
         XWOS_UNUSED(mtx);
-        return 0;
+        return 1;
 }
 
 static __xwcc_inline

@@ -81,7 +81,7 @@ static __xwcc_inline
 xwsq_t xwosdl_flg_gettik(struct xwosdl_flg * flg)
 {
         XWOS_UNUSED(flg);
-        return 0;
+        return 1;
 }
 
 static __xwcc_inline

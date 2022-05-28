@@ -24,7 +24,7 @@ xwer_t xwosdl_flg_create(xwosdl_flg_d * flgd, xwsz_t num)
         rc = xwup_evt_create(&flg, XWUP_EVT_TYPE_FLG, num);
         if (XWOK == rc) {
                 flgd->flg = flg;
-                flgd->tik = 0;
+                flgd->tik = 1;
         } else {
                 *flgd = XWOSDL_FLG_NILD;
         }
@@ -36,9 +36,7 @@ xwer_t xwosdl_flg_acquire(struct xwosdl_flg * flg, xwsq_t tik)
 {
         xwer_t rc;
 
-        XWOS_UNUSED(tik);
-
-        if (NULL == flg) {
+        if ((NULL == flg) || (0 == tik)) {
                 rc = -ENILOBJD;
         } else {
                 rc = XWOK;
@@ -51,9 +49,7 @@ xwer_t xwosdl_flg_release(struct xwosdl_flg * flg, xwsq_t tik)
 {
         xwer_t rc;
 
-        XWOS_UNUSED(tik);
-
-        if (NULL == flg) {
+        if ((NULL == flg) || (0 == tik)) {
                 rc = -ENILOBJD;
         } else {
                 rc = XWOK;
