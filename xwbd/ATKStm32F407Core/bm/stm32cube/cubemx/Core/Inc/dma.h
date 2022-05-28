@@ -43,6 +43,8 @@ void MX_DMA_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 void MX_DMA_DeInit(void);
+void MX_DMA_Suspend(void);
+void MX_DMA_Resume(void);
 
 /* USER CODE END Prototypes */
 

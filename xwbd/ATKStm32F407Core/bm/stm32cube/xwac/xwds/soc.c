@@ -205,6 +205,9 @@ static
 xwer_t stm32cube_soc_drv_suspend(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
+        MX_FSMC_Suspend();
+        MX_DMA_Suspend();
+        MX_GPIO_Suspend();
         return XWOK;
 }
 
@@ -212,6 +215,9 @@ static
 xwer_t stm32cube_soc_drv_resume(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
+        MX_GPIO_Resume();
+        MX_DMA_Resume();
+        MX_FSMC_Resume();
         return XWOK;
 }
 #endif

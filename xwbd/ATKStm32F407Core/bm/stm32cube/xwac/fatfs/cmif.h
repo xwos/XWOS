@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内核适配代码：内核HOOK
+ * @brief STM32CUBE FATFS：子模块接口
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,30 +18,13 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
-#include <armv7m_isa.h>
-#include <xwos/ospl/skd.h>
+#ifndef __bm_stm32cube_xwac_fatfs_cmif_h__
+#define __bm_stm32cube_xwac_fatfs_cmif_h__
 
-extern
-void stm32cube_systick_hook(void);
+#include <bm/stm32cube/standard.h>
 
-__xwos_code
-void board_xwskd_idle_hook(struct xwospl_skd * xwskd)
-{
-        XWOS_UNUSED(xwskd);
-        cm_wfi();
-}
+xwer_t sdcard_fatfs_mount(void);
+xwer_t sdcard_fatfs_unmount(void);
+void sdcard_fatfs_tst(void);
 
-__xwos_code
-void board_xwskd_syshwt_hook(struct xwospl_skd * xwskd)
-{
-        XWOS_UNUSED(xwskd);
-        stm32cube_systick_hook();
-}
-
-__xwos_code
-void board_thd_postinit_hook(struct xwospl_thd * thd)
-{
-        XWOS_UNUSED(thd);
-        /* Add MPU code here. */
-}
+#endif /* bm/stm32cube/xwac/fatfs/cmif.h */

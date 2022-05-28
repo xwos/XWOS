@@ -19,11 +19,12 @@
  */
 
 #include <bm/stm32cube/standard.h>
+#include <armv7m_isa.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
 #include <bm/stm32cube/xwac/xwds/cmif.h>
+#include <bm/stm32cube/xwac/fatfs/cmif.h>
 #include <bm/stm32cube/mif.h>
-#include <armv7m_isa.h>
 
 extern xwu8_t sram_mr_origin[];
 extern xwu8_t sram_mr_size[];
@@ -125,8 +126,15 @@ xwer_t stm32cube_start(void)
                 goto err_xwds_start;
         }
 
+        /* fatfs */
+        rc = sdcard_fatfs_mount();
+        if (rc < 0) {
+                goto err_fatfs_mount;
+        }
         return XWOK;
 
+
+err_fatfs_mount:
 err_xwds_start:
         return rc;
 }
@@ -144,6 +152,9 @@ err_xwds_start:
 xwer_t stm32cube_stop(void)
 {
         xwer_t rc;
+
+        /* fatfs */
+        sdcard_fatfs_unmount();
 
         /* xwds */
         rc = stm32cube_xwds_stop();

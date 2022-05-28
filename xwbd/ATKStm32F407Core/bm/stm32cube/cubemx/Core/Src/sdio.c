@@ -22,6 +22,30 @@
 #include "sdio.h"
 
 /* USER CODE BEGIN 0 */
+#include <xwos/osal/thd.h>
+#include <xwos/osal/lock/mtx.h>
+#include <xwos/osal/lock/spinlock.h>
+#include <xwos/osal/sync/cond.h>
+
+#define MX_SDIO_SD_MAX_RETRY_TIMES 8
+
+struct xwos_mtx hsd_xfer_mtx;
+struct xwos_splk hsd_lock;
+struct xwos_cond hsd_xfer_cond;
+xwer_t hsd_xfer_rc = XWOK;
+
+void MX_SDIO_SD_Construct(void)
+{
+  xwos_mtx_init(&hsd_xfer_mtx, XWOS_SKD_PRIORITY_RT_MAX);
+  xwos_splk_init(&hsd_lock);
+  xwos_cond_init(&hsd_xfer_cond);
+}
+
+void MX_SDIO_SD_Destruct(void)
+{
+  xwos_cond_fini(&hsd_xfer_cond);
+  xwos_mtx_fini(&hsd_xfer_mtx);
+}
 
 /* USER CODE END 0 */
 
@@ -188,5 +212,272 @@ void HAL_SD_MspDeInit(SD_HandleTypeDef* sdHandle)
 }
 
 /* USER CODE BEGIN 1 */
+void MX_SDIO_SD_DeInit(void)
+{
+  HAL_SD_DeInit(&hsd);
+}
+
+void MX_SDIO_SD_ReInit(uint32_t clkdiv)
+{
+  HAL_StatusTypeDef ret;
+  uint32_t cnt;
+
+  HAL_Delay(1);
+  MX_SDIO_SD_DeInit();
+  HAL_Delay(1);
+  hsd.Instance = SDIO;
+  hsd.Init.ClockEdge = SDIO_CLOCK_EDGE_RISING;
+  hsd.Init.ClockBypass = SDIO_CLOCK_BYPASS_DISABLE;
+  hsd.Init.ClockPowerSave = SDIO_CLOCK_POWER_SAVE_DISABLE;
+  hsd.Init.BusWide = SDIO_BUS_WIDE_1B;
+  hsd.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_DISABLE;
+  hsd.Init.ClockDiv = clkdiv;
+
+  cnt = 0;
+  do {
+    ret = HAL_SD_Init(&hsd);
+    if (HAL_OK == ret)
+    {
+      ret = HAL_SD_ConfigWideBusOperation(&hsd, SDIO_BUS_WIDE_4B);
+    }
+    cnt++;
+  } while ((ret != HAL_OK) && (cnt < 5));
+  if (ret != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+xwer_t MX_SDIO_SD_TrimClk(xwsq_t cnt)
+{
+  xwu8_t __xwcc_aligned(4) buf[512];
+  xwer_t rc;
+  xwsq_t i;
+
+  rc = XWOK;
+  for (i = 0; i < cnt; i++) {
+    xwos_cthd_sleep(XWTM_MS(1));
+    rc = MX_SDIO_SD_Read(buf, i, 1);
+    if (XWOK == rc) {
+    } else if (-EIO == rc) {
+      if (hsd.Init.ClockDiv <= 0xFD) {
+        MX_SDIO_SD_ReInit(hsd.Init.ClockDiv + 2);
+        rc = XWOK;
+      } else {
+        break;
+      }
+    } else {
+      break;
+    }
+  }
+  return rc;
+}
+
+xwer_t MX_SDIO_SD_GetState(void)
+{
+  xwer_t rc;
+  xwsq_t cnt;
+  HAL_SD_CardStateTypeDef cardst;
+
+  cnt = 0;
+  do {
+    cardst = HAL_SD_GetCardState(&hsd);
+    if ((0 == cardst) && (HAL_SD_ERROR_NONE != hsd.ErrorCode)) {
+      rc = -EIO;
+      MX_SDIO_SD_ReInit(hsd.Init.ClockDiv);
+      cnt++;
+    } else if (HAL_SD_CARD_TRANSFER == cardst) {
+      rc = XWOK;
+    } else {
+      rc = -EBUSY;
+    }
+  } while ((-EIO == rc) && (cnt < MX_SDIO_SD_MAX_RETRY_TIMES));
+  return rc;
+}
+
+xwer_t MX_SDIO_SD_Read(uint8_t * data, uint32_t blkaddr,
+                       uint32_t nrblk)
+{
+  xwer_t rc;
+  xwsq_t cnt;
+  HAL_SD_CardStateTypeDef cardst;
+
+  rc = xwos_mtx_lock(&hsd_xfer_mtx);
+  if (XWOK == rc) {
+    cnt = 0;
+    do {
+      if (rc < 0) {
+        MX_SDIO_SD_ReInit(hsd.Init.ClockDiv);
+        cnt++;
+      }
+      cardst = HAL_SD_GetCardState(&hsd);
+      if ((0 == cardst) && (HAL_SD_ERROR_NONE != hsd.ErrorCode)) {
+        rc = -EIO;
+      } else if (HAL_SD_CARD_TRANSFER == cardst) {
+        HAL_StatusTypeDef halrc;
+        xwreg_t cpuirq;
+        xwsq_t lkst;
+        union xwos_ulock ulk;
+
+        hsd_xfer_rc = -EINPROGRESS;
+        ulk.osal.splk = &hsd_lock;
+        halrc = HAL_SD_ReadBlocks_DMA(&hsd, data, blkaddr, nrblk);
+        if (HAL_OK == halrc) {
+          xwos_splk_lock_cpuirqsv(&hsd_lock, &cpuirq);
+          if (-EINPROGRESS == hsd_xfer_rc) {
+            rc = xwos_cond_wait(&hsd_xfer_cond,
+                                ulk, XWOS_LK_SPLK,
+                                NULL, &lkst);
+            if (XWOK == rc) {
+              rc = hsd_xfer_rc;
+            } else {
+              if (XWOS_LKST_UNLOCKED == lkst) {
+                xwos_splk_lock(&hsd_lock);
+              }
+            }
+          } else {
+            rc = hsd_xfer_rc;
+          }
+          xwos_splk_unlock_cpuirqrs(&hsd_lock, cpuirq);
+        } else if (HAL_BUSY == halrc) {
+          rc = -EBUSY;
+        } else {
+          rc = -EIO;
+        }
+      } else {
+        rc = -EBUSY;
+      }
+    } while ((-EIO == rc) && (cnt < MX_SDIO_SD_MAX_RETRY_TIMES));
+    xwos_mtx_unlock(&hsd_xfer_mtx);
+  }/* else { failed to lock mutex! } */
+  return rc;
+}
+
+xwer_t MX_SDIO_SD_Write(uint8_t * data, uint32_t blkaddr,
+                        uint32_t nrblk)
+{
+  xwer_t rc;
+  xwsq_t cnt;
+  HAL_SD_CardStateTypeDef cardst;
+
+  rc = xwos_mtx_lock(&hsd_xfer_mtx);
+  if (XWOK == rc) {
+    cnt = 0;
+    do {
+      if (rc < 0) {
+        MX_SDIO_SD_ReInit(hsd.Init.ClockDiv);
+        cnt++;
+      }
+      cardst = HAL_SD_GetCardState(&hsd);
+      if ((0 == cardst) && (HAL_SD_ERROR_NONE != hsd.ErrorCode)) {
+        rc = -EIO;
+      } else if (HAL_SD_CARD_TRANSFER == cardst) {
+        HAL_StatusTypeDef halrc;
+        xwreg_t cpuirq;
+        xwsq_t lkst;
+        union xwos_ulock ulk;
+
+        hsd_xfer_rc = -EINPROGRESS;
+        ulk.osal.splk = &hsd_lock;
+        halrc = HAL_SD_WriteBlocks_DMA(&hsd, data, blkaddr, nrblk);
+        if (HAL_OK == halrc) {
+          xwos_splk_lock_cpuirqsv(&hsd_lock, &cpuirq);
+          if (-EINPROGRESS == hsd_xfer_rc) {
+            rc = xwos_cond_wait(&hsd_xfer_cond,
+                                ulk, XWOS_LK_SPLK,
+                                NULL, &lkst);
+            if (XWOK == rc) {
+              rc = hsd_xfer_rc;
+            } else {
+              if (XWOS_LKST_UNLOCKED == lkst) {
+                xwos_splk_lock(&hsd_lock);
+              }
+            }
+          } else {
+            rc = hsd_xfer_rc;
+          }
+          xwos_splk_unlock_cpuirqrs(&hsd_lock, cpuirq);
+        } else if (HAL_BUSY == halrc) {
+          rc = -EBUSY;
+        } else {
+          rc = -EIO;
+        }
+      } else {
+        rc = -EBUSY;
+      }
+    } while ((-EIO == rc) && (cnt < MX_SDIO_SD_MAX_RETRY_TIMES));
+    xwos_mtx_unlock(&hsd_xfer_mtx);
+  }/* else { failed to lock mutex! } */
+  return rc;
+}
+
+void HAL_SD_RxCpltCallback(SD_HandleTypeDef * phsd)
+{
+  HAL_SD_CardStateTypeDef cardst;
+
+  cardst = HAL_SD_GetCardState(phsd);
+  if (cardst != HAL_SD_CARD_TRANSFER) {
+    /* FIXME */
+  }
+
+  if ((SD_CONTEXT_NONE == phsd->Context) && (HAL_SD_STATE_READY == phsd->State)) {
+    xwreg_t cpuirq;
+    xwos_splk_lock_cpuirqsv(&hsd_lock, &cpuirq);
+    if (phsd->ErrorCode != HAL_SD_ERROR_NONE) {
+      hsd_xfer_rc = -EIO;
+    } else {
+      hsd_xfer_rc = XWOK;
+    }
+    xwos_splk_unlock_cpuirqrs(&hsd_lock, cpuirq);
+    xwos_cond_broadcast(&hsd_xfer_cond);
+  }
+}
+
+void HAL_SD_TxCpltCallback(SD_HandleTypeDef * phsd)
+{
+  HAL_SD_CardStateTypeDef cardst;
+
+  cardst = HAL_SD_GetCardState(phsd);
+  if (cardst != HAL_SD_CARD_TRANSFER) {
+    /* FIXME */
+  }
+  if ((SD_CONTEXT_NONE == phsd->Context) && (HAL_SD_STATE_READY == phsd->State)) {
+    xwreg_t cpuirq;
+    xwos_splk_lock_cpuirqsv(&hsd_lock, &cpuirq);
+    if (phsd->ErrorCode != HAL_SD_ERROR_NONE) {
+      hsd_xfer_rc = -EIO;
+    } else {
+      hsd_xfer_rc = XWOK;
+    }
+    xwos_splk_unlock_cpuirqrs(&hsd_lock, cpuirq);
+    xwos_cond_broadcast(&hsd_xfer_cond);
+  }
+}
+
+void HAL_SD_ErrorCallback(SD_HandleTypeDef * phsd)
+{
+  if ((SD_CONTEXT_NONE == phsd->Context) && (HAL_SD_STATE_READY == phsd->State)) {
+    xwreg_t cpuirq;
+    xwos_splk_lock_cpuirqsv(&hsd_lock, &cpuirq);
+    if (phsd->ErrorCode != HAL_SD_ERROR_NONE) {
+      hsd_xfer_rc = -EIO;
+    } else {
+      hsd_xfer_rc = XWOK;
+    }
+    xwos_splk_unlock_cpuirqrs(&hsd_lock, cpuirq);
+    xwos_cond_broadcast(&hsd_xfer_cond);
+  }
+}
+
+void HAL_SD_AbortCallback(SD_HandleTypeDef * phsd)
+{
+  if ((SD_CONTEXT_NONE == phsd->Context) && (HAL_SD_STATE_READY == phsd->State)) {
+    xwreg_t cpuirq;
+    xwos_splk_lock_cpuirqsv(&hsd_lock, &cpuirq);
+    hsd_xfer_rc = -ECANCELED;
+    xwos_splk_unlock_cpuirqrs(&hsd_lock, cpuirq);
+    xwos_cond_broadcast(&hsd_xfer_cond);
+  }
+}
 
 /* USER CODE END 1 */

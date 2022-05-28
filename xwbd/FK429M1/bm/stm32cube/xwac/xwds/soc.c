@@ -296,9 +296,9 @@ xwer_t stm32cube_soc_drv_stop(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
 
-        MX_SDRAM_Deinit();
-        MX_DMA_Deinit();
-        MX_GPIO_Deinit();
+        MX_SDRAM_DeInit();
+        MX_DMA_DeInit();
+        MX_GPIO_DeInit();
 
         return XWOK;
 }

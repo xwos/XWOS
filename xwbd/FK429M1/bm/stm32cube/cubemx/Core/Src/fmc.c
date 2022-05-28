@@ -100,7 +100,7 @@ void MX_SDRAM_Init(void)
   HAL_SDRAM_ProgramRefreshRate(&hsdram2, 1292);
 }
 
-void MX_SDRAM_Deinit(void)
+void MX_SDRAM_DeInit(void)
 {
   HAL_SDRAM_DeInit(&hsdram2);
 }

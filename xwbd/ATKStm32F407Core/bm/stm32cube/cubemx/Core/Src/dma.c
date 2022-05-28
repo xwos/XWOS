@@ -68,6 +68,21 @@ void MX_DMA_Init(void)
 /* USER CODE BEGIN 2 */
 void MX_DMA_DeInit(void)
 {
+  HAL_NVIC_DisableIRQ(DMA2_Stream7_IRQn);
+  HAL_NVIC_DisableIRQ(DMA2_Stream6_IRQn);
+  HAL_NVIC_DisableIRQ(DMA2_Stream5_IRQn);
+  HAL_NVIC_DisableIRQ(DMA2_Stream3_IRQn);
+  HAL_NVIC_DisableIRQ(DMA2_Stream2_IRQn);
+  HAL_NVIC_DisableIRQ(DMA2_Stream0_IRQn);
+  __HAL_RCC_DMA2_CLK_DISABLE();
+}
+
+void MX_DMA_Suspend(void)
+{
+}
+
+void MX_DMA_Resume(void)
+{
 }
 
 /* USER CODE END 2 */

@@ -28,6 +28,14 @@ void MX_FSMC_DeInit(void)
   HAL_SRAM_DeInit(&hsram3);
 }
 
+void MX_FSMC_Suspend(void)
+{
+}
+
+void MX_FSMC_Resume(void)
+{
+}
+
 /* USER CODE END 0 */
 
 SRAM_HandleTypeDef hsram3;

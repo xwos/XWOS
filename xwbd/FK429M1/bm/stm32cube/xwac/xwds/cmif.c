@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE设备栈：子模块接口
+ * @brief STM32CUBE：子模块接口
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
