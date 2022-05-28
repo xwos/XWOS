@@ -147,6 +147,8 @@ struct xwmp_cond * xwmp_cond_alloc(void)
         cond = malloc(sizeof(struct xwmp_cond));
         if (NULL == cond) {
                 cond = err_ptr(-ENOMEM);
+        } else {
+                xwmp_cond_construct(cond);
         }
         return cond;
 #else

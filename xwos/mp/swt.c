@@ -104,6 +104,8 @@ struct xwmp_swt * xwmp_swt_alloc(void)
         swt = malloc(sizeof(struct xwmp_swt));
         if (NULL == swt) {
                 swt = err_ptr(-ENOMEM);
+        } else {
+                xwmp_swt_construct(swt);
         }
         return swt;
 #else

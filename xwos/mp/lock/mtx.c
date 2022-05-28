@@ -138,6 +138,8 @@ struct xwmp_mtx * xwmp_mtx_alloc(void)
         mtx = malloc(sizeof(struct xwmp_mtx));
         if (NULL == mtx) {
                 mtx = err_ptr(-ENOMEM);
+        } else {
+                xwmp_mtx_construct(mtx);
         }
         return mtx;
 #else

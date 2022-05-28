@@ -146,6 +146,8 @@ struct xwmp_thd * xwmp_thd_alloc(void)
         thd = malloc(sizeof(struct xwmp_thd));
         if (NULL == thd) {
                 thd = err_ptr(-ENOMEM);
+        } else {
+                xwmp_thd_construct(thd);
         }
         return thd;
 #else
