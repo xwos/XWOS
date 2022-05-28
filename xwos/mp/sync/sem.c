@@ -168,6 +168,8 @@ struct xwmp_sem * xwmp_sem_alloc(void)
         sem = malloc(sizeof(struct xwmp_sem));
         if (NULL == sem) {
                 sem = err_ptr(-ENOMEM);
+        } else {
+                xwmp_sem_construct(sem);
         }
         return sem;
 #else
