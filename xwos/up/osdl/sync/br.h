@@ -71,7 +71,7 @@ static __xwcc_inline
 xwsq_t xwosdl_br_gettik(struct xwosdl_br * br)
 {
         XWOS_UNUSED(br);
-        return 0;
+        return 1;
 }
 
 static __xwcc_inline

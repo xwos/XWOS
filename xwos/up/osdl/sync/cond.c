@@ -24,7 +24,7 @@ xwer_t xwosdl_cond_create(xwosdl_cond_d * condd)
         rc = xwup_cond_create(&cond);
         if (XWOK == rc) {
                 condd->cond = cond;
-                condd->tik = 0;
+                condd->tik = 1;
         } else {
                 *condd = XWOSDL_COND_NILD;
         }
@@ -36,9 +36,7 @@ xwer_t xwosdl_cond_acquire(struct xwosdl_cond * cond, xwsq_t tik)
 {
         xwer_t rc;
 
-        XWOS_UNUSED(tik);
-
-        if (NULL == cond) {
+        if ((NULL == cond) || (0 == tik)) {
                 rc = -ENILOBJD;
         } else {
                 rc = XWOK;
@@ -51,9 +49,7 @@ xwer_t xwosdl_cond_release(struct xwosdl_cond * cond, xwsq_t tik)
 {
         xwer_t rc;
 
-        XWOS_UNUSED(tik);
-
-        if (NULL == cond) {
+        if ((NULL == cond) || (0 == tik)) {
                 rc = -ENILOBJD;
         } else {
                 rc = XWOK;

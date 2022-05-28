@@ -24,7 +24,7 @@ xwer_t xwosdl_mtx_create(xwosdl_mtx_d * mtxd, xwpr_t sprio)
         rc = xwup_mtx_create(&mtx, sprio);
         if (XWOK == rc) {
                 mtxd->mtx = mtx;
-                mtxd->tik = 0;
+                mtxd->tik = 1;
         } else {
                 *mtxd = XWOSDL_MTX_NILD;
         }
@@ -36,9 +36,7 @@ xwer_t xwosdl_mtx_acquire(struct xwosdl_mtx * mtx, xwsq_t tik)
 {
         xwer_t rc;
 
-        XWOS_UNUSED(tik);
-
-        if (NULL == mtx) {
+        if ((NULL == mtx) || (0 == tik)) {
                 rc = -ENILOBJD;
         } else {
                 rc = XWOK;
@@ -51,9 +49,7 @@ xwer_t xwosdl_mtx_release(struct xwosdl_mtx * mtx, xwsq_t tik)
 {
         xwer_t rc;
 
-        XWOS_UNUSED(tik);
-
-        if (NULL == mtx) {
+        if ((NULL == mtx) || (0 == tik)) {
                 rc = -ENILOBJD;
         } else {
                 rc = XWOK;

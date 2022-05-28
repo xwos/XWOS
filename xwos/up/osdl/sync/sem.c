@@ -25,7 +25,7 @@ xwer_t xwosdl_sem_create(xwosdl_sem_d * semd, xwssq_t val, xwssq_t max)
         rc = xwup_rtsem_create(&sem, val, max);
         if (XWOK == rc) {
                 semd->sem = sem;
-                semd->tik = 0;
+                semd->tik = 1;
         } else {
                 *semd = XWOSDL_SEM_NILD;
         }
@@ -43,7 +43,7 @@ xwer_t xwosdl_sem_create(xwosdl_sem_d * semd, xwssq_t val, xwssq_t max)
         rc = xwup_plsem_create(&sem, val, max);
         if (XWOK == rc) {
                 semd->sem = sem;
-                semd->tik = 0;
+                semd->tik = 1;
         } else {
                 *semd = XWOSDL_SEM_NILD;
         }
@@ -58,9 +58,7 @@ xwer_t xwosdl_sem_acquire(struct xwosdl_sem * sem, xwsq_t tik)
 {
         xwer_t rc;
 
-        XWOS_UNUSED(tik);
-
-        if (NULL == sem) {
+        if ((NULL == sem) || (0 == tik)) {
                 rc = -ENILOBJD;
         } else {
                 rc = XWOK;
@@ -73,9 +71,7 @@ xwer_t xwosdl_sem_release(struct xwosdl_sem * sem, xwsq_t tik)
 {
         xwer_t rc;
 
-        XWOS_UNUSED(tik);
-
-        if (NULL == sem) {
+        if ((NULL == sem) || (0 == tik)) {
                 rc = -ENILOBJD;
         } else {
                 rc = XWOK;

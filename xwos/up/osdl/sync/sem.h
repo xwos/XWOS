@@ -73,7 +73,7 @@ static __xwcc_inline
 xwsq_t xwosdl_sem_gettik(struct xwosdl_sem * sem)
 {
         XWOS_UNUSED(sem);
-        return 0;
+        return 1;
 }
 
 static __xwcc_inline
@@ -191,7 +191,7 @@ static __xwcc_inline
 xwsq_t xwosdl_sem_gettik(struct xwosdl_sem * sem)
 {
         XWOS_UNUSED(sem);
-        return 0;
+        return 1;
 }
 
 static __xwcc_inline
