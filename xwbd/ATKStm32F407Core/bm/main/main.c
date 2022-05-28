@@ -35,7 +35,7 @@ const struct xwos_thd_desc main_thd_desc = {
         .attr = {
                 .name = "main.thd",
                 .stack = NULL,
-                .stack_size = 4096,
+                .stack_size = 8192,
                 .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
                 .priority = MAIN_THD_PRIORITY,
                 .detached = true,
@@ -72,6 +72,8 @@ err_skd_start_lc:
         return rc;
 }
 
+extern void xwrust_main(void);
+
 static
 xwer_t main_task(void * arg)
 {
@@ -83,6 +85,8 @@ xwer_t main_task(void * arg)
         if (rc < 0) {
                 goto err_stm32cube_start;
         }
+
+        xwrust_main();
 
         rc = led_task();
         return rc;

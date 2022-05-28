@@ -29,7 +29,7 @@
 #define BRDCFG_XWSKD_POST_SWCX_HOOK             0
 #define BRDCFG_XWSKD_SYSHWT_HOOK                1
 #define BRDCFG_XWSKD_THD_STACK_POOL             1
-#define BRDCFG_XWSKD_THD_POSTINIT_HOOK          0
+#define BRDCFG_XWSKD_THD_POSTINIT_HOOK          1
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       xwlib       ******** ******** ********
@@ -52,5 +52,6 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define BMCFG_stm32cube                         1
 #define BMCFG_main                              1
+#define BMCFG_rustapp                           1
 
 #endif /* cfg/board.h */

@@ -36,13 +36,23 @@ extern "C" {
 extern SD_HandleTypeDef hsd;
 
 /* USER CODE BEGIN Private defines */
-#define MX_SD_SECTOR_SIZE 512U
+#define MX_SD_SECTOR_SIZE BLOCKSIZE
 
 /* USER CODE END Private defines */
 
 void MX_SDIO_SD_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+void MX_SDIO_SD_Construct(void);
+void MX_SDIO_SD_Destruct(void);
+void MX_SDIO_SD_DeInit(void);
+void MX_SDIO_SD_ReInit(uint32_t clkdiv);
+xwer_t MX_SDIO_SD_TrimClk(xwsq_t cnt);
+xwer_t MX_SDIO_SD_GetState(void);
+xwer_t MX_SDIO_SD_Read(uint8_t * data, uint32_t blkaddr,
+                       uint32_t nrblk);
+xwer_t MX_SDIO_SD_Write(uint8_t * data, uint32_t blkaddr,
+                        uint32_t nrblk);
 
 /* USER CODE END Prototypes */
 

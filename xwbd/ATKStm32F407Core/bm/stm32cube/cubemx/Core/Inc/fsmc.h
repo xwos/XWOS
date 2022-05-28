@@ -44,6 +44,8 @@ void HAL_SRAM_MspDeInit(SRAM_HandleTypeDef* hsram);
 
 /* USER CODE BEGIN Prototypes */
 void MX_FSMC_DeInit(void);
+void MX_FSMC_Suspend(void);
+void MX_FSMC_Resume(void);
 
 /* USER CODE END Prototypes */
 

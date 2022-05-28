@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内核适配代码：内核HOOK
+ * @brief STM32CUBE模块：定义内存池
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -19,29 +19,8 @@
  */
 
 #include <xwos/standard.h>
-#include <armv7m_isa.h>
-#include <xwos/ospl/skd.h>
+#include <xwos/mm/mempool/allocator.h>
 
-extern
-void stm32cube_systick_hook(void);
+extern xwsz_t sram_mr_origin[];
 
-__xwos_code
-void board_xwskd_idle_hook(struct xwospl_skd * xwskd)
-{
-        XWOS_UNUSED(xwskd);
-        cm_wfi();
-}
-
-__xwos_code
-void board_xwskd_syshwt_hook(struct xwospl_skd * xwskd)
-{
-        XWOS_UNUSED(xwskd);
-        stm32cube_systick_hook();
-}
-
-__xwos_code
-void board_thd_postinit_hook(struct xwospl_thd * thd)
-{
-        XWOS_UNUSED(thd);
-        /* Add MPU code here. */
-}
+struct xwmm_mempool * newlibac_mempool = (void *)sram_mr_origin;

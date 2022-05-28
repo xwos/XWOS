@@ -40,7 +40,7 @@ extern "C" {
 void MX_GPIO_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-void MX_GPIO_Deinit(void);
+void MX_GPIO_DeInit(void);
 void MX_GPIO_Suspend(void);
 void MX_GPIO_Resume(void);
 
@@ -50,4 +50,3 @@ void MX_GPIO_Resume(void);
 }
 #endif
 #endif /*__ GPIO_H__ */
-

@@ -44,7 +44,7 @@ void HAL_SDRAM_MspDeInit(SDRAM_HandleTypeDef* hsdram);
 
 /* USER CODE BEGIN Prototypes */
 void MX_SDRAM_Init(void);
-void MX_SDRAM_Deinit(void);
+void MX_SDRAM_DeInit(void);
 void MX_SDRAM_Suspend(void);
 void MX_SDRAM_Resume(void);
 
