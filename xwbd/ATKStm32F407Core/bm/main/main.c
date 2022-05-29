@@ -31,11 +31,13 @@ xwer_t main_task(void * arg);
 static
 xwer_t led_task(void);
 
+__xwcc_aligned(8) xwu8_t main_thd_stack[8192] = {0};
+
 const struct xwos_thd_desc main_thd_desc = {
         .attr = {
                 .name = "main.thd",
-                .stack = NULL,
-                .stack_size = 8192,
+                .stack = (xwstk_t *)main_thd_stack,
+                .stack_size = sizeof(main_thd_stack),
                 .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
                 .priority = MAIN_THD_PRIORITY,
                 .detached = true,
@@ -44,16 +46,17 @@ const struct xwos_thd_desc main_thd_desc = {
         .func = main_task,
         .arg = NULL,
 };
-xwos_thd_d main_thd;
+struct xwos_thd main_thd;
+xwos_thd_d main_thdd;
 
 xwer_t xwos_main(void)
 {
         xwer_t rc;
 
-        rc = xwos_thd_create(&main_thd,
-                             &main_thd_desc.attr,
-                             main_thd_desc.func,
-                             main_thd_desc.arg);
+        rc = xwos_thd_init(&main_thd, &main_thdd,
+                           &main_thd_desc.attr,
+                           main_thd_desc.func,
+                           main_thd_desc.arg);
         if (rc < 0) {
                 goto err_init_thd_create;
         }

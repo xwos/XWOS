@@ -42,56 +42,33 @@ xwer_t xwosdl_thd_init(struct xwosdl_thd * thd, xwosdl_thd_d * thdd,
                        const struct xwosdl_thd_attr * inattr,
                        xwosdl_thd_f mainfunc, void * arg);
 
-static __xwcc_inline
-xwer_t xwosdl_thd_grab(struct xwosdl_thd * thd)
-{
-        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
-        XWOS_UNUSED(thd);
-        return XWOK;
-}
+xwer_t xwosdl_thd_grab(struct xwosdl_thd * thd);
 
-static __xwcc_inline
-xwer_t xwosdl_thd_put(struct xwosdl_thd * thd)
-{
-        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
-        XWOS_UNUSED(thd);
-        return XWOK;
-}
+xwer_t xwosdl_thd_put(struct xwosdl_thd * thd);
 
 xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd,
                          const struct xwosdl_thd_attr * attr,
                          xwosdl_thd_f mainfunc, void * arg);
 
-xwer_t xwosdl_thd_acquire(struct xwosdl_thd * thd, xwsq_t tik);
-
-xwer_t xwosdl_thd_release(struct xwosdl_thd * thd, xwsq_t tik);
+static __xwcc_inline
+xwer_t xwosdl_thd_acquire(struct xwosdl_thd * thd, xwsq_t tik)
+{
+        return xwup_thd_acquire(thd, tik);
+}
 
 static __xwcc_inline
-xwer_t xwosdl_thd_quit(struct xwosdl_thd * thd, xwsq_t tik)
+xwer_t xwosdl_thd_release(struct xwosdl_thd * thd, xwsq_t tik)
 {
-        XWOS_VALIDATE((NULL != thd), "nild", -ENILOBJD);
-        XWOS_UNUSED(tik);
-        xwup_thd_quit(thd);
-        return XWOK;
+        return xwup_thd_release(thd, tik);
 }
 
-static __xwos_inline_api
-xwer_t xwosdl_thd_join(struct xwosdl_thd * thd, xwsq_t tik, xwer_t * trc)
-{
-        XWOS_VALIDATE((NULL != thd), "nild", -ENILOBJD);
-        XWOS_UNUSED(tik);
-        return xwup_thd_join(thd, trc);
-}
+xwer_t xwosdl_thd_quit(struct xwosdl_thd * thd, xwsq_t tik);
+
+xwer_t xwosdl_thd_join(struct xwosdl_thd * thd, xwsq_t tik, xwer_t * trc);
 
 xwer_t xwosdl_thd_stop(struct xwosdl_thd * thd, xwsq_t tik, xwer_t * rc);
 
-static __xwcc_inline
-xwer_t xwosdl_thd_detach(struct xwosdl_thd * thd, xwsq_t tik)
-{
-        XWOS_VALIDATE((NULL != thd), "nild", -ENILOBJD);
-        XWOS_UNUSED(tik);
-        return xwup_thd_detach(thd);
-}
+xwer_t xwosdl_thd_detach(struct xwosdl_thd * thd, xwsq_t tik);
 
 static __xwcc_inline
 xwer_t xwosdl_thd_migrate(struct xwosdl_thd * thd, xwsq_t tik, xwid_t dstcpu)

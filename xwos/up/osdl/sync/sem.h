@@ -40,40 +40,34 @@ xwer_t xwosdl_sem_fini(struct xwosdl_sem * sem)
         return xwup_rtsem_fini(sem);
 }
 
-static __xwcc_inline
-xwer_t xwosdl_sem_grab(struct xwosdl_sem * sem)
-{
-        XWOS_UNUSED(sem);
-        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        return XWOK;
-}
+xwer_t xwosdl_sem_grab(struct xwosdl_sem * sem);
 
-static __xwcc_inline
-xwer_t xwosdl_sem_put(struct xwosdl_sem * sem)
-{
-        XWOS_UNUSED(sem);
-        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        return XWOK;
-}
+xwer_t xwosdl_sem_put(struct xwosdl_sem * sem);
 
 xwer_t xwosdl_sem_create(xwosdl_sem_d * semd, xwssq_t val, xwssq_t max);
 
 static __xwcc_inline
 xwer_t xwosdl_sem_delete(struct xwosdl_sem * sem, xwsq_t tik)
 {
-        XWOS_UNUSED(tik);
-        return xwup_rtsem_delete(sem);
+        return xwup_rtsem_delete(sem, tik);
 }
 
-xwer_t xwosdl_sem_acquire(struct xwosdl_sem * sem, xwsq_t tik);
+static __xwcc_inline
+xwer_t xwosdl_sem_acquire(struct xwosdl_sem * sem, xwsq_t tik)
+{
+        return xwup_rtsem_acquire(sem, tik);
+}
 
-xwer_t xwosdl_sem_release(struct xwosdl_sem * sem, xwsq_t tik);
+static __xwcc_inline
+xwer_t xwosdl_sem_release(struct xwosdl_sem * sem, xwsq_t tik)
+{
+        return xwup_rtsem_release(sem, tik);
+}
 
 static __xwcc_inline
 xwsq_t xwosdl_sem_gettik(struct xwosdl_sem * sem)
 {
-        XWOS_UNUSED(sem);
-        return 1;
+        return sem ? sem->vsem.synobj.xwobj.tik : 0;
 }
 
 static __xwcc_inline
@@ -174,43 +168,38 @@ xwer_t xwosdl_sem_fini(struct xwosdl_sem * sem)
         return xwup_plsem_fini(sem);
 }
 
+xwer_t xwosdl_sem_grab(struct xwosdl_sem * sem);
+
+xwer_t xwosdl_sem_put(struct xwosdl_sem * sem);
+
 xwer_t xwosdl_sem_create(xwosdl_sem_d * semd, xwssq_t val, xwssq_t max);
 
 static __xwcc_inline
 xwer_t xwosdl_sem_delete(struct xwosdl_sem * sem, xwsq_t tik)
 {
-        XWOS_UNUSED(tik);
-        return xwup_plsem_delete(sem);
+        return xwup_plsem_delete(sem, tik);
 }
 
-xwer_t xwosdl_sem_acquire(struct xwosdl_sem * sem, xwsq_t tik);
+static __xwcc_inline
+xwer_t xwosdl_sem_acquire(struct xwosdl_sem * sem, xwsq_t tik)
+{
+        return xwup_plsem_acquire(sem, tik);
+}
 
-xwer_t xwosdl_sem_release(struct xwosdl_sem * sem, xwsq_t tik);
+static __xwcc_inline
+xwer_t xwosdl_sem_release(struct xwosdl_sem * sem, xwsq_t tik)
+{
+        return xwup_plsem_release(sem, tik);
+}
 
 static __xwcc_inline
 xwsq_t xwosdl_sem_gettik(struct xwosdl_sem * sem)
 {
-        XWOS_UNUSED(sem);
-        return 1;
+        return sem ? sem->vsem.synobj.xwobj.tik : 0;
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sem_grab(struct xwosdl_sem * sem)
-{
-        XWOS_UNUSED(sem);
-        return XWOK;
-}
-
-static __xwcc_inline
-xwer_t xwosdl_sem_put(struct xwosdl_sem * sem)
-{
-        XWOS_UNUSED(sem);
-        return XWOK;
-}
-
-static __xwcc_inline
-xwer_t xwosdl_sem_bind(struct xwosdl_sem * sem, struct xwosdl_sel * sel,
-                       xwsq_t pos)
+xwer_t xwosdl_sem_bind(struct xwosdl_sem * sem, struct xwosdl_sel * sel, xwsq_t pos)
 {
 #  if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
         return xwup_plsem_bind(sem, sel, pos);

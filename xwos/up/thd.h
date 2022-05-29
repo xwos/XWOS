@@ -14,6 +14,7 @@
 #define __xwos_up_thd_h__
 
 #include <xwos/standard.h>
+#include <xwos/lib/object.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
@@ -62,6 +63,7 @@ struct xwup_thd_attr {
  * @brief XWOS UP线程对象
  */
 struct xwup_thd {
+        struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
         struct xwup_skdobj_stack stack; /**< 栈 */
         struct xwlib_bclst_node thdnode; /**< 调度器线程链表中的节点 */
 
@@ -160,11 +162,13 @@ void xwup_thd_attr_init(struct xwup_thd_attr * attr);
 xwer_t xwup_thd_init(struct xwup_thd * thd,
                      const struct xwup_thd_attr * inattr,
                      xwup_thd_f mainfunc, void * arg);
-xwer_t xwup_thd_fini(struct xwup_thd * thd);
 xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
                        const struct xwup_thd_attr * inattr,
                        xwup_thd_f manfunc, void * arg);
-xwer_t xwup_thd_delete(struct xwup_thd * thd);
+xwer_t xwup_thd_acquire(struct xwup_thd * thd, xwsq_t tik);
+xwer_t xwup_thd_release(struct xwup_thd * thd, xwsq_t tik);
+xwer_t xwup_thd_grab(struct xwup_thd * thd);
+xwer_t xwup_thd_put(struct xwup_thd * thd);
 void xwup_cthd_yield(void);
 void xwup_cthd_exit(xwer_t rc);
 void xwup_thd_quit(struct xwup_thd * thd);

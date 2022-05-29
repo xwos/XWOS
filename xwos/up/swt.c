@@ -28,13 +28,19 @@ static __xwup_code
 void xwup_swt_free(struct xwup_swt * swt);
 
 static __xwup_code
-void xwup_swt_construct(struct xwup_swt * swt, xwsq_t flag, xwup_swt_gc_f gc);
+void xwup_swt_construct(struct xwup_swt * swt);
 
 static __xwup_code
 void xwup_swt_destruct(struct xwup_swt * swt);
 
 static __xwup_code
-void xwup_swt_gc(struct xwup_swt * swt);
+xwer_t xwup_swt_activate(struct xwup_swt * swt, xwsq_t flag, xwobj_gc_f gcfunc);
+
+static __xwup_code
+xwer_t xwup_swt_sgc(void * obj);
+
+static __xwup_code
+xwer_t xwup_swt_dgc(void * obj);
 
 static __xwup_code
 void xwup_swt_ttn_cb(void * entry);
@@ -52,6 +58,8 @@ struct xwup_swt * xwup_swt_alloc(void)
         swt = malloc(sizeof(struct xwup_swt));
         if (NULL == swt) {
                 swt = err_ptr(-ENOMEM);
+        } else {
+                xwup_swt_construct(swt);
         }
         return swt;
 #else
@@ -64,7 +72,9 @@ struct xwup_swt * xwup_swt_alloc(void)
         rc = xwmm_kma_alloc(sizeof(struct xwup_swt), XWMM_ALIGNMENT, &mem.anon);
         if (rc < 0) {
                 mem.swt = err_ptr(-ENOMEM);
-        }/* else {} */
+        } else {
+                xwup_swt_construct(mem.swt);
+        }
         return mem.swt;
 #endif
 }
@@ -83,83 +93,96 @@ void xwup_swt_free(struct xwup_swt * swt)
 #endif
 }
 
-/**
- * @brief 激活软件定时器对象
- * @param[in] swt: 软件定时器对象的指针
- * @param[in] flag: 标志
- * @param[in] gc: 垃圾回收函数
- */
 static __xwup_code
-void xwup_swt_construct(struct xwup_swt * swt,
-                        xwsq_t flag,
-                        xwup_swt_gc_f gc)
+void xwup_swt_construct(struct xwup_swt * swt)
 {
+        xwos_object_construct(&swt->xwobj);
+        swt->flag = 0;
         xwup_ttn_init(&swt->ttn, (xwptr_t)swt, XWUP_TTN_TYPE_SWT);
         swt->cb = NULL;
         swt->arg = NULL;
         swt->period = 0;
-        swt->flag = flag;
-        xwaop_write(xwsq_t, &swt->refcnt, 1, NULL);
-        swt->gc = gc;
 }
 
 static __xwup_code
 void xwup_swt_destruct(struct xwup_swt * swt)
 {
-        swt->period = 0;
-        swt->flag = 0;
+        xwos_object_destruct(&swt->xwobj);
 }
 
 static __xwup_code
-void xwup_swt_gc(struct xwup_swt * swt)
+xwer_t xwup_swt_activate(struct xwup_swt * swt, xwsq_t flag, xwobj_gc_f gcfunc)
 {
+        xwer_t rc;
+
+        rc = xwos_object_activate(&swt->xwobj, gcfunc);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_xwobj_activate;
+        }
+        swt->flag = flag;
+        return XWOK;
+
+err_xwobj_activate:
+        return rc;
+}
+
+static __xwup_code
+xwer_t xwup_swt_sgc(void * obj)
+{
+        struct xwup_swt * swt = obj;
+
+        xwup_swt_destruct(swt);
+        return XWOK;
+}
+
+static __xwup_code
+xwer_t xwup_swt_dgc(void * obj)
+{
+        struct xwup_swt * swt = obj;
+
         xwup_swt_destruct(swt);
         xwup_swt_free(swt);
+        return XWOK;
+}
+
+__xwup_api
+xwer_t xwup_swt_acquire(struct xwup_swt * swt, xwsq_t tik)
+{
+        return xwos_object_acquire(&swt->xwobj, tik);
+}
+
+__xwup_api
+xwer_t xwup_swt_release(struct xwup_swt * swt, xwsq_t tik)
+{
+        return xwos_object_release(&swt->xwobj, tik);
 }
 
 __xwup_api
 xwer_t xwup_swt_grab(struct xwup_swt * swt)
 {
-        xwer_t rc;
-
-        rc = xwaop_tge_then_add(xwsq_t, &swt->refcnt, 1, 1, NULL, NULL);
-        if (__xwcc_unlikely(rc < 0)) {
-                rc = -EOBJDEAD;
-        }
-        return rc;
+        return xwos_object_grab(&swt->xwobj);
 }
 
 __xwup_api
 xwer_t xwup_swt_put(struct xwup_swt * swt)
 {
-        xwer_t rc;
-        xwsq_t nv;
-
-        rc = xwaop_tgt_then_sub(xwsq_t, &swt->refcnt,
-                                0, 1,
-                                &nv, NULL);
-        if (XWOK == rc) {
-                if (0 == nv) {
-                        swt->gc(swt);
-                }
-        } else {
-                rc = -EOBJDEAD;
-        }
-        return rc;
+        return xwos_object_put(&swt->xwobj);
 }
 
 __xwup_api
 xwer_t xwup_swt_init(struct xwup_swt * swt, xwsq_t flag)
 {
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
-        xwup_swt_construct(swt, flag, xwup_swt_destruct);
-        return XWOK;
+
+        xwup_swt_construct(swt);
+        return xwup_swt_activate(swt, flag, xwup_swt_sgc);
 }
 
 __xwup_api
 xwer_t xwup_swt_fini(struct xwup_swt * swt)
 {
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
+
         return xwup_swt_put(swt);
 }
 
@@ -170,31 +193,30 @@ xwer_t xwup_swt_create(struct xwup_swt ** ptrbuf, xwsq_t flag)
         xwer_t rc;
 
         XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
+
         *ptrbuf = NULL;
         swt = xwup_swt_alloc();
         if (is_err(swt)) {
                 rc = ptr_err(swt);
                 goto err_swt_alloc;
         }
-        xwup_swt_construct(swt, flag, xwup_swt_gc);
+        rc = xwup_swt_activate(swt, flag, xwup_swt_dgc);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_swt_activate;
+        }
         *ptrbuf = swt;
         return XWOK;
 
+err_swt_activate:
+        xwup_swt_free(swt);
 err_swt_alloc:
         return rc;
 }
 
 __xwup_api
-xwer_t xwup_swt_delete(struct xwup_swt * swt)
+xwer_t xwup_swt_delete(struct xwup_swt * swt, xwsq_t tik)
 {
-        xwer_t rc;
-
-        if (swt) {
-                rc = xwup_swt_put(swt);
-        } else {
-                rc = -ENILOBJD;
-        }
-        return rc;
+        return xwup_swt_release(swt, tik);
 }
 
 /**
@@ -207,6 +229,7 @@ void xwup_swt_ttn_cb(void * entry)
         struct xwup_swt * swt;
         struct xwup_skd * xwskd;
         struct xwup_tt * xwtt;
+        xwsq_t refcnt;
         xwtm_t to;
         xwreg_t cpuirq;
 
@@ -217,7 +240,8 @@ void xwup_swt_ttn_cb(void * entry)
         if (XWUP_SWT_FLAG_RESTART & swt->flag) {
                 to = xwtm_add_safely(swt->ttn.wkup_xwtm, swt->period);
                 xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
-                if (swt->refcnt >= 3) {
+                refcnt = xwos_object_get_refcnt(&swt->xwobj);
+                if (refcnt >= 3) {
                         swt->ttn.wkup_xwtm = to;
                         swt->ttn.wkuprs = XWUP_TTN_WKUPRS_UNKNOWN;
                         swt->ttn.cb = xwup_swt_ttn_cb;

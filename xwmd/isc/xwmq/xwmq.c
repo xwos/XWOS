@@ -70,7 +70,6 @@ __xwmd_api
 xwer_t xwmq_grab(struct xwmq * mq)
 {
         XWOS_VALIDATE((mq), "nullptr", -EFAULT);
-
         return xwos_object_grab(&mq->xwobj);
 }
 

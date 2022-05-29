@@ -75,6 +75,7 @@ ifeq ($(XWUPCFG_LOCK_MTX),y)
 endif
 
 ######## ######## ######## ######## sync ######## ######## ######## ########
+XWOS_CSRCS += up/sync/obj.c
 XWOS_CSRCS += up/sync/vsem.c
 ifeq ($(XWUPCFG_SYNC_PLSEM),y)
     XWOS_CSRCS += up/sync/plsem.c

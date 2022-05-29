@@ -46,7 +46,13 @@ xwer_t xwup_evt_init(struct xwup_evt * evt, xwsq_t type, xwsz_t num,
                      xwbmp_t * bmp, xwbmp_t * msk);
 xwer_t xwup_evt_fini(struct xwup_evt * evt);
 xwer_t xwup_evt_create(struct xwup_evt ** ptrbuf, xwsq_t type, xwsz_t num);
-xwer_t xwup_evt_delete(struct xwup_evt * evt);
+xwer_t xwup_evt_delete(struct xwup_evt * evt, xwsq_t tik);
+
+xwer_t xwup_evt_acquire(struct xwup_evt * evt, xwsq_t tik);
+xwer_t xwup_evt_release(struct xwup_evt * evt, xwsq_t tik);
+xwer_t xwup_evt_grab(struct xwup_evt * evt);
+xwer_t xwup_evt_put(struct xwup_evt * evt);
+
 xwer_t xwup_evt_bind(struct xwup_evt * evt, struct xwup_evt * slt, xwsq_t pos);
 xwer_t xwup_evt_unbind(struct xwup_evt * evt, struct xwup_evt * slt);
 xwer_t xwup_evt_intr_all(struct xwup_evt * evt);

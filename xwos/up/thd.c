@@ -51,6 +51,18 @@
 #  include <xwos/up/sync/cond.h>
 #endif
 
+static __xwup_code
+void xwup_thd_construct(struct xwup_thd * thd);
+
+static __xwup_code
+void xwup_thd_destruct(struct xwup_thd * thd);
+
+static __xwup_code
+xwer_t xwup_thd_sgc(void * obj);
+
+static __xwup_code
+xwer_t xwup_thd_dgc(void * obj);
+
 #if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
 extern __xwup_code
 xwer_t board_thd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf);
@@ -77,12 +89,87 @@ static __xwup_code
 xwer_t xwup_thd_stack_free(xwstk_t * stk);
 
 static __xwup_code
-void xwup_thd_activate(struct xwup_thd * thd,
-                       struct xwup_thd_attr * attr,
-                       xwup_thd_f mainfunc, void * arg);
+xwer_t xwup_thd_activate(struct xwup_thd * thd,
+                         struct xwup_thd_attr * attr,
+                         xwup_thd_f mainfunc, void * arg,
+                         xwobj_gc_f gcfunc);
 
 static __xwup_code
 void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f mainfunc, void * arg);
+
+static __xwup_code
+xwer_t xwup_thd_delete(struct xwup_thd * thd);
+
+
+/**
+ * @brief 线程对象的构造函数
+ * @param[in] thd: 线程对象的指针
+ */
+static __xwup_code
+void xwup_thd_construct(struct xwup_thd * thd)
+{
+        xwos_object_construct(&thd->xwobj);
+}
+
+/**
+ * @brief 线程对象的析构函数
+ * @param[in] thd: 线程对象的指针
+ */
+static __xwup_code
+void xwup_thd_destruct(struct xwup_thd * thd)
+{
+        xwos_object_destruct(&thd->xwobj);
+}
+
+static __xwup_code
+xwer_t xwup_thd_sgc(void * obj)
+{
+        struct xwup_thd * thd;
+
+        thd = obj;
+        xwup_thd_destruct(thd);
+        return XWOK;
+}
+
+static __xwup_code
+xwer_t xwup_thd_dgc(void * obj)
+{
+        xwstk_t * base;
+        struct xwup_thd * thd;
+
+        thd = obj;
+        if (XWUP_SKDOBJ_FLAG_ALLOCATED_STACK & thd->stack.flag) {
+                base = ((struct xwup_thd *)thd)->stack.base;
+                xwup_thd_stack_free(base);
+        }
+        xwup_thd_destruct(thd);
+        xwup_thd_free(thd);
+        return XWOK;
+}
+
+__xwup_api
+xwer_t xwup_thd_acquire(struct xwup_thd * thd, xwsq_t tik)
+{
+        return xwos_object_acquire(&thd->xwobj, tik);
+}
+
+__xwup_api
+xwer_t xwup_thd_release(struct xwup_thd * thd, xwsq_t tik)
+{
+        return xwos_object_release(&thd->xwobj, tik);
+}
+
+__xwup_api
+xwer_t xwup_thd_grab(struct xwup_thd * thd)
+{
+        return xwos_object_grab(&thd->xwobj);
+}
+
+__xwup_api
+xwer_t xwup_thd_put(struct xwup_thd * thd)
+{
+        return xwos_object_put(&thd->xwobj);
+}
 
 /**
  * @brief 从线程对象缓存中申请一个对象
@@ -97,6 +184,8 @@ struct xwup_thd * xwup_thd_alloc(void)
         thd = malloc(sizeof(struct xwup_thd));
         if (NULL == thd) {
                 thd = err_ptr(-ENOMEM);
+        } else {
+                xwup_thd_construct(thd);
         }
         return thd;
 #else
@@ -109,7 +198,9 @@ struct xwup_thd * xwup_thd_alloc(void)
         rc = xwmm_kma_alloc(sizeof(struct xwup_thd), XWMM_ALIGNMENT, &mem.anon);
         if (rc < 0) {
                 mem.thd = err_ptr(-ENOMEM);
-        }/* else {} */
+        } else {
+                xwup_thd_construct(mem.thd);
+        }
         return mem.thd;
 #endif
 }
@@ -197,12 +288,19 @@ xwer_t xwup_thd_stack_free(xwstk_t * stk)
  * @param[in] arg: 线程函数的参数
  */
 static __xwup_code
-void xwup_thd_activate(struct xwup_thd * thd,
-                       struct xwup_thd_attr * attr,
-                       xwup_thd_f mainfunc, void * arg)
+xwer_t xwup_thd_activate(struct xwup_thd * thd,
+                         struct xwup_thd_attr * attr,
+                         xwup_thd_f mainfunc, void * arg,
+                         xwobj_gc_f gcfunc)
 {
+        xwer_t rc;
+
+        rc = xwos_object_activate(&thd->xwobj, gcfunc);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_obj_activate;
+        }
+
         thd->state = XWUP_SKDOBJ_ST_UNKNOWN;
-        thd->stack.flag = 0;
         if (attr->privileged) {
                 xwaop_s1m(xwsq_t, &thd->stack.flag, XWUP_SKDOBJ_FLAG_PRIVILEGED,
                           NULL, NULL);
@@ -270,16 +368,10 @@ void xwup_thd_activate(struct xwup_thd * thd,
         } else {
                 xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_STANDBY);
         }
-}
+        return XWOK;
 
-/**
- * @brief 使得线程对象无效
- * @param[in] thd: 线程对象的指针
- */
-static __xwup_code
-void xwup_thd_deactivate(struct xwup_thd * thd)
-{
-        XWOS_UNUSED(thd);
+err_obj_activate:
+        return rc;
 }
 
 /**
@@ -294,6 +386,7 @@ void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f mainfunc, void * arg)
         struct xwup_skd * xwskd;
         xwreg_t cpuirq;
 
+        xwup_thd_grab(thd);
         /* add to ready queue */
         xwskd = xwup_skd_get_lc();
         thd->stack.main = mainfunc;
@@ -326,22 +419,17 @@ xwer_t xwup_thd_init(struct xwup_thd * thd,
                      const struct xwup_thd_attr * inattr,
                      xwup_thd_f mainfunc, void * arg)
 {
+        xwer_t rc;
         struct xwup_thd_attr attr;
 
+        xwup_thd_construct(thd);
         attr = *inattr;
         if (attr.stack_size < XWMMCFG_STACK_SIZE_MIN) {
                 attr.stack_size = XWMMCFG_STACK_SIZE_MIN;
         }
         thd->stack.flag = 0;
-        xwup_thd_activate(thd, &attr, mainfunc, arg);
-        return XWOK;
-}
-
-__xwup_api
-xwer_t xwup_thd_fini(struct xwup_thd * thd)
-{
-        xwup_thd_deactivate(thd);
-        return XWOK;
+        rc = xwup_thd_activate(thd, &attr, mainfunc, arg, xwup_thd_sgc);
+        return rc;
 }
 
 __xwup_api
@@ -402,10 +490,16 @@ xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
                 thd->stack.flag = XWUP_SKDOBJ_FLAG_ALLOCATED_OBJ;
         }
 
-        xwup_thd_activate(thd, &attr, mainfunc, arg);
+        rc = xwup_thd_activate(thd, &attr, mainfunc, arg, xwup_thd_dgc);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_thd_activate;
+        }
+
         *thdpbuf = thd;
         return XWOK;
 
+err_thd_activate:
+        xwup_thd_free(thd);
 err_thd_alloc:
         if (allocated_stack) {
                 xwup_thd_stack_free(attr.stack);
@@ -415,39 +509,11 @@ err_stack_alloc:
         return rc;
 }
 
-__xwup_api
+static __xwup_code
 xwer_t xwup_thd_delete(struct xwup_thd * thd)
 {
-        xwer_t rc;
-        xwstk_t * base;
-
-        if (thd) {
-                xwup_thd_deactivate(thd);
-                if (XWUP_SKDOBJ_FLAG_ALLOCATED_STACK & thd->stack.flag) {
-                        base = ((struct xwup_thd *)thd)->stack.base;
-                        xwup_thd_stack_free(base);
-                }
-                xwup_thd_free(thd);
-                rc = XWOK;
-        } else {
-                rc = -ENILOBJD;
-        }
-        return rc;
+        return xwup_thd_put(thd);
 }
-
-__xwup_code
-xwer_t xwup_thd_drop(struct xwup_thd * thd)
-{
-        xwer_t rc;
-
-        if (XWUP_SKDOBJ_FLAG_ALLOCATED_OBJ & thd->stack.flag) {
-                rc = xwup_thd_delete(thd);
-        } else {
-                rc = xwup_thd_fini(thd);
-        }
-        return rc;
-}
-
 
 /**
  * @brief 执行退出线程
@@ -480,13 +546,16 @@ xwer_t xwup_thd_exit_lic(struct xwup_thd * thd, xwer_t rc)
 #  if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
         if (xwskd->pm.frz_thd_cnt == xwskd->thd_num) {
                 xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_thd_put(thd);
                 xwup_skd_notify_allfrz_lic();
         } else {
                 xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_thd_put(thd);
                 xwup_skd_req_swcx();
         }
 #  else
         xwospl_cpuirq_restore_lc(cpuirq);
+        xwup_thd_put(thd);
         xwup_skd_req_swcx();
 #  endif
 #else

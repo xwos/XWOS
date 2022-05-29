@@ -38,35 +38,9 @@ xwer_t xwosdl_swt_create(xwosdl_swt_d * swtd, xwsq_t flag)
         rc = xwup_swt_create(&swt, flag);
         if (XWOK == rc) {
                 swtd->swt = swt;
-                swtd->tik = 1;
+                swtd->tik = swt->xwobj.tik;
         } else {
                 *swtd = XWOSDL_SWT_NILD;
-        }
-        return rc;
-}
-
-__xwup_code
-xwer_t xwosdl_swt_acquire(struct xwosdl_swt * swt, xwsq_t tik)
-{
-        xwer_t rc;
-
-        if ((NULL == swt) || (0 == tik)) {
-                rc = -ENILOBJD;
-        } else {
-                rc = xwup_swt_grab(swt);
-        }
-        return rc;
-}
-
-__xwup_code
-xwer_t xwosdl_swt_release(struct xwosdl_swt * swt, xwsq_t tik)
-{
-        xwer_t rc;
-
-        if ((NULL == swt) || (0 == tik)) {
-                rc = -ENILOBJD;
-        } else {
-                rc = xwup_swt_put(swt);
         }
         return rc;
 }

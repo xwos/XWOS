@@ -38,40 +38,34 @@ xwer_t xwosdl_br_fini(struct xwosdl_br * br)
         return xwup_evt_fini(br);
 }
 
-static __xwcc_inline
-xwer_t xwosdl_br_grab(struct xwosdl_br * br)
-{
-        XWOS_UNUSED(br);
-        XWOS_VALIDATE((br), "nullptr", -EFAULT);
-        return XWOK;
-}
+xwer_t xwosdl_br_grab(struct xwosdl_br * br);
 
-static __xwcc_inline
-xwer_t xwosdl_br_put(struct xwosdl_br * br)
-{
-        XWOS_UNUSED(br);
-        XWOS_VALIDATE((br), "nullptr", -EFAULT);
-        return XWOK;
-}
+xwer_t xwosdl_br_put(struct xwosdl_br * br);
 
 xwer_t xwosdl_br_create(xwosdl_br_d * brd, xwsz_t num);
 
 static __xwcc_inline
 xwer_t xwosdl_br_delete(struct xwosdl_br * br, xwsq_t tik)
 {
-        XWOS_UNUSED(tik);
-        return xwup_evt_delete(br);
+        return xwup_evt_delete(br, tik);
 }
 
-xwer_t xwosdl_br_acquire(struct xwosdl_br * br, xwsq_t tik);
+static __xwcc_inline
+xwer_t xwosdl_br_acquire(struct xwosdl_br * br, xwsq_t tik)
+{
+        return xwup_evt_acquire(br, tik);
+}
 
-xwer_t xwosdl_br_release(struct xwosdl_br * br, xwsq_t tik);
+static __xwcc_inline
+xwer_t xwosdl_br_release(struct xwosdl_br * br, xwsq_t tik)
+{
+        return xwup_evt_release(br, tik);
+}
 
 static __xwcc_inline
 xwsq_t xwosdl_br_gettik(struct xwosdl_br * br)
 {
-        XWOS_UNUSED(br);
-        return 1;
+        return br ? br->cond.synobj.xwobj.tik : 0;
 }
 
 static __xwcc_inline

@@ -28,7 +28,13 @@ struct xwup_plsem {
 xwer_t xwup_plsem_init(struct xwup_plsem * sem, xwssq_t val, xwssq_t max);
 xwer_t xwup_plsem_fini(struct xwup_plsem * sem);
 xwer_t xwup_plsem_create(struct xwup_plsem ** ptrbuf, xwssq_t val, xwssq_t max);
-xwer_t xwup_plsem_delete(struct xwup_plsem * sem);
+xwer_t xwup_plsem_delete(struct xwup_plsem * sem, xwsq_t tik);
+
+xwer_t xwup_plsem_acquire(struct xwup_plsem * sem, xwsq_t tik);
+xwer_t xwup_plsem_release(struct xwup_plsem * sem, xwsq_t tik);
+xwer_t xwup_plsem_grab(struct xwup_plsem * sem);
+xwer_t xwup_plsem_put(struct xwup_plsem * sem);
+
 xwer_t xwup_plsem_intr(struct xwup_plsem * sem, struct xwup_wqn * wqn);
 
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
