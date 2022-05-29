@@ -14,6 +14,20 @@
 #include <xwos/up/osdl/sync/sel.h>
 
 __xwup_code
+xwer_t xwosdl_sel_grab(struct xwosdl_sel * sel)
+{
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+        return xwup_evt_grab(sel);
+}
+
+__xwup_code
+xwer_t xwosdl_sel_put(struct xwosdl_sel * sel)
+{
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+        return xwup_evt_put(sel);
+}
+
+__xwup_code
 xwer_t xwosdl_sel_create(xwosdl_sel_d * seld, xwsz_t num)
 {
         xwer_t rc;
@@ -24,35 +38,9 @@ xwer_t xwosdl_sel_create(xwosdl_sel_d * seld, xwsz_t num)
         rc = xwup_evt_create(&sel, XWUP_EVT_TYPE_SEL, num);
         if (XWOK == rc) {
                 seld->sel = sel;
-                seld->tik = 1;
+                seld->tik = sel->cond.synobj.xwobj.tik;
         } else {
                 *seld = XWOSDL_SEL_NILD;
-        }
-        return rc;
-}
-
-__xwup_code
-xwer_t xwosdl_sel_acquire(struct xwosdl_sel * sel, xwsq_t tik)
-{
-        xwer_t rc;
-
-        if ((NULL == sel) || (0 == tik)) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
-        }
-        return rc;
-}
-
-__xwup_code
-xwer_t xwosdl_sel_release(struct xwosdl_sel * sel, xwsq_t tik)
-{
-        xwer_t rc;
-
-        if ((NULL == sel) || (0 == tik)) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
         }
         return rc;
 }

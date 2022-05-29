@@ -35,10 +35,20 @@ static __xwup_code
 void xwup_plsem_free(struct xwup_plsem * sem);
 
 static __xwup_code
-void xwup_plsem_activate(struct xwup_plsem * sem, xwssq_t val, xwssq_t max);
+void xwup_plsem_construct(struct xwup_plsem * sem);
 
 static __xwup_code
-void xwup_plsem_deactivate(struct xwup_plsem * sem);
+void xwup_plsem_destruct(struct xwup_plsem * sem);
+
+static __xwup_code
+xwer_t xwup_plsem_sgc(void * sem);
+
+static __xwup_code
+xwer_t xwup_plsem_dgc(void * sem);
+
+static __xwup_code
+xwer_t xwup_plsem_activate(struct xwup_plsem * sem, xwssq_t val, xwssq_t max,
+                           xwobj_gc_f gcfunc);
 
 static __xwup_code
 xwer_t xwup_plsem_blkthd_to_unlkwq_cpuirqrs(struct xwup_plsem * sem,
@@ -73,6 +83,8 @@ struct xwup_plsem * xwup_plsem_alloc(void)
         plsem = malloc(sizeof(struct xwup_plsem));
         if (NULL == plsem) {
                 plsem = err_ptr(-ENOMEM);
+        } else {
+                xwup_plsem_construct(plsem);
         }
         return plsem;
 #else
@@ -85,7 +97,9 @@ struct xwup_plsem * xwup_plsem_alloc(void)
         rc = xwmm_kma_alloc(sizeof(struct xwup_plsem), XWMM_ALIGNMENT, &mem.anon);
         if (rc < 0) {
                 mem.sem = err_ptr(-ENOMEM);
-        }/* else {} */
+        } else {
+                xwup_plsem_construct(mem.sem);
+        }
         return mem.sem;
 #endif
 }
@@ -104,39 +118,82 @@ void xwup_plsem_free(struct xwup_plsem * sem)
 #endif
 }
 
-/**
- * @brief 激活管道信号量对象
- * @param[in] sem: 信号量对象的指针
- * @param[in] val: 信号量的初始值
- * @param[in] max: 信号量的最大值
- */
 static __xwup_code
-void xwup_plsem_activate(struct xwup_plsem * sem, xwssq_t val, xwssq_t max)
+void xwup_plsem_construct(struct xwup_plsem * sem)
 {
-        xwup_vsem_activate(&sem->vsem);
-        xwup_plwq_init(&sem->plwq);
-        sem->vsem.count = val;
-        sem->vsem.max = max;
+        xwup_vsem_construct(&sem->vsem);
 }
 
-/**
- * @brief 使得管道信号量对象无效
- * @param[in] sem: 信号量对象的指针
- */
 static __xwup_code
-void xwup_plsem_deactivate(struct xwup_plsem * sem)
+void xwup_plsem_destruct(struct xwup_plsem * sem)
 {
-        XWOS_UNUSED(sem);
+        xwup_vsem_destruct(&sem->vsem);
+}
+
+static __xwup_code
+xwer_t xwup_plsem_sgc(void * sem)
+{
+        xwup_plsem_destruct((struct xwup_plsem *)sem);
+        return XWOK;
+}
+
+static __xwup_code
+xwer_t xwup_plsem_dgc(void * sem)
+{
+        xwup_plsem_destruct((struct xwup_plsem *)sem);
+        xwup_plsem_free((struct xwup_plsem *)sem);
+        return XWOK;
+}
+
+__xwup_api
+xwer_t xwup_plsem_acquire(struct xwup_plsem * sem, xwsq_t tik)
+{
+        return xwup_vsem_acquire(&sem->vsem, tik);
+}
+
+__xwup_api
+xwer_t xwup_plsem_release(struct xwup_plsem * sem, xwsq_t tik)
+{
+        return xwup_vsem_release(&sem->vsem, tik);
+}
+
+__xwup_api
+xwer_t xwup_plsem_grab(struct xwup_plsem * sem)
+{
+        return xwup_vsem_grab(&sem->vsem);
+}
+
+__xwup_api
+xwer_t xwup_plsem_put(struct xwup_plsem * sem)
+{
+        return xwup_vsem_put(&sem->vsem);
+}
+
+static __xwup_code
+xwer_t xwup_plsem_activate(struct xwup_plsem * sem, xwssq_t val, xwssq_t max,
+                           xwobj_gc_f gcfunc)
+{
+        xwer_t rc;
+
+        XWOS_VALIDATE(((val >= 0) && (max > 0) && (val <= max)),
+                      "invalid-value", -EINVAL);
+
+        rc = xwup_vsem_activate(&sem->vsem, gcfunc);
+        if (XWOK == rc) {
+                xwup_plwq_init(&sem->plwq);
+                sem->vsem.count = val;
+                sem->vsem.max = max;
+        }
+        return rc;
 }
 
 __xwup_api
 xwer_t xwup_plsem_init(struct xwup_plsem * sem, xwssq_t val, xwssq_t max)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((val >= 0) && (max > 0) && (val <= max)),
-                      "invalid-value", -EINVAL);
 
-        xwup_plsem_activate(sem, val, max);
+        xwup_plsem_construct(sem);
+        xwup_plsem_activate(sem, val, max, xwup_plsem_sgc);
         return XWOK;
 }
 
@@ -144,9 +201,7 @@ __xwup_api
 xwer_t xwup_plsem_fini(struct xwup_plsem * sem)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-
-        xwup_plsem_deactivate(sem);
-        return XWOK;
+        return xwup_plsem_put(sem);
 }
 
 __xwup_api
@@ -155,35 +210,25 @@ xwer_t xwup_plsem_create(struct xwup_plsem ** ptrbuf, xwssq_t val, xwssq_t max)
         struct xwup_plsem * sem;
         xwer_t rc;
 
-        XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((val >= 0) && (max > 0) && (val <= max)),
-                      "invalid-value", -EINVAL);
-
         *ptrbuf = NULL;
         sem = xwup_plsem_alloc();
         if (__xwcc_unlikely(is_err(sem))) {
                 rc = ptr_err(sem);
         } else {
-                xwup_plsem_activate(sem, val, max);
-                *ptrbuf = sem;
-                rc = XWOK;
+                rc = xwup_plsem_activate(sem, val, max, xwup_plsem_dgc);
+                if (__xwcc_unlikely(rc < 0)) {
+                        xwup_plsem_free(sem);
+                } else {
+                        *ptrbuf = sem;
+                }
         }
         return rc;
 }
 
 __xwup_api
-xwer_t xwup_plsem_delete(struct xwup_plsem * sem)
+xwer_t xwup_plsem_delete(struct xwup_plsem * sem, xwsq_t tik)
 {
-        xwer_t rc;
-
-        if (sem) {
-                xwup_plsem_deactivate(sem);
-                xwup_plsem_free(sem);
-                rc = XWOK;
-        } else {
-                rc = -ENILOBJD;
-        }
-        return rc;
+        return xwup_plsem_release(sem, tik);
 }
 
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)

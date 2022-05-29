@@ -14,6 +14,20 @@
 #include <xwos/up/osdl/lock/mtx.h>
 
 __xwup_code
+xwer_t xwosdl_mtx_grab(struct xwosdl_mtx * mtx)
+{
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+        return xwup_mtx_grab(mtx);
+}
+
+__xwup_code
+xwer_t xwosdl_mtx_put(struct xwosdl_mtx * mtx)
+{
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+        return xwup_mtx_put(mtx);
+}
+
+__xwup_code
 xwer_t xwosdl_mtx_create(xwosdl_mtx_d * mtxd, xwpr_t sprio)
 {
         xwer_t rc;
@@ -24,35 +38,9 @@ xwer_t xwosdl_mtx_create(xwosdl_mtx_d * mtxd, xwpr_t sprio)
         rc = xwup_mtx_create(&mtx, sprio);
         if (XWOK == rc) {
                 mtxd->mtx = mtx;
-                mtxd->tik = 1;
+                mtxd->tik = mtx->xwobj.tik;
         } else {
                 *mtxd = XWOSDL_MTX_NILD;
-        }
-        return rc;
-}
-
-__xwup_code
-xwer_t xwosdl_mtx_acquire(struct xwosdl_mtx * mtx, xwsq_t tik)
-{
-        xwer_t rc;
-
-        if ((NULL == mtx) || (0 == tik)) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
-        }
-        return rc;
-}
-
-__xwup_code
-xwer_t xwosdl_mtx_release(struct xwosdl_mtx * mtx, xwsq_t tik)
-{
-        xwer_t rc;
-
-        if ((NULL == mtx) || (0 == tik)) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
         }
         return rc;
 }

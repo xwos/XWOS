@@ -14,6 +14,20 @@
 #include <xwos/up/osdl/sync/br.h>
 
 __xwup_code
+xwer_t xwosdl_br_grab(struct xwosdl_br * br)
+{
+        XWOS_VALIDATE((br), "nullptr", -EFAULT);
+        return xwup_evt_grab(br);
+}
+
+__xwup_code
+xwer_t xwosdl_br_put(struct xwosdl_br * br)
+{
+        XWOS_VALIDATE((br), "nullptr", -EFAULT);
+        return xwup_evt_put(br);
+}
+
+__xwup_code
 xwer_t xwosdl_br_create(xwosdl_br_d * brd, xwsz_t num)
 {
         xwer_t rc;
@@ -24,35 +38,9 @@ xwer_t xwosdl_br_create(xwosdl_br_d * brd, xwsz_t num)
         rc = xwup_evt_create(&br, XWUP_EVT_TYPE_BR, num);
         if (XWOK == rc) {
                 brd->br = br;
-                brd->tik = 1;
+                brd->tik = br->cond.synobj.xwobj.tik;
         } else {
                 *brd = XWOSDL_BR_NILD;
-        }
-        return rc;
-}
-
-__xwup_code
-xwer_t xwosdl_br_acquire(struct xwosdl_br * br, xwsq_t tik)
-{
-        xwer_t rc;
-
-        if ((NULL == br) || (0 == tik)) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
-        }
-        return rc;
-}
-
-__xwup_code
-xwer_t xwosdl_br_release(struct xwosdl_br * br, xwsq_t tik)
-{
-        xwer_t rc;
-
-        if ((NULL == br) || (0 == tik)) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
         }
         return rc;
 }

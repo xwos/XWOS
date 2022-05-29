@@ -14,6 +14,7 @@
 #define __xwos_up_sync_obj_h__
 
 #include <xwos/standard.h>
+#include <xwos/lib/object.h>
 
 struct xwup_evt;
 
@@ -21,17 +22,22 @@ struct xwup_evt;
  * @brief 同步对象
  */
 struct xwup_synobj {
+        struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
         struct {
                 struct xwup_evt * evt; /**< 事件对象 */
                 xwsq_t pos; /**< 事件对象中的位图位置 */
         } sel; /**< 选择器 */
+#endif
 };
 
-static __xwcc_inline
-void xwup_synobj_activate(struct xwup_synobj * synobj)
-{
-        synobj->sel.evt = NULL;
-        synobj->sel.pos = 0;
-}
+void xwup_synobj_construct(struct xwup_synobj * synobj);
+void xwup_synobj_destruct(struct xwup_synobj * synobj);
+xwer_t xwup_synobj_activate(struct xwup_synobj * synobj, xwobj_gc_f gcfunc);
+xwer_t xwup_synobj_acquire(struct xwup_synobj * synobj, xwsq_t tik);
+xwer_t xwup_synobj_release(struct xwup_synobj * synobj, xwsq_t tik);
+xwer_t xwup_synobj_grab(struct xwup_synobj * synobj);
+xwer_t xwup_synobj_put(struct xwup_synobj * synobj);
+
 
 #endif /* xwos/up/sync/obj.h */

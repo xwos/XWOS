@@ -34,11 +34,18 @@
 #endif
 #include <xwos/up/sync/cond.h>
 
+
 static __xwup_code
 struct xwup_cond * xwup_cond_alloc(void);
 
 static __xwup_code
 void xwup_cond_free(struct xwup_cond * cond);
+
+static __xwup_code
+xwer_t xwup_cond_sgc(void * cond);
+
+static __xwup_code
+xwer_t xwup_cond_dgc(void * cond);
 
 static __xwup_code
 xwer_t xwup_cond_broadcast_once(struct xwup_cond * cond, bool * retry);
@@ -92,6 +99,8 @@ struct xwup_cond * xwup_cond_alloc(void)
         cond = malloc(sizeof(struct xwup_cond));
         if (NULL == cond) {
                 cond = err_ptr(-ENOMEM);
+        } else {
+                xwup_synobj_construct(&cond->synobj);
         }
         return cond;
 #else
@@ -104,7 +113,9 @@ struct xwup_cond * xwup_cond_alloc(void)
         rc = xwmm_kma_alloc(sizeof(struct xwup_cond), XWMM_ALIGNMENT, &mem.anon);
         if (rc < 0) {
                 mem.cond = err_ptr(-ENOMEM);
-        }/* else {} */
+        } else {
+                xwup_synobj_construct(&mem.cond->synobj);
+        }
         return mem.cond;
 #endif
 }
@@ -117,34 +128,74 @@ static __xwup_code
 void xwup_cond_free(struct xwup_cond * cond)
 {
 #if defined(XWUPCFG_SKD_COND_STDC_MM) && (1 == XWUPCFG_SKD_COND_STDC_MM)
-        free(sem);
+        free(cond);
 #else
         xwmm_kma_free(cond);
 #endif
 }
 
-/**
- * @brief 激活条件量对象
- * @param[in] cond: 条件量对象的指针
- */
 __xwup_code
-void xwup_cond_activate(struct xwup_cond * cond)
+void xwup_cond_construct(struct xwup_cond * cond)
 {
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-        xwup_synobj_activate(&cond->synobj);
-#endif
-        xwup_plwq_init(&cond->wq);
-        cond->neg = false;
+        xwup_synobj_construct(&cond->synobj);
 }
 
-/**
- * @brief XWUP API：使得条件量对象无效
- * @param[in] cond: 条件量的指针
- */
 __xwup_code
-void xwup_cond_deactivate(struct xwup_cond * cond)
+void xwup_cond_destruct(struct xwup_cond * cond)
 {
-        XWOS_UNUSED(cond);
+        xwup_synobj_destruct(&cond->synobj);
+}
+
+static __xwup_code
+xwer_t xwup_cond_sgc(void * cond)
+{
+        xwup_synobj_destruct((struct xwup_synobj *)cond);
+        return XWOK;
+}
+
+static __xwup_code
+xwer_t xwup_cond_dgc(void * cond)
+{
+        xwup_synobj_destruct((struct xwup_synobj *)cond);
+        xwup_cond_free((struct xwup_cond *)cond);
+        return XWOK;
+}
+
+__xwup_api
+xwer_t xwup_cond_acquire(struct xwup_cond * cond, xwsq_t tik)
+{
+        return xwup_synobj_acquire(&cond->synobj, tik);
+}
+
+__xwup_api
+xwer_t xwup_cond_release(struct xwup_cond * cond, xwsq_t tik)
+{
+        return xwup_synobj_release(&cond->synobj, tik);
+}
+
+__xwup_api
+xwer_t xwup_cond_grab(struct xwup_cond * cond)
+{
+        return xwup_synobj_grab(&cond->synobj);
+}
+
+__xwup_api
+xwer_t xwup_cond_put(struct xwup_cond * cond)
+{
+        return xwup_synobj_put(&cond->synobj);
+}
+
+__xwup_code
+xwer_t xwup_cond_activate(struct xwup_cond * cond, xwobj_gc_f gcfunc)
+{
+        xwer_t rc;
+
+        rc = xwup_synobj_activate(&cond->synobj, gcfunc);
+        if (XWOK == rc) {
+                xwup_plwq_init(&cond->wq);
+                cond->neg = false;
+        }
+        return rc;
 }
 
 __xwup_api
@@ -152,17 +203,15 @@ xwer_t xwup_cond_init(struct xwup_cond * cond)
 {
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
 
-        xwup_cond_activate(cond);
-        return XWOK;
+        xwup_synobj_construct(&cond->synobj);
+        return xwup_cond_activate(cond, xwup_cond_sgc);
 }
 
 __xwup_api
 xwer_t xwup_cond_fini(struct xwup_cond * cond)
 {
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-
-        xwup_cond_deactivate(cond);
-        return XWOK;
+        return xwup_cond_put(cond);
 }
 
 __xwup_api
@@ -171,32 +220,25 @@ xwer_t xwup_cond_create(struct xwup_cond ** ptrbuf)
         struct xwup_cond * cond;
         xwer_t rc;
 
-        XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
         *ptrbuf = NULL;
         cond = xwup_cond_alloc();
         if (__xwcc_unlikely(is_err(cond))) {
                 rc = ptr_err(cond);
         } else {
-                xwup_cond_activate(cond);
-                *ptrbuf = cond;
-                rc = XWOK;
+                rc = xwup_cond_activate(cond, xwup_cond_dgc);
+                if (__xwcc_unlikely(rc < 0)) {
+                        xwup_cond_free(cond);
+                } else {
+                        *ptrbuf = cond;
+                }
         }
         return rc;
 }
 
 __xwup_api
-xwer_t xwup_cond_delete(struct xwup_cond * cond)
+xwer_t xwup_cond_delete(struct xwup_cond * cond, xwsq_t tik)
 {
-        xwer_t rc;
-
-        if (cond) {
-                xwup_cond_deactivate(cond);
-                xwup_cond_free(cond);
-                rc = XWOK;
-        } else {
-                rc = -ENILOBJD;
-        }
-        return rc;
+        return xwup_cond_release(cond, tik);
 }
 
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)

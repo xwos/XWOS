@@ -14,6 +14,20 @@
 #include <xwos/up/osdl/sync/cond.h>
 
 __xwup_code
+xwer_t xwosdl_cond_grab(struct xwosdl_cond * cond)
+{
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+        return xwup_cond_grab(cond);
+}
+
+__xwup_code
+xwer_t xwosdl_cond_put(struct xwosdl_cond * cond)
+{
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+        return xwup_cond_put(cond);
+}
+
+__xwup_code
 xwer_t xwosdl_cond_create(xwosdl_cond_d * condd)
 {
         xwer_t rc;
@@ -24,35 +38,9 @@ xwer_t xwosdl_cond_create(xwosdl_cond_d * condd)
         rc = xwup_cond_create(&cond);
         if (XWOK == rc) {
                 condd->cond = cond;
-                condd->tik = 1;
+                condd->tik = cond->synobj.xwobj.tik;
         } else {
                 *condd = XWOSDL_COND_NILD;
-        }
-        return rc;
-}
-
-__xwup_code
-xwer_t xwosdl_cond_acquire(struct xwosdl_cond * cond, xwsq_t tik)
-{
-        xwer_t rc;
-
-        if ((NULL == cond) || (0 == tik)) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
-        }
-        return rc;
-}
-
-__xwup_code
-xwer_t xwosdl_cond_release(struct xwosdl_cond * cond, xwsq_t tik)
-{
-        xwer_t rc;
-
-        if ((NULL == cond) || (0 == tik)) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
         }
         return rc;
 }

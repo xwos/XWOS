@@ -14,6 +14,7 @@
 #define __xwos_up_swt_h__
 
 #include <xwos/standard.h>
+#include <xwos/lib/object.h>
 #include <xwos/up/skd.h>
 #include <xwos/up/tt.h>
 
@@ -35,27 +36,23 @@ enum xwup_swt_flag_em {
 typedef void (* xwup_swt_f)(struct xwup_swt *, void *);
 
 /**
- * @brief 垃圾回收函数
- */
-typedef void (* xwup_swt_gc_f)(struct xwup_swt *);
-
-/**
  * @brief 软件定时器控制块
  */
 struct xwup_swt {
+        struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
         xwsq_t flag; /**< 标志 */
         struct xwup_ttn ttn; /**< 时间树节点 */
         xwup_swt_f cb; /**< 回调函数 */
         void * arg; /**< 回调函数参数 */
         xwtm_t period; /**< 周期 */
-        atomic_xwsq_t refcnt; /**< 引用计数 */
-        xwup_swt_gc_f gc; /**< 垃圾回收函数 */
 };
 
 xwer_t xwup_swt_init(struct xwup_swt * swt, xwsq_t flag);
 xwer_t xwup_swt_fini(struct xwup_swt * swt);
 xwer_t xwup_swt_create(struct xwup_swt ** ptrbuf, xwsq_t flag);
-xwer_t xwup_swt_delete(struct xwup_swt * swt);
+xwer_t xwup_swt_delete(struct xwup_swt * swt, xwsq_t tik);
+xwer_t xwup_swt_acquire(struct xwup_swt * swt, xwsq_t tik);
+xwer_t xwup_swt_release(struct xwup_swt * swt, xwsq_t tik);
 xwer_t xwup_swt_grab(struct xwup_swt * swt);
 xwer_t xwup_swt_put(struct xwup_swt * swt);
 xwer_t xwup_swt_start(struct xwup_swt * swt,

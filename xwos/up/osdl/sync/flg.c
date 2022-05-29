@@ -14,6 +14,20 @@
 #include <xwos/up/osdl/sync/flg.h>
 
 __xwup_code
+xwer_t xwosdl_flg_grab(struct xwosdl_flg * flg)
+{
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+        return xwup_evt_grab(flg);
+}
+
+__xwup_code
+xwer_t xwosdl_flg_put(struct xwosdl_flg * flg)
+{
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+        return xwup_evt_put(flg);
+}
+
+__xwup_code
 xwer_t xwosdl_flg_create(xwosdl_flg_d * flgd, xwsz_t num)
 {
         xwer_t rc;
@@ -24,35 +38,9 @@ xwer_t xwosdl_flg_create(xwosdl_flg_d * flgd, xwsz_t num)
         rc = xwup_evt_create(&flg, XWUP_EVT_TYPE_FLG, num);
         if (XWOK == rc) {
                 flgd->flg = flg;
-                flgd->tik = 1;
+                flgd->tik = flg->cond.synobj.xwobj.tik;
         } else {
                 *flgd = XWOSDL_FLG_NILD;
-        }
-        return rc;
-}
-
-__xwup_code
-xwer_t xwosdl_flg_acquire(struct xwosdl_flg * flg, xwsq_t tik)
-{
-        xwer_t rc;
-
-        if ((NULL == flg) || (0 == tik)) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
-        }
-        return rc;
-}
-
-__xwup_code
-xwer_t xwosdl_flg_release(struct xwosdl_flg * flg, xwsq_t tik)
-{
-        xwer_t rc;
-
-        if ((NULL == flg) || (0 == tik)) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
         }
         return rc;
 }

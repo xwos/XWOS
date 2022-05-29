@@ -14,6 +14,7 @@
 #define __xwos_up_lock_mtx_h__
 
 #include <xwos/standard.h>
+#include <xwos/lib/object.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
@@ -25,6 +26,7 @@ struct xwup_mtxtree;
  * @brief 互斥锁
  */
 struct xwup_mtx {
+        struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
         struct xwup_mtxtree * ownertree; /**< 获得此互斥锁的线程的互斥锁树：
                                               如果为空(NULL)，互斥锁处于未加锁状态。
                                               此成员被锁rtwq.lock保护。*/
@@ -43,7 +45,13 @@ struct xwup_mtx {
 xwer_t xwup_mtx_init(struct xwup_mtx * mtx, xwpr_t sprio);
 xwer_t xwup_mtx_fini(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio);
-xwer_t xwup_mtx_delete(struct xwup_mtx * mtx);
+xwer_t xwup_mtx_delete(struct xwup_mtx * mtx, xwsq_t tik);
+
+xwer_t xwup_mtx_acquire(struct xwup_mtx * mtx, xwsq_t tik);
+xwer_t xwup_mtx_release(struct xwup_mtx * mtx, xwsq_t tik);
+xwer_t xwup_mtx_grab(struct xwup_mtx * mtx);
+xwer_t xwup_mtx_put(struct xwup_mtx * mtx);
+
 xwer_t xwup_mtx_intr(struct xwup_mtx * mtx, struct xwup_thd * thd);
 xwer_t xwup_mtx_unlock(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_lock(struct xwup_mtx * mtx);

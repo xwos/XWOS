@@ -279,7 +279,7 @@ void xwup_skd_del_thd_lc(struct xwup_skd * xwskd)
                                                struct xwup_thd, thdnode) {
                         xwlib_bclst_del_init(&thd->thdnode);
                         xwospl_cpuirq_enable_lc();
-                        xwup_thd_drop(thd);
+                        xwup_thd_put(thd);
                         xwospl_cpuirq_disable_lc();
                 }
                 xwospl_cpuirq_enable_lc();

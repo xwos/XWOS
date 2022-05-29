@@ -48,40 +48,34 @@ xwer_t xwosdl_flg_fini(struct xwosdl_flg * flg)
         return xwup_evt_fini(flg);
 }
 
-static __xwcc_inline
-xwer_t xwosdl_flg_grab(struct xwosdl_flg * flg)
-{
-        XWOS_UNUSED(flg);
-        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
-        return XWOK;
-}
+xwer_t xwosdl_flg_grab(struct xwosdl_flg * flg);
 
-static __xwcc_inline
-xwer_t xwosdl_flg_put(struct xwosdl_flg * flg)
-{
-        XWOS_UNUSED(flg);
-        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
-        return XWOK;
-}
+xwer_t xwosdl_flg_put(struct xwosdl_flg * flg);
 
 xwer_t xwosdl_flg_create(xwosdl_flg_d * flgd, xwsz_t num);
 
 static __xwcc_inline
 xwer_t xwosdl_flg_delete(struct xwosdl_flg * flg, xwsq_t tik)
 {
-        XWOS_UNUSED(tik);
-        return xwup_evt_delete(flg);
+        return xwup_evt_delete(flg, tik);
 }
 
-xwer_t xwosdl_flg_acquire(struct xwosdl_flg * flg, xwsq_t tik);
+static __xwcc_inline
+xwer_t xwosdl_flg_acquire(struct xwosdl_flg * flg, xwsq_t tik)
+{
+        return xwup_evt_acquire(flg, tik);
+}
 
-xwer_t xwosdl_flg_release(struct xwosdl_flg * flg, xwsq_t tik);
+static __xwcc_inline
+xwer_t xwosdl_flg_release(struct xwosdl_flg * flg, xwsq_t tik)
+{
+        return xwup_evt_release(flg, tik);
+}
 
 static __xwcc_inline
 xwsq_t xwosdl_flg_gettik(struct xwosdl_flg * flg)
 {
-        XWOS_UNUSED(flg);
-        return 1;
+        return flg ? flg->cond.synobj.xwobj.tik : 0;
 }
 
 static __xwcc_inline

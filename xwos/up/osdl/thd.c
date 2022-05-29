@@ -24,15 +24,33 @@ xwer_t xwosdl_thd_init(struct xwosdl_thd * thd, xwosdl_thd_d * thdd,
         XWOS_VALIDATE((NULL != thdd), "nullptr", -EFAULT);
         XWOS_VALIDATE((NULL != inattr), "nullptr", -EFAULT);
         XWOS_VALIDATE((NULL != inattr->stack), "nullptr", -EFAULT);
+        XWOS_VALIDATE((inattr->stack_size >= XWMMCFG_STACK_SIZE_MIN),
+                      "nullptr", -ESIZE);
+        XWOS_VALIDATE(((inattr->stack_size & (XWMMCFG_STACK_ALIGNMENT - 1)) == 0),
+                      "nullptr", -EALIGN);
 
         rc = xwup_thd_init(thd, inattr, mainfunc, arg);
         if (XWOK == rc) {
                 thdd->thd = thd;
-                thdd->tik = 1;
+                thdd->tik = thd->xwobj.tik;
         } else {
                 *thdd = XWOSDL_THD_NILD;
         }
         return rc;
+}
+
+__xwup_code
+xwer_t xwosdl_thd_grab(struct xwosdl_thd * thd)
+{
+        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
+        return xwup_thd_grab(thd);
+}
+
+__xwup_code
+xwer_t xwosdl_thd_put(struct xwosdl_thd * thd)
+{
+        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
+        return xwup_thd_put(thd);
 }
 
 __xwup_code
@@ -48,7 +66,7 @@ xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd,
         rc = xwup_thd_create(&thd, attr, mainfunc, arg);
         if (XWOK == rc) {
                 thdd->thd = thd;
-                thdd->tik = 1;
+                thdd->tik = thd->xwobj.tik;
         } else {
                 *thdd = XWOSDL_THD_NILD;
         }
@@ -56,27 +74,27 @@ xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd,
 }
 
 __xwup_code
-xwer_t xwosdl_thd_acquire(struct xwosdl_thd * thd, xwsq_t tik)
+xwer_t xwosdl_thd_quit(struct xwosdl_thd * thd, xwsq_t tik)
 {
         xwer_t rc;
 
-        if ((NULL == thd) || (0 == tik)) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
+        rc = xwup_thd_acquire(thd, tik);
+        if (XWOK == rc) {
+                xwup_thd_quit(thd);
+                xwup_thd_put(thd);
         }
         return rc;
 }
 
 __xwup_code
-xwer_t xwosdl_thd_release(struct xwosdl_thd * thd, xwsq_t tik)
+xwer_t xwosdl_thd_join(struct xwosdl_thd * thd, xwsq_t tik, xwer_t * trc)
 {
         xwer_t rc;
 
-        if ((NULL == thd) || (0 == tik)) {
-                rc = -ENILOBJD;
-        } else {
-                rc = XWOK;
+        rc = xwup_thd_acquire(thd, tik);
+        if (XWOK == rc) {
+                rc = xwup_thd_join(thd, trc);
+                xwup_thd_put(thd);
         }
         return rc;
 }
@@ -86,11 +104,25 @@ xwer_t xwosdl_thd_stop(struct xwosdl_thd * thd, xwsq_t tik, xwer_t * trc)
 {
         xwer_t rc;
 
-        XWOS_VALIDATE((NULL != thd), "nild", -ENILOBJD);
-        XWOS_UNUSED(tik);
+        rc = xwup_thd_acquire(thd, tik);
+        if (XWOK == rc) {
+                xwup_thd_quit(thd);
+                rc = xwup_thd_join(thd, trc);
+                xwup_thd_put(thd);
+        }
+        return rc;
+}
 
-        xwup_thd_quit(thd);
-        rc = xwup_thd_join(thd, trc);
+__xwup_code
+xwer_t xwosdl_thd_detach(struct xwosdl_thd * thd, xwsq_t tik)
+{
+        xwer_t rc;
+
+        rc = xwup_thd_acquire(thd, tik);
+        if (XWOK == rc) {
+                rc = xwup_thd_detach(thd);
+                xwup_thd_put(thd);
+        }
         return rc;
 }
 
@@ -99,6 +131,6 @@ xwosdl_thd_d xwosdl_cthd_self(void)
         xwosdl_thd_d thdd;
 
         thdd.thd = xwup_skd_get_cthd_lc();
-        thdd.tik = 1;
+        thdd.tik = thdd.thd->xwobj.tik;;
         return thdd;
 }

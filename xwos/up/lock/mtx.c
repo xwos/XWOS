@@ -11,6 +11,7 @@
  */
 
 #include <xwos/standard.h>
+#include <xwos/lib/object.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
 #include <xwos/mm/common.h>
@@ -27,16 +28,25 @@
 #include <xwos/up/lock/mtx.h>
 
 static __xwup_code
+void xwup_mtx_construct(struct xwup_mtx * mtx);
+
+static __xwup_code
+void xwup_mtx_destruct(struct xwup_mtx * mtx);
+
+static __xwup_code
 struct xwup_mtx * xwup_mtx_alloc(void);
 
 static __xwup_code
 void xwup_mtx_free(struct xwup_mtx * mtx);
 
 static __xwup_code
-void xwup_mtx_activate(struct xwup_mtx * mtx, xwpr_t sprio);
+xwer_t xwup_mtx_sgc(void * mtx);
 
 static __xwup_code
-void xwup_mtx_deactivate(struct xwup_mtx * mtx);
+xwer_t xwup_mtx_dgc(void * mtx);
+
+static __xwup_code
+xwer_t xwup_mtx_activate(struct xwup_mtx * mtx, xwpr_t sprio, xwobj_gc_f gcfunc);
 
 static __xwup_code
 void xwup_mtx_chprio_once(struct xwup_mtx * mtx, struct xwup_thd ** pthd);
@@ -75,6 +85,8 @@ struct xwup_mtx * xwup_mtx_alloc(void)
         mtx = malloc(sizeof(struct xwup_mtx));
         if (NULL == mtx) {
                 mtx = err_ptr(-ENOMEM);
+        } else {
+                xwup_mtx_construct(mtx);
         }
         return mtx;
 #else
@@ -87,7 +99,9 @@ struct xwup_mtx * xwup_mtx_alloc(void)
         rc = xwmm_kma_alloc(sizeof(struct xwup_mtx), XWMM_ALIGNMENT, &mem.anon);
         if (rc < 0) {
                 mem.mtx = err_ptr(-ENOMEM);
-        }/* else {} */
+        } else {
+                xwup_mtx_construct(mem.mtx);
+        }
         return mem.mtx;
 #endif
 }
@@ -107,13 +121,54 @@ void xwup_mtx_free(struct xwup_mtx * mtx)
 }
 
 /**
+ * @brief 互斥锁对象的构造函数
+ * @param[in] mtx: 互斥锁对象的指针
+ */
+static __xwup_code
+void xwup_mtx_construct(struct xwup_mtx * mtx)
+{
+        xwos_object_construct(&mtx->xwobj);
+}
+
+/**
+ * @brief 互斥锁对象的析构函数
+ * @param[in] mtx: 互斥锁对象的指针
+ */
+static __xwup_code
+void xwup_mtx_destruct(struct xwup_mtx * mtx)
+{
+        xwos_object_destruct(&mtx->xwobj);
+}
+
+static __xwup_code
+xwer_t xwup_mtx_sgc(void * mtx)
+{
+        xwup_mtx_destruct((struct xwup_mtx *)mtx);
+        return XWOK;
+}
+
+static __xwup_code
+xwer_t xwup_mtx_dgc(void * mtx)
+{
+        xwup_mtx_free((struct xwup_mtx *)mtx);
+        return XWOK;
+}
+
+/**
  * @brief 激活互斥锁对象
  * @param[in] mtx: 互斥锁对象的指针
  * @param[in] sprio: 互斥锁的静态优先级
+ * @param[in] gcfunc: 垃圾回收函数的指针
  */
 static __xwup_code
-void xwup_mtx_activate(struct xwup_mtx * mtx, xwpr_t sprio)
+xwer_t xwup_mtx_activate(struct xwup_mtx * mtx, xwpr_t sprio, xwobj_gc_f gcfunc)
 {
+        xwer_t rc;
+
+        rc = xwos_object_activate(&mtx->xwobj, gcfunc);
+        if (rc < 0) {
+                goto err_xwobj_activate;
+        }
         if (sprio >= XWUP_SKD_PRIORITY_RT_NUM) {
                 sprio = XWUP_SKD_PRIORITY_RT_MAX;
         } else if (sprio <= XWUP_SKD_PRIORITY_INVALID) {
@@ -126,27 +181,19 @@ void xwup_mtx_activate(struct xwup_mtx * mtx, xwpr_t sprio)
         mtx->reentrant = 0;
         xwlib_rbtree_init_node(&mtx->rbnode);
         xwlib_bclst_init_node(&mtx->rbbuddy);
-}
+        return XWOK;
 
-/**
- * @brief 使得互斥锁对象无效
- * @param[in] mtx: 互斥锁对象的指针
- */
-static __xwup_code
-void xwup_mtx_deactivate(struct xwup_mtx * mtx)
-{
-        XWOS_UNUSED(mtx);
+err_xwobj_activate:
+        return rc;
 }
 
 __xwup_api
 xwer_t xwup_mtx_init(struct xwup_mtx * mtx, xwpr_t sprio)
 {
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((sprio >= XWUP_SKD_PRIORITY_RT_MIN), "invalid-priority", -EINVAL);
-        XWOS_VALIDATE((sprio <= XWUP_SKD_PRIORITY_RT_MAX), "invalid-priority", -EINVAL);
 
-        xwup_mtx_activate(mtx, sprio);
-        return XWOK;
+        xwup_mtx_construct(mtx);
+        return xwup_mtx_activate(mtx, sprio, xwup_mtx_sgc);
 }
 
 __xwup_api
@@ -154,8 +201,7 @@ xwer_t xwup_mtx_fini(struct xwup_mtx * mtx)
 {
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
 
-        xwup_mtx_deactivate(mtx);
-        return XWOK;
+        return xwup_mtx_put(mtx);
 }
 
 __xwup_api
@@ -164,35 +210,49 @@ xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio)
         struct xwup_mtx * mtx;
         xwer_t rc;
 
-        XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
-        XWOS_VALIDATE((sprio >= XWUP_SKD_PRIORITY_RT_MIN), "invalid-priority", -EINVAL);
-        XWOS_VALIDATE((sprio <= XWUP_SKD_PRIORITY_RT_MAX), "invalid-priority", -EINVAL);
-
         *ptrbuf = NULL;
         mtx = xwup_mtx_alloc();
         if (__xwcc_unlikely(is_err(mtx))) {
                 rc = ptr_err(mtx);
         } else {
-                xwup_mtx_activate(mtx, sprio);
-                *ptrbuf = mtx;
-                rc = XWOK;
+                rc = xwup_mtx_activate(mtx, sprio, xwup_mtx_dgc);
+                if (__xwcc_unlikely(rc < 0)) {
+                        xwup_mtx_free(mtx);
+                } else {
+                        *ptrbuf = mtx;
+                }
         }
         return rc;
 }
 
 __xwup_api
-xwer_t xwup_mtx_delete(struct xwup_mtx * mtx)
+xwer_t xwup_mtx_delete(struct xwup_mtx * mtx, xwsq_t tik)
 {
-        xwer_t rc;
+        return xwup_mtx_release(mtx, tik);
+}
 
-        if (mtx) {
-                xwup_mtx_deactivate(mtx);
-                xwup_mtx_free(mtx);
-                rc = XWOK;
-        } else {
-                rc = -ENILOBJD;
-        }
-        return rc;
+__xwup_api
+xwer_t xwup_mtx_acquire(struct xwup_mtx * mtx, xwsq_t tik)
+{
+        return xwos_object_acquire(&mtx->xwobj, tik);
+}
+
+__xwup_api
+xwer_t xwup_mtx_release(struct xwup_mtx * mtx, xwsq_t tik)
+{
+        return xwos_object_release(&mtx->xwobj, tik);
+}
+
+__xwup_api
+xwer_t xwup_mtx_grab(struct xwup_mtx * mtx)
+{
+        return xwos_object_grab(&mtx->xwobj);
+}
+
+__xwup_api
+xwer_t xwup_mtx_put(struct xwup_mtx * mtx)
+{
+        return xwos_object_put(&mtx->xwobj);
 }
 
 /**

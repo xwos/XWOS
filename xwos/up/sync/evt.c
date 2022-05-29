@@ -26,16 +26,28 @@
 #include <xwos/up/sync/evt.h>
 
 static __xwup_code
+void xwup_evt_construct(struct xwup_evt * evt);
+
+static __xwup_code
+void xwup_evt_destruct(struct xwup_evt * evt);
+
+static __xwup_code
+void xwup_evt_setup(struct xwup_evt * evt, xwsz_t num, xwbmp_t * bmp, xwbmp_t * msk);
+
+static __xwup_code
 struct xwup_evt * xwup_evt_alloc(xwsz_t num);
 
 static __xwup_code
 void xwup_evt_free(struct xwup_evt * evt);
 
 static __xwup_code
-void xwup_evt_setup(struct xwup_evt * evt, xwsz_t num, xwbmp_t * bmp, xwbmp_t * msk);
+xwer_t xwup_evt_sgc(void * evt);
 
 static __xwup_code
-void xwup_evt_activate(struct xwup_evt * evt, xwsq_t type);
+xwer_t xwup_evt_dgc(void * evt);
+
+static __xwup_code
+xwer_t xwup_evt_activate(struct xwup_evt * evt, xwsq_t type, xwobj_gc_f gcfunc);
 
 static __xwup_code
 xwer_t xwup_flg_trywait_level(struct xwup_evt * evt,
@@ -56,6 +68,18 @@ static __xwup_code
 xwer_t xwup_flg_wait_to_edge(struct xwup_evt * evt, xwsq_t trigger,
                              xwbmp_t origin[], xwbmp_t msk[],
                              xwtm_t to);
+
+static __xwup_code
+void xwup_evt_construct(struct xwup_evt * evt)
+{
+        xwup_cond_construct(&evt->cond);
+}
+
+static __xwup_code
+void xwup_evt_destruct(struct xwup_evt * evt)
+{
+        xwup_cond_destruct(&evt->cond);
+}
 
 static __xwup_code
 void xwup_evt_setup(struct xwup_evt * evt, xwsz_t num,
@@ -86,6 +110,7 @@ struct xwup_evt * xwup_evt_alloc(xwsz_t num)
         } else {
                 bmp = (void *)&evt[1];
                 msk = &bmp[bmpnum];
+                xwup_evt_construct(evt);
                 xwup_evt_setup(evt, num, bmp, msk);
         }
         return evt;
@@ -105,6 +130,7 @@ struct xwup_evt * xwup_evt_alloc(xwsz_t num)
         if (XWOK == rc) {
                 bmp = (void *)&mem.evt[1];
                 msk = &bmp[bmpnum];
+                xwup_evt_construct(mem.evt);
                 xwup_evt_setup(mem.evt, num, bmp, msk);
         } else {
                 mem.evt = err_ptr(-ENOMEM);
@@ -127,26 +153,66 @@ void xwup_evt_free(struct xwup_evt * evt)
 #endif
 }
 
+static __xwup_code
+xwer_t xwup_evt_sgc(void * evt)
+{
+        xwup_evt_destruct((struct xwup_evt *)evt);
+        return XWOK;
+}
+
+static __xwup_code
+xwer_t xwup_evt_dgc(void * evt)
+{
+        xwup_evt_destruct((struct xwup_evt *)evt);
+        xwup_evt_free((struct xwup_evt *)evt);
+        return XWOK;
+}
+
+__xwup_api
+xwer_t xwup_evt_acquire(struct xwup_evt * evt, xwsq_t tik)
+{
+        return xwup_cond_acquire(&evt->cond, tik);
+}
+
+__xwup_api
+xwer_t xwup_evt_release(struct xwup_evt * evt, xwsq_t tik)
+{
+        return xwup_cond_release(&evt->cond, tik);
+}
+
+__xwup_api
+xwer_t xwup_evt_grab(struct xwup_evt * evt)
+{
+        return xwup_cond_grab(&evt->cond);
+}
+
+__xwup_api
+xwer_t xwup_evt_put(struct xwup_evt * evt)
+{
+        return xwup_cond_put(&evt->cond);
+}
+
 /**
- * @brief 激活事件对象
+ * @brief 激活并初始化事件对象
  * @param[in] evt: 事件对象的指针
  * @param[in] type: 事件的类型，取值：
  *   @arg XWUP_EVT_TYPE_FLG: 事件标志
  *   @arg XWUP_EVT_TYPE_SEL: 信号选择器
  *   @arg XWUP_EVT_TYPE_BR: 线程栅栏
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * @param[in] gcfunc: 垃圾回收函数的指针
  */
 static __xwup_code
-void xwup_evt_activate(struct xwup_evt * evt, xwsq_t type)
+xwer_t xwup_evt_activate(struct xwup_evt * evt, xwsq_t type, xwobj_gc_f gcfunc)
 {
         xwsz_t size;
+        xwer_t rc;
         xwsq_t i;
 
         size = BITS_TO_XWBMP_T(evt->num);
-        xwup_cond_activate(&evt->cond);
+        rc = xwup_cond_activate(&evt->cond, gcfunc);
+        if (rc < 0) {
+                goto err_cond_activate;
+        }
         evt->type = type;
         switch (type & XWUP_EVT_TYPE_MASK) {
         case XWUP_EVT_TYPE_BR:
@@ -165,16 +231,10 @@ void xwup_evt_activate(struct xwup_evt * evt, xwsq_t type)
         }
         memset(evt->bmp, 0, size);
         xwup_splk_init(&evt->lock);
-}
+        return XWOK;
 
-/**
- * @brief 使得事件对象无效
- * @param[in] evt: 事件对象的指针
- */
-static __xwup_code
-void xwup_evt_deactivate(struct xwup_evt * evt)
-{
-        XWOS_UNUSED(evt);
+err_cond_activate:
+        return rc;
 }
 
 __xwup_api
@@ -183,34 +243,25 @@ xwer_t xwup_evt_create(struct xwup_evt ** ptrbuf, xwsq_t type, xwsz_t num)
         struct xwup_evt * evt;
         xwer_t rc;
 
-        XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((type & XWUP_EVT_TYPE_MASK) < XWUP_EVT_TYPE_MAX),
-                      "type-error", -EINVAL);
         *ptrbuf = NULL;
         evt = xwup_evt_alloc(num);
         if (__xwcc_unlikely(is_err(evt))) {
                 rc = ptr_err(evt);
         } else {
-                xwup_evt_activate(evt, type);
-                *ptrbuf = evt;
-                rc = XWOK;
+                rc = xwup_evt_activate(evt, type, xwup_evt_dgc);
+                if (__xwcc_unlikely(rc < 0)) {
+                        xwup_evt_free(evt);
+                } else {
+                        *ptrbuf = evt;
+                }
         }
         return rc;
 }
 
 __xwup_api
-xwer_t xwup_evt_delete(struct xwup_evt * evt)
+xwer_t xwup_evt_delete(struct xwup_evt * evt, xwsq_t tik)
 {
-        xwer_t rc;
-
-        if (evt) {
-                xwup_evt_deactivate(evt);
-                xwup_evt_free(evt);
-                rc = XWOK;
-        } else {
-                rc = -ENILOBJD;
-        }
-        return rc;
+        return xwup_evt_release(evt, tik);
 }
 
 __xwup_api
@@ -218,19 +269,21 @@ xwer_t xwup_evt_init(struct xwup_evt * evt, xwsq_t type, xwsz_t num,
                      xwbmp_t * bmp, xwbmp_t * msk)
 {
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
+        XWOS_VALIDATE((bmp), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
         XWOS_VALIDATE(((type & XWUP_EVT_TYPE_MASK) < XWUP_EVT_TYPE_MAX),
                       "type-error", -EINVAL);
+
+        xwup_evt_construct(evt);
         xwup_evt_setup(evt, num, bmp, msk);
-        xwup_evt_activate(evt, type);
-        return XWOK;
+        return xwup_evt_activate(evt, type, xwup_evt_sgc);
 }
 
 __xwup_api
 xwer_t xwup_evt_fini(struct xwup_evt * evt)
 {
         XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        xwup_evt_deactivate(evt);
-        return XWOK;
+        return xwup_evt_put(evt);
 }
 
 __xwup_api

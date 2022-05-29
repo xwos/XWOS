@@ -35,10 +35,21 @@ static __xwup_code
 void xwup_rtsem_free(struct xwup_rtsem * sem);
 
 static __xwup_code
-void xwup_rtsem_activate(struct xwup_rtsem * sem, xwssq_t val, xwssq_t max);
+void xwup_rtsem_construct(struct xwup_rtsem * sem);
 
 static __xwup_code
-void xwup_rtsem_deactivate(struct xwup_rtsem * sem);
+void xwup_rtsem_destruct(struct xwup_rtsem * sem);
+
+static __xwup_code
+xwer_t xwup_rtsem_sgc(void * sem);
+
+static __xwup_code
+xwer_t xwup_rtsem_dgc(void * sem);
+
+static __xwup_code
+xwer_t xwup_rtsem_activate(struct xwup_rtsem * sem,
+                           xwssq_t val, xwssq_t max,
+                           xwobj_gc_f gcfunc);
 
 static __xwup_code
 xwer_t xwup_rtsem_blkthd_to_unlkwq_cpuirqrs(struct xwup_rtsem * sem,
@@ -73,6 +84,8 @@ struct xwup_rtsem * xwup_rtsem_alloc(void)
         rtsem = malloc(sizeof(struct xwup_rtsem));
         if (NULL == rtsem) {
                 rtsem = err_ptr(-ENOMEM);
+        } else {
+                xwup_rtsem_construct(rtsem);
         }
         return rtsem;
 #else
@@ -85,7 +98,9 @@ struct xwup_rtsem * xwup_rtsem_alloc(void)
         rc = xwmm_kma_alloc(sizeof(struct xwup_rtsem), XWMM_ALIGNMENT, &mem.anon);
         if (rc < 0) {
                 mem.sem = err_ptr(-ENOMEM);
-        }/* else {} */
+        } else {
+                xwup_rtsem_construct(mem.sem);
+        }
         return mem.sem;
 #endif
 }
@@ -104,53 +119,90 @@ void xwup_rtsem_free(struct xwup_rtsem * sem)
 #endif
 }
 
-/**
- * @brief 激活实时信号量
- * @param[in] sem: 信号量对象的指针
- * @param[in] val: 信号量的初始值
- * @param[in] max: 信号量的最大值
- * @return 错误码
- * @retval XWOK: 没有错误
- * @note
- * + 上下文：任意
- */
 static __xwup_code
-void xwup_rtsem_activate(struct xwup_rtsem * sem, xwssq_t val, xwssq_t max)
+void xwup_rtsem_construct(struct xwup_rtsem * sem)
 {
-        xwup_vsem_activate(&sem->vsem);
-        xwup_rtwq_init(&sem->rtwq);
-        sem->vsem.count = val;
-        sem->vsem.max = max;
+        xwup_vsem_construct(&sem->vsem);
 }
 
-/**
- * @brief 使得实时信号量对象无效
- * @param[in] sem: 信号量对象的指针
- */
 static __xwup_code
-void xwup_rtsem_deactivate(struct xwup_rtsem * sem)
+void xwup_rtsem_destruct(struct xwup_rtsem * sem)
 {
-        XWOS_UNUSED(sem);
+        xwup_vsem_destruct(&sem->vsem);
+}
+
+static __xwup_code
+xwer_t xwup_rtsem_sgc(void * sem)
+{
+        xwup_rtsem_destruct((struct xwup_rtsem *)sem);
+        return XWOK;
+}
+
+static __xwup_code
+xwer_t xwup_rtsem_dgc(void * sem)
+{
+        xwup_rtsem_destruct((struct xwup_rtsem *)sem);
+        xwup_rtsem_free((struct xwup_rtsem *)sem);
+        return XWOK;
+}
+
+__xwup_api
+xwer_t xwup_rtsem_acquire(struct xwup_rtsem * sem, xwsq_t tik)
+{
+        return xwup_vsem_acquire(&sem->vsem, tik);
+}
+
+__xwup_api
+xwer_t xwup_rtsem_release(struct xwup_rtsem * sem, xwsq_t tik)
+{
+        return xwup_vsem_release(&sem->vsem, tik);
+}
+
+__xwup_api
+xwer_t xwup_rtsem_grab(struct xwup_rtsem * sem)
+{
+        return xwup_vsem_grab(&sem->vsem);
+}
+
+__xwup_api
+xwer_t xwup_rtsem_put(struct xwup_rtsem * sem)
+{
+        return xwup_vsem_put(&sem->vsem);
+}
+
+static __xwup_code
+xwer_t xwup_rtsem_activate(struct xwup_rtsem * sem,
+                           xwssq_t val, xwssq_t max,
+                           xwobj_gc_f gcfunc)
+{
+        xwer_t rc;
+
+        XWOS_VALIDATE(((val >= 0) && (max > 0) && (val <= max)),
+                      "invalid-value", -EINVAL);
+
+        rc = xwup_vsem_activate(&sem->vsem, gcfunc);
+        if (XWOK == rc) {
+                xwup_rtwq_init(&sem->rtwq);
+                sem->vsem.count = val;
+                sem->vsem.max = max;
+        }
+        return rc;
 }
 
 __xwup_api
 xwer_t xwup_rtsem_init(struct xwup_rtsem * sem, xwssq_t val, xwssq_t max)
 {
         XWOS_VALIDATE((NULL != sem), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((val >= 0) && (max > 0) && (val <= max)),
-                      "invalid-value", -EINVAL);
 
-        xwup_rtsem_activate(sem, val, max);
-        return XWOK;
+        xwup_rtsem_construct(sem);
+        return xwup_rtsem_activate(sem, val, max, xwup_rtsem_sgc);
 }
 
 __xwup_api
 xwer_t xwup_rtsem_fini(struct xwup_rtsem * sem)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-
-        xwup_rtsem_deactivate(sem);
-        return XWOK;
+        return xwup_rtsem_put(sem);
 }
 
 __xwup_api
@@ -159,35 +211,25 @@ xwer_t xwup_rtsem_create(struct xwup_rtsem ** ptrbuf, xwssq_t val, xwssq_t max)
         struct xwup_rtsem * sem;
         xwer_t rc;
 
-        XWOS_VALIDATE((NULL != ptrbuf), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((val >= 0) && (max > 0) && (val <= max)),
-                      "invalid-value", -EINVAL);
-
         *ptrbuf = NULL;
         sem = xwup_rtsem_alloc();
         if (__xwcc_unlikely(is_err(sem))) {
                 rc = ptr_err(sem);
         } else {
-                xwup_rtsem_activate(sem, val, max);
-                *ptrbuf = sem;
-                rc = XWOK;
+                rc = xwup_rtsem_activate(sem, val, max, xwup_rtsem_dgc);
+                if (__xwcc_unlikely(rc < 0)) {
+                        xwup_rtsem_free(sem);
+                } else {
+                        *ptrbuf = sem;
+                }
         }
         return rc;
 }
 
 __xwup_api
-xwer_t xwup_rtsem_delete(struct xwup_rtsem * sem)
+xwer_t xwup_rtsem_delete(struct xwup_rtsem * sem, xwsq_t tik)
 {
-        xwer_t rc;
-
-        if (sem) {
-                xwup_rtsem_fini(sem);
-                xwup_rtsem_free(sem);
-                rc = XWOK;
-        } else {
-                rc = -ENILOBJD;
-        }
-        return rc;
+        return xwup_rtsem_release(sem, tik);
 }
 
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
