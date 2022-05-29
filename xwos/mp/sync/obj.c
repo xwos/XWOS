@@ -18,23 +18,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
-#include <xwos/lib/xwbop.h>
-#include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
-#include <xwos/mp/irq.h>
-#include <xwos/mp/skd.h>
-#include <xwos/mp/tt.h>
-#include <xwos/mp/thd.h>
-#include <xwos/mp/rtwq.h>
-#include <xwos/mp/plwq.h>
-#include <xwos/mp/lock/spinlock.h>
-#include <xwos/mp/lock/seqlock.h>
-#include <xwos/mp/lock/mtx.h>
-#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
-#  include <xwos/mp/sync/evt.h>
-#endif
 #include <xwos/mp/sync/obj.h>
-#include <xwos/mp/sync/sem.h>
 
 __xwmp_code
 void xwmp_synobj_construct(struct xwmp_synobj * synobj)

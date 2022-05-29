@@ -65,7 +65,10 @@ static __xwmp_code
 void xwmp_sem_destruct(struct xwmp_sem * sem);
 
 static __xwmp_code
-xwer_t xwmp_sem_gc(void * sem);
+xwer_t xwmp_sem_sgc(void * sem);
+
+static __xwmp_code
+xwer_t xwmp_sem_dgc(void * sem);
 
 #if defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
 static __xwmp_code
@@ -228,12 +231,22 @@ void xwmp_sem_destruct(struct xwmp_sem * sem)
 }
 
 /**
- * @brief 信号量对象的垃圾回收函数
+ * @brief 静态信号量对象的垃圾回收函数
  * @param[in] sem: 信号量对象的指针
- * @return 错误码
  */
 static __xwmp_code
-xwer_t xwmp_sem_gc(void * sem)
+xwer_t xwmp_sem_sgc(void * sem)
+{
+        xwmp_sem_destruct((struct xwmp_sem *)sem);
+        return XWOK;
+}
+
+/**
+ * @brief 动态信号量对象的垃圾回收函数
+ * @param[in] sem: 信号量对象的指针
+ */
+static __xwmp_code
+xwer_t xwmp_sem_dgc(void * sem)
 {
         xwmp_sem_free((struct xwmp_sem *)sem);
         return XWOK;
@@ -279,12 +292,12 @@ xwer_t xwmp_sem_create(struct xwmp_sem ** sembuf, xwid_t type,
                 switch (type) {
 #if defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
                 case XWMP_SEM_TYPE_PIPELINE:
-                        rc = xwmp_plsem_activate(sem, val, max, xwmp_sem_gc);
+                        rc = xwmp_plsem_activate(sem, val, max, xwmp_sem_dgc);
                         break;
 #endif
 #if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
                 case XWMP_SEM_TYPE_RT:
-                        rc = xwmp_rtsem_activate(sem, val, max, xwmp_sem_gc);
+                        rc = xwmp_rtsem_activate(sem, val, max, xwmp_sem_dgc);
                         break;
 #endif
                 }
@@ -434,7 +447,7 @@ xwer_t xwmp_plsem_init(struct xwmp_sem * sem, xwssq_t val, xwssq_t max)
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
 
         xwmp_sem_construct(sem);
-        return xwmp_plsem_activate(sem, val, max, NULL);
+        return xwmp_plsem_activate(sem, val, max, xwmp_sem_sgc);
 }
 
 __xwmp_api
@@ -984,7 +997,7 @@ xwer_t xwmp_rtsem_init(struct xwmp_sem * sem, xwssq_t val, xwssq_t max)
                       "invalid-value", -EINVAL);
 
         xwmp_sem_construct(sem);
-        return xwmp_rtsem_activate(sem, val, max, NULL);
+        return xwmp_rtsem_activate(sem, val, max, xwmp_sem_sgc);
 }
 
 __xwmp_api

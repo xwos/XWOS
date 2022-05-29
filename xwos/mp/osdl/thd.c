@@ -24,6 +24,10 @@ xwer_t xwosdl_thd_init(struct xwosdl_thd * thd, xwosdl_thd_d * thdd,
         XWOS_VALIDATE((NULL != thdd), "nullptr", -EFAULT);
         XWOS_VALIDATE((NULL != inattr), "nullptr", -EFAULT);
         XWOS_VALIDATE((NULL != inattr->stack), "nullptr", -EFAULT);
+        XWOS_VALIDATE((inattr->stack_size >= XWMMCFG_STACK_SIZE_MIN),
+                      "nullptr", -ESIZE);
+        XWOS_VALIDATE(((inattr->stack_size & (XWMMCFG_STACK_ALIGNMENT - 1)) == 0),
+                      "nullptr", -EALIGN);
 
         rc = xwmp_thd_init(thd, inattr, mainfunc, arg);
         if (XWOK == rc) {

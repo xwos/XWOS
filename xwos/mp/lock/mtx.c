@@ -46,7 +46,10 @@ xwer_t xwmp_mtx_activate(struct xwmp_mtx * mtx, xwpr_t sprio,
                          xwobj_gc_f gcfunc);
 
 static __xwmp_code
-xwer_t xwmp_mtx_gc(void * mtx);
+xwer_t xwmp_mtx_sgc(void * mtx);
+
+static __xwmp_code
+xwer_t xwmp_mtx_dgc(void * mtx);
 
 static __xwmp_code
 xwer_t xwmp_mtx_chprio_once(struct xwmp_mtx * mtx,
@@ -198,12 +201,22 @@ void xwmp_mtx_destruct(struct xwmp_mtx * mtx)
 }
 
 /**
- * @brief 互斥锁对象的垃圾回收函数
+ * @brief 静态互斥锁对象的垃圾回收函数
  * @param[in] mtx: 互斥锁对象的指针
- * @return 错误码
  */
 static __xwmp_code
-xwer_t xwmp_mtx_gc(void * mtx)
+xwer_t xwmp_mtx_sgc(void * mtx)
+{
+        xwmp_mtx_destruct((struct xwmp_mtx *)mtx);
+        return XWOK;
+}
+
+/**
+ * @brief 动态互斥锁对象的垃圾回收函数
+ * @param[in] mtx: 互斥锁对象的指针
+ */
+static __xwmp_code
+xwer_t xwmp_mtx_dgc(void * mtx)
 {
         xwmp_mtx_free((struct xwmp_mtx *)mtx);
         return XWOK;
@@ -214,38 +227,31 @@ xwer_t xwmp_mtx_gc(void * mtx)
  * @param[in] mtx: 互斥锁对象的指针
  * @param[in] sprio: 互斥锁的静态优先级
  * @param[in] gcfunc: 垃圾回收函数的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EINVAL: 无效参数
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入，除非对象的引用计数重新为0
- * @note
- * - 静态初始化的对象所有资源都是由用户自己提供的，
- *   因此当对象销毁时，垃圾回收函数也需要用户自己提供。
  */
 static __xwmp_code
-xwer_t xwmp_mtx_activate(struct xwmp_mtx * mtx, xwpr_t sprio,
-                         xwobj_gc_f gcfunc)
+xwer_t xwmp_mtx_activate(struct xwmp_mtx * mtx, xwpr_t sprio, xwobj_gc_f gcfunc)
 {
         xwer_t rc;
 
         rc = xwos_object_activate(&mtx->xwobj, gcfunc);
-        if (__xwcc_likely(XWOK == rc)) {
-                if (sprio >= XWMP_SKD_PRIORITY_RT_NUM) {
-                        sprio = XWMP_SKD_PRIORITY_RT_MAX;
-                } else if (sprio <= XWMP_SKD_PRIORITY_INVALID) {
-                        sprio = XWMP_SKD_PRIORITY_RT_MIN;
-                }
-                mtx->sprio = sprio;
-                mtx->dprio = sprio;
-                xwmp_rtwq_init(&mtx->rtwq);
-                mtx->ownertree = NULL;
-                mtx->reentrant = 0;
-                xwlib_rbtree_init_node(&mtx->rbnode);
-                xwlib_bclst_init_node(&mtx->rbbuddy);
-        } /* else {} */
+        if (rc < 0) {
+                goto err_xwobj_activate;
+        }
+        if (sprio >= XWMP_SKD_PRIORITY_RT_NUM) {
+                sprio = XWMP_SKD_PRIORITY_RT_MAX;
+        } else if (sprio <= XWMP_SKD_PRIORITY_INVALID) {
+                sprio = XWMP_SKD_PRIORITY_RT_MIN;
+        }
+        mtx->sprio = sprio;
+        mtx->dprio = sprio;
+        xwmp_rtwq_init(&mtx->rtwq);
+        mtx->ownertree = NULL;
+        mtx->reentrant = 0;
+        xwlib_rbtree_init_node(&mtx->rbnode);
+        xwlib_bclst_init_node(&mtx->rbbuddy);
+        return XWOK;
+
+err_xwobj_activate:
         return rc;
 }
 
@@ -255,7 +261,7 @@ xwer_t xwmp_mtx_init(struct xwmp_mtx * mtx, xwpr_t sprio)
         XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
 
         xwmp_mtx_construct(mtx);
-        return xwmp_mtx_activate(mtx, sprio, NULL);
+        return xwmp_mtx_activate(mtx, sprio, xwmp_mtx_sgc);
 }
 
 __xwmp_api
@@ -277,10 +283,9 @@ xwer_t xwmp_mtx_create(struct xwmp_mtx ** mtxbuf, xwpr_t sprio)
         if (__xwcc_unlikely(is_err(mtx))) {
                 rc = ptr_err(mtx);
         } else {
-                rc = xwmp_mtx_activate(mtx, sprio, xwmp_mtx_gc);
+                rc = xwmp_mtx_activate(mtx, sprio, xwmp_mtx_dgc);
                 if (__xwcc_unlikely(rc < 0)) {
                         xwmp_mtx_free(mtx);
-                        mtx = err_ptr(rc);
                 } else {
                         *mtxbuf = mtx;
                 }
