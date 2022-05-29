@@ -135,11 +135,9 @@ void xwmp_thd_attr_init(struct xwmp_thd_attr * attr);
 xwer_t xwmp_thd_init(struct xwmp_thd * thd,
                      const struct xwmp_thd_attr * inattr,
                      xwmp_thd_f mainfunc, void * arg);
-xwer_t xwmp_thd_fini(struct xwmp_thd * thd);
 xwer_t xwmp_thd_create(struct xwmp_thd ** thdpbuf,
                        const struct xwmp_thd_attr * inattr,
                        xwmp_thd_f manfunc, void * arg);
-xwer_t xwmp_thd_delete(struct xwmp_thd * thd);
 xwer_t xwmp_thd_acquire(struct xwmp_thd * thd, xwsq_t tik);
 xwer_t xwmp_thd_release(struct xwmp_thd * thd, xwsq_t tik);
 xwer_t xwmp_thd_grab(struct xwmp_thd * thd);

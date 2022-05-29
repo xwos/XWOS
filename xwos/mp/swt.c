@@ -39,7 +39,10 @@ static __xwmp_code
 xwer_t xwmp_swt_activate(struct xwmp_swt * swt, xwsq_t flag, xwobj_gc_f gcfunc);
 
 static __xwmp_code
-xwer_t xwmp_swt_gc(void * swt);
+xwer_t xwmp_swt_sgc(void * swt);
+
+static __xwmp_code
+xwer_t xwmp_swt_dgc(void * swt);
 
 static __xwmp_code
 void xwmp_swt_ttn_cb(void * entry);
@@ -166,18 +169,26 @@ void xwmp_swt_construct(struct xwmp_swt * swt)
 static __xwmp_code
 void xwmp_swt_destruct(struct xwmp_swt * swt)
 {
-        swt->xwskd = NULL;
-        swt->flag = 0;
         xwos_object_destruct(&swt->xwobj);
 }
 
 /**
- * @brief 软件定时器对象的垃圾回收函数
+ * @brief 静态软件定时器对象的垃圾回收函数
  * @param[in] swt: 软件定时器对象的指针
- * @return 错误码
  */
 static __xwmp_code
-xwer_t xwmp_swt_gc(void * swt)
+xwer_t xwmp_swt_sgc(void * swt)
+{
+        xwmp_swt_destruct((struct xwmp_swt *)swt);
+        return XWOK;
+}
+
+/**
+ * @brief 动态软件定时器对象的垃圾回收函数
+ * @param[in] swt: 软件定时器对象的指针
+ */
+static __xwmp_code
+xwer_t xwmp_swt_dgc(void * swt)
 {
         xwmp_swt_free(swt);
         return XWOK;
@@ -201,7 +212,6 @@ xwer_t xwmp_swt_activate(struct xwmp_swt * swt,
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwobj_activate;
         }
-
         swt->xwskd = xwmp_skd_get_lc();
         swt->flag = flag;
         return XWOK;
@@ -216,7 +226,7 @@ xwer_t xwmp_swt_init(struct xwmp_swt * swt, xwsq_t flag)
         XWOS_VALIDATE((swt), "nullptr", -EFAULT);
 
         xwmp_swt_construct(swt);
-        return xwmp_swt_activate(swt, flag, NULL);
+        return xwmp_swt_activate(swt, flag, xwmp_swt_sgc);
 }
 
 __xwmp_api
@@ -239,7 +249,7 @@ xwer_t xwmp_swt_create(struct xwmp_swt ** swtbuf, xwsq_t flag)
                 rc = ptr_err(swt);
                 goto err_swt_alloc;
         }
-        rc = xwmp_swt_activate(swt, flag, xwmp_swt_gc);
+        rc = xwmp_swt_activate(swt, flag, xwmp_swt_dgc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_swt_activate;
         }

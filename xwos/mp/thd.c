@@ -69,7 +69,7 @@ static __xwmp_code
 void xwmp_thd_destruct(struct xwmp_thd * thd);
 
 static __xwmp_code
-xwer_t xwmp_thd_gc(void * thd);
+xwer_t xwmp_thd_dgc(void * thd);
 
 static __xwmp_code
 xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
@@ -79,6 +79,9 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
 
 static __xwmp_code
 void xwmp_thd_launch(struct xwmp_thd * thd, xwmp_thd_f mainfunc, void * arg);
+
+static __xwmp_code
+xwer_t xwmp_thd_delete(struct xwmp_thd * thd);
 
 static __xwmp_code
 void xwmp_thd_outmigrate_frozen_lic(struct xwmp_thd * thd);
@@ -266,16 +269,28 @@ void xwmp_thd_destruct(struct xwmp_thd * thd)
 }
 
 /**
- * @brief 线程对象的垃圾回收函数
+ * @brief 静态线程对象的垃圾回收函数
  * @param[in] thd: 线程对象的指针
- * @return 错误码
  */
 static __xwmp_code
-xwer_t xwmp_thd_gc(void * thd)
+xwer_t xwmp_thd_sgc(void * obj)
+{
+        xwmp_thd_destruct((struct xwmp_thd *)obj);
+        return XWOK;
+}
+
+/**
+ * @brief 动态线程对象的垃圾回收函数
+ * @param[in] thd: 线程对象的指针
+ */
+static __xwmp_code
+xwer_t xwmp_thd_dgc(void * obj)
 {
         xwstk_t * base;
+        struct xwmp_thd * thd;
 
-        if (XWMP_SKDOBJ_FLAG_ALLOCATED_STACK & ((struct xwmp_thd *)thd)->stack.flag) {
+        thd = obj;
+        if (XWMP_SKDOBJ_FLAG_ALLOCATED_STACK & thd->stack.flag) {
                 base = ((struct xwmp_thd *)thd)->stack.base;
                 xwmp_thd_stack_free(base);
         }
@@ -286,14 +301,12 @@ xwer_t xwmp_thd_gc(void * thd)
 __xwmp_api
 xwer_t xwmp_thd_acquire(struct xwmp_thd * thd, xwsq_t tik)
 {
-        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
         return xwos_object_acquire(&thd->xwobj, tik);
 }
 
 __xwmp_api
 xwer_t xwmp_thd_release(struct xwmp_thd * thd, xwsq_t tik)
 {
-        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
         return xwos_object_release(&thd->xwobj, tik);
 }
 
@@ -317,13 +330,6 @@ xwer_t xwmp_thd_put(struct xwmp_thd * thd)
  * @param[in] arg: 线程函数的参数
  * @param[in] gcfunc: 垃圾回收函数的指针
  * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入，除非对象的引用计数重新为0
- * @note
- * - 静态初始化的对象所有资源都是由用户自己提供的，
- *   因此当对象销毁时，垃圾回收函数也需要用户自己提供。
  */
 static __xwmp_code
 xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
@@ -336,7 +342,7 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
 
         rc = xwos_object_activate(&thd->xwobj, gcfunc);
         if (__xwcc_unlikely(rc < 0)) {
-                goto err_obj_activate;
+                goto err_xwobj_activate;
         }
 
         xwmp_splk_init(&thd->stlock);
@@ -410,7 +416,7 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
         }
         return XWOK;
 
-err_obj_activate:
+err_xwobj_activate:
         return rc;
 }
 
@@ -485,16 +491,8 @@ xwer_t xwmp_thd_init(struct xwmp_thd * thd,
                 attr.stack_size = XWMMCFG_STACK_SIZE_MIN;
         }
         thd->stack.flag = 0;
-        rc = xwmp_thd_activate(thd, &attr, mainfunc, arg, NULL);
+        rc = xwmp_thd_activate(thd, &attr, mainfunc, arg, xwmp_thd_sgc);
         return rc;
-}
-
-__xwmp_api
-xwer_t xwmp_thd_fini(struct xwmp_thd * thd)
-{
-        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
-
-        return xwmp_thd_put(thd);
 }
 
 __xwmp_api
@@ -554,7 +552,7 @@ xwer_t xwmp_thd_create(struct xwmp_thd ** thdpbuf,
                 thd->stack.flag = 0;
         }
 
-        rc = xwmp_thd_activate(thd, &attr, mainfunc, arg, xwmp_thd_gc);
+        rc = xwmp_thd_activate(thd, &attr, mainfunc, arg, xwmp_thd_dgc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_thd_activate;
         }
@@ -573,11 +571,9 @@ err_stack_alloc:
         return rc;
 }
 
-__xwmp_api
+static __xwmp_code
 xwer_t xwmp_thd_delete(struct xwmp_thd * thd)
 {
-        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
-
         return xwmp_thd_put(thd);
 }
 

@@ -58,7 +58,10 @@ static __xwmp_code
 void xwmp_cond_free(struct xwmp_cond * cond);
 
 static __xwmp_code
-xwer_t xwmp_cond_gc(void * cond);
+xwer_t xwmp_cond_sgc(void * cond);
+
+static __xwmp_code
+xwer_t xwmp_cond_dgc(void * cond);
 
 static __xwmp_code
 xwer_t xwmp_cond_broadcast_once(struct xwmp_cond * cond, bool * retry);
@@ -207,12 +210,22 @@ void xwmp_cond_destruct(struct xwmp_cond * cond)
 }
 
 /**
- * @brief 条件量对象的垃圾回收函数
+ * @brief 静态条件量对象的垃圾回收函数
  * @param[in] cond: 条件量对象的指针
- * @return 错误码
  */
 static __xwmp_code
-xwer_t xwmp_cond_gc(void * cond)
+xwer_t xwmp_cond_sgc(void * cond)
+{
+        xwmp_cond_destruct((struct xwmp_cond *)cond);
+        return XWOK;
+}
+
+/**
+ * @brief 动态条件量对象的垃圾回收函数
+ * @param[in] cond: 条件量对象的指针
+ */
+static __xwmp_code
+xwer_t xwmp_cond_dgc(void * cond)
 {
         xwmp_cond_free((struct xwmp_cond *)cond);
         return XWOK;
@@ -250,7 +263,7 @@ xwer_t xwmp_cond_init(struct xwmp_cond * cond)
 {
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         xwmp_cond_construct(cond);
-        return xwmp_cond_activate(cond, NULL);
+        return xwmp_cond_activate(cond, xwmp_cond_sgc);
 }
 
 __xwmp_api
@@ -271,7 +284,7 @@ xwer_t xwmp_cond_create(struct xwmp_cond ** condbuf)
         if (__xwcc_unlikely(is_err(cond))) {
                 rc = ptr_err(cond);
         } else {
-                rc = xwmp_cond_activate(cond, xwmp_cond_gc);
+                rc = xwmp_cond_activate(cond, xwmp_cond_dgc);
                 if (__xwcc_unlikely(rc < 0)) {
                         xwmp_cond_free(cond);
                 } else {

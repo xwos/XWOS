@@ -46,7 +46,10 @@ static __xwmp_code
 void xwmp_evt_destruct(struct xwmp_evt * evt);
 
 static __xwmp_code
-xwer_t xwmp_evt_gc(void * evt);
+xwer_t xwmp_evt_sgc(void * evt);
+
+static __xwmp_code
+xwer_t xwmp_evt_dgc(void * evt);
 
 static __xwmp_code
 xwer_t xwmp_evt_activate(struct xwmp_evt * evt, xwsq_t type, xwobj_gc_f gcfunc);
@@ -174,12 +177,22 @@ void xwmp_evt_destruct(struct xwmp_evt * evt)
 }
 
 /**
- * @brief 事件对象的垃圾回收函数
+ * @brief 静态事件对象的垃圾回收函数
  * @param[in] evt: 事件对象的指针
- * @return 错误码
  */
 static __xwmp_code
-xwer_t xwmp_evt_gc(void * evt)
+xwer_t xwmp_evt_sgc(void * evt)
+{
+        xwmp_evt_destruct((struct xwmp_evt *)evt);
+        return XWOK;
+}
+
+/**
+ * @brief 动态事件对象的垃圾回收函数
+ * @param[in] evt: 事件对象的指针
+ */
+static __xwmp_code
+xwer_t xwmp_evt_dgc(void * evt)
 {
         xwmp_evt_free((struct xwmp_evt *)evt);
         return XWOK;
@@ -193,14 +206,6 @@ xwer_t xwmp_evt_gc(void * evt)
  *   @arg XWMP_EVT_TYPE_SEL: 信号选择器
  *   @arg XWMP_EVT_TYPE_BR: 线程栅栏
  * @param[in] gcfunc: 垃圾回收函数的指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入，除非对象的引用计数重新为0
- * @note
- * - 静态初始化的对象所有资源都是由用户自己提供的，
- *   因此当对象销毁时，垃圾回收函数也需要用户自己提供。
  */
 static __xwmp_code
 xwer_t xwmp_evt_activate(struct xwmp_evt * evt, xwsq_t type, xwobj_gc_f gcfunc)
@@ -211,26 +216,30 @@ xwer_t xwmp_evt_activate(struct xwmp_evt * evt, xwsq_t type, xwobj_gc_f gcfunc)
 
         size = BITS_TO_XWBMP_T(evt->num);
         rc = xwmp_cond_activate(&evt->cond, gcfunc);
-        if (__xwcc_likely(XWOK == rc)) {
-                evt->type = type;
-                switch (type & XWMP_EVT_TYPE_MASK) {
-                case XWMP_EVT_TYPE_BR:
-                        memset(evt->msk, 0, size);
-                        for (i = 0; i < evt->num; i++) {
-                                xwbmpop_s1i(evt->msk, i);
-                        }
-                        break;
-                case XWMP_EVT_TYPE_SEL:
-                        memset(evt->msk, 0, size);
-                        break;
-                case XWMP_EVT_TYPE_FLG:
-                default:
-                        memset(evt->msk, 0xFF, size);
-                        break;
-                }
-                memset(evt->bmp, 0, size);
-                xwmp_splk_init(&evt->lock);
+        if (rc < 0) {
+                goto err_cond_activate;
         }
+        evt->type = type;
+        switch (type & XWMP_EVT_TYPE_MASK) {
+        case XWMP_EVT_TYPE_BR:
+                memset(evt->msk, 0, size);
+                for (i = 0; i < evt->num; i++) {
+                        xwbmpop_s1i(evt->msk, i);
+                }
+                break;
+        case XWMP_EVT_TYPE_SEL:
+                memset(evt->msk, 0, size);
+                break;
+        case XWMP_EVT_TYPE_FLG:
+        default:
+                memset(evt->msk, 0xFF, size);
+                break;
+        }
+        memset(evt->bmp, 0, size);
+        xwmp_splk_init(&evt->lock);
+        return XWOK;
+
+err_cond_activate:
         return rc;
 }
 
@@ -246,7 +255,7 @@ xwer_t xwmp_evt_init(struct xwmp_evt * evt, xwsq_t type, xwsz_t num,
 
         xwmp_evt_construct(evt);
         xwmp_evt_setup(evt, num, bmp, msk);
-        return xwmp_evt_activate(evt, type, NULL);
+        return xwmp_evt_activate(evt, type, xwmp_evt_sgc);
 }
 
 __xwmp_api
@@ -267,7 +276,7 @@ xwer_t xwmp_evt_create(struct xwmp_evt ** evtbuf, xwsq_t type, xwsz_t num)
         if (__xwcc_unlikely(is_err(evt))) {
                 rc = ptr_err(evt);
         } else {
-                rc = xwmp_evt_activate(evt, type, xwmp_evt_gc);
+                rc = xwmp_evt_activate(evt, type, xwmp_evt_dgc);
                 if (__xwcc_unlikely(rc < 0)) {
                         xwmp_evt_free(evt);
                 } else {
