@@ -42,22 +42,24 @@ struct xwup_mtx {
         xwpr_t dprio; /**< 动态优先级：此成员被锁rtwq.lock保护。*/
 };
 
+/* public(xwmp) */
+xwer_t xwup_mtx_intr(struct xwup_mtx * mtx, struct xwup_thd * thd);
+
+/* public */
 xwer_t xwup_mtx_init(struct xwup_mtx * mtx, xwpr_t sprio);
 xwer_t xwup_mtx_fini(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio);
 xwer_t xwup_mtx_delete(struct xwup_mtx * mtx, xwsq_t tik);
-
 xwer_t xwup_mtx_acquire(struct xwup_mtx * mtx, xwsq_t tik);
 xwer_t xwup_mtx_release(struct xwup_mtx * mtx, xwsq_t tik);
 xwer_t xwup_mtx_grab(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_put(struct xwup_mtx * mtx);
 
-xwer_t xwup_mtx_intr(struct xwup_mtx * mtx, struct xwup_thd * thd);
 xwer_t xwup_mtx_unlock(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_lock(struct xwup_mtx * mtx);
-xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_lock_to(struct xwup_mtx * mtx, xwtm_t to);
 xwer_t xwup_mtx_lock_unintr(struct xwup_mtx * mtx);
+xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_getlkst(struct xwup_mtx * mtx, xwsq_t * lkst);
 
 #endif /* xwos/up/lock/mtx.h */

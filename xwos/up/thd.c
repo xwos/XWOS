@@ -91,11 +91,11 @@ xwer_t xwup_thd_stack_free(xwstk_t * stk);
 static __xwup_code
 xwer_t xwup_thd_activate(struct xwup_thd * thd,
                          struct xwup_thd_attr * attr,
-                         xwup_thd_f mainfunc, void * arg,
+                         xwup_thd_f thdfunc, void * arg,
                          xwobj_gc_f gcfunc);
 
 static __xwup_code
-void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f mainfunc, void * arg);
+void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f thdfunc, void * arg);
 
 static __xwup_code
 xwer_t xwup_thd_delete(struct xwup_thd * thd);
@@ -284,13 +284,13 @@ xwer_t xwup_thd_stack_free(xwstk_t * stk)
  * @brief 激活线程对象
  * @param[in] thd: 线程对象的指针
  * @param[in] attr: 线程属性
- * @param[in] mainfunc: 线程函数的指针
+ * @param[in] thdfunc: 线程函数的指针
  * @param[in] arg: 线程函数的参数
  */
 static __xwup_code
 xwer_t xwup_thd_activate(struct xwup_thd * thd,
                          struct xwup_thd_attr * attr,
-                         xwup_thd_f mainfunc, void * arg,
+                         xwup_thd_f thdfunc, void * arg,
                          xwobj_gc_f gcfunc)
 {
         xwer_t rc;
@@ -329,8 +329,6 @@ xwer_t xwup_thd_activate(struct xwup_thd * thd,
 
         /* 栈信息 */
         thd->stack.name = attr->name;
-        attr->stack_size = (attr->stack_size + XWMM_ALIGNMENT_MASK) &
-                           (~XWMM_ALIGNMENT_MASK);
         thd->stack.size = attr->stack_size;
         thd->stack.base = attr->stack;
 #if defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK)
@@ -363,8 +361,8 @@ xwer_t xwup_thd_activate(struct xwup_thd * thd,
         board_thd_postinit_hook(thd);
 #endif
 
-        if (mainfunc) {
-                xwup_thd_launch(thd, mainfunc, arg);
+        if (thdfunc) {
+                xwup_thd_launch(thd, thdfunc, arg);
         } else {
                 xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_STANDBY);
         }
@@ -377,11 +375,11 @@ err_obj_activate:
 /**
  * @brief 加载线程
  * @param[in] thd: 线程对象的指针
- * @param[in] mainfunc: 线程主函数
+ * @param[in] thdfunc: 线程主函数
  * @param[in] arg: 线程主函数的参数
  */
 static __xwup_code
-void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f mainfunc, void * arg)
+void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f thdfunc, void * arg)
 {
         struct xwup_skd * xwskd;
         xwreg_t cpuirq;
@@ -389,7 +387,7 @@ void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f mainfunc, void * arg)
         xwup_thd_grab(thd);
         /* add to ready queue */
         xwskd = xwup_skd_get_lc();
-        thd->stack.main = mainfunc;
+        thd->stack.main = thdfunc;
         thd->stack.arg = arg;
         xwospl_skd_init_stack(&thd->stack, xwup_cthd_return);
         xwospl_cpuirq_save_lc(&cpuirq);
@@ -417,25 +415,22 @@ void xwup_thd_attr_init(struct xwup_thd_attr * attr)
 __xwup_api
 xwer_t xwup_thd_init(struct xwup_thd * thd,
                      const struct xwup_thd_attr * inattr,
-                     xwup_thd_f mainfunc, void * arg)
+                     xwup_thd_f thdfunc, void * arg)
 {
         xwer_t rc;
         struct xwup_thd_attr attr;
 
         xwup_thd_construct(thd);
         attr = *inattr;
-        if (attr.stack_size < XWMMCFG_STACK_SIZE_MIN) {
-                attr.stack_size = XWMMCFG_STACK_SIZE_MIN;
-        }
         thd->stack.flag = 0;
-        rc = xwup_thd_activate(thd, &attr, mainfunc, arg, xwup_thd_sgc);
+        rc = xwup_thd_activate(thd, &attr, thdfunc, arg, xwup_thd_sgc);
         return rc;
 }
 
 __xwup_api
 xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
                        const struct xwup_thd_attr * inattr,
-                       xwup_thd_f mainfunc, void * arg)
+                       xwup_thd_f thdfunc, void * arg)
 {
         struct xwup_thd * thd;
         struct xwup_thd_attr attr;
@@ -448,6 +443,8 @@ xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
                         attr.stack_size = XWMMCFG_STACK_SIZE_DEFAULT;
                 } else if (attr.stack_size < XWMMCFG_STACK_SIZE_MIN) {
                         attr.stack_size = XWMMCFG_STACK_SIZE_MIN;
+                } else {
+                        attr.stack_size &= XWMM_STACK_ALIGNMENT_MASK;
                 }
                 if (NULL == attr.stack) {
                         attr.stack = xwup_thd_stack_alloc(attr.stack_size);
@@ -490,7 +487,7 @@ xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
                 thd->stack.flag = XWUP_SKDOBJ_FLAG_ALLOCATED_OBJ;
         }
 
-        rc = xwup_thd_activate(thd, &attr, mainfunc, arg, xwup_thd_dgc);
+        rc = xwup_thd_activate(thd, &attr, thdfunc, arg, xwup_thd_dgc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_thd_activate;
         }
@@ -1152,8 +1149,6 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        XWOS_VALIDATE((NULL != from), "nullptr", -EFAULT);
-
         cthd = xwup_skd_get_cthd_lc();
         xwskd = xwup_skd_get_lc();
         xwtt = &xwskd->tt;
@@ -1357,8 +1352,6 @@ xwer_t xwup_thd_set_data(struct xwup_thd * thd, xwsq_t pos, void * data)
 {
         xwer_t rc;
 
-        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
-
         if (pos < XWUPCFG_SKD_THD_LOCAL_DATA_NUM) {
                 thd->data[pos] = data;
                 rc = XWOK;
@@ -1372,9 +1365,6 @@ __xwup_api
 xwer_t xwup_thd_get_data(struct xwup_thd * thd, xwsq_t pos, void ** databuf)
 {
         xwer_t rc;
-
-        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
-        XWOS_VALIDATE((databuf), "nullptr", -EFAULT);
 
         if (pos < XWUPCFG_SKD_THD_LOCAL_DATA_NUM) {
                 *databuf = thd->data[pos];
@@ -1401,7 +1391,7 @@ xwer_t xwup_cthd_get_data(xwsq_t pos, void ** databuf)
         struct xwup_thd * cthd;
 
         cthd = xwup_skd_get_cthd_lc();
-        return xwup_thd_set_data(cthd, pos, databuf);
+        return xwup_thd_get_data(cthd, pos, databuf);
 
 }
 #endif

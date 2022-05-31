@@ -83,7 +83,7 @@ xwer_t xwmm_sma_alloc(struct xwmm_sma * sa, xwsz_t size, xwsz_t aligned,
                 goto err_inval;
         }
 
-        if (aligned & XWMM_ALIGNMENT_MASK) {
+        if (aligned & XWMM_UNALIGNED_MASK) {
                 rc = -EINVAL;
                 *membuf = NULL;
                 goto err_inval;

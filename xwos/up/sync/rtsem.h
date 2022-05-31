@@ -25,6 +25,10 @@ struct xwup_rtsem {
         struct xwup_rtwq rtwq; /**< 实时等待队列 */
 };
 
+/* public(xwup) */
+xwer_t xwup_rtsem_intr(struct xwup_rtsem * sem, struct xwup_wqn * wqn);
+
+/* public */
 xwer_t xwup_rtsem_init(struct xwup_rtsem * sem, xwssq_t val, xwssq_t max);
 xwer_t xwup_rtsem_fini(struct xwup_rtsem * sem);
 xwer_t xwup_rtsem_create(struct xwup_rtsem ** ptrbuf, xwssq_t val, xwssq_t max);
@@ -35,8 +39,6 @@ xwer_t xwup_rtsem_release(struct xwup_rtsem * sem, xwsq_t tik);
 xwer_t xwup_rtsem_grab(struct xwup_rtsem * sem);
 xwer_t xwup_rtsem_put(struct xwup_rtsem * sem);
 
-xwer_t xwup_rtsem_intr(struct xwup_rtsem * sem, struct xwup_wqn * wqn);
-
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
 xwer_t xwup_rtsem_bind(struct xwup_rtsem * sem, struct xwup_evt * evt, xwsq_t pos);
 xwer_t xwup_rtsem_unbind(struct xwup_rtsem * sem, struct xwup_evt * evt);
@@ -45,13 +47,13 @@ xwer_t xwup_rtsem_unbind(struct xwup_rtsem * sem, struct xwup_evt * evt);
 #  define xwup_rtsem_unbind(sem, evt) (-ENOSYS)
 #endif
 
-xwer_t xwup_rtsem_post(struct xwup_rtsem * sem);
-xwer_t xwup_rtsem_wait(struct xwup_rtsem * sem);
-xwer_t xwup_rtsem_trywait(struct xwup_rtsem * sem);
-xwer_t xwup_rtsem_wait_to(struct xwup_rtsem * sem, xwtm_t xwtm);
-xwer_t xwup_rtsem_wait_unintr(struct xwup_rtsem * sem);
 xwer_t xwup_rtsem_freeze(struct xwup_rtsem * sem);
 xwer_t xwup_rtsem_thaw(struct xwup_rtsem * sem);
+xwer_t xwup_rtsem_post(struct xwup_rtsem * sem);
+xwer_t xwup_rtsem_wait(struct xwup_rtsem * sem);
+xwer_t xwup_rtsem_wait_to(struct xwup_rtsem * sem, xwtm_t xwtm);
+xwer_t xwup_rtsem_wait_unintr(struct xwup_rtsem * sem);
+xwer_t xwup_rtsem_trywait(struct xwup_rtsem * sem);
 xwer_t xwup_rtsem_getvalue(struct xwup_rtsem * sem, xwssq_t * sval);
 
 #endif /* xwos/up/sync/rtsem.h */

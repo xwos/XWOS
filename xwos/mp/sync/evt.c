@@ -216,7 +216,7 @@ xwer_t xwmp_evt_activate(struct xwmp_evt * evt, xwsq_t type, xwobj_gc_f gcfunc)
 
         size = BITS_TO_XWBMP_T(evt->num);
         rc = xwmp_cond_activate(&evt->cond, gcfunc);
-        if (rc < 0) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_cond_activate;
         }
         evt->type = type;
@@ -247,12 +247,6 @@ __xwmp_api
 xwer_t xwmp_evt_init(struct xwmp_evt * evt, xwsq_t type, xwsz_t num,
                      xwbmp_t * bmp, xwbmp_t * msk)
 {
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((bmp), "nullptr", -EFAULT);
-        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((type & XWMP_EVT_TYPE_MASK) < XWMP_EVT_TYPE_MAX),
-                      "type-error", -EINVAL);
-
         xwmp_evt_construct(evt);
         xwmp_evt_setup(evt, num, bmp, msk);
         return xwmp_evt_activate(evt, type, xwmp_evt_sgc);
@@ -261,7 +255,6 @@ xwer_t xwmp_evt_init(struct xwmp_evt * evt, xwsq_t type, xwsz_t num,
 __xwmp_api
 xwer_t xwmp_evt_fini(struct xwmp_evt * evt)
 {
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
         return xwmp_evt_put(evt);
 }
 
@@ -329,19 +322,16 @@ xwer_t xwmp_evt_unbind(struct xwmp_evt * evt, struct xwmp_evt * sel)
 }
 
 __xwmp_api
-xwer_t xwmp_evt_intr_all(struct xwmp_evt * evt)
-{
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        return xwmp_cond_intr_all(&evt->cond);
-}
-
-__xwmp_api
 xwer_t xwmp_evt_get_num(struct xwmp_evt * evt, xwsz_t * numbuf)
 {
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((numbuf), "nullptr", -EFAULT);
         *numbuf = evt->num;
         return XWOK;
+}
+
+__xwmp_code
+xwer_t xwmp_evt_intr_all(struct xwmp_evt * evt)
+{
+        return xwmp_cond_intr_all(&evt->cond);
 }
 
 /******** type:XWMP_EVT_TYPE_FLG ********/
@@ -350,10 +340,6 @@ xwer_t xwmp_flg_s1m(struct xwmp_evt * evt, xwbmp_t msk[])
 {
         xwreg_t cpuirq;
 
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_FLG),
-                      "type-error", -ETYPE);
         xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         xwbmpop_s1m(evt->bmp, msk, evt->num);
         xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
@@ -367,9 +353,6 @@ xwer_t xwmp_flg_s1i(struct xwmp_evt * evt, xwsq_t pos)
         xwer_t rc;
         xwreg_t cpuirq;
 
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_FLG),
-                      "type-error", -ETYPE);
         if (pos >= evt->num) {
                 rc = -ECHRNG;
                 goto err_pos_range;
@@ -389,10 +372,6 @@ xwer_t xwmp_flg_c0m(struct xwmp_evt * evt, xwbmp_t msk[])
 {
         xwreg_t cpuirq;
 
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_FLG),
-                      "type-error", -ETYPE);
         xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         xwbmpop_c0m(evt->bmp, msk, evt->num);
         xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
@@ -406,9 +385,6 @@ xwer_t xwmp_flg_c0i(struct xwmp_evt * evt, xwsq_t pos)
         xwer_t rc;
         xwreg_t cpuirq;
 
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_FLG),
-                      "type-error", -ETYPE);
         if (pos >= evt->num) {
                 rc = -ECHRNG;
                 goto err_pos_range;
@@ -428,10 +404,6 @@ xwer_t xwmp_flg_x1m(struct xwmp_evt * evt, xwbmp_t msk[])
 {
         xwreg_t cpuirq;
 
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_FLG),
-                      "type-error", -ETYPE);
         xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         xwbmpop_x1m(evt->bmp, msk, evt->num);
         xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
@@ -445,9 +417,6 @@ xwer_t xwmp_flg_x1i(struct xwmp_evt * evt, xwsq_t pos)
         xwer_t rc;
         xwreg_t cpuirq;
 
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_FLG),
-                      "type-error", -ETYPE);
         if (pos >= evt->num) {
                 rc = -ECHRNG;
                 goto err_pos_range;
@@ -467,128 +436,10 @@ xwer_t xwmp_flg_read(struct xwmp_evt * evt, xwbmp_t out[])
 {
         xwreg_t cpuirq;
 
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((out), "nullptr", -EFAULT);
-
         xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         xwbmpop_assign(out, evt->bmp, evt->num);
         xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
         return XWOK;
-}
-
-static __xwmp_code
-xwer_t xwmp_flg_trywait_level(struct xwmp_evt * evt,
-                              xwsq_t trigger, xwsq_t action,
-                              xwbmp_t origin[], xwbmp_t msk[])
-{
-        xwreg_t cpuirq;
-        bool triggered;
-        xwer_t rc;
-
-        XWOS_VALIDATE((trigger <= XWMP_FLG_TRIGGER_CLR_ANY),
-                      "illegal-trigger", -EINVAL);
-        XWOS_VALIDATE((action < XWMP_FLG_ACTION_NUM),
-                      "illegal-action", -EINVAL);
-
-        rc = XWOK;
-        xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        if (origin) {
-                xwbmpop_assign(origin, evt->bmp, evt->num);
-        }
-        if (XWMP_FLG_ACTION_CONSUMPTION == action) {
-                switch (trigger) {
-                case XWMP_FLG_TRIGGER_SET_ALL:
-                        triggered = xwbmpop_t1ma_then_c0m(evt->bmp, msk, evt->num);
-                        break;
-                case XWMP_FLG_TRIGGER_SET_ANY:
-                        triggered = xwbmpop_t1mo_then_c0m(evt->bmp, msk, evt->num);
-                        break;
-                case XWMP_FLG_TRIGGER_CLR_ALL:
-                        triggered = xwbmpop_t0ma_then_s1m(evt->bmp, msk, evt->num);
-                        break;
-                case XWMP_FLG_TRIGGER_CLR_ANY:
-                        triggered = xwbmpop_t0mo_then_s1m(evt->bmp, msk, evt->num);
-                        break;
-                default:
-                        triggered = true;
-                        rc = -EINVAL;
-                        break;
-                }
-        } else {
-                switch (trigger) {
-                case XWMP_FLG_TRIGGER_SET_ALL:
-                        triggered = xwbmpop_t1ma(evt->bmp, msk, evt->num);
-                        break;
-                case XWMP_FLG_TRIGGER_SET_ANY:
-                        triggered = xwbmpop_t1mo(evt->bmp, msk, evt->num);
-                        break;
-                case XWMP_FLG_TRIGGER_CLR_ALL:
-                        triggered = xwbmpop_t0ma(evt->bmp, msk, evt->num);
-                        break;
-                case XWMP_FLG_TRIGGER_CLR_ANY:
-                        triggered = xwbmpop_t0mo(evt->bmp, msk, evt->num);
-                        break;
-                default:
-                        triggered = true;
-                        rc = -EINVAL;
-                        break;
-                }
-        }
-        xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
-        if (!triggered) {
-                rc = -ENODATA;
-        }
-        return rc;
-}
-
-static __xwmp_code
-xwer_t xwmp_flg_trywait_edge(struct xwmp_evt * evt, xwsq_t trigger,
-                             xwbmp_t origin[], xwbmp_t msk[])
-{
-        xwreg_t cpuirq;
-        xwssq_t cmprc;
-        bool triggered;
-        xwer_t rc;
-        xwbmpop_define(cur, evt->num);
-        xwbmpop_define(tmp, evt->num);
-
-        XWOS_VALIDATE((origin), "nullptr", -EFAULT);
-
-        xwbmpop_and(origin, msk, evt->num);
-        xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        xwbmpop_assign(cur, evt->bmp, evt->num);
-        xwbmpop_and(cur, msk, evt->num);
-        if (XWMP_FLG_TRIGGER_TGL_ALL == trigger) {
-                xwbmpop_assign(tmp, cur, evt->num);
-                xwbmpop_xor(tmp, origin, evt->num);
-                cmprc = xwbmpop_cmp(tmp, msk, evt->num);
-                if (0 == cmprc) {
-                        triggered = true;
-                        rc = XWOK;
-                } else {
-                        triggered = false;
-                        rc = -ENODATA;
-                }
-        } else if (XWMP_FLG_TRIGGER_TGL_ANY == trigger) {
-                cmprc = xwbmpop_cmp(origin, cur, evt->num);
-                if (0 == cmprc) {
-                        triggered = false;
-                        rc = -ENODATA;
-                } else {
-                        triggered = true;
-                        rc = XWOK;
-                }
-        } else {
-                triggered = true;
-                rc = -EINVAL;
-        }
-        if (triggered) {
-                xwbmpop_assign(origin, cur, evt->num);
-                xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
-        } else {
-                xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
-        }
-        return rc;
 }
 
 __xwmp_api
@@ -597,26 +448,6 @@ xwer_t xwmp_flg_wait(struct xwmp_evt * evt,
                      xwbmp_t origin[], xwbmp_t msk[])
 {
         return xwmp_flg_wait_to(evt, trigger, action, origin, msk, XWTM_MAX);
-}
-
-__xwmp_api
-xwer_t xwmp_flg_trywait(struct xwmp_evt * evt,
-                        xwsq_t trigger, xwsq_t action,
-                        xwbmp_t origin[], xwbmp_t msk[])
-{
-        xwer_t rc;
-
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_FLG),
-                      "type-error", -ETYPE);
-
-        if (trigger <= XWMP_FLG_TRIGGER_CLR_ANY) {
-                rc = xwmp_flg_trywait_level(evt, trigger, action, origin, msk);
-        } else {
-                rc = xwmp_flg_trywait_edge(evt, trigger, origin, msk);
-        }
-        return rc;
 }
 
 static __xwmp_code
@@ -629,11 +460,6 @@ xwer_t xwmp_flg_wait_to_level(struct xwmp_evt * evt,
         bool triggered;
         xwsq_t lkst;
         xwer_t rc;
-
-        XWOS_VALIDATE((trigger <= XWMP_FLG_TRIGGER_CLR_ANY),
-                      "illegal-trigger", -EINVAL);
-        XWOS_VALIDATE((action < XWMP_FLG_ACTION_NUM),
-                      "illegal-action", -EINVAL);
 
         rc = XWOK;
         xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
@@ -720,8 +546,6 @@ xwer_t xwmp_flg_wait_to_edge(struct xwmp_evt * evt, xwsq_t trigger,
         xwbmpop_define(cur, evt->num);
         xwbmpop_define(tmp, evt->num);
 
-        XWOS_VALIDATE((origin), "nullptr", -EFAULT);
-
         xwbmpop_and(origin, msk, evt->num);
         xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         while (true) {
@@ -781,12 +605,6 @@ xwer_t xwmp_flg_wait_to(struct xwmp_evt * evt,
 {
         xwer_t rc;
 
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_FLG),
-                      "type-error", -ETYPE);
-        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
-
         if (trigger <= XWMP_FLG_TRIGGER_CLR_ANY) {
                 rc = xwmp_flg_wait_to_level(evt, trigger, action, origin, msk, to);
         } else {
@@ -795,9 +613,132 @@ xwer_t xwmp_flg_wait_to(struct xwmp_evt * evt,
         return rc;
 }
 
+static __xwmp_code
+xwer_t xwmp_flg_trywait_level(struct xwmp_evt * evt,
+                              xwsq_t trigger, xwsq_t action,
+                              xwbmp_t origin[], xwbmp_t msk[])
+{
+        xwreg_t cpuirq;
+        bool triggered;
+        xwer_t rc;
+
+        rc = XWOK;
+        xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        if (origin) {
+                xwbmpop_assign(origin, evt->bmp, evt->num);
+        }
+        if (XWMP_FLG_ACTION_CONSUMPTION == action) {
+                switch (trigger) {
+                case XWMP_FLG_TRIGGER_SET_ALL:
+                        triggered = xwbmpop_t1ma_then_c0m(evt->bmp, msk, evt->num);
+                        break;
+                case XWMP_FLG_TRIGGER_SET_ANY:
+                        triggered = xwbmpop_t1mo_then_c0m(evt->bmp, msk, evt->num);
+                        break;
+                case XWMP_FLG_TRIGGER_CLR_ALL:
+                        triggered = xwbmpop_t0ma_then_s1m(evt->bmp, msk, evt->num);
+                        break;
+                case XWMP_FLG_TRIGGER_CLR_ANY:
+                        triggered = xwbmpop_t0mo_then_s1m(evt->bmp, msk, evt->num);
+                        break;
+                default:
+                        triggered = true;
+                        rc = -EINVAL;
+                        break;
+                }
+        } else {
+                switch (trigger) {
+                case XWMP_FLG_TRIGGER_SET_ALL:
+                        triggered = xwbmpop_t1ma(evt->bmp, msk, evt->num);
+                        break;
+                case XWMP_FLG_TRIGGER_SET_ANY:
+                        triggered = xwbmpop_t1mo(evt->bmp, msk, evt->num);
+                        break;
+                case XWMP_FLG_TRIGGER_CLR_ALL:
+                        triggered = xwbmpop_t0ma(evt->bmp, msk, evt->num);
+                        break;
+                case XWMP_FLG_TRIGGER_CLR_ANY:
+                        triggered = xwbmpop_t0mo(evt->bmp, msk, evt->num);
+                        break;
+                default:
+                        triggered = true;
+                        rc = -EINVAL;
+                        break;
+                }
+        }
+        xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+        if (!triggered) {
+                rc = -ENODATA;
+        }
+        return rc;
+}
+
+static __xwmp_code
+xwer_t xwmp_flg_trywait_edge(struct xwmp_evt * evt, xwsq_t trigger,
+                             xwbmp_t origin[], xwbmp_t msk[])
+{
+        xwreg_t cpuirq;
+        xwssq_t cmprc;
+        bool triggered;
+        xwer_t rc;
+        xwbmpop_define(cur, evt->num);
+        xwbmpop_define(tmp, evt->num);
+
+        xwbmpop_and(origin, msk, evt->num);
+        xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        xwbmpop_assign(cur, evt->bmp, evt->num);
+        xwbmpop_and(cur, msk, evt->num);
+        if (XWMP_FLG_TRIGGER_TGL_ALL == trigger) {
+                xwbmpop_assign(tmp, cur, evt->num);
+                xwbmpop_xor(tmp, origin, evt->num);
+                cmprc = xwbmpop_cmp(tmp, msk, evt->num);
+                if (0 == cmprc) {
+                        triggered = true;
+                        rc = XWOK;
+                } else {
+                        triggered = false;
+                        rc = -ENODATA;
+                }
+        } else if (XWMP_FLG_TRIGGER_TGL_ANY == trigger) {
+                cmprc = xwbmpop_cmp(origin, cur, evt->num);
+                if (0 == cmprc) {
+                        triggered = false;
+                        rc = -ENODATA;
+                } else {
+                        triggered = true;
+                        rc = XWOK;
+                }
+        } else {
+                triggered = true;
+                rc = -EINVAL;
+        }
+        if (triggered) {
+                xwbmpop_assign(origin, cur, evt->num);
+                xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+        } else {
+                xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+        }
+        return rc;
+}
+
+__xwmp_api
+xwer_t xwmp_flg_trywait(struct xwmp_evt * evt,
+                        xwsq_t trigger, xwsq_t action,
+                        xwbmp_t origin[], xwbmp_t msk[])
+{
+        xwer_t rc;
+
+        if (trigger <= XWMP_FLG_TRIGGER_CLR_ANY) {
+                rc = xwmp_flg_trywait_level(evt, trigger, action, origin, msk);
+        } else {
+                rc = xwmp_flg_trywait_edge(evt, trigger, origin, msk);
+        }
+        return rc;
+}
+
 /******** type:XWMP_EVT_TYPE_SEL ********/
 /**
- * @brief 绑定同步对象到事件对象，事件对象类型为XWMP_EVT_TYPE_SEL
+ * @brief 绑定同步对象到事件对象，事件对象类型为 `XWMP_EVT_TYPE_SEL`
  * @param[in] evt: 事件对象的指针
  * @param[in] obj: 同步对象的指针
  * @param[in] pos: 同步对象映射到位图中的位置
@@ -820,8 +761,6 @@ xwer_t xwmp_sel_obj_bind(struct xwmp_evt * evt,
         bool existed;
         xwer_t rc;
 
-        XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_SEL),
-                      "type-error", -ETYPE);
         rc = xwmp_evt_grab(evt);
         if (rc < 0) {
                 goto err_evt_grab;
@@ -859,7 +798,7 @@ err_evt_grab:
 }
 
 /**
- * @brief 从事件对象上解绑同步对象，事件对象类型为XWMP_EVT_TYPE_SEL
+ * @brief 从事件对象上解绑同步对象，事件对象类型为 `XWMP_EVT_TYPE_SEL`
  * @param[in] evt: 事件对象的指针
  * @param[in] obj: 同步对象的指针
  * @param[in] exclusive: 是否为独占绑定
@@ -877,8 +816,6 @@ xwer_t xwmp_sel_obj_unbind(struct xwmp_evt * evt,
         xwreg_t cpuirq;
         xwer_t rc;
 
-        XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_SEL),
-                      "type-error", -ETYPE);
         xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         owner = synobj->sel.evt;
         if (evt != owner) {
@@ -900,7 +837,7 @@ err_notconn:
 }
 
 /**
- * @brief 在事件对象上设置同步对象的标志位，事件对象类型为XWMP_EVT_TYPE_SEL
+ * @brief 在事件对象上设置同步对象的标志位，事件对象类型为 `XWMP_EVT_TYPE_SEL`
  * @param[in] evt: 事件对象的指针
  * @param[in] obj: 同步对象的指针
  * @return 错误码
@@ -931,7 +868,7 @@ err_notconn:
 }
 
 /**
- * @brief 在事件对象上清除同步对象的标志位，事件对象类型为XWMP_EVT_TYPE_SEL
+ * @brief 在事件对象上清除同步对象的标志位，事件对象类型为 `XWMP_EVT_TYPE_SEL`
  * @param[in] evt: 事件对象的指针
  * @param[in] obj: 同步对象的指针
  * @return 错误码
@@ -967,39 +904,6 @@ xwer_t xwmp_sel_select(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
 }
 
 __xwmp_api
-xwer_t xwmp_sel_tryselect(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
-{
-        xwer_t rc;
-        xwreg_t cpuirq;
-        bool triggered;
-
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_SEL),
-                      "type-error", -ETYPE);
-        xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        triggered = xwbmpop_t1mo(evt->bmp, msk, evt->num);
-        if (triggered) {
-                if (NULL != trg) {
-                        xwbmpop_assign(trg, evt->bmp, evt->num);
-                        /* Clear non-exclusive bits */
-                        xwbmpop_and(evt->bmp, evt->msk, evt->num);
-                        xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
-                        xwbmpop_and(trg, msk, evt->num);
-                } else {
-                        /* Clear non-exclusive bits */
-                        xwbmpop_and(evt->bmp, evt->msk, evt->num);
-                        xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
-                }
-                rc = XWOK;
-        } else {
-                xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
-                rc = -ENODATA;
-        }
-        return rc;
-}
-
-__xwmp_api
 xwer_t xwmp_sel_select_to(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
                           xwtm_t to)
 {
@@ -1008,11 +912,6 @@ xwer_t xwmp_sel_select_to(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
         bool triggered;
         xwsq_t lkst;
 
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_SEL),
-                      "type-error", -ETYPE);
-        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
         xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         while (true) {
                 triggered = xwbmpop_t1mo(evt->bmp, msk, evt->num);
@@ -1055,6 +954,35 @@ xwer_t xwmp_sel_select_to(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
         return rc;
 }
 
+__xwmp_api
+xwer_t xwmp_sel_tryselect(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[])
+{
+        xwer_t rc;
+        xwreg_t cpuirq;
+        bool triggered;
+
+        xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
+        triggered = xwbmpop_t1mo(evt->bmp, msk, evt->num);
+        if (triggered) {
+                if (NULL != trg) {
+                        xwbmpop_assign(trg, evt->bmp, evt->num);
+                        /* Clear non-exclusive bits */
+                        xwbmpop_and(evt->bmp, evt->msk, evt->num);
+                        xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                        xwbmpop_and(trg, msk, evt->num);
+                } else {
+                        /* Clear non-exclusive bits */
+                        xwbmpop_and(evt->bmp, evt->msk, evt->num);
+                        xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                }
+                rc = XWOK;
+        } else {
+                xwmp_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
+                rc = -ENODATA;
+        }
+        return rc;
+}
+
 /******** type:XWMP_EVT_TYPE_BR ********/
 __xwmp_api
 xwer_t xwmp_br_wait(struct xwmp_evt * evt)
@@ -1071,10 +999,6 @@ xwer_t xwmp_br_wait_to(struct xwmp_evt * evt, xwtm_t to)
         xwsq_t lkst;
         xwer_t rc;
 
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((evt->type & XWMP_EVT_TYPE_MASK) == XWMP_EVT_TYPE_BR),
-                      "type-error", -ETYPE);
-        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
         xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         pos = xwbmpop_ffz(evt->bmp, evt->num);
         if ((pos < 0) || (pos >= (xwssq_t)evt->num)) {

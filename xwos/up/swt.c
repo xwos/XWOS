@@ -172,8 +172,6 @@ xwer_t xwup_swt_put(struct xwup_swt * swt)
 __xwup_api
 xwer_t xwup_swt_init(struct xwup_swt * swt, xwsq_t flag)
 {
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
-
         xwup_swt_construct(swt);
         return xwup_swt_activate(swt, flag, xwup_swt_sgc);
 }
@@ -181,8 +179,6 @@ xwer_t xwup_swt_init(struct xwup_swt * swt, xwsq_t flag)
 __xwup_api
 xwer_t xwup_swt_fini(struct xwup_swt * swt)
 {
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
-
         return xwup_swt_put(swt);
 }
 
@@ -191,8 +187,6 @@ xwer_t xwup_swt_create(struct xwup_swt ** ptrbuf, xwsq_t flag)
 {
         struct xwup_swt * swt;
         xwer_t rc;
-
-        XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
 
         *ptrbuf = NULL;
         swt = xwup_swt_alloc();
@@ -269,11 +263,6 @@ xwer_t xwup_swt_start(struct xwup_swt * swt,
         xwer_t rc;
         xwreg_t cpuirq;
 
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((cb), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((xwtm_cmp(origin, 0) > 0) && (xwtm_cmp(period, 0) > 0)),
-                      "out-of-time", -EINVAL);
-
         rc = xwup_swt_grab(swt);
         if (rc < 0) {
                 goto err_swt_grab;
@@ -321,8 +310,6 @@ xwer_t xwup_swt_stop(struct xwup_swt * swt)
         struct xwup_tt * xwtt;
         xwreg_t cpuirq;
         xwer_t rc;
-
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
 
         xwskd = xwup_skd_get_lc();
         xwtt = &xwskd->tt;

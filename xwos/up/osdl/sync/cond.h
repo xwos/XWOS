@@ -13,6 +13,7 @@
 #ifndef __xwos_up_osdl_sync_cond_h__
 #define __xwos_up_osdl_sync_cond_h__
 
+#include <xwos/up/irq.h>
 #include <xwos/up/osdl/sync/sel.h>
 #include <xwos/up/sync/cond.h>
 
@@ -28,18 +29,34 @@ typedef struct {
 static __xwcc_inline
 xwer_t xwosdl_cond_init(struct xwosdl_cond * cond)
 {
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+
         return xwup_cond_init(cond);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_cond_fini(struct xwosdl_cond * cond)
 {
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+
         return xwup_cond_fini(cond);
 }
 
-xwer_t xwosdl_cond_grab(struct xwosdl_cond * cond);
+static __xwcc_inline
+xwer_t xwosdl_cond_grab(struct xwosdl_cond * cond)
+{
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
 
-xwer_t xwosdl_cond_put(struct xwosdl_cond * cond);
+        return xwup_cond_grab(cond);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_cond_put(struct xwosdl_cond * cond)
+{
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+
+        return xwup_cond_put(cond);
+}
 
 xwer_t xwosdl_cond_create(xwosdl_cond_d * condd);
 
@@ -68,48 +85,67 @@ xwsq_t xwosdl_cond_gettik(struct xwosdl_cond * cond)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_cond_bind(struct xwosdl_cond * cond, struct xwosdl_sel * sel,
-                        xwsq_t pos)
+xwer_t xwosdl_cond_bind(struct xwosdl_cond * cond, struct xwosdl_sel * sel, xwsq_t pos)
 {
-#if !defined(XWUPCFG_SYNC_EVT) || (1 != XWUPCFG_SYNC_EVT)
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel->type == XWUP_EVT_TYPE_SEL), "type-error", -ETYPE);
+
+        return xwup_cond_bind(cond, sel, pos);
+#else
         XWOS_UNUSED(cond);
         XWOS_UNUSED(sel);
         XWOS_UNUSED(pos);
+        return -ENOSYS;
 #endif
-        return xwup_cond_bind(cond, sel, pos);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_cond_unbind(struct xwosdl_cond * cond, struct xwosdl_sel * sel)
 {
-#if !defined(XWUPCFG_SYNC_EVT) || (1 != XWUPCFG_SYNC_EVT)
+#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel->type == XWUP_EVT_TYPE_SEL), "type-error", -ETYPE);
+
+        return xwup_cond_unbind(cond, sel);
+#else
         XWOS_UNUSED(cond);
         XWOS_UNUSED(sel);
+        return -ENOSYS;
 #endif
-        return xwup_cond_unbind(cond, sel);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_cond_freeze(struct xwosdl_cond * cond)
 {
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+
         return xwup_cond_freeze(cond);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_cond_thaw(struct xwosdl_cond * cond)
 {
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+
         return xwup_cond_thaw(cond);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_cond_broadcast(struct xwosdl_cond * cond)
 {
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+
         return xwup_cond_broadcast(cond);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_cond_unicast(struct xwosdl_cond * cond)
 {
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+
         return xwup_cond_unicast(cond);
 }
 
@@ -118,6 +154,14 @@ xwer_t xwosdl_cond_wait(struct xwosdl_cond * cond,
                         union xwos_ulock lock, xwsq_t lktype, void * lkdata,
                         xwsq_t * lkst)
 {
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+        XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
+        XWOS_VALIDATE((lktype < XWOS_LK_NUM), "invalid-type", -EINVAL);
+        XWOS_VALIDATE((((NULL == lock.anon) && (XWOS_LK_NONE == lktype)) ||
+                       ((lock.anon) && (lktype > XWOS_LK_NONE))),
+                      "invalid-lock", -EINVAL);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+
         return xwup_cond_wait(cond,
                               lock.anon, lktype, lkdata,
                               lkst);
@@ -128,6 +172,14 @@ xwer_t xwosdl_cond_wait_to(struct xwosdl_cond * cond,
                            union xwos_ulock lock, xwsq_t lktype, void * lkdata,
                            xwtm_t to, xwsq_t * lkst)
 {
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+        XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
+        XWOS_VALIDATE((lktype < XWOS_LK_NUM), "invalid-type", -EINVAL);
+        XWOS_VALIDATE((((NULL == lock.anon) && (XWOS_LK_NONE == lktype)) ||
+                       ((lock.anon) && (lktype > XWOS_LK_NONE))),
+                      "invalid-lock", -EINVAL);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+
         return xwup_cond_wait_to(cond,
                                  lock.anon, lktype, lkdata,
                                  to, lkst);
@@ -138,6 +190,14 @@ xwer_t xwosdl_cond_wait_unintr(struct xwosdl_cond * cond,
                                union xwos_ulock lock, xwsq_t lktype, void * lkdata,
                                xwsq_t * lkst)
 {
+        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
+        XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
+        XWOS_VALIDATE((lktype < XWOS_LK_NUM), "invalid-type", -EINVAL);
+        XWOS_VALIDATE((((NULL == lock.anon) && (XWOS_LK_NONE == lktype)) ||
+                       ((lock.anon) && (lktype > XWOS_LK_NONE))),
+                      "invalid-lock", -EINVAL);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+
         return xwup_cond_wait_unintr(cond,
                                      lock.anon, lktype, lkdata,
                                      lkst);

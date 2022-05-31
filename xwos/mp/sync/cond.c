@@ -235,15 +235,6 @@ xwer_t xwmp_cond_dgc(void * cond)
  * @brief 激活条件量
  * @param[in] cond: 条件量对象的指针
  * @param[in] gcfunc: 垃圾回收函数的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入，除非对象的引用计数重新为0
- * @note
- * - 静态初始化的对象所有资源都是由用户自己提供的，
- *   因此当对象销毁时，垃圾回收函数也需要用户自己提供。
  */
 __xwmp_code
 xwer_t xwmp_cond_activate(struct xwmp_cond * cond, xwobj_gc_f gcfunc)
@@ -251,17 +242,20 @@ xwer_t xwmp_cond_activate(struct xwmp_cond * cond, xwobj_gc_f gcfunc)
         xwer_t rc;
 
         rc = xwmp_synobj_activate(&cond->synobj, gcfunc);
-        if (__xwcc_likely(XWOK == rc)) {
-                xwmp_plwq_init(&cond->wq.pl);
-                cond->count = XWMP_COND_POSITIVE;
-        }/* else {} */
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_synobj_activate;
+        }
+        xwmp_plwq_init(&cond->wq.pl);
+        cond->count = XWMP_COND_POSITIVE;
+        return XWOK;
+
+err_synobj_activate:
         return rc;
 }
 
 __xwmp_api
 xwer_t xwmp_cond_init(struct xwmp_cond * cond)
 {
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         xwmp_cond_construct(cond);
         return xwmp_cond_activate(cond, xwmp_cond_sgc);
 }
@@ -269,7 +263,6 @@ xwer_t xwmp_cond_init(struct xwmp_cond * cond)
 __xwmp_api
 xwer_t xwmp_cond_fini(struct xwmp_cond * cond)
 {
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         return xwmp_cond_put(cond);
 }
 
@@ -332,15 +325,16 @@ xwer_t xwmp_cond_bind(struct xwmp_cond * cond,
         xwreg_t cpuirq;
         xwer_t rc;
 
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-
         rc = xwmp_cond_grab(cond);
-        if (__xwcc_likely(XWOK == rc)) {
-                xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
-                rc = xwmp_sel_obj_bind(evt, &cond->synobj, pos, false);
-                xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
+        if (__xwcc_likely(rc > 0)) {
+                goto err_cond_bind;
         }
+        xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
+        rc = xwmp_sel_obj_bind(evt, &cond->synobj, pos, false);
+        xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
+        return XWOK;
+
+err_cond_bind:
         return rc;
 }
 
@@ -349,9 +343,6 @@ xwer_t xwmp_cond_unbind(struct xwmp_cond * cond, struct xwmp_evt * evt)
 {
         xwreg_t cpuirq;
         xwer_t rc;
-
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
 
         xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
         rc = xwmp_sel_obj_unbind(evt, &cond->synobj, false);
@@ -369,7 +360,6 @@ xwer_t xwmp_cond_freeze(struct xwmp_cond * cond)
         xwer_t rc;
         xwreg_t cpuirq;
 
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         rc = XWOK;
         xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
         if (__xwcc_unlikely(cond->count < 0)) {
@@ -387,7 +377,6 @@ xwer_t xwmp_cond_thaw(struct xwmp_cond * cond)
         xwer_t rc;
         xwreg_t cpuirq;
 
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         rc = XWOK;
         xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
         if (__xwcc_unlikely(cond->count >= 0)) {
@@ -403,13 +392,6 @@ xwer_t xwmp_cond_thaw(struct xwmp_cond * cond)
  * @brief 中断条件量等待队列中的一个节点
  * @param[in] cond: 条件量对象的指针
  * @param[in] wqn: 等待队列节点
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -ESRCH: 等待队列中没有找到节点
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
  */
 __xwmp_code
 xwer_t xwmp_cond_intr(struct xwmp_cond * cond, struct xwmp_wqn * wqn)
@@ -438,14 +420,12 @@ xwer_t xwmp_cond_intr(struct xwmp_cond * cond, struct xwmp_wqn * wqn)
         return rc;
 }
 
-__xwmp_api
+__xwmp_code
 xwer_t xwmp_cond_intr_all(struct xwmp_cond * cond)
 {
         struct xwmp_wqn * c;
         xwmp_wqn_f cb;
         xwreg_t cpuirq;
-
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
 
         xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
         xwmp_plwq_itr_wqn_rm(c, &cond->wq.pl) {
@@ -506,7 +486,6 @@ xwer_t xwmp_cond_broadcast(struct xwmp_cond * cond)
         bool retry;
         xwer_t rc;
 
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         retry = false;
         do {
                 rc = xwmp_cond_broadcast_once(cond, &retry);
@@ -537,7 +516,6 @@ xwer_t xwmp_cond_unicast(struct xwmp_cond * cond)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
         if (__xwcc_unlikely(cond->count < 0)) {
                 xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
@@ -881,14 +859,6 @@ xwer_t xwmp_cond_wait_to(struct xwmp_cond * cond,
         xwtm_t now;
         xwer_t rc;
 
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-        XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
-        XWOS_VALIDATE((lktype < XWOS_LK_NUM), "invalid-type", -EINVAL);
-        XWOS_VALIDATE((((NULL == lock) && (XWOS_LK_NONE == lktype)) ||
-                       ((lock) && (lktype > XWOS_LK_NONE))),
-                      "invalid-lock", -EINVAL);
-        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
-
         *lkst = XWOS_LKST_LOCKED;
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
@@ -1004,14 +974,6 @@ xwer_t xwmp_cond_wait_unintr(struct xwmp_cond * cond,
 {
         struct xwmp_thd * cthd;
         xwer_t rc;
-
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-        XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
-        XWOS_VALIDATE((lktype < XWOS_LK_NUM), "invalid-type", -EINVAL);
-        XWOS_VALIDATE((((NULL == lock) && (XWOS_LK_NONE == lktype)) ||
-                       ((lock) && (lktype > XWOS_LK_NONE))),
-                      "invalid-lock", -EINVAL);
-        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         *lkst = XWOS_LKST_LOCKED;
         cthd = xwmp_skd_get_cthd_lc();

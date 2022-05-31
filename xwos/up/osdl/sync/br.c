@@ -14,20 +14,6 @@
 #include <xwos/up/osdl/sync/br.h>
 
 __xwup_code
-xwer_t xwosdl_br_grab(struct xwosdl_br * br)
-{
-        XWOS_VALIDATE((br), "nullptr", -EFAULT);
-        return xwup_evt_grab(br);
-}
-
-__xwup_code
-xwer_t xwosdl_br_put(struct xwosdl_br * br)
-{
-        XWOS_VALIDATE((br), "nullptr", -EFAULT);
-        return xwup_evt_put(br);
-}
-
-__xwup_code
 xwer_t xwosdl_br_create(xwosdl_br_d * brd, xwsz_t num)
 {
         xwer_t rc;

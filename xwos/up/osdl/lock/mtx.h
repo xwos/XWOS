@@ -13,6 +13,7 @@
 #ifndef __xwos_up_osdl_lock_mtx_h__
 #define __xwos_up_osdl_lock_mtx_h__
 
+#include <xwos/up/irq.h>
 #if defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)
 #  include <xwos/up/lock/mtx.h>
 #elif defined(XWUPCFG_LOCK_FAKEMTX) && (1 == XWUPCFG_LOCK_FAKEMTX)
@@ -33,18 +34,34 @@ typedef struct {
 static __xwcc_inline
 xwer_t xwosdl_mtx_init(struct xwosdl_mtx * mtx, xwpr_t sprio)
 {
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+
         return xwup_mtx_init(mtx, sprio);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_mtx_fini(struct xwosdl_mtx * mtx)
 {
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+
         return xwup_mtx_fini(mtx);
 }
 
-xwer_t xwosdl_mtx_grab(struct xwosdl_mtx * mtx);
+static __xwcc_inline
+xwer_t xwosdl_mtx_grab(struct xwosdl_mtx * mtx)
+{
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
 
-xwer_t xwosdl_mtx_put(struct xwosdl_mtx * mtx);
+        return xwup_mtx_grab(mtx);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_mtx_put(struct xwosdl_mtx * mtx)
+{
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+
+        return xwup_mtx_put(mtx);
+}
 
 xwer_t xwosdl_mtx_create(xwosdl_mtx_d * mtxd, xwpr_t sprio);
 
@@ -75,36 +92,53 @@ xwsq_t xwosdl_mtx_gettik(struct xwosdl_mtx * mtx)
 static __xwcc_inline
 xwer_t xwosdl_mtx_unlock(struct xwosdl_mtx * mtx)
 {
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+
         return xwup_mtx_unlock(mtx);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_mtx_lock(struct xwosdl_mtx * mtx)
 {
-        return xwup_mtx_lock(mtx);
-}
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
-static __xwcc_inline
-xwer_t xwosdl_mtx_trylock(struct xwosdl_mtx * mtx)
-{
-        return xwup_mtx_trylock(mtx);
+        return xwup_mtx_lock(mtx);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_mtx_lock_to(struct xwosdl_mtx * mtx, xwtm_t to)
 {
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+
         return xwup_mtx_lock_to(mtx, to);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_mtx_lock_unintr(struct xwosdl_mtx * mtx)
 {
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+
         return xwup_mtx_lock_unintr(mtx);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_mtx_trylock(struct xwosdl_mtx * mtx)
+{
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+
+        return xwup_mtx_trylock(mtx);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_mtx_getlkst(struct xwosdl_mtx * mtx, xwsq_t * lkst)
 {
+        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
+        XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
+
         return xwup_mtx_getlkst(mtx, lkst);
 }
 

@@ -166,7 +166,7 @@ xwer_t xwup_mtx_activate(struct xwup_mtx * mtx, xwpr_t sprio, xwobj_gc_f gcfunc)
         xwer_t rc;
 
         rc = xwos_object_activate(&mtx->xwobj, gcfunc);
-        if (rc < 0) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwobj_activate;
         }
         if (sprio >= XWUP_SKD_PRIORITY_RT_NUM) {
@@ -190,8 +190,6 @@ err_xwobj_activate:
 __xwup_api
 xwer_t xwup_mtx_init(struct xwup_mtx * mtx, xwpr_t sprio)
 {
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-
         xwup_mtx_construct(mtx);
         return xwup_mtx_activate(mtx, sprio, xwup_mtx_sgc);
 }
@@ -199,8 +197,6 @@ xwer_t xwup_mtx_init(struct xwup_mtx * mtx, xwpr_t sprio)
 __xwup_api
 xwer_t xwup_mtx_fini(struct xwup_mtx * mtx)
 {
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-
         return xwup_mtx_put(mtx);
 }
 
@@ -335,11 +331,6 @@ void xwup_mtx_chprio(struct xwup_mtx * mtx)
  * @brief 中断互斥锁等待队列中的一个节点
  * @param[in] mtx: 互斥锁对象的指针
  * @param[in] thd: 线程控制块对象的指针
- * @return 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
  */
 __xwup_code
 xwer_t xwup_mtx_intr(struct xwup_mtx * mtx, struct xwup_thd * thd)
@@ -373,9 +364,6 @@ xwer_t xwup_mtx_unlock(struct xwup_mtx * mtx)
         struct xwup_thd * t, * cthd;
         struct xwup_mtxtree * mt;
         xwreg_t cpuirq;
-
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         rc = XWOK;
         xwup_skd_dspmpt_lc();
@@ -438,40 +426,6 @@ __xwup_api
 xwer_t xwup_mtx_lock(struct xwup_mtx * mtx)
 {
         return xwup_mtx_lock_to(mtx, XWTM_MAX);
-}
-
-__xwup_api
-xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx)
-{
-        struct xwup_thd * cthd;
-        struct xwup_mtxtree * mt;
-        xwreg_t cpuirq;
-        xwer_t rc;
-
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
-
-        rc = XWOK;
-        xwup_skd_dspmpt_lc();
-        cthd = xwup_skd_get_cthd_lc();
-        mt = &cthd->mtxtree;
-        xwospl_cpuirq_save_lc(&cpuirq);
-        if (mtx->ownertree == mt) {
-                mtx->reentrant++;
-                xwospl_cpuirq_restore_lc(cpuirq);
-                xwup_skd_enpmpt_lc();
-        } else if (mtx->ownertree) {
-                xwospl_cpuirq_restore_lc(cpuirq);
-                rc = -EWOULDBLOCK;
-                xwup_skd_enpmpt_lc();
-        } else {
-                xwup_mtxtree_add(mt, mtx);
-                xwup_thd_chprio(cthd);
-                xwospl_cpuirq_restore_lc(cpuirq);
-                xwup_skd_enpmpt_lc();
-                xwup_skd_chkpmpt();
-        }
-        return rc;
 }
 
 static __xwup_code
@@ -645,9 +599,6 @@ xwer_t xwup_mtx_lock_to(struct xwup_mtx * mtx, xwtm_t to)
         xwtm_t now;
         xwer_t rc;
 
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
-
         cthd = xwup_skd_get_cthd_lc();
         xwskd = xwup_skd_get_lc();
         hwt = &xwskd->tt.hwt;
@@ -666,7 +617,7 @@ xwer_t xwup_mtx_lock_to(struct xwup_mtx * mtx, xwtm_t to)
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
         } else if (!xwup_skd_tstbh_lc()) {
                 rc = -ECANNOTBH;
-#endif/* XWUPCFG_SKD_BH */
+#endif
         } else {
                 rc = xwup_mtx_test(mtx, cthd, to);
         }
@@ -737,14 +688,12 @@ xwer_t xwup_mtx_lock_unintr(struct xwup_mtx * mtx)
         xwer_t rc;
         struct xwup_thd * cthd;
 
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-
         if (!xwup_skd_tstpmpt_lc()) {
                 rc = -ECANNOTPMPT;
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
         } else if (!xwup_skd_tstbh_lc()) {
                 rc = -ECANNOTBH;
-#endif/* XWUPCFG_SKD_BH */
+#endif
         } else {
                 cthd = xwup_skd_get_cthd_lc();
                 rc = xwup_mtx_test_unintr(mtx, cthd);
@@ -753,12 +702,40 @@ xwer_t xwup_mtx_lock_unintr(struct xwup_mtx * mtx)
 }
 
 __xwup_api
+xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx)
+{
+        struct xwup_thd * cthd;
+        struct xwup_mtxtree * mt;
+        xwreg_t cpuirq;
+        xwer_t rc;
+
+        rc = XWOK;
+        xwup_skd_dspmpt_lc();
+        cthd = xwup_skd_get_cthd_lc();
+        mt = &cthd->mtxtree;
+        xwospl_cpuirq_save_lc(&cpuirq);
+        if (mtx->ownertree == mt) {
+                mtx->reentrant++;
+                xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_skd_enpmpt_lc();
+        } else if (mtx->ownertree) {
+                xwospl_cpuirq_restore_lc(cpuirq);
+                rc = -EWOULDBLOCK;
+                xwup_skd_enpmpt_lc();
+        } else {
+                xwup_mtxtree_add(mt, mtx);
+                xwup_thd_chprio(cthd);
+                xwospl_cpuirq_restore_lc(cpuirq);
+                xwup_skd_enpmpt_lc();
+                xwup_skd_chkpmpt();
+        }
+        return rc;
+}
+
+__xwup_api
 xwer_t xwup_mtx_getlkst(struct xwup_mtx * mtx, xwsq_t * lkst)
 {
         volatile struct xwup_mtxtree * ownertree;
-
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
 
         xwmb_read(struct xwup_mtxtree *, ownertree, &mtx->ownertree);
         if (ownertree) {

@@ -16,20 +16,20 @@
 __xwmp_code
 xwer_t xwosdl_thd_init(struct xwosdl_thd * thd, xwosdl_thd_d * thdd,
                        const struct xwosdl_thd_attr * inattr,
-                       xwosdl_thd_f mainfunc, void * arg)
+                       xwosdl_thd_f thdfunc, void * arg)
 {
         xwer_t rc;
 
-        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
         XWOS_VALIDATE((NULL != thdd), "nullptr", -EFAULT);
+        XWOS_VALIDATE((NULL != thd), "nullptr", -EFAULT);
         XWOS_VALIDATE((NULL != inattr), "nullptr", -EFAULT);
         XWOS_VALIDATE((NULL != inattr->stack), "nullptr", -EFAULT);
         XWOS_VALIDATE((inattr->stack_size >= XWMMCFG_STACK_SIZE_MIN),
-                      "nullptr", -ESIZE);
-        XWOS_VALIDATE(((inattr->stack_size & (XWMMCFG_STACK_ALIGNMENT - 1)) == 0),
-                      "nullptr", -EALIGN);
+                      "stack-size", -ESIZE);
+        XWOS_VALIDATE(((inattr->stack_size & XWMM_STACK_UNALIGNED_MASK) == 0),
+                      "stack-unaligned", -EALIGN);
 
-        rc = xwmp_thd_init(thd, inattr, mainfunc, arg);
+        rc = xwmp_thd_init(thd, inattr, thdfunc, arg);
         if (XWOK == rc) {
                 thdd->thd = thd;
                 thdd->tik = thd->xwobj.tik;
@@ -40,30 +40,16 @@ xwer_t xwosdl_thd_init(struct xwosdl_thd * thd, xwosdl_thd_d * thdd,
 }
 
 __xwmp_code
-xwer_t xwosdl_thd_grab(struct xwosdl_thd * thd)
-{
-        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
-        return xwmp_thd_grab(thd);
-}
-
-__xwmp_code
-xwer_t xwosdl_thd_put(struct xwosdl_thd * thd)
-{
-        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
-        return xwmp_thd_put(thd);
-}
-
-__xwmp_code
 xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd,
                          const struct xwosdl_thd_attr * inattr,
-                         xwosdl_thd_f mainfunc, void * arg)
+                         xwosdl_thd_f thdfunc, void * arg)
 {
         xwer_t rc;
         struct xwosdl_thd * thd;
 
         XWOS_VALIDATE((thdd), "nullptr", -EFAULT);
 
-        rc = xwmp_thd_create(&thd, inattr, mainfunc, arg);
+        rc = xwmp_thd_create(&thd, inattr, thdfunc, arg);
         if (XWOK == rc) {
                 thdd->thd = thd;
                 thdd->tik = thd->xwobj.tik;
@@ -170,6 +156,8 @@ xwer_t xwosdl_thd_get_data(struct xwosdl_thd * thd, xwsq_t tik,
                            xwsq_t pos, void ** databuf)
 {
         xwer_t rc;
+
+        XWOS_VALIDATE((databuf), "nullptr", -EFAULT);
 
         rc = xwmp_thd_acquire(thd, tik);
         if (XWOK == rc) {

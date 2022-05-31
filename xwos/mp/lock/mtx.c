@@ -234,7 +234,7 @@ xwer_t xwmp_mtx_activate(struct xwmp_mtx * mtx, xwpr_t sprio, xwobj_gc_f gcfunc)
         xwer_t rc;
 
         rc = xwos_object_activate(&mtx->xwobj, gcfunc);
-        if (rc < 0) {
+        if (__xwcc_unlikely(rc < 0)) {
                 goto err_xwobj_activate;
         }
         if (sprio >= XWMP_SKD_PRIORITY_RT_NUM) {
@@ -258,8 +258,6 @@ err_xwobj_activate:
 __xwmp_api
 xwer_t xwmp_mtx_init(struct xwmp_mtx * mtx, xwpr_t sprio)
 {
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-
         xwmp_mtx_construct(mtx);
         return xwmp_mtx_activate(mtx, sprio, xwmp_mtx_sgc);
 }
@@ -267,8 +265,6 @@ xwer_t xwmp_mtx_init(struct xwmp_mtx * mtx, xwpr_t sprio)
 __xwmp_api
 xwer_t xwmp_mtx_fini(struct xwmp_mtx * mtx)
 {
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-
         return xwmp_mtx_put(mtx);
 }
 
@@ -489,9 +485,6 @@ xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx)
         xwsq_t seq;
         xwreg_t cpuirq;
 
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
-
         rc = XWOK;
         local = xwmp_skd_dspmpt_lc();
         cthd = xwmp_skd_get_cthd(local);
@@ -577,47 +570,6 @@ __xwmp_api
 xwer_t xwmp_mtx_lock(struct xwmp_mtx * mtx)
 {
         return xwmp_mtx_lock_to(mtx, XWTM_MAX);
-}
-
-__xwmp_api
-xwer_t xwmp_mtx_trylock(struct xwmp_mtx * mtx)
-{
-        struct xwmp_skd * xwskd;
-        struct xwmp_thd * cthd;
-        struct xwmp_mtxtree * mt;
-        xwer_t rc;
-
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
-
-        rc = xwmp_mtx_grab(mtx);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_mtx_grab;
-        }
-        rc = XWOK;
-        xwskd = xwmp_skd_dspmpt_lc();
-        cthd = xwmp_skd_get_cthd(xwskd);
-        mt = &cthd->mtxtree;
-        xwmp_rtwq_lock_cpuirq(&mtx->rtwq);
-        if (mtx->ownertree == mt) {
-                mtx->reentrant++;
-                xwmp_rtwq_unlock_cpuirq(&mtx->rtwq);
-                xwmp_skd_enpmpt(xwskd);
-        } else if (mtx->ownertree) {
-                xwmp_rtwq_unlock_cpuirq(&mtx->rtwq);
-                xwmp_mtx_put(mtx);
-                rc = -EWOULDBLOCK;
-                xwmp_skd_enpmpt(xwskd);
-        } else {
-                xwmp_mtxtree_add(mtx, mt);
-                xwmp_rtwq_unlock_cpuirq(&mtx->rtwq);
-                xwmp_thd_chprio(cthd);
-                xwmp_skd_enpmpt(xwskd);
-                xwmp_skd_chkpmpt(xwskd);
-        }
-
-err_mtx_grab:
-        return rc;
 }
 
 static __xwmp_code
@@ -823,9 +775,6 @@ xwer_t xwmp_mtx_lock_to(struct xwmp_mtx * mtx, xwtm_t to)
         xwtm_t now;
         xwer_t rc;
 
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
-
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
         hwt = &xwskd->tt.hwt;
@@ -938,9 +887,6 @@ xwer_t xwmp_mtx_lock_unintr(struct xwmp_mtx * mtx)
         struct xwmp_thd * cthd;
         struct xwmp_skd * xwskd;
 
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((-ETHDCTX == xwmp_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
-
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
         if (!xwmp_skd_tstpmpt(xwskd)) {
@@ -971,13 +917,48 @@ err_cannot:
 }
 
 __xwmp_api
+xwer_t xwmp_mtx_trylock(struct xwmp_mtx * mtx)
+{
+        struct xwmp_skd * xwskd;
+        struct xwmp_thd * cthd;
+        struct xwmp_mtxtree * mt;
+        xwer_t rc;
+
+        rc = xwmp_mtx_grab(mtx);
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_mtx_grab;
+        }
+        rc = XWOK;
+        xwskd = xwmp_skd_dspmpt_lc();
+        cthd = xwmp_skd_get_cthd(xwskd);
+        mt = &cthd->mtxtree;
+        xwmp_rtwq_lock_cpuirq(&mtx->rtwq);
+        if (mtx->ownertree == mt) {
+                mtx->reentrant++;
+                xwmp_rtwq_unlock_cpuirq(&mtx->rtwq);
+                xwmp_skd_enpmpt(xwskd);
+        } else if (mtx->ownertree) {
+                xwmp_rtwq_unlock_cpuirq(&mtx->rtwq);
+                xwmp_mtx_put(mtx);
+                rc = -EWOULDBLOCK;
+                xwmp_skd_enpmpt(xwskd);
+        } else {
+                xwmp_mtxtree_add(mtx, mt);
+                xwmp_rtwq_unlock_cpuirq(&mtx->rtwq);
+                xwmp_thd_chprio(cthd);
+                xwmp_skd_enpmpt(xwskd);
+                xwmp_skd_chkpmpt(xwskd);
+        }
+
+err_mtx_grab:
+        return rc;
+}
+
+__xwmp_api
 xwer_t xwmp_mtx_getlkst(struct xwmp_mtx * mtx, xwsq_t * lkst)
 {
         xwer_t rc;
         volatile struct xwmp_mtxtree * ownertree;
-
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
 
         rc = xwmp_mtx_grab(mtx);
         if (__xwcc_unlikely(rc < 0)) {

@@ -102,7 +102,7 @@ xwer_t xwcq_init(struct xwcq * cq, xwsz_t slotsize, xwsz_t slotnum, xwu8_t * mem
         XWOS_VALIDATE((mem), "nullptr", -EFAULT);
         XWOS_VALIDATE((slotsize > 0), "zero-size", -ESIZE);
         XWOS_VALIDATE((slotnum > 0), "zero-num", -ESIZE);
-        XWOS_VALIDATE(!(slotsize & XWMM_ALIGNMENT_MASK), "size-not-aligned", -EALIGN);
+        XWOS_VALIDATE(!(slotsize & XWMM_UNALIGNED_MASK), "size-not-aligned", -EALIGN);
 
         xwcq_construct(cq, mem);
         return xwcq_activate(cq, slotsize, slotnum, xwcq_gc);
@@ -112,6 +112,7 @@ __xwmd_api
 xwer_t xwcq_fini(struct xwcq * cq)
 {
         XWOS_VALIDATE((cq), "nullptr", -EFAULT);
+
         return xwcq_put(cq);
 }
 

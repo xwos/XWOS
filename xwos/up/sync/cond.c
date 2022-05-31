@@ -191,18 +191,20 @@ xwer_t xwup_cond_activate(struct xwup_cond * cond, xwobj_gc_f gcfunc)
         xwer_t rc;
 
         rc = xwup_synobj_activate(&cond->synobj, gcfunc);
-        if (XWOK == rc) {
-                xwup_plwq_init(&cond->wq);
-                cond->neg = false;
+        if (__xwcc_unlikely(rc < 0)) {
+                goto err_synobj_activate;
         }
+        xwup_plwq_init(&cond->wq);
+        cond->neg = false;
+        return XWOK;
+
+err_synobj_activate:
         return rc;
 }
 
 __xwup_api
 xwer_t xwup_cond_init(struct xwup_cond * cond)
 {
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-
         xwup_synobj_construct(&cond->synobj);
         return xwup_cond_activate(cond, xwup_cond_sgc);
 }
@@ -210,7 +212,6 @@ xwer_t xwup_cond_init(struct xwup_cond * cond)
 __xwup_api
 xwer_t xwup_cond_fini(struct xwup_cond * cond)
 {
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         return xwup_cond_put(cond);
 }
 
@@ -249,8 +250,6 @@ xwer_t xwup_cond_bind(struct xwup_cond * cond,
         xwreg_t cpuirq;
         xwer_t rc;
 
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         xwospl_cpuirq_save_lc(&cpuirq);
         rc = xwup_sel_obj_bind(evt, &cond->synobj, pos, false);
         xwospl_cpuirq_restore_lc(cpuirq);
@@ -263,8 +262,6 @@ xwer_t xwup_cond_unbind(struct xwup_cond * cond, struct xwup_evt * evt)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-        XWOS_VALIDATE((evt), "nullptr", -EFAULT);
         xwospl_cpuirq_save_lc(&cpuirq);
         rc = xwup_sel_obj_unbind(evt, &cond->synobj, false);
         xwospl_cpuirq_restore_lc(cpuirq);
@@ -278,7 +275,6 @@ xwer_t xwup_cond_freeze(struct xwup_cond * cond)
         xwer_t rc;
         xwreg_t cpuirq;
 
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         rc = XWOK;
         xwospl_cpuirq_save_lc(&cpuirq);
         if (__xwcc_unlikely(cond->neg)) {
@@ -296,7 +292,6 @@ xwer_t xwup_cond_thaw(struct xwup_cond * cond)
         xwer_t rc;
         xwreg_t cpuirq;
 
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         rc = XWOK;
         xwospl_cpuirq_save_lc(&cpuirq);
         if (__xwcc_likely(cond->neg)) {
@@ -312,12 +307,6 @@ xwer_t xwup_cond_thaw(struct xwup_cond * cond)
  * @brief 中断条件量等待队列中的一个节点
  * @param[in] cond: 条件量对象的指针
  * @param[in] wqn: 等待队列节点
- * @return 错误码
- * @retval XWOK: 没有错误
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
  */
 __xwup_code
 xwer_t xwup_cond_intr(struct xwup_cond * cond, struct xwup_wqn * wqn)
@@ -342,14 +331,16 @@ xwer_t xwup_cond_intr(struct xwup_cond * cond, struct xwup_wqn * wqn)
         return rc;
 }
 
-__xwup_api
+/**
+ * @brief 中断条件量等待队列中的所有节点
+ * @param[in] cond: 条件量对象的指针
+ */
+__xwup_code
 xwer_t xwup_cond_intr_all(struct xwup_cond * cond)
 {
         struct xwup_wqn * c;
         xwup_wqn_f cb;
         xwreg_t cpuirq;
-
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
 
         xwospl_cpuirq_save_lc(&cpuirq);
         xwup_plwq_itr_wqn_rm(c, &cond->wq) {
@@ -406,7 +397,6 @@ xwer_t xwup_cond_broadcast(struct xwup_cond * cond)
         bool retry;
         xwer_t rc;
 
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         retry = false;
         do {
                 rc = xwup_cond_broadcast_once(cond, &retry);
@@ -437,7 +427,6 @@ xwer_t xwup_cond_unicast(struct xwup_cond * cond)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         rc = XWOK;
         xwospl_cpuirq_save_lc(&cpuirq);
         if (__xwcc_unlikely(cond->neg)) {
@@ -466,7 +455,6 @@ xwer_t xwup_cond_unicast(struct xwup_cond * cond)
  * @param[in] lock: 锁的地址
  * @param[in] lktype: 锁的类型
  * @param[in] lkdata: 锁的数据
- * @return 错误码
  */
 __xwup_code
 xwer_t xwup_cond_unlock(void * lock, xwsq_t lktype, void * lkdata)
@@ -511,7 +499,6 @@ xwer_t xwup_cond_unlock(void * lock, xwsq_t lktype, void * lkdata)
  * @param[in] to: 期望唤醒的时间点
  * @param[in] unintr: 是否不可中断
  * @param[in] lkdata: 锁的数据
- * @return 错误码
  */
 static __xwup_code
 xwer_t xwup_cond_lock(void * lock, xwsq_t lktype, xwtm_t to, bool unintr,
@@ -764,13 +751,6 @@ xwer_t xwup_cond_wait_to(struct xwup_cond * cond,
         xwtm_t now;
         xwer_t rc;
 
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-        XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
-        XWOS_VALIDATE((lktype < XWOS_LK_NUM), "invalid-type", -EINVAL);
-        XWOS_VALIDATE((((NULL == lock) && (XWOS_LK_NONE == lktype)) ||
-                       ((lock) && (lktype > XWOS_LK_NONE))),
-                      "invalid-lock", -EINVAL);
-        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
         *lkst = XWOS_LKST_LOCKED;
         cthd = xwup_skd_get_cthd_lc();
         xwskd = xwup_skd_get_lc();
@@ -874,14 +854,6 @@ xwer_t xwup_cond_wait_unintr(struct xwup_cond * cond,
 {
         struct xwup_thd * cthd;
         xwer_t rc;
-
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-        XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
-        XWOS_VALIDATE((lktype < XWOS_LK_NUM), "invalid-type", -EINVAL);
-        XWOS_VALIDATE((((NULL == lock) && (XWOS_LK_NONE == lktype)) ||
-                       ((lock) && (lktype > XWOS_LK_NONE))),
-                      "invalid-lock", -EINVAL);
-        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
         *lkst = XWOS_LKST_LOCKED;
         cthd = xwup_skd_get_cthd_lc();

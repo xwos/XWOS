@@ -13,6 +13,7 @@
 #ifndef __xwos_up_osdl_sync_sel_h__
 #define __xwos_up_osdl_sync_sel_h__
 
+#include <xwos/up/irq.h>
 #include <xwos/up/sync/evt.h>
 
 #define xwosdl_sel xwup_evt
@@ -28,18 +29,36 @@ static __xwcc_inline
 xwer_t xwosdl_sel_init(struct xwosdl_sel * sel, xwsz_t num,
                        xwbmp_t * bmp, xwbmp_t * msk)
 {
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+        XWOS_VALIDATE((bmp), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
+
         return xwup_evt_init(sel, XWUP_EVT_TYPE_SEL, num, bmp, msk);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sel_fini(struct xwosdl_sel * sel)
 {
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+
         return xwup_evt_fini(sel);
 }
 
-xwer_t xwosdl_sel_grab(struct xwosdl_sel * sel);
+static __xwcc_inline
+xwer_t xwosdl_sel_grab(struct xwosdl_sel * sel)
+{
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
 
-xwer_t xwosdl_sel_put(struct xwosdl_sel * sel);
+        return xwup_evt_grab(sel);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sel_put(struct xwosdl_sel * sel)
+{
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+
+        return xwup_evt_put(sel);
+}
 
 xwer_t xwosdl_sel_create(xwosdl_sel_d * seld, xwsz_t num);
 
@@ -71,31 +90,40 @@ static __xwcc_inline
 xwer_t xwosdl_sel_bind(struct xwosdl_sel * src, struct xwosdl_sel * dst,
                        xwsq_t pos)
 {
+        XWOS_VALIDATE((src), "nullptr", -EFAULT);
+        XWOS_VALIDATE((dst), "nullptr", -EFAULT);
+        XWOS_VALIDATE((dst->type == XWUP_EVT_TYPE_SEL), "type-error", -ETYPE);
+
         return xwup_evt_bind(src, dst, pos);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sel_unbind(struct xwosdl_sel * src, struct xwosdl_sel * dst)
 {
+        XWOS_VALIDATE((src), "nullptr", -EFAULT);
+        XWOS_VALIDATE((dst), "nullptr", -EFAULT);
+        XWOS_VALIDATE((dst->type == XWUP_EVT_TYPE_SEL), "type-error", -ETYPE);
+
         return xwup_evt_unbind(src, dst);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sel_get_num(struct xwosdl_sel * sel, xwsz_t * numbuf)
 {
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+
         return xwup_evt_get_num(sel, numbuf);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sel_select(struct xwosdl_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
 {
-        return xwup_sel_select(sel, msk, trg);
-}
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel->type == XWUP_EVT_TYPE_SEL), "type-error", -ETYPE);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
-static __xwcc_inline
-xwer_t xwosdl_sel_tryselect(struct xwosdl_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
-{
-        return xwup_sel_tryselect(sel, msk, trg);
+        return xwup_sel_select(sel, msk, trg);
 }
 
 static __xwcc_inline
@@ -103,7 +131,22 @@ xwer_t xwosdl_sel_select_to(struct xwosdl_sel * sel,
                             xwbmp_t msk[], xwbmp_t trg[],
                             xwtm_t to)
 {
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel->type == XWUP_EVT_TYPE_SEL), "type-error", -ETYPE);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+
         return xwup_sel_select_to(sel, msk, trg, to);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sel_tryselect(struct xwosdl_sel * sel, xwbmp_t msk[], xwbmp_t trg[])
+{
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel->type == XWUP_EVT_TYPE_SEL), "type-error", -ETYPE);
+
+        return xwup_sel_tryselect(sel, msk, trg);
 }
 
 #endif /* xwos/up/osdl/sync/sel.h */

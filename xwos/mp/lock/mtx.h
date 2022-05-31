@@ -45,8 +45,10 @@ struct xwmp_mtx {
         xwpr_t dprio; /**< 动态优先级：此成员被锁rtwq.lock保护。*/
 };
 
+/* public(xwmp) */
 xwer_t xwmp_mtx_intr(struct xwmp_mtx * mtx, struct xwmp_thd * thd);
 
+/* public */
 #if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
 xwer_t xwmp_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
@@ -55,17 +57,15 @@ xwer_t xwmp_mtx_init(struct xwmp_mtx * mtx, xwpr_t sprio);
 xwer_t xwmp_mtx_fini(struct xwmp_mtx * mtx);
 xwer_t xwmp_mtx_create(struct xwmp_mtx ** mtxbuf, xwpr_t sprio);
 xwer_t xwmp_mtx_delete(struct xwmp_mtx * mtx, xwsq_t tik);
-
 xwer_t xwmp_mtx_acquire(struct xwmp_mtx * mtx, xwsq_t tik);
 xwer_t xwmp_mtx_release(struct xwmp_mtx * mtx, xwsq_t tik);
 xwer_t xwmp_mtx_grab(struct xwmp_mtx * mtx);
 xwer_t xwmp_mtx_put(struct xwmp_mtx * mtx);
-
 xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx);
 xwer_t xwmp_mtx_lock(struct xwmp_mtx * mtx);
-xwer_t xwmp_mtx_trylock(struct xwmp_mtx * mtx);
 xwer_t xwmp_mtx_lock_to(struct xwmp_mtx * mtx, xwtm_t to);
 xwer_t xwmp_mtx_lock_unintr(struct xwmp_mtx * mtx);
+xwer_t xwmp_mtx_trylock(struct xwmp_mtx * mtx);
 xwer_t xwmp_mtx_getlkst(struct xwmp_mtx * mtx, xwsq_t * lkst);
 
 #endif /* xwos/mp/lock/mtx.h */

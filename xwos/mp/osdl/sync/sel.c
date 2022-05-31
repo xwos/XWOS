@@ -14,20 +14,6 @@
 #include <xwos/mp/osdl/sync/sel.h>
 
 __xwmp_code
-xwer_t xwosdl_sel_grab(struct xwosdl_sel * sel)
-{
-        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
-        return xwmp_evt_grab(sel);
-}
-
-__xwmp_code
-xwer_t xwosdl_sel_put(struct xwosdl_sel * sel)
-{
-        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
-        return xwmp_evt_put(sel);
-}
-
-__xwmp_code
 xwer_t xwosdl_sel_create(xwosdl_sel_d * seld, xwsz_t num)
 {
         xwer_t rc;

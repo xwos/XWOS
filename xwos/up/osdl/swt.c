@@ -14,20 +14,6 @@
 #include <xwos/up/osdl/swt.h>
 
 __xwup_code
-xwer_t xwosdl_swt_grab(struct xwosdl_swt * swt)
-{
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
-        return xwup_swt_grab(swt);
-}
-
-__xwup_code
-xwer_t xwosdl_swt_put(struct xwosdl_swt * swt)
-{
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
-        return xwup_swt_put(swt);
-}
-
-__xwup_code
 xwer_t xwosdl_swt_create(xwosdl_swt_d * swtd, xwsq_t flag)
 {
         xwer_t rc;

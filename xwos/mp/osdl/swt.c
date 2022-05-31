@@ -14,20 +14,6 @@
 #include <xwos/mp/osdl/swt.h>
 
 __xwmp_code
-xwer_t xwosdl_swt_grab(struct xwosdl_swt * swt)
-{
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
-        return xwmp_swt_grab(swt);
-}
-
-__xwmp_code
-xwer_t xwosdl_swt_put(struct xwosdl_swt * swt)
-{
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
-        return xwmp_swt_put(swt);
-}
-
-__xwmp_code
 xwer_t xwosdl_swt_create(xwosdl_swt_d * swtd, xwsq_t flag)
 {
         xwer_t rc;

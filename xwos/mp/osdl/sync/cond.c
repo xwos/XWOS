@@ -14,20 +14,6 @@
 #include <xwos/mp/osdl/sync/cond.h>
 
 __xwmp_code
-xwer_t xwosdl_cond_grab(struct xwosdl_cond * cond)
-{
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-        return xwmp_cond_grab(cond);
-}
-
-__xwmp_code
-xwer_t xwosdl_cond_put(struct xwosdl_cond * cond)
-{
-        XWOS_VALIDATE((cond), "nullptr", -EFAULT);
-        return xwmp_cond_put(cond);
-}
-
-__xwmp_code
 xwer_t xwosdl_cond_create(xwosdl_cond_d * condd)
 {
         xwer_t rc;

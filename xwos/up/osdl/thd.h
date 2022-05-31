@@ -40,15 +40,27 @@ void xwosdl_thd_attr_init(struct xwosdl_thd_attr * attr)
 
 xwer_t xwosdl_thd_init(struct xwosdl_thd * thd, xwosdl_thd_d * thdd,
                        const struct xwosdl_thd_attr * inattr,
-                       xwosdl_thd_f mainfunc, void * arg);
+                       xwosdl_thd_f thdfunc, void * arg);
 
-xwer_t xwosdl_thd_grab(struct xwosdl_thd * thd);
+static __xwcc_inline
+xwer_t xwosdl_thd_grab(struct xwosdl_thd * thd)
+{
+        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
 
-xwer_t xwosdl_thd_put(struct xwosdl_thd * thd);
+        return xwup_thd_grab(thd);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_thd_put(struct xwosdl_thd * thd)
+{
+        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
+
+        return xwup_thd_put(thd);
+}
 
 xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd,
                          const struct xwosdl_thd_attr * attr,
-                         xwosdl_thd_f mainfunc, void * arg);
+                         xwosdl_thd_f thdfunc, void * arg);
 
 static __xwcc_inline
 xwer_t xwosdl_thd_acquire(struct xwosdl_thd * thd, xwsq_t tik)
@@ -73,11 +85,10 @@ xwer_t xwosdl_thd_detach(struct xwosdl_thd * thd, xwsq_t tik);
 static __xwcc_inline
 xwer_t xwosdl_thd_migrate(struct xwosdl_thd * thd, xwsq_t tik, xwid_t dstcpu)
 {
-        XWOS_VALIDATE((NULL != thd), "nild", -ENILOBJD);
         XWOS_UNUSED(thd);
         XWOS_UNUSED(tik);
         XWOS_UNUSED(dstcpu);
-        return XWOK;
+        return -ENOSYS;
 }
 
 xwosdl_thd_d xwosdl_cthd_self(void);
@@ -121,6 +132,8 @@ xwer_t xwosdl_cthd_sleep_to(xwtm_t to)
 static __xwcc_inline
 xwer_t xwosdl_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
 {
+        XWOS_VALIDATE((from), "nullptr", -EFAULT);
+
         return xwup_cthd_sleep_from(from, dur);
 }
 
@@ -131,23 +144,11 @@ xwer_t xwosdl_cthd_freeze(void)
 }
 
 #if defined(XWUPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWUPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
-static __xwos_inline_api
 xwer_t xwosdl_thd_set_data(struct xwosdl_thd * thd, xwsq_t tik,
-                           xwsq_t pos, void * data)
-{
-        XWOS_VALIDATE((NULL != thd), "nild", -ENILOBJD);
-        XWOS_UNUSED(tik);
-        return xwup_thd_set_data(thd, pos, data);
-}
+                           xwsq_t pos, void * data);
 
-static __xwos_inline_api
 xwer_t xwosdl_thd_get_data(struct xwosdl_thd * thd, xwsq_t tik,
-                           xwsq_t pos, void ** databuf)
-{
-        XWOS_VALIDATE((NULL != thd), "nild", -ENILOBJD);
-        XWOS_UNUSED(tik);
-        return xwup_thd_get_data(thd, pos, databuf);
-}
+                           xwsq_t pos, void ** databuf);
 
 static __xwos_inline_api
 xwer_t xwosdl_cthd_set_data(xwsq_t pos, void * data)

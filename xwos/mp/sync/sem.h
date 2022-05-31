@@ -64,6 +64,7 @@ struct xwmp_sem {
         } wq; /**< 等待队列 */
 };
 
+/* public(xwmp) */
 #if defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
 xwer_t xwmp_plsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn);
 #endif
@@ -76,6 +77,7 @@ xwer_t xwmp_rtsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn);
 xwer_t xwmp_sem_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
 
+/* public */
 xwer_t xwmp_sem_fini(struct xwmp_sem * sem);
 xwer_t xwmp_sem_grab(struct xwmp_sem * sem);
 xwer_t xwmp_sem_put(struct xwmp_sem * sem);
@@ -97,9 +99,9 @@ xwer_t xwmp_plsem_thaw(struct xwmp_sem * sem);
 xwer_t xwmp_plsem_freeze(struct xwmp_sem * sem);
 xwer_t xwmp_plsem_post(struct xwmp_sem * sem);
 xwer_t xwmp_plsem_wait(struct xwmp_sem * sem);
-xwer_t xwmp_plsem_trywait(struct xwmp_sem * sem);
 xwer_t xwmp_plsem_wait_to(struct xwmp_sem * sem, xwtm_t xwtm);
 xwer_t xwmp_plsem_wait_unintr(struct xwmp_sem * sem);
+xwer_t xwmp_plsem_trywait(struct xwmp_sem * sem);
 #endif
 
 #if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
@@ -108,9 +110,9 @@ xwer_t xwmp_rtsem_thaw(struct xwmp_sem * sem);
 xwer_t xwmp_rtsem_freeze(struct xwmp_sem * sem);
 xwer_t xwmp_rtsem_post(struct xwmp_sem * sem);
 xwer_t xwmp_rtsem_wait(struct xwmp_sem * sem);
-xwer_t xwmp_rtsem_trywait(struct xwmp_sem * sem);
 xwer_t xwmp_rtsem_wait_to(struct xwmp_sem * sem, xwtm_t xwtm);
 xwer_t xwmp_rtsem_wait_unintr(struct xwmp_sem * sem);
+xwer_t xwmp_rtsem_trywait(struct xwmp_sem * sem);
 #endif
 
 xwer_t xwmp_sem_getvalue(struct xwmp_sem * sem, xwssq_t * sval);

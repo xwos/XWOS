@@ -31,11 +31,14 @@ struct xwmp_cond {
         } wq; /**< 条件量的等待队列 */
 };
 
+/* public(xwmp) */
 void xwmp_cond_construct(struct xwmp_cond * cond);
 void xwmp_cond_destruct(struct xwmp_cond * cond);
 xwer_t xwmp_cond_activate(struct xwmp_cond * cond, xwobj_gc_f gcfunc);
 xwer_t xwmp_cond_intr(struct xwmp_cond * cond, struct xwmp_wqn * wqn);
+xwer_t xwmp_cond_intr_all(struct xwmp_cond * cond);
 
+/* public */
 #if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
 xwer_t xwmp_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
@@ -51,15 +54,12 @@ xwer_t xwmp_cond_acquire(struct xwmp_cond * cond, xwsq_t tik);
 xwer_t xwmp_cond_release(struct xwmp_cond * cond, xwsq_t tik);
 
 #if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
-xwer_t xwmp_cond_bind(struct xwmp_cond * cond,
-                      struct xwmp_evt * evt, xwsq_t pos);
-xwer_t xwmp_cond_unbind(struct xwmp_cond * cond,
-                        struct xwmp_evt * evt);
+xwer_t xwmp_cond_bind(struct xwmp_cond * cond, struct xwmp_evt * evt, xwsq_t pos);
+xwer_t xwmp_cond_unbind(struct xwmp_cond * cond, struct xwmp_evt * evt);
 #endif
 
 xwer_t xwmp_cond_freeze(struct xwmp_cond * cond);
 xwer_t xwmp_cond_thaw(struct xwmp_cond * cond);
-xwer_t xwmp_cond_intr_all(struct xwmp_cond * cond);
 xwer_t xwmp_cond_broadcast(struct xwmp_cond * cond);
 xwer_t xwmp_cond_unicast(struct xwmp_cond * cond);
 xwer_t xwmp_cond_wait(struct xwmp_cond * cond,

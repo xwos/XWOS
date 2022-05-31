@@ -13,6 +13,7 @@
 #ifndef __xwos_up_osdl_sync_br_h__
 #define __xwos_up_osdl_sync_br_h__
 
+#include <xwos/up/irq.h>
 #include <xwos/up/osdl/sync/sel.h>
 #include <xwos/up/sync/evt.h>
 
@@ -29,18 +30,36 @@ static __xwcc_inline
 xwer_t xwosdl_br_init(struct xwosdl_br * br, xwsz_t num,
                       xwbmp_t * bmp, xwbmp_t * msk)
 {
+        XWOS_VALIDATE((br), "nullptr", -EFAULT);
+        XWOS_VALIDATE((bmp), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
+
         return xwup_evt_init(br, XWUP_EVT_TYPE_BR, num, bmp, msk);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_br_fini(struct xwosdl_br * br)
 {
+        XWOS_VALIDATE((br), "nullptr", -EFAULT);
+
         return xwup_evt_fini(br);
 }
 
-xwer_t xwosdl_br_grab(struct xwosdl_br * br);
+static __xwcc_inline
+xwer_t xwosdl_br_grab(struct xwosdl_br * br)
+{
+        XWOS_VALIDATE((br), "nullptr", -EFAULT);
 
-xwer_t xwosdl_br_put(struct xwosdl_br * br);
+        return xwup_evt_grab(br);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_br_put(struct xwosdl_br * br)
+{
+        XWOS_VALIDATE((br), "nullptr", -EFAULT);
+
+        return xwup_evt_put(br);
+}
 
 xwer_t xwosdl_br_create(xwosdl_br_d * brd, xwsz_t num);
 
@@ -71,30 +90,48 @@ xwsq_t xwosdl_br_gettik(struct xwosdl_br * br)
 static __xwcc_inline
 xwer_t xwosdl_br_bind(struct xwosdl_br * br, struct xwosdl_sel * sel, xwsq_t pos)
 {
+        XWOS_VALIDATE((br), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel->type == XWUP_EVT_TYPE_SEL), "type-error", -ETYPE);
+
         return xwup_evt_bind(br, sel, pos);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_br_unbind(struct xwosdl_br * br, struct xwosdl_sel * sel)
 {
+        XWOS_VALIDATE((br), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel->type == XWUP_EVT_TYPE_SEL), "type-error", -ETYPE);
+
         return xwup_evt_unbind(br, sel);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_br_get_num(struct xwosdl_br * br, xwsz_t * numbuf)
 {
+        XWOS_VALIDATE((br), "nullptr", -EFAULT);
+
         return xwup_evt_get_num(br, numbuf);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_br_wait(struct xwosdl_br * br)
 {
+        XWOS_VALIDATE((br), "nullptr", -EFAULT);
+        XWOS_VALIDATE((br->type == XWUP_EVT_TYPE_BR), "type-error", -ETYPE);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+
         return xwup_br_wait(br);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_br_wait_to(struct xwosdl_br * br, xwtm_t to)
 {
+        XWOS_VALIDATE((br), "nullptr", -EFAULT);
+        XWOS_VALIDATE((br->type == XWUP_EVT_TYPE_BR), "type-error", -ETYPE);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+
         return xwup_br_wait_to(br, to);
 }
 
