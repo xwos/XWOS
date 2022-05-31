@@ -40,15 +40,27 @@ void xwosdl_thd_attr_init(struct xwosdl_thd_attr * attr)
 
 xwer_t xwosdl_thd_init(struct xwosdl_thd * thd, xwosdl_thd_d * thdd,
                        const struct xwosdl_thd_attr * inattr,
-                       xwosdl_thd_f mainfunc, void * arg);
+                       xwosdl_thd_f thdfunc, void * arg);
 
-xwer_t xwosdl_thd_grab(struct xwosdl_thd * thd);
+static __xwcc_inline
+xwer_t xwosdl_thd_grab(struct xwosdl_thd * thd)
+{
+        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
 
-xwer_t xwosdl_thd_put(struct xwosdl_thd * thd);
+        return xwmp_thd_grab(thd);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_thd_put(struct xwosdl_thd * thd)
+{
+        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
+
+        return xwmp_thd_put(thd);
+}
 
 xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd,
                          const struct xwosdl_thd_attr * inattr,
-                         xwosdl_thd_f mainfunc, void * arg);
+                         xwosdl_thd_f thdfunc, void * arg);
 
 static __xwcc_inline
 xwer_t xwosdl_thd_acquire(struct xwosdl_thd * thd, xwsq_t tik)
@@ -113,6 +125,8 @@ xwer_t xwosdl_cthd_sleep_to(xwtm_t to)
 static __xwcc_inline
 xwer_t xwosdl_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
 {
+        XWOS_VALIDATE((from), "nullptr", -EFAULT);
+
         return xwmp_cthd_sleep_from(from, dur);
 }
 

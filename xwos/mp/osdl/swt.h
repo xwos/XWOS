@@ -31,18 +31,34 @@ typedef struct {
 static __xwcc_inline
 xwer_t xwosdl_swt_init(struct xwosdl_swt * swt, xwsq_t flag)
 {
+        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
+
         return xwmp_swt_init(swt, flag);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_swt_fini(struct xwosdl_swt * swt)
 {
+        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
+
         return xwmp_swt_fini(swt);
 }
 
-xwer_t xwosdl_swt_grab(struct xwosdl_swt * swt);
+static __xwcc_inline
+xwer_t xwosdl_swt_grab(struct xwosdl_swt * swt)
+{
+        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
 
-xwer_t xwosdl_swt_put(struct xwosdl_swt * swt);
+        return xwmp_swt_grab(swt);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_swt_put(struct xwosdl_swt * swt)
+{
+        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
+
+        return xwmp_swt_put(swt);
+}
 
 xwer_t xwosdl_swt_create(xwosdl_swt_d * swtd, xwsq_t flag);
 
@@ -74,12 +90,19 @@ static __xwcc_inline
 xwer_t xwosdl_swt_start(struct xwosdl_swt * swt, xwtm_t origin, xwtm_t period,
                         xwosdl_swt_f callback, void * arg)
 {
+        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
+        XWOS_VALIDATE((callback), "nullptr", -EFAULT);
+        XWOS_VALIDATE(((xwtm_cmp(origin, 0) > 0) && (xwtm_cmp(period, 0) > 0)),
+                      "out-of-time", -EINVAL);
+
         return xwmp_swt_start(swt, origin, period, (xwmp_swt_f)callback, arg);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_swt_stop(struct xwosdl_swt * swt)
 {
+        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
+
         return xwmp_swt_stop(swt);
 }
 

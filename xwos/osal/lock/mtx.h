@@ -307,10 +307,10 @@ xwer_t xwos_mtx_lock_unintr(struct xwos_mtx * mtx)
  * @retval -ENOTTHDCTX: 不在线程上下文中
  * @note
  * + 上下文：线程
- * @note
- * - 此函数虽然不会阻塞调用线程，但也不可在中断上下文中使用，
- *   因为在OS中互斥锁通常需要记录自己的拥有者（一般是线程对象结构体），
- *   中断上下文不存在对应的线程对象结构体。
+ * @details
+ * 此函数虽然不会阻塞调用线程，但也不可在中断上下文中使用，
+ * 因为在OS中互斥锁通常需要记录自己的拥有者（一般是线程对象结构体），
+ * 中断上下文不存在对应的线程对象结构体。
  */
 static __xwos_inline_api
 xwer_t xwos_mtx_trylock(struct xwos_mtx * mtx)

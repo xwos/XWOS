@@ -223,8 +223,6 @@ err_xwobj_activate:
 __xwmp_api
 xwer_t xwmp_swt_init(struct xwmp_swt * swt, xwsq_t flag)
 {
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
-
         xwmp_swt_construct(swt);
         return xwmp_swt_activate(swt, flag, xwmp_swt_sgc);
 }
@@ -232,8 +230,6 @@ xwer_t xwmp_swt_init(struct xwmp_swt * swt, xwsq_t flag)
 __xwmp_api
 xwer_t xwmp_swt_fini(struct xwmp_swt * swt)
 {
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
-
         return xwmp_swt_put(swt);
 }
 
@@ -356,11 +352,6 @@ xwer_t xwmp_swt_start(struct xwmp_swt * swt,
         xwer_t rc;
         xwreg_t cpuirq;
 
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
-        XWOS_VALIDATE((cb), "nullptr", -EFAULT);
-        XWOS_VALIDATE(((xwtm_cmp(origin, 0) > 0) && (xwtm_cmp(period, 0) > 0)),
-                      "out-of-time", -EINVAL);
-
         rc = xwmp_swt_grab(swt);
         if (rc < 0) {
                 goto err_swt_grab;
@@ -407,8 +398,6 @@ xwer_t xwmp_swt_stop(struct xwmp_swt * swt)
         xwreg_t cpuirq;
         xwer_t rc;
         struct xwmp_tt * xwtt;
-
-        XWOS_VALIDATE((swt), "nullptr", -EFAULT);
 
         xwtt = &swt->xwskd->tt;
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);

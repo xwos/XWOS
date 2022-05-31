@@ -13,6 +13,7 @@
 #ifndef __xwos_up_osdl_sync_flg_h__
 #define __xwos_up_osdl_sync_flg_h__
 
+#include <xwos/up/irq.h>
 #include <xwos/up/osdl/sync/sel.h>
 #include <xwos/up/sync/evt.h>
 
@@ -39,18 +40,36 @@ static __xwcc_inline
 xwer_t xwosdl_flg_init(struct xwosdl_flg * flg, xwsz_t num,
                        xwbmp_t * bmp, xwbmp_t * msk)
 {
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+        XWOS_VALIDATE((bmp), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
+
         return xwup_evt_init(flg, XWUP_EVT_TYPE_FLG, num, bmp, msk);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_flg_fini(struct xwosdl_flg * flg)
 {
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+
         return xwup_evt_fini(flg);
 }
 
-xwer_t xwosdl_flg_grab(struct xwosdl_flg * flg);
+static __xwcc_inline
+xwer_t xwosdl_flg_grab(struct xwosdl_flg * flg)
+{
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
 
-xwer_t xwosdl_flg_put(struct xwosdl_flg * flg);
+        return xwup_evt_grab(flg);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_flg_put(struct xwosdl_flg * flg)
+{
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+
+        return xwup_evt_put(flg);
+}
 
 xwer_t xwosdl_flg_create(xwosdl_flg_d * flgd, xwsz_t num);
 
@@ -82,60 +101,94 @@ static __xwcc_inline
 xwer_t xwosdl_flg_bind(struct xwosdl_flg * flg, struct xwosdl_sel * sel,
                        xwsq_t pos)
 {
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel->type == XWUP_EVT_TYPE_SEL), "type-error", -ETYPE);
+
         return xwup_evt_bind(flg, sel, pos);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_flg_unbind(struct xwosdl_flg * flg, struct xwosdl_sel * sel)
 {
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel->type == XWUP_EVT_TYPE_SEL), "type-error", -ETYPE);
+
         return xwup_evt_unbind(flg, sel);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_flg_get_num(struct xwosdl_flg * flg, xwsz_t * numbuf)
 {
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+
         return xwup_evt_get_num(flg, numbuf);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_flg_s1m(struct xwosdl_flg * flg, xwbmp_t msk[])
 {
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
+        XWOS_VALIDATE((flg->type == XWUP_EVT_TYPE_FLG), "type-error", -ETYPE);
+
         return xwup_flg_s1m(flg, msk);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_flg_s1i(struct xwosdl_flg * flg, xwsq_t pos)
 {
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+        XWOS_VALIDATE((flg->type == XWUP_EVT_TYPE_FLG), "type-error", -ETYPE);
+
         return xwup_flg_s1i(flg, pos);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_flg_c0m(struct xwosdl_flg * flg, xwbmp_t msk[])
 {
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
+        XWOS_VALIDATE((flg->type == XWUP_EVT_TYPE_FLG), "type-error", -ETYPE);
+
         return xwup_flg_c0m(flg, msk);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_flg_c0i(struct xwosdl_flg * flg, xwsq_t pos)
 {
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+        XWOS_VALIDATE((flg->type == XWUP_EVT_TYPE_FLG), "type-error", -ETYPE);
+
         return xwup_flg_c0i(flg, pos);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_flg_x1m(struct xwosdl_flg * flg, xwbmp_t msk[])
 {
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
+        XWOS_VALIDATE((flg->type == XWUP_EVT_TYPE_FLG), "type-error", -ETYPE);
+
         return xwup_flg_x1m(flg, msk);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_flg_x1i(struct xwosdl_flg * flg, xwsq_t pos)
 {
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+        XWOS_VALIDATE((flg->type == XWUP_EVT_TYPE_FLG), "type-error", -ETYPE);
+
         return xwup_flg_x1i(flg, pos);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_flg_read(struct xwosdl_flg * flg, xwbmp_t out[])
 {
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+        XWOS_VALIDATE((out), "nullptr", -EFAULT);
+
         return xwup_flg_read(flg, out);
 }
 
@@ -144,15 +197,15 @@ xwer_t xwosdl_flg_wait(struct xwosdl_flg * flg,
                        xwsq_t trigger, xwsq_t action,
                        xwbmp_t origin[], xwbmp_t msk[])
 {
-        return xwup_flg_wait(flg, trigger, action, origin, msk);
-}
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+        XWOS_VALIDATE((flg->type == XWUP_EVT_TYPE_FLG), "type-error", -ETYPE);
+        XWOS_VALIDATE((origin), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
+        XWOS_VALIDATE((trigger < XWUP_FLG_TRIGGER_NUM), "invalid-trigger", -EINVAL);
+        XWOS_VALIDATE((action < XWUP_FLG_ACTION_NUM), "invalid-action", -EINVAL);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
-static __xwcc_inline
-xwer_t xwosdl_flg_trywait(struct xwosdl_flg * flg,
-                          xwsq_t trigger, xwsq_t action,
-                          xwbmp_t origin[], xwbmp_t msk[])
-{
-        return xwup_flg_trywait(flg, trigger, action, origin, msk);
+        return xwup_flg_wait(flg, trigger, action, origin, msk);
 }
 
 static __xwcc_inline
@@ -161,7 +214,30 @@ xwer_t xwosdl_flg_wait_to(struct xwosdl_flg * flg,
                           xwbmp_t origin[], xwbmp_t msk[],
                           xwtm_t to)
 {
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+        XWOS_VALIDATE((flg->type == XWUP_EVT_TYPE_FLG), "type-error", -ETYPE);
+        XWOS_VALIDATE((origin), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
+        XWOS_VALIDATE((trigger < XWUP_FLG_TRIGGER_NUM), "invalid-trigger", -EINVAL);
+        XWOS_VALIDATE((action < XWUP_FLG_ACTION_NUM), "invalid-action", -EINVAL);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+
         return xwup_flg_wait_to(flg, trigger, action, origin, msk, to);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_flg_trywait(struct xwosdl_flg * flg,
+                          xwsq_t trigger, xwsq_t action,
+                          xwbmp_t origin[], xwbmp_t msk[])
+{
+        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
+        XWOS_VALIDATE((flg->type == XWUP_EVT_TYPE_FLG), "type-error", -ETYPE);
+        XWOS_VALIDATE((origin), "nullptr", -EFAULT);
+        XWOS_VALIDATE((msk), "nullptr", -EFAULT);
+        XWOS_VALIDATE((trigger < XWUP_FLG_TRIGGER_NUM), "invalid-trigger", -EINVAL);
+        XWOS_VALIDATE((action < XWUP_FLG_ACTION_NUM), "invalid-action", -EINVAL);
+
+        return xwup_flg_trywait(flg, trigger, action, origin, msk);
 }
 
 #endif /* xwos/up/osdl/sync/flg.h */

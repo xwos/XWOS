@@ -60,8 +60,6 @@ xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio)
         struct xwup_sem * sem;
         xwer_t rc;
 
-        XWOS_VALIDATE((ptrbuf), "nullptr", -EFAULT);
-
         XWOS_UNUSED(sprio);
         rc = XWUP_SEM_API(create, &sem, 1, 1);
         if (XWOK == rc) {
@@ -89,17 +87,6 @@ xwer_t xwup_mtx_unlock(struct xwup_mtx * mtx)
 }
 
 static __xwup_inline_api
-xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx)
-{
-        xwer_t rc;
-        rc = XWUP_SEM_API(trywait, &mtx->fake);
-        if (rc == -ENODATA) {
-                rc = -EWOULDBLOCK;
-        }
-        return rc;
-}
-
-static __xwup_inline_api
 xwer_t xwup_mtx_lock(struct xwup_mtx * mtx)
 {
         return XWUP_SEM_API(wait, &mtx->fake);
@@ -118,12 +105,21 @@ xwer_t xwup_mtx_lock_unintr(struct xwup_mtx * mtx)
 }
 
 static __xwup_inline_api
+xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx)
+{
+        xwer_t rc;
+        rc = XWUP_SEM_API(trywait, &mtx->fake);
+        if (rc == -ENODATA) {
+                rc = -EWOULDBLOCK;
+        }
+        return rc;
+}
+
+static __xwup_inline_api
 xwer_t xwup_mtx_getlkst(struct xwup_mtx * mtx, xwsq_t * lkst)
 {
         xwer_t rc;
         xwssq_t val;
-
-        XWOS_VALIDATE((lkst), "nullptr", -EFAULT);
 
         val = 0;
         rc = XWUP_SEM_API(getvalue, &mtx->fake, &val);

@@ -13,20 +13,6 @@
 #include <xwos/standard.h>
 #include <xwos/mp/osdl/sync/sem.h>
 
-__xwmp_code
-xwer_t xwosdl_sem_grab(struct xwosdl_sem * sem)
-{
-        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        return xwmp_sem_grab(sem);
-}
-
-__xwmp_code
-xwer_t xwosdl_sem_put(struct xwosdl_sem * sem)
-{
-        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        return xwmp_sem_put(sem);
-}
-
 #if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
 __xwmp_code
 xwer_t xwosdl_sem_create(xwosdl_sem_d * semd, xwssq_t val, xwssq_t max)
@@ -35,6 +21,8 @@ xwer_t xwosdl_sem_create(xwosdl_sem_d * semd, xwssq_t val, xwssq_t max)
         struct xwmp_sem * sem;
 
         XWOS_VALIDATE((semd), "nullptr", -EFAULT);
+        XWOS_VALIDATE(((val >= 0) && (max > 0) && (val <= max)),
+                      "invalid-value", -EINVAL);
 
         rc = xwmp_sem_create(&sem, XWMP_SEM_TYPE_RT, val, max);
         if (XWOK == rc) {

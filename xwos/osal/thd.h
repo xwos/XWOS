@@ -127,7 +127,7 @@ void xwos_thd_attr_init(struct xwos_thd_attr * attr)
  * @param[in] thd: 指向构造线程对象内存的指针
  * @param[out] thdd: 指向缓冲区的指针，通过此缓冲区返回线程对象描述符
  * @param[in] attr: 线程属性
- * @param[in] mainfunc: 线程函数的指针
+ * @param[in] thdfunc: 线程函数的指针
  * @param[in] arg: 线程函数的参数
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -150,11 +150,11 @@ void xwos_thd_attr_init(struct xwos_thd_attr * attr)
 static __xwos_inline_api
 xwer_t xwos_thd_init(struct xwos_thd * thd, xwos_thd_d * thdd,
                      const struct xwos_thd_attr * attr,
-                     xwos_thd_f mainfunc, void * arg)
+                     xwos_thd_f thdfunc, void * arg)
 {
         return xwosdl_thd_init(&thd->osthd, (xwosdl_thd_d *)thdd,
                                (const struct xwosdl_thd_attr *)attr,
-                               (xwosdl_thd_f)mainfunc, arg);
+                               (xwosdl_thd_f)thdfunc, arg);
 }
 
 /**
@@ -199,7 +199,7 @@ xwer_t xwos_thd_put(xwos_thd_d thdd)
  * @brief XWOS API：使用动态申请内存方式创建线程并初始化
  * @param[out] thdd: 指向缓冲区的指针，通过此缓冲区返回线程对象描述符
  * @param[in] attr: 线程属性
- * @param[in] mainfunc: 线程函数的指针
+ * @param[in] thdfunc: 线程函数的指针
  * @param[in] arg: 线程函数的参数
  * @return 错误码
  * @note
@@ -214,11 +214,11 @@ xwer_t xwos_thd_put(xwos_thd_d thdd)
 static __xwos_inline_api
 xwer_t xwos_thd_create(xwos_thd_d * thdd,
                        const struct xwos_thd_attr * attr,
-                       xwos_thd_f mainfunc, void * arg)
+                       xwos_thd_f thdfunc, void * arg)
 {
         return xwosdl_thd_create((xwosdl_thd_d *)thdd,
                                  (const struct xwosdl_thd_attr *)attr,
-                                 (xwosdl_thd_f)mainfunc, arg);
+                                 (xwosdl_thd_f)thdfunc, arg);
 }
 
 /**
@@ -468,7 +468,7 @@ bool xwos_cthd_shld_stop(void)
  * 此函数是在 @ref xwos_cthd_shld_stop() 的基础上增加了是否需要冻结的判断。
  * 如果可以冻结，就在函数内部将线程冻结。
  *
- * 参数```frozen```用于返回线程是否被冻结过，可以填```NULL```表示不需要关注这个状态。
+ * 参数 `frozen` 用于返回线程是否被冻结过，若为 `NULL` 表示不需要关注这个状态。
  *
  * 例如：
  * ```C
@@ -498,7 +498,7 @@ bool xwos_cthd_frz_shld_stop(bool * frozen)
  * @note
  * + 上下文：线程
  * @details
- * 调用此函数的线程会睡眠 `dur` ，也即是线程会在 **当前时间点** + `dur` 时被唤醒。
+ * 调用此函数的线程会睡眠 `dur` ，也即是线程会在 `当前时间点` + `dur` 时被唤醒。
  */
 static __xwos_inline_api
 xwer_t xwos_cthd_sleep(xwtm_t dur)
@@ -518,8 +518,8 @@ xwer_t xwos_cthd_sleep(xwtm_t dur)
  * @note
  * + 上下文：线程
  * @details
- * 调用此函数的线程，睡眠到未来的某个时间点 ```to``` 被唤醒。
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 调用此函数的线程，睡眠到未来的某个时间点 `to` 被唤醒。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 static __xwos_inline_api
 xwer_t xwos_cthd_sleep_to(xwtm_t to)

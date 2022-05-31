@@ -14,20 +14,6 @@
 #include <xwos/up/osdl/sync/flg.h>
 
 __xwup_code
-xwer_t xwosdl_flg_grab(struct xwosdl_flg * flg)
-{
-        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
-        return xwup_evt_grab(flg);
-}
-
-__xwup_code
-xwer_t xwosdl_flg_put(struct xwosdl_flg * flg)
-{
-        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
-        return xwup_evt_put(flg);
-}
-
-__xwup_code
 xwer_t xwosdl_flg_create(xwosdl_flg_d * flgd, xwsz_t num)
 {
         xwer_t rc;

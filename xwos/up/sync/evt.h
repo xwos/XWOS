@@ -26,7 +26,7 @@ enum xwup_evt_type_em {
         XWUP_EVT_TYPE_FLG = 0, /**< 事件标志 */
         XWUP_EVT_TYPE_SEL, /**< 信号选择器 */
         XWUP_EVT_TYPE_BR, /**< 线程栅栏 */
-        XWUP_EVT_TYPE_MAX,
+        XWUP_EVT_TYPE_NUM,
         XWUP_EVT_TYPE_MASK = 0xFF,
 };
 
@@ -42,12 +42,15 @@ struct xwup_evt {
         xwbmp_t * msk; /**< 掩码位图 */
 };
 
+/* public(xwup) */
+xwer_t xwup_evt_intr_all(struct xwup_evt * evt);
+
+/* public */
 xwer_t xwup_evt_init(struct xwup_evt * evt, xwsq_t type, xwsz_t num,
                      xwbmp_t * bmp, xwbmp_t * msk);
 xwer_t xwup_evt_fini(struct xwup_evt * evt);
 xwer_t xwup_evt_create(struct xwup_evt ** ptrbuf, xwsq_t type, xwsz_t num);
 xwer_t xwup_evt_delete(struct xwup_evt * evt, xwsq_t tik);
-
 xwer_t xwup_evt_acquire(struct xwup_evt * evt, xwsq_t tik);
 xwer_t xwup_evt_release(struct xwup_evt * evt, xwsq_t tik);
 xwer_t xwup_evt_grab(struct xwup_evt * evt);
@@ -55,7 +58,6 @@ xwer_t xwup_evt_put(struct xwup_evt * evt);
 
 xwer_t xwup_evt_bind(struct xwup_evt * evt, struct xwup_evt * slt, xwsq_t pos);
 xwer_t xwup_evt_unbind(struct xwup_evt * evt, struct xwup_evt * slt);
-xwer_t xwup_evt_intr_all(struct xwup_evt * evt);
 xwer_t xwup_evt_get_num(struct xwup_evt * evt, xwsz_t * numbuf);
 
 /******** type:XWUP_EVT_TYPE_FLG ********/
@@ -81,6 +83,7 @@ enum xwup_flg_action_em {
         XWUP_FLG_ACTION_NUM,
 };
 
+/* public */
 xwer_t xwup_flg_s1m(struct xwup_evt * evt, xwbmp_t msk[]);
 xwer_t xwup_flg_s1i(struct xwup_evt * evt, xwsq_t pos);
 xwer_t xwup_flg_c0m(struct xwup_evt * evt, xwbmp_t msk[]);
@@ -100,6 +103,7 @@ xwer_t xwup_flg_wait_to(struct xwup_evt * evt,
                         xwtm_t to);
 
 /******** type:XWUP_EVT_TYPE_SEL ********/
+/* public(xwup) */
 xwer_t xwup_sel_obj_bind(struct xwup_evt * evt,
                          struct xwup_synobj * synobj,
                          xwsq_t pos,
@@ -109,12 +113,15 @@ xwer_t xwup_sel_obj_unbind(struct xwup_evt * evt,
                            bool exclusive);
 xwer_t xwup_sel_obj_s1i(struct xwup_evt * evt, struct xwup_synobj * synobj);
 xwer_t xwup_sel_obj_c0i(struct xwup_evt * evt, struct xwup_synobj * synobj);
+
+/* public */
 xwer_t xwup_sel_select(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[]);
 xwer_t xwup_sel_tryselect(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[]);
 xwer_t xwup_sel_select_to(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
                           xwtm_t to);
 
 /******** type:XWUP_EVT_TYPE_BR ********/
+/* public */
 xwer_t xwup_br_wait(struct xwup_evt * evt);
 xwer_t xwup_br_wait_to(struct xwup_evt * evt, xwtm_t to);
 

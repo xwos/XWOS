@@ -20,8 +20,8 @@
  * @defgroup xwos_irq 中断
  * @ingroup xwos
  * @details
- * - EXC：编号为负数，从-1开始编号
- * - IRQ：编号为正数或0，从0开始编号
+ * + EXC：编号为负数，从-1开始编号
+ * + IRQ：编号为正数或0，从0开始编号
  * @{
  */
 
@@ -39,7 +39,7 @@
  * + 上下文：任意
  * @details
  * **申请中断** 用于向中断向量表安装中断处理函数(ISR)。中断号的枚举通常定义在芯片的头文件中。
- * 当```SOCCFG_RO_IVT```配置为 **0** 时，参数 **isr** 与 **data** 无效，中断向量需预先写入中断向量表的向量表中。
+ * 当 `SOCCFG_RO_IVT` 配置为 `0` 时，参数 `isr` 与 `data` 无效，中断向量需预先写入中断向量表的向量表中。
  */
 static __xwos_inline_api
 xwer_t xwos_irq_request(xwirq_t irqn, xwisr_f isr, void * data,

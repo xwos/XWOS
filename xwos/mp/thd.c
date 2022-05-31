@@ -74,11 +74,11 @@ xwer_t xwmp_thd_dgc(void * thd);
 static __xwmp_code
 xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
                          struct xwmp_thd_attr * attr,
-                         xwmp_thd_f mainfunc, void * arg,
+                         xwmp_thd_f thdfunc, void * arg,
                          xwobj_gc_f gcfunc);
 
 static __xwmp_code
-void xwmp_thd_launch(struct xwmp_thd * thd, xwmp_thd_f mainfunc, void * arg);
+void xwmp_thd_launch(struct xwmp_thd * thd, xwmp_thd_f thdfunc, void * arg);
 
 static __xwmp_code
 xwer_t xwmp_thd_delete(struct xwmp_thd * thd);
@@ -326,7 +326,7 @@ xwer_t xwmp_thd_put(struct xwmp_thd * thd)
  * @brief 激活线程对象
  * @param[in] thd: 线程对象的指针
  * @param[in] attr: 线程属性
- * @param[in] mainfunc: 线程函数的指针
+ * @param[in] thdfunc: 线程函数的指针
  * @param[in] arg: 线程函数的参数
  * @param[in] gcfunc: 垃圾回收函数的指针
  * @return 错误码
@@ -334,7 +334,7 @@ xwer_t xwmp_thd_put(struct xwmp_thd * thd)
 static __xwmp_code
 xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
                          struct xwmp_thd_attr * attr,
-                         xwmp_thd_f mainfunc, void * arg,
+                         xwmp_thd_f thdfunc, void * arg,
                          xwobj_gc_f gcfunc)
 {
         xwer_t rc;
@@ -374,8 +374,6 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
 
         /* 栈信息 */
         thd->stack.name = attr->name;
-        attr->stack_size = (attr->stack_size + XWMM_ALIGNMENT_MASK) &
-                           (~XWMM_ALIGNMENT_MASK);
         thd->stack.size = attr->stack_size;
         thd->stack.base = attr->stack;
 #if (defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK))
@@ -407,8 +405,8 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
 #endif
 
         /* 加入就绪队列 */
-        if (mainfunc) {
-                xwmp_thd_launch(thd, mainfunc, arg);
+        if (thdfunc) {
+                xwmp_thd_launch(thd, thdfunc, arg);
         } else {
                 xwmp_splk_lock_cpuirqsv(&thd->stlock, &cpuirq);
                 xwbop_s1m(xwsq_t, &thd->state, XWMP_SKDOBJ_ST_STANDBY);
@@ -423,7 +421,7 @@ err_xwobj_activate:
 /**
  * @brief 加载就绪态的线程对象
  * @param[in] thd: 线程对象的指针
- * @param[in] mainfunc: 线程主函数
+ * @param[in] thdfunc: 线程主函数
  * @param[in] arg: 线程主函数的参数
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -435,7 +433,7 @@ err_xwobj_activate:
  * - 重入性：不可重入，除非线程主函数已经退出，线程回到‘STANDBY’状态
  */
 static __xwmp_code
-void xwmp_thd_launch(struct xwmp_thd * thd, xwmp_thd_f mainfunc, void * arg)
+void xwmp_thd_launch(struct xwmp_thd * thd, xwmp_thd_f thdfunc, void * arg)
 {
         struct xwmp_skd * xwskd;
         xwreg_t cpuirq;
@@ -451,7 +449,7 @@ void xwmp_thd_launch(struct xwmp_thd * thd, xwmp_thd_f mainfunc, void * arg)
         xwlib_bclst_add_tail(&xwskd->thdlist, &thd->thdnode);
         xwmb_mp_store_release(struct xwmp_skd *, &thd->xwskd, xwskd);
         xwmp_splk_unlock_cpuirqrs(&xwskd->thdlistlock, cpuirq);
-        thd->stack.main = mainfunc;
+        thd->stack.main = thdfunc;
         thd->stack.arg = arg;
         xwospl_skd_init_stack(&thd->stack, xwmp_cthd_return);
         xwmp_splk_lock_cpuirqsv(&thd->stlock, &cpuirq);
@@ -480,25 +478,22 @@ void xwmp_thd_attr_init(struct xwmp_thd_attr * attr)
 __xwmp_api
 xwer_t xwmp_thd_init(struct xwmp_thd * thd,
                      const struct xwmp_thd_attr * inattr,
-                     xwmp_thd_f mainfunc, void * arg)
+                     xwmp_thd_f thdfunc, void * arg)
 {
         xwer_t rc;
         struct xwmp_thd_attr attr;
 
         xwmp_thd_construct(thd);
         attr = *inattr;
-        if (attr.stack_size < XWMMCFG_STACK_SIZE_MIN) {
-                attr.stack_size = XWMMCFG_STACK_SIZE_MIN;
-        }
         thd->stack.flag = 0;
-        rc = xwmp_thd_activate(thd, &attr, mainfunc, arg, xwmp_thd_sgc);
+        rc = xwmp_thd_activate(thd, &attr, thdfunc, arg, xwmp_thd_sgc);
         return rc;
 }
 
 __xwmp_api
 xwer_t xwmp_thd_create(struct xwmp_thd ** thdpbuf,
                        const struct xwmp_thd_attr * inattr,
-                       xwmp_thd_f mainfunc, void * arg)
+                       xwmp_thd_f thdfunc, void * arg)
 {
         struct xwmp_thd * thd;
         struct xwmp_thd_attr attr;
@@ -511,6 +506,8 @@ xwer_t xwmp_thd_create(struct xwmp_thd ** thdpbuf,
                         attr.stack_size = XWMMCFG_STACK_SIZE_DEFAULT;
                 } else if (attr.stack_size < XWMMCFG_STACK_SIZE_MIN) {
                         attr.stack_size = XWMMCFG_STACK_SIZE_MIN;
+                } else {
+                        attr.stack_size &= XWMM_STACK_ALIGNMENT_MASK;
                 }
                 if (NULL == attr.stack) {
                         attr.stack = xwmp_thd_stack_alloc(attr.stack_size);
@@ -552,7 +549,7 @@ xwer_t xwmp_thd_create(struct xwmp_thd ** thdpbuf,
                 thd->stack.flag = 0;
         }
 
-        rc = xwmp_thd_activate(thd, &attr, mainfunc, arg, xwmp_thd_dgc);
+        rc = xwmp_thd_activate(thd, &attr, thdfunc, arg, xwmp_thd_dgc);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_thd_activate;
         }
@@ -1268,7 +1265,7 @@ xwer_t xwmp_cthd_sleep_to(xwtm_t to)
         } else if (!xwmp_skd_tstbh(xwskd)) {
                 rc = -ECANNOTBH;
                 goto err_cannot;
-#endif/* XWMPCFG_SKD_BH */
+#endif
         }
 
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
@@ -1335,8 +1332,6 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         xwsq_t wkuprs;
         xwer_t rc;
 
-        XWOS_VALIDATE((NULL != from), "nullptr", -EFAULT);
-
         cthd = xwmp_skd_get_cthd_lc();
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
         xwtt = &xwskd->tt;
@@ -1350,7 +1345,7 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         } else if (!xwmp_skd_tstbh(xwskd)) {
                 rc = -ECANNOTBH;
                 goto err_cannot;
-#endif/* XWMPCFG_SKD_BH */
+#endif
         }
 
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
@@ -1823,9 +1818,6 @@ xwer_t xwmp_thd_get_data(struct xwmp_thd * thd, xwsq_t pos, void ** databuf)
 {
         xwer_t rc;
 
-        XWOS_VALIDATE((thd), "nullptr", -EFAULT);
-        XWOS_VALIDATE((databuf), "nullptr", -EFAULT);
-
         if (pos < XWMPCFG_SKD_THD_LOCAL_DATA_NUM) {
                 *databuf = thd->data[pos];
                 rc = XWOK;
@@ -1851,7 +1843,7 @@ xwer_t xwmp_cthd_get_data(xwsq_t pos, void ** databuf)
         struct xwmp_thd * cthd;
 
         cthd = xwmp_skd_get_cthd_lc();
-        return xwmp_thd_set_data(cthd, pos, databuf);
+        return xwmp_thd_get_data(cthd, pos, databuf);
 
 }
 #endif

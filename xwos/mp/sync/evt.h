@@ -26,7 +26,7 @@ enum xwmp_evt_type_em {
         XWMP_EVT_TYPE_FLG = 0, /**< 事件标志 */
         XWMP_EVT_TYPE_SEL, /**< 信号选择器 */
         XWMP_EVT_TYPE_BR, /**< 线程栅栏 */
-        XWMP_EVT_TYPE_MAX,
+        XWMP_EVT_TYPE_NUM,
         XWMP_EVT_TYPE_MASK = 0xFF,
 };
 
@@ -42,6 +42,10 @@ struct xwmp_evt {
         xwbmp_t * msk; /**< 掩码位图 */
 };
 
+/* public(xwmp) */
+xwer_t xwmp_evt_intr_all(struct xwmp_evt * evt);
+
+/* public */
 xwer_t xwmp_evt_init(struct xwmp_evt * evt, xwsq_t type, xwsz_t num,
                      xwbmp_t * bmp, xwbmp_t * msk);
 xwer_t xwmp_evt_fini(struct xwmp_evt * evt);
@@ -55,7 +59,6 @@ xwer_t xwmp_evt_release(struct xwmp_evt * evt, xwsq_t tik);
 
 xwer_t xwmp_evt_bind(struct xwmp_evt * evt, struct xwmp_evt * slt, xwsq_t pos);
 xwer_t xwmp_evt_unbind(struct xwmp_evt * evt, struct xwmp_evt * slt);
-xwer_t xwmp_evt_intr_all(struct xwmp_evt * evt);
 xwer_t xwmp_evt_get_num(struct xwmp_evt * evt, xwsz_t * numbuf);
 
 /******** type:XWMP_EVT_TYPE_FLG ********/
@@ -81,6 +84,7 @@ enum xwmp_flg_action_em {
         XWMP_FLG_ACTION_NUM,
 };
 
+/* public */
 xwer_t xwmp_flg_s1m(struct xwmp_evt * evt, xwbmp_t msk[]);
 xwer_t xwmp_flg_s1i(struct xwmp_evt * evt, xwsq_t pos);
 xwer_t xwmp_flg_c0m(struct xwmp_evt * evt, xwbmp_t msk[]);
@@ -101,6 +105,7 @@ xwer_t xwmp_flg_wait_to(struct xwmp_evt * evt,
 
 
 /******** type:XWMP_EVT_TYPE_SEL ********/
+/* public(xwmp) */
 xwer_t xwmp_sel_obj_bind(struct xwmp_evt * evt,
                          struct xwmp_synobj * synobj,
                          xwsq_t pos,
@@ -110,6 +115,8 @@ xwer_t xwmp_sel_obj_unbind(struct xwmp_evt * evt,
                            bool exclusive);
 xwer_t xwmp_sel_obj_s1i(struct xwmp_evt * evt, struct xwmp_synobj * synobj);
 xwer_t xwmp_sel_obj_c0i(struct xwmp_evt * evt, struct xwmp_synobj * synobj);
+
+/* public */
 xwer_t xwmp_sel_select(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[]);
 xwer_t xwmp_sel_tryselect(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[]);
 xwer_t xwmp_sel_select_to(struct xwmp_evt * evt,
@@ -117,6 +124,7 @@ xwer_t xwmp_sel_select_to(struct xwmp_evt * evt,
                           xwtm_t to);
 
 /******** type:XWMP_EVT_TYPE_BR ********/
+/* public */
 xwer_t xwmp_br_wait(struct xwmp_evt * evt);
 xwer_t xwmp_br_wait_to(struct xwmp_evt * evt, xwtm_t to);
 

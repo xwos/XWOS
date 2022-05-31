@@ -161,7 +161,7 @@ void xwup_thd_wakeup(struct xwup_thd * thd)
 void xwup_thd_attr_init(struct xwup_thd_attr * attr);
 xwer_t xwup_thd_init(struct xwup_thd * thd,
                      const struct xwup_thd_attr * inattr,
-                     xwup_thd_f mainfunc, void * arg);
+                     xwup_thd_f thdfunc, void * arg);
 xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
                        const struct xwup_thd_attr * inattr,
                        xwup_thd_f manfunc, void * arg);

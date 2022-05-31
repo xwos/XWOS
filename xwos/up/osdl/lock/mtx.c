@@ -14,20 +14,6 @@
 #include <xwos/up/osdl/lock/mtx.h>
 
 __xwup_code
-xwer_t xwosdl_mtx_grab(struct xwosdl_mtx * mtx)
-{
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        return xwup_mtx_grab(mtx);
-}
-
-__xwup_code
-xwer_t xwosdl_mtx_put(struct xwosdl_mtx * mtx)
-{
-        XWOS_VALIDATE((mtx), "nullptr", -EFAULT);
-        return xwup_mtx_put(mtx);
-}
-
-__xwup_code
 xwer_t xwosdl_mtx_create(xwosdl_mtx_d * mtxd, xwpr_t sprio)
 {
         xwer_t rc;

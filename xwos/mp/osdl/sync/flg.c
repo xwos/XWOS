@@ -14,20 +14,6 @@
 #include <xwos/mp/osdl/sync/flg.h>
 
 __xwmp_code
-xwer_t xwosdl_flg_grab(struct xwosdl_flg * flg)
-{
-        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
-        return xwmp_evt_grab(flg);
-}
-
-__xwmp_code
-xwer_t xwosdl_flg_put(struct xwosdl_flg * flg)
-{
-        XWOS_VALIDATE((flg), "nullptr", -EFAULT);
-        return xwmp_evt_put(flg);
-}
-
-__xwmp_code
 xwer_t xwosdl_flg_create(xwosdl_flg_d * flgd, xwsz_t num)
 {
         xwer_t rc;

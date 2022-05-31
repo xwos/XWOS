@@ -13,6 +13,7 @@
 #ifndef __xwos_up_osdl_sync_sem_h__
 #define __xwos_up_osdl_sync_sem_h__
 
+#include <xwos/up/irq.h>
 #include <xwos/up/osdl/sync/sel.h>
 
 #if defined(XWUPCFG_SYNC_RTSEM) && (1 == XWUPCFG_SYNC_RTSEM)
@@ -31,18 +32,34 @@ typedef struct {
 static __xwcc_inline
 xwer_t xwosdl_sem_init(struct xwosdl_sem * sem, xwssq_t val, xwssq_t max)
 {
+        XWOS_VALIDATE((NULL != sem), "nullptr", -EFAULT);
+
         return xwup_rtsem_init(sem, val, max);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_fini(struct xwosdl_sem * sem)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+
         return xwup_rtsem_fini(sem);
 }
 
-xwer_t xwosdl_sem_grab(struct xwosdl_sem * sem);
+static __xwcc_inline
+xwer_t xwosdl_sem_grab(struct xwosdl_sem * sem)
+{
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
 
-xwer_t xwosdl_sem_put(struct xwosdl_sem * sem);
+        return xwup_rtsem_grab(sem);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sem_put(struct xwosdl_sem * sem)
+{
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+
+        return xwup_rtsem_put(sem);
+}
 
 xwer_t xwosdl_sem_create(xwosdl_sem_d * semd, xwssq_t val, xwssq_t max);
 
@@ -74,12 +91,16 @@ static __xwcc_inline
 xwer_t xwosdl_sem_bind(struct xwosdl_sem * sem, struct xwosdl_sel * sel, xwsq_t pos)
 {
 #  if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel->type == XWUP_EVT_TYPE_SEL), "type-error", -ETYPE);
+
         return xwup_rtsem_bind(sem, sel, pos);
 #  else
         XWOS_UNUSED(sem);
         XWOS_UNUSED(sel);
         XWOS_UNUSED(pos);
-        return XWOK;
+        return -ENOSYS;
 #  endif
 }
 
@@ -87,59 +108,83 @@ static __xwcc_inline
 xwer_t xwosdl_sem_unbind(struct xwosdl_sem * sem, struct xwosdl_sel * sel)
 {
 #  if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel->type == XWUP_EVT_TYPE_SEL), "type-error", -ETYPE);
+
         return xwup_rtsem_unbind(sem, sel);
 #  else
         XWOS_UNUSED(sem);
         XWOS_UNUSED(sel);
-        return XWOK;
+        return -ENOSYS;
 #  endif
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_freeze(struct xwosdl_sem * sem)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+
         return xwup_rtsem_freeze(sem);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_thaw(struct xwosdl_sem * sem)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+
         return xwup_rtsem_thaw(sem);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_post(struct xwosdl_sem * sem)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+
         return xwup_rtsem_post(sem);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_wait(struct xwosdl_sem * sem)
 {
-        return xwup_rtsem_wait(sem);
-}
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
-static __xwcc_inline
-xwer_t xwosdl_sem_trywait(struct xwosdl_sem * sem)
-{
-        return xwup_rtsem_trywait(sem);
+        return xwup_rtsem_wait(sem);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_wait_to(struct xwosdl_sem * sem, xwtm_t to)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+
         return xwup_rtsem_wait_to(sem, to);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_wait_unintr(struct xwosdl_sem * sem)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+
         return xwup_rtsem_wait_unintr(sem);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sem_trywait(struct xwosdl_sem * sem)
+{
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+
+        return xwup_rtsem_trywait(sem);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_getvalue(struct xwosdl_sem * sem, xwssq_t * sval)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sval), "nullptr", -EFAULT);
+
         return xwup_rtsem_getvalue(sem, sval);
 }
 
@@ -159,18 +204,36 @@ typedef struct {
 static __xwcc_inline
 xwer_t xwosdl_sem_init(struct xwosdl_sem * sem, xwssq_t val, xwssq_t max)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        XWOS_VALIDATE(((val >= 0) && (max > 0) && (val <= max)),
+                      "invalid-value", -EINVAL);
+
         return xwup_plsem_init(sem, val, max);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_fini(struct xwosdl_sem * sem)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+
         return xwup_plsem_fini(sem);
 }
 
-xwer_t xwosdl_sem_grab(struct xwosdl_sem * sem);
+static __xwcc_inline
+xwer_t xwosdl_sem_grab(struct xwosdl_sem * sem)
+{
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
 
-xwer_t xwosdl_sem_put(struct xwosdl_sem * sem);
+        return xwup_plsem_grab(sem);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sem_put(struct xwosdl_sem * sem)
+{
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+
+        return xwup_plsem_put(sem);
+}
 
 xwer_t xwosdl_sem_create(xwosdl_sem_d * semd, xwssq_t val, xwssq_t max);
 
@@ -202,12 +265,15 @@ static __xwcc_inline
 xwer_t xwosdl_sem_bind(struct xwosdl_sem * sem, struct xwosdl_sel * sel, xwsq_t pos)
 {
 #  if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+
         return xwup_plsem_bind(sem, sel, pos);
 #  else
         XWOS_UNUSED(sem);
         XWOS_UNUSED(sel);
         XWOS_UNUSED(pos);
-        return XWOK;
+        return -ENOSYS;
 #  endif
 }
 
@@ -215,59 +281,82 @@ static __xwcc_inline
 xwer_t xwosdl_sem_unbind(struct xwosdl_sem * sem, struct xwosdl_sel * sel)
 {
 #  if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sel), "nullptr", -EFAULT);
+
         return xwup_plsem_unbind(sem, sel);
 #  else
         XWOS_UNUSED(sem);
         XWOS_UNUSED(sel);
-        return XWOK;
+        return -ENOSYS;
 #  endif
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_freeze(struct xwosdl_sem * sem)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+
         return xwup_plsem_freeze(sem);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_thaw(struct xwosdl_sem * sem)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+
         return xwup_plsem_thaw(sem);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_post(struct xwosdl_sem * sem)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+
         return xwup_plsem_post(sem);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_wait(struct xwosdl_sem * sem)
 {
-        return xwup_plsem_wait(sem);
-}
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
 
-static __xwcc_inline
-xwer_t xwosdl_sem_trywait(struct xwosdl_sem * sem)
-{
-        return xwup_plsem_trywait(sem);
+        return xwup_plsem_wait(sem);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_wait_to(struct xwosdl_sem * sem, xwtm_t to)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+
         return xwup_plsem_wait_to(sem, to);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_wait_unintr(struct xwosdl_sem * sem)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        XWOS_VALIDATE((-ETHDCTX == xwup_irq_get_id(NULL)), "not-thd-ctx", -ENOTTHDCTX);
+
         return xwup_plsem_wait_unintr(sem);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sem_trywait(struct xwosdl_sem * sem)
+{
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+
+        return xwup_plsem_trywait(sem);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_sem_getvalue(struct xwosdl_sem * sem, xwssq_t * sval)
 {
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        XWOS_VALIDATE((sval), "nullptr", -EFAULT);
+
         return xwup_plsem_getvalue(sem, sval);
 }
 

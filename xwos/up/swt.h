@@ -47,6 +47,7 @@ struct xwup_swt {
         xwtm_t period; /**< 周期 */
 };
 
+/* public */
 xwer_t xwup_swt_init(struct xwup_swt * swt, xwsq_t flag);
 xwer_t xwup_swt_fini(struct xwup_swt * swt);
 xwer_t xwup_swt_create(struct xwup_swt ** ptrbuf, xwsq_t flag);

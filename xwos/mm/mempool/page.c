@@ -91,7 +91,7 @@ xwer_t xwmm_mempool_page_allocator_init(struct xwmm_mempool_page_allocator * pa,
                 rc = -E2SMALL;
                 goto err_mem2small;
         }
-        if (pgsize & XWMM_ALIGNMENT_MASK) {
+        if (pgsize & XWMM_UNALIGNED_MASK) {
                 rc = -EALIGN;
                 goto err_aligned;
         }

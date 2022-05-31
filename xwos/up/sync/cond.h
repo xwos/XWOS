@@ -32,18 +32,18 @@ struct xwup_cond {
         struct xwup_plwq wq; /**< 等待队列 */
 };
 
-
+/* public(xwup) */
 void xwup_cond_construct(struct xwup_cond * cond);
 void xwup_cond_destruct(struct xwup_cond * cond);
-
 xwer_t xwup_cond_activate(struct xwup_cond * cond, xwobj_gc_f gcfunc);
 xwer_t xwup_cond_intr(struct xwup_cond * cond, struct xwup_wqn * wqn);
+xwer_t xwup_cond_intr_all(struct xwup_cond * cond);
 
+/* public */
 xwer_t xwup_cond_init(struct xwup_cond * cond);
 xwer_t xwup_cond_fini(struct xwup_cond * cond);
 xwer_t xwup_cond_create(struct xwup_cond ** ptrbuf);
 xwer_t xwup_cond_delete(struct xwup_cond * cond, xwsq_t tik);
-
 xwer_t xwup_cond_acquire(struct xwup_cond * cond, xwsq_t tik);
 xwer_t xwup_cond_release(struct xwup_cond * cond, xwsq_t tik);
 xwer_t xwup_cond_grab(struct xwup_cond * cond);
@@ -59,7 +59,6 @@ xwer_t xwup_cond_unbind(struct xwup_cond * cond, struct xwup_evt * evt);
 
 xwer_t xwup_cond_freeze(struct xwup_cond * cond);
 xwer_t xwup_cond_thaw(struct xwup_cond * cond);
-xwer_t xwup_cond_intr_all(struct xwup_cond * cond);
 xwer_t xwup_cond_broadcast(struct xwup_cond * cond);
 xwer_t xwup_cond_unicast(struct xwup_cond * cond);
 xwer_t xwup_cond_wait(struct xwup_cond * cond,

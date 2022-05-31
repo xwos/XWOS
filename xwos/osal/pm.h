@@ -24,16 +24,16 @@
 
 /**
  * @brief 电源管理回调函数指针类型
- * @note
- * - 定义：
+ * @details
  * ``` C
  * void (* xwos_pmdm_cb_f)(void * arg);
  * ```
- * + 电源管理要求用户定义四个回调函数，通过API @ref xwos_pm_set_cb()指定：
- *   + resume_cb: 从暂停模式恢复的回调函数
- *   + suspend_cb: 进入暂停模式的回调函数
- *   + wakeup_cb: 唤醒时回调函数
- *   + sleep_cb: 休眠时的回调函数
+ *
+ * 电源管理要求用户定义四个回调函数，通过API @ref xwos_pm_set_cb()指定：
+ * + resume_cb: 从暂停模式恢复的回调函数
+ * + suspend_cb: 进入暂停模式的回调函数
+ * + wakeup_cb: 唤醒时回调函数
+ * + sleep_cb: 休眠时的回调函数
  */
 typedef xwosdl_pm_cb_f xwos_pm_cb_f;
 
