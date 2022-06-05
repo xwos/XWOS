@@ -75,6 +75,7 @@ version = "0.1.0"
 dependencies = [
  "cortex-m",
  "libc-print",
+ "rustbtn",
  "xwrust",
  "xwrust_example_br",
  "xwrust_example_cond",
@@ -90,6 +91,14 @@ dependencies = [
  "xwrust_example_vector",
  "xwrust_example_xwcq",
  "xwrust_example_xwmq",
+]
+
+[[package]]
+name = "rustbtn"
+version = "0.1.0"
+dependencies = [
+ "libc-print",
+ "xwrust",
 ]
 
 [[package]]

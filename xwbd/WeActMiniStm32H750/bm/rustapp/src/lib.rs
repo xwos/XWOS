@@ -18,6 +18,8 @@ use libc_print::std_name::println;
 use xwrust::xwtm;
 use xwrust::xwos::cthd;
 
+use rustbtn;
+
 use xwrust_example_vector::xwrust_example_vector;
 use xwrust_example_dthd::xwrust_example_dthd;
 use xwrust_example_sthd::xwrust_example_sthd;
@@ -39,6 +41,8 @@ pub static ALLOCATOR: xwrust::xwmm::Allocator = xwrust::xwmm::Allocator;
 #[no_mangle]
 pub unsafe extern "C" fn xwrust_main() {
     println!("XWOS RUST App");
+    rustbtn::start();
+
     xwrust_example_vector();
     cthd::sleep(xwtm::ms(300));
     xwrust_example_dthd();
