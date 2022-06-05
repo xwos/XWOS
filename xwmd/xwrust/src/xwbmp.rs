@@ -287,9 +287,9 @@ impl<const N: XwSz> PartialOrd for Bmp<N>
 where
     [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
 {
-    fn partial_cmp(&self, rhs: &Self) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         unsafe {
-            let rc = xwbmpop_cmp(self.bmp.get() as _, rhs.bmp.get() as _, N);
+            let rc = xwbmpop_cmp(self.bmp.get() as _, other.bmp.get() as _, N);
             if rc < 0 {
                 Some(Ordering::Less)
             } else if rc > 0 {

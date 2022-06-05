@@ -1399,10 +1399,9 @@ xwer_t xwmp_skd_suspend(xwid_t cpuid)
  * @brief 继续本地CPU调度器
  * @param[in] xwskd: XWOS MP调度器的指针
  * @return 错误码
- * @note
- * - 此函数只能在CPU自身的调度器服务中断中执行，因此当电源管理的代码运行在
- *   其他CPU上时，可通过@ref xwmp_skd_resume(cpuid)向对应CPU申请
- *   调度器服务中断执行此函数。
+ * @details
+ * 此函数只能在CPU自身的调度器服务中断中执行，因此当电源管理的代码运行在其他CPU上时，
+ * 可通过 @ref xwmp_skd_resume(cpuid) 向其他CPU申请执行此函数。
  */
 __xwmp_code
 xwer_t xwmp_skd_resume_lic(struct xwmp_skd * xwskd)

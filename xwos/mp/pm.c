@@ -26,10 +26,6 @@ __xwmp_data struct xwmp_pmdm xwmp_pmdm = {
 /**
  * @brief 初始化电源管理领域
  * @param[in] pmdm: 电源管理领域控制块指针
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
  */
 __xwmp_code
 void xwmp_pmdm_init(void)
@@ -47,9 +43,7 @@ void xwmp_pmdm_init(void)
  * @param[in] sleep_cb: 电源管理领域休眠的回调函数
  * @param[in] arg: 回调函数调用时的参数
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * - 上下文：任意
  */
 __xwmp_api
 void xwmp_pmdm_set_cb(xwmp_pmdm_cb_f resume_cb,
@@ -67,13 +61,8 @@ void xwmp_pmdm_set_cb(xwmp_pmdm_cb_f resume_cb,
 
 /**
  * @brief XWMP PM API：暂停电源管理领域
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval <0: 错误
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * - 上下文：任意
  */
 __xwmp_api
 xwer_t xwmp_pmdm_suspend(void)
@@ -99,13 +88,8 @@ xwer_t xwmp_pmdm_suspend(void)
 
 /**
  * @brief XWMP PM API：继续电源管理领域
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval <0: 错误
  * @note
- * - 同步/异步：异步
  * - 上下文：中断
- * - 重入性：不可重入
  */
 __xwmp_api
 xwer_t xwmp_pmdm_resume(void)
@@ -128,7 +112,7 @@ xwer_t xwmp_pmdm_resume(void)
 
                 rc = xwaop_teq_then_add(xwsq_t, &xwmp_pmdm.stage,
                                         XWMP_PM_STAGE_RESUMING,
-                                        1,
+                                        2,
                                         &nv, &ov);
                 if ((XWOK == rc) && (XWMP_PM_STAGE_THAWING == nv)) {
                         xwmp_splk_lock_cpuirqsv(&xwmp_pmdm.rslock, &cpuirq);
@@ -161,10 +145,6 @@ xwer_t xwmp_pmdm_resume(void)
 /**
  * @brief XWMP PM API：获取当前电源管理阶段
  * @return 电源管理阶段 @ref xwmp_pm_stage_em
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
  */
 __xwmp_api
 xwsq_t xwmp_pmdm_get_stage(void)
@@ -192,7 +172,7 @@ void xwmp_pmdm_report_xwskd_suspended(struct xwmp_pmdm * pmdm)
                 xwmp_splk_lock_cpuirqsv(&pmdm->rslock, &cpuirq);
                 rc = xwaop_teq_then_sub(xwsq_t, &pmdm->stage,
                                         XWMP_PM_STAGE_FREEZING,
-                                        1,
+                                        2,
                                         &nv, NULL);
                 if ((XWOK == rc) && (XWMP_PM_STAGE_SUSPENDING == nv)) {
                         if (pmdm->cb.suspend) {
