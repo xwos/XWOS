@@ -86,7 +86,7 @@ xwer_t xwosdl_mtx_release(struct xwosdl_mtx * mtx, xwsq_t tik)
 static __xwcc_inline
 xwsq_t xwosdl_mtx_gettik(struct xwosdl_mtx * mtx)
 {
-        return mtx ? mtx->xwobj.tik : 0;
+        return xwup_mtx_gettik(mtx);
 }
 
 static __xwcc_inline

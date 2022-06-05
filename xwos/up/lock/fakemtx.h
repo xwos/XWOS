@@ -55,6 +55,18 @@ xwer_t xwup_mtx_fini(struct xwup_mtx * mtx)
 }
 
 static __xwup_inline_api
+xwer_t xwup_mtx_grab(struct xwup_mtx * mtx)
+{
+        return XWUP_SEM_API(grab, (struct xwup_sem *)mtx);
+}
+
+static __xwup_inline_api
+xwer_t xwup_mtx_put(struct xwup_mtx * mtx)
+{
+        return XWUP_SEM_API(put, (struct xwup_sem *)mtx);
+}
+
+static __xwup_inline_api
 xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio)
 {
         struct xwup_sem * sem;
@@ -69,15 +81,27 @@ xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio)
 }
 
 static __xwup_inline_api
-xwer_t xwup_mtx_delete(struct xwup_mtx * mtx)
+xwer_t xwup_mtx_delete(struct xwup_mtx * mtx, xwsq_t tik)
 {
-        return XWUP_SEM_API(delete, (struct xwup_sem *)mtx);
+        return XWUP_SEM_API(delete, (struct xwup_sem *)mtx, tik);
 }
 
 static __xwup_inline_api
-xwer_t xwup_mtx_intr(struct xwup_mtx * mtx, struct xwup_thd * thd)
+xwer_t xwup_mtx_acquire(struct xwup_mtx * mtx, xwsq_t tik)
 {
-        return XWUP_SEM_API(intr, &mtx->fake, &thd->wqn);
+        return XWUP_SEM_API(acquire, (struct xwup_sem *)mtx, tik);
+}
+
+static __xwup_inline_api
+xwer_t xwup_mtx_release(struct xwup_mtx * mtx, xwsq_t tik)
+{
+        return XWUP_SEM_API(release, (struct xwup_sem *)mtx, tik);
+}
+
+static __xwup_inline_api
+xwsq_t xwup_mtx_gettik(struct xwup_mtx * mtx)
+{
+        return mtx ? mtx->fake.vsem.synobj.xwobj.tik : 0;
 }
 
 static __xwup_inline_api

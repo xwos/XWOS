@@ -97,9 +97,6 @@ xwer_t xwup_thd_activate(struct xwup_thd * thd,
 static __xwup_code
 void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f thdfunc, void * arg);
 
-static __xwup_code
-xwer_t xwup_thd_delete(struct xwup_thd * thd);
-
 
 /**
  * @brief 线程对象的构造函数
@@ -506,7 +503,7 @@ err_stack_alloc:
         return rc;
 }
 
-static __xwup_code
+__xwup_code
 xwer_t xwup_thd_delete(struct xwup_thd * thd)
 {
         return xwup_thd_put(thd);

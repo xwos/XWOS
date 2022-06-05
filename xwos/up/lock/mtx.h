@@ -54,6 +54,7 @@ xwer_t xwup_mtx_acquire(struct xwup_mtx * mtx, xwsq_t tik);
 xwer_t xwup_mtx_release(struct xwup_mtx * mtx, xwsq_t tik);
 xwer_t xwup_mtx_grab(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_put(struct xwup_mtx * mtx);
+xwsq_t xwup_mtx_gettik(struct xwup_mtx * mtx);
 
 xwer_t xwup_mtx_unlock(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_lock(struct xwup_mtx * mtx);
