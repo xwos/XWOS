@@ -82,7 +82,7 @@ xwer_t main_task(void * arg)
                 goto err_stm32cube_start;
         }
 
-        xwds_st7735_draw(&stm32cube_st7735_cb, 0, 0, 160, 80, bootlogo, XWTM_MAX);
+        xwds_st7735_draw(&st7735, 0, 0, 160, 80, bootlogo, XWTM_MAX);
 
         rc = newlibac_init();
         if (rc < 0) {

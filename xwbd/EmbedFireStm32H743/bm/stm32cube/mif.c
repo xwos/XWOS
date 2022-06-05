@@ -118,14 +118,14 @@ void stm32cube_init(void)
         axisram_init();
         sram4_init();
 
-        rc = stm32cube_xwds_ll_start();
+        rc = stm32cube_xwds_probe();
         BDL_BUG_ON(rc < 0);
 
         sdram_init();
 
         /*
            若SDRAM、QSPI Flash等可映射到内存地址上的器件未初始化完成，
-           开启Cache可能会因为Cache的预取操作去访问这些器件导致宕机。
+           开启Cache可能会因为Cache的预取操作导致宕机。
          */
 #if defined(STM32CUBECFG_ICACHE) && (1 == STM32CUBECFG_ICACHE)
         SCB_EnableICache();

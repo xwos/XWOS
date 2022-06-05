@@ -34,18 +34,18 @@
 extern struct xwds stm32cube_ds;
 
 /******** ******** soc ******** ********/
-extern struct xwds_soc stm32cube_soc_cb;
+extern struct xwds_soc stm32soc;
 
 /******** ******** uart ******** ********/
-extern struct xwds_dmauartc stm32cube_usart1_cb;
-extern struct xwds_dmauartc stm32cube_usart2_cb;
+extern struct xwds_dmauartc stm32usart1;
+extern struct xwds_dmauartc stm32usart2;
 
 /******** ******** i2c ******** ********/
-extern struct xwds_i2cm stm32cube_i2c2m_cb;
-extern struct xwds_eeprom stm32cube_at24c02_cb;
+extern struct xwds_i2cm stm32i2c2m;
+extern struct xwds_eeprom at24c02;
 
 /******** ******** spi ******** ********/
-extern struct xwds_spim stm32cube_spi1m_cb;
-extern struct xwds_spim stm32cube_spi2m_cb;
+extern struct xwds_spim stm32spi1m;
+extern struct xwds_spim stm32spi2m;
 
 #endif /* bm/stm32cube/xwac/xwds/device.h */

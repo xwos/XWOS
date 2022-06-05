@@ -34,7 +34,7 @@ xwer_t bm_xwscp_start(void)
         xwer_t rc;
 
         rc = xwscp_start(&bm_xwscp, "bm.xwscp",
-                         &xwscpif_uart_ops, &stm32cube_usart2_cb,
+                         &xwscpif_uart_ops, &stm32usart2,
                          bm_xwscp_mem, sizeof(bm_xwscp_mem));
         return rc;
 }

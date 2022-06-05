@@ -30,10 +30,10 @@
 extern struct xwds stm32cube_ds;
 
 /******** ******** soc ******** ********/
-extern struct xwds_soc stm32cube_soc_cb;
+extern struct xwds_soc stm32soc;
 
 /******** ******** uart ******** ********/
-extern struct xwds_dmauartc stm32cube_usart1_cb;
-extern struct xwds_dmauartc stm32cube_usart3_cb;
+extern struct xwds_dmauartc stm32usart1;
+extern struct xwds_dmauartc stm32usart3;
 
 #endif /* bm/stm32cube/xwac/xwds/device.h */

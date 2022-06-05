@@ -93,7 +93,7 @@ xwer_t led_task(void * arg)
         xwer_t rc;
 
         XWOS_UNUSED(arg);
-        rc = xwds_gpio_req(&stm32cube_soc_cb,
+        rc = xwds_gpio_req(&stm32soc,
                            BLUE_LED_GPIO_PORT, BLUE_LED_GPIO_PIN);
         if (rc < 0) {
                 goto err_gpio_req;
@@ -101,16 +101,16 @@ xwer_t led_task(void * arg)
 
         while (!xwos_cthd_shld_stop()) {
                 if (xwos_cthd_shld_frz()) {
-                        rc = xwds_gpio_rls(&stm32cube_soc_cb,
+                        rc = xwds_gpio_rls(&stm32soc,
                                            BLUE_LED_GPIO_PORT, BLUE_LED_GPIO_PIN);
                         rc = xwos_cthd_freeze();
-                        rc = xwds_gpio_req(&stm32cube_soc_cb,
+                        rc = xwds_gpio_req(&stm32soc,
                                            BLUE_LED_GPIO_PORT, BLUE_LED_GPIO_PIN);
                 }
-                xwds_gpio_set(&stm32cube_soc_cb,
+                xwds_gpio_set(&stm32soc,
                               BLUE_LED_GPIO_PORT, BLUE_LED_GPIO_PIN);
                 xwos_cthd_sleep(XWTM_S(1));
-                xwds_gpio_reset(&stm32cube_soc_cb,
+                xwds_gpio_reset(&stm32soc,
                                 BLUE_LED_GPIO_PORT, BLUE_LED_GPIO_PIN);
                 xwos_cthd_sleep(XWTM_S(1));
         }

@@ -102,10 +102,10 @@ err_stm32cube_start:
 static
 xwer_t led_task(void)
 {
-        xwds_gpio_req(&stm32cube_soc_cb,
+        xwds_gpio_req(&stm32soc,
                       XWDS_GPIO_PORT_F,
                       XWDS_GPIO_PIN_9);
-        xwds_gpio_req(&stm32cube_soc_cb,
+        xwds_gpio_req(&stm32soc,
                       XWDS_GPIO_PORT_F,
                       XWDS_GPIO_PIN_10);
         while (!xwos_cthd_shld_stop()) {
@@ -113,10 +113,10 @@ xwer_t led_task(void)
                         xwos_cthd_freeze();
                 }
                 xwos_cthd_sleep(XWTM_S(1));
-                xwds_gpio_toggle(&stm32cube_soc_cb,
+                xwds_gpio_toggle(&stm32soc,
                                  XWDS_GPIO_PORT_F,
                                  XWDS_GPIO_PIN_9);
-                xwds_gpio_toggle(&stm32cube_soc_cb,
+                xwds_gpio_toggle(&stm32soc,
                                  XWDS_GPIO_PORT_F,
                                  XWDS_GPIO_PIN_10);
         }

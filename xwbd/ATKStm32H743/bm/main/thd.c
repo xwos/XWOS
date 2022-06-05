@@ -94,21 +94,21 @@ xwer_t eeprom_task(void)
         xwu8_t eedata[8] = {0};
 
         to = xwtm_ft(XWTM_S(1));
-        rc = xwds_eeprom_reset(&stm32cube_at24c02_cb, to);
+        rc = xwds_eeprom_reset(&at24c02, to);
         if (rc < 0) {
                 goto err_eeprom_reset;
         }
 
         size = 8;
         to = xwtm_ft(XWTM_S(1));
-        rc = xwds_eeprom_pgread(&stm32cube_at24c02_cb, eedata, &size, 0, to);
+        rc = xwds_eeprom_pgread(&at24c02, eedata, &size, 0, to);
         if (rc < 0) {
                 goto err_eeprom_read;
         }
 
         size = 8;
         to = xwtm_ft(XWTM_S(1));
-        rc = xwds_eeprom_pgread(&stm32cube_at24c02_cb, eedata, &size, 1, to);
+        rc = xwds_eeprom_pgread(&at24c02, eedata, &size, 1, to);
         if (rc < 0) {
                 goto err_eeprom_read;
         }
@@ -130,14 +130,14 @@ xwer_t led_task(void * arg)
                 BDL_BUG();
         }
 
-        xwds_gpio_req(&stm32cube_soc_cb,
+        xwds_gpio_req(&stm32soc,
                       XWDS_GPIO_PORT_B, XWDS_GPIO_PIN_0);
         while (!xwos_cthd_shld_stop()) {
                 if (xwos_cthd_shld_frz()) {
                         xwos_cthd_freeze();
                 }
                 xwos_cthd_sleep(XWTM_S(1));
-                xwds_gpio_toggle(&stm32cube_soc_cb,
+                xwds_gpio_toggle(&stm32soc,
                                  XWDS_GPIO_PORT_B,
                                  XWDS_GPIO_PIN_0);
         }

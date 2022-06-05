@@ -34,7 +34,7 @@ xwer_t bm_xwpcp_start(void)
         xwer_t rc;
 
         rc = xwpcp_start(&bm_xwpcp, "bm.xwpcp",
-                         &xwpcpif_uart_ops, &stm32cube_usart1_cb,
+                         &xwpcpif_uart_ops, &stm32usart1,
                          bm_xwpcp_mem, sizeof(bm_xwpcp_mem));
         return rc;
 }

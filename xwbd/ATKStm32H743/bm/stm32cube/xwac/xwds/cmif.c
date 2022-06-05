@@ -30,17 +30,9 @@
 #include <bm/stm32cube/xwac/xwds/cmif.h>
 
 /**
- * @brief 准备启动设备栈
- * @retrun 错误码
- * @note
- * - 在初始化过程中调用此函数，此函数中只能初始化SOC的基本资源，
- *   例如：GPIO、时钟等。
- * @note
- * - 同步/异步：同步
- * - 上下文：初始化流程
- * - 重入性：不可重入
+ * @brief 探测设备栈
  */
-xwer_t stm32cube_xwds_ll_start(void)
+xwer_t stm32cube_xwds_probe(void)
 {
         xwer_t rc;
 
@@ -65,15 +57,7 @@ err_soc_start:
 }
 
 /**
- * @brief 准备停止设备栈
- * @retrun 错误码
- * @note
- * - 在反初始化过程中调用此函数，此函数中只能停止SOC的基本资源，
- *   例如：GPIO、时钟等。
- * @note
- * - 同步/异步：同步
- * - 上下文：反初始化流程
- * - 重入性：不可重入
+ * @brief 删除设备栈
  */
 xwer_t stm32cube_xwds_ll_stop(void)
 {
@@ -93,13 +77,6 @@ err_soc_stop:
 
 /**
  * @brief 启动设备栈
- * @retrun 错误码
- * @note
- * - 此函数会启动所有外设，有些外设启动流程需要延时，因此此函数只能运行在线程中。
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
  */
 xwer_t stm32cube_xwds_start(void)
 {
@@ -139,13 +116,6 @@ err_uart_start:
 
 /**
  * @brief 停止设备栈
- * @retrun 错误码
- * @note
- * - 此函数会停止所有外设，有些外设的停止流程需要延时，因此此函数只能运行在线程中。
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
  */
 xwer_t stm32cube_xwds_stop(void)
 {
@@ -182,152 +152,117 @@ err_spi_stop:
 
 /**
  * @brief 启动SOC
- * @retrun 错误码
- * @note
- * - 已经由@ref stm32cube_xwds_ll_start()调用。
- * @note
- * - 同步/异步：同步
- * - 上下文：初始化流程
- * - 重入性：不可重入
  */
 xwer_t stm32cube_xwds_soc_start(void)
 {
         xwer_t rc;
 
-        xwds_soc_construct(&stm32cube_soc_cb);
+        xwds_soc_construct(&stm32soc);
         rc = xwds_device_probe(&stm32cube_ds,
-                               xwds_cast(struct xwds_device *, &stm32cube_soc_cb),
+                               xwds_cast(struct xwds_device *, &stm32soc),
                                NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_probe;
         }
-        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32cube_soc_cb));
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32soc));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_start;
         }
         return XWOK;
 
 err_dev_start:
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_soc_cb));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32soc));
 err_dev_probe:
-        xwds_soc_destruct(&stm32cube_soc_cb);
+        xwds_soc_destruct(&stm32soc);
         return rc;
 }
 
 /**
  * @brief 停止SOC
- * @retrun 错误码
- * @note
- * - 已经由@ref stm32cube_xwds_ll_stop()调用。
- * @note
- * - 同步/异步：同步
- * - 上下文：反初始化流程
- * - 重入性：不可重入
  */
 xwer_t stm32cube_xwds_soc_stop(void)
 {
-        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_soc_cb));
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_soc_cb));
-        xwds_soc_destruct(&stm32cube_soc_cb);
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32soc));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32soc));
+        xwds_soc_destruct(&stm32soc);
         return XWOK;
 }
 
 /**
  * @brief 启动UART
- * @retrun 错误码
- * @note
- * - 已经由@ref stm32cube_xwds_start()调用。
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
  */
 xwer_t stm32cube_xwds_uart_start(void)
 {
         xwer_t rc;
 
-        xwds_dmauartc_construct(&stm32cube_usart1_cb);
+        xwds_dmauartc_construct(&stm32usart1);
         rc = xwds_device_probe(&stm32cube_ds,
-                               xwds_cast(struct xwds_device *, &stm32cube_usart1_cb),
+                               xwds_cast(struct xwds_device *, &stm32usart1),
                                NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_usart1_probe;
         }
-        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32cube_usart1_cb));
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32usart1));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_usart1_start;
         }
 
-        xwds_dmauartc_construct(&stm32cube_usart2_cb);
+        xwds_dmauartc_construct(&stm32usart2);
         rc = xwds_device_probe(&stm32cube_ds,
-                               xwds_cast(struct xwds_device *, &stm32cube_usart2_cb),
+                               xwds_cast(struct xwds_device *, &stm32usart2),
                                NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_usart2_probe;
         }
-        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32cube_usart2_cb));
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32usart2));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_usart2_start;
         }
         return XWOK;
 
 err_usart2_start:
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_usart2_cb));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32usart2));
 err_usart2_probe:
-        xwds_dmauartc_destruct(&stm32cube_usart2_cb);
+        xwds_dmauartc_destruct(&stm32usart2);
 
-        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_usart1_cb));
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32usart1));
 err_usart1_start:
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_usart1_cb));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32usart1));
 err_usart1_probe:
-        xwds_dmauartc_destruct(&stm32cube_usart1_cb);
+        xwds_dmauartc_destruct(&stm32usart1);
         return rc;
 }
 
 /**
  * @brief 停止UART
- * @retrun 错误码
- * @note
- * - 已经由@ref stm32cube_xwds_stop()调用。
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
  */
 xwer_t stm32cube_xwds_uart_stop(void)
 {
-        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_usart2_cb));
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_usart2_cb));
-        xwds_dmauartc_destruct(&stm32cube_usart2_cb);
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32usart2));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32usart2));
+        xwds_dmauartc_destruct(&stm32usart2);
 
-        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_usart1_cb));
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_usart1_cb));
-        xwds_dmauartc_destruct(&stm32cube_usart1_cb);
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32usart1));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32usart1));
+        xwds_dmauartc_destruct(&stm32usart1);
         return XWOK;
 }
 
 /**
  * @brief 启动I2C
- * @retrun 错误码
- * @note
- * - 已经由@ref stm32cube_xwds_start()调用。
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
  */
 xwer_t stm32cube_xwds_i2c_start(void)
 {
         xwer_t rc;
 
-        xwds_i2cm_construct(&stm32cube_i2c2m_cb);
+        xwds_i2cm_construct(&stm32i2c2m);
         rc = xwds_device_probe(&stm32cube_ds,
-                               xwds_cast(struct xwds_device *, &stm32cube_i2c2m_cb),
+                               xwds_cast(struct xwds_device *, &stm32i2c2m),
                                NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_probe;
         }
-        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32cube_i2c2m_cb));
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32i2c2m));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_start;
         }
@@ -335,52 +270,38 @@ xwer_t stm32cube_xwds_i2c_start(void)
         return XWOK;
 
 err_dev_start:
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_i2c2m_cb));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32i2c2m));
 err_dev_probe:
-        xwds_i2cm_destruct(&stm32cube_i2c2m_cb);
+        xwds_i2cm_destruct(&stm32i2c2m);
         return rc;
 }
 
 /**
  * @brief 停止I2C
- * @retrun 错误码
- * @note
- * - 已经由@ref stm32cube_xwds_stop()调用。
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
  */
 xwer_t stm32cube_xwds_i2c_stop(void)
 {
-        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_i2c2m_cb));
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_i2c2m_cb));
-        xwds_i2cm_destruct(&stm32cube_i2c2m_cb);
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32i2c2m));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32i2c2m));
+        xwds_i2cm_destruct(&stm32i2c2m);
         return XWOK;
 }
 
 /**
  * @brief 启动EEPROM
- * @retrun 错误码
- * @note
- * - 已经由@ref stm32cube_xwds_start()调用。
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
  */
 xwer_t stm32cube_xwds_eeprom_start(void)
 {
         xwer_t rc;
 
-        xwds_eeprom_construct(&stm32cube_at24c02_cb);
+        xwds_eeprom_construct(&at24c02);
         rc = xwds_device_probe(&stm32cube_ds,
-                               xwds_cast(struct xwds_device *, &stm32cube_at24c02_cb),
+                               xwds_cast(struct xwds_device *, &at24c02),
                                NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_probe;
         }
-        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32cube_at24c02_cb));
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &at24c02));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_start;
         }
@@ -388,66 +309,52 @@ xwer_t stm32cube_xwds_eeprom_start(void)
         return XWOK;
 
 err_dev_start:
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_at24c02_cb));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &at24c02));
 err_dev_probe:
-        xwds_eeprom_destruct(&stm32cube_at24c02_cb);
+        xwds_eeprom_destruct(&at24c02);
         return rc;
 }
 
 /**
  * @brief 停止EEPROM
- * @retrun 错误码
- * @note
- * - 已经由@ref stm32cube_xwds_stop()调用。
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
  */
 xwer_t stm32cube_xwds_eeprom_stop(void)
 {
-        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_at24c02_cb));
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_at24c02_cb));
-        xwds_eeprom_destruct(&stm32cube_at24c02_cb);
+        xwds_device_stop(xwds_cast(struct xwds_device *, &at24c02));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &at24c02));
+        xwds_eeprom_destruct(&at24c02);
         return XWOK;
 }
 
 /**
  * @brief 启动SPI
- * @retrun 错误码
- * @note
- * - 已经由@ref stm32cube_xwds_start()调用。
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
  */
 xwer_t stm32cube_xwds_spi_start(void)
 {
         xwer_t rc;
 
         /* SPI1 */
-        xwds_spim_construct(&stm32cube_spi1m_cb);
+        xwds_spim_construct(&stm32spi1m);
         rc = xwds_device_probe(&stm32cube_ds,
-                               xwds_cast(struct xwds_device *, &stm32cube_spi1m_cb),
+                               xwds_cast(struct xwds_device *, &stm32spi1m),
                                NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spi1_probe;
         }
-        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32cube_spi1m_cb));
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32spi1m));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spi1_start;
         }
 
         /* SPI2 */
-        xwds_spim_construct(&stm32cube_spi2m_cb);
+        xwds_spim_construct(&stm32spi2m);
         rc = xwds_device_probe(&stm32cube_ds,
-                               xwds_cast(struct xwds_device *, &stm32cube_spi2m_cb),
+                               xwds_cast(struct xwds_device *, &stm32spi2m),
                                NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spi2_probe;
         }
-        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32cube_spi2m_cb));
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32spi2m));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spi2_start;
         }
@@ -456,39 +363,32 @@ xwer_t stm32cube_xwds_spi_start(void)
 
         /* SPI2 */
 err_spi2_start:
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_spi2m_cb));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32spi2m));
 err_spi2_probe:
-        xwds_spim_destruct(&stm32cube_spi2m_cb);
+        xwds_spim_destruct(&stm32spi2m);
 
         /* SPI1 */
-        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_spi1m_cb));
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32spi1m));
 err_spi1_start:
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_spi1m_cb));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32spi1m));
 err_spi1_probe:
-        xwds_spim_destruct(&stm32cube_spi1m_cb);
+        xwds_spim_destruct(&stm32spi1m);
         return rc;
 }
 
 /**
  * @brief 停止SPI
- * @retrun 错误码
- * @note
- * - 已经由@ref stm32cube_xwds_stop()调用。
- * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：不可重入
  */
 xwer_t stm32cube_xwds_spi_stop(void)
 {
         /* SPI2 */
-        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_spi2m_cb));
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_spi2m_cb));
-        xwds_spim_destruct(&stm32cube_spi2m_cb);
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32spi2m));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32spi2m));
+        xwds_spim_destruct(&stm32spi2m);
 
         /* SPI1 */
-        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_spi1m_cb));
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_spi1m_cb));
-        xwds_spim_destruct(&stm32cube_spi1m_cb);
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32spi1m));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32spi1m));
+        xwds_spim_destruct(&stm32spi1m);
         return XWOK;
 }

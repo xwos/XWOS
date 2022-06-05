@@ -146,7 +146,7 @@ atomic_xwsq_t stm32cube_gpio_pin_state[] = {
         [XWDS_GPIO_PORT_I] = 0,
 };
 
-struct xwds_soc stm32cube_soc_cb = {
+struct xwds_soc stm32soc = {
         /* attributes */
         .dev = {
                 .name = "stm32cube.soc",

@@ -30,7 +30,7 @@
 #include <bm/stm32cube/xwac/xwds/pm.h>
 #include <bm/stm32cube/xwac/xwds/cmif.h>
 
-xwer_t stm32cube_xwds_ll_start(void)
+xwer_t stm32cube_xwds_probe(void)
 {
         xwer_t rc;
 
@@ -51,7 +51,7 @@ err_soc_start:
         return rc;
 }
 
-xwer_t stm32cube_xwds_ll_stop(void)
+xwer_t stm32cube_xwds_remove(void)
 {
         xwer_t rc;
 
@@ -131,31 +131,31 @@ xwer_t stm32cube_xwds_soc_start(void)
 {
         xwer_t rc;
 
-        xwds_soc_construct(&stm32cube_soc_cb);
+        xwds_soc_construct(&stm32soc);
         rc = xwds_device_probe(&stm32cube_ds,
-                               xwds_cast(struct xwds_device *, &stm32cube_soc_cb),
+                               xwds_cast(struct xwds_device *, &stm32soc),
                                NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_probe;
         }
-        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32cube_soc_cb));
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32soc));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dev_start;
         }
         return XWOK;
 
 err_dev_start:
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_soc_cb));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32soc));
 err_dev_probe:
-        xwds_soc_destruct(&stm32cube_soc_cb);
+        xwds_soc_destruct(&stm32soc);
         return rc;
 }
 
 xwer_t stm32cube_xwds_soc_stop(void)
 {
-        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_soc_cb));
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_soc_cb));
-        xwds_soc_destruct(&stm32cube_soc_cb);
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32soc));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32soc));
+        xwds_soc_destruct(&stm32soc);
         return XWOK;
 }
 
@@ -163,52 +163,52 @@ xwer_t stm32cube_xwds_uart_start(void)
 {
         xwer_t rc;
 
-        xwds_dmauartc_construct(&stm32cube_usart1_cb);
+        xwds_dmauartc_construct(&stm32usart1);
         rc = xwds_device_probe(&stm32cube_ds,
-                               xwds_cast(struct xwds_device *, &stm32cube_usart1_cb),
+                               xwds_cast(struct xwds_device *, &stm32usart1),
                                NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_usart1_probe;
         }
-        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32cube_usart1_cb));
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32usart1));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_usart1_start;
         }
-        xwds_dmauartc_construct(&stm32cube_usart3_cb);
+        xwds_dmauartc_construct(&stm32usart3);
         rc = xwds_device_probe(&stm32cube_ds,
-                               xwds_cast(struct xwds_device *, &stm32cube_usart3_cb),
+                               xwds_cast(struct xwds_device *, &stm32usart3),
                                NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_usart3_probe;
         }
-        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32cube_usart3_cb));
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32usart3));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_usart3_start;
         }
         return XWOK;
 
 err_usart3_start:
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_usart3_cb));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32usart3));
 err_usart3_probe:
-        xwds_dmauartc_destruct(&stm32cube_usart3_cb);
+        xwds_dmauartc_destruct(&stm32usart3);
 
-        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_usart1_cb));
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32usart1));
 err_usart1_start:
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_usart1_cb));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32usart1));
 err_usart1_probe:
-        xwds_dmauartc_destruct(&stm32cube_usart1_cb);
+        xwds_dmauartc_destruct(&stm32usart1);
         return rc;
 }
 
 xwer_t stm32cube_xwds_uart_stop(void)
 {
-        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_usart3_cb));
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_usart3_cb));
-        xwds_dmauartc_destruct(&stm32cube_usart3_cb);
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32usart3));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32usart3));
+        xwds_dmauartc_destruct(&stm32usart3);
 
-        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_usart1_cb));
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_usart1_cb));
-        xwds_dmauartc_destruct(&stm32cube_usart1_cb);
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32usart1));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32usart1));
+        xwds_dmauartc_destruct(&stm32usart1);
         return XWOK;
 }
 
@@ -217,27 +217,27 @@ xwer_t stm32cube_xwds_spi_start(void)
         xwer_t rc;
 
         /* SPI1 */
-        xwds_spim_construct(&stm32cube_spi1m_cb);
+        xwds_spim_construct(&stm32spi1m);
         rc = xwds_device_probe(&stm32cube_ds,
-                               xwds_cast(struct xwds_device *, &stm32cube_spi1m_cb),
+                               xwds_cast(struct xwds_device *, &stm32spi1m),
                                NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spi1_probe;
         }
-        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32cube_spi1m_cb));
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32spi1m));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spi1_start;
         }
 
         /* SPI4 */
-        xwds_spim_construct(&stm32cube_spi4m_cb);
+        xwds_spim_construct(&stm32spi4m);
         rc = xwds_device_probe(&stm32cube_ds,
-                               xwds_cast(struct xwds_device *, &stm32cube_spi4m_cb),
+                               xwds_cast(struct xwds_device *, &stm32spi4m),
                                NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spi4_probe;
         }
-        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32cube_spi4m_cb));
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32spi4m));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_spi4_start;
         }
@@ -245,28 +245,28 @@ xwer_t stm32cube_xwds_spi_start(void)
         return XWOK;
 
 err_spi4_start:
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_spi4m_cb));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32spi4m));
 err_spi4_probe:
-        xwds_spim_destruct(&stm32cube_spi4m_cb);
-        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_spi1m_cb));
+        xwds_spim_destruct(&stm32spi4m);
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32spi1m));
 err_spi1_start:
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_spi1m_cb));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32spi1m));
 err_spi1_probe:
-        xwds_spim_destruct(&stm32cube_spi1m_cb);
+        xwds_spim_destruct(&stm32spi1m);
         return rc;
 }
 
 xwer_t stm32cube_xwds_spi_stop(void)
 {
         /* SPI4 */
-        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_spi4m_cb));
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_spi4m_cb));
-        xwds_spim_destruct(&stm32cube_spi4m_cb);
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32spi4m));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32spi4m));
+        xwds_spim_destruct(&stm32spi4m);
 
         /* SPI1 */
-        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_spi1m_cb));
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_spi1m_cb));
-        xwds_spim_destruct(&stm32cube_spi1m_cb);
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32spi1m));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32spi1m));
+        xwds_spim_destruct(&stm32spi1m);
         return XWOK;
 }
 
@@ -274,14 +274,14 @@ xwer_t stm32cube_xwds_st7735_start(void)
 {
         xwer_t rc;
 
-        xwds_st7735_construct(&stm32cube_st7735_cb);
+        xwds_st7735_construct(&st7735);
         rc = xwds_device_probe(&stm32cube_ds,
-                               xwds_cast(struct xwds_device *, &stm32cube_st7735_cb),
+                               xwds_cast(struct xwds_device *, &st7735),
                                NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_st7735_probe;
         }
-        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32cube_st7735_cb));
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &st7735));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_st7735_start;
         }
@@ -289,17 +289,17 @@ xwer_t stm32cube_xwds_st7735_start(void)
         return XWOK;
 
 err_st7735_start:
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_st7735_cb));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &st7735));
 err_st7735_probe:
-        xwds_st7735_destruct(&stm32cube_st7735_cb);
+        xwds_st7735_destruct(&st7735);
         return rc;
 }
 
 xwer_t stm32cube_xwds_st7735_stop(void)
 {
-        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_st7735_cb));
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_st7735_cb));
-        xwds_st7735_destruct(&stm32cube_st7735_cb);
+        xwds_device_stop(xwds_cast(struct xwds_device *, &st7735));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &st7735));
+        xwds_st7735_destruct(&st7735);
         return XWOK;
 }
 
@@ -307,30 +307,30 @@ xwer_t stm32cube_xwds_w25q64jv_start(void)
 {
         xwer_t rc;
 
-        xwds_w25qxx_construct(&stm32cube_w25q64jv_cb);
+        xwds_w25qxx_construct(&w25q64jv);
         rc = xwds_device_probe(&stm32cube_ds,
-                               xwds_cast(struct xwds_device *, &stm32cube_w25q64jv_cb),
+                               xwds_cast(struct xwds_device *, &w25q64jv),
                                NULL);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_w25q64jv_probe;
         }
-        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32cube_w25q64jv_cb));
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &w25q64jv));
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_w25q64jv_start;
         }
         return XWOK;
 
 err_w25q64jv_start:
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_w25q64jv_cb));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &w25q64jv));
 err_w25q64jv_probe:
-        xwds_w25qxx_destruct(&stm32cube_w25q64jv_cb);
+        xwds_w25qxx_destruct(&w25q64jv);
         return rc;
 }
 
 xwer_t stm32cube_xwds_w25q64jv_stop(void)
 {
-        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32cube_w25q64jv_cb));
-        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32cube_w25q64jv_cb));
-        xwds_w25qxx_destruct(&stm32cube_w25q64jv_cb);
+        xwds_device_stop(xwds_cast(struct xwds_device *, &w25q64jv));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &w25q64jv));
+        xwds_w25qxx_destruct(&w25q64jv);
         return XWOK;
 }

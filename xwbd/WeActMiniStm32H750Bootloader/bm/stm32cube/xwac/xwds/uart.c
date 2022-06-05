@@ -70,7 +70,7 @@ const struct xwds_dmauartc_driver stm32cube_usart1_drv = {
         .putc = stm32cube_usart1_drv_putc,
 };
 
-struct xwds_dmauartc stm32cube_usart1_cb = {
+struct xwds_dmauartc stm32usart1 = {
         /* attributes */
         .dev = {
                 .name = "stm32cube.usart.1",
@@ -279,11 +279,11 @@ const struct xwds_dmauartc_driver stm32cube_usart3_drv = {
         .putc = stm32cube_usart3_drv_putc,
 };
 
-struct xwds_dmauartc stm32cube_usart3_cb = {
+struct xwds_dmauartc stm32usart3 = {
         /* attributes */
         .dev = {
-                .name = "stm32cube.usart.1",
-                .id = 1,
+                .name = "stm32cube.usart.3",
+                .id = 3,
                 .resources = NULL,
                 .drv = xwds_cast(struct xwds_driver *, &stm32cube_usart3_drv),
                 .data = (void *)&huart3_drvdata,

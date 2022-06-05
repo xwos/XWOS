@@ -25,7 +25,7 @@ xwer_t board_log_write(const char * s, xwsz_t * n)
 {
         xwer_t rc;
 
-        rc = xwds_dmauartc_tx(&stm32cube_usart1_cb,
+        rc = xwds_dmauartc_tx(&stm32usart1,
                               (const xwu8_t *)s, n,
                               XWTM_MAX);
         return rc;

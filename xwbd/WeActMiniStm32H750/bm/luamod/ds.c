@@ -26,7 +26,7 @@
 
 void xwlua_open_brdlibs(lua_State * L)
 {
-        xwlua_soc_register(L, "stm32", &stm32cube_soc_cb);
-        xwlua_uart_register(L, "uart1", &stm32cube_usart1_cb);
-        xwlua_uart_register(L, "uart3", &stm32cube_usart3_cb);
+        xwlua_soc_register(L, "stm32", &stm32soc);
+        xwlua_uart_register(L, "usart1", &stm32usart1);
+        xwlua_uart_register(L, "usart3", &stm32usart3);
 }

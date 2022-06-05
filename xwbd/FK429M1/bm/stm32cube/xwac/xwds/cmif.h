@@ -23,10 +23,11 @@
 
 #include <bm/stm32cube/xwac/xwds/device.h>
 
-xwer_t stm32cube_xwds_ll_start(void);
-xwer_t stm32cube_xwds_ll_stop(void);
+xwer_t stm32cube_xwds_probe(void);
+xwer_t stm32cube_xwds_remove(void);
 xwer_t stm32cube_xwds_start(void);
 xwer_t stm32cube_xwds_stop(void);
+
 xwer_t stm32cube_xwds_soc_start(void);
 xwer_t stm32cube_xwds_soc_stop(void);
 xwer_t stm32cube_xwds_uart_start(void);

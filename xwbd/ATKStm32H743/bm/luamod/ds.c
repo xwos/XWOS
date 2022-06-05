@@ -28,10 +28,10 @@
 
 void xwlua_open_brdlibs(lua_State * L)
 {
-        xwlua_soc_register(L, "stm32", &stm32cube_soc_cb);
-        xwlua_uart_register(L, "uart1", &stm32cube_usart1_cb);
-        xwlua_uart_register(L, "uart2", &stm32cube_usart2_cb);
-        xwlua_i2cm_register(L, "i2c2m", &stm32cube_i2c2m_cb);
-        xwlua_spim_register(L, "spi1m", &stm32cube_spi1m_cb);
-        xwlua_spim_register(L, "spi2m", &stm32cube_spi2m_cb);
+        xwlua_soc_register(L, "stm32", &stm32soc);
+        xwlua_uart_register(L, "usart1", &stm32usart1);
+        xwlua_uart_register(L, "uart2", &stm32usart2);
+        xwlua_i2cm_register(L, "i2c2m", &stm32i2c2m);
+        xwlua_spim_register(L, "spi1m", &stm32spi1m);
+        xwlua_spim_register(L, "spi2m", &stm32spi2m);
 }
