@@ -66,7 +66,7 @@ const struct xwds_spim_driver stm32cube_spi1m_drv = {
         .xfer = stm32cube_spi1m_drv_xfer,
 };
 
-struct xwds_spim stm32cube_spi1m_cb = {
+struct xwds_spim stm32spi1m = {
         /* attributes */
         .dev = {
                 .name = "stm32cube.spim.1",
@@ -231,7 +231,7 @@ const struct xwds_spim_driver stm32cube_spi4m_drv = {
         .xfer = stm32cube_spi4m_drv_xfer,
 };
 
-struct xwds_spim stm32cube_spi4m_cb = {
+struct xwds_spim stm32spi4m = {
         /* attributes */
         .dev = {
                 .name = "stm32cube.spim.4",

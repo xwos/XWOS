@@ -225,7 +225,7 @@ __xwds_soc_eirq_tbl_qualifier xwds_eirq_arg_t stm32cube_eirq_israrg[] = {
         [XWDS_EIRQ(15)] = NULL,
 };
 
-struct xwds_soc stm32cube_soc_cb = {
+struct xwds_soc stm32soc = {
         /* attributes */
         .dev = {
                 .name = "stm32cube.soc",
@@ -511,7 +511,7 @@ xwer_t stm32cube_soc_drv_eirq_rls(struct xwds_soc * soc,
 
 void stm32cube_soc_cb_eirq_isr(xwid_t eiid)
 {
-        struct xwds_soc * soc = &stm32cube_soc_cb;
+        struct xwds_soc * soc = &stm32soc;
 
         if (!is_err_or_null(soc->eirq.isrs[eiid])) {
                 soc->eirq.isrs[eiid](soc, (xwid_t)eiid, soc->eirq.isrargs[eiid]);

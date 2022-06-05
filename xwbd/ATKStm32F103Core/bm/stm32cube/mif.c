@@ -87,7 +87,7 @@ void stm32cube_init(void)
         HAL_Init();
         SystemClock_Config();
 
-        rc = stm32cube_xwds_ll_start();
+        rc = stm32cube_xwds_probe();
         BDL_BUG_ON(rc < 0);
 
 #if defined(STM32CUBECFG_SRAM) && (1 == STM32CUBECFG_SRAM)

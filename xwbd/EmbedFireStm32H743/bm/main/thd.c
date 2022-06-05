@@ -74,13 +74,13 @@ xwer_t led_task(void * arg)
 {
         XWOS_UNUSED(arg);
 
-        xwds_gpio_req(&stm32cube_soc_cb, LED_Blue_GPIO_Port, LED_Blue_Pin);
+        xwds_gpio_req(&stm32soc, LED_Blue_GPIO_Port, LED_Blue_Pin);
         while (!xwos_cthd_shld_stop()) {
                 if (xwos_cthd_shld_frz()) {
                         xwos_cthd_freeze();
                 }
                 xwos_cthd_sleep(XWTM_S(1));
-                xwds_gpio_toggle(&stm32cube_soc_cb, LED_Blue_GPIO_Port, LED_Blue_Pin);
+                xwds_gpio_toggle(&stm32soc, LED_Blue_GPIO_Port, LED_Blue_Pin);
         }
         return XWOK;
 }

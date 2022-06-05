@@ -93,7 +93,7 @@ void stm32cube_init(void)
         HAL_Init();
         SystemClock_Config();
 
-        rc = stm32cube_xwds_ll_start();
+        rc = stm32cube_xwds_probe();
         BDL_BUG_ON(rc < 0);
 
         odr = xwbop_fls(xwsz_t, (xwsz_t)sdram_mr_size / XWMM_MEMPOOL_PAGE_SIZE);

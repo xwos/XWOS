@@ -141,7 +141,7 @@ xwer_t bmbtn_get_btn_evt(xwsq_t * evt)
 
         cnt = 0;
         do {
-                rc = xwds_gpio_input(&stm32cube_soc_cb,
+                rc = xwds_gpio_input(&stm32soc,
                                      BMBTN_GPIO_PORT,
                                      BMBTN_GPIO_PIN,
                                      &in);
@@ -173,12 +173,12 @@ xwer_t bmbtn_thd_init(void)
 {
         xwer_t rc;
 
-        rc = xwds_gpio_req(&stm32cube_soc_cb,
+        rc = xwds_gpio_req(&stm32soc,
                            BMBTN_GPIO_PORT, BMBTN_GPIO_PIN);
         if (rc < 0) {
                 goto err_btn_gpio_req;
         }
-        rc = xwds_eirq_req(&stm32cube_soc_cb,
+        rc = xwds_eirq_req(&stm32soc,
                            BMBTN_GPIO_PORT, BMBTN_GPIO_PIN,
                            BMBTN_IRQLINE,
                            XWDS_SOC_EIF_TM_RISING | XWDS_SOC_EIF_WKUP,
@@ -196,16 +196,16 @@ err_btn_gpio_req:
 static
 void bmbtn_thd_deinit(void)
 {
-        xwds_eirq_rls(&stm32cube_soc_cb,
+        xwds_eirq_rls(&stm32soc,
                       BMBTN_GPIO_PORT, BMBTN_GPIO_PIN,
                       BMBTN_IRQLINE);
-        xwds_gpio_rls(&stm32cube_soc_cb, BMBTN_GPIO_PORT, BMBTN_GPIO_PIN);
+        xwds_gpio_rls(&stm32soc, BMBTN_GPIO_PORT, BMBTN_GPIO_PIN);
 }
 
 static
 void bmbtn_req_btn_irq(void)
 {
-        xwds_eirq_req(&stm32cube_soc_cb,
+        xwds_eirq_req(&stm32soc,
                       BMBTN_GPIO_PORT, BMBTN_GPIO_PIN,
                       BMBTN_IRQLINE, XWDS_SOC_EIF_TM_RISING | XWDS_SOC_EIF_WKUP,
                       bmbtn_eirq_btn_isr, &bmbtn_sem);
@@ -214,7 +214,7 @@ void bmbtn_req_btn_irq(void)
 static
 void bmbtn_rls_btn_irq(void)
 {
-        xwds_eirq_rls(&stm32cube_soc_cb,
+        xwds_eirq_rls(&stm32soc,
                       BMBTN_GPIO_PORT, BMBTN_GPIO_PIN,
                       BMBTN_IRQLINE);
 }

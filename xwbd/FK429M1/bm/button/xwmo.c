@@ -128,14 +128,14 @@ xwer_t bmbtn_stop(void)
 static
 void bmbtn_suspend(void)
 {
-        xwds_gpio_rls(&stm32cube_soc_cb,
+        xwds_gpio_rls(&stm32soc,
                       BMBTN_LED_GPIO_PORT, BMBTN_LED_GPIO_PIN);
 }
 
 static
 void bmbtn_resume(void)
 {
-        xwds_gpio_req(&stm32cube_soc_cb,
+        xwds_gpio_req(&stm32soc,
                       BMBTN_LED_GPIO_PORT, BMBTN_LED_GPIO_PIN);
 }
 
@@ -158,7 +158,7 @@ xwer_t bmbtn_get_btn_evt(xwsq_t * evt)
 
         cnt = 0;
         do {
-                rc = xwds_gpio_input(&stm32cube_soc_cb,
+                rc = xwds_gpio_input(&stm32soc,
                                      BMBTN_GPIO_PORT,
                                      BMBTN_GPIO_PIN,
                                      &in);
@@ -190,17 +190,17 @@ xwer_t bmbtn_thd_init(void)
 {
         xwer_t rc;
 
-        rc = xwds_gpio_req(&stm32cube_soc_cb,
+        rc = xwds_gpio_req(&stm32soc,
                            BMBTN_LED_GPIO_PORT, BMBTN_LED_GPIO_PIN);
         if (rc < 0) {
                 goto err_led_gpio_req;
         }
-        rc = xwds_gpio_req(&stm32cube_soc_cb,
+        rc = xwds_gpio_req(&stm32soc,
                            BMBTN_GPIO_PORT, BMBTN_GPIO_PIN);
         if (rc < 0) {
                 goto err_btn_gpio_req;
         }
-        rc = xwds_eirq_req(&stm32cube_soc_cb,
+        rc = xwds_eirq_req(&stm32soc,
                            BMBTN_GPIO_PORT, BMBTN_GPIO_PIN,
                            8, XWDS_SOC_EIF_TM_FALLING | XWDS_SOC_EIF_WKUP,
                            bmbtn_eirq_btn_isr, &bmbtn_sem);
@@ -218,16 +218,16 @@ err_led_gpio_req:
 static
 void bmbtn_thd_deinit(void)
 {
-        xwds_eirq_rls(&stm32cube_soc_cb, BMBTN_GPIO_PORT, BMBTN_GPIO_PIN, 8);
-        xwds_gpio_rls(&stm32cube_soc_cb, BMBTN_GPIO_PORT, BMBTN_GPIO_PIN);
-        xwds_gpio_rls(&stm32cube_soc_cb,
+        xwds_eirq_rls(&stm32soc, BMBTN_GPIO_PORT, BMBTN_GPIO_PIN, 8);
+        xwds_gpio_rls(&stm32soc, BMBTN_GPIO_PORT, BMBTN_GPIO_PIN);
+        xwds_gpio_rls(&stm32soc,
                       BMBTN_LED_GPIO_PORT, BMBTN_LED_GPIO_PIN);
 }
 
 static
 void bmbtn_req_btn_irq(void)
 {
-        xwds_eirq_req(&stm32cube_soc_cb,
+        xwds_eirq_req(&stm32soc,
                       BMBTN_GPIO_PORT, BMBTN_GPIO_PIN,
                       8, XWDS_SOC_EIF_TM_FALLING | XWDS_SOC_EIF_WKUP,
                       bmbtn_eirq_btn_isr, &bmbtn_sem);
@@ -236,28 +236,28 @@ void bmbtn_req_btn_irq(void)
 static
 void bmbtn_rls_btn_irq(void)
 {
-        xwds_eirq_rls(&stm32cube_soc_cb, BMBTN_GPIO_PORT, BMBTN_GPIO_PIN, 8);
+        xwds_eirq_rls(&stm32soc, BMBTN_GPIO_PORT, BMBTN_GPIO_PIN, 8);
 }
 
 static
 void bmbtn_led_blink(void)
 {
-        xwds_gpio_toggle(&stm32cube_soc_cb,
+        xwds_gpio_toggle(&stm32soc,
                          BMBTN_LED_GPIO_PORT,
                          BMBTN_LED_GPIO_PIN);
         xwos_cthd_sleep(XWTM_MS(500));
 
-        xwds_gpio_toggle(&stm32cube_soc_cb,
+        xwds_gpio_toggle(&stm32soc,
                          BMBTN_LED_GPIO_PORT,
                          BMBTN_LED_GPIO_PIN);
         xwos_cthd_sleep(XWTM_MS(500));
 
-        xwds_gpio_toggle(&stm32cube_soc_cb,
+        xwds_gpio_toggle(&stm32soc,
                          BMBTN_LED_GPIO_PORT,
                          BMBTN_LED_GPIO_PIN);
         xwos_cthd_sleep(XWTM_MS(500));
 
-        xwds_gpio_toggle(&stm32cube_soc_cb,
+        xwds_gpio_toggle(&stm32soc,
                          BMBTN_LED_GPIO_PORT,
                          BMBTN_LED_GPIO_PIN);
         xwos_cthd_sleep(XWTM_MS(500));
@@ -268,7 +268,7 @@ void bmbtn_handle_evt(xwsq_t evt)
 {
         switch (evt) {
         case BMBTN_EVT_CLICK:
-                xwds_gpio_toggle(&stm32cube_soc_cb,
+                xwds_gpio_toggle(&stm32soc,
                                  BMBTN_LED_GPIO_PORT,
                                  BMBTN_LED_GPIO_PIN);
                 break;

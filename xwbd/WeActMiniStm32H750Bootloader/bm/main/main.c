@@ -70,14 +70,14 @@ xwer_t xwos_main(void)
         xwer_t rc;
         xwsq_t key;
 
-        xwds_gpio_req(&stm32cube_soc_cb, KEY_GPIO_PORT, KEY_GPIO_PIN);
-        xwds_gpio_input(&stm32cube_soc_cb, KEY_GPIO_PORT, KEY_GPIO_PIN, &key);
+        xwds_gpio_req(&stm32soc, KEY_GPIO_PORT, KEY_GPIO_PIN);
+        xwds_gpio_input(&stm32soc, KEY_GPIO_PORT, KEY_GPIO_PIN, &key);
         if (0 == key) {
                 arch_boot_image((void *)qspiflash_mr_origin);
         }
 
-        xwds_gpio_req(&stm32cube_soc_cb, LED_GPIO_PORT, LED_GPIO_PIN);
-        xwds_gpio_set(&stm32cube_soc_cb, LED_GPIO_PORT, LED_GPIO_PIN);
+        xwds_gpio_req(&stm32soc, LED_GPIO_PORT, LED_GPIO_PIN);
+        xwds_gpio_set(&stm32soc, LED_GPIO_PORT, LED_GPIO_PIN);
 
         rc = xwos_thd_create(&main_thd,
                              &main_thd_desc.attr,

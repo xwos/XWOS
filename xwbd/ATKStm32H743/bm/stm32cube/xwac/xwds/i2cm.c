@@ -66,7 +66,7 @@ const struct xwds_i2cm_driver stm32cube_i2c2m_drv = {
         .abort = stm32cube_i2c2m_drv_abort,
 };
 
-struct xwds_i2cm stm32cube_i2c2m_cb = {
+struct xwds_i2cm stm32i2c2m = {
         /* attributes */
         .dev = {
                 .name = "stm32cube.i2cm.2",

@@ -63,7 +63,7 @@ const struct xwds_st7735_driver stm32cube_st7735_drv = {
         .set_brightness = stm32cube_st7735_drv_set_brightness,
 };
 
-struct xwds_st7735 stm32cube_st7735_cb = {
+struct xwds_st7735 st7735 = {
         /* attributes */
         .spip = {
                 .dev = {
@@ -73,7 +73,7 @@ struct xwds_st7735 stm32cube_st7735_cb = {
                         .drv = xwds_cast(struct xwds_driver *, &stm32cube_st7735_drv),
                         .data = NULL,
                 },
-                .bus = &stm32cube_spi4m_cb,
+                .bus = &stm32spi4m,
                 .buscfgid = 0,
         },
         .parameter = {
@@ -101,17 +101,17 @@ xwer_t stm32cube_st7735_drv_start(struct xwds_device * dev)
 {
         xwer_t rc;
 
-        rc = xwds_gpio_req(&stm32cube_soc_cb,
+        rc = xwds_gpio_req(&stm32soc,
                            STM32CUBE_ST7735_CS_PORT,
                            STM32CUBE_ST7735_CS_PIN);
         if (rc < 0) {
                 goto err_gpio;
         }
-        xwds_gpio_set(&stm32cube_soc_cb,
+        xwds_gpio_set(&stm32soc,
                            STM32CUBE_ST7735_CS_PORT,
                            STM32CUBE_ST7735_CS_PIN);
 
-        rc = xwds_gpio_req(&stm32cube_soc_cb,
+        rc = xwds_gpio_req(&stm32soc,
                            STM32CUBE_ST7735_DC_PORT,
                            STM32CUBE_ST7735_DC_PIN);
         if (rc < 0) {
@@ -142,10 +142,10 @@ xwer_t stm32cube_st7735_drv_stop(struct xwds_device * dev)
                 goto err_st7735_stop;
         }
         MX_TIM1_DeInit();
-        xwds_gpio_rls(&stm32cube_soc_cb,
+        xwds_gpio_rls(&stm32soc,
                       STM32CUBE_ST7735_DC_PORT,
                       STM32CUBE_ST7735_DC_PIN);
-        xwds_gpio_rls(&stm32cube_soc_cb,
+        xwds_gpio_rls(&stm32soc,
                       STM32CUBE_ST7735_CS_PORT,
                       STM32CUBE_ST7735_CS_PIN);
         return XWOK;
@@ -173,18 +173,18 @@ xwer_t stm32cube_st7735_drv_write(struct xwds_st7735 * st7735, xwu8_t reg,
         xwer_t rc;
         xwsz_t xfsz, rest, pos;
 
-        xwds_gpio_reset(&stm32cube_soc_cb,
+        xwds_gpio_reset(&stm32soc,
                         STM32CUBE_ST7735_CS_PORT,
                         STM32CUBE_ST7735_CS_PIN);
         xfsz = 1;
-        xwds_gpio_reset(&stm32cube_soc_cb,
+        xwds_gpio_reset(&stm32soc,
                         STM32CUBE_ST7735_DC_PORT,
                         STM32CUBE_ST7735_DC_PIN);
         rc = xwds_spim_xfer(st7735->spip.bus, &reg, NULL, &xfsz, to);
         if (rc < 0) {
                 goto err_write_cmd;
         }
-        xwds_gpio_set(&stm32cube_soc_cb,
+        xwds_gpio_set(&stm32soc,
                       STM32CUBE_ST7735_DC_PORT,
                       STM32CUBE_ST7735_DC_PIN);
         xfsz = *size;
@@ -198,7 +198,7 @@ xwer_t stm32cube_st7735_drv_write(struct xwds_st7735 * st7735, xwu8_t reg,
                 pos += rest;
         }
         *size = pos;
-        xwds_gpio_set(&stm32cube_soc_cb,
+        xwds_gpio_set(&stm32soc,
                       STM32CUBE_ST7735_CS_PORT,
                       STM32CUBE_ST7735_CS_PIN);
         return XWOK;
@@ -215,18 +215,18 @@ xwer_t stm32cube_st7735_drv_read(struct xwds_st7735 * st7735, xwu8_t reg,
         xwer_t rc;
         xwsz_t xfsz, rest, pos;
 
-        xwds_gpio_reset(&stm32cube_soc_cb,
+        xwds_gpio_reset(&stm32soc,
                         STM32CUBE_ST7735_CS_PORT,
                         STM32CUBE_ST7735_CS_PIN);
         xfsz = 1;
-        xwds_gpio_reset(&stm32cube_soc_cb,
+        xwds_gpio_reset(&stm32soc,
                         STM32CUBE_ST7735_DC_PORT,
                         STM32CUBE_ST7735_DC_PIN);
         rc = xwds_spim_xfer(st7735->spip.bus, &reg, NULL, &xfsz, to);
         if (rc < 0) {
                 goto err_write_cmd;
         }
-        xwds_gpio_set(&stm32cube_soc_cb,
+        xwds_gpio_set(&stm32soc,
                       STM32CUBE_ST7735_DC_PORT,
                       STM32CUBE_ST7735_DC_PIN);
         xfsz = *size;
@@ -240,7 +240,7 @@ xwer_t stm32cube_st7735_drv_read(struct xwds_st7735 * st7735, xwu8_t reg,
                 pos += rest;
         }
         *size = pos;
-        xwds_gpio_set(&stm32cube_soc_cb,
+        xwds_gpio_set(&stm32soc,
                       STM32CUBE_ST7735_CS_PORT,
                       STM32CUBE_ST7735_CS_PIN);
         return XWOK;

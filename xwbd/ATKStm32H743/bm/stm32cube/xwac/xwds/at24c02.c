@@ -22,7 +22,7 @@
 #include <xwcd/perpheral/i2c/eeprom/driver.h>
 #include <bm/stm32cube/xwac/xwds/device.h>
 
-struct xwds_eeprom stm32cube_at24c02_cb = {
+struct xwds_eeprom at24c02 = {
         /* attributes */
         .i2cp = {
                 .dev = {
@@ -32,7 +32,7 @@ struct xwds_eeprom stm32cube_at24c02_cb = {
                         .drv = xwds_cast(struct xwds_driver *, &at24sd_drv),
                         .data = NULL,
                 },
-                .bus = &stm32cube_i2c2m_cb,
+                .bus = &stm32i2c2m,
                 .addr = 0xA0,
         },
         .parameter = {

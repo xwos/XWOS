@@ -54,7 +54,7 @@ const struct xwds_w25qxx_driver stm32cube_w25q64jv_drv = {
         .io = stm32cube_w25q64jv_drv_io,
 };
 
-struct xwds_w25qxx stm32cube_w25q64jv_cb = {
+struct xwds_w25qxx w25q64jv = {
         /* attributes */
         .spip = {
                 .dev = {
@@ -64,7 +64,7 @@ struct xwds_w25qxx stm32cube_w25q64jv_cb = {
                         .drv = xwds_cast(struct xwds_driver *, &stm32cube_w25q64jv_drv),
                         .data = NULL,
                 },
-                .bus = &stm32cube_spi1m_cb,
+                .bus = &stm32spi1m,
                 .buscfgid = 0,
         },
         .parameter = {
@@ -83,13 +83,13 @@ xwer_t stm32cube_w25q64jv_drv_start(struct xwds_device * dev)
 {
         xwer_t rc;
 
-        rc = xwds_gpio_req(&stm32cube_soc_cb,
+        rc = xwds_gpio_req(&stm32soc,
                            STM32CUBE_W25Q64JV_CS_PORT,
                            STM32CUBE_W25Q64JV_CS_PIN);
         if (rc < 0) {
                 goto err_gpio;
         }
-        xwds_gpio_set(&stm32cube_soc_cb,
+        xwds_gpio_set(&stm32soc,
                       STM32CUBE_W25Q64JV_CS_PORT,
                       STM32CUBE_W25Q64JV_CS_PIN);
 
@@ -112,7 +112,7 @@ xwer_t stm32cube_w25q64jv_drv_stop(struct xwds_device * dev)
         if (rc < 0) {
                 goto err_w25q64jv_stop;
         }
-        xwds_gpio_rls(&stm32cube_soc_cb,
+        xwds_gpio_rls(&stm32soc,
                       STM32CUBE_W25Q64JV_CS_PORT,
                       STM32CUBE_W25Q64JV_CS_PIN);
         return XWOK;
@@ -140,7 +140,7 @@ xwer_t stm32cube_w25q64jv_drv_io(struct xwds_w25qxx * w25qxx,
         xwer_t rc;
         xwsz_t xfsz, rest, pos;
 
-        xwds_gpio_reset(&stm32cube_soc_cb,
+        xwds_gpio_reset(&stm32soc,
                         STM32CUBE_W25Q64JV_CS_PORT, STM32CUBE_W25Q64JV_CS_PIN);
         rc = XWOK;
         xfsz = *size;
@@ -155,7 +155,7 @@ xwer_t stm32cube_w25q64jv_drv_io(struct xwds_w25qxx * w25qxx,
                 }
                 pos += rest;
         }
-        xwds_gpio_set(&stm32cube_soc_cb,
+        xwds_gpio_set(&stm32soc,
                       STM32CUBE_W25Q64JV_CS_PORT, STM32CUBE_W25Q64JV_CS_PIN);
 err_write_data:
         *size = pos;
