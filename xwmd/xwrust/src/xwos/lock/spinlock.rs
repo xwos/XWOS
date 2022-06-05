@@ -252,12 +252,13 @@ impl<T: ?Sized> Spinlock<T> {
     ///   + [`SpinlockGuard`] 中包含 [`Spinlock`] 的引用， 当 [`SpinlockGuard`] 生命周期结束时，会在 [`drop()`] 方法中自动解锁自旋锁。
     /// + 若失败，将返回错误码 [`SpinlockError`] 。
     ///
-    /// # 锁模式 **mode**
+    /// # 参数说明
     ///
-    /// + [`SpinlockMode::Lock`] 关闭抢占
-    /// + [`SpinlockMode::LockBh`] 关闭抢占、中断底半部
-    /// + [`SpinlockMode::LockCpuirq`] 关闭抢占、中断底半部和中断
-    /// + [`SpinlockMode::LockCpuirqSave(None)`] 关闭抢占、中断底半部和中断，并保存之前的中断标志
+    /// + mode: 锁模式
+    ///   + [`SpinlockMode::Lock`] 关闭抢占
+    ///   + [`SpinlockMode::LockBh`] 关闭抢占、中断底半部
+    ///   + [`SpinlockMode::LockCpuirq`] 关闭抢占、中断底半部和中断
+    ///   + [`SpinlockMode::LockCpuirqSave(None)`] 关闭抢占、中断底半部和中断，并保存之前的中断标志
     ///
     /// # 错误码
     ///
@@ -320,12 +321,13 @@ impl<T: ?Sized> Spinlock<T> {
     ///   + [`SpinlockGuard`] 中包含 [`Spinlock`] 的引用， 当 [`SpinlockGuard`] 生命周期结束时，会在 [`drop()`] 方法中自动解锁自旋锁。
     /// + 若失败，将返回错误码 [`SpinlockError`] 。
     ///
-    /// # 锁模式 **mode**
+    /// # 参数说明
     ///
-    /// + [`SpinlockMode::Lock`] 关闭抢占
-    /// + [`SpinlockMode::LockBh`] 关闭抢占、中断底半部
-    /// + [`SpinlockMode::LockCpuirq`] 关闭抢占、中断底半部和中断
-    /// + [`SpinlockMode::LockCpuirqSave(None)`] 关闭抢占、中断底半部和中断，并保存之前的中断标志
+    /// + mode: 锁模式
+    ///   + [`SpinlockMode::Lock`] 关闭抢占
+    ///   + [`SpinlockMode::LockBh`] 关闭抢占、中断底半部
+    ///   + [`SpinlockMode::LockCpuirq`] 关闭抢占、中断底半部和中断
+    ///   + [`SpinlockMode::LockCpuirqSave(None)`] 关闭抢占、中断底半部和中断，并保存之前的中断标志
     ///
     /// # 错误码
     ///
@@ -508,6 +510,10 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
     /// + 当返回自旋锁的守卫 [`SpinlockGuard`] 时，自旋锁已经被重新上锁；
     /// + 当返回 [`Err`] 时，自旋锁未被上锁。
     ///
+    /// # 参数说明
+    ///
+    /// + cond: 条件量的引用
+    ///
     /// # 错误码
     ///
     /// + [`CondError::NotInit`] 条件量未被初始化
@@ -608,6 +614,11 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
     ///
     /// + 当返回自旋锁的守卫 [`SpinlockGuard`] 时，自旋锁已经被重新上锁；
     /// + 当返回 [`Err`] 时，自旋锁未被上锁。
+    ///
+    /// # 参数说明
+    ///
+    /// + cond: 条件量的引用
+    /// + to: 期望唤醒的时间点
     ///
     /// # 错误码
     ///
@@ -711,6 +722,10 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
     ///
     /// + 当返回自旋锁的守卫 [`SpinlockGuard`] 时，自旋锁已经被重新上锁；
     /// + 当返回 [`Err`] 时，自旋锁未被上锁。
+    ///
+    /// # 参数说明
+    ///
+    /// + cond: 条件量的引用
     ///
     /// # 错误码
     ///

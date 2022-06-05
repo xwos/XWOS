@@ -110,6 +110,9 @@ xwer_t xwos_pm_resume(void)
  * @return 电源管理阶段 @ref xwos_pm_stage_em
  * @note
  * + 上下文：任意
+ * @details
+ * 电源管理是复杂的异步操作，当系统正在进入低功耗、或从低功耗唤醒时可通过此函数获取进展的阶段。
+ * 返回值取值 @ref xwos_pm_stage_em
  */
 static __xwos_inline_api
 xwsq_t xwos_pm_get_stage(void)

@@ -25,6 +25,8 @@ pub type PmCallback = extern "C" fn(*mut c_void);
 
 /// 设置电源管理的回调函数
 ///
+/// # 参数说明
+///
 /// + resume_cb: 从暂停模式恢复的回调函数
 /// + suspend_cb: 进入暂停模式的回调函数
 /// + wakeup_cb: 唤醒时回调函数
@@ -96,6 +98,11 @@ impl PmStage {
     pub const RUNNING: PmStage = PmStage(4);
 }
 
+/// 获取当前电源管理阶段
+///
+/// 电源管理是复杂的异步操作，当系统正在进入低功耗、或从低功耗唤醒时可通过此函数获取进展的阶段。
+///
+/// 返回值是枚举 [`PmStage`] 。
 pub fn get_stage() -> PmStage {
     unsafe {
         PmStage(xwrustffi_pm_get_stage())

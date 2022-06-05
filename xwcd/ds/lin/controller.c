@@ -197,11 +197,9 @@ xwer_t xwds_linc_vop_resume(struct xwds_linc * linc)
  * @retval -EFAULT: 无效指针
  * @retval -ENOSYS: 控制器不支持主机模式发送
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 上下文：线程
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_linc_msttx(struct xwds_linc * linc,
@@ -253,11 +251,9 @@ err_linc_grab:
  * @retval -EFAULT: 无效指针
  * @retval -ENOSYS: 控制器不支持从机模式发送
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 上下文：线程
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_linc_slvtx(struct xwds_linc * linc,
@@ -309,11 +305,9 @@ err_linc_grab:
  * @retval -EFAULT: 无效指针
  * @retval -ENOSYS: 控制器不支持接收
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 上下文：线程
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_linc_rx(struct xwds_linc * linc,
@@ -358,9 +352,7 @@ err_linc_grab:
  * @retval -EFAULT: 无效指针
  * @retval -ENODEV: 找不到ID
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
 __xwds_api
 xwer_t xwds_linc_get_msg_size(struct xwds_linc * linc,

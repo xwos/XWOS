@@ -336,16 +336,17 @@ impl<T: ?Sized> Seqlock<T> {
     ///   + [`SeqlockGuard`] 中包含 [`Seqlock`] 的引用， 当 [`SeqlockGuard`] 生命周期结束时，会在 [`drop()`] 方法中自动解锁顺序锁。
     /// + 若失败，将返回错误码 [`SeqlockError`] 。
     ///
-    /// # 锁模式 **mode**
+    /// # 参数说明
     ///
-    /// + [`SeqlockMode::WriteLock`] 写，关闭抢占
-    /// + [`SeqlockMode::WriteLockBh`] 写，关闭抢占、中断底半部
-    /// + [`SeqlockMode::WriteLockCpuirq`] 写，关闭抢占、中断底半部和中断
-    /// + [`SeqlockMode::WriteLockCpuirqSave(None)`] 写，关闭抢占、中断底半部和中断，并保存之前的中断标志
-    /// + [`SeqlockMode::ReadExclusiveLock`] 独占读，关闭抢占
-    /// + [`SeqlockMode::ReadExclusiveLockBh`] 独占读，关闭抢占、中断底半部
-    /// + [`SeqlockMode::ReadExclusiveLockCpuirq`] 独占读，关闭抢占、中断底半部和中断
-    /// + [`SeqlockMode::ReadExclusiveLockCpuirqSave(None)`] 独占读，关闭抢占、中断底半部和中断，并保存之前的中断标志
+    /// + mode: 锁模式
+    ///   + [`SeqlockMode::WriteLock`] 写，关闭抢占
+    ///   + [`SeqlockMode::WriteLockBh`] 写，关闭抢占、中断底半部
+    ///   + [`SeqlockMode::WriteLockCpuirq`] 写，关闭抢占、中断底半部和中断
+    ///   + [`SeqlockMode::WriteLockCpuirqSave(None)`] 写，关闭抢占、中断底半部和中断，并保存之前的中断标志
+    ///   + [`SeqlockMode::ReadExclusiveLock`] 独占读，关闭抢占
+    ///   + [`SeqlockMode::ReadExclusiveLockBh`] 独占读，关闭抢占、中断底半部
+    ///   + [`SeqlockMode::ReadExclusiveLockCpuirq`] 独占读，关闭抢占、中断底半部和中断
+    ///   + [`SeqlockMode::ReadExclusiveLockCpuirqSave(None)`] 独占读，关闭抢占、中断底半部和中断，并保存之前的中断标志
     ///
     /// # 错误码
     ///
@@ -428,16 +429,18 @@ impl<T: ?Sized> Seqlock<T> {
     ///   + [`SeqlockGuard`] 中包含 [`Seqlock`] 的引用， 当 [`SeqlockGuard`] 生命周期结束时，会在 [`drop()`] 方法中自动解锁顺序锁。
     /// + 若失败，将返回错误码 [`SeqlockError`] 。
     ///
-    /// # 锁模式 **mode**
     ///
-    /// + [`SeqlockMode::WriteLock`] 写，关闭抢占
-    /// + [`SeqlockMode::WriteLockBh`] 写，关闭抢占、中断底半部
-    /// + [`SeqlockMode::WriteLockCpuirq`] 写，关闭抢占、中断底半部和中断
-    /// + [`SeqlockMode::WriteLockCpuirqSave(None)`] 写，关闭抢占、中断底半部和中断，并保存之前的中断标志
-    /// + [`SeqlockMode::ReadExclusiveLock`] 独占读，关闭抢占
-    /// + [`SeqlockMode::ReadExclusiveLockBh`] 独占读，关闭抢占、中断底半部
-    /// + [`SeqlockMode::ReadExclusiveLockCpuirq`] 独占读，关闭抢占、中断底半部和中断
-    /// + [`SeqlockMode::ReadExclusiveLockCpuirqSave(None)`] 独占读，关闭抢占、中断底半部和中断，并保存之前的中断标志
+    /// # 参数说明
+    ///
+    /// + mode: 锁模式
+    ///   + [`SeqlockMode::WriteLock`] 写，关闭抢占
+    ///   + [`SeqlockMode::WriteLockBh`] 写，关闭抢占、中断底半部
+    ///   + [`SeqlockMode::WriteLockCpuirq`] 写，关闭抢占、中断底半部和中断
+    ///   + [`SeqlockMode::WriteLockCpuirqSave(None)`] 写，关闭抢占、中断底半部和中断，并保存之前的中断标志
+    ///   + [`SeqlockMode::ReadExclusiveLock`] 独占读，关闭抢占
+    ///   + [`SeqlockMode::ReadExclusiveLockBh`] 独占读，关闭抢占、中断底半部
+    ///   + [`SeqlockMode::ReadExclusiveLockCpuirq`] 独占读，关闭抢占、中断底半部和中断
+    ///   + [`SeqlockMode::ReadExclusiveLockCpuirqSave(None)`] 独占读，关闭抢占、中断底半部和中断，并保存之前的中断标志
     ///
     /// # 错误码
     ///
@@ -751,6 +754,10 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
     /// + 当返回顺序锁的守卫 [`SeqlockGuard`] 时，顺序锁已经被重新上锁；
     /// + 当返回 [`Err`] 时，顺序锁未被上锁。
     ///
+    /// # 参数说明
+    ///
+    /// + cond: 条件量的引用
+    ///
     /// # 错误码
     ///
     /// + [`CondError::NotInit`] 条件量未被初始化
@@ -865,6 +872,11 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
     ///
     /// + 当返回顺序锁的守卫 [`SeqlockGuard`] 时，顺序锁已经被重新上锁；
     /// + 当返回 [`Err`] 时，顺序锁未被上锁。
+    ///
+    /// # 参数说明
+    ///
+    /// + cond: 条件量的引用
+    /// + to: 期望唤醒的时间点
     ///
     /// # 错误码
     ///
@@ -982,6 +994,10 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
     ///
     /// + 当返回顺序锁的守卫 [`SeqlockGuard`] 时，顺序锁已经被重新上锁；
     /// + 当返回 [`Err`] 时，顺序锁未被上锁。
+    ///
+    /// # 参数说明
+    ///
+    /// + cond: 条件量的引用
     ///
     /// # 错误码
     ///

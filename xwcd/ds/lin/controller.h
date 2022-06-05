@@ -105,12 +105,12 @@ struct xwds_linc {
         const struct xwds_lin_cfg * cfg; /**< 配置s */
         const struct xwds_lin_msg_info * msgitable; /**< LIN消息信息表 */
         xwsz_t msgitable_itemnum; /**< LIN消息信息表条目数量 */
-        xwer_t (*get_msg_size)(struct xwds_linc *,
-                               xwu8_t ,
-                               xwu8_t *); /**< 虚函数：从LIN消息表中查询消息的大小。
-                                               默认 @ref xwds_linc_get_msg_size()
-                                               用户可以重载这个函数以便实现
-                                               高效率的查询算法。*/
+        xwer_t ( *get_msg_size)(struct xwds_linc *,
+                                xwu8_t ,
+                                xwu8_t *); /**< 虚函数：从LIN消息表中查询消息的大小。
+                                                默认 @ref xwds_linc_get_msg_size()
+                                                用户可以重载这个函数以便实现
+                                                高效率的查询算法。*/
 
         /* private */
         struct xwos_mtx txlock; /**< 提供多线程访问安全的锁 */

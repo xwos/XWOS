@@ -450,6 +450,10 @@ impl ThdD {
     }
 
     /// 将线程迁移到目标CPU
+    ///
+    /// # 参数说明
+    ///
+    /// + cpuid: 目标CPU的ID
     pub fn migrate(&self, cpuid: XwId) -> XwEr {
         unsafe {
             xwrustffi_thd_migrate(self.thd, self.tik, cpuid)
@@ -488,9 +492,9 @@ pub enum ThdJoinState {
 /// + [`stack_size`] 设置线程的栈大小
 /// + [`privileged`] 设置线程的系统权限
 ///
-/// [`spawn`] 方法将获取构建器的所有权，并使用给定的配置创建线程，返回 [`core::result::Result`] 。
+/// [`spawn`] 方法将获取构建器的所有权，并使用给定的配置创建线程，返回 [`Result`] 。
 ///
-/// [`thd::spawn`] 独立的函数，并使用默认配置的 `DThdBuilder`创建线程，返回 [`core::result::Result`] 。
+/// [`thd::spawn`] 独立的函数，并使用默认配置的 `DThdBuilder`创建线程，返回 [`Result`] 。
 ///
 ///
 /// # 示例
@@ -511,7 +515,7 @@ pub enum ThdJoinState {
 /// [`privileged`]: DThdBuilder::privileged
 /// [`spawn`]: DThdBuilder::spawn
 /// [`thd::spawn`]: spawn
-/// [`core::result::Result`]: <https://doc.rust-lang.org/core/result/enum.Result.html>
+/// [`Result`]: <https://doc.rust-lang.org/core/result/enum.Result.html>
 pub struct DThdBuilder {
     /// 线程的名字
     name: Option<String>,
@@ -611,14 +615,18 @@ impl DThdBuilder {
 
     /// 消费 `DThdBuilder` ，并新建一个动态线程
     ///
-    /// + 创建线程成功，返回一个包含 [`DThdHandle`] 的 [`core::result::Result`] ；
-    /// + 创建线程失败，返回一个包含 [`XwEr`] 的 [`core::result::Result`] ， [`XwEr`] 指示错误的原因。
+    /// + 创建线程成功，返回一个包含 [`DThdHandle`] 的 [`Result`] ；
+    /// + 创建线程失败，返回一个包含 [`XwEr`] 的 [`Result`] ， [`XwEr`] 指示错误的原因。
     ///
     /// 方法的签名：
     ///
     /// + [`'static`] 约束是因为新建的线程可能比调用者的生命周期更长，因此线程的闭包和返回值的生命周期限定为静态生命周期；
     /// + [`Send`] 约束是因为闭包和返回值需要在线程之间进行转移。并且被移动到 [`Send`] 约束的闭包的变量也必须是 [`Send`] 的，否则编译器会报错。
     ///   RUSTC是通过 [`Send`] 约束来区分闭包是不是另一线程的代码的。
+    ///
+    /// # 参数说明
+    ///
+    /// + f: 线程的闭包
     ///
     /// # 示例
     ///
@@ -649,7 +657,7 @@ impl DThdBuilder {
     ///     }
     /// };
     /// ```
-    /// [`core::result::Result`]: <https://doc.rust-lang.org/core/result/enum.Result.html>
+    /// [`Result`]: <https://doc.rust-lang.org/core/result/enum.Result.html>
     /// [`'static`]: <https://doc.rust-lang.org/std/keyword.static.html>
     /// [`Send`]: <https://doc.rust-lang.org/core/marker/trait.Send.html>
     pub fn spawn<F, R>(self, f: F) -> Result<DThdHandle<R>, XwEr>
@@ -663,10 +671,14 @@ impl DThdBuilder {
 
     /// 消费 `DThdBuilder` ，并产生一个新的动态线程
     ///
-    /// + 创建线程成功，返回一个包含 [`DThdHandle`] 的 [`core::result::Result`] ；
-    /// + 创建线程失败，返回一个包含 [`XwEr`] 的 [`core::result::Result`] ， [`XwEr`] 指示错误的原因。
+    /// + 创建线程成功，返回一个包含 [`DThdHandle`] 的 [`Result`] ；
+    /// + 创建线程失败，返回一个包含 [`XwEr`] 的 [`Result`] ， [`XwEr`] 指示错误的原因。
     ///
     /// 此方法只要求闭包 `F` 和 返回值 `R` 的生命周期一样长，然后不做其他限制，因此是 `unsafe` 的。
+    ///
+    /// # 参数说明
+    ///
+    /// + f: 线程的闭包
     ///
     /// # 示例
     ///
@@ -697,7 +709,7 @@ impl DThdBuilder {
     ///     }
     /// };
     /// ```
-    /// [`core::result::Result`]: <https://doc.rust-lang.org/core/result/enum.Result.html>
+    /// [`Result`]: <https://doc.rust-lang.org/core/result/enum.Result.html>
     pub unsafe fn spawn_unchecked<'a, F, R>(self, f: F) -> Result<DThdHandle<R>, XwEr>
     where
         F: FnOnce(Arc<DThdElement>) -> R,
@@ -743,8 +755,8 @@ impl DThdBuilder {
 
 /// 新建一个动态线程
 ///
-/// + 创建线程成功，返回一个包含 [`DThdHandle`] 的 [`core::result::Result`] ；
-/// + 创建线程失败，返回一个包含 [`XwEr`] 的 [`core::result::Result`] ， [`XwEr`] 指示错误的原因。
+/// + 创建线程成功，返回一个包含 [`DThdHandle`] 的 [`Result`] ；
+/// + 创建线程失败，返回一个包含 [`XwEr`] 的 [`Result`] ， [`XwEr`] 指示错误的原因。
 ///
 /// 此方法使用默认的线程工厂创建线程。
 ///
@@ -755,6 +767,10 @@ impl DThdBuilder {
 /// + [`'static`] 约束是因为新建的线程可能比调用者的生命周期更长，因此线程的闭包和返回值的生命周期限定为静态生命周期；
 /// + [`Send`] 约束是因为闭包和返回值需要在线程之间进行转移。并且被移动到 [`Send`] 约束的闭包的变量也必须是 [`Send`] 的，否则编译器会报错。
 ///   RUSTC是通过 [`Send`] 约束来区分闭包是不是另一线程的代码的。
+///
+/// # 参数说明
+///
+/// + f: 线程的闭包
 ///
 /// # 示例
 ///
@@ -781,7 +797,7 @@ impl DThdBuilder {
 ///     },
 /// };
 /// ```
-/// [`core::result::Result`]: <https://doc.rust-lang.org/core/result/enum.Result.html>
+/// [`Result`]: <https://doc.rust-lang.org/core/result/enum.Result.html>
 /// [`drop()`]: <https://doc.rust-lang.org/core/ops/trait.Drop.html#tymethod.drop>
 /// [`join()`]: DThdHandle::join
 /// [`'static`]: <https://doc.rust-lang.org/std/keyword.static.html>
@@ -1180,6 +1196,11 @@ where
     ///
     /// 此方法是编译期方法。
     ///
+    /// # 参数说明
+    ///
+    /// + name: 线程的名字
+    /// + privileged: 线程的是否具有系统特权
+    ///
     /// # 示例
     ///
     /// ```rust
@@ -1213,7 +1234,6 @@ where
     /// 线程函数的原型为 `fn(&Self) -> R` ，线程运行时，系统会以静态线程自身的引用作为参数调用线程函数 `f` 。
     ///
     /// 用户可通过此引用调用线程的方法或访问线程的名字，栈大小等信息。
-    ///
     ///
     /// # 返回值
     ///
