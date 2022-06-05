@@ -209,29 +209,7 @@ struct xwds_soc {
 
 void xwds_soc_construct(struct xwds_soc * soc);
 void xwds_soc_destruct(struct xwds_soc * soc);
-
-/**
- * @brief XWDS API：增加对象的引用计数
- * @param[in] soc: SOC对象指针
- * @return 错误码
- * @retval @ref xwds_device_grab()
- */
-static __xwds_inline_api
-xwer_t xwds_soc_grab(struct xwds_soc * soc)
-{
-        return xwds_device_grab(&soc->dev);
-}
-
-/**
- * @brief XWDS API：减少对象的引用计数
- * @param[in] soc: SOC对象指针
- * @return 错误码
- * @retval @ref xwds_device_put()
- */
-static __xwds_inline_api
-xwer_t xwds_soc_put(struct xwds_soc * soc)
-{
-        return xwds_device_put(&soc->dev);
-}
+xwer_t xwds_soc_grab(struct xwds_soc * soc);
+xwer_t xwds_soc_put(struct xwds_soc * soc);
 
 #endif /* xwcd/ds/soc/chip.h */

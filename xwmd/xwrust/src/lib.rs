@@ -105,10 +105,13 @@ pub mod xwbmp;
 
 pub mod xwtm;
 
+pub mod xwmm;
+
 #[allow(dead_code)]
 pub mod xwos;
 
 #[allow(dead_code)]
 pub mod xwmd;
 
-pub mod xwmm;
+#[macro_use]
+pub mod xwds;

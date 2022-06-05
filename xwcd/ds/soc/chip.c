@@ -75,6 +75,26 @@ void xwds_soc_destruct(struct xwds_soc * soc)
         xwds_device_destruct(&soc->dev);
 }
 
+/**
+ * @brief XWDS API：增加对象的引用计数
+ * @param[in] soc: SOC对象指针
+ */
+__xwds_api
+xwer_t xwds_soc_grab(struct xwds_soc * soc)
+{
+        return xwds_device_grab(&soc->dev);
+}
+
+/**
+ * @brief XWDS API：减少对象的引用计数
+ * @param[in] soc: SOC对象指针
+ */
+__xwds_api
+xwer_t xwds_soc_put(struct xwds_soc * soc)
+{
+        return xwds_device_put(&soc->dev);
+}
+
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测SOC
