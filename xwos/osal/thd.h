@@ -499,6 +499,8 @@ bool xwos_cthd_frz_shld_stop(bool * frozen)
  * + 上下文：线程
  * @details
  * 调用此函数的线程会睡眠 `dur` ，也即是线程会在 `当前时间点` + `dur` 时被唤醒。
+ *
+ * 此函数等价于 `xwos_cthd_sleep_to(xwtm_ft(xwtm_s(dur)))` 。
  */
 static __xwos_inline_api
 xwer_t xwos_cthd_sleep(xwtm_t dur)

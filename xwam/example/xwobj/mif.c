@@ -35,6 +35,19 @@
 #include <xwmd/isc/xwpcp/protocol.h>
 #include <xwmd/isc/xwscp/protocol.h>
 #include <xwam/example/xwobj/mif.h>
+#include <xwcd/ds/object.h>
+#include <xwcd/ds/device.h>
+#include <xwcd/ds/soc/chip.h>
+#include <xwcd/ds/uart/dma.h>
+#include <xwcd/ds/uart/general.h>
+#include <xwcd/ds/i2c/master.h>
+#include <xwcd/ds/i2c/perpheral.h>
+#include <xwcd/ds/spi/master.h>
+#include <xwcd/ds/spi/perpheral.h>
+#include <xwcd/ds/can/controller.h>
+#include <xwcd/ds/can/transceiver.h>
+#include <xwcd/ds/lin/controller.h>
+#include <xwcd/ds/misc/chip.h>
 
 #define LOGTAG "xwobj"
 #define xwobjlogf(lv, fmt, ...) xwlogf(lv, LOGTAG, fmt, ##__VA_ARGS__)
@@ -72,5 +85,32 @@ xwer_t xwos_example_xwobj(void)
                   sizeof(struct xwpcp));
         xwobjlogf(INFO, "sizeof(struct xwscp): %d\n",
                   sizeof(struct xwscp));
+
+        xwobjlogf(INFO, "sizeof(struct xwds_object): %d\n",
+                  sizeof(struct xwds_object));
+        xwobjlogf(INFO, "sizeof(struct xwds_device): %d\n",
+                  sizeof(struct xwds_device));
+        xwobjlogf(INFO, "sizeof(struct xwds_soc): %d\n",
+                  sizeof(struct xwds_soc));
+        xwobjlogf(INFO, "sizeof(struct xwds_dmauartc): %d\n",
+                  sizeof(struct xwds_dmauartc));
+        xwobjlogf(INFO, "sizeof(struct xwds_uartc): %d\n",
+                  sizeof(struct xwds_uartc));
+        xwobjlogf(INFO, "sizeof(struct xwds_i2cm): %d\n",
+                  sizeof(struct xwds_i2cm));
+        xwobjlogf(INFO, "sizeof(struct xwds_i2cp): %d\n",
+                  sizeof(struct xwds_i2cp));
+        xwobjlogf(INFO, "sizeof(struct xwds_spim): %d\n",
+                  sizeof(struct xwds_spim));
+        xwobjlogf(INFO, "sizeof(struct xwds_spip): %d\n",
+                  sizeof(struct xwds_spip));
+        xwobjlogf(INFO, "sizeof(struct xwds_canc): %d\n",
+                  sizeof(struct xwds_canc));
+        xwobjlogf(INFO, "sizeof(struct xwds_cantrcv): %d\n",
+                  sizeof(struct xwds_cantrcv));
+        xwobjlogf(INFO, "sizeof(struct xwds_linc): %d\n",
+                  sizeof(struct xwds_linc));
+        xwobjlogf(INFO, "sizeof(struct xwds_misc): %d\n",
+                  sizeof(struct xwds_misc));
         return XWOK;
 }

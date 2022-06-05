@@ -53,11 +53,25 @@ macro_rules! xwos_struct {
 /// 生成GPIO PIN掩码的宏
 ///
 /// # 示例
+///
 /// ```rust
 /// let pinmsk: XwSq = pin!(0, 1, 2, 3); // 0b1111
 /// ```
 ///
 #[macro_export]
 macro_rules! pin {
+    ($($pos:expr),*) => ($((1 << $pos) | )* 0)
+}
+
+/// 生成位掩码的宏
+///
+/// # 示例
+///
+/// ```rust
+/// let pinmsk: XwSq = bit!(0, 1, 2, 3); // 0b1111
+/// ```
+///
+#[macro_export]
+macro_rules! bit {
     ($($pos:expr),*) => ($((1 << $pos) | )* 0)
 }

@@ -121,7 +121,7 @@ fn resume() {
 
 fn req_eirq(soc: &Soc) -> XwEr {
     soc.eirq_req(GpioPort::C, pin!(13), 13,
-                 EirqFlag::from(EirqFlag::RISING | EirqFlag::WKUP),
+                 EirqFlag::RISING | EirqFlag::WKUP,
                  isr)
 }
 

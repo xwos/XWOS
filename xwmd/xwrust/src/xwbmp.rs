@@ -307,9 +307,9 @@ where
 {
     type Output = Self;
 
-    fn bitand(self, rhs: Self) -> Self {
+    fn bitand(self, other: Self) -> Self {
         unsafe {
-            xwbmpop_and(self.bmp.get() as _, rhs.bmp.get() as _, N);
+            xwbmpop_and(self.bmp.get() as _, other.bmp.get() as _, N);
             self
         }
     }
@@ -319,9 +319,9 @@ impl<const N: XwSz> BitAndAssign for Bmp<N>
 where
     [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
 {
-    fn bitand_assign(&mut self, rhs: Self){
+    fn bitand_assign(&mut self, other: Self) {
         unsafe {
-            xwbmpop_and(self.bmp.get() as _, rhs.bmp.get() as _, N);
+            xwbmpop_and(self.bmp.get() as _, other.bmp.get() as _, N);
         }
     }
 }
@@ -332,9 +332,9 @@ where
 {
     type Output = Self;
 
-    fn bitor(self, rhs: Self) -> Self {
+    fn bitor(self, other: Self) -> Self {
         unsafe {
-            xwbmpop_or(self.bmp.get() as _, rhs.bmp.get() as _, N);
+            xwbmpop_or(self.bmp.get() as _, other.bmp.get() as _, N);
             self
         }
     }
@@ -344,9 +344,9 @@ impl<const N: XwSz> BitOrAssign for Bmp<N>
 where
     [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
 {
-    fn bitor_assign(&mut self, rhs: Self){
+    fn bitor_assign(&mut self, other: Self) {
         unsafe {
-            xwbmpop_or(self.bmp.get() as _, rhs.bmp.get() as _, N);
+            xwbmpop_or(self.bmp.get() as _, other.bmp.get() as _, N);
         }
     }
 }
@@ -357,9 +357,9 @@ where
 {
     type Output = Self;
 
-    fn bitxor(self, rhs: Self) -> Self {
+    fn bitxor(self, other: Self) -> Self {
         unsafe {
-            xwbmpop_xor(self.bmp.get() as _, rhs.bmp.get() as _, N);
+            xwbmpop_xor(self.bmp.get() as _, other.bmp.get() as _, N);
             self
         }
     }
@@ -369,9 +369,9 @@ impl<const N: XwSz> BitXorAssign for Bmp<N>
 where
     [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
 {
-    fn bitxor_assign(&mut self, rhs: Self){
+    fn bitxor_assign(&mut self, other: Self) {
         unsafe {
-            xwbmpop_xor(self.bmp.get() as _, rhs.bmp.get() as _, N);
+            xwbmpop_xor(self.bmp.get() as _, other.bmp.get() as _, N);
         }
     }
 }

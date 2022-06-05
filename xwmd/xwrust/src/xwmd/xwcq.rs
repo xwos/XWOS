@@ -358,6 +358,10 @@ where
     /// + 发送时，数据类型是泛型 `T` ，`T` 必须是 [`Sized`] 的，数据是被逐字节地被拷贝到循环队列的数据槽内的。
     /// + 当发送的数据类型大小大于循环队列的数据槽大小 `S` ，发送会失败，并返回错误码 [`XwcqError::DataSize`] 。
     ///
+    /// # 参数说明
+    ///
+    /// + data: 类型为 `T` 的数据
+    ///
     /// # 错误码
     ///
     /// + [`XwcqError::Ok`] 没有错误
@@ -398,20 +402,20 @@ where
     /// ```
     ///
     /// [`Sized`]: <https://doc.rust-lang.org/std/marker/trait.Sized.html>
-    pub fn eq<T>(&self, sdu: T) -> Result<XwSz, XwcqError>
+    pub fn eq<T>(&self, data: T) -> Result<XwSz, XwcqError>
     where
         T: Sized + Send
     {
         unsafe {
-            let mut sdusz: XwSz = mem::size_of::<T>();
-            if sdusz <= self.size() {
+            let mut datasz: XwSz = mem::size_of::<T>();
+            if datasz <= self.size() {
                 let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
-                    let refsdu = &sdu as *const T;
-                    rc = xwcq_eq(self.cq.get(), refsdu as *const u8, &mut sdusz as _);
+                    let refdata = &data as *const T;
+                    rc = xwcq_eq(self.cq.get(), refdata as *const u8, &mut datasz as _);
                     xwcq_put(self.cq.get());
                     if XWOK == rc {
-                        Ok(sdusz)
+                        Ok(datasz)
                     } else {
                         Err(XwcqError::Unknown(rc))
                     }
@@ -429,6 +433,10 @@ where
     /// + 如果队列数据已满，不会阻塞发送者，循环队列会将最后面（最新的）的数据丢弃，腾出空间将新数据放入队列。
     /// + 发送时，数据类型是泛型 `T` ，`T` 必须是 [`Sized`] 的，数据是被逐字节地被拷贝到循环队列的数据槽内的。
     /// + 当发送的数据类型大小大于循环队列的数据槽大小 `S` ，发送会失败，并返回错误码 [`XwcqError::DataSize`] 。
+    ///
+    /// # 参数说明
+    ///
+    /// + data: 类型为 `T` 的数据
     ///
     /// # 错误码
     ///
@@ -470,20 +478,20 @@ where
     /// ```
     ///
     /// [`Sized`]: <https://doc.rust-lang.org/std/marker/trait.Sized.html>
-    pub fn jq<T>(&self, sdu: T) -> Result<XwSz, XwcqError>
+    pub fn jq<T>(&self, data: T) -> Result<XwSz, XwcqError>
     where
         T: Sized + Send
     {
         unsafe {
-            let mut sdusz: XwSz = mem::size_of::<T>();
-            if sdusz <= self.size() {
+            let mut datasz: XwSz = mem::size_of::<T>();
+            if datasz <= self.size() {
                 let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
-                    let refsdu = &sdu as *const T;
-                    rc = xwcq_jq(self.cq.get(), refsdu as *const u8, &mut sdusz as _);
+                    let refdata = &data as *const T;
+                    rc = xwcq_jq(self.cq.get(), refdata as *const u8, &mut datasz as _);
                     xwcq_put(self.cq.get());
                     if XWOK == rc {
-                        Ok(sdusz)
+                        Ok(datasz)
                     } else {
                         Err(XwcqError::Unknown(rc))
                     }
@@ -545,16 +553,16 @@ where
         T: Sized + Send
     {
         unsafe {
-            let mut sdusz: XwSz = mem::size_of::<T>();
-            if sdusz <= self.size() {
+            let mut datasz: XwSz = mem::size_of::<T>();
+            if datasz <= self.size() {
                 let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
-                    let mut sdu: T = mem::zeroed();
+                    let mut data: T = mem::zeroed();
                     rc = xwcq_dq(self.cq.get(),
-                                 &mut sdu as *mut T as *mut u8, &mut sdusz as _);
+                                 &mut data as *mut T as *mut u8, &mut datasz as _);
                     xwcq_put(self.cq.get());
                     if XWOK == rc {
-                        Ok(sdu)
+                        Ok(data)
                     } else if  -EINTR == rc {
                         Err(XwcqError::Interrupt(rc))
                     } else if -ENOTTHDCTX == rc {
@@ -584,6 +592,10 @@ where
     /// + 当 `T` 大小大于循环队列的数据槽大小 `S` ，接收会失败，并返回错误码 [`XwcqError::DataSize`] 。
     /// + 当线程阻塞等待被中断时，返回错误码 [`XwcqError::Interrupt`] 。
     /// + 当到达指定的唤醒时间点，线程被唤醒，返回错误码 [`XwcqError::Timedout`] 。
+    ///
+    /// # 参数说明
+    ///
+    /// + to: 期望唤醒的时间点
     ///
     /// # 上下文
     ///
@@ -626,17 +638,17 @@ where
         T: Sized + Send
     {
         unsafe {
-            let mut sdusz: XwSz = mem::size_of::<T>();
-            if sdusz <= self.size() {
+            let mut datasz: XwSz = mem::size_of::<T>();
+            if datasz <= self.size() {
                 let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
-                    let mut sdu: T = mem::zeroed();
+                    let mut data: T = mem::zeroed();
                     rc = xwcq_dq_to(self.cq.get(),
-                                    &mut sdu as *mut T as *mut u8, &mut sdusz as _,
+                                    &mut data as *mut T as *mut u8, &mut datasz as _,
                                     to);
                     xwcq_put(self.cq.get());
                     if XWOK == rc {
-                        Ok(sdu)
+                        Ok(data)
                     } else if  -EINTR == rc {
                         Err(XwcqError::Interrupt(rc))
                     } else if -ETIMEDOUT == rc {
@@ -706,16 +718,16 @@ where
         T: Sized + Send
     {
         unsafe {
-            let mut sdusz: XwSz = mem::size_of::<T>();
-            if sdusz <= self.size() {
+            let mut datasz: XwSz = mem::size_of::<T>();
+            if datasz <= self.size() {
                 let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
-                    let mut sdu: T = mem::zeroed();
+                    let mut data: T = mem::zeroed();
                     rc = xwcq_trydq(self.cq.get(),
-                                    &mut sdu as *mut T as *mut u8, &mut sdusz as _);
+                                    &mut data as *mut T as *mut u8, &mut datasz as _);
                     xwcq_put(self.cq.get());
                     if XWOK == rc {
-                        Ok(sdu)
+                        Ok(data)
                     } else if -ENODATA == rc {
                         Err(XwcqError::NoData(rc))
                     } else {
@@ -779,16 +791,16 @@ where
         T: Sized + Send
     {
         unsafe {
-            let mut sdusz: XwSz = mem::size_of::<T>();
-            if sdusz <= self.size() {
+            let mut datasz: XwSz = mem::size_of::<T>();
+            if datasz <= self.size() {
                 let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
-                    let mut sdu: T = mem::zeroed();
+                    let mut data: T = mem::zeroed();
                     rc = xwcq_rq(self.cq.get(),
-                                 &mut sdu as *mut T as *mut u8, &mut sdusz as _);
+                                 &mut data as *mut T as *mut u8, &mut datasz as _);
                     xwcq_put(self.cq.get());
                     if XWOK == rc {
-                        Ok(sdu)
+                        Ok(data)
                     } else if  -EINTR == rc {
                         Err(XwcqError::Interrupt(rc))
                     } else if -ENOTTHDCTX == rc {
@@ -818,6 +830,10 @@ where
     /// + 当 `T` 大小大于循环队列的数据槽大小 `S` ，接收会失败，并返回错误码 [`XwcqError::DataSize`] 。
     /// + 当线程阻塞等待被中断时，返回错误码 [`XwcqError::Interrupt`] 。
     /// + 当到达指定的唤醒时间点，线程被唤醒，返回错误码 [`XwcqError::Timedout`] 。
+    ///
+    /// # 参数说明
+    ///
+    /// + to: 期望唤醒的时间点
     ///
     /// # 上下文
     ///
@@ -860,17 +876,17 @@ where
         T: Sized + Send
     {
         unsafe {
-            let mut sdusz: XwSz = mem::size_of::<T>();
-            if sdusz <= self.size() {
+            let mut datasz: XwSz = mem::size_of::<T>();
+            if datasz <= self.size() {
                 let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
-                    let mut sdu: T = mem::zeroed();
+                    let mut data: T = mem::zeroed();
                     rc = xwcq_rq_to(self.cq.get(),
-                                    &mut sdu as *mut T as *mut u8, &mut sdusz as _,
+                                    &mut data as *mut T as *mut u8, &mut datasz as _,
                                     to);
                     xwcq_put(self.cq.get());
                     if XWOK == rc {
-                        Ok(sdu)
+                        Ok(data)
                     } else if  -EINTR == rc {
                         Err(XwcqError::Interrupt(rc))
                     } else if -ETIMEDOUT == rc {
@@ -940,16 +956,16 @@ where
         T: Sized + Send
     {
         unsafe {
-            let mut sdusz: XwSz = mem::size_of::<T>();
-            if sdusz <= self.size() {
+            let mut datasz: XwSz = mem::size_of::<T>();
+            if datasz <= self.size() {
                 let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
-                    let mut sdu: T = mem::zeroed();
+                    let mut data: T = mem::zeroed();
                     rc = xwcq_tryrq(self.cq.get(),
-                                    &mut sdu as *mut T as *mut u8, &mut sdusz as _);
+                                    &mut data as *mut T as *mut u8, &mut datasz as _);
                     xwcq_put(self.cq.get());
                     if XWOK == rc {
-                        Ok(sdu)
+                        Ok(data)
                     } else if -ENODATA == rc {
                         Err(XwcqError::NoData(rc))
                     } else {
@@ -1014,16 +1030,16 @@ where
         T: Sized + Send
     {
         unsafe {
-            let mut sdusz: XwSz = mem::size_of::<T>();
-            if sdusz <= self.size() {
+            let mut datasz: XwSz = mem::size_of::<T>();
+            if datasz <= self.size() {
                 let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
-                    let mut sdu: T = mem::zeroed();
+                    let mut data: T = mem::zeroed();
                     rc = xwcq_pfq(self.cq.get(),
-                                  &mut sdu as *mut T as *mut u8, &mut sdusz as _);
+                                  &mut data as *mut T as *mut u8, &mut datasz as _);
                     xwcq_put(self.cq.get());
                     if XWOK == rc {
-                        Ok(sdu)
+                        Ok(data)
                     } else if  -EINTR == rc {
                         Err(XwcqError::Interrupt(rc))
                     } else if -ENOTTHDCTX == rc {
@@ -1054,6 +1070,10 @@ where
     /// + 当 `T` 大小大于循环队列的数据槽大小 `S` ，接收会失败，并返回错误码 [`XwcqError::DataSize`] 。
     /// + 当线程阻塞等待被中断时，返回错误码 [`XwcqError::Interrupt`] 。
     /// + 当到达指定的唤醒时间点，线程被唤醒，返回错误码 [`XwcqError::Timedout`] 。
+    ///
+    /// # 参数说明
+    ///
+    /// + to: 期望唤醒的时间点
     ///
     /// # 上下文
     ///
@@ -1096,17 +1116,17 @@ where
         T: Sized + Send
     {
         unsafe {
-            let mut sdusz: XwSz = mem::size_of::<T>();
-            if sdusz <= self.size() {
+            let mut datasz: XwSz = mem::size_of::<T>();
+            if datasz <= self.size() {
                 let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
-                    let mut sdu: T = mem::zeroed();
+                    let mut data: T = mem::zeroed();
                     rc = xwcq_pfq_to(self.cq.get(),
-                                     &mut sdu as *mut T as *mut u8, &mut sdusz as _,
+                                     &mut data as *mut T as *mut u8, &mut datasz as _,
                                      to);
                     xwcq_put(self.cq.get());
                     if XWOK == rc {
-                        Ok(sdu)
+                        Ok(data)
                     } else if  -EINTR == rc {
                         Err(XwcqError::Interrupt(rc))
                     } else if -ETIMEDOUT == rc {
@@ -1177,16 +1197,16 @@ where
         T: Sized + Send
     {
         unsafe {
-            let mut sdusz: XwSz = mem::size_of::<T>();
-            if sdusz <= self.size() {
+            let mut datasz: XwSz = mem::size_of::<T>();
+            if datasz <= self.size() {
                 let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
-                    let mut sdu: T = mem::zeroed();
+                    let mut data: T = mem::zeroed();
                     rc = xwcq_trypfq(self.cq.get(),
-                                     &mut sdu as *mut T as *mut u8, &mut sdusz as _);
+                                     &mut data as *mut T as *mut u8, &mut datasz as _);
                     xwcq_put(self.cq.get());
                     if XWOK == rc {
-                        Ok(sdu)
+                        Ok(data)
                     } else if -ENODATA == rc {
                         Err(XwcqError::NoData(rc))
                     } else {
@@ -1251,16 +1271,16 @@ where
         T: Sized + Send
     {
         unsafe {
-            let mut sdusz: XwSz = mem::size_of::<T>();
-            if sdusz <= self.size() {
+            let mut datasz: XwSz = mem::size_of::<T>();
+            if datasz <= self.size() {
                 let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
-                    let mut sdu: T = mem::zeroed();
+                    let mut data: T = mem::zeroed();
                     rc = xwcq_prq(self.cq.get(),
-                                  &mut sdu as *mut T as *mut u8, &mut sdusz as _);
+                                  &mut data as *mut T as *mut u8, &mut datasz as _);
                     xwcq_put(self.cq.get());
                     if XWOK == rc {
-                        Ok(sdu)
+                        Ok(data)
                     } else if  -EINTR == rc {
                         Err(XwcqError::Interrupt(rc))
                     } else if -ENOTTHDCTX == rc {
@@ -1291,6 +1311,10 @@ where
     /// + 当 `T` 大小大于循环队列的数据槽大小 `S` ，接收会失败，并返回错误码 [`XwcqError::DataSize`] 。
     /// + 当线程阻塞等待被中断时，返回错误码 [`XwcqError::Interrupt`] 。
     /// + 当到达指定的唤醒时间点，线程被唤醒，返回错误码 [`XwcqError::Timedout`] 。
+    ///
+    /// # 参数说明
+    ///
+    /// + to: 期望唤醒的时间点
     ///
     /// # 上下文
     ///
@@ -1333,17 +1357,17 @@ where
         T: Sized + Send
     {
         unsafe {
-            let mut sdusz: XwSz = mem::size_of::<T>();
-            if sdusz <= self.size() {
+            let mut datasz: XwSz = mem::size_of::<T>();
+            if datasz <= self.size() {
                 let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
-                    let mut sdu: T = mem::zeroed();
+                    let mut data: T = mem::zeroed();
                     rc = xwcq_prq_to(self.cq.get(),
-                                     &mut sdu as *mut T as *mut u8, &mut sdusz as _,
+                                     &mut data as *mut T as *mut u8, &mut datasz as _,
                                      to);
                     xwcq_put(self.cq.get());
                     if XWOK == rc {
-                        Ok(sdu)
+                        Ok(data)
                     } else if  -EINTR == rc {
                         Err(XwcqError::Interrupt(rc))
                     } else if -ETIMEDOUT == rc {
@@ -1414,16 +1438,16 @@ where
         T: Sized + Send
     {
         unsafe {
-            let mut sdusz: XwSz = mem::size_of::<T>();
-            if sdusz <= self.size() {
+            let mut datasz: XwSz = mem::size_of::<T>();
+            if datasz <= self.size() {
                 let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
-                    let mut sdu: T = mem::zeroed();
+                    let mut data: T = mem::zeroed();
                     rc = xwcq_tryprq(self.cq.get(),
-                                     &mut sdu as *mut T as *mut u8, &mut sdusz as _);
+                                     &mut data as *mut T as *mut u8, &mut datasz as _);
                     xwcq_put(self.cq.get());
                     if XWOK == rc {
-                        Ok(sdu)
+                        Ok(data)
                     } else if -ENODATA == rc {
                         Err(XwcqError::NoData(rc))
                     } else {
