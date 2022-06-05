@@ -112,25 +112,53 @@ extern "C" {
 #[derive(Debug)]
 pub enum BrError {
     /// 没有错误
-    Ok,
+    Ok(XwEr),
     /// 线程栅栏没有初始化
-    NotInit,
+    NotInit(XwEr),
     /// 线程数量超出范围
-    OutOfRange,
+    OutOfRange(XwEr),
     /// 等待被中断
-    Interrupt,
+    Interrupt(XwEr),
     /// 等待超时
-    Timedout,
+    Timedout(XwEr),
     /// 不在线程上下文内
-    NotThreadContext,
+    NotThreadContext(XwEr),
     /// 信号选择器的位置超出范围
-    OutOfSelPos,
-    /// 信号量已经绑定
-    AlreadyBound,
+    OutOfSelPos(XwEr),
+    /// 事件标志已经绑定
+    AlreadyBound(XwEr),
     /// 信号选择器的位置被占用
-    SelPosBusy,
+    SelPosBusy(XwEr),
     /// 未知错误
     Unknown(XwEr),
+}
+
+impl BrError {
+    /// 消费掉 `BrError` 自身，返回内部的错误码。
+    pub fn unwrap(self) -> XwEr {
+        match self {
+            Self::Ok(rc) => rc,
+            Self::NotInit(rc) => rc,
+            Self::OutOfRange(rc) => rc,
+            Self::Interrupt(rc) => rc,
+            Self::Timedout(rc) => rc,
+            Self::NotThreadContext(rc) => rc,
+            Self::OutOfSelPos(rc) => rc,
+            Self::AlreadyBound(rc) => rc,
+            Self::SelPosBusy(rc) => rc,
+            Self::Unknown(rc) => rc,
+        }
+    }
+
+    /// 如果错误码是 [`BrError::Ok`] ，返回 `true` 。
+    pub const fn is_ok(&self) -> bool {
+        matches!(*self, Self::Ok(_))
+    }
+
+    /// 如果错误码不是 [`BrError::Ok`] ，返回 `true` 。
+    pub const fn is_err(&self) -> bool {
+        !self.is_ok()
+    }
 }
 
 /// XWOS线程栅栏对象占用的内存大小
@@ -312,18 +340,18 @@ where
                 rc = xwrustffi_br_wait(self.br.get() as _);
                 xwrustffi_br_put(self.br.get() as _);
                 if XWOK == rc {
-                    BrError::Ok
+                    BrError::Ok(rc)
                 } else if -ECHRNG == rc {
-                    BrError::OutOfRange
+                    BrError::OutOfRange(rc)
                 } else if -EINTR == rc {
-                    BrError::Interrupt
+                    BrError::Interrupt(rc)
                 } else if -ENOTTHDCTX == rc {
-                    BrError::NotThreadContext
+                    BrError::NotThreadContext(rc)
                 } else {
                     BrError::Unknown(rc)
                 }
             } else {
-                BrError::NotInit
+                BrError::NotInit(rc)
             }
         }
     }
@@ -374,20 +402,20 @@ where
                 rc = xwrustffi_br_wait_to(self.br.get() as _, to);
                 xwrustffi_br_put(self.br.get() as _);
                 if XWOK == rc {
-                    BrError::Ok
+                    BrError::Ok(rc)
                 } else if -ECHRNG == rc {
-                    BrError::OutOfRange
+                    BrError::OutOfRange(rc)
                 } else if -EINTR == rc {
-                    BrError::Interrupt
+                    BrError::Interrupt(rc)
                 } else if -ETIMEDOUT == rc {
-                    BrError::Timedout
+                    BrError::Timedout(rc)
                 } else if -ENOTTHDCTX == rc {
-                    BrError::NotThreadContext
+                    BrError::NotThreadContext(rc)
                 } else {
                     BrError::Unknown(rc)
                 }
             } else {
-                BrError::NotInit
+                BrError::NotInit(rc)
             }
         }
     }
@@ -453,16 +481,16 @@ where
                         pos: pos,
                     })
                 } else if -ECHRNG == rc {
-                    Err(BrError::OutOfSelPos)
+                    Err(BrError::OutOfSelPos(rc))
                 } else if -EALREADY == rc {
-                    Err(BrError::AlreadyBound)
+                    Err(BrError::AlreadyBound(rc))
                 } else if -EBUSY == rc {
-                    Err(BrError::SelPosBusy)
+                    Err(BrError::SelPosBusy(rc))
                 } else {
                     Err(BrError::Unknown(rc))
                 }
             } else {
-                Err(BrError::NotInit)
+                Err(BrError::NotInit(rc))
             }
         }
     }

@@ -159,33 +159,65 @@ extern "C" {
 #[derive(Debug)]
 pub enum SemError {
     /// 没有错误
-    Ok,
+    Ok(XwEr),
     /// 信号量没有初始化
-    NotInit,
+    NotInit(XwEr),
     /// 信号量已被冻结
-    AlreadyFrozen,
+    AlreadyFrozen(XwEr),
     /// 信号量已解冻
-    AlreadyThawed,
+    AlreadyThawed(XwEr),
     /// 等待被中断
-    Interrupt,
+    Interrupt(XwEr),
     /// 等待超时
-    Timedout,
+    Timedout(XwEr),
     /// 不在线程上下文内
-    NotThreadContext,
+    NotThreadContext(XwEr),
     /// 抢占被关闭
-    CannotPmpt,
+    CannotPmpt(XwEr),
     /// 中断底半部被关闭
-    CannotBh,
+    CannotBh(XwEr),
     /// 信号量不可用
-    NoData,
+    NoData(XwEr),
     /// 信号选择器的位置超出范围
-    OutOfSelPos,
+    OutOfSelPos(XwEr),
     /// 信号量已经绑定
-    AlreadyBound,
+    AlreadyBound(XwEr),
     /// 信号选择器的位置被占用
-    SelPosBusy,
+    SelPosBusy(XwEr),
     /// 未知错误
     Unknown(XwEr),
+}
+
+impl SemError {
+    /// 消费掉 `SemError` 自身，返回内部的错误码。
+    pub fn unwrap(self) -> XwEr {
+        match self {
+            Self::Ok(rc) => rc,
+            Self::NotInit(rc) => rc,
+            Self::AlreadyFrozen(rc) => rc,
+            Self::AlreadyThawed(rc) => rc,
+            Self::Interrupt(rc) => rc,
+            Self::Timedout(rc) => rc,
+            Self::NotThreadContext(rc) => rc,
+            Self::CannotPmpt(rc) => rc,
+            Self::CannotBh(rc) => rc,
+            Self::NoData(rc) => rc,
+            Self::OutOfSelPos(rc) => rc,
+            Self::AlreadyBound(rc) => rc,
+            Self::SelPosBusy(rc) => rc,
+            Self::Unknown(rc) => rc,
+        }
+    }
+
+    /// 如果信号量的错误码是 [`SemError::Ok`] ，返回 `true` 。
+    pub const fn is_ok(&self) -> bool {
+        matches!(*self, Self::Ok(_))
+    }
+
+    /// 如果信号量的错误码不是 [`SemError::Ok`] ，返回 `true` 。
+    pub const fn is_err(&self) -> bool {
+        !self.is_ok()
+    }
 }
 
 /// XWOS信号量对象占用的内存大小
@@ -333,14 +365,14 @@ impl Sem {
                 rc = xwrustffi_sem_freeze(self.sem.get());
                 xwrustffi_sem_put(self.sem.get());
                 if XWOK == rc {
-                    SemError::Ok
+                    SemError::Ok(rc)
                 } else if -EALREADY == rc {
-                    SemError::AlreadyFrozen
+                    SemError::AlreadyFrozen(rc)
                 } else {
                     SemError::Unknown(rc)
                 }
             } else {
-                SemError::NotInit
+                SemError::NotInit(rc)
             }
         }
     }
@@ -382,14 +414,14 @@ impl Sem {
                 rc = xwrustffi_sem_thaw(self.sem.get());
                 xwrustffi_sem_put(self.sem.get());
                 if XWOK == rc {
-                    SemError::Ok
+                    SemError::Ok(rc)
                 } else if -EALREADY == rc {
-                    SemError::AlreadyThawed
+                    SemError::AlreadyThawed(rc)
                 } else {
                     SemError::Unknown(rc)
                 }
             } else {
-                SemError::NotInit
+                SemError::NotInit(rc)
             }
         }
     }
@@ -428,14 +460,14 @@ impl Sem {
                 rc = xwrustffi_sem_post(self.sem.get());
                 xwrustffi_sem_put(self.sem.get());
                 if XWOK == rc {
-                    SemError::Ok
+                    SemError::Ok(rc)
                 } else if -ENEGATIVE == rc {
-                    SemError::AlreadyFrozen
+                    SemError::AlreadyFrozen(rc)
                 } else {
                     SemError::Unknown(rc)
                 }
             } else {
-                SemError::NotInit
+                SemError::NotInit(rc)
             }
         }
     }
@@ -482,7 +514,7 @@ impl Sem {
                 xwrustffi_sem_put(self.sem.get());
                 Ok(val)
             } else {
-                Err(SemError::NotInit)
+                Err(SemError::NotInit(rc))
             }
         }
     }
@@ -535,20 +567,20 @@ impl Sem {
                 rc = xwrustffi_sem_wait(self.sem.get());
                 xwrustffi_sem_put(self.sem.get());
                 if XWOK == rc {
-                    SemError::Ok
+                    SemError::Ok(rc)
                 } else if -EINTR == rc {
-                    SemError::Interrupt
+                    SemError::Interrupt(rc)
                 } else if -ENOTTHDCTX == rc {
-                    SemError::NotThreadContext
+                    SemError::NotThreadContext(rc)
                 } else if -ECANNOTPMPT == rc {
-                    SemError::CannotPmpt
+                    SemError::CannotPmpt(rc)
                 } else if -ECANNOTBH == rc {
-                    SemError::CannotBh
+                    SemError::CannotBh(rc)
                 } else {
                     SemError::Unknown(rc)
                 }
             } else {
-                SemError::NotInit
+                SemError::NotInit(rc)
             }
         }
     }
@@ -605,22 +637,22 @@ impl Sem {
                 rc = xwrustffi_sem_wait_to(self.sem.get(), to);
                 xwrustffi_sem_put(self.sem.get());
                 if XWOK == rc {
-                    SemError::Ok
+                    SemError::Ok(rc)
                 } else if -EINTR == rc {
-                    SemError::Interrupt
+                    SemError::Interrupt(rc)
                 } else if -ETIMEDOUT == rc {
-                    SemError::Timedout
+                    SemError::Timedout(rc)
                 } else if -ENOTTHDCTX == rc {
-                    SemError::NotThreadContext
+                    SemError::NotThreadContext(rc)
                 } else if -ECANNOTPMPT == rc {
-                    SemError::CannotPmpt
+                    SemError::CannotPmpt(rc)
                 } else if -ECANNOTBH == rc {
-                    SemError::CannotBh
+                    SemError::CannotBh(rc)
                 } else {
                     SemError::Unknown(rc)
                 }
             } else {
-                SemError::NotInit
+                SemError::NotInit(rc)
             }
         }
     }
@@ -672,18 +704,18 @@ impl Sem {
                 rc = xwrustffi_sem_wait_unintr(self.sem.get());
                 xwrustffi_sem_put(self.sem.get());
                 if XWOK == rc {
-                    SemError::Ok
+                    SemError::Ok(rc)
                 } else if -ENOTTHDCTX == rc {
-                    SemError::NotThreadContext
+                    SemError::NotThreadContext(rc)
                 } else if -ECANNOTPMPT == rc {
-                    SemError::CannotPmpt
+                    SemError::CannotPmpt(rc)
                 } else if -ECANNOTBH == rc {
-                    SemError::CannotBh
+                    SemError::CannotBh(rc)
                 } else {
                     SemError::Unknown(rc)
                 }
             } else {
-                SemError::NotInit
+                SemError::NotInit(rc)
             }
         }
     }
@@ -733,14 +765,14 @@ impl Sem {
                 rc = xwrustffi_sem_trywait(self.sem.get());
                 xwrustffi_sem_put(self.sem.get());
                 if XWOK == rc {
-                    SemError::Ok
+                    SemError::Ok(rc)
                 } else if -ENODATA == rc {
-                    SemError::NoData
+                    SemError::NoData(rc)
                 } else {
                     SemError::Unknown(rc)
                 }
             } else {
-                SemError::NotInit
+                SemError::NotInit(rc)
             }
         }
     }
@@ -806,16 +838,16 @@ impl Sem {
                         pos: pos,
                     })
                 } else if -ECHRNG == rc {
-                    Err(SemError::OutOfSelPos)
+                    Err(SemError::OutOfSelPos(rc))
                 } else if -EALREADY == rc {
-                    Err(SemError::AlreadyBound)
+                    Err(SemError::AlreadyBound(rc))
                 } else if -EBUSY == rc {
-                    Err(SemError::SelPosBusy)
+                    Err(SemError::SelPosBusy(rc))
                 } else {
                     Err(SemError::Unknown(rc))
                 }
             } else {
-                Err(SemError::NotInit)
+                Err(SemError::NotInit(rc))
             }
         }
     }

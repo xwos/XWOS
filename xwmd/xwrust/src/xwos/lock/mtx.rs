@@ -227,21 +227,37 @@ extern "C" {
 #[derive(Debug)]
 pub enum MutexError {
     /// 互斥锁没有初始化
-    NotInit,
+    NotInit(XwEr),
     /// 等待被中断
-    Interrupt,
+    Interrupt(XwEr),
     /// 尝试上锁失败
-    WouldBlock,
+    WouldBlock(XwEr),
     /// 等待超时
-    Timedout,
+    Timedout(XwEr),
     /// 不在线程上下文内
-    NotThreadContext,
+    NotThreadContext(XwEr),
     /// 抢占被关闭
-    CannotPmpt,
+    CannotPmpt(XwEr),
     /// 中断底半部被关闭
-    CannotBh,
+    CannotBh(XwEr),
     /// 未知错误
     Unknown(XwEr),
+}
+
+impl MutexError {
+    /// 消费掉 `MutexError` 自身，返回内部的错误码。
+    pub fn unwrap(self) -> XwEr {
+        match self {
+            Self::NotInit(rc) => rc,
+            Self::Interrupt(rc) => rc,
+            Self::Timedout(rc) => rc,
+            Self::NotThreadContext(rc) => rc,
+            Self::CannotPmpt(rc) => rc,
+            Self::CannotBh(rc) => rc,
+            Self::WouldBlock(rc) => rc,
+            Self::Unknown(rc) => rc,
+        }
+    }
 }
 
 /// XWOS互斥锁对象占用的内存大小
@@ -382,18 +398,18 @@ impl<T: ?Sized> Mutex<T> {
                 if 0 == rc {
                     Ok(MutexGuard::new(self))
                 } else if -EINTR == rc {
-                    Err(MutexError::Interrupt)
+                    Err(MutexError::Interrupt(rc))
                 } else if -ENOTTHDCTX == rc {
-                    Err(MutexError::NotThreadContext)
+                    Err(MutexError::NotThreadContext(rc))
                 } else if -ECANNOTPMPT == rc {
-                    Err(MutexError::CannotPmpt)
+                    Err(MutexError::CannotPmpt(rc))
                 } else if -ECANNOTBH == rc {
-                    Err(MutexError::CannotBh)
+                    Err(MutexError::CannotBh(rc))
                 } else {
                     Err(MutexError::Unknown(rc))
                 }
             } else {
-                Err(MutexError::NotInit)
+                Err(MutexError::NotInit(rc))
             }
         }
     }
@@ -443,14 +459,14 @@ impl<T: ?Sized> Mutex<T> {
                 if 0 == rc {
                     Ok(MutexGuard::new(self))
                 } else if -EWOULDBLOCK == rc {
-                    Err(MutexError::WouldBlock)
+                    Err(MutexError::WouldBlock(rc))
                 } else if -ENOTTHDCTX == rc {
-                    Err(MutexError::NotThreadContext)
+                    Err(MutexError::NotThreadContext(rc))
                 } else {
                     Err(MutexError::Unknown(rc))
                 }
             } else {
-                Err(MutexError::NotInit)
+                Err(MutexError::NotInit(rc))
             }
         }
     }
@@ -505,20 +521,20 @@ impl<T: ?Sized> Mutex<T> {
                 if 0 == rc {
                     Ok(MutexGuard::new(self))
                 } else if -EINTR == rc {
-                    Err(MutexError::Interrupt)
+                    Err(MutexError::Interrupt(rc))
                 } else if -ETIMEDOUT == rc {
-                    Err(MutexError::Timedout)
+                    Err(MutexError::Timedout(rc))
                 } else if -ENOTTHDCTX == rc {
-                    Err(MutexError::NotThreadContext)
+                    Err(MutexError::NotThreadContext(rc))
                 } else if -ECANNOTPMPT == rc {
-                    Err(MutexError::CannotPmpt)
+                    Err(MutexError::CannotPmpt(rc))
                 } else if -ECANNOTBH == rc {
-                    Err(MutexError::CannotBh)
+                    Err(MutexError::CannotBh(rc))
                 } else {
                     Err(MutexError::Unknown(rc))
                 }
             } else {
-                Err(MutexError::NotInit)
+                Err(MutexError::NotInit(rc))
             }
         }
     }
@@ -570,18 +586,18 @@ impl<T: ?Sized> Mutex<T> {
                 if 0 == rc {
                     Ok(MutexGuard::new(self))
                 } else if -EWOULDBLOCK == rc {
-                    Err(MutexError::WouldBlock)
+                    Err(MutexError::WouldBlock(rc))
                 } else if -ENOTTHDCTX == rc {
-                    Err(MutexError::NotThreadContext)
+                    Err(MutexError::NotThreadContext(rc))
                 } else if -ECANNOTPMPT == rc {
-                    Err(MutexError::CannotPmpt)
+                    Err(MutexError::CannotPmpt(rc))
                 } else if -ECANNOTBH == rc {
-                    Err(MutexError::CannotBh)
+                    Err(MutexError::CannotBh(rc))
                 } else {
                     Err(MutexError::Unknown(rc))
                 }
             } else {
-                Err(MutexError::NotInit)
+                Err(MutexError::NotInit(rc))
             }
         }
     }
@@ -759,16 +775,16 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
                         mem::forget(self);
                     }
                     if -EINTR == rc {
-                        Err(CondError::Interrupt)
+                        Err(CondError::Interrupt(rc))
                     } else if -ENOTTHDCTX == rc {
-                        Err(CondError::NotThreadContext)
+                        Err(CondError::NotThreadContext(rc))
                     } else {
                         Err(CondError::Unknown(rc))
                     }
                 }
             } else {
                 drop(self);
-                Err(CondError::NotInit)
+                Err(CondError::NotInit(rc))
             }
         }
     }
@@ -864,18 +880,18 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
                         mem::forget(self);
                     }
                     if -EINTR == rc {
-                        Err(CondError::Interrupt)
+                        Err(CondError::Interrupt(rc))
                     } else if -ETIMEDOUT == rc {
-                        Err(CondError::Timedout)
+                        Err(CondError::Timedout(rc))
                     } else if -ENOTTHDCTX == rc {
-                        Err(CondError::NotThreadContext)
+                        Err(CondError::NotThreadContext(rc))
                     } else {
                         Err(CondError::Unknown(rc))
                     }
                 }
             } else {
                 drop(self);
-                Err(CondError::NotInit)
+                Err(CondError::NotInit(rc))
             }
         }
     }
@@ -968,14 +984,14 @@ impl<'a, T: ?Sized> MutexGuard<'a, T> {
                         mem::forget(self);
                     }
                     if -ENOTTHDCTX == rc {
-                        Err(CondError::NotThreadContext)
+                        Err(CondError::NotThreadContext(rc))
                     } else {
                         Err(CondError::Unknown(rc))
                     }
                 }
             } else {
                 drop(self);
-                Err(CondError::NotInit)
+                Err(CondError::NotInit(rc))
             }
         }
     }

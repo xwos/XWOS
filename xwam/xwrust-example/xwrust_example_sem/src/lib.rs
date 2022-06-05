@@ -17,9 +17,9 @@ use libc_print::std_name::println;
 
 pub fn xwrust_example_sem() {
     println!("XWOS RUST Example: Semaphore");
-    let sema = Arc::new(Sem::new());
-    sema.init(0, XwSsq::MAX);
-    let sema_c = sema.clone();
+    let sem = Arc::new(Sem::new());
+    sem.init(0, XwSsq::MAX);
+    let sem_c = sem.clone();
 
     println!("[主线程] thd: {:?}", cthd::i());
     match DThdBuilder::new()
@@ -28,7 +28,7 @@ pub fn xwrust_example_sem() {
             println!("[子线程] thd: {:?}", cthd::i());
             cthd::sleep(xwtm::ms(500));
             println!("[子线程]<{} ms> 发布信号量。", xwtm::nowtc());
-            sema_c.post();
+            sem_c.post();
             "OK"
         }) {
             Ok(_) => {},
@@ -37,9 +37,9 @@ pub fn xwrust_example_sem() {
                 return;
             },
         };
-    let rc = sema.wait();
+    let rc = sem.wait();
     match rc {
-        SemError::Ok => {
+        SemError::Ok(_) => {
             println!("[主线程] 获取信号量。");
         },
         _ => {

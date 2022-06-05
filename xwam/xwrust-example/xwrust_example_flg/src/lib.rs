@@ -35,7 +35,7 @@ pub fn xwrust_example_flg() {
     msk.s1all();
     let res = flg.wait(Trigger::SetAny, Action::Consumption, &mut tg, &msk);
     match res {
-        FlgError::Ok => {
+        FlgError::Ok(_) => {
             println!("[主线程]<{} ms> 事件发生 {:?}", xwtm::nowtc(), tg);
         },
         _ => {

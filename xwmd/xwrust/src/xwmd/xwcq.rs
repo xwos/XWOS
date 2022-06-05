@@ -176,27 +176,56 @@ extern "C" {
 #[derive(Debug)]
 pub enum XwcqError {
     /// 没有错误
-    Ok,
+    Ok(XwEr),
     /// 循环队列没有初始化
-    NotInit,
+    NotInit(XwEr),
     /// 循环队列内存大小错误
-    PoolSize,
+    PoolSize(XwEr),
     /// 数据大小错误
-    DataSize,
+    DataSize(XwEr),
     /// 等待被中断
-    Interrupt,
+    Interrupt(XwEr),
     /// 等待超时
-    Timedout,
+    Timedout(XwEr),
     /// 不在线程上下文内
-    NotThreadContext,
+    NotThreadContext(XwEr),
     /// 抢占被关闭
-    CannotPmpt,
+    CannotPmpt(XwEr),
     /// 中断底半部被关闭
-    CannotBh,
+    CannotBh(XwEr),
     /// 循环队列中没有数据
-    NoData,
+    NoData(XwEr),
     /// 未知错误
     Unknown(XwEr),
+}
+
+impl XwcqError {
+    /// 消费掉 `XwcqError` 自身，返回内部的错误码。
+    pub fn unwrap(self) -> XwEr {
+        match self {
+            Self::Ok(rc) => rc,
+            Self::NotInit(rc) => rc,
+            Self::PoolSize(rc) => rc,
+            Self::DataSize(rc) => rc,
+            Self::Interrupt(rc) => rc,
+            Self::Timedout(rc) => rc,
+            Self::NotThreadContext(rc) => rc,
+            Self::CannotPmpt(rc) => rc,
+            Self::CannotBh(rc) => rc,
+            Self::NoData(rc) => rc,
+            Self::Unknown(rc) => rc,
+        }
+    }
+
+    /// 如果信号量的错误码是 [`XwcqError::Ok`] ，返回 `true` 。
+    pub const fn is_ok(&self) -> bool {
+        matches!(*self, Self::Ok(_))
+    }
+
+    /// 如果信号量的错误码不是 [`XwcqError::Ok`] ，返回 `true` 。
+    pub const fn is_err(&self) -> bool {
+        !self.is_ok()
+    }
 }
 
 const XWCQ_MM_ALIGN: XwSz = XWMMCFG_ALIGNMENT;
@@ -314,9 +343,9 @@ where
             let rc = xwcq_init(self.cq.get(), slotsize, N, self.pool.get() as _);
             *self.tik.get() = xwcq_gettik(self.cq.get());
             if rc == 0 {
-                XwcqError::Ok
+                XwcqError::Ok(rc)
             } else if rc == -ESIZE {
-                XwcqError::PoolSize
+                XwcqError::PoolSize(rc)
             } else {
                 XwcqError::Unknown(rc)
             }
@@ -387,10 +416,10 @@ where
                         Err(XwcqError::Unknown(rc))
                     }
                 } else {
-                    Err(XwcqError::NotInit)
+                    Err(XwcqError::NotInit(rc))
                 }
             } else {
-                Err(XwcqError::DataSize)
+                Err(XwcqError::DataSize(-ESIZE))
             }
         }
     }
@@ -459,10 +488,10 @@ where
                         Err(XwcqError::Unknown(rc))
                     }
                 } else {
-                    Err(XwcqError::NotInit)
+                    Err(XwcqError::NotInit(rc))
                 }
             } else {
-                Err(XwcqError::DataSize)
+                Err(XwcqError::DataSize(-ESIZE))
             }
         }
     }
@@ -527,21 +556,21 @@ where
                     if XWOK == rc {
                         Ok(sdu)
                     } else if  -EINTR == rc {
-                        Err(XwcqError::Interrupt)
+                        Err(XwcqError::Interrupt(rc))
                     } else if -ENOTTHDCTX == rc {
-                        Err(XwcqError::NotThreadContext)
+                        Err(XwcqError::NotThreadContext(rc))
                     } else if -ECANNOTPMPT == rc {
-                        Err(XwcqError::CannotPmpt)
+                        Err(XwcqError::CannotPmpt(rc))
                     } else if -ECANNOTBH == rc {
-                        Err(XwcqError::CannotBh)
+                        Err(XwcqError::CannotBh(rc))
                     } else {
                         Err(XwcqError::Unknown(rc))
                     }
                 } else {
-                    Err(XwcqError::NotInit)
+                    Err(XwcqError::NotInit(rc))
                 }
             } else {
-                Err(XwcqError::DataSize)
+                Err(XwcqError::DataSize(-ESIZE))
             }
         }
     }
@@ -609,23 +638,23 @@ where
                     if XWOK == rc {
                         Ok(sdu)
                     } else if  -EINTR == rc {
-                        Err(XwcqError::Interrupt)
+                        Err(XwcqError::Interrupt(rc))
                     } else if -ETIMEDOUT == rc {
-                        Err(XwcqError::Timedout)
+                        Err(XwcqError::Timedout(rc))
                     } else if -ENOTTHDCTX == rc {
-                        Err(XwcqError::NotThreadContext)
+                        Err(XwcqError::NotThreadContext(rc))
                     } else if -ECANNOTPMPT == rc {
-                        Err(XwcqError::CannotPmpt)
+                        Err(XwcqError::CannotPmpt(rc))
                     } else if -ECANNOTBH == rc {
-                        Err(XwcqError::CannotBh)
+                        Err(XwcqError::CannotBh(rc))
                     } else {
                         Err(XwcqError::Unknown(rc))
                     }
                 } else {
-                    Err(XwcqError::NotInit)
+                    Err(XwcqError::NotInit(rc))
                 }
             } else {
-                Err(XwcqError::DataSize)
+                Err(XwcqError::DataSize(-ESIZE))
             }
         }
     }
@@ -688,15 +717,15 @@ where
                     if XWOK == rc {
                         Ok(sdu)
                     } else if -ENODATA == rc {
-                        Err(XwcqError::NoData)
+                        Err(XwcqError::NoData(rc))
                     } else {
                         Err(XwcqError::Unknown(rc))
                     }
                 } else {
-                    Err(XwcqError::NotInit)
+                    Err(XwcqError::NotInit(rc))
                 }
             } else {
-                Err(XwcqError::DataSize)
+                Err(XwcqError::DataSize(-ESIZE))
             }
         }
     }
@@ -761,21 +790,21 @@ where
                     if XWOK == rc {
                         Ok(sdu)
                     } else if  -EINTR == rc {
-                        Err(XwcqError::Interrupt)
+                        Err(XwcqError::Interrupt(rc))
                     } else if -ENOTTHDCTX == rc {
-                        Err(XwcqError::NotThreadContext)
+                        Err(XwcqError::NotThreadContext(rc))
                     } else if -ECANNOTPMPT == rc {
-                        Err(XwcqError::CannotPmpt)
+                        Err(XwcqError::CannotPmpt(rc))
                     } else if -ECANNOTBH == rc {
-                        Err(XwcqError::CannotBh)
+                        Err(XwcqError::CannotBh(rc))
                     } else {
                         Err(XwcqError::Unknown(rc))
                     }
                 } else {
-                    Err(XwcqError::NotInit)
+                    Err(XwcqError::NotInit(rc))
                 }
             } else {
-                Err(XwcqError::DataSize)
+                Err(XwcqError::DataSize(-ESIZE))
             }
         }
     }
@@ -843,23 +872,23 @@ where
                     if XWOK == rc {
                         Ok(sdu)
                     } else if  -EINTR == rc {
-                        Err(XwcqError::Interrupt)
+                        Err(XwcqError::Interrupt(rc))
                     } else if -ETIMEDOUT == rc {
-                        Err(XwcqError::Timedout)
+                        Err(XwcqError::Timedout(rc))
                     } else if -ENOTTHDCTX == rc {
-                        Err(XwcqError::NotThreadContext)
+                        Err(XwcqError::NotThreadContext(rc))
                     } else if -ECANNOTPMPT == rc {
-                        Err(XwcqError::CannotPmpt)
+                        Err(XwcqError::CannotPmpt(rc))
                     } else if -ECANNOTBH == rc {
-                        Err(XwcqError::CannotBh)
+                        Err(XwcqError::CannotBh(rc))
                     } else {
                         Err(XwcqError::Unknown(rc))
                     }
                 } else {
-                    Err(XwcqError::NotInit)
+                    Err(XwcqError::NotInit(rc))
                 }
             } else {
-                Err(XwcqError::DataSize)
+                Err(XwcqError::DataSize(-ESIZE))
             }
         }
     }
@@ -922,15 +951,15 @@ where
                     if XWOK == rc {
                         Ok(sdu)
                     } else if -ENODATA == rc {
-                        Err(XwcqError::NoData)
+                        Err(XwcqError::NoData(rc))
                     } else {
                         Err(XwcqError::Unknown(rc))
                     }
                 } else {
-                    Err(XwcqError::NotInit)
+                    Err(XwcqError::NotInit(rc))
                 }
             } else {
-                Err(XwcqError::DataSize)
+                Err(XwcqError::DataSize(-ESIZE))
             }
         }
     }
@@ -996,21 +1025,21 @@ where
                     if XWOK == rc {
                         Ok(sdu)
                     } else if  -EINTR == rc {
-                        Err(XwcqError::Interrupt)
+                        Err(XwcqError::Interrupt(rc))
                     } else if -ENOTTHDCTX == rc {
-                        Err(XwcqError::NotThreadContext)
+                        Err(XwcqError::NotThreadContext(rc))
                     } else if -ECANNOTPMPT == rc {
-                        Err(XwcqError::CannotPmpt)
+                        Err(XwcqError::CannotPmpt(rc))
                     } else if -ECANNOTBH == rc {
-                        Err(XwcqError::CannotBh)
+                        Err(XwcqError::CannotBh(rc))
                     } else {
                         Err(XwcqError::Unknown(rc))
                     }
                 } else {
-                    Err(XwcqError::NotInit)
+                    Err(XwcqError::NotInit(rc))
                 }
             } else {
-                Err(XwcqError::DataSize)
+                Err(XwcqError::DataSize(-ESIZE))
             }
         }
     }
@@ -1079,23 +1108,23 @@ where
                     if XWOK == rc {
                         Ok(sdu)
                     } else if  -EINTR == rc {
-                        Err(XwcqError::Interrupt)
+                        Err(XwcqError::Interrupt(rc))
                     } else if -ETIMEDOUT == rc {
-                        Err(XwcqError::Timedout)
+                        Err(XwcqError::Timedout(rc))
                     } else if -ENOTTHDCTX == rc {
-                        Err(XwcqError::NotThreadContext)
+                        Err(XwcqError::NotThreadContext(rc))
                     } else if -ECANNOTPMPT == rc {
-                        Err(XwcqError::CannotPmpt)
+                        Err(XwcqError::CannotPmpt(rc))
                     } else if -ECANNOTBH == rc {
-                        Err(XwcqError::CannotBh)
+                        Err(XwcqError::CannotBh(rc))
                     } else {
                         Err(XwcqError::Unknown(rc))
                     }
                 } else {
-                    Err(XwcqError::NotInit)
+                    Err(XwcqError::NotInit(rc))
                 }
             } else {
-                Err(XwcqError::DataSize)
+                Err(XwcqError::DataSize(-ESIZE))
             }
         }
     }
@@ -1159,15 +1188,15 @@ where
                     if XWOK == rc {
                         Ok(sdu)
                     } else if -ENODATA == rc {
-                        Err(XwcqError::NoData)
+                        Err(XwcqError::NoData(rc))
                     } else {
                         Err(XwcqError::Unknown(rc))
                     }
                 } else {
-                    Err(XwcqError::NotInit)
+                    Err(XwcqError::NotInit(rc))
                 }
             } else {
-                Err(XwcqError::DataSize)
+                Err(XwcqError::DataSize(-ESIZE))
             }
         }
     }
@@ -1233,21 +1262,21 @@ where
                     if XWOK == rc {
                         Ok(sdu)
                     } else if  -EINTR == rc {
-                        Err(XwcqError::Interrupt)
+                        Err(XwcqError::Interrupt(rc))
                     } else if -ENOTTHDCTX == rc {
-                        Err(XwcqError::NotThreadContext)
+                        Err(XwcqError::NotThreadContext(rc))
                     } else if -ECANNOTPMPT == rc {
-                        Err(XwcqError::CannotPmpt)
+                        Err(XwcqError::CannotPmpt(rc))
                     } else if -ECANNOTBH == rc {
-                        Err(XwcqError::CannotBh)
+                        Err(XwcqError::CannotBh(rc))
                     } else {
                         Err(XwcqError::Unknown(rc))
                     }
                 } else {
-                    Err(XwcqError::NotInit)
+                    Err(XwcqError::NotInit(rc))
                 }
             } else {
-                Err(XwcqError::DataSize)
+                Err(XwcqError::DataSize(-ESIZE))
             }
         }
     }
@@ -1316,23 +1345,23 @@ where
                     if XWOK == rc {
                         Ok(sdu)
                     } else if  -EINTR == rc {
-                        Err(XwcqError::Interrupt)
+                        Err(XwcqError::Interrupt(rc))
                     } else if -ETIMEDOUT == rc {
-                        Err(XwcqError::Timedout)
+                        Err(XwcqError::Timedout(rc))
                     } else if -ENOTTHDCTX == rc {
-                        Err(XwcqError::NotThreadContext)
+                        Err(XwcqError::NotThreadContext(rc))
                     } else if -ECANNOTPMPT == rc {
-                        Err(XwcqError::CannotPmpt)
+                        Err(XwcqError::CannotPmpt(rc))
                     } else if -ECANNOTBH == rc {
-                        Err(XwcqError::CannotBh)
+                        Err(XwcqError::CannotBh(rc))
                     } else {
                         Err(XwcqError::Unknown(rc))
                     }
                 } else {
-                    Err(XwcqError::NotInit)
+                    Err(XwcqError::NotInit(rc))
                 }
             } else {
-                Err(XwcqError::DataSize)
+                Err(XwcqError::DataSize(-ESIZE))
             }
         }
     }
@@ -1396,15 +1425,15 @@ where
                     if XWOK == rc {
                         Ok(sdu)
                     } else if -ENODATA == rc {
-                        Err(XwcqError::NoData)
+                        Err(XwcqError::NoData(rc))
                     } else {
                         Err(XwcqError::Unknown(rc))
                     }
                 } else {
-                    Err(XwcqError::NotInit)
+                    Err(XwcqError::NotInit(rc))
                 }
             } else {
-                Err(XwcqError::DataSize)
+                Err(XwcqError::DataSize(-ESIZE))
             }
         }
     }
@@ -1423,12 +1452,12 @@ where
                 rc = xwcq_flush(self.cq.get());
                 xwcq_put(self.cq.get());
                 if XWOK == rc {
-                    XwcqError::Ok
+                    XwcqError::Ok(rc)
                 } else {
                     XwcqError::Unknown(rc)
                 }
             } else {
-                XwcqError::NotInit
+                XwcqError::NotInit(rc)
             }
         }
     }
@@ -1476,7 +1505,7 @@ where
                     Err(XwcqError::Unknown(rc))
                 }
             } else {
-                Err(XwcqError::NotInit)
+                Err(XwcqError::NotInit(rc))
             }
         }
     }

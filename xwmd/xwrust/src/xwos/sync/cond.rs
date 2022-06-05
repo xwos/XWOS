@@ -190,27 +190,56 @@ extern "C" {
 #[derive(Debug)]
 pub enum CondError {
     /// 没有错误
-    Ok,
+    Ok(XwEr),
     /// 条件量没有初始化
-    NotInit,
+    NotInit(XwEr),
     /// 条件量已被冻结
-    AlreadyFrozen,
+    AlreadyFrozen(XwEr),
     /// 条件量已解冻
-    AlreadyThawed,
+    AlreadyThawed(XwEr),
     /// 等待被中断
-    Interrupt,
+    Interrupt(XwEr),
     /// 等待超时
-    Timedout,
+    Timedout(XwEr),
     /// 不在线程上下文内
-    NotThreadContext,
+    NotThreadContext(XwEr),
     /// 信号选择器的位置超出范围
-    OutOfSelPos,
+    OutOfSelPos(XwEr),
     /// 条件量已经绑定
-    AlreadyBound,
+    AlreadyBound(XwEr),
     /// 信号选择器的位置被占用
-    SelPosBusy,
+    SelPosBusy(XwEr),
     /// 未知错误
     Unknown(XwEr),
+}
+
+impl CondError {
+    /// 消费掉 `CondError` 自身，返回内部的错误码。
+    pub fn unwrap(self) -> XwEr {
+        match self {
+            Self::Ok(rc) => rc,
+            Self::NotInit(rc) => rc,
+            Self::AlreadyFrozen(rc) => rc,
+            Self::AlreadyThawed(rc) => rc,
+            Self::Interrupt(rc) => rc,
+            Self::Timedout(rc) => rc,
+            Self::NotThreadContext(rc) => rc,
+            Self::OutOfSelPos(rc) => rc,
+            Self::AlreadyBound(rc) => rc,
+            Self::SelPosBusy(rc) => rc,
+            Self::Unknown(rc) => rc,
+        }
+    }
+
+    /// 如果错误码是 [`CondError::Ok`] ，返回 `true` 。
+    pub const fn is_ok(&self) -> bool {
+        matches!(*self, Self::Ok(_))
+    }
+
+    /// 如果错误码不是 [`CondError::Ok`] ，返回 `true` 。
+    pub const fn is_err(&self) -> bool {
+        !self.is_ok()
+    }
 }
 
 /// 锁类型：无
@@ -376,14 +405,14 @@ impl Cond {
                 rc = xwrustffi_cond_freeze(self.cond.get());
                 xwrustffi_cond_put(self.cond.get());
                 if XWOK == rc {
-                    CondError::Ok
+                    CondError::Ok(rc)
                 } else if -EALREADY == rc {
-                    CondError::AlreadyFrozen
+                    CondError::AlreadyFrozen(rc)
                 } else {
                     CondError::Unknown(rc)
                 }
             } else {
-                CondError::NotInit
+                CondError::NotInit(rc)
             }
         }
     }
@@ -423,14 +452,14 @@ impl Cond {
                 rc = xwrustffi_cond_thaw(self.cond.get());
                 xwrustffi_cond_put(self.cond.get());
                 if XWOK == rc {
-                    CondError::Ok
+                    CondError::Ok(rc)
                 } else if -EALREADY == rc {
-                    CondError::AlreadyThawed
+                    CondError::AlreadyThawed(rc)
                 } else {
                     CondError::Unknown(rc)
                 }
             } else {
-                CondError::NotInit
+                CondError::NotInit(rc)
             }
         }
     }
@@ -469,14 +498,14 @@ impl Cond {
                 rc = xwrustffi_cond_unicast(self.cond.get());
                 xwrustffi_cond_put(self.cond.get());
                 if XWOK == rc {
-                    CondError::Ok
+                    CondError::Ok(rc)
                 } else if -ENEGATIVE == rc {
-                    CondError::AlreadyFrozen
+                    CondError::AlreadyFrozen(rc)
                 } else {
                     CondError::Unknown(rc)
                 }
             } else {
-                CondError::NotInit
+                CondError::NotInit(rc)
             }
         }
     }
@@ -515,14 +544,14 @@ impl Cond {
                 rc = xwrustffi_cond_broadcast(self.cond.get());
                 xwrustffi_cond_put(self.cond.get());
                 if XWOK == rc {
-                    CondError::Ok
+                    CondError::Ok(rc)
                 } else if -ENEGATIVE == rc {
-                    CondError::AlreadyFrozen
+                    CondError::AlreadyFrozen(rc)
                 } else {
                     CondError::Unknown(rc)
                 }
             } else {
-                CondError::NotInit
+                CondError::NotInit(rc)
             }
         }
     }
@@ -588,16 +617,16 @@ impl Cond {
                         pos: pos,
                     })
                 } else if -ECHRNG == rc {
-                    Err(CondError::OutOfSelPos)
+                    Err(CondError::OutOfSelPos(rc))
                 } else if -EALREADY == rc {
-                    Err(CondError::AlreadyBound)
+                    Err(CondError::AlreadyBound(rc))
                 } else if -EBUSY == rc {
-                    Err(CondError::SelPosBusy)
+                    Err(CondError::SelPosBusy(rc))
                 } else {
                     Err(CondError::Unknown(rc))
                 }
             } else {
-                Err(CondError::NotInit)
+                Err(CondError::NotInit(rc))
             }
         }
     }
