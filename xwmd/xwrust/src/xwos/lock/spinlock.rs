@@ -128,11 +128,22 @@ extern "C" {
 #[derive(Debug)]
 pub enum SpinlockError {
     /// 自旋锁没有初始化
-    NotInit,
+    NotInit(XwEr),
     /// 尝试上锁失败
-    Again,
+    Again(XwEr),
     /// 未知错误
     Unknown(XwEr),
+}
+
+impl SpinlockError {
+    /// 消费掉 `SpinlockError` 自身，返回内部的错误码。
+    pub fn unwrap(self) -> XwEr {
+        match self {
+            Self::NotInit(rc) => rc,
+            Self::Again(rc) => rc,
+            Self::Unknown(rc) => rc,
+        }
+    }
 }
 
 /// 自旋锁的上锁模式
@@ -299,7 +310,7 @@ impl<T: ?Sized> Spinlock<T> {
                 Ok(SpinlockGuard::new(self))
             }
         } else {
-            Err(SpinlockError::NotInit)
+            Err(SpinlockError::NotInit(-ENILOBJD))
         }
     }
 
@@ -353,7 +364,7 @@ impl<T: ?Sized> Spinlock<T> {
                             *self.mode.get() = SpinlockMode::Lock;
                             Ok(SpinlockGuard::new(self))
                         } else if -EAGAIN == rc {
-                            Err(SpinlockError::Again)
+                            Err(SpinlockError::Again(rc))
                         } else {
                             Err(SpinlockError::Unknown(rc))
                         }
@@ -364,7 +375,7 @@ impl<T: ?Sized> Spinlock<T> {
                             *self.mode.get() = SpinlockMode::LockCpuirq;
                             Ok(SpinlockGuard::new(self))
                         } else if -EAGAIN == rc {
-                            Err(SpinlockError::Again)
+                            Err(SpinlockError::Again(rc))
                         } else {
                             Err(SpinlockError::Unknown(rc))
                         }
@@ -376,7 +387,7 @@ impl<T: ?Sized> Spinlock<T> {
                             *self.mode.get() = SpinlockMode::LockCpuirqSave(Some(cpuirq));
                             Ok(SpinlockGuard::new(self))
                         } else if -EAGAIN == rc {
-                            Err(SpinlockError::Again)
+                            Err(SpinlockError::Again(rc))
                         } else {
                             Err(SpinlockError::Unknown(rc))
                         }
@@ -387,7 +398,7 @@ impl<T: ?Sized> Spinlock<T> {
                             *self.mode.get() = SpinlockMode::LockBh;
                             Ok(SpinlockGuard::new(self))
                         } else if -EAGAIN == rc {
-                            Err(SpinlockError::Again)
+                            Err(SpinlockError::Again(rc))
                         } else {
                             Err(SpinlockError::Unknown(rc))
                         }
@@ -395,7 +406,7 @@ impl<T: ?Sized> Spinlock<T> {
                 }
             }
         } else {
-            Err(SpinlockError::NotInit)
+            Err(SpinlockError::NotInit(-ENILOBJD))
         }
     }
 
@@ -575,16 +586,16 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
                         drop(self);
                     }
                     if -EINTR == rc {
-                        Err(CondError::Interrupt)
+                        Err(CondError::Interrupt(rc))
                     } else if -ENOTTHDCTX == rc {
-                        Err(CondError::NotThreadContext)
+                        Err(CondError::NotThreadContext(rc))
                     } else {
                         Err(CondError::Unknown(rc))
                     }
                 }
             } else {
                 drop(self);
-                Err(CondError::NotInit)
+                Err(CondError::NotInit(rc))
             }
         }
     }
@@ -677,18 +688,18 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
                         drop(self);
                     }
                     if -EINTR == rc {
-                        Err(CondError::Interrupt)
+                        Err(CondError::Interrupt(rc))
                     } else if -ETIMEDOUT == rc {
-                        Err(CondError::Timedout)
+                        Err(CondError::Timedout(rc))
                     } else if -ENOTTHDCTX == rc {
-                        Err(CondError::NotThreadContext)
+                        Err(CondError::NotThreadContext(rc))
                     } else {
                         Err(CondError::Unknown(rc))
                     }
                 }
             } else {
                 drop(self);
-                Err(CondError::NotInit)
+                Err(CondError::NotInit(rc))
             }
         }
     }
@@ -778,16 +789,16 @@ impl<'a, T: ?Sized> SpinlockGuard<'a, T> {
                         drop(self);
                     }
                     if -EINTR == rc {
-                        Err(CondError::Interrupt)
+                        Err(CondError::Interrupt(rc))
                     } else if -ENOTTHDCTX == rc {
-                        Err(CondError::NotThreadContext)
+                        Err(CondError::NotThreadContext(rc))
                     } else {
                         Err(CondError::Unknown(rc))
                     }
                 }
             } else {
                 drop(self);
-                Err(CondError::NotInit)
+                Err(CondError::NotInit(rc))
             }
         }
     }

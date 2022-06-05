@@ -306,25 +306,53 @@ extern "C" {
 #[derive(Debug)]
 pub enum XwmqError {
     /// 没有错误
-    Ok,
+    Ok(XwEr),
     /// 消息队列没有初始化
-    NotInit,
+    NotInit(XwEr),
     /// 等待被中断
-    Interrupt,
+    Interrupt(XwEr),
     /// 等待超时
-    Timedout,
+    Timedout(XwEr),
     /// 不在线程上下文内
-    NotThreadContext,
+    NotThreadContext(XwEr),
     /// 抢占被关闭
-    CannotPmpt,
+    CannotPmpt(XwEr),
     /// 中断底半部被关闭
-    CannotBh,
+    CannotBh(XwEr),
     /// 消息队列中没有可用的消息槽
-    NoSlot,
+    NoSlot(XwEr),
     /// 消息队列中没有消息
-    NoMsg,
+    NoMsg(XwEr),
     /// 未知错误
     Unknown(XwEr),
+}
+
+impl XwmqError {
+    /// 消费掉 `XwmqError` 自身，返回内部的错误码。
+    pub fn unwrap(self) -> XwEr {
+        match self {
+            Self::Ok(rc) => rc,
+            Self::NotInit(rc) => rc,
+            Self::Interrupt(rc) => rc,
+            Self::Timedout(rc) => rc,
+            Self::NotThreadContext(rc) => rc,
+            Self::CannotPmpt(rc) => rc,
+            Self::CannotBh(rc) => rc,
+            Self::NoSlot(rc) => rc,
+            Self::NoMsg(rc) => rc,
+            Self::Unknown(rc) => rc,
+        }
+    }
+
+    /// 如果信号量的错误码是 [`XwmqError::Ok`] ，返回 `true` 。
+    pub const fn is_ok(&self) -> bool {
+        matches!(*self, Self::Ok(_))
+    }
+
+    /// 如果信号量的错误码不是 [`XwmqError::Ok`] ，返回 `true` 。
+    pub const fn is_err(&self) -> bool {
+        !self.is_ok()
+    }
 }
 
 /// 消息队列对象占用的内存大小
@@ -547,20 +575,20 @@ where
                 rc = xwmq_eq(self.xwmq.mq.get(), 0, raw as *mut c_void);
                 xwmq_put(self.xwmq.mq.get());
                 if XWOK == rc {
-                    XwmqError::Ok
+                    XwmqError::Ok(rc)
                 } else if  -EINTR == rc {
-                    XwmqError::Interrupt
+                    XwmqError::Interrupt(rc)
                 } else if -ENOTTHDCTX == rc {
-                    XwmqError::NotThreadContext
+                    XwmqError::NotThreadContext(rc)
                 } else if -ECANNOTPMPT == rc {
-                    XwmqError::CannotPmpt
+                    XwmqError::CannotPmpt(rc)
                 } else if -ECANNOTBH == rc {
-                    XwmqError::CannotBh
+                    XwmqError::CannotBh(rc)
                 } else {
                     XwmqError::Unknown(rc)
                 }
             } else {
-                XwmqError::NotInit
+                XwmqError::NotInit(rc)
             }
         }
     }
@@ -617,22 +645,22 @@ where
                 rc = xwmq_eq_to(self.xwmq.mq.get(), 0, raw as *mut c_void, to);
                 xwmq_put(self.xwmq.mq.get());
                 if XWOK == rc {
-                    XwmqError::Ok
+                    XwmqError::Ok(rc)
                 } else if  -EINTR == rc {
-                    XwmqError::Interrupt
+                    XwmqError::Interrupt(rc)
                 } else if -ETIMEDOUT == rc {
-                    XwmqError::Timedout
+                    XwmqError::Timedout(rc)
                 } else if -ENOTTHDCTX == rc {
-                    XwmqError::NotThreadContext
+                    XwmqError::NotThreadContext(rc)
                 } else if -ECANNOTPMPT == rc {
-                    XwmqError::CannotPmpt
+                    XwmqError::CannotPmpt(rc)
                 } else if -ECANNOTBH == rc {
-                    XwmqError::CannotBh
+                    XwmqError::CannotBh(rc)
                 } else {
                     XwmqError::Unknown(rc)
                 }
             } else {
-                XwmqError::NotInit
+                XwmqError::NotInit(rc)
             }
         }
     }
@@ -682,14 +710,14 @@ where
                 rc = xwmq_tryeq(self.xwmq.mq.get(), 0, raw as *mut c_void);
                 xwmq_put(self.xwmq.mq.get());
                 if XWOK == rc {
-                    XwmqError::Ok
+                    XwmqError::Ok(rc)
                 } else if  -ENODATA == rc {
-                    XwmqError::NoSlot
+                    XwmqError::NoSlot(rc)
                 } else {
                     XwmqError::Unknown(rc)
                 }
             } else {
-                XwmqError::NotInit
+                XwmqError::NotInit(rc)
             }
         }
     }
@@ -743,20 +771,20 @@ where
                 rc = xwmq_jq(self.xwmq.mq.get(), 0, raw as *mut c_void);
                 xwmq_put(self.xwmq.mq.get());
                 if XWOK == rc {
-                    XwmqError::Ok
+                    XwmqError::Ok(rc)
                 } else if  -EINTR == rc {
-                    XwmqError::Interrupt
+                    XwmqError::Interrupt(rc)
                 } else if -ENOTTHDCTX == rc {
-                    XwmqError::NotThreadContext
+                    XwmqError::NotThreadContext(rc)
                 } else if -ECANNOTPMPT == rc {
-                    XwmqError::CannotPmpt
+                    XwmqError::CannotPmpt(rc)
                 } else if -ECANNOTBH == rc {
-                    XwmqError::CannotBh
+                    XwmqError::CannotBh(rc)
                 } else {
                     XwmqError::Unknown(rc)
                 }
             } else {
-                XwmqError::NotInit
+                XwmqError::NotInit(rc)
             }
         }
     }
@@ -813,22 +841,22 @@ where
                 rc = xwmq_jq_to(self.xwmq.mq.get(), 0, raw as *mut c_void, to);
                 xwmq_put(self.xwmq.mq.get());
                 if XWOK == rc {
-                    XwmqError::Ok
+                    XwmqError::Ok(rc)
                 } else if  -EINTR == rc {
-                    XwmqError::Interrupt
+                    XwmqError::Interrupt(rc)
                 } else if -ETIMEDOUT == rc {
-                    XwmqError::Timedout
+                    XwmqError::Timedout(rc)
                 } else if -ENOTTHDCTX == rc {
-                    XwmqError::NotThreadContext
+                    XwmqError::NotThreadContext(rc)
                 } else if -ECANNOTPMPT == rc {
-                    XwmqError::CannotPmpt
+                    XwmqError::CannotPmpt(rc)
                 } else if -ECANNOTBH == rc {
-                    XwmqError::CannotBh
+                    XwmqError::CannotBh(rc)
                 } else {
                     XwmqError::Unknown(rc)
                 }
             } else {
-                XwmqError::NotInit
+                XwmqError::NotInit(rc)
             }
         }
     }
@@ -878,14 +906,14 @@ where
                 rc = xwmq_tryjq(self.xwmq.mq.get(), 0, raw as *mut c_void);
                 xwmq_put(self.xwmq.mq.get());
                 if XWOK == rc {
-                    XwmqError::Ok
+                    XwmqError::Ok(rc)
                 } else if  -ENODATA == rc {
-                    XwmqError::NoSlot
+                    XwmqError::NoSlot(rc)
                 } else {
                     XwmqError::Unknown(rc)
                 }
             } else {
-                XwmqError::NotInit
+                XwmqError::NotInit(rc)
             }
         }
     }
@@ -956,18 +984,18 @@ where
                     let boxdata = Box::from_raw(raw as *mut T);
                     Ok(boxdata)
                 } else if -EINTR == rc {
-                    Err(XwmqError::Interrupt)
+                    Err(XwmqError::Interrupt(rc))
                 } else if -ENOTTHDCTX == rc {
-                    Err(XwmqError::NotThreadContext)
+                    Err(XwmqError::NotThreadContext(rc))
                 } else if -ECANNOTPMPT == rc {
-                    Err(XwmqError::CannotPmpt)
+                    Err(XwmqError::CannotPmpt(rc))
                 } else if -ECANNOTBH == rc {
-                    Err(XwmqError::CannotBh)
+                    Err(XwmqError::CannotBh(rc))
                 } else {
                     Err(XwmqError::Unknown(rc))
                 }
             } else {
-                Err(XwmqError::NotInit)
+                Err(XwmqError::NotInit(rc))
             }
         }
     }
@@ -1036,20 +1064,20 @@ where
                     let boxdata = Box::from_raw(raw as *mut T);
                     Ok(boxdata)
                 } else if -EINTR == rc {
-                    Err(XwmqError::Interrupt)
+                    Err(XwmqError::Interrupt(rc))
                 } else if -ETIMEDOUT == rc {
-                    Err(XwmqError::Timedout)
+                    Err(XwmqError::Timedout(rc))
                 } else if -ENOTTHDCTX == rc {
-                    Err(XwmqError::NotThreadContext)
+                    Err(XwmqError::NotThreadContext(rc))
                 } else if -ECANNOTPMPT == rc {
-                    Err(XwmqError::CannotPmpt)
+                    Err(XwmqError::CannotPmpt(rc))
                 } else if -ECANNOTBH == rc {
-                    Err(XwmqError::CannotBh)
+                    Err(XwmqError::CannotBh(rc))
                 } else {
                     Err(XwmqError::Unknown(rc))
                 }
             } else {
-                Err(XwmqError::NotInit)
+                Err(XwmqError::NotInit(rc))
             }
         }
     }
@@ -1111,12 +1139,12 @@ where
                     let boxdata = Box::from_raw(raw as *mut T);
                     Ok(boxdata)
                 } else if -ENODATA == rc {
-                    Err(XwmqError::NoMsg)
+                    Err(XwmqError::NoMsg(rc))
                 } else {
                     Err(XwmqError::Unknown(rc))
                 }
             } else {
-                Err(XwmqError::NotInit)
+                Err(XwmqError::NotInit(rc))
             }
         }
     }
@@ -1182,18 +1210,18 @@ where
                     let boxdata = Box::from_raw(raw as *mut T);
                     Ok(boxdata)
                 } else if -EINTR == rc {
-                    Err(XwmqError::Interrupt)
+                    Err(XwmqError::Interrupt(rc))
                 } else if -ENOTTHDCTX == rc {
-                    Err(XwmqError::NotThreadContext)
+                    Err(XwmqError::NotThreadContext(rc))
                 } else if -ECANNOTPMPT == rc {
-                    Err(XwmqError::CannotPmpt)
+                    Err(XwmqError::CannotPmpt(rc))
                 } else if -ECANNOTBH == rc {
-                    Err(XwmqError::CannotBh)
+                    Err(XwmqError::CannotBh(rc))
                 } else {
                     Err(XwmqError::Unknown(rc))
                 }
             } else {
-                Err(XwmqError::NotInit)
+                Err(XwmqError::NotInit(rc))
             }
         }
     }
@@ -1262,20 +1290,20 @@ where
                     let boxdata = Box::from_raw(raw as *mut T);
                     Ok(boxdata)
                 } else if -EINTR == rc {
-                    Err(XwmqError::Interrupt)
+                    Err(XwmqError::Interrupt(rc))
                 } else if -ETIMEDOUT == rc {
-                    Err(XwmqError::Timedout)
+                    Err(XwmqError::Timedout(rc))
                 } else if -ENOTTHDCTX == rc {
-                    Err(XwmqError::NotThreadContext)
+                    Err(XwmqError::NotThreadContext(rc))
                 } else if -ECANNOTPMPT == rc {
-                    Err(XwmqError::CannotPmpt)
+                    Err(XwmqError::CannotPmpt(rc))
                 } else if -ECANNOTBH == rc {
-                    Err(XwmqError::CannotBh)
+                    Err(XwmqError::CannotBh(rc))
                 } else {
                     Err(XwmqError::Unknown(rc))
                 }
             } else {
-                Err(XwmqError::NotInit)
+                Err(XwmqError::NotInit(rc))
             }
         }
     }
@@ -1337,12 +1365,12 @@ where
                     let boxdata = Box::from_raw(raw as *mut T);
                     Ok(boxdata)
                 } else if -ENODATA == rc {
-                    Err(XwmqError::NoMsg)
+                    Err(XwmqError::NoMsg(rc))
                 } else {
                     Err(XwmqError::Unknown(rc))
                 }
             } else {
-                Err(XwmqError::NotInit)
+                Err(XwmqError::NotInit(rc))
             }
         }
     }

@@ -116,7 +116,7 @@
 //!
 //! # 初始化
 //!
-//! 无论以何种方式创建的信号量，都必须在使用前调用 [`Sel::init()`] 进行初始化：
+//! 无论以何种方式创建的信号选择器，都必须在使用前调用 [`Sel::init()`] 进行初始化：
 //!
 //! ```rust
 //! pub fn xwrust_example_sel() {
@@ -212,40 +212,68 @@ extern "C" {
     pub(crate) fn xwrustffi_sel_tryselect(sel: *mut c_void, msk: *mut XwBmp, trg: *mut XwBmp) -> XwEr;
 }
 
-/// 条件量的错误码
+/// 信号选择器的错误码
 #[derive(Debug)]
 pub enum SelError {
     /// 没有错误
-    Ok,
-    /// 条件量没有初始化
-    NotInit,
+    Ok(XwEr),
+    /// 信号选择器没有初始化
+    NotInit(XwEr),
     /// 等待被中断
-    Interrupt,
+    Interrupt(XwEr),
     /// 等待超时
-    Timedout,
+    Timedout(XwEr),
     /// 没有检测到 **选择信号**
-    NoSignal,
+    NoSignal(XwEr),
     /// 不在线程上下文内
-    NotThreadContext,
+    NotThreadContext(XwEr),
     /// 信号选择器的位置超出范围
-    OutOfSelPos,
-    /// 信号量已经绑定
-    AlreadyBound,
+    OutOfSelPos(XwEr),
+    /// 信号选择器已经绑定
+    AlreadyBound(XwEr),
     /// 信号选择器的位置被占用
-    SelPosBusy,
+    SelPosBusy(XwEr),
     /// 未知错误
     Unknown(XwEr),
 }
 
-/// XWOS条件量对象占用的内存大小
+impl SelError {
+    /// 消费掉 `SelError` 自身，返回内部的错误码。
+    pub fn unwrap(self) -> XwEr {
+        match self {
+            Self::Ok(rc) => rc,
+            Self::NotInit(rc) => rc,
+            Self::Interrupt(rc) => rc,
+            Self::Timedout(rc) => rc,
+            Self::NoSignal(rc) => rc,
+            Self::NotThreadContext(rc) => rc,
+            Self::OutOfSelPos(rc) => rc,
+            Self::AlreadyBound(rc) => rc,
+            Self::SelPosBusy(rc) => rc,
+            Self::Unknown(rc) => rc,
+        }
+    }
+
+    /// 如果错误码是 [`SelError::Ok`] ，返回 `true` 。
+    pub const fn is_ok(&self) -> bool {
+        matches!(*self, Self::Ok(_))
+    }
+
+    /// 如果错误码不是 [`SelError::Ok`] ，返回 `true` 。
+    pub const fn is_err(&self) -> bool {
+        !self.is_ok()
+    }
+}
+
+/// XWOS信号选择器对象占用的内存大小
 #[cfg(target_pointer_width = "32")]
 pub const SIZEOF_XWOS_SEL: usize = 64;
 
-/// XWOS条件量对象占用的内存大小
+/// XWOS信号选择器对象占用的内存大小
 #[cfg(target_pointer_width = "64")]
 pub const SIZEOF_XWOS_SEL: usize = 128;
 
-/// 用于构建条件量的内存数组类型
+/// 用于构建信号选择器的内存数组类型
 #[repr(C)]
 #[cfg_attr(target_pointer_width = "32", repr(align(8)))]
 #[cfg_attr(target_pointer_width = "64", repr(align(16)))]
@@ -258,14 +286,14 @@ where
     pub(crate) msk: [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
 }
 
-/// 条件量对象结构体
+/// 信号选择器对象结构体
 pub struct Sel<const N: XwSz>
 where
     [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
 {
-    /// 用于初始化XWOS条件量对象的内存空间
+    /// 用于初始化XWOS信号选择器对象的内存空间
     pub(crate) sel: UnsafeCell<XwosSel<N>>,
-    /// 条件量对象的标签
+    /// 信号选择器对象的标签
     pub(crate) tik: UnsafeCell<XwSq>,
 }
 
@@ -384,7 +412,7 @@ where
     ///
     /// # 错误码
     ///
-    /// + [`SelError::NotInit`] 信号量没有初始化
+    /// + [`SelError::NotInit`] 信号选择器没有初始化
     /// + [`SelError::Interrupt`] 等待被中断
     /// + [`SelError::NotThreadContext`] 不在线程上下文内
     ///
@@ -420,14 +448,14 @@ where
                 if XWOK == rc {
                     Ok(trg)
                 } else if -EINTR == rc {
-                    Err(SelError::Interrupt)
+                    Err(SelError::Interrupt(rc))
                 } else if -ENOTTHDCTX == rc {
-                    Err(SelError::NotThreadContext)
+                    Err(SelError::NotThreadContext(rc))
                 } else {
                     Err(SelError::Unknown(rc))
                 }
             } else {
-                Err(SelError::NotInit)
+                Err(SelError::NotInit(rc))
             }
         }
     }
@@ -445,7 +473,7 @@ where
     ///
     /// # 错误码
     ///
-    /// + [`SelError::NotInit`] 信号量没有初始化
+    /// + [`SelError::NotInit`] 信号选择器没有初始化
     /// + [`SelError::Interrupt`] 等待被中断
     /// + [`SelError::Timedout`] 等待超时
     /// + [`SelError::NotThreadContext`] 不在线程上下文内
@@ -483,16 +511,16 @@ where
                 if XWOK == rc {
                     Ok(trg)
                 } else if -EINTR == rc {
-                    Err(SelError::Interrupt)
+                    Err(SelError::Interrupt(rc))
                 } else if -ETIMEDOUT == rc {
-                    Err(SelError::Timedout)
+                    Err(SelError::Timedout(rc))
                 } else if -ENOTTHDCTX == rc {
-                    Err(SelError::NotThreadContext)
+                    Err(SelError::NotThreadContext(rc))
                 } else {
                     Err(SelError::Unknown(rc))
                 }
             } else {
-                Err(SelError::NotInit)
+                Err(SelError::NotInit(rc))
             }
         }
     }
@@ -508,7 +536,7 @@ where
     ///
     /// # 错误码
     ///
-    /// + [`SelError::NotInit`] 信号量没有初始化
+    /// + [`SelError::NotInit`] 信号选择器没有初始化
     /// + [`SelError::NoSignal`] 没有检测到 **选择信号**
     ///
     /// # 示例
@@ -543,14 +571,14 @@ where
                 if XWOK == rc {
                     Ok(trg)
                 } else if -EINTR == rc {
-                    Err(SelError::Interrupt)
+                    Err(SelError::Interrupt(rc))
                 } else if -ENODATA == rc {
-                    Err(SelError::NoSignal)
+                    Err(SelError::NoSignal(rc))
                 } else {
                     Err(SelError::Unknown(rc))
                 }
             } else {
-                Err(SelError::NotInit)
+                Err(SelError::NotInit(rc))
             }
         }
     }
@@ -616,16 +644,16 @@ where
                         pos: pos,
                     })
                 } else if -ECHRNG == rc {
-                    Err(SelError::OutOfSelPos)
+                    Err(SelError::OutOfSelPos(rc))
                 } else if -EALREADY == rc {
-                    Err(SelError::AlreadyBound)
+                    Err(SelError::AlreadyBound(rc))
                 } else if -EBUSY == rc {
-                    Err(SelError::SelPosBusy)
+                    Err(SelError::SelPosBusy(rc))
                 } else {
                     Err(SelError::Unknown(rc))
                 }
             } else {
-                Err(SelError::NotInit)
+                Err(SelError::NotInit(rc))
             }
         }
     }

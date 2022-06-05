@@ -165,11 +165,22 @@ extern "C" {
 #[derive(Debug)]
 pub enum SeqlockError {
     /// 顺序锁没有初始化
-    NotInit,
+    NotInit(XwEr),
     /// 尝试上锁失败
-    Again,
+    Again(XwEr),
     /// 未知错误
     Unknown(XwEr),
+}
+
+impl SeqlockError {
+    /// 消费掉 `SeqlockError` 自身，返回内部的错误码。
+    pub fn unwrap(self) -> XwEr {
+        match self {
+            Self::NotInit(rc) => rc,
+            Self::Again(rc) => rc,
+            Self::Unknown(rc) => rc,
+        }
+    }
 }
 
 /// 顺序锁的上锁模式
@@ -309,7 +320,7 @@ impl<T: ?Sized> Seqlock<T> {
                 Ok(SeqlockReadGuard::new(self, start))
             }
         } else {
-            Err(SeqlockError::NotInit)
+            Err(SeqlockError::NotInit(-ENILOBJD))
         }
     }
 
@@ -407,7 +418,7 @@ impl<T: ?Sized> Seqlock<T> {
                 Ok(SeqlockGuard::new(self))
             }
         } else {
-            Err(SeqlockError::NotInit)
+            Err(SeqlockError::NotInit(-ENILOBJD))
         }
     }
 
@@ -466,7 +477,7 @@ impl<T: ?Sized> Seqlock<T> {
                             *self.mode.get() = SeqlockMode::ReadExclusiveLock;
                             Ok(SeqlockGuard::new(self))
                         } else if -EAGAIN == rc {
-                            Err(SeqlockError::Again)
+                            Err(SeqlockError::Again(rc))
                         } else {
                             Err(SeqlockError::Unknown(rc))
                         }
@@ -477,7 +488,7 @@ impl<T: ?Sized> Seqlock<T> {
                             *self.mode.get() = SeqlockMode::ReadExclusiveLockCpuirq;
                             Ok(SeqlockGuard::new(self))
                         } else if -EAGAIN == rc {
-                            Err(SeqlockError::Again)
+                            Err(SeqlockError::Again(rc))
                         } else {
                             Err(SeqlockError::Unknown(rc))
                         }
@@ -489,7 +500,7 @@ impl<T: ?Sized> Seqlock<T> {
                             *self.mode.get() = SeqlockMode::ReadExclusiveLockCpuirqSave(Some(cpuirq));
                             Ok(SeqlockGuard::new(self))
                         } else if -EAGAIN == rc {
-                            Err(SeqlockError::Again)
+                            Err(SeqlockError::Again(rc))
                         } else {
                             Err(SeqlockError::Unknown(rc))
                         }
@@ -500,7 +511,7 @@ impl<T: ?Sized> Seqlock<T> {
                             *self.mode.get() = SeqlockMode::ReadExclusiveLockBh;
                             Ok(SeqlockGuard::new(self))
                         } else if -EAGAIN == rc {
-                            Err(SeqlockError::Again)
+                            Err(SeqlockError::Again(rc))
                         } else {
                             Err(SeqlockError::Unknown(rc))
                         }
@@ -512,7 +523,7 @@ impl<T: ?Sized> Seqlock<T> {
                             *self.mode.get() = SeqlockMode::WriteLock;
                             Ok(SeqlockGuard::new(self))
                         } else if -EAGAIN == rc {
-                            Err(SeqlockError::Again)
+                            Err(SeqlockError::Again(rc))
                         } else {
                             Err(SeqlockError::Unknown(rc))
                         }
@@ -523,7 +534,7 @@ impl<T: ?Sized> Seqlock<T> {
                             *self.mode.get() = SeqlockMode::WriteLockCpuirq;
                             Ok(SeqlockGuard::new(self))
                         } else if -EAGAIN == rc {
-                            Err(SeqlockError::Again)
+                            Err(SeqlockError::Again(rc))
                         } else {
                             Err(SeqlockError::Unknown(rc))
                         }
@@ -535,7 +546,7 @@ impl<T: ?Sized> Seqlock<T> {
                             *self.mode.get() = SeqlockMode::WriteLockCpuirqSave(Some(cpuirq));
                             Ok(SeqlockGuard::new(self))
                         } else if -EAGAIN == rc {
-                            Err(SeqlockError::Again)
+                            Err(SeqlockError::Again(rc))
                         } else {
                             Err(SeqlockError::Unknown(rc))
                         }
@@ -546,7 +557,7 @@ impl<T: ?Sized> Seqlock<T> {
                             *self.mode.get() = SeqlockMode::WriteLockBh;
                             Ok(SeqlockGuard::new(self))
                         } else if -EAGAIN == rc {
-                            Err(SeqlockError::Again)
+                            Err(SeqlockError::Again(rc))
                         } else {
                             Err(SeqlockError::Unknown(rc))
                         }
@@ -554,7 +565,7 @@ impl<T: ?Sized> Seqlock<T> {
                 }
             }
         } else {
-            Err(SeqlockError::NotInit)
+            Err(SeqlockError::NotInit(-ENILOBJD))
         }
     }
 
@@ -832,16 +843,16 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
                         drop(self);
                     }
                     if -EINTR == rc {
-                        Err(CondError::Interrupt)
+                        Err(CondError::Interrupt(rc))
                     } else if -ENOTTHDCTX == rc {
-                        Err(CondError::NotThreadContext)
+                        Err(CondError::NotThreadContext(rc))
                     } else {
                         Err(CondError::Unknown(rc))
                     }
                 }
             } else {
                 drop(self);
-                Err(CondError::NotInit)
+                Err(CondError::NotInit(rc))
             }
         }
     }
@@ -948,18 +959,18 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
                         drop(self);
                     }
                     if -EINTR == rc {
-                        Err(CondError::Interrupt)
+                        Err(CondError::Interrupt(rc))
                     } else if -ETIMEDOUT == rc {
-                        Err(CondError::Timedout)
+                        Err(CondError::Timedout(rc))
                     } else if -ENOTTHDCTX == rc {
-                        Err(CondError::NotThreadContext)
+                        Err(CondError::NotThreadContext(rc))
                     } else {
                         Err(CondError::Unknown(rc))
                     }
                 }
             } else {
                 drop(self);
-                Err(CondError::NotInit)
+                Err(CondError::NotInit(rc))
             }
         }
     }
@@ -1063,16 +1074,16 @@ impl<'a, T: ?Sized> SeqlockGuard<'a, T> {
                         drop(self);
                     }
                     if -EINTR == rc {
-                        Err(CondError::Interrupt)
+                        Err(CondError::Interrupt(rc))
                     } else if -ENOTTHDCTX == rc {
-                        Err(CondError::NotThreadContext)
+                        Err(CondError::NotThreadContext(rc))
                     } else {
                         Err(CondError::Unknown(rc))
                     }
                 }
             } else {
                 drop(self);
-                Err(CondError::NotInit)
+                Err(CondError::NotInit(rc))
             }
         }
     }

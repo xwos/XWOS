@@ -172,27 +172,56 @@ extern "C" {
 #[derive(Debug)]
 pub enum FlgError {
     /// 没有错误
-    Ok,
+    Ok(XwEr),
     /// 事件标志没有初始化
-    NotInit,
+    NotInit(XwEr),
     /// 位置超出范围
-    OutOfRange,
+    OutOfRange(XwEr),
     /// 等待被中断
-    Interrupt,
+    Interrupt(XwEr),
     /// 等待超时
-    Timedout,
+    Timedout(XwEr),
     /// 没有检测到事件
-    NoEvent,
+    NoEvent(XwEr),
     /// 不在线程上下文内
-    NotThreadContext,
+    NotThreadContext(XwEr),
     /// 信号选择器的位置超出范围
-    OutOfSelPos,
-    /// 信号量已经绑定
-    AlreadyBound,
+    OutOfSelPos(XwEr),
+    /// 事件标志已经绑定
+    AlreadyBound(XwEr),
     /// 信号选择器的位置被占用
-    SelPosBusy,
+    SelPosBusy(XwEr),
     /// 未知错误
     Unknown(XwEr),
+}
+
+impl FlgError {
+    /// 消费掉 `FlgError` 自身，返回内部的错误码。
+    pub fn unwrap(self) -> XwEr {
+        match self {
+            Self::Ok(rc) => rc,
+            Self::NotInit(rc) => rc,
+            Self::OutOfRange(rc) => rc,
+            Self::Interrupt(rc) => rc,
+            Self::Timedout(rc) => rc,
+            Self::NoEvent(rc) => rc,
+            Self::NotThreadContext(rc) => rc,
+            Self::OutOfSelPos(rc) => rc,
+            Self::AlreadyBound(rc) => rc,
+            Self::SelPosBusy(rc) => rc,
+            Self::Unknown(rc) => rc,
+        }
+    }
+
+    /// 如果错误码是 [`FlgError::Ok`] ，返回 `true` 。
+    pub const fn is_ok(&self) -> bool {
+        matches!(*self, Self::Ok(_))
+    }
+
+    /// 如果错误码不是 [`FlgError::Ok`] ，返回 `true` 。
+    pub const fn is_err(&self) -> bool {
+        !self.is_ok()
+    }
 }
 
 /// 触发方式
@@ -370,7 +399,7 @@ where
                     Err(FlgError::Unknown(rc))
                 }
             } else {
-                Err(FlgError::NotInit)
+                Err(FlgError::NotInit(rc))
             }
         }
     }
@@ -389,12 +418,12 @@ where
                 rc = xwrustffi_flg_s1m(self.flg.get() as _, msk.bmp.get() as _);
                 xwrustffi_flg_put(self.flg.get() as _);
                 if XWOK == rc {
-                    FlgError::Ok
+                    FlgError::Ok(rc)
                 } else {
                     FlgError::Unknown(rc)
                 }
             } else {
-                FlgError::NotInit
+                FlgError::NotInit(rc)
             }
         }
     }
@@ -413,12 +442,12 @@ where
                 rc = xwrustffi_flg_s1i(self.flg.get() as _, pos);
                 xwrustffi_flg_put(self.flg.get() as _);
                 if XWOK == rc {
-                    FlgError::Ok
+                    FlgError::Ok(rc)
                 } else {
                     FlgError::Unknown(rc)
                 }
             } else {
-                FlgError::NotInit
+                FlgError::NotInit(rc)
             }
         }
     }
@@ -437,12 +466,12 @@ where
                 rc = xwrustffi_flg_c0m(self.flg.get() as _, msk.bmp.get() as _);
                 xwrustffi_flg_put(self.flg.get() as _);
                 if XWOK == rc {
-                    FlgError::Ok
+                    FlgError::Ok(rc)
                 } else {
                     FlgError::Unknown(rc)
                 }
             } else {
-                FlgError::NotInit
+                FlgError::NotInit(rc)
             }
         }
     }
@@ -461,12 +490,12 @@ where
                 rc = xwrustffi_flg_c0i(self.flg.get() as _, pos);
                 xwrustffi_flg_put(self.flg.get() as _);
                 if XWOK == rc {
-                    FlgError::Ok
+                    FlgError::Ok(rc)
                 } else {
                     FlgError::Unknown(rc)
                 }
             } else {
-                FlgError::NotInit
+                FlgError::NotInit(rc)
             }
         }
     }
@@ -485,12 +514,12 @@ where
                 rc = xwrustffi_flg_x1m(self.flg.get() as _, msk.bmp.get() as _);
                 xwrustffi_flg_put(self.flg.get() as _);
                 if XWOK == rc {
-                    FlgError::Ok
+                    FlgError::Ok(rc)
                 } else {
                     FlgError::Unknown(rc)
                 }
             } else {
-                FlgError::NotInit
+                FlgError::NotInit(rc)
             }
         }
     }
@@ -509,12 +538,12 @@ where
                 rc = xwrustffi_flg_x1i(self.flg.get() as _, pos);
                 xwrustffi_flg_put(self.flg.get() as _);
                 if XWOK == rc {
-                    FlgError::Ok
+                    FlgError::Ok(rc)
                 } else {
                     FlgError::Unknown(rc)
                 }
             } else {
-                FlgError::NotInit
+                FlgError::NotInit(rc)
             }
         }
     }
@@ -587,16 +616,16 @@ where
                                         origin.bmp.get() as _, msk.bmp.get() as _);
                 xwrustffi_flg_put(self.flg.get() as _);
                 if XWOK == rc {
-                    FlgError::Ok
+                    FlgError::Ok(rc)
                 } else if -EINTR == rc {
-                    FlgError::Interrupt
+                    FlgError::Interrupt(rc)
                 } else if -ENOTTHDCTX == rc {
-                    FlgError::NotThreadContext
+                    FlgError::NotThreadContext(rc)
                 } else {
                     FlgError::Unknown(rc)
                 }
             } else {
-                FlgError::NotInit
+                FlgError::NotInit(rc)
             }
         }
     }
@@ -671,18 +700,18 @@ where
                                            origin.bmp.get() as _, msk.bmp.get() as _, to);
                 xwrustffi_flg_put(self.flg.get() as _);
                 if XWOK == rc {
-                    FlgError::Ok
+                    FlgError::Ok(rc)
                 } else if -EINTR == rc {
-                    FlgError::Interrupt
+                    FlgError::Interrupt(rc)
                 } else if -ETIMEDOUT == rc {
-                    FlgError::Timedout
+                    FlgError::Timedout(rc)
                 } else if -ENOTTHDCTX == rc {
-                    FlgError::NotThreadContext
+                    FlgError::NotThreadContext(rc)
                 } else {
                     FlgError::Unknown(rc)
                 }
             } else {
-                FlgError::NotInit
+                FlgError::NotInit(rc)
             }
         }
     }
@@ -753,14 +782,14 @@ where
                                            origin.bmp.get() as _, msk.bmp.get() as _);
                 xwrustffi_flg_put(self.flg.get() as _);
                 if XWOK == rc {
-                    FlgError::Ok
+                    FlgError::Ok(rc)
                 } else if -ENODATA == rc {
-                    FlgError::NoEvent
+                    FlgError::NoEvent(rc)
                 } else {
                     FlgError::Unknown(rc)
                 }
             } else {
-                FlgError::NotInit
+                FlgError::NotInit(rc)
             }
         }
     }
@@ -826,16 +855,16 @@ where
                         pos: pos,
                     })
                 } else if -ECHRNG == rc {
-                    Err(FlgError::OutOfSelPos)
+                    Err(FlgError::OutOfSelPos(rc))
                 } else if -EALREADY == rc {
-                    Err(FlgError::AlreadyBound)
+                    Err(FlgError::AlreadyBound(rc))
                 } else if -EBUSY == rc {
-                    Err(FlgError::SelPosBusy)
+                    Err(FlgError::SelPosBusy(rc))
                 } else {
                     Err(FlgError::Unknown(rc))
                 }
             } else {
-                Err(FlgError::NotInit)
+                Err(FlgError::NotInit(rc))
             }
         }
     }
