@@ -116,6 +116,9 @@ struct xwup_thd {
 #endif
 };
 
+
+xwer_t xwup_thd_delete(struct xwup_thd * thd);
+/* public(xwup) */
 #if (defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX))
 void xwup_thd_chprio_once(struct xwup_thd * thd, xwpr_t dprio,
                           struct xwup_mtx ** pmtx);
@@ -157,7 +160,7 @@ void xwup_thd_wakeup(struct xwup_thd * thd)
         xwup_thd_rq_add_tail(thd);
 }
 
-
+/* public */
 void xwup_thd_attr_init(struct xwup_thd_attr * attr);
 xwer_t xwup_thd_init(struct xwup_thd * thd,
                      const struct xwup_thd_attr * inattr,
