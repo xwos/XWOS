@@ -2,11 +2,39 @@
 //! ========
 //!
 
+extern crate core;
+use core::ffi::*;
+use core::ptr;
+use core::cmp::{PartialOrd, Ordering};
+
 use crate::types::*;
 
 extern "C" {
+    fn xwrustffi_pm_set_cb(resume_cb: PmCallback,
+                           suspend_cb: PmCallback,
+                           wakeup_cb: PmCallback,
+                           sleep_cb: PmCallback,
+                           arg: *mut c_void);
     fn xwrustffi_pm_suspend() -> XwEr;
     fn xwrustffi_pm_resume() -> XwEr;
+    fn xwrustffi_pm_get_stage() -> XwSq;
+}
+
+/// 电源管理回调函数类型
+pub type PmCallback = extern "C" fn(*mut c_void);
+
+/// 设置电源管理的回调函数
+///
+/// + resume_cb: 从暂停模式恢复的回调函数
+/// + suspend_cb: 进入暂停模式的回调函数
+/// + wakeup_cb: 唤醒时回调函数
+/// + sleep_cb: 休眠时的回调函数
+pub fn set_cb(resume_cb: PmCallback, suspend_cb: PmCallback,
+              wakeup_cb: PmCallback, sleep_cb: PmCallback) {
+    unsafe {
+        xwrustffi_pm_set_cb(resume_cb, suspend_cb, wakeup_cb, sleep_cb,
+                            ptr::null_mut());
+    }
 }
 
 /// 将系统切换为低功耗状态
@@ -48,5 +76,46 @@ pub fn suspend() -> XwEr {
 pub fn resume() -> XwEr {
     unsafe {
         xwrustffi_pm_resume()
+    }
+}
+
+pub struct PmStage(XwSq);
+
+impl PmStage {
+    /// 已经暂停
+    pub const SUSPENDED: PmStage = PmStage(0);
+    /// 正在暂停
+    pub const SUSPENDING: PmStage = PmStage(1);
+    /// 正在恢复
+    pub const RESUMING: PmStage = PmStage(1);
+    /// 正在冻结线程
+    pub const FREEZING: PmStage = PmStage(3);
+    /// 正在解冻线程
+    pub const THAWING: PmStage = PmStage(3);
+    /// 正常运行
+    pub const RUNNING: PmStage = PmStage(4);
+}
+
+pub fn get_stage() -> PmStage {
+    unsafe {
+        PmStage(xwrustffi_pm_get_stage())
+    }
+}
+
+impl PartialEq for PmStage {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
+
+impl PartialOrd for PmStage {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        if self.0 < other.0 {
+            Some(Ordering::Less)
+        } else if self.0 > other.0 {
+            Some(Ordering::Greater)
+        } else {
+            Some(Ordering::Equal)
+        }
     }
 }

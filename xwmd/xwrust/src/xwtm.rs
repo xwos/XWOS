@@ -107,7 +107,7 @@ pub fn nowtc() -> u64 {
 ///
 /// let tp = xwtm::us(8); // 8微妙
 /// ```
-pub fn us(us: XwTm) -> XwTm {
+pub const fn us(us: XwTm) -> XwTm {
     us * MICROSECOND
 }
 
@@ -121,7 +121,7 @@ pub fn us(us: XwTm) -> XwTm {
 ///
 /// let tp = xwtm::ms(8); // 8毫妙
 /// ```
-pub fn ms(ms: XwTm) -> XwTm {
+pub const fn ms(ms: XwTm) -> XwTm {
     ms * MILLISECOND
 }
 
@@ -135,7 +135,7 @@ pub fn ms(ms: XwTm) -> XwTm {
 ///
 /// let tp = xwtm::s(8); // 8妙
 /// ```
-pub fn s(s: XwTm) -> XwTm {
+pub const fn s(s: XwTm) -> XwTm {
     s * SECOND
 }
 
@@ -149,7 +149,7 @@ pub fn s(s: XwTm) -> XwTm {
 ///
 /// let tp = xwtm::m(8); // 8分
 /// ```
-pub fn m(m: XwTm) -> XwTm {
+pub const fn m(m: XwTm) -> XwTm {
     m * MINUTE
 }
 
@@ -163,7 +163,7 @@ pub fn m(m: XwTm) -> XwTm {
 ///
 /// let tp = xwtm::h(8); // 8小时
 /// ```
-pub fn h(h: XwTm) -> XwTm {
+pub const fn h(h: XwTm) -> XwTm {
     h * HOUR
 }
 
@@ -177,6 +177,6 @@ pub fn h(h: XwTm) -> XwTm {
 ///
 /// let tp = xwtm::d(8); // 8天
 /// ```
-pub fn d(d: XwTm) -> XwTm {
+pub const fn d(d: XwTm) -> XwTm {
     d * DAY
 }

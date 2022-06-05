@@ -13,6 +13,15 @@
 #include <xwos/standard.h>
 #include <xwos/osal/pm.h>
 
+void xwrustffi_pm_set_cb(xwos_pm_cb_f resume_cb,
+                         xwos_pm_cb_f suspend_cb,
+                         xwos_pm_cb_f wakeup_cb,
+                         xwos_pm_cb_f sleep_cb,
+                         void * arg)
+{
+        xwos_pm_set_cb(resume_cb, suspend_cb, wakeup_cb, sleep_cb, arg);
+}
+
 xwer_t xwrustffi_pm_suspend(void)
 {
         return xwos_pm_suspend();
@@ -21,4 +30,9 @@ xwer_t xwrustffi_pm_suspend(void)
 xwer_t xwrustffi_pm_resume(void)
 {
         return xwos_pm_resume();
+}
+
+xwsq_t xwrustffi_pm_get_stage(void)
+{
+        return xwos_pm_get_stage();
 }

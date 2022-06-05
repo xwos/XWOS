@@ -26,6 +26,7 @@ enum xwmp_pm_stage_em {
         XWMP_PM_STAGE_SUSPENDED = 0, /**< 已经暂停 */
         XWMP_PM_STAGE_SUSPENDING, /**< 正在暂停 */
         XWMP_PM_STAGE_RESUMING = XWMP_PM_STAGE_SUSPENDING, /**< 正在恢复 */
+        XWMP_PM_STAGE_RESERVED,
         XWMP_PM_STAGE_FREEZING, /**< 正在冻结线程 */
         XWMP_PM_STAGE_THAWING = XWMP_PM_STAGE_FREEZING, /**< 正在解冻线程 */
         XWMP_PM_STAGE_RUNNING, /**< 正常运行 */
