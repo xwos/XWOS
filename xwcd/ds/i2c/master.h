@@ -61,6 +61,9 @@ struct xwds_i2cm {
 
 void xwds_i2cm_construct(struct xwds_i2cm * i2cm);
 void xwds_i2cm_destruct(struct xwds_i2cm * i2cm);
+xwer_t xwds_i2cm_grab(struct xwds_i2cm * i2cm);
+xwer_t xwds_i2cm_put(struct xwds_i2cm * i2cm);
+
 xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm,
                       struct xwds_i2c_msg * msg,
                       xwtm_t to);
@@ -68,28 +71,6 @@ xwer_t xwds_i2cm_abort(struct xwds_i2cm * i2cm,
                        xwu16_t address, xwu16_t addrmode,
                        xwtm_t to);
 
-/**
- * @brief XWDS API：增加对象的引用计数
- * @param[in] i2cm: I2C主机控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_grab()
- */
-static __xwds_inline_api
-xwer_t xwds_i2cm_grab(struct xwds_i2cm * i2cm)
-{
-        return xwds_device_grab(&i2cm->dev);
-}
 
-/**
- * @brief XWDS API：减少对象的引用计数
- * @param[in] i2cm: I2C主机控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_put()
- */
-static __xwds_inline_api
-xwer_t xwds_i2cm_put(struct xwds_i2cm * i2cm)
-{
-        return xwds_device_put(&i2cm->dev);
-}
 
 #endif /* xwcd/ds/i2c/master.h */

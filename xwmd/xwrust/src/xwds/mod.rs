@@ -3,3 +3,4 @@
 //!
 
 pub mod soc;
+pub mod i2cm;
