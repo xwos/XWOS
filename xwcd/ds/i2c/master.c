@@ -75,6 +75,26 @@ void xwds_i2cm_destruct(struct xwds_i2cm * i2cm)
         xwds_device_destruct(&i2cm->dev);
 }
 
+/**
+ * @brief XWDS API：增加对象的引用计数
+ * @param[in] i2cm: I2C主机控制器对象指针
+ */
+__xwds_api
+xwer_t xwds_i2cm_grab(struct xwds_i2cm * i2cm)
+{
+        return xwds_device_grab(&i2cm->dev);
+}
+
+/**
+ * @brief XWDS API：减少对象的引用计数
+ * @param[in] i2cm: I2C主机控制器对象指针
+ */
+__xwds_api
+xwer_t xwds_i2cm_put(struct xwds_i2cm * i2cm)
+{
+        return xwds_device_put(&i2cm->dev);
+}
+
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测I2C主机控制器
@@ -222,11 +242,9 @@ xwer_t xwds_i2cm_vop_resume(struct xwds_i2cm * i2cm)
  * @retval -EADDRNOTAVAIL: 地址无响应
  * @retval -ETIMEDOUT: 超时
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 上下文：线程
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_i2cm_xfer(struct xwds_i2cm * i2cm, struct xwds_i2c_msg * msg, xwtm_t to)
