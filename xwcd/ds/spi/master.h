@@ -61,34 +61,13 @@ struct xwds_spim {
 
 void xwds_spim_construct(struct xwds_spim * spim);
 void xwds_spim_destruct(struct xwds_spim * spim);
+xwer_t xwds_spim_grab(struct xwds_spim * spim);
+xwer_t xwds_spim_put(struct xwds_spim * spim);
+
 xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t to);
 xwer_t xwds_spim_xfer(struct xwds_spim * spim,
                       const xwu8_t txd[], xwu8_t * rxb, xwsz_t * size,
                       xwtm_t to);
 xwer_t xwds_spim_abort(struct xwds_spim * spim, xwtm_t to);
-
-/**
- * @brief XWDS API：增加对象的引用计数
- * @param[in] spim: SPI主机模式控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_grab()
- */
-static __xwds_inline_api
-xwer_t xwds_spim_grab(struct xwds_spim * spim)
-{
-        return xwds_device_grab(&spim->dev);
-}
-
-/**
- * @brief XWDS API：减少对象的引用计数
- * @param[in] spim: SPI主机模式控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_put()
- */
-static __xwds_inline_api
-xwer_t xwds_spim_put(struct xwds_spim * spim)
-{
-        return xwds_device_put(&spim->dev);
-}
 
 #endif /* xwcd/ds/spi/master.h */
