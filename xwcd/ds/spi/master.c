@@ -79,6 +79,26 @@ void xwds_spim_destruct(struct xwds_spim * spim)
         xwds_device_destruct(dev);
 }
 
+/**
+ * @brief XWDS API：增加对象的引用计数
+ * @param[in] spim: SPI主机模式控制器对象指针
+ */
+__xwds_api
+xwer_t xwds_spim_grab(struct xwds_spim * spim)
+{
+        return xwds_device_grab(&spim->dev);
+}
+
+/**
+ * @brief XWDS API：减少对象的引用计数
+ * @param[in] spim: SPI主机模式控制器对象指针
+ */
+__xwds_api
+xwer_t xwds_spim_put(struct xwds_spim * spim)
+{
+        return xwds_device_put(&spim->dev);
+}
+
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测设备
@@ -202,7 +222,7 @@ xwer_t xwds_spim_vop_resume(struct xwds_spim * spim)
  * - 上下文：线程
  * - 重入性：可重入
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_spim_buscfg(struct xwds_spim * spim, xwid_t cfgid, xwtm_t to)
@@ -264,13 +284,16 @@ err_spim_grab:
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
- * @retval -ENOSYS: 不支持主机模式传输
+ * @retval -EINVAL: 参数错误
+ * @retval -EBUSY: 总线繁忙
+ * @retval -EIO: 传输错误
+ * @retval -ETIMEDOUT: 超时
  * @note
  * - 同步/异步：同步
  * - 上下文：线程
  * - 重入性：可重入
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_spim_xfer(struct xwds_spim * spim,

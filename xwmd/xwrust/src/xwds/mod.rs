@@ -4,3 +4,4 @@
 
 pub mod soc;
 pub mod i2cm;
+pub mod spim;
