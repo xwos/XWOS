@@ -235,6 +235,7 @@ xwer_t xwds_dmauartc_vop_resume(struct xwds_dmauartc * dmauartc)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
+ * @retval -ETIMEDOUT: 超时
  * @note
  * + 上下文：线程
  * @details
@@ -310,6 +311,7 @@ err_dmauartc_grab:
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
+ * @retval -ENODATA: 没有数据
  * @note
  * + 上下文：中断、中断底半部、线程
  */
@@ -383,6 +385,9 @@ err_dmauartc_grab:
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
+ * @retval -ENOSYS: 不支持此操作
+ * @retval -ECANCELED: 发送被取消
+ * @retval -ETIMEDOUT: 超时
  * @note
  * + 上下文：线程
  * @details
@@ -437,6 +442,7 @@ err_dmauartc_grab:
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
+ * @retval -ENOSYS: 不支持此操作
  * @note
  * + 上下文：线程
  * @details
@@ -488,6 +494,7 @@ err_dmauartc_grab:
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
+ * @retval -ENOSYS: 不支持此操作
  * @note
  * + 上下文：中断、中断底半部、线程
  */
