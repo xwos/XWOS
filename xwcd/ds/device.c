@@ -47,7 +47,6 @@ __xwds_rodata const struct xwds_virtual_operation xwds_dev_vop = {
 /**
  * @brief XWDS API：设备的构造函数
  * @param[in] dev: 设备对象的指针
- * @return 错误码
  */
 __xwds_api
 void xwds_device_construct(struct xwds_device * dev)
@@ -71,7 +70,6 @@ void xwds_device_destruct(struct xwds_device * dev)
 /**
  * @brief 设备基本操作函数：探测设备
  * @param[in] dev: 设备对象的指针
- * @return 错误码
  */
 __xwds_vop
 xwer_t xwds_device_vop_probe(struct xwds_device * dev)
@@ -91,7 +89,6 @@ xwer_t xwds_device_vop_probe(struct xwds_device * dev)
 /**
  * @brief 设备基本操作函数：删除设备
  * @param[in] dev: 设备对象的指针
- * @return 错误码
  */
 __xwds_vop
 xwer_t xwds_device_vop_remove(struct xwds_device * dev)
@@ -111,7 +108,6 @@ xwer_t xwds_device_vop_remove(struct xwds_device * dev)
 /**
  * @brief 设备基本操作函数：启动设备
  * @param[in] dev: 设备对象的指针
- * @return 错误码
  */
 __xwds_vop
 xwer_t xwds_device_vop_start(struct xwds_device * dev)
@@ -131,7 +127,6 @@ xwer_t xwds_device_vop_start(struct xwds_device * dev)
 /**
  * @brief 设备基本操作函数：停止设备
  * @param[in] dev: 设备对象的指针
- * @return 错误码
  */
 __xwds_vop
 xwer_t xwds_device_vop_stop(struct xwds_device * dev)
@@ -152,7 +147,6 @@ xwer_t xwds_device_vop_stop(struct xwds_device * dev)
 /**
  * @brief 设备基本操作函数：暂停设备
  * @param[in] dev: 设备对象的指针
- * @return 错误码
  */
 __xwds_vop
 xwer_t xwds_device_vop_suspend(struct xwds_device * dev)
@@ -172,7 +166,6 @@ xwer_t xwds_device_vop_suspend(struct xwds_device * dev)
 /**
  * @brief 设备基本操作函数：继续设备
  * @param[in] dev: 设备对象的指针
- * @return 错误码
  */
 __xwds_vop
 xwer_t xwds_device_vop_resume(struct xwds_device * dev)
@@ -233,9 +226,7 @@ err_dev_vop_remove:
  * @retval XWOK: 没有错误发生
  * @retval -EPERM: 引用计数错误
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_device_probe(struct xwds * ds, struct xwds_device * dev,
@@ -292,9 +283,7 @@ err_obj_probe:
  * @retval XWOK: 没有错误发生
  * @retval -EPERM: 引用计数错误
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_device_remove(struct xwds_device * dev)
@@ -311,9 +300,7 @@ xwer_t xwds_device_remove(struct xwds_device * dev)
  * @retval XWOK: 没有错误发生
  * @retval -EPERM: 引用计数错误
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_device_start(struct xwds_device * dev)
@@ -352,9 +339,7 @@ err_obj_start:
  * @param[in] dev: 设备对象的指针
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_device_stop(struct xwds_device * dev)
@@ -394,9 +379,7 @@ err_obj_stop:
  * @param[in] dev: 设备对象的指针
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_device_suspend(struct xwds_device * dev)
@@ -435,9 +418,7 @@ err_obj_suspend:
  * @param[in] dev: 设备对象的指针
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_device_resume(struct xwds_device * dev)
@@ -477,9 +458,7 @@ err_obj_resume:
  * @param[in] ign_err: 是否忽略错误：若为假，发生错误时，函数会中止并返回
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err)
@@ -514,9 +493,7 @@ xwer_t xwds_device_suspend_all(struct xwds * ds, bool ign_err)
  * @param[in] ign_err: 是否忽略错误：若为假，发生错误时，函数会中止并返回
  * @return 错误码
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_device_resume_all(struct xwds * ds, bool ign_err)

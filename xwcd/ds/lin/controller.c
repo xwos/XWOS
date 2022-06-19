@@ -75,11 +75,30 @@ void xwds_linc_destruct(struct xwds_linc * linc)
         xwds_device_destruct(&linc->dev);
 }
 
+/**
+ * @brief XWDS API：增加对象的引用计数
+ * @param[in] linc: LIN控制器对象指针
+ */
+__xwds_api
+xwer_t xwds_linc_grab(struct xwds_linc * linc)
+{
+        return xwds_device_grab(&linc->dev);
+}
+
+/**
+ * @brief XWDS API：减少对象的引用计数
+ * @param[in] linc: LIN控制器对象指针
+ */
+__xwds_api
+xwer_t xwds_linc_put(struct xwds_linc * linc)
+{
+        return xwds_device_put(&linc->dev);
+}
+
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测LIN控制器
  * @param[in] linc: LIN控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_linc_vop_probe(struct xwds_linc * linc)
@@ -108,7 +127,6 @@ err_mtx_init:
 /**
  * @brief XWDS VOP：移除LIN控制器
  * @param[in] linc: LIN控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_linc_vop_remove(struct xwds_linc * linc)
@@ -129,7 +147,6 @@ err_dev_vop_remove:
 /**
  * @brief XWDS VOP：启动LIN控制器
  * @param[in] linc: LIN控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_linc_vop_start(struct xwds_linc * linc)
@@ -143,7 +160,6 @@ xwer_t xwds_linc_vop_start(struct xwds_linc * linc)
 /**
  * @brief XWDS VOP：停止LIN控制器
  * @param[in] linc: LIN控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_linc_vop_stop(struct xwds_linc * linc)
@@ -159,7 +175,6 @@ xwer_t xwds_linc_vop_stop(struct xwds_linc * linc)
 /**
  * @brief XWDS VOP：暂停LIN控制器
  * @param[in] linc: LIN控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_linc_vop_suspend(struct xwds_linc * linc)
@@ -173,7 +188,6 @@ xwer_t xwds_linc_vop_suspend(struct xwds_linc * linc)
 /**
  * @brief XWDS VOP：继续LIN控制器
  * @param[in] linc: LIN控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_linc_vop_resume(struct xwds_linc * linc)

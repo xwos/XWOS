@@ -86,11 +86,30 @@ void xwds_dmauartc_destruct(struct xwds_dmauartc * dmauartc)
         xwds_device_destruct(&dmauartc->dev);
 }
 
+/**
+ * @brief 增加对象的引用计数
+ * @param[in] dmauartc: DMA UART控制器对象指针
+ */
+__xwds_api
+xwer_t xwds_dmauartc_grab(struct xwds_dmauartc * dmauartc)
+{
+        return xwds_device_grab(&dmauartc->dev);
+}
+
+/**
+ * @brief 减少对象的引用计数
+ * @param[in] dmauartc: DMA UART控制器对象指针
+ */
+__xwds_api
+xwer_t xwds_dmauartc_put(struct xwds_dmauartc * dmauartc)
+{
+        return xwds_device_put(&dmauartc->dev);
+}
+
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测DMA UART控制器
  * @param[in] dmauartc: DMA UART控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_dmauartc_vop_probe(struct xwds_dmauartc * dmauartc)
@@ -123,7 +142,6 @@ err_sem_init:
 /**
  * @brief XWDS VOP：移除DMA UART控制器
  * @param[in] dmauartc: DMA UART控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_dmauartc_vop_remove(struct xwds_dmauartc * dmauartc)
@@ -146,7 +164,6 @@ err_dev_vop_remove:
 /**
  * @brief XWDS VOP：启动DMA UART控制器
  * @param[in] dmauartc: DMA UART控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_dmauartc_vop_start(struct xwds_dmauartc * dmauartc)
@@ -164,7 +181,6 @@ xwer_t xwds_dmauartc_vop_start(struct xwds_dmauartc * dmauartc)
 /**
  * @brief XWDS VOP：停止DMA UART控制器
  * @param[in] dmauartc: DMA UART控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_dmauartc_vop_stop(struct xwds_dmauartc * dmauartc)
@@ -180,7 +196,6 @@ xwer_t xwds_dmauartc_vop_stop(struct xwds_dmauartc * dmauartc)
 /**
  * @brief XWDS VOP：暂停DMA UART控制器
  * @param[in] dmauartc: DMA UART控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_dmauartc_vop_suspend(struct xwds_dmauartc * dmauartc)
@@ -194,7 +209,6 @@ xwer_t xwds_dmauartc_vop_suspend(struct xwds_dmauartc * dmauartc)
 /**
  * @brief XWDS VOP：继续DMA UART控制器
  * @param[in] dmauartc: DMA UART控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_dmauartc_vop_resume(struct xwds_dmauartc * dmauartc)
@@ -222,11 +236,9 @@ xwer_t xwds_dmauartc_vop_resume(struct xwds_dmauartc * dmauartc)
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 上下文：线程
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
@@ -299,9 +311,7 @@ err_dmauartc_grab:
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_dmauartc_try_rx(struct xwds_dmauartc * dmauartc,
@@ -374,11 +384,9 @@ err_dmauartc_grab:
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 上下文：线程
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
@@ -430,11 +438,9 @@ err_dmauartc_grab:
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 上下文：线程
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_dmauartc_putc(struct xwds_dmauartc * dmauartc,
@@ -483,9 +489,7 @@ err_dmauartc_grab:
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_dmauartc_cfg(struct xwds_dmauartc * dmauartc,

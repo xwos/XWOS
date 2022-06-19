@@ -99,7 +99,6 @@ xwer_t xwds_soc_put(struct xwds_soc * soc)
 /**
  * @brief XWDS VOP：探测SOC
  * @param[in] soc: SOC对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_soc_vop_probe(struct xwds_soc * soc)
@@ -115,7 +114,6 @@ xwer_t xwds_soc_vop_probe(struct xwds_soc * soc)
 /**
  * @brief XWDS VOP：移除SOC
  * @param[in] soc: SOC对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_soc_vop_remove(struct xwds_soc * soc)
@@ -129,7 +127,6 @@ xwer_t xwds_soc_vop_remove(struct xwds_soc * soc)
 /**
  * @brief XWDS VOP：启动SOC
  * @param[in] soc: SOC对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_soc_vop_start(struct xwds_soc * soc)
@@ -143,7 +140,6 @@ xwer_t xwds_soc_vop_start(struct xwds_soc * soc)
 /**
  * @brief XWDS VOP：停止SOC
  * @param[in] soc: SOC对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_soc_vop_stop(struct xwds_soc * soc)
@@ -159,7 +155,6 @@ xwer_t xwds_soc_vop_stop(struct xwds_soc * soc)
 /**
  * @brief XWDS VOP：暂停SOC
  * @param[in] soc: SOC对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_soc_vop_suspend(struct xwds_soc * soc)
@@ -173,7 +168,6 @@ xwer_t xwds_soc_vop_suspend(struct xwds_soc * soc)
 /**
  * @brief XWDS VOP：继续SOC
  * @param[in] soc: SOC对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_soc_vop_resume(struct xwds_soc * soc)

@@ -29,9 +29,7 @@
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 测试错误
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_eram_test(struct xwds_soc * soc, xwptr_t * erraddr)

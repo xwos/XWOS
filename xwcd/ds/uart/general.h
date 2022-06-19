@@ -70,6 +70,8 @@ struct xwds_uartc {
 
 void xwds_uartc_construct(struct xwds_uartc * uartc);
 void xwds_uartc_destruct(struct xwds_uartc * uartc);
+xwer_t xwds_uartc_grab(struct xwds_uartc * uartc);
+xwer_t xwds_uartc_put(struct xwds_uartc * uartc);
 
 xwer_t xwds_uartc_clear_rxq(struct xwds_uartc * uartc);
 xwer_t xwds_uartc_get_rxq_datasize(struct xwds_uartc * uartc, xwsz_t *ret);
@@ -89,30 +91,6 @@ xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
                      xwtm_t to);
 xwer_t xwds_uartc_cfg(struct xwds_uartc * uartc,
                       const struct xwds_uart_cfg * cfg);
-
-/**
- * @brief XWDS API：增加对象的引用计数
- * @param[in] uartc: UART控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_grab()
- */
-static __xwds_inline_api
-xwer_t xwds_uartc_grab(struct xwds_uartc * uartc)
-{
-        return xwds_device_grab(&uartc->dev);
-}
-
-/**
- * @brief XWDS API：减少对象的引用计数
- * @param[in] uartc: UART控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_put()
- */
-static __xwds_inline_api
-xwer_t xwds_uartc_put(struct xwds_uartc * uartc)
-{
-        return xwds_device_put(&uartc->dev);
-}
 
 /******** ******** Callbacks for driver ******** ********/
 void xwds_uartc_drvcb_rx_isr(struct xwds_uartc * uartc);

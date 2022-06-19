@@ -75,6 +75,8 @@ struct xwds_dmauartc {
 
 void xwds_dmauartc_construct(struct xwds_dmauartc * dmauartc);
 void xwds_dmauartc_destruct(struct xwds_dmauartc * dmauartc);
+xwer_t xwds_dmauartc_grab(struct xwds_dmauartc * dmauartc);
+xwer_t xwds_dmauartc_put(struct xwds_dmauartc * dmauartc);
 
 xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
                         xwu8_t * buf, xwsz_t * size,
@@ -89,30 +91,6 @@ xwer_t xwds_dmauartc_putc(struct xwds_dmauartc * dmauartc,
                           xwtm_t to);
 xwer_t xwds_dmauartc_cfg(struct xwds_dmauartc * dmauartc,
                          const struct xwds_uart_cfg * cfg);
-
-/**
- * @brief 增加对象的引用计数
- * @param[in] dmauartc: DMA UART控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_grab()
- */
-static __xwds_inline_api
-xwer_t xwds_dmauartc_grab(struct xwds_dmauartc * dmauartc)
-{
-        return xwds_device_grab(&dmauartc->dev);
-}
-
-/**
- * @brief 减少对象的引用计数
- * @param[in] dmauartc: DMA UART控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_put()
- */
-static __xwds_inline_api
-xwer_t xwds_dmauartc_put(struct xwds_dmauartc * dmauartc)
-{
-        return xwds_device_put(&dmauartc->dev);
-}
 
 /******** ******** Callbacks for driver ******** ********/
 void xwds_dmauartc_drvcb_rxq_flush(struct xwds_dmauartc * dmauartc);

@@ -74,11 +74,31 @@ void xwds_spip_destruct(struct xwds_spip * spip)
         xwds_device_destruct(&spip->dev);
 }
 
+
+/**
+ * @brief XWDS API：增加对象的引用计数
+ * @param[in] spip: SPI外设控制器对象指针
+ */
+__xwds_api
+xwer_t xwds_spip_grab(struct xwds_spip * spip)
+{
+        return xwds_device_grab(&spip->dev);
+}
+
+/**
+ * @brief XWDS API：减少对象的引用计数
+ * @param[in] spip: SPI外设控制器对象指针
+ */
+__xwds_api
+xwer_t xwds_spip_put(struct xwds_spip * spip)
+{
+        return xwds_device_put(&spip->dev);
+}
+
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测设备
  * @param[in] spip: SPI外设控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_spip_vop_probe(struct xwds_spip * spip)
@@ -98,7 +118,6 @@ err_dev_vop_probe:
 /**
  * @brief XWDS VOP：删除设备
  * @param[in] spip: SPI外设控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_spip_vop_remove(struct xwds_spip * spip)
@@ -120,7 +139,6 @@ err_dev_vop_remove:
 /**
  * @brief XWDS VOP：启动设备
  * @param[in] spip: SPI外设控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_spip_vop_start(struct xwds_spip * spip)
@@ -150,7 +168,6 @@ err_spim_grab:
 /**
  * @brief XWDS VOP：停止设备
  * @param[in] spip: SPI外设控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_spip_vop_stop(struct xwds_spip * spip)
@@ -175,7 +192,6 @@ err_dev_vop_stop:
 /**
  * @brief XWDS VOP：暂停设备
  * @param[in] spip: SPI外设控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_spip_vop_suspend(struct xwds_spip * spip)
@@ -198,7 +214,6 @@ err_dev_vop_suspend:
 /**
  * @brief XWDS VOP：继续设备
  * @param[in] spip: SPI外设控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_spip_vop_resume(struct xwds_spip * spip)

@@ -82,11 +82,30 @@ void xwds_uartc_destruct(struct xwds_uartc * uartc)
         xwds_device_destruct(&uartc->dev);
 }
 
+/**
+ * @brief XWDS API：增加对象的引用计数
+ * @param[in] uartc: UART控制器对象指针
+ */
+__xwds_api
+xwer_t xwds_uartc_grab(struct xwds_uartc * uartc)
+{
+        return xwds_device_grab(&uartc->dev);
+}
+
+/**
+ * @brief XWDS API：减少对象的引用计数
+ * @param[in] uartc: UART控制器对象指针
+ */
+__xwds_api
+xwer_t xwds_uartc_put(struct xwds_uartc * uartc)
+{
+        return xwds_device_put(&uartc->dev);
+}
+
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测UART控制器
  * @param[in] uartc: UART控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_uartc_vop_probe(struct xwds_uartc * uartc)
@@ -138,7 +157,6 @@ err_rxsem_init:
 /**
  * @brief XWDS VOP：移除UART控制器
  * @param[in] uartc: UART控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_uartc_vop_remove(struct xwds_uartc * uartc)
@@ -160,7 +178,6 @@ err_dev_vop_remove:
 /**
  * @brief XWDS VOP：启动UART控制器
  * @param[in] uartc: UART控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_uartc_vop_start(struct xwds_uartc * uartc)
@@ -204,7 +221,6 @@ err_dev_start:
 /**
  * @brief XWDS VOP：停止UART控制器
  * @param[in] uartc: UART控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_uartc_vop_stop(struct xwds_uartc * uartc)
@@ -237,7 +253,6 @@ err_rxsem_freeze:
 /**
  * @brief XWDS VOP：暂停UART控制器
  * @param[in] uartc: UART控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_uartc_vop_suspend(struct xwds_uartc * uartc)
@@ -261,7 +276,6 @@ err_dev_suspend:
 /**
  * @brief XWDS VOP：继续UART控制器
  * @param[in] uartc: UART控制器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_uartc_vop_resume(struct xwds_uartc * uartc)
@@ -303,9 +317,7 @@ err_dev_resume:
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_uartc_clear_rxq(struct xwds_uartc * uartc)
@@ -349,9 +361,7 @@ err_uartc_grab:
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_uartc_get_rxq_datasize(struct xwds_uartc * uartc, xwsz_t *ret)
@@ -393,11 +403,9 @@ err_uartc_grab:
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 上下文：线程
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_uartc_getc(struct xwds_uartc * uartc, xwu8_t * buf, xwtm_t to)
@@ -440,9 +448,7 @@ err_uartc_grab:
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_uartc_try_getc(struct xwds_uartc * uartc, xwu8_t * buf)
@@ -489,11 +495,9 @@ err_uartc_grab:
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 上下文：线程
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
@@ -548,9 +552,7 @@ err_uartc_grab:
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc, void * buf, xwsz_t * size)
@@ -599,9 +601,7 @@ err_uartc_grab:
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_uartc_clear_txq(struct xwds_uartc * uartc)
@@ -675,11 +675,9 @@ xwer_t xwds_uartc_tx_1byte(struct xwds_uartc * uartc, const xwu8_t byte)
  * @retval -EFAULT: 无效指针
  * @retval -EOVERFLOW: 发送队列已满
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 上下文：线程
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_uartc_putc(struct xwds_uartc * uartc,
@@ -726,11 +724,9 @@ err_uartc_grab:
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
- * - 同步/异步：同步
- * - 上下文：线程
- * - 重入性：可重入
+ * + 上下文：线程
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwds_api
 xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
@@ -783,9 +779,7 @@ err_uartc_grab:
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_uartc_cfg(struct xwds_uartc * uartc,

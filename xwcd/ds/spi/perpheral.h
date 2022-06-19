@@ -48,29 +48,7 @@ struct xwds_spip {
 
 void xwds_spip_construct(struct xwds_spip * spip);
 void xwds_spip_destruct(struct xwds_spip * spip);
-
-/**
- * @brief XWDS API：增加对象的引用计数
- * @param[in] spip: SPI外设控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_grab()
- */
-static __xwds_inline_api
-xwer_t xwds_spip_grab(struct xwds_spip * spip)
-{
-        return xwds_device_grab(&spip->dev);
-}
-
-/**
- * @brief XWDS API：减少对象的引用计数
- * @param[in] spip: SPI外设控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_put()
- */
-static __xwds_inline_api
-xwer_t xwds_spip_put(struct xwds_spip * spip)
-{
-        return xwds_device_put(&spip->dev);
-}
+xwer_t xwds_spip_grab(struct xwds_spip * spip);
+xwer_t xwds_spip_put(struct xwds_spip * spip);
 
 #endif /* xwcd/ds/spi/perpheral.h */

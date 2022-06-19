@@ -48,9 +48,7 @@ void xwds_init(struct xwds * ds)
  * @param[in] ds: 设备栈控制块指针
  * @return 错误码
  * @note
- * - 同步/异步：异步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_pm_suspend(struct xwds * ds)
@@ -80,9 +78,7 @@ void xwds_pm_report_devices_suspending(struct xwds * ds, xwer_t rc)
  * @param[in] ds: 设备栈控制块指针
  * @return 错误码
  * @note
- * - 同步/异步：异步
- * - 上下文：中断
- * - 重入性：不可重入
+ * + 上下文：中断
  */
 __xwds_api
 xwer_t xwds_pm_resume(struct xwds * ds)

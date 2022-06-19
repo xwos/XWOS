@@ -118,6 +118,8 @@ struct xwds_linc {
 
 void xwds_linc_construct(struct xwds_linc * linc);
 void xwds_linc_destruct(struct xwds_linc * linc);
+xwer_t xwds_linc_grab(struct xwds_linc * linc);
+xwer_t xwds_linc_put(struct xwds_linc * linc);
 
 xwer_t xwds_linc_msttx(struct xwds_linc * linc,
                        xwu8_t id, struct xwds_lin_msg * msg,
@@ -131,29 +133,5 @@ xwer_t xwds_linc_rx(struct xwds_linc * linc,
 xwer_t xwds_linc_get_msg_size(struct xwds_linc * linc,
                               xwu8_t protected_id,
                               xwu8_t * ret);
-
-/**
- * @brief XWDS API：增加对象的引用计数
- * @param[in] linc: LIN控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_grab()
- */
-static __xwds_inline_api
-xwer_t xwds_linc_grab(struct xwds_linc * linc)
-{
-        return xwds_device_grab(&linc->dev);
-}
-
-/**
- * @brief XWDS API：减少对象的引用计数
- * @param[in] linc: LIN控制器对象指针
- * @return 错误码
- * @retval @ref xwds_device_put()
- */
-static __xwds_inline_api
-xwer_t xwds_linc_put(struct xwds_linc * linc)
-{
-        return xwds_device_put(&linc->dev);
-}
 
 #endif /* xwcd/ds/lin/controller.h */

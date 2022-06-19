@@ -34,9 +34,7 @@
  * @retval -ERANGE: GPIO PORT错误
  * @retval -EBUSY: GPIO PIN已被使用
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_gpio_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
@@ -85,9 +83,7 @@ err_soc_grab:
  * @retval -ERANGE: GPIO PORT错误
  * @retval -EPERM: GPIO PIN未被申请
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_gpio_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
@@ -134,9 +130,7 @@ err_pinsts:
  * @retval -ERANGE: GPIO PORT错误
  * @retval -ENOSYS: 不支持的API
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_gpio_cfg(struct xwds_soc * soc,
@@ -185,9 +179,7 @@ err_soc_grab:
  * @retval -EPERM: GPIO PIN未被申请
  * @retval -ENOSYS: 不支持的API
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_gpio_set(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
@@ -240,9 +232,7 @@ err_soc_grab:
  * @retval -EPERM: GPIO PIN未被申请
  * @retval -ENOSYS: 不支持的API
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_gpio_reset(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
@@ -295,9 +285,7 @@ err_soc_grab:
  * @retval -EPERM: GPIO PIN未被申请
  * @retval -ENOSYS: 不支持的API
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_gpio_toggle(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask)
@@ -352,9 +340,7 @@ err_soc_grab:
  * @retval -EPERM: GPIO PIN未被申请
  * @retval -ENOSYS: 不支持的API
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_gpio_output(struct xwds_soc * soc,
@@ -410,9 +396,7 @@ err_soc_grab:
  * @retval -EPERM: GPIO PIN未被申请
  * @retval -ENOSYS: 不支持的API
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_gpio_input(struct xwds_soc * soc,

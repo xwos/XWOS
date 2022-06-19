@@ -74,11 +74,30 @@ void xwds_misc_destruct(struct xwds_misc * misc)
         xwds_device_destruct(&misc->dev);
 }
 
+/**
+ * @brief XWDS API：增加对象的引用计数
+ * @param[in] misc: MISC设备对象指针
+ */
+__xwds_api
+xwer_t xwds_misc_grab(struct xwds_misc * misc)
+{
+        return xwds_device_grab(&misc->dev);
+}
+
+/**
+ * @brief XWDS API：减少对象的引用计数
+ * @param[in] misc: MISC设备对象指针
+ */
+__xwds_api
+xwer_t xwds_misc_put(struct xwds_misc * misc)
+{
+        return xwds_device_put(&misc->dev);
+}
+
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测MISC设备
  * @param[in] misc: MISC设备对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_misc_vop_probe(struct xwds_misc * misc)
@@ -93,7 +112,6 @@ xwer_t xwds_misc_vop_probe(struct xwds_misc * misc)
  * @brief XWDS VOP：移除MISC设备
  * @param[in] ds: 设备栈控制块指针
  * @param[in] misc: MISC设备对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_misc_vop_remove(struct xwds_misc * misc)
@@ -107,7 +125,6 @@ xwer_t xwds_misc_vop_remove(struct xwds_misc * misc)
 /**
  * @brief XWDS VOP：启动MISC设备
  * @param[in] misc: MISC设备对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_misc_vop_start(struct xwds_misc * misc)
@@ -121,7 +138,6 @@ xwer_t xwds_misc_vop_start(struct xwds_misc * misc)
 /**
  * @brief XWDS VOP：停止MISC设备
  * @param[in] misc: MISC设备对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_misc_vop_stop(struct xwds_misc * misc)
@@ -137,7 +153,6 @@ xwer_t xwds_misc_vop_stop(struct xwds_misc * misc)
 /**
  * @brief XWDS VOP：暂停MISC设备
  * @param[in] misc: MISC设备对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_misc_vop_suspend(struct xwds_misc * misc)
@@ -151,7 +166,6 @@ xwer_t xwds_misc_vop_suspend(struct xwds_misc * misc)
 /**
  * @brief XWDS VOP：继续MISC设备
  * @param[in] misc: MISC设备对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_misc_vop_resume(struct xwds_misc * misc)
