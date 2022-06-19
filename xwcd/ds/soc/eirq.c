@@ -36,9 +36,7 @@
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: 外部中断ID错误
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_eirq_req(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask,
@@ -105,9 +103,7 @@ err_soc_grab:
  * @retval -EFAULT: 无效指针
  * @retval -ERANGE: 外部中断ID错误
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_eirq_rls(struct xwds_soc * soc, xwid_t port, xwsq_t pinmask, xwid_t eiid)

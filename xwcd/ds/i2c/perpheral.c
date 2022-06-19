@@ -74,11 +74,30 @@ void xwds_i2cp_destruct(struct xwds_i2cp * i2cp)
         xwds_device_destruct(&i2cp->dev);
 }
 
+/**
+ * @brief XWDS API：增加对象的引用计数
+ * @param[in] i2cp: I2C外设对象指针
+ */
+__xwds_api
+xwer_t xwds_i2cp_grab(struct xwds_i2cp * i2cp)
+{
+        return xwds_device_grab(&i2cp->dev);
+}
+
+/**
+ * @brief XWDS API：减少对象的引用计数
+ * @param[in] i2cp: I2C外设对象指针
+ */
+__xwds_api
+xwer_t xwds_i2cp_put(struct xwds_i2cp * i2cp)
+{
+        return xwds_device_put(&i2cp->dev);
+}
+
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测I2C外设
  * @param[in] i2cp: I2C外设对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_i2cp_vop_probe(struct xwds_i2cp * i2cp)
@@ -98,7 +117,6 @@ err_dev_vop_probe:
 /**
  * @brief XWDS VOP：移除I2C外设
  * @param[in] i2cp: I2C外设对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_i2cp_vop_remove(struct xwds_i2cp * i2cp)
@@ -120,7 +138,6 @@ err_dev_vop_remove:
 /**
  * @brief XWDS VOP：启动I2C外设
  * @param[in] i2cp: I2C外设对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_i2cp_vop_start(struct xwds_i2cp * i2cp)
@@ -150,7 +167,6 @@ err_i2cm_grab:
 /**
  * @brief XWDS VOP：停止I2C外设
  * @param[in] i2cp: I2C外设对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_i2cp_vop_stop(struct xwds_i2cp * i2cp)
@@ -175,7 +191,6 @@ err_dev_vop_stop:
 /**
  * @brief XWDS VOP：暂停I2C外设
  * @param[in] i2cp: I2C外设对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_i2cp_vop_suspend(struct xwds_i2cp * i2cp)
@@ -198,7 +213,6 @@ err_dev_vop_suspend:
 /**
  * @brief XWDS VOP：继续I2C外设
  * @param[in] i2cp: I2C外设对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_i2cp_vop_resume(struct xwds_i2cp * i2cp)

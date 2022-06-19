@@ -31,9 +31,7 @@
  * @retval -ERANGE: 电源ID错误
  * @retval -ENOSYS: 不支持的API
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_pwr_req(struct xwds_soc * soc, xwid_t id)
@@ -75,9 +73,7 @@ err_soc_grab:
  * @retval -ERANGE: 电源ID错误
  * @retval -ENOSYS: 不支持的API
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_pwr_rls(struct xwds_soc * soc, xwid_t id)
@@ -119,9 +115,7 @@ err_drv_pwr_rls:
  * @retval -ERANGE: 电源ID错误
  * @retval -ENOSYS: 不支持的API
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_pwr_getvltg(struct xwds_soc * soc, xwid_t id,

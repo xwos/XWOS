@@ -49,29 +49,7 @@ struct xwds_i2cp {
 
 void xwds_i2cp_construct(struct xwds_i2cp * i2cp);
 void xwds_i2cp_destruct(struct xwds_i2cp * i2cp);
-
-/**
- * @brief XWDS API：增加对象的引用计数
- * @param[in] i2cp: I2C外设对象指针
- * @return 错误码
- * @retval @ref xwds_device_grab()
- */
-static __xwds_inline_api
-xwer_t xwds_i2cp_grab(struct xwds_i2cp * i2cp)
-{
-        return xwds_device_grab(&i2cp->dev);
-}
-
-/**
- * @brief XWDS API：减少对象的引用计数
- * @param[in] i2cp: I2C外设对象指针
- * @return 错误码
- * @retval @ref xwds_device_put()
- */
-static __xwds_inline_api
-xwer_t xwds_i2cp_put(struct xwds_i2cp * i2cp)
-{
-        return xwds_device_put(&i2cp->dev);
-}
+xwer_t xwds_i2cp_grab(struct xwds_i2cp * i2cp);
+xwer_t xwds_i2cp_put(struct xwds_i2cp * i2cp);
 
 #endif /* xwcd/ds/i2c/perpheral.h */

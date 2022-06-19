@@ -222,6 +222,8 @@ struct xwds_canc {
 
 void xwds_canc_construct(struct xwds_canc * canc);
 void xwds_canc_destruct(struct xwds_canc * canc);
+xwer_t xwds_canc_grab(struct xwds_canc * canc);
+xwer_t xwds_canc_put(struct xwds_canc * canc);
 
 xwer_t xwds_canc_write(struct xwds_canc * canc, xwid_t txobjid,
                        struct xwds_can_msg * msg);
@@ -246,28 +248,6 @@ void xwds_canc_setcb_err_indication(struct xwds_canc * canc,
                                                xwsq_t, xwsq_t, xwsq_t));
 void xwds_canc_setcb_busoff_indication(struct xwds_canc * canc,
                                        void (*cb)(struct xwds_canc *));
-
-/**
- * @brief XWDS API：增加对象的引用计数
- * @param[in] canc: CAN控制器对象指针
- * @return 错误码
- */
-static __xwds_inline_api
-xwer_t xwds_canc_grab(struct xwds_canc * canc)
-{
-        return xwds_device_grab(&canc->bc.dev);
-}
-
-/**
- * @brief XWDS API：减少对象的引用计数
- * @param[in] canc: CAN控制器对象指针
- * @return 错误码
- */
-static __xwds_inline_api
-xwer_t xwds_canc_put(struct xwds_canc * canc)
-{
-        return xwds_device_put(&canc->bc.dev);
-}
 
 /******** ******** RX Queue ******** ********/
 void xwds_canc_rxq_init(struct xwds_canc_rxqueue * rxq);

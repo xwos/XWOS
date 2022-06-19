@@ -77,11 +77,30 @@ void xwds_cantrcv_destruct(struct xwds_cantrcv * cantrcv)
         xwds_device_destruct(&cantrcv->bc.dev);
 }
 
+/**
+ * @brief XWDS API：增加对象的引用计数
+ * @param[in] cantrcv: CAN接收器对象指针
+ */
+__xwds_api
+xwer_t xwds_cantrcv_grab(struct xwds_cantrcv * cantrcv)
+{
+        return xwds_device_grab(&cantrcv->bc.dev);
+}
+
+/**
+ * @brief XWDS API：减少对象的引用计数
+ * @param[in] cantrcv: CAN接收器对象指针
+ */
+__xwds_api
+xwer_t xwds_cantrcv_put(struct xwds_cantrcv * cantrcv)
+{
+        return xwds_device_put(&cantrcv->bc.dev);
+}
+
 /******** ******** base virtual operations ******** ********/
 /**
  * @brief XWDS VOP：探测CAN接收器
  * @param[in] cantrcv: CAN接收器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_cantrcv_vop_probe(struct xwds_cantrcv * cantrcv)
@@ -98,7 +117,6 @@ xwer_t xwds_cantrcv_vop_probe(struct xwds_cantrcv * cantrcv)
 /**
  * @brief XWDS VOP：移除CAN接收器
  * @param[in] cantrcv: CAN接收器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_cantrcv_vop_remove(struct xwds_cantrcv * cantrcv)
@@ -115,7 +133,6 @@ xwer_t xwds_cantrcv_vop_remove(struct xwds_cantrcv * cantrcv)
 /**
  * @brief XWDS VOP：启动CAN接收器
  * @param[in] cantrcv: CAN接收器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_cantrcv_vop_start(struct xwds_cantrcv * cantrcv)
@@ -145,7 +162,6 @@ err_dev_vop_start:
 /**
  * @brief XWDS VOP：停止CAN接收器
  * @param[in] cantrcv: CAN接收器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_cantrcv_vop_stop(struct xwds_cantrcv * cantrcv)
@@ -163,7 +179,6 @@ xwer_t xwds_cantrcv_vop_stop(struct xwds_cantrcv * cantrcv)
 /**
  * @brief XWDS VOP：暂停CAN接收器
  * @param[in] cantrcv: CAN接收器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_cantrcv_vop_suspend(struct xwds_cantrcv * cantrcv)
@@ -179,7 +194,6 @@ xwer_t xwds_cantrcv_vop_suspend(struct xwds_cantrcv * cantrcv)
 /**
  * @brief XWDS VOP：继续CAN接收器
  * @param[in] cantrcv: CAN接收器对象指针
- * @return 错误码
  */
 static __xwds_vop
 xwer_t xwds_cantrcv_vop_resume(struct xwds_cantrcv * cantrcv)
@@ -203,9 +217,7 @@ xwer_t xwds_cantrcv_vop_resume(struct xwds_cantrcv * cantrcv)
  * @retval -EFAULT: 空指针
  * @retval -ERANGE: 不支持的模式
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_cantrcv_set_opmode(struct xwds_cantrcv * cantrcv, xwsq_t opmode)
@@ -237,9 +249,7 @@ err_ops_set_opmode:
  * @param[in] cantrcv: CAN接收器对象指针
  * @param[out] opmode: 指向缓冲区的指针，通过次缓冲区返回模式
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 void xwds_cantrcv_get_opmode(struct xwds_cantrcv * cantrcv, xwsq_t * opmode)
@@ -258,9 +268,7 @@ void xwds_cantrcv_get_opmode(struct xwds_cantrcv * cantrcv, xwsq_t * opmode)
  * @retval -EFAULT: 空指针
  * @retval -EOPNOTSUPP: 不支持此API
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_cantrcv_enable_wkup(struct xwds_cantrcv * cantrcv)
@@ -294,9 +302,7 @@ xwer_t xwds_cantrcv_enable_wkup(struct xwds_cantrcv * cantrcv)
  * @retval -EFAULT: 空指针
  * @retval -EOPNOTSUPP: 不支持此API
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 xwer_t xwds_cantrcv_disable_wkup(struct xwds_cantrcv * cantrcv)
@@ -327,10 +333,9 @@ xwer_t xwds_cantrcv_disable_wkup(struct xwds_cantrcv * cantrcv)
  * @param[in] cantrcv: CAN接收器对象指针
  * @param[in] isr: 回调函数
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- * - 必须调用xwds_cantrcv_disable_wkup()后才可修改回调函数
+ * + 上下文：中断、中断底半部、线程
+ * @details
+ * 必须调用 `xwds_cantrcv_disable_wkup()` 后才可修改回调函数。
  */
 __xwds_api
 void xwds_cantrcv_set_wkup_isr(struct xwds_cantrcv * cantrcv,
@@ -344,9 +349,7 @@ void xwds_cantrcv_set_wkup_isr(struct xwds_cantrcv * cantrcv,
  * @param[in] cantrcv: CAN接收器对象指针
  * @param[out] wkuprs: 指向缓冲区的指针，通过次缓冲区返回唤醒原因
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 void xwds_cantrcv_get_wkuprs(struct xwds_cantrcv * cantrcv, xwsq_t * wkuprs)
@@ -368,9 +371,7 @@ void xwds_cantrcv_get_wkuprs(struct xwds_cantrcv * cantrcv, xwsq_t * wkuprs)
  * @brief XWDS API：清除CAN接收器的唤醒原因
  * @param[in] cantrcv: CAN接收器对象指针
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 上下文：中断、中断底半部、线程
  */
 __xwds_api
 void xwds_cantrcv_clear_wkuprs(struct xwds_cantrcv * cantrcv)
@@ -384,7 +385,9 @@ void xwds_cantrcv_clear_wkuprs(struct xwds_cantrcv * cantrcv)
  * @brief CAN接收器回调函数：CAN接收器的唤醒通知
  * @param[in] cantrcv: CAN接收器对象指针
  * @note
- * - 这个回调函数在中断上下文中被调用，用于通知唤醒
+ * + 上下文：中断、中断底半部
+ * @details
+ * 此回调函数在中断上下文中被调用，用于通知唤醒。
  */
 __xwds_code
 void xwds_cantrcv_drvcb_wakeup_notification(struct xwds_cantrcv * cantrcv)
