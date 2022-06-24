@@ -54,14 +54,9 @@
 
 /******** ******** Message Queue ******** ********/
 #define XWMDCFG_isc_xwmq                                        1
-#define XWMDCFG_isc_xwmq_LOG                                    0
-#define XWMDCFG_isc_xwmq_MEMSLICE                               0
-#define XWMDCFG_isc_xwmq_STDC_MM                                1
 
 /******** ******** Circular Queue ******** ********/
 #define XWMDCFG_isc_xwcq                                        1
-#define XWMDCFG_isc_xwcq_LOG                                    0
-#define XWMDCFG_isc_xwcq_STDC_MM                                1
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********            C/C++ Runtime            ******** ********

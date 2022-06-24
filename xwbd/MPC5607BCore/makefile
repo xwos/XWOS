@@ -25,7 +25,7 @@ TARGET ?= XWOS
 MKCFG := ${XWOS}/xwbs/util/el/mkcfg.el
 
 all: $(WKSPC) cfg
-	$(MAKE) -C $(WKSPC) TARGET=$(TARGET)
+	$(MAKE) -C $(WKSPC) -f ../makefile.2 TARGET=$(TARGET)
 
 $(WKSPC):
 	@mkdir -p $@
@@ -34,7 +34,7 @@ cfg: $(WKSPC) $(WKSPC)/XuanWuOS.cfg
 
 $(WKSPC)/XuanWuOS.cfg: cfg/*.h
 	@[ -x ${MKCFG} ] || chmod +x ${MKCFG}
-	@${MKCFG} --XWOS=$(XWOS) --cfgdir=cfg --wkspc=$(WKSPC) -- $(@F)
+	@${MKCFG} --XWOS=$(XWOS) --cfgdir=cfg --wkspc=$(WKSPC)
 
 fmw: all
 	@dd if=$(WKSPC)/$(TARGET).bin of=$(WKSPC)/$(TARGET).fmw bs=1 skip=65536
@@ -46,15 +46,15 @@ pegdbserver:
 		-configfile=cfg/dbg/config.ini
 
 c clean: cfg
-	$(MAKE) -C $(WKSPC) TARGET=$(TARGET) NODEP=y clean
+	$(MAKE) -C $(WKSPC) -f ../makefile.2 TARGET=$(TARGET) NODEP=y clean
 
 d distclean: cfg
-	$(MAKE) -C $(WKSPC) TARGET=$(TARGET) NODEP=y distclean
+	$(MAKE) -C $(WKSPC) -f ../makefile.2 TARGET=$(TARGET) NODEP=y distclean
 	@rm -rf $(WKSPC)
 	@rm -rf cfg/dbg/*.gdb
 
 .DEFAULT:
 	@$(MAKE) cfg
-	$(MAKE) -C $(WKSPC) TARGET=$(TARGET) $@
+	$(MAKE) -C $(WKSPC) -f ../makefile.2 TARGET=$(TARGET) $@
 
 .PHONY : all cfg fmw c clean d distclean

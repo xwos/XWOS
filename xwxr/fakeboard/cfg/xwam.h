@@ -21,10 +21,11 @@
 #ifndef __cfg_xwam_h__
 #define __cfg_xwam_h__
 
-#define XWAMCFG_example_thread_create           1
-#define XWAMCFG_example_thread_exit             1
-#define XWAMCFG_example_thread_sleep            1
-#define XWAMCFG_example_timer                   1
+#define XWAMCFG_example_xwobj                   1
+#define XWAMCFG_example_thd_new                 1
+#define XWAMCFG_example_thd_exit                1
+#define XWAMCFG_example_thd_sleep               1
+#define XWAMCFG_example_swt                     1
 #define XWAMCFG_example_lock_cpuirq             1
 #define XWAMCFG_example_lock_mtx                1
 #define XWAMCFG_example_lock_spinlock           1
@@ -40,6 +41,7 @@
 #define XWAMCFG_example_xwlib_crc               1
 #define XWAMCFG_example_cxx                     1
 #define XWAMCFG_example_isc_xwmq                1
+#define XWAMCFG_example_isc_xwcq                1
 
 #define XWAMCFG_application_w25qrpt             1
 

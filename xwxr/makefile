@@ -30,8 +30,8 @@ html: cfg
 	cd .. && doxygen -d Preprocessor xwxr/doxyfile
 
 rustdoc: cfg
-	cd fakeboard/template; cargo +nightly clean --target=thumbv7em-none-eabihf
-	cd fakeboard/template; cargo +nightly doc --target=thumbv7em-none-eabihf
+	$(MAKE) -C $(WKSPC) -f ../makefile.rustdoc clean
+	$(MAKE) -C $(WKSPC) -f ../makefile.rustdoc doc
 	rm -rf wkspc/rustdoc
 	cp -ap fakeboard/template/target/thumbv7em-none-eabihf/doc wkspc/rustdoc
 
@@ -45,13 +45,10 @@ cfg: $(WKSPC) $(WKSPC)/XuanWuOS.cfg
 
 $(WKSPC)/XuanWuOS.cfg: fakeboard/cfg/*.h
 	@[ -x ${MKCFG} ] || chmod +x ${MKCFG}
-	@${MKCFG} --XWOS=$(XWOS) --cfgdir=$(<D) --wkspc=$(WKSPC) -- $(@F)
+	@${MKCFG} --XWOS=$(XWOS) --cfgdir=$(<D) --wkspc=$(WKSPC)
 
-c clean : cfg
-	$(MAKE) -C $(WKSPC) TARGET=$(TARGET) NODEP=y clean
-
-d distclean: cfg
-	$(MAKE) -C $(WKSPC) TARGET=$(TARGET) NODEP=y distclean
+c d clean distclean: cfg
+	$(MAKE) -C $(WKSPC) -f ../makefile.rustdoc distclean
 	@rm -rf $(WKSPC)
 
-.PHONY : all cfg c clean d distclean
+.PHONY : all cfg c clean d distclean rustdoc

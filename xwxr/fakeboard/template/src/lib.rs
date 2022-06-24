@@ -14,6 +14,7 @@ use core::ffi::*;
 use core::panic::PanicInfo;
 
 extern crate alloc;
+use alloc::boxed::Box;
 
 use libc_print::std_name::println;
 

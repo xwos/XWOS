@@ -5,19 +5,11 @@ use std::path::Path;
 fn main() {
     let out_dir = env::var_os("OUT_DIR").unwrap();
     let dest_path = Path::new(&out_dir).join("cfg.rs");
+    let xwos_dir = env::var_os("XuanWuOS_PATH").unwrap();
+    let wkspc_dir = env::var_os("XuanWuOS_WKSPC_DIR").unwrap();
+    let src_path = Path::new(&xwos_dir).join(&wkspc_dir).join("XuanWuOS.cfg.rs");
 
-    let xwmmcfg_alignment = env::var("XWMMCFG_ALIGNMENT").unwrap_or("8".into());
-    let mut strbuf = format!("pub const XWMMCFG_ALIGNMENT: usize = {};\n",
-                             xwmmcfg_alignment);
-    match env::var("CPUCFG_L1_CACHELINE_SIZE") {
-        Ok(cpucfg_l1_cacheline_size) => {
-            strbuf += format!("pub const CPUCFG_L1_CACHELINE_SIZE: usize = {};\n",
-                               cpucfg_l1_cacheline_size).as_str();
-        },
-        Err(_) => {},
-    };
-
-    fs::write(&dest_path, strbuf).unwrap();
+    fs::copy(&src_path, &dest_path).unwrap();
 
     println!("cargo:rerun-if-changed=build.rs");
 

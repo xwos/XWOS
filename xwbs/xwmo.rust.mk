@@ -45,10 +45,8 @@ else
   XWMO_RUSTLIB := $(XWMO_DIR)/target/$(RUST_TARGET)/debug/$(XWMO_RUSTLIB_NAME)
 endif
 
-export XWMMCFG_ALIGNMENT
-ifneq ($(CPUCFG_L1_CACHELINE_SIZE),)
-  export CPUCFG_L1_CACHELINE_SIZE
-endif
+export XuanWuOS_PATH
+export XuanWuOS_WKSPC_DIR
 
 $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/$(XWMO_NAME): $(XWMO_RUSTLIB) $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)
 	$(SHOW_CP) $(CP) $< $@

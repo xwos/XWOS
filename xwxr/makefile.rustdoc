@@ -1,6 +1,6 @@
 #! /bin/make -f
 # @file
-# @brief Top makefile of board/project
+# @brief L2 building makefile
 # @author
 # + 隐星魂 (Roy Sun) <xwos@xwos.tech>
 # @copyright
@@ -18,33 +18,19 @@
 # > limitations under the License.
 #
 
-XWOS ?= ../..
-WKSPC ?= wkspc
-TARGET ?= XWOS
+include XuanWuOS.cfg
 
-MKCFG := ${XWOS}/xwbs/util/el/mkcfg.el
+MAKE_ARGS = $(strip -C $(XuanWuOS_PATH) -f xwxr/fakeboard/template/xwmo.mk \
+                    XuanWuOS_WKSPC_DIR=$(XuanWuOS_WKSPC_DIR))
 
-all: $(WKSPC) cfg
-	$(MAKE) -C $(WKSPC) -f ../makefile.2 TARGET=$(TARGET)
+doc:
+	@$(MAKE) $(MAKE_ARGS) doc
 
-$(WKSPC):
-	@mkdir -p $@
+clean:
+	@$(MAKE) $(MAKE_ARGS) clean
 
-cfg: $(WKSPC) $(WKSPC)/XuanWuOS.cfg
-
-$(WKSPC)/XuanWuOS.cfg: cfg/*.h
-	@[ -x ${MKCFG} ] || chmod +x ${MKCFG}
-	@${MKCFG} --XWOS=$(XWOS) --cfgdir=cfg --wkspc=$(WKSPC)
-
-c clean: cfg
-	$(MAKE) -C $(WKSPC) -f ../makefile.2 TARGET=$(TARGET) NODEP=y clean
-
-d distclean: cfg
-	$(MAKE) -C $(WKSPC) -f ../makefile.2 TARGET=$(TARGET) NODEP=y distclean
-	@rm -rf $(WKSPC)
+distclean:
+	@$(MAKE) $(MAKE_ARGS) distclean
 
 .DEFAULT:
-	@$(MAKE) cfg
-	$(MAKE) -C $(WKSPC) -f ../makefile.2 TARGET=$(TARGET) $@
-
-.PHONY : all cfg c clean d distclean
+	$(MAKE) $(MAKE_ARGS) $@
