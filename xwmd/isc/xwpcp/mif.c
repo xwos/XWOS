@@ -345,7 +345,7 @@ void xwpcp_txcb_notify(struct xwpcp * xwpcp, xwpcp_txh_t txh, xwer_t rc, void * 
  * - 上下文：线程
  * - 重入性：可重入
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwmd_api
 xwer_t xwpcp_tx(struct xwpcp * xwpcp,
@@ -550,7 +550,7 @@ xwsq_t xwpcp_get_txstate(xwpcp_txh_t txh)
  * - 上下文：线程
  * - 重入性：可重入
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwmd_api
 xwer_t xwpcp_rx(struct xwpcp * xwpcp, xwu8_t port,

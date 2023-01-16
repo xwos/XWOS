@@ -315,8 +315,8 @@ void xwos_splk_lock_bh(struct xwos_splk * spl)
  * @note
  * + 上下文：线程、中断底半部
  * @details
- * - 若自旋锁已开启临界区，立即返回，不会自旋等待。
- * - 此函数只会关闭本地CPU的抢占和中断底半部，因此只能保证其临界区在线程上下文与中断底半部中是安全的。
+ * + 若自旋锁已开启临界区，立即返回，不会自旋等待。
+ * + 此函数只会关闭本地CPU的抢占和中断底半部，因此只能保证其临界区在线程上下文与中断底半部中是安全的。
  */
 static __xwos_inline_api
 xwer_t xwos_splk_trylock_bh(struct xwos_splk * spl)

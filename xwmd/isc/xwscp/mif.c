@@ -275,7 +275,7 @@ err_mtx_lock_to:
  * - 上下文：线程
  * - 重入性：可重入
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwmd_api
 xwer_t xwscp_connect(struct xwscp * xwscp, xwtm_t to)
@@ -418,7 +418,7 @@ err_fmt_msg:
  * - 上下文：线程
  * - 重入性：可重入
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwmd_api
 xwer_t xwscp_tx(struct xwscp * xwscp,
@@ -471,7 +471,7 @@ err_txmtx_lock_to:
  * - 上下文：线程
  * - 重入性：可重入
  * @details
- * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
+ * 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 __xwmd_api
 xwer_t xwscp_rx(struct xwscp * xwscp, xwu8_t buf[], xwsz_t * size, xwtm_t to)

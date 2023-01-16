@@ -35,7 +35,7 @@
  * `XWOS的系统时间 = 滴答时间定时器中断的次数 * 中断的周期（以纳秒为单位）`
  */
 static __xwos_inline_api
-xwtm_t xwtm_now()
+xwtm_t xwtm_now(void)
 {
         return xwosdl_skd_get_timetick_lc();
 }
@@ -74,7 +74,7 @@ xwtm_t xwtm_ft(xwtm_t dur)
  * `XWOS的系统时间戳 = XWOS的系统时间 + 滴答时间定时器中数值换算成纳秒的时间`
  */
 static __xwos_inline_api
-xwtm_t xwtm_nowts()
+xwtm_t xwtm_nowts(void)
 {
         return xwosdl_skd_get_timestamp_lc();
 }

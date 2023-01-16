@@ -29,6 +29,22 @@
 //!
 //! ```C
 //! extern void xwrust_main(void);
+//! xwer_t xwrust_task(void * arg);
+//!
+//! xwos_thd_d xwrust_thd;
+//! xwer_t xwos_main(void)
+//! {
+//!         struct xwos_thd_attr attr;
+//!
+//!         xwos_thd_attr_init(&attr);
+//!         attr.name = "xwrust.thd";
+//!         attr.stack = NULL;
+//!         attr.stack_size = 8192;
+//!         attr.priority = XWRUST_THD_PRIORITY;
+//!         attr.detached = true;
+//!         attr.privileged = true;
+//!         xwos_thd_create(&xwrust_thd, &attr, xwrust_task, NULL);
+//! }
 //!
 //! // 独立的RUST线程
 //! xwer_t xwrust_task(void * arg)
