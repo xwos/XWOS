@@ -89,7 +89,7 @@ xwer_t main_task(void * arg)
                 goto err_stm32cube_start;
         }
 
-        example_crc_start();
+        xwos_example_crc();
 
         rc = led_task();
         return rc;

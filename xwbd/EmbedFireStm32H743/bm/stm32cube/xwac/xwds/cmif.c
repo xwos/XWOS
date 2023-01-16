@@ -31,7 +31,7 @@
 /**
  * @brief 探测设备栈
  */
-xwer_t stm32cube_xwds_ll_start(void)
+xwer_t stm32cube_xwds_probe(void)
 {
         xwer_t rc;
 
