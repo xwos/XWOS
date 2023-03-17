@@ -609,7 +609,7 @@ impl Cond {
     pub fn bind<'a, const M: XwSz>(&'a self, sel: &'a Sel<M>, pos: XwSq)
                                    -> Result<CondSel<'a, M>, CondError>
     where
-        [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+        [XwBmp; (M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
     {
         unsafe {
             let mut rc = xwrustffi_cond_acquire(self.cond.get(), *self.tik.get());
@@ -651,7 +651,7 @@ impl Cond {
 /// [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
 pub struct CondSel<'a, const M: XwSz>
 where
-    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     cond: &'a Cond,
     sel: &'a Sel<M>,
@@ -660,17 +660,17 @@ where
 
 unsafe impl<'a, const M: XwSz> Send for CondSel<'a, M>
 where
-    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {}
 
 unsafe impl<'a, const M: XwSz> Sync for CondSel<'a, M>
 where
-    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {}
 
 impl<'a, const M: XwSz> Drop for CondSel<'a, M>
 where
-    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     fn drop(&mut self) {
         unsafe {
@@ -682,7 +682,7 @@ where
 
 impl<'a, const M: XwSz> CondSel<'a, M>
 where
-    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     /// 判断触发的 **选择信号** 是否包括此条件量
     ///

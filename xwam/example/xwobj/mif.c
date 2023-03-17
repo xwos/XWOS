@@ -32,7 +32,7 @@
 #include <xwos/osal/sync/sel.h>
 #include <xwmd/isc/xwcq/mif.h>
 #include <xwmd/isc/xwmq/mif.h>
-#include <xwmd/isc/xwpcp/protocol.h>
+#include <xwmd/isc/xwssc/protocol.h>
 #include <xwmd/isc/xwscp/protocol.h>
 #include <xwam/example/xwobj/mif.h>
 #include <xwcd/ds/object.h>
@@ -81,8 +81,8 @@ xwer_t xwos_example_xwobj(void)
                   sizeof(struct xwcq));
         xwobjlogf(INFO, "sizeof(struct xwmq): %d, sizeof(struct xwmq_msg): %d\n",
                   sizeof(struct xwmq), sizeof(struct xwmq_msg));
-        xwobjlogf(INFO, "sizeof(struct xwpcp): %d\n",
-                  sizeof(struct xwpcp));
+        xwobjlogf(INFO, "sizeof(struct xwssc): %d\n",
+                  sizeof(struct xwssc));
         xwobjlogf(INFO, "sizeof(struct xwscp): %d\n",
                   sizeof(struct xwscp));
 

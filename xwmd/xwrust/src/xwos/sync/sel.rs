@@ -279,17 +279,17 @@ pub const SIZEOF_XWOS_SEL: usize = 128;
 #[cfg_attr(target_pointer_width = "64", repr(align(16)))]
 pub(crate) struct XwosSel<const N: XwSz>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     pub(crate) obj: [u8; SIZEOF_XWOS_SEL],
-    pub(crate) bmp: [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
-    pub(crate) msk: [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
+    pub(crate) bmp: [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize],
+    pub(crate) msk: [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize],
 }
 
 /// 信号选择器对象结构体
 pub struct Sel<const N: XwSz>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     /// 用于初始化XWOS信号选择器对象的内存空间
     pub(crate) sel: UnsafeCell<XwosSel<N>>,
@@ -299,17 +299,17 @@ where
 
 unsafe impl<const N: XwSz> Send for Sel<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {}
 
 unsafe impl<const N: XwSz> Sync for Sel<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {}
 
 impl<const N: XwSz> Drop for Sel<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     fn drop(&mut self) {
         unsafe {
@@ -320,7 +320,7 @@ where
 
 impl<const N: XwSz> Sel<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     /// 新建信号选择器对象
     ///
@@ -352,8 +352,8 @@ where
         Self {
             sel: UnsafeCell::new(XwosSel {
                 obj: [0; SIZEOF_XWOS_SEL],
-                bmp: [0; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
-                msk: [0; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
+                bmp: [0; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize],
+                msk: [0; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize],
             }),
             tik: UnsafeCell::new(0),
         }
@@ -649,7 +649,7 @@ where
     pub fn bind<'a, const M: XwSz>(&'a self, dst: &'a Sel<M>, pos: XwSq) ->
                                    Result<SelSel<'a, N, M>, SelError>
     where
-        [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+        [XwBmp; (M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
     {
         unsafe {
             let mut rc = xwrustffi_sel_acquire(self.sel.get() as _, *self.tik.get());
@@ -692,8 +692,8 @@ where
 /// [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
 pub struct SelSel<'a, const N: XwSz, const M: XwSz>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized,
-    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized,
+    [XwBmp; (M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     src: &'a Sel<N>,
     dst: &'a Sel<M>,
@@ -702,20 +702,20 @@ where
 
 unsafe impl<'a, const N: XwSz, const M: XwSz> Send for SelSel<'a, N, M>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized,
-    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized,
+    [XwBmp; (M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {}
 
 unsafe impl<'a, const N: XwSz, const M: XwSz> Sync for SelSel<'a, N, M>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized,
-    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized,
+    [XwBmp; (M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {}
 
 impl<'a, const N: XwSz, const M: XwSz> Drop for SelSel<'a, N, M>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized,
-    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized,
+    [XwBmp; (M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     fn drop(&mut self) {
         unsafe {
@@ -727,8 +727,8 @@ where
 
 impl<'a, const N: XwSz, const M: XwSz> SelSel<'a, N, M>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized,
-    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized,
+    [XwBmp; (M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     /// 判断触发的 **选择信号** 是否包括此信号选择器
     ///

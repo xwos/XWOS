@@ -262,17 +262,17 @@ pub const SIZEOF_XWOS_FLG: usize = 128;
 #[cfg_attr(target_pointer_width = "64", repr(align(16)))]
 pub(crate) struct XwosFlg<const N: XwSz>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     pub(crate) obj: [u8; SIZEOF_XWOS_FLG],
-    pub(crate) bmp: [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
-    pub(crate) msk: [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
+    pub(crate) bmp: [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize],
+    pub(crate) msk: [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize],
 }
 
 /// 事件标志对象结构体
 pub struct Flg<const N: XwSz>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     /// 用于初始化XWOS事件标志对象的内存空间
     pub(crate) flg: UnsafeCell<XwosFlg<N>>,
@@ -282,17 +282,17 @@ where
 
 unsafe impl<const N: XwSz> Send for Flg<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {}
 
 unsafe impl<const N: XwSz> Sync for Flg<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {}
 
 impl<const N: XwSz> Drop for Flg<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     fn drop(&mut self) {
         unsafe {
@@ -303,7 +303,7 @@ where
 
 impl<const N: XwSz> Flg<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     /// 新建事件标志对象
     ///
@@ -335,8 +335,8 @@ where
         Self {
             flg: UnsafeCell::new(XwosFlg {
                 obj: [0; SIZEOF_XWOS_FLG],
-                bmp: [0; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
-                msk: [0; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
+                bmp: [0; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize],
+                msk: [0; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize],
             }),
             tik: UnsafeCell::new(0),
         }
@@ -899,7 +899,7 @@ where
     pub fn bind<'a, const M: XwSz>(&'a self, sel: &'a Sel<M>, pos: XwSq) ->
                                    Result<FlgSel<'a, N, M>, FlgError>
     where
-        [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+        [XwBmp; (M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
     {
         unsafe {
             let mut rc = xwrustffi_flg_acquire(self.flg.get() as _, *self.tik.get());
@@ -941,8 +941,8 @@ where
 /// [`drop()`]: https://doc.rust-lang.org/std/mem/fn.drop.html
 pub struct FlgSel<'a, const N: XwSz, const M: XwSz>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized,
-    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized,
+    [XwBmp; (M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     /// 事件标志
     pub flg: &'a Flg<N>,
@@ -954,20 +954,20 @@ where
 
 unsafe impl<'a, const N: XwSz, const M: XwSz> Send for FlgSel<'a, N, M>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized,
-    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized,
+    [XwBmp; (M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {}
 
 unsafe impl<'a, const N: XwSz, const M: XwSz> Sync for FlgSel<'a, N, M>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized,
-    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized,
+    [XwBmp; (M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {}
 
 impl<'a, const N: XwSz, const M: XwSz> Drop for FlgSel<'a, N, M>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized,
-    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized,
+    [XwBmp; (M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     fn drop(&mut self) {
         unsafe {
@@ -979,8 +979,8 @@ where
 
 impl<'a, const N: XwSz, const M: XwSz> FlgSel<'a, N, M>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized,
-    [XwBmp; ((M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized,
+    [XwBmp; (M + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     /// 判断触发的 **选择信号** 是否包括此事件标志
     ///

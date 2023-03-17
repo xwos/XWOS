@@ -635,7 +635,7 @@ void xwlib_crc32_swcal_rs(xwu32_t * crc32,
 }
 
 /**
- * @brief 软件方式计算一段数据的CRC32校验值（直驱表法）
+ * @brief 软件方式计算一段数据的CRC32校验值
  * @param[in,out] crc32: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示初始值
  * + (O) 作为输出时，返回计算结果
@@ -756,7 +756,7 @@ xwer_t xwlib_crc32_cal(xwu32_t * crc32, xwu32_t xorout,
 }
 
 /**
- * @brief 用主流CRC32参数模型计算一段数据的CRC32校验值
+ * @brief 用主流CRC32参数模型计算一段数据的校验值
  * @param[in] stream: 指向数据的指针
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
  * + (I) 作为输入时，表示数据长度

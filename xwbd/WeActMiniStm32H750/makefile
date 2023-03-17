@@ -25,7 +25,7 @@ TARGET ?= XWOS
 MKCFG := ${XWOS}/xwbs/util/el/mkcfg.el
 
 all: $(WKSPC) cfg
-	$(MAKE) -C $(WKSPC) -f ../makefile.2 TARGET=$(TARGET)
+	$(MAKE) -C $(WKSPC) -f $(PWD)/makefile.2 TARGET=$(TARGET)
 
 $(WKSPC):
 	@mkdir -p $@
@@ -37,14 +37,14 @@ $(WKSPC)/XuanWuOS.cfg: cfg/*.h
 	@${MKCFG} --XWOS=$(XWOS) --cfgdir=cfg --wkspc=$(WKSPC)
 
 c clean: cfg
-	$(MAKE) -C $(WKSPC) -f ../makefile.2 TARGET=$(TARGET) NODEP=y clean
+	$(MAKE) -C $(WKSPC) -f $(PWD)/makefile.2 TARGET=$(TARGET) NODEP=y clean
 
 d distclean: cfg
-	$(MAKE) -C $(WKSPC) -f ../makefile.2 TARGET=$(TARGET) NODEP=y distclean
+	$(MAKE) -C $(WKSPC) -f $(PWD)/makefile.2 TARGET=$(TARGET) NODEP=y distclean
 	@rm -rf $(WKSPC)
 
 .DEFAULT:
 	@$(MAKE) cfg
-	$(MAKE) -C $(WKSPC) -f ../makefile.2 TARGET=$(TARGET) $@
+	$(MAKE) -C $(WKSPC) -f $(PWD)/makefile.2 TARGET=$(TARGET) $@
 
 .PHONY : all cfg c clean d distclean

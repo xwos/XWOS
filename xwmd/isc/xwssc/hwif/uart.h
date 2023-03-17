@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 点对点通讯协议：UART硬件接口
+ * @brief SOC间点对点通讯协议：UART硬件接口
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -10,13 +10,13 @@
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
-#ifndef __xwmd_isc_xwpcp_hwif_uart_h__
-#define __xwmd_isc_xwpcp_hwif_uart_h__
+#ifndef __xwmd_isc_xwssc_hwif_uart_h__
+#define __xwmd_isc_xwssc_hwif_uart_h__
 
 #include <xwos/standard.h>
-#include <xwmd/isc/xwpcp/hwifal.h>
+#include <xwmd/isc/xwssc/hwifal.h>
 
 extern
-const struct xwpcp_hwifal_operation xwpcpif_uart_ops;
+const struct xwssc_hwifal_operation xwsscif_uart_ops;
 
-#endif /* xwmd/isc/xwpcp/hwif/uart.h */
+#endif /* xwmd/isc/xwssc/hwif/uart.h */

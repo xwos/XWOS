@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 主模块：xwpcp子模块
+ * @brief 主模块：xwssc子模块
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,12 +18,12 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_main_xwpcp_h__
-#define __bm_main_xwpcp_h__
+#ifndef __bm_main_xwssc_h__
+#define __bm_main_xwssc_h__
 
 #include <xwos/standard.h>
 
-xwer_t bm_xwpcp_start(void);
-xwer_t bm_xwpcp_stop(void);
+xwer_t bm_xwssc_start(void);
+xwer_t bm_xwssc_stop(void);
 
-#endif /* bm/main/xwpcp.h */
+#endif /* bm/main/xwssc.h */

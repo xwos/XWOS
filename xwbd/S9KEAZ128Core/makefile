@@ -25,7 +25,7 @@ TARGET ?= XWOS
 MKCFG := ${XWOS}/xwbs/util/el/mkcfg.el
 
 all: $(WKSPC) cfg dbgcfg
-	$(MAKE) -C $(WKSPC) -f ../makefile.2 TARGET=$(TARGET)
+	$(MAKE) -C $(WKSPC) -f $(PWD)/makefile.2 TARGET=$(TARGET)
 
 $(WKSPC):
 	@mkdir -p $@
@@ -46,15 +46,15 @@ jlink:
 	@openocd -f cfg/dbg/openocd/jlink-swd.cfg
 
 c clean: cfg
-	$(MAKE) -C $(WKSPC) -f ../makefile.2 TARGET=$(TARGET) NODEP=y clean
+	$(MAKE) -C $(WKSPC) -f $(PWD)/makefile.2 TARGET=$(TARGET) NODEP=y clean
 
 d distclean: cfg
-	$(MAKE) -C $(WKSPC) -f ../makefile.2 TARGET=$(TARGET) NODEP=y distclean
+	$(MAKE) -C $(WKSPC) -f $(PWD)/makefile.2 TARGET=$(TARGET) NODEP=y distclean
 	@rm -rf $(WKSPC)
 	@rm -rf cfg/dbg/*.gdb
 
 .DEFAULT:
 	@$(MAKE) cfg
-	$(MAKE) -C $(WKSPC) -f ../makefile.2 TARGET=$(TARGET) $@
+	$(MAKE) -C $(WKSPC) -f $(PWD)/makefile.2 TARGET=$(TARGET) $@
 
 .PHONY : all cfg dbgcfg c clean d distclean

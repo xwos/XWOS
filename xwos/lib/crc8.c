@@ -96,7 +96,7 @@ __xwlib_rodata const xwu8_t xwlib_crc8tbl_0x31[256] = {
 
 #if defined(XWLIBCFG_CRC8_0X9B) && (1 == XWLIBCFG_CRC8_0X9B)
 /**
- * @brief CRC8多项式0x31的查询表
+ * @brief CRC8多项式0x9B的查询表
  */
 __xwlib_rodata const xwu8_t xwlib_crc8tbl_0x9B[256] = {
         0x00, 0x9B, 0xAD, 0x36, 0xC1, 0x5A, 0x6C, 0xF7,

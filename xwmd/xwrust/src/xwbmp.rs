@@ -47,10 +47,10 @@ extern "C" {
 #[cfg_attr(target_pointer_width = "64", repr(align(16)))]
 pub(crate) struct BmpArray<const N: XwSz>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     #[doc(hidden)]
-    pub(crate) array: [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
+    pub(crate) array: [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize],
 }
 
 /// 位图类型
@@ -58,7 +58,7 @@ where
 /// 常数 `N` 表示有多少位。
 pub struct Bmp<const N: XwSz>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     #[doc(hidden)]
     pub(crate) bmp: UnsafeCell<BmpArray<N>>,
@@ -66,17 +66,17 @@ where
 
 unsafe impl<const N: XwSz> Send for Bmp<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {}
 
 unsafe impl<const N: XwSz> Sync for Bmp<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {}
 
 impl<const N: XwSz> Bmp<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     /// 新建位图
     ///
@@ -120,7 +120,7 @@ where
     pub const fn new() -> Self {
         Self {
             bmp: UnsafeCell::new(BmpArray {
-                array: [0; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)],
+                array: [0; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize],
             }),
         }
     }
@@ -273,7 +273,7 @@ where
 
 impl<const N: XwSz> PartialEq for Bmp<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     fn eq(&self, other: &Self) -> bool {
         unsafe {
@@ -285,7 +285,7 @@ where
 
 impl<const N: XwSz> PartialOrd for Bmp<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         unsafe {
@@ -303,7 +303,7 @@ where
 
 impl<const N: XwSz> BitAnd for Bmp<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     type Output = Self;
 
@@ -317,7 +317,7 @@ where
 
 impl<const N: XwSz> BitAndAssign for Bmp<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     fn bitand_assign(&mut self, other: Self) {
         unsafe {
@@ -328,7 +328,7 @@ where
 
 impl<const N: XwSz> BitOr for Bmp<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     type Output = Self;
 
@@ -342,7 +342,7 @@ where
 
 impl<const N: XwSz> BitOrAssign for Bmp<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     fn bitor_assign(&mut self, other: Self) {
         unsafe {
@@ -353,7 +353,7 @@ where
 
 impl<const N: XwSz> BitXor for Bmp<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     type Output = Self;
 
@@ -367,7 +367,7 @@ where
 
 impl<const N: XwSz> BitXorAssign for Bmp<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     fn bitxor_assign(&mut self, other: Self) {
         unsafe {
@@ -378,7 +378,7 @@ where
 
 impl<const N: XwSz> Neg for Bmp<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     type Output = Self;
 
@@ -392,7 +392,7 @@ where
 
 impl<const N: XwSz> fmt::Debug for Bmp<N>
 where
-    [XwBmp; ((N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize)]: Sized
+    [XwBmp; (N + XwBmp::BITS as usize - 1) / XwBmp::BITS as usize]: Sized
 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         unsafe {

@@ -580,8 +580,8 @@ union xwos_ulock {
 #endif
 
 #ifndef XWBMP_T__SIZE
-#  define BITS_PER_XWBMP_T      BITS_PER_LONG
-#  define XWBMP_T_SHIFT         LONG_SHIFT
+#  define BITS_PER_XWBMP_T      BITS_PER_XWU32_T
+#  define XWBMP_T_SHIFT         XWU32_T_SHIFT
 #endif
 
 #ifndef XWSZ_T__SIZE

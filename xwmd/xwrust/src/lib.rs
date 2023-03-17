@@ -100,7 +100,6 @@
 
 #![no_std]
 #![feature(alloc_error_handler)]
-#![feature(core_ffi_c)]
 #![feature(negative_impls)]
 #![feature(generic_const_exprs)]
 #![allow(incomplete_features)]

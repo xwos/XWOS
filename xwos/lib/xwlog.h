@@ -93,7 +93,7 @@ int xwpf(const char * fmt, ...)
  *   @arg ERR，等级6
  *   @arg CRIT，等级7
  *   @arg EMERG，等级8
- * @param[in] tag: 日至标签
+ * @param[in] tag: 日志标签
  * @param[in] fmt: 格式的字符串
  * @param[in] ...: 需要格式化的参数
  * @note

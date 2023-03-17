@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 主模块：xwpcp子模块
+ * @brief 主模块：xwssc子模块
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -19,30 +19,30 @@
  */
 
 #include <xwos/standard.h>
-#include <xwmd/isc/xwpcp/protocol.h>
-#include <xwmd/isc/xwpcp/mif.h>
-#include <xwmd/isc/xwpcp/hwif/uart.h>
+#include <xwmd/isc/xwssc/protocol.h>
+#include <xwmd/isc/xwssc/mif.h>
+#include <xwmd/isc/xwssc/hwif/uart.h>
 #include <bm/stm32cube/mif.h>
-#include <bm/main/xwpcp.h>
+#include <bm/main/xwssc.h>
 
-struct xwpcp bm_xwpcp;
+struct xwssc bm_xwssc;
 
-XWPCP_DEF_MEMPOOL(bm_xwpcp_mem);
+XWSSC_DEF_MEMPOOL(bm_xwssc_mem);
 
-xwer_t bm_xwpcp_start(void)
+xwer_t bm_xwssc_start(void)
 {
         xwer_t rc;
 
-        rc = xwpcp_start(&bm_xwpcp, "bm.xwpcp",
-                         &xwpcpif_uart_ops, &stm32usart3,
-                         bm_xwpcp_mem, sizeof(bm_xwpcp_mem));
+        rc = xwssc_start(&bm_xwssc, "bm.xwssc",
+                         &xwsscif_uart_ops, &stm32usart3,
+                         bm_xwssc_mem, sizeof(bm_xwssc_mem));
         return rc;
 }
 
-xwer_t bm_xwpcp_stop(void)
+xwer_t bm_xwssc_stop(void)
 {
         xwer_t rc;
 
-        rc = xwpcp_stop(&bm_xwpcp);
+        rc = xwssc_stop(&bm_xwssc);
         return rc;
 }

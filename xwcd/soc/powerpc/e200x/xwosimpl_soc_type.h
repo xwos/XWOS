@@ -289,10 +289,6 @@ typedef signed int xwpr_t; /**< 优先级 (有符号) */
 #define BITS_PER_DOUBLE         64
 #define DOUBLE_SHIFT            6
 
-#define XWBMP_T__SIZE
-#define BITS_PER_XWBMP_T        BITS_PER_LONG
-#define XWBMP_T_SHIFT           LONG_SHIFT
-
 #define XWSZ_T__SIZE
 #define BITS_PER_XWSZ_T         BITS_PER_LONG
 #define XWSZ_T_SHIFT            LONG_SHIFT
