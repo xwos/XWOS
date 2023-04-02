@@ -18,29 +18,29 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_xwos_h__
-#define __cfg_xwos_h__
+#ifndef __cfg_os_h__
+#define __cfg_os_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********        Common Configurations        ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWKNCFG_CHECK_PARAMETERS                        1
+#define XWKNCFG_CHECK_PARAMETERS                        0
 #define XWKNCFG_BUG                                     1
 #define XWKNCFG_RELOCATE_DATA                           1
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         xwlib Configurations        ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWLIBCFG_LOG                                    1
+#define XWLIBCFG_LOG                                    0
 #define XWLIBCFG_XWLOG_LEVEL                            (0U)
-#define XWLIBCFG_XWLOG_BUFSIZE                          (256U)
+#define XWLIBCFG_XWLOG_BUFSIZE                          (128U)
 
-#define XWLIBCFG_SC                                     1
+#define XWLIBCFG_SC                                     0
 
 #define XWLIBCFG_XWAOP8                                 1
 #define XWLIBCFG_XWAOP16                                1
 #define XWLIBCFG_XWAOP32                                1
-#define XWLIBCFG_XWAOP64                                0
+#define XWLIBCFG_XWAOP64                                1
 #define XWLIBCFG_XWBMPAOP                               1
 
 #define XWLIBCFG_MAP                                    1
@@ -48,12 +48,12 @@
 #define XWLIBCFG_CRC32                                  1
 #define XWLIBCFG_CRC32_0X04C11DB7                       1
 #define XWLIBCFG_CRC32_0XEDB88320                       1
-#define XWLIBCFG_CRC8                                   1
+#define XWLIBCFG_CRC8                                   0
 #define XWLIBCFG_CRC8_0X07                              1
-#define XWLIBCFG_CRC8_0X31                              1
-#define XWLIBCFG_CRC8_0X9B                              1
+#define XWLIBCFG_CRC8_0X31                              0
+#define XWLIBCFG_CRC8_0X9B                              0
 
-#define XWLIBCFG_SETJMP                                 1
+#define XWLIBCFG_SETJMP                                 0
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********   Memory Management Configurations  ******** ********
@@ -77,7 +77,7 @@
 #define XWMMCFG_BMA                                     1
 
 /******** mempool ********/
-#define XWMMCFG_MEMPOOL                                 1
+#define XWMMCFG_MEMPOOL                                 0
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********          MP Configurations          ******** ********
@@ -90,32 +90,32 @@
 /******** ******** ******** memory management ******** ******** ********/
 
 /******** ******** ******** scheduler ******** ******** ********/
-/* #define XWMPCFG_SKD_PRIORITY_RT_NUM                  (32U) */
+/* #define XWMPCFG_SKD_PRIORITY_RT_NUM                  (8U) */
 /* #define XWMPCFG_SKD_IDLE_STACK_SIZE                  (2048U) */
-/* #define XWMPCFG_SKD_BH                               1 */
+/* #define XWMPCFG_SKD_BH                               0 */
 /* #define XWMPCFG_SKD_BH_STACK_SIZE                    (2048U) */
 /* #define XWMPCFG_SKD_THD_PRIVILEGED_DEFAULT           1 */
-/* #define XWMPCFG_SKD_THD_MEMSLICE                     1 */
+/* #define XWMPCFG_SKD_THD_MEMSLICE                     0 */
 /* #define XWMPCFG_SKD_THD_STDC_MM                      0 */
 /* #define XWMPCFG_SKD_THD_LOCAL_DATA_NUM               (2U) */
 /* #define XWMPCFG_SKD_SWT                              1 */
-/* #define XWMPCFG_SKD_SWT_MEMSLICE                     1 */
+/* #define XWMPCFG_SKD_SWT_MEMSLICE                     0 */
 /* #define XWMPCFG_SKD_SWT_STDC_MM                      0 */
 
 /******** ******** ******** sync ******** ******** ********/
 /* #define XWMPCFG_SYNC_PLSEM                           1 */
 /* #define XWMPCFG_SYNC_RTSEM                           1 */
-/* #define XWMPCFG_SYNC_SEM_MEMSLICE                    1 */
+/* #define XWMPCFG_SYNC_EVSEM                           1 */
 /* #define XWMPCFG_SYNC_SEM_STDC_MM                     0 */
 
-/* #define XWMPCFG_SYNC_COND_MEMSLICE                   1 */
+/* #define XWMPCFG_SYNC_COND_MEMSLICE                   0 */
 /* #define XWMPCFG_SYNC_COND_STDC_MM                    0 */
 
 /* #define XWMPCFG_SYNC_EVT                             1 */
 /* #define XWMPCFG_SYNC_EVT_STDC_MM                     0 */
 
 /******** ******** ******** lock ******** ******** ********/
-/* #define XWMPCFG_LOCK_MTX_MEMSLICE                    1 */
+/* #define XWMPCFG_LOCK_MTX_MEMSLICE                    0 */
 /* #define XWMPCFG_LOCK_MTX_STDC_MM                     0 */
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -130,8 +130,8 @@
 
 /******** ******** ******** scheduler ******** ******** ********/
 #define XWUPCFG_SKD_PRIORITY_RT_NUM                     (4U)
-#define XWUPCFG_SKD_IDLE_STACK_SIZE                     (2048U)
-#define XWUPCFG_SKD_BH                                  0
+#define XWUPCFG_SKD_IDLE_STACK_SIZE                     (1536U)
+#define XWUPCFG_SKD_BH                                  1
 #define XWUPCFG_SKD_BH_STACK_SIZE                       (2048U)
 #define XWUPCFG_SKD_PM                                  1
 #define XWUPCFG_SKD_THD_PRIVILEGED_DEFAULT              1
@@ -158,4 +158,4 @@
 #define XWUPCFG_LOCK_MTX_STDC_MM                        0
 #define XWUPCFG_LOCK_FAKEMTX                            0
 
-#endif /* cfg/xwos.h */
+#endif /* cfg/os.h */

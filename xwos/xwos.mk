@@ -40,7 +40,7 @@ endif
 
 ######## kernel ########
 XWOS_CSRCS += ospl/xwosplcb.c
-ifeq ($(XuanWuOS_CFG_CORE),mp)
+ifeq ($(XWOS_CFG_CORE),mp)
     include xwos/mp/mp.mk
 else
     include xwos/up/up.mk

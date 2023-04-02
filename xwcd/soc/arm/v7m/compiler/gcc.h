@@ -21,7 +21,7 @@
 #ifndef __compiler_gcc_h__
 #define __compiler_gcc_h__
 
-#include <cfg/XuanWuOS.h>
+#include <cfg/XWOS.h>
 
 #define __xw_i  volatile const /**< 'read only' structure member permissions */
 #define __xw_o  volatile       /**< 'write only' structure member permissions */

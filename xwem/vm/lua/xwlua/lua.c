@@ -612,7 +612,7 @@ static void doREPL (lua_State *L) {
 /* }================================================================== */
 /* ^^^^^^^^ ======== Copy from lua source ======== ^^^^^^^^ */
 
-/* ======== ======== XuanWuOS Lua Thread ======== ======== */
+/* ======== ======== XWOS Lua Thread ======== ======== */
 /*
 ** Main body of stand-alone interpreter (to be called in protected mode).
 ** Reads the options and handles them all.

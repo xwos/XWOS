@@ -18,7 +18,7 @@
  * > limitations under the License.
  */
 
-#include <cfg/XuanWuOS.h>
+#include <cfg/XWOS.h>
 
         .equ            EAGAIN, 11
 

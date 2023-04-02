@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XuanWuOS基本配置
+ * @brief XWOS基本配置
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,74 +18,74 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_XuanWuOS_h__
-#define __cfg_XuanWuOS_h__
+#ifndef __cfg_XWOS_h__
+#define __cfg_XWOS_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********  ARCH & compiler  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_ARCH                               arm
-#define XuanWuOS_CFG_SUBARCH                            v7m
-#define XuanWuOS_CFG_COMPILER                           llvm
-#define XuanWuOS_CFG_LDSCRIPT                           cfg/XuanWuOS.lds
-#define XuanWuOS_CFG_ELF_MK                             elf.mk
-#define XuanWuOS_CFG_XWMO_MK                            xwmo.mk
-#define XuanWuOS_CFG_XWMO_PREBUILT_MK                   xwmo.prebuilt.mk
-#define XuanWuOS_CFG_XWMO_RUST_MK                       xwmo.rust.mk
+#define XWOS_CFG_ARCH                               arm
+#define XWOS_CFG_SUBARCH                            v6m
+#define XWOS_CFG_COMPILER                           gcc
+#define XWOS_CFG_LDSCRIPT                           cfg/brd.lds
+#define XWOS_CFG_ELF_MK                             elf.mk
+#define XWOS_CFG_XWMO_MK                            xwmo.mk
+#define XWOS_CFG_XWMO_PREBUILT_MK                   xwmo.prebuilt.mk
+#define XWOS_CFG_XWMO_RUST_MK                       xwmo.rust.mk
 #include <cfg/arch.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********        CPU        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_CPU                                m4
+#define XWOS_CFG_CPU                                m0p
 #include <cfg/cpu.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********        SOC        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_SOC                                stm32
+#define XWOS_CFG_SOC                                kea
 #include <cfg/soc.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       board       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_BOARD                              FK429M1
+#define XWOS_CFG_BOARD                              S9KEAZ128Core
 #include <cfg/board.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********    XWOS kernel    ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_CORE                               mp
-#include <cfg/xwos.h>
+#define XWOS_CFG_CORE                               up
+#include <cfg/os.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********   chip & device   ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_XWCD                               1
+#define XWOS_CFG_XWCD                               1
 #include <cfg/xwcd.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********  XWOS middleware  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_XWMD                               1
+#define XWOS_CFG_XWMD                               1
 #include <cfg/xwmd.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********  external module  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_XWEM                               1
+#define XWOS_CFG_XWEM                               1
 #include <cfg/xwem.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********     APP module    ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_XWAM                               1
+#define XWOS_CFG_XWAM                               1
 #include <cfg/xwam.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********     OEM module    ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XuanWuOS_CFG_OEMPATH                            ../oem
+#define XWOS_CFG_OEMPATH                            ../oem
 #include <cfg/oem.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -93,4 +93,4 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <autogen.h>
 
-#endif /* cfg/XuanWuOS.h */
+#endif /* cfg/XWOS.h */

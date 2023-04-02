@@ -23,7 +23,7 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/bma.h>
 #include <xwos/mm/mempool/allocator.h>
-#if defined(XuanWuOS_CFG_CORE__mp)
+#if defined(XWOS_CFG_CORE__mp)
 #  include <xwos/mp/thd.h>
 #  include <xwos/mp/swt.h>
 #  include <xwos/mp/sync/sem.h>
@@ -109,7 +109,7 @@ xwer_t sys_mm_init(void)
                 goto err_dtcmheap_bma_init;
         }
 
-#if defined(XuanWuOS_CFG_CORE__mp)
+#if defined(XWOS_CFG_CORE__mp)
         void * mem;
 
         rc = xwmm_bma_alloc(dtcmheap_bma, BRDCFG_XWOS_THD_CACHE_ODR, &mem);
@@ -165,7 +165,7 @@ xwer_t sys_mm_init(void)
 
         return XWOK;
 
-#if defined(XuanWuOS_CFG_CORE__mp)
+#if defined(XWOS_CFG_CORE__mp)
 err_mtx_cache_init:
         BDL_BUG();
 err_mtx_bma_alloc:

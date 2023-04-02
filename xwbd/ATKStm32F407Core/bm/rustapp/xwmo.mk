@@ -18,6 +18,6 @@
 # > limitations under the License.
 #
 
-include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
+include $(XWOS_WKSPC_DIR)/XWOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
-include xwbs/$(XuanWuOS_CFG_XWMO_RUST_MK)
+include xwbs/$(XWOS_CFG_XWMO_RUST_MK)

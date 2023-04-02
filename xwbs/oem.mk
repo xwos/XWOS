@@ -20,52 +20,52 @@
 
 include xwbs/util/mk/xwmo.mk
 
-OEM_LIST := $(shell test -d $(XuanWuOS_OEM_DIR) && \
-                    find $(XuanWuOS_OEM_DIR) -type f -name "xwmo.mk" -exec dirname {} \;)
+OEM_LIST := $(shell test -d $(XWOS_OEM_DIR) && \
+                    find $(XWOS_OEM_DIR) -type f -name "xwmo.mk" -exec dirname {} \;)
 
 define findOemTarget
-  ifeq ($$(OEMCFG$(call xwmoPathToName,$(1),$(XuanWuOS_OEM_DIR))),y)
-    OEM += $(subst $(XuanWuOS_OEM_DIR)/,,$(1))/oem$(call xwmoPathToName,$(1),$(XuanWuOS_OEM_DIR)).a
-    OEM_DSM += $(subst $(XuanWuOS_OEM_DIR)/,,$(1))/oem$(call xwmoPathToName,$(1),$(XuanWuOS_OEM_DIR)).a.dsm
-    OEM_CLEAN += $(subst $(XuanWuOS_OEM_DIR)/,,$(1))/oem$(call xwmoPathToName,$(1),$(XuanWuOS_OEM_DIR)).a.clean
-    OEM_DISTCLEAN += $(subst $(XuanWuOS_OEM_DIR)/,,$(1))/oem$(call xwmoPathToName,$(1),$(XuanWuOS_OEM_DIR)).a.distclean
+  ifeq ($$(OEMCFG$(call xwmoPathToName,$(1),$(XWOS_OEM_DIR))),y)
+    OEM += $(subst $(XWOS_OEM_DIR)/,,$(1))/oem$(call xwmoPathToName,$(1),$(XWOS_OEM_DIR)).a
+    OEM_DSM += $(subst $(XWOS_OEM_DIR)/,,$(1))/oem$(call xwmoPathToName,$(1),$(XWOS_OEM_DIR)).a.dsm
+    OEM_CLEAN += $(subst $(XWOS_OEM_DIR)/,,$(1))/oem$(call xwmoPathToName,$(1),$(XWOS_OEM_DIR)).a.clean
+    OEM_DISTCLEAN += $(subst $(XWOS_OEM_DIR)/,,$(1))/oem$(call xwmoPathToName,$(1),$(XWOS_OEM_DIR)).a.distclean
   endif
 endef
 
 $(foreach oem,$(OEM_LIST),$(eval $(call findOemTarget,$(oem))))
-OEM := $(addprefix $(XuanWuOS_OEMOBJ_DIR)/,$(OEM))
-OEM_DSM := $(addprefix $(XuanWuOS_OEMOBJ_DIR)/,$(OEM_DSM))
-OEM_CLEAN := $(addprefix $(XuanWuOS_OEMOBJ_DIR)/,$(OEM_CLEAN))
-OEM_DISTCLEAN := $(addprefix $(XuanWuOS_OEMOBJ_DIR)/,$(OEM_DISTCLEAN))
+OEM := $(addprefix $(XWOS_OEMOBJ_DIR)/,$(OEM))
+OEM_DSM := $(addprefix $(XWOS_OEMOBJ_DIR)/,$(OEM_DSM))
+OEM_CLEAN := $(addprefix $(XWOS_OEMOBJ_DIR)/,$(OEM_CLEAN))
+OEM_DISTCLEAN := $(addprefix $(XWOS_OEMOBJ_DIR)/,$(OEM_DISTCLEAN))
 
 $(OEM):
 	@echo "building $@ ..."
-	$(MAKE) $(strip -C $(XuanWuOS_PATH) \
-                        -f $(subst $(XuanWuOS_OEMOBJ_DIR),$(XuanWuOS_OEM_DIR),$(@D))/xwmo.mk \
-                        XuanWuOS_BRD_DIR=$(XuanWuOS_BRD_DIR) \
-                        XWMO_OBJ_DIR=$(XuanWuOS_BWDPATH)/$(subst $(XuanWuOS_OEMOBJ_DIR),oem,$(@D)))
+	$(MAKE) $(strip -C $(XWOS_PATH) \
+                        -f $(subst $(XWOS_OEMOBJ_DIR),$(XWOS_OEM_DIR),$(@D))/xwmo.mk \
+                        XWOS_BRD_DIR=$(XWOS_BRD_DIR) \
+                        XWMO_OBJ_DIR=$(XWOS_BWDPATH)/$(subst $(XWOS_OEMOBJ_DIR),oem,$(@D)))
 
 $(OEM_DSM):
-	$(MAKE) $(strip -C $(XuanWuOS_PATH) \
-                        -f $(subst $(XuanWuOS_OEMOBJ_DIR),$(XuanWuOS_OEM_DIR),$(@D))/xwmo.mk \
-                        XuanWuOS_BRD_DIR=$(XuanWuOS_BRD_DIR) \
-                        XWMO_OBJ_DIR=$(XuanWuOS_BWDPATH)/$(subst $(XuanWuOS_OEMOBJ_DIR),oem,$(@D)) \
+	$(MAKE) $(strip -C $(XWOS_PATH) \
+                        -f $(subst $(XWOS_OEMOBJ_DIR),$(XWOS_OEM_DIR),$(@D))/xwmo.mk \
+                        XWOS_BRD_DIR=$(XWOS_BRD_DIR) \
+                        XWMO_OBJ_DIR=$(XWOS_BWDPATH)/$(subst $(XWOS_OEMOBJ_DIR),oem,$(@D)) \
                         NODEP=y \
                         dsm)
 
 $(OEM_CLEAN):
-	$(MAKE) $(strip -C $(XuanWuOS_PATH) \
-                        -f $(subst $(XuanWuOS_OEMOBJ_DIR),$(XuanWuOS_OEM_DIR),$(@D))/xwmo.mk \
-                        XuanWuOS_BRD_DIR=$(XuanWuOS_BRD_DIR) \
-                        XWMO_OBJ_DIR=$(XuanWuOS_BWDPATH)/$(subst $(XuanWuOS_OEMOBJ_DIR),oem,$(@D)) \
+	$(MAKE) $(strip -C $(XWOS_PATH) \
+                        -f $(subst $(XWOS_OEMOBJ_DIR),$(XWOS_OEM_DIR),$(@D))/xwmo.mk \
+                        XWOS_BRD_DIR=$(XWOS_BRD_DIR) \
+                        XWMO_OBJ_DIR=$(XWOS_BWDPATH)/$(subst $(XWOS_OEMOBJ_DIR),oem,$(@D)) \
                         NODEP=y \
                         clean)
 
 $(OEM_DISTCLEAN):
-	$(MAKE) $(strip -C $(XuanWuOS_PATH) \
-                        -f $(subst $(XuanWuOS_OEMOBJ_DIR),$(XuanWuOS_OEM_DIR),$(@D))/xwmo.mk \
-		        XuanWuOS_BRD_DIR=$(XuanWuOS_BRD_DIR) \
-                        XWMO_OBJ_DIR=$(XuanWuOS_BWDPATH)/$(subst $(XuanWuOS_OEMOBJ_DIR),oem,$(@D)) \
+	$(MAKE) $(strip -C $(XWOS_PATH) \
+                        -f $(subst $(XWOS_OEMOBJ_DIR),$(XWOS_OEM_DIR),$(@D))/xwmo.mk \
+		        XWOS_BRD_DIR=$(XWOS_BRD_DIR) \
+                        XWMO_OBJ_DIR=$(XWOS_BWDPATH)/$(subst $(XWOS_OEMOBJ_DIR),oem,$(@D)) \
                         NODEP=y \
                         distclean)
 

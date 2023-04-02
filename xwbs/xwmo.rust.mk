@@ -18,21 +18,21 @@
 # > limitations under the License.
 #
 
-include $(XuanWuOS_ARCH_DIR)/arch.mk
-include $(XuanWuOS_CPU_DIR)/cpu.mk
-include $(XuanWuOS_SOC_DIR)/soc.mk
-include $(XuanWuOS_BRD_DIR)/brd.mk
-include $(XuanWuOS_XWOS_DIR)/xwos.mk
-include $(XuanWuOS_BRD_DIR)/lib.mk
+include $(XWOS_ARCH_DIR)/arch.mk
+include $(XWOS_CPU_DIR)/cpu.mk
+include $(XWOS_SOC_DIR)/soc.mk
+include $(XWOS_BRD_DIR)/brd.mk
+include $(XWOS_OS_DIR)/xwos.mk
+include $(XWOS_BRD_DIR)/lib.mk
 include $(XWBS_UTIL_MK_XWMO)
-include xwbs/$(XuanWuOS_CFG_ARCH).$(XuanWuOS_CFG_COMPILER).rule
+include xwbs/$(XWOS_CFG_ARCH).$(XWOS_CFG_COMPILER).rule
 
 XWMO_NAME := $(call getXwmoName)
 XWMO_DIR := $(call getXwmoDir)
 XWMO_OBJ_DIR ?= $(XWMO_DIR)
 XWMO_RUSTLIB_NAME := lib$(notdir $(XWMO_DIR)).a
 
-ifeq ($(XuanWuOS_CFG_HOSTOS),windows-nt)
+ifeq ($(XWOS_CFG_HOSTOS),windows-nt)
   RUST_TOOLCHAIN := +nightly-x86_64-pc-windows-gnu
 else
   RUST_TOOLCHAIN := +nightly
@@ -45,13 +45,13 @@ else
   XWMO_RUSTLIB := $(XWMO_DIR)/target/$(RUST_TARGET)/debug/$(XWMO_RUSTLIB_NAME)
 endif
 
-export XuanWuOS_PATH
-export XuanWuOS_WKSPC_DIR
+export XWOS_PATH
+export XWOS_WKSPC_DIR
 
-$(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/$(XWMO_NAME): $(XWMO_RUSTLIB) $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)
+$(XWOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/$(XWMO_NAME): $(XWMO_RUSTLIB) $(XWOS_OBJ_DIR)/$(XWMO_OBJ_DIR)
 	$(SHOW_CP) $(CP) $< $@
 
-$(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR):
+$(XWOS_OBJ_DIR)/$(XWMO_OBJ_DIR):
 	@[ ! -d $@ ] && mkdir -p $@ || true
 
 $(XWMO_RUSTLIB):
@@ -64,11 +64,11 @@ rustdoc:
 	cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) rustdoc $(CARGO_BUILD_FLAGS) --target=$(RUST_TARGET)
 
 clean:
-	@$(RM) -f $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/$(XWMO_NAME)
+	@$(RM) -f $(XWOS_OBJ_DIR)/$(XWMO_OBJ_DIR)/$(XWMO_NAME)
 	@cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) clean
 
 distclean:
-	$(RM) -rf $(XuanWuOS_OBJ_DIR)/$(XWMO_OBJ_DIR)
+	$(RM) -rf $(XWOS_OBJ_DIR)/$(XWMO_OBJ_DIR)
 	@cd $(XWMO_DIR); cargo $(RUST_TOOLCHAIN) clean; rm -rf $(XWMO_DIR)/target
 
 .PHONY: dsm clean distclean $(XWMO_RUSTLIB)

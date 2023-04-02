@@ -11,12 +11,12 @@
  */
 
 #include <xwos/standard.h>
-#if defined(XuanWuOS_CFG_CORE__mp)
+#if defined(XWOS_CFG_CORE__mp)
 #  include <xwos/mp/init.h>
-#elif defined(XuanWuOS_CFG_CORE__up)
+#elif defined(XWOS_CFG_CORE__up)
 #  include <xwos/up/init.h>
 #else
-#  error "Can't find the configuration XuanWuOS_CFG_CORE!"
+#  error "Can't find the configuration XWOS_CFG_CORE!"
 #endif
 #include <xwos/lib/object.h>
 #include <xwos/mm/kma.h>
@@ -65,9 +65,9 @@ void xwos_init(void)
         /* 初始化KMA */
         xwmm_kma_init();
 
-#if defined(XuanWuOS_CFG_CORE__mp)
+#if defined(XWOS_CFG_CORE__mp)
         xwmp_init();
-#elif defined(XuanWuOS_CFG_CORE__up)
+#elif defined(XWOS_CFG_CORE__up)
         xwup_init();
 #endif
 }

@@ -18,7 +18,7 @@
 # > limitations under the License.
 #
 
-include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
+include $(XWOS_WKSPC_DIR)/XWOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
 $(eval $(call XwmoReqCfg,XWCDCFG_ds_I2C_MASTER,y))
@@ -32,4 +32,4 @@ XWMO_CSRCS += chip/at24md.c
 XWMO_CFLAGS :=
 XWMO_INCDIRS :=
 
-include xwbs/$(XuanWuOS_CFG_XWMO_MK)
+include xwbs/$(XWOS_CFG_XWMO_MK)

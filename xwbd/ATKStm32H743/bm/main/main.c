@@ -25,7 +25,7 @@
 #include <bdl/standard.h>
 #include <bm/stm32cube/mif.h>
 #include <bm/button/mif.h>
-#include <bm/main/xwpcp.h>
+#include <bm/main/xwssc.h>
 #include <bm/main/thd.h>
 
 #define MAIN_THD_PRIORITY XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 0)
@@ -100,9 +100,9 @@ xwer_t main_task(void * arg)
                 goto err_bmbtn_start;
         }
 
-        rc = bm_xwpcp_start();
+        rc = bm_xwssc_start();
         if (rc < 0) {
-                goto err_xwpcp_start;
+                goto err_xwssc_start;
         }
 
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
@@ -120,7 +120,7 @@ xwer_t main_task(void * arg)
 err_xwlua_start:
         BDL_BUG();
 #endif
-err_xwpcp_start:
+err_xwssc_start:
         BDL_BUG();
 err_bmbtn_start:
         BDL_BUG();

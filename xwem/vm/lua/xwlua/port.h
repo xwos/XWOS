@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Port Lua for XuanWuOS
+ * @brief Port Lua for XWOS
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

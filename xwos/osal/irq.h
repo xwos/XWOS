@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 操作系统抽象层：中断
+ * @brief 操作系统抽象层：异常与中断
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

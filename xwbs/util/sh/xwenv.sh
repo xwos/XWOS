@@ -23,23 +23,23 @@ function xwmc()
   local cpath=$(pwd)
   local rpath=
   local prefix=
-  if [[ ${cpath} =~ ${XuanWuOS_XWMD_DIR} ]] ; then
-    rpath=${cpath#*${XuanWuOS_XWMD_DIR}}
+  if [[ ${cpath} =~ ${XWOS_XWMD_DIR} ]] ; then
+    rpath=${cpath#*${XWOS_XWMD_DIR}}
     prefix=XWMDCFG
-  elif [[ ${cpath} =~ ${XuanWuOS_XWCD_DIR} ]] ; then
-    rpath=${cpath#*${XuanWuOS_XWCD_DIR}}
+  elif [[ ${cpath} =~ ${XWOS_XWCD_DIR} ]] ; then
+    rpath=${cpath#*${XWOS_XWCD_DIR}}
     prefix=XWCDCFG
-  elif [[ ${cpath} =~ ${XuanWuOS_XWEM_DIR} ]] ; then
-    rpath=${cpath#*${XuanWuOS_XWEM_DIR}}
+  elif [[ ${cpath} =~ ${XWOS_XWEM_DIR} ]] ; then
+    rpath=${cpath#*${XWOS_XWEM_DIR}}
     prefix=XWEMCFG
-  elif [[ ${cpath} =~ ${XuanWuOS_XWAM_DIR} ]] ; then
-    rpath=${cpath#*${XuanWuOS_XWAM_DIR}}
+  elif [[ ${cpath} =~ ${XWOS_XWAM_DIR} ]] ; then
+    rpath=${cpath#*${XWOS_XWAM_DIR}}
     prefix=XWAMCFG
-  elif [[ ${cpath} =~ ${XuanWuOS_BM_DIR} ]] ; then
-    rpath=${cpath#*${XuanWuOS_BM_DIR}}
+  elif [[ ${cpath} =~ ${XWOS_BM_DIR} ]] ; then
+    rpath=${cpath#*${XWOS_BM_DIR}}
     prefix=BMCFG
-  elif [[ ${cpath} =~ ${XuanWuOS_OEM_DIR} ]] ; then
-    rpath=${cpath#*${XuanWuOS_OEM_DIR}}
+  elif [[ ${cpath} =~ ${XWOS_OEM_DIR} ]] ; then
+    rpath=${cpath#*${XWOS_OEM_DIR}}
     prefix=OEMCFG
   fi
   local cfg=${rpath//_/__}
@@ -54,23 +54,23 @@ function xwmn()
   local cpath=$(pwd)
   local rpath=
   local prefix=
-  if [[ ${cpath} =~ ${XuanWuOS_XWMD_DIR} ]] ; then
-    rpath=${cpath#*${XuanWuOS_XWMD_DIR}}
+  if [[ ${cpath} =~ ${XWOS_XWMD_DIR} ]] ; then
+    rpath=${cpath#*${XWOS_XWMD_DIR}}
     prefix=xwmd
-  elif [[ ${cpath} =~ ${XuanWuOS_XWCD_DIR} ]] ; then
-    rpath=${cpath#*${XuanWuOS_XWCD_DIR}}
+  elif [[ ${cpath} =~ ${XWOS_XWCD_DIR} ]] ; then
+    rpath=${cpath#*${XWOS_XWCD_DIR}}
     prefix=xwcd
-  elif [[ ${cpath} =~ ${XuanWuOS_XWEM_DIR} ]] ; then
-    rpath=${cpath#*${XuanWuOS_XWEM_DIR}}
+  elif [[ ${cpath} =~ ${XWOS_XWEM_DIR} ]] ; then
+    rpath=${cpath#*${XWOS_XWEM_DIR}}
     prefix=xwem
-  elif [[ ${cpath} =~ ${XuanWuOS_XWAM_DIR} ]] ; then
-    rpath=${cpath#*${XuanWuOS_XWAM_DIR}}
+  elif [[ ${cpath} =~ ${XWOS_XWAM_DIR} ]] ; then
+    rpath=${cpath#*${XWOS_XWAM_DIR}}
     prefix=xwam
-  elif [[ ${cpath} =~ ${XuanWuOS_BM_DIR} ]] ; then
-    rpath=${cpath#*${XuanWuOS_BM_DIR}}
+  elif [[ ${cpath} =~ ${XWOS_BM_DIR} ]] ; then
+    rpath=${cpath#*${XWOS_BM_DIR}}
     prefix=bm
-  elif [[ ${cpath} =~ ${XuanWuOS_OEM_DIR} ]] ; then
-    rpath=${cpath#*${XuanWuOS_OEM_DIR}}
+  elif [[ ${cpath} =~ ${XWOS_OEM_DIR} ]] ; then
+    rpath=${cpath#*${XWOS_OEM_DIR}}
     prefix=oem
   fi
   local name=${rpath//_/__}
@@ -100,9 +100,9 @@ function xwm()
   done
 
   if [[ ${opt_b} = true ]] ; then
-    make -C ${XuanWuOS_BRD_DIR} clean
+    make -C ${XWOS_BRD_DIR} clean
   fi
-  make -C ${XuanWuOS_BRD_DIR} ${opt_target}
+  make -C ${XWOS_BRD_DIR} ${opt_target}
 }
 
 function xwmm()
@@ -125,11 +125,11 @@ function xwmm()
   done
 
   local cpath=$(pwd)
-  local rpath=${cpath#*${XuanWuOS_PATH}/}
+  local rpath=${cpath#*${XWOS_PATH}/}
   if [[ ${opt_b} = true ]] ; then
-    make -C ${XuanWuOS_PATH} -f ${rpath}/xwmo.mk XuanWuOS_BRD_DIR=${XuanWuOS_BRD_DIR} clean
+    make -C ${XWOS_PATH} -f ${rpath}/xwmo.mk XWOS_BRD_DIR=${XWOS_BRD_DIR} clean
   fi
-  make -C ${XuanWuOS_PATH} -f ${rpath}/xwmo.mk XuanWuOS_BRD_DIR=${XuanWuOS_BRD_DIR} ${opt_target}
+  make -C ${XWOS_PATH} -f ${rpath}/xwmo.mk XWOS_BRD_DIR=${XWOS_BRD_DIR} ${opt_target}
 }
 
 function xwmmm()
@@ -153,19 +153,19 @@ function xwmmm()
 
   local rpath=${opt_mo}
   if [[ ${opt_b} = true ]] ; then
-    make -C ${XuanWuOS_PATH} -f ${rpath}/xwmo.mk XuanWuOS_BRD_DIR=${XuanWuOS_BRD_DIR} clean
+    make -C ${XWOS_PATH} -f ${rpath}/xwmo.mk XWOS_BRD_DIR=${XWOS_BRD_DIR} clean
   fi
-  make -C ${XuanWuOS_PATH} -f ${rpath}/xwmo.mk XuanWuOS_BRD_DIR=${XuanWuOS_BRD_DIR}
+  make -C ${XWOS_PATH} -f ${rpath}/xwmo.mk XWOS_BRD_DIR=${XWOS_BRD_DIR}
 }
 
 function xwcroot()
 {
-  cd ${XuanWuOS_PATH}
+  cd ${XWOS_PATH}
 }
 
 function xwcbd()
 {
-  cd ${XuanWuOS_PATH}/${XuanWuOS_BRD_DIR}
+  cd ${XWOS_PATH}/${XWOS_BRD_DIR}
 }
 
 echo -e "\e[1m\e[47;34m初始化完成 Y(^_^)Y \e[0m"

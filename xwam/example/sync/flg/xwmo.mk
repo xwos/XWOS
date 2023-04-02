@@ -18,11 +18,11 @@
 # > limitations under the License.
 #
 
-include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
+include $(XWOS_WKSPC_DIR)/XWOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
 XWMO_CSRCS := mif.c
 XWMO_CFLAGS := -Wno-unused-value
 XWMO_CFLAGS_gcc :=-Wno-unused-but-set-variable
 XWMO_INCDIRS :=
-include xwbs/$(XuanWuOS_CFG_XWMO_MK)
+include xwbs/$(XWOS_CFG_XWMO_MK)

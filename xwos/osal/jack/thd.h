@@ -13,9 +13,9 @@
 #ifndef __xwos_osal_jack_thd_h__
 #define __xwos_osal_jack_thd_h__
 
-#if defined(XuanWuOS_CFG_CORE__mp)
+#if defined(XWOS_CFG_CORE__mp)
 #  include <xwos/mp/osdl/thd.h>
-#elif defined(XuanWuOS_CFG_CORE__up)
+#elif defined(XWOS_CFG_CORE__up)
 #  include <xwos/up/osdl/thd.h>
 #endif
 

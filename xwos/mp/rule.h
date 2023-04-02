@@ -13,6 +13,6 @@
 #ifndef __xwos_mp_rule_h__
 #define __xwos_mp_rule_h__
 
-#include <cfg/XuanWuOS.h>
+#include <cfg/XWOS.h>
 
 #endif /* xwos/mp/rule.h */

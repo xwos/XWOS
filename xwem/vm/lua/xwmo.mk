@@ -18,10 +18,10 @@
 # > limitations under the License.
 #
 
-include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
+include $(XWOS_WKSPC_DIR)/XWOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
-$(eval $(call XwmoReqCfg,XuanWuOS_CFG_CORE,mp))
+$(eval $(call XwmoReqCfg,XWOS_CFG_CORE,mp))
 $(eval $(call XwmoReqCfg,XWEMCFG_fs_fatfs,y))
 $(eval $(call XwmoReqCfg,XWMDCFG_libc_newlibac,y))
 
@@ -42,4 +42,4 @@ XWMO_INCDIRS := $(call getXwmoDir) $(call getXwmoDir)/src
 
 XWMO_CFLAGS_llvm := -Wno-format
 
-include xwbs/$(XuanWuOS_CFG_XWMO_MK)
+include xwbs/$(XWOS_CFG_XWMO_MK)

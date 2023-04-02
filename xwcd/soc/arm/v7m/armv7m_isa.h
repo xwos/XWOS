@@ -113,7 +113,7 @@ struct cm_scs_reg {
                 union {
                         __xw_io xwu32_t u32;
                         struct {
-#ifdef XuanWuOS_CFG_CPU__m7
+#ifdef XWOS_CFG_CPU__m7
                                 __xw_io xwu32_t reserved0:2;
                                 __xw_io xwu32_t disfold:1;
                                 __xw_io xwu32_t reserved1:7;

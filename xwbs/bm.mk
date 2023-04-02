@@ -20,36 +20,36 @@
 
 include xwbs/util/mk/xwmo.mk
 
-BM_LIST := $(shell test -d $(XuanWuOS_BM_DIR) && \
-                   find $(XuanWuOS_BM_DIR) -type f -name "xwmo.mk" -exec dirname {} \;)
+BM_LIST := $(shell test -d $(XWOS_BM_DIR) && \
+                   find $(XWOS_BM_DIR) -type f -name "xwmo.mk" -exec dirname {} \;)
 
 define findBmTarget
-  ifeq ($$(BMCFG$(call xwmoPathToName,$(1),$(XuanWuOS_BM_DIR))),y)
-    BM += $(1)/bm$(call xwmoPathToName,$(1),$(XuanWuOS_BM_DIR)).a
-    BM_DSM += $(1)/bm$(call xwmoPathToName,$(1),$(XuanWuOS_BM_DIR)).a.dsm
-    BM_CLEAN += $(1)/bm$(call xwmoPathToName,$(1),$(XuanWuOS_BM_DIR)).a.clean
-    BM_DISTCLEAN += $(1)/bm$(call xwmoPathToName,$(1),$(XuanWuOS_BM_DIR)).a.distclean
+  ifeq ($$(BMCFG$(call xwmoPathToName,$(1),$(XWOS_BM_DIR))),y)
+    BM += $(1)/bm$(call xwmoPathToName,$(1),$(XWOS_BM_DIR)).a
+    BM_DSM += $(1)/bm$(call xwmoPathToName,$(1),$(XWOS_BM_DIR)).a.dsm
+    BM_CLEAN += $(1)/bm$(call xwmoPathToName,$(1),$(XWOS_BM_DIR)).a.clean
+    BM_DISTCLEAN += $(1)/bm$(call xwmoPathToName,$(1),$(XWOS_BM_DIR)).a.distclean
   endif
 endef
 
 $(foreach bm,$(BM_LIST),$(eval $(call findBmTarget,$(bm))))
-BM := $(addprefix $(XuanWuOS_OBJ_DIR)/,$(BM))
-BM_DSM := $(addprefix $(XuanWuOS_OBJ_DIR)/,$(BM_DSM))
-BM_CLEAN := $(addprefix $(XuanWuOS_OBJ_DIR)/,$(BM_CLEAN))
-BM_DISTCLEAN := $(addprefix $(XuanWuOS_OBJ_DIR)/,$(BM_DISTCLEAN))
+BM := $(addprefix $(XWOS_OBJ_DIR)/,$(BM))
+BM_DSM := $(addprefix $(XWOS_OBJ_DIR)/,$(BM_DSM))
+BM_CLEAN := $(addprefix $(XWOS_OBJ_DIR)/,$(BM_CLEAN))
+BM_DISTCLEAN := $(addprefix $(XWOS_OBJ_DIR)/,$(BM_DISTCLEAN))
 
 $(BM):
 	@echo "building $@ ..."
-	$(MAKE) -C $(XuanWuOS_PATH) -f $(subst $(XuanWuOS_OBJ_DIR)/,,$(@D))/xwmo.mk XuanWuOS_BRD_DIR=$(XuanWuOS_BRD_DIR)
+	$(MAKE) -C $(XWOS_PATH) -f $(subst $(XWOS_OBJ_DIR)/,,$(@D))/xwmo.mk XWOS_BRD_DIR=$(XWOS_BRD_DIR)
 
 $(BM_DSM):
-	$(MAKE) -C $(XuanWuOS_PATH) -f $(subst $(XuanWuOS_OBJ_DIR)/,,$(@D))/xwmo.mk XuanWuOS_BRD_DIR=$(XuanWuOS_BRD_DIR) NODEP=y dsm
+	$(MAKE) -C $(XWOS_PATH) -f $(subst $(XWOS_OBJ_DIR)/,,$(@D))/xwmo.mk XWOS_BRD_DIR=$(XWOS_BRD_DIR) NODEP=y dsm
 
 $(BM_CLEAN):
-	$(MAKE) -C $(XuanWuOS_PATH) -f $(subst $(XuanWuOS_OBJ_DIR)/,,$(@D))/xwmo.mk XuanWuOS_BRD_DIR=$(XuanWuOS_BRD_DIR) NODEP=y clean
+	$(MAKE) -C $(XWOS_PATH) -f $(subst $(XWOS_OBJ_DIR)/,,$(@D))/xwmo.mk XWOS_BRD_DIR=$(XWOS_BRD_DIR) NODEP=y clean
 
 $(BM_DISTCLEAN):
-	$(MAKE) -C $(XuanWuOS_PATH) -f $(subst $(XuanWuOS_OBJ_DIR)/,,$(@D))/xwmo.mk XuanWuOS_BRD_DIR=$(XuanWuOS_BRD_DIR) NODEP=y distclean
+	$(MAKE) -C $(XWOS_PATH) -f $(subst $(XWOS_OBJ_DIR)/,,$(@D))/xwmo.mk XWOS_BRD_DIR=$(XWOS_BRD_DIR) NODEP=y distclean
 
 bm.mk.dbg:
 	@echo BM_LIST:$(BM_LIST)

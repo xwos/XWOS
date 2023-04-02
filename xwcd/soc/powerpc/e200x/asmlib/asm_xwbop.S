@@ -18,7 +18,7 @@
  * > limitations under the License.
  */
 
-#include <cfg/XuanWuOS.h>
+#include <cfg/XWOS.h>
 
         .section        .xwos.text,"ax"
         .global         xwbop_fls32

@@ -18,10 +18,10 @@
 # > limitations under the License.
 #
 
-include XuanWuOS.cfg
+include XWOS.cfg
 
-MAKE_ARGS = $(strip -C $(XuanWuOS_PATH) -f xwxr/fakeboard/template/xwmo.mk \
-                    XuanWuOS_WKSPC_DIR=$(XuanWuOS_WKSPC_DIR))
+MAKE_ARGS = $(strip -C $(XWOS_PATH) -f xwxr/fakeboard/template/xwmo.mk \
+                    XWOS_WKSPC_DIR=$(XWOS_WKSPC_DIR))
 
 doc:
 	@$(MAKE) $(MAKE_ARGS) doc

@@ -15,18 +15,18 @@
 
 #include <xwos/standard.h>
 
-#if defined(XuanWuOS_CFG_CORE__mp)
+#if defined(XWOS_CFG_CORE__mp)
 #  include <xwos/mp/tt.h>
 #  define xwospl_syshwt xwmp_syshwt
 #  define XWOSPL_SYSHWT_PERIOD  XWMPCFG_SYSHWT_PERIOD
 #  define XWOSPL_SYSHWT_HZ      (XWTM_S(1) / XWMPCFG_SYSHWT_PERIOD)
-#elif defined(XuanWuOS_CFG_CORE__up)
+#elif defined(XWOS_CFG_CORE__up)
 #  include <xwos/up/tt.h>
 #  define xwospl_syshwt xwup_syshwt
 #  define XWOSPL_SYSHWT_PERIOD  XWUPCFG_SYSHWT_PERIOD
 #  define XWOSPL_SYSHWT_HZ      (XWTM_S(1) / XWUPCFG_SYSHWT_PERIOD)
 #else
-#  error "Can't find the configuration XuanWuOS_CFG_CORE!"
+#  error "Can't find the configuration XWOS_CFG_CORE!"
 #endif
 
 struct xwospl_syshwt;

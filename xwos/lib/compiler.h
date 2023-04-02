@@ -13,7 +13,7 @@
 #ifndef __xwos_lib_compiler_h__
 #define __xwos_lib_compiler_h__
 
-#include <cfg/XuanWuOS.h>
+#include <cfg/XWOS.h>
 
 /**
  * @defgroup xwos_lib_compiler 编译器

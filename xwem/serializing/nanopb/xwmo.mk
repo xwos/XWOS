@@ -18,10 +18,10 @@
 # > limitations under the License.
 #
 
-include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
+include $(XWOS_WKSPC_DIR)/XWOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
 XWMO_CSRCS = pb_common.c pb_decode.c pb_encode.c
 XWMO_CFLAGS =
 XWMO_INCDIRS = $(call getXwmoDir)
-include xwbs/$(XuanWuOS_CFG_XWMO_MK)
+include xwbs/$(XWOS_CFG_XWMO_MK)

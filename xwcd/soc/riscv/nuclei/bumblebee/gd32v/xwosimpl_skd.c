@@ -349,7 +349,7 @@ xwer_t xwospl_thd_freeze_lc(struct xwospl_thd * thd)
         return rc;
 }
 
-#if defined(XuanWuOS_CFG_CORE__mp)
+#if defined(XWOS_CFG_CORE__mp)
 __xwbsp_code
 xwer_t xwospl_thd_outmigrate(struct xwospl_thd * thd, xwid_t cpuid)
 {

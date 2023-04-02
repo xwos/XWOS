@@ -41,9 +41,9 @@ luadoc: cfg
 $(WKSPC):
 	@mkdir -p $@
 
-cfg: $(WKSPC) $(WKSPC)/XuanWuOS.cfg
+cfg: $(WKSPC) $(WKSPC)/XWOS.cfg
 
-$(WKSPC)/XuanWuOS.cfg: fakeboard/cfg/*.h
+$(WKSPC)/XWOS.cfg: fakeboard/cfg/*.h
 	@[ -x ${MKCFG} ] || chmod +x ${MKCFG}
 	@${MKCFG} --XWOS=$(XWOS) --cfgdir=$(<D) --wkspc=$(WKSPC)
 

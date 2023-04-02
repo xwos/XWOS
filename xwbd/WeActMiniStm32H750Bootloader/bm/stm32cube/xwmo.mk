@@ -19,7 +19,7 @@
 #
 
 # 引入配置
-include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
+include $(XWOS_WKSPC_DIR)/XWOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
 # 使用脚本makefile-grep-variable.el获取STM32CubeMX生成的Makefile中的配置
@@ -49,4 +49,4 @@ XWMO_INCDIRS := $(call getXwmoDir) # getXwmoDir函数可获取当前玄武模块
 XWMO_INCDIRS += $(addprefix $(call getXwmoDir)/cubemx/,$(patsubst -I%,%,$(CUBEMX_INCDIRS)))
 
 # 引入编译规则
-include xwbs/$(XuanWuOS_CFG_XWMO_MK)
+include xwbs/$(XWOS_CFG_XWMO_MK)

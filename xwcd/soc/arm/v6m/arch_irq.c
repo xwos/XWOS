@@ -55,6 +55,7 @@ void arch_init_sysirqs(void)
 __xwbsp_isr __xwcc_naked
 void arch_isr_reset(void)
 {
+        __asm__ volatile(".syntax       unified");
         __asm__ volatile("      cpsid   i");
         __asm__ volatile("      bl      arch_lowlevel_init");
         __asm__ volatile("      bl      cpu_lowlevel_init");

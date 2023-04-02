@@ -79,11 +79,11 @@ ELIBS += $(ELIBS_gcc)
 WARN := -Wall -Wextra -Wsign-conversion -Werror
 WARN += -Wno-undef -Wno-cast-function-type
 INCDIRS = -I. \
-          -I$(XuanWuOS_ARCH_DIR) \
-          -I$(XuanWuOS_CPU_DIR) \
-          -I$(XuanWuOS_SOC_DIR) \
-          -I$(XuanWuOS_BRD_DIR) \
-          -I$(XuanWuOS_WKSPC_DIR)
+          -I$(XWOS_ARCH_DIR) \
+          -I$(XWOS_CPU_DIR) \
+          -I$(XWOS_SOC_DIR) \
+          -I$(XWOS_BRD_DIR) \
+          -I$(XWOS_WKSPC_DIR)
 
 PERDEF = -D__XWOS__
 
@@ -120,9 +120,9 @@ ifeq ($(ARCHCFG_COMPILER_CLIB),n)
 endif
 
 LDFLAGS = -nostartfiles \
-          -L$(XuanWuOS_SOC_DIR) -T$(XuanWuOS_BRD_DIR)/$(XuanWuOS_CFG_LDSCRIPT) \
+          -L$(XWOS_SOC_DIR) -T$(XWOS_BRD_DIR)/$(XWOS_CFG_LDSCRIPT) \
           -Wl,--gc-sections \
-          -Wl,-Map=$(XuanWuOS_WKSPC_DIR)/$(TARGET).map,--cref
+          -Wl,-Map=$(XWOS_WKSPC_DIR)/$(TARGET).map,--cref
 
 # colorfully build
 SHOW_CPP =
@@ -139,7 +139,7 @@ SHOW_SIZE =
 SHOW_LUA2HEX =
 SHOW_CP =
 
-ifeq ($(XuanWuOS_CFG_HOSTOS),gnu/linux)
+ifeq ($(XWOS_CFG_HOSTOS),gnu/linux)
   ifneq ($(~V),1)
     SHOW_CPP = @$(MSG) "\e[1m\e[44;38m[cc -E] "$<" -> "$@" \e[0m";
     SHOW_CC = @$(MSG) "\e[1m\e[44;38m[cc] "$<" -> "$@" \e[0m";
@@ -157,7 +157,7 @@ ifeq ($(XuanWuOS_CFG_HOSTOS),gnu/linux)
   endif
 endif
 
-ifeq ($(XuanWuOS_CFG_HOSTOS),darwin)
+ifeq ($(XWOS_CFG_HOSTOS),darwin)
   ifneq ($(~V),1)
     SHOW_CPP = @$(MSG) "\e[1m\e[44;38m[cc -E] "$<" -> "$@" \e[0m";
     SHOW_CC = @$(MSG) "\e[1m\e[44;38m[cc] "$<" -> "$@" \e[0m";
@@ -175,7 +175,7 @@ ifeq ($(XuanWuOS_CFG_HOSTOS),darwin)
   endif
 endif
 
-ifeq ($(XuanWuOS_CFG_HOSTOS),windows-nt)
+ifeq ($(XWOS_CFG_HOSTOS),windows-nt)
   ifneq ($(~V),1)
     SHOW_CPP = @$(MSG) "[cc -E] "$<" -> "$@;
     SHOW_CC = @$(MSG) "[cc] "$<" -> "$@;

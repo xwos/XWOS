@@ -13,14 +13,14 @@
 #ifndef __xwos_lib_rule_h__
 #define __xwos_lib_rule_h__
 
-#include <cfg/XuanWuOS.h>
+#include <cfg/XWOS.h>
 
-#if defined(XuanWuOS_CFG_CORE__mp)
+#if defined(XWOS_CFG_CORE__mp)
 #  include <xwos/mp/rule.h>
-#elif defined(XuanWuOS_CFG_CORE__up)
+#elif defined(XWOS_CFG_CORE__up)
 #  include <xwos/up/rule.h>
 #else
-#  error "Can't find the configuration XuanWuOS_CFG_CORE!"
+#  error "Can't find the configuration XWOS_CFG_CORE!"
 #endif
 
 #endif /* xwos/lib/rule.h */

@@ -15,6 +15,7 @@
 #include <xwos/osal/lock/mtx.h>
 #include <sys/lock.h>
 
+#if defined(_RETARGETABLE_LOCKING)
 struct __lock {
         struct xwos_mtx xwmtx;
 };
@@ -143,3 +144,5 @@ void __retarget_lock_release_recursive(_LOCK_T lock)
 {
         __retarget_lock_release(lock);
 }
+
+#endif

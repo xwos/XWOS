@@ -13,7 +13,7 @@
 #ifndef __xwos_lib_type_h__
 #define __xwos_lib_type_h__
 
-#include <cfg/XuanWuOS.h>
+#include <cfg/XWOS.h>
 
 /**
  * @defgroup xwos_lib_type XWOS的基本类型

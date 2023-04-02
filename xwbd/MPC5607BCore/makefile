@@ -30,9 +30,9 @@ all: $(WKSPC) cfg
 $(WKSPC):
 	@mkdir -p $@
 
-cfg: $(WKSPC) $(WKSPC)/XuanWuOS.cfg
+cfg: $(WKSPC) $(WKSPC)/XWOS.cfg
 
-$(WKSPC)/XuanWuOS.cfg: cfg/*.h
+$(WKSPC)/XWOS.cfg: cfg/*.h
 	@[ -x ${MKCFG} ] || chmod +x ${MKCFG}
 	@${MKCFG} --XWOS=$(XWOS) --cfgdir=cfg --wkspc=$(WKSPC)
 

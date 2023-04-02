@@ -9,10 +9,10 @@
 # > License, v. 2.0. If a copy of the MPL was not distributed with this
 # > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
 
-include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
+include $(XWOS_WKSPC_DIR)/XWOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
 XWMO_CSRCS := ramcode.c
 XWMO_CFLAGS :=
 XWMO_INCDIRS :=
-include xwbs/$(XuanWuOS_CFG_XWMO_MK)
+include xwbs/$(XWOS_CFG_XWMO_MK)

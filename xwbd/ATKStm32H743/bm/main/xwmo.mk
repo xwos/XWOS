@@ -19,12 +19,12 @@
 #
 
 # 引入配置
-include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
+include $(XWOS_WKSPC_DIR)/XWOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
 # 增加源代码文件
 XWMO_CSRCS :=
-XWMO_CSRCS += main.c thd.c xwpcp.c xwscp.c
+XWMO_CSRCS += main.c thd.c xwssc.c xwscp.c
 
 # 定义编译选项
 XWMO_CFLAGS :=
@@ -34,4 +34,4 @@ XWMO_CFLAGS += -Wno-undef -Wno-unused-parameter
 XWMO_INCDIRS := $(call getXwmoDir) # getXwmoDir函数可获取当前玄武模块的路径
 
 # 引入编译规则
-include xwbs/$(XuanWuOS_CFG_XWMO_MK)
+include xwbs/$(XWOS_CFG_XWMO_MK)

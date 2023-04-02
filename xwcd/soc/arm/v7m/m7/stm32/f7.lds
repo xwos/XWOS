@@ -51,15 +51,43 @@ SECTIONS {
                 KEEP (*(.init))
                 KEEP (*(.fini))
                 *(.text .text.* .gnu.linkonce.t.*)
-                *(.glue_7)      /* glue arm to thumb code */
-                *(.glue_7t)     /* glue thumb to arm code */
-                *(.eh_frame)
-                *(.gnu.warning)
-                *(.vfp11_veneer)
-                *(.v4_bx)
                 *(.rodata .rodata.* .gnu.linkonce.r.*)
+
+                *(.gnu.warning)
+                *(.glue_7) /* glue arm to thumb code */
+                *(.glue_7t) /* glue thumb to arm code */
+                *(.vfp11_veneer) /* 用于VFP单元 */
         } > code_mr AT> code_mr
 
+        /* ++++++++ 以下与unwinding有关，用于C++的异常处理 ++++++++ */
+        .ARM.extab : ALIGN(8) { /* @ref ehabi.pdf for details */
+                *(.ARM.extab* .gnu.linkonce.armextab.*)
+        } > code_mr AT> code_mr
+
+        .ARM.exidx : ALIGN(8) { /* @ref ehabi.pdf for details */
+                PROVIDE(__exidx_start = .);
+                *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+                PROVIDE(__exidx_end = .);
+        } > code_mr AT> code_mr
+
+        .eh_frame_hdr : ALIGN(8) { /* 用于栈展开 */
+                KEEP(*(.eh_frame_hdr .eh_frame_entry .eh_frame_entry.*))
+        } > code_mr AT> code_mr
+
+        .eh_frame : ALIGN(8) { /* 用于栈展开 */
+                KEEP(*(.eh_frame .eh_frame.*))
+        } > code_mr AT> code_mr
+
+        .gcc_except_table : ALIGN(8) { /* 用于try ... catch ... */
+                *(.gcc_except_table .gcc_except_table.*)
+        } > code_mr AT> code_mr
+
+        .gnu_extab : ALIGN(8) {
+                *(.gnu_extab*)
+        } > code_mr AT> code_mr
+        /* -------- 以上与unwinding有关，用于C++的异常处理 -------- */
+
+        /* ++++++++ 以下与C++全局对象的构造函数与析构函数有关 ++++++++ */
         .preinit_array : ALIGN(8) {
                 PROVIDE_HIDDEN (__preinit_array_start = .);
                 KEEP (*(.preinit_array*))
@@ -85,32 +113,24 @@ SECTIONS {
                 KEEP (*(SORT_BY_INIT_PRIORITY(.dtors*)))
                 PROVIDE_HIDDEN (__fini_array_end = .);
                 fini_array_vma_end = .;
+                . = ALIGN(32);
         } > code_mr AT> code_mr
         fini_array_vma_base = ADDR(.fini_array);
         fini_array_lma_base = LOADADDR(.fini_array);
+        /* -------- 以上与C++全局对象的构造函数与析构函数有关 -------- */
 
-        .ARM.extab : {  /* @ref ehabi.pdf for details */
-                *(.ARM.extab* .gnu.linkonce.armextab.*)
-        } > code_mr AT> code_mr
-
-        .ARM.exidx : {  /* @ref ehabi.pdf for details */
-                PROVIDE(__exidx_start = .);
-                *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-                PROVIDE(__exidx_end = .);
-        } > code_mr AT> code_mr
-
-        .xwos.data : ALIGN(16) {
+        .xwos.data : ALIGN(32) {
                 *(.xwos.data)
-                . = ALIGN(16);
                 xwos_data_vma_end = .;
+                . = ALIGN(32);
         } > xwos_data_mr AT> code_mr
         xwos_data_vma_base = ADDR(.xwos.data);
         xwos_data_lma_base = LOADADDR(.xwos.data);
 
-        .data : ALIGN(16) {
+        .data : ALIGN(32) {
                 *(.data .data.* .gnu.linkonce.d.*)
-                . = ALIGN(16);
                 data_vma_end = .;
+                . = ALIGN(32);
         } > data_mr AT> code_mr
         data_vma_base = ADDR(.data);
         data_lma_base = LOADADDR(.data);
@@ -134,9 +154,11 @@ SECTIONS {
         bss_vma_base = ADDR(.bss);
 
         .heap : ALIGN(16) {
-                PROVIDE(end = .);
+                PROVIDE(end = .); /* 被libc中的malloc()使用 */
+                PROVIDE(_end = .); /* 被libc中的malloc()使用 */
         } > data_mr
 
+        /* ++++++++ 以下与动态连接有关，不适用于MCU的ROM环境 ++++++++ */
         .rel.dyn : {
                 *(.rel.init)
                 *(.rel.text .rel.text.* .rel.gnu.linkonce.t.*)
@@ -193,9 +215,11 @@ SECTIONS {
         .got : {
                 *(.got.plt) *(.igot.plt) *(.got) *(.igot)
         }
+        /* -------- 以上与动态连接有关，不适用于MCU的ROM环境 -------- */
 
         .ARM.attributes 0 : { /* architecture infomations @ref aaelf.pdf */
                 *(.ARM.attributes)
+                *(.gnu.attributes)
         }
 }
 

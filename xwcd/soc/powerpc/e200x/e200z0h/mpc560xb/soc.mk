@@ -42,7 +42,7 @@ SOC_CSRCS += soc_reset.c
 SOC_CSRCS += xwosimpl_irq.c
 SOC_CSRCS += xwosimpl_skd.c
 SOC_CSRCS += xwosimpl_syshwt.c
-ifeq ($(XuanWuOS_CFG_CORE),mp)
+ifeq ($(XWOS_CFG_CORE),mp)
     SOC_CSRCS += soc_mp_irqc.c
     SOC_CSRCS += soc_mp_irqc_drv.c
 endif

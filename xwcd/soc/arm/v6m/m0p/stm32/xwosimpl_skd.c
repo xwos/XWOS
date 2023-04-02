@@ -94,7 +94,7 @@ xwer_t xwospl_thd_freeze_lc(__xwcc_unused struct xwospl_thd * thd)
                 "       bx      lr\n");
 }
 
-#if defined(XuanWuOS_CFG_CORE__mp)
+#if defined(XWOS_CFG_CORE__mp)
 __xwbsp_code __xwcc_naked
 xwer_t xwospl_thd_outmigrate(__xwcc_unused struct xwospl_thd * thd,
                              __xwcc_unused xwid_t cpuid)

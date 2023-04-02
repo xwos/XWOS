@@ -20,7 +20,7 @@
 #ifndef __xwos_standard_h__
 #define __xwos_standard_h__
 
-#include <cfg/XuanWuOS.h>
+#include <cfg/XWOS.h>
 #include <xwos/lib/rule.h>
 #include <xwos/lib/compiler.h>
 #include <xwos/lib/version.h>

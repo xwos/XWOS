@@ -26,9 +26,9 @@
 #endif
 
 #if defined(__llvm__)
-#  include <compiler/llvm.h>
+#  include <xwcd/soc/riscv/nuclei/compiler/llvm.h>
 #elif defined(__GNUC__)
-#  include <compiler/gcc.h>
+#  include <xwcd/soc/riscv/nuclei/compiler/gcc.h>
 #else
 #  error "Unknown compiler!"
 #endif

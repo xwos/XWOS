@@ -18,59 +18,59 @@
 # > limitations under the License.
 #
 
-include $(XuanWuOS_WKSPC_DIR)/XuanWuOS.cfg
-include $(XuanWuOS_ARCH_DIR)/arch.mk
-include $(XuanWuOS_CPU_DIR)/cpu.mk
-include $(XuanWuOS_SOC_DIR)/soc.mk
-include $(XuanWuOS_BRD_DIR)/brd.mk
-include $(XuanWuOS_XWOS_DIR)/xwos.mk
-include $(XuanWuOS_BRD_DIR)/lib.mk
+include $(XWOS_WKSPC_DIR)/XWOS.cfg
+include $(XWOS_ARCH_DIR)/arch.mk
+include $(XWOS_CPU_DIR)/cpu.mk
+include $(XWOS_SOC_DIR)/soc.mk
+include $(XWOS_BRD_DIR)/brd.mk
+include $(XWOS_OS_DIR)/xwos.mk
+include $(XWOS_BRD_DIR)/lib.mk
 include $(XWBS_UTIL_MK_XWMO)
-include xwbs/$(XuanWuOS_CFG_ARCH).$(XuanWuOS_CFG_COMPILER).rule
+include xwbs/$(XWOS_CFG_ARCH).$(XWOS_CFG_COMPILER).rule
 
-ARCH_INCDIRS := $(addprefix $(XuanWuOS_ARCH_DIR)/,$(ARCH_INCDIRS))
-ARCH_CSRCS := $(addprefix $(XuanWuOS_ARCH_DIR)/,$(ARCH_CSRCS))
-ARCH_ASRCS := $(addprefix $(XuanWuOS_ARCH_DIR)/,$(ARCH_ASRCS))
-ARCH_COBJS := $(addprefix $(XuanWuOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(ARCH_CSRCS))))
-ARCH_AOBJS := $(addprefix $(XuanWuOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(ARCH_ASRCS))))
+ARCH_INCDIRS := $(addprefix $(XWOS_ARCH_DIR)/,$(ARCH_INCDIRS))
+ARCH_CSRCS := $(addprefix $(XWOS_ARCH_DIR)/,$(ARCH_CSRCS))
+ARCH_ASRCS := $(addprefix $(XWOS_ARCH_DIR)/,$(ARCH_ASRCS))
+ARCH_COBJS := $(addprefix $(XWOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(ARCH_CSRCS))))
+ARCH_AOBJS := $(addprefix $(XWOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(ARCH_ASRCS))))
 ARCH_OBJS := $(ARCH_COBJS) $(ARCH_AOBJS)
-ARCH_OBJS_LST := $(XuanWuOS_OBJ_DIR)/$(XuanWuOS_ARCH_DIR)/arch-objs.txt
-ARCH_LIB := $(XuanWuOS_OBJ_DIR)/$(XuanWuOS_ARCH_DIR)/arch.a
+ARCH_OBJS_LST := $(XWOS_OBJ_DIR)/$(XWOS_ARCH_DIR)/arch-objs.txt
+ARCH_LIB := $(XWOS_OBJ_DIR)/$(XWOS_ARCH_DIR)/arch.a
 
-CPU_INCDIRS := $(addprefix $(XuanWuOS_CPU_DIR)/,$(CPU_INCDIRS))
-CPU_CSRCS := $(addprefix $(XuanWuOS_CPU_DIR)/,$(CPU_CSRCS))
-CPU_ASRCS := $(addprefix $(XuanWuOS_CPU_DIR)/,$(CPU_ASRCS))
-CPU_COBJS := $(addprefix $(XuanWuOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(CPU_CSRCS))))
-CPU_AOBJS := $(addprefix $(XuanWuOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(CPU_ASRCS))))
+CPU_INCDIRS := $(addprefix $(XWOS_CPU_DIR)/,$(CPU_INCDIRS))
+CPU_CSRCS := $(addprefix $(XWOS_CPU_DIR)/,$(CPU_CSRCS))
+CPU_ASRCS := $(addprefix $(XWOS_CPU_DIR)/,$(CPU_ASRCS))
+CPU_COBJS := $(addprefix $(XWOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(CPU_CSRCS))))
+CPU_AOBJS := $(addprefix $(XWOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(CPU_ASRCS))))
 CPU_OBJS := $(CPU_COBJS) $(CPU_AOBJS)
-CPU_OBJS_LST := $(XuanWuOS_OBJ_DIR)/$(XuanWuOS_CPU_DIR)/cpu-objs.txt
-CPU_LIB := $(XuanWuOS_OBJ_DIR)/$(XuanWuOS_CPU_DIR)/cpu.a
+CPU_OBJS_LST := $(XWOS_OBJ_DIR)/$(XWOS_CPU_DIR)/cpu-objs.txt
+CPU_LIB := $(XWOS_OBJ_DIR)/$(XWOS_CPU_DIR)/cpu.a
 
-SOC_INCDIRS := $(addprefix $(XuanWuOS_SOC_DIR)/,$(SOC_INCDIRS))
-SOC_CSRCS := $(addprefix $(XuanWuOS_SOC_DIR)/,$(SOC_CSRCS))
-SOC_ASRCS := $(addprefix $(XuanWuOS_SOC_DIR)/,$(SOC_ASRCS))
-SOC_COBJS := $(addprefix $(XuanWuOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(SOC_CSRCS))))
-SOC_AOBJS := $(addprefix $(XuanWuOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(SOC_ASRCS))))
+SOC_INCDIRS := $(addprefix $(XWOS_SOC_DIR)/,$(SOC_INCDIRS))
+SOC_CSRCS := $(addprefix $(XWOS_SOC_DIR)/,$(SOC_CSRCS))
+SOC_ASRCS := $(addprefix $(XWOS_SOC_DIR)/,$(SOC_ASRCS))
+SOC_COBJS := $(addprefix $(XWOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(SOC_CSRCS))))
+SOC_AOBJS := $(addprefix $(XWOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(SOC_ASRCS))))
 SOC_OBJS := $(SOC_COBJS) $(SOC_AOBJS)
-SOC_OBJS_LST := $(XuanWuOS_OBJ_DIR)/$(XuanWuOS_SOC_DIR)/soc-objs.txt
-SOC_LIB := $(XuanWuOS_OBJ_DIR)/$(XuanWuOS_SOC_DIR)/soc.a
+SOC_OBJS_LST := $(XWOS_OBJ_DIR)/$(XWOS_SOC_DIR)/soc-objs.txt
+SOC_LIB := $(XWOS_OBJ_DIR)/$(XWOS_SOC_DIR)/soc.a
 
-BRD_INCDIRS := $(addprefix $(XuanWuOS_BRD_DIR)/,$(BRD_INCDIRS))
-BRD_CSRCS := $(addprefix $(XuanWuOS_BRD_DIR)/,$(BRD_CSRCS))
-BRD_ASRCS := $(addprefix $(XuanWuOS_BRD_DIR)/,$(BRD_ASRCS))
-BRD_COBJS := $(addprefix $(XuanWuOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(BRD_CSRCS))))
-BRD_AOBJS := $(addprefix $(XuanWuOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(BRD_ASRCS))))
+BRD_INCDIRS := $(addprefix $(XWOS_BRD_DIR)/,$(BRD_INCDIRS))
+BRD_CSRCS := $(addprefix $(XWOS_BRD_DIR)/,$(BRD_CSRCS))
+BRD_ASRCS := $(addprefix $(XWOS_BRD_DIR)/,$(BRD_ASRCS))
+BRD_COBJS := $(addprefix $(XWOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(BRD_CSRCS))))
+BRD_AOBJS := $(addprefix $(XWOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(BRD_ASRCS))))
 BRD_OBJS := $(BRD_COBJS) $(BRD_AOBJS)
-BRD_OBJS_LST := $(XuanWuOS_OBJ_DIR)/$(XuanWuOS_BRD_DIR)/brd-objs.txt
-BRD_LIB := $(XuanWuOS_OBJ_DIR)/$(XuanWuOS_BRD_DIR)/brd.a
+BRD_OBJS_LST := $(XWOS_OBJ_DIR)/$(XWOS_BRD_DIR)/brd-objs.txt
+BRD_LIB := $(XWOS_OBJ_DIR)/$(XWOS_BRD_DIR)/brd.a
 
-XWOS_CSRCS := $(addprefix $(XuanWuOS_XWOS_DIR)/,$(XWOS_CSRCS))
-XWOS_ASRCS := $(addprefix $(XuanWuOS_XWOS_DIR)/,$(XWOS_ASRCS))
-XWOS_COBJS := $(addprefix $(XuanWuOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(XWOS_CSRCS))))
-XWOS_AOBJS := $(addprefix $(XuanWuOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(XWOS_ASRCS))))
+XWOS_CSRCS := $(addprefix $(XWOS_OS_DIR)/,$(XWOS_CSRCS))
+XWOS_ASRCS := $(addprefix $(XWOS_OS_DIR)/,$(XWOS_ASRCS))
+XWOS_COBJS := $(addprefix $(XWOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(XWOS_CSRCS))))
+XWOS_AOBJS := $(addprefix $(XWOS_OBJ_DIR)/,$(addsuffix .o,$(basename $(XWOS_ASRCS))))
 XWOS_OBJS := $(XWOS_COBJS) $(XWOS_AOBJS)
-XWOS_OBJS_LST := $(XuanWuOS_OBJ_DIR)/$(XuanWuOS_XWOS_DIR)/xwos-objs.txt
-XWOS_LIB := $(XuanWuOS_OBJ_DIR)/$(XuanWuOS_XWOS_DIR)/xwos.a
+XWOS_OBJS_LST := $(XWOS_OBJ_DIR)/$(XWOS_OS_DIR)/xwos-objs.txt
+XWOS_LIB := $(XWOS_OBJ_DIR)/$(XWOS_OS_DIR)/xwos.a
 
 LIBS :=
 LIBS += $(XWOS_LIB)
@@ -104,7 +104,7 @@ LD_OBJS = $(strip -Wl,--whole-archive -Wl,--start-group \
                   $(ARCH_LIB) $(ARCH_EOBJS) \
                   -Wl,--end-group -Wl,--no-whole-archive \
                   -Wl,--start-group $(ELIBS) -Wl,--end-group)
-LD_OBJS_LST := $(XuanWuOS_OBJ_DIR)/$(TARGET)-objs.txt
+LD_OBJS_LST := $(XWOS_OBJ_DIR)/$(TARGET)-objs.txt
 
 MM_ARGS = $(strip $(MMFLAGS))
 
@@ -121,27 +121,27 @@ LD_ARGS = $(strip $(LDFLAGS) $(ARCH_LDFLAGS) $(CPU_LDFLAGS) \
                   $(SOC_LDFLAGS) $(BRD_LDFLAGS))
 
 all: $(LIB_OBJS) $(LIBS) $(XWMD) $(XWCD) $(XWEM) $(XWAM) $(BM) $(OEM) \
-    $(XuanWuOS_WKSPC_DIR)/$(TARGET).elf \
-    $(XuanWuOS_WKSPC_DIR)/$(TARGET).hex \
-    $(XuanWuOS_WKSPC_DIR)/$(TARGET).smot \
-    $(XuanWuOS_WKSPC_DIR)/$(TARGET).bin
+    $(XWOS_WKSPC_DIR)/$(TARGET).elf \
+    $(XWOS_WKSPC_DIR)/$(TARGET).hex \
+    $(XWOS_WKSPC_DIR)/$(TARGET).smot \
+    $(XWOS_WKSPC_DIR)/$(TARGET).bin
 
-ifeq ($(XuanWuOS_CFG_XWMD),y)
+ifeq ($(XWOS_CFG_XWMD),y)
   include xwbs/xwmd.mk
 endif
 
 include xwbs/xwcd.mk
 include xwbs/bm.mk
 
-ifeq ($(XuanWuOS_CFG_XWEM),y)
+ifeq ($(XWOS_CFG_XWEM),y)
   include xwbs/xwem.mk
 endif
 
-ifeq ($(XuanWuOS_CFG_XWAM),y)
+ifeq ($(XWOS_CFG_XWAM),y)
   include xwbs/xwam.mk
 endif
 
-ifneq ($(XuanWuOS_OEM_DIR),)
+ifneq ($(XWOS_OEM_DIR),)
   include xwbs/oem.mk
 endif
 
@@ -170,61 +170,61 @@ $(XWOS_LIB): $(XWOS_OBJS)
 	$(SHOW_AR) $(AR) rcs $@ @$(XWOS_OBJS_LST)
 
 dsm: $(DSMS) $(XWMD_DSM) $(XWCD_DSM) $(XWEM_DSM) $(XWAM_DSM) $(BM_DSM) $(OEM_DSM) \
-  $(XuanWuOS_WKSPC_DIR)/$(TARGET).dsm
+  $(XWOS_WKSPC_DIR)/$(TARGET).dsm
 
-$(XuanWuOS_OBJ_DIR)/%.s: %.S
+$(XWOS_OBJ_DIR)/%.s: %.S
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_AS) $(AS) -E $(AS_ARGS) $< -o $@
 
-$(XuanWuOS_OBJ_DIR)/%.o.d: %.S
+$(XWOS_OBJ_DIR)/%.o.d: %.S
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_MM) $(CC) $(MM_ARGS) $(AS_ARGS) $< > $@;
-	@sed -i 's|\(^.*\)\.o[ :]*|$(XuanWuOS_OBJ_DIR)/$*.o $@: \\\n |g' $@
+	@sed -i 's|\(^.*\)\.o[ :]*|$(XWOS_OBJ_DIR)/$*.o $@: \\\n |g' $@
 
-$(XuanWuOS_OBJ_DIR)/%.o: %.S
+$(XWOS_OBJ_DIR)/%.o: %.S
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_AS) $(AS) -c $(AS_ARGS) $< -o $@
 
-$(XuanWuOS_OBJ_DIR)/%.i: %.c
+$(XWOS_OBJ_DIR)/%.i: %.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_CC) $(CC) -E $(CC_ARGS) $< -o $@
 
-$(XuanWuOS_OBJ_DIR)/%.o.d: %.c
+$(XWOS_OBJ_DIR)/%.o.d: %.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_MM) $(CC) $(MM_ARGS) $(CC_ARGS) $< > $@;
-	@sed -i 's|\(^.*\)\.o[ :]*|$(XuanWuOS_OBJ_DIR)/$*.o $@: \\\n |g' $@
+	@sed -i 's|\(^.*\)\.o[ :]*|$(XWOS_OBJ_DIR)/$*.o $@: \\\n |g' $@
 
-$(XuanWuOS_OBJ_DIR)/%.o: %.c
+$(XWOS_OBJ_DIR)/%.o: %.c
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_CC) $(CC) -c $(CC_ARGS) $< -o $@
 
-$(XuanWuOS_OBJ_DIR)/%.i: %.cpp
+$(XWOS_OBJ_DIR)/%.i: %.cpp
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_CXX) $(CXX) -E $(CXX_ARGS) $< -o $@
 
-$(XuanWuOS_OBJ_DIR)/%.o.d: %.cpp
+$(XWOS_OBJ_DIR)/%.o.d: %.cpp
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_MM) $(CXX) $(MM_ARGS) $(CXX_ARGS) $< > $@;
-	@sed -i 's|\(^.*\)\.o[ :]*|$(XuanWuOS_OBJ_DIR)/$*.o $@: \\\n |g' $@
+	@sed -i 's|\(^.*\)\.o[ :]*|$(XWOS_OBJ_DIR)/$*.o $@: \\\n |g' $@
 
-$(XuanWuOS_OBJ_DIR)/%.o: %.cpp
+$(XWOS_OBJ_DIR)/%.o: %.cpp
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_CXX) $(CXX) -c $(CXX_ARGS) $< -o $@
 
-$(XuanWuOS_OBJ_DIR)/%.i: %.cxx
+$(XWOS_OBJ_DIR)/%.i: %.cxx
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_CXX) $(CXX) -E $(CXX_ARGS) $< -o $@
 
-$(XuanWuOS_OBJ_DIR)/%.o.d: %.cxx
+$(XWOS_OBJ_DIR)/%.o.d: %.cxx
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_MM) $(CXX) $(MM_ARGS) $(CXX_ARGS) $< > $@;
-	@sed -i 's|\(^.*\)\.o[ :]*|$(XuanWuOS_OBJ_DIR)/$*.o $@: \\\n |g' $@
+	@sed -i 's|\(^.*\)\.o[ :]*|$(XWOS_OBJ_DIR)/$*.o $@: \\\n |g' $@
 
-$(XuanWuOS_OBJ_DIR)/%.o: %.cxx
+$(XWOS_OBJ_DIR)/%.o: %.cxx
 	@[ ! -d $(@D) ] && mkdir -p $(@D) || true
 	$(SHOW_CXX) $(CXX) -c $(CXX_ARGS) $< -o $@
 
-$(XuanWuOS_WKSPC_DIR)/$(TARGET).elf: $(LIB_OBJS) $(LIBS) \
+$(XWOS_WKSPC_DIR)/$(TARGET).elf: $(LIB_OBJS) $(LIBS) \
   $(XWMD) $(XWCD) $(XWEM) $(XWAM) $(BM) $(OEM)
 	$(file > $(LD_OBJS_LST),$(LD_OBJS))
 	$(SHOW_LD) $(LD) $(LD_ARGS) @$(LD_OBJS_LST) -o $@
@@ -239,7 +239,7 @@ $(XuanWuOS_WKSPC_DIR)/$(TARGET).elf: $(LIB_OBJS) $(LIBS) \
 %.bin: %.elf
 	$(SHOW_OBJCOPY) $(OBJCOPY) -S -O binary $< $@
 
-$(XuanWuOS_WKSPC_DIR)/$(TARGET).dsm: $(XuanWuOS_WKSPC_DIR)/$(TARGET).elf
+$(XWOS_WKSPC_DIR)/$(TARGET).dsm: $(XWOS_WKSPC_DIR)/$(TARGET).elf
 	$(SHOW_OD) $(OD) -D $< > $@
 
 %.dsm: %.o
@@ -282,17 +282,17 @@ clean: $(XWMD_CLEAN) $(XWCD_CLEAN) $(XWEM_CLEAN) $(XWAM_CLEAN) $(BM_CLEAN) $(OEM
 	@$(RM) -f $(ARCH_OBJS:.o=.i)
 	@$(RM) -f $(ARCH_OBJS_LST)
 
-	@$(RM) -f $(XuanWuOS_WKSPC_DIR)/$(TARGET).elf
-	@$(RM) -f $(XuanWuOS_WKSPC_DIR)/$(TARGET).dsm
-	@$(RM) -f $(XuanWuOS_WKSPC_DIR)/$(TARGET).map
-	@$(RM) -f $(XuanWuOS_WKSPC_DIR)/$(TARGET).hex
-	@$(RM) -f $(XuanWuOS_WKSPC_DIR)/$(TARGET).smot
-	@$(RM) -f $(XuanWuOS_WKSPC_DIR)/$(TARGET).bin
+	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).elf
+	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).dsm
+	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).map
+	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).hex
+	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).smot
+	@$(RM) -f $(XWOS_WKSPC_DIR)/$(TARGET).bin
 	@$(RM) -rf doc/doxygen
 
 distclean: $(XWMD_DISTCLEAN) $(XWCD_DISTCLEAN) $(XWEM_DISTCLEAN) $(XWAM_DISTCLEAN) $(BM_DISTCLEAN) $(OEM_DISTCLEAN)
 	@echo "distclean ..."
-	@$(RM) -rf $(XuanWuOS_OBJ_DIR)
+	@$(RM) -rf $(XWOS_OBJ_DIR)
 	@$(RM) -rf doc/doxygen
 
 .PHONY: all clean distclean
