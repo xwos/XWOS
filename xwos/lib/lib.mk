@@ -15,10 +15,6 @@ XWOS_CSRCS += lib/xwbop.c
 XWOS_CSRCS += lib/rbtree.c
 XWOS_CSRCS += lib/div64.c
 
-ifeq ($(XWLIBCFG_SC),y)
-    XWOS_CSRCS += lib/sc.c
-endif
-
 ifeq ($(XWLIBCFG_XWAOP8),y)
     ifneq ($(ARCHCFG_LIB_XWAOP8),y)
         XWOS_CSRCS += lib/xwaops8.c

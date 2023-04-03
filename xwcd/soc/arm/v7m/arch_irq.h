@@ -35,6 +35,8 @@ void arch_isr_dbgmon(void);
 void arch_isr_svc(void);
 void arch_isr_noop(void);
 
+void arch_svc_xwsc(xwstk_t * sp);
+
 /**
  * @brief Enable local CPU IRQ
  */

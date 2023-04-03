@@ -31,9 +31,6 @@
  */
 xws64_t xwsc(xwsc_f func, xwreg_t argnum, ...);
 
-void xwlib_privilege_start(void);
-void xwlib_privilege_end(void);
-
 /**
  * @} xwos_lib_xwsc
  */

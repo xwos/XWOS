@@ -21,28 +21,6 @@
 #include <xwos/standard.h>
 
 /**
- * @brief Start supervisor call (change to privileged access temporarily)
- */
-__xwbsp_code __xwcc_naked
-void soc_privilege_start(void)
-{
-        __asm__ volatile(".syntax       unified");
-        __asm__ volatile("      svc     1");
-        __asm__ volatile("      bx      lr");
-}
-
-/**
- * @brief End supervisor call (close the privileged access)
- */
-__xwbsp_code __xwcc_naked
-void soc_privilege_end(void)
-{
-        __asm__ volatile(".syntax       unified");
-        __asm__ volatile("      svc     2");
-        __asm__ volatile("      bx      lr");
-}
-
-/**
  * @brief 以函数func作为系统调用
  * @param[in] func: 系统调用函数指针
  * @param[in] argnum: 函数参数的数量
@@ -169,4 +147,52 @@ xws64_t soc_xwsc_entry(__xwcc_unused xwsc_f func, __xwcc_unused xwptr_t argnum,
         __asm__ volatile("      orr     r2, #1");                       /* r2 |= 1;             */
         __asm__ volatile("      msr     control, r2");                  /* control = r2;        */
         __asm__ volatile("      pop     {r3, r4, r5, r6, r7, r8, r9, sl, ip, pc}");
+}
+
+/**
+ * @brief SVC XWSC
+ * @param[in] sp: 调用者传递的栈指针
+ * @details
+ * ARM内核进入handler模式时，会自动将 `r0, r1, r2, r3, ip, lr, pc, xpsr` 压栈保存；
+ * 通过指令 `bx lr` 返回thread模式时，会自动从栈中弹出原始值恢复这些寄存器。
+ *
+ * 返回的地址被存放在 `[SP+24]` 的地址处。可以将这个内存地址中的内容改为XWSC的真正
+ * 入口 @ref soc_xwsc_entry() ，并将原始返回地址存放在原始LR的位置 `[SP+20]` 。
+ *
+ * 寄存器R3用于返回旧的LR的值，因此需要将原始LR的值覆盖到R3的位置 `[SP+12]` 。
+ *
+ * 当执行指令 `bx lr` 返回时，就会进入到 @ref soc_xwsc_entry() 函数，并且以 `r0, r1, r2` 作为参数，
+ * 函数的第四个参数（通过R3的位置传递）作为LR的原始值。
+ *
+ *         ------------------------------\n
+ *         | stack      | change        |\n
+ *         ------------------------------\n
+ *   sp+28 | xpsr       |               |\n
+ *   sp+24 | pc         | real entry    |\n
+ *   sp+20 | lr         | old PC        |\n
+ *   sp+16 | r12        |               |\n
+ *   sp+12 | r3         | old lr        |\n
+ *   sp+8  | r2         | args addr     |\n
+ *   sp+4  | r1         | args number   |\n
+ *   sp->  | r0         | function      |\n
+ *         ------------------------------\n
+ */
+
+__xwbsp_isr __xwcc_naked
+void arch_svc_xwsc(__unused xwstk_t * sp)
+{
+        __asm__ volatile("      ldr     r1, [r0, #20]"); /* get old lr value */
+        __asm__ volatile("      str     r1, [r0, #12]"); /* save old lr value */
+        __asm__ volatile("      ldr     r1, [r0, #24]"); /* get old pc value */
+        __asm__ volatile("      orr     r1, #1"); /* set lsb to 1, Thumb mode */
+        __asm__ volatile("      str     r1, [r0, #20]"); /* save old pc value */
+        __asm__ volatile("      mov     r1, %[__soc_xwsc_entry]"
+                         :
+                         : [__soc_xwsc_entry] "r" ((xwptr_t)soc_xwsc_entry)
+                         : "r0", "r1", "r2", "memory");
+        __asm__ volatile("      str     r1, [r0, #24]"); /* setup xwsc entry */
+        __asm__ volatile("      mrs     r0, control"); /* open privileged access */
+        __asm__ volatile("      bic     r0, #1");
+        __asm__ volatile("      msr     control, r0");
+        __asm__ volatile("      bx      lr"); /* 从SVC异常返回 */
 }
