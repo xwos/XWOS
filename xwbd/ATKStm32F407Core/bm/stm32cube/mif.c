@@ -22,6 +22,7 @@
 #include <armv7m_isa.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
+#include <bm/stm32cube/cubemx/IVT/isr.h>
 #include <bm/stm32cube/xwac/xwds/cmif.h>
 #include <bm/stm32cube/xwac/fatfs/cmif.h>
 #include <bm/stm32cube/mif.h>
@@ -70,6 +71,7 @@ void stm32cube_lowlevel_init(void)
 #if defined(STM32CUBECFG_DISDEFWBUF) && (1 == STM32CUBECFG_DISDEFWBUF)
         cm_scs.scnscb.actlr.bit.disdefwbuf = 1;
 #endif
+        SCB->VTOR = (xwu32_t)&stm32_ivt;
 }
 
 /**

@@ -16,19 +16,6 @@
 #include <xwos/ospl/irq.h>
 
 static __xwcc_inline
-xwer_t xwosdl_irq_request(xwirq_t irqn, xwisr_f isr, void * data,
-                          const struct soc_irq_cfg * cfg)
-{
-        return xwup_irq_request(irqn, isr, data, cfg);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_irq_release(xwirq_t irqn)
-{
-        return xwup_irq_release(irqn);
-}
-
-static __xwcc_inline
 xwer_t xwosdl_irq_enable(xwirq_t irqn)
 {
         return xwup_irq_enable(irqn);
@@ -50,42 +37,6 @@ static __xwcc_inline
 xwer_t xwosdl_irq_restore(xwirq_t irqn, xwreg_t flag)
 {
         return xwup_irq_restore(irqn, flag);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_irq_pend(xwirq_t irqn)
-{
-        return xwup_irq_pend(irqn);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_irq_clear(xwirq_t irqn)
-{
-        return xwup_irq_clear(irqn);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_irq_tst(xwirq_t irqn, bool * pending)
-{
-        return xwup_irq_tst(irqn, pending);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg)
-{
-        return xwup_irq_cfg(irqn, cfg);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
-{
-        return xwup_irq_get_cfg(irqn, cfgbuf);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
-{
-        return xwup_irq_get_data(irqn, databuf);
 }
 
 static __xwcc_inline

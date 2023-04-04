@@ -24,6 +24,13 @@
 #include "standard.h"
 #include "cubemx/Core/Inc/main.h"
 
+struct soc_ivt {
+        xwisr_f exc[SOCCFG_EXC_NUM];
+        xwisr_f irq[SOCCFG_IRQ_NUM];
+};
+
+extern struct soc_ivt stm32_ivt;
+
 void WWDG_IRQHandler(void);
 void PVD_VDDIO2_IRQHandler(void);
 void RTC_IRQHandler(void);

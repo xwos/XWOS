@@ -27,7 +27,6 @@
 /******** ******** IRQ ******** ********/
 #define SOCCFG_EXC_NUM                          16U
 #define SOCCFG_IRQ_NUM                          112U
-#define SOCCFG_RO_IVT                           1
 #define SOCCFG_NVIC_PRIO_BITNUM                 4U
 #define SOCCFG_NVIC_SUBPRIO_BITIDX              4U
 
@@ -36,5 +35,6 @@
 
 /******** ******** CRC ******** ********/
 #define SOCCFG_CRC32                            1
+#define SOCCFG_CRC8                             0
 
 #endif /* cfg/soc.h */

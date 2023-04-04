@@ -21,6 +21,7 @@
 #include <xwos/lib/xwbop.h>
 #include <bm/stm32cube/standard.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
+#include <bm/stm32cube/cubemx/IVT/isr.h>
 #include <bm/stm32cube/xwac/xwlib/crc.h>
 #include <bm/stm32cube/xwac/xwds/cmif.h>
 #include <bm/stm32cube/xwac/fatfs/cmif.h>
@@ -74,6 +75,7 @@ void stm32cube_lowlevel_init(void)
         __HAL_RCC_D2SRAM2_CLK_ENABLE();
         __HAL_RCC_D2SRAM3_CLK_ENABLE();
         __HAL_RCC_D3SRAM1_CLKAM_ENABLE();
+        SCB->VTOR = (xwu32_t)&stm32_ivt;
 }
 
 /**

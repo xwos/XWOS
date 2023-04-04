@@ -21,6 +21,7 @@
 #include <bm/stm32cube/standard.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
 #include <bm/stm32cube/cubemx/Core/Inc/gpio.h>
+#include <bm/stm32cube/cubemx/IVT/isr.h>
 #include <bm/stm32cube/mif.h>
 
 /**
@@ -48,6 +49,7 @@ __xwbsp_init_code
 void stm32cube_lowlevel_init(void)
 {
         SystemInit();
+        SCB->VTOR = (xwu32_t)&stm32_ivt;
 }
 
 /**

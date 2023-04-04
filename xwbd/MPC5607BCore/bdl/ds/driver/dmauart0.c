@@ -20,7 +20,6 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/xwlog.h>
-#include <xwos/osal/irq.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/cond.h>
 #include <xwcd/ds/device.h>
@@ -29,6 +28,7 @@
 #include <xwcd/ds/soc/dma.h>
 #include <xwcd/ds/uart/dma.h>
 #include <soc.h>
+#include <soc_irq.h>
 #include <soc_dma.h>
 #include <soc_dmauart.h>
 #include <bdl/ds/driver/dmauart0.h>
@@ -135,7 +135,7 @@ xwer_t mpc560xb_dmauart0_drv_start(struct xwds_device * dev)
         __xwcc_unused const struct xwds_resource_dma * txdmarsc;
         __xwcc_unused const struct xwds_resource_dma * rxdmarsc;
         const struct xwds_resources * resources;
-        const struct xwos_irq_resource * irqrsc;
+        const struct xwds_resource_irq * irqrsc;
         const struct xwds_resource_clk * clkrsc;
         const struct xwds_resource_gpio * gpiorsc;
         const struct xwds_resource_dma * dmarsc;
@@ -157,11 +157,11 @@ xwer_t mpc560xb_dmauart0_drv_start(struct xwds_device * dev)
         /* Request IRQ resources */
         for (i = 0; i < (xwssz_t)resources->irqrsc_num; i++) {
                 irqrsc = &resources->irqrsc_array[i];
-                rc = xwos_irq_request(irqrsc->irqn, irqrsc->isr, dev, NULL);
+                rc = soc_irq_request(irqrsc->irqn, irqrsc->isr, dev);
                 if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 irqrsc = &resources->irqrsc_array[j];
-                                xwos_irq_release(irqrsc->irqn);
+                                soc_irq_release(irqrsc->irqn);
                         }
                         goto err_req_irqs;
                 }
@@ -268,15 +268,14 @@ xwer_t mpc560xb_dmauart0_drv_start(struct xwds_device * dev)
         /* enable IRQs */
         for (i = 0; i < (xwssz_t)resources->irqrsc_num; i++) {
                 irqrsc = &resources->irqrsc_array[i];
-                xwos_irq_clear(irqrsc->irqn);
-                rc = xwos_irq_cfg(irqrsc->irqn, irqrsc->cfg);
+                rc = soc_irq_cfg(irqrsc->irqn, irqrsc->cfg);
                 if (XWOK == rc) {
-                        rc = xwos_irq_enable(irqrsc->irqn);
+                        rc = soc_irq_enable(irqrsc->irqn);
                 }
                 if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 irqrsc = &resources->irqrsc_array[j];
-                                xwos_irq_disable(irqrsc->irqn);
+                                soc_irq_disable(irqrsc->irqn);
                         }
                         goto err_en_irq;
                 }
@@ -297,7 +296,7 @@ xwer_t mpc560xb_dmauart0_drv_start(struct xwds_device * dev)
 err_rxdma_setup:
         for (j = (xwssz_t)resources->irqrsc_num - 1; j >=0; j--) {
                 irqrsc = &resources->irqrsc_array[j];
-                xwos_irq_disable(irqrsc->irqn);
+                soc_irq_disable(irqrsc->irqn);
         }
 err_en_irq:
 err_setup_bd:
@@ -318,7 +317,7 @@ err_req_gpios:
 err_req_clks:
         for (j = (xwssz_t)resources->irqrsc_num - 1; j >= 0; j--) {
                 irqrsc = &resources->irqrsc_array[j];
-                xwos_irq_release(irqrsc->irqn);
+                soc_irq_release(irqrsc->irqn);
         }
 err_req_irqs:
         return rc;
@@ -333,7 +332,7 @@ xwer_t mpc560xb_dmauart0_drv_stop(struct xwds_device * dev)
         const struct xwds_resource_dma * dmarsc;
         const struct xwds_resource_gpio * gpiorsc;
         const struct xwds_resource_clk * clkrsc;
-        const struct xwos_irq_resource * irqrsc;
+        const struct xwds_resource_irq * irqrsc;
         xwssz_t j;
         xwer_t rc;
 
@@ -346,7 +345,7 @@ xwer_t mpc560xb_dmauart0_drv_stop(struct xwds_device * dev)
         /* disable IRQs */
         for (j = (xwssz_t)resources->irqrsc_num - 1; j >=0; j--) {
                 irqrsc = &resources->irqrsc_array[j];
-                rc = xwos_irq_disable(irqrsc->irqn);
+                rc = soc_irq_disable(irqrsc->irqn);
                 if (__xwcc_unlikely(rc < 0)) {
                         goto err_irq_disable;
                 }
@@ -382,7 +381,7 @@ xwer_t mpc560xb_dmauart0_drv_stop(struct xwds_device * dev)
         /* release IRQ resources */
         for (j = (xwssz_t)resources->irqrsc_num - 1; j >=0; j--) {
                 irqrsc = &resources->irqrsc_array[j];
-                rc = xwos_irq_release(irqrsc->irqn);
+                rc = soc_irq_release(irqrsc->irqn);
                 if (__xwcc_unlikely(rc < 0)) {
                         goto err_irq_rls;
                 }
@@ -688,7 +687,7 @@ void mpc560xb_dmauart0_err_isr(void)
         xwid_t ch;
         xwsq_t tail;
 
-        xwos_irq_get_data(IRQ_LINFLEX0_ERR, &irqdata);
+        soc_irq_get_data(IRQ_LINFLEX0_ERR, &irqdata);
         dmauartc = irqdata.data;
 
         if (LINFLEX_0.UARTSR.B.TO) {

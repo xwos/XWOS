@@ -23,8 +23,8 @@ MEMORY {
         sram_l_mr (rwx): org = 0x1FFFF000, len = 4k /* internal SRAM_L */
         sram_u_mr (rwx): org = 0x20000000, len = 12k /* internal SRAM_U */
 
-        ivt_lmr (rx): org = 0x00000000, len = 1k /* vectors table lma region */
-        ivt_vmr (rw): org = 0x00000000, len = 1k /* vectors table vma region */
+        armv6m_ivt_lmr (rx): org = 0x00000000, len = 1k /* vectors table lma region */
+        armv6m_ivt_vmr (rw): org = 0x00000000, len = 1k /* vectors table vma region */
         flash_cfg_mr (rx): org = 0x00000400, len = 16 /* flash config */
         image_description_mr (rx): org = 0x00000410, len = 240 /* image description */
         code_mr (rx): org = 0x00000500, len = 129792 /* .text & .rodata */

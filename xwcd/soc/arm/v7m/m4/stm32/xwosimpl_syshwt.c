@@ -25,7 +25,8 @@
 __xwbsp_code
 xwer_t xwospl_syshwt_init(struct xwospl_syshwt * hwt)
 {
-        return arch_systick_init(hwt);
+        arch_systick_init(hwt);
+        return XWOK;
 }
 
 __xwbsp_code

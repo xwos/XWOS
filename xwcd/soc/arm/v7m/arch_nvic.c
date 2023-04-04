@@ -26,21 +26,13 @@
 #include <arch_irq.h>
 #include <arch_nvic.h>
 
-__xwbsp_rodata const struct cortexm_nvic_cfg arch_nvic_cfg = {
-        .subprio = SOCCFG_NVIC_SUBPRIO_BITIDX,
-        .basepri = 0,
-};
-
 __xwbsp_code
-xwer_t arch_nvic_init(void)
+void arch_nvic_init(void)
 {
-        cm_scs.scb.vtor.u32 = (xwu32_t)&xwospl_ivt;
-        cm_set_basepri(arch_nvic_cfg.basepri);
-        cm_nvic_set_prioritygrouping(arch_nvic_cfg.subprio);
-        return XWOK;
+        cm_set_basepri(0);
+        cm_nvic_set_prioritygrouping(SOCCFG_NVIC_SUBPRIO_BITIDX);
 }
 
-/******** ******** IRQ Drivers ******** ********/
 __xwbsp_code
 xwer_t arch_nvic_irq_get_id(xwirq_t * irqnbuf)
 {
@@ -58,48 +50,6 @@ xwer_t arch_nvic_irq_get_id(xwirq_t * irqnbuf)
                 *irqnbuf = curr;
         }
         return rc;
-}
-
-__xwbsp_code
-xwer_t arch_nvic_irq_request(xwirq_t irqn,
-                             __xwcc_unused xwisr_f isrfunc,
-                             __xwcc_unused void * data,
-                             const struct soc_irq_cfg * cfg)
-{
-#if (!defined(SOCCFG_RO_IVT) || (1 != SOCCFG_RO_IVT))
-        __xwos_ivt_qualifier struct soc_ivt * ivt;
-        __xwos_ivt_qualifier struct soc_idvt * idvt;
-
-        ivt = &xwospl_ivt;
-        ivt->irq[irqn] = isrfunc;
-
-        idvt = &xwospl_idvt;
-        if ((NULL != idvt) && (NULL != data)) {
-                idvt->irq[irqn] = data;
-        }
-#endif
-        if (cfg) {
-                arch_nvic_irq_cfg(irqn, cfg);
-        }
-        return XWOK;
-}
-
-__xwbsp_code
-xwer_t arch_nvic_irq_release(__xwcc_unused xwirq_t irqn)
-{
-#if (!defined(SOCCFG_RO_IVT) || (1 != SOCCFG_RO_IVT))
-        __xwos_ivt_qualifier struct soc_ivt * ivt;
-        __xwos_ivt_qualifier struct soc_idvt * idvt;
-
-        ivt = &xwospl_ivt;
-        ivt->irq[irqn] = arch_isr_noop;
-
-        idvt = &xwospl_idvt;
-        if (NULL != idvt) {
-                idvt->irq[irqn] = NULL;
-        }
-#endif
-        return XWOK;
 }
 
 __xwbsp_code
@@ -229,36 +179,4 @@ xwer_t arch_nvic_irq_tst(xwirq_t irqn, bool * pending)
                 rc = -EPERM;
         }
         return rc;
-}
-
-__xwbsp_code
-xwer_t arch_nvic_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg)
-{
-        if (irqn >= 0) {
-                cm_nvic_set_irq_priority(irqn, cfg->irqcfg.priority);
-        } else {
-                cm_nvic_set_sysirq_priority(irqn, cfg->irqcfg.priority);
-        }
-        return XWOK;
-}
-
-__xwbsp_code
-xwer_t arch_nvic_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
-{
-        if (irqn >= 0) {
-                cfgbuf->irqcfg.priority = cm_nvic_get_irq_priority(irqn);
-        } else {
-                cfgbuf->irqcfg.priority = cm_nvic_get_sysirq_priority(irqn);
-        }
-        return XWOK;
-}
-
-__xwbsp_code
-xwer_t arch_nvic_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
-{
-        __xwos_ivt_qualifier struct soc_idvt * idvt;
-
-        idvt = &xwospl_idvt;
-        databuf->data = idvt->irq[irqn];
-        return XWOK;
 }

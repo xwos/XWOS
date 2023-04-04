@@ -27,7 +27,6 @@
 /******** ******** IRQ ******** ********/
 #define SOCCFG_EXC_NUM                          16U
 #define SOCCFG_IRQ_NUM                          48U
-#define SOCCFG_RO_IVT                           1
 #define SOCCFG_NVIC_PRIO_BITNUM                 2U
 
 /******** Debug ********/

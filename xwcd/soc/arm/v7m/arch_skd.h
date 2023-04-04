@@ -24,7 +24,7 @@
 #include <xwos/standard.h>
 #include <xwos/ospl/skd.h>
 
-xwer_t arch_skd_init_pendsv(struct xwospl_skd * xwskd);
+void arch_skd_init_pendsv(void);
 void arch_skd_init_stack(struct xwospl_skdobj_stack * stk,
                          void (* exit)(xwer_t));
 void arch_skd_svcsr_start(struct xwospl_skd * xwskd);

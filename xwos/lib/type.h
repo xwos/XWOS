@@ -257,7 +257,6 @@ enum xwaop_memory_order_em {
 struct xwos_irq_resource {
         xwirq_t irqn; /**< 中断号 */
         xwisr_f isr; /**< 中断处理函数 */
-        const struct soc_irq_cfg * cfg; /**< 配置 */
         const char * description; /**< 描述 */
 };
 

@@ -24,13 +24,15 @@
 #include <arch_skd.h>
 
 __xwbsp_code
-xwer_t xwospl_skd_init(struct xwospl_skd * xwskd)
+xwer_t xwospl_skd_init(__unused struct xwospl_skd * xwskd)
 {
-        return arch_skd_init_pendsv(xwskd);
+        arch_skd_init_pendsv();
+        return XWOK;
 }
 
 __xwbsp_code
-void xwospl_skd_init_stack(struct xwospl_skdobj_stack * stk, void (* exit)(xwer_t))
+void xwospl_skd_init_stack(struct xwospl_skdobj_stack * stk,
+                           void (* exit)(xwer_t))
 {
         arch_skd_init_stack(stk, exit);
 }

@@ -31,8 +31,8 @@ MEMORY {
         bkram_mr (rw): org = 0x38800000, len = 4k /* backup SRAM */
         sdram_mr (rw): org = 0xD0000000, len = 64M /* external SDRAM */
 
-        ivt_lmr (rx): org = 0x08000000, len = 2048 /* vectors table lma region */
-        ivt_vmr (rw): org = 0x00000000, len = 2048 /* vectors table vma region */
+        armv7m_ivt_lmr (rx): org = 0x08000000, len = 2048 /* vectors table lma region */
+        armv7m_ivt_vmr (rw): org = 0x00000000, len = 2048 /* vectors table vma region */
         image_description_mr (rx): org = 0x08000800, len = 1k /* image description */
         code_mr (rx): org = 0x08000C00, len = 2045k /* text & rodata */
         xwos_data_mr (arw): org = 0x800, len = 54k /* .xwos.data */

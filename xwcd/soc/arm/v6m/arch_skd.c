@@ -36,19 +36,6 @@
 
 extern xwstk_t xwos_stk_top[];
 
-__xwbsp_rodata const struct soc_irq_cfg cortex_m_swcx_irq_cfg = {
-        .irqcfg = {
-                .priority = SOC_EXC_SWCX_PRIO,
-        },
-};
-
-__xwbsp_rodata const struct xwos_irq_resource cortex_m_swcx_irqrsc = {
-        .irqn = SOC_EXC_PENDSV,
-        .isr = xwospl_skd_isr_swcx,
-        .cfg = &cortex_m_swcx_irq_cfg,
-        .description = "irq.pendsv.armv6m",
-};
-
 static __xwbsp_code
 void arch_skd_report_stk_overflow(struct xwospl_skdobj_stack * stk);
 
@@ -60,22 +47,9 @@ void arch_skd_report_stk_overflow(struct xwospl_skdobj_stack * stk);
  * - 使用PendSV作为线程上下文切换的中断
  */
 __xwbsp_code
-xwer_t arch_skd_init_pendsv(struct xwospl_skd * xwskd)
+void arch_skd_init_pendsv(void)
 {
-        xwer_t rc;
-        const struct xwos_irq_resource * irqrsc;
-
-        XWOS_UNUSED(xwskd);
-
-        irqrsc = &cortex_m_swcx_irqrsc;
-        rc = xwos_irq_request(irqrsc->irqn, irqrsc->isr,
-                              XWOS_UNUSED_ARGUMENT, irqrsc->cfg);
-        XWOS_BUG_ON(rc < 0);
-
-        rc = xwos_irq_enable(irqrsc->irqn);
-        XWOS_BUG_ON(rc < 0);
-
-        return rc;
+        cm_nvic_set_sysirq_priority(SOC_EXC_PENDSV, SOC_EXC_SWCX_PRIO);
 }
 
 /**

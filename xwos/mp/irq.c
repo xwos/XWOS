@@ -16,27 +16,6 @@
 #include <xwos/mp/irq.h>
 
 __xwmp_api
-xwer_t xwmp_irq_request(xwirq_t irqn, xwisr_f isr, void * data,
-                        const struct soc_irq_cfg * cfg)
-{
-        XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM), "out-of-range", -ERANGE);
-        XWOS_VALIDATE((irqn >= (0 - (xwirq_t)SOCCFG_EXC_NUM)), "out-of-range", -ERANGE);
-
-        return xwospl_irq_request(irqn, isr, data, cfg);
-}
-
-__xwmp_api
-xwer_t xwmp_irq_release(xwirq_t irqn)
-{
-        XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM),
-                      "out-of-range", -ERANGE);
-        XWOS_VALIDATE((irqn >= (0 - (xwirq_t)SOCCFG_EXC_NUM)),
-                      "out-of-range", -ERANGE);
-
-        return xwospl_irq_release(irqn);
-}
-
-__xwmp_api
 xwer_t xwmp_irq_enable(xwirq_t irqn)
 {
         XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM),
@@ -78,73 +57,6 @@ xwer_t xwmp_irq_restore(xwirq_t irqn, xwreg_t flag)
                       "out-of-range", -ERANGE);
 
         return xwospl_irq_restore(irqn, flag);
-}
-
-__xwmp_api
-xwer_t xwmp_irq_pend(xwirq_t irqn)
-{
-        XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM),
-                      "out-of-range", -ERANGE);
-        XWOS_VALIDATE((irqn >= (0 - (xwirq_t)SOCCFG_EXC_NUM)),
-                      "out-of-range", -ERANGE);
-
-        return xwospl_irq_pend(irqn);
-}
-
-__xwmp_api
-xwer_t xwmp_irq_clear(xwirq_t irqn)
-{
-        XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM),
-                      "out-of-range", -ERANGE);
-        XWOS_VALIDATE((irqn >= (0 - (xwirq_t)SOCCFG_EXC_NUM)),
-                      "out-of-range", -ERANGE);
-
-        return xwospl_irq_clear(irqn);
-}
-
-__xwmp_api
-xwer_t xwmp_irq_tst(xwirq_t irqn, bool * pending)
-{
-        XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM),
-                      "out-of-range", -ERANGE);
-        XWOS_VALIDATE((irqn >= (0 - (xwirq_t)SOCCFG_EXC_NUM)),
-                      "out-of-range", -ERANGE);
-        XWOS_VALIDATE((pending), "nullptr", -EFAULT);
-
-        return xwospl_irq_tst(irqn, pending);
-}
-
-__xwmp_api
-xwer_t xwmp_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg)
-{
-        XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM),
-                      "out-of-range", -ERANGE);
-        XWOS_VALIDATE((irqn >= (0 - (xwirq_t)SOCCFG_EXC_NUM)),
-                      "out-of-range", -ERANGE);
-
-        return xwospl_irq_cfg(irqn, cfg);
-}
-
-__xwmp_api
-xwer_t xwmp_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
-{
-        XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM),
-                      "out-of-range", -ERANGE);
-        XWOS_VALIDATE((irqn >= (0 - (xwirq_t)SOCCFG_EXC_NUM)),
-                      "out-of-range", -ERANGE);
-
-        return xwospl_irq_get_cfg(irqn, cfgbuf);
-}
-
-__xwmp_api
-xwer_t xwmp_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
-{
-        XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM),
-                      "out-of-range", -ERANGE);
-        XWOS_VALIDATE((irqn >= (0 - (xwirq_t)SOCCFG_EXC_NUM)),
-                      "out-of-range", -ERANGE);
-
-        return xwospl_irq_get_data(irqn, databuf);
 }
 
 __xwmp_api

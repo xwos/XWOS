@@ -24,6 +24,7 @@
 #include <e200x_core.h>
 #include <arch_sc_trap.h>
 #include <soc.h>
+#include <soc_irq.h>
 
 #define SOC_STKFRAME_SIZE               0x50
 
@@ -36,28 +37,12 @@ extern xwstk_t xwos_stk_top[];
 extern xwstk_t _SDA_BASE_[];
 extern xwstk_t _SDA2_BASE_[];
 
-__xwbsp_rodata const struct soc_irq_cfg soc_skd_irq_cfg[] = {
-        [0] = {
-                .priority = SOC_SWCX_PRIO,
-        },
-        [1] = {
-                .priority = SOC_SKD_SWI_PRIO,
-        },
+__xwbsp_rodata const struct soc_irq_cfg soc_skd_irq_cfg_swcx = {
+        .priority = SOC_SWCX_PRIO,
 };
 
-__xwbsp_rodata const struct xwos_irq_resource soc_skd_irqrsc[] = {
-        [0] = {
-                .irqn = SOC_SWCX_IRQN,
-                .isr = xwospl_skd_isr_swcx,
-                .cfg = &soc_skd_irq_cfg[0],
-                .description = "arch_switch_context_irq",
-        },
-        [1] = {
-                .irqn = SOC_SKD_SWI_IRQN,
-                .isr = soc_skd_isr_swi,
-                .cfg = &soc_skd_irq_cfg[1],
-                .description = "soc_skd_swi_irq",
-        },
+__xwbsp_rodata const struct soc_irq_cfg soc_skd_irq_cfg_swi = {
+        .priority = SOC_SKD_SWI_PRIO,
 };
 
 __xwbsp_data struct e200x_context soc_context = {
@@ -75,21 +60,25 @@ __xwbsp_data struct e200x_context soc_context = {
 __xwbsp_init_code
 xwer_t xwospl_skd_init(struct xwospl_skd * xwskd)
 {
-        const struct xwos_irq_resource * irqrsc;
-        xwsq_t i;
         xwer_t rc;
 
         XWOS_UNUSED(xwskd);
-        for (i = 0; i < xw_array_size(soc_skd_irqrsc); i++) {
-                irqrsc = &soc_skd_irqrsc[i];
-                rc = xwos_irq_request(irqrsc->irqn, irqrsc->isr,
-                                      XWOS_UNUSED_ARGUMENT, irqrsc->cfg);
-                SDL_BUG_ON(rc < 0);
 
-                rc = xwos_irq_enable(irqrsc->irqn);
-                SDL_BUG_ON(rc < 0);
-        }
-        return rc;
+        rc = soc_irq_request(SOC_SWCX_IRQN, xwospl_skd_isr_swcx, XWOS_UNUSED_ARGUMENT);
+        SDL_BUG_ON(rc < 0);
+        rc = soc_irq_cfg(SOC_SWCX_IRQN, &soc_skd_irq_cfg_swcx);
+        SDL_BUG_ON(rc < 0);
+        rc = xwos_irq_enable(SOC_SWCX_IRQN);
+        SDL_BUG_ON(rc < 0);
+
+        rc = soc_irq_request(SOC_SKD_SWI_IRQN, soc_skd_isr_swi, XWOS_UNUSED_ARGUMENT);
+        SDL_BUG_ON(rc < 0);
+        rc = soc_irq_cfg(SOC_SKD_SWI_IRQN, &soc_skd_irq_cfg_swi);
+        SDL_BUG_ON(rc < 0);
+        rc = xwos_irq_enable(SOC_SKD_SWI_IRQN);
+        SDL_BUG_ON(rc < 0);
+
+        return XWOK;
 }
 
 /**

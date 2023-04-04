@@ -34,11 +34,11 @@ extern xwu8_t bss_vma_end[];
 
 extern const xwu8_t image_tail_lma_base[];
 extern const xwu8_t image_tail_lma_end[];
-extern const xwu8_t xwos_ivt_lma_base[];
+extern const xwu8_t image_head_lma[];
 
 __image_description
 const struct arch_image_description arch_image_description = {
-        .head = (void *)xwos_ivt_lma_base,
+        .head = (void *)image_head_lma,
         .tail_flag_addr = (void *)image_tail_lma_base,
         .end_addr = (void *)image_tail_lma_end,
         .entry = arch_isr_reset,
@@ -66,7 +66,6 @@ void arch_lowlevel_init(void)
 __xwbsp_init_code
 void arch_init(void)
 {
-        arch_nvic_init();
 }
 
 /**

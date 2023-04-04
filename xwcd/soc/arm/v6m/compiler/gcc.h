@@ -67,7 +67,6 @@
 #define __xwos_exit_code        __xwcc_section(".xwos.exit.text")
 #define __xwos_exit_rodata      __xwcc_section(".xwos.exit.rodata")
 
-#define __xwos_ivt              __xwcc_section(".xwos.ivt")
 #define __xwos_isr              __xwcc_section(".xwos.isr.text")
 #define __xwos_bh               __xwos_isr
 #define __xwos_code             __xwcc_section(".xwos.text")

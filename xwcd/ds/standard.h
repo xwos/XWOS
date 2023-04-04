@@ -58,6 +58,16 @@ struct xwds_resource_reg {
 };
 
 /**
+ * @brief 设备栈中断钟资源
+ */
+struct xwds_resource_irq {
+        xwirq_t irqn; /**< 中断号 */
+        xwisr_f isr; /**< 中断处理函数 */
+        const void * cfg; /**< 配置 */
+        const char * description; /**< 描述 */
+};
+
+/**
  * @brief 设备栈时钟资源
  */
 struct xwds_resource_clk {
@@ -99,7 +109,7 @@ struct xwds_resource_dma {
  * @brief 设备栈资源
  */
 struct xwds_resources {
-        const struct xwos_irq_resource * irqrsc_array; /**< IRQ资源数组 */
+        const struct xwds_resource_irq * irqrsc_array; /**< IRQ资源数组 */
         xwsz_t irqrsc_num; /**< IRQ资源数量 */
         const struct xwds_resource_reg * regrsc_array; /**< 寄存器资源数组 */
         xwsz_t regrsc_num; /**< 寄存器资源数量 */

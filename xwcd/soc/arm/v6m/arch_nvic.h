@@ -23,14 +23,7 @@
 
 #include <xwos/standard.h>
 
-struct soc_irq_cfg;
-struct soc_irq_data;
-
-xwer_t arch_nvic_init(void);
 xwer_t arch_nvic_irq_get_id(xwirq_t * irqnbuf);
-xwer_t arch_nvic_irq_request(xwirq_t irqn, xwisr_f isrfunc, void * data,
-                             const struct soc_irq_cfg * cfg);
-xwer_t arch_nvic_irq_release(xwirq_t irqn);
 xwer_t arch_nvic_irq_enable(xwirq_t irqn);
 xwer_t arch_nvic_irq_disable(xwirq_t irqn);
 xwer_t arch_nvic_irq_save(xwirq_t irqn, xwreg_t * flag);
@@ -38,8 +31,5 @@ xwer_t arch_nvic_irq_restore(xwirq_t irqn, xwreg_t flag);
 xwer_t arch_nvic_irq_pend(xwirq_t irqn);
 xwer_t arch_nvic_irq_clear(xwirq_t irqn);
 xwer_t arch_nvic_irq_tst(xwirq_t irqn, bool * pending);
-xwer_t arch_nvic_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg);
-xwer_t arch_nvic_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf);
-xwer_t arch_nvic_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf);
 
 #endif /* arch_nvic.h */

@@ -19,9 +19,9 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/ospl/syshwt.h>
+#include <soc_irq.h>
 #include <bdl/ds/driver/soc.h>
 #include <bdl/ds/driver/dmauart0.h>
 #include <bdl/ds/description/mpc560xbdkp.h>
@@ -29,7 +29,7 @@
 /**
  * @brief 中断向量表
  */
-__xwos_ivt __xwos_ivt_qualifier struct soc_ivt xwospl_ivt = {
+__xwcc_section(".e200z0h.ivt") struct soc_ivt soc_ivt = {
         .irq = {
                 (xwisr_f)xwospl_skd_isr_swcx, /* Vector - 0 SWINT0 */
                 (xwisr_f)soc_skd_isr_swi, /* Vector - 1 SWINT1 */
@@ -268,7 +268,7 @@ __xwos_ivt __xwos_ivt_qualifier struct soc_ivt xwospl_ivt = {
         },
 };
 
-__xwos_ivt_qualifier struct soc_idvt xwospl_idvt = {
+__xwcc_section(".e200z0h.ivt") struct soc_idvt soc_idvt = {
         .irq = {
                 [IRQ_EDMA_CMBERR] = &mpc560xb_soc_cb,
                 [IRQ_EDMA_CH0] = &mpc560xb_soc_cb,

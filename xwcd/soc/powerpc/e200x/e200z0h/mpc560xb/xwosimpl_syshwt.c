@@ -23,6 +23,7 @@
 #include <xwos/ospl/skd.h>
 #include <xwos/ospl/syshwt.h>
 #include <soc.h>
+#include <soc_irq.h>
 
 #define SYSHWT_CH               SOCCFG_SYSHWT_CHANNEL
 #define SYSHWT_SRCCLK           SOCCFG_SYSHWT_SRCCLK
@@ -42,7 +43,6 @@ __xwbsp_rodata const struct soc_irq_cfg soc_syshwt_irq_cfg = {
 __xwbsp_rodata const struct xwos_irq_resource soc_syshwt_irqrsc = {
         .irqn = SYSHWT_IRQN,
         .isr = xwospl_syshwt_isr,
-        .cfg = &soc_syshwt_irq_cfg,
         .description = "soc.syshwt.irq",
 };
 
@@ -54,11 +54,12 @@ xwer_t xwospl_syshwt_init(struct xwospl_syshwt * hwt)
         XWOS_UNUSED(hwt);
         hwt->irqrsc = &soc_syshwt_irqrsc;
         hwt->irqs_num = 1;
-        rc = xwos_irq_request(hwt->irqrsc->irqn, hwt->irqrsc->isr,
-                              XWOS_UNUSED_ARGUMENT, hwt->irqrsc->cfg);
-        SDL_BUG_ON(rc < 0);
 
-        rc = xwos_irq_enable(hwt->irqrsc->irqn);
+        rc = soc_irq_request(SYSHWT_IRQN, xwospl_syshwt_isr, XWOS_UNUSED_ARGUMENT);
+        SDL_BUG_ON(rc < 0);
+        rc = soc_irq_cfg(SYSHWT_IRQN, &soc_syshwt_irq_cfg);
+        SDL_BUG_ON(rc < 0);
+        rc = soc_irq_enable(SYSHWT_IRQN);
         SDL_BUG_ON(rc < 0);
 
         /* stop clock of PIT to init */

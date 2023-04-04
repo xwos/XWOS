@@ -37,7 +37,7 @@ SOC_CSRCS += soc_me.c
 ifeq ($(SOCCFG_FLASH_OPCODE),y)
     SOC_CSRCS += soc_flash.c
 endif
-SOC_CSRCS += soc_wdg.c
+SOC_CSRCS += soc_wdg.c soc_irq.c
 SOC_CSRCS += soc_reset.c
 SOC_CSRCS += xwosimpl_irq.c
 SOC_CSRCS += xwosimpl_skd.c

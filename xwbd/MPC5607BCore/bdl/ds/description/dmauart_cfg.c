@@ -20,13 +20,13 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
-#include <xwos/osal/irq.h>
 #include <xwcd/ds/device.h>
 #include <xwcd/ds/uart/dma.h>
 #include <bdl/ds/description/mpc560xbdkp.h>
 #include <bdl/ds/driver/dmauart0.h>
 #include <soc_gpio.h>
 #include <soc_dma.h>
+#include <soc_irq.h>
 #include <soc_dmauart.h>
 
 const struct soc_irq_cfg mpc560xb_uart0_irq_cfgs[] = {
@@ -35,7 +35,7 @@ const struct soc_irq_cfg mpc560xb_uart0_irq_cfgs[] = {
         },
 };
 
-const struct xwos_irq_resource mpc560xb_uart0_irq_resources[] = {
+const struct xwds_resource_irq mpc560xb_uart0_irq_resources[] = {
         [0] = {
                 .irqn = IRQ_LINFLEX0_ERR,
                 .isr = mpc560xb_dmauart0_err_isr,

@@ -33,32 +33,20 @@
 #  define ARCH_SYSHWT_SRCCLK BRDCFG_SYSCLK
 #endif
 
-__xwbsp_rodata const struct soc_irq_cfg cortex_m_systick_irqcfg = {
-        .irqcfg = {
-                .priority = SOC_EXC_TICK_PRIO,
+__xwbsp_rodata const struct xwos_irq_resource armv7m_systick_irqrsc[1] = {
+        [0] = {
+                .irqn = SOC_EXC_SYSTICK,
+                .isr = xwospl_syshwt_isr,
+                .description = "irq.armv7m.systick",
         },
 };
 
-__xwbsp_rodata const struct xwos_irq_resource cortex_m_systick_irqrsc = {
-        .irqn = SOC_EXC_SYSTICK,
-        .isr = xwospl_syshwt_isr,
-        .cfg = &cortex_m_systick_irqcfg,
-        .description = "irq.armv7m.systick",
-};
-
 __xwbsp_code
-xwer_t arch_systick_init(struct xwospl_syshwt * hwt)
+void arch_systick_init(struct xwospl_syshwt * hwt)
 {
-        xwer_t rc;
-
-        hwt->irqrsc = &cortex_m_systick_irqrsc;
+        hwt->irqrsc = armv7m_systick_irqrsc;
         hwt->irqs_num = 1;
-        rc = xwos_irq_request(hwt->irqrsc->irqn, hwt->irqrsc->isr,
-                              XWOS_UNUSED_ARGUMENT, hwt->irqrsc->cfg);
-        XWOS_BUG_ON(rc < 0);
-
-        rc = xwos_irq_enable(hwt->irqrsc->irqn);
-        XWOS_BUG_ON(rc < 0);
+        cm_nvic_set_sysirq_priority(SOC_EXC_SYSTICK, SOC_EXC_TICK_PRIO);
 
         cm_scs.systick.rvr.u32 = (ARCH_SYSHWT_SRCCLK / XWOSPL_SYSHWT_HZ) - 1;
         cm_scs.systick.cvr.u32 = 0x0; /* clear value */
@@ -67,7 +55,6 @@ xwer_t arch_systick_init(struct xwospl_syshwt * hwt)
 #else
         cm_scs.systick.csr.u32 = 0x6;/* processor clk, enable interrupt */
 #endif
-        return rc;
 }
 
 __xwbsp_code

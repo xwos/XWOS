@@ -20,10 +20,10 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
-#include <xwos/osal/irq.h>
 #include <soc_clk.h>
 #include <soc_eirq.h>
 #include <soc_gpio.h>
+#include <soc_irq.h>
 #include <soc_dma.h>
 #include <xwcd/ds/device.h>
 #include <xwcd/ds/soc/chip.h>
@@ -107,7 +107,7 @@ const struct soc_irq_cfg mpc560xb_soc_irq_cfgs[] = {
 #endif
 };
 
-const struct xwos_irq_resource mpc560xb_soc_irq_resources[] = {
+const struct xwds_resource_irq mpc560xb_soc_irq_resources[] = {
         [0] = {
                 .irqn = IRQ_EXT_IRQ0,
                 .isr = mpc560xb_eirq0_7_isr,

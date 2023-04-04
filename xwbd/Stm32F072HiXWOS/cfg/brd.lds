@@ -33,24 +33,24 @@ MEMORY {
         ocram_mr (rwx): org = ocram_mr_origin, len = ocram_mr_size
 
         /* 中断向量表的加载地址(LMA)区域 */
-        ivt_lmr (rx):
+        armv6m_ivt_lmr (rx):
                 org = fmw_origin,
                 len = 512
 
         /* 中断向量表的运行地址(VMA)区域 */
-        ivt_vmr (rw):
+        armv6m_ivt_vmr (rw):
                 org = fmw_origin,
                 len = 512
 
         /* 镜像文件的信息 */
         image_description_mr (rx):
-                org = ORIGIN(ivt_lmr) + LENGTH(ivt_lmr),
+                org = ORIGIN(armv6m_ivt_lmr) + LENGTH(armv6m_ivt_lmr),
                 len = 64
 
         /* 代码段(.text)与只读数据段(.rodata) */
         code_mr (rx):
                 org = ORIGIN(image_description_mr) + LENGTH(image_description_mr),
-                len = flash_mr_size - LENGTH(image_description_mr) - LENGTH(ivt_lmr)
+                len = flash_mr_size - LENGTH(image_description_mr) - LENGTH(armv6m_ivt_lmr)
 
         /* 数据段(.data)与未初始化的数据段(.bss) */
         data_mr (arw):

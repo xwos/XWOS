@@ -26,35 +26,16 @@
 #include <soc.h>
 #include <soc_init.h>
 
-#if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
-static __xwos_init_code
-void soc_relocate_isrtable(void);
-#endif
-
-extern xwu8_t xwos_ivt_lma_base[];
-extern xwu8_t xwos_ivt_vma_base[];
-extern xwu8_t xwos_ivt_vma_end[];
-
 __xwbsp_init_code
 void soc_lowlevel_init(void)
 {
 }
 
-__xwbsp_init_code
-void soc_init(void)
-{
-        xwer_t rc;
 
-#if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
-        soc_relocate_isrtable();
-#endif
+extern xwu8_t armv7m_ivt_lma_base[];
+extern xwu8_t armv7m_ivt_vma_base[];
+extern xwu8_t armv7m_ivt_vma_end[];
 
-        /* Init scheduler of local CPU */
-        rc = xwosplcb_skd_init_lc();
-        XWOS_BUG_ON(rc);
-}
-
-#if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
 static __xwos_init_code
 void soc_relocate_isrtable(void)
 {
@@ -62,13 +43,22 @@ void soc_relocate_isrtable(void)
         xwu8_t * src;
         xwu8_t * dst;
 
-        src = xwos_ivt_lma_base;
-        dst = xwos_ivt_vma_base;
+        src = armv7m_ivt_lma_base;
+        dst = armv7m_ivt_vma_base;
         if (dst != src) {
-                cnt = (xwsz_t)xwos_ivt_vma_end - (xwsz_t)xwos_ivt_vma_base;
+                cnt = (xwsz_t)armv7m_ivt_vma_end - (xwsz_t)armv7m_ivt_vma_base;
                 for (i = 0; i < cnt; i++) {
                         dst[i] = src[i];
                 }
         }
 }
-#endif
+
+__xwbsp_init_code
+void soc_init(void)
+{
+        xwer_t rc;
+
+        soc_relocate_isrtable();
+        rc = xwosplcb_skd_init_lc();
+        XWOS_BUG_ON(rc);
+}

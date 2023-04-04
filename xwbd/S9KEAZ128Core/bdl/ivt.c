@@ -29,10 +29,15 @@
 
 extern xwu8_t xwos_stk_top[];
 
+struct soc_ivt {
+        xwisr_f exc[SOCCFG_EXC_NUM];
+        xwisr_f irq[SOCCFG_IRQ_NUM];
+};
+
 /**
  * @brief 中断向量表
  */
-__xwos_ivt __xwos_ivt_qualifier struct soc_ivt xwospl_ivt = {
+__xwcc_section(".armv6m.ivt") struct soc_ivt kea_ivt = {
         .exc = {
                 (xwisr_f)xwos_stk_top,
                 (xwisr_f)arch_isr_reset,
@@ -53,29 +58,5 @@ __xwos_ivt __xwos_ivt_qualifier struct soc_ivt xwospl_ivt = {
         },
         .irq = {
                 arch_isr_noop,
-        },
-};
-
-__xwos_ivt_qualifier struct soc_idvt xwospl_idvt = {
-        .exc = {
-                [SOC_SP_TOP + SOCCFG_EXC_NUM] = NULL,
-                [SOC_EXC_RESET + SOCCFG_EXC_NUM] = NULL,
-                [SOC_EXC_NMI + SOCCFG_EXC_NUM] = NULL,
-                [SOC_EXC_HARDFAULT + SOCCFG_EXC_NUM] = NULL,
-                [SOC_EXC_MMFAULT + SOCCFG_EXC_NUM] = NULL,
-                [SOC_EXC_BUSFAULT + SOCCFG_EXC_NUM] = NULL,
-                [SOC_EXC_USGFAULT + SOCCFG_EXC_NUM] = NULL,
-                [SOC_EXC_RSVN9 + SOCCFG_EXC_NUM] = NULL,
-                [SOC_EXC_RSVN8 + SOCCFG_EXC_NUM] = NULL,
-                [SOC_EXC_RSVN7 + SOCCFG_EXC_NUM] = NULL,
-                [SOC_EXC_RSVN6 + SOCCFG_EXC_NUM] = NULL,
-                [SOC_EXC_SVCALL + SOCCFG_EXC_NUM] = NULL,
-                [SOC_EXC_DBGMON + SOCCFG_EXC_NUM] = NULL,
-                [SOC_EXC_RSVN3 + SOCCFG_EXC_NUM] = NULL,
-                [SOC_EXC_PENDSV + SOCCFG_EXC_NUM] = NULL,
-                [SOC_EXC_SYSTICK + SOCCFG_EXC_NUM] = NULL,
-        },
-        .irq = {
-                NULL,
         },
 };

@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_xwos_h__
-#define __cfg_xwos_h__
+#ifndef __cfg_os_h__
+#define __cfg_os_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********        Common Configurations        ******** ********

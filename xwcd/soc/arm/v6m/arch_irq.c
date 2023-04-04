@@ -158,27 +158,6 @@ void arch_isr_dbgmon(void)
  * - SVC handler中不能再次调用svc指令，否则会造成Hard Fault，且scs.scb.hfsr.bit.forced
  *   会被置位。PendSV则没有这个限制。参考ARMv7-M_RM.pdf第B1-585页。
  *   SVC的处理机制是Fault，当无法执行时会造成Hard Fault。
- * @note
- * - xwsc (svc 8)
- *   + ARM内核进入handler模式时会自动将r0 ~ r3, ip,lr, pc & xpsr压栈保存；
- *     返回thread模式时会自动从栈中弹出原始值恢复这些寄存器。
- *     返回的地址被存放在[SP+24]的地址处。可以将这个内存地址中的内容改为xwsc的真正
- *     入口@ref soc_xwsc_entry()，并将原始返回地址存放在原始LR的位置[SP+20]。原始
- *     LR的值又存放在原始R3的位置[SP+12]。原始R3在xwsc中没有使用到，因此不需要备份。
- *     当svc_sysisr()返回时，就会进入到@ref soc_xwsc_entry()函数，并且以r0 ~ r2作为
- *     参数，函数的第四个参数（通过R3的位置传递）作为LR的原始值。
- *         ------------------------------\n
- *         | stack      | change        |\n
- *         ------------------------------\n
- *   sp+28 | xpsr       |               |\n
- *   sp+24 | pc         | real entry    |\n
- *   sp+20 | lr         | old PC        |\n
- *   sp+16 | r12        |               |\n
- *   sp+12 | r3         | old lr        |\n
- *   sp+8  | r2         | args addr     |\n
- *   sp+4  | r1         | args number   |\n
- *   sp->  | r0         | function      |\n
- *         ------------------------------\n
  */
 __xwbsp_isr __xwcc_naked
 void arch_isr_svc(void)

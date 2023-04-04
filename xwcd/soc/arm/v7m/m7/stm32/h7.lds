@@ -23,12 +23,12 @@
 ENTRY(arch_isr_reset)
 
 SECTIONS {
-        .xwos.ivt : ALIGN(8) {
-                KEEP(*(.xwos.ivt))
-                xwos_ivt_vma_end = .;
-        } > ivt_vmr AT> ivt_lmr
-        xwos_ivt_vma_base = ADDR(.xwos.ivt);
-        xwos_ivt_lma_base = LOADADDR(.xwos.ivt);
+        .armv7m.ivt : ALIGN(8) {
+                KEEP(*(.armv7m.ivt))
+                armv7m_ivt_vma_end = .;
+        } > armv7m_ivt_vmr AT> armv7m_ivt_lmr
+        armv7m_ivt_vma_base = ADDR(.armv7m.ivt);
+        armv7m_ivt_lma_base = LOADADDR(.armv7m.ivt);
 
         .image.description : ALIGN(8) {
                 KEEP(*(.image.description))
@@ -57,9 +57,10 @@ SECTIONS {
                 *(.glue_7) /* glue arm to thumb code */
                 *(.glue_7t) /* glue thumb to arm code */
                 *(.vfp11_veneer) /* 用于VFP单元 */
+                *(.v4_bx) /* linker stubs */
         } > code_mr AT> code_mr
 
-        /* ++++++++ 以下与unwinding有关，用于C++的异常处理 ++++++++ */
+        /* ++++++++ 以下与unwinding有关，用于异常处理和栈回溯 ++++++++ */
         .ARM.extab : ALIGN(8) { /* @ref ehabi.pdf for details */
                 *(.ARM.extab* .gnu.linkonce.armextab.*)
         } > code_mr AT> code_mr
@@ -85,7 +86,7 @@ SECTIONS {
         .gnu_extab : ALIGN(8) {
                 *(.gnu_extab*)
         } > code_mr AT> code_mr
-        /* -------- 以上与unwinding有关，用于C++的异常处理 -------- */
+        /* -------- 以上与unwinding有关，用于异常处理和栈回溯 -------- */
 
         /* ++++++++ 以下与C++全局对象的构造函数与析构函数有关 ++++++++ */
         .preinit_array : ALIGN(8) {
@@ -231,6 +232,9 @@ SECTIONS {
                 *(.gnu.attributes)
         }
 }
+
+/* 用于提供image文件头信息 */
+image_head_lma = armv7m_ivt_lma_base;
 
 xwos_data_mr_origin = ORIGIN(xwos_data_mr);
 xwos_data_mr_size = LENGTH(xwos_data_mr);

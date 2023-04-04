@@ -23,12 +23,12 @@
 ENTRY(arch_isr_reset)
 
 SECTIONS {
-        .xwos.ivt : ALIGN(8) {
-                KEEP(*(.xwos.ivt))
-                xwos_ivt_vma_end = .;
-        } > ivt_vmr AT> ivt_lmr
-        xwos_ivt_vma_base = ADDR(.xwos.ivt);
-        xwos_ivt_lma_base = LOADADDR(.xwos.ivt);
+        .armv7m.ivt : ALIGN(8) {
+                KEEP(*(.armv7m.ivt))
+                armv7m_ivt_vma_end = .;
+        } > armv7m_ivt_vmr AT> armv7m_ivt_lmr
+        armv7m_ivt_vma_base = ADDR(.armv7m.ivt);
+        armv7m_ivt_lma_base = LOADADDR(.armv7m.ivt);
 
         .image.description : ALIGN(8) {
                 KEEP(*(.image.description))
@@ -57,6 +57,7 @@ SECTIONS {
                 *(.glue_7) /* glue arm to thumb code */
                 *(.glue_7t) /* glue thumb to arm code */
                 *(.vfp11_veneer) /* 用于VFP单元 */
+                *(.v4_bx) /* linker stubs */
         } > code_mr AT> code_mr
 
         /* ++++++++ 以下与unwinding有关，用于C++的异常处理 ++++++++ */
@@ -121,16 +122,16 @@ SECTIONS {
 
         .xwos.data : ALIGN(32) {
                 *(.xwos.data)
-                xwos_data_vma_end = .;
                 . = ALIGN(32);
+                xwos_data_vma_end = .;
         } > xwos_data_mr AT> code_mr
         xwos_data_vma_base = ADDR(.xwos.data);
         xwos_data_lma_base = LOADADDR(.xwos.data);
 
         .data : ALIGN(32) {
                 *(.data .data.* .gnu.linkonce.d.*)
-                data_vma_end = .;
                 . = ALIGN(32);
+                data_vma_end = .;
         } > data_mr AT> code_mr
         data_vma_base = ADDR(.data);
         data_lma_base = LOADADDR(.data);
@@ -145,10 +146,11 @@ SECTIONS {
         image_tail_lma_base = LOADADDR(.image.tail);
         image_tail_lma_end = image_tail_lma_base + image_tail_size;
 
-        .bss : ALIGN(8) {
+        .bss : ALIGN(16) {
                 *(.dynbss)
                 *(.bss .bss.* .gnu.linkonce.b.*)
                 *(COMMON)
+                . = ALIGN(16);
                 bss_vma_end = .;
         } > data_mr
         bss_vma_base = ADDR(.bss);
@@ -222,6 +224,9 @@ SECTIONS {
                 *(.gnu.attributes)
         }
 }
+
+/* 用于提供image文件头信息 */
+image_head_lma = armv7m_ivt_lma_base;
 
 xwos_data_mr_origin = ORIGIN(xwos_data_mr);
 xwos_data_mr_size = LENGTH(xwos_data_mr);

@@ -18,12 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __xwosimpl_soc_irq_h__
-#define __xwosimpl_soc_irq_h__
-
-#ifndef __xwos_ospl_soc_irq_h__
-#  error "This file should be included from <xwos/ospl/soc/irq.h>."
-#endif
+#ifndef __soc_irq_h__
+#define __soc_irq_h__
 
 #include <arch_irq.h>
 
@@ -298,8 +294,22 @@ struct soc_idvt {
         void * irq[SOCCFG_IRQ_NUM];
 };
 
-void soc_irqc_init(void);
+extern struct soc_ivt soc_ivt;
+extern struct soc_idvt soc_idvt;
+
+xwer_t soc_irq_get_id(xwirq_t * irqnbuf);
 void soc_isr_noop(void);
+void soc_irqc_init(void);
+xwer_t soc_irq_request(xwirq_t irqn, xwisr_f isrfunc, void * data);
+xwer_t soc_irq_release(xwirq_t irqn);
+xwer_t soc_irq_enable(xwirq_t irqn);
+xwer_t soc_irq_disable(xwirq_t irqn);
+xwer_t soc_irq_save(xwirq_t irqn, xwreg_t * flag);
+xwer_t soc_irq_restore(xwirq_t irqn, xwreg_t flag);
+xwer_t soc_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg);
+xwer_t soc_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf);
+xwer_t soc_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf);
+
 void soc_skd_isr_swi(void);
 
-#endif /* xwosimpl_soc_irq.h */
+#endif /* soc_irq.h */

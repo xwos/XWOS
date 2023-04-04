@@ -29,19 +29,6 @@ xwer_t xwospl_irq_get_id(xwirq_t * irqnbuf)
 }
 
 __xwbsp_code
-xwer_t xwospl_irq_request(xwirq_t irqn, xwisr_f isrfunc, void * data,
-                          const struct soc_irq_cfg * cfg)
-{
-        return arch_nvic_irq_request(irqn, isrfunc, data, cfg);
-}
-
-__xwbsp_code
-xwer_t xwospl_irq_release(xwirq_t irqn)
-{
-        return arch_nvic_irq_release(irqn);
-}
-
-__xwbsp_code
 xwer_t xwospl_irq_enable(xwirq_t irqn)
 {
         return arch_nvic_irq_enable(irqn);
@@ -63,40 +50,4 @@ __xwbsp_code
 xwer_t xwospl_irq_restore(xwirq_t irqn, xwreg_t flag)
 {
         return arch_nvic_irq_restore(irqn, flag);
-}
-
-__xwbsp_code
-xwer_t xwospl_irq_pend(xwirq_t irqn)
-{
-        return arch_nvic_irq_pend(irqn);
-}
-
-__xwbsp_code
-xwer_t xwospl_irq_clear(xwirq_t irqn)
-{
-        return arch_nvic_irq_clear(irqn);
-}
-
-__xwbsp_code
-xwer_t xwospl_irq_tst(xwirq_t irqn, bool * pending)
-{
-        return arch_nvic_irq_tst(irqn, pending);
-}
-
-__xwbsp_code
-xwer_t xwospl_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg)
-{
-        return arch_nvic_irq_cfg(irqn, cfg);
-}
-
-__xwbsp_code
-xwer_t xwospl_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
-{
-        return arch_nvic_irq_get_cfg(irqn, cfgbuf);
-}
-
-__xwbsp_code
-xwer_t xwospl_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
-{
-        return arch_nvic_irq_get_data(irqn, databuf);
 }

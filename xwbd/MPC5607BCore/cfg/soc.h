@@ -31,7 +31,6 @@
 /******** ******** ******** IRQ ******** ******** ********/
 #define SOCCFG_EXC_NUM                          9
 #define SOCCFG_IRQ_NUM                          256U
-#define SOCCFG_RO_IVT                           1
 
 /******** ******** ******** syshwt ******** ******** ********/
 #define SOCCFG_SYSHWT_SRCCLK                    (64000000UL)

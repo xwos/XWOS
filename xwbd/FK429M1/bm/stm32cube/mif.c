@@ -23,6 +23,7 @@
 #include <armv7m_isa.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <bm/stm32cube/cubemx/Core/Inc/main.h>
+#include <bm/stm32cube/cubemx/IVT/isr.h>
 #include <bm/stm32cube/xwac/xwds/cmif.h>
 #include <bm/stm32cube/xwac/fatfs/cmif.h>
 #include <bm/stm32cube/mif.h>
@@ -61,11 +62,8 @@ void SystemClock_Config(void);
 
 /**
  * @brief STM32CUBE模块的低级初始化
- * @retrun 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：低级初始化流程
- * - 重入性：不可重入
+ * @details
+ * 此函数在 `board_lowlevel_init()` 中被调用。只能配置部分寄存器，不可访问全局变量。
  */
 __xwbsp_init_code
 void stm32cube_lowlevel_init(void)
@@ -74,15 +72,13 @@ void stm32cube_lowlevel_init(void)
 #if defined(STM32CUBECFG_DISDEFWBUF) && (1 == STM32CUBECFG_DISDEFWBUF)
         cm_scs.scnscb.actlr.bit.disdefwbuf = 1;
 #endif
+        SCB->VTOR = (xwu32_t)&stm32_ivt;
 }
 
 /**
  * @brief STM32CUBE模块的初始化
- * @retrun 错误码
- * @note
- * - 同步/异步：同步
- * - 上下文：初始化流程
- * - 重入性：不可重入
+ * @details
+ * 此函数在 `board_init()` 中被调用。
  */
 __xwbsp_init_code
 void stm32cube_init(void)

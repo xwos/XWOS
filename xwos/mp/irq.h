@@ -17,21 +17,11 @@
 #define __xwos_mp_irq_h__
 
 #include <xwos/standard.h>
-#include <xwos/ospl/soc/irq.h>
 
-xwer_t xwmp_irq_request(xwirq_t irqn, xwisr_f isr, void * data,
-                        const struct soc_irq_cfg * cfg);
-xwer_t xwmp_irq_release(xwirq_t irqn);
 xwer_t xwmp_irq_enable(xwirq_t irqn);
 xwer_t xwmp_irq_disable(xwirq_t irqn);
 xwer_t xwmp_irq_save(xwirq_t irqn, xwreg_t * flag);
 xwer_t xwmp_irq_restore(xwirq_t irqn, xwreg_t flag);
-xwer_t xwmp_irq_pend(xwirq_t irqn);
-xwer_t xwmp_irq_clear(xwirq_t irqn);
-xwer_t xwmp_irq_tst(xwirq_t irqn, bool * pending);
-xwer_t xwmp_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg);
-xwer_t xwmp_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf);
-xwer_t xwmp_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf);
 xwer_t xwmp_irq_get_id(xwirq_t * irqnbuf);
 void xwmp_cpuirq_enable_lc(void);
 void xwmp_cpuirq_disable_lc(void);

@@ -24,68 +24,68 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********  ARCH & compiler  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWOS_CFG_ARCH                               arm
-#define XWOS_CFG_SUBARCH                            v7m
-#define XWOS_CFG_COMPILER                           llvm
-#define XWOS_CFG_LDSCRIPT                           cfg/brd.lds
-#define XWOS_CFG_ELF_MK                             elf.mk
-#define XWOS_CFG_XWMO_MK                            xwmo.mk
-#define XWOS_CFG_XWMO_PREBUILT_MK                   xwmo.prebuilt.mk
-#define XWOS_CFG_XWMO_RUST_MK                       xwmo.rust.mk
+#define XWOS_CFG_ARCH                                   arm
+#define XWOS_CFG_SUBARCH                                v7m
+#define XWOS_CFG_COMPILER                               llvm
+#define XWOS_CFG_LDSCRIPT                               cfg/brd.lds
+#define XWOS_CFG_ELF_MK                                 elf.mk
+#define XWOS_CFG_XWMO_MK                                xwmo.mk
+#define XWOS_CFG_XWMO_PREBUILT_MK                       xwmo.prebuilt.mk
+#define XWOS_CFG_XWMO_RUST_MK                           xwmo.rust.mk
 #include <cfg/arch.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********        CPU        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWOS_CFG_CPU                                m4
+#define XWOS_CFG_CPU                                    m4
 #include <cfg/cpu.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********        SOC        ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWOS_CFG_SOC                                stm32
+#define XWOS_CFG_SOC                                    stm32
 #include <cfg/soc.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       board       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWOS_CFG_BOARD                              FK429M1
+#define XWOS_CFG_BOARD                                  FK429M1
 #include <cfg/board.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********    XWOS kernel    ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWOS_CFG_CORE                               mp
+#define XWOS_CFG_CORE                                   mp
 #include <cfg/os.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********   chip & device   ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWOS_CFG_XWCD                               1
+#define XWOS_CFG_XWCD                                   1
 #include <cfg/xwcd.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********  XWOS middleware  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWOS_CFG_XWMD                               1
+#define XWOS_CFG_XWMD                                   1
 #include <cfg/xwmd.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********  external module  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWOS_CFG_XWEM                               1
+#define XWOS_CFG_XWEM                                   1
 #include <cfg/xwem.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********     APP module    ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWOS_CFG_XWAM                               1
+#define XWOS_CFG_XWAM                                   1
 #include <cfg/xwam.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********     OEM module    ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWOS_CFG_OEMPATH                            ../oem
+#define XWOS_CFG_OEMPATH                                ../oem
 #include <cfg/oem.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********

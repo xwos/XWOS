@@ -37,7 +37,7 @@ extern xwu8_t bss_vma_end[];
 
 extern const xwu8_t image_tail_lma_base[];
 extern const xwu8_t image_tail_lma_end[];
-extern const xwu8_t xwos_ivt_lma_base[];
+extern const xwu8_t image_head_lma[];
 
 extern const xwu8_t preinit_array_vma_base[];
 extern const xwu8_t preinit_array_vma_end[];
@@ -47,7 +47,7 @@ extern const xwu8_t init_array_vma_end[];
 
 __image_description
 const struct arch_image_description arch_image_description = {
-        .head = (void *)xwos_ivt_lma_base,
+        .head = (void *)image_head_lma,
         .tail_flag_addr = (void *)image_tail_lma_base,
         .end_addr = (void *)image_tail_lma_end,
         .entry = arch_isr_reset,
@@ -67,6 +67,7 @@ void arch_lowlevel_init(void)
         cm_scs.scb.ccr.bit.stkalign = 1; /* stack aligned to 8-byte */
         cm_scs.scb.ccr.bit.bp = 1; /* enable branch prediction */
         cm_scs.scb.ccr.bit.div_0_trp = 1; /* enable divide by 0 trap */
+        arch_nvic_init();
 #if (ARCHCFG_FPU == 1)
         arch_fpu_init();
 #endif
@@ -79,7 +80,6 @@ void arch_lowlevel_init(void)
 __xwbsp_init_code
 void arch_init(void)
 {
-        arch_nvic_init();
 }
 
 /**

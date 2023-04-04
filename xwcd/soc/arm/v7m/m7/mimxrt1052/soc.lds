@@ -37,14 +37,14 @@ SECTIONS {
                 . = LENGTH(boot_hdr_mr) ;
         } > boot_hdr_mr AT> boot_hdr_mr
 
-        .xwos.ivt : ALIGN(4) {
+        .armv7m.ivt : ALIGN(4) {
                 FILL(0xFF)
-                *(.xwos.ivt)
-                xwos_ivt_vma_end = .;
-                . = ORIGIN(ivt_vmr) + LENGTH(ivt_vmr) ;
-        } > ivt_vmr AT> ivt_lmr
-        xwos_ivt_vma_base = ADDR(.xwos.ivt);
-        xwos_ivt_lma_base = LOADADDR(.xwos.ivt);
+                *(.armv7m.ivt)
+                armv7m_ivt_vma_end = .;
+                . = ORIGIN(armv7m_ivt_vmr) + LENGTH(armv7m_ivt_vmr) ;
+        } > armv7m_ivt_vmr AT> armv7m_ivt_lmr
+        armv7m_ivt_vma_base = ADDR(.armv7m.ivt);
+        armv7m_ivt_lma_base = LOADADDR(.armv7m.ivt);
 
         .image.description : ALIGN(8) {
                 KEEP(*(.image.description))
@@ -300,6 +300,9 @@ SECTIONS {
                 *(.ARM.attributes)
         }
 }
+
+/* 用于提供image文件头信息 */
+image_head_lma = armv7m_ivt_lma_base;
 
 data_mr_origin = ORIGIN(data_mr);
 data_mr_size = LENGTH(data_mr);
