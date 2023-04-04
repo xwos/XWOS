@@ -33,11 +33,8 @@ __xwbsp_rodata const struct soc_irq_cfg soc_syshwt_irq_cfg = {
         .shv = ECLIC_NON_VECTOR_INTERRUPT,
 };
 
-__xwbsp_rodata const struct xwos_irq_resource soc_syshwt_irqrsc = {
-        .irqn = SysTimer_IRQn,
-        .isr = xwospl_syshwt_isr,
-        .cfg = &soc_syshwt_irq_cfg,
-        .description = "soc.syshwt.irq",
+__xwbsp_rodata const xwirq_t soc_syshwt_irqrsc[1] = {
+        SysTimer_IRQn,
 };
 
 __xwbsp_code
@@ -51,13 +48,14 @@ xwer_t xwospl_syshwt_init(struct xwospl_syshwt * hwt)
         SysTimer_SetLoadValue(0);
         SysTick_Reload(SYSHWT_SRCCLK / XWOSPL_SYSHWT_HZ);
 
-        hwt->irqrsc = &soc_syshwt_irqrsc;
+        hwt->irqrsc = soc_syshwt_irqrsc;
         hwt->irqs_num = 1;
-        rc = xwos_irq_request(hwt->irqrsc->irqn, hwt->irqrsc->isr,
-                              XWOS_UNUSED_ARGUMENT, hwt->irqrsc->cfg);
-        if (XWOK == rc) {
-                rc = xwos_irq_enable(hwt->irqrsc->irqn);
-        }
+
+        rc = soc_irq_cfg(SysTimer_IRQn, &soc_syshwt_irq_cfg);
+        XWOS_BUG_ON(rc < 0);
+        rc = soc_irq_enable(SysTimer_IRQn);
+        XWOS_BUG_ON(rc < 0);
+
         return rc;
 }
 

@@ -18,12 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __xwosimpl_soc_irq_h__
-#define __xwosimpl_soc_irq_h__
-
-#ifndef __xwos_ospl_soc_irq_h__
-#  error "This file should be included from <xwos/ospl/soc/irq.h>."
-#endif
+#ifndef __soc_irq_h__
+#define __soc_irq_h__
 
 /**
  * @brief IRQ Number Enumeration (For NMSIS)
@@ -116,17 +112,19 @@ struct soc_irq_data {
 typedef void (* soc_esr_f)(xwreg_t /*sp*/);
 
 struct soc_ivt {
-        __xwos_ivt_qualifier soc_esr_f * exc;
-        __xwos_ivt_qualifier xwisr_f * irq;
+        soc_esr_f * exc;
+        xwisr_f * irq;
 };
 
 struct soc_idvt {
-        __xwos_ivt_qualifier struct soc_irq_data * exc;
-        __xwos_ivt_qualifier struct soc_irq_data * irq;
+        struct soc_irq_data * exc;
+        struct soc_irq_data * irq;
 };
 
-extern __xwos_ivt_qualifier soc_esr_f soc_evt[SOC_ESRi_NUM];
-extern __xwos_ivt_qualifier struct soc_irq_data soc_edvt[SOC_ESRi_NUM];
+extern soc_esr_f soc_evt[SOC_ESRi_NUM];
+extern struct soc_irq_data soc_edvt[SOC_ESRi_NUM];
+extern const struct soc_ivt soc_ivt;
+extern const struct soc_idvt soc_idvt;
 
 void soc_esr_noop(xwreg_t);
 void soc_isr_noop(void);
@@ -135,5 +133,18 @@ void soc_cpuirq_disable_lc(void);
 void soc_cpuirq_restore_lc(xwreg_t cpuirq);
 void soc_cpuirq_save_lc(xwreg_t * cpuirq);
 xwer_t soc_irqc_init(void);
+xwer_t soc_irq_get_id(xwirq_t * irqnbuf);
+xwer_t soc_irq_request(xwirq_t irqn, xwisr_f isrfunc, void * data);
+xwer_t soc_irq_release(xwirq_t irqn);
+xwer_t soc_irq_enable(xwirq_t irqn);
+xwer_t soc_irq_disable(xwirq_t irqn);
+xwer_t soc_irq_save(xwirq_t irqn, xwreg_t * flag);
+xwer_t soc_irq_restore(xwirq_t irqn, xwreg_t flag);
+xwer_t soc_irq_pend(xwirq_t irqn);
+xwer_t soc_irq_clear(xwirq_t irqn);
+xwer_t soc_irq_tst(xwirq_t irqn, bool * pending);
+xwer_t soc_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg);
+xwer_t soc_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf);
+xwer_t soc_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf);
 
-#endif /* xwosimpl_soc_irq.h */
+#endif /* soc_irq.h */

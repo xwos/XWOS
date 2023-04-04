@@ -239,7 +239,7 @@ void xwos_sqlk_rdex_unlock_cpuirqrs(struct xwos_sqlk * sql,
  */
 static __xwos_inline_api
 void xwos_sqlk_rdex_lock_irqs(struct xwos_sqlk * sql,
-                              const struct xwos_irq_resource * irqs,
+                              const xwirq_t irqs[],
                               xwsz_t num)
 {
         xwosdl_sqlk_rdex_lock_irqs(&sql->ossql, irqs, num);
@@ -260,7 +260,7 @@ void xwos_sqlk_rdex_lock_irqs(struct xwos_sqlk * sql,
  */
 static __xwos_inline_api
 xwer_t xwos_sqlk_rdex_trylock_irqs(struct xwos_sqlk * sql,
-                                   const struct xwos_irq_resource * irqs,
+                                   const xwirq_t irqs[],
                                    xwsz_t num)
 {
         return xwosdl_sqlk_rdex_trylock_irqs(&sql->ossql, irqs, num);
@@ -276,7 +276,7 @@ xwer_t xwos_sqlk_rdex_trylock_irqs(struct xwos_sqlk * sql,
  */
 static __xwos_inline_api
 void xwos_sqlk_rdex_unlock_irqs(struct xwos_sqlk * sql,
-                                const struct xwos_irq_resource * irqs,
+                                const xwirq_t irqs[],
                                 xwsz_t num)
 {
         xwosdl_sqlk_rdex_unlock_irqs(&sql->ossql, irqs, num);
@@ -296,7 +296,7 @@ void xwos_sqlk_rdex_unlock_irqs(struct xwos_sqlk * sql,
  */
 static __xwos_inline_api
 void xwos_sqlk_rdex_lock_irqssv(struct xwos_sqlk * sql,
-                                const struct xwos_irq_resource * irqs,
+                                const xwirq_t irqs[],
                                 xwreg_t flags[], xwsz_t num)
 {
         xwosdl_sqlk_rdex_lock_irqssv(&sql->ossql, irqs, flags, num);
@@ -318,7 +318,7 @@ void xwos_sqlk_rdex_lock_irqssv(struct xwos_sqlk * sql,
  */
 static __xwos_inline_api
 xwer_t xwos_sqlk_rdex_trylock_irqssv(struct xwos_sqlk * sql,
-                                     const struct xwos_irq_resource * irqs,
+                                     const xwirq_t irqs[],
                                      xwreg_t flags[], xwsz_t num)
 {
         return xwosdl_sqlk_rdex_trylock_irqssv(&sql->ossql, irqs, flags, num);
@@ -335,7 +335,7 @@ xwer_t xwos_sqlk_rdex_trylock_irqssv(struct xwos_sqlk * sql,
  */
 static __xwos_inline_api
 void xwos_sqlk_rdex_unlock_irqsrs(struct xwos_sqlk * sql,
-                                  const struct xwos_irq_resource * irqs,
+                                  const xwirq_t irqs[],
                                   xwreg_t flags[], xwsz_t num)
 {
         xwosdl_sqlk_rdex_unlock_irqsrs(&sql->ossql, irqs, flags, num);
@@ -535,7 +535,7 @@ void xwos_sqlk_wr_unlock_cpuirqrs(struct xwos_sqlk * sql,
  */
 static __xwos_inline_api
 void xwos_sqlk_wr_lock_irqs(struct xwos_sqlk * sql,
-                            const struct xwos_irq_resource * irqs,
+                            const xwirq_t irqs[],
                             xwsz_t num)
 {
         xwosdl_sqlk_wr_lock_irqs(&sql->ossql, irqs, num);
@@ -556,7 +556,7 @@ void xwos_sqlk_wr_lock_irqs(struct xwos_sqlk * sql,
  */
 static __xwos_inline_api
 xwer_t xwos_sqlk_wr_trylock_irqs(struct xwos_sqlk * sql,
-                                 const struct xwos_irq_resource * irqs,
+                                 const xwirq_t irqs[],
                                  xwsz_t num)
 {
         return xwosdl_sqlk_wr_trylock_irqs(&sql->ossql, irqs, num);
@@ -572,7 +572,7 @@ xwer_t xwos_sqlk_wr_trylock_irqs(struct xwos_sqlk * sql,
  */
 static __xwos_inline_api
 void xwos_sqlk_wr_unlock_irqs(struct xwos_sqlk * sql,
-                              const struct xwos_irq_resource * irqs,
+                              const xwirq_t irqs[],
                               xwsz_t num)
 {
         xwosdl_sqlk_wr_unlock_irqs(&sql->ossql, irqs, num);
@@ -593,7 +593,7 @@ void xwos_sqlk_wr_unlock_irqs(struct xwos_sqlk * sql,
  */
 static __xwos_inline_api
 void xwos_sqlk_wr_lock_irqssv(struct xwos_sqlk * sql,
-                              const struct xwos_irq_resource * irqs,
+                              const xwirq_t irqs[],
                               xwreg_t flags[], xwsz_t num)
 {
         xwosdl_sqlk_wr_lock_irqssv(&sql->ossql, irqs, flags, num);
@@ -615,7 +615,7 @@ void xwos_sqlk_wr_lock_irqssv(struct xwos_sqlk * sql,
  */
 static __xwos_inline_api
 xwer_t xwos_sqlk_wr_trylock_irqssv(struct xwos_sqlk * sql,
-                                   const struct xwos_irq_resource * irqs,
+                                   const xwirq_t irqs[],
                                    xwreg_t flags[], xwsz_t num)
 {
         return xwosdl_sqlk_wr_trylock_irqssv(&sql->ossql, irqs, flags, num);
@@ -632,7 +632,7 @@ xwer_t xwos_sqlk_wr_trylock_irqssv(struct xwos_sqlk * sql,
  */
 static __xwos_inline_api
 void xwos_sqlk_wr_unlock_irqsrs(struct xwos_sqlk * sql,
-                                const struct xwos_irq_resource * irqs,
+                                const xwirq_t irqs[],
                                 xwreg_t flags[], xwsz_t num)
 {
         xwosdl_sqlk_wr_unlock_irqsrs(&sql->ossql, irqs, flags, num);

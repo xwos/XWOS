@@ -80,28 +80,28 @@ void xwosdl_splk_unlock_cpuirqrs(xwosdl_splk_t * ossl, xwreg_t cpuirq)
 
 static __xwcc_inline
 void xwosdl_splk_lock_irqs(xwosdl_splk_t * ossl,
-                           const struct xwos_irq_resource * irqs, xwsz_t num)
+                           const xwirq_t irqs[], xwsz_t num)
 {
         xwup_splk_lock_irqs(ossl, irqs, num);
 }
 
 static __xwcc_inline
 xwer_t xwosdl_splk_trylock_irqs(xwosdl_splk_t * ossl,
-                                const struct xwos_irq_resource * irqs, xwsz_t num)
+                                const xwirq_t irqs[], xwsz_t num)
 {
         return xwup_splk_trylock_irqs(ossl, irqs, num);
 }
 
 static __xwcc_inline
 void xwosdl_splk_unlock_irqs(xwosdl_splk_t * ossl,
-                             const struct xwos_irq_resource * irqs, xwsz_t num)
+                             const xwirq_t irqs[], xwsz_t num)
 {
         xwup_splk_unlock_irqs(ossl, irqs, num);
 }
 
 static __xwcc_inline
 void xwosdl_splk_lock_irqssv(xwosdl_splk_t * ossl,
-                             const struct xwos_irq_resource * irqs,
+                             const xwirq_t irqs[],
                              xwreg_t flags[], xwsz_t num)
 {
         xwup_splk_lock_irqssv(ossl, irqs, flags, num);
@@ -109,7 +109,7 @@ void xwosdl_splk_lock_irqssv(xwosdl_splk_t * ossl,
 
 static __xwcc_inline
 xwer_t xwosdl_splk_trylock_irqssv(xwosdl_splk_t * ossl,
-                                  const struct xwos_irq_resource * irqs,
+                                  const xwirq_t irqs[],
                                   xwreg_t flags[], xwsz_t num)
 {
         return xwup_splk_trylock_irqssv(ossl, irqs, flags, num);
@@ -117,7 +117,7 @@ xwer_t xwosdl_splk_trylock_irqssv(xwosdl_splk_t * ossl,
 
 static __xwcc_inline
 void xwosdl_splk_unlock_irqsrs(xwosdl_splk_t * ossl,
-                               const struct xwos_irq_resource * irqs,
+                               const xwirq_t irqs[],
                                xwreg_t flags[], xwsz_t num)
 {
         xwup_splk_unlock_irqsrs(ossl, irqs, flags, num);

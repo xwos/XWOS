@@ -49,7 +49,7 @@ SECTIONS {
         .rx : ALIGN(4) {
                 image_description_vma_base = .;
                 KEEP(*(.image.description))
-                KEEP(*(.xwos.ivt))
+                KEEP(*(.soc.ivt))
                 *(.xwos.init.text)
                 *(.xwos.init.rodata)
                 *(.xwos.exit.text)

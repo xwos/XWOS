@@ -40,10 +40,8 @@ __xwbsp_rodata const struct soc_irq_cfg soc_syshwt_irq_cfg = {
         .priority = SOC_SYSHWT_PRIO,
 };
 
-__xwbsp_rodata const struct xwos_irq_resource soc_syshwt_irqrsc = {
-        .irqn = SYSHWT_IRQN,
-        .isr = xwospl_syshwt_isr,
-        .description = "soc.syshwt.irq",
+__xwbsp_rodata const xwirq_t soc_syshwt_irqrsc[1] = {
+        SYSHWT_IRQN,
 };
 
 __xwbsp_code
@@ -52,7 +50,7 @@ xwer_t xwospl_syshwt_init(struct xwospl_syshwt * hwt)
         xwer_t rc;
 
         XWOS_UNUSED(hwt);
-        hwt->irqrsc = &soc_syshwt_irqrsc;
+        hwt->irqrsc = soc_syshwt_irqrsc;
         hwt->irqs_num = 1;
 
         rc = soc_irq_request(SYSHWT_IRQN, xwospl_syshwt_isr, XWOS_UNUSED_ARGUMENT);

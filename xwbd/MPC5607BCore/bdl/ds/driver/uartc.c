@@ -108,7 +108,7 @@ xwer_t mpc560xb_uartc_drv_start(struct xwds_device * dev)
         struct xwds_uartc * uartc;
         const struct xwds_resources * resources;
         volatile struct LINFLEX_tag * linflex_reg;
-        const struct xwos_irq_resource * irqrsc;
+        const struct xwds_resource_irq * irqrsc;
         const struct xwds_resource_clk * clkrsc;
         const struct xwds_resource_gpio * gpiorsc;
         const struct xwds_uart_cfg * cfg;
@@ -123,11 +123,11 @@ xwer_t mpc560xb_uartc_drv_start(struct xwds_device * dev)
         /* Request IRQs */
         for (i = 0; i < (xwssz_t)resources->irqrsc_num; i++) {
                 irqrsc = &resources->irqrsc_array[i];
-                rc = xwos_irq_request(irqrsc->irqn, irqrsc->isr, dev, NULL);
+                rc = soc_irq_request(irqrsc->irqn, irqrsc->isr, dev);
                 if (__xwcc_unlikely(rc < 0)) {
                         for (j = i - 1; j >= 0; j--) {
                                 irqrsc = &resources->irqrsc_array[j];
-                                xwos_irq_release(irqrsc->irqn);
+                                xwds_irq_release(irqrsc->irqn);
                         }
                         goto err_req_irqs;
                 }
@@ -217,8 +217,7 @@ xwer_t mpc560xb_uartc_drv_start(struct xwds_device * dev)
         /* Enable IRQs */
         for (i = 0; i < (xwssz_t)resources->irqrsc_num; i++) {
                 irqrsc = &resources->irqrsc_array[i];
-                xwos_irq_clear(irqrsc->irqn);
-                rc = xwos_irq_cfg(irqrsc->irqn, irqrsc->cfg);
+                rc = soc_irq_cfg(irqrsc->irqn, irqrsc->cfg);
                 if (XWOK == rc) {
                         rc = xwos_irq_enable(irqrsc->irqn);
                 }
@@ -250,7 +249,7 @@ err_req_gpios:
 err_req_clks:
         for (j = (xwssz_t)resources->irqrsc_num - 1; j >= 0; j--) {
                 irqrsc = &resources->irqrsc_array[j];
-                xwos_irq_release(irqrsc->irqn);
+                xwds_irq_release(irqrsc->irqn);
         }
 err_req_irqs:
         return rc;
@@ -264,7 +263,7 @@ xwer_t mpc560xb_uartc_drv_stop(struct xwds_device * dev)
         volatile struct LINFLEX_tag * linflex_reg;
         const struct xwds_resource_gpio * gpiorsc;
         const struct xwds_resource_clk * clkrsc;
-        const struct xwos_irq_resource * irqrsc;
+        const struct xwds_resource_irq * irqrsc;
         xwssz_t j;
         xwer_t rc;
 
@@ -307,7 +306,7 @@ xwer_t mpc560xb_uartc_drv_stop(struct xwds_device * dev)
         /* Release IRQs */
         for (j = (xwssz_t)resources->irqrsc_num - 1; j >=0; j--) {
                 irqrsc = &resources->irqrsc_array[j];
-                rc = xwos_irq_release(irqrsc->irqn);
+                rc = xwds_irq_release(irqrsc->irqn);
                 if (__xwcc_unlikely(rc < 0)) {
                         goto err_irq_release;
                 }
@@ -469,7 +468,7 @@ void mpc560xb_uartc_rx_isr(void)
         struct xwds_uartc * uartc;
 
         xwos_irq_get_id(&irqn);
-        xwos_irq_get_data(irqn, &irqdata);
+        soc_irq_get_data(irqn, &irqdata);
         uartc = irqdata.data;
         xwds_uartc_drvcb_rx_isr(uartc);
 }
@@ -484,7 +483,7 @@ void mpc560xb_uartc_tx_isr(void)
         volatile struct LINFLEX_tag * linflex_reg;
 
         xwos_irq_get_id(&irqn);
-        xwos_irq_get_data(irqn, &irqdata);
+        soc_irq_get_data(irqn, &irqdata);
         uartc = irqdata.data;
         resources = uartc->dev.resources;
         linflex_reg = resources->regrsc_array[0].base;
@@ -503,7 +502,7 @@ void mpc560xb_uartc_err_isr(void)
         xwu32_t sr;
 
         xwos_irq_get_id(&irqn);
-        xwos_irq_get_data(irqn, &irqdata);
+        soc_irq_get_data(irqn, &irqdata);
         uartc = irqdata.data;
         resources = uartc->dev.resources;
         linflex_reg = resources->regrsc_array[0].base;

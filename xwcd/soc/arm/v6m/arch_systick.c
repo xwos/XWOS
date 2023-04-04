@@ -33,12 +33,8 @@
 #  define ARCH_SYSHWT_SRCCLK BRDCFG_SYSCLK
 #endif
 
-__xwbsp_rodata const struct xwos_irq_resource armv6m_systick_irqrsc[1] = {
-        [0] = {
-                .irqn = SOC_EXC_SYSTICK,
-                .isr = xwospl_syshwt_isr,
-                .description = "irq.armv6m.systick",
-        },
+__xwbsp_rodata const xwirq_t armv6m_systick_irqrsc[1] = {
+        SOC_EXC_SYSTICK,
 };
 
 __xwbsp_code

@@ -133,7 +133,7 @@ void xwmp_sqlk_rdex_unlock_cpuirqrs(struct xwmp_sqlk * sql, xwreg_t cpuirq)
 
 static __xwmp_inline_api
 void xwmp_sqlk_rdex_lock_irqs(struct xwmp_sqlk * sql,
-                              const struct xwos_irq_resource * irqs,
+                              const xwirq_t irqs[],
                               xwsz_t num)
 {
         xwmp_splk_lock_irqs(&sql->splk, irqs, num);
@@ -141,7 +141,7 @@ void xwmp_sqlk_rdex_lock_irqs(struct xwmp_sqlk * sql,
 
 static __xwmp_inline_api
 xwer_t xwmp_sqlk_rdex_trylock_irqs(struct xwmp_sqlk * sql,
-                                   const struct xwos_irq_resource * irqs,
+                                   const xwirq_t irqs[],
                                    xwsz_t num)
 {
         return xwmp_splk_trylock_irqs(&sql->splk, irqs, num);
@@ -149,7 +149,7 @@ xwer_t xwmp_sqlk_rdex_trylock_irqs(struct xwmp_sqlk * sql,
 
 static __xwmp_inline_api
 void xwmp_sqlk_rdex_unlock_irqs(struct xwmp_sqlk * sql,
-                                const struct xwos_irq_resource * irqs,
+                                const xwirq_t irqs[],
                                 xwsz_t num)
 {
         xwmp_splk_unlock_irqs(&sql->splk, irqs, num);
@@ -157,7 +157,7 @@ void xwmp_sqlk_rdex_unlock_irqs(struct xwmp_sqlk * sql,
 
 static __xwmp_inline_api
 void xwmp_sqlk_rdex_lock_irqssv(struct xwmp_sqlk * sql,
-                                const struct xwos_irq_resource * irqs,
+                                const xwirq_t irqs[],
                                 xwreg_t flags[], xwsz_t num)
 {
         xwmp_splk_lock_irqssv(&sql->splk, irqs, flags, num);
@@ -165,7 +165,7 @@ void xwmp_sqlk_rdex_lock_irqssv(struct xwmp_sqlk * sql,
 
 static __xwmp_inline_api
 xwer_t xwmp_sqlk_rdex_trylock_irqssv(struct xwmp_sqlk * sql,
-                                     const struct xwos_irq_resource * irqs,
+                                     const xwirq_t irqs[],
                                      xwreg_t flags[], xwsz_t num)
 {
         return xwmp_splk_trylock_irqssv(&sql->splk, irqs, flags, num);
@@ -173,7 +173,7 @@ xwer_t xwmp_sqlk_rdex_trylock_irqssv(struct xwmp_sqlk * sql,
 
 static __xwmp_inline_api
 void xwmp_sqlk_rdex_unlock_irqsrs(struct xwmp_sqlk * sql,
-                                  const struct xwos_irq_resource * irqs,
+                                  const xwirq_t irqs[],
                                   xwreg_t flags[], xwsz_t num)
 {
         xwmp_splk_unlock_irqsrs(&sql->splk, irqs, flags, num);
@@ -286,7 +286,7 @@ void xwmp_sqlk_wr_unlock_cpuirqrs(struct xwmp_sqlk * sql, xwreg_t cpuirq)
 
 static __xwmp_inline_api
 void xwmp_sqlk_wr_lock_irqs(struct xwmp_sqlk * sql,
-                            const struct xwos_irq_resource * irqs,
+                            const xwirq_t irqs[],
                             xwsz_t num)
 {
         xwmp_splk_lock_irqs(&sql->splk, irqs, num);
@@ -296,7 +296,7 @@ void xwmp_sqlk_wr_lock_irqs(struct xwmp_sqlk * sql,
 
 static __xwmp_inline_api
 xwer_t xwmp_sqlk_wr_trylock_irqs(struct xwmp_sqlk * sql,
-                                 const struct xwos_irq_resource * irqs,
+                                 const xwirq_t irqs[],
                                  xwsz_t num)
 {
         xwer_t rc;
@@ -311,7 +311,7 @@ xwer_t xwmp_sqlk_wr_trylock_irqs(struct xwmp_sqlk * sql,
 
 static __xwmp_inline_api
 void xwmp_sqlk_wr_unlock_irqs(struct xwmp_sqlk * sql,
-                              const struct xwos_irq_resource * irqs,
+                              const xwirq_t irqs[],
                               xwsz_t num)
 {
         xwmb_mp_wmb();
@@ -321,7 +321,7 @@ void xwmp_sqlk_wr_unlock_irqs(struct xwmp_sqlk * sql,
 
 static __xwmp_inline_api
 void xwmp_sqlk_wr_lock_irqssv(struct xwmp_sqlk * sql,
-                              const struct xwos_irq_resource * irqs,
+                              const xwirq_t irqs[],
                               xwreg_t flags[], xwsz_t num)
 {
         xwmp_splk_lock_irqssv(&sql->splk, irqs, flags, num);
@@ -331,7 +331,7 @@ void xwmp_sqlk_wr_lock_irqssv(struct xwmp_sqlk * sql,
 
 static __xwmp_inline_api
 xwer_t xwmp_sqlk_wr_trylock_irqssv(struct xwmp_sqlk * sql,
-                                   const struct xwos_irq_resource * irqs,
+                                   const xwirq_t irqs[],
                                    xwreg_t flags[], xwsz_t num)
 {
         xwer_t rc;
@@ -346,7 +346,7 @@ xwer_t xwmp_sqlk_wr_trylock_irqssv(struct xwmp_sqlk * sql,
 
 static __xwmp_inline_api
 void xwmp_sqlk_wr_unlock_irqsrs(struct xwmp_sqlk * sql,
-                                const struct xwos_irq_resource * irqs,
+                                const xwirq_t irqs[],
                                 xwreg_t flags[], xwsz_t num)
 {
         xwmb_mp_wmb();

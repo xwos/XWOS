@@ -25,6 +25,8 @@
 #  error "This file should be included from <xwos/ospl/irq.h>."
 #endif
 
+#include <xwcd/soc/riscv/nuclei/bumblebee/gd32v/soc_irq.h>
+
 static __xwbsp_inline
 void xwospl_cpuirq_enable_lc(void)
 {

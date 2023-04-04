@@ -189,7 +189,7 @@ void xwos_splk_unlock_cpuirqrs(struct xwos_splk * spl, xwreg_t cpuirq)
  */
 static __xwos_inline_api
 void xwos_splk_lock_irqs(struct xwos_splk * spl,
-                         const struct xwos_irq_resource * irqs,
+                         const xwirq_t irqs[],
                          xwsz_t num)
 {
         xwosdl_splk_lock_irqs(&spl->osspl, irqs, num);
@@ -211,7 +211,7 @@ void xwos_splk_lock_irqs(struct xwos_splk * spl,
  */
 static __xwos_inline_api
 xwer_t xwos_splk_trylock_irqs(struct xwos_splk * spl,
-                              const struct xwos_irq_resource * irqs,
+                              const xwirq_t irqs[],
                               xwsz_t num)
 {
         return xwosdl_splk_trylock_irqs(&spl->osspl, irqs, num);
@@ -227,7 +227,7 @@ xwer_t xwos_splk_trylock_irqs(struct xwos_splk * spl,
  */
 static __xwos_inline_api
 void xwos_splk_unlock_irqs(struct xwos_splk * spl,
-                           const struct xwos_irq_resource * irqs,
+                           const xwirq_t irqs[],
                            xwsz_t num)
 {
         xwosdl_splk_unlock_irqs(&spl->osspl, irqs, num);
@@ -246,7 +246,7 @@ void xwos_splk_unlock_irqs(struct xwos_splk * spl,
  */
 static __xwos_inline_api
 void xwos_splk_lock_irqssv(struct xwos_splk * spl,
-                           const struct xwos_irq_resource * irqs,
+                           const xwirq_t irqs[],
                            xwreg_t flags[], xwsz_t num)
 {
         xwosdl_splk_lock_irqssv(&spl->osspl, irqs, flags, num);
@@ -269,7 +269,7 @@ void xwos_splk_lock_irqssv(struct xwos_splk * spl,
  */
 static __xwos_inline_api
 xwer_t xwos_splk_trylock_irqssv(struct xwos_splk * spl,
-                                const struct xwos_irq_resource * irqs,
+                                const xwirq_t irqs[],
                                 xwreg_t flags[], xwsz_t num)
 {
         return xwosdl_splk_trylock_irqssv(&spl->osspl, irqs, flags, num);
@@ -286,7 +286,7 @@ xwer_t xwos_splk_trylock_irqssv(struct xwos_splk * spl,
  */
 static __xwos_inline_api
 void xwos_splk_unlock_irqsrs(struct xwos_splk * spl,
-                             const struct xwos_irq_resource * irqs,
+                             const xwirq_t irqs[],
                              xwreg_t flags[], xwsz_t num)
 {
         xwosdl_splk_unlock_irqsrs(&spl->osspl, irqs, flags, num);

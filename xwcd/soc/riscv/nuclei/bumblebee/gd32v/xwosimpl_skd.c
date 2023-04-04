@@ -19,10 +19,10 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/osal/irq.h>
 #include <xwos/ospl/soc/xwsc.h>
 #include <xwos/ospl/skd.h>
 #include <soc.h>
+#include <soc_irq.h>
 
 #ifndef __riscv_32e
 #  define SOC_CALLER_CONTEXT_SIZE (20 * REGBYTES)
@@ -42,26 +42,15 @@ __xwbsp_rodata const struct soc_irq_cfg soc_swcx_irqcfg = {
         .shv = ECLIC_NON_VECTOR_INTERRUPT,
 };
 
-__xwbsp_rodata const struct xwos_irq_resource soc_swcx_irqrsc = {
-        .irqn = SysTimerSW_IRQn,
-        .isr = xwospl_skd_isr_swcx,
-        .cfg = &soc_swcx_irqcfg,
-        .description = "soc.irq.swcx",
-};
-
 __xwbsp_code
 xwer_t xwospl_skd_init(struct xwospl_skd * xwskd)
 {
         xwer_t rc;
-        const struct xwos_irq_resource * irqrsc;
 
         XWOS_UNUSED(xwskd);
-        irqrsc = &soc_swcx_irqrsc;
-        rc = xwos_irq_request(irqrsc->irqn, irqrsc->isr,
-                              XWOS_UNUSED_ARGUMENT, irqrsc->cfg);
+        rc = soc_irq_cfg(SysTimerSW_IRQn, &soc_swcx_irqcfg);
         XWOS_BUG_ON(rc < 0);
-
-        rc = xwos_irq_enable(irqrsc->irqn);
+        rc = soc_irq_enable(SysTimerSW_IRQn);
         XWOS_BUG_ON(rc < 0);
         return rc;
 }

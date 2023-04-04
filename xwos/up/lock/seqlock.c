@@ -132,21 +132,21 @@ void xwup_sqlk_rdex_unlock_cpuirqrs(struct xwup_sqlk * sql, xwreg_t flag)
 
 __xwup_api
 void xwup_sqlk_rdex_lock_irqs(struct xwup_sqlk * sql,
-                              const struct xwos_irq_resource * irqs,
+                              const xwirq_t irqs[],
                               xwsz_t num)
 {
         xwssz_t i;
 
         XWOS_UNUSED(sql);
         for (i = 0; i < (xwssz_t)num; i++) {
-                xwup_irq_disable(irqs[i].irqn);
+                xwup_irq_disable(irqs[i]);
         }
         xwup_skd_dspmpt_lc();
 }
 
 __xwup_api
 xwer_t xwup_sqlk_rdex_trylock_irqs(struct xwup_sqlk * sql,
-                                   const struct xwos_irq_resource * irqs,
+                                   const xwirq_t irqs[],
                                    xwsz_t num)
 {
         xwup_sqlk_rdex_lock_irqs(sql, irqs, num);
@@ -155,7 +155,7 @@ xwer_t xwup_sqlk_rdex_trylock_irqs(struct xwup_sqlk * sql,
 
 __xwup_api
 void xwup_sqlk_rdex_unlock_irqs(struct xwup_sqlk * sql,
-                                const struct xwos_irq_resource * irqs,
+                                const xwirq_t irqs[],
                                 xwsz_t num)
 {
         xwssz_t i;
@@ -163,27 +163,27 @@ void xwup_sqlk_rdex_unlock_irqs(struct xwup_sqlk * sql,
         XWOS_UNUSED(sql);
         xwup_skd_enpmpt_lc();
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
-                xwup_irq_enable(irqs[i].irqn);
+                xwup_irq_enable(irqs[i]);
         }
 }
 
 __xwup_api
 void xwup_sqlk_rdex_lock_irqssv(struct xwup_sqlk * sql,
-                                const struct xwos_irq_resource * irqs,
+                                const xwirq_t irqs[],
                                 xwreg_t flags[], xwsz_t num)
 {
         xwssz_t i;
 
         XWOS_UNUSED(sql);
         for (i = 0; i < (xwssz_t)num; i++) {
-                xwup_irq_save(irqs[i].irqn, &flags[i]);
+                xwup_irq_save(irqs[i], &flags[i]);
         }
         xwup_skd_dspmpt_lc();
 }
 
 __xwup_api
 xwer_t xwup_sqlk_rdex_trylock_irqssv(struct xwup_sqlk * sql,
-                                     const struct xwos_irq_resource * irqs,
+                                     const xwirq_t irqs[],
                                      xwreg_t flags[], xwsz_t num)
 {
         xwup_sqlk_rdex_lock_irqssv(sql, irqs, flags, num);
@@ -192,7 +192,7 @@ xwer_t xwup_sqlk_rdex_trylock_irqssv(struct xwup_sqlk * sql,
 
 __xwup_api
 void xwup_sqlk_rdex_unlock_irqsrs(struct xwup_sqlk * sql,
-                                  const struct xwos_irq_resource * irqs,
+                                  const xwirq_t irqs[],
                                   xwreg_t flags[], xwsz_t num)
 {
         xwssz_t i;
@@ -200,7 +200,7 @@ void xwup_sqlk_rdex_unlock_irqsrs(struct xwup_sqlk * sql,
         XWOS_UNUSED(sql);
         xwup_skd_enpmpt_lc();
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
-                xwup_irq_restore(irqs[i].irqn, flags[i]);
+                xwup_irq_restore(irqs[i], flags[i]);
         }
 }
 
@@ -304,13 +304,13 @@ void xwup_sqlk_wr_unlock_cpuirqrs(struct xwup_sqlk * sql, xwreg_t flag)
 
 __xwup_api
 void xwup_sqlk_wr_lock_irqs(struct xwup_sqlk * sql,
-                            const struct xwos_irq_resource * irqs,
+                            const xwirq_t irqs[],
                             xwsz_t num)
 {
         xwssz_t i;
 
         for (i = 0; i < (xwssz_t)num; i++) {
-                xwup_irq_disable(irqs[i].irqn);
+                xwup_irq_disable(irqs[i]);
         }
         xwup_skd_dspmpt_lc();
         sql->seq += XWUP_SQLK_GRANULARITY;
@@ -319,7 +319,7 @@ void xwup_sqlk_wr_lock_irqs(struct xwup_sqlk * sql,
 
 __xwup_api
 xwer_t xwup_sqlk_wr_trylock_irqs(struct xwup_sqlk * sql,
-                                 const struct xwos_irq_resource * irqs,
+                                 const xwirq_t irqs[],
                                  xwsz_t num)
 {
         xwup_sqlk_wr_lock_irqs(sql, irqs, num);
@@ -328,7 +328,7 @@ xwer_t xwup_sqlk_wr_trylock_irqs(struct xwup_sqlk * sql,
 
 __xwup_api
 void xwup_sqlk_wr_unlock_irqs(struct xwup_sqlk * sql,
-                              const struct xwos_irq_resource * irqs,
+                              const xwirq_t irqs[],
                               xwsz_t num)
 {
         xwssz_t i;
@@ -337,19 +337,19 @@ void xwup_sqlk_wr_unlock_irqs(struct xwup_sqlk * sql,
         sql->seq += XWUP_SQLK_GRANULARITY;
         xwup_skd_enpmpt_lc();
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
-                xwup_irq_enable(irqs[i].irqn);
+                xwup_irq_enable(irqs[i]);
         }
 }
 
 __xwup_api
 void xwup_sqlk_wr_lock_irqssv(struct xwup_sqlk * sql,
-                              const struct xwos_irq_resource * irqs,
+                              const xwirq_t irqs[],
                               xwreg_t flags[], xwsz_t num)
 {
         xwssz_t i;
 
         for (i = 0; i < (xwssz_t)num; i++) {
-                xwup_irq_save(irqs[i].irqn, &flags[i]);
+                xwup_irq_save(irqs[i], &flags[i]);
         }
         xwup_skd_dspmpt_lc();
         sql->seq += XWUP_SQLK_GRANULARITY;
@@ -358,7 +358,7 @@ void xwup_sqlk_wr_lock_irqssv(struct xwup_sqlk * sql,
 
 __xwup_api
 xwer_t xwup_sqlk_wr_trylock_irqssv(struct xwup_sqlk * sql,
-                                   const struct xwos_irq_resource * irqs,
+                                   const xwirq_t irqs[],
                                    xwreg_t flags[], xwsz_t num)
 {
         xwup_sqlk_wr_lock_irqssv(sql, irqs, flags, num);
@@ -367,7 +367,7 @@ xwer_t xwup_sqlk_wr_trylock_irqssv(struct xwup_sqlk * sql,
 
 __xwup_api
 void xwup_sqlk_wr_unlock_irqsrs(struct xwup_sqlk * sql,
-                                const struct xwos_irq_resource * irqs,
+                                const xwirq_t irqs[],
                                 xwreg_t flags[], xwsz_t num)
 {
         xwssz_t i;
@@ -376,7 +376,7 @@ void xwup_sqlk_wr_unlock_irqsrs(struct xwup_sqlk * sql,
         sql->seq += XWUP_SQLK_GRANULARITY;
         xwup_skd_enpmpt_lc();
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
-                xwup_irq_restore(irqs[i].irqn, flags[i]);
+                xwup_irq_restore(irqs[i], flags[i]);
         }
 }
 

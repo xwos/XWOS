@@ -32,7 +32,7 @@ SOC_EOBJS :=
 
 SOC_ASRCS += soc.S xwosasmimpl_skd.S
 
-SOC_CSRCS += soc_init.c
+SOC_CSRCS += soc_init.c soc_irq.c
 SOC_CSRCS += xwosimpl_irq.c
 SOC_CSRCS += xwosimpl_skd.c
 SOC_CSRCS += xwosimpl_syshwt.c

@@ -141,12 +141,12 @@ void xwmp_rawly_unlock_cpuirqrs(struct xwmp_splk * splk, xwreg_t cpuirq)
 
 __xwmp_code
 void xwmp_rawly_lock_irqs(struct xwmp_splk * splk,
-                          const struct xwos_irq_resource * irqs, xwsz_t num)
+                          const xwirq_t irqs[], xwsz_t num)
 {
         xwssz_t i;
 
         for (i = 0; i < (xwssz_t)num; i++) {
-                xwmp_irq_disable(irqs[i].irqn);
+                xwmp_irq_disable(irqs[i]);
         }
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_lock(&splk->socsplk);
@@ -158,20 +158,20 @@ void xwmp_rawly_lock_irqs(struct xwmp_splk * splk,
 
 __xwmp_code
 xwer_t xwmp_rawly_trylock_irqs(struct xwmp_splk * splk,
-                               const struct xwos_irq_resource * irqs, xwsz_t num)
+                               const xwirq_t irqs[], xwsz_t num)
 {
         xwer_t rc;
         xwssz_t i;
 
         rc = XWOK;
         for (i = 0; i < (xwssz_t)num; i++) {
-                xwmp_irq_disable(irqs[i].irqn);
+                xwmp_irq_disable(irqs[i]);
         }
 #if (CPUCFG_CPU_NUM > 1)
         rc = soc_splk_trylock(&splk->socsplk);
         if (rc < 0) {
                 for (i = (xwssz_t)num - 1; i >= 0; i--) {
-                        xwmp_irq_enable(irqs[i].irqn);
+                        xwmp_irq_enable(irqs[i]);
                 }
         }
 #else
@@ -183,7 +183,7 @@ xwer_t xwmp_rawly_trylock_irqs(struct xwmp_splk * splk,
 
 __xwmp_code
 void xwmp_rawly_unlock_irqs(struct xwmp_splk * splk,
-                            const struct xwos_irq_resource * irqs, xwsz_t num)
+                            const xwirq_t irqs[], xwsz_t num)
 {
         xwssz_t i;
 
@@ -194,19 +194,19 @@ void xwmp_rawly_unlock_irqs(struct xwmp_splk * splk,
         xwmb_mp_mb();
 #endif
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
-                xwmp_irq_enable(irqs[i].irqn);
+                xwmp_irq_enable(irqs[i]);
         }
 }
 
 __xwmp_code
 void xwmp_rawly_lock_irqssv(struct xwmp_splk * splk,
-                            const struct xwos_irq_resource * irqs,
+                            const xwirq_t irqs[],
                             xwreg_t flags[], xwsz_t num)
 {
         xwssz_t i;
 
         for (i = 0; i < (xwssz_t)num; i++) {
-                xwmp_irq_save(irqs[i].irqn, &flags[i]);
+                xwmp_irq_save(irqs[i], &flags[i]);
         }
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_lock(&splk->socsplk);
@@ -218,7 +218,7 @@ void xwmp_rawly_lock_irqssv(struct xwmp_splk * splk,
 
 __xwmp_code
 xwer_t xwmp_rawly_trylock_irqssv(struct xwmp_splk * splk,
-                                 const struct xwos_irq_resource * irqs,
+                                 const xwirq_t irqs[],
                                  xwreg_t flags[], xwsz_t num)
 {
         xwer_t rc;
@@ -226,13 +226,13 @@ xwer_t xwmp_rawly_trylock_irqssv(struct xwmp_splk * splk,
 
         rc = XWOK;
         for (i = 0; i < (xwssz_t)num; i++) {
-                xwmp_irq_save(irqs[i].irqn, &flags[i]);
+                xwmp_irq_save(irqs[i], &flags[i]);
         }
 #if (CPUCFG_CPU_NUM > 1)
         rc = soc_splk_trylock(&splk->socsplk);
         if (rc < 0) {
                 for (i = (xwssz_t)num - 1; i >= 0; i--) {
-                        xwmp_irq_restore(irqs[i].irqn, flags[i]);
+                        xwmp_irq_restore(irqs[i], flags[i]);
                 }
                 return rc;
         }
@@ -245,7 +245,7 @@ xwer_t xwmp_rawly_trylock_irqssv(struct xwmp_splk * splk,
 
 __xwmp_code
 void xwmp_rawly_unlock_irqsrs(struct xwmp_splk * splk,
-                              const struct xwos_irq_resource * irqs,
+                              const xwirq_t irqs[],
                               xwreg_t flags[], xwsz_t num)
 {
         xwssz_t i;
@@ -256,7 +256,7 @@ void xwmp_rawly_unlock_irqsrs(struct xwmp_splk * splk,
         xwmb_mp_mb();
 #endif
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
-                xwmp_irq_restore(irqs[i].irqn, flags[i]);
+                xwmp_irq_restore(irqs[i], flags[i]);
         }
 }
 
@@ -405,12 +405,12 @@ void xwmp_splk_unlock_cpuirqrs(struct xwmp_splk * splk, xwreg_t cpuirq)
 
 __xwmp_api
 void xwmp_splk_lock_irqs(struct xwmp_splk * splk,
-                         const struct xwos_irq_resource * irqs, xwsz_t num)
+                         const xwirq_t irqs[], xwsz_t num)
 {
         xwssz_t i;
 
         for (i = 0; i < (xwssz_t)num; i++) {
-                xwmp_irq_disable(irqs[i].irqn);
+                xwmp_irq_disable(irqs[i]);
         }
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
@@ -423,14 +423,14 @@ void xwmp_splk_lock_irqs(struct xwmp_splk * splk,
 
 __xwmp_api
 xwer_t xwmp_splk_trylock_irqs(struct xwmp_splk * splk,
-                              const struct xwos_irq_resource * irqs, xwsz_t num)
+                              const xwirq_t irqs[], xwsz_t num)
 {
         xwer_t rc;
         xwssz_t i;
 
         rc = XWOK;
         for (i = 0; i < (xwssz_t)num; i++) {
-                xwmp_irq_disable(irqs[i].irqn);
+                xwmp_irq_disable(irqs[i]);
         }
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
@@ -438,7 +438,7 @@ xwer_t xwmp_splk_trylock_irqs(struct xwmp_splk * splk,
         if (rc < 0) {
                 xwmp_skd_enpmpt_lc();
                 for (i = (xwssz_t)num - 1; i >= 0; i--) {
-                        xwmp_irq_enable(irqs[i].irqn);
+                        xwmp_irq_enable(irqs[i]);
                 }
         }
 #else
@@ -450,7 +450,7 @@ xwer_t xwmp_splk_trylock_irqs(struct xwmp_splk * splk,
 
 __xwmp_api
 void xwmp_splk_unlock_irqs(struct xwmp_splk * splk,
-                           const struct xwos_irq_resource * irqs, xwsz_t num)
+                           const xwirq_t irqs[], xwsz_t num)
 {
         xwssz_t i;
 
@@ -462,19 +462,19 @@ void xwmp_splk_unlock_irqs(struct xwmp_splk * splk,
 #endif
         xwmp_skd_enpmpt_lc();
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
-                xwmp_irq_enable(irqs[i].irqn);
+                xwmp_irq_enable(irqs[i]);
         }
 }
 
 __xwmp_api
 void xwmp_splk_lock_irqssv(struct xwmp_splk * splk,
-                           const struct xwos_irq_resource * irqs,
+                           const xwirq_t irqs[],
                            xwreg_t flags[], xwsz_t num)
 {
         xwssz_t i;
 
         for (i = 0; i < (xwssz_t)num; i++) {
-                xwmp_irq_save(irqs[i].irqn, &flags[i]);
+                xwmp_irq_save(irqs[i], &flags[i]);
         }
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
@@ -487,7 +487,7 @@ void xwmp_splk_lock_irqssv(struct xwmp_splk * splk,
 
 __xwmp_api
 xwer_t xwmp_splk_trylock_irqssv(struct xwmp_splk * splk,
-                                const struct xwos_irq_resource * irqs,
+                                const xwirq_t irqs[],
                                 xwreg_t flags[], xwsz_t num)
 {
         xwer_t rc;
@@ -495,7 +495,7 @@ xwer_t xwmp_splk_trylock_irqssv(struct xwmp_splk * splk,
 
         rc = XWOK;
         for (i = 0; i < (xwssz_t)num; i++) {
-                xwmp_irq_save(irqs[i].irqn, &flags[i]);
+                xwmp_irq_save(irqs[i], &flags[i]);
         }
         xwmp_skd_dspmpt_lc();
 #if (CPUCFG_CPU_NUM > 1)
@@ -503,7 +503,7 @@ xwer_t xwmp_splk_trylock_irqssv(struct xwmp_splk * splk,
         if (rc < 0) {
                 xwmp_skd_enpmpt_lc();
                 for (i = (xwssz_t)num - 1; i >= 0; i--) {
-                        xwmp_irq_restore(irqs[i].irqn, flags[i]);
+                        xwmp_irq_restore(irqs[i], flags[i]);
                 }
         }
 #else
@@ -515,7 +515,7 @@ xwer_t xwmp_splk_trylock_irqssv(struct xwmp_splk * splk,
 
 __xwmp_api
 void xwmp_splk_unlock_irqsrs(struct xwmp_splk * splk,
-                             const struct xwos_irq_resource * irqs,
+                             const xwirq_t irqs[],
                              xwreg_t flags[], xwsz_t num)
 {
         xwssz_t i;
@@ -528,7 +528,7 @@ void xwmp_splk_unlock_irqsrs(struct xwmp_splk * splk,
 #endif
         xwmp_skd_enpmpt_lc();
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
-                xwmp_irq_restore(irqs[i].irqn, flags[i]);
+                xwmp_irq_restore(irqs[i], flags[i]);
         }
 }
 
