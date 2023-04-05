@@ -44,7 +44,7 @@ xwid_t xwospl_skd_id_lc(void)
 }
 
 __xwbsp_code __xwcc_naked
-xwer_t xwospl_skd_start_lc(__xwcc_unused struct xwospl_skd * xwskd)
+xwer_t xwospl_skd_start(__xwcc_unused struct xwospl_skd * xwskd)
 {
         __asm__ volatile(
                 ".syntax       unified");

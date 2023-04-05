@@ -25,16 +25,9 @@
         .extern         xwos_stk_end
         .extern         _SDA_BASE_
         .extern         _SDA2_BASE_
-        .extern         arch_lowlevel_init
-        .extern         cpu_lowlevel_init
-        .extern         soc_lowlevel_init
-        .extern         board_lowlevel_init
-        .extern         arch_relocate
-        .extern         arch_init
-        .extern         cpu_init
-        .extern         soc_init
-        .extern         board_init
+        .extern         xwos_preinit
         .extern         xwos_init
+        .extern         xwos_postinit
         .extern         xwos_main
 
 /**
@@ -68,10 +61,7 @@ arch_isr_reset:
         e_lis           r2, _SDA2_BASE_@h
         e_or2i          r2, _SDA2_BASE_@l
         e_stwu          r1, -64 (r1) /* Reserve stack frame to backchain; */
-        e_bl            arch_lowlevel_init
-        e_bl            cpu_lowlevel_init
-        e_bl            soc_lowlevel_init
-        e_bl            board_lowlevel_init
+        e_bl            xwos_preinit
 
         /* step 4: init xwos-stack & ecc flags */
         e_li            r4, 0
@@ -106,13 +96,11 @@ loop:
 
         /* step 6: init */
         e_bl            xwos_init
-        e_bl            arch_relocate
-        e_bl            arch_init
-        e_bl            cpu_init
-        e_bl            soc_init
-        e_bl            board_init
 
-        /* step 7: goto user main function */
+        /* step 7: postinit */
+        e_bl            xwos_postinit
+
+        /* step 8: goto user main function */
         e_bl            xwos_main
 arch_isr_reset_end:
         .endfunc

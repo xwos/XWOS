@@ -38,8 +38,6 @@
 #define ARCH_NVGR_SIZE                                  0x28U
 #define ARCH_NVFR_SIZE                                  0x40U
 
-extern xwstk_t xwos_stk_top[];
-
 static __xwbsp_code
 void arch_skd_report_stk_overflow(struct xwospl_skdobj_stack * stk);
 
@@ -219,11 +217,11 @@ void arch_skd_init_stack(struct xwospl_skdobj_stack * stk,
 }
 
 /**
- * @brief 启动调度器的SVC(svc 0)的处理函数
+ * @brief 启动调度器的SVC(svc 9)的处理函数
  * @param[in] xwskd: 调度器的指针
  */
 __xwbsp_isr __xwcc_naked
-void arch_skd_svcsr_start(__xwcc_unused struct xwospl_skd * xwskd)
+void arch_svc_skd_start(__xwcc_unused struct xwospl_skd * xwskd)
 {
         /* r3 = r0->cstk; */
         __asm__ volatile(".syntax       unified");
@@ -248,10 +246,6 @@ void arch_skd_svcsr_start(__xwcc_unused struct xwospl_skd * xwskd)
         __asm__ volatile("      dsb");
         __asm__ volatile("      isb");
         __asm__ volatile("      clrex");
-        __asm__ volatile("      msr     msp, %[__xwos_stk_top]"
-                         :
-                         : [__xwos_stk_top] "Ir" (xwos_stk_top)
-                         :);
         __asm__ volatile("      bx      lr");
 }
 

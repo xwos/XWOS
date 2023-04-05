@@ -117,13 +117,6 @@ SECTIONS {
         bkup_vma_base = ADDR(.bkup);
         bkup_lma_base = LOADADDR(.bkup);
 
-        .xwos.data : ALIGN(8) {
-                *(.xwos.data)
-                xwos_data_vma_end = .;
-        } > data_mr AT> code_mr
-        xwos_data_vma_base = ADDR(.xwos.data);
-        xwos_data_lma_base = LOADADDR(.xwos.data);
-
         .flsopc : ALIGN(8) {
                 *(.flsopc)
                 flsopc_vma_end = .;
@@ -132,6 +125,7 @@ SECTIONS {
         flsopc_lma_base = LOADADDR(.flsopc);
 
         .data : ALIGN(8) {
+                *(.xwos.data)
                 *(.data)
                 *(.data.*)
                 data_vma_end = .;

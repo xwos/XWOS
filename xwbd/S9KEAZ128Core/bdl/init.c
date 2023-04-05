@@ -19,29 +19,15 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/osal/irq.h>
+#include <xwcd/soc/arm/v6m/arch_init.h>
+#include <xwcd/soc/arm/v6m/m0p/kea/soc_init.h>
 #include <soc_osc.h>
 #include <soc_sim.h>
 #include <soc_ics.h>
-#include <bdl/board_init.h>
-
-static __xwbsp_init_code
-void bdl_clk_init(void);
-
-__xwbsp_init_code
-void board_lowlevel_init(void)
-{
-        bdl_clk_init();
-}
 
 /**
- * @brief init board
+ * @brief 时钟的初始化
  */
-__xwbsp_init_code
-void board_init(void)
-{
-}
-
 static __xwbsp_init_code
 void bdl_clk_init(void)
 {
@@ -138,4 +124,25 @@ void bdl_clk_init(void)
 
         soc_sim.clkdiv.word = 0x01100000; /* div2 = 2; div3 = 2; div1 = 1; */
         soc_ics.c2.bit.bdiv = 0; /* bdiv = 1; */
+}
+
+/**
+ * @brief XWOS预初始化
+ */
+__xwbsp_init_code
+void xwos_preinit(void)
+{
+        arch_init();
+        soc_init();
+        bdl_clk_init();
+        soc_relocate_data();
+        soc_relocate_ivt();
+}
+
+/**
+ * @brief XWOS后初始化
+ */
+__xwbsp_init_code
+void xwos_postinit(void)
+{
 }

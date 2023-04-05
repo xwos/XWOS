@@ -19,16 +19,11 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/ospl/irq.h>
-#include <xwos/ospl/skd.h>
 #include <soc.h>
 #include <soc_clk.h>
 #include <soc_me.h>
 #include <soc_irq.h>
 #include <soc_init.h>
-
-static __xwos_init_code
-void soc_relocate_isrtable(void);
 
 extern xwu8_t e200z0h_ivt_lma_base[];
 extern xwu8_t e200z0h_ivt_vma_base[];
@@ -48,6 +43,27 @@ extern xwu32_t stdby_wkup_mr_size[];
 
 extern xwu32_t data_mr_origin[];
 extern xwu32_t data_mr_size[];
+
+extern xwu8_t data_lma_base[];
+extern xwu8_t data_vma_base[];
+extern xwu8_t data_vma_end[];
+
+extern xwu8_t sdata_lma_base[];
+extern xwu8_t sdata_vma_base[];
+extern xwu8_t sdata_vma_end[];
+
+extern xwu8_t sbss_vma_base[];
+extern xwu8_t sbss_vma_end[];
+
+extern xwu8_t sdata2_lma_base[];
+extern xwu8_t sdata2_vma_base[];
+extern xwu8_t sdata2_vma_end[];
+
+extern xwu8_t sbss2_vma_base[];
+extern xwu8_t sbss2_vma_end[];
+
+extern xwu8_t bss_vma_base[];
+extern xwu8_t bss_vma_end[];
 
 __xwbsp_data struct soc_reset_flags soc_reset_flags;
 __xwbsp_data struct soc_wkup_flags soc_wkup_flags;
@@ -818,18 +834,8 @@ void soc_me_init(void)
         ME.MCTL.R = ((xwu32_t)(ME.GS.B.S_CURRENTMODE << 28) | MPC5_ME_MCTL_KEY_INV);
 }
 
-__xwbsp_init_code
-void soc_lowlevel_init(void)
-{
-        soc_sysclk_init();
-        soc_rgm_init();
-        soc_flash_init();
-        soc_ram_init();
-        soc_me_init();
-}
-
-static __xwos_init_code
-void soc_relocate_isrtable(void)
+__xwos_init_code
+void soc_relocate_ivt(void)
 {
         xwsz_t cnt, i;
         xwu8_t * src;
@@ -845,14 +851,88 @@ void soc_relocate_isrtable(void)
         }
 }
 
+/**
+ * @brief relocate data to RAM
+ */
+__xwbsp_init_code
+void soc_relocate_data(void)
+{
+        xwsz_t count, i;
+        xwu8_t * src;
+        xwu8_t * dst;
+
+        src = data_lma_base;
+        if (data_vma_base != src) {
+                dst = data_vma_base;
+                count = (xwsz_t)data_vma_end - (xwsz_t)data_vma_base;
+                for (i = 0; i < count; i++) {
+                        *dst = *src;
+                        dst++;
+                        src++;
+                }
+        }
+
+        src = sdata_lma_base;
+        if (sdata_vma_base != src) {
+                dst = sdata_vma_base;
+                count = (xwsz_t)sdata_vma_end - (xwsz_t)sdata_vma_base;
+                for (i = 0; i < count; i++) {
+                        *dst = *src;
+                        dst++;
+                        src++;
+                }
+        }
+
+        src = sdata2_lma_base;
+        if (sdata2_vma_base != src) {
+                dst = sdata2_vma_base;
+                count = (xwsz_t)sdata2_vma_end - (xwsz_t)sdata2_vma_base;
+                for (i = 0; i < count; i++) {
+                        *dst = *src;
+                        dst++;
+                        src++;
+                }
+        }
+
+        dst = sbss_vma_base;
+        count = (xwsz_t)sbss_vma_end - (xwsz_t)sbss_vma_base;
+        for (i = 0; i < count; i++) {
+                *dst = 0;
+                dst++;
+        }
+
+        dst = sbss2_vma_base;
+        count = (xwsz_t)sbss2_vma_end - (xwsz_t)sbss2_vma_base;
+        for (i = 0; i < count; i++) {
+                *dst = 0;
+                dst++;
+        }
+
+        dst = bss_vma_base;
+        count = (xwsz_t)bss_vma_end - (xwsz_t)bss_vma_base;
+        for (i = 0; i < count; i++) {
+                *dst = 0;
+                dst++;
+        }
+}
+
+__xwbsp_init_code
+void soc_lowlevel_init(void)
+{
+        soc_sysclk_init();
+        soc_rgm_init();
+        soc_flash_init();
+        soc_ram_init();
+        soc_me_init();
+        soc_relocate_data();
+        soc_relocate_ivt();
+}
+
 __xwbsp_init_code
 void soc_init(void)
 {
-        soc_relocate_isrtable();
-
         soc_reset_flags.fes = 0;
         soc_reset_flags.des = 0;
-
         soc_wkup_flags.nsr = 0;
         soc_wkup_flags.wisr = 0;
 
@@ -875,5 +955,4 @@ void soc_init(void)
         }
 
         soc_irqc_init();
-        xwosplcb_skd_init_lc();
 }

@@ -172,7 +172,7 @@ xwer_t xwup_skd_start_lc(void)
         rc = xwup_syshwt_start(&xwskd->tt.hwt);
         if (__xwcc_unlikely(XWOK == rc)) {
                 xwskd->state = true;
-                xwospl_skd_start_lc(xwskd);
+                xwospl_skd_start(xwskd);
         }/* else {} */
         return rc;
 }

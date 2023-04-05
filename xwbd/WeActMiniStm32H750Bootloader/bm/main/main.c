@@ -79,6 +79,7 @@ xwer_t xwos_main(void)
         xwds_gpio_req(&stm32soc, LED_GPIO_PORT, LED_GPIO_PIN);
         xwds_gpio_set(&stm32soc, LED_GPIO_PORT, LED_GPIO_PIN);
 
+        xwos_skd_init_lc();
         rc = xwos_thd_create(&main_thd,
                              &main_thd_desc.attr,
                              main_thd_desc.func,

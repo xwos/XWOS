@@ -19,20 +19,17 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/ospl/skd.h>
 #include <soc_init.h>
-
-__xwbsp_init_code
-void soc_lowlevel_init(void)
-{
-}
 
 extern xwu8_t armv6m_ivt_lma_base[];
 extern xwu8_t armv6m_ivt_vma_base[];
 extern xwu8_t armv6m_ivt_vma_end[];
 
-static __xwos_init_code
-void soc_relocate_isrtable(void)
+/**
+ * @brief 重定向数据区到内存
+ */
+__xwos_init_code
+void soc_relocate_ivt(void)
 {
         xwsz_t cnt, i;
         xwu8_t * src;
@@ -48,12 +45,46 @@ void soc_relocate_isrtable(void)
         }
 }
 
+extern xwu8_t data_lma_base[];
+extern xwu8_t data_vma_base[];
+extern xwu8_t data_vma_end[];
+
+extern xwu8_t bss_vma_base[];
+extern xwu8_t bss_vma_end[];
+
+/**
+ * @brief 重定向数据区到内存
+ */
+__xwbsp_init_code
+void soc_relocate_data(void)
+{
+        xwsz_t count, i;
+        xwu8_t * src;
+        xwu8_t * dst;
+
+        src = data_lma_base;
+        dst = data_vma_base;
+        if (dst != src) {
+                count = (xwsz_t)data_vma_end - (xwsz_t)data_vma_base;
+                for (i = 0; i < count; i++) {
+                        *dst = *src;
+                        dst++;
+                        src++;
+                }
+        }
+
+        dst = bss_vma_base;
+        count = (xwsz_t)bss_vma_end - (xwsz_t)bss_vma_base;
+        for (i = 0; i < count; i++) {
+                *dst = 0;
+                dst++;
+        }
+}
+
+/**
+ * @brief SOC的初始化
+ */
 __xwbsp_init_code
 void soc_init(void)
 {
-        xwer_t rc;
-
-        soc_relocate_isrtable();
-        rc = xwosplcb_skd_init_lc();
-        XWOS_BUG_ON(rc);
 }

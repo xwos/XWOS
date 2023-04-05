@@ -20,19 +20,24 @@
 
 #include <xwos/standard.h>
 #include <bdl/standard.h>
+#include <xwcd/soc/powerpc/e200x/arch_init.h>
+#include <xwcd/soc/powerpc/e200x/e200z0h/mpc560xb/soc_init.h>
 #include <bdl/ds/description/mpc560xbdkp.h>
 #include <bdl/bkup.h>
 #include <bdl/ds/device.h>
-#include <bdl/board_init.h>
 
 __xwos_init_code
-void board_lowlevel_init(void)
+void xwos_preinit(void)
 {
+        arch_init();
+        soc_lowlevel_init();
 }
 
 __xwos_init_code
-void board_init(void)
+void xwos_postinit(void)
 {
+        soc_init();
+
         /* save hw reset flags */
         if (soc_reset_flags.fes || soc_reset_flags.des) {
                 bdl_bkup_data.soc_reset_flags.reg.fes = soc_reset_flags.fes;

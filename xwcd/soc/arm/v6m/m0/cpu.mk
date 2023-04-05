@@ -25,7 +25,7 @@ CPU_CXXFLAGS := -mcpu=cortex-m0 -mfloat-abi=soft
 CPU_LDFLAGS := -mcpu=cortex-m0 -mfloat-abi=soft
 
 CPU_ASRCS :=
-CPU_CSRCS := cpu_init.c
+CPU_CSRCS :=
 CPU_CXXSRCS :=
 
 CPU_EOBJS :=

@@ -123,7 +123,7 @@ void arch_skd_init_stack(struct xwospl_skdobj_stack * stk, void (* exit)(xwer_t)
  * @param[in] xwskd: 调度器的指针
  */
 __xwbsp_isr __xwcc_naked
-void arch_skd_svcsr_start(__xwcc_unused struct xwospl_skd * xwskd)
+void arch_svc_skd_start(__xwcc_unused struct xwospl_skd * xwskd)
 {
         /* r3 = r0->cstk; */
         __asm__ volatile(".syntax       unified");

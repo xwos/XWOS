@@ -229,7 +229,7 @@ xwer_t xwmp_skd_start_lc(void)
         rc = xwmp_syshwt_start(&xwskd->tt.hwt);
         if (__xwcc_likely(XWOK == rc)) {
                 xwskd->state = true;
-                xwospl_skd_start_lc(xwskd);
+                xwospl_skd_start(xwskd);
         }/* else {} */
         return rc;
 }

@@ -25,7 +25,7 @@ CPU_AFLAGS := -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16
 CPU_LDFLAGS := -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
 CPU_ASRCS :=
-CPU_CSRCS := cpu_init.c
+CPU_CSRCS :=
 CPU_CXXSRCS :=
 
 CPU_EOBJS :=

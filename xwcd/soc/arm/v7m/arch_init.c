@@ -28,22 +28,9 @@
 #include <arch_nvic.h>
 #include <arch_init.h>
 
-extern xwu8_t data_lma_base[];
-extern xwu8_t data_vma_base[];
-extern xwu8_t data_vma_end[];
-
-extern xwu8_t bss_vma_base[];
-extern xwu8_t bss_vma_end[];
-
 extern const xwu8_t image_tail_lma_base[];
 extern const xwu8_t image_tail_lma_end[];
 extern const xwu8_t image_head_lma[];
-
-extern const xwu8_t preinit_array_vma_base[];
-extern const xwu8_t preinit_array_vma_end[];
-
-extern const xwu8_t init_array_vma_base[];
-extern const xwu8_t init_array_vma_end[];
 
 __image_description
 const struct arch_image_description arch_image_description = {
@@ -59,10 +46,10 @@ const struct arch_image_tail arch_image_tail = {
 };
 
 /**
- * @brief Lowlevel-init architecture
+ * @brief Init Architecture
  */
 __xwbsp_init_code
-void arch_lowlevel_init(void)
+void arch_init(void)
 {
         cm_scs.scb.ccr.bit.stkalign = 1; /* stack aligned to 8-byte */
         cm_scs.scb.ccr.bit.bp = 1; /* enable branch prediction */
@@ -72,41 +59,4 @@ void arch_lowlevel_init(void)
         arch_fpu_init();
 #endif
         arch_init_sysirqs();
-}
-
-/**
- * @brief Init architecture
- */
-__xwbsp_init_code
-void arch_init(void)
-{
-}
-
-/**
- * @brief relocate data to RAM
- */
-__xwbsp_init_code
-void arch_relocate(void)
-{
-        xwsz_t count, i;
-        xwu8_t * src;
-        xwu8_t * dst;
-
-        src = data_lma_base;
-        dst = data_vma_base;
-        if (dst != src) {
-                count = (xwsz_t)data_vma_end - (xwsz_t)data_vma_base;
-                for (i = 0; i < count; i++) {
-                        *dst = *src;
-                        dst++;
-                        src++;
-                }
-        }
-
-        dst = bss_vma_base;
-        count = (xwsz_t)bss_vma_end - (xwsz_t)bss_vma_base;
-        for (i = 0; i < count; i++) {
-                *dst = 0;
-                dst++;
-        }
 }

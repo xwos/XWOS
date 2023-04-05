@@ -39,6 +39,8 @@ xwer_t xwos_main(void)
         xwer_t rc;
         struct xwos_thd_attr attr;
 
+        xwos_skd_init_lc();
+
         xwos_thd_attr_init(&attr);
         attr.name = "main.thd";
         attr.stack = NULL;

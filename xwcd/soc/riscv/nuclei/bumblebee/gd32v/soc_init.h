@@ -23,7 +23,8 @@
 
 #include <xwos/standard.h>
 
-void soc_lowlevel_init(void);
+void soc_relocate_data(void);
+void soc_relocate_ivt(void);
 void soc_init(void);
 
 #endif /* soc_init.h */

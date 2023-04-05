@@ -25,7 +25,7 @@ CPU_AFLAGS := -mcpu=cortex-m7 -mfloat-abi=hard
 CPU_LDFLAGS := -mcpu=cortex-m7 -mfloat-abi=hard
 
 CPU_ASRCS :=
-CPU_CSRCS := cpu_init.c
+CPU_CSRCS :=
 CPU_CXXSRCS :=
 
 CPU_EOBJS :=

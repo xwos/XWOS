@@ -26,15 +26,40 @@
 #include <soc.h>
 #include <soc_init.h>
 
-static __xwos_init_code
-void soc_relocate_isrtable(void);
-
-static __xwbsp_init_code
-void soc_relocate(void);
 
 extern xwu8_t armv7m_ivt_lma_base[];
 extern xwu8_t armv7m_ivt_vma_base[];
 extern xwu8_t armv7m_ivt_vma_end[];
+
+/**
+ * @brief 重定向中断向量表到内存
+ */
+__xwos_init_code
+void soc_relocate_ivt(void)
+{
+        xwsz_t cnt, i;
+        xwu8_t * src;
+        xwu8_t * dst;
+
+        src = armv7m_ivt_lma_base;
+        dst = armv7m_ivt_vma_base;
+        if (dst != src) {
+                cnt = (xwsz_t)armv7m_ivt_vma_end - (xwsz_t)armv7m_ivt_vma_base;
+                for (i = 0; i < cnt; i++) {
+                        dst[i] = src[i];
+                }
+        }
+}
+
+extern xwu8_t xwos_data_lma_base[];
+extern xwu8_t xwos_data_vma_base[];
+extern xwu8_t xwos_data_vma_end[];
+
+extern xwu8_t data_lma_base[];
+extern xwu8_t data_vma_base[];
+extern xwu8_t data_vma_end[];
+extern xwu8_t bss_vma_base[];
+extern xwu8_t bss_vma_end[];
 
 extern xwu8_t itcm_lma_base[];
 extern xwu8_t itcm_vma_base[];
@@ -54,53 +79,48 @@ extern xwu8_t ncache_vma_end[];
 extern xwu8_t ncache_bss_vma_base[];
 extern xwu8_t ncache_bss_vma_end[];
 
+/**
+ * @brief 重定向数据区到内存
+ */
 __xwbsp_init_code
-void soc_lowlevel_init(void)
-{
-        /* cm_scs.scb.cacr.bit.siwt = 1; */
-        /* cm_scs.scb.cacr.bit.forcewt = 1; */
-}
-
-__xwbsp_init_code
-void soc_init(void)
-{
-        xwer_t rc;
-
-        soc_relocate_isrtable();
-        soc_relocate();
-        rc = xwosplcb_skd_init_lc();
-        XWOS_BUG_ON(rc);
-}
-
-static __xwos_init_code
-void soc_relocate_isrtable(void)
+void soc_relocate_data(void)
 {
         xwsz_t cnt, i;
         xwu8_t * src;
         xwu8_t * dst;
 
-        src = armv7m_ivt_lma_base;
-        dst = armv7m_ivt_vma_base;
+        src = xwos_data_lma_base;
+        dst = xwos_data_vma_base;
         if (dst != src) {
-                cnt = (xwsz_t)armv7m_ivt_vma_end - (xwsz_t)armv7m_ivt_vma_base;
+                cnt = (xwsz_t)xwos_data_vma_end - (xwsz_t)xwos_data_vma_base;
                 for (i = 0; i < cnt; i++) {
                         dst[i] = src[i];
                 }
         }
-}
 
-static __xwbsp_init_code
-void soc_relocate(void)
-{
-        xwsz_t count, i;
-        xwu8_t * src;
-        xwu8_t * dst;
+        src = data_lma_base;
+        dst = data_vma_base;
+        if (dst != src) {
+                cnt = (xwsz_t)data_vma_end - (xwsz_t)data_vma_base;
+                for (i = 0; i < cnt; i++) {
+                        *dst = *src;
+                        dst++;
+                        src++;
+                }
+        }
+
+        dst = bss_vma_base;
+        cnt = (xwsz_t)bss_vma_end - (xwsz_t)bss_vma_base;
+        for (i = 0; i < cnt; i++) {
+                *dst = 0;
+                dst++;
+        }
 
         src = itcm_lma_base;
         dst = itcm_vma_base;
         if (dst != src) {
-                count = (xwsz_t)itcm_vma_end - (xwsz_t)itcm_vma_base;
-                for (i = 0; i < count; i++) {
+                cnt = (xwsz_t)itcm_vma_end - (xwsz_t)itcm_vma_base;
+                for (i = 0; i < cnt; i++) {
                         *dst = *src;
                         dst++;
                         src++;
@@ -108,8 +128,8 @@ void soc_relocate(void)
         }
 
         dst = itcm_bss_vma_base;
-        count = (xwsz_t)itcm_bss_vma_end - (xwsz_t)itcm_bss_vma_base;
-        for (i = 0; i < count; i++) {
+        cnt = (xwsz_t)itcm_bss_vma_end - (xwsz_t)itcm_bss_vma_base;
+        for (i = 0; i < cnt; i++) {
                 *dst = 0;
                 dst++;
         }
@@ -117,8 +137,8 @@ void soc_relocate(void)
         src = ocram_lma_base;
         dst = ocram_vma_base;
         if (dst != src) {
-                count = (xwsz_t)ocram_vma_end - (xwsz_t)ocram_vma_base;
-                for (i = 0; i < count; i++) {
+                cnt = (xwsz_t)ocram_vma_end - (xwsz_t)ocram_vma_base;
+                for (i = 0; i < cnt; i++) {
                         *dst = *src;
                         dst++;
                         src++;
@@ -126,8 +146,8 @@ void soc_relocate(void)
         }
 
         dst = ocram_bss_vma_base;
-        count = (xwsz_t)ocram_bss_vma_end - (xwsz_t)ocram_bss_vma_base;
-        for (i = 0; i < count; i++) {
+        cnt = (xwsz_t)ocram_bss_vma_end - (xwsz_t)ocram_bss_vma_base;
+        for (i = 0; i < cnt; i++) {
                 *dst = 0;
                 dst++;
         }
@@ -135,8 +155,8 @@ void soc_relocate(void)
         src = ncache_lma_base;
         dst = ncache_vma_base;
         if (dst != src) {
-                count = (xwsz_t)ncache_vma_end - (xwsz_t)ncache_vma_base;
-                for (i = 0; i < count; i++) {
+                cnt = (xwsz_t)ncache_vma_end - (xwsz_t)ncache_vma_base;
+                for (i = 0; i < cnt; i++) {
                         *dst = *src;
                         dst++;
                         src++;
@@ -144,9 +164,17 @@ void soc_relocate(void)
         }
 
         dst = ncache_bss_vma_base;
-        count = (xwsz_t)ncache_bss_vma_end - (xwsz_t)ncache_bss_vma_base;
-        for (i = 0; i < count; i++) {
+        cnt = (xwsz_t)ncache_bss_vma_end - (xwsz_t)ncache_bss_vma_base;
+        for (i = 0; i < cnt; i++) {
                 *dst = 0;
                 dst++;
         }
+}
+
+/**
+ * @brief SOC的初始化
+ */
+__xwbsp_init_code
+void soc_init(void)
+{
 }

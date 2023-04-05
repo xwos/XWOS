@@ -41,16 +41,9 @@
         .equ SOC_CONTEXT_SIZE, (SOC_CALLER_CONTEXT_SIZE + SOC_CALLEE_CONTEXT_SIZE)
 
         .extern         __global_pointer$
-        .extern         arch_lowlevel_init
-        .extern         cpu_lowlevel_init
-        .extern         soc_lowlevel_init
-        .extern         board_lowlevel_init
-        .extern         arch_relocate
-        .extern         arch_init
-        .extern         cpu_init
-        .extern         soc_init
-        .extern         board_init
+        .extern         xwos_preinit
         .extern         xwos_init
+        .extern         xwos_postinit
         .extern         xwos_main
         .extern         soc_esr_c_entry
         .extern         soc_esr_nmi
@@ -114,16 +107,9 @@ soc_boot_vma:
         csrci           CSR_MCOUNTINHIBIT, MCOUNTINHIBIT_IR | MCOUNTINHIBIT_CY
 
         /* Boot Stage 3 */
-        call            arch_lowlevel_init
-        call            cpu_lowlevel_init
-        call            soc_lowlevel_init
-        call            board_lowlevel_init
+        call            xwos_preinit
         call            xwos_init
-        call            arch_relocate
-        call            arch_init
-        call            cpu_init
-        call            soc_init
-        call            board_init
+        call            xwos_postinit
         call            xwos_main
         .endfunc
 soc_boot_end:

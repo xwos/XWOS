@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内核的初始化
+ * @brief 玄武OS的初始化
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -15,7 +15,9 @@
 
 #include <xwos/standard.h>
 
+void xwos_preinit(void);
 void xwos_init(void);
+void xwos_postinit(void);
 xwer_t xwos_main(void);
 
 #endif /* xwos/lib/init.h */

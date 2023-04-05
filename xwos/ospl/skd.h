@@ -39,7 +39,6 @@ struct xwospl_skdobj_stack;
 struct xwospl_skd;
 struct xwospl_thd;
 
-xwer_t xwosplcb_skd_init_lc(void);
 struct xwospl_skd * xwosplcb_skd_get_lc(void);
 struct xwospl_skd * xwosplcb_skd_pre_swcx_lic(struct xwospl_skd * xwskd);
 struct xwospl_skd * xwosplcb_skd_post_swcx_lic(struct xwospl_skd * xwskd);
@@ -74,7 +73,7 @@ xwid_t xwospl_skd_id_lc(void);
  * @brief 玄武OS移植层：启动调度器
  * @param[in] xwskd: 调度器的指针
  */
-xwer_t xwospl_skd_start_lc(struct xwospl_skd * xwskd);
+xwer_t xwospl_skd_start(struct xwospl_skd * xwskd);
 
 /**
  * @brief 玄武OS移植层：暂停调度器，用于电源管理

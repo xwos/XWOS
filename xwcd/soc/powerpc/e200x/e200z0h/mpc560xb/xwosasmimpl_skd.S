@@ -160,10 +160,10 @@ xwospl_skd_isr_swcx_end:
  * @param[in] xwskd(r3): xwos scheduler
  */
         .section        .xwos.isr.text,"ax"
-        .global         xwospl_skd_start_lc
+        .global         xwospl_skd_start
         .align          4
-/* xwer_t xwospl_skd_start_lc(__maybe_unused struct xwos_skd * xwskd) */
-xwospl_skd_start_lc:
+/* xwer_t xwospl_skd_start(__maybe_unused struct xwos_skd * xwskd) */
+xwospl_skd_start:
         se_lwz          r4, 0x0 (r3) /* r4 = xwskd->cstk; */
         se_lwz          r1, 0x0 (r4) /* r1 = r4->sp; */
 
@@ -200,9 +200,8 @@ xwospl_skd_start_lc:
         e_addi          r1, r1, 0x50 /* delete stack frame */
         se_isync
         se_rfi
-xwospl_skd_start_lc_end:
-        .size           xwospl_skd_start_lc, \
-                        xwospl_skd_start_lc_end - xwospl_skd_start_lc
+xwospl_skd_start_end:
+        .size           xwospl_skd_start, xwospl_skd_start_end - xwospl_skd_start
 
 /**
  * @brief scheduler software interrupt

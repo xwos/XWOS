@@ -28,6 +28,8 @@ void soc_rgm_init(void);
 void soc_flash_init(void);
 void soc_ram_init(void);
 void soc_me_init(void);
+void soc_relocate_data(void);
+void soc_relocate_ivt(void);
 void soc_lowlevel_init(void);
 void soc_init(void);
 

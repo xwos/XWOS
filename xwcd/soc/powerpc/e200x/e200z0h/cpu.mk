@@ -30,5 +30,5 @@ CPU_CXXSRCS :=
 
 CPU_EOBJS :=
 
-CPU_CSRCS += cpu_init.c
+CPU_CSRCS +=
 CPU_ASRCS +=

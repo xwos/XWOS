@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief CPU描述层：初始化
+ * @brief 板级描述层：初始化
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,15 +18,15 @@
  * > limitations under the License.
  */
 
-#ifndef __cpu_init_h__
-#define __cpu_init_h__
-
 #include <xwos/standard.h>
+#include <xwcd/soc/arm/v7m/armv7m_isa.h>
+#include <xwcd/soc/arm/v7m/armv7m_nvic.h>
 
-__xwbsp_init_code
-void cpu_lowlevel_init(void);
-
-__xwbsp_init_code
-void cpu_init(void);
-
-#endif /* cpu_init.h */
+/**
+ * @brief 复位系统
+ */
+void board_reset(void)
+{
+        cm_nvic_disable_faults();
+        cm_reset_system();
+}

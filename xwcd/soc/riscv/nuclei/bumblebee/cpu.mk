@@ -25,7 +25,7 @@ CPU_CXXFLAGS := -march=rv32imac -mabi=ilp32
 CPU_LDFLAGS := -march=rv32imac -mabi=ilp32
 
 CPU_ASRCS :=
-CPU_CSRCS := cpu_init.c
+CPU_CSRCS :=
 CPU_CXXSRCS :=
 
 CPU_EOBJS :=

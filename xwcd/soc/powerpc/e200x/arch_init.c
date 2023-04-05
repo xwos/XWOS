@@ -32,27 +32,6 @@ void arch_ivpr_init(void);
 static __xwbsp_init_code
 void arch_spr_init(void);
 
-extern xwu8_t data_lma_base[];
-extern xwu8_t data_vma_base[];
-extern xwu8_t data_vma_end[];
-
-extern xwu8_t sdata_lma_base[];
-extern xwu8_t sdata_vma_base[];
-extern xwu8_t sdata_vma_end[];
-
-extern xwu8_t sbss_vma_base[];
-extern xwu8_t sbss_vma_end[];
-
-extern xwu8_t sdata2_lma_base[];
-extern xwu8_t sdata2_vma_base[];
-extern xwu8_t sdata2_vma_end[];
-
-extern xwu8_t sbss2_vma_base[];
-extern xwu8_t sbss2_vma_end[];
-
-extern xwu8_t bss_vma_base[];
-extern xwu8_t bss_vma_end[];
-
 extern const xwu8_t image_tail_lma_base[];
 extern const xwu8_t image_tail_lma_end[];
 
@@ -123,81 +102,8 @@ void arch_spr_init(void)
  * @brief lowlevel init architecture
  */
 __xwbsp_init_code
-void arch_lowlevel_init(void)
+void arch_init(void)
 {
         arch_spr_init();
         arch_ivpr_init();
-}
-
-/**
- * @brief init architecture
- */
-__xwbsp_init_code
-void arch_init(void)
-{
-}
-
-/**
- * @brief relocate data to RAM
- */
-__xwbsp_init_code
-void arch_relocate(void)
-{
-        xwsz_t count, i;
-        xwu8_t * src;
-        xwu8_t * dst;
-
-        src = data_lma_base;
-        if (data_vma_base != src) {
-                dst = data_vma_base;
-                count = (xwsz_t)data_vma_end - (xwsz_t)data_vma_base;
-                for (i = 0; i < count; i++) {
-                        *dst = *src;
-                        dst++;
-                        src++;
-                }
-        }
-
-        src = sdata_lma_base;
-        if (sdata_vma_base != src) {
-                dst = sdata_vma_base;
-                count = (xwsz_t)sdata_vma_end - (xwsz_t)sdata_vma_base;
-                for (i = 0; i < count; i++) {
-                        *dst = *src;
-                        dst++;
-                        src++;
-                }
-        }
-
-        src = sdata2_lma_base;
-        if (sdata2_vma_base != src) {
-                dst = sdata2_vma_base;
-                count = (xwsz_t)sdata2_vma_end - (xwsz_t)sdata2_vma_base;
-                for (i = 0; i < count; i++) {
-                        *dst = *src;
-                        dst++;
-                        src++;
-                }
-        }
-
-        dst = sbss_vma_base;
-        count = (xwsz_t)sbss_vma_end - (xwsz_t)sbss_vma_base;
-        for (i = 0; i < count; i++) {
-                *dst = 0;
-                dst++;
-        }
-
-        dst = sbss2_vma_base;
-        count = (xwsz_t)sbss2_vma_end - (xwsz_t)sbss2_vma_base;
-        for (i = 0; i < count; i++) {
-                *dst = 0;
-                dst++;
-        }
-
-        dst = bss_vma_base;
-        count = (xwsz_t)bss_vma_end - (xwsz_t)bss_vma_base;
-        for (i = 0; i < count; i++) {
-                *dst = 0;
-                dst++;
-        }
 }

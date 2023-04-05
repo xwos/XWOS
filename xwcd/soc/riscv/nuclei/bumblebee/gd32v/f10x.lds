@@ -96,14 +96,8 @@ SECTIONS {
         fini_array_vma_base = ADDR(.fini_array);
         fini_array_lma_base = LOADADDR(.fini_array);
 
-        .xwos.data : ALIGN(4) {
-                *(.xwos.data)
-                xwos_data_vma_end = .;
-        } > data_mr AT> code_mr
-        xwos_data_vma_base = ADDR(.xwos.data);
-        xwos_data_lma_base = LOADADDR(.xwos.data);
-
         .data : ALIGN(4) {
+                *(.xwos.data)
                 *(.data .data.* .gnu.linkonce.d.*)
                 . = ALIGN(8);
                 PROVIDE( __global_pointer$ = . + 0x800 );

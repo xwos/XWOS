@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：初始化
+ * @brief 架构描述层：image标记
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,12 +18,23 @@
  * > limitations under the License.
  */
 
-#ifndef __bdl_board_init_h__
-#define __bdl_board_init_h__
-
 #include <xwos/standard.h>
+#include <arch_image.h>
 
-void board_lowlevel_init(void);
-void board_init(void);
+extern const xwu8_t image_tail_lma_base[];
+extern const xwu8_t image_tail_lma_end[];
 
-#endif /* bdl/board_init.h */
+extern void soc_boot(void);
+
+__image_description
+const struct arch_image_description arch_image_description = {
+        .head = (void *)soc_boot,
+        .tail_flag_addr = (void *)image_tail_lma_base,
+        .end_addr = (void *)image_tail_lma_end,
+        .entry = soc_boot,
+};
+
+__image_tail
+const struct arch_image_tail arch_image_tail = {
+        .flag = ARCHCFG_IMAGE_TAILFLAG,
+};

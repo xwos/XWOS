@@ -34,6 +34,12 @@ bool xwosdl_skd_prio_tst_valid(xwpr_t prio)
 }
 
 static __xwcc_inline
+xwer_t xwosdl_skd_init_lc(void)
+{
+        return xwmp_skd_init_lc();
+}
+
+static __xwcc_inline
 xwer_t xwosdl_skd_start_lc(void)
 {
         return xwmp_skd_start_lc();

@@ -30,7 +30,7 @@ BRD_CXXSRCS :=
 
 BRD_EOBJS :=
 
-BRD_CSRCS += bdl/board_init.c
+BRD_CSRCS += bdl/init.c
 BRD_CSRCS += bdl/ocheap.c
 BRD_CSRCS += bdl/xwac/thd_stack_mempool.c
 BRD_CSRCS += bdl/xwac/xwskd_hook.c

@@ -18,12 +18,29 @@
  * > limitations under the License.
  */
 
-#ifndef __bdl_board_init_h__
-#define __bdl_board_init_h__
-
 #include <xwos/standard.h>
+#include <xwcd/soc/arm/v7m/arch_init.h>
+#include <xwcd/soc/arm/v7m/m7/stm32/soc_init.h>
+#include <bm/stm32cube/mif.h>
 
-void board_lowlevel_init(void);
-void board_init(void);
+/**
+ * @brief XWOS预初始化
+ */
+__xwbsp_init_code
+void xwos_preinit(void)
+{
+        arch_init();
+        soc_init();
+        stm32cube_lowlevel_init();
+        soc_relocate_data();
+        soc_relocate_ivt();
+}
 
-#endif /* bdl/board_init.h */
+/**
+ * @brief XWOS后初始化
+ */
+__xwbsp_init_code
+void xwos_postinit(void)
+{
+        stm32cube_init();
+}

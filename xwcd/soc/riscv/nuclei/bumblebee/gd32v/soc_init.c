@@ -19,15 +19,46 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/ospl/irq.h>
-#include <xwos/ospl/skd.h>
-#include <soc.h>
-#include <soc_init.h>
+#include <xwcd/soc/riscv/nuclei/bumblebee/gd32v/soc.h>
+#include <xwcd/soc/riscv/nuclei/bumblebee/gd32v/soc_irq.h>
+#include <xwcd/soc/riscv/nuclei/bumblebee/gd32v/soc_init.h>
 
-#if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
-static __xwos_init_code
-void soc_relocate_ivt(void);
-#endif
+
+extern xwu8_t data_lma_base[];
+extern xwu8_t data_vma_base[];
+extern xwu8_t data_vma_end[];
+
+extern xwu8_t bss_vma_base[];
+extern xwu8_t bss_vma_end[];
+
+/**
+ * @brief 重定向数据区到内存
+ */
+__xwbsp_init_code
+void soc_relocate_data(void)
+{
+        xwsz_t count, i;
+        xwu8_t * src;
+        xwu8_t * dst;
+
+        src = data_lma_base;
+        dst = data_vma_base;
+        if (dst != src) {
+                count = (xwsz_t)data_vma_end - (xwsz_t)data_vma_base;
+                for (i = 0; i < count; i++) {
+                        *dst = *src;
+                        dst++;
+                        src++;
+                }
+        }
+
+        dst = bss_vma_base;
+        count = (xwsz_t)bss_vma_end - (xwsz_t)bss_vma_base;
+        for (i = 0; i < count; i++) {
+                *dst = 0;
+                dst++;
+        }
+}
 
 extern xwu8_t evt_lma_base[];
 extern xwu8_t evt_vma_base[];
@@ -37,25 +68,10 @@ extern xwu8_t eclic_ivt_lma_base[];
 extern xwu8_t eclic_ivt_vma_base[];
 extern xwu8_t eclic_ivt_vma_end[];
 
-__xwbsp_init_code
-void soc_lowlevel_init(void)
-{
-        SysTimer_Stop();
-}
-
-__xwbsp_init_code
-void soc_init(void)
-{
-#if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
-        soc_relocate_ivt();
-#endif
-
-        soc_irqc_init();
-        xwosplcb_skd_init_lc();
-}
-
-#if (!defined(SOCCFG_RO_IVT)) || (1 != SOCCFG_RO_IVT)
-static __xwos_init_code
+/**
+ * @brief 重定向中断向量表到内存
+ */
+__xwos_init_code
 void soc_relocate_ivt(void)
 {
         xwsz_t cnt, i;
@@ -80,4 +96,13 @@ void soc_relocate_ivt(void)
                 }
         }
 }
-#endif
+
+/**
+ * @brief SOC的初始化
+ */
+__xwbsp_init_code
+void soc_init(void)
+{
+        SysTimer_Stop();
+        soc_irqc_init();
+}

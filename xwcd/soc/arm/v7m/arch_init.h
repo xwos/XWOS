@@ -23,8 +23,6 @@
 
 #include <xwos/standard.h>
 
-void arch_lowlevel_init(void);
 void arch_init(void);
-void arch_relocate(void);
 
 #endif /* arch_init.h */

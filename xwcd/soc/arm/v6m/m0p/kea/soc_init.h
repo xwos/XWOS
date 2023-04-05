@@ -23,16 +23,8 @@
 
 #include <xwos/standard.h>
 
-struct soc_flash_cfgs {
-        xwu8_t backdoor_key[8]; /**< Backdoor Comparison Key 0 ~ 7, offset: 0x0 */
-        xwu8_t reserved0[4];
-        xwu8_t reserved1[1];
-        xwu8_t fprot; /**< Non-volatile P-Flash Protection Register, offset: 0xD */
-        xwu8_t fsec; /**< Non-volatile Flash Security Register, offset: 0xE */
-        xwu8_t fopt; /**< Non-volatile Flash Option Register, offset: 0xF */
-};
-
-void soc_lowlevel_init(void);
+void soc_relocate_ivt(void);
+void soc_relocate_data(void);
 void soc_init(void);
 
 #endif /* soc_init.h */

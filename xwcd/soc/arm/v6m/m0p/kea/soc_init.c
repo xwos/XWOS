@@ -27,11 +27,14 @@
 #include <soc_sim.h>
 #include <soc_init.h>
 
-static __xwbsp_init_code
-void soc_wdg_init(void);
-
-static __xwos_init_code
-void soc_relocate_isrtable(void);
+struct soc_flash_cfgs {
+        xwu8_t backdoor_key[8]; /**< Backdoor Comparison Key 0 ~ 7, offset: 0x0 */
+        xwu8_t reserved0[4];
+        xwu8_t reserved1[1];
+        xwu8_t fprot; /**< Non-volatile P-Flash Protection Register, offset: 0xD */
+        xwu8_t fsec; /**< Non-volatile Flash Security Register, offset: 0xE */
+        xwu8_t fopt; /**< Non-volatile Flash Option Register, offset: 0xF */
+};
 
 __flscfg struct soc_flash_cfgs soc_flash_cfgs = {
         .backdoor_key = {
@@ -42,28 +45,15 @@ __flscfg struct soc_flash_cfgs soc_flash_cfgs = {
         .fopt = 0xFF,
 };
 
-__xwbsp_init_code
-void soc_lowlevel_init(void)
-{
-        soc_wdg_init();
-}
-
-__xwbsp_init_code
-void soc_init(void)
-{
-        xwer_t rc;
-
-        soc_relocate_isrtable();
-        rc = xwosplcb_skd_init_lc();
-        XWOS_BUG_ON(rc);
-}
-
 extern xwu8_t armv6m_ivt_lma_base[];
 extern xwu8_t armv6m_ivt_vma_base[];
 extern xwu8_t armv6m_ivt_vma_end[];
 
-static __xwos_init_code
-void soc_relocate_isrtable(void)
+/**
+ * @brief 重定向数据区到内存
+ */
+__xwos_init_code
+void soc_relocate_ivt(void)
 {
         xwsz_t cnt, i;
         xwu8_t * src;
@@ -80,6 +70,45 @@ void soc_relocate_isrtable(void)
         cm_scs.scb.vtor.u32 = (xwu32_t)armv6m_ivt_vma_base;
 }
 
+extern xwu8_t data_lma_base[];
+extern xwu8_t data_vma_base[];
+extern xwu8_t data_vma_end[];
+
+extern xwu8_t bss_vma_base[];
+extern xwu8_t bss_vma_end[];
+
+/**
+ * @brief 重定向数据区到内存
+ */
+__xwbsp_init_code
+void soc_relocate_data(void)
+{
+        xwsz_t count, i;
+        xwu8_t * src;
+        xwu8_t * dst;
+
+        src = data_lma_base;
+        dst = data_vma_base;
+        if (dst != src) {
+                count = (xwsz_t)data_vma_end - (xwsz_t)data_vma_base;
+                for (i = 0; i < count; i++) {
+                        *dst = *src;
+                        dst++;
+                        src++;
+                }
+        }
+
+        dst = bss_vma_base;
+        count = (xwsz_t)bss_vma_end - (xwsz_t)bss_vma_base;
+        for (i = 0; i < count; i++) {
+                *dst = 0;
+                dst++;
+        }
+}
+
+/**
+ * @brief 初始化SOC的看门狗
+ */
 static __xwbsp_init_code
 void soc_wdg_init(void)
 {
@@ -99,4 +128,13 @@ void soc_wdg_init(void)
         soc_wdg.toval.dbyte = toval;
         soc_wdg.win.dbyte = win;
         soc_wdg.cs1.byte = cs1;
+}
+
+/**
+ * @brief SOC的初始化
+ */
+__xwbsp_init_code
+void soc_init(void)
+{
+        soc_wdg_init();
 }

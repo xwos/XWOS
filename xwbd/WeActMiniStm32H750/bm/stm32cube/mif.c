@@ -99,6 +99,7 @@ void stm32cube_init(void)
         /*
            若SDRAM、QSPI Flash等可映射到内存地址上的器件未初始化完成，
            开启Cache可能会因为Cache的预取操作导致宕机。
+           开启Cache必须在上述器件初始化完成之后。
          */
 #if defined(STM32CUBECFG_ICACHE) && (1 == STM32CUBECFG_ICACHE)
         SCB_EnableICache();

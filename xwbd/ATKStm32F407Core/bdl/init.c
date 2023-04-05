@@ -19,9 +19,11 @@
  */
 
 #include <xwos/standard.h>
+#include <bdl/standard.h>
+#include <xwcd/soc/arm/v7m/arch_init.h>
+#include <xwcd/soc/arm/v7m/m4/stm32/soc_init.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/bma.h>
-#include <bdl/board_init.h>
 #include <bm/stm32cube/mif.h>
 
 #define OCHEAP_BLKSZ    BRDCFG_MM_OCHEAP_BLKSZ
@@ -36,43 +38,39 @@ extern xwsz_t ocheap_mr_size[];
 __xwbsp_data XWMM_BMA_DEF(ocheap_bma_raw, OCHEAP_BLKODR);
 __xwbsp_data struct xwmm_bma * ocheap_bma = (void *)ocheap_bma_raw;
 
-static __xwbsp_init_code
-xwer_t sys_mm_init(void);
-
-__xwbsp_init_code
-void board_lowlevel_init(void)
-{
-        stm32cube_lowlevel_init();
-}
-
-__xwbsp_init_code
-void board_init(void)
-{
-        xwer_t rc;
-
-        stm32cube_init();
-
-        rc = sys_mm_init();
-        BDL_BUG_ON(rc < 0);
-}
-
 /**
  * @brief 初始化内存管理
  */
 static __xwbsp_init_code
-xwer_t sys_mm_init(void)
+void board_mm_init(void)
 {
         xwer_t rc;
 
         rc = xwmm_bma_init(ocheap_bma, "ocheap",
                            (xwptr_t)ocheap_mr_origin, (xwsz_t)ocheap_mr_size,
                            OCHEAP_BLKSZ, OCHEAP_BLKODR);
-        if (rc < 0) {
-                goto err_ocheap_bma_init;
-        }
-        return XWOK;
+        BDL_BUG_ON(rc < 0);
+}
 
-err_ocheap_bma_init:
-        BDL_BUG();
-        return rc;
+/**
+ * @brief XWOS预初始化
+ */
+__xwbsp_init_code
+void xwos_preinit(void)
+{
+        arch_init();
+        soc_init();
+        stm32cube_lowlevel_init();
+        soc_relocate_data();
+        soc_relocate_ivt();
+}
+
+/**
+ * @brief XWOS后初始化
+ */
+__xwbsp_init_code
+void xwos_postinit(void)
+{
+        stm32cube_init();
+        board_mm_init();
 }

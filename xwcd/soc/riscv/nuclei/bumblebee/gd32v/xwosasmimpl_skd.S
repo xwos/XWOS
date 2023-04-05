@@ -115,11 +115,11 @@
  * @param[in] xwskd(a0): XWOS scheduler
  */
         .section        .xwos.isr.text,"ax"
-        .global         xwospl_skd_start_lc
+        .global         xwospl_skd_start
         .align          2 /* 1 < 2 */
-        .func           xwospl_skd_start_lc
-/* xwer_t xwospl_skd_start_lc(__maybe_unused struct xwos_skd * xwskd) */
-xwospl_skd_start_lc:
+        .func           xwospl_skd_start
+/* xwer_t xwospl_skd_start(__maybe_unused struct xwos_skd * xwskd) */
+xwospl_skd_start:
         /* Load SP */
         LOAD            tp, 0 * REGBYTES (a0) /* t0 = xwskd->cstk */
         LOAD            sp, 0 * REGBYTES (tp) /* sp = cstk->sp */
@@ -128,8 +128,8 @@ xwospl_skd_start_lc:
         /* Return to thread main function */
         mret
         .endfunc
-xwospl_skd_start_lc_end:
-        .size           xwospl_skd_start_lc, xwospl_skd_start_lc_end - xwospl_skd_start_lc
+xwospl_skd_start_end:
+        .size           xwospl_skd_start, xwospl_skd_start_end - xwospl_skd_start
 
 
 /**

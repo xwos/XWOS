@@ -53,6 +53,7 @@ xwer_t xwos_main(void)
 {
         xwer_t rc;
 
+        xwos_skd_init_lc();
         rc = xwos_thd_init(&main_thd, &main_thdd,
                            &main_thd_desc.attr,
                            main_thd_desc.func,

@@ -57,16 +57,9 @@ void arch_isr_reset(void)
 {
         __asm__ volatile(".syntax       unified");
         __asm__ volatile("      cpsid   i");
-        __asm__ volatile("      bl      arch_lowlevel_init");
-        __asm__ volatile("      bl      cpu_lowlevel_init");
-        __asm__ volatile("      bl      soc_lowlevel_init");
-        __asm__ volatile("      bl      board_lowlevel_init");
+        __asm__ volatile("      bl      xwos_preinit");
         __asm__ volatile("      bl      xwos_init");
-        __asm__ volatile("      bl      arch_relocate");
-        __asm__ volatile("      bl      arch_init");
-        __asm__ volatile("      bl      cpu_init");
-        __asm__ volatile("      bl      soc_init");
-        __asm__ volatile("      bl      board_init");
+        __asm__ volatile("      bl      xwos_postinit");
         __asm__ volatile("      bl      xwos_main");
 }
 
@@ -184,25 +177,34 @@ void arch_isr_svc(void)
         __asm__ volatile(".2byte        (svc_9 - svc_table) / 2");
         __asm__ volatile(".2byte        (svc_10 - svc_table) / 2");
         __asm__ volatile(".2byte        (svc_11 - svc_table) / 2");
+        __asm__ volatile(".2byte        (svc_12 - svc_table) / 2");
+        __asm__ volatile(".2byte        (svc_13 - svc_table) / 2");
+        __asm__ volatile(".2byte        (svc_14 - svc_table) / 2");
+        __asm__ volatile(".2byte        (svc_15 - svc_table) / 2");
         __asm__ volatile(".align        2");
-        __asm__ volatile("svc_0:"); /* case 0: */
-        __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 */
-        __asm__ volatile("      b       arch_skd_svcsr_start");
-        __asm__ volatile("svc_1:"); /* case 1: privilege_start */
-        __asm__ volatile("      mrs     r0, control");
-        __asm__ volatile("      orr     r0, #1");
-        __asm__ volatile("      msr     control, r0");
         __asm__ volatile("      bx      lr");
-        __asm__ volatile("svc_2:"); /* case 2: privilege_end */
-        __asm__ volatile("      mrs     r0, control");
-        __asm__ volatile("      bic     r0, #1");
-        __asm__ volatile("      msr     control, r0");
+        __asm__ volatile("svc_0:"); /* case 0: */
+        __asm__ volatile("      bx      lr");
+        __asm__ volatile("svc_1:"); /* case 1: */
+        __asm__ volatile("      bx      lr");
+        __asm__ volatile("svc_2:"); /* case 2: */
         __asm__ volatile("      bx      lr");
         __asm__ volatile("svc_3:"); /* case 3: */
         __asm__ volatile("      bx      lr");
         __asm__ volatile("svc_4:"); /* case 4: */
         __asm__ volatile("      bx      lr");
-        __asm__ volatile("svc_5:"); /* case 5: freeze thread */
+        __asm__ volatile("svc_5:"); /* case 5: */
+        __asm__ volatile("      bx      lr");
+        __asm__ volatile("svc_6:"); /* case 6: */
+        __asm__ volatile("      bx      lr");
+        __asm__ volatile("svc_7:"); /* case 7: */
+        __asm__ volatile("      bx      lr");
+        __asm__ volatile("svc_8:"); /* case 8: XWSC */
+        __asm__ volatile("      b       arch_svc_xwsc");
+        __asm__ volatile("svc_9:"); /* case 9: Start XWOS */
+        __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 */
+        __asm__ volatile("      b       arch_svc_skd_start");
+        __asm__ volatile("svc_10:"); /* case 10: Freeze Thread */
         __asm__ volatile("      push    {r0, lr}");
         __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 value: cthd */
         __asm__ volatile("      bl      xwosplcb_thd_freeze_lic");
@@ -210,9 +212,7 @@ void arch_isr_svc(void)
         __asm__ volatile("      pop     {r0, lr}");
         __asm__ volatile("      str     r1, [r0, #0]"); /* save the return value */
         __asm__ volatile("      bx      lr");
-        __asm__ volatile("svc_6:"); /* case 6: */
-        __asm__ volatile("      bx      lr");
-        __asm__ volatile("svc_7:"); /* case 7: thread exits */
+        __asm__ volatile("svc_11:"); /* case 11: thread exits */
         __asm__ volatile("      push    {r0, lr}");
         __asm__ volatile("      ldr     r1, [r0, #4]"); /* get old r1 value */
         __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 value */
@@ -221,9 +221,7 @@ void arch_isr_svc(void)
         __asm__ volatile("      pop     {r0, lr}");
         __asm__ volatile("      str     r1, [r0, #0]"); /* save the return value */
         __asm__ volatile("      bx      lr");
-        __asm__ volatile("svc_8:"); /* case 8: xwsc */
-        __asm__ volatile("      b       arch_svc_xwsc");
-        __asm__ volatile("svc_9:"); /* case 9: */
+        __asm__ volatile("svc_12:"); /* case 12: Suspend scheduler */
         __asm__ volatile("      push    {r0, lr}");
         __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 value: xwskd */
         __asm__ volatile("      bl      xwosplcb_skd_suspend_lic");
@@ -231,7 +229,7 @@ void arch_isr_svc(void)
         __asm__ volatile("      pop     {r0, lr}");
         __asm__ volatile("      str     r1, [r0, #0]"); /* save the return value */
         __asm__ volatile("      bx      lr");
-        __asm__ volatile("svc_10:"); /* case 10: */
+        __asm__ volatile("svc_13:"); /* case 13: Resume scheduler */
         __asm__ volatile("      push    {r0, lr}");
         __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 value: xwskd */
         __asm__ volatile("      bl      xwosplcb_skd_resume_lic");
@@ -239,7 +237,7 @@ void arch_isr_svc(void)
         __asm__ volatile("      pop     {r0, lr}");
         __asm__ volatile("      str     r1, [r0, #0]"); /* save the return value */
         __asm__ volatile("      bx      lr");
-        __asm__ volatile("svc_11:"); /* case 11: thread migrate */
+        __asm__ volatile("svc_14:"); /* case 14: Migrate thread */
 #if defined(XWOS_CFG_CORE__mp)
         __asm__ volatile("      push    {r0, lr}");
         __asm__ volatile("      ldr     r1, [r0, #4]"); /* get old r1 value */
@@ -249,6 +247,8 @@ void arch_isr_svc(void)
         __asm__ volatile("      pop     {r0, lr}");
         __asm__ volatile("      str     r1, [r0, #0]"); /* save the return value */
 #endif
+        __asm__ volatile("      bx      lr");
+        __asm__ volatile("svc_15:"); /* case 15: */
         __asm__ volatile("      bx      lr");
 }
 
