@@ -15,9 +15,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/up/plwq.h>
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-#  include <xwos/up/sync/obj.h>
-#endif
+#include <xwos/up/sync/obj.h>
 
 struct xwup_thd;
 
@@ -25,9 +23,7 @@ struct xwup_thd;
  * @brief 条件量对象
  */
 struct xwup_cond {
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
         struct xwup_synobj synobj; /**< C语言面向对象：继承struct xwup_synobj */
-#endif
         bool neg; /**< 是否为负 */
         struct xwup_plwq wq; /**< 等待队列 */
 };

@@ -14,9 +14,7 @@
 #define __xwos_up_sync_vsem_h__
 
 #include <xwos/standard.h>
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-#  include <xwos/up/sync/obj.h>
-#endif
+#include <xwos/up/sync/obj.h>
 
 struct xwup_evt;
 
@@ -24,9 +22,7 @@ struct xwup_evt;
  * @brief 信号量的虚基类
  */
 /* abstract */ struct xwup_vsem {
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
         struct xwup_synobj synobj; /**< C语言面向对象：继承struct xwup_synobj */
-#endif
         xwssq_t count; /**< 信号量计数器：如果这个成员的值<0，信号量处于负状态。*/
         xwssq_t max; /**< 信号量计数器的最大值 */
 };

@@ -98,7 +98,11 @@ XWOS_CSRCS += up/osdl/thd.c
 XWOS_CSRCS += up/osdl/swt.c
 XWOS_CSRCS += up/osdl/lock/mtx.c
 XWOS_CSRCS += up/osdl/sync/sem.c
-XWOS_CSRCS += up/osdl/sync/cond.c
-XWOS_CSRCS += up/osdl/sync/flg.c
-XWOS_CSRCS += up/osdl/sync/sel.c
-XWOS_CSRCS += up/osdl/sync/br.c
+ifeq ($(XWUPCFG_SYNC_COND),y)
+    XWOS_CSRCS += up/osdl/sync/cond.c
+endif
+ifeq ($(XWUPCFG_SYNC_EVT),y)
+    XWOS_CSRCS += up/osdl/sync/flg.c
+    XWOS_CSRCS += up/osdl/sync/sel.c
+    XWOS_CSRCS += up/osdl/sync/br.c
+endif

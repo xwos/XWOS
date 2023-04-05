@@ -22,11 +22,12 @@
 #include <xwos/up/tt.h>
 #include <xwos/up/thd.h>
 #include <xwos/up/plwq.h>
+#include <xwos/up/sync/obj.h>
 #if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-#  include <xwos/up/sync/obj.h>
 #  include <xwos/up/sync/evt.h>
 #endif
 #include <xwos/up/lock/seqlock.h>
+#include <xwos/up/lock/fakespinlock.h>
 #if (defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX))
 #  include <xwos/up/lock/mtx.h>
 #elif (defined(XWUPCFG_LOCK_FAKEMTX) && (1 == XWUPCFG_LOCK_FAKEMTX))
