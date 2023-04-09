@@ -87,7 +87,9 @@ enum xwssc_msg_qos_em {
         XWSSC_MSG_QOS_NUM,
 
         XWSSC_MSG_QOS_CHKSUM_MSK = (1 << 0U),
-        XWSSC_MSG_QOS_ACK_MSK = (1 << 1U),
+        XWSSC_MSG_QOS_RELIABLE_MSK = (1 << 1U),
+
+        XWSSC_MSG_QOS_MSK = XWSSC_MSG_QOS_CHKSUM_MSK | XWSSC_MSG_QOS_RELIABLE_MSK,
 };
 
 /**

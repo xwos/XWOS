@@ -28,16 +28,16 @@
 #include <xwmd/isc/xwssc/mif.h>
 
 /**
- * @brief 控制帧模板：同步帧
+ * @brief 控制帧模板：连接帧
  */
-__xwmd_rodata const xwu8_t xwssc_cmd_connect[] = {
+__xwmd_rodata const xwu8_t xwssc_frm_connect[] = {
         (xwu8_t)XWSSC_SOF,
         (xwu8_t)XWSSC_SOF,
-        (xwu8_t)0x66, /* 帧头长度 | mirror */
-        (xwu8_t)0x8E, /* 帧头校验和 */
-        (xwu8_t)XWSSC_PORT_CMD, /* 端口:0 */
-        (xwu8_t)XWSSC_PORT0_CMDID_CONNECT, /* 同步帧的命令ID */
-        (xwu8_t)XWSSC_MSG_QOS_3, /* Qos: 可靠消息，有CRC校验码 */
+        (xwu8_t)0x66, /* 帧头长度 | 长度的镜像 */
+        (xwu8_t)0x7E, /* 帧头校验和 */
+        (xwu8_t)0x0, /* 端口：不使用，默认为0 */
+        (xwu8_t)0x0, /* ID：不使用，默认为0 */
+        (xwu8_t)XWSSC_MSG_QOS_3 | XWSSC_FLAG_CONNECT, /* Qos: 可靠消息 + CRC校验码; Flag: CONNECT */
         (xwu8_t)0x8, /* SDU长度 */
         (xwu8_t)'X', /* sdu[0]: protocol 0 */
         (xwu8_t)'W', /* sdu[1]: protocol 1 */
@@ -56,16 +56,16 @@ __xwmd_rodata const xwu8_t xwssc_cmd_connect[] = {
 };
 
 /**
- * @brief 控制帧模板：同步应答帧
+ * @brief 控制帧模板：连接应答帧
  */
-__xwmd_rodata const xwu8_t xwssc_cmd_connect_ack[] = {
+__xwmd_rodata const xwu8_t xwssc_ackfrm_connect[] = {
         (xwu8_t)XWSSC_SOF,
         (xwu8_t)XWSSC_SOF,
-        (xwu8_t)0x66, /* 帧头长度 | mirror */
-        (xwu8_t)0x0E, /* 帧头校验和 */
-        (xwu8_t)XWSSC_PORT_CMD, /* 端口:0 */
-        (xwu8_t)(XWSSC_PORT0_CMDID_CONNECT | XWSSC_ID_ACK), /* 同步帧的命令ID | 应答 */
-        (xwu8_t)XWSSC_MSG_QOS_3, /* Qos: 可靠消息，有CRC校验码 */
+        (xwu8_t)0x66, /* 帧头长度 | 长度的镜像 */
+        (xwu8_t)0xFD, /* 帧头校验和 */
+        (xwu8_t)0x0, /* 端口：不使用，默认为0 */
+        (xwu8_t)0x0, /* ID：不使用，默认为0 */
+        (xwu8_t)(XWSSC_MSG_QOS_3 | XWSSC_FLAG_CONNECT | XWSSC_FLAG_ACK), /* Qos: 可靠消息 + CRC校验码; Flag: CONNECT | ACK */
         (xwu8_t)0x8, /* SDU长度 */
         (xwu8_t)'X', /* sdu[0]: protocol 0 */
         (xwu8_t)'W', /* sdu[1]: protocol 1 */
@@ -86,21 +86,34 @@ __xwmd_rodata const xwu8_t xwssc_cmd_connect_ack[] = {
 /**
  * @brief 数据应答帧模板
  */
-__xwmd_rodata const xwu8_t xwssc_sdu_ack[] = {
+__xwmd_rodata const xwu8_t xwssc_ackfrm_sdu[] = {
         (xwu8_t)XWSSC_SOF,
         (xwu8_t)XWSSC_SOF,
         (xwu8_t)0x66, /* 帧头长度 | mirror */
-        /* 以下数据需依据实际情况填充 */
-        (xwu8_t)0x0, /* 帧头校验和 */
-        (xwu8_t)0x0, /* 端口 */
-        (xwu8_t)XWSSC_ID_ACK, /* id | XWSSC_ID_ACK */
-        (xwu8_t)XWSSC_MSG_QOS_3, /* Qos: 可靠消息，有CRC校验码 */
+        (xwu8_t)0x0, /* 帧头校验和，依据实际情况填充 */
+        (xwu8_t)0x0, /* 端口，依据实际情况填充 */
+        (xwu8_t)0x0, /* ID，依据实际情况填充 */
+        (xwu8_t)XWSSC_MSG_QOS_3 | XWSSC_FLAG_ACK, /* Qos: 可靠消息 + CRC校验码; Flag: ACK */
         (xwu8_t)0x1, /* SDU长度 */
-        (xwu8_t)0, /* sdu[0]: 应答 */
-        (xwu8_t)0, /* CRC32 第一字节（最高有效字节） */
-        (xwu8_t)0, /* CRC32 第二字节 */
-        (xwu8_t)0, /* CRC32 第三字节 */
-        (xwu8_t)0, /* CRC32 第四字节（第低有效字节） */
+        (xwu8_t)0, /* sdu[0]: 应答，依据实际情况填充 */
+        (xwu8_t)0, /* CRC32 第一字节（最高有效字节），依据实际情况填充 */
+        (xwu8_t)0, /* CRC32 第二字节，依据实际情况填充 */
+        (xwu8_t)0, /* CRC32 第三字节，依据实际情况填充 */
+        (xwu8_t)0, /* CRC32 第四字节（第低有效字节），依据实际情况填充 */
+        (xwu8_t)XWSSC_EOF,
+        (xwu8_t)XWSSC_EOF,
+};
+
+/**
+ * @brief 空白帧
+ */
+__xwmd_rodata const xwu8_t xwssc_frm_blank[] = {
+        (xwu8_t)XWSSC_EOF,
+        (xwu8_t)XWSSC_EOF,
+        (xwu8_t)XWSSC_EOF,
+        (xwu8_t)XWSSC_EOF,
+        (xwu8_t)XWSSC_EOF,
+        (xwu8_t)XWSSC_EOF,
         (xwu8_t)XWSSC_EOF,
         (xwu8_t)XWSSC_EOF,
 };
@@ -133,16 +146,16 @@ void xwssc_rxq_pub(struct xwssc * xwssc,
                    xwu8_t port);
 
 static __xwmd_code
-xwer_t xwssc_rx_cmd_connect(struct xwssc * xwssc, union xwssc_slot * slot);
+xwer_t xwssc_rx_frm_connect(struct xwssc * xwssc, union xwssc_slot * slot);
 
 static __xwmd_code
-xwer_t xwssc_rx_cmd_connect_ack(struct xwssc * xwssc, union xwssc_slot * slot);
+xwer_t xwssc_rx_ack_connect(struct xwssc * xwssc, union xwssc_slot * slot);
 
 static __xwmd_code
-xwer_t xwssc_rx_sdu(struct xwssc * xwssc, union xwssc_slot * slot);
+xwer_t xwssc_rx_frm_sdu(struct xwssc * xwssc, union xwssc_slot * slot);
 
 static __xwmd_code
-xwer_t xwssc_rx_sdu_ack(struct xwssc * xwssc, union xwssc_slot * slot);
+xwer_t xwssc_rx_ack_sdu(struct xwssc * xwssc, union xwssc_slot * slot);
 
 static __xwmd_code
 xwer_t xwssc_rx_frm(struct xwssc * xwssc, union xwssc_slot * slot);
@@ -157,10 +170,10 @@ static __xwmd_code
 void xwssc_txq_add_tail(struct xwssc * xwssc, struct xwssc_carrier * car);
 
 static __xwmd_code
-xwer_t xwssc_tx_cmd_connect(struct xwssc * xwssc);
+xwer_t xwssc_tx_frm_connect(struct xwssc * xwssc);
 
 static __xwmd_code
-xwer_t xwssc_tx_cmd_connect_ack(struct xwssc * xwssc);
+xwer_t xwssc_tx_ack_connect(struct xwssc * xwssc);
 
 static __xwmd_code
 xwer_t xwssc_connect(struct xwssc * xwssc);
@@ -272,7 +285,7 @@ xwu8_t xwssc_cal_head_chksum(xwu8_t data[], xwsz_t size)
                 chksum += (xwu16_t)data[i];
         }
         while (chksum & 0xFF00U) {
-                chksum = (xwu16_t)(chksum >> 16U) + (xwu16_t)(chksum & 0xFFU);
+                chksum = (xwu16_t)(chksum >> 8U) + (xwu16_t)(chksum & 0xFFU);
         }
         chksum ^= 0xFF;
         return (xwu8_t)chksum;
@@ -297,7 +310,7 @@ bool xwssc_chk_head(xwu8_t data[], xwsz_t size)
                 chksum += (xwu16_t)data[i];
         }
         while (chksum & 0xFF00U) {
-                chksum = (xwu16_t)(chksum >> 16U) + (xwu16_t)(chksum & 0xFFU);
+                chksum = (xwu16_t)(chksum >> 8U) + (xwu16_t)(chksum & 0xFFU);
         }
         return (chksum == 0xFF);
 }
@@ -384,7 +397,7 @@ union xwssc_slot * xwssc_rxq_choose(struct xwssc * xwssc, xwu8_t port)
  * @return 错误码
  */
 static __xwmd_code
-xwer_t xwssc_rx_cmd_connect(struct xwssc * xwssc, union xwssc_slot * slot)
+xwer_t xwssc_rx_frm_connect(struct xwssc * xwssc, union xwssc_slot * slot)
 {
         xwu8_t * sdupos;
         xwer_t rc;
@@ -402,7 +415,7 @@ xwer_t xwssc_rx_cmd_connect(struct xwssc * xwssc, union xwssc_slot * slot)
         if ((0 == strcmp(proto, "XWSSC")) &&
             (XWSSC_VERSION_MAJOR == sdupos[5]) &&
             (XWSSC_VERSION_MINOR == sdupos[6])) {
-                rc = xwssc_tx_cmd_connect_ack(xwssc);
+                rc = xwssc_tx_ack_connect(xwssc);
                 if (XWOK == rc) {
                         xwaop_write(xwu32_t, &xwssc->rxq.cnt, 0, NULL);
                 }/* else {} */
@@ -420,7 +433,7 @@ xwer_t xwssc_rx_cmd_connect(struct xwssc * xwssc, union xwssc_slot * slot)
  * @return 错误码
  */
 static __xwmd_code
-xwer_t xwssc_rx_cmd_connect_ack(struct xwssc * xwssc, union xwssc_slot * slot)
+xwer_t xwssc_rx_ack_connect(struct xwssc * xwssc, union xwssc_slot * slot)
 {
         xwu8_t * sdupos;
         xwsq_t hwifst;
@@ -441,8 +454,7 @@ xwer_t xwssc_rx_cmd_connect_ack(struct xwssc * xwssc, union xwssc_slot * slot)
         if (!(XWSSC_HWIFST_CONNECT & hwifst)) {
                 if ((0 == strcmp(proto, "XWSSC")) &&
                     (XWSSC_VERSION_MAJOR == sdupos[5]) &&
-                    (XWSSC_VERSION_MINOR == sdupos[6]) &&
-                    (XWSSC_VERSION_REVISION == sdupos[7])) {
+                    (XWSSC_VERSION_MINOR == sdupos[6])) {
                         xwaop_write(xwu32_t, &xwssc->txq.cnt, 0, NULL);
                         xwaop_s1m(xwsq_t, &xwssc->hwifst, XWSSC_HWIFST_CONNECT,
                                   NULL, NULL);
@@ -463,7 +475,7 @@ xwer_t xwssc_rx_cmd_connect_ack(struct xwssc * xwssc, union xwssc_slot * slot)
  *   - (xwu8_t)XWSSC_SOF,
  *   - (xwu8_t)XWSSC_SOF,
  *   - (xwu8_t)帧头长度 | 镜像反转
- *   - (xwu8_t)帧头校验和，从下一字节开始计算
+ *   - (xwu8_t)帧头校验和
  *   - (xwu8_t)端口
  *   - (xwu8_t)ID
  *   - (xwu8_t)QoS
@@ -477,7 +489,7 @@ xwer_t xwssc_rx_cmd_connect_ack(struct xwssc * xwssc, union xwssc_slot * slot)
  *   - (xwu8_t)XWSSC_EOF,
  */
 static __xwmd_code
-xwer_t xwssc_rx_sdu(struct xwssc * xwssc, union xwssc_slot * slot)
+xwer_t xwssc_rx_frm_sdu(struct xwssc * xwssc, union xwssc_slot * slot)
 {
         xwu32_t rxcnt;
         xwu8_t rmtid, lclid;
@@ -492,10 +504,10 @@ xwer_t xwssc_rx_sdu(struct xwssc * xwssc, union xwssc_slot * slot)
                   "[RX] port:0x%X, qos:0x%X, frmsize:0x%X, "
                   "Remote ID:0x%X, Local ID:0x%X\n",
                   port, slot->rx.frm.head.qos, slot->rx.frmsize, rmtid, lclid);
-        if (slot->rx.frm.head.qos & XWSSC_MSG_QOS_ACK_MSK) {
+        if (slot->rx.frm.head.qos & XWSSC_MSG_QOS_RELIABLE_MSK) {
                 if (__xwcc_likely(rmtid == lclid)) {
                         /* 收到数据 */
-                        rc = xwssc_tx_sdu_ack(xwssc, port, rmtid, XWSSC_ACK_OK);
+                        rc = xwssc_tx_ack_sdu(xwssc, port, rmtid, XWSSC_ACK_OK);
                         if (XWOK == rc) {
                                 xwaop_add(xwu32_t, &xwssc->rxq.cnt, 1, NULL, NULL);
                                 xwssc_rxq_pub(xwssc, slot, port);
@@ -504,11 +516,11 @@ xwer_t xwssc_rx_sdu(struct xwssc * xwssc, union xwssc_slot * slot)
                         }
                 } else if (XWSSC_ID(rmtid + 1) == lclid) {
                         /* 收到重复的数据 */
-                        rc = xwssc_tx_sdu_ack(xwssc, port, rmtid, XWSSC_ACK_EALREADY);
+                        rc = xwssc_tx_ack_sdu(xwssc, port, rmtid, XWSSC_ACK_EALREADY);
                         xwmm_bma_free(xwssc->mempool, slot);
                 } else {
                         /* 连接被复位 */
-                        rc = xwssc_tx_sdu_ack(xwssc, port, rmtid, XWSSC_ACK_ECONNRESET);
+                        rc = xwssc_tx_ack_sdu(xwssc, port, rmtid, XWSSC_ACK_ECONNRESET);
                         xwmm_bma_free(xwssc->mempool, slot);
                 }
         } else {
@@ -525,7 +537,7 @@ xwer_t xwssc_rx_sdu(struct xwssc * xwssc, union xwssc_slot * slot)
  * @return 错误码
  */
 static __xwmd_code
-xwer_t xwssc_rx_sdu_ack(struct xwssc * xwssc, union xwssc_slot * slot)
+xwer_t xwssc_rx_ack_sdu(struct xwssc * xwssc, union xwssc_slot * slot)
 {
         xwu8_t * sdupos;
         xwu8_t rmtid;
@@ -550,7 +562,7 @@ xwer_t xwssc_rx_sdu_ack(struct xwssc * xwssc, union xwssc_slot * slot)
                 xwos_cond_unicast(&xwssc->txq.cscond);
         } else {
                 xwos_mtx_unlock(&xwssc->txq.csmtx);
-                xwssclogf(ERR, "[RX] no sending frame!\n");
+                xwssclogf(ERR, "[RX] Nothing sending frame!\n");
         }
 
 err_mtx_lock:
@@ -568,15 +580,11 @@ static __xwmd_code
 xwer_t xwssc_rx_frm(struct xwssc * xwssc, union xwssc_slot * slot)
 {
         xwer_t rc;
-        xwu8_t port;
-        xwu8_t id;
         xwu8_t qos;
 
-        port = slot->rx.frm.head.port;
-        id = slot->rx.frm.head.id;
         qos = slot->rx.frm.head.qos;
         xwssclogf(DEBUG, "[RX] RX Frame(port:0x%X, ID:0x%X, qos:0x%X)\n",
-                  port, id, qos);
+                  slot->rx.frm.head.port, slot->rx.frm.head.id, qos);
         if (XWSSC_MSG_QOS_CHKSUM_MSK & qos) {
                 rc = xwssc_chk_frm(slot);
                 if (rc < 0) {
@@ -584,17 +592,17 @@ xwer_t xwssc_rx_frm(struct xwssc * xwssc, union xwssc_slot * slot)
                         goto err_badmsg;
                 }
         }
-        if (XWSSC_PORT_CMD == port) {
-                if (XWSSC_PORT0_CMDID_CONNECT == id) {
-                        rc = xwssc_rx_cmd_connect(xwssc, slot);
+        if (XWSSC_FLAG_CONNECT & qos) {
+                if (XWSSC_FLAG_ACK & qos) {
+                        rc = xwssc_rx_ack_connect(xwssc, slot);
                 } else {
-                        rc = xwssc_rx_cmd_connect_ack(xwssc, slot);
+                        rc = xwssc_rx_frm_connect(xwssc, slot);
                 }
         } else {
-                if (XWSSC_ID_ACK & id) {
-                        rc = xwssc_rx_sdu_ack(xwssc, slot);
+                if (XWSSC_FLAG_ACK & qos) {
+                        rc = xwssc_rx_ack_sdu(xwssc, slot);
                 } else {
-                        rc = xwssc_rx_sdu(xwssc, slot);
+                        rc = xwssc_rx_frm_sdu(xwssc, slot);
                 }
         }
 
@@ -773,16 +781,16 @@ struct xwssc_carrier * xwssc_txq_choose(struct xwssc * xwssc)
  * @return 错误码
  */
 static __xwmd_code
-xwer_t xwssc_tx_cmd_connect(struct xwssc * xwssc)
+xwer_t xwssc_tx_frm_connect(struct xwssc * xwssc)
 {
         xwer_t rc;
 
-        xwssclogf(DEBUG, "[TX] TX Cmd: SYNC.\n");
+        xwssclogf(DEBUG, "[TX] Sending CMD: CONNECT ...\n");
         rc = xwos_mtx_lock(&xwssc->txq.csmtx);
         if (XWOK == rc) {
                 rc = xwssc_hwifal_tx(xwssc,
-                                     (xwu8_t *)xwssc_cmd_connect,
-                                     sizeof(xwssc_cmd_connect));
+                                     (xwu8_t *)xwssc_frm_connect,
+                                     sizeof(xwssc_frm_connect));
                 xwos_mtx_unlock(&xwssc->txq.csmtx);
         }/* else {} */
         return rc;
@@ -795,16 +803,16 @@ xwer_t xwssc_tx_cmd_connect(struct xwssc * xwssc)
  * @return 错误码
  */
 static __xwmd_code
-xwer_t xwssc_tx_cmd_connect_ack(struct xwssc * xwssc)
+xwer_t xwssc_tx_ack_connect(struct xwssc * xwssc)
 {
         xwer_t rc;
 
-        xwssclogf(DEBUG, "[TX] TX ACK: SYNC.\n");
+        xwssclogf(DEBUG, "[TX] Sending ACK: CONNECT ...\n");
         rc = xwos_mtx_lock(&xwssc->txq.csmtx);
         if (XWOK == rc) {
                 rc = xwssc_hwifal_tx(xwssc,
-                                     (xwu8_t *)xwssc_cmd_connect_ack,
-                                     sizeof(xwssc_cmd_connect_ack));
+                                     (xwu8_t *)xwssc_ackfrm_connect,
+                                     sizeof(xwssc_ackfrm_connect));
                 xwos_mtx_unlock(&xwssc->txq.csmtx);
         }/* else {} */
         return rc;
@@ -820,9 +828,9 @@ xwer_t xwssc_tx_cmd_connect_ack(struct xwssc * xwssc)
  * @return 错误码
  */
 __xwmd_code
-xwer_t xwssc_tx_sdu_ack(struct xwssc * xwssc, xwu8_t port, xwu8_t id, xwu8_t ack)
+xwer_t xwssc_tx_ack_sdu(struct xwssc * xwssc, xwu8_t port, xwu8_t id, xwu8_t ack)
 {
-        xwu8_t stream[sizeof(xwssc_sdu_ack)];
+        xwu8_t stream[sizeof(xwssc_ackfrm_sdu)];
         struct xwssc_frm * frm;
         xwu8_t * sdupos;
         xwu8_t * crc32pos;
@@ -831,11 +839,14 @@ xwer_t xwssc_tx_sdu_ack(struct xwssc * xwssc, xwu8_t port, xwu8_t id, xwu8_t ack
         xwu32_t crc32;
         xwer_t rc;
 
-        xwssclogf(DEBUG, "[TX] TX ACK:0x%X, ID:0x%X\n", ack, id);
+        xwssclogf(DEBUG, "[TX] ACK:0x%X, ID:0x%X\n", ack, id);
         frm = (struct xwssc_frm *)stream;
-        memcpy(stream, xwssc_sdu_ack, sizeof(xwssc_sdu_ack));
+        memcpy(stream, xwssc_ackfrm_sdu, sizeof(xwssc_ackfrm_sdu));
         frm->head.port = port;
-        frm->head.id = id | XWSSC_ID_ACK;
+        frm->head.id = id;
+        frm->head.chksum = 0; /* 计算前先填0 */
+        calsz = XWSSC_FRMHEAD_SIZE(frm->head.headsize);
+        frm->head.chksum = xwssc_cal_head_chksum((xwu8_t *)&frm->head, calsz);
         sdupos = XWSSC_SDUPOS(&frm->head);
         sdupos[0] = ack;
 
@@ -849,7 +860,7 @@ xwer_t xwssc_tx_sdu_ack(struct xwssc * xwssc, xwu8_t port, xwu8_t id, xwu8_t ack
         crc32pos[3] = (xwu8_t)((crc32 >> 0U) & 0xFFU);
         rc = xwos_mtx_lock(&xwssc->txq.csmtx);
         if (XWOK == rc) {
-                rc = xwssc_hwifal_tx(xwssc, stream, sizeof(xwssc_sdu_ack));
+                rc = xwssc_hwifal_tx(xwssc, stream, sizeof(xwssc_ackfrm_sdu));
                 xwos_mtx_unlock(&xwssc->txq.csmtx);
         }/* else {} */
         return rc;
@@ -874,7 +885,7 @@ xwer_t xwssc_tx_sdu_ack(struct xwssc * xwssc, xwu8_t port, xwu8_t id, xwu8_t ack
  *   - (xwu8_t)XWSSC_SOF,
  *   - (xwu8_t)XWSSC_SOF,
  *   - (xwu8_t)帧头长度 | 镜像反转
- *   - (xwu8_t)帧头校验和，从下一字节开始计算
+ *   - (xwu8_t)帧头校验和
  *   - (xwu8_t)端口
  *   - (xwu8_t)ID
  *   - (xwu8_t)QoS
@@ -947,7 +958,7 @@ xwer_t xwssc_eq_msg(struct xwssc * xwssc,
         frmheadszmir = xwbop_rbit(xwu8_t, frmheadsz);
         slot->tx.frm.head.headsize = frmheadsz | frmheadszmir;
         slot->tx.frm.head.port = port;
-        slot->tx.frm.head.qos = qos;
+        slot->tx.frm.head.qos = qos & XWSSC_MSG_QOS_MSK;
         memcpy(slot->tx.frm.head.ecsdusz, ecsdusz, ecsize);
         /* slot->tx.frm.head.id 与 slot->tx.frm.head.chksum 待发送时才能确定 */
 
@@ -1008,7 +1019,7 @@ xwer_t xwssc_connect(struct xwssc * xwssc)
                 if (XWSSC_HWIFST_CONNECT & hwifst) {
                         break;
                 }
-                rc = xwssc_tx_cmd_connect(xwssc);
+                rc = xwssc_tx_frm_connect(xwssc);
                 if (XWOK == rc) {
                         rc = xwssc_doze(1);
                         if (rc < 0) {
@@ -1115,7 +1126,7 @@ xwer_t xwssc_tx_frm(struct xwssc * xwssc, struct xwssc_carrier * car)
         xwaop_read(xwu32_t, &xwssc->txq.cnt, &txcnt);
         id = XWSSC_ID(txcnt);
         car->slot->tx.frm.head.id = id;
-        car->slot->tx.frm.head.chksum = 0;
+        car->slot->tx.frm.head.chksum = 0; /* 计算前先填0 */
         calsz = XWSSC_FRMHEAD_SIZE(car->slot->tx.frm.head.headsize);
         car->slot->tx.frm.head.chksum =
                         xwssc_cal_head_chksum((xwu8_t *)&car->slot->tx.frm.head,
@@ -1128,7 +1139,7 @@ xwer_t xwssc_tx_frm(struct xwssc * xwssc, struct xwssc_carrier * car)
         if (rc < 0) {
                 goto err_mtx_lock;
         }
-        if (car->slot->tx.frm.head.qos & XWSSC_MSG_QOS_ACK_MSK) {
+        if (car->slot->tx.frm.head.qos & XWSSC_MSG_QOS_RELIABLE_MSK) {
                 xwaop_s1m(xwsq_t, &xwssc->hwifst, XWSSC_HWIFST_TX, NULL, NULL);
                 do {
                         xwssclogf(DEBUG,

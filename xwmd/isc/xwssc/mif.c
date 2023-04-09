@@ -338,7 +338,6 @@ void xwssc_txcb_notify(struct xwssc * xwssc, xwssc_txh_t txh, xwer_t rc, void * 
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -E2BIG: 数据太长
- * @retval -ENXIO: 端口0不允许发送用户数据
  * @retval -ENODEV: 端口号超出范围
  * @retval -EINVAL: qos错误
  * @retval -ENOBUFS: 帧槽被使用完
@@ -367,7 +366,6 @@ xwer_t xwssc_tx(struct xwssc * xwssc,
         XWSSC_VALIDATE((size), "nullptr", -EFAULT);
         XWSSC_VALIDATE((*size <= XWSSC_SDU_MAX_SIZE), "size-invalid", -E2BIG);
         XWSSC_VALIDATE((pri < XWSSC_PRI_NUM), "pri-invalid", -E2BIG);
-        XWSSC_VALIDATE((port > XWSSC_PORT_CMD), "port0-not-permitted", -ENXIO);
         XWSSC_VALIDATE((port < XWSSC_PORT_NUM), "no-such-port", -ENODEV);
         XWSSC_VALIDATE((qos < XWSSC_MSG_QOS_NUM), "qos-invalid", -EINVAL);
 
@@ -441,7 +439,6 @@ err_ifnotrdy:
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -E2BIG: 数据太长
- * @retval -ENXIO: 端口0不允许发送用户数据
  * @retval -ENODEV: 端口号超出范围
  * @retval -EINVAL: qos错误
  * @retval -ENOBUFS: 帧槽被使用完
@@ -470,7 +467,6 @@ xwer_t xwssc_eq(struct xwssc * xwssc,
         XWSSC_VALIDATE((size), "nullptr", -EFAULT);
         XWSSC_VALIDATE((*size <= XWSSC_SDU_MAX_SIZE), "size-invalid", -E2BIG);
         XWSSC_VALIDATE((pri < XWSSC_PRI_NUM), "pri-invalid", -E2BIG);
-        XWSSC_VALIDATE((port > XWSSC_PORT_CMD), "port0-not-permitted", -ENXIO);
         XWSSC_VALIDATE((port < XWSSC_PORT_NUM), "no-such-port", -ENODEV);
         XWSSC_VALIDATE((qos < XWSSC_MSG_QOS_NUM), "qos-invalid", -EINVAL);
 
@@ -547,7 +543,6 @@ xwsq_t xwssc_get_txstate(xwssc_txh_t txh)
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
- * @retval -ENXIO: 端口0不允许发送用户数据
  * @retval -ENODEV: 端口号超出范围
  * @retval -EPERM: XWSSC未启动
  * @retval -ETIMEDOUT: 超时
@@ -573,7 +568,6 @@ xwer_t xwssc_rx(struct xwssc * xwssc, xwu8_t port,
         XWSSC_VALIDATE((xwssc), "nullptr", -EFAULT);
         XWSSC_VALIDATE((rxbuf), "nullptr", -EFAULT);
         XWSSC_VALIDATE((size), "nullptr", -EFAULT);
-        XWSSC_VALIDATE((port > XWSSC_PORT_CMD), "port0-not-permitted", -ENXIO);
         XWSSC_VALIDATE((port < XWSSC_PORT_NUM), "no-such-port", -ENODEV);
 
         rc = xwssc_grab(xwssc);
@@ -629,7 +623,6 @@ err_ifnotrdy:
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
- * @retval -ENXIO: 端口0不允许发送用户数据
  * @retval -ENODEV: 端口号超出范围
  * @retval -ENODATA: 接收队列为空
  * @retval -EPERM: XWSSC未启动
@@ -652,7 +645,6 @@ xwer_t xwssc_try_rx(struct xwssc * xwssc, xwu8_t port,
         XWSSC_VALIDATE((xwssc), "nullptr", -EFAULT);
         XWSSC_VALIDATE((rxbuf), "nullptr", -EFAULT);
         XWSSC_VALIDATE((size), "nullptr", -EFAULT);
-        XWSSC_VALIDATE((port > XWSSC_PORT_CMD), "port0-not-permitted", -ENXIO);
         XWSSC_VALIDATE((port < XWSSC_PORT_NUM), "no-such-port", -ENODEV);
 
         rc = xwssc_grab(xwssc);

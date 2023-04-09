@@ -37,11 +37,8 @@
 #define XWSSC_FRMHEAD_SIZE_MIRROR(size) ((size) & 0xF0U)
 #define XWSSC_FRMHEAD_MAXSIZE           (16U)
 
-#define XWSSC_PORT_CMD          (0U)
-
-#define XWSSC_ID_MSK            (0x7FU)
+#define XWSSC_ID_MSK            (0xFFU)
 #define XWSSC_ID(id)            ((xwu8_t)((xwu8_t)(id) & XWSSC_ID_MSK))
-#define XWSSC_ID_ACK            XWBOP_BIT(7)
 
 #define XWSSC_ECSIZE(head)      (XWSSC_FRMHEAD_SIZE((head)->headsize) - \
                                  sizeof(struct xwssc_frmhead))
@@ -77,10 +74,12 @@
         }
 
 /**
- * @brief 端口0命令
+ * @brief 协议内部标志
  */
-enum xwssc_port0_cmd_em {
-        XWSSC_PORT0_CMDID_CONNECT,
+enum xwssc_flag_em {
+        XWSSC_FLAG_CONNECT = 0x10, /**< 连接标志 */
+        XWSSC_FLAG_ACK = 0x80, /**< 应答命令 */
+        XWSSC_FLAG_MSK = 0xF0,
 };
 
 /**
@@ -101,9 +100,8 @@ struct __xwcc_packed xwssc_frmhead {
         xwu8_t headsize; /**< 帧头的长度 | 镜像反转 */
         xwu8_t chksum; /**< 帧头的校验和 */
         xwu8_t port; /**< 端口，端口0保留为协议内部使用 */
-        xwu8_t id; /**< bit[0:6]:消息的ID
-                        bit[7]: 应答标志 */
-        xwu8_t qos; /**< QoS */
+        xwu8_t id; /**< 消息的ID */
+        xwu8_t qos; /**< [0:3]: QoS, [4:7]: 协议内部标签 */
         xwu8_t ecsdusz[0]; /**< 数据长度：变长编码 */
 };
 
@@ -202,12 +200,12 @@ xwer_t xwssc_rxthd(struct xwssc * xwssc);
 struct xwssc_carrier * xwssc_txq_carrier_alloc(struct xwssc * xwssc);
 void xwssc_txq_carrier_free(struct xwssc * xwssc, struct xwssc_carrier * car);
 struct xwssc_carrier * xwssc_txq_choose(struct xwssc * xwssc);
-xwer_t xwssc_tx_sdu_ack(struct xwssc * xwssc, xwu8_t port, xwu8_t id, xwu8_t ack);
 xwer_t xwssc_eq_msg(struct xwssc * xwssc,
                     const xwu8_t sdu[], xwsz_t sdusize,
                     xwu8_t pri, xwu8_t port, xwu8_t qos,
                     xwssc_ntf_f ntfcb, void * cbarg,
                     xwssc_txh_t * txhbuf);
+xwer_t xwssc_tx_ack_sdu(struct xwssc * xwssc, xwu8_t port, xwu8_t id, xwu8_t ack);
 xwer_t xwssc_txthd(struct xwssc * xwssc);
 
 #endif /* xwmd/isc/xwssc/protocol.h */

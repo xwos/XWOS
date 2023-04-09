@@ -17,19 +17,7 @@
 #include <xwmd/isc/xwssc/hwifal.h>
 #include <xwmd/isc/xwssc/protocol.h>
 
-/**
- * @brief 空白帧
- */
-__xwmd_rodata const xwu8_t xwssc_frm_blank[] = {
-        (xwu8_t)XWSSC_EOF,
-        (xwu8_t)XWSSC_EOF,
-        (xwu8_t)XWSSC_EOF,
-        (xwu8_t)XWSSC_EOF,
-        (xwu8_t)XWSSC_EOF,
-        (xwu8_t)XWSSC_EOF,
-        (xwu8_t)XWSSC_EOF,
-        (xwu8_t)XWSSC_EOF,
-};
+extern const uint8_t xwssc_frm_blank[8];
 
 /**
  * @brief 打开硬件接口
@@ -202,7 +190,7 @@ xwer_t xwssc_hwifal_rx(struct xwssc * xwssc, union xwssc_slot ** slotbuf)
         }
         rc = xwmm_bma_alloc(xwssc->mempool, (xwsq_t)odr, &mem);
         if (__xwcc_unlikely(rc < 0)) {
-                xwssc_tx_sdu_ack(xwssc,
+                xwssc_tx_ack_sdu(xwssc,
                                  stream.head.port, stream.head.id,
                                  XWSSC_ACK_NOMEM);
                 goto err_bma_alloc;
