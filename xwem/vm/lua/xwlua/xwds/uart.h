@@ -22,16 +22,16 @@
 #define __xwem_vm_lua_xwlua_xwds_uart_h__
 
 #include <xwos/standard.h>
-#include <xwcd/ds/uart/dma.h>
+#include <xwcd/ds/uart/controller.h>
 #include "src/lauxlib.h"
 
 struct xwlua_uart {
-        struct xwds_dmauartc * dmauartc;
+        struct xwds_uartc * uartc;
         xwsq_t tik;
 };
 
 void xwlua_uart_register(lua_State * L, const char * name,
-                         struct xwds_dmauartc * dmauartc);
+                         struct xwds_uartc * uartc);
 void xwlua_uart_unregister(lua_State * L, const char * name);
 void xwlua_ds_open_uart(lua_State * L);
 

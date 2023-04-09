@@ -20,19 +20,19 @@
 
 #include <xwos/standard.h>
 #include <string.h>
-#include <xwcd/ds/uart/dma.h>
+#include <xwcd/ds/uart/controller.h>
 #include "src/lauxlib.h"
 #include "xwlua/port.h"
 #include "xwlua/xwds/uart.h"
 
 void xwlua_uart_register(lua_State * L, const char * name,
-                         struct xwds_dmauartc * dmauartc)
+                         struct xwds_uartc * uartc)
 {
         struct xwlua_uart * luart;
 
         luart = lua_newuserdatauv(L, sizeof(struct xwlua_uart), 0);
-        luart->dmauartc = dmauartc;
-        luart->tik = dmauartc->dev.obj.xwobj.tik;
+        luart->uartc = uartc;
+        luart->tik = uartc->dev.obj.xwobj.tik;
         luaL_setmetatable(L, "xwlua_uart");
         lua_pushvalue(L, -1);
         lua_setfield(L, LUA_REGISTRYINDEX, name);
@@ -50,7 +50,7 @@ int xwlua_uart_tostring(lua_State * L)
         struct xwlua_uart * luart;
 
         luart = (struct xwlua_uart *)luaL_checkudata(L, 1, "xwlua_uart");
-        lua_pushstring(L, luart->dmauartc->dev.name);
+        lua_pushstring(L, luart->uartc->dev.name);
         return 1;
 }
 
@@ -74,7 +74,7 @@ int xwlua_uart_rx(lua_State * L)
         }
         luaL_buffinit(L, &b);
         rxb = (xwu8_t *)luaL_prepbuffsize(&b, size);
-        rc = xwds_dmauartc_rx(luart->dmauartc, rxb, &size, to);
+        rc = xwds_uartc_rx(luart->uartc, rxb, &size, to);
         luaL_addsize(&b, size);
         lua_pushinteger(L, (lua_Integer)rc);
         lua_pushinteger(L, (lua_Integer)size);
@@ -95,7 +95,7 @@ int xwlua_uart_try_rx(lua_State * L)
         size = (xwsz_t)luaL_checkinteger(L, 2);
         luaL_buffinit(L, &b);
         rxb = (xwu8_t *)luaL_prepbuffsize(&b, size);
-        rc = xwds_dmauartc_try_rx(luart->dmauartc, rxb, &size);
+        rc = xwds_uartc_try_rx(luart->uartc, rxb, &size);
         luaL_addsize(&b, size);
         lua_pushinteger(L, (lua_Integer)rc);
         lua_pushinteger(L, (lua_Integer)size);
@@ -121,7 +121,7 @@ int xwlua_uart_tx(lua_State * L)
         } else {
                 to = XWTM_MAX;
         }
-        rc = xwds_dmauartc_tx(luart->dmauartc, txd, &size, to);
+        rc = xwds_uartc_tx(luart->uartc, txd, &size, to);
         lua_pushinteger(L, (lua_Integer)rc);
         lua_pushinteger(L, (lua_Integer)size);
         return 1;

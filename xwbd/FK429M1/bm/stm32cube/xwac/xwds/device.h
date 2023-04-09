@@ -24,7 +24,7 @@
 #include <bm/stm32cube/standard.h>
 #include <xwcd/ds/device.h>
 #include <xwcd/ds/soc/chip.h>
-#include <xwcd/ds/uart/dma.h>
+#include <xwcd/ds/uart/controller.h>
 
 /******** ******** ds ******** ********/
 extern struct xwds stm32cube_ds;
@@ -33,6 +33,6 @@ extern struct xwds stm32cube_ds;
 extern struct xwds_soc stm32soc;
 
 /******** ******** uart ******** ********/
-extern struct xwds_dmauartc stm32usart1;
+extern struct xwds_uartc stm32usart1;
 
 #endif /* bm/stm32cube/xwac/xwds/device.h */

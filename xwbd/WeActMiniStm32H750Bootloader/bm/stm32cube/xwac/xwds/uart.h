@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE设备栈：DMA-UART
+ * @brief STM32CUBE设备栈：UART
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -23,16 +23,16 @@
 
 #include <bm/stm32cube/standard.h>
 
-void stm32cube_usart1_cb_txdma_cplt(struct xwds_dmauartc * dmauartc, xwer_t dmarc);
-void stm32cube_usart1_cb_rxdma_restart(struct xwds_dmauartc * dmauartc);
-void stm32cube_usart1_cb_rxdma_halfcplt(struct xwds_dmauartc * dmauartc);
-void stm32cube_usart1_cb_rxdma_cplt(struct xwds_dmauartc * dmauartc);
-void stm32cube_usart1_cb_rxdma_timer(struct xwds_dmauartc * dmauartc);
+void stm32cube_usart1_cb_txdma_cplt(struct xwds_uartc * uartc, xwer_t dmarc);
+void stm32cube_usart1_cb_rxdma_restart(struct xwds_uartc * uartc);
+void stm32cube_usart1_cb_rxdma_halfcplt(struct xwds_uartc * uartc);
+void stm32cube_usart1_cb_rxdma_cplt(struct xwds_uartc * uartc);
+void stm32cube_usart1_cb_rxdma_timer(struct xwds_uartc * uartc);
 
-void stm32cube_usart3_cb_txdma_cplt(struct xwds_dmauartc * dmauartc, xwer_t dmarc);
-void stm32cube_usart3_cb_rxdma_restart(struct xwds_dmauartc * dmauartc);
-void stm32cube_usart3_cb_rxdma_halfcplt(struct xwds_dmauartc * dmauartc);
-void stm32cube_usart3_cb_rxdma_cplt(struct xwds_dmauartc * dmauartc);
-void stm32cube_usart3_cb_rxdma_timer(struct xwds_dmauartc * dmauartc);
+void stm32cube_usart3_cb_txdma_cplt(struct xwds_uartc * uartc, xwer_t dmarc);
+void stm32cube_usart3_cb_rxdma_restart(struct xwds_uartc * uartc);
+void stm32cube_usart3_cb_rxdma_halfcplt(struct xwds_uartc * uartc);
+void stm32cube_usart3_cb_rxdma_cplt(struct xwds_uartc * uartc);
+void stm32cube_usart3_cb_rxdma_timer(struct xwds_uartc * uartc);
 
 #endif /* bm/stm32cube/xwac/xwds/uart.h */

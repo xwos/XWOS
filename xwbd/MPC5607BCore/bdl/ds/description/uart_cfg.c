@@ -21,13 +21,13 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwcd/ds/device.h>
-#include <xwcd/ds/uart/dma.h>
+#include <xwcd/ds/uart/controller.h>
 #include <bdl/ds/description/mpc560xbdkp.h>
-#include <bdl/ds/driver/dmauart0.h>
+#include <bdl/ds/driver/uart0.h>
 #include <soc_gpio.h>
 #include <soc_dma.h>
 #include <soc_irq.h>
-#include <soc_dmauart.h>
+#include <soc_uart.h>
 
 const struct soc_irq_cfg mpc560xb_uart0_irq_cfgs[] = {
         [0] = {
@@ -38,7 +38,7 @@ const struct soc_irq_cfg mpc560xb_uart0_irq_cfgs[] = {
 const struct xwds_resource_irq mpc560xb_uart0_irq_resources[] = {
         [0] = {
                 .irqn = IRQ_LINFLEX0_ERR,
-                .isr = mpc560xb_dmauart0_err_isr,
+                .isr = mpc560xb_uart0_err_isr,
                 .cfg = &mpc560xb_uart0_irq_cfgs[0],
                 .description = "rsc.irq.linflexd.err.0",
         },
@@ -175,7 +175,7 @@ const struct xwds_resources mpc560xb_uart0_resources = {
         .dmarsc_num = xw_array_size(mpc560xb_uart0_dma_resources),
 };
 
-const struct soc_dmauart_private_cfg mpc560xb_uart0_xwccfg = {
+const struct soc_uart_private_cfg mpc560xb_uart0_xwccfg = {
         .pto = 4000,
 };
 
@@ -191,15 +191,15 @@ const struct xwds_uart_cfg mpc560xb_uart0_cfg = {
         .xwccfg = (void *)&mpc560xb_uart0_xwccfg,
 };
 
-struct mpc560xb_dmauart0_drvdata mpc560xb_uart0_drvdata;
+struct mpc560xb_uart0_drvdata mpc560xb_uart0_drvdata;
 
-struct xwds_dmauartc mpc560xb_uart0_cb = {
+struct xwds_uartc mpc560xb_uart0_cb = {
         /* attributes */
         .dev = {
                 .name = "mpc560xb.linflexd",
                 .id = 0,
                 .resources = &mpc560xb_uart0_resources,
-                .drv = xwds_cast(struct xwds_driver *, &mpc560xb_dmauart0_drv),
+                .drv = xwds_cast(struct xwds_driver *, &mpc560xb_uart0_drv),
                 .data = &mpc560xb_uart0_drvdata,
         },
         .cfg = &mpc560xb_uart0_cfg,

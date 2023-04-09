@@ -71,7 +71,7 @@ xwer_t bdl_iftx(const xwu8_t * str, xwsz_t size)
 {
         xwer_t rc;
 
-        rc = xwds_dmauartc_tx(&mpc560xb_uart0_cb, str, &size, XWTM_MAX);
+        rc = xwds_uartc_tx(&mpc560xb_uart0_cb, str, &size, XWTM_MAX);
         if (__xwcc_unlikely(rc < 0)) {
                 goto err_dmatx;
         }
@@ -89,7 +89,7 @@ xwer_t uart_task(void * arg)
         XWOS_UNUSED(arg);
         while (!xwos_cthd_frz_shld_stop(NULL)) {
                 size = sizeof(rxbuffer);
-                rc = xwds_dmauartc_rx(&mpc560xb_uart0_cb, rxbuffer, &size, XWTM_MAX);
+                rc = xwds_uartc_rx(&mpc560xb_uart0_cb, rxbuffer, &size, XWTM_MAX);
                 if ((XWOK == rc) && (size > 0)) {
                         xwos_cthd_sleep(XWTM_S(5));
                         rc = bdl_iftx(rxbuffer, size >> 1);

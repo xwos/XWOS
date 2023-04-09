@@ -23,7 +23,7 @@
 #include <xwos/ospl/syshwt.h>
 #include <soc_irq.h>
 #include <bdl/ds/driver/soc.h>
-#include <bdl/ds/driver/dmauart0.h>
+#include <bdl/ds/driver/uart0.h>
 #include <bdl/ds/description/mpc560xbdkp.h>
 
 /**
@@ -112,7 +112,7 @@ __xwcc_section(".e200z0h.ivt") struct soc_ivt soc_ivt = {
                 (xwisr_f)soc_isr_noop, /* Vector - 78 DSPI0_SR_RFDF */
                 (xwisr_f)soc_isr_noop, /* Vector - 79 LINFLEX0_RX */
                 (xwisr_f)soc_isr_noop, /* Vector - 80 LINFLEX0_TX */
-                (xwisr_f)mpc560xb_dmauart0_err_isr, /* Vector - 81 LINFLEX0_ERR */
+                (xwisr_f)mpc560xb_uart0_err_isr, /* Vector - 81 LINFLEX0_ERR */
                 (xwisr_f)soc_isr_noop, /* Vector - 82 ADC1_EOC */
                 (xwisr_f)soc_isr_noop, /* Vector - 83 */
                 (xwisr_f)soc_isr_noop, /* Vector - 84 ADC1_WD */

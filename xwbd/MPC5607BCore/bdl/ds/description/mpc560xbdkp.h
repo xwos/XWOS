@@ -25,7 +25,7 @@
 #include <xwos/osal/irq.h>
 #include <xwcd/ds/device.h>
 #include <xwcd/ds/soc/chip.h>
-#include <xwcd/ds/uart/dma.h>
+#include <xwcd/ds/uart/controller.h>
 #include <xwcd/ds/i2c/master.h>
 #include <xwcd/ds/misc/chip.h>
 #include <soc_clk.h>
@@ -45,6 +45,6 @@ extern struct xwds mpc560xb_ds;
 extern struct xwds_soc mpc560xb_soc_cb;
 
 /******** ******** UART ******** ********/
-extern struct xwds_dmauartc mpc560xb_uart0_cb;
+extern struct xwds_uartc mpc560xb_uart0_cb;
 
 #endif /* bdl/ds/description/mpc560xbdkp.h */

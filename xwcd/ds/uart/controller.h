@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武设备栈：UART with DMA
+ * @brief 玄武设备栈：UART控制器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __xwcd_ds_uart_dma_h__
-#define __xwcd_ds_uart_dma_h__
+#ifndef __xwcd_ds_uart_controller_h__
+#define __xwcd_ds_uart_controller_h__
 
 #include <xwcd/ds/standard.h>
 #include <xwos/lib/xwbop.h>
@@ -30,28 +30,28 @@
 #include <xwcd/ds/soc/dma.h>
 #include <xwcd/ds/uart/common.h>
 
-#define XWDS_DMAUART_RXQ_SIZE   XWCDCFG_ds_UART_DMA_RXQ_SIZE
+#define XWDS_UART_RXQ_SIZE XWCDCFG_ds_UART_RXQ_SIZE
 
-struct xwds_dmauartc;
+struct xwds_uartc;
 
 /**
- * @brief BSP中需要提供的DMA UART控制器驱动函数表
+ * @brief BSP中需要提供的UART控制器驱动函数表
  */
-struct xwds_dmauartc_driver {
+struct xwds_uartc_driver {
         struct xwds_driver base; /**< C语言面向对象：继承struct xwds_driver */
-        xwer_t (* cfg)(struct xwds_dmauartc * /*dmauartc*/,
+        xwer_t (* cfg)(struct xwds_uartc * /*uartc*/,
                        const struct xwds_uart_cfg * /*cfg*/); /**< 配置UART控制器 */
-        xwer_t (* tx)(struct xwds_dmauartc * /*dmauartc*/,
+        xwer_t (* tx)(struct xwds_uartc * /*uartc*/,
                       const xwu8_t * /*data*/, xwsz_t * /*size*/,
                       xwtm_t /*to*/); /**< 配置DMA通道并发送 */
-        xwer_t (* putc)(struct xwds_dmauartc * /*dmauartc*/,
+        xwer_t (* putc)(struct xwds_uartc * /*uartc*/,
                         const xwu8_t /*byte*/); /**< 发送一个字节 */
 };
 
 /**
- * @brief DMA UART控制器
+ * @brief UART控制器
  */
-struct xwds_dmauartc {
+struct xwds_uartc {
         struct xwds_device dev; /**< 继承struct xwds_device */
 
         /* attributes */
@@ -68,32 +68,31 @@ struct xwds_dmauartc {
                 struct xwos_splk lock; /**< 保护接收队列的锁 */
                 xwsq_t pos; /**< 当前有效数据的起始位置 */
                 xwsz_t tail; /**< 当前有效数据的结束位置 + 1 */
-                xwu8_t mem[2 * XWDS_DMAUART_RXQ_SIZE] __xwcc_alignl1cache;
-                                /**< 双缓冲区 */
+                xwu8_t mem[2 * XWDS_UART_RXQ_SIZE] __xwcc_alignl1cache; /**< 双缓冲区 */
         } rxq; /**< 循环接收队列 */
 };
 
-void xwds_dmauartc_construct(struct xwds_dmauartc * dmauartc);
-void xwds_dmauartc_destruct(struct xwds_dmauartc * dmauartc);
-xwer_t xwds_dmauartc_grab(struct xwds_dmauartc * dmauartc);
-xwer_t xwds_dmauartc_put(struct xwds_dmauartc * dmauartc);
+void xwds_uartc_construct(struct xwds_uartc * uartc);
+void xwds_uartc_destruct(struct xwds_uartc * uartc);
+xwer_t xwds_uartc_grab(struct xwds_uartc * uartc);
+xwer_t xwds_uartc_put(struct xwds_uartc * uartc);
 
-xwer_t xwds_dmauartc_rx(struct xwds_dmauartc * dmauartc,
-                        xwu8_t * buf, xwsz_t * size,
-                        xwtm_t to);
-xwer_t xwds_dmauartc_try_rx(struct xwds_dmauartc * dmauartc,
-                            xwu8_t * buf, xwsz_t * size);
-xwer_t xwds_dmauartc_tx(struct xwds_dmauartc * dmauartc,
-                        const xwu8_t * data, xwsz_t * size,
-                        xwtm_t to);
-xwer_t xwds_dmauartc_putc(struct xwds_dmauartc * dmauartc,
-                          const xwu8_t byte,
-                          xwtm_t to);
-xwer_t xwds_dmauartc_cfg(struct xwds_dmauartc * dmauartc,
-                         const struct xwds_uart_cfg * cfg);
+xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
+                     xwu8_t * buf, xwsz_t * size,
+                     xwtm_t to);
+xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc,
+                         xwu8_t * buf, xwsz_t * size);
+xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
+                     const xwu8_t * data, xwsz_t * size,
+                     xwtm_t to);
+xwer_t xwds_uartc_putc(struct xwds_uartc * uartc,
+                       const xwu8_t byte,
+                       xwtm_t to);
+xwer_t xwds_uartc_cfg(struct xwds_uartc * uartc,
+                      const struct xwds_uart_cfg * cfg);
 
 /******** ******** Callbacks for driver ******** ********/
-void xwds_dmauartc_drvcb_rxq_flush(struct xwds_dmauartc * dmauartc);
-void xwds_dmauartc_drvcb_rxq_pub(struct xwds_dmauartc * dmauartc, xwsq_t tail);
+void xwds_uartc_drvcb_rxq_flush(struct xwds_uartc * uartc);
+void xwds_uartc_drvcb_rxq_pub(struct xwds_uartc * uartc, xwsq_t tail);
 
-#endif /* xwcd/ds/uart/dma.h */
+#endif /* xwcd/ds/uart/controller.h */

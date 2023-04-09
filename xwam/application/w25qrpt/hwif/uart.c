@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <xwcd/ds/uart/dma.h>
+#include <xwcd/ds/uart/controller.h>
 #include <xwam/application/w25qrpt/w25qrpt.h>
 #include <xwam/application/w25qrpt/hwifal.h>
 #include <xwam/application/w25qrpt/hwif/uart.h>
@@ -63,12 +63,12 @@ static
 xwer_t w25qrptif_uart_tx(struct w25qrpt * w25qrpt, const xwu8_t * data,
                          xwsz_t *size, xwtm_t to)
 {
-        return xwds_dmauartc_tx(w25qrpt->hwifcb, data, size, to);
+        return xwds_uartc_tx(w25qrpt->hwifcb, data, size, to);
 }
 
 static
 xwer_t w25qrptif_uart_rx(struct w25qrpt * w25qrpt, xwu8_t * buf,
                          xwsz_t * size, xwtm_t to)
 {
-	return xwds_dmauartc_rx(w25qrpt->hwifcb, buf, size, to);
+	return xwds_uartc_rx(w25qrpt->hwifcb, buf, size, to);
 }

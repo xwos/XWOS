@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE设备栈：DMA-UART
+ * @brief STM32CUBE设备栈：UART
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -21,7 +21,7 @@
 #include <bm/stm32cube/standard.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/cond.h>
-#include <xwcd/ds/uart/dma.h>
+#include <xwcd/ds/uart/controller.h>
 #include <bm/stm32cube/cubemx/Core/Inc/tim.h>
 #include <bm/stm32cube/cubemx/Core/Inc/usart.h>
 #include <bm/stm32cube/xwac/xwds/device.h>
@@ -43,19 +43,19 @@ xwer_t stm32cube_usart1_drv_resume(struct xwds_device * dev);
 #endif
 
 static
-xwer_t stm32cube_usart1_drv_cfg(struct xwds_dmauartc * dmauartc,
+xwer_t stm32cube_usart1_drv_cfg(struct xwds_uartc * uartc,
                                 const struct xwds_uart_cfg * cfg);
 
 static
-xwer_t stm32cube_usart1_drv_tx(struct xwds_dmauartc * dmauartc,
+xwer_t stm32cube_usart1_drv_tx(struct xwds_uartc * uartc,
                                const xwu8_t * data, xwsz_t * size,
                                xwtm_t to);
 
 static
-xwer_t stm32cube_usart1_drv_putc(struct xwds_dmauartc * dmauartc,
+xwer_t stm32cube_usart1_drv_putc(struct xwds_uartc * uartc,
                                  const xwu8_t byte);
 
-const struct xwds_dmauartc_driver stm32cube_usart1_drv = {
+const struct xwds_uartc_driver stm32cube_usart1_drv = {
         .base = {
                 .name = "stm32cube.usart.1",
                 .probe = NULL,
@@ -72,7 +72,7 @@ const struct xwds_dmauartc_driver stm32cube_usart1_drv = {
         .putc = stm32cube_usart1_drv_putc,
 };
 
-struct xwds_dmauartc stm32usart1 = {
+struct xwds_uartc stm32usart1 = {
         /* attributes */
         .dev = {
                 .name = "stm32cube.usart.1",
@@ -88,16 +88,16 @@ struct xwds_dmauartc stm32usart1 = {
 static
 xwer_t stm32cube_usart1_drv_start(struct xwds_device * dev)
 {
-        struct xwds_dmauartc * dmauartc;
+        struct xwds_uartc * uartc;
         struct MX_UART_DriverData * drvdata;
         xwer_t rc;
 
-        dmauartc = xwds_cast(struct xwds_dmauartc *, dev);
-        drvdata = dmauartc->dev.data;
-        drvdata->dmauartc = dmauartc;
+        uartc = xwds_cast(struct xwds_uartc *, dev);
+        drvdata = uartc->dev.data;
+        drvdata->uartc = uartc;
 
         MX_USART1_UART_Init();
-        rc = MX_USART1_RXDMA_Start(dmauartc->rxq.mem, sizeof(dmauartc->rxq.mem));
+        rc = MX_USART1_RXDMA_Start(uartc->rxq.mem, sizeof(uartc->rxq.mem));
         if (rc < 0) {
                 goto err_rxdma_start;
         }
@@ -135,16 +135,16 @@ xwer_t stm32cube_usart1_drv_suspend(struct xwds_device * dev)
 #endif
 
 static
-xwer_t stm32cube_usart1_drv_cfg(struct xwds_dmauartc * dmauartc,
+xwer_t stm32cube_usart1_drv_cfg(struct xwds_uartc * uartc,
                                 const struct xwds_uart_cfg * cfg)
 {
-        XWOS_UNUSED(dmauartc);
+        XWOS_UNUSED(uartc);
         XWOS_UNUSED(cfg);
         return -ENOSYS;
 }
 
 static
-xwer_t stm32cube_usart1_drv_tx(struct xwds_dmauartc * dmauartc,
+xwer_t stm32cube_usart1_drv_tx(struct xwds_uartc * uartc,
                                const xwu8_t * data, xwsz_t * size,
                                xwtm_t to)
 {
@@ -156,7 +156,7 @@ xwer_t stm32cube_usart1_drv_tx(struct xwds_dmauartc * dmauartc,
         xwer_t rc;
 
         wrsz = *size;
-        drvdata = dmauartc->dev.data;
+        drvdata = uartc->dev.data;
         ulk.osal.splk = &drvdata->tx.splk;
         xwos_splk_lock_cpuirqsv(&drvdata->tx.splk, &flag);
         drvdata->tx.rc = -EINPROGRESS;
@@ -186,12 +186,12 @@ xwer_t stm32cube_usart1_drv_tx(struct xwds_dmauartc * dmauartc,
         return rc;
 }
 
-void stm32cube_usart1_cb_txdma_cplt(struct xwds_dmauartc * dmauartc, xwer_t dmarc)
+void stm32cube_usart1_cb_txdma_cplt(struct xwds_uartc * uartc, xwer_t dmarc)
 {
         struct MX_UART_DriverData * drvdata;
         xwreg_t flag;
 
-        drvdata = dmauartc->dev.data;
+        drvdata = uartc->dev.data;
         xwos_splk_lock_cpuirqsv(&drvdata->tx.splk, &flag);
         if (-ECANCELED != drvdata->tx.rc) {
                 drvdata->tx.rc = dmarc;
@@ -202,37 +202,37 @@ void stm32cube_usart1_cb_txdma_cplt(struct xwds_dmauartc * dmauartc, xwer_t dmar
 }
 
 static
-xwer_t stm32cube_usart1_drv_putc(struct xwds_dmauartc * dmauartc,
+xwer_t stm32cube_usart1_drv_putc(struct xwds_uartc * uartc,
                                  const xwu8_t byte)
 {
-        XWOS_UNUSED(dmauartc);
+        XWOS_UNUSED(uartc);
         return MX_USART1_Putc(byte);
 }
 
-void stm32cube_usart1_cb_rxdma_restart(struct xwds_dmauartc * dmauartc)
+void stm32cube_usart1_cb_rxdma_restart(struct xwds_uartc * uartc)
 {
-        xwds_dmauartc_drvcb_rxq_flush(dmauartc);
-        MX_USART1_RXDMA_Start(dmauartc->rxq.mem, sizeof(dmauartc->rxq.mem));
+        xwds_uartc_drvcb_rxq_flush(uartc);
+        MX_USART1_RXDMA_Start(uartc->rxq.mem, sizeof(uartc->rxq.mem));
 }
 
-void stm32cube_usart1_cb_rxdma_halfcplt(struct xwds_dmauartc * dmauartc)
+void stm32cube_usart1_cb_rxdma_halfcplt(struct xwds_uartc * uartc)
 {
-        xwds_dmauartc_drvcb_rxq_pub(dmauartc, XWDS_DMAUART_RXQ_SIZE);
+        xwds_uartc_drvcb_rxq_pub(uartc, XWDS_UART_RXQ_SIZE);
 }
 
-void stm32cube_usart1_cb_rxdma_cplt(struct xwds_dmauartc * dmauartc)
+void stm32cube_usart1_cb_rxdma_cplt(struct xwds_uartc * uartc)
 {
-        xwds_dmauartc_drvcb_rxq_pub(dmauartc, 0);
+        xwds_uartc_drvcb_rxq_pub(uartc, 0);
 }
 
-void stm32cube_usart1_cb_rxdma_timer(struct xwds_dmauartc * dmauartc)
+void stm32cube_usart1_cb_rxdma_timer(struct xwds_uartc * uartc)
 {
         xwsq_t tail;
 
-        tail = sizeof(dmauartc->rxq.mem) - MX_USART1_RXDMA_GetCounter();
-        if (sizeof(dmauartc->rxq.mem) == tail) {
-                xwds_dmauartc_drvcb_rxq_pub(dmauartc, 0);
+        tail = sizeof(uartc->rxq.mem) - MX_USART1_RXDMA_GetCounter();
+        if (sizeof(uartc->rxq.mem) == tail) {
+                xwds_uartc_drvcb_rxq_pub(uartc, 0);
         } else {
-                xwds_dmauartc_drvcb_rxq_pub(dmauartc, tail);
+                xwds_uartc_drvcb_rxq_pub(uartc, tail);
         }
 }

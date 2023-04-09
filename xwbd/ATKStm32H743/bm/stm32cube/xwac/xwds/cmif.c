@@ -23,7 +23,7 @@
 #include <xwcd/ds/xwds.h>
 #include <xwcd/ds/device.h>
 #include <xwcd/ds/soc/chip.h>
-#include <xwcd/ds/uart/dma.h>
+#include <xwcd/ds/uart/controller.h>
 #include <xwcd/ds/spi/master.h>
 #include <bm/stm32cube/xwac/xwds/device.h>
 #include <bm/stm32cube/xwac/xwds/pm.h>
@@ -195,7 +195,7 @@ xwer_t stm32cube_xwds_uart_start(void)
 {
         xwer_t rc;
 
-        xwds_dmauartc_construct(&stm32usart1);
+        xwds_uartc_construct(&stm32usart1);
         rc = xwds_device_probe(&stm32cube_ds,
                                xwds_cast(struct xwds_device *, &stm32usart1),
                                NULL);
@@ -207,7 +207,7 @@ xwer_t stm32cube_xwds_uart_start(void)
                 goto err_usart1_start;
         }
 
-        xwds_dmauartc_construct(&stm32usart2);
+        xwds_uartc_construct(&stm32usart2);
         rc = xwds_device_probe(&stm32cube_ds,
                                xwds_cast(struct xwds_device *, &stm32usart2),
                                NULL);
@@ -223,13 +223,13 @@ xwer_t stm32cube_xwds_uart_start(void)
 err_usart2_start:
         xwds_device_remove(xwds_cast(struct xwds_device *, &stm32usart2));
 err_usart2_probe:
-        xwds_dmauartc_destruct(&stm32usart2);
+        xwds_uartc_destruct(&stm32usart2);
 
         xwds_device_stop(xwds_cast(struct xwds_device *, &stm32usart1));
 err_usart1_start:
         xwds_device_remove(xwds_cast(struct xwds_device *, &stm32usart1));
 err_usart1_probe:
-        xwds_dmauartc_destruct(&stm32usart1);
+        xwds_uartc_destruct(&stm32usart1);
         return rc;
 }
 
@@ -240,11 +240,11 @@ xwer_t stm32cube_xwds_uart_stop(void)
 {
         xwds_device_stop(xwds_cast(struct xwds_device *, &stm32usart2));
         xwds_device_remove(xwds_cast(struct xwds_device *, &stm32usart2));
-        xwds_dmauartc_destruct(&stm32usart2);
+        xwds_uartc_destruct(&stm32usart2);
 
         xwds_device_stop(xwds_cast(struct xwds_device *, &stm32usart1));
         xwds_device_remove(xwds_cast(struct xwds_device *, &stm32usart1));
-        xwds_dmauartc_destruct(&stm32usart1);
+        xwds_uartc_destruct(&stm32usart1);
         return XWOK;
 }
 

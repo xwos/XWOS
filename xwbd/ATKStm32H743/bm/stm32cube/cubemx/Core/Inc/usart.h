@@ -33,7 +33,7 @@ extern "C" {
 #include <bm/stm32cube/standard.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/cond.h>
-#include <xwcd/ds/uart/dma.h>
+#include <xwcd/ds/uart/controller.h>
 
 /* USER CODE END Includes */
 
@@ -46,7 +46,7 @@ extern UART_HandleTypeDef huart2;
 
 struct MX_UART_DriverData {
   UART_HandleTypeDef * halhdl;
-  struct xwds_dmauartc * dmauartc;
+  struct xwds_uartc * uartc;
   struct {
     struct xwos_cond cond; /**< 条件量 */
     struct xwos_splk splk; /**< 保证发送状态只被单一上下文访问的锁 */
@@ -94,4 +94,3 @@ xwer_t MX_USART2_Putc(xwu8_t byte);
 #endif
 
 #endif /* __USART_H__ */
-

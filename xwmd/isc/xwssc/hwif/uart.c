@@ -11,7 +11,7 @@
  */
 
 #include <xwos/standard.h>
-#include <xwcd/ds/uart/dma.h>
+#include <xwcd/ds/uart/controller.h>
 #include <xwmd/isc/xwssc/protocol.h>
 #include <xwmd/isc/xwssc/hwifal.h>
 #include <xwmd/isc/xwssc/hwif/uart.h>
@@ -57,13 +57,13 @@ xwer_t xwsscif_uart_close(struct xwssc * xwssc)
 static __xwmd_code
 xwer_t xwsscif_uart_tx(struct xwssc * xwssc, const xwu8_t * data, xwsz_t size)
 {
-        return xwds_dmauartc_tx(xwssc->hwifcb, data, &size, XWTM_MAX);
+        return xwds_uartc_tx(xwssc->hwifcb, data, &size, XWTM_MAX);
 }
 
 static __xwmd_code
 xwer_t xwsscif_uart_rx(struct xwssc * xwssc, xwu8_t * buf, xwsz_t * size)
 {
-	return xwds_dmauartc_rx(xwssc->hwifcb, buf, size, XWTM_MAX);
+	return xwds_uartc_rx(xwssc->hwifcb, buf, size, XWTM_MAX);
 }
 
 static __xwmd_code

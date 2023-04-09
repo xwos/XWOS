@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC描述层：DMAUART
+ * @brief 设备栈驱动：UART0
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,18 +18,24 @@
  * > limitations under the License.
  */
 
-#ifndef __soc_dmauart_h__
-#define __soc_dmauart_h__
+#ifndef __bdl_ds_driver_uart0_h__
+#define __bdl_ds_driver_uart0_h__
 
 #include <xwos/standard.h>
-#include <soc.h>
+#include <xwos/osal/lock/spinlock.h>
+#include <xwos/osal/sync/cond.h>
+#include <xwcd/ds/uart/controller.h>
 
-/**
- * @brief mpc560xb DMA UART private configurations
- */
-struct soc_dmauart_private_cfg {
-        xwu32_t pto; /**< preset timeout */
+struct mpc560xb_uart0_drvdata {
+        struct {
+                struct xwos_cond cond;
+                struct xwos_splk splk;
+                xwer_t rc;
+        } tx;
 };
 
+extern __xwbsp_rodata const struct xwds_uartc_driver mpc560xb_uart0_drv;
 
-#endif /* soc_dmauart.h */
+void mpc560xb_uart0_err_isr(void);
+
+#endif /* bdl/ds/driver/uart0.h */

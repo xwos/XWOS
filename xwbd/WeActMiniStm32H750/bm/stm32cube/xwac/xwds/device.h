@@ -24,7 +24,7 @@
 #include <bm/stm32cube/standard.h>
 #include <xwcd/ds/device.h>
 #include <xwcd/ds/soc/chip.h>
-#include <xwcd/ds/uart/dma.h>
+#include <xwcd/ds/uart/controller.h>
 #include <xwcd/ds/spi/master.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/device.h>
 #include <xwcd/perpheral/spi/lcd/st7735/device.h>
@@ -36,8 +36,8 @@ extern struct xwds stm32cube_ds;
 extern struct xwds_soc stm32soc;
 
 /******** ******** uart ******** ********/
-extern struct xwds_dmauartc stm32usart1;
-extern struct xwds_dmauartc stm32usart3;
+extern struct xwds_uartc stm32usart1;
+extern struct xwds_uartc stm32usart3;
 
 /******** ******** spi ******** ********/
 extern struct xwds_spim stm32spi1m;

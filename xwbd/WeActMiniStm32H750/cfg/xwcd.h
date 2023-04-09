@@ -46,11 +46,7 @@
 
 /******** ******** UART ******** ********/
 #define XWCDCFG_ds_UART                                         1
-#define XWCDCFG_ds_UART_GNR                                     1
-#define XWCDCFG_ds_UART_GNR_TXQ_SIZE                            (128U)
-#define XWCDCFG_ds_UART_GNR_RXQ_SIZE                            (128U)
-#define XWCDCFG_ds_UART_DMA                                     1
-#define XWCDCFG_ds_UART_DMA_RXQ_SIZE                            (256U)
+#define XWCDCFG_ds_UART_RXQ_SIZE                                (256U)
 
 /******** ******** I2C device ******** ********/
 #define XWCDCFG_ds_I2C_MASTER                                   1

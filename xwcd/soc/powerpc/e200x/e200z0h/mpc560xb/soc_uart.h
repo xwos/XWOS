@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 设备栈驱动：MPC560xB UART
+ * @brief SOC描述层：UART
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,17 +18,18 @@
  * > limitations under the License.
  */
 
-#ifndef __driver_ds_uartc_h__
-#define __driver_ds_uartc_h__
+#ifndef __soc_uart_h__
+#define __soc_uart_h__
 
 #include <xwos/standard.h>
-#include <xwcd/ds/device.h>
-#include <xwcd/ds/uart/general.h>
+#include <soc.h>
 
-extern const struct xwds_uartc_driver mpc560xb_uartc_drv;
+/**
+ * @brief mpc560xb DMA UART private configurations
+ */
+struct soc_uart_private_cfg {
+        xwu32_t pto; /**< preset timeout */
+};
 
-void mpc560xb_uartc_rx_isr(void);
-void mpc560xb_uartc_tx_isr(void);
-void mpc560xb_uartc_err_isr(void);
 
-#endif /* uart.h */
+#endif /* soc_uart.h */

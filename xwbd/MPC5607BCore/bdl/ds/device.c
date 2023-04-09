@@ -23,7 +23,7 @@
 #include <xwcd/ds/xwds.h>
 #include <xwcd/ds/device.h>
 #include <xwcd/ds/soc/chip.h>
-#include <xwcd/ds/uart/general.h>
+#include <xwcd/ds/uart/controller.h>
 #include <xwcd/ds/misc/chip.h>
 #include <xwcd/perpheral/i2c/eeprom/device.h>
 #include <bdl/standard.h>
@@ -154,7 +154,7 @@ xwer_t bdl_xwds_uart_start(void)
 {
         xwer_t rc;
 
-        xwds_dmauartc_construct(&mpc560xb_uart0_cb);
+        xwds_uartc_construct(&mpc560xb_uart0_cb);
         rc = xwds_device_probe(&bdl_xwds,
                                xwds_cast(struct xwds_device *, &mpc560xb_uart0_cb),
                                NULL);

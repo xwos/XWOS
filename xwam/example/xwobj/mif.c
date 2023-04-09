@@ -38,8 +38,7 @@
 #include <xwcd/ds/object.h>
 #include <xwcd/ds/device.h>
 #include <xwcd/ds/soc/chip.h>
-#include <xwcd/ds/uart/dma.h>
-#include <xwcd/ds/uart/general.h>
+#include <xwcd/ds/uart/controller.h>
 #include <xwcd/ds/i2c/master.h>
 #include <xwcd/ds/i2c/perpheral.h>
 #include <xwcd/ds/spi/master.h>
@@ -92,8 +91,6 @@ xwer_t xwos_example_xwobj(void)
                   sizeof(struct xwds_device));
         xwobjlogf(INFO, "sizeof(struct xwds_soc): %d\n",
                   sizeof(struct xwds_soc));
-        xwobjlogf(INFO, "sizeof(struct xwds_dmauartc): %d\n",
-                  sizeof(struct xwds_dmauartc));
         xwobjlogf(INFO, "sizeof(struct xwds_uartc): %d\n",
                   sizeof(struct xwds_uartc));
         xwobjlogf(INFO, "sizeof(struct xwds_i2cm): %d\n",

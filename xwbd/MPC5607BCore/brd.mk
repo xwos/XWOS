@@ -42,6 +42,6 @@ BRD_CSRCS += bdl/main.c
 
 BRD_CSRCS += bdl/ds/device.c
 BRD_CSRCS += bdl/ds/driver/soc.c
-BRD_CSRCS += bdl/ds/driver/dmauart0.c
+BRD_CSRCS += bdl/ds/driver/uart0.c
 BRD_CSRCS += bdl/ds/description/soc_cfg.c
-BRD_CSRCS += bdl/ds/description/dmauart_cfg.c
+BRD_CSRCS += bdl/ds/description/uart_cfg.c

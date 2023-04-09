@@ -46,12 +46,7 @@ ifeq ($(XWCDCFG_ds_SOC),y)
     endif
 endif
 ifeq ($(XWCDCFG_ds_UART),y)
-    ifeq ($(XWCDCFG_ds_UART_GNR),y)
-        XWMO_CSRCS += uart/general.c
-    endif
-    ifeq ($(XWCDCFG_ds_UART_DMA),y)
-        XWMO_CSRCS += uart/dma.c
-    endif
+    XWMO_CSRCS += uart/controller.c
 endif
 ifeq ($(XWCDCFG_ds_SPI_MASTER),y)
     XWMO_CSRCS += spi/master.c
