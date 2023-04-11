@@ -313,33 +313,3 @@ xwmm_dkma_mmz_pos = xwmm_dkma_mmz_start - xwmm_dkma_mmz_origin;
 
 /* 用于提供image文件头信息 */
 image_head_lma = ORIGIN(boot_mr);
-
-/* 用于RTD中Flash操作 */
-Fls_ACEraseRomStart = __acfls_code_rom_start;
-Fls_ACEraseRomEnd = __acfls_code_rom_end;
-Fls_ACEraseSize = (__acfls_code_rom_end - __acfls_code_rom_start) / 4; /* Copy 4 bytes at a time*/
-
-Fls_ACWriteRomStart = __acfls_code_rom_start;
-Fls_ACWriteRomEnd = __acfls_code_rom_end;
-Fls_ACWriteSize = (__acfls_code_rom_end - __acfls_code_rom_start) / 4; /* Copy 4 bytes at a time*/
-
-_ERASE_FUNC_ADDRESS_ = ADDR(.acfls_code_ram);
-_WRITE_FUNC_ADDRESS_ = ADDR(.acfls_code_ram);
-
-
-/* 用于 SystemInit() 内初始化MPU */
-__INT_SRAM_START         = ORIGIN(sram_mr);
-__INT_ITCM_START         = ORIGIN(itcm_mr);
-__INT_DTCM_START         = ORIGIN(dtcm_mr);
-
-__RAM_NO_CACHEABLE_START = ORIGIN(armv7m_ivt_vmr);
-__RAM_NO_CACHEABLE_SIZE  = 0xE; /* 16KiB in power of 2 (include armv7m_ivt_mr, non_cacheable_data_mr, int_sram_results) */
-
-__RAM_CACHEABLE_START    = ORIGIN(cacheable_data_mr);
-__RAM_CACHEABLE_SIZE     = 0x10;  /* 64KiB in power of 2 (include cacheable_data_mr, int_sram_fls_rsv, heap_mr) */
-
-__RAM_SHAREABLE_START    = ORIGIN(shareable_data_mr);
-__RAM_SHAREABLE_SIZE     = 0xE; /* 16KiB in power of 2 */
-
-__ROM_CODE_START         = ORIGIN(codeflash_mr); /* Code Flash */
-__ROM_DATA_START         = ORIGIN(dataflash_mr); /* DATA Flash */
