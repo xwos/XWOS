@@ -1090,14 +1090,17 @@ void xwssc_finish_tx(struct xwssc * xwssc, struct xwssc_carrier * car)
                         xwssclogf(WARNING, "[TX] Link has been severed!\n");
                         xwaop_c0m(xwsq_t, &xwssc->hwifst, XWSSC_HWIFST_CONNECT,
                                   NULL, NULL);
+                        xwaop_write(xwu32_t, &car->state, XWSSC_CRS_READY, NULL);
                         xwssc->txq.tmp = car;
                         break;
                 case XWSSC_ACK_NOMEM:
                         xwssclogf(WARNING, "[TX] Remote has no memory!\n");
+                        xwaop_write(xwu32_t, &car->state, XWSSC_CRS_READY, NULL);
                         xwssc->txq.tmp = car;
                         break;
                 default:
                         XWSSC_BUG();
+                        xwaop_write(xwu32_t, &car->state, XWSSC_CRS_READY, NULL);
                         xwssc->txq.tmp = car;
                         break;
                 }
