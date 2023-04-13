@@ -179,6 +179,36 @@ void xwos_skd_enpmpt_lc(void)
         xwosdl_skd_enpmpt_lc();
 }
 
+/**
+ * @brief XWOS API：继续运行本地CPU调度器
+ * @note
+ * + 上下文：任意
+ * @details
+ * 继续运行调度器包括两个操作：
+ * + 1. 打开本地CPU调度器的抢占；
+ * + 2. 启动本地CPU的系统定时器。
+ */
+static __xwos_inline_api
+void xwos_skd_continue_lc(void)
+{
+        xwosdl_skd_continue_lc();
+}
+
+/**
+ * @brief XWOS API：暂停本地CPU调度器
+ * @note
+ * + 上下文：任意
+ * @details
+ * 继续运行调度器包括两个操作：
+ * + 1. 关闭本地CPU的系统定时器；
+ * + 2. 关闭本地CPU调度器的抢占。
+ */
+static __xwos_inline_api
+void xwos_skd_pause_lc(void)
+{
+        xwosdl_skd_pause_lc();
+}
+
 /** @} */ // xwos_skd
 
 

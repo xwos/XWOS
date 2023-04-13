@@ -25,8 +25,8 @@ ENTRY(Reset_Handler)
 SECTIONS {
         .boot : { /* BOOT区域 */
                 KEEP(*(.boot_header)) /* S32K3的IVT */
-                image_description_vma_base = .;
                 . = ALIGN(2048);
+                image_description_vma_base = .;
                 KEEP(*(.image.description)) /* XWOS的image描述结构体 */
                 image_description_vma_end = .;
         } > boot_mr

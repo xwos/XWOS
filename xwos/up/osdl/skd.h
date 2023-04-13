@@ -96,4 +96,18 @@ void xwosdl_skd_enpmpt_lc(void)
         xwup_skd_enpmpt_lc();
 }
 
+static __xwos_inline_api
+void xwosdl_skd_continue_lc(void)
+{
+        xwup_skd_enpmpt_lc();
+        xwup_skd_start_syshwt_lc();
+}
+
+static __xwos_inline_api
+void xwosdl_skd_pause_lc(void)
+{
+        xwup_skd_stop_syshwt_lc();
+        xwup_skd_dspmpt_lc();
+}
+
 #endif /* xwos/up/osdl/skd.h */
