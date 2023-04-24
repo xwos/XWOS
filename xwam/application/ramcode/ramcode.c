@@ -14,7 +14,7 @@
 #include <string.h>
 #include <arch_firmware.h>
 #include <xwos/lib/crc32.h>
-#include <xwmd/ramcode/mif.h>
+#include <xwam/application/ramcode/mif.h>
 
 const char ramcode_tag[] = "XWOS.RC";
 

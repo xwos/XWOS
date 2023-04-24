@@ -10,8 +10,8 @@
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
-#ifndef __xwmd_ramcode_mif_h__
-#define __xwmd_ramcode_mif_h__
+#ifndef __xwam_application_ramcode_mif_h__
+#define __xwam_application_ramcode_mif_h__
 
 #include <xwos/standard.h>
 
@@ -45,4 +45,4 @@ xwer_t ramcode_init(struct ramcode * ramcode,
 xwer_t ramcode_load(struct ramcode * ramcode);
 xwer_t ramcode_boot(struct ramcode * ramcode);
 
-#endif /* xwmd/ramcode/mif.h */
+#endif /* xwam/application/ramcode/mif.h */

@@ -22,10 +22,10 @@
 #include <arch_firmware.h>
 #include <xwos/osal/thd.h>
 #include <xwcd/ds/soc/gpio.h>
-#include <xwmd/ramcode/mif.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/mif.h>
 #include <bm/main/xwscp.h>
+#include <xwam/application/ramcode/mif.h>
 
 #define KEY_GPIO_PORT           XWDS_GPIO_PORT_C
 #define KEY_GPIO_PIN            XWDS_GPIO_PIN_13

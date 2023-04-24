@@ -66,4 +66,9 @@
 #define XWMDCFG_libc_newlibac_mem                               1
 #define XWMDCFG_libc_newlibac_fops                              1
 
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ********            XWRust Runtime            ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#define XWMDCFG_xwrust_ffi                                      0
+
 #endif /* cfg/xwmd.h */
