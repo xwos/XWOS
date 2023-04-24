@@ -37,9 +37,8 @@
 #define BRDCFG_LOG                              0
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********      version      ******** ******** ********
+ ******** ******** ********   firmware info   ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define BRDCFG_SW_VERSION                       ("M56BDKP.0000.0000.0000")
-#define BRDCFG_HW_VERSION                       ("M56BDKP.0000.0000.0000")
+#define BRDCFG_FIRMWARE_TAILFLAG                "XWOS,MCU:MPC5607B"
 
 #endif /* cfg/board.h */

@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <arch_image.h>
+#include <arch_firmware.h>
 #include <xwos/osal/thd.h>
 #include <xwcd/ds/soc/gpio.h>
 #include <xwmd/ramcode/mif.h>
@@ -58,7 +58,8 @@ const struct xwos_thd_desc main_thd_desc = {
 };
 xwos_thd_d main_thd;
 
-extern uint8_t qspiflash_mr_origin[];
+extern xwu8_t qspiflash_mr_origin[];
+extern xwu8_t firmware_info_offset[];
 
 struct ramcode bm_ramcode;
 const struct ramcode_operation bm_ramcode_op = {
@@ -73,7 +74,9 @@ xwer_t xwos_main(void)
         xwds_gpio_req(&stm32soc, KEY_GPIO_PORT, KEY_GPIO_PIN);
         xwds_gpio_input(&stm32soc, KEY_GPIO_PORT, KEY_GPIO_PIN, &key);
         if (0 == key) {
-                arch_boot_image((void *)qspiflash_mr_origin);
+                arch_boot_firmware((void *)qspiflash_mr_origin,
+                                   (xwsz_t)firmware_info_offset,
+                                   BRDCFG_FIRMWARE_TAILFLAG);
         }
 
         xwds_gpio_req(&stm32soc, LED_GPIO_PORT, LED_GPIO_PIN);
@@ -133,7 +136,10 @@ xwer_t main_task(void * arg)
         }
 
         /* load ramcode */
-        ramcode_init(&bm_ramcode, &bm_ramcode_op, &bm_xwscp);
+        ramcode_init(&bm_ramcode,
+                     &bm_ramcode_op, &bm_xwscp,
+                     (xwsz_t)firmware_info_offset,
+                     BRDCFG_FIRMWARE_TAILFLAG);
         rc = ramcode_load(&bm_ramcode);
         if (rc < 0) {
                 goto err_ramcode_load;

@@ -30,12 +30,12 @@ SECTIONS {
         armv7m_ivt_vma_base = ADDR(.armv7m.ivt);
         armv7m_ivt_lma_base = LOADADDR(.armv7m.ivt);
 
-        .image.description : ALIGN(8) {
-                KEEP(*(.image.description))
-                image_description_vma_end = .;
-        } > image_description_mr AT> image_description_mr
-        image_description_vma_base = ADDR(.image.description);
-        image_description_lma_base = LOADADDR(.image.description);
+        .firmware.info : ALIGN(8) {
+                KEEP(*(.firmware.info))
+                firmware_info_vma_end = .;
+        } > firmware_info_mr AT> firmware_info_mr
+        firmware_info_vma_base = ADDR(.firmware.info);
+        firmware_info_lma_base = LOADADDR(.firmware.info);
 
         .xwos.rx : ALIGN(8) {
                 *(.xwos.init.text)
@@ -85,6 +85,10 @@ SECTIONS {
 
         .gnu_extab : ALIGN(8) {
                 *(.gnu_extab*)
+        } > code_mr AT> code_mr
+
+        .exception_ranges : ALIGN(8) {
+                *(.exception_ranges*)
         } > code_mr AT> code_mr
         /* -------- 以上与unwinding有关，用于异常处理和栈回溯 -------- */
 
@@ -145,14 +149,14 @@ SECTIONS {
         data4_vma_base = ADDR(.data4);
         data4_lma_base = LOADADDR(.data4);
 
-        .image.tail : ALIGN(32) {
-                KEEP(*(.image.tail))
-                image_tail_vma_end = .;
+        .firmware.tail : ALIGN(32) {
+                KEEP(*(.firmware.tail))
+                firmware_tail_vma_end = .;
         } > code_mr AT> code_mr
-        image_tail_vma_base = ADDR(.image.tail);
-        image_tail_size = image_tail_vma_end - image_tail_vma_base;
-        image_tail_lma_base = LOADADDR(.image.tail);
-        image_tail_lma_end = image_tail_lma_base + image_tail_size;
+        firmware_tail_vma_base = ADDR(.firmware.tail);
+        firmware_tail_size = firmware_tail_vma_end - firmware_tail_vma_base;
+        firmware_tail_lma_base = LOADADDR(.firmware.tail);
+        firmware_tail_lma_end = firmware_tail_lma_base + firmware_tail_size;
 
         .bss : ALIGN(16) {
                 *(.dynbss)
@@ -233,8 +237,8 @@ SECTIONS {
         }
 }
 
-/* 用于提供image文件头信息 */
-image_head_lma = armv7m_ivt_lma_base;
+/* 用于提供firmware文件头信息 */
+firmware_head_lma = armv7m_ivt_lma_base;
 
 xwos_data_mr_origin = ORIGIN(xwos_data_mr);
 xwos_data_mr_size = LENGTH(xwos_data_mr);

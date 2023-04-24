@@ -18,10 +18,10 @@
 struct ramcode;
 
 struct ramcode_info {
-        char head[8];
+        char tag[8]; /* "XWOS.RC" */
         xwptr_t origin;
         xwsz_t size;
-        xwu8_t crc32[4];
+        xwu32_t crc32;
 };
 
 struct ramcode_operation {
@@ -32,13 +32,16 @@ struct ramcode_operation {
 
 struct ramcode {
         struct ramcode_info info;
+        xwsz_t firmware_info_offset;
+        const char * firmware_tailflag;
         const struct ramcode_operation * op;
         void * opcb;
 };
 
 xwer_t ramcode_init(struct ramcode * ramcode,
-                    const struct ramcode_operation * op,
-                    void * opcb);
+                    const struct ramcode_operation * op, void * opcb,
+                    xwsz_t firmware_info_offset,
+                    const char * firmware_tailflag);
 xwer_t ramcode_load(struct ramcode * ramcode);
 xwer_t ramcode_boot(struct ramcode * ramcode);
 

@@ -75,8 +75,8 @@
 #define __xwos_rodata           __xwcc_section(".xwos.rodata")
 #define __xwos_data             __xwcc_section(".xwos.data")
 
-#define __image_description     __xwcc_section(".image.description")
-#define __image_tail            __xwcc_section(".image.tail")
+#define __firmware_info         __xwcc_section(".firmware.info")
+#define __firmware_tail         __xwcc_section(".firmware.tail")
 
 /******** ******** barrier ******** ********/
 #define xwccmb()                __asm__ volatile("": : :"memory")

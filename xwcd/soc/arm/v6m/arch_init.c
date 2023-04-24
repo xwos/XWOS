@@ -21,26 +21,7 @@
 #include <xwos/standard.h>
 #include <armv6m_isa.h>
 #include <arch_irq.h>
-#include <arch_image.h>
-#include <arch_nvic.h>
 #include <arch_init.h>
-
-extern const xwu8_t image_tail_lma_base[];
-extern const xwu8_t image_tail_lma_end[];
-extern const xwu8_t image_head_lma[];
-
-__image_description
-const struct arch_image_description arch_image_description = {
-        .head = (void *)image_head_lma,
-        .tail_flag_addr = (void *)image_tail_lma_base,
-        .end_addr = (void *)image_tail_lma_end,
-        .entry = arch_isr_reset,
-};
-
-__image_tail
-const struct arch_image_tail arch_image_tail = {
-        .flag = ARCHCFG_IMAGE_TAILFLAG,
-};
 
 /**
  * @brief Init architecture

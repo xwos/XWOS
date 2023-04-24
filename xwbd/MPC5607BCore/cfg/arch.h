@@ -79,12 +79,6 @@
 #define ARCHCFG_LIB_XWBMPAOP                    1
 
 /******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********     image flag    ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#define ARCHCFG_IMG_TAILFLAG1                   ((xwu64_t)0xBEEFCAFEFEEDFACE)
-#define ARCHCFG_IMG_TAILFLAG2                   ((xwu64_t)0xFEEDFACECAFEBEEF)
-
-/******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         default configures          ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #if (((!defined(ARCHCFG_BIG_ENDIAN)) || (1 != ARCHCFG_BIG_ENDIAN)) && \

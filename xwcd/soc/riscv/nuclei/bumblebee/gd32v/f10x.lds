@@ -17,7 +17,7 @@
  * > See the License for the specific language governing permissions and
  * > limitations under the License.
  * @note
- * - Reference: riscv-none-embed-ld --verbose
+ * - Reference: riscv-nuclei-elf-ld --verbose
  */
 
 ENTRY(soc_boot)
@@ -47,8 +47,8 @@ SECTIONS {
         eclic_ivt_lma_base = LOADADDR(.eclic.ivt);
 
         .rx : ALIGN(4) {
-                image_description_vma_base = .;
-                KEEP(*(.image.description))
+                firmware_info_vma_base = .;
+                KEEP(*(.firmware.info))
                 KEEP(*(.soc.ivt))
                 *(.xwos.init.text)
                 *(.xwos.init.rodata)
@@ -57,16 +57,37 @@ SECTIONS {
                 *(.xwos.isr.text)
                 *(.xwos.text)
                 *(.xwos.rodata)
+                KEEP (*(SORT_NONE(.init)))
                 *(.text .text.* .gnu.linkonce.t.*)
+                KEEP (*(SORT_NONE(.fini)))
                 *(.rodata .rodata.* .gnu.linkonce.r.*)
                 *(.srodata .srodata.* .gnu.linkonce.sr.*)
         } > code_mr AT> code_mr
-        image_description_lma_base = LOADADDR(.rx);
+        firmware_info_lma_base = LOADADDR(.rx);
 
-        .fini : {
-                KEEP (*(SORT_NONE(.fini)))
+        /* ++++++++ 以下与unwinding有关，用于异常处理和栈回溯 ++++++++ */
+        .eh_frame_hdr : ALIGN(8) { /* 用于栈展开 */
+                KEEP(*(.eh_frame_hdr .eh_frame_entry .eh_frame_entry.*))
         } > code_mr AT> code_mr
 
+        .eh_frame : ALIGN(8) { /* 用于栈展开 */
+                KEEP(*(.eh_frame .eh_frame.*))
+        } > code_mr AT> code_mr
+
+        .gcc_except_table : ALIGN(8) { /* 用于try ... catch ... */
+                *(.gcc_except_table .gcc_except_table.*)
+        } > code_mr AT> code_mr
+
+        .gnu_extab : ALIGN(8) {
+                *(.gnu_extab*)
+        } > code_mr AT> code_mr
+
+        .exception_ranges : ALIGN(8) {
+                *(.exception_ranges*)
+        } > code_mr AT> code_mr
+        /* -------- 以上与unwinding有关，用于异常处理和栈回溯 -------- */
+
+        /* ++++++++ 以下与C++全局对象的构造函数与析构函数有关 ++++++++ */
         .preinit_array : ALIGN(4) {
                 PROVIDE_HIDDEN (__preinit_array_start = .);
                 KEEP (*(.preinit_array*))
@@ -95,6 +116,7 @@ SECTIONS {
         } > code_mr AT> code_mr
         fini_array_vma_base = ADDR(.fini_array);
         fini_array_lma_base = LOADADDR(.fini_array);
+        /* -------- 以上与C++全局对象的构造函数与析构函数有关 -------- */
 
         .data : ALIGN(4) {
                 *(.xwos.data)
@@ -107,14 +129,14 @@ SECTIONS {
         data_vma_base = ADDR(.data);
         data_lma_base = LOADADDR(.data);
 
-        .image.tail : ALIGN(32) {
-                KEEP(*(.image.tail))
-                image_tail_vma_end = .;
+        .firmware.tail : ALIGN(32) {
+                KEEP(*(.firmware.tail))
+                firmware_tail_vma_end = .;
         } > code_mr AT> code_mr
-        image_tail_vma_base = ADDR(.image.tail);
-        image_tail_size = image_tail_vma_end - image_tail_vma_base;
-        image_tail_lma_base = LOADADDR(.image.tail);
-        image_tail_lma_end = image_tail_lma_base + image_tail_size;
+        firmware_tail_vma_base = ADDR(.firmware.tail);
+        firmware_tail_size = firmware_tail_vma_end - firmware_tail_vma_base;
+        firmware_tail_lma_base = LOADADDR(.firmware.tail);
+        firmware_tail_lma_end = firmware_tail_lma_base + firmware_tail_size;
 
         .bss : ALIGN(4) {
                 *(.bss .bss.* .gnu.linkonce.b.*)
@@ -147,6 +169,9 @@ SECTIONS {
                 PROVIDE_HIDDEN (__rela_iplt_end = .);
         }
 }
+
+/* 用于提供firmware文件头信息 */
+firmware_head_lma = ORIGIN(soc_mr);
 
 data_mr_origin = ORIGIN(data_mr);
 data_mr_size = LENGTH(data_mr);

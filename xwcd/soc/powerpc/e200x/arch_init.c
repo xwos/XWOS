@@ -20,37 +20,14 @@
 
 #include <xwos/standard.h>
 #include <e200x_core.h>
-#include <arch_image_flag.h>
+#include <arch_firmware.h>
 #include <arch_init.h>
-
-extern __xwos_isr
-void arch_isr_reset(void);
 
 extern __xwbsp_init_code
 void arch_ivpr_init(void);
 
 static __xwbsp_init_code
 void arch_spr_init(void);
-
-extern const xwu8_t image_tail_lma_base[];
-extern const xwu8_t image_tail_lma_end[];
-
-__image_header const struct arch_image_header arch_image_header = {
-        .tailflag_addr = (void *)image_tail_lma_base,
-        .end_addr = (void *)image_tail_lma_end,
-        .prolog = NULL,
-        .entry = arch_isr_reset,
-        .epilog = NULL,
-};
-
-__image_tail const struct arch_image_tail arch_image_tail = {
-        .flag1 = ARCHCFG_IMG_TAILFLAG1,
-        .flag2 = ARCHCFG_IMG_TAILFLAG2,
-        .aligned_bytes = {
-                0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7,
-                0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF,
-        },
-};
 
 /**
  * @brief init special registers of arch

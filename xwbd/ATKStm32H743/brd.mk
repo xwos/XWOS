@@ -31,6 +31,7 @@ BRD_CXXSRCS :=
 BRD_EOBJS :=
 
 BRD_CSRCS += bdl/init.c
+BRD_CSRCS += bdl/firmware.c
 BRD_CSRCS += bdl/axisram.c
 ifeq ($(BRDCFG_XWSKD_THD_STACK_POOL),y)
   BRD_CSRCS += bdl/xwac/thd_stack_mempool.c

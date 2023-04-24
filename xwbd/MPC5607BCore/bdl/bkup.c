@@ -29,5 +29,4 @@ __bkup struct bdl_bkup bdl_bkup_data = {
                 .wisr = 0,
         },
         .softreset_reason = BDL_SOFTRST_REASON_NONE,
-        .assistant = NULL,
 };

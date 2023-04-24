@@ -43,14 +43,14 @@ MEMORY {
                 len = 512
 
         /* 镜像文件的信息 */
-        image_description_mr (rx):
+        firmware_info_mr (rx):
                 org = ORIGIN(armv6m_ivt_lmr) + LENGTH(armv6m_ivt_lmr),
                 len = 64
 
         /* 代码段(.text)与只读数据段(.rodata) */
         code_mr (rx):
-                org = ORIGIN(image_description_mr) + LENGTH(image_description_mr),
-                len = flash_mr_size - LENGTH(image_description_mr) - LENGTH(armv6m_ivt_lmr)
+                org = ORIGIN(firmware_info_mr) + LENGTH(firmware_info_mr),
+                len = flash_mr_size - LENGTH(firmware_info_mr) - LENGTH(armv6m_ivt_lmr)
 
         /* 数据段(.data)与未初始化的数据段(.bss) */
         data_mr (arw):

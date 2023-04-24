@@ -29,7 +29,7 @@ MEMORY {
 
         armv7m_ivt_lmr (rx): org = 0x08000000, len = 2048 /* vectors table lma region */
         armv7m_ivt_vmr (rw): org = 0x08000000, len = 2048 /* vectors table vma region */
-        image_description_mr (rx): org = 0x08000800, len = 1k /* image description */
+        firmware_info_mr (rx): org = 0x08000800, len = 1k /* firmware info */
         code_mr (rx): org = 0x08000C00, len = 2045k /* text & rodata */
         stkmempool_mr (arw): org = 0x20000000, len = 128k /* .stkmempool */
         data_mr (arw): org = 0x20020000, len = 64k /* .data, .bss & .heap */

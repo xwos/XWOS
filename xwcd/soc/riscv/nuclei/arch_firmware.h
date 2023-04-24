@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 架构描述层：image标记
+ * @brief 架构描述层：Firmware信息
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,26 +18,23 @@
  * > limitations under the License.
  */
 
-#ifndef __arch_image_h__
-#define __arch_image_h__
+#ifndef __arch_firmware_h__
+#define __arch_firmware_h__
 
 #include <xwos/standard.h>
 
-struct arch_image_description {
+struct firmware_info {
         void * head;
         void * tail_flag_addr;
         void * end_addr;
         void (* entry)(void);
+        xwstk_t * sp;
 };
 
-struct __xwcc_aligned(32) arch_image_tail {
+struct __xwcc_aligned(32) firmware_tail {
         char flag[32];
 };
 
-extern const struct arch_image_description arch_image_description;
+xwer_t arch_boot_firmware(void * firmware, xwsz_t info_offset, const char * tailflag);
 
-extern const struct arch_image_tail arch_image_tail;
-
-xwer_t arch_boot_image(void * addr);
-
-#endif /* arch_image.h */
+#endif /* arch_firmware.h */

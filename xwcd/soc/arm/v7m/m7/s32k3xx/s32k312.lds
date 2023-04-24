@@ -26,9 +26,7 @@ SECTIONS {
         .boot : { /* BOOT区域 */
                 KEEP(*(.boot_header)) /* S32K3的IVT */
                 . = ALIGN(2048);
-                image_description_vma_base = .;
-                KEEP(*(.image.description)) /* XWOS的image描述结构体 */
-                image_description_vma_end = .;
+                KEEP(*(.firmware.info)) /* XWOS的firmware描述结构体 */
         } > boot_mr
 
         .armv7m.ivt : ALIGN(8) {
@@ -116,6 +114,10 @@ SECTIONS {
         .gnu_extab : ALIGN(8) {
                 *(.gnu_extab*)
         } > code_mr AT> code_mr
+
+        .exception_ranges : ALIGN(8) {
+                *(.exception_ranges*)
+        } > code_mr AT> code_mr
         /* -------- 以上与unwinding有关，用于异常处理和栈回溯 -------- */
 
         /* ++++++++ 以下与C++全局对象的构造函数与析构函数有关 ++++++++ */
@@ -186,14 +188,14 @@ SECTIONS {
         shareable_data_lma_base = LOADADDR(.shareable_data);
 
         /* 文件尾信息 */
-        .image.tail : ALIGN(32) {
-                KEEP(*(.image.tail))
-                image_tail_vma_end = .;
+        .firmware.tail : ALIGN(32) {
+                KEEP(*(.firmware.tail))
+                firmware_tail_vma_end = .;
         } > code_mr AT> code_mr
-        image_tail_vma_base = ADDR(.image.tail);
-        image_tail_size = image_tail_vma_end - image_tail_vma_base;
-        image_tail_lma_base = LOADADDR(.image.tail);
-        image_tail_lma_end = image_tail_lma_base + image_tail_size;
+        firmware_tail_vma_base = ADDR(.firmware.tail);
+        firmware_tail_size = firmware_tail_vma_end - firmware_tail_vma_base;
+        firmware_tail_lma_base = LOADADDR(.firmware.tail);
+        firmware_tail_lma_end = firmware_tail_lma_base + firmware_tail_size;
 
         /* 未初始化的全局变量和静态变量 */
         .cacheable_bss (NOLOAD) : ALIGN(16) {
@@ -311,5 +313,5 @@ xwmm_dkma_mmz_origin = ORIGIN(cacheable_data_mr);
 xwmm_dkma_mmz_size = xwmm_dkma_mmz_end - xwmm_dkma_mmz_origin;
 xwmm_dkma_mmz_pos = xwmm_dkma_mmz_start - xwmm_dkma_mmz_origin;
 
-/* 用于提供image文件头信息 */
-image_head_lma = ORIGIN(boot_mr);
+/* 用于提供firmware文件头信息 */
+firmware_head_lma = ORIGIN(boot_mr);

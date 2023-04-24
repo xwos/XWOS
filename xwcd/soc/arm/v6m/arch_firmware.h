@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 架构描述层：image标记
+ * @brief 架构描述层：Firmware信息
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,23 +18,23 @@
  * > limitations under the License.
  */
 
+#ifndef __arch_firmware_h__
+#define __arch_firmware_h__
+
 #include <xwos/standard.h>
-#include <arch_image.h>
 
-extern const xwu8_t image_tail_lma_base[];
-extern const xwu8_t image_tail_lma_end[];
-
-extern void soc_boot(void);
-
-__image_description
-const struct arch_image_description arch_image_description = {
-        .head = (void *)soc_boot,
-        .tail_flag_addr = (void *)image_tail_lma_base,
-        .end_addr = (void *)image_tail_lma_end,
-        .entry = soc_boot,
+struct firmware_info {
+        void * head;
+        void * tail_flag_addr;
+        void * end_addr;
+        void (* entry)(void);
+        xwstk_t * sp;
 };
 
-__image_tail
-const struct arch_image_tail arch_image_tail = {
-        .flag = ARCHCFG_IMAGE_TAILFLAG,
+struct __xwcc_aligned(32) firmware_tail {
+        char flag[32];
 };
+
+xwer_t arch_boot_firmware(void * firmware, xwsz_t info_offset, const char * tailflag);
+
+#endif /* arch_firmware.h */

@@ -51,4 +51,9 @@
 #define BRDCFG_SYSCLK                           (40000000U)
 #define BRDCFG_SYSHWT_SRCCLK                    (BRDCFG_SYSCLK / 16)
 
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********   firmware info   ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#define BRDCFG_FIRMWARE_TAILFLAG                "XWOS,MCU:S9KEAZ128"
+
 #endif /* cfg/board.h */

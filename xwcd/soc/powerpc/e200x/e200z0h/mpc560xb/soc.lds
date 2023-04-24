@@ -19,9 +19,9 @@ SECTIONS {
                 KEEP(*(.bam_bootarea))
         } > rcw_mr AT> rcw_mr
 
-        .image_header : {
-                KEEP(*(.image_header))
-                image_header_vma_end = .;
+        .firmware_info : {
+                KEEP(*(.firmware_info))
+                firmware_info_vma_end = .;
         } > code_mr AT> code_mr
 
         .xwos.rx : ALIGN(8) {
@@ -183,15 +183,19 @@ SECTIONS {
                 KEEP(*(.arch_isrtable))
         } > code_mr AT> code_mr
 
-        .image_tail : ALIGN(16) {
-                KEEP(*(.image_tail))
-                image_tail_vma_end = .;
+        .firmware_tail : ALIGN(16) {
+                KEEP(*(.firmware_tail))
+                firmware_tail_vma_end = .;
         } > code_mr AT> code_mr
-        image_tail_vma_base = ADDR(.image_tail);
-        image_tail_size = image_tail_vma_end - image_tail_vma_base;
-        image_tail_lma_base = LOADADDR(.image_tail);
-        image_tail_lma_end = image_tail_lma_base + image_tail_size;
+        firmware_tail_vma_base = ADDR(.firmware_tail);
+        firmware_tail_size = firmware_tail_vma_end - firmware_tail_vma_base;
+        firmware_tail_lma_base = LOADADDR(.firmware_tail);
+        firmware_tail_lma_end = firmware_tail_lma_base + firmware_tail_size;
 }
+
+
+/* 用于提供firmware文件头信息 */
+firmware_head_lma = ORIGIN(code_mr);
 
 xwos_stk_mr_origin = ORIGIN(xwos_stk_mr);
 xwos_stk_mr_size = LENGTH(xwos_stk_mr);

@@ -22,7 +22,6 @@
 #define __bdl_bkup_h__
 
 #include <xwos/standard.h>
-#include <arch_image_flag.h>
 
 enum bdl_softreset_reason_em {
         BDL_SOFTRST_REASON_NONE = 0,
@@ -42,7 +41,6 @@ struct bdl_bkup {
                 xwu32_t wisr; /**< wakeup status flags */
         } soc_wkup_flags;
         xwu32_t softreset_reason;
-        struct arch_image_header * assistant;
 };
 
 extern __bkup struct bdl_bkup bdl_bkup_data;

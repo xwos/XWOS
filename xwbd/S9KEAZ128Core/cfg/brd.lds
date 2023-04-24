@@ -26,7 +26,7 @@ MEMORY {
         armv6m_ivt_lmr (rx): org = 0x00000000, len = 1k /* vectors table lma region */
         armv6m_ivt_vmr (rw): org = 0x00000000, len = 1k /* vectors table vma region */
         flash_cfg_mr (rx): org = 0x00000400, len = 16 /* flash config */
-        image_description_mr (rx): org = 0x00000410, len = 240 /* image description */
+        firmware_info_mr (rx): org = 0x00000410, len = 240 /* firmware info */
         code_mr (rx): org = 0x00000500, len = 129792 /* .text & .rodata */
         data_mr (arw): org = 0x1FFFF000, len = 14k /* .data and .bss */
         xwos_stk_mr (rw): org = 0x20002800, len = 1k /* xwos stack */

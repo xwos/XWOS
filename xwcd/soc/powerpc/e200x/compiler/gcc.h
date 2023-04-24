@@ -70,8 +70,8 @@
 #define __xwos_data             __xwcc_section(".xwos.data")
 
 #define __bkup                  __xwcc_section(".bkup")
-#define __image_header          __xwcc_section(".image_header")
-#define __image_tail            __xwcc_section(".image_tail")
+#define __firmware_info         __xwcc_section(".firmware_info")
+#define __firmware_tail         __xwcc_section(".firmware_tail")
 #define __flsopc                __xwcc_section(".flsopc")
 
 /******** ******** barrier ******** ********/

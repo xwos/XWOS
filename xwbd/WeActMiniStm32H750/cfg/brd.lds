@@ -32,7 +32,7 @@ MEMORY {
 
         armv7m_ivt_lmr (rx): org = 0x90000000, len = 2048 /* vectors table lma region */
         armv7m_ivt_vmr (rw): org = 0x20000000, len = 2048 /* vectors table vma region */
-        image_description_mr (rx): org = 0x90000800, len = 1k /* image description */
+        firmware_info_mr (rx): org = 0x90000800, len = 1k /* firmware info */
         code_mr (rx): org = 0x90000C00, len = 8189k /* text & rodata */
         xwos_data_mr (arw): org = 0x20000800, len = 54k /* .xwos.data */
         data_mr (arw): org = 0x30000000, len = 288k /* .data, .bss & .heap */
@@ -49,5 +49,9 @@ axisram_mr_size = LENGTH(axisram_mr);
 
 qspiflash_mr_origin = ORIGIN(qspiflash_mr);
 qspiflash_mr_size = LENGTH(qspiflash_mr);
+
+firmware_info_mr_origin = ORIGIN(firmware_info_mr);
+firmware_info_mr_size = LENGTH(firmware_info_mr);
+firmware_info_offset = firmware_info_mr_origin - qspiflash_mr_origin;
 
 INCLUDE h7.lds

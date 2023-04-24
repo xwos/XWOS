@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 架构描述层：image标记
+ * @brief 架构描述层：Firmware信息
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -20,44 +20,41 @@
 
 #include <xwos/standard.h>
 #include <string.h>
-#include <arch_image.h>
-
-static __xwbsp_code
-void arch_goto_image(xwstk_t * sp, void (*entry)(void));
+#include <arch_firmware.h>
 
 static __xwbsp_code __xwcc_naked
-void arch_goto_image(__xwcc_unused xwstk_t * sp, __xwcc_unused void (*entry)(void))
+void arch_goto_firmware(__xwcc_unused void (*entry)(void), __xwcc_unused xwstk_t * sp)
 {
         __asm__ volatile(".syntax       unified");
         __asm__ volatile("      cpsid   i");
-        __asm__ volatile("      mov     r2, #0");
+        __asm__ volatile("      movs    r2, #0");
         __asm__ volatile("      msr     control, r2");
-        __asm__ volatile("      msr     msp, r0");
-        __asm__ volatile("      bx      r1");
+        __asm__ volatile("      msr     msp, r1");
+        __asm__ volatile("      dsb");
+        __asm__ volatile("      isb");
+        __asm__ volatile("      bx      r0");
 }
 
 __xwbsp_code
-xwer_t arch_boot_image(void * addr)
+xwer_t arch_boot_firmware(void * firmware, xwsz_t info_offset, const char * tailflag)
 {
         xwer_t rc;
-        const struct arch_image_description * imgd;
-        const struct arch_image_tail * imgt;
+        const struct firmware_info * fmwi;
+        const struct firmware_tail * fmwt;
         bool head_matched;
         bool tail_matched;
         bool flag_matched;
 
-        imgd = (const struct arch_image_description *)(((xwptr_t)addr) +
-                                                       ARCHCFG_IMAGE_FLAG_OFFSET);
-
-        head_matched = !!((xwptr_t)imgd->head == (xwptr_t)addr);
-        tail_matched = !!((((xwptr_t)imgd->tail_flag_addr) + 0x20U) ==
-                          (xwptr_t)imgd->end_addr);
+        fmwi = (const struct firmware_info *)(((xwptr_t)firmware) + info_offset);
+        head_matched = !!((xwptr_t)fmwi->head == (xwptr_t)firmware);
+        tail_matched = !!((((xwptr_t)fmwi->tail_flag_addr) + 0x20U) ==
+                          (xwptr_t)fmwi->end_addr);
         if ((head_matched) && (tail_matched)) {
-                imgt = imgd->tail_flag_addr;
-                flag_matched = !strcmp(imgt->flag, ARCHCFG_IMAGE_TAILFLAG);
-                if ((flag_matched) && (imgd->entry)) {
+                fmwt = fmwi->tail_flag_addr;
+                flag_matched = !strcmp(fmwt->flag, tailflag);
+                if ((flag_matched) && (fmwi->entry)) {
                         rc = XWOK;
-                        arch_goto_image(*((xwstk_t **)imgd->head), imgd->entry);
+                        arch_goto_firmware(fmwi->entry, fmwi->sp);
                         /* never return to here. */
                 } else {
                         rc = -EFAULT;

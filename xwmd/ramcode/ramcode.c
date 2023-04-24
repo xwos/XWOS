@@ -12,17 +12,22 @@
 
 #include <xwos/standard.h>
 #include <string.h>
-#include <arch_image.h>
+#include <arch_firmware.h>
 #include <xwos/lib/crc32.h>
 #include <xwmd/ramcode/mif.h>
 
+const char ramcode_tag[] = "XWOS.RC";
+
 xwer_t ramcode_init(struct ramcode * ramcode,
-                    const struct ramcode_operation * op,
-                    void * opcb)
+                    const struct ramcode_operation * op, void * opcb,
+                    xwsz_t firmware_info_offset,
+                    const char * firmware_tailflag)
 {
-        memset(ramcode, 0 , sizeof(struct ramcode));
+        memset(ramcode, 0, sizeof(struct ramcode));
         ramcode->op = op;
         ramcode->opcb = opcb;
+        ramcode->firmware_info_offset = firmware_info_offset;
+        ramcode->firmware_tailflag = firmware_tailflag;
         return XWOK;
 }
 
@@ -43,6 +48,10 @@ xwer_t ramcode_load(struct ramcode * ramcode)
         if ((rc < 0) || (size <= 0)) {
                 goto err_info;
         }
+        if (0 != memcmp(ramcode->info.tag, ramcode_tag, sizeof(ramcode_tag))) {
+                goto err_tag;
+        }
+
         rest = (xwssz_t)ramcode->info.size;
         while (rest > 0) {
                 size = (xwsz_t)rest;
@@ -59,16 +68,14 @@ xwer_t ramcode_load(struct ramcode * ramcode)
         }
         size = ramcode->info.size;
         crc32 = xwlib_crc32_calms((const xwu8_t *)ramcode->info.origin, &size);
-        if ((((crc32 >> 24U) & 0xFFU) != ramcode->info.crc32[0]) ||
-            (((crc32 >> 16U) & 0xFFU) != ramcode->info.crc32[1]) ||
-            (((crc32 >> 8U) & 0xFFU) != ramcode->info.crc32[2]) ||
-            (((crc32 >> 0U) & 0xFFU) != ramcode->info.crc32[3])) {
+        if (crc32 != ramcode->info.crc32) {
                 rc = -EBADMSG;
         } else {
                 rc = XWOK;
         }
 
 err_size:
+err_tag:
 err_info:
 err_op:
         return rc;
@@ -76,6 +83,8 @@ err_op:
 
 xwer_t ramcode_boot(struct ramcode * ramcode)
 {
-        arch_boot_image((void *)ramcode->info.origin);
+        arch_boot_firmware((void *)ramcode->info.origin,
+                           ramcode->firmware_info_offset,
+                           ramcode->firmware_tailflag);
         return -EFAULT;
 }
