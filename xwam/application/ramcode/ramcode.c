@@ -43,7 +43,7 @@ xwer_t ramcode_load(struct ramcode * ramcode)
                 goto err_op;
         }
         size = sizeof(struct ramcode_info);
-        rc = ramcode->op->load(ramcode->opcb,
+        rc = ramcode->op->load(ramcode,
                                (xwu8_t *)&ramcode->info, &size, XWTM_MAX);
         if ((rc < 0) || (size <= 0)) {
                 goto err_info;
@@ -55,7 +55,7 @@ xwer_t ramcode_load(struct ramcode * ramcode)
         rest = (xwssz_t)ramcode->info.size;
         while (rest > 0) {
                 size = (xwsz_t)rest;
-                rc = ramcode->op->load(ramcode->opcb,
+                rc = ramcode->op->load(ramcode,
                                        (xwu8_t *)ramcode->info.origin, &size,
                                        XWTM_MAX);
                 if (XWOK == rc) {

@@ -33,7 +33,6 @@
 #include <xwmd/isc/xwcq/mif.h>
 #include <xwmd/isc/xwmq/mif.h>
 #include <xwmd/isc/xwssc/protocol.h>
-#include <xwmd/isc/xwscp/protocol.h>
 #include <xwam/example/xwobj/mif.h>
 #include <xwcd/ds/object.h>
 #include <xwcd/ds/device.h>
@@ -82,8 +81,6 @@ xwer_t xwos_example_xwobj(void)
                   sizeof(struct xwmq), sizeof(struct xwmq_msg));
         xwobjlogf(INFO, "sizeof(struct xwssc): %d\n",
                   sizeof(struct xwssc));
-        xwobjlogf(INFO, "sizeof(struct xwscp): %d\n",
-                  sizeof(struct xwscp));
 
         xwobjlogf(INFO, "sizeof(struct xwds_object): %d\n",
                   sizeof(struct xwds_object));

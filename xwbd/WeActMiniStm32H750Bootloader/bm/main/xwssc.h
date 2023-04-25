@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 主模块：xwscp子模块
+ * @brief 主模块：xwssc子模块
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,12 +18,15 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_main_xwscp_h__
-#define __bm_main_xwscp_h__
+#ifndef __bm_main_xwssc_h__
+#define __bm_main_xwssc_h__
 
 #include <xwos/standard.h>
+#include <xwmd/isc/xwssc/mif.h>
 
-xwer_t bm_xwscp_start(void);
-xwer_t bm_xwscp_stop(void);
+xwer_t bm_xwssc_start(void);
+xwer_t bm_xwssc_stop(void);
+xwer_t bm_xwssc_tx(const xwu8_t data[], xwsz_t * size, xwtm_t to);
+xwer_t bm_xwssc_rx(xwu8_t rxbuf[], xwsz_t * size, xwtm_t to);
 
-#endif /* bm/main/xwscp.h */
+#endif /* bm/main/xwssc.h */

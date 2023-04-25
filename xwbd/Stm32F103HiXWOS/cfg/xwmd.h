@@ -43,15 +43,6 @@
 #define XWMDCFG_isc_xwssc_TXTHD_PRIORITY                        \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
-/******** ******** simple communication protocol ******** ********/
-#define XWMDCFG_isc_xwscp                                       1
-#define XWMDCFG_isc_xwscp_LOG                                   0
-#define XWMDCFG_isc_xwscp_PERIOD                                (XWTM_S(1))
-#define XWMDCFG_isc_xwscp_MEMBLK_SIZE                           (64U)
-#define XWMDCFG_isc_xwscp_MEMBLK_ODR                            (6U)
-#define XWMDCFG_isc_xwscp_THD_PRIORITY                          \
-        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
-
 /******** ******** Message Queue ******** ********/
 #define XWMDCFG_isc_xwmq                                        0
 

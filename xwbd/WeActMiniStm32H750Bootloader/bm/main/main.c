@@ -24,7 +24,7 @@
 #include <xwcd/ds/soc/gpio.h>
 #include <bdl/standard.h>
 #include <bm/stm32cube/mif.h>
-#include <bm/main/xwscp.h>
+#include <bm/main/xwssc.h>
 #include <xwam/application/ramcode/mif.h>
 
 #define KEY_GPIO_PORT           XWDS_GPIO_PORT_C
@@ -104,12 +104,14 @@ err_skd_start_lc:
         return rc;
 }
 
+
 static
 xwer_t bm_ramcode_load(struct ramcode * ramcode,
                        xwu8_t * loadbuf, xwsz_t * bufsize,
                        xwtm_t to)
 {
-        return xwscp_rx(ramcode->opcb, loadbuf, bufsize, to);
+        XWOS_UNUSED(ramcode);
+        return bm_xwssc_rx(loadbuf, bufsize, to);
 }
 
 static
@@ -125,19 +127,15 @@ xwer_t main_task(void * arg)
                 goto err_stm32cube_start;
         }
 
-        /* Init xwscp */
-        rc =  bm_xwscp_start();
+        /* Init xwssc */
+        rc =  bm_xwssc_start();
         if (rc < 0) {
-                goto err_xwscp_start;
-        }
-        rc = xwscp_connect(&bm_xwscp, XWTM_MAX);
-        if (rc < 0) {
-                goto err_xwscp_connect;
+                goto err_xwssc_start;
         }
 
         /* load ramcode */
         ramcode_init(&bm_ramcode,
-                     &bm_ramcode_op, &bm_xwscp,
+                     &bm_ramcode_op, NULL,
                      (xwsz_t)firmware_info_offset,
                      BRDCFG_FIRMWARE_TAILFLAG);
         rc = ramcode_load(&bm_ramcode);
@@ -154,9 +152,7 @@ err_ramcode_boot:
         BRD_BUG();
 err_ramcode_load:
         BRD_BUG();
-err_xwscp_connect:
-        BRD_BUG();
-err_xwscp_start:
+err_xwssc_start:
         BRD_BUG();
 err_stm32cube_start:
         BRD_BUG();
