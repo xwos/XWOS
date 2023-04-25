@@ -122,8 +122,9 @@ xwer_t xwos_skd_init_lc(void)
  * @note
  * + 上下文：启动
  * @details
- * 此函数调用后，调度器将开始调度，且不会返回，
- * 上下文(Context)也从 **启动** 切换为 **线程** 。
+ * 此函数被调用后，调度器将开始调度，上下文(Context)也从 **启动** 切换为 **线程** 。
+ * 调度器启动后，此函数不会返回。
+ * 此函数只能在 `xwos_init()` 之后被调用。
  */
 static __xwos_inline_api
 xwer_t xwos_skd_start_lc(void)

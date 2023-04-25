@@ -108,15 +108,6 @@ xwer_t xwmm_kma_init(void)
 }
 
 /**
- * @brief 退出内核内存分配器
- */
-__xwos_exit_code
-xwer_t xwmm_kma_exit(void)
-{
-        return XWOK;
-}
-
-/**
  * @brief XWMM API：申请内核内存
  * @param[in] size: 大小
  * @param[in] aligned: 申请到的内存的首地址需要对齐到的边界

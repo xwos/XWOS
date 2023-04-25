@@ -12,6 +12,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/mp/pm.h>
+#include <xwos/mp/skd.h>
 #include <xwos/mp/init.h>
 
 /**
@@ -20,7 +21,12 @@
 __xwmp_init_code
 xwer_t xwmp_init(void)
 {
-        /* 初始化中断管理系统 */
-        xwmp_pmdm_init();
+        xwid_t cpuid;
+
+        cpuid = xwmp_skd_id_lc();
+        if (0 == cpuid) {
+                xwmp_pmdm_init();
+        }
+        xwmp_skd_init_lc();
         return XWOK;
 }

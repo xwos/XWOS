@@ -11,13 +11,15 @@
  */
 
 #include <xwos/standard.h>
+#include <xwos/up/skd.h>
 #include <xwos/up/init.h>
 
 /**
- * @brief 初始化XWOS UP Kernel
+ * @brief 初始化XWOS UP内核
  */
 __xwup_init_code
 xwer_t xwup_init(void)
 {
+        xwup_skd_init_lc();
         return XWOK;
 }

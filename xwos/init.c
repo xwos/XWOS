@@ -20,21 +20,18 @@
 #endif
 #include <xwos/lib/object.h>
 #include <xwos/mm/kma.h>
-#include <xwos/init.h>
+#include <xwos/osal/skd.h>
 
-/**
- * @brief 初始化XWOS内核
- */
 __xwos_init_code
 void xwos_init(void)
 {
-        /* 初始化对象标签分配器 */
-        xwos_objtik_init();
+        xwid_t cpuid;
 
-        /* 初始化KMA */
-        xwmm_kma_init();
-
-        /* 初始化内核 */
+        cpuid = xwos_skd_id_lc();
+        if (0 == cpuid) {
+                xwos_objtik_init();
+                xwmm_kma_init();
+        }
 #if defined(XWOS_CFG_CORE__mp)
         xwmp_init();
 #elif defined(XWOS_CFG_CORE__up)

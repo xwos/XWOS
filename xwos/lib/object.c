@@ -45,11 +45,11 @@ void xwos_objtik_init(void)
 /**
  * @brief 从对象标签分配器获取一个标签
  * @return 标签
- * @note
- * - 为了避免频繁地访问多CPU共享原子变量xwos_objtik_dispatcher，每次获取标签
- *   都是从当前CPU的每CPU变量xwos_objtik中分配的，只有当xwos_objtik的分配额
- *   达到最大额度XWOS_OBJTIK_CHUNK时，才会访问xwos_objtik_dispatcher再次预先分配
- *   XWOS_OBJTIK_CHUNK个标签。
+ * @details
+ * 为了避免频繁地访问多CPU共享原子变量 `xwos_objtik_dispatcher` ，每次获取标签
+ * 都是从当前CPU的私有变量 `xwos_objtik[cpu]` 中分配的，只有当 `xwos_objtik[cpu]` 的
+ * 分配额达到最大额度 `XWOS_OBJTIK_CHUNK` 时，才会在临界区访问 `xwos_objtik_dispatcher`
+ * 预先分配数量为 `XWOS_OBJTIK_CHUNK` 的标签。
  */
 __xwlib_code
 xwsq_t xwos_objtik_get(void)
