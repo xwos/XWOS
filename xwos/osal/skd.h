@@ -103,20 +103,6 @@ bool xwos_skd_prio_tst_valid(xwpr_t prio)
 }
 
 /**
- * @brief XWOS API：初始化当前CPU的调度器
- * @return 错误码
- * @note
- * + 上下文：启动
- * @details
- * 此函数只能在 `xwos_init()` 之后， `xwos_skd_start_lc()` 之前被调用 。
- */
-static __xwos_inline_api
-xwer_t xwos_skd_init_lc(void)
-{
-        return xwosdl_skd_init_lc();
-}
-
-/**
  * @brief XWOS API：启动当前CPU的调度器
  * @return 此函数不会返回
  * @note

@@ -145,7 +145,6 @@ xwer_t xwos_main(void)
         xwer_t rc = XWOK;
         xwsz_t i;
 
-        xwos_skd_init_lc();
         for (i = 0; i < xw_array_size(board_thd_desc); i++) {
                 rc = xwos_thd_create(&board_thd[i],
                                      &board_thd_desc[i].attr,

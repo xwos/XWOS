@@ -46,7 +46,6 @@ xwer_t xwos_main(void)
 {
         xwer_t rc;
 
-        xwos_skd_init_lc();
         rc = xwos_thd_create(&sysmgr_thd,
                              &sysmgr_thd_desc.attr,
                              sysmgr_thd_desc.func,
