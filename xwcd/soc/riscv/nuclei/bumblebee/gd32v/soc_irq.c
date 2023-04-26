@@ -61,20 +61,6 @@ __evt soc_esr_f soc_evt[SOC_ESRi_NUM] = {
         [SOC_ESRi_NMI] = NULL, /* Not from here */
 };
 
-__edvt struct soc_irq_data soc_edvt[SOC_ESRi_NUM] = {
-        [SOC_ESRi_InsUnalign] = {NULL,},
-        [SOC_ESRi_InsAccFault] = {NULL,},
-        [SOC_ESRi_IlleIns] = {NULL,},
-        [SOC_ESRi_Break] = {NULL,},
-        [SOC_ESRi_LdAddrUnalign] = {NULL,},
-        [SOC_ESRi_LdFault] = {NULL,},
-        [SOC_ESRi_StAddrUnalign] = {NULL,},
-        [SOC_ESRi_StAccessFault] = {NULL,},
-        [SOC_ESRi_UmodeEcall] = {NULL,},
-        [SOC_ESRi_MmodeEcall] = {NULL,},
-        [SOC_ESRi_NMI] = {NULL,},
-};
-
 __xwbsp_isr
 void soc_esr_c_entry(CSR_MCAUSE_Type mcause, xwreg_t sp)
 {
@@ -157,18 +143,13 @@ extern xwu8_t evt_lma_base[];
 extern xwu8_t evt_vma_base[];
 
 __xwbsp_code
-xwer_t soc_irq_request(xwirq_t irqn, xwisr_f isrfunc, void * data)
+xwer_t soc_irq_request(xwirq_t irqn, xwisr_f isrfunc)
 {
         const struct soc_ivt * ivt;
-        const struct soc_idvt * idvt;
 
-        idvt = &soc_idvt;
         ivt = &soc_ivt;
         if ((irqn >= 0) && (eclic_ivt_lma_base != eclic_ivt_vma_base)) {
                 ivt->irq[irqn] = isrfunc;
-                if ((NULL != idvt) && (NULL != data)) {
-                        idvt->irq[irqn].data = data;
-                }
         } else {
         }
         return XWOK;
@@ -178,15 +159,10 @@ __xwbsp_code
 xwer_t soc_irq_release(xwirq_t irqn)
 {
         const struct soc_ivt * ivt;
-        const struct soc_idvt * idvt;
 
-        idvt = &soc_idvt;
         ivt = &soc_ivt;
         if ((irqn >= 0) && (eclic_ivt_lma_base != eclic_ivt_vma_base)) {
                 ivt->irq[irqn] = soc_isr_noop;
-                if (NULL != idvt) {
-                        idvt->irq[irqn].data = NULL;
-                }
         } else {
         }
         return XWOK;
@@ -316,24 +292,6 @@ xwer_t soc_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf)
                 rc = XWOK;
         } else {
                 rc = -EPERM;
-        }
-        return rc;
-}
-
-__xwbsp_code
-xwer_t soc_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf)
-{
-        xwer_t rc;
-        const struct soc_idvt * idvt;
-
-        idvt = &soc_idvt;
-        if (irqn >= 0) {
-                databuf->data = idvt->irq[irqn].data;
-                rc = XWOK;
-        } else {
-                xwirq_t esri = SOCCFG_EXC_NUM + irqn;
-                databuf->data = idvt->exc[esri].data;
-                rc = XWOK;
         }
         return rc;
 }

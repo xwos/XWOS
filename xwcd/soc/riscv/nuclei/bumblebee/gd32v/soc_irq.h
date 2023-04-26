@@ -116,15 +116,8 @@ struct soc_ivt {
         xwisr_f * irq;
 };
 
-struct soc_idvt {
-        struct soc_irq_data * exc;
-        struct soc_irq_data * irq;
-};
-
 extern soc_esr_f soc_evt[SOC_ESRi_NUM];
-extern struct soc_irq_data soc_edvt[SOC_ESRi_NUM];
 extern const struct soc_ivt soc_ivt;
-extern const struct soc_idvt soc_idvt;
 
 void soc_esr_noop(xwreg_t);
 void soc_isr_noop(void);
@@ -134,7 +127,7 @@ void soc_cpuirq_restore_lc(xwreg_t cpuirq);
 void soc_cpuirq_save_lc(xwreg_t * cpuirq);
 xwer_t soc_irqc_init(void);
 xwer_t soc_irq_get_id(xwirq_t * irqnbuf);
-xwer_t soc_irq_request(xwirq_t irqn, xwisr_f isrfunc, void * data);
+xwer_t soc_irq_request(xwirq_t irqn, xwisr_f isrfunc);
 xwer_t soc_irq_release(xwirq_t irqn);
 xwer_t soc_irq_enable(xwirq_t irqn);
 xwer_t soc_irq_disable(xwirq_t irqn);
@@ -145,6 +138,5 @@ xwer_t soc_irq_clear(xwirq_t irqn);
 xwer_t soc_irq_tst(xwirq_t irqn, bool * pending);
 xwer_t soc_irq_cfg(xwirq_t irqn, const struct soc_irq_cfg * cfg);
 xwer_t soc_irq_get_cfg(xwirq_t irqn, struct soc_irq_cfg * cfgbuf);
-xwer_t soc_irq_get_data(xwirq_t irqn, struct soc_irq_data * databuf);
 
 #endif /* soc_irq.h */

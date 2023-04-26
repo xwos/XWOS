@@ -78,11 +78,10 @@
 #define __firmware_tail         __xwcc_section(".firmware.tail")
 
 #define __soc_isr_entry         __xwcc_section(".soc.isr.entry")
-#define __eclic_ivt             __xwcc_section(".eclic.ivt")
-#define __eclic_idvt            __xwcc_section(".eclic.idvt")
 #define __soc_esr_entry         __xwcc_section(".soc.esr.entry")
+#define __eclic_ivt             __xwcc_section(".eclic.ivt")
 #define __evt                   __xwcc_section(".evt")
-#define __edvt                  __xwcc_section(".edvt")
+#define __soc_ivt               __xwcc_section(".soc.ivt")
 
 /******** ******** barrier ******** ********/
 #define xwccmb()                __asm__ volatile("": : :"memory")
