@@ -282,6 +282,7 @@
       (logi "update version: V%s.%s" vstr opt-phase))
      (opt-revision ;; case opt-revision
       (setq XWOS-version-revision (number-to-string (+ vnum-revision 1)))
+      (setq XWOS-version-phase "revision")
       (setq vstr (concat XWOS-version-major "."
                          XWOS-version-minor "."
                          XWOS-version-revision))
@@ -292,6 +293,11 @@
               "^\\(#define[ \t]+XWOS_VERSION_REVISION[ \t]+\\)\\(.+\\)"
               nil t)
         (replace-match (concat "\\1" XWOS-version-revision)))
+      (goto-char (point-min))
+      (while (re-search-forward
+              "^\\(#define[ \t]+XWOS_VERSION_PHASE[ \t]+\\)\\(.+\\)"
+              nil t)
+        (replace-match (concat "\\1" XWOS-version-phase)))
       (save-buffer)
       (call-process "git" nil nil nil "add" XWOS-version-file)
       (call-process "git" nil nil nil "commit" "-m" (concat "revision: :bookmark: XWOS-V" vstr))
