@@ -19,6 +19,9 @@
 //! // crate-type = ["staticlib"]
 //! #![no_std]
 //!
+//! #[global_allocator]
+//! pub static ALLOCATOR: xwrust::xwmm::Allocator = xwrust::xwmm::Allocator;
+//!
 //! #[no_mangle]
 //! pub unsafe extern "C" fn xwrust_main() {
 //!     // 主线程的代码
@@ -93,10 +96,18 @@
 //!   + [错误码](crate::errno)
 //!   + [位图](crate::xwbmp)
 //!
+//! XWOS RUST所有功能都提供了 [`static`] 创建的方法，如果不使用 [`Arc<T>`], [`Box<T>`] 等，
+//! 即可实现完全静态内存分配的代码。
+//!
 //!
 //! # 返回XWOS首页
 //!
 //! [XWOS首页](/)
+//!
+//!
+//! [`static`]: <https://doc.rust-lang.org/std/keyword.static.html>
+//! [`Box<T>`]: <https://doc.rust-lang.org/alloc/boxed/struct.Box.html>
+//! [`Arc<T>`]: <https://doc.rust-lang.org/alloc/sync/struct.Arc.html>
 
 #![no_std]
 #![feature(alloc_error_handler)]

@@ -5,14 +5,6 @@
 
 #![no_std]
 
-extern crate core;
-use core::ffi::*;
-use core::panic::PanicInfo;
-
-extern crate alloc;
-use alloc::boxed::Box;
-
-use cortex_m::asm;
 use libc_print::std_name::println;
 
 use xwrust::xwtm;
@@ -66,19 +58,4 @@ pub unsafe extern "C" fn xwrust_main() {
     xwrust_example_xwmq();
     cthd::sleep(xwtm::ms(300));
     xwrust_example_xwcq();
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn board_alloc_error_handler(_size: usize, _align: usize) -> ! {
-    loop {
-        asm::bkpt();
-    }
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn board_panic(raw: *mut c_void) -> ! {
-    let _info = Box::from_raw(raw as *mut &PanicInfo);
-    loop {
-        asm::bkpt();
-    }
 }
