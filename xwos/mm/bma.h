@@ -40,15 +40,25 @@
 #endif
 
 /**
- * @brief 定义伙伴算法内存块分配器结构体的RAW内存空间，
- *        用于初始化伙伴算法内存块分配器结构体
- * @param[in] mem: 内存数组名
+ * @brief 定义伙伴算法内存块分配器结构体类型
+ * @param[in] name: 结构体名
  * @param[in] blkodr: 伙伴算法内存块分配器中单位内存块的数量，以2的blkodr次方形式表示
  */
-#define XWMM_BMA_DEF(mem, blkodr) \
-        xwu8_t mem[sizeof(struct xwmm_bma) + \
-                   (sizeof(struct xwmm_bma_bcb) * (1 << (blkodr))) + \
-                   (sizeof(struct xwmm_bma_orderlist) * ((blkodr) + 1))]
+#define XWMM_BMA_TYPEDEF(name, blkodr) \
+        struct name { \
+                struct xwmm_bma bma[1]; \
+                struct xwmm_bma_orderlist orderlist[(blkodr) + 1]; \
+                struct xwmm_bma_bcb bcb[1 << (blkodr)]; \
+        }
+
+/**
+ * @brief 定义伙伴算法内存块分配器结构体的RAW内存空间，
+ *        用于初始化伙伴算法内存块分配器结构体
+ * @param[in] name: 内存数组名
+ * @param[in] blkodr: 伙伴算法内存块分配器中单位内存块的数量，以2的blkodr次方形式表示
+ */
+#define XWMM_BMA_DEF(name, blkodr) \
+        xwu8_t name[sizeof(XWMM_BMA_TYPEDEF(name, blkodr))]
 
 /**
  * @brief 阶链表
@@ -78,7 +88,6 @@ struct xwmm_bma {
         xwsq_t blkodr; /**< 单位块的数量，以2的blkodr次方的形式表示 */
         struct xwmm_bma_orderlist * orderlists; /**< 阶链表数组指针 */
         struct xwmm_bma_bcb * bcbs; /**< 内存块控制块数组指针 */
-        xwu8_t rem[0]; /**< 结构体剩余的内存空间 */
 };
 
 xwer_t xwmm_bma_init(struct xwmm_bma * bma, const char * name,

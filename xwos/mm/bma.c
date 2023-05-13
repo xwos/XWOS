@@ -78,9 +78,11 @@ xwer_t xwmm_bma_init(struct xwmm_bma * bma, const char * name,
         xwer_t rc;
         xwsz_t num;
         xwsz_t i;
+        XWMM_BMA_TYPEDEF(realbma, blkodr) * realbma;
 
         XWOS_VALIDATE((bma), "nullptr", -EFAULT);
 
+        realbma = (void *)bma;
         num = 1U << blkodr;
         if (size != (num * blksize)) {
                 rc = -ESIZE;
@@ -93,8 +95,8 @@ xwer_t xwmm_bma_init(struct xwmm_bma * bma, const char * name,
         bma->zone.size = blksize * num;
         bma->blksize = blksize;
         bma->blkodr = blkodr;
-        bma->orderlists = (void *)bma->rem;
-        bma->bcbs = (void *)&bma->rem[sizeof(struct xwmm_bma_orderlist) * (1 + blkodr)];
+        bma->orderlists = realbma->orderlist;
+        bma->bcbs = realbma->bcb;
 
         /* Init all blocks */
         for (i = 0; i < num; i++) {
