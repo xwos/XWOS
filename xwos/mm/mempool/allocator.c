@@ -195,7 +195,7 @@ err_pa_init:
  * @param[in] name: 名字
  * @param[in] origin: 内存区域的起始地址
  * @param[in] size: 内存区域的总大小
- * @param[in] pgodr: 页的数量，以2的blkodr次方形式表示
+ * @param[in] pgodr: 页的数量，以2的pgodr次方形式表示
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -214,28 +214,21 @@ __xwos_api
 xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
                          xwptr_t origin, xwsz_t size, xwsz_t pgodr)
 {
-        struct xwmm_mempool_page_odrbtree * odrbtree;
-        struct xwmm_mempool_page * pgarray;
         xwsz_t nr;
-        xwssq_t order;
-        xwsz_t odrbtree_size;
-        xwsz_t array_size;
         xwer_t rc;
+        XWMM_MEMPOOL_TYPEDEF(realmp, pgodr) * realmp;
 
         XWOS_VALIDATE((mp), "nullptr", -EFAULT);
 
+        realmp = (void *)mp;
         nr = size / XWMM_MEMPOOL_PAGE_SIZE;
         if (nr != (1U << pgodr)) {
                 rc = - ESIZE;
                 goto err_size;
         }
-        order = xwbop_fls(xwsz_t, nr);
-        odrbtree_size = sizeof(struct xwmm_mempool_page_odrbtree) * (xwsz_t)(order + 1);
-        array_size = (sizeof(struct xwmm_mempool_page) << order);
-        odrbtree = (void *)(((xwptr_t)mp) + sizeof(struct xwmm_mempool));
-        pgarray = (struct xwmm_mempool_page *)(((xwptr_t)odrbtree) + odrbtree_size);
 
-        rc = xwmm_mempool_construct(mp, name, origin, size, odrbtree, pgarray);
+        rc = xwmm_mempool_construct(realmp->mempool, name, origin, size,
+                                    realmp->odrbtree, realmp->page);
         if (rc < 0) {
                 goto err_mempool_construct;
         }
@@ -244,7 +237,7 @@ xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
                 xwsz_t mpsz;
                 void * mem;
 
-                mpsz = sizeof(struct xwmm_mempool) + odrbtree_size + array_size;
+                mpsz = sizeof(struct realmp);
                 if (mpsz < XWMM_MEMPOOL_PAGE_SIZE) {
                         mpsz = XWMM_MEMPOOL_PAGE_SIZE;
                 }

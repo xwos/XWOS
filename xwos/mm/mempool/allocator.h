@@ -54,14 +54,24 @@
 #endif
 
 /**
- * @brief 定义内存池结构体的RAW内存空间，用于初始化内存池结构体
- * @param[in] mem: 内存数组名
+ * @brief 定义内存池结构体类型
+ * @param[in] name: 结构体名
  * @param[in] pgodr: 页的数量，以2的pgodr次方形式表示
  */
-#define XWMM_MEMPOOL_DEF(mem, pgodr) \
-        xwu8_t mem[sizeof(struct xwmm_mempool) + \
-                   (sizeof(struct xwmm_mempool_page) * (1 << (pgodr))) + \
-                   (sizeof(struct xwmm_mempool_page_odrbtree) * ((pgodr) + 1))]
+#define XWMM_MEMPOOL_TYPEDEF(name, pgodr) \
+        struct name { \
+                struct xwmm_mempool mempool[1]; \
+                struct xwmm_mempool_page_odrbtree odrbtree[(pgodr) + 1]; \
+                struct xwmm_mempool_page page[1 << (pgodr)]; \
+        }
+
+/**
+ * @brief 定义内存池结构体的RAW内存空间，用于初始化内存池结构体
+ * @param[in] name: 内存数组名
+ * @param[in] pgodr: 页的数量，以2的pgodr次方形式表示
+ */
+#define XWMM_MEMPOOL_DEF(name, pgodr) \
+        xwu8_t name[sizeof(XWMM_MEMPOOL_TYPEDEF(name, pgodr))]
 
 /**
  * @brief 内存池
