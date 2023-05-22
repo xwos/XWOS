@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32F7x的链接脚本
+ * @brief S32K3XX的链接脚本
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -20,8 +20,6 @@
  * - Reference: arm-none-eabi-ld --verbose
  */
 
-ENTRY(Reset_Handler)
-
 SECTIONS {
         .boot : { /* BOOT区域 */
                 KEEP(*(.boot_header)) /* S32K3的IVT */
@@ -30,8 +28,7 @@ SECTIONS {
         } > boot_mr
 
         .armv7m.ivt : ALIGN(8) {
-                KEEP(*(.intc_vector)) /* 中断向量表 */
-                . = ALIGN(16);
+                KEEP(*(.armv7m.ivt))
                 armv7m_ivt_vma_end = .;
         } > armv7m_ivt_vmr AT> armv7m_ivt_lmr
         armv7m_ivt_vma_base = ADDR(.armv7m.ivt);
