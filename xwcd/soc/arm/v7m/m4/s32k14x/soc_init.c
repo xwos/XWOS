@@ -21,10 +21,19 @@
 #include <xwos/standard.h>
 #include <soc_init.h>
 
+struct soc_flash_cfg {
+        xwu8_t backdoor_key[8];
+        xwu8_t fprot[4];
+        xwu8_t fsec;
+        xwu8_t fopt;
+        xwu8_t feprot;
+        xwu8_t fdprot;
+};
+
 /**
  * @brief Flash OTP区域配置
  */
-__flscfg struct soc_flash_cfg soc_flash_cfg = {
+__xwcc_section(".flash.cfg") struct soc_flash_cfg soc_flash_cfg = {
         .backdoor_key = {
                 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
         },
@@ -37,77 +46,15 @@ __flscfg struct soc_flash_cfg soc_flash_cfg = {
         .fdprot = 0xFF,
 };
 
-extern xwu8_t xwos_data_lma_base[];
-extern xwu8_t xwos_data_vma_base[];
-extern xwu8_t xwos_data_vma_end[];
+#define WDOG_CS (*((__xw_io xwreg_t *)0x40052000))
+#define WDOG_CS_DISABLE (0x00002520)
+#define WDOG_TOVAL (*((__xw_io xwreg_t *)0x40052008))
 
-extern xwu8_t data_lma_base[];
-extern xwu8_t data_vma_base[];
-extern xwu8_t data_vma_end[];
-
-extern xwu8_t bss_vma_base[];
-extern xwu8_t bss_vma_end[];
-
-/**
- * @brief 重定向数据区到内存
- */
 __xwbsp_init_code
-void soc_relocate_data(void)
+void soc_disable_wdog(void)
 {
-        xwsz_t cnt, i;
-        xwu8_t * src;
-        xwu8_t * dst;
-
-        src = xwos_data_lma_base;
-        dst = xwos_data_vma_base;
-        if (dst != src) {
-                cnt = (xwsz_t)xwos_data_vma_end - (xwsz_t)xwos_data_vma_base;
-                for (i = 0; i < cnt; i++) {
-                        dst[i] = src[i];
-                }
-        }
-
-        src = data_lma_base;
-        dst = data_vma_base;
-        if (dst != src) {
-                cnt = (xwsz_t)data_vma_end - (xwsz_t)data_vma_base;
-                for (i = 0; i < cnt; i++) {
-                        *dst = *src;
-                        dst++;
-                        src++;
-                }
-        }
-
-        dst = bss_vma_base;
-        cnt = (xwsz_t)bss_vma_end - (xwsz_t)bss_vma_base;
-        for (i = 0; i < cnt; i++) {
-                *dst = 0;
-                dst++;
-        }
-}
-
-extern xwu8_t armv7m_ivt_lma_base[];
-extern xwu8_t armv7m_ivt_vma_base[];
-extern xwu8_t armv7m_ivt_vma_end[];
-
-/**
- * @brief 重定向中断向量表到内存
- */
-__xwos_init_code
-void soc_relocate_ivt(void)
-{
-        xwsz_t cnt, i;
-        xwu8_t * src;
-        xwu8_t * dst;
-
-        src = armv7m_ivt_lma_base;
-        dst = armv7m_ivt_vma_base;
-        if (dst != src) {
-                cnt = (xwsz_t)armv7m_ivt_vma_end - (xwsz_t)armv7m_ivt_vma_base;
-                for (i = 0; i < cnt; i++) {
-                        dst[i] = src[i];
-                }
-        }
+        WDOG_CS = WDOG_CS_DISABLE;
+        WDOG_TOVAL= 0xFFFF;
 }
 
 /**
@@ -116,4 +63,5 @@ void soc_relocate_ivt(void)
 __xwbsp_init_code
 void soc_init(void)
 {
+        soc_disable_wdog();
 }
