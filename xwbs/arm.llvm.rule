@@ -19,12 +19,13 @@
 #
 
 XWTC ?= $(shell xwtcwd)
+ARMGCC ?= $(XWTC)/armgcc
 ARMLLVM ?= $(XWTC)/armllvm
 SYSROOT ?= $(ARMLLVM)/lib/clang-runtimes/$(SYSROOT_llvm)
 CC := $(ARMLLVM)/bin/clang
 CXX := $(ARMLLVM)/bin/clang++
 AS := $(CC) -x assembler-with-cpp
-OBJCOPY := arm-none-eabi-objcopy
+OBJCOPY := $(ARMGCC)/bin/arm-none-eabi-objcopy
 OD := $(ARMLLVM)/bin/llvm-objdump
 AR := $(ARMLLVM)/bin/llvm-ar
 LD := $(CC)

@@ -1,6 +1,6 @@
 #! /bin/make -f
 # @file
-# @brief L2 building makefile
+# @brief L2 building makefile in workspace
 # @author
 # + 隐星魂 (Roy Sun) <xwos@xwos.tech>
 # @copyright
@@ -21,8 +21,7 @@
 include XWOS.cfg
 TARGET ?= XWOS
 
-MAKE_ARGS = $(strip -C $(XWOS_PATH) -f xwbs/$(XWOS_CFG_ELF_MK) \
-                    TARGET=$(TARGET) XWOS_WKSPC_DIR=$(XWOS_WKSPC_DIR))
+MAKE_ARGS = $(strip -C $(XWOS_PATH) -f xwbs/$(XWOS_CFG_ELF_MK) TARGET=$(TARGET) XWOS_WKSPC_DIR=$(XWOS_WKSPC_DIR))
 
 all:
 	$(MAKE) $(MAKE_ARGS) all

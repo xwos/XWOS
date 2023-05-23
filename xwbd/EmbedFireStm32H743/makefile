@@ -22,13 +22,14 @@ XWOS ?= ../..
 WKSPC ?= wkspc
 TARGET ?= XWOS
 
-MKCFG := ${XWOS}/xwbs/util/el/mkcfg.el
+MKCFG := $(XWOS)/xwbs/util/el/mkcfg.el
 
 all: $(WKSPC) cfg dbgcfg
-	$(MAKE) -C $(WKSPC) -f $(PWD)/makefile.2 TARGET=$(TARGET)
+	$(MAKE) -C $(WKSPC) TARGET=$(TARGET)
 
 $(WKSPC):
 	@mkdir -p $@
+	@cp $(XWOS)/xwbs/wkspc.mk $@/makefile
 
 cfg: $(WKSPC) $(WKSPC)/XWOS.cfg
 
@@ -60,15 +61,15 @@ erase: cfg/dbg/erase.gdb
 	@arm-none-eabi-gdb -x cfg/dbg/erase.gdb
 
 c clean: cfg
-	$(MAKE) -C $(WKSPC) -f $(PWD)/makefile.2 TARGET=$(TARGET) NODEP=y clean
+	$(MAKE) -C $(WKSPC) TARGET=$(TARGET) NODEP=y clean
 
 d distclean: cfg
-	$(MAKE) -C $(WKSPC) -f $(PWD)/makefile.2 TARGET=$(TARGET) NODEP=y distclean
+	$(MAKE) -C $(WKSPC) TARGET=$(TARGET) NODEP=y distclean
 	@rm -rf $(WKSPC)
 	@rm -rf cfg/dbg/*.gdb
 
 .DEFAULT:
 	@$(MAKE) cfg
-	$(MAKE) -C $(WKSPC) -f $(PWD)/makefile.2 TARGET=$(TARGET) $@
+	$(MAKE) -C $(WKSPC) TARGET=$(TARGET) $@
 
 .PHONY : all cfg dbgcfg c clean d distclean
