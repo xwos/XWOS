@@ -38,7 +38,7 @@ else
   RUST_TOOLCHAIN := +nightly
 endif
 
-ifeq ($(~D),0)
+ifeq ($(D),0)
   CARGO_BUILD_FLAGS += --release
   XWMO_RUSTLIB := $(XWMO_DIR)/target/$(RUST_TARGET)/release/$(XWMO_RUSTLIB_NAME)
 else

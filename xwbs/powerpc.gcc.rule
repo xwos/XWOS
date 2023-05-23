@@ -81,7 +81,7 @@ ifeq ($(ARCHCFG_LITTLE_ENDIAN),y)
 else
   ENDIAN := big
 endif
-~D ?= 1
+D ?= 1
 WARN := -Wall -Wextra -Wundef -Wsign-conversion -Werror
 WARN += -Wno-cast-function-type
 INCDIRS = -I. \
@@ -110,16 +110,16 @@ CXXFLAGS = -mvle -mcpu=e200z0 -m$(ENDIAN) -mregnames -std=gnu11 \
 
 MMFLAGS = -MM -MP
 
-ifeq ($(~O),)
-  ifeq ($(~D),0)
-    ~O := 1
+ifeq ($(O),)
+  ifeq ($(D),0)
+    O := 1
   else
-    ~O := g
+    O := g
   endif
 endif
 
-CFLAGS += -O$(~O)
-CXXFLAGS += -O$(~O)
+CFLAGS += -O$(O)
+CXXFLAGS += -O$(O)
 
 ifeq ($(ARCHCFG_COMPILER_CLIB),n)
   CFLAGS += -fno-builtin
@@ -146,7 +146,7 @@ SHOW_LUA2HEX =
 SHOW_CP =
 
 ifeq ($(XWOS_CFG_HOSTOS),gnu/linux)
-  ifneq ($(~V),1)
+  ifneq ($(V),1)
     SHOW_CPP = @$(MSG) "\e[1m\e[44;38m[cc -E] "$<" -> "$@" \e[0m";
     SHOW_CC = @$(MSG) "\e[1m\e[44;38m[cc] "$<" -> "$@" \e[0m";
     SHOW_CXX = @$(MSG) "\e[1m\e[44;38m[c++] "$<" -> "$@" \e[0m";
@@ -164,7 +164,7 @@ ifeq ($(XWOS_CFG_HOSTOS),gnu/linux)
 endif
 
 ifeq ($(XWOS_CFG_HOSTOS),darwin)
-  ifneq ($(~V),1)
+  ifneq ($(V),1)
     SHOW_CPP = @$(MSG) "\e[1m\e[44;38m[cc -E] "$<" -> "$@" \e[0m";
     SHOW_CC = @$(MSG) "\e[1m\e[44;38m[cc] "$<" -> "$@" \e[0m";
     SHOW_CXX = @$(MSG) "\e[1m\e[44;38m[c++] "$<" -> "$@" \e[0m";

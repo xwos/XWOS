@@ -76,7 +76,7 @@ BRD_EOBJS += $(BRD_EOBJS_gcc)
 EINCDIRS += $(EINCDIRS_gcc)
 ELIBS += $(ELIBS_gcc)
 
-~D ?= 1
+D ?= 1
 WARN := -Wall -Wextra -Wsign-conversion -Werror
 WARN += -Wno-undef -Wno-cast-function-type
 INCDIRS = -I. \
@@ -105,16 +105,16 @@ CXXFLAGS = -std=gnu++17 \
 
 MMFLAGS = -MM -MP
 
-ifeq ($(~O),)
-  ifeq ($(~D),0)
-    ~O := 1
+ifeq ($(O),)
+  ifeq ($(D),0)
+    O := 1
   else
-    ~O := g
+    O := g
   endif
 endif
 
-CFLAGS += -O$(~O)
-CXXFLAGS += -O$(~O)
+CFLAGS += -O$(O)
+CXXFLAGS += -O$(O)
 
 ifeq ($(ARCHCFG_COMPILER_CLIB),n)
   CFLAGS += -fno-builtin
@@ -141,7 +141,7 @@ SHOW_LUA2HEX =
 SHOW_CP =
 
 ifeq ($(XWOS_CFG_HOSTOS),gnu/linux)
-  ifneq ($(~V),1)
+  ifneq ($(V),1)
     SHOW_CPP = @$(MSG) "\e[1m\e[44;38m[cc -E] "$<" -> "$@" \e[0m";
     SHOW_CC = @$(MSG) "\e[1m\e[44;38m[cc] "$<" -> "$@" \e[0m";
     SHOW_CXX = @$(MSG) "\e[1m\e[44;38m[c++] "$<" -> "$@" \e[0m";
@@ -159,7 +159,7 @@ ifeq ($(XWOS_CFG_HOSTOS),gnu/linux)
 endif
 
 ifeq ($(XWOS_CFG_HOSTOS),darwin)
-  ifneq ($(~V),1)
+  ifneq ($(V),1)
     SHOW_CPP = @$(MSG) "\e[1m\e[44;38m[cc -E] "$<" -> "$@" \e[0m";
     SHOW_CC = @$(MSG) "\e[1m\e[44;38m[cc] "$<" -> "$@" \e[0m";
     SHOW_CXX = @$(MSG) "\e[1m\e[44;38m[c++] "$<" -> "$@" \e[0m";
@@ -177,7 +177,7 @@ ifeq ($(XWOS_CFG_HOSTOS),darwin)
 endif
 
 ifeq ($(XWOS_CFG_HOSTOS),windows-nt)
-  ifneq ($(~V),1)
+  ifneq ($(V),1)
     SHOW_CPP = @$(MSG) "[cc -E] "$<" -> "$@;
     SHOW_CC = @$(MSG) "[cc] "$<" -> "$@;
     SHOW_CXX = @$(MSG) "[c++] "$<" -> "$@;
