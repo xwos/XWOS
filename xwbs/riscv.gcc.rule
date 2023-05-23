@@ -18,7 +18,8 @@
 # > limitations under the License.
 #
 
-CROSS_COMPILE ?= riscv-nuclei-elf-
+XWTC ?= $(shell xwtcwd)
+CROSS_COMPILE ?= $(XWTC)/nucleigcc/bin/riscv-nuclei-elf-
 CC := $(CROSS_COMPILE)gcc
 CXX := $(CROSS_COMPILE)g++
 AS := $(CROSS_COMPILE)gcc -x assembler-with-cpp

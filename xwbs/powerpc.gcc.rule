@@ -18,7 +18,8 @@
 # > limitations under the License.
 #
 
-CROSS_COMPILE ?= powerpc-eabivle-
+XWTC ?= $(shell xwtcwd)
+CROSS_COMPILE ?= $(XWTC)/nxp/ppcvlegcc/bin/powerpc-eabivle-
 CC := $(CROSS_COMPILE)gcc
 CXX := $(CROSS_COMPILE)g++
 AS := $(CROSS_COMPILE)gcc -x assembler-with-cpp
