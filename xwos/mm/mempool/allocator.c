@@ -214,21 +214,26 @@ __xwos_api
 xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
                          xwptr_t origin, xwsz_t size, xwsz_t pgodr)
 {
-        xwsz_t nr;
         xwer_t rc;
-        XWMM_MEMPOOL_TYPEDEF(realmp, pgodr) * realmp;
+        struct xwmm_mempool_page_odrbtree * odrbtrees;
+        xwsz_t odrbtrees_size;
+        struct xwmm_mempool_page * pages;
+        xwsz_t pages_nr;
+        xwsz_t pages_size;
 
         XWOS_VALIDATE((mp), "nullptr", -EFAULT);
 
-        realmp = (void *)mp;
-        nr = size / XWMM_MEMPOOL_PAGE_SIZE;
-        if (nr != (1U << pgodr)) {
+        pages_nr = size / XWMM_MEMPOOL_PAGE_SIZE;
+        if (pages_nr != (1U << pgodr)) {
                 rc = - ESIZE;
                 goto err_size;
         }
 
-        rc = xwmm_mempool_construct(realmp->mempool, name, origin, size,
-                                    realmp->odrbtree, realmp->page);
+        odrbtrees = (struct xwmm_mempool_page_odrbtree *)&mp[1];
+        pages = (struct xwmm_mempool_page *)&odrbtrees[pgodr + 1];
+        odrbtrees_size = sizeof(struct xwmm_mempool_page_odrbtree) * (pgodr + 1);
+        pages_size = sizeof(struct xwmm_mempool_page) << pgodr;
+        rc = xwmm_mempool_construct(mp, name, origin, size, odrbtrees, pages);
         if (rc < 0) {
                 goto err_mempool_construct;
         }
@@ -237,7 +242,7 @@ xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
                 xwsz_t mpsz;
                 void * mem;
 
-                mpsz = sizeof(struct realmp);
+                mpsz = sizeof(struct xwmm_mempool) + odrbtrees_size + pages_size;
                 if (mpsz < XWMM_MEMPOOL_PAGE_SIZE) {
                         mpsz = XWMM_MEMPOOL_PAGE_SIZE;
                 }
