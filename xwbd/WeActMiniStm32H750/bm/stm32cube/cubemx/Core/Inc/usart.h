@@ -94,3 +94,4 @@ xwer_t MX_USART3_Putc(xwu8_t byte);
 #endif
 
 #endif /* __USART_H__ */
+
