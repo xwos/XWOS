@@ -182,17 +182,19 @@ ifeq ($(XWOS_CFG_HOSTOS),darwin)
 endif
 
 ifeq ($(XWOS_CFG_HOSTOS),windows-nt)
-  SHOW_CPP = @$(MSG) "[cc -E] "$<" -> "$@;
-  SHOW_CC = @$(MSG) "[cc] "$<" -> "$@;
-  SHOW_CXX = @$(MSG) "[c++] "$<" -> "$@;
-  SHOW_APP = @$(MSG) "[as -E] "$<" -> "$@;
-  SHOW_AS = @$(MSG) "[as] "$<" -> "$@;
-  SHOW_OD = @$(MSG) "[od] "$<" -> "$@;
-  SHOW_OBJCOPY = @$(MSG) "[objcopy] "$<" -> "$@;
-  SHOW_MM = @$(MSG) "[mm] "$<" -> "$@;
-  SHOW_AR = @$(MSG) "[ar] "$@;
-  SHOW_LD = @$(MSG) "[ld] "$@;
-  SHOW_SIZE = @$(MSG) "[size] "$@;
-  SHOW_LUA2HEX = @$(MSG) "[lua2hex] "$@;
-  SHOW_CP = @$(MSG) "[cp] "$<" -> "$@;
+  ifneq ($(V),1)
+    SHOW_CPP = @$(MSG) "[cc -E] "$<" -> "$@;
+    SHOW_CC = @$(MSG) "[cc] "$<" -> "$@;
+    SHOW_CXX = @$(MSG) "[c++] "$<" -> "$@;
+    SHOW_APP = @$(MSG) "[as -E] "$<" -> "$@;
+    SHOW_AS = @$(MSG) "[as] "$<" -> "$@;
+    SHOW_OD = @$(MSG) "[od] "$<" -> "$@;
+    SHOW_OBJCOPY = @$(MSG) "[objcopy] "$<" -> "$@;
+    SHOW_MM = @$(MSG) "[mm] "$<" -> "$@;
+    SHOW_AR = @$(MSG) "[ar] "$@;
+    SHOW_LD = @$(MSG) "[ld] "$@;
+    SHOW_SIZE = @$(MSG) "[size] "$@;
+    SHOW_LUA2HEX = @$(MSG) "[lua2hex] "$@;
+    SHOW_CP = @$(MSG) "[cp] "$<" -> "$@;
+  endif
 endif
