@@ -1,6 +1,0 @@
-.settings
-.cproject.bak
-.mxproject
-.project.bak
-STM32F103C8Tx_FLASH.ld
-startup_stm32f103xb.s
