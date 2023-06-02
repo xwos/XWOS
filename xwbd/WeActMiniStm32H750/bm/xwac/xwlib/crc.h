@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：电路板Lua模块：XWOS设备栈
+ * @brief 板级描述层：XWOS适配层：CRC32
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,15 +18,11 @@
  * > limitations under the License.
  */
 
-#include "board/std.h"
-#include <xwem/vm/lua/src/lauxlib.h>
-#include <xwem/vm/lua/xwlua/xwds/soc.h>
-#include <xwem/vm/lua/xwlua/xwds/uart.h>
-#include "bm/xwac/xwds/device.h"
+#ifndef __board_xwac_xwlib_crc_h__
+#define __board_xwac_xwlib_crc_h__
 
-void xwlua_open_brdlibs(lua_State * L)
-{
-        xwlua_soc_register(L, "stm32", &stm32soc);
-        xwlua_uart_register(L, "usart1", &stm32usart1);
-        xwlua_uart_register(L, "usart3", &stm32usart3);
-}
+#include "board/std.h"
+
+void stm32cube_crc_init(void);
+
+#endif /* board/xwac/xwlib/crc.h */

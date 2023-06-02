@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：电路板Lua模块：XWOS设备栈
+ * @brief 玄武OS内核适配代码：线程栈内存池
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -19,14 +19,28 @@
  */
 
 #include "board/std.h"
-#include <xwem/vm/lua/src/lauxlib.h>
-#include <xwem/vm/lua/xwlua/xwds/soc.h>
-#include <xwem/vm/lua/xwlua/xwds/uart.h>
-#include "bm/xwac/xwds/device.h"
+#include "board/axisram.h"
 
-void xwlua_open_brdlibs(lua_State * L)
+__xwos_code
+xwer_t board_thd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf)
 {
-        xwlua_soc_register(L, "stm32", &stm32soc);
-        xwlua_uart_register(L, "usart1", &stm32usart1);
-        xwlua_uart_register(L, "usart3", &stm32usart3);
+        union {
+                xwstk_t * stk;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = xwmm_mempool_malloc(axisram_mempool, stack_size, &mem.anon);
+        if (XWOK == rc) {
+                *membuf = mem.stk;
+        } else {
+                *membuf = NULL;
+        }
+        return rc;
+}
+
+__xwos_code
+xwer_t board_thd_stack_pool_free(xwstk_t * stk)
+{
+        return xwmm_mempool_free(axisram_mempool, stk);
 }

@@ -95,28 +95,28 @@
 #define XWMPCFG_SKD_BH                                  1
 #define XWMPCFG_SKD_BH_STACK_SIZE                       (2048U)
 #define XWMPCFG_SKD_THD_PRIVILEGED_DEFAULT              1
-#define XWMPCFG_SKD_THD_MEMSLICE                        1
-#define XWMPCFG_SKD_THD_STDC_MM                         0
+#define XWMPCFG_SKD_THD_MEMSLICE                        0
+#define XWMPCFG_SKD_THD_STDC_MM                         1
 #define XWMPCFG_SKD_THD_LOCAL_DATA_NUM                  (2U)
 #define XWMPCFG_SKD_SWT                                 1
-#define XWMPCFG_SKD_SWT_MEMSLICE                        1
-#define XWMPCFG_SKD_SWT_STDC_MM                         0
+#define XWMPCFG_SKD_SWT_MEMSLICE                        0
+#define XWMPCFG_SKD_SWT_STDC_MM                         1
 
 /******** ******** ******** sync ******** ******** ********/
 #define XWMPCFG_SYNC_PLSEM                              1
 #define XWMPCFG_SYNC_RTSEM                              1
-#define XWMPCFG_SYNC_SEM_MEMSLICE                       1
-#define XWMPCFG_SYNC_SEM_STDC_MM                        0
+#define XWMPCFG_SYNC_SEM_MEMSLICE                       0
+#define XWMPCFG_SYNC_SEM_STDC_MM                        1
 
-#define XWMPCFG_SYNC_COND_MEMSLICE                      1
-#define XWMPCFG_SYNC_COND_STDC_MM                       0
+#define XWMPCFG_SYNC_COND_MEMSLICE                      0
+#define XWMPCFG_SYNC_COND_STDC_MM                       1
 
 #define XWMPCFG_SYNC_EVT                                1
-#define XWMPCFG_SYNC_EVT_STDC_MM                        0
+#define XWMPCFG_SYNC_EVT_STDC_MM                        1
 
 /******** ******** ******** lock ******** ******** ********/
-#define XWMPCFG_LOCK_MTX_MEMSLICE                       1
-#define XWMPCFG_LOCK_MTX_STDC_MM                        0
+#define XWMPCFG_LOCK_MTX_MEMSLICE                       0
+#define XWMPCFG_LOCK_MTX_STDC_MM                        1
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********          UP Configurations          ******** ********

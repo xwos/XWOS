@@ -30,5 +30,6 @@ BRD_CXXSRCS :=
 
 BRD_EOBJS :=
 
+BRD_CSRCS :=
 BRD_CSRCS += bdl/init.c bdl/reset.c bdl/firmware.c
 BRD_CSRCS += bdl/xwac/xwskd_hook.c

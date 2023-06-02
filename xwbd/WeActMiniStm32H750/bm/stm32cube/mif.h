@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE模块：接口
+ * @brief 板级描述层：STM32CUBE模块：模块接口
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -21,10 +21,7 @@
 #ifndef __bm_stm32cube_mif_h__
 #define __bm_stm32cube_mif_h__
 
-#include <bm/stm32cube/standard.h>
-#include <bm/stm32cube/xwac/xwds/cmif.h>
-
-extern struct xwmm_mempool * sdram_mempool;
+#include "board/std.h"
 
 void stm32cube_lowlevel_init(void);
 void stm32cube_init(void);

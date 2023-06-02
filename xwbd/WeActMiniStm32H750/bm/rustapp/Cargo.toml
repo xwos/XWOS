@@ -10,7 +10,6 @@ crate-type = ["staticlib"]
 [dependencies]
 cortex-m = "0.7"
 xwrust = {path = "../../../../xwmd/xwrust"}
-rustbtn = {path = "../rustbtn"}
 xwrust_example_vector = {path = "../../../../xwam/xwrust-example/xwrust_example_vector"}
 xwrust_example_swt = {path = "../../../../xwam/xwrust-example/xwrust_example_swt"}
 xwrust_example_dthd = {path = "../../../../xwam/xwrust-example/xwrust_example_dthd"}

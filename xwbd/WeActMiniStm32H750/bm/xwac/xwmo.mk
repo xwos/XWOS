@@ -22,13 +22,36 @@
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
-# 定义C源码
-XWMO_CSRCS := mif.c
-XWMO_CSRCS += $(call getAllFileUnderXwmoDir,*.c,Core/Src)
-XWMO_CSRCS += $(call getAllFileUnderXwmoDir,*.c,Drivers/STM32H7xx_HAL_Driver/Src)
+# 增加源代码文件
+XWMO_CSRCS :=
+
+ifeq ($(BRDCFG_XWSKD_THD_STACK_POOL),y)
+  XWMO_CSRCS += xwos/thd_stack_mempool.c
+endif
+XWMO_CSRCS += xwos/xwskd_hook.c
+
+XWMO_CSRCS += xwds/core.c
+XWMO_CSRCS += xwds/device.c
+XWMO_CSRCS += xwds/pm.c
+XWMO_CSRCS += xwds/soc.c
+XWMO_CSRCS += xwds/uart.c
+XWMO_CSRCS += xwds/spim.c
+XWMO_CSRCS += xwds/st7735.c
+XWMO_CSRCS += xwds/w25q64jv.c
+
+XWMO_CSRCS += xwlib/log.c
+XWMO_CSRCS += xwlib/crc.c
+
+XWMO_CSRCS += newlib/stdio.c
+XWMO_CSRCS += newlib/mem.c
+
+XWMO_CSRCS += fatfs/sdcard.c
+
+XWMO_CSRCS += lua/mem.c
 
 # 定义编译选项
-XWMO_CFLAGS += -Wno-undef -Wno-unused-parameter -Wno-sign-conversion
+XWMO_CFLAGS :=
+XWMO_CFLAGS += -Wno-unused-parameter -Wno-sign-conversion
 
 # 定义头文件路径
 XWMO_INCDIRS :=

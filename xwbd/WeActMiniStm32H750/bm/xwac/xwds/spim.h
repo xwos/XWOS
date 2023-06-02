@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：电路板Lua模块：XWOS设备栈
+ * @brief 板级描述层：XWOS适配层：XWOS设备栈：SPI主机控制器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,15 +18,12 @@
  * > limitations under the License.
  */
 
-#include "board/std.h"
-#include <xwem/vm/lua/src/lauxlib.h>
-#include <xwem/vm/lua/xwlua/xwds/soc.h>
-#include <xwem/vm/lua/xwlua/xwds/uart.h>
-#include "bm/xwac/xwds/device.h"
+#ifndef __bm_xwac_xwds_spim_h__
+#define __bm_xwac_xwds_spim_h__
 
-void xwlua_open_brdlibs(lua_State * L)
-{
-        xwlua_soc_register(L, "stm32", &stm32soc);
-        xwlua_uart_register(L, "usart1", &stm32usart1);
-        xwlua_uart_register(L, "usart3", &stm32usart3);
-}
+#include "board/std.h"
+
+void stm32cube_spi1m_cb_xfercplt(struct xwds_spim * spim, xwer_t xrc);
+void stm32cube_spi4m_cb_xfercplt(struct xwds_spim * spim, xwer_t xrc);
+
+#endif /* bm/xwac/xwds/spim.h */

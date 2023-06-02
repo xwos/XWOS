@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：电路板Lua模块：XWOS设备栈
+ * @brief 玄武OS内核适配代码：内核HOOK
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -19,14 +19,29 @@
  */
 
 #include "board/std.h"
-#include <xwem/vm/lua/src/lauxlib.h>
-#include <xwem/vm/lua/xwlua/xwds/soc.h>
-#include <xwem/vm/lua/xwlua/xwds/uart.h>
-#include "bm/xwac/xwds/device.h"
+#include <xwcd/soc/arm/v7m/armv7m_isa.h>
+#include <xwos/ospl/skd.h>
 
-void xwlua_open_brdlibs(lua_State * L)
+__xwos_code
+void board_xwskd_idle_hook(struct xwospl_skd * xwskd)
 {
-        xwlua_soc_register(L, "stm32", &stm32soc);
-        xwlua_uart_register(L, "usart1", &stm32usart1);
-        xwlua_uart_register(L, "usart3", &stm32usart3);
+        XWOS_UNUSED(xwskd);
+        cm_wfi();
+}
+
+extern
+void HAL_IncTick(void);
+
+__xwos_code
+void board_xwskd_syshwt_hook(struct xwospl_skd * xwskd)
+{
+        XWOS_UNUSED(xwskd);
+        HAL_IncTick();
+}
+
+__xwos_code
+void board_thd_postinit_hook(struct xwospl_thd * thd)
+{
+        XWOS_UNUSED(thd);
+        /* Add MPU code here. */
 }
