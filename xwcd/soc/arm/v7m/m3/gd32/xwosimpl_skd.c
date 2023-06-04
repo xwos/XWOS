@@ -50,22 +50,12 @@ xwer_t xwospl_skd_start(__xwcc_unused struct xwospl_skd * xwskd)
                 ".syntax       unified");
         __asm__ volatile(
                 "      cpsie   i\n"
-                "      svc     0\n"
+                "      svc     9\n"
                 "      bx      lr\n");
 }
 
 __xwbsp_code __xwcc_naked
-xwer_t xwospl_skd_suspend(__xwcc_unused struct xwospl_skd * xwskd)
-{
-        __asm__ volatile(
-                ".syntax       unified");
-        __asm__ volatile(
-                "       svc     9\n"
-                "       bx      lr\n");
-}
-
-__xwbsp_code __xwcc_naked
-xwer_t xwospl_skd_resume(__xwcc_unused struct xwospl_skd * xwskd)
+xwer_t xwospl_thd_freeze_lc(__xwcc_unused struct xwospl_thd * thd)
 {
         __asm__ volatile(
                 ".syntax       unified");
@@ -81,18 +71,28 @@ void xwospl_thd_exit_lc(__xwcc_unused struct xwospl_thd * thd,
         __asm__ volatile(
                 ".syntax       unified");
         __asm__ volatile(
-                "       svc     7\n"
+                "       svc     11\n"
                 "       b       .\n"
                 "       bx      lr\n");
 }
 
 __xwbsp_code __xwcc_naked
-xwer_t xwospl_thd_freeze_lc(__xwcc_unused struct xwospl_thd * thd)
+xwer_t xwospl_skd_suspend(__xwcc_unused struct xwospl_skd * xwskd)
 {
         __asm__ volatile(
                 ".syntax       unified");
         __asm__ volatile(
-                "       svc     5\n"
+                "       svc     12\n"
+                "       bx      lr\n");
+}
+
+__xwbsp_code __xwcc_naked
+xwer_t xwospl_skd_resume(__xwcc_unused struct xwospl_skd * xwskd)
+{
+        __asm__ volatile(
+                ".syntax       unified");
+        __asm__ volatile(
+                "       svc     13\n"
                 "       bx      lr\n");
 }
 
@@ -104,7 +104,7 @@ xwer_t xwospl_thd_outmigrate(__xwcc_unused struct xwospl_thd * thd,
         __asm__ volatile(
                 ".syntax       unified");
         __asm__ volatile(
-                "       svc     11\n"
+                "       svc     14\n"
                 "       bx      lr\n");
 }
 
