@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：STM32CUBE模块：模块接口
+ * @brief 板级描述层：标准头文件
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,14 +18,12 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_mif_h__
-#define __bm_stm32cube_mif_h__
+#ifndef __board_std_h__
+#define __board_std_h__
 
-#include "board/std.h"
+#include <xwos/standard.h>
 
-void stm32cube_lowlevel_init(void);
-void stm32cube_init(void);
-xwer_t stm32cube_start(void);
-xwer_t stm32cube_stop(void);
+#define BOARD_BUG() XWOS_BUG()
+#define BOARD_BUG_ON(x) XWOS_BUG_ON(x)
 
-#endif /* bm/stm32cube/mif.h */
+#endif /* board/std.h */

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：STM32CUBE模块：模块接口
+ * @brief 板级描述层：初始化
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,14 +18,29 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_mif_h__
-#define __bm_stm32cube_mif_h__
-
 #include "board/std.h"
+#include <xwcd/soc/arm/v7m/arch_init.h>
+#include <xwcd/soc/arm/v7m/m7/stm32/soc_init.h>
+#include "bm/stm32cube/mif.h"
 
-void stm32cube_lowlevel_init(void);
-void stm32cube_init(void);
-xwer_t stm32cube_start(void);
-xwer_t stm32cube_stop(void);
+/**
+ * @brief XWOS预初始化
+ */
+__xwbsp_init_code
+void xwos_preinit(void)
+{
+        arch_init();
+        soc_init();
+        stm32cube_lowlevel_init();
+        soc_relocate_data();
+        soc_relocate_ivt();
+}
 
-#endif /* bm/stm32cube/mif.h */
+/**
+ * @brief XWOS后初始化
+ */
+__xwbsp_init_code
+void xwos_postinit(void)
+{
+        stm32cube_init();
+}

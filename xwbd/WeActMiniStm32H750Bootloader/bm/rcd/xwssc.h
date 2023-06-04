@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：STM32CUBE模块：模块接口
+ * @brief 板级描述层：RAMCODE下载器：xwssc
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,14 +18,14 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_mif_h__
-#define __bm_stm32cube_mif_h__
+#ifndef __bm_rcd_xwssc_h__
+#define __bm_rcd_xwssc_h__
 
 #include "board/std.h"
 
-void stm32cube_lowlevel_init(void);
-void stm32cube_init(void);
-xwer_t stm32cube_start(void);
-xwer_t stm32cube_stop(void);
+xwer_t board_xwssc_start(void);
+xwer_t board_xwssc_stop(void);
+xwer_t board_xwssc_tx(const xwu8_t data[], xwsz_t * size, xwtm_t to);
+xwer_t board_xwssc_rx(xwu8_t rxbuf[], xwsz_t * size, xwtm_t to);
 
-#endif /* bm/stm32cube/mif.h */
+#endif /* bm/rcd/xwssc.h */

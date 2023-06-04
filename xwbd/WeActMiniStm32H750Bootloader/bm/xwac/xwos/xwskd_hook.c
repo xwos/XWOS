@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：STM32CUBE模块：模块接口
+ * @brief 玄武OS内核适配代码：内核HOOK
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,14 +18,23 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_mif_h__
-#define __bm_stm32cube_mif_h__
-
 #include "board/std.h"
+#include <xwcd/soc/arm/v7m/armv7m_isa.h>
+#include <xwos/ospl/skd.h>
 
-void stm32cube_lowlevel_init(void);
-void stm32cube_init(void);
-xwer_t stm32cube_start(void);
-xwer_t stm32cube_stop(void);
+__xwos_code
+void board_xwskd_idle_hook(struct xwospl_skd * xwskd)
+{
+        XWOS_UNUSED(xwskd);
+        cm_wfi();
+}
 
-#endif /* bm/stm32cube/mif.h */
+extern
+void HAL_IncTick(void);
+
+__xwos_code
+void board_xwskd_syshwt_hook(struct xwospl_skd * xwskd)
+{
+        XWOS_UNUSED(xwskd);
+        HAL_IncTick();
+}

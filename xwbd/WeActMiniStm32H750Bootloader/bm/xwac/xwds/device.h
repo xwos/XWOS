@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：STM32CUBE模块：模块接口
+ * @brief 板级描述层：XWOS适配层：XWOS设备栈：设备
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,14 +18,22 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_mif_h__
-#define __bm_stm32cube_mif_h__
+#ifndef __bm_xwac_xwds_device_h__
+#define __bm_xwac_xwds_device_h__
 
 #include "board/std.h"
+#include <xwcd/ds/device.h>
+#include <xwcd/ds/soc/chip.h>
+#include <xwcd/ds/uart/controller.h>
 
-void stm32cube_lowlevel_init(void);
-void stm32cube_init(void);
-xwer_t stm32cube_start(void);
-xwer_t stm32cube_stop(void);
+/******** ******** ds ******** ********/
+extern struct xwds stm32xwds;
 
-#endif /* bm/stm32cube/mif.h */
+/******** ******** soc ******** ********/
+extern struct xwds_soc stm32soc;
+
+/******** ******** uart ******** ********/
+extern struct xwds_uartc stm32usart1;
+extern struct xwds_uartc stm32usart3;
+
+#endif /* bm/xwac/xwds/device.h */

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：STM32CUBE模块：模块接口
+ * @brief 板级描述层：XWOS适配层：CRC32
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,14 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_mif_h__
-#define __bm_stm32cube_mif_h__
+#ifndef __board_xwac_xwlib_crc_h__
+#define __board_xwac_xwlib_crc_h__
 
 #include "board/std.h"
 
-void stm32cube_lowlevel_init(void);
-void stm32cube_init(void);
-xwer_t stm32cube_start(void);
-xwer_t stm32cube_stop(void);
+void stm32cube_crc_init(void);
 
-#endif /* bm/stm32cube/mif.h */
+#endif /* board/xwac/xwlib/crc.h */

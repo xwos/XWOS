@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：STM32CUBE模块：模块接口
+ * @brief 板级描述层：固件描述信息
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,14 +18,25 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_stm32cube_mif_h__
-#define __bm_stm32cube_mif_h__
+#include <xwos/standard.h>
+#include <xwcd/soc/arm/v7m/arch_firmware.h>
 
-#include "board/std.h"
+extern const xwu8_t firmware_tail_lma_base[];
+extern const xwu8_t firmware_tail_lma_end[];
+extern const xwu8_t firmware_head_lma[];
+extern void arch_isr_reset(void);
+extern xwstk_t xwos_stk_top[];
 
-void stm32cube_lowlevel_init(void);
-void stm32cube_init(void);
-xwer_t stm32cube_start(void);
-xwer_t stm32cube_stop(void);
+__firmware_info
+const struct firmware_info firmware_info = {
+        .head = (void *)firmware_head_lma,
+        .tail_flag_addr = (void *)firmware_tail_lma_base,
+        .end_addr = (void *)firmware_tail_lma_end,
+        .entry = arch_isr_reset,
+        .sp = xwos_stk_top,
+};
 
-#endif /* bm/stm32cube/mif.h */
+__firmware_tail
+const struct firmware_tail firmware_tail = {
+        .flag = BRDCFG_FIRMWARE_TAILFLAG,
+};

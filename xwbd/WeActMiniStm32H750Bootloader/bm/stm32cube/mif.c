@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief STM32CUBE模块：接口
+ * @brief 板级描述层：STM32CUBE模块：模块接口
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,13 +18,11 @@
  * > limitations under the License.
  */
 
+#include "board/std.h"
 #include <xwos/lib/xwbop.h>
-#include <bm/stm32cube/standard.h>
-#include <bm/stm32cube/cubemx/Core/Inc/main.h>
-#include <bm/stm32cube/cubemx/IVT/isr.h>
-#include <bm/stm32cube/xwac/xwlib/crc.h>
-#include <bm/stm32cube/xwac/xwds/cmif.h>
-#include <bm/stm32cube/mif.h>
+#include "bm/stm32cube/Core/Inc/main.h"
+#include "bm/xwac/xwlib/crc.h"
+#include "bm/xwac/xwds/core.h"
 
 extern xwsz_t itcm_mr_origin[];
 extern xwsz_t itcm_mr_size[];
@@ -55,6 +53,9 @@ void SystemInit(void);
 extern
 void SystemClock_Config(void);
 
+extern
+void stm32cube_init_vtor(void);
+
 static
 void axisram_init(void);
 
@@ -74,7 +75,7 @@ void stm32cube_lowlevel_init(void)
         __HAL_RCC_D2SRAM2_CLK_ENABLE();
         __HAL_RCC_D2SRAM3_CLK_ENABLE();
         __HAL_RCC_D3SRAM1_CLKAM_ENABLE();
-        SCB->VTOR = (xwu32_t)&stm32_ivt;
+        stm32cube_init_vtor(); /* 覆盖HAL库中的VTOR的值 */
 }
 
 /**
@@ -93,16 +94,17 @@ void stm32cube_init(void)
         sram4_init();
 
         rc = stm32cube_xwds_probe();
-        BRD_BUG_ON(rc < 0);
+        BOARD_BUG_ON(rc < 0);
 
         /*
            若SDRAM、QSPI Flash等可映射到内存地址上的器件未初始化完成，
            开启Cache可能会因为Cache的预取操作导致宕机。
+           开启Cache必须在上述器件初始化完成之后。
          */
-#if defined(STM32CUBECFG_ICACHE) && (1 == STM32CUBECFG_ICACHE)
+#if defined(BRDCFG_ICACHE) && (1 == BRDCFG_ICACHE)
         SCB_EnableICache();
 #endif
-#if defined(STM32CUBECFG_DCACHE) && (1 == STM32CUBECFG_DCACHE)
+#if defined(BRDCFG_DCACHE) && (1 == BRDCFG_DCACHE)
         SCB_EnableDCache();
         SCB_CleanInvalidateDCache();
 #endif
@@ -131,6 +133,7 @@ err_xwds_start:
 
 /**
  * @brief 停止STM32CUBE模块
+ * + 上下文：线程
  */
 xwer_t stm32cube_stop(void)
 {
