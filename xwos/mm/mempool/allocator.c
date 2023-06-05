@@ -290,7 +290,7 @@ xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf
         } else {
                 size = XWBOP_ALIGN(size, XWMM_ALIGNMENT);
                 odr = xwbop_fls(xwsz_t, size);
-                if ((1U << odr) < size) {
+                while ((1U << odr) < size) {
                         odr++;
                 }
                 size = 1U << odr;
@@ -363,6 +363,7 @@ xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -EALREADY: 页内存已释放
+ * @retval -ERANGE: 内存地址不在内存池的范围内
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -455,6 +456,7 @@ do_nothing:
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
  * @retval -ENOMEM: 内存不足
+ * @retval -ERANGE: 内存地址不在内存池的范围内
  * @note
  * - 同步/异步：同步
  * - 上下文：中断、中断底半部、线程
@@ -506,7 +508,7 @@ xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size, void ** membu
 /**
  * @brief XWMM API：从内存池中申请对齐的内存
  * @param[in] mp: 内存池的指针
- * @param[in] alignment: 内存的起始地址对齐的字节数
+ * @param[in] alignment: 内存的起始地址对齐的字节数，只能是2的n次方
  * @param[in] size: 申请的大小
  * @param[out] membuf: 指向缓冲区的指针，通过此缓冲区返回申请到的内存的首地址
  * @return 错误码
@@ -519,7 +521,7 @@ xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size, void ** membu
  * - 重入性：可重入
  * - 此API类似于C11标准中的aligned_alloc()函数，alignment只能是2的n次方，
  *   若size小于alignment，size会被扩大为alignment，
- *   若size大于alignment，size会被继续扩大，直到为alignment的整数倍。
+ *   若size大于alignment，size会扩大至2的n次方，（此时也一定为alignment的整数倍）。
  */
 __xwos_api
 xwer_t xwmm_mempool_memalign(struct xwmm_mempool * mp,
@@ -550,7 +552,7 @@ xwer_t xwmm_mempool_memalign(struct xwmm_mempool * mp,
                 size = alignment;
         } else {
                 p2 = xwbop_fls(xwsz_t, size);
-                if ((1U << p2) < size) {
+                while ((1U << p2) < size) {
                         p2++;
                 }
                 size = 1U << p2;

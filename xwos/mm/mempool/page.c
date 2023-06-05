@@ -508,22 +508,29 @@ xwmm_mempool_page_get_buddy(struct xwmm_mempool_page_allocator * pa,
  * @param[in] pa: 页分配器的指针
  * @param[in] mem: 内存地址
  * @param[out] pgbuf: 指向缓冲区的指针，通过此缓冲区返回申请到的页控制块的指针
- * @return 伙伴页控制块的指针
- * @note
- * - 被查找的页不在阶红黑树中（也即是从页分配器中已经分配出去）
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -ERANGE: 内存地址不在内存池的范围内
  */
 __xwos_code
 xwer_t xwmm_mempool_page_find(struct xwmm_mempool_page_allocator * pa, void * mem,
                               struct xwmm_mempool_page ** pgbuf)
 {
+        xwer_t rc;
         struct xwmm_mempool_page * pg;
 
-        pg = xwmm_mempool_mem_to_page(pa, mem);
-        while (XWMM_MEMPOOL_PAGE_ORDER_CMB == pg->order) {
-                pg--;
+        if (((xwptr_t)mem < pa->zone.origin) ||
+            ((xwptr_t)mem >= (pa->zone.origin + pa->zone.size))) {
+                rc = -ERANGE;
+        } else {
+                pg = xwmm_mempool_mem_to_page(pa, mem);
+                while (XWMM_MEMPOOL_PAGE_ORDER_CMB == pg->order) {
+                        pg--;
+                }
+                *pgbuf = pg;
+                rc = XWOK;
         }
-        *pgbuf = pg;
-        return XWOK;
+        return rc;
 }
 
 /**

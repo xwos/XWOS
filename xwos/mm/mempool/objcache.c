@@ -72,12 +72,13 @@ xwer_t xwmm_mempool_objcache_init(struct xwmm_mempool_objcache * oc,
  * -----------------------------------------------------------------------------
  * |  attr.objcache.objhead   |->| obj | a | obj | a | obj | a | ...
  * |--------------------------|-------------------------------------------------
- * | ...                      |      |       ^ |       ^ |       ^
- * |--------------------------|      |_______| |_______| |_______|
+ * | ...                      |        |   ^     |   ^     |   ^
+ * |--------------------------|        |___|     |___|     |___|
  * obj: object
  * a: alignment area
  */
 
+        alignment = XWBOP_ALIGN(alignment, XWMM_ALIGNMENT);
         objsize = XWBOP_ALIGN(objsize, alignment);
         if (ctor) {
                 xwu8_t obj[objsize];
@@ -311,7 +312,7 @@ err_page_get:
  * @param[in] obj: 对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -ENOMEM: 内存不足
+ * @retval -ERANGE: 内存地址不在内存池的范围内
  */
 __xwos_code
 xwer_t xwmm_mempool_objcache_free(struct xwmm_mempool_objcache * oc, void * obj)
