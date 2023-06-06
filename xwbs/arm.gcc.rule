@@ -18,6 +18,7 @@
 # > limitations under the License.
 #
 
+TARGET ?= XWOS
 XWTC ?= $(shell xwtcwd)
 CROSS_COMPILE ?= $(XWTC)/armgcc/bin/arm-none-eabi-
 CC := $(CROSS_COMPILE)gcc
@@ -88,8 +89,7 @@ INCDIRS = -I. \
           -I$(XWOS_ARCH_DIR) \
           -I$(XWOS_CPU_DIR) \
           -I$(XWOS_SOC_DIR) \
-          -I$(XWOS_BRD_DIR) \
-          -I$(XWOS_WKSPC_DIR)
+          -I$(XWOS_BRD_DIR)
 
 PERDEF = -D__XWOS__
 

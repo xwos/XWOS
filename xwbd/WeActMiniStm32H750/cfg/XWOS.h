@@ -27,7 +27,7 @@
 #define XWOS_CFG_ARCH                                   arm
 #define XWOS_CFG_SUBARCH                                v7m
 #define XWOS_CFG_COMPILER                               gcc
-#define XWOS_CFG_LDSCRIPT                               cfg/brd.lds
+#define XWOS_CFG_LDSCRIPT                               brd.lds
 #define XWOS_CFG_ELF_MK                                 elf.mk
 #define XWOS_CFG_XWMO_MK                                xwmo.mk
 #define XWOS_CFG_XWMO_PREBUILT_MK                       xwmo.prebuilt.mk
@@ -91,6 +91,6 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********        auto-generated header        ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <autogen.h>
+#include <cfg/autogen.h>
 
 #endif /* cfg/XWOS.h */

@@ -20,32 +20,31 @@
 
 XWOS ?= ../..
 WKSPC ?= wkspc
-TARGET ?= XWOS
 
 MKCFG := $(XWOS)/xwbs/util/el/mkcfg.el
 
-all: $(WKSPC) cfg
-	$(MAKE) -C $(WKSPC) TARGET=$(TARGET)
+all: cfg $(WKSPC)
+	$(MAKE) -C $(WKSPC)
+
+cfg: $(WKSPC) $(WKSPC)/XWOS.cfg
 
 $(WKSPC):
 	@mkdir -p $@
 	@cp $(XWOS)/xwbs/wkspc.mk $@/makefile
 
-cfg: $(WKSPC) $(WKSPC)/XWOS.cfg
-
-$(WKSPC)/XWOS.cfg: cfg/*.h
+$(WKSPC)/XWOS.cfg: $(filter-out cfg/autogen.h,$(wildcard cfg/*.h))
 	@[ -x ${MKCFG} ] || chmod +x ${MKCFG}
 	@${MKCFG} --XWOS=$(XWOS) --cfgdir=cfg --wkspc=$(WKSPC)
 
 c clean: cfg
-	$(MAKE) -C $(WKSPC) TARGET=$(TARGET) NODEP=y clean
+	$(MAKE) -C $(WKSPC) NODEP=y clean
 
 d distclean: cfg
-	$(MAKE) -C $(WKSPC) TARGET=$(TARGET) NODEP=y distclean
+	$(MAKE) -C $(WKSPC) NODEP=y distclean
 	@rm -rf $(WKSPC)
 
 .DEFAULT:
 	@$(MAKE) cfg
-	$(MAKE) -C $(WKSPC) TARGET=$(TARGET) $@
+	$(MAKE) -C $(WKSPC) $@
 
 .PHONY : all cfg c clean d distclean

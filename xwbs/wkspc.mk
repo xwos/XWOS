@@ -19,9 +19,8 @@
 #
 
 include XWOS.cfg
-TARGET ?= XWOS
 
-MAKE_ARGS = $(strip -C $(XWOS_PATH) -f xwbs/$(XWOS_CFG_ELF_MK) TARGET=$(TARGET) XWOS_WKSPC_DIR=$(XWOS_WKSPC_DIR))
+MAKE_ARGS = $(strip -C $(XWOS_PATH) -f xwbs/$(XWOS_CFG_ELF_MK) XWOS_WKSPC_DIR=$(XWOS_WKSPC_DIR))
 
 all:
 	$(MAKE) $(MAKE_ARGS) all
