@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief FatFs在玄武OS中的适配代码
+ * @brief FatFs适配层
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  */
