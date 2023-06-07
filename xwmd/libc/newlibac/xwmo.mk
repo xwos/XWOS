@@ -15,17 +15,18 @@ include $(XWBS_UTIL_MK_XWMO)
 $(eval $(call XwmoReqCfg,XWEMCFG_fs_fatfs,y))
 $(eval $(call XwmoReqCfg,XWMMCFG_MEMPOOL,y))
 
-XWMO_CSRCS := mif.c errno.c lock.c
-
-ifeq ($(XWMDCFG_libc_newlibac_string),y)
-  XWMO_CSRCS += string.c
-endif
-ifeq ($(XWMDCFG_libc_newlibac_mem),y)
-  XWMO_CSRCS += mem.c
-endif
-ifeq ($(XWMDCFG_libc_newlibac_fops),y)
-  XWMO_CSRCS += fops.c
-endif
+XWMO_CSRCS := mif.c
+XWMO_CSRCS += errno.c
+XWMO_CSRCS += lock.c
+XWMO_CSRCS += sysconf.c
+XWMO_CSRCS += time.c
+XWMO_CSRCS += string.c
+XWMO_CSRCS += mem.c
+XWMO_CSRCS += fops.c
+XWMO_CSRCS += isatty.c
+XWMO_CSRCS += getpid.c
+XWMO_CSRCS += kill.c
+XWMO_CSRCS += exit.c
 
 XWMO_CFLAGS := -Wno-unused-value -Wno-unused-parameter
 XWMO_INCDIRS :=

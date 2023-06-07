@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief newlib适配代码：锁
+ * @brief newlib适配层：锁
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -13,7 +13,12 @@
 #include <xwos/standard.h>
 #include <xwos/osal/thd.h>
 #include <xwos/osal/lock/mtx.h>
+#include <xwmd/libc/newlibac/check.h>
 #include <sys/lock.h>
+
+void newlibac_lock_linkage_stub(void)
+{
+}
 
 #if defined(_RETARGETABLE_LOCKING)
 struct __lock {

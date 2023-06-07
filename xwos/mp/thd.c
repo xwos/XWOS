@@ -396,9 +396,7 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
                 thd->data[i] = NULL;
         }
 #endif
-#if defined(XWMDCFG_libc_newlibac) && (1 == XWMDCFG_libc_newlibac)
-        thd->newlib.__errno = XWOK;
-#endif
+        thd->libc.__errno = XWOK;
 
 #if defined(BRDCFG_XWSKD_THD_POSTINIT_HOOK) && (1 == BRDCFG_XWSKD_THD_POSTINIT_HOOK)
         board_thd_postinit_hook(thd);

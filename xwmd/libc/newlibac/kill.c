@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief newlib适配层：模块接口
+ * @brief newlib适配层：kill
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -10,11 +10,19 @@
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
-#ifndef __xwmd_libc_newlibac_mif_h__
-#define __xwmd_libc_newlibac_mif_h__
-
 #include <xwos/standard.h>
+#include <xwos/lib/errno.h>
+#include <xwos/osal/thd.h>
+#include <xwmd/libc/newlibac/check.h>
+#include <unistd.h>
 
-xwer_t newlibac_init(void);
+void newlibac_kill_linkage_stub(void)
+{
+}
 
-#endif /* xwmd/libc/newlibac/mif.h */
+
+int _kill_r(struct _reent * r, pid_t pid, int sig)
+{
+        errno = ESRCH;
+        return -1;
+}

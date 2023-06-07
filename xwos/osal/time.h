@@ -22,6 +22,8 @@
  * @{
  */
 
+#define XWTM_TC_PER_S XWOSDL_SKD_TC_PER_S /**< 每秒的tick数 */
+
 /**
  * @brief XWOS API：获取当前CPU的系统时间点
  * @return 当前时间点

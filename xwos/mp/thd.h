@@ -92,12 +92,9 @@ struct xwmp_thd {
         /* 线程私有数据 */
         void * data[XWMPCFG_SKD_THD_LOCAL_DATA_NUM];
 #endif
-
-#if defined(XWMDCFG_libc_newlibac) && (1 == XWMDCFG_libc_newlibac)
         struct {
                 int __errno;
-        } newlib;
-#endif
+        } libc;
 };
 
 xwer_t xwmp_thd_chprio_once(struct xwmp_thd * thd, xwpr_t dprio,

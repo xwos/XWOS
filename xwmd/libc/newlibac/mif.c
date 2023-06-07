@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief newlib适配代码：模块接口
+ * @brief newlib适配层：模块接口
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -14,21 +14,43 @@
 #include <xwmd/libc/newlibac/mif.h>
 #include <stdlib.h>
 
+typedef void (* newlibac_linkage_f)(void);
 typedef void (* newlibac_init_f)(void);
 
 extern void __libc_init_array (void);
 extern void __libc_fini_array (void);
 
-extern void newlibac_errno_init(void);
-#if defined(XWMDCFG_libc_newlibac_string) && (1 == XWMDCFG_libc_newlibac_string)
-extern void newlibac_string_init(void);
-#endif
-#if defined(XWMDCFG_libc_newlibac_mem) && (1 == XWMDCFG_libc_newlibac_mem)
-extern void newlibac_mem_init(void);
-#endif
-#if defined(XWMDCFG_libc_newlibac_fops) && (1 == XWMDCFG_libc_newlibac_fops)
-extern void newlibac_fops_init(void);
-#endif
+extern void newlibac_errno_linkage_stub(void);
+extern void newlibac_lock_linkage_stub(void);
+extern void newlibac_sysconf_linkage_stub(void);
+extern void newlibac_time_linkage_stub(void);
+extern void newlibac_string_linkage_stub(void);
+extern void newlibac_mem_linkage_stub(void);
+extern void newlibac_fops_linkage_stub(void);
+extern void newlibac_isatty_linkage_stub(void);
+extern void newlibac_kill_linkage_stub(void);
+extern void newlibac_getpid_linkage_stub(void);
+extern void newlibac_exit_linkage_stub(void);
+
+/**
+ * @brief 静态链接表
+ * @note
+ * + 此函数表作为静态链接占位符，可保证符号重名时优先使用此库中的符号。
+ */
+const newlibac_linkage_f newlibac_linkage_table[] = {
+        newlibac_errno_linkage_stub,
+        newlibac_lock_linkage_stub,
+        newlibac_sysconf_linkage_stub,
+        newlibac_time_linkage_stub,
+        newlibac_string_linkage_stub,
+        newlibac_mem_linkage_stub,
+        newlibac_fops_linkage_stub,
+        newlibac_isatty_linkage_stub,
+        newlibac_kill_linkage_stub,
+        newlibac_getpid_linkage_stub,
+        newlibac_exit_linkage_stub,
+};
+
 extern void newlibac_lock_init(void);
 
 /**
@@ -37,16 +59,6 @@ extern void newlibac_lock_init(void);
  * + 此函数表同时作为静态链接占位符，可保证符号重名时优先使用此库中的符号。
  */
 const newlibac_init_f newlibac_init_table[] = {
-        newlibac_errno_init,
-#if defined(XWMDCFG_libc_newlibac_string) && (1 == XWMDCFG_libc_newlibac_string)
-        newlibac_string_init,
-#endif
-#if defined(XWMDCFG_libc_newlibac_mem) && (1 == XWMDCFG_libc_newlibac_mem)
-        newlibac_mem_init,
-#endif
-#if defined(XWMDCFG_libc_newlibac_fops) && (1 == XWMDCFG_libc_newlibac_fops)
-        newlibac_fops_init,
-#endif
         newlibac_lock_init,
 };
 

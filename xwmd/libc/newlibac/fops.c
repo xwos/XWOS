@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief newlib适配代码：文件操作
+ * @brief newlib适配层：文件操作
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -14,9 +14,15 @@
 #include <xwos/lib/errno.h>
 #include <xwos/lib/xwbop.h>
 #include <xwem/fs/fatfs/ff.h>
+#include <xwmd/libc/newlibac/check.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <time.h>
+
+void newlibac_fops_linkage_stub(void)
+{
+}
 
 #define NEWLIBAC_FOPS_FD_NUM         32
 #define NEWLIBAC_FOPS_FD_OFFSET      3 /* 0,1,2 分别代表 stdin, stdout, stderr. */
@@ -33,10 +39,7 @@ xwssz_t newlibac_fops_write_stderr(int fd, const void * data, size_t cnt);
 xwbmpop_define(newlibac_fops_node_bmp, NEWLIBAC_FOPS_FD_NUM) = {0};
 xwbmpop_define(newlibac_fops_nodetype_bmp, NEWLIBAC_FOPS_FD_NUM) = {0};
 void * newlibac_fops_fatfs_node[NEWLIBAC_FOPS_FD_NUM] = {NULL};
-
-void newlibac_fops_init(void)
-{
-}
+void * newlibac_fops_fatfs_filinfo[NEWLIBAC_FOPS_FD_NUM] = {NULL};
 
 #ifdef O_DIRECTORY
 static
@@ -140,6 +143,7 @@ int newlibac_fops_openfile(struct _reent * r, const char * path, int flag, int m
         int fd;
         FRESULT fsrc;
         FIL * fp;
+        FILINFO * fi;
         BYTE fsmode;
         xwssq_t idx;
 
@@ -155,7 +159,13 @@ int newlibac_fops_openfile(struct _reent * r, const char * path, int flag, int m
         if (NULL == fp) {
                 errno = ENOMEM;
                 fd = -1;
-                goto err_nomem;
+                goto err_malloc_fp;
+        }
+        fi = malloc(sizeof(FILINFO));
+        if (NULL == fi) {
+                errno = ENOMEM;
+                fd = -1;
+                goto err_malloc_fi;
         }
 
         fsmode = 0;
@@ -250,10 +260,22 @@ int newlibac_fops_openfile(struct _reent * r, const char * path, int flag, int m
                 break;
         }
         if (fd < 0) {
-                free(fp);
+                goto err_fopen;
         }
 
-err_nomem:
+        fsrc = f_stat(path, fi);
+        if (FR_OK == fsrc) {
+                newlibac_fops_fatfs_filinfo[idx] = fi;
+        } else {
+                newlibac_fops_fatfs_filinfo[idx] = NULL;
+        }
+        return fd;
+
+err_fopen:
+        free(fi);
+err_malloc_fi:
+        free(fp);
+err_malloc_fp:
 err_mfile:
         return fd;
 }
@@ -272,6 +294,11 @@ int _open_r(struct _reent * r, const char * path, int flag, int mode)
         fd = newlibac_fops_openfile(r, path, flag, mode);
 #endif
         return fd;
+}
+
+int _open64_r(struct _reent * r, const char * path, int flag, int mode)
+{
+        return _open_r(r, path, flag, mode);
 }
 
 #ifdef O_DIRECTORY
@@ -317,11 +344,17 @@ int newlibac_fops_closefile(struct _reent * r, xwsq_t idx)
         int rc;
         FRESULT fsrc;
         FIL * fp;
+        FILINFO * fi;
 
         fp = newlibac_fops_fatfs_node[idx];
+        fi = newlibac_fops_fatfs_filinfo[idx];
         fsrc = f_close(fp);
         switch (fsrc) {
         case FR_OK:
+                if (fi) {
+                        free(fi);
+                        newlibac_fops_fatfs_filinfo[idx] = NULL;
+                }
                 free(fp);
                 newlibac_fops_fatfs_node[idx] = NULL;
                 xwbmpop_c0i(newlibac_fops_node_bmp, idx);
@@ -536,6 +569,11 @@ _off_t _lseek_r(struct _reent * r, int fd, _off_t pos, int whence)
         return curpos;
 }
 
+_off64_t _lseek64_r(struct _reent * r, int fd, _off64_t offset, int whence)
+{
+        return (_off64_t)_lseek_r(r, fd, (off_t) offset, whence);
+}
+
 int _unlink_r(struct _reent * r, const char * path)
 {
         FRESULT fsrc;
@@ -628,4 +666,59 @@ int _rename_r(struct _reent * ptr, const char * oldname, const char * newname)
                 break;
         }
         return rc;
+}
+
+int _fstat_r(struct _reent * r, int fd, struct stat * sbuf)
+{
+        FILINFO * fi;
+        xwssq_t idx;
+        int rc;
+
+        switch (fd) {
+        case 0:
+        case 1:
+        case 2:
+                errno = ENOSYS;
+                rc = -1;
+                break;
+        default:
+                idx = fd - NEWLIBAC_FOPS_FD_OFFSET;
+                fi = newlibac_fops_fatfs_filinfo[idx];
+                if (fi) {
+                        struct tm tm;
+                        time_t sec;
+
+                        sbuf->st_nlink = 1;
+                        sbuf->st_uid = 0;
+                        sbuf->st_gid = 0;
+                        sbuf->st_mode = (mode_t)(S_IFREG | S_IRWXU | S_IRWXG | S_IRWXO);
+                        if (AM_RDO & fi->fattrib) {
+                                sbuf->st_mode &= (mode_t)(~(S_IRUSR | S_IRGRP | S_IROTH));
+                        }
+                        tm.tm_sec = (fi->ftime & 0x1F) << 1;
+                        tm.tm_min = (fi->ftime >> 5) & 0x3F;
+                        tm.tm_hour = (fi->ftime >> 11) & 0xF;
+                        tm.tm_mday = (fi->fdate & 0x1F);
+                        tm.tm_mon = (fi->fdate >> 5) & 0xF;
+                        tm.tm_year = (fi->fdate >> 9) & 0x7F;
+                        tm.tm_wday = 0;
+                        tm.tm_yday = 0;
+                        tm.tm_isdst = 0;
+                        sec = mktime(&tm);
+                        sbuf->st_mtim.tv_sec = sec;
+                        sbuf->st_mtim.tv_nsec = 0;
+                        sbuf->st_atim.tv_sec = sec;
+                        sbuf->st_atim.tv_nsec = 0;
+                        sbuf->st_ctim.tv_sec = sec;
+                        sbuf->st_ctim.tv_nsec = 0;
+                        sbuf->st_size = (off_t)fi->fsize;
+                        errno = XWOK;
+                        rc = 0;
+                } else {
+                        errno = ENOSYS;
+                        rc = -1;
+                }
+                break;
+        }
+	return rc;
 }

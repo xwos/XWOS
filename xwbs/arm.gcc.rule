@@ -133,6 +133,7 @@ endif
 LDFLAGS = -mthumb -mabi=aapcs -m$(ENDIAN) \
           -L$(XWOS_SOC_DIR) -T$(XWOS_BRD_DIR)/$(XWOS_CFG_LDSCRIPT) \
           -Wl,--allow-multiple-definition -Wl,--gc-sections \
+          -Wl,-z,noexecstack -Wl,--no-warn-rwx-segment \
           -Wl,-Map=$(XWOS_WKSPC_DIR)/$(TARGET).map,--cref
 
 # colorfully build

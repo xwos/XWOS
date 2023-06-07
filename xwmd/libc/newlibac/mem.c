@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief newlib适配代码：动态内存申请与释放
+ * @brief newlib适配层：动态内存申请与释放
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -13,8 +13,13 @@
 #include <xwos/standard.h>
 #include <xwos/lib/errno.h>
 #include <xwos/mm/mempool/allocator.h>
+#include <xwmd/libc/newlibac/check.h>
 #include <string.h>
 #include <reent.h>
+
+void newlibac_mem_linkage_stub(void)
+{
+}
 
 extern struct xwmm_mempool * newlibac_mempool;
 
@@ -29,10 +34,6 @@ void * newlibac_realloc(struct _reent * r, void * mem, xwsz_t size);
 
 static
 void * newlibac_memalign(struct _reent * r, xwsz_t alignment, xwsz_t size);
-
-void newlibac_mem_init(void)
-{
-}
 
 static
 void * newlibac_malloc(struct _reent * r, xwsz_t size)
@@ -116,4 +117,9 @@ void * _pvalloc_r(struct _reent * r, size_t n)
 void _free_r(struct _reent * r, void * p)
 {
         newlibac_free(r, p);
+}
+
+int getpagesize(void)
+{
+        return XWMM_MEMPOOL_PAGE_SIZE;
 }

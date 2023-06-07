@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief newlib适配层：errno
+ * @brief newlib适配层：exit
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -13,14 +13,17 @@
 #include <xwos/standard.h>
 #include <xwos/osal/thd.h>
 #include <xwmd/libc/newlibac/check.h>
-#include <errno.h>
 
-void newlibac_errno_linkage_stub(void)
+void newlibac_exit_linkage_stub(void)
 {
 }
 
-int * __errno()
+void _exit(int rc)
 {
-        xwos_thd_d thdd = xwos_cthd_self();
-        return &thdd.thd->osthd.libc.__errno;
+        /* `exit()` 是结束整个进程。
+           RTOS可以看做是单一进程运行多个的线程，`exit()` 相当于结束整个系统。
+           但此处将其实现为结束当前线程。 */
+        xwos_cthd_exit((xwer_t)rc);
+        while (true) {
+        }
 }

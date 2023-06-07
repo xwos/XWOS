@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief newlib适配层：errno
+ * @brief newlib适配层：isatty
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -13,14 +13,25 @@
 #include <xwos/standard.h>
 #include <xwos/osal/thd.h>
 #include <xwmd/libc/newlibac/check.h>
-#include <errno.h>
+#include <unistd.h>
 
-void newlibac_errno_linkage_stub(void)
+void newlibac_isatty_linkage_stub(void)
 {
 }
 
-int * __errno()
+int _isatty_r(struct _reent * r, int fd)
 {
-        xwos_thd_d thdd = xwos_cthd_self();
-        return &thdd.thd->osthd.libc.__errno;
+        int rc;
+
+        switch (fd) {
+        case 0:
+        case 1:
+        case 2:
+                rc = 1;
+                break;
+        default:
+                rc = 0;
+                break;
+        }
+        return rc;
 }

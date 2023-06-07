@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief newlib适配代码：string
+ * @brief newlib适配层：string
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -11,8 +11,9 @@
  */
 
 #include <xwos/standard.h>
+#include <xwmd/libc/newlibac/check.h>
 
-void newlibac_string_init(void)
+void newlibac_string_linkage_stub(void)
 {
 }
 
