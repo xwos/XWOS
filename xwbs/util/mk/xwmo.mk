@@ -63,3 +63,9 @@ ifneq ($$($(1)),$(2))
     $$(error "$(1) is not configured to $(2)!")
 endif
 endef
+
+define XwmoReqNotCfg
+ifeq ($$($(1)),$(2))
+    $$(error "$(1) is configured to $(2)!")
+endif
+endef

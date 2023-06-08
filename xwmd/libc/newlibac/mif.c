@@ -26,6 +26,7 @@ extern void newlibac_sysconf_linkage_stub(void);
 extern void newlibac_time_linkage_stub(void);
 extern void newlibac_string_linkage_stub(void);
 extern void newlibac_mem_linkage_stub(void);
+extern void newlibac_setjmp_linkage_stub(void);
 extern void newlibac_fops_linkage_stub(void);
 extern void newlibac_isatty_linkage_stub(void);
 extern void newlibac_kill_linkage_stub(void);
@@ -44,6 +45,7 @@ const newlibac_linkage_f newlibac_linkage_table[] = {
         newlibac_time_linkage_stub,
         newlibac_string_linkage_stub,
         newlibac_mem_linkage_stub,
+        newlibac_setjmp_linkage_stub,
         newlibac_fops_linkage_stub,
         newlibac_isatty_linkage_stub,
         newlibac_kill_linkage_stub,

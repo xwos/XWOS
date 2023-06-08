@@ -46,11 +46,6 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define BRDCFG_MM_DTCMHEAP_BLKSZ                (512U)
 #define BRDCFG_MM_DTCMHEAP_BLKODR               (7U) /* 128 */
-#define BRDCFG_XWOS_THD_CACHE_ODR               4
-#define BRDCFG_XWOS_SWT_CACHE_ODR               0
-#define BRDCFG_XWOS_SEM_CACHE_ODR               0
-#define BRDCFG_XWOS_COND_CACHE_ODR              0
-#define BRDCFG_XWOS_MTX_CACHE_ODR               0
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********    chip config    ******** ******** ********

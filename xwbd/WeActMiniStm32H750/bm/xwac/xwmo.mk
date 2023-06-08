@@ -42,8 +42,14 @@ XWMO_CSRCS += xwds/w25q64jv.c
 XWMO_CSRCS += xwlib/log.c
 XWMO_CSRCS += xwlib/crc.c
 
-XWMO_CSRCS += newlib/stdio.c
-XWMO_CSRCS += newlib/mem.c
+ifeq ($(XWMDCFG_libc_newlibac),y)
+  XWMO_CSRCS += newlib/stdio.c
+  XWMO_CSRCS += newlib/mem.c
+endif
+ifeq ($(XWMDCFG_libc_picolibcac),y)
+  XWMO_CSRCS += picolibc/stdio.c
+  XWMO_CSRCS += picolibc/mem.c
+endif
 
 XWMO_CSRCS += fatfs/sdcard.c
 

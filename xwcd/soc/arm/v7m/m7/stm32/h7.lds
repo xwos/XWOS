@@ -124,6 +124,15 @@ SECTIONS {
         fini_array_lma_base = LOADADDR(.fini_array);
         /* -------- 以上与C++全局对象的构造函数与析构函数有关 -------- */
 
+        /* ++++++++ Global Offset Table ++++++++ */
+        /* 当-ftls-model=initial-exec时，tls变量的offset是从got表的地址加载的 */
+        /* 当-ftls-model=local-exec时，tls变量的offset是直接加载立即数，此时不需要 .got */
+        /* MCU静态连接的环境，C11标准中的thread_local 变量只能是以上两种模型。 */
+        .got : ALIGN(8) {
+                *(.got.plt) *(.igot.plt) *(.got) *(.igot)
+        } > code_mr AT> code_mr
+        /* -------- Global Offset Table -------- */
+
         .xwos.data : ALIGN(32) {
                 *(.xwos.data)
                 . = ALIGN(32);
@@ -139,6 +148,38 @@ SECTIONS {
         } > data_mr AT> code_mr
         data_vma_base = ADDR(.data);
         data_lma_base = LOADADDR(.data);
+
+	.tdata : ALIGN(32) {
+	        *(.tdata .tdata.* .gnu.linkonce.td.*)
+                tdata_vma_end = .;
+                PROVIDE(__tdata_end = .);
+	} > data_mr AT> code_mr
+        tdata_vma_base = ADDR(.tdata);
+        tdata_lma_base = LOADADDR(.tdata);
+	PROVIDE(__tls_base = ADDR(.tdata));
+	PROVIDE(__tdata_start = ADDR(.tdata));
+	PROVIDE(__tdata_source = LOADADDR(.tdata));
+	PROVIDE(__tdata_source_end = LOADADDR(.tdata) + SIZEOF(.tdata));
+	PROVIDE(__tdata_size = SIZEOF(.tdata));
+	PROVIDE(__tls_align = MAX(ALIGNOF(.tdata),ALIGNOF(.tbss)));
+
+        .tbss (NOLOAD) :  {
+        *(.tbss .tbss.* .gnu.linkonce.tb.*)
+		*(.tcommon)
+                . = ALIGN(16);
+                tbss_vma_end = .;
+                PROVIDE(__tls_end = .);
+                PROVIDE(__tbss_end = .);
+        } > data_mr
+        tbss_vma_base = ADDR(.tbss);
+        PROVIDE(__bss_start = ADDR(.tbss));
+        PROVIDE(__tbss_start = ADDR(.tbss));
+        PROVIDE(__tbss_offset = ADDR(.tbss) - ADDR(.tdata));
+        PROVIDE(__tbss_size = SIZEOF(.tbss));
+        PROVIDE(__tls_size = __tls_end - __tls_base);
+        PROVIDE(__tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)));
+        PROVIDE(__arm32_tls_tcb_offset = MAX(8, __tls_align));
+        PROVIDE(__arm64_tls_tcb_offset = MAX(16, __tls_align));
 
         /* STM32H7的SRAM4分区 */
         .data4 : ALIGN(32) {
@@ -158,7 +199,7 @@ SECTIONS {
         firmware_tail_lma_base = LOADADDR(.firmware.tail);
         firmware_tail_lma_end = firmware_tail_lma_base + firmware_tail_size;
 
-        .bss : ALIGN(16) {
+        .bss (NOLOAD) : ALIGN(16) {
                 *(.dynbss)
                 *(.bss .bss.* .gnu.linkonce.b.*)
                 *(COMMON)
@@ -224,10 +265,6 @@ SECTIONS {
         }
         .iplt : {
                 *(.iplt)
-        }
-
-        .got : {
-                *(.got.plt) *(.igot.plt) *(.got) *(.igot)
         }
         /* -------- 以上与动态连接有关，不适用于MCU的ROM环境 -------- */
 

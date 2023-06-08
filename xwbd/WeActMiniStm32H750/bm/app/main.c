@@ -21,7 +21,12 @@
 #include "board/std.h"
 #include <xwos/osal/thd.h>
 #include <xwcd/perpheral/spi/lcd/st7735/driver.h>
-#include <xwmd/libc/newlibac/mif.h>
+#if defined(XWMDCFG_libc_newlibac) && (1 == XWMDCFG_libc_newlibac)
+#  include <xwmd/libc/newlibac/mif.h>
+#endif /* XWMDCFG_libc_newlibac */
+#if defined(XWMDCFG_libc_picolibcac) && (1 == XWMDCFG_libc_picolibcac)
+#  include <xwmd/libc/picolibcac/mif.h>
+#endif /* XWMDCFG_libc_picolibcac */
 #include <xwem/vm/lua/mif.h>
 #include "bm/xwac/xwds/device.h"
 #include "bm/stm32cube/mif.h"
@@ -83,10 +88,19 @@ xwer_t main_task(void * arg)
 
         xwds_st7735_draw(&st7735, 0, 0, 160, 80, bootlogo, XWTM_MAX);
 
+#if defined(XWMDCFG_libc_newlibac) && (1 == XWMDCFG_libc_newlibac)
         rc = newlibac_init();
         if (rc < 0) {
                 goto err_newlibac_init;
         }
+#endif /* XWMDCFG_libc_newlibac */
+
+#if defined(XWMDCFG_libc_picolibcac) && (1 == XWMDCFG_libc_picolibcac)
+        rc = picolibcac_init();
+        if (rc < 0) {
+                goto err_picolibcac_init;
+        }
+#endif /* XWMDCFG_libc_picolibcac */
 
         rc = child_thd_start();
         if (rc < 0) {
@@ -103,7 +117,7 @@ xwer_t main_task(void * arg)
         if (rc < 0) {
                 goto err_xwlua_start;
         }
-#endif
+#endif /* XWEMCFG_vm_lua */
 
         xwrust_main();
 
@@ -112,12 +126,19 @@ xwer_t main_task(void * arg)
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
 err_xwlua_start:
         BOARD_BUG();
-#endif
+#endif /* XWEMCFG_vm_lua */
 err_xwssc_start:
         BOARD_BUG();
 err_child_thd_start:
+
+#if defined(XWMDCFG_libc_picolibcac) && (1 == XWMDCFG_libc_picolibcac)
+        BOARD_BUG();
+err_picolibcac_init:
+#endif /* XWMDCFG_libc_picolibcac */
+#if defined(XWMDCFG_libc_newlibac) && (1 == XWMDCFG_libc_newlibac)
         BOARD_BUG();
 err_newlibac_init:
+#endif /* XWMDCFG_libc_newlibac */
         BOARD_BUG();
 err_stm32cube_start:
         BOARD_BUG();

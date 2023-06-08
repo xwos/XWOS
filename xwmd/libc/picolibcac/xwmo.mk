@@ -14,7 +14,7 @@ include $(XWBS_UTIL_MK_XWMO)
 
 $(eval $(call XwmoReqCfg,XWEMCFG_fs_fatfs,y))
 $(eval $(call XwmoReqCfg,XWMMCFG_MEMPOOL,y))
-$(eval $(call XwmoReqNotCfg,XWMDCFG_libc_picolibcac,y))
+$(eval $(call XwmoNotReqCfg,XWMDCFG_libc_newlibac,y))
 
 XWMO_CSRCS := mif.c
 XWMO_CSRCS += errno.c

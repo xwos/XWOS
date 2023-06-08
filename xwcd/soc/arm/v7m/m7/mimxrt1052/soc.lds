@@ -69,15 +69,55 @@ SECTIONS {
                 KEEP (*(.init))
                 KEEP (*(.fini))
                 *(.text .text.* .gnu.linkonce.t.*)
-                *(.glue_7)      /* glue arm to thumb code */
-                *(.glue_7t)     /* glue thumb to arm code */
-                *(.eh_frame)
-                *(.gnu.warning)
-                *(.vfp11_veneer)
-                *(.v4_bx)
                 *(.rodata .rodata.* .gnu.linkonce.r.*)
+
+                *(.gnu.warning)
+                *(.glue_7) /* glue arm to thumb code */
+                *(.glue_7t) /* glue thumb to arm code */
+                *(.vfp11_veneer) /* 用于VFP单元 */
+                *(.v4_bx) /* linker stubs */
         } > code_mr AT> code_mr
 
+        /* ++++++++ 以下与unwinding有关，用于异常处理和栈回溯 ++++++++ */
+        .ARM.extab : ALIGN(8) { /* @ref ehabi.pdf for details */
+                FILL(0xFF)
+                *(.ARM.extab* .gnu.linkonce.armextab.*)
+        } > code_mr AT> code_mr
+
+        .ARM.exidx : ALIGN(8) { /* @ref ehabi.pdf for details */
+                FILL(0xFF)
+                PROVIDE(__exidx_start = .);
+                *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+                PROVIDE(__exidx_end = .);
+        } > code_mr AT> code_mr
+
+        .eh_frame_hdr : ALIGN(8) { /* 用于栈展开 */
+                FILL(0xFF)
+                KEEP(*(.eh_frame_hdr .eh_frame_entry .eh_frame_entry.*))
+        } > code_mr AT> code_mr
+
+        .eh_frame : ALIGN(8) { /* 用于栈展开 */
+                FILL(0xFF)
+                KEEP(*(.eh_frame .eh_frame.*))
+        } > code_mr AT> code_mr
+
+        .gcc_except_table : ALIGN(8) { /* 用于try ... catch ... */
+                FILL(0xFF)
+                *(.gcc_except_table .gcc_except_table.*)
+        } > code_mr AT> code_mr
+
+        .gnu_extab : ALIGN(8) {
+                FILL(0xFF)
+                *(.gnu_extab*)
+        } > code_mr AT> code_mr
+
+        .exception_ranges : ALIGN(8) {
+                FILL(0xFF)
+                *(.exception_ranges*)
+        } > code_mr AT> code_mr
+        /* -------- 以上与unwinding有关，用于异常处理和栈回溯 -------- */
+
+        /* ++++++++ 以下与C++全局对象的构造函数与析构函数有关 ++++++++ */
         .preinit_array : ALIGN(8) {
                 FILL(0xFF)
                 PROVIDE_HIDDEN (__preinit_array_start = .);
@@ -106,19 +146,21 @@ SECTIONS {
                 KEEP (*(SORT_BY_INIT_PRIORITY(.dtors*)))
                 PROVIDE_HIDDEN (__fini_array_end = .);
                 fini_array_vma_end = .;
+                . = ALIGN(32);
         } > code_mr AT> code_mr
         fini_array_vma_base = ADDR(.fini_array);
         fini_array_lma_base = LOADADDR(.fini_array);
+        /* -------- 以上与C++全局对象的构造函数与析构函数有关 -------- */
 
-        .ARM.extab : {  /* @ref ehabi.pdf for details */
-                *(.ARM.extab* .gnu.linkonce.armextab.*)
+        /* ++++++++ Global Offset Table ++++++++ */
+        /* 当-ftls-model=initial-exec时，tls变量的offset是从got表的地址加载的 */
+        /* 当-ftls-model=local-exec时，tls变量的offset是直接加载立即数，此时不需要 .got */
+        /* MCU静态连接的环境，C11标准中的thread_local 变量只能是以上两种模型。 */
+        .got : ALIGN(8) {
+                FILL(0xFF)
+                *(.got.plt) *(.igot.plt) *(.got) *(.igot)
         } > code_mr AT> code_mr
-
-        .ARM.exidx : {  /* @ref ehabi.pdf for details */
-                PROVIDE(__exidx_start = .);
-                *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-                PROVIDE(__exidx_end = .);
-        } > code_mr AT> code_mr
+        /* -------- Global Offset Table -------- */
 
         .xwos.data : ALIGN(16) {
                 FILL(0xFF)
@@ -184,7 +226,7 @@ SECTIONS {
         ncache_vma_base = ADDR(.ncache);
         ncache_lma_base = LOADADDR(.ncache);
 
-        .firmware.tail : ALIGN(128) {
+        .firmware.tail : ALIGN(32) {
                 KEEP(*(.firmware.tail))
                 firmware_tail_vma_end = .;
         } > code_mr AT> code_mr
@@ -193,11 +235,11 @@ SECTIONS {
         firmware_tail_lma_base = LOADADDR(.firmware.tail);
         firmware_tail_lma_end = firmware_tail_lma_base + firmware_tail_size;
 
-        .bss : ALIGN(8) {
+        .bss (NOLOAD) : ALIGN(16) {
                 *(.dynbss)
                 *(.bss .bss.* .gnu.linkonce.b.*)
                 *(COMMON)
-                . = ALIGN(8);
+                . = ALIGN(16);
                 bss_vma_end = .;
         } > data_mr
         bss_vma_base = ADDR(.bss);
@@ -239,6 +281,7 @@ SECTIONS {
                 _pvHeapLimit = .;
         } > ocram_mr
 
+        /* ++++++++ 以下与动态连接有关，不适用于MCU的ROM环境 ++++++++ */
         .rel.dyn : {
                 *(.rel.init)
                 *(.rel.text .rel.text.* .rel.gnu.linkonce.t.*)
@@ -291,13 +334,11 @@ SECTIONS {
         .iplt : {
                 *(.iplt)
         }
-
-        .got : {
-                *(.got.plt) *(.igot.plt) *(.got) *(.igot)
-        }
+        /* -------- 以上与动态连接有关，不适用于MCU的ROM环境 -------- */
 
         .ARM.attributes 0 : { /* architecture infomations @ref aaelf.pdf */
                 *(.ARM.attributes)
+                *(.gnu.attributes)
         }
 }
 

@@ -53,9 +53,7 @@
  ******** ********            C/C++ Runtime            ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWMDCFG_libc_newlibac                                   0
-#define XWMDCFG_libc_newlibac_string                            1
-#define XWMDCFG_libc_newlibac_mem                               1
-#define XWMDCFG_libc_newlibac_fops                              1
+#define XWMDCFG_libc_picolibcac                                 0
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********            XWRust Runtime            ******** ********

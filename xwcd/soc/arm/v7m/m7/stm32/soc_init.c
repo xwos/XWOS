@@ -32,6 +32,13 @@ extern xwu8_t data_vma_end[];
 extern xwu8_t bss_vma_base[];
 extern xwu8_t bss_vma_end[];
 
+extern xwu8_t tdata_lma_base[];
+extern xwu8_t tdata_vma_base[];
+extern xwu8_t tdata_vma_end[];
+
+extern xwu8_t tbss_vma_base[];
+extern xwu8_t tbss_vma_end[];
+
 /**
  * @brief 重定向数据区到内存
  */
@@ -64,6 +71,24 @@ void soc_relocate_data(void)
 
         dst = bss_vma_base;
         cnt = (xwsz_t)bss_vma_end - (xwsz_t)bss_vma_base;
+        for (i = 0; i < cnt; i++) {
+                *dst = 0;
+                dst++;
+        }
+
+        src = tdata_lma_base;
+        dst = tdata_vma_base;
+        if (dst != src) {
+                cnt = (xwsz_t)tdata_vma_end - (xwsz_t)tdata_vma_base;
+                for (i = 0; i < cnt; i++) {
+                        *dst = *src;
+                        dst++;
+                        src++;
+                }
+        }
+
+        dst = tbss_vma_base;
+        cnt = (xwsz_t)tbss_vma_end - (xwsz_t)tbss_vma_base;
         for (i = 0; i < cnt; i++) {
                 *dst = 0;
                 dst++;

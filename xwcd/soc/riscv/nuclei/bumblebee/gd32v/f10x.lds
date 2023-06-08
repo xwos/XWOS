@@ -118,6 +118,12 @@ SECTIONS {
         fini_array_lma_base = LOADADDR(.fini_array);
         /* -------- 以上与C++全局对象的构造函数与析构函数有关 -------- */
 
+        /* ++++++++ Global Offset Table ++++++++ */
+        .got : ALIGN(4) {
+                *(.got.plt) *(.igot.plt) *(.got) *(.igot)
+        } > code_mr AT> code_mr
+        /* -------- Global Offset Table -------- */
+
         .data : ALIGN(4) {
                 *(.xwos.data)
                 *(.data .data.* .gnu.linkonce.d.*)

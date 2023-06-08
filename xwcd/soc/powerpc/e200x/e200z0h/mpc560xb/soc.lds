@@ -124,6 +124,10 @@ SECTIONS {
         flsopc_vma_base = ADDR(.flsopc);
         flsopc_lma_base = LOADADDR(.flsopc);
 
+        .got : ALIGN(8) {
+                *(.got.plt) *(.igot.plt) *(.got) *(.igot)
+        } > code_mr AT> code_mr
+
         .data : ALIGN(8) {
                 *(.xwos.data)
                 *(.data)

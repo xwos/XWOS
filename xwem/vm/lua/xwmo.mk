@@ -22,8 +22,6 @@ include $(XWOS_WKSPC_DIR)/XWOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
 $(eval $(call XwmoReqCfg,XWOS_CFG_CORE,mp))
-$(eval $(call XwmoReqCfg,XWEMCFG_fs_fatfs,y))
-$(eval $(call XwmoReqCfg,XWMDCFG_libc_newlibac,y))
 
 CORE_O := $(shell xwbs/util/el/makefile-grep-variable.el -a CORE_O $(call getXwmoDir)/src/Makefile)
 LUA_CORE := $(addprefix src/,$(addsuffix .c,$(basename $(CORE_O))))
