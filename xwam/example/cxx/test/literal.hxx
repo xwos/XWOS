@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_cxx_test_literal_hxx__
-#define __bm_cxx_test_literal_hxx__
+#ifndef __xwam_example_cxx_test_literal_hxx__
+#define __xwam_example_cxx_test_literal_hxx__
 
 #include <string>
 
@@ -55,4 +55,4 @@ template <typename T, T... chlst>
 
 void testLiteralOperator();
 
-#endif /* bm/cxx/test/literal.hxx */
+#endif /* xwam/example/cxx/test/literal.hxx */

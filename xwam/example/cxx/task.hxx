@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __example_cxx_task_hxx__
-#define __example_cxx_task_hxx__
+#ifndef __xwam_example_cxx_task_hxx__
+#define __xwam_example_cxx_task_hxx__
 
 extern "C" {
 #include <xwos/standard.h>
@@ -29,4 +29,4 @@ extern "C" {
 xwer_t cxx_thd_main(void * arg);
 }
 
-#endif /* example/cxx/task.hxx */
+#endif /* xwam/example/cxx/task.hxx */

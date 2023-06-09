@@ -19,6 +19,7 @@
  */
 
 #include "board/std.h"
+#include <xwos/lib/xwlog.h>
 #include <xwos/osal/thd.h>
 #include <xwcd/perpheral/spi/lcd/st7735/driver.h>
 #if defined(XWMDCFG_libc_newlibac) && (1 == XWMDCFG_libc_newlibac)
@@ -28,6 +29,7 @@
 #  include <xwmd/libc/picolibcac/mif.h>
 #endif /* XWMDCFG_libc_picolibcac */
 #include <xwem/vm/lua/mif.h>
+#include <xwam/example/cxx/mif.h>
 #include "bm/xwac/xwds/device.h"
 #include "bm/stm32cube/mif.h"
 #include "bm/app/xwssc.h"
@@ -91,6 +93,7 @@ xwer_t main_task(void * arg)
 #if defined(XWMDCFG_libc_newlibac) && (1 == XWMDCFG_libc_newlibac)
         rc = newlibac_init();
         if (rc < 0) {
+                xwlogf(ERR, "main", "Init newlib ... <rc:%d>", rc);
                 goto err_newlibac_init;
         }
 #endif /* XWMDCFG_libc_newlibac */
@@ -98,23 +101,32 @@ xwer_t main_task(void * arg)
 #if defined(XWMDCFG_libc_picolibcac) && (1 == XWMDCFG_libc_picolibcac)
         rc = picolibcac_init();
         if (rc < 0) {
+                xwlogf(ERR, "main", "Init picolibc ... <rc:%d>", rc);
                 goto err_picolibcac_init;
         }
 #endif /* XWMDCFG_libc_picolibcac */
 
+        rc = xwos_example_cxx();
+        if (rc < 0) {
+                xwlogf(ERR, "main", "Start C++ example ... <rc:%d>", rc);
+        }
+
         rc = child_thd_start();
         if (rc < 0) {
+                xwlogf(ERR, "main", "Start child threads ... <rc:%d>", rc);
                 goto err_child_thd_start;
         }
 
         rc = board_xwssc_start();
         if (rc < 0) {
+                xwlogf(ERR, "main", "Start XWSSC ... <rc:%d>", rc);
                 goto err_xwssc_start;
         }
 
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
         rc = xwlua_start();
         if (rc < 0) {
+                xwlogf(ERR, "main", "Start lua VM ... <rc:%d>", rc);
                 goto err_xwlua_start;
         }
 #endif /* XWEMCFG_vm_lua */

@@ -101,13 +101,13 @@ AFLAGS = -mabi=aapcs -m$(ENDIAN) -mthumb \
          -g -g3 -gdwarf-4 \
          $(WARN) $(PERDEF)
 
-CFLAGS = -mabi=aapcs -mthumb -std=gnu11 --sysroot=$(SYSROOT) \
+CFLAGS = -mabi=aapcs -mthumb -std=gnu18 --sysroot=$(SYSROOT) \
          -m$(ENDIAN) -mno-unaligned-access \
          -fomit-frame-pointer -ffunction-sections -fdata-sections -ftls-model=local-exec \
          -g -g3 -gdwarf-4 -fverbose-asm \
          $(WARN) $(PERDEF)
 
-CXXFLAGS = -mabi=aapcs -mthumb -std=gnu++14 --sysroot=$(SYSROOT) \
+CXXFLAGS = -mabi=aapcs -mthumb -std=gnu++17 --sysroot=$(SYSROOT) \
            -m$(ENDIAN) -mno-unaligned-access \
            -fomit-frame-pointer -ffunction-sections -fdata-sections -ftls-model=local-exec \
            -g -g3 -gdwarf-4 -fverbose-asm \

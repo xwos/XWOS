@@ -18,11 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __example_cxx_mif_h__
-#define __example_cxx_mif_h__
+#ifndef __xwam_example_cxx_mif_h__
+#define __xwam_example_cxx_mif_h__
 
 #include <xwos/standard.h>
 
 xwer_t xwos_example_cxx(void);
 
-#endif /* example/cxx/mif.h */
+#endif /* xwam/example/cxx/mif.h */

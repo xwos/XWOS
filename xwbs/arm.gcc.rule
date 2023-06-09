@@ -99,7 +99,7 @@ AFLAGS = -mabi=aapcs -mno-thumb-interwork -m$(ENDIAN) -mthumb \
          -g -g3 -gdwarf-4 -fvar-tracking -fvar-tracking-assignments \
          -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
-CFLAGS = -mabi=aapcs -mthumb -std=gnu11 \
+CFLAGS = -mabi=aapcs -mthumb -std=gnu18 \
          -fomit-frame-pointer -mno-thumb-interwork -m$(ENDIAN) \
          -mno-unaligned-access \
          -ffunction-sections -fdata-sections \

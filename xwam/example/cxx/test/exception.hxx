@@ -18,9 +18,9 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_cxx_test_exception_hxx__
-#define __bm_cxx_test_exception_hxx__
+#ifndef __xwam_example_cxx_test_exception_hxx__
+#define __xwam_example_cxx_test_exception_hxx__
 
 void testStdExcept(int a);
 
-#endif /* bm/cxx/test/exception.hxx */
+#endif /* xwam/example/cxx/test/exception.hxx */
