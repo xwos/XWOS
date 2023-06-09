@@ -190,7 +190,7 @@ err_pa_init:
 }
 
 /**
- * @brief XWMM API：静态方式初始化内存池。
+ * @brief XWMM API：初始化内存池
  * @param[in] mp: 内存池的指针
  * @param[in] name: 名字
  * @param[in] origin: 内存区域的起始地址
@@ -202,13 +202,14 @@ err_pa_init:
  * @retval -E2SMALL: 内存区域太小
  * @retval -ESIZE: 内存区域大小size与pgodr指明的页数量不匹配
  * @note
- * - 页的数量只能是2的n次方，即2, 4, 8, 16, 32, 64, 128, ...，对应的pgodr
- *   分别为1, 2, 3, 4, 5, 6, 7, ...；
- * - 内存区域大小必须满足关系：size == (XWMM_MEMPOOL_PAGE_SIZE * (1 << pgodr))。
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：不可重入
+ * @details
+ * + 将首地址为 `origin` ，大小为 `size` 的内存初始化为内存池：
+ *   + 页的数量用 `pgodr` 表示，只能是2的n次方，即 `2, 4, 8, 16, 32, 64, 128, ...` ，
+ *     对应的pgodr分别为 `1, 2, 3, 4, 5, 6, 7, ...` ；
+ *   + 内存区域大小必须满足关系： `size == (XWMM_MEMPOOL_PAGE_SIZE * (1 << pgodr))` 。
  */
 __xwos_api
 xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
@@ -270,9 +271,15 @@ err_size:
  * @retval -EFAULT: 空指针
  * @retval -ENOMEM: 内存不足
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
+ * @details
+ * + 此函数向内存池申请大小为 `size` 的内存：
+ *   + 若申请成功，通过 `*membuf` 返回申请到的内存地址 ，返回错误码为 `XWOK` ；
+ *   + 若申请失败，通过 `*membuf` 返回 `NULL` ，返回值为负的错误码。
+ * + 内存不会被初始化；
+ * + 当 `size` 为 `0` ， 通过 `*membuf` 返回 `NULL` ，返回错误码为 `XWOK` ；
  */
 __xwos_api
 xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf)
@@ -365,9 +372,12 @@ xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf
  * @retval -EALREADY: 页内存已释放
  * @retval -ERANGE: 内存地址不在内存池的范围内
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
+ * @details
+ * 此函数向内存池释放内存。内存必须是此前申请的，如果 `mem` 是错误的地址或之前被释放过，
+ * 将产生未定义的错误。 `mem` 可以为 `NULL` ，此函数什么也不做，并且返回错误码 `XWOK` 。
  */
 __xwos_api
 xwer_t xwmm_mempool_free(struct xwmm_mempool * mp, void * mem)
@@ -458,9 +468,18 @@ do_nothing:
  * @retval -ENOMEM: 内存不足
  * @retval -ERANGE: 内存地址不在内存池的范围内
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
+ * @details
+ * + 此API类似于C11标准中的 `realloc()` 函数：
+ *   + 当 `*membuf` 为 `NULL` ，此函数等价于 `xwmm_mempool_mealloc(mp, size, membuf)` ；
+ *   + 当 `*membuf` 不为 `NULL` 且 `size` 为 `0` ，
+ *     此函数等价于 `xwmm_mempool_free(mp, *membuf)` ，并且通过 `*membuf` 返回 `NULL` ；
+ *   + 当 `*membuf` 不为 `NULL` 且 `size` 比之前的小 ，此函数不重新申请内存，直接返回原来的 `*membuf` 以及 `XWOK` ；
+ *   + 当 `*membuf` 不为 `NULL` 且 `size` 比之前的大 ，此函数会尝试重新申请内存：
+ *     + 如果申请失败，原来的内存不会受影响，且通过 `*membuf` 返回 `NULL` 以及 错误码；
+ *     + 如果申请成功，会将旧内存空间的内容移动到新内存空间内，然后返回新的 `*membuf` 以及 `XWOK` 。
  */
 __xwos_api
 xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf)
@@ -492,8 +511,12 @@ xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size, void ** membu
                                 if (XWOK == rc) {
                                         memcpy(newmem, oldmem, pg->data.value);
                                         rc = xwmm_mempool_free(mp, oldmem);
-                                        XWOS_BUG_ON(rc < 0);
-                                        *membuf = newmem;
+                                        if (XWOK == rc) {
+                                                *membuf = newmem;
+                                        } else {
+                                                xwmm_mempool_free(mp, newmem);
+                                                *membuf = NULL;
+                                        }
                                 } else {
                                         *membuf = NULL;
                                 }
@@ -516,12 +539,16 @@ xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size, void ** membu
  * @retval -EFAULT: 空指针
  * @retval -ENOMEM: 内存不足
  * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- * - 此API类似于C11标准中的aligned_alloc()函数，alignment只能是2的n次方，
- *   若size小于alignment，size会被扩大为alignment，
- *   若size大于alignment，size会扩大至2的n次方，（此时也一定为alignment的整数倍）。
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
+ * @details
+ * + 此API类似于C标准中的 `memalign()` 函数：
+ *   + `alignment` 如果比 `XWMM_ALIGNMENT` 小，会被扩大为 `XWMM_ALIGNMENT` ：
+ *   + `alignment` 只能是2的n次方：
+ *   + 若size小于 `alignment` ， `size` 会被扩大为 `alignment` ，
+ *   + 若size大于 `alignment` ， `size` 会向上对齐到2的n次方，此时也一定为 `alignment` 的整数倍。
+ * + 申请内存失败时，此函数不会修改 `*membuf` 的值。
  */
 __xwos_api
 xwer_t xwmm_mempool_memalign(struct xwmm_mempool * mp,
@@ -591,9 +618,6 @@ xwer_t xwmm_mempool_memalign(struct xwmm_mempool * mp,
                 break;
         }
         rc = ia->malloc(ia, size, membuf);
-        if (rc < 0) {
-                *membuf = NULL;
-        }
 
 nothing:
 err_notp2:

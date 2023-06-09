@@ -14,12 +14,16 @@
 #define __xwos_mm_common_h__
 
 #include <xwos/standard.h>
+#include <assert.h>
 
 /**
  * @defgroup xwmm_common XWOS内存管理通用定义
  * @ingroup xwmm
  * @{
  */
+
+static_assert((XWMMCFG_ALIGNMENT >= sizeof(void *)) && (XWMMCFG_ALIGNMENT % sizeof(void *) == 0),
+              "XWMMCFG_ALIGNMENT must be a multiple of sizeof(void *) !");
 
 #define XWMM_ALIGNMENT XWMMCFG_ALIGNMENT /**< 内存管理对齐的字节数 */
 #define XWMM_UNALIGNED_MASK (XWMM_ALIGNMENT - 1) /**< 内存管理未对齐的掩码 */

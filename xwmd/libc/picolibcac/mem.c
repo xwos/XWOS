@@ -14,7 +14,9 @@
 #include <xwos/lib/errno.h>
 #include <xwos/mm/mempool/allocator.h>
 #include <xwmd/libc/picolibcac/check.h>
+#include <stdio.h>
 #include <string.h>
+#include <malloc.h>
 
 void picolibcac_mem_linkage_stub(void)
 {
@@ -22,20 +24,7 @@ void picolibcac_mem_linkage_stub(void)
 
 extern struct xwmm_mempool * picolibcac_mempool;
 
-static
-void * picolibcac_malloc(xwsz_t size);
-
-static
-void picolibcac_free(void * mem);
-
-static
-void * picolibcac_realloc(void * mem, xwsz_t size);
-
-static
-void * picolibcac_memalign(xwsz_t alignment, xwsz_t size);
-
-static
-void * picolibcac_malloc(xwsz_t size)
+void * malloc(size_t size)
 {
         void * mem;
         xwer_t rc;
@@ -45,17 +34,7 @@ void * picolibcac_malloc(xwsz_t size)
         return mem;
 }
 
-static
-void picolibcac_free(void * mem)
-{
-        xwer_t rc;
-
-        rc = xwmm_mempool_free(picolibcac_mempool, mem);
-        errno = -rc;
-}
-
-static
-void * picolibcac_realloc(void * mem, xwsz_t size)
+void * realloc(void * mem, size_t size)
 {
         xwer_t rc;
 
@@ -64,61 +43,125 @@ void * picolibcac_realloc(void * mem, xwsz_t size)
         return mem;
 }
 
-static
-void * picolibcac_memalign(xwsz_t alignment, xwsz_t size)
-{
-        xwer_t rc;
-        void * mem;
-
-        rc = xwmm_mempool_memalign(picolibcac_mempool, alignment, size, &mem);
-        errno = -rc;
-        return mem;
-}
-
-void * malloc(size_t n)
-{
-        return picolibcac_malloc(n);
-}
-
-void * realloc(void * p, size_t n)
-{
-        return picolibcac_realloc(p, n);
-}
-
 void * calloc(size_t elem_nr, size_t elem_sz)
 {
         xwsz_t total;
         void * mem;
+        xwer_t rc;
 
         total = elem_nr * elem_sz;
-        mem = picolibcac_malloc(total);
-        if (NULL != mem) {
+        rc = xwmm_mempool_malloc(picolibcac_mempool, total, &mem);
+        errno = -rc;
+        if (XWOK == rc) {
                 memset(mem, 0, total);
         }
         return mem;
 }
 
-void * memalign(size_t alignment, size_t n)
+void * memalign(xwsz_t alignment, xwsz_t size)
 {
-        return picolibcac_memalign(alignment, n);
+        xwer_t rc;
+        void * mem;
+
+        mem = NULL;
+        rc = xwmm_mempool_memalign(picolibcac_mempool, alignment, size, &mem);
+        errno = -rc;
+        return mem;
 }
 
-void * valloc(size_t n)
+int posix_memalign(void ** memptr, size_t alignment, size_t size)
 {
-        return memalign(XWMM_MEMPOOL_PAGE_SIZE, n);
+        int rc;
+
+        if (((alignment & (alignment - 1)) != 0) ||
+            (alignment % sizeof(void *) != 0) ||
+            (alignment == 0)) {
+                rc = EINVAL;
+        } else {
+                void * mem;
+                rc = xwmm_mempool_memalign(picolibcac_mempool, alignment, size, &mem);
+                if (XWOK == rc) {
+                        *memptr = mem;
+                } else {
+                        rc = -rc;
+                }
+        }
+        return rc;
 }
 
-void * pvalloc(size_t n)
+void * aligned_alloc(size_t alignment, size_t size)
 {
-        return memalign(XWMM_MEMPOOL_PAGE_SIZE, n);
+        return memalign(alignment, size);
 }
 
-void free(void * p)
+void * valloc(size_t size)
 {
-        picolibcac_free(p);
+        return memalign(XWMM_MEMPOOL_PAGE_SIZE, size);
+}
+
+void * pvalloc(size_t size)
+{
+        return memalign(XWMM_MEMPOOL_PAGE_SIZE, size);
+}
+
+void free(void * mem)
+{
+        xwer_t rc;
+
+        rc = xwmm_mempool_free(picolibcac_mempool, mem);
+        errno = -rc;
+}
+
+void cfree(void * mem)
+{
+        free(mem);
 }
 
 int getpagesize(void)
 {
         return XWMM_MEMPOOL_PAGE_SIZE;
+}
+
+int mallopt(int parameter, int value)
+{
+        return 0;
+}
+
+struct mallinfo mallinfo(void)
+{
+        struct mallinfo mi = {0};
+
+        mi.arena = picolibcac_mempool->pa.zone.size;
+        /* FIXME */
+        return mi;
+}
+
+void malloc_stats(void)
+{
+        struct mallinfo mi;
+        mi = mallinfo();
+        fprintf(stderr, "max system bytes = %10lu\n", (long) mi.arena);
+        /* FIXME */
+}
+
+
+size_t malloc_usable_size(void * mem)
+{
+        xwer_t rc;
+        struct xwmm_mempool_page * pg;
+        size_t sz;
+
+        rc = xwmm_mempool_page_find(&picolibcac_mempool->pa, mem, &pg);
+        if (XWOK == rc) {
+                sz = pg->data.value;
+        } else {
+                sz = 0;
+        }
+        return sz;
+}
+
+int malloc_trim(size_t pad)
+{
+        /* TODO */
+        return 0;
 }
