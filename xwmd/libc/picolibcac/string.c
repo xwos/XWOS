@@ -28,45 +28,76 @@ void picolibcac_string_linkage_stub(void)
  */
 void * memset(void * src, int c, size_t count)
 {
-        char * m = src;
+        union {
+                xwu8_t * u8;
+                xwu32_t * u32;
+                xwptr_t val;
+        } m;
+        xwu32_t fill32;
 
-        while (count--) {
-                *m++ = (char)c;
+        c = c & 0xFF;
+        fill32 = (xwu32_t)c;
+        fill32 = (fill32 << 8) | fill32;
+        fill32 = (fill32 << 16) | fill32;
+        m.u8 = src;
+        while ((m.val & (sizeof(void *) - 1)) && (count)) {
+                *m.u8 = (xwu8_t)c;
+                m.u8++;
+                count--;
         }
+        do {
+                if (count < sizeof(void *)) {
+                        while (count) {
+                                *m.u8 = (xwu8_t)c;
+                                m.u8++;
+                                count--;
+                        }
+                } else {
+                        *m.u32 = fill32;
+                        m.u32++;
+                        count -= sizeof(void *);
+                }
+        } while (count);
         return src;
 }
 
 void * memcpy(void * restrict dst, const void * restrict src, size_t count)
 {
-        char * tmp = dst;
-        const char * s = src;
+        union {
+                const xwu8_t * u8;
+                const xwu32_t * u32;
+                xwptr_t val;
+        } s;
+        union {
+                xwu8_t * u8;
+                xwu32_t * u32;
+                xwptr_t val;
+        } d;
 
-        while (count--) {
-                *tmp = *s;
-                tmp++;
-                s++;
-        }
-        return dst;
-}
+        s.u8 = src;
+        d.u8 = dst;
 
-void * memmove(void * dst, const void * src, size_t count)
-{
-        char * tmp;
-        const char * s;
-
-        if (dst <= src) {
-                tmp = dst;
-                s = src;
-                while (count--) {
-                        *tmp++ = *s++;
+        if ((s.val & (sizeof(void *) - 1)) ||
+            (d.val & (sizeof(void *) - 1)) ||
+            (count < sizeof(void *))) {
+                while (count) {
+                        *d.u8 = *s.u8;
+                        d.u8++;
+                        s.u8++;
+                        count--;
                 }
         } else {
-                tmp = dst;
-                tmp += count;
-                s = src;
-                s += count;
-                while (count--) {
-                        *--tmp = *--s;
+                do {
+                        *d.u32 = *s.u32;
+                        d.u32++;
+                        s.u32++;
+                        count -= sizeof(void *);
+                } while (count >= sizeof(void *));
+                while (count) {
+                        *d.u8 = *s.u8;
+                        d.u8++;
+                        s.u8++;
+                        count--;
                 }
         }
         return dst;
