@@ -18,7 +18,7 @@
  * > limitations under the License.
  */
 
-#include <cfg/XWOS.h>
+#include <cfg/project.h>
 #include <xwos/lib/errno.h>
 
 

@@ -13,6 +13,6 @@
 #ifndef __xwos_mp_rule_h__
 #define __xwos_mp_rule_h__
 
-#include <cfg/XWOS.h>
+#include <cfg/project.h>
 
 #endif /* xwos/mp/rule.h */

@@ -18,7 +18,7 @@
  * > limitations under the License.
  */
 
-#include <cfg/XWOS.h>
+#include <cfg/project.h>
 
         .equ            EAGAIN, 11
 

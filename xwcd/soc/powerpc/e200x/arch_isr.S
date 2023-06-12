@@ -18,7 +18,7 @@
  * > limitations under the License.
  */
 
-#include <cfg/XWOS.h>
+#include <cfg/project.h>
 
 
         .equ            INTC_IACKR, 0xFFF48010  /* Interrupt Acknowledge Reg. addr. */

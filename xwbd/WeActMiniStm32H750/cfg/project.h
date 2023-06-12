@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS基本配置
+ * @brief 工程基本配置
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,16 +18,16 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_XWOS_h__
-#define __cfg_XWOS_h__
+#ifndef __cfg_project_h__
+#define __cfg_project_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********  ARCH & compiler  ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWOS_CFG_ARCH                                   arm
 #define XWOS_CFG_SUBARCH                                v7m
-#define XWOS_CFG_COMPILER                               gcc
-#define XWOS_CFG_LDSCRIPT                               cfg/brd.lds
+#define XWOS_CFG_COMPILER                               llvm
+#define XWOS_CFG_LDSCRIPT                               brd.lds
 #define XWOS_CFG_ELF_MK                                 elf.mk
 #define XWOS_CFG_XWMO_MK                                xwmo.mk
 #define XWOS_CFG_XWMO_PREBUILT_MK                       xwmo.prebuilt.mk
@@ -49,7 +49,7 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********       board       ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWOS_CFG_BOARD                                  xwxr
+#define XWOS_CFG_BOARD                                  WeActMiniStm32H750
 #include <cfg/board.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
@@ -85,12 +85,12 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********     OEM module    ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWOS_CFG_OEMPATH                                fakeboard
+#define XWOS_CFG_OEMPATH                                oem
 #include <cfg/oem.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********        auto-generated header        ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#include <autogen.h>
+#include <cfg/autogen.h>
 
-#endif /* cfg/XWOS.h */
+#endif /* cfg/project.h */

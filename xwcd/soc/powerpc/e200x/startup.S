@@ -18,7 +18,7 @@
  * > limitations under the License.
  */
 
-#include <cfg/XWOS.h>
+#include <cfg/project.h>
 
         .extern         xwos_stk_mr_size
         .extern         xwos_stk_top

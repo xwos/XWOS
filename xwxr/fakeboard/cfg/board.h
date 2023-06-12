@@ -45,19 +45,26 @@
  ******** ********          memory management          ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define BRDCFG_MM_DTCMHEAP_BLKSZ                (512U)
-#define BRDCFG_MM_DTCMHEAP_BLKODR               (8U) /* 256 */
-#define BRDCFG_XWOS_THD_CACHE_ODR               3
-#define BRDCFG_XWOS_SWT_CACHE_ODR               0
-#define BRDCFG_XWOS_SEM_CACHE_ODR               0
-#define BRDCFG_XWOS_COND_CACHE_ODR              0
-#define BRDCFG_XWOS_MTX_CACHE_ODR               0
+#define BRDCFG_MM_DTCMHEAP_BLKODR               (7U) /* 128 */
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********    chip config    ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#define BRDCFG_DCACHE                           1
+#define BRDCFG_ICACHE                           1
+
+/******** ******** ******** ******** ******** ******** ******** ********
+ ******** ******** ********   firmware info   ******** ******** ********
+ ******** ******** ******** ******** ******** ******** ******** ********/
+#define BRDCFG_FIRMWARE_TAILFLAG                "XWOS,MCU:STM32H750"
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********   board modules   ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-#define BMCFG_main                              1
+#define BMCFG_xwac                              1
+#define BMCFG_app                               1
 #define BMCFG_stm32cube                         1
-#define BMCFG_button                            1
 #define BMCFG_luamod                            1
+#define BMCFG_rustapp                           1
 
 #endif /* cfg/board.h */

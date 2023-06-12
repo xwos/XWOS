@@ -21,7 +21,7 @@
 #ifndef __compiler_llvm_h__
 #define __compiler_llvm_h__
 
-#include <cfg/XWOS.h>
+#include <cfg/project.h>
 
 #define __xw_i  volatile const /**< 'read only' structure member permissions */
 #define __xw_o  volatile       /**< 'write only' structure member permissions */

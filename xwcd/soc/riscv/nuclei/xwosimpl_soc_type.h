@@ -25,7 +25,7 @@
 #  error "This file should be included from <xwos/ospl/soc/type.h>."
 #endif
 
-#include <cfg/XWOS.h>
+#include <cfg/project.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <limits.h>

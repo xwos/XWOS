@@ -29,27 +29,18 @@
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********     Inter-System Communication      ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
-/******** ******** point to point communication protocol ******** ********/
-#define XWMDCFG_isc_xwpcp                                       1
-#define XWMDCFG_isc_xwpcp_LOG                                   0
-#define XWMDCFG_isc_xwpcp_PORT_NUM                              (12U)
-#define XWMDCFG_isc_xwpcp_PRI_NUM                               (4U)
-#define XWMDCFG_isc_xwpcp_RETRY_PERIOD                          (XWTM_S(1))
-#define XWMDCFG_isc_xwpcp_RETRY_NUM                             (8U)
-#define XWMDCFG_isc_xwpcp_MEMBLK_SIZE                           (64U)
-#define XWMDCFG_isc_xwpcp_MEMBLK_ODR                            (6U)
-#define XWMDCFG_isc_xwpcp_RXTHD_PRIORITY                        \
+/******** ******** SOC to SOC Communication ******** ********/
+#define XWMDCFG_isc_xwssc                                       1
+#define XWMDCFG_isc_xwssc_LOG                                   0
+#define XWMDCFG_isc_xwssc_PORT_NUM                              (12U)
+#define XWMDCFG_isc_xwssc_PRI_NUM                               (4U)
+#define XWMDCFG_isc_xwssc_RETRY_PERIOD                          (XWTM_S(1))
+#define XWMDCFG_isc_xwssc_RETRY_NUM                             (8U)
+#define XWMDCFG_isc_xwssc_MEMBLK_SIZE                           (64U)
+#define XWMDCFG_isc_xwssc_MEMBLK_ODR                            (6U)
+#define XWMDCFG_isc_xwssc_RXTHD_PRIORITY                        \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
-#define XWMDCFG_isc_xwpcp_TXTHD_PRIORITY                        \
-        XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
-
-/******** ******** simple communication protocol ******** ********/
-#define XWMDCFG_isc_xwscp                                       1
-#define XWMDCFG_isc_xwscp_LOG                                   0
-#define XWMDCFG_isc_xwscp_PERIOD                                (XWTM_S(1))
-#define XWMDCFG_isc_xwscp_MEMBLK_SIZE                           (64U)
-#define XWMDCFG_isc_xwscp_MEMBLK_ODR                            (6U)
-#define XWMDCFG_isc_xwscp_THD_PRIORITY                          \
+#define XWMDCFG_isc_xwssc_TXTHD_PRIORITY                        \
         XWOS_SKD_PRIORITY_DROP(XWOS_SKD_PRIORITY_RT_MAX, 1)
 
 /******** ******** Message Queue ******** ********/
@@ -62,18 +53,11 @@
  ******** ********            C/C++ Runtime            ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWMDCFG_libc_newlibac                                   1
-#define XWMDCFG_libc_newlibac_string                            1
-#define XWMDCFG_libc_newlibac_mem                               1
-#define XWMDCFG_libc_newlibac_fops                              1
+#define XWMDCFG_libc_picolibcac                                 0
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********            XWRust Runtime            ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWMDCFG_xwrust_ffi                                      1
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ********               RAMCode               ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#define XWMDCFG_ramcode                                         0
 
 #endif /* cfg/xwmd.h */

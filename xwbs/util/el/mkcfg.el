@@ -166,23 +166,23 @@
 (setq XWOS-autogen-header-buffer (find-file-noselect (concat XWOS-opt-cfgdir "/autogen.h")))
 (setq XWOS-envrc-buffer (find-file-noselect (concat XWOS-opt-wkspc "/env.rc")))
 
-(defvar XWOS-cfg-h (concat XWOS-opt-cfgdir "/" "XWOS.h") "Path of cfg/XWOS.h")
+(defvar project-cfg-h (concat XWOS-opt-cfgdir "/" "project.h") "Path of cfg/project.h")
 (defvar arch-cfg-h (concat XWOS-opt-cfgdir "/" "arch.h") "Path of cfg/arch.h")
 (defvar cpu-cfg-h (concat XWOS-opt-cfgdir "/" "cpu.h") "Path of cfg/cpu.h")
 (defvar soc-cfg-h (concat XWOS-opt-cfgdir "/" "soc.h") "Path of cfg/soc.h")
 (defvar brd-cfg-h (concat XWOS-opt-cfgdir "/" "board.h") "Path of cfg/board.h")
-(defvar xwkn-cfg-h (concat XWOS-opt-cfgdir "/" "os.h") "Path of cfg/os.h")
+(defvar xwos-cfg-h (concat XWOS-opt-cfgdir "/" "xwos.h") "Path of cfg/xwos.h")
 (defvar xwcd-cfg-h (concat XWOS-opt-cfgdir "/" "xwcd.h") "Path of cfg/xwcd.h")
 (defvar xwmd-cfg-h (concat XWOS-opt-cfgdir "/" "xwmd.h") "Path of cfg/xwmd.h")
 (defvar xwem-cfg-h (concat XWOS-opt-cfgdir "/" "xwem.h") "Path of cfg/xwem.h")
 (defvar xwam-cfg-h (concat XWOS-opt-cfgdir "/" "xwam.h") "Path of cfg/xwam.h")
 (defvar oem-cfg-h (concat XWOS-opt-cfgdir "/" "oem.h") "Path of cfg/oem.h")
-(setq XWOS-cfg-h-buffer (find-file-noselect XWOS-cfg-h))
+(setq project-cfg-h-buffer (find-file-noselect project-cfg-h))
 (setq arch-cfg-h-buffer (find-file-noselect arch-cfg-h))
 (setq cpu-cfg-h-buffer (find-file-noselect cpu-cfg-h))
 (setq soc-cfg-h-buffer (find-file-noselect soc-cfg-h))
 (setq brd-cfg-h-buffer (find-file-noselect brd-cfg-h))
-(setq xwkn-cfg-h-buffer (find-file-noselect xwkn-cfg-h))
+(setq xwos-cfg-h-buffer (find-file-noselect xwos-cfg-h))
 (setq xwcd-cfg-h-buffer (find-file-noselect xwcd-cfg-h))
 (setq xwmd-cfg-h-buffer (find-file-noselect xwmd-cfg-h))
 (setq xwem-cfg-h-buffer (find-file-noselect xwem-cfg-h))
@@ -190,7 +190,7 @@
 (setq oem-cfg-h-buffer (find-file-noselect oem-cfg-h))
 
 ;; Get base Info
-(set-buffer XWOS-cfg-h-buffer)
+(set-buffer project-cfg-h-buffer)
 (set-buffer-multibyte nil)
 
 (logi "host:%s" (symbol-name system-type))
@@ -490,7 +490,7 @@
 (set-buffer XWOS-cfg-buffer)
 (insert "## ******** ******** ******** ******** XWOS Kernel ******** ******** ******** ******** ##\n")
 
-(set-buffer xwkn-cfg-h-buffer)
+(set-buffer xwos-cfg-h-buffer)
 (goto-char (point-min))
 (let ((rc))
   (setq rc (re-search-forward "^#define[ \t]+XWMMCFG_ALIGNMENT[ \t]+(*\\([0-9]+\\))*" nil t))
@@ -501,7 +501,7 @@
         (insert (concat "XWMMCFG_ALIGNMENT := " xwmmcfg-alignment "\n")))))
 
 (let (item cfg (loopflg t) (iterpoint 1))
-  (set-buffer xwkn-cfg-h-buffer)
+  (set-buffer xwos-cfg-h-buffer)
   (while loopflg
     (goto-char iterpoint)
     (setq iterpoint (re-search-forward
@@ -514,7 +514,7 @@
         (setq cfg (if (string= (match-string 2) "1") "y" "n"))
         (set-buffer XWOS-cfg-buffer)
         (insert (concat item " := " cfg "\n"))
-        (set-buffer xwkn-cfg-h-buffer))
+        (set-buffer xwos-cfg-h-buffer))
       (setq loopflg nil))))
 (set-buffer XWOS-cfg-buffer)
 (insert "## ******** ******** ******** ******** XWOS Middleware ******** ******** ******** ******** ##\n")
@@ -616,7 +616,7 @@
 
 (insert "// ******** ******** ******** ******** XWOS Kernel ******** ******** ******** ********\n")
 
-(set-buffer xwkn-cfg-h-buffer)
+(set-buffer xwos-cfg-h-buffer)
 (goto-char (point-min))
 (let ((rc))
   (setq rc (re-search-forward "^#define[ \t]+XWMMCFG_ALIGNMENT[ \t]+(*\\([0-9]+\\))*" nil t))

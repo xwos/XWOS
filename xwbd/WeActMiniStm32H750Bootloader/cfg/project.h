@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS基本配置
+ * @brief 工程基本配置
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_XWOS_h__
-#define __cfg_XWOS_h__
+#ifndef __cfg_project_h__
+#define __cfg_project_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********  ARCH & compiler  ******** ******** ********
@@ -56,7 +56,7 @@
  ******** ******** ********    XWOS kernel    ******** ******** ********
  ******** ******** ******** ******** ******** ******** ******** ********/
 #define XWOS_CFG_CORE                                   up
-#include <cfg/os.h>
+#include <cfg/xwos.h>
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ******** ********   chip & device   ******** ******** ********
@@ -93,4 +93,4 @@
  ******** ******** ******** ******** ******** ******** ******** ********/
 #include <cfg/autogen.h>
 
-#endif /* cfg/XWOS.h */
+#endif /* cfg/project.h */

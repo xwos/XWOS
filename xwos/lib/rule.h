@@ -13,7 +13,7 @@
 #ifndef __xwos_lib_rule_h__
 #define __xwos_lib_rule_h__
 
-#include <cfg/XWOS.h>
+#include <cfg/project.h>
 
 #if defined(XWOS_CFG_CORE__mp)
 #  include <xwos/mp/rule.h>

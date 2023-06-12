@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_os_h__
-#define __cfg_os_h__
+#ifndef __cfg_xwos_h__
+#define __cfg_xwos_h__
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********        Common Configurations        ******** ********
@@ -162,4 +162,4 @@
 /* #define XWUPCFG_LOCK_MTX_STDC_MM                     1 */
 /* #define XWUPCFG_LOCK_FAKEMTX                         0 */
 
-#endif /* cfg/os.h */
+#endif /* cfg/xwos.h */

@@ -34,6 +34,7 @@ BRD_LDFLAGS :=
 BRD_ASRCS :=
 BRD_CSRCS :=
 BRD_CXXSRCS :=
+BRD_LDFLAGS_gcc := -Wl,--no-warn-rwx-segment
 
 BRD_EOBJS :=
 

@@ -13,7 +13,7 @@
 #ifndef __xwos_up_rule_h__
 #define __xwos_up_rule_h__
 
-#include <cfg/XWOS.h>
+#include <cfg/project.h>
 
 #if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
 #  if !defined(XWUPCFG_SYNC_COND) || (0 == XWUPCFG_SYNC_COND)

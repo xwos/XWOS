@@ -35,8 +35,8 @@
 
 /******** ******** architecture libs ******** ********/
 /******** libc.a ********/
-#define ARCHCFG_COMPILER_CLIB                   0
-#define ARCHCFG_COMPILER_ERRNO                  0
+#define ARCHCFG_COMPILER_CLIB                   1
+#define ARCHCFG_COMPILER_ERRNO                  1
 
 /******** xwbop ********/
 #define ARCHCFG_LIB_XWBOP_FFS8                  1
@@ -77,12 +77,6 @@
 #define ARCHCFG_LIB_XWAOP32                     1
 #define ARCHCFG_LIB_XWAOP64                     1
 #define ARCHCFG_LIB_XWBMPAOP                    1
-
-/******** ******** ******** ******** ******** ******** ******** ********
- ******** ******** ********     image flag    ******** ******** ********
- ******** ******** ******** ******** ******** ******** ******** ********/
-#define ARCHCFG_IMAGE_FLAG_OFFSET               2048U
-#define ARCHCFG_IMAGE_TAILFLAG                  "XuanWuOS"
 
 /******** ******** ******** ******** ******** ******** ******** ********
  ******** ********         default configures          ******** ********

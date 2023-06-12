@@ -18,7 +18,7 @@
  * > limitations under the License.
  */
 
-#include <cfg/XWOS.h>
+#include <cfg/project.h>
 
         .equ            INTC_SSCIR0, 0xFFF48020
         .equ            INTC_SSCIR1, 0xFFF48021
