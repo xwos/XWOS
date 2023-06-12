@@ -571,3 +571,4 @@ ARCH_CSRCS += arch_nvic.c
 ifeq ($(ARCHCFG_FPU),y)
     ARCH_CSRCS += arch_fpu.c
 endif
+ARCH_CSRCS += xwosimpl_tls.c

@@ -13,7 +13,6 @@
 #include <xwos/standard.h>
 #include <xwos/osal/time.h>
 #include <xwmd/libc/picolibcac/check.h>
-#include <picotls.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -65,8 +64,6 @@ const picolibcac_init_f picolibcac_init_table[] = {
         picolibcac_lock_init,
 };
 
-extern xwu8_t tdata_vma_base[];
-
 xwer_t picolibcac_init(void)
 {
         const picolibcac_init_f * f = picolibcac_init_table;
@@ -76,7 +73,6 @@ xwer_t picolibcac_init(void)
         for (i = 0; i < sz; i++) {
                 f[i]();
         }
-        _set_tls(tdata_vma_base);
         __libc_init_array();
         atexit(__libc_fini_array);
         return XWOK;

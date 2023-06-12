@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 外部模块配置
+ * @brief 玄武OS移植实现层：线程本地存储
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,19 +18,12 @@
  * > limitations under the License.
  */
 
-#ifndef __cfg_xwem_h__
-#define __cfg_xwem_h__
+#include <xwos/standard.h>
+#include <xwos/ospl/skd.h>
 
-#define XWEMCFG_serializing_nanopb                      1
-#define XWEMCFG_fs_fatfs                                1
-#define XWEMCFG_fs_littlefs                             1
-#define XWEMCFG_fs_spiffs                               0
-#define XWEMCFG_fs_dhara                                0
-
-#define XWEMCFG_vm_lua                                  1
-#define XWEMCFG_vm_lua_INT_TYPE                         LUA_INT_LONG
-#define XWEMCFG_vm_lua_FLOAT_TYPE                       LUA_FLOAT_DOUBLE
-#define XWEMCFG_vm_lua_THD_STACK_SIZE                   16384
-#define XWEMCFG_vm_lua_BRDLIBS                          1
-
-#endif /* cfg/xwem.h */
+__xwbsp_code
+void xwospl_tls_init(struct xwospl_skdobj_stack * stk)
+{
+        /* EPPC is not support TLS */
+        XWOS_UNUSED(stk);
+}

@@ -94,12 +94,12 @@ AFLAGS = -nostdinc -nostdlib \
          -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
 CFLAGS = -std=gnu11 \
-         -ffunction-sections -fdata-sections -fno-common \
+         -ffunction-sections -fdata-sections -fno-common -ftls-model=local-exec \
          -g -g3 -gdwarf-4 -fvar-tracking -fvar-tracking-assignments -fverbose-asm \
          -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
 CXXFLAGS = -std=gnu++17 \
-           -ffunction-sections -fdata-sections -fno-common \
+           -ffunction-sections -fdata-sections -fno-common -ftls-model=local-exec \
            -g -g3 -gdwarf-4 -fvar-tracking -fvar-tracking-assignments -fverbose-asm \
            -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 

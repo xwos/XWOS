@@ -40,6 +40,7 @@ struct xwospl_skd;
 struct xwospl_thd;
 
 struct xwospl_skd * xwosplcb_skd_get_lc(void);
+struct xwospl_thd * xwosplcb_skd_get_cthd_lc(void);
 struct xwospl_skd * xwosplcb_skd_pre_swcx_lic(struct xwospl_skd * xwskd);
 struct xwospl_skd * xwosplcb_skd_post_swcx_lic(struct xwospl_skd * xwskd);
 xwer_t xwosplcb_skd_suspend_lic(struct xwospl_skd * xwskd);

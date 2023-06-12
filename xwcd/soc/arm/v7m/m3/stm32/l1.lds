@@ -57,7 +57,7 @@ SECTIONS {
                 *(.v4_bx) /* linker stubs */
         } > code_mr AT> code_mr
 
-        /* ++++++++ 以下与unwinding有关，用于C++的异常处理 ++++++++ */
+        /* ++++++++ 以下与unwinding有关，用于异常处理和栈回溯 ++++++++ */
         .ARM.extab : ALIGN(8) { /* @ref ehabi.pdf for details */
                 *(.ARM.extab* .gnu.linkonce.armextab.*)
         } > code_mr AT> code_mr
@@ -87,7 +87,7 @@ SECTIONS {
         .exception_ranges : ALIGN(8) {
                 *(.exception_ranges*)
         } > code_mr AT> code_mr
-        /* -------- 以上与unwinding有关，用于C++的异常处理 -------- */
+        /* -------- 以上与unwinding有关，用于异常处理和栈回溯 -------- */
 
         /* ++++++++ 以下与C++全局对象的构造函数与析构函数有关 ++++++++ */
         .preinit_array : ALIGN(8) {
@@ -121,24 +121,49 @@ SECTIONS {
         fini_array_lma_base = LOADADDR(.fini_array);
         /* -------- 以上与C++全局对象的构造函数与析构函数有关 -------- */
 
-        .xwos.data : ALIGN(16) {
+        /* ++++++++ Global Offset Table ++++++++ */
+        /* 当-ftls-model=initial-exec时，tls变量的offset是从got表的地址加载的 */
+        /* 当-ftls-model=local-exec时，tls变量的offset是直接加载立即数，此时不需要 .got */
+        /* MCU静态连接的环境，C11标准中的thread_local 变量只能是以上两种模型。 */
+        .got : ALIGN(8) {
+                *(.got.plt) *(.igot.plt) *(.got) *(.igot)
+        } > code_mr AT> code_mr
+        /* -------- Global Offset Table -------- */
+
+        .xwos.data : ALIGN(8) {
                 *(.xwos.data)
-                . = ALIGN(16);
+                . = ALIGN(8);
                 xwos_data_vma_end = .;
         } > data_mr AT> code_mr
         xwos_data_vma_base = ADDR(.xwos.data);
         xwos_data_lma_base = LOADADDR(.xwos.data);
 
-        .data : ALIGN(16) {
+        .data : ALIGN(8) {
                 *(.data .data.* .gnu.linkonce.d.*)
-                . = ALIGN(16);
+                . = ALIGN(8);
                 data_vma_end = .;
         } > data_mr AT> code_mr
         data_vma_base = ADDR(.data);
         data_lma_base = LOADADDR(.data);
 
-        /* 设置ALIGN(128)绕过ld.lld的overlaps Bug */
-        .firmware.tail : ALIGN(128) {
+        .tdata : ALIGN(8) {
+                *(.tdata .tdata.* .gnu.linkonce.td.*)
+                tdata_vma_end = .;
+	} > data_mr AT> code_mr
+        tdata_vma_base = ADDR(.tdata);
+        tdata_lma_base = LOADADDR(.tdata);
+
+        .tbss (NOLOAD) :  {
+                *(.tbss .tbss.* .gnu.linkonce.tb.*)
+                *(.tcommon)
+                tbss_vma_end = .;
+        } > data_mr
+        tbss_vma_base = ADDR(.tbss);
+        tbss_vma_offset = ADDR(.tbss) - ADDR(.tdata);
+        tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss));
+        tls_offset = MAX(8, tls_align);
+
+        .firmware.tail : ALIGN(32) {
                 KEEP(*(.firmware.tail))
                 firmware_tail_vma_end = .;
         } > code_mr AT> code_mr
@@ -147,7 +172,7 @@ SECTIONS {
         firmware_tail_lma_base = LOADADDR(.firmware.tail);
         firmware_tail_lma_end = firmware_tail_lma_base + firmware_tail_size;
 
-        .bss : ALIGN(8) {
+        .bss (NOLOAD) : ALIGN(8) {
                 *(.dynbss)
                 *(.bss .bss.* .gnu.linkonce.b.*)
                 *(COMMON)
@@ -156,7 +181,7 @@ SECTIONS {
         } > data_mr
         bss_vma_base = ADDR(.bss);
 
-        .heap : ALIGN(16) {
+        .heap : ALIGN(8) {
                 PROVIDE(end = .); /* 被libc中的malloc()使用 */
                 PROVIDE(_end = .); /* 被libc中的malloc()使用 */
         } > xwos_stk_mr
@@ -213,10 +238,6 @@ SECTIONS {
         }
         .iplt : {
                 *(.iplt)
-        }
-
-        .got : {
-                *(.got.plt) *(.igot.plt) *(.got) *(.igot)
         }
         /* -------- 以上与动态连接有关，不适用于MCU的ROM环境 -------- */
 

@@ -225,9 +225,16 @@ void arch_svc_skd_start(__xwcc_unused struct xwospl_skd * xwskd)
 {
         /* r3 = r0->cstk; */
         __asm__ volatile(".syntax       unified");
-        __asm__ volatile("      ldr     r3, [r0, #0]");
+        /* get xwskd->cstk */
+        __asm__ volatile("      ldr     r3, [r0, %[__cstk]]"
+                         :
+                         :[__cstk] "I" (xwcc_offsetof(struct xwospl_skd, cstk))
+                         :);
         /* get value of stack pointer, r2 = cstk->sp */
-        __asm__ volatile("      ldr     r2, [r3, #0]");
+        __asm__ volatile("      ldr     r2, [r3, %[__sp]]"
+                         :
+                         :[__sp] "I" (xwcc_offsetof(struct xwospl_skdobj_stack, sp))
+                         :);
         /* restore CONTROL */
         __asm__ volatile("      ldr     r1, [r2], #4");
         __asm__ volatile("      msr     control, r1");
@@ -257,12 +264,12 @@ void arch_svc_skd_start(__xwcc_unused struct xwospl_skd * xwskd)
 __xwbsp_isr __xwcc_naked
 void xwospl_skd_isr_swcx(void)
 {
-        /* get scheduler */
+        /* check previous stack */
         __asm__ volatile(".syntax       unified");
         __asm__ volatile("      push    {lr}");
         __asm__ volatile("      sub     sp, #4");
         __asm__ volatile("      bl      arch_skd_chk_swcx");
-        __asm__ volatile("      bl      xwosplcb_skd_pre_swcx_lic");
+        __asm__ volatile("      bl      xwosplcb_skd_pre_swcx_lic"); /* r0 = xwstk */
         __asm__ volatile("      add     sp, #4");
         __asm__ volatile("      pop     {lr}");
 
@@ -270,7 +277,10 @@ void xwospl_skd_isr_swcx(void)
         __asm__ volatile("      mrs     r2, psp");
         /* save previous context */
         /* r3 = r0->pstk; */
-        __asm__ volatile("      ldr     r3, [r0, #4]");
+        __asm__ volatile("      ldr     r3, [r0, %[__pstk]]"
+                         :
+                         :[__pstk] "I" (xwcc_offsetof(struct xwospl_skd, pstk))
+                         :);
 #if defined(ARCHCFG_FPU) && (1 == ARCHCFG_FPU)
         /* save s16-s31 */
         __asm__ volatile("      sub     r2, %[__nvfr]"
@@ -285,13 +295,22 @@ void xwospl_skd_isr_swcx(void)
         __asm__ volatile("      mrs     r1, control");
         __asm__ volatile("      str     r1, [r2, #-4]!");
         /* save PSP, pstk->sp = r2; */
-        __asm__ volatile("      str     r2, [r3, #0]");
+        __asm__ volatile("      str     r2, [r3, %[__sp]]"
+                         :
+                         :[__sp] "I" (xwcc_offsetof(struct xwospl_skdobj_stack, sp))
+                         :);
 
         /* restore current context */
         /* r3 = r0->cstk; */
-        __asm__ volatile("      ldr     r3, [r0, #0]");
+        __asm__ volatile("      ldr     r3, [r0, %[__cstk]]"
+                         :
+                         :[__cstk] "I" (xwcc_offsetof(struct xwospl_skd, cstk))
+                         :);
         /* get value of stack pointer, r2 = cstk->sp */
-        __asm__ volatile("      ldr     r2, [r3, #0]");
+        __asm__ volatile("      ldr     r2, [r3, %[__sp]]"
+                         :
+                         :[__sp] "I" (xwcc_offsetof(struct xwospl_skdobj_stack, sp))
+                         :);
         /* restore CONTROL */
         __asm__ volatile("      ldr     r1, [r2], #4");
         __asm__ volatile("      msr     control, r1");

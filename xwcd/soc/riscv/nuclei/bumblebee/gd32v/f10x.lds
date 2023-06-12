@@ -135,6 +135,22 @@ SECTIONS {
         data_vma_base = ADDR(.data);
         data_lma_base = LOADADDR(.data);
 
+        .tdata : ALIGN(8) {
+                *(.tdata .tdata.* .gnu.linkonce.td.*)
+                tdata_vma_end = .;
+	} > data_mr AT> code_mr
+        tdata_vma_base = ADDR(.tdata);
+        tdata_lma_base = LOADADDR(.tdata);
+
+        .tbss (NOLOAD) :  {
+                *(.tbss .tbss.* .gnu.linkonce.tb.*)
+                *(.tcommon)
+                tbss_vma_end = .;
+        } > data_mr
+        tbss_vma_base = ADDR(.tbss);
+        tbss_vma_offset = ADDR(.tbss) - ADDR(.tdata);
+        tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss));
+
         .firmware.tail : ALIGN(32) {
                 KEEP(*(.firmware.tail))
                 firmware_tail_vma_end = .;

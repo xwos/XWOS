@@ -102,14 +102,14 @@ AFLAGS = -mabi=aapcs -mno-thumb-interwork -m$(ENDIAN) -mthumb \
 CFLAGS = -mabi=aapcs -mthumb -std=gnu18 \
          -fomit-frame-pointer -mno-thumb-interwork -m$(ENDIAN) \
          -mno-unaligned-access \
-         -ffunction-sections -fdata-sections \
+         -ffunction-sections -fdata-sections -ftls-model=local-exec \
          -g -g3 -gdwarf-4 -fvar-tracking -fvar-tracking-assignments -fverbose-asm \
          -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 
 CXXFLAGS = -mabi=aapcs -mthumb -std=gnu++17 \
            -fomit-frame-pointer -mno-thumb-interwork -m$(ENDIAN) \
            -mno-unaligned-access \
-           -ffunction-sections -fdata-sections \
+           -ffunction-sections -fdata-sections -ftls-model=local-exec \
            -g -g3 -gdwarf-4 -fvar-tracking -fvar-tracking-assignments -fverbose-asm \
            -Wa,-adhlns="$@.lst" $(WARN) $(PERDEF)
 

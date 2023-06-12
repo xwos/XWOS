@@ -257,5 +257,6 @@ ifeq ($(XWLIBCFG_SETJMP),y)
 endif
 
 ARCH_CSRCS += xwosimpl_soc_lfq.c xwosimpl_soc_xwsc.c
+ARCH_CSRCS += xwosimpl_tls.c
 
 ARCH_ASRCS += xwosimpl_soc_spinlock.S xwosasmimpl_soc_xwsc.S

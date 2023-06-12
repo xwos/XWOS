@@ -23,6 +23,12 @@ struct xwospl_skd * xwosplcb_skd_get_lc(void)
 }
 
 __xwos_code
+struct xwospl_thd * xwosplcb_skd_get_cthd_lc(void)
+{
+        return xwmp_skd_get_cthd_lc();
+}
+
+__xwos_code
 struct xwospl_skd * xwosplcb_skd_pre_swcx_lic(struct xwospl_skd * xwskd)
 {
         return xwmp_skd_pre_swcx_lic(xwskd);
@@ -83,6 +89,12 @@ __xwos_code
 struct xwospl_skd * xwosplcb_skd_get_lc(void)
 {
         return xwup_skd_get_lc();
+}
+
+__xwos_code
+struct xwospl_thd * xwosplcb_skd_get_cthd_lc(void)
+{
+        return xwup_skd_get_cthd_lc();
 }
 
 __xwos_code

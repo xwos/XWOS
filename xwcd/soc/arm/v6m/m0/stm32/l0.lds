@@ -130,54 +130,38 @@ SECTIONS {
         } > code_mr AT> code_mr
         /* -------- Global Offset Table -------- */
 
-        .xwos.data : ALIGN(16) {
+        .xwos.data : ALIGN(8) {
                 *(.xwos.data)
-                . = ALIGN(16);
+                . = ALIGN(8);
                 xwos_data_vma_end = .;
         } > data_mr AT> code_mr
         xwos_data_vma_base = ADDR(.xwos.data);
         xwos_data_lma_base = LOADADDR(.xwos.data);
 
-        .data : ALIGN(16) {
+        .data : ALIGN(8) {
                 *(.data .data.* .gnu.linkonce.d.*)
-                . = ALIGN(16);
+                . = ALIGN(8);
                 data_vma_end = .;
         } > data_mr AT> code_mr
         data_vma_base = ADDR(.data);
         data_lma_base = LOADADDR(.data);
 
-	.tdata : ALIGN(16) {
-	        *(.tdata .tdata.* .gnu.linkonce.td.*)
+        .tdata : ALIGN(8) {
+                *(.tdata .tdata.* .gnu.linkonce.td.*)
                 tdata_vma_end = .;
-                PROVIDE(__tdata_end = .);
 	} > data_mr AT> code_mr
         tdata_vma_base = ADDR(.tdata);
         tdata_lma_base = LOADADDR(.tdata);
-	PROVIDE(__tls_base = ADDR(.tdata));
-	PROVIDE(__tdata_start = ADDR(.tdata));
-	PROVIDE(__tdata_source = LOADADDR(.tdata));
-	PROVIDE(__tdata_source_end = LOADADDR(.tdata) + SIZEOF(.tdata));
-	PROVIDE(__tdata_size = SIZEOF(.tdata));
-	PROVIDE(__tls_align = MAX(ALIGNOF(.tdata),ALIGNOF(.tbss)));
 
         .tbss (NOLOAD) :  {
-        *(.tbss .tbss.* .gnu.linkonce.tb.*)
-		*(.tcommon)
-                . = ALIGN(16);
+                *(.tbss .tbss.* .gnu.linkonce.tb.*)
+                *(.tcommon)
                 tbss_vma_end = .;
-                PROVIDE(__tls_end = .);
-                PROVIDE(__tbss_end = .);
         } > data_mr
         tbss_vma_base = ADDR(.tbss);
-        PROVIDE(__bss_start = ADDR(.tbss));
-        PROVIDE(__tbss_start = ADDR(.tbss));
-        PROVIDE(__tbss_offset = ADDR(.tbss) - ADDR(.tdata));
-        PROVIDE(__tbss_size = SIZEOF(.tbss));
-        PROVIDE(__tls_size = __tls_end - __tls_base);
-        PROVIDE(__tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)));
-        PROVIDE(__arm32_tls_tcb_offset = MAX(8, __tls_align));
-        PROVIDE(__arm64_tls_tcb_offset = MAX(16, __tls_align));
-
+        tbss_vma_offset = ADDR(.tbss) - ADDR(.tdata);
+        tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss));
+        tls_offset = MAX(8, tls_align);
 
         .firmware.tail : ALIGN(32) {
                 KEEP(*(.firmware.tail))
@@ -188,7 +172,7 @@ SECTIONS {
         firmware_tail_lma_base = LOADADDR(.firmware.tail);
         firmware_tail_lma_end = firmware_tail_lma_base + firmware_tail_size;
 
-        .bss : ALIGN(8) {
+        .bss (NOLOAD) : ALIGN(8) {
                 *(.dynbss)
                 *(.bss .bss.* .gnu.linkonce.b.*)
                 *(COMMON)
@@ -197,7 +181,7 @@ SECTIONS {
         } > data_mr
         bss_vma_base = ADDR(.bss);
 
-        .heap : ALIGN(16) {
+        .heap : ALIGN(8) {
                 PROVIDE(end = .); /* 被libc中的malloc()使用 */
                 PROVIDE(_end = .); /* 被libc中的malloc()使用 */
         } > xwos_stk_mr

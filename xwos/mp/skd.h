@@ -84,6 +84,7 @@ typedef xwer_t (* xwmp_thd_f)(void *);
  */
 struct xwmp_skdobj_stack {
         xwstk_t * sp; /**< 栈指针 */
+        void * tls; /**< TLS变量区的基地址 */
         xwstk_t * base; /**< 栈内存的基地址 */
         xwsz_t size; /**< 栈内存的大小，单位：字节 */
         xwsz_t guard; /**< 栈内存警戒线，单位：字节 */

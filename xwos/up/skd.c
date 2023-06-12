@@ -21,6 +21,7 @@
 #include <xwos/mm/kma.h>
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
+#include <xwos/ospl/tls.h>
 #include <xwos/up/pm.h>
 #include <xwos/up/thd.h>
 #include <xwos/up/rtrq.h>
@@ -326,18 +327,25 @@ void xwup_skd_init_idled(void)
         xwskd->idle.base = (xwstk_t *)xwup_skd_idled_stack;
 #if (defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK))
         xwskd->idle.sp = xwskd->idle.base + (xwskd->idle.size / sizeof(xwstk_t));
+        xwskd->idle.tls = xwskd->idle.base;
 #elif (defined(XWMMCFG_ED_STACK) && (1 == XWMMCFG_ED_STACK))
         xwskd->idle.sp = xwskd->idle.base + (xwskd->idle.size / sizeof(xwstk_t)) - 1;
+        xwskd->idle.tls = xwskd->idle.base;
 #elif (defined(XWMMCFG_FA_STACK) && (1 == XWMMCFG_FA_STACK))
         xwskd->idle.sp = xwskd->idle.base - 1;
+        xwskd->idle.tls = (void *)xwskd->idle.base + attr->stack_size;
 #elif (defined(XWMMCFG_EA_STACK) && (1 == XWMMCFG_EA_STACK))
         xwskd->idle.sp = xwskd->idle.base;
+        xwskd->idle.tls = (void *)xwskd->idle.base + attr->stack_size;
 #else
 #  error "Unknown stack type!"
 #endif
         xwskd->idle.guard = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
         xwskd->idle.flag = XWUP_SKDOBJ_FLAG_PRIVILEGED;
         xwospl_skd_init_stack(&xwskd->idle, xwup_cthd_return);
+#if (defined(XWUPCFG_SKD_IDLE_TLS) && (1 == XWUPCFG_SKD_IDLE_TLS))
+        xwospl_tls_init(&xwskd->idle);
+#endif
 }
 
 #if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
@@ -391,18 +399,25 @@ void xwup_skd_init_bhd(void)
         xwskd->bh.base = (xwstk_t *)xwup_skd_bhd_stack;
 #if defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK)
         xwskd->bh.sp = xwskd->bh.base + (xwskd->bh.size / sizeof(xwstk_t));
+        xwskd->bh.tls = xwskd->bh.base;
 #elif defined(XWMMCFG_ED_STACK) && (1 == XWMMCFG_ED_STACK)
         xwskd->bh.sp = xwskd->bh.base + (xwskd->bh.size / sizeof(xwstk_t)) - 1;
+        xwskd->bh.tls = xwskd->bh.base;
 #elif defined(XWMMCFG_FA_STACK) && (1 == XWMMCFG_FA_STACK)
         xwskd->bh.sp = xwskd->bh.base - 1;
+        xwskd->bh.tls = (void *)xwskd->bh.base + attr->stack_size;
 #elif defined(XWMMCFG_EA_STACK) && (1 == XWMMCFG_EA_STACK)
         xwskd->bh.sp = xwskd->bh.base;
+        xwskd->bh.tls = (void *)xwskd->bh.base + attr->stack_size;
 #else
 #  error "Unknown stack type!"
 #endif
         xwskd->bh.guard = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
         xwskd->bh.flag = XWUP_SKDOBJ_FLAG_PRIVILEGED;
         xwospl_skd_init_stack(&xwskd->bh, xwup_cthd_return);
+#if (defined(XWUPCFG_SKD_BH_TLS) && (1 == XWUPCFG_SKD_BH_TLS))
+        xwospl_tls_init(&xwskd->bh);
+#endif
 }
 
 /**

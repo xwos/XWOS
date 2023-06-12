@@ -121,8 +121,9 @@
 /* xwer_t xwospl_skd_start(__maybe_unused struct xwos_skd * xwskd) */
 xwospl_skd_start:
         /* Load SP */
-        LOAD            tp, 0 * REGBYTES (a0) /* t0 = xwskd->cstk */
-        LOAD            sp, 0 * REGBYTES (tp) /* sp = cstk->sp */
+        LOAD            a0, 0 * REGBYTES (a0) /* a0 = xwskd->cstk */
+        LOAD            sp, 0 * REGBYTES (a0) /* sp = cstk->sp */
+        LOAD            tp, 1 * REGBYTES (a0) /* tp = cstk->tls */
         SOC_RESTORE_CALLEE_CONTEXT sp, t0
         SOC_RESTORE_CALLER_CONTEXT sp, t0
         /* Return to thread main function */
@@ -145,20 +146,22 @@ xwospl_skd_isr_swcx:
         addi	        sp, sp, -16
         STORE           ra, 3 * REGBYTES (sp)
 
-        /* clear swcx IRQ & check thread stack */
-        call            soc_skd_chk_swcx /* a0 = soc_skd_chk_swcx(); */
-        call            xwosplcb_skd_pre_swcx_lic /* a0 = xwosplcb_skd_pre_swcx_lic(a0); */
+        /* check previous stack */
+        call            soc_skd_chk_swcx
+        call            xwosplcb_skd_pre_swcx_lic /* a0 = xwskd; */
 
         /* Save previous context */
-        csrr            t0, CSR_MSCRATCH /* t0 = prev thd sp */
+        csrr            t0, CSR_MSCRATCH /* t0 = previous stack sp */
         SOC_SAVE_CALLEE_CONTEXT t0, t1
-        STORE           t0, 0 (tp) /* pstk->sp = t0 */
+        LOAD            t1, 1 * REGBYTES (a0) /* t1 = a0->pstk */
+        STORE           t0, 0 * REGBYTES (t1) /* pstk->sp = t0 */
 
         /* Restore current context */
-        LOAD            tp, 0 (a0) /* tp = skd->cstk */
-        LOAD            t0, 0 (tp) /* t0 = cstk->sp */
+        LOAD            t1, 0 * REGBYTES (a0) /* t1 = skd->cstk */
+        LOAD            tp, 1 * REGBYTES (t1) /* tp = cstk->tls */
+        LOAD            t0, 0 * REGBYTES (t1) /* t0 = cstk->sp */
         SOC_RESTORE_CALLEE_CONTEXT t0, t1
-        csrw            CSR_MSCRATCH, t0 /* MSCRATCH = cstk */
+        csrw            CSR_MSCRATCH, t0 /* MSCRATCH = current stack sp */
 
         /* Finish */
         call            xwosplcb_skd_post_swcx_lic

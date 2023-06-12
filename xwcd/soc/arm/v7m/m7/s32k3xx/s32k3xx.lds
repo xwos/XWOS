@@ -149,6 +149,15 @@ SECTIONS {
         fini_array_lma_base = LOADADDR(.fini_array);
         /* -------- 以上与C++全局对象的构造函数与析构函数有关 -------- */
 
+        /* ++++++++ Global Offset Table ++++++++ */
+        /* 当-ftls-model=initial-exec时，tls变量的offset是从got表的地址加载的 */
+        /* 当-ftls-model=local-exec时，tls变量的offset是直接加载立即数，此时不需要 .got */
+        /* MCU静态连接的环境，C11标准中的thread_local 变量只能是以上两种模型。 */
+        .got : ALIGN(8) {
+                *(.got.plt) *(.igot.plt) *(.got) *(.igot)
+        } > code_mr AT> code_mr
+        /* -------- Global Offset Table -------- */
+
         /* 全局变量与静态变量 */
         .cacheable_data : ALIGN(32) {
                 *(.ramcode) /* RTD中的RAMCODE */
@@ -163,6 +172,23 @@ SECTIONS {
         } > cacheable_data_mr AT> code_mr
         cacheable_data_vma_base = ADDR(.cacheable_data);
         cacheable_data_lma_base = LOADADDR(.cacheable_data);
+
+        .tdata : ALIGN(32) {
+                *(.tdata .tdata.* .gnu.linkonce.td.*)
+                tdata_vma_end = .;
+	} > cacheable_data_mr AT> code_mr
+        tdata_vma_base = ADDR(.tdata);
+        tdata_lma_base = LOADADDR(.tdata);
+
+        .tbss (NOLOAD) :  {
+                *(.tbss .tbss.* .gnu.linkonce.tb.*)
+                *(.tcommon)
+                tbss_vma_end = .;
+        } > cacheable_data_mr
+        tbss_vma_base = ADDR(.tbss);
+        tbss_vma_offset = ADDR(.tbss) - ADDR(.tdata);
+        tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss));
+        tls_offset = MAX(8, tls_align);
 
         .non_cacheable_data : ALIGN(32) {
                 *(.mcal_data_no_cacheable)
@@ -292,10 +318,6 @@ SECTIONS {
         }
         .iplt : {
                 *(.iplt)
-        }
-
-        .got : {
-                *(.got.plt) *(.igot.plt) *(.got) *(.igot)
         }
         /* -------- 以上与动态连接有关，不适用于MCU的ROM环境 -------- */
 

@@ -25,6 +25,7 @@
 #endif
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
+#include <xwos/ospl/tls.h>
 #include <xwos/mp/rtrq.h>
 #include <xwos/mp/rtwq.h>
 #include <xwos/mp/plwq.h>
@@ -378,12 +379,16 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
         thd->stack.base = attr->stack;
 #if (defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK))
         thd->stack.sp = thd->stack.base + (attr->stack_size / sizeof(xwstk_t));
+        thd->stack.tls = thd->stack.base;
 #elif (defined(XWMMCFG_ED_STACK) && (1 == XWMMCFG_ED_STACK))
         thd->stack.sp = thd->stack.base + (attr->stack_size / sizeof(xwstk_t)) - 1;
+        thd->stack.tls = thd->stack.base;
 #elif (defined(XWMMCFG_FA_STACK) && (1 == XWMMCFG_FA_STACK))
         thd->stack.sp = thd->stack.base - 1;
+        thd->stack.tls = (void *)thd->stack.base + attr->stack_size;
 #elif (defined(XWMMCFG_EA_STACK) && (1 == XWMMCFG_EA_STACK))
         thd->stack.sp = thd->stack.base;
+        thd->stack.tls = (void *)thd->stack.base + attr->stack_size;
 #else
 #  error "Unknown stack type!"
 #endif
@@ -398,13 +403,12 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
 #endif
         thd->libc.__errno = XWOK;
 
-#if defined(BRDCFG_XWSKD_THD_POSTINIT_HOOK) && (1 == BRDCFG_XWSKD_THD_POSTINIT_HOOK)
-        board_thd_postinit_hook(thd);
-#endif
-
         /* 加入就绪队列 */
         if (thdfunc) {
                 xwmp_thd_launch(thd, thdfunc, arg);
+#if defined(BRDCFG_XWSKD_THD_POSTINIT_HOOK) && (1 == BRDCFG_XWSKD_THD_POSTINIT_HOOK)
+                board_thd_postinit_hook(thd);
+#endif
         } else {
                 xwmp_splk_lock_cpuirqsv(&thd->stlock, &cpuirq);
                 xwbop_s1m(xwsq_t, &thd->state, XWMP_SKDOBJ_ST_STANDBY);
@@ -437,10 +441,8 @@ void xwmp_thd_launch(struct xwmp_thd * thd, xwmp_thd_f thdfunc, void * arg)
         xwreg_t cpuirq;
         xwer_t rc;
 
-        /* add to ready queue */
         rc = xwmp_thd_grab(thd);
         XWOS_BUG_ON(rc < 0);
-        /* Add to the thdlist of scheduler */
         xwskd = xwmp_skd_get_lc();
         xwmp_splk_lock_cpuirqsv(&xwskd->thdlistlock, &cpuirq);
         xwskd->thd_num++;
@@ -450,6 +452,7 @@ void xwmp_thd_launch(struct xwmp_thd * thd, xwmp_thd_f thdfunc, void * arg)
         thd->stack.main = thdfunc;
         thd->stack.arg = arg;
         xwospl_skd_init_stack(&thd->stack, xwmp_cthd_return);
+        xwospl_tls_init(&thd->stack);
         xwmp_splk_lock_cpuirqsv(&thd->stlock, &cpuirq);
         xwbop_c0m(xwsq_t, &thd->state, XWMP_SKDOBJ_ST_STANDBY);
         xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);

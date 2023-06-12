@@ -182,6 +182,23 @@ SECTIONS {
         data_vma_base = ADDR(.data);
         data_lma_base = LOADADDR(.data);
 
+        .tdata : ALIGN(32) {
+                *(.tdata .tdata.* .gnu.linkonce.td.*)
+                tdata_vma_end = .;
+	} > data_mr AT> code_mr
+        tdata_vma_base = ADDR(.tdata);
+        tdata_lma_base = LOADADDR(.tdata);
+
+        .tbss (NOLOAD) :  {
+                *(.tbss .tbss.* .gnu.linkonce.tb.*)
+                *(.tcommon)
+                tbss_vma_end = .;
+        } > data_mr
+        tbss_vma_base = ADDR(.tbss);
+        tbss_vma_offset = ADDR(.tbss) - ADDR(.tdata);
+        tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss));
+        tls_offset = MAX(8, tls_align);
+
         .itcm : ALIGN(16) {
                 FILL(0xFF)
                 *(.ramfunc.$RAM2)

@@ -20,18 +20,16 @@
 
 XWOS ?= ../..
 WKSPC ?= wkspc
-TARGET ?= XWOS
-
 MKCFG := $(XWOS)/xwbs/util/el/mkcfg.el
 
-all: cfg $(WKSPC)
+all: $(WKSPC) cfg
 	$(MAKE) -C $(WKSPC)
-
-cfg: $(WKSPC) $(WKSPC)/XWOS.cfg
 
 $(WKSPC):
 	@mkdir -p $@
 	@cp $(XWOS)/xwbs/wkspc.mk $@/makefile
+
+cfg: $(WKSPC) $(WKSPC)/XWOS.cfg
 
 $(WKSPC)/XWOS.cfg: $(filter-out cfg/autogen.h,$(wildcard cfg/*.h))
 	@[ -x ${MKCFG} ] || chmod +x ${MKCFG}

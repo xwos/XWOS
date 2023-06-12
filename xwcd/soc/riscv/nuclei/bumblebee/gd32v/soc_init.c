@@ -31,21 +31,28 @@ extern xwu8_t data_vma_end[];
 extern xwu8_t bss_vma_base[];
 extern xwu8_t bss_vma_end[];
 
+extern xwu8_t tdata_lma_base[];
+extern xwu8_t tdata_vma_base[];
+extern xwu8_t tdata_vma_end[];
+
+extern xwu8_t tbss_vma_base[];
+extern xwu8_t tbss_vma_end[];
+
 /**
  * @brief 重定向数据区到内存
  */
 __xwbsp_init_code
 void soc_relocate_data(void)
 {
-        xwsz_t count, i;
+        xwsz_t cnt, i;
         xwu8_t * src;
         xwu8_t * dst;
 
         src = data_lma_base;
         dst = data_vma_base;
         if (dst != src) {
-                count = (xwsz_t)data_vma_end - (xwsz_t)data_vma_base;
-                for (i = 0; i < count; i++) {
+                cnt = (xwsz_t)data_vma_end - (xwsz_t)data_vma_base;
+                for (i = 0; i < cnt; i++) {
                         *dst = *src;
                         dst++;
                         src++;
@@ -53,8 +60,26 @@ void soc_relocate_data(void)
         }
 
         dst = bss_vma_base;
-        count = (xwsz_t)bss_vma_end - (xwsz_t)bss_vma_base;
-        for (i = 0; i < count; i++) {
+        cnt = (xwsz_t)bss_vma_end - (xwsz_t)bss_vma_base;
+        for (i = 0; i < cnt; i++) {
+                *dst = 0;
+                dst++;
+        }
+
+        src = tdata_lma_base;
+        dst = tdata_vma_base;
+        if (dst != src) {
+                cnt = (xwsz_t)tdata_vma_end - (xwsz_t)tdata_vma_base;
+                for (i = 0; i < cnt; i++) {
+                        *dst = *src;
+                        dst++;
+                        src++;
+                }
+        }
+
+        dst = tbss_vma_base;
+        cnt = (xwsz_t)tbss_vma_end - (xwsz_t)tbss_vma_base;
+        for (i = 0; i < cnt; i++) {
                 *dst = 0;
                 dst++;
         }

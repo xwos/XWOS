@@ -92,8 +92,10 @@
 /******** ******** ******** scheduler ******** ******** ********/
 #define XWMPCFG_SKD_PRIORITY_RT_NUM                     (8U)
 #define XWMPCFG_SKD_IDLE_STACK_SIZE                     (2048U)
+#define XWMPCFG_SKD_IDLE_TLS                            1
 #define XWMPCFG_SKD_BH                                  1
 #define XWMPCFG_SKD_BH_STACK_SIZE                       (2048U)
+#define XWMPCFG_SKD_BH_TLS                              1
 #define XWMPCFG_SKD_THD_PRIVILEGED_DEFAULT              1
 #define XWMPCFG_SKD_THD_MEMSLICE                        0
 #define XWMPCFG_SKD_THD_STDC_MM                         1
@@ -131,8 +133,10 @@
 /******** ******** ******** scheduler ******** ******** ********/
 /* #define XWUPCFG_SKD_PRIORITY_RT_NUM                  (8U) */
 /* #define XWUPCFG_SKD_IDLE_STACK_SIZE                  (2048U) */
+/* #define XWUPCFG_SKD_IDLE_TLS                         1 */
 /* #define XWUPCFG_SKD_BH                               1 */
 /* #define XWUPCFG_SKD_BH_STACK_SIZE                    (2048U) */
+/* #define XWUPCFG_SKD_BH_TLS                           1 */
 /* #define XWUPCFG_SKD_PM                               1 */
 /* #define XWUPCFG_SKD_THD_PRIVILEGED_DEFAULT           1 */
 /* #define XWUPCFG_SKD_THD_STDC_MM                      1 */

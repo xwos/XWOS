@@ -116,7 +116,7 @@ soc_boot_end:
         .size           soc_boot, soc_boot_end - soc_boot
 
 /**
- * @brief Macro to save caller x-registers
+ * @brief Macro to save caller general registers
  */
         .macro SOC_SAVE_CALLER_X_CONTEXT
         addi            sp, sp, -(SOC_CALLER_CONTEXT_SIZE)
@@ -141,7 +141,7 @@ soc_boot_end:
         .endm
 
 /**
- * @brief Macro to restore caller x-registers
+ * @brief Macro to restore caller general registers
  */
         .macro SOC_RESTORE_CALLER_X_CONTEXT
 #ifndef __riscv_32e

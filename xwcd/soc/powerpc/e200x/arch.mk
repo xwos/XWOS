@@ -45,3 +45,4 @@ ARCH_CSRCS += arch_init.c arch_sc_trap.c xwosimpl_soc_lfq.c xwosimpl_soc_xwsc.c
 
 ARCH_ASRCS += asmlib/asm_rw.S asmlib/asm_xwbop.S
 ARCH_ASRCS += startup.S arch_isr.S xwosimpl_soc_spinlock.S
+ARCH_CSRCS += xwosimpl_tls.c

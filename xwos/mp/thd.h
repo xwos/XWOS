@@ -66,8 +66,7 @@ struct xwmp_thd {
         } migration; /**< 迁移状态成员 */
 
         /* 就绪态 */
-        struct xwlib_bclst_node rqnode; /**< 就绪队列节点，
-                                             此成员被锁rtrq->lock保护 */
+        struct xwlib_bclst_node rqnode; /**< 就绪队列节点，此成员被锁rtrq->lock保护 */
 
         /* 睡眠态 */
         struct xwmp_ttn ttn; /**< 继承：时间树节点, 被锁tt->lock保护 */
@@ -93,7 +92,7 @@ struct xwmp_thd {
         void * data[XWMPCFG_SKD_THD_LOCAL_DATA_NUM];
 #endif
         struct {
-                int __errno;
+                int __errno; /**< 错误码 */
         } libc;
 };
 

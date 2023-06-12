@@ -23,6 +23,7 @@
 #endif
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
+#include <xwos/ospl/tls.h>
 #include <xwos/up/lock/seqlock.h>
 #include <xwos/up/lock/fakespinlock.h>
 #include <xwos/up/rtrq.h>
@@ -330,12 +331,16 @@ xwer_t xwup_thd_activate(struct xwup_thd * thd,
         thd->stack.base = attr->stack;
 #if defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK)
         thd->stack.sp = thd->stack.base + (attr->stack_size / sizeof(xwstk_t));
+        thd->stack.tls = thd->stack.base;
 #elif defined(XWMMCFG_ED_STACK) && (1 == XWMMCFG_ED_STACK)
         thd->stack.sp = thd->stack.base + (attr->stack_size / sizeof(xwstk_t)) - 1;
+        thd->stack.tls = thd->stack.base;
 #elif defined(XWMMCFG_FA_STACK) && (1 == XWMMCFG_FA_STACK)
         thd->stack.sp = thd->stack.base - 1;
+        thd->stack.tls = (void *)thd->stack.base + attr->stack_size;
 #elif defined(XWMMCFG_EA_STACK) && (1 == XWMMCFG_EA_STACK)
         thd->stack.sp = thd->stack.base;
+        thd->stack.tls = (void *)thd->stack.base + attr->stack_size;
 #else
 #  error "Unknown stack type!"
 #endif
@@ -352,12 +357,11 @@ xwer_t xwup_thd_activate(struct xwup_thd * thd,
 #endif
         thd->libc.__errno = XWOK;
 
-#if defined(BRDCFG_XWSKD_THD_POSTINIT_HOOK) && (1 == BRDCFG_XWSKD_THD_POSTINIT_HOOK)
-        board_thd_postinit_hook(thd);
-#endif
-
         if (thdfunc) {
                 xwup_thd_launch(thd, thdfunc, arg);
+#if defined(BRDCFG_XWSKD_THD_POSTINIT_HOOK) && (1 == BRDCFG_XWSKD_THD_POSTINIT_HOOK)
+                board_thd_postinit_hook(thd);
+#endif
         } else {
                 xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_STANDBY);
         }
@@ -380,11 +384,11 @@ void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f thdfunc, void * arg)
         xwreg_t cpuirq;
 
         xwup_thd_grab(thd);
-        /* add to ready queue */
         xwskd = xwup_skd_get_lc();
         thd->stack.main = thdfunc;
         thd->stack.arg = arg;
         xwospl_skd_init_stack(&thd->stack, xwup_cthd_return);
+        xwospl_tls_init(&thd->stack);
         xwospl_cpuirq_save_lc(&cpuirq);
         xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_STANDBY);
         xwup_thd_rq_add_tail(thd);
