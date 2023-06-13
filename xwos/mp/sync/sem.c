@@ -20,9 +20,9 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
-#if defined(XWMPCFG_SYNC_SEM_MEMSLICE) && (1 == XWMPCFG_SYNC_SEM_MEMSLICE)
+#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
 #  include <xwos/mm/memslice.h>
-#elif defined(XWMPCFG_SYNC_SEM_STDC_MM) && (1 == XWMPCFG_SYNC_SEM_STDC_MM)
+#elif defined(XWOSCFG_SYNC_SEM_STDC_MM) && (1 == XWOSCFG_SYNC_SEM_STDC_MM)
 #  include <stdlib.h>
 #endif
 #include <xwos/ospl/irq.h>
@@ -34,13 +34,13 @@
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/lock/seqlock.h>
 #include <xwos/mp/lock/mtx.h>
-#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
 #  include <xwos/mp/sync/evt.h>
 #endif
 #include <xwos/mp/sync/obj.h>
 #include <xwos/mp/sync/sem.h>
 
-#if defined(XWMPCFG_SYNC_SEM_MEMSLICE) && (1 == XWMPCFG_SYNC_SEM_MEMSLICE)
+#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
 /**
  * @brief 结构体xwmp_sem的对象缓存
  */
@@ -70,7 +70,7 @@ xwer_t xwmp_sem_sgc(void * sem);
 static __xwmp_code
 xwer_t xwmp_sem_dgc(void * sem);
 
-#if defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
+#if defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
 static __xwmp_code
 xwer_t xwmp_plsem_activate(struct xwmp_sem * sem, xwssq_t val, xwssq_t max,
                            xwobj_gc_f gcfunc);
@@ -96,7 +96,7 @@ xwer_t xwmp_plsem_test_unintr(struct xwmp_sem * sem,
                               struct xwmp_thd * thd, struct xwmp_skd * xwskd);
 #endif
 
-#if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
+#if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
 static __xwmp_code
 xwer_t xwmp_rtsem_activate(struct xwmp_sem * sem, xwssq_t val, xwssq_t max,
                            xwobj_gc_f gcfunc);
@@ -123,7 +123,7 @@ xwer_t xwmp_rtsem_test_unintr(struct xwmp_sem * sem,
                               struct xwmp_thd * thd, struct xwmp_skd * xwskd);
 #endif
 
-#if defined(XWMPCFG_SYNC_SEM_MEMSLICE) && (1 == XWMPCFG_SYNC_SEM_MEMSLICE)
+#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
 /**
  * @brief XWMP INIT CODE：初始化结构体xwmp_sem的对象缓存
  * @param[in] zone_origin: 内存区域的首地址
@@ -153,7 +153,7 @@ xwer_t xwmp_sem_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 static __xwmp_code
 struct xwmp_sem * xwmp_sem_alloc(void)
 {
-#if defined(XWMPCFG_SYNC_SEM_MEMSLICE) && (1 == XWMPCFG_SYNC_SEM_MEMSLICE)
+#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
         union {
                 struct xwmp_sem * sem;
                 void * anon;
@@ -165,7 +165,7 @@ struct xwmp_sem * xwmp_sem_alloc(void)
                 mem.sem = err_ptr(rc);
         }/* else {} */
         return mem.sem;
-#elif defined(XWMPCFG_SYNC_SEM_STDC_MM) && (1 == XWMPCFG_SYNC_SEM_STDC_MM)
+#elif defined(XWOSCFG_SYNC_SEM_STDC_MM) && (1 == XWOSCFG_SYNC_SEM_STDC_MM)
         struct xwmp_sem * sem;
 
         sem = malloc(sizeof(struct xwmp_sem));
@@ -199,9 +199,9 @@ struct xwmp_sem * xwmp_sem_alloc(void)
 static __xwmp_code
 void xwmp_sem_free(struct xwmp_sem * sem)
 {
-#if defined(XWMPCFG_SYNC_SEM_MEMSLICE) && (1 == XWMPCFG_SYNC_SEM_MEMSLICE)
+#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
         xwmm_memslice_free(&xwmp_sem_cache, sem);
-#elif defined(XWMPCFG_SYNC_SEM_STDC_MM) && (1 == XWMPCFG_SYNC_SEM_STDC_MM)
+#elif defined(XWOSCFG_SYNC_SEM_STDC_MM) && (1 == XWOSCFG_SYNC_SEM_STDC_MM)
         xwmp_sem_destruct(sem);
         free(sem);
 #else
@@ -290,12 +290,12 @@ xwer_t xwmp_sem_create(struct xwmp_sem ** sembuf, xwid_t type,
         } else {
                 rc = -ETYPE;
                 switch (type) {
-#if defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
+#if defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
                 case XWMP_SEM_TYPE_PIPELINE:
                         rc = xwmp_plsem_activate(sem, val, max, xwmp_sem_dgc);
                         break;
 #endif
-#if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
+#if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
                 case XWMP_SEM_TYPE_RT:
                         rc = xwmp_rtsem_activate(sem, val, max, xwmp_sem_dgc);
                         break;
@@ -322,7 +322,7 @@ xwer_t xwmp_sem_fini(struct xwmp_sem * sem)
         return xwmp_sem_put(sem);
 }
 
-#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
 __xwmp_api
 xwer_t xwmp_sem_bind(struct xwmp_sem * sem, struct xwmp_evt * evt, xwsq_t pos)
 {
@@ -335,7 +335,7 @@ xwer_t xwmp_sem_bind(struct xwmp_sem * sem, struct xwmp_evt * evt, xwsq_t pos)
         }
 
         switch (sem->type) {
-#  if defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
+#  if defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
         case XWMP_SEM_TYPE_PIPELINE:
                 xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
                 rc = xwmp_sel_obj_bind(evt, &sem->synobj, pos, true);
@@ -345,7 +345,7 @@ xwer_t xwmp_sem_bind(struct xwmp_sem * sem, struct xwmp_evt * evt, xwsq_t pos)
                 xwmp_plwq_unlock_cpuirqrs(&sem->wq.pl, cpuirq);
                 break;
 #  endif
-#  if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
+#  if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
         case XWMP_SEM_TYPE_RT:
                 xwmp_rtwq_lock_cpuirqsv(&sem->wq.rt, &cpuirq);
                 rc = xwmp_sel_obj_bind(evt, &sem->synobj, pos, true);
@@ -372,7 +372,7 @@ xwer_t xwmp_sem_unbind(struct xwmp_sem * sem, struct xwmp_evt * evt)
         xwer_t rc;
 
         switch (sem->type) {
-#  if defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
+#  if defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
         case XWMP_SEM_TYPE_PIPELINE:
                 xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
                 rc = xwmp_sel_obj_unbind(evt, &sem->synobj, true);
@@ -383,7 +383,7 @@ xwer_t xwmp_sem_unbind(struct xwmp_sem * sem, struct xwmp_evt * evt)
                 xwmp_sem_put(sem);
                 break;
 #  endif
-#  if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
+#  if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
         case XWMP_SEM_TYPE_RT:
                 xwmp_rtwq_lock_cpuirqsv(&sem->wq.rt, &cpuirq);
                 rc = xwmp_sel_obj_unbind(evt, &sem->synobj, true);
@@ -402,7 +402,7 @@ xwer_t xwmp_sem_unbind(struct xwmp_sem * sem, struct xwmp_evt * evt)
 }
 #endif
 
-#if defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
+#if defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
 /**
  * @brief XWMP API：激活并初始化管道信号量对象
  * @param[in] sem: 信号量对象的指针
@@ -449,7 +449,7 @@ xwer_t xwmp_plsem_freeze(struct xwmp_sem * sem)
                 rc = -EALREADY;
         } else {
                 sem->count = XWMP_SEM_NEGTIVE;
-#  if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#  if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
                 struct xwmp_evt * evt;
                 struct xwmp_synobj * synobj;
 
@@ -546,7 +546,7 @@ xwer_t xwmp_plsem_post(struct xwmp_sem * sem)
                         } else {
                                 rc = -ERANGE;
                         }
-#  if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#  if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
                         if (sem->count > 0) {
                                 struct xwmp_evt * evt;
                                 struct xwmp_synobj * synobj;
@@ -740,7 +740,7 @@ xwer_t xwmp_plsem_test(struct xwmp_sem * sem, struct xwmp_skd * xwskd,
                 }
         } else {
                 sem->count--;
-#  if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#  if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
                 if (0 == sem->count) {
                         struct xwmp_evt * evt;
                         struct xwmp_synobj * synobj;
@@ -783,7 +783,7 @@ xwer_t xwmp_plsem_wait_to(struct xwmp_sem * sem, xwtm_t to)
                 }
         } else if (!xwmp_skd_tstpmpt(xwskd)) {
                 rc = -ECANNOTPMPT;
-#  if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#  if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         } else if (!xwmp_skd_tstbh(xwskd)) {
                 rc = -ECANNOTBH;
 #  endif
@@ -849,7 +849,7 @@ xwer_t xwmp_plsem_test_unintr(struct xwmp_sem * sem,
                 rc = xwmp_plsem_blkthd_unlkwq_cpuirqrs(sem, thd, xwskd, cpuirq);
         } else {
                 sem->count--;
-#  if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#  if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
                 if (0 == sem->count) {
                         struct xwmp_evt * evt;
                         struct xwmp_synobj * synobj;
@@ -878,7 +878,7 @@ xwer_t xwmp_plsem_wait_unintr(struct xwmp_sem * sem)
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
         if (!xwmp_skd_tstpmpt(xwskd)) {
                 rc = -ECANNOTPMPT;
-#  if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#  if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         } else if (!xwmp_skd_tstbh(xwskd)) {
                 rc = -ECANNOTBH;
 #  endif
@@ -898,7 +898,7 @@ xwer_t xwmp_plsem_trywait(struct xwmp_sem * sem)
         xwmp_plwq_lock_cpuirqsv(&sem->wq.pl, &cpuirq);
         if (sem->count > 0) {
                 sem->count--;
-#  if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#  if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
                 if (0 == sem->count) {
                         struct xwmp_evt * evt;
                         struct xwmp_synobj * synobj;
@@ -920,7 +920,7 @@ xwer_t xwmp_plsem_trywait(struct xwmp_sem * sem)
 }
 #endif
 
-#if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
+#if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
 /**
  * @brief 激活并初始化实时信号量对象
  * @param[in] sem: 信号量对象的指针
@@ -967,7 +967,7 @@ xwer_t xwmp_rtsem_freeze(struct xwmp_sem * sem)
                 rc = -EALREADY;
         } else {
                 sem->count = XWMP_SEM_NEGTIVE;
-#  if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#  if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
                 struct xwmp_evt * evt;
                 struct xwmp_synobj * synobj;
 
@@ -1066,7 +1066,7 @@ xwer_t xwmp_rtsem_post(struct xwmp_sem * sem)
                         } else {
                                 rc = -ERANGE;
                         }
-#  if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#  if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
                         if (sem->count > 0) {
                                 struct xwmp_evt * evt;
                                 struct xwmp_synobj * synobj;
@@ -1258,7 +1258,7 @@ xwer_t xwmp_rtsem_test(struct xwmp_sem * sem, struct xwmp_skd * xwskd,
                 }
         } else {
                 sem->count--;
-#  if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#  if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
                 if (0 == sem->count) {
                         struct xwmp_evt * evt;
                         struct xwmp_synobj * synobj;
@@ -1301,7 +1301,7 @@ xwer_t xwmp_rtsem_wait_to(struct xwmp_sem * sem, xwtm_t to)
                 }
         } else if (!xwmp_skd_tstpmpt(xwskd)) {
                 rc = -ECANNOTPMPT;
-#  if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#  if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         } else if (!xwmp_skd_tstbh(xwskd)) {
                 rc = -ECANNOTBH;
 #  endif
@@ -1367,7 +1367,7 @@ xwer_t xwmp_rtsem_test_unintr(struct xwmp_sem * sem,
                 rc = xwmp_rtsem_blkthd_unlkwq_cpuirqrs(sem, thd, xwskd, cpuirq);
         } else {
                 sem->count--;
-#  if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#  if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
                 if (0 == sem->count) {
                         struct xwmp_evt * evt;
                         struct xwmp_synobj * synobj;
@@ -1396,7 +1396,7 @@ xwer_t xwmp_rtsem_wait_unintr(struct xwmp_sem * sem)
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
         if (!xwmp_skd_tstpmpt(xwskd)) {
                 rc = -ECANNOTPMPT;
-#  if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#  if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         } else if (!xwmp_skd_tstbh(xwskd)) {
                 rc = -ECANNOTBH;
 #  endif
@@ -1415,7 +1415,7 @@ xwer_t xwmp_rtsem_trywait(struct xwmp_sem * sem)
         xwmp_rtwq_lock_cpuirqsv(&sem->wq.rt, &cpuirq);
         if (sem->count > 0) {
                 sem->count--;
-#  if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#  if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
                 if (0 == sem->count) {
                         struct xwmp_evt * evt;
                         struct xwmp_synobj * synobj;

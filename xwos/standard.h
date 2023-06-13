@@ -50,7 +50,7 @@
 #  define xw_array_size(ay) (sizeof(ay) / sizeof((ay)[0]))
 #endif
 
-#if defined(XWKNCFG_BUG) && (1 == XWKNCFG_BUG)
+#if defined(XWOSCFG_BUG) && (1 == XWOSCFG_BUG)
 #  if defined(SOCCFG_BKPT) && (1 == SOCCFG_BKPT)
 #    define XWOS_BUG()          soc_bkpt() /**< 报告BUG */
 #  else
@@ -74,7 +74,7 @@
  * @param[in] errstr: 条件表达式为假时的错误信息
  * @param[in] ...: 返回值
  */
-#if defined(XWKNCFG_CHECK_PARAMETERS) && (1 == XWKNCFG_CHECK_PARAMETERS)
+#if defined(XWOSCFG_CHECK_PARAMETERS) && (1 == XWOSCFG_CHECK_PARAMETERS)
 #  define XWOS_VALIDATE(exp, errstr, ...)       \
           if (__xwcc_unlikely((!(exp)))) {      \
               return __VA_ARGS__;               \

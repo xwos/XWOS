@@ -34,6 +34,7 @@ void throwFunc(std::out_of_range * e)
 
 void testStdExcept(int a)
 {
+  printf("++++++++ C++ Exception test ++++++++\n");
   try {
     if (a > 100) {
       throwFunc(new std::out_of_range("GT 100"));
@@ -44,4 +45,5 @@ void testStdExcept(int a)
     cxxlogf(INFO, "throw exception:%s\n", e->what());
     delete e;
   }
+  printf("-------- C++ Exception test --------\n");
 }

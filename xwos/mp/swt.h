@@ -49,7 +49,7 @@ struct xwmp_swt {
 };
 
 /* public */
-#if defined(XWMPCFG_SKD_SWT_MEMSLICE) && (1 == XWMPCFG_SKD_SWT_MEMSLICE)
+#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
 xwer_t xwmp_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
 

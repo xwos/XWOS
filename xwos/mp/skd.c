@@ -54,7 +54,7 @@
 #include <xwos/mp/thd.h>
 #include <xwos/mp/rtrq.h>
 #include <xwos/mp/tt.h>
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 #  include <xwos/mp/bh.h>
 #endif
 
@@ -68,14 +68,14 @@ struct xwmp_skd xwmp_skd[CPUCFG_CPU_NUM];
  * @brief 每CPU的调度器的空闲线程栈
  */
 __xwmp_data __xwcc_alignl1cache
-xwu8_t xwmp_skd_idled_stack[CPUCFG_CPU_NUM][XWMPCFG_SKD_IDLE_STACK_SIZE];
+xwu8_t xwmp_skd_idled_stack[CPUCFG_CPU_NUM][XWOSCFG_SKD_IDLE_STACK_SIZE];
 
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 /**
  * @brief 每CPU的调度器的中断底半部栈
  */
 __xwmp_data __xwcc_alignl1cache
-xwu8_t xwmp_skd_bhd_stack[CPUCFG_CPU_NUM][XWMPCFG_SKD_BH_STACK_SIZE];
+xwu8_t xwmp_skd_bhd_stack[CPUCFG_CPU_NUM][XWOSCFG_SKD_BH_STACK_SIZE];
 #endif
 
 #if defined(BRDCFG_XWSKD_IDLE_HOOK) && (1 == BRDCFG_XWSKD_IDLE_HOOK)
@@ -111,7 +111,7 @@ xwer_t xwmp_skd_idled(struct xwmp_skd * xwskd);
 static __xwmp_code
 void xwmp_skd_init_idled(struct xwmp_skd * xwskd);
 
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 static __xwmp_code
 xwer_t xwmp_skd_bhd(struct xwmp_skd * xwskd);
 
@@ -171,7 +171,7 @@ xwer_t xwmp_skd_init_lc(void)
         xwskd->req_schedule_cnt = 0;
         xwskd->req_chkpmpt_cnt = 0;
         xwskd->dis_pmpt_cnt = 0;
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwskd->req_bh_cnt = 0;
         xwskd->dis_bh_cnt = 0;
         xwmp_bh_cb_init(&xwskd->bhcb);
@@ -442,7 +442,7 @@ void xwmp_skd_init_idled(struct xwmp_skd * xwskd)
         xwskd->idle.name = NULL;
         xwskd->idle.main = (xwmp_thd_f)xwmp_skd_idled;
         xwskd->idle.arg = xwskd;
-        xwskd->idle.size = XWMPCFG_SKD_IDLE_STACK_SIZE;
+        xwskd->idle.size = XWOSCFG_SKD_IDLE_STACK_SIZE;
         xwskd->idle.base = (xwstk_t *)xwmp_skd_idled_stack[xwskd->id];
 #if (defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK))
         xwskd->idle.sp = xwskd->idle.base + (xwskd->idle.size / sizeof(xwstk_t));
@@ -462,12 +462,12 @@ void xwmp_skd_init_idled(struct xwmp_skd * xwskd)
         xwskd->idle.guard = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
         xwskd->idle.flag = XWMP_SKDOBJ_FLAG_PRIVILEGED;
         xwospl_skd_init_stack(&xwskd->idle, xwmp_cthd_return);
-#if (defined(XWMPCFG_SKD_IDLE_TLS) && (1 == XWMPCFG_SKD_IDLE_TLS))
+#if (defined(XWOSCFG_SKD_IDLE_TLS) && (1 == XWOSCFG_SKD_IDLE_TLS))
         xwospl_tls_init(&xwskd->idle);
 #endif
 }
 
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 /**
  * @brief 中断底半部的主函数
  * @param[in] xwskd: XWOS MP调度器的指针
@@ -509,7 +509,7 @@ void xwmp_skd_init_bhd(struct xwmp_skd * xwskd)
         xwskd->bh.name = NULL;
         xwskd->bh.main = (xwmp_thd_f)xwmp_skd_bhd;
         xwskd->bh.arg = xwskd;
-        xwskd->bh.size = XWMPCFG_SKD_BH_STACK_SIZE;
+        xwskd->bh.size = XWOSCFG_SKD_BH_STACK_SIZE;
         xwskd->bh.base = (xwstk_t *)xwmp_skd_bhd_stack[xwskd->id];
 #  if defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK)
         xwskd->bh.sp = xwskd->bh.base + (xwskd->bh.size / sizeof(xwstk_t));
@@ -529,7 +529,7 @@ void xwmp_skd_init_bhd(struct xwmp_skd * xwskd)
         xwskd->bh.guard = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
         xwskd->bh.flag = XWMP_SKDOBJ_FLAG_PRIVILEGED;
         xwospl_skd_init_stack(&xwskd->bh, xwmp_cthd_return);
-#if (defined(XWMPCFG_SKD_BH_TLS) && (1 == XWMPCFG_SKD_BH_TLS))
+#if (defined(XWOSCFG_SKD_BH_TLS) && (1 == XWOSCFG_SKD_BH_TLS))
         xwospl_tls_init(&xwskd->bh);
 #endif
 }
@@ -738,7 +738,7 @@ bool xwmp_skd_tst_in_bh_lc(void)
         xwskd = xwmp_skd_get_lc();
         return !!(XWMP_SKD_BH_STK(xwskd) == xwskd->cstk);
 }
-#endif /* XWMPCFG_SKD_BH */
+#endif
 
 __xwmp_api
 struct xwmp_skd * xwmp_skd_dspmpt_lc(void)
@@ -857,7 +857,7 @@ bool xwmp_skd_chkpmpt_thd(struct xwmp_skd * xwskd, struct xwmp_thd * t)
 
         xwrtrq = &xwskd->rq.rt;
         XWOS_BUG_ON(&t->stack == &xwskd->idle);
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         XWOS_BUG_ON(&t->stack == &xwskd->bh);
 #endif
         xwmp_rawly_lock(&xwrtrq->lock);
@@ -894,7 +894,7 @@ void xwmp_skd_chkpmpt(struct xwmp_skd * xwskd)
                 xwaop_add(xwsq_t, &xwskd->req_chkpmpt_cnt, 1, NULL, NULL);
         } else {
                 xwmp_rawly_lock_cpuirqsv(&xwskd->cxlock, &cpuirq);
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
                 if (XWMP_SKD_BH_STK(xwskd) == xwskd->cstk) {
                         cstk = xwskd->pstk;
                 } else {
@@ -1056,7 +1056,7 @@ struct xwmp_skd * xwmp_skd_post_swcx_lic(struct xwmp_skd * xwskd)
         return xwskd;
 }
 
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 /**
  * @brief 请求切换上下文
  * @param[in] xwskd: XWOS MP调度器的指针

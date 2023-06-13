@@ -45,7 +45,7 @@ xwer_t xwup_cond_release(struct xwup_cond * cond, xwsq_t tik);
 xwer_t xwup_cond_grab(struct xwup_cond * cond);
 xwer_t xwup_cond_put(struct xwup_cond * cond);
 
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
 xwer_t xwup_cond_bind(struct xwup_cond * cond, struct xwup_evt * evt, xwsq_t pos);
 xwer_t xwup_cond_unbind(struct xwup_cond * cond, struct xwup_evt * evt);
 #else

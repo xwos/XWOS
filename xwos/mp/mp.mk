@@ -30,7 +30,7 @@ XWOS_CSRCS += mp/pm.c
 XWOS_CSRCS += mp/mtxtree.c
 
 ######## ######## ######## ######## swt ######## ######## ######## ########
-ifeq ($(XWMPCFG_SKD_SWT),y)
+ifeq ($(XWOSCFG_SKD_SWT),y)
     XWOS_CSRCS += mp/swt.c
 endif
 
@@ -42,7 +42,7 @@ XWOS_CSRCS += mp/lock/mtx.c
 XWOS_CSRCS += mp/sync/obj.c
 XWOS_CSRCS += mp/sync/sem.c
 XWOS_CSRCS += mp/sync/cond.c
-ifeq ($(XWMPCFG_SYNC_EVT),y)
+ifeq ($(XWOSCFG_SYNC_EVT),y)
     XWOS_CSRCS += mp/sync/evt.c
 endif
 

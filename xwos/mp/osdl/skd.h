@@ -27,7 +27,7 @@
 #define XWOSDL_SKD_CONTEXT_BH                   XWMP_SKD_CONTEXT_BH
 #define XWOSDL_SKD_CONTEXT_IDLE                 XWMP_SKD_CONTEXT_IDLE
 
-#define XWOSDL_SKD_TC_PER_S                     (XWTM_S(1) / XWMPCFG_SYSHWT_PERIOD)
+#define XWOSDL_SKD_TC_PER_S                     (XWTM_S(1) / XWOSCFG_SYSHWT_PERIOD)
 
 static __xwcc_inline
 bool xwosdl_skd_prio_tst_valid(xwpr_t prio)

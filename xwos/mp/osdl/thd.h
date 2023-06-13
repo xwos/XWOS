@@ -15,8 +15,8 @@
 
 #include <xwos/mp/thd.h>
 
-#if defined(XWMPCFG_SKD_THD_LOCAL_DATA_NUM)
-#  define XWOSDL_THD_LOCAL_DATA_NUM             XWMPCFG_SKD_THD_LOCAL_DATA_NUM
+#if defined(XWOSCFG_SKD_THD_LOCAL_DATA_NUM)
+#  define XWOSDL_THD_LOCAL_DATA_NUM             XWOSCFG_SKD_THD_LOCAL_DATA_NUM
 #else
 #  define XWOSDL_THD_LOCAL_DATA_NUM            (0U)
 #endif
@@ -136,7 +136,7 @@ xwer_t xwosdl_cthd_freeze(void)
         return xwmp_cthd_freeze();
 }
 
-#if defined(XWMPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWMPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
+#if defined(XWOSCFG_SKD_THD_LOCAL_DATA_NUM) && (XWOSCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
 xwer_t xwosdl_thd_set_data(struct xwosdl_thd * thd, xwsq_t tik,
                            xwsq_t pos, void * data);
 

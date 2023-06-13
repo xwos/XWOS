@@ -87,9 +87,9 @@ struct xwmp_thd {
                 xwpr_t wq; /**< 线程的等待态优先级 */
         } dprio; /**< 线程的动态优先级，被<em><b>stlock</b></em>保护 */
 
-#if defined(XWMPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWMPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
+#if defined(XWOSCFG_SKD_THD_LOCAL_DATA_NUM) && (XWOSCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
         /* 线程私有数据 */
-        void * data[XWMPCFG_SKD_THD_LOCAL_DATA_NUM];
+        void * data[XWOSCFG_SKD_THD_LOCAL_DATA_NUM];
 #endif
         struct {
                 int __errno; /**< 错误码 */
@@ -123,7 +123,7 @@ xwer_t xwmp_thd_freeze_lic(struct xwmp_thd * thd);
 void xwmp_thd_immigrate_lic(struct xwmp_thd * thd);
 xwer_t xwmp_thd_outmigrate_lic(struct xwmp_thd * thd, xwid_t dstcpu);
 
-#if defined(XWMPCFG_SKD_THD_MEMSLICE) && (1 == XWMPCFG_SKD_THD_MEMSLICE)
+#if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
 xwer_t xwmp_thd_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
 
@@ -152,7 +152,7 @@ bool xwmp_cthd_shld_stop(void);
 bool xwmp_cthd_frz_shld_stop(bool * frozen);
 xwer_t xwmp_thd_migrate(struct xwmp_thd * thd, xwid_t dstcpu);
 
-#if defined(XWMPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWMPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
+#if defined(XWOSCFG_SKD_THD_LOCAL_DATA_NUM) && (XWOSCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
 xwer_t xwmp_thd_set_data(struct xwmp_thd * thd, xwsq_t pos, void * data);
 xwer_t xwmp_thd_get_data(struct xwmp_thd * thd, xwsq_t pos, void ** databuf);
 xwer_t xwmp_cthd_set_data(xwsq_t pos, void * data);

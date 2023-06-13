@@ -18,12 +18,12 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/up/rtrq.h>
 #include <xwos/up/pm.h>
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 #  include <xwos/up/bh.h>
 #endif
 #include <xwos/up/tt.h>
 
-#define XWUP_SKD_PRIORITY_RT_NUM                ((xwpr_t)XWUPCFG_SKD_PRIORITY_RT_NUM)
+#define XWUP_SKD_PRIORITY_RT_NUM                ((xwpr_t)XWOSCFG_SKD_PRIORITY_RT_NUM)
 #define XWUP_SKD_PRIORITY_RT_MIN                ((xwpr_t)0)
 #define XWUP_SKD_PRIORITY_RT_MAX                (XWUP_SKD_PRIORITY_RT_NUM - 1)
 #define XWUP_SKD_PRIORITY_INVALID               ((xwpr_t) - 1)
@@ -31,7 +31,7 @@
 #define XWUP_SKD_PRIORITY_DROP(base, dec)       ((base) - (dec))
 
 #define XWUP_SKD_IDLE_STK(xwskd)                (&((xwskd)->idle))
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 #  define XWUP_SKD_BH_STK(xwskd)                (&((xwskd)->bh))
 #endif
 
@@ -104,7 +104,7 @@ enum xwup_skd_context_em {
         XWUP_SKD_CONTEXT_IDLE, /**< 空闲任务 */
 };
 
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
 /**
  * @brief 电源管理回调函数集合
  */
@@ -145,14 +145,14 @@ struct xwup_skd {
         xwsq_t req_schedule_cnt; /**< 请求调度的计数器 */
         xwsq_t req_chkpmpt_cnt; /**< 请求检查抢占的计数器 */
         xwsq_t dis_pmpt_cnt; /**< 关闭抢占的计数器 */
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwsq_t req_bh_cnt; /**< 请求进入中断底半部的计数器 */
         xwsq_t dis_bh_cnt; /**< 关闭中断底半部的计数器 */
         struct xwup_bh_cb bhcb; /**< 中断底半部控制块 */
         struct xwup_skdobj_stack bh; /**< 中断底半部任务的栈信息 */
 #endif
         struct xwup_tt tt; /**< 时间树 */
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         struct xwup_skd_pm pm; /**< 调度器低功耗控制块 */
 #endif
         struct xwlib_bclst_head thdlist; /**< 本调度器中所有线程的链表头 */
@@ -164,7 +164,7 @@ struct xwup_skd {
 struct xwup_skd * xwup_skd_get_lc(void);
 struct xwup_thd * xwup_skd_get_cthd_lc(void);
 
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 xwer_t xwup_skd_req_bh(void);
 #endif
 
@@ -187,7 +187,7 @@ xwer_t xwup_skd_start_lc(void);
 xwer_t xwup_skd_start_syshwt_lc(void);
 xwer_t xwup_skd_stop_syshwt_lc(void);
 
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 struct xwup_skd * xwup_skd_dsbh_lc(void);
 struct xwup_skd * xwup_skd_enbh_lc(void);
 struct xwup_skd * xwup_skd_svbh_lc(xwsq_t * dis_bh_cnt);

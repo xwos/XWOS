@@ -105,7 +105,7 @@ xwer_t xwosdl_sem_unbind(struct xwosdl_sem * sem, struct xwosdl_sel * sel)
         return xwmp_sem_unbind(sem, sel);
 }
 
-#if defined(XWMPCFG_SYNC_RTSEM) && (1 == XWMPCFG_SYNC_RTSEM)
+#if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
 static __xwcc_inline
 xwer_t xwosdl_sem_init(struct xwosdl_sem * sem, xwssq_t val, xwssq_t max)
 {
@@ -175,7 +175,7 @@ xwer_t xwosdl_sem_trywait(struct xwosdl_sem * sem)
         return xwmp_rtsem_trywait(sem);
 }
 
-#elif defined(XWMPCFG_SYNC_PLSEM) && (1 == XWMPCFG_SYNC_PLSEM)
+#elif defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
 
 static __xwcc_inline
 xwer_t xwosdl_sem_init(struct xwosdl_sem * sem, xwssq_t val, xwssq_t max)

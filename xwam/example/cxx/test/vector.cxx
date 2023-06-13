@@ -18,6 +18,7 @@
  * > limitations under the License.
  */
 
+#include <cstdio>
 #include <vector>
 #include "test/vector.hxx"
 
@@ -26,11 +27,11 @@ class Data {
   Data(int v);
   ~Data();
  public:
-  int mVersion;
+  int mVal;
 };
 
 Data::Data(int v) :
-    mVersion(v)
+    mVal(v)
 {
 }
 
@@ -43,22 +44,25 @@ Data gData(1);
 
 void testStdVector(void)
 {
-  ::std::vector<Data> array;
+  std::vector<Data> array;
 
+  printf("++++++++ C++ std::vector test ++++++++\n");
   Data * d = new Data(2);
   array.push_back(gData);
   array.push_back(*d);
 
   auto sz = array.size();
-  (void)sz;
+  printf("After inserting, vector size: %d\n", sz);
 
+  printf("vector: ");
   auto it = array.begin();
   for (; it != array.end(); ++it) {
-    if (2 == it->mVersion) {
-      break;
-    }
+    printf("%d ", it->mVal);
   }
+  printf("\n");
   array.erase(it);
   sz = array.size();
+  printf("After erasing, vector size: %d\n", sz);
+  printf("-------- C++ std::vector test --------\n");
   delete d;
 }

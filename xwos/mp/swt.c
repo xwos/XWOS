@@ -14,9 +14,9 @@
 #include <xwos/lib/object.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
-#if defined(XWMPCFG_SKD_SWT_MEMSLICE) && (1 == XWMPCFG_SKD_SWT_MEMSLICE)
+#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
 #  include <xwos/mm/memslice.h>
-#elif defined(XWMPCFG_SKD_SWT_STDC_MM) && (1 == XWMPCFG_SKD_SWT_STDC_MM)
+#elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
 #  include <stdlib.h>
 #endif
 #include <xwos/mp/skd.h>
@@ -47,7 +47,7 @@ xwer_t xwmp_swt_dgc(void * swt);
 static __xwmp_code
 void xwmp_swt_ttn_cb(void * entry);
 
-#if defined(XWMPCFG_SKD_SWT_MEMSLICE) && (1 == XWMPCFG_SKD_SWT_MEMSLICE)
+#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
 /**
  * @brief 软件定时器对象缓存
  */
@@ -59,7 +59,7 @@ static __xwmp_data struct xwmm_memslice xwmp_swt_cache;
 const __xwmp_rodata char xwmp_swt_cache_name[] = "xwos.mp.swt.cache";
 #endif
 
-#if defined(XWMPCFG_SKD_SWT_MEMSLICE) && (1 == XWMPCFG_SKD_SWT_MEMSLICE)
+#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
 /**
  * @brief XWMP INIT CODE：初始化软件定时器对象缓存
  * @param[in] zone_origin: 内存区域首地址
@@ -89,7 +89,7 @@ xwer_t xwmp_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 static __xwmp_code
 struct xwmp_swt * xwmp_swt_alloc(void)
 {
-#if defined(XWMPCFG_SKD_SWT_MEMSLICE) && (1 == XWMPCFG_SKD_SWT_MEMSLICE)
+#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
         union {
                 struct xwmp_swt * swt;
                 void * anon;
@@ -101,7 +101,7 @@ struct xwmp_swt * xwmp_swt_alloc(void)
                 mem.swt = err_ptr(rc);
         }/* else {} */
         return mem.swt;
-#elif defined(XWMPCFG_SKD_SWT_STDC_MM) && (1 == XWMPCFG_SKD_SWT_STDC_MM)
+#elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
         struct xwmp_swt * swt;
 
         swt = malloc(sizeof(struct xwmp_swt));
@@ -135,9 +135,9 @@ struct xwmp_swt * xwmp_swt_alloc(void)
 static __xwmp_code
 void xwmp_swt_free(struct xwmp_swt * swt)
 {
-#if defined(XWMPCFG_SKD_SWT_MEMSLICE) && (1 == XWMPCFG_SKD_SWT_MEMSLICE)
+#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
         xwmm_memslice_free(&xwmp_swt_cache, swt);
-#elif defined(XWMPCFG_SKD_SWT_STDC_MM) && (1 == XWMPCFG_SKD_SWT_STDC_MM)
+#elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
         xwmp_swt_destruct(swt);
         free(swt);
 #else

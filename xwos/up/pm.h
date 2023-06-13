@@ -45,7 +45,7 @@ enum xwup_skd_pm_stage_em {
 
 typedef void (* xwup_skd_pm_cb_f)(void *); /**< 电源管理回调函数 */
 
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
 void xwup_skd_set_pm_cb(xwup_skd_pm_cb_f resume_cb,
                         xwup_skd_pm_cb_f suspend_cb,
                         xwup_skd_pm_cb_f wakeup_cb,

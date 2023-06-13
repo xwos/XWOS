@@ -204,7 +204,7 @@ void xwup_sqlk_rdex_unlock_irqsrs(struct xwup_sqlk * sql,
         }
 }
 
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 __xwup_api
 void xwup_sqlk_rdex_lock_bh(struct xwup_sqlk * sql)
 {
@@ -380,7 +380,7 @@ void xwup_sqlk_wr_unlock_irqsrs(struct xwup_sqlk * sql,
         }
 }
 
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 __xwup_api
 void xwup_sqlk_wr_lock_bh(struct xwup_sqlk * sql)
 {

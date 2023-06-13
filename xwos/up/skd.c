@@ -27,7 +27,7 @@
 #include <xwos/up/rtrq.h>
 #include <xwos/up/tt.h>
 #include <xwos/up/skd.h>
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 #  include <xwos/up/bh.h>
 #endif
 
@@ -40,14 +40,14 @@ __xwup_data struct xwup_skd xwup_skd;
  * @brief XWOS UP调度器的空闲线程栈
  */
 __xwup_data __xwcc_alignl1cache
-xwu8_t xwup_skd_idled_stack[XWUPCFG_SKD_IDLE_STACK_SIZE];
+xwu8_t xwup_skd_idled_stack[XWOSCFG_SKD_IDLE_STACK_SIZE];
 
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 /**
  * @brief XWOS UP调度器的中断底半部栈
  */
 __xwup_data __xwcc_alignl1cache
-xwu8_t xwup_skd_bhd_stack[XWUPCFG_SKD_BH_STACK_SIZE];
+xwu8_t xwup_skd_bhd_stack[XWOSCFG_SKD_BH_STACK_SIZE];
 #endif
 
 #if defined(BRDCFG_XWSKD_IDLE_HOOK) && (1 == BRDCFG_XWSKD_IDLE_HOOK)
@@ -68,7 +68,7 @@ void board_xwskd_post_swcx_hook(struct xwup_skd * xwskd);
 static __xwup_code
 struct xwup_thd * xwup_skd_rtrq_choose(void);
 
-#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
 static __xwup_code
 void xwup_skd_del_thd_lc(struct xwup_skd * xwskd);
 #endif
@@ -79,7 +79,7 @@ xwer_t xwup_skd_idled(struct xwup_skd * xwskd);
 static __xwup_code
 void xwup_skd_init_idled(void);
 
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 static __xwup_code
 xwer_t xwup_skd_bhd(struct xwup_skd * xwskd);
 
@@ -99,7 +99,7 @@ xwer_t xwup_skd_swcx(void);
 static __xwup_code
 void xwup_skd_finish_swcx_lic(struct xwup_skd * xwskd);
 
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
 static __xwup_code
 void xwup_skd_notify_allfrz_lc(struct xwup_skd * xwskd);
 
@@ -126,7 +126,7 @@ xwer_t xwup_skd_init_lc(void)
         xwskd->req_schedule_cnt = 0;
         xwskd->req_chkpmpt_cnt = 0;
         xwskd->dis_pmpt_cnt = 0;
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwskd->req_bh_cnt = 0;
         xwskd->dis_bh_cnt = 0;
         xwup_bh_cb_init(&xwskd->bhcb);
@@ -141,7 +141,7 @@ xwer_t xwup_skd_init_lc(void)
         }
         xwup_rtrq_init(&xwskd->rq.rt);
         xwup_skd_init_idled();
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         xwskd->pm.wklkcnt = XWUP_SKD_WKLKCNT_UNLOCKED;
         xwskd->pm.frz_thd_cnt = 0;
         xwlib_bclst_init_head(&xwskd->pm.frzlist);
@@ -264,7 +264,7 @@ struct xwup_thd * xwup_skd_rtrq_choose(void)
         return t;
 }
 
-#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
 /**
  * @brief 删除“删除列表”中的线程
  * @param[in] xwskd: XWOS UP调度器的指针
@@ -298,10 +298,10 @@ xwer_t xwup_skd_idled(struct xwup_skd * xwskd)
         XWOS_UNUSED(xwskd);
 
         while (true) {
-#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
                 xwup_skd_del_thd_lc(xwskd);
 #endif
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
                 xwup_skd_notify_allfrz_lc(xwskd);
 #endif
 #if (defined(BRDCFG_XWSKD_IDLE_HOOK) && (1 == BRDCFG_XWSKD_IDLE_HOOK))
@@ -323,7 +323,7 @@ void xwup_skd_init_idled(void)
         xwskd->idle.name = NULL;
         xwskd->idle.main = (xwup_thd_f)xwup_skd_idled;
         xwskd->idle.arg = xwskd;
-        xwskd->idle.size = XWUPCFG_SKD_IDLE_STACK_SIZE;
+        xwskd->idle.size = XWOSCFG_SKD_IDLE_STACK_SIZE;
         xwskd->idle.base = (xwstk_t *)xwup_skd_idled_stack;
 #if (defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK))
         xwskd->idle.sp = xwskd->idle.base + (xwskd->idle.size / sizeof(xwstk_t));
@@ -343,12 +343,12 @@ void xwup_skd_init_idled(void)
         xwskd->idle.guard = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
         xwskd->idle.flag = XWUP_SKDOBJ_FLAG_PRIVILEGED;
         xwospl_skd_init_stack(&xwskd->idle, xwup_cthd_return);
-#if (defined(XWUPCFG_SKD_IDLE_TLS) && (1 == XWUPCFG_SKD_IDLE_TLS))
+#if (defined(XWOSCFG_SKD_IDLE_TLS) && (1 == XWOSCFG_SKD_IDLE_TLS))
         xwospl_tls_init(&xwskd->idle);
 #endif
 }
 
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 /**
  * @brief 中断底半部的主函数
  * @param[in] xwskd: XWOS UP调度器的指针
@@ -395,7 +395,7 @@ void xwup_skd_init_bhd(void)
         xwskd->bh.name = NULL;
         xwskd->bh.main = (xwup_thd_f)xwup_skd_bhd;
         xwskd->bh.arg = xwskd;
-        xwskd->bh.size = XWUPCFG_SKD_BH_STACK_SIZE;
+        xwskd->bh.size = XWOSCFG_SKD_BH_STACK_SIZE;
         xwskd->bh.base = (xwstk_t *)xwup_skd_bhd_stack;
 #if defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK)
         xwskd->bh.sp = xwskd->bh.base + (xwskd->bh.size / sizeof(xwstk_t));
@@ -415,7 +415,7 @@ void xwup_skd_init_bhd(void)
         xwskd->bh.guard = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
         xwskd->bh.flag = XWUP_SKDOBJ_FLAG_PRIVILEGED;
         xwospl_skd_init_stack(&xwskd->bh, xwup_cthd_return);
-#if (defined(XWUPCFG_SKD_BH_TLS) && (1 == XWUPCFG_SKD_BH_TLS))
+#if (defined(XWOSCFG_SKD_BH_TLS) && (1 == XWOSCFG_SKD_BH_TLS))
         xwospl_tls_init(&xwskd->bh);
 #endif
 }
@@ -624,7 +624,7 @@ struct xwup_skd * xwup_skd_enpmpt_lc(void)
                 if (0 != xwskd->req_chkpmpt_cnt) {
                         struct xwup_skdobj_stack * cstk;
 
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
                         if (XWUP_SKD_BH_STK(xwskd) == xwskd->cstk) {
                                 cstk = xwskd->pstk;
                         } else {
@@ -689,7 +689,7 @@ struct xwup_skd * xwup_skd_rspmpt_lc(xwsq_t dis_pmpt_cnt)
                 if (0 != xwskd->req_chkpmpt_cnt) {
                         struct xwup_skdobj_stack * cstk;
 
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
                         if (XWUP_SKD_BH_STK(xwskd) == xwskd->cstk) {
                                 cstk = xwskd->pstk;
                         } else {
@@ -779,7 +779,7 @@ void xwup_skd_chkpmpt(void)
         if (0 != xwskd->dis_pmpt_cnt) {
                 xwskd->req_chkpmpt_cnt++;
         } else {
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
                 if (XWUP_SKD_BH_STK(xwskd) == xwskd->cstk) {
                         cstk = xwskd->pstk;
                 } else {
@@ -915,7 +915,7 @@ struct xwup_skd * xwup_skd_post_swcx_lic(struct xwup_skd * xwskd)
         return xwskd;
 }
 
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 /**
  * @brief 请求切换上下文
  * @return 错误码
@@ -1084,7 +1084,7 @@ void xwup_skd_intr_all(void)
         xwospl_cpuirq_restore_lc(cpuirq);
 }
 
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
 /**
  * @brief XWUP PM API：设置电源管理回调函数
  * @param[in] resume_cb: 从暂停模式恢复的回调函数

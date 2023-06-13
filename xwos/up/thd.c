@@ -18,7 +18,7 @@
 #include <xwos/lib/rbtree.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
-#if defined(XWUPCFG_SKD_THD_STDC_MM) && (1 == XWUPCFG_SKD_THD_STDC_MM)
+#if defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
 #  include <stdlib.h>
 #endif
 #include <xwos/ospl/irq.h>
@@ -35,20 +35,20 @@
 #endif
 #include <xwos/up/tt.h>
 #include <xwos/up/thd.h>
-#if defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)
+#if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
 #  include <xwos/up/lock/mtx.h>
 #  include <xwos/up/mtxtree.h>
 #endif
-#if defined(XWUPCFG_LOCK_FAKEMTX) && (1 == XWUPCFG_LOCK_FAKEMTX)
+#if defined(XWOSCFG_LOCK_FAKEMTX) && (1 == XWOSCFG_LOCK_FAKEMTX)
 #  include <xwos/up/lock/fakemtx.h>
 #endif
-#if defined(XWUPCFG_SYNC_PLSEM) && (1 == XWUPCFG_SYNC_PLSEM)
+#if defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
 #  include <xwos/up/sync/plsem.h>
 #endif
-#if defined(XWUPCFG_SYNC_RTSEM) && (1 == XWUPCFG_SYNC_RTSEM)
+#if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
 #  include <xwos/up/sync/rtsem.h>
 #endif
-#if defined(XWUPCFG_SYNC_COND) && (1 == XWUPCFG_SYNC_COND)
+#if defined(XWOSCFG_SYNC_COND) && (1 == XWOSCFG_SYNC_COND)
 #  include <xwos/up/sync/cond.h>
 #endif
 
@@ -176,7 +176,7 @@ xwer_t xwup_thd_put(struct xwup_thd * thd)
 static __xwup_code
 struct xwup_thd * xwup_thd_alloc(void)
 {
-#if defined(XWUPCFG_SKD_THD_STDC_MM) && (1 == XWUPCFG_SKD_THD_STDC_MM)
+#if defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         struct xwup_thd * thd;
 
         thd = malloc(sizeof(struct xwup_thd));
@@ -210,7 +210,7 @@ struct xwup_thd * xwup_thd_alloc(void)
 static __xwup_code
 void xwup_thd_free(struct xwup_thd * thd)
 {
-#if defined(XWUPCFG_SKD_THD_STDC_MM) && (1 == XWUPCFG_SKD_THD_STDC_MM)
+#if defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         free(thd);
 #else
         xwmm_kma_free(thd);
@@ -237,7 +237,7 @@ xwstk_t * xwup_thd_stack_alloc(xwsz_t stack_size)
                 mem.stkbase = err_ptr(rc);
         }/* else {} */
         return mem.stkbase;
-#elif defined(XWUPCFG_SKD_THD_STDC_MM) && (1 == XWUPCFG_SKD_THD_STDC_MM)
+#elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         xwstk_t * stkbase;
 
         stkbase = malloc(stack_size);
@@ -270,7 +270,7 @@ xwer_t xwup_thd_stack_free(xwstk_t * stk)
 {
 #if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
         return board_thd_stack_pool_free(stk);
-#elif defined(XWUPCFG_SKD_THD_STDC_MM) && (1 == XWUPCFG_SKD_THD_STDC_MM)
+#elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         free(stk);
         return XWOK;
 #else
@@ -312,7 +312,7 @@ xwer_t xwup_thd_activate(struct xwup_thd * thd,
         xwlib_bclst_init_node(&thd->rqnode);
         xwup_ttn_init(&thd->ttn, (xwptr_t)thd, XWUP_TTN_TYPE_THD);
         xwup_wqn_init(&thd->wqn, thd);
-#if defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)
+#if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
         xwup_mtxtree_init(&thd->mtxtree);
 #endif
 
@@ -346,12 +346,12 @@ xwer_t xwup_thd_activate(struct xwup_thd * thd,
 #endif
         thd->stack.guard = attr->stack_guard_size;
 
-#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
         xwup_cond_init(&thd->completion);
 #endif
         xwlib_bclst_init_node(&thd->thdnode);
-#if defined(XWUPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWUPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
-        for (xwsq_t i = 0; i < XWUPCFG_SKD_THD_LOCAL_DATA_NUM; i++) {
+#if defined(XWOSCFG_SKD_THD_LOCAL_DATA_NUM) && (XWOSCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
+        for (xwsq_t i = 0; i < XWOSCFG_SKD_THD_LOCAL_DATA_NUM; i++) {
                 thd->data[i] = NULL;
         }
 #endif
@@ -407,7 +407,7 @@ void xwup_thd_attr_init(struct xwup_thd_attr * attr)
                 attr->stack_guard_size = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
                 attr->priority = XWUP_SKD_PRIORITY_RT_MIN;
                 attr->detached = false;
-                attr->privileged = XWUPCFG_SKD_THD_PRIVILEGED_DEFAULT;
+                attr->privileged = XWOSCFG_SKD_THD_PRIVILEGED_DEFAULT;
         }
 }
 
@@ -470,7 +470,7 @@ xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
                 attr.stack_guard_size = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
                 attr.priority = XWUP_SKD_PRIORITY_RT_MIN;
                 attr.detached = false;
-                attr.privileged = XWUPCFG_SKD_THD_PRIVILEGED_DEFAULT;
+                attr.privileged = XWOSCFG_SKD_THD_PRIVILEGED_DEFAULT;
         }
 
         thd = xwup_thd_alloc();
@@ -519,7 +519,7 @@ xwer_t xwup_thd_delete(struct xwup_thd * thd)
 __xwup_code
 xwer_t xwup_thd_exit_lic(struct xwup_thd * thd, xwer_t rc)
 {
-#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
         struct xwup_skd * xwskd;
         bool detached;
         xwreg_t cpuirq;
@@ -539,7 +539,7 @@ xwer_t xwup_thd_exit_lic(struct xwup_thd * thd, xwer_t rc)
         if (detached) {
                 xwlib_bclst_add_tail(&xwskd->thdelist, &thd->thdnode);
         }
-#  if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#  if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         if (xwskd->pm.frz_thd_cnt == xwskd->thd_num) {
                 xwospl_cpuirq_restore_lc(cpuirq);
                 xwup_thd_put(thd);
@@ -568,7 +568,7 @@ xwer_t xwup_thd_exit_lic(struct xwup_thd * thd, xwer_t rc)
 __xwup_code
 void xwup_cthd_return(xwer_t rc)
 {
-#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
         struct xwup_thd * cthd;
 
         cthd = xwup_skd_get_cthd_lc();
@@ -583,7 +583,7 @@ void xwup_cthd_return(xwer_t rc)
 __xwup_api
 void xwup_cthd_exit(xwer_t rc)
 {
-#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
         struct xwup_thd * cthd;
 
         cthd = xwup_skd_get_cthd_lc();
@@ -595,7 +595,7 @@ void xwup_cthd_exit(xwer_t rc)
 #endif
 }
 
-#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
 __xwup_api
 void xwup_thd_quit(struct xwup_thd * thd)
 {
@@ -683,7 +683,7 @@ xwer_t xwup_thd_detach(struct xwup_thd * thd)
         return rc;
 }
 
-#else /* !XWUPCFG_SKD_THD_EXIT */
+#else /* !XWOSCFG_SKD_THD_EXIT */
 
 __xwup_api
 void xwup_thd_quit(struct xwup_thd * thd)
@@ -707,7 +707,7 @@ xwer_t xwup_thd_detach(struct xwup_thd * thd)
 }
 #endif
 
-#if defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)
+#if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
 /**
  * @brief 改变线程的动态优先级一次
  * @param[in] thd: 线程对象的指针
@@ -741,7 +741,7 @@ void xwup_thd_chprio_once(struct xwup_thd * thd, xwpr_t dprio,
                         thd->prio.d = dprio;
                         xwup_rtwq_add(&mtx->rtwq, &thd->wqn, dprio);
                         *pmtx = mtx;
-#if defined(XWUPCFG_SYNC_RTSEM) && (1 == XWUPCFG_SYNC_RTSEM)
+#if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
                 } else if (XWUP_WQTYPE_RTSEM == thd->wqn.type) {
                         struct xwup_rtsem * sem;
 
@@ -871,7 +871,7 @@ xwer_t xwup_thd_intr(struct xwup_thd * thd)
                         xwospl_cpuirq_restore_lc(cpuirq);
                         cb(thd);
                         rc = XWOK;
-#if defined(XWUPCFG_SYNC_PLSEM) && (1 == XWUPCFG_SYNC_PLSEM)
+#if defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
                 } else if (XWUP_WQTYPE_PLSEM == thd->wqn.type) {
                         struct xwup_plsem * sem;
 
@@ -881,7 +881,7 @@ xwer_t xwup_thd_intr(struct xwup_thd * thd)
                         xwospl_cpuirq_restore_lc(cpuirq);
                         rc = xwup_plsem_intr(sem, &thd->wqn);
 #endif
-#if defined(XWUPCFG_SYNC_RTSEM) && (1 == XWUPCFG_SYNC_RTSEM)
+#if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
                 } else if (XWUP_WQTYPE_RTSEM == thd->wqn.type) {
                         struct xwup_rtsem * sem;
 
@@ -891,7 +891,7 @@ xwer_t xwup_thd_intr(struct xwup_thd * thd)
                         xwospl_cpuirq_restore_lc(cpuirq);
                         rc = xwup_rtsem_intr(sem, &thd->wqn);
 #endif
-#if defined(XWUPCFG_SYNC_COND) && (1 == XWUPCFG_SYNC_COND)
+#if defined(XWOSCFG_SYNC_COND) && (1 == XWOSCFG_SYNC_COND)
                 } else if (XWUP_WQTYPE_COND == thd->wqn.type) {
                         struct xwup_cond * sem;
 
@@ -901,7 +901,7 @@ xwer_t xwup_thd_intr(struct xwup_thd * thd)
                         xwospl_cpuirq_restore_lc(cpuirq);
                         rc = xwup_cond_intr(sem, &thd->wqn);
 #endif
-#if defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)
+#if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
                 } else if (XWUP_WQTYPE_MTX == thd->wqn.type) {
                         struct xwup_mtx * mtx;
 
@@ -1080,16 +1080,16 @@ xwer_t xwup_cthd_sleep_to(xwtm_t to)
         } else if (!xwup_skd_tstpmpt_lc()) {
                 rc = -ECANNOTPMPT;
                 goto err_cannot;
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         } else if (!xwup_skd_tstbh_lc()) {
                 rc = -ECANNOTBH;
                 goto err_cannot;
-#endif/* XWUPCFG_SKD_BH */
+#endif
         }
 
         xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         /* 检查是否被中断 */
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         rc = xwup_skd_wakelock_lock();
         if (__xwcc_unlikely(rc < 0)) {
                 xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
@@ -1103,7 +1103,7 @@ xwer_t xwup_cthd_sleep_to(xwtm_t to)
                     & cthd->state);
         if (XWUP_SKDOBJ_ST_EXITING & cthd->state) {
                 xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
                 xwup_skd_wakelock_unlock();
 #endif
                 rc = -EINTR;
@@ -1114,7 +1114,7 @@ xwer_t xwup_cthd_sleep_to(xwtm_t to)
         xwbop_s1m(xwsq_t, &cthd->state, XWUP_SKDOBJ_ST_SLEEPING);
         xwup_thd_tt_add_locked(cthd, xwtt, to, cpuirq);
         xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         xwup_skd_wakelock_unlock();
 #endif
         xwup_skd_req_swcx();
@@ -1157,16 +1157,16 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         if (!xwup_skd_tstpmpt_lc()) {
                 rc = -ECANNOTPMPT;
                 goto err_cannot;
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         } else if (!xwup_skd_tstbh_lc()) {
                 rc = -ECANNOTBH;
                 goto err_cannot;
-#endif/* XWUPCFG_SKD_BH */
+#endif
         }
 
         xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         /* 检查是否被中断 */
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         rc = xwup_skd_wakelock_lock();
         if (__xwcc_unlikely(rc < 0)) {
                 xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
@@ -1181,7 +1181,7 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
                     & cthd->state);
         if (XWUP_SKDOBJ_ST_EXITING & cthd->state) {
                 xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
                 xwup_skd_wakelock_unlock();
 #endif
                 rc = -EINTR;
@@ -1192,7 +1192,7 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         xwbop_s1m(xwsq_t, &cthd->state, XWUP_SKDOBJ_ST_SLEEPING);
         xwup_thd_tt_add_locked(cthd, xwtt, to, cpuirq);
         xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         xwup_skd_wakelock_unlock();
 #endif
         xwup_skd_req_swcx();
@@ -1309,7 +1309,7 @@ bool xwup_cthd_shld_frz(void)
 __xwup_api
 bool xwup_cthd_shld_stop(void)
 {
-#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
         struct xwup_thd * cthd;
 
         cthd = xwup_skd_get_cthd_lc();
@@ -1345,13 +1345,13 @@ bool xwup_cthd_frz_shld_stop(bool * frozen)
         return xwup_cthd_shld_stop();
 }
 
-#if defined(XWUPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWUPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
+#if defined(XWOSCFG_SKD_THD_LOCAL_DATA_NUM) && (XWOSCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
 __xwup_api
 xwer_t xwup_thd_set_data(struct xwup_thd * thd, xwsq_t pos, void * data)
 {
         xwer_t rc;
 
-        if (pos < XWUPCFG_SKD_THD_LOCAL_DATA_NUM) {
+        if (pos < XWOSCFG_SKD_THD_LOCAL_DATA_NUM) {
                 thd->data[pos] = data;
                 rc = XWOK;
         } else {
@@ -1365,7 +1365,7 @@ xwer_t xwup_thd_get_data(struct xwup_thd * thd, xwsq_t pos, void ** databuf)
 {
         xwer_t rc;
 
-        if (pos < XWUPCFG_SKD_THD_LOCAL_DATA_NUM) {
+        if (pos < XWOSCFG_SKD_THD_LOCAL_DATA_NUM) {
                 *databuf = thd->data[pos];
                 rc = XWOK;
         } else {

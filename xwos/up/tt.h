@@ -17,7 +17,7 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
 #include <xwos/up/lock/seqlock.h>
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 #  include <xwos/up/bh.h>
 #endif
 
@@ -47,7 +47,7 @@ struct xwup_tt {
         struct xwup_ttn * leftmost; /**< 指向最小关键字节点的指针 */
         struct xwlib_bclst_head timeout; /**< 超时链表的表头 */
         struct xwup_sqlk lock; /**< 保护本结构体的自旋锁 */
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         struct xwup_bh_node bhn; /**< 中断底半部节点 */
 #endif
         struct xwup_syshwt hwt; /**< 硬件定时器 */

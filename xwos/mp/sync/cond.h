@@ -39,7 +39,7 @@ xwer_t xwmp_cond_intr(struct xwmp_cond * cond, struct xwmp_wqn * wqn);
 xwer_t xwmp_cond_intr_all(struct xwmp_cond * cond);
 
 /* public */
-#if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
+#if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
 xwer_t xwmp_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
 
@@ -53,7 +53,7 @@ xwer_t xwmp_cond_delete(struct xwmp_cond * cond, xwsq_t tik);
 xwer_t xwmp_cond_acquire(struct xwmp_cond * cond, xwsq_t tik);
 xwer_t xwmp_cond_release(struct xwmp_cond * cond, xwsq_t tik);
 
-#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
 xwer_t xwmp_cond_bind(struct xwmp_cond * cond, struct xwmp_evt * evt, xwsq_t pos);
 xwer_t xwmp_cond_unbind(struct xwmp_cond * cond, struct xwmp_evt * evt);
 #endif

@@ -66,7 +66,7 @@ xwer_t xwup_irq_get_id(xwirq_t * irqnbuf)
 
         rc = xwospl_irq_get_id(irqnbuf);
         if (rc < 0) {
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
                 if (xwup_skd_tst_in_bh_lc()) {
                         rc = -EBHCTX;
                 } else {

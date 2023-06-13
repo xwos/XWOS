@@ -16,7 +16,7 @@
 #include <xwos/ospl/syshwt.h>
 #include <xwos/up/irq.h>
 #include <xwos/up/skd.h>
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 #  include <xwos/up/bh.h>
 #endif
 #include <xwos/up/lock/seqlock.h>
@@ -67,7 +67,7 @@ xwer_t xwup_tt_init(struct xwup_tt * xwtt)
         xwtt->deadline = 0;
         xwtt->leftmost = NULL;
         xwlib_bclst_init_head(&xwtt->timeout);
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwup_bh_node_init(&xwtt->bhn, (xwup_bh_f)xwup_tt_bh, xwtt);
 #endif
         rc = xwup_syshwt_init(&xwtt->hwt);
@@ -331,7 +331,7 @@ xwer_t xwup_syshwt_init(struct xwup_syshwt * hwt)
 {
         xwer_t rc;
 
-        hwt->timetick = (xwtm_t)(-(XWUPCFG_SYSHWT_PERIOD));
+        hwt->timetick = (xwtm_t)(-(XWOSCFG_SYSHWT_PERIOD));
         hwt->irqrsc = NULL;
         hwt->irqs_num = 0;
         xwup_sqlk_init(&hwt->lock);
@@ -399,7 +399,7 @@ xwtm_t xwup_syshwt_get_timetick(struct xwup_syshwt * hwt)
 __xwup_code
 xwu64_t xwup_syshwt_get_tickcount(struct xwup_syshwt * hwt)
 {
-        return (xwu64_t)xwup_syshwt_get_timetick(hwt) / XWUPCFG_SYSHWT_PERIOD;
+        return (xwu64_t)xwup_syshwt_get_timetick(hwt) / XWOSCFG_SYSHWT_PERIOD;
 }
 
 /**
@@ -440,11 +440,11 @@ void xwup_syshwt_task(struct xwup_syshwt * hwt)
 
         xwtt = xwup_syshwt_get_tt(hwt);
         xwup_sqlk_wr_lock_irqssv(&hwt->lock, hwt->irqrsc, flags, hwt->irqs_num);
-        hwt->timetick = xwtm_add(hwt->timetick, XWUPCFG_SYSHWT_PERIOD);
+        hwt->timetick = xwtm_add(hwt->timetick, XWOSCFG_SYSHWT_PERIOD);
         xwup_sqlk_wr_unlock_irqsrs(&hwt->lock, hwt->irqrsc, flags, hwt->irqs_num);
         rc = xwup_tt_check_deadline(xwtt);
         if (-ETIMEDOUT == rc) {
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
                 struct xwup_skd * xwskd;
 
                 xwskd = xwup_tt_get_skd(xwtt);

@@ -15,7 +15,7 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
-#if defined(XWUPCFG_SYNC_EVT_STDC_MM) && (1 == XWUPCFG_SYNC_EVT_STDC_MM)
+#if defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
 #  include <stdlib.h>
 #endif
 #include <xwos/ospl/irq.h>
@@ -97,7 +97,7 @@ void xwup_evt_setup(struct xwup_evt * evt, xwsz_t num,
 static __xwup_code
 struct xwup_evt * xwup_evt_alloc(xwsz_t num)
 {
-#if defined(XWUPCFG_SYNC_EVT_STDC_MM) && (1 == XWUPCFG_SYNC_EVT_STDC_MM)
+#if defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
         struct xwup_evt * evt;
         xwbmp_t * bmp, * msk;
         xwsz_t bmpnum, bmpsize;
@@ -146,7 +146,7 @@ struct xwup_evt * xwup_evt_alloc(xwsz_t num)
 static __xwup_code
 void xwup_evt_free(struct xwup_evt * evt)
 {
-#if defined(XWUPCFG_SYNC_EVT_STDC_MM) && (1 == XWUPCFG_SYNC_EVT_STDC_MM)
+#if defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
         free(evt);
 #else
         xwmm_kma_free(evt);

@@ -24,7 +24,7 @@ __xwup_code
 void xwup_synobj_construct(struct xwup_synobj * synobj)
 {
         xwos_object_construct(&synobj->xwobj);
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
         synobj->sel.evt = NULL;
         synobj->sel.pos = 0;
 #endif
@@ -33,7 +33,7 @@ void xwup_synobj_construct(struct xwup_synobj * synobj)
 __xwup_code
 void xwup_synobj_destruct(struct xwup_synobj * synobj)
 {
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
         synobj->sel.evt = NULL;
         synobj->sel.pos = 0;
 #endif

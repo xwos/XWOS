@@ -19,9 +19,9 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
-#if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
+#if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
 #  include <xwos/mm/memslice.h>
-#elif defined(XWMPCFG_SYNC_COND_STDC_MM) && (1 == XWMPCFG_SYNC_COND_STDC_MM)
+#elif defined(XWOSCFG_SYNC_COND_STDC_MM) && (1 == XWOSCFG_SYNC_COND_STDC_MM)
 #  include <stdlib.h>
 #endif
 #include <xwos/ospl/irq.h>
@@ -39,7 +39,7 @@
 #define XWMP_COND_NEGTIVE  ((xwssq_t)(-1))
 #define XWMP_COND_POSITIVE ((xwssq_t)(1))
 
-#if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
+#if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
 /**
  * @brief 结构体xwmp_cond的对象缓存
  */
@@ -102,7 +102,7 @@ xwer_t xwmp_cond_test_unintr(struct xwmp_cond * cond,
                              void * lock, xwsq_t lktype, void * lkdata,
                              xwsq_t * lkst);
 
-#if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
+#if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
 /**
  * @brief XWMP INIT CODE：初始化结构体xwmp_cond的对象缓存
  * @param[in] zone_origin: 内存区域的首地址
@@ -132,7 +132,7 @@ xwer_t xwmp_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 static __xwmp_code
 struct xwmp_cond * xwmp_cond_alloc(void)
 {
-#if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
+#if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
         union {
                 struct xwmp_cond * cond;
                 void * anon;
@@ -144,7 +144,7 @@ struct xwmp_cond * xwmp_cond_alloc(void)
                 mem.cond = err_ptr(rc);
         }/* else {} */
         return mem.cond;
-#elif defined(XWMPCFG_SYNC_COND_STDC_MM) && (1 == XWMPCFG_SYNC_COND_STDC_MM)
+#elif defined(XWOSCFG_SYNC_COND_STDC_MM) && (1 == XWOSCFG_SYNC_COND_STDC_MM)
         struct xwmp_cond * cond;
 
         cond = malloc(sizeof(struct xwmp_cond));
@@ -178,9 +178,9 @@ struct xwmp_cond * xwmp_cond_alloc(void)
 static __xwmp_code
 void xwmp_cond_free(struct xwmp_cond * cond)
 {
-#if defined(XWMPCFG_SYNC_COND_MEMSLICE) && (1 == XWMPCFG_SYNC_COND_MEMSLICE)
+#if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
         xwmm_memslice_free(&xwmp_cond_cache, cond);
-#elif defined(XWMPCFG_SYNC_COND_STDC_MM) && (1 == XWMPCFG_SYNC_COND_STDC_MM)
+#elif defined(XWOSCFG_SYNC_COND_STDC_MM) && (1 == XWOSCFG_SYNC_COND_STDC_MM)
         xwmp_cond_destruct(cond);
         free(cond);
 #else
@@ -317,7 +317,7 @@ xwer_t xwmp_cond_put(struct xwmp_cond * cond)
         return xwmp_synobj_put(&cond->synobj);
 }
 
-#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
 __xwmp_api
 xwer_t xwmp_cond_bind(struct xwmp_cond * cond,
                       struct xwmp_evt * evt, xwsq_t pos)
@@ -490,7 +490,7 @@ xwer_t xwmp_cond_broadcast(struct xwmp_cond * cond)
         do {
                 rc = xwmp_cond_broadcast_once(cond, &retry);
         } while (retry);
-#if defined(XWMPCFG_SYNC_EVT) && (1 == XWMPCFG_SYNC_EVT)
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
         if (__xwcc_likely(XWOK == rc)) {
                 struct xwmp_evt * evt;
                 struct xwmp_synobj * synobj;
@@ -643,7 +643,7 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         xwsq_t wkuprs;
         xwsq_t reason;
         xwsq_t pmpt;
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwsq_t bh;
 #endif
         struct xwmp_tt * xwtt;
@@ -688,7 +688,7 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         /* 调度 */
         xwmp_skd_svpmpt(xwskd, &pmpt);
         xwmp_skd_rspmpt(xwskd, 0);
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwmp_skd_svbh(xwskd, &bh);
         xwmp_skd_rsbh(xwskd, 0);
 #endif
@@ -697,7 +697,7 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         xwmp_skd_req_swcx(xwskd);
         xwmp_skd_wakelock_lock(xwskd);
         xwospl_cpuirq_restore_lc(cpuirq);
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwmp_skd_rsbh(xwskd, bh);
 #endif
         xwmp_skd_rspmpt(xwskd, pmpt);
@@ -890,7 +890,7 @@ xwer_t xwmp_cond_blkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         xwpr_t dprio;
         xwsq_t reason;
         xwsq_t pmpt;
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwsq_t bh;
 #endif
         xwer_t rc;
@@ -921,14 +921,14 @@ xwer_t xwmp_cond_blkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         /* 调度 */
         xwmp_skd_svpmpt(xwskd, &pmpt);
         xwmp_skd_rspmpt(xwskd, 0);
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwmp_skd_svbh(xwskd, &bh);
         xwmp_skd_rsbh(xwskd, 0);
 #endif
         xwospl_cpuirq_enable_lc();
         xwmp_skd_req_swcx(xwskd);
         xwospl_cpuirq_restore_lc(cpuirq);
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwmp_skd_rsbh(xwskd, bh);
 #endif
         xwmp_skd_rspmpt(xwskd, pmpt);

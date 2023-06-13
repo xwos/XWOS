@@ -18,13 +18,13 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/rtrq.h>
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 #  include <xwos/mp/bh.h>
 #endif
 #include <xwos/mp/tt.h>
 
 #define XWMP_CPU_NUM                            ((xwid_t)CPUCFG_CPU_NUM)
-#define XWMP_SKD_PRIORITY_RT_NUM                ((xwpr_t)XWMPCFG_SKD_PRIORITY_RT_NUM)
+#define XWMP_SKD_PRIORITY_RT_NUM                ((xwpr_t)XWOSCFG_SKD_PRIORITY_RT_NUM)
 #define XWMP_SKD_PRIORITY_RT_MIN                ((xwpr_t)0)
 #define XWMP_SKD_PRIORITY_RT_MAX                (XWMP_SKD_PRIORITY_RT_NUM - 1)
 #define XWMP_SKD_PRIORITY_INVALID               ((xwpr_t)-1)
@@ -32,7 +32,7 @@
 #define XWMP_SKD_PRIORITY_DROP(base, dec)       ((base) - (dec))
 
 #define XWMP_SKD_IDLE_STK(xwskd)                (&((xwskd)->idle))
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 #  define XWMP_SKD_BH_STK(xwskd)                (&((xwskd)->bh))
 #endif
 
@@ -148,7 +148,7 @@ struct __xwcc_alignl1cache xwmp_skd {
         xwsq_t req_schedule_cnt; /**< 请求调度的计数器 */
         atomic_xwsq_t req_chkpmpt_cnt; /**< 请求检查抢占的计数器 */
         atomic_xwsq_t dis_pmpt_cnt; /**< 关闭抢占的计数器 */
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         atomic_xwsq_t req_bh_cnt; /**< 请求进入中断底半部的计数器 */
         atomic_xwsq_t dis_bh_cnt; /**< 关闭中断底半部的计数器 */
         struct xwmp_bh_cb bhcb; /**< 中断底半部控制块 */
@@ -176,7 +176,7 @@ struct xwmp_skd * xwmp_skd_svpmpt(struct xwmp_skd * xwskd, xwsq_t * dis_pmpt_cnt
 struct xwmp_skd * xwmp_skd_rspmpt(struct xwmp_skd * xwskd, xwsq_t dis_pmpt_cnt);
 bool xwmp_skd_tstpmpt(struct xwmp_skd * xwskd);
 
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 struct xwmp_skd * xwmp_skd_dsbh(struct xwmp_skd * xwskd);
 struct xwmp_skd * xwmp_skd_enbh(struct xwmp_skd * xwskd);
 struct xwmp_skd * xwmp_skd_svbh(struct xwmp_skd * xwskd, xwsq_t * dis_bh_cnt);
@@ -206,7 +206,7 @@ xwer_t xwmp_skd_start_syshwt_lc(void);
 xwer_t xwmp_skd_stop_syshwt_lc(void);
 xwid_t xwmp_skd_id_lc(void);
 
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 struct xwmp_skd * xwmp_skd_dsbh_lc(void);
 struct xwmp_skd * xwmp_skd_enbh_lc(void);
 bool xwmp_skd_tst_in_bh_lc(void);

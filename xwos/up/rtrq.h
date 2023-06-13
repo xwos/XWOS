@@ -17,7 +17,7 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/xwbop.h>
 
-#define XWUP_RTRQ_QNUM          XWUPCFG_SKD_PRIORITY_RT_NUM
+#define XWUP_RTRQ_QNUM XWOSCFG_SKD_PRIORITY_RT_NUM
 
 struct xwup_skd;
 struct xwup_thd;

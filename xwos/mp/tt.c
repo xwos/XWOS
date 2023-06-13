@@ -19,7 +19,7 @@
 #include <xwos/mp/irq.h>
 #include <xwos/mp/skd.h>
 #include <xwos/mp/lock/seqlock.h>
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 #  include <xwos/mp/bh.h>
 #endif
 #include <xwos/mp/tt.h>
@@ -93,7 +93,7 @@ xwer_t xwmp_tt_init(struct xwmp_tt * xwtt)
         xwtt->deadline = 0;
         xwtt->leftmost = NULL;
         xwlib_bclst_init_head(&xwtt->timeout);
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwmp_bh_node_init(&xwtt->bhn, (xwmp_bh_f)xwmp_tt_bh, xwtt);
 #endif
         rc = xwmp_syshwt_init(&xwtt->hwt);
@@ -358,7 +358,7 @@ xwer_t xwmp_syshwt_init(struct xwmp_syshwt * hwt)
 {
         xwer_t rc;
 
-        hwt->timetick = (xwtm_t)(-(XWMPCFG_SYSHWT_PERIOD));
+        hwt->timetick = (xwtm_t)(-(XWOSCFG_SYSHWT_PERIOD));
         hwt->irqrsc = NULL;
         hwt->irqs_num = 0;
         xwmp_sqlk_init(&hwt->lock);
@@ -426,7 +426,7 @@ xwtm_t xwmp_syshwt_get_timetick(struct xwmp_syshwt * hwt)
 __xwmp_code
 xwu64_t xwmp_syshwt_get_tickcount(struct xwmp_syshwt * hwt)
 {
-        return (xwu64_t)xwmp_syshwt_get_timetick(hwt) / XWMPCFG_SYSHWT_PERIOD;
+        return (xwu64_t)xwmp_syshwt_get_timetick(hwt) / XWOSCFG_SYSHWT_PERIOD;
 }
 
 /**
@@ -469,11 +469,11 @@ void xwmp_syshwt_task(struct xwmp_syshwt * hwt)
         xwtt = xwmp_syshwt_get_tt(hwt);
         xwskd = xwmp_tt_get_skd(xwtt);
         xwmp_sqlk_wr_lock_irqssv(&hwt->lock, hwt->irqrsc, flags, hwt->irqs_num);
-        hwt->timetick = xwtm_add(hwt->timetick, XWMPCFG_SYSHWT_PERIOD);
+        hwt->timetick = xwtm_add(hwt->timetick, XWOSCFG_SYSHWT_PERIOD);
         xwmp_sqlk_wr_unlock_irqsrs(&hwt->lock, hwt->irqrsc, flags, hwt->irqs_num);
         rc = xwmp_tt_check_deadline(xwtt);
         if (-ETIMEDOUT == rc) {
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
                 xwmp_bh_node_eq(&xwskd->bhcb, &xwtt->bhn);
                 xwmp_skd_req_bh(xwskd);
 #else

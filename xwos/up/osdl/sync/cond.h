@@ -87,7 +87,7 @@ xwsq_t xwosdl_cond_gettik(struct xwosdl_cond * cond)
 static __xwcc_inline
 xwer_t xwosdl_cond_bind(struct xwosdl_cond * cond, struct xwosdl_sel * sel, xwsq_t pos)
 {
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         XWOS_VALIDATE((sel), "nullptr", -EFAULT);
         XWOS_VALIDATE((sel->type == XWUP_EVT_TYPE_SEL), "type-error", -ETYPE);
@@ -104,7 +104,7 @@ xwer_t xwosdl_cond_bind(struct xwosdl_cond * cond, struct xwosdl_sel * sel, xwsq
 static __xwcc_inline
 xwer_t xwosdl_cond_unbind(struct xwosdl_cond * cond, struct xwosdl_sel * sel)
 {
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
         XWOS_VALIDATE((cond), "nullptr", -EFAULT);
         XWOS_VALIDATE((sel), "nullptr", -EFAULT);
         XWOS_VALIDATE((sel->type == XWUP_EVT_TYPE_SEL), "type-error", -ETYPE);

@@ -16,7 +16,7 @@
 #include <xwos/up/irq.h>
 #include <xwos/up/osdl/sync/sel.h>
 
-#if defined(XWUPCFG_SYNC_RTSEM) && (1 == XWUPCFG_SYNC_RTSEM)
+#if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
 
 #  include <xwos/up/sync/rtsem.h>
 
@@ -90,7 +90,7 @@ xwsq_t xwosdl_sem_gettik(struct xwosdl_sem * sem)
 static __xwcc_inline
 xwer_t xwosdl_sem_bind(struct xwosdl_sem * sem, struct xwosdl_sel * sel, xwsq_t pos)
 {
-#  if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+#  if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((sel), "nullptr", -EFAULT);
         XWOS_VALIDATE((sel->type == XWUP_EVT_TYPE_SEL), "type-error", -ETYPE);
@@ -107,7 +107,7 @@ xwer_t xwosdl_sem_bind(struct xwosdl_sem * sem, struct xwosdl_sel * sel, xwsq_t 
 static __xwcc_inline
 xwer_t xwosdl_sem_unbind(struct xwosdl_sem * sem, struct xwosdl_sel * sel)
 {
-#  if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+#  if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((sel), "nullptr", -EFAULT);
         XWOS_VALIDATE((sel->type == XWUP_EVT_TYPE_SEL), "type-error", -ETYPE);
@@ -188,7 +188,7 @@ xwer_t xwosdl_sem_getvalue(struct xwosdl_sem * sem, xwssq_t * sval)
         return xwup_rtsem_getvalue(sem, sval);
 }
 
-#elif defined(XWUPCFG_SYNC_PLSEM) && (1 == XWUPCFG_SYNC_PLSEM)
+#elif defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
 
 #  include <xwos/up/sync/plsem.h>
 
@@ -264,7 +264,7 @@ xwsq_t xwosdl_sem_gettik(struct xwosdl_sem * sem)
 static __xwcc_inline
 xwer_t xwosdl_sem_bind(struct xwosdl_sem * sem, struct xwosdl_sel * sel, xwsq_t pos)
 {
-#  if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+#  if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((sel), "nullptr", -EFAULT);
 
@@ -280,7 +280,7 @@ xwer_t xwosdl_sem_bind(struct xwosdl_sem * sem, struct xwosdl_sel * sel, xwsq_t 
 static __xwcc_inline
 xwer_t xwosdl_sem_unbind(struct xwosdl_sem * sem, struct xwosdl_sel * sel)
 {
-#  if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+#  if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((sel), "nullptr", -EFAULT);
 

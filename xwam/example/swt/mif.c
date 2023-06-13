@@ -96,13 +96,9 @@ err_flg_init:
 /**
  * @brief 定时器0的回调函数
  * @note
- * - UP系统
- *   - 当配置(XWUPCFG_SKD_BH == 1)，此函数运行在中断底半部；
- *   - 当配置(XWUPCFG_SKD_BH == 0)，此函数运行在中断上下文；
- * - MP系统
- *   - 当配置(XWMPCFG_SKD_BH == 1)，此函数运行在中断底半部；
- *   - 当配置(XWMPCFG_SKD_BH == 0)，此函数运行在中断上下文；
- * - 此函数中不可调用会导致线程睡眠或阻塞的函数。
+ * + 当配置(XWOSCFG_SKD_BH == 1)，此函数运行在中断底半部；
+ * + 当配置(XWOSCFG_SKD_BH == 0)，此函数运行在中断上下文；
+ * + 此函数中不可调用会导致线程睡眠或阻塞的函数。
  */
 void swtdemo_swt0_callback(struct xwos_swt * swt, void * arg)
 {
@@ -115,13 +111,9 @@ void swtdemo_swt0_callback(struct xwos_swt * swt, void * arg)
 /**
  * @brief 定时器1的回调函数
  * @note
- * - UP系统
- *   - 当配置(XWUPCFG_SKD_BH == 1)，此函数运行在中断底半部；
- *   - 当配置(XWUPCFG_SKD_BH == 0)，此函数运行在中断上下文；
- * - MP系统
- *   - 当配置(XWMPCFG_SKD_BH == 1)，此函数运行在中断底半部；
- *   - 当配置(XWMPCFG_SKD_BH == 0)，此函数运行在中断上下文；
- * - 此函数中不可调用会导致线程睡眠或阻塞的函数。
+ * + 当配置(XWOSCFG_SKD_BH == 1)，此函数运行在中断底半部；
+ * + 当配置(XWOSCFG_SKD_BH == 0)，此函数运行在中断上下文；
+ * + 此函数中不可调用会导致线程睡眠或阻塞的函数。
  */
 void swtdemo_swt1_callback(struct xwos_swt * swt, void * arg)
 {

@@ -23,15 +23,15 @@
 #include <xwos/up/skd.h>
 #include <xwos/up/wqn.h>
 #include <xwos/up/tt.h>
-#if defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)
+#if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
 #  include <xwos/up/mtxtree.h>
 #endif
-#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
-#  if !defined(XWUPCFG_SYNC_COND) || (1 != XWUPCFG_SYNC_COND)
-#    error "XWUPCFG_SYNC_COND must be 1 if (1 == XWUPCFG_SKD_THD_EXIT) !"
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
+#  if !defined(XWOSCFG_SYNC_COND) || (1 != XWOSCFG_SYNC_COND)
+#    error "XWOSCFG_SYNC_COND must be 1 if (1 == XWOSCFG_SKD_THD_EXIT) !"
 #  endif
 #endif
-#if defined(XWUPCFG_SYNC_COND) && (1 == XWUPCFG_SYNC_COND)
+#if defined(XWOSCFG_SYNC_COND) && (1 == XWOSCFG_SYNC_COND)
 #  include <xwos/up/sync/cond.h>
 #endif
 
@@ -85,7 +85,7 @@ struct xwup_thd {
         struct xwup_wqn wqn; /**< 等待队列 */
 
         /* 线程优先级 */
-#if defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)
+#if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
         struct xwup_mtxtree mtxtree; /**< 互斥锁树：线程已经获得的所有互斥锁都
                                           需要加入到互斥锁树 */
         struct {
@@ -99,14 +99,14 @@ struct xwup_thd {
         } prio; /**< 线程的优先级 */
 #endif
 
-#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
         /* 退出态 */
         struct xwup_cond completion; /**< 线程退出时的事件信号量 */
 #endif
 
-#if defined(XWUPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWUPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
+#if defined(XWOSCFG_SKD_THD_LOCAL_DATA_NUM) && (XWOSCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
         /* 线程私有数据 */
-        void * data[XWUPCFG_SKD_THD_LOCAL_DATA_NUM];
+        void * data[XWOSCFG_SKD_THD_LOCAL_DATA_NUM];
 #endif
         struct {
                 int __errno;
@@ -116,7 +116,7 @@ struct xwup_thd {
 
 xwer_t xwup_thd_delete(struct xwup_thd * thd);
 /* public(xwup) */
-#if (defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX))
+#if (defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX))
 void xwup_thd_chprio_once(struct xwup_thd * thd, xwpr_t dprio,
                           struct xwup_mtx ** pmtx);
 void xwup_thd_chprio(struct xwup_thd * thd);
@@ -182,7 +182,7 @@ bool xwup_cthd_shld_frz(void);
 bool xwup_cthd_frz_shld_stop(bool * frozen);
 bool xwup_cthd_shld_stop(void);
 
-#if defined(XWUPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWUPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
+#if defined(XWOSCFG_SKD_THD_LOCAL_DATA_NUM) && (XWOSCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
 xwer_t xwup_thd_set_data(struct xwup_thd * thd, xwsq_t pos, void * data);
 xwer_t xwup_thd_get_data(struct xwup_thd * thd, xwsq_t pos, void ** databuf);
 xwer_t xwup_cthd_set_data(xwsq_t pos, void * data);

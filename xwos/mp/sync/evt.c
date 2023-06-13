@@ -20,7 +20,7 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
-#if defined(XWMPCFG_SYNC_EVT_STDC_MM) && (1 == XWMPCFG_SYNC_EVT_STDC_MM)
+#if defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
 #  include <stdlib.h>
 #endif
 #include <xwos/ospl/irq.h>
@@ -82,7 +82,7 @@ xwer_t xwmp_flg_wait_to_edge(struct xwmp_evt * evt, xwsq_t trigger,
 static __xwmp_code
 struct xwmp_evt * xwmp_evt_alloc(xwsz_t num)
 {
-#if defined(XWMPCFG_SYNC_EVT_STDC_MM) && (1 == XWMPCFG_SYNC_EVT_STDC_MM)
+#if defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
         struct xwmp_evt * evt;
         xwbmp_t * bmp, * msk;
         xwsz_t bmpnum, bmpsize;
@@ -131,7 +131,7 @@ struct xwmp_evt * xwmp_evt_alloc(xwsz_t num)
 static __xwmp_code
 void xwmp_evt_free(struct xwmp_evt * evt)
 {
-#if defined(XWMPCFG_SYNC_EVT_STDC_MM) && (1 == XWMPCFG_SYNC_EVT_STDC_MM)
+#if defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
         xwmp_evt_destruct(evt);
         free(evt);
 #else

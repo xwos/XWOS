@@ -27,6 +27,8 @@ void testLiteralOperator(void)
 {
   std::string cxxstr;
 
+  printf("++++++++ C++ literal operator (GNU Extensions) test ++++++++\n");
   cxxstr = "XWOS"_s;
   std::cout << "LiteralOpreator \"s\":" << cxxstr << std::endl;
+  printf("-------- C++ literal operator (GNU Extensions) test --------\n");
 }

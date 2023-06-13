@@ -18,7 +18,7 @@
 #include <xwos/lib/rbtree.h>
 #include <xwos/mp/irq.h>
 #include <xwos/mp/lock/seqlock.h>
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 #  include <xwos/mp/bh.h>
 #endif
 
@@ -48,7 +48,7 @@ struct xwmp_tt {
         struct xwmp_ttn * leftmost; /**< 指向最小关键字节点的指针 */
         struct xwlib_bclst_head timeout; /**< 超时链表的表头 */
         struct xwmp_sqlk lock; /**< 保护本结构体的自旋锁 */
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         struct xwmp_bh_node bhn; /**< 中断底半部节点 */
 #endif
         struct xwmp_syshwt hwt; /**< 硬件定时器 */

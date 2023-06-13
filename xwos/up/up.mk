@@ -14,20 +14,20 @@ XWOS_EOBJS :=
 ######## ######## ######## ######## ******** ######## ######## ######## ########
 ######## ######## ######## ########   rules  ######## ######## ######## ########
 ######## ######## ######## ######## ******** ######## ######## ######## ########
-ifeq ($(XWUPCFG_SYNC_PLSEM),y)
+ifeq ($(XWOSCFG_SYNC_PLSEM),y)
     XWUPRULE_SKD_WQ_PL := y
 else
-    ifeq ($(XWUPCFG_SYNC_COND),y)
+    ifeq ($(XWOSCFG_SYNC_COND),y)
         XWUPRULE_SKD_WQ_PL := y
     else
         XWUPRULE_SKD_WQ_PL := n
     endif
 endif
 
-ifeq ($(XWUPCFG_LOCK_MTX),y)
+ifeq ($(XWOSCFG_LOCK_MTX),y)
     XWUPRULE_SKD_WQ_RT := y
 else
-    ifeq ($(XWUPCFG_SYNC_RTSEM),y)
+    ifeq ($(XWOSCFG_SYNC_RTSEM),y)
         XWUPRULE_SKD_WQ_RT := y
     else
         XWUPRULE_SKD_WQ_RT := n
@@ -43,7 +43,7 @@ XWOS_CSRCS += up/irq.c
 ######## ######## ######## ######## scheduler ######## ######## ######## ########
 XWOS_CSRCS += up/skd.c
 XWOS_CSRCS += up/rtrq.c
-ifeq ($(XWUPCFG_SKD_BH),y)
+ifeq ($(XWOSCFG_SKD_BH),y)
     XWOS_CSRCS += up/bh.c
 endif
 XWOS_CSRCS += up/tt.c
@@ -58,38 +58,38 @@ ifeq ($(XWUPRULE_SKD_WQ_RT),y)
     XWOS_CSRCS += up/rtwq.c
 endif
 
-ifeq ($(XWUPCFG_LOCK_MTX),y)
+ifeq ($(XWOSCFG_LOCK_MTX),y)
     XWOS_CSRCS += up/mtxtree.c
 endif
 
 ######## ######## ######## ######## swt ######## ######## ######## ########
-ifeq ($(XWUPCFG_SKD_SWT),y)
+ifeq ($(XWOSCFG_SKD_SWT),y)
     XWOS_CSRCS += up/swt.c
 endif
 
 ######## ######## ######## ######## locks ######## ######## ######## ########
 XWOS_CSRCS += up/lock/seqlock.c
 
-ifeq ($(XWUPCFG_LOCK_MTX),y)
+ifeq ($(XWOSCFG_LOCK_MTX),y)
     XWOS_CSRCS += up/lock/mtx.c
 endif
 
 ######## ######## ######## ######## sync ######## ######## ######## ########
 XWOS_CSRCS += up/sync/obj.c
 XWOS_CSRCS += up/sync/vsem.c
-ifeq ($(XWUPCFG_SYNC_PLSEM),y)
+ifeq ($(XWOSCFG_SYNC_PLSEM),y)
     XWOS_CSRCS += up/sync/plsem.c
 endif
 
-ifeq ($(XWUPCFG_SYNC_RTSEM),y)
+ifeq ($(XWOSCFG_SYNC_RTSEM),y)
     XWOS_CSRCS += up/sync/rtsem.c
 endif
 
-ifeq ($(XWUPCFG_SYNC_COND),y)
+ifeq ($(XWOSCFG_SYNC_COND),y)
     XWOS_CSRCS += up/sync/cond.c
 endif
 
-ifeq ($(XWUPCFG_SYNC_EVT),y)
+ifeq ($(XWOSCFG_SYNC_EVT),y)
     XWOS_CSRCS += up/sync/evt.c
 endif
 
@@ -98,10 +98,10 @@ XWOS_CSRCS += up/osdl/thd.c
 XWOS_CSRCS += up/osdl/swt.c
 XWOS_CSRCS += up/osdl/lock/mtx.c
 XWOS_CSRCS += up/osdl/sync/sem.c
-ifeq ($(XWUPCFG_SYNC_COND),y)
+ifeq ($(XWOSCFG_SYNC_COND),y)
     XWOS_CSRCS += up/osdl/sync/cond.c
 endif
-ifeq ($(XWUPCFG_SYNC_EVT),y)
+ifeq ($(XWOSCFG_SYNC_EVT),y)
     XWOS_CSRCS += up/osdl/sync/flg.c
     XWOS_CSRCS += up/osdl/sync/sel.c
     XWOS_CSRCS += up/osdl/sync/br.c

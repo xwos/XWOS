@@ -18,7 +18,7 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/mp/lock/spinlock.h>
 
-#define XWMP_RTRQ_QNUM          XWMPCFG_SKD_PRIORITY_RT_NUM
+#define XWMP_RTRQ_QNUM XWOSCFG_SKD_PRIORITY_RT_NUM
 
 struct xwmp_skd;
 struct xwmp_thd;

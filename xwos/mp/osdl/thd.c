@@ -136,7 +136,7 @@ xwosdl_thd_d xwosdl_cthd_self(void)
         return thdd;
 }
 
-#if defined(XWMPCFG_SKD_THD_LOCAL_DATA_NUM) && (XWMPCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
+#if defined(XWOSCFG_SKD_THD_LOCAL_DATA_NUM) && (XWOSCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
 __xwmp_code
 xwer_t xwosdl_thd_set_data(struct xwosdl_thd * thd, xwsq_t tik,
                            xwsq_t pos, void * data)

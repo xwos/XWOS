@@ -38,7 +38,7 @@ xwer_t xwup_plsem_release(struct xwup_plsem * sem, xwsq_t tik);
 xwer_t xwup_plsem_grab(struct xwup_plsem * sem);
 xwer_t xwup_plsem_put(struct xwup_plsem * sem);
 
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
 xwer_t xwup_plsem_bind(struct xwup_plsem * sem, struct xwup_evt * evt, xwsq_t pos);
 xwer_t xwup_plsem_unbind(struct xwup_plsem * sem, struct xwup_evt * evt);
 #else

@@ -14,7 +14,7 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
-#if defined(XWUPCFG_SYNC_COND_STDC_MM) && (1 == XWUPCFG_SYNC_COND_STDC_MM)
+#if defined(XWOSCFG_SYNC_COND_STDC_MM) && (1 == XWOSCFG_SYNC_COND_STDC_MM)
 #  include <stdlib.h>
 #endif
 #include <xwos/ospl/irq.h>
@@ -23,14 +23,14 @@
 #include <xwos/up/thd.h>
 #include <xwos/up/plwq.h>
 #include <xwos/up/sync/obj.h>
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
 #  include <xwos/up/sync/evt.h>
 #endif
 #include <xwos/up/lock/seqlock.h>
 #include <xwos/up/lock/fakespinlock.h>
-#if (defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX))
+#if (defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX))
 #  include <xwos/up/lock/mtx.h>
-#elif (defined(XWUPCFG_LOCK_FAKEMTX) && (1 == XWUPCFG_LOCK_FAKEMTX))
+#elif (defined(XWOSCFG_LOCK_FAKEMTX) && (1 == XWOSCFG_LOCK_FAKEMTX))
 #  include <xwos/up/lock/fakemtx.h>
 #endif
 #include <xwos/up/sync/cond.h>
@@ -94,7 +94,7 @@ xwer_t xwup_cond_test_unintr(struct xwup_cond * cond,
 static __xwup_code
 struct xwup_cond * xwup_cond_alloc(void)
 {
-#if defined(XWUPCFG_SKD_COND_STDC_MM) && (1 == XWUPCFG_SKD_COND_STDC_MM)
+#if defined(XWOSCFG_SKD_COND_STDC_MM) && (1 == XWOSCFG_SKD_COND_STDC_MM)
         struct xwup_cond * cond;
 
         cond = malloc(sizeof(struct xwup_cond));
@@ -128,7 +128,7 @@ struct xwup_cond * xwup_cond_alloc(void)
 static __xwup_code
 void xwup_cond_free(struct xwup_cond * cond)
 {
-#if defined(XWUPCFG_SKD_COND_STDC_MM) && (1 == XWUPCFG_SKD_COND_STDC_MM)
+#if defined(XWOSCFG_SKD_COND_STDC_MM) && (1 == XWOSCFG_SKD_COND_STDC_MM)
         free(cond);
 #else
         xwmm_kma_free(cond);
@@ -243,7 +243,7 @@ xwer_t xwup_cond_delete(struct xwup_cond * cond, xwsq_t tik)
         return xwup_cond_release(cond, tik);
 }
 
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
 __xwup_api
 xwer_t xwup_cond_bind(struct xwup_cond * cond,
                       struct xwup_evt * evt, xwsq_t pos)
@@ -402,7 +402,7 @@ xwer_t xwup_cond_broadcast(struct xwup_cond * cond)
         do {
                 rc = xwup_cond_broadcast_once(cond, &retry);
         } while (retry);
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
         if (__xwcc_likely(XWOK == rc)) {
                 xwreg_t cpuirq;
                 struct xwup_evt * evt;
@@ -467,8 +467,8 @@ xwer_t xwup_cond_unlock(void * lock, xwsq_t lktype, void * lkdata)
         rc = XWOK;
         switch (lktype) {
         case XWOS_LK_MTX:
-#if ((defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)) || \
-     (defined(XWUPCFG_LOCK_FAKEMTX) && (1 == XWUPCFG_LOCK_FAKEMTX)))
+#if ((defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)) || \
+     (defined(XWOSCFG_LOCK_FAKEMTX) && (1 == XWOSCFG_LOCK_FAKEMTX)))
                 rc = xwup_mtx_unlock(ulk.xwup.mtx);
 #endif
                 break;
@@ -512,8 +512,8 @@ xwer_t xwup_cond_lock(void * lock, xwsq_t lktype, xwtm_t to, bool unintr,
         rc = XWOK;
         switch (lktype) {
         case XWOS_LK_MTX:
-#if ((defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX)) || \
-     (defined(XWUPCFG_LOCK_FAKEMTX) && (1 == XWUPCFG_LOCK_FAKEMTX)))
+#if ((defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)) || \
+     (defined(XWOSCFG_LOCK_FAKEMTX) && (1 == XWOSCFG_LOCK_FAKEMTX)))
                 if (unintr) {
                         rc = xwup_mtx_lock_unintr(ulk.xwup.mtx);
                 } else {
@@ -558,7 +558,7 @@ xwer_t xwup_cond_blkthd_to_unlkwq_cpuirqrs(struct xwup_cond * cond,
 {
         struct xwup_tt * xwtt;
         xwsq_t pmpt;
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwsq_t bh;
 #endif
         xwer_t rc;
@@ -596,20 +596,20 @@ xwer_t xwup_cond_blkthd_to_unlkwq_cpuirqrs(struct xwup_cond * cond,
         /* 调度 */
         xwup_skd_svpmpt_lc(&pmpt);
         xwup_skd_rspmpt_lc(0);
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwup_skd_svbh_lc(&bh);
         xwup_skd_rsbh_lc(0);
 #endif
         xwospl_cpuirq_enable_lc();
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         xwup_skd_wakelock_unlock();
 #endif
         xwup_skd_req_swcx();
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         xwup_skd_wakelock_lock();
 #endif
         xwospl_cpuirq_restore_lc(cpuirq);
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwup_skd_rsbh_lc(bh);
 #endif
         xwup_skd_rspmpt_lc(pmpt);
@@ -714,7 +714,7 @@ xwer_t xwup_cond_test(struct xwup_cond * cond,
         xwer_t rc;
 
         xwospl_cpuirq_save_lc(&cpuirq);
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         rc = xwup_skd_wakelock_lock();
         if (__xwcc_unlikely(rc < 0)) {
                 /* 系统准备进入低功耗模式，线程需被冻结，返回-EINTR。*/
@@ -726,7 +726,7 @@ xwer_t xwup_cond_test(struct xwup_cond * cond,
                                                          lock, lktype, lkdata,
                                                          to, lkst,
                                                          cpuirq);
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
                 xwup_skd_wakelock_unlock();
         }
 #endif
@@ -781,7 +781,7 @@ xwer_t xwup_cond_blkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
 {
         xwer_t rc;
         xwsq_t pmpt;
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwsq_t bh;
 #endif
 
@@ -804,14 +804,14 @@ xwer_t xwup_cond_blkthd_unlkwq_cpuirqrs(struct xwup_cond * cond,
         /* 调度 */
         xwup_skd_svpmpt_lc(&pmpt);
         xwup_skd_rspmpt_lc(0);
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwup_skd_svbh_lc(&bh);
         xwup_skd_rsbh_lc(0);
 #endif
         xwospl_cpuirq_enable_lc();
         xwup_skd_req_swcx();
         xwospl_cpuirq_restore_lc(cpuirq);
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         xwup_skd_rsbh_lc(bh);
 #endif
         xwup_skd_rspmpt_lc(pmpt);

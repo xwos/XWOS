@@ -13,11 +13,6 @@
 #include <string.h>
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
-#include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
-#if defined(XWMDCFG_isc_xwcq_STDC_MM) && (1 == XWMDCFG_isc_xwcq_STDC_MM)
-#  include <stdlib.h>
-#endif
 #include <xwos/lib/bclst.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/osal/sync/sem.h>

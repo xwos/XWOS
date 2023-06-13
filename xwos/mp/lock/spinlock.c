@@ -532,7 +532,7 @@ void xwmp_splk_unlock_irqsrs(struct xwmp_splk * splk,
         }
 }
 
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 __xwmp_api
 void xwmp_splk_lock_bh(struct xwmp_splk * splk)
 {

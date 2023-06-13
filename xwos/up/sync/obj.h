@@ -23,7 +23,7 @@ struct xwup_evt;
  */
 struct xwup_synobj {
         struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
         struct {
                 struct xwup_evt * evt; /**< 事件对象 */
                 xwsq_t pos; /**< 事件对象中的位图位置 */

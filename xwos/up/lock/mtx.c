@@ -16,7 +16,7 @@
 #include <xwos/lib/rbtree.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
-#if defined(XWUPCFG_LOCK_MTX_STDC_MM) && (1 == XWUPCFG_LOCK_MTX_STDC_MM)
+#if defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
 #  include <stdlib.h>
 #endif
 #include <xwos/ospl/irq.h>
@@ -79,7 +79,7 @@ xwer_t xwup_mtx_test_unintr(struct xwup_mtx * mtx, struct xwup_thd * thd);
 static __xwup_code
 struct xwup_mtx * xwup_mtx_alloc(void)
 {
-#if defined(XWUPCFG_SKD_MTX_STDC_MM) && (1 == XWUPCFG_SKD_MTX_STDC_MM)
+#if defined(XWOSCFG_SKD_MTX_STDC_MM) && (1 == XWOSCFG_SKD_MTX_STDC_MM)
         struct xwup_mtx * mtx;
 
         mtx = malloc(sizeof(struct xwup_mtx));
@@ -113,7 +113,7 @@ struct xwup_mtx * xwup_mtx_alloc(void)
 static __xwup_code
 void xwup_mtx_free(struct xwup_mtx * mtx)
 {
-#if defined(XWUPCFG_SKD_MTX_STDC_MM) && (1 == XWUPCFG_SKD_MTX_STDC_MM)
+#if defined(XWOSCFG_SKD_MTX_STDC_MM) && (1 == XWOSCFG_SKD_MTX_STDC_MM)
         free(mtx);
 #else
         xwmm_kma_free(mtx);
@@ -472,12 +472,12 @@ xwer_t xwup_mtx_blkthd_to_unlkwq_cpuirqrs(struct xwup_mtx * mtx,
 
         /* 调度 */
         xwospl_cpuirq_enable_lc();
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         xwup_skd_wakelock_unlock();
 #endif
         xwup_skd_enpmpt_lc();
         xwup_skd_req_swcx();
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         xwup_skd_wakelock_lock();
 #endif
         xwospl_cpuirq_restore_lc(cpuirq);
@@ -571,7 +571,7 @@ xwer_t xwup_mtx_test(struct xwup_mtx * mtx, struct xwup_thd * thd, xwtm_t to)
                 xwospl_cpuirq_restore_lc(cpuirq);
                 xwup_skd_enpmpt_lc();
         } else if (mtx->ownertree) {
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
                 rc = xwup_skd_wakelock_lock();
                 if (__xwcc_unlikely(rc < 0)) {
                         /* 系统准备进入低功耗模式，线程需被冻结，返回-EINTR。*/
@@ -582,7 +582,7 @@ xwer_t xwup_mtx_test(struct xwup_mtx * mtx, struct xwup_thd * thd, xwtm_t to)
 #endif
                         rc = xwup_mtx_blkthd_to_unlkwq_cpuirqrs(mtx, xwskd, thd,
                                                                 to, cpuirq);
-#if defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM)
+#if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
                         xwup_skd_wakelock_unlock();
                 }
 #endif
@@ -620,7 +620,7 @@ xwer_t xwup_mtx_lock_to(struct xwup_mtx * mtx, xwtm_t to)
                 }/* else {} */
         } else if (!xwup_skd_tstpmpt_lc()) {
                 rc = -ECANNOTPMPT;
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         } else if (!xwup_skd_tstbh_lc()) {
                 rc = -ECANNOTBH;
 #endif
@@ -696,7 +696,7 @@ xwer_t xwup_mtx_lock_unintr(struct xwup_mtx * mtx)
 
         if (!xwup_skd_tstpmpt_lc()) {
                 rc = -ECANNOTPMPT;
-#if defined(XWUPCFG_SKD_BH) && (1 == XWUPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         } else if (!xwup_skd_tstbh_lc()) {
                 rc = -ECANNOTBH;
 #endif

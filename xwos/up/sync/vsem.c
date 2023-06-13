@@ -13,7 +13,7 @@
 #include <xwos/standard.h>
 #include <xwos/ospl/irq.h>
 #include <xwos/up/sync/obj.h>
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
 #  include <xwos/up/sync/evt.h>
 #endif
 #include <xwos/up/sync/vsem.h>
@@ -61,7 +61,7 @@ xwer_t xwup_vsem_put(struct xwup_vsem * sem)
         return xwup_synobj_put(&sem->synobj);
 }
 
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
 __xwup_code
 xwer_t xwup_vsem_bind(struct xwup_vsem * vsem, struct xwup_evt * evt, xwsq_t pos)
 {
@@ -107,7 +107,7 @@ xwer_t xwup_vsem_freeze(struct xwup_vsem * vsem)
                 rc = -EALREADY;
         } else {
                 vsem->count = XWUP_VSEM_NEGTIVE;
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
                 struct xwup_evt * evt;
                 struct xwup_synobj * synobj;
 

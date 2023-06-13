@@ -15,35 +15,35 @@
 
 #include <cfg/project.h>
 
-#if defined(XWUPCFG_SKD_THD_EXIT) && (1 == XWUPCFG_SKD_THD_EXIT)
-#  if !defined(XWUPCFG_SYNC_COND) || (0 == XWUPCFG_SYNC_COND)
-#    error "XWUPCFG_SYNC_COND must be '1' when (XWUPCFG_SKD_THD_EXIT == 1) !"
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
+#  if !defined(XWOSCFG_SYNC_COND) || (0 == XWOSCFG_SYNC_COND)
+#    error "XWOSCFG_SYNC_COND must be '1' when (XWOSCFG_SKD_THD_EXIT == 1) !"
 #  endif
 #endif
 
-#if defined(XWUPCFG_SYNC_EVT) && (1 == XWUPCFG_SYNC_EVT)
-#  if !defined(XWUPCFG_SYNC_COND) || (0 == XWUPCFG_SYNC_COND)
-#    error "XWUPCFG_SYNC_EVT must be '1' when (XWUPCFG_SKD_THD_EXIT == 1) !"
+#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
+#  if !defined(XWOSCFG_SYNC_COND) || (0 == XWOSCFG_SYNC_COND)
+#    error "XWOSCFG_SYNC_EVT must be '1' when (XWOSCFG_SKD_THD_EXIT == 1) !"
 #  endif
 #endif
 
-#if (defined(XWUPCFG_SYNC_PLSEM) && (1 == XWUPCFG_SYNC_PLSEM))
+#if (defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM))
 #  define XWUPRULE_SKD_WQ_PL                    1
-#elif (defined(XWUPCFG_SYNC_COND) && (1 == XWUPCFG_SYNC_COND))
+#elif (defined(XWOSCFG_SYNC_COND) && (1 == XWOSCFG_SYNC_COND))
 #  define XWUPRULE_SKD_WQ_PL                    1
 #else
 #  define XWUPRULE_SKD_WQ_PL                    0
 #endif
 
-#if (defined(XWUPCFG_LOCK_MTX) && (1 == XWUPCFG_LOCK_MTX))
+#if (defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX))
 #  define XWUPRULE_SKD_WQ_RT                    1
-#elif (defined(XWUPCFG_SYNC_RTSEM) && (1 == XWUPCFG_SYNC_RTSEM))
+#elif (defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM))
 #  define XWUPRULE_SKD_WQ_RT                    1
 #else
 #  define XWUPRULE_SKD_WQ_RT                    0
 #endif
 
-#if (defined(XWUPCFG_SKD_PM) && (1 == XWUPCFG_SKD_PM))
+#if (defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM))
 #  define XWUPRULE_SKD_THD_FREEZE               1
 #else
 #  define XWUPRULE_SKD_THD_FREEZE               0

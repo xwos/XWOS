@@ -16,9 +16,9 @@
 #include <xwos/lib/rbtree.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
-#if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
+#if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
 #  include <xwos/mm/memslice.h>
-#elif defined(XWMPCFG_LOCK_MTX_STDC_MM) && (1 == XWMPCFG_LOCK_MTX_STDC_MM)
+#elif defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
 #  include <stdlib.h>
 #endif
 #include <xwos/ospl/irq.h>
@@ -81,7 +81,7 @@ static __xwmp_code
 xwer_t xwmp_mtx_test_unintr(struct xwmp_mtx * mtx,
                             struct xwmp_thd * thd, struct xwmp_skd * xwskd);
 
-#if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
+#if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
 /**
  * @brief 结构体xwmp_mtx的对象缓存
  */
@@ -93,7 +93,7 @@ static __xwmp_data struct xwmm_memslice xwmp_mtx_cache;
 const __xwmp_rodata char xwmp_mtx_cache_name[] = "xwos.mp.lk.mtx.cache";
 #endif
 
-#if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
+#if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
 /**
  * @brief XWMP INIT CODE：初始化结构体xwmp_mtx的对象缓存
  * @param[in] zone_origin: 内存区域的首地址
@@ -123,7 +123,7 @@ xwer_t xwmp_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 static __xwmp_code
 struct xwmp_mtx * xwmp_mtx_alloc(void)
 {
-#if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
+#if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
         union {
                 struct xwmp_mtx * mtx;
                 void * anon;
@@ -135,7 +135,7 @@ struct xwmp_mtx * xwmp_mtx_alloc(void)
                 mem.mtx = err_ptr(rc);
         }/* else {} */
         return mem.mtx;
-#elif defined(XWMPCFG_LOCK_MTX_STDC_MM) && (1 == XWMPCFG_LOCK_MTX_STDC_MM)
+#elif defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
         struct xwmp_mtx * mtx;
 
         mtx = malloc(sizeof(struct xwmp_mtx));
@@ -169,9 +169,9 @@ struct xwmp_mtx * xwmp_mtx_alloc(void)
 static __xwmp_code
 void xwmp_mtx_free(struct xwmp_mtx * mtx)
 {
-#if defined(XWMPCFG_LOCK_MTX_MEMSLICE) && (1 == XWMPCFG_LOCK_MTX_MEMSLICE)
+#if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
         xwmm_memslice_free(&xwmp_mtx_cache, mtx);
-#elif defined(XWMPCFG_LOCK_MTX_STDC_MM) && (1 == XWMPCFG_LOCK_MTX_STDC_MM)
+#elif defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
         xwmp_mtx_destruct(mtx);
         free(mtx);
 #else
@@ -790,10 +790,10 @@ xwer_t xwmp_mtx_lock_to(struct xwmp_mtx * mtx, xwtm_t to)
                 }
         } else if (!xwmp_skd_tstpmpt(xwskd)) {
                 rc = -ECANNOTPMPT;
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         } else if (!xwmp_skd_tstbh(xwskd)) {
                 rc = -ECANNOTBH;
-#endif/* XWMPCFG_SKD_BH */
+#endif
         } else {
                 rc = xwmp_mtx_grab(mtx);
                 if (__xwcc_likely(XWOK == rc)) {
@@ -892,11 +892,11 @@ xwer_t xwmp_mtx_lock_unintr(struct xwmp_mtx * mtx)
         if (!xwmp_skd_tstpmpt(xwskd)) {
                 rc = -ECANNOTPMPT;
                 goto err_cannot;
-#if defined(XWMPCFG_SKD_BH) && (1 == XWMPCFG_SKD_BH)
+#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
         } else if (!xwmp_skd_tstbh(xwskd)) {
                 rc = -ECANNOTBH;
                 goto err_cannot;
-#endif/* XWMPCFG_SKD_BH */
+#endif
         }
 
         rc = xwmp_mtx_grab(mtx);
