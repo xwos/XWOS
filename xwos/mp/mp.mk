@@ -27,7 +27,9 @@ XWOS_CSRCS += mp/plwq.c
 XWOS_CSRCS += mp/skd.c
 XWOS_CSRCS += mp/thd.c
 XWOS_CSRCS += mp/pm.c
-XWOS_CSRCS += mp/mtxtree.c
+ifeq ($(XWOSCFG_LOCK_MTX),y)
+    XWOS_CSRCS += mp/mtxtree.c
+endif
 
 ######## ######## ######## ######## swt ######## ######## ######## ########
 ifeq ($(XWOSCFG_SKD_SWT),y)
@@ -36,7 +38,9 @@ endif
 
 ######## ######## ######## ######## lock ######## ######## ######## ########
 XWOS_CSRCS += mp/lock/spinlock.c
-XWOS_CSRCS += mp/lock/mtx.c
+ifeq ($(XWOSCFG_LOCK_MTX),y)
+    XWOS_CSRCS += mp/lock/mtx.c
+endif
 
 ######## ######## ######## ######## sync ######## ######## ######## ########
 XWOS_CSRCS += mp/sync/obj.c

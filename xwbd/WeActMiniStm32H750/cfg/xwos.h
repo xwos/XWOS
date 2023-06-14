@@ -115,9 +115,9 @@
 #define XWOSCFG_SYNC_EVT_STDC_MM                        1
 
 /******** ******** ******** lock ******** ******** ********/
-#define XWOSCFG_LOCK_MTX                                1 /* UP Only */
+#define XWOSCFG_LOCK_MTX                                1
 #define XWOSCFG_LOCK_MTX_MEMSLICE                       0 /* MP Only */
 #define XWOSCFG_LOCK_MTX_STDC_MM                        1
-#define XWOSCFG_LOCK_FAKEMTX                            0 /* UP Only */
+#define XWOSCFG_LOCK_FAKEMTX                            0
 
 #endif /* cfg/xwos.h */

@@ -31,7 +31,11 @@
 #include <xwos/mp/plwq.h>
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/lock/seqlock.h>
-#include <xwos/mp/lock/mtx.h>
+#if (defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX))
+#  include <xwos/mp/lock/mtx.h>
+#elif (defined(XWOSCFG_LOCK_FAKEMTX) && (1 == XWOSCFG_LOCK_FAKEMTX))
+#  include <xwos/mp/lock/fakemtx.h>
+#endif
 #include <xwos/mp/sync/obj.h>
 #include <xwos/mp/sync/evt.h>
 #include <xwos/mp/sync/cond.h>
@@ -558,7 +562,10 @@ xwer_t xwmp_cond_unlock(void * lock, xwsq_t lktype, void * lkdata)
         rc = XWOK;
         switch (lktype) {
         case XWOS_LK_MTX:
+#if ((defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)) || \
+     (defined(XWOSCFG_LOCK_FAKEMTX) && (1 == XWOSCFG_LOCK_FAKEMTX)))
                 rc = xwmp_mtx_unlock(ulk.xwmp.mtx);
+#endif
                 break;
         case XWOS_LK_SPLK:
                 xwmp_splk_unlock(ulk.xwmp.splk);
@@ -602,11 +609,17 @@ xwer_t xwmp_cond_lock(void * lock, xwsq_t lktype, xwtm_t to, bool unintr,
         rc = XWOK;
         switch (lktype) {
         case XWOS_LK_MTX:
+#if ((defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)) || \
+     (defined(XWOSCFG_LOCK_FAKEMTX) && (1 == XWOSCFG_LOCK_FAKEMTX)))
                 if (unintr) {
                         rc = xwmp_mtx_lock_unintr(ulk.xwmp.mtx);
                 } else {
                         rc = xwmp_mtx_lock_to(ulk.xwmp.mtx, to);
                 }
+#else
+                XWOS_UNUSED(to);
+                XWOS_UNUSED(unintr);
+#endif
                 break;
         case XWOS_LK_SPLK:
                 xwmp_splk_lock(ulk.xwmp.splk);

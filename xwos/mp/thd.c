@@ -32,10 +32,12 @@
 #include <xwos/mp/tt.h>
 #include <xwos/mp/sync/cond.h>
 #include <xwos/mp/sync/sem.h>
-#include <xwos/mp/mtxtree.h>
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/lock/seqlock.h>
-#include <xwos/mp/lock/mtx.h>
+#if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
+#  include <xwos/mp/lock/mtx.h>
+#  include <xwos/mp/mtxtree.h>
+#endif
 #include <xwos/mp/thd.h>
 
 #if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
@@ -362,7 +364,9 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
         xwlib_bclst_init_node(&thd->rqnode);
         xwmp_ttn_init(&thd->ttn, (xwptr_t)thd, XWMP_TTN_TYPE_THD);
         xwmp_wqn_init(&thd->wqn, thd);
+#if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
         xwmp_mtxtree_init(&thd->mtxtree);
+#endif
 
         /* 优先级 */
         if (attr->priority > XWMP_SKD_PRIORITY_RT_MAX) {
@@ -775,6 +779,7 @@ xwer_t xwmp_thd_detach(struct xwmp_thd * thd)
 }
 #endif
 
+#if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
 /**
  * @brief 改变线程的动态优先级一次
  * @param[in] thd: 线程对象的指针
@@ -911,7 +916,9 @@ xwer_t xwmp_thd_chprio_once(struct xwmp_thd * thd, xwpr_t dprio,
         }
         return rc;
 }
+#endif
 
+#if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
 /**
  * @brief 重新设定线程的动态优先级
  * @param[in] thd: 线程对象的指针
@@ -933,6 +940,7 @@ void xwmp_thd_chprio(struct xwmp_thd * thd)
                 rc = xwmp_thd_chprio_once(thd, dprio, &tmp);
         } while (xwmp_sqlk_rd_retry(&mt->lock, seq) || (rc < 0));
 }
+#endif
 
 /**
  * @brief 将线程加入到调度器就绪队列的头部
@@ -1095,6 +1103,7 @@ xwer_t xwmp_thd_intr(struct xwmp_thd * thd)
                         xwmp_splk_unlock_cpuirqrs(&thd->wqn.lock, cpuirq);
                         rc = xwmp_cond_intr(cond, &thd->wqn);
                         xwmp_cond_put(cond);
+#if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
                 } else if (XWMP_WQTYPE_MTX == thd->wqn.type) {
                         struct xwmp_mtx * mtx;
 
@@ -1103,6 +1112,7 @@ xwer_t xwmp_thd_intr(struct xwmp_thd * thd)
                         xwmp_splk_unlock_cpuirqrs(&thd->wqn.lock, cpuirq);
                         rc = xwmp_mtx_intr(mtx, thd);
                         xwmp_mtx_put(mtx);
+#endif
                 } else {
                         xwmp_splk_unlock_cpuirqrs(&thd->wqn.lock, cpuirq);
                         XWOS_BUG();
@@ -1135,6 +1145,8 @@ xwer_t xwmp_thd_intr(struct xwmp_thd * thd)
         return rc;
 }
 
+
+#if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
 /**
  * @brief 唤醒一个阻塞/睡眠态的线程，将其加入到调度器的就绪队列
  * @param[in] thd: 线程对象的指针
@@ -1155,6 +1167,18 @@ xwer_t xwmp_thd_wakeup(struct xwmp_thd * thd)
         xwmp_sqlk_rdex_unlock_cpuirqrs(&mt->lock, cpuirq);
         return rc;
 }
+#else
+/**
+ * @brief 唤醒一个阻塞/睡眠态的线程，将其加入到调度器的就绪队列
+ * @param[in] thd: 线程对象的指针
+ * @return 错误码
+ */
+__xwmp_code
+xwer_t xwmp_thd_wakeup(struct xwmp_thd * thd)
+{
+        return xwmp_thd_rq_add_tail(thd, thd->sprio);
+}
+#endif
 
 /**
  * @brief 线程的时间树节点回调函数

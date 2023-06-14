@@ -42,10 +42,8 @@ struct xwup_mtx {
         xwpr_t dprio; /**< 动态优先级：此成员被锁rtwq.lock保护。*/
 };
 
-/* public(xwmp) */
 xwer_t xwup_mtx_intr(struct xwup_mtx * mtx, struct xwup_thd * thd);
 
-/* public */
 xwer_t xwup_mtx_init(struct xwup_mtx * mtx, xwpr_t sprio);
 xwer_t xwup_mtx_fini(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio);

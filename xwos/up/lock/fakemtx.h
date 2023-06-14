@@ -8,9 +8,6 @@
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
- * @note
- * - 单核(UP)系统中并不需要自旋锁，为了满足xwosal中API的风格，
- *   源码中实现的自旋锁是虚假的。
  */
 
 #ifndef __xwos_up_lock_fakemtx_h__
@@ -20,18 +17,14 @@
 #include <xwos/up/thd.h>
 #if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
 #  include <xwos/up/sync/rtsem.h>
-#elif defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
-#  include <xwos/up/sync/plsem.h>
-#else
-#  error "Can't find the configuration of semaphore!"
-#endif
-
-#if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
 #  define XWUP_SEM_API(api, ...) xwup_rtsem_##api(__VA_ARGS__)
 #  define xwup_sem xwup_rtsem
 #elif defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
+#  include <xwos/up/sync/plsem.h>
 #  define XWUP_SEM_API(api, ...) xwup_plsem_##api(__VA_ARGS__)
 #  define xwup_sem xwup_plsem
+#else
+#  error "Can't find the configuration of semaphore!"
 #endif
 
 /**
@@ -57,13 +50,13 @@ xwer_t xwup_mtx_fini(struct xwup_mtx * mtx)
 static __xwup_inline_api
 xwer_t xwup_mtx_grab(struct xwup_mtx * mtx)
 {
-        return XWUP_SEM_API(grab, (struct xwup_sem *)mtx);
+        return XWUP_SEM_API(grab, &mtx->fake);
 }
 
 static __xwup_inline_api
 xwer_t xwup_mtx_put(struct xwup_mtx * mtx)
 {
-        return XWUP_SEM_API(put, (struct xwup_sem *)mtx);
+        return XWUP_SEM_API(put, &mtx->fake);
 }
 
 static __xwup_inline_api
@@ -83,19 +76,19 @@ xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio)
 static __xwup_inline_api
 xwer_t xwup_mtx_delete(struct xwup_mtx * mtx, xwsq_t tik)
 {
-        return XWUP_SEM_API(delete, (struct xwup_sem *)mtx, tik);
+        return XWUP_SEM_API(delete, &mtx->fake, tik);
 }
 
 static __xwup_inline_api
 xwer_t xwup_mtx_acquire(struct xwup_mtx * mtx, xwsq_t tik)
 {
-        return XWUP_SEM_API(acquire, (struct xwup_sem *)mtx, tik);
+        return XWUP_SEM_API(acquire, &mtx->fake, tik);
 }
 
 static __xwup_inline_api
 xwer_t xwup_mtx_release(struct xwup_mtx * mtx, xwsq_t tik)
 {
-        return XWUP_SEM_API(release, (struct xwup_sem *)mtx, tik);
+        return XWUP_SEM_API(release, &mtx->fake, tik);
 }
 
 static __xwup_inline_api

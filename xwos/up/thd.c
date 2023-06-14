@@ -39,9 +39,6 @@
 #  include <xwos/up/lock/mtx.h>
 #  include <xwos/up/mtxtree.h>
 #endif
-#if defined(XWOSCFG_LOCK_FAKEMTX) && (1 == XWOSCFG_LOCK_FAKEMTX)
-#  include <xwos/up/lock/fakemtx.h>
-#endif
 #if defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
 #  include <xwos/up/sync/plsem.h>
 #endif

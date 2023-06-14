@@ -438,6 +438,12 @@ xwer_t xwmp_plsem_init(struct xwmp_sem * sem, xwssq_t val, xwssq_t max)
 }
 
 __xwmp_api
+xwer_t xwmp_plsem_create(struct xwmp_sem ** sembuf, xwssq_t val, xwssq_t max)
+{
+        return xwmp_sem_create(sembuf, XWMP_SEM_TYPE_PIPELINE, val, max);
+}
+
+__xwmp_api
 xwer_t xwmp_plsem_freeze(struct xwmp_sem * sem)
 {
         xwer_t rc;
@@ -953,6 +959,12 @@ xwer_t xwmp_rtsem_init(struct xwmp_sem * sem, xwssq_t val, xwssq_t max)
 {
         xwmp_sem_construct(sem);
         return xwmp_rtsem_activate(sem, val, max, xwmp_sem_sgc);
+}
+
+__xwmp_api
+xwer_t xwmp_rtsem_create(struct xwmp_sem ** sembuf, xwssq_t val, xwssq_t max)
+{
+        return xwmp_sem_create(sembuf, XWMP_SEM_TYPE_RT, val, max);
 }
 
 __xwmp_api

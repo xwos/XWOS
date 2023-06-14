@@ -269,6 +269,12 @@ xwer_t xwmp_mtx_fini(struct xwmp_mtx * mtx)
 }
 
 __xwmp_api
+xwsq_t xwmp_mtx_gettik(struct xwmp_mtx * mtx)
+{
+        return mtx ? mtx->xwobj.tik : 0;
+}
+
+__xwmp_api
 xwer_t xwmp_mtx_create(struct xwmp_mtx ** mtxbuf, xwpr_t sprio)
 {
         struct xwmp_mtx * mtx;

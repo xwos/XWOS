@@ -95,6 +95,7 @@ xwer_t xwmp_sem_unbind(struct xwmp_sem * sem, struct xwmp_evt * evt);
 
 #if defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
 xwer_t xwmp_plsem_init(struct xwmp_sem * sem, xwssq_t val, xwssq_t max);
+xwer_t xwmp_plsem_create(struct xwmp_sem ** sembuf, xwssq_t val, xwssq_t max);
 xwer_t xwmp_plsem_thaw(struct xwmp_sem * sem);
 xwer_t xwmp_plsem_freeze(struct xwmp_sem * sem);
 xwer_t xwmp_plsem_post(struct xwmp_sem * sem);
@@ -106,6 +107,7 @@ xwer_t xwmp_plsem_trywait(struct xwmp_sem * sem);
 
 #if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
 xwer_t xwmp_rtsem_init(struct xwmp_sem * sem, xwssq_t val, xwssq_t max);
+xwer_t xwmp_rtsem_create(struct xwmp_sem ** sembuf, xwssq_t val, xwssq_t max);
 xwer_t xwmp_rtsem_thaw(struct xwmp_sem * sem);
 xwer_t xwmp_rtsem_freeze(struct xwmp_sem * sem);
 xwer_t xwmp_rtsem_post(struct xwmp_sem * sem);

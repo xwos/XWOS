@@ -107,17 +107,17 @@
 #define XWOSCFG_SYNC_SEM_MEMSLICE                       0 /* MP Only */
 #define XWOSCFG_SYNC_SEM_STDC_MM                        0
 
-#define XWOSCFG_SYNC_COND                               1
+#define XWOSCFG_SYNC_COND                               1 /* UP Only */
 #define XWOSCFG_SYNC_COND_MEMSLICE                      0 /* MP Only */
-#define XWOSCFG_SYNC_COND_STDC_MM                       0 /* MP Only */
+#define XWOSCFG_SYNC_COND_STDC_MM                       0
 
 #define XWOSCFG_SYNC_EVT                                1
 #define XWOSCFG_SYNC_EVT_STDC_MM                        0
 
 /******** ******** ******** lock ******** ******** ********/
-#define XWOSCFG_LOCK_MTX                                0 /* UP Only */
+#define XWOSCFG_LOCK_MTX                                0
 #define XWOSCFG_LOCK_MTX_MEMSLICE                       0 /* MP Only */
 #define XWOSCFG_LOCK_MTX_STDC_MM                        0
-#define XWOSCFG_LOCK_FAKEMTX                            1 /* UP Only */
+#define XWOSCFG_LOCK_FAKEMTX                            1
 
 #endif /* cfg/xwos.h */

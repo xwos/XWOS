@@ -13,7 +13,13 @@
 #ifndef __xwos_mp_osdl_lock_mtx_h__
 #define __xwos_mp_osdl_lock_mtx_h__
 
-#include <xwos/mp/lock/mtx.h>
+#if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
+#  include <xwos/mp/lock/mtx.h>
+#elif defined(XWOSCFG_LOCK_FAKEMTX) && (1 == XWOSCFG_LOCK_FAKEMTX)
+#  include <xwos/mp/lock/fakemtx.h>
+#else
+#  error "Can't find the mtx configuration!"
+#endif
 
 #define xwosdl_mtx xwmp_mtx
 
@@ -79,7 +85,7 @@ xwer_t xwosdl_mtx_release(struct xwosdl_mtx * mtx, xwsq_t tik)
 static __xwcc_inline
 xwsq_t xwosdl_mtx_gettik(struct xwosdl_mtx * mtx)
 {
-        return mtx ? mtx->xwobj.tik : 0;
+        return xwmp_mtx_gettik(mtx);
 }
 
 static __xwcc_inline

@@ -24,8 +24,10 @@
 #include <xwos/mp/sync/cond.h>
 #include <xwos/mp/skd.h>
 #include <xwos/mp/wqn.h>
-#include <xwos/mp/mtxtree.h>
 #include <xwos/mp/tt.h>
+#if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
+#  include <xwos/mp/mtxtree.h>
+#endif
 
 struct xwmp_plwq;
 struct xwmp_rtwq;
@@ -80,8 +82,10 @@ struct xwmp_thd {
 #endif
 
         /* 线程优先级 */
+#if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
         struct xwmp_mtxtree mtxtree; /**< 互斥锁树：线程已经获得的所有互斥锁都
                                           需要加入到互斥锁树 */
+#endif
         xwpr_t sprio; /**< 线程的固有优先级 */
         struct {
                 xwpr_t r; /**< 线程的运行态优先级 */
@@ -98,9 +102,12 @@ struct xwmp_thd {
         } libc;
 };
 
+#if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
 xwer_t xwmp_thd_chprio_once(struct xwmp_thd * thd, xwpr_t dprio,
                             struct xwmp_mtx ** pmtx);
 void xwmp_thd_chprio(struct xwmp_thd * thd);
+#endif
+
 xwer_t xwmp_thd_rq_add_head(struct xwmp_thd * thd, xwpr_t prio);
 xwer_t xwmp_thd_rq_add_tail(struct xwmp_thd * thd, xwpr_t prio);
 xwer_t xwmp_thd_rq_remove(struct xwmp_thd * thd);
