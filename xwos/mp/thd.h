@@ -74,8 +74,10 @@ struct xwmp_thd {
         /* 阻塞态 */
         struct xwmp_wqn wqn; /**< 等待队列 */
 
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
         /* 退出态 */
         struct xwmp_cond completion; /**< 线程退出时的事件信号量 */
+#endif
 
         /* 线程优先级 */
         struct xwmp_mtxtree mtxtree; /**< 互斥锁树：线程已经获得的所有互斥锁都

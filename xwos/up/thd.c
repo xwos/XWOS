@@ -98,6 +98,11 @@ xwer_t xwup_thd_activate(struct xwup_thd * thd,
 static __xwup_code
 void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f thdfunc, void * arg);
 
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
+static __xwup_code
+xwer_t xwup_thd_delete(struct xwup_thd * thd);
+#endif
+
 
 /**
  * @brief 线程对象的构造函数
@@ -505,11 +510,13 @@ err_stack_alloc:
         return rc;
 }
 
-__xwup_code
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
+static __xwup_code
 xwer_t xwup_thd_delete(struct xwup_thd * thd)
 {
         return xwup_thd_put(thd);
 }
+#endif
 
 /**
  * @brief 执行退出线程
@@ -683,7 +690,7 @@ xwer_t xwup_thd_detach(struct xwup_thd * thd)
         return rc;
 }
 
-#else /* !XWOSCFG_SKD_THD_EXIT */
+#else
 
 __xwup_api
 void xwup_thd_quit(struct xwup_thd * thd)

@@ -81,8 +81,10 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
 static __xwmp_code
 void xwmp_thd_launch(struct xwmp_thd * thd, xwmp_thd_f thdfunc, void * arg);
 
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
 static __xwmp_code
 xwer_t xwmp_thd_delete(struct xwmp_thd * thd);
+#endif
 
 static __xwmp_code
 void xwmp_thd_outmigrate_frozen_lic(struct xwmp_thd * thd);
@@ -394,7 +396,9 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
 #endif
         thd->stack.guard = attr->stack_guard_size;
 
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
         xwmp_cond_init(&thd->completion);
+#endif
         xwlib_bclst_init_node(&thd->thdnode);
 #if defined(XWOSCFG_SKD_THD_LOCAL_DATA_NUM) && (XWOSCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
         for (xwsq_t i = 0; i < XWOSCFG_SKD_THD_LOCAL_DATA_NUM; i++) {
@@ -569,11 +573,13 @@ err_stack_alloc:
         return rc;
 }
 
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
 static __xwmp_code
 xwer_t xwmp_thd_delete(struct xwmp_thd * thd)
 {
         return xwmp_thd_put(thd);
 }
+#endif
 
 /**
  * @brief 执行退出线程的本地中断函数
@@ -583,6 +589,7 @@ xwer_t xwmp_thd_delete(struct xwmp_thd * thd)
 __xwmp_code
 xwer_t xwmp_thd_exit_lic(struct xwmp_thd * thd, xwer_t rc)
 {
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
         struct xwmp_skd * xwskd;
         bool detached;
         xwreg_t cpuirq;
@@ -615,6 +622,10 @@ xwer_t xwmp_thd_exit_lic(struct xwmp_thd * thd, xwer_t rc)
                 xwmp_thd_put(thd);
                 xwmp_skd_req_swcx(xwskd);
         }
+#else
+        XWOS_UNUSED(thd);
+        XWOS_UNUSED(rc);
+#endif
         return XWOK;
 }
 
@@ -625,21 +636,34 @@ xwer_t xwmp_thd_exit_lic(struct xwmp_thd * thd, xwer_t rc)
 __xwmp_code
 void xwmp_cthd_return(xwer_t rc)
 {
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
         struct xwmp_thd * cthd;
 
         cthd = xwmp_skd_get_cthd_lc();
         xwospl_thd_exit_lc((struct xwospl_thd *)cthd, rc);
+#else
+        XWOS_UNUSED(rc);
+        while (true) {
+        }
+#endif
 }
 
 __xwmp_api
 void xwmp_cthd_exit(xwer_t rc)
 {
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
         struct xwmp_thd * cthd;
 
         cthd = xwmp_skd_get_cthd_lc();
         xwospl_thd_exit_lc((struct xwospl_thd *)cthd, rc);
+#else
+        XWOS_UNUSED(rc);
+        while (true) {
+        }
+#endif
 }
 
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
 __xwmp_api
 void xwmp_thd_quit(struct xwmp_thd * thd)
 {
@@ -728,6 +752,28 @@ xwer_t xwmp_thd_detach(struct xwmp_thd * thd)
         }
         return rc;
 }
+#else
+__xwmp_api
+void xwmp_thd_quit(struct xwmp_thd * thd)
+{
+        XWOS_UNUSED(thd);
+}
+
+__xwmp_api
+xwer_t xwmp_thd_join(struct xwmp_thd * thd, xwer_t * trc)
+{
+        XWOS_UNUSED(thd);
+        XWOS_UNUSED(trc);
+        return -ENOSYS;
+}
+
+__xwmp_api
+xwer_t xwmp_thd_detach(struct xwmp_thd * thd)
+{
+        XWOS_UNUSED(thd);
+        return -ENOSYS;
+}
+#endif
 
 /**
  * @brief 改变线程的动态优先级一次
@@ -1575,10 +1621,14 @@ bool xwmp_cthd_shld_frz(void)
 __xwmp_api
 bool xwmp_cthd_shld_stop(void)
 {
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
         struct xwmp_thd * cthd;
 
         cthd = xwmp_skd_get_cthd_lc();
         return !!(XWMP_SKDOBJ_ST_EXITING & cthd->state);
+#else
+        return false;
+#endif
 }
 
 __xwmp_api

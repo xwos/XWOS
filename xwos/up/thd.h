@@ -26,11 +26,6 @@
 #if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
 #  include <xwos/up/mtxtree.h>
 #endif
-#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
-#  if !defined(XWOSCFG_SYNC_COND) || (1 != XWOSCFG_SYNC_COND)
-#    error "XWOSCFG_SYNC_COND must be 1 if (1 == XWOSCFG_SKD_THD_EXIT) !"
-#  endif
-#endif
 #if defined(XWOSCFG_SYNC_COND) && (1 == XWOSCFG_SYNC_COND)
 #  include <xwos/up/sync/cond.h>
 #endif
@@ -113,9 +108,6 @@ struct xwup_thd {
         } libc;
 };
 
-
-xwer_t xwup_thd_delete(struct xwup_thd * thd);
-/* public(xwup) */
 #if (defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX))
 void xwup_thd_chprio_once(struct xwup_thd * thd, xwpr_t dprio,
                           struct xwup_mtx ** pmtx);
@@ -157,7 +149,6 @@ void xwup_thd_wakeup(struct xwup_thd * thd)
         xwup_thd_rq_add_tail(thd);
 }
 
-/* public */
 void xwup_thd_attr_init(struct xwup_thd_attr * attr);
 xwer_t xwup_thd_init(struct xwup_thd * thd,
                      const struct xwup_thd_attr * inattr,

@@ -96,7 +96,7 @@
 #define XWOSCFG_SKD_THD_MEMSLICE                        0 /* MP Only */
 #define XWOSCFG_SKD_THD_STDC_MM                         1
 #define XWOSCFG_SKD_THD_LOCAL_DATA_NUM                  (2U)
-#define XWOSCFG_SKD_THD_EXIT                            1 /* UP Only */
+#define XWOSCFG_SKD_THD_EXIT                            1
 #define XWOSCFG_SKD_SWT                                 1
 #define XWOSCFG_SKD_SWT_MEMSLICE                        0 /* MP Only */
 #define XWOSCFG_SKD_SWT_STDC_MM                         1

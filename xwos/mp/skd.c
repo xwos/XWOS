@@ -102,8 +102,10 @@ void xwmp_pmdm_report_xwskd_resuming(struct xwmp_pmdm * pmdm);
 static __xwmp_code
 struct xwmp_thd * xwmp_skd_rtrq_choose(struct xwmp_skd * xwskd);
 
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
 static __xwmp_code
 void xwmp_skd_del_thd_lc(struct xwmp_skd * xwskd);
+#endif
 
 static __xwmp_code
 xwer_t xwmp_skd_idled(struct xwmp_skd * xwskd);
@@ -390,6 +392,7 @@ struct xwmp_thd * xwmp_skd_rtrq_choose(struct xwmp_skd * xwskd)
         return t;
 }
 
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
 /**
  * @brief 删除“删除列表”中的线程
  * @param[in] xwskd: XWOS MP调度器的指针
@@ -411,6 +414,7 @@ void xwmp_skd_del_thd_lc(struct xwmp_skd * xwskd)
                 xwmp_splk_unlock_cpuirq(&xwskd->thdlistlock);
         }
 }
+#endif
 
 /**
  * @brief 空闲任务的主函数
@@ -423,7 +427,9 @@ xwer_t xwmp_skd_idled(struct xwmp_skd * xwskd)
         XWOS_UNUSED(xwskd);
 
         while (true) {
+#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
                 xwmp_skd_del_thd_lc(xwskd);
+#endif
                 xwmp_skd_notify_allfrz_lc(xwskd);
 #if defined(BRDCFG_XWSKD_IDLE_HOOK) && (1 == BRDCFG_XWSKD_IDLE_HOOK)
                 board_xwskd_idle_hook(xwskd);

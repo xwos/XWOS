@@ -45,7 +45,7 @@ xwer_t xwosdl_sem_create(xwosdl_sem_d * semd, xwssq_t val, xwssq_t max)
         rc = xwmp_sem_create(&sem, XWMP_SEM_TYPE_PIPELINE, val, max);
         if (XWOK == rc) {
                 semd->sem = sem;
-                semd->tik = sem->xwobj.tik;
+                semd->tik = sem->synobj.xwobj.tik;
         } else {
                 *semd = XWOSDL_SEM_NILD;
         }
