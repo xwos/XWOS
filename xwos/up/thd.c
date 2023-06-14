@@ -27,10 +27,10 @@
 #include <xwos/up/lock/seqlock.h>
 #include <xwos/up/lock/fakespinlock.h>
 #include <xwos/up/rtrq.h>
-#if (1 == XWUPRULE_SKD_WQ_RT)
+#if (1 == XWOSRULE_SKD_WQ_RT)
 #  include <xwos/up/rtwq.h>
 #endif
-#if (1 == XWUPRULE_SKD_WQ_PL)
+#if (1 == XWOSRULE_SKD_WQ_PL)
 #  include <xwos/up/plwq.h>
 #endif
 #include <xwos/up/tt.h>
@@ -308,7 +308,7 @@ xwer_t xwup_thd_activate(struct xwup_thd * thd,
         if (attr->detached) {
                 thd->state |= XWUP_SKDOBJ_ST_DETACHED;
         }
-#if (1 == XWUPRULE_SKD_THD_FREEZE)
+#if (1 == XWOSRULE_SKD_THD_FREEZE)
         xwlib_bclst_init_node(&thd->frznode);
 #endif
         xwlib_bclst_init_node(&thd->rqnode);
@@ -1006,7 +1006,7 @@ void xwup_thd_wqn_callback(void * entry)
         xwup_skd_chkpmpt();
 }
 
-#if (1 == XWUPRULE_SKD_WQ_RT)
+#if (1 == XWOSRULE_SKD_WQ_RT)
 /**
  * @brief 将线程加入到实时（红黑树）等待队列中
  * @param[in] thd: 线程对象的指针
@@ -1025,7 +1025,7 @@ void xwup_thd_eq_rtwq(struct xwup_thd * thd, struct xwup_rtwq * xwrtwq,
 }
 #endif
 
-#if (1 == XWUPRULE_SKD_WQ_PL)
+#if (1 == XWOSRULE_SKD_WQ_PL)
 /**
  * @brief 将线程加入到管道（双循环链表）等待队列中
  * @param[in] thd: 线程对象的指针
@@ -1223,7 +1223,7 @@ err_cannot:
 __xwup_api
 xwer_t xwup_cthd_freeze(void)
 {
-#if (1 == XWUPRULE_SKD_THD_FREEZE)
+#if (1 == XWOSRULE_SKD_THD_FREEZE)
         struct xwup_thd * cthd;
         xwer_t rc;
 
@@ -1246,7 +1246,7 @@ xwer_t xwup_cthd_freeze(void)
 __xwup_code
 xwer_t xwup_thd_freeze_lic(struct xwup_thd * thd)
 {
-#if (1 == XWUPRULE_SKD_THD_FREEZE)
+#if (1 == XWOSRULE_SKD_THD_FREEZE)
         struct xwup_skd * xwskd;
         xwreg_t cpuirq;
 
@@ -1280,7 +1280,7 @@ xwer_t xwup_thd_freeze_lic(struct xwup_thd * thd)
 __xwup_code
 xwer_t xwup_thd_thaw_lic(struct xwup_thd * thd)
 {
-#if (1 == XWUPRULE_SKD_THD_FREEZE)
+#if (1 == XWOSRULE_SKD_THD_FREEZE)
         struct xwup_skd * xwskd;
         xwreg_t cpuirq;
         xwer_t rc;
@@ -1303,7 +1303,7 @@ xwer_t xwup_thd_thaw_lic(struct xwup_thd * thd)
 __xwup_api
 bool xwup_cthd_shld_frz(void)
 {
-#if (1 == XWUPRULE_SKD_THD_FREEZE)
+#if (1 == XWOSRULE_SKD_THD_FREEZE)
         return !!(xwup_skd_get_pm_stage() < XWUP_PM_STAGE_RUNNING);
 #else
         return false;
@@ -1326,7 +1326,7 @@ bool xwup_cthd_shld_stop(void)
 __xwup_api
 bool xwup_cthd_frz_shld_stop(bool * frozen)
 {
-#if (1 == XWUPRULE_SKD_THD_FREEZE)
+#if (1 == XWOSRULE_SKD_THD_FREEZE)
         bool frz;
         xwer_t rc;
 

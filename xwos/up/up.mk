@@ -11,26 +11,24 @@
 
 XWOS_EOBJS :=
 
-######## ######## ######## ######## ******** ######## ######## ######## ########
-######## ######## ######## ########   rules  ######## ######## ######## ########
-######## ######## ######## ######## ******** ######## ######## ######## ########
+######## ######## ######## ######## rule ######## ######## ######## ########
 ifeq ($(XWOSCFG_SYNC_PLSEM),y)
-    XWUPRULE_SKD_WQ_PL := y
+    XWOSRULE_SKD_WQ_PL := y
 else
     ifeq ($(XWOSCFG_SYNC_COND),y)
-        XWUPRULE_SKD_WQ_PL := y
+        XWOSRULE_SKD_WQ_PL := y
     else
-        XWUPRULE_SKD_WQ_PL := n
+        XWOSRULE_SKD_WQ_PL := n
     endif
 endif
 
 ifeq ($(XWOSCFG_LOCK_MTX),y)
-    XWUPRULE_SKD_WQ_RT := y
+    XWOSRULE_SKD_WQ_RT := y
 else
     ifeq ($(XWOSCFG_SYNC_RTSEM),y)
-        XWUPRULE_SKD_WQ_RT := y
+        XWOSRULE_SKD_WQ_RT := y
     else
-        XWUPRULE_SKD_WQ_RT := n
+        XWOSRULE_SKD_WQ_RT := n
     endif
 endif
 
@@ -50,11 +48,11 @@ XWOS_CSRCS += up/tt.c
 XWOS_CSRCS += up/thd.c
 XWOS_CSRCS += up/wqn.c
 
-ifeq ($(XWUPRULE_SKD_WQ_PL),y)
+ifeq ($(XWOSRULE_SKD_WQ_PL),y)
     XWOS_CSRCS += up/plwq.c
 endif
 
-ifeq ($(XWUPRULE_SKD_WQ_RT),y)
+ifeq ($(XWOSRULE_SKD_WQ_RT),y)
     XWOS_CSRCS += up/rtwq.c
 endif
 

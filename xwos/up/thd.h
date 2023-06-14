@@ -32,11 +32,11 @@
 
 struct xwup_skd;
 
-#if (1 == XWUPRULE_SKD_WQ_RT)
+#if (1 == XWOSRULE_SKD_WQ_RT)
 struct xwup_rtwq;
 #endif
 
-#if (1 == XWUPRULE_SKD_WQ_PL)
+#if (1 == XWOSRULE_SKD_WQ_PL)
 struct xwup_plwq;
 #endif
 
@@ -64,7 +64,7 @@ struct xwup_thd {
 
         xwsq_t state; /**< 线程状态 */
 
-#if (1 == XWUPRULE_SKD_THD_FREEZE)
+#if (1 == XWOSRULE_SKD_THD_FREEZE)
         /* 冻结态 */
         struct xwlib_bclst_node frznode; /**< 冻结链表节点 */
 #endif
@@ -124,12 +124,12 @@ xwer_t xwup_thd_tt_add_locked(struct xwup_thd * thd, struct xwup_tt * xwtt,
                               xwtm_t to, xwreg_t flag);
 void xwup_thd_wqn_callback(void * entry);
 
-#if (1 == XWUPRULE_SKD_WQ_RT)
+#if (1 == XWOSRULE_SKD_WQ_RT)
 void xwup_thd_eq_rtwq(struct xwup_thd * thd, struct xwup_rtwq * xwrtwq,
                       xwu16_t type);
 #endif
 
-#if (1 == XWUPRULE_SKD_WQ_PL)
+#if (1 == XWOSRULE_SKD_WQ_PL)
 void xwup_thd_eq_plwq(struct xwup_thd * thd, struct xwup_plwq * xwplwq,
                       xwu16_t type);
 #endif

@@ -10,6 +10,35 @@
 # > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
 
 ######## ######## ######## ######## rule ######## ######## ######## ########
+ifeq ($(XWOSCFG_SYNC_PLSEM),y)
+    XWOSRULE_SKD_WQ_PL := y
+else
+    ifeq ($(XWOSCFG_SYNC_COND),y)
+        XWOSRULE_SKD_WQ_PL := y
+    else
+        XWOSRULE_SKD_WQ_PL := n
+    endif
+endif
+
+ifeq ($(XWOSCFG_LOCK_MTX),y)
+    XWOSRULE_SKD_WQ_RT := y
+else
+    ifeq ($(XWOSCFG_SYNC_RTSEM),y)
+        XWOSRULE_SKD_WQ_RT := y
+    else
+        XWOSRULE_SKD_WQ_RT := n
+    endif
+endif
+
+ifeq ($(XWOSCFG_SYNC_PLSEM),y)
+    XWOSRULE_SYNC_SEM := y
+else
+    ifeq ($(XWOSCFG_SYNC_RTSEM),y)
+        XWOSRULE_SYNC_SEM := y
+    else
+        XWOSRULE_SYNC_SEM := n
+    endif
+endif
 
 ######## ######## ######## ######## init ######## ######## ######## ########
 XWOS_CSRCS += mp/init.c
@@ -19,11 +48,17 @@ XWOS_CSRCS += mp/irq.c
 
 ######## ######## ######## ######## scheduler ######## ######## ######## ########
 XWOS_CSRCS += mp/rtrq.c
-XWOS_CSRCS += mp/bh.c
+ifeq ($(XWOSCFG_SKD_BH),y)
+    XWOS_CSRCS += mp/bh.c
+endif
 XWOS_CSRCS += mp/tt.c
 XWOS_CSRCS += mp/wqn.c
-XWOS_CSRCS += mp/rtwq.c
-XWOS_CSRCS += mp/plwq.c
+ifeq ($(XWOSRULE_SKD_WQ_PL),y)
+    XWOS_CSRCS += mp/plwq.c
+endif
+ifeq ($(XWOSRULE_SKD_WQ_RT),y)
+    XWOS_CSRCS += mp/rtwq.c
+endif
 XWOS_CSRCS += mp/skd.c
 XWOS_CSRCS += mp/thd.c
 XWOS_CSRCS += mp/pm.c
@@ -44,8 +79,12 @@ endif
 
 ######## ######## ######## ######## sync ######## ######## ######## ########
 XWOS_CSRCS += mp/sync/obj.c
-XWOS_CSRCS += mp/sync/sem.c
-XWOS_CSRCS += mp/sync/cond.c
+ifeq ($(XWOSRULE_SYNC_SEM),y)
+    XWOS_CSRCS += mp/sync/sem.c
+endif
+ifeq ($(XWOSCFG_SYNC_COND),y)
+    XWOS_CSRCS += mp/sync/cond.c
+endif
 ifeq ($(XWOSCFG_SYNC_EVT),y)
     XWOS_CSRCS += mp/sync/evt.c
 endif
@@ -54,8 +93,14 @@ endif
 XWOS_CSRCS += mp/osdl/thd.c
 XWOS_CSRCS += mp/osdl/swt.c
 XWOS_CSRCS += mp/osdl/lock/mtx.c
-XWOS_CSRCS += mp/osdl/sync/sem.c
-XWOS_CSRCS += mp/osdl/sync/cond.c
-XWOS_CSRCS += mp/osdl/sync/flg.c
-XWOS_CSRCS += mp/osdl/sync/sel.c
-XWOS_CSRCS += mp/osdl/sync/br.c
+ifeq ($(XWOSRULE_SYNC_SEM),y)
+    XWOS_CSRCS += mp/osdl/sync/sem.c
+endif
+ifeq ($(XWOSCFG_SYNC_COND),y)
+    XWOS_CSRCS += mp/osdl/sync/cond.c
+endif
+ifeq ($(XWOSCFG_SYNC_EVT),y)
+    XWOS_CSRCS += mp/osdl/sync/flg.c
+    XWOS_CSRCS += mp/osdl/sync/sel.c
+    XWOS_CSRCS += mp/osdl/sync/br.c
+endif

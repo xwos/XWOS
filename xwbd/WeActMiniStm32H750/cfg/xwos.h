@@ -107,7 +107,7 @@
 #define XWOSCFG_SYNC_SEM_MEMSLICE                       0 /* MP Only */
 #define XWOSCFG_SYNC_SEM_STDC_MM                        1
 
-#define XWOSCFG_SYNC_COND                               1 /* UP Only */
+#define XWOSCFG_SYNC_COND                               1
 #define XWOSCFG_SYNC_COND_MEMSLICE                      0 /* MP Only */
 #define XWOSCFG_SYNC_COND_STDC_MM                       1
 

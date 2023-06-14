@@ -27,16 +27,22 @@
 #include <xwos/ospl/skd.h>
 #include <xwos/ospl/tls.h>
 #include <xwos/mp/rtrq.h>
-#include <xwos/mp/rtwq.h>
-#include <xwos/mp/plwq.h>
+#if (1 == XWOSRULE_SKD_WQ_RT)
+#  include <xwos/mp/rtwq.h>
+#endif
+#if (1 == XWOSRULE_SKD_WQ_PL)
+#  include <xwos/mp/plwq.h>
+#endif
 #include <xwos/mp/tt.h>
-#include <xwos/mp/sync/cond.h>
 #include <xwos/mp/sync/sem.h>
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/lock/seqlock.h>
 #if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
 #  include <xwos/mp/lock/mtx.h>
 #  include <xwos/mp/mtxtree.h>
+#endif
+#if defined(XWOSCFG_SYNC_COND) && (1 == XWOSCFG_SYNC_COND)
+#  include <xwos/mp/sync/cond.h>
 #endif
 #include <xwos/mp/thd.h>
 
@@ -1095,6 +1101,7 @@ xwer_t xwmp_thd_intr(struct xwmp_thd * thd)
                         rc = xwmp_rtsem_intr(sem, &thd->wqn);
                         xwmp_sem_put(sem);
 #endif
+#if defined(XWOSCFG_SYNC_COND) && (1 == XWOSCFG_SYNC_COND)
                 } else if (XWMP_WQTYPE_COND == thd->wqn.type) {
                         struct xwmp_cond * cond;
 
@@ -1103,6 +1110,7 @@ xwer_t xwmp_thd_intr(struct xwmp_thd * thd)
                         xwmp_splk_unlock_cpuirqrs(&thd->wqn.lock, cpuirq);
                         rc = xwmp_cond_intr(cond, &thd->wqn);
                         xwmp_cond_put(cond);
+#endif
 #if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
                 } else if (XWMP_WQTYPE_MTX == thd->wqn.type) {
                         struct xwmp_mtx * mtx;
@@ -1243,6 +1251,7 @@ void xwmp_thd_wqn_callback(void * entry)
         xwmp_skd_chkpmpt(thd->xwskd);
 }
 
+#if (1 == XWOSRULE_SKD_WQ_RT)
 /**
  * @brief 将线程加入到实时（红黑树）等待队列中
  * @param[in] thd: 线程对象的指针
@@ -1264,7 +1273,9 @@ void xwmp_thd_eq_rtwq_locked(struct xwmp_thd * thd,
         xwmp_rtwq_add_locked(xwrtwq, &thd->wqn, dprio);
         xwmp_splk_unlock(&thd->wqn.lock);
 }
+#endif
 
+#if (1 == XWOSRULE_SKD_WQ_PL)
 /**
  * @brief 将线程加入到管道（双循环链表）等待队列中
  * @param[in] thd: 线程对象的指针
@@ -1285,6 +1296,7 @@ void xwmp_thd_eq_plwq_locked(struct xwmp_thd * thd,
         xwmp_plwq_add_tail_locked(xwplwq, &thd->wqn);
         xwmp_splk_unlock(&thd->wqn.lock);
 }
+#endif
 
 __xwmp_api
 void xwmp_cthd_yield(void)

@@ -21,18 +21,24 @@
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
 #include <xwos/mp/lock/spinlock.h>
-#include <xwos/mp/sync/cond.h>
 #include <xwos/mp/skd.h>
 #include <xwos/mp/wqn.h>
 #include <xwos/mp/tt.h>
 #if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
 #  include <xwos/mp/mtxtree.h>
 #endif
+#if defined(XWOSCFG_SYNC_COND) && (1 == XWOSCFG_SYNC_COND)
+#  include <xwos/mp/sync/cond.h>
+#endif
 
-struct xwmp_plwq;
-struct xwmp_rtwq;
 struct xwmp_skd;
 struct xwmp_thd;
+#if (1 == XWOSRULE_SKD_WQ_RT)
+struct xwmp_rtwq;
+#endif
+#if (1 == XWOSRULE_SKD_WQ_PL)
+struct xwmp_plwq;
+#endif
 
 /**
  * @brief XWOS MP线程属性
@@ -116,13 +122,18 @@ void xwmp_thd_ttn_callback(void * entry);
 void xwmp_thd_wqn_callback(void * entry);
 xwer_t xwmp_thd_tt_add_locked(struct xwmp_thd * thd, struct xwmp_tt * xwtt,
                               xwtm_t to, xwreg_t cpuirq);
+
+#if (1 == XWOSRULE_SKD_WQ_RT)
 void xwmp_thd_eq_rtwq_locked(struct xwmp_thd * thd,
                              struct xwmp_rtwq * xwrtwq,
                              xwu16_t type,
                              xwpr_t dprio);
+#endif
+#if (1 == XWOSRULE_SKD_WQ_PL)
 void xwmp_thd_eq_plwq_locked(struct xwmp_thd * thd,
                              struct xwmp_plwq * xwplwq,
                              xwu16_t type);
+#endif
 xwer_t xwmp_thd_reqfrz_lic(struct xwmp_thd * thd);
 xwer_t xwmp_thd_thaw_lic_pmlk(struct xwmp_thd * thd);
 
