@@ -25,23 +25,23 @@ XWOS_CSRCS += mm/sma.c
 XWOS_CSRCS += mm/kma.c
 
 ifeq ($(XWMMCFG_BMA),y)
-    XWOS_CSRCS += mm/bma.c
+  XWOS_CSRCS += mm/bma.c
 endif
 
 ifeq ($(XWMMCFG_MEMSLICE),y)
-    XWOS_CSRCS += mm/memslice.c
+  XWOS_CSRCS += mm/memslice.c
 endif
 
 ifeq ($(XWMMCFG_MEMPOOL),y)
-    XWOS_CSRCS += mm/mempool/page.c
-    XWOS_CSRCS += mm/mempool/objcache.c
-    XWOS_CSRCS += mm/mempool/allocator.c
+  XWOS_CSRCS += mm/mempool/page.c
+  XWOS_CSRCS += mm/mempool/objcache.c
+  XWOS_CSRCS += mm/mempool/allocator.c
 endif
 
 ######## kernel ########
 XWOS_CSRCS += ospl/xwosplcb.c
 ifeq ($(XWOS_CFG_CORE),mp)
-    include xwos/mp/mp.mk
+  include xwos/mp/mp.mk
 else
-    include xwos/up/up.mk
+  include xwos/up/up.mk
 endif

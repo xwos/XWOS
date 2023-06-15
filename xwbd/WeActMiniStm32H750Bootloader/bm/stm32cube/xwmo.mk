@@ -24,8 +24,8 @@ include $(XWBS_UTIL_MK_XWMO)
 
 # 定义C源码
 XWMO_CSRCS := mif.c
-XWMO_CSRCS += $(call getAllFileUnderXwmoDir,*.c,Core/Src)
-XWMO_CSRCS += $(call getAllFileUnderXwmoDir,*.c,Drivers/STM32H7xx_HAL_Driver/Src)
+XWMO_CSRCS += $(call XwmoWildcard,*.c,Core/Src)
+XWMO_CSRCS += $(call XwmoWildcard,*.c,Drivers/STM32H7xx_HAL_Driver/Src)
 
 # 定义编译选项
 XWMO_CFLAGS += -Wno-undef -Wno-unused-parameter -Wno-sign-conversion

@@ -52,9 +52,9 @@ $(strip
 			  "")))))))
 endef
 
-getAllFileUnderXwmoDir = $(subst $(call getXwmoDir)/,,$(wildcard $(call getXwmoDir)/$(2)/$(1)))
+XwmoWildcard = $(subst $(call getXwmoDir)/,,$(wildcard $(call getXwmoDir)/$(2)/$(1)))
 
-define getAllFileUnderXwmoDirRecursively
+define XwmoWildcardRecursively
 $(subst $(call getXwmoDir)/,,$(shell find $(call getXwmoDir)/$(2) -name $(1)))
 endef
 
