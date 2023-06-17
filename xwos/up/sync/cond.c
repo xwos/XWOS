@@ -14,7 +14,9 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
-#if defined(XWOSCFG_SYNC_COND_STDC_MM) && (1 == XWOSCFG_SYNC_COND_STDC_MM)
+#if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
+#  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_SYNC_COND_STDC_MM) && (1 == XWOSCFG_SYNC_COND_STDC_MM)
 #  include <stdlib.h>
 #endif
 #include <xwos/ospl/irq.h>
@@ -35,6 +37,17 @@
 #endif
 #include <xwos/up/sync/cond.h>
 
+#if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
+/**
+ * @brief 结构体 `xwup_cond` 的对象缓存
+ */
+static __xwup_data struct xwmm_memslice xwup_cond_cache;
+
+/**
+ * @brief 结构体 `xwup_cond` 的对象缓存的名字
+ */
+const __xwup_rodata char xwup_cond_cache_name[] = "xwup.sync.cond.cache";
+#endif
 
 static __xwup_code
 struct xwup_cond * xwup_cond_alloc(void);
@@ -87,6 +100,29 @@ xwer_t xwup_cond_test_unintr(struct xwup_cond * cond,
                              void * lock, xwsq_t lktype, void * lkdata,
                              xwsq_t * lkst);
 
+#if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
+/**
+ * @brief XWUP INIT CODE：初始化结构体 `xwup_cond` 的对象缓存
+ * @param[in] zone_origin: 内存区域的首地址
+ * @param[in] zone_size: 内存区域的大小
+ * @return 错误码
+ * @note
+ * - 重入性：只可在系统初始化时使用一次
+ */
+__xwup_init_code
+xwer_t xwup_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
+{
+        xwer_t rc;
+
+        rc = xwmm_memslice_init(&xwup_cond_cache, zone_origin, zone_size,
+                                sizeof(struct xwup_cond),
+                                xwup_cond_cache_name,
+                                (ctor_f)xwup_cond_construct,
+                                (dtor_f)xwup_cond_destruct);
+        return rc;
+}
+#endif
+
 /**
  * @brief 申请条件量对象
  * @return 条件量对象的指针
@@ -94,7 +130,19 @@ xwer_t xwup_cond_test_unintr(struct xwup_cond * cond,
 static __xwup_code
 struct xwup_cond * xwup_cond_alloc(void)
 {
-#if defined(XWOSCFG_SKD_COND_STDC_MM) && (1 == XWOSCFG_SKD_COND_STDC_MM)
+#if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
+        union {
+                struct xwup_cond * cond;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = xwmm_memslice_alloc(&xwup_cond_cache, &mem.anon);
+        if (rc < 0) {
+                mem.cond = err_ptr(rc);
+        }/* else {} */
+        return mem.cond;
+#elif defined(XWOSCFG_SKD_COND_STDC_MM) && (1 == XWOSCFG_SKD_COND_STDC_MM)
         struct xwup_cond * cond;
 
         cond = malloc(sizeof(struct xwup_cond));
@@ -128,7 +176,9 @@ struct xwup_cond * xwup_cond_alloc(void)
 static __xwup_code
 void xwup_cond_free(struct xwup_cond * cond)
 {
-#if defined(XWOSCFG_SKD_COND_STDC_MM) && (1 == XWOSCFG_SKD_COND_STDC_MM)
+#if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
+        xwmm_memslice_free(&xwup_cond_cache, cond);
+#elif defined(XWOSCFG_SKD_COND_STDC_MM) && (1 == XWOSCFG_SKD_COND_STDC_MM)
         free(cond);
 #else
         xwmm_kma_free(cond);

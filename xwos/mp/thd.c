@@ -46,6 +46,18 @@
 #endif
 #include <xwos/mp/thd.h>
 
+#if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+/**
+ * @brief 结构体 `xwmp_thd` 的对象缓存
+ */
+static __xwmp_data struct xwmm_memslice xwmp_thd_cache;
+
+/**
+ * @brief 结构体 `xwmp_thd` 的对象缓存的名字
+ */
+const __xwmp_rodata char xwmp_thd_cache_name[] = "xwmp.thd.cache";
+#endif
+
 #if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
 extern
 xwer_t board_thd_stack_pool_alloc(xwsz_t stack_size, xwstk_t ** membuf);
@@ -102,19 +114,7 @@ xwer_t xwmp_thd_outmigrate_reqfrz_lic(struct xwmp_thd * thd, xwid_t dstcpu);
 
 #if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
 /**
- * @brief 结构体xwmp_thd的对象缓存
- */
-static __xwmp_data struct xwmm_memslice xwmp_thd_cache;
-
-/**
- * @brief 结构体xwmp_thd的对象缓存的名字
- */
-const __xwmp_rodata char xwmp_thd_cache_name[] = "xwmp.mp.thd.cache";
-#endif
-
-#if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
-/**
- * @brief XWMP API：初始化结构体xwmp_thd的对象缓存
+ * @brief XWMP INIT CODE：初始化结构体xwmp_thd的对象缓存
  * @param[in] zone_origin: 内存区域的首地址
  * @param[in] zone_size: 内存区域的大小
  * @return 错误码

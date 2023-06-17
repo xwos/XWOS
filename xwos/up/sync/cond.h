@@ -28,14 +28,12 @@ struct xwup_cond {
         struct xwup_plwq wq; /**< 等待队列 */
 };
 
-/* public(xwup) */
 void xwup_cond_construct(struct xwup_cond * cond);
 void xwup_cond_destruct(struct xwup_cond * cond);
 xwer_t xwup_cond_activate(struct xwup_cond * cond, xwobj_gc_f gcfunc);
 xwer_t xwup_cond_intr(struct xwup_cond * cond, struct xwup_wqn * wqn);
 xwer_t xwup_cond_intr_all(struct xwup_cond * cond);
 
-/* public */
 xwer_t xwup_cond_init(struct xwup_cond * cond);
 xwer_t xwup_cond_fini(struct xwup_cond * cond);
 xwer_t xwup_cond_create(struct xwup_cond ** ptrbuf);

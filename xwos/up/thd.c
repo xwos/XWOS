@@ -18,7 +18,9 @@
 #include <xwos/lib/rbtree.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
-#if defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
+#if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+#  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
 #  include <stdlib.h>
 #endif
 #include <xwos/ospl/irq.h>
@@ -47,6 +49,18 @@
 #endif
 #if defined(XWOSCFG_SYNC_COND) && (1 == XWOSCFG_SYNC_COND)
 #  include <xwos/up/sync/cond.h>
+#endif
+
+#if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+/**
+ * @brief 结构体 `xwup_thd` 的对象缓存
+ */
+static __xwup_data struct xwmm_memslice xwup_thd_cache;
+
+/**
+ * @brief 结构体 `xwup_thd` 的对象缓存的名字
+ */
+const __xwup_rodata char xwup_thd_cache_name[] = "xwup.thd.cache";
 #endif
 
 static __xwup_code
@@ -98,6 +112,29 @@ void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f thdfunc, void * arg);
 #if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
 static __xwup_code
 xwer_t xwup_thd_delete(struct xwup_thd * thd);
+#endif
+
+#if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+/**
+ * @brief XWUP API：初始化结构体xwup_thd的对象缓存
+ * @param[in] zone_origin: 内存区域的首地址
+ * @param[in] zone_size: 内存区域的大小
+ * @return 错误码
+ * @note
+ * - 重入性：只可在系统初始化时使用一次
+ */
+__xwup_init_code
+xwer_t xwup_thd_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
+{
+        xwer_t rc;
+
+        rc = xwmm_memslice_init(&xwup_thd_cache, zone_origin, zone_size,
+                                sizeof(struct xwup_thd),
+                                xwup_thd_cache_name,
+                                (ctor_f)xwup_thd_construct,
+                                (dtor_f)xwup_thd_destruct);
+        return rc;
+}
 #endif
 
 
@@ -178,7 +215,19 @@ xwer_t xwup_thd_put(struct xwup_thd * thd)
 static __xwup_code
 struct xwup_thd * xwup_thd_alloc(void)
 {
-#if defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
+#if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+        union {
+                struct xwup_thd * thd;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = xwmm_memslice_alloc(&xwup_thd_cache, &mem.anon);
+        if (rc < 0) {
+                mem.thd = err_ptr(rc);
+        }/* else {} */
+        return mem.thd;
+#elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         struct xwup_thd * thd;
 
         thd = malloc(sizeof(struct xwup_thd));
@@ -212,7 +261,9 @@ struct xwup_thd * xwup_thd_alloc(void)
 static __xwup_code
 void xwup_thd_free(struct xwup_thd * thd)
 {
-#if defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
+#if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+        xwmm_memslice_free(&xwup_thd_cache, thd);
+#elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         free(thd);
 #else
         xwmm_kma_free(thd);

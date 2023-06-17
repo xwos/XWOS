@@ -42,14 +42,14 @@
 
 #if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
 /**
- * @brief 结构体xwmp_sem的对象缓存
+ * @brief 结构体 `xwmp_sem` 的对象缓存
  */
 static __xwmp_data struct xwmm_memslice xwmp_sem_cache;
 
 /**
- * @brief 结构体xwmp_sem的对象缓存的名字
+ * @brief 结构体 `xwmp_sem` 的对象缓存的名字
  */
-const __xwmp_rodata char xwmp_sem_cache_name[] = "xwos.mp.sync.sem.cache";
+const __xwmp_rodata char xwmp_sem_cache_name[] = "xwmp.sync.sem.cache";
 #endif
 
 static __xwmp_code
@@ -125,14 +125,14 @@ xwer_t xwmp_rtsem_test_unintr(struct xwmp_sem * sem,
 
 #if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
 /**
- * @brief XWMP INIT CODE：初始化结构体xwmp_sem的对象缓存
+ * @brief XWMP INIT CODE：初始化结构体 `xwmp_sem` 的对象缓存
  * @param[in] zone_origin: 内存区域的首地址
  * @param[in] zone_size: 内存区域的大小
  * @return 错误码
  * @note
  * - 重入性：只可在系统初始化时使用一次
  */
-__xwmp_init_code
+__xwmp_api
 xwer_t xwmp_sem_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 {
         xwer_t rc;
@@ -404,7 +404,7 @@ xwer_t xwmp_sem_unbind(struct xwmp_sem * sem, struct xwmp_evt * evt)
 
 #if defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
 /**
- * @brief XWMP API：激活并初始化管道信号量对象
+ * @brief 激活并初始化管道信号量对象
  * @param[in] sem: 信号量对象的指针
  * @param[in] val: 信号量的初始值
  * @param[in] max: 信号量的最大值

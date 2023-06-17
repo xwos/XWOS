@@ -16,7 +16,9 @@
 #include <xwos/lib/rbtree.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
-#if defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
+#if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
+#  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
 #  include <stdlib.h>
 #endif
 #include <xwos/ospl/irq.h>
@@ -26,6 +28,18 @@
 #include <xwos/up/mtxtree.h>
 #include <xwos/up/thd.h>
 #include <xwos/up/lock/mtx.h>
+
+#if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
+/**
+ * @brief 结构体 `xwup_mtx` 的对象缓存
+ */
+static __xwup_data struct xwmm_memslice xwup_mtx_cache;
+
+/**
+ * @brief 结构体 `xwup_mtx` 的对象缓存的名字
+ */
+const __xwup_rodata char xwup_mtx_cache_name[] = "xwup.lk.mtx.cache";
+#endif
 
 static __xwup_code
 void xwup_mtx_construct(struct xwup_mtx * mtx);
@@ -72,6 +86,29 @@ xwer_t xwup_mtx_blkthd_unlkwq_cpuirqrs(struct xwup_mtx * mtx,
 static __xwup_code
 xwer_t xwup_mtx_test_unintr(struct xwup_mtx * mtx, struct xwup_thd * thd);
 
+#if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
+/**
+ * @brief XWUP INIT CODE：初始化结构体 `xwup_mtx` 的对象缓存
+ * @param[in] zone_origin: 内存区域的首地址
+ * @param[in] zone_size: 内存区域的大小
+ * @return 错误码
+ * @note
+ * - 只可在系统初始化时使用一次
+ */
+__xwup_init_code
+xwer_t xwup_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
+{
+        xwer_t rc;
+
+        rc = xwmm_memslice_init(&xwup_mtx_cache, zone_origin, zone_size,
+                                sizeof(struct xwup_mtx),
+                                xwup_mtx_cache_name,
+                                (ctor_f)xwup_mtx_construct,
+                                (dtor_f)xwup_mtx_destruct);
+        return rc;
+}
+#endif
+
 /**
  * @brief 申请互斥锁对象
  * @return 互斥锁对象的指针
@@ -79,7 +116,19 @@ xwer_t xwup_mtx_test_unintr(struct xwup_mtx * mtx, struct xwup_thd * thd);
 static __xwup_code
 struct xwup_mtx * xwup_mtx_alloc(void)
 {
-#if defined(XWOSCFG_SKD_MTX_STDC_MM) && (1 == XWOSCFG_SKD_MTX_STDC_MM)
+#if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
+        union {
+                struct xwup_mtx * mtx;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = xwmm_memslice_alloc(&xwup_mtx_cache, &mem.anon);
+        if (rc < 0) {
+                mem.mtx = err_ptr(rc);
+        }/* else {} */
+        return mem.mtx;
+#elif defined(XWOSCFG_SKD_MTX_STDC_MM) && (1 == XWOSCFG_SKD_MTX_STDC_MM)
         struct xwup_mtx * mtx;
 
         mtx = malloc(sizeof(struct xwup_mtx));
@@ -113,7 +162,9 @@ struct xwup_mtx * xwup_mtx_alloc(void)
 static __xwup_code
 void xwup_mtx_free(struct xwup_mtx * mtx)
 {
-#if defined(XWOSCFG_SKD_MTX_STDC_MM) && (1 == XWOSCFG_SKD_MTX_STDC_MM)
+#if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
+        xwmm_memslice_free(&xwup_mtx_cache, mtx);
+#elif defined(XWOSCFG_SKD_MTX_STDC_MM) && (1 == XWOSCFG_SKD_MTX_STDC_MM)
         free(mtx);
 #else
         xwmm_kma_free(mtx);

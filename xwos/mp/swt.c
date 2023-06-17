@@ -23,6 +23,18 @@
 #include <xwos/mp/tt.h>
 #include <xwos/mp/swt.h>
 
+#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
+/**
+ * @brief 软件定时器对象缓存
+ */
+static __xwmp_data struct xwmm_memslice xwmp_swt_cache;
+
+/**
+ * @brief 软件定时器对象缓存的名字
+ */
+const __xwmp_rodata char xwmp_swt_cache_name[] = "xwmp.swt.cache";
+#endif
+
 static __xwmp_code
 struct xwmp_swt * xwmp_swt_alloc(void);
 
@@ -46,18 +58,6 @@ xwer_t xwmp_swt_dgc(void * swt);
 
 static __xwmp_code
 void xwmp_swt_ttn_cb(void * entry);
-
-#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
-/**
- * @brief 软件定时器对象缓存
- */
-static __xwmp_data struct xwmm_memslice xwmp_swt_cache;
-
-/**
- * @brief 软件定时器对象缓存的名字
- */
-const __xwmp_rodata char xwmp_swt_cache_name[] = "xwos.mp.swt.cache";
-#endif
 
 #if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
 /**

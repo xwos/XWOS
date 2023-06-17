@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS UP内核：软件定时器
+ * @brief XWOS UP内核：软件定时器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -13,13 +13,27 @@
 #include <xwos/standard.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
-#if defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
+#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
+#  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
 #  include <stdlib.h>
 #endif
 #include <xwos/lib/xwaop.h>
 #include <xwos/up/skd.h>
 #include <xwos/up/tt.h>
 #include <xwos/up/swt.h>
+
+#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
+/**
+ * @brief 软件定时器对象缓存
+ */
+static __xwup_data struct xwmm_memslice xwup_swt_cache;
+
+/**
+ * @brief 软件定时器对象缓存的名字
+ */
+const __xwup_rodata char xwup_swt_cache_name[] = "xwup.swt.cache";
+#endif
 
 static __xwup_code
 struct xwup_swt * xwup_swt_alloc(void);
@@ -45,6 +59,29 @@ xwer_t xwup_swt_dgc(void * obj);
 static __xwup_code
 void xwup_swt_ttn_cb(void * entry);
 
+#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
+/**
+ * @brief XWUP INIT CODE：初始化软件定时器对象缓存
+ * @param[in] zone_origin: 内存区域首地址
+ * @param[in] zone_size: 内存区域大小
+ * @return 错误码
+ * @note
+ * - 重入性：只可在系统初始化时使用一次
+ */
+__xwup_init_code
+xwer_t xwup_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
+{
+        xwer_t rc;
+
+        rc = xwmm_memslice_init(&xwup_swt_cache, zone_origin, zone_size,
+                                sizeof(struct xwup_swt),
+                                xwup_swt_cache_name,
+                                (ctor_f)xwup_swt_construct,
+                                (dtor_f)xwup_swt_destruct);
+        return rc;
+}
+#endif
+
 /**
  * @brief 从软件定时器对象缓存中申请一个对象
  * @return 软件定时器对象的指针
@@ -52,7 +89,19 @@ void xwup_swt_ttn_cb(void * entry);
 static __xwup_code
 struct xwup_swt * xwup_swt_alloc(void)
 {
-#if defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
+#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
+        union {
+                struct xwup_swt * swt;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = xwmm_memslice_alloc(&xwup_swt_cache, &mem.anon);
+        if (rc < 0) {
+                mem.swt = err_ptr(rc);
+        }/* else {} */
+        return mem.swt;
+#elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
         struct xwup_swt * swt;
 
         swt = malloc(sizeof(struct xwup_swt));
@@ -86,7 +135,9 @@ struct xwup_swt * xwup_swt_alloc(void)
 static __xwup_code
 void xwup_swt_free(struct xwup_swt * swt)
 {
-#if defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
+#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
+        xwmm_memslice_free(&xwup_swt_cache, swt);
+#elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
         free(swt);
 #else
         xwmm_kma_free(swt);

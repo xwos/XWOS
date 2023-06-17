@@ -64,7 +64,6 @@ struct xwmp_sem {
         } wq; /**< 等待队列 */
 };
 
-/* public(xwmp) */
 #if defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
 xwer_t xwmp_plsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn);
 #endif
@@ -77,7 +76,6 @@ xwer_t xwmp_rtsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn);
 xwer_t xwmp_sem_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
 
-/* public */
 xwer_t xwmp_sem_fini(struct xwmp_sem * sem);
 xwer_t xwmp_sem_grab(struct xwmp_sem * sem);
 xwer_t xwmp_sem_put(struct xwmp_sem * sem);

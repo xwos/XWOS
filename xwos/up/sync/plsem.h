@@ -25,10 +25,8 @@ struct xwup_plsem {
         struct xwup_plwq plwq; /**< 实时等待队列 */
 };
 
-/* public(xwup) */
 xwer_t xwup_plsem_intr(struct xwup_plsem * sem, struct xwup_wqn * wqn);
 
-/* public */
 xwer_t xwup_plsem_init(struct xwup_plsem * sem, xwssq_t val, xwssq_t max);
 xwer_t xwup_plsem_fini(struct xwup_plsem * sem);
 xwer_t xwup_plsem_create(struct xwup_plsem ** ptrbuf, xwssq_t val, xwssq_t max);

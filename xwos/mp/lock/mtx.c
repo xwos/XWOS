@@ -29,6 +29,18 @@
 #include <xwos/mp/thd.h>
 #include <xwos/mp/lock/mtx.h>
 
+#if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
+/**
+ * @brief 结构体 `xwmp_mtx` 的对象缓存
+ */
+static __xwmp_data struct xwmm_memslice xwmp_mtx_cache;
+
+/**
+ * @brief 结构体 `xwmp_mtx` 的对象缓存的名字
+ */
+const __xwmp_rodata char xwmp_mtx_cache_name[] = "xwmp.lk.mtx.cache";
+#endif
+
 static __xwmp_code
 void xwmp_mtx_construct(struct xwmp_mtx * mtx);
 
@@ -83,19 +95,7 @@ xwer_t xwmp_mtx_test_unintr(struct xwmp_mtx * mtx,
 
 #if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
 /**
- * @brief 结构体xwmp_mtx的对象缓存
- */
-static __xwmp_data struct xwmm_memslice xwmp_mtx_cache;
-
-/**
- * @brief 结构体xwmp_mtx的对象缓存的名字
- */
-const __xwmp_rodata char xwmp_mtx_cache_name[] = "xwos.mp.lk.mtx.cache";
-#endif
-
-#if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
-/**
- * @brief XWMP INIT CODE：初始化结构体xwmp_mtx的对象缓存
+ * @brief XWMP INIT CODE：初始化结构体 `xwmp_mtx` 的对象缓存
  * @param[in] zone_origin: 内存区域的首地址
  * @param[in] zone_size: 内存区域的大小
  * @return 错误码

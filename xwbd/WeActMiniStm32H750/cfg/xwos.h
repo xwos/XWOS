@@ -93,22 +93,22 @@
 #define XWOSCFG_SKD_BH_TLS                              1
 #define XWOSCFG_SKD_PM                                  1 /* UP Only */
 #define XWOSCFG_SKD_THD_PRIVILEGED_DEFAULT              1
-#define XWOSCFG_SKD_THD_MEMSLICE                        0 /* MP Only */
+#define XWOSCFG_SKD_THD_MEMSLICE                        0
 #define XWOSCFG_SKD_THD_STDC_MM                         1
 #define XWOSCFG_SKD_THD_LOCAL_DATA_NUM                  (2U)
 #define XWOSCFG_SKD_THD_EXIT                            1
 #define XWOSCFG_SKD_SWT                                 1
-#define XWOSCFG_SKD_SWT_MEMSLICE                        0 /* MP Only */
+#define XWOSCFG_SKD_SWT_MEMSLICE                        0
 #define XWOSCFG_SKD_SWT_STDC_MM                         1
 
 /******** ******** ******** sync ******** ******** ********/
 #define XWOSCFG_SYNC_PLSEM                              1
 #define XWOSCFG_SYNC_RTSEM                              1
-#define XWOSCFG_SYNC_SEM_MEMSLICE                       0 /* MP Only */
+#define XWOSCFG_SYNC_SEM_MEMSLICE                       0
 #define XWOSCFG_SYNC_SEM_STDC_MM                        1
 
 #define XWOSCFG_SYNC_COND                               1
-#define XWOSCFG_SYNC_COND_MEMSLICE                      0 /* MP Only */
+#define XWOSCFG_SYNC_COND_MEMSLICE                      0
 #define XWOSCFG_SYNC_COND_STDC_MM                       1
 
 #define XWOSCFG_SYNC_EVT                                1
@@ -116,7 +116,7 @@
 
 /******** ******** ******** lock ******** ******** ********/
 #define XWOSCFG_LOCK_MTX                                1
-#define XWOSCFG_LOCK_MTX_MEMSLICE                       0 /* MP Only */
+#define XWOSCFG_LOCK_MTX_MEMSLICE                       0
 #define XWOSCFG_LOCK_MTX_STDC_MM                        1
 #define XWOSCFG_LOCK_FAKEMTX                            0
 

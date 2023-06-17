@@ -31,14 +31,12 @@ struct xwmp_cond {
         } wq; /**< 条件量的等待队列 */
 };
 
-/* public(xwmp) */
 void xwmp_cond_construct(struct xwmp_cond * cond);
 void xwmp_cond_destruct(struct xwmp_cond * cond);
 xwer_t xwmp_cond_activate(struct xwmp_cond * cond, xwobj_gc_f gcfunc);
 xwer_t xwmp_cond_intr(struct xwmp_cond * cond, struct xwmp_wqn * wqn);
 xwer_t xwmp_cond_intr_all(struct xwmp_cond * cond);
 
-/* public */
 #if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
 xwer_t xwmp_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif

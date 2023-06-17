@@ -42,10 +42,8 @@ struct xwup_evt {
         xwbmp_t * msk; /**< 掩码位图 */
 };
 
-/* public(xwup) */
 xwer_t xwup_evt_intr_all(struct xwup_evt * evt);
 
-/* public */
 xwer_t xwup_evt_init(struct xwup_evt * evt, xwsq_t type, xwsz_t num,
                      xwbmp_t * bmp, xwbmp_t * msk);
 xwer_t xwup_evt_fini(struct xwup_evt * evt);

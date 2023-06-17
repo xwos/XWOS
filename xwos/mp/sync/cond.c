@@ -45,14 +45,14 @@
 
 #if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
 /**
- * @brief 结构体xwmp_cond的对象缓存
+ * @brief 结构体 `xwmp_cond` 的对象缓存
  */
 static __xwmp_data struct xwmm_memslice xwmp_cond_cache;
 
 /**
- * @brief 结构体xwmp_cond的对象缓存的名字
+ * @brief 结构体 `xwmp_cond` 的对象缓存的名字
  */
-const __xwmp_rodata char xwmp_cond_cache_name[] = "xwos.mp.sync.cond.cache";
+const __xwmp_rodata char xwmp_cond_cache_name[] = "xwmp.sync.cond.cache";
 #endif
 
 static __xwmp_code
@@ -108,7 +108,7 @@ xwer_t xwmp_cond_test_unintr(struct xwmp_cond * cond,
 
 #if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
 /**
- * @brief XWMP INIT CODE：初始化结构体xwmp_cond的对象缓存
+ * @brief XWMP INIT CODE：初始化结构体 `xwmp_cond` 的对象缓存
  * @param[in] zone_origin: 内存区域的首地址
  * @param[in] zone_size: 内存区域的大小
  * @return 错误码

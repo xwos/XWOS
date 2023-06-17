@@ -14,7 +14,9 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
-#if defined(XWOSCFG_SYNC_SEM_STDC_MM) && (1 == XWOSCFG_SYNC_SEM_STDC_MM)
+#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+#  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_SYNC_SEM_STDC_MM) && (1 == XWOSCFG_SYNC_SEM_STDC_MM)
 #  include <stdlib.h>
 #endif
 #include <xwos/ospl/irq.h>
@@ -71,6 +73,41 @@ xwer_t xwup_rtsem_blkthd_unlkwq_cpuirqrs(struct xwup_rtsem * sem,
 static __xwup_code
 xwer_t xwup_rtsem_test_unintr(struct xwup_rtsem * sem, struct xwup_thd * thd);
 
+#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+/**
+ * @brief 结构体 `xwup_rtsem` 的对象缓存
+ */
+static __xwup_data struct xwmm_memslice xwup_rtsem_cache;
+
+/**
+ * @brief 结构体 `xwup_rtsem` 的对象缓存的名字
+ */
+const __xwup_rodata char xwup_rtsem_cache_name[] = "xwup.sync.rtsem.cache";
+#endif
+
+#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+/**
+ * @brief XWUP INIT CODE：初始化结构体 `xwup_rtsem` 的对象缓存
+ * @param[in] zone_origin: 内存区域的首地址
+ * @param[in] zone_size: 内存区域的大小
+ * @return 错误码
+ * @note
+ * - 重入性：只可在系统初始化时使用一次
+ */
+__xwup_api
+xwer_t xwup_rtsem_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
+{
+        xwer_t rc;
+
+        rc = xwmm_memslice_init(&xwup_rtsem_cache, zone_origin, zone_size,
+                                sizeof(struct xwup_rtsem),
+                                xwup_rtsem_cache_name,
+                                (ctor_f)xwup_rtsem_construct,
+                                (dtor_f)xwup_rtsem_destruct);
+        return rc;
+}
+#endif
+
 /**
  * @brief 申请实时信号量对象
  * @return 信号量对象的指针
@@ -78,7 +115,19 @@ xwer_t xwup_rtsem_test_unintr(struct xwup_rtsem * sem, struct xwup_thd * thd);
 static __xwup_code
 struct xwup_rtsem * xwup_rtsem_alloc(void)
 {
-#if defined(XWOSCFG_SKD_RTSEM_STDC_MM) && (1 == XWOSCFG_SKD_RTSEM_STDC_MM)
+#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+        union {
+                struct xwup_rtsem * rtsem;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = xwmm_memslice_alloc(&xwup_rtsem_cache, &mem.anon);
+        if (rc < 0) {
+                mem.rtsem = err_ptr(rc);
+        }/* else {} */
+        return mem.rtsem;
+#elif defined(XWOSCFG_SKD_RTSEM_STDC_MM) && (1 == XWOSCFG_SKD_RTSEM_STDC_MM)
         struct xwup_rtsem * rtsem;
 
         rtsem = malloc(sizeof(struct xwup_rtsem));
@@ -112,7 +161,9 @@ struct xwup_rtsem * xwup_rtsem_alloc(void)
 static __xwup_code
 void xwup_rtsem_free(struct xwup_rtsem * sem)
 {
-#if defined(XWOSCFG_SKD_RTSEM_STDC_MM) && (1 == XWOSCFG_SKD_RTSEM_STDC_MM)
+#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+        xwmm_memslice_free(&xwup_rtsem_cache, sem);
+#elif defined(XWOSCFG_SKD_RTSEM_STDC_MM) && (1 == XWOSCFG_SKD_RTSEM_STDC_MM)
         free(sem);
 #else
         xwmm_kma_free(sem);
