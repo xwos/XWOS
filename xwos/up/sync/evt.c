@@ -15,7 +15,9 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
 #include <xwos/mm/kma.h>
-#if defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
+#if defined(XWOSCFG_SYNC_EVT_MEMSLICE) && (1 == XWOSCFG_SYNC_EVT_MEMSLICE)
+#  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
 #  include <stdlib.h>
 #endif
 #include <xwos/ospl/irq.h>
@@ -24,6 +26,18 @@
 #include <xwos/up/sync/cond.h>
 #include <xwos/up/sync/obj.h>
 #include <xwos/up/sync/evt.h>
+
+#if defined(XWOSCFG_SYNC_EVT_MEMSLICE) && (1 == XWOSCFG_SYNC_EVT_MEMSLICE)
+/**
+ * @brief 结构体 `xwup_evt` 的对象缓存
+ */
+static __xwup_data struct xwmm_memslice xwup_evt_cache;
+
+/**
+ * @brief 结构体 `xwup_evt` 的对象缓存的名字
+ */
+const __xwup_rodata char xwup_evt_cache_name[] = "xwup.sync.evt.cache";
+#endif
 
 static __xwup_code
 void xwup_evt_construct(struct xwup_evt * evt);
@@ -90,6 +104,29 @@ void xwup_evt_setup(struct xwup_evt * evt, xwsz_t num,
         evt->msk = msk;
 }
 
+#if defined(XWOSCFG_SYNC_EVT_MEMSLICE) && (1 == XWOSCFG_SYNC_EVT_MEMSLICE)
+/**
+ * @brief XWUP INIT CODE：初始化结构体 `xwup_evt` 的对象缓存
+ * @param[in] zone_origin: 内存区域的首地址
+ * @param[in] zone_size: 内存区域的大小
+ * @return 错误码
+ * @note
+ * - 重入性：只可在系统初始化时使用一次
+ */
+__xwup_api
+xwer_t xwup_evt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
+{
+        xwer_t rc;
+
+        rc = xwmm_memslice_init(&xwup_evt_cache, zone_origin, zone_size,
+                                sizeof(struct xwup_evt) * 3,
+                                xwup_evt_cache_name,
+                                (ctor_f)xwup_evt_construct,
+                                (dtor_f)xwup_evt_destruct);
+        return rc;
+}
+#endif
+
 /**
  * @brief 从事件对象缓存中申请对象
  * @return 事件对象的指针
@@ -97,7 +134,32 @@ void xwup_evt_setup(struct xwup_evt * evt, xwsz_t num,
 static __xwup_code
 struct xwup_evt * xwup_evt_alloc(xwsz_t num)
 {
-#if defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
+#if defined(XWOSCFG_SYNC_EVT_MEMSLICE) && (1 == XWOSCFG_SYNC_EVT_MEMSLICE)
+        union {
+                struct xwup_evt * evt;
+                void * anon;
+        } mem;
+        xwbmp_t * bmp, * msk;
+        xwsz_t bmpnum, bmpsize;
+        xwer_t rc;
+
+        bmpnum = BITS_TO_XWBMP_T(num);
+        bmpsize = bmpnum * sizeof(xwbmp_t);
+        if (bmpsize > sizeof(struct xwup_evt)) {
+                mem.evt = err_ptr(-ENOMEM);
+        } else {
+                rc = xwmm_memslice_alloc(&xwup_evt_cache, &mem.anon);
+                if (rc < 0) {
+                        mem.evt = err_ptr(rc);
+                } else {
+                        bmp = (void *)&mem.evt[1];
+                        msk = (void *)&mem.evt[2];
+                        xwup_evt_construct(mem.evt);
+                        xwup_evt_setup(mem.evt, num, bmp, msk);
+                }
+        }
+        return mem.evt;
+#elif defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
         struct xwup_evt * evt;
         xwbmp_t * bmp, * msk;
         xwsz_t bmpnum, bmpsize;
@@ -146,7 +208,9 @@ struct xwup_evt * xwup_evt_alloc(xwsz_t num)
 static __xwup_code
 void xwup_evt_free(struct xwup_evt * evt)
 {
-#if defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
+#if defined(XWOSCFG_SYNC_EVT_MEMSLICE) && (1 == XWOSCFG_SYNC_EVT_MEMSLICE)
+        xwmm_memslice_free(&xwup_evt_cache, evt);
+#elif defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
         free(evt);
 #else
         xwmm_kma_free(evt);

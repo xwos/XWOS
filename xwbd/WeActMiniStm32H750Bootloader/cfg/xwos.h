@@ -112,6 +112,7 @@
 #define XWOSCFG_SYNC_COND_STDC_MM                       0
 
 #define XWOSCFG_SYNC_EVT                                1
+#define XWOSCFG_SYNC_EVT_MEMSLICE                       0
 #define XWOSCFG_SYNC_EVT_STDC_MM                        0
 
 /******** ******** ******** lock ******** ******** ********/

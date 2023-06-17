@@ -42,6 +42,10 @@ struct xwmp_evt {
         xwbmp_t * msk; /**< 掩码位图 */
 };
 
+#if defined(XWOSCFG_SYNC_EVT_MEMSLICE) && (1 == XWOSCFG_SYNC_EVT_MEMSLICE)
+xwer_t xwmp_evt_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
+#endif
+
 xwer_t xwmp_evt_intr_all(struct xwmp_evt * evt);
 
 xwer_t xwmp_evt_init(struct xwmp_evt * evt, xwsq_t type, xwsz_t num,
