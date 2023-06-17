@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS UP内核操作系统接口描述层：信号选择器
+ * @brief XWOS UP内核操作系统接口描述层：信号选择器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

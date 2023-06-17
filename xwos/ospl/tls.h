@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS移植层：线程本地存储
+ * @brief XWOS移植层：线程本地存储
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -17,7 +17,7 @@
 #include <xwos/ospl/skd.h>
 
 /**
- * @brief 玄武OS移植层：初始化线程对象的TLS段
+ * @brief XWOS移植层：初始化线程对象的TLS段
  * @param[in] thd: 线程对象的指针
  */
 void xwospl_tls_init(struct xwospl_skdobj_stack * stk);

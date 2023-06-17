@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS MP内核同步机制：信号量
+ * @brief XWOS MP内核同步机制：信号量
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

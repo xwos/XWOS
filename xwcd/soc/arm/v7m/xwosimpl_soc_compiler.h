@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS移植实现层：SOC编译器宏定义
+ * @brief XWOS移植实现层：SOC编译器宏定义
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

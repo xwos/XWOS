@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS MP内核：电源管理
+ * @brief XWOS MP内核：电源管理
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -17,7 +17,7 @@
 #include <xwos/mp/lock/spinlock.h>
 
 /**
- * @brief 玄武OS MP内核电源管理领域
+ * @brief XWOS MP内核电源管理领域
  */
 __xwmp_data struct xwmp_pmdm xwmp_pmdm = {
         .xwskd_num = CPUCFG_CPU_NUM,

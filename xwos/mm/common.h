@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内存管理：通用定义
+ * @brief XWOS内存管理：通用定义
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

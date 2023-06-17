@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内存管理：对象缓存
+ * @brief XWOS内存管理：对象缓存
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

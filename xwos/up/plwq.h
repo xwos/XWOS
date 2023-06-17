@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS UP内核：管道等待队列
+ * @brief XWOS UP内核：管道等待队列
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

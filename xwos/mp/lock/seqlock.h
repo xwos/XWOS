@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS MP内核锁机制：顺序锁
+ * @brief XWOS MP内核锁机制：顺序锁
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

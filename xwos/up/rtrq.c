@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS UP内核：实时就绪队列
+ * @brief XWOS UP内核：实时就绪队列
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

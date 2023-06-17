@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS MP内核操作系统接口描述层：自旋锁
+ * @brief XWOS MP内核操作系统接口描述层：自旋锁
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

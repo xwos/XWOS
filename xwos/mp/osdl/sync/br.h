@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS MP内核操作系统接口描述层：线程栅栏
+ * @brief XWOS MP内核操作系统接口描述层：线程栅栏
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

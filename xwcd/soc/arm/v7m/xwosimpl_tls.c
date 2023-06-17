@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS移植实现层：线程本地存储
+ * @brief XWOS移植实现层：线程本地存储
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -69,7 +69,7 @@ void xwospl_tls_init(struct xwospl_skdobj_stack * stk)
 }
 
 /**
- * @brief 玄武OS移植层：返回TLS段的基地址
+ * @brief XWOS移植层：返回TLS段的基地址
  * @return TLS段的基地址
  * @details
  * ARM EABI中定义的函数，用于返回TLS段的基地址。

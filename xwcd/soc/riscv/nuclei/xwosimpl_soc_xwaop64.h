@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS移植实现层：SOC 64位原子操作
+ * @brief XWOS移植实现层：SOC 64位原子操作
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

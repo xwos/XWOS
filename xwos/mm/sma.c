@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内存管理：简单内存分配器
+ * @brief XWOS内存管理：简单内存分配器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

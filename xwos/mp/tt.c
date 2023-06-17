@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS MP内核：调度器的时间树
+ * @brief XWOS MP内核：调度器的时间树
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

@@ -1,11 +1,11 @@
 /**
- * @defgroup xwos 玄武OS内核
+ * @defgroup xwos XWOS内核
  */
 
 /**
- * @defgroup xwos_sync 玄武OS的同步机制
+ * @defgroup xwos_sync XWOS的同步机制
  */
 
 /**
- * @defgroup xwos_lock 玄武OS的锁
+ * @defgroup xwos_lock XWOS的锁
  */

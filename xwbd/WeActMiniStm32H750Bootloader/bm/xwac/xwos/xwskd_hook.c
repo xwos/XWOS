@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内核适配代码：内核HOOK
+ * @brief XWOS内核适配代码：内核HOOK
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

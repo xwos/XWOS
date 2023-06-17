@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS移植层：调度器
+ * @brief XWOS移植层：调度器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -51,14 +51,14 @@ void xwosplcb_thd_immigrate_lic(struct xwospl_thd * thd);
 xwer_t xwosplcb_thd_outmigrate_lic(struct xwospl_thd * thd, xwid_t dstcpu);
 
 /**
- * @brief 玄武OS移植层：初始化调度调度器
+ * @brief XWOS移植层：初始化调度调度器
  * @param[in] xwskd: 调度器的指针
  * @return 错误码
  */
 xwer_t xwospl_skd_init(struct xwospl_skd * xwskd);
 
 /**
- * @brief 玄武OS移植层：初始化调度对象的栈
+ * @brief XWOS移植层：初始化调度对象的栈
  * @param[in] stk: 栈信息结构体指针
  * @param[in] attr: 标志
  */
@@ -66,58 +66,58 @@ void xwospl_skd_init_stack(struct xwospl_skdobj_stack * stk,
                            void (* exit)(xwer_t));
 
 /**
- * @brief 玄武OS移植层：获取当前CPU的ID
+ * @brief XWOS移植层：获取当前CPU的ID
  */
 xwid_t xwospl_skd_id_lc(void);
 
 /**
- * @brief 玄武OS移植层：启动调度器
+ * @brief XWOS移植层：启动调度器
  * @param[in] xwskd: 调度器的指针
  */
 xwer_t xwospl_skd_start(struct xwospl_skd * xwskd);
 
 /**
- * @brief 玄武OS移植层：暂停调度器，用于电源管理
+ * @brief XWOS移植层：暂停调度器，用于电源管理
  * @param[in] xwskd: 调度器的指针
  * @return 错误码
  */
 xwer_t xwospl_skd_suspend(struct xwospl_skd * xwskd);
 
 /**
- * @brief 玄武OS移植层：继续调度器，用于电源管理
+ * @brief XWOS移植层：继续调度器，用于电源管理
  * @param[in] xwskd: 调度器的指针
  * @return 错误码
  */
 xwer_t xwospl_skd_resume(struct xwospl_skd * xwskd);
 
 /**
- * @brief 玄武OS移植层：触发切换上下文的软中断
+ * @brief XWOS移植层：触发切换上下文的软中断
  * @param[in] xwskd: 调度器的指针
  */
 static __xwbsp_inline
 void xwospl_skd_req_swcx(struct xwospl_skd * xwskd);
 
 /**
- * @brief 玄武OS移植层：切换上下文中断的服务函数
+ * @brief XWOS移植层：切换上下文中断的服务函数
  */
 void xwospl_skd_isr_swcx(void);
 
 /**
- * @brief 玄武OS移植层：当前CPU上的线程退出
+ * @brief XWOS移植层：当前CPU上的线程退出
  * @param[in] thd: 线程对象的指针
  * @param[in] rc: 线程退出抛出的返回值
  */
 void xwospl_thd_exit_lc(struct xwospl_thd * thd, xwer_t rc);
 
 /**
- * @brief 玄武OS移植层：冻结当前CPU中正在运行的线程
+ * @brief XWOS移植层：冻结当前CPU中正在运行的线程
  * @param[in] thd: 线程对象的指针
  */
 xwer_t xwospl_thd_freeze_lc(struct xwospl_thd * thd);
 
 #if defined(XWOS_CFG_CORE__mp)
 /**
- * @brief 玄武OS移植层：将线程迁出其他CPU，并准备迁入其他CPU
+ * @brief XWOS移植层：将线程迁出其他CPU，并准备迁入其他CPU
  * @param[in] thd: 线程对象的指针
  * @param[in] cpuid: 目的地CPU的ID
  * @return 错误码
@@ -125,7 +125,7 @@ xwer_t xwospl_thd_freeze_lc(struct xwospl_thd * thd);
 xwer_t xwospl_thd_outmigrate(struct xwospl_thd * thd, xwid_t cpuid);
 
 /**
- * @brief 玄武OS移植层：迁移线程至目标CPU
+ * @brief XWOS移植层：迁移线程至目标CPU
  * @param[in] thd: 线程对象的指针
  * @param[in] cpuid: 目的地CPU的ID
  */

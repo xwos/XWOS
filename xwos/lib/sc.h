@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS通用库：系统调用与系统特权
+ * @brief XWOS通用库：系统调用与系统特权
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

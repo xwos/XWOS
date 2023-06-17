@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS移植实现层：SOC调试断点
+ * @brief XWOS移植实现层：SOC调试断点
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

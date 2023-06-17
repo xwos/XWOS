@@ -1,6 +1,6 @@
 #! /bin/make -f
 # @file
-# @brief 玄武OS内核的编译规则
+# @brief XWOS内核的编译规则
 # @author
 # + 隐星魂 (Roy Sun) <xwos@xwos.tech>
 # @copyright

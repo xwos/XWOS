@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS的标准头文件
+ * @brief XWOS的标准头文件
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS UP内核：初始化
+ * @brief XWOS UP内核：初始化
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

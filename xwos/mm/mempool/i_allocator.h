@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS内存管理：内存池分配器接口
+ * @brief XWOS内存管理：内存池分配器接口
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS UP内核操作系统接口描述层：顺序锁
+ * @brief XWOS UP内核操作系统接口描述层：顺序锁
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

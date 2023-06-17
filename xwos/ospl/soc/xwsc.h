@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS移植层：SOC系统调用与系统特权
+ * @brief XWOS移植层：SOC系统调用与系统特权
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

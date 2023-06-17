@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS UP内核同步机制：管道信号量
+ * @brief XWOS UP内核同步机制：管道信号量
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

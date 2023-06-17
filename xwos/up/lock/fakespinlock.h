@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS UP内核锁机制：虚假自旋锁
+ * @brief XWOS UP内核锁机制：虚假自旋锁
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

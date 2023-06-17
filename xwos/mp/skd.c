@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS MP内核：调度器
+ * @brief XWOS MP内核：调度器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

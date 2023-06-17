@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS通用库：CRC8
+ * @brief XWOS通用库：CRC8
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

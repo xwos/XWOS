@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武OS UP内核同步机制：信号量的虚基类
+ * @brief XWOS UP内核同步机制：信号量的虚基类
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
