@@ -21,12 +21,15 @@
 EINCDIRS :=
 ELIBS :=
 
-ifeq ($(ARCHCFG_COMPILER_CLIB),y)
+ifeq ($(XWOS_CFG_LIBC),newlib)
   ELIBS_gcc += -lstdc++ -lsupc++ -lm -lc
-endif
-ELIBS_gcc += -lgcc
-
-ifeq ($(ARCHCFG_COMPILER_CLIB),y)
   ELIBS_llvm += -lunwind -lc++ -lc++abi -lm -lc
 endif
+
+ifeq ($(XWOS_CFG_LIBC),picolibc)
+  ELIBS_gcc += -lstdc++ -lsupc++ -lm -lc
+  ELIBS_llvm += -lunwind -lc++ -lc++abi -lm -lc
+endif
+
+ELIBS_gcc += -lgcc
 ELIBS_llvm += -lclang_rt.builtins

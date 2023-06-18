@@ -121,10 +121,6 @@ endif
 CFLAGS += -O$(O)
 CXXFLAGS += -O$(O)
 
-ifeq ($(ARCHCFG_COMPILER_CLIB),n)
-  CFLAGS += -fno-builtin
-endif
-
 LDFLAGS = -mcpu=e200z0 -mhard-float \
           -L$(XWOS_SOC_DIR) -T$(XWOS_BRD_DIR)/$(XWOS_CFG_LDSCRIPT) \
           -Wl,--gc-sections \

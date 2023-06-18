@@ -27,6 +27,7 @@
 #define XWOS_CFG_ARCH                                   arm
 #define XWOS_CFG_SUBARCH                                v7m
 #define XWOS_CFG_COMPILER                               gcc
+#define XWOS_CFG_LIBC                                   newlib
 #define XWOS_CFG_LDSCRIPT                               brd.lds
 #define XWOS_CFG_ELF_MK                                 elf.mk
 #define XWOS_CFG_XWMO_MK                                xwmo.mk

@@ -12,6 +12,7 @@
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
 include $(XWBS_UTIL_MK_XWMO)
 
+$(eval $(call XwmoReqCfg,XWOS_CFG_LIBC,newlib))
 $(eval $(call XwmoReqCfg,XWEMCFG_fs_fatfs,y))
 $(eval $(call XwmoReqCfg,XWMMCFG_MEMPOOL,y))
 $(eval $(call XwmoReqNotCfg,XWMDCFG_libc_picolibcac,y))

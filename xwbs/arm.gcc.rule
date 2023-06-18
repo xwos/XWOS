@@ -20,7 +20,8 @@
 
 TARGET ?= XWOS
 XWTC ?= $(shell xwtcwd)
-CROSS_COMPILE ?= $(XWTC)/armgcc/bin/arm-none-eabi-
+ARMGCC ?= $(XWTC)/armgcc
+CROSS_COMPILE ?= $(ARMGCC)/bin/arm-none-eabi-
 CC := $(CROSS_COMPILE)gcc
 CXX := $(CROSS_COMPILE)g++
 AS := $(CROSS_COMPILE)gcc -x assembler-with-cpp
@@ -125,10 +126,6 @@ endif
 
 CFLAGS += -O$(O)
 CXXFLAGS += -O$(O)
-
-ifeq ($(ARCHCFG_COMPILER_CLIB),n)
-  CFLAGS += -fno-builtin
-endif
 
 LDFLAGS = -mthumb -mabi=aapcs -m$(ENDIAN) \
           -L$(XWOS_SOC_DIR) -T$(XWOS_BRD_DIR)/$(XWOS_CFG_LDSCRIPT) \

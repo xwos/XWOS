@@ -35,7 +35,6 @@
 
 /******** ******** architecture libs ******** ********/
 /******** libc.a ********/
-#define ARCHCFG_COMPILER_CLIB                   1
 #define ARCHCFG_COMPILER_ERRNO                  1
 
 /******** xwbop ********/

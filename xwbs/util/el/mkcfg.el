@@ -214,6 +214,12 @@
 (logi "compiler:%s" XWOS-cfg-compiler)
 
 (goto-char (point-min))
+(re-search-forward
+ "^#define[ \t]+\\(XWOS_CFG_LIBC\\)[ \t]+\\(.+\\)")
+(setq XWOS-cfg-libc (match-string 2))
+(logi "libc:%s" XWOS-cfg-libc)
+
+(goto-char (point-min))
 (let ((rc))
   (setq rc (re-search-forward "^#define[ \t]+XWOS_CFG_ELF_MK[ \t]+\\(.+\\)" nil t))
   (if (null rc)
@@ -355,6 +361,7 @@
 (insert (concat "XWOS_CFG_ARCH := " XWOS-cfg-arch "\n"))
 (insert (concat "XWOS_CFG_SUBARCH := " XWOS-cfg-subarch "\n"))
 (insert (concat "XWOS_CFG_COMPILER := " XWOS-cfg-compiler "\n"))
+(insert (concat "XWOS_CFG_LIBC := " XWOS-cfg-libc "\n"))
 (insert (concat "XWOS_CFG_LDSCRIPT := " XWOS-cfg-lds "\n"))
 (insert (concat "XWOS_CFG_CPU := " XWOS-cfg-cpu "\n"))
 (insert (concat "XWOS_CFG_SOC := " XWOS-cfg-soc "\n"))
@@ -644,6 +651,7 @@
 #define XWOS_CFG_ARCH__" XWOS-cfg-arch " 1
 #define XWOS_CFG_SUBARCH__" XWOS-cfg-subarch " 1
 #define XWOS_CFG_COMPILER__" XWOS-cfg-compiler " 1
+#define XWOS_CFG_LIBC__" XWOS-cfg-libc " 1
 #define XWOS_CFG_CPU__" XWOS-cfg-cpu " 1
 #define XWOS_CFG_SOC__" XWOS-cfg-soc " 1
 #define XWOS_CFG_BOARD__" XWOS-cfg-brd " 1
@@ -670,6 +678,7 @@
 (insert (concat "export XWOS_CFG_ARCH=" XWOS-cfg-arch "\n"))
 (insert (concat "export XWOS_CFG_SUBARCH=" XWOS-cfg-subarch "\n"))
 (insert (concat "export XWOS_CFG_COMPILER=" XWOS-cfg-compiler "\n"))
+(insert (concat "export XWOS_CFG_LIBC=" XWOS-cfg-libc "\n"))
 (insert (concat "export XWOS_CFG_LDSCRIPT=" XWOS-cfg-lds "\n"))
 (insert (concat "export XWOS_CFG_CPU=" XWOS-cfg-cpu "\n"))
 (insert (concat "export XWOS_CFG_SOC=" XWOS-cfg-soc "\n"))
