@@ -238,7 +238,7 @@ void arch_isr_svc(void)
         __asm__ volatile("      str     r1, [r0, #0]"); /* save the return value */
         __asm__ volatile("      bx      lr");
         __asm__ volatile("svc_14:"); /* case 14: Migrate thread */
-#if defined(XWOS_CFG_CORE__mp)
+#if (1 == XWOSRULE_THD_MIGRATION)
         __asm__ volatile("      push    {r0, lr}");
         __asm__ volatile("      ldr     r1, [r0, #4]"); /* get old r1 value */
         __asm__ volatile("      ldr     r0, [r0, #0]"); /* get old r0 value */

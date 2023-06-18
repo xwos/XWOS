@@ -49,4 +49,6 @@
 #  define XWOSRULE_SKD_THD_FREEZE               0
 #endif
 
+#define XWOSRULE_THD_MIGRATION                   0
+
 #endif /* xwos/up/rule.h */

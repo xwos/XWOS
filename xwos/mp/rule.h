@@ -43,4 +43,6 @@
 #  define XWOSRULE_SKD_WQ_RT                    0
 #endif
 
+#define XWOSRULE_THD_MIGRATION                   1
+
 #endif /* xwos/mp/rule.h */

@@ -349,7 +349,7 @@ xwer_t xwospl_thd_freeze_lc(struct xwospl_thd * thd)
         return rc;
 }
 
-#if defined(XWOS_CFG_CORE__mp)
+#if (1 == XWOSRULE_THD_MIGRATION)
 /**
  * @brief 将线程迁出其他CPU，并准备迁入其他CPU
  * @param[in] thd: 线程控制块对象的指针
