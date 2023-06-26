@@ -13,6 +13,7 @@
 #include <xwos/standard.h>
 #include <xwos/up/osdl/sync/br.h>
 
+#if (1 == XWOSRULE_SYNC_EVT_CREATE_DELETE)
 __xwup_code
 xwer_t xwosdl_br_create(xwosdl_br_d * brd, xwsz_t num)
 {
@@ -30,3 +31,4 @@ xwer_t xwosdl_br_create(xwosdl_br_d * brd, xwsz_t num)
         }
         return rc;
 }
+#endif

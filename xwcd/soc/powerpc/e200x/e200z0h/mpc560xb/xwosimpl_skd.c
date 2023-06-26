@@ -33,7 +33,7 @@ xwer_t soc_skd_swi(xwer_t(* swifunc)(void *, void *), void * arg0, void * arg1);
 static __xwbsp_code
 void soc_skd_report_stk_overflow(struct xwospl_skdobj_stack * stk);
 
-extern xwstk_t xwos_stk_top[];
+extern xwstk_t e200z0h_isr_stack_top[];
 extern xwstk_t _SDA_BASE_[];
 extern xwstk_t _SDA2_BASE_[];
 
@@ -46,7 +46,7 @@ __xwbsp_rodata const struct soc_irq_cfg soc_skd_irq_cfg_swi = {
 };
 
 __xwbsp_data struct e200x_context soc_context = {
-        .isr_sp = xwos_stk_top,
+        .isr_sp = e200z0h_isr_stack_top,
         .thd_sp = NULL,
         .irq_nesting_cnt = 0,
         .irqn = SOC_IRQN_NIL,

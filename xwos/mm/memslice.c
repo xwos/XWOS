@@ -15,7 +15,6 @@
 #include <xwos/lib/xwaop.h>
 #include <xwos/lib/lfq.h>
 #include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
 #include <xwos/mm/memslice.h>
 
 /**

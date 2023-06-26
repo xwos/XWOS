@@ -17,7 +17,6 @@
 #include <xwos/lib/lfq.h>
 #include <xwos/osal/lock/seqlock.h>
 #include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
 #include <xwos/mm/mempool/page.h>
 #include <xwos/mm/mempool/objcache.h>
 

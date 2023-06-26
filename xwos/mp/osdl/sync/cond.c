@@ -13,6 +13,7 @@
 #include <xwos/standard.h>
 #include <xwos/mp/osdl/sync/cond.h>
 
+#if (1 == XWOSRULE_SYNC_COND_CREATE_DELETE)
 __xwmp_code
 xwer_t xwosdl_cond_create(xwosdl_cond_d * condd)
 {
@@ -30,3 +31,4 @@ xwer_t xwosdl_cond_create(xwosdl_cond_d * condd)
         }
         return rc;
 }
+#endif

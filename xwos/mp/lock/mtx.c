@@ -15,7 +15,6 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
 #include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
 #if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
 #  include <xwos/mm/memslice.h>
 #elif defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
@@ -47,11 +46,13 @@ void xwmp_mtx_construct(struct xwmp_mtx * mtx);
 static __xwmp_code
 void xwmp_mtx_destruct(struct xwmp_mtx * mtx);
 
+#if (1 == XWOSRULE_LOCK_MTX_CREATE_DELETE)
 static __xwmp_code
 struct xwmp_mtx * xwmp_mtx_alloc(void);
 
 static __xwmp_code
 void xwmp_mtx_free(struct xwmp_mtx * mtx);
+#endif
 
 static __xwmp_code
 xwer_t xwmp_mtx_activate(struct xwmp_mtx * mtx, xwpr_t sprio,
@@ -60,8 +61,10 @@ xwer_t xwmp_mtx_activate(struct xwmp_mtx * mtx, xwpr_t sprio,
 static __xwmp_code
 xwer_t xwmp_mtx_sgc(void * mtx);
 
+#if (1 == XWOSRULE_LOCK_MTX_CREATE_DELETE)
 static __xwmp_code
 xwer_t xwmp_mtx_dgc(void * mtx);
+#endif
 
 static __xwmp_code
 xwer_t xwmp_mtx_chprio_once(struct xwmp_mtx * mtx,
@@ -116,6 +119,7 @@ xwer_t xwmp_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 }
 #endif
 
+#if (1 == XWOSRULE_LOCK_MTX_CREATE_DELETE)
 /**
  * @brief 从互斥锁对象缓存中申请对象
  * @return 互斥锁对象的指针
@@ -123,7 +127,7 @@ xwer_t xwmp_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 static __xwmp_code
 struct xwmp_mtx * xwmp_mtx_alloc(void)
 {
-#if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
+#  if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
         union {
                 struct xwmp_mtx * mtx;
                 void * anon;
@@ -135,7 +139,7 @@ struct xwmp_mtx * xwmp_mtx_alloc(void)
                 mem.mtx = err_ptr(rc);
         }/* else {} */
         return mem.mtx;
-#elif defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
+#  elif defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
         struct xwmp_mtx * mtx;
 
         mtx = malloc(sizeof(struct xwmp_mtx));
@@ -145,23 +149,13 @@ struct xwmp_mtx * xwmp_mtx_alloc(void)
                 xwmp_mtx_construct(mtx);
         }
         return mtx;
-#else
-        union {
-                struct xwmp_mtx * mtx;
-                void * anon;
-        } mem;
-        xwer_t rc;
-
-        rc = xwmm_kma_alloc(sizeof(struct xwmp_mtx), XWMM_ALIGNMENT, &mem.anon);
-        if (XWOK == rc ) {
-                xwmp_mtx_construct(mem.mtx);
-        } else {
-                mem.mtx = err_ptr(-ENOMEM);
-        }
-        return mem.mtx;
-#endif
+#  else
+        return err_ptr(-ENOSYS);;
+#  endif
 }
+#endif
 
+#if (1 == XWOSRULE_LOCK_MTX_CREATE_DELETE)
 /**
  * @brief 释放互斥锁对象
  * @param[in] mtx: 互斥锁对象的指针
@@ -169,16 +163,16 @@ struct xwmp_mtx * xwmp_mtx_alloc(void)
 static __xwmp_code
 void xwmp_mtx_free(struct xwmp_mtx * mtx)
 {
-#if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
+#  if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
         xwmm_memslice_free(&xwmp_mtx_cache, mtx);
-#elif defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
+#  elif defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
         xwmp_mtx_destruct(mtx);
         free(mtx);
-#else
-        xwmp_mtx_destruct(mtx);
-        xwmm_kma_free(mtx);
-#endif
+#  else
+        XWOS_UNUSED(mtx);
+#  endif
 }
+#endif
 
 /**
  * @brief 互斥锁对象的构造函数
@@ -211,6 +205,7 @@ xwer_t xwmp_mtx_sgc(void * mtx)
         return XWOK;
 }
 
+#if (1 == XWOSRULE_LOCK_MTX_CREATE_DELETE)
 /**
  * @brief 动态互斥锁对象的垃圾回收函数
  * @param[in] mtx: 互斥锁对象的指针
@@ -221,6 +216,7 @@ xwer_t xwmp_mtx_dgc(void * mtx)
         xwmp_mtx_free((struct xwmp_mtx *)mtx);
         return XWOK;
 }
+#endif
 
 /**
  * @brief 激活互斥锁对象，并初始化
@@ -274,6 +270,7 @@ xwsq_t xwmp_mtx_gettik(struct xwmp_mtx * mtx)
         return mtx ? mtx->xwobj.tik : 0;
 }
 
+#if (1 == XWOSRULE_LOCK_MTX_CREATE_DELETE)
 __xwmp_api
 xwer_t xwmp_mtx_create(struct xwmp_mtx ** mtxbuf, xwpr_t sprio)
 {
@@ -294,12 +291,15 @@ xwer_t xwmp_mtx_create(struct xwmp_mtx ** mtxbuf, xwpr_t sprio)
         }
         return rc;
 }
+#endif
 
+#if (1 == XWOSRULE_LOCK_MTX_CREATE_DELETE)
 __xwmp_api
 xwer_t xwmp_mtx_delete(struct xwmp_mtx * mtx, xwsq_t tik)
 {
         return xwmp_mtx_release(mtx, tik);
 }
+#endif
 
 __xwmp_api
 xwer_t xwmp_mtx_acquire(struct xwmp_mtx * mtx, xwsq_t tik)

@@ -13,6 +13,7 @@
 #include <xwos/standard.h>
 #include <xwos/mp/osdl/swt.h>
 
+#if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
 __xwmp_code
 xwer_t xwosdl_swt_create(xwosdl_swt_d * swtd, xwsq_t flag)
 {
@@ -30,3 +31,4 @@ xwer_t xwosdl_swt_create(xwosdl_swt_d * swtd, xwsq_t flag)
         }
         return rc;
 }
+#endif

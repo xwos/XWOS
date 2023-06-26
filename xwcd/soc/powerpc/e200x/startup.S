@@ -20,9 +20,9 @@
 
 #include <cfg/project.h>
 
-        .extern         xwos_stk_mr_size
-        .extern         xwos_stk_top
-        .extern         xwos_stk_end
+        .extern         e200z0h_isr_stack_mr_size
+        .extern         e200z0h_isr_stack_top
+        .extern         e200z0h_isr_stack_end
         .extern         _SDA_BASE_
         .extern         _SDA2_BASE_
         .extern         xwos_preinit
@@ -54,8 +54,8 @@ arch_isr_reset:
         se_stw          r7, 0x0 (r6)  /* # WEN = 0 */
 
         /* step 3: lowlevel-init */
-        e_lis           r1, xwos_stk_top@h /* sp = xwos_stk_top; */
-        e_or2i          r1, xwos_stk_top@l
+        e_lis           r1, e200z0h_isr_stack_top@h /* sp = e200z0h_isr_stack_top; */
+        e_or2i          r1, e200z0h_isr_stack_top@l
         e_lis           r13, _SDA_BASE_@h
         e_or2i          r13, _SDA_BASE_@l
         e_lis           r2, _SDA2_BASE_@h
@@ -65,16 +65,16 @@ arch_isr_reset:
 
         /* step 4: init xwos-stack & ecc flags */
         e_li            r4, 0
-        e_lis           r1, xwos_stk_top@h /* r1 = xwos_stk_top; */
-        e_or2i          r1, xwos_stk_top@l
-        e_lis           r3, xwos_stk_mr_size@h /* r3 = xwos_stk_mr_size */
-        e_or2i          r3, xwos_stk_mr_size@l
+        e_lis           r1, e200z0h_isr_stack_top@h /* r1 = e200z0h_isr_stack_top; */
+        e_or2i          r1, e200z0h_isr_stack_top@l
+        e_lis           r3, e200z0h_isr_stack_mr_size@h /* r3 = e200z0h_isr_stack_mr_size */
+        e_or2i          r3, e200z0h_isr_stack_mr_size@l
         e_srwi          r3, r3, 2 /* r3 = r3 / 4; */
         mtctr           r3 /* ctr = r3; */
 loop:
         e_stwu          r4, -4 (r1) /* *(r1-4) = 0; r1 -= 4; */
         e_bdnz          loop /* Loop for stack */
-        /* Now only SRAM in xwos_stk can be used. */
+        /* Now only SRAM in e200z0h_isr_stack_mr can be used. */
         /* ECC RAM non-correction error report disabled
            ECC FLASH non-correction error report disabled
            Reporting of single-bit RAM corrections disabled
@@ -85,8 +85,8 @@ loop:
         e_stb           r12, 0 (r11)
 
         /* step 5: setup env of the C language */
-        e_lis           r1, xwos_stk_top@h
-        e_or2i          r1, xwos_stk_top@l
+        e_lis           r1, e200z0h_isr_stack_top@h
+        e_or2i          r1, e200z0h_isr_stack_top@l
         e_lis           r13, _SDA_BASE_@h
         e_or2i          r13, _SDA_BASE_@l
         e_lis           r2, _SDA2_BASE_@h

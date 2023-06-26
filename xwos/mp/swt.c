@@ -13,7 +13,6 @@
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
 #include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
 #if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
 #  include <xwos/mm/memslice.h>
 #elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
@@ -35,11 +34,13 @@ static __xwmp_data struct xwmm_memslice xwmp_swt_cache;
 const __xwmp_rodata char xwmp_swt_cache_name[] = "xwmp.swt.cache";
 #endif
 
+#if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
 static __xwmp_code
 struct xwmp_swt * xwmp_swt_alloc(void);
 
 static __xwmp_code
 void xwmp_swt_free(struct xwmp_swt * swt);
+#endif
 
 static __xwmp_code
 void xwmp_swt_construct(struct xwmp_swt * swt);
@@ -53,8 +54,10 @@ xwer_t xwmp_swt_activate(struct xwmp_swt * swt, xwsq_t flag, xwobj_gc_f gcfunc);
 static __xwmp_code
 xwer_t xwmp_swt_sgc(void * swt);
 
+#if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
 static __xwmp_code
 xwer_t xwmp_swt_dgc(void * swt);
+#endif
 
 static __xwmp_code
 void xwmp_swt_ttn_cb(void * entry);
@@ -82,6 +85,7 @@ xwer_t xwmp_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 }
 #endif
 
+#if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
 /**
  * @brief 从软件定时器对象缓存中申请一个对象
  * @return 软件定时器对象的指针
@@ -89,7 +93,7 @@ xwer_t xwmp_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 static __xwmp_code
 struct xwmp_swt * xwmp_swt_alloc(void)
 {
-#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
+#  if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
         union {
                 struct xwmp_swt * swt;
                 void * anon;
@@ -101,7 +105,7 @@ struct xwmp_swt * xwmp_swt_alloc(void)
                 mem.swt = err_ptr(rc);
         }/* else {} */
         return mem.swt;
-#elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
+#  elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
         struct xwmp_swt * swt;
 
         swt = malloc(sizeof(struct xwmp_swt));
@@ -111,23 +115,13 @@ struct xwmp_swt * xwmp_swt_alloc(void)
                 xwmp_swt_construct(swt);
         }
         return swt;
-#else
-        union {
-                struct xwmp_swt * swt;
-                void * anon;
-        } mem;
-        xwer_t rc;
-
-        rc = xwmm_kma_alloc(sizeof(struct xwmp_swt), XWMM_ALIGNMENT, &mem.anon);
-        if (XWOK == rc) {
-                xwmp_swt_construct(mem.swt);
-        } else {
-                mem.swt = err_ptr(-ENOMEM);
-        }
-        return mem.swt;
-#endif
+#  else
+        return err_ptr(-ENOSYS);
+#  endif
 }
+#endif
 
+#if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
 /**
  * @brief 释放软件定时器对象
  * @param[in] swt: 软件定时器对象的指针
@@ -135,16 +129,16 @@ struct xwmp_swt * xwmp_swt_alloc(void)
 static __xwmp_code
 void xwmp_swt_free(struct xwmp_swt * swt)
 {
-#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
+#  if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
         xwmm_memslice_free(&xwmp_swt_cache, swt);
-#elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
+#  elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
         xwmp_swt_destruct(swt);
         free(swt);
-#else
-        xwmp_swt_destruct(swt);
-        xwmm_kma_free(swt);
-#endif
+#  else
+        XWOS_UNUSED(swt);
+#  endif
 }
+#endif
 
 /**
  * @brief 软件定时器对象的构造函数
@@ -183,6 +177,7 @@ xwer_t xwmp_swt_sgc(void * swt)
         return XWOK;
 }
 
+#if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
 /**
  * @brief 动态软件定时器对象的垃圾回收函数
  * @param[in] swt: 软件定时器对象的指针
@@ -193,6 +188,7 @@ xwer_t xwmp_swt_dgc(void * swt)
         xwmp_swt_free(swt);
         return XWOK;
 }
+#endif
 
 /**
  * @brief 激活软件定时器对象
@@ -233,6 +229,7 @@ xwer_t xwmp_swt_fini(struct xwmp_swt * swt)
         return xwmp_swt_put(swt);
 }
 
+#if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
 __xwmp_api
 xwer_t xwmp_swt_create(struct xwmp_swt ** swtbuf, xwsq_t flag)
 {
@@ -257,12 +254,15 @@ err_swt_activate:
 err_swt_alloc:
         return rc;
 }
+#endif
 
+#if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
 __xwmp_api
 xwer_t xwmp_swt_delete(struct xwmp_swt * swt, xwsq_t tik)
 {
         return xwmp_swt_release(swt, tik);
 }
+#endif
 
 __xwmp_api
 xwer_t xwmp_swt_acquire(struct xwmp_swt * swt, xwsq_t tik)

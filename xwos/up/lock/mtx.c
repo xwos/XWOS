@@ -15,14 +15,13 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
 #include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
 #if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
 #  include <xwos/mm/memslice.h>
 #elif defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
 #  include <stdlib.h>
 #endif
 #include <xwos/ospl/irq.h>
-#include <xwos/ospl/skd.h>
+#include <xwos/up/skd.h>
 #include <xwos/up/tt.h>
 #include <xwos/up/rtwq.h>
 #include <xwos/up/mtxtree.h>
@@ -47,17 +46,21 @@ void xwup_mtx_construct(struct xwup_mtx * mtx);
 static __xwup_code
 void xwup_mtx_destruct(struct xwup_mtx * mtx);
 
+#if (1 == XWOSRULE_LOCK_MTX_CREATE_DELETE)
 static __xwup_code
 struct xwup_mtx * xwup_mtx_alloc(void);
 
 static __xwup_code
 void xwup_mtx_free(struct xwup_mtx * mtx);
+#endif
 
 static __xwup_code
 xwer_t xwup_mtx_sgc(void * mtx);
 
+#if (1 == XWOSRULE_LOCK_MTX_CREATE_DELETE)
 static __xwup_code
 xwer_t xwup_mtx_dgc(void * mtx);
+#endif
 
 static __xwup_code
 xwer_t xwup_mtx_activate(struct xwup_mtx * mtx, xwpr_t sprio, xwobj_gc_f gcfunc);
@@ -109,6 +112,7 @@ xwer_t xwup_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 }
 #endif
 
+#if (1 == XWOSRULE_LOCK_MTX_CREATE_DELETE)
 /**
  * @brief 申请互斥锁对象
  * @return 互斥锁对象的指针
@@ -116,7 +120,7 @@ xwer_t xwup_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 static __xwup_code
 struct xwup_mtx * xwup_mtx_alloc(void)
 {
-#if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
+#  if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
         union {
                 struct xwup_mtx * mtx;
                 void * anon;
@@ -128,7 +132,7 @@ struct xwup_mtx * xwup_mtx_alloc(void)
                 mem.mtx = err_ptr(rc);
         }/* else {} */
         return mem.mtx;
-#elif defined(XWOSCFG_SKD_MTX_STDC_MM) && (1 == XWOSCFG_SKD_MTX_STDC_MM)
+#  elif defined(XWOSCFG_SKD_MTX_STDC_MM) && (1 == XWOSCFG_SKD_MTX_STDC_MM)
         struct xwup_mtx * mtx;
 
         mtx = malloc(sizeof(struct xwup_mtx));
@@ -138,23 +142,13 @@ struct xwup_mtx * xwup_mtx_alloc(void)
                 xwup_mtx_construct(mtx);
         }
         return mtx;
-#else
-        union {
-                struct xwup_mtx * mtx;
-                void * anon;
-        } mem;
-        xwer_t rc;
-
-        rc = xwmm_kma_alloc(sizeof(struct xwup_mtx), XWMM_ALIGNMENT, &mem.anon);
-        if (rc < 0) {
-                mem.mtx = err_ptr(-ENOMEM);
-        } else {
-                xwup_mtx_construct(mem.mtx);
-        }
-        return mem.mtx;
-#endif
+#  else
+        return err_ptr(-ENOSYS);
+#  endif
 }
+#endif
 
+#if (1 == XWOSRULE_LOCK_MTX_CREATE_DELETE)
 /**
  * @brief 释放互斥锁对象
  * @param[in] mtx: 互斥锁对象的指针
@@ -162,14 +156,15 @@ struct xwup_mtx * xwup_mtx_alloc(void)
 static __xwup_code
 void xwup_mtx_free(struct xwup_mtx * mtx)
 {
-#if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
+#  if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
         xwmm_memslice_free(&xwup_mtx_cache, mtx);
-#elif defined(XWOSCFG_SKD_MTX_STDC_MM) && (1 == XWOSCFG_SKD_MTX_STDC_MM)
+#  elif defined(XWOSCFG_SKD_MTX_STDC_MM) && (1 == XWOSCFG_SKD_MTX_STDC_MM)
         free(mtx);
-#else
-        xwmm_kma_free(mtx);
-#endif
+#  else
+        XWOS_UNUSED(mtx);
+#  endif
 }
+#endif
 
 /**
  * @brief 互斥锁对象的构造函数
@@ -198,12 +193,14 @@ xwer_t xwup_mtx_sgc(void * mtx)
         return XWOK;
 }
 
+#if (1 == XWOSRULE_LOCK_MTX_CREATE_DELETE)
 static __xwup_code
 xwer_t xwup_mtx_dgc(void * mtx)
 {
         xwup_mtx_free((struct xwup_mtx *)mtx);
         return XWOK;
 }
+#endif
 
 /**
  * @brief 激活互斥锁对象
@@ -257,6 +254,7 @@ xwsq_t xwup_mtx_gettik(struct xwup_mtx * mtx)
         return mtx ? mtx->xwobj.tik : 0;
 }
 
+#if (1 == XWOSRULE_LOCK_MTX_CREATE_DELETE)
 __xwup_api
 xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio)
 {
@@ -277,12 +275,15 @@ xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio)
         }
         return rc;
 }
+#endif
 
+#if (1 == XWOSRULE_LOCK_MTX_CREATE_DELETE)
 __xwup_api
 xwer_t xwup_mtx_delete(struct xwup_mtx * mtx, xwsq_t tik)
 {
         return xwup_mtx_release(mtx, tik);
 }
+#endif
 
 __xwup_api
 xwer_t xwup_mtx_acquire(struct xwup_mtx * mtx, xwsq_t tik)

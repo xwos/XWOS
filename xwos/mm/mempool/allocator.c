@@ -14,7 +14,6 @@
 #include <string.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
 #include <xwos/mm/mempool/page.h>
 #include <xwos/mm/mempool/allocator.h>
 
@@ -196,6 +195,8 @@ err_pa_init:
  * @param[in] origin: 内存区域的起始地址
  * @param[in] size: 内存区域的总大小
  * @param[in] pgodr: 页的数量，以2的pgodr次方形式表示
+ * @param[in] pre: 预申请的内存的大小
+ * @param[out] membuf: 指向缓冲区的指针，通过此缓冲区返回预申请内存的首地址
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -210,10 +211,15 @@ err_pa_init:
  *   + 页的数量用 `pgodr` 表示，只能是2的n次方，即 `2, 4, 8, 16, 32, 64, 128, ...` ，
  *     对应的pgodr分别为 `1, 2, 3, 4, 5, 6, 7, ...` ；
  *   + 内存区域大小必须满足关系： `size == (XWMM_MEMPOOL_PAGE_SIZE * (1 << pgodr))` 。
+ * + 如果在内存区域开始的地方，已经由编译器预先分配了一片内存，
+ *   用户只想将剩下的内存用作内存池，则需要将编译器预先分配的内存在内存池中申请出来，
+ *   防止内存发生重叠。参数 `pre` 以及 `membuf` 就是作为此用途而设计的。
+ *   `membuf` 可以为 `NULL` ，表示不需要返回编译器预先申请内存的首地址。
  */
 __xwos_api
 xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
-                         xwptr_t origin, xwsz_t size, xwsz_t pgodr)
+                         xwptr_t origin, xwsz_t size, xwsz_t pgodr,
+                         xwsz_t pre, void ** membuf)
 {
         xwer_t rc;
         struct xwmm_mempool_page_odrbtree * odrbtrees;
@@ -221,6 +227,7 @@ xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
         struct xwmm_mempool_page * pages;
         xwsz_t pages_nr;
         xwsz_t pages_size;
+        void * mem;
 
         XWOS_VALIDATE((mp), "nullptr", -EFAULT);
 
@@ -239,23 +246,30 @@ xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
                 goto err_mempool_construct;
         }
 
-        if ((xwptr_t)mp == origin) {
-                xwsz_t mpsz;
-                void * mem;
-
-                mpsz = sizeof(struct xwmm_mempool) + odrbtrees_size + pages_size;
+        if (pre > 0) {
+                rc = xwmm_mempool_malloc(mp, pre, &mem);
+                if (rc < 0) {
+                        goto err_mempool_prealloc;
+                }
+                if (membuf) {
+                        *membuf = mem;
+                }
+        } else if ((xwptr_t)mp == origin) {
+                xwsz_t mpsz = sizeof(struct xwmm_mempool) + odrbtrees_size + pages_size;
                 if (mpsz < XWMM_MEMPOOL_PAGE_SIZE) {
                         mpsz = XWMM_MEMPOOL_PAGE_SIZE;
                 }
                 rc = xwmm_mempool_malloc(mp, mpsz, &mem);
                 if (rc < 0) {
-                        goto err_mempool_selfalloc;
+                        goto err_mempool_prealloc;
+                }
+                if (membuf) {
+                        *membuf = mem;
                 }
         }
-
         return XWOK;
 
-err_mempool_selfalloc:
+err_mempool_prealloc:
 err_mempool_construct:
 err_size:
         return rc;

@@ -19,7 +19,6 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
 #include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/skd.h>
 #include <xwos/mp/wqn.h>

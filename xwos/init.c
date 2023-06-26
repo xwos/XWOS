@@ -19,7 +19,6 @@
 #  error "Can't find the configuration XWOS_CFG_CORE!"
 #endif
 #include <xwos/lib/object.h>
-#include <xwos/mm/kma.h>
 #include <xwos/osal/skd.h>
 
 __xwos_init_code
@@ -30,7 +29,6 @@ void xwos_init(void)
         cpuid = xwos_skd_id_lc();
         if (0 == cpuid) {
                 xwos_objtik_init();
-                xwmm_kma_init();
         }
 #if defined(XWOS_CFG_CORE__mp)
         xwmp_init();

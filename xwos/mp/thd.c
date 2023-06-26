@@ -17,7 +17,6 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
 #include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
 #if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
 #  include <xwos/mm/memslice.h>
 #elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
@@ -71,6 +70,7 @@ extern
 void board_thd_postinit_hook(struct xwmp_thd * thd);
 #endif
 
+#if (1 == XWOSRULE_SKD_THD_CREATE)
 static __xwmp_code
 struct xwmp_thd * xwmp_thd_alloc(void);
 
@@ -82,6 +82,7 @@ xwstk_t * xwmp_thd_stack_alloc(xwsz_t stack_size);
 
 static __xwmp_code
 xwer_t xwmp_thd_stack_free(xwstk_t * stk);
+#endif
 
 static __xwmp_code
 void xwmp_thd_construct(struct xwmp_thd * thd);
@@ -89,8 +90,10 @@ void xwmp_thd_construct(struct xwmp_thd * thd);
 static __xwmp_code
 void xwmp_thd_destruct(struct xwmp_thd * thd);
 
+#if (1 == XWOSRULE_SKD_THD_CREATE)
 static __xwmp_code
 xwer_t xwmp_thd_dgc(void * thd);
+#endif
 
 static __xwmp_code
 xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
@@ -100,11 +103,6 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
 
 static __xwmp_code
 void xwmp_thd_launch(struct xwmp_thd * thd, xwmp_thd_f thdfunc, void * arg);
-
-#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
-static __xwmp_code
-xwer_t xwmp_thd_delete(struct xwmp_thd * thd);
-#endif
 
 static __xwmp_code
 void xwmp_thd_outmigrate_frozen_lic(struct xwmp_thd * thd);
@@ -135,6 +133,7 @@ xwer_t xwmp_thd_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 }
 #endif
 
+#if (1 == XWOSRULE_SKD_THD_CREATE)
 /**
  * @brief 从线程对象缓存中申请一个对象
  * @return 线程对象的指针
@@ -142,7 +141,7 @@ xwer_t xwmp_thd_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 static __xwmp_code
 struct xwmp_thd * xwmp_thd_alloc(void)
 {
-#if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+#  if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
         union {
                 struct xwmp_thd * thd;
                 void * anon;
@@ -154,7 +153,7 @@ struct xwmp_thd * xwmp_thd_alloc(void)
                 mem.thd = err_ptr(rc);
         }/* else {} */
         return mem.thd;
-#elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
+#  elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         struct xwmp_thd * thd;
 
         thd = malloc(sizeof(struct xwmp_thd));
@@ -164,23 +163,13 @@ struct xwmp_thd * xwmp_thd_alloc(void)
                 xwmp_thd_construct(thd);
         }
         return thd;
-#else
-        union {
-                struct xwmp_thd * thd;
-                void * anon;
-        } mem;
-        xwer_t rc;
-
-        rc = xwmm_kma_alloc(sizeof(struct xwmp_thd), XWMM_ALIGNMENT, &mem.anon);
-        if (XWOK == rc) {
-                xwmp_thd_construct(mem.thd);
-        } else {
-                mem.thd = err_ptr(-ENOMEM);
-        }
-        return mem.thd;
-#endif
+#  else
+        return err_ptr(-ENOSYS);
+#  endif
 }
+#endif
 
+#if (1 == XWOSRULE_SKD_THD_CREATE)
 /**
  * @brief 释放线程对象
  * @param[in] thd: 线程对象的指针
@@ -188,17 +177,18 @@ struct xwmp_thd * xwmp_thd_alloc(void)
 static __xwmp_code
 void xwmp_thd_free(struct xwmp_thd * thd)
 {
-#if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+#  if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
         xwmm_memslice_free(&xwmp_thd_cache, thd);
-#elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
+#  elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         xwmp_thd_destruct(thd);
         free(thd);
-#else
-        xwmp_thd_destruct(thd);
-        xwmm_kma_free(thd);
-#endif
+#  else
+        XWOS_UNUSED(thd);
+#  endif
 }
+#endif
 
+#if (1 == XWOSRULE_SKD_THD_CREATE)
 /**
  * @brief 动态分配线程栈
  * @param[in] stack_size: 线程栈的大小
@@ -207,7 +197,7 @@ void xwmp_thd_free(struct xwmp_thd * thd)
 static __xwmp_code
 xwstk_t * xwmp_thd_stack_alloc(xwsz_t stack_size)
 {
-#if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
+#  if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
         union {
                 xwstk_t * stkbase;
                 void * anon;
@@ -219,7 +209,7 @@ xwstk_t * xwmp_thd_stack_alloc(xwsz_t stack_size)
                 mem.stkbase = err_ptr(rc);
         }/* else {} */
         return mem.stkbase;
-#elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
+#  elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         xwstk_t * stkbase;
 
         stkbase = malloc(stack_size);
@@ -227,21 +217,14 @@ xwstk_t * xwmp_thd_stack_alloc(xwsz_t stack_size)
                 stkbase = err_ptr(-ENOMEM);
         }
         return stkbase;
-#else
-        union {
-                xwstk_t * stkbase;
-                void * anon;
-        } mem;
-        xwer_t rc;
-
-        rc = xwmm_kma_alloc(stack_size, XWMMCFG_STACK_ALIGNMENT, &mem.anon);
-        if (rc < 0) {
-                mem.stkbase = err_ptr(rc);
-        }/* else {} */
-        return mem.stkbase;
-#endif
+#  else
+        XWOS_UNUSED(stack_size);
+        return err_ptr(-ENOSYS);
+#  endif
 }
+#endif
 
+#if (1 == XWOSRULE_SKD_THD_CREATE)
 /**
  * @brief 释放动态分配的线程栈内存
  * @param[in] stk: 线程栈的首地址
@@ -250,14 +233,16 @@ xwstk_t * xwmp_thd_stack_alloc(xwsz_t stack_size)
 static __xwmp_code
 xwer_t xwmp_thd_stack_free(xwstk_t * stk)
 {
-#if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
+#  if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
         return board_thd_stack_pool_free(stk);
-#elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
+#  elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         return free(stk);
-#else
-        return xwmm_kma_free(stk);
-#endif
+#  else
+        XWOS_UNUSED(stk);
+        return -ENOSYS;
+#  endif
 }
+#endif
 
 /**
  * @brief 线程对象的构造函数
@@ -290,6 +275,7 @@ xwer_t xwmp_thd_sgc(void * obj)
         return XWOK;
 }
 
+#if (1 == XWOSRULE_SKD_THD_CREATE)
 /**
  * @brief 动态线程对象的垃圾回收函数
  * @param[in] thd: 线程对象的指针
@@ -308,6 +294,7 @@ xwer_t xwmp_thd_dgc(void * obj)
         xwmp_thd_free(thd);
         return XWOK;
 }
+#endif
 
 __xwmp_api
 xwer_t xwmp_thd_acquire(struct xwmp_thd * thd, xwsq_t tik)
@@ -505,6 +492,7 @@ xwer_t xwmp_thd_init(struct xwmp_thd * thd,
         return rc;
 }
 
+#if (1 == XWOSRULE_SKD_THD_CREATE)
 __xwmp_api
 xwer_t xwmp_thd_create(struct xwmp_thd ** thdpbuf,
                        const struct xwmp_thd_attr * inattr,
@@ -581,13 +569,6 @@ err_thd_alloc:
 err_stack_alloc:
         *thdpbuf = NULL;
         return rc;
-}
-
-#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
-static __xwmp_code
-xwer_t xwmp_thd_delete(struct xwmp_thd * thd)
-{
-        return xwmp_thd_put(thd);
 }
 #endif
 
@@ -715,7 +696,7 @@ xwer_t xwmp_thd_join(struct xwmp_thd * thd, xwer_t * trc)
                 if (!is_err_or_null(trc)) {
                         *trc = (xwer_t)thd->stack.arg;
                 }
-                rc = xwmp_thd_delete(thd);
+                rc = xwmp_thd_put(thd);
                 XWOS_BUG_ON(rc < 0);
         } else {
                 xwbop_s1m(xwsq_t, &thd->state, XWMP_SKDOBJ_ST_JOINED);
@@ -727,7 +708,7 @@ xwer_t xwmp_thd_join(struct xwmp_thd * thd, xwer_t * trc)
                         if (!is_err_or_null(trc)) {
                                 *trc = (xwer_t)thd->stack.arg;
                         }
-                        rc = xwmp_thd_delete(thd);
+                        rc = xwmp_thd_put(thd);
                         XWOS_BUG_ON(rc < 0);
                 } else {
                         xwmp_splk_lock(&thd->stlock);
@@ -754,7 +735,7 @@ xwer_t xwmp_thd_detach(struct xwmp_thd * thd)
                 xwbop_s1m(xwsq_t, &thd->state, XWMP_SKDOBJ_ST_DETACHED);
                 if (XWMP_SKDOBJ_ST_STANDBY & thd->state) {
                         xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
-                        xwmp_thd_delete(thd);
+                        xwmp_thd_put(thd);
                 } else {
                         xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
                 }
@@ -827,9 +808,9 @@ xwer_t xwmp_thd_chprio_once(struct xwmp_thd * thd, xwpr_t dprio,
                         rc = XWOK;
                 } else {
                         xwmp_splk_unlock_cpuirqrs(&thd->stlock, cpuirq);
-                        /* 因为锁的顺序此处必须解锁重新上锁，程序可能被中断打断，
-                           所以需要重新检查条件。
-                        */
+                        /* 必须满足上锁顺序的要求。
+                           此处必须解锁重新上锁，程序可能被中断打断。
+                           因此，需要重新检查条件。*/
                         xwmp_splk_lock_cpuirq(&thd->wqn.lock);
                         if (XWMP_WQTYPE_MTX == thd->wqn.type) {
                                 struct xwmp_mtx * mtx;
@@ -839,9 +820,9 @@ xwer_t xwmp_thd_chprio_once(struct xwmp_thd * thd, xwpr_t dprio,
                                                   rtwq);
                                 xwmp_mtx_grab(mtx);
                                 xwmp_splk_unlock_cpuirqrs(&thd->wqn.lock, cpuirq);
-                                /* 因为锁的顺序此处必须解锁重新上锁，
-                                   程序可能被中断打断，所以需要重新检查条件。
-                                */
+                                /* 必须满足上锁顺序的要求。
+                                   此处必须解锁重新上锁，程序可能被中断打断。
+                                   因此，需要重新检查条件。*/
                                 xwmp_rtwq_lock_cpuirq(&mtx->rtwq);
                                 xwmp_splk_lock(&thd->wqn.lock);
                                 if (NULL == thd->wqn.cb) {
@@ -876,9 +857,9 @@ xwer_t xwmp_thd_chprio_once(struct xwmp_thd * thd, xwpr_t dprio,
                                                   wq.rt);
                                 xwmp_sem_grab(sem);
                                 xwmp_splk_unlock_cpuirqrs(&thd->wqn.lock, cpuirq);
-                                /* 因为锁的顺序此处必须解锁重新上锁，
-                                   程序可能被中断打断，所以需要重新检查条件。
-                                */
+                                /* 必须满足上锁顺序的要求。
+                                   此处必须解锁重新上锁，程序可能被中断打断。
+                                   因此，需要重新检查条件。*/
                                 xwmp_rtwq_lock_cpuirq(&sem->wq.rt);
                                 xwmp_splk_lock(&thd->wqn.lock);
                                 if (NULL == thd->wqn.cb) {

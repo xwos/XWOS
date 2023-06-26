@@ -16,7 +16,6 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/osal/lock/seqlock.h>
 #include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
 #include <xwos/mm/mempool/i_allocator.h>
 #include <xwos/mm/mempool/page.h>
 

@@ -13,7 +13,6 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
 #if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
 #  include <xwos/mm/memslice.h>
 #elif defined(XWOSCFG_SYNC_COND_STDC_MM) && (1 == XWOSCFG_SYNC_COND_STDC_MM)
@@ -49,17 +48,21 @@ static __xwup_data struct xwmm_memslice xwup_cond_cache;
 const __xwup_rodata char xwup_cond_cache_name[] = "xwup.sync.cond.cache";
 #endif
 
+#if (1 == XWOSRULE_SYNC_COND_CREATE_DELETE)
 static __xwup_code
 struct xwup_cond * xwup_cond_alloc(void);
 
 static __xwup_code
 void xwup_cond_free(struct xwup_cond * cond);
+#endif
 
 static __xwup_code
 xwer_t xwup_cond_sgc(void * cond);
 
+#if (1 == XWOSRULE_SYNC_COND_CREATE_DELETE)
 static __xwup_code
 xwer_t xwup_cond_dgc(void * cond);
+#endif
 
 static __xwup_code
 xwer_t xwup_cond_broadcast_once(struct xwup_cond * cond, bool * retry);
@@ -123,6 +126,7 @@ xwer_t xwup_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 }
 #endif
 
+#if (1 == XWOSRULE_SYNC_COND_CREATE_DELETE)
 /**
  * @brief 申请条件量对象
  * @return 条件量对象的指针
@@ -130,7 +134,7 @@ xwer_t xwup_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 static __xwup_code
 struct xwup_cond * xwup_cond_alloc(void)
 {
-#if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
+#  if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
         union {
                 struct xwup_cond * cond;
                 void * anon;
@@ -142,7 +146,7 @@ struct xwup_cond * xwup_cond_alloc(void)
                 mem.cond = err_ptr(rc);
         }/* else {} */
         return mem.cond;
-#elif defined(XWOSCFG_SKD_COND_STDC_MM) && (1 == XWOSCFG_SKD_COND_STDC_MM)
+#  elif defined(XWOSCFG_SKD_COND_STDC_MM) && (1 == XWOSCFG_SKD_COND_STDC_MM)
         struct xwup_cond * cond;
 
         cond = malloc(sizeof(struct xwup_cond));
@@ -152,23 +156,13 @@ struct xwup_cond * xwup_cond_alloc(void)
                 xwup_synobj_construct(&cond->synobj);
         }
         return cond;
-#else
-        union {
-                struct xwup_cond * cond;
-                void * anon;
-        } mem;
-        xwer_t rc;
-
-        rc = xwmm_kma_alloc(sizeof(struct xwup_cond), XWMM_ALIGNMENT, &mem.anon);
-        if (rc < 0) {
-                mem.cond = err_ptr(-ENOMEM);
-        } else {
-                xwup_synobj_construct(&mem.cond->synobj);
-        }
-        return mem.cond;
-#endif
+#  else
+        return err_ptr(-ENOSYS);
+#  endif
 }
+#endif
 
+#if (1 == XWOSRULE_SYNC_COND_CREATE_DELETE)
 /**
  * @brief XWUP API：释放条件量对象
  * @param[in] cond: 条件量对象的指针
@@ -176,14 +170,15 @@ struct xwup_cond * xwup_cond_alloc(void)
 static __xwup_code
 void xwup_cond_free(struct xwup_cond * cond)
 {
-#if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
+#  if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
         xwmm_memslice_free(&xwup_cond_cache, cond);
-#elif defined(XWOSCFG_SKD_COND_STDC_MM) && (1 == XWOSCFG_SKD_COND_STDC_MM)
+#  elif defined(XWOSCFG_SKD_COND_STDC_MM) && (1 == XWOSCFG_SKD_COND_STDC_MM)
         free(cond);
-#else
-        xwmm_kma_free(cond);
-#endif
+#  else
+        XWOS_UNUSED(cond);
+#  endif
 }
+#endif
 
 __xwup_code
 void xwup_cond_construct(struct xwup_cond * cond)
@@ -204,6 +199,7 @@ xwer_t xwup_cond_sgc(void * cond)
         return XWOK;
 }
 
+#if (1 == XWOSRULE_SYNC_COND_CREATE_DELETE)
 static __xwup_code
 xwer_t xwup_cond_dgc(void * cond)
 {
@@ -211,6 +207,7 @@ xwer_t xwup_cond_dgc(void * cond)
         xwup_cond_free((struct xwup_cond *)cond);
         return XWOK;
 }
+#endif
 
 __xwup_api
 xwer_t xwup_cond_acquire(struct xwup_cond * cond, xwsq_t tik)
@@ -266,6 +263,7 @@ xwer_t xwup_cond_fini(struct xwup_cond * cond)
         return xwup_cond_put(cond);
 }
 
+#if (1 == XWOSRULE_SYNC_COND_CREATE_DELETE)
 __xwup_api
 xwer_t xwup_cond_create(struct xwup_cond ** ptrbuf)
 {
@@ -286,12 +284,15 @@ xwer_t xwup_cond_create(struct xwup_cond ** ptrbuf)
         }
         return rc;
 }
+#endif
 
+#if (1 == XWOSRULE_SYNC_COND_CREATE_DELETE)
 __xwup_api
 xwer_t xwup_cond_delete(struct xwup_cond * cond, xwsq_t tik)
 {
         return xwup_cond_release(cond, tik);
 }
+#endif
 
 #if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
 __xwup_api

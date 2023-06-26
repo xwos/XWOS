@@ -37,12 +37,12 @@ MEMORY {
         xwos_data_mr (arw): org = 0x800, len = 54k /* .xwos.data */
         data_mr (arw): org = 0x30000000, len = 288k /* .data, .bss & .heap */
         data4_mr (rw): org = 0x38000000, len = 64k /* .data4 for D3 Domain */
-        dtcmheap_mr (arw): org = 0x20000000, len = 128k /* .dtcmheap */
-        xwos_stk_mr (rw): org = 0x0000E000, len = 8k /* xwos stack */
+        armv7m_isr_stack_mr (rw): org = 0x0000E000, len = 8k /* xwos stack */
 }
 
-dtcmheap_mr_origin = ORIGIN(dtcmheap_mr);
-dtcmheap_mr_size = LENGTH(dtcmheap_mr);
+dtcm_mr_origin = ORIGIN(dtcm_mr);
+dtcm_mr_size = LENGTH(dtcm_mr);
+dtcm_mr_pos = xwos_data_vma_end;
 
 axisram_mr_origin = ORIGIN(axisram_mr);
 axisram_mr_size = LENGTH(axisram_mr);
@@ -51,5 +51,11 @@ qspiflash_mr_origin = ORIGIN(qspiflash_mr);
 qspiflash_mr_size = LENGTH(qspiflash_mr);
 
 firmware_info_offset = 0x800;
+
+armv7m_isr_stack_mr_origin = ORIGIN(armv7m_isr_stack_mr);
+armv7m_isr_stack_mr_size = LENGTH(armv7m_isr_stack_mr);
+armv7m_isr_stack_top = armv7m_isr_stack_mr_origin + armv7m_isr_stack_mr_size;
+armv7m_isr_stack_end = armv7m_isr_stack_mr_origin;
+
 
 INCLUDE h7.lds

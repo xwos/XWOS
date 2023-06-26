@@ -12,7 +12,6 @@
 
 #include <xwos/standard.h>
 #include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
 #if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
 #  include <xwos/mm/memslice.h>
 #elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
@@ -35,11 +34,13 @@ static __xwup_data struct xwmm_memslice xwup_swt_cache;
 const __xwup_rodata char xwup_swt_cache_name[] = "xwup.swt.cache";
 #endif
 
+#if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
 static __xwup_code
 struct xwup_swt * xwup_swt_alloc(void);
 
 static __xwup_code
 void xwup_swt_free(struct xwup_swt * swt);
+#endif
 
 static __xwup_code
 void xwup_swt_construct(struct xwup_swt * swt);
@@ -53,8 +54,10 @@ xwer_t xwup_swt_activate(struct xwup_swt * swt, xwsq_t flag, xwobj_gc_f gcfunc);
 static __xwup_code
 xwer_t xwup_swt_sgc(void * obj);
 
+#if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
 static __xwup_code
 xwer_t xwup_swt_dgc(void * obj);
+#endif
 
 static __xwup_code
 void xwup_swt_ttn_cb(void * entry);
@@ -82,6 +85,7 @@ xwer_t xwup_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 }
 #endif
 
+#if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
 /**
  * @brief 从软件定时器对象缓存中申请一个对象
  * @return 软件定时器对象的指针
@@ -89,7 +93,7 @@ xwer_t xwup_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 static __xwup_code
 struct xwup_swt * xwup_swt_alloc(void)
 {
-#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
+#  if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
         union {
                 struct xwup_swt * swt;
                 void * anon;
@@ -101,7 +105,7 @@ struct xwup_swt * xwup_swt_alloc(void)
                 mem.swt = err_ptr(rc);
         }/* else {} */
         return mem.swt;
-#elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
+#  elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
         struct xwup_swt * swt;
 
         swt = malloc(sizeof(struct xwup_swt));
@@ -111,23 +115,13 @@ struct xwup_swt * xwup_swt_alloc(void)
                 xwup_swt_construct(swt);
         }
         return swt;
-#else
-        union {
-                struct xwup_swt * swt;
-                void * anon;
-        } mem;
-        xwer_t rc;
-
-        rc = xwmm_kma_alloc(sizeof(struct xwup_swt), XWMM_ALIGNMENT, &mem.anon);
-        if (rc < 0) {
-                mem.swt = err_ptr(-ENOMEM);
-        } else {
-                xwup_swt_construct(mem.swt);
-        }
-        return mem.swt;
-#endif
+#  else
+        return err_ptr(-ENOSYS);
+#  endif
 }
+#endif
 
+#if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
 /**
  * @brief 释放软件定时器对象
  * @param[in] swt: 软件定时器对象的指针
@@ -135,14 +129,15 @@ struct xwup_swt * xwup_swt_alloc(void)
 static __xwup_code
 void xwup_swt_free(struct xwup_swt * swt)
 {
-#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
+#  if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
         xwmm_memslice_free(&xwup_swt_cache, swt);
-#elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
+#  elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
         free(swt);
-#else
-        xwmm_kma_free(swt);
-#endif
+#  else
+        XWOS_UNUSED(swt);
+#  endif
 }
+#endif
 
 static __xwup_code
 void xwup_swt_construct(struct xwup_swt * swt)
@@ -186,6 +181,7 @@ xwer_t xwup_swt_sgc(void * obj)
         return XWOK;
 }
 
+#if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
 static __xwup_code
 xwer_t xwup_swt_dgc(void * obj)
 {
@@ -195,6 +191,7 @@ xwer_t xwup_swt_dgc(void * obj)
         xwup_swt_free(swt);
         return XWOK;
 }
+#endif
 
 __xwup_api
 xwer_t xwup_swt_acquire(struct xwup_swt * swt, xwsq_t tik)
@@ -233,6 +230,7 @@ xwer_t xwup_swt_fini(struct xwup_swt * swt)
         return xwup_swt_put(swt);
 }
 
+#if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
 __xwup_api
 xwer_t xwup_swt_create(struct xwup_swt ** ptrbuf, xwsq_t flag)
 {
@@ -257,12 +255,15 @@ err_swt_activate:
 err_swt_alloc:
         return rc;
 }
+#endif
 
+#if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
 __xwup_api
 xwer_t xwup_swt_delete(struct xwup_swt * swt, xwsq_t tik)
 {
         return xwup_swt_release(swt, tik);
 }
+#endif
 
 /**
  * @brief 软件定时器的时间树节点回调函数

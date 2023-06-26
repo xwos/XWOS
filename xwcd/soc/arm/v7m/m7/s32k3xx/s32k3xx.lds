@@ -327,10 +327,5 @@ SECTIONS {
         }
 }
 
-/* 用于提供XWOS内核的默认内核内存分配器 */
-xwmm_dkma_mmz_origin = ORIGIN(cacheable_data_mr);
-xwmm_dkma_mmz_size = xwmm_dkma_mmz_end - xwmm_dkma_mmz_origin;
-xwmm_dkma_mmz_pos = xwmm_dkma_mmz_start - xwmm_dkma_mmz_origin;
-
 /* 用于提供firmware文件头信息 */
 firmware_head_lma = ORIGIN(boot_mr);

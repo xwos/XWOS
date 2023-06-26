@@ -13,7 +13,6 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
 #if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
 #  include <xwos/mm/memslice.h>
 #elif defined(XWOSCFG_SYNC_SEM_STDC_MM) && (1 == XWOSCFG_SYNC_SEM_STDC_MM)
@@ -30,11 +29,13 @@
 #endif
 #include <xwos/up/sync/rtsem.h>
 
+#if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 static __xwup_code
 struct xwup_rtsem * xwup_rtsem_alloc(void);
 
 static __xwup_code
 void xwup_rtsem_free(struct xwup_rtsem * sem);
+#endif
 
 static __xwup_code
 void xwup_rtsem_construct(struct xwup_rtsem * sem);
@@ -45,8 +46,10 @@ void xwup_rtsem_destruct(struct xwup_rtsem * sem);
 static __xwup_code
 xwer_t xwup_rtsem_sgc(void * sem);
 
+#if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 static __xwup_code
 xwer_t xwup_rtsem_dgc(void * sem);
+#endif
 
 static __xwup_code
 xwer_t xwup_rtsem_activate(struct xwup_rtsem * sem,
@@ -108,6 +111,7 @@ xwer_t xwup_rtsem_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 }
 #endif
 
+#if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 /**
  * @brief 申请实时信号量对象
  * @return 信号量对象的指针
@@ -115,7 +119,7 @@ xwer_t xwup_rtsem_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 static __xwup_code
 struct xwup_rtsem * xwup_rtsem_alloc(void)
 {
-#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+#  if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
         union {
                 struct xwup_rtsem * rtsem;
                 void * anon;
@@ -127,7 +131,7 @@ struct xwup_rtsem * xwup_rtsem_alloc(void)
                 mem.rtsem = err_ptr(rc);
         }/* else {} */
         return mem.rtsem;
-#elif defined(XWOSCFG_SKD_RTSEM_STDC_MM) && (1 == XWOSCFG_SKD_RTSEM_STDC_MM)
+#  elif defined(XWOSCFG_SKD_RTSEM_STDC_MM) && (1 == XWOSCFG_SKD_RTSEM_STDC_MM)
         struct xwup_rtsem * rtsem;
 
         rtsem = malloc(sizeof(struct xwup_rtsem));
@@ -137,23 +141,13 @@ struct xwup_rtsem * xwup_rtsem_alloc(void)
                 xwup_rtsem_construct(rtsem);
         }
         return rtsem;
-#else
-        union {
-                struct xwup_rtsem * sem;
-                void * anon;
-        } mem;
-        xwer_t rc;
-
-        rc = xwmm_kma_alloc(sizeof(struct xwup_rtsem), XWMM_ALIGNMENT, &mem.anon);
-        if (rc < 0) {
-                mem.sem = err_ptr(-ENOMEM);
-        } else {
-                xwup_rtsem_construct(mem.sem);
-        }
-        return mem.sem;
-#endif
+#  else
+        return err_ptr(-ENOSYS);
+#  endif
 }
+#endif
 
+#if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 /**
  * @brief 释放实时信号量对象
  * @param[in] sem: 信号量对象的指针
@@ -161,14 +155,15 @@ struct xwup_rtsem * xwup_rtsem_alloc(void)
 static __xwup_code
 void xwup_rtsem_free(struct xwup_rtsem * sem)
 {
-#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+#  if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
         xwmm_memslice_free(&xwup_rtsem_cache, sem);
-#elif defined(XWOSCFG_SKD_RTSEM_STDC_MM) && (1 == XWOSCFG_SKD_RTSEM_STDC_MM)
+#  elif defined(XWOSCFG_SKD_RTSEM_STDC_MM) && (1 == XWOSCFG_SKD_RTSEM_STDC_MM)
         free(sem);
-#else
-        xwmm_kma_free(sem);
-#endif
+#  else
+        XWOS_UNUSED(sem);
+#  endif
 }
+#endif
 
 static __xwup_code
 void xwup_rtsem_construct(struct xwup_rtsem * sem)
@@ -189,6 +184,7 @@ xwer_t xwup_rtsem_sgc(void * sem)
         return XWOK;
 }
 
+#if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 static __xwup_code
 xwer_t xwup_rtsem_dgc(void * sem)
 {
@@ -196,6 +192,7 @@ xwer_t xwup_rtsem_dgc(void * sem)
         xwup_rtsem_free((struct xwup_rtsem *)sem);
         return XWOK;
 }
+#endif
 
 __xwup_api
 xwer_t xwup_rtsem_acquire(struct xwup_rtsem * sem, xwsq_t tik)
@@ -254,6 +251,7 @@ xwer_t xwup_rtsem_fini(struct xwup_rtsem * sem)
         return xwup_rtsem_put(sem);
 }
 
+#if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 __xwup_api
 xwer_t xwup_rtsem_create(struct xwup_rtsem ** ptrbuf, xwssq_t val, xwssq_t max)
 {
@@ -274,12 +272,15 @@ xwer_t xwup_rtsem_create(struct xwup_rtsem ** ptrbuf, xwssq_t val, xwssq_t max)
         }
         return rc;
 }
+#endif
 
+#if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 __xwup_api
 xwer_t xwup_rtsem_delete(struct xwup_rtsem * sem, xwsq_t tik)
 {
         return xwup_rtsem_release(sem, tik);
 }
+#endif
 
 #if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
 __xwup_api

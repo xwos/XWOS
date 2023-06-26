@@ -17,7 +17,6 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
 #include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
 #if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
 #  include <xwos/mm/memslice.h>
 #elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
@@ -72,8 +71,10 @@ void xwup_thd_destruct(struct xwup_thd * thd);
 static __xwup_code
 xwer_t xwup_thd_sgc(void * obj);
 
+#if (1 == XWOSRULE_SKD_THD_CREATE)
 static __xwup_code
 xwer_t xwup_thd_dgc(void * obj);
+#endif
 
 #if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
 extern __xwup_code
@@ -88,6 +89,7 @@ extern
 void board_thd_postinit_hook(struct xwup_thd * thd);
 #endif
 
+#if (1 == XWOSRULE_SKD_THD_CREATE)
 static __xwup_code
 struct xwup_thd * xwup_thd_alloc(void);
 
@@ -99,6 +101,7 @@ xwstk_t * xwup_thd_stack_alloc(xwsz_t stack_size);
 
 static __xwup_code
 xwer_t xwup_thd_stack_free(xwstk_t * stk);
+#endif
 
 static __xwup_code
 xwer_t xwup_thd_activate(struct xwup_thd * thd,
@@ -108,11 +111,6 @@ xwer_t xwup_thd_activate(struct xwup_thd * thd,
 
 static __xwup_code
 void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f thdfunc, void * arg);
-
-#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
-static __xwup_code
-xwer_t xwup_thd_delete(struct xwup_thd * thd);
-#endif
 
 #if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
 /**
@@ -168,6 +166,7 @@ xwer_t xwup_thd_sgc(void * obj)
         return XWOK;
 }
 
+#if (1 == XWOSRULE_SKD_THD_CREATE)
 static __xwup_code
 xwer_t xwup_thd_dgc(void * obj)
 {
@@ -183,6 +182,7 @@ xwer_t xwup_thd_dgc(void * obj)
         xwup_thd_free(thd);
         return XWOK;
 }
+#endif
 
 __xwup_api
 xwer_t xwup_thd_acquire(struct xwup_thd * thd, xwsq_t tik)
@@ -208,6 +208,7 @@ xwer_t xwup_thd_put(struct xwup_thd * thd)
         return xwos_object_put(&thd->xwobj);
 }
 
+#if (1 == XWOSRULE_SKD_THD_CREATE)
 /**
  * @brief 从线程对象缓存中申请一个对象
  * @return 线程对象的指针
@@ -215,7 +216,7 @@ xwer_t xwup_thd_put(struct xwup_thd * thd)
 static __xwup_code
 struct xwup_thd * xwup_thd_alloc(void)
 {
-#if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+#  if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
         union {
                 struct xwup_thd * thd;
                 void * anon;
@@ -227,7 +228,7 @@ struct xwup_thd * xwup_thd_alloc(void)
                 mem.thd = err_ptr(rc);
         }/* else {} */
         return mem.thd;
-#elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
+#  elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         struct xwup_thd * thd;
 
         thd = malloc(sizeof(struct xwup_thd));
@@ -237,23 +238,13 @@ struct xwup_thd * xwup_thd_alloc(void)
                 xwup_thd_construct(thd);
         }
         return thd;
-#else
-        union {
-                struct xwup_thd * thd;
-                void * anon;
-        } mem;
-        xwer_t rc;
-
-        rc = xwmm_kma_alloc(sizeof(struct xwup_thd), XWMM_ALIGNMENT, &mem.anon);
-        if (rc < 0) {
-                mem.thd = err_ptr(-ENOMEM);
-        } else {
-                xwup_thd_construct(mem.thd);
-        }
-        return mem.thd;
-#endif
+#  else
+        return err_ptr(-ENOSYS);
+#  endif
 }
+#endif
 
+#if (1 == XWOSRULE_SKD_THD_CREATE)
 /**
  * @brief 释放线程对象
  * @param[in] thd: 线程对象的指针
@@ -261,15 +252,17 @@ struct xwup_thd * xwup_thd_alloc(void)
 static __xwup_code
 void xwup_thd_free(struct xwup_thd * thd)
 {
-#if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+#  if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
         xwmm_memslice_free(&xwup_thd_cache, thd);
-#elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
+#  elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         free(thd);
-#else
-        xwmm_kma_free(thd);
-#endif
+#  else
+        XWOS_UNUSED(thd);
+#  endif
 }
+#endif
 
+#if (1 == XWOSRULE_SKD_THD_CREATE)
 /**
  * @brief 动态分配线程栈
  * @param[in] stack_size: 线程栈的大小
@@ -278,7 +271,7 @@ void xwup_thd_free(struct xwup_thd * thd)
 static __xwup_code
 xwstk_t * xwup_thd_stack_alloc(xwsz_t stack_size)
 {
-#if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
+#  if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
         union {
                 xwstk_t * stkbase;
                 void * anon;
@@ -290,7 +283,7 @@ xwstk_t * xwup_thd_stack_alloc(xwsz_t stack_size)
                 mem.stkbase = err_ptr(rc);
         }/* else {} */
         return mem.stkbase;
-#elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
+#  elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         xwstk_t * stkbase;
 
         stkbase = malloc(stack_size);
@@ -298,21 +291,14 @@ xwstk_t * xwup_thd_stack_alloc(xwsz_t stack_size)
                 stkbase = err_ptr(-ENOMEM);
         }
         return stkbase;
-#else
-        union {
-                xwstk_t * stkbase;
-                void * anon;
-        } mem;
-        xwer_t rc;
-
-        rc = xwmm_kma_alloc(stack_size, XWMMCFG_STACK_ALIGNMENT, &mem.anon);
-        if (rc < 0) {
-                mem.stkbase = err_ptr(rc);
-        }/* else {} */
-        return mem.stkbase;
-#endif
+#  else
+        XWOS_UNUSED(stack_size);
+        return err_ptr(-ENOSYS);
+#  endif
 }
+#endif
 
+#if (1 == XWOSRULE_SKD_THD_CREATE)
 /**
  * @brief 释放动态分配的线程栈内存
  * @param[in] stk: 线程栈的首地址
@@ -321,15 +307,17 @@ xwstk_t * xwup_thd_stack_alloc(xwsz_t stack_size)
 static __xwup_code
 xwer_t xwup_thd_stack_free(xwstk_t * stk)
 {
-#if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
+#  if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
         return board_thd_stack_pool_free(stk);
-#elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
+#  elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         free(stk);
         return XWOK;
-#else
-        return xwmm_kma_free(stk);
-#endif
+#  else
+        XWOS_UNUSED(stk);
+        return -ENOSYS;
+#  endif
 }
+#endif
 
 /**
  * @brief 激活线程对象
@@ -479,6 +467,7 @@ xwer_t xwup_thd_init(struct xwup_thd * thd,
         return rc;
 }
 
+#if (1 == XWOSRULE_SKD_THD_CREATE)
 __xwup_api
 xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
                        const struct xwup_thd_attr * inattr,
@@ -556,13 +545,6 @@ err_thd_alloc:
 err_stack_alloc:
         *thdpbuf = NULL;
         return rc;
-}
-
-#if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
-static __xwup_code
-xwer_t xwup_thd_delete(struct xwup_thd * thd)
-{
-        return xwup_thd_put(thd);
 }
 #endif
 
@@ -692,7 +674,7 @@ xwer_t xwup_thd_join(struct xwup_thd * thd, xwer_t * trc)
                 if (!is_err_or_null(trc)) {
                         *trc = (xwer_t)thd->stack.arg;
                 }
-                xwup_thd_delete(thd);
+                xwup_thd_put(thd);
         } else {
                 xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_JOINED);
                 rc = xwup_cond_wait(&thd->completion,
@@ -703,7 +685,7 @@ xwer_t xwup_thd_join(struct xwup_thd * thd, xwer_t * trc)
                                 *trc = (xwer_t)thd->stack.arg;
                         }
                         xwospl_cpuirq_restore_lc(cpuirq);
-                        xwup_thd_delete(thd);
+                        xwup_thd_put(thd);
                 } else {
                         xwospl_cpuirq_disable_lc();
                         xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_JOINED);
@@ -729,7 +711,7 @@ xwer_t xwup_thd_detach(struct xwup_thd * thd)
                 xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_DETACHED);
                 if (XWUP_SKDOBJ_ST_STANDBY & thd->state) {
                         xwospl_cpuirq_restore_lc(cpuirq);
-                        xwup_thd_delete(thd);
+                        xwup_thd_put(thd);
                 } else {
                         xwospl_cpuirq_restore_lc(cpuirq);
                 }

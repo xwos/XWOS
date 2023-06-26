@@ -39,6 +39,7 @@ xwer_t xwosdl_thd_init(struct xwosdl_thd * thd, xwosdl_thd_d * thdd,
         return rc;
 }
 
+#if (1 == XWOSRULE_SKD_THD_CREATE)
 __xwup_code
 xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd,
                          const struct xwosdl_thd_attr * attr,
@@ -58,6 +59,7 @@ xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd,
         }
         return rc;
 }
+#endif
 
 __xwup_code
 xwer_t xwosdl_thd_quit(struct xwosdl_thd * thd, xwsq_t tik)

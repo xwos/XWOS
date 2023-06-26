@@ -184,7 +184,7 @@ SECTIONS {
         .heap : ALIGN(8) {
                 PROVIDE(end = .); /* 被libc中的malloc()使用 */
                 PROVIDE(_end = .); /* 被libc中的malloc()使用 */
-        } > xwos_stk_mr
+        } > data_mr
 
         /* ++++++++ 以下与动态连接有关，不适用于MCU的ROM环境 ++++++++ */
         .rel.dyn : {
@@ -249,15 +249,3 @@ SECTIONS {
 
 /* 用于提供firmware文件头信息 */
 firmware_head_lma = armv6m_ivt_lma_base;
-
-data_mr_origin = ORIGIN(data_mr);
-data_mr_size = LENGTH(data_mr);
-
-xwmm_dkma_mmz_origin = data_mr_origin;
-xwmm_dkma_mmz_size = data_mr_size;
-xwmm_dkma_mmz_pos = bss_vma_end - data_mr_origin;
-
-xwos_stk_mr_origin = ORIGIN(xwos_stk_mr);
-xwos_stk_mr_size = LENGTH(xwos_stk_mr);
-xwos_stk_top = xwos_stk_mr_origin + xwos_stk_mr_size;
-xwos_stk_end = xwos_stk_mr_origin;

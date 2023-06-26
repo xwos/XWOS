@@ -16,7 +16,6 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
 #include <xwos/mm/bma.h>
 
 static __xwos_code

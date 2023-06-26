@@ -54,6 +54,9 @@
 #define XWSSC_CRC32_SIZE        (4U)
 #define XWSSC_SDU_MAX_SIZE      (XWSSC_MEMPOOL_SIZE / 8)
 
+#define XWSSC_TXTHD_STACK       (2048U)
+#define XWSSC_RXTHD_STACK       (2048U)
+
 #if defined(XWMDCFG_isc_xwssc_LOG) && (1 == XWMDCFG_isc_xwssc_LOG)
 #  define XWSSC_LOGTAG                  "XWSSC"
 #  define xwssclogf(lv, fmt, ...)       xwlogf(lv, XWSSC_LOGTAG, fmt, ##__VA_ARGS__)
@@ -165,7 +168,9 @@ struct xwssc {
         struct xwmm_bma * mempool; /**< 内存池分配器 */
 
         /* 发送状态机 */
-        xwos_thd_d txthd; /**< 发送线程 */
+        __xwcc_alignl1cache xwu8_t txthd_stack[XWSSC_TXTHD_STACK]; /**< 发送线程的栈 */
+        struct xwos_thd txthdobj; /**< 发送线程的线程结构体 */
+        xwos_thd_d txthd; /**< 发送线程的线程描述符 */
         struct {
                 atomic_xwu32_t cnt; /**< 发送计数器 */
                 struct xwssc_carrier car[XWSSC_MEMBLK_NUM]; /**< 包含待发送帧的发送器 */
@@ -185,7 +190,9 @@ struct xwssc {
         } txq; /**< 发送队列 */
 
         /* 接收状态机 */
-        xwos_thd_d rxthd; /**< 接收线程的描述符 */
+        __xwcc_alignl1cache xwu8_t rxthd_stack[XWSSC_RXTHD_STACK]; /**< 接收线程的栈 */
+        struct xwos_thd rxthdobj; /**< 接收线程的线程结构体 */
+        xwos_thd_d rxthd; /**< 接收线程的线程描述符 */
         struct {
                 atomic_xwu32_t cnt; /**< 接收计数器 */
                 struct xwlib_bclst_head q[XWSSC_PORT_NUM]; /**< 每个端口的接收队列 */

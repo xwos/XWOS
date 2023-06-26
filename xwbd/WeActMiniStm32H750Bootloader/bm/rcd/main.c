@@ -43,11 +43,12 @@ xwer_t board_ramcode_load(struct ramcode * ramcode,
 static
 xwer_t main_task(void * arg);
 
+__xwcc_alignl1cache xwu8_t main_thd_stack[4096] = {0};
 const struct xwos_thd_desc main_thd_desc = {
         .attr = {
                 .name = "main.thd",
-                .stack = NULL,
-                .stack_size = 4096,
+                .stack = (xwstk_t *)main_thd_stack,
+                .stack_size = sizeof(main_thd_stack),
                 .stack_guard_size = XWOS_STACK_GUARD_SIZE_DEFAULT,
                 .priority = MAIN_THD_PRIORITY,
                 .detached = true,
@@ -56,7 +57,8 @@ const struct xwos_thd_desc main_thd_desc = {
         .func = main_task,
         .arg = NULL,
 };
-xwos_thd_d main_thd;
+struct xwos_thd main_thd;
+xwos_thd_d main_thdd;
 
 extern xwu8_t qspiflash_mr_origin[];
 extern xwu8_t firmware_info_offset[];
@@ -82,12 +84,12 @@ xwer_t xwos_main(void)
         xwds_gpio_req(&stm32soc, LED_GPIO_PORT, LED_GPIO_PIN);
         xwds_gpio_set(&stm32soc, LED_GPIO_PORT, LED_GPIO_PIN);
 
-        rc = xwos_thd_create(&main_thd,
-                             &main_thd_desc.attr,
-                             main_thd_desc.func,
-                             main_thd_desc.arg);
+        rc = xwos_thd_init(&main_thd, &main_thdd,
+                           &main_thd_desc.attr,
+                           main_thd_desc.func,
+                           main_thd_desc.arg);
         if (rc < 0) {
-                goto err_init_thd_create;
+                goto err_thd_init;
         }
 
         rc = xwos_skd_start_lc();
@@ -96,7 +98,7 @@ xwer_t xwos_main(void)
         }
         return XWOK;
 
-err_init_thd_create:
+err_thd_init:
         BOARD_BUG();
 err_skd_start_lc:
         BOARD_BUG();

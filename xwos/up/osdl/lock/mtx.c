@@ -13,6 +13,7 @@
 #include <xwos/standard.h>
 #include <xwos/up/osdl/lock/mtx.h>
 
+#if (1 == XWOSRULE_LOCK_MTX_CREATE_DELETE)
 __xwup_code
 xwer_t xwosdl_mtx_create(xwosdl_mtx_d * mtxd, xwpr_t sprio)
 {
@@ -30,3 +31,4 @@ xwer_t xwosdl_mtx_create(xwosdl_mtx_d * mtxd, xwpr_t sprio)
         }
         return rc;
 }
+#endif

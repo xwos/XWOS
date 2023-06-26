@@ -19,7 +19,6 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
 #if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
 #  include <xwos/mm/memslice.h>
 #elif defined(XWOSCFG_SYNC_SEM_STDC_MM) && (1 == XWOSCFG_SYNC_SEM_STDC_MM)
@@ -52,11 +51,13 @@ static __xwmp_data struct xwmm_memslice xwmp_sem_cache;
 const __xwmp_rodata char xwmp_sem_cache_name[] = "xwmp.sync.sem.cache";
 #endif
 
+#if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 static __xwmp_code
 struct xwmp_sem * xwmp_sem_alloc(void);
 
 static __xwmp_code
 void xwmp_sem_free(struct xwmp_sem * sem);
+#endif
 
 static __xwmp_code
 void xwmp_sem_construct(struct xwmp_sem * sem);
@@ -67,8 +68,10 @@ void xwmp_sem_destruct(struct xwmp_sem * sem);
 static __xwmp_code
 xwer_t xwmp_sem_sgc(void * sem);
 
+#if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 static __xwmp_code
 xwer_t xwmp_sem_dgc(void * sem);
+#endif
 
 #if defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
 static __xwmp_code
@@ -146,6 +149,7 @@ xwer_t xwmp_sem_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 }
 #endif
 
+#if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 /**
  * @brief 从信号量对象缓存中申请对象
  * @return 信号量对象的指针
@@ -153,7 +157,7 @@ xwer_t xwmp_sem_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 static __xwmp_code
 struct xwmp_sem * xwmp_sem_alloc(void)
 {
-#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+#  if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
         union {
                 struct xwmp_sem * sem;
                 void * anon;
@@ -165,7 +169,7 @@ struct xwmp_sem * xwmp_sem_alloc(void)
                 mem.sem = err_ptr(rc);
         }/* else {} */
         return mem.sem;
-#elif defined(XWOSCFG_SYNC_SEM_STDC_MM) && (1 == XWOSCFG_SYNC_SEM_STDC_MM)
+#  elif defined(XWOSCFG_SYNC_SEM_STDC_MM) && (1 == XWOSCFG_SYNC_SEM_STDC_MM)
         struct xwmp_sem * sem;
 
         sem = malloc(sizeof(struct xwmp_sem));
@@ -175,23 +179,13 @@ struct xwmp_sem * xwmp_sem_alloc(void)
                 xwmp_sem_construct(sem);
         }
         return sem;
-#else
-        union {
-                struct xwmp_sem * sem;
-                void * anon;
-        } mem;
-        xwer_t rc;
-
-        rc = xwmm_kma_alloc(sizeof(struct xwmp_sem), XWMM_ALIGNMENT, &mem.anon);
-        if (XWOK == rc) {
-                xwmp_sem_construct(mem.sem);
-        } else {
-                mem.sem = err_ptr(-ENOMEM);
-        }
-        return mem.sem;
-#endif
+#  else
+        return err_ptr(-ENOSYS);
+#  endif
 }
+#endif
 
+#if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 /**
  * @brief 释放信号量对象
  * @param[in] sem: 信号量对象的指针
@@ -199,16 +193,16 @@ struct xwmp_sem * xwmp_sem_alloc(void)
 static __xwmp_code
 void xwmp_sem_free(struct xwmp_sem * sem)
 {
-#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+#  if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
         xwmm_memslice_free(&xwmp_sem_cache, sem);
-#elif defined(XWOSCFG_SYNC_SEM_STDC_MM) && (1 == XWOSCFG_SYNC_SEM_STDC_MM)
+#  elif defined(XWOSCFG_SYNC_SEM_STDC_MM) && (1 == XWOSCFG_SYNC_SEM_STDC_MM)
         xwmp_sem_destruct(sem);
         free(sem);
-#else
-        xwmp_sem_destruct(sem);
-        xwmm_kma_free(sem);
-#endif
+#  else
+        XWOS_UNUSED(sem);
+#  endif
 }
+#endif
 
 /**
  * @brief 信号量对象的构造函数
@@ -241,6 +235,7 @@ xwer_t xwmp_sem_sgc(void * sem)
         return XWOK;
 }
 
+#if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 /**
  * @brief 动态信号量对象的垃圾回收函数
  * @param[in] sem: 信号量对象的指针
@@ -251,6 +246,7 @@ xwer_t xwmp_sem_dgc(void * sem)
         xwmp_sem_free((struct xwmp_sem *)sem);
         return XWOK;
 }
+#endif
 
 __xwmp_api
 xwer_t xwmp_sem_acquire(struct xwmp_sem * sem, xwsq_t tik)
@@ -276,6 +272,7 @@ xwer_t xwmp_sem_put(struct xwmp_sem * sem)
         return xwmp_synobj_put(&sem->synobj);
 }
 
+#if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 __xwmp_api
 xwer_t xwmp_sem_create(struct xwmp_sem ** sembuf, xwid_t type,
                        xwssq_t val, xwssq_t max)
@@ -290,16 +287,16 @@ xwer_t xwmp_sem_create(struct xwmp_sem ** sembuf, xwid_t type,
         } else {
                 rc = -ETYPE;
                 switch (type) {
-#if defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
+#  if defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
                 case XWMP_SEM_TYPE_PIPELINE:
                         rc = xwmp_plsem_activate(sem, val, max, xwmp_sem_dgc);
                         break;
-#endif
-#if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
+#  endif
+#  if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
                 case XWMP_SEM_TYPE_RT:
                         rc = xwmp_rtsem_activate(sem, val, max, xwmp_sem_dgc);
                         break;
-#endif
+#  endif
                 }
                 if (__xwcc_unlikely(rc < 0)) {
                         xwmp_sem_free(sem);
@@ -309,12 +306,15 @@ xwer_t xwmp_sem_create(struct xwmp_sem ** sembuf, xwid_t type,
         }
         return rc;
 }
+#endif
 
+#if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 __xwmp_api
 xwer_t xwmp_sem_delete(struct xwmp_sem * sem, xwsq_t tik)
 {
         return xwmp_sem_release(sem, tik);
 }
+#endif
 
 __xwmp_api
 xwer_t xwmp_sem_fini(struct xwmp_sem * sem)
@@ -437,11 +437,13 @@ xwer_t xwmp_plsem_init(struct xwmp_sem * sem, xwssq_t val, xwssq_t max)
         return xwmp_plsem_activate(sem, val, max, xwmp_sem_sgc);
 }
 
+#  if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 __xwmp_api
 xwer_t xwmp_plsem_create(struct xwmp_sem ** sembuf, xwssq_t val, xwssq_t max)
 {
         return xwmp_sem_create(sembuf, XWMP_SEM_TYPE_PIPELINE, val, max);
 }
+#  endif
 
 __xwmp_api
 xwer_t xwmp_plsem_freeze(struct xwmp_sem * sem)
@@ -961,11 +963,13 @@ xwer_t xwmp_rtsem_init(struct xwmp_sem * sem, xwssq_t val, xwssq_t max)
         return xwmp_rtsem_activate(sem, val, max, xwmp_sem_sgc);
 }
 
+#  if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 __xwmp_api
 xwer_t xwmp_rtsem_create(struct xwmp_sem ** sembuf, xwssq_t val, xwssq_t max)
 {
         return xwmp_sem_create(sembuf, XWMP_SEM_TYPE_RT, val, max);
 }
+#  endif
 
 __xwmp_api
 xwer_t xwmp_rtsem_freeze(struct xwmp_sem * sem)

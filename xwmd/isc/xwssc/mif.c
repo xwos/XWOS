@@ -135,35 +135,39 @@ xwer_t xwssc_start(struct xwssc * xwssc, const char * name,
         /* 创建线程 */
         xwos_thd_attr_init(&attr);
         attr.name = "xwmd.isc.xwssc.rxthd";
-        attr.stack = NULL;
-        attr.stack_size = 2048;
+        attr.stack = (xwstk_t *)xwssc->rxthd_stack;
+        attr.stack_size = sizeof(xwssc->rxthd_stack);
         attr.priority = XWSSC_RXTHD_PRIORITY;
         attr.detached = false;
         attr.privileged = true;
-        rc = xwos_thd_create(&xwssc->rxthd, &attr, (xwos_thd_f)xwssc_rxthd, xwssc);
+        rc = xwos_thd_init(&xwssc->rxthdobj, &xwssc->rxthd,
+                           &attr,
+                           (xwos_thd_f)xwssc_rxthd, xwssc);
         if (rc < 0) {
-                goto err_rxthd_create;
+                goto err_rxthd_init;
         }
 
         xwos_thd_attr_init(&attr);
         attr.name = "xwmd.isc.xwssc.txthd";
-        attr.stack = NULL;
-        attr.stack_size = 2048;
+        attr.stack = (xwstk_t *)xwssc->txthd_stack;
+        attr.stack_size = sizeof(xwssc->txthd_stack);
         attr.priority = XWSSC_TXTHD_PRIORITY;
         attr.detached = false;
         attr.privileged = true;
-        rc = xwos_thd_create(&xwssc->txthd, &attr, (xwos_thd_f)xwssc_txthd, xwssc);
+        rc = xwos_thd_init(&xwssc->txthdobj, &xwssc->txthd,
+                           &attr,
+                           (xwos_thd_f)xwssc_txthd, xwssc);
         if (rc < 0) {
-                goto err_txthd_create;
+                goto err_txthd_init;
         }
 
         return XWOK;
 
-err_txthd_create:
+err_txthd_init:
         xwos_thd_detach(xwssc->rxthd);
         xwos_thd_quit(xwssc->rxthd);
         xwssc->rxthd = XWOS_THD_NILD;
-err_rxthd_create:
+err_rxthd_init:
         xwssc_hwifal_close(xwssc);
 err_hwifal_open:
 err_rxqsem_init:

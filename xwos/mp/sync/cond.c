@@ -18,7 +18,6 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
 #if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
 #  include <xwos/mm/memslice.h>
 #elif defined(XWOSCFG_SYNC_COND_STDC_MM) && (1 == XWOSCFG_SYNC_COND_STDC_MM)
@@ -55,17 +54,21 @@ static __xwmp_data struct xwmm_memslice xwmp_cond_cache;
 const __xwmp_rodata char xwmp_cond_cache_name[] = "xwmp.sync.cond.cache";
 #endif
 
+#if (1 == XWOSRULE_SYNC_COND_CREATE_DELETE)
 static __xwmp_code
 struct xwmp_cond * xwmp_cond_alloc(void);
 
 static __xwmp_code
 void xwmp_cond_free(struct xwmp_cond * cond);
+#endif
 
 static __xwmp_code
 xwer_t xwmp_cond_sgc(void * cond);
 
+#if (1 == XWOSRULE_SYNC_COND_CREATE_DELETE)
 static __xwmp_code
 xwer_t xwmp_cond_dgc(void * cond);
+#endif
 
 static __xwmp_code
 xwer_t xwmp_cond_broadcast_once(struct xwmp_cond * cond, bool * retry);
@@ -129,6 +132,7 @@ xwer_t xwmp_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 }
 #endif
 
+#if (1 == XWOSRULE_SYNC_COND_CREATE_DELETE)
 /**
  * @brief 从条件量对象缓存中申请对象
  * @return 条件量对象的指针
@@ -136,7 +140,7 @@ xwer_t xwmp_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 static __xwmp_code
 struct xwmp_cond * xwmp_cond_alloc(void)
 {
-#if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
+#  if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
         union {
                 struct xwmp_cond * cond;
                 void * anon;
@@ -148,7 +152,7 @@ struct xwmp_cond * xwmp_cond_alloc(void)
                 mem.cond = err_ptr(rc);
         }/* else {} */
         return mem.cond;
-#elif defined(XWOSCFG_SYNC_COND_STDC_MM) && (1 == XWOSCFG_SYNC_COND_STDC_MM)
+#  elif defined(XWOSCFG_SYNC_COND_STDC_MM) && (1 == XWOSCFG_SYNC_COND_STDC_MM)
         struct xwmp_cond * cond;
 
         cond = malloc(sizeof(struct xwmp_cond));
@@ -158,23 +162,13 @@ struct xwmp_cond * xwmp_cond_alloc(void)
                 xwmp_cond_construct(cond);
         }
         return cond;
-#else
-        union {
-                struct xwmp_cond * cond;
-                void * anon;
-        } mem;
-        xwer_t rc;
-
-        rc = xwmm_kma_alloc(sizeof(struct xwmp_cond), XWMM_ALIGNMENT, &mem.anon);
-        if (XWOK == rc) {
-                xwmp_cond_construct(mem.cond);
-        } else {
-                mem.cond = err_ptr(-ENOMEM);
-        }
-        return mem.cond;
-#endif
+#  else
+        return -ENOSYS;
+#  endif
 }
+#endif
 
+#if (1 == XWOSRULE_SYNC_COND_CREATE_DELETE)
 /**
  * @brief 释放条件量对象
  * @param[in] cond: 条件量对象的指针
@@ -182,16 +176,16 @@ struct xwmp_cond * xwmp_cond_alloc(void)
 static __xwmp_code
 void xwmp_cond_free(struct xwmp_cond * cond)
 {
-#if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
+#  if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
         xwmm_memslice_free(&xwmp_cond_cache, cond);
-#elif defined(XWOSCFG_SYNC_COND_STDC_MM) && (1 == XWOSCFG_SYNC_COND_STDC_MM)
+#  elif defined(XWOSCFG_SYNC_COND_STDC_MM) && (1 == XWOSCFG_SYNC_COND_STDC_MM)
         xwmp_cond_destruct(cond);
         free(cond);
-#else
-        xwmp_cond_destruct(cond);
-        xwmm_kma_free(cond);
-#endif
+#  else
+        XWOS_UNUSED(cond);
+#  endif
 }
+#endif
 
 /**
  * @brief 条件量对象的构造函数
@@ -224,6 +218,7 @@ xwer_t xwmp_cond_sgc(void * cond)
         return XWOK;
 }
 
+#if (1 == XWOSRULE_SYNC_COND_CREATE_DELETE)
 /**
  * @brief 动态条件量对象的垃圾回收函数
  * @param[in] cond: 条件量对象的指针
@@ -234,6 +229,7 @@ xwer_t xwmp_cond_dgc(void * cond)
         xwmp_cond_free((struct xwmp_cond *)cond);
         return XWOK;
 }
+#endif
 
 /**
  * @brief 激活条件量
@@ -270,6 +266,7 @@ xwer_t xwmp_cond_fini(struct xwmp_cond * cond)
         return xwmp_cond_put(cond);
 }
 
+#if (1 == XWOSRULE_SYNC_COND_CREATE_DELETE)
 __xwmp_api
 xwer_t xwmp_cond_create(struct xwmp_cond ** condbuf)
 {
@@ -290,12 +287,15 @@ xwer_t xwmp_cond_create(struct xwmp_cond ** condbuf)
         }
         return rc;
 }
+#endif
 
+#if (1 == XWOSRULE_SYNC_COND_CREATE_DELETE)
 __xwmp_api
 xwer_t xwmp_cond_delete(struct xwmp_cond * cond, xwsq_t tik)
 {
         return xwmp_cond_release(cond, tik);
 }
+#endif
 
 __xwmp_api
 xwer_t xwmp_cond_acquire(struct xwmp_cond * cond, xwsq_t tik)

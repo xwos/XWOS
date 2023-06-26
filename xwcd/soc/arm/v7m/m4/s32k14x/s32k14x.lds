@@ -289,12 +289,3 @@ SECTIONS {
 
 /* 用于提供firmware文件头信息 */
 firmware_head_lma = armv7m_ivt_lma_base;
-
-xwmm_dkma_mmz_origin = ORIGIN(data_mr);
-xwmm_dkma_mmz_size = xwmm_dkma_mmz_end - xwmm_dkma_mmz_origin;
-xwmm_dkma_mmz_pos = xwmm_dkma_mmz_start - xwmm_dkma_mmz_origin;
-
-xwos_stk_mr_origin = ORIGIN(xwos_stk_mr);
-xwos_stk_mr_size = LENGTH(xwos_stk_mr);
-xwos_stk_top = xwos_stk_mr_origin + xwos_stk_mr_size;
-xwos_stk_end = xwos_stk_mr_origin;

@@ -14,6 +14,7 @@
 #include <xwos/up/osdl/sync/sem.h>
 
 #if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
+#  if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 __xwup_code
 xwer_t xwosdl_sem_create(xwosdl_sem_d * semd, xwssq_t val, xwssq_t max)
 {
@@ -33,7 +34,9 @@ xwer_t xwosdl_sem_create(xwosdl_sem_d * semd, xwssq_t val, xwssq_t max)
         }
         return rc;
 }
+#  endif
 #elif defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
+#  if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 __xwup_code
 xwer_t xwosdl_sem_create(xwosdl_sem_d * semd, xwssq_t val, xwssq_t max)
 {
@@ -53,6 +56,7 @@ xwer_t xwosdl_sem_create(xwosdl_sem_d * semd, xwssq_t val, xwssq_t max)
         }
         return rc;
 }
+#  endif
 #else
 #  error "Can't find the semaphore configuration!"
 #endif

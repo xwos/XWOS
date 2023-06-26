@@ -80,7 +80,7 @@ soc_boot_vma:
         .option         pop
 
         /* 初始化SP */
-        la              sp, xwos_stk_top
+        la              sp, gd32v_isr_stack_top
         csrw            CSR_MSCRATCH, sp
 
         /* 设置NMI使用mtvec寄存器中的地址作为中断服务程序入口 */

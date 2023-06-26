@@ -34,15 +34,15 @@ MEMORY {
         armv7m_ivt_vmr (rw): org = 0x20000000, len = 2048 /* vectors table vma region */
         firmware_info_mr (rx): org = 0x90000800, len = 1k /* firmware info */
         code_mr (rx): org = 0x90000C00, len = 8189k /* text & rodata */
-        xwos_data_mr (arw): org = 0x20000800, len = 54k /* .xwos.data */
-        data_mr (arw): org = 0x30000000, len = 288k /* .data, .bss & .heap */
+        xwos_data_mr (arw): org = 0x20000800, len = 54k /* .xwos.data in DTCM */
+        data_mr (arw): org = 0x30000000, len = 288k /* .data & .bss in SRAM */
         data4_mr (arw): org = 0x38000000, len = 64k /* .data4 for D3 Domain */
-        dtcmheap_mr (arw): org = 0x20010000, len = 64k /* .dtcmheap */
-        xwos_stk_mr (arw): org = 0x2000E000, len = 8k /* xwos stack */
+        armv7m_isr_stack_mr (arw): org = 0x2000E000, len = 8k /* xwos stack */
 }
 
-dtcmheap_mr_origin = ORIGIN(dtcmheap_mr);
-dtcmheap_mr_size = LENGTH(dtcmheap_mr);
+dtcm_mr_origin = ORIGIN(dtcm_mr);
+dtcm_mr_size = LENGTH(dtcm_mr);
+dtcm_mr_pos = xwos_data_vma_end;
 
 axisram_mr_origin = ORIGIN(axisram_mr);
 axisram_mr_size = LENGTH(axisram_mr);
@@ -53,5 +53,10 @@ qspiflash_mr_size = LENGTH(qspiflash_mr);
 firmware_info_mr_origin = ORIGIN(firmware_info_mr);
 firmware_info_mr_size = LENGTH(firmware_info_mr);
 firmware_info_offset = firmware_info_mr_origin - qspiflash_mr_origin;
+
+armv7m_isr_stack_mr_origin = ORIGIN(armv7m_isr_stack_mr);
+armv7m_isr_stack_mr_size = LENGTH(armv7m_isr_stack_mr);
+armv7m_isr_stack_top = armv7m_isr_stack_mr_origin + armv7m_isr_stack_mr_size;
+armv7m_isr_stack_end = armv7m_isr_stack_mr_origin;
 
 INCLUDE h7.lds

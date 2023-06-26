@@ -22,17 +22,11 @@
 #include <xwcd/soc/arm/v7m/arch_init.h>
 #include <xwcd/soc/arm/v7m/m7/stm32/soc_init.h>
 #include <string.h>
-#include <xwos/mm/bma.h>
 #include <xwos/mm/mempool/allocator.h>
 #include "bm/stm32cube/mif.h"
 
-#define DTCMHEAP_BLKSZ          BRDCFG_MM_DTCMHEAP_BLKSZ
-#define DTCMHEAP_BLKODR         BRDCFG_MM_DTCMHEAP_BLKODR
-
 extern xwsz_t axisram_mr_origin[];
 extern xwsz_t axisram_mr_size[];
-extern xwsz_t dtcmheap_mr_origin[];
-extern xwsz_t dtcmheap_mr_size[];
 
 /**
  * @brief AXISRAM内存池
@@ -46,11 +40,15 @@ extern xwsz_t dtcmheap_mr_size[];
  */
 __xwbsp_data struct xwmm_mempool * axisram_mempool = (void *)axisram_mr_origin;
 
+extern xwsz_t dtcm_mr_origin[];
+extern xwsz_t dtcm_mr_size[];
+extern xwsz_t dtcm_mr_pos[];
+#define DTCM_PAGE_ORDER 5 /* 128K / 4K == 32 == exp2(5) */
+
 /**
- * @brief CCMRAM zone
+ * @brief mempool in DTCM
  */
-__xwbsp_data XWMM_BMA_DEF(dtcmheap_bma_objrawmem, DTCMHEAP_BLKODR);
-__xwbsp_data struct xwmm_bma * dtcmheap_bma = (void *)&dtcmheap_bma_objrawmem;
+__xwbsp_data XWMM_MEMPOOL_DEF(dtcm_mempool, DTCM_PAGE_ORDER);
 
 
 /**
@@ -61,17 +59,22 @@ void board_mm_init(void)
 {
         xwer_t rc;
         xwssq_t odr;
+        xwsz_t used;
 
         odr = xwbop_fls(xwsz_t, (xwsz_t)axisram_mr_size / XWMM_MEMPOOL_PAGE_SIZE);
         rc = xwmm_mempool_init(axisram_mempool, "AXISRAM",
                                (xwptr_t)axisram_mr_origin,
                                (xwsz_t)axisram_mr_size,
-                               (xwsz_t)odr);
+                               (xwsz_t)odr,
+                               0, NULL);
         BOARD_BUG_ON(rc < 0);
 
-        rc = xwmm_bma_init(dtcmheap_bma, "dtcmheap",
-                           (xwptr_t)dtcmheap_mr_origin, (xwsz_t)dtcmheap_mr_size,
-                           DTCMHEAP_BLKSZ, DTCMHEAP_BLKODR);
+        used = (xwsz_t)dtcm_mr_pos - (xwsz_t)dtcm_mr_origin;
+        rc = xwmm_mempool_init((struct xwmm_mempool *)dtcm_mempool, "DTCM",
+                               (xwptr_t)dtcm_mr_origin,
+                               (xwsz_t)dtcm_mr_size,
+                               DTCM_PAGE_ORDER,
+                               used, NULL);
         BOARD_BUG_ON(rc < 0);
 }
 

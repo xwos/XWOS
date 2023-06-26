@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 板级描述层：固件描述信息
+ * @brief 板级描述层：DTCM区域内存池
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,25 +18,12 @@
  * > limitations under the License.
  */
 
-#include <xwos/standard.h>
-#include <xwcd/soc/arm/v7m/arch_firmware.h>
+#ifndef __board_dtcm_h__
+#define __board_dtcm_h__
 
-extern const xwu8_t firmware_tail_lma_base[];
-extern const xwu8_t firmware_tail_lma_end[];
-extern const xwu8_t firmware_head_lma[];
-extern void arch_isr_reset(void);
-extern xwstk_t armv7m_isr_stack_top[];
+#include "board/std.h"
+#include <xwos/mm/mempool/allocator.h>
 
-__firmware_info
-const struct firmware_info firmware_info = {
-        .head = (void *)firmware_head_lma,
-        .tail_flag_addr = (void *)firmware_tail_lma_base,
-        .end_addr = (void *)firmware_tail_lma_end,
-        .entry = arch_isr_reset,
-        .sp = armv7m_isr_stack_top,
-};
+extern struct xwmm_mempool * dtcm_mempool;
 
-__firmware_tail
-const struct firmware_tail firmware_tail = {
-        .flag = BRDCFG_FIRMWARE_TAILFLAG,
-};
+#endif /* board/dtcm.h */

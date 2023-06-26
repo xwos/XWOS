@@ -18,7 +18,6 @@
 #include <string.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
-#include <xwos/mm/kma.h>
 #include <xwos/ospl/irq.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/ospl/tls.h>

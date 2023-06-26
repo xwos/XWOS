@@ -45,7 +45,6 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/xwaop.h>
 #include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
 #include <xwos/ospl/skd.h>
 #include <xwos/ospl/tls.h>
 #include <xwos/mp/irq.h>

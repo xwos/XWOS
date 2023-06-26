@@ -34,7 +34,7 @@
 
 #define ARCH_NVGR_SIZE                                  36U
 
-extern xwstk_t xwos_stk_top[];
+extern xwstk_t armv6m_isr_stack_top[];
 
 static __xwbsp_code
 void arch_skd_report_stk_overflow(struct xwospl_skdobj_stack * stk);
@@ -152,9 +152,9 @@ void arch_svc_skd_start(__xwcc_unused struct xwospl_skd * xwskd)
         /* restore non-volatile register: r4-r7 */
         __asm__ volatile("      subs    r2, #32");
         __asm__ volatile("      ldmfd   r2!, {r4-r7}");
-        __asm__ volatile("      msr     msp, %[__xwos_stk_top]"
+        __asm__ volatile("      msr     msp, %[__armv6m_isr_stack_top]"
                          :
-                         : [__xwos_stk_top] "Ir" (xwos_stk_top)
+                         : [__armv6m_isr_stack_top] "Ir" (armv6m_isr_stack_top)
                          :);
         __asm__ volatile("      mov     r0, %[__exc]\n"
                          "      mov     lr, r0\n"

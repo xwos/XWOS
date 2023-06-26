@@ -25,7 +25,7 @@ extern const xwu8_t firmware_tail_lma_base[];
 extern const xwu8_t firmware_tail_lma_end[];
 extern const xwu8_t firmware_head_lma[];
 extern void arch_isr_reset(void);
-extern xwstk_t xwos_stk_top[];
+extern xwstk_t armv7m_isr_stack_top[];
 
 __firmware_info
 const struct firmware_info firmware_info = {
@@ -33,7 +33,7 @@ const struct firmware_info firmware_info = {
         .tail_flag_addr = (void *)firmware_tail_lma_base,
         .end_addr = (void *)firmware_tail_lma_end,
         .entry = arch_isr_reset,
-        .sp = xwos_stk_top,
+        .sp = armv7m_isr_stack_top,
 };
 
 __firmware_tail

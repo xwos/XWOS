@@ -33,7 +33,7 @@
 #endif
 #define SOC_CONTEXT_SIZE (SOC_CALLER_CONTEXT_SIZE + SOC_CALLEE_CONTEXT_SIZE)
 
-extern xwu8_t xwos_stk_top[];
+extern xwu8_t gd32v_isr_stack_top[];
 
 __xwbsp_rodata const struct soc_irq_cfg soc_swcx_irqcfg = {
         .level = 0,
@@ -148,7 +148,7 @@ void xwospl_skd_init_stack(struct xwospl_skdobj_stack * stk,
         *(stk->sp) = csr;
         /* MSCRATCH */
         stk->sp--;
-        *(stk->sp) = (xwstk_t)&xwos_stk_top;
+        *(stk->sp) = (xwstk_t)&gd32v_isr_stack_top;
         stk->sp--;
         *(stk->sp) = (xwstk_t)0; /* x15 (a5) */
         stk->sp--;

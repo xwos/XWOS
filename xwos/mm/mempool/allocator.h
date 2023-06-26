@@ -98,7 +98,8 @@ struct xwmm_mempool {
 };
 
 xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
-                         xwptr_t origin, xwsz_t size, xwsz_t pgodr);
+                         xwptr_t origin, xwsz_t size, xwsz_t pgodr,
+                         xwsz_t pre, void ** membuf);
 xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size,
                            void ** membuf);
 xwer_t xwmm_mempool_free(struct xwmm_mempool * mp, void * mem);

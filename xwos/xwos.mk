@@ -22,7 +22,6 @@ XWOS_CSRCS += init.c
 
 ######## mm ########
 XWOS_CSRCS += mm/sma.c
-XWOS_CSRCS += mm/kma.c
 
 ifeq ($(XWMMCFG_BMA),y)
   XWOS_CSRCS += mm/bma.c

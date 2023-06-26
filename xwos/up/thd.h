@@ -19,7 +19,6 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
 #include <xwos/mm/common.h>
-#include <xwos/mm/kma.h>
 #include <xwos/up/skd.h>
 #include <xwos/up/wqn.h>
 #include <xwos/up/tt.h>

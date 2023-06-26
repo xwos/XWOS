@@ -35,7 +35,7 @@ void MX_NOOP_IRQHandler(void)
         }
 }
 
-extern xwu8_t xwos_stk_top[];
+extern xwu8_t armv7m_isr_stack_top[];
 void WWDG_IRQHandler(void) __xwcc_weakalias("MX_NOOP_IRQHandler");
 void PVD_AVD_IRQHandler(void) __xwcc_weakalias("MX_NOOP_IRQHandler");
 void TAMP_STAMP_IRQHandler(void) __xwcc_weakalias("MX_NOOP_IRQHandler");
@@ -179,7 +179,7 @@ void WAKEUP_PIN_IRQHandler(void) __xwcc_weakalias("MX_NOOP_IRQHandler");
 
 __xwcc_section(".armv7m.ivt") struct soc_ivt stm32_ivt = {
         .exc = {
-                [SOC_SP_TOP + SOCCFG_EXC_NUM] = (xwisr_f)xwos_stk_top,
+                [SOC_SP_TOP + SOCCFG_EXC_NUM] = (xwisr_f)armv7m_isr_stack_top,
                 [SOC_EXC_RESET + SOCCFG_EXC_NUM] = (xwisr_f)arch_isr_reset,
                 [SOC_EXC_NMI + SOCCFG_EXC_NUM] = arch_isr_nmi,
                 [SOC_EXC_HARDFAULT + SOCCFG_EXC_NUM] = arch_isr_hardfault,

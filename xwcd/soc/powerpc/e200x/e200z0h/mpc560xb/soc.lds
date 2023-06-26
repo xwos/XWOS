@@ -200,21 +200,3 @@ SECTIONS {
 
 /* 用于提供firmware文件头信息 */
 firmware_head_lma = ORIGIN(code_mr);
-
-xwos_stk_mr_origin = ORIGIN(xwos_stk_mr);
-xwos_stk_mr_size = LENGTH(xwos_stk_mr);
-xwos_stk_top = xwos_stk_mr_origin + xwos_stk_mr_size;
-xwos_stk_end = xwos_stk_mr_origin;
-
-data_mr_origin = ORIGIN(data_mr);
-data_mr_size = LENGTH(data_mr);
-
-xwmm_dkma_mmz_origin = data_mr_origin;
-xwmm_dkma_mmz_size = data_mr_size;
-xwmm_dkma_mmz_pos = rwx_vma_end - data_mr_origin;
-
-bkup_mr_origin = ORIGIN(bkup_mr);
-bkup_mr_size = LENGTH(bkup_mr);
-
-stdby_wkup_mr_origin = ORIGIN(stdby_wkup_mr);
-stdby_wkup_mr_size = LENGTH(stdby_wkup_mr);
