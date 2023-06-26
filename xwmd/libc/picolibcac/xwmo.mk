@@ -32,5 +32,6 @@ XWMO_CSRCS += kill.c
 XWMO_CSRCS += exit.c
 
 XWMO_CFLAGS := -Wno-unused-value -Wno-unused-parameter
+XWMO_CFLAGS_gcc := -Wno-sign-conversion -Wno-incompatible-pointer-types
 XWMO_INCDIRS :=
 include xwbs/$(XWOS_CFG_XWMO_MK)

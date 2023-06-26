@@ -1,0 +1,25 @@
+/**
+ * @defgroup xwmd_isc_xwssc SOC间点对点通讯协议
+ * @ingroup xwmd_isc
+ * @{
+ */
+
+/**
+ * @defgroup xwmd_isc_xwssc_mif SOC间点对点通讯协议：用户应用接口层
+ */
+
+/**
+ * @defgroup xwmd_isc_xwssc_protocol SOC间点对点通讯协议：协议层
+ */
+
+/**
+ * @defgroup xwmd_isc_xwssc_hwifal SOC间点对点通讯协议：硬件接口抽象层
+ */
+
+/**
+ * @defgroup xwmd_isc_xwssc_hwif SOC间点对点通讯协议：硬件接口层
+ */
+
+/**
+ * @} xwmd_isc_xwssc
+ */

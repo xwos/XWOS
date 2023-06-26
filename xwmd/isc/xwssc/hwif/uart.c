@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC间点对点通讯协议：UART硬件接口
+ * @brief SOC间点对点通讯协议：硬件接口层：UART
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -15,6 +15,11 @@
 #include <xwmd/isc/xwssc/protocol.h>
 #include <xwmd/isc/xwssc/hwifal.h>
 #include <xwmd/isc/xwssc/hwif/uart.h>
+
+/**
+ * @ingroup xwmd_isc_xwssc_hwif_uart
+ * @{
+ */
 
 static __xwmd_code
 xwer_t xwsscif_uart_open(struct xwssc * xwssc);
@@ -73,3 +78,7 @@ void xwsscif_uart_notify(struct xwssc * xwssc, xwsq_t ntf)
         if (XWSSC_HWIFNTF_NETUNREACH == ntf) {
         }
 }
+
+/**
+ * @} xwmd_isc_xwssc
+ */

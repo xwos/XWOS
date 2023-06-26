@@ -17,6 +17,11 @@
 #include <xwmd/isc/xwssc/hwifal.h>
 #include <xwmd/isc/xwssc/protocol.h>
 
+/**
+ * @ingroup xwmd_isc_xwssc_hwifal
+ * @{
+ */
+
 extern const uint8_t xwssc_frm_blank[8];
 
 /**
@@ -268,3 +273,7 @@ void xwssc_hwifal_notify(struct xwssc * xwssc, xwsq_t evt)
                 xwssc->hwifops->notify(xwssc, evt);
         }
 }
+
+/**
+ * @} xwmd_isc_xwssc_hwifal
+ */

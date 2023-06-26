@@ -16,6 +16,11 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 
+/**
+ * @ingroup xwmd_isc_xwssc_hwifal
+ * @{
+ */
+
 struct xwssc;
 union xwssc_slot;
 struct xwssc_frm;
@@ -54,5 +59,9 @@ xwer_t xwssc_hwifal_close(struct xwssc * xwssc);
 xwer_t xwssc_hwifal_tx(struct xwssc * xwssc, xwu8_t * stream, xwsz_t size);
 xwer_t xwssc_hwifal_rx(struct xwssc * xwssc, union xwssc_slot ** slotbuf);
 void xwssc_hwifal_notify(struct xwssc * xwssc, xwsq_t evt);
+
+/**
+ * @} xwmd_isc_xwssc_hwifal
+ */
 
 #endif /* xwmd/isc/xwssc/hwifal.h */

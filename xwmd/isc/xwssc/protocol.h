@@ -28,6 +28,11 @@
 #include <xwmd/isc/xwssc/hwifal.h>
 #include <xwmd/isc/xwssc/mif.h>
 
+/**
+ * @ingroup xwmd_isc_xwssc_protocol
+ * @{
+ */
+
 #define XWSSC_SOF               ((xwu8_t)0xAA)
 #define XWSSC_EOF               ((xwu8_t)(XWSSC_SOF ^ 0xFF))
 #define XWSSC_SOF_SIZE          (2U)
@@ -207,5 +212,9 @@ xwer_t xwssc_eq_msg(struct xwssc * xwssc,
                     xwssc_txh_t * txhbuf);
 xwer_t xwssc_tx_ack_sdu(struct xwssc * xwssc, xwu8_t port, xwu8_t id, xwu8_t ack);
 xwer_t xwssc_txthd(struct xwssc * xwssc);
+
+/**
+ * @} xwmd_isc_xwssc_protocol
+ */
 
 #endif /* xwmd/isc/xwssc/protocol.h */

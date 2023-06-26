@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief SOC间点对点通讯协议：UART硬件接口
+ * @brief SOC间点对点通讯协议：硬件接口层：UART
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -16,7 +16,17 @@
 #include <xwos/standard.h>
 #include <xwmd/isc/xwssc/hwifal.h>
 
+/**
+ * @defgroup xwmd_isc_xwssc_hwif_uart SOC间点对点通讯协议：硬件接口层：UART
+ * @ingroup xwmd_isc_xwssc_hwif
+ * @{
+ */
+
 extern
-const struct xwssc_hwifal_operation xwsscif_uart_ops;
+const struct xwssc_hwifal_operation xwsscif_uart_ops; /**< UART接口操作函数集 */
+
+/**
+ * @} xwmd_isc_xwssc_hwif_uart
+ */
 
 #endif /* xwmd/isc/xwssc/hwif/uart.h */

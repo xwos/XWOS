@@ -28,6 +28,11 @@
 #include <xwmd/isc/xwssc/mif.h>
 
 /**
+ * @ingroup xwmd_isc_xwssc_protocol
+ * @{
+ */
+
+/**
  * @brief 控制帧模板：连接帧
  */
 __xwmd_rodata const xwu8_t xwssc_frm_connect[] = {
@@ -1354,3 +1359,7 @@ xwer_t xwssc_doze(xwu32_t cnt)
 {
         return xwos_cthd_sleep(XWSSC_RETRY_PERIOD * cnt);
 }
+
+/**
+ * @} xwmd_isc_xwssc_protocol
+ */

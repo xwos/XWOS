@@ -877,8 +877,7 @@ WARN_LOGFILE           =
 INPUT                  = xwxr/index.md xwos/standard.h xwos/standard.hxx xwos/osal \
                          xwos/mm xwos/lib xwmd/group.dox \
                          xwmd/isc/xwcq xwmd/isc/xwmq \
-                         xwmd/isc/xwpcp/mif.h xwmd/isc/xwpcp/mif.c \
-                         xwmd/isc/xwscp/mif.h xwmd/isc/xwscp/mif.c
+                         xwmd/isc/xwssc/group.dox xwmd/isc/xwssc/mif.h xwmd/isc/xwssc/protocol.h xwmd/isc/xwssc/hwifal.h xwmd/isc/xwssc/hwif/uart.h
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
