@@ -27,6 +27,9 @@ struct xwup_plsem {
 
 xwer_t xwup_plsem_intr(struct xwup_plsem * sem, struct xwup_wqn * wqn);
 
+#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+xwer_t xwup_plsem_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
+#endif
 xwer_t xwup_plsem_init(struct xwup_plsem * sem, xwssq_t val, xwssq_t max);
 xwer_t xwup_plsem_fini(struct xwup_plsem * sem);
 xwer_t xwup_plsem_create(struct xwup_plsem ** ptrbuf, xwssq_t val, xwssq_t max);
@@ -36,14 +39,8 @@ xwer_t xwup_plsem_release(struct xwup_plsem * sem, xwsq_t tik);
 xwer_t xwup_plsem_grab(struct xwup_plsem * sem);
 xwer_t xwup_plsem_put(struct xwup_plsem * sem);
 
-#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
-xwer_t xwup_plsem_bind(struct xwup_plsem * sem, struct xwup_evt * evt, xwsq_t pos);
-xwer_t xwup_plsem_unbind(struct xwup_plsem * sem, struct xwup_evt * evt);
-#else
-#  define xwup_plsem_bind(sem, evt, pos) (-ENOSYS)
-#  define xwup_plsem_unbind(sem, evt) (-ENOSYS)
-#endif
-
+xwer_t xwup_plsem_bind(struct xwup_plsem * sem, struct xwup_evt * sel, xwsq_t pos);
+xwer_t xwup_plsem_unbind(struct xwup_plsem * sem, struct xwup_evt * sel);
 xwer_t xwup_plsem_freeze(struct xwup_plsem * sem);
 xwer_t xwup_plsem_thaw(struct xwup_plsem * sem);
 xwer_t xwup_plsem_post(struct xwup_plsem * sem);

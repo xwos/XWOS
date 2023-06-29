@@ -34,6 +34,9 @@ xwer_t xwup_cond_activate(struct xwup_cond * cond, xwobj_gc_f gcfunc);
 xwer_t xwup_cond_intr(struct xwup_cond * cond, struct xwup_wqn * wqn);
 xwer_t xwup_cond_intr_all(struct xwup_cond * cond);
 
+#if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
+xwer_t xwup_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
+#endif
 xwer_t xwup_cond_init(struct xwup_cond * cond);
 xwer_t xwup_cond_fini(struct xwup_cond * cond);
 xwer_t xwup_cond_create(struct xwup_cond ** ptrbuf);
@@ -43,14 +46,8 @@ xwer_t xwup_cond_release(struct xwup_cond * cond, xwsq_t tik);
 xwer_t xwup_cond_grab(struct xwup_cond * cond);
 xwer_t xwup_cond_put(struct xwup_cond * cond);
 
-#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
-xwer_t xwup_cond_bind(struct xwup_cond * cond, struct xwup_evt * evt, xwsq_t pos);
-xwer_t xwup_cond_unbind(struct xwup_cond * cond, struct xwup_evt * evt);
-#else
-#  define xwup_cond_bind(cond, evt, pos) (-ENOSYS)
-#  define xwup_cond_unbind(cond, evt) (ENOSYS)
-#endif
-
+xwer_t xwup_cond_bind(struct xwup_cond * cond, struct xwup_evt * sel, xwsq_t pos);
+xwer_t xwup_cond_unbind(struct xwup_cond * cond, struct xwup_evt * sel);
 xwer_t xwup_cond_freeze(struct xwup_cond * cond);
 xwer_t xwup_cond_thaw(struct xwup_cond * cond);
 xwer_t xwup_cond_broadcast(struct xwup_cond * cond);

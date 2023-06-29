@@ -61,11 +61,11 @@ static __xwmp_code
 void xwmp_evt_destruct(struct xwmp_evt * evt);
 
 static __xwmp_code
-xwer_t xwmp_evt_sgc(void * evt);
+xwer_t xwmp_evt_sgc(struct xwos_object * obj);
 
 #if (1 == XWOSRULE_SYNC_EVT_CREATE_DELETE)
 static __xwmp_code
-xwer_t xwmp_evt_dgc(void * evt);
+xwer_t xwmp_evt_dgc(struct xwos_object * obj);
 #endif
 
 static __xwmp_code
@@ -106,7 +106,7 @@ xwer_t xwmp_evt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
         xwer_t rc;
 
         rc = xwmm_memslice_init(&xwmp_evt_cache, zone_origin, zone_size,
-                                sizeof(struct xwmp_evt) * 3,
+                                sizeof(struct xwmp_evt) * 3U,
                                 xwmp_evt_cache_name,
                                 (ctor_f)xwmp_evt_construct,
                                 (dtor_f)xwmp_evt_destruct);
@@ -128,8 +128,10 @@ struct xwmp_evt * xwmp_evt_alloc(xwsz_t num)
                 struct xwmp_evt * evt;
                 void * anon;
         } mem;
-        xwbmp_t * bmp, * msk;
-        xwsz_t bmpnum, bmpsize;
+        xwbmp_t * bmp;
+        xwbmp_t * msk;
+        xwsz_t bmpnum;
+        xwsz_t bmpsize;
         xwer_t rc;
 
         bmpnum = BITS_TO_XWBMP_T(num);
@@ -150,8 +152,10 @@ struct xwmp_evt * xwmp_evt_alloc(xwsz_t num)
         return mem.evt;
 #  elif defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
         struct xwmp_evt * evt;
-        xwbmp_t * bmp, * msk;
-        xwsz_t bmpnum, bmpsize;
+        xwbmp_t * bmp;
+        xwbmp_t * msk;
+        xwsz_t bmpnum;
+        xwsz_t bmpsize;
 
         bmpnum = BITS_TO_XWBMP_T(num);
         bmpsize = bmpnum * sizeof(xwbmp_t);
@@ -231,9 +235,12 @@ void xwmp_evt_destruct(struct xwmp_evt * evt)
  * @param[in] evt: 事件对象的指针
  */
 static __xwmp_code
-xwer_t xwmp_evt_sgc(void * evt)
+xwer_t xwmp_evt_sgc(struct xwos_object * obj)
 {
-        xwmp_evt_destruct((struct xwmp_evt *)evt);
+        struct xwmp_evt * evt;
+
+        evt = xwcc_derof(obj, struct xwmp_evt, cond.synobj.xwobj);
+        xwmp_evt_destruct(evt);
         return XWOK;
 }
 
@@ -243,9 +250,12 @@ xwer_t xwmp_evt_sgc(void * evt)
  * @param[in] evt: 事件对象的指针
  */
 static __xwmp_code
-xwer_t xwmp_evt_dgc(void * evt)
+xwer_t xwmp_evt_dgc(struct xwos_object * obj)
 {
-        xwmp_evt_free((struct xwmp_evt *)evt);
+        struct xwmp_evt * evt;
+
+        evt = xwcc_derof(obj, struct xwmp_evt, cond.synobj.xwobj);
+        xwmp_evt_free(evt);
         return XWOK;
 }
 #endif
@@ -268,26 +278,26 @@ xwer_t xwmp_evt_activate(struct xwmp_evt * evt, xwsq_t type, xwobj_gc_f gcfunc)
 
         size = BITS_TO_XWBMP_T(evt->num);
         rc = xwmp_cond_activate(&evt->cond, gcfunc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_cond_activate;
         }
         evt->type = type;
         switch (type & XWMP_EVT_TYPE_MASK) {
         case XWMP_EVT_TYPE_BR:
-                memset(evt->msk, 0, size);
+                memset(evt->msk, 0, size); // cppcheck-suppress [misra-c2012-17.7]
                 for (i = 0; i < evt->num; i++) {
                         xwbmpop_s1i(evt->msk, i);
                 }
                 break;
         case XWMP_EVT_TYPE_SEL:
-                memset(evt->msk, 0, size);
+                memset(evt->msk, 0, size); // cppcheck-suppress [misra-c2012-17.7]
                 break;
         case XWMP_EVT_TYPE_FLG:
         default:
-                memset(evt->msk, 0xFF, size);
+                memset(evt->msk, 0xFF, size); // cppcheck-suppress [misra-c2012-17.7]
                 break;
         }
-        memset(evt->bmp, 0, size);
+        memset(evt->bmp, 0, size); // cppcheck-suppress [misra-c2012-17.7]
         xwmp_splk_init(&evt->lock);
         return XWOK;
 
@@ -319,11 +329,11 @@ xwer_t xwmp_evt_create(struct xwmp_evt ** evtbuf, xwsq_t type, xwsz_t num)
 
         *evtbuf = NULL;
         evt = xwmp_evt_alloc(num);
-        if (__xwcc_unlikely(is_err(evt))) {
+        if (is_err(evt)) {
                 rc = ptr_err(evt);
         } else {
                 rc = xwmp_evt_activate(evt, type, xwmp_evt_dgc);
-                if (__xwcc_unlikely(rc < 0)) {
+                if (rc < 0) {
                         xwmp_evt_free(evt);
                 } else {
                         *evtbuf = evt;
@@ -519,8 +529,8 @@ xwer_t xwmp_flg_wait_to_level(struct xwmp_evt * evt,
 
         rc = XWOK;
         xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        while (true) {
-                if (origin) {
+        while (true) { // cppcheck-suppress [misra-c2012-15.4]
+                if (NULL != origin) {
                         xwbmpop_assign(origin, evt->bmp, evt->num);
                 }
                 if (XWMP_FLG_ACTION_CONSUMPTION == action) {
@@ -604,7 +614,7 @@ xwer_t xwmp_flg_wait_to_edge(struct xwmp_evt * evt, xwsq_t trigger,
 
         xwbmpop_and(origin, msk, evt->num);
         xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        while (true) {
+        while (true) { // cppcheck-suppress [misra-c2012-15.4]
                 xwbmpop_assign(cur, evt->bmp, evt->num);
                 xwbmpop_and(cur, msk, evt->num);
                 if (XWMP_FLG_TRIGGER_TGL_ALL == trigger) {
@@ -680,7 +690,7 @@ xwer_t xwmp_flg_trywait_level(struct xwmp_evt * evt,
 
         rc = XWOK;
         xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        if (origin) {
+        if (NULL != origin) {
                 xwbmpop_assign(origin, evt->bmp, evt->num);
         }
         if (XWMP_FLG_ACTION_CONSUMPTION == action) {
@@ -969,7 +979,7 @@ xwer_t xwmp_sel_select_to(struct xwmp_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
         xwsq_t lkst;
 
         xwmp_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        while (true) {
+        while (true) { // cppcheck-suppress [misra-c2012-15.4]
                 triggered = xwbmpop_t1mo(evt->bmp, msk, evt->num);
                 if (triggered) {
                         if (NULL != trg) {

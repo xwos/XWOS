@@ -63,15 +63,15 @@ xwer_t xwup_vsem_put(struct xwup_vsem * sem)
 
 #if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
 __xwup_code
-xwer_t xwup_vsem_bind(struct xwup_vsem * vsem, struct xwup_evt * evt, xwsq_t pos)
+xwer_t xwup_vsem_bind(struct xwup_vsem * vsem, struct xwup_evt * sel, xwsq_t pos)
 {
         xwreg_t cpuirq;
         xwer_t rc;
 
         xwospl_cpuirq_save_lc(&cpuirq);
-        rc = xwup_sel_obj_bind(evt, &vsem->synobj, pos, true);
+        rc = xwup_sel_obj_bind(sel, &vsem->synobj, pos, true);
         if ((XWOK == rc) && (vsem->count > 0)) {
-                rc = xwup_sel_obj_s1i(evt, &vsem->synobj);
+                rc = xwup_sel_obj_s1i(sel, &vsem->synobj);
         }
         xwospl_cpuirq_restore_lc(cpuirq);
 
@@ -79,19 +79,36 @@ xwer_t xwup_vsem_bind(struct xwup_vsem * vsem, struct xwup_evt * evt, xwsq_t pos
 }
 
 __xwup_code
-xwer_t xwup_vsem_unbind(struct xwup_vsem * vsem, struct xwup_evt * evt)
+xwer_t xwup_vsem_unbind(struct xwup_vsem * vsem, struct xwup_evt * sel)
 {
         xwreg_t cpuirq;
         xwer_t rc;
 
         xwospl_cpuirq_save_lc(&cpuirq);
-        rc = xwup_sel_obj_unbind(evt, &vsem->synobj, true);
+        rc = xwup_sel_obj_unbind(sel, &vsem->synobj, true);
         if (XWOK == rc) {
-                rc = xwup_sel_obj_c0i(evt, &vsem->synobj);
+                rc = xwup_sel_obj_c0i(sel, &vsem->synobj);
         }
         xwospl_cpuirq_restore_lc(cpuirq);
 
         return rc;
+}
+#else
+__xwup_api
+xwer_t xwup_vsem_bind(struct xwup_vsem * vsem, struct xwup_evt * sel, xwsq_t pos)
+{
+        XWOS_UNUSED(vsem);
+        XWOS_UNUSED(sel);
+        XWOS_UNUSED(pos);
+        return -ENOSYS;
+}
+
+__xwup_api
+xwer_t xwup_vsem_unbind(struct xwup_vsem * vsem, struct xwup_evt * sel)
+{
+        XWOS_UNUSED(vsem);
+        XWOS_UNUSED(sel);
+        return -ENOSYS;
 }
 #endif
 
@@ -103,7 +120,7 @@ xwer_t xwup_vsem_freeze(struct xwup_vsem * vsem)
 
         rc = XWOK;
         xwospl_cpuirq_save_lc(&cpuirq);
-        if (__xwcc_unlikely(vsem->count < 0)) {
+        if (vsem->count < 0) {
                 rc = -EALREADY;
         } else {
                 vsem->count = XWUP_VSEM_NEGTIVE;
@@ -131,7 +148,7 @@ xwer_t xwup_vsem_thaw(struct xwup_vsem * vsem)
 
         rc = XWOK;
         xwospl_cpuirq_save_lc(&cpuirq);
-        if (__xwcc_unlikely(vsem->count >= 0)) {
+        if (vsem->count >= 0) {
                 rc = -EALREADY;
         } else {
                 vsem->count = 0;

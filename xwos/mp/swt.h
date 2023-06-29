@@ -25,8 +25,8 @@ struct xwmp_swt;
  * @brief 软件定时器标志枚举
  */
 enum xwmp_swt_flag_em {
-        XWMP_SWT_FLAG_NULL = 0, /**< 无（默认标志） */
-        XWMP_SWT_FLAG_RESTART = (1 << 0), /**< 自动重启 */
+        XWMP_SWT_FLAG_NULL = 0U, /**< 无（默认标志） */
+        XWMP_SWT_FLAG_RESTART = 1U, /**< 自动重启，BIT(0) */
         XWMP_SWT_FLAG_MASK = XWMP_SWT_FLAG_RESTART,
 };
 

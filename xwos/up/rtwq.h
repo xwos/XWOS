@@ -30,9 +30,10 @@ struct xwup_rtwq {
 
 /**
  * @brief 以删除为目的，遍历实时等待队列中所有节点
- * @param[in] c: 作为循环光标的等待队列节点结构体(struct xwup_wqn)指针
+ * @param[in] c: 循环变量，类型只能是 `struct xwup_wqn *`
  * @param[in] xwrtwq: 等待队列的指针
  */
+// cppcheck-suppress [misra-c2012-20.7]
 #define xwup_rtwq_itr_thd_rm(c, xwrtwq) \
         for (c = (xwrtwq)->rightmost; c; c = (xwrtwq)->rightmost)
 

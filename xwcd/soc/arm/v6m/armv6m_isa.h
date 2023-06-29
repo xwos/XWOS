@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 架构描述层：ARMv6 Cortex-M
+ * @brief 架构描述层：ARMv6M指令和架构
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

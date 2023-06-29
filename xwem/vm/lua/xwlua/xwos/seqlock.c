@@ -25,9 +25,9 @@
 #include "xwlua/port.h"
 #include "xwlua/xwos/seqlock.h"
 
-xwer_t xwlua_sqlk_gc(void * gcobj)
+xwer_t xwlua_sqlk_gc(struct xwos_object * obj)
 {
-        free(gcobj);
+        free(obj);
         return XWOK;
 }
 

@@ -44,6 +44,9 @@ struct xwup_mtx {
 
 xwer_t xwup_mtx_intr(struct xwup_mtx * mtx, struct xwup_thd * thd);
 
+#if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
+xwer_t xwup_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
+#endif
 xwer_t xwup_mtx_init(struct xwup_mtx * mtx, xwpr_t sprio);
 xwer_t xwup_mtx_fini(struct xwup_mtx * mtx);
 xwer_t xwup_mtx_create(struct xwup_mtx ** ptrbuf, xwpr_t sprio);

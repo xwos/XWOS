@@ -1,0 +1,51 @@
+#! /bin/make -f
+# @file
+# @brief Makefile规则：cppcheck
+# @author
+# + 隐星魂 (Roy Sun) <xwos@xwos.tech>
+# @copyright
+# + Copyright © 2015 xwos.tech, All Rights Reserved.
+# > Licensed under the Apache License, Version 2.0 (the "License");
+# > you may not use this file except in compliance with the License.
+# > You may obtain a copy of the License at
+# >
+# >         http://www.apache.org/licenses/LICENSE-2.0
+# >
+# > Unless required by applicable law or agreed to in writing, software
+# > distributed under the License is distributed on an "AS IS" BASIS,
+# > WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# > See the License for the specific language governing permissions and
+# > limitations under the License.
+#
+
+MSG := echo -e
+CPPCHECK := cppcheck
+CPPCHECK_CLANG ?= $(XWTC)/armllvm/bin/clang --sysroot=$(XWTC)/armllvm/lib/clang-runtimes/arm-none-eabi/$(SYSROOT_llvm)
+CPPCHECK_OUT ?= $(XWOS_WKSPC_DIR)/cppcheck
+CPPCHECK_INCDIRS = -I. -I$(XWOS_ARCH_DIR) -I$(XWOS_CPU_DIR) -I$(XWOS_SOC_DIR) -I$(XWOS_BRD_DIR)
+CPPCHECK_CFLAGS = --force --addon=misra --cppcheck-build-dir=$(CPPCHECK_OUT) --template=gcc
+CPPCHECK_CFLAGS += --inline-suppr --suppressions-list=xwbs/util/cppcheck/misra-c2012-suppressions.txt
+ifeq ($(XWOS_CFG_CORE),mp)
+  CPPCHECK_CFLAGS += -i xwos/up
+endif
+ifeq ($(XWOS_CFG_CORE),up)
+  CPPCHECK_CFLAGS += -i xwos/mp
+endif
+
+ifeq ($(XWOS_CFG_HOSTOS),gnu/linux)
+  ifneq ($(V),1)
+    SHOW_CPPCHECK = @$(MSG) "\e[1m\e[44;38m[cppcheck] "$*" \e[0m";
+  endif
+endif
+
+ifeq ($(XWOS_CFG_HOSTOS),darwin)
+  ifneq ($(V),1)
+    SHOW_CPPCHECK = @$(MSG) "\e[1m\e[44;38m[cppcheck] "$*" \e[0m";
+  endif
+endif
+
+ifeq ($(XWOS_CFG_HOSTOS),windows-nt)
+  ifneq ($(V),1)
+    SHOW_CPPCHECK = @$(MSG) "[cppcheck] "$* ;
+  endif
+endif

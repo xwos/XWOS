@@ -39,12 +39,16 @@ xwer_t xwmm_memslice_init(struct xwmm_memslice * msa, xwptr_t origin,
                           xwsz_t total_size, xwsz_t card_size,
                           const char * name, ctor_f ctor, dtor_f dtor)
 {
-        xwsz_t num_max, n, nm;
-        xwptr_t curr, next;
+        xwsz_t num_max;
+        xwsz_t n;
+        xwsz_t nm;
+        xwptr_t curr;
+        xwptr_t next;
         xwer_t rc;
 
         XWOS_VALIDATE((msa), "nullptr", -EFAULT);
 
+        // cppcheck-suppress [misra-c2012-17.8]
         card_size = XWBOP_ALIGN(card_size, XWMM_ALIGNMENT);
         num_max = total_size / card_size;
         if (0 == num_max) {
@@ -62,7 +66,7 @@ xwer_t xwmm_memslice_init(struct xwmm_memslice * msa, xwptr_t origin,
         msa->dtor = dtor;
 
         /* 构造所有对象 */
-        if (ctor) {
+        if (NULL != ctor) {
                 curr = origin;
                 next = curr;
                 for (n = 0; n < num_max; n++) {
@@ -147,13 +151,13 @@ xwer_t xwmm_memslice_free(struct xwmm_memslice * msa, void * mem)
         XWOS_VALIDATE((msa), "nullptr", -EFAULT);
         XWOS_VALIDATE((mem), "nullptr", -EFAULT);
 
-        if (__xwcc_unlikely((xwptr_t)mem < msa->zone.origin ||
-                            ((xwptr_t)mem - msa->zone.origin) > msa->zone.size)) {
+        if (((xwptr_t)mem < msa->zone.origin) ||
+            (((xwptr_t)mem - msa->zone.origin) > msa->zone.size)) {
                 rc = -EOWNER;
         } else {
-                if (msa->dtor) {
+                if (NULL != msa->dtor) {
                         msa->dtor(mem);
-                }/* else {} */
+                }
                 card = (atomic_xwlfq_t *)mem;
                 xwlib_lfq_push(&msa->free_list, card);
                 xwaop_add(xwsz_t, &msa->num_free, 1, NULL, NULL);

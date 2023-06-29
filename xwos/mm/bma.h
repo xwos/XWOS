@@ -44,6 +44,7 @@
  * @param[in] name: 结构体名
  * @param[in] blkodr: 伙伴算法内存块分配器中单位内存块的数量，以2的blkodr次方形式表示
  */
+// cppcheck-suppress [misra-c2012-20.7]
 #define XWMM_BMA_TYPEDEF(name, blkodr) \
         struct name { \
                 struct xwmm_bma bma[1]; \

@@ -25,7 +25,6 @@
 #include <xwos/lib/compiler.h>
 #include <xwos/lib/version.h>
 #include <xwos/lib/type.h>
-#include <xwos/lib/rule.h>
 #include <xwos/lib/error.h>
 #if defined(SOCCFG_BKPT) && (1 == SOCCFG_BKPT)
 #  include <xwos/ospl/soc/bkpt.h>

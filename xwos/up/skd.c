@@ -135,7 +135,7 @@ xwer_t xwup_skd_init_lc(void)
         xwskd->thd_num = 0;
         xwlib_bclst_init_head(&xwskd->thdelist);
         rc = xwup_tt_init(&xwskd->tt);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_tt_init;
         }
         xwup_rtrq_init(&xwskd->rq.rt);
@@ -170,10 +170,10 @@ xwer_t xwup_skd_start_lc(void)
 
         xwskd = &xwup_skd;
         rc = xwup_syshwt_start(&xwskd->tt.hwt);
-        if (__xwcc_unlikely(XWOK == rc)) {
+        if (XWOK == rc) {
                 xwskd->state = true;
                 xwospl_skd_start(xwskd);
-        }/* else {} */
+        }
         return rc;
 }
 
@@ -234,7 +234,7 @@ struct xwup_thd * xwup_skd_get_cthd_lc(void)
 {
         struct xwup_thd * cthd;
 
-        cthd = xwcc_baseof(xwup_skd.cstk, struct xwup_thd, stack);
+        cthd = xwcc_derof(xwup_skd.cstk, struct xwup_thd, stack);
         return cthd;
 }
 
@@ -255,11 +255,11 @@ struct xwup_thd * xwup_skd_rtrq_choose(void)
         xwskd = &xwup_skd;
         xwrtrq = &xwskd->rq.rt;
         t = xwup_rtrq_choose(xwrtrq);
-        if (__xwcc_likely(NULL != t)) {
+        if (NULL != t) {
                 xwup_rtrq_remove(xwrtrq, t);
                 xwbop(xwsq_t, c0m, &t->state, XWUP_SKDOBJ_ST_READY);
                 xwbop(xwsq_t, s1m, &t->state, XWUP_SKDOBJ_ST_RUNNING);
-        }/* else {} */
+        }
         return t;
 }
 
@@ -325,17 +325,17 @@ void xwup_skd_init_idled(void)
         xwskd->idle.size = XWOSCFG_SKD_IDLE_STACK_SIZE;
         xwskd->idle.base = (xwstk_t *)xwup_skd_idled_stack;
 #if (defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK))
-        xwskd->idle.sp = xwskd->idle.base + (xwskd->idle.size / sizeof(xwstk_t));
-        xwskd->idle.tls = xwskd->idle.base;
+        xwskd->idle.sp = &xwskd->idle.base[(xwskd->idle.size / sizeof(xwstk_t))];
+        xwskd->idle.tls = &xwskd->idle.base[0];
 #elif (defined(XWMMCFG_ED_STACK) && (1 == XWMMCFG_ED_STACK))
-        xwskd->idle.sp = xwskd->idle.base + (xwskd->idle.size / sizeof(xwstk_t)) - 1;
-        xwskd->idle.tls = xwskd->idle.base;
+        xwskd->idle.sp = &xwskd->idle.base[(xwskd->idle.size / sizeof(xwstk_t)) - 1];
+        xwskd->idle.tls = &xwskd->idle.base[0];
 #elif (defined(XWMMCFG_FA_STACK) && (1 == XWMMCFG_FA_STACK))
-        xwskd->idle.sp = xwskd->idle.base - 1;
-        xwskd->idle.tls = (void *)xwskd->idle.base + attr->stack_size;
+        xwskd->idle.sp = &xwskd->idle.base[-1];
+        xwskd->idle.tls = &xwskd->idle.base[(attr->stack_size / sizeof(xwstk_t))];
 #elif (defined(XWMMCFG_EA_STACK) && (1 == XWMMCFG_EA_STACK))
-        xwskd->idle.sp = xwskd->idle.base;
-        xwskd->idle.tls = (void *)xwskd->idle.base + attr->stack_size;
+        xwskd->idle.sp = &xwskd->idle.base[0];
+        xwskd->idle.tls = &xwskd->idle.base[(attr->stack_size / sizeof(xwstk_t))];
 #else
 #  error "Unknown stack type!"
 #endif
@@ -359,7 +359,7 @@ xwer_t xwup_skd_bhd(struct xwup_skd * xwskd)
         struct xwup_bh_node * bhn;
 
         xwospl_cpuirq_disable_lc();
-        while (1) {
+        while (true) {
                 if (!xwlib_bclst_tst_empty(&xwskd->bhcb.list)) {
                         bhn = xwlib_bclst_first_entry(&xwskd->bhcb.list,
                                                       struct xwup_bh_node,
@@ -368,7 +368,7 @@ xwer_t xwup_skd_bhd(struct xwup_skd * xwskd)
                         xwospl_cpuirq_enable_lc();
                         bhn->func(bhn->arg);
                         xwospl_cpuirq_disable_lc();
-                }/* else {} */
+                }
                 xwskd->req_bh_cnt--;
                 if (0 == xwskd->req_bh_cnt) {
                         xwskd->cstk = xwskd->pstk;
@@ -376,7 +376,7 @@ xwer_t xwup_skd_bhd(struct xwup_skd * xwskd)
                         xwospl_cpuirq_enable_lc();
                         xwospl_skd_req_swcx(xwskd);
                         xwospl_cpuirq_disable_lc();
-                }/* else {} */
+                }
         }
         xwospl_cpuirq_enable_lc();
         return XWOK;
@@ -397,17 +397,17 @@ void xwup_skd_init_bhd(void)
         xwskd->bh.size = XWOSCFG_SKD_BH_STACK_SIZE;
         xwskd->bh.base = (xwstk_t *)xwup_skd_bhd_stack;
 #if defined(XWMMCFG_FD_STACK) && (1 == XWMMCFG_FD_STACK)
-        xwskd->bh.sp = xwskd->bh.base + (xwskd->bh.size / sizeof(xwstk_t));
-        xwskd->bh.tls = xwskd->bh.base;
+        xwskd->bh.sp = &xwskd->bh.base[(xwskd->bh.size / sizeof(xwstk_t))];
+        xwskd->bh.tls = &xwskd->bh.base[0];
 #elif defined(XWMMCFG_ED_STACK) && (1 == XWMMCFG_ED_STACK)
-        xwskd->bh.sp = xwskd->bh.base + (xwskd->bh.size / sizeof(xwstk_t)) - 1;
-        xwskd->bh.tls = xwskd->bh.base;
+        xwskd->bh.sp = &xwskd->bh.base[(xwskd->bh.size / sizeof(xwstk_t)) - 1];
+        xwskd->bh.tls = &xwskd->bh.base[0];
 #elif defined(XWMMCFG_FA_STACK) && (1 == XWMMCFG_FA_STACK)
-        xwskd->bh.sp = xwskd->bh.base - 1;
-        xwskd->bh.tls = (void *)xwskd->bh.base + attr->stack_size;
+        xwskd->bh.sp = &xwskd->bh.base[-1];
+        xwskd->bh.tls = &xwskd->bh.base[(attr->stack_size / sizeof(xwstk_t))];
 #elif defined(XWMMCFG_EA_STACK) && (1 == XWMMCFG_EA_STACK)
-        xwskd->bh.sp = xwskd->bh.base;
-        xwskd->bh.tls = (void *)xwskd->bh.base + attr->stack_size;
+        xwskd->bh.sp = &xwskd->bh.base[0];
+        xwskd->bh.tls = &xwskd->bh.base[(attr->stack_size / sizeof(xwstk_t))];
 #else
 #  error "Unknown stack type!"
 #endif
@@ -465,13 +465,13 @@ struct xwup_skd * xwup_skd_enbh_lc(void)
                                 xwskd->pstk = xwskd->cstk;
                                 xwskd->cstk = XWUP_SKD_BH_STK(xwskd);
                                 sched = true;
-                        }/* else {} */
-                }/* else {} */
+                        }
+                }
         }
         xwospl_cpuirq_restore_lc(cpuirq);
         if (sched) {
                 xwospl_skd_req_swcx(xwskd);
-        }/* else {} */
+        }
         return xwskd;
 }
 
@@ -516,13 +516,13 @@ struct xwup_skd * xwup_skd_rsbh_lc(xwsq_t dis_bh_cnt)
                                 xwskd->pstk = xwskd->cstk;
                                 xwskd->cstk = XWUP_SKD_BH_STK(xwskd);
                                 sched = true;
-                        }/* else {} */
-                }/* else {} */
+                        }
+                }
         }
         xwospl_cpuirq_restore_lc(cpuirq);
         if (sched) {
                 xwospl_skd_req_swcx(xwskd);
-        }/* else {} */
+        }
         return xwskd;
 }
 
@@ -559,9 +559,9 @@ xwer_t xwup_skd_req_bh(void)
         xwospl_cpuirq_save_lc(&cpuirq);
         xwskd->req_bh_cnt++;
         if (0 == xwskd->dis_bh_cnt) {
-                if (__xwcc_unlikely(NULL != xwskd->pstk)) {
+                if (NULL != xwskd->pstk) {
                         rc = -EINPROGRESS;
-                } else if (__xwcc_unlikely(XWUP_SKD_BH_STK(xwskd) == xwskd->cstk)) {
+                } else if (XWUP_SKD_BH_STK(xwskd) == xwskd->cstk) {
                         rc = -EALREADY;
                 } else {
                         xwskd->pstk = xwskd->cstk;
@@ -574,7 +574,7 @@ xwer_t xwup_skd_req_bh(void)
         xwospl_cpuirq_restore_lc(cpuirq);
         if (XWOK == rc) {
                 xwospl_skd_req_swcx(xwskd);
-        }/* else {} */
+        }
         return rc;
 }
 
@@ -633,7 +633,7 @@ struct xwup_skd * xwup_skd_enpmpt_lc(void)
                         cstk = xwskd->cstk;
 #endif
                         if (XWUP_SKD_IDLE_STK(xwskd) != cstk) {
-                                t = xwcc_baseof(cstk, struct xwup_thd, stack);
+                                t = xwcc_derof(cstk, struct xwup_thd, stack);
                                 sched = xwup_skd_chkpmpt_thd(t);
                         } else {
                                 sched = true;
@@ -644,7 +644,7 @@ struct xwup_skd * xwup_skd_enpmpt_lc(void)
         xwospl_cpuirq_restore_lc(cpuirq);
         if (sched) {
                 xwup_skd_req_swcx();
-        }/* else {} */
+        }
         return xwskd;
 }
 
@@ -698,7 +698,7 @@ struct xwup_skd * xwup_skd_rspmpt_lc(xwsq_t dis_pmpt_cnt)
                         cstk = xwskd->cstk;
 #endif
                         if (XWUP_SKD_IDLE_STK(xwskd) != cstk) {
-                                t = xwcc_baseof(cstk, struct xwup_thd, stack);
+                                t = xwcc_derof(cstk, struct xwup_thd, stack);
                                 sched = xwup_skd_chkpmpt_thd(t);
                         } else {
                                 sched = true;
@@ -709,7 +709,7 @@ struct xwup_skd * xwup_skd_rspmpt_lc(xwsq_t dis_pmpt_cnt)
         xwospl_cpuirq_restore_lc(cpuirq);
         if (sched) {
                 xwup_skd_req_swcx();
-        }/* else {} */
+        }
         return xwskd;
 }
 
@@ -746,15 +746,14 @@ bool xwup_skd_chkpmpt_thd(struct xwup_thd * t)
 
         xwskd = &xwup_skd;
         xwrtrq = &xwskd->rq.rt;
-        if (XWUP_SKDOBJ_ST_RUNNING & t->state) {
+        if (0 != (XWUP_SKDOBJ_ST_RUNNING & t->state)) {
                 if (t->prio.d >= xwrtrq->top) {
                         sched = false;
                 } else {
                         sched = true;
                 }
         } else {
-                /* The thread will give up the CPU in a jiffy.
-                   We don't check the preemption */
+                /* 线程没有运行标志，马上就会发生调度。因此这里不必检测抢占。*/
                 sched = false;
         }
         return sched;
@@ -788,7 +787,7 @@ void xwup_skd_chkpmpt(void)
                 cstk = xwskd->cstk;
 #endif
                 if (XWUP_SKD_IDLE_STK(xwskd) != cstk) {
-                        t = xwcc_baseof(cstk, struct xwup_thd, stack);
+                        t = xwcc_derof(cstk, struct xwup_thd, stack);
                         sched = xwup_skd_chkpmpt_thd(t);
                 } else {
                         sched = true;
@@ -799,7 +798,7 @@ void xwup_skd_chkpmpt(void)
         xwospl_cpuirq_restore_lc(cpuirq);
         if (sched) {
                 xwup_skd_req_swcx();
-        }/* else {} */
+        }
 }
 
 /**
@@ -821,7 +820,7 @@ xwer_t xwup_skd_check_swcx(struct xwup_thd * t, struct xwup_thd ** pmthd)
 
         xwskd = &xwup_skd;
         xwrtrq = &xwskd->rq.rt;
-        if (XWUP_SKDOBJ_ST_RUNNING & t->state) {
+        if (0 != (XWUP_SKDOBJ_ST_RUNNING & t->state)) {
                 if (t->prio.d >= xwrtrq->top) {
                         rc = -EPERM;
                 } else {
@@ -847,7 +846,8 @@ static __xwup_code
 xwer_t xwup_skd_swcx(void)
 {
         struct xwup_skd * xwskd;
-        struct xwup_thd * swt, * cthd;
+        struct xwup_thd * swt;
+        struct xwup_thd * cthd;
         xwer_t rc;
 
         xwskd = &xwup_skd;
@@ -934,10 +934,10 @@ xwer_t xwup_skd_req_swcx(void)
         xwskd = &xwup_skd;
         xwospl_cpuirq_save_lc(&cpuirq);
         xwskd->req_schedule_cnt++;
-        if (__xwcc_unlikely(NULL != xwskd->pstk)) {
+        if (NULL != xwskd->pstk) {
                 xwospl_cpuirq_restore_lc(cpuirq);
                 rc = -EINPROGRESS;
-        } else if (__xwcc_unlikely(XWUP_SKD_BH_STK(xwskd) == xwskd->cstk)) {
+        } else if (XWUP_SKD_BH_STK(xwskd) == xwskd->cstk) {
                 xwospl_cpuirq_restore_lc(cpuirq);
                 rc = -EBUSY;
         } else {
@@ -947,6 +947,7 @@ xwer_t xwup_skd_req_swcx(void)
                 if (XWOK == rc) {
                         xwospl_skd_req_swcx(xwskd);
                 } else {
+                        // cppcheck-suppress [misra-c2012-17.2]
                         xwup_skd_finish_swcx_lic(xwskd);
                 }
         }
@@ -979,6 +980,7 @@ void xwup_skd_finish_swcx_lic(struct xwup_skd * xwskd)
                 } else if (xwskd->req_schedule_cnt > 0) {
                         xwskd->req_schedule_cnt = 0;
                         xwospl_cpuirq_restore_lc(cpuirq);
+                        // cppcheck-suppress [misra-c2012-17.2]
                         xwup_skd_req_swcx();
                 } else {
                         xwospl_cpuirq_restore_lc(cpuirq);
@@ -995,6 +997,7 @@ void xwup_skd_finish_swcx_lic(struct xwup_skd * xwskd)
                 } else if (xwskd->req_schedule_cnt > 0) {
                         xwskd->req_schedule_cnt = 0;
                         xwospl_cpuirq_restore_lc(cpuirq);
+                        // cppcheck-suppress [misra-c2012-17.2]
                         xwup_skd_req_swcx();
                 } else {
                         xwospl_cpuirq_restore_lc(cpuirq);
@@ -1021,7 +1024,7 @@ xwer_t xwup_skd_req_swcx(void)
         xwskd = &xwup_skd;
         xwospl_cpuirq_save_lc(&cpuirq);
         xwskd->req_schedule_cnt++;
-        if (__xwcc_unlikely(NULL != xwskd->pstk)) {
+        if (NULL != xwskd->pstk) {
                 xwospl_cpuirq_restore_lc(cpuirq);
                 rc = -EINPROGRESS;
         } else {
@@ -1031,6 +1034,7 @@ xwer_t xwup_skd_req_swcx(void)
                 if (XWOK == rc) {
                         xwospl_skd_req_swcx(xwskd);
                 } else {
+                        // cppcheck-suppress [misra-c2012-17.2]
                         xwup_skd_finish_swcx_lic(xwskd);
                 }
         }
@@ -1055,6 +1059,7 @@ void xwup_skd_finish_swcx_lic(struct xwup_skd * xwskd)
         if (xwskd->req_schedule_cnt > 0) {
                 xwskd->req_schedule_cnt = 0;
                 xwospl_cpuirq_restore_lc(cpuirq);
+                // cppcheck-suppress [misra-c2012-17.2]
                 xwup_skd_req_swcx();
         } else {
                 xwospl_cpuirq_restore_lc(cpuirq);
@@ -1069,11 +1074,13 @@ __xwup_code
 void xwup_skd_intr_all(void)
 {
         struct xwup_skd * xwskd;
-        struct xwup_thd * c, * n;
+        struct xwup_thd * c;
+        struct xwup_thd * n;
         xwreg_t cpuirq;
 
         xwskd = &xwup_skd;
         xwospl_cpuirq_save_lc(&cpuirq);
+        // cppcheck-suppress [misra-c2012-12.3, misra-c2012-14.2]
         xwlib_bclst_itr_next_entry_safe(c, n, &xwskd->thdlist,
                                         struct xwup_thd, thdnode) {
                 xwospl_cpuirq_restore_lc(cpuirq);
@@ -1158,7 +1165,7 @@ xwer_t xwup_skd_dec_wklkcnt(void)
                 xwskd->pm.wklkcnt--;
                 if (XWUP_SKD_WKLKCNT_FREEZING == xwskd->pm.wklkcnt) {
                         lpm = true;
-                }/* else {} */
+                }
                 rc = XWOK;
         } else {
                 rc = -EACCES;
@@ -1166,7 +1173,7 @@ xwer_t xwup_skd_dec_wklkcnt(void)
         xwospl_cpuirq_restore_lc(cpuirq);
         if (lpm) {
                 xwospl_skd_suspend(xwskd);
-        }/* else {} */
+        }
         return rc;
 }
 
@@ -1255,13 +1262,13 @@ void xwup_skd_notify_allfrz_lc(struct xwup_skd * xwskd)
                         xwskd->pm.wklkcnt--;
                         if (xwskd->pm.cb.suspend) {
                                 xwskd->pm.cb.suspend(xwskd->pm.cb.arg);
-                        }/* else {} */
+                        }
                         xwskd->pm.wklkcnt--;
                         xwospl_cpuirq_restore_lc(cpuirq);
                         while (XWUP_SKD_WKLKCNT_SUSPENDED == xwskd->pm.wklkcnt) {
                                 if (xwskd->pm.cb.sleep) {
                                         xwskd->pm.cb.sleep(xwskd->pm.cb.arg);
-                                }/* else {} */
+                                }
                         }
                 } else {
                         xwospl_cpuirq_restore_lc(cpuirq);
@@ -1332,16 +1339,16 @@ xwer_t xwup_skd_resume_lic(struct xwup_skd * xwskd)
                 if (XWUP_SKD_WKLKCNT_SUSPENDED == xwskd->pm.wklkcnt) {
                         xwskd->pm.wklkcnt++;
                         xwospl_cpuirq_restore_lc(cpuirq);
-                        if (xwskd->pm.cb.wakeup) {
+                        if (NULL != xwskd->pm.cb.wakeup) {
                                 xwskd->pm.cb.wakeup(xwskd->pm.cb.arg);
-                        }/* else {} */
+                        }
                         xwospl_cpuirq_save_lc(&cpuirq);
                 }
                 if (XWUP_SKD_WKLKCNT_RESUMING == xwskd->pm.wklkcnt) {
                         xwskd->pm.wklkcnt++;
-                        if (xwskd->pm.cb.resume) {
+                        if (NULL != xwskd->pm.cb.resume) {
                                 xwskd->pm.cb.resume(xwskd->pm.cb.arg);
-                        }/* else {} */
+                        }
                 }
                 if (XWUP_SKD_WKLKCNT_ALLFRZ == xwskd->pm.wklkcnt) {
                         xwskd->pm.wklkcnt++;
@@ -1440,7 +1447,7 @@ void xwup_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
         rc = xwup_irq_get_id(&irqn);
         if (XWOK == rc) {
                 ctx = XWUP_SKD_CONTEXT_ISR;
-                if (irqnbuf) {
+                if (NULL != irqnbuf) {
                         *irqnbuf = irqn;
                 }
         } else {
@@ -1457,7 +1464,7 @@ void xwup_skd_get_context_lc(xwsq_t * ctxbuf, xwirq_t * irqnbuf)
                         ctx = XWUP_SKD_CONTEXT_BOOT;
                 }
         }
-        if (ctxbuf) {
+        if (NULL != ctxbuf) {
                 *ctxbuf = ctx;
         }
 }

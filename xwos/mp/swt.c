@@ -52,15 +52,15 @@ static __xwmp_code
 xwer_t xwmp_swt_activate(struct xwmp_swt * swt, xwsq_t flag, xwobj_gc_f gcfunc);
 
 static __xwmp_code
-xwer_t xwmp_swt_sgc(void * swt);
+xwer_t xwmp_swt_sgc(struct xwos_object * obj);
 
 #if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
 static __xwmp_code
-xwer_t xwmp_swt_dgc(void * swt);
+xwer_t xwmp_swt_dgc(struct xwos_object * obj);
 #endif
 
 static __xwmp_code
-void xwmp_swt_ttn_cb(void * entry);
+void xwmp_swt_ttn_callback(struct xwmp_ttn * ttn);
 
 #if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
 /**
@@ -103,7 +103,7 @@ struct xwmp_swt * xwmp_swt_alloc(void)
         rc = xwmm_memslice_alloc(&xwmp_swt_cache, &mem.anon);
         if (rc < 0) {
                 mem.swt = err_ptr(rc);
-        }/* else {} */
+        }
         return mem.swt;
 #  elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
         struct xwmp_swt * swt;
@@ -150,7 +150,7 @@ void xwmp_swt_construct(struct xwmp_swt * swt)
         xwos_object_construct(&swt->xwobj);
         swt->xwskd = NULL;
         swt->flag = 0;
-        xwmp_ttn_init(&swt->ttn, (xwptr_t)swt, XWMP_TTN_TYPE_SWT);
+        xwmp_ttn_init(&swt->ttn);
         swt->cb = NULL;
         swt->arg = NULL;
         swt->period = 0;
@@ -171,9 +171,12 @@ void xwmp_swt_destruct(struct xwmp_swt * swt)
  * @param[in] swt: 软件定时器对象的指针
  */
 static __xwmp_code
-xwer_t xwmp_swt_sgc(void * swt)
+xwer_t xwmp_swt_sgc(struct xwos_object * obj)
 {
-        xwmp_swt_destruct((struct xwmp_swt *)swt);
+        struct xwmp_swt * swt;
+
+        swt = xwcc_derof(obj, struct xwmp_swt, xwobj);
+        xwmp_swt_destruct(swt);
         return XWOK;
 }
 
@@ -183,8 +186,11 @@ xwer_t xwmp_swt_sgc(void * swt)
  * @param[in] swt: 软件定时器对象的指针
  */
 static __xwmp_code
-xwer_t xwmp_swt_dgc(void * swt)
+xwer_t xwmp_swt_dgc(struct xwos_object * obj)
 {
+        struct xwmp_swt * swt;
+
+        swt = xwcc_derof(obj, struct xwmp_swt, xwobj);
         xwmp_swt_free(swt);
         return XWOK;
 }
@@ -205,7 +211,7 @@ xwer_t xwmp_swt_activate(struct xwmp_swt * swt,
         xwer_t rc;
 
         rc = xwos_object_activate(&swt->xwobj, gcfunc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_xwobj_activate;
         }
         swt->xwskd = xwmp_skd_get_lc();
@@ -243,7 +249,7 @@ xwer_t xwmp_swt_create(struct xwmp_swt ** swtbuf, xwsq_t flag)
                 goto err_swt_alloc;
         }
         rc = xwmp_swt_activate(swt, flag, xwmp_swt_dgc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_swt_activate;
         }
         *swtbuf = swt;
@@ -293,7 +299,7 @@ xwer_t xwmp_swt_put(struct xwmp_swt * swt)
  * @param[in] entry: 软件定时器对象的指针
  */
 static __xwmp_code
-void xwmp_swt_ttn_cb(void * entry)
+void xwmp_swt_ttn_callback(struct xwmp_ttn * ttn)
 {
         struct xwmp_swt * swt;
         struct xwmp_tt * xwtt;
@@ -301,10 +307,10 @@ void xwmp_swt_ttn_cb(void * entry)
         xwtm_t to;
         xwreg_t cpuirq;
 
-        swt = entry;
+        swt = xwcc_derof(ttn, struct xwmp_swt, ttn);
         xwtt = &swt->xwskd->tt;
         swt->cb(swt, swt->arg);
-        if (XWMP_SWT_FLAG_RESTART & swt->flag) {
+        if (0 != (XWMP_SWT_FLAG_RESTART & swt->flag)) {
                 to = xwtm_add_safely(swt->ttn.wkup_xwtm, swt->period);
                 /* 若此时，其他CPU调用 `xwmp_swt_stop()` ，会失败，
                    `xwmp_swt_stop()` 只会减少一次引用计数。
@@ -315,7 +321,7 @@ void xwmp_swt_ttn_cb(void * entry)
                         swt->ttn.wkup_xwtm = to;
                         xwaop_write(xwsq_t, &swt->ttn.wkuprs,
                                     XWMP_TTN_WKUPRS_UNKNOWN, NULL);
-                        swt->ttn.cb = xwmp_swt_ttn_cb;
+                        swt->ttn.cb = xwmp_swt_ttn_callback;
                         /* 在本地CPU执行 `xwmp_tt_add_locked()` 的过程中，其他CPU可能会执行
                            `xwmp_swt_stop() + xwmp_swt_delete()` ，导致 `swt` 成为野指针。
                            因此，需要在 `xwmp_tt_add_locked()` 之前增加对 `swt` 的引用。
@@ -359,11 +365,11 @@ xwer_t xwmp_swt_start(struct xwmp_swt * swt,
         xwtt = &swt->xwskd->tt;
         to = xwtm_add_safely(origin, period);
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
-        if (__xwcc_unlikely(NULL != swt->ttn.cb)) {
+        if (NULL != swt->ttn.cb) {
                 rc = -EALREADY;
                 goto err_already;
         }
-        if (XWMP_SWT_FLAG_RESTART & swt->flag) {
+        if (0 != (XWMP_SWT_FLAG_RESTART & swt->flag)) {
                 /* 多增加一次引用计数作为继续重启定时器的依据。 */
                 xwmp_swt_grab(swt);
         }
@@ -373,7 +379,7 @@ xwer_t xwmp_swt_start(struct xwmp_swt * swt,
         swt->ttn.wkup_xwtm = to;
         xwaop_write(xwsq_t, &swt->ttn.wkuprs, XWMP_TTN_WKUPRS_UNKNOWN, NULL);
         swt->ttn.xwtt = xwtt;
-        swt->ttn.cb = xwmp_swt_ttn_cb;
+        swt->ttn.cb = xwmp_swt_ttn_callback;
         rc = xwmp_tt_add_locked(xwtt, &swt->ttn, cpuirq);
         if (rc < 0) {
                 goto err_swt_add;
@@ -382,7 +388,7 @@ xwer_t xwmp_swt_start(struct xwmp_swt * swt,
         return XWOK;
 
 err_swt_add:
-        if (XWMP_SWT_FLAG_RESTART & swt->flag) {
+        if (0 != (XWMP_SWT_FLAG_RESTART & swt->flag)) {
                 xwmp_swt_put(swt);
         }
 err_already:
@@ -402,7 +408,7 @@ xwer_t xwmp_swt_stop(struct xwmp_swt * swt)
         xwtt = &swt->xwskd->tt;
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         rc = xwmp_tt_remove_locked(xwtt, &swt->ttn);
-        if (XWMP_SWT_FLAG_RESTART & swt->flag) {
+        if (0 != (XWMP_SWT_FLAG_RESTART & swt->flag)) {
                 xwmp_swt_put(swt);
         }
         xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);

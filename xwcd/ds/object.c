@@ -70,7 +70,7 @@ xwer_t xwds_obj_remove(struct xwds_object * obj)
                                 NULL, NULL);
         if (XWOK == rc) {
                 if (obj->xwobj.gcfunc) {
-                        rc = obj->xwobj.gcfunc(obj);
+                        rc = obj->xwobj.gcfunc(&obj->xwobj);
                 }
         } else {
                 rc = -EPERM;

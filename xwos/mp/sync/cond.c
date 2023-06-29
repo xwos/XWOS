@@ -63,11 +63,11 @@ void xwmp_cond_free(struct xwmp_cond * cond);
 #endif
 
 static __xwmp_code
-xwer_t xwmp_cond_sgc(void * cond);
+xwer_t xwmp_cond_sgc(struct xwos_object * obj);
 
 #if (1 == XWOSRULE_SYNC_COND_CREATE_DELETE)
 static __xwmp_code
-xwer_t xwmp_cond_dgc(void * cond);
+xwer_t xwmp_cond_dgc(struct xwos_object * obj);
 #endif
 
 static __xwmp_code
@@ -150,7 +150,7 @@ struct xwmp_cond * xwmp_cond_alloc(void)
         rc = xwmm_memslice_alloc(&xwmp_cond_cache, &mem.anon);
         if (rc < 0) {
                 mem.cond = err_ptr(rc);
-        }/* else {} */
+        }
         return mem.cond;
 #  elif defined(XWOSCFG_SYNC_COND_STDC_MM) && (1 == XWOSCFG_SYNC_COND_STDC_MM)
         struct xwmp_cond * cond;
@@ -212,9 +212,12 @@ void xwmp_cond_destruct(struct xwmp_cond * cond)
  * @param[in] cond: 条件量对象的指针
  */
 static __xwmp_code
-xwer_t xwmp_cond_sgc(void * cond)
+xwer_t xwmp_cond_sgc(struct xwos_object * obj)
 {
-        xwmp_cond_destruct((struct xwmp_cond *)cond);
+        struct xwmp_cond * cond;
+
+        cond = xwcc_derof(obj, struct xwmp_cond, synobj.xwobj);
+        xwmp_cond_destruct(cond);
         return XWOK;
 }
 
@@ -224,9 +227,12 @@ xwer_t xwmp_cond_sgc(void * cond)
  * @param[in] cond: 条件量对象的指针
  */
 static __xwmp_code
-xwer_t xwmp_cond_dgc(void * cond)
+xwer_t xwmp_cond_dgc(struct xwos_object * obj)
 {
-        xwmp_cond_free((struct xwmp_cond *)cond);
+        struct xwmp_cond * cond;
+
+        cond = xwcc_derof(obj, struct xwmp_cond, synobj.xwobj);
+        xwmp_cond_free(cond);
         return XWOK;
 }
 #endif
@@ -242,7 +248,7 @@ xwer_t xwmp_cond_activate(struct xwmp_cond * cond, xwobj_gc_f gcfunc)
         xwer_t rc;
 
         rc = xwmp_synobj_activate(&cond->synobj, gcfunc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_synobj_activate;
         }
         xwmp_plwq_init(&cond->wq.pl);
@@ -275,11 +281,11 @@ xwer_t xwmp_cond_create(struct xwmp_cond ** condbuf)
 
         *condbuf = NULL;
         cond = xwmp_cond_alloc();
-        if (__xwcc_unlikely(is_err(cond))) {
+        if (is_err(cond)) {
                 rc = ptr_err(cond);
         } else {
                 rc = xwmp_cond_activate(cond, xwmp_cond_dgc);
-                if (__xwcc_unlikely(rc < 0)) {
+                if (rc < 0) {
                         xwmp_cond_free(cond);
                 } else {
                         *condbuf = cond;
@@ -330,7 +336,7 @@ xwer_t xwmp_cond_bind(struct xwmp_cond * cond,
         xwer_t rc;
 
         rc = xwmp_cond_grab(cond);
-        if (__xwcc_likely(rc > 0)) {
+        if (rc > 0) {
                 goto err_cond_bind;
         }
         xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
@@ -366,7 +372,7 @@ xwer_t xwmp_cond_freeze(struct xwmp_cond * cond)
 
         rc = XWOK;
         xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
-        if (__xwcc_unlikely(cond->count < 0)) {
+        if (cond->count < 0) {
                 rc = -EALREADY;
         } else {
                 cond->count = XWMP_COND_NEGTIVE;
@@ -383,7 +389,7 @@ xwer_t xwmp_cond_thaw(struct xwmp_cond * cond)
 
         rc = XWOK;
         xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
-        if (__xwcc_unlikely(cond->count >= 0)) {
+        if (cond->count >= 0) {
                 rc = -EALREADY;
         } else {
                 cond->count = XWMP_COND_POSITIVE;
@@ -416,7 +422,7 @@ xwer_t xwmp_cond_intr(struct xwmp_cond * cond, struct xwmp_wqn * wqn)
                 wqn->cb = NULL;
                 xwmp_splk_unlock(&wqn->lock);
                 xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
-                cb(wqn->owner);
+                cb(wqn);
         } else {
                 xwmp_splk_unlock(&wqn->lock);
                 xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
@@ -442,7 +448,7 @@ xwer_t xwmp_cond_intr_all(struct xwmp_cond * cond)
                 c->cb = NULL;
                 xwmp_splk_unlock(&c->lock);
                 xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
-                cb(c->owner);
+                cb(c);
                 xwmp_plwq_lock_cpuirq(&cond->wq.pl);
         }
         xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
@@ -459,13 +465,13 @@ xwer_t xwmp_cond_broadcast_once(struct xwmp_cond * cond, bool * retry)
 
         rc = XWOK;
         xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
-        if (__xwcc_unlikely(cond->count < 0)) {
+        if (cond->count < 0) {
                 xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
                 rc = -ENEGATIVE;
                 *retry = false;
         } else {
                 wqn = xwmp_plwq_choose_locked(&cond->wq.pl);
-                if (wqn) {
+                if (NULL != wqn) {
                         wqn->wq = NULL;
                         wqn->type = XWMP_WQTYPE_UNKNOWN;
                         xwaop_store(xwsq_t, &wqn->reason,
@@ -474,7 +480,7 @@ xwer_t xwmp_cond_broadcast_once(struct xwmp_cond * cond, bool * retry)
                         wqn->cb = NULL;
                         xwmp_splk_unlock(&wqn->lock);
                         xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
-                        cb(wqn->owner);
+                        cb(wqn);
                         *retry = true;
                 } else {
                         xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
@@ -495,13 +501,14 @@ xwer_t xwmp_cond_broadcast(struct xwmp_cond * cond)
                 rc = xwmp_cond_broadcast_once(cond, &retry);
         } while (retry);
 #if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
-        if (__xwcc_likely(XWOK == rc)) {
+        if (XWOK == rc) {
                 struct xwmp_evt * evt;
                 struct xwmp_synobj * synobj;
                 xwreg_t cpuirq;
 
                 synobj = &cond->synobj;
                 xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
+                // cppcheck-suppress [misra-c2012-17.7]
                 xwmb_mp_load_acquire(struct xwmp_evt *, evt, &synobj->sel.evt);
                 if (NULL != evt) {
                         xwmp_sel_obj_s1i(evt, synobj);
@@ -521,12 +528,12 @@ xwer_t xwmp_cond_unicast(struct xwmp_cond * cond)
         xwer_t rc;
 
         xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
-        if (__xwcc_unlikely(cond->count < 0)) {
+        if (cond->count < 0) {
                 xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
                 rc = -ENEGATIVE;
         } else {
                 wqn = xwmp_plwq_choose_locked(&cond->wq.pl);
-                if (wqn) {
+                if (NULL != wqn) {
                         wqn->wq = NULL;
                         wqn->type = XWMP_WQTYPE_UNKNOWN;
                         xwaop_store(xwsq_t, &wqn->reason,
@@ -535,7 +542,7 @@ xwer_t xwmp_cond_unicast(struct xwmp_cond * cond)
                         wqn->cb = NULL;
                         xwmp_splk_unlock(&wqn->lock);
                         xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
-                        cb(wqn->owner);
+                        cb(wqn);
                 } else {
                         xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
                 }
@@ -577,7 +584,7 @@ xwer_t xwmp_cond_unlock(void * lock, xwsq_t lktype, void * lkdata)
                 xwmp_sqlk_rdex_unlock(ulk.xwmp.sqlk);
                 break;
         case XWOS_LK_CALLBACK:
-                if (ulk.cb->unlock) {
+                if (NULL != ulk.cb->unlock) {
                         rc = ulk.cb->unlock(lkdata);
                 }
                 break;
@@ -631,7 +638,7 @@ xwer_t xwmp_cond_lock(void * lock, xwsq_t lktype, xwtm_t to, bool unintr,
                 xwmp_sqlk_rdex_lock(ulk.xwmp.sqlk);
                 break;
         case XWOS_LK_CALLBACK:
-                if (ulk.cb->lock) {
+                if (NULL != ulk.cb->lock) {
                         rc = ulk.cb->lock(lkdata);
                 }
                 break;
@@ -663,12 +670,12 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
 
         xwtt = &xwskd->tt;
         xwmp_splk_lock(&thd->stlock);
-        XWOS_BUG_ON((XWMP_SKDOBJ_ST_BLOCKING | XWMP_SKDOBJ_ST_SLEEPING |
-                     XWMP_SKDOBJ_ST_READY | XWMP_SKDOBJ_ST_STANDBY |
-                     XWMP_SKDOBJ_ST_FROZEN | XWMP_SKDOBJ_ST_MIGRATING)
-                    & thd->state);
+        XWOS_BUG_ON(0 != ((XWMP_SKDOBJ_ST_BLOCKING | XWMP_SKDOBJ_ST_SLEEPING |
+                           XWMP_SKDOBJ_ST_READY | XWMP_SKDOBJ_ST_STANDBY |
+                           XWMP_SKDOBJ_ST_FROZEN | XWMP_SKDOBJ_ST_MIGRATING)
+                          & thd->state));
         /* 检查是否被中断 */
-        if ((XWMP_SKDOBJ_ST_FREEZABLE | XWMP_SKDOBJ_ST_EXITING) & thd->state) {
+        if (0 !=((XWMP_SKDOBJ_ST_FREEZABLE | XWMP_SKDOBJ_ST_EXITING) & thd->state)) {
                 xwmp_splk_unlock(&thd->stlock);
                 xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
                 rc = -EINTR;
@@ -688,7 +695,7 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         rc = xwmp_cond_unlock(lock, lktype, lkdata);
         if (XWOK == rc){
                 *lkst = XWOS_LKST_UNLOCKED;
-        }/* else {} */
+        }
 
         /* 加入时间树 */
         xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
@@ -699,11 +706,11 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
 
         /* 调度 */
-        xwmp_skd_svpmpt(xwskd, &pmpt);
-        xwmp_skd_rspmpt(xwskd, 0);
+        xwmp_skd_svpmpt(xwskd, &pmpt); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rspmpt(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
-        xwmp_skd_svbh(xwskd, &bh);
-        xwmp_skd_rsbh(xwskd, 0);
+        xwmp_skd_svbh(xwskd, &bh); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rsbh(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
 #endif
         xwospl_cpuirq_enable_lc();
         xwmp_skd_wakelock_unlock(xwskd);
@@ -711,9 +718,9 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         xwmp_skd_wakelock_lock(xwskd);
         xwospl_cpuirq_restore_lc(cpuirq);
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
-        xwmp_skd_rsbh(xwskd, bh);
+        xwmp_skd_rsbh(xwskd, bh); // cppcheck-suppress [misra-c2012-17.7]
 #endif
-        xwmp_skd_rspmpt(xwskd, pmpt);
+        xwmp_skd_rspmpt(xwskd, pmpt); // cppcheck-suppress [misra-c2012-17.7]
 
         /* 判断唤醒原因 */
         xwmb_mp_rmb();
@@ -727,7 +734,7 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
                         xwmp_splk_lock(&thd->stlock);
                         xwbop_c0m(xwsq_t, &thd->state, XWMP_SKDOBJ_ST_SLEEPING);
                         xwmp_splk_unlock(&thd->stlock);
-                }/* else {} */
+                }
                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                 rc = -EINTR;
         } else if (XWMP_WQN_REASON_UP == reason) {
@@ -737,14 +744,14 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
                         xwmp_splk_lock(&thd->stlock);
                         xwbop_c0m(xwsq_t, &thd->state, XWMP_SKDOBJ_ST_SLEEPING);
                         xwmp_splk_unlock(&thd->stlock);
-                }/* else {} */
+                }
                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                if (__xwcc_likely(XWOS_LKST_UNLOCKED == *lkst)) {
+                if (XWOS_LKST_UNLOCKED == *lkst) {
                         rc = xwmp_cond_lock(lock, lktype, to, false, lkdata);
                         if (XWOK == rc) {
                                 *lkst = XWOS_LKST_LOCKED;
-                        }/* else {} */
-                }/* else {} */
+                        }
+                }
                 rc = XWOK;
         } else if (XWMP_TTN_WKUPRS_TIMEDOUT == wkuprs) {
                 xwmp_plwq_lock_cpuirq(&cond->wq.pl);
@@ -770,13 +777,13 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
                         if (XWMP_WQN_REASON_INTR == reason) {
                                 rc = -EINTR;
                         } else if (XWMP_WQN_REASON_UP == reason) {
-                                if (__xwcc_likely(XWOS_LKST_UNLOCKED == *lkst)) {
+                                if (XWOS_LKST_UNLOCKED == *lkst) {
                                         rc = xwmp_cond_lock(lock, lktype, to, false,
                                                             lkdata);
                                         if (XWOK == rc) {
                                                 *lkst = XWOS_LKST_LOCKED;
                                         }
-                                }/* else {} */
+                                }
                                 rc = XWOK;
                         } else {
                                 XWOS_BUG();
@@ -806,13 +813,13 @@ xwer_t xwmp_cond_blkthd_to_unlkwq_cpuirqrs(struct xwmp_cond * cond,
                         if (XWMP_WQN_REASON_INTR == reason) {
                                 rc = -EINTR;
                         } else if (XWMP_WQN_REASON_UP == reason) {
-                                if (__xwcc_likely(XWOS_LKST_UNLOCKED == *lkst)) {
+                                if (XWOS_LKST_UNLOCKED == *lkst) {
                                         rc = xwmp_cond_lock(lock, lktype, to, false,
                                                             lkdata);
                                         if (XWOK == rc) {
                                                 *lkst = XWOS_LKST_LOCKED;
                                         }
-                                }/* else {} */
+                                }
                                 rc = XWOK;
                         } else {
                                 XWOS_BUG();
@@ -840,7 +847,7 @@ xwer_t xwmp_cond_test(struct xwmp_cond * cond,
 
         xwmp_plwq_lock_cpuirqsv(&cond->wq.pl, &cpuirq);
         rc = xwmp_skd_wakelock_lock(xwskd);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 /* 当前调度器正准备休眠，线程需被冻结，返回-EINTR。*/
                 xwmp_plwq_unlock_cpuirqrs(&cond->wq.pl, cpuirq);
                 rc = -EINTR;
@@ -874,12 +881,13 @@ xwer_t xwmp_cond_wait_to(struct xwmp_cond * cond,
 
         *lkst = XWOS_LKST_LOCKED;
         cthd = xwmp_skd_get_cthd_lc();
+        // cppcheck-suppress [misra-c2012-17.7]
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &cthd->xwskd);
         hwt = &xwskd->tt.hwt;
         now = xwmp_syshwt_get_timetick(hwt);
-        if (__xwcc_unlikely(xwtm_cmp(to, now) < 0)) {
+        if (xwtm_cmp(to, now) < 0) {
                 rc = -ETIMEDOUT;
-        } else if (__xwcc_unlikely(xwtm_cmp(to, now) == 0)) {
+        } else if (xwtm_cmp(to, now) == 0) {
                 rc = xwmp_cond_unlock(lock, lktype, lkdata);
                 if (XWOK == rc) {
                         *lkst = XWOS_LKST_UNLOCKED;
@@ -908,12 +916,13 @@ xwer_t xwmp_cond_blkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
 #endif
         xwer_t rc;
 
+        // cppcheck-suppress [misra-c2012-17.7]
         xwmb_mp_load_acquire(struct xwmp_skd *, xwskd, &thd->xwskd);
         xwmp_splk_lock(&thd->stlock);
-        XWOS_BUG_ON((XWMP_SKDOBJ_ST_BLOCKING | XWMP_SKDOBJ_ST_SLEEPING |
-                     XWMP_SKDOBJ_ST_READY | XWMP_SKDOBJ_ST_STANDBY |
-                     XWMP_SKDOBJ_ST_FROZEN | XWMP_SKDOBJ_ST_MIGRATING)
-                    & thd->state);
+        XWOS_BUG_ON(0 != ((XWMP_SKDOBJ_ST_BLOCKING | XWMP_SKDOBJ_ST_SLEEPING |
+                           XWMP_SKDOBJ_ST_READY | XWMP_SKDOBJ_ST_STANDBY |
+                           XWMP_SKDOBJ_ST_FROZEN | XWMP_SKDOBJ_ST_MIGRATING)
+                          & thd->state));
         /* 加入等待队列 */
         dprio = thd->dprio.r;
         xwbop_c0m(xwsq_t, &thd->state, XWMP_SKDOBJ_ST_RUNNING);
@@ -929,34 +938,34 @@ xwer_t xwmp_cond_blkthd_unlkwq_cpuirqrs(struct xwmp_cond * cond,
         rc = xwmp_cond_unlock(lock, lktype, lkdata);
         if (XWOK == rc){
                 *lkst = XWOS_LKST_UNLOCKED;
-        }/* else {} */
+        }
 
         /* 调度 */
-        xwmp_skd_svpmpt(xwskd, &pmpt);
-        xwmp_skd_rspmpt(xwskd, 0);
+        xwmp_skd_svpmpt(xwskd, &pmpt); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rspmpt(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
-        xwmp_skd_svbh(xwskd, &bh);
-        xwmp_skd_rsbh(xwskd, 0);
+        xwmp_skd_svbh(xwskd, &bh); // cppcheck-suppress [misra-c2012-17.7]
+        xwmp_skd_rsbh(xwskd, 0); // cppcheck-suppress [misra-c2012-17.7]
 #endif
         xwospl_cpuirq_enable_lc();
         xwmp_skd_req_swcx(xwskd);
         xwospl_cpuirq_restore_lc(cpuirq);
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
-        xwmp_skd_rsbh(xwskd, bh);
+        xwmp_skd_rsbh(xwskd, bh); // cppcheck-suppress [misra-c2012-17.7]
 #endif
-        xwmp_skd_rspmpt(xwskd, pmpt);
+        xwmp_skd_rspmpt(xwskd, pmpt); // cppcheck-suppress [misra-c2012-17.7]
 
         /* 判断唤醒原因 */
         xwmb_mp_rmb();
         /* 确保对唤醒原因的读取操作发生在线程状态切换之后 */
         reason = xwaop_load(xwsq_t, &thd->wqn.reason, xwaop_mo_relaxed);
         if (XWMP_WQN_REASON_UP == reason) {
-                if (__xwcc_likely(XWOS_LKST_UNLOCKED == *lkst)) {
+                if (XWOS_LKST_UNLOCKED == *lkst) {
                         rc = xwmp_cond_lock(lock, lktype, 0, true, lkdata);
                         if (XWOK == rc) {
                                 *lkst = XWOS_LKST_LOCKED;
-                        }/* else {} */
-                }/* else {} */
+                        }
+                }
                 rc = XWOK;
         } else {
                 XWOS_BUG();

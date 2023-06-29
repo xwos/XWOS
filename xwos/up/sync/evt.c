@@ -38,15 +38,6 @@ static __xwup_data struct xwmm_memslice xwup_evt_cache;
 const __xwup_rodata char xwup_evt_cache_name[] = "xwup.sync.evt.cache";
 #endif
 
-static __xwup_code
-void xwup_evt_construct(struct xwup_evt * evt);
-
-static __xwup_code
-void xwup_evt_destruct(struct xwup_evt * evt);
-
-static __xwup_code
-void xwup_evt_setup(struct xwup_evt * evt, xwsz_t num, xwbmp_t * bmp, xwbmp_t * msk);
-
 #if (1 == XWOSRULE_SYNC_EVT_CREATE_DELETE)
 static __xwup_code
 struct xwup_evt * xwup_evt_alloc(xwsz_t num);
@@ -56,11 +47,20 @@ void xwup_evt_free(struct xwup_evt * evt);
 #endif
 
 static __xwup_code
-xwer_t xwup_evt_sgc(void * evt);
+void xwup_evt_construct(struct xwup_evt * evt);
+
+static __xwup_code
+void xwup_evt_setup(struct xwup_evt * evt, xwsz_t num, xwbmp_t * bmp, xwbmp_t * msk);
+
+static __xwup_code
+void xwup_evt_destruct(struct xwup_evt * evt);
+
+static __xwup_code
+xwer_t xwup_evt_sgc(struct xwos_object * obj);
 
 #if (1 == XWOSRULE_SYNC_EVT_CREATE_DELETE)
 static __xwup_code
-xwer_t xwup_evt_dgc(void * evt);
+xwer_t xwup_evt_dgc(struct xwos_object * obj);
 #endif
 
 static __xwup_code
@@ -86,27 +86,6 @@ xwer_t xwup_flg_wait_to_edge(struct xwup_evt * evt, xwsq_t trigger,
                              xwbmp_t origin[], xwbmp_t msk[],
                              xwtm_t to);
 
-static __xwup_code
-void xwup_evt_construct(struct xwup_evt * evt)
-{
-        xwup_cond_construct(&evt->cond);
-}
-
-static __xwup_code
-void xwup_evt_destruct(struct xwup_evt * evt)
-{
-        xwup_cond_destruct(&evt->cond);
-}
-
-static __xwup_code
-void xwup_evt_setup(struct xwup_evt * evt, xwsz_t num,
-                    xwbmp_t * bmp, xwbmp_t * msk)
-{
-        evt->num = num;
-        evt->bmp = bmp;
-        evt->msk = msk;
-}
-
 #if defined(XWOSCFG_SYNC_EVT_MEMSLICE) && (1 == XWOSCFG_SYNC_EVT_MEMSLICE)
 /**
  * @brief XWUP INIT CODE：初始化结构体 `xwup_evt` 的对象缓存
@@ -122,7 +101,7 @@ xwer_t xwup_evt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
         xwer_t rc;
 
         rc = xwmm_memslice_init(&xwup_evt_cache, zone_origin, zone_size,
-                                sizeof(struct xwup_evt) * 3,
+                                sizeof(struct xwup_evt) * 3U,
                                 xwup_evt_cache_name,
                                 (ctor_f)xwup_evt_construct,
                                 (dtor_f)xwup_evt_destruct);
@@ -143,8 +122,10 @@ struct xwup_evt * xwup_evt_alloc(xwsz_t num)
                 struct xwup_evt * evt;
                 void * anon;
         } mem;
-        xwbmp_t * bmp, * msk;
-        xwsz_t bmpnum, bmpsize;
+        xwbmp_t * bmp;
+        xwbmp_t * msk;
+        xwsz_t bmpnum;
+        xwsz_t bmpsize;
         xwer_t rc;
 
         bmpnum = BITS_TO_XWBMP_T(num);
@@ -165,8 +146,10 @@ struct xwup_evt * xwup_evt_alloc(xwsz_t num)
         return mem.evt;
 #  elif defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
         struct xwup_evt * evt;
-        xwbmp_t * bmp, * msk;
-        xwsz_t bmpnum, bmpsize;
+        xwbmp_t * bmp;
+        xwbmp_t * msk;
+        xwsz_t bmpnum;
+        xwsz_t bmpsize;
 
         bmpnum = BITS_TO_XWBMP_T(num);
         bmpsize = bmpnum * sizeof(xwbmp_t);
@@ -197,6 +180,7 @@ void xwup_evt_free(struct xwup_evt * evt)
 #  if defined(XWOSCFG_SYNC_EVT_MEMSLICE) && (1 == XWOSCFG_SYNC_EVT_MEMSLICE)
         xwmm_memslice_free(&xwup_evt_cache, evt);
 #  elif defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
+        xwup_evt_destruct(evt);
         free(evt);
 #  else
         XWOS_UNUSED(evt);
@@ -204,20 +188,160 @@ void xwup_evt_free(struct xwup_evt * evt)
 }
 #endif
 
+/**
+ * @brief 事件对象的构造函数
+ * @param[in] evt: 事件对象的指针
+ */
 static __xwup_code
-xwer_t xwup_evt_sgc(void * evt)
+void xwup_evt_construct(struct xwup_evt * evt)
 {
-        xwup_evt_destruct((struct xwup_evt *)evt);
+        xwup_cond_construct(&evt->cond);
+}
+
+/**
+ * @brief 为事件对象安装位图数组
+ * @param[in] evt: 事件对象的指针
+ * @param[in] num: 事件的数量
+ * @param[in] bmp: 事件对象记录事件状态的位图数组缓冲区
+ * @param[in] msk: 事件对象记录掩码状态的位图数组缓冲区
+ */
+static __xwup_code
+void xwup_evt_setup(struct xwup_evt * evt, xwsz_t num,
+                    xwbmp_t * bmp, xwbmp_t * msk)
+{
+        evt->num = num;
+        evt->bmp = bmp;
+        evt->msk = msk;
+}
+
+/**
+ * @brief 事件对象的析构函数
+ * @param[in] evt: 事件对象的指针
+ */
+static __xwup_code
+void xwup_evt_destruct(struct xwup_evt * evt)
+{
+        xwup_cond_destruct(&evt->cond);
+}
+
+/**
+ * @brief 静态事件对象的垃圾回收函数
+ * @param[in] evt: 事件对象的指针
+ */
+static __xwup_code
+xwer_t xwup_evt_sgc(struct xwos_object * obj)
+{
+        struct xwup_evt * evt;
+
+        evt = xwcc_derof(obj, struct xwup_evt, cond.synobj.xwobj);
+        xwup_evt_destruct(evt);
         return XWOK;
 }
 
 #if (1 == XWOSRULE_SYNC_EVT_CREATE_DELETE)
+/**
+ * @brief 动态事件对象的垃圾回收函数
+ * @param[in] evt: 事件对象的指针
+ */
 static __xwup_code
-xwer_t xwup_evt_dgc(void * evt)
+xwer_t xwup_evt_dgc(struct xwos_object * obj)
 {
-        xwup_evt_destruct((struct xwup_evt *)evt);
-        xwup_evt_free((struct xwup_evt *)evt);
+        struct xwup_evt * evt;
+
+        evt = xwcc_derof(obj, struct xwup_evt, cond.synobj.xwobj);
+        xwup_evt_free(evt);
         return XWOK;
+}
+#endif
+
+/**
+ * @brief 激活并初始化事件对象
+ * @param[in] evt: 事件对象的指针
+ * @param[in] type: 事件的类型，取值：
+ *   @arg XWUP_EVT_TYPE_FLG: 事件标志
+ *   @arg XWUP_EVT_TYPE_SEL: 信号选择器
+ *   @arg XWUP_EVT_TYPE_BR: 线程栅栏
+ * @param[in] gcfunc: 垃圾回收函数的指针
+ */
+static __xwup_code
+xwer_t xwup_evt_activate(struct xwup_evt * evt, xwsq_t type, xwobj_gc_f gcfunc)
+{
+        xwsz_t size;
+        xwer_t rc;
+        xwsq_t i;
+
+        size = BITS_TO_XWBMP_T(evt->num);
+        rc = xwup_cond_activate(&evt->cond, gcfunc);
+        if (rc < 0) {
+                goto err_cond_activate;
+        }
+        evt->type = type;
+        switch (type & XWUP_EVT_TYPE_MASK) {
+        case XWUP_EVT_TYPE_BR:
+                memset(evt->msk, 0, size); // cppcheck-suppress [misra-c2012-17.7]
+                for (i = 0; i < evt->num; i++) {
+                        xwbmpop_s1i(evt->msk, i);
+                }
+                break;
+        case XWUP_EVT_TYPE_SEL:
+                memset(evt->msk, 0, size); // cppcheck-suppress [misra-c2012-17.7]
+                break;
+        case XWUP_EVT_TYPE_FLG:
+        default:
+                memset(evt->msk, 0xFF, size); // cppcheck-suppress [misra-c2012-17.7]
+                break;
+        }
+        memset(evt->bmp, 0, size); // cppcheck-suppress [misra-c2012-17.7]
+        xwup_splk_init(&evt->lock);
+        return XWOK;
+
+err_cond_activate:
+        return rc;
+}
+
+__xwup_api
+xwer_t xwup_evt_init(struct xwup_evt * evt, xwsq_t type, xwsz_t num,
+                     xwbmp_t * bmp, xwbmp_t * msk)
+{
+        xwup_evt_construct(evt);
+        xwup_evt_setup(evt, num, bmp, msk);
+        return xwup_evt_activate(evt, type, xwup_evt_sgc);
+}
+
+__xwup_api
+xwer_t xwup_evt_fini(struct xwup_evt * evt)
+{
+        return xwup_evt_put(evt);
+}
+
+#if (1 == XWOSRULE_SYNC_EVT_CREATE_DELETE)
+__xwup_api
+xwer_t xwup_evt_create(struct xwup_evt ** ptrbuf, xwsq_t type, xwsz_t num)
+{
+        struct xwup_evt * evt;
+        xwer_t rc;
+
+        *ptrbuf = NULL;
+        evt = xwup_evt_alloc(num);
+        if (is_err(evt)) {
+                rc = ptr_err(evt);
+        } else {
+                rc = xwup_evt_activate(evt, type, xwup_evt_dgc);
+                if (rc < 0) {
+                        xwup_evt_free(evt);
+                } else {
+                        *ptrbuf = evt;
+                }
+        }
+        return rc;
+}
+#endif
+
+#if (1 == XWOSRULE_SYNC_EVT_CREATE_DELETE)
+__xwup_api
+xwer_t xwup_evt_delete(struct xwup_evt * evt, xwsq_t tik)
+{
+        return xwup_evt_release(evt, tik);
 }
 #endif
 
@@ -243,97 +367,6 @@ __xwup_api
 xwer_t xwup_evt_put(struct xwup_evt * evt)
 {
         return xwup_cond_put(&evt->cond);
-}
-
-/**
- * @brief 激活并初始化事件对象
- * @param[in] evt: 事件对象的指针
- * @param[in] type: 事件的类型，取值：
- *   @arg XWUP_EVT_TYPE_FLG: 事件标志
- *   @arg XWUP_EVT_TYPE_SEL: 信号选择器
- *   @arg XWUP_EVT_TYPE_BR: 线程栅栏
- * @param[in] gcfunc: 垃圾回收函数的指针
- */
-static __xwup_code
-xwer_t xwup_evt_activate(struct xwup_evt * evt, xwsq_t type, xwobj_gc_f gcfunc)
-{
-        xwsz_t size;
-        xwer_t rc;
-        xwsq_t i;
-
-        size = BITS_TO_XWBMP_T(evt->num);
-        rc = xwup_cond_activate(&evt->cond, gcfunc);
-        if (__xwcc_unlikely(rc < 0)) {
-                goto err_cond_activate;
-        }
-        evt->type = type;
-        switch (type & XWUP_EVT_TYPE_MASK) {
-        case XWUP_EVT_TYPE_BR:
-                memset(evt->msk, 0, size);
-                for (i = 0; i < evt->num; i++) {
-                        xwbmpop_s1i(evt->msk, i);
-                }
-                break;
-        case XWUP_EVT_TYPE_SEL:
-                memset(evt->msk, 0, size);
-                break;
-        case XWUP_EVT_TYPE_FLG:
-        default:
-                memset(evt->msk, 0xFF, size);
-                break;
-        }
-        memset(evt->bmp, 0, size);
-        xwup_splk_init(&evt->lock);
-        return XWOK;
-
-err_cond_activate:
-        return rc;
-}
-
-#if (1 == XWOSRULE_SYNC_EVT_CREATE_DELETE)
-__xwup_api
-xwer_t xwup_evt_create(struct xwup_evt ** ptrbuf, xwsq_t type, xwsz_t num)
-{
-        struct xwup_evt * evt;
-        xwer_t rc;
-
-        *ptrbuf = NULL;
-        evt = xwup_evt_alloc(num);
-        if (__xwcc_unlikely(is_err(evt))) {
-                rc = ptr_err(evt);
-        } else {
-                rc = xwup_evt_activate(evt, type, xwup_evt_dgc);
-                if (__xwcc_unlikely(rc < 0)) {
-                        xwup_evt_free(evt);
-                } else {
-                        *ptrbuf = evt;
-                }
-        }
-        return rc;
-}
-#endif
-
-#if (1 == XWOSRULE_SYNC_EVT_CREATE_DELETE)
-__xwup_api
-xwer_t xwup_evt_delete(struct xwup_evt * evt, xwsq_t tik)
-{
-        return xwup_evt_release(evt, tik);
-}
-#endif
-
-__xwup_api
-xwer_t xwup_evt_init(struct xwup_evt * evt, xwsq_t type, xwsz_t num,
-                     xwbmp_t * bmp, xwbmp_t * msk)
-{
-        xwup_evt_construct(evt);
-        xwup_evt_setup(evt, num, bmp, msk);
-        return xwup_evt_activate(evt, type, xwup_evt_sgc);
-}
-
-__xwup_api
-xwer_t xwup_evt_fini(struct xwup_evt * evt)
-{
-        return xwup_evt_put(evt);
 }
 
 __xwup_api
@@ -490,8 +523,8 @@ xwer_t xwup_flg_wait_to_level(struct xwup_evt * evt,
 
         rc = XWOK;
         xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        while (true) {
-                if (origin) {
+        while (true) { // cppcheck-suppress [misra-c2012-15.4]
+                if (NULL != origin) {
                         xwbmpop_assign(origin, evt->bmp, evt->num);
                 }
                 if (XWUP_FLG_ACTION_CONSUMPTION == action) {
@@ -575,7 +608,7 @@ xwer_t xwup_flg_wait_to_edge(struct xwup_evt * evt, xwsq_t trigger,
 
         xwbmpop_and(origin, msk, evt->num);
         xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        while (true) {
+        while (true) { // cppcheck-suppress [misra-c2012-15.4]
                 xwbmpop_assign(cur, evt->bmp, evt->num);
                 xwbmpop_and(cur, msk, evt->num);
                 if (XWUP_FLG_TRIGGER_TGL_ALL == trigger) {
@@ -651,7 +684,7 @@ xwer_t xwup_flg_trywait_level(struct xwup_evt * evt,
 
         rc = XWOK;
         xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        if (origin) {
+        if (NULL != origin) {
                 xwbmpop_assign(origin, evt->bmp, evt->num);
         }
         if (XWUP_FLG_ACTION_CONSUMPTION == action) {
@@ -933,7 +966,7 @@ xwer_t xwup_sel_select_to(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
         xwsq_t lkst;
 
         xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
-        while (true) {
+        while (true) { // cppcheck-suppress [misra-c2012-15.4]
                 triggered = xwbmpop_t1mo(evt->bmp, msk, evt->num);
                 if (triggered) {
                         if (NULL != trg) {

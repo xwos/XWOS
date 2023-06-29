@@ -95,7 +95,7 @@ xwer_t xwosdl_swt_start(struct xwosdl_swt * swt, xwtm_t origin, xwtm_t period,
         XWOS_VALIDATE(((xwtm_cmp(origin, 0) > 0) && (xwtm_cmp(period, 0) > 0)),
                       "out-of-time", -EINVAL);
 
-        return xwup_swt_start(swt, origin, period, (xwup_swt_f)callback, arg);
+        return xwup_swt_start(swt, origin, period, callback, arg);
 }
 
 static __xwcc_inline

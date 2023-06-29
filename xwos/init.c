@@ -20,6 +20,7 @@
 #endif
 #include <xwos/lib/object.h>
 #include <xwos/osal/skd.h>
+#include <xwos/init.h>
 
 __xwos_init_code
 void xwos_init(void)

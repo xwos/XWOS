@@ -27,7 +27,6 @@
 #define XWBOP_BIT(n)  ((xwbmp_t)1 << (n))
 #define XWBOP_BMP_MASK(n)  ((xwbmp_t)1 << (xwbmp_t)((n) % BITS_PER_XWBMP_T))
 #define XWBOP_BMP(n)  ((n) / BITS_PER_XWBMP_T)
-#define BITS_PER_XWU8_T  8
 #define XWBOP_DIV_ROUND(n, d)  ((n) / (d))
 #define XWBOP_DIV_ROUND_UP(n, d)  (((n) + (d) - 1) / (d))
 #define XWBOP_SHIFT_ROUND(n, s)  ((n) >> (s))
@@ -43,6 +42,9 @@
 #define xwbop_c0m8(a, mask)     *(a) &= (~(mask))
 #define xwbop_x1m8(a, mask)     *(a) ^= (mask)
 
+xwssq_t xwbop_ffs8(xwu8_t x);
+xwssq_t xwbop_fls8(xwu8_t x);
+
 static __xwlib_inline
 xwssq_t xwbop_ffz8(xwu8_t x)
 {
@@ -55,16 +57,23 @@ xwssq_t xwbop_flz8(xwu8_t x)
         return xwbop_fls8((xwu8_t)(~x));
 }
 
+xwu8_t xwbop_rbit8(xwu8_t x);
+
 static __xwlib_inline
 xwu8_t xwbop_re8(xwu8_t x)
 {
         return x;
 }
 
+xwsz_t xwbop_weight8(xwu8_t x);
+
 /******** ******** 16-bit 位操作 ******** ********/
 #define xwbop_s1m16(a, mask)    *(a) |= (mask)
 #define xwbop_c0m16(a, mask)    *(a) &= (~(mask))
 #define xwbop_x1m16(a, mask)    *(a) ^= (mask)
+
+xwssq_t xwbop_ffs16(xwu16_t x);
+xwssq_t xwbop_fls16(xwu16_t x);
 
 static __xwlib_inline
 xwssq_t xwbop_ffz16(xwu16_t x)
@@ -78,10 +87,17 @@ xwssq_t xwbop_flz16(xwu16_t x)
         return xwbop_fls16((xwu16_t)(~x));
 }
 
+xwu16_t xwbop_rbit16(xwu16_t x);
+xwu16_t xwbop_re16(xwu16_t a);
+xwsz_t xwbop_weight16(xwu16_t x);
+
 /******** ******** 32-bit 位操作 ******** ********/
 #define xwbop_s1m32(a, mask)    *(a) |= (mask)
 #define xwbop_c0m32(a, mask)    *(a) &= (~(mask))
 #define xwbop_x1m32(a, mask)    *(a) ^= (mask)
+
+xwssq_t xwbop_ffs32(xwu32_t x);
+xwssq_t xwbop_fls32(xwu32_t x);
 
 static __xwlib_inline
 xwssq_t xwbop_ffz32(xwu32_t x)
@@ -95,10 +111,17 @@ xwssq_t xwbop_flz32(xwu32_t x)
         return xwbop_fls32(~x);
 }
 
+xwu32_t xwbop_rbit32(xwu32_t x);
+xwu32_t xwbop_re32(xwu32_t x);
+xwsz_t xwbop_weight32(xwu32_t x);
+
 /******** ******** 64-bit 位操作 ******** ********/
-#define xwbop_s1m64(a64, mask64)        *((xwu64_t *)a64) |= (mask64)
-#define xwbop_c0m64(a64, mask64)        *((xwu64_t *)a64) &= (~(mask64))
-#define xwbop_x1m64(a64, mask64)        *((xwu64_t *)a64) ^= (mask64)
+#define xwbop_s1m64(a64, mask64)        *((xwu64_t *)(a64)) |= (mask64)
+#define xwbop_c0m64(a64, mask64)        *((xwu64_t *)(a64)) &= (~(mask64))
+#define xwbop_x1m64(a64, mask64)        *((xwu64_t *)(a64)) ^= (mask64)
+
+xwssq_t xwbop_ffs64(xwu64_t x);
+xwssq_t xwbop_fls64(xwu64_t x);
 
 static __xwlib_inline
 xwssq_t xwbop_ffz64(xwu64_t x)
@@ -111,6 +134,10 @@ xwssq_t xwbop_flz64(xwu64_t x)
 {
         return xwbop_ffs64(~x);
 }
+
+xwu64_t xwbop_re64(xwu64_t x);
+xwu64_t xwbop_rbit64(xwu64_t x);
+xwsz_t xwbop_weight64(xwu64_t x);
 
 /******** ******** 位操作 ******** ********/
 /**

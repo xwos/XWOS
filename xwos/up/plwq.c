@@ -66,7 +66,7 @@ xwer_t xwup_plwq_remove(struct xwup_plwq * xwplwq, struct xwup_wqn * wqn)
 {
         xwer_t rc;
 
-        if (__xwcc_unlikely((NULL == wqn->cb) || (xwplwq != wqn->wq))) {
+        if ((NULL == wqn->cb) || (xwplwq != wqn->wq)) {
                 rc = -ESRCH;
         } else {
                 xwlib_bclst_del_init(&wqn->cln.pl);

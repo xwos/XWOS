@@ -27,6 +27,9 @@ struct xwup_rtsem {
 
 xwer_t xwup_rtsem_intr(struct xwup_rtsem * sem, struct xwup_wqn * wqn);
 
+#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+xwer_t xwup_rtsem_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
+#endif
 xwer_t xwup_rtsem_init(struct xwup_rtsem * sem, xwssq_t val, xwssq_t max);
 xwer_t xwup_rtsem_fini(struct xwup_rtsem * sem);
 xwer_t xwup_rtsem_create(struct xwup_rtsem ** ptrbuf, xwssq_t val, xwssq_t max);
@@ -37,14 +40,8 @@ xwer_t xwup_rtsem_release(struct xwup_rtsem * sem, xwsq_t tik);
 xwer_t xwup_rtsem_grab(struct xwup_rtsem * sem);
 xwer_t xwup_rtsem_put(struct xwup_rtsem * sem);
 
-#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
-xwer_t xwup_rtsem_bind(struct xwup_rtsem * sem, struct xwup_evt * evt, xwsq_t pos);
-xwer_t xwup_rtsem_unbind(struct xwup_rtsem * sem, struct xwup_evt * evt);
-#else
-#  define xwup_rtsem_bind(sem, evt, pos) (-ENOSYS)
-#  define xwup_rtsem_unbind(sem, evt) (-ENOSYS)
-#endif
-
+xwer_t xwup_rtsem_bind(struct xwup_rtsem * sem, struct xwup_evt * sel, xwsq_t pos);
+xwer_t xwup_rtsem_unbind(struct xwup_rtsem * sem, struct xwup_evt * sel);
 xwer_t xwup_rtsem_freeze(struct xwup_rtsem * sem);
 xwer_t xwup_rtsem_thaw(struct xwup_rtsem * sem);
 xwer_t xwup_rtsem_post(struct xwup_rtsem * sem);

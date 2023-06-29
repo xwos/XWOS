@@ -11,6 +11,7 @@
  */
 
 #include <xwos/standard.h>
+#include <xwos/lib/object.h>
 #include <xwos/mm/common.h>
 #if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
 #  include <xwos/mm/memslice.h>
@@ -52,15 +53,15 @@ static __xwup_code
 xwer_t xwup_swt_activate(struct xwup_swt * swt, xwsq_t flag, xwobj_gc_f gcfunc);
 
 static __xwup_code
-xwer_t xwup_swt_sgc(void * obj);
+xwer_t xwup_swt_sgc(struct xwos_object * obj);
 
 #if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
 static __xwup_code
-xwer_t xwup_swt_dgc(void * obj);
+xwer_t xwup_swt_dgc(struct xwos_object * obj);
 #endif
 
 static __xwup_code
-void xwup_swt_ttn_cb(void * entry);
+void xwup_swt_ttn_callback(struct xwup_ttn * ttn);
 
 #if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
 /**
@@ -103,7 +104,7 @@ struct xwup_swt * xwup_swt_alloc(void)
         rc = xwmm_memslice_alloc(&xwup_swt_cache, &mem.anon);
         if (rc < 0) {
                 mem.swt = err_ptr(rc);
-        }/* else {} */
+        }
         return mem.swt;
 #  elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
         struct xwup_swt * swt;
@@ -132,6 +133,7 @@ void xwup_swt_free(struct xwup_swt * swt)
 #  if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
         xwmm_memslice_free(&xwup_swt_cache, swt);
 #  elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
+        xwup_swt_destruct(swt);
         free(swt);
 #  else
         XWOS_UNUSED(swt);
@@ -144,7 +146,7 @@ void xwup_swt_construct(struct xwup_swt * swt)
 {
         xwos_object_construct(&swt->xwobj);
         swt->flag = 0;
-        xwup_ttn_init(&swt->ttn, (xwptr_t)swt, XWUP_TTN_TYPE_SWT);
+        xwup_ttn_init(&swt->ttn);
         swt->cb = NULL;
         swt->arg = NULL;
         swt->period = 0;
@@ -162,7 +164,7 @@ xwer_t xwup_swt_activate(struct xwup_swt * swt, xwsq_t flag, xwobj_gc_f gcfunc)
         xwer_t rc;
 
         rc = xwos_object_activate(&swt->xwobj, gcfunc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_xwobj_activate;
         }
         swt->flag = flag;
@@ -173,21 +175,22 @@ err_xwobj_activate:
 }
 
 static __xwup_code
-xwer_t xwup_swt_sgc(void * obj)
+xwer_t xwup_swt_sgc(struct xwos_object * obj)
 {
-        struct xwup_swt * swt = obj;
+        struct xwup_swt * swt;
 
+        swt = xwcc_derof(obj, struct xwup_swt, xwobj);
         xwup_swt_destruct(swt);
         return XWOK;
 }
 
 #if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
 static __xwup_code
-xwer_t xwup_swt_dgc(void * obj)
+xwer_t xwup_swt_dgc(struct xwos_object * obj)
 {
-        struct xwup_swt * swt = obj;
+        struct xwup_swt * swt;
 
-        xwup_swt_destruct(swt);
+        swt = xwcc_derof(obj, struct xwup_swt, xwobj);
         xwup_swt_free(swt);
         return XWOK;
 }
@@ -244,7 +247,7 @@ xwer_t xwup_swt_create(struct xwup_swt ** ptrbuf, xwsq_t flag)
                 goto err_swt_alloc;
         }
         rc = xwup_swt_activate(swt, flag, xwup_swt_dgc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_swt_activate;
         }
         *ptrbuf = swt;
@@ -270,7 +273,7 @@ xwer_t xwup_swt_delete(struct xwup_swt * swt, xwsq_t tik)
  * @param[in] entry: 软件定时器对象的指针
  */
 static __xwup_code
-void xwup_swt_ttn_cb(void * entry)
+void xwup_swt_ttn_callback(struct xwup_ttn * ttn)
 {
         struct xwup_swt * swt;
         struct xwup_skd * xwskd;
@@ -279,18 +282,18 @@ void xwup_swt_ttn_cb(void * entry)
         xwtm_t to;
         xwreg_t cpuirq;
 
-        swt = entry;
+        swt = xwcc_derof(ttn, struct xwup_swt, ttn);
         xwskd = xwup_skd_get_lc();
         xwtt = &xwskd->tt;
         swt->cb(swt, swt->arg);
-        if (XWUP_SWT_FLAG_RESTART & swt->flag) {
+        if (0 != (XWUP_SWT_FLAG_RESTART & swt->flag)) {
                 to = xwtm_add_safely(swt->ttn.wkup_xwtm, swt->period);
                 xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
                 refcnt = xwos_object_get_refcnt(&swt->xwobj);
                 if (refcnt >= 3) {
                         swt->ttn.wkup_xwtm = to;
                         swt->ttn.wkuprs = XWUP_TTN_WKUPRS_UNKNOWN;
-                        swt->ttn.cb = xwup_swt_ttn_cb;
+                        swt->ttn.cb = xwup_swt_ttn_callback;
                         xwup_swt_grab(swt);
                         xwup_tt_add_locked(xwtt, &swt->ttn, cpuirq);
                         xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
@@ -326,16 +329,16 @@ xwer_t xwup_swt_start(struct xwup_swt * swt,
         swt->arg = arg;
         swt->period = period;
         xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
-        if (__xwcc_unlikely(swt->ttn.cb)) {
+        if (NULL != swt->ttn.cb) {
                 rc = -EALREADY;
                 goto err_already;
         }
-        if (XWUP_SWT_FLAG_RESTART & swt->flag) {
+        if (0 != (XWUP_SWT_FLAG_RESTART & swt->flag)) {
                 xwup_swt_grab(swt);
         }
         swt->ttn.wkup_xwtm = to;
         swt->ttn.wkuprs = XWUP_TTN_WKUPRS_UNKNOWN;
-        swt->ttn.cb = xwup_swt_ttn_cb;
+        swt->ttn.cb = xwup_swt_ttn_callback;
         swt->ttn.xwtt = xwtt;
         rc = xwup_tt_add_locked(xwtt, &swt->ttn, cpuirq);
         if (rc < 0) {
@@ -345,7 +348,7 @@ xwer_t xwup_swt_start(struct xwup_swt * swt,
         return XWOK;
 
 err_add:
-        if (XWUP_SWT_FLAG_RESTART & swt->flag) {
+        if (0 != (XWUP_SWT_FLAG_RESTART & swt->flag)) {
                 xwup_swt_put(swt);
         }
 err_already:
@@ -367,7 +370,7 @@ xwer_t xwup_swt_stop(struct xwup_swt * swt)
         xwtt = &xwskd->tt;
         xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         rc = xwup_tt_remove_locked(xwtt, &swt->ttn);
-        if (XWUP_SWT_FLAG_RESTART & swt->flag) {
+        if (0 != (XWUP_SWT_FLAG_RESTART & swt->flag)) {
                 xwup_swt_put(swt);
         }
         xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);

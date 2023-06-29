@@ -1,6 +1,6 @@
 #! /bin/make -f
 # @file
-# @brief Makefile规则 (RISC-V)
+# @brief Makefile规则：riscv-nuclei-elf-gcc
 # @author
 # + 隐星魂 (Roy Sun) <xwos@xwos.tech>
 # @copyright

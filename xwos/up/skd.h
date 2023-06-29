@@ -50,27 +50,26 @@ enum xwup_skd_policy_em {
  */
 enum xwup_skdobj_state_em {
         XWUP_SKDOBJ_ST_UNKNOWN = 0U, /**< 未知状态 */
-        XWUP_SKDOBJ_ST_STANDBY = (1U << 0U), /**< 待机 */
-        XWUP_SKDOBJ_ST_RUNNING = (1U << 1U), /**< 运行 */
-        XWUP_SKDOBJ_ST_READY = (1U << 2U), /**< 就绪 */
-        XWUP_SKDOBJ_ST_SLEEPING = (1U << 3U), /**< 睡眠 */
-        XWUP_SKDOBJ_ST_BLOCKING = (1U << 4U), /**< 阻塞 */
-        XWUP_SKDOBJ_ST_RESERVED5 = (1U << 5U), /**< 保留位5 */
-        XWUP_SKDOBJ_ST_FROZEN = (1U << 6U), /**< 已经被冻结 */
-        XWUP_SKDOBJ_ST_EXITING = (1U << 7U), /**< 正在退出 */
-        XWUP_SKDOBJ_ST_RESERVED8 = (1U << 8U), /**< 保留位8 */
-        XWUP_SKDOBJ_ST_DETACHED = (1U << 9U), /**< 已分离 */
-        XWUP_SKDOBJ_ST_JOINED = (1U << 10U), /**< 已连接 */
-        XWUP_SKDOBJ_ST_UNINTERRUPTED = (1U << 15U), /**< 阻塞态不可中断 */
+        XWUP_SKDOBJ_ST_STANDBY = 1U, /**< 待机，BIT(0) */
+        XWUP_SKDOBJ_ST_RUNNING = 2U, /**< 运行，BIT(1) */
+        XWUP_SKDOBJ_ST_READY = 4U, /**< 就绪，BIT(2) */
+        XWUP_SKDOBJ_ST_SLEEPING = 8U, /**< 睡眠，BIT(3) */
+        XWUP_SKDOBJ_ST_BLOCKING = 16U, /**< 阻塞，BIT(4) */
+        XWUP_SKDOBJ_ST_RESERVED5 = 32U, /**< 保留位5，BIT(5) */
+        XWUP_SKDOBJ_ST_FROZEN = 64U, /**< 已经被冻结，BIT(6) */
+        XWUP_SKDOBJ_ST_EXITING = 128U, /**< 正在退出，BIT(7) */
+        XWUP_SKDOBJ_ST_RESERVED8 = 256U, /**< 保留位8，BIT(8) */
+        XWUP_SKDOBJ_ST_DETACHED = 512U, /**< 已分离，BIT(9) */
+        XWUP_SKDOBJ_ST_JOINED = 1024U, /**< 已连接，BIT(10) */
+        XWUP_SKDOBJ_ST_UNINTERRUPTED = 32768U, /**< 阻塞态不可中断，BIT(15) */
 };
 
 /**
  * @brief 调度对象标签
  */
 enum xwup_skdobj_flag_em {
-        XWUP_SKDOBJ_FLAG_PRIVILEGED = (1U << 0U), /**< 拥有超级权限 */
-        XWUP_SKDOBJ_FLAG_ALLOCATED_STACK = (1U << 1U), /**< 动态申请的栈 */
-        XWUP_SKDOBJ_FLAG_ALLOCATED_OBJ = (1U << 2U), /**< 动态申请的结构体 */
+        XWUP_SKDOBJ_FLAG_PRIVILEGED = 1U, /**< 拥有超级权限，BIT(0) */
+        XWUP_SKDOBJ_FLAG_ALLOCATED_STACK = 2U, /**< 动态申请的栈，BIT(1) */
 };
 
 /**

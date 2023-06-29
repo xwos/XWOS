@@ -25,9 +25,9 @@
 #include "xwlua/port.h"
 #include "xwlua/xwos/spinlock.h"
 
-xwer_t xwlua_splk_gc(void * gcobj)
+xwer_t xwlua_splk_gc(struct xwos_object * obj)
 {
-        free(gcobj);
+        free(obj);
         return XWOK;
 }
 

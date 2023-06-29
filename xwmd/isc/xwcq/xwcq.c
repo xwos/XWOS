@@ -50,11 +50,11 @@ void xwcq_destruct(struct xwcq * cq)
  * @return 错误码
  */
 static __xwmd_code
-xwer_t xwcq_gc(void * obj)
+xwer_t xwcq_gc(struct xwos_object * obj)
 {
         struct xwcq * cq;
 
-        cq = obj;
+        cq = xwcc_derof(obj, struct xwcq, xwobj);
         xwos_sem_fini(&cq->sem);
         xwcq_destruct(cq);
         return XWOK;

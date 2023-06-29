@@ -56,7 +56,8 @@ void xwmp_rtwq_add_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn,
         struct xwlib_rbtree_node ** new;
         struct xwlib_rbtree_node * rbn;
         xwptr_t lpc;
-        struct xwmp_wqn * n, * rightmost;
+        struct xwmp_wqn * n;
+        struct xwmp_wqn * rightmost;
         struct xwlib_rbtree * tree;
         xwpr_t nodeprio;
 
@@ -79,7 +80,7 @@ void xwmp_rtwq_add_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn,
                 n = rightmost;
         } else {
                 rbn = *new;
-                while (rbn) {
+                while (NULL != rbn) {
                         n = xwlib_rbtree_entry(rbn, struct xwmp_wqn, rbn);
                         nodeprio = n->prio;
                         if (prio < nodeprio) {
@@ -96,7 +97,7 @@ void xwmp_rtwq_add_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn,
                         }
                 }
         }
-        if (lpc) {
+        if (0 != lpc) {
                 xwlib_rbtree_link(&wqn->rbn, lpc);
                 xwlib_rbtree_insert_color(tree, &wqn->rbn);
         } else {
@@ -122,7 +123,7 @@ void xwmp_rtwq_rmrbb_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn)
         xwlib_rbtree_init_node(&wqn->rbn);
         if (wqn == xwrtwq->rightmost) {
                 xwrtwq->rightmost = n;
-        }/* else {} */
+        }
 }
 
 /**
@@ -143,9 +144,9 @@ void xwmp_rtwq_rmrbn_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn)
                                       red-black tree. Or if there is no
                                       left child, the predecessor is its
                                       parent. */
-                if (!p) {
+                if (NULL == p) {
                         p = xwlib_rbtree_get_parent(&wqn->rbn);
-                }/* else {} */
+                }
                 if (p != (struct xwlib_rbtree_node *)&xwrtwq->tree.root) {
                         xwrtwq->rightmost = xwlib_rbtree_entry(p, struct xwmp_wqn,
                                                                rbn);
@@ -173,7 +174,7 @@ xwer_t xwmp_rtwq_remove_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn)
 {
         xwer_t rc;
 
-        if (__xwcc_unlikely((NULL == wqn->cb) || (xwrtwq != wqn->wq))) {
+        if ((NULL == wqn->cb) || (xwrtwq != wqn->wq)) {
                 rc = -ESRCH;
         } else {
                 if (xwlib_rbtree_tst_node_unlinked(&wqn->rbn)) {

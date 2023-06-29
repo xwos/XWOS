@@ -50,9 +50,11 @@ void xwmp_mtxtree_add_locked(struct xwmp_mtx * mtx, struct xwmp_mtxtree * mt)
         struct xwlib_rbtree_node * rbn;
         xwptr_t lpc;
         xwpr_t prio;
-        struct xwmp_mtx * m, * max;
-        struct xwlib_rbtree * tree = &mt->rbtree;
+        struct xwmp_mtx * m;
+        struct xwmp_mtx * max;
+        struct xwlib_rbtree * tree;
 
+        tree = &mt->rbtree;
         prio = mtx->dprio;
         pos = &tree->root;
         lpc = (xwptr_t)pos;
@@ -71,7 +73,7 @@ void xwmp_mtxtree_add_locked(struct xwmp_mtx * mtx, struct xwmp_mtxtree * mt)
                 lpc = (xwptr_t)0;
         } else {
                 rbn = *pos;
-                while (rbn) {
+                while (NULL != rbn) {
                         m = xwlib_rbtree_entry(rbn, struct xwmp_mtx, rbnode);
                         if (prio < m->dprio) {
                                 pos = &rbn->left;
@@ -87,7 +89,7 @@ void xwmp_mtxtree_add_locked(struct xwmp_mtx * mtx, struct xwmp_mtxtree * mt)
                         }
                 }
         }
-        if (lpc) {
+        if (0 != lpc) {
                 xwlib_rbtree_link(&mtx->rbnode, lpc);
                 xwlib_rbtree_insert_color(tree, &mtx->rbnode);
         } else {
@@ -143,9 +145,9 @@ void xwmp_mtxtree_remove_locked(struct xwmp_mtx * mtx, struct xwmp_mtxtree * mt)
                                                  red-black tree. Or if there is no
                                                  left child, the predecessor is its
                                                  parent. */
-                        if (!p) {
+                        if (NULL == p) {
                                 p = xwlib_rbtree_get_parent(&mtx->rbnode);
-                        }/* else {} */
+                        }
                         if (p != (struct xwlib_rbtree_node *)&tree->root) {
                                 mt->rightmost = xwlib_rbtree_entry(p,
                                                                    struct xwmp_mtx,

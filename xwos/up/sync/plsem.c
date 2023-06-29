@@ -44,11 +44,11 @@ static __xwup_code
 void xwup_plsem_destruct(struct xwup_plsem * sem);
 
 static __xwup_code
-xwer_t xwup_plsem_sgc(void * sem);
+xwer_t xwup_plsem_sgc(struct xwos_object * obj);
 
 #if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 static __xwup_code
-xwer_t xwup_plsem_dgc(void * sem);
+xwer_t xwup_plsem_dgc(struct xwos_object * obj);
 #endif
 
 static __xwup_code
@@ -128,7 +128,7 @@ struct xwup_plsem * xwup_plsem_alloc(void)
         rc = xwmm_memslice_alloc(&xwup_plsem_cache, &mem.anon);
         if (rc < 0) {
                 mem.plsem = err_ptr(rc);
-        }/* else {} */
+        }
         return mem.plsem;
 #  elif defined(XWOSCFG_SKD_PLSEM_STDC_MM) && (1 == XWOSCFG_SKD_PLSEM_STDC_MM)
         struct xwup_plsem * plsem;
@@ -157,6 +157,7 @@ void xwup_plsem_free(struct xwup_plsem * sem)
 #  if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
         xwmm_memslice_free(&xwup_plsem_cache, sem);
 #  elif defined(XWOSCFG_SKD_PLSEM_STDC_MM) && (1 == XWOSCFG_SKD_PLSEM_STDC_MM)
+        xwup_plsem_destruct(sem);
         free(sem);
 #  else
         XWOS_UNUSED(sem);
@@ -177,18 +178,23 @@ void xwup_plsem_destruct(struct xwup_plsem * sem)
 }
 
 static __xwup_code
-xwer_t xwup_plsem_sgc(void * sem)
+xwer_t xwup_plsem_sgc(struct xwos_object * obj)
 {
-        xwup_plsem_destruct((struct xwup_plsem *)sem);
+        struct xwup_plsem * plsem;
+
+        plsem = xwcc_derof(obj, struct xwup_plsem, vsem.synobj.xwobj);
+        xwup_plsem_destruct(plsem);
         return XWOK;
 }
 
 #if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 static __xwup_code
-xwer_t xwup_plsem_dgc(void * sem)
+xwer_t xwup_plsem_dgc(struct xwos_object * obj)
 {
-        xwup_plsem_destruct((struct xwup_plsem *)sem);
-        xwup_plsem_free((struct xwup_plsem *)sem);
+        struct xwup_plsem * plsem;
+
+        plsem = xwcc_derof(obj, struct xwup_plsem, vsem.synobj.xwobj);
+        xwup_plsem_free(plsem);
         return XWOK;
 }
 #endif
@@ -224,7 +230,7 @@ xwer_t xwup_plsem_activate(struct xwup_plsem * sem, xwssq_t val, xwssq_t max,
         xwer_t rc;
 
         rc = xwup_vsem_activate(&sem->vsem, gcfunc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_vsem_activate;
         }
         xwup_plwq_init(&sem->plwq);
@@ -259,11 +265,11 @@ xwer_t xwup_plsem_create(struct xwup_plsem ** ptrbuf, xwssq_t val, xwssq_t max)
 
         *ptrbuf = NULL;
         sem = xwup_plsem_alloc();
-        if (__xwcc_unlikely(is_err(sem))) {
+        if (is_err(sem)) {
                 rc = ptr_err(sem);
         } else {
                 rc = xwup_plsem_activate(sem, val, max, xwup_plsem_dgc);
-                if (__xwcc_unlikely(rc < 0)) {
+                if (rc < 0) {
                         xwup_plsem_free(sem);
                 } else {
                         *ptrbuf = sem;
@@ -281,20 +287,17 @@ xwer_t xwup_plsem_delete(struct xwup_plsem * sem, xwsq_t tik)
 }
 #endif
 
-#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
 __xwup_api
-xwer_t xwup_plsem_bind(struct xwup_plsem * sem, struct xwup_evt * evt,
-                       xwsq_t pos)
+xwer_t xwup_plsem_bind(struct xwup_plsem * sem, struct xwup_evt * sel, xwsq_t pos)
 {
-        return xwup_vsem_bind(&sem->vsem, evt, pos);
+        return xwup_vsem_bind(&sem->vsem, sel, pos);
 }
 
 __xwup_api
-xwer_t xwup_plsem_unbind(struct xwup_plsem * sem, struct xwup_evt * evt)
+xwer_t xwup_plsem_unbind(struct xwup_plsem * sem, struct xwup_evt * sel)
 {
-        return xwup_vsem_unbind(&sem->vsem, evt);
+        return xwup_vsem_unbind(&sem->vsem, sel);
 }
-#endif
 
 /**
  * @brief 中断管道信号量等待队列中的一个节点
@@ -320,7 +323,7 @@ xwer_t xwup_plsem_intr(struct xwup_plsem * sem, struct xwup_wqn * wqn)
                 cb = wqn->cb;
                 wqn->cb = NULL;
                 xwospl_cpuirq_restore_lc(cpuirq);
-                cb(wqn->owner);
+                cb(wqn);
         } else {
                 xwospl_cpuirq_restore_lc(cpuirq);
         }
@@ -354,14 +357,14 @@ xwer_t xwup_plsem_post(struct xwup_plsem * sem)
                 rc = -ENEGATIVE;
         } else {
                 wqn = xwup_plwq_choose(&sem->plwq);
-                if (wqn) {
+                if (NULL != wqn) {
                         wqn->wq = NULL;
                         wqn->type = XWUP_WQTYPE_UNKNOWN;
                         wqn->reason = XWUP_WQN_REASON_UP;
                         cb = wqn->cb;
                         wqn->cb = NULL;
                         xwospl_cpuirq_restore_lc(cpuirq);
-                        cb(wqn->owner);
+                        cb(wqn);
                 } else {
                         /* add plsem counter */
                         if (sem->vsem.count < sem->vsem.max) {
@@ -402,13 +405,13 @@ xwer_t xwup_plsem_blkthd_to_unlkwq_cpuirqrs(struct xwup_plsem * sem,
         xwer_t rc;
 
         xwtt = &xwskd->tt;
-        XWOS_BUG_ON((XWUP_SKDOBJ_ST_BLOCKING | XWUP_SKDOBJ_ST_SLEEPING |
-                     XWUP_SKDOBJ_ST_READY | XWUP_SKDOBJ_ST_STANDBY |
-                     XWUP_SKDOBJ_ST_FROZEN)
-                    & thd->state);
+        XWOS_BUG_ON(0 != ((XWUP_SKDOBJ_ST_BLOCKING | XWUP_SKDOBJ_ST_SLEEPING |
+                           XWUP_SKDOBJ_ST_READY | XWUP_SKDOBJ_ST_STANDBY |
+                           XWUP_SKDOBJ_ST_FROZEN)
+                          & thd->state));
 
         /* 检查是否被中断 */
-        if (XWUP_SKDOBJ_ST_EXITING & thd->state) {
+        if (0 != (XWUP_SKDOBJ_ST_EXITING & thd->state)) {
                 xwospl_cpuirq_restore_lc(cpuirq);
                 rc = -EINTR;
                 goto err_intr;
@@ -519,7 +522,7 @@ xwer_t xwup_plsem_test(struct xwup_plsem * sem,
         if (sem->vsem.count <= 0) {
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
                 rc = xwup_skd_wakelock_lock();
-                if (__xwcc_unlikely(rc < 0)) {
+                if (rc < 0) {
                         /* 系统准备进入低功耗模式，线程需被冻结，返回-EINTR*/
                         xwospl_cpuirq_restore_lc(cpuirq);
                         rc = -EINTR;
@@ -562,11 +565,11 @@ xwer_t xwup_plsem_wait_to(struct xwup_plsem * sem, xwtm_t to)
         xwskd = xwup_skd_get_lc();
         hwt = &xwskd->tt.hwt;
         now = xwup_syshwt_get_timetick(hwt);
-        if (__xwcc_unlikely(xwtm_cmp(to, now) < 0)) {
+        if (xwtm_cmp(to, now) < 0) {
                 rc = -ETIMEDOUT;
-        } else if (__xwcc_unlikely(xwtm_cmp(to, now) == 0)) {
+        } else if (xwtm_cmp(to, now) == 0) {
                 rc = xwup_plsem_trywait(sem);
-                if (__xwcc_unlikely(rc < 0)) {
+                if (rc < 0) {
                         if (-ENODATA == rc) {
                                 rc = -ETIMEDOUT;
                         }
@@ -590,10 +593,10 @@ xwer_t xwup_plsem_blkthd_unlkwq_cpuirqrs(struct xwup_plsem * sem,
 {
         xwer_t rc;
 
-        XWOS_BUG_ON((XWUP_SKDOBJ_ST_BLOCKING | XWUP_SKDOBJ_ST_SLEEPING |
-                     XWUP_SKDOBJ_ST_READY | XWUP_SKDOBJ_ST_STANDBY |
-                     XWUP_SKDOBJ_ST_FROZEN)
-                    & thd->state);
+        XWOS_BUG_ON(0 != ((XWUP_SKDOBJ_ST_BLOCKING | XWUP_SKDOBJ_ST_SLEEPING |
+                           XWUP_SKDOBJ_ST_READY | XWUP_SKDOBJ_ST_STANDBY |
+                           XWUP_SKDOBJ_ST_FROZEN)
+                          & thd->state));
 
         /* 加入等待队列 */
         xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_RUNNING);

@@ -40,14 +40,8 @@ xwer_t xwup_vsem_release(struct xwup_vsem * sem, xwsq_t tik);
 xwer_t xwup_vsem_grab(struct xwup_vsem * sem);
 xwer_t xwup_vsem_put(struct xwup_vsem * sem);
 
-#if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
-xwer_t xwup_vsem_bind(struct xwup_vsem * sem, struct xwup_evt * evt, xwsq_t pos);
-xwer_t xwup_vsem_unbind(struct xwup_vsem * sem, struct xwup_evt * evt);
-#else
-#  define xwup_vsem_bind(sem, evt, pos) (-ENOSYS)
-#  define xwup_vsem_unbind(sem, evt) (-ENOSYS)
-#endif
-
+xwer_t xwup_vsem_bind(struct xwup_vsem * sem, struct xwup_evt * sel, xwsq_t pos);
+xwer_t xwup_vsem_unbind(struct xwup_vsem * sem, struct xwup_evt * sel);
 xwer_t xwup_vsem_freeze(struct xwup_vsem * sem);
 xwer_t xwup_vsem_thaw(struct xwup_vsem * sem);
 xwer_t xwup_vsem_getvalue(struct xwup_vsem * sem, xwssq_t * sval);

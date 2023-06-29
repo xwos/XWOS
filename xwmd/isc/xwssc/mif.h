@@ -53,6 +53,7 @@
  * @brief 定义内存池
  * @param[in] name: 数值名
  */
+// cppcheck-suppress [misra-c2012-20.7]
 #define XWSSC_DEF_MEMPOOL(name) __xwcc_alignl1cache xwu8_t name[XWSSC_MEMPOOL_SIZE]
 
 struct xwssc;

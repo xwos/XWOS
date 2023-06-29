@@ -35,6 +35,7 @@ xwer_t xwmp_rtrq_init(struct xwmp_rtrq * xwrtrq)
         xwsq_t i;
 
         xwmp_splk_init(&xwrtrq->lock);
+        // cppcheck-suppress [misra-c2012-17.7]
         memset(&xwrtrq->bmp, 0, sizeof(xwrtrq->bmp));
         for (i = 0; i < XWMP_RTRQ_QNUM; i++) {
                 xwlib_bclst_init_head(&xwrtrq->q[i]);

@@ -78,7 +78,7 @@ xwer_t xwmp_pmdm_suspend(void)
         if ((XWOK == rc) && (XWMP_PM_STAGE_FREEZING == nv)) {
                 for (cpuid = 0; cpuid < xwmp_pmdm.xwskd_num; cpuid++) {
                         rc = xwmp_skd_suspend(cpuid);
-                        if (__xwcc_unlikely(rc < 0)) {
+                        if (rc < 0) {
                                 break;
                         }
                 }
@@ -95,19 +95,21 @@ __xwmp_api
 xwer_t xwmp_pmdm_resume(void)
 {
         xwid_t cpuid;
-        xwsq_t nv, ov;
+        xwsq_t nv;
+        xwsq_t ov;
         xwreg_t cpuirq;
         xwer_t rc;
 
+        // cppcheck-suppress [misra-c2012-15.4]
         do {
                 rc = xwaop_teq_then_add(xwsq_t, &xwmp_pmdm.stage,
                                         XWMP_PM_STAGE_SUSPENDED,
                                         1,
                                         &nv, &ov);
                 if ((XWOK == rc) && (XWMP_PM_STAGE_RESUMING == nv)) {
-                        if (xwmp_pmdm.cb.wakeup) {
+                        if (NULL != xwmp_pmdm.cb.wakeup) {
                                 xwmp_pmdm.cb.wakeup(xwmp_pmdm.cb.arg);
-                        }/* else {} */
+                        }
                 }
 
                 rc = xwaop_teq_then_add(xwsq_t, &xwmp_pmdm.stage,
@@ -116,9 +118,9 @@ xwer_t xwmp_pmdm_resume(void)
                                         &nv, &ov);
                 if ((XWOK == rc) && (XWMP_PM_STAGE_THAWING == nv)) {
                         xwmp_splk_lock_cpuirqsv(&xwmp_pmdm.rslock, &cpuirq);
-                        if (xwmp_pmdm.cb.resume) {
+                        if (NULL != xwmp_pmdm.cb.resume) {
                                 xwmp_pmdm.cb.resume(xwmp_pmdm.cb.arg);
-                        }/* else {} */
+                        }
                         xwmp_splk_unlock_cpuirqrs(&xwmp_pmdm.rslock, cpuirq);
                 }
 
@@ -129,9 +131,9 @@ xwer_t xwmp_pmdm_resume(void)
                 if ((XWOK == rc) && (XWMP_PM_STAGE_RUNNING == nv)) {
                         for (cpuid = 0; cpuid < xwmp_pmdm.xwskd_num; cpuid++) {
                                 rc = xwmp_skd_resume(cpuid);
-                                if (__xwcc_unlikely(rc < 0)) {
+                                if (rc < 0) {
                                         break;
-                                }/* else {} */
+                                }
                         }
                         break;
                 }
@@ -175,9 +177,9 @@ void xwmp_pmdm_report_xwskd_suspended(struct xwmp_pmdm * pmdm)
                                         2,
                                         &nv, NULL);
                 if ((XWOK == rc) && (XWMP_PM_STAGE_SUSPENDING == nv)) {
-                        if (pmdm->cb.suspend) {
+                        if (NULL != pmdm->cb.suspend) {
                                 pmdm->cb.suspend(pmdm->cb.arg);
-                        }/* else {} */
+                        }
                         xwmp_splk_unlock_cpuirqrs(&pmdm->rslock, cpuirq);
 
                         xwaop_teq_then_sub(xwsq_t, &pmdm->stage,
@@ -185,9 +187,9 @@ void xwmp_pmdm_report_xwskd_suspended(struct xwmp_pmdm * pmdm)
                                            1,
                                            &nv, NULL);
                         while (XWMP_PM_STAGE_SUSPENDED == nv) {
-                                if (pmdm->cb.sleep) {
+                                if (NULL != pmdm->cb.sleep) {
                                         pmdm->cb.sleep(pmdm->cb.arg);
-                                }/* else {} */
+                                }
                                 nv = xwaop_load(xwsq_t, &pmdm->stage, xwaop_mo_relaxed);
                         }
                 } else {

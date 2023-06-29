@@ -47,7 +47,7 @@ xwsq_t xwmp_sqlk_rd_begin(struct xwmp_sqlk * sql)
 #if (XWMP_SQLK_GRANULARITY > 1)
                 ret &= ((~XWMP_SQLK_GRANULARITY) + 1U);
 #endif
-        } while (__xwcc_unlikely(ret & XWMP_SQLK_GRANULARITY));
+        } while (0 != (ret & XWMP_SQLK_GRANULARITY));
         xwmb_mp_rmb();
         return ret;
 }

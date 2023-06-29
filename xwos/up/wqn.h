@@ -31,14 +31,6 @@ enum xwup_wqtype_em {
 };
 
 /**
- * @brief 等待队列节点所属对象枚举
- */
-enum xwup_wqowner_em {
-        XWUP_WQOWNER_UNKNOWN = 0,
-        XWUP_WQOWNER_THD,
-};
-
-/**
  * @brief 等待队列节点唤醒原因枚举
  */
 enum xwup_wqn_reason_em {
@@ -47,10 +39,12 @@ enum xwup_wqn_reason_em {
         XWUP_WQN_REASON_INTR, /**< 等待被中断 */
 };
 
+struct xwup_wqn;
+
 /**
  * @brief 等待队列节点回调函数指针类型
  */
-typedef void (* xwup_wqn_f)(void *);
+typedef void (* xwup_wqn_f)(struct xwup_wqn *);
 
 /**
  * @brief 等待队列节点
@@ -60,15 +54,14 @@ struct xwup_wqn {
         volatile xwu16_t reason; /**< 唤醒原因 */
         void * wq; /**< 指向所属的等待队列的指针 */
         xwup_wqn_f cb; /**< 被唤醒时的回调函数 */
-        void * owner; /**< 拥有此结构体的对象指针 */
         xwpr_t prio; /**< 优先级 */
         struct xwlib_rbtree_node rbn; /**> 红黑树节点 */
         union {
-                struct xwlib_bclst_node rbb;
-                struct xwlib_bclst_node pl;
+                struct xwlib_bclst_node rbb; /**< 当等待队列为 `rtwq` 时的链表节点 */
+                struct xwlib_bclst_node pl; /**< 当等待队列为 `plwq` 时的链表节点 */
         } cln; /**< 双循环链表节点 */
 };
 
-void xwup_wqn_init(struct xwup_wqn * wqn, void * owner);
+void xwup_wqn_init(struct xwup_wqn * wqn);
 
 #endif /* xwos/up/wqn.h */

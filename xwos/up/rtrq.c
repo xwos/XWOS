@@ -27,6 +27,7 @@ void xwup_rtrq_init(struct xwup_rtrq * xwrtrq)
 {
         xwsq_t i;
 
+        // cppcheck-suppress [misra-c2012-17.7]
         memset(&xwrtrq->bmp, 0, sizeof(xwrtrq->bmp));
         for (i = 0; i < XWUP_RTRQ_QNUM; i++) {
                 xwlib_bclst_init_head(&xwrtrq->q[i]);
@@ -58,8 +59,8 @@ void xwup_rtrq_add_head(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
                 xwbmpop_s1i(xwrtrq->bmp, (xwsq_t)prio);
                 if (xwrtrq->top < prio) {
                         xwrtrq->top = prio;
-                }/* else {} */
-        }/* else {} */
+                }
+        }
 
 }
 
@@ -87,8 +88,8 @@ void xwup_rtrq_add_tail(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
                 xwbmpop_s1i(xwrtrq->bmp, (xwsq_t)prio);
                 if (xwrtrq->top < prio) {
                         xwrtrq->top = prio;
-                }/* else {} */
-        }/* else {} */
+                }
+        }
 }
 
 /**

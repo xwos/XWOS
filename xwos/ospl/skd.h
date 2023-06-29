@@ -34,6 +34,7 @@
 #else
 #  error "Can't find the configuration XWOS_CFG_CORE!"
 #endif
+#include <xwosimpl_skd.h>
 
 struct xwospl_skdobj_stack;
 struct xwospl_skd;
@@ -131,7 +132,5 @@ xwer_t xwospl_thd_outmigrate(struct xwospl_thd * thd, xwid_t cpuid);
  */
 void xwospl_thd_immigrate(struct xwospl_thd * thd, xwid_t cpuid);
 #endif
-
-#include <xwosimpl_skd.h>
 
 #endif /* xwos/ospl/skd.h */

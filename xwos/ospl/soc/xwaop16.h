@@ -14,6 +14,7 @@
 #define __xwos_ospl_soc_xwaop16_h__
 
 #include <xwos/standard.h>
+#include <xwosimpl_soc_xwaop16.h>
 
 /******** ******** ******** ******** unsigned ******** ******** ******** ********/
 xwu16_t xwaop__xwu16_t__load(atomic_xwu16_t * a,
@@ -571,7 +572,5 @@ xwer_t xwaop__xws16_t__tst_then_op(atomic_xws16_t * a,
                                    xwaop_tst_f tst, void * tst_args,
                                    xwaop_op_f op, void * op_args,
                                    xws16_t * nv, xws16_t * ov);
-
-#include <xwosimpl_soc_xwaop16.h>
 
 #endif /* xwos/ospl/soc/xwaop16.h */

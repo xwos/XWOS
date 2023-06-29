@@ -26,14 +26,12 @@ xwsq_t xwup_sqlk_rd_begin(struct xwup_sqlk * sql)
 {
         xwsq_t ret;
 
-retry:
-        xwmb_read(xwsq_t, ret, &sql->seq);
+        do {
+                xwmb_read(xwsq_t, ret, &sql->seq);
 #if (XWUP_SQLK_GRANULARITY > 1)
-        ret &= ((~XWUP_SQLK_GRANULARITY) + 1U);
+                ret &= ((~XWUP_SQLK_GRANULARITY) + 1U);
 #endif
-        if (__xwcc_unlikely(ret & XWUP_SQLK_GRANULARITY)) {
-                goto retry;
-        }
+        } while (0 != (ret & XWUP_SQLK_GRANULARITY));
         xwmb_mp_rmb();
         return ret;
 }

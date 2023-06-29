@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <e200x_core.h>
+#include <e200x_isa.h>
 #include <arch_firmware.h>
 #include <arch_init.h>
 

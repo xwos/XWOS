@@ -14,6 +14,7 @@
 #define __xwos_ospl_soc_xwbmpaop_h__
 
 #include <xwos/standard.h>
+#include <xwosimpl_soc_xwbmpaop.h>
 
 bool xwbmpaop_t1i(atomic_xwbmp_t * bmp, xwsq_t idx);
 void xwbmpaop_s1i(atomic_xwbmp_t * bmp, xwsq_t idx);
@@ -27,7 +28,5 @@ xwssq_t xwbmpaop_fls_then_c0i(atomic_xwbmp_t * bmp, xwsz_t num);
 xwssq_t xwbmpaop_flz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num);
 xwssq_t xwbmpaop_ffs_then_c0i(atomic_xwbmp_t * bmp, xwsz_t num);
 xwssq_t xwbmpaop_ffz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num);
-
-#include <xwosimpl_soc_xwbmpaop.h>
 
 #endif /* xwos/ospl/soc/xwbmpaop.h */

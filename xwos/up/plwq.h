@@ -27,10 +27,11 @@ struct xwup_plwq {
 
 /**
  * @brief 安全地遍历管道等待队列中所有节点，以防其被删除
- * @param[in] c: 作为循环光标的等待队列节点结构体(struct xwup_wqn)指针
- * @param[in] n: 作为临时变量的另一个等待队列节点结构体(struct xwup_wqn)指针
+ * @param[in] c: 循环变量，类型只能是 `struct xwup_wqn *`
+ * @param[in] n: 临时变量，类型只能是 `struct xwup_wqn *`
  * @param[in] xwplwq: 管道等待队列的指针
  */
+// cppcheck-suppress [misra-c2012-20.7]
 #define xwup_plwq_itr_wqn_safe(c, n, xwplwq)                            \
         xwlib_bclst_itr_next_entry_safe(c, n, &((xwplwq)->head),        \
                                         struct xwup_wqn,                \
@@ -38,9 +39,10 @@ struct xwup_plwq {
 
 /**
  * @brief 以删除为目的，遍历管道等待队列中所有节点
- * @param[in] c: 作为循环光标的等待队列节点结构体(struct xwup_wqn)指针
+ * @param[in] c: 循环变量，类型只能是 `struct xwup_wqn *`
  * @param[in] xwplwq: 管道等待队列的指针
  */
+// cppcheck-suppress [misra-c2012-20.7]
 #define xwup_plwq_itr_wqn_rm(c, xwplwq)                                 \
         xwlib_bclst_itr_next_entry_del(c, &((xwplwq)->head),            \
                                        struct xwup_wqn,                 \

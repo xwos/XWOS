@@ -25,8 +25,8 @@ struct xwup_swt;
  * @brief 软件定时器标志枚举
  */
 enum xwup_swt_flag_em {
-        XWUP_SWT_FLAG_NULL = 0, /**< 无（默认标志） */
-        XWUP_SWT_FLAG_RESTART = (1 << 0), /**< 自动重启 */
+        XWUP_SWT_FLAG_NULL = 0U, /**< 无（默认标志） */
+        XWUP_SWT_FLAG_RESTART = 1U, /**< 自动重启，BIT(0) */
         XWUP_SWT_FLAG_MASK = XWUP_SWT_FLAG_RESTART,
 };
 
@@ -47,7 +47,9 @@ struct xwup_swt {
         xwtm_t period; /**< 周期 */
 };
 
-/* public */
+#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
+xwer_t xwup_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
+#endif
 xwer_t xwup_swt_init(struct xwup_swt * swt, xwsq_t flag);
 xwer_t xwup_swt_fini(struct xwup_swt * swt);
 xwer_t xwup_swt_create(struct xwup_swt ** ptrbuf, xwsq_t flag);

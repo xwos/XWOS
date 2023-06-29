@@ -54,6 +54,16 @@ struct xwmp_thd_attr {
 
 /**
  * @brief XWOS MP线程对象
+ * @details
+ * 在语义上，相当于C++的
+ * ```C++
+ * class xwmp_thd :
+ *   public xwos_object,
+ *   public xwmp_skdobj_stack,
+ *   public xwmp_ttn,
+ *   public xwmp_wqn,
+ *   public xwmp_mtxtree
+ * ```
  */
 struct xwmp_thd {
         struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
@@ -88,8 +98,7 @@ struct xwmp_thd {
 
         /* 线程优先级 */
 #if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
-        struct xwmp_mtxtree mtxtree; /**< 互斥锁树：线程已经获得的所有互斥锁都
-                                          需要加入到互斥锁树 */
+        struct xwmp_mtxtree mt; /**< 互斥锁树 */
 #endif
         xwpr_t sprio; /**< 线程的固有优先级 */
         struct {
@@ -117,8 +126,6 @@ xwer_t xwmp_thd_rq_add_head(struct xwmp_thd * thd, xwpr_t prio);
 xwer_t xwmp_thd_rq_add_tail(struct xwmp_thd * thd, xwpr_t prio);
 xwer_t xwmp_thd_rq_remove(struct xwmp_thd * thd);
 xwer_t xwmp_thd_wakeup(struct xwmp_thd * thd);
-void xwmp_thd_ttn_callback(void * entry);
-void xwmp_thd_wqn_callback(void * entry);
 xwer_t xwmp_thd_tt_add_locked(struct xwmp_thd * thd, struct xwmp_tt * xwtt,
                               xwtm_t to, xwreg_t cpuirq);
 

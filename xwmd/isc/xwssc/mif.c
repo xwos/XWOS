@@ -34,7 +34,7 @@ static __xwmd_code
 void xwssc_txcb_notify(struct xwssc * xwssc, xwssc_txh_t txh, xwer_t rc, void * arg);
 
 static __xwmd_code
-xwer_t xwssc_gc(void * obj);
+xwer_t xwssc_gc(struct xwos_object * obj);
 
 __xwmd_api
 xwer_t xwssc_start(struct xwssc * xwssc, const char * name,
@@ -199,7 +199,7 @@ xwer_t xwssc_stop(struct xwssc * xwssc)
  * @return 错误码
  */
 static __xwmd_code
-xwer_t xwssc_gc(void * obj)
+xwer_t xwssc_gc(struct xwos_object * obj)
 {
         struct xwssc * xwssc;
         struct xwssc_carrier * car;
@@ -207,7 +207,7 @@ xwer_t xwssc_gc(void * obj)
         xwer_t rc, childrc;
         xwssq_t j;
 
-        xwssc = obj;
+        xwssc = xwcc_derof(obj, struct xwssc, xwobj);
         if (xwssc->txthd.thd) {
                 rc = xwos_thd_stop(xwssc->txthd, &childrc);
                 if (XWOK == rc) {

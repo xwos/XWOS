@@ -168,11 +168,14 @@ xwer_t xwlib_crc8_swcal(xwu8_t * crc8,
                         bool refin, xwu8_t plynml,
                         const xwu8_t stream[], xwsz_t * size)
 {
-        xwsz_t i, total;
-        xwu8_t byte, remainder;
+        xwsz_t i;
+        xwsz_t total;
+        xwu8_t byte;
+        xwu8_t remainder;
         const xwu8_t * table;
         xwer_t rc;
 
+        // cppcheck-suppress [misra-c2012-16.6]
         switch (plynml) {
 #if defined(XWLIBCFG_CRC8_0X07) && (1 == XWLIBCFG_CRC8_0X07)
         case 0x7:
@@ -193,7 +196,7 @@ xwer_t xwlib_crc8_swcal(xwu8_t * crc8,
                 table = NULL;
                 break;
         }
-        if (table) {
+        if (NULL != table) {
                 remainder = *crc8;
                 total = *size;
                 for (i = 0; i < total; i++) {
@@ -241,7 +244,8 @@ xwer_t xwlib_crc8_cal(xwu8_t * crc8,
                       const xwu8_t stream[], xwsz_t * size)
 {
         xwer_t rc;
-        xwsz_t total, pos;
+        xwsz_t total;
+        xwsz_t pos;
         xwu8_t res;
 
         XWOS_VALIDATE((crc8), "nullptr", -EFAULT);
@@ -252,21 +256,21 @@ xwer_t xwlib_crc8_cal(xwu8_t * crc8,
         pos = 0;
         /* 使用硬件计算部分CRC8校验值 */
         rc = soc_crc8_cal(&res, refin, plynml, &stream[0], size);
-        if (*size) {
+        if (*size > 0) {
                 /* 使用软件计算剩余部分的CRC8校验值 */
                 pos = total - *size;
                 rc = xwlib_crc8_swcal(&res, refin, plynml, &stream[pos], size);
                 pos = total - *size;
-        }/* else {} */
+        }
         if (XWOK == rc) {
                 if (0 == *size) {
                         if (refout) {
                                 res = xwbop_rbit8(res);
-                        }/* else {} */
+                        }
                         res = res ^ xorout;
-                }/* else {} */
+                }
                 *crc8 = res;
-        }/* else {} */
+        }
         return rc;
 }
 

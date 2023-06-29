@@ -42,7 +42,8 @@ void xwup_mtxtree_add(struct xwup_mtxtree * mt, struct xwup_mtx * mtx)
 {
         struct xwlib_rbtree_node ** pos;
         struct xwlib_rbtree_node * rbn;
-        struct xwup_mtx * m, * max;
+        struct xwup_mtx * m;
+        struct xwup_mtx * max;
         struct xwlib_rbtree * tree;
         xwptr_t lpc;
         xwpr_t prio;
@@ -67,7 +68,7 @@ void xwup_mtxtree_add(struct xwup_mtxtree * mt, struct xwup_mtx * mtx)
                 lpc = (xwptr_t)0;
         } else {
                 rbn = *pos;
-                while (rbn) {
+                while (NULL != rbn) {
                         m = xwlib_rbtree_entry(rbn, struct xwup_mtx, rbnode);
                         if (prio < m->dprio) {
                                 pos = &rbn->left;
@@ -83,7 +84,7 @@ void xwup_mtxtree_add(struct xwup_mtxtree * mt, struct xwup_mtx * mtx)
                         }
                 }
         }
-        if (lpc) {
+        if (0 != lpc) {
                 xwlib_rbtree_link(&mtx->rbnode, lpc);
                 xwlib_rbtree_insert_color(tree, &mtx->rbnode);
         } else {
@@ -116,7 +117,7 @@ void xwup_mtxtree_remove(struct xwup_mtxtree * mt, struct xwup_mtx * mtx)
                 xwlib_rbtree_init_node(&mtx->rbnode);
                 if (mtx == mt->rightmost) {
                         mt->rightmost = n;
-                }/* else {} */
+                }
         } else {
                 if (mtx == mt->rightmost) {
                         p = mtx->rbnode.left; /* The predecessor of a max node is its
@@ -124,9 +125,9 @@ void xwup_mtxtree_remove(struct xwup_mtxtree * mt, struct xwup_mtx * mtx)
                                                  red-black tree. Or if there is no
                                                  left child, the predecessor is its
                                                  parent. */
-                        if (!p) {
+                        if (NULL == p) {
                                 p = xwlib_rbtree_get_parent(&mtx->rbnode);
-                        }/* else {} */
+                        }
                         if (p != (struct xwlib_rbtree_node *)&tree->root) {
                                 mt->rightmost = xwlib_rbtree_entry(p,
                                                                    struct xwup_mtx,

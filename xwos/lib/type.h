@@ -479,94 +479,94 @@ union xwos_ulock {
 #endif
 
 #ifndef XWU8_T__SIZE
-#  define BITS_PER_XWU8_T       8
-#  define XWU8_T_SHIFT          3
+#  define BITS_PER_XWU8_T       8U
+#  define XWU8_T_SHIFT          3U
 #endif
 #ifndef XWS8_T__SIZE
-#  define BITS_PER_XWS8_T       8
-#  define XWS8_T_SHIFT          3
+#  define BITS_PER_XWS8_T       8U
+#  define XWS8_T_SHIFT          3U
 #endif
 
 #ifndef XWU16_T__SIZE
-#  define BITS_PER_XWU16_T      16
-#  define XWU16_T_SHIFT         4
+#  define BITS_PER_XWU16_T      16U
+#  define XWU16_T_SHIFT         4U
 #endif
 #ifndef XWS16_T__SIZE
-#  define BITS_PER_XWS16_T      16
-#  define XWS16_T_SHIFT         4
+#  define BITS_PER_XWS16_T      16U
+#  define XWS16_T_SHIFT         4U
 #endif
 
 #ifndef XWU32_T__SIZE
-#  define BITS_PER_XWU32_T      32
-#  define XWU32_T_SHIFT         5
+#  define BITS_PER_XWU32_T      32U
+#  define XWU32_T_SHIFT         5U
 #endif
 #ifndef XWS32_T__SIZE
-#  define BITS_PER_XWS32_T      32
-#  define XWS32_T_SHIFT         5
+#  define BITS_PER_XWS32_T      32U
+#  define XWS32_T_SHIFT         5U
 #endif
 
 #ifndef XWU64_T__SIZE
-#  define BITS_PER_XWU64_T      64
-#  define XWU64_T_SHIFT         6
+#  define BITS_PER_XWU64_T      64U
+#  define XWU64_T_SHIFT         6U
 #endif
 #ifndef XWS64_T__SIZE
-#  define BITS_PER_XWS64_T      64
-#  define XWS64_T_SHIFT         6
+#  define BITS_PER_XWS64_T      64U
+#  define XWS64_T_SHIFT         6U
 #endif
 
 #ifndef CHAR__SIZE
-#  define BITS_PER_CHAR         8
-#  define CHAR_SHIFT            3
+#  define BITS_PER_CHAR         8U
+#  define CHAR_SHIFT            3U
 #endif
 #ifndef UCHAR__SIZE
-#  define BITS_PER_UCHAR        8
-#  define UCHAR_SHIFT           3
+#  define BITS_PER_UCHAR        8U
+#  define UCHAR_SHIFT           3U
 #endif
 
 #ifndef SHORT__SIZE
-#  define BITS_PER_SHORT        16
-#  define SHORT_SHIFT           4
+#  define BITS_PER_SHORT        16U
+#  define SHORT_SHIFT           4U
 #endif
 #ifndef USHORT__SIZE
-#  define BITS_PER_USHORT       16
-#  define USHORT_SHIFT          4
+#  define BITS_PER_USHORT       16U
+#  define USHORT_SHIFT          4U
 #endif
 
 #ifndef INT__SIZE
-#  define BITS_PER_INT          32
-#  define INT_SHIFT             5
+#  define BITS_PER_INT          32U
+#  define INT_SHIFT             5U
 #endif
 #ifndef UINT__SIZE
-#  define BITS_PER_UINT         32
-#  define UINT_SHIFT            5
+#  define BITS_PER_UINT         32U
+#  define UINT_SHIFT            5U
 #endif
 
 #ifndef LONG__SIZE
-#  define BITS_PER_LONG         32
-#  define LONG_SHIFT            5
+#  define BITS_PER_LONG         32U
+#  define LONG_SHIFT            5U
 #endif
 #ifndef ULONG__SIZE
-#  define BITS_PER_ULONG        32
-#  define LONG_SHIFT            5
+#  define BITS_PER_ULONG        32U
+#  define LONG_SHIFT            5U
 #endif
 
 #ifndef LONGLONG__SIZE
-#  define BITS_PER_LONGLONG     64
-#  define LONGLONG_SHIFT        6
+#  define BITS_PER_LONGLONG     64U
+#  define LONGLONG_SHIFT        6U
 #endif
 #ifndef ULONGLONG__SIZE
-#  define BITS_PER_ULONGLONG    64
-#  define ULONGLONG_SHIFT       6
+#  define BITS_PER_ULONGLONG    64U
+#  define ULONGLONG_SHIFT       6U
 #endif
 
 #ifndef FLOAT__SIZE
-#  define BITS_PER_FLOAT        32
-#  define FLOAT_SHIFT           5
+#  define BITS_PER_FLOAT        32U
+#  define FLOAT_SHIFT           5U
 #endif
 
 #ifndef DOUBLE__SIZE
-#  define BITS_PER_DOUBLE       64
-#  define DOUBLE_SHIFT          6
+#  define BITS_PER_DOUBLE       64U
+#  define DOUBLE_SHIFT          6U
 #endif
 
 #ifndef XWBMP_T__SIZE
@@ -693,9 +693,9 @@ xwtm_t xwtm_add_safely(const xwtm_t a, const xwtm_t b)
         xwtm_t res;
 
         res = a + b;
-        if (__xwcc_unlikely(res < 0)) {
+        if (res < 0) {
                 res = XWTM_MAX;
-        }/* else {} */
+        }
         return res;
 }
 

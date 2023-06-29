@@ -14,10 +14,9 @@
 #define __xwos_ospl_soc_bkpt_h__
 
 #include <xwos/standard.h>
+#include <xwosimpl_soc_bkpt.h>
 
 static __xwbsp_inline
 void soc_bkpt(void);
-
-#include <xwosimpl_soc_bkpt.h>
 
 #endif /* xwos/ospl/soc/bkpt.h */

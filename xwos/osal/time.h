@@ -54,7 +54,8 @@ xwtm_t xwtm_now(void)
 static __xwos_inline_api
 xwtm_t xwtm_ft(xwtm_t dur)
 {
-        xwtm_t from, to;
+        xwtm_t from;
+        xwtm_t to;
 
         from = xwtm_now();
         to = xwtm_add_safely(from, dur);
@@ -93,7 +94,8 @@ xwtm_t xwtm_nowts(void)
 static __xwos_inline_api
 xwtm_t xwtm_fts(xwtm_t dur)
 {
-        xwtm_t from, to;
+        xwtm_t from;
+        xwtm_t to;
 
         from = xwtm_nowts();
         to = xwtm_add_safely(from, dur);

@@ -16,7 +16,6 @@
 #include <xwosimpl_soc_setjmp.h>
 
 typedef soc_jmpbuf_b xwjmpbuf_b;
-
 int xwlib_setjmp(xwjmpbuf_b ctx);
 __xwcc_noreturn void xwlib_longjmp(xwjmpbuf_b ctx, int val);
 

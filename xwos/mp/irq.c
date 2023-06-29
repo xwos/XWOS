@@ -20,7 +20,7 @@ xwer_t xwmp_irq_enable(xwirq_t irqn)
 {
         XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM),
                       "out-of-range", -ERANGE);
-        XWOS_VALIDATE((irqn >= (0 - (xwirq_t)SOCCFG_EXC_NUM)),
+        XWOS_VALIDATE((irqn >= (-(xwirq_t)SOCCFG_EXC_NUM)),
                       "out-of-range", -ERANGE);
 
         return xwospl_irq_enable(irqn);
@@ -31,7 +31,7 @@ xwer_t xwmp_irq_disable(xwirq_t irqn)
 {
         XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM),
                       "out-of-range", -ERANGE);
-        XWOS_VALIDATE((irqn >= (0 - (xwirq_t)SOCCFG_EXC_NUM)),
+        XWOS_VALIDATE((irqn >= (-(xwirq_t)SOCCFG_EXC_NUM)),
                       "out-of-range", -ERANGE);
 
         return xwospl_irq_disable(irqn);;
@@ -42,7 +42,7 @@ xwer_t xwmp_irq_save(xwirq_t irqn, xwreg_t * flag)
 {
         XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM),
                       "out-of-range", -ERANGE);
-        XWOS_VALIDATE((irqn >= (0 - (xwirq_t)SOCCFG_EXC_NUM)),
+        XWOS_VALIDATE((irqn >= (-(xwirq_t)SOCCFG_EXC_NUM)),
                       "out-of-range", -ERANGE);
 
         return xwospl_irq_save(irqn, flag);
@@ -53,7 +53,7 @@ xwer_t xwmp_irq_restore(xwirq_t irqn, xwreg_t flag)
 {
         XWOS_VALIDATE((irqn < (xwirq_t)SOCCFG_IRQ_NUM),
                       "out-of-range", -ERANGE);
-        XWOS_VALIDATE((irqn >= (0 - (xwirq_t)SOCCFG_EXC_NUM)),
+        XWOS_VALIDATE((irqn >= (-(xwirq_t)SOCCFG_EXC_NUM)),
                       "out-of-range", -ERANGE);
 
         return xwospl_irq_restore(irqn, flag);

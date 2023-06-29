@@ -22,6 +22,7 @@
 #else
 #  error "Can't find the configuration XWOS_CFG_CORE!"
 #endif
+#include <xwosimpl_irq.h>
 
 static __xwbsp_inline
 void xwospl_cpuirq_enable_lc(void);
@@ -37,7 +38,5 @@ xwer_t xwospl_irq_enable(xwirq_t irqn);
 xwer_t xwospl_irq_disable(xwirq_t irqn);
 xwer_t xwospl_irq_save(xwirq_t irqn, xwreg_t * flag);
 xwer_t xwospl_irq_restore(xwirq_t irqn, xwreg_t flag);
-
-#include <xwosimpl_irq.h>
 
 #endif /* xwos/ospl/irq.h */

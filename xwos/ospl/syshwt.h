@@ -28,17 +28,15 @@
 #else
 #  error "Can't find the configuration XWOS_CFG_CORE!"
 #endif
+#include <xwosimpl_syshwt.h>
 
 struct xwospl_syshwt;
 
 void xwosplcb_syshwt_task(struct xwospl_syshwt * hwt);
-
 xwer_t xwospl_syshwt_init(struct xwospl_syshwt * hwt);
 xwer_t xwospl_syshwt_start(struct xwospl_syshwt * hwt);
 xwer_t xwospl_syshwt_stop(struct xwospl_syshwt * hwt);
 xwtm_t xwospl_syshwt_get_timeconfetti(struct xwospl_syshwt * hwt);
 void xwospl_syshwt_isr(void);
-
-#include <xwosimpl_syshwt.h>
 
 #endif /* xwos/ospl/syshwt.h */

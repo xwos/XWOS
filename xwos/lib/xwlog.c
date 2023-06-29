@@ -11,21 +11,21 @@
  */
 
 #include <xwos/standard.h>
-#include <stdio.h>
+#include <stdio.h> // cppcheck-suppress [misra-c2012-21.6]
 #include <xwos/lib/xwlog.h>
 
 extern xwer_t soc_log_write(const char * s, xwsz_t * n);
 extern xwer_t board_log_write(const char * s, xwsz_t * n);
 
 /**
- * @brief 格式化字符串并输出到日志，同printf()函数
+ * @brief 格式化字符串并输出到日志，同 `printf()` 函数
  * @param[in] fmt: 格式的字符串
  * @param[in] ...: 需要转换位字符串的其他参数
- * @return 同vsnprintf()函数
+ * @return 同 `vsnprintf()` 函数
  * @note
- * - 同步/异步：依据BSP中soc_log_write()或board_log_write()的实现
- * - 上下文：依据BSP中soc_log_write()或board_log_write()的实现
- * - 重入性：依据BSP中soc_log_write()或board_log_write()的实现
+ * - 同步/异步：依据BSP中 `soc_log_write(` )或 `board_log_write()` 的实现
+ * - 上下文：依据BSP中 `soc_log_write()` 或 `board_log_write()` 的实现
+ * - 重入性：依据BSP中 `soc_log_write()` 或 `board_log_write()` 的实现
  */
 __xwlib_code
 int xwpf(const char * fmt, ...)

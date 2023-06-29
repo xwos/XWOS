@@ -51,7 +51,7 @@ struct xwlib_bclst_node {
  * @param[in] member: 节点在外层结构体中的成员符号名(symbol)
  * @return 外层结构体的指针
  */
-#define xwlib_bclst_entry(ptr, type, member) xwcc_baseof((ptr), type, member)
+#define xwlib_bclst_entry(ptr, type, member) xwcc_derof((ptr), type, member)
 
 /**
  * @brief 获得包含链表第一个节点的外层结构体的指针。
@@ -291,7 +291,7 @@ static __xwlib_inline
 bool xwlib_bclst_tst_empty_carefully(const struct xwlib_bclst_head * h)
 {
         struct xwlib_bclst_node * next = h->next;
-        return ((next == (struct xwlib_bclst_node *)h) && (next == h->prev));
+        return ((next == (const struct xwlib_bclst_node *)h) && (next == h->prev));
 }
 
 /**
@@ -453,7 +453,7 @@ void xwlib_bclst_splice_head(struct xwlib_bclst_head * head,
 {
         if (!xwlib_bclst_tst_empty(list)) {
                 xwlib_bclst_splice_between(list, head, head->next);
-        }/* else {} */
+        }
 }
 
 /**
@@ -467,7 +467,7 @@ void xwlib_bclst_splice_tail(struct xwlib_bclst_head * head,
 {
         if (!xwlib_bclst_tst_empty(list)) {
                 xwlib_bclst_splice_between(list, head->prev, head);
-        }/* else {} */
+        }
 }
 
 /**
@@ -482,7 +482,7 @@ void xwlib_bclst_splice_head_init(struct xwlib_bclst_head * head,
         if (!xwlib_bclst_tst_empty(list)) {
                 xwlib_bclst_splice_between(list, head, head->next);
                 xwlib_bclst_init_head(list);
-        }/* else {} */
+        }
 }
 
 /**

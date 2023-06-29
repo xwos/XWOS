@@ -22,13 +22,15 @@ __xwlib_code __xwcc_hot
 void xwlib_rbtree_insert_color(struct xwlib_rbtree * tree,
                                struct xwlib_rbtree_node * node)
 {
-        struct xwlib_rbtree_node * parent, * gparent;
+        struct xwlib_rbtree_node * parent;
+        struct xwlib_rbtree_node * gparent;
         union {
                 struct xwlib_rbtree_node * child;
                 struct xwlib_rbtree_node * sibling;
                 struct xwlib_rbtree_node * uncle;
         } tmp;
-        xwptr_t rotation, lpc;
+        xwptr_t rotation;
+        xwptr_t lpc;
 
 recursively_fix:
         if (node == tree->root) {
@@ -48,7 +50,7 @@ recursively_fix:
                  *
                  */
                 xwlib_rbtree_flip_color(node);
-                return;
+                return; // cppcheck-suppress [misra-c2012-15.5]
         }
 
         parent = xwlib_rbtree_get_parent(node);
@@ -57,7 +59,7 @@ recursively_fix:
                  * 情况 2 父节点为黑色
                  * ====================
                  */
-                return;
+                return; // cppcheck-suppress [misra-c2012-15.5]
         }
 
         /* 情况 3： 父节点为红色 */
@@ -129,8 +131,8 @@ recursively_fix:
                 xwlib_rbtree_flip_color(parent);
                 xwlib_rbtree_flip_color(tmp.uncle);
                 xwlib_rbtree_flip_color(gparent);
-                node = gparent;
-                goto recursively_fix;
+                node = gparent; // cppcheck-suppress [misra-c2012-17.8]
+                goto recursively_fix; // cppcheck-suppress [misra-c2012-15.2]
         }
 
         /* 情况 3.2 叔节点(U)是叶子或黑色 */
@@ -201,9 +203,9 @@ recursively_fix:
                 lpc = parent->lpc.v;
 
                 *xwlib_rbtree_get_link(node->lpc.v) = tmp.child;
-                if (tmp.child) {
+                if (NULL != tmp.child) {
                         tmp.child->lpc.v = node->lpc.v | XWLIB_RBTREE_COLOR_BLACK;
-                }/* else {} */
+                }
 
                 *xwlib_rbtree_get_link(rotation) = parent;
                 parent->lpc.v = rotation; /* color: red */
@@ -214,7 +216,7 @@ recursively_fix:
                 /* 转换为情况 3.2.2 */
                 tmp.child = parent;
                 parent = node;
-                node = tmp.child;
+                node = tmp.child; // cppcheck-suppress [misra-c2012-17.8]
                 /* lpc = parent->lpc.v; */ /* omitted */
         }
 
@@ -310,9 +312,9 @@ recursively_fix:
         parent->lpc.v = gparent->lpc.v; /* flip_color(p): 黑 */
 
         *xwlib_rbtree_get_link(lpc) = tmp.sibling;
-        if (tmp.sibling) {
+        if (NULL != tmp.sibling) {
                 tmp.sibling->lpc.v = ((xwptr_t)lpc) | XWLIB_RBTREE_COLOR_BLACK;
-        }/* else {} */
+        }
 
         *xwlib_rbtree_get_link(rotation) = gparent;
         gparent->lpc.v = rotation; /* flip_color(g): 红 */
@@ -329,7 +331,8 @@ __xwlib_code __xwcc_hot
 void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                          struct xwlib_rbtree_node * node)
 {
-        struct xwlib_rbtree_node * parent, * sibling;
+        struct xwlib_rbtree_node * parent;
+        struct xwlib_rbtree_node * sibling;
         union {
                 struct xwlib_rbtree_node * same;
                 struct xwlib_rbtree_node * left;
@@ -348,10 +351,10 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
         /* 步骤 1 删除节点 */
         rr.right =  node->right;
         sl.left =  node->left;
-        if (!sl.left) {
+        if (NULL == sl.left) {
                 parent = xwlib_rbtree_get_parent(node);
                 *xwlib_rbtree_get_link(node->lpc.v) = rr.right;
-                if (!rr.right) {
+                if (NULL == rr.right) {
                         /*
                          * 情况 1.1 待删除的节点(n)没有子节点
                          * ===================================
@@ -411,7 +414,7 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                          *        NULL(B)    NULL(B)                   l(B)    r(B)
                          */
                         if (NULL == tree->root) {
-                                return;
+                                return; // cppcheck-suppress [misra-c2012-15.5]
                         }
 
                         lpc = node->lpc.v;
@@ -457,7 +460,7 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                         rr.right->lpc.v = node->lpc.v; /* Inherit color */
                         sibling = NULL;
                 }
-        } else if (!rr.right) {
+        } else if (NULL == rr.right) {
                 /*
                  * 情况 1.2.2 待删除的节点(n)没有右子节点
                  * ======================================
@@ -557,7 +560,7 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                          *   transplant操作后，不会产生双黑的叶子；
                          */
 
-                        if (successor->right) {
+                        if (NULL != successor->right) {
                                 xwlib_rbtree_set_black(successor->right);
                                 sibling = NULL;
                         } else {
@@ -649,7 +652,7 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                         cc.child = successor->right;
 
                         *xwlib_rbtree_get_link(lpc) = cc.child;
-                        if (cc.child) {
+                        if (NULL != cc.child) {
                                 cc.child->lpc.v = lpc; /* Inherit color */
                                 sibling = NULL;
                         } else {
@@ -678,8 +681,8 @@ void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
 
         /* 步骤 2：修复颜色 */
         /* X有可能是NULL或节点(n) */
-        if (!sibling) {
-                return;
+        if (NULL == sibling) {
+                return; // cppcheck-suppress [misra-c2012-15.5]
         }
 
 recursively_fix:
@@ -746,7 +749,7 @@ black_sibling:
                 rotation = xwlib_rbtree_gen_lr(sibling); /* 用于情况2.2.3中左旋 */
                 rr.reverse = sibling->left;
                 sl.same = sibling->right;
-                if (rr.reverse) {
+                if (NULL != rr.reverse) {
                         lpc = xwlib_rbtree_gen_rr(rr.reverse); /* 用于情况2.2.2中右旋 */
                 } else {
                         lpc = 0;
@@ -755,15 +758,15 @@ black_sibling:
                 rotation = xwlib_rbtree_gen_rr(sibling); /* 用于情况2.2.3中右旋 */
                 rr.reverse = sibling->right;
                 sl.same = sibling->left;
-                if (rr.reverse) {
+                if (NULL != rr.reverse) {
                         lpc = xwlib_rbtree_gen_lr(rr.reverse); /* 用于情况2.2.2中左旋 */
                 } else {
                         lpc = 0;
                 }
         }
 
-        if (!sl.same || xwlib_rbtree_tst_black(sl.same->lpc.v)) {
-                if (!rr.reverse || xwlib_rbtree_tst_black(rr.reverse->lpc.v)) {
+        if ((NULL == sl.same) || xwlib_rbtree_tst_black(sl.same->lpc.v)) {
+                if ((NULL == rr.reverse) || xwlib_rbtree_tst_black(rr.reverse->lpc.v)) {
                         /*
                          * 情况 2.2.1 兄弟节点(s)没有红色的子节点
                          * =====================================
@@ -824,12 +827,13 @@ black_sibling:
                                                 sibling = parent->right;
                                                 rotation = xwlib_rbtree_gen_lr(sibling);
                                         }
+                                        // cppcheck-suppress [misra-c2012-15.2]
                                         goto recursively_fix;
                                 }
                         } else {
                                 xwlib_rbtree_flip_color(parent);
                         }
-                        return;
+                        return; // cppcheck-suppress [misra-c2012-15.5]
                 }
 
                 /*
@@ -926,9 +930,9 @@ black_sibling:
                 /*      xwlib_rbtree_link_nil(rr.reverse->lpc.v);                  */
                 /* }                                                               */
                 *xwlib_rbtree_get_link(rr.reverse->lpc.v) = cc.child;
-                if (cc.child) {
+                if (NULL != cc.child) {
                         cc.child->lpc.v = rr.reverse->lpc.v | XWLIB_RBTREE_COLOR_BLACK;
-                }/* else {} */
+                }
 
                 /* xwlib_rbtree_link(rr.reverse,
                                      (rotation | XWLIB_RBTREE_COLOR_BLACK));       */
@@ -938,7 +942,7 @@ black_sibling:
 
                 /* 转换为情况 2.2 */
                 sibling = rr.reverse;
-                goto black_sibling;
+                goto black_sibling; // cppcheck-suppress [misra-c2012-15.2]
         }
 
         /*
@@ -998,10 +1002,10 @@ black_sibling:
         /* xwlib_rbtree_link(rr.reverse,
                              xwlib_rbtree_get_lnpos(sibling->lpc.v) | cc.color); */
         *xwlib_rbtree_get_link(sibling->lpc.v) = rr.reverse;
-        if (rr.reverse) {
+        if (NULL != rr.reverse) {
                 cc.color = xwlib_rbtree_get_color(rr.reverse->lpc.v);
                 rr.reverse->lpc.v = xwlib_rbtree_get_lnpos(sibling->lpc.v) | cc.color;
-        }/* else {} */
+        }
 
         /* xwlib_rbtree_link(sibling, lpc); */
         sibling->lpc.v = lpc; /* Inherit color. */
@@ -1022,15 +1026,15 @@ void xwlib_rbtree_replace(struct xwlib_rbtree_node * newn,
         struct xwlib_rbtree_node * right = oldn->right;
 
         xwlib_rbtree_transplant(newn, oldn);
-        if (left) {
+        if (NULL != left) {
                 xwptr_t lpc = xwlib_rbtree_get_color(left->lpc.v);
                 lpc |= (xwptr_t)(&newn->left);
                 xwlib_rbtree_link(left, lpc);
-        }/* else {} */
+        }
 
-        if (right) {
+        if (NULL != right) {
                 xwptr_t lpc = xwlib_rbtree_get_color(right->lpc.v);
                 lpc |= ((xwptr_t)(&newn->right) | XWLIB_RBTREE_POS_RIGHT);
                 xwlib_rbtree_link(right, lpc);
-        }/* else {} */
+        }
 }

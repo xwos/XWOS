@@ -47,7 +47,7 @@ xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num)
         : [__tmp] "r" (tmp)
         :
         );
-        p = (BITS_PER_XWBMP_T - 1) - p;
+        p = ((xwssq_t)BITS_PER_XWBMP_T - 1) - p;
         if (p >= 0) {
                 p += (xwssq_t)(i << XWBMP_T_SHIFT); /* p += i * BITS_PER_XWBMP_T; */
         }/* else {} */

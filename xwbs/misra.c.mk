@@ -1,6 +1,6 @@
 #! /bin/make -f
 # @file
-# @brief Top makefile of board/project
+# @brief 进行MISRA-C检查的Makefile
 # @author
 # + 隐星魂 (Roy Sun) <xwos@xwos.tech>
 # @copyright
@@ -18,34 +18,19 @@
 # > limitations under the License.
 #
 
-XWOS ?= ../..
-WKSPC ?= wkspc
-MKCFG := $(XWOS)/xwbs/util/el/mkcfg.el
+include $(XWOS_WKSPC_DIR)/XWOS.cfg
+include $(XWOS_ARCH_DIR)/arch.mk
+include $(XWOS_CPU_DIR)/cpu.mk
+include $(XWOS_SOC_DIR)/soc.mk
+include $(XWOS_BRD_DIR)/brd.mk
+include xwbs/misra.c.rule
 
-all: $(WKSPC) cfg
-	$(MAKE) -C $(WKSPC)
+CPPCHECK_C_ARGS = $(strip $(CPPCHECK_INCDIRS) $(CPPCHECK_CFLAGS))
 
-$(WKSPC):
+%.mc: $(CPPCHECK_OUT) FORCE
+	$(SHOW_CPPCHECK) $(CPPCHECK) $(CPPCHECK_C_ARGS) $*
+
+$(CPPCHECK_OUT):
 	@mkdir -p $@
-	@cp $(XWOS)/xwbs/wkspc.mk $@/makefile
-
-cfg: $(WKSPC) $(WKSPC)/XWOS.cfg
-
-$(WKSPC)/XWOS.cfg: $(filter-out cfg/autogen.h,$(wildcard cfg/*.h))
-	@[ -x ${MKCFG} ] || chmod +x ${MKCFG}
-	@${MKCFG} --XWOS=$(XWOS) --cfgdir=cfg --wkspc=$(WKSPC)
-
-c clean: cfg
-	$(MAKE) -C $(WKSPC) NODEP=y clean
-
-d distclean: cfg
-	$(MAKE) -C $(WKSPC) NODEP=y distclean
-	@rm -rf $(WKSPC)
 
 FORCE:
-
-.DEFAULT:
-	@$(MAKE) cfg
-	$(MAKE) -C $(WKSPC) $@
-
-.PHONY : all cfg c clean d distclean

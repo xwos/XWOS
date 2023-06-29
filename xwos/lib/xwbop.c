@@ -14,11 +14,15 @@
 #include <xwos/lib/xwbop.h>
 
 #if (!defined(ARCHCFG_LIB_XWBOP_RBIT8)) || (1 != ARCHCFG_LIB_XWBOP_RBIT8)
-#  define XWBOP_RBIT8_R2(n)  n,           n + 2*64,       n + 1*64,       n + 3*64
-#  define XWBOP_RBIT8_R4(n)  XWBOP_RBIT8_R2(n), XWBOP_RBIT8_R2(n + 2 * 16), \
-                             XWBOP_RBIT8_R2(n + 1 * 16), XWBOP_RBIT8_R2(n + 3 * 16)
-#  define XWBOP_RBIT8_R6(n)  XWBOP_RBIT8_R4(n), XWBOP_RBIT8_R4(n + 2 * 4), \
-                             XWBOP_RBIT8_R4(n + 1 * 4), XWBOP_RBIT8_R4(n + 3 * 4)
+#  define XWBOP_RBIT8_R2(n)  (n), ((n) + 2U * 64U), ((n) + 1U * 64U), ((n) + 3U * 64U)
+#  define XWBOP_RBIT8_R4(n)  XWBOP_RBIT8_R2(n), \
+                             XWBOP_RBIT8_R2((n) + 2U * 16U), \
+                             XWBOP_RBIT8_R2((n) + 1U * 16U), \
+                             XWBOP_RBIT8_R2((n) + 3U * 16U)
+#  define XWBOP_RBIT8_R6(n)  XWBOP_RBIT8_R4(n), \
+                             XWBOP_RBIT8_R4((n) + 2U * 4U), \
+                             XWBOP_RBIT8_R4((n) + 1U * 4U), \
+                             XWBOP_RBIT8_R4((n) + 3U * 4U)
 #endif
 
 #if (!defined(ARCHCFG_LIB_XWBOP_RBIT8)) || (1 != ARCHCFG_LIB_XWBOP_RBIT8)
@@ -26,7 +30,8 @@
  * @brief 位镜面翻转表
  */
 __xwlib_rodata const xwu8_t xwbop_rbit8_table[256] = {
-        XWBOP_RBIT8_R6(0), XWBOP_RBIT8_R6(2), XWBOP_RBIT8_R6(1), XWBOP_RBIT8_R6(3)
+        // cppcheck-suppress [misra-c2012-2.2, misra-c2012-12.1]
+        XWBOP_RBIT8_R6(0U), XWBOP_RBIT8_R6(2U), XWBOP_RBIT8_R6(1U), XWBOP_RBIT8_R6(3U),
 };
 #endif
 
@@ -34,30 +39,32 @@ __xwlib_rodata const xwu8_t xwbop_rbit8_table[256] = {
 __xwlib_code
 xwssq_t xwbop_ffs8(xwu8_t x)
 {
+        xwssq_t r;
 #  if defined(__GNUC__)
         if ((xwu8_t)0 == x) {
-                return (xwssq_t)-1;
+                r = (xwssq_t)-1;
+        } else {
+                r = (xwssq_t)__builtin_ffs((int)x) - (xwssq_t)1;
         }
-        return (xwssq_t)__builtin_ffs((int)x) - (xwssq_t)1;
 #  else
-        xwssq_t r = (xwssq_t)0;
-
-        if (!x) {
-                return (xwssq_t)-1;
+        r = (xwssq_t)0;
+        if (0 == x) {
+                r = (xwssq_t)-1;
+        } else {
+                if (0 == (x & (xwu8_t)0x0F)) {
+                        x >>= (xwu8_t)4;
+                        r += (xwssq_t)4;
+                }
+                if (0 == (x & (xwu8_t)0x03)) {
+                        x >>= (xwu8_t)2;
+                        r += (xwssq_t)2;
+                }
+                if (0 == (x & (xwu8_t)0x01)) {
+                        r += (xwssq_t)1;
+                }
         }
-        if (!(x & (xwu8_t)0x0F)) {
-                x >>= (xwu8_t)4;
-                r += (xwssq_t)4;
-        }
-        if (!(x & (xwu8_t)0x03)) {
-                x >>= (xwu8_t)2;
-                r += (xwssq_t)2;
-        }
-        if (!(x & (xwu8_t)0x01)) {
-                r += (xwssq_t)1;
-        }
-        return r;
 #  endif
+        return r;
 }
 #endif
 
@@ -65,30 +72,32 @@ xwssq_t xwbop_ffs8(xwu8_t x)
 __xwlib_code
 xwssq_t xwbop_fls8(xwu8_t x)
 {
+        xwssq_t r;
 #  if defined(__GNUC__)
         if ((xwu8_t)0 == x) {
-                return (xwssq_t)-1;
+                r = (xwssq_t)-1;
+        } else {
+                r = (xwssq_t)7 - (xwssq_t)__builtin_clz((unsigned int)x);
         }
-        return (xwssq_t)7 - (xwssq_t)__builtin_clz((unsigned int)x);
 #  else
-        xwssq_t r = (xwssq_t)7;
-
-        if (!x) {
-                return (xwssq_t)-1;
+        r = (xwssq_t)7;
+        if (0 == x) {
+                r = (xwssq_t)-1;
+        } else {
+                if (0 == (x & (xwu8_t)0xF0)) {
+                        x <<= (xwu8_t)4;
+                        r -= (xwssq_t)4;
+                }
+                if (0 == (x & (xwu8_t)0xC0)) {
+                        x <<= (xwu8_t)2;
+                        r -= (xwssq_t)2;
+                }
+                if (0 == (x & (xwu8_t)0x80)) {
+                        r -= (xwssq_t)1;
+                }
         }
-        if (!(x & (xwu8_t)0xF0)) {
-                x <<= (xwu8_t)4;
-                r -= (xwssq_t)4;
-        }
-        if (!(x & (xwu8_t)0xC0)) {
-                x <<= (xwu8_t)2;
-                r -= (xwssq_t)2;
-        }
-        if (!(x & (xwu8_t)0x80)) {
-                r -= (xwssq_t)1;
-        }
-        return r;
 #  endif
+        return r;
 }
 #endif
 
@@ -96,34 +105,36 @@ xwssq_t xwbop_fls8(xwu8_t x)
 __xwlib_code
 xwssq_t xwbop_ffs16(xwu16_t x)
 {
+        xwssq_t r;
 #  if defined(__GNUC__)
         if ((xwu16_t)0 == x) {
-                return (xwssq_t)-1;
+                r = (xwssq_t)-1;
+        } else {
+                r = (xwssq_t)__builtin_ffs((int)x) - (xwssq_t)1;
         }
-        return (xwssq_t)__builtin_ffs((int)x) - (xwssq_t)1;
 #  else
-        xwssq_t r = (xwssq_t)0;
-
-        if (!x) {
-                return (xwssq_t)-1;
+        r = (xwssq_t)0;
+        if (0 == x) {
+                r = (xwssq_t)-1;
+        } else {
+                if (0 == (x & (xwu16_t)0x00FF)) {
+                        x >>= (xwu16_t)8;
+                        r += (xwssq_t)8;
+                }
+                if (0 == (x & (xwu16_t)0x000F)) {
+                        x >>= (xwu16_t)4;
+                        r += (xwssq_t)4;
+                }
+                if (0 == (x & (xwu16_t)0x0003)) {
+                        x >>= (xwu16_t)2;
+                        r += (xwssq_t)2;
+                }
+                if (0 == (x & (xwu16_t)0x0001)) {
+                        r += (xwssq_t)1;
+                }
         }
-        if (!(x & (xwu16_t)0x00FF)) {
-                x >>= (xwu16_t)8;
-                r += (xwssq_t)8;
-        }
-        if (!(x & (xwu16_t)0x000F)) {
-                x >>= (xwu16_t)4;
-                r += (xwssq_t)4;
-        }
-        if (!(x & (xwu16_t)0x0003)) {
-                x >>= (xwu16_t)2;
-                r += (xwssq_t)2;
-        }
-        if (!(x & (xwu16_t)0x0001)) {
-                r += (xwssq_t)1;
-        }
-        return r;
 #  endif
+        return r;
 }
 #endif
 
@@ -131,34 +142,36 @@ xwssq_t xwbop_ffs16(xwu16_t x)
 __xwlib_code
 xwssq_t xwbop_fls16(xwu16_t x)
 {
+        xwssq_t r;
 #  if defined(__GNUC__)
         if ((xwu16_t)0 == x) {
-                return (xwssq_t)-1;
+                r = (xwssq_t)-1;
+        } else {
+                r = (xwssq_t)15 - (xwssq_t)__builtin_clz((unsigned int)x);
         }
-        return (xwssq_t)15 - (xwssq_t)__builtin_clz((unsigned int)x);
 #  else
-        xwssq_t r = (xwssq_t)15;
-
-        if (!x) {
-                return (xwssq_t)-1;
+        r = (xwssq_t)15;
+        if (0 == x) {
+                r = (xwssq_t)-1;
+        } else {
+                if (0 == (x & (xwu16_t)0xFF00)) {
+                        x <<= (xwu16_t)8;
+                        r -= (xwssq_t)8;
+                }
+                if (0 == (x & (xwu16_t)0xF000)) {
+                        x <<= (xwu16_t)4;
+                        r -= (xwssq_t)4;
+                }
+                if (0 == (x & (xwu16_t)0xC000)) {
+                        x <<= (xwu16_t)2;
+                        r -= (xwssq_t)2;
+                }
+                if (0 == (x & (xwu16_t)0x8000)) {
+                        r -= (xwssq_t)1;
+                }
         }
-        if (!(x & (xwu16_t)0xFF00)) {
-                x <<= (xwu16_t)8;
-                r -= (xwssq_t)8;
-        }
-        if (!(x & (xwu16_t)0xF000)) {
-                x <<= (xwu16_t)4;
-                r -= (xwssq_t)4;
-        }
-        if (!(x & (xwu16_t)0xC000)) {
-                x <<= (xwu16_t)2;
-                r -= (xwssq_t)2;
-        }
-        if (!(x & (xwu16_t)0x8000)) {
-                r -= (xwssq_t)1;
-        }
-        return r;
 #  endif
+        return r;
 }
 #endif
 
@@ -166,38 +179,40 @@ xwssq_t xwbop_fls16(xwu16_t x)
 __xwlib_code
 xwssq_t xwbop_ffs32(xwu32_t x)
 {
+        xwssq_t r;
 #  if defined(__GNUC__)
         if ((xwu32_t)0 == x) {
-                return (xwssq_t)-1;
+                r = (xwssq_t)-1;
+        } else {
+                r = (xwssq_t)__builtin_ffs((int)x) - (xwssq_t)1;
         }
-        return (xwssq_t)__builtin_ffs((int)x) - (xwssq_t)1;
 #  else
-        xwssq_t r = (xwssq_t)0;
-
-        if (!x) {
-                return -1;
+        r = (xwssq_t)0;
+        if (0 == x) {
+                r = (xwssq_t)-1;
+        } else {
+                if (0 == (x & (xwu32_t)0x0000FFFF)) {
+                        x >>= (xwu32_t)16;
+                        r += (xwssq_t)16;
+                }
+                if (0 == (x & (xwu32_t)0x000000FF)) {
+                        x >>= (xwu32_t)8;
+                        r += (xwssq_t)8;
+                }
+                if (0 == (x & (xwu32_t)0x0000000F)) {
+                        x >>= (xwu32_t)4;
+                        r += (xwssq_t)4;
+                }
+                if (0 == (x & (xwu32_t)0x00000003)) {
+                        x >>= (xwu32_t)2;
+                        r += (xwssq_t)2;
+                }
+                if (0 == (x & (xwu32_t)0x00000001)) {
+                        r += (xwssq_t)1;
+                }
         }
-        if (!(x & (xwu32_t)0x0000FFFF)) {
-                x >>= (xwu32_t)16;
-                r += (xwssq_t)16;
-        }
-        if (!(x & (xwu32_t)0x000000FF)) {
-                x >>= (xwu32_t)8;
-                r += (xwssq_t)8;
-        }
-        if (!(x & (xwu32_t)0x0000000F)) {
-                x >>= (xwu32_t)4;
-                r += (xwssq_t)4;
-        }
-        if (!(x & (xwu32_t)0x00000003)) {
-                x >>= (xwu32_t)2;
-                r += (xwssq_t)2;
-        }
-        if (!(x & (xwu32_t)0x00000001)) {
-                r += (xwssq_t)1;
-        }
-        return r;
 #  endif
+        return r;
 }
 #endif
 
@@ -205,38 +220,40 @@ xwssq_t xwbop_ffs32(xwu32_t x)
 __xwlib_code
 xwssq_t xwbop_fls32(xwu32_t x)
 {
+        xwssq_t r;
 #  if defined(__GNUC__)
         if ((xwu32_t)0 == x) {
-                return (xwssq_t)-1;
+                r = (xwssq_t)-1;
+        } else {
+                r = (xwssq_t)31 - (xwssq_t)__builtin_clz((unsigned int)x);
         }
-        return (xwssq_t)31 - (xwssq_t)__builtin_clz((unsigned int)x);
 #  else
-        xwssq_t r = (xwssq_t)31;
-
-        if (!x) {
-                return (xwssq_t)-1;
+        r = (xwssq_t)31;
+        if (0 == x) {
+                r = (xwssq_t)-1;
+        } else {
+                if (0 == (x & (xwu32_t)0xFFFF0000)) {
+                        x <<= (xwu32_t)16;
+                        r -= (xwssq_t)16;
+                }
+                if (0 == (x & (xwu32_t)0xFF000000)) {
+                        x <<= (xwu32_t)8;
+                        r -= (xwssq_t)8;
+                }
+                if (0 == (x & (xwu32_t)0xF0000000)) {
+                        x <<= (xwu32_t)4;
+                        r -= (xwssq_t)4;
+                }
+                if (0 == (x & (xwu32_t)0xC0000000)) {
+                        x <<= (xwu32_t)2;
+                        r -= (xwssq_t)2;
+                }
+                if (0 == (x & (xwu32_t)0x80000000)) {
+                        r -= (xwssq_t)1;
+                }
         }
-        if (!(x & (xwu32_t)0xFFFF0000)) {
-                x <<= (xwu32_t)16;
-                r -= (xwssq_t)16;
-        }
-        if (!(x & (xwu32_t)0xFF000000)) {
-                x <<= (xwu32_t)8;
-                r -= (xwssq_t)8;
-        }
-        if (!(x & (xwu32_t)0xF0000000)) {
-                x <<= (xwu32_t)4;
-                r -= (xwssq_t)4;
-        }
-        if (!(x & (xwu32_t)0xC0000000)) {
-                x <<= (xwu32_t)2;
-                r -= (xwssq_t)2;
-        }
-        if (!(x & (xwu32_t)0x80000000)) {
-                r -= (xwssq_t)1;
-        }
-        return r;
 #  endif
+        return r;
 }
 #endif
 
@@ -244,42 +261,44 @@ xwssq_t xwbop_fls32(xwu32_t x)
 __xwlib_code
 xwssq_t xwbop_ffs64(xwu64_t x)
 {
+        xwssq_t r;
 #  if defined(__GNUC__)
         if ((xwu64_t)0 == x) {
-                return (xwssq_t)-1;
+                r = (xwssq_t)-1;
+        } else {
+                r = (xwssq_t)__builtin_ffsll((long long)x) - (xwssq_t)1;
         }
-        return (xwssq_t)__builtin_ffsll((long long)x) - (xwssq_t)1;
 #  else
-        xwssq_t r = (xwssq_t)0;
-
-        if (!x) {
-                return (xwssq_t)-1;
+        r = (xwssq_t)0;
+        if (0 == x) {
+                r = (xwssq_t)-1;
+        } else {
+                if (0 == (x & (xwu64_t)0xFFFFFFFF)) {
+                        x >>= (xwu64_t)32;
+                        r += (xwssq_t)32;
+                }
+                if (0 == (x & (xwu64_t)0xFFFF)) {
+                        x >>= (xwu64_t)16;
+                        r += (xwssq_t)16;
+                }
+                if (0 == (x & (xwu64_t)0xFF)) {
+                        x >>= (xwu64_t)8;
+                        r += (xwssq_t)8;
+                }
+                if (0 == (x & (xwu64_t)0xF)) {
+                        x >>= (xwu64_t)4;
+                        r += (xwssq_t)4;
+                }
+                if (0 == (x & (xwu64_t)0x3)) {
+                        x >>= (xwu64_t)2;
+                        r += (xwssq_t)2;
+                }
+                if (0 == (x & (xwu64_t)0x1)) {
+                        r += (xwssq_t)1;
+                }
         }
-        if (!(x & (xwu64_t)0xFFFFFFFF)) {
-                x >>= (xwu64_t)32;
-                r += (xwssq_t)32;
-        }
-        if (!(x & (xwu64_t)0xFFFF)) {
-                x >>= (xwu64_t)16;
-                r += (xwssq_t)16;
-        }
-        if (!(x & (xwu64_t)0xFF)) {
-                x >>= (xwu64_t)8;
-                r += (xwssq_t)8;
-        }
-        if (!(x & (xwu64_t)0xF)) {
-                x >>= (xwu64_t)4;
-                r += (xwssq_t)4;
-        }
-        if (!(x & (xwu64_t)0x3)) {
-                x >>= (xwu64_t)2;
-                r += (xwssq_t)2;
-        }
-        if (!(x & (xwu64_t)0x1)) {
-                r += (xwssq_t)1;
-        }
-        return r;
 #  endif
+        return r;
 }
 #endif
 
@@ -287,45 +306,45 @@ xwssq_t xwbop_ffs64(xwu64_t x)
 __xwlib_code
 xwssq_t xwbop_fls64(xwu64_t x)
 {
+        xwssq_t r;
 #  if defined(__GNUC__)
         if (0 == x) {
-                return (xwssq_t)-1;
-        }
-        return (xwssq_t)63 - (xwssq_t)__builtin_clzll((unsigned long long)x);
-#  else
-        xwssq_t r = (xwssq_t)63;
-
-        if (!x) {
-                return (xwssq_t)-1;
-        }
-
-        if (!(x & (xwu64_t)0xFFFFFFFF00000000)) {
-                r -= (xwssq_t)32;
+                r = (xwssq_t)-1;
         } else {
-                x >>= (xwu64_t)32;
+                r = (xwssq_t)63 - (xwssq_t)__builtin_clzll((unsigned long long)x);
         }
-
-        if (!(x & (xwu64_t)0xFFFF0000)) {
-                x <<= (xwu64_t)16;
-                r -= (xwssq_t)16;
+#  else
+        r = (xwssq_t)63;
+        if (0 == x) {
+                r = (xwssq_t)-1;
+        } else {
+                if (0 == (x & (xwu64_t)0xFFFFFFFF00000000)) {
+                        r -= (xwssq_t)32;
+                } else {
+                        x >>= (xwu64_t)32;
+                }
+                if (0 == (x & (xwu64_t)0xFFFF0000)) {
+                        x <<= (xwu64_t)16;
+                        r -= (xwssq_t)16;
+                }
+                if (0 == (x & (xwu64_t)0xFF000000)) {
+                        x <<= (xwu64_t)8;
+                        r -= (xwssq_t)8;
+                }
+                if (0 == (x & (xwu64_t)0xF0000000)) {
+                        x <<= (xwu64_t)4;
+                        r -= (xwssq_t)4;
+                }
+                if (0 == (x & (xwu64_t)0xC0000000)) {
+                        x <<= (xwu64_t)2;
+                        r -= (xwssq_t)2;
+                }
+                if (0 == (x & (xwu64_t)0x80000000)) {
+                        r -= (xwssq_t)1;
+                }
         }
-        if (!(x & (xwu64_t)0xFF000000)) {
-                x <<= (xwu64_t)8;
-                r -= (xwssq_t)8;
-        }
-        if (!(x & (xwu64_t)0xF0000000)) {
-                x <<= (xwu64_t)4;
-                r -= (xwssq_t)4;
-        }
-        if (!(x & (xwu64_t)0xC0000000)) {
-                x <<= (xwu64_t)2;
-                r -= (xwssq_t)2;
-        }
-        if (!(x & (xwu64_t)0x80000000)) {
-                r -= (xwssq_t)1;
-        }
-        return r;
 #  endif
+        return r;
 }
 #endif
 
@@ -344,11 +363,12 @@ __xwlib_code
 xwssq_t xwbmpop_cmp(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
 {
         xwsz_t n = BITS_TO_XWBMP_T(num);
-        xwsz_t i, j;
+        xwsz_t i;
+        xwsz_t j;
         xwssq_t ret;
 
         ret = 0;
-        for (j = n; j > 0; j--) {
+        for (j = n; j > 0; j--) { // cppcheck-suppress [misra-c2012-15.4]
                 i = j - 1;
                 if (bmp[i] < opd[i]) {
                         ret = -1;
@@ -356,7 +376,7 @@ xwssq_t xwbmpop_cmp(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
                 } else if (bmp[i] > opd[i]) {
                         ret = 1;
                         break;
-                }/* else {} */
+                } else {}
         }
         return ret;
 }
@@ -681,7 +701,7 @@ xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t num)
                         msk = (XWBOP_BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
                         if ((xwbmp_t)0 == msk) {
                                 msk = (xwbmp_t)(~(xwbmp_t)0);
-                        }/* else {} */
+                        }
                 } else {
                         msk = (xwbmp_t)(~(xwbmp_t)0);
                 }
@@ -692,7 +712,7 @@ xwssq_t xwbmpop_ffs(xwbmp_t * bmp, xwsz_t num)
         }
         if (p >= 0) {
                 p += ((xwssq_t)i << XWBMP_T_SHIFT); /* p = p + i * BITS_PER_XWBMP_T; */
-        }/* else {} */
+        }
         return p;
 }
 #endif
@@ -711,7 +731,7 @@ xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t num)
                         msk = ~(XWBOP_BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
                         if ((xwbmp_t)(~(xwbmp_t)0) == msk) {
                                 msk = (xwbmp_t)0;
-                        }/* else {} */
+                        }
                 } else {
                         msk = (xwbmp_t)0;
                 }
@@ -722,7 +742,7 @@ xwssq_t xwbmpop_ffz(xwbmp_t * bmp, xwsz_t num)
         }
         if (p >= 0) {
                 p += ((xwssq_t)i << XWBMP_T_SHIFT); /* p = p + i * BITS_PER_XWBMP_T; */
-        }/* else {} */
+        }
         return p;
 }
 #endif
@@ -738,7 +758,7 @@ xwssq_t xwbmpop_fls(xwbmp_t * bmp, xwsz_t num)
         msk = (XWBOP_BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
         if ((xwbmp_t)0 == msk) {
                 msk = (xwbmp_t)(~(xwbmp_t)0);
-        }/* else {} */
+        }
         do {
                 i--;
                 p = xwbop_fls(xwbmp_t, bmp[i] & msk);
@@ -763,7 +783,7 @@ xwssq_t xwbmpop_flz(xwbmp_t * bmp, xwsz_t num)
         msk = ~(XWBOP_BIT(num % BITS_PER_XWBMP_T) - (xwbmp_t)1);
         if ((xwbmp_t)(~(xwbmp_t)0) == msk) {
                 msk = (xwbmp_t)0;
-        }/* else {} */
+        }
         do {
                 i--;
                 p = xwbop_flz(xwbmp_t, bmp[i] | msk);
@@ -880,7 +900,7 @@ xwu16_t xwbop_rbit16(xwu16_t x)
                         xwu8_t h;
                         xwu8_t l;
                 } d8;
-        } r, t;
+        } r, t; // cppcheck-suppress [misra-c2012-12.3]
 
         t.d16 = x;
         r.d8.h = xwbop_rbit8(t.d8.l);
@@ -901,7 +921,7 @@ xwu32_t xwbop_rbit32(xwu32_t x)
                         xwu8_t byte2;
                         xwu8_t byte3;
                 } d8;
-        } r, t;
+        } r, t; // cppcheck-suppress [misra-c2012-12.3]
 
         t.d32 = x;
         r.d8.byte0 = xwbop_rbit8(t.d8.byte3);
@@ -928,7 +948,7 @@ xwu64_t xwbop_rbit64(xwu64_t x)
                         xwu8_t byte6;
                         xwu8_t byte7;
                 } d8;
-        } r, t;
+        } r, t; // cppcheck-suppress [misra-c2012-12.3]
 
         t.d64 = x;
         r.d8.byte0 = xwbop_rbit8(t.d8.byte7);

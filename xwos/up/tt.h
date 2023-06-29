@@ -56,7 +56,7 @@ struct xwup_tt {
 /**
  * @brief 时间树节点的回调函数
  */
-typedef void (* xwup_tt_cb_f)(void *);
+typedef void (* xwup_tt_cb_f)(struct xwup_ttn * ttn);
 
 /**
  * @brief 唤醒原因枚举
@@ -65,14 +65,6 @@ enum xwup_ttn_wkup_reasaon_em {
         XWUP_TTN_WKUPRS_UNKNOWN = 0,
         XWUP_TTN_WKUPRS_TIMEDOUT, /**< 超时 */
         XWUP_TTN_WKUPRS_INTR, /**< 被中断 */
-};
-
-/**
- * @brief 时间树节点的类型枚举
- */
-enum xwup_ttn_type_em {
-        XWUP_TTN_TYPE_THD = 0, /**< 线程 */
-        XWUP_TTN_TYPE_SWT, /**< 软件定时器 */
 };
 
 /**
@@ -86,15 +78,9 @@ struct xwup_ttn {
         xwsq_t wkuprs; /**< 唤醒原因 */
         xwup_tt_cb_f cb; /**< 回调函数：NULL表示节点不在时间树上 */
         struct xwup_tt * xwtt; /**< 时间树 */
-        union {
-                xwptr_t addr; /**< XWOS对象要求至少4字节对齐
-                                   （若为64位系统则要求8字节对齐），
-                                   因此，低2位始终为0 */
-                xwptr_t type; /**< 低2位作为类型标识 */
-        } entry; /**< 时间树节点所属的对象 */
 };
 
-void xwup_ttn_init(struct xwup_ttn * ttn, xwptr_t entry, xwptr_t type);
+void xwup_ttn_init(struct xwup_ttn * ttn);
 
 xwer_t xwup_tt_init(struct xwup_tt * xwtt);
 xwer_t xwup_tt_add_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn,
@@ -111,27 +97,5 @@ xwu64_t xwup_syshwt_get_tickcount(struct xwup_syshwt * hwt);
 xwtm_t xwup_syshwt_get_timestamp(struct xwup_syshwt * hwt);
 void xwup_syshwt_task(struct xwup_syshwt * hwt);
 struct xwup_tt * xwup_syshwt_get_tt(struct xwup_syshwt * hwt);
-
-/**
- * @brief 获取时间树节点所属的对象的地址
- * @param[in] ttn: 时间树节点的指针
- * @return 时间树节点所属的对象的地址
- */
-static __xwcc_inline
-void * xwup_ttn_get_entry(struct xwup_ttn * ttn)
-{
-        return (void *)(ttn->entry.addr & ~XWUP_TTN_TYPE_MASK);
-}
-
-/**
- * @brief 获取时间树节点的类型
- * @param[in] ttn: 时间树节点的指针
- * @return 类型
- */
-static __xwcc_inline
-xwptr_t xwup_ttn_get_type(struct xwup_ttn * ttn)
-{
-        return ttn->entry.type & XWUP_TTN_TYPE_MASK;
-}
 
 #endif /* xwos/up/tt.h */

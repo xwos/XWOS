@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 架构描述层：ARMv7M指令架构
+ * @brief 架构描述层：ARMv7M指令和架构
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -50,7 +50,7 @@
  * @note little-endian
  */
 union cm_xpsr_reg {
-        struct {
+        struct { // cppcheck-suppress [misra-c2012-5.7]
                 xwu32_t reserved0:16; /**< bit0~15 Reserved */
                 __xw_io xwu32_t ge:4; /**< bit16~19 Greater than or Equal flags */
                 xwu32_t reserved1:7; /**< bit20~26 Reserved */
@@ -1392,8 +1392,8 @@ void cm_set_control(xwu32_t control)
 static __xwbsp_inline
 void cm_itm_putc(xwu32_t port, const char c)
 {
-        if (__xwcc_likely((cm_itm.tcr.bit.itmena) &&
-                     (cm_itm.ter[port >> 5].u32 & (1U << (port & 0x1FU))))) {
+        if ((cm_itm.tcr.bit.itmena) &&
+            (cm_itm.ter[port >> 5].u32 & (1U << (port & 0x1FU)))) {
                 while (0 == cm_itm.port[port].u32) {
                 }
                 cm_itm.port[port].u8 = (xwu8_t)c;
@@ -1410,7 +1410,7 @@ xwssz_t cm_itm_puts(xwu32_t port, const char * s)
         xwssz_t i;
 
         i = 0;
-        while (s[i]) {
+        while ('\0' != s[i]) {
                 cm_itm_putc(port, s[i]);
                 i++;
         }
@@ -1448,11 +1448,9 @@ void cm_reset_system(void)
 {
         armv7m_dsb(); /* Ensure all outstanding memory accesses
                          included buffered write are completed before reset */
-        cm_scs.scb.aircr.u32  = (xwu32_t)((0x5FA << SCB_AIRCR_VECTKEY_POS) |
-                                          (cm_scs.scb.aircr.u32 &
-                                           SCB_AIRCR_PRIGROUP_MSK) |
-                                          SCB_AIRCR_SYSRESETREQ_MSK); /* Keep priority
-                                                                         group */
+        cm_scs.scb.aircr.u32  = (((xwu32_t)0x5FAU << SCB_AIRCR_VECTKEY_POS) |
+                                 (cm_scs.scb.aircr.u32 & SCB_AIRCR_PRIGROUP_MSK) |
+                                 SCB_AIRCR_SYSRESETREQ_MSK); /* Keep priority group */
         armv7m_dsb();
         while (true) {
         }

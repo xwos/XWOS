@@ -20,16 +20,33 @@
 
 include XWOS.cfg
 
-MAKE_ARGS = $(strip -C $(XWOS_PATH) -f xwbs/$(XWOS_CFG_ELF_MK) XWOS_WKSPC_DIR=$(XWOS_WKSPC_DIR))
+MAKE_ELF_ARGS = $(strip -C $(XWOS_PATH) -f xwbs/$(XWOS_CFG_ELF_MK) XWOS_WKSPC_DIR=$(XWOS_WKSPC_DIR))
+MAKE_MISRA_C_ARGS = $(strip -C $(XWOS_PATH) -f xwbs/misra.c.mk XWOS_WKSPC_DIR=$(XWOS_WKSPC_DIR))
 
 all:
-	$(MAKE) $(MAKE_ARGS) all
+	$(MAKE) $(MAKE_ELF_ARGS) all
 
 clean:
-	@$(MAKE) $(MAKE_ARGS) clean
+	@$(MAKE) $(MAKE_ELF_ARGS) clean
 
 distclean:
-	@$(MAKE) $(MAKE_ARGS) distclean
+	@$(MAKE) $(MAKE_ELF_ARGS) distclean
+
+%.mc: FORCE
+	$(MAKE) $(MAKE_MISRA_C_ARGS) $@
+
+mc: FORCE
+	$(MAKE) $(MAKE_MISRA_C_ARGS) \
+		$(XWOS_ARCH_DIR) \
+		$(XWOS_CPU_DIR) \
+		$(XWOS_SOC_DIR) \
+		$(XWOS_BRD_DIR) \
+		$(XWOS_OS_DIR) \
+		$(XWOS_XWMD_DIR)
 
 .DEFAULT:
-	$(MAKE) $(MAKE_ARGS) $@
+	$(MAKE) $(MAKE_ELF_ARGS) $@
+
+FORCE:
+
+.PHONY : all clean distclean misra-c/xwos

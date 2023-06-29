@@ -149,7 +149,7 @@ void * xwmm_bma_bcb_to_mem(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb)
         xwptr_t mem;
 
         idx = ((xwptr_t)bcb - (xwptr_t)bma->bcbs) / sizeof(struct xwmm_bma_bcb);
-        mem = idx * bma->blksize + bma->zone.origin;
+        mem = (idx * bma->blksize) + bma->zone.origin;
         return (void *)mem;
 }
 
@@ -323,7 +323,7 @@ xwer_t xwmm_bma_alloc(struct xwmm_bma * bma, xwsq_t order, void ** membuf)
                         break;
                 }
         }
-        if (is_err(bcb)) {
+        if (is_err(bcb)) { // cppcheck-suppress [misra-c2012-14.4]
                 rc = -ENOMEM;
                 *membuf = NULL;
                 goto err_nomem;
@@ -408,13 +408,13 @@ xwer_t xwmm_bma_free(struct xwmm_bma * bma, void * mem)
         XWOS_VALIDATE((bma), "nullptr", -EFAULT);
         XWOS_VALIDATE((mem), "nullptr", -EFAULT);
 
-        if (__xwcc_unlikely((((xwptr_t)mem < bma->zone.origin) ||
-                             ((xwptr_t)mem >= (bma->zone.origin + bma->zone.size))))) {
+        if ((((xwptr_t)mem < bma->zone.origin) ||
+             ((xwptr_t)mem >= (bma->zone.origin + bma->zone.size)))) {
                 rc = -ERANGE;
                 goto err_range;
         }
         bcb = xwmm_bma_mem_to_bcb(bma, mem);
-        if (__xwcc_unlikely(is_err(bcb))) {
+        if (is_err(bcb)) {  // cppcheck-suppress [misra-c2012-14.4]
                 rc = ptr_err(bcb);
                 goto err_invalmem;
         }

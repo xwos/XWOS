@@ -38,7 +38,7 @@ xwer_t xwmm_sma_init(struct xwmm_sma * sa,
 {
         xwer_t rc;
 
-        pos = XWBOP_ALIGN(pos, XWMM_ALIGNMENT);
+        pos = XWBOP_ALIGN(pos, XWMM_ALIGNMENT); // cppcheck-suppress [misra-c2012-17.8]
         if (size < pos) {
                 rc = -EINVAL;
         } else {
@@ -70,29 +70,31 @@ __xwos_api
 xwer_t xwmm_sma_alloc(struct xwmm_sma * sa, xwsz_t size, xwsz_t aligned,
                       void ** membuf)
 {
-        xwsq_t cpos, npos;
+        xwsq_t cpos;
+        xwsq_t npos;
         xwsq_t tmp;
         xwer_t rc;
 
         XWOS_VALIDATE((sa), "nullptr", -EFAULT);
         XWOS_VALIDATE((membuf), "nullptr", -EFAULT);
 
-        if (__xwcc_unlikely(0 == size)) {
+        if (0 == size) {
                 rc = -EINVAL;
                 *membuf = NULL;
                 goto err_inval;
         }
 
-        if (aligned & XWMM_UNALIGNED_MASK) {
+        if (0 != (aligned & XWMM_UNALIGNED_MASK)) {
                 rc = -EINVAL;
                 *membuf = NULL;
                 goto err_inval;
         }
 
         if (0 == aligned) {
-                aligned = XWMM_ALIGNMENT;
-        }/* else {} */
+                aligned = XWMM_ALIGNMENT; // cppcheck-suppress [misra-c2012-17.8]
+        }
 
+        // cppcheck-suppress [misra-c2012-17.8]
         size = XWBOP_ALIGN(size, XWMM_ALIGNMENT);
         do {
                 cpos = xwaop_load(xwsq_t, &sa->pos, xwaop_mo_acquire);
@@ -104,7 +106,7 @@ xwer_t xwmm_sma_alloc(struct xwmm_sma * sa, xwsz_t size, xwsz_t aligned,
                         goto err_nomem;
                 }
                 *membuf = (void *)tmp;
-        } while (xwaop_teq_then_write(xwsq_t, &sa->pos, cpos, npos, NULL));
+        } while (XWOK != xwaop_teq_then_write(xwsq_t, &sa->pos, cpos, npos, NULL));
         return XWOK;
 
 err_nomem:

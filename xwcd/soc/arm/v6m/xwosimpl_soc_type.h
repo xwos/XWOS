@@ -218,75 +218,75 @@ typedef int32_t xwpr_t; /**< 优先级 (有符号) */
 #endif
 
 #define XWU8_T__SIZE
-#define BITS_PER_XWU8_T         8
-#define XWU8_T_SHIFT            3
+#define BITS_PER_XWU8_T         8U
+#define XWU8_T_SHIFT            3U
 #define XWS8_T__SIZE
-#define BITS_PER_XWS8_T         8
-#define XWS8_T_SHIFT            3
+#define BITS_PER_XWS8_T         8U
+#define XWS8_T_SHIFT            3U
 
 #define XWU16_T__SIZE
-#define BITS_PER_XWU16_T        16
-#define XWU16_T_SHIFT           4
+#define BITS_PER_XWU16_T        16U
+#define XWU16_T_SHIFT           4U
 #define XWS16_T__SIZE
-#define BITS_PER_XWS16_T        16
-#define XWS16_T_SHIFT           4
+#define BITS_PER_XWS16_T        16U
+#define XWS16_T_SHIFT           4U
 
 #define XWU32_T__SIZE
-#define BITS_PER_XWU32_T        32
-#define XWU32_T_SHIFT           5
+#define BITS_PER_XWU32_T        32U
+#define XWU32_T_SHIFT           5U
 #define XWS32_T__SIZE
-#define BITS_PER_XWS32_T        32
-#define XWS32_T_SHIFT           5
+#define BITS_PER_XWS32_T        32U
+#define XWS32_T_SHIFT           5U
 
 #define XWU64_T__SIZE
-#define BITS_PER_XWU64_T        64
-#define XWU64_T_SHIFT           6
+#define BITS_PER_XWU64_T        64U
+#define XWU64_T_SHIFT           6U
 #define XWS64_T__SIZE
-#define BITS_PER_XWS64_T        64
-#define XWS64_T_SHIFT           6
+#define BITS_PER_XWS64_T        64U
+#define XWS64_T_SHIFT           6U
 
 #define CHAR__SIZE
-#define BITS_PER_CHAR           8
-#define CHAR_SHIFT              3
+#define BITS_PER_CHAR           8U
+#define CHAR_SHIFT              3U
 #define UCHAR__SIZE
-#define BITS_PER_UCHAR          8
-#define UCHAR_SHIFT             3
+#define BITS_PER_UCHAR          8U
+#define UCHAR_SHIFT             3U
 
 #define SHORT__SIZE
-#define BITS_PER_SHORT          16
-#define SHORT_SHIFT             4
+#define BITS_PER_SHORT          16U
+#define SHORT_SHIFT             4U
 #define USHORT__SIZE
-#define BITS_PER_USHORT         16
-#define USHORT_SHIFT            4
+#define BITS_PER_USHORT         16U
+#define USHORT_SHIFT            4U
 
 #define INT__SIZE
-#define BITS_PER_INT            32
-#define INT_SHIFT               5
+#define BITS_PER_INT            32U
+#define INT_SHIFT               5U
 #define UINT__SIZE
-#define BITS_PER_UINT           32
-#define UINT_SHIFT              5
+#define BITS_PER_UINT           32U
+#define UINT_SHIFT              5U
 
 #define LONG__SIZE
-#define BITS_PER_LONG           32
-#define LONG_SHIFT              5
+#define BITS_PER_LONG           32U
+#define LONG_SHIFT              5U
 #define ULONG__SIZE
-#define BITS_PER_ULONG          32
-#define LONG_SHIFT              5
+#define BITS_PER_ULONG          32U
+#define LONG_SHIFT              5U
 
 #define LONGLONG__SIZE
-#define BITS_PER_LONGLONG       64
-#define LONGLONG_SHIFT          6
+#define BITS_PER_LONGLONG       64U
+#define LONGLONG_SHIFT          6U
 #define ULONGLONG__SIZE
-#define BITS_PER_ULONGLONG      64
-#define ULONGLONG_SHIFT         6
+#define BITS_PER_ULONGLONG      64U
+#define ULONGLONG_SHIFT         6U
 
 #define FLOAT__SIZE
-#define BITS_PER_FLOAT          32
-#define FLOAT_SHIFT             5
+#define BITS_PER_FLOAT          32U
+#define FLOAT_SHIFT             5U
 
 #define DOUBLE__SIZE
-#define BITS_PER_DOUBLE         64
-#define DOUBLE_SHIFT            6
+#define BITS_PER_DOUBLE         64U
+#define DOUBLE_SHIFT            6U
 
 #define XWSZ_T__SIZE
 #define BITS_PER_XWSZ_T         BITS_PER_LONG

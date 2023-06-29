@@ -48,7 +48,8 @@ void xwup_rtwq_add(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn, xwpr_t prio
         struct xwlib_rbtree_node ** new;
         struct xwlib_rbtree_node * rbn;
         xwptr_t lpc;
-        struct xwup_wqn * n, * rightmost;
+        struct xwup_wqn * n;
+        struct xwup_wqn * rightmost;
         struct xwlib_rbtree * tree;
         xwpr_t nprio;
 
@@ -71,7 +72,7 @@ void xwup_rtwq_add(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn, xwpr_t prio
                 n = rightmost;
         } else {
                 rbn = *new;
-                while (rbn) {
+                while (NULL != rbn) {
                         n = xwlib_rbtree_entry(rbn, struct xwup_wqn, rbn);
                         nprio = n->prio;
                         if (prio < nprio) {
@@ -88,7 +89,7 @@ void xwup_rtwq_add(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn, xwpr_t prio
                         }
                 }
         }
-        if (lpc) {
+        if (0 != lpc) {
                 xwlib_rbtree_link(&wqn->rbn, lpc);
                 xwlib_rbtree_insert_color(tree, &wqn->rbn);
         } else {
@@ -114,7 +115,7 @@ void xwup_rtwq_rmrbb(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn)
         xwlib_rbtree_init_node(&wqn->rbn);
         if (wqn == xwrtwq->rightmost) {
                 xwrtwq->rightmost = n;
-        }/* else {} */
+        }
 }
 
 /**
@@ -135,9 +136,9 @@ void xwup_rtwq_rmrbn(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn)
                                       red-black tree. Or if there is no
                                       left child, the predecessor is its
                                       parent. */
-                if (!p) {
+                if (NULL == p) {
                         p = xwlib_rbtree_get_parent(&wqn->rbn);
-                }/* else {} */
+                }
                 if (p != (struct xwlib_rbtree_node *)&xwrtwq->tree.root) {
                         xwrtwq->rightmost = xwlib_rbtree_entry(p,
                                                                struct xwup_wqn,
@@ -166,7 +167,7 @@ xwer_t xwup_rtwq_remove(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn)
 {
         xwer_t rc;
 
-        if (__xwcc_unlikely((NULL == wqn->cb) || (xwrtwq != wqn->wq))) {
+        if ((NULL == wqn->cb) || (xwrtwq != wqn->wq)) {
                 rc = -ESRCH;
         } else {
                 if (xwlib_rbtree_tst_node_unlinked(&wqn->rbn)) {

@@ -14,6 +14,7 @@
 #define __xwos_ospl_soc_xwaop8_h__
 
 #include <xwos/standard.h>
+#include <xwosimpl_soc_xwaop8.h>
 
 /******** ******** ******** ******** unsigned ******** ******** ******** ********/
 xwu8_t xwaop__xwu8_t__load(atomic_xwu8_t * a,
@@ -573,7 +574,5 @@ xwer_t xwaop__xws8_t__tst_then_op(atomic_xws8_t * a,
                                   xwaop_tst_f tst, void * tst_args,
                                   xwaop_op_f op, void * op_args,
                                   xws8_t * nv, xws8_t * ov);
-
-#include <xwosimpl_soc_xwaop8.h>
 
 #endif /* xwos/ospl/soc/xwaop8.h */

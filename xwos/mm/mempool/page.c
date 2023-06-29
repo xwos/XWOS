@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS内存管理：内存池 —— 页分配器
+ * @brief XWOS内存管理：内存池：页分配器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -86,11 +86,11 @@ xwer_t xwmm_mempool_page_allocator_init(struct xwmm_mempool_page_allocator * pa,
         xwsz_t nr;
         xwer_t rc;
 
-        if (__xwcc_unlikely(size < pgsize)) {
+        if (size < pgsize) {
                 rc = -E2SMALL;
                 goto err_mem2small;
         }
-        if (pgsize & XWMM_UNALIGNED_MASK) {
+        if (0 != (pgsize & XWMM_UNALIGNED_MASK)) {
                 rc = -EALIGN;
                 goto err_aligned;
         }
@@ -253,13 +253,11 @@ void xwmm_mempool_page_combine(struct xwmm_mempool_page_allocator * pa,
         odr = pg->order + 1U;
         while (odr < pa->max_order) {
                 buddy = xwmm_mempool_page_get_buddy(pa, pg);
-                if (buddy->order != pg->order) {
-                        break;
-                }
-                /* 不能使用buddy->order，因为未上锁时，buddy->order有可能改变，
-                   尤其是多核系统，但此时pg还未加入到红黑树，是私有数据。 */
-                rc = xwmm_mempool_page_odrbtree_remove(&pa->odrbtree[pg->order],
-                                                       buddy);
+                /* 不能使用 `buddy->order` ，因为未上锁时， `buddy->order` 有可能改变，
+                   尤其是多核系统。
+                   但此时可以使用 `pg->order` ，因为 `pg` 还未加入到红黑树，
+                   是私有数据。*/
+                rc = xwmm_mempool_page_odrbtree_remove(&pa->odrbtree[pg->order], buddy);
                 if (rc < 0) {
                         break;
                 }
@@ -297,13 +295,14 @@ xwer_t xwmm_mempool_page_odrbtree_add(struct xwmm_mempool_page_odrbtree * ot,
         xwptr_t lpc;
         struct xwlib_rbtree_node * rbn;
         xwsq_t pgseq;
-        struct xwmm_mempool_page * b, * leftmost;
+        struct xwmm_mempool_page * b;
+        struct xwmm_mempool_page * leftmost;
         xwreg_t flag;
         xwer_t rc;
 
         tree = &ot->tree;
         pgseq = pg->attr.free.seq;
-        if (!pg->mapping) {
+        if (XWMM_MEMPOOL_PAGE_MAPPING_FREE == pg->mapping) {
                 rc = -EEXIST;
                 goto err_exist;
         }
@@ -322,7 +321,7 @@ xwer_t xwmm_mempool_page_odrbtree_add(struct xwmm_mempool_page_odrbtree * ot,
                 ot->leftmost = pg;
         } else {
                 rbn = *new;
-                while (rbn) {
+                while (NULL != rbn) {
                         b = xwlib_rbtree_entry(rbn, struct xwmm_mempool_page,
                                                attr.free.rbnode);
                         if (pgseq < b->attr.free.seq) {
@@ -354,8 +353,9 @@ err_exist:
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ESRCH: 页不在阶红黑树中
+ * @retval -EBUSY: 页不在阶红黑树中
  * @note
- * - 将要删除的页还在阶红黑树中，所以是共享数据，对pg->mapping的读只可在锁内。
+ * - 将要删除的页还在阶红黑树中，所以是共享数据，对 `pg->mapping` 的读只可在锁内。
  */
 static __xwos_code
 xwer_t xwmm_mempool_page_odrbtree_remove(struct xwmm_mempool_page_odrbtree * ot,
@@ -373,7 +373,7 @@ xwer_t xwmm_mempool_page_odrbtree_remove(struct xwmm_mempool_page_odrbtree * ot,
         }
 
         xwos_sqlk_wr_lock_cpuirqsv(&ot->lock, &flag);
-        if (pg->mapping) {
+        if (XWMM_MEMPOOL_PAGE_MAPPING_FREE != pg->mapping) {
                 rc = -EBUSY;
                 goto err_notfree;
         }
@@ -384,7 +384,8 @@ xwer_t xwmm_mempool_page_odrbtree_remove(struct xwmm_mempool_page_odrbtree * ot,
                         s = xwlib_rbtree_get_parent(&pg->attr.free.rbnode);
                 }
                 if (s != (struct xwlib_rbtree_node *)&tree->root) {
-                        ot->leftmost = xwlib_rbtree_entry(s, struct xwmm_mempool_page,
+                        ot->leftmost = xwlib_rbtree_entry(s,
+                                                          struct xwmm_mempool_page,
                                                           attr.free.rbnode);
                 } else {
                         ot->leftmost = NULL;

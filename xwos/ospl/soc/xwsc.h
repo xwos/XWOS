@@ -14,9 +14,8 @@
 #define __xwos_ospl_soc_xwsc_h__
 
 #include <xwos/standard.h>
+#include <xwosimpl_soc_xwsc.h>
 
 xws64_t xwsc(xwsc_f func, xwreg_t argnum, ...);
-
-#include <xwosimpl_soc_xwsc.h>
 
 #endif /* xwos/ospl/soc/xwsc.h */

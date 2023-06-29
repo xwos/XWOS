@@ -102,7 +102,7 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
  * @param[in] lpc: 链指针，位置，颜色的合并值
  * @return 链指针和位置信息
  */
-#define xwlib_rbtree_get_lnpos(lpc)     ((xwptr_t)lpc & (~((xwptr_t)2UL)))
+#define xwlib_rbtree_get_lnpos(lpc)     ((xwptr_t)(lpc) & (~((xwptr_t)2UL)))
 
 /**
  * @brief 获取lpc信息中的位置信息
@@ -204,18 +204,18 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
  * @param[in] type: 外层结构体类型
  * @param[in] member: 红黑树节点在外层结构体中的成员符号名(symbol)
  */
-#define xwlib_rbtree_entry(ptr, type, member)   xwcc_baseof((ptr), type, member)
+#define xwlib_rbtree_entry(ptr, type, member)   xwcc_derof((ptr), type, member)
 
 /**
  * @brief 返回节点的父节点指针
  * @param[in] node: 子节点指针
  * @return 父节点指针
  * @note
- * - left是@ref xwlib_rbtree_node 的第一个成员。
- * - &parent->left与&parent在数值上是相等的（指针就是一个位数等于CPU位宽的无符号整数）。
- *   因此当link指向parent->left时，其数值也等于parent的地址；
- *   当link指向parent->right时，其数值减去sizeof(指针)后可获取parent地址。
- * - 当父节点不存在（红黑树第一个节点），其link指针指向root，此函数返回root的指针。
+ * + `left` 是 @ref xwlib_rbtree_node 的第一个成员。
+ * + `&parent->left` 与 `&parent` 在数值上是相等的（指针就是位宽等于CPU位宽的无符号整数）。
+ *   + 当 `link` 指向 `parent->left` 时，其数值就等于 `parent` 的地址；
+ *   + 当 `link` 指向 `parent->right` 时，其数值减去 `sizeof(void *)` 后可获取 `parent` 地址。
+ * + 当父节点不存在（红黑树第一个节点），其 `link` 指针指向 `root` ，此函数返回 `root` 的地址。
  */
 static __xwlib_inline
 struct xwlib_rbtree_node * xwlib_rbtree_get_parent(struct xwlib_rbtree_node * node)
@@ -224,7 +224,7 @@ struct xwlib_rbtree_node * xwlib_rbtree_get_parent(struct xwlib_rbtree_node * no
         struct xwlib_rbtree_node ** link;
 
         pos = xwlib_rbtree_get_pos(node->lpc.pos);
-        link = xwlib_rbtree_get_link(node->lpc.link) - pos;
+        link = &(xwlib_rbtree_get_link(node->lpc.link)[-pos]);
         return (struct xwlib_rbtree_node *)link;
 }
 
@@ -240,7 +240,7 @@ struct xwlib_rbtree_node * xwlib_rbtree_get_parent_from_lpc(xwptr_t lpc)
         struct xwlib_rbtree_node ** link;
 
         pos = xwlib_rbtree_get_pos(lpc);
-        link = xwlib_rbtree_get_link(lpc) - pos;
+        link = &(xwlib_rbtree_get_link(lpc)[-pos]);
         return (struct xwlib_rbtree_node *)link;
 }
 
@@ -342,7 +342,7 @@ xwlib_rbtree_get_predecessor(struct xwlib_rbtree_node * node)
         if (!c) {
                 c = node;
         } else {
-                while (c->right) {
+                while (NULL != c->right) {
                         c = c->right;
                 }
         }
@@ -362,7 +362,7 @@ xwlib_rbtree_get_successor(struct xwlib_rbtree_node * node)
         if (!c) {
                 c = node;
         } else {
-                while (c->left) {
+                while (NULL != c->left) {
                         c = c->left;
                 }
         }

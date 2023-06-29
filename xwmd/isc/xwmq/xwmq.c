@@ -31,10 +31,11 @@ void xwmq_destruct(struct xwmq * mq)
 }
 
 static __xwmd_code
-xwer_t xwmq_gc(void * obj)
+xwer_t xwmq_gc(struct xwos_object * obj)
 {
-        struct xwmq * mq = obj;
+        struct xwmq * mq;
 
+        mq = xwcc_derof(obj, struct xwmq, xwobj);
         xwos_sem_fini(&mq->txqsem);
         xwos_sem_fini(&mq->rxqsem);
         xwmq_destruct(mq);

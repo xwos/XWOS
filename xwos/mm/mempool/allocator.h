@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS内存管理：内存池分配器
+ * @brief XWOS内存管理：内存池：页分配器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -58,6 +58,7 @@
  * @param[in] name: 结构体名
  * @param[in] pgodr: 页的数量，以2的pgodr次方形式表示
  */
+// cppcheck-suppress [misra-c2012-20.7]
 #define XWMM_MEMPOOL_TYPEDEF(name, pgodr) \
         struct name { \
                 struct xwmm_mempool mempool[1]; \

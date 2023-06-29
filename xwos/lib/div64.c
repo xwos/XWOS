@@ -50,7 +50,8 @@ xwu32_t xwdiv64_32(xwu64_t * n, xwu32_t divisor)
 {
         xwu64_t rem = *n;
         xwu64_t b = divisor;
-        xwu64_t res, d = 1;
+        xwu64_t res;
+        xwu64_t d = 1;
         xwu32_t high = (xwu32_t)(rem >> 32);
 
         res = 0;
@@ -60,7 +61,7 @@ xwu32_t xwdiv64_32(xwu64_t * n, xwu32_t divisor)
                 rem -= (xwu64_t) (high * divisor) << 32;
         }
 
-        while ((xws64_t)b > 0 && b < rem) {
+        while (((xws64_t)b > 0) && (b < rem)) {
                 b = b + b;
                 d = d + d;
         }
@@ -72,7 +73,7 @@ xwu32_t xwdiv64_32(xwu64_t * n, xwu32_t divisor)
                 }
                 b >>= 1;
                 d >>= 1;
-        } while (d);
+        } while (0 != d);
 
         *n = res;
         return (xwu32_t)rem;

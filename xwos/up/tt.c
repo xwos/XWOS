@@ -41,7 +41,7 @@ void xwup_tt_bh(struct xwup_tt * xwtt);
  * @param[in] ttn: 时间树节点的指针
  */
 __xwup_code
-void xwup_ttn_init(struct xwup_ttn * ttn, xwptr_t entry, xwptr_t type)
+void xwup_ttn_init(struct xwup_ttn * ttn)
 {
         xwlib_bclst_init_node(&ttn->rbb);
         xwlib_rbtree_init_node(&ttn->rbn);
@@ -49,8 +49,6 @@ void xwup_ttn_init(struct xwup_ttn * ttn, xwptr_t entry, xwptr_t type)
         ttn->wkuprs = XWUP_TTN_WKUPRS_UNKNOWN;
         ttn->cb = NULL;
         ttn->xwtt = NULL;
-        ttn->entry.addr = entry & (~XWUP_TTN_TYPE_MASK);
-        ttn->entry.type |= type & XWUP_TTN_TYPE_MASK;
 }
 
 /**
@@ -91,7 +89,8 @@ xwer_t xwup_tt_add_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn,
 {
         struct xwlib_rbtree_node ** pos;
         struct xwlib_rbtree_node * rbn;
-        struct xwup_ttn * n, * leftmost;
+        struct xwup_ttn * n;
+        struct xwup_ttn * leftmost;
         xwptr_t lpc;
         xwsq_t seq;
         xwer_t rc;
@@ -99,7 +98,7 @@ xwer_t xwup_tt_add_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn,
 
 retry:
         /* the state of thread may be change in IRQ */
-        if (__xwcc_unlikely((NULL == ttn->cb) || (xwtt != ttn->xwtt))) {
+        if ((NULL == ttn->cb) || (xwtt != ttn->xwtt)) {
                 rc = -EINTR;
         } else {
                 pos = &xwtt->rbtree.root;
@@ -127,9 +126,9 @@ retry:
                         xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
                         seq += XWUP_SQLK_GRANULARITY;
                         if (xwup_sqlk_rd_retry(&xwtt->lock, seq)) {
-                                goto retry;
+                                goto retry; // cppcheck-suppress [misra-c2012-15.2]
                         }
-                        while (rbn) {
+                        while (NULL != rbn) { // cppcheck-suppress [misra-c2012-15.4]
                                 n = xwlib_rbtree_entry(rbn, struct xwup_ttn, rbn);
                                 nt = n->wkup_xwtm;
                                 xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
@@ -142,6 +141,7 @@ retry:
                                         xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
                                         seq += XWUP_SQLK_GRANULARITY;
                                         if (xwup_sqlk_rd_retry(&xwtt->lock, seq)) {
+                                                // cppcheck-suppress [misra-c2012-15.2]
                                                 goto retry;
                                         }
                                         rbn = rbn->left;
@@ -151,6 +151,7 @@ retry:
                                         xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
                                         seq += XWUP_SQLK_GRANULARITY;
                                         if (xwup_sqlk_rd_retry(&xwtt->lock, seq)) {
+                                                // cppcheck-suppress [misra-c2012-15.2]
                                                 goto retry;
                                         }
                                         rbn = rbn->right;
@@ -159,13 +160,14 @@ retry:
                                         xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
                                         seq += XWUP_SQLK_GRANULARITY;
                                         if (xwup_sqlk_rd_retry(&xwtt->lock, seq)) {
+                                                // cppcheck-suppress [misra-c2012-15.2]
                                                 goto retry;
                                         }
                                         break;
                                 }
                         }
                 }
-                if (lpc) {
+                if (0 != lpc) {
                         xwlib_rbtree_link(&ttn->rbn, lpc);
                         xwlib_rbtree_insert_color(&xwtt->rbtree, &ttn->rbn);
                 } else {
@@ -194,7 +196,7 @@ void xwup_tt_rmrbb_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn)
         xwlib_rbtree_init_node(&ttn->rbn);
         if (ttn == xwtt->leftmost) {
                 xwtt->leftmost = n;
-        }/* else {} */
+        }
 }
 
 /**
@@ -215,9 +217,9 @@ void xwup_tt_rmrbn_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn)
                                        red-black tree. Or if there is no
                                        right child, the successor is its
                                        parent. */
-                if (!s) {
+                if (NULL == s) {
                         s = xwlib_rbtree_get_parent(&ttn->rbn);
-                }/* else {} */
+                }
                 if (s != (struct xwlib_rbtree_node *)&xwtt->rbtree.root) {
                         xwtt->leftmost = xwlib_rbtree_entry(s, struct xwup_ttn, rbn);
                         xwtt->deadline = xwtt->leftmost->wkup_xwtm;
@@ -243,7 +245,7 @@ xwer_t xwup_tt_remove_locked(struct xwup_tt * xwtt, struct xwup_ttn * ttn)
 {
         xwer_t rc;
 
-        if (__xwcc_unlikely((NULL == ttn->cb) || (xwtt != ttn->xwtt))) {
+        if ((NULL == ttn->cb) || (xwtt != ttn->xwtt)) {
                 rc = -ESRCH;
         } else {
                 if (xwlib_rbtree_tst_node_unlinked(&ttn->rbn)) {
@@ -303,7 +305,7 @@ void xwup_tt_bh(struct xwup_tt * xwtt)
                 ttn->wkuprs = XWUP_TTN_WKUPRS_TIMEDOUT;
                 ttn->cb = NULL;
                 xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
-                cb(xwup_ttn_get_entry(ttn));
+                cb(ttn);
                 xwup_sqlk_wr_lock_cpuirq(&xwtt->lock);
         }
         xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
@@ -318,7 +320,7 @@ void xwup_tt_bh(struct xwup_tt * xwtt)
 __xwup_code
 struct xwup_skd * xwup_tt_get_skd(struct xwup_tt * xwtt)
 {
-        return xwcc_baseof(xwtt, struct xwup_skd, tt);
+        return xwcc_derof(xwtt, struct xwup_skd, tt);
 }
 
 /**
@@ -337,10 +339,10 @@ xwer_t xwup_syshwt_init(struct xwup_syshwt * hwt)
         xwup_sqlk_init(&hwt->lock);
         /* port code of CPU must set the irqc & irqrsc */
         rc = xwospl_syshwt_init(hwt);
-        if (__xwcc_likely(XWOK == rc)) {
+        if (XWOK == rc) {
                 XWOS_BUG_ON(NULL == hwt->irqrsc);
                 XWOS_BUG_ON(0 == hwt->irqs_num);
-        }/* else {} */
+        }
         return rc;
 }
 
@@ -468,5 +470,5 @@ void xwup_syshwt_task(struct xwup_syshwt * hwt)
 __xwup_code
 struct xwup_tt * xwup_syshwt_get_tt(struct xwup_syshwt * hwt)
 {
-        return xwcc_baseof(hwt, struct xwup_tt, hwt);
+        return xwcc_derof(hwt, struct xwup_tt, hwt);
 }

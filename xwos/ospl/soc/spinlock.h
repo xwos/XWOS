@@ -14,16 +14,14 @@
 #define __xwos_ospl_soc_spinlock_h__
 
 #include <xwos/standard.h>
+#include <xwosimpl_soc_spinlock.h>
 
 struct soc_splk;
 
 static __xwbsp_inline
 void soc_splk_init(struct soc_splk * socsplk);
-
 void soc_splk_lock(struct soc_splk * socsplk);
 xwer_t soc_splk_trylock(struct soc_splk * socsplk);
 void soc_splk_unlock(struct soc_splk * socsplk);
-
-#include <xwosimpl_soc_spinlock.h>
 
 #endif /* xwos/ospl/soc/spinlock.h */

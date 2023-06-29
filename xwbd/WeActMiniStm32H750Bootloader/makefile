@@ -42,6 +42,8 @@ d distclean: cfg
 	$(MAKE) -C $(WKSPC) NODEP=y distclean
 	@rm -rf $(WKSPC)
 
+FORCE:
+
 .DEFAULT:
 	@$(MAKE) cfg
 	$(MAKE) -C $(WKSPC) $@

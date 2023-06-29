@@ -30,6 +30,7 @@
  * @param[in] name: 符号名
  * @param[in] bits: 位图中的位数
  */
+// cppcheck-suppress [misra-c2012-20.7]
 #define xwbmpaop_define(name, bits) atomic_xwbmp_t name[BITS_TO_XWBMP_T(bits)]
 
 /**

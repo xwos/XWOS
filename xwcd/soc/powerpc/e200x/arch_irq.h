@@ -22,7 +22,7 @@
 #define __arch_irq_h__
 
 #include <xwos/standard.h>
-#include <e200x_core.h>
+#include <e200x_isa.h>
 
 #define SOC_EXC_CRITICAL_INPUT                  (-9)
 #define SOC_EXC_MACHINE_CHECK                   (-8)

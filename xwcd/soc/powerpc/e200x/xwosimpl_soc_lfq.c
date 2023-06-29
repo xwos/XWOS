@@ -19,7 +19,7 @@
  */
 
 #include <xwos/standard.h>
-#include <e200x_core.h>
+#include <e200x_isa.h>
 #include <xwos/lib/lfq.h>
 
 __xwbsp_code

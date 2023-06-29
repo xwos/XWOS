@@ -21,7 +21,7 @@
 #include <xwos/standard.h>
 #include <xwos/osal/irq.h>
 #include <xwos/ospl/skd.h>
-#include <e200x_core.h>
+#include <e200x_isa.h>
 #include <arch_sc_trap.h>
 #include <soc.h>
 #include <soc_irq.h>

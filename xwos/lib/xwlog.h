@@ -21,18 +21,7 @@
  * @{
  */
 
-#if defined(XWLIBCFG_LOG) && (1 == XWLIBCFG_LOG)
-__xwlib_code
 int xwpf(const char * fmt, ...);
-
-#else
-static __xwlib_inline
-int xwpf(const char * fmt, ...)
-{
-        XWOS_UNUSED(fmt);
-        return 0;
-}
-#endif
 
 #if (XWLIBCFG_XWLOG_LEVEL <= 1)
 #  define XWLOGF_VERBOSE(tag, fmt, ...) xwpf("[V.%s] " fmt, tag, ##__VA_ARGS__)

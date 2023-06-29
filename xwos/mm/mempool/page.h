@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS内存管理：内存池 —— 页分配器
+ * @brief XWOS内存管理：内存池：页分配器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -28,20 +28,20 @@
 #include <xwos/mm/mempool/i_allocator.h>
 
 #define XWMM_MEMPOOL_PAGE_ORDER_CMB             (XWSQ_MAX)
-#define XWMM_MEMPOOL_PAGE_MAPPING_FREE          (0)
+#define XWMM_MEMPOOL_PAGE_MAPPING_FREE          (0U)
 #define XWMM_MEMPOOL_PAGE_MAPPING_INVAILD       (XWPTR_MAX)
 
 /**
  * @brief 内存页
  */
 struct xwmm_mempool_page {
-        xwsq_t order; /**< 页的数量的阶。当取值XWMM_MEMPOOL_PAGE_ORDER_CMB，
+        xwsq_t order; /**< 页的数量的阶。当取值 `XWMM_MEMPOOL_PAGE_ORDER_CMB` ，
                            表示页被合并在更大的页中 */
-        xwptr_t mapping; /**< - 如果页被申请, mapping为页的首地址；
-                              - 如果页在阶红黑树中，
-                                mapping取值XWMM_MEMPOOL_PAGE_MAPPING_FREE；
-                              - 如果页刚被申请还未映射地址，或合并在更大的页中，
-                                mapping取值(XWMM_MEMPOOL_PAGE_MAPPING_INVAILD)。 */
+        xwptr_t mapping; /**< + 如果页被申请， `mapping` 为页的首地址；
+                              + 如果页在阶红黑树中，
+                                `mapping` 取值 `XWMM_MEMPOOL_PAGE_MAPPING_FREE` ；
+                              + 如果页刚被申请还未映射地址，或合并在更大的页中，
+                                `mapping` 取值 `XWMM_MEMPOOL_PAGE_MAPPING_INVAILD` 。 */
         union {
                 struct {
                         struct xwlib_rbtree_node rbnode; /**< 红黑树节点 */
@@ -51,7 +51,7 @@ struct xwmm_mempool_page {
                         struct xwlib_bclst_node node; /**< 页链表节点 */
                         atomic_xwlfq_t objhead; /**< 空闲对象无锁队列头 */
                         xwsq_t refcnt; /**< 页的引用计数（aka: 已被使用的对象数量）
-                                            被xwmm_mempool_objcache.page_list.lock
+                                            被 `xwmm_mempool_objcache.page_list.lock`
                                             保护。 */
                 } objcache; /**< 页作为对象缓存 */
         } attr;

@@ -20,7 +20,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
-#include <e200x_core.h>
+#include <e200x_isa.h>
 
 __xwbsp_code
 xwssq_t xwbop_ffs8(xwu8_t x)

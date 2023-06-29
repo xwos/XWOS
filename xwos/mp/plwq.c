@@ -72,7 +72,7 @@ xwer_t xwmp_plwq_remove_locked(struct xwmp_plwq * xwplwq, struct xwmp_wqn * wqn)
 {
         xwer_t rc;
 
-        if (__xwcc_unlikely((NULL == wqn->cb) || (xwplwq != wqn->wq))) {
+        if ((NULL == wqn->cb) || (xwplwq != wqn->wq)) {
                 rc = -ESRCH;
         } else {
                 xwlib_bclst_del_init(&wqn->cln.pl);
@@ -98,8 +98,7 @@ struct xwmp_wqn * xwmp_plwq_choose_locked(struct xwmp_plwq * xwplwq)
         if (xwlib_bclst_tst_empty(&xwplwq->head)) {
                 wqn = NULL;
         } else {
-                wqn = xwlib_bclst_first_entry(&xwplwq->head, struct xwmp_wqn,
-                                              cln.pl);
+                wqn = xwlib_bclst_first_entry(&xwplwq->head, struct xwmp_wqn, cln.pl);
                 xwmp_splk_lock(&wqn->lock);
                 xwlib_bclst_del_init(&wqn->cln.pl);
         }

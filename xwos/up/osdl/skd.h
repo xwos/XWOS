@@ -83,18 +83,21 @@ xwtm_t xwosdl_skd_get_timestamp_lc(void)
 static __xwcc_inline
 void xwosdl_skd_dspmpt_lc(void)
 {
+        // cppcheck-suppress [misra-c2012-17.7]
         xwup_skd_dspmpt_lc();
 }
 
 static __xwcc_inline
 void xwosdl_skd_enpmpt_lc(void)
 {
+        // cppcheck-suppress [misra-c2012-17.7]
         xwup_skd_enpmpt_lc();
 }
 
 static __xwos_inline_api
 void xwosdl_skd_continue_lc(void)
 {
+        // cppcheck-suppress [misra-c2012-17.7]
         xwup_skd_enpmpt_lc();
         xwup_skd_start_syshwt_lc();
 }
@@ -103,6 +106,7 @@ static __xwos_inline_api
 void xwosdl_skd_pause_lc(void)
 {
         xwup_skd_stop_syshwt_lc();
+        // cppcheck-suppress [misra-c2012-17.7]
         xwup_skd_dspmpt_lc();
 }
 

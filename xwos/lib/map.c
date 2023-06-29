@@ -34,9 +34,8 @@ xwer_t xwlib_map_insert(struct xwlib_map * map, struct xwlib_map_container * new
 
         pos = &map->rbtree.root;
         lpc = (xwptr_t)pos;
-
         rbn = *pos;
-        while (rbn) {
+        while (NULL != rbn) {
                 mc = xwlib_rbtree_entry(rbn, struct xwlib_map_container, rbn);
                 cmprc = map->cmp(newmc->key, mc->key);
                 if (cmprc < 0) {
@@ -52,7 +51,7 @@ xwer_t xwlib_map_insert(struct xwlib_map * map, struct xwlib_map_container * new
                         break;
                 }
         }
-        if (lpc) {
+        if (0 != lpc) {
                 if (xwlib_rbtree_tst_link_root(&map->rbtree,
                                                xwlib_rbtree_get_link(lpc))) {
                         xwlib_bclst_add_head(&map->bclh, &newmc->bcln);
@@ -118,7 +117,7 @@ xwer_t xwlib_map_find(struct xwlib_map * map, void * key,
         xwer_t rc;
 
         rbn = map->rbtree.root;
-        while (rbn) {
+        while (NULL != rbn) {
                 mc = xwlib_rbtree_entry(rbn, struct xwlib_map_container, rbn);
                 cmprc = map->cmp(key, mc->key);
                 if (cmprc < 0) {
@@ -129,7 +128,7 @@ xwer_t xwlib_map_find(struct xwlib_map * map, void * key,
                         break;
                 }
         }
-        if (rbn) {
+        if (NULL != rbn) {
                 *mcbuf = xwlib_rbtree_entry(rbn, struct xwlib_map_container, rbn);
                 rc = XWOK;
         } else {

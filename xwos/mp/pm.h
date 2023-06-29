@@ -24,12 +24,12 @@ struct xwmp_pmdm;
  */
 enum xwmp_pm_stage_em {
         XWMP_PM_STAGE_SUSPENDED = 0, /**< 已经暂停 */
-        XWMP_PM_STAGE_SUSPENDING, /**< 正在暂停 */
+        XWMP_PM_STAGE_SUSPENDING = 1, /**< 正在暂停 */
         XWMP_PM_STAGE_RESUMING = XWMP_PM_STAGE_SUSPENDING, /**< 正在恢复 */
-        XWMP_PM_STAGE_RESERVED,
-        XWMP_PM_STAGE_FREEZING, /**< 正在冻结线程 */
+        XWMP_PM_STAGE_RESERVED = 2,
+        XWMP_PM_STAGE_FREEZING = 3, /**< 正在冻结线程 */
         XWMP_PM_STAGE_THAWING = XWMP_PM_STAGE_FREEZING, /**< 正在解冻线程 */
-        XWMP_PM_STAGE_RUNNING, /**< 正常运行 */
+        XWMP_PM_STAGE_RUNNING = 4, /**< 正常运行 */
 };
 
 typedef void (* xwmp_pmdm_cb_f)(void *); /**< 电源管理回调函数 */
@@ -70,5 +70,7 @@ void xwmp_pmdm_set_cb(xwmp_pmdm_cb_f resume_cb,
 xwer_t xwmp_pmdm_suspend(void);
 xwer_t xwmp_pmdm_resume(void);
 xwsq_t xwmp_pmdm_get_stage(void);
+void xwmp_pmdm_report_xwskd_suspended(struct xwmp_pmdm * pmdm);
+void xwmp_pmdm_report_xwskd_resuming(struct xwmp_pmdm * pmdm);
 
 #endif /* xwos/mp/pm.h */

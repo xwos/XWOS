@@ -14,6 +14,7 @@
 #define __xwos_ospl_soc_xwaop64_h__
 
 #include <xwos/standard.h>
+#include <xwosimpl_soc_xwaop64.h>
 
 /******** ******** ******** ******** unsigned ******** ******** ******** ********/
 xwu64_t xwaop__xwu64_t__load(atomic_xwu64_t * a,
@@ -571,7 +572,5 @@ xwer_t xwaop__xws64_t__tst_then_op(atomic_xws64_t * a,
                                    xwaop_tst_f tst, void * tst_args,
                                    xwaop_op_f op, void * op_args,
                                    xws64_t * nv, xws64_t * ov);
-
-#include <xwosimpl_soc_xwaop64.h>
 
 #endif /* xwos/ospl/soc/xwaop64.h */

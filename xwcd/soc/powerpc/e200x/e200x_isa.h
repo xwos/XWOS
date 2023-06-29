@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief e200z0 core registers
+ * @brief e200z0指令和架构
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,8 +18,8 @@
  * > limitations under the License.
  */
 
-#ifndef __arch_e200x_core_h__
-#define __arch_e200x_core_h__
+#ifndef __arch_e200x_isa_h__
+#define __arch_e200x_isa_h__
 
 #ifndef __ASM__
 #  include <xwos/standard.h>
@@ -74,4 +74,4 @@ xwu16_t lhbrx(volatile xwu16_t * addr);
 
 #endif
 
-#endif /* e200x_core.h */
+#endif /* e200x_isa.h */

@@ -42,12 +42,11 @@ struct xwup_evt {
         xwbmp_t * msk; /**< 掩码位图 */
 };
 
+xwer_t xwup_evt_intr_all(struct xwup_evt * evt);
+
 #if defined(XWOSCFG_SYNC_EVT_MEMSLICE) && (1 == XWOSCFG_SYNC_EVT_MEMSLICE)
 xwer_t xwup_evt_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
-
-xwer_t xwup_evt_intr_all(struct xwup_evt * evt);
-
 xwer_t xwup_evt_init(struct xwup_evt * evt, xwsq_t type, xwsz_t num,
                      xwbmp_t * bmp, xwbmp_t * msk);
 xwer_t xwup_evt_fini(struct xwup_evt * evt);
@@ -58,8 +57,8 @@ xwer_t xwup_evt_release(struct xwup_evt * evt, xwsq_t tik);
 xwer_t xwup_evt_grab(struct xwup_evt * evt);
 xwer_t xwup_evt_put(struct xwup_evt * evt);
 
-xwer_t xwup_evt_bind(struct xwup_evt * evt, struct xwup_evt * slt, xwsq_t pos);
-xwer_t xwup_evt_unbind(struct xwup_evt * evt, struct xwup_evt * slt);
+xwer_t xwup_evt_bind(struct xwup_evt * evt, struct xwup_evt * sel, xwsq_t pos);
+xwer_t xwup_evt_unbind(struct xwup_evt * evt, struct xwup_evt * sel);
 xwer_t xwup_evt_get_num(struct xwup_evt * evt, xwsz_t * numbuf);
 
 /******** type:XWUP_EVT_TYPE_FLG ********/

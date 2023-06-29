@@ -1,6 +1,6 @@
  /**
  * @file
- * @brief XWOS内存管理：对象缓存
+ * @brief XWOS内存管理：内存池：对象缓存
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -63,7 +63,8 @@ xwer_t xwmm_mempool_objcache_init(struct xwmm_mempool_objcache * oc,
                                   xwsz_t objsize, xwsz_t alignment, xwsq_t pg_order,
                                   ctor_f ctor, dtor_f dtor)
 {
-        xwsz_t nr, pgsize;
+        xwsz_t nr;
+        xwsz_t pgsize;
 
 /*
  * ----------------------------
@@ -79,7 +80,7 @@ xwer_t xwmm_mempool_objcache_init(struct xwmm_mempool_objcache * oc,
 
         alignment = XWBOP_ALIGN(alignment, XWMM_ALIGNMENT);
         objsize = XWBOP_ALIGN(objsize, alignment);
-        if (ctor) {
+        if (NULL != ctor) {
                 xwu8_t obj[objsize];
                 ctor((void *)obj);
                 oc->backup = *((xwptr_t *)obj);
@@ -120,15 +121,17 @@ static __xwos_code
 void xwmm_mempool_objcache_page_init(struct xwmm_mempool_objcache * oc,
                                      struct xwmm_mempool_page * pg)
 {
-        xwsz_t i, loop;
-        xwptr_t curr, next;
+        xwsz_t i;
+        xwsz_t loop;
+        xwptr_t curr;
+        xwptr_t next;
 
         xwlib_bclst_init_node(&pg->attr.objcache.node);
         pg->attr.objcache.refcnt = 0;
         pg->data.value = oc->objsize;
 
         /* 构造所有对象 */
-        if (oc->ctor) {
+        if (NULL != oc->ctor) {
                 curr = pg->mapping;
                 next = curr;
                 loop = oc->pg_objnr;
@@ -278,7 +281,7 @@ xwer_t xwmm_mempool_objcache_alloc(struct xwmm_mempool_objcache * oc, void ** ob
         xwer_t rc;
 
         rc = xwmm_mempool_objcache_page_get(oc, &pg);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_page_get;
         }
 
@@ -320,7 +323,8 @@ xwer_t xwmm_mempool_objcache_free(struct xwmm_mempool_objcache * oc, void * obj)
         struct xwmm_mempool_page * pg;
         xwsz_t reserved;
         xwsz_t idleness;
-        xwptr_t offset, origin;
+        xwptr_t offset;
+        xwptr_t origin;
         xwer_t rc;
 
         rc = xwmm_mempool_page_find(oc->pa, obj, &pg);
@@ -332,7 +336,7 @@ xwer_t xwmm_mempool_objcache_free(struct xwmm_mempool_objcache * oc, void * obj)
         origin = (xwptr_t)obj - offset;
         obj = (void *)origin;
 
-        if (oc->dtor) {
+        if (NULL != oc->dtor) {
                 oc->dtor(obj);
         }
 
@@ -343,7 +347,7 @@ xwer_t xwmm_mempool_objcache_free(struct xwmm_mempool_objcache * oc, void * obj)
         xwaop_add(xwsz_t, &oc->idleness, 1, &idleness, NULL);
         reserved = xwaop_load(xwsz_t, &oc->reserved, xwaop_mo_relaxed);
 
-        if (reserved + oc->pg_objnr <= idleness) {
+        if ((reserved + oc->pg_objnr) <= idleness) {
                 xwsz_t nr;
 
                 nr = (idleness - reserved) / oc->pg_objnr;
@@ -389,7 +393,7 @@ xwer_t xwmm_mempool_objcache_reserve(struct xwmm_mempool_objcache * oc,
                 xwos_sqlk_wr_lock_cpuirqsv(&oc->page_list.lock, &flag);
                 xwlib_bclst_add_tail(&oc->page_list.idle, &pg->attr.objcache.node);
                 xwos_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
-        } else if (reserved + oc->pg_objnr < idleness) {
+        } else if ((reserved + oc->pg_objnr) < idleness) {
                 xwsz_t nr;
 
                 nr = (idleness - reserved) / oc->pg_objnr;

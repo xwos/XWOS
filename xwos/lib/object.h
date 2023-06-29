@@ -34,10 +34,12 @@
 
 #define XWOS_OBJ_MAGIC  0x58574F53U /**< 所有XWOS的对象都有相同的幻数 */
 
+struct xwos_object;
+
 /**
  * @brief 垃圾回收函数指针类型
  */
-typedef xwer_t (* xwobj_gc_f)(void *);
+typedef xwer_t (* xwobj_gc_f)(struct xwos_object *);
 
 /**
  * @brief XWOS对象
@@ -47,6 +49,7 @@ typedef xwer_t (* xwobj_gc_f)(void *);
  *   并且它们的初始值都为0。memslice可以将这个初始值备份起来，当结构体被分配
  *   出去时使用备份值恢复原内容。
  */
+// cppcheck-suppress [misra-c2012-2.7, misra-c2012-5.5, misra-c2012-8.2]
 struct __xwcc_aligned(XWMM_ALIGNMENT) xwos_object {
         xwsq_t tik; /**< 对象的标签，用于防止ABA问题与野指针问题 */
         xwsq_t magic; /**< 对象的幻数，用于防止ABA问题与野指针问题 */

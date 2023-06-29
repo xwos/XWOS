@@ -421,11 +421,12 @@
 
 /**
  * @brief: 强制从内存中访问指定类型的变量
- * @param[in] t: 类型，只能为基本类型及其typedef后的类型
+ * @param[in] t: 类型，只能为基本类型
  * @param[out] v: 类型为t左值，读取的值放在这个左值中
  * @note
  * + 类型t的位宽只能是8位、16位、32位、64位。
  */
+// cppcheck-suppress [misra-c2012-20.7]
 #define xwmb_access(t, v)       (*((volatile t *)&(v)))
 
 /**
@@ -436,6 +437,7 @@
  * @note
  * + 类型t的位宽只能是8位、16位、32位、64位。
  */
+// cppcheck-suppress [misra-c2012-20.7]
 #define xwmb_read(t, v, p)      xwmb_access(t, v) = (*(volatile t * )(p))
 
 /**
@@ -446,6 +448,7 @@
  * @note
  * + 类型t的位宽只能是8位、16位、32位、64位。
  */
+// cppcheck-suppress [misra-c2012-20.7]
 #define xwmb_write(t, p, v)     (*(volatile t * )(p)) = (v)
 
 #ifndef xwccmb
@@ -613,16 +616,17 @@
 /**
  * @brief 定义stringify的辅助宏
  */
+// cppcheck-suppress [misra-c2012-20.10]
 #  define __stringify(m)                  #m
 
 /**
  * @brief 字符串化
  * @param[in] m: 将m变为字符串
  * @note
- * C语言宏展开的规则：遇到```#```和```##```就停止展开。
- * 因此如果直接定义```stringify(m)```为```#m```，
+ * C语言宏展开的规则：遇到 `#` 和 `##` 就停止展开。
+ * 因此如果直接定义 `stringify(m)` 为 `#m` ，
  * 遇到下面的代码将不能正常工作：
- * ``` C
+ * ```C
  * #define stringify(m)       #m
  * #define NAME               Roy
  * const char my_name[] = stringify(NAME);
@@ -636,15 +640,20 @@
  * const char my_name[] = stringify(NAME);
  * // 结果是 my_name[] = "Roy";
  * ```
- * 因为```NAME```在```stringify(m)```中展开，没有遇到```#```或```##```。
+ * 因为 `NAME`在 `stringify(m)` 中展开，没有遇到 `#` 或 `##` 。
  */
+// cppcheck-suppress [misra-c2012-20.10]
 #  define stringify(m)                    __stringify(m)
 #endif
 
 /**
  * @brief 显示宏的值
  * @param[in] m: 宏
+ * @note
+ * + violation of [misra-c2012-20.10]
+ *   + 此宏的用途是显示宏的内容，只能用于调试目的。
  */
+// cppcheck-suppress [misra-c2012-20.10]
 #define __show_macro(m)                 #m ":" stringify(m)
 
 /******** ******** struct & member ******** ********/
@@ -667,6 +676,21 @@
 #  define xwcc_baseof(ptr, type, member) \
           ((type *)(((xwptr_t)(ptr)) - xwcc_offsetof(type, member)))
 #endif
+
+#ifndef xwcc_derof
+/**
+ * @brief 将基类结构体指针转换为派生类结构体指针
+ * @param[in] ptr: 基类结构体指针
+ * @param[in] type: 派生类结构体类型
+ * @param[in] member: 基类在派生类结构体中成员符号名
+ * @note
+ * + 违反 **MISRA-C:2012-11.5**
+ *   + XWOS内核虽然是C语言编写，但使用了面向对象的思想，
+ *     具有继承关系的基类结构体指针可转换为派生类结构体指针。
+ */
+#define xwcc_derof(ptr, type, member) xwcc_baseof(ptr, type, member)
+#endif
+
 
 /**
  * @} xwos_lib_compiler

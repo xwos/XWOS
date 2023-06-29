@@ -584,7 +584,8 @@ void xwlib_crc32_swcal_ls(xwu32_t * crc32,
                           const xwu8_t stream[], xwsz_t * size)
 {
         xwsz_t i;
-        xwu8_t index, byte;
+        xwu8_t index;
+        xwu8_t byte;
         xwu32_t remainder = *crc32;
 
         for (i = 0; i < *size; i++) {
@@ -618,7 +619,8 @@ void xwlib_crc32_swcal_rs(xwu32_t * crc32,
                           const xwu8_t stream[], xwsz_t * size)
 {
         xwsz_t i;
-        xwu8_t index, byte;
+        xwu8_t index;
+        xwu8_t byte;
         xwu32_t remainder = *crc32;
 
         for (i = 0; i < *size; i++) {
@@ -657,6 +659,7 @@ xwer_t xwlib_crc32_swcal(xwu32_t * crc32,
 {
         xwer_t rc;
 
+        // cppcheck-suppress [misra-c2012-16.6]
         switch (plynml) {
 #if defined(XWLIBCFG_CRC32_0X04C11DB7) && (1 == XWLIBCFG_CRC32_0X04C11DB7)
         case 0x04C11DB7:
@@ -687,6 +690,7 @@ xwer_t xwlib_crc32_swcal(xwu32_t * crc32,
                 XWOS_UNUSED(crc32);
                 XWOS_UNUSED(refin);
                 XWOS_UNUSED(plynml);
+                XWOS_UNUSED(direction);
                 XWOS_UNUSED(stream);
                 XWOS_UNUSED(size);
                 rc = -EOPNOTSUPP;
@@ -724,7 +728,8 @@ xwer_t xwlib_crc32_cal(xwu32_t * crc32, xwu32_t xorout,
                        const xwu8_t stream[], xwsz_t * size)
 {
         xwer_t rc;
-        xwsz_t total, pos;
+        xwsz_t total;
+        xwsz_t pos;
         xwu32_t res;
 
         XWOS_VALIDATE((crc32), "nullptr", -EFAULT);
@@ -742,16 +747,16 @@ xwer_t xwlib_crc32_cal(xwu32_t * crc32, xwu32_t xorout,
                                        refin, plynml, direction,
                                        &stream[pos], size);
                 pos = total - *size;
-        }/* else {} */
+        }
         if (XWOK == rc) {
                 if (0 == *size) {
                         if (refout) {
                                 res = xwbop_rbit32(res);
-                        }/* else {} */
+                        }
                         res = res ^ xorout;
-                }/* else {} */
+                }
                 *crc32 = res;
-        }/* else {} */
+        }
         return rc;
 }
 

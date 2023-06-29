@@ -55,6 +55,16 @@ struct xwup_thd_attr {
 
 /**
  * @brief XWOS UP线程对象
+ * @details
+ * 在语义上，相当于C++的
+ * ```C++
+ * class xwup_thd :
+ *   public xwos_object,
+ *   public xwup_skdobj_stack,
+ *   public xwup_ttn,
+ *   public xwup_wqn,
+ *   public xwup_mtxtree
+ * ```
  */
 struct xwup_thd {
         struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
@@ -80,8 +90,7 @@ struct xwup_thd {
 
         /* 线程优先级 */
 #if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
-        struct xwup_mtxtree mtxtree; /**< 互斥锁树：线程已经获得的所有互斥锁都
-                                          需要加入到互斥锁树 */
+        struct xwup_mtxtree mt; /**< 互斥锁树 */
         struct {
                 xwpr_t s; /**< 线程的固有优先级 */
                 xwpr_t d; /**< 线程的动态优先级 */
@@ -118,10 +127,8 @@ void xwup_cthd_return(xwer_t rc);
 xwer_t xwup_thd_rq_add_head(struct xwup_thd * thd);
 xwer_t xwup_thd_rq_add_tail(struct xwup_thd * thd);
 void xwup_thd_rq_remove(struct xwup_thd * thd);
-void xwup_thd_ttn_callback(void * entry);
 xwer_t xwup_thd_tt_add_locked(struct xwup_thd * thd, struct xwup_tt * xwtt,
                               xwtm_t to, xwreg_t flag);
-void xwup_thd_wqn_callback(void * entry);
 
 #if (1 == XWOSRULE_SKD_WQ_RT)
 void xwup_thd_eq_rtwq(struct xwup_thd * thd, struct xwup_rtwq * xwrtwq,

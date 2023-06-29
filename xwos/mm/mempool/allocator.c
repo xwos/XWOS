@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS内存管理：内存池 —— 页分配器
+ * @brief XWOS内存管理：内存池：页分配器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
