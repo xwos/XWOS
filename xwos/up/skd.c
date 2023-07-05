@@ -358,8 +358,8 @@ xwer_t xwup_skd_bhd(struct xwup_skd * xwskd)
 {
         struct xwup_bh_node * bhn;
 
-        xwospl_cpuirq_disable_lc();
         while (true) {
+                xwospl_cpuirq_disable_lc();
                 if (!xwlib_bclst_tst_empty(&xwskd->bhcb.list)) {
                         bhn = xwlib_bclst_first_entry(&xwskd->bhcb.list,
                                                       struct xwup_bh_node,
@@ -369,16 +369,20 @@ xwer_t xwup_skd_bhd(struct xwup_skd * xwskd)
                         bhn->func(bhn->arg);
                         xwospl_cpuirq_disable_lc();
                 }
-                xwskd->req_bh_cnt--;
-                if (0 == xwskd->req_bh_cnt) {
-                        xwskd->cstk = xwskd->pstk;
-                        xwskd->pstk = XWUP_SKD_BH_STK(xwskd);
+                if (xwskd->req_bh_cnt > 0) {
+                        xwskd->req_bh_cnt--;
+                        if (0 == xwskd->req_bh_cnt) {
+                                xwskd->cstk = xwskd->pstk;
+                                xwskd->pstk = XWUP_SKD_BH_STK(xwskd);
+                                xwospl_cpuirq_enable_lc();
+                                xwospl_skd_req_swcx(xwskd);
+                        } else {
+                                xwospl_cpuirq_enable_lc();
+                        }
+                } else {
                         xwospl_cpuirq_enable_lc();
-                        xwospl_skd_req_swcx(xwskd);
-                        xwospl_cpuirq_disable_lc();
                 }
         }
-        xwospl_cpuirq_enable_lc();
         return XWOK;
 }
 

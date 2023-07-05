@@ -220,6 +220,8 @@ void soc_skd_req_swcx(struct xwospl_skd * xwskd)
 {
         XWOS_UNUSED(xwskd);
         INTC.SSCIR[SOC_SWCX_CH].R = 0x2;
+        eppc_dmb();
+        eppc_isb();
 }
 
 /**

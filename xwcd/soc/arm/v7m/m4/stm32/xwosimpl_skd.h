@@ -32,6 +32,8 @@ void xwospl_skd_req_swcx(struct xwospl_skd * xwskd)
 {
         XWOS_UNUSED(xwskd);
         cm_nvic_pend_pendsv();
+        armv7m_dsb();
+        armv7m_isb();
 }
 
 #endif /* xwosimpl_skd.h */

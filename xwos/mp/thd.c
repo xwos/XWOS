@@ -1422,7 +1422,7 @@ xwer_t xwmp_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
                 rc = -ECANNOTBH;
                 goto err_cannot;
 #endif
-        }
+        } else {}
 
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         /* 检查是否被中断 */

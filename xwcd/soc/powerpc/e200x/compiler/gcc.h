@@ -76,8 +76,8 @@
 
 /******** ******** barrier ******** ********/
 #define xwccmb()                __asm__ volatile("": : :"memory")
-#define eppc_isb(option)        __asm__ volatile("se_isync" : : : "memory")
-#define eppc_dmb(option)        __asm__ volatile("msync" : : : "memory")
+#define eppc_isb()              __asm__ volatile("se_isync" : : : "memory")
+#define eppc_dmb()              __asm__ volatile("msync" : : : "memory")
 
 #define xwmb_mp_mb()            eppc_dmb()
 #define xwmb_mp_rmb()           xwmb_mp_mb()

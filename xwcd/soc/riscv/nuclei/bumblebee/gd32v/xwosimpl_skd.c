@@ -225,6 +225,7 @@ void soc_skd_req_swcx(struct xwospl_skd * xwskd)
         XWOS_UNUSED(xwskd);
         SysTimer_SetSWIRQ();
         xwmb_mp_mb();
+        xwmb_mp_isb();
 }
 
 /**
