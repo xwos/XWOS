@@ -19,9 +19,9 @@
 #
 
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
-include $(XWBS_UTIL_MK_XWMO)
+include xwbs/util/mk/xwmo.mk
 
 XWMO_CSRCS := lfs.c lfs_util.c
 XWMO_CFLAGS := -Wno-sign-conversion -Wno-undef
 XWMO_INCDIRS := $(call getXwmoDir)
-include xwbs/$(XWOS_CFG_XWMO_MK)
+include xwbs/xwmo.mk

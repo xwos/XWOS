@@ -20,7 +20,7 @@
 
 # 引入配置
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
-include $(XWBS_UTIL_MK_XWMO)
+include xwbs/util/mk/xwmo.mk
 
 # 增加源代码文件
 XWMO_CSRCS :=
@@ -42,11 +42,11 @@ XWMO_CSRCS += xwds/w25q64jv.c
 XWMO_CSRCS += xwlib/log.c
 XWMO_CSRCS += xwlib/crc.c
 
-ifeq ($(XWOS_CFG_LIBC),newlib)
+ifeq ($(XWCFG_LIBC),newlib)
   XWMO_CSRCS += newlib/stdio.c
   XWMO_CSRCS += newlib/mem.c
 endif
-ifeq ($(XWOS_CFG_LIBC),picolibc)
+ifeq ($(XWCFG_LIBC),picolibc)
   XWMO_CSRCS += picolibc/stdio.c
   XWMO_CSRCS += picolibc/mem.c
 endif
@@ -63,4 +63,4 @@ XWMO_CFLAGS += -Wno-unused-parameter -Wno-sign-conversion
 XWMO_INCDIRS :=
 
 # 引入编译规则
-include xwbs/$(XWOS_CFG_XWMO_MK)
+include xwbs/xwmo.mk

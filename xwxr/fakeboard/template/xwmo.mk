@@ -19,5 +19,5 @@
 #
 
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
-include $(XWBS_UTIL_MK_XWMO)
-include xwbs/$(XWOS_CFG_XWMO_RUST_MK)
+include xwbs/util/mk/xwmo.mk
+include xwbs/xwmo.rust.mk

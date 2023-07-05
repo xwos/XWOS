@@ -25,26 +25,26 @@ CPPCHECK_OUT ?= $(XWOS_WKSPC_DIR)/cppcheck
 CPPCHECK_INCDIRS = -I. -I$(XWOS_ARCH_DIR) -I$(XWOS_CPU_DIR) -I$(XWOS_SOC_DIR) -I$(XWOS_BRD_DIR)
 CPPCHECK_CFLAGS = --force --addon=misra --cppcheck-build-dir=$(CPPCHECK_OUT) --template=gcc
 CPPCHECK_CFLAGS += --inline-suppr --suppressions-list=xwbs/util/cppcheck/misra-c2012-suppressions.txt
-ifeq ($(XWOS_CFG_CORE),mp)
+ifeq ($(XWCFG_CORE),mp)
   CPPCHECK_CFLAGS += -i xwos/up
 endif
-ifeq ($(XWOS_CFG_CORE),up)
+ifeq ($(XWCFG_CORE),up)
   CPPCHECK_CFLAGS += -i xwos/mp
 endif
 
-ifeq ($(XWOS_CFG_HOSTOS),gnu/linux)
+ifeq ($(XWCFG_HOSTOS),gnu/linux)
   ifneq ($(V),1)
     SHOW_CPPCHECK = @$(MSG) "\e[1m\e[44;38m[cppcheck] "$*" \e[0m";
   endif
 endif
 
-ifeq ($(XWOS_CFG_HOSTOS),darwin)
+ifeq ($(XWCFG_HOSTOS),darwin)
   ifneq ($(V),1)
     SHOW_CPPCHECK = @$(MSG) "\e[1m\e[44;38m[cppcheck] "$*" \e[0m";
   endif
 endif
 
-ifeq ($(XWOS_CFG_HOSTOS),windows-nt)
+ifeq ($(XWCFG_HOSTOS),windows-nt)
   ifneq ($(V),1)
     SHOW_CPPCHECK = @$(MSG) "[cppcheck] "$* ;
   endif

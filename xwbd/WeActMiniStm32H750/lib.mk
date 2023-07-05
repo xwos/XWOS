@@ -21,12 +21,12 @@
 EINCDIRS :=
 ELIBS :=
 
-ifeq ($(XWOS_CFG_LIBC),newlib)
+ifeq ($(XWCFG_LIBC),newlib)
   ELIBS_gcc += -lstdc++ -lsupc++ -lm -lc
   ELIBS_llvm += -lunwind -lc++ -lc++abi -lm -lc
 endif
 
-ifeq ($(XWOS_CFG_LIBC),picolibc)
+ifeq ($(XWCFG_LIBC),picolibc)
   ELIBS_gcc += -lstdc++ -lsupc++ -lm -lc
   ELIBS_llvm += -lunwind -lc++ -lc++abi -lm -lc
 endif

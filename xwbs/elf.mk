@@ -25,8 +25,8 @@ include $(XWOS_SOC_DIR)/soc.mk
 include $(XWOS_BRD_DIR)/brd.mk
 include $(XWOS_OS_DIR)/xwos.mk
 include $(XWOS_BRD_DIR)/lib.mk
-include $(XWBS_UTIL_MK_XWMO)
-include xwbs/$(XWOS_CFG_ARCH).$(XWOS_CFG_COMPILER).rule
+include xwbs/util/mk/xwmo.mk
+include xwbs/$(XWCFG_ARCH).$(XWCFG_COMPILER).rule
 
 ARCH_INCDIRS := $(addprefix $(XWOS_ARCH_DIR)/,$(ARCH_INCDIRS))
 ARCH_CSRCS := $(addprefix $(XWOS_ARCH_DIR)/,$(ARCH_CSRCS))
@@ -126,18 +126,18 @@ all: $(LIB_OBJS) $(LIBS) $(XWMD) $(XWCD) $(XWEM) $(XWAM) $(BM) $(OEM) \
     $(XWOS_WKSPC_DIR)/$(TARGET).smot \
     $(XWOS_WKSPC_DIR)/$(TARGET).bin
 
-ifeq ($(XWOS_CFG_XWMD),y)
+ifeq ($(XWCFG_XWMD),y)
   include xwbs/xwmd.mk
 endif
 
 include xwbs/xwcd.mk
 include xwbs/bm.mk
 
-ifeq ($(XWOS_CFG_XWEM),y)
+ifeq ($(XWCFG_XWEM),y)
   include xwbs/xwem.mk
 endif
 
-ifeq ($(XWOS_CFG_XWAM),y)
+ifeq ($(XWCFG_XWAM),y)
   include xwbs/xwam.mk
 endif
 

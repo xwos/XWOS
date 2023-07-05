@@ -15,12 +15,12 @@
 
 #include <cfg/project.h>
 
-#if defined(XWOS_CFG_CORE__mp)
+#if defined(XWCFG_CORE__mp)
 #  include <xwos/mp/rule.h>
-#elif defined(XWOS_CFG_CORE__up)
+#elif defined(XWCFG_CORE__up)
 #  include <xwos/up/rule.h>
 #else
-#  error "Can't find the configuration XWOS_CFG_CORE!"
+#  error "Can't find the configuration XWCFG_CORE!"
 #endif
 
 #endif /* xwos/lib/rule.h */

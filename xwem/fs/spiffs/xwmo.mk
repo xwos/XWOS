@@ -19,10 +19,10 @@
 #
 
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
-include $(XWBS_UTIL_MK_XWMO)
+include xwbs/util/mk/xwmo.mk
 
 XWMO_CSRCS := spiffs_nucleus.c spiffs_gc.c spiffs_hydrogen.c spiffs_cache.c spiffs_check.c
 XWMO_CFLAGS := -DCONFIG_BUILD_SPIFFS -Wno-sign-conversion -Wno-undef
 XWMO_CFLAGS_gcc := -Wno-stringop-truncation -Wno-error=maybe-uninitialized
 XWMO_INCDIRS := $(call getXwmoDir)
-include xwbs/$(XWOS_CFG_XWMO_MK)
+include xwbs/xwmo.mk

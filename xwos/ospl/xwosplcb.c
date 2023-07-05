@@ -14,7 +14,7 @@
 #include <xwos/ospl/skd.h>
 #include <xwos/ospl/syshwt.h>
 
-#if defined(XWOS_CFG_CORE__mp)
+#if defined(XWCFG_CORE__mp)
 /******** skd ********/
 __xwos_code
 struct xwospl_skd * xwosplcb_skd_get_lc(void)
@@ -83,7 +83,7 @@ void xwosplcb_syshwt_task(struct xwospl_syshwt * hwt)
         xwmp_syshwt_task(hwt);
 }
 
-#elif defined(XWOS_CFG_CORE__up)
+#elif defined(XWCFG_CORE__up)
 /******** skd ********/
 __xwos_code
 struct xwospl_skd * xwosplcb_skd_get_lc(void)

@@ -22,10 +22,10 @@
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/thd.h>
 #include <xwcd/perpheral/spi/lcd/st7735/driver.h>
-#ifdef XWOS_CFG_LIBC__newlib
+#ifdef XWCFG_LIBC__newlib
 #  include <xwmd/libc/newlibac/mif.h>
 #endif
-#ifdef XWOS_CFG_LIBC__picolibc
+#ifdef XWCFG_LIBC__picolibc
 #  include <xwmd/libc/picolibcac/mif.h>
 #endif
 #include <xwem/vm/lua/mif.h>
@@ -90,7 +90,7 @@ xwer_t main_task(void * arg)
 
         xwds_st7735_draw(&st7735, 0, 0, 160, 80, bootlogo, XWTM_MAX);
 
-#ifdef XWOS_CFG_LIBC__newlib
+#ifdef XWCFG_LIBC__newlib
         rc = newlibac_init();
         if (rc < 0) {
                 xwlogf(ERR, "main", "Init newlib ... <rc:%d>", rc);
@@ -98,7 +98,7 @@ xwer_t main_task(void * arg)
         }
 #endif
 
-#ifdef XWOS_CFG_LIBC__picolibc
+#ifdef XWCFG_LIBC__picolibc
         rc = picolibcac_init();
         if (rc < 0) {
                 xwlogf(ERR, "main", "Init picolibc ... <rc:%d>", rc);
@@ -143,11 +143,11 @@ err_xwssc_start:
         BOARD_BUG();
 err_child_thd_start:
 
-#ifdef XWOS_CFG_LIBC__picolibc
+#ifdef XWCFG_LIBC__picolibc
         BOARD_BUG();
 err_picolibcac_init:
 #endif
-#ifdef XWOS_CFG_LIBC__newlib
+#ifdef XWCFG_LIBC__newlib
         BOARD_BUG();
 err_newlibac_init:
 #endif

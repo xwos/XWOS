@@ -10,15 +10,15 @@
 # > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
 
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
-include $(XWBS_UTIL_MK_XWMO)
+include xwbs/util/mk/xwmo.mk
 
-ifeq ($(XWOS_CFG_LIBC),newlib)
+ifeq ($(XWCFG_LIBC),newlib)
   include $(call getXwmoDir)/newlibac/newlib.mk
   XWMO_CSRCS := $(addprefix newlibac/,$(XWMO_CSRCS))
 endif
-ifeq ($(XWOS_CFG_LIBC),picolibc)
+ifeq ($(XWCFG_LIBC),picolibc)
   include $(call getXwmoDir)/picolibcac/picolibc.mk
   XWMO_CSRCS := $(addprefix picolibcac/,$(XWMO_CSRCS))
 endif
 
-include xwbs/$(XWOS_CFG_XWMO_MK)
+include xwbs/xwmo.mk

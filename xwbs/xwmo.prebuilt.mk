@@ -18,7 +18,7 @@
 # > limitations under the License.
 #
 
-include xwbs/$(XWOS_CFG_ARCH).$(XWOS_CFG_COMPILER).rule
+include xwbs/$(XWCFG_ARCH).$(XWCFG_COMPILER).rule
 
 XWMO_NAME := $(call getXwmoName)
 XWMO_DIR := $(call getXwmoDir)

@@ -15,12 +15,12 @@
 
 #include <xwos/standard.h>
 
-#if defined(XWOS_CFG_CORE__mp)
+#if defined(XWCFG_CORE__mp)
 #  include <xwos/mp/irq.h>
-#elif defined(XWOS_CFG_CORE__up)
+#elif defined(XWCFG_CORE__up)
 #  include <xwos/up/irq.h>
 #else
-#  error "Can't find the configuration XWOS_CFG_CORE!"
+#  error "Can't find the configuration XWCFG_CORE!"
 #endif
 #include <xwosimpl_irq.h>
 

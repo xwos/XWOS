@@ -19,7 +19,7 @@
 #
 
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
-include $(XWBS_UTIL_MK_XWMO)
+include xwbs/util/mk/xwmo.mk
 
 XWMO_CSRCS :=
 XWMO_CSRCS += xwds.c object.c device.c
@@ -83,4 +83,4 @@ endif
 
 XWMO_CFLAGS =
 XWMO_INCDIRS =
-include xwbs/$(XWOS_CFG_XWMO_MK)
+include xwbs/xwmo.mk

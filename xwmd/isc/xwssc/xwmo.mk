@@ -10,11 +10,11 @@
 # > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
 
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
-include $(XWBS_UTIL_MK_XWMO)
+include xwbs/util/mk/xwmo.mk
 
 $(eval $(call XwmoReqCfg,XWLIBCFG_CRC32,y))
 
 XWMO_CSRCS := protocol.c hwifal.c hwif/uart.c mif.c
 XWMO_CFLAGS :=
 XWMO_INCDIRS :=
-include xwbs/$(XWOS_CFG_XWMO_MK)
+include xwbs/xwmo.mk

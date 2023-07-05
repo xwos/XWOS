@@ -10,8 +10,8 @@
 # > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
 
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
-include $(XWBS_UTIL_MK_XWMO)
+include xwbs/util/mk/xwmo.mk
 XWMO_CSRCS := xwtm.c skd.c pm.c thd.c swt.c mtx.c spinlock.c seqlock.c sem.c cond.c flg.c br.c sel.c
 XWMO_CFLAGS := -Wno-unused-function
 XWMO_INCDIRS :=
-include xwbs/$(XWOS_CFG_XWMO_MK)
+include xwbs/xwmo.mk

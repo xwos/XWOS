@@ -19,7 +19,7 @@
 #
 
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
-include $(XWBS_UTIL_MK_XWMO)
+include xwbs/util/mk/xwmo.mk
 
 $(eval $(call XwmoReqCfg,XWCDCFG_ds_SPI_MASTER,y))
 $(eval $(call XwmoReqCfg,XWCDCFG_ds_SPI_PERPHERAL,y))
@@ -27,4 +27,4 @@ $(eval $(call XwmoReqCfg,XWCDCFG_ds_SPI_PERPHERAL,y))
 XWMO_CSRCS := device.c driver.c
 XWMO_CFLAGS :=
 XWMO_INCDIRS :=
-include xwbs/$(XWOS_CFG_XWMO_MK)
+include xwbs/xwmo.mk

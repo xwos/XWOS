@@ -13,9 +13,9 @@
 #ifndef __xwos_osal_jack_sync_sel_h__
 #define __xwos_osal_jack_sync_sel_h__
 
-#if defined(XWOS_CFG_CORE__mp)
+#if defined(XWCFG_CORE__mp)
 #  include <xwos/mp/osdl/sync/sel.h>
-#elif defined(XWOS_CFG_CORE__up)
+#elif defined(XWCFG_CORE__up)
 #  include <xwos/up/osdl/sync/sel.h>
 #endif
 

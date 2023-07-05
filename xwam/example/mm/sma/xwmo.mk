@@ -19,9 +19,9 @@
 #
 
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
-include $(XWBS_UTIL_MK_XWMO)
+include xwbs/util/mk/xwmo.mk
 
 XWMO_CSRCS := mif.c
 XWMO_CFLAGS := -Wno-unused-value
 XWMO_INCDIRS :=
-include xwbs/$(XWOS_CFG_XWMO_MK)
+include xwbs/xwmo.mk

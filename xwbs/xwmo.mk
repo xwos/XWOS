@@ -24,10 +24,9 @@ include $(XWOS_SOC_DIR)/soc.mk
 include $(XWOS_BRD_DIR)/brd.mk
 include $(XWOS_OS_DIR)/xwos.mk
 include $(XWOS_BRD_DIR)/lib.mk
-include $(XWBS_UTIL_MK_XWMO)
-include xwbs/$(XWOS_CFG_ARCH).$(XWOS_CFG_COMPILER).rule
+include xwbs/$(XWCFG_ARCH).$(XWCFG_COMPILER).rule
 
-ifeq ($(XWOS_CFG_COMPILER),gcc)
+ifeq ($(XWCFG_COMPILER),gcc)
   XWMO_ASRCS += $(XWMO_ASRCS_gcc)
   XWMO_CSRCS += $(XWMO_CSRCS_gcc)
   XWMO_CXXSRCS += $(XWMO_CXXSRCS_gcc)
@@ -37,7 +36,7 @@ ifeq ($(XWOS_CFG_COMPILER),gcc)
   XWMO_INCDIRS += $(XWMO_INCDIRS_gcc)
 endif
 
-ifeq ($(XWOS_CFG_COMPILER),llvm)
+ifeq ($(XWCFG_COMPILER),llvm)
   XWMO_ASRCS += $(XWMO_ASRCS_llvm)
   XWMO_CSRCS += $(XWMO_CSRCS_llvm)
   XWMO_CXXSRCS += $(XWMO_CXXSRCS_llvm)

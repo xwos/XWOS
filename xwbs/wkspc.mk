@@ -20,7 +20,7 @@
 
 include XWOS.cfg
 
-MAKE_ELF_ARGS = $(strip -C $(XWOS_PATH) -f xwbs/$(XWOS_CFG_ELF_MK) XWOS_WKSPC_DIR=$(XWOS_WKSPC_DIR))
+MAKE_ELF_ARGS = $(strip -C $(XWOS_PATH) -f xwbs/elf.mk XWOS_WKSPC_DIR=$(XWOS_WKSPC_DIR))
 MAKE_MISRA_C_ARGS = $(strip -C $(XWOS_PATH) -f xwbs/misra.c.mk XWOS_WKSPC_DIR=$(XWOS_WKSPC_DIR))
 
 all:

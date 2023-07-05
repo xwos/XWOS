@@ -24,15 +24,15 @@ include $(XWOS_SOC_DIR)/soc.mk
 include $(XWOS_BRD_DIR)/brd.mk
 include $(XWOS_OS_DIR)/xwos.mk
 include $(XWOS_BRD_DIR)/lib.mk
-include $(XWBS_UTIL_MK_XWMO)
-include xwbs/$(XWOS_CFG_ARCH).$(XWOS_CFG_COMPILER).rule
+include xwbs/util/mk/xwmo.mk
+include xwbs/$(XWCFG_ARCH).$(XWCFG_COMPILER).rule
 
 XWMO_NAME := $(call getXwmoName)
 XWMO_DIR := $(call getXwmoDir)
 XWMO_OBJ_DIR ?= $(XWMO_DIR)
 XWMO_RUSTLIB_NAME := lib$(notdir $(XWMO_DIR)).a
 
-ifeq ($(XWOS_CFG_HOSTOS),windows-nt)
+ifeq ($(XWCFG_HOSTOS),windows-nt)
   RUST_TOOLCHAIN := +nightly-x86_64-pc-windows-gnu
 else
   RUST_TOOLCHAIN := +nightly

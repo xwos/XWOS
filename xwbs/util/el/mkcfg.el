@@ -197,63 +197,31 @@
 
 (goto-char (point-min))
 (re-search-forward
- "^#define[ \t]+\\(XWOS_CFG_ARCH\\)[ \t]+\\(.+\\)")
+ "^#define[ \t]+\\(XWCFG_ARCH\\)[ \t]+\\(.+\\)")
 (setq XWOS-cfg-arch (match-string 2))
 (logi "ARCH:%s" XWOS-cfg-arch)
 
 (goto-char (point-min))
 (re-search-forward
- "^#define[ \t]+\\(XWOS_CFG_SUBARCH\\)[ \t]+\\(.+\\)")
+ "^#define[ \t]+\\(XWCFG_SUBARCH\\)[ \t]+\\(.+\\)")
 (setq XWOS-cfg-subarch (match-string 2))
 (logi "Sub-ARCH:%s" XWOS-cfg-subarch)
 
 (goto-char (point-min))
 (re-search-forward
- "^#define[ \t]+\\(XWOS_CFG_COMPILER\\)[ \t]+\\(.+\\)")
+ "^#define[ \t]+\\(XWCFG_COMPILER\\)[ \t]+\\(.+\\)")
 (setq XWOS-cfg-compiler (match-string 2))
 (logi "compiler:%s" XWOS-cfg-compiler)
 
 (goto-char (point-min))
 (re-search-forward
- "^#define[ \t]+\\(XWOS_CFG_LIBC\\)[ \t]+\\(.+\\)")
+ "^#define[ \t]+\\(XWCFG_LIBC\\)[ \t]+\\(.+\\)")
 (setq XWOS-cfg-libc (match-string 2))
 (logi "libc:%s" XWOS-cfg-libc)
 
 (goto-char (point-min))
 (let ((rc))
-  (setq rc (re-search-forward "^#define[ \t]+XWOS_CFG_ELF_MK[ \t]+\\(.+\\)" nil t))
-  (if (null rc)
-    (setq XWOS-cfg-elf-mk "")
-    (setq XWOS-cfg-elf-mk (match-string 1))))
-(logi "XWOS-cfg-elf-makefile:%s" XWOS-cfg-elf-mk)
-
-(goto-char (point-min))
-(let ((rc))
-  (setq rc (re-search-forward "^#define[ \t]+XWOS_CFG_XWMO_MK[ \t]+\\(.+\\)" nil t))
-  (if (null rc)
-    (setq XWOS-cfg-xwmo-mk "")
-    (setq XWOS-cfg-xwmo-mk (match-string 1))))
-(logi "XWOS-cfg-xwmo-makefile:%s" XWOS-cfg-xwmo-mk)
-
-(goto-char (point-min))
-(let ((rc))
-  (setq rc (re-search-forward "^#define[ \t]+XWOS_CFG_XWMO_PREBUILT_MK[ \t]+\\(.+\\)" nil t))
-  (if (null rc)
-    (setq XWOS-cfg-xwmo-prebuilt-mk "")
-    (setq XWOS-cfg-xwmo-prebuilt-mk (match-string 1))))
-(logi "XWOS-cfg-xwmo-makefile:%s" XWOS-cfg-xwmo-prebuilt-mk)
-
-(goto-char (point-min))
-(let ((rc))
-  (setq rc (re-search-forward "^#define[ \t]+XWOS_CFG_XWMO_RUST_MK[ \t]+\\(.+\\)" nil t))
-  (if (null rc)
-    (setq XWOS-cfg-xwmo-rust-mk "")
-    (setq XWOS-cfg-xwmo-rust-mk (match-string 1))))
-(logi "XWOS-cfg-xwmo-makefile:%s" XWOS-cfg-xwmo-rust-mk)
-
-(goto-char (point-min))
-(let ((rc))
-  (setq rc (re-search-forward "^#define[ \t]+XWOS_CFG_LDSCRIPT[ \t]+\\(.+\\)" nil t))
+  (setq rc (re-search-forward "^#define[ \t]+XWCFG_LDSCRIPT[ \t]+\\(.+\\)" nil t))
   (if (null rc)
     (setq XWOS-cfg-lds "")
     (setq XWOS-cfg-lds (match-string 1))))
@@ -261,31 +229,31 @@
 
 (goto-char (point-min))
 (re-search-forward
- "^#define[ \t]+\\(XWOS_CFG_CPU\\)[ \t]+\\(.+\\)")
+ "^#define[ \t]+\\(XWCFG_CPU\\)[ \t]+\\(.+\\)")
 (setq XWOS-cfg-cpu (match-string 2))
 (logi "CPU:%s" XWOS-cfg-cpu)
 
 (goto-char (point-min))
 (re-search-forward
- "^#define[ \t]+\\(XWOS_CFG_SOC\\)[ \t]+\\(.+\\)")
+ "^#define[ \t]+\\(XWCFG_SOC\\)[ \t]+\\(.+\\)")
 (setq XWOS-cfg-soc (match-string 2))
 (logi "SOC:%s" XWOS-cfg-soc)
 
 (goto-char (point-min))
 (re-search-forward
- "^#define[ \t]+\\(XWOS_CFG_BOARD\\)[ \t]+\\(.+\\)")
+ "^#define[ \t]+\\(XWCFG_BOARD\\)[ \t]+\\(.+\\)")
 (setq XWOS-cfg-brd (match-string 2))
 (logi "board:%s" XWOS-cfg-brd)
 
 (goto-char (point-min))
 (re-search-forward
- "^#define[ \t]+\\(XWOS_CFG_CORE\\)[ \t]+\\(.+\\)")
+ "^#define[ \t]+\\(XWCFG_CORE\\)[ \t]+\\(.+\\)")
 (setq XWOS-cfg-core (match-string 2))
 (logi "core:%s" XWOS-cfg-core)
 
 (goto-char (point-min))
 (re-search-forward
- "^#define[ \t]+\\(XWOS_CFG_XWMD\\)[\t ]+\\([10]\\)" nil t)
+ "^#define[ \t]+\\(XWCFG_XWMD\\)[\t ]+\\([10]\\)" nil t)
 (setq XWOS-cfg-xwmd
       (cond
        ((string= (match-string 2) "1") "y")
@@ -294,7 +262,7 @@
 
 (goto-char (point-min))
 (re-search-forward
- "^#define[ \t]+\\(XWOS_CFG_XWEM\\)[\t ]+\\([10]\\)" nil t)
+ "^#define[ \t]+\\(XWCFG_XWEM\\)[\t ]+\\([10]\\)" nil t)
 (setq XWOS-cfg-xwem
       (cond
        ((string= (match-string 2) "1") "y")
@@ -303,7 +271,7 @@
 
 (goto-char (point-min))
 (re-search-forward
- "^#define[ \t]+\\(XWOS_CFG_XWAM\\)[\t ]+\\([10]\\)" nil t)
+ "^#define[ \t]+\\(XWCFG_XWAM\\)[\t ]+\\([10]\\)" nil t)
 (setq XWOS-cfg-xwam
       (cond
        ((string= (match-string 2) "1") "y")
@@ -313,7 +281,7 @@
 (goto-char (point-min))
 (let (rc)
   (setq rc (re-search-forward
-            "^#define[ \t]+XWOS_CFG_OEMPATH[ \t]+\\(.+\\)" nil t))
+            "^#define[ \t]+XWCFG_OEMPATH[ \t]+\\(.+\\)" nil t))
   (if (null rc)
       (setq XWOS-cfg-oempath "")
       (setq XWOS-cfg-oempath (match-string 1))))
@@ -357,25 +325,19 @@
 (set-buffer-multibyte nil)
 (erase-buffer)
 (insert "## ******** ******** ******** ******** basic info ******** ******** ******** ******** ##\n")
-(insert (concat "XWOS_CFG_HOSTOS := " (symbol-name system-type) "\n"))
-(insert (concat "XWOS_CFG_ARCH := " XWOS-cfg-arch "\n"))
-(insert (concat "XWOS_CFG_SUBARCH := " XWOS-cfg-subarch "\n"))
-(insert (concat "XWOS_CFG_COMPILER := " XWOS-cfg-compiler "\n"))
-(insert (concat "XWOS_CFG_LIBC := " XWOS-cfg-libc "\n"))
-(insert (concat "XWOS_CFG_LDSCRIPT := " XWOS-cfg-lds "\n"))
-(insert (concat "XWOS_CFG_CPU := " XWOS-cfg-cpu "\n"))
-(insert (concat "XWOS_CFG_SOC := " XWOS-cfg-soc "\n"))
-(insert (concat "XWOS_CFG_BRD := " XWOS-cfg-brd "\n"))
-(insert (concat "XWOS_CFG_CORE := " XWOS-cfg-core "\n"))
-(insert (concat "XWOS_CFG_XWMD := " XWOS-cfg-xwmd "\n"))
-(insert (concat "XWOS_CFG_XWEM := " XWOS-cfg-xwem "\n"))
-(insert (concat "XWOS_CFG_XWAM := " XWOS-cfg-xwam "\n"))
-(insert (concat "XWOS_CFG_ELF_MK := " XWOS-cfg-elf-mk "\n"))
-(insert (concat "XWOS_CFG_XWMO_MK := " XWOS-cfg-xwmo-mk "\n"))
-(insert (concat "XWOS_CFG_XWMO_PREBUILT_MK := " XWOS-cfg-xwmo-prebuilt-mk "\n"))
-(insert (concat "XWOS_CFG_XWMO_RUST_MK := " XWOS-cfg-xwmo-rust-mk "\n"))
-(insert "## ******** ******** ******** ******** build Script info ******** ******** ******** ******** ##\n")
-(insert (concat "XWBS_UTIL_MK_XWMO := " "xwbs/util/mk/xwmo.mk\n"))
+(insert (concat "XWCFG_HOSTOS := " (symbol-name system-type) "\n"))
+(insert (concat "XWCFG_ARCH := " XWOS-cfg-arch "\n"))
+(insert (concat "XWCFG_SUBARCH := " XWOS-cfg-subarch "\n"))
+(insert (concat "XWCFG_COMPILER := " XWOS-cfg-compiler "\n"))
+(insert (concat "XWCFG_LIBC := " XWOS-cfg-libc "\n"))
+(insert (concat "XWCFG_LDSCRIPT := " XWOS-cfg-lds "\n"))
+(insert (concat "XWCFG_CPU := " XWOS-cfg-cpu "\n"))
+(insert (concat "XWCFG_SOC := " XWOS-cfg-soc "\n"))
+(insert (concat "XWCFG_BRD := " XWOS-cfg-brd "\n"))
+(insert (concat "XWCFG_CORE := " XWOS-cfg-core "\n"))
+(insert (concat "XWCFG_XWMD := " XWOS-cfg-xwmd "\n"))
+(insert (concat "XWCFG_XWEM := " XWOS-cfg-xwem "\n"))
+(insert (concat "XWCFG_XWAM := " XWOS-cfg-xwam "\n"))
 (insert "## ******** ******** ******** ******** directory info ******** ******** ******** ******** ##\n")
 (insert (concat "XWOS_PATH := " XWOS-srcpath "\n"))
 (insert (concat "XWOS_FWDPATH := " XWOS-forward-srcpath "\n"))
@@ -648,14 +610,14 @@
 #ifndef __cfg_autogen_h__
 #define __cfg_autogen_h__
 
-#define XWOS_CFG_ARCH__" XWOS-cfg-arch " 1
-#define XWOS_CFG_SUBARCH__" XWOS-cfg-subarch " 1
-#define XWOS_CFG_COMPILER__" XWOS-cfg-compiler " 1
-#define XWOS_CFG_LIBC__" XWOS-cfg-libc " 1
-#define XWOS_CFG_CPU__" XWOS-cfg-cpu " 1
-#define XWOS_CFG_SOC__" XWOS-cfg-soc " 1
-#define XWOS_CFG_BOARD__" XWOS-cfg-brd " 1
-#define XWOS_CFG_CORE__" XWOS-cfg-core " 1
+#define XWCFG_ARCH__" XWOS-cfg-arch " 1
+#define XWCFG_SUBARCH__" XWOS-cfg-subarch " 1
+#define XWCFG_COMPILER__" XWOS-cfg-compiler " 1
+#define XWCFG_LIBC__" XWOS-cfg-libc " 1
+#define XWCFG_CPU__" XWOS-cfg-cpu " 1
+#define XWCFG_SOC__" XWOS-cfg-soc " 1
+#define XWCFG_BOARD__" XWOS-cfg-brd " 1
+#define XWCFG_CORE__" XWOS-cfg-core " 1
 
 #endif /* cfg/autogen.h */
 "))
@@ -674,23 +636,19 @@
 ")
 
 (insert "## ******** ******** ******** ******** basic info ******** ******** ******** ******** ##\n")
-(insert (concat "export XWOS_CFG_HOSTOS=" (symbol-name system-type) "\n"))
-(insert (concat "export XWOS_CFG_ARCH=" XWOS-cfg-arch "\n"))
-(insert (concat "export XWOS_CFG_SUBARCH=" XWOS-cfg-subarch "\n"))
-(insert (concat "export XWOS_CFG_COMPILER=" XWOS-cfg-compiler "\n"))
-(insert (concat "export XWOS_CFG_LIBC=" XWOS-cfg-libc "\n"))
-(insert (concat "export XWOS_CFG_LDSCRIPT=" XWOS-cfg-lds "\n"))
-(insert (concat "export XWOS_CFG_CPU=" XWOS-cfg-cpu "\n"))
-(insert (concat "export XWOS_CFG_SOC=" XWOS-cfg-soc "\n"))
-(insert (concat "export XWOS_CFG_BRD=" XWOS-cfg-brd "\n"))
-(insert (concat "export XWOS_CFG_CORE=" XWOS-cfg-core "\n"))
-(insert (concat "export XWOS_CFG_XWMD=" XWOS-cfg-xwmd "\n"))
-(insert (concat "export XWOS_CFG_XWEM=" XWOS-cfg-xwem "\n"))
-(insert (concat "export XWOS_CFG_XWAM=" XWOS-cfg-xwam "\n"))
-(insert (concat "export XWOS_CFG_ELF_MK=" XWOS-cfg-elf-mk "\n"))
-(insert (concat "export XWOS_CFG_XWMO_MK=" XWOS-cfg-xwmo-mk "\n"))
-(insert (concat "export XWOS_CFG_XWMO_PREBUILT_MK=" XWOS-cfg-xwmo-prebuilt-mk "\n"))
-(insert (concat "export XWOS_CFG_XWMO_RUST_MK=" XWOS-cfg-xwmo-rust-mk "\n"))
+(insert (concat "export XWCFG_HOSTOS=" (symbol-name system-type) "\n"))
+(insert (concat "export XWCFG_ARCH=" XWOS-cfg-arch "\n"))
+(insert (concat "export XWCFG_SUBARCH=" XWOS-cfg-subarch "\n"))
+(insert (concat "export XWCFG_COMPILER=" XWOS-cfg-compiler "\n"))
+(insert (concat "export XWCFG_LIBC=" XWOS-cfg-libc "\n"))
+(insert (concat "export XWCFG_LDSCRIPT=" XWOS-cfg-lds "\n"))
+(insert (concat "export XWCFG_CPU=" XWOS-cfg-cpu "\n"))
+(insert (concat "export XWCFG_SOC=" XWOS-cfg-soc "\n"))
+(insert (concat "export XWCFG_BRD=" XWOS-cfg-brd "\n"))
+(insert (concat "export XWCFG_CORE=" XWOS-cfg-core "\n"))
+(insert (concat "export XWCFG_XWMD=" XWOS-cfg-xwmd "\n"))
+(insert (concat "export XWCFG_XWEM=" XWOS-cfg-xwem "\n"))
+(insert (concat "export XWCFG_XWAM=" XWOS-cfg-xwam "\n"))
 (insert "## ******** ******** ******** ******** directory info ******** ******** ******** ******** ##\n")
 (insert (concat "export XWOS_PATH=" XWOS-srcpath "\n"))
 (insert (concat "export XWOS_FWDPATH=" XWOS-forward-srcpath "\n"))

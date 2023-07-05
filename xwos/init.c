@@ -11,12 +11,12 @@
  */
 
 #include <xwos/standard.h>
-#if defined(XWOS_CFG_CORE__mp)
+#if defined(XWCFG_CORE__mp)
 #  include <xwos/mp/init.h>
-#elif defined(XWOS_CFG_CORE__up)
+#elif defined(XWCFG_CORE__up)
 #  include <xwos/up/init.h>
 #else
-#  error "Can't find the configuration XWOS_CFG_CORE!"
+#  error "Can't find the configuration XWCFG_CORE!"
 #endif
 #include <xwos/lib/object.h>
 #include <xwos/osal/skd.h>
@@ -31,9 +31,9 @@ void xwos_init(void)
         if (0 == cpuid) {
                 xwos_objtik_init();
         }
-#if defined(XWOS_CFG_CORE__mp)
+#if defined(XWCFG_CORE__mp)
         xwmp_init();
-#elif defined(XWOS_CFG_CORE__up)
+#elif defined(XWCFG_CORE__up)
         xwup_init();
 #endif
 }

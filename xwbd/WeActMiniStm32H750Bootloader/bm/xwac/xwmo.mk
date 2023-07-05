@@ -20,7 +20,7 @@
 
 # 引入配置
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
-include $(XWBS_UTIL_MK_XWMO)
+include xwbs/util/mk/xwmo.mk
 
 # 增加源代码文件
 XWMO_CSRCS :=
@@ -43,4 +43,4 @@ XWMO_CFLAGS += -Wno-unused-parameter -Wno-sign-conversion
 XWMO_INCDIRS :=
 
 # 引入编译规则
-include xwbs/$(XWOS_CFG_XWMO_MK)
+include xwbs/xwmo.mk

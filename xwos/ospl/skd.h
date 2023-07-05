@@ -15,7 +15,7 @@
 
 #include <xwos/standard.h>
 
-#if defined(XWOS_CFG_CORE__mp)
+#if defined(XWCFG_CORE__mp)
 #  include <xwos/mp/skd.h>
 #  include <xwos/mp/thd.h>
 
@@ -23,7 +23,7 @@
 #  define xwospl_skd                    xwmp_skd
 #  define xwospl_thd                    xwmp_thd
 #  define XWOSPL_SKDOBJ_FLAG_PRIVILEGED XWMP_SKDOBJ_FLAG_PRIVILEGED
-#elif defined(XWOS_CFG_CORE__up)
+#elif defined(XWCFG_CORE__up)
 #  include <xwos/up/skd.h>
 #  include <xwos/up/thd.h>
 
@@ -32,7 +32,7 @@
 #  define xwospl_thd                    xwup_thd
 #  define XWOSPL_SKDOBJ_FLAG_PRIVILEGED XWUP_SKDOBJ_FLAG_PRIVILEGED
 #else
-#  error "Can't find the configuration XWOS_CFG_CORE!"
+#  error "Can't find the configuration XWCFG_CORE!"
 #endif
 #include <xwosimpl_skd.h>
 
@@ -116,7 +116,7 @@ void xwospl_thd_exit_lc(struct xwospl_thd * thd, xwer_t rc);
  */
 xwer_t xwospl_thd_freeze_lc(struct xwospl_thd * thd);
 
-#if defined(XWOS_CFG_CORE__mp)
+#if defined(XWCFG_CORE__mp)
 /**
  * @brief XWOS移植层：将线程迁出其他CPU，并准备迁入其他CPU
  * @param[in] thd: 线程对象的指针
