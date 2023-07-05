@@ -36,13 +36,7 @@ distclean:
 	$(MAKE) $(MAKE_MISRA_C_ARGS) $@
 
 mc: FORCE
-	$(MAKE) $(MAKE_MISRA_C_ARGS) \
-		$(XWOS_ARCH_DIR) \
-		$(XWOS_CPU_DIR) \
-		$(XWOS_SOC_DIR) \
-		$(XWOS_BRD_DIR) \
-		$(XWOS_OS_DIR) \
-		$(XWOS_XWMD_DIR)
+	$(MAKE) $(MAKE_MISRA_C_ARGS) $@
 
 .DEFAULT:
 	$(MAKE) $(MAKE_ELF_ARGS) $@

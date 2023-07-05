@@ -12,12 +12,15 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/thd.h>
+#include <xwmd/libc/picolibcac/linkage.h>
 #include <xwmd/libc/picolibcac/check.h>
 #include <unistd.h>
 
 void picolibcac_isatty_linkage_stub(void)
 {
 }
+
+int isatty(int fd);
 
 int isatty(int fd)
 {

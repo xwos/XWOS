@@ -14,12 +14,15 @@
 #include <xwos/lib/errno.h>
 #include <xwos/osal/time.h>
 #include <xwos/mm/mempool/allocator.h>
+#include <xwmd/libc/picolibcac/linkage.h>
 #include <xwmd/libc/picolibcac/check.h>
 #include <unistd.h>
 
 void picolibcac_sysconf_linkage_stub(void)
 {
 }
+
+long sysconf(int name);
 
 long sysconf(int name)
 {

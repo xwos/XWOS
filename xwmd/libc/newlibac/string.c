@@ -11,11 +11,17 @@
  */
 
 #include <xwos/standard.h>
+#include <xwmd/libc/newlibac/linkage.h>
 #include <xwmd/libc/newlibac/check.h>
 
 void newlibac_string_linkage_stub(void)
 {
 }
+
+// cppcheck-suppress [misra-c2012-21.2]
+void * memset(void * src, int c, size_t count);
+// cppcheck-suppress [misra-c2012-8.14, misra-c2012-21.2]
+void * memcpy(void * restrict dst, const void * restrict src, size_t count);
 
 /**
  * @brief fill memory with a constant byte
@@ -35,32 +41,33 @@ void * memset(void * src, int c, size_t count)
         } m;
         xwu32_t fill32;
 
-        c = c & 0xFF;
+        c = c & 0xFF; // cppcheck-suppress [misra-c2012-17.8]
         fill32 = (xwu32_t)c;
         fill32 = (fill32 << 8) | fill32;
         fill32 = (fill32 << 16) | fill32;
         m.u8 = src;
-        while ((m.val & (sizeof(void *) - 1)) && (count)) {
+        while ((m.val & (sizeof(void *) - 1U)) && (0U != count)) {
                 *m.u8 = (xwu8_t)c;
                 m.u8++;
-                count--;
+                count--; // cppcheck-suppress [misra-c2012-17.8]
         }
         do {
                 if (count < sizeof(void *)) {
-                        while (count) {
+                        while (0U != count) {
                                 *m.u8 = (xwu8_t)c;
                                 m.u8++;
-                                count--;
+                                count--; // cppcheck-suppress [misra-c2012-17.8]
                         }
                 } else {
                         *m.u32 = fill32;
                         m.u32++;
-                        count -= sizeof(void *);
+                        count -= sizeof(void *); // cppcheck-suppress [misra-c2012-17.8]
                 }
-        } while (count);
+        } while (0U != count);
         return src;
 }
 
+// cppcheck-suppress [misra-c2012-8.14]
 void * memcpy(void * restrict dst, const void * restrict src, size_t count)
 {
         union {
@@ -77,27 +84,27 @@ void * memcpy(void * restrict dst, const void * restrict src, size_t count)
         s.u8 = src;
         d.u8 = dst;
 
-        if ((s.val & (sizeof(void *) - 1)) ||
-            (d.val & (sizeof(void *) - 1)) ||
+        if ((s.val & (sizeof(void *) - 1U)) ||
+            (d.val & (sizeof(void *) - 1U)) ||
             (count < sizeof(void *))) {
-                while (count) {
+                while (0U != count) {
                         *d.u8 = *s.u8;
                         d.u8++;
                         s.u8++;
-                        count--;
+                        count--; // cppcheck-suppress [misra-c2012-17.8]
                 }
         } else {
                 do {
                         *d.u32 = *s.u32;
                         d.u32++;
                         s.u32++;
-                        count -= sizeof(void *);
+                        count -= sizeof(void *); // cppcheck-suppress [misra-c2012-17.8]
                 } while (count >= sizeof(void *));
-                while (count) {
+                while (0U != count) {
                         *d.u8 = *s.u8;
                         d.u8++;
                         s.u8++;
-                        count--;
+                        count--; // cppcheck-suppress [misra-c2012-17.8]
                 }
         }
         return dst;

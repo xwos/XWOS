@@ -12,14 +12,18 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/setjmp.h>
+#include <xwmd/libc/picolibcac/linkage.h>
 #include <xwmd/libc/picolibcac/check.h>
-#include <setjmp.h>
+#include <setjmp.h> // cppcheck-suppress [misra-c2012-21.4]
 
 void picolibcac_setjmp_linkage_stub(void)
 {
 }
 
 #if defined(XWLIBCFG_SETJMP) && (1 == XWLIBCFG_SETJMP)
+int setjmp(jmp_buf jmpb); // cppcheck-suppress [misra-c2012-21.2]
+void longjmp(jmp_buf jmpb, int rc); // cppcheck-suppress [misra-c2012-21.2]
+
 int setjmp(jmp_buf jmpb)
 {
         return xwlib_setjmp(jmpb);

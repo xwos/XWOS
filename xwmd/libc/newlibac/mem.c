@@ -13,6 +13,7 @@
 #include <xwos/standard.h>
 #include <xwos/lib/errno.h>
 #include <xwos/mm/mempool/allocator.h>
+#include <xwmd/libc/newlibac/linkage.h>
 #include <xwmd/libc/newlibac/check.h>
 #include <string.h>
 #include <reent.h>
@@ -25,10 +26,28 @@ void newlibac_mem_linkage_stub(void)
 
 extern struct xwmm_mempool * newlibac_mempool;
 
+void * _malloc_r(struct _reent * r, size_t size);
+void * _realloc_r(struct _reent * r, void * mem, size_t size);
+void * _calloc_r(struct _reent * r, size_t elem_nr, size_t elem_sz);
+void * _memalign_r(struct _reent * r, size_t alignment, size_t size);
+int posix_memalign(void ** memptr, size_t alignment, size_t size);
+void * _valloc_r(struct _reent * r, size_t size);
+void * _pvalloc_r(struct _reent * r, size_t size);
+void _free_r(struct _reent * r, void * mem);
+void cfree(void * mem);
+int getpagesize(void);
+int _mallopt_r(struct _reent * r, int parameter, int value);
+struct mallinfo _mallinfo_r(struct _reent * r);
+void _malloc_stats_r(struct _reent * r);
+size_t _malloc_usable_size_r(struct _reent * r, void * mem);
+int _malloc_trim_r(struct _reent * r, size_t pad);
+
 void * _malloc_r(struct _reent * r, size_t size)
 {
         void * mem;
         xwer_t rc;
+
+        XWOS_UNUSED(r);
 
         rc = xwmm_mempool_malloc(newlibac_mempool, size, &mem);
         errno = -rc;
@@ -38,6 +57,8 @@ void * _malloc_r(struct _reent * r, size_t size)
 void * _realloc_r(struct _reent * r, void * mem, size_t size)
 {
         xwer_t rc;
+
+        XWOS_UNUSED(r);
 
         rc = xwmm_mempool_realloc(newlibac_mempool, size, &mem);
         errno = -rc;
@@ -49,6 +70,8 @@ void * _calloc_r(struct _reent * r, size_t elem_nr, size_t elem_sz)
         xwsz_t total;
         void * mem;
         xwer_t rc;
+
+        XWOS_UNUSED(r);
 
         total = elem_nr * elem_sz;
         rc = xwmm_mempool_malloc(newlibac_mempool, total, &mem);
@@ -63,6 +86,8 @@ void * _memalign_r(struct _reent * r, size_t alignment, size_t size)
 {
         xwer_t rc;
         void * mem;
+
+        XWOS_UNUSED(r);
 
         mem = NULL;
         rc = xwmm_mempool_memalign(newlibac_mempool, alignment, size, &mem);
@@ -104,6 +129,8 @@ void _free_r(struct _reent * r, void * mem)
 {
         xwer_t rc;
 
+        XWOS_UNUSED(r);
+
         rc = xwmm_mempool_free(newlibac_mempool, mem);
         errno = -rc;
 }
@@ -120,12 +147,18 @@ int getpagesize(void)
 
 int _mallopt_r(struct _reent * r, int parameter, int value)
 {
+        XWOS_UNUSED(r);
+        XWOS_UNUSED(parameter);
+        XWOS_UNUSED(value);
+
         return 0;
 }
 
 struct mallinfo _mallinfo_r(struct _reent * r)
 {
         struct mallinfo mi = {0};
+
+        XWOS_UNUSED(r);
 
         mi.arena = newlibac_mempool->pa.zone.size;
         /* FIXME */
@@ -135,6 +168,9 @@ struct mallinfo _mallinfo_r(struct _reent * r)
 void _malloc_stats_r(struct _reent * r)
 {
         struct mallinfo mi;
+
+        XWOS_UNUSED(r);
+
         mi = mallinfo();
         fprintf(stderr, "max system bytes = %10lu\n", (long) mi.arena);
         /* FIXME */
@@ -147,6 +183,8 @@ size_t _malloc_usable_size_r(struct _reent * r, void * mem)
         struct xwmm_mempool_page * pg;
         size_t sz;
 
+        XWOS_UNUSED(r);
+
         rc = xwmm_mempool_page_find(&newlibac_mempool->pa, mem, &pg);
         if (XWOK == rc) {
                 sz = pg->data.value;
@@ -158,6 +196,8 @@ size_t _malloc_usable_size_r(struct _reent * r, void * mem)
 
 int _malloc_trim_r(struct _reent * r, size_t pad)
 {
+        XWOS_UNUSED(r);
+        XWOS_UNUSED(pad);
         /* TODO */
         return 0;
 }

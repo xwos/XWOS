@@ -13,7 +13,7 @@
 #include <xwos/standard.h>
 #include <xwos/osal/time.h>
 
-xwtm_t xwrustffi_xwtm_now()
+xwtm_t xwrustffi_xwtm_now(void)
 {
         return xwtm_now();
 }
@@ -23,7 +23,7 @@ xwtm_t xwrustffi_xwtm_ft(xwtm_t xwtm)
         return xwtm_ft(xwtm);
 }
 
-xwtm_t xwrustffi_xwtm_nowts()
+xwtm_t xwrustffi_xwtm_nowts(void)
 {
         return xwtm_nowts();
 }

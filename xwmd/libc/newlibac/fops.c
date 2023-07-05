@@ -14,6 +14,7 @@
 #include <xwos/lib/errno.h>
 #include <xwos/lib/xwbop.h>
 #include <xwem/fs/fatfs/ff.h>
+#include <xwmd/libc/newlibac/linkage.h>
 #include <xwmd/libc/newlibac/check.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,22 +25,52 @@ void newlibac_fops_linkage_stub(void)
 {
 }
 
+int _open_r(struct _reent * r, const char * path, int flag, int mode);
+int _open64_r(struct _reent * r, const char * path, int flag, int mode);
+int _close_r(struct _reent * r, int fd);
+_ssize_t _read_r(struct _reent * r, int fd, void * buf, size_t cnt);
+_ssize_t _write_r(struct _reent * r, int fd, const void * data, size_t cnt);
+_off_t _lseek_r(struct _reent * r, int fd, _off_t pos, int whence);
+_off64_t _lseek64_r(struct _reent * r, int fd, _off64_t offset, int whence);
+int _unlink_r(struct _reent * r, const char * path);
+int _rename_r(struct _reent * r, const char * oldname, const char * newname);
+int _fstat_r(struct _reent * r, int fd, struct stat * sbuf);
+
 #define NEWLIBAC_FOPS_FD_NUM         32
 #define NEWLIBAC_FOPS_FD_OFFSET      3 /* 0,1,2 分别代表 stdin, stdout, stderr. */
 
+static xwbmpop_define(newlibac_fops_node_bmp, NEWLIBAC_FOPS_FD_NUM) = {0};
+// cppcheck-suppress [misra-c2012-8.9]
+static xwbmpop_define(newlibac_fops_nodetype_bmp, NEWLIBAC_FOPS_FD_NUM) = {0};
+// cppcheck-suppress [misra-c2012-9.3]
+static void * newlibac_fops_fatfs_node[NEWLIBAC_FOPS_FD_NUM] = {NULL};
+// cppcheck-suppress [misra-c2012-9.3]
+static FILINFO * newlibac_fops_fatfs_filinfo[NEWLIBAC_FOPS_FD_NUM] = {NULL};
+
+#ifdef O_DIRECTORY
+static
+int newlibac_fops_opendir(struct _reent * r, const char * path, int flag, int mode);
+static
+int newlibac_fops_closedir(struct _reent * r, xwsq_t idx);
+#endif
+
+static
+int newlibac_fops_openfile(struct _reent * r, const char * path, int oflag, int mode);
+static
+int newlibac_fops_closefile(struct _reent * r, xwsq_t idx);
+static
+xwssz_t newlibac_fops_read_file(struct _reent * r, int fd, void * buf, size_t cnt);
+static
+xwssz_t newlibac_fops_write_file(struct _reent * r,
+                                 int fd, const void * data, size_t cnt);
+
 extern
 xwssz_t newlibac_fops_read_stdin(int fd, void * buf, size_t cnt);
-
 extern
 xwssz_t newlibac_fops_write_stdout(int fd, const void * data, size_t cnt);
-
 extern
 xwssz_t newlibac_fops_write_stderr(int fd, const void * data, size_t cnt);
 
-xwbmpop_define(newlibac_fops_node_bmp, NEWLIBAC_FOPS_FD_NUM) = {0};
-xwbmpop_define(newlibac_fops_nodetype_bmp, NEWLIBAC_FOPS_FD_NUM) = {0};
-void * newlibac_fops_fatfs_node[NEWLIBAC_FOPS_FD_NUM] = {NULL};
-void * newlibac_fops_fatfs_filinfo[NEWLIBAC_FOPS_FD_NUM] = {NULL};
 
 #ifdef O_DIRECTORY
 static
@@ -50,6 +81,7 @@ int newlibac_fops_opendir(struct _reent * r, const char * path, int flag, int mo
         DIR * dp;
         xwssq_t idx;
 
+        XWOS_UNUSED(r);
         XWOS_UNUSED(flag);
         XWOS_UNUSED(mode);
 
@@ -71,6 +103,7 @@ int newlibac_fops_opendir(struct _reent * r, const char * path, int flag, int mo
         case FR_OK:
                 xwbmpop_s1i(newlibac_fops_node_bmp, (xwsq_t)idx);
                 xwbmpop_s1i(newlibac_fops_nodetype_bmp, (xwsq_t)idx);
+                // cppcheck-suppress [misra-c2012-11.5]
                 newlibac_fops_fatfs_node[idx] = dp;
                 fd = idx + NEWLIBAC_FOPS_FD_OFFSET;
                 errno = 0;
@@ -138,7 +171,8 @@ err_mdir:
 }
 #endif
 
-int newlibac_fops_openfile(struct _reent * r, const char * path, int flag, int mode)
+static
+int newlibac_fops_openfile(struct _reent * r, const char * path, int oflag, int mode)
 {
         int fd;
         FRESULT fsrc;
@@ -146,22 +180,25 @@ int newlibac_fops_openfile(struct _reent * r, const char * path, int flag, int m
         FILINFO * fi;
         BYTE fsmode;
         xwssq_t idx;
+        int flag;
 
+        XWOS_UNUSED(r);
         XWOS_UNUSED(mode);
 
+        flag = oflag;
         idx = xwbmpop_ffz(newlibac_fops_node_bmp, NEWLIBAC_FOPS_FD_NUM);
         if (idx < 0) {
                 errno = EMFILE;
                 fd = -1;
                 goto err_mfile;
         }
-        fp = malloc(sizeof(FIL));
+        fp = malloc(sizeof(FIL)); // cppcheck-suppress [misra-c2012-11.5]
         if (NULL == fp) {
                 errno = ENOMEM;
                 fd = -1;
                 goto err_malloc_fp;
         }
-        fi = malloc(sizeof(FILINFO));
+        fi = malloc(sizeof(FILINFO)); // cppcheck-suppress [misra-c2012-11.5]
         if (NULL == fi) {
                 errno = ENOMEM;
                 fd = -1;
@@ -175,7 +212,7 @@ int newlibac_fops_openfile(struct _reent * r, const char * path, int flag, int m
         } else if (O_WRONLY == (flag & O_ACCMODE)) {
                 fsmode = FA_WRITE;
                 flag &= ~(O_ACCMODE);
-                if (flag & O_EXCL) { /* wx */
+                if (0 != (flag & O_EXCL)) { /* wx */
                         fsmode |= FA_CREATE_NEW;
                 } else if ((flag & (O_CREAT | O_TRUNC)) ==
                            ((O_CREAT | O_TRUNC))) { /* w */
@@ -183,11 +220,12 @@ int newlibac_fops_openfile(struct _reent * r, const char * path, int flag, int m
                 } else if ((flag & (O_CREAT | O_APPEND)) ==
                            ((O_CREAT | O_APPEND))) { /* "a" */
                         fsmode |= FA_OPEN_APPEND;
+                } else {
                 }
         } else { /* + */
                 fsmode = FA_READ | FA_WRITE;
                 flag &= ~(O_ACCMODE);
-                if (flag & O_EXCL) { /* w+x */
+                if (0 != (flag & O_EXCL)) { /* w+x */
                         fsmode |= FA_CREATE_NEW;
                 } else if ((flag & (O_CREAT | O_TRUNC)) ==
                            ((O_CREAT | O_TRUNC))) { /* w+ */
@@ -195,13 +233,15 @@ int newlibac_fops_openfile(struct _reent * r, const char * path, int flag, int m
                 } else if ((flag & (O_CREAT | O_APPEND)) ==
                            ((O_CREAT | O_APPEND))) { /* "a+" */
                         fsmode |= FA_OPEN_APPEND;
-                }/* else { r+ } */
+                } else { /* r+ */
+                }
         }
         fsrc = f_open(fp, path, fsmode);
         switch (fsrc) {
         case FR_OK:
                 xwbmpop_s1i(newlibac_fops_node_bmp, (xwsq_t)idx);
                 xwbmpop_c0i(newlibac_fops_nodetype_bmp, (xwsq_t)idx);
+                // cppcheck-suppress [misra-c2012-11.5]
                 newlibac_fops_fatfs_node[idx] = fp;
                 fd = idx + NEWLIBAC_FOPS_FD_OFFSET;
                 errno = 0;
@@ -309,7 +349,9 @@ int newlibac_fops_closedir(struct _reent * r, xwsq_t idx)
         FRESULT fsrc;
         DIR * dp;
 
-        dp = newlibac_fops_fatfs_node[idx];
+        XWOS_UNUSED(r);
+
+        dp = newlibac_fops_fatfs_node[idx]; // cppcheck-suppress [misra-c2012-11.5]
         fsrc = f_closedir(dp);
         switch (fsrc) {
         case FR_OK:
@@ -346,12 +388,14 @@ int newlibac_fops_closefile(struct _reent * r, xwsq_t idx)
         FIL * fp;
         FILINFO * fi;
 
-        fp = newlibac_fops_fatfs_node[idx];
+        XWOS_UNUSED(r);
+
+        fp = newlibac_fops_fatfs_node[idx]; // cppcheck-suppress [misra-c2012-11.5]
         fi = newlibac_fops_fatfs_filinfo[idx];
         fsrc = f_close(fp);
         switch (fsrc) {
         case FR_OK:
-                if (fi) {
+                if (NULL != fi) {
                         free(fi);
                         newlibac_fops_fatfs_filinfo[idx] = NULL;
                 }
@@ -415,8 +459,10 @@ xwssz_t newlibac_fops_read_file(struct _reent * r, int fd, void * buf, size_t cn
         UINT fsrd;
         FIL * fp;
 
+        XWOS_UNUSED(r);
+
         idx = fd - NEWLIBAC_FOPS_FD_OFFSET;
-        fp = newlibac_fops_fatfs_node[idx];
+        fp = newlibac_fops_fatfs_node[idx]; // cppcheck-suppress [misra-c2012-11.5]
         fsrc = f_read(fp, buf, cnt, &fsrd);
         switch (fsrc) {
         case FR_OK:
@@ -470,8 +516,10 @@ xwssz_t newlibac_fops_write_file(struct _reent * r,
         UINT fswr;
         FIL * fp;
 
+        XWOS_UNUSED(r);
+
         idx = fd - NEWLIBAC_FOPS_FD_OFFSET;
-        fp = newlibac_fops_fatfs_node[idx];
+        fp = newlibac_fops_fatfs_node[idx]; // cppcheck-suppress [misra-c2012-11.5]
         fsrc = f_write(fp, data, cnt, &fswr);
         switch (fsrc) {
         case FR_OK:
@@ -504,6 +552,8 @@ _ssize_t _write_r(struct _reent * r, int fd, const void * data, size_t cnt)
 {
         int ret;
 
+        XWOS_UNUSED(r);
+
         if (1 == fd) {
                 ret = (int)newlibac_fops_write_stdout(fd, data, cnt);
         } else if (2 == fd) {
@@ -524,11 +574,14 @@ _off_t _lseek_r(struct _reent * r, int fd, _off_t pos, int whence)
         FIL * fp;
         int curpos;
 
+        XWOS_UNUSED(r);
+
         if ((fd <= 2) || (fd >= NEWLIBAC_FOPS_FD_NUM)) {
                 errno = EPERM;
                 curpos = -1;
         } else {
                 idx = fd - NEWLIBAC_FOPS_FD_OFFSET;
+                // cppcheck-suppress [misra-c2012-11.5]
                 fp = newlibac_fops_fatfs_node[idx];
                 switch (whence) {
                 case SEEK_SET:
@@ -571,13 +624,15 @@ _off_t _lseek_r(struct _reent * r, int fd, _off_t pos, int whence)
 
 _off64_t _lseek64_r(struct _reent * r, int fd, _off64_t offset, int whence)
 {
-        return (_off64_t)_lseek_r(r, fd, (off_t) offset, whence);
+        return (_off64_t)_lseek_r(r, fd, (off_t)offset, whence);
 }
 
 int _unlink_r(struct _reent * r, const char * path)
 {
         FRESULT fsrc;
         int rc;
+
+        XWOS_UNUSED(r);
 
         rc = -1;
         fsrc = f_unlink(path);
@@ -621,10 +676,12 @@ int _unlink_r(struct _reent * r, const char * path)
         return rc;
 }
 
-int _rename_r(struct _reent * ptr, const char * oldname, const char * newname)
+int _rename_r(struct _reent * r, const char * oldname, const char * newname)
 {
         FRESULT fsrc;
         int rc;
+
+        XWOS_UNUSED(r);
 
         rc = -1;
         fsrc = f_rename(oldname, newname);
@@ -674,6 +731,8 @@ int _fstat_r(struct _reent * r, int fd, struct stat * sbuf)
         xwssq_t idx;
         int rc;
 
+        XWOS_UNUSED(r);
+
         switch (fd) {
         case 0:
         case 1:
@@ -684,23 +743,26 @@ int _fstat_r(struct _reent * r, int fd, struct stat * sbuf)
         default:
                 idx = fd - NEWLIBAC_FOPS_FD_OFFSET;
                 fi = newlibac_fops_fatfs_filinfo[idx];
-                if (fi) {
+                if (NULL != fi) {
                         struct tm tm;
                         time_t sec;
 
                         sbuf->st_nlink = 1;
                         sbuf->st_uid = 0;
                         sbuf->st_gid = 0;
-                        sbuf->st_mode = (mode_t)(S_IFREG | S_IRWXU | S_IRWXG | S_IRWXO);
-                        if (AM_RDO & fi->fattrib) {
-                                sbuf->st_mode &= (mode_t)(~(S_IRUSR | S_IRGRP | S_IROTH));
+                        sbuf->st_mode = (mode_t)(S_IFREG | S_IRWXU |
+                                                 S_IRWXG | S_IRWXO);
+                        if (0 != ((xwu8_t)AM_RDO & fi->fattrib)) {
+                                sbuf->st_mode &= (mode_t)(~(S_IRUSR |
+                                                            S_IRGRP |
+                                                            S_IROTH));
                         }
-                        tm.tm_sec = (fi->ftime & 0x1F) << 1;
-                        tm.tm_min = (fi->ftime >> 5) & 0x3F;
-                        tm.tm_hour = (fi->ftime >> 11) & 0xF;
-                        tm.tm_mday = (fi->fdate & 0x1F);
-                        tm.tm_mon = (fi->fdate >> 5) & 0xF;
-                        tm.tm_year = (fi->fdate >> 9) & 0x7F;
+                        tm.tm_sec = (fi->ftime & 0x1FU) << 1U;
+                        tm.tm_min = (fi->ftime >> 5U) & 0x3FU;
+                        tm.tm_hour = (fi->ftime >> 11U) & 0xFU;
+                        tm.tm_mday = fi->fdate & 0x1FU;
+                        tm.tm_mon = (fi->fdate >> 5U) & 0xFU;
+                        tm.tm_year = (fi->fdate >> 9U) & 0x7FU;
                         tm.tm_wday = 0;
                         tm.tm_yday = 0;
                         tm.tm_isdst = 0;

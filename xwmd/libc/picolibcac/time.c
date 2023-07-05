@@ -13,6 +13,7 @@
 #include <xwos/standard.h>
 #include <xwos/lib/errno.h>
 #include <xwos/osal/time.h>
+#include <xwmd/libc/picolibcac/linkage.h>
 #include <xwmd/libc/picolibcac/check.h>
 #include <sys/time.h>
 #include <sys/times.h>
@@ -21,9 +22,17 @@ void picolibcac_time_linkage_stub(void)
 {
 }
 
+// cppcheck-suppress [misra-c2012-8.14]
+int gettimeofday(struct timeval * restrict tv, void * restrict tz);
+clock_t times(struct tms * buf);
+
+// cppcheck-suppress [misra-c2012-8.14]
 int gettimeofday(struct timeval * restrict tv, void * restrict tz)
 {
         xwtm_t nowts;
+
+        XWOS_UNUSED(tv);
+        XWOS_UNUSED(tz);
 
         errno = 0;
         nowts = xwtm_nowts();
@@ -37,7 +46,7 @@ clock_t times(struct tms * buf)
         xwtm_t nowtc;
 
         nowtc = (clock_t)xwtm_nowtc();
-        if (buf) {
+        if (NULL != buf) {
                 buf->tms_stime = 0;
                 buf->tms_cstime = 0;
                 buf->tms_cutime = 0;

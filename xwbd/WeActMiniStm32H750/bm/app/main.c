@@ -22,12 +22,12 @@
 #include <xwos/lib/xwlog.h>
 #include <xwos/osal/thd.h>
 #include <xwcd/perpheral/spi/lcd/st7735/driver.h>
-#if defined(XWMDCFG_libc_newlibac) && (1 == XWMDCFG_libc_newlibac)
+#ifdef XWOS_CFG_LIBC__newlib
 #  include <xwmd/libc/newlibac/mif.h>
-#endif /* XWMDCFG_libc_newlibac */
-#if defined(XWMDCFG_libc_picolibcac) && (1 == XWMDCFG_libc_picolibcac)
+#endif
+#ifdef XWOS_CFG_LIBC__picolibc
 #  include <xwmd/libc/picolibcac/mif.h>
-#endif /* XWMDCFG_libc_picolibcac */
+#endif
 #include <xwem/vm/lua/mif.h>
 #include <xwam/example/cxx/mif.h>
 #include "bm/xwac/xwds/device.h"
@@ -90,21 +90,21 @@ xwer_t main_task(void * arg)
 
         xwds_st7735_draw(&st7735, 0, 0, 160, 80, bootlogo, XWTM_MAX);
 
-#if defined(XWMDCFG_libc_newlibac) && (1 == XWMDCFG_libc_newlibac)
+#ifdef XWOS_CFG_LIBC__newlib
         rc = newlibac_init();
         if (rc < 0) {
                 xwlogf(ERR, "main", "Init newlib ... <rc:%d>", rc);
                 goto err_newlibac_init;
         }
-#endif /* XWMDCFG_libc_newlibac */
+#endif
 
-#if defined(XWMDCFG_libc_picolibcac) && (1 == XWMDCFG_libc_picolibcac)
+#ifdef XWOS_CFG_LIBC__picolibc
         rc = picolibcac_init();
         if (rc < 0) {
                 xwlogf(ERR, "main", "Init picolibc ... <rc:%d>", rc);
                 goto err_picolibcac_init;
         }
-#endif /* XWMDCFG_libc_picolibcac */
+#endif
 
         rc = xwos_example_cxx();
         if (rc < 0) {
@@ -129,7 +129,7 @@ xwer_t main_task(void * arg)
                 xwlogf(ERR, "main", "Start lua VM ... <rc:%d>", rc);
                 goto err_xwlua_start;
         }
-#endif /* XWEMCFG_vm_lua */
+#endif
 
         xwrust_main();
 
@@ -138,19 +138,19 @@ xwer_t main_task(void * arg)
 #if defined(XWEMCFG_vm_lua) && (1 == XWEMCFG_vm_lua)
 err_xwlua_start:
         BOARD_BUG();
-#endif /* XWEMCFG_vm_lua */
+#endif
 err_xwssc_start:
         BOARD_BUG();
 err_child_thd_start:
 
-#if defined(XWMDCFG_libc_picolibcac) && (1 == XWMDCFG_libc_picolibcac)
+#ifdef XWOS_CFG_LIBC__picolibc
         BOARD_BUG();
 err_picolibcac_init:
-#endif /* XWMDCFG_libc_picolibcac */
-#if defined(XWMDCFG_libc_newlibac) && (1 == XWMDCFG_libc_newlibac)
+#endif
+#ifdef XWOS_CFG_LIBC__newlib
         BOARD_BUG();
 err_newlibac_init:
-#endif /* XWMDCFG_libc_newlibac */
+#endif
         BOARD_BUG();
 err_stm32cube_start:
         BOARD_BUG();

@@ -26,9 +26,13 @@ include $(XWOS_BRD_DIR)/brd.mk
 include xwbs/misra.c.rule
 
 CPPCHECK_C_ARGS = $(strip $(CPPCHECK_INCDIRS) $(CPPCHECK_CFLAGS))
+MISRA_C_ARGS = $(strip $(CPPCHECK_C_ARGS) $(XWOS_OS_DIR) $(XWOS_XWMD_DIR))
 
 %.mc: $(CPPCHECK_OUT) FORCE
 	$(SHOW_CPPCHECK) $(CPPCHECK) $(CPPCHECK_C_ARGS) $*
+
+mc: $(CPPCHECK_OUT) FORCE
+	$(SHOW_CPPCHECK) $(CPPCHECK) $(MISRA_C_ARGS)
 
 $(CPPCHECK_OUT):
 	@mkdir -p $@

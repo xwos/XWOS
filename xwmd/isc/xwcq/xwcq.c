@@ -75,7 +75,7 @@ xwer_t xwcq_activate(struct xwcq * cq, xwsz_t slotsize, xwsz_t slotnum,
         xwer_t rc;
 
         rc = xwos_object_activate(&cq->xwobj, gcfunc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_xwobj_activate;
         }
         xwos_splk_init(&cq->lock);
@@ -115,7 +115,7 @@ xwsq_t xwcq_gettik(struct xwcq * cq)
 {
         xwsq_t tik;
 
-        if (cq) {
+        if (NULL != cq) {
                 tik = cq->xwobj.tik;
         } else {
                 tik = 0;
@@ -160,8 +160,9 @@ xwer_t xwcq_eq(struct xwcq * cq, const xwu8_t * data, xwsz_t * size)
         XWOS_VALIDATE((size), "nullptr", -EFAULT);
 
         eqsize = *size;
-        eqsize = eqsize > cq->slotsize ? cq->slotsize : eqsize;
+        eqsize = (eqsize > cq->slotsize) ? cq->slotsize : eqsize;
         xwos_splk_lock_cpuirqsv(&cq->lock, &cpuirq);
+        // cppcheck-suppress [misra-c2012-17.7]
         memcpy(&cq->q[(xwsz_t)cq->rear * cq->slotsize], data, eqsize);
         cq->rear++;
         if (cq->rear >= (xwssq_t)cq->slotnum) {
@@ -191,7 +192,7 @@ xwer_t xwcq_jq(struct xwcq * cq, const xwu8_t * data, xwsz_t * size)
         XWOS_VALIDATE((size), "nullptr", -EFAULT);
 
         eqsize = *size;
-        eqsize = eqsize > cq->slotsize ? cq->slotsize : eqsize;
+        eqsize = (eqsize > cq->slotsize) ? cq->slotsize : eqsize;
         xwos_splk_lock_cpuirqsv(&cq->lock, &cpuirq);
         cq->front--;
         if (cq->front < 0) {
@@ -204,6 +205,7 @@ xwer_t xwcq_jq(struct xwcq * cq, const xwu8_t * data, xwsz_t * size)
                         cq->rear = (xwssz_t)cq->slotnum;
                 }
         }
+        // cppcheck-suppress [misra-c2012-17.7]
         memcpy(&cq->q[(xwsz_t)cq->front * cq->slotsize], data, eqsize);
         xwos_splk_unlock_cpuirqrs(&cq->lock, cpuirq);
         xwos_sem_post(&cq->sem);
@@ -230,12 +232,13 @@ xwer_t xwcq_dq_to(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t to)
         XWOS_VALIDATE(size, "nullptr", -EFAULT);
 
         bufsz = *size;
-        cpsz = bufsz > cq->slotsize? cq->slotsize : bufsz;
+        cpsz = (bufsz > cq->slotsize) ? cq->slotsize : bufsz;
         rc = xwos_sem_wait_to(&cq->sem, to);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_sem_wait_to;
         }
         xwos_splk_lock_cpuirqsv(&cq->lock, &cpuirq);
+        // cppcheck-suppress [misra-c2012-17.7]
         memcpy(buf, &cq->q[(xwsz_t)cq->front * cq->slotsize], cpsz);
         cq->front++;
         if (cq->front >= (xwssz_t)cq->slotnum) {
@@ -252,7 +255,8 @@ err_sem_wait_to:
 __xwmd_api
 xwer_t xwcq_trydq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
 {
-        xwsz_t bufsz, cpsz;
+        xwsz_t bufsz;
+        xwsz_t cpsz;
         xwreg_t cpuirq;
         xwer_t rc;
 
@@ -261,12 +265,13 @@ xwer_t xwcq_trydq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
         XWOS_VALIDATE(size, "nullptr", -EFAULT);
 
         bufsz = *size;
-        cpsz = bufsz > cq->slotsize ? cq->slotsize : bufsz;
+        cpsz = (bufsz > cq->slotsize) ? cq->slotsize : bufsz;
         rc = xwos_sem_trywait(&cq->sem);
         if (rc < 0) {
                 goto err_sem_trywait;
         }
         xwos_splk_lock_cpuirqsv(&cq->lock, &cpuirq);
+        // cppcheck-suppress [misra-c2012-17.7]
         memcpy(buf, &cq->q[(xwsz_t)cq->front * cq->slotsize], cpsz);
         cq->front++;
         if (cq->front >= (xwssz_t)cq->slotnum) {
@@ -299,9 +304,9 @@ xwer_t xwcq_rq_to(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t to)
         XWOS_VALIDATE(size, "nullptr", -EFAULT);
 
         bufsz = *size;
-        cpsz = bufsz > cq->slotsize? cq->slotsize : bufsz;
+        cpsz = (bufsz > cq->slotsize) ? cq->slotsize : bufsz;
         rc = xwos_sem_wait_to(&cq->sem, to);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_sem_wait_to;
         }
         xwos_splk_lock_cpuirqsv(&cq->lock, &cpuirq);
@@ -309,6 +314,7 @@ xwer_t xwcq_rq_to(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t to)
         if (cq->rear < 0) {
                 cq->rear = (xwssz_t)cq->slotnum - 1;
         }
+        // cppcheck-suppress [misra-c2012-17.7]
         memcpy(buf, &cq->q[(xwsz_t)cq->rear * cq->slotsize], cpsz);
         xwos_splk_unlock_cpuirqrs(&cq->lock, cpuirq);
         *size = cpsz;
@@ -331,9 +337,9 @@ xwer_t xwcq_tryrq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
         XWOS_VALIDATE(size, "nullptr", -EFAULT);
 
         bufsz = *size;
-        cpsz = bufsz > cq->slotsize? cq->slotsize : bufsz;
+        cpsz = (bufsz > cq->slotsize) ? cq->slotsize : bufsz;
         rc = xwos_sem_trywait(&cq->sem);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_sem_trywait;
         }
         xwos_splk_lock_cpuirqsv(&cq->lock, &cpuirq);
@@ -341,6 +347,7 @@ xwer_t xwcq_tryrq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
         if (cq->rear < 0) {
                 cq->rear = (xwssz_t)cq->slotnum - 1;
         }
+        // cppcheck-suppress [misra-c2012-17.7]
         memcpy(buf, &cq->q[(xwsz_t)cq->rear * cq->slotsize], cpsz);
         xwos_splk_unlock_cpuirqrs(&cq->lock, cpuirq);
         *size = cpsz;
@@ -369,12 +376,13 @@ xwer_t xwcq_pfq_to(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t to)
         XWOS_VALIDATE(size, "nullptr", -EFAULT);
 
         bufsz = *size;
-        cpsz = bufsz > cq->slotsize? cq->slotsize : bufsz;
+        cpsz = (bufsz > cq->slotsize) ? cq->slotsize : bufsz;
         rc = xwos_sem_wait_to(&cq->sem, to);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_sem_wait_to;
         }
         xwos_splk_lock_cpuirqsv(&cq->lock, &cpuirq);
+        // cppcheck-suppress [misra-c2012-17.7]
         memcpy(buf, &cq->q[(xwsz_t)cq->front * cq->slotsize], cpsz);
         xwos_splk_unlock_cpuirqrs(&cq->lock, cpuirq);
         xwos_sem_post(&cq->sem);
@@ -398,12 +406,13 @@ xwer_t xwcq_trypfq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
         XWOS_VALIDATE(size, "nullptr", -EFAULT);
 
         bufsz = *size;
-        cpsz = bufsz > cq->slotsize? cq->slotsize : bufsz;
+        cpsz = (bufsz > cq->slotsize) ? cq->slotsize : bufsz;
         rc = xwos_sem_trywait(&cq->sem);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_sem_trywait;
         }
         xwos_splk_lock_cpuirqsv(&cq->lock, &cpuirq);
+        // cppcheck-suppress [misra-c2012-17.7]
         memcpy(buf, &cq->q[(xwsz_t)cq->front * cq->slotsize], cpsz);
         xwos_splk_unlock_cpuirqrs(&cq->lock, cpuirq);
         xwos_sem_post(&cq->sem);
@@ -434,9 +443,9 @@ xwer_t xwcq_prq_to(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t to)
         XWOS_VALIDATE(size, "nullptr", -EFAULT);
 
         bufsz = *size;
-        cpsz = bufsz > cq->slotsize? cq->slotsize : bufsz;
+        cpsz = (bufsz > cq->slotsize) ? cq->slotsize : bufsz;
         rc = xwos_sem_wait_to(&cq->sem, to);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_sem_wait_to;
         }
         xwos_splk_lock_cpuirqsv(&cq->lock, &cpuirq);
@@ -444,6 +453,7 @@ xwer_t xwcq_prq_to(struct xwcq * cq, xwu8_t * buf, xwsz_t * size, xwtm_t to)
         if (rear < 0) {
                 rear = (xwssz_t)cq->slotnum - 1;
         }
+        // cppcheck-suppress [misra-c2012-17.7]
         memcpy(buf, &cq->q[(xwsz_t)rear * cq->slotsize], cpsz);
         xwos_splk_unlock_cpuirqrs(&cq->lock, cpuirq);
         xwos_sem_post(&cq->sem);
@@ -468,9 +478,9 @@ xwer_t xwcq_tryprq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
         XWOS_VALIDATE(size, "nullptr", -EFAULT);
 
         bufsz = *size;
-        cpsz = bufsz > cq->slotsize? cq->slotsize : bufsz;
+        cpsz = (bufsz > cq->slotsize) ? cq->slotsize : bufsz;
         rc = xwos_sem_trywait(&cq->sem);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_sem_trywait;
         }
         xwos_splk_lock_cpuirqsv(&cq->lock, &cpuirq);
@@ -478,6 +488,7 @@ xwer_t xwcq_tryprq(struct xwcq * cq, xwu8_t * buf, xwsz_t * size)
         if (rear < 0) {
                 rear = (xwssz_t)cq->slotnum - 1;
         }
+        // cppcheck-suppress [misra-c2012-17.7]
         memcpy(buf, &cq->q[(xwsz_t)rear * cq->slotsize], cpsz);
         xwos_splk_unlock_cpuirqrs(&cq->lock, cpuirq);
         xwos_sem_post(&cq->sem);

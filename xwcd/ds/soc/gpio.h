@@ -24,7 +24,7 @@
 #include <xwcd/ds/standard.h>
 #include <xwcd/ds/soc/chip.h>
 
-#define XWDS_GPIO_PIN(n)                (1U << n)
+#define XWDS_GPIO_PIN(n)                (1U << (n))
 #define XWDS_GPIO_PIN_MASK(n)           (XWDS_GPIO_PIN(n) - 1U)
 
 /**

@@ -240,7 +240,9 @@ xwer_t xwos_swt_start(struct xwos_swt * swt, xwtm_t origin, xwtm_t period,
                       xwos_swt_f callback, void * arg)
 {
         return xwosdl_swt_start(&swt->osswt, origin, period,
-                                (xwosdl_swt_f)callback, arg);
+                                // cppcheck-suppress [misra-c2012-11.1]
+                                (xwosdl_swt_f)callback,
+                                arg);
 }
 
 /**

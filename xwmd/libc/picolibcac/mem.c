@@ -13,6 +13,7 @@
 #include <xwos/standard.h>
 #include <xwos/lib/errno.h>
 #include <xwos/mm/mempool/allocator.h>
+#include <xwmd/libc/picolibcac/linkage.h>
 #include <xwmd/libc/picolibcac/check.h>
 #include <stdio.h>
 #include <string.h>
@@ -21,6 +22,23 @@
 void picolibcac_mem_linkage_stub(void)
 {
 }
+
+void * malloc(size_t size);
+void * realloc(void * mem, size_t size);
+void * calloc(size_t elem_nr, size_t elem_sz);
+void * memalign(xwsz_t alignment, xwsz_t size);
+int posix_memalign(void ** memptr, size_t alignment, size_t size);
+void * aligned_alloc(size_t alignment, size_t size);
+void * valloc(size_t size);
+void * pvalloc(size_t size);
+void free(void * mem);
+void cfree(void * mem);
+int getpagesize(void);
+int mallopt(int parameter, int value);
+struct mallinfo mallinfo(void);
+void malloc_stats(void);
+size_t malloc_usable_size(void * mem);
+int malloc_trim(size_t pad);
 
 extern struct xwmm_mempool * picolibcac_mempool;
 
@@ -124,6 +142,8 @@ int getpagesize(void)
 
 int mallopt(int parameter, int value)
 {
+        XWOS_UNUSED(parameter);
+        XWOS_UNUSED(value);
         return 0;
 }
 
@@ -144,7 +164,6 @@ void malloc_stats(void)
         /* FIXME */
 }
 
-
 size_t malloc_usable_size(void * mem)
 {
         xwer_t rc;
@@ -162,6 +181,7 @@ size_t malloc_usable_size(void * mem)
 
 int malloc_trim(size_t pad)
 {
+        XWOS_UNUSED(pad);
         /* TODO */
         return 0;
 }

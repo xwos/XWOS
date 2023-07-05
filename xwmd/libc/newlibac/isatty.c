@@ -12,6 +12,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/thd.h>
+#include <xwmd/libc/newlibac/linkage.h>
 #include <xwmd/libc/newlibac/check.h>
 #include <unistd.h>
 
@@ -19,9 +20,13 @@ void newlibac_isatty_linkage_stub(void)
 {
 }
 
+int _isatty_r(struct _reent * r, int fd);
+
 int _isatty_r(struct _reent * r, int fd)
 {
         int rc;
+
+        XWOS_UNUSED(r);
 
         switch (fd) {
         case 0:

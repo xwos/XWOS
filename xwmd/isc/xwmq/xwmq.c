@@ -16,7 +16,7 @@
 #include <xwmd/isc/xwmq/mif.h>
 
 static __xwmd_code
-void xwmq_msg_construct(void * obj);
+void xwmq_msg_construct(struct xwmq_msg * msg);
 
 static __xwmd_code
 void xwmq_construct(struct xwmq * mq)
@@ -47,7 +47,7 @@ xwsq_t xwmq_gettik(struct xwmq * mq)
 {
         xwsq_t tik;
 
-        if (mq) {
+        if (NULL != mq) {
                 tik = mq->xwobj.tik;
         } else {
                 tik = 0;
@@ -94,13 +94,13 @@ xwer_t xwmq_activate(struct xwmq * mq,
         xwer_t rc;
 
         rc = xwos_object_activate(&mq->xwobj, gcfunc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_xwobj_activate;
         }
         xwmm_memslice_init(&mq->txq,
                            (xwptr_t)txq, sizeof(struct xwmq_msg) * num,
                            sizeof(struct xwmq_msg), xwmq_txq_name,
-                           xwmq_msg_construct, NULL);
+                           (ctor_f)xwmq_msg_construct, NULL);
         xwos_sem_init(&mq->txqsem, (xwssq_t)num, (xwssq_t)num);
         xwlib_bclst_init_head(&mq->rxq);
         xwos_splk_init(&mq->rxqlock);
@@ -133,10 +133,8 @@ xwer_t xwmq_fini(struct xwmq * mq)
  * @param[in] msg: 消息槽的指针
  */
 static __xwmd_code
-void xwmq_msg_construct(void * obj)
+void xwmq_msg_construct(struct xwmq_msg * msg)
 {
-        struct xwmq_msg * msg = obj;
-
         xwlib_bclst_init_node(&msg->node);
         msg->topic = 0;
         msg->data = NULL;
@@ -345,7 +343,7 @@ xwer_t xwmq_dq_to(struct xwmq * mq, xwsq_t * topic, void ** databuf, xwtm_t to)
         }
         msg = xwmq_choose_head(mq);
         *databuf = msg->data;
-        if (topic) {
+        if (NULL != topic) {
                 *topic = msg->topic;
         }
         xwmq_msg_put(mq, msg);
@@ -371,7 +369,7 @@ xwer_t xwmq_trydq(struct xwmq * mq, xwsq_t * topic, void ** databuf)
         }
         msg = xwmq_choose_head(mq);
         *databuf = msg->data;
-        if (topic) {
+        if (NULL != topic) {
                 *topic = msg->topic;
         }
         xwmq_msg_put(mq, msg);
@@ -403,7 +401,7 @@ xwer_t xwmq_rq_to(struct xwmq * mq, xwsq_t * topic, void ** databuf, xwtm_t to)
         }
         msg = xwmq_choose_tail(mq);
         *databuf = msg->data;
-        if (topic) {
+        if (NULL != topic) {
                 *topic = msg->topic;
         }
         xwmq_msg_put(mq, msg);
@@ -429,7 +427,7 @@ xwer_t xwmq_tryrq(struct xwmq * mq, xwsq_t * topic, void ** databuf)
         }
         msg = xwmq_choose_tail(mq);
         *databuf = msg->data;
-        if (topic) {
+        if (NULL != topic) {
                 *topic = msg->topic;
         }
         xwmq_msg_put(mq, msg);

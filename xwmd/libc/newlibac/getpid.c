@@ -13,6 +13,7 @@
 #include <xwos/standard.h>
 #include <xwos/lib/errno.h>
 #include <xwos/osal/thd.h>
+#include <xwmd/libc/newlibac/linkage.h>
 #include <xwmd/libc/newlibac/check.h>
 #include <unistd.h>
 
@@ -20,7 +21,11 @@ void newlibac_getpid_linkage_stub(void)
 {
 }
 
+pid_t _getpid_r(struct _reent * r);
+
 pid_t _getpid_r(struct _reent * r)
 {
+        XWOS_UNUSED(r);
+
         return 1;
 }

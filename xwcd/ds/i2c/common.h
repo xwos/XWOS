@@ -29,25 +29,25 @@
  * @brief I2C消息标志枚举
  */
 enum xwds_i2c_msgflag_em {
-        XWDS_I2C_F_7BITADDR = (0U), /**< 7位外设地址 */
-        XWDS_I2C_F_10BITADDR = (1U << 0U), /**< 10位外设地址 */
-        XWDS_I2C_F_ADDRMSK = (1U << 0U), /**< 地址掩码 */
+        XWDS_I2C_F_7BITADDR = (0U), /**< 7位外设地址，!BIT(0) */
+        XWDS_I2C_F_10BITADDR = (1U), /**< 10位外设地址，BIT(0) */
+        XWDS_I2C_F_ADDRMSK = (1U), /**< 地址掩码，BIT(0) */
 
-        XWDS_I2C_F_RD = (1U << 1U), /**< 方向：读 */
-        XWDS_I2C_F_WR = (0U << 1U), /**< 方向：写 */
-        XWDS_I2C_F_DIRMSK = (1U << 1U), /**< 方向掩码 */
+        XWDS_I2C_F_RD = (2U), /**< 方向：读，BIT(1) */
+        XWDS_I2C_F_WR = (0U), /**< 方向：写，!BIT(1) */
+        XWDS_I2C_F_DIRMSK = (2U), /**< 方向掩码，BIT(1) */
 
-        XWDS_I2C_F_START = (1U << 2U), /**< 产生起始条件：
-                                            + 如果传输方向发生改变，需要增加START标志，
-                                              传输方向发生改变是指：
-                                              - 两次传输地址发生改变；
-                                              - 传输方向由无变为读；
-                                              - 传输方向由无变为写；
-                                              - 传输方向由写变为读；
-                                              - 传输方向由读变为写。
-                                            + I2C外设驱动需要自己管理START标志，
-                                              xwds/i2cm框架不保证能纠正标志错误。 */
-        XWDS_I2C_F_STOP = (1U << 3U), /**< 产生结束条件 */
+        XWDS_I2C_F_START = (4U), /**< BIT(2)，产生起始条件：
+                                      + 如果传输方向发生改变，需要增加START标志，
+                                        传输方向发生改变是指：
+                                        - 两次传输地址发生改变；
+                                        - 传输方向由无变为读；
+                                        - 传输方向由无变为写；
+                                        - 传输方向由写变为读；
+                                        - 传输方向由读变为写。
+                                      + I2C外设驱动需要自己管理START标志，
+                                        xwds/i2cm框架不保证能纠正标志错误。 */
+        XWDS_I2C_F_STOP = (8U), /**< 产生结束条件，BIT(3) */
 };
 
 /**

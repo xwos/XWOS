@@ -414,7 +414,7 @@ xwer_t xwmp_thd_activate(struct xwmp_thd * thd,
                 thd->data[i] = NULL;
         }
 #endif
-        thd->libc.__errno = XWOK;
+        thd->libc.error_number = XWOK;
 
         /* 加入就绪队列 */
         if (NULL != thdfunc) {

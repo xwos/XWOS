@@ -154,7 +154,7 @@ xwer_t xwos_thd_init(struct xwos_thd * thd, xwos_thd_d * thdd,
 {
         return xwosdl_thd_init(&thd->osthd, (xwosdl_thd_d *)thdd,
                                (const struct xwosdl_thd_attr *)attr,
-                               (xwosdl_thd_f)thdfunc, arg);
+                               (xwosdl_thd_f)thdfunc, arg); // cppcheck-suppress [misra-c2012-11.1]
 }
 
 /**
@@ -218,7 +218,7 @@ xwer_t xwos_thd_create(xwos_thd_d * thdd,
 {
         return xwosdl_thd_create((xwosdl_thd_d *)thdd,
                                  (const struct xwosdl_thd_attr *)attr,
-                                 (xwosdl_thd_f)thdfunc, arg);
+                                 (xwosdl_thd_f)thdfunc, arg); // cppcheck-suppress [misra-c2012-11.1]
 }
 
 /**

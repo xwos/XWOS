@@ -80,17 +80,17 @@ enum xwssc_carrier_state_em {
  * @brief 服务质量枚举
  */
 enum xwssc_msg_qos_em {
-        XWSSC_MSG_QOS_0 = 0, /**< 不可靠消息，无CRC校验码 */
-        XWSSC_MSG_QOS_1, /**< 不可靠消息，有CRC校验码 */
-        XWSSC_MSG_QOS_2, /**< 可靠消息，无CRC校验码 */
-        XWSSC_MSG_QOS_3, /**< 可靠消息，有CRC校验码 */
-        XWSSC_MSG_QOS_NUM,
-
-        XWSSC_MSG_QOS_CHKSUM_MSK = (1 << 0U),
-        XWSSC_MSG_QOS_RELIABLE_MSK = (1 << 1U),
-
-        XWSSC_MSG_QOS_MSK = XWSSC_MSG_QOS_CHKSUM_MSK | XWSSC_MSG_QOS_RELIABLE_MSK,
+        XWSSC_MSG_QOS_0 = 0U, /**< 不可靠消息，无CRC校验码 */
+        XWSSC_MSG_QOS_1 = 1U, /**< 不可靠消息，有CRC校验码 */
+        XWSSC_MSG_QOS_2 = 2U, /**< 可靠消息，无CRC校验码 */
+        XWSSC_MSG_QOS_3 = 3U, /**< 可靠消息，有CRC校验码 */
+        XWSSC_MSG_QOS_NUM, /**< QOS数量 */
+        XWSSC_MSG_QOS_CHKSUM_MSK = (1U), /**< CHKSUM标志的掩码，BIT(0) */
+        XWSSC_MSG_QOS_RELIABLE_MSK = (2U), /**< RELIABLE标志的掩码，BIT(1) */
+        XWSSC_MSG_QOS_MSK = XWSSC_MSG_QOS_CHKSUM_MSK |
+                            XWSSC_MSG_QOS_RELIABLE_MSK, /**< 掩码，BIT(0) | BIT(1) */
 };
+
 
 /**
  * @brief 通知发送结果的回调函数

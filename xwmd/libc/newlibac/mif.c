@@ -11,8 +11,10 @@
  */
 
 #include <xwos/standard.h>
-#include <xwmd/libc/newlibac/mif.h>
+#include <xwmd/libc/newlibac/linkage.h>
+#include <xwmd/libc/newlibac/check.h>
 #include <stdlib.h>
+#include <xwmd/libc/newlibac/mif.h>
 
 typedef void (* newlibac_linkage_f)(void);
 typedef void (* newlibac_init_f)(void);
@@ -20,24 +22,12 @@ typedef void (* newlibac_init_f)(void);
 extern void __libc_init_array (void);
 extern void __libc_fini_array (void);
 
-extern void newlibac_errno_linkage_stub(void);
-extern void newlibac_lock_linkage_stub(void);
-extern void newlibac_sysconf_linkage_stub(void);
-extern void newlibac_time_linkage_stub(void);
-extern void newlibac_string_linkage_stub(void);
-extern void newlibac_mem_linkage_stub(void);
-extern void newlibac_setjmp_linkage_stub(void);
-extern void newlibac_fops_linkage_stub(void);
-extern void newlibac_isatty_linkage_stub(void);
-extern void newlibac_kill_linkage_stub(void);
-extern void newlibac_getpid_linkage_stub(void);
-extern void newlibac_exit_linkage_stub(void);
-
 /**
  * @brief 静态链接表
  * @note
  * + 此函数表作为静态链接占位符，可保证符号重名时优先使用此库中的符号。
  */
+// cppcheck-suppress [misra-c2012-8.4]
 const newlibac_linkage_f newlibac_linkage_table[] = {
         newlibac_errno_linkage_stub,
         newlibac_lock_linkage_stub,
@@ -51,6 +41,7 @@ const newlibac_linkage_f newlibac_linkage_table[] = {
         newlibac_kill_linkage_stub,
         newlibac_getpid_linkage_stub,
         newlibac_exit_linkage_stub,
+        NULL,
 };
 
 extern void newlibac_lock_init(void);
@@ -60,20 +51,23 @@ extern void newlibac_lock_init(void);
  * @note
  * + 此函数表同时作为静态链接占位符，可保证符号重名时优先使用此库中的符号。
  */
+// cppcheck-suppress [misra-c2012-8.4]
 const newlibac_init_f newlibac_init_table[] = {
         newlibac_lock_init,
+        NULL,
 };
 
 xwer_t newlibac_init(void)
 {
         const newlibac_init_f * f = newlibac_init_table;
-        xwsz_t sz = xw_array_size(newlibac_init_table);
         xwsz_t i;
 
-        for (i = 0; i < sz; i++) {
+        i = 0;
+        while (NULL != f[i]) {
                 f[i]();
+                i++;
         }
         __libc_init_array();
-        atexit(__libc_fini_array);
+        atexit(__libc_fini_array); // cppcheck-suppress [misra-c2012-17.7]
         return XWOK;
 }

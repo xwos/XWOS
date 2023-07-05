@@ -13,12 +13,15 @@
 #include <xwos/standard.h>
 #include <xwos/lib/errno.h>
 #include <xwos/osal/thd.h>
+#include <xwmd/libc/picolibcac/linkage.h>
 #include <xwmd/libc/picolibcac/check.h>
 #include <unistd.h>
 
 void picolibcac_getpid_linkage_stub(void)
 {
 }
+
+pid_t getpid(void);
 
 pid_t getpid(void)
 {

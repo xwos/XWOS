@@ -12,11 +12,14 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/thd.h>
+#include <xwmd/libc/newlibac/linkage.h>
 #include <xwmd/libc/newlibac/check.h>
 
 void newlibac_exit_linkage_stub(void)
 {
 }
+
+void _exit(int rc);
 
 void _exit(int rc)
 {

@@ -402,7 +402,7 @@ xwer_t xwup_thd_activate(struct xwup_thd * thd,
                 thd->data[i] = NULL;
         }
 #endif
-        thd->libc.__errno = XWOK;
+        thd->libc.error_number = XWOK;
 
         if (NULL != thdfunc) {
                 xwup_thd_launch(thd, thdfunc, arg);

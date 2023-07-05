@@ -112,7 +112,7 @@ struct xwup_thd {
         void * data[XWOSCFG_SKD_THD_LOCAL_DATA_NUM];
 #endif
         struct {
-                int __errno;
+                int error_number; /**< 错误码 */
         } libc;
 };
 

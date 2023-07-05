@@ -43,14 +43,16 @@ xwer_t xwssc_start(struct xwssc * xwssc, const char * name,
 {
         struct xwos_thd_attr attr;
         xwer_t rc;
-        xwssq_t i, j;
+        xwssq_t i;
+        xwssq_t j;
 
-        XWSSC_VALIDATE((xwssc), "nullptr", -EFAULT);
-        XWSSC_VALIDATE((hwifops), "nullptr", -EFAULT);
-        XWSSC_VALIDATE((hwifops->tx), "nullptr", -EFAULT);
-        XWSSC_VALIDATE((hwifops->rx), "nullptr", -EFAULT);
-
-        XWSSC_VALIDATE_FORCE((mem), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != xwssc), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != hwifops), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != hwifops->tx), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != hwifops->rx), "nullptr", -EFAULT);
+        // cppcheck-suppress [misra-c2012-15.5]
+        XWSSC_VALIDATE_FORCE((NULL != mem), "nullptr", -EFAULT);
+        // cppcheck-suppress [misra-c2012-15.5]
         XWSSC_VALIDATE_FORCE((XWSSC_MEMPOOL_SIZE == memsize),
                              "memsize-error",
                              -ESIZE);
@@ -72,9 +74,9 @@ xwer_t xwssc_start(struct xwssc * xwssc, const char * name,
         rc = xwmm_bma_init(xwssc->mempool, "xwssc.mempool",
                            (xwptr_t)mem, memsize,
                            XWSSC_MEMBLK_SIZE, XWSSC_MEMBLK_ODR);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 xwssclogf(ERR, "[API] Init BMA ... <rc:%d>\n", rc);
-                goto err_bma_init;
+                goto err_bma_init; // cppcheck-suppress [misra-c2012-15.2]
         }
         xwssclogf(DEBUG, "[API] Create BMA ... [OK]\n");
 
@@ -87,26 +89,28 @@ xwer_t xwssc_start(struct xwssc * xwssc, const char * name,
                 xwssc->txq.car[i].pri = XWSSC_INVALID_PRI;
                 xwssc->txq.car[i].slot = NULL;
         }
+        // cppcheck-suppress [misra-c2012-17.7]
         memset((void *)&xwssc->txq.carbmp, 0, sizeof(xwssc->txq.carbmp));
         for (i = 0; i < (xwssq_t)XWSSC_PRI_NUM; i++) {
                 xwlib_bclst_init_head(&xwssc->txq.q[i]);
         }
+        // cppcheck-suppress [misra-c2012-17.7]
         memset(&xwssc->txq.qnebmp, 0, sizeof(xwssc->txq.qnebmp));
         xwos_splk_init(&xwssc->txq.qlock);
         rc = xwos_sem_init(&xwssc->txq.qsem, 0, XWSSC_MEMBLK_NUM);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 xwssclogf(ERR, "[API] Init TXQ semaphore ... <rc:%d>\n", rc);
-                goto err_txqsem_init;
+                goto err_txqsem_init; // cppcheck-suppress [misra-c2012-15.2]
         }
         rc = xwos_mtx_init(&xwssc->txq.csmtx, XWOS_SKD_PRIORITY_RT_MIN);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 xwssclogf(ERR, "[API] Init xwssc->csmtx ... <rc:%d>\n", rc);
-                goto err_csmtx_init;
+                goto err_csmtx_init; // cppcheck-suppress [misra-c2012-15.2]
         }
         rc = xwos_cond_init(&xwssc->txq.cscond);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 xwssclogf(ERR, "[API] Init xwssc->cscond ... <rc:%d>\n", rc);
-                goto err_cscond_init;
+                goto err_cscond_init; // cppcheck-suppress [misra-c2012-15.2]
         }
         xwssc->txq.remote.ack = 0;
         xwssc->txq.remote.id = 0;
@@ -119,17 +123,17 @@ xwer_t xwssc_start(struct xwssc * xwssc, const char * name,
                 xwlib_bclst_init_head(&xwssc->rxq.q[i]);
                 xwos_splk_init(&xwssc->rxq.lock[i]);
                 rc = xwos_sem_init(&xwssc->rxq.sem[i], 0, XWSSC_MEMBLK_NUM);
-                if (__xwcc_unlikely(rc < 0)) {
+                if (rc < 0) {
                         xwssclogf(ERR, "[API] Init RXQ semaphore[%d] ... <rc:%d>\n",
                                   i, rc);
-                        goto err_rxqsem_init;
+                        goto err_rxqsem_init; // cppcheck-suppress [misra-c2012-15.2]
                 }
         }
 
         /* 打开硬件接口 */
         rc = xwssc_hwifal_open(xwssc, hwifcb);
         if (rc < 0) {
-                goto err_hwifal_open;
+                goto err_hwifal_open; // cppcheck-suppress [misra-c2012-15.2]
         }
 
         /* 创建线程 */
@@ -144,7 +148,7 @@ xwer_t xwssc_start(struct xwssc * xwssc, const char * name,
                            &attr,
                            (xwos_thd_f)xwssc_rxthd, xwssc);
         if (rc < 0) {
-                goto err_rxthd_init;
+                goto err_rxthd_init; // cppcheck-suppress [misra-c2012-15.2]
         }
 
         xwos_thd_attr_init(&attr);
@@ -188,7 +192,7 @@ err_bma_init:
 __xwmd_api
 xwer_t xwssc_stop(struct xwssc * xwssc)
 {
-        XWSSC_VALIDATE((xwssc), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != xwssc), "nullptr", -EFAULT);
 
         return xwssc_put(xwssc);
 }
@@ -204,11 +208,12 @@ xwer_t xwssc_gc(struct xwos_object * obj)
         struct xwssc * xwssc;
         struct xwssc_carrier * car;
         union xwssc_slot * slot;
-        xwer_t rc, childrc;
+        xwer_t rc;
+        xwer_t childrc;
         xwssq_t j;
 
         xwssc = xwcc_derof(obj, struct xwssc, xwobj);
-        if (xwssc->txthd.thd) {
+        if (NULL != xwssc->txthd.thd) {
                 rc = xwos_thd_stop(xwssc->txthd, &childrc);
                 if (XWOK == rc) {
                         xwssc->txthd = XWOS_THD_NILD;
@@ -216,7 +221,7 @@ xwer_t xwssc_gc(struct xwos_object * obj)
                 }
         }
 
-        if (xwssc->rxthd.thd) {
+        if (NULL != xwssc->rxthd.thd) {
                 rc = xwos_thd_stop(xwssc->rxthd, &childrc);
                 if (XWOK == rc) {
                         xwssc->rxthd = XWOS_THD_NILD;
@@ -289,7 +294,7 @@ void xwssc_txcb_notify(struct xwssc * xwssc, xwssc_txh_t txh, xwer_t rc, void * 
         car = txh;
         xwssclogf(DEBUG, "[API] txh:%p, rc:%d\n", txh, rc);
         if (XWSSC_CRS_FINISH == car->state) {
-                cbarg = arg;
+                cbarg = arg; // cppcheck-suppress [misra-c2012-11.5]
                 xwos_splk_lock(&cbarg->splk);
                 cbarg->rc = rc;
                 xwos_splk_unlock(&cbarg->splk);
@@ -309,16 +314,16 @@ xwer_t xwssc_tx(struct xwssc * xwssc,
         xwsq_t lkst;
         xwer_t rc;
 
-        XWSSC_VALIDATE((xwssc), "nullptr", -EFAULT);
-        XWSSC_VALIDATE((data), "nullptr", -EFAULT);
-        XWSSC_VALIDATE((size), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != xwssc), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != data), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != size), "nullptr", -EFAULT);
         XWSSC_VALIDATE((*size <= XWSSC_SDU_MAX_SIZE), "size-invalid", -E2BIG);
         XWSSC_VALIDATE((pri < XWSSC_PRI_NUM), "pri-invalid", -E2BIG);
         XWSSC_VALIDATE((port < XWSSC_PORT_NUM), "no-such-port", -ENODEV);
         XWSSC_VALIDATE((qos < XWSSC_MSG_QOS_NUM), "qos-invalid", -EINVAL);
 
         rc = xwssc_grab(xwssc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 rc = -EPERM;
                 goto err_ifnotrdy;
         }
@@ -329,7 +334,7 @@ xwer_t xwssc_tx(struct xwssc * xwssc,
 
         rc = xwssc_eq_msg(xwssc, data, *size, pri, port, qos,
                           xwssc_txcb_notify, &cbarg, &txh);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_xwssc_eq;
         }
 
@@ -379,16 +384,16 @@ xwer_t xwssc_eq(struct xwssc * xwssc,
 {
         xwer_t rc;
 
-        XWSSC_VALIDATE((xwssc), "nullptr", -EFAULT);
-        XWSSC_VALIDATE((data), "nullptr", -EFAULT);
-        XWSSC_VALIDATE((size), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != xwssc), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != data), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != size), "nullptr", -EFAULT);
         XWSSC_VALIDATE((*size <= XWSSC_SDU_MAX_SIZE), "size-invalid", -E2BIG);
         XWSSC_VALIDATE((pri < XWSSC_PRI_NUM), "pri-invalid", -E2BIG);
         XWSSC_VALIDATE((port < XWSSC_PORT_NUM), "no-such-port", -ENODEV);
         XWSSC_VALIDATE((qos < XWSSC_MSG_QOS_NUM), "qos-invalid", -EINVAL);
 
         rc = xwssc_grab(xwssc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 rc = -EPERM;
                 goto err_ifnotrdy;
         }
@@ -404,8 +409,8 @@ xwer_t xwssc_abort(struct xwssc * xwssc, xwssc_txh_t txh)
 {
         xwer_t rc;
 
-        XWSSC_VALIDATE((xwssc), "nullptr", -EFAULT);
-        XWSSC_VALIDATE((txh), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != xwssc), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != txh), "nullptr", -EFAULT);
 
         XWOS_UNUSED(xwssc);
 
@@ -434,13 +439,13 @@ xwer_t xwssc_rx(struct xwssc * xwssc, xwu8_t port,
         xwsz_t realsize;
         xwer_t rc;
 
-        XWSSC_VALIDATE((xwssc), "nullptr", -EFAULT);
-        XWSSC_VALIDATE((rxbuf), "nullptr", -EFAULT);
-        XWSSC_VALIDATE((size), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != xwssc), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != rxbuf), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != size), "nullptr", -EFAULT);
         XWSSC_VALIDATE((port < XWSSC_PORT_NUM), "no-such-port", -ENODEV);
 
         rc = xwssc_grab(xwssc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 rc = -EPERM;
                 goto err_ifnotrdy;
         }
@@ -448,7 +453,7 @@ xwer_t xwssc_rx(struct xwssc * xwssc, xwu8_t port,
         bufsize = *size;
         xwssclogf(DEBUG, "[API] port:%d, buffer size:0x%X\n", port, bufsize);
         rc = xwos_sem_wait_to(&xwssc->rxq.sem[port], to);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_sem_wait_to;
         }
 
@@ -464,8 +469,10 @@ xwer_t xwssc_rx(struct xwssc * xwssc, xwu8_t port,
         } else {
                 realsize = sdusize;
         }
+
+        // cppcheck-suppress [misra-c2012-17.7]
         memcpy(rxbuf, sdupos, realsize);
-        if (qos) {
+        if (NULL != qos) {
                 *qos = slot->rx.frm.head.qos;
         }
         *size = realsize;
@@ -491,13 +498,13 @@ xwer_t xwssc_try_rx(struct xwssc * xwssc, xwu8_t port,
         xwsz_t realsize;
         xwer_t rc;
 
-        XWSSC_VALIDATE((xwssc), "nullptr", -EFAULT);
-        XWSSC_VALIDATE((rxbuf), "nullptr", -EFAULT);
-        XWSSC_VALIDATE((size), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != xwssc), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != rxbuf), "nullptr", -EFAULT);
+        XWSSC_VALIDATE((NULL != size), "nullptr", -EFAULT);
         XWSSC_VALIDATE((port < XWSSC_PORT_NUM), "no-such-port", -ENODEV);
 
         rc = xwssc_grab(xwssc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 rc = -EPERM;
                 goto err_ifnotrdy;
         }
@@ -505,7 +512,7 @@ xwer_t xwssc_try_rx(struct xwssc * xwssc, xwu8_t port,
         bufsize = *size;
         xwssclogf(DEBUG, "[API] port:%d, buffer size:0x%X\n", port, bufsize);
         rc = xwos_sem_trywait(&xwssc->rxq.sem[port]);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_sem_trywait;
         }
 
@@ -521,8 +528,9 @@ xwer_t xwssc_try_rx(struct xwssc * xwssc, xwu8_t port,
         } else {
                 realsize = sdusize;
         }
+        // cppcheck-suppress [misra-c2012-17.7]
         memcpy(rxbuf, sdupos, realsize);
-        if (qos) {
+        if (NULL != qos) {
                 *qos = slot->rx.frm.head.qos;
         }
         *size = realsize;

@@ -42,7 +42,8 @@ __xwmd_rodata const xwu8_t xwssc_frm_connect[] = {
         (xwu8_t)0x7E, /* 帧头校验和 */
         (xwu8_t)0x0, /* 端口：不使用，默认为0 */
         (xwu8_t)0x0, /* ID：不使用，默认为0 */
-        (xwu8_t)XWSSC_MSG_QOS_3 | XWSSC_FLAG_CONNECT, /* Qos: 可靠消息 + CRC校验码; Flag: CONNECT */
+        ((xwu8_t)XWSSC_MSG_QOS_3 |
+         (xwu8_t)XWSSC_FLAG_CONNECT), /* Qos: 可靠消息 + CRC校验码 + CONNECT */
         (xwu8_t)0x8, /* SDU长度 */
         (xwu8_t)'X', /* sdu[0]: protocol 0 */
         (xwu8_t)'W', /* sdu[1]: protocol 1 */
@@ -70,7 +71,9 @@ __xwmd_rodata const xwu8_t xwssc_ackfrm_connect[] = {
         (xwu8_t)0xFD, /* 帧头校验和 */
         (xwu8_t)0x0, /* 端口：不使用，默认为0 */
         (xwu8_t)0x0, /* ID：不使用，默认为0 */
-        (xwu8_t)(XWSSC_MSG_QOS_3 | XWSSC_FLAG_CONNECT | XWSSC_FLAG_ACK), /* Qos: 可靠消息 + CRC校验码; Flag: CONNECT | ACK */
+        ((xwu8_t)XWSSC_MSG_QOS_3 |
+         (xwu8_t)XWSSC_FLAG_CONNECT |
+         (xwu8_t)XWSSC_FLAG_ACK), /* (可靠消息 + CRC校验码) + CONNECT + ACK */
         (xwu8_t)0x8, /* SDU长度 */
         (xwu8_t)'X', /* sdu[0]: protocol 0 */
         (xwu8_t)'W', /* sdu[1]: protocol 1 */
@@ -98,7 +101,8 @@ __xwmd_rodata const xwu8_t xwssc_ackfrm_sdu[] = {
         (xwu8_t)0x0, /* 帧头校验和，依据实际情况填充 */
         (xwu8_t)0x0, /* 端口，依据实际情况填充 */
         (xwu8_t)0x0, /* ID，依据实际情况填充 */
-        (xwu8_t)XWSSC_MSG_QOS_3 | XWSSC_FLAG_ACK, /* Qos: 可靠消息 + CRC校验码; Flag: ACK */
+        ((xwu8_t)XWSSC_MSG_QOS_3 |
+         (xwu8_t)XWSSC_FLAG_ACK), /* (可靠消息 + CRC校验码) + ACK */
         (xwu8_t)0x1, /* SDU长度 */
         (xwu8_t)0, /* sdu[0]: 应答，依据实际情况填充 */
         (xwu8_t)0, /* CRC32 第一字节（最高有效字节），依据实际情况填充 */
@@ -235,8 +239,8 @@ void xwssc_encode_sdusize(xwsz_t sdusize, xwu8_t * ecsdusz, xwu8_t * ecsize)
         i = 0;
         while (true) {
                 ecsdusz[i] = sdusize & 0x7F;
-                sdusize >>= 7U;
-                if (sdusize) {
+                sdusize >>= 7U; // cppcheck-suppress [misra-c2012-17.8]
+                if (0 != sdusize) {
                         ecsdusz[i] |= 0x80;
                         i++;
                 } else {
@@ -264,7 +268,7 @@ void xwssc_decode_sdusize(xwu8_t * ecsdusz, xwsz_t * sdusize)
         while (true) {
                 sft = xwssc_ecsdusz_shift_table[i];
                 dcsdusz |= ((xwsz_t)(ecsdusz[i] & 0x7F) << sft);
-                if (ecsdusz[i] & 0x80) {
+                if (0 != (ecsdusz[i] & 0x80U)) {
                         i++;
                 } else {
                         break;
@@ -289,7 +293,7 @@ xwu8_t xwssc_cal_head_chksum(xwu8_t data[], xwsz_t size)
         for (i = 0; i < size; i++) {
                 chksum += (xwu16_t)data[i];
         }
-        while (chksum & 0xFF00U) {
+        while (0 != (chksum & 0xFF00U)) {
                 chksum = (xwu16_t)(chksum >> 8U) + (xwu16_t)(chksum & 0xFFU);
         }
         chksum ^= 0xFF;
@@ -314,7 +318,7 @@ bool xwssc_chk_head(xwu8_t data[], xwsz_t size)
         for (i = 0; i < size; i++) {
                 chksum += (xwu16_t)data[i];
         }
-        while (chksum & 0xFF00U) {
+        while (0 != (chksum & 0xFF00U)) {
                 chksum = (xwu16_t)(chksum >> 8U) + (xwu16_t)(chksum & 0xFFU);
         }
         return (chksum == 0xFF);
@@ -423,7 +427,7 @@ xwer_t xwssc_rx_frm_connect(struct xwssc * xwssc, union xwssc_slot * slot)
                 rc = xwssc_tx_ack_connect(xwssc);
                 if (XWOK == rc) {
                         xwaop_write(xwu32_t, &xwssc->rxq.cnt, 0, NULL);
-                }/* else {} */
+                }
         } else {
                 rc = -EPERM;
         }
@@ -464,7 +468,7 @@ xwer_t xwssc_rx_ack_connect(struct xwssc * xwssc, union xwssc_slot * slot)
                         xwaop_s1m(xwsq_t, &xwssc->hwifst, XWSSC_HWIFST_CONNECT,
                                   NULL, NULL);
                         xwssc_hwifal_notify(xwssc, XWSSC_HWIFNTF_CONNECT);
-                }/* else {} */
+                }
         }
         xwmm_bma_free(xwssc->mempool, slot);
         return XWOK;
@@ -497,7 +501,8 @@ static __xwmd_code
 xwer_t xwssc_rx_frm_sdu(struct xwssc * xwssc, union xwssc_slot * slot)
 {
         xwu32_t rxcnt;
-        xwu8_t rmtid, lclid;
+        xwu8_t rmtid;
+        xwu8_t lclid;
         xwu8_t port;
         xwer_t rc;
 
@@ -509,8 +514,8 @@ xwer_t xwssc_rx_frm_sdu(struct xwssc * xwssc, union xwssc_slot * slot)
                   "[RX] port:0x%X, qos:0x%X, frmsize:0x%X, "
                   "Remote ID:0x%X, Local ID:0x%X\n",
                   port, slot->rx.frm.head.qos, slot->rx.frmsize, rmtid, lclid);
-        if (slot->rx.frm.head.qos & XWSSC_MSG_QOS_RELIABLE_MSK) {
-                if (__xwcc_likely(rmtid == lclid)) {
+        if (0 != (slot->rx.frm.head.qos & XWSSC_MSG_QOS_RELIABLE_MSK)) {
+                if (rmtid == lclid) {
                         /* 收到数据 */
                         rc = xwssc_tx_ack_sdu(xwssc, port, rmtid, XWSSC_ACK_OK);
                         if (XWOK == rc) {
@@ -559,7 +564,7 @@ xwer_t xwssc_rx_ack_sdu(struct xwssc * xwssc, union xwssc_slot * slot)
                 goto err_mtx_lock;
         }
         xwaop_read(xwsq_t, &xwssc->hwifst, &hwifst);
-        if (XWSSC_HWIFST_TX & hwifst) {
+        if (0 != (XWSSC_HWIFST_TX & hwifst)) {
                 xwssc->txq.remote.ack = ack;
                 xwssc->txq.remote.id = rmtid;
                 xwaop_c0m(xwsq_t, &xwssc->hwifst, XWSSC_HWIFST_TX, NULL, NULL);
@@ -590,21 +595,21 @@ xwer_t xwssc_rx_frm(struct xwssc * xwssc, union xwssc_slot * slot)
         qos = slot->rx.frm.head.qos;
         xwssclogf(DEBUG, "[RX] RX Frame(port:0x%X, ID:0x%X, qos:0x%X)\n",
                   slot->rx.frm.head.port, slot->rx.frm.head.id, qos);
-        if (XWSSC_MSG_QOS_CHKSUM_MSK & qos) {
+        if (0 != (XWSSC_MSG_QOS_CHKSUM_MSK & qos)) {
                 rc = xwssc_chk_frm(slot);
                 if (rc < 0) {
                         xwmm_bma_free(xwssc->mempool, slot);
                         goto err_badmsg;
                 }
         }
-        if (XWSSC_FLAG_CONNECT & qos) {
-                if (XWSSC_FLAG_ACK & qos) {
+        if (0 != (XWSSC_FLAG_CONNECT & qos)) {
+                if (0 != (XWSSC_FLAG_ACK & qos)) {
                         rc = xwssc_rx_ack_connect(xwssc, slot);
                 } else {
                         rc = xwssc_rx_frm_connect(xwssc, slot);
                 }
         } else {
-                if (XWSSC_FLAG_ACK & qos) {
+                if (0 != (XWSSC_FLAG_ACK & qos)) {
                         rc = xwssc_rx_ack_sdu(xwssc, slot);
                 } else {
                         rc = xwssc_rx_frm_sdu(xwssc, slot);
@@ -655,7 +660,7 @@ xwer_t xwssc_rxthd(struct xwssc * xwssc)
                                           "[RX] Failed to freeze ... <rc:%d>\n",
                                           rc);
                                 xwssc_doze(1);
-                        }/* else {} */
+                        }
                         xwssclogf(DEBUG, "[RX] Resuming ...\n");
                 } else {
                         rc = xwssc_rxfsm(xwssc);
@@ -676,7 +681,7 @@ xwer_t xwssc_rxthd(struct xwssc * xwssc)
                                           rc);
                                 XWSSC_BUG();
                                 break;
-                        }/* else {} */
+                        } else {}
                 }
         }
         return rc;
@@ -732,7 +737,7 @@ void xwssc_txq_add_head(struct xwssc * xwssc, struct xwssc_carrier * car)
         xwlib_bclst_add_head(&xwssc->txq.q[pri], &car->node);
         if (!xwbmpop_t1i(xwssc->txq.qnebmp, (xwsq_t)pri)) {
                 xwbmpop_s1i(xwssc->txq.qnebmp, (xwsq_t)pri);
-        }/* else {} */
+        }
         xwos_splk_unlock(&xwssc->txq.qlock);
 }
 
@@ -752,7 +757,7 @@ void xwssc_txq_add_tail(struct xwssc * xwssc, struct xwssc_carrier * car)
         xwlib_bclst_add_tail(&xwssc->txq.q[pri], &car->node);
         if (!xwbmpop_t1i(xwssc->txq.qnebmp, (xwsq_t)pri)) {
                 xwbmpop_s1i(xwssc->txq.qnebmp, (xwsq_t)pri);
-        }/* else {} */
+        }
         xwos_splk_unlock(&xwssc->txq.qlock);
 }
 
@@ -775,7 +780,7 @@ struct xwssc_carrier * xwssc_txq_choose(struct xwssc * xwssc)
         xwlib_bclst_del_init(&car->node);
         if (xwlib_bclst_tst_empty(&xwssc->txq.q[pri])) {
                 xwbmpop_c0i(xwssc->txq.qnebmp, (xwsq_t)pri);
-        }/* else {} */
+        }
         xwos_splk_unlock(&xwssc->txq.qlock);
         return car;
 }
@@ -797,7 +802,7 @@ xwer_t xwssc_tx_frm_connect(struct xwssc * xwssc)
                                      (xwu8_t *)xwssc_frm_connect,
                                      sizeof(xwssc_frm_connect));
                 xwos_mtx_unlock(&xwssc->txq.csmtx);
-        }/* else {} */
+        }
         return rc;
 }
 
@@ -819,7 +824,7 @@ xwer_t xwssc_tx_ack_connect(struct xwssc * xwssc)
                                      (xwu8_t *)xwssc_ackfrm_connect,
                                      sizeof(xwssc_ackfrm_connect));
                 xwos_mtx_unlock(&xwssc->txq.csmtx);
-        }/* else {} */
+        }
         return rc;
 }
 
@@ -846,6 +851,7 @@ xwer_t xwssc_tx_ack_sdu(struct xwssc * xwssc, xwu8_t port, xwu8_t id, xwu8_t ack
 
         xwssclogf(DEBUG, "[TX] ACK:0x%X, ID:0x%X\n", ack, id);
         frm = (struct xwssc_frm *)stream;
+        // cppcheck-suppress [misra-c2012-17.7]
         memcpy(stream, xwssc_ackfrm_sdu, sizeof(xwssc_ackfrm_sdu));
         frm->head.port = port;
         frm->head.id = id;
@@ -867,7 +873,7 @@ xwer_t xwssc_tx_ack_sdu(struct xwssc * xwssc, xwu8_t port, xwu8_t id, xwu8_t ack
         if (XWOK == rc) {
                 rc = xwssc_hwifal_tx(xwssc, stream, sizeof(xwssc_ackfrm_sdu));
                 xwos_mtx_unlock(&xwssc->txq.csmtx);
-        }/* else {} */
+        }
         return rc;
 }
 
@@ -916,7 +922,8 @@ xwer_t xwssc_eq_msg(struct xwssc * xwssc,
         xwu8_t frmheadszmir;
         struct xwssc_carrier * car;
         union xwssc_slot * slot;
-        xwsz_t need, neednum;
+        xwsz_t need;
+        xwsz_t neednum;
         xwssq_t odr;
         xwu8_t * sdupos;
         xwu8_t * crc32pos;
@@ -957,6 +964,7 @@ xwer_t xwssc_eq_msg(struct xwssc * xwssc,
                   "[API] car(%p), slot(%p), pri:0x%X, port:0x%X, sdusize:0x%X\n",
                   car, slot, pri, port, sdusize);
         /* SOF */
+        // cppcheck-suppress [misra-c2012-17.7]
         memset(slot->tx.frm.sof, XWSSC_SOF, XWSSC_SOF_SIZE);
         /* Head */
         frmheadsz = sizeof(struct xwssc_frmhead) + ecsize;
@@ -964,16 +972,17 @@ xwer_t xwssc_eq_msg(struct xwssc * xwssc,
         slot->tx.frm.head.headsize = frmheadsz | frmheadszmir;
         slot->tx.frm.head.port = port;
         slot->tx.frm.head.qos = qos & XWSSC_MSG_QOS_MSK;
+        // cppcheck-suppress [misra-c2012-17.7]
         memcpy(slot->tx.frm.head.ecsdusz, ecsdusz, ecsize);
         /* slot->tx.frm.head.id 与 slot->tx.frm.head.chksum 待发送时才能确定 */
 
         /* SDU */
         sdupos = XWSSC_SDUPOS(&slot->tx.frm.head);
-        memcpy(sdupos, sdu, sdusize);
+        memcpy(sdupos, sdu, sdusize); // cppcheck-suppress [misra-c2012-17.7]
 
         /* CRC32 */
         crc32pos = &sdupos[sdusize];
-        if (qos & XWSSC_MSG_QOS_CHKSUM_MSK) {
+        if (0 != (qos & XWSSC_MSG_QOS_CHKSUM_MSK)) {
                 calsz = sdusize;
                 crc32 = xwlib_crc32_calms(sdu, &calsz);
                 crc32pos[0] = (xwu8_t)((crc32 >> 24U) & 0xFFU);
@@ -988,13 +997,14 @@ xwer_t xwssc_eq_msg(struct xwssc * xwssc,
         }
 
         /* EOF */
+        // cppcheck-suppress [misra-c2012-17.7]
         memset(&crc32pos[XWSSC_CRC32_SIZE], XWSSC_EOF, XWSSC_EOF_SIZE);
 
         /* 加入到发送队列 */
         xwssc_txq_add_tail(xwssc, car);
         xwos_sem_post(&xwssc->txq.qsem);
 
-        if (txhbuf) {
+        if (NULL != txhbuf) {
                 *txhbuf = (xwssc_txh_t)car;
         }
         return XWOK;
@@ -1019,9 +1029,9 @@ xwer_t xwssc_connect(struct xwssc * xwssc)
 
         cnt = 0;
         rc = XWOK;
-        do {
+        do { // cppcheck-suppress [misra-c2012-15.4]
                 xwaop_read(xwsq_t, &xwssc->hwifst, &hwifst);
-                if (XWSSC_HWIFST_CONNECT & hwifst) {
+                if (0 != (XWSSC_HWIFST_CONNECT & hwifst)) {
                         break;
                 }
                 rc = xwssc_tx_frm_connect(xwssc);
@@ -1038,7 +1048,7 @@ xwer_t xwssc_connect(struct xwssc * xwssc)
         if ((XWOK == rc) && (XWSSC_RETRY_NUM == cnt)) {
                 xwssc_hwifal_notify(xwssc, XWSSC_HWIFNTF_NETUNREACH);
                 xwssc_doze(3);
-        }/* else {} */
+        }
         return rc;
 }
 
@@ -1066,11 +1076,11 @@ void xwssc_finish_tx(struct xwssc * xwssc, struct xwssc_carrier * car)
                         xwaop_add(xwu32_t, &xwssc->txq.cnt, 1, NULL, NULL);
                         xwaop_write(xwu32_t, &car->state, XWSSC_CRS_FINISH, NULL);
                         xwos_splk_lock(&xwssc->txq.notiflk);
-                        if (car->slot->tx.ntfcb) {
+                        if (NULL != car->slot->tx.ntfcb) {
                                 car->slot->tx.ntfcb(xwssc, (xwssc_txh_t)car,
                                                     xwssc_callback_rc[XWSSC_ACK_OK],
                                                     car->slot->tx.cbarg);
-                        }/* else {} */
+                        }
                         xwos_splk_unlock(&xwssc->txq.notiflk);
                         xwmm_bma_free(xwssc->mempool, car->slot);
                         car->slot = NULL;
@@ -1081,11 +1091,11 @@ void xwssc_finish_tx(struct xwssc * xwssc, struct xwssc_carrier * car)
                         xwaop_add(xwu32_t, &xwssc->txq.cnt, 1, NULL, NULL);
                         xwaop_write(xwu32_t, &car->state, XWSSC_CRS_FINISH, NULL);
                         xwos_splk_lock(&xwssc->txq.notiflk);
-                        if (car->slot->tx.ntfcb) {
+                        if (NULL != car->slot->tx.ntfcb) {
                                 car->slot->tx.ntfcb(xwssc, (xwssc_txh_t)car,
                                                     xwssc_callback_rc[XWSSC_ACK_OK],
                                                     car->slot->tx.cbarg);
-                        }/* else {} */
+                        }
                         xwos_splk_unlock(&xwssc->txq.notiflk);
                         xwmm_bma_free(xwssc->mempool, car->slot);
                         car->slot = NULL;
@@ -1147,9 +1157,9 @@ xwer_t xwssc_tx_frm(struct xwssc * xwssc, struct xwssc_carrier * car)
         if (rc < 0) {
                 goto err_mtx_lock;
         }
-        if (car->slot->tx.frm.head.qos & XWSSC_MSG_QOS_RELIABLE_MSK) {
+        if (0 != (car->slot->tx.frm.head.qos & XWSSC_MSG_QOS_RELIABLE_MSK)) {
                 xwaop_s1m(xwsq_t, &xwssc->hwifst, XWSSC_HWIFST_TX, NULL, NULL);
-                do {
+                do { // cppcheck-suppress [misra-c2012-15.4]
                         xwssclogf(DEBUG,
                                   "[TX] carrier(%p), ID:0x%X, cnt:0x%X\n",
                                   car, id, cnt);
@@ -1177,7 +1187,7 @@ xwer_t xwssc_tx_frm(struct xwssc * xwssc, struct xwssc_carrier * car)
                                         goto err_mtx_lock;
                                 }
                                 xwaop_read(xwsq_t, &xwssc->hwifst, &hwifst);
-                                if (XWSSC_HWIFST_TX & hwifst) {
+                                if (0 != (XWSSC_HWIFST_TX & hwifst)) {
                                         cnt++;
                                         rc = -ETIMEDOUT;
                                 } else {
@@ -1212,11 +1222,11 @@ xwer_t xwssc_tx_frm(struct xwssc * xwssc, struct xwssc_carrier * car)
                 }
                 xwos_mtx_unlock(&xwssc->txq.csmtx);
                 xwos_splk_lock(&xwssc->txq.notiflk);
-                if (car->slot->tx.ntfcb) {
+                if (NULL != car->slot->tx.ntfcb) {
                         car->slot->tx.ntfcb(xwssc, (xwssc_txh_t)car,
                                             xwssc_callback_rc[XWSSC_ACK_OK],
                                             car->slot->tx.cbarg);
-                }/* else {} */
+                }
                 xwos_splk_unlock(&xwssc->txq.notiflk);
                 xwmm_bma_free(xwssc->mempool, car->slot);
                 car->slot = NULL;
@@ -1242,9 +1252,9 @@ xwer_t xwssc_txfsm(struct xwssc * xwssc)
         xwer_t rc;
 
         xwaop_read(xwsq_t, &xwssc->hwifst, &hwifst);
-        if (XWSSC_HWIFST_CONNECT & hwifst) {
+        if (0 != (XWSSC_HWIFST_CONNECT & hwifst)) {
                 /* 选择一个待发送的帧 */
-                if (xwssc->txq.tmp) {
+                if (NULL != xwssc->txq.tmp) {
                         car = xwssc->txq.tmp;
                         xwssc->txq.tmp = NULL;
                 } else {
@@ -1272,12 +1282,12 @@ xwer_t xwssc_txfsm(struct xwssc * xwssc)
                 } else {
                         if (XWSSC_CRS_ABORT == state) {
                                 xwos_splk_lock(&xwssc->txq.notiflk);
-                                if (car->slot->tx.ntfcb) {
+                                if (NULL != car->slot->tx.ntfcb) {
                                         car->slot->tx.ntfcb(xwssc,
                                                             (xwssc_txh_t)car,
                                                             -ECONNABORTED,
                                                             car->slot->tx.cbarg);
-                                }/* else {} */
+                                }
                                 xwos_splk_unlock(&xwssc->txq.notiflk);
                                 xwmm_bma_free(xwssc->mempool, car->slot);
                                 car->slot = NULL;
@@ -1339,14 +1349,14 @@ xwer_t xwssc_txthd(struct xwssc * xwssc)
                                           rc);
                                 XWSSC_BUG();
                                 break;
-                        }/* else {} */
+                        } else {}
                 }
         }
-        if (xwssc->txq.tmp) {
+        if (NULL != xwssc->txq.tmp) {
                 xwssc_txq_add_head(xwssc, xwssc->txq.tmp);
                 xwssc->txq.tmp = NULL;
                 xwos_sem_post(&xwssc->txq.qsem);
-        }/* else {} */
+        }
         return rc;
 }
 

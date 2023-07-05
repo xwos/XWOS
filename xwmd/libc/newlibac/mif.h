@@ -14,6 +14,7 @@
 #define __xwmd_libc_newlibac_mif_h__
 
 #include <xwos/standard.h>
+#include <xwmd/libc/newlibac/linkage.h>
 
 xwer_t newlibac_init(void);
 

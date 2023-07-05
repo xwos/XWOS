@@ -24,12 +24,16 @@ misra-c2012-5.7:xwos/up/thd.h
 misra-c2012-5.7:xwos/lib/xwbop.c
 misra-c2012-5.7:xwos/mm/mempool/objcache.h
 misra-c2012-5.7:xwos/mm/mempool/page.h
+misra-c2012-5.7:xwmd/isc/xwssc/protocol.h
+misra-c2012-5.7:xwcd/ds/uart/common.h
+misra-c2012-5.7:xwcd/ds/uart/controller.h
 
 misra-c2012-5.9:xwos/lib/xwaop.h
 misra-c2012-5.9:xwos/lib/xwbop.h
 misra-c2012-5.9:xwos/lib/bclst.h
 misra-c2012-5.9:xwos/lib/rbtree.h
 misra-c2012-5.9:xwos/lib/lfq.h
+misra-c2012-5.9:xwos/lib/xwbmpaop.h
 misra-c2012-5.9:xwos/mm/common.h
 misra-c2012-5.9:xwos/osal/*.h
 misra-c2012-5.9:xwos/osal/lock/*.h
@@ -50,14 +54,23 @@ misra-c2012-5.9:xwos/up/osdl/sync/sel.h
 misra-c2012-5.9:xwos/up/plwq.h
 
 misra-c2012-8.4:xwos/ospl/xwosplcb.c
+misra-c2012-8.4:xwmd/xwrust/ffi/*.c
 
 misra-c2012-8.5:xwos/ospl/soc/*.h
 misra-c2012-8.5:xwos/lib/xwbop.h
 misra-c2012-8.5:xwos/lib/lfq.h
+misra-c2012-8.5:xwmd/libc/newlibac/*.c
+misra-c2012-8.5:xwmd/libc/picolibcac/*.c
+
+misra-c2012-8.6:xwmd/libc/newlibac/*.c
+misra-c2012-8.6:xwmd/libc/picolibcac/*.c
 
 misra-c2012-8.7
 
 misra-c2012-11.3:xwos/mm/bma.c
+misra-c2012-11.3:xwos/osal/*.h
+misra-c2012-11.3:xwos/osal/lock/*.h
+misra-c2012-11.3:xwos/osal/sync/*.h
 
 misra-c2012-11.4:xwcd/soc/arm/v6m/armv6m_isa.h
 misra-c2012-11.4:xwcd/soc/arm/v7m/armv7m_isa.h
@@ -70,7 +83,7 @@ misra-c2012-11.5:xwos/mm/mempool/page.c
 
 misra-c2012-15.1
 
-misra-c2012-17.1:xwos/lib/xwlog.c
+misra-c2012-17.1
 
 misra-c2012-17.8:xwos/lib/xwbop.c
 misra-c2012-17.8:xwos/mm/bma.c
@@ -83,9 +96,15 @@ misra-c2012-19.2
 
 misra-c2012-20.9
 
+misra-c2012-21.3:xwmd/libc/newlibac/fops.c
+misra-c2012-21.3:xwmd/libc/newlibac/mem.c
+misra-c2012-21.3:xwmd/libc/picolibcac/fops.c
+misra-c2012-21.3:xwmd/libc/picolibcac/mem.c
+
 misra-c2012-20.7:xwos/lib/xwaop.h
 misra-c2012-20.7:xwos/lib/xwbop.h
 misra-c2012-20.7:xwos/mm/bma.h
+misra-c2012-20.7:xwmd/isc/xwcq/mif.h
 
 misra-c2012-20.10:xwos/lib/xwaop.h
 misra-c2012-20.10:xwos/lib/xwbop.h
@@ -94,3 +113,8 @@ misra-c2012-20.12:xwos/lib/xwaop.h
 misra-c2012-20.12:xwos/lib/xwbop.h
 
 misra-c2012-21.1
+
+misra-c2012-21.6
+misra-c2012-21.10
+
+*:xwem/fs/fatfs/ff.h

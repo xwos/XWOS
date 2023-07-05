@@ -69,7 +69,7 @@
 
 #if defined(XWMDCFG_CHECK_PARAMETERS) && (1 == XWMDCFG_CHECK_PARAMETERS)
 #define XWSSC_VALIDATE(exp, errstr, ...)        \
-        if (__xwcc_unlikely(!(exp))) {          \
+        if (!(exp)) {                           \
             return __VA_ARGS__;                 \
         }
 #else
@@ -77,7 +77,7 @@
 #endif
 
 #define XWSSC_VALIDATE_FORCE(exp, errstr, ...)  \
-        if (__xwcc_unlikely(!(exp))) {          \
+        if (!(exp)) {                           \
             return __VA_ARGS__;                 \
         }
 
@@ -85,9 +85,9 @@
  * @brief 协议内部标志
  */
 enum xwssc_flag_em {
-        XWSSC_FLAG_CONNECT = 0x10, /**< 连接标志 */
-        XWSSC_FLAG_ACK = 0x80, /**< 应答命令 */
-        XWSSC_FLAG_MSK = 0xF0,
+        XWSSC_FLAG_CONNECT = 0x10U, /**< 连接标志 */
+        XWSSC_FLAG_ACK = 0x80U, /**< 应答命令 */
+        XWSSC_FLAG_MSK = 0xF0U,
 };
 
 /**

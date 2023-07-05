@@ -32,6 +32,7 @@
  * @param[in] slotsize: 数据槽的大小
  * @param[in] slotnum: 数据槽的个数
  */
+// cppcheck-suppress [misra-c2012-20.7]
 #define XWCQ_DEF_MEMPOOL(name, slotsize, slotnum) \
         __xwcc_alignl1cache xwu8_t name[(slotsize) * (slotnum)]
 

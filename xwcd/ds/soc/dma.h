@@ -28,7 +28,7 @@
 /**
  * @brief XWDS DMA 通道
  */
-#define XWDS_DMA_CH(x)          ((xwid_t)x)
+#define XWDS_DMA_CH(x)          ((xwid_t)(x))
 
 xwer_t xwds_dma_req(struct xwds_soc * soc, xwid_t ch);
 xwer_t xwds_dma_rls(struct xwds_soc * soc, xwid_t ch);

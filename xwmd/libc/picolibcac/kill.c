@@ -13,6 +13,7 @@
 #include <xwos/standard.h>
 #include <xwos/lib/errno.h>
 #include <xwos/osal/thd.h>
+#include <xwmd/libc/picolibcac/linkage.h>
 #include <xwmd/libc/picolibcac/check.h>
 #include <unistd.h>
 
@@ -20,9 +21,13 @@ void picolibcac_kill_linkage_stub(void)
 {
 }
 
+int kill(pid_t pid, int sig);
 
 int kill(pid_t pid, int sig)
 {
+        XWOS_UNUSED(pid);
+        XWOS_UNUSED(sig);
+
         errno = ESRCH;
         return -1;
 }

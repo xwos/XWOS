@@ -42,11 +42,11 @@ XWMO_CSRCS += xwds/w25q64jv.c
 XWMO_CSRCS += xwlib/log.c
 XWMO_CSRCS += xwlib/crc.c
 
-ifeq ($(XWMDCFG_libc_newlibac),y)
+ifeq ($(XWOS_CFG_LIBC),newlib)
   XWMO_CSRCS += newlib/stdio.c
   XWMO_CSRCS += newlib/mem.c
 endif
-ifeq ($(XWMDCFG_libc_picolibcac),y)
+ifeq ($(XWOS_CFG_LIBC),picolibc)
   XWMO_CSRCS += picolibc/stdio.c
   XWMO_CSRCS += picolibc/mem.c
 endif

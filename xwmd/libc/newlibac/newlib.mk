@@ -9,13 +9,8 @@
 # > License, v. 2.0. If a copy of the MPL was not distributed with this
 # > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
 
-include $(XWOS_WKSPC_DIR)/XWOS.cfg
-include $(XWBS_UTIL_MK_XWMO)
-
-$(eval $(call XwmoReqCfg,XWOS_CFG_LIBC,newlib))
 $(eval $(call XwmoReqCfg,XWEMCFG_fs_fatfs,y))
 $(eval $(call XwmoReqCfg,XWMMCFG_MEMPOOL,y))
-$(eval $(call XwmoReqNotCfg,XWMDCFG_libc_picolibcac,y))
 
 XWMO_CSRCS := mif.c
 XWMO_CSRCS += errno.c
@@ -31,6 +26,5 @@ XWMO_CSRCS += getpid.c
 XWMO_CSRCS += kill.c
 XWMO_CSRCS += exit.c
 
-XWMO_CFLAGS := -Wno-unused-value -Wno-unused-parameter
+XWMO_CFLAGS := -Wno-unused-value -Wno-sign-conversion
 XWMO_INCDIRS :=
-include xwbs/$(XWOS_CFG_XWMO_MK)

@@ -29,7 +29,9 @@ struct xwssc_frm;
  * @brief 硬件接口抽象层操作函数集
  */
 struct xwssc_hwifal_operation {
+        // cppcheck-suppress [misra-c2012-5.8]
         xwer_t (* open)(struct xwssc *); /**< 打开硬件接口 */
+        // cppcheck-suppress [misra-c2012-5.8]
         xwer_t (* close)(struct xwssc *); /**< 关闭硬件接口 */
         xwer_t (* tx)(struct xwssc *, const xwu8_t *, xwsz_t); /**< 发送数据 */
         xwer_t (* rx)(struct xwssc *, xwu8_t *, xwsz_t *); /**< 接收数据 */

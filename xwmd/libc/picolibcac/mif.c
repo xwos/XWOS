@@ -11,10 +11,10 @@
  */
 
 #include <xwos/standard.h>
-#include <xwos/osal/time.h>
+#include <xwmd/libc/picolibcac/linkage.h>
 #include <xwmd/libc/picolibcac/check.h>
 #include <stdlib.h>
-#include <time.h>
+#include <xwmd/libc/picolibcac/mif.h>
 
 typedef void (* picolibcac_linkage_f)(void);
 typedef void (* picolibcac_init_f)(void);
@@ -22,24 +22,12 @@ typedef void (* picolibcac_init_f)(void);
 extern void __libc_init_array(void);
 extern void __libc_fini_array(void);
 
-extern void picolibcac_errno_linkage_stub(void);
-extern void picolibcac_lock_linkage_stub(void);
-extern void picolibcac_sysconf_linkage_stub(void);
-extern void picolibcac_time_linkage_stub(void);
-extern void picolibcac_string_linkage_stub(void);
-extern void picolibcac_mem_linkage_stub(void);
-extern void picolibcac_setjmp_linkage_stub(void);
-extern void picolibcac_fops_linkage_stub(void);
-extern void picolibcac_isatty_linkage_stub(void);
-extern void picolibcac_kill_linkage_stub(void);
-extern void picolibcac_getpid_linkage_stub(void);
-extern void picolibcac_exit_linkage_stub(void);
-
 /**
  * @brief 静态链接表
  * @note
  * + 此函数表作为静态链接占位符，可保证符号重名时优先使用此库中的符号。
  */
+// cppcheck-suppress [misra-c2012-8.4]
 const picolibcac_linkage_f picolibcac_linkage_table[] = {
         picolibcac_errno_linkage_stub,
         picolibcac_lock_linkage_stub,
@@ -53,6 +41,7 @@ const picolibcac_linkage_f picolibcac_linkage_table[] = {
         picolibcac_kill_linkage_stub,
         picolibcac_getpid_linkage_stub,
         picolibcac_exit_linkage_stub,
+        NULL,
 };
 
 extern void picolibcac_lock_init(void);
@@ -60,20 +49,23 @@ extern void picolibcac_lock_init(void);
 /**
  * @brief 初始化列表
  */
+// cppcheck-suppress [misra-c2012-8.4]
 const picolibcac_init_f picolibcac_init_table[] = {
         picolibcac_lock_init,
+        NULL,
 };
 
 xwer_t picolibcac_init(void)
 {
         const picolibcac_init_f * f = picolibcac_init_table;
-        xwsz_t sz = xw_array_size(picolibcac_init_table);
         xwsz_t i;
 
-        for (i = 0; i < sz; i++) {
+        i = 0;
+        while (NULL != f[i]) {
                 f[i]();
+                i++;
         }
         __libc_init_array();
-        atexit(__libc_fini_array);
+        atexit(__libc_fini_array); // cppcheck-suppress [misra-c2012-17.7]
         return XWOK;
 }

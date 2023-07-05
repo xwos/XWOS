@@ -40,8 +40,8 @@
  * @brief CAN消息标志枚举
  */
 enum xwds_can_msgflag_em {
-        XWDS_CAN_MSG_F_EXID = (1U << 0U), /**< 扩展ID */
-        XWDS_CAN_MSG_F_REMOTE = (1U << 1U), /**< 远程帧 */
+        XWDS_CAN_MSG_F_EXID = (1U), /**< 扩展ID，BIT(0) */
+        XWDS_CAN_MSG_F_REMOTE = (2U), /**< 远程帧，BIT(1) */
 };
 
 /**
