@@ -45,11 +45,52 @@ struct xwmm_memslice {
         dtor_f dtor; /**< 析构函数 */
 };
 
+/**
+ * @brief XWMM API：静态方式初始化内存切片分配器
+ * @param[in] msa: 内存切片分配器对象的指针
+ * @param[in] origin: 建立内存切片分配算法的内存区域首地址
+ * @param[in] total_size: 建立内存切片分配算法的内存区域大小
+ * @param[in] card_size: 切片大小
+ * @param[in] name: 名字
+ * @param[in] ctor: 切片的构造函数
+ * @param[in] dtor: 切片的析构函数
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -E2SMALL: 内存区域太小
+ * @note
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：不可重入
+ */
 xwer_t xwmm_memslice_init(struct xwmm_memslice * msa,
                           xwptr_t origin, xwsz_t total_size,
                           xwsz_t card_size, const char * name,
                           ctor_f ctor, dtor_f dtor);
+
+/**
+ * @brief XWMM API：申请内存切片
+ * @param[in] msa: 内存切片分配器对象的指针
+ * @param[out] membuf: 指向地址缓存的指针，通过此指针缓存返回申请到的内存的首地址
+ * @return 错误码
+ * @retval -EFAULT: 空指针
+ * @retval -ENOMEM: 内存不足
+ * @note
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
+ */
 xwer_t xwmm_memslice_alloc(struct xwmm_memslice * msa, void ** membuf);
+
+/**
+ * @brief XWMM API：释放内存切片
+ * @param[in] msa: 内存切片分配器对象的指针
+ * @param[in] mem: 内存切片的首地址
+ * @return 错误码
+ * @note
+ * + 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * + 重入性：可重入
+ */
 xwer_t xwmm_memslice_free(struct xwmm_memslice * msa, void * mem);
 
 /**

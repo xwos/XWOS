@@ -64,7 +64,9 @@ xwer_t xwmm_mempool_objcache_init(struct xwmm_mempool_objcache * oc,
                                   const char * name,
                                   xwsz_t objsize, xwsz_t alignment, xwsq_t pg_order,
                                   ctor_f ctor, dtor_f dtor);
+
 xwer_t xwmm_mempool_objcache_alloc(struct xwmm_mempool_objcache * oc, void ** objbuf);
+
 xwer_t xwmm_mempool_objcache_free(struct xwmm_mempool_objcache * oc, void * obj);
 xwer_t xwmm_mempool_objcache_reserve(struct xwmm_mempool_objcache * oc,
                                      xwsz_t reserved);

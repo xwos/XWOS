@@ -5,7 +5,7 @@
 
 #define XWCFG_ARCH__arm 1
 #define XWCFG_SUBARCH__v7m 1
-#define XWCFG_COMPILER__gcc 1
+#define XWCFG_COMPILER__llvm 1
 #define XWCFG_LIBC__picolibc 1
 #define XWCFG_CPU__m7 1
 #define XWCFG_SOC__stm32 1

@@ -50,25 +50,6 @@ void xwmm_bma_divide_block(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb,
 static __xwos_code
 void xwmm_bma_combine(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb);
 
-/**
- * @brief XWMM API：初始化伙伴算法内存块分配器
- * @param[in] bma: 伙伴算法内存块分配器的指针
- * @param[in] name: 名字
- * @param[in] origin: 内存区域的起始地址
- * @param[in] size: 内存区域的大小
- * @param[in] blksize: 伙伴算法内存块分配器中单位内存块的大小
- * @param[in] blkodr: 伙伴算法内存块分配器中单位内存块的数量，以2的blkodr次方形式表示
- * @return 错误码
- * @retval -ESIZE: 内存区域大小不匹配
- * @note
- * - 单位内存块的数量只能是2的n次方，即2, 4, 8, 16, 32, 64, 128, ...，对应的blkodr
- *   分别为1, 2, 3, 4, 5, 6, 7, ...；
- * - 内存区域大小必须满足关系：size == (blksize * (1 << blkodr))。
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：不可重入
- */
 __xwos_api
 xwer_t xwmm_bma_init(struct xwmm_bma * bma, const char * name,
                      xwptr_t origin, xwsz_t size,
@@ -288,20 +269,6 @@ void xwmm_bma_divide_block(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb,
         }
 }
 
-/**
- * @brief XWMM API：申请一块连续的内存
- * @param[in] bma: 伙伴算法内存块分配器对象的指针
- * @param[in] order: 块数量的阶，内存块大小：((1 << order) * bma->blksize)
- * @param[out] membuf: 指向地址缓存的指针，通过此指针缓存返回申请到的内存的首地址
- * @return 错误码
- * @retval -EFAULT: 空指针
- * @retval -ERANGE: order无效
- * @retval -ENOMEM: 内存不足
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwos_api
 xwer_t xwmm_bma_alloc(struct xwmm_bma * bma, xwsq_t order, void ** membuf)
 {
@@ -386,19 +353,6 @@ void xwmm_bma_combine(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb)
         xwmm_bma_orderlist_add(bma, &bma->orderlists[odr], bcb);
 }
 
-/**
- * @brief XWMM API：释放内存块
- * @param[in] bma: 伙伴算法内存块分配器对象的指针
- * @param[in] mem: 内存块的首地址指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EINVAL: 参数错误
- * @retval -ERANGE: 内存块不属于指定的伙伴算法内存块分配器对象
- * @note
- * - 同步/异步：同步
- * - 上下文：中断、中断底半部、线程
- * - 重入性：可重入
- */
 __xwos_api
 xwer_t xwmm_bma_free(struct xwmm_bma * bma, void * mem)
 {
