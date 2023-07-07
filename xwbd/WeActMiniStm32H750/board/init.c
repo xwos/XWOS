@@ -46,7 +46,7 @@ extern xwsz_t dtcm_mr_pos[];
 #define DTCM_PAGE_ORDER 5 /* 128K / 4K == 32 == exp2(5) */
 
 /**
- * @brief mempool in DTCM
+ * @brief DTCM内存池
  */
 __xwbsp_data XWMM_MEMPOOL_DEF(dtcm_mempool, DTCM_PAGE_ORDER);
 

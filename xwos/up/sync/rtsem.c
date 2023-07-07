@@ -13,7 +13,9 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
-#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+#if defined(XWOSCFG_SYNC_SEM_MEMPOOL) && (1 == XWOSCFG_SYNC_SEM_MEMPOOL)
+#  include <xwos/mm/mempool/allocator.h>
+#elif defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
 #  include <xwos/mm/memslice.h>
 #elif defined(XWOSCFG_SYNC_SEM_STDC_MM) && (1 == XWOSCFG_SYNC_SEM_STDC_MM)
 #  include <stdlib.h>
@@ -28,6 +30,29 @@
 #  include <xwos/up/sync/evt.h>
 #endif
 #include <xwos/up/sync/rtsem.h>
+
+
+#if defined(XWOSCFG_SYNC_SEM_MEMPOOL) && (1 == XWOSCFG_SYNC_SEM_MEMPOOL)
+/**
+ * @brief 结构体 `xwup_rtsem` 的对象缓存
+ */
+static __xwup_data struct xwmm_mempool_objcache xwup_rtsem_cache;
+
+/**
+ * @brief 结构体 `xwup_rtsem` 的对象缓存的名字
+ */
+const __xwup_rodata char xwup_rtsem_cache_name[] = "xwup.sync.rtsem.cache";
+#elif defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+/**
+ * @brief 结构体 `xwup_rtsem` 的对象缓存
+ */
+static __xwup_data struct xwmm_memslice xwup_rtsem_cache;
+
+/**
+ * @brief 结构体 `xwup_rtsem` 的对象缓存的名字
+ */
+const __xwup_rodata char xwup_rtsem_cache_name[] = "xwup.sync.rtsem.cache";
+#endif
 
 #if (1 == XWOSRULE_SYNC_SEM_CREATE_DELETE)
 static __xwup_code
@@ -76,19 +101,36 @@ xwer_t xwup_rtsem_blkthd_unlkwq_cpuirqrs(struct xwup_rtsem * sem,
 static __xwup_code
 xwer_t xwup_rtsem_test_unintr(struct xwup_rtsem * sem, struct xwup_thd * thd);
 
-#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+#if defined(XWOSCFG_SYNC_SEM_MEMPOOL) && (1 == XWOSCFG_SYNC_SEM_MEMPOOL)
 /**
- * @brief 结构体 `xwup_rtsem` 的对象缓存
+ * @brief XWUP INIT CODE：初始化 `struct xwup_rtsem` 的对象缓存
+ * @param[in] mp: 内存池
+ * @param[in] page_order: 每次预先申请页的数量的阶，几阶就是2的几次方
+ * @return 错误码
+ * @note
+ * + 重入性：只可在系统初始化时使用一次
+ * @details
+ * 内存池中，每一页内存固定为4096字节，对象缓存每次会预先申请
+ * 大小为 `pow(2, page_order) * 4096` 字节的内存页，并建立对象缓存。
+ * 当对象使用完后，才会再次申请大小为 `pow(2, page_order) * 4096` 字节的内存页，
+ * 并扩展对象缓存。
  */
-static __xwup_data struct xwmm_memslice xwup_rtsem_cache;
+__xwup_init_code
+xwer_t xwup_rtsem_cache_init(struct xwmm_mempool * mp, xwsq_t page_order)
+{
+        xwer_t rc;
 
-/**
- * @brief 结构体 `xwup_rtsem` 的对象缓存的名字
- */
-const __xwup_rodata char xwup_rtsem_cache_name[] = "xwup.sync.rtsem.cache";
-#endif
-
-#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+        rc = xwmm_mempool_objcache_init(&xwup_rtsem_cache,
+                                        &mp->pa,
+                                        xwup_rtsem_cache_name,
+                                        sizeof(struct xwup_rtsem),
+                                        XWMM_ALIGNMENT,
+                                        page_order,
+                                        (ctor_f)xwup_rtsem_construct,
+                                        (dtor_f)xwup_rtsem_destruct);
+        return rc;
+}
+#elif defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
 /**
  * @brief XWUP INIT CODE：初始化结构体 `xwup_rtsem` 的对象缓存
  * @param[in] zone_origin: 内存区域的首地址
@@ -119,7 +161,19 @@ xwer_t xwup_rtsem_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 static __xwup_code
 struct xwup_rtsem * xwup_rtsem_alloc(void)
 {
-#  if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+#  if defined(XWOSCFG_SYNC_SEM_MEMPOOL) && (1 == XWOSCFG_SYNC_SEM_MEMPOOL)
+        union {
+                struct xwup_rtsem * rtsem;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = xwmm_mempool_objcache_alloc(&xwup_rtsem_cache, &mem.anon);
+        if (rc < 0) {
+                mem.rtsem = err_ptr(rc);
+        }
+        return mem.rtsem;
+#  elif defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
         union {
                 struct xwup_rtsem * rtsem;
                 void * anon;
@@ -155,7 +209,9 @@ struct xwup_rtsem * xwup_rtsem_alloc(void)
 static __xwup_code
 void xwup_rtsem_free(struct xwup_rtsem * sem)
 {
-#  if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+#  if defined(XWOSCFG_SYNC_SEM_MEMPOOL) && (1 == XWOSCFG_SYNC_SEM_MEMPOOL)
+        xwmm_mempool_objcache_free(&xwup_rtsem_cache, sem);
+#  elif defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
         xwmm_memslice_free(&xwup_rtsem_cache, sem);
 #  elif defined(XWOSCFG_SKD_RTSEM_STDC_MM) && (1 == XWOSCFG_SKD_RTSEM_STDC_MM)
         xwup_rtsem_destruct(sem);

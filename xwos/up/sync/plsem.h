@@ -14,6 +14,11 @@
 #define __xwos_up_sync_plsem_h__
 
 #include <xwos/standard.h>
+#if defined(XWOSCFG_SYNC_SEM_MEMPOOL) && (1 == XWOSCFG_SYNC_SEM_MEMPOOL)
+#  include <xwos/mm/mempool/allocator.h>
+#elif defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+#  include <xwos/mm/memslice.h>
+#endif
 #include <xwos/up/plwq.h>
 #include <xwos/up/sync/vsem.h>
 
@@ -27,7 +32,9 @@ struct xwup_plsem {
 
 xwer_t xwup_plsem_intr(struct xwup_plsem * sem, struct xwup_wqn * wqn);
 
-#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+#if defined(XWOSCFG_SYNC_SEM_MEMPOOL) && (1 == XWOSCFG_SYNC_SEM_MEMPOOL)
+xwer_t xwup_plsem_cache_init(struct xwmm_mempool * mp, xwsq_t page_order);
+#elif defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
 xwer_t xwup_plsem_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
 xwer_t xwup_plsem_init(struct xwup_plsem * sem, xwssq_t val, xwssq_t max);

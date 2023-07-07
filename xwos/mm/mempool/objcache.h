@@ -66,7 +66,7 @@ struct xwmm_mempool_objcache {
  * @param[in] name: 名字
  * @param[in] objsize: 对象的大小
  * @param[in] alignment: 对齐的大小
- * @param[in] pg_order: 每次申请的页的数量的阶
+ * @param[in] pg_order: 每次预先申请页的数量的阶，几阶就是2的几次方
  * @param[in] ctor: 构造函数
  * @param[in] dtor: 析构函数
  * @return 错误码

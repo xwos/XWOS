@@ -15,6 +15,11 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
+#if defined(XWOSCFG_SKD_THD_MEMPOOL) && (1 == XWOSCFG_SKD_THD_MEMPOOL)
+#  include <xwos/mm/mempool/allocator.h>
+#elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+#  include <xwos/mm/memslice.h>
+#endif
 #include <xwos/mp/skd.h>
 #include <xwos/mp/tt.h>
 
@@ -48,8 +53,9 @@ struct xwmp_swt {
         xwtm_t period; /**< 周期 */
 };
 
-/* public */
-#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
+#if defined(XWOSCFG_SKD_SWT_MEMPOOL) && (1 == XWOSCFG_SKD_SWT_MEMPOOL)
+xwer_t xwmp_swt_cache_init(struct xwmm_mempool * mp, xwsq_t page_order);
+#elif defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
 xwer_t xwmp_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
 

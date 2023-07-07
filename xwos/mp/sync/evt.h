@@ -15,6 +15,11 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
+#if defined(XWOSCFG_SYNC_EVT_MEMPOOL) && (1 == XWOSCFG_SYNC_EVT_MEMPOOL)
+#  include <xwos/mm/mempool/allocator.h>
+#elif defined(XWOSCFG_SYNC_EVT_MEMSLICE) && (1 == XWOSCFG_SYNC_EVT_MEMSLICE)
+#  include <xwos/mm/memslice.h>
+#endif
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/sync/obj.h>
 #include <xwos/mp/sync/cond.h>
@@ -42,7 +47,9 @@ struct xwmp_evt {
         xwbmp_t * msk; /**< 掩码位图 */
 };
 
-#if defined(XWOSCFG_SYNC_EVT_MEMSLICE) && (1 == XWOSCFG_SYNC_EVT_MEMSLICE)
+#if defined(XWOSCFG_SYNC_EVT_MEMPOOL) && (1 == XWOSCFG_SYNC_EVT_MEMPOOL)
+xwer_t xwmp_evt_cache_init(struct xwmm_mempool * mp, xwsq_t page_order);
+#elif defined(XWOSCFG_SYNC_EVT_MEMSLICE) && (1 == XWOSCFG_SYNC_EVT_MEMSLICE)
 xwer_t xwmp_evt_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
 

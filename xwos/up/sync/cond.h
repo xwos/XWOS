@@ -14,6 +14,11 @@
 #define __xwos_up_sync_cond_h__
 
 #include <xwos/standard.h>
+#if defined(XWOSCFG_SYNC_COND_MEMPOOL) && (1 == XWOSCFG_SYNC_COND_MEMPOOL)
+#  include <xwos/mm/mempool/allocator.h>
+#elif defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
+#  include <xwos/mm/memslice.h>
+#endif
 #include <xwos/up/plwq.h>
 #include <xwos/up/sync/obj.h>
 
@@ -34,9 +39,12 @@ xwer_t xwup_cond_activate(struct xwup_cond * cond, xwobj_gc_f gcfunc);
 xwer_t xwup_cond_intr(struct xwup_cond * cond, struct xwup_wqn * wqn);
 xwer_t xwup_cond_intr_all(struct xwup_cond * cond);
 
-#if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
+#if defined(XWOSCFG_SYNC_COND_MEMPOOL) && (1 == XWOSCFG_SYNC_COND_MEMPOOL)
+xwer_t xwup_cond_cache_init(struct xwmm_mempool * mp, xwsq_t page_order);
+#elif defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
 xwer_t xwup_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
+
 xwer_t xwup_cond_init(struct xwup_cond * cond);
 xwer_t xwup_cond_fini(struct xwup_cond * cond);
 xwer_t xwup_cond_create(struct xwup_cond ** ptrbuf);

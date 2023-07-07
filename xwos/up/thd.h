@@ -19,6 +19,11 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
 #include <xwos/mm/common.h>
+#if defined(XWOSCFG_SKD_THD_MEMPOOL) && (1 == XWOSCFG_SKD_THD_MEMPOOL)
+#  include <xwos/mm/mempool/allocator.h>
+#elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+#  include <xwos/mm/memslice.h>
+#endif
 #include <xwos/up/skd.h>
 #include <xwos/up/wqn.h>
 #include <xwos/up/tt.h>
@@ -154,6 +159,12 @@ void xwup_thd_wakeup(struct xwup_thd * thd)
 {
         xwup_thd_rq_add_tail(thd);
 }
+
+#if defined(XWOSCFG_SKD_THD_MEMPOOL) && (1 == XWOSCFG_SKD_THD_MEMPOOL)
+xwer_t xwup_thd_cache_init(struct xwmm_mempool * mp, xwsq_t page_order);
+#elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+xwer_t xwup_thd_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
+#endif
 
 void xwup_thd_attr_init(struct xwup_thd_attr * attr);
 xwer_t xwup_thd_init(struct xwup_thd * thd,

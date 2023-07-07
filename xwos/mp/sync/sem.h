@@ -14,6 +14,11 @@
 #define __xwos_mp_sync_sem_h__
 
 #include <xwos/standard.h>
+#if defined(XWOSCFG_SYNC_SEM_MEMPOOL) && (1 == XWOSCFG_SYNC_SEM_MEMPOOL)
+#  include <xwos/mm/mempool/allocator.h>
+#elif defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+#  include <xwos/mm/memslice.h>
+#endif
 #include <xwos/mp/rtwq.h>
 #include <xwos/mp/plwq.h>
 #include <xwos/mp/sync/obj.h>
@@ -72,7 +77,9 @@ xwer_t xwmp_plsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn);
 xwer_t xwmp_rtsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn);
 #endif
 
-#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+#if defined(XWOSCFG_SYNC_SEM_MEMPOOL) && (1 == XWOSCFG_SYNC_SEM_MEMPOOL)
+xwer_t xwmp_sem_cache_init(struct xwmm_mempool * mp, xwsq_t page_order);
+#elif defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
 xwer_t xwmp_sem_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
 

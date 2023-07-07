@@ -13,7 +13,9 @@
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
 #include <xwos/mm/common.h>
-#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
+#if defined(XWOSCFG_SKD_SWT_MEMPOOL) && (1 == XWOSCFG_SKD_SWT_MEMPOOL)
+#  include <xwos/mm/mempool/allocator.h>
+#elif defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
 #  include <xwos/mm/memslice.h>
 #elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
 #  include <stdlib.h>
@@ -22,7 +24,18 @@
 #include <xwos/mp/tt.h>
 #include <xwos/mp/swt.h>
 
-#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
+
+#if defined(XWOSCFG_SKD_SWT_MEMPOOL) && (1 == XWOSCFG_SKD_SWT_MEMPOOL)
+/**
+ * @brief 软件定时器对象缓存
+ */
+static __xwmp_data struct xwmm_mempool_objcache xwmp_swt_cache;
+
+/**
+ * @brief 软件定时器对象缓存的名字
+ */
+const __xwmp_rodata char xwmp_swt_cache_name[] = "xwmp.swt.cache";
+#elif defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
 /**
  * @brief 软件定时器对象缓存
  */
@@ -62,7 +75,32 @@ xwer_t xwmp_swt_dgc(struct xwos_object * obj);
 static __xwmp_code
 void xwmp_swt_ttn_callback(struct xwmp_ttn * ttn);
 
-#if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
+
+#if defined(XWOSCFG_SKD_SWT_MEMPOOL) && (1 == XWOSCFG_SKD_SWT_MEMPOOL)
+/**
+ * @brief XWMP INIT CODE：初始化软件定时器对象缓存
+ * @param[in] zone_origin: 内存区域首地址
+ * @param[in] zone_size: 内存区域大小
+ * @return 错误码
+ * @note
+ * - 重入性：只可在系统初始化时使用一次
+ */
+__xwmp_init_code
+xwer_t xwmp_swt_cache_init(struct xwmm_mempool * mp, xwsq_t page_order)
+{
+        xwer_t rc;
+
+        rc = xwmm_mempool_objcache_init(&xwmp_swt_cache,
+                                        &mp->pa,
+                                        xwmp_swt_cache_name,
+                                        sizeof(struct xwmp_swt),
+                                        XWMM_ALIGNMENT,
+                                        page_order,
+                                        (ctor_f)xwmp_swt_construct,
+                                        (dtor_f)xwmp_swt_destruct);
+        return rc;
+}
+#elif defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
 /**
  * @brief XWMP INIT CODE：初始化软件定时器对象缓存
  * @param[in] zone_origin: 内存区域首地址
@@ -93,7 +131,19 @@ xwer_t xwmp_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 static __xwmp_code
 struct xwmp_swt * xwmp_swt_alloc(void)
 {
-#  if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
+#  if defined(XWOSCFG_SKD_SWT_MEMPOOL) && (1 == XWOSCFG_SKD_SWT_MEMPOOL)
+        union {
+                struct xwmp_swt * swt;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = xwmm_mempool_objcache_alloc(&xwmp_swt_cache, &mem.anon);
+        if (rc < 0) {
+                mem.swt = err_ptr(rc);
+        }
+        return mem.swt;
+#  elif defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
         union {
                 struct xwmp_swt * swt;
                 void * anon;
@@ -129,7 +179,9 @@ struct xwmp_swt * xwmp_swt_alloc(void)
 static __xwmp_code
 void xwmp_swt_free(struct xwmp_swt * swt)
 {
-#  if defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
+#  if defined(XWOSCFG_SKD_SWT_MEMPOOL) && (1 == XWOSCFG_SKD_SWT_MEMPOOL)
+        xwmm_mempool_objcache_free(&xwmp_swt_cache, swt);
+#  elif defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
         xwmm_memslice_free(&xwmp_swt_cache, swt);
 #  elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
         xwmp_swt_destruct(swt);

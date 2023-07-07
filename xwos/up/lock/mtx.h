@@ -18,6 +18,11 @@
 #include <xwos/lib/xwbop.h>
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
+#if defined(XWOSCFG_LOCK_MTX_MEMPOOL) && (1 == XWOSCFG_LOCK_MTX_MEMPOOL)
+#  include <xwos/mm/mempool/allocator.h>
+#elif defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
+#  include <xwos/mm/memslice.h>
+#endif
 #include <xwos/up/rtwq.h>
 
 struct xwup_mtxtree;
@@ -44,7 +49,9 @@ struct xwup_mtx {
 
 xwer_t xwup_mtx_intr(struct xwup_mtx * mtx, struct xwup_thd * thd);
 
-#if defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
+#if defined(XWOSCFG_LOCK_MTX_MEMPOOL) && (1 == XWOSCFG_LOCK_MTX_MEMPOOL)
+xwer_t xwup_mtx_cache_init(struct xwmm_mempool * mp, xwsq_t page_order);
+#elif defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
 xwer_t xwup_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
 xwer_t xwup_mtx_init(struct xwup_mtx * mtx, xwpr_t sprio);

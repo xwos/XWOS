@@ -14,6 +14,11 @@
 #define __xwos_mp_sync_cond_h__
 
 #include <xwos/standard.h>
+#if defined(XWOSCFG_SYNC_COND_MEMPOOL) && (1 == XWOSCFG_SYNC_COND_MEMPOOL)
+#  include <xwos/mm/mempool/allocator.h>
+#elif defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
+#  include <xwos/mm/memslice.h>
+#endif
 #include <xwos/mp/sync/obj.h>
 #include <xwos/mp/plwq.h>
 
@@ -37,7 +42,9 @@ xwer_t xwmp_cond_activate(struct xwmp_cond * cond, xwobj_gc_f gcfunc);
 xwer_t xwmp_cond_intr(struct xwmp_cond * cond, struct xwmp_wqn * wqn);
 xwer_t xwmp_cond_intr_all(struct xwmp_cond * cond);
 
-#if defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
+#if defined(XWOSCFG_SYNC_COND_MEMPOOL) && (1 == XWOSCFG_SYNC_COND_MEMPOOL)
+xwer_t xwmp_cond_cache_init(struct xwmm_mempool * mp, xwsq_t page_order);
+#elif defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
 xwer_t xwmp_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
 

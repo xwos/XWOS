@@ -19,7 +19,9 @@
 #include <xwos/standard.h>
 #include <xwos/lib/xwbop.h>
 #include <xwos/mm/common.h>
-#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+#if defined(XWOSCFG_SYNC_SEM_MEMPOOL) && (1 == XWOSCFG_SYNC_SEM_MEMPOOL)
+#  include <xwos/mm/mempool/allocator.h>
+#elif defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
 #  include <xwos/mm/memslice.h>
 #elif defined(XWOSCFG_SYNC_SEM_STDC_MM) && (1 == XWOSCFG_SYNC_SEM_STDC_MM)
 #  include <stdlib.h>
@@ -39,7 +41,18 @@
 #include <xwos/mp/sync/obj.h>
 #include <xwos/mp/sync/sem.h>
 
-#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+
+#if defined(XWOSCFG_SYNC_SEM_MEMPOOL) && (1 == XWOSCFG_SYNC_SEM_MEMPOOL)
+/**
+ * @brief 结构体 `xwmp_sem` 的对象缓存
+ */
+static __xwmp_data struct xwmm_mempool_objcache xwmp_sem_cache;
+
+/**
+ * @brief 结构体 `xwmp_sem` 的对象缓存的名字
+ */
+const __xwmp_rodata char xwmp_sem_cache_name[] = "xwmp.sync.sem.cache";
+#elif defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
 /**
  * @brief 结构体 `xwmp_sem` 的对象缓存
  */
@@ -126,7 +139,36 @@ xwer_t xwmp_rtsem_test_unintr(struct xwmp_sem * sem,
                               struct xwmp_thd * thd, struct xwmp_skd * xwskd);
 #endif
 
-#if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+#if defined(XWOSCFG_SYNC_SEM_MEMPOOL) && (1 == XWOSCFG_SYNC_SEM_MEMPOOL)
+/**
+ * @brief XWMP INIT CODE：初始化 `struct xwmp_sem` 的对象缓存
+ * @param[in] mp: 内存池
+ * @param[in] page_order: 每次预先申请页的数量的阶，几阶就是2的几次方
+ * @return 错误码
+ * @note
+ * + 重入性：只可在系统初始化时使用一次
+ * @details
+ * 内存池中，每一页内存固定为4096字节，对象缓存每次会预先申请
+ * 大小为 `pow(2, page_order) * 4096` 字节的内存页，并建立对象缓存。
+ * 当对象使用完后，才会再次申请大小为 `pow(2, page_order) * 4096` 字节的内存页，
+ * 并扩展对象缓存。
+ */
+__xwmp_init_code
+xwer_t xwmp_sem_cache_init(struct xwmm_mempool * mp, xwsq_t page_order)
+{
+        xwer_t rc;
+
+        rc = xwmm_mempool_objcache_init(&xwmp_sem_cache,
+                                        &mp->pa,
+                                        xwmp_sem_cache_name,
+                                        sizeof(struct xwmp_sem),
+                                        XWMM_ALIGNMENT,
+                                        page_order,
+                                        (ctor_f)xwmp_sem_construct,
+                                        (dtor_f)xwmp_sem_destruct);
+        return rc;
+}
+#elif defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
 /**
  * @brief XWMP INIT CODE：初始化结构体 `xwmp_sem` 的对象缓存
  * @param[in] zone_origin: 内存区域的首地址
@@ -157,7 +199,19 @@ xwer_t xwmp_sem_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
 static __xwmp_code
 struct xwmp_sem * xwmp_sem_alloc(void)
 {
-#  if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+#  if defined(XWOSCFG_SYNC_SEM_MEMPOOL) && (1 == XWOSCFG_SYNC_SEM_MEMPOOL)
+        union {
+                struct xwmp_sem * sem;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = xwmm_mempool_objcache_alloc(&xwmp_sem_cache, &mem.anon);
+        if (rc < 0) {
+                mem.sem = err_ptr(rc);
+        }
+        return mem.sem;
+#  elif defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
         union {
                 struct xwmp_sem * sem;
                 void * anon;
@@ -193,7 +247,9 @@ struct xwmp_sem * xwmp_sem_alloc(void)
 static __xwmp_code
 void xwmp_sem_free(struct xwmp_sem * sem)
 {
-#  if defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
+#  if defined(XWOSCFG_SYNC_SEM_MEMPOOL) && (1 == XWOSCFG_SYNC_SEM_MEMPOOL)
+        xwmm_mempool_objcache_free(&xwmp_sem_cache, sem);
+#  elif defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
         xwmm_memslice_free(&xwmp_sem_cache, sem);
 #  elif defined(XWOSCFG_SYNC_SEM_STDC_MM) && (1 == XWOSCFG_SYNC_SEM_STDC_MM)
         xwmp_sem_destruct(sem);

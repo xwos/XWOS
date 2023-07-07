@@ -19,6 +19,11 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
 #include <xwos/mm/common.h>
+#if defined(XWOSCFG_SKD_THD_MEMPOOL) && (1 == XWOSCFG_SKD_THD_MEMPOOL)
+#  include <xwos/mm/mempool/allocator.h>
+#elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+#  include <xwos/mm/memslice.h>
+#endif
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/skd.h>
 #include <xwos/mp/wqn.h>
@@ -149,7 +154,9 @@ xwer_t xwmp_thd_freeze_lic(struct xwmp_thd * thd);
 void xwmp_thd_immigrate_lic(struct xwmp_thd * thd);
 xwer_t xwmp_thd_outmigrate_lic(struct xwmp_thd * thd, xwid_t dstcpu);
 
-#if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+#if defined(XWOSCFG_SKD_THD_MEMPOOL) && (1 == XWOSCFG_SKD_THD_MEMPOOL)
+xwer_t xwmp_thd_cache_init(struct xwmm_mempool * mp, xwsq_t page_order);
+#elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
 xwer_t xwmp_thd_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
 #endif
 

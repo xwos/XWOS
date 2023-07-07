@@ -17,7 +17,9 @@
 #include <xwos/lib/bclst.h>
 #include <xwos/lib/rbtree.h>
 #include <xwos/mm/common.h>
-#if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+#if defined(XWOSCFG_SKD_THD_MEMPOOL) && (1 == XWOSCFG_SKD_THD_MEMPOOL)
+#  include <xwos/mm/mempool/allocator.h>
+#elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
 #  include <xwos/mm/memslice.h>
 #elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
 #  include <stdlib.h>
@@ -50,7 +52,18 @@
 #  include <xwos/up/sync/cond.h>
 #endif
 
-#if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+
+#if defined(XWOSCFG_SKD_THD_MEMPOOL) && (1 == XWOSCFG_SKD_THD_MEMPOOL)
+/**
+ * @brief 结构体 `xwup_thd` 的对象缓存
+ */
+static __xwup_data struct xwmm_mempool_objcache xwup_thd_cache;
+
+/**
+ * @brief 结构体 `xwup_thd` 的对象缓存的名字
+ */
+const __xwup_rodata char xwup_thd_cache_name[] = "xwup.thd.cache";
+#elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
 /**
  * @brief 结构体 `xwup_thd` 的对象缓存
  */
@@ -118,7 +131,36 @@ void xwup_thd_wqn_callback(struct xwup_wqn * wqn);
 static __xwup_code
 void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f thdfunc, void * arg);
 
-#if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+#if defined(XWOSCFG_SKD_THD_MEMPOOL) && (1 == XWOSCFG_SKD_THD_MEMPOOL)
+/**
+ * @brief XWUP INIT CODE：初始化 `struct xwup_thd` 的对象缓存
+ * @param[in] mp: 内存池
+ * @param[in] page_order: 每次预先申请页的数量的阶，几阶就是2的几次方
+ * @return 错误码
+ * @note
+ * + 重入性：只可在系统初始化时使用一次
+ * @details
+ * 内存池中，每一页内存固定为4096字节，对象缓存每次会预先申请
+ * 大小为 `pow(2, page_order) * 4096` 字节的内存页，并建立对象缓存。
+ * 当对象使用完后，才会再次申请大小为 `pow(2, page_order) * 4096` 字节的内存页，
+ * 并扩展对象缓存。
+ */
+__xwup_init_code
+xwer_t xwup_thd_cache_init(struct xwmm_mempool * mp, xwsq_t page_order)
+{
+        xwer_t rc;
+
+        rc = xwmm_mempool_objcache_init(&xwup_thd_cache,
+                                        &mp->pa,
+                                        xwup_thd_cache_name,
+                                        sizeof(struct xwup_thd),
+                                        XWMM_ALIGNMENT,
+                                        page_order,
+                                        (ctor_f)xwup_thd_construct,
+                                        (dtor_f)xwup_thd_destruct);
+        return rc;
+}
+#elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
 /**
  * @brief XWUP API：初始化结构体xwup_thd的对象缓存
  * @param[in] zone_origin: 内存区域的首地址
@@ -222,7 +264,19 @@ xwer_t xwup_thd_put(struct xwup_thd * thd)
 static __xwup_code
 struct xwup_thd * xwup_thd_alloc(void)
 {
-#  if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+#  if defined(XWOSCFG_SKD_THD_MEMPOOL) && (1 == XWOSCFG_SKD_THD_MEMPOOL)
+        union {
+                struct xwup_thd * thd;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = xwmm_mempool_objcache_alloc(&xwup_thd_cache, &mem.anon);
+        if (rc < 0) {
+                mem.thd = err_ptr(rc);
+        }
+        return mem.thd;
+#  elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
         union {
                 struct xwup_thd * thd;
                 void * anon;
@@ -258,7 +312,9 @@ struct xwup_thd * xwup_thd_alloc(void)
 static __xwup_code
 void xwup_thd_free(struct xwup_thd * thd)
 {
-#  if defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
+#  if defined(XWOSCFG_SKD_THD_MEMPOOL) && (1 == XWOSCFG_SKD_THD_MEMPOOL)
+        xwmm_mempool_objcache_free(&xwup_thd_cache, thd);
+#  elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
         xwmm_memslice_free(&xwup_thd_cache, thd);
 #  elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         free(thd);
