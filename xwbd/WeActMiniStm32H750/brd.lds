@@ -34,10 +34,10 @@ MEMORY {
         armv7m_ivt_vmr (rw): org = 0x20000000, len = 2048 /* vectors table vma region */
         firmware_info_mr (rx): org = 0x90000800, len = 1k /* firmware info */
         code_mr (rx): org = 0x90000C00, len = 8189k /* text & rodata */
-        xwos_data_mr (arw): org = 0x20000800, len = 54k /* .xwos.data in DTCM */
+        xwos_data_mr (arw): org = 0x20000800, len = 126k /* .xwos.data in DTCM */
         data_mr (arw): org = 0x30000000, len = 288k /* .data & .bss in SRAM */
         data4_mr (arw): org = 0x38000000, len = 64k /* .data4 for D3 Domain */
-        armv7m_isr_stack_mr (arw): org = 0x2000E000, len = 8k /* xwos stack */
+        armv7m_isr_stack_mr (arw): org = 0x0000E000, len = 8k /* ISR stack in ITCM */
 }
 
 dtcm_mr_origin = ORIGIN(dtcm_mr);

@@ -42,7 +42,6 @@ MEMORY {
 
 dtcm_mr_origin = ORIGIN(dtcm_mr);
 dtcm_mr_size = LENGTH(dtcm_mr);
-dtcm_mr_pos = xwos_data_vma_end;
 
 axisram_mr_origin = ORIGIN(axisram_mr);
 axisram_mr_size = LENGTH(axisram_mr);
