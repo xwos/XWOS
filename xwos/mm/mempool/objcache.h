@@ -59,17 +59,64 @@ struct xwmm_mempool_objcache {
         } page_list; /**< 页链表 */
 };
 
+/**
+ * @brief XWMM API：初始化对象缓存
+ * @param[in] oc: 对象缓存的指针
+ * @param[in] pa: 页分配器的指针
+ * @param[in] name: 名字
+ * @param[in] objsize: 对象的大小
+ * @param[in] alignment: 对齐的大小
+ * @param[in] pg_order: 每次申请的页的数量的阶
+ * @param[in] ctor: 构造函数
+ * @param[in] dtor: 析构函数
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EALIGN: 内存区域没有对齐
+ */
 xwer_t xwmm_mempool_objcache_init(struct xwmm_mempool_objcache * oc,
                                   struct xwmm_mempool_page_allocator * pa,
                                   const char * name,
                                   xwsz_t objsize, xwsz_t alignment, xwsq_t pg_order,
                                   ctor_f ctor, dtor_f dtor);
 
+/**
+ * @brief XWMM API：从对象缓存中申请一个对象
+ * @param[in] oc: 对象缓存的指针
+ * @param[out] objbuf: 指向缓冲区的指针，此缓冲区被用于返回对象的指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -ENOMEM: 内存不足
+ */
 xwer_t xwmm_mempool_objcache_alloc(struct xwmm_mempool_objcache * oc, void ** objbuf);
 
+/**
+ * @brief XWMM API：释放对象到对象缓存中
+ * @param[in] oc: 对象缓存的指针
+ * @param[in] obj: 对象的指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -ERANGE: 内存地址不在内存池的范围内
+ */
 xwer_t xwmm_mempool_objcache_free(struct xwmm_mempool_objcache * oc, void * obj);
+
+/**
+ * @brief XWMM API：预留对象到对象缓存中
+ * @param[in] oc: 对象缓存的指针
+ * @param[in] reserved: 预留的数量
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -ENOMEM: 内存不足
+ */
 xwer_t xwmm_mempool_objcache_reserve(struct xwmm_mempool_objcache * oc,
                                      xwsz_t reserved);
+
+/**
+ * @brief XWMM API：获取对象缓存的容量
+ * @param[in] oc: 对象缓存的指针
+ * @param[out] capacity: 指向缓冲区的指针，通过此缓冲区返回对象缓存的容量
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ */
 xwer_t xwmm_mempool_objcache_get_capacity(struct xwmm_mempool_objcache * oc,
                                           xwsz_t * capacity);
 

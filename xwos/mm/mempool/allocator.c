@@ -238,7 +238,7 @@ xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
                 if (membuf) {
                         *membuf = mem;
                 }
-        }
+        } else {}
         return XWOK;
 
 err_mempool_prealloc:
