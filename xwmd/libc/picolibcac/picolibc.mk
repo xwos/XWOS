@@ -9,9 +9,6 @@
 # > License, v. 2.0. If a copy of the MPL was not distributed with this
 # > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
 
-$(eval $(call XwmoReqCfg,XWEMCFG_fs_fatfs,y))
-$(eval $(call XwmoReqCfg,XWMMCFG_MEMPOOL,y))
-
 XWMO_CSRCS := mif.c
 XWMO_CSRCS += errno.c
 XWMO_CSRCS += lock.c

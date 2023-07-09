@@ -51,6 +51,8 @@ ifeq ($(XWCFG_LIBC),picolibc)
   XWMO_CSRCS += picolibc/mem.c
 endif
 
+XWMO_CSRCS += xwrust/allocator.c
+
 XWMO_CSRCS += fatfs/sdcard.c
 
 XWMO_CSRCS += lua/mem.c

@@ -9,12 +9,11 @@
 
 #![no_std]
 
-use libc_print::std_name::println;
+use xwrust::xwmm::allocator::AllocatorMempool;
 
 #[global_allocator]
-pub static ALLOCATOR: xwrust::xwmm::Allocator = xwrust::xwmm::Allocator;
+pub static GLOBAL_ALLOCATOR: AllocatorMempool = AllocatorMempool;
 
 #[no_mangle]
 pub unsafe extern "C" fn xwrust_main() {
-    println!("XWOS RUST");
 }

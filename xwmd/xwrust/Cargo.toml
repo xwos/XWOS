@@ -10,4 +10,3 @@ license = "MPL-2.0"
 name = "xwrust"
 
 [dependencies]
-libc = "0.2"

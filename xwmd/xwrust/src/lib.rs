@@ -19,12 +19,14 @@
 //! // crate-type = ["staticlib"]
 //! #![no_std]
 //!
+//! use xwrust::xwmm::allocator::AllocatorMempool;
+//!
 //! #[global_allocator]
-//! pub static ALLOCATOR: xwrust::xwmm::Allocator = xwrust::xwmm::Allocator;
+//! pub static GLOBAL_ALLOCATOR: AllocatorMempool = AllocatorMempool;
 //!
 //! #[no_mangle]
 //! pub unsafe extern "C" fn xwrust_main() {
-//!     // 主线程的代码
+//!     // 用户代码
 //! }
 //! ```
 //!
@@ -73,6 +75,8 @@
 //!
 //! XWOS RUST提供了RTOS的基本功能：
 //!
+//! + [内存管理](crate::xwmm)
+//!   + [全局内存分配器](crate::xwmm::allocator)
 //! + [调度器](crate::xwos::skd)
 //! + [电源管理](crate::xwos::pm)
 //! + [线程](crate::xwos::thd)

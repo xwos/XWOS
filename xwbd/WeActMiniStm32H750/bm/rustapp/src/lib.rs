@@ -10,6 +10,7 @@ pub mod button;
 use libc_print::std_name::println;
 
 use xwrust::xwtm;
+use xwrust::xwmm::allocator::AllocatorMempool;
 use xwrust::xwos::cthd;
 
 use xwrust_example_vector::xwrust_example_vector;
@@ -28,11 +29,11 @@ use xwrust_example_xwcq::xwrust_example_xwcq;
 use xwrust_example_xwmq::xwrust_example_xwmq;
 
 #[global_allocator]
-pub static ALLOCATOR: xwrust::xwmm::Allocator = xwrust::xwmm::Allocator;
+pub static GLOBAL_ALLOCATOR: AllocatorMempool = AllocatorMempool;
 
 #[no_mangle]
 pub unsafe extern "C" fn xwrust_main() {
-    println!("XWOS RUST App");
+    println!("XWOS RUST APP");
     button::start();
 
     xwrust_example_vector();
