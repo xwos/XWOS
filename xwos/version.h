@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS通用库：版本号
+ * @brief XWOS版本号
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -10,26 +10,24 @@
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
  */
 
-#ifndef __xwos_lib_version_h__
-#define __xwos_lib_version_h__
+#ifndef __xwos_version_h__
+#define __xwos_version_h__
 
 #ifndef __xwos_standard_h__
 #  error "This file should be included from <xwos/standard.h>."
 #endif
 
 /**
- * @defgroup xwos_lib_version XWOS的版本号
- * @ingroup xwos_lib
+ * @defgroup xwos_version XWOS的版本号
+ * @ingroup xwos
  * @{
  */
 /**
  * @page xwos_version_page XWOS的版本号
  * #### 版本号规则: M.m.r
- *   - M: 大版本号
- *   - m: 小版本号
- *     + 奇数：开发版
- *     + 偶数：稳定版
- *   - r: 修订号
+ *   - M: 大版本号，里程碑版本
+ *   - m: 小版本号，功能修订与更新
+ *   - r: 修订号，BUG修复
  */
 
 /**
@@ -71,7 +69,7 @@
         "  Copyright (C) 2015 xwos.tech, All Rights Reserved."
 
 /**
- * @} xwos_lib_version
+ * @} xwos_version
  */
 
-#endif /* xwos/lib/version.h */
+#endif /* xwos/version.h */

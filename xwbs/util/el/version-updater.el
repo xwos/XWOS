@@ -129,7 +129,7 @@
 ;;;;;;;; ;;;;;;;; ;;;;;;;; env ;;;;;;;; ;;;;;;;; ;;;;;;;;
 (defvar XWOS-topdir (expand-directory elpath "../../../"))
 (defvar XWOS-kndir (expand-directory XWOS-topdir "xwos/"))
-(defvar XWOS-version-file (expand-file-name "lib/version.h" XWOS-kndir))
+(defvar XWOS-version-file (expand-file-name "version.h" XWOS-kndir))
 
 ;;(logd "XWOS-topdir:%s" XWOS-topdir)
 ;;(logd "XWOS-version-file:%s" XWOS-version-file)

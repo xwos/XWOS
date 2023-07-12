@@ -43,4 +43,4 @@ void xwos_postinit(void);
  */
 xwer_t xwos_main(void);
 
-#endif /* xwos/lib/init.h */
+#endif /* xwos/init.h */
