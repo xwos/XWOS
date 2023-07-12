@@ -19,14 +19,28 @@
  * @defgroup xwos_lib_rbtree 红黑树
  * @ingroup xwos_lib
  * ## 红黑树性质
- * -   1. 节点不是红色就是黑色；
- * -   2. 根节点是黑色；
- * -   3. 所有的叶子都是黑色；
- * -   4. 每个红色的节点，如果有子节点，必须是黑色；
- * -   5. 从任意节点到其任意子树的叶子的路径上，所包含的黑色节点数量相同。
- * ## 算法特点
- * -   红黑树节点的内存地址必须按4字节对齐，其地址信息的低两位必须为0，
- *     算法使用这两个空闲的位存放位置(pos)和颜色(color)信息。
+ * + 1. 节点不是红色就是黑色；
+ * + 2. 根节点是黑色；
+ * + 3. 所有的叶子都是黑色；
+ * + 4. 每个红色的节点，如果有子节点，必须是黑色；
+ * + 5. 从任意节点到其任意子树的叶子的路径上，所包含的黑色节点数量相同。
+ *
+ * ## 本算法的特点
+ * + 和标准红黑树算法不同，本算法在每个节点中引入一个 **链指针** ，
+ *   指向节点在父节点上连接的位置。
+ *   由于强制约定节点的内存地址必须按 `sizeof(void *)` 对齐，
+ *   节点结构体内部三个指针成员的地址的低两位必定为 `0b00` 。
+ *   因此 **链指针** 在数值上的低两位必定为 `0b00` 。
+ *   本算法使用这两个空闲的位来存放 **位置(pos)** 和 **颜色(color)** 信息。
+ *   **链指针** 、 **位置(pos)** 和 **颜色(color)** 统一被称为 `lpc` 。
+ * + 为了更通用，本算法有如下要求：
+ *   + 用户需要将红黑树的节点结构体 `struct xwlib_rbtree_node` 嵌入到用户结构体中使用。
+ *     已知节点的指针，可通过 @ref xwlib_rbtree_entry() 来计算用户结构体的指针。
+ *   + 用户需要自己实现二叉树的查找、插入和删除方法：
+ *     + 查找：可以参考 @ref xwlib_map_find()
+ *     + 插入：可以参考 @ref xwlib_map_insert()
+ *     + 删除：可以参考 @ref xwlib_map_erase()
+ *
  * @{
  */
 
@@ -54,9 +68,9 @@ struct __xwcc_alignptr xwlib_rbtree_node {
         struct xwlib_rbtree_node * right; /**< 指向右孩子 */
         union {
                 struct xwlib_rbtree_node ** link; /**< 链指针，指向父节点中连接的位置 */
-                xwptr_t pos; /**< 只使用bit0，位置信息 */
-                xwptr_t color; /**< 只使用bit1，颜色信息 */
-                xwptr_t v; /**< 所有信息 */
+                xwptr_t pos; /**< 只使用 `bit0` ，位置信息 */
+                xwptr_t color; /**< 只使用 `bit1` ，颜色信息 */
+                xwptr_t v; /**< 所有信息的整数表达 */
         } lpc; /**< 链指针，位置，颜色的合并信息 */
 };
 
@@ -212,10 +226,13 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
  * @return 父节点指针
  * @note
  * + `left` 是 @ref xwlib_rbtree_node 的第一个成员。
- * + `&parent->left` 与 `&parent` 在数值上是相等的（指针就是位宽等于CPU位宽的无符号整数）。
+ * + `&parent->left` 与 `&parent` 在数值上是相等的（指针
+ *   就是位宽等于CPU位宽的无符号整数）。
  *   + 当 `link` 指向 `parent->left` 时，其数值就等于 `parent` 的地址；
- *   + 当 `link` 指向 `parent->right` 时，其数值减去 `sizeof(void *)` 后可获取 `parent` 地址。
- * + 当父节点不存在（红黑树第一个节点），其 `link` 指针指向 `root` ，此函数返回 `root` 的地址。
+ *   + 当 `link` 指向 `parent->right` 时，其数值减去 `sizeof(void *)` 后，
+ *     可获取 `parent` 地址。
+ * + 当父节点不存在，表示此节点是红黑树的第一个节点，其 `link` 指针指向 `root` ，
+ *   此函数返回 `root` 的地址。
  */
 static __xwlib_inline
 struct xwlib_rbtree_node * xwlib_rbtree_get_parent(struct xwlib_rbtree_node * node)
@@ -232,6 +249,8 @@ struct xwlib_rbtree_node * xwlib_rbtree_get_parent(struct xwlib_rbtree_node * no
  * @brief 从lpc信息返回父节点指针
  * @param[in] lpc: 链指针，位置，颜色的合并值
  * @return 父节点指针
+ * @note
+ * `lpc` 是从节点内取出的值，说明同 @ref xwlib_rbtree_get_parent() 。
  */
 static __xwlib_inline
 struct xwlib_rbtree_node * xwlib_rbtree_get_parent_from_lpc(xwptr_t lpc)
@@ -263,7 +282,7 @@ bool xwlib_rbtree_tst_root(struct xwlib_rbtree * rbt,
 }
 
 /**
- * @brief 测试是否连接到根节点
+ * @brief 测试是否连接到根节点（是否为根节点的子节点）
  * @param[in] rbt: 红黑树指针
  * @param[in] link: 链指针
  * @return 布尔值
@@ -288,7 +307,7 @@ void xwlib_rbtree_flip_color(struct xwlib_rbtree_node * node)
 }
 
 /**
- * @brief 将节点设为黑色
+ * @brief 将节点设置为黑色
  * @param[in] node: 红黑树节点指针
  */
 static __xwlib_inline
@@ -298,7 +317,7 @@ void xwlib_rbtree_set_black(struct xwlib_rbtree_node * node)
 }
 
 /**
- * @brief 将节点设为红色
+ * @brief 将节点设置为红色
  * @param[in] node: 红黑树节点指针
  */
 static __xwlib_inline
@@ -310,7 +329,7 @@ void xwlib_rbtree_set_red(struct xwlib_rbtree_node * node)
 /**
  * @brief 链接节点，并设置位置及颜色信息
  * @param[in] node: 被链接的节点指针
- * @param[in] lpc: 链指针，位置，颜色的合并值
+ * @param[in] lpc: 链指针、位置和颜色的合并值
  */
 static __xwlib_inline
 void xwlib_rbtree_link(struct xwlib_rbtree_node * node, xwptr_t lpc)
@@ -371,7 +390,7 @@ xwlib_rbtree_get_successor(struct xwlib_rbtree_node * node)
 
 /**
  * @brief 用新节点代替旧节点并继承它的链指针、颜色和位置信息，
- *        但新节点并不接管旧节点的孩子节点
+ *        但新节点并不接管旧节点的子节点
  * @param[in] newn: 新节点指针
  * @param[in] oldn: 旧节点指针
  */
@@ -417,10 +436,29 @@ bool xwlib_rbtree_tst_node_unlinked(struct xwlib_rbtree_node * n)
         return !!(0 == n->lpc.v);
 }
 
+/**
+ * @brief 插入一个红色节点后修正红黑树的颜色
+ * @param[in] tree: 红黑树的指针
+ * @param[in] node: 待修正颜色的节点的指针
+ */
 void xwlib_rbtree_insert_color(struct xwlib_rbtree * tree,
                                struct xwlib_rbtree_node * node);
+
+/**
+ * @brief 删除一个节点，并修正红黑树的颜色
+ * @param[in] tree: 红黑树的指针
+ * @param[in] node: 待删除的节点的指针
+ * @note
+ * + 此函数假设不存在节点没有链接到红黑树的情形。
+ */
 void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                          struct xwlib_rbtree_node * node);
+
+/**
+ * @brief 用一个新节点代替旧节点，继承它的颜色、位置信息并接管它的子树
+ * @param[in] newn: 新节点的指针
+ * @param[in] oldn: 旧节点的指针
+ */
 void xwlib_rbtree_replace(struct xwlib_rbtree_node * newn,
                           struct xwlib_rbtree_node * oldn);
 

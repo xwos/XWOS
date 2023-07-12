@@ -1,5 +1,6 @@
 + @subpage xwos
   + @subpage xwos_standard
+  + @subpage xwos_version
   + @subpage xwos_time
   + @subpage xwos_irq
   + @subpage xwos_skd
@@ -17,9 +18,9 @@
   + @subpage xwos_sync_br
   + @subpage xwos_sync_sel
 + @subpage xwos_lib
-  + @subpage xwos_lib_version
   + @subpage xwos_lib_compiler
   + @subpage xwos_lib_error
+  + @subpage xwos_lib_errno
   + @subpage xwos_lib_type
   + @subpage xwos_lib_bclst
   + @subpage xwos_lib_rbtree

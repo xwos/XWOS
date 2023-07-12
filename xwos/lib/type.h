@@ -29,196 +29,204 @@
 #endif
 #define NIL  NULL
 
-#if !defined(ARCH_HAVE_XWU8_T)
-typedef uint8_t xwu8_t;
+#if !defined(ARCH_HAVE_XWU8_T) || defined(__DOXYGEN__)
+typedef uint8_t xwu8_t; /**< 8位无符号整数 */
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWU8_T)
-typedef __xwcc_atomic xwu8_t atomic_xwu8_t;
+#if !defined(ARCH_HAVE_ATOMIC_XWU8_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xwu8_t atomic_xwu8_t; /**< 原子的8位无符号整数 */
 #endif
 
-#if !defined(ARCH_HAVE_XWS8_T)
-typedef int8_t xws8_t;
+#if !defined(ARCH_HAVE_XWS8_T) || defined(__DOXYGEN__)
+typedef int8_t xws8_t; /**< 8位有符号整数 */
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWS8_T)
-typedef __xwcc_atomic xws8_t atomic_xws8_t;
+#if !defined(ARCH_HAVE_ATOMIC_XWS8_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xws8_t atomic_xws8_t; /**< 原子的8位有符号整数 */
 #endif
 
-#if !defined(ARCH_HAVE_XWU16_T)
-typedef uint16_t xwu16_t;
+#if !defined(ARCH_HAVE_XWU16_T) || defined(__DOXYGEN__)
+typedef uint16_t xwu16_t; /**< 16位无符号整数 */
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWU16_T)
-typedef __xwcc_atomic xwu16_t atomic_xwu16_t;
+#if !defined(ARCH_HAVE_ATOMIC_XWU16_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xwu16_t atomic_xwu16_t; /**< 原子的16位无符号整数 */
 #endif
 
-#if !defined(ARCH_HAVE_XWS16_T)
-typedef int16_t xws16_t;
+#if !defined(ARCH_HAVE_XWS16_T) || defined(__DOXYGEN__)
+typedef int16_t xws16_t; /**< 16位有符号整数 */
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWS16_T)
-typedef __xwcc_atomic xws16_t atomic_xws16_t;
+#if !defined(ARCH_HAVE_ATOMIC_XWS16_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xws16_t atomic_xws16_t; /**< 原子的16位有符号整数 */
 #endif
 
-#if !defined(ARCH_HAVE_XWU32_T)
-typedef uint32_t xwu32_t;
+#if !defined(ARCH_HAVE_XWU32_T) || defined(__DOXYGEN__)
+typedef uint32_t xwu32_t; /**< 32位无符号整数 */
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWU32_T)
-typedef __xwcc_atomic xwu32_t atomic_xwu32_t;
+#if !defined(ARCH_HAVE_ATOMIC_XWU32_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xwu32_t atomic_xwu32_t; /**< 原子的32位无符号整数 */
 #endif
 
-#if !defined(ARCH_HAVE_XWS32_T)
-typedef int32_t xws32_t;
+#if !defined(ARCH_HAVE_XWS32_T) || defined(__DOXYGEN__)
+typedef int32_t xws32_t; /**< 32位有符号整数 */
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWS32_T)
-typedef __xwcc_atomic xws32_t atomic_xws32_t;
+#if !defined(ARCH_HAVE_ATOMIC_XWS32_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xws32_t atomic_xws32_t; /**< 原子的32位有符号整数 */
 #endif
 
-#if !defined(ARCH_HAVE_XWU64_T)
-typedef uint64_t xwu64_t;
+#if !defined(ARCH_HAVE_XWU64_T) || defined(__DOXYGEN__)
+typedef uint64_t xwu64_t; /**< 64位无符号整数 */
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWU64_T)
-typedef __xwcc_atomic xwu64_t atomic_xwu64_t;
+#if !defined(ARCH_HAVE_ATOMIC_XWU64_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xwu64_t atomic_xwu64_t; /**< 原子的64位无符号整数 */
 #endif
 
-#if !defined(ARCH_HAVE_XWS64_T)
-typedef int64_t xws64_t;
+#if !defined(ARCH_HAVE_XWS64_T) || defined(__DOXYGEN__)
+typedef int64_t xws64_t; /**< 64位有符号整数 */
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWS64_T)
-typedef __xwcc_atomic xws64_t atomic_xws64_t;
+#if !defined(ARCH_HAVE_ATOMIC_XWS64_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xws64_t atomic_xws64_t; /**< 原子的64位有符号整数 */
 #endif
 
-#if !defined(ARCH_HAVE_XWSZ_T)
-typedef unsigned long xwsz_t; /**< 大小值 (无符号) */
+#if !defined(ARCH_HAVE_XWSZ_T) || defined(__DOXYGEN__)
+typedef unsigned long xwsz_t; /**< 大小值（无符号）*/
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWSZ_T)
-typedef __xwcc_atomic xwsz_t atomic_xwsz_t; /**< 大小值 (无符号，原子的) */
+#if !defined(ARCH_HAVE_ATOMIC_XWSZ_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xwsz_t atomic_xwsz_t; /**< 大小值（无符号，原子的）*/
 #endif
 
-#if !defined(ARCH_HAVE_XWSSZ_T)
-typedef signed long xwssz_t; /**< 大小值 (有符号) */
+#if !defined(ARCH_HAVE_XWSSZ_T) || defined(__DOXYGEN__)
+typedef signed long xwssz_t; /**< 大小值（有符号）*/
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWSSZ_T)
-typedef __xwcc_atomic xwssz_t atomic_xwssz_t; /**< 大小值 (有符号，原子的) */
+#if !defined(ARCH_HAVE_ATOMIC_XWSSZ_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xwssz_t atomic_xwssz_t; /**< 大小值（有符号，原子的）*/
 #endif
 
-#if !defined(ARCH_HAVE_XWSTK_T)
+#if !defined(ARCH_HAVE_XWSTK_T) || defined(__DOXYGEN__)
 typedef unsigned long xwstk_t; /**< 栈槽 */
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWSTK_T)
-typedef __xwcc_atomic xwstk_t atomic_xwstk_t; /**< 栈槽 (原子的) */
+#if !defined(ARCH_HAVE_ATOMIC_XWSTK_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xwstk_t atomic_xwstk_t; /**< 栈槽（原子的）*/
 #endif
 
-#if !defined(ARCH_HAVE_XWPTR_T)
+#if !defined(ARCH_HAVE_XWPTR_T) || defined(__DOXYGEN__)
 typedef unsigned long xwptr_t; /**< 指针数值 */
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWPTR_T)
-typedef __xwcc_atomic xwptr_t atomic_xwptr_t; /**< 指针数值 (原子的) */
+#if !defined(ARCH_HAVE_ATOMIC_XWPTR_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xwptr_t atomic_xwptr_t; /**< 指针数值（原子的）*/
 #endif
 
-#if !defined(ARCH_HAVE_XWREG_T)
-typedef unsigned long xwreg_t; /**< 寄存器数值 (无符号) */
+#if !defined(ARCH_HAVE_XWREG_T) || defined(__DOXYGEN__)
+typedef unsigned long xwreg_t; /**< 寄存器数值（无符号）*/
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWREG_T)
-typedef __xwcc_atomic xwreg_t atomic_xwreg_t; /**< 寄存器数值 (无符号，原子的) */
+#if !defined(ARCH_HAVE_ATOMIC_XWREG_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xwreg_t atomic_xwreg_t; /**< 寄存器数值（无符号，原子的）*/
 #endif
 
-#if !defined(ARCH_HAVE_XWSREG_T)
-typedef signed long xwsreg_t; /**< 寄存器数值 (有符号) */
+#if !defined(ARCH_HAVE_XWSREG_T) || defined(__DOXYGEN__)
+typedef signed long xwsreg_t; /**< 寄存器数值（有符号）*/
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWSREG_T)
-typedef __xwcc_atomic xwsreg_t atomic_xwsreg_t; /**< 寄存器数值 (有符号，原子的) */
+#if !defined(ARCH_HAVE_ATOMIC_XWSREG_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xwsreg_t atomic_xwsreg_t; /**< 寄存器数值（有符号，原子的）*/
 #endif
 
-#if !defined(ARCH_HAVE_XWSQ_T)
-typedef unsigned long xwsq_t; /**< 顺序值 (无符号) */
+#if !defined(ARCH_HAVE_XWSQ_T) || defined(__DOXYGEN__)
+typedef unsigned long xwsq_t; /**< 顺序值（无符号）*/
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWSQ_T)
-typedef __xwcc_atomic xwsq_t atomic_xwsq_t; /**< 顺序值 (无符号，原子的) */
+#if !defined(ARCH_HAVE_ATOMIC_XWSQ_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xwsq_t atomic_xwsq_t; /**< 顺序值（无符号，原子的）*/
 #endif
 
-#if !defined(ARCH_HAVE_XWSSQ_T)
-typedef signed long xwssq_t; /**< 顺序值 (有符号) */
+#if !defined(ARCH_HAVE_XWSSQ_T) || defined(__DOXYGEN__)
+typedef signed long xwssq_t; /**< 顺序值（有符号）*/
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWSSQ_T)
-typedef __xwcc_atomic xwssq_t atomic_xwssq_t; /**< 顺序值 (有符号，原子的) */
+#if !defined(ARCH_HAVE_ATOMIC_XWSSQ_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xwssq_t atomic_xwssq_t; /**< 顺序值（有符号，原子的）*/
 #endif
 
-#if !defined(ARCH_HAVE_XWID_T)
-typedef unsigned long xwid_t; /**< ID (无符号) */
+#if !defined(ARCH_HAVE_XWID_T) || defined(__DOXYGEN__)
+typedef unsigned long xwid_t; /**< ID（无符号）*/
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWID_T)
-typedef __xwcc_atomic xwid_t atomic_xwid_t; /**< ID (无符号，原子的) */
+#if !defined(ARCH_HAVE_ATOMIC_XWID_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xwid_t atomic_xwid_t; /**< ID（无符号，原子的）*/
 #endif
 
-#if !defined(ARCH_HAVE_XWSID_T)
-typedef signed long xwsid_t; /**< ID (有符号) */
+#if !defined(ARCH_HAVE_XWSID_T) || defined(__DOXYGEN__)
+typedef signed long xwsid_t; /**< ID（有符号）*/
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWSID_T)
-typedef __xwcc_atomic xwsid_t atomic_xwsid_t; /**< ID (有符号，原子的) */
+#if !defined(ARCH_HAVE_ATOMIC_XWSID_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xwsid_t atomic_xwsid_t; /**< ID（有符号，原子的）*/
 #endif
 
-#if !defined(ARCH_HAVE_XWISR_F)
+#if !defined(ARCH_HAVE_XWISR_F) || defined(__DOXYGEN__)
 typedef void (* xwisr_f)(void); /**< 中断向量 */
 #endif
 
-#if !defined(ARCH_HAVE_XWIRQ_T)
-typedef signed int xwirq_t; /**< 中断号 (有符号) */
+#if !defined(ARCH_HAVE_XWIRQ_T) || defined(__DOXYGEN__)
+typedef signed int xwirq_t; /**< 中断号（有符号）*/
 #endif
 
-#if !defined(ARCH_HAVE_XWPR_T)
-typedef signed int xwpr_t; /**< 优先级 (有符号) */
+#if !defined(ARCH_HAVE_XWPR_T) || defined(__DOXYGEN__)
+typedef signed int xwpr_t; /**< 优先级（有符号）*/
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWPR_T)
-typedef __xwcc_atomic xwpr_t atomic_xwpr_t; /**< 优先级 (有符号，原子的) */
+#if !defined(ARCH_HAVE_ATOMIC_XWPR_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xwpr_t atomic_xwpr_t; /**< 优先级（有符号，原子的）*/
 #endif
 
-#if !defined(ARCH_HAVE_XWER_T)
-typedef signed long xwer_t; /**< 错误码 (有符号) */
+#if !defined(ARCH_HAVE_XWER_T) || defined(__DOXYGEN__)
+typedef signed long xwer_t; /**< 错误码（有符号）*/
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWER_T)
-typedef __xwcc_atomic xwer_t atomic_xwer_t; /**< 错误码 (有符号，原子的) */
+#if !defined(ARCH_HAVE_ATOMIC_XWER_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xwer_t atomic_xwer_t; /**< 错误码（有符号，原子的）*/
 #endif
 
-#if !defined(ARCH_HAVE_XWBMP_T)
-typedef xwu32_t xwbmp_t; /**< 位图 (无符号) */
+#if !defined(ARCH_HAVE_XWBMP_T) || defined(__DOXYGEN__)
+typedef xwu32_t xwbmp_t; /**< 位图（无符号）*/
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWBMP_T)
-typedef __xwcc_atomic xwbmp_t atomic_xwbmp_t; /**< 位图 (无符号，原子的) */
+#if !defined(ARCH_HAVE_ATOMIC_XWBMP_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xwbmp_t atomic_xwbmp_t; /**< 位图（无符号，原子的）*/
 #endif
 
-#if !defined(ARCH_HAVE_XWTM_T)
-typedef xws64_t xwtm_t; /**< XWOS系统时间 (有符号) */
+#if !defined(ARCH_HAVE_XWTM_T) || defined(__DOXYGEN__)
+/**
+ * @ingroup xwos_lib_type_time
+ * @brief XWOS系统时间（有符号)
+ */
+typedef xws64_t xwtm_t;
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWTM_T)
-typedef __xwcc_atomic xwtm_t atomic_xwtm_t; /**< XWOS系统时间 (有符号，原子的) */
+#if !defined(ARCH_HAVE_ATOMIC_XWTM_T) || defined(__DOXYGEN__)
+/**
+ * @ingroup xwos_lib_type_time
+ * @brief XWOS系统时间（有符号，原子的)
+ */
+typedef __xwcc_atomic xwtm_t atomic_xwtm_t;
 #endif
 
-#if !defined(ARCH_HAVE_XWLFQ_T)
+#if !defined(ARCH_HAVE_XWLFQ_T) || defined(__DOXYGEN__)
 typedef xwptr_t xwlfq_t; /**< 无锁队列 */
 #endif
 
-#if !defined(ARCH_HAVE_ATOMIC_XWLFQ_T)
-typedef __xwcc_atomic xwlfq_t atomic_xwlfq_t; /**< 无锁队列 (原子的) */
+#if !defined(ARCH_HAVE_ATOMIC_XWLFQ_T) || defined(__DOXYGEN__)
+typedef __xwcc_atomic xwlfq_t atomic_xwlfq_t; /**< 无锁队列（原子的）*/
 #endif
 
 typedef void (* ctor_f)(void * /*obj*/); /**< 构造函数 */
@@ -241,6 +249,8 @@ typedef void (* xwaop_op_f)(void * /* nv */,
 
 /**
  * @brief 原子操作内存模型
+ * @details
+ * 对应于 `stdatomic.h` 中定义的六种内存模型。
  */
 enum xwaop_memory_order_em {
         xwaop_mo_relaxed = 0,
@@ -317,164 +327,310 @@ union xwos_ulock {
 };
 
 #ifndef UCHAR_MAX
+/**
+ * @brief `unsigned char` 的最大值
+ */
 #  define UCHAR_MAX     ((unsigned char)(~((unsigned char)0)))
 #endif
 #ifndef CHAR_MAX
+/**
+ * @brief `signed char` 的最大值
+ */
 #  define CHAR_MAX      ((signed char)(UCHAR_MAX >> (unsigned char)1))
 #endif
 #ifndef CHAR_MIN
+/**
+ * @brief `signed char` 的最小值
+ */
 #  define CHAR_MIN      ((signed char)(-CHAR_MAX - (signed char)1))
 #endif
 
 #ifndef USHRT_MAX
+/**
+ * @brief `unsigned short` 的最大值
+ */
 #  define USHRT_MAX     ((unsigned short)(~((unsigned short)0)))
 #endif
 #ifndef SHRT_MAX
+/**
+ * @brief `signed short` 的最大值
+ */
 #  define SHRT_MAX      ((signed short)(USHRT_MAX >> (unsigned short)1))
 #endif
 #ifndef SHRT_MIN
+/**
+ * @brief `signed short` 的最小值
+ */
 #  define SHRT_MIN      ((signed short)(-SHRT_MAX - (signed short)1))
 #endif
 
 #ifndef UINT_MAX
+/**
+ * @brief `unsigned int` 的最大值
+ */
 #  define UINT_MAX      ((unsigned int)(~((unsigned int)0)))
 #endif
 #ifndef INT_MAX
+/**
+ * @brief `signed int` 的最大值
+ */
 #  define INT_MAX       ((signed int)(UINT_MAX >> (unsigned int)1))
 #endif
 #ifndef INT_MIN
+/**
+ * @brief `signed int` 的最小值
+ */
 #  define INT_MIN       ((signed int)(-INT_MAX - (signed int)1))
 #endif
 
 #ifndef ULONG_MAX
+/**
+ * @brief `unsigned long` 的最大值
+ */
 #  define ULONG_MAX     ((unsigned long)(~((unsigned long)0)))
 #endif
 #ifndef LONG_MAX
+/**
+ * @brief `signed long` 的最大值
+ */
 #  define LONG_MAX      ((signed long)(ULONG_MAX >> (unsigned long)1))
 #endif
 #ifndef LONG_MIN
+/**
+ * @brief `signed long` 的最小值
+ */
 #  define LONG_MIN      ((signed long)(-LONG_MAX - (signed long)1))
 #endif
 
 #ifndef ULLONG_MAX
+/**
+ * @brief `unsigned long long` 的最大值
+ */
 #  define ULLONG_MAX    ((unsigned long long)(~((unsigned long long)0)))
 #endif
 #ifndef LLONG_MAX
+/**
+ * @brief `signed long long` 的最大值
+ */
 #  define LLONG_MAX     ((signed long long)(ULLONG_MAX >> (unsigned long long)1))
 #endif
 #ifndef LLONG_MIN
+/**
+ * @brief `signed long long` 的最小值
+ */
 #  define LLONG_MIN     ((signed long long)(-LLONG_MAX - (signed long long)1))
 #endif
 
 #ifndef XWU8_MAX
+/**
+ * @brief `xwu8_t` 的最大值
+ */
 #  define XWU8_MAX      ((xwu8_t)(~((xwu8_t)0)))
 #endif
 #ifndef XWS8_MAX
+/**
+ * @brief `xws8_t` 的最大值
+ */
 #  define XWS8_MAX      ((xws8_t)(XWU8_MAX >> (xwu8_t)1))
 #endif
 #ifndef XWS8_MIN
+/**
+ * @brief `xws8_t` 的最小值
+ */
 #  define XWS8_MIN      ((xws8_t)(-XWS8_MAX - (xws8_t)1))
 #endif
 
 #ifndef XWU16_MAX
+/**
+ * @brief `xwu16_t` 的最大值
+ */
 #  define XWU16_MAX     ((xwu16_t)(~((xwu16_t)0)))
 #endif
 #ifndef XWS16_MAX
+/**
+ * @brief `xws16_t` 的最大值
+ */
 #  define XWS16_MAX     ((xws16_t)(XWU16_MAX >> (xwu16_t)1))
 #endif
 #ifndef XWS16_MIN
+/**
+ * @brief `xws16_t` 的最小值
+ */
 #  define XWS16_MIN     ((xws16_t)(-XWS16_MAX - (xws16_t)1))
 #endif
 
 #ifndef XWU32_MAX
+/**
+ * @brief `xwu32_t` 的最大值
+ */
 #  define XWU32_MAX     ((xwu32_t)(~((xwu32_t)0)))
 #endif
 #ifndef XWS32_MAX
+/**
+ * @brief `xws32_t` 的最大值
+ */
 #  define XWS32_MAX     ((xws32_t)(XWU32_MAX >> (xwu32_t)1))
 #endif
 #ifndef XWS32_MIN
+/**
+ * @brief `xws32_t` 的最小值
+ */
 #  define XWS32_MIN     ((xws32_t)(-XWS32_MAX - (xws32_t)1))
 #endif
 
 #ifndef XWU64_MAX
+/**
+ * @brief `xwu64_t` 的最大值
+ */
 #  define XWU64_MAX     ((xwu64_t)(~((xwu64_t)0)))
 #endif
 #ifndef XWS64_MAX
+/**
+ * @brief `xws64_t` 的最大值
+ */
 #  define XWS64_MAX     ((xws64_t)(XWU64_MAX >> (xwu64_t)1))
 #endif
 #ifndef XWS64_MIN
+/**
+ * @brief `xws64_t` 的最小值
+ */
 #  define XWS64_MIN     ((xws64_t)(-XWS64_MAX - (xws64_t)1))
 #endif
 
 #ifndef XWSZ_MAX
+/**
+ * @brief `xwsz_t` 的最大值
+ */
 #  define XWSZ_MAX      ((xwsz_t)(~((xwsz_t)0)))
 #endif
 #ifndef XWSSZ_MAX
+/**
+ * @brief `xwssz_t` 的最大值
+ */
 #  define XWSSZ_MAX     ((xwssz_t)(XWSZ_MAX >> (xwsz_t)1))
 #endif
 #ifndef XWSSZ_MIN
+/**
+ * @brief `xwssz_t` 的最小值
+ */
 #  define XWSSZ_MIN     ((xwssz_t)(-XWSSZ_MAX - (xwssz_t)1))
 #endif
 
 #ifndef XWPTR_MAX
+/**
+ * @brief `xwptr_t` 的最大值
+ */
 #  define XWPTR_MAX     ((xwptr_t)(~(xwptr_t)0))
 #endif
 
 #ifndef XWREG_MAX
+/**
+ * @brief `xwreg_t` 的最大值
+ */
 #  define XWREG_MAX     ((xwreg_t)(~((xwreg_t)0)))
 #endif
 #ifndef XWSREG_MAX
+/**
+ * @brief `xwsreg_t` 的最大值
+ */
 #  define XWSREG_MAX    ((xwsreg_t)(XWREG_MAX >> (xwreg_t)1))
 #endif
 #ifndef XWSREG_MIN
+/**
+ * @brief `xwsreg_t` 的最小值
+ */
 #  define XWSREG_MIN    ((xwsreg_t)(-XWSREG_MAX - (xwsreg_t)1))
 #endif
 
 #ifndef XWER_MAX
+/**
+ * @brief `xwer_t` 的最大值
+ */
 #  define XWER_MAX      ((xwer_t)OK)
 #endif
 #ifndef XWER_MIN
+/**
+ * @brief `xwer_t` 的最小值
+ */
 #  define XWER_MIN      ((xwer_t)(-MAX_ERRNO))
 #endif
 
 #ifndef XWSQ_MAX
+/**
+ * @brief `xwsq_t` 的最大值
+ */
 #  define XWSQ_MAX      ((xwsq_t)(~((xwsq_t)0)))
 #endif
 #ifndef XWSSQ_MAX
+/**
+ * @brief `xwssq_t` 的最大值
+ */
 #  define XWSSQ_MAX     ((xwssq_t)(XWSQ_MAX >> (xwsq_t)1))
 #endif
 #ifndef XWSSQ_MIN
+/**
+ * @brief `xwssq_t` 的最小值
+ */
 #  define XWSSQ_MIN     ((xwssq_t)(-XWSSQ_MAX - (xwssq_t)1))
 #endif
 
 #ifndef XWID_MAX
+/**
+ * @brief `xwid_t` 的最大值
+ */
 #  define XWID_MAX      ((xwid_t)(~((xwid_t)0)))
 #endif
 #ifndef XWSID_MAX
+/**
+ * @brief `xwsid_t` 的最大值
+ */
 #  define XWSID_MAX     ((xwsid_t)(XWID_MAX >> (xwid_t)1))
 #endif
 #ifndef XWSID_MIN
+/**
+ * @brief `xwsid_t` 的最小值
+ */
 #  define XWSID_MIN     ((xwsid_t)(-XWSID_MAX - (xwsid_t)1))
 #endif
 
 #ifndef XWIRQ_MAX
+/**
+ * @brief `xwirq_t` 的最大值
+ */
 #  define XWIRQ_MAX     ((xwirq_t)((~(xwu32_t)0) >> (xwu32_t)1))
 #endif
 #ifndef XWIRQ_MIN
+/**
+ * @brief `xwirq_t` 的最小值
+ */
 #  define XWIRQ_MIN     ((xwirq_t)(-XWIRQ_MAX - (xwirq_t)1))
 #endif
 
 #ifndef XWPR_MAX
+/**
+ * @brief `xwpr_t` 的最大值
+ */
 #  define XWPR_MAX      ((xwpr_t)((~(xwu32_t)0) >> (xwu32_t)1))
 #endif
 #ifndef XWPR_MIN
+/**
+ * @brief `xwpr_t` 的最小值
+ */
 #  define XWPR_MIN      ((xwpr_t)(-XWPR_MAX - (xwpr_t)1))
 #endif
 
 #ifndef XWTM_MAX
+/**
+ * @ingroup xwos_lib_type_time
+ * @brief `xwtm_t` 的最大值
+ */
 #  define XWTM_MAX      ((xwtm_t)((~(xwu64_t)0) >> 1))
 #endif
 #ifndef XWTM_MIN
+/**
+ * @ingroup xwos_lib_type_time
+ * @brief `xwtm_t` 的最小值
+ */
 #  define XWTM_MIN      ((xwtm_t)(-XWTM_MAX - (xwtm_t)1))
 #endif
 
@@ -620,58 +776,54 @@ union xwos_ulock {
 #  define XWSSQ_T_SHIFT         LONG_SHIFT
 #endif
 
+/**
+ * @defgroup xwos_lib_type_time XWOS的时间类型
+ * @ingroup xwos_lib_type
+ * @{
+ */
+
 #ifndef XWTM_T__SIZE
 #  define BITS_PER_XWTM_T       BITS_PER_LONGLONG
 #  define XWTM_T_SHIFT          LONGLONG_SHIFT
 #endif
 
-/** @} */ // xwos_lib_type
-
-
 /**
- * @ingroup xwos_time
  * @brief 系统时间的单位：纳秒
  * @param[in] ns: 纳秒
  */
 #define XWTM_NS(ns)     ((ns) * 1LL)
 
 /**
- * @ingroup xwos_time
  * @brief 系统时间的单位：微秒
  * @param[in] us: 微秒
  */
 #define XWTM_US(us)     ((us) * 1000LL)
 
 /**
- * @ingroup xwos_time
  * @brief 系统时间的单位：毫秒
  * @param[in] ms: 毫秒
  */
 #define XWTM_MS(ms)     ((ms) * 1000000LL)
 
 /**
- * @ingroup xwos_time
  * @brief 系统时间的单位：秒
  * @param[in] s: 秒
  */
 #define XWTM_S(s)       ((s) * 1000000000LL)
 
 /**
- * @ingroup xwos_time
  * @brief 系统时间的单位：分
  * @param[in] m: 分
  */
 #define XWTM_M(m)       ((m) * XWTM_S(60))
 
 /**
- * @ingroup xwos_time
  * @brief 系统时间的单位：时
  * @param[in] h: 时
  */
 #define XWTM_H(h)       ((h) * XWTM_M(60))
 
 /**
- * @ingroup xwos_time
  * @brief 系统时间的单位：天
  * @param[in] d: 天
  */
@@ -679,7 +831,6 @@ union xwos_ulock {
 
 #if !defined(ARCH_HAVE_XWTM_T)
 /**
- * @ingroup xwos_time
  * @brief 将两个系统时间相加，并检查溢出
  * @param[in] a: 加数a
  * @param[in] b: 加数b
@@ -700,7 +851,6 @@ xwtm_t xwtm_add_safely(const xwtm_t a, const xwtm_t b)
 }
 
 /**
- * @ingroup xwos_time
  * @brief 将两个系统时间相加
  * @param[in] a: 加数a
  * @param[in] b: 加数b
@@ -713,7 +863,6 @@ xwtm_t xwtm_add(const xwtm_t a, const xwtm_t b)
 }
 
 /**
- * @ingroup xwos_time
  * @brief 将两个系统时间相减
  * @param[in] a: 被减数
  * @param[in] b: 减数
@@ -726,7 +875,6 @@ xwtm_t xwtm_sub(const xwtm_t a, const xwtm_t b)
 }
 
 /**
- * @ingroup xwos_time
  * @brief 比较两个系统时间
  * @param[in] a: 系统时间a
  * @param[in] b: 系统时间b
@@ -751,8 +899,7 @@ xwer_t xwtm_cmp(const xwtm_t a, const xwtm_t b)
 }
 
 /**
- * @ingroup xwos_time
- * @brief 返回以纳秒为单位的系统时间
+ * @brief 返回以 **纳秒** 为单位的系统时间
  * @param[in] ns: 纳秒
  * @return 系统时间
  */
@@ -763,8 +910,7 @@ xwtm_t xwtm_ns(xwtm_t ns)
 }
 
 /**
- * @ingroup xwos_time
- * @brief 返回以微秒为单位的系统时间
+ * @brief 返回以 **微秒** 为单位的系统时间
  * @param[in] us: 微秒
  * @return 系统时间
  */
@@ -775,8 +921,7 @@ xwtm_t xwtm_us(xwtm_t us)
 }
 
 /**
- * @ingroup xwos_time
- * @brief 返回以毫秒为单位的系统时间
+ * @brief 返回以 **毫秒** 为单位的系统时间
  * @param[in] ms: 毫秒
  * @return 系统时间
  */
@@ -787,8 +932,7 @@ xwtm_t xwtm_ms(xwtm_t ms)
 }
 
 /**
- * @ingroup xwos_time
- * @brief 返回以秒为单位的系统时间
+ * @brief 返回以 **秒** 为单位的系统时间
  * @param[in] s: 秒
  * @return 系统时间
  */
@@ -799,8 +943,7 @@ xwtm_t xwtm_s(xwtm_t s)
 }
 
 /**
- * @ingroup xwos_time
- * @brief 返回以分为单位的系统时间
+ * @brief 返回以 **分** 为单位的系统时间
  * @param[in] m: 分
  * @return 系统时间
  */
@@ -811,8 +954,7 @@ xwtm_t xwtm_m(xwtm_t m)
 }
 
 /**
- * @ingroup xwos_time
- * @brief 返回以时为单位的系统时间
+ * @brief 返回以 **时** 为单位的系统时间
  * @param[in] h: 时
  * @return 系统时间
  */
@@ -823,8 +965,7 @@ xwtm_t xwtm_h(xwtm_t h)
 }
 
 /**
- * @ingroup xwos_time
- * @brief 返回以天为单位的系统时间
+ * @brief 返回以 **天** 为单位的系统时间
  * @param[in] d: 天
  * @return 系统时间
  */
@@ -834,5 +975,8 @@ xwtm_t xwtm_d(xwtm_t d)
         return XWTM_D(d);
 }
 #endif
+
+/** @} */ // xwos_lib_type_time
+/** @} */ // xwos_lib_type
 
 #endif /* xwos/lib/type.h */

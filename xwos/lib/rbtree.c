@@ -13,11 +13,6 @@
 #include <xwos/standard.h>
 #include <xwos/lib/rbtree.h>
 
-/**
- * @brief 插入一个红色节点后修正红黑树的颜色
- * @param[in] tree: 红黑树的指针
- * @param[in] node: 待修正颜色的节点的指针
- */
 __xwlib_code __xwcc_hot
 void xwlib_rbtree_insert_color(struct xwlib_rbtree * tree,
                                struct xwlib_rbtree_node * node)
@@ -320,13 +315,6 @@ recursively_fix:
         gparent->lpc.v = rotation; /* flip_color(g): 红 */
 }
 
-/**
- * @brief 删除一个节点，并修正红黑树的颜色
- * @param[in] tree: 红黑树的指针
- * @param[in] node: 待删除的节点的指针
- * @note
- * - 此函数假设不存在节点没有链接到红黑树的情形。
- */
 __xwlib_code __xwcc_hot
 void xwlib_rbtree_remove(struct xwlib_rbtree * tree,
                          struct xwlib_rbtree_node * node)
@@ -1013,11 +1001,6 @@ black_sibling:
         xwlib_rbtree_set_black(sl.same); /* Inherit color of sibling */
 }
 
-/**
- * @brief 用一个新节点代替旧节点，继承它的颜色、位置信息并接管它的子孙。
- * @param[in] newn: 新节点的指针
- * @param[in] oldn: 旧节点的指针
- */
 __xwlib_code __xwcc_hot
 void xwlib_rbtree_replace(struct xwlib_rbtree_node * newn,
                           struct xwlib_rbtree_node * oldn)

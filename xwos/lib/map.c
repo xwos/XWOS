@@ -13,14 +13,6 @@
 #include <xwos/standard.h>
 #include <xwos/lib/map.h>
 
-/**
- * @brief 插入键值对容器
- * @param[in] map: map的指针
- * @param[in] newmc: 键值对容器的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -EEXIST: 键值对已经存在
- */
 __xwlib_code
 xwer_t xwlib_map_insert(struct xwlib_map * map, struct xwlib_map_container * newmc)
 {
@@ -74,14 +66,6 @@ xwer_t xwlib_map_insert(struct xwlib_map * map, struct xwlib_map_container * new
         return rc;
 }
 
-/**
- * @brief 删除键值对容器
- * @param[in] map: map的指针
- * @param[in] mc: 键值对容器的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -ESRCH: 此键值对容器不在键值对集合中
- */
 __xwlib_code
 xwer_t xwlib_map_erase(struct xwlib_map * map, struct xwlib_map_container * mc)
 {
@@ -98,15 +82,6 @@ xwer_t xwlib_map_erase(struct xwlib_map * map, struct xwlib_map_container * mc)
         return rc;
 }
 
-/**
- * @brief 根据“键”查找键值对容器
- * @param[in] map: map的指针
- * @param[in] key: 键值对容器的指针
- * @param[out] mcbuf: 指向指针缓存的指针，此指针缓存用于返回查找到的键值对容器的指针
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -ESRCH: 目标不存在
- */
 __xwlib_code
 xwer_t xwlib_map_find(struct xwlib_map * map, void * key,
                       struct xwlib_map_container ** mcbuf)

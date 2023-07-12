@@ -19,6 +19,11 @@
 /**
  * @defgroup xwos_swt 软件定时器
  * @ingroup xwos
+ * 软件定时器是基于调度器的滴答定时器实现的，因此时间精度为定时器的中断频率。
+ *
+ * 软件定时器可以是 **单次** 的，也可以是 **周期** 的。
+ * 创建 **周期** 的软件定时器需要在调用 `xwos_swt_init()` 或 `xwos_swt_create()`
+ * 时指定标识 @ref XWOS_SWT_FLAG_RESTART 。
  * @{
  */
 

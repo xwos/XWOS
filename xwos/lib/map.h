@@ -8,9 +8,6 @@
  * > This Source Code Form is subject to the terms of the Mozilla Public
  * > License, v. 2.0. If a copy of the MPL was not distributed with this
  * > file, You can obtain one at <http://mozilla.org/MPL/2.0/>.
- * @note
- * # 概述
- *   map是按从“小”到“大”排列的键值对容器的集合。在map中，“键”是唯一的。
  */
 
 #ifndef __xwos_lib_map_h__
@@ -23,6 +20,9 @@
 /**
  * @defgroup xwos_lib_map 键值对容器
  * @ingroup xwos_lib
+ * ## 概述
+ *
+ * map是按从 **小** 到 **大** 排列的键值对容器的集合。在map中， **键** 是唯一的。
  * @{
  */
 
@@ -51,7 +51,7 @@ struct __xwcc_alignptr xwlib_map {
 };
 
 /**
- * @brief 初始化map
+ * @brief 初始化键值对容器的map
  * @param[in] map: map指针
  * @param[in] cmp: 比较键大小的函数指针
  */
@@ -64,7 +64,7 @@ void xwlib_map_init(struct xwlib_map * map, xwlib_map_cmp_f cmp)
 }
 
 /**
- * @brief 初始化map容器
+ * @brief 初始化键值对容器
  * @param[in] mc: 键值对容器的指针
  * @param[in] key: 键
  * @param[in] value: 值
@@ -121,8 +121,37 @@ void xwlib_map_init_container(struct xwlib_map_container * mc,
                                         &(map)->bclh, \
                                         struct xwlib_map_container, bcln)
 
+/**
+ * @brief 插入键值对容器
+ * @param[in] map: map的指针
+ * @param[in] newmc: 待插入的键值对容器的指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EEXIST: 键值对已经存在
+ */
 xwer_t xwlib_map_insert(struct xwlib_map * map, struct xwlib_map_container * newmc);
+
+
+/**
+ * @brief 删除键值对容器
+ * @param[in] map: map的指针
+ * @param[in] mc: 待删除的键值对容器的指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -ESRCH: 此键值对容器不在键值对集合中
+ */
 xwer_t xwlib_map_erase(struct xwlib_map * map, struct xwlib_map_container * mc);
+
+
+/**
+ * @brief 根据 **键值** 查找容器
+ * @param[in] map: map的指针
+ * @param[in] key: 键值对容器的指针
+ * @param[out] mcbuf: 指向指针缓存的指针，此指针缓存用于返回查找到的键值对容器的指针
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -ESRCH: 目标不存在
+ */
 xwer_t xwlib_map_find(struct xwlib_map * map, void * key,
                       struct xwlib_map_container ** mcbuf);
 
