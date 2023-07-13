@@ -121,7 +121,7 @@ xwer_t xwup_evt_cache_init(struct xwmm_mempool * mp, xwsq_t page_order)
         rc = xwmm_mempool_objcache_init(&xwup_evt_cache,
                                         &mp->pa,
                                         xwup_evt_cache_name,
-                                        sizeof(struct xwup_evt),
+                                        sizeof(struct xwup_evt) * 3U,
                                         XWMM_ALIGNMENT,
                                         page_order,
                                         (ctor_f)xwup_evt_construct,
