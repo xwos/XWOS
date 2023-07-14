@@ -195,7 +195,8 @@ void xwos_skd_enbh_lc(void)
  * @details
  * 继续运行调度器包括两个操作：
  * + 1. 打开本地CPU调度器的抢占；
- * + 2. 启动本地CPU的系统定时器。
+ * + 2. 打开本地CPU调度器的中断底半部；
+ * + 3. 启动本地CPU的系统定时器。
  */
 static __xwos_inline_api
 void xwos_skd_continue_lc(void)
@@ -210,7 +211,8 @@ void xwos_skd_continue_lc(void)
  * @details
  * 继续运行调度器包括两个操作：
  * + 1. 关闭本地CPU的系统定时器；
- * + 2. 关闭本地CPU调度器的抢占。
+ * + 2. 关闭本地CPU调度器的中断底半部；
+ * + 3. 关闭本地CPU调度器的抢占。
  */
 static __xwos_inline_api
 void xwos_skd_pause_lc(void)
