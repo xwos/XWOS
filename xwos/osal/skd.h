@@ -167,6 +167,28 @@ void xwos_skd_enpmpt_lc(void)
 }
 
 /**
+ * @brief XWOS API：关闭本地CPU调度器的中断底半部
+ * @note
+ * + 上下文：线程、中断、中断底半部、空闲任务
+ */
+static __xwos_inline_api
+void xwos_skd_dsbh_lc(void)
+{
+        xwosdl_skd_dsbh_lc();
+}
+
+/**
+ * @brief XWOS API：开启本地CPU调度器的中断底半部
+ * @note
+ * + 上下文：线程、中断、中断底半部、空闲任务
+ */
+static __xwos_inline_api
+void xwos_skd_enbh_lc(void)
+{
+        xwosdl_skd_enbh_lc();
+}
+
+/**
  * @brief XWOS API：继续运行本地CPU调度器
  * @note
  * + 上下文：任意

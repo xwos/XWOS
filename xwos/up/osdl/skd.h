@@ -94,6 +94,20 @@ void xwosdl_skd_enpmpt_lc(void)
         xwup_skd_enpmpt_lc();
 }
 
+static __xwcc_inline
+void xwosdl_skd_dsbh_lc(void)
+{
+        // cppcheck-suppress [misra-c2012-17.7]
+        xwup_skd_dsbh_lc();
+}
+
+static __xwcc_inline
+void xwosdl_skd_enbh_lc(void)
+{
+        // cppcheck-suppress [misra-c2012-17.7]
+        xwup_skd_enbh_lc();
+}
+
 static __xwos_inline_api
 void xwosdl_skd_continue_lc(void)
 {

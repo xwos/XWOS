@@ -186,14 +186,12 @@ xwer_t xwup_skd_start_lc(void);
 xwer_t xwup_skd_start_syshwt_lc(void);
 xwer_t xwup_skd_stop_syshwt_lc(void);
 
-#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 struct xwup_skd * xwup_skd_dsbh_lc(void);
 struct xwup_skd * xwup_skd_enbh_lc(void);
 struct xwup_skd * xwup_skd_svbh_lc(xwsq_t * dis_bh_cnt);
 struct xwup_skd * xwup_skd_rsbh_lc(xwsq_t dis_bh_cnt);
 bool xwup_skd_tstbh_lc(void);
 bool xwup_skd_tst_in_bh_lc(void);
-#endif
 
 struct xwup_skd * xwup_skd_dspmpt_lc(void);
 struct xwup_skd * xwup_skd_enpmpt_lc(void);

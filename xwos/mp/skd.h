@@ -176,7 +176,6 @@ struct xwmp_skd * xwmp_skd_svpmpt(struct xwmp_skd * xwskd, xwsq_t * dis_pmpt_cnt
 struct xwmp_skd * xwmp_skd_rspmpt(struct xwmp_skd * xwskd, xwsq_t dis_pmpt_cnt);
 bool xwmp_skd_tstpmpt(struct xwmp_skd * xwskd);
 
-#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 struct xwmp_skd * xwmp_skd_dsbh(struct xwmp_skd * xwskd);
 struct xwmp_skd * xwmp_skd_enbh(struct xwmp_skd * xwskd);
 struct xwmp_skd * xwmp_skd_svbh(struct xwmp_skd * xwskd, xwsq_t * dis_bh_cnt);
@@ -184,7 +183,6 @@ struct xwmp_skd * xwmp_skd_rsbh(struct xwmp_skd * xwskd, xwsq_t dis_bh_cnt);
 bool xwmp_skd_tstbh(struct xwmp_skd * xwskd);
 xwer_t xwmp_skd_req_bh(struct xwmp_skd * xwskd);
 bool xwmp_skd_tst_in_bh(struct xwmp_skd * xwskd);
-#endif
 
 void xwmp_skd_chkpmpt(struct xwmp_skd * xwskd);
 void xwmp_skd_chkpmpt_all(void);
@@ -206,11 +204,9 @@ xwer_t xwmp_skd_start_syshwt_lc(void);
 xwer_t xwmp_skd_stop_syshwt_lc(void);
 xwid_t xwmp_skd_id_lc(void);
 
-#if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
 struct xwmp_skd * xwmp_skd_dsbh_lc(void);
 struct xwmp_skd * xwmp_skd_enbh_lc(void);
 bool xwmp_skd_tst_in_bh_lc(void);
-#endif
 
 struct xwmp_skd * xwmp_skd_dspmpt_lc(void);
 struct xwmp_skd * xwmp_skd_enpmpt_lc(void);
