@@ -19,9 +19,56 @@
 /**
  * @defgroup xwos_irq 中断
  * @ingroup xwos
- * @details
- * + EXC：编号为负数，从-1开始编号
- * + IRQ：编号为正数或0，从0开始编号
+ * ## CPU中断开关
+ *
+ * CPU只能操作自身的中断开关，不可操作其他CPU的中断。下面的函数运行在哪个CPU，就对哪个CPU起作用：
+ *
+ * + `xwos_cpuirq_enable_lc()` ：开启CPU的中断开关
+ * + `xwos_cpuirq_disable_lc()` ：关闭CPU的中断开关
+ * + `xwos_cpuirq_save_lc()` ：保存当前CPU的中断开关状态后关闭
+ * + `xwos_cpuirq_restore_lc()` ：恢复之前保存的CPU的中断开关状态
+ *
+ * 为某个芯片移植XWOS时，需要在操作系统移植实现层(XWOSIMPL)中给出上述函数的具体实现方法：
+ *
+ * + 源文件： `xwosimpl_irq.h/xwosimpl_irq.c`
+ *   + `xwospl_cpuirq_enable_lc()` ：对应于 `xwos_cpuirq_enable_lc()`
+ *   + `xwospl_cpuirq_disable_lc()` ：对应于 `xwos_cpuirq_disable_lc()`
+ *   + `xwospl_cpuirq_save_lc()` ：对应于 `xwos_cpuirq_save_lc()`
+ *   + `xwospl_cpuirq_restore_lc()` ：对应于 `xwos_cpuirq_restore_lc()`
+ *
+ * ## 外设中断
+ *
+ * ### 获取当前代码的中断号
+ *
+ * XWOS提供CAPI `xwos_irq_get_id()` 可以获取当前中断的中断号。
+ * 如果不在中断内使用此CAPI，将返回错误码：
+ *
+ * + `-ETHDCTX` ：当前上下文为线程
+ * + `-EBHCTX` ：当前上下文为中断底半部
+ *
+ * 因此，此CAPI还可用于 **判断上下文** 。
+ *
+ *
+ * 为某个芯片移植XWOS时，需要操作系统移植实现层(XWOSIMPL)中给出上述函数的实现方法：
+ *
+ * + 源文件： `xwosimpl_irq.h/xwosimpl_irq.c`
+ *   + `xwospl_irq_get_id()` ：对应于 `xwos_irq_get_id()`
+ *
+ * ### 外设中断的其他CAPI
+ *
+ * + `xwos_irq_enable()` ：开启某个外设中断
+ * + `xwos_irq_disable()` ：关闭某个外设中断
+ * + `xwos_irq_save()` ：保存某个外设中断的开关，然后将其关闭
+ * + `xwos_irq_restore()` ：恢复某个外设中断的开关
+ *
+ * 为某个芯片移植XWOS时，需要操作系统移植实现层(XWOSIMPL)中给出上述函数的实现方法：
+ *
+ * + 源文件： `xwosimpl_irq.h/xwosimpl_irq.c`
+ *  + `xwospl_irq_enable()` ：对应于 `xwos_irq_enable()`
+ *  + `xwospl_irq_disable()` ：对应于 `xwos_irq_disable()`
+ *  + `xwospl_irq_save()` ：对应于 `xwos_irq_save()`
+ *  + `xwospl_irq_restore()` ：对应于 `xwos_irq_restore()`
+ *
  * @{
  */
 

@@ -51,12 +51,9 @@ typedef xwer_t (* xwobj_gc_f)(struct xwos_object *);
  */
 // cppcheck-suppress [misra-c2012-2.7, misra-c2012-5.5, misra-c2012-8.2]
 struct __xwcc_aligned(XWMM_ALIGNMENT) xwos_object {
-        xwsq_t tik; /**< 对象的标签，用于防止ABA问题与野指针问题 */
-        xwsq_t magic; /**< 对象的幻数，用于防止ABA问题与野指针问题 */
-        atomic_xwsq_t refcnt; /**< 引用计数:
-                                   + 0: 对象可以被销毁；
-                                   + 1: 对象就绪；
-                                   + > 1: 对象正在被引用。*/
+        xwsq_t tik; /**< 对象的标签 */
+        xwsq_t magic; /**< 对象的幻数 */
+        atomic_xwsq_t refcnt; /**< 引用计数 */
         xwobj_gc_f gcfunc; /**< 垃圾回收函数 */
 };
 
@@ -64,8 +61,8 @@ struct __xwcc_aligned(XWMM_ALIGNMENT) xwos_object {
  * @brief XWOS对象描述符
  */
 typedef struct {
-        struct xwos_object * obj;
-        xwsq_t tik;
+        struct xwos_object * obj; /**< 对象的指针 */
+        xwsq_t tik; /**< 标签 */
 } xwobj_d;
 
 /**
