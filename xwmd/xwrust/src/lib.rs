@@ -106,7 +106,7 @@
 //!
 //! # 返回XWOS首页
 //!
-//! [XWOS首页](/)
+//! [**XWOS首页**](/)
 //!
 //!
 //! [`static`]: <https://doc.rust-lang.org/std/keyword.static.html>

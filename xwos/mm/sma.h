@@ -19,7 +19,14 @@
 /**
  * @defgroup xwmm_sma 简单内存分配器
  * @ingroup xwmm
- * 此算法是在所有上下文（线程、中断、中断底半部）都是安全的。
+ * 简单内存分配器只分配大小最适应内存块，不对内存进行回收。
+ *
+ * + 优点：
+ *   + 简单，代码量非常小；
+ *   + 运行时间稳定。
+ * + 缺点：内存一旦分配出去不再回收，释放函数只是一个 **Dummy** 函数；
+ * + 适用性：简单的RTOS应用场合或不需要回收内存的场合
+ * + 上下文的安全性：在任何上下文（中断、中断底半部、线程）都是安全的。
  * @{
  */
 
@@ -79,7 +86,7 @@ xwer_t xwmm_sma_alloc(struct xwmm_sma * sa, xwsz_t size, xwsz_t aligned,
  * + 上下文：中断、中断底半部、线程
  * + 重入性：可重入
  * @details
- * + dummy函数，简单内存分配器不支持释放内存。
+ * + Dummy函数，简单内存分配器不支持释放内存。
  */
 xwer_t xwmm_sma_free(struct xwmm_sma * sa, void * mem);
 
