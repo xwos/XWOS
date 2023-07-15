@@ -124,15 +124,15 @@ xwsq_t xwcq_gettik(struct xwcq * cq)
 }
 
 __xwmd_api
-xwer_t xwcq_acquire(struct xwcq * cq, xwsq_t tik)
+xwer_t xwcq_acquire(xwcq_d cqd)
 {
-        return xwos_object_acquire(&cq->xwobj, tik);
+        return xwos_object_acquire(&cqd.cq->xwobj, cqd.tik);
 }
 
 __xwmd_api
-xwer_t xwcq_release(struct xwcq * cq, xwsq_t tik)
+xwer_t xwcq_release(xwcq_d cqd)
 {
-        return xwos_object_release(&cq->xwobj, tik);
+        return xwos_object_release(&cqd.cq->xwobj, cqd.tik);
 }
 
 __xwmd_api

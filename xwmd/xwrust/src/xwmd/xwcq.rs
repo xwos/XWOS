@@ -148,8 +148,8 @@ extern "C" {
     fn xwcq_grab(cq: *mut XwmdXwcq) -> XwEr;
     fn xwcq_put(cq: *mut XwmdXwcq) -> XwEr;
     fn xwcq_gettik(cq: *mut XwmdXwcq) -> XwSq;
-    fn xwcq_acquire(cq: *mut XwmdXwcq, tik: XwSq) -> XwEr;
-    fn xwcq_release(cq: *mut XwmdXwcq, tik: XwSq) -> XwEr;
+    fn xwrustffi_xwcq_acquire(cq: *mut XwmdXwcq, tik: XwSq) -> XwEr;
+    fn xwrustffi_xwcq_release(cq: *mut XwmdXwcq, tik: XwSq) -> XwEr;
     fn xwcq_eq(cq: *mut XwmdXwcq, data: *const u8, size: *mut XwSz) -> XwEr;
     fn xwcq_jq(cq: *mut XwmdXwcq, data: *const u8, size: *mut XwSz) -> XwEr;
     fn xwcq_dq(cq: *mut XwmdXwcq, data: *mut u8, size: *mut XwSz) -> XwEr;
@@ -409,7 +409,7 @@ where
         unsafe {
             let mut datasz: XwSz = mem::size_of::<T>();
             if datasz <= self.size() {
-                let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
+                let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
                     let refdata = &data as *const T;
                     rc = xwcq_eq(self.cq.get(), refdata as *const u8, &mut datasz as _);
@@ -485,7 +485,7 @@ where
         unsafe {
             let mut datasz: XwSz = mem::size_of::<T>();
             if datasz <= self.size() {
-                let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
+                let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
                     let refdata = &data as *const T;
                     rc = xwcq_jq(self.cq.get(), refdata as *const u8, &mut datasz as _);
@@ -555,7 +555,7 @@ where
         unsafe {
             let mut datasz: XwSz = mem::size_of::<T>();
             if datasz <= self.size() {
-                let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
+                let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
                     let mut data: T = mem::zeroed();
                     rc = xwcq_dq(self.cq.get(),
@@ -640,7 +640,7 @@ where
         unsafe {
             let mut datasz: XwSz = mem::size_of::<T>();
             if datasz <= self.size() {
-                let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
+                let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
                     let mut data: T = mem::zeroed();
                     rc = xwcq_dq_to(self.cq.get(),
@@ -720,7 +720,7 @@ where
         unsafe {
             let mut datasz: XwSz = mem::size_of::<T>();
             if datasz <= self.size() {
-                let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
+                let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
                     let mut data: T = mem::zeroed();
                     rc = xwcq_trydq(self.cq.get(),
@@ -793,7 +793,7 @@ where
         unsafe {
             let mut datasz: XwSz = mem::size_of::<T>();
             if datasz <= self.size() {
-                let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
+                let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
                     let mut data: T = mem::zeroed();
                     rc = xwcq_rq(self.cq.get(),
@@ -878,7 +878,7 @@ where
         unsafe {
             let mut datasz: XwSz = mem::size_of::<T>();
             if datasz <= self.size() {
-                let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
+                let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
                     let mut data: T = mem::zeroed();
                     rc = xwcq_rq_to(self.cq.get(),
@@ -958,7 +958,7 @@ where
         unsafe {
             let mut datasz: XwSz = mem::size_of::<T>();
             if datasz <= self.size() {
-                let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
+                let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
                     let mut data: T = mem::zeroed();
                     rc = xwcq_tryrq(self.cq.get(),
@@ -1032,7 +1032,7 @@ where
         unsafe {
             let mut datasz: XwSz = mem::size_of::<T>();
             if datasz <= self.size() {
-                let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
+                let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
                     let mut data: T = mem::zeroed();
                     rc = xwcq_pfq(self.cq.get(),
@@ -1118,7 +1118,7 @@ where
         unsafe {
             let mut datasz: XwSz = mem::size_of::<T>();
             if datasz <= self.size() {
-                let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
+                let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
                     let mut data: T = mem::zeroed();
                     rc = xwcq_pfq_to(self.cq.get(),
@@ -1199,7 +1199,7 @@ where
         unsafe {
             let mut datasz: XwSz = mem::size_of::<T>();
             if datasz <= self.size() {
-                let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
+                let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
                     let mut data: T = mem::zeroed();
                     rc = xwcq_trypfq(self.cq.get(),
@@ -1273,7 +1273,7 @@ where
         unsafe {
             let mut datasz: XwSz = mem::size_of::<T>();
             if datasz <= self.size() {
-                let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
+                let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
                     let mut data: T = mem::zeroed();
                     rc = xwcq_prq(self.cq.get(),
@@ -1359,7 +1359,7 @@ where
         unsafe {
             let mut datasz: XwSz = mem::size_of::<T>();
             if datasz <= self.size() {
-                let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
+                let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
                     let mut data: T = mem::zeroed();
                     rc = xwcq_prq_to(self.cq.get(),
@@ -1440,7 +1440,7 @@ where
         unsafe {
             let mut datasz: XwSz = mem::size_of::<T>();
             if datasz <= self.size() {
-                let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
+                let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
                 if rc == 0 {
                     let mut data: T = mem::zeroed();
                     rc = xwcq_tryprq(self.cq.get(),
@@ -1471,7 +1471,7 @@ where
     /// + 任意
     pub fn flush(&self) -> XwcqError {
         unsafe {
-            let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
+            let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
             if rc == 0 {
                 rc = xwcq_flush(self.cq.get());
                 xwcq_put(self.cq.get());
@@ -1518,7 +1518,7 @@ where
     /// + 任意
     pub fn availability(&self) -> Result<XwSz, XwcqError> {
         unsafe {
-            let mut rc = xwcq_acquire(self.cq.get(), *self.tik.get());
+            let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
             if rc == 0 {
                 let mut avb: XwSz = 0;
                 rc = xwcq_get_availability(self.cq.get(), &mut avb);

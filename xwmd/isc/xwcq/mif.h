@@ -51,6 +51,14 @@ struct xwcq {
 };
 
 /**
+ * @brief 循环队列对象描述符
+ */
+typedef struct {
+        struct xwcq * cq; /**< 循环队列对象的指针 */
+        xwsq_t tik; /**< 标签 */
+} xwcq_d;
+
+/**
  * @brief XWCQ API：初始化循环队列
  * @param[in] cq: 循环队列对象的指针
  * @param[in] slotsize: 每个数据槽的大小
@@ -96,25 +104,25 @@ xwer_t xwcq_fini(struct xwcq * cq);
 xwsq_t xwcq_gettik(struct xwcq * cq);
 
 /**
- * @brief XWCQ API：检查循环队列对象的标签并增加引用计数
- * @param[in] cq: 循环队列对象指针
- * @param[in] tik: 标签
- * @return 错误码
- * @retval XWOK: 没有错误
- * @retval -ENILOBJD: 空的对象描述符
- * @retval -EOBJDEAD: 对象无效
- * @retval -EACCES: 对象标签检查失败
+ * @brief XWCQ API：获取循环队列对象描述符
+ * @param[in] cq: 循环队列对象的指针
+ * @return 循环队列对象描述符
  * @note
- * - 同步/异步：同步
- * + 上下文：中断、中断底半部、线程
- * - 重入性：可重入
+ * + 上下文：任意
  */
-xwer_t xwcq_acquire(struct xwcq * cq, xwsq_t tik);
+static __xwos_inline_api
+xwcq_d xwcq_getd(struct xwcq * cq)
+{
+        xwcq_d cqd;
+
+        cqd.cq = cq;
+        cqd.tik = xwcq_gettik(cq);
+        return cqd;
+}
 
 /**
  * @brief XWCQ API：检查循环队列对象的标签并增加引用计数
- * @param[in] cq: 循环队列对象指针
- * @param[in] tik: 标签
+ * @param[in] cqd: 循环队列对象描述符
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENILOBJD: 空的对象描述符
@@ -125,7 +133,22 @@ xwer_t xwcq_acquire(struct xwcq * cq, xwsq_t tik);
  * + 上下文：中断、中断底半部、线程
  * - 重入性：可重入
  */
-xwer_t xwcq_release(struct xwcq * cq, xwsq_t tik);
+xwer_t xwcq_acquire(xwcq_d cqd);
+
+/**
+ * @brief XWCQ API：检查循环队列对象的标签并增加引用计数
+ * @param[in] cqd: 循环队列对象描述符
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -ENILOBJD: 空的对象描述符
+ * @retval -EOBJDEAD: 对象无效
+ * @retval -EACCES: 对象标签检查失败
+ * @note
+ * - 同步/异步：同步
+ * + 上下文：中断、中断底半部、线程
+ * - 重入性：可重入
+ */
+xwer_t xwcq_release(xwcq_d cqd);
 
 /**
  * @brief XWCQ API：增加循环队列对象的引用计数

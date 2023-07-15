@@ -11,7 +11,11 @@
 
 include $(XWOS_WKSPC_DIR)/XWOS.cfg
 include xwbs/util/mk/xwmo.mk
-XWMO_CSRCS := allocator.c xwtm.c skd.c pm.c thd.c swt.c mtx.c spinlock.c seqlock.c sem.c cond.c flg.c br.c sel.c
+XWMO_CSRCS := allocator.c
+XWMO_CSRCS += xwtm.c skd.c thd.c swt.c pm.c
+XWMO_CSRCS += spinlock.c seqlock.c mtx.c
+XWMO_CSRCS += sem.c cond.c flg.c br.c sel.c
+XWMO_CSRCS += xwmq.c xwcq.c
 XWMO_CFLAGS := -Wno-unused-function
 XWMO_INCDIRS :=
 include xwbs/xwmo.mk

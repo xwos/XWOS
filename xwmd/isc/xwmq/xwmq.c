@@ -56,15 +56,15 @@ xwsq_t xwmq_gettik(struct xwmq * mq)
 }
 
 __xwmd_api
-xwer_t xwmq_acquire(struct xwmq * mq, xwsq_t tik)
+xwer_t xwmq_acquire(xwmq_d mqd)
 {
-        return xwos_object_acquire(&mq->xwobj, tik);
+        return xwos_object_acquire(&mqd.mq->xwobj, mqd.tik);
 }
 
 __xwmd_api
-xwer_t xwmq_release(struct xwmq * mq, xwsq_t tik)
+xwer_t xwmq_release(xwmq_d mqd)
 {
-        return xwos_object_release(&mq->xwobj, tik);
+        return xwos_object_release(&mqd.mq->xwobj, mqd.tik);
 }
 
 __xwmd_api

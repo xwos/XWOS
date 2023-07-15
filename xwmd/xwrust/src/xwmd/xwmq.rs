@@ -285,8 +285,8 @@ extern "C" {
     fn xwmq_grab(mq: *mut XwmdXwmq) -> XwEr;
     fn xwmq_put(mq: *mut XwmdXwmq) -> XwEr;
     fn xwmq_gettik(mq: *mut XwmdXwmq) -> XwSq;
-    fn xwmq_acquire(mq: *mut XwmdXwmq, tik: XwSq) -> XwEr;
-    fn xwmq_release(mq: *mut XwmdXwmq, tik: XwSq) -> XwEr;
+    fn xwrustffi_xwmq_acquire(mq: *mut XwmdXwmq, tik: XwSq) -> XwEr;
+    fn xwrustffi_xwmq_release(mq: *mut XwmdXwmq, tik: XwSq) -> XwEr;
 
     fn xwmq_eq(mq: *mut XwmdXwmq, topic: XwSq, data: *mut c_void) -> XwEr;
     fn xwmq_eq_to(mq: *mut XwmdXwmq, topic: XwSq, data: *mut c_void, to: XwTm) -> XwEr;
@@ -574,7 +574,7 @@ where
         let boxdata = Box::new(data);
         let raw = Box::into_raw(boxdata);
         unsafe {
-            let mut rc = xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
+            let mut rc = xwrustffi_xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
             if rc == 0 {
                 rc = xwmq_eq(self.xwmq.mq.get(), 0, raw as *mut c_void);
                 xwmq_put(self.xwmq.mq.get());
@@ -649,7 +649,7 @@ where
         let boxdata = Box::new(data);
         let raw = Box::into_raw(boxdata);
         unsafe {
-            let mut rc = xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
+            let mut rc = xwrustffi_xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
             if rc == 0 {
                 rc = xwmq_eq_to(self.xwmq.mq.get(), 0, raw as *mut c_void, to);
                 xwmq_put(self.xwmq.mq.get());
@@ -718,7 +718,7 @@ where
         let boxdata = Box::new(data);
         let raw = Box::into_raw(boxdata);
         unsafe {
-            let mut rc = xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
+            let mut rc = xwrustffi_xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
             if rc == 0 {
                 rc = xwmq_tryeq(self.xwmq.mq.get(), 0, raw as *mut c_void);
                 xwmq_put(self.xwmq.mq.get());
@@ -783,7 +783,7 @@ where
         let boxdata = Box::new(data);
         let raw = Box::into_raw(boxdata);
         unsafe {
-            let mut rc = xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
+            let mut rc = xwrustffi_xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
             if rc == 0 {
                 rc = xwmq_jq(self.xwmq.mq.get(), 0, raw as *mut c_void);
                 xwmq_put(self.xwmq.mq.get());
@@ -858,7 +858,7 @@ where
         let boxdata = Box::new(data);
         let raw = Box::into_raw(boxdata);
         unsafe {
-            let mut rc = xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
+            let mut rc = xwrustffi_xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
             if rc == 0 {
                 rc = xwmq_jq_to(self.xwmq.mq.get(), 0, raw as *mut c_void, to);
                 xwmq_put(self.xwmq.mq.get());
@@ -927,7 +927,7 @@ where
         let boxdata = Box::new(data);
         let raw = Box::into_raw(boxdata);
         unsafe {
-            let mut rc = xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
+            let mut rc = xwrustffi_xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
             if rc == 0 {
                 rc = xwmq_tryjq(self.xwmq.mq.get(), 0, raw as *mut c_void);
                 xwmq_put(self.xwmq.mq.get());
@@ -1000,7 +1000,7 @@ where
     /// [`Err()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
     pub fn dq(&self) -> Result<Box<T>, XwmqError> {
         unsafe {
-            let mut rc = xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
+            let mut rc = xwrustffi_xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
             if rc == 0 {
                 let mut topic = 0;
                 let mut raw: *mut c_void = ptr::null_mut();
@@ -1084,7 +1084,7 @@ where
     /// [`Err()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
     pub fn dq_to(&self, to: XwTm) -> Result<Box<T>, XwmqError> {
         unsafe {
-            let mut rc = xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
+            let mut rc = xwrustffi_xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
             if rc == 0 {
                 let mut topic = 0;
                 let mut raw: *mut c_void = ptr::null_mut();
@@ -1159,7 +1159,7 @@ where
     /// [`Err()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
     pub fn trydq(&self) -> Result<Box<T>, XwmqError> {
         unsafe {
-            let mut rc = xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
+            let mut rc = xwrustffi_xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
             if rc == 0 {
                 let mut topic = 0;
                 let mut raw: *mut c_void = ptr::null_mut();
@@ -1230,7 +1230,7 @@ where
     /// [`Err()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
     pub fn rq(&self) -> Result<Box<T>, XwmqError> {
         unsafe {
-            let mut rc = xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
+            let mut rc = xwrustffi_xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
             if rc == 0 {
                 let mut topic = 0;
                 let mut raw: *mut c_void = ptr::null_mut();
@@ -1314,7 +1314,7 @@ where
     /// [`Err()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
     pub fn rq_to(&self, to: XwTm) -> Result<Box<T>, XwmqError> {
         unsafe {
-            let mut rc = xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
+            let mut rc = xwrustffi_xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
             if rc == 0 {
                 let mut topic = 0;
                 let mut raw: *mut c_void = ptr::null_mut();
@@ -1389,7 +1389,7 @@ where
     /// [`Err()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
     pub fn tryrq(&self) -> Result<Box<T>, XwmqError> {
         unsafe {
-            let mut rc = xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
+            let mut rc = xwrustffi_xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
             if rc == 0 {
                 let mut topic = 0;
                 let mut raw: *mut c_void = ptr::null_mut();

@@ -50,6 +50,14 @@ struct xwmq {
 };
 
 /**
+ * @brief 消息队列对象描述符
+ */
+typedef struct {
+        struct xwmq * mq; /**< 消息队列对象的指针 */
+        xwsq_t tik; /**< 标签 */
+} xwmq_d;
+
+/**
  * @brief XWMQ API：静态方式初始化消息队列
  * @param[in] mq: 消息队列对象的指针
  * @param[in] txq: 消息槽内存池
@@ -107,9 +115,25 @@ xwer_t xwmq_put(struct xwmq * mq);
 xwsq_t xwmq_gettik(struct xwmq * mq);
 
 /**
+ * @brief XWMQ API：获取消息队列对象描述符
+ * @param[in] mq: 消息队列对象的指针
+ * @return 消息队列对象描述符
+ * @note
+ * + 上下文：任意
+ */
+static __xwos_inline_api
+xwmq_d xwmq_getd(struct xwmq * mq)
+{
+        xwmq_d mqd;
+
+        mqd.mq = mq;
+        mqd.tik = xwmq_gettik(mq);
+        return mqd;
+}
+
+/**
  * @brief XWMQ API：检查消息队列对象的标签并增加引用计数
- * @param[in] mq: 消息队列对象指针
- * @param[in] tik: 标签
+ * @param[in] mqd: 消息队列对象描述符
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENILOBJD: 空的对象描述符
@@ -118,12 +142,11 @@ xwsq_t xwmq_gettik(struct xwmq * mq);
  * @note
  * + 上下文：任意
  */
-xwer_t xwmq_acquire(struct xwmq * mq, xwsq_t tik);
+xwer_t xwmq_acquire(xwmq_d mqd);
 
 /**
  * @brief XWMQ API：检查消息队列对象的标签并减少引用计数
- * @param[in] mq: 消息队列对象指针
- * @param[in] tik: 标签
+ * @param[in] mqd: 消息队列对象描述符
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -ENILOBJD: 空的对象描述符
@@ -132,7 +155,7 @@ xwer_t xwmq_acquire(struct xwmq * mq, xwsq_t tik);
  * @note
  * + 上下文：任意
  */
-xwer_t xwmq_release(struct xwmq * mq, xwsq_t tik);
+xwer_t xwmq_release(xwmq_d mqd);
 
 /**
  * @brief XWMQ API：等待消息槽，然后将消息放入到消息队列的尾端（入队）
