@@ -175,7 +175,7 @@ xwer_t xwcq_grab(struct xwcq * cq);
 xwer_t xwcq_put(struct xwcq * cq);
 
 /**
- * @brief XWCQ API：将数据放入循环队列的后面（入队 EnQueue）
+ * @brief XWCQ API：将数据发送到循环队列的 **尾端** （入队，EnQueue）
  * @param[in] cq: 循环队列对象的指针
  * @param[in] data: 数据
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
@@ -187,15 +187,15 @@ xwer_t xwcq_put(struct xwcq * cq);
  * @note
  * + 上下文：任意
  * @details
- * 如果传入的数据大小超过初始化循环队列时指定的 `slotsize` ，数据将被截断。
- * 如果循环队列数据已满，将会循环回最旧数据的位置，覆盖掉数据。
+ * 如果传入的数据大小 `*size` 超过初始化循环队列时指定的 `slotsize` ，数据将被截断。
+ * 如果循环队列数据已被填满，循环队列会循环回队列 **首端** 的位置，覆盖掉原数据。
  *
  * 此CAPI不会阻塞调用者，因此可以在中断中使用。
  */
 xwer_t xwcq_eq(struct xwcq * cq, const xwu8_t * data, xwsz_t * size);
 
 /**
- * @brief XWCQ API：将数据放入循环队列的前面（插队 Jump the Queue）
+ * @brief XWCQ API：将数据发送循环队列的 **首端** （插队，Jump the Queue）
  * @param[in] cq: 循环队列对象的指针
  * @param[in] data: 数据
  * @param[in] size: 数据的大小
@@ -205,15 +205,15 @@ xwer_t xwcq_eq(struct xwcq * cq, const xwu8_t * data, xwsz_t * size);
  * @note
  * + 上下文：任意
  * @details
- * 如果传入的数据大小超过初始化循环队列时指定的 `slotsize` ，数据将被截断。
- * 如果循环队列数据已满，将会循环回最新数据的位置，覆盖掉数据。
+ * 如果传入的数据大小 `*size` 超过初始化循环队列时指定的 `slotsize` ，数据将被截断。
+ * 如果循环队列数据已被填满，循环队列会循环回队列 **尾端** 的位置，覆盖掉原数据。
  *
  * 此CAPI不会阻塞调用者，因此可以在中断中使用。
  */
 xwer_t xwcq_jq(struct xwcq * cq, const xwu8_t * data, xwsz_t * size);
 
 /**
- * @brief XWCQ API: 等待从循环队列的前面取出一份数据（离队 DeQueue）
+ * @brief XWCQ API: 等待从循环队列的 **首端** 接收数据（离队，DeQueue）
  * @param[in] cq: 循环队列对象的指针
  * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
@@ -221,22 +221,22 @@ xwer_t xwcq_jq(struct xwcq * cq, const xwu8_t * data, xwsz_t * size);
  * + (O) 作为输出时，返回实际接收的数据大小
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -EINTR: 等待被中断
  * @retval -EFAULT: 空指针
+ * @retval -EINTR: 等待被中断
  * @retval -ENOTTHDCTX: 不在线程上下文中
  * @retval -EDSPMPT: 抢占被关闭
  * @retval -EDSBH: 中断底半部被关闭
  * @note
  * + 上下文：线程
  * @details
- * 若循环队列中为空，就无限等待，直到循环队列中有消息可取出或被中断。
+ * 若循环队列中数据为空，接收线程会阻塞等待，直到循环队列中有消息可取出，或等待被中断。
  *
  * 如果等待被中断，此CAPI将返回 `-EINTR` 。
  */
 xwer_t xwcq_dq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
 
 /**
- * @brief XWCQ API: 限时等待从循环队列的前面取出一份数据（离队 DeQueue）
+ * @brief XWCQ API: 限时等待从循环队列的 **首端** 接收数据（离队，DeQueue）
  * @param[in] cq: 循环队列对象的指针
  * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
@@ -254,7 +254,8 @@ xwer_t xwcq_dq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
  * @note
  * + 上下文：线程
  * @details
- * 若循环队列中为空，就限时等待，直到循环队列中有消息可取出或被中断或等待超时。
+ * 若循环队列中数据为空，接收线程会阻塞等待，
+ * 直到循环队列中有消息可取出，或等待被中断，或等待超时。
  *
  * 如果等待被中断，此CAPI将返回 `-EINTR` 。
  *
@@ -263,7 +264,30 @@ xwer_t xwcq_dq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
 xwer_t xwcq_dq_to(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t to);
 
 /**
- * @brief XWCQ API: 尝试从循环队列的前面取出一份数据（离队 DeQueue）
+ * @brief XWCQ API: 等待从循环队列的 **首端** 接收数据（离队，DeQueue），
+ *        并且等待不可被中断
+ * @param[in] cq: 循环队列对象的指针
+ * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示接收缓冲区的大小
+ * + (O) 作为输出时，返回实际接收的数据大小
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @retval -EDSPMPT: 抢占被关闭
+ * @retval -EDSBH: 中断底半部被关闭
+ * @note
+ * + 上下文：线程
+ * @details
+ * 若循环队列中数据为空，接收线程会阻塞等待，直到循环队列中有消息可取出。
+ *
+ * 接收线程的阻塞等待不可被中断。
+ */
+xwer_t xwcq_dq_unintr(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
+
+/**
+ * @brief XWCQ API: 尝试从循环队列的 **首端** 接收数据（离队，DeQueue）
  * @param[in] cq: 循环队列对象的指针
  * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
@@ -276,12 +300,12 @@ xwer_t xwcq_dq_to(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t to);
  * @note
  * + 上下文：任意
  * @details
- * 若循环队列中为空，就立即返回 `-ENODATA` ，因此可在中断中使用。
+ * 若循环队列中为空，就立即返回 `-ENODATA` ，此CAPI可在中断中使用。
  */
 xwer_t xwcq_trydq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
 
 /**
- * @brief XWCQ API: 等待从循环队列的后面取出一份数据（Reversely deQueue）
+ * @brief XWCQ API: 等待从循环队列的 **尾端** 接收数据（反向离队，Reversely deQueue）
  * @param[in] cq: 循环队列对象的指针
  * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
@@ -289,22 +313,23 @@ xwer_t xwcq_trydq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
  * + (O) 作为输出时，返回实际接收的数据大小
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -EINTR: 等待被中断
  * @retval -EFAULT: 空指针
+ * @retval -EINTR: 等待被中断
  * @retval -ENOTTHDCTX: 不在线程上下文中
  * @retval -EDSPMPT: 抢占被关闭
  * @retval -EDSBH: 中断底半部被关闭
  * @note
  * + 上下文：线程
  * @details
- * 若循环队列中为空，就无限等待，直到循环队列中有消息可取出或被中断。
+ * 若循环队列中数据为空，接收线程会阻塞等待，直到循环队列中有消息可取出，或等待被中断。
  *
  * 如果等待被中断，此CAPI将返回 `-EINTR` 。
  */
 xwer_t xwcq_rq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
 
 /**
- * @brief XWCQ API: 限时等待从循环队列的后面取出一份数据（Reversely deQueue）
+ * @brief XWCQ API: 限时等待从循环队列的 **尾端** 接收数据
+ *        （反向离队，Reversely deQueue）
  * @param[in] cq: 循环队列对象的指针
  * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
@@ -322,7 +347,8 @@ xwer_t xwcq_rq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
  * @note
  * + 上下文：线程
  * @details
- * 若循环队列中为空，就限时等待，直到循环队列中有消息可取出或被中断或等待超时。
+ * 若循环队列中数据为空，接收线程会阻塞等待，
+ * 直到循环队列中有消息可取出，或等待被中断，或等待超时。
  *
  * 如果等待被中断，此CAPI将返回 `-EINTR` 。
  *
@@ -331,7 +357,30 @@ xwer_t xwcq_rq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
 xwer_t xwcq_rq_to(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t to);
 
 /**
- * @brief XWCQ API: 尝试从循环队列的后面取出一份数据（Reversely deQueue）
+ * @brief XWCQ API: 等待从循环队列的 **尾端** 接收数据（反向离队，Reversely deQueue），
+ *        并且等待不可被中断
+ * @param[in] cq: 循环队列对象的指针
+ * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示接收缓冲区的大小
+ * + (O) 作为输出时，返回实际接收的数据大小
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @retval -EDSPMPT: 抢占被关闭
+ * @retval -EDSBH: 中断底半部被关闭
+ * @note
+ * + 上下文：线程
+ * @details
+ * 若循环队列中数据为空，接收线程会阻塞等待，直到循环队列中有消息可取出。
+ *
+ * 接收线程的阻塞等待不可被中断。
+ */
+xwer_t xwcq_rq_unintr(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
+
+/**
+ * @brief XWCQ API: 尝试从循环队列的 **尾端** 接收数据（反向离队，Reversely deQueue）
  * @param[in] cq: 循环队列对象的指针
  * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
@@ -344,12 +393,12 @@ xwer_t xwcq_rq_to(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t to);
  * @note
  * + 上下文：任意
  * @details
- * 若循环队列中没有新的消息，就立即返回 `-ENODATA` ，因此可在中断中使用。
+ * 若循环队列中为空，就立即返回 `-ENODATA` ，此CAPI可在中断中使用。
  */
 xwer_t xwcq_tryrq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
 
 /**
- * @brief XWCQ API: 等待从循环队列前面拷贝一份数据（Peek at the Front of Queue）
+ * @brief XWCQ API: 等待从循环队列 **头端** 拷贝数据（Peek at the Front of Queue）
  * @param[in] cq: 循环队列对象的指针
  * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
@@ -357,26 +406,25 @@ xwer_t xwcq_tryrq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
  * + (O) 作为输出时，返回实际接收的数据大小
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -EINTR: 等待被中断
  * @retval -EFAULT: 空指针
+ * @retval -EINTR: 等待被中断
  * @retval -ENOTTHDCTX: 不在线程上下文中
  * @retval -EDSPMPT: 抢占被关闭
  * @retval -EDSBH: 中断底半部被关闭
  * @note
  * + 上下文：线程
  * @details
- * 从循环队列前面拷贝一份数据，数据不会被取走，可重复拷贝。
+ * 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
  *
- * 若循环队列为空，就无限等待，直到循环队列中有消息可拷贝或被中断。
- *
- * 若循环队列中为空，此CAPI会阻塞调用者，直到循环队列中有消息可取出。
+ * 若循环队列中数据为空，接收线程会阻塞等待，直到循环队列中有消息可取出，或等待被中断。
  *
  * 如果等待被中断，此CAPI将返回 `-EINTR` 。
  */
 xwer_t xwcq_pfq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
 
 /**
- * @brief XWCQ API: 限时等待从循环队列前面拷贝一份数据（Peek at the Front of Queue）
+ * @brief XWCQ API: 限时等待从循环队列 **头端** 拷贝数据
+ *        （Peek at the Front of Queue）
  * @param[in] cq: 循环队列对象的指针
  * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
@@ -394,9 +442,10 @@ xwer_t xwcq_pfq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
  * @note
  * + 上下文：线程
  * @details
- * 从循环队列前面拷贝一份数据，数据不会被取走，可重复拷贝。
+ * 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
  *
- * 若循环队列为空，就限时等待，直到循环队列中有消息可拷贝或被中断或等待超时。
+ * 若循环队列中数据为空，接收线程会阻塞等待，
+ * 直到循环队列中有消息可取出，或等待被中断，或等待超时。
  *
  * 如果等待被中断，此CAPI将返回 `-EINTR` 。
  *
@@ -405,7 +454,32 @@ xwer_t xwcq_pfq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
 xwer_t xwcq_pfq_to(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t to);
 
 /**
- * @brief XWCQ API: 尝试从循环队列前面拷贝一份数据（Peek at the Front of Queue）
+ * @brief XWCQ API: 等待从循环队列 **头端** 拷贝数据（Peek at the Front of Queue），
+ *        并且等待不可被中断
+ * @param[in] cq: 循环队列对象的指针
+ * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示接收缓冲区的大小
+ * + (O) 作为输出时，返回实际接收的数据大小
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @retval -EDSPMPT: 抢占被关闭
+ * @retval -EDSBH: 中断底半部被关闭
+ * @note
+ * + 上下文：线程
+ * @details
+ * 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
+ *
+ * 若循环队列中数据为空，接收线程会阻塞等待，直到循环队列中有消息可取出。
+ *
+ * 接收线程的阻塞等待不可被中断。
+ */
+xwer_t xwcq_pfq_unintr(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
+
+/**
+ * @brief XWCQ API: 尝试从循环队列 **头端** 拷贝数据（Peek at the Front of Queue）
  * @param[in] cq: 循环队列对象的指针
  * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
@@ -418,14 +492,14 @@ xwer_t xwcq_pfq_to(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t to);
  * @note
  * + 上下文：任意
  * @details
- * 尝试从循环队列前面拷贝一份数据，数据未被取走，可被再次拷贝，若循环队列为空立即返回。
+ * 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
  *
- * 若循环队列中没有新的消息，就立即返回 `-ENODATA` ，因此可在中断中使用。
+ * 若循环队列中为空，就立即返回 `-ENODATA` ，此CAPI可在中断中使用。
  */
 xwer_t xwcq_trypfq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
 
 /**
- * @brief XWCQ API: 等待从循环队列后面拷贝一份数据（Peek at the Rear of Queue）
+ * @brief XWCQ API: 等待从循环队列 **尾端** 拷贝数据（Peek at the Rear of Queue）
  * @param[in] cq: 循环队列对象的指针
  * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
@@ -433,26 +507,24 @@ xwer_t xwcq_trypfq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
  * + (O) 作为输出时，返回实际接收的数据大小
  * @return 错误码
  * @retval XWOK: 没有错误
- * @retval -EINTR: 等待被中断
  * @retval -EFAULT: 空指针
+ * @retval -EINTR: 等待被中断
  * @retval -ENOTTHDCTX: 不在线程上下文中
  * @retval -EDSPMPT: 抢占被关闭
  * @retval -EDSBH: 中断底半部被关闭
  * @note
  * + 上下文：线程
  * @details
- * 从循环队列前面拷贝一份数据，数据不会被取走，可重复拷贝。
+ * 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
  *
- * 若循环队列为空，就无限等待，直到循环队列中有消息可拷贝或被中断。
- *
- * 若循环队列中为空，此CAPI会阻塞调用者，直到循环队列中有消息可取出。
+ * 若循环队列中数据为空，接收线程会阻塞等待，直到循环队列中有消息可取出，或等待被中断。
  *
  * 如果等待被中断，此CAPI将返回 `-EINTR` 。
  */
 xwer_t xwcq_prq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
 
 /**
- * @brief XWCQ API: 限时等待从循环队列后面拷贝一份数据（Peek at the Rear of Queue）
+ * @brief XWCQ API: 限时等待从循环队列 **尾端** 拷贝数据（Peek at the Rear of Queue）
  * @param[in] cq: 循环队列对象的指针
  * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
@@ -470,9 +542,10 @@ xwer_t xwcq_prq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
  * @note
  * + 上下文：线程
  * @details
- * 从循环队列前面拷贝一份数据，数据不会被取走，可重复拷贝。
+ * 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
  *
- * 若循环队列为空，就限时等待，直到循环队列中有消息可拷贝或被中断或等待超时。
+ * 若循环队列中数据为空，接收线程会阻塞等待，
+ * 直到循环队列中有消息可取出，或等待被中断，或等待超时。
  *
  * 如果等待被中断，此CAPI将返回 `-EINTR` 。
  *
@@ -481,7 +554,32 @@ xwer_t xwcq_prq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
 xwer_t xwcq_prq_to(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t to);
 
 /**
- * @brief XWCQ API: 尝试从循环队列后面拷贝一份数据（Peek at the Rear of Queue）
+ * @brief XWCQ API: 等待从循环队列 **尾端** 拷贝数据（Peek at the Rear of Queue），
+ *        并且等待不可被中断
+ * @param[in] cq: 循环队列对象的指针
+ * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
+ * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
+ * + (I) 作为输入时，表示接收缓冲区的大小
+ * + (O) 作为输出时，返回实际接收的数据大小
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @retval -EDSPMPT: 抢占被关闭
+ * @retval -EDSBH: 中断底半部被关闭
+ * @note
+ * + 上下文：线程
+ * @details
+ * 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
+ *
+ * 若循环队列中数据为空，接收线程会阻塞等待，直到循环队列中有消息可取出。
+ *
+ * 接收线程的阻塞等待不可被中断。
+ */
+xwer_t xwcq_prq_unintr(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
+
+/**
+ * @brief XWCQ API: 尝试从循环队列 **尾端** 拷贝数据（Peek at the Rear of Queue）
  * @param[in] cq: 循环队列对象的指针
  * @param[out] buf: 指向缓冲区的指针，此缓冲区用于接收数据
  * @param[in,out] size: 指向缓冲区的指针，此缓冲区：
@@ -494,9 +592,9 @@ xwer_t xwcq_prq_to(struct xwcq * cq, xwu8_t * data, xwsz_t * size, xwtm_t to);
  * @note
  * + 上下文：任意
  * @details
- * 尝试从循环队列前面拷贝一份数据，数据未被取走，可被再次拷贝，若循环队列为空立即返回。
+ * 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
  *
- * 若循环队列中没有新的消息，就立即返回 `-ENODATA` ，因此可在中断中使用。
+ * 若循环队列中为空，就立即返回 `-ENODATA` ，此CAPI可在中断中使用。
  */
 xwer_t xwcq_tryprq(struct xwcq * cq, xwu8_t * data, xwsz_t * size);
 

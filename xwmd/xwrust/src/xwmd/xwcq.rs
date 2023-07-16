@@ -1,10 +1,10 @@
 //! XWOS RUST：循环队列
 //! ========
 //!
-//! XWOS RUST的循环队列是不依赖任何动态内存申请与释放而实现的多线程间的通讯机制。
+//! XWOS RUST的 **循环队列** 是不依赖任何动态内存申请与释放的多线程间通讯机制。
 //!
 //! 循环队列有 `N` 个数据槽，每个数据槽的大小固定为 `S` 。
-//! 在创建循环队列时，需要指明类型常数 `S` 和 `N`，其内存完全由编译器进行分配。
+//! 在创建循环队列时，需要指明类型常数 `S` 和 `N`，其内存完全在编译期进行分配。
 //!
 //! 发送时，可以将数据发送到队列后面（入队），也可以将数据发送到队列前面（插队）。
 //! 如果循环队列已满，不会阻塞发送者，循环队列会丢弃一份数据，腾出数据槽，再将新数据放入队列。
@@ -71,32 +71,36 @@
 //!
 //! 离队是指从循环队列的最前面取出数据。取出数据后，数据槽被释放。
 //!
-//! + [`Xwcq::dq()`] 若循环队列中为空，就无限等待，直到循环队列中有数据可取出或被中断。
-//! + [`Xwcq::dq_to()`] 若循环队列中为空，就限时等待，直到循环队列中有数据可取出或被中断或等待超时。
+//! + [`Xwcq::dq()`] 若循环队列中为空，接收线程就阻塞等待，直到循环队列中有数据可取出或被中断。
+//! + [`Xwcq::dq_to()`] 若循环队列中为空，接收线程就限时阻塞等待，直到循环队列中有数据可取出或被中断或等待超时。
+//! + [`Xwcq::dq_unintr()`] 若循环队列中为空，接收线程就阻塞等待，直到循环队列中有数据可取出。阻塞等待不可被中断。
 //! + [`Xwcq::trydq()`] 若循环队列中为空，就立即返回，可在中断中使用。
 //!
 //! ### 反向离队
 //!
 //! 反向离队是指从循环队列的最后面取出数据。取出数据后，数据槽被释放。
 //!
-//! + [`Xwcq::rq()`] 若循环队列中为空，就无限等待，直到循环队列中有数据可取出或被中断。
-//! + [`Xwcq::rq_to()`] 若循环队列中为空，就限时等待，直到循环队列中有数据可取出或被中断或等待超时。
+//! + [`Xwcq::rq()`] 若循环队列中为空，接收线程就阻塞等待，直到循环队列中有数据可取出或被中断。
+//! + [`Xwcq::rq_to()`] 若循环队列中为空，接收线程就限时阻塞等待，直到循环队列中有数据可取出或被中断或等待超时。
+//! + [`Xwcq::rq_unintr()`] 若循环队列中为空，接收线程就阻塞等待，直到循环队列中有数据可取出。阻塞等待不可被中断。
 //! + [`Xwcq::tryrq()`] 若循环队列中为空，就立即返回，可在中断中使用。
 //!
 //! ### 从循环队列前面拷贝数据
 //!
-//! 从循环队列前面拷贝数据时，数据不会取走数据，数据槽不会被释放。因此命名为 **前向偷窥 (Peek at the Front of Queue)** 。
+//! 从循环队列前面拷贝数据时，数据不会取走数据，数据槽不会被释放。因此命名为 **前向窥视 (Peek at the Front of Queue)** 。
 //!
-//! + [`Xwcq::pfq()`] 若循环队列中为空，就无限等待，直到循环队列中有数据可取出或被中断。
-//! + [`Xwcq::pfq_to()`] 若循环队列中为空，就限时等待，直到循环队列中有数据可取出或被中断或等待超时。
+//! + [`Xwcq::pfq()`] 若循环队列中为空，接收线程就阻塞等待，直到循环队列中有数据可取出或被中断。
+//! + [`Xwcq::pfq_to()`] 若循环队列中为空，接收线程就限时阻塞等待，直到循环队列中有数据可取出或被中断或等待超时。
+//! + [`Xwcq::pfq_unintr()`] 若循环队列中为空，接收线程就阻塞等待，直到循环队列中有数据可取出。阻塞等待不可被中断。
 //! + [`Xwcq::trypfq()`] 若循环队列中为空，就立即返回，可在中断中使用。
 //!
 //! ### 从循环队列后面拷贝数据
 //!
-//! 从循环队列后面拷贝数据，数据不会取走数据，数据槽不会被释放。因此命名为 **后向偷窥 (Peek at the Rear of Queue)** 。
+//! 从循环队列后面拷贝数据，数据不会取走数据，数据槽不会被释放。因此命名为 **后向窥视 (Peek at the Rear of Queue)** 。
 //!
-//! + [`Xwcq::prq()`] 若循环队列中为空，就无限等待，直到循环队列中有数据可取出或被中断。
-//! + [`Xwcq::prq_to()`] 若循环队列中为空，就限时等待，直到循环队列中有数据可取出或被中断或等待超时。
+//! + [`Xwcq::prq()`] 若循环队列中为空，接收线程就阻塞等待，直到循环队列中有数据可取出或被中断。
+//! + [`Xwcq::prq_to()`] 若循环队列中为空，接收线程就限时阻塞等待，直到循环队列中有数据可取出或被中断或等待超时。
+//! + [`Xwcq::prq_unintr()`] 若循环队列中为空，接收线程就阻塞等待，直到循环队列中有数据可取出。阻塞等待不可被中断。
 //! + [`Xwcq::tryprq()`] 若循环队列中为空，就立即返回，可在中断中使用。
 //!
 //!
@@ -154,15 +158,19 @@ extern "C" {
     fn xwcq_jq(cq: *mut XwmdXwcq, data: *const u8, size: *mut XwSz) -> XwEr;
     fn xwcq_dq(cq: *mut XwmdXwcq, data: *mut u8, size: *mut XwSz) -> XwEr;
     fn xwcq_dq_to(cq: *mut XwmdXwcq, data: *mut u8, size: *mut XwSz, to: XwTm) -> XwEr;
+    fn xwcq_dq_unintr(cq: *mut XwmdXwcq, data: *mut u8, size: *mut XwSz) -> XwEr;
     fn xwcq_trydq(cq: *mut XwmdXwcq, data: *mut u8, size: *mut XwSz) -> XwEr;
     fn xwcq_rq(cq: *mut XwmdXwcq, data: *mut u8, size: *mut XwSz) -> XwEr;
     fn xwcq_rq_to(cq: *mut XwmdXwcq, data: *mut u8, size: *mut XwSz, to: XwTm) -> XwEr;
+    fn xwcq_rq_unintr(cq: *mut XwmdXwcq, data: *mut u8, size: *mut XwSz) -> XwEr;
     fn xwcq_tryrq(cq: *mut XwmdXwcq, data: *mut u8, size: *mut XwSz) -> XwEr;
     fn xwcq_pfq(cq: *mut XwmdXwcq, data: *mut u8, size: *mut XwSz) -> XwEr;
     fn xwcq_pfq_to(cq: *mut XwmdXwcq, data: *mut u8, size: *mut XwSz, to: XwTm) -> XwEr;
+    fn xwcq_pfq_unintr(cq: *mut XwmdXwcq, data: *mut u8, size: *mut XwSz) -> XwEr;
     fn xwcq_trypfq(cq: *mut XwmdXwcq, data: *mut u8, size: *mut XwSz) -> XwEr;
     fn xwcq_prq(cq: *mut XwmdXwcq, data: *mut u8, size: *mut XwSz) -> XwEr;
     fn xwcq_prq_to(cq: *mut XwmdXwcq, data: *mut u8, size: *mut XwSz, to: XwTm) -> XwEr;
+    fn xwcq_prq_unintr(cq: *mut XwmdXwcq, data: *mut u8, size: *mut XwSz) -> XwEr;
     fn xwcq_tryprq(cq: *mut XwmdXwcq, data: *mut u8, size: *mut XwSz) -> XwEr;
     fn xwcq_flush(cq: *mut XwmdXwcq) -> XwEr;
     fn xwcq_get_capacity(cq: *mut XwmdXwcq, capbuf: *mut XwSz) -> XwEr;
@@ -352,9 +360,9 @@ where
         }
     }
 
-    /// 将数据放入循环队列的后面（入队 EnQueue）
+    /// 将数据发送到循环队列的 **尾端** （入队，EnQueue）
     ///
-    /// + 如果队列数据已满，不会阻塞发送者，循环队列会将最前面（最旧的）的数据丢弃，腾出空间将新数据放入队列。
+    /// + 如果循环队列数据已被填满，循环队列会循环回队列 **首端** 的位置，覆盖掉原数据。
     /// + 发送时，数据类型是泛型 `T` ，`T` 必须是 [`Sized`] 的，数据是被逐字节地被拷贝到循环队列的数据槽内的。
     /// + 当发送的数据类型大小大于循环队列的数据槽大小 `S` ，发送会失败，并返回错误码 [`XwcqError::DataSize`] 。
     ///
@@ -428,9 +436,9 @@ where
         }
     }
 
-    /// 将数据放入循环队列的前面（插队 Jump the Queue）
+    /// 将数据发送循环队列的 **首端** （插队，Jump the Queue）
     ///
-    /// + 如果队列数据已满，不会阻塞发送者，循环队列会将最后面（最新的）的数据丢弃，腾出空间将新数据放入队列。
+    /// + 如果循环队列数据已被填满，循环队列会循环回队列 **尾端** 的位置，覆盖掉原数据。
     /// + 发送时，数据类型是泛型 `T` ，`T` 必须是 [`Sized`] 的，数据是被逐字节地被拷贝到循环队列的数据槽内的。
     /// + 当发送的数据类型大小大于循环队列的数据槽大小 `S` ，发送会失败，并返回错误码 [`XwcqError::DataSize`] 。
     ///
@@ -504,7 +512,7 @@ where
         }
     }
 
-    /// 等待从循环队列的前面取出一份数据（离队 DeQueue）
+    /// 等待从循环队列的 **首端** 接收数据（离队，DeQueue）
     ///
     /// + 当循环队列未初始化，返回错误码 [`XwcqError::NotInit`] 。
     /// + 若循环队列为空，线程会阻塞等待。
@@ -516,6 +524,15 @@ where
     /// # 上下文
     ///
     /// + 线程
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwcqError::Ok`] 没有错误
+    /// + [`XwcqError::NotInit`] 循环队列没有初始化
+    /// + [`XwcqError::Interrupt`] 等待被中断
+    /// + [`XwcqError::NotThreadContext`] 不在线程上下文内
+    /// + [`XwcqError::CannotPmpt`] 抢占被关闭
+    /// + [`XwcqError::CannotBh`] 中断底半部被关闭
     ///
     /// # 示例
     ///
@@ -583,7 +600,7 @@ where
         }
     }
 
-    /// 限时等待从循环队列的前面取出一份数据（离队 DeQueue）
+    /// 等待从循环队列的 **首端** 接收数据（离队，DeQueue）
     ///
     /// + 当循环队列未初始化，返回错误码 [`XwcqError::NotInit`] 。
     /// + 若循环队列为空，线程会阻塞等待，等待时会指定一个唤醒时间点。
@@ -600,6 +617,16 @@ where
     /// # 上下文
     ///
     /// + 线程
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwcqError::Ok`] 没有错误
+    /// + [`XwcqError::NotInit`] 循环队列没有初始化
+    /// + [`XwcqError::Interrupt`] 等待被中断
+    /// + [`XwcqError::Timedout`] 等待超时
+    /// + [`XwcqError::NotThreadContext`] 不在线程上下文内
+    /// + [`XwcqError::CannotPmpt`] 抢占被关闭
+    /// + [`XwcqError::CannotBh`] 中断底半部被关闭
     ///
     /// # 示例
     ///
@@ -671,10 +698,95 @@ where
         }
     }
 
-    /// 尝试从循环队列的前面取出一份数据（离队 DeQueue）
+    /// 等待从循环队列的 **首端** 接收数据（离队，DeQueue），并且等待不可被中断
     ///
     /// + 当循环队列未初始化，返回错误码 [`XwcqError::NotInit`] 。
-    /// + 若循环队列为空，立即返回 [`XwcqError::DataSize`] ，此方法不会阻塞。
+    /// + 若循环队列为空，线程会阻塞等待，且不可被中断。
+    /// + 接收时，数据类型是泛型 `T` ，`T` 必须是 [`Sized`] 的，数据是被逐字节地从循环队列的数据槽中拷贝到出来的。
+    /// + 循环队列不会对接收时的 `T` 与 发送时的 `T` 进行检查，因此用户必须确保两个类型是一样的，或能安全地进行转换。
+    /// + 当 `T` 大小大于循环队列的数据槽大小 `S` ，接收会失败，并返回错误码 [`XwcqError::DataSize`] 。
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwcqError::Ok`] 没有错误
+    /// + [`XwcqError::NotInit`] 循环队列没有初始化
+    /// + [`XwcqError::NotThreadContext`] 不在线程上下文内
+    /// + [`XwcqError::CannotPmpt`] 抢占被关闭
+    /// + [`XwcqError::CannotBh`] 中断底半部被关闭
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    /// extern crate core;
+    /// use core::str;
+    /// use core::slice::memchr::memchr;
+    ///
+    /// use xwrust::xwmd::xwcq::*;
+    ///
+    /// static CQ: Xwcq<64, 16> = Xwcq::new();
+    ///
+    /// pub fn xwrust_example_xwcq() {
+    ///     CQ.init();
+    ///     // ...省略...
+    ///     let rc = CQ.dq_unintr::<[u8; 64]>();
+    ///     match rc {
+    ///         Ok(d) => { // 获取数据成功
+    ///             // 从 `[u8; 64]` 数组中构建切片 `&str`
+    ///             let totalslice = &d[0..64];
+    ///             let nullpos = memchr(0, totalslice).unwrap_or(64);
+    ///             let msgu8slice = &d[0..nullpos];
+    ///             let msg = str::from_utf8(msgu8slice);
+    ///         },
+    ///         Err(e) => { // 获取数据失败
+    ///             break;
+    ///         },
+    ///     };
+    /// }
+    /// ```
+    ///
+    /// [`Sized`]: <https://doc.rust-lang.org/std/marker/trait.Sized.html>
+    pub fn dq_unintr<T>(&self) -> Result<T, XwcqError>
+    where
+        T: Sized + Send
+    {
+        unsafe {
+            let mut datasz: XwSz = mem::size_of::<T>();
+            if datasz <= self.size() {
+                let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
+                if rc == 0 {
+                    let mut data: T = mem::zeroed();
+                    rc = xwcq_dq_unintr(self.cq.get(),
+                                        &mut data as *mut T as *mut u8,
+                                        &mut datasz as _);
+                    xwcq_put(self.cq.get());
+                    if XWOK == rc {
+                        Ok(data)
+                    } else if -ENOTTHDCTX == rc {
+                        Err(XwcqError::NotThreadContext(rc))
+                    } else if -ECANNOTPMPT == rc {
+                        Err(XwcqError::CannotPmpt(rc))
+                    } else if -ECANNOTBH == rc {
+                        Err(XwcqError::CannotBh(rc))
+                    } else {
+                        Err(XwcqError::Unknown(rc))
+                    }
+                } else {
+                    Err(XwcqError::NotInit(rc))
+                }
+            } else {
+                Err(XwcqError::DataSize(-ESIZE))
+            }
+        }
+    }
+
+    /// 尝试从循环队列的 **首端** 接收数据（离队，DeQueue）
+    ///
+    /// + 当循环队列未初始化，返回错误码 [`XwcqError::NotInit`] 。
+    /// + 若循环队列为空，立即返回 [`XwcqError::DataSize`] ，此方法不会阻塞等待。
     /// + 接收时，数据类型是泛型 `T` ，`T` 必须是 [`Sized`] 的，数据是被逐字节地从循环队列的数据槽中拷贝到出来的。
     /// + 循环队列不会对接收时的 `T` 与 发送时的 `T` 进行检查，因此用户必须确保两个类型是一样的，或能安全地进行转换。
     /// + 当 `T` 大小大于循环队列的数据槽大小 `S` ，接收会失败，并返回错误码 [`XwcqError::DataSize`] 。
@@ -682,6 +794,12 @@ where
     /// # 上下文
     ///
     /// + 任意
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwcqError::Ok`] 没有错误
+    /// + [`XwcqError::NotInit`] 循环队列没有初始化
+    /// + [`XwcqError::NoData`] 循环队列中没有数据
     ///
     /// # 示例
     ///
@@ -742,7 +860,7 @@ where
         }
     }
 
-    /// 等待从循环队列的后面取出一份数据（反向离队 Reversely deQueue）
+    /// 等待从循环队列的 **尾端** 接收数据（反向离队，Reversely deQueue）
     ///
     /// + 当循环队列未初始化，返回错误码 [`XwcqError::NotInit`] 。
     /// + 若循环队列为空，线程会阻塞等待。
@@ -754,6 +872,15 @@ where
     /// # 上下文
     ///
     /// + 线程
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwcqError::Ok`] 没有错误
+    /// + [`XwcqError::NotInit`] 循环队列没有初始化
+    /// + [`XwcqError::Interrupt`] 等待被中断
+    /// + [`XwcqError::NotThreadContext`] 不在线程上下文内
+    /// + [`XwcqError::CannotPmpt`] 抢占被关闭
+    /// + [`XwcqError::CannotBh`] 中断底半部被关闭
     ///
     /// # 示例
     ///
@@ -821,7 +948,7 @@ where
         }
     }
 
-    /// 限时等待从循环队列的后面取出一份数据（反向离队 Reversely deQueue）
+    /// 限时等待从循环队列的 **尾端** 接收数据（反向离队，Reversely deQueue）
     ///
     /// + 当循环队列未初始化，返回错误码 [`XwcqError::NotInit`] 。
     /// + 若循环队列为空，线程会阻塞等待，等待时会指定一个唤醒时间点。
@@ -834,6 +961,20 @@ where
     /// # 参数说明
     ///
     /// + to: 期望唤醒的时间点
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwcqError::Ok`] 没有错误
+    /// + [`XwcqError::NotInit`] 循环队列没有初始化
+    /// + [`XwcqError::Interrupt`] 等待被中断
+    /// + [`XwcqError::Timedout`] 等待超时
+    /// + [`XwcqError::NotThreadContext`] 不在线程上下文内
+    /// + [`XwcqError::CannotPmpt`] 抢占被关闭
+    /// + [`XwcqError::CannotBh`] 中断底半部被关闭
     ///
     /// # 上下文
     ///
@@ -909,7 +1050,92 @@ where
         }
     }
 
-    /// 尝试从循环队列的后面取出一份数据（反向离队 Reversely deQueue）
+    /// 等待从循环队列的 **尾端** 接收数据（反向离队，Reversely deQueue），并且等待不可被中断
+    ///
+    /// + 当循环队列未初始化，返回错误码 [`XwcqError::NotInit`] 。
+    /// + 若循环队列为空，线程会阻塞等待，且不可被中断。
+    /// + 接收时，数据类型是泛型 `T` ，`T` 必须是 [`Sized`] 的，数据是被逐字节地从循环队列的数据槽中拷贝到出来的。
+    /// + 循环队列不会对接收时的 `T` 与 发送时的 `T` 进行检查，因此用户必须确保两个类型是一样的，或能安全地进行转换。
+    /// + 当 `T` 大小大于循环队列的数据槽大小 `S` ，接收会失败，并返回错误码 [`XwcqError::DataSize`] 。
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwcqError::Ok`] 没有错误
+    /// + [`XwcqError::NotInit`] 循环队列没有初始化
+    /// + [`XwcqError::NotThreadContext`] 不在线程上下文内
+    /// + [`XwcqError::CannotPmpt`] 抢占被关闭
+    /// + [`XwcqError::CannotBh`] 中断底半部被关闭
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    /// extern crate core;
+    /// use core::str;
+    /// use core::slice::memchr::memchr;
+    ///
+    /// use xwrust::xwmd::xwcq::*;
+    ///
+    /// static CQ: Xwcq<64, 16> = Xwcq::new();
+    ///
+    /// pub fn xwrust_example_xwcq() {
+    ///     CQ.init();
+    ///     // ...省略...
+    ///     let rc = CQ.rq_unintr::<[u8; 64]>();
+    ///     match rc {
+    ///         Ok(d) => { // 获取数据成功
+    ///             // 从 `[u8; 64]` 数组中构建切片 `&str`
+    ///             let totalslice = &d[0..64];
+    ///             let nullpos = memchr(0, totalslice).unwrap_or(64);
+    ///             let msgu8slice = &d[0..nullpos];
+    ///             let msg = str::from_utf8(msgu8slice);
+    ///         },
+    ///         Err(e) => { // 获取数据失败
+    ///             break;
+    ///         },
+    ///     };
+    /// }
+    /// ```
+    ///
+    /// [`Sized`]: <https://doc.rust-lang.org/std/marker/trait.Sized.html>
+    pub fn rq_unintr<T>(&self) -> Result<T, XwcqError>
+    where
+        T: Sized + Send
+    {
+        unsafe {
+            let mut datasz: XwSz = mem::size_of::<T>();
+            if datasz <= self.size() {
+                let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
+                if rc == 0 {
+                    let mut data: T = mem::zeroed();
+                    rc = xwcq_rq_unintr(self.cq.get(),
+                                        &mut data as *mut T as *mut u8,
+                                        &mut datasz as _);
+                    xwcq_put(self.cq.get());
+                    if XWOK == rc {
+                        Ok(data)
+                    } else if -ENOTTHDCTX == rc {
+                        Err(XwcqError::NotThreadContext(rc))
+                    } else if -ECANNOTPMPT == rc {
+                        Err(XwcqError::CannotPmpt(rc))
+                    } else if -ECANNOTBH == rc {
+                        Err(XwcqError::CannotBh(rc))
+                    } else {
+                        Err(XwcqError::Unknown(rc))
+                    }
+                } else {
+                    Err(XwcqError::NotInit(rc))
+                }
+            } else {
+                Err(XwcqError::DataSize(-ESIZE))
+            }
+        }
+    }
+
+    /// 尝试从循环队列的 **尾端** 接收数据（反向离队，Reversely deQueue）
     ///
     /// + 当循环队列未初始化，返回错误码 [`XwcqError::NotInit`] 。
     /// + 若循环队列为空，立即返回 [`XwcqError::DataSize`] ，此方法不会阻塞。
@@ -920,6 +1146,12 @@ where
     /// # 上下文
     ///
     /// + 任意
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwcqError::Ok`] 没有错误
+    /// + [`XwcqError::NotInit`] 循环队列没有初始化
+    /// + [`XwcqError::NoData`] 循环队列中没有数据
     ///
     /// # 示例
     ///
@@ -980,10 +1212,10 @@ where
         }
     }
 
-    /// 等待从循环队列前面拷贝一份数据（Peek at the Front of Queue）
+    /// 等待从循环队列 **头端** 拷贝数据（Peek at the Front of Queue）
     ///
     /// + 当循环队列未初始化，返回错误码 [`XwcqError::NotInit`] 。
-    /// + 从循环队列中拷贝数据时，数据不会取走数据，数据槽不会被释放。
+    /// + 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
     /// + 若循环队列为空，线程会阻塞等待。
     /// + 接收时，数据类型是泛型 `T` ，`T` 必须是 [`Sized`] 的，数据是被逐字节地从循环队列的数据槽中拷贝到出来的。
     /// + 循环队列不会对接收时的 `T` 与 发送时的 `T` 进行检查，因此用户必须确保两个类型是一样的，或能安全地进行转换。
@@ -993,6 +1225,15 @@ where
     /// # 上下文
     ///
     /// + 线程
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwcqError::Ok`] 没有错误
+    /// + [`XwcqError::NotInit`] 循环队列没有初始化
+    /// + [`XwcqError::Interrupt`] 等待被中断
+    /// + [`XwcqError::NotThreadContext`] 不在线程上下文内
+    /// + [`XwcqError::CannotPmpt`] 抢占被关闭
+    /// + [`XwcqError::CannotBh`] 中断底半部被关闭
     ///
     /// # 示例
     ///
@@ -1060,10 +1301,10 @@ where
         }
     }
 
-    /// 限时等待从循环队列前面拷贝一份数据（Peek at the Front of Queue）
+    /// 限时等待从循环队列 **头端** 拷贝数据（Peek at the Front of Queue）
     ///
     /// + 当循环队列未初始化，返回错误码 [`XwcqError::NotInit`] 。
-    /// + 从循环队列中拷贝数据时，数据不会取走数据，数据槽不会被释放。
+    /// + 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
     /// + 若循环队列为空，线程会阻塞等待，等待时会指定一个唤醒时间点。
     /// + 接收时，数据类型是泛型 `T` ，`T` 必须是 [`Sized`] 的，数据是被逐字节地从循环队列的数据槽中拷贝到出来的。
     /// + 循环队列不会对接收时的 `T` 与 发送时的 `T` 进行检查，因此用户必须确保两个类型是一样的，或能安全地进行转换。
@@ -1078,6 +1319,16 @@ where
     /// # 上下文
     ///
     /// + 线程
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwcqError::Ok`] 没有错误
+    /// + [`XwcqError::NotInit`] 循环队列没有初始化
+    /// + [`XwcqError::Interrupt`] 等待被中断
+    /// + [`XwcqError::Timedout`] 等待超时
+    /// + [`XwcqError::NotThreadContext`] 不在线程上下文内
+    /// + [`XwcqError::CannotPmpt`] 抢占被关闭
+    /// + [`XwcqError::CannotBh`] 中断底半部被关闭
     ///
     /// # 示例
     ///
@@ -1149,10 +1400,96 @@ where
         }
     }
 
-    /// 尝试从循环队列前面拷贝一份数据（Peek at the Front of Queue）
+    /// 等待从循环队列 **头端** 拷贝数据（Peek at the Front of Queue），并且等待不可被中断
     ///
     /// + 当循环队列未初始化，返回错误码 [`XwcqError::NotInit`] 。
-    /// + 从循环队列中拷贝数据时，数据不会取走数据，数据槽不会被释放。
+    /// + 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
+    /// + 若循环队列为空，线程会阻塞等待，且不可被中断。
+    /// + 接收时，数据类型是泛型 `T` ，`T` 必须是 [`Sized`] 的，数据是被逐字节地从循环队列的数据槽中拷贝到出来的。
+    /// + 循环队列不会对接收时的 `T` 与 发送时的 `T` 进行检查，因此用户必须确保两个类型是一样的，或能安全地进行转换。
+    /// + 当 `T` 大小大于循环队列的数据槽大小 `S` ，接收会失败，并返回错误码 [`XwcqError::DataSize`] 。
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwcqError::Ok`] 没有错误
+    /// + [`XwcqError::NotInit`] 循环队列没有初始化
+    /// + [`XwcqError::NotThreadContext`] 不在线程上下文内
+    /// + [`XwcqError::CannotPmpt`] 抢占被关闭
+    /// + [`XwcqError::CannotBh`] 中断底半部被关闭
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    /// extern crate core;
+    /// use core::str;
+    /// use core::slice::memchr::memchr;
+    ///
+    /// use xwrust::xwmd::xwcq::*;
+    ///
+    /// static CQ: Xwcq<64, 16> = Xwcq::new();
+    ///
+    /// pub fn xwrust_example_xwcq() {
+    ///     CQ.init();
+    ///     // ...省略...
+    ///     let rc = CQ.pfq_unintr::<[u8; 64]>();
+    ///     match rc {
+    ///         Ok(d) => { // 获取数据成功
+    ///             // 从 `[u8; 64]` 数组中构建切片 `&str`
+    ///             let totalslice = &d[0..64];
+    ///             let nullpos = memchr(0, totalslice).unwrap_or(64);
+    ///             let msgu8slice = &d[0..nullpos];
+    ///             let msg = str::from_utf8(msgu8slice);
+    ///         },
+    ///         Err(e) => { // 获取数据失败
+    ///             break;
+    ///         },
+    ///     };
+    /// }
+    /// ```
+    ///
+    /// [`Sized`]: <https://doc.rust-lang.org/std/marker/trait.Sized.html>
+    pub fn pfq_unintr<T>(&self) -> Result<T, XwcqError>
+    where
+        T: Sized + Send
+    {
+        unsafe {
+            let mut datasz: XwSz = mem::size_of::<T>();
+            if datasz <= self.size() {
+                let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
+                if rc == 0 {
+                    let mut data: T = mem::zeroed();
+                    rc = xwcq_pfq_unintr(self.cq.get(),
+                                         &mut data as *mut T as *mut u8,
+                                         &mut datasz as _);
+                    xwcq_put(self.cq.get());
+                    if XWOK == rc {
+                        Ok(data)
+                    } else if -ENOTTHDCTX == rc {
+                        Err(XwcqError::NotThreadContext(rc))
+                    } else if -ECANNOTPMPT == rc {
+                        Err(XwcqError::CannotPmpt(rc))
+                    } else if -ECANNOTBH == rc {
+                        Err(XwcqError::CannotBh(rc))
+                    } else {
+                        Err(XwcqError::Unknown(rc))
+                    }
+                } else {
+                    Err(XwcqError::NotInit(rc))
+                }
+            } else {
+                Err(XwcqError::DataSize(-ESIZE))
+            }
+        }
+    }
+
+    /// 尝试从循环队列 **头端** 拷贝数据（Peek at the Front of Queue）
+    ///
+    /// + 当循环队列未初始化，返回错误码 [`XwcqError::NotInit`] 。
+    /// + 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
     /// + 若循环队列为空，立即返回 [`XwcqError::DataSize`] ，此方法不会阻塞。
     /// + 接收时，数据类型是泛型 `T` ，`T` 必须是 [`Sized`] 的，数据是被逐字节地从循环队列的数据槽中拷贝到出来的。
     /// + 循环队列不会对接收时的 `T` 与 发送时的 `T` 进行检查，因此用户必须确保两个类型是一样的，或能安全地进行转换。
@@ -1161,6 +1498,12 @@ where
     /// # 上下文
     ///
     /// + 任意
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwcqError::Ok`] 没有错误
+    /// + [`XwcqError::NotInit`] 循环队列没有初始化
+    /// + [`XwcqError::NoData`] 循环队列中没有数据
     ///
     /// # 示例
     ///
@@ -1221,10 +1564,10 @@ where
         }
     }
 
-    /// 等待从循环队列后面拷贝一份数据（Peek at the Rear of Queue）
+    /// 等待从循环队列 **尾端** 拷贝数据（Peek at the Rear of Queue）
     ///
     /// + 当循环队列未初始化，返回错误码 [`XwcqError::NotInit`] 。
-    /// + 从循环队列中拷贝数据时，数据不会取走数据，数据槽不会被释放。
+    /// + 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
     /// + 若循环队列为空，线程会阻塞等待。
     /// + 接收时，数据类型是泛型 `T` ，`T` 必须是 [`Sized`] 的，数据是被逐字节地从循环队列的数据槽中拷贝到出来的。
     /// + 循环队列不会对接收时的 `T` 与 发送时的 `T` 进行检查，因此用户必须确保两个类型是一样的，或能安全地进行转换。
@@ -1234,6 +1577,15 @@ where
     /// # 上下文
     ///
     /// + 线程
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwcqError::Ok`] 没有错误
+    /// + [`XwcqError::NotInit`] 循环队列没有初始化
+    /// + [`XwcqError::Interrupt`] 等待被中断
+    /// + [`XwcqError::NotThreadContext`] 不在线程上下文内
+    /// + [`XwcqError::CannotPmpt`] 抢占被关闭
+    /// + [`XwcqError::CannotBh`] 中断底半部被关闭
     ///
     /// # 示例
     ///
@@ -1301,10 +1653,10 @@ where
         }
     }
 
-    /// 限时等待从循环队列后面拷贝一份数据（Peek at the Rear of Queue）
+    /// 限时等待从循环队列 **尾端** 拷贝数据（Peek at the Rear of Queue）
     ///
     /// + 当循环队列未初始化，返回错误码 [`XwcqError::NotInit`] 。
-    /// + 从循环队列中拷贝数据时，数据不会取走数据，数据槽不会被释放。
+    /// + 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
     /// + 若循环队列为空，线程会阻塞等待，等待时会指定一个唤醒时间点。
     /// + 接收时，数据类型是泛型 `T` ，`T` 必须是 [`Sized`] 的，数据是被逐字节地从循环队列的数据槽中拷贝到出来的。
     /// + 循环队列不会对接收时的 `T` 与 发送时的 `T` 进行检查，因此用户必须确保两个类型是一样的，或能安全地进行转换。
@@ -1319,6 +1671,16 @@ where
     /// # 上下文
     ///
     /// + 线程
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwcqError::Ok`] 没有错误
+    /// + [`XwcqError::NotInit`] 循环队列没有初始化
+    /// + [`XwcqError::Interrupt`] 等待被中断
+    /// + [`XwcqError::Timedout`] 等待超时
+    /// + [`XwcqError::NotThreadContext`] 不在线程上下文内
+    /// + [`XwcqError::CannotPmpt`] 抢占被关闭
+    /// + [`XwcqError::CannotBh`] 中断底半部被关闭
     ///
     /// # 示例
     ///
@@ -1390,10 +1752,96 @@ where
         }
     }
 
-    /// 尝试从循环队列后面拷贝一份数据（Peek at the Rear of Queue）
+    /// 等待从循环队列 **尾端** 拷贝数据（Peek at the Rear of Queue），并且等待不可被中断
     ///
     /// + 当循环队列未初始化，返回错误码 [`XwcqError::NotInit`] 。
-    /// + 从循环队列中拷贝数据时，数据不会取走数据，数据槽不会被释放。
+    /// + 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
+    /// + 若循环队列为空，线程会阻塞等待，且不可被中断。
+    /// + 接收时，数据类型是泛型 `T` ，`T` 必须是 [`Sized`] 的，数据是被逐字节地从循环队列的数据槽中拷贝到出来的。
+    /// + 循环队列不会对接收时的 `T` 与 发送时的 `T` 进行检查，因此用户必须确保两个类型是一样的，或能安全地进行转换。
+    /// + 当 `T` 大小大于循环队列的数据槽大小 `S` ，接收会失败，并返回错误码 [`XwcqError::DataSize`] 。
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwcqError::Ok`] 没有错误
+    /// + [`XwcqError::NotInit`] 循环队列没有初始化
+    /// + [`XwcqError::NotThreadContext`] 不在线程上下文内
+    /// + [`XwcqError::CannotPmpt`] 抢占被关闭
+    /// + [`XwcqError::CannotBh`] 中断底半部被关闭
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    /// extern crate core;
+    /// use core::str;
+    /// use core::slice::memchr::memchr;
+    ///
+    /// use xwrust::xwmd::xwcq::*;
+    ///
+    /// static CQ: Xwcq<64, 16> = Xwcq::new();
+    ///
+    /// pub fn xwrust_example_xwcq() {
+    ///     CQ.init();
+    ///     // ...省略...
+    ///     let rc = CQ.prq_unintr::<[u8; 64]>();
+    ///     match rc {
+    ///         Ok(d) => { // 获取数据成功
+    ///             // 从 `[u8; 64]` 数组中构建切片 `&str`
+    ///             let totalslice = &d[0..64];
+    ///             let nullpos = memchr(0, totalslice).unwrap_or(64);
+    ///             let msgu8slice = &d[0..nullpos];
+    ///             let msg = str::from_utf8(msgu8slice);
+    ///         },
+    ///         Err(e) => { // 获取数据失败
+    ///             break;
+    ///         },
+    ///     };
+    /// }
+    /// ```
+    ///
+    /// [`Sized`]: <https://doc.rust-lang.org/std/marker/trait.Sized.html>
+    pub fn prq_unintr<T>(&self) -> Result<T, XwcqError>
+    where
+        T: Sized + Send
+    {
+        unsafe {
+            let mut datasz: XwSz = mem::size_of::<T>();
+            if datasz <= self.size() {
+                let mut rc = xwrustffi_xwcq_acquire(self.cq.get(), *self.tik.get());
+                if rc == 0 {
+                    let mut data: T = mem::zeroed();
+                    rc = xwcq_prq_unintr(self.cq.get(),
+                                         &mut data as *mut T as *mut u8,
+                                         &mut datasz as _);
+                    xwcq_put(self.cq.get());
+                    if XWOK == rc {
+                        Ok(data)
+                    } else if -ENOTTHDCTX == rc {
+                        Err(XwcqError::NotThreadContext(rc))
+                    } else if -ECANNOTPMPT == rc {
+                        Err(XwcqError::CannotPmpt(rc))
+                    } else if -ECANNOTBH == rc {
+                        Err(XwcqError::CannotBh(rc))
+                    } else {
+                        Err(XwcqError::Unknown(rc))
+                    }
+                } else {
+                    Err(XwcqError::NotInit(rc))
+                }
+            } else {
+                Err(XwcqError::DataSize(-ESIZE))
+            }
+        }
+    }
+
+    /// 尝试从循环队列 **尾端** 拷贝数据（Peek at the Rear of Queue）
+    ///
+    /// + 当循环队列未初始化，返回错误码 [`XwcqError::NotInit`] 。
+    /// + 拷贝数据不会取走数据，也不会释放数据槽，数据可被重复拷贝，也可继续被接收。
     /// + 若循环队列为空，立即返回 [`XwcqError::DataSize`] ，此方法不会阻塞。
     /// + 接收时，数据类型是泛型 `T` ，`T` 必须是 [`Sized`] 的，数据是被逐字节地从循环队列的数据槽中拷贝到出来的。
     /// + 循环队列不会对接收时的 `T` 与 发送时的 `T` 进行检查，因此用户必须确保两个类型是一样的，或能安全地进行转换。
@@ -1402,6 +1850,12 @@ where
     /// # 上下文
     ///
     /// + 任意
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwcqError::Ok`] 没有错误
+    /// + [`XwcqError::NotInit`] 循环队列没有初始化
+    /// + [`XwcqError::NoData`] 循环队列中没有数据
     ///
     /// # 示例
     ///
