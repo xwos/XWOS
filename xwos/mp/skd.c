@@ -632,7 +632,7 @@ struct xwmp_skd * xwmp_skd_rsbh(struct xwmp_skd * xwskd, xwsq_t dis_bh_cnt)
 }
 
 /**
- * @brief 测试调度器是否允许中断底半部
+ * @brief 测试调度器是否允许进入中断底半部
  * @param[in] xwskd: XWOS MP调度器的指针
  * @retval true: 允许
  * @retval false: 禁止

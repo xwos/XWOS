@@ -531,7 +531,7 @@ struct xwup_skd * xwup_skd_rsbh_lc(xwsq_t dis_bh_cnt)
 }
 
 /**
- * @brief 测试调度器是否允许中断底半部
+ * @brief 测试调度器是否允许进入中断底半部
  * @retval true: 允许
  * @retval false: 禁止
  */

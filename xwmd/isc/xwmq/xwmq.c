@@ -198,6 +198,33 @@ err_sem_wait_to:
 }
 
 __xwmd_api
+xwer_t xwmq_eq_unintr(struct xwmq * mq, xwsq_t topic, void * data)
+{
+        xwer_t rc;
+        xwreg_t cpuirq;
+        struct xwmq_msg * msg;
+
+        XWOS_VALIDATE((mq), "nullptr", -EFAULT);
+        XWOS_VALIDATE((data), "nullptr", -EFAULT);
+
+        rc = xwos_sem_wait_unintr(&mq->txqsem);
+        if (rc < 0) {
+                goto err_sem_wait_unintr;
+        }
+        msg = xwmq_msg_get(mq);
+        msg->topic = topic;
+        msg->data = data;
+        xwos_splk_lock_cpuirqsv(&mq->rxqlock, &cpuirq);
+        xwlib_bclst_add_tail(&mq->rxq, &msg->node);
+        xwos_splk_unlock_cpuirqrs(&mq->rxqlock, cpuirq);
+        xwos_sem_post(&mq->rxqsem);
+        return XWOK;
+
+err_sem_wait_unintr:
+        return rc;
+}
+
+__xwmd_api
 xwer_t xwmq_tryeq(struct xwmq * mq, xwsq_t topic, void * data)
 {
         xwer_t rc;
@@ -254,6 +281,33 @@ xwer_t xwmq_jq_to(struct xwmq * mq, xwsq_t topic, void * data, xwtm_t to)
         return XWOK;
 
 err_sem_wait_to:
+        return rc;
+}
+
+__xwmd_api
+xwer_t xwmq_jq_unintr(struct xwmq * mq, xwsq_t topic, void * data)
+{
+        xwer_t rc;
+        xwreg_t cpuirq;
+        struct xwmq_msg * msg;
+
+        XWOS_VALIDATE((mq), "nullptr", -EFAULT);
+        XWOS_VALIDATE((data), "nullptr", -EFAULT);
+
+        rc = xwos_sem_wait_unintr(&mq->txqsem);
+        if (rc < 0) {
+                goto err_sem_wait_unintr;
+        }
+        msg = xwmq_msg_get(mq);
+        msg->topic = topic;
+        msg->data = data;
+        xwos_splk_lock_cpuirqsv(&mq->rxqlock, &cpuirq);
+        xwlib_bclst_add_head(&mq->rxq, &msg->node);
+        xwos_splk_unlock_cpuirqrs(&mq->rxqlock, cpuirq);
+        xwos_sem_post(&mq->rxqsem);
+        return XWOK;
+
+err_sem_wait_unintr:
         return rc;
 }
 
@@ -335,6 +389,7 @@ xwer_t xwmq_dq_to(struct xwmq * mq, xwsq_t * topic, void ** databuf, xwtm_t to)
         struct xwmq_msg * msg;
 
         XWOS_VALIDATE((mq), "nullptr", -EFAULT);
+        XWOS_VALIDATE((topic), "nullptr", -EFAULT);
         XWOS_VALIDATE((databuf), "nullptr", -EFAULT);
 
         rc = xwos_sem_wait_to(&mq->rxqsem, to);
@@ -355,12 +410,40 @@ err_sem_wait_to:
 }
 
 __xwmd_api
+xwer_t xwmq_dq_unintr(struct xwmq * mq, xwsq_t * topic, void ** databuf)
+{
+        xwer_t rc;
+        struct xwmq_msg * msg;
+
+        XWOS_VALIDATE((mq), "nullptr", -EFAULT);
+        XWOS_VALIDATE((topic), "nullptr", -EFAULT);
+        XWOS_VALIDATE((databuf), "nullptr", -EFAULT);
+
+        rc = xwos_sem_wait_unintr(&mq->rxqsem);
+        if (rc < 0) {
+                goto err_sem_wait_unintr;
+        }
+        msg = xwmq_choose_head(mq);
+        *databuf = msg->data;
+        if (NULL != topic) {
+                *topic = msg->topic;
+        }
+        xwmq_msg_put(mq, msg);
+        xwos_sem_post(&mq->txqsem);
+        return XWOK;
+
+err_sem_wait_unintr:
+        return rc;
+}
+
+__xwmd_api
 xwer_t xwmq_trydq(struct xwmq * mq, xwsq_t * topic, void ** databuf)
 {
         xwer_t rc;
         struct xwmq_msg * msg;
 
         XWOS_VALIDATE((mq), "nullptr", -EFAULT);
+        XWOS_VALIDATE((topic), "nullptr", -EFAULT);
         XWOS_VALIDATE((databuf), "nullptr", -EFAULT);
 
         rc = xwos_sem_trywait(&mq->rxqsem);
@@ -393,6 +476,7 @@ xwer_t xwmq_rq_to(struct xwmq * mq, xwsq_t * topic, void ** databuf, xwtm_t to)
         struct xwmq_msg * msg;
 
         XWOS_VALIDATE((mq), "nullptr", -EFAULT);
+        XWOS_VALIDATE((topic), "nullptr", -EFAULT);
         XWOS_VALIDATE((databuf), "nullptr", -EFAULT);
 
         rc = xwos_sem_wait_to(&mq->rxqsem, to);
@@ -413,12 +497,40 @@ err_sem_wait_to:
 }
 
 __xwmd_api
+xwer_t xwmq_rq_unintr(struct xwmq * mq, xwsq_t * topic, void ** databuf)
+{
+        xwer_t rc;
+        struct xwmq_msg * msg;
+
+        XWOS_VALIDATE((mq), "nullptr", -EFAULT);
+        XWOS_VALIDATE((topic), "nullptr", -EFAULT);
+        XWOS_VALIDATE((databuf), "nullptr", -EFAULT);
+
+        rc = xwos_sem_wait_unintr(&mq->rxqsem);
+        if (rc < 0) {
+                goto err_sem_wait_unintr;
+        }
+        msg = xwmq_choose_tail(mq);
+        *databuf = msg->data;
+        if (NULL != topic) {
+                *topic = msg->topic;
+        }
+        xwmq_msg_put(mq, msg);
+        xwos_sem_post(&mq->txqsem);
+        return XWOK;
+
+err_sem_wait_unintr:
+        return rc;
+}
+
+__xwmd_api
 xwer_t xwmq_tryrq(struct xwmq * mq, xwsq_t * topic, void ** databuf)
 {
         xwer_t rc;
         struct xwmq_msg * msg;
 
         XWOS_VALIDATE((mq), "nullptr", -EFAULT);
+        XWOS_VALIDATE((topic), "nullptr", -EFAULT);
         XWOS_VALIDATE((databuf), "nullptr", -EFAULT);
 
         rc = xwos_sem_trywait(&mq->rxqsem);

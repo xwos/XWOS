@@ -28,12 +28,13 @@
  */
 
 /**
- * @brief XWMQ消息
+ * @brief 消息队列的消息
  */
 struct xwmq_msg {
         void * data; /**< 消息数据 */
         xwsq_t topic; /**< 消息的主题 */
-        struct xwlib_bclst_node node; /**< 链表节点，因memslice实现的原因，不可作为第一个成员 */
+        struct xwlib_bclst_node node; /**< 链表节点，因 `xwmm_memslice` 实现的原因，
+                                           不可作为结构体第一个成员 */
 };
 
 /**
@@ -158,7 +159,7 @@ xwer_t xwmq_acquire(xwmq_d mqd);
 xwer_t xwmq_release(xwmq_d mqd);
 
 /**
- * @brief XWMQ API：等待消息槽，然后将消息放入到消息队列的尾端（入队）
+ * @brief XWMQ API：等待消息槽，成功后将消息发送到消息队列的 **尾端** （入队）
  * @param[in] mq: 消息队列对象的指针
  * @param[in] topic: 消息的标题
  * @param[in] data: 消息的数据
@@ -179,7 +180,7 @@ xwer_t xwmq_release(xwmq_d mqd);
 xwer_t xwmq_eq(struct xwmq * mq, xwsq_t topic, void * data);
 
 /**
- * @brief XWMQ API：限时等待消息槽，然后将消息放入到消息队列的尾端（入队）
+ * @brief XWMQ API：限时等待消息槽，成功后将消息发送到消息队列的 **尾端** （入队）
  * @param[in] mq: 消息队列对象的指针
  * @param[in] topic: 消息的标题
  * @param[in] data: 消息的数据
@@ -204,7 +205,27 @@ xwer_t xwmq_eq(struct xwmq * mq, xwsq_t topic, void * data);
 xwer_t xwmq_eq_to(struct xwmq * mq, xwsq_t topic, void * data, xwtm_t to);
 
 /**
- * @brief XWMQ API：尝试获取消息槽，然后将消息放入到消息队列的尾端（入队）
+ * @brief XWMQ API：等待消息槽，且等待不可被中断，
+ *        成功后将消息发送到消息队列的 **尾端** （入队）
+ * @param[in] mq: 消息队列对象的指针
+ * @param[in] topic: 消息的标题
+ * @param[in] data: 消息的数据
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @retval -EDSPMPT: 抢占被关闭
+ * @retval -EDSBH: 中断底半部被关闭
+ * @note
+ * + 上下文：线程
+ * @details
+ * 若消息槽队列中没有空闲的消息槽，就阻塞发送线程，直到有空闲的消息槽。
+ * 并且发送线程的等待不可被中断。
+ */
+xwer_t xwmq_eq_unintr(struct xwmq * mq, xwsq_t topic, void * data);
+
+/**
+ * @brief XWMQ API：尝试获取消息槽，成功后将消息发送到消息队列的 **尾端** （入队）
  * @param[in] mq: 消息队列对象的指针
  * @param[in] topic: 消息的标题
  * @param[in] data: 消息的数据
@@ -215,12 +236,12 @@ xwer_t xwmq_eq_to(struct xwmq * mq, xwsq_t topic, void * data, xwtm_t to);
  * @note
  * + 上下文：任意
  * @details
- * 若消息槽队列中没有空闲的消息槽，就立即返回 `-ENODATA`，不会阻塞。
+ * 若消息槽队列中没有空闲的消息槽，就立即返回 `-ENODATA`，此CAPI可在中断中使用。
  */
 xwer_t xwmq_tryeq(struct xwmq * mq, xwsq_t topic, void * data);
 
 /**
- * @brief XWMQ API：等待消息槽，然后将消息放入到消息队列的首端（插队）
+ * @brief XWMQ API：等待消息槽，成功后将消息发送到消息队列的 **首端** （插队）
  * @param[in] mq: 消息队列对象的指针
  * @param[in] topic: 消息的标题
  * @param[in] data: 消息的数据
@@ -241,7 +262,7 @@ xwer_t xwmq_tryeq(struct xwmq * mq, xwsq_t topic, void * data);
 xwer_t xwmq_jq(struct xwmq * mq, xwsq_t topic, void * data);
 
 /**
- * @brief XWMQ API：限时等待消息槽，然后将消息放入到消息队列的首端（插队）
+ * @brief XWMQ API：限时等待消息槽，成功后将消息发送到消息队列的 **首端** （插队）
  * @param[in] mq: 消息队列对象的指针
  * @param[in] topic: 消息的标题
  * @param[in] data: 消息的数据
@@ -266,7 +287,27 @@ xwer_t xwmq_jq(struct xwmq * mq, xwsq_t topic, void * data);
 xwer_t xwmq_jq_to(struct xwmq * mq, xwsq_t topic, void * data, xwtm_t to);
 
 /**
- * @brief XWMQ API：尝试获取消息槽，然后将消息放入到消息队列的首端（插队）
+ * @brief XWMQ API：等待消息槽，且等待不可被中断，
+ *        成功后将消息发送到消息队列的 **首端** （插队）
+ * @param[in] mq: 消息队列对象的指针
+ * @param[in] topic: 消息的标题
+ * @param[in] data: 消息的数据
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @retval -EDSPMPT: 抢占被关闭
+ * @retval -EDSBH: 中断底半部被关闭
+ * @note
+ * + 上下文：线程
+ * @details
+ * 若消息槽队列中没有空闲的消息槽，就阻塞发送线程，直到有空闲的消息槽。
+ * 并且发送线程的等待不可被中断。
+ */
+xwer_t xwmq_jq_unintr(struct xwmq * mq, xwsq_t topic, void * data);
+
+/**
+ * @brief XWMQ API：尝试获取消息槽，成功后将消息发送到消息队列的 **首端** （插队）
  * @param[in] mq: 消息队列对象的指针
  * @param[in] topic: 消息的标题
  * @param[in] data: 消息的数据
@@ -277,15 +318,15 @@ xwer_t xwmq_jq_to(struct xwmq * mq, xwsq_t topic, void * data, xwtm_t to);
  * @note
  * + 上下文：任意
  * @details
- * 若消息槽队列中没有空闲的消息槽，就立即返回 `-ENODATA`，不会阻塞。
+ * 若消息槽队列中没有空闲的消息槽，就立即返回 `-ENODATA`，此CAPI可在中断中使用。
  */
 xwer_t xwmq_tryjq(struct xwmq * mq, xwsq_t topic, void * data);
 
 /**
- * @brief XWMQ API: 等待从消息队列头部取出一条消息
+ * @brief XWMQ API: 等待从消息队列 **首端** 接收一条消息
  * @param[in] mq: 消息队列对象的指针
- * @param[out] :data 指向缓冲区的指针，通过此缓冲区返回接收消息的数据
  * @param[out] :topic 指向缓冲区的指针，通过此缓冲区返回接收消息的标题
+ * @param[out] :databuf 指向缓冲区的指针，通过此缓冲区返回接收消息的数据
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -296,17 +337,17 @@ xwer_t xwmq_tryjq(struct xwmq * mq, xwsq_t topic, void * data);
  * @note
  * + 上下文：线程
  * @details
- * 若接收队列中没有消息，就阻塞接收线程，直到有新的消息槽或被中断。
+ * 若接收队列中没有消息，就阻塞接收线程，直到有新的消息或被中断。
  *
  * 如果等待被中断，此CAPI将返回 `-EINTR` 。
  */
 xwer_t xwmq_dq(struct xwmq * mq, xwsq_t * topic, void ** databuf);
 
 /**
- * @brief XWMQ API: 限时等待从消息接收队列头部取出一条消息
+ * @brief XWMQ API: 限时等待从消息队列 **首端** 接收一条消息
  * @param[in] mq: 消息队列对象的指针
- * @param[out] :data 指向缓冲区的指针，通过此缓冲区返回接收消息的数据
  * @param[out] :topic 指向缓冲区的指针，通过此缓冲区返回接收消息的标题
+ * @param[out] :databuf 指向缓冲区的指针，通过此缓冲区返回接收消息的数据
  * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -319,7 +360,7 @@ xwer_t xwmq_dq(struct xwmq * mq, xwsq_t * topic, void ** databuf);
  * @note
  * + 上下文：线程
  * @details
- * 若接收队列中没有消息，就阻塞接收线程，直到新的消息槽或被中断或超时。
+ * 若接收队列中没有消息，就阻塞接收线程，直到新的消息或被中断或超时。
  *
  * 如果等待被中断，此CAPI将返回 `-EINTR` 。
  *
@@ -328,9 +369,29 @@ xwer_t xwmq_dq(struct xwmq * mq, xwsq_t * topic, void ** databuf);
 xwer_t xwmq_dq_to(struct xwmq * mq, xwsq_t * topic, void ** databuf, xwtm_t to);
 
 /**
- * @brief XWMQ API: 尝试从消息队列头部取出一条消息
+ * @brief XWMQ API: 等待从消息队列 **首端** 接收一条消息，且等待不可被中断
  * @param[in] mq: 消息队列对象的指针
- * @param[out] ptrbuf: 指向缓冲区的指针，此缓冲区用于接收消息
+ * @param[out] :topic 指向缓冲区的指针，通过此缓冲区返回接收消息的标题
+ * @param[out] :databuf 指向缓冲区的指针，通过此缓冲区返回接收消息的数据
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @retval -EDSPMPT: 抢占被关闭
+ * @retval -EDSBH: 中断底半部被关闭
+ * @note
+ * + 上下文：线程
+ * @details
+ * 若接收队列中没有消息，就阻塞接收线程，直到有新的消息。
+ * 并且接收线程的等待不可被中断。
+ */
+xwer_t xwmq_dq_unintr(struct xwmq * mq, xwsq_t * topic, void ** databuf);
+
+/**
+ * @brief XWMQ API: 尝试从消息队列 **首端** 接收一条消息
+ * @param[in] mq: 消息队列对象的指针
+ * @param[out] :topic 指向缓冲区的指针，通过此缓冲区返回接收消息的标题
+ * @param[out] :databuf 指向缓冲区的指针，通过此缓冲区返回接收消息的数据
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -338,15 +399,15 @@ xwer_t xwmq_dq_to(struct xwmq * mq, xwsq_t * topic, void ** databuf, xwtm_t to);
  * @note
  * + 上下文：任意
  * @details
- * 若接收队列中没有新的消息，就立即返回 `-ENODATA` ，因此可在中断中使用。
+ * 若接收队列中没有新的消息，就立即返回 `-ENODATA` ，此CAPI可在中断中使用。
  */
 xwer_t xwmq_trydq(struct xwmq * mq, xwsq_t * topic, void ** databuf);
 
 /**
- * @brief XWMQ API: 等待从消息队列尾部取出一条消息
+ * @brief XWMQ API: 等待从消息队列 **尾端** 接收一条消息
  * @param[in] mq: 消息队列对象的指针
- * @param[out] :data 指向缓冲区的指针，通过此缓冲区返回接收消息的数据
  * @param[out] :topic 指向缓冲区的指针，通过此缓冲区返回接收消息的标题
+ * @param[out] :databuf 指向缓冲区的指针，通过此缓冲区返回接收消息的数据
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -357,17 +418,17 @@ xwer_t xwmq_trydq(struct xwmq * mq, xwsq_t * topic, void ** databuf);
  * @note
  * + 上下文：线程
  * @details
- * 若接收队列中没有消息，就阻塞接收线程，直到有新的消息槽或被中断。
+ * 若接收队列中没有消息，就阻塞接收线程，直到有新的消息或被中断。
  *
  * 如果等待被中断，此CAPI将返回 `-EINTR` 。
  */
 xwer_t xwmq_rq(struct xwmq * mq, xwsq_t * topic, void ** databuf);
 
 /**
- * @brief XWMQ API: 限时等待从消息接收队列尾部取出一条消息
+ * @brief XWMQ API: 限时等待从消息队列 **尾端** 接收一条消息
  * @param[in] mq: 消息队列对象的指针
- * @param[out] :data 指向缓冲区的指针，通过此缓冲区返回接收消息的数据
  * @param[out] :topic 指向缓冲区的指针，通过此缓冲区返回接收消息的标题
+ * @param[out] :databuf 指向缓冲区的指针，通过此缓冲区返回接收消息的数据
  * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -380,7 +441,7 @@ xwer_t xwmq_rq(struct xwmq * mq, xwsq_t * topic, void ** databuf);
  * @note
  * + 上下文：线程
  * @details
- * 若接收队列中没有消息，就阻塞接收线程，直到新的消息槽或被中断或超时。
+ * 若接收队列中没有消息，就阻塞接收线程，直到新的消息或被中断或超时。
  *
  * 如果等待被中断，此CAPI将返回 `-EINTR` 。
  *
@@ -389,9 +450,29 @@ xwer_t xwmq_rq(struct xwmq * mq, xwsq_t * topic, void ** databuf);
 xwer_t xwmq_rq_to(struct xwmq * mq, xwsq_t * topic, void ** databuf, xwtm_t to);
 
 /**
- * @brief XWMQ API: 尝试从消息队列尾部取出一条消息
+ * @brief XWMQ API: 等待从消息队列 **尾端** 接收一条消息，且等待不可被中断
  * @param[in] mq: 消息队列对象的指针
- * @param[out] ptrbuf: 指向缓冲区的指针，此缓冲区用于接收消息
+ * @param[out] :topic 指向缓冲区的指针，通过此缓冲区返回接收消息的标题
+ * @param[out] :databuf 指向缓冲区的指针，通过此缓冲区返回接收消息的数据
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @retval -ENOTTHDCTX: 不在线程上下文中
+ * @retval -EDSPMPT: 抢占被关闭
+ * @retval -EDSBH: 中断底半部被关闭
+ * @note
+ * + 上下文：线程
+ * @details
+ * 若接收队列中没有消息，就阻塞接收线程，直到有新的消息。
+ * 并且接收线程的等待不可被中断。
+ */
+xwer_t xwmq_rq_unintr(struct xwmq * mq, xwsq_t * topic, void ** databuf);
+
+/**
+ * @brief XWMQ API: 尝试从消息队列 **尾端** 接收一条消息
+ * @param[in] mq: 消息队列对象的指针
+ * @param[out] :topic 指向缓冲区的指针，通过此缓冲区返回接收消息的标题
+ * @param[out] :databuf 指向缓冲区的指针，通过此缓冲区返回接收消息的数据
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -399,7 +480,7 @@ xwer_t xwmq_rq_to(struct xwmq * mq, xwsq_t * topic, void ** databuf, xwtm_t to);
  * @note
  * + 上下文：任意
  * @details
- * 若接收队列中没有新的消息，就立即返回 `-ENODATA` ，因此可在中断中使用。
+ * 若接收队列中没有新的消息，就立即返回 `-ENODATA` ，此CAPI可在中断中使用。
  */
 xwer_t xwmq_tryrq(struct xwmq * mq, xwsq_t * topic, void ** databuf);
 

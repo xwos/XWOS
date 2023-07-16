@@ -7,10 +7,10 @@
 //!
 //! 消息队列在创建时，需要指定一个类型 `T` ，发送和接收的数据只能是类型 `T` 的数据。
 //! 发送时，消息队列会通过 [`Box`] 将类型 `T` 的数据存入堆内存中。然后将 `Box<T>` 的裸指针发送到队列。
-//! 可以发送到尾部（入队 [`XwmqTx::eq()`] ），也可将消息发送到队列的头部（插队 [`XwmqTx::jq()`] ）。
+//! 可以发送到尾端（入队 [`XwmqTx::eq()`] ），也可将消息发送到队列的头端（插队 [`XwmqTx::jq()`] ）。
 //!
 //! 接收时，会从队列中取出 `T` 的裸指针，然后恢复成 `Box<T>` 后返回，由于 [`Box`] 能自动释放内存，因此用户不需要关心内存释放的问题。
-//! 接收消息可以从头部接收，也可以从尾部接收。
+//! 接收消息可以从头端接收，也可以从尾端接收。
 //!
 //!
 //! # 创建
@@ -59,7 +59,7 @@
 //!
 //! ## 入队
 //!
-//! **入队** 方式是将消息发送到队列的 **尾部** ， **入队** 时，会通过 [`Box`] 将数据放入heap中，然后进行发送。
+//! **入队** 方式是将消息发送到队列的 **尾端** ， **入队** 时，会通过 [`Box`] 将数据放入heap中，然后进行发送。
 //!
 //! ### 等待入队
 //!
@@ -78,6 +78,14 @@
 //! + 当线程阻塞等待被中断时，返回 [`XwmqError::Interrupt`] 。
 //! + 当到达指定的唤醒时间点，线程被唤醒，并返回 [`XwmqError::Timedout`] 。
 //!
+//! ### 等待入队，且等待不可不中断
+//!
+//! 方法 [`XwmqTx::eq_unintr()`] 只可在 **线程** 上下文中使用：
+//!
+//! + 当消息队列中没有空的消息槽可用时，发送线程会阻塞等待。
+//! + 发送线程的阻塞等待不可被中断。
+//! + 当消息队列中有可用的消息槽时，发送线程被唤醒，并取走一个消息槽，并发送数据。
+//!
 //! ### 尝试等待入队
 //!
 //! 方法 [`XwmqTx::tryeq()`] 方法可在 **任意** 上下文中使用，不会阻塞，只会检测信号量的值：
@@ -87,11 +95,11 @@
 //!
 //! ## 插队
 //!
-//! **插队** 方式是将消息发送到队列的 **头部** ， **插队** 时，会通过 [`Box`] 将数据放入heap中，然后进行发送。
+//! **插队** 方式是将消息发送到队列的 **头端** ， **插队** 时，会通过 [`Box`] 将数据放入heap中，然后进行发送。
 //!
 //! ### 等待插队
 //!
-//! 方法 [`XwmqTx::eq()`] 只可在 **线程** 上下文中使用：
+//! 方法 [`XwmqTx::jq()`] 只可在 **线程** 上下文中使用：
 //!
 //! + 当消息队列中没有空的消息槽可用时，发送线程会阻塞等待。
 //! + 当消息队列中有可用的消息槽时，发送线程被唤醒，并取走一个消息槽，并发送数据。
@@ -99,16 +107,22 @@
 //!
 //! ### 超时等待插队
 //!
-//! 方法 [`XwmqTx::eq_to()`] 只可在 **线程** 上下文中使用：
+//! 方法 [`XwmqTx::jq_to()`] 只可在 **线程** 上下文中使用：
 //!
 //! + 当消息队列中没有空的消息槽可用时，发送线程会阻塞等待，等待时会指定一个唤醒时间点。
 //! + 当消息队列中有可用的消息槽时，发送线程被唤醒，并取走一个消息槽，并发送数据。
 //! + 当线程阻塞等待被中断时，返回 [`XwmqError::Interrupt`] 。
 //! + 当到达指定的唤醒时间点，线程被唤醒，并返回 [`XwmqError::Timedout`] 。
 //!
+//! 方法 [`XwmqTx::jq_unintr()`] 只可在 **线程** 上下文中使用：
+//!
+//! + 当消息队列中没有空的消息槽可用时，发送线程会阻塞等待。
+//! + 发送线程的阻塞等待不可被中断。
+//! + 当消息队列中有可用的消息槽时，发送线程被唤醒，并取走一个消息槽，并发送数据。
+//!
 //! ### 尝试等待插队
 //!
-//! 方法 [`XwmqTx::tryeq()`] 方法可在 **任意** 上下文中使用，不会阻塞，只会检测信号量的值：
+//! 方法 [`XwmqTx::tryjq()`] 方法可在 **任意** 上下文中使用，不会阻塞，只会检测信号量的值：
 //!
 //! + 当消息队列中没有空的消息槽可用时，立即返回 [`XwmqError::NoSlot`] 。
 //! + 当消息队列中有可用的消息槽时，发送线程会取走一个消息槽，并发送数据。
@@ -120,9 +134,9 @@
 //!
 //! 接收者 [`XwmqRx`] 不可被“克隆”，因为接收者只能有一个。
 //!
-//! ## 从头部接收
+//! ## 从头端接收
 //!
-//! 从接收队列的 **头部** 取出消息，称为 **离队** 。
+//! 从消息队列的 **头端** 取出消息，称为 **离队** 。
 //! 接收成功，消息 **离队** 时，会通过 [`Box::from_raw()`] 将数据重新放入 [`Box`] 中，然后通过 [`Ok()`] 返回。
 //! 当 [`Box`] 被 [`drop()`] 时，会自动释放heap内存。
 //!
@@ -130,55 +144,68 @@
 //!
 //! 方法 [`XwmqRx::dq()`] 只可在 **线程** 上下文中使用：
 //!
-//! + 当接收队列中没有消息时，接收线程会阻塞等待。
-//! + 当接收队列中有可用的消息时，接收线程被唤醒，并取走一个消息，并释放消息槽。
+//! + 当消息队列中没有消息时，接收线程会阻塞等待。
+//! + 当消息队列中有可用的消息时，接收线程被唤醒，并取走一个消息，并释放消息槽。
 //! + 当线程阻塞等待被中断时，通过 [`Err()`] 返回 [`XwmqError::Interrupt`] 。
 //!
 //! ### 超时等待离队
 //!
 //! 方法 [`XwmqRx::dq_to()`] 只可在 **线程** 上下文中使用：
 //!
-//! + 当消息接收队列中没有消息时，接收线程会阻塞等待，等待时会指定一个唤醒时间点。
-//! + 当接收队列中有可用的消息时，接收线程被唤醒，并取走一个消息，释放消息槽。
+//! + 当消息队列中没有消息时，接收线程会阻塞等待，等待时会指定一个唤醒时间点。
+//! + 当消息队列中有可用的消息时，接收线程被唤醒，并取走一个消息，释放消息槽。
 //! + 当线程阻塞等待被中断时，通过 [`Err()`] 返回 [`XwmqError::Interrupt`] 。
 //! + 当到达指定的唤醒时间点，线程被唤醒，并通过 [`Err()`] 返回 [`XwmqError::Timedout`] 。
+//!
+//! 方法 [`XwmqRx::dq_unintr()`] 只可在 **线程** 上下文中使用：
+//!
+//! + 当消息队列中没有消息时，接收线程会阻塞等待。
+//! + 接收线程的阻塞等待不可被中断。
+//! + 当消息队列中有可用的消息时，接收线程被唤醒，并取走一个消息，并释放消息槽。
 //!
 //! ### 尝试等待离队
 //!
 //! 方法 [`XwmqRx::trydq()`] 方法可在 **任意** 上下文中使用，不会阻塞，只会检测信号量的值：
 //!
-//! + 当接收队列中没有消息时，立即通过 [`Err()`] 返回 [`XwmqError::NoMsg`] 。
-//! + 当接收队列中有可用的消息时，接收线程会取走一个消息，并释放消息槽。
+//! + 当消息队列中没有消息时，立即通过 [`Err()`] 返回 [`XwmqError::NoMsg`] 。
+//! + 当消息队列中有可用的消息时，接收线程会取走一个消息，并释放消息槽。
 //!
-//! ## 从尾部接收
+//! ## 从尾端接收
 //!
-//! 从接收队列的 **尾部** 取出消息，称为 **反向离队** 。
-//! 接收成功，消息 **离队** 时，会通过 [`Box::from_raw()`] 将数据重新放入 [`Box`] 中，然后通过 [`Ok()`] 返回。
+//! 从消息队列的 **尾端** 取出消息，称为 **反向离队** 。
+//! 接收成功，消息 **离队** 时，会通过 [`Box::from_raw()`] 将数据重新放入 [`Box`] 中，
+//! 然后通过 [`Ok()`] 返回。
 //! 当 [`Box`] 被 [`drop()`] 时，会自动释放heap内存。
 //!
 //! ## 等待反向离队
 //!
 //! 方法 [`XwmqRx::rq()`] 只可在 **线程** 上下文中使用：
 //!
-//! + 当接收队列中没有消息时，接收线程会阻塞等待。
-//! + 当接收队列中有可用的消息时，接收线程被唤醒，并取走一个消息，并释放消息槽。
+//! + 当消息队列中没有消息时，接收线程会阻塞等待。
+//! + 当消息队列中有可用的消息时，接收线程被唤醒，并取走一个消息，并释放消息槽。
 //! + 当线程阻塞等待被中断时，通过 [`Err()`] 返回 [`XwmqError::Interrupt`] 。
 //!
 //! ### 超时等待反向离队
 //!
 //! 方法 [`XwmqRx::rq_to()`] 只可在 **线程** 上下文中使用：
 //!
-//! + 当消息接收队列中没有消息时，接收线程会阻塞等待，等待时会指定一个唤醒时间点。
-//! + 当接收队列中有可用的消息时，接收线程被唤醒，并取走一个消息，释放消息槽。
+//! + 当消息队列中没有消息时，接收线程会阻塞等待，等待时会指定一个唤醒时间点。
+//! + 当消息队列中有可用的消息时，接收线程被唤醒，并取走一个消息，释放消息槽。
 //! + 当线程阻塞等待被中断时，通过 [`Err()`] 返回 [`XwmqError::Interrupt`] 。
 //! + 当到达指定的唤醒时间点，线程被唤醒，并通过 [`Err()`] 返回 [`XwmqError::Timedout`] 。
+//!
+//! 方法 [`XwmqRx::rq_unintr()`] 只可在 **线程** 上下文中使用：
+//!
+//! + 当消息队列中没有消息时，接收线程会阻塞等待。
+//! + 接收线程的阻塞等待不可被中断。
+//! + 当消息队列中有可用的消息时，接收线程被唤醒，并取走一个消息，并释放消息槽。
 //!
 //! ### 尝试等待反向离队
 //!
 //! 方法 [`XwmqRx::tryrq()`] 方法可在 **任意** 上下文中使用，不会阻塞，只会检测信号量的值：
 //!
-//! + 当接收队列中没有消息时，立即通过 [`Err()`] 返回 [`XwmqError::NoMsg`] 。
-//! + 当接收队列中有可用的消息时，接收线程会取走一个消息，并释放消息槽。
+//! + 当消息队列中没有消息时，立即通过 [`Err()`] 返回 [`XwmqError::NoMsg`] 。
+//! + 当消息队列中有可用的消息时，接收线程会取走一个消息，并释放消息槽。
 //!
 //!
 //! # 示例
@@ -236,14 +263,17 @@
 //!
 //! ### 构建全局变量的方式
 //!
-//! + [`std::sync::mpsc`] 没有编译期构造函数，因此只能借助宏 [`lazy_static!`] 创建全局变量；
+//! + [`std::sync::mpsc`] 没有编译期构造函数，因此只能借助
+//!   宏 [`lazy_static!`] 创建全局变量；
 //! + [`xwrust::xwmd::xwmq`] 则可以直接在函数外部定义。
 //!
 //!
 //! ### 通道类型
 //!
 //! + [`std::sync::mpsc`] 还有异步的通道 [`std::sync::mpsc::channel()`] ；
-//! + [`xwrust::xwmd::xwmq`] 通过 [`Xwmq::init()`] 返回的是类似于 [`std::sync::mpsc::sync_channel()`] 的通道， [`xwrust::xwmd::xwmq`] 没有异步的通道 。
+//! + [`xwrust::xwmd::xwmq`] 通过 [`Xwmq::init()`] 返回的是类似于
+//!   [`std::sync::mpsc::sync_channel()`] 的通道，
+//!   [`xwrust::xwmd::xwmq`] 没有异步的通道 。
 //!
 //! ### 接收消息返回方式不同
 //!
@@ -291,14 +321,18 @@ extern "C" {
     fn xwmq_eq(mq: *mut XwmdXwmq, topic: XwSq, data: *mut c_void) -> XwEr;
     fn xwmq_eq_to(mq: *mut XwmdXwmq, topic: XwSq, data: *mut c_void, to: XwTm) -> XwEr;
     fn xwmq_tryeq(mq: *mut XwmdXwmq, topic: XwSq, data: *mut c_void) -> XwEr;
+    fn xwmq_eq_unintr(mq: *mut XwmdXwmq, topic: XwSq, data: *mut c_void) -> XwEr;
     fn xwmq_jq(mq: *mut XwmdXwmq, topic: XwSq, data: *mut c_void) -> XwEr;
     fn xwmq_jq_to(mq: *mut XwmdXwmq, topic: XwSq, data: *mut c_void, to: XwTm) -> XwEr;
+    fn xwmq_jq_unintr(mq: *mut XwmdXwmq, topic: XwSq, data: *mut c_void) -> XwEr;
     fn xwmq_tryjq(mq: *mut XwmdXwmq, topic: XwSq, data: *mut c_void) -> XwEr;
     fn xwmq_dq(mq: *mut XwmdXwmq, topic: *mut XwSq, data: *mut *mut c_void) -> XwEr;
     fn xwmq_dq_to(mq: *mut XwmdXwmq, topic: *mut XwSq, data: *mut *mut c_void, to: XwTm) -> XwEr;
+    fn xwmq_dq_unintr(mq: *mut XwmdXwmq, topic: *mut XwSq, data: *mut *mut c_void) -> XwEr;
     fn xwmq_trydq(mq: *mut XwmdXwmq, topic: *mut XwSq, data: *mut *mut c_void) -> XwEr;
     fn xwmq_rq(mq: *mut XwmdXwmq, topic: *mut XwSq, data: *mut *mut c_void) -> XwEr;
     fn xwmq_rq_to(mq: *mut XwmdXwmq, topic: *mut XwSq, data: *mut *mut c_void, to: XwTm) -> XwEr;
+    fn xwmq_rq_unintr(mq: *mut XwmdXwmq, topic: *mut XwSq, data: *mut *mut c_void) -> XwEr;
     fn xwmq_tryrq(mq: *mut XwmdXwmq, topic: *mut XwSq, data: *mut *mut c_void) -> XwEr;
 }
 
@@ -526,7 +560,7 @@ impl<'a, const N: XwSz, T> XwmqTx<'a, N, T>
 where
     [u8; N * SIZEOF_XWMQ_MSG]: Sized
 {
-    /// 等待空的消息槽，通过消息槽将消息发送到队列的 **尾部**
+    /// 等待消息槽，成功后将消息发送到消息队列的 **尾端** （入队）
     ///
     /// + 当消息队列中没有空的消息槽可用时，发送线程会阻塞等待。
     /// + 当消息队列中有可用的消息槽时，发送线程被唤醒，并取走一个消息槽，并发送数据。
@@ -597,7 +631,7 @@ where
         }
     }
 
-    /// 限时等待空的消息槽，通过消息槽将消息发送到队列的 **尾部**
+    /// 限时等待消息槽，成功后将消息发送到消息队列的 **尾端** （入队）
     ///
     /// + 当消息队列中没有空的消息槽可用时，发送线程会阻塞等待，等待时会指定一个唤醒时间点。
     /// + 当消息队列中有可用的消息槽时，发送线程被唤醒，并取走一个消息槽，并发送数据。
@@ -674,7 +708,75 @@ where
         }
     }
 
-    /// 尝试获取空的消息槽，并通过消息槽将消息发送到队列的 **尾部**
+    /// 等待消息槽，且等待不可被中断，成功后将消息发送到消息队列的 **尾端** （入队）
+    ///
+    /// + 当消息队列中没有空的消息槽可用时，发送线程会阻塞等待。
+    /// + 发送线程的阻塞等待不可被中断。
+    /// + 当消息队列中有可用的消息槽时，发送线程被唤醒，并取走一个消息槽，并发送数据。
+    /// + 消息 **入队** 时，会通过 [`Box`] 将数据放入heap中，然后进行发送。
+    ///
+    /// # 参数说明
+    ///
+    /// + data: 类型为 `T` 的数据
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwmqError::Ok`] 没有错误
+    /// + [`XwmqError::NotInit`] 消息队列没有初始化
+    /// + [`XwmqError::NotThreadContext`] 不在线程上下文内
+    /// + [`XwmqError::CannotPmpt`] 抢占被关闭
+    /// + [`XwmqError::CannotBh`] 中断底半部被关闭
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    /// extern crate alloc;
+    /// use alloc::string::String;
+    /// use alloc::string::ToString;
+    ///
+    /// use xwrust::xwmd::xwmq::*;
+    ///
+    /// static MQ: Xwmq<16, String> = Xwmq::new();
+    ///
+    /// pub fn xwrust_example_xwmq() {
+    ///     let (tx, rx) = MQ.init();
+    ///     // ...省略...
+    ///     tx.eq_unintr("message".to_string());
+    ///     // ...省略...
+    /// }
+    /// ```
+    ///
+    /// [`Box`]: <https://doc.rust-lang.org/alloc/boxed/struct.Box.html>
+    pub fn eq_unintr(&self, data: T) -> XwmqError {
+        let boxdata = Box::new(data);
+        let raw = Box::into_raw(boxdata);
+        unsafe {
+            let mut rc = xwrustffi_xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
+            if rc == 0 {
+                rc = xwmq_eq_unintr(self.xwmq.mq.get(), 0, raw as *mut c_void);
+                xwmq_put(self.xwmq.mq.get());
+                if XWOK == rc {
+                    XwmqError::Ok(rc)
+                } else if -ENOTTHDCTX == rc {
+                    XwmqError::NotThreadContext(rc)
+                } else if -ECANNOTPMPT == rc {
+                    XwmqError::CannotPmpt(rc)
+                } else if -ECANNOTBH == rc {
+                    XwmqError::CannotBh(rc)
+                } else {
+                    XwmqError::Unknown(rc)
+                }
+            } else {
+                XwmqError::NotInit(rc)
+            }
+        }
+    }
+
+    /// 尝试获取消息槽，成功后将消息发送到消息队列的 **尾端** （入队）
     ///
     /// + 当消息队列中没有空的消息槽可用时，立即返回 [`XwmqError::NoSlot`] 。
     /// + 当消息队列中有可用的消息槽时，发送线程会取走一个消息槽，并发送数据。
@@ -735,7 +837,7 @@ where
         }
     }
 
-    /// 等待空的消息槽，通过消息槽将消息发送到队列的 **头部**
+    /// 等待消息槽，成功后将消息发送到消息队列的 **首端** （插队）
     ///
     /// + 当消息队列中没有空的消息槽可用时，发送线程会阻塞等待。
     /// + 当消息队列中有可用的消息槽时，发送线程被唤醒，并取走一个消息槽，并发送数据。
@@ -806,7 +908,7 @@ where
         }
     }
 
-    /// 限时等待空的消息槽，通过消息槽将消息发送到队列的 **头部**
+    /// 限时等待消息槽，成功后将消息发送到消息队列的 **首端** （插队）
     ///
     /// + 当消息队列中没有空的消息槽可用时，发送线程会阻塞等待，等待时会指定一个唤醒时间点。
     /// + 当消息队列中有可用的消息槽时，发送线程被唤醒，并取走一个消息槽，并发送数据。
@@ -883,7 +985,75 @@ where
         }
     }
 
-    /// 尝试获取空的消息槽，并通过消息槽将消息发送到队列的 **头部**
+    /// 等待消息槽，且等待不可被中断，成功后将消息发送到消息队列的 **首端** （插队）
+    ///
+    /// + 当消息队列中没有空的消息槽可用时，发送线程会阻塞等待。
+    /// + 发送线程的阻塞等待不可被中断。
+    /// + 当消息队列中有可用的消息槽时，发送线程被唤醒，并取走一个消息槽，并发送数据。
+    /// + 消息 **入队** 时，会通过 [`Box`] 将数据放入heap中，然后进行发送。
+    ///
+    /// # 参数说明
+    ///
+    /// + data: 类型为 `T` 的数据
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwmqError::Ok`] 没有错误
+    /// + [`XwmqError::NotInit`] 消息队列没有初始化
+    /// + [`XwmqError::NotThreadContext`] 不在线程上下文内
+    /// + [`XwmqError::CannotPmpt`] 抢占被关闭
+    /// + [`XwmqError::CannotBh`] 中断底半部被关闭
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    /// extern crate alloc;
+    /// use alloc::string::String;
+    /// use alloc::string::ToString;
+    ///
+    /// use xwrust::xwmd::xwmq::*;
+    ///
+    /// static MQ: Xwmq<16, String> = Xwmq::new();
+    ///
+    /// pub fn xwrust_example_xwmq() {
+    ///     let (tx, rx) = MQ.init();
+    ///     // ...省略...
+    ///     tx.jq_unintr("message".to_string());
+    ///     // ...省略...
+    /// }
+    /// ```
+    ///
+    /// [`Box`]: <https://doc.rust-lang.org/alloc/boxed/struct.Box.html>
+    pub fn jq_unintr(&self, data: T) -> XwmqError {
+        let boxdata = Box::new(data);
+        let raw = Box::into_raw(boxdata);
+        unsafe {
+            let mut rc = xwrustffi_xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
+            if rc == 0 {
+                rc = xwmq_jq_unintr(self.xwmq.mq.get(), 0, raw as *mut c_void);
+                xwmq_put(self.xwmq.mq.get());
+                if XWOK == rc {
+                    XwmqError::Ok(rc)
+                } else if -ENOTTHDCTX == rc {
+                    XwmqError::NotThreadContext(rc)
+                } else if -ECANNOTPMPT == rc {
+                    XwmqError::CannotPmpt(rc)
+                } else if -ECANNOTBH == rc {
+                    XwmqError::CannotBh(rc)
+                } else {
+                    XwmqError::Unknown(rc)
+                }
+            } else {
+                XwmqError::NotInit(rc)
+            }
+        }
+    }
+
+    /// 尝试获取消息槽，成功后将消息发送到消息队列的 **首端** （插队）
     ///
     /// + 当消息队列中没有空的消息槽可用时，立即返回 [`XwmqError::NoSlot`] 。
     /// + 当消息队列中有可用的消息槽时，发送线程会取走一个消息槽，并发送数据。
@@ -949,11 +1119,11 @@ impl<'a, const N: XwSz, T> XwmqRx<'a, N, T>
 where
     [u8; N * SIZEOF_XWMQ_MSG]: Sized
 {
-    /// 等待从头部接收消息
+    /// 等待从消息队列 **首端** 接收一条消息
     ///
-    /// + 从接收队列的 **头部** 取出消息，称为 **离队** 。
-    /// + 当接收队列中没有消息时，接收线程会阻塞等待。
-    /// + 当接收队列中有可用的消息时，接收线程被唤醒，并取走一个消息，释放消息槽。
+    /// + 从消息队列的 **首端** 取出消息，称为 **离队** 。
+    /// + 当消息队列中没有消息时，接收线程会阻塞等待。
+    /// + 当消息队列中有可用的消息时，接收线程被唤醒，并取走一个消息，释放消息槽。
     /// + 消息 **离队** 时，会通过 [`Box::from_raw()`] 将数据重新放入 [`Box`] 中，然后通过 [`Ok()`] 返回。
     /// + 当线程阻塞等待被中断时，通过 [`Err()`] 返回 [`XwmqError::Interrupt`] 。
     ///
@@ -1026,11 +1196,11 @@ where
         }
     }
 
-    /// 限时从头部等待接收消息
+    /// 限时等待从消息队列 **首端** 接收一条消息
     ///
-    /// + 从接收队列的 **头部** 取出消息，称为 **离队** 。
-    /// + 当接收队列中没有消息时，接收线程会阻塞等待，等待时会指定一个唤醒时间点。
-    /// + 当接收队列中有可用的消息时，接收线程被唤醒，并取走一个消息，释放消息槽。
+    /// + 从消息队列的 **首端** 取出消息，称为 **离队** 。
+    /// + 当消息队列中没有消息时，接收线程会阻塞等待，等待时会指定一个唤醒时间点。
+    /// + 当消息队列中有可用的消息时，接收线程被唤醒，并取走一个消息，释放消息槽。
     /// + 消息 **离队** 时，会通过 [`Box::from_raw()`] 将数据重新放入 [`Box`] 中，然后通过 [`Ok()`] 返回。
     /// + 当线程阻塞等待被中断时，通过 [`Err()`] 返回 [`XwmqError::Interrupt`] 。
     /// + 当到达指定的唤醒时间点，线程被唤醒，并通过 [`Err()`] 返回 [`XwmqError::Timedout`] 。
@@ -1112,11 +1282,85 @@ where
         }
     }
 
-    /// 尝试从头部接收消息
+    /// 等待从消息队列 **首端** 接收一条消息，且等待不可被中断
     ///
-    /// + 从接收队列的 **头部** 取出消息，称为 **离队** 。
-    /// + 当接收队列中没有消息时，立即通过 [`Err()`] 返回 [`XwmqError::NoMsg`] 。
-    /// + 当接收队列中有可用的消息时，接收线程会取走一个消息，并释放消息槽。
+    /// + 从消息队列的 **首端** 取出消息，称为 **离队** 。
+    /// + 当消息队列中没有消息时，接收线程会阻塞等待。
+    /// + 接收线程的阻塞等待不可被中断。
+    /// + 当消息队列中有可用的消息时，接收线程被唤醒，并取走一个消息，释放消息槽。
+    /// + 消息 **离队** 时，会通过 [`Box::from_raw()`] 将数据重新放入 [`Box`] 中，然后通过 [`Ok()`] 返回。
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwmqError::NotInit`] 消息队列没有初始化
+    /// + [`XwmqError::NotThreadContext`] 不在线程上下文内
+    /// + [`XwmqError::CannotPmpt`] 抢占被关闭
+    /// + [`XwmqError::CannotBh`] 中断底半部被关闭
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    /// extern crate alloc;
+    /// use alloc::string::String;
+    /// use alloc::string::ToString;
+    ///
+    /// use xwrust::xwmd::xwmq::*;
+    ///
+    /// static MQ: Xwmq<16, String> = Xwmq::new();
+    ///
+    /// pub fn xwrust_example_xwmq() {
+    ///     let (tx, rx) = MQ.init();
+    ///     // ...省略...
+    ///     let rc = rx.dq();
+    ///         match rc {
+    ///             Ok(d) => { // d是Box<String>
+    ///             },
+    ///             Err(e) => { // e是错误码
+    ///             },
+    ///         };
+    ///     // ...省略...
+    /// }
+    /// ```
+    ///
+    /// [`Box`]: <https://doc.rust-lang.org/alloc/boxed/struct.Box.html>
+    /// [`Box::from_raw()`]: <https://doc.rust-lang.org/alloc/boxed/struct.Box.html#method.from_raw>
+    /// [`Ok()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
+    /// [`Err()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
+    pub fn dq_unintr(&self) -> Result<Box<T>, XwmqError> {
+        unsafe {
+            let mut rc = xwrustffi_xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
+            if rc == 0 {
+                let mut topic = 0;
+                let mut raw: *mut c_void = ptr::null_mut();
+                rc = xwmq_dq_unintr(self.xwmq.mq.get(), &mut topic, &mut raw);
+                xwmq_put(self.xwmq.mq.get());
+                if XWOK == rc {
+                    let boxdata = Box::from_raw(raw as *mut T);
+                    Ok(boxdata)
+                } else if -ENOTTHDCTX == rc {
+                    Err(XwmqError::NotThreadContext(rc))
+                } else if -ECANNOTPMPT == rc {
+                    Err(XwmqError::CannotPmpt(rc))
+                } else if -ECANNOTBH == rc {
+                    Err(XwmqError::CannotBh(rc))
+                } else {
+                    Err(XwmqError::Unknown(rc))
+                }
+            } else {
+                Err(XwmqError::NotInit(rc))
+            }
+        }
+    }
+
+    /// 尝试从消息队列 **首端** 接收一条消息
+    ///
+    /// + 从消息队列的 **首端** 取出消息，称为 **离队** 。
+    /// + 当消息队列中没有消息时，立即通过 [`Err()`] 返回 [`XwmqError::NoMsg`] 。
+    /// + 当消息队列中有可用的消息时，接收线程会取走一个消息，并释放消息槽。
     /// + 消息 **离队** 时，会通过 [`Box::from_raw()`] 将数据重新放入 [`Box`] 中，然后通过 [`Ok()`] 返回。
     ///
     /// # 上下文
@@ -1179,11 +1423,11 @@ where
         }
     }
 
-    /// 等待从尾部接收消息
+    /// 等待从消息队列 **尾端** 接收一条消息
     ///
-    /// + 从接收队列的 **尾部** 取出消息，称为 **反向离队** 。
-    /// + 当接收队列中没有消息时，接收线程会阻塞等待。
-    /// + 当接收队列中有可用的消息时，接收线程被唤醒，并取走一个消息，释放消息槽。
+    /// + 从消息队列的 **尾端** 取出消息，称为 **反向离队** 。
+    /// + 当消息队列中没有消息时，接收线程会阻塞等待。
+    /// + 当消息队列中有可用的消息时，接收线程被唤醒，并取走一个消息，释放消息槽。
     /// + 消息 **离队** 时，会通过 [`Box::from_raw()`] 将数据重新放入 [`Box`] 中，然后通过 [`Ok()`] 返回。
     /// + 当线程阻塞等待被中断时，通过 [`Err()`] 返回 [`XwmqError::Interrupt`] 。
     ///
@@ -1256,11 +1500,11 @@ where
         }
     }
 
-    /// 限时从尾部等待接收消息
+    /// 限时等待从消息队列 **尾端** 接收一条消息
     ///
-    /// + 从接收队列的 **尾部** 取出消息，称为 **反向离队** 。
-    /// + 当接收队列中没有消息时，接收线程会阻塞等待，等待时会指定一个唤醒时间点。
-    /// + 当接收队列中有可用的消息时，接收线程被唤醒，并取走一个消息，释放消息槽。
+    /// + 从消息队列的 **尾端** 取出消息，称为 **反向离队** 。
+    /// + 当消息队列中没有消息时，接收线程会阻塞等待，等待时会指定一个唤醒时间点。
+    /// + 当消息队列中有可用的消息时，接收线程被唤醒，并取走一个消息，释放消息槽。
     /// + 消息 **离队** 时，会通过 [`Box::from_raw()`] 将数据重新放入 [`Box`] 中，然后通过 [`Ok()`] 返回。
     /// + 当线程阻塞等待被中断时，通过 [`Err()`] 返回 [`XwmqError::Interrupt`] 。
     /// + 当到达指定的唤醒时间点，线程被唤醒，并通过 [`Err()`] 返回 [`XwmqError::Timedout`] 。
@@ -1342,11 +1586,85 @@ where
         }
     }
 
-    /// 尝试从尾部接收消息
+    /// 等待从消息队列 **尾端** 接收一条消息，且等待不可被中断
     ///
-    /// + 从接收队列的 **尾部** 取出消息，称为 **反向离队** 。
-    /// + 当接收队列中没有消息时，立即通过 [`Err()`] 返回 [`XwmqError::NoMsg`] 。
-    /// + 当接收队列中有可用的消息时，接收线程会取走一个消息，并释放消息槽。
+    /// + 从消息队列的 **尾端** 取出消息，称为 **反向离队** 。
+    /// + 当消息队列中没有消息时，接收线程会阻塞等待。
+    /// + 接收线程的阻塞等待不可被中断。
+    /// + 当消息队列中有可用的消息时，接收线程被唤醒，并取走一个消息，释放消息槽。
+    /// + 消息 **离队** 时，会通过 [`Box::from_raw()`] 将数据重新放入 [`Box`] 中，然后通过 [`Ok()`] 返回。
+    ///
+    /// # 上下文
+    ///
+    /// + 线程
+    ///
+    /// # 错误码
+    ///
+    /// + [`XwmqError::NotInit`] 消息队列没有初始化
+    /// + [`XwmqError::NotThreadContext`] 不在线程上下文内
+    /// + [`XwmqError::CannotPmpt`] 抢占被关闭
+    /// + [`XwmqError::CannotBh`] 中断底半部被关闭
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    /// extern crate alloc;
+    /// use alloc::string::String;
+    /// use alloc::string::ToString;
+    ///
+    /// use xwrust::xwmd::xwmq::*;
+    ///
+    /// static MQ: Xwmq<16, String> = Xwmq::new();
+    ///
+    /// pub fn xwrust_example_xwmq() {
+    ///     let (tx, rx) = MQ.init();
+    ///     // ...省略...
+    ///     let rc = rx.rq();
+    ///         match rc {
+    ///             Ok(d) => { // d是Box<String>
+    ///             },
+    ///             Err(e) => { // e是错误码
+    ///             },
+    ///         };
+    ///     // ...省略...
+    /// }
+    /// ```
+    ///
+    /// [`Box`]: <https://doc.rust-lang.org/alloc/boxed/struct.Box.html>
+    /// [`Box::from_raw()`]: <https://doc.rust-lang.org/alloc/boxed/struct.Box.html#method.from_raw>
+    /// [`Ok()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
+    /// [`Err()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Err>
+    pub fn rq_unintr(&self) -> Result<Box<T>, XwmqError> {
+        unsafe {
+            let mut rc = xwrustffi_xwmq_acquire(self.xwmq.mq.get(), *self.xwmq.tik.get());
+            if rc == 0 {
+                let mut topic = 0;
+                let mut raw: *mut c_void = ptr::null_mut();
+                rc = xwmq_rq_unintr(self.xwmq.mq.get(), &mut topic, &mut raw);
+                xwmq_put(self.xwmq.mq.get());
+                if XWOK == rc {
+                    let boxdata = Box::from_raw(raw as *mut T);
+                    Ok(boxdata)
+                } else if -ENOTTHDCTX == rc {
+                    Err(XwmqError::NotThreadContext(rc))
+                } else if -ECANNOTPMPT == rc {
+                    Err(XwmqError::CannotPmpt(rc))
+                } else if -ECANNOTBH == rc {
+                    Err(XwmqError::CannotBh(rc))
+                } else {
+                    Err(XwmqError::Unknown(rc))
+                }
+            } else {
+                Err(XwmqError::NotInit(rc))
+            }
+        }
+    }
+
+    /// 尝试从消息队列 **尾端** 接收一条消息
+    ///
+    /// + 从消息队列的 **尾端** 取出消息，称为 **反向离队** 。
+    /// + 当消息队列中没有消息时，立即通过 [`Err()`] 返回 [`XwmqError::NoMsg`] 。
+    /// + 当消息队列中有可用的消息时，接收线程会取走一个消息，并释放消息槽。
     /// + 消息 **离队** 时，会通过 [`Box::from_raw()`] 将数据重新放入 [`Box`] 中，然后通过 [`Ok()`] 返回。
     ///
     /// # 上下文
