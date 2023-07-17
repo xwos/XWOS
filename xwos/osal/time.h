@@ -20,7 +20,7 @@
  * @defgroup xwos_time 时间
  * @ingroup xwos
  * XWOS的 **时间** 以 @ref xwtm_t 表示。
- * `xwtm_t` 是一个有符号的64位整数，单位为 **纳秒**。参考 @ref xwos_lib_type_time
+ * `xwtm_t` 是一个有符号的64位整数，单位为 **纳秒** 。参考 @ref xwos_lib_type_time
  * @{
  */
 

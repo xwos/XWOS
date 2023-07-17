@@ -638,7 +638,7 @@ xwer_t xwcq_get_capacity(struct xwcq * cq, xwsz_t * capbuf);
 xwer_t xwcq_get_size(struct xwcq * cq, xwsz_t * szbuf);
 
 /**
- * @brief XWCQ API: 获取循环队列中有效数据的数量
+ * @brief XWCQ API: 获取循环队列中有效数据槽的数量
  * @param[in] cq: 循环队列对象的指针
  * @param[out] szbuf: 指向缓冲区的指针，此缓冲区用于返回数量
  * @return 错误码
@@ -647,7 +647,7 @@ xwer_t xwcq_get_size(struct xwcq * cq, xwsz_t * szbuf);
  * @note
  * + 上下文：任意
  * @details
- * 有效数据的数量是指可被取出的数据的数量。
+ * 有效数据槽是指包含了可被接收数据的数据槽。
  */
 xwer_t xwcq_get_availability(struct xwcq * cq, xwsz_t * avbbuf);
 
