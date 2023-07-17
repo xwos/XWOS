@@ -21,6 +21,66 @@
 /**
  * @defgroup xwos_sync_sem 信号量
  * @ingroup xwos_sync
+ * 参考文档： [信号量](../docs/UserManual/Sync/Sem)
+ *
+ *
+ * ## 信号量的静态初始化、销毁
+ *
+ * + `xwos_sem_init()` ：静态初始化
+ * + `xwos_sem_fini()` ：销毁
+ *
+ *
+ * ## 信号量的动态创建、删除
+ *
+ * + `xwos_sem_create()` ：动态创建
+ * + `xwos_sem_delete()` ：删除
+ *
+ *
+ * ## 发布信号量
+ *
+ * + `xwos_sem_post()` ：发布信号量，可在 **任意** 上下文使用
+ *
+ *
+ * ## 等待信号量
+ *
+ * + `xwos_sem_wait()` ：等待信号量，只能在 **线程** 上下文使用
+ * + `xwos_sem_wait_to()` ：限时等待信号量，只能在 **线程** 上下文使用
+ * + `xwos_sem_wait_unintr()` ：不可中断地等待信号量，只能在 **线程** 上下文使用
+ * + `xwos_sem_trywait()` ：仅测试信号量，可在 **任意** 上下文使用
+ *
+ *
+ * ## 冻结与解冻信号量
+ *
+ * + `xwos_sem_freeze()` ：冻结，可在 **任意** 上下文使用
+ * + `xwos_sem_thaw()` ：解冻，可在 **任意** 上下文使用
+ *
+ *
+ *
+ * ## 使用信号选择器选择信号量
+ *
+ * + `xwos_sem_bind()` ：将信号量绑定到 [信号选择器](../docs/UserManual/Sync/Sel) 上
+ * + `xwos_sem_unbind()` ：从 [信号选择器](../docs/UserManual/Sync/Sel) 上解绑
+ *
+ *
+ * ## 信号量对象的生命周期管理
+ *
+ * + 通过 **对象指针** 管理生命周期：
+ *   + `xwos_sem_grab()` ：增加引用计数
+ *   + `xwos_sem_put()` ：减少引用计数
+ * + 通过 **对象描述符** 管理生命周期：
+ *   + `xwos_sem_acquire()` ：增加引用计数
+ *   + `xwos_sem_release()` ：减少引用计数
+ *
+ *
+ * ## 对象描述符和对象标签
+ *
+ * 已知信号量对象的指针的情况下，可以通过 `xwos_sem_getd()` 获取 @ref xwos_sem_d ，
+ * 或可以通过 `xwos_sem_gettik()` 获取对象标签。
+ *
+ *
+ * ## C++
+ *
+ * C++头文件： @ref xwos/osal/sync/sem.hxx
  * @{
  */
 
@@ -282,7 +342,8 @@ xwer_t xwos_sem_freeze(struct xwos_sem * sem)
  * @note
  * + 上下文：任意
  * @details
- * 此函数只对已冻结的信号量对象起作用，对未冻结的信号量对象调用此函数将返回错误码 `-EALREADY` 。
+ * 此函数只对已冻结的信号量对象起作用，
+ * 对未冻结的信号量对象调用此函数将返回错误码 `-EALREADY` 。
  */
 static __xwos_inline_api
 xwer_t xwos_sem_thaw(struct xwos_sem * sem)

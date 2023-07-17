@@ -19,11 +19,51 @@
 /**
  * @defgroup xwos_swt 软件定时器
  * @ingroup xwos
- * 软件定时器是基于调度器的滴答定时器实现的，因此时间精度为定时器的中断频率。
+ * 参考文档： [软件定时器](../docs/UserManual/Swt)
  *
- * 软件定时器可以是 **单次** 的，也可以是 **周期** 的。
- * 创建 **周期** 的软件定时器需要在调用 `xwos_swt_init()` 或 `xwos_swt_create()`
- * 时指定标识 @ref XWOS_SWT_FLAG_RESTART 。
+ *
+ * ## 软件定时器的静态初始化、销毁
+ *
+ * + `xwos_swt_init()` ：初始化
+ * + `xwos_swt_fini()` ：销毁
+ *
+ *
+ * ## 软件定时器的动态创建、删除
+ *
+ * + `xwos_swt_create()` ：创建
+ * + `xwos_swt_delete()` ：删除
+ *
+ *
+ * ## 软件定时器的标志
+ *
+ * + @ref XWOS_SWT_FLAG_RESTART ：软件定时器是 **周期** 的。
+ *
+ *
+ * ## 软件定时器的启动与停止
+ *
+ * + 通过 `xwos_swt_start()` 启动软件定时器；
+ * + 通过 `xwos_swt_stop()` 停止软件定时器。
+ *
+ *
+ * ## 软件定时器对象的生命周期管理
+ *
+ * + 通过 **对象指针** 管理生命周期：
+ *   + `xwos_swt_grab()` ：增加引用计数
+ *   + `xwos_swt_put()` ：减少引用计数
+ * + 通过 **对象描述符** 管理生命周期：
+ *   + `xwos_swt_acquire()` ：增加引用计数
+ *   + `xwos_swt_release()` ：减少引用计数
+ *
+ *
+ * ## 对象描述符和对象标签
+ *
+ * 已知软件定时器对象的指针的情况下，可以通过 `xwos_swt_getd()` 获取 @ref xwos_swt_d ，
+ * 或可以通过 `xwos_swt_gettik()` 获取对象标签。
+ *
+ *
+ * ## C++
+ *
+ * C++头文件： @ref xwos/osal/swt.hxx
  * @{
  */
 

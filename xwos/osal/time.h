@@ -21,6 +21,17 @@
  * @ingroup xwos
  * XWOS的 **时间** 以 @ref xwtm_t 表示。
  * `xwtm_t` 是一个有符号的64位整数，单位为 **纳秒** 。参考 @ref xwos_lib_type_time
+ *
+ * ## 获取当前的系统时间
+ *
+ * + 通过 `xwtm_now()` 可以获取当前CPU的系统时间点；
+ * + 通过 `xwtm_nowts()` 可以获取当前CPU的系统时间戳；
+ * + 通过 `xwtm_nowtc()` 获取当前CPU的系统滴答计数。
+ *
+ * ## 获取未来的系统时间
+ *
+ * + 通过 `xwtm_ft()` 可以计算出CPU的未来系统时间点；
+ * + 通过 `xwtm_fts()` 可以计算出CPU的未来系统时间戳。
  * @{
  */
 

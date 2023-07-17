@@ -21,6 +21,57 @@
 /**
  * @defgroup xwos_sync_br 线程栅栏
  * @ingroup xwos_sync
+ * 参考文档： [线程栅栏](../docs/UserManual/Sync/Br)
+ *
+ *
+ * ## 线程栅栏的静态初始化、销毁
+ *
+ * + `xwos_br_init()` ：静态初始化
+ * + `xwos_br_fini()` ：销毁
+ *
+ *
+ * ## 线程栅栏的动态创建、删除
+ *
+ * + `xwos_br_create()` ：动态创建
+ * + `xwos_br_delete()` ：删除
+ *
+ *
+ * ## 获取事件的状态
+ *
+ * + `xwos_br_get_num()` ：获取线程栅栏中线程槽数量，可在 **任意** 上下文使用
+ *
+ *
+ * ## 同步线程
+ *
+ * + `xwos_br_wait()` ：等待所有线程到达栅栏，只能在 **线程** 上下文使用
+ * + `xwos_br_wait_to()` ：限时等待所有线程到达栅栏，只能在 **线程** 上下文使用
+ *
+ *
+ * ## 使用信号选择器选择线程栅栏
+ *
+ * + `xwos_br_bind()` ：将线程栅栏绑定到 [信号选择器](../docs/UserManual/Sync/Sel) 上
+ * + `xwos_br_unbind()` ：从 [信号选择器](../docs/UserManual/Sync/Sel) 上解绑
+ *
+ *
+ * ## 线程栅栏对象的生命周期管理
+ *
+ * + 通过 **对象指针** 管理生命周期：
+ *   + `xwos_br_grab()` ：增加引用计数
+ *   + `xwos_br_put()` ：减少引用计数
+ * + 通过 **对象描述符** 管理生命周期：
+ *   + `xwos_br_acquire()` ：增加引用计数
+ *   + `xwos_br_release()` ：减少引用计数
+ *
+ *
+ * ## 对象描述符和对象标签
+ *
+ * 已知线程栅栏对象的指针的情况下，可以通过 `xwos_br_getd()` 获取 @ref xwos_br_d ，
+ * 或可以通过 `xwos_br_gettik()` 获取对象标签。
+ *
+ *
+ * ## C++
+ *
+ * C++头文件： @ref xwos/osal/sync/br.hxx
  * @{
  */
 

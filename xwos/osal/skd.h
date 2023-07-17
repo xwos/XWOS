@@ -20,6 +20,76 @@
 /**
  * @defgroup xwos_skd 调度器
  * @ingroup xwos
+ * 参考文档： [调度器](../docs/UserManual/Skd)
+ *
+ *
+ * ## 调度优先级
+ *
+ * XWOS的优先级，用类型 @ref xwpr_t 表示：
+ *
+ * + 值越 **小** ，优先级越 **低** ，优先级的值越 **大** ，优先级越 **高** ；
+ * + 为了保证今后的扩展性，应该使用模块 @ref xwos_skd_priority 定义的宏，
+ *   而不要直接使用 @ref xwpr_t 的数值；
+ * + 通过 `xwos_skd_prio_tst_valid()` 可以测试优先级是否有效；
+ *
+ * ## 上下文
+ *
+ * XWOS将上下文分为五种，定义可以参考 @ref xwos_skd_context ，
+ * 当前代码的上下文可以通过 `xwos_skd_get_context_lc()` 获取。
+ *
+ * ## 调度器ID
+ *
+ * + `xwos_skd_id_lc()` ：获取调度器ID（也是CPU ID）。
+ *
+ * ## 启动调度
+ *
+ * 系统启动时，每个CPU都需要调用一次 `xwos_skd_start_lc()` 启动调度。
+ *
+ * ## 抢占
+ *
+ * + `xwos_skd_dspmpt_lc()` ：关闭抢占
+ * + `xwos_skd_enpmpt_lc()` ：打开抢占
+ *
+ * 需要注意，关闭多少次抢占，就要打开相同次数的抢占。
+ *
+ * ## 中断底半部
+ *
+ * 当配置 `XWOSCFG_SKD_BH` 为 **1** ，XWOS的某些系统函数运行在中断底半部。
+ * 例如定时器任务。
+ *
+ * + `xwos_skd_dsbh_lc()` ：关闭中断底半部
+ * + `xwos_skd_enbh_lc()` ：打开中断底半部
+ *
+ * 需要注意，关闭多少次中断底半部，就要打开相同次数的中断底半部。
+ *
+ *
+ * 当配置 `XWOSCFG_SKD_BH` 为 **0** ，中断底半部被彻底禁用，
+ * `xwos_skd_dsbh_lc()` 与 `xwos_skd_enbh_lc()` **不** 可被调用。
+ *
+ *
+ * ## 调度器的暂停与继续
+ *
+ * 可以通过 `xwos_skd_pause_lc()` 暂停调度器，包括几个操作：
+ *
+ * + 1. 关闭本地CPU的系统定时器；
+ * + 2. 关闭本地CPU调度器的中断底半部；
+ * + 3. 关闭本地CPU调度器的抢占。
+ *
+ * 可以通过 `xwos_skd_continue_lc()` 继续已暂停的调度器，包括几个操作：
+ *
+ * + 1. 打开本地CPU调度器的抢占；
+ * + 2. 打开本地CPU调度器的中断底半部；
+ * + 3. 启动本地CPU的系统定时器。
+ *
+ *
+ * ## C++
+ *
+ * C++头文件： @ref xwos/osal/skd.hxx
+ * @{
+ */
+
+/**
+ * @defgroup xwos_skd_priority 调度优先级
  * @{
  */
 
@@ -48,9 +118,11 @@
  */
 #define XWOS_SKD_PRIORITY_DROP(base, dec)       XWOSDL_SKD_PRIORITY_DROP(base, dec)
 
+/** @} */ // xwos_skd_priority
+
 
 /**
- * @defgroup xwos_skd_context_em 上下文类型枚举
+ * @defgroup xwos_skd_context 上下文类型
  * @{
  */
 
@@ -79,7 +151,7 @@
  */
 #define XWOS_SKD_CONTEXT_IDLE           XWOSDL_SKD_CONTEXT_IDLE
 
-/** @} */ // xwos_skd_context_em
+/** @} */ // xwos_skd_context
 
 /**
  * @brief XWOS API：线程本地数据指针的数量
@@ -133,7 +205,7 @@ xwid_t xwos_skd_id_lc(void)
 /**
  * @brief XWOS API：获取当前代码的上下文
  * @param[out] ctxbuf: 指向缓冲区的指针，通过此缓冲区返回当前上下文，
- *  返回值 @ref xwos_skd_context_em
+ *  返回值 @ref xwos_skd_context
  * @param[out] irqnbuf: 指向缓冲区的指针，通过此缓冲区返回中断号
  * @note
  * + 上下文：任意
@@ -193,7 +265,7 @@ void xwos_skd_enbh_lc(void)
  * @note
  * + 上下文：任意
  * @details
- * 继续运行调度器包括两个操作：
+ * 继续运行调度器包括几个操作：
  * + 1. 打开本地CPU调度器的抢占；
  * + 2. 打开本地CPU调度器的中断底半部；
  * + 3. 启动本地CPU的系统定时器。
@@ -209,7 +281,7 @@ void xwos_skd_continue_lc(void)
  * @note
  * + 上下文：任意
  * @details
- * 继续运行调度器包括两个操作：
+ * 暂停运行调度器包括几个操作：
  * + 1. 关闭本地CPU的系统定时器；
  * + 2. 关闭本地CPU调度器的中断底半部；
  * + 3. 关闭本地CPU调度器的抢占。

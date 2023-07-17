@@ -21,6 +21,58 @@
 /**
  * @defgroup xwos_lock_mtx 互斥锁
  * @ingroup xwos_lock
+ * 参考文档： [互斥锁](../docs/UserManual/Lock/Mutex)
+ *
+ *
+ * ## 互斥锁的静态初始化、销毁
+ *
+ * + `xwos_mtx_init()` ：静态初始化
+ * + `xwos_mtx_fini()` ：销毁
+ *
+ *
+ * ## 互斥锁的动态创建、删除
+ *
+ * + `xwos_mtx_create()` ：动态创建
+ * + `xwos_mtx_delete()` ：删除
+ *
+ *
+ * ## 解锁
+ *
+ * + `xwos_mtx_post()` ：解锁互斥锁，只能在 **线程** 上下文使用
+ *
+ *
+ * ## 上锁
+ *
+ * + `xwos_mtx_lock()` ：等待并上锁互斥锁，只能在 **线程** 上下文使用
+ * + `xwos_mtx_lock_to()` ：限时等待并上锁互斥锁，只能在 **线程** 上下文使用
+ * + `xwos_mtx_lock_unintr()` ：不可中断地等待并上锁互斥锁，只能在 **线程** 上下文使用
+ * + `xwos_mtx_trylock()` ：尝试上锁互斥锁，只能在 **线程** 上下文使用
+ *
+ *
+ * ## 获取锁状态
+ *
+ * + `xwos_mtx_getlkst()` ：获取锁的状态，可在 **任意** 上下文使用
+ *
+ *
+ * ## 互斥锁对象的生命周期管理
+ *
+ * + 通过 **对象指针** 管理生命周期：
+ *   + `xwos_mtx_grab()` ：增加引用计数
+ *   + `xwos_mtx_put()` ：减少引用计数
+ * + 通过 **对象描述符** 管理生命周期：
+ *   + `xwos_mtx_acquire()` ：增加引用计数
+ *   + `xwos_mtx_release()` ：减少引用计数
+ *
+ *
+ * ## 对象描述符和对象标签
+ *
+ * 已知互斥锁对象的指针的情况下，可以通过 `xwos_mtx_getd()` 获取 @ref xwos_mtx_d ，
+ * 或可以通过 `xwos_mtx_gettik()` 获取对象标签。
+ *
+ *
+ * ## C++
+ *
+ * C++头文件： @ref xwos/osal/lock/mtx.hxx
  * @{
  */
 
@@ -230,7 +282,7 @@ xwer_t xwos_mtx_unlock(struct xwos_mtx * mtx)
 }
 
 /**
- * @brief XWOS API：等待并获取互斥锁
+ * @brief XWOS API：等待并上锁互斥锁
  * @param[in] mtx: 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -243,7 +295,7 @@ xwer_t xwos_mtx_unlock(struct xwos_mtx * mtx)
  * @note
  * + 上下文：线程
  * @details
- * 若线程无法获取互斥锁，就阻塞等待，直到能获得锁为之。
+ * 若线程无法上锁互斥锁，就阻塞等待，直到能获得锁为之。
  *
  * 线程的阻塞等待可能被中断，此时，API返回 `-EINTR` 。
  */
@@ -278,7 +330,7 @@ xwer_t xwos_mtx_lock_to(struct xwos_mtx * mtx, xwtm_t to)
 }
 
 /**
- * @brief XWOS API：等待并获取互斥锁，且等待不可被中断
+ * @brief XWOS API：等待并上锁互斥锁，且等待不可被中断
  * @param[in] mtx: 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -297,7 +349,7 @@ xwer_t xwos_mtx_lock_unintr(struct xwos_mtx * mtx)
 }
 
 /**
- * @brief XWOS API：尝试获取互斥锁，不会阻塞调用线程
+ * @brief XWOS API：尝试上锁互斥锁，不会阻塞调用线程
  * @param[in] mtx: 互斥锁对象的指针
  * @return 错误码
  * @retval XWOK: 没有错误

@@ -19,6 +19,30 @@
 /**
  * @defgroup xwos_pm 电源管理
  * @ingroup xwos
+ * 参考文档： [电源管理](../docs/UserManual/Pm)
+ *
+ * ## 电源管理回调
+ *
+ * 用户可以通过 `xwos_pm_set_cb()` 设置电源管理回调函数。
+ *
+ * + `resume_cb` ：从暂停模式恢复的回调函数
+ * + `suspend_cb` ：进入暂停模式的回调函数
+ * + `wakeup_cb` ：唤醒时回调函数
+ * + `sleep_cb` ：休眠时的回调函数
+ *
+ *
+ * ## 系统休眠与唤醒
+ *
+ * 用户可以通过调用 `xwos_pm_suspend()` 使得操作系统进入休眠模式。
+ * 休眠后可以在唤醒中断中调用 `xwos_pm_resume()` 唤醒操作系统。
+ *
+ * 休眠与唤醒是一个比较复杂的过程，可以通过 `xwos_pm_get_stage()` 获取电源管理
+ * 目前所处的 @ref xwos_pm_stage 。
+ *
+ *
+ * ## C++
+ *
+ * C++头文件： @ref xwos/osal/pm.hxx
  * @{
  */
 
@@ -30,15 +54,15 @@
  * ```
  *
  * 电源管理要求用户定义四个回调函数，通过API @ref xwos_pm_set_cb()指定：
- * + resume_cb: 从暂停模式恢复的回调函数
- * + suspend_cb: 进入暂停模式的回调函数
- * + wakeup_cb: 唤醒时回调函数
- * + sleep_cb: 休眠时的回调函数
+ * + `resume_cb` ：从暂停模式恢复的回调函数
+ * + `suspend_cb` ：进入暂停模式的回调函数
+ * + `wakeup_cb` ：唤醒时回调函数
+ * + `sleep_cb` ：休眠时的回调函数
  */
 typedef xwosdl_pm_cb_f xwos_pm_cb_f;
 
 /**
- * @defgroup xwos_pm_stage_em 电源管理阶段枚举
+ * @defgroup xwos_pm_stage 电源管理阶段
  * @{
  */
 
@@ -50,7 +74,7 @@ typedef xwosdl_pm_cb_f xwos_pm_cb_f;
 #define XWOS_PM_STAGE_RUNNING     XWOSDL_PM_STAGE_RUNNING /**< 正常运行 */
 
 /**
- * @}
+ * @} end of xwos_pm_stage
  */
 
 /**
@@ -107,12 +131,13 @@ xwer_t xwos_pm_resume(void)
 
 /**
  * @brief XWOS API：获取当前电源管理阶段
- * @return 电源管理阶段 @ref xwos_pm_stage_em
+ * @return 电源管理阶段 @ref xwos_pm_stage
  * @note
  * + 上下文：任意
  * @details
- * 电源管理是复杂的异步操作，当系统正在进入低功耗、或从低功耗唤醒时可通过此函数获取进展的阶段。
- * 返回值取值 @ref xwos_pm_stage_em
+ * 电源管理是复杂的异步操作，当系统正在进入低功耗、
+ * 或从低功耗唤醒时可通过此函数获取进展的阶段。
+ * 返回值取值 @ref xwos_pm_stage
  */
 static __xwos_inline_api
 xwsq_t xwos_pm_get_stage(void)

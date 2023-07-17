@@ -20,6 +20,58 @@
 /**
  * @defgroup xwos_sync_sel 信号选择器
  * @ingroup xwos_sync
+ * 参考文档： [信号选择器](../docs/UserManual/Sync/Sel)
+ *
+ *
+  * ## 信号选择器的静态初始化、销毁
+ *
+ * + `xwos_sel_init()` ：静态初始化
+ * + `xwos_sel_fini()` ：销毁
+ *
+ *
+ * ## 信号选择器的动态创建、删除
+ *
+ * + `xwos_sel_create()` ：动态创建
+ * + `xwos_sel_delete()` ：删除
+ *
+ *
+ * ## 获取事件的状态
+ *
+ * + `xwos_sel_get_num()` ：获取信号选择器中的信号槽的数量，可在 **任意** 上下文使用
+ *
+ *
+ * ## 选择信号
+ *
+ * + `xwos_sel_select()` ：等待 **选择信号** ，只能在 **线程** 上下文使用
+ * + `xwos_sel_select_to()` ：限时等待 **选择信号** ，只能在 **线程** 上下文使用
+ * + `xwos_sel_tryselect()` ：仅测试是否有 **选择信号** ，可在 **任意** 上下文使用
+ *
+ *
+ * ## 使用信号选择器选择信号选择器
+ *
+ * + `xwos_sel_bind()` ：将信号选择器绑定到另一个信号选择器上
+ * + `xwos_sel_unbind()` ：从信号选择器上解绑
+ *
+ *
+ * ## 信号选择器对象的生命周期管理
+ *
+ * + 通过 **对象指针** 管理生命周期：
+ *   + `xwos_sel_grab()` ：增加引用计数
+ *   + `xwos_sel_put()` ：减少引用计数
+ * + 通过 **对象描述符** 管理生命周期：
+ *   + `xwos_sel_acquire()` ：增加引用计数
+ *   + `xwos_sel_release()` ：减少引用计数
+ *
+ *
+ * ## 对象描述符和对象标签
+ *
+ * 已知信号选择器对象的指针的情况下，可以通过 `xwos_sel_getd()` 获取 @ref xwos_sel_d ，
+ * 或可以通过 `xwos_sel_gettik()` 获取对象标签。
+ *
+ *
+ * ## C++
+ *
+ * C++头文件： @ref xwos/osal/sync/sel.hxx
  * @{
  */
 

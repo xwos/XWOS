@@ -22,6 +22,65 @@
 /**
  * @defgroup xwos_sync_cond 条件量
  * @ingroup xwos_sync
+ * 参考文档： [条件量](../docs/UserManual/Sync/Cond)
+ *
+ *
+ * ## 条件量的静态初始化、销毁
+ *
+ * + `xwos_cond_init()` ：静态初始化
+ * + `xwos_cond_fini()` ：销毁
+ *
+ *
+ * ## 条件量的动态创建、删除
+ *
+ * + `xwos_cond_create()` ：动态创建
+ * + `xwos_cond_delete()` ：删除
+ *
+ *
+ * ## 触发条件量
+ *
+ * + `xwos_cond_unicast()` ：单播条件量，可在 **任意** 上下文使用
+ * + `xwos_cond_broadcast()` ：广播条件量，可在 **任意** 上下文使用
+ *
+ *
+ * ## 等待条件量
+ *
+ * + `xwos_cond_wait()` ：等待条件量，只能在 **线程** 上下文使用
+ * + `xwos_cond_wait_to()` ：限时等待条件量，只能在 **线程** 上下文使用
+ * + `xwos_cond_wait_unintr()` ：不可中断地等待条件量，只能在 **线程** 上下文使用
+ *
+ *
+ * ## 冻结与解冻条件量
+ *
+ * + `xwos_cond_freeze()` ：冻结，可在 **任意** 上下文使用
+ * + `xwos_cond_thaw()` ：解冻，可在 **任意** 上下文使用
+ *
+ *
+ * ## 使用信号选择器选择条件量
+ *
+ * + `xwos_cond_bind()` ：将条件量绑定到 [信号选择器](../docs/UserManual/Sync/Sel) 上
+ * + `xwos_cond_unbind()` ：从 [信号选择器](../docs/UserManual/Sync/Sel) 上解绑
+ *
+ *
+ * ## 条件量对象的生命周期管理
+ *
+ * + 通过 **对象指针** 管理生命周期：
+ *   + `xwos_cond_grab()` ：增加引用计数
+ *   + `xwos_cond_put()` ：减少引用计数
+ * + 通过 **对象描述符** 管理生命周期：
+ *   + `xwos_cond_acquire()` ：增加引用计数
+ *   + `xwos_cond_release()` ：减少引用计数
+ *
+ *
+ * ## 对象描述符和对象标签
+ *
+ * 已知条件量对象的指针的情况下，可以通过 `xwos_cond_getd()` 获取 @ref xwos_cond_d ，
+ * 或可以通过 `xwos_cond_gettik()` 获取对象标签。
+ *
+ *
+ * ## C++
+ *
+ * C++头文件： @ref xwos/osal/sync/cond.hxx
  * @{
  */
 
@@ -277,7 +336,8 @@ xwer_t xwos_cond_freeze(struct xwos_cond * cond)
  * @note
  * + 上下文：任意
  * @details
- * 此函数只对已冻结的条件量对象起作用，对未冻结的条件量对象调用此函数将返回错误码 `-EALREADY` 。
+ * 此函数只对已冻结的条件量对象起作用，
+ * 对未冻结的条件量对象调用此函数将返回错误码 `-EALREADY` 。
  */
 static __xwos_inline_api
 xwer_t xwos_cond_thaw(struct xwos_cond * cond)
@@ -339,7 +399,8 @@ xwer_t xwos_cond_unicast(struct xwos_cond * cond)
  * @note
  * + 上下文：线程
  * @details
- * + 所有锁统一使用 `union xwlk_ulock` 指代，此联合中包含所有锁的定义，实际只是一个指针，有些锁还需要伴生数据 `lkdata` ，具体意义由 `xwsq_t lktype` 决定：
+ * + 所有锁统一使用 `union xwlk_ulock` 指代，此联合中包含所有锁的定义，
+ *   实际只是一个指针，有些锁还需要伴生数据 `lkdata` ，具体意义由 `xwsq_t lktype` 决定：
  *   + `XWOS_LK_MTX` ：互斥锁
  *     + `lock` ：代表互斥锁（访问方式： `lock.osal.mtx` ）；
  *     + `lockdata` ：无作用，设置为 `NULL` 即可；
@@ -355,7 +416,7 @@ xwer_t xwos_cond_unicast(struct xwos_cond * cond)
  *   + `XWOS_LK_CALLBACK` ：自定义的加锁与解锁函数
  *     + `lock` ：代表指向 `struct xwlk_cblk` 的指针（访问方式： `lock.cb` ）；
  *     + `lockdata` ：传递给 `struct xwlk_cblk` 中的 `lock` 与 `unlock` 函数的参数；
- * + `lkst` 是用来返回锁的状态。XWOS的条件量在返回 `XWOK` 时，锁状态一定是是 **已上锁**，
+ * + `lkst` 用于返回锁的状态。XWOS的条件量在返回 `XWOK` 时，锁状态一定是是 **已上锁**，
  *   但若返回错误码时，锁的状态不确定。
  */
 static __xwos_inline_api
@@ -387,7 +448,8 @@ xwer_t xwos_cond_wait(struct xwos_cond * cond,
  * + 上下文：线程
  * @details
  * + 如果 `to` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
- * + 所有锁统一使用 `union xwlk_ulock` 指代，此联合中包含所有锁的定义，实际只是一个指针，有些锁还需要伴生数据 `lkdata` ，具体意义由 `xwsq_t lktype` 决定：
+ * + 所有锁统一使用 `union xwlk_ulock` 指代，此联合中包含所有锁的定义，
+ *   实际只是一个指针，有些锁还需要伴生数据 `lkdata` ，具体意义由 `xwsq_t lktype` 决定：
  *   + `XWOS_LK_MTX` ：互斥锁
  *     + `lock` ：代表互斥锁（访问方式： `lock.osal.mtx` ）；
  *     + `lockdata` ：无作用，设置为 `NULL` 即可；
@@ -403,7 +465,7 @@ xwer_t xwos_cond_wait(struct xwos_cond * cond,
  *   + `XWOS_LK_CALLBACK` ：自定义的加锁与解锁函数
  *     + `lock` ：代表指向 `struct xwlk_cblk` 的指针（访问方式： `lock.cb` ）；
  *     + `lockdata` ：传递给 `struct xwlk_cblk` 中的 `lock` 与 `unlock` 函数的参数；
- * + `lkst` 是用来返回锁的状态。XWOS的条件量在返回 `XWOK` 时，锁状态一定是是 **已上锁**，
+ * + `lkst` 用于返回锁的状态。XWOS的条件量在返回 `XWOK` 时，锁状态一定是是 **已上锁**，
  *   但若返回错误码时，锁的状态不确定。
  */
 static __xwos_inline_api
@@ -432,7 +494,8 @@ xwer_t xwos_cond_wait_to(struct xwos_cond * cond,
  * @note
  * + 上下文：线程
  * @details
- * + 所有锁统一使用 `union xwlk_ulock` 指代，此联合中包含所有锁的定义，实际只是一个指针，有些锁还需要伴生数据 `lkdata` ，具体意义由 `xwsq_t lktype` 决定：
+ * + 所有锁统一使用 `union xwlk_ulock` 指代，此联合中包含所有锁的定义，
+ *   实际只是一个指针，有些锁还需要伴生数据 `lkdata` ，具体意义由 `xwsq_t lktype` 决定：
  *   + `XWOS_LK_MTX` ：互斥锁
  *     + `lock` ：代表互斥锁（访问方式： `lock.osal.mtx` ）；
  *     + `lockdata` ：无作用，设置为 `NULL` 即可；
@@ -448,7 +511,7 @@ xwer_t xwos_cond_wait_to(struct xwos_cond * cond,
  *   + `XWOS_LK_CALLBACK` ：自定义的加锁与解锁函数
  *     + `lock` ：代表指向 `struct xwlk_cblk` 的指针（访问方式： `lock.cb` ）；
  *     + `lockdata` ：传递给 `struct xwlk_cblk` 中的 `lock` 与 `unlock` 函数的参数；
- * + `lkst` 是用来返回锁的状态。XWOS的条件量在返回 `XWOK` 时，锁状态一定是是 **已上锁**，
+ * + `lkst` 用于返回锁的状态。XWOS的条件量在返回 `XWOK` 时，锁状态一定是是 **已上锁**，
  *   但若返回错误码时，锁的状态不确定。
  */
 static __xwos_inline_api

@@ -20,6 +20,89 @@
 /**
  * @defgroup xwos_lock_seqlock 顺序锁
  * @ingroup xwos_lock
+ * 参考文档： [顺序锁](../docs/UserManual/Lock/Seqlock)
+ *
+ *
+ * ## 顺序锁的初始化
+ *
+ * + `xwos_sqlk_init()` ：静态初始化
+ *
+ *
+ * ## 非独占读
+ *
+ * + `xwos_sqlk_rd_begin()` ：开启共享读临界区
+ * + `xwos_sqlk_rd_retry()` ：关闭共享读临界区，并检查是否需要重试
+ * + `xwos_sqlk_get_seq()` ：获取顺序锁的顺序值
+ *
+ *
+ * ## 独占读
+ *
+ * + 只保护 **线程** 上下文之间的临界区
+ *   + `xwos_sqlk_rdex_lock()` ：上锁，关闭抢占
+ *   + `xwos_sqlk_rdex_trylock()` ：尝试上锁，关闭抢占
+ *   + `xwos_sqlk_rdex_unlock()` ：解锁，开启抢占
+ *
+ * + 保护 **任意** 上下文之间的临界区
+ *   + `xwos_sqlk_rdex_lock_cpuirq()` ：上锁，关闭抢占、CPU中断
+ *   + `xwos_sqlk_rdex_trylock_cpuirq()` ：尝试上锁，关闭抢占、CPU中断
+ *   + `xwos_sqlk_rdex_unlock_cpuirq()` ：解锁，开启抢占、CPU中断
+ *
+ * + **多个** 自旋锁保护 **任意** 上下文之间的 **嵌套** 临界区
+ *   + `xwos_sqlk_rdex_lock_cpuirqsv()` ：上锁，关闭抢占，保存CPU中断标志并关闭
+ *   + `xwos_sqlk_rdex_trylock_cpuirqsv()` ：尝试上锁，关闭抢占，保存CPU中断标志并关闭
+ *   + `xwos_sqlk_rdex_unlock_cpuirqrs()` ：解锁，开启抢占，恢复CPU中断
+ *
+ * + 保护 **线程** 和 **指定的外设中断** 上下文之间的临界区
+ *   + `xwos_sqlk_rdex_lock_irqs()` ：上锁，关闭抢占，关闭部分中断
+ *   + `xwos_sqlk_rdex_trylock_irqs()` ：尝试上锁，关闭抢占，关闭部分中断
+ *   + `xwos_sqlk_rdex_unlock_irqs()` ：解锁，开启抢占、开启部分中断
+ *
+ * + **多个** 自旋锁保护 **线程** 和 **指定的外设中断** 上下文之间的 **嵌套** 临界区
+ *   + `xwos_sqlk_rdex_lock_irqssv()` ：上锁，关闭抢占，保存部分中断标志并关闭
+ *   + `xwos_sqlk_rdex_trylock_irqssv()` ：尝试上锁，关闭抢占，保存部分中断标志并关闭
+ *   + `xwos_sqlk_rdex_unlock_irqsrs()` ：解锁，开启抢占、恢复部分中断
+ *
+ * + 保护 **线程** 和 **中断底半部** 上下文之间的临界区
+ *   + `xwos_sqlk_rdex_lock_bh()` ：上锁，关闭抢占、中断底半部
+ *   + `xwos_sqlk_rdex_trylock_bh()` ：尝试上锁，关闭抢占、中断底半部
+ *   + `xwos_sqlk_rdex_unlock_bh()` ：解锁，开启抢占、中断底半部
+ *
+ *
+ * ## 写
+ *
+ * + 只保护 **线程** 上下文之间的临界区
+ *   + `xwos_sqlk_wr_lock()` ：上锁，关闭抢占
+ *   + `xwos_sqlk_wr_trylock()` ：尝试上锁，关闭抢占
+ *   + `xwos_sqlk_wr_unlock()` ：解锁，开启抢占
+ *
+ * + 保护 **任意** 上下文之间的临界区
+ *   + `xwos_sqlk_wr_lock_cpuirq()` ：上锁，关闭抢占、CPU中断
+ *   + `xwos_sqlk_wr_trylock_cpuirq()` ：尝试上锁，关闭抢占、CPU中断
+ *   + `xwos_sqlk_wr_unlock_cpuirq()` ：解锁，开启抢占、CPU中断
+ *
+ * + **多个** 自旋锁保护 **任意** 上下文之间的 **嵌套** 临界区
+ *   + `xwos_sqlk_wr_lock_cpuirqsv()` ：上锁，关闭抢占，保存CPU中断标志并关闭
+ *   + `xwos_sqlk_wr_trylock_cpuirqsv()` ：尝试上锁，关闭抢占，保存CPU中断标志并关闭
+ *   + `xwos_sqlk_wr_unlock_cpuirqrs()` ：解锁，开启抢占，恢复CPU中断
+ *
+ * + 保护 **线程** 和 **指定的外设中断** 上下文之间的临界区
+ *   + `xwos_sqlk_wr_lock_irqs()` ：上锁，关闭抢占，关闭部分中断
+ *   + `xwos_sqlk_wr_trylock_irqs()` ：尝试上锁，关闭抢占，关闭部分中断
+ *   + `xwos_sqlk_wr_unlock_irqs()` ：解锁，开启抢占、开启部分中断
+ *
+ * + **多个** 自旋锁保护 **线程** 和 **指定的外设中断** 上下文之间的 **嵌套** 临界区
+ *   + `xwos_sqlk_wr_lock_irqssv()` ：上锁，关闭抢占，保存部分中断标志并关闭
+ *   + `xwos_sqlk_wr_trylock_irqssv()` ：尝试上锁，关闭抢占，保存部分中断标志并关闭
+ *   + `xwos_sqlk_wr_unlock_irqsrs()` ：解锁，开启抢占、恢复部分中断
+ *
+ * + 保护 **线程** 和 **中断底半部** 上下文之间的临界区
+ *   + `xwos_sqlk_wr_lock_bh()` ：上锁，关闭抢占、中断底半部
+ *   + `xwos_sqlk_wr_trylock_bh()` ：尝试上锁，关闭抢占、中断底半部
+ *   + `xwos_sqlk_wr_unlock_bh()` ：解锁，开启抢占、中断底半部
+ *
+ * ## C++
+ *
+ * C++头文件： @ref xwos/osal/lock/seqlock.hxx
  * @{
  */
 
@@ -227,15 +310,16 @@ void xwos_sqlk_rdex_unlock_cpuirqrs(struct xwos_sqlk * sql,
 }
 
 /**
- * @brief XWOS API：开启独占读临界区，并关闭部分外部中断
+ * @brief XWOS API：开启独占读临界区，并关闭部分中断
  * @param[in] sql: 顺序锁的指针
- * @param[in] irqs: 外部中断资源数组指针
+ * @param[in] irqs: 中断资源数组指针
  * @param[in] num: 数组中元素数量
  * @note
  * + 上下文：线程、中断资源数组中描述的中断
  * @details
  * + 若顺序锁已处于写或独占读临界区，就自旋等待。
- * + 此函数只会关闭本地CPU的抢占和部分外部中断，因此只能保证其临界区在这些中断与线程上下文是安全的。
+ * + 此函数只会关闭本地CPU的抢占和部分中断，
+ *   因此只能保证其临界区在这些中断与线程上下文是安全的。
  */
 static __xwos_inline_api
 void xwos_sqlk_rdex_lock_irqs(struct xwos_sqlk * sql,
@@ -246,9 +330,9 @@ void xwos_sqlk_rdex_lock_irqs(struct xwos_sqlk * sql,
 }
 
 /**
- * @brief XWOS API：尝试开启独占读临界区，并关闭部分外部中断
+ * @brief XWOS API：尝试开启独占读临界区，并关闭部分中断
  * @param[in] sql: 顺序锁的指针
- * @param[in] irqs: 外部中断资源数组指针
+ * @param[in] irqs: 中断资源数组指针
  * @param[in] num: 数组中元素数量
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -256,7 +340,8 @@ void xwos_sqlk_rdex_lock_irqs(struct xwos_sqlk * sql,
  * @note
  * + 上下文：线程、中断资源数组中描述的中断
  * @details
- * - 此函数只会关闭本地CPU的抢占和部分外部中断，因此只能保证其临界区在这些中断与线程上下文是安全的。
+ * + 此函数只会关闭本地CPU的抢占和部分中断，
+ *   因此只能保证其临界区在这些中断与线程上下文是安全的。
  */
 static __xwos_inline_api
 xwer_t xwos_sqlk_rdex_trylock_irqs(struct xwos_sqlk * sql,
@@ -267,9 +352,9 @@ xwer_t xwos_sqlk_rdex_trylock_irqs(struct xwos_sqlk * sql,
 }
 
 /**
- * @brief XWOS API：关闭独占读临界区，并开启部分外部中断
+ * @brief XWOS API：关闭独占读临界区，并开启部分中断
  * @param[in] sql: 顺序锁的指针
- * @param[in] irqs: 外部中断资源数组指针
+ * @param[in] irqs: 中断资源数组指针
  * @param[in] num: 数组中元素数量
  * @note
  * + 上下文：线程、中断资源数组中描述的中断
@@ -283,16 +368,17 @@ void xwos_sqlk_rdex_unlock_irqs(struct xwos_sqlk * sql,
 }
 
 /**
- * @brief XWOS API：开启独占读临界区，保存部分外部中断的中断标志并关闭
+ * @brief XWOS API：开启独占读临界区，保存部分中断的中断标志并关闭
  * @param[in] sql: 顺序锁的指针
- * @param[in] irqs: 外部中断资源数组指针
- * @param[out] flags: 缓冲区指针，用于返回部分外部中断的中断标志
+ * @param[in] irqs: 中断资源数组指针
+ * @param[out] flags: 缓冲区指针，用于返回部分中断的中断标志
  * @param[in] num: 数组中元素数量
  * @note
  * + 上下文：线程、中断资源数组中描述的中断
  * @details
  * + 若顺序锁已处于写或独占读临界区，就自旋等待。
- * + 此函数只会关闭本地CPU的抢占和部分外部中断，因此只能保证其临界区在这些中断与线程上下文是安全的。
+ * + 此函数只会关闭本地CPU的抢占和部分中断，
+ *   因此只能保证其临界区在这些中断与线程上下文是安全的。
  */
 static __xwos_inline_api
 void xwos_sqlk_rdex_lock_irqssv(struct xwos_sqlk * sql,
@@ -303,10 +389,10 @@ void xwos_sqlk_rdex_lock_irqssv(struct xwos_sqlk * sql,
 }
 
 /**
- * @brief XWOS API：尝试开启独占读临界区，保存部分外部中断的中断标志并关闭
+ * @brief XWOS API：尝试开启独占读临界区，保存部分中断的中断标志并关闭
  * @param[in] sql: 顺序锁的指针
- * @param[in] irqs: 外部中断资源数组指针
- * @param[out] flags: 缓冲区指针，用于返回部分外部中断的中断标志
+ * @param[in] irqs: 中断资源数组指针
+ * @param[out] flags: 缓冲区指针，用于返回部分中断的中断标志
  * @param[in] num: 数组中元素数量
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -314,7 +400,8 @@ void xwos_sqlk_rdex_lock_irqssv(struct xwos_sqlk * sql,
  * @note
  * + 上下文：线程、中断资源数组中描述的中断
  * @details
- * + 此函数只会关闭本地CPU的抢占和部分外部中断，因此只能保证其临界区在这些中断与线程上下文是安全的。
+ * + 此函数只会关闭本地CPU的抢占和部分中断，
+ *   因此只能保证其临界区在这些中断与线程上下文是安全的。
  */
 static __xwos_inline_api
 xwer_t xwos_sqlk_rdex_trylock_irqssv(struct xwos_sqlk * sql,
@@ -325,10 +412,10 @@ xwer_t xwos_sqlk_rdex_trylock_irqssv(struct xwos_sqlk * sql,
 }
 
 /**
- * @brief XWOS API：关闭独占读临界区，恢复部分外部中断的中断标志
+ * @brief XWOS API：关闭独占读临界区，恢复部分中断的中断标志
  * @param[in] sql: 顺序锁的指针
- * @param[in] irqs: 外部中断资源数组指针
- * @param[in] flags: 部分外部中断的中断标志数组
+ * @param[in] irqs: 中断资源数组指针
+ * @param[in] flags: 部分中断的中断标志数组
  * @param[in] num: 数组中元素数量
  * @note
  * + 上下文：线程、中断资源数组中描述的中断
@@ -348,7 +435,8 @@ void xwos_sqlk_rdex_unlock_irqsrs(struct xwos_sqlk * sql,
  * + 上下文：线程、中断底半部
  * @details
  * + 若顺序锁已处于写或独占读临界区，就自旋等待。
- * + 此函数只会关闭本地CPU的抢占和中断底半部，因此只能保证其临界区在线程与中断底半部中是安全的。
+ * + 此函数只会关闭本地CPU的抢占和中断底半部，
+ *   因此只能保证其临界区在线程与中断底半部中是安全的。
  */
 static __xwos_inline_api
 void xwos_sqlk_rdex_lock_bh(struct xwos_sqlk * sql)
@@ -365,7 +453,8 @@ void xwos_sqlk_rdex_lock_bh(struct xwos_sqlk * sql)
  * @note
  * + 上下文：线程、中断底半部
  * @details
- * + 此函数只会关闭本地CPU的抢占和中断底半部，因此只能保证其临界区在线程与中断底半部中是安全的。
+ * + 此函数只会关闭本地CPU的抢占和中断底半部，
+ *   因此只能保证其临界区在线程与中断底半部中是安全的。
  */
 static __xwos_inline_api
 xwer_t xwos_sqlk_rdex_trylock_bh(struct xwos_sqlk * sql)
@@ -523,15 +612,16 @@ void xwos_sqlk_wr_unlock_cpuirqrs(struct xwos_sqlk * sql,
 }
 
 /**
- * @brief XWOS API：开启写临界区，并关闭部分外部中断
+ * @brief XWOS API：开启写临界区，并关闭部分中断
  * @param[in] sql: 顺序锁的指针
- * @param[in] irqs: 外部中断资源数组指针
+ * @param[in] irqs: 中断资源数组指针
  * @param[in] num: 数组中元素数量
  * @note
  * + 上下文：线程、中断资源数组中描述的中断
  * @details
  * + 若顺序锁已处于写或独占读临界区，就自旋等待。
- * + 此函数只会关闭本地CPU的抢占和部分外部中断，因此只能保证其临界区在这些中断与线程上下文中是安全的。
+ * + 此函数只会关闭本地CPU的抢占和部分中断，
+ *   因此只能保证其临界区在这些中断与线程上下文中是安全的。
  */
 static __xwos_inline_api
 void xwos_sqlk_wr_lock_irqs(struct xwos_sqlk * sql,
@@ -542,9 +632,9 @@ void xwos_sqlk_wr_lock_irqs(struct xwos_sqlk * sql,
 }
 
 /**
- * @brief XWOS API：尝试开启写临界区，并关闭部分外部中断
+ * @brief XWOS API：尝试开启写临界区，并关闭部分中断
  * @param[in] sql: 顺序锁的指针
- * @param[in] irqs: 外部中断资源数组指针
+ * @param[in] irqs: 中断资源数组指针
  * @param[in] num: 数组中元素数量
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -552,7 +642,8 @@ void xwos_sqlk_wr_lock_irqs(struct xwos_sqlk * sql,
  * @note
  * + 上下文：线程、中断资源数组中描述的中断
  * @details
- * + 此函数只会关闭本地CPU的抢占和部分外部中断，因此只能保证其临界区在这些中断与线程上下文是安全的。
+ * + 此函数只会关闭本地CPU的抢占和部分中断，
+ *   因此只能保证其临界区在这些中断与线程上下文是安全的。
  */
 static __xwos_inline_api
 xwer_t xwos_sqlk_wr_trylock_irqs(struct xwos_sqlk * sql,
@@ -563,9 +654,9 @@ xwer_t xwos_sqlk_wr_trylock_irqs(struct xwos_sqlk * sql,
 }
 
 /**
- * @brief XWOS API：关闭写临界区，并开启部分外部中断
+ * @brief XWOS API：关闭写临界区，并开启部分中断
  * @param[in] sql: 顺序锁的指针
- * @param[in] irqs: 外部中断资源数组指针
+ * @param[in] irqs: 中断资源数组指针
  * @param[in] num: 数组中元素数量
  * @note
  * + 上下文：线程、中断资源数组中描述的中断
@@ -580,16 +671,17 @@ void xwos_sqlk_wr_unlock_irqs(struct xwos_sqlk * sql,
 
 
 /**
- * @brief XWOS API：开启写临界区，保存部分外部中断的中断标志并关闭
+ * @brief XWOS API：开启写临界区，保存部分中断的中断标志并关闭
  * @param[in] sql: 顺序锁的指针
- * @param[in] irqs: 外部中断资源数组指针
- * @param[out] flags: 缓冲区指针，用于返回部分外部中断的中断标志
+ * @param[in] irqs: 中断资源数组指针
+ * @param[out] flags: 缓冲区指针，用于返回部分中断的中断标志
  * @param[in] num: 数组中元素数量
  * @note
  * + 上下文：线程、中断资源数组中描述的中断
  * @details
  * + 若顺序锁已处于写或独占读临界区，就自旋等待。
- * + 此函数只会关闭本地CPU的抢占和部分外部中断，因此只能保证其临界区在这些中断与线程上下文是安全的。
+ * + 此函数只会关闭本地CPU的抢占和部分中断，
+ *   因此只能保证其临界区在这些中断与线程上下文是安全的。
  */
 static __xwos_inline_api
 void xwos_sqlk_wr_lock_irqssv(struct xwos_sqlk * sql,
@@ -600,10 +692,10 @@ void xwos_sqlk_wr_lock_irqssv(struct xwos_sqlk * sql,
 }
 
 /**
- * @brief XWOS API：尝试开启写临界区，保存部分外部中断的中断标志并关闭
+ * @brief XWOS API：尝试开启写临界区，保存部分中断的中断标志并关闭
  * @param[in] sql: 顺序锁的指针
- * @param[in] irqs: 外部中断资源数组指针
- * @param[out] flags: 缓冲区指针，用于返回部分外部中断的中断标志
+ * @param[in] irqs: 中断资源数组指针
+ * @param[out] flags: 缓冲区指针，用于返回部分中断的中断标志
  * @param[in] num: 数组中元素数量
  * @return 错误码
  * @retval XWOK: 没有错误
@@ -611,7 +703,8 @@ void xwos_sqlk_wr_lock_irqssv(struct xwos_sqlk * sql,
  * @note
  * + 上下文：线程、中断资源数组中描述的中断
  * @details
- * + 此函数只会关闭本地CPU的抢占和部分外部中断，因此只能保证其临界区在这些中断与线程上下文是安全的。
+ * + 此函数只会关闭本地CPU的抢占和部分中断，
+ *   因此只能保证其临界区在这些中断与线程上下文是安全的。
  */
 static __xwos_inline_api
 xwer_t xwos_sqlk_wr_trylock_irqssv(struct xwos_sqlk * sql,
@@ -622,10 +715,10 @@ xwer_t xwos_sqlk_wr_trylock_irqssv(struct xwos_sqlk * sql,
 }
 
 /**
- * @brief XWOS API：关闭写临界区，恢复部分外部中断的中断标志
+ * @brief XWOS API：关闭写临界区，恢复部分中断的中断标志
  * @param[in] sql: 顺序锁的指针
- * @param[in] irqs: 外部中断资源数组指针
- * @param[in] flags: 部分外部中断的中断标志数组
+ * @param[in] irqs: 中断资源数组指针
+ * @param[in] flags: 部分中断的中断标志数组
  * @param[in] num: 数组中元素数量
  * @note
  * + 上下文：线程、中断资源数组中描述的中断
@@ -645,7 +738,8 @@ void xwos_sqlk_wr_unlock_irqsrs(struct xwos_sqlk * sql,
  * + 上下文：线程、中断底半部
  * @details
  * + 若顺序锁已处于写或独占读临界区，就自旋等待。
- * + 此函数只会关闭本地CPU的抢占和中断底半部，因此只能保证其临界区在线程与中断底半部中是安全的。
+ * + 此函数只会关闭本地CPU的抢占和中断底半部，
+ *   因此只能保证其临界区在线程与中断底半部中是安全的。
  */
 static __xwos_inline_api
 void xwos_sqlk_wr_lock_bh(struct xwos_sqlk * sql)
@@ -662,7 +756,8 @@ void xwos_sqlk_wr_lock_bh(struct xwos_sqlk * sql)
  * @note
  * + 上下文：线程、中断底半部
  * @details
- * + 此函数只会关闭本地CPU的抢占和中断底半部，因此只能保证其临界区在线程与中断底半部中是安全的。
+ * + 此函数只会关闭本地CPU的抢占和中断底半部，
+ *   因此只能保证其临界区在线程与中断底半部中是安全的。
  */
 static __xwos_inline_api
 xwer_t xwos_sqlk_wr_trylock_bh(struct xwos_sqlk * sql)

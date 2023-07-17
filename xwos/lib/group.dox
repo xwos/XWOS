@@ -1,3 +1,4 @@
 /**
  * @defgroup xwos_lib XWOS的通用库
+ * @ingroup xwos
  */

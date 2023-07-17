@@ -21,33 +21,70 @@
 /**
  * @defgroup xwos_sync_flg 事件标志
  * @ingroup xwos_sync
+ * 参考文档： [事件标志](../docs/UserManual/Sync/Flg)
+ *
+ *
+ * ## 事件标志的静态初始化、销毁
+ *
+ * + `xwos_flg_init()` ：静态初始化
+ * + `xwos_flg_fini()` ：销毁
+ *
+ *
+ * ## 事件标志的动态创建、删除
+ *
+ * + `xwos_flg_create()` ：动态创建
+ * + `xwos_flg_delete()` ：删除
+ *
+ *
+ * ## 产生事件
+ *
+ * + `xwos_flg_s1m()` ：同时设置多个事件标志位，可在 **任意** 上下文使用
+ * + `xwos_flg_s1i()` ：设置单个事件标志位，可在 **任意** 上下文使用
+ * + `xwos_flg_c0m()` ：同时清除多个事件标志位，可在 **任意** 上下文使用
+ * + `xwos_flg_c0i()` ：清除单个事件标志位，可在 **任意** 上下文使用
+ * + `xwos_flg_x1m()` ：同时翻转多个事件标志位，可在 **任意** 上下文使用
+ * + `xwos_flg_x1i()` ：翻转单个事件标志位，可在 **任意** 上下文使用
+ *
+ *
+ * ## 获取事件的状态
+ *
+ * + `xwos_flg_get_num()` ：获取事件标志中总共有多少个事件，可在 **任意** 上下文使用
+ * + `xwos_flg_read()` ：读取事件标志中位图的值，可在 **任意** 上下文使用
+ *
+ *
+ * ## 等待事件
+ *
+ * + `xwos_flg_wait()` ：等待事件，只能在 **线程** 上下文使用
+ * + `xwos_flg_wait_to()` ：限时等待事件，只能在 **线程** 上下文使用
+ * + `xwos_flg_trywait()` ：仅测试事件，可在 **任意** 上下文使用
+ *
+ *
+ * ## 使用信号选择器选择事件标志
+ *
+ * + `xwos_flg_bind()` ：将事件标志绑定到 [信号选择器](../docs/UserManual/Sync/Sel) 上
+ * + `xwos_flg_unbind()` ：从 [信号选择器](../docs/UserManual/Sync/Sel) 上解绑
+ *
+ *
+ * ## 事件标志对象的生命周期管理
+ *
+ * + 通过 **对象指针** 管理生命周期：
+ *   + `xwos_flg_grab()` ：增加引用计数
+ *   + `xwos_flg_put()` ：减少引用计数
+ * + 通过 **对象描述符** 管理生命周期：
+ *   + `xwos_flg_acquire()` ：增加引用计数
+ *   + `xwos_flg_release()` ：减少引用计数
+ *
+ *
+ * ## 对象描述符和对象标签
+ *
+ * 已知事件标志对象的指针的情况下，可以通过 `xwos_flg_getd()` 获取 @ref xwos_flg_d ，
+ * 或可以通过 `xwos_flg_gettik()` 获取对象标签。
+ *
+ *
+ * ## C++
+ *
+ * C++头文件： @ref xwos/osal/sync/flg.hxx
  * @{
- * @section trigger 触发条件
- *
- * 事件的触发方式可通过参数 `trigger` 设置。事件的触发方式分为两类。
- *
- * @subsection level_trigger 电平触发
- *
- * + @ref XWOS_FLG_TRIGGER_SET_ALL : 掩码中的所有位同时为1
- * + @ref XWOS_FLG_TRIGGER_SET_ANY : 掩码中的任意位为1
- * + @ref XWOS_FLG_TRIGGER_CLR_ALL : 掩码中的所有位同时为0
- * + @ref XWOS_FLG_TRIGGER_CLR_ANY : 掩码中的任意位为0
- *
- * **电平触发** 时，若参数 `action` 取值 @ref XWOS_FLG_ACTION_CONSUMPTION ，表示线程在读取事件位图后，会 **清除** 事件。
- * **电平触发** 时，参数 `origin` 用于返回事件发生时的位图状态。
- *
- * @subsection edge_trigger 边沿触发
- *
- * + @ref XWOS_FLG_TRIGGER_TGL_ALL : 掩码中的所有位同时发生翻转
- * + @ref XWOS_FLG_TRIGGER_TGL_ANY : 掩码中的任意位发生翻转
- *
- * **边沿触发** 时，参数 `action` 没有作用，取值 `XWOS_FLG_ACTION_NONE` 即可。
- * **边沿触发** 时，必须要有一个初始状态，就像数字电路一样：
- *
- * + 当位的初始值为 **0** (低电平)，然后跳变到 **1** (高电平)的瞬间被称为上升沿。此时触发的事件被称为上升沿触发。
- * + 当位的初始值为 **1** (高电平)，然后跳变到 **0** (低电平)的瞬间被称为下降沿。此时触发的事件被称为下降沿触发。
- *
- * 初始值就由参数 `origin` 指明，触发后，事件位发生跳变，跳变后的结果还是由 参数 `origin` 返回。
  */
 
 /**
@@ -506,23 +543,23 @@ xwer_t xwos_flg_read(struct xwos_flg * flg, xwbmp_t out[])
  * @brief XWOS API：等待事件
  * @param[in] flg: 事件标志对象指针
  * @param[in] trigger: 事件触发条件，取值：
- * + [电平触发](@ref level_trigger)
+ * + 电平触发
  *   @arg @ref XWOS_FLG_TRIGGER_SET_ALL : 掩码中的所有位同时为1
  *   @arg @ref XWOS_FLG_TRIGGER_SET_ANY : 掩码中的任意位为1
  *   @arg @ref XWOS_FLG_TRIGGER_CLR_ALL : 掩码中的所有位同时为0
  *   @arg @ref XWOS_FLG_TRIGGER_CLR_ANY : 掩码中的任意位为0
- * + [边沿触发](@ref edge_trigger)
+ * + 边沿触发
  *   @arg @ref XWOS_FLG_TRIGGER_TGL_ALL : 掩码中的所有位同时发生翻转
  *   @arg @ref XWOS_FLG_TRIGGER_TGL_ANY : 掩码中的任意位发生翻转
  * @param[in] action: 事件触发后的动作，
- * + 当trigger为 [电平触发](@ref level_trigger) 时，取值：
+ * + 当trigger为 **电平触发** 时，取值：
  *   @arg @ref XWOS_FLG_ACTION_CONSUMPTION : 消费事件
  *   @arg @ref XWOS_FLG_ACTION_NONE : 无操作
- * + 当trigger为 [边沿触发](@ref edge_trigger) 时，此参数没有用，可填 `XWOS_FLG_ACTION_NONE`
+ * + 当trigger为 **边沿触发** 时，此参数没有用，可填 `XWOS_FLG_ACTION_NONE`
  * @param[in,out] origin: 指向缓冲区的指针：
- * + 当 `trigger` 为 [电平触发](@ref level_trigger) 时
+ * + 当 `trigger` 为 **电平触发** 时
  *   + (O) 返回事件发生时的位图的状态
- * + 当trigger为 [边沿触发](@ref edge_trigger) 时
+ * + 当trigger为 **边沿触发** 时
  *   + (I) 作为输入时，作为比较的初始状态
  *   + (O) 作为输出时，返回触发后的事件位图状态（常作为下一次调用的初始值）
  * @param[in] msk: 事件的位图掩码，表示只关注掩码部分的事件
@@ -550,23 +587,23 @@ xwer_t xwos_flg_wait(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
  * @brief XWOS API：限时等待触发事件
  * @param[in] flg: 事件标志对象指针
  * @param[in] trigger: 事件触发条件，取值：
- * + [电平触发](@ref level_trigger)
+ * + 电平触发
  *   @arg @ref XWOS_FLG_TRIGGER_SET_ALL : 掩码中的所有位同时为1
  *   @arg @ref XWOS_FLG_TRIGGER_SET_ANY : 掩码中的任意位为1
  *   @arg @ref XWOS_FLG_TRIGGER_CLR_ALL : 掩码中的所有位同时为0
  *   @arg @ref XWOS_FLG_TRIGGER_CLR_ANY : 掩码中的任意位为0
- * + [电平触发](@ref level_trigger)
+ * + 边沿触发
  *   @arg @ref XWOS_FLG_TRIGGER_TGL_ALL : 掩码中的所有位同时发生翻转
  *   @arg @ref XWOS_FLG_TRIGGER_TGL_ANY : 掩码中的任意位发生翻转
  * @param[in] action: 事件触发后的动作，
- * + 当trigger为 [电平触发](@ref level_trigger) 时，取值：
+ * + 当trigger为 **电平触发** 时，取值：
  *   @arg @ref XWOS_FLG_ACTION_CONSUMPTION : 消费事件
  *   @arg @ref XWOS_FLG_ACTION_NONE : 无操作
- * + 当trigger为 [边沿触发](@ref edge_trigger) 时，此参数没有用，可填 `XWOS_FLG_ACTION_NONE`
+ * + 当trigger为 **边沿触发** 时，此参数没有用，可填 `XWOS_FLG_ACTION_NONE`
  * @param[in,out] origin: 指向缓冲区的指针：
- * + 当 `trigger` 为 [电平触发](@ref level_trigger) 时
+ * + 当 `trigger` 为 **电平触发** 时
  *   + (O) 返回事件发生时的位图的状态
- * + 当trigger为 [边沿触发](@ref edge_trigger) 时
+ * + 当trigger为 **边沿触发** 时
  *   + (I) 作为输入时，作为比较的初始状态
  *   + (O) 作为输出时，返回触发后的事件位图状态（常作为下一次调用的初始值）
  * @param[in] msk: 事件的位图掩码，表示只关注掩码部分的事件
@@ -599,23 +636,23 @@ xwer_t xwos_flg_wait_to(struct xwos_flg * flg, xwsq_t trigger, xwsq_t action,
  * @brief XWOS API：检查触发事件
  * @param[in] flg: 事件标志对象指针
  * @param[in] trigger: 事件触发条件，取值：
- * + [电平触发](@ref level_trigger)
+ * + 电平触发
  *   @arg @ref XWOS_FLG_TRIGGER_SET_ALL : 掩码中的所有位同时为1
  *   @arg @ref XWOS_FLG_TRIGGER_SET_ANY : 掩码中的任意位为1
  *   @arg @ref XWOS_FLG_TRIGGER_CLR_ALL : 掩码中的所有位同时为0
  *   @arg @ref XWOS_FLG_TRIGGER_CLR_ANY : 掩码中的任意位为0
- * + [电平触发](@ref level_trigger)
+ * + 边沿触发
  *   @arg @ref XWOS_FLG_TRIGGER_TGL_ALL : 掩码中的所有位同时发生翻转
  *   @arg @ref XWOS_FLG_TRIGGER_TGL_ANY : 掩码中的任意位发生翻转
  * @param[in] action: 事件触发后的动作，
- * + 当trigger为 [电平触发](@ref level_trigger) 时，取值：
+ * + 当trigger为 **电平触发** 时，取值：
  *   @arg @ref XWOS_FLG_ACTION_CONSUMPTION : 消费事件
  *   @arg @ref XWOS_FLG_ACTION_NONE : 无操作
- * + 当trigger为 [边沿触发](@ref edge_trigger) 时，此参数没有用，可填 `XWOS_FLG_ACTION_NONE`
+ * + 当trigger为 **边沿触发** 时，此参数没有用，可填 `XWOS_FLG_ACTION_NONE`
  * @param[in,out] origin: 指向缓冲区的指针：
- * + 当 `trigger` 为 [电平触发](@ref level_trigger) 时
+ * + 当 `trigger` 为 **电平触发** 时
  *   + (O) 返回事件发生时的位图的状态
- * + 当trigger为 [边沿触发](@ref edge_trigger) 时
+ * + 当trigger为 **边沿触发** 时
  *   + (I) 作为输入时，作为比较的初始状态
  *   + (O) 作为输出时，返回触发后的事件位图状态（常作为下一次调用的初始值）
  * @param[in] msk: 事件的位图掩码，表示只关注掩码部分的事件

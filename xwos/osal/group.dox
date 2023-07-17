@@ -4,8 +4,10 @@
 
 /**
  * @defgroup xwos_sync XWOS的同步机制
+ * @ingroup xwos
  */
 
 /**
  * @defgroup xwos_lock XWOS的锁
+ * @ingroup xwos
  */
