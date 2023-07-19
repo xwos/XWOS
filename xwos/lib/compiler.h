@@ -666,29 +666,19 @@
 #  define xwcc_offsetof(type, member)  ((xwptr_t)&(((type *)0)->member))
 #endif
 
-#ifndef xwcc_baseof
-/**
- * @brief 从结构体的某个成员的地址计算出结构体的首地址
- * @param[in] ptr: 结构体某个成员的地址
- * @param[in] type: 结构体类型
- * @param[in] member: 成员在结构体中符号名
- */
-#  define xwcc_baseof(ptr, type, member) \
-        ((type *)(((xwptr_t)(ptr)) - (xwptr_t)xwcc_offsetof(type, member)))
-#endif
-
 #ifndef xwcc_derof
 /**
  * @brief 将基类结构体指针转换为派生类结构体指针
- * @param[in] ptr: 基类结构体指针
- * @param[in] type: 派生类结构体类型
+ * @param[in] baseptr: 基类结构体指针
+ * @param[in] derclass: 派生类结构体类型
  * @param[in] member: 基类在派生类结构体中成员符号名
  * @note
  * + 违反 **MISRA-C:2012-11.5**
  *   + XWOS内核虽然是C语言编写，但使用了面向对象的思想，
  *     具有继承关系的基类结构体指针可转换为派生类结构体指针。
  */
-#define xwcc_derof(ptr, type, member) xwcc_baseof(ptr, type, member)
+#define xwcc_derof(baseptr, derclass, member) \
+        ((derclass *)(((xwptr_t)(baseptr)) - (xwptr_t)xwcc_offsetof(derclass, member)))
 #endif
 
 
