@@ -46,8 +46,8 @@ void xwmp_ttn_init(struct xwmp_ttn * ttn)
 {
         xwlib_bclst_init_node(&ttn->rbb);
         xwlib_rbtree_init_node(&ttn->rbn);
-        ttn->wkup_xwtm = 0;
-        xwaop_write(xwsq_t, &ttn->wkuprs, XWMP_TTN_WKUPRS_UNKNOWN, NULL);
+        ttn->wkup_xwtm = (xwtm_t)0;
+        xwaop_write(xwsq_t, &ttn->wkuprs, (xwsq_t)XWMP_TTN_WKUPRS_UNKNOWN, NULL);
         ttn->cb = NULL;
         ttn->xwtt = NULL;
 }
@@ -63,7 +63,7 @@ xwer_t xwmp_tt_init(struct xwmp_tt * xwtt)
 
         xwmp_sqlk_init(&xwtt->lock);
         xwlib_rbtree_init(&xwtt->rbtree);
-        xwtt->deadline = 0;
+        xwtt->deadline = (xwtm_t)0;
         xwtt->leftmost = NULL;
         xwlib_bclst_init_head(&xwtt->timeout);
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
@@ -122,9 +122,9 @@ retry:
                         seq = xwmp_sqlk_get_seq(&xwtt->lock);
                         xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                         /* IRQs may happen */
-                        seq += XWMP_SQLK_GRANULARITY;
+                        seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
                         xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                        seq += XWMP_SQLK_GRANULARITY;
+                        seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
                         if (xwmp_sqlk_rd_retry(&xwtt->lock, seq)) {
                                 goto retry; // cppcheck-suppress [misra-c2012-15.2]
                         }
@@ -133,13 +133,13 @@ retry:
                                 nt = n->wkup_xwtm;
                                 xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
                                 /* IRQs may happen */
-                                seq += XWMP_SQLK_GRANULARITY;
+                                seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
                                 rc = xwtm_cmp(ttn->wkup_xwtm, nt);
                                 if (rc < 0) {
                                         pos = &rbn->left;
                                         lpc = (xwptr_t)pos;
                                         xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                                        seq += XWMP_SQLK_GRANULARITY;
+                                        seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
                                         if (xwmp_sqlk_rd_retry(&xwtt->lock, seq)) {
                                                 // cppcheck-suppress [misra-c2012-15.2]
                                                 goto retry;
@@ -147,9 +147,10 @@ retry:
                                         rbn = rbn->left;
                                 } else if (rc > 0) {
                                         pos = &rbn->right;
-                                        lpc = (xwptr_t)pos | XWLIB_RBTREE_POS_RIGHT;
+                                        lpc = ((xwptr_t)pos |
+                                               (xwptr_t)XWLIB_RBTREE_POS_RIGHT);
                                         xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                                        seq += XWMP_SQLK_GRANULARITY;
+                                        seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
                                         if (xwmp_sqlk_rd_retry(&xwtt->lock, seq)) {
                                                 // cppcheck-suppress [misra-c2012-15.2]
                                                 goto retry;
@@ -158,7 +159,7 @@ retry:
                                 } else {
                                         lpc = (xwptr_t)0;
                                         xwmp_sqlk_wr_lock_cpuirq(&xwtt->lock);
-                                        seq += XWMP_SQLK_GRANULARITY;
+                                        seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
                                         if (xwmp_sqlk_rd_retry(&xwtt->lock, seq)) {
                                                 // cppcheck-suppress [misra-c2012-15.2]
                                                 goto retry;
@@ -167,7 +168,7 @@ retry:
                                 }
                         }
                 }
-                if (0 != lpc) {
+                if ((xwptr_t)0 != lpc) {
                         xwlib_rbtree_link(&ttn->rbn, lpc);
                         xwlib_rbtree_insert_color(&xwtt->rbtree, &ttn->rbn);
                 } else {
@@ -256,7 +257,7 @@ xwer_t xwmp_tt_remove_locked(struct xwmp_tt * xwtt, struct xwmp_ttn * ttn)
                         xwmp_tt_rmrbn_locked(xwtt, ttn);
                 }
                 ttn->xwtt = NULL;
-                xwaop_write(xwsq_t, &ttn->wkuprs, XWMP_TTN_WKUPRS_INTR, NULL);
+                xwaop_write(xwsq_t, &ttn->wkuprs, (xwsq_t)XWMP_TTN_WKUPRS_INTR, NULL);
                 ttn->cb = NULL;
                 rc = XWOK;
         }
@@ -304,7 +305,8 @@ void xwmp_tt_bh(struct xwmp_tt * xwtt)
         xwlib_bclst_itr_prev_entry_del(ttn, &xwtt->timeout, struct xwmp_ttn, rbb) {
                 xwlib_bclst_del_init(&ttn->rbb);
                 cb = ttn->cb;
-                xwaop_write(xwsq_t, &ttn->wkuprs, XWMP_TTN_WKUPRS_TIMEDOUT, NULL);
+                xwaop_write(xwsq_t, &ttn->wkuprs, (xwsq_t)XWMP_TTN_WKUPRS_TIMEDOUT,
+                            NULL);
                 ttn->cb = NULL;
                 xwmp_sqlk_wr_unlock_cpuirq(&xwtt->lock);
                 cb(ttn);
@@ -337,12 +339,12 @@ xwer_t xwmp_syshwt_init(struct xwmp_syshwt * hwt)
 
         hwt->timetick = (xwtm_t)(-(XWOSCFG_SYSHWT_PERIOD));
         hwt->irqrsc = NULL;
-        hwt->irqs_num = 0;
+        hwt->irqs_num = (xwsz_t)0;
         xwmp_sqlk_init(&hwt->lock);
         rc = xwospl_syshwt_init(hwt);
         if (XWOK == rc) {
                 XWOS_BUG_ON(NULL == hwt->irqrsc);
-                XWOS_BUG_ON(0 == hwt->irqs_num);
+                XWOS_BUG_ON((xwsz_t)0 == hwt->irqs_num);
         }
         return rc;
 }
@@ -402,7 +404,7 @@ xwtm_t xwmp_syshwt_get_timetick(struct xwmp_syshwt * hwt)
 __xwmp_code
 xwu64_t xwmp_syshwt_get_tickcount(struct xwmp_syshwt * hwt)
 {
-        return (xwu64_t)xwmp_syshwt_get_timetick(hwt) / XWOSCFG_SYSHWT_PERIOD;
+        return (xwu64_t)xwmp_syshwt_get_timetick(hwt) / (xwu64_t)XWOSCFG_SYSHWT_PERIOD;
 }
 
 /**
@@ -451,7 +453,7 @@ void xwmp_syshwt_task(struct xwmp_syshwt * hwt)
         if (-ETIMEDOUT == rc) {
 #if defined(XWOSCFG_SKD_BH) && (1 == XWOSCFG_SKD_BH)
                 xwmp_bh_node_eq(&xwskd->bhcb, &xwtt->bhn);
-                xwmp_skd_req_bh(xwskd);
+                xwmp_skd_req_bh(xwskd); // cppcheck-suppress [misra-c2012-17.7]
 #else
                 xwmp_tt_bh(xwtt);
 #endif

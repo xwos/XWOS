@@ -22,8 +22,9 @@ void newlibac_time_linkage_stub(void)
 {
 }
 
-// cppcheck-suppress [misra-c2012-8.14]
-int _gettimeofday_r(struct _reent * r, struct timeval * restrict tv, void * restrict tz);
+int _gettimeofday_r(struct _reent * r,
+                    // cppcheck-suppress [misra-c2012-8.14]
+                    struct timeval * restrict tv, void * restrict tz);
 clock_t _times_r(struct _reent * r, struct tms * buf);
 
 // cppcheck-suppress [misra-c2012-8.14]
@@ -36,8 +37,10 @@ int _gettimeofday_r(struct _reent * r, struct timeval * restrict tv, void * rest
 
         errno = 0;
         nowts = xwtm_nowts();
-        tv->tv_sec = (time_t)(nowts / XWTM_S(1));
-        tv->tv_usec = (suseconds_t)(nowts % XWTM_S(1)) / XWTM_MS(1);
+        // cppcheck-suppress [misra-c2012-10.7] 64bit to 32bit
+        tv->tv_sec = (time_t)(nowts / XWTM_MS(1000));
+        // cppcheck-suppress [misra-c2012-10.7] 64bit to 32bit
+        tv->tv_usec = (suseconds_t)((nowts % XWTM_MS(1000)) / XWTM_US(1000));
         return 0;
 }
 

@@ -209,21 +209,22 @@ xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
                 goto err_size;
         }
 
-        odrbtrees = (struct xwmm_mempool_page_odrbtree *)&mp[1];
-        pages = (struct xwmm_mempool_page *)&odrbtrees[pgodr + 1];
-        odrbtrees_size = sizeof(struct xwmm_mempool_page_odrbtree) * (pgodr + 1);
+        odrbtrees = (struct xwmm_mempool_page_odrbtree *)&mp[(xwsz_t)1];
+        pages = (struct xwmm_mempool_page *)&odrbtrees[pgodr + (xwsz_t)1];
+        odrbtrees_size = sizeof(struct xwmm_mempool_page_odrbtree) *
+                         (pgodr + (xwsz_t)1);
         pages_size = sizeof(struct xwmm_mempool_page) << pgodr;
         rc = xwmm_mempool_construct(mp, name, origin, size, odrbtrees, pages);
         if (rc < 0) {
                 goto err_mempool_construct;
         }
 
-        if (pre > 0) {
+        if (pre > (xwsz_t)0) {
                 rc = xwmm_mempool_malloc(mp, pre, &mem);
                 if (rc < 0) {
                         goto err_mempool_prealloc;
                 }
-                if (membuf) {
+                if (NULL != membuf) {
                         *membuf = mem;
                 }
         } else if ((xwptr_t)mp == origin) {
@@ -235,7 +236,7 @@ xwer_t xwmm_mempool_init(struct xwmm_mempool * mp, const char * name,
                 if (rc < 0) {
                         goto err_mempool_prealloc;
                 }
-                if (membuf) {
+                if (NULL != membuf) {
                         *membuf = mem;
                 }
         } else {}
@@ -257,16 +258,17 @@ xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf
         XWOS_VALIDATE((mp), "nullptr", -EFAULT);
         XWOS_VALIDATE((membuf), "nullptr", -EFAULT);
 
-        if (0 == size) {
+        if ((xwsz_t)0 == size) {
                 rc = XWOK;
                 *membuf = NULL;
         } else {
-                size = XWBOP_ALIGN(size, XWMM_ALIGNMENT);
+                size = XWBOP_ALIGN(size, (xwsz_t)XWMM_ALIGNMENT);
                 odr = xwbop_fls(xwsz_t, size);
-                while ((1U << odr) < size) {
+                while (((xwsz_t)1 << (xwsz_t)odr) < size) {
                         odr++;
                 }
-                size = 1U << odr;
+                // cppcheck-suppress [misra-c2012-17.8]
+                size = (xwsz_t)1 << (xwsz_t)odr;
 
                 switch (size) {
                 case 8:
@@ -282,32 +284,32 @@ xwer_t xwmm_mempool_malloc(struct xwmm_mempool * mp, xwsz_t size, void ** membuf
                         ia = (void *)&mp->oc_64;
                         break;
                 case 128:
-                        if (size <= 96) {
+                        if (size <= (xwsz_t)96) {
                                 ia = (void *)&mp->oc_96;
                         } else {
                                 ia = (void *)&mp->oc_128;
                         }
                         break;
                 case 256:
-                        if (size <= 160) {
+                        if (size <= (xwsz_t)160) {
                                 ia = (void *)&mp->oc_160;
-                        } else if (size <= 192) {
+                        } else if (size <= (xwsz_t)192) {
                                 ia = (void *)&mp->oc_192;
                         } else {
                                 ia = (void *)&mp->oc_256;
                         }
                         break;
                 case 512:
-                        if (size <= 320) {
+                        if (size <= (xwsz_t)320) {
                                 ia = (void *)&mp->oc_320;
-                        } else if (size <= 384) {
+                        } else if (size <= (xwsz_t)384) {
                                 ia = (void *)&mp->oc_384;
                         } else {
                                 ia = (void *)&mp->oc_512;
                         }
                         break;
                 case 1024:
-                        if (size <= 768) {
+                        if (size <= (xwsz_t)768) {
                                 ia = (void *)&mp->oc_768;
                         } else {
                                 ia = (void *)&mp->oc_1024;
@@ -414,7 +416,7 @@ xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size, void ** membu
 
         if (NULL == *membuf) {
                 rc = xwmm_mempool_malloc(mp, size, membuf);
-        } else if (0 == size) {
+        } else if ((xwsz_t)0 == size) {
                 rc = xwmm_mempool_free(mp, *membuf);
                 if (XWOK == rc) {
                         *membuf = NULL;
@@ -432,11 +434,13 @@ xwer_t xwmm_mempool_realloc(struct xwmm_mempool * mp, xwsz_t size, void ** membu
                         } else {
                                 rc = xwmm_mempool_malloc(mp, size, &newmem);
                                 if (XWOK == rc) {
+                                        // cppcheck-suppress [misra-c2012-17.7]
                                         memcpy(newmem, oldmem, pg->data.value);
                                         rc = xwmm_mempool_free(mp, oldmem);
                                         if (XWOK == rc) {
                                                 *membuf = newmem;
                                         } else {
+                                                // cppcheck-suppress [misra-c2012-17.7]
                                                 xwmm_mempool_free(mp, newmem);
                                                 *membuf = NULL;
                                         }
@@ -467,11 +471,11 @@ xwer_t xwmm_mempool_memalign(struct xwmm_mempool * mp,
                 alignment = XWMM_ALIGNMENT;
         }
         p2 = xwbop_fls(xwsz_t, alignment);
-        if ((1U << p2) != alignment) {
+        if (((xwsz_t)1 << (xwsz_t)p2) != alignment) {
                 rc = -EINVAL;
                 goto err_notp2;
         }
-        if (0 == size) {
+        if ((xwsz_t)0 == size) {
                 rc = XWOK;
                 *membuf = NULL;
                 goto nothing;
@@ -480,10 +484,10 @@ xwer_t xwmm_mempool_memalign(struct xwmm_mempool * mp,
                 size = alignment;
         } else {
                 p2 = xwbop_fls(xwsz_t, size);
-                while ((1U << p2) < size) {
+                while (((xwsz_t)1 << (xwsz_t)p2) < size) {
                         p2++;
                 }
-                size = 1U << p2;
+                size = (xwsz_t)1 << (xwsz_t)p2;
         }
 
         switch (size) {

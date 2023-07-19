@@ -34,7 +34,7 @@
  */
 
 #define XWSSC_SOF               ((xwu8_t)0xAA)
-#define XWSSC_EOF               ((xwu8_t)(XWSSC_SOF ^ 0xFF))
+#define XWSSC_EOF               (XWSSC_SOF ^ (xwu8_t)0xFF)
 #define XWSSC_SOF_SIZE          (2U)
 #define XWSSC_EOF_SIZE          (2U)
 

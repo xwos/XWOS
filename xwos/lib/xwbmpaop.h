@@ -158,7 +158,7 @@ void xwbmpaop_s1all(atomic_xwbmp_t * bmp, xwsq_t num)
         xwsz_t i;
 
         for (i = 0; i < n; i++) {
-                xwaop_s1m(xwbmp_t, &bmp[i], (xwbmp_t)(~0), NULL, NULL);
+                xwaop_s1m(xwbmp_t, &bmp[i], ~((xwbmp_t)0), NULL, NULL);
         }
 }
 
@@ -176,7 +176,7 @@ void xwbmpaop_c0all(atomic_xwbmp_t * bmp, xwsq_t num)
         xwsz_t i;
 
         for (i = 0; i < n; i++) {
-                xwaop_c0m(xwbmp_t, &bmp[i], (xwbmp_t)(~0), NULL, NULL);
+                xwaop_c0m(xwbmp_t, &bmp[i], ~((xwbmp_t)0), NULL, NULL);
         }
 }
 

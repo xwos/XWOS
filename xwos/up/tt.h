@@ -62,9 +62,9 @@ typedef void (* xwup_tt_cb_f)(struct xwup_ttn * ttn);
  * @brief 唤醒原因枚举
  */
 enum xwup_ttn_wkup_reasaon_em {
-        XWUP_TTN_WKUPRS_UNKNOWN = 0,
-        XWUP_TTN_WKUPRS_TIMEDOUT, /**< 超时 */
-        XWUP_TTN_WKUPRS_INTR, /**< 被中断 */
+        XWUP_TTN_WKUPRS_UNKNOWN = 0U,
+        XWUP_TTN_WKUPRS_TIMEDOUT = 1U, /**< 超时 */
+        XWUP_TTN_WKUPRS_INTR = 2U, /**< 被中断 */
 };
 
 /**

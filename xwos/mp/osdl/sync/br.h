@@ -84,7 +84,7 @@ xwer_t xwosdl_br_release(struct xwosdl_br * br, xwsq_t tik)
 static __xwcc_inline
 xwsq_t xwosdl_br_gettik(struct xwosdl_br * br)
 {
-        return br ? br->cond.synobj.xwobj.tik : 0;
+        return (NULL != br) ? br->cond.synobj.xwobj.tik : (xwsq_t)0;
 }
 
 static __xwcc_inline

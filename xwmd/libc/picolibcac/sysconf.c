@@ -30,7 +30,7 @@ long sysconf(int name)
         switch (name) {
         case _SC_CLK_TCK:
                 errno = 0;
-                conf = XWTM_TC_PER_S;
+                conf = (long)XWTM_TC_PER_S; // cppcheck-suppress [misra-c2012-10.7]
                 break;
         case _SC_PAGESIZE:
                 errno = 0;

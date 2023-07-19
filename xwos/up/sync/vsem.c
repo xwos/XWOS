@@ -70,7 +70,7 @@ xwer_t xwup_vsem_bind(struct xwup_vsem * vsem, struct xwup_evt * sel, xwsq_t pos
 
         xwospl_cpuirq_save_lc(&cpuirq);
         rc = xwup_sel_obj_bind(sel, &vsem->synobj, pos, true);
-        if ((XWOK == rc) && (vsem->count > 0)) {
+        if ((XWOK == rc) && (vsem->count > (xwssq_t)0)) {
                 rc = xwup_sel_obj_s1i(sel, &vsem->synobj);
         }
         xwospl_cpuirq_restore_lc(cpuirq);
@@ -120,7 +120,7 @@ xwer_t xwup_vsem_freeze(struct xwup_vsem * vsem)
 
         rc = XWOK;
         xwospl_cpuirq_save_lc(&cpuirq);
-        if (vsem->count < 0) {
+        if (vsem->count < (xwssq_t)0) {
                 rc = -EALREADY;
         } else {
                 vsem->count = XWUP_VSEM_NEGTIVE;
@@ -131,6 +131,7 @@ xwer_t xwup_vsem_freeze(struct xwup_vsem * vsem)
                 synobj = &vsem->synobj;
                 evt = synobj->sel.evt;
                 if (NULL != evt) {
+                        // cppcheck-suppress [misra-c2012-17.7]
                         xwup_sel_obj_c0i(evt, synobj);
                 }
 #endif
@@ -148,7 +149,7 @@ xwer_t xwup_vsem_thaw(struct xwup_vsem * vsem)
 
         rc = XWOK;
         xwospl_cpuirq_save_lc(&cpuirq);
-        if (vsem->count >= 0) {
+        if (vsem->count >= (xwssq_t)0) {
                 rc = -EALREADY;
         } else {
                 vsem->count = 0;

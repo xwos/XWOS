@@ -21,6 +21,9 @@
  * @{
  */
 
+extern const xwu32_t xwlib_crc32tbl_0x04c11db7[256];
+extern const xwu32_t xwlib_crc32tbl_0xedb88320[256];
+
 /**
  * @brief 计算CRC32的移位方向枚举
  */

@@ -21,6 +21,10 @@
  * @{
  */
 
+extern const xwu8_t xwlib_crc8tbl_0x07[256];
+extern const xwu8_t xwlib_crc8tbl_0x31[256];
+extern const xwu8_t xwlib_crc8tbl_0x9B[256];
+
 /**
  * @brief 计算数据的CRC8校验值
  * @param[in,out] crc8: 指向缓冲区的指针，此缓冲区：

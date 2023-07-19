@@ -43,4 +43,4 @@ mc: FORCE
 
 FORCE:
 
-.PHONY : all clean distclean misra-c/xwos
+.PHONY : all clean distclean mc

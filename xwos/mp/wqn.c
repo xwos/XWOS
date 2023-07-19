@@ -24,8 +24,8 @@
 __xwmp_code
 void xwmp_wqn_init(struct xwmp_wqn * wqn)
 {
-        wqn->type = (xwu8_t)XWMP_WQTYPE_UNKNOWN;
-        wqn->reason = XWMP_WQN_REASON_UNKNOWN;
+        wqn->type = (xwsq_t)XWMP_WQTYPE_UNKNOWN;
+        wqn->reason = (xwsq_t)XWMP_WQN_REASON_UNKNOWN;
         wqn->wq = NULL;
         xwmp_splk_init(&wqn->lock);
         wqn->prio = XWMP_SKD_PRIORITY_INVALID;

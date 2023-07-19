@@ -257,9 +257,10 @@ xwu8_t xwlib_crc8_calms(const xwu8_t stream[], xwsz_t * size)
 {
         xwu8_t result;
 
-        result = 0x0;
+        result = (xwu8_t)0x0;
+        // cppcheck-suppress [misra-c2012-17.7]
         xwlib_crc8_cal(&result,
-                       0x0, false, false, 0x07,
+                       (xwu8_t)0x0, false, false, (xwu8_t)0x07,
                        stream, size);
         return result;
 }

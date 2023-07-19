@@ -199,7 +199,8 @@ recursively_fix:
 
                 *xwlib_rbtree_get_link(node->lpc.v) = tmp.child;
                 if (NULL != tmp.child) {
-                        tmp.child->lpc.v = node->lpc.v | XWLIB_RBTREE_COLOR_BLACK;
+                        tmp.child->lpc.v = node->lpc.v |
+                                        (xwptr_t)XWLIB_RBTREE_COLOR_BLACK;
                 }
 
                 *xwlib_rbtree_get_link(rotation) = parent;
@@ -308,7 +309,7 @@ recursively_fix:
 
         *xwlib_rbtree_get_link(lpc) = tmp.sibling;
         if (NULL != tmp.sibling) {
-                tmp.sibling->lpc.v = ((xwptr_t)lpc) | XWLIB_RBTREE_COLOR_BLACK;
+                tmp.sibling->lpc.v = ((xwptr_t)lpc) | (xwptr_t)XWLIB_RBTREE_COLOR_BLACK;
         }
 
         *xwlib_rbtree_get_link(rotation) = gparent;
@@ -719,7 +720,7 @@ recursively_fix:
                 sibling->lpc.v = parent->lpc.v; /* flip_color: 黑色 */
 
                 *xwlib_rbtree_get_link(lpc) = cc.child;
-                cc.child->lpc.v = lpc | XWLIB_RBTREE_COLOR_BLACK;
+                cc.child->lpc.v = lpc | (xwptr_t)XWLIB_RBTREE_COLOR_BLACK;
 
                 /* xwlib_rbtree_link(parent, rotation); */
                 *xwlib_rbtree_get_link(rotation) = parent;
@@ -919,14 +920,15 @@ black_sibling:
                 /* }                                                               */
                 *xwlib_rbtree_get_link(rr.reverse->lpc.v) = cc.child;
                 if (NULL != cc.child) {
-                        cc.child->lpc.v = rr.reverse->lpc.v | XWLIB_RBTREE_COLOR_BLACK;
+                        cc.child->lpc.v = rr.reverse->lpc.v |
+                                        (xwptr_t)XWLIB_RBTREE_COLOR_BLACK;
                 }
 
                 /* xwlib_rbtree_link(rr.reverse,
                                      (rotation | XWLIB_RBTREE_COLOR_BLACK));       */
                 *xwlib_rbtree_get_link(rotation) = rr.reverse;
                 /* flip_color(cr) */
-                rr.reverse->lpc.v = rotation | XWLIB_RBTREE_COLOR_BLACK;
+                rr.reverse->lpc.v = rotation | (xwptr_t)XWLIB_RBTREE_COLOR_BLACK;
 
                 /* 转换为情况 2.2 */
                 sibling = rr.reverse;
@@ -984,7 +986,7 @@ black_sibling:
 
         /* xwlib_rbtree_link(parent, rotation | XWLIB_RBTREE_COLOR_BLACK); */
         *xwlib_rbtree_get_link(rotation) = parent;
-        parent->lpc.v = rotation | XWLIB_RBTREE_COLOR_BLACK;
+        parent->lpc.v = rotation | (xwptr_t)XWLIB_RBTREE_COLOR_BLACK;
 
         /* cc.color = xwlib_rbtree_get_color(rr.reverse->lpc.v); */
         /* xwlib_rbtree_link(rr.reverse,
@@ -1017,7 +1019,7 @@ void xwlib_rbtree_replace(struct xwlib_rbtree_node * newn,
 
         if (NULL != right) {
                 xwptr_t lpc = xwlib_rbtree_get_color(right->lpc.v);
-                lpc |= ((xwptr_t)(&newn->right) | XWLIB_RBTREE_POS_RIGHT);
+                lpc |= ((xwptr_t)(&newn->right) | (xwptr_t)XWLIB_RBTREE_POS_RIGHT);
                 xwlib_rbtree_link(right, lpc);
         }
 }

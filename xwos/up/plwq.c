@@ -91,9 +91,7 @@ struct xwup_wqn * xwup_plwq_choose(struct xwup_plwq * xwplwq)
         if (xwlib_bclst_tst_empty(&xwplwq->head)) {
                 wqn = NULL;
         } else {
-                wqn = xwlib_bclst_first_entry(&xwplwq->head,
-                                              struct xwup_wqn,
-                                              cln.pl);
+                wqn = xwlib_bclst_first_entry(&xwplwq->head, struct xwup_wqn, cln.pl);
                 xwlib_bclst_del_init(&wqn->cln.pl);
         }
         return wqn;

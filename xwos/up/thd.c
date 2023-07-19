@@ -222,9 +222,9 @@ xwer_t xwup_thd_dgc(struct xwos_object * obj)
         struct xwup_thd * thd;
 
         thd = xwcc_derof(obj, struct xwup_thd, xwobj);
-        if (0 != (XWUP_SKDOBJ_FLAG_ALLOCATED_STACK & thd->stack.flag)) {
+        if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_FLAG_ALLOCATED_STACK & thd->stack.flag)) {
                 base = ((struct xwup_thd *)thd)->stack.base;
-                xwup_thd_stack_free(base);
+                xwup_thd_stack_free(base); //cppcheck-suppress [misra-c2012-17.7]
         }
         xwup_thd_destruct(thd);
         xwup_thd_free(thd);
@@ -401,13 +401,13 @@ xwer_t xwup_thd_activate(struct xwup_thd * thd,
                 goto err_obj_activate;
         }
 
-        thd->state = XWUP_SKDOBJ_ST_UNKNOWN;
+        thd->state = (xwsq_t)XWUP_SKDOBJ_ST_UNKNOWN;
         if (attr->privileged) {
-                xwaop_s1m(xwsq_t, &thd->stack.flag, XWUP_SKDOBJ_FLAG_PRIVILEGED,
+                xwaop_s1m(xwsq_t, &thd->stack.flag, (xwsq_t)XWUP_SKDOBJ_FLAG_PRIVILEGED,
                           NULL, NULL);
         }
         if (attr->detached) {
-                thd->state |= XWUP_SKDOBJ_ST_DETACHED;
+                thd->state |= (xwsq_t)XWUP_SKDOBJ_ST_DETACHED;
         }
 #if (1 == XWOSRULE_SKD_THD_FREEZE)
         xwlib_bclst_init_node(&thd->frznode);
@@ -436,7 +436,7 @@ xwer_t xwup_thd_activate(struct xwup_thd * thd,
         thd->stack.sp =  &thd->stack.base[(attr->stack_size / sizeof(xwstk_t))];
         thd->stack.tls = &thd->stack.base[0];
 #elif defined(XWMMCFG_ED_STACK) && (1 == XWMMCFG_ED_STACK)
-        thd->stack.sp = &thd->stack.base[(attr->stack_size / sizeof(xwstk_t)) - 1];
+        thd->stack.sp = &thd->stack.base[(attr->stack_size / sizeof(xwstk_t)) - 1U];
         thd->stack.tls = &thd->stack.base[0];
 #elif defined(XWMMCFG_FA_STACK) && (1 == XWMMCFG_FA_STACK)
         thd->stack.sp = &thd->stack.base[-1];
@@ -450,11 +450,11 @@ xwer_t xwup_thd_activate(struct xwup_thd * thd,
         thd->stack.guard = attr->stack_guard_size;
 
 #if defined(XWOSCFG_SKD_THD_EXIT) && (1 == XWOSCFG_SKD_THD_EXIT)
-        xwup_cond_init(&thd->completion);
+        xwup_cond_init(&thd->completion); //cppcheck-suppress [misra-c2012-17.7]
 #endif
         xwlib_bclst_init_node(&thd->thdnode);
 #if defined(XWOSCFG_SKD_THD_LOCAL_DATA_NUM) && (XWOSCFG_SKD_THD_LOCAL_DATA_NUM > 0U)
-        for (xwsq_t i = 0; i < XWOSCFG_SKD_THD_LOCAL_DATA_NUM; i++) {
+        for (xwsq_t i = (xwsq_t)0; i < XWOSCFG_SKD_THD_LOCAL_DATA_NUM; i++) {
                 thd->data[i] = NULL;
         }
 #endif
@@ -466,7 +466,7 @@ xwer_t xwup_thd_activate(struct xwup_thd * thd,
                 board_thd_postinit_hook(thd);
 #endif
         } else {
-                xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_STANDBY);
+                xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_STANDBY);
         }
         return XWOK;
 
@@ -486,15 +486,15 @@ void xwup_thd_launch(struct xwup_thd * thd, xwup_thd_f thdfunc, void * arg)
         struct xwup_skd * xwskd;
         xwreg_t cpuirq;
 
-        xwup_thd_grab(thd);
+        xwup_thd_grab(thd); // cppcheck-suppress [misra-c2012-17.7]
         xwskd = xwup_skd_get_lc();
         thd->stack.main = thdfunc;
         thd->stack.arg = arg;
         xwospl_skd_init_stack(&thd->stack, xwup_cthd_return);
         xwospl_tls_init(&thd->stack);
         xwospl_cpuirq_save_lc(&cpuirq);
-        xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_STANDBY);
-        xwup_thd_rq_add_tail(thd);
+        xwbop_c0m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_STANDBY);
+        xwup_thd_rq_add_tail(thd); //cppcheck-suppress [misra-c2012-17.7]
         xwskd->thd_num++;
         xwlib_bclst_add_tail(&xwskd->thdlist, &thd->thdnode);
         xwospl_cpuirq_restore_lc(cpuirq);
@@ -524,7 +524,7 @@ xwer_t xwup_thd_init(struct xwup_thd * thd,
 
         xwup_thd_construct(thd);
         attr = *inattr;
-        thd->stack.flag = 0;
+        thd->stack.flag = (xwsq_t)0;
         rc = xwup_thd_activate(thd, &attr, thdfunc, arg, xwup_thd_sgc);
         return rc;
 }
@@ -540,9 +540,9 @@ xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
         bool allocated_stack;
         xwer_t rc;
 
-        if (inattr) {
+        if (NULL != inattr) {
                 attr = *inattr;
-                if (0 == attr.stack_size) {
+                if ((xwsz_t)0 == attr.stack_size) {
                         attr.stack_size = XWMMCFG_STACK_SIZE_DEFAULT;
                 } else if (attr.stack_size < XWMMCFG_STACK_SIZE_MIN) {
                         attr.stack_size = XWMMCFG_STACK_SIZE_MIN;
@@ -559,7 +559,7 @@ xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
                 } else {
                         allocated_stack = false;
                 }
-                if (0 == attr.stack_guard_size) {
+                if ((xwsz_t)0 == attr.stack_guard_size) {
                         attr.stack_guard_size = XWMMCFG_STACK_GUARD_SIZE_DEFAULT;
                 }
         } else {
@@ -584,7 +584,7 @@ xwer_t xwup_thd_create(struct xwup_thd ** thdpbuf,
         }
 
         if (allocated_stack) {
-                thd->stack.flag = XWUP_SKDOBJ_FLAG_ALLOCATED_STACK;
+                thd->stack.flag = (xwsq_t)XWUP_SKDOBJ_FLAG_ALLOCATED_STACK;
         } else {
                 thd->stack.flag = 0;
         }
@@ -601,7 +601,7 @@ err_thd_activate:
         xwup_thd_free(thd);
 err_thd_alloc:
         if (allocated_stack) {
-                xwup_thd_stack_free(attr.stack);
+                xwup_thd_stack_free(attr.stack); //cppcheck-suppress [misra-c2012-17.7]
         }
 err_stack_alloc:
         *thdpbuf = NULL;
@@ -624,13 +624,13 @@ xwer_t xwup_thd_exit_lic(struct xwup_thd * thd, xwer_t rc)
 
         xwskd = xwup_skd_get_lc();
         xwospl_cpuirq_save_lc(&cpuirq);
-        xwbop_c0m(xwsq_t, &thd->state,
-                  XWUP_SKDOBJ_ST_RUNNING | XWUP_SKDOBJ_ST_EXITING);
-        xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_STANDBY);
+        xwbop_c0m(xwsq_t, &thd->state, ((xwsq_t)XWUP_SKDOBJ_ST_RUNNING |
+                                        (xwsq_t)XWUP_SKDOBJ_ST_EXITING));
+        xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_STANDBY);
         thd->stack.arg = err_ptr(rc);
-        detached = !!(XWUP_SKDOBJ_ST_DETACHED & thd->state);
+        detached = !!((xwsq_t)XWUP_SKDOBJ_ST_DETACHED & thd->state);
         xwospl_cpuirq_restore_lc(cpuirq);
-        xwup_cond_broadcast(&thd->completion);
+        xwup_cond_broadcast(&thd->completion); //cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_disable_lc();
         xwlib_bclst_del_init(&thd->thdnode);
         xwskd->thd_num--;
@@ -640,17 +640,17 @@ xwer_t xwup_thd_exit_lic(struct xwup_thd * thd, xwer_t rc)
 #  if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
         if (xwskd->pm.frz_thd_cnt == xwskd->thd_num) {
                 xwospl_cpuirq_restore_lc(cpuirq);
-                xwup_thd_put(thd);
-                xwup_skd_notify_allfrz_lic();
+                xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
+                xwup_skd_notify_allfrz_lic(); // cppcheck-suppress [misra-c2012-17.7]
         } else {
                 xwospl_cpuirq_restore_lc(cpuirq);
-                xwup_thd_put(thd);
-                xwup_skd_req_swcx();
+                xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
+                xwup_skd_req_swcx(); // cppcheck-suppress [misra-c2012-17.7]
         }
 #  else
         xwospl_cpuirq_restore_lc(cpuirq);
-        xwup_thd_put(thd);
-        xwup_skd_req_swcx();
+        xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
+        xwup_skd_req_swcx(); // cppcheck-suppress [misra-c2012-17.7]
 #  endif
 #else
         XWOS_UNUSED(thd);
@@ -700,12 +700,12 @@ void xwup_thd_quit(struct xwup_thd * thd)
         xwreg_t cpuirq;
 
         xwospl_cpuirq_save_lc(&cpuirq);
-        if (0 != (XWUP_SKDOBJ_ST_STANDBY & thd->state)) {
+        if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_STANDBY & thd->state)) {
                 xwospl_cpuirq_restore_lc(cpuirq);
         } else {
-                xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_EXITING);
+                xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_EXITING);
                 xwospl_cpuirq_restore_lc(cpuirq);
-                xwup_thd_intr(thd);
+                xwup_thd_intr(thd); //cppcheck-suppress [misra-c2012-17.7]
         }
 }
 
@@ -723,21 +723,21 @@ xwer_t xwup_thd_join(struct xwup_thd * thd, xwer_t * trc)
                 goto err_join_self;
         }
         xwospl_cpuirq_save_lc(&cpuirq);
-        if (0 != (XWUP_SKDOBJ_ST_DETACHED & thd->state)) {
+        if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_DETACHED & thd->state)) {
                 xwospl_cpuirq_restore_lc(cpuirq);
                 rc = -EINVAL;
-        } else if (0 != (XWUP_SKDOBJ_ST_JOINED & thd->state)) {
+        } else if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_JOINED & thd->state)) {
                 xwospl_cpuirq_restore_lc(cpuirq);
                 rc = -EALREADY;
-        } else if (0 != (XWUP_SKDOBJ_ST_STANDBY & thd->state)) {
+        } else if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_STANDBY & thd->state)) {
                 xwospl_cpuirq_restore_lc(cpuirq);
                 rc = XWOK;
                 if (!is_err_or_null(trc)) {
                         *trc = (xwer_t)thd->stack.arg;
                 }
-                xwup_thd_put(thd);
+                xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
         } else {
-                xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_JOINED);
+                xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_JOINED);
                 rc = xwup_cond_wait(&thd->completion,
                                     NULL, XWOS_LK_NONE, NULL,
                                     &lkst);
@@ -746,10 +746,10 @@ xwer_t xwup_thd_join(struct xwup_thd * thd, xwer_t * trc)
                                 *trc = (xwer_t)thd->stack.arg;
                         }
                         xwospl_cpuirq_restore_lc(cpuirq);
-                        xwup_thd_put(thd);
+                        xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
                 } else {
                         xwospl_cpuirq_disable_lc();
-                        xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_JOINED);
+                        xwbop_c0m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_JOINED);
                         xwospl_cpuirq_restore_lc(cpuirq);
                 }
         }
@@ -765,14 +765,14 @@ xwer_t xwup_thd_detach(struct xwup_thd * thd)
         xwer_t rc;
 
         xwospl_cpuirq_save_lc(&cpuirq);
-        if (0 != (XWUP_SKDOBJ_ST_JOINED & thd->state)) {
+        if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_JOINED & thd->state)) {
                 xwospl_cpuirq_restore_lc(cpuirq);
                 rc = -EINVAL;
         } else {
-                xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_DETACHED);
-                if (0 != (XWUP_SKDOBJ_ST_STANDBY & thd->state)) {
+                xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_DETACHED);
+                if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_STANDBY & thd->state)) {
                         xwospl_cpuirq_restore_lc(cpuirq);
-                        xwup_thd_put(thd);
+                        xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
                 } else {
                         xwospl_cpuirq_restore_lc(cpuirq);
                 }
@@ -821,29 +821,33 @@ __xwup_code
 void xwup_thd_chprio_once(struct xwup_thd * thd, xwpr_t dprio,
                           struct xwup_mtx ** pmtx)
 {
-        if (0 != ((XWUP_SKDOBJ_ST_RUNNING | XWUP_SKDOBJ_ST_FROZEN) & thd->state)) {
+        if ((xwsq_t)0 != (((xwsq_t)XWUP_SKDOBJ_ST_RUNNING |
+                           (xwsq_t)XWUP_SKDOBJ_ST_FROZEN) & thd->state)) {
                 thd->prio.d = dprio;
-        } else if (0 != (XWUP_SKDOBJ_ST_READY & thd->state)) {
+        } else if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_READY & thd->state)) {
                 if (thd->prio.d != dprio) {
                         xwup_thd_rq_remove(thd);
                         thd->prio.d = dprio;
+                        //cppcheck-suppress [misra-c2012-17.7]
                         xwup_thd_rq_add_tail(thd);
                 }
-        } else if (0 != (XWUP_SKDOBJ_ST_BLOCKING & thd->state)) {
+        } else if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_BLOCKING & thd->state)) {
                 if (thd->prio.d == dprio) {
-                } else if (XWUP_WQTYPE_MTX == thd->wqn.type) {
+                } else if ((xwu16_t)XWUP_WQTYPE_MTX == thd->wqn.type) {
                         struct xwup_mtx * mtx;
 
                         mtx = xwcc_derof(thd->wqn.wq, struct xwup_mtx, rtwq);
+                        //cppcheck-suppress [misra-c2012-17.7]
                         xwup_rtwq_remove(&mtx->rtwq, &thd->wqn);
                         thd->prio.d = dprio;
                         xwup_rtwq_add(&mtx->rtwq, &thd->wqn, dprio);
                         *pmtx = mtx;
 #if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
-                } else if (XWUP_WQTYPE_RTSEM == thd->wqn.type) {
+                } else if ((xwu16_t)XWUP_WQTYPE_RTSEM == thd->wqn.type) {
                         struct xwup_rtsem * sem;
 
                         sem = xwcc_derof(thd->wqn.wq, struct xwup_rtsem, rtwq);
+                        //cppcheck-suppress [misra-c2012-17.7]
                         xwup_rtwq_remove(&sem->rtwq, &thd->wqn);
                         thd->prio.d = dprio;
                         xwup_rtwq_add(&sem->rtwq, &thd->wqn, dprio);
@@ -852,7 +856,7 @@ void xwup_thd_chprio_once(struct xwup_thd * thd, xwpr_t dprio,
                         thd->prio.d = dprio;
                 }
         } else {
-                XWOS_BUG_ON(0 != (XWUP_SKDOBJ_ST_STANDBY & thd->state));
+                XWOS_BUG_ON((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_STANDBY & thd->state));
                 thd->prio.d = dprio;
         }
 }
@@ -869,7 +873,7 @@ void xwup_thd_chprio(struct xwup_thd * thd)
         xwpr_t dprio;
 
         mt = &thd->mt;
-        dprio = thd->prio.s > mt->maxprio ? thd->prio.s : mt->maxprio;
+        dprio = (thd->prio.s > mt->maxprio) ? thd->prio.s : mt->maxprio;
         xwup_thd_chprio_once(thd, dprio, &unused);
 }
 #endif
@@ -891,10 +895,11 @@ xwer_t xwup_thd_rq_add_head(struct xwup_thd * thd)
 
         xwskd = xwup_skd_get_lc();
         xwrtrq = &xwskd->rq.rt;
-        if (0 != ((XWUP_SKDOBJ_ST_RUNNING | XWUP_SKDOBJ_ST_READY) & thd->state)) {
+        if ((xwsq_t)0 != (((xwsq_t)XWUP_SKDOBJ_ST_RUNNING |
+                           (xwsq_t)XWUP_SKDOBJ_ST_READY) & thd->state)) {
                 rc = -EEXIST;
         } else {
-                xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_READY);
+                xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_READY);
                 xwup_rtrq_add_head(xwrtrq, thd);
                 rc = XWOK;
         }
@@ -918,10 +923,11 @@ xwer_t xwup_thd_rq_add_tail(struct xwup_thd * thd)
 
         xwskd = xwup_skd_get_lc();
         xwrtrq = &xwskd->rq.rt;
-        if (0 != ((XWUP_SKDOBJ_ST_RUNNING | XWUP_SKDOBJ_ST_READY) & thd->state)) {
+        if ((xwsq_t)0 != (((xwsq_t)XWUP_SKDOBJ_ST_RUNNING |
+                           (xwsq_t)XWUP_SKDOBJ_ST_READY) & thd->state)) {
                 rc = -EEXIST;
         } else {
-                xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_READY);
+                xwbop_s1m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_READY);
                 xwup_rtrq_add_tail(xwrtrq, thd);
                 rc = XWOK;
         }
@@ -944,7 +950,7 @@ void xwup_thd_rq_remove(struct xwup_thd * thd)
         xwskd = xwup_skd_get_lc();
         xwrtrq = &xwskd->rq.rt;
         xwup_rtrq_remove(xwrtrq, thd);
-        xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_READY);
+        xwbop_c0m(xwsq_t, &thd->state, (xwsq_t)XWUP_SKDOBJ_ST_READY);
 }
 
 __xwup_api
@@ -954,23 +960,23 @@ xwer_t xwup_thd_intr(struct xwup_thd * thd)
         xwer_t rc;
 
         xwospl_cpuirq_save_lc(&cpuirq);
-        if (0 != (XWUP_SKDOBJ_ST_UNINTERRUPTED & thd->state)) {
+        if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_UNINTERRUPTED & thd->state)) {
                 rc = -EPERM;
                 xwospl_cpuirq_restore_lc(cpuirq);
-        } else if (0 != (XWUP_SKDOBJ_ST_BLOCKING & thd->state)) {
+        } else if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_BLOCKING & thd->state)) {
                 xwup_wqn_f cb;
 
-                if (XWUP_WQTYPE_NULL == thd->wqn.type) {
+                if ((xwu16_t)XWUP_WQTYPE_NULL == thd->wqn.type) {
                         thd->wqn.wq = NULL;
-                        thd->wqn.type = XWUP_WQTYPE_UNKNOWN;
-                        thd->wqn.reason = XWUP_WQN_REASON_INTR;
+                        thd->wqn.type = (xwu16_t)XWUP_WQTYPE_UNKNOWN;
+                        thd->wqn.reason = (xwu16_t)XWUP_WQN_REASON_INTR;
                         cb = thd->wqn.cb;
                         thd->wqn.cb = NULL;
                         xwospl_cpuirq_restore_lc(cpuirq);
                         cb(&thd->wqn);
                         rc = XWOK;
 #if defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
-                } else if (XWUP_WQTYPE_PLSEM == thd->wqn.type) {
+                } else if ((xwu16_t)XWUP_WQTYPE_PLSEM == thd->wqn.type) {
                         struct xwup_plsem * sem;
 
                         sem = xwcc_derof(thd->wqn.wq, struct xwup_plsem, plwq);
@@ -978,7 +984,7 @@ xwer_t xwup_thd_intr(struct xwup_thd * thd)
                         rc = xwup_plsem_intr(sem, &thd->wqn);
 #endif
 #if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
-                } else if (XWUP_WQTYPE_RTSEM == thd->wqn.type) {
+                } else if ((xwu16_t)XWUP_WQTYPE_RTSEM == thd->wqn.type) {
                         struct xwup_rtsem * sem;
 
                         sem = xwcc_derof(thd->wqn.wq, struct xwup_rtsem, rtwq);
@@ -986,7 +992,7 @@ xwer_t xwup_thd_intr(struct xwup_thd * thd)
                         rc = xwup_rtsem_intr(sem, &thd->wqn);
 #endif
 #if defined(XWOSCFG_SYNC_COND) && (1 == XWOSCFG_SYNC_COND)
-                } else if (XWUP_WQTYPE_COND == thd->wqn.type) {
+                } else if ((xwu16_t)XWUP_WQTYPE_COND == thd->wqn.type) {
                         struct xwup_cond * sem;
 
                         sem = xwcc_derof(thd->wqn.wq, struct xwup_cond, wq);
@@ -994,7 +1000,7 @@ xwer_t xwup_thd_intr(struct xwup_thd * thd)
                         rc = xwup_cond_intr(sem, &thd->wqn);
 #endif
 #if defined(XWOSCFG_LOCK_MTX) && (1 == XWOSCFG_LOCK_MTX)
-                } else if (XWUP_WQTYPE_MTX == thd->wqn.type) {
+                } else if ((xwu16_t)XWUP_WQTYPE_MTX == thd->wqn.type) {
                         struct xwup_mtx * mtx;
 
                         mtx = xwcc_derof(thd->wqn.wq, struct xwup_mtx, rtwq);
@@ -1006,7 +1012,7 @@ xwer_t xwup_thd_intr(struct xwup_thd * thd)
                         rc = -EBUG;
                         XWOS_BUG();
                 }
-        } else if (0 != (XWUP_SKDOBJ_ST_SLEEPING & thd->state)) {
+        } else if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_SLEEPING & thd->state)) {
                 struct xwup_skd * xwskd;
                 struct xwup_tt * xwtt;
 
@@ -1105,7 +1111,7 @@ void xwup_thd_eq_rtwq(struct xwup_thd * thd, struct xwup_rtwq * xwrtwq,
 {
         thd->wqn.wq = xwrtwq;
         thd->wqn.type = type;
-        thd->wqn.reason = XWUP_WQN_REASON_UNKNOWN;
+        thd->wqn.reason = (xwu16_t)XWUP_WQN_REASON_UNKNOWN;
         thd->wqn.cb = xwup_thd_wqn_callback;
         xwup_rtwq_add(xwrtwq, &thd->wqn, thd->prio.d);
 }
@@ -1124,7 +1130,7 @@ void xwup_thd_eq_plwq(struct xwup_thd * thd, struct xwup_plwq * xwplwq,
 {
         thd->wqn.wq = xwplwq;
         thd->wqn.type = type;
-        thd->wqn.reason = XWUP_WQN_REASON_UNKNOWN;
+        thd->wqn.reason = (xwu16_t)XWUP_WQN_REASON_UNKNOWN;
         thd->wqn.cb = xwup_thd_wqn_callback;
         xwup_plwq_add_tail(xwplwq, &thd->wqn);
 }
@@ -1139,9 +1145,9 @@ void xwup_cthd_yield(void)
         cthd = xwup_skd_get_cthd_lc();
         xwospl_cpuirq_save_lc(&cpuirq);
         xwbop_c0m(xwsq_t, &cthd->state, XWUP_SKDOBJ_ST_RUNNING);
-        xwup_thd_rq_add_tail(cthd);
+        xwup_thd_rq_add_tail(cthd); //cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_enable_lc();
-        xwup_skd_req_swcx();
+        xwup_skd_req_swcx(); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
 }
 
@@ -1188,13 +1194,14 @@ xwer_t xwup_cthd_sleep_to(xwtm_t to)
                 goto err_intr;
         }
 #endif
-        XWOS_BUG_ON(0 != ((XWUP_SKDOBJ_ST_SLEEPING | XWUP_SKDOBJ_ST_READY |
-                           XWUP_SKDOBJ_ST_STANDBY | XWUP_SKDOBJ_ST_FROZEN)
-                          & cthd->state));
-        if (0 != (XWUP_SKDOBJ_ST_EXITING & cthd->state)) {
+        XWOS_BUG_ON((xwsq_t)0 != (((xwsq_t)XWUP_SKDOBJ_ST_SLEEPING |
+                                   (xwsq_t)XWUP_SKDOBJ_ST_READY |
+                                   (xwsq_t)XWUP_SKDOBJ_ST_STANDBY |
+                                   (xwsq_t)XWUP_SKDOBJ_ST_FROZEN) & cthd->state));
+        if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_EXITING & cthd->state)) {
                 xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
-                xwup_skd_wakelock_unlock();
+                xwup_skd_wakelock_unlock(); //cppcheck-suppress [misra-c2012-17.7]
 #endif
                 rc = -EINTR;
                 goto err_intr;
@@ -1202,18 +1209,19 @@ xwer_t xwup_cthd_sleep_to(xwtm_t to)
         /* 设置线程的睡眠态 */
         xwbop_c0m(xwsq_t, &cthd->state, XWUP_SKDOBJ_ST_RUNNING);
         xwbop_s1m(xwsq_t, &cthd->state, XWUP_SKDOBJ_ST_SLEEPING);
+        //cppcheck-suppress [misra-c2012-17.7]
         xwup_thd_tt_add_locked(cthd, xwtt, to, cpuirq);
         xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
-        xwup_skd_wakelock_unlock();
+        xwup_skd_wakelock_unlock(); //cppcheck-suppress [misra-c2012-17.7]
 #endif
-        xwup_skd_req_swcx();
+        xwup_skd_req_swcx(); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
-        if (XWUP_TTN_WKUPRS_TIMEDOUT == cthd->ttn.wkuprs) {
+        if ((xwsq_t)XWUP_TTN_WKUPRS_TIMEDOUT == cthd->ttn.wkuprs) {
                 rc = XWOK;
-        } else if (XWUP_TTN_WKUPRS_INTR == cthd->ttn.wkuprs) {
+        } else if ((xwsq_t)XWUP_TTN_WKUPRS_INTR == cthd->ttn.wkuprs) {
                 rc = -EINTR;
         } else {
                 XWOS_BUG();
@@ -1266,13 +1274,14 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
                 goto err_intr;
         }
 #endif
-        XWOS_BUG_ON(0 != ((XWUP_SKDOBJ_ST_SLEEPING | XWUP_SKDOBJ_ST_READY |
-                           XWUP_SKDOBJ_ST_STANDBY | XWUP_SKDOBJ_ST_FROZEN)
-                          & cthd->state));
-        if (0 != (XWUP_SKDOBJ_ST_EXITING & cthd->state)) {
+        XWOS_BUG_ON((xwsq_t)0 != (((xwsq_t)XWUP_SKDOBJ_ST_SLEEPING |
+                                   (xwsq_t)XWUP_SKDOBJ_ST_READY |
+                                   (xwsq_t)XWUP_SKDOBJ_ST_STANDBY |
+                                   (xwsq_t)XWUP_SKDOBJ_ST_FROZEN) & cthd->state));
+        if ((xwsq_t)0 != ((xwsq_t)XWUP_SKDOBJ_ST_EXITING & cthd->state)) {
                 xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
-                xwup_skd_wakelock_unlock();
+                xwup_skd_wakelock_unlock(); //cppcheck-suppress [misra-c2012-17.7]
 #endif
                 rc = -EINTR;
                 goto err_intr;
@@ -1280,18 +1289,19 @@ xwer_t xwup_cthd_sleep_from(xwtm_t * from, xwtm_t dur)
         /* 设置线程的睡眠态 */
         xwbop_c0m(xwsq_t, &cthd->state, XWUP_SKDOBJ_ST_RUNNING);
         xwbop_s1m(xwsq_t, &cthd->state, XWUP_SKDOBJ_ST_SLEEPING);
+        //cppcheck-suppress [misra-c2012-17.7]
         xwup_thd_tt_add_locked(cthd, xwtt, to, cpuirq);
         xwup_sqlk_wr_unlock_cpuirq(&xwtt->lock);
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)
-        xwup_skd_wakelock_unlock();
+        xwup_skd_wakelock_unlock(); //cppcheck-suppress [misra-c2012-17.7]
 #endif
-        xwup_skd_req_swcx();
+        xwup_skd_req_swcx(); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(cpuirq);
 
         /* 判断唤醒原因 */
-        if (XWUP_TTN_WKUPRS_TIMEDOUT == cthd->ttn.wkuprs) {
+        if ((xwsq_t)XWUP_TTN_WKUPRS_TIMEDOUT == cthd->ttn.wkuprs) {
                 rc = XWOK;
-        } else if (XWUP_TTN_WKUPRS_INTR == cthd->ttn.wkuprs) {
+        } else if ((xwsq_t)XWUP_TTN_WKUPRS_INTR == cthd->ttn.wkuprs) {
                 rc = -EINTR;
         } else {
                 XWOS_BUG();
@@ -1313,7 +1323,7 @@ xwer_t xwup_cthd_freeze(void)
         struct xwup_thd * cthd;
         xwer_t rc;
 
-        xwup_skd_dspmpt_lc();
+        xwup_skd_dspmpt_lc(); //cppcheck-suppress [misra-c2012-17.7]
         cthd = xwup_skd_get_cthd_lc();
         rc = xwospl_thd_freeze_lc(cthd);
         return rc;
@@ -1336,20 +1346,21 @@ xwer_t xwup_thd_freeze_lic(struct xwup_thd * thd)
         struct xwup_skd * xwskd;
         xwreg_t cpuirq;
 
-        XWOS_BUG_ON(!(XWUP_SKDOBJ_ST_RUNNING & thd->state));
+        XWOS_BUG_ON((xwsq_t)0 == ((xwsq_t)XWUP_SKDOBJ_ST_RUNNING & thd->state));
         xwskd = xwup_skd_get_lc();
         xwospl_cpuirq_save_lc(&cpuirq);
         xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_RUNNING);
         xwbop_s1m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_FROZEN);
         xwskd->pm.frz_thd_cnt++;
         xwlib_bclst_add_tail(&xwskd->pm.frzlist, &thd->frznode);
-        xwup_skd_enpmpt_lc();
+        xwup_skd_enpmpt_lc(); //cppcheck-suppress [misra-c2012-17.7]
         if (xwskd->pm.frz_thd_cnt == xwskd->thd_num) {
                 xwospl_cpuirq_restore_lc(cpuirq);
+                // cppcheck-suppress [misra-c2012-17.7]
                 xwup_skd_notify_allfrz_lic();
         } else {
                 xwospl_cpuirq_restore_lc(cpuirq);
-                xwup_skd_req_swcx();
+                xwup_skd_req_swcx(); // cppcheck-suppress [misra-c2012-17.7]
         }
         return XWOK;
 #else
@@ -1373,7 +1384,7 @@ xwer_t xwup_thd_thaw_lic(struct xwup_thd * thd)
 
         xwskd = xwup_skd_get_lc();
         xwospl_cpuirq_save_lc(&cpuirq);
-        XWOS_BUG_ON(!(XWUP_SKDOBJ_ST_FROZEN & thd->state));
+        XWOS_BUG_ON((xwsq_t)0 == ((xwsq_t)XWUP_SKDOBJ_ST_FROZEN & thd->state));
         xwlib_bclst_del_init(&thd->frznode);
         xwskd->pm.frz_thd_cnt--;
         xwbop_c0m(xwsq_t, &thd->state, XWUP_SKDOBJ_ST_FROZEN);
@@ -1390,7 +1401,7 @@ __xwup_api
 bool xwup_cthd_shld_frz(void)
 {
 #if (1 == XWOSRULE_SKD_THD_FREEZE)
-        return !!(xwup_skd_get_pm_stage() < XWUP_PM_STAGE_RUNNING);
+        return !!(xwup_skd_get_pm_stage() < (xwsq_t)XWUP_PM_STAGE_RUNNING);
 #else
         return false;
 #endif
@@ -1403,7 +1414,7 @@ bool xwup_cthd_shld_stop(void)
         struct xwup_thd * cthd;
 
         cthd = xwup_skd_get_cthd_lc();
-        return !!(XWUP_SKDOBJ_ST_EXITING & cthd->state);
+        return !!((xwsq_t)XWUP_SKDOBJ_ST_EXITING & cthd->state);
 #else
         return false;
 #endif

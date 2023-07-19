@@ -24,198 +24,26 @@
 #include <xwos/standard.h>
 
 /******** SCB Application Interrupt and Reset Control Register ********/
-#define SCB_AIRCR_VECTKEY_POS           (16UL)
-#define SCB_AIRCR_VECTKEY_MSK           (0xFFFFUL << SCB_AIRCR_VECTKEY_POS)
+#define SCB_AIRCR_VECTKEY_POS           ((xwu32_t)16)
+#define SCB_AIRCR_VECTKEY_MSK           ((xwu32_t)0xFFFF << SCB_AIRCR_VECTKEY_POS)
 
-#define SCB_AIRCR_VECTKEYSTAT_POS       (16UL)
-#define SCB_AIRCR_VECTKEYSTAT_MSK       (0xFFFFUL << SCB_AIRCR_VECTKEYSTAT_POS)
+#define SCB_AIRCR_VECTKEYSTAT_POS       ((xwu32_t)16)
+#define SCB_AIRCR_VECTKEYSTAT_MSK       ((xwu32_t)0xFFFF << SCB_AIRCR_VECTKEYSTAT_POS)
 
-#define SCB_AIRCR_ENDIANESS_POS         (15UL)
-#define SCB_AIRCR_ENDIANESS_MSK         (1UL << SCB_AIRCR_ENDIANESS_POS)
+#define SCB_AIRCR_ENDIANESS_POS         ((xwu32_t)15)
+#define SCB_AIRCR_ENDIANESS_MSK         ((xwu32_t)1 << SCB_AIRCR_ENDIANESS_POS)
 
-#define SCB_AIRCR_PRIGROUP_POS          (8UL)
-#define SCB_AIRCR_PRIGROUP_MSK          (7UL << SCB_AIRCR_PRIGROUP_POS)
+#define SCB_AIRCR_PRIGROUP_POS          ((xwu32_t)8)
+#define SCB_AIRCR_PRIGROUP_MSK          ((xwu32_t)7 << SCB_AIRCR_PRIGROUP_POS)
 
-#define SCB_AIRCR_SYSRESETREQ_POS       (2UL)
-#define SCB_AIRCR_SYSRESETREQ_MSK       (1UL << SCB_AIRCR_SYSRESETREQ_POS)
+#define SCB_AIRCR_SYSRESETREQ_POS       ((xwu32_t)2)
+#define SCB_AIRCR_SYSRESETREQ_MSK       ((xwu32_t)1 << SCB_AIRCR_SYSRESETREQ_POS)
 
-#define SCB_AIRCR_VECTCLRACTIVE_POS     (1UL)
-#define SCB_AIRCR_VECTCLRACTIVE_MSK     (1UL << SCB_AIRCR_VECTCLRACTIVE_POS)
+#define SCB_AIRCR_VECTCLRACTIVE_POS     ((xwu32_t)1)
+#define SCB_AIRCR_VECTCLRACTIVE_MSK     ((xwu32_t)1 << SCB_AIRCR_VECTCLRACTIVE_POS)
 
-#define SCB_AIRCR_VECTRESET_POS         (0UL)
-#define SCB_AIRCR_VECTRESET_MSK         (1UL << SCB_AIRCR_VECTRESET_POS)
-
-/******** TPI Asynchronous Clock Prescaler Register Definitions ********/
-#define TPI_ACPR_PRESCALER_POS          (0UL)
-#define TPI_ACPR_PRESCALER_MSK          (0x1FFFUL << TPI_ACPR_PRESCALER_POS)
-
-/* TPI Selected Pin Protocol Register Definitions */
-#define TPI_SPPR_TXMODE_POS             (0UL)
-#define TPI_SPPR_TXMODE_MSK             (0x3UL << TPI_SPPR_TXMODE_POS)
-#define TPI_SPPR_TXMODE_TRACEPORTMODE   (0UL)
-#define TPI_SPPR_TXMODE_MANCHESTER      (1UL)
-#define TPI_SPPR_TXMODE_NRZ             (2UL)
-
-/* TPI Formatter and Flush Status Register Definitions */
-#define TPI_FFSR_FTNONSTOP_POS          (3UL)
-#define TPI_FFSR_FTNONSTOP_MSK          (0x1UL << TPI_FFSR_FTNONSTOP_POS)
-
-#define TPI_FFSR_TCPRESENT_POS          (2UL)
-#define TPI_FFSR_TCPRESENT_MSK          (0x1UL << TPI_FFSR_TCPRESENT_POS)
-
-#define TPI_FFSR_FTSTOPPED_POS          (1UL)
-#define TPI_FFSR_FTSTOPPED_MSK          (0x1UL << TPI_FFSR_FTSTOPPED_POS)
-
-#define TPI_FFSR_FLINPROG_POS           (0UL)
-#define TPI_FFSR_FLINPROG_MSK           (0x1UL << TPI_FFSR_FLINPROG_POS)
-
-/* TPI Formatter and Flush Control Register Definitions */
-#define TPI_FFCR_TRIGIN_POS             (8UL)
-#define TPI_FFCR_TRIGIN_MSK             (0x1UL << TPI_FFCR_TRIGIN_POS)
-
-#define TPI_FFCR_ENFCONT_POS            (1UL)
-#define TPI_FFCR_ENFCONT_MSK            (0x1UL << TPI_FFCR_ENFCONT_POS)
-
-/* TPI TRIGGER Register Definitions */
-#define TPI_TRIGGER_TRIGGER_POS         (0UL)
-#define TPI_TRIGGER_TRIGGER_MSK         (0x1UL << TPI_TRIGGER_TRIGGER_POS)
-
-/* TPI Integration ETM Data Register Definitions (FIFO0) */
-#define TPI_FIFO0_ITM_ATVALID_POS       29
-#define TPI_FIFO0_ITM_ATVALID_MSK       (0x3UL << TPI_FIFO0_ITM_ATVALID_POS)
-
-#define TPI_FIFO0_ITM_BYTECOUNT_POS     27
-#define TPI_FIFO0_ITM_BYTECOUNT_MSK     (0x3UL << TPI_FIFO0_ITM_BYTECOUNT_POS)
-
-#define TPI_FIFO0_ETM_ATVALID_POS       26
-#define TPI_FIFO0_ETM_ATVALID_MSK       (0x3UL << TPI_FIFO0_ETM_ATVALID_POS)
-
-#define TPI_FIFO0_ETM_BYTECOUNT_POS     24
-#define TPI_FIFO0_ETM_BYTECOUNT_MSK     (0x3UL << TPI_FIFO0_ETM_BYTECOUNT_POS)
-
-#define TPI_FIFO0_ETM2_POS              16
-#define TPI_FIFO0_ETM2_MSK              (0xFFUL << TPI_FIFO0_ETM2_POS)
-
-#define TPI_FIFO0_ETM1_POS              8
-#define TPI_FIFO0_ETM1_MSK              (0xFFUL << TPI_FIFO0_ETM1_POS)
-
-#define TPI_FIFO0_ETM0_POS              0
-#define TPI_FIFO0_ETM0_MSK              (0xFFUL << TPI_FIFO0_ETM0_POS)
-
-/* TPI ITATBCTR2 Register Definitions */
-#define TPI_ITATBCTR2_ATREADY_POS       0
-#define TPI_ITATBCTR2_ATREADY_MSK       (0x1UL << TPI_ITATBCTR2_ATREADY_POS)
-
-/* TPI Integration ITM Data Register Definitions (FIFO1) */
-#define TPI_FIFO1_ITM_ATVALID_POS       29
-#define TPI_FIFO1_ITM_ATVALID_MSK       (0x3UL << TPI_FIFO1_ITM_ATVALID_POS)
-
-#define TPI_FIFO1_ITM_BYTECOUNT_POS     27
-#define TPI_FIFO1_ITM_BYTECOUNT_MSK     (0X3UL << TPI_FIFO1_ITM_BYTECOUNT_POS)
-
-#define TPI_FIFO1_ETM_ATVALID_POS       26
-#define TPI_FIFO1_ETM_ATVALID_MSK       (0X3UL << TPI_FIFO1_ETM_ATVALID_POS)
-
-#define TPI_FIFO1_ETM_BYTECOUNT_POS     24
-#define TPI_FIFO1_ETM_BYTECOUNT_MSK     (0X3UL << TPI_FIFO1_ETM_BYTECOUNT_POS)
-
-#define TPI_FIFO1_ITM2_POS              16
-#define TPI_FIFO1_ITM2_MSK              (0XFFUL << TPI_FIFO1_ITM2_POS)
-
-#define TPI_FIFO1_ITM1_POS              8
-#define TPI_FIFO1_ITM1_MSK              (0XFFUL << TPI_FIFO1_ITM1_POS)
-
-#define TPI_FIFO1_ITM0_POS              0
-#define TPI_FIFO1_ITM0_MSK              (0XFFUL << TPI_FIFO1_ITM0_POS)
-
-/* TPI ITATBCTR0 Register Definitions */
-#define TPI_ITATBCTR0_ATREADY_POS       0
-#define TPI_ITATBCTR0_ATREADY_MSK       (0X1UL << TPI_ITATBCTR0_ATREADY_POS)
-
-/* TPI Integration Mode Control Register Definitions */
-#define TPI_ITCTRL_MODE_POS             0
-#define TPI_ITCTRL_MODE_MSK             (0X1UL << TPI_ITCTRL_MODE_POS)
-
-/* TPI DEVID Register Definitions */
-#define TPI_DEVID_NRZVALID_POS          11
-#define TPI_DEVID_NRZVALID_MSK          (0X1UL << TPI_DEVID_NRZVALID_POS)
-
-#define TPI_DEVID_MANCVALID_POS         10
-#define TPI_DEVID_MANCVALID_MSK         (0X1UL << TPI_DEVID_MANCVALID_POS)
-
-#define TPI_DEVID_PTINVALID_POS         9
-#define TPI_DEVID_PTINVALID_MSK         (0X1UL << TPI_DEVID_PTINVALID_POS)
-
-#define TPI_DEVID_MINBUFSZ_POS          6
-#define TPI_DEVID_MINBUFSZ_MSK          (0X7UL << TPI_DEVID_MINBUFSZ_POS)
-
-#define TPI_DEVID_ASYNCLKIN_POS         5
-#define TPI_DEVID_ASYNCLKIN_MSK         (0X1UL << TPI_DEVID_ASYNCLKIN_POS)
-
-#define TPI_DEVID_NRTRACEINPUT_POS      0
-#define TPI_DEVID_NRTRACEINPUT_MSK      (0X1FUL << TPI_DEVID_NRTRACEINPUT_POS)
-
-/* TPI DEVTYPE Register Definitions */
-#define TPI_DEVTYPE_SUBTYPE_POS         0
-#define TPI_DEVTYPE_SUBTYPE_MSK         (0XFUL << TPI_DEVTYPE_SUBTYPE_POS)
-
-#define TPI_DEVTYPE_MAJORTYPE_POS       4
-#define TPI_DEVTYPE_MAJORTYPE_MSK       (0XFUL << TPI_DEVTYPE_MAJORTYPE_POS)
-
-/******** ITM Trace Control Register Definitions ********/
-/* ITM Trace Privilege Register Definitions */
-#define ITM_TPR_PRIVMASK_POS            0 /**< ITM TPR: PRIVMASK Position */
-#define ITM_TPR_PRIVMASK_MSK            (0xFUL << ITM_TPR_PRIVMASK_POS) /**< ITM TPR: PRIVMASK Mask */
-
-/* ITM Trace Control Register Definitions */
-#define ITM_TCR_BUSY_POS                23 /**< ITM TCR: BUSY Position */
-#define ITM_TCR_BUSY_MSK                (1UL << ITM_TCR_BUSY_POS) /**< ITM TCR: BUSY Mask */
-
-#define ITM_TCR_TRACEBUSID_POS          16 /**< ITM TCR: ATBID Position */
-#define ITM_TCR_TRACEBUSID_MSK          (0x7FUL << ITM_TCR_TRACEBUSID_POS) /**< ITM TCR: ATBID Mask */
-
-#define ITM_TCR_GTSFREQ_POS             10 /**< ITM TCR: Global timestamp frequency Position */
-#define ITM_TCR_GTSFREQ_MSK             (3UL << ITM_TCR_GTSFREQ_Pos) /**< ITM TCR: Global timestamp frequency Mask */
-
-#define ITM_TCR_TSPRESCALE_POS          8 /**< ITM TCR: TSPrescale Position */
-#define ITM_TCR_TSPRESCALE_MSK          (3UL << ITM_TCR_TSPRESCALE_POS) /**< ITM TCR: TSPrescale Mask */
-
-#define ITM_TCR_SWOENA_POS              4 /**< ITM TCR: SWOENA Position */
-#define ITM_TCR_SWOENA_MSK              (1UL << ITM_TCR_SWOENA_POS) /**< ITM TCR: SWOENA Mask */
-
-#define ITM_TCR_DWTENA_POS              3 /**< ITM TCR: DWTENA Position */
-#define ITM_TCR_DWTENA_MSK              (1UL << ITM_TCR_DWTENA_POS) /**< ITM TCR: DWTENA Mask */
-
-#define ITM_TCR_SYNCENA_POS             2 /**< ITM TCR: SYNCENA Position */
-#define ITM_TCR_SYNCENA_MSK             (1UL << ITM_TCR_SYNCENA_POS) /**< ITM TCR: SYNCENA Mask */
-
-#define ITM_TCR_TSENA_POS               1 /**< ITM TCR: TSENA Position */
-#define ITM_TCR_TSENA_MSK               (1UL << ITM_TCR_TSENA_POS) /**< ITM TCR: TSENA Mask */
-
-#define ITM_TCR_ITMENA_POS              0 /**< ITM TCR: ITM Enable bit Position */
-#define ITM_TCR_ITMENA_MSK              (1UL << ITM_TCR_ITMENA_POS) /**< ITM TCR: ITM Enable bit Mask */
-
-/* ITM Integration Write Register Definitions */
-#define ITM_IWR_ATVALIDM_POS            0 /**< ITM IWR: ATVALIDM Position */
-#define ITM_IWR_ATVALIDM_MSK            (1UL << ITM_IWR_ATVALIDM_POS) /**< ITM IWR: ATVALIDM Mask */
-
-/* ITM Integration Read Register Definitions */
-#define ITM_IRR_ATREADYM_POS            0 /**< ITM IRR: ATREADYM Position */
-#define ITM_IRR_ATREADYM_MSK            (1UL << ITM_IRR_ATREADYM_POS) /**< ITM IRR: ATREADYM Mask */
-
-/* ITM Integration Mode Control Register Definitions */
-#define ITM_IMCR_INTEGRATION_POS        0 /**< ITM IMCR: INTEGRATION Position */
-#define ITM_IMCR_INTEGRATION_MSK        (1UL << ITM_IMCR_INTEGRATION_POS) /**< ITM IMCR: INTEGRATION Mask */
-
-/* ITM Lock Status Register Definitions */
-#define ITM_LSR_BYTEACC_POS             2 /**< ITM LSR: ByteAcc Position */
-#define ITM_LSR_BYTEACC_MSK             (1UL << ITM_LSR_BYTEACC_POS) /**< ITM LSR: ByteAcc Mask */
-
-#define ITM_LSR_ACCESS_POS              1 /**< ITM LSR: Access Position */
-#define ITM_LSR_ACCESS_MSK              (1UL << ITM_LSR_ACCESS_POS) /**< ITM LSR: Access Mask */
-
-#define ITM_LSR_PRESENT_POS             0 /**< ITM LSR: Present Position */
-#define ITM_LSR_PRESENT_MSK             (1UL << ITM_LSR_PRESENT_POS) /**< ITM LSR: Present Mask */
+#define SCB_AIRCR_VECTRESET_POS         ((xwu32_t)0)
+#define SCB_AIRCR_VECTRESET_MSK         ((xwu32_t)1 << SCB_AIRCR_VECTRESET_POS)
 
 /**
  * @brief program status register
@@ -1161,10 +989,10 @@ struct cm_tpiu_reg {
 };
 
 /* Memory mapping of Core Hardware */
-#define ARMv6m_SCS_BASE         (0xE000E000UL) /**< System Control Space Base Address */
-#define ARMv6m_ITM_BASE         (0xE0000000UL) /**< ITM Base Address */
-#define ARMv6m_DWT_BASE         (0xE0001000UL) /**< DWT Base Address */
-#define ARMv6m_TPI_BASE         (0xE0040000UL) /**< TPI Base Address */
+#define ARMv6m_SCS_BASE         (0xE000E000U) /**< System Control Space Base Address */
+#define ARMv6m_ITM_BASE         (0xE0000000U) /**< ITM Base Address */
+#define ARMv6m_DWT_BASE         (0xE0001000U) /**< DWT Base Address */
+#define ARMv6m_TPI_BASE         (0xE0040000U) /**< TPI Base Address */
 
 #define cm_scs                  (*((__xw_io struct cm_scs_reg *)ARMv6m_SCS_BASE))
 #define cm_itm                  (*((__xw_io struct cm_itm_reg *)ARMv6m_ITM_BASE))

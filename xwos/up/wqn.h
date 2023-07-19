@@ -22,21 +22,21 @@
  * @brief 等待队列类型枚举
  */
 enum xwup_wqtype_em {
-        XWUP_WQTYPE_UNKNOWN = 0,
-        XWUP_WQTYPE_NULL,
-        XWUP_WQTYPE_PLSEM,
-        XWUP_WQTYPE_RTSEM,
-        XWUP_WQTYPE_COND,
-        XWUP_WQTYPE_MTX,
+        XWUP_WQTYPE_UNKNOWN = 0U,
+        XWUP_WQTYPE_NULL = 1U,
+        XWUP_WQTYPE_PLSEM = 2U,
+        XWUP_WQTYPE_RTSEM = 3U,
+        XWUP_WQTYPE_COND = 4U,
+        XWUP_WQTYPE_MTX = 5U,
 };
 
 /**
  * @brief 等待队列节点唤醒原因枚举
  */
 enum xwup_wqn_reason_em {
-        XWUP_WQN_REASON_UNKNOWN = 0,
-        XWUP_WQN_REASON_UP, /**< 资源可用 */
-        XWUP_WQN_REASON_INTR, /**< 等待被中断 */
+        XWUP_WQN_REASON_UNKNOWN = 0U,
+        XWUP_WQN_REASON_UP = 1U, /**< 资源可用 */
+        XWUP_WQN_REASON_INTR = 2U, /**< 等待被中断 */
 };
 
 struct xwup_wqn;

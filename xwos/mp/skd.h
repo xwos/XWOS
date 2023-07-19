@@ -26,7 +26,7 @@
 #define XWMP_CPU_NUM                            ((xwid_t)CPUCFG_CPU_NUM)
 #define XWMP_SKD_PRIORITY_RT_NUM                ((xwpr_t)XWOSCFG_SKD_PRIORITY_RT_NUM)
 #define XWMP_SKD_PRIORITY_RT_MIN                ((xwpr_t)0)
-#define XWMP_SKD_PRIORITY_RT_MAX                (XWMP_SKD_PRIORITY_RT_NUM - 1)
+#define XWMP_SKD_PRIORITY_RT_MAX                (XWMP_SKD_PRIORITY_RT_NUM - (xwpr_t)1)
 #define XWMP_SKD_PRIORITY_INVALID               ((xwpr_t)-1)
 #define XWMP_SKD_PRIORITY_RAISE(base, inc)      ((base) + (inc))
 #define XWMP_SKD_PRIORITY_DROP(base, dec)       ((base) - (dec))
@@ -98,24 +98,24 @@ struct xwmp_skdobj_stack {
  * @brief 调度器上下文枚举
  */
 enum xwmp_skd_context_em {
-        XWMP_SKD_CONTEXT_BOOT = 0, /**< 启动 */
-        XWMP_SKD_CONTEXT_THD, /**< 线程 */
-        XWMP_SKD_CONTEXT_ISR, /**< 中断 */
-        XWMP_SKD_CONTEXT_BH, /**< 中断底半部 */
-        XWMP_SKD_CONTEXT_IDLE, /**< 空闲任务 */
+        XWMP_SKD_CONTEXT_BOOT = 0U, /**< 启动 */
+        XWMP_SKD_CONTEXT_THD = 1U, /**< 线程 */
+        XWMP_SKD_CONTEXT_ISR = 2U, /**< 中断 */
+        XWMP_SKD_CONTEXT_BH = 3U, /**< 中断底半部 */
+        XWMP_SKD_CONTEXT_IDLE = 4U, /**< 空闲任务 */
 };
 
 /**
  * @brief 调度器唤醒锁状态枚举
  */
 enum xwmp_skd_wakelock_cnt_em {
-        XWMP_SKD_WKLKCNT_SUSPENDED = 0, /**< 调度器已暂停 */
-        XWMP_SKD_WKLKCNT_ALLFRZ = 1, /**< 调度器所有线程已冻结 */
-        XWMP_SKD_WKLKCNT_FREEZING = 2, /**< 调度器正在暂停 */
+        XWMP_SKD_WKLKCNT_SUSPENDED = 0U, /**< 调度器已暂停 */
+        XWMP_SKD_WKLKCNT_ALLFRZ = 1U, /**< 调度器所有线程已冻结 */
+        XWMP_SKD_WKLKCNT_FREEZING = 2U, /**< 调度器正在暂停 */
         XWMP_SKD_WKLKCNT_THAWING = XWMP_SKD_WKLKCNT_FREEZING, /**< 调度器正在恢复 */
-        XWMP_SKD_WKLKCNT_RUNNING = 3, /**< 正常运行 */
+        XWMP_SKD_WKLKCNT_RUNNING = 3U, /**< 正常运行 */
         XWMP_SKD_WKLKCNT_UNLOCKED = XWMP_SKD_WKLKCNT_RUNNING, /**< 唤醒锁：未加锁 */
-        XWMP_SKD_WKLKCNT_LOCKED = 4, /**< 唤醒锁：已加锁 */
+        XWMP_SKD_WKLKCNT_LOCKED = 4U, /**< 唤醒锁：已加锁 */
 };
 
 /**

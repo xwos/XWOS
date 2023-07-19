@@ -28,9 +28,9 @@ __xwlib_code
 xwu32_t xwdiv64(xwu64_t * n, xwu32_t divisor)
 {
         xwu32_t rem;
-        if (((*n) >> 32) == 0) {
+        if (((*n) >> (xwu32_t)32) == (xwu32_t)0) {
                 rem = (xwu32_t)(*n) % divisor;
-                *n = (xwu32_t)(*n) / divisor;
+                *n = (*n) / (xwu64_t)divisor;
         } else {
                 rem = xwdiv64_32(n, divisor);
         }
@@ -51,17 +51,17 @@ xwu32_t xwdiv64_32(xwu64_t * n, xwu32_t divisor)
         xwu64_t rem = *n;
         xwu64_t b = divisor;
         xwu64_t res;
-        xwu64_t d = 1;
-        xwu32_t high = (xwu32_t)(rem >> 32);
+        xwu64_t d = (xwu64_t)1;
+        xwu32_t high = (xwu32_t)(rem >> (xwu32_t)32);
 
         res = 0;
         if (high >= divisor) {
                 high /= divisor;
-                res = (xwu64_t) high << 32;
-                rem -= (xwu64_t) (high * divisor) << 32;
+                res = (xwu64_t)high << (xwu64_t)32;
+                rem -= (((xwu64_t)high * (xwu64_t)divisor) << (xwu64_t)32);
         }
 
-        while (((xws64_t)b > 0) && (b < rem)) {
+        while (((xws64_t)b > (xws64_t)0) && (b < rem)) {
                 b = b + b;
                 d = d + d;
         }
@@ -71,9 +71,9 @@ xwu32_t xwdiv64_32(xwu64_t * n, xwu32_t divisor)
                         rem -= b;
                         res += d;
                 }
-                b >>= 1;
-                d >>= 1;
-        } while (0 != d);
+                b >>= (xwu64_t)1;
+                d >>= (xwu64_t)1;
+        } while ((xwu64_t)0 != d);
 
         *n = res;
         return (xwu32_t)rem;

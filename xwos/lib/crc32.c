@@ -594,7 +594,7 @@ void xwlib_crc32_swcal_ls(xwu32_t * crc32,
                 } else {
                         byte = stream[i];
                 }
-                index = (xwu8_t)((remainder >> 24) ^ byte);
+                index = ((xwu8_t)(remainder >> (xwu32_t)24) ^ byte);
                 remainder = table[index] ^ (remainder << 8);
         }
         *crc32 = remainder;
@@ -629,7 +629,7 @@ void xwlib_crc32_swcal_rs(xwu32_t * crc32,
                 } else {
                         byte = stream[i];
                 }
-                index = (xwu8_t)((remainder & 0xFF) ^ byte);
+                index = ((xwu8_t)(remainder & (xwu32_t)0xFF) ^ byte);
                 remainder = table[index] ^ (remainder >> 8);
         }
         *crc32 = remainder;
@@ -662,8 +662,8 @@ xwer_t xwlib_crc32_swcal(xwu32_t * crc32,
         // cppcheck-suppress [misra-c2012-16.6]
         switch (plynml) {
 #if defined(XWLIBCFG_CRC32_0X04C11DB7) && (1 == XWLIBCFG_CRC32_0X04C11DB7)
-        case 0x04C11DB7:
-                if (XWLIB_CRC32_LEFT_SHIFT == direction) {
+        case (xwu32_t)0x04C11DB7:
+                if ((xwu32_t)XWLIB_CRC32_LEFT_SHIFT == direction) {
                         xwlib_crc32_swcal_ls(crc32, refin, xwlib_crc32tbl_0x04c11db7,
                                              stream, size);
                 } else {
@@ -675,8 +675,8 @@ xwer_t xwlib_crc32_swcal(xwu32_t * crc32,
 #endif
 
 #if defined(XWLIBCFG_CRC32_0XEDB88320) && (1 == XWLIBCFG_CRC32_0XEDB88320)
-        case 0xEDB88320:
-                if (XWLIB_CRC32_RIGHT_SHIFT == direction) {
+        case (xwu32_t)0xEDB88320:
+                if ((xwu32_t)XWLIB_CRC32_RIGHT_SHIFT == direction) {
                         xwlib_crc32_swcal_rs(crc32, refin, xwlib_crc32tbl_0xedb88320,
                                              stream, size);
                 } else {
@@ -743,9 +743,10 @@ xwu32_t xwlib_crc32_calms(const xwu8_t stream[], xwsz_t * size)
 {
         xwu32_t result;
 
-        result = 0xFFFFFFFF;
-        xwlib_crc32_cal(&result, 0xFFFFFFFF, false, false,
-                        0xEDB88320, XWLIB_CRC32_RIGHT_SHIFT,
+        result = (xwu32_t)0xFFFFFFFF;
+        // cppcheck-suppress [misra-c2012-17.7]
+        xwlib_crc32_cal(&result, (xwu32_t)0xFFFFFFFF, false, false,
+                        (xwu32_t)0xEDB88320, XWLIB_CRC32_RIGHT_SHIFT,
                         stream, size);
         return result;
 }

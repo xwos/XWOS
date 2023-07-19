@@ -25,7 +25,9 @@
  * @brief interface：分配器
  */
 interface xwmm_mempool_i_allocator {
+        // cppcheck-suppress [misra-c2012-5.8]
         xwer_t (* malloc)(void *, xwsz_t, void **);
+        // cppcheck-suppress [misra-c2012-5.8]
         xwer_t (* free)(void *, void *);
 };
 

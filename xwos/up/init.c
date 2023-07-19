@@ -20,6 +20,5 @@
 __xwup_init_code
 xwer_t xwup_init(void)
 {
-        xwup_skd_init_lc();
-        return XWOK;
+        return xwup_skd_init_lc();
 }

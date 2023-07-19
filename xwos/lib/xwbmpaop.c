@@ -88,7 +88,7 @@ xwer_t xwbmpaop_t1i_then_c0i(atomic_xwbmp_t * bmp, xwsq_t idx)
 
         do {
                 o = xwaop_load(xwbmp_t, &bmp[i], xwaop_mo_consume);
-                if (0 != (o & m)) {
+                if ((xwbmp_t)0 != (o & m)) {
                         n = o & (xwbmp_t)(~m);
                         rc = XWOK;
                 } else {
@@ -121,19 +121,19 @@ xwssq_t xwbmpaop_fls_then_c0i(atomic_xwbmp_t * bmp, xwsz_t num)
                         i--;
                         o = xwaop_load(xwbmp_t, &bmp[i], xwaop_mo_consume);
                         o &= msk;
-                        if (0 != o) {
+                        if ((xwbmp_t)0 != o) {
                                 pos = xwbop_fls(xwbmp_t, o);
                                 break;
                         }
                         msk = (xwbmp_t)(~(xwbmp_t)0);
-                } while (i > 0);
+                } while (i > (xwsq_t)0);
                 if (pos < 0) {
                         pos = -ENODATA;
                         break;
                 } else {
-                        m = ((xwbmp_t)1 << pos);
+                        m = ((xwbmp_t)1 << (xwbmp_t)pos);
                         n = o & (xwbmp_t)(~m);
-                        pos += (xwssq_t)(i * BITS_PER_XWBMP_T);
+                        pos += (xwssq_t)i * (xwssq_t)BITS_PER_XWBMP_T;
                 }
         } while (XWOK != xwaop_teq_then_write(xwbmp_t, &bmp[i], o, n, NULL));
         return pos;
@@ -162,19 +162,19 @@ xwssq_t xwbmpaop_flz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num)
                         i--;
                         o = xwaop_load(xwbmp_t, &bmp[i], xwaop_mo_consume);
                         tmp = (xwbmp_t)(~o) & msk;
-                        if (0 != tmp) {
+                        if ((xwbmp_t)0 != tmp) {
                                 pos = xwbop_fls(xwbmp_t, tmp);
                                 break;
                         }
                         msk = (xwbmp_t)(~(xwbmp_t)0);
-                } while (i > 0);
+                } while (i > (xwsq_t)0);
                 if (pos < 0) {
                         pos = -ENODATA;
                         break;
                 } else {
-                        m = ((xwbmp_t)1 << pos);
+                        m = ((xwbmp_t)1 << (xwbmp_t)pos);
                         n = o | m;
-                        pos += (xwssq_t)(i * BITS_PER_XWBMP_T);
+                        pos += (xwssq_t)i * (xwssq_t)BITS_PER_XWBMP_T;
                 }
         } while (XWOK != xwaop_teq_then_write(xwbmp_t, &bmp[i], o, n, NULL));
         return pos;
@@ -195,7 +195,7 @@ xwssq_t xwbmpaop_ffs_then_c0i(atomic_xwbmp_t * bmp, xwsz_t num)
                 i = 0;
                 pos = -ENODATA;
                 do {
-                        if (i == (total - 1)) {
+                        if (i == (total - (xwsz_t)1)) {
                                 msk = ((xwbmp_t)XWBOP_BIT(num % BITS_PER_XWBMP_T) -
                                        (xwbmp_t)1);
                                 if ((xwbmp_t)0 == msk) {
@@ -206,7 +206,7 @@ xwssq_t xwbmpaop_ffs_then_c0i(atomic_xwbmp_t * bmp, xwsz_t num)
                         }
                         o = xwaop_load(xwbmp_t, &bmp[i], xwaop_mo_consume);
                         o &= msk;
-                        if (0 != o) {
+                        if ((xwbmp_t)0 != o) {
                                 pos = xwbop_ffs(xwbmp_t, o);
                                 break;
                         }
@@ -216,9 +216,9 @@ xwssq_t xwbmpaop_ffs_then_c0i(atomic_xwbmp_t * bmp, xwsz_t num)
                         pos = -ENODATA;
                         break;
                 } else {
-                        m = ((xwbmp_t)1 << pos);
+                        m = ((xwbmp_t)1 << (xwbmp_t)pos);
                         n = o & (xwbmp_t)(~m);
-                        pos += (xwssq_t)(i * BITS_PER_XWBMP_T);
+                        pos += (xwssq_t)i * (xwssq_t)BITS_PER_XWBMP_T;
                 }
         } while (XWOK != xwaop_teq_then_write(xwbmp_t, &bmp[i], o, n, NULL));
         return pos;
@@ -240,7 +240,7 @@ xwssq_t xwbmpaop_ffz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num)
                 i = 0;
                 pos = -ENODATA;
                 do {
-                        if (i == (total - 1)) {
+                        if (i == (total - (xwsz_t)1)) {
                                 msk = ((xwbmp_t)XWBOP_BIT(num % BITS_PER_XWBMP_T) -
                                        (xwbmp_t)1);
                                 if ((xwbmp_t)0 == msk) {
@@ -251,7 +251,7 @@ xwssq_t xwbmpaop_ffz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num)
                         }
                         o = xwaop_load(xwbmp_t, &bmp[i], xwaop_mo_consume);
                         tmp = (xwbmp_t)(~o) & msk;
-                        if (0 != tmp) {
+                        if ((xwbmp_t)0 != tmp) {
                                 pos = xwbop_ffs(xwbmp_t, tmp);
                                 break;
                         }
@@ -261,9 +261,9 @@ xwssq_t xwbmpaop_ffz_then_s1i(atomic_xwbmp_t * bmp, xwsz_t num)
                         pos = -ENODATA;
                         break;
                 } else {
-                        m = ((xwbmp_t)1 << pos);
+                        m = ((xwbmp_t)1 << (xwbmp_t)pos);
                         n = o | m;
-                        pos += (xwssq_t)(i * BITS_PER_XWBMP_T);
+                        pos += (xwssq_t)i * (xwssq_t)BITS_PER_XWBMP_T;
                 }
         } while (XWOK != xwaop_teq_then_write(xwbmp_t, &bmp[i], o, n, NULL));
         return pos;

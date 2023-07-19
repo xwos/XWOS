@@ -78,9 +78,9 @@
 // cppcheck-suppress [misra-c2012-20.7]
 #define XWMM_MEMPOOL_TYPEDEF(name, pgodr) \
         struct name { \
-                struct xwmm_mempool mempool[1]; \
-                struct xwmm_mempool_page_odrbtree odrbtree[(pgodr) + 1]; \
-                struct xwmm_mempool_page page[1 << (pgodr)]; \
+                struct xwmm_mempool mempool[1U]; \
+                struct xwmm_mempool_page_odrbtree odrbtree[(pgodr) + 1U]; \
+                struct xwmm_mempool_page page[1U << (pgodr)]; \
         }
 
 /**

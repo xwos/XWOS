@@ -26,7 +26,7 @@ void xwmp_synobj_construct(struct xwmp_synobj * synobj)
         xwos_object_construct(&synobj->xwobj);
 #if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
         synobj->sel.evt = NULL;
-        synobj->sel.pos = 0;
+        synobj->sel.pos = (xwsq_t)0;
 #endif
 }
 
@@ -35,7 +35,7 @@ void xwmp_synobj_destruct(struct xwmp_synobj * synobj)
 {
 #if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
         synobj->sel.evt = NULL;
-        synobj->sel.pos = 0;
+        synobj->sel.pos = (xwsq_t)0;
 #endif
         xwos_object_destruct(&synobj->xwobj);
 }

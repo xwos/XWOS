@@ -65,7 +65,7 @@ void xwmp_mtxtree_add_locked(struct xwmp_mtx * mtx, struct xwmp_mtxtree * mt)
                 mt->rightmost = mtx;
         } else if (prio > mt->maxprio) {
                 pos = &(max->rbnode.right);
-                lpc = (xwptr_t)pos | XWLIB_RBTREE_POS_RIGHT;
+                lpc = (xwptr_t)pos | (xwptr_t)XWLIB_RBTREE_POS_RIGHT;
                 mt->maxprio = prio;
                 mt->rightmost = mtx;
         } else if (prio == mt->maxprio) {
@@ -81,7 +81,7 @@ void xwmp_mtxtree_add_locked(struct xwmp_mtx * mtx, struct xwmp_mtxtree * mt)
                                 rbn = rbn->left;
                         } else if (prio > m->dprio) {
                                 pos = &rbn->right;
-                                lpc = (xwptr_t)pos | XWLIB_RBTREE_POS_RIGHT;
+                                lpc = (xwptr_t)pos | (xwptr_t)XWLIB_RBTREE_POS_RIGHT;
                                 rbn = rbn->right;
                         } else {
                                 lpc = (xwptr_t)0;
@@ -89,7 +89,7 @@ void xwmp_mtxtree_add_locked(struct xwmp_mtx * mtx, struct xwmp_mtxtree * mt)
                         }
                 }
         }
-        if (0 != lpc) {
+        if ((xwptr_t)0 != lpc) {
                 xwlib_rbtree_link(&mtx->rbnode, lpc);
                 xwlib_rbtree_insert_color(tree, &mtx->rbnode);
         } else {

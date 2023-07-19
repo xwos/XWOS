@@ -23,10 +23,10 @@
 __xwup_code
 void xwup_wqn_init(struct xwup_wqn * wqn)
 {
-        wqn->type = (xwu8_t)XWUP_WQTYPE_UNKNOWN;
-        wqn->reason = XWUP_WQN_REASON_UNKNOWN;
+        wqn->type = (xwu16_t)XWUP_WQTYPE_UNKNOWN;
+        wqn->reason = (xwu16_t)XWUP_WQN_REASON_UNKNOWN;
         wqn->wq = NULL;
-        wqn->prio = XWUP_SKD_PRIORITY_INVALID;
+        wqn->prio = (xwpr_t)XWUP_SKD_PRIORITY_INVALID;
         xwlib_rbtree_init_node(&wqn->rbn);
         xwlib_bclst_init_node(&wqn->cln.rbb);
         wqn->cb = NULL;

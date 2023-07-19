@@ -18,7 +18,7 @@
 __xwup_api
 void xwup_sqlk_init(struct xwup_sqlk * sql)
 {
-        sql->seq = 0;
+        sql->seq = (xwsq_t)0;
 }
 
 __xwup_api
@@ -29,9 +29,9 @@ xwsq_t xwup_sqlk_rd_begin(struct xwup_sqlk * sql)
         do {
                 xwmb_read(xwsq_t, ret, &sql->seq);
 #if (XWUP_SQLK_GRANULARITY > 1)
-                ret &= ((~XWUP_SQLK_GRANULARITY) + 1U);
+                ret &= ((~(xwsq_t)XWUP_SQLK_GRANULARITY) + (xwsq_t)1);
 #endif
-        } while (0 != (ret & XWUP_SQLK_GRANULARITY));
+        } while ((xwsq_t)0 != (ret & (xwsq_t)XWUP_SQLK_GRANULARITY));
         xwmb_mp_rmb();
         return ret;
 }
@@ -41,7 +41,7 @@ bool xwup_sqlk_rd_retry(struct xwup_sqlk * sql, xwsq_t start)
 {
         xwmb_mp_rmb(); /* ensure all read accesses are finished */
 #if (XWUP_SQLK_GRANULARITY > 1)
-        return ((sql->seq & ((~XWUP_SQLK_GRANULARITY) + 1U)) != start);
+        return ((sql->seq & ((~(xwsq_t)XWUP_SQLK_GRANULARITY) + (xwsq_t)1)) != start);
 #else
         return (sql->seq != start);
 #endif
@@ -55,7 +55,7 @@ xwsq_t xwup_sqlk_get_seq(struct xwup_sqlk * sql)
         xwmb_read(xwsq_t, ret, &sql->seq);
         xwmb_mp_rmb();
 #if (XWUP_SQLK_GRANULARITY > 1)
-        return ret & ((~XWUP_SQLK_GRANULARITY) + 1U);
+        return ret & ((~(xwsq_t)XWUP_SQLK_GRANULARITY) + (xwsq_t)1);
 #else
         return ret;
 #endif
@@ -65,7 +65,7 @@ __xwup_api
 void xwup_sqlk_rdex_lock(struct xwup_sqlk * sql)
 {
         XWOS_UNUSED(sql);
-        xwup_skd_dspmpt_lc();
+        xwup_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
 }
 
 __xwup_api
@@ -79,7 +79,7 @@ __xwup_api
 void xwup_sqlk_rdex_unlock(struct xwup_sqlk * sql)
 {
         XWOS_UNUSED(sql);
-        xwup_skd_enpmpt_lc();
+        xwup_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
 }
 
 __xwup_api
@@ -87,7 +87,7 @@ void xwup_sqlk_rdex_lock_cpuirq(struct xwup_sqlk * sql)
 {
         XWOS_UNUSED(sql);
         xwospl_cpuirq_disable_lc();
-        xwup_skd_dspmpt_lc();
+        xwup_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
 }
 
 __xwup_api
@@ -101,7 +101,7 @@ __xwup_api
 void xwup_sqlk_rdex_unlock_cpuirq(struct xwup_sqlk * sql)
 {
         XWOS_UNUSED(sql);
-        xwup_skd_enpmpt_lc();
+        xwup_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_enable_lc();
 }
 
@@ -110,7 +110,7 @@ void xwup_sqlk_rdex_lock_cpuirqsv(struct xwup_sqlk * sql, xwreg_t * flag)
 {
         XWOS_UNUSED(sql);
         xwospl_cpuirq_save_lc(flag);
-        xwup_skd_dspmpt_lc();
+        xwup_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
 }
 
 __xwup_api
@@ -124,7 +124,7 @@ __xwup_api
 void xwup_sqlk_rdex_unlock_cpuirqrs(struct xwup_sqlk * sql, xwreg_t flag)
 {
         XWOS_UNUSED(sql);
-        xwup_skd_enpmpt_lc();
+        xwup_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(flag);
 }
 
@@ -137,9 +137,9 @@ void xwup_sqlk_rdex_lock_irqs(struct xwup_sqlk * sql,
 
         XWOS_UNUSED(sql);
         for (i = 0; i < (xwssz_t)num; i++) {
-                xwup_irq_disable(irqs[i]);
+                xwup_irq_disable(irqs[i]); // cppcheck-suppress [misra-c2012-17.7]
         }
-        xwup_skd_dspmpt_lc();
+        xwup_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
 }
 
 __xwup_api
@@ -159,9 +159,9 @@ void xwup_sqlk_rdex_unlock_irqs(struct xwup_sqlk * sql,
         xwssz_t i;
 
         XWOS_UNUSED(sql);
-        xwup_skd_enpmpt_lc();
+        xwup_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
-                xwup_irq_enable(irqs[i]);
+                xwup_irq_enable(irqs[i]); // cppcheck-suppress [misra-c2012-17.7]
         }
 }
 
@@ -174,9 +174,10 @@ void xwup_sqlk_rdex_lock_irqssv(struct xwup_sqlk * sql,
 
         XWOS_UNUSED(sql);
         for (i = 0; i < (xwssz_t)num; i++) {
+                // cppcheck-suppress [misra-c2012-17.7]
                 xwup_irq_save(irqs[i], &flags[i]);
         }
-        xwup_skd_dspmpt_lc();
+        xwup_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
 }
 
 __xwup_api
@@ -196,8 +197,9 @@ void xwup_sqlk_rdex_unlock_irqsrs(struct xwup_sqlk * sql,
         xwssz_t i;
 
         XWOS_UNUSED(sql);
-        xwup_skd_enpmpt_lc();
+        xwup_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
+                // cppcheck-suppress [misra-c2012-17.7]
                 xwup_irq_restore(irqs[i], flags[i]);
         }
 }
@@ -207,8 +209,8 @@ __xwup_api
 void xwup_sqlk_rdex_lock_bh(struct xwup_sqlk * sql)
 {
         XWOS_UNUSED(sql);
-        xwup_skd_dspmpt_lc();
-        xwup_skd_dsbh_lc();
+        xwup_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
+        xwup_skd_dsbh_lc(); // cppcheck-suppress [misra-c2012-17.7]
 }
 
 __xwup_api
@@ -222,16 +224,16 @@ __xwup_api
 void xwup_sqlk_rdex_unlock_bh(struct xwup_sqlk * sql)
 {
         XWOS_UNUSED(sql);
-        xwup_skd_enbh_lc();
-        xwup_skd_enpmpt_lc();
+        xwup_skd_enbh_lc(); // cppcheck-suppress [misra-c2012-17.7]
+        xwup_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
 }
 #endif
 
 __xwup_api
 void xwup_sqlk_wr_lock(struct xwup_sqlk * sql)
 {
-        xwup_skd_dspmpt_lc();
-        sql->seq += XWUP_SQLK_GRANULARITY;
+        xwup_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
+        sql->seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
         xwmb_mp_wmb();
 }
 
@@ -246,16 +248,16 @@ __xwup_api
 void xwup_sqlk_wr_unlock(struct xwup_sqlk * sql)
 {
         xwmb_mp_wmb();
-        sql->seq += XWUP_SQLK_GRANULARITY;
-        xwup_skd_enpmpt_lc();
+        sql->seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
+        xwup_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
 }
 
 __xwup_api
 void xwup_sqlk_wr_lock_cpuirq(struct xwup_sqlk * sql)
 {
         xwospl_cpuirq_disable_lc();
-        xwup_skd_dspmpt_lc();
-        sql->seq += XWUP_SQLK_GRANULARITY;
+        xwup_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
+        sql->seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
         xwmb_mp_wmb();
 }
 
@@ -270,8 +272,8 @@ __xwup_api
 void xwup_sqlk_wr_unlock_cpuirq(struct xwup_sqlk * sql)
 {
         xwmb_mp_wmb();
-        sql->seq += XWUP_SQLK_GRANULARITY;
-        xwup_skd_enpmpt_lc();
+        sql->seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
+        xwup_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_enable_lc();
 }
 
@@ -279,8 +281,8 @@ __xwup_api
 void xwup_sqlk_wr_lock_cpuirqsv(struct xwup_sqlk * sql, xwreg_t * flag)
 {
         xwospl_cpuirq_save_lc(flag);
-        xwup_skd_dspmpt_lc();
-        sql->seq += XWUP_SQLK_GRANULARITY;
+        xwup_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
+        sql->seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
         xwmb_mp_wmb();
 }
 
@@ -295,8 +297,8 @@ __xwup_api
 void xwup_sqlk_wr_unlock_cpuirqrs(struct xwup_sqlk * sql, xwreg_t flag)
 {
         xwmb_mp_wmb();
-        sql->seq += XWUP_SQLK_GRANULARITY;
-        xwup_skd_enpmpt_lc();
+        sql->seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
+        xwup_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
         xwospl_cpuirq_restore_lc(flag);
 }
 
@@ -308,10 +310,10 @@ void xwup_sqlk_wr_lock_irqs(struct xwup_sqlk * sql,
         xwssz_t i;
 
         for (i = 0; i < (xwssz_t)num; i++) {
-                xwup_irq_disable(irqs[i]);
+                xwup_irq_disable(irqs[i]); // cppcheck-suppress [misra-c2012-17.7]
         }
-        xwup_skd_dspmpt_lc();
-        sql->seq += XWUP_SQLK_GRANULARITY;
+        xwup_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
+        sql->seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
         xwmb_mp_wmb();
 }
 
@@ -332,10 +334,10 @@ void xwup_sqlk_wr_unlock_irqs(struct xwup_sqlk * sql,
         xwssz_t i;
 
         xwmb_mp_wmb();
-        sql->seq += XWUP_SQLK_GRANULARITY;
-        xwup_skd_enpmpt_lc();
+        sql->seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
+        xwup_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
-                xwup_irq_enable(irqs[i]);
+                xwup_irq_enable(irqs[i]); // cppcheck-suppress [misra-c2012-17.7]
         }
 }
 
@@ -347,10 +349,11 @@ void xwup_sqlk_wr_lock_irqssv(struct xwup_sqlk * sql,
         xwssz_t i;
 
         for (i = 0; i < (xwssz_t)num; i++) {
+                // cppcheck-suppress [misra-c2012-17.7]
                 xwup_irq_save(irqs[i], &flags[i]);
         }
-        xwup_skd_dspmpt_lc();
-        sql->seq += XWUP_SQLK_GRANULARITY;
+        xwup_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
+        sql->seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
         xwmb_mp_wmb();
 }
 
@@ -371,9 +374,10 @@ void xwup_sqlk_wr_unlock_irqsrs(struct xwup_sqlk * sql,
         xwssz_t i;
 
         xwmb_mp_wmb();
-        sql->seq += XWUP_SQLK_GRANULARITY;
-        xwup_skd_enpmpt_lc();
+        sql->seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
+        xwup_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
         for (i = (xwssz_t)num - 1; i >= 0; i--) {
+                // cppcheck-suppress [misra-c2012-17.7]
                 xwup_irq_restore(irqs[i], flags[i]);
         }
 }
@@ -382,9 +386,9 @@ void xwup_sqlk_wr_unlock_irqsrs(struct xwup_sqlk * sql,
 __xwup_api
 void xwup_sqlk_wr_lock_bh(struct xwup_sqlk * sql)
 {
-        xwup_skd_dspmpt_lc();
-        xwup_skd_dsbh_lc();
-        sql->seq += XWUP_SQLK_GRANULARITY;
+        xwup_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
+        xwup_skd_dsbh_lc(); // cppcheck-suppress [misra-c2012-17.7]
+        sql->seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
         xwmb_mp_wmb();
 }
 
@@ -399,8 +403,8 @@ __xwup_api
 void xwup_sqlk_wr_unlock_bh(struct xwup_sqlk * sql)
 {
         xwmb_mp_wmb();
-        sql->seq += XWUP_SQLK_GRANULARITY;
-        xwup_skd_enbh_lc();
-        xwup_skd_enpmpt_lc();
+        sql->seq += (xwsq_t)XWUP_SQLK_GRANULARITY;
+        xwup_skd_enbh_lc(); // cppcheck-suppress [misra-c2012-17.7]
+        xwup_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
 }
 #endif

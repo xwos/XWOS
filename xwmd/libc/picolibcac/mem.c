@@ -71,7 +71,7 @@ void * calloc(size_t elem_nr, size_t elem_sz)
         rc = xwmm_mempool_malloc(picolibcac_mempool, total, &mem);
         errno = -rc;
         if (XWOK == rc) {
-                memset(mem, 0, total);
+                memset(mem, 0, total); // cppcheck-suppress [misra-c2012-17.7]
         }
         return mem;
 }
@@ -91,9 +91,9 @@ int posix_memalign(void ** memptr, size_t alignment, size_t size)
 {
         int rc;
 
-        if (((alignment & (alignment - 1)) != 0) ||
-            (alignment % sizeof(void *) != 0) ||
-            (alignment == 0)) {
+        if (((alignment & (alignment - (size_t)1)) != (size_t)0) ||
+            (alignment % sizeof(void *) != (size_t)0) ||
+            (alignment == (size_t)0)) {
                 rc = EINVAL;
         } else {
                 void * mem;
@@ -160,6 +160,7 @@ void malloc_stats(void)
 {
         struct mallinfo mi;
         mi = mallinfo();
+        // cppcheck-suppress [misra-c2012-17.7]
         fprintf(stderr, "max system bytes = %10lu\n", (long) mi.arena);
         /* FIXME */
 }

@@ -157,7 +157,7 @@ xwer_t xwup_thd_drop(struct xwup_thd * thd);
 static __xwcc_inline
 void xwup_thd_wakeup(struct xwup_thd * thd)
 {
-        xwup_thd_rq_add_tail(thd);
+        xwup_thd_rq_add_tail(thd); // cppcheck-suppress [misra-c2012-17.7]
 }
 
 #if defined(XWOSCFG_SKD_THD_MEMPOOL) && (1 == XWOSCFG_SKD_THD_MEMPOOL)

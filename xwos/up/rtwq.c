@@ -64,7 +64,7 @@ void xwup_rtwq_add(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn, xwpr_t prio
                 xwrtwq->rightmost = wqn;
         } else if (prio > xwrtwq->max_prio) {
                 new = &(rightmost->rbn.right);
-                lpc = (xwptr_t)new | XWLIB_RBTREE_POS_RIGHT;
+                lpc = (xwptr_t)new | (xwptr_t)XWLIB_RBTREE_POS_RIGHT;
                 xwrtwq->max_prio = prio;
                 xwrtwq->rightmost = wqn;
         } else if (prio == xwrtwq->max_prio) {
@@ -81,7 +81,7 @@ void xwup_rtwq_add(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn, xwpr_t prio
                                 rbn = rbn->left;
                         } else if (prio > nprio) {
                                 new = &rbn->right;
-                                lpc = (xwptr_t)new | XWLIB_RBTREE_POS_RIGHT;
+                                lpc = (xwptr_t)new | (xwptr_t)XWLIB_RBTREE_POS_RIGHT;
                                 rbn = rbn->right;
                         } else {
                                 lpc = (xwptr_t)0;
@@ -89,7 +89,7 @@ void xwup_rtwq_add(struct xwup_rtwq * xwrtwq, struct xwup_wqn * wqn, xwpr_t prio
                         }
                 }
         }
-        if (0 != lpc) {
+        if ((xwptr_t)0 != lpc) {
                 xwlib_rbtree_link(&wqn->rbn, lpc);
                 xwlib_rbtree_insert_color(tree, &wqn->rbn);
         } else {

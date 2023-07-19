@@ -25,8 +25,8 @@
 
 #define XWUP_SKD_PRIORITY_RT_NUM                ((xwpr_t)XWOSCFG_SKD_PRIORITY_RT_NUM)
 #define XWUP_SKD_PRIORITY_RT_MIN                ((xwpr_t)0)
-#define XWUP_SKD_PRIORITY_RT_MAX                (XWUP_SKD_PRIORITY_RT_NUM - 1)
-#define XWUP_SKD_PRIORITY_INVALID               ((xwpr_t) - 1)
+#define XWUP_SKD_PRIORITY_RT_MAX                (XWUP_SKD_PRIORITY_RT_NUM - (xwpr_t)1)
+#define XWUP_SKD_PRIORITY_INVALID               ((xwpr_t)-1)
 #define XWUP_SKD_PRIORITY_RAISE(base, inc)      ((base) + (inc))
 #define XWUP_SKD_PRIORITY_DROP(base, dec)       ((base) - (dec))
 
@@ -96,11 +96,11 @@ struct xwup_skdobj_stack {
  * @brief 调度器上下文枚举
  */
 enum xwup_skd_context_em {
-        XWUP_SKD_CONTEXT_BOOT = 0, /**< 初始化与反初始化 */
-        XWUP_SKD_CONTEXT_THD, /**< 线程 */
-        XWUP_SKD_CONTEXT_ISR, /**< 中断 */
-        XWUP_SKD_CONTEXT_BH, /**< 中断底半部 */
-        XWUP_SKD_CONTEXT_IDLE, /**< 空闲任务 */
+        XWUP_SKD_CONTEXT_BOOT = 0U, /**< 初始化与反初始化 */
+        XWUP_SKD_CONTEXT_THD = 1U, /**< 线程 */
+        XWUP_SKD_CONTEXT_ISR = 2U, /**< 中断 */
+        XWUP_SKD_CONTEXT_BH = 3U, /**< 中断底半部 */
+        XWUP_SKD_CONTEXT_IDLE = 4U, /**< 空闲任务 */
 };
 
 #if defined(XWOSCFG_SKD_PM) && (1 == XWOSCFG_SKD_PM)

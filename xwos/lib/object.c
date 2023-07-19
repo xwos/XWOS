@@ -30,13 +30,13 @@ void xwos_object_release_refaop_op(void * nv, const void * ov, void * arg);
 /**
  * @brief 对象标签分配器，每次分配 `XWOS_OBJTIK_CHUNK` 个ID给CPU
  */
-__xwlib_data
+static __xwlib_data
 atomic_xwsq_t xwos_objtik_dispatcher = (CPUCFG_CPU_NUM * XWOS_OBJTIK_CHUNK);
 
 /**
  * @brief 每CPU的对象标签分配器
  */
-__xwlib_data
+static __xwlib_data
 atomic_xwsq_t xwos_objtik[CPUCFG_CPU_NUM] __xwcc_alignl1cache = {0};
 
 /**
@@ -167,8 +167,8 @@ xwer_t xwos_object_acquire_refaop_tst(const void * ov, void * arg)
         xwobj_d * objd;
         xwer_t rc;
 
-        o = (const xwsq_t *)ov; // cppcheck-suppress [misra-c2012-11.5]
-        objd = arg; // cppcheck-suppress [misra-c2012-11.5]
+        o = (const xwsq_t *)ov;
+        objd = arg;
         if ((XWOS_OBJ_MAGIC != objd->obj->magic) ||
             (objd->tik != objd->obj->tik)) {
                 rc = -EACCES;
@@ -187,8 +187,8 @@ void xwos_object_acquire_refaop_op(void * nv, const void * ov, void * arg)
         const xwsq_t * o;
 
         XWOS_UNUSED(arg);
-        n = (xwsq_t *)nv; // cppcheck-suppress [misra-c2012-11.5]
-        o = (xwsq_t *)ov; // cppcheck-suppress [misra-c2012-11.5]
+        n = (xwsq_t *)nv;
+        o = (const xwsq_t *)ov;
         *n = *o + 1;
 }
 
@@ -208,7 +208,7 @@ xwer_t xwos_object_acquire(struct xwos_object * obj, xwsq_t tik)
         xwobj_d objd = {obj, tik};
         xwer_t rc;
 
-        if ((NULL == obj) || (0 == tik)) {
+        if ((NULL == obj) || ((xwsq_t)0 == tik)) {
                 rc = -ENILOBJD;
         } else {
                 rc = xwaop_tst_then_op(xwsq_t, &obj->refcnt,
@@ -226,8 +226,8 @@ xwer_t xwos_object_release_refaop_tst(const void * ov, void * arg)
         xwobj_d * objd;
         xwer_t rc;
 
-        o = (const xwsq_t *)ov; // cppcheck-suppress [misra-c2012-11.5]
-        objd = arg; // cppcheck-suppress [misra-c2012-11.5]
+        o = (const xwsq_t *)ov;
+        objd = arg;
         if ((XWOS_OBJ_MAGIC != objd->obj->magic) ||
             (objd->tik != objd->obj->tik)) {
                 rc = -EACCES;
@@ -246,8 +246,8 @@ void xwos_object_release_refaop_op(void * nv, const void * ov, void * arg)
         const xwsq_t * o;
 
         XWOS_UNUSED(arg);
-        n = (xwsq_t *)nv; // cppcheck-suppress [misra-c2012-11.5]
-        o = (xwsq_t *)ov; // cppcheck-suppress [misra-c2012-11.5]
+        n = (xwsq_t *)nv;
+        o = (const xwsq_t *)ov;
         *n = *o - 1;
 }
 
@@ -268,7 +268,7 @@ xwer_t xwos_object_release(struct xwos_object * obj, xwsq_t tik)
         xwsq_t nv;
         xwer_t rc;
 
-        if ((NULL == obj) || (0 == tik)) {
+        if ((NULL == obj) || ((xwsq_t)0 == tik)) {
                 rc = -ENILOBJD;
         } else {
                 rc = xwaop_tst_then_op(xwsq_t, &obj->refcnt,
@@ -276,7 +276,7 @@ xwer_t xwos_object_release(struct xwos_object * obj, xwsq_t tik)
                                        xwos_object_release_refaop_op, &objd,
                                        &nv, NULL);
                 if (XWOK == rc) {
-                        if (0 == nv) {
+                        if ((xwsq_t)0 == nv) {
                                 if (NULL != obj->gcfunc) {
                                         rc = obj->gcfunc(obj);
                                 }
@@ -322,7 +322,7 @@ xwer_t xwos_object_put(struct xwos_object * obj)
                                 0, 1,
                                 &nv, NULL);
         if (XWOK == rc) {
-                if (0 == nv) {
+                if ((xwsq_t)0 == nv) {
                         if (NULL != obj->gcfunc) {
                                 rc = obj->gcfunc(obj);
                         }

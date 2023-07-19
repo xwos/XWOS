@@ -64,8 +64,8 @@ xwer_t xwmm_mempool_objcache_init(struct xwmm_mempool_objcache * oc,
  * a: alignment area
  */
 
-        alignment = XWBOP_ALIGN(alignment, XWMM_ALIGNMENT);
-        objsize = XWBOP_ALIGN(objsize, alignment);
+        alignment = XWBOP_ALIGN(alignment, (xwsz_t)XWMM_ALIGNMENT);
+        objsize = XWBOP_ALIGN(objsize, (xwsz_t)alignment);
         if (NULL != ctor) {
                 xwu8_t obj[objsize];
                 ctor((void *)obj);
@@ -168,6 +168,7 @@ xwsz_t xwmm_mempool_objcache_free_idle_page(struct xwmm_mempool_objcache * oc,
                                             attr.objcache.node);
                 xwlib_bclst_del_init(&pg->attr.objcache.node);
                 xwos_sqlk_wr_unlock_cpuirqrs(&oc->page_list.lock, flag);
+                // cppcheck-suppress [misra-c2012-17.7]
                 xwmm_mempool_page_free(oc->pa, pg);
                 xwaop_sub(xwsz_t, &oc->capacity, oc->pg_objnr, NULL, NULL);
                 xwaop_sub(xwsz_t, &oc->idleness, oc->pg_objnr, NULL, NULL);
@@ -191,10 +192,10 @@ void xwmm_mempool_objcache_page_put(struct xwmm_mempool_objcache * oc,
         xwreg_t flag;
 
         xwos_sqlk_wr_lock_cpuirqsv(&oc->page_list.lock, &flag);
-        XWOS_BUG_ON(0 == pg->attr.objcache.refcnt);
+        XWOS_BUG_ON((xwsq_t)0 == pg->attr.objcache.refcnt);
         pg->attr.objcache.refcnt--;
         xwlib_bclst_del_init(&pg->attr.objcache.node);
-        if (0 == pg->attr.objcache.refcnt) {
+        if ((xwsq_t)0 == pg->attr.objcache.refcnt) {
                 xwlib_bclst_add_head(&oc->page_list.idle,
                                      &pg->attr.objcache.node);
         } else {
@@ -321,6 +322,7 @@ xwer_t xwmm_mempool_objcache_free(struct xwmm_mempool_objcache * oc, void * obj)
                 xwsz_t nr;
 
                 nr = (idleness - reserved) / oc->pg_objnr;
+                // cppcheck-suppress [misra-c2012-17.7]
                 xwmm_mempool_objcache_free_idle_page(oc, nr);
         }
 
@@ -359,6 +361,7 @@ xwer_t xwmm_mempool_objcache_reserve(struct xwmm_mempool_objcache * oc,
                 xwsz_t nr;
 
                 nr = (idleness - reserved) / oc->pg_objnr;
+                // cppcheck-suppress [misra-c2012-17.7]
                 xwmm_mempool_objcache_free_idle_page(oc, nr);
         } else {
         }

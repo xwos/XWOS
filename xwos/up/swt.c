@@ -196,11 +196,11 @@ static __xwup_code
 void xwup_swt_construct(struct xwup_swt * swt)
 {
         xwos_object_construct(&swt->xwobj);
-        swt->flag = 0;
+        swt->flag = (xwsq_t)0;
         xwup_ttn_init(&swt->ttn);
         swt->cb = NULL;
         swt->arg = NULL;
-        swt->period = 0;
+        swt->period = (xwtm_t)0;
 }
 
 static __xwup_code
@@ -337,24 +337,25 @@ void xwup_swt_ttn_callback(struct xwup_ttn * ttn)
         xwskd = xwup_skd_get_lc();
         xwtt = &xwskd->tt;
         swt->cb(swt, swt->arg);
-        if (0 != (XWUP_SWT_FLAG_RESTART & swt->flag)) {
+        if ((xwsq_t)0 != ((xwsq_t)XWUP_SWT_FLAG_RESTART & swt->flag)) {
                 to = xwtm_add_safely(swt->ttn.wkup_xwtm, swt->period);
                 xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
                 refcnt = xwos_object_get_refcnt(&swt->xwobj);
-                if (refcnt >= 3) {
+                if (refcnt >= (xwsq_t)3) {
                         swt->ttn.wkup_xwtm = to;
-                        swt->ttn.wkuprs = XWUP_TTN_WKUPRS_UNKNOWN;
+                        swt->ttn.wkuprs = (xwsq_t)XWUP_TTN_WKUPRS_UNKNOWN;
                         swt->ttn.cb = xwup_swt_ttn_callback;
-                        xwup_swt_grab(swt);
+                        xwup_swt_grab(swt); // cppcheck-suppress [misra-c2012-17.7]
+                        // cppcheck-suppress [misra-c2012-17.7]
                         xwup_tt_add_locked(xwtt, &swt->ttn, cpuirq);
                         xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                        xwup_swt_put(swt);
+                        xwup_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
                 } else {
                         xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                        xwup_swt_put(swt);
+                        xwup_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
                 }
         } else {
-                xwup_swt_put(swt);
+                xwup_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
         }
 }
 
@@ -384,11 +385,11 @@ xwer_t xwup_swt_start(struct xwup_swt * swt,
                 rc = -EALREADY;
                 goto err_already;
         }
-        if (0 != (XWUP_SWT_FLAG_RESTART & swt->flag)) {
-                xwup_swt_grab(swt);
+        if ((xwsq_t)0 != ((xwsq_t)XWUP_SWT_FLAG_RESTART & swt->flag)) {
+                xwup_swt_grab(swt); // cppcheck-suppress [misra-c2012-17.7]
         }
         swt->ttn.wkup_xwtm = to;
-        swt->ttn.wkuprs = XWUP_TTN_WKUPRS_UNKNOWN;
+        swt->ttn.wkuprs = (xwsq_t)XWUP_TTN_WKUPRS_UNKNOWN;
         swt->ttn.cb = xwup_swt_ttn_callback;
         swt->ttn.xwtt = xwtt;
         rc = xwup_tt_add_locked(xwtt, &swt->ttn, cpuirq);
@@ -399,12 +400,12 @@ xwer_t xwup_swt_start(struct xwup_swt * swt,
         return XWOK;
 
 err_add:
-        if (0 != (XWUP_SWT_FLAG_RESTART & swt->flag)) {
-                xwup_swt_put(swt);
+        if ((xwsq_t)0 != ((xwsq_t)XWUP_SWT_FLAG_RESTART & swt->flag)) {
+                xwup_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
         }
 err_already:
         xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-        xwup_swt_put(swt);
+        xwup_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
 err_swt_grab:
         return rc;
 }
@@ -421,12 +422,12 @@ xwer_t xwup_swt_stop(struct xwup_swt * swt)
         xwtt = &xwskd->tt;
         xwup_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         rc = xwup_tt_remove_locked(xwtt, &swt->ttn);
-        if (0 != (XWUP_SWT_FLAG_RESTART & swt->flag)) {
-                xwup_swt_put(swt);
+        if ((xwsq_t)0 != ((xwsq_t)XWUP_SWT_FLAG_RESTART & swt->flag)) {
+                xwup_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
         }
         xwup_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
         if (XWOK == rc) {
-                xwup_swt_put(swt);
+                xwup_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
         }
         return rc;
 }

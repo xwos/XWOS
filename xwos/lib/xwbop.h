@@ -28,7 +28,7 @@
 #define XWBOP_BMP_MASK(n)  ((xwbmp_t)1 << (xwbmp_t)((n) % BITS_PER_XWBMP_T))
 #define XWBOP_BMP(n)  ((n) / BITS_PER_XWBMP_T)
 #define XWBOP_DIV_ROUND(n, d)  ((n) / (d))
-#define XWBOP_DIV_ROUND_UP(n, d)  (((n) + (d) - 1) / (d))
+#define XWBOP_DIV_ROUND_UP(n, d)  (((n) + (d) - 1U) / (d))
 #define XWBOP_SHIFT_ROUND(n, s)  ((n) >> (s))
 #define XWBOP_SHIFT_ROUND_UP(n, s)  (((n) + (1ULL << (s)) - 1ULL) >> (s))
 #define BITS_TO_XWU8_T(n)  XWBOP_DIV_ROUND_UP(n, BITS_PER_XWU8_T)

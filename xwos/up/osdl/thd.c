@@ -69,7 +69,7 @@ xwer_t xwosdl_thd_quit(struct xwosdl_thd * thd, xwsq_t tik)
         rc = xwup_thd_acquire(thd, tik);
         if (XWOK == rc) {
                 xwup_thd_quit(thd);
-                xwup_thd_put(thd);
+                xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
         }
         return rc;
 }
@@ -82,7 +82,7 @@ xwer_t xwosdl_thd_join(struct xwosdl_thd * thd, xwsq_t tik, xwer_t * trc)
         rc = xwup_thd_acquire(thd, tik);
         if (XWOK == rc) {
                 rc = xwup_thd_join(thd, trc);
-                xwup_thd_put(thd);
+                xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
         }
         return rc;
 }
@@ -96,7 +96,7 @@ xwer_t xwosdl_thd_stop(struct xwosdl_thd * thd, xwsq_t tik, xwer_t * trc)
         if (XWOK == rc) {
                 xwup_thd_quit(thd);
                 rc = xwup_thd_join(thd, trc);
-                xwup_thd_put(thd);
+                xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
         }
         return rc;
 }
@@ -109,7 +109,7 @@ xwer_t xwosdl_thd_detach(struct xwosdl_thd * thd, xwsq_t tik)
         rc = xwup_thd_acquire(thd, tik);
         if (XWOK == rc) {
                 rc = xwup_thd_detach(thd);
-                xwup_thd_put(thd);
+                xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
         }
         return rc;
 }
@@ -134,7 +134,7 @@ xwer_t xwosdl_thd_set_data(struct xwosdl_thd * thd, xwsq_t tik,
         rc = xwup_thd_acquire(thd, tik);
         if (XWOK == rc) {
                 rc = xwup_thd_set_data(thd, pos, data);
-                xwup_thd_put(thd);
+                xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
         }
         return rc;
 }
@@ -150,7 +150,7 @@ xwer_t xwosdl_thd_get_data(struct xwosdl_thd * thd, xwsq_t tik,
         rc = xwup_thd_acquire(thd, tik);
         if (XWOK == rc) {
                 rc = xwup_thd_get_data(thd, pos, databuf);
-                xwup_thd_put(thd);
+                xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
         }
         return rc;
 }

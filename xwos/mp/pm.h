@@ -23,13 +23,13 @@ struct xwmp_pmdm;
  * @brief 电源管理阶段枚举
  */
 enum xwmp_pm_stage_em {
-        XWMP_PM_STAGE_SUSPENDED = 0, /**< 已经暂停 */
-        XWMP_PM_STAGE_SUSPENDING = 1, /**< 正在暂停 */
+        XWMP_PM_STAGE_SUSPENDED = 0U, /**< 已经暂停 */
+        XWMP_PM_STAGE_SUSPENDING = 1U, /**< 正在暂停 */
         XWMP_PM_STAGE_RESUMING = XWMP_PM_STAGE_SUSPENDING, /**< 正在恢复 */
-        XWMP_PM_STAGE_RESERVED = 2,
-        XWMP_PM_STAGE_FREEZING = 3, /**< 正在冻结线程 */
+        XWMP_PM_STAGE_RESERVED = 2U,
+        XWMP_PM_STAGE_FREEZING = 3U, /**< 正在冻结线程 */
         XWMP_PM_STAGE_THAWING = XWMP_PM_STAGE_FREEZING, /**< 正在解冻线程 */
-        XWMP_PM_STAGE_RUNNING = 4, /**< 正常运行 */
+        XWMP_PM_STAGE_RUNNING = 4U, /**< 正常运行 */
 };
 
 typedef void (* xwmp_pmdm_cb_f)(void *); /**< 电源管理回调函数 */

@@ -674,7 +674,7 @@
  * @param[in] member: 成员在结构体中符号名
  */
 #  define xwcc_baseof(ptr, type, member) \
-          ((type *)(((xwptr_t)(ptr)) - xwcc_offsetof(type, member)))
+        ((type *)(((xwptr_t)(ptr)) - (xwptr_t)xwcc_offsetof(type, member)))
 #endif
 
 #ifndef xwcc_derof

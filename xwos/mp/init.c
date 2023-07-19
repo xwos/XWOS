@@ -24,9 +24,8 @@ xwer_t xwmp_init(void)
         xwid_t cpuid;
 
         cpuid = xwmp_skd_id_lc();
-        if (0 == cpuid) {
+        if ((xwid_t)0 == cpuid) {
                 xwmp_pmdm_init();
         }
-        xwmp_skd_init_lc();
-        return XWOK;
+        return xwmp_skd_init_lc();
 }

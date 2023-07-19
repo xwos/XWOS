@@ -90,13 +90,14 @@ xwer_t xwmm_mempool_page_allocator_init(struct xwmm_mempool_page_allocator * pa,
                 rc = -E2SMALL;
                 goto err_mem2small;
         }
-        if (0 != (pgsize & XWMM_UNALIGNED_MASK)) {
+        // cppcheck-suppress [misra-c2012-10.8]
+        if ((xwsz_t)0 != (pgsize & (xwsz_t)XWMM_UNALIGNED_MASK)) {
                 rc = -EALIGN;
                 goto err_aligned;
         }
         nr = size / pgsize;
         order = xwbop_fls(xwsz_t, nr);
-        if ((order < 0) || (nr & ((1U << order) - 1U))) {
+        if ((order < 0) || (nr & ((1U << (xwsz_t)order) - 1U))) {
                 rc = -EALIGN;
                 goto err_aligned;
         }
@@ -123,6 +124,7 @@ xwer_t xwmm_mempool_page_allocator_init(struct xwmm_mempool_page_allocator * pa,
                 xwlib_rbtree_init_node(&pa->pgarray[i].attr.free.rbnode);
                 pa->pgarray[i].data.value = 0;
         }
+        // cppcheck-suppress [misra-c2012-17.7]
         xwmm_mempool_page_odrbtree_add(&pa->odrbtree[pa->max_order],
                                        &pa->pgarray[0]);
 
@@ -230,6 +232,7 @@ void xwmm_mempool_page_divide_page(struct xwmm_mempool_page_allocator * pa,
                 pg_odr--;
                 pg_offset >>= 1;
                 buddy = &pa->pgarray[pg_seq + pg_offset];
+                // cppcheck-suppress [misra-c2012-17.7]
                 xwmm_mempool_page_odrbtree_add(ot, buddy);
                 pg->order = pg_odr;
         }
@@ -272,6 +275,7 @@ void xwmm_mempool_page_combine(struct xwmm_mempool_page_allocator * pa,
                 odr++;
         }
         odr = pg->order;
+        // cppcheck-suppress [misra-c2012-17.7]
         xwmm_mempool_page_odrbtree_add(&pa->odrbtree[odr], pg);
 }
 
@@ -330,7 +334,7 @@ xwer_t xwmm_mempool_page_odrbtree_add(struct xwmm_mempool_page_odrbtree * ot,
                                 rbn = rbn->left;
                         } else if (pgseq > b->attr.free.seq) {
                                 new = &rbn->right;
-                                lpc = (xwptr_t)new | XWLIB_RBTREE_POS_RIGHT;
+                                lpc = (xwptr_t)new | (xwptr_t)XWLIB_RBTREE_POS_RIGHT;
                                 rbn = rbn->right;
                         } else {
                                 XWOS_BUG();
@@ -554,7 +558,7 @@ xwer_t xwmm_mempool_page_i_a_malloc(void * this, xwsz_t size, void ** membuf)
         pa = this;
         nr = size / pa->pgsize;
         order = xwbop_fls(xwsz_t, nr);
-        if ((order < 0) || ((pa->pgsize << order) < size)) {
+        if ((order < 0) || ((pa->pgsize << (xwsz_t)order) < size)) {
                 order++;
         }
         rc = xwmm_mempool_page_allocate(pa, (xwsq_t)order, &pg);

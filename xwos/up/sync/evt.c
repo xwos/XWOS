@@ -347,7 +347,7 @@ xwer_t xwup_evt_activate(struct xwup_evt * evt, xwsq_t type, xwobj_gc_f gcfunc)
                 goto err_cond_activate;
         }
         evt->type = type;
-        switch (type & XWUP_EVT_TYPE_MASK) {
+        switch (type & (xwsq_t)XWUP_EVT_TYPE_MASK) {
         case XWUP_EVT_TYPE_BR:
                 memset(evt->msk, 0, size); // cppcheck-suppress [misra-c2012-17.7]
                 for (i = 0; i < evt->num; i++) {
@@ -474,8 +474,7 @@ xwer_t xwup_flg_s1m(struct xwup_evt * evt, xwbmp_t msk[])
         xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         xwbmpop_s1m(evt->bmp, msk, evt->num);
         xwup_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
-        xwup_cond_broadcast(&evt->cond);
-        return XWOK;
+        return xwup_cond_broadcast(&evt->cond);
 }
 
 __xwup_api
@@ -491,8 +490,7 @@ xwer_t xwup_flg_s1i(struct xwup_evt * evt, xwsq_t pos)
         xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         xwbmpop_s1i(evt->bmp, pos);
         xwup_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
-        xwup_cond_broadcast(&evt->cond);
-        return XWOK;
+        return xwup_cond_broadcast(&evt->cond);
 
 err_pos_range:
         return rc;
@@ -506,8 +504,7 @@ xwer_t xwup_flg_c0m(struct xwup_evt * evt, xwbmp_t msk[])
         xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         xwbmpop_c0m(evt->bmp, msk, evt->num);
         xwup_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
-        xwup_cond_broadcast(&evt->cond);
-        return XWOK;
+        return xwup_cond_broadcast(&evt->cond);
 }
 
 __xwup_api
@@ -523,8 +520,7 @@ xwer_t xwup_flg_c0i(struct xwup_evt * evt, xwsq_t pos)
         xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         xwbmpop_c0i(evt->bmp, pos);
         xwup_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
-        xwup_cond_broadcast(&evt->cond);
-        return XWOK;
+        return xwup_cond_broadcast(&evt->cond);
 
 err_pos_range:
         return rc;
@@ -538,8 +534,7 @@ xwer_t xwup_flg_x1m(struct xwup_evt * evt, xwbmp_t msk[])
         xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         xwbmpop_x1m(evt->bmp, msk, evt->num);
         xwup_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
-        xwup_cond_broadcast(&evt->cond);
-        return XWOK;
+        return xwup_cond_broadcast(&evt->cond);
 }
 
 __xwup_api
@@ -555,8 +550,7 @@ xwer_t xwup_flg_x1i(struct xwup_evt * evt, xwsq_t pos)
         xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         xwbmpop_x1i(evt->bmp, pos);
         xwup_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
-        xwup_cond_broadcast(&evt->cond);
-        return XWOK;
+        return xwup_cond_broadcast(&evt->cond);
 
 err_pos_range:
         return rc;
@@ -598,7 +592,7 @@ xwer_t xwup_flg_wait_to_level(struct xwup_evt * evt,
                 if (NULL != origin) {
                         xwbmpop_assign(origin, evt->bmp, evt->num);
                 }
-                if (XWUP_FLG_ACTION_CONSUMPTION == action) {
+                if ((xwsq_t)XWUP_FLG_ACTION_CONSUMPTION == action) {
                         switch (trigger) {
                         case XWUP_FLG_TRIGGER_SET_ALL:
                                 triggered = xwbmpop_t1ma_then_c0m(evt->bmp, msk,
@@ -649,11 +643,11 @@ xwer_t xwup_flg_wait_to_level(struct xwup_evt * evt,
                                                &evt->lock, XWOS_LK_SPLK, NULL,
                                                to, &lkst);
                         if (XWOK == rc) {
-                                if (XWOS_LKST_UNLOCKED == lkst) {
+                                if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
                                         xwup_splk_lock(&evt->lock);
                                 }
                         } else {
-                                if (XWOS_LKST_LOCKED == lkst) {
+                                if ((xwsq_t)XWOS_LKST_LOCKED == lkst) {
                                         xwup_splk_unlock(&evt->lock);
                                 }
                                 xwup_cpuirq_restore_lc(cpuirq);
@@ -673,7 +667,7 @@ xwer_t xwup_flg_wait_to_edge(struct xwup_evt * evt, xwsq_t trigger,
         xwsq_t lkst;
         xwssq_t cmprc;
         bool triggered;
-        xwer_t rc;
+        xwer_t rc = XWOK;
         xwbmpop_define(cur, evt->num);
         xwbmpop_define(tmp, evt->num);
 
@@ -682,19 +676,19 @@ xwer_t xwup_flg_wait_to_edge(struct xwup_evt * evt, xwsq_t trigger,
         while (true) { // cppcheck-suppress [misra-c2012-15.4]
                 xwbmpop_assign(cur, evt->bmp, evt->num);
                 xwbmpop_and(cur, msk, evt->num);
-                if (XWUP_FLG_TRIGGER_TGL_ALL == trigger) {
+                if ((xwsq_t)XWUP_FLG_TRIGGER_TGL_ALL == trigger) {
                         xwbmpop_assign(tmp, cur, evt->num);
                         xwbmpop_xor(tmp, origin, evt->num);
                         cmprc = xwbmpop_cmp(tmp, msk, evt->num);
-                        if (0 == cmprc) {
+                        if ((xwssq_t)0 == cmprc) {
                                 triggered = true;
                                 rc = XWOK;
                         } else {
                                 triggered = false;
                         }
-                } else if (XWUP_FLG_TRIGGER_TGL_ANY == trigger) {
+                } else if ((xwsq_t)XWUP_FLG_TRIGGER_TGL_ANY == trigger) {
                         cmprc = xwbmpop_cmp(origin, cur, evt->num);
-                        if (0 == cmprc) {
+                        if ((xwssq_t)0 == cmprc) {
                                 triggered = false;
                         } else {
                                 triggered = true;
@@ -713,11 +707,11 @@ xwer_t xwup_flg_wait_to_edge(struct xwup_evt * evt, xwsq_t trigger,
                                                &evt->lock, XWOS_LK_SPLK, NULL,
                                                to, &lkst);
                         if (XWOK == rc) {
-                                if (XWOS_LKST_UNLOCKED == lkst) {
+                                if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
                                         xwup_splk_lock(&evt->lock);
                                 }
                         } else {
-                                if (XWOS_LKST_LOCKED == lkst) {
+                                if ((xwsq_t)XWOS_LKST_LOCKED == lkst) {
                                         xwup_splk_unlock(&evt->lock);
                                 }
                                 xwup_cpuirq_restore_lc(cpuirq);
@@ -736,7 +730,7 @@ xwer_t xwup_flg_wait_to(struct xwup_evt * evt,
 {
         xwer_t rc;
 
-        if (trigger <= XWUP_FLG_TRIGGER_CLR_ANY) {
+        if (trigger <= (xwsq_t)XWUP_FLG_TRIGGER_CLR_ANY) {
                 rc = xwup_flg_wait_to_level(evt, trigger, action, origin, msk, to);
         } else {
                 rc = xwup_flg_wait_to_edge(evt, trigger, origin, msk, to);
@@ -758,7 +752,7 @@ xwer_t xwup_flg_trywait_level(struct xwup_evt * evt,
         if (NULL != origin) {
                 xwbmpop_assign(origin, evt->bmp, evt->num);
         }
-        if (XWUP_FLG_ACTION_CONSUMPTION == action) {
+        if ((xwsq_t)XWUP_FLG_ACTION_CONSUMPTION == action) {
                 switch (trigger) {
                 case XWUP_FLG_TRIGGER_SET_ALL:
                         triggered = xwbmpop_t1ma_then_c0m(evt->bmp, msk, evt->num);
@@ -819,20 +813,20 @@ xwer_t xwup_flg_trywait_edge(struct xwup_evt * evt, xwsq_t trigger,
         xwup_splk_lock_cpuirqsv(&evt->lock, &cpuirq);
         xwbmpop_assign(cur, evt->bmp, evt->num);
         xwbmpop_and(cur, msk, evt->num);
-        if (XWUP_FLG_TRIGGER_TGL_ALL == trigger) {
+        if ((xwsq_t)XWUP_FLG_TRIGGER_TGL_ALL == trigger) {
                 xwbmpop_assign(tmp, cur, evt->num);
                 xwbmpop_xor(tmp, origin, evt->num);
                 cmprc = xwbmpop_cmp(tmp, msk, evt->num);
-                if (0 == cmprc) {
+                if ((xwssq_t)0 == cmprc) {
                         triggered = true;
                         rc = XWOK;
                 } else {
                         triggered = false;
                         rc = -ENODATA;
                 }
-        } else if (XWUP_FLG_TRIGGER_TGL_ANY == trigger) {
+        } else if ((xwsq_t)XWUP_FLG_TRIGGER_TGL_ANY == trigger) {
                 cmprc = xwbmpop_cmp(origin, cur, evt->num);
-                if (0 == cmprc) {
+                if ((xwssq_t)0 == cmprc) {
                         triggered = false;
                         rc = -ENODATA;
                 } else {
@@ -859,7 +853,7 @@ xwer_t xwup_flg_trywait(struct xwup_evt * evt,
 {
         xwer_t rc;
 
-        if (trigger <= XWUP_FLG_TRIGGER_CLR_ANY) {
+        if (trigger <= (xwsq_t)XWUP_FLG_TRIGGER_CLR_ANY) {
                 rc = xwup_flg_trywait_level(evt, trigger, action, origin, msk);
         } else {
                 rc = xwup_flg_trywait_edge(evt, trigger, origin, msk);
@@ -869,7 +863,7 @@ xwer_t xwup_flg_trywait(struct xwup_evt * evt,
 
 /******** type:XWUP_EVT_TYPE_SEL ********/
 /**
- * @brief 绑定同步对象到事件对象，事件对象类型为XWUP_EVT_TYPE_SEL
+ * @brief 绑定同步对象到事件对象，事件对象类型为 `XWUP_EVT_TYPE_SEL`
  * @param[in] evt: 事件对象的指针
  * @param[in] obj: 同步对象的指针
  * @param[in] pos: 同步对象映射到位图中的位置
@@ -923,7 +917,7 @@ err_pos_range:
 }
 
 /**
- * @brief 从事件对象上解绑同步对象，事件对象类型为XWUP_EVT_TYPE_SEL
+ * @brief 从事件对象上解绑同步对象，事件对象类型为 `XWUP_EVT_TYPE_SEL`
  * @param[in] evt: 事件对象的指针
  * @param[in] obj: 同步对象的指针
  * @param[in] exclusive: 是否为独占绑定
@@ -961,7 +955,7 @@ err_notconn:
 }
 
 /**
- * @brief 在事件对象上设置同步对象的标志位，事件对象类型为XWUP_EVT_TYPE_SEL
+ * @brief 在事件对象上设置同步对象的标志位，事件对象类型为 `XWUP_EVT_TYPE_SEL`
  * @param[in] evt: 事件对象的指针
  * @param[in] obj: 同步对象的指针
  * @return 错误码
@@ -983,7 +977,7 @@ xwer_t xwup_sel_obj_s1i(struct xwup_evt * evt, struct xwup_synobj * synobj)
         }
         xwbmpop_s1i(evt->bmp, synobj->sel.pos);
         xwup_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
-        xwup_cond_broadcast(&evt->cond);
+        xwup_cond_broadcast(&evt->cond); // cppcheck-suppress [misra-c2012-17.7]
         return XWOK;
 
 err_notconn:
@@ -992,7 +986,7 @@ err_notconn:
 }
 
 /**
- * @brief 在事件对象上清除同步对象的标志位，事件对象类型为XWUP_EVT_TYPE_SEL
+ * @brief 在事件对象上清除同步对象的标志位，事件对象类型为 `XWUP_EVT_TYPE_SEL`
  * @param[in] evt: 事件对象的指针
  * @param[in] obj: 同步对象的指针
  * @return 错误码
@@ -1060,11 +1054,11 @@ xwer_t xwup_sel_select_to(struct xwup_evt * evt, xwbmp_t msk[], xwbmp_t trg[],
                                                &evt->lock, XWOS_LK_SPLK, NULL,
                                                to, &lkst);
                         if (XWOK == rc) {
-                                if (XWOS_LKST_UNLOCKED == lkst) {
+                                if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
                                         xwup_splk_lock(&evt->lock);
                                 }
                         } else {
-                                if (XWOS_LKST_LOCKED == lkst) {
+                                if ((xwsq_t)XWOS_LKST_LOCKED == lkst) {
                                         xwup_splk_unlock(&evt->lock);
                                 }
                                 xwup_cpuirq_restore_lc(cpuirq);
@@ -1134,14 +1128,14 @@ xwer_t xwup_br_wait_to(struct xwup_evt * evt, xwtm_t to)
         if (triggered) {
                 xwbmpop_c0i(evt->bmp, (xwsq_t)pos);
                 xwup_splk_unlock_cpuirqrs(&evt->lock, cpuirq);
-                xwup_cond_broadcast(&evt->cond);
+                xwup_cond_broadcast(&evt->cond); // cppcheck-suppress [misra-c2012-17.7]
                 xwup_cthd_yield();
                 rc = XWOK;
         } else {
                 rc = xwup_cond_wait_to(&evt->cond,
                                        &evt->lock, XWOS_LK_SPLK, NULL,
                                        to, &lkst);
-                if (XWOS_LKST_UNLOCKED == lkst) {
+                if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
                         xwup_splk_lock(&evt->lock);
                 }
                 xwbmpop_c0i(evt->bmp, (xwsq_t)pos);

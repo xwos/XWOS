@@ -145,8 +145,8 @@ void xwmp_rawly_lock_irqs(struct xwmp_splk * splk,
 {
         xwssz_t i;
 
-        for (i = 0; i < (xwssz_t)num; i++) {
-                xwmp_irq_disable(irqs[i]);
+        for (i = (xwssz_t)0; i < (xwssz_t)num; i++) {
+                xwmp_irq_disable(irqs[i]); // cppcheck-suppress [misra-c2012-17.7]
         }
 #if (CPUCFG_CPU_NUM > 1)
         soc_splk_lock(&splk->socsplk);
@@ -164,13 +164,14 @@ xwer_t xwmp_rawly_trylock_irqs(struct xwmp_splk * splk,
         xwssz_t i;
 
         rc = XWOK;
-        for (i = 0; i < (xwssz_t)num; i++) {
-                xwmp_irq_disable(irqs[i]);
+        for (i = (xwssz_t)0; i < (xwssz_t)num; i++) {
+                xwmp_irq_disable(irqs[i]); // cppcheck-suppress [misra-c2012-17.7]
         }
 #if (CPUCFG_CPU_NUM > 1)
         rc = soc_splk_trylock(&splk->socsplk);
         if (rc < 0) {
-                for (i = (xwssz_t)num - 1; i >= 0; i--) {
+                for (i = (xwssz_t)num - (xwssz_t)1; i >= (xwssz_t)0; i--) {
+                        // cppcheck-suppress [misra-c2012-17.7]
                         xwmp_irq_enable(irqs[i]);
                 }
         }
@@ -193,8 +194,8 @@ void xwmp_rawly_unlock_irqs(struct xwmp_splk * splk,
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif
-        for (i = (xwssz_t)num - 1; i >= 0; i--) {
-                xwmp_irq_enable(irqs[i]);
+        for (i = (xwssz_t)num - (xwssz_t)1; i >= (xwssz_t)0; i--) {
+                xwmp_irq_enable(irqs[i]); // cppcheck-suppress [misra-c2012-17.7]
         }
 }
 
@@ -205,7 +206,8 @@ void xwmp_rawly_lock_irqssv(struct xwmp_splk * splk,
 {
         xwssz_t i;
 
-        for (i = 0; i < (xwssz_t)num; i++) {
+        for (i = (xwssz_t)0; i < (xwssz_t)num; i++) {
+                // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_irq_save(irqs[i], &flags[i]);
         }
 #if (CPUCFG_CPU_NUM > 1)
@@ -225,13 +227,15 @@ xwer_t xwmp_rawly_trylock_irqssv(struct xwmp_splk * splk,
         xwssz_t i;
 
         rc = XWOK;
-        for (i = 0; i < (xwssz_t)num; i++) {
+        for (i = (xwssz_t)0; i < (xwssz_t)num; i++) {
+                // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_irq_save(irqs[i], &flags[i]);
         }
 #if (CPUCFG_CPU_NUM > 1)
         rc = soc_splk_trylock(&splk->socsplk);
         if (rc < 0) {
-                for (i = (xwssz_t)num - 1; i >= 0; i--) {
+                for (i = (xwssz_t)num - (xwssz_t)1; i >= (xwssz_t)0; i--) {
+                        // cppcheck-suppress [misra-c2012-17.7]
                         xwmp_irq_restore(irqs[i], flags[i]);
                 }
                 return rc;
@@ -255,7 +259,8 @@ void xwmp_rawly_unlock_irqsrs(struct xwmp_splk * splk,
         XWOS_UNUSED(splk);
         xwmb_mp_mb();
 #endif
-        for (i = (xwssz_t)num - 1; i >= 0; i--) {
+        for (i = (xwssz_t)num - (xwssz_t)1; i >= (xwssz_t)0; i--) {
+                // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_irq_restore(irqs[i], flags[i]);
         }
 }
@@ -409,8 +414,8 @@ void xwmp_splk_lock_irqs(struct xwmp_splk * splk,
 {
         xwssz_t i;
 
-        for (i = 0; i < (xwssz_t)num; i++) {
-                xwmp_irq_disable(irqs[i]);
+        for (i = (xwssz_t)0; i < (xwssz_t)num; i++) {
+                xwmp_irq_disable(irqs[i]); // cppcheck-suppress [misra-c2012-17.7]
         }
         xwmp_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
 #if (CPUCFG_CPU_NUM > 1)
@@ -429,15 +434,16 @@ xwer_t xwmp_splk_trylock_irqs(struct xwmp_splk * splk,
         xwssz_t i;
 
         rc = XWOK;
-        for (i = 0; i < (xwssz_t)num; i++) {
-                xwmp_irq_disable(irqs[i]);
+        for (i = (xwssz_t)0; i < (xwssz_t)num; i++) {
+                xwmp_irq_disable(irqs[i]); // cppcheck-suppress [misra-c2012-17.7]
         }
         xwmp_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
 #if (CPUCFG_CPU_NUM > 1)
         rc = soc_splk_trylock(&splk->socsplk);
         if (rc < 0) {
                 xwmp_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
-                for (i = (xwssz_t)num - 1; i >= 0; i--) {
+                for (i = (xwssz_t)num - (xwssz_t)1; i >= (xwssz_t)0; i--) {
+                        // cppcheck-suppress [misra-c2012-17.7]
                         xwmp_irq_enable(irqs[i]);
                 }
         }
@@ -461,8 +467,8 @@ void xwmp_splk_unlock_irqs(struct xwmp_splk * splk,
         xwmb_mp_mb();
 #endif
         xwmp_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
-        for (i = (xwssz_t)num - 1; i >= 0; i--) {
-                xwmp_irq_enable(irqs[i]);
+        for (i = (xwssz_t)num - (xwssz_t)1; i >= (xwssz_t)0; i--) {
+                xwmp_irq_enable(irqs[i]); // cppcheck-suppress [misra-c2012-17.7]
         }
 }
 
@@ -473,7 +479,8 @@ void xwmp_splk_lock_irqssv(struct xwmp_splk * splk,
 {
         xwssz_t i;
 
-        for (i = 0; i < (xwssz_t)num; i++) {
+        for (i = (xwssz_t)0; i < (xwssz_t)num; i++) {
+                // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_irq_save(irqs[i], &flags[i]);
         }
         xwmp_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
@@ -494,7 +501,8 @@ xwer_t xwmp_splk_trylock_irqssv(struct xwmp_splk * splk,
         xwssz_t i;
 
         rc = XWOK;
-        for (i = 0; i < (xwssz_t)num; i++) {
+        for (i = (xwssz_t)0; i < (xwssz_t)num; i++) {
+                // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_irq_save(irqs[i], &flags[i]);
         }
         xwmp_skd_dspmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
@@ -502,7 +510,8 @@ xwer_t xwmp_splk_trylock_irqssv(struct xwmp_splk * splk,
         rc = soc_splk_trylock(&splk->socsplk);
         if (rc < 0) {
                 xwmp_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
-                for (i = (xwssz_t)num - 1; i >= 0; i--) {
+                for (i = (xwssz_t)num - (xwssz_t)1; i >= (xwssz_t)0; i--) {
+                        // cppcheck-suppress [misra-c2012-17.7]
                         xwmp_irq_restore(irqs[i], flags[i]);
                 }
         }
@@ -527,7 +536,8 @@ void xwmp_splk_unlock_irqsrs(struct xwmp_splk * splk,
         xwmb_mp_mb();
 #endif
         xwmp_skd_enpmpt_lc(); // cppcheck-suppress [misra-c2012-17.7]
-        for (i = (xwssz_t)num - 1; i >= 0; i--) {
+        for (i = (xwssz_t)num - (xwssz_t)1; i >= (xwssz_t)0; i--) {
+                // cppcheck-suppress [misra-c2012-17.7]
                 xwmp_irq_restore(irqs[i], flags[i]);
         }
 }

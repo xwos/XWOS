@@ -37,7 +37,7 @@ struct xwmp_rtwq {
         struct xwmp_splk lock; /* 保护结构体的锁 */
 };
 
-xwer_t xwmp_rtwq_init(struct xwmp_rtwq * xwrtwq);
+void xwmp_rtwq_init(struct xwmp_rtwq * xwrtwq);
 void xwmp_rtwq_add_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn,
                           xwpr_t prio);
 xwer_t xwmp_rtwq_remove_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn);

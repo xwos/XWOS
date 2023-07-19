@@ -73,8 +73,8 @@ xwer_t xwmm_bma_init(struct xwmm_bma * bma, const char * name,
         bma->zone.size = blksize * num;
         bma->blksize = blksize;
         bma->blkodr = blkodr;
-        bma->orderlists = (struct xwmm_bma_orderlist *)&bma[1];
-        bma->bcbs = (struct xwmm_bma_bcb *)&bma->orderlists[1 + blkodr];
+        bma->orderlists = (struct xwmm_bma_orderlist *)&bma[(xwsz_t)1];
+        bma->bcbs = (struct xwmm_bma_bcb *)&bma->orderlists[(xwsz_t)1 + blkodr];
 
         /* Init all blocks */
         for (i = 0; i < num; i++) {
@@ -321,11 +321,11 @@ void xwmm_bma_combine(struct xwmm_bma * bma, struct xwmm_bma_bcb * bcb)
         xwer_t rc;
 
         bcb->order &= XWMM_BMA_ORDER_MASK; /* clear the `inused' state */
-        odr = (xwsq_t)bcb->order + 1;
+        odr = (xwsq_t)bcb->order + (xwsz_t)1;
 
         while (odr <= bma->blkodr) {
                 buddy = xwmm_bma_find_buddy(bma, bcb);
-                XWOS_BUG_ON(XWMM_BMA_COMBINED == buddy->order);
+                XWOS_BUG_ON((xwu8_t)XWMM_BMA_COMBINED == buddy->order);
                 xwmm_bmalogf(DEBUG,
                              "bcb(idx:0x%X,odr:0x%X), buddy(idx:0x%X,odr:0x%X)\n",
                              (bcb - bma->bcbs)/sizeof(struct xwmm_bma_bcb),

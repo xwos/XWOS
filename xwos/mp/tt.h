@@ -22,7 +22,7 @@
 #  include <xwos/mp/bh.h>
 #endif
 
-#define XWMP_TTN_TYPE_MASK            (3UL)
+#define XWMP_TTN_TYPE_MASK (3UL)
 
 struct xwmp_skd;
 struct xwmp_tt;
@@ -63,9 +63,9 @@ typedef void (* xwmp_tt_cb_f)(struct xwmp_ttn *);
  * @brief 唤醒原因枚举
  */
 enum xwmp_ttn_wkup_reasaon_em {
-        XWMP_TTN_WKUPRS_UNKNOWN = 0,
-        XWMP_TTN_WKUPRS_TIMEDOUT, /**< 超时 */
-        XWMP_TTN_WKUPRS_INTR, /**< 被中断 */
+        XWMP_TTN_WKUPRS_UNKNOWN = 0U,
+        XWMP_TTN_WKUPRS_TIMEDOUT = 1U, /**< 超时 */
+        XWMP_TTN_WKUPRS_INTR = 2U, /**< 被中断 */
 };
 
 /**

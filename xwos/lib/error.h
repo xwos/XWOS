@@ -64,11 +64,11 @@ xwer_t __xwcc_must_check ptr_err(const void * ptr)
 static __xwcc_inline
 bool __xwcc_must_check is_err(const void * ptr)
 {
-        return IS_ERR_VALUE(ptr)? true : false;
+        return IS_ERR_VALUE(ptr) ? true : false;
 }
 
 /**
- * @brief 测试指针的值是否为错误码或空(指针是否为无效指针)
+ * @brief 测试指针的值是否为空或错误码(指针是否为无效指针)
  * @param[in] ptr: 指针
  * @retval true: 是
  * @retval false: 否
@@ -76,7 +76,7 @@ bool __xwcc_must_check is_err(const void * ptr)
 static __xwcc_inline
 bool __xwcc_must_check is_err_or_null(const void * ptr)
 {
-        return (!ptr || IS_ERR_VALUE(ptr))? true : false;
+        return ((NULL == ptr) || IS_ERR_VALUE(ptr)) ? true : false;
 }
 
 /**

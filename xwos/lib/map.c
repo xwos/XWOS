@@ -36,14 +36,14 @@ xwer_t xwlib_map_insert(struct xwlib_map * map, struct xwlib_map_container * new
                         rbn = rbn->left;
                 } else if (cmprc > 0) {
                         pos = &rbn->right;
-                        lpc = (xwptr_t)pos | XWLIB_RBTREE_POS_RIGHT;
+                        lpc = (xwptr_t)pos | (xwptr_t)XWLIB_RBTREE_POS_RIGHT;
                         rbn = rbn->right;
                 } else {
                         lpc = (xwptr_t)0;
                         break;
                 }
         }
-        if (0 != lpc) {
+        if ((xwptr_t)0 != lpc) {
                 if (xwlib_rbtree_tst_link_root(&map->rbtree,
                                                xwlib_rbtree_get_link(lpc))) {
                         xwlib_bclst_add_head(&map->bclh, &newmc->bcln);

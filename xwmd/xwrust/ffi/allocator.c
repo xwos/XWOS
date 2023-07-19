@@ -18,11 +18,13 @@ extern struct xwmm_mempool * xwrust_mempool;
 void * xwrustffi_allocator_alloc(xwsz_t alignment, xwsz_t size)
 {
         void * mem = NULL;
+        // cppcheck-suppress [misra-c2012-17.7]
         xwmm_mempool_memalign(xwrust_mempool, alignment, size, &mem);
         return mem;
 }
 
 void xwrustffi_allocator_free(void * mem)
 {
+        // cppcheck-suppress [misra-c2012-17.7]
         xwmm_mempool_free(xwrust_mempool, mem);
 }

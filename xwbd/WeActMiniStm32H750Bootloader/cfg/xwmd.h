@@ -34,7 +34,7 @@
 #define XWMDCFG_isc_xwssc_LOG                                   0
 #define XWMDCFG_isc_xwssc_PORT_NUM                              (12U)
 #define XWMDCFG_isc_xwssc_PRI_NUM                               (4U)
-#define XWMDCFG_isc_xwssc_RETRY_PERIOD                          (XWTM_S(1))
+#define XWMDCFG_isc_xwssc_RETRY_PERIOD                          (XWTM_MS(1000))
 #define XWMDCFG_isc_xwssc_RETRY_NUM                             (8U)
 #define XWMDCFG_isc_xwssc_MEMBLK_SIZE                           (64U)
 #define XWMDCFG_isc_xwssc_MEMBLK_ODR                            (6U)

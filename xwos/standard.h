@@ -54,12 +54,12 @@
 #  else
 #    define XWOS_BUG()          do {} while (1) /**< 报告BUG */
 #  endif
-#  define XWOS_BUG_ON(x)        if (__xwcc_unlikely(x)) XWOS_BUG() /**< 当条件x成立时报告BUG */
+#  define XWOS_BUG_ON(x)        if (x) XWOS_BUG() /**< 当条件x成立时报告BUG */
 #else
 #  define XWOS_BUG() /**< 报告BUG */
 #  define XWOS_BUG_ON(x) /**< 当条件x成立时报告BUG */
 #endif
-#define XWOS_LOOP_ON(x)         do {} while (__xwcc_unlikely(x)) /**< 当条件x成立时循环 */
+#define XWOS_LOOP_ON(x)         do {} while (x) /**< 当条件x成立时循环 */
 
 #define XWOS_UNUSED_ARGUMENT    0 /**< 未使用的参数的占位符 */
 
@@ -74,7 +74,7 @@
  */
 #if defined(XWOSCFG_CHECK_PARAMETERS) && (1 == XWOSCFG_CHECK_PARAMETERS)
 #  define XWOS_VALIDATE(exp, errstr, ...)       \
-          if (__xwcc_unlikely((!(exp)))) {      \
+          if ((!(exp))) {                       \
               return __VA_ARGS__;               \
           }
 #else

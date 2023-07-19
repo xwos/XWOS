@@ -15,7 +15,7 @@
 
 #include <xwos/standard.h>
 
-#define XWUP_SQLK_GRANULARITY           (1U)
+#define XWUP_SQLK_GRANULARITY (1U)
 
 /**
  * @brief 顺序锁

@@ -38,16 +38,17 @@
 #define XWSSC_VERSION_MINOR     0U /**< XWSSC的小版本号 */
 #define XWSSC_VERSION_REVISION  0U /**< XWSSC的修订版本号 */
 
-#define XWSSC_PRI_NUM           (XWMDCFG_isc_xwssc_PRI_NUM) /**< 优先级数量 */
-#define XWSSC_INVALID_PRI       (0xFFU) /**< 无效优先级 */
-#define XWSSC_MAX_PRI           (XWSSC_PRI_NUM - 1) /**< XWSSC的大版本号 */
-#define XWSSC_PORT_NUM          (XWMDCFG_isc_xwssc_PORT_NUM) /**< 端口号 */
-#define XWSSC_RETRY_PERIOD      (XWMDCFG_isc_xwssc_RETRY_PERIOD) /**< 重试发送的周期 */
-#define XWSSC_RETRY_NUM         (XWMDCFG_isc_xwssc_RETRY_NUM) /**< 重试发送的次数 */
-#define XWSSC_MEMBLK_SIZE       (XWMDCFG_isc_xwssc_MEMBLK_SIZE) /**< 单位内存块的大小 */
-#define XWSSC_MEMBLK_ODR        (XWMDCFG_isc_xwssc_MEMBLK_ODR) /**< 内存块数量的阶，内存块数量等于1左移“阶”次 */
-#define XWSSC_MEMBLK_NUM        (1 << XWSSC_MEMBLK_ODR) /**< 内存块的数量 */
-#define XWSSC_MEMPOOL_SIZE      (XWSSC_MEMBLK_SIZE * XWSSC_MEMBLK_NUM) /**< 内存池的总大小 */
+#define XWSSC_PRI_NUM (XWMDCFG_isc_xwssc_PRI_NUM) /**< 优先级数量 */
+#define XWSSC_INVALID_PRI (0xFFU) /**< 无效优先级 */
+#define XWSSC_MAX_PRI (XWSSC_PRI_NUM - 1U) /**< XWSSC的大版本号 */
+#define XWSSC_PORT_NUM (XWMDCFG_isc_xwssc_PORT_NUM) /**< 端口号 */
+#define XWSSC_RETRY_PERIOD (XWMDCFG_isc_xwssc_RETRY_PERIOD) /**< 重试发送的周期 */
+#define XWSSC_RETRY_NUM (XWMDCFG_isc_xwssc_RETRY_NUM) /**< 重试发送的次数 */
+#define XWSSC_MEMBLK_SIZE (XWMDCFG_isc_xwssc_MEMBLK_SIZE) /**< 单位内存块的大小 */
+#define XWSSC_MEMBLK_ODR (XWMDCFG_isc_xwssc_MEMBLK_ODR) /**< 内存块数量的阶，
+                                                             阶是指2的n次方中的n */
+#define XWSSC_MEMBLK_NUM (1U << XWSSC_MEMBLK_ODR) /**< 内存块的数量 */
+#define XWSSC_MEMPOOL_SIZE (XWSSC_MEMBLK_SIZE * XWSSC_MEMBLK_NUM) /**< 内存池的总大小 */
 
 /**
  * @brief 定义内存池
@@ -69,11 +70,11 @@ typedef struct xwssc_carrier * xwssc_txh_t;
  * @brief 发送状态枚举
  */
 enum xwssc_carrier_state_em {
-        XWSSC_CRS_IDLE = 0,
-        XWSSC_CRS_READY,
-        XWSSC_CRS_INPROGRESS,
-        XWSSC_CRS_ABORT,
-        XWSSC_CRS_FINISH,
+        XWSSC_CRS_IDLE = 0U,
+        XWSSC_CRS_READY = 1U,
+        XWSSC_CRS_INPROGRESS = 2U,
+        XWSSC_CRS_ABORT = 3U,
+        XWSSC_CRS_FINISH = 4U,
 };
 
 /**

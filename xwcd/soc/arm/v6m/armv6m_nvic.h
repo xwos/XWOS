@@ -30,12 +30,12 @@
 #  define CM_NVIC_PRIO_BITNUM SOCCFG_NVIC_PRIO_BITNUM
 #endif
 
-#define CM_NVIC_PRIO_MAXBITNUM  8
-#define CM_NVIC_PRIO_SHIFT      (CM_NVIC_PRIO_MAXBITNUM - CM_NVIC_PRIO_BITNUM)
-#define SOC_IRQ_PRIO_MSK        (((1 << CM_NVIC_PRIO_BITNUM) - 1) << CM_NVIC_PRIO_SHIFT)
+#define CM_NVIC_PRIO_MAXBITNUM 8U
+#define CM_NVIC_PRIO_SHIFT (CM_NVIC_PRIO_MAXBITNUM - CM_NVIC_PRIO_BITNUM)
+#define SOC_IRQ_PRIO_MSK (((1U << CM_NVIC_PRIO_BITNUM) - 1U) << CM_NVIC_PRIO_SHIFT)
 
-#define SOC_IRQ_PRIO_HIGHEST    0x0
-#define SOC_IRQ_PRIO_LOWEST     ((1 << CM_NVIC_PRIO_BITNUM) - 1)
+#define SOC_IRQ_PRIO_HIGHEST 0x0U
+#define SOC_IRQ_PRIO_LOWEST ((1U << CM_NVIC_PRIO_BITNUM) - 1U)
 
 enum soc_exc_em {
         SOC_SP_TOP = -16, /**< initial value of stack point */
@@ -184,7 +184,8 @@ void cm_nvic_set_prioritygrouping(xwu32_t prigroup)
 
         val = cm_scs.scb.aircr.u32;
         val &= ~(SCB_AIRCR_VECTKEY_MSK | SCB_AIRCR_PRIGROUP_MSK);
-        val = (val | ((xwu32_t)0x5FA << SCB_AIRCR_VECTKEY_POS) |
+        val = (val |
+               ((xwu32_t)0x5FA << SCB_AIRCR_VECTKEY_POS) |
                ((prigroup & (xwu32_t)0x07) << SCB_AIRCR_PRIGROUP_POS));
         cm_scs.scb.aircr.u32 = val;
 }
@@ -206,7 +207,7 @@ xwu32_t cm_nvic_get_prioritygrouping(void)
 static __xwbsp_inline
 xwu32_t cm_nvic_get_irq_num(void)
 {
-        return cm_scs.ictr.u32 << 5;
+        return cm_scs.ictr.u32 << (xwu32_t)5;
 }
 
 /******** ******** ******** external interrupts ******** ******** ********/
@@ -217,7 +218,8 @@ xwu32_t cm_nvic_get_irq_num(void)
 static __xwbsp_inline
 void cm_nvic_enable_irq(xwirq_t irq)
 {
-        cm_scs.nvic.iser[irq >> 5].u32 = (xwu32_t)(1U << ((xwu32_t)irq & 0x1FU));
+        xwu32_t idx = (xwu32_t)irq >> (xwu32_t)5;
+        cm_scs.nvic.iser[idx].u32 = ((xwu32_t)1 << ((xwu32_t)irq & (xwu32_t)0x1F));
 }
 
 /**
@@ -227,7 +229,8 @@ void cm_nvic_enable_irq(xwirq_t irq)
 static __xwbsp_inline
 void cm_nvic_disable_irq(xwirq_t irq)
 {
-        cm_scs.nvic.icer[irq >> 5].u32 = (xwu32_t)(1U << ((xwu32_t)irq & 0x1FU));
+        xwu32_t idx = (xwu32_t)irq >> (xwu32_t)5;
+        cm_scs.nvic.icer[idx].u32 = ((xwu32_t)1 << ((xwu32_t)irq & (xwu32_t)0x1F));
 }
 
 /**
@@ -238,8 +241,9 @@ void cm_nvic_disable_irq(xwirq_t irq)
 static __xwbsp_inline
 void cm_nvic_save_irq(xwirq_t irq, xwreg_t * flag)
 {
-        *flag = (cm_scs.nvic.iser[irq >> 5].u32) &
-                 ((xwu32_t)(1U << ((xwu32_t)irq & 0x1FU)));
+        xwu32_t idx = (xwu32_t)irq >> (xwu32_t)5;
+        *flag = ((cm_scs.nvic.iser[idx].u32) &
+                 ((xwu32_t)1 << ((xwu32_t)irq & (xwu32_t)0x1F)));
 }
 
 /**
@@ -250,12 +254,13 @@ void cm_nvic_save_irq(xwirq_t irq, xwreg_t * flag)
 static __xwbsp_inline
 void cm_nvic_restore_irq(xwirq_t irq, xwreg_t flag)
 {
-        if (flag) {
-                cm_scs.nvic.iser[irq >> 5].u32 = (xwu32_t)(1U <<
-                                                           ((xwu32_t)irq & 0x1FU));
+        xwu32_t idx = (xwu32_t)irq >> (xwu32_t)5;
+        if (0U != flag) {
+                cm_scs.nvic.iser[idx].u32 = ((xwu32_t)1 <<
+                                             ((xwu32_t)irq & (xwu32_t)0x1F));
         } else {
-                cm_scs.nvic.icer[irq >> 5].u32 = (xwu32_t)(1U <<
-                                                           ((xwu32_t)irq & 0x1FU));
+                cm_scs.nvic.icer[idx].u32 = ((xwu32_t)1 <<
+                                             ((xwu32_t)irq & (xwu32_t)0x1F));
         }
 }
 
@@ -266,7 +271,7 @@ void cm_nvic_restore_irq(xwirq_t irq, xwreg_t flag)
 static __xwbsp_inline
 void cm_nvic_software_trigger_irq(xwirq_t irq)
 {
-        cm_scs.stir.u32 = ((xwu32_t)irq & 0x1FF);
+        cm_scs.stir.u32 = ((xwu32_t)irq & (xwu32_t)0x1FF);
 }
 
 /**
@@ -278,7 +283,8 @@ void cm_nvic_software_trigger_irq(xwirq_t irq)
 static __xwbsp_inline
 bool cm_nvic_tst_irq(xwirq_t irq)
 {
-        return !!(cm_scs.nvic.ispr[irq >> 5].u32 >> ((xwu32_t)irq & 0x1F));
+        xwu32_t idx = (xwu32_t)irq >> (xwu32_t)5;
+        return !!(cm_scs.nvic.ispr[idx].u32 >> ((xwu32_t)irq & (xwu32_t)0x1F));
 }
 
 /**
@@ -288,7 +294,8 @@ bool cm_nvic_tst_irq(xwirq_t irq)
 static __xwbsp_inline
 void cm_nvic_pend_irq(xwirq_t irq)
 {
-        cm_scs.nvic.ispr[irq >> 5].u32 = (xwu32_t)(1 << ((xwu32_t)irq & 0x1F));
+        xwu32_t idx = (xwu32_t)irq >> (xwu32_t)5;
+        cm_scs.nvic.ispr[idx].u32 = ((xwu32_t)1 << ((xwu32_t)irq & (xwu32_t)0x1F));
 }
 
 /**
@@ -298,7 +305,8 @@ void cm_nvic_pend_irq(xwirq_t irq)
 static __xwbsp_inline
 void cm_nvic_clear_irq(xwirq_t irq)
 {
-        cm_scs.nvic.icpr[irq >> 5].u32 = (xwu32_t)(1 << ((xwu32_t)irq & 0x1F));
+        xwu32_t idx = (xwu32_t)irq >> (xwu32_t)5;
+        cm_scs.nvic.icpr[idx].u32 = ((xwu32_t)1 << ((xwu32_t)irq & (xwu32_t)0x1F));
 }
 
 /**
@@ -310,7 +318,8 @@ void cm_nvic_clear_irq(xwirq_t irq)
 static __xwbsp_inline
 bool cm_nvic_get_irq_active(xwirq_t irq)
 {
-        return (cm_scs.nvic.iabr[irq >> 5].u32 >> ((xwu32_t)irq & 0x1F));
+        xwu32_t idx = (xwu32_t)irq >> (xwu32_t)5;
+        return (cm_scs.nvic.iabr[idx].u32 >> ((xwu32_t)irq & (xwu32_t)0x1F));
 }
 
 /**
@@ -321,8 +330,9 @@ bool cm_nvic_get_irq_active(xwirq_t irq)
 static __xwbsp_inline
 void cm_nvic_set_irq_priority(xwirq_t irq, xwpr_t priority)
 {
-        cm_scs.nvic.ipr[irq].u8 = (xwu8_t)((priority << (8 - CM_NVIC_PRIO_BITNUM)) &
-                                           0xFF);
+        cm_scs.nvic.ipr[irq].u8 = (((xwu8_t)priority <<
+                                    ((xwu8_t)8 - (xwu8_t)CM_NVIC_PRIO_BITNUM)) &
+                                   (xwu8_t)0xFF);
 }
 
 /**
@@ -333,7 +343,7 @@ void cm_nvic_set_irq_priority(xwirq_t irq, xwpr_t priority)
 static __xwbsp_inline
 xwpr_t cm_nvic_get_irq_priority(xwirq_t irq)
 {
-        return (xwpr_t)(cm_scs.nvic.ipr[(irq)].u8 >> (8 - CM_NVIC_PRIO_BITNUM));
+        return (cm_scs.nvic.ipr[irq].u8 >> ((xwu8_t)8 - (xwu8_t)CM_NVIC_PRIO_BITNUM));
 }
 
 /******** ******** ******** system irqs ******** ******** ********/
@@ -632,11 +642,10 @@ bool cm_nvic_get_monitor_active(void)
 static __xwbsp_inline
 void cm_nvic_set_sysirq_priority(xwirq_t irq, xwpr_t priority)
 {
-        xwu32_t idx;
-
-        idx = (((xwu32_t)irq) & 0xF) - 4;
-        cm_scs.scb.shpr[idx].u8 = (xwu8_t)((priority << (8 - CM_NVIC_PRIO_BITNUM)) &
-                                           0xFF);
+        xwu32_t idx = (((xwu32_t)irq) & (xwu32_t)0xF) - (xwu32_t)4;
+        cm_scs.scb.shpr[idx].u8 = (((xwu8_t)priority <<
+                                    ((xwu8_t)8 - (xwu8_t)CM_NVIC_PRIO_BITNUM)) &
+                                   (xwu8_t)0xFF);
 }
 
 /**
@@ -647,10 +656,8 @@ void cm_nvic_set_sysirq_priority(xwirq_t irq, xwpr_t priority)
 static __xwbsp_inline
 xwpr_t cm_nvic_get_sysirq_priority(xwirq_t irq)
 {
-        xwu32_t idx;
-
-        idx = (((xwu32_t)irq) & 0xF) - 4;
-        return (xwpr_t)(cm_scs.scb.shpr[idx].u8 >> (8 - CM_NVIC_PRIO_BITNUM));
+        xwu32_t idx = (((xwu32_t)irq) & (xwu32_t)0xF) - (xwu32_t)4;
+        return (cm_scs.scb.shpr[idx].u8 >> ((xwu8_t)8 - (xwu8_t)CM_NVIC_PRIO_BITNUM));
 }
 
 #endif /* armv6m_nvic.h */

@@ -75,7 +75,7 @@ static __xwmd_code
 void xwsscif_uart_notify(struct xwssc * xwssc, xwsq_t ntf)
 {
         XWOS_UNUSED(xwssc);
-        if (XWSSC_HWIFNTF_NETUNREACH == ntf) {
+        if (XWSSC_HWIFNTF_NETUNREACH == (enum xwssc_hwifal_notification_em)ntf) {
         }
 }
 

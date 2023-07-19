@@ -201,11 +201,11 @@ void xwmp_swt_construct(struct xwmp_swt * swt)
 {
         xwos_object_construct(&swt->xwobj);
         swt->xwskd = NULL;
-        swt->flag = 0;
+        swt->flag = (xwsq_t)0;
         xwmp_ttn_init(&swt->ttn);
         swt->cb = NULL;
         swt->arg = NULL;
-        swt->period = 0;
+        swt->period = (xwtm_t)0;
 }
 
 /**
@@ -362,41 +362,43 @@ void xwmp_swt_ttn_callback(struct xwmp_ttn * ttn)
         swt = xwcc_derof(ttn, struct xwmp_swt, ttn);
         xwtt = &swt->xwskd->tt;
         swt->cb(swt, swt->arg);
-        if (0 != (XWMP_SWT_FLAG_RESTART & swt->flag)) {
+        if ((xwsq_t)0 != ((xwsq_t)XWMP_SWT_FLAG_RESTART & swt->flag)) {
                 to = xwtm_add_safely(swt->ttn.wkup_xwtm, swt->period);
-                /* 若此时，其他CPU调用 `xwmp_swt_stop()` ，会失败，
-                   `xwmp_swt_stop()` 只会减少一次引用计数。
+                /* 其他CPU在此时调用 `xwmp_swt_stop()` 会失败，
+                   软件定时器只会减少一次引用计数。
                    引用计数的值一定小于3，本地CPU可由此获知需要停止重启软件定时器。*/
                 xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
                 refcnt = xwos_object_get_refcnt(&swt->xwobj);
-                if (refcnt >= 3) {
+                if (refcnt >= (xwsq_t)3) {
                         swt->ttn.wkup_xwtm = to;
                         xwaop_write(xwsq_t, &swt->ttn.wkuprs,
-                                    XWMP_TTN_WKUPRS_UNKNOWN, NULL);
+                                    (xwsq_t)XWMP_TTN_WKUPRS_UNKNOWN, NULL);
                         swt->ttn.cb = xwmp_swt_ttn_callback;
-                        /* 在本地CPU执行 `xwmp_tt_add_locked()` 的过程中，其他CPU可能会执行
-                           `xwmp_swt_stop() + xwmp_swt_delete()` ，导致 `swt` 成为野指针。
+                        /* 在本地CPU执行 `xwmp_tt_add_locked()` 的过程中，
+                           其他CPU可能会执行 `xwmp_swt_stop() + xwmp_swt_delete()` ，
+                           导致 `swt` 成为野指针。
                            因此，需要在 `xwmp_tt_add_locked()` 之前增加对 `swt` 的引用。
-                           + 如果[本地CPU] `xwmp_tt_add_locked()` 在
-                             [其他CPU] `xwmp_swt_stop()` 之后执行成功，软件定时器将在下一次
-                             进入回调函数后彻底停止。
-                           + 如果[本地CPU] `xwmp_tt_add_locked()` 执行失败，
+                           + 如果 **本地CPU** 的 `xwmp_tt_add_locked()` 在
+                             **其他CPU** 的 `xwmp_swt_stop()` 之后执行成功，
+                             软件定时器将在下一次进入回调函数后彻底停止。
+                           + 如果 **本地CPU** 的 `xwmp_tt_add_locked()` 执行失败，
                              软件定时器立即停止。
-                           + 如果[本地CPU] `xwmp_tt_add_locked()` 执行成功之后，
-                             [其他CPU] `xwmp_swt_stop()` 也执行成功，
-                             软件定时器不会进入下一次的回调函数。 */
-                        xwmp_swt_grab(swt);
+                           + 如果 **本地CPU** 的 `xwmp_tt_add_locked()` 执行成功之后，
+                             **其他CPU** `xwmp_swt_stop()` 也执行成功，
+                             软件定时器不会再进入回调函数。 */
+                        xwmp_swt_grab(swt); // cppcheck-suppress [misra-c2012-17.7]
+                        // cppcheck-suppress [misra-c2012-17.7]
                         xwmp_tt_add_locked(xwtt, &swt->ttn, cpuirq);
                         xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                        xwmp_swt_put(swt);
+                        xwmp_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
                 } else {
                         xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-                        xwmp_swt_put(swt);
+                        xwmp_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
                 }
         } else {
-                /* 若此时，其他CPU调用 `xwmp_swt_stop()` ，会失败，
+                /* 其他CPU在此时调用 `xwmp_swt_stop()` 会失败，
                    `xwmp_swt_stop()` 中减少引用计数的代码不会执行。 */
-                xwmp_swt_put(swt);
+                xwmp_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
         }
 }
 
@@ -421,15 +423,15 @@ xwer_t xwmp_swt_start(struct xwmp_swt * swt,
                 rc = -EALREADY;
                 goto err_already;
         }
-        if (0 != (XWMP_SWT_FLAG_RESTART & swt->flag)) {
+        if ((xwsq_t)0 != ((xwsq_t)XWMP_SWT_FLAG_RESTART & swt->flag)) {
                 /* 多增加一次引用计数作为继续重启定时器的依据。 */
-                xwmp_swt_grab(swt);
+                xwmp_swt_grab(swt); // cppcheck-suppress [misra-c2012-17.7]
         }
         swt->cb = cb;
         swt->arg = arg;
         swt->period = period;
         swt->ttn.wkup_xwtm = to;
-        xwaop_write(xwsq_t, &swt->ttn.wkuprs, XWMP_TTN_WKUPRS_UNKNOWN, NULL);
+        xwaop_write(xwsq_t, &swt->ttn.wkuprs, (xwsq_t)XWMP_TTN_WKUPRS_UNKNOWN, NULL);
         swt->ttn.xwtt = xwtt;
         swt->ttn.cb = xwmp_swt_ttn_callback;
         rc = xwmp_tt_add_locked(xwtt, &swt->ttn, cpuirq);
@@ -440,12 +442,12 @@ xwer_t xwmp_swt_start(struct xwmp_swt * swt,
         return XWOK;
 
 err_swt_add:
-        if (0 != (XWMP_SWT_FLAG_RESTART & swt->flag)) {
-                xwmp_swt_put(swt);
+        if ((xwsq_t)0 != ((xwsq_t)XWMP_SWT_FLAG_RESTART & swt->flag)) {
+                xwmp_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
         }
 err_already:
         xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
-        xwmp_swt_put(swt);
+        xwmp_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
 err_swt_grab:
         return rc;
 }
@@ -460,14 +462,14 @@ xwer_t xwmp_swt_stop(struct xwmp_swt * swt)
         xwtt = &swt->xwskd->tt;
         xwmp_sqlk_wr_lock_cpuirqsv(&xwtt->lock, &cpuirq);
         rc = xwmp_tt_remove_locked(xwtt, &swt->ttn);
-        if (0 != (XWMP_SWT_FLAG_RESTART & swt->flag)) {
-                xwmp_swt_put(swt);
+        if ((xwsq_t)0 != ((xwsq_t)XWMP_SWT_FLAG_RESTART & swt->flag)) {
+                xwmp_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
         }
         xwmp_sqlk_wr_unlock_cpuirqrs(&xwtt->lock, cpuirq);
         if (XWOK == rc) {
                 /* 从时间树上删除成功，回调函数不可能再被执行。
                    回调函数中减少引用计数的代码也不会执行 */
-                xwmp_swt_put(swt);
+                xwmp_swt_put(swt); // cppcheck-suppress [misra-c2012-17.7]
         }
         return rc;
 }

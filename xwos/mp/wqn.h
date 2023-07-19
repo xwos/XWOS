@@ -27,22 +27,22 @@
  * @brief 等待队列类型枚举
  */
 enum xwmp_wqtype_em {
-        XWMP_WQTYPE_UNKNOWN = 0,
-        XWMP_WQTYPE_NULL,
-        XWMP_WQTYPE_PLSEM,
-        XWMP_WQTYPE_RTSEM,
-        XWMP_WQTYPE_COND,
-        XWMP_WQTYPE_EVENT,
-        XWMP_WQTYPE_MTX,
+        XWMP_WQTYPE_UNKNOWN = 0U,
+        XWMP_WQTYPE_NULL = 1U,
+        XWMP_WQTYPE_PLSEM = 2U,
+        XWMP_WQTYPE_RTSEM = 3U,
+        XWMP_WQTYPE_COND = 4U,
+        XWMP_WQTYPE_EVENT = 5U,
+        XWMP_WQTYPE_MTX = 6U,
 };
 
 /**
  * @brief 等待队列节点唤醒原因枚举
  */
 enum xwmp_wqn_reason_em {
-        XWMP_WQN_REASON_UNKNOWN = 0,
-        XWMP_WQN_REASON_UP, /**< 资源可用 */
-        XWMP_WQN_REASON_INTR, /**< 等待被中断 */
+        XWMP_WQN_REASON_UNKNOWN = 0U,
+        XWMP_WQN_REASON_UP = 1U, /**< 资源可用 */
+        XWMP_WQN_REASON_INTR = 2U, /**< 等待被中断 */
 };
 
 struct xwmp_wqn;

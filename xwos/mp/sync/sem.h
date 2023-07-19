@@ -26,7 +26,7 @@
 /**
  * @brief 负信号量的值
  */
-#define XWMP_SEM_NEGTIVE              ((xwssq_t)(-1))
+#define XWMP_SEM_NEGTIVE (-1)
 
 #if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
 #  define XWMP_SEM_API(api, ...) xwmp_rtsem_##api(__VA_ARGS__)
@@ -40,14 +40,14 @@ struct xwmp_evt;
  * @brief 信号量类型枚举
  */
 enum xwmp_sem_type_em {
-        XWMP_SEM_TYPE_UNKNOWN = 0,
+        XWMP_SEM_TYPE_UNKNOWN = 0U,
 
 #if defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
-        XWMP_SEM_TYPE_PIPELINE, /**< 管道信号量：先进先出 */
+        XWMP_SEM_TYPE_PIPELINE = 1U, /**< 管道信号量：先进先出 */
 #endif
 
 #if defined(XWOSCFG_SYNC_RTSEM) && (1 == XWOSCFG_SYNC_RTSEM)
-        XWMP_SEM_TYPE_RT, /**< 实时信号量：高优先级先出 */
+        XWMP_SEM_TYPE_RT = 2U, /**< 实时信号量：高优先级先出 */
 #endif
 };
 
@@ -56,7 +56,7 @@ enum xwmp_sem_type_em {
  */
 struct xwmp_sem {
         struct xwmp_synobj synobj; /**< C语言面向对象：继承struct xwmp_synobj */
-        xwid_t type; /**< 类型 */
+        xwsq_t type; /**< 类型 */
         xwssq_t count; /**< 信号量计数器：<0，信号量处于负状态 */
         xwssq_t max; /**< 信号量计数器的最大值 */
         union {

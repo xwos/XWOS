@@ -34,13 +34,12 @@ void xwmp_rtwq_rmrbn_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn);
  * @param[in] xwrtwq: 实时等待队列
  */
 __xwmp_code
-xwer_t xwmp_rtwq_init(struct xwmp_rtwq * xwrtwq)
+void xwmp_rtwq_init(struct xwmp_rtwq * xwrtwq)
 {
         xwrtwq->max_prio = XWMP_SKD_PRIORITY_INVALID;
         xwlib_rbtree_init(&xwrtwq->tree);
         xwrtwq->rightmost = NULL;
         xwmp_splk_init(&xwrtwq->lock);
-        return XWOK;
 }
 
 /**
@@ -72,7 +71,7 @@ void xwmp_rtwq_add_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn,
                 xwrtwq->rightmost = wqn;
         } else if (prio > xwrtwq->max_prio) {
                 new = &(rightmost->rbn.right);
-                lpc = (xwptr_t)new | XWLIB_RBTREE_POS_RIGHT;
+                lpc = (xwptr_t)new | (xwptr_t)XWLIB_RBTREE_POS_RIGHT;
                 xwrtwq->max_prio = prio;
                 xwrtwq->rightmost = wqn;
         } else if (prio == xwrtwq->max_prio) {
@@ -89,7 +88,7 @@ void xwmp_rtwq_add_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn,
                                 rbn = rbn->left;
                         } else if (prio > nodeprio) {
                                 new = &rbn->right;
-                                lpc = (xwptr_t)new | XWLIB_RBTREE_POS_RIGHT;
+                                lpc = (xwptr_t)new | (xwptr_t)XWLIB_RBTREE_POS_RIGHT;
                                 rbn = rbn->right;
                         } else {
                                 lpc = (xwptr_t)0;
@@ -97,7 +96,7 @@ void xwmp_rtwq_add_locked(struct xwmp_rtwq * xwrtwq, struct xwmp_wqn * wqn,
                         }
                 }
         }
-        if (0 != lpc) {
+        if ((xwptr_t)0 != lpc) {
                 xwlib_rbtree_link(&wqn->rbn, lpc);
                 xwlib_rbtree_insert_color(tree, &wqn->rbn);
         } else {

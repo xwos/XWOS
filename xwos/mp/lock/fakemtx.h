@@ -92,7 +92,7 @@ xwer_t xwmp_mtx_release(struct xwmp_mtx * mtx, xwsq_t tik)
 static __xwmp_inline_api
 xwsq_t xwmp_mtx_gettik(struct xwmp_mtx * mtx)
 {
-        return mtx ? mtx->fake.synobj.xwobj.tik : 0;
+        return (NULL != mtx) ? mtx->fake.synobj.xwobj.tik : (xwsq_t)0;
 }
 
 static __xwmp_inline_api
@@ -136,7 +136,7 @@ xwer_t xwmp_mtx_getlkst(struct xwmp_mtx * mtx, xwsq_t * lkst)
         xwer_t rc;
         xwssq_t val;
 
-        val = 0;
+        val = (xwssq_t)0;
         rc = xwmp_sem_getvalue(&mtx->fake, &val);
         if (val) {
                 *lkst = XWOS_LKST_LOCKED;

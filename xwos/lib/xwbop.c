@@ -368,8 +368,8 @@ xwssq_t xwbmpop_cmp(xwbmp_t * bmp, xwbmp_t opd[], xwsz_t num)
         xwssq_t ret;
 
         ret = 0;
-        for (j = n; j > 0; j--) { // cppcheck-suppress [misra-c2012-15.4]
-                i = j - 1;
+        for (j = n; j > (xwsz_t)0; j--) { // cppcheck-suppress [misra-c2012-15.4]
+                i = j - (xwsz_t)1;
                 if (bmp[i] < opd[i]) {
                         ret = -1;
                         break;
@@ -388,7 +388,7 @@ void xwbmpop_s1all(xwbmp_t * bmp, xwsq_t num)
         xwsz_t i;
 
         for (i = 0; i < n; i++) {
-                xwbop_s1m(xwbmp_t, &bmp[i], (xwbmp_t)(~0));
+                xwbop_s1m(xwbmp_t, &bmp[i], (~(xwbmp_t)0));
         }
 }
 
@@ -399,7 +399,7 @@ void xwbmpop_c0all(xwbmp_t * bmp, xwsq_t num)
         xwsz_t i;
 
         for (i = 0; i < n; i++) {
-                xwbop_c0m(xwbmp_t, &bmp[i], (xwbmp_t)(~0));
+                xwbop_c0m(xwbmp_t, &bmp[i], (~(xwbmp_t)0));
         }
 }
 

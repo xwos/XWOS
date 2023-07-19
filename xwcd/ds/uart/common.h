@@ -29,42 +29,42 @@
  * @brief UART波特率枚举
  */
 enum xwds_uart_baudrate_em {
-        B50 = 50,
-        B75 = 75,
-        B110 = 110,
-        B134 = 134,
-        B150 = 150,
-        B200 = 200,
-        B300 = 300,
-        B600 = 600,
-        B1200 = 1200,
-        B1800 = 1800,
-        B2400 = 2400,
-        B4800 = 4800,
-        B9600 = 9600,
-        B19200 = 19200,
-        B38400 = 38400,
-        B57600 = 57600,
-        B115200 = 115200,
-        B230400 = 230400,
-        B460800 = 460800,
-        B576000 = 576000,
-        B921600 = 921600,
-        B1000000 = 1000000,
-        B1152000 = 1152000,
-        B1500000 = 1500000,
-        B2000000 = 2000000,
-        B2500000 = 2500000,
-        B3000000 = 3000000,
-        B3500000 = 3500000,
-        B4000000 = 4000000,
+        B50 = 50U,
+        B75 = 75U,
+        B110 = 110U,
+        B134 = 134U,
+        B150 = 150U,
+        B200 = 200U,
+        B300 = 300U,
+        B600 = 600U,
+        B1200 = 1200U,
+        B1800 = 1800U,
+        B2400 = 2400U,
+        B4800 = 4800U,
+        B9600 = 9600U,
+        B19200 = 19200U,
+        B38400 = 38400U,
+        B57600 = 57600U,
+        B115200 = 115200U,
+        B230400 = 230400U,
+        B460800 = 460800U,
+        B576000 = 576000U,
+        B921600 = 921600U,
+        B1000000 = 1000000U,
+        B1152000 = 1152000U,
+        B1500000 = 1500000U,
+        B2000000 = 2000000U,
+        B2500000 = 2500000U,
+        B3000000 = 3000000U,
+        B3500000 = 3500000U,
+        B4000000 = 4000000U,
 };
 
 /**
  * @brief UART字长枚举
  */
 enum xwds_uart_bits_em {
-        XWDS_UART_BITS_8 = 0,
+        XWDS_UART_BITS_8 = 0U,
         XWDS_UART_BITS_9,
         XWDS_UART_BITS_7,
 };
@@ -73,7 +73,7 @@ enum xwds_uart_bits_em {
  * @brief UART停止位枚举
  */
 enum xwds_uart_stopbits_em {
-        XWDS_UART_STOPBITS_1_0 = 0,
+        XWDS_UART_STOPBITS_1_0 = 0U,
         XWDS_UART_STOPBITS_0_5,
         XWDS_UART_STOPBITS_2_0,
         XWDS_UART_STOPBITS_1_5,
@@ -83,7 +83,7 @@ enum xwds_uart_stopbits_em {
  * @brief UART奇偶校验枚举
  */
 enum xwds_uart_parity_em {
-        XWDS_UART_PARITY_NONE = 0,
+        XWDS_UART_PARITY_NONE = 0U,
         XWDS_UART_PARITY_EVEN,
         XWDS_UART_PARITY_ODD,
 };
@@ -92,7 +92,7 @@ enum xwds_uart_parity_em {
  * @brief UART模式枚举
  */
 enum xwds_uart_mode_em {
-        XWDS_UART_MODE_CLOSE = 0,
+        XWDS_UART_MODE_CLOSE = 0U,
         XWDS_UART_MODE_TX = XWBOP_BIT(0),
         XWDS_UART_MODE_RX = XWBOP_BIT(1),
 };
@@ -101,7 +101,7 @@ enum xwds_uart_mode_em {
  * @brief UART硬件流控枚举
  */
 enum xwds_uart_hardwareflowcontrol_em {
-        XWDS_UART_HFC_NONE = 0,
+        XWDS_UART_HFC_NONE = 0U,
         XWDS_UART_HFC_RTS = XWBOP_BIT(0),
         XWDS_UART_HFC_CTS = XWBOP_BIT(1),
 };
@@ -132,18 +132,19 @@ struct xwds_uart_cfg {
 static __xwcc_inline
 bool xwds_uart_tst_baudrate(xwu32_t baudrate)
 {
-        return ((B50 == baudrate) || (B75 == baudrate) || (B110 == baudrate) ||
-                (B134 == baudrate) || (B150 == baudrate) || (B200 == baudrate) ||
-                (B300 == baudrate) || (B600 == baudrate) || (B1200 == baudrate) ||
-                (B1800 == baudrate) || (B2400 == baudrate) || (B4800 == baudrate) ||
-                (B9600 == baudrate) || (B19200 == baudrate) || (B38400 == baudrate) ||
-                (B57600 == baudrate) || (B115200 == baudrate) ||
-                (B230400 == baudrate) || (B460800 == baudrate) ||
-                (B576000 == baudrate) || (B921600 == baudrate) ||
-                (B1000000 == baudrate) || (B1152000 == baudrate) ||
-                (B1500000 == baudrate) || (B2000000 == baudrate) ||
-                (B2500000 == baudrate) || (B3000000 == baudrate) ||
-                (B3500000 == baudrate) || (B4000000 == baudrate));
+        enum xwds_uart_baudrate_em br = baudrate;
+        return ((B50 == br) || (B75 == br) || (B110 == br) ||
+                (B134 == br) || (B150 == br) || (B200 == br) ||
+                (B300 == br) || (B600 == br) || (B1200 == br) ||
+                (B1800 == br) || (B2400 == br) || (B4800 == br) ||
+                (B9600 == br) || (B19200 == br) || (B38400 == br) ||
+                (B57600 == br) || (B115200 == br) ||
+                (B230400 == br) || (B460800 == br) ||
+                (B576000 == br) || (B921600 == br) ||
+                (B1000000 == br) || (B1152000 == br) ||
+                (B1500000 == br) || (B2000000 == br) ||
+                (B2500000 == br) || (B3000000 == br) ||
+                (B3500000 == br) || (B4000000 == br));
 }
 
 #endif /* xwcd/ds/uart/common.h */

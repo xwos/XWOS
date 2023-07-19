@@ -24,33 +24,33 @@
 #include <xwos/standard.h>
 
 /******** SCB Application Interrupt and Reset Control Register ********/
-#define SCB_AIRCR_VECTKEY_POS           (16UL)
-#define SCB_AIRCR_VECTKEY_MSK           (0xFFFFUL << SCB_AIRCR_VECTKEY_POS)
+#define SCB_AIRCR_VECTKEY_POS           ((xwu32_t)16)
+#define SCB_AIRCR_VECTKEY_MSK           ((xwu32_t)0xFFFF << SCB_AIRCR_VECTKEY_POS)
 
-#define SCB_AIRCR_VECTKEYSTAT_POS       (16UL)
-#define SCB_AIRCR_VECTKEYSTAT_MSK       (0xFFFFUL << SCB_AIRCR_VECTKEYSTAT_POS)
+#define SCB_AIRCR_VECTKEYSTAT_POS       ((xwu32_t)16)
+#define SCB_AIRCR_VECTKEYSTAT_MSK       ((xwu32_t)0xFFFF << SCB_AIRCR_VECTKEYSTAT_POS)
 
-#define SCB_AIRCR_ENDIANESS_POS         (15UL)
-#define SCB_AIRCR_ENDIANESS_MSK         (1UL << SCB_AIRCR_ENDIANESS_POS)
+#define SCB_AIRCR_ENDIANESS_POS         ((xwu32_t)15)
+#define SCB_AIRCR_ENDIANESS_MSK         ((xwu32_t)1 << SCB_AIRCR_ENDIANESS_POS)
 
-#define SCB_AIRCR_PRIGROUP_POS          (8UL)
-#define SCB_AIRCR_PRIGROUP_MSK          (7UL << SCB_AIRCR_PRIGROUP_POS)
+#define SCB_AIRCR_PRIGROUP_POS          ((xwu32_t)8)
+#define SCB_AIRCR_PRIGROUP_MSK          ((xwu32_t)7 << SCB_AIRCR_PRIGROUP_POS)
 
-#define SCB_AIRCR_SYSRESETREQ_POS       (2UL)
-#define SCB_AIRCR_SYSRESETREQ_MSK       (1UL << SCB_AIRCR_SYSRESETREQ_POS)
+#define SCB_AIRCR_SYSRESETREQ_POS       ((xwu32_t)2)
+#define SCB_AIRCR_SYSRESETREQ_MSK       ((xwu32_t)1 << SCB_AIRCR_SYSRESETREQ_POS)
 
-#define SCB_AIRCR_VECTCLRACTIVE_POS     (1UL)
-#define SCB_AIRCR_VECTCLRACTIVE_MSK     (1UL << SCB_AIRCR_VECTCLRACTIVE_POS)
+#define SCB_AIRCR_VECTCLRACTIVE_POS     ((xwu32_t)1)
+#define SCB_AIRCR_VECTCLRACTIVE_MSK     ((xwu32_t)1 << SCB_AIRCR_VECTCLRACTIVE_POS)
 
-#define SCB_AIRCR_VECTRESET_POS         (0UL)
-#define SCB_AIRCR_VECTRESET_MSK         (1UL << SCB_AIRCR_VECTRESET_POS)
+#define SCB_AIRCR_VECTRESET_POS         ((xwu32_t)0)
+#define SCB_AIRCR_VECTRESET_MSK         ((xwu32_t)1 << SCB_AIRCR_VECTRESET_POS)
 
 /**
  * @brief program status register
  * @note little-endian
  */
 union cm_xpsr_reg {
-        struct { // cppcheck-suppress [misra-c2012-5.7]
+        struct {
                 xwu32_t reserved0:16; /**< bit0~15 Reserved */
                 __xw_io xwu32_t ge:4; /**< bit16~19 Greater than or Equal flags */
                 xwu32_t reserved1:7; /**< bit20~26 Reserved */
@@ -1073,10 +1073,10 @@ struct cm_tpiu_reg {
 };
 
 /* Memory mapping of Core Hardware */
-#define ARMv7m_SCS_BASE         (0xE000E000UL) /**< System Control Space Base Address */
-#define ARMv7m_ITM_BASE         (0xE0000000UL) /**< ITM Base Address */
-#define ARMv7m_DWT_BASE         (0xE0001000UL) /**< DWT Base Address */
-#define ARMv7m_TPI_BASE         (0xE0040000UL) /**< TPI Base Address */
+#define ARMv7m_SCS_BASE         (0xE000E000U) /**< System Control Space Base Address */
+#define ARMv7m_ITM_BASE         (0xE0000000U) /**< ITM Base Address */
+#define ARMv7m_DWT_BASE         (0xE0001000U) /**< DWT Base Address */
+#define ARMv7m_TPI_BASE         (0xE0040000U) /**< TPI Base Address */
 
 #define cm_scs                  (*((__xw_io struct cm_scs_reg *)ARMv7m_SCS_BASE))
 #define cm_itm                  (*((__xw_io struct cm_itm_reg *)ARMv7m_ITM_BASE))
@@ -1394,7 +1394,7 @@ void cm_itm_putc(xwu32_t port, const char c)
 {
         if ((cm_itm.tcr.bit.itmena) &&
             (cm_itm.ter[port >> 5].u32 & (1U << (port & 0x1FU)))) {
-                while (0 == cm_itm.port[port].u32) {
+                while (0U == cm_itm.port[port].u32) {
                 }
                 cm_itm.port[port].u8 = (xwu8_t)c;
         }

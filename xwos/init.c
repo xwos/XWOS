@@ -28,12 +28,12 @@ void xwos_init(void)
         xwid_t cpuid;
 
         cpuid = xwos_skd_id_lc();
-        if (0 == cpuid) {
+        if ((xwid_t)0 == cpuid) {
                 xwos_objtik_init();
         }
 #if defined(XWCFG_CORE__mp)
-        xwmp_init();
+        xwmp_init(); // cppcheck-suppress [misra-c2012-17.7]
 #elif defined(XWCFG_CORE__up)
-        xwup_init();
+        xwup_init(); // cppcheck-suppress [misra-c2012-17.7]
 #endif
 }

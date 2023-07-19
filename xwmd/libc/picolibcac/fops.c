@@ -37,15 +37,14 @@ int unlink(const char * path);
 int rename(const char * oldname, const char * newname);
 int fstat(int fd, struct stat * sbuf);
 
-#define PICOLIBCAC_FOPS_FD_NUM          32
+#define PICOLIBCAC_FOPS_FD_NUM          32U
 #define PICOLIBCAC_FOPS_FD_OFFSET       3 /* 0,1,2 分别代表 stdin, stdout, stderr. */
 
-static xwbmpop_define(picolibcac_fops_node_bmp, PICOLIBCAC_FOPS_FD_NUM) = {0};
-// cppcheck-suppress [misra-c2012-8.9]
-static xwbmpop_define(picolibcac_fops_nodetype_bmp, PICOLIBCAC_FOPS_FD_NUM) = {0};
+static xwbmpop_define(picolibcac_fops_node_bmp, PICOLIBCAC_FOPS_FD_NUM) = {0U};
+static xwbmpop_define(picolibcac_fops_nodetype_bmp, PICOLIBCAC_FOPS_FD_NUM) = {0U};
 // cppcheck-suppress [misra-c2012-9.3]
 static void * picolibcac_fops_fatfs_node[PICOLIBCAC_FOPS_FD_NUM] = {NULL};
-// cppcheck-suppress [misra-c2012-9.3]
+// cppcheck-suppress [misra-c2012-9.2, misra-c2012-9.3]
 static FILINFO * picolibcac_fops_fatfs_filinfo[PICOLIBCAC_FOPS_FD_NUM] = {NULL};
 
 #ifdef O_DIRECTORY
@@ -101,7 +100,6 @@ int picolibcac_fops_opendir(const char * path, int flag, int mode)
         case FR_OK:
                 xwbmpop_s1i(picolibcac_fops_node_bmp, (xwsq_t)idx);
                 xwbmpop_s1i(picolibcac_fops_nodetype_bmp, (xwsq_t)idx);
-                // cppcheck-suppress [misra-c2012-11.5]
                 picolibcac_fops_fatfs_node[idx] = dp;
                 fd = idx + PICOLIBCAC_FOPS_FD_OFFSET;
                 errno = 0;
@@ -189,13 +187,13 @@ int picolibcac_fops_openfile(const char * path, int oflag, int mode)
                 fd = -1;
                 goto err_mfile;
         }
-        fp = malloc(sizeof(FIL)); // cppcheck-suppress [misra-c2012-11.5]
+        fp = malloc(sizeof(FIL));
         if (NULL == fp) {
                 errno = ENOMEM;
                 fd = -1;
                 goto err_malloc_fp;
         }
-        fi = malloc(sizeof(FILINFO)); // cppcheck-suppress [misra-c2012-11.5]
+        fi = malloc(sizeof(FILINFO));
         if (NULL == fi) {
                 errno = ENOMEM;
                 fd = -1;
@@ -238,9 +236,8 @@ int picolibcac_fops_openfile(const char * path, int oflag, int mode)
         case FR_OK:
                 xwbmpop_s1i(picolibcac_fops_node_bmp, (xwsq_t)idx);
                 xwbmpop_c0i(picolibcac_fops_nodetype_bmp, (xwsq_t)idx);
-                // cppcheck-suppress [misra-c2012-11.5]
                 picolibcac_fops_fatfs_node[idx] = fp;
-                fd = idx + PICOLIBCAC_FOPS_FD_OFFSET;
+                fd = (int)idx + PICOLIBCAC_FOPS_FD_OFFSET;
                 errno = 0;
                 break;
         case FR_NO_FILE:
@@ -367,7 +364,7 @@ int picolibcac_fops_closedir(xwsq_t idx)
         FRESULT fsrc;
         DIR * dp;
 
-        dp = picolibcac_fops_fatfs_node[idx]; // cppcheck-suppress [misra-c2012-11.5]
+        dp = picolibcac_fops_fatfs_node[idx];
         fsrc = f_closedir(dp);
         switch (fsrc) {
         case FR_OK:
@@ -404,7 +401,7 @@ int picolibcac_fops_closefile(xwsq_t idx)
         FIL * fp;
         FILINFO * fi;
 
-        fp = picolibcac_fops_fatfs_node[idx]; // cppcheck-suppress [misra-c2012-11.5]
+        fp = picolibcac_fops_fatfs_node[idx];
         fi = picolibcac_fops_fatfs_filinfo[idx];
         fsrc = f_close(fp);
         switch (fsrc) {
@@ -442,14 +439,14 @@ int close(int fd)
         int rc;
         xwssq_t idx;
 
-        if ((fd <= 2) || (fd >= PICOLIBCAC_FOPS_FD_NUM)) {
+        if ((fd <= 2) || (fd >= (int)PICOLIBCAC_FOPS_FD_NUM)) {
                 errno = ENFILE;
                 rc = -1;
         } else {
 #ifdef O_DIRECTORY
                 bool dir;
 
-                idx = fd - PICOLIBCAC_FOPS_FD_OFFSET;
+                idx = (xwssq_t)fd - (xwssq_t)PICOLIBCAC_FOPS_FD_OFFSET;
                 dir = xwbmpop_t1i(picolibcac_fops_nodetype_bmp, (xwsq_t)idx);
                 if (dir) {
                         rc = picolibcac_fops_closedir((xwsq_t)idx);
@@ -457,7 +454,7 @@ int close(int fd)
                         rc = picolibcac_fops_closefile((xwsq_t)idx);
                 }
 #else
-                idx = fd - PICOLIBCAC_FOPS_FD_OFFSET;
+                idx = (xwssq_t)fd - (xwssq_t)PICOLIBCAC_FOPS_FD_OFFSET;
                 rc = picolibcac_fops_closefile((xwsq_t)idx);
 #endif
         }
@@ -473,8 +470,8 @@ xwssz_t picolibcac_fops_read_file(int fd, void * buf, size_t cnt)
         UINT fsrd;
         FIL * fp;
 
-        idx = fd - PICOLIBCAC_FOPS_FD_OFFSET;
-        fp = picolibcac_fops_fatfs_node[idx]; // cppcheck-suppress [misra-c2012-11.5]
+        idx = (xwssq_t)fd - (xwssq_t)PICOLIBCAC_FOPS_FD_OFFSET;
+        fp = picolibcac_fops_fatfs_node[idx];
         fsrc = f_read(fp, buf, cnt, &fsrd);
         switch (fsrc) {
         case FR_OK:
@@ -509,7 +506,7 @@ ssize_t read(int fd, void * buf, size_t cnt)
 
         if (0 == fd) {
                 ret = (int)picolibcac_fops_read_stdin(fd, buf, cnt);
-        } else if ((fd <= 2) || (fd >= PICOLIBCAC_FOPS_FD_NUM)) {
+        } else if ((fd <= 2) || (fd >= (int)PICOLIBCAC_FOPS_FD_NUM)) {
                 errno = EPERM;
                 ret = -1;
         } else {
@@ -527,8 +524,8 @@ xwssz_t picolibcac_fops_write_file(int fd, const void * data, size_t cnt)
         UINT fswr;
         FIL * fp;
 
-        idx = fd - PICOLIBCAC_FOPS_FD_OFFSET;
-        fp = picolibcac_fops_fatfs_node[idx]; // cppcheck-suppress [misra-c2012-11.5]
+        idx = (xwssq_t)fd - (xwssq_t)PICOLIBCAC_FOPS_FD_OFFSET;
+        fp = picolibcac_fops_fatfs_node[idx];
         fsrc = f_write(fp, data, cnt, &fswr);
         switch (fsrc) {
         case FR_OK:
@@ -565,7 +562,7 @@ ssize_t write(int fd, const void * data, size_t cnt)
                 ret = (int)picolibcac_fops_write_stdout(fd, data, cnt);
         } else if (2 == fd) {
                 ret = (int)picolibcac_fops_write_stderr(fd, data, cnt);
-        } else if ((fd <= 2) || (fd >= PICOLIBCAC_FOPS_FD_NUM)) {
+        } else if ((fd <= 2) || (fd >= (int)PICOLIBCAC_FOPS_FD_NUM)) {
                 errno = EPERM;
                 ret = -1;
         } else {
@@ -581,12 +578,11 @@ _off_t lseek(int fd, _off_t pos, int whence)
         FIL * fp;
         int curpos;
 
-        if ((fd <= 2) || (fd >= PICOLIBCAC_FOPS_FD_NUM)) {
+        if ((fd <= 2) || (fd >= (int)PICOLIBCAC_FOPS_FD_NUM)) {
                 errno = EPERM;
                 curpos = -1;
         } else {
-                idx = fd - PICOLIBCAC_FOPS_FD_OFFSET;
-                // cppcheck-suppress [misra-c2012-11.5]
+                idx = (xwssq_t)fd - (xwssq_t)PICOLIBCAC_FOPS_FD_OFFSET;
                 fp = picolibcac_fops_fatfs_node[idx];
                 switch (whence) {
                 case SEEK_SET:
@@ -740,7 +736,7 @@ int fstat(int fd, struct stat * sbuf)
                 rc = -1;
                 break;
         default:
-                idx = fd - PICOLIBCAC_FOPS_FD_OFFSET;
+                idx = (xwssq_t)fd - (xwssq_t)PICOLIBCAC_FOPS_FD_OFFSET;
                 fi = picolibcac_fops_fatfs_filinfo[idx];
                 if (NULL != fi) {
                         struct tm tm;
@@ -751,7 +747,7 @@ int fstat(int fd, struct stat * sbuf)
                         sbuf->st_gid = 0;
                         sbuf->st_mode = (mode_t)(S_IFREG | S_IRWXU |
                                                  S_IRWXG | S_IRWXO);
-                        if (0 != ((xwu8_t)AM_RDO & fi->fattrib)) {
+                        if ((xwu8_t)0 != ((xwu8_t)AM_RDO & fi->fattrib)) {
                                 sbuf->st_mode &= (mode_t)(~(S_IRUSR |
                                                             S_IRGRP |
                                                             S_IROTH));

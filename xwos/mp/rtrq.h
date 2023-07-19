@@ -33,7 +33,7 @@ struct xwmp_rtrq {
         struct xwmp_splk lock;
 };
 
-xwer_t xwmp_rtrq_init(struct xwmp_rtrq * xwrtrq);
+void xwmp_rtrq_init(struct xwmp_rtrq * xwrtrq);
 xwer_t xwmp_rtrq_add_head_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * thd);
 xwer_t xwmp_rtrq_add_tail_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * thd);
 xwer_t xwmp_rtrq_remove_locked(struct xwmp_rtrq * xwrtrq, struct xwmp_thd * thd);

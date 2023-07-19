@@ -84,7 +84,7 @@ xwer_t xwosdl_sem_release(struct xwosdl_sem * sem, xwsq_t tik)
 static __xwcc_inline
 xwsq_t xwosdl_sem_gettik(struct xwosdl_sem * sem)
 {
-        return sem ? sem->vsem.synobj.xwobj.tik : 0;
+        return (NULL != sem) ? sem->vsem.synobj.xwobj.tik : (xwsq_t)0;
 }
 
 static __xwcc_inline

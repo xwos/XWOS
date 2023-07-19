@@ -22,7 +22,20 @@
  * @{
  */
 
-extern const uint8_t xwssc_frm_blank[8];
+/**
+ * @brief 空白帧
+ */
+static __xwmd_rodata
+const xwu8_t xwssc_frm_blank[8] = {
+        (xwu8_t)XWSSC_EOF,
+        (xwu8_t)XWSSC_EOF,
+        (xwu8_t)XWSSC_EOF,
+        (xwu8_t)XWSSC_EOF,
+        (xwu8_t)XWSSC_EOF,
+        (xwu8_t)XWSSC_EOF,
+        (xwu8_t)XWSSC_EOF,
+        (xwu8_t)XWSSC_EOF,
+};
 
 /**
  * @brief 打开硬件接口
@@ -98,7 +111,7 @@ err_xwssc_clear_hwifst:
  * @return 错误码
  */
 __xwmd_code
-xwer_t xwssc_hwifal_tx(struct xwssc * xwssc, xwu8_t * stream, xwsz_t size)
+xwer_t xwssc_hwifal_tx(struct xwssc * xwssc, const xwu8_t * stream, xwsz_t size)
 {
         xwer_t rc;
 
@@ -192,24 +205,25 @@ xwer_t xwssc_hwifal_rx(struct xwssc * xwssc, union xwssc_slot ** slotbuf)
                XWSSC_CRC32_SIZE + XWSSC_EOF_SIZE;
         neednum = XWBOP_DIV_ROUND_UP(need, XWSSC_MEMBLK_SIZE);
         odr = xwbop_fls(xwsz_t, neednum);
-        if ((odr < 0) || ((XWSSC_MEMBLK_SIZE << odr) < need)) {
+        if ((odr < 0) || ((XWSSC_MEMBLK_SIZE << (xwsz_t)odr) < need)) {
                 odr++;
         }
         rc = xwmm_bma_alloc(xwssc->mempool, (xwsq_t)odr, &mem);
         if (rc < 0) {
+                // cppcheck-suppress [misra-c2012-17.7]
                 xwssc_tx_ack_sdu(xwssc,
                                  stream.head.port, stream.head.id,
                                  XWSSC_ACK_NOMEM);
                 goto err_bma_alloc;
         }
-        slot = mem; // cppcheck-suppress [misra-c2012-11.5]
+        slot = mem;
         xwlib_bclst_init_node(&slot->rx.node);
         slot->rx.frmsize = sizeof(struct xwssc_frm) + ecsize + sdusize +
                            XWSSC_CRC32_SIZE + XWSSC_EOF_SIZE;
         // cppcheck-suppress [misra-c2012-17.7]
         memset(slot->rx.frm.sof, XWSSC_SOF, XWSSC_SOF_SIZE);
         // cppcheck-suppress [misra-c2012-17.7]
-        memcpy(&slot->rx.frm.head, &stream.data,
+        memcpy((xwu8_t *)&slot->rx.frm.head, &stream.data,
                sizeof(struct xwssc_frmhead) + ecsize);
         sdupos = &slot->rx.frm.head.ecsdusz[ecsize];
 
@@ -256,7 +270,7 @@ xwer_t xwssc_hwifal_rx(struct xwssc * xwssc, union xwssc_slot ** slotbuf)
 
 err_eof_ifrx:
 err_body_ifrx:
-        xwmm_bma_free(xwssc->mempool, mem);
+        xwmm_bma_free(xwssc->mempool, mem); // cppcheck-suppress [misra-c2012-17.7]
 err_bma_alloc:
 err_head_ifrx:
 err_sof_ifrx:
@@ -271,7 +285,7 @@ err_sof_ifrx:
 __xwmd_code
 void xwssc_hwifal_notify(struct xwssc * xwssc, xwsq_t evt)
 {
-        if (XWSSC_HWIFNTF_NETUNREACH == evt) {
+        if (XWSSC_HWIFNTF_NETUNREACH == (enum xwssc_hwifal_notification_em)evt) {
                 xwssc->hwifops->tx(xwssc, xwssc_frm_blank, sizeof(xwssc_frm_blank));
         }
         if (NULL != xwssc->hwifops->notify) {

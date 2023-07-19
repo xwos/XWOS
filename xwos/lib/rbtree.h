@@ -26,22 +26,35 @@
  * + 4. 每个红色的节点，如果有子节点，必须是黑色；
  * + 5. 从任意节点到其任意子树的叶子的路径上，所包含的黑色节点数量相同。
  *
+ *
  * ## 本算法的特点
  *
- * + 和标准红黑树算法不同，本算法在每个节点中引入一个 **链指针** ，
- *   指向节点在父节点上连接的位置。
- *   由于强制约定节点的内存地址必须按 `sizeof(void *)` 对齐，
- *   节点结构体内部三个指针成员的地址的低两位必定为 `0b00` 。
- *   因此 **链指针** 在数值上的低两位必定为 `0b00` 。
- *   本算法使用这两个空闲的位来存放 **位置(pos)** 和 **颜色(color)** 信息。
- *   **链指针** 、 **位置(pos)** 和 **颜色(color)** 统一被称为 `lpc` 。
- * + 为了更通用，本算法有如下要求：
- *   + 用户需要将红黑树的节点结构体 `struct xwlib_rbtree_node` 嵌入到用户结构体中使用。
- *     已知节点的指针，可通过 @ref xwlib_rbtree_entry() 来计算用户结构体的指针。
+ * 和传统的红黑树算法不同，本算法实现时比较有技巧性。
+ *
+ * + 高效地查找父节点
+ *   + 在每个节点中引入一个 **链指针** ，目的是能快速找到父节点的地址。
+ *     + **链指针** 是一个双重指针，指向本节点在父节点上连接的位置，通过 **链指针**
+ *       可快速计算出父节点的地址。而传统二叉树的实现查找父节点时需要进行遍历。
+ *   + 实现
+ *     + `xwlib_rbtree_get_parent()`
+ *     + `xwlib_rbtree_get_parent_from_lpc()`
+ * + 节省内存
+ *   + 由于强制约定节点的内存地址必须按 `sizeof(void *)` 对齐，
+ *     节点结构体内部三个指针成员肯定也是按照 `sizeof(void *)` 对齐的，
+ *     也就是说它们的地址的低两位必定为 `0b00` 。
+ *   + 使用 **链指针** 指向 `left` 或 `right` 时，
+ *     **链指针** 在数值上的低两位必定为 `0b00` 。
+ *   + **链指针** 这两个空闲的位可用来存放 **位置(pos)** 和 **颜色(color)** 信息。
+ *   + **链指针** 、 **位置(pos)** 和 **颜色(color)** 统一被称为 **lpc** 。
+ * + 高通用性
+ *   + 用户可将红黑树的节点结构体 `xwlib_rbtree_node` 嵌入到自己的结构体中来使用本算法。
+ *     已知红黑树节点的指针，可通过 @ref xwlib_rbtree_entry() 来计算用户结构体的指针。
  *   + 用户需要自己实现二叉树的查找、插入和删除方法：
- *     + 查找：可以参考 @ref xwlib_map_find()
- *     + 插入：可以参考 @ref xwlib_map_insert()
- *     + 删除：可以参考 @ref xwlib_map_erase()
+ *     + 查找：可以参考 @ref xwlib_map_find() 。用户需要自己实现遍历的循环。
+ *     + 插入：可以参考 @ref xwlib_map_insert() 。用户需要自己实现遍历的循环，
+ *       插入后，可通过 `xwlib_rbtree_insert_color()` 调整红黑树颜色。
+ *     + 删除：可以参考 @ref xwlib_map_erase() 。
+ *       使用 `xwlib_rbtree_remove()` 来删除节点。
  *
  * @{
  */
@@ -161,7 +174,7 @@ void xwlib_rbtree_init_node(struct xwlib_rbtree_node * rbn)
  * @return 指向节点右边的链指针、位置和颜色信息
  */
 #define xwlib_rbtree_gen_rc(n, color) \
-        ((xwptr_t)(&((n)->right)) | (xwptr_t)(color) | XWLIB_RBTREE_POS_RIGHT)
+        ((xwptr_t)(&((n)->right)) | (xwptr_t)(color) | (xwptr_t)XWLIB_RBTREE_POS_RIGHT)
 
 /**
  * @brief 生成节点左边的链指针、位置和红色信息
@@ -435,7 +448,7 @@ bool xwlib_rbtree_tst_empty(struct xwlib_rbtree * t)
 static __xwlib_inline
 bool xwlib_rbtree_tst_node_unlinked(struct xwlib_rbtree_node * n)
 {
-        return !!(0 == n->lpc.v);
+        return !!((xwptr_t)0 == n->lpc.v);
 }
 
 /**

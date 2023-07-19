@@ -67,7 +67,7 @@ xwer_t xwosdl_swt_release(struct xwosdl_swt * swt, xwsq_t tik)
 static __xwcc_inline
 xwsq_t xwosdl_swt_gettik(struct xwosdl_swt * swt)
 {
-        return swt ? swt->xwobj.tik : 0;
+        return (NULL != swt) ? swt->xwobj.tik : (xwsq_t)0;
 }
 
 static __xwcc_inline

@@ -29,7 +29,7 @@ void xwup_rtrq_init(struct xwup_rtrq * xwrtrq)
 
         // cppcheck-suppress [misra-c2012-17.7]
         memset(&xwrtrq->bmp, 0, sizeof(xwrtrq->bmp));
-        for (i = 0; i < XWUP_RTRQ_QNUM; i++) {
+        for (i = 0; i < (xwsq_t)XWUP_RTRQ_QNUM; i++) {
                 xwlib_bclst_init_head(&xwrtrq->q[i]);
         }
         xwrtrq->top = XWUP_SKD_PRIORITY_INVALID;
@@ -40,13 +40,14 @@ void xwup_rtrq_init(struct xwup_rtrq * xwrtrq)
  * @param[in] xwrtrq: XWOS UP内核的实时就绪队列
  * @param[in] thd: 线程控制块的指针
  * @retval XWOK: 没有错误
- * @retval -EPERM: 线程没有设置状态标志@ref XWUP_SKDOBJ_ST_READY
+ * @retval -EPERM: 线程没有设置状态标志 `XWUP_SKDOBJ_ST_READY`
+ * @details
+ * + 当线程加入到就绪队列时，它不应该拥有下面的状态：
+ *   `XWUP_SKDOBJ_ST_RUNNING | XWUP_SKDOBJ_ST_FROZEN | XWUP_SKDOBJ_ST_STANDBY`
+ * + 当线程加入到就绪队列时, 它不应该*同时*拥有下面的状态：
+ *   `XWUP_SKDOBJ_ST_BLOCKING & XWUP_SKDOBJ_ST_SLEEPING`
  * @note
- * - 当线程加入到就绪队列时，它不应该拥有下面的状态：
- *   XWUP_SKDOBJ_ST_RUNNING | XWUP_SKDOBJ_ST_FROZEN | XWUP_SKDOBJ_ST_STANDBY
- * - 当线程加入到就绪队列时, 它不应该*同时*拥有下面的状态：
- *   XWUP_SKDOBJ_ST_BLOCKING & XWUP_SKDOBJ_ST_SLEEPING
- * - 这个函数只能在临界区中调用。
+ * + 此函数只能在临界区中调用。
  */
 __xwup_code
 void xwup_rtrq_add_head(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
@@ -69,13 +70,14 @@ void xwup_rtrq_add_head(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
  * @param[in] xwrtrq: XWOS UP内核的实时就绪队列
  * @param[in] thd: 线程控制块的指针
  * @retval XWOK: 没有错误
- * @retval -EPERM: 线程没有设置状态标志@ref XWUP_SKDOBJ_ST_READY
+ * @retval -EPERM: 线程没有设置状态标志 `XWUP_SKDOBJ_ST_READY`
+ * @details
+ * + 当线程加入到就绪队列时，它不应该拥有下面的状态：
+ *   `XWUP_SKDOBJ_ST_RUNNING | XWUP_SKDOBJ_ST_FROZEN | XWUP_SKDOBJ_ST_STANDBY`
+ * + 当线程加入到就绪队列时, 它不应该*同时*拥有下面的状态：
+ *   `XWUP_SKDOBJ_ST_BLOCKING & XWUP_SKDOBJ_ST_SLEEPING`
  * @note
- * - 当线程加入到就绪队列时，它不应该拥有下面的状态：
- *   XWUP_SKDOBJ_ST_RUNNING | XWUP_SKDOBJ_ST_FROZEN | XWUP_SKDOBJ_ST_STANDBY
- * - 当线程加入到就绪队列时, 它不应该*同时*拥有下面的状态：
- *   XWUP_SKDOBJ_ST_BLOCKING & XWUP_SKDOBJ_ST_SLEEPING
- * - 这个函数只能在临界区中调用。
+ * + 此函数只能在临界区中调用。
  */
 __xwup_code
 void xwup_rtrq_add_tail(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
@@ -97,7 +99,7 @@ void xwup_rtrq_add_tail(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
  * @param[in] xwrtrq: XWOS UP内核的实时就绪队列
  * @param[in] thd: 线程控制块的指针
  * @note
- * - 这个函数只能在临界区中调用。
+ * + 此函数只能在临界区中调用。
  */
 __xwup_code
 void xwup_rtrq_remove(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
@@ -108,7 +110,7 @@ void xwup_rtrq_remove(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
         xwlib_bclst_del_init(&thd->rqnode);
         if (xwlib_bclst_tst_empty(&xwrtrq->q[prio])) {
                 xwbmpop_c0i(xwrtrq->bmp, (xwsq_t)prio);
-                prio = (xwpr_t)xwbmpop_fls(xwrtrq->bmp, XWUP_RTRQ_QNUM);
+                prio = (xwpr_t)xwbmpop_fls(xwrtrq->bmp, (xwsq_t)XWUP_RTRQ_QNUM);
                 if (prio < 0) {
                         xwrtrq->top = XWUP_SKD_PRIORITY_INVALID;
                 } else {
@@ -122,7 +124,7 @@ void xwup_rtrq_remove(struct xwup_rtrq * xwrtrq, struct xwup_thd * thd)
  * @param[in] xwrtrq: XWOS UP内核的实时就绪队列
  * @return 被选择的线程控制块的指针
  * @note
- * - 这个函数只能在临界区中调用。
+ * + 此函数只能在临界区中调用。
  */
 __xwup_code
 struct xwup_thd * xwup_rtrq_choose(struct xwup_rtrq * xwrtrq)

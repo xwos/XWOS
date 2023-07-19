@@ -94,7 +94,7 @@ xwer_t xwup_mtx_release(struct xwup_mtx * mtx, xwsq_t tik)
 static __xwup_inline_api
 xwsq_t xwup_mtx_gettik(struct xwup_mtx * mtx)
 {
-        return mtx ? mtx->fake.vsem.synobj.xwobj.tik : 0;
+        return (NULL != mtx) ? mtx->fake.vsem.synobj.xwobj.tik : (xwsq_t)0;
 }
 
 static __xwup_inline_api
@@ -138,7 +138,7 @@ xwer_t xwup_mtx_getlkst(struct xwup_mtx * mtx, xwsq_t * lkst)
         xwer_t rc;
         xwssq_t val;
 
-        val = 0;
+        val = (xwssq_t)0;
         rc = XWUP_SEM_API(getvalue, &mtx->fake, &val);
         if (val) {
                 *lkst = XWOS_LKST_LOCKED;

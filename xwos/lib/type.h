@@ -265,12 +265,12 @@ enum xwaop_memory_order_em {
  * @brief XWOS的锁类型枚举
  */
 enum xwos_lock_type_em {
-        XWOS_LK_NONE = 0, /**< 无 */
-        XWOS_LK_MTX, /**< 互斥锁 */
-        XWOS_LK_SPLK, /**< 自旋锁 */
-        XWOS_LK_SQLK_WR, /**< 顺序写锁 */
-        XWOS_LK_SQLK_RDEX, /**< 顺序读锁 */
-        XWOS_LK_CALLBACK, /**< 抽象回调锁 */
+        XWOS_LK_NONE = 0U, /**< 无 */
+        XWOS_LK_MTX = 1U, /**< 互斥锁 */
+        XWOS_LK_SPLK = 2U, /**< 自旋锁 */
+        XWOS_LK_SQLK_WR = 3U, /**< 顺序写锁 */
+        XWOS_LK_SQLK_RDEX = 4U, /**< 顺序读锁 */
+        XWOS_LK_CALLBACK = 5U, /**< 抽象回调锁 */
         XWOS_LK_NUM, /**< 锁类型的数量 */
 };
 
@@ -286,8 +286,8 @@ struct xwos_cblk {
  * @brief XWOS锁状态
  */
 enum xwos_lkst_em {
-        XWOS_LKST_LOCKED = 0, /**< 锁定 */
-        XWOS_LKST_UNLOCKED, /**< 未锁定 */
+        XWOS_LKST_LOCKED = 0U, /**< 锁定 */
+        XWOS_LKST_UNLOCKED = 1U, /**< 未锁定 */
 };
 
 struct xwos_mtx;

@@ -28,11 +28,11 @@
  * @brief 事件类型枚举
  */
 enum xwup_evt_type_em {
-        XWUP_EVT_TYPE_FLG = 0, /**< 事件标志 */
-        XWUP_EVT_TYPE_SEL, /**< 信号选择器 */
-        XWUP_EVT_TYPE_BR, /**< 线程栅栏 */
+        XWUP_EVT_TYPE_FLG = 0U, /**< 事件标志 */
+        XWUP_EVT_TYPE_SEL = 1U, /**< 信号选择器 */
+        XWUP_EVT_TYPE_BR = 2U, /**< 线程栅栏 */
         XWUP_EVT_TYPE_NUM,
-        XWUP_EVT_TYPE_MASK = 0xFF,
+        XWUP_EVT_TYPE_MASK = 0xFFU,
 };
 
 /**
@@ -74,12 +74,12 @@ xwer_t xwup_evt_get_num(struct xwup_evt * evt, xwsz_t * numbuf);
  * @brief 事件触发条件枚举
  */
 enum xwup_flg_trigger_em {
-        XWUP_FLG_TRIGGER_SET_ALL = 0, /**< 掩码中所有位被置1 */
-        XWUP_FLG_TRIGGER_SET_ANY, /**< 掩码中任何位被置1 */
-        XWUP_FLG_TRIGGER_CLR_ALL, /**< 掩码中所有位被清0 */
-        XWUP_FLG_TRIGGER_CLR_ANY, /**< 掩码中任何位被清0 */
-        XWUP_FLG_TRIGGER_TGL_ALL, /**< 掩码中任何位翻转 */
-        XWUP_FLG_TRIGGER_TGL_ANY, /**< 掩码中任何位翻转 */
+        XWUP_FLG_TRIGGER_SET_ALL = 0U, /**< 掩码中所有位被置1 */
+        XWUP_FLG_TRIGGER_SET_ANY = 1U, /**< 掩码中任何位被置1 */
+        XWUP_FLG_TRIGGER_CLR_ALL = 2U, /**< 掩码中所有位被清0 */
+        XWUP_FLG_TRIGGER_CLR_ANY = 3U, /**< 掩码中任何位被清0 */
+        XWUP_FLG_TRIGGER_TGL_ALL = 4U, /**< 掩码中任何位翻转 */
+        XWUP_FLG_TRIGGER_TGL_ANY = 5U, /**< 掩码中任何位翻转 */
         XWUP_FLG_TRIGGER_NUM,
 };
 
@@ -87,8 +87,8 @@ enum xwup_flg_trigger_em {
  * @brief 事件触发后的动作枚举
  */
 enum xwup_flg_action_em {
-        XWUP_FLG_ACTION_NONE = 0, /**< 无动作 */
-        XWUP_FLG_ACTION_CONSUMPTION, /**< 消费事件 */
+        XWUP_FLG_ACTION_NONE = 0U, /**< 无动作 */
+        XWUP_FLG_ACTION_CONSUMPTION = 1U, /**< 消费事件 */
         XWUP_FLG_ACTION_NUM,
 };
 

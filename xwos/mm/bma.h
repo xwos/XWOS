@@ -61,9 +61,9 @@
 // cppcheck-suppress [misra-c2012-20.7]
 #define XWMM_BMA_TYPEDEF(name, blkodr) \
         struct name { \
-                struct xwmm_bma bma[1]; \
-                struct xwmm_bma_orderlist orderlist[(blkodr) + 1]; \
-                struct xwmm_bma_bcb bcb[1 << (blkodr)]; \
+                struct xwmm_bma bma[1U]; \
+                struct xwmm_bma_orderlist orderlist[(blkodr) + 1U]; \
+                struct xwmm_bma_bcb bcb[1U << (blkodr)]; \
         }
 
 /**

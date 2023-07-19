@@ -32,9 +32,9 @@ xwer_t xwmm_memslice_init(struct xwmm_memslice * msa, xwptr_t origin,
         XWOS_VALIDATE((msa), "nullptr", -EFAULT);
 
         // cppcheck-suppress [misra-c2012-17.8]
-        card_size = XWBOP_ALIGN(card_size, XWMM_ALIGNMENT);
+        card_size = XWBOP_ALIGN(card_size, (xwsz_t)XWMM_ALIGNMENT);
         num_max = total_size / card_size;
-        if (0 == num_max) {
+        if ((xwsz_t)0 == num_max) {
                 rc = -E2SMALL;
                 goto err_mem2small;
         }

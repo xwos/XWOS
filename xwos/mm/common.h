@@ -22,16 +22,17 @@
  * @{
  */
 
-static_assert((XWMMCFG_ALIGNMENT >= sizeof(void *)) && (XWMMCFG_ALIGNMENT % sizeof(void *) == 0),
+static_assert((XWMMCFG_ALIGNMENT >= sizeof(void *)) &&
+              (XWMMCFG_ALIGNMENT % sizeof(void *) == 0U),
               "XWMMCFG_ALIGNMENT must be a multiple of sizeof(void *) !");
 
 #define XWMM_ALIGNMENT XWMMCFG_ALIGNMENT /**< 内存管理对齐的字节数 */
-#define XWMM_UNALIGNED_MASK (XWMM_ALIGNMENT - 1) /**< 内存管理未对齐的掩码 */
-#define XWMM_ALIGNMENT_MASK (~(XWMM_UNALIGNED_MASK)) /**< 内存管理对齐的掩码 */
+#define XWMM_UNALIGNED_MASK (XWMM_ALIGNMENT - 1U) /**< 内存管理未对齐掩码 */
+#define XWMM_ALIGNMENT_MASK (~(XWMM_UNALIGNED_MASK)) /**< 内存管理对齐掩码 */
 
 #define XWMM_STACK_ALIGNMENT XWMMCFG_STACK_ALIGNMENT /**< 线程栈对齐的字节数 */
-#define XWMM_STACK_UNALIGNED_MASK (XWMM_STACK_ALIGNMENT - 1) /**< 线程栈未对齐的掩码 */
-#define XWMM_STACK_ALIGNMENT_MASK (~XWMM_STACK_UNALIGNED_MASK) /**< 线程栈对齐的掩码 */
+#define XWMM_STACK_UNALIGNED_MASK (XWMM_STACK_ALIGNMENT - 1U) /**< 线程栈未对齐掩码 */
+#define XWMM_STACK_ALIGNMENT_MASK (~(XWMM_STACK_UNALIGNED_MASK)) /**< 线程栈对齐掩码 */
 
 /**
  * @brief XWOS内存区域

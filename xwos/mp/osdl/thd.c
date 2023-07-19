@@ -69,7 +69,7 @@ xwer_t xwosdl_thd_quit(struct xwosdl_thd * thd, xwsq_t tik)
         rc = xwmp_thd_acquire(thd, tik);
         if (XWOK == rc) {
                 xwmp_thd_quit(thd);
-                xwmp_thd_put(thd);
+                xwmp_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
         }
         return rc;
 }
@@ -82,7 +82,7 @@ xwer_t xwosdl_thd_join(struct xwosdl_thd * thd, xwsq_t tik, xwer_t * trc)
         rc = xwmp_thd_acquire(thd, tik);
         if (XWOK == rc) {
                 rc = xwmp_thd_join(thd, trc);
-                xwmp_thd_put(thd);
+                xwmp_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
         }
         return rc;
 }
@@ -96,7 +96,7 @@ xwer_t xwosdl_thd_stop(struct xwosdl_thd * thd, xwsq_t tik, xwer_t * trc)
         if (XWOK == rc) {
                 xwmp_thd_quit(thd);
                 rc = xwmp_thd_join(thd, trc);
-                xwmp_thd_put(thd);
+                xwmp_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
         }
         return rc;
 }
@@ -109,7 +109,7 @@ xwer_t xwosdl_thd_detach(struct xwosdl_thd * thd, xwsq_t tik)
         rc = xwmp_thd_acquire(thd, tik);
         if (XWOK == rc) {
                 rc = xwmp_thd_detach(thd);
-                xwmp_thd_put(thd);
+                xwmp_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
         }
         return rc;
 }
@@ -123,7 +123,7 @@ xwer_t xwosdl_thd_migrate(struct xwosdl_thd * thd, xwsq_t tik, xwid_t dstcpu)
         rc = xwmp_thd_acquire(thd, tik);
         if (XWOK == rc) {
                 rc = xwmp_thd_migrate(thd, dstcpu);
-                xwmp_thd_put(thd);
+                xwmp_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
         }
         return rc;
 }
@@ -148,7 +148,7 @@ xwer_t xwosdl_thd_set_data(struct xwosdl_thd * thd, xwsq_t tik,
         rc = xwmp_thd_acquire(thd, tik);
         if (XWOK == rc) {
                 rc = xwmp_thd_set_data(thd, pos, data);
-                xwmp_thd_put(thd);
+                xwmp_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
         }
         return rc;
 }
@@ -164,7 +164,7 @@ xwer_t xwosdl_thd_get_data(struct xwosdl_thd * thd, xwsq_t tik,
         rc = xwmp_thd_acquire(thd, tik);
         if (XWOK == rc) {
                 rc = xwmp_thd_get_data(thd, pos, databuf);
-                xwmp_thd_put(thd);
+                xwmp_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
         }
         return rc;
 }

@@ -20,7 +20,7 @@
 /**
  * @brief 序锁顺序值的粒度
  */
-#define XWMP_SQLK_GRANULARITY           (1U)
+#define XWMP_SQLK_GRANULARITY (1U)
 
 /**
  * @brief 顺序锁
@@ -33,7 +33,7 @@ struct xwmp_sqlk {
 static __xwmp_inline_api
 void xwmp_sqlk_init(struct xwmp_sqlk * sql)
 {
-        sql->seq = 0;
+        sql->seq = (xwsq_t)0;
         xwmp_splk_init(&sql->splk);
 }
 
@@ -45,9 +45,9 @@ xwsq_t xwmp_sqlk_rd_begin(struct xwmp_sqlk * sql)
         do {
                 ret = xwmb_access(xwsq_t, sql->seq);
 #if (XWMP_SQLK_GRANULARITY > 1)
-                ret &= ((~XWMP_SQLK_GRANULARITY) + 1U);
+                ret &= ((~(xwsq_t)XWMP_SQLK_GRANULARITY) + (xwsq_t)1);
 #endif
-        } while (0 != (ret & XWMP_SQLK_GRANULARITY));
+        } while ((xwsq_t)0 != (ret & (xwsq_t)XWMP_SQLK_GRANULARITY));
         xwmb_mp_rmb();
         return ret;
 }
@@ -57,7 +57,7 @@ bool xwmp_sqlk_rd_retry(struct xwmp_sqlk * sql, xwsq_t start)
 {
         xwmb_mp_rmb(); /* ensure all read accesses are finished */
 #if (XWMP_SQLK_GRANULARITY > 1)
-        return ((sql->seq & ((~XWMP_SQLK_GRANULARITY) + 1U)) != start);
+        return ((sql->seq & ((~(xwsq_t)XWMP_SQLK_GRANULARITY) + (xwsq_t)1)) != start);
 #else
         return (sql->seq != start);
 #endif
@@ -71,7 +71,7 @@ xwsq_t xwmp_sqlk_get_seq(struct xwmp_sqlk * sql)
         ret = xwmb_access(xwsq_t, sql->seq);
         xwmb_mp_rmb();
 #if (XWMP_SQLK_GRANULARITY > 1)
-        return ret & ((~XWMP_SQLK_GRANULARITY) + 1U);
+        return ret & ((~(xwsq_t)XWMP_SQLK_GRANULARITY) + (xwsq_t)1);
 #else
         return ret;
 #endif
@@ -201,7 +201,7 @@ static __xwmp_inline_api
 void xwmp_sqlk_wr_lock(struct xwmp_sqlk * sql)
 {
         xwmp_splk_lock(&sql->splk);
-        sql->seq += XWMP_SQLK_GRANULARITY;
+        sql->seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
         xwmb_mp_wmb();
 }
 
@@ -212,7 +212,7 @@ xwer_t xwmp_sqlk_wr_trylock(struct xwmp_sqlk * sql)
 
         rc = xwmp_splk_trylock(&sql->splk);
         if (XWOK == rc) {
-                sql->seq += XWMP_SQLK_GRANULARITY;
+                sql->seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
                 xwmb_mp_wmb();
         }
         return rc;
@@ -222,7 +222,7 @@ static __xwmp_inline_api
 void xwmp_sqlk_wr_unlock(struct xwmp_sqlk * sql)
 {
         xwmb_mp_wmb();
-        sql->seq += XWMP_SQLK_GRANULARITY;
+        sql->seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
         xwmp_splk_unlock(&sql->splk);
 }
 
@@ -230,7 +230,7 @@ static __xwmp_inline_api
 void xwmp_sqlk_wr_lock_cpuirq(struct xwmp_sqlk * sql)
 {
         xwmp_splk_lock_cpuirq(&sql->splk);
-        sql->seq += XWMP_SQLK_GRANULARITY;
+        sql->seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
         xwmb_mp_wmb();
 }
 
@@ -241,7 +241,7 @@ xwer_t xwmp_sqlk_wr_trylock_cpuirq(struct xwmp_sqlk * sql)
 
         rc = xwmp_splk_trylock_cpuirq(&sql->splk);
         if (XWOK == rc) {
-                sql->seq += XWMP_SQLK_GRANULARITY;
+                sql->seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
                 xwmb_mp_wmb();
         }
         return rc;
@@ -251,7 +251,7 @@ static __xwmp_inline_api
 void xwmp_sqlk_wr_unlock_cpuirq(struct xwmp_sqlk * sql)
 {
         xwmb_mp_wmb();
-        sql->seq += XWMP_SQLK_GRANULARITY;
+        sql->seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
         xwmp_splk_unlock_cpuirq(&sql->splk);
 }
 
@@ -259,7 +259,7 @@ static __xwmp_inline_api
 void xwmp_sqlk_wr_lock_cpuirqsv(struct xwmp_sqlk * sql, xwreg_t * cpuirq)
 {
         xwmp_splk_lock_cpuirqsv(&sql->splk, cpuirq);
-        sql->seq += XWMP_SQLK_GRANULARITY;
+        sql->seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
         xwmb_mp_wmb();
 }
 
@@ -270,7 +270,7 @@ xwer_t xwmp_sqlk_wr_trylock_cpuirqsv(struct xwmp_sqlk * sql, xwreg_t * cpuirq)
 
         rc = xwmp_splk_trylock_cpuirqsv(&sql->splk, cpuirq);
         if (XWOK == rc) {
-                sql->seq += XWMP_SQLK_GRANULARITY;
+                sql->seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
                 xwmb_mp_wmb();
         }
         return rc;
@@ -280,7 +280,7 @@ static __xwmp_inline_api
 void xwmp_sqlk_wr_unlock_cpuirqrs(struct xwmp_sqlk * sql, xwreg_t cpuirq)
 {
         xwmb_mp_wmb();
-        sql->seq += XWMP_SQLK_GRANULARITY;
+        sql->seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
         xwmp_splk_unlock_cpuirqrs(&sql->splk, cpuirq);
 }
 
@@ -290,7 +290,7 @@ void xwmp_sqlk_wr_lock_irqs(struct xwmp_sqlk * sql,
                             xwsz_t num)
 {
         xwmp_splk_lock_irqs(&sql->splk, irqs, num);
-        sql->seq += XWMP_SQLK_GRANULARITY;
+        sql->seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
         xwmb_mp_wmb();
 }
 
@@ -303,7 +303,7 @@ xwer_t xwmp_sqlk_wr_trylock_irqs(struct xwmp_sqlk * sql,
 
         rc = xwmp_splk_trylock_irqs(&sql->splk, irqs, num);
         if (XWOK == rc) {
-                sql->seq += XWMP_SQLK_GRANULARITY;
+                sql->seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
                 xwmb_mp_wmb();
         }
         return rc;
@@ -315,7 +315,7 @@ void xwmp_sqlk_wr_unlock_irqs(struct xwmp_sqlk * sql,
                               xwsz_t num)
 {
         xwmb_mp_wmb();
-        sql->seq += XWMP_SQLK_GRANULARITY;
+        sql->seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
         xwmp_splk_unlock_irqs(&sql->splk, irqs, num);
 }
 
@@ -325,7 +325,7 @@ void xwmp_sqlk_wr_lock_irqssv(struct xwmp_sqlk * sql,
                               xwreg_t flags[], xwsz_t num)
 {
         xwmp_splk_lock_irqssv(&sql->splk, irqs, flags, num);
-        sql->seq += XWMP_SQLK_GRANULARITY;
+        sql->seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
         xwmb_mp_wmb();
 }
 
@@ -338,7 +338,7 @@ xwer_t xwmp_sqlk_wr_trylock_irqssv(struct xwmp_sqlk * sql,
 
         rc = xwmp_splk_trylock_irqssv(&sql->splk, irqs, flags, num);
         if (XWOK == rc) {
-                sql->seq += XWMP_SQLK_GRANULARITY;
+                sql->seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
                 xwmb_mp_wmb();
         }
         return rc;
@@ -350,7 +350,7 @@ void xwmp_sqlk_wr_unlock_irqsrs(struct xwmp_sqlk * sql,
                                 xwreg_t flags[], xwsz_t num)
 {
         xwmb_mp_wmb();
-        sql->seq += XWMP_SQLK_GRANULARITY;
+        sql->seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
         xwmp_splk_unlock_irqsrs(&sql->splk, irqs, flags, num);
 }
 
@@ -358,7 +358,7 @@ static __xwmp_inline_api
 void xwmp_sqlk_wr_lock_bh(struct xwmp_sqlk * sql)
 {
         xwmp_splk_lock_bh(&sql->splk);
-        sql->seq += XWMP_SQLK_GRANULARITY;
+        sql->seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
         xwmb_mp_wmb();
 }
 
@@ -369,7 +369,7 @@ xwer_t xwmp_sqlk_wr_trylock_bh(struct xwmp_sqlk * sql)
 
         rc = xwmp_splk_trylock_bh(&sql->splk);
         if (XWOK == rc) {
-                sql->seq += XWMP_SQLK_GRANULARITY;
+                sql->seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
                 xwmb_mp_wmb();
         }
         return rc;
@@ -379,7 +379,7 @@ static __xwmp_inline_api
 void xwmp_sqlk_wr_unlock_bh(struct xwmp_sqlk * sql)
 {
         xwmb_mp_wmb();
-        sql->seq += XWMP_SQLK_GRANULARITY;
+        sql->seq += (xwsq_t)XWMP_SQLK_GRANULARITY;
         xwmp_splk_unlock_bh(&sql->splk);
 }
 

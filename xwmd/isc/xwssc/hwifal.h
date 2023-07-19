@@ -42,7 +42,7 @@ struct xwssc_hwifal_operation {
  * @brief 硬件接口抽象层状态枚举
  */
 enum xwssc_hwifal_state_em {
-        XWSSC_HWIFST_CLOSED, /**< 硬件接口已经关闭 */
+        XWSSC_HWIFST_CLOSED = 0U, /**< 硬件接口已经关闭 */
         XWSSC_HWIFST_CONNECT = XWBOP_BIT(0), /**< 硬件接口已经连接 */
         XWSSC_HWIFST_RX = XWBOP_BIT(1), /**< 硬件接口正在接收数据 */
         XWSSC_HWIFST_TX = XWBOP_BIT(2), /**< 硬件接口正在发送数据 */
@@ -52,13 +52,13 @@ enum xwssc_hwifal_state_em {
  * @brief 硬件接口层事件枚举
  */
 enum xwssc_hwifal_notification_em {
-        XWSSC_HWIFNTF_CONNECT = 0, /**< 与远程端链接 */
-        XWSSC_HWIFNTF_NETUNREACH = 1, /**< 远程端无响应 */
+        XWSSC_HWIFNTF_CONNECT = 0U, /**< 与远程端链接 */
+        XWSSC_HWIFNTF_NETUNREACH = 1U, /**< 远程端无响应 */
 };
 
 xwer_t xwssc_hwifal_open(struct xwssc * xwssc, void * hwifcb);
 xwer_t xwssc_hwifal_close(struct xwssc * xwssc);
-xwer_t xwssc_hwifal_tx(struct xwssc * xwssc, xwu8_t * stream, xwsz_t size);
+xwer_t xwssc_hwifal_tx(struct xwssc * xwssc, const xwu8_t * stream, xwsz_t size);
 xwer_t xwssc_hwifal_rx(struct xwssc * xwssc, union xwssc_slot ** slotbuf);
 void xwssc_hwifal_notify(struct xwssc * xwssc, xwsq_t evt);
 

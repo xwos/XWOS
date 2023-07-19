@@ -83,8 +83,8 @@ xwer_t xwmq_put(struct xwmq * mq)
         return xwos_object_put(&mq->xwobj);
 }
 
-__xwmd_rodata
-const __xwmd_rodata char xwmq_txq_name[] = "xwmq.txq";
+static __xwmd_rodata
+const char xwmq_txq_name[] = "xwmq.txq";
 
 static __xwmd_code
 xwer_t xwmq_activate(struct xwmq * mq,
@@ -97,16 +97,22 @@ xwer_t xwmq_activate(struct xwmq * mq,
         if (rc < 0) {
                 goto err_xwobj_activate;
         }
-        xwmm_memslice_init(&mq->txq,
-                           (xwptr_t)txq, sizeof(struct xwmq_msg) * num,
-                           sizeof(struct xwmq_msg), xwmq_txq_name,
-                           (ctor_f)xwmq_msg_construct, NULL);
+        rc = xwmm_memslice_init(&mq->txq,
+                                (xwptr_t)txq,
+                                sizeof(struct xwmq_msg) * num,
+                                sizeof(struct xwmq_msg), xwmq_txq_name,
+                                (ctor_f)xwmq_msg_construct, NULL);
+        if (rc < 0) {
+                goto err_memslice_init;
+        }
         xwos_sem_init(&mq->txqsem, (xwssq_t)num, (xwssq_t)num);
         xwlib_bclst_init_head(&mq->rxq);
         xwos_splk_init(&mq->rxqlock);
         xwos_sem_init(&mq->rxqsem, 0, (xwssq_t)num);
         return XWOK;
 
+err_memslice_init:
+        xwmq_put(mq); // cppcheck-suppress [misra-c2012-17.7]
 err_xwobj_activate:
         return rc;
 }
@@ -151,6 +157,7 @@ struct xwmq_msg * xwmq_msg_get(struct xwmq * mq)
                 void * anon;
         } mem;
 
+        // cppcheck-suppress [misra-c2012-17.7]
         xwmm_memslice_alloc(&mq->txq, &mem.anon);
         return mem.msg;
 }
@@ -161,6 +168,7 @@ struct xwmq_msg * xwmq_msg_get(struct xwmq * mq)
 static __xwmd_code
 void xwmq_msg_put(struct xwmq * mq, struct xwmq_msg * msg)
 {
+        // cppcheck-suppress [misra-c2012-17.7]
         xwmm_memslice_free(&mq->txq, msg);
 }
 

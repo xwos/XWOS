@@ -94,7 +94,7 @@ xwer_t xwosdl_flg_release(struct xwosdl_flg * flg, xwsq_t tik)
 static __xwcc_inline
 xwsq_t xwosdl_flg_gettik(struct xwosdl_flg * flg)
 {
-        return flg ? flg->cond.synobj.xwobj.tik : 0;
+        return (NULL != flg) ? flg->cond.synobj.xwobj.tik : (xwsq_t)0;
 }
 
 static __xwcc_inline

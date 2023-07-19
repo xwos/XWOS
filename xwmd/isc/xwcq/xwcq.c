@@ -694,7 +694,8 @@ xwer_t xwcq_unbind(struct xwcq * cq, struct xwos_sel * sel)
         if (rc < 0) {
                 goto err_unbind;
         }
-        xwcq_put(cq);
+        rc = xwcq_put(cq);
+        XWOS_BUG_ON(rc < 0);
         return XWOK;
 
 err_unbind:
