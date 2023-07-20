@@ -90,6 +90,7 @@ ifeq ($(XWOSCFG_SYNC_EVT),y)
 endif
 
 ######## ######## ######## ######## osdl ######## ######## ######## ########
+XWOS_CSRCS += mp/osdl/skd.c
 XWOS_CSRCS += mp/osdl/thd.c
 XWOS_CSRCS += mp/osdl/swt.c
 XWOS_CSRCS += mp/osdl/lock/mtx.c

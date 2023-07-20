@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWOS UP内核操作系统接口描述层：调度
+ * @brief XWOS UP内核操作系统接口描述层：调度器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -108,24 +108,8 @@ void xwosdl_skd_enbh_lc(void)
         xwup_skd_enbh_lc();
 }
 
-static __xwos_inline_api
-void xwosdl_skd_continue_lc(void)
-{
-        // cppcheck-suppress [misra-c2012-17.7]
-        xwup_skd_enpmpt_lc();
-        // cppcheck-suppress [misra-c2012-17.7]
-        xwup_skd_enbh_lc();
-        xwup_skd_start_syshwt_lc();
-}
+xwer_t xwosdl_skd_continue_lc(void);
+xwer_t xwosdl_skd_pause_lc(void);
 
-static __xwos_inline_api
-void xwosdl_skd_pause_lc(void)
-{
-        xwup_skd_stop_syshwt_lc();
-        // cppcheck-suppress [misra-c2012-17.7]
-        xwup_skd_dsbh_lc();
-        // cppcheck-suppress [misra-c2012-17.7]
-        xwup_skd_dspmpt_lc();
-}
 
 #endif /* xwos/up/osdl/skd.h */

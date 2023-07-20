@@ -29,8 +29,8 @@
  *
  * + 值越 **小** ，优先级越 **低** ，优先级的值越 **大** ，优先级越 **高** ；
  * + 为了保证今后的扩展性，应该使用模块 @ref xwos_skd_priority 定义的宏，
- *   而不要直接使用 @ref xwpr_t 的数值；
- * + 通过 `xwos_skd_prio_tst_valid()` 可以测试优先级是否有效；
+ *   而不要直接使用 @ref xwpr_t 的数值。
+ * + `xwos_skd_prio_tst_valid()` ：测试优先级是否有效
  *
  * ## 上下文
  *
@@ -69,18 +69,8 @@
  *
  * ## 调度器的暂停与继续
  *
- * 可以通过 `xwos_skd_pause_lc()` 暂停调度器，包括几个操作：
- *
- * + 1. 关闭本地CPU的系统定时器；
- * + 2. 关闭本地CPU调度器的中断底半部；
- * + 3. 关闭本地CPU调度器的抢占。
- *
- * 可以通过 `xwos_skd_continue_lc()` 继续已暂停的调度器，包括几个操作：
- *
- * + 1. 打开本地CPU调度器的抢占；
- * + 2. 打开本地CPU调度器的中断底半部；
- * + 3. 启动本地CPU的系统定时器。
- *
+ * + `xwos_skd_pause_lc()` ：暂停调度器
+ * + `xwos_skd_continue_lc()` ：继续已暂停的调度器
  *
  * ## C++
  *
@@ -262,34 +252,36 @@ void xwos_skd_enbh_lc(void)
 
 /**
  * @brief XWOS API：继续运行本地CPU调度器
+ * @return 错误码
  * @note
  * + 上下文：任意
  * @details
  * 继续运行调度器包括几个操作：
- * + 1. 打开本地CPU调度器的抢占；
+ * + 1. 启动本地CPU的系统定时器；
  * + 2. 打开本地CPU调度器的中断底半部；
- * + 3. 启动本地CPU的系统定时器。
+ * + 3. 打开本地CPU调度器的抢占。
  */
 static __xwos_inline_api
-void xwos_skd_continue_lc(void)
+xwer_t xwos_skd_continue_lc(void)
 {
-        xwosdl_skd_continue_lc();
+        return xwosdl_skd_continue_lc();
 }
 
 /**
  * @brief XWOS API：暂停本地CPU调度器
+ * @return 错误码
  * @note
  * + 上下文：任意
  * @details
- * 暂停运行调度器包括几个操作：
- * + 1. 关闭本地CPU的系统定时器；
+ * 暂停调度器包括几个操作：
+ * + 1. 关闭本地CPU调度器的抢占；
  * + 2. 关闭本地CPU调度器的中断底半部；
- * + 3. 关闭本地CPU调度器的抢占。
+ * + 3. 关闭本地CPU的系统定时器。
  */
 static __xwos_inline_api
-void xwos_skd_pause_lc(void)
+xwer_t xwos_skd_pause_lc(void)
 {
-        xwosdl_skd_pause_lc();
+        return xwosdl_skd_pause_lc();
 }
 
 /** @} */ // xwos_skd
