@@ -181,7 +181,7 @@ xwer_t stm32cube_usart1_drv_tx(struct xwds_uartc * uartc,
         }
         xwos_splk_unlock_cpuirqrs(&drvdata->tx.splk, cpuirq);
         if (rc < 0) {
-                *size = 0;
+                *size = (xwsz_t)0;
         }
         return rc;
 }

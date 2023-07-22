@@ -791,7 +791,7 @@ union xwos_ulock {
  * @brief 系统时间的单位：纳秒
  * @param[in] ns: 纳秒
  */
-#define XWTM_NS(ns)     ((ns) * 1LL)
+#define XWTM_NS(ns)     (ns)
 
 /**
  * @brief 系统时间的单位：微秒

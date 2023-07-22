@@ -66,14 +66,14 @@ void board_mm_init(void)
                                (xwptr_t)axisram_mr_origin,
                                (xwsz_t)axisram_mr_size,
                                (xwsz_t)odr,
-                               0, NULL);
+                               (xwsz_t)0, NULL);
         BOARD_BUG_ON(rc < 0);
 
         used = (xwsz_t)dtcm_mr_pos - (xwsz_t)dtcm_mr_origin;
         rc = xwmm_mempool_init((struct xwmm_mempool *)dtcm_mempool, "DTCM",
                                (xwptr_t)dtcm_mr_origin,
                                (xwsz_t)dtcm_mr_size,
-                               DTCM_PAGE_ORDER,
+                               (xwsz_t)DTCM_PAGE_ORDER,
                                used, NULL);
         BOARD_BUG_ON(rc < 0);
 }

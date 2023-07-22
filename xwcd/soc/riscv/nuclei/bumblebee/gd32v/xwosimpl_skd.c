@@ -140,9 +140,11 @@ void xwospl_skd_init_stack(struct xwospl_skdobj_stack * stk,
         /* MCAUSE */
         if (privileged) {
                 /* INTERRUPT:1,MINHV:0,MPP,MPIE:1,MPIL:0,EXCCODE:SysTimerSW_IRQn */
-                csr = (xwstk_t)((1 << 31) | (3 << 28) | (1 << 27) | SysTimerSW_IRQn);
+                csr = ((1U << 31U) | (3U << 28U) | (1U << 27U) |
+                       (xwreg_t)SysTimerSW_IRQn);
         } else {
-                csr = (xwstk_t)((1 << 31) | (1 << 27) | SysTimerSW_IRQn);
+                csr = ((1U << 31U) | (1U << 27U) |
+                       (xwreg_t)SysTimerSW_IRQn);
         }
         stk->sp--;
         *(stk->sp) = csr;

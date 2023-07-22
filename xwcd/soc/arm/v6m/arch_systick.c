@@ -73,8 +73,9 @@ xwtm_t arch_systick_get_timeconfetti(__xwcc_unused struct xwospl_syshwt * hwt)
         xwu32_t delta;
         xwu32_t confetti;
 
-        delta = cm_scs.systick.rvr.u32 - cm_scs.systick.cvr.u32 + 1;
-        confetti = delta / (ARCH_SYSHWT_SRCCLK / XWTM_MS(1)) * XWTM_US(1);
+        delta = cm_scs.systick.rvr.u32 - cm_scs.systick.cvr.u32 + (xwu32_t)1;
+        confetti = (delta / ((xwu32_t)ARCH_SYSHWT_SRCCLK / (xwu32_t)xwtm_ms(1)) *
+                    (xwu32_t)xwtm_us(1));
         return (xwtm_t)confetti;
 }
 

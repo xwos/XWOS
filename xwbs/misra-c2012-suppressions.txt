@@ -1,5 +1,6 @@
 uninitvar
 misra-config
+zerodiv
 
 misra-c2012-1.4
 
