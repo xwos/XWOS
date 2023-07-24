@@ -214,17 +214,14 @@ SECTIONS {
                 acfls_code_ram_end = .;
         } > data_mr
 
-        .heap (NOLOAD): ALIGN(8) {
-                xwmm_dkma_mmz_start = .;
-                . = ORIGIN(data_mr) + LENGTH(data_mr) - 2048;
-                xwmm_dkma_mmz_end = .;
-                PROVIDE(end = .); /* 被libc中的malloc()使用 */
-                PROVIDE(_end = .); /* 被libc中的malloc()使用 */
-        } > data_mr
-
         .int_results (NOLOAD): ALIGN(4) {
                 KEEP(*(.int_results))
         } > results_mr
+
+        .heap (NOLOAD): ALIGN(8) {
+                PROVIDE(end = .); /* 被libc中的malloc()使用 */
+                PROVIDE(_end = .); /* 被libc中的malloc()使用 */
+        } > heap_mr
 
         /* ++++++++ 以下与动态连接有关，不适用于MCU的ROM环境 ++++++++ */
         .rel.dyn : {
