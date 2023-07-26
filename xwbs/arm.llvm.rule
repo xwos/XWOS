@@ -20,6 +20,8 @@
 
 TARGET ?= XWOS
 XWTC ?= $(shell xwtcwd)
+XWTC := $(subst \,/,$(XWTC))
+export XWTC
 ARMGCC ?= $(XWTC)/armgcc
 ARMLLVM ?= $(XWTC)/armllvm
 SYSROOT ?= $(ARMLLVM)/lib/clang-runtimes/arm-none-eabi/$(SYSROOT_llvm)

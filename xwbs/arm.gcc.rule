@@ -20,6 +20,8 @@
 
 TARGET ?= XWOS
 XWTC ?= $(shell xwtcwd)
+XWTC := $(subst \,/,$(XWTC))
+export XWTC
 ARMGCC ?= $(XWTC)/armgcc
 CROSS_COMPILE ?= $(ARMGCC)/bin/arm-none-eabi-
 CC := $(CROSS_COMPILE)gcc

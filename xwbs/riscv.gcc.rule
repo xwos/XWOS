@@ -20,6 +20,8 @@
 
 TARGET ?= XWOS
 XWTC ?= $(shell xwtcwd)
+XWTC := $(subst \,/,$(XWTC))
+export XWTC
 CROSS_COMPILE ?= $(XWTC)/nucleigcc/bin/riscv-nuclei-elf-
 CC := $(CROSS_COMPILE)gcc
 CXX := $(CROSS_COMPILE)g++
