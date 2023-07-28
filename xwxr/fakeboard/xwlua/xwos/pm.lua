@@ -6,8 +6,9 @@ XWLUA模块：电源管理
 
 
 --[[--------
-进入低功耗模式<br>
-<br>
+进入低功耗模式
+
+
 
 @usage
 xwos.pm.suspend()

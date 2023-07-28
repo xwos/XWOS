@@ -1,30 +1,29 @@
 --[[--------
 XWLUA类：事件标志对象强指针
 
-事件标志对象强指针是Lua语言中的一种 `userdata` ，用于**强引用**XWOS的事件标志对象。
+事件标志对象强指针是Lua语言中的一种 `userdata` ，用于 **强引用** XWOS的事件标志对象。
 
-**强引用**表示会增加XWOS的事件标志对象的**引用计数**。
+**强引用** 表示会增加XWOS的事件标志对象的 **引用计数** 。
 
 @classmod flgsp
 ]]
 
 
 --[[--------
-元方法：__copy<br>
-<br>
+元方法：__copy
+
+
 
 将事件标志对象强指针拷贝到全局导出表 `xwxt` 中。
 
-此元方法意味着事件标志对象的强引用多了一个，**引用计数**加1。
+此元方法意味着事件标志对象的强引用多了一个， **引用计数** 加 **1** 。
 
 @within MetaMethods
 @function flgsp:metatable.__copy
 
-@tparam userdata flgsp (**in**) 事件标志对象强指针<br>
-<br>
+@tparam userdata flgsp (**in**) 事件标志对象强指针
 
-@tparam userdata vm (**in**) 目标虚拟机<br>
-<br>
+@tparam userdata vm (**in**) 目标虚拟机
 
 @usage
 flgsp = ... -- 创建事件标志的代码（省略）
@@ -35,18 +34,18 @@ xwxt.someflg = nil -- 事件标志对象的引用计数减1
 
 
 --[[--------
-元方法：__gc<br>
-<br>
+元方法：__gc
+
+
 
 事件标志对象强指针的垃圾回收方法。
 
-此元方法意味着事件标志对象的强引用少了一个，**引用计数**减1。
+此元方法意味着事件标志对象的强引用少了一个， **引用计数** 减 **1** 。
 
 @within MetaMethods
 @function flgsp:metatable.__gc
 
-@tparam userdata flgsp (**in**) 事件标志对象强指针<br>
-<br>
+@tparam userdata flgsp (**in**) 事件标志对象强指针
 
 @usage
 flgsp = nil -- 删除引用
@@ -55,16 +54,16 @@ collectgarbage() -- 强制垃圾回收，将调用__gc()函数
 
 
 --[[--------
-元方法：__tostring<br>
-<br>
+元方法：__tostring
+
+
 
 将事件标志对象强指针格式化成字符串，可用于终端打印调试。
 
 @within MetaMethods
 @function flgsp:metatable.__tostring
 
-@tparam userdata flgsp (**in**) 事件标志对象强指针<br>
-<br>
+@tparam userdata flgsp (**in**) 事件标志对象强指针
 
 @usage
 print(flgsp)
@@ -72,24 +71,21 @@ print(flgsp)
 
 
 --[[--------
-绑定事件标志对象到信号选择器<br>
-<br>
+绑定事件标志对象到信号选择器
 
-@tparam userdata flgsp (**in**) 事件标志对象强指针<br>
-<br>
 
-@tparam userdata sel (**in**) 信号选择器对象的强指针<br>
-<br>
 
-@tparam number pos (**in**) 事件标志对象映射到信号选择器位图中的位置，位置从0开始编号<br>
-<br>
+@tparam userdata flgsp (**in**) 事件标志对象强指针
 
-@treturn number
-+ ● **rc** 返回值
-  + ○ **0** 没有错误
-  + ○ **-ECHRNG** 位置超出范围
-  + ○ **-EALREADY** 同步对象已经绑定到事件对象
-  + ○ **-EBUSY** 通道已经被其他同步对象独占
+@tparam userdata sel (**in**) 信号选择器对象的强指针
+
+@tparam number pos (**in**) 事件标志对象映射到信号选择器位图中的位置，位置从 **0** 开始编号
+
+@treturn number 错误码<br>
+　● **0** 没有错误<br>
+　● **-ECHRNG** 位置超出范围<br>
+　● **-EALREADY** 同步对象已经绑定到事件对象<br>
+　● **-EBUSY** 通道已经被其他同步对象独占
 
 @usage
 flg = xwos.flg.new(32)
@@ -106,19 +102,17 @@ end
 
 
 --[[--------
-从信号选择器上解绑事件标志对象<br>
-<br>
+从信号选择器上解绑事件标志对象
 
-@tparam userdata flgsp (**in**) 事件标志对象强指针<br>
-<br>
 
-@tparam userdata sel (**in**) 信号选择器对象的强指针<br>
-<br>
 
-@treturn number
-+ ● **rc** 返回值
-  + ○ **0** 没有错误
-  + ○ **-ENOTCONN** 同步对象没有绑定到事件对象上
+@tparam userdata flgsp (**in**) 事件标志对象强指针
+
+@tparam userdata sel (**in**) 信号选择器对象的强指针
+
+@treturn number 错误码<br>
+　● **0** 没有错误<br>
+　● **-ENOTCONN** 同步对象没有绑定到事件对象上
 
 @usage
 flg:unbind(sel)
@@ -128,11 +122,11 @@ end
 
 
 --[[--------
-新建位图，位的数量与事件标志中的事件数量相等<br>
-<br>
+新建位图，位的数量与事件标志中的事件数量相等
 
-@tparam userdata flgsp (**in**) 事件标志对象强指针<br>
-<br>
+
+
+@tparam userdata flgsp (**in**) 事件标志对象强指针
 
 @treturn userdata 位图
 
@@ -144,11 +138,11 @@ end
 
 
 --[[--------
-获取事件标志中事件（位）的数量<br>
-<br>
+获取事件标志中事件（位）的数量
 
-@tparam userdata flgsp (**in**) 事件标志对象强指针<br>
-<br>
+
+
+@tparam userdata flgsp (**in**) 事件标志对象强指针
 
 @treturn number 数量
 
@@ -160,16 +154,16 @@ end
 
 
 --[[--------
-读取事件标志<br>
-<br>
+读取事件标志
 
-@tparam userdata flgsp (**in**) 事件标志对象强指针<br>
-<br>
 
-@treturn {number,userdata}
-+ ● **rc** 返回值
-  + ○ **0** 没有错误
-+ ● **bmp** 事件标志位图
+
+@tparam userdata flgsp (**in**) 事件标志对象强指针
+
+@treturn number 错误码<br>
+　● **0** 没有错误
+
+@treturn userdata 事件标志位图
 
 @usage
 rc, bmp = flg:read()
@@ -179,18 +173,16 @@ end
 
 
 --[[--------
-同时设置多个事件标志位<br>
-<br>
+同时设置多个事件标志位
 
-@tparam userdata flgsp (**in**) 事件标志对象强指针<br>
-<br>
 
-@tparam userdata msk (**in**) 事件的位图掩码<br>
-<br>
 
-@treturn number
-+ ● **rc** 返回值
-  + ○ **0** 没有错误
+@tparam userdata flgsp (**in**) 事件标志对象强指针
+
+@tparam userdata msk (**in**) 事件的位图掩码
+
+@treturn number 错误码<br>
+　● **0** 没有错误
 
 @usage
 msk = flg:bmp()
@@ -203,18 +195,16 @@ end
 
 
 --[[--------
-设置单个事件标志位<br>
-<br>
+设置单个事件标志位
 
-@tparam userdata flgsp (**in**) 事件标志对象强指针<br>
-<br>
 
-@tparam number pos (**in**) 事件的序号<br>
-<br>
 
-@treturn number
-+ ● **rc** 返回值
-  + ○ **0** 没有错误
+@tparam userdata flgsp (**in**) 事件标志对象强指针
+
+@tparam number pos (**in**) 事件的序号
+
+@treturn number 错误码<br>
+　● **0** 没有错误
 
 @usage
 flg:s1i(1) -- 设置事件1
@@ -224,17 +214,16 @@ end
 
 
 --[[--------
-同时清除多个事件标志位<br>
-<br>
+同时清除多个事件标志位
 
-@tparam userdata flgsp (**in**) 事件标志对象强指针<br>
-<br>
 
-@tparam userdata msk (**in**) 事件的位图掩码<br>
 
-@treturn number
-+ ● **rc** 返回值
-  + ○ **0** 没有错误
+@tparam userdata flgsp (**in**) 事件标志对象强指针
+
+@tparam userdata msk (**in**) 事件的位图掩码
+
+@treturn number 错误码<br>
+　● **0** 没有错误
 
 @usage
 msk = flg:bmp()
@@ -247,18 +236,16 @@ end
 
 
 --[[--------
-清除单个事件标志位<br>
-<br>
+清除单个事件标志位
 
-@tparam userdata flgsp (**in**) 事件标志对象强指针<br>
-<br>
 
-@tparam number pos (**in**) 事件的序号<br>
-<br>
 
-@treturn number
-+ ● **rc** 返回值
-  + ○ **0** 没有错误
+@tparam userdata flgsp (**in**) 事件标志对象强指针
+
+@tparam number pos (**in**) 事件的序号
+
+@treturn number 错误码<br>
+　● **0** 没有错误
 
 @usage
 flg:c0i(1) -- 清除事件1
@@ -268,18 +255,16 @@ end
 
 
 --[[--------
-同时翻转多个事件标志位<br>
-<br>
+同时翻转多个事件标志位
 
-@tparam userdata flgsp (**in**) 事件标志对象强指针<br>
-<br>
 
-@tparam userdata msk (**in**) 事件的位图掩码<br>
-<br>
 
-@treturn number
-+ ● **rc** 返回值
-  + ○ **0** 没有错误
+@tparam userdata flgsp (**in**) 事件标志对象强指针
+
+@tparam userdata msk (**in**) 事件的位图掩码
+
+@treturn number 错误码<br>
+　● **0** 没有错误
 
 @usage
 msk = flg:bmp()
@@ -292,18 +277,16 @@ end
 
 
 --[[--------
-翻转单个事件标志位<br>
-<br>
+翻转单个事件标志位
 
-@tparam userdata flgsp (**in**) 事件标志对象强指针<br>
-<br>
 
-@tparam number pos (**in**) 事件的序号<br>
-<br>
 
-@treturn number
-+ ● **rc** 返回值
-  + ○ **0** 没有错误
+@tparam userdata flgsp (**in**) 事件标志对象强指针
+
+@tparam number pos (**in**) 事件的序号
+
+@treturn number 错误码<br>
+　● **0** 没有错误
 
 @usage
 flg:x1i(1) -- 翻转事件1
@@ -313,46 +296,41 @@ end
 
 
 --[[--------
-等待触发事件<br>
-<br>
+等待触发事件
 
-@tparam userdata flgsp (**in**) 事件标志对象强指针<br>
-<br>
+
+
+@tparam userdata flgsp (**in**) 事件标志对象强指针
 
 @tparam string trigger (**in**) 事件触发条件<br>
-..● **"sa"** 所有事件位被置1触发<br>
-..● **"so"** 任意事件位被置1触发<br>
-..● **"ca"** 所有事件位被清0触发<br>
-..● **"co"** 任意事件位被清0触发<br>
-..● **"ta"** 所有事件位发生翻转触发<br>
-..● **"to"** 任意事件位发生翻转触发<br>
-<br>
+　● **"sa"** 所有事件位被置 **1** 触发<br>
+　● **"so"** 任意事件位被置 **1** 触发<br>
+　● **"ca"** 所有事件位被清 **0** 触发<br>
+　● **"co"** 任意事件位被清 **0** 触发<br>
+　● **"ta"** 所有事件位发生翻转触发<br>
+　● **"to"** 任意事件位发生翻转触发
 
 @tparam boolean consumption (**in**) 是否消费事件<br>
-..● **消费**事件是指，当线程等到事件被唤醒，可以选择是否**清除**事件标志。<br>
-..● **清除**的含义是：<br>
-....○ 当线程等待的是位图中的事件位被置1，**清除**是指将这些位清0；<br>
-....○ 当线程等待的是位图中的事件位被清0，**清除**是指将这些位置1；<br>
-..● 此参数对**trigger**取值 **"sa"**，**"so"**，**"ca"**，**"co"** 有效；<br>
-..● 此参数对**trigger**取值 **"ta"**，**"to"**，无意义。<br>
-<br>
+　● **消费** 事件是指，当线程等到事件被唤醒，可以选择是否 **清除** 事件标志。<br>
+　● **清除** 的含义是：<br>
+　　○ 当线程等待的是位图中的事件位被置 **1** ，**清除** 是指将这些位清 **0** ；<br>
+　　○ 当线程等待的是位图中的事件位被清 **0** ，**清除** 是指将这些位置 **1** ；<br>
+　● 此参数对 **trigger** 取值 **"sa"** ， **"so"** ， **"ca"** ， **"co"** 有效；<br>
+　● 此参数对 **trigger** 取值 **"ta"** ， **"to"** ，无意义。
 
 @tparam userdata origin (**in,out**) 事件的状态位图<br>
-..● 当参数trigger取值**"sa"**，**"so"**，**"ca"**，**"co"**时：(**out**) 返回触发时的事件状态位图<br>
-..● 当参数trigger取值**"ta"**，**"to"**时：<br>
-....○ (**in**) 用于比较的初始值<br>
-....○ (**out**) 返回触发时的事件状态位图<br>
-<br>
+　● 当参数 **trigger** 取值 **"sa"** ， **"so"** ， **"ca"** ， **"co"** 时：(**out**) 返回触发时的事件状态位图<br>
+　● 当参数 **trigger** 取值 **"ta"** ， **"to"** 时：<br>
+　　○ (**in**) 用于比较的初始值<br>
+　　○ (**out**) 返回触发时的事件状态位图
 
-@tparam userdata msk (**in**) 事件的位图掩码，表示只关注掩码部分的事件<br>
-<br>
+@tparam userdata msk (**in**) 事件的位图掩码，表示只关注掩码部分的事件
 
-@treturn number
-+ ● **rc** 返回值
-  + ○ **0** 没有错误
-  + ○ **-EINVAL** 参数错误
-  + ○ **-EINTR** 等待被中断
-  + ○ **-ENOTTHDCTX** 不在线程上下文中
+@treturn[1] number 返回值<br>
+　● **0** 没有错误<br>
+　● **-EINVAL** 参数错误<br>
+　● **-EINTR** 等待被中断<br>
+　● **-ENOTTHDCTX** 不在线程上下文中
 
 @usage
 flg = xwos.flg.new(32)
@@ -449,49 +427,44 @@ end
 
 
 --[[--------
-检查事件标志<br>
-<br>
+检查事件标志
+
+
 
 若事件没有触发，立即返回，不会等待。
 
-@tparam userdata flgsp (**in**) 事件标志对象强指针<br>
-<br>
+@tparam userdata flgsp (**in**) 事件标志对象强指针
 
 @tparam string trigger (**in**) 事件触发条件<br>
-..● **"sa"** 所有事件位被置1触发<br>
-..● **"so"** 任意事件位被置1触发<br>
-..● **"ca"** 所有事件位被清0触发<br>
-..● **"co"** 任意事件位被清0触发<br>
-..● **"ta"** 所有事件位发生翻转触发<br>
-..● **"to"** 任意事件位发生翻转触发<br>
-<br>
+　● **"sa"** 所有事件位被置 **1** 触发<br>
+　● **"so"** 任意事件位被置 **1** 触发<br>
+　● **"ca"** 所有事件位被清 **0** 触发<br>
+　● **"co"** 任意事件位被清 **0** 触发<br>
+　● **"ta"** 所有事件位发生翻转触发<br>
+　● **"to"** 任意事件位发生翻转触发
 
 @tparam boolean consumption (**in**) 是否消费事件<br>
-..● **消费**事件是指，当线程等到事件被唤醒，可以选择是否**清除**事件标志。<br>
-..● **清除**的含义是：<br>
-....○ 当线程等待的是位图中的事件位被置1，**清除**是指将这些位清0；<br>
-....○ 当线程等待的是位图中的事件位被清0，**清除**是指将这些位置1；<br>
-..● 此参数对**trigger**取值 **"sa"**，**"so"**，**"ca"**，**"co"** 有效；<br>
-..● 此参数对**trigger**取值 **"ta"**，**"to"**，无意义。<br>
-<br>
+　● **消费** 事件是指，当线程等到事件被唤醒，可以选择是否 **清除** 事件标志。<br>
+　● **清除** 的含义是：<br>
+　　○ 当线程等待的是位图中的事件位被置 **1** ， **清除** 是指将这些位清 **0** ；<br>
+　　○ 当线程等待的是位图中的事件位被清 **0** ， **清除** 是指将这些位置 **1** ；<br>
+　● 此参数对 **trigger** 取值 **"sa"** ， **"so"** ， **"ca"** ， **"co"** 有效；<br>
+　● 此参数对 **trigger** 取值 **"ta"** ， **"to"** ，无意义。
 
 @tparam userdata origin (**in,out**) 事件的状态位图<br>
-..● 当参数trigger取值**"sa"**，**"so"**，**"ca"**，**"co"**时：(**out**) 返回触发时的事件状态位图<br>
-..● 当参数trigger取值**"ta"**，**"to"**时：<br>
-....○ (**in**) 用于比较的初始值<br>
-....○ (**out**) 返回触发时的事件状态位图<br>
-<br>
+　● 当参数 **trigger** 取值 **"sa"** ， **"so"** ， **"ca"** ， **"co"** 时：(**out**) 返回触发时的事件状态位图<br>
+　● 当参数 **trigger** 取值 **"ta"** ， **"to"** 时：<br>
+　　○ (**in**) 用于比较的初始值<br>
+　　○ (**out**) 返回触发时的事件状态位图
 
-@tparam userdata msk (**in**) 事件的位图掩码，表示只关注掩码部分的事件<br>
-<br>
+@tparam userdata msk (**in**) 事件的位图掩码，表示只关注掩码部分的事件
 
-@treturn number
-+ ● **rc** 返回值
-  + ○ **0** 没有错误
-  + ○ **-EINVAL** 参数错误
-  + ○ **-EINTR** 等待被中断
-  + ○ **-ENOTTHDCTX** 不在线程上下文中
-  + ○ **-ENODATA** 尝试失败
+@treturn[1] number 返回值<br>
+　● **0** 没有错误<br>
+　● **-EINVAL** 参数错误<br>
+　● **-EINTR** 等待被中断<br>
+　● **-ENOTTHDCTX** 不在线程上下文中<br>
+　● **-ENODATA** 尝试失败
 
 @usage
 flg = xwos.flg.new(32)
@@ -514,50 +487,44 @@ end
 
 
 --[[--------
-限时等待事件标志对象的触发事件<br>
-<br>
+限时等待事件标志对象的触发事件
 
-@tparam userdata flgsp (**in**) 事件标志对象强指针<br>
-<br>
+
+
+@tparam userdata flgsp (**in**) 事件标志对象强指针
 
 @tparam string trigger (**in**) 事件触发条件<br>
-..● **"sa"** 所有事件位被置1触发<br>
-..● **"so"** 任意事件位被置1触发<br>
-..● **"ca"** 所有事件位被清0触发<br>
-..● **"co"** 任意事件位被清0触发<br>
-..● **"ta"** 所有事件位发生翻转触发<br>
-..● **"to"** 任意事件位发生翻转触发<br>
-<br>
+　● **"sa"** 所有事件位被置 **1** 触发<br>
+　● **"so"** 任意事件位被置 **1** 触发<br>
+　● **"ca"** 所有事件位被清 **0** 触发<br>
+　● **"co"** 任意事件位被清 **0** 触发<br>
+　● **"ta"** 所有事件位发生翻转触发<br>
+　● **"to"** 任意事件位发生翻转触发
 
 @tparam boolean consumption (**in**) 是否消费事件<br>
-..● **消费**事件是指，当线程等到事件被唤醒，可以选择是否**清除**事件标志。<br>
-..● **清除**的含义是：<br>
-....○ 当线程等待的是位图中的事件位被置1，**清除**是指将这些位清0；<br>
-....○ 当线程等待的是位图中的事件位被清0，**清除**是指将这些位置1；<br>
-..● 此参数对**trigger**取值 **"sa"**，**"so"**，**"ca"**，**"co"** 有效；<br>
-..● 此参数对**trigger**取值 **"ta"**，**"to"**，无意义。<br>
-<br>
+　● **消费** 事件是指，当线程等到事件被唤醒，可以选择是否 **清除** 事件标志。<br>
+　● **清除** 的含义是：<br>
+　　○ 当线程等待的是位图中的事件位被置 **1** ， **清除** 是指将这些位清 **0** ；<br>
+　　○ 当线程等待的是位图中的事件位被清 **0** ， **清除** 是指将这些位置 **1** ；<br>
+　● 此参数对 **trigger** 取值 **"sa"** ， **"so"** ， **"ca"** ， **"co"** 有效；<br>
+　● 此参数对 **trigger** 取值 **"ta"** ， **"to"** ，无意义。
 
 @tparam userdata origin (**in,out**) 事件的状态位图<br>
-..● 当参数trigger取值**"sa"**，**"so"**，**"ca"**，**"co"**时：(**out**) 返回触发时的事件状态位图<br>
-..● 当参数trigger取值**"ta"**，**"to"**时：<br>
-....○ (**in**) 用于比较的初始值<br>
-....○ (**out**) 返回触发时的事件状态位图<br>
-<br>
+　● 当参数 **trigger** 取值 **"sa"** ， **"so"** ， **"ca"** ， **"co"** 时：(**out**) 返回触发时的事件状态位图<br>
+　● 当参数 **trigger** 取值 **"ta"** ， **"to"** 时：<br>
+　　○ (**in**) 用于比较的初始值<br>
+　　○ (**out**) 返回触发时的事件状态位图
 
-@tparam userdata msk (**in**) 事件的位图掩码，表示只关注掩码部分的事件<br>
-<br>
+@tparam userdata msk (**in**) 事件的位图掩码，表示只关注掩码部分的事件
 
-@tparam number to (**in**) 期望的阻塞等待时间<br>
-<br>
+@tparam number to (**in**) 期望的阻塞等待时间
 
-@treturn number
-+ ● **rc** 返回值
-  + ○ **0** 没有错误
-  + ○ **-EINVAL** 参数错误
-  + ○ **-EINTR** 等待被中断
-  + ○ **-ENOTTHDCTX** 不在线程上下文中
-  + ○ **-ETIMEDOUT** 超时
+@treturn number 返回值<br>
+　● **0** 没有错误<br>
+　● **-EINVAL** 参数错误<br>
+　● **-EINTR** 等待被中断<br>
+　● **-ENOTTHDCTX** 不在线程上下文中<br>
+　● **-ETIMEDOUT** 超时
 
 @usage
 flg = xwos.flg.new(32)

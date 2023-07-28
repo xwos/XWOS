@@ -7,12 +7,14 @@ XWLUA模块：位图
 ]]
 
 --[[--------
-新建位图<br>
-<br>
+新建位图
+
+
 
 @within StaticMethods
 @function xwlib.bmp.new
-@tparam number bits (**in**) 位图中位的数量<br>
+
+@tparam number bits (**in**) 位图中位的数量
 
 @treturn userdata 新的位图
 @usage
@@ -21,15 +23,19 @@ mybmp = xwlib.bmp.new(64) -- 创建包含64个位的位图
 
 
 --[[--------
-元方法：__copy<br>
-<br>
+元方法：__copy
+
+
 
 将位图导出到全局导出表 `xwxt` 中，此方法会逐位拷贝。
 
 @within MetaMethods
 @function bmp:metatable.__copy
+
 @tparam userdata bmp (**in**) 位图对象
+
 @tparam userdata vm (**in**) 目标虚拟机
+
 @usage
 mybmp = ... -- 创建（省略）
 xwxt.somebmp = mybmp -- 复制到全局导出表
@@ -37,13 +43,15 @@ xwxt.somebmp = mybmp -- 复制到全局导出表
 
 
 --[[--------
-元方法：__tostring<br>
-<br>
+元方法：__tostring
+
+
 
 将位图格式化成字符串，可用于终端打印调试。
 
 @within MetaMethods
 @function bmp:metatable.__tostring
+
 @tparam userdata bmp (**in**) 位图对象
 @usage
 mybmp = ... -- 创建（省略）
@@ -52,20 +60,19 @@ print(mybmp)
 
 
 --[[--------
-元方法：__band<br>
-<br>
+元方法：__band
 
-运算符：**位与 &**，此运算符要求两个操作数的位数一致，
+
+
+运算符：**位与 &** ，此运算符要求两个操作数的位数一致，
 会将两个位图对象按位进行与运算，并产生一个新的位图对象返回结果。
 
 @within MetaMethods
 @function bmp:metatable.__band
 
-@tparam userdata opd1 (**in**) 位图对象1<br>
-<br>
+@tparam userdata opd1 (**in**) 位图对象1
 
-@tparam userdata opd2 (**in**) 位图对象2<br>
-<br>
+@tparam userdata opd2 (**in**) 位图对象2
 
 @treturn userdata 结果
 
@@ -85,20 +92,19 @@ print(mybmp3)
 
 
 --[[--------
-元方法：__bor<br>
-<br>
+元方法：__bor
 
-运算符：**位或 |**，此运算符要求两个操作数的位数一致，
+
+
+运算符：**位或 |** ，此运算符要求两个操作数的位数一致，
 会将两个位图对象按位进行或运算，并产生一个新的位图对象返回结果。
 
 @within MetaMethods
 @function bmp:metatable.__bor
 
-@tparam userdata opd1 (**in**) 位图对象1<br>
-<br>
+@tparam userdata opd1 (**in**) 位图对象1
 
-@tparam userdata opd2 (**in**) 位图对象2<br>
-<br>
+@tparam userdata opd2 (**in**) 位图对象2
 
 @treturn userdata 结果
 
@@ -118,20 +124,19 @@ print(mybmp3)
 
 
 --[[--------
-元方法：__bxor<br>
-<br>
+元方法：__bxor
 
-运算符：**位异或 ~**，此运算符要求两个操作数的位数一致，
+
+
+运算符：**位异或 ~** ，此运算符要求两个操作数的位数一致，
 会将两个位图对象按位进行异或运算，并产生一个新的位图对象返回结果。
 
 @within MetaMethods
 @function bmp:metatable.__bxor
 
-@tparam userdata opd1 (**in**) 位图对象1<br>
-<br>
+@tparam userdata opd1 (**in**) 位图对象1
 
-@tparam userdata opd2 (**in**) 位图对象2<br>
-<br>
+@tparam userdata opd2 (**in**) 位图对象2
 
 @treturn userdata 结果
 
@@ -151,16 +156,16 @@ print(mybmp3)
 
 
 --[[--------
-元方法：__bnot<br>
-<br>
+元方法：__bnot
+
+
 
 运算符：**位取反 ~**，此运算符会将位图对象按位进行取反运算，并产生一个新的位图对象返回结果。
 
 @within MetaMethods
 @function bmp:metatable.__bnot
 
-@tparam userdata opd1 (**in**) 位图对象1<br>
-<br>
+@tparam userdata opd1 (**in**) 位图对象1
 
 @treturn userdata 结果
 
@@ -179,16 +184,16 @@ print(mybmp2)
 
 
 --[[--------
-元方法：__len<br>
-<br>
+元方法：__len
+
+
 
 运算符：**计算长度 #**，此运算符会返回位图中位数。
 
 @within MetaMethods
 @function bmp:metatable.__len
 
-@tparam userdata opd1 (**in**) 位图对象1<br>
-<br>
+@tparam userdata opd1 (**in**) 位图对象1
 
 @treturn userdata 结果
 
@@ -203,19 +208,18 @@ print(#mybmp)
 
 
 --[[--------
-元方法：__eq<br>
-<br>
+元方法：__eq
+
+
 
 运算符：**比较相等 ==**，此运算符会返回位图中位数。
 
 @within MetaMethods
 @function bmp:metatable.__eq
 
-@tparam userdata opd1 (**in**) 位图对象1<br>
-<br>
+@tparam userdata opd1 (**in**) 位图对象1
 
-@tparam userdata opd2 (**in**) 位图对象2<br>
-<br>
+@tparam userdata opd2 (**in**) 位图对象2
 
 @treturn boolean 是否相等
 
@@ -235,11 +239,11 @@ end
 
 
 --[[--------
-将位图全部填1<br>
-<br>
+将位图全部填 **1**
 
-@tparam userdata bmp (**in**) 位图对象<br>
-<br>
+
+
+@tparam userdata bmp (**in**) 位图对象
 
 @usage
 mybmp = xwlib.bmp.new(64) -- 创建一个包含64个位的位图
@@ -256,11 +260,11 @@ end
 
 
 --[[--------
-将位图全部清0<br>
-<br>
+将位图全部清 **0**
 
-@tparam userdata bmp (**in**) 位图对象<br>
-<br>
+
+
+@tparam userdata bmp (**in**) 位图对象
 
 @usage
 mybmp = xwlib.bmp.new(64) -- 创建一个包含64个位的位图
@@ -277,17 +281,16 @@ end
 
 
 --[[--------
-赋值<br>
-<br>
+赋值
 
-此函数与`bmp = opd`不同，`bmp = opd`只是将引用bmp指向opd，
-bmp原来的对象如果没有被别的引用持有，将会被虚拟机回收掉，属于**浅拷贝**。
 
-@tparam userdata bmp (**in**) 目的位图对象<br>
-<br>
 
-@tparam userdata opd (**in**) 源位图对象<br>
-<br>
+此函数与 `bmp = opd` 不同， `bmp = opd` 只是将引用bmp指向opd，
+bmp原来的对象如果没有被别的引用持有，将会被虚拟机回收掉，属于 **浅拷贝** 。
+
+@tparam userdata bmp (**in**) 目的位图对象
+
+@tparam userdata opd (**in**) 源位图对象
 
 @usage
 mybmp1 = xwlib.bmp.new(64) -- 创建一个包含64个位的位图1
@@ -307,11 +310,11 @@ end
 
 
 --[[--------
-计算位图中1的个数<br>
-<br>
+计算位图中 **1** 的个数
 
-@tparam userdata bmp (**in**) 目的位图对象<br>
-<br>
+
+
+@tparam userdata bmp (**in**) 目的位图对象
 
 @treturn number 位图中1的个数
 
@@ -330,11 +333,11 @@ end
 
 
 --[[--------
-从位图的最低位开始，查找第一个被置1的位的序号<br>
-<br>
+从位图的最低位开始，查找第一个被置 **1** 的位的序号
 
-@tparam userdata bmp (**in**) 目的位图对象<br>
-<br>
+
+
+@tparam userdata bmp (**in**) 目的位图对象
 
 @treturn number 序号
 
@@ -354,11 +357,11 @@ end
 
 
 --[[--------
-从位图的最低位开始，查找第一个被清0的位的序号<br>
-<br>
+从位图的最低位开始，查找第一个被清 **0** 的位的序号
 
-@tparam userdata bmp (**in**) 目的位图对象<br>
-<br>
+
+
+@tparam userdata bmp (**in**) 目的位图对象
 
 @treturn number 序号
 
@@ -378,11 +381,11 @@ end
 
 
 --[[--------
-从位图的最高位开始，查找第一个被置1的位的序号<br>
-<br>
+从位图的最高位开始，查找第一个被置 **1** 的位的序号
 
-@tparam userdata bmp (**in**) 目的位图对象<br>
-<br>
+
+
+@tparam userdata bmp (**in**) 目的位图对象
 
 @treturn number 序号
 
@@ -402,11 +405,11 @@ end
 
 
 --[[--------
-从位图的最高位开始，查找第一个被清0的位的序号<br>
-<br>
+从位图的最高位开始，查找第一个被清 **0** 的位的序号
 
-@tparam userdata bmp (**in**) 目的位图对象<br>
-<br>
+
+
+@tparam userdata bmp (**in**) 目的位图对象
 
 @treturn number 序号
 
@@ -426,20 +429,17 @@ end
 
 
 --[[--------
-依次将位图中的位置1<br>
-<br>
+依次将位图中的位置 **1**
 
-@tparam userdata bmp (**in**) 目的位图对象<br>
-<br>
 
-@tparam userdata pos1 (**in**) 位的序号1<br>
-<br>
 
-@tparam userdata pos2 (**in**) (**optional**) 位的序号2<br>
-<br>
+@tparam userdata bmp (**in**) 目的位图对象
 
-@tparam userdata ... (**in**) (**optional**) 位的序号n<br>
-<br>
+@tparam userdata pos1 (**in**) 位的序号1
+
+@tparam userdata pos2 (**in**) (**optional**) 位的序号2
+
+@tparam userdata ... (**in**) (**optional**) 位的序号n
 
 @usage
 mybmp = xwlib.bmp.new(64) -- 创建一个包含64个位的位图
@@ -456,14 +456,13 @@ end
 
 
 --[[--------
-将位图中的掩码部分全部置1<br>
-<br>
+将位图中的掩码部分全部置 **1**
 
-@tparam userdata bmp (**in**) 目的位图对象<br>
-<br>
 
-@tparam userdata msk (**in**) 掩码位图<br>
-<br>
+
+@tparam userdata bmp (**in**) 目的位图对象
+
+@tparam userdata msk (**in**) 掩码位图
 
 @usage
 mybmp = xwlib.bmp.new(64) -- 创建一个包含64个位的位图
@@ -483,20 +482,17 @@ end
 
 
 --[[--------
-依次将位图中的位清0<br>
-<br>
+依次将位图中的位清 **0**
 
-@tparam userdata bmp (**in**) 目的位图对象<br>
-<br>
 
-@tparam userdata pos1 (**in**) 位的序号1<br>
-<br>
 
-@tparam userdata pos2 (**in**) (**optional**) 位的序号2<br>
-<br>
+@tparam userdata bmp (**in**) 目的位图对象
 
-@tparam userdata ... (**in**) (**optional**) 位的序号n<br>
-<br>
+@tparam userdata pos1 (**in**) 位的序号1
+
+@tparam userdata pos2 (**in**) (**optional**) 位的序号2
+
+@tparam userdata ... (**in**) (**optional**) 位的序号n
 
 @usage
 mybmp = xwlib.bmp.new(64) -- 创建一个包含64个位的位图
@@ -513,14 +509,13 @@ end
 
 
 --[[--------
-将位图中的掩码部分全部清0<br>
-<br>
+将位图中的掩码部分全部清 **0**
 
-@tparam userdata bmp (**in**) 目的位图对象<br>
-<br>
 
-@tparam userdata msk (**in**) 掩码位图<br>
-<br>
+
+@tparam userdata bmp (**in**) 目的位图对象
+
+@tparam userdata msk (**in**) 掩码位图
 
 @usage
 mybmp = xwlib.bmp.new(64) -- 创建一个包含64个位的位图
@@ -540,20 +535,17 @@ end
 
 
 --[[--------
-依次将位图中的位翻转<br>
-<br>
+依次将位图中的位翻转
 
-@tparam userdata bmp (**in**) 目的位图对象<br>
-<br>
 
-@tparam userdata pos1 (**in**) 位的序号1<br>
-<br>
 
-@tparam userdata pos2 (**in**) (**optional**) 位的序号2<br>
-<br>
+@tparam userdata bmp (**in**) 目的位图对象
 
-@tparam userdata ... (**in**) (**optional**) 位的序号n<br>
-<br>
+@tparam userdata pos1 (**in**) 位的序号1
+
+@tparam userdata pos2 (**in**) (**optional**) 位的序号2
+
+@tparam userdata ... (**in**) (**optional**) 位的序号n
 
 @usage
 mybmp = xwlib.bmp.new(64) -- 创建一个包含64个位的位图
@@ -570,14 +562,13 @@ end
 
 
 --[[--------
-将位图中的掩码部分全部翻转<br>
-<br>
+将位图中的掩码部分全部翻转
 
-@tparam userdata bmp (**in**) 目的位图对象<br>
-<br>
 
-@tparam userdata msk (**in**) 掩码位图<br>
-<br>
+
+@tparam userdata bmp (**in**) 目的位图对象
+
+@tparam userdata msk (**in**) 掩码位图
 
 @usage
 mybmp = xwlib.bmp.new(64) -- 创建一个包含64个位的位图
@@ -597,14 +588,13 @@ end
 
 
 --[[--------
-测试位图中的某个位<br>
-<br>
+测试位图中的某个位
 
-@tparam userdata bmp (**in**) 目的位图对象<br>
-<br>
 
-@tparam number pos (**in**) 位的序号<br>
-<br>
+
+@tparam userdata bmp (**in**) 目的位图对象
+
+@tparam number pos (**in**) 位的序号
 
 @treturn boolean
 
@@ -625,14 +615,13 @@ end
 
 
 --[[--------
-测试位图中的掩码部分的位是否全部置1<br>
-<br>
+测试位图中的掩码部分的位是否全部置 **1**
 
-@tparam userdata bmp (**in**) 目的位图对象<br>
-<br>
 
-@tparam userdata msk (**in**) 掩码位图<br>
-<br>
+
+@tparam userdata bmp (**in**) 目的位图对象
+
+@tparam userdata msk (**in**) 掩码位图
 
 @treturn boolean
 
@@ -657,14 +646,13 @@ end
 
 
 --[[--------
-测试位图中的掩码部分的位是否至少有一位置1<br>
-<br>
+测试位图中的掩码部分的位是否至少有一位置 **1**
 
-@tparam userdata bmp (**in**) 目的位图对象<br>
-<br>
 
-@tparam userdata msk (**in**) 掩码位图<br>
-<br>
+
+@tparam userdata bmp (**in**) 目的位图对象
+
+@tparam userdata msk (**in**) 掩码位图
 
 @treturn boolean
 
@@ -689,14 +677,13 @@ end
 
 
 --[[--------
-测试位图中的掩码部分的位是否全部清0<br>
-<br>
+测试位图中的掩码部分的位是否全部清 **0**
 
-@tparam userdata bmp (**in**) 目的位图对象<br>
-<br>
 
-@tparam userdata msk (**in**) 掩码位图<br>
-<br>
+
+@tparam userdata bmp (**in**) 目的位图对象
+
+@tparam userdata msk (**in**) 掩码位图
 
 @treturn boolean
 
@@ -721,14 +708,13 @@ end
 
 
 --[[--------
-测试位图中的掩码部分的位是否至少有一位清0<br>
-<br>
+测试位图中的掩码部分的位是否至少有一位清 **0**
 
-@tparam userdata bmp (**in**) 目的位图对象<br>
-<br>
 
-@tparam userdata msk (**in**) 掩码位图<br>
-<br>
+
+@tparam userdata bmp (**in**) 目的位图对象
+
+@tparam userdata msk (**in**) 掩码位图
 
 @treturn boolean
 

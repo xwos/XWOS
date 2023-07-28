@@ -90,7 +90,7 @@ xwtm_t xwtm_ft(xwtm_t dur)
  *
  * **系统时间戳** 是每CPU私有变量。代码运行在哪个CPU，访问的就是哪个私有变量。
  *
- * `XWOS的系统时间戳 = XWOS的系统时间 + 滴答时间定时器中数值换算成纳秒的时间`
+ * `XWOS的系统时间戳 = XWOS的系统时间 + 滴答定时器距离下一次中断还有多少时间`
  */
 static __xwos_inline_api
 xwtm_t xwtm_nowts(void)

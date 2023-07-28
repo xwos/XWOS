@@ -489,7 +489,6 @@ xwer_t xwos_cond_wait_to(struct xwos_cond * cond,
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 无效的指针或空指针
  * @retval -EINVAL: 参数无效
- * @retval -EINTR: 等待被中断
  * @retval -ENOTTHDCTX: 不在线程上下文中
  * @note
  * + 上下文：线程

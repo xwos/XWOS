@@ -8,19 +8,18 @@ XWLUA模块：UART
 --[[--------
 注册UART对象
 
-在C代码中为XWLUA注册UART对象
+
+
+在C代码中为XWLUA注册UART对象。
 
 @within CAPI
 @function xwds.uart.xwlua_uart_register
 
-@param L **(lua_State *)** 虚拟机指针（向哪个虚拟机注册）<br>
-<br>
+@param L **(lua_State *)** (**in**) 虚拟机指针（向哪个虚拟机注册）
 
-@param name **(const char *)** 在Lua语言中的符号名<br>
-<br>
+@param name **(const char *)** (**in**) 在Lua语言中的符号名
 
-@param dmauartc **(struct xwds_dmauartc *)** UART对象<br>
-<br>
+@param dmauartc **(struct xwds_dmauartc *)** (**in**) UART对象
 
 @usage
 void xwlua_uart_register(lua_State * L, const char * name, struct xwds_dmauartc * dmauartc);
@@ -33,17 +32,16 @@ xwlua_uart_register(L, "uart1", &stm32cube_usart1_cb);
 --[[--------
 删除UART对象
 
-在C代码中删除UART对象
 
+
+在C代码中删除UART对象。
 
 @within CAPI
 @function xwds.uart.xwlua_uart_unregister
 
-@param L **(lua_State *)** 虚拟机指针（从哪个虚拟机删除）<br>
-<br>
+@param L **(lua_State *)** (**in**) 虚拟机指针（从哪个虚拟机删除）
 
-@param name **(const char *)** 在Lua语言中的符号名<br>
-<br>
+@param name **(const char *)** (**in**) 在Lua语言中的符号名
 
 @usage
 void xwlua_uart_unregister(lua_State * L, const char * name);
@@ -51,42 +49,39 @@ void xwlua_uart_unregister(lua_State * L, const char * name);
 
 
 --[[--------
-元方法：__tostring<br>
-<br>
+元方法：__tostring
+
+
 
 将UART对象格式化成字符串，可用于终端打印调试。
 
 @within MetaMethods
-@function thdsp:metatable.__tostring
+@function xwds.uart:metatable.__tostring
 
-@tparam userdata uart (**in**) C代码中注册的UART控制器<br>
-<br>
-@usage
-print(thdsp)
+@tparam userdata uart (**in**) C代码中注册的UART控制器
 ]]
 
 
 --[[--------
-从接收队列中获取数据<br>
-<br>
+从接收队列中获取数据
 
-@tparam userdata uart (**in**) C代码中注册的UART控制器<br>
-<br>
 
-@tparam number size (**in**) 申请的缓冲区大小<br>
-<br>
 
-@tparam number time (**in**) 期望的阻塞等待时间<br>
-<br>
+@tparam userdata uart (**in**) C代码中注册的UART控制器
 
-@treturn {number,number,string}
-+ ● **rc** 此方法的返回值
-  + ○ **0** 没有错误
-  + ○ **-EINTR** 等待被中断
-  + ○ **-ENOTTHDCTX** 不在线程上下文中
-  + ○ **-ETIMEDOUT** 超时
-+ ● **rxsize** 实际接受的大小
-+ ● **rxd** 接收的数据
+@tparam number size (**in**) 申请的缓冲区大小
+
+@tparam number time (**in**) 期望的阻塞等待时间
+
+@treturn number 错误码<br>
+　● **0** 没有错误<br>
+　● **-EINTR** 等待被中断<br>
+　● **-ENOTTHDCTX** 不在线程上下文中<br>
+　● **-ETIMEDOUT** 超时
+
+@treturn number 实际接受的大小
+
+@treturn string 接收的数据
 
 @usage
 -- 从uart3接收数据，接收10个字节，最多等待时间2s
@@ -97,23 +92,23 @@ end
 
 
 --[[--------
-尝试从接收队列中获取数据<br>
-<br>
+尝试从接收队列中获取数据
 
-@tparam userdata uart (**in**) C代码中注册的UART控制器<br>
-<br>
 
-@tparam number size (**in**) 申请的缓冲区大小<br>
-<br>
 
-@treturn {number,number,string}
-+ ● **rc** 此方法的返回值
-  + ○ **0** 没有错误
-  + ○ **-EINTR** 等待被中断
-  + ○ **-ENOTTHDCTX** 不在线程上下文中
-  + ○ **-ENODATA** 尝试失败
-+ ● **rxsize** 实际接受的大小
-+ ● **rxd** 接收的数据
+@tparam userdata uart (**in**) C代码中注册的UART控制器
+
+@tparam number size (**in**) 申请的缓冲区大小
+
+@treturn number 错误码<br>
+　● **0** 没有错误<br>
+　● **-EINTR** 等待被中断<br>
+　● **-ENOTTHDCTX** 不在线程上下文中<br>
+　● **-ENODATA** 尝试失败
+
+@treturn number 实际接受的大小
+
+@treturn string 接收的数据
 
 @usage
 -- 尝试从uart3接收数据，接收10个字节
@@ -124,25 +119,23 @@ end
 
 
 --[[--------
-发送数据<br>
-<br>
+发送数据
 
-@tparam userdata uart (**in**) C代码中注册的UART控制器<br>
-<br>
 
-@tparam string data (**in**) 待发送的数据<br>
-<br>
 
-@tparam number time (**optional**) (**in**) 期望的阻塞等待时间<br>
-<br>
+@tparam userdata uart (**in**) C代码中注册的UART控制器
 
-@treturn {number,number,string}
-+ ● **rc** 此方法的返回值
-  + ○ **0** 没有错误
-  + ○ **-EINTR** 等待被中断
-  + ○ **-ENOTTHDCTX** 不在线程上下文中
-  + ○ **-ETIMEDOUT** 超时
-+ ● **txsize** 实际发送的大小
+@tparam string data (**in**) 待发送的数据
+
+@tparam number time (**optional**) (**in**) 期望的阻塞等待时间
+
+@treturn number 错误码<br>
+　● **0** 没有错误<br>
+　● **-EINTR** 等待被中断<br>
+　● **-ENOTTHDCTX** 不在线程上下文中<br>
+　● **-ETIMEDOUT** 超时
+
+@treturn number 实际发送的大小
 
 @usage
 -- 打包{88, 87, 79, 83}

@@ -8,14 +8,11 @@ XWLUA模块：信号量
 ]]
 
 --[[--------
-新建信号量<br>
-<br>
+新建信号量
 
-@tparam number val (**in**) 信号量的初始值<br>
-<br>
+@tparam number val (**in**) 信号量的初始值
 
-@tparam number max (**in**) 信号量的最大值，0表示使用最大值<br>
-<br>
+@tparam number max (**in**) 信号量的最大值，0表示使用最大值
 
 @treturn userdata 新的信号量对象的强指针 `semsp`
 
