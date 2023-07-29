@@ -162,11 +162,23 @@ int xwlua_mtxsp_lock_to(lua_State * L)
         return 1;
 }
 
+int xwlua_mtxsp_get_lkst(lua_State * L)
+{
+        xwlua_mtx_sp * mtxsp;
+        xwsq_t lkst;
+
+        mtxsp = (xwlua_mtx_sp *)luaL_checkudata(L, 1, "xwlua_mtx_sp");
+        xwos_mtx_getlkst(mtxsp->mtx, &lkst);
+        lua_pushinteger(L, (lua_Integer)lkst);
+        return 1;
+}
+
 const luaL_Reg xwlua_mtxsp_indexmethod[] = {
         {"unlock", xwlua_mtxsp_unlock},
         {"lock", xwlua_mtxsp_lock},
         {"trylock", xwlua_mtxsp_trylock},
         {"lock_to", xwlua_mtxsp_lock_to},
+        {"get_lkst", xwlua_mtxsp_get_lkst},
         {NULL, NULL},
 };
 

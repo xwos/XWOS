@@ -286,8 +286,8 @@ struct xwos_cblk {
  * @brief XWOS锁状态
  */
 enum xwos_lkst_em {
-        XWOS_LKST_LOCKED = 0U, /**< 锁定 */
-        XWOS_LKST_UNLOCKED = 1U, /**< 未锁定 */
+        XWOS_LKST_UNLOCKED = 0U, /**< 未锁定 */
+        XWOS_LKST_LOCKED = 1U, /**< 锁定 */
 };
 
 struct xwos_mtx;

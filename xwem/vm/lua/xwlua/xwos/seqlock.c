@@ -324,6 +324,17 @@ int xwlua_sqlksp_rdex_trylock(lua_State * L)
         return 1;
 }
 
+int xwlua_sqlksp_get_lkst(lua_State * L)
+{
+        xwlua_sqlk_sp * sqlksp;
+        xwsq_t lkst;
+
+        sqlksp = (xwlua_sqlk_sp *)luaL_checkudata(L, 1, "xwlua_sqlk_sp");
+        lkst = sqlksp->luasqlk->lkst;
+        lua_pushinteger(L, (lua_Integer)lkst);
+        return 1;
+}
+
 const luaL_Reg xwlua_sqlksp_indexmethod[] = {
         {"rd_begin", xwlua_sqlksp_rd_begin},
         {"rd_retry", xwlua_sqlksp_rd_retry},
@@ -333,6 +344,7 @@ const luaL_Reg xwlua_sqlksp_indexmethod[] = {
         {"wr_trylock", xwlua_sqlksp_wr_trylock},
         {"rdex_lock", xwlua_sqlksp_rdex_lock},
         {"rdex_trylock", xwlua_sqlksp_rdex_trylock},
+        {"get_lkst", xwlua_sqlksp_get_lkst},
         {NULL, NULL},
 };
 

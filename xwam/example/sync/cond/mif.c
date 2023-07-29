@@ -171,7 +171,7 @@ xwer_t conddemo_thd_func(void * arg)
                                 is_updated = false;
                         } else {
                                 /* 错误返回，自旋锁不会自动上锁 */
-                                if (XWOS_LKST_UNLOCKED == lkst) {
+                                if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
                                         xwos_splk_lock(&conddemo_lock);
                                 }
                         }

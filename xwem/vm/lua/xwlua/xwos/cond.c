@@ -211,7 +211,7 @@ int xwlua_condsp_wait(lua_State * L)
                         if (ulualksp.ud) {
                                 ulock.osal.mtx = ulualksp.mtxsp->mtx;
                                 xwos_mtx_getlkst(ulualksp.mtxsp->mtx, &lkst);
-                                if (XWOS_LKST_UNLOCKED == lkst) {
+                                if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
                                         lktype = XWOS_LK_NONE;
                                 } else {
                                         lktype = XWOS_LK_MTX;
@@ -222,7 +222,7 @@ int xwlua_condsp_wait(lua_State * L)
                         if (ulualksp.ud) {
                                 ulock.osal.splk = &ulualksp.splksp->luasplk->ossplk;
                                 lkst = ulualksp.splksp->luasplk->lkst;
-                                if (XWLUA_SPLK_LKST_LOCK == lkst) {
+                                if ((xwsq_t)XWLUA_SPLK_LKST_LOCK == lkst) {
                                         lktype = XWOS_LK_SPLK;
                                 } else {
                                         lktype = XWOS_LK_NONE;
@@ -252,7 +252,7 @@ int xwlua_condsp_wait(lua_State * L)
         }
         rc = xwos_cond_wait(condsp->cond, ulock, lktype, NULL, &lkst);
         if (rc < 0) {
-                if (XWOS_LKST_LOCKED == lkst) {
+                if ((xwsq_t)XWOS_LKST_LOCKED == lkst) {
                         switch (lktype) {
                         case XWOS_LK_MTX:
                                 xwos_mtx_unlock(ulock.osal.mtx);
@@ -302,7 +302,7 @@ int xwlua_condsp_wait_to(lua_State * L)
                         if (ulualksp.ud) {
                                 ulock.osal.mtx = ulualksp.mtxsp->mtx;
                                 xwos_mtx_getlkst(ulualksp.mtxsp->mtx, &lkst);
-                                if (XWOS_LKST_UNLOCKED == lkst) {
+                                if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
                                         lktype = XWOS_LK_NONE;
                                 } else {
                                         lktype = XWOS_LK_MTX;
@@ -313,7 +313,7 @@ int xwlua_condsp_wait_to(lua_State * L)
                         if (ulualksp.ud) {
                                 ulock.osal.splk = &ulualksp.splksp->luasplk->ossplk;
                                 lkst = ulualksp.splksp->luasplk->lkst;
-                                if (XWLUA_SPLK_LKST_LOCK == lkst) {
+                                if ((xwsq_t)XWLUA_SPLK_LKST_LOCK == lkst) {
                                         lktype = XWOS_LK_SPLK;
                                 } else {
                                         lktype = XWOS_LK_NONE;
@@ -347,7 +347,7 @@ int xwlua_condsp_wait_to(lua_State * L)
         }
         rc = xwos_cond_wait_to(condsp->cond, ulock, lktype, NULL, to, &lkst);
         if (rc < 0) {
-                if (XWOS_LKST_LOCKED == lkst) {
+                if ((xwsq_t)XWOS_LKST_LOCKED == lkst) {
                         switch (lktype) {
                         case XWOS_LK_MTX:
                                 xwos_mtx_unlock(ulock.osal.mtx);
@@ -397,7 +397,7 @@ int xwlua_condsp_wait_unintr(lua_State * L)
                         if (ulualksp.ud) {
                                 ulock.osal.mtx = ulualksp.mtxsp->mtx;
                                 xwos_mtx_getlkst(ulualksp.mtxsp->mtx, &lkst);
-                                if (XWOS_LKST_UNLOCKED == lkst) {
+                                if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
                                         lktype = XWOS_LK_NONE;
                                 } else {
                                         lktype = XWOS_LK_MTX;
@@ -408,7 +408,7 @@ int xwlua_condsp_wait_unintr(lua_State * L)
                         if (ulualksp.ud) {
                                 ulock.osal.splk = &ulualksp.splksp->luasplk->ossplk;
                                 lkst = ulualksp.splksp->luasplk->lkst;
-                                if (XWLUA_SPLK_LKST_LOCK == lkst) {
+                                if ((xwsq_t)XWLUA_SPLK_LKST_LOCK == lkst) {
                                         lktype = XWOS_LK_SPLK;
                                 } else {
                                         lktype = XWOS_LK_NONE;
@@ -438,7 +438,7 @@ int xwlua_condsp_wait_unintr(lua_State * L)
         }
         rc = xwos_cond_wait_unintr(condsp->cond, ulock, lktype, NULL, &lkst);
         if (rc < 0) {
-                if (XWOS_LKST_LOCKED == lkst) {
+                if ((xwsq_t)XWOS_LKST_LOCKED == lkst) {
                         switch (lktype) {
                         case XWOS_LK_MTX:
                                 xwos_mtx_unlock(ulock.osal.mtx);

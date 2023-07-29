@@ -141,9 +141,9 @@ xwer_t xwup_mtx_getlkst(struct xwup_mtx * mtx, xwsq_t * lkst)
         val = (xwssq_t)0;
         rc = XWUP_SEM_API(getvalue, &mtx->fake, &val);
         if (val) {
-                *lkst = XWOS_LKST_LOCKED;
+                *lkst = (xwsq_t)XWOS_LKST_LOCKED;
         } else {
-                *lkst = XWOS_LKST_UNLOCKED;
+                *lkst = (xwsq_t)XWOS_LKST_UNLOCKED;
         }
         return rc;
 

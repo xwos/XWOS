@@ -156,13 +156,13 @@ xwer_t stm32cube_spi1m_drv_xfer(struct xwds_spim * spim,
                                        ulk, XWOS_LK_SPLK, NULL,
                                        to, &lkst);
                 if (XWOK == rc) {
-                        if (XWOS_LKST_UNLOCKED == lkst) {
+                        if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
                                 xwos_splk_lock(&drvdata->splk);
                         }
                         *size = hspi1_drvdata.size;
                         rc = drvdata->rc;
                 } else {
-                        if (XWOS_LKST_UNLOCKED == lkst) {
+                        if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
                                 xwos_splk_lock(&drvdata->splk);
                         }
                         drvdata->rc = -ECANCELED;
@@ -321,13 +321,13 @@ xwer_t stm32cube_spi4m_drv_xfer(struct xwds_spim * spim,
                                        ulk, XWOS_LK_SPLK, NULL,
                                        to, &lkst);
                 if (XWOK == rc) {
-                        if (XWOS_LKST_UNLOCKED == lkst) {
+                        if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
                                 xwos_splk_lock(&drvdata->splk);
                         }
                         *size = hspi4_drvdata.size;
                         rc = drvdata->rc;
                 } else {
-                        if (XWOS_LKST_UNLOCKED == lkst) {
+                        if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
                                 xwos_splk_lock(&drvdata->splk);
                         }
                         drvdata->rc = -ECANCELED;

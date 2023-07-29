@@ -164,10 +164,10 @@ xwer_t stm32cube_usart1_drv_tx(struct xwds_uartc * uartc,
                                        ulk, XWOS_LK_SPLK, NULL,
                                        to, &lkst);
                 if (XWOK == rc) {
-                        XWOS_BUG_ON(XWOS_LKST_UNLOCKED == lkst);
+                        XWOS_BUG_ON((xwsq_t)XWOS_LKST_UNLOCKED == lkst);
                         rc = drvdata->tx.rc;
                 } else {
-                        if (XWOS_LKST_UNLOCKED == lkst) {
+                        if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
                                 xwos_splk_lock(&drvdata->tx.splk);
                         }
                         if (-EINPROGRESS == drvdata->tx.rc) {
@@ -375,10 +375,10 @@ xwer_t stm32cube_usart3_drv_tx(struct xwds_uartc * uartc,
                                        ulk, XWOS_LK_SPLK, NULL,
                                        to, &lkst);
                 if (XWOK == rc) {
-                        XWOS_BUG_ON(XWOS_LKST_UNLOCKED == lkst);
+                        XWOS_BUG_ON((xwsq_t)XWOS_LKST_UNLOCKED == lkst);
                         rc = drvdata->tx.rc;
                 } else {
-                        if (XWOS_LKST_UNLOCKED == lkst) {
+                        if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
                                 xwos_splk_lock(&drvdata->tx.splk);
                         }
                         if (-EINPROGRESS == drvdata->tx.rc) {

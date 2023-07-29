@@ -139,9 +139,9 @@ xwer_t xwmp_mtx_getlkst(struct xwmp_mtx * mtx, xwsq_t * lkst)
         val = (xwssq_t)0;
         rc = xwmp_sem_getvalue(&mtx->fake, &val);
         if (val) {
-                *lkst = XWOS_LKST_LOCKED;
+                *lkst = (xwsq_t)XWOS_LKST_LOCKED;
         } else {
-                *lkst = XWOS_LKST_UNLOCKED;
+                *lkst = (xwsq_t)XWOS_LKST_UNLOCKED;
         }
         return rc;
 

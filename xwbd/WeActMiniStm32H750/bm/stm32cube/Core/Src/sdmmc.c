@@ -321,7 +321,7 @@ xwer_t MX_SDMMC1_SD_Read(uint8_t * buf, uint32_t blkaddr,
           if (XWOK == rc) {
             rc = hsd1_xfer_rc;
           } else {
-            if (XWOS_LKST_UNLOCKED == lkst) {
+            if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
               xwos_splk_lock(&hsd1_lock);
             }
           }
@@ -416,7 +416,7 @@ xwer_t MX_SDMMC1_SD_Write(uint8_t * data, uint32_t blkaddr,
           if (XWOK == rc) {
             rc = hsd1_xfer_rc;
           } else {
-            if (XWOS_LKST_UNLOCKED == lkst) {
+            if ((xwsq_t)XWOS_LKST_UNLOCKED == lkst) {
               xwos_splk_lock(&hsd1_lock);
             }
           }
