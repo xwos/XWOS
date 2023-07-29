@@ -55,6 +55,6 @@ xwer_t xwup_plsem_wait(struct xwup_plsem * sem);
 xwer_t xwup_plsem_wait_to(struct xwup_plsem * sem, xwtm_t xwtm);
 xwer_t xwup_plsem_wait_unintr(struct xwup_plsem * sem);
 xwer_t xwup_plsem_trywait(struct xwup_plsem * sem);
-xwer_t xwup_plsem_getvalue(struct xwup_plsem * sem, xwssq_t * sval);
+xwer_t xwup_plsem_get_value(struct xwup_plsem * sem, xwssq_t * sval);
 
 #endif /* xwos/up/sync/plsem.h */

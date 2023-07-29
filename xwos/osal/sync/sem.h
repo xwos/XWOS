@@ -459,9 +459,9 @@ xwer_t xwos_sem_trywait(struct xwos_sem * sem)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwer_t xwos_sem_getvalue(struct xwos_sem * sem, xwssq_t * sval)
+xwer_t xwos_sem_get_value(struct xwos_sem * sem, xwssq_t * sval)
 {
-        return xwosdl_sem_getvalue(&sem->ossem, sval);
+        return xwosdl_sem_get_value(&sem->ossem, sval);
 }
 
 /**

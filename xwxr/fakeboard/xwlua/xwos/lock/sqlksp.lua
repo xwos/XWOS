@@ -280,3 +280,28 @@ end
 ]]
 function sqlksp:unlock(sqlksp)
 end
+
+
+--[[--------
+获取顺序锁状态
+
+
+
+@tparam userdata sqlksp (**in**) 顺序锁对象强指针
+
+@treturn number 锁状态<br>
+　● **0** 未锁定<br>
+　● **1** 独占读锁<br>
+　● **2** 写锁
+
+@usage
+lock = xwos.sqlk.new()
+rc = lock:lock()
+if (rc == 0) then
+  -- 临界区
+  lkst = lock:get_lkst()
+  lock:unlock()
+end
+]]
+function sqlksp:get_lkst(sqlksp)
+end

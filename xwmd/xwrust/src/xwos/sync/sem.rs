@@ -105,7 +105,7 @@
 //!
 //! # 获取信号量值
 //!
-//! 可以通过方法 [`Sem::getvalue()`] 获取信号量的值，此方法只是读取值，不会 **消费** 信号量。
+//! 可以通过方法 [`Sem::get_value()`] 获取信号量的值，此方法只是读取值，不会 **消费** 信号量。
 //!
 //!
 //! # 绑定到信号选择器
@@ -152,7 +152,7 @@ extern "C" {
     fn xwrustffi_sem_trywait(sem: *mut XwosSem) -> XwEr;
     fn xwrustffi_sem_wait_to(sem: *mut XwosSem, to: XwTm) -> XwEr;
     fn xwrustffi_sem_wait_unintr(sem: *mut XwosSem) -> XwEr;
-    fn xwrustffi_sem_getvalue(sem: *mut XwosSem, sval: *mut XwSsq) -> XwEr;
+    fn xwrustffi_sem_get_value(sem: *mut XwosSem, sval: *mut XwSsq) -> XwEr;
 }
 
 /// 信号量的错误码
@@ -497,7 +497,7 @@ impl Sem {
     ///     let sem: Sem = Sem::new();
     ///     sem.init(0, XwSsq::MAX);
     ///     // ...省略...
-    ///     let res = sem.getvalue();
+    ///     let res = sem.get_value();
     ///     match res {
     ///         Ok(val) => {
     ///             // 返回信号量的值
@@ -510,12 +510,12 @@ impl Sem {
     /// ```
     ///
     /// [`Ok()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
-    pub fn getvalue(&self) -> Result<XwSsq, SemError> {
+    pub fn get_value(&self) -> Result<XwSsq, SemError> {
         unsafe {
             let rc = xwrustffi_sem_acquire(self.sem.get(), *self.tik.get());
             if rc == 0 {
                 let mut val: XwSsq = 0;
-                xwrustffi_sem_getvalue(self.sem.get(), &mut val);
+                xwrustffi_sem_get_value(self.sem.get(), &mut val);
                 xwrustffi_sem_put(self.sem.get());
                 Ok(val)
             } else {

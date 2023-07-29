@@ -159,7 +159,7 @@ xwer_t xwup_vsem_thaw(struct xwup_vsem * vsem)
 }
 
 __xwup_code
-xwer_t xwup_vsem_getvalue(struct xwup_vsem * vsem, xwssq_t * sval)
+xwer_t xwup_vsem_get_value(struct xwup_vsem * vsem, xwssq_t * sval)
 {
         *sval = vsem->count;
         return XWOK;

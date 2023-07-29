@@ -262,3 +262,20 @@ end
 ]]
 function semsp:wait_to(semsp, to)
 end
+
+
+--[[--------
+获取信号量的值
+
+
+
+@tparam userdata semsp (**in**) 自旋锁对象强指针
+
+@treturn number 信号量的值
+
+@usage
+sem = xwos.sem.new(1, 0)
+value = sem:get_value()
+]]
+function semsp:get_value(semsp)
+end

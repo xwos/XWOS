@@ -382,9 +382,9 @@ xwer_t xwos_mtx_trylock(struct xwos_mtx * mtx)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwer_t xwos_mtx_getlkst(struct xwos_mtx * mtx, xwsq_t * lkst)
+xwer_t xwos_mtx_get_lkst(struct xwos_mtx * mtx, xwsq_t * lkst)
 {
-        return xwosdl_mtx_getlkst(&mtx->osmtx, lkst);
+        return xwosdl_mtx_get_lkst(&mtx->osmtx, lkst);
 }
 
 /**

@@ -133,13 +133,13 @@ xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx)
 }
 
 static __xwup_inline_api
-xwer_t xwup_mtx_getlkst(struct xwup_mtx * mtx, xwsq_t * lkst)
+xwer_t xwup_mtx_get_lkst(struct xwup_mtx * mtx, xwsq_t * lkst)
 {
         xwer_t rc;
         xwssq_t val;
 
         val = (xwssq_t)0;
-        rc = XWUP_SEM_API(getvalue, &mtx->fake, &val);
+        rc = XWUP_SEM_API(get_value, &mtx->fake, &val);
         if (val) {
                 *lkst = (xwsq_t)XWOS_LKST_LOCKED;
         } else {

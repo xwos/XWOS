@@ -210,13 +210,13 @@ int xwlua_semsp_wait_to(lua_State * L)
         return 1;
 }
 
-int xwlua_semsp_getvalue(lua_State * L)
+int xwlua_semsp_get_value(lua_State * L)
 {
         xwlua_sem_sp * semsp;
         xwssq_t val;
 
         semsp = (xwlua_sem_sp *)luaL_checkudata(L, 1, "xwlua_sem_sp");
-        xwos_sem_getvalue(semsp->sem, &val);
+        xwos_sem_get_value(semsp->sem, &val);
         lua_pushinteger(L, (lua_Integer)val);
         return 1;
 }
@@ -230,7 +230,7 @@ const luaL_Reg xwlua_semsp_indexmethod[] = {
         {"wait", xwlua_semsp_wait},
         {"trywait", xwlua_semsp_trywait},
         {"wait_to", xwlua_semsp_wait_to},
-        {"getvalue", xwlua_semsp_getvalue},
+        {"get_value", xwlua_semsp_get_value},
         {NULL, NULL},
 };
 

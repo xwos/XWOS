@@ -860,7 +860,7 @@ xwer_t xwup_mtx_trylock(struct xwup_mtx * mtx)
 }
 
 __xwup_api
-xwer_t xwup_mtx_getlkst(struct xwup_mtx * mtx, xwsq_t * lkst)
+xwer_t xwup_mtx_get_lkst(struct xwup_mtx * mtx, xwsq_t * lkst)
 {
         volatile struct xwup_mtxtree * ownertree;
 

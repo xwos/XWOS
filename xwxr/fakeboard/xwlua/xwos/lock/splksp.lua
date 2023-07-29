@@ -159,3 +159,27 @@ end
 ]]
 function splksp:unlock(splksp)
 end
+
+
+--[[--------
+获取自旋锁状态
+
+
+
+@tparam userdata splksp (**in**) 自旋锁对象强指针
+
+@treturn number 锁状态<br>
+　● **0** 未锁定<br>
+　● **1** 锁定
+
+@usage
+lock = xwos.splk.new()
+rc = lock:lock()
+if (rc == 0) then
+  -- 临界区
+  lkst = lock:get_lkst()
+  lock:unlock()
+end
+]]
+function splksp:get_lkst(splksp)
+end

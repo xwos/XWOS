@@ -168,7 +168,7 @@ int xwlua_mtxsp_get_lkst(lua_State * L)
         xwsq_t lkst;
 
         mtxsp = (xwlua_mtx_sp *)luaL_checkudata(L, 1, "xwlua_mtx_sp");
-        xwos_mtx_getlkst(mtxsp->mtx, &lkst);
+        xwos_mtx_get_lkst(mtxsp->mtx, &lkst);
         lua_pushinteger(L, (lua_Integer)lkst);
         return 1;
 }

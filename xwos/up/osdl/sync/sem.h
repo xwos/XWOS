@@ -180,12 +180,12 @@ xwer_t xwosdl_sem_trywait(struct xwosdl_sem * sem)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sem_getvalue(struct xwosdl_sem * sem, xwssq_t * sval)
+xwer_t xwosdl_sem_get_value(struct xwosdl_sem * sem, xwssq_t * sval)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((sval), "nullptr", -EFAULT);
 
-        return xwup_rtsem_getvalue(sem, sval);
+        return xwup_rtsem_get_value(sem, sval);
 }
 
 #elif defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
@@ -352,12 +352,12 @@ xwer_t xwosdl_sem_trywait(struct xwosdl_sem * sem)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sem_getvalue(struct xwosdl_sem * sem, xwssq_t * sval)
+xwer_t xwosdl_sem_get_value(struct xwosdl_sem * sem, xwssq_t * sval)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((sval), "nullptr", -EFAULT);
 
-        return xwup_plsem_getvalue(sem, sval);
+        return xwup_plsem_get_value(sem, sval);
 }
 
 #else

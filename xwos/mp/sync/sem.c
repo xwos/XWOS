@@ -1540,7 +1540,7 @@ xwer_t xwmp_rtsem_trywait(struct xwmp_sem * sem)
 #endif
 
 __xwmp_api
-xwer_t xwmp_sem_getvalue(struct xwmp_sem * sem, xwssq_t * sval)
+xwer_t xwmp_sem_get_value(struct xwmp_sem * sem, xwssq_t * sval)
 {
         *sval = sem->count;
         return XWOK;
@@ -1557,7 +1557,7 @@ xwer_t xwmp_sem_getvalue(struct xwmp_sem * sem, xwssq_t * sval)
  * + 上下文：任意
  */
 __xwmp_api
-xwer_t xwmp_sem_gettype(struct xwmp_sem * sem, xwid_t * type)
+xwer_t xwmp_sem_get_type(struct xwmp_sem * sem, xwid_t * type)
 {
         *type = sem->type;
         return XWOK;

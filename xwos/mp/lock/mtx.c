@@ -1033,7 +1033,7 @@ err_mtx_grab:
 }
 
 __xwmp_api
-xwer_t xwmp_mtx_getlkst(struct xwmp_mtx * mtx, xwsq_t * lkst)
+xwer_t xwmp_mtx_get_lkst(struct xwmp_mtx * mtx, xwsq_t * lkst)
 {
         xwer_t rc;
         volatile struct xwmp_mtxtree * ownertree;

@@ -216,17 +216,17 @@ end
 @tparam userdata mtxsp (**in**) 互斥锁对象强指针
 
 @treturn number 锁状态<br>
-　● **1** 锁定<br>
-　● **0** 未锁定
+　● **0** 未锁定<br>
+　● **1** 锁定
 
 @usage
 lock = xwos.mtx.new()
 rc = lock:lock()
 if (rc == 0) then
   -- 临界区
-  lkst = lock:getlkst()
+  lkst = lock:get_lkst()
   lock:unlock()
 end
 ]]
-function mtxsp:unlock(mtxsp)
+function mtxsp:get_lkst(mtxsp)
 end

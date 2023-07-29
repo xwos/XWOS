@@ -122,7 +122,7 @@ xwer_t xwmp_rtsem_wait_unintr(struct xwmp_sem * sem);
 xwer_t xwmp_rtsem_trywait(struct xwmp_sem * sem);
 #endif
 
-xwer_t xwmp_sem_getvalue(struct xwmp_sem * sem, xwssq_t * sval);
-xwer_t xwmp_sem_gettype(struct xwmp_sem * sem, xwid_t * type);
+xwer_t xwmp_sem_get_value(struct xwmp_sem * sem, xwssq_t * sval);
+xwer_t xwmp_sem_get_type(struct xwmp_sem * sem, xwid_t * type);
 
 #endif /* xwos/mp/sync/sem.h */

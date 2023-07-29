@@ -131,13 +131,13 @@ xwer_t xwmp_mtx_trylock(struct xwmp_mtx * mtx)
 }
 
 static __xwmp_inline_api
-xwer_t xwmp_mtx_getlkst(struct xwmp_mtx * mtx, xwsq_t * lkst)
+xwer_t xwmp_mtx_get_lkst(struct xwmp_mtx * mtx, xwsq_t * lkst)
 {
         xwer_t rc;
         xwssq_t val;
 
         val = (xwssq_t)0;
-        rc = xwmp_sem_getvalue(&mtx->fake, &val);
+        rc = xwmp_sem_get_value(&mtx->fake, &val);
         if (val) {
                 *lkst = (xwsq_t)XWOS_LKST_LOCKED;
         } else {
