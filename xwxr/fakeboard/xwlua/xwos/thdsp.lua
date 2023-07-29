@@ -70,6 +70,27 @@ print(thdsp)
 
 
 --[[--------
+中断线程的阻塞态和睡眠态
+
+
+
+　● 此LuaAPI会中断线程的 **阻塞状态** 和 **睡眠状态** 。
+　● 阻塞和睡眠的函数将以错误码 `-EINTR` (`-4`) 退出。
+　● 如果线程的 **阻塞状态** 是不可被中断的，中断将不会发生。
+
+@tparam userdata thdsp (**in**) 线程对象强指针
+
+@treturn number 错误码<br>
+　● **0** 没有错误
+
+@usage
+rc = thdsp:intr()
+]]
+function thdsp:intr(thdsp)
+end
+
+
+--[[--------
 通知线程退出
 
 

@@ -62,6 +62,19 @@ xwer_t xwosdl_thd_create(xwosdl_thd_d * thdd,
 #endif
 
 __xwup_code
+xwer_t xwosdl_thd_intr(struct xwosdl_thd * thd, xwsq_t tik)
+{
+        xwer_t rc;
+
+        rc = xwup_thd_acquire(thd, tik);
+        if (XWOK == rc) {
+                xwup_thd_intr(thd);
+                xwup_thd_put(thd); // cppcheck-suppress [misra-c2012-17.7]
+        }
+        return rc;
+}
+
+__xwup_code
 xwer_t xwosdl_thd_quit(struct xwosdl_thd * thd, xwsq_t tik)
 {
         xwer_t rc;

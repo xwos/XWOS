@@ -19,19 +19,75 @@
 -- > limitations under the License.
 --
 
+-- 测试1：成功获取信号量
 tstsem = xwos.sem.new(0, -1)
 xwxt["tstsem"] = tstsem
-function semthd_main()
-  rc = xwxt.tstsem:wait()
+function childthd_main()
+  local sp = xwos.cthd.sp()
+  local tstsem = xwxt.tstsem
+  print("Child Thread:", sp)
+  rc = tstsem:wait()
   if (rc == 0) then
-    print("Wait semaphore ... OK")
+    print("[Child Thread] Wait semaphore ... OK, value:", tstsem:get_value(), ", max:", tstsem:get_max())
   else
-    print("Wait semaphore ... error:", rc)
+    print("[Child Thread] Wait semaphore ... error:", rc)
   end
 end
-semthd = xwos.thd.call(semthd_main)
+print("Main Thread:", xwos.cthd.sp())
+childthd = xwos.thd.call(childthd_main)
+xwos.cthd.sleep(xwtm.ms(100))
 tstsem:post()
-semthd:stop()
+childthd:stop()
+xwxt.tstsem = nil
+xwxt.gc()
+tstsem = nil
+collectgarbage()
+
+
+-- 测试2：等待超时
+tstsem = xwos.sem.new(0, -1)
+xwxt["tstsem"] = tstsem
+function childthd_main()
+  local sp = xwos.cthd.sp()
+  local tstsem = xwxt.tstsem
+  print("Child Thread:", sp)
+  rc = tstsem:wait_to(xwtm.ms(100))
+  if (rc == 0) then
+    print("[Child Thread] Wait semaphore ... OK, value:", tstsem:get_value(), ", max:", tstsem:get_max())
+  else
+    print("[Child Thread] Wait semaphore ... error:", rc, ",value:", tstsem:get_value(), ", max:", tstsem:get_max())
+  end
+end
+print("Main Thread:", xwos.cthd.sp())
+childthd = xwos.thd.call(childthd_main)
+xwos.cthd.sleep(xwtm.ms(1000))
+tstsem:post()
+childthd:stop()
+xwxt.tstsem = nil
+xwxt.gc()
+tstsem = nil
+collectgarbage()
+
+
+-- 测试3：等待中断
+tstsem = xwos.sem.new(0, -1)
+xwxt["tstsem"] = tstsem
+function childthd_main()
+  local sp = xwos.cthd.sp()
+  local tstsem = xwxt.tstsem
+  print("Child Thread:", sp)
+  rc = tstsem:wait()
+  if (rc == 0) then
+    print("[Child Thread] Wait semaphore ... OK, value:", tstsem:get_value(), ", max:", tstsem:get_max())
+  else
+    print("[Child Thread] Wait semaphore ... error:", rc, ",value:", tstsem:get_value(), ", max:", tstsem:get_max())
+  end
+end
+print("Main Thread:", xwos.cthd.sp())
+childthd = xwos.thd.call(childthd_main)
+xwos.cthd.sleep(xwtm.ms(1000))
+childthd:intr()
+childthd:stop()
 xwxt.tstsem = nil
 xwxt.gc()
 tstsem = nil

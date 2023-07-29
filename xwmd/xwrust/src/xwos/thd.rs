@@ -108,11 +108,29 @@
 //!
 //! 静态线程的句柄 [`DThdHandle`] 功能类似于 [`std::thread::JoinHandle`] ，可用于控制动态子线程的退出。
 //!
+//! #### 中断动态线程的阻塞态和睡眠态
+//!
+//! 方法 [`DThdHandle::intr()`] 可用于中断线程的 **阻塞态** 和 **睡眠态** 。
+//! 阻塞和睡眠的方法将以返回值 **负** 的 [`EINTR`] 退出。错误码 [`EINTR`] 会被转换为各个可阻塞线程的操作系统对象的错误码：
+//!
+//! + [`MutexError::Interrupt`]
+//! + [`SemError::Interrupt`]
+//! + [`CondError::Interrupt`]
+//! + [`FlgError::Interrupt`]
+//! + [`BrError::Interrupt`]
+//! + [`SelError::Interrupt`]
+//!
+//! 但是，当动态线程的 **阻塞状态** 是不可被中断的，不会发生中断。
+//!
+//!
+//! 方法 [`DThdHandle::intr()`] 是基于 [`ThdD::intr()`] 实现的，调用后者与前者在功能上没有区别。
+//! 动态线程自身的 [`ThdD`] 可通过 [`cthd::i()`] 获取。
+//!
 //! #### 通知动态线程退出
 //!
 //! 方法 [`DThdHandle::quit()`] 可用于父线程通知动态子线程退出。此方法不会等待动态子线程退出。
 //!
-//! 方法 [`DThdHandle::quit()`] 是基于 [`ThdD::quit()`] 实现的，调用后者与前者在功能上没有区别。后者可以由静态现在自己调用，自己通知自己退出。
+//! 方法 [`DThdHandle::quit()`] 是基于 [`ThdD::quit()`] 实现的，调用后者与前者在功能上没有区别。
 //! 动态线程自身的 [`ThdD`] 可通过 [`cthd::i()`] 获取。
 //!
 //!
@@ -122,6 +140,9 @@
 //! + [`MutexError::Interrupt`]
 //! + [`SemError::Interrupt`]
 //! + [`CondError::Interrupt`]
+//! + [`FlgError::Interrupt`]
+//! + [`BrError::Interrupt`]
+//! + [`SelError::Interrupt`]
 //!
 //! 但是，当动态子线程的 **阻塞状态** 是不可被中断的，方法 [`DThdHandle::quit()`] 只会为动态子线程设置 **退出状态** ，不会发生中断。
 //!
@@ -283,6 +304,24 @@
 //!
 //! 静态线程的句柄 [`SThdHandle`] 由方法 [`SThd::run()`] 返回，功能类似于 [`std::thread::JoinHandle`] ，可用于控制静态子线程的退出。
 //!
+//! #### 中断静态线程的阻塞态和睡眠态
+//!
+//! 方法 [`SThdHandle::intr()`] 可用于中断线程的 **阻塞态** 和 **睡眠态** 。
+//! 阻塞和睡眠的方法将以返回值 **负** 的 [`EINTR`] 退出。错误码 [`EINTR`] 会被转换为各个可阻塞线程的操作系统对象的错误码：
+//!
+//! + [`MutexError::Interrupt`]
+//! + [`SemError::Interrupt`]
+//! + [`CondError::Interrupt`]
+//! + [`FlgError::Interrupt`]
+//! + [`BrError::Interrupt`]
+//! + [`SelError::Interrupt`]
+//!
+//! 但是，当静态线程的 **阻塞状态** 是不可被中断的，不会发生中断。
+//!
+//!
+//! 方法 [`SThdHandle::intr()`] 是基于 [`ThdD::intr()`] 实现的，调用后者与前者在功能上没有区别。
+//! 动态线程自身的 [`ThdD`] 可通过 [`cthd::i()`] 获取。
+//!
 //! #### 通知动态线程退出
 //!
 //! 方法 [`SThdHandle::quit()`] 可用于父线程通知静态子线程退出。此方法不会等待静态子线程退出。
@@ -298,6 +337,9 @@
 //! + [`MutexError::Interrupt`]
 //! + [`SemError::Interrupt`]
 //! + [`CondError::Interrupt`]
+//! + [`FlgError::Interrupt`]
+//! + [`BrError::Interrupt`]
+//! + [`SelError::Interrupt`]
 //!
 //! 但是，当静态子线程的 **阻塞状态** 是不可被中断的，方法 [`SThdHandle::quit()`] 只会为静态子线程设置 **退出状态** ，不会发生中断。
 //!
@@ -378,6 +420,7 @@ extern "C" {
                           arg: *mut c_void) -> XwEr;
     fn xwrustffi_thd_acquire(thd: *mut c_void, tik: XwSq) -> XwEr;
     fn xwrustffi_thd_release(thd: *mut c_void, tik: XwSq) -> XwEr;
+    fn xwrustffi_thd_intr(thd: *mut c_void, tik: XwSq) -> XwEr;
     fn xwrustffi_thd_quit(thd: *mut c_void, tik: XwSq) -> XwEr;
     fn xwrustffi_thd_join(thd: *mut c_void, tik: XwSq, trc: *mut XwEr) -> XwEr;
     fn xwrustffi_thd_stop(thd: *mut c_void, tik: XwSq, trc: *mut XwEr) -> XwEr;
@@ -441,6 +484,13 @@ impl ThdD {
             func();
         }
         0
+    }
+
+    /// 中断线程的阻塞态和睡眠态
+    pub fn intr(&self) -> XwEr {
+        unsafe {
+            xwrustffi_thd_intr(self.thd, self.tik)
+        }
     }
 
     /// 通知线程退出
@@ -941,6 +991,10 @@ struct DThdHandleInner<R> {
 }
 
 impl<R> DThdHandleInner<R> {
+    fn intr(&self) -> XwEr {
+        self.thdd.intr()
+    }
+
     fn quit(&self) -> XwEr {
         self.thdd.quit()
     }
@@ -1006,9 +1060,20 @@ impl<R> DThdHandle<R> {
         &self.inner.thdd
     }
 
-    /// 返回线程的元素。
+    /// 返回线程的元素
     pub fn element(&self) -> &DThdElement {
         &self.inner.element
+    }
+
+    /// 中断线程的阻塞态和睡眠态
+    ///
+    /// 此方法用于中断线程的 **阻塞态** 和 **睡眠态** 。
+    ///
+    /// # 上下文
+    ///
+    /// + 线程、中断、中断底半部、空闲任务
+    pub fn intr(&self) -> XwEr {
+        self.inner.intr()
     }
 
     /// 通知动态线程退出
@@ -1334,6 +1399,19 @@ where
         N * (XwStk::BITS / 8) as XwSz
     }
 
+    /// 中断线程的阻塞态和睡眠态
+    ///
+    /// 此方法用于中断线程的 **阻塞状态** 和 **睡眠状态** 。
+    ///
+    /// # 上下文
+    ///
+    /// + 线程、中断、中断底半部、空闲任务
+    pub fn intr(&self) -> XwEr {
+        unsafe {
+            xwrustffi_thd_intr(self.thd.get() as _, *self.tik.get())
+        }
+    }
+
     /// 通知静态线程退出
     ///
     /// 此方法用于向线程设置 **退出状态** 。
@@ -1418,6 +1496,19 @@ where
     [XwStk; N]: Sized,
     R: Send
 {
+    /// 中断线程的阻塞态和睡眠态
+    ///
+    /// 此方法用于中断线程的 **阻塞状态** 和 **睡眠状态** 。
+    ///
+    /// # 上下文
+    ///
+    /// + 线程、中断、中断底半部、空闲任务
+    pub fn intr(&self) -> XwEr {
+        unsafe {
+            (*(self.sthd.get())).intr()
+        }
+    }
+
     /// 通知静态线程退出
     ///
     /// 此方法用于向线程设置 **退出状态** 。

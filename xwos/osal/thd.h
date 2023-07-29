@@ -40,6 +40,11 @@
  * 用户可以在程序运行时通过 `xwos_thd_create()` 动态创建线程。
  *
  *
+ * ## 中断线程的阻塞态和睡眠态
+ *
+ * 用户可以通过 `xwos_thd_intr()` 中断另一个线程的阻塞态和睡眠态。
+ *
+ *
  * ## 线程的连接态与分离态
  *
  * XWOS线程的分离态与连接态是参考 **pthread** 设计的：
@@ -360,6 +365,26 @@ xwer_t xwos_thd_release(xwos_thd_d thdd)
 }
 
 /**
+ * @brief XWOS API：中断线程的阻塞态和睡眠态
+ * @param[in] thdd: 线程对象描述符
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EOBJDEAD: 线程对象无效
+ * @note
+ * + 上下文：线程、中断、中断底半部、空闲任务
+ * @details
+ * + 此CAPI可在 **线程** 、 **中断** 、 **中断底半部** 、 **空闲任务** 上下文中使用。
+ * + 此CAPI会中断线程的 **阻塞状态** 和 **睡眠状态** ，
+ *   阻塞和睡眠的函数将以错误码 `-EINTR` 退出。
+ * + 如果线程的 **阻塞状态** 是不可被中断的，中断将不会发生。
+ */
+static __xwos_inline_api
+xwer_t xwos_thd_intr(xwos_thd_d thdd)
+{
+        return xwosdl_thd_intr(&thdd.thd->osthd, thdd.tik);
+}
+
+/**
  * @brief XWOS API：通知线程退出
  * @param[in] thdd: 线程对象描述符
  * @return 错误码
@@ -368,17 +393,16 @@ xwer_t xwos_thd_release(xwos_thd_d thdd)
  * @note
  * + 上下文：线程、中断、中断底半部、空闲任务
  * @details
- * 此CAPI用于父线程 **A** 向另一个子线程 **B** 设置 **退出状态** 。
+ * 此CAPI用于向另一个子线程 **B** 设置 **退出状态** 。
  *
- * + 调用此CAPI的父线程 **A** 不会等待子线程 **B** 退出。
+ * + 此CAPI可在 **线程** 、 **中断** 、 **中断底半部** 、 **空闲任务** 上下文中使用，
+ *   不会等待子线程 **B** 退出。
  * + 子线程 **B** 可以是 **Joinable** 的，也可以是 **Detached** 的。
  * + 此CAPI可被重复调用，子线程 **B** **退出状态** 一旦被设置，不可被清除。
  * + 此CAPI会中断子线程 **B** 的 **阻塞状态** 和 **睡眠状态** ，
  *   阻塞和睡眠的函数将以错误码 `-EINTR` 退出。
  * + 如果子线程 **B** 的 **阻塞状态** 是不可被中断的，中断将不会发生。
- * + 子线程 **B** 可以通过 `xwos_cthd_shld_stop()` 检测 **退出状态** ，
- *   并以此作为线程循环的退出条件。
- * + 此CAPI还可在其他上下文调用。
+ * + 子线程 **B** 可以通过 `xwos_cthd_shld_stop()` 检测 **退出状态** 。
  *
  *
  * 在XWOS-V2.0以前，此CAPI被命名为 `xwos_thd_cancel()` ，

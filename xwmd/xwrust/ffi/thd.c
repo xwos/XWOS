@@ -63,6 +63,11 @@ xwer_t xwrustffi_thd_release(struct xwos_thd * thd, xwsq_t tik)
         return xwos_thd_release((xwos_thd_d){thd, tik});
 }
 
+xwer_t xwrustffi_thd_intr(struct xwos_thd * thd, xwsq_t tik)
+{
+        return xwos_thd_intr((xwos_thd_d){thd, tik});
+}
+
 xwer_t xwrustffi_thd_quit(struct xwos_thd * thd, xwsq_t tik)
 {
         return xwos_thd_quit((xwos_thd_d){thd, tik});

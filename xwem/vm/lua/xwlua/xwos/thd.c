@@ -383,21 +383,26 @@ const luaL_Reg xwlua_thdsp_metamethod[] = {
         {NULL, NULL},
 };
 
-int xwlua_thdsp_stop(lua_State * L)
+int xwlua_thdsp_detach(lua_State * L)
 {
         xwlua_thd_sp * thdsp;
-        xwer_t rc, trc;
+        xwer_t rc;
 
         thdsp = (xwlua_thd_sp *)luaL_checkudata(L, 1, "xwlua_thd_sp");
-        rc = xwos_thd_stop(*thdsp, &trc);
-        if (XWOK == rc) {
-                lua_pushinteger(L, (lua_Integer)rc);
-                lua_pushinteger(L, (lua_Integer)trc);
-        } else {
-                lua_pushinteger(L, (lua_Integer)rc);
-                lua_pushnil(L);
-        }
-        return 2;
+        rc = xwos_thd_detach(*thdsp);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
+}
+
+int xwlua_thdsp_intr(lua_State * L)
+{
+        xwlua_thd_sp * thdsp;
+        xwer_t rc;
+
+        thdsp = (xwlua_thd_sp *)luaL_checkudata(L, 1, "xwlua_thd_sp");
+        rc = xwos_thd_intr(*thdsp);
+        lua_pushinteger(L, (lua_Integer)rc);
+        return 1;
 }
 
 int xwlua_thdsp_quit(lua_State * L)
@@ -428,15 +433,21 @@ int xwlua_thdsp_join(lua_State * L)
         return 2;
 }
 
-int xwlua_thdsp_detach(lua_State * L)
+int xwlua_thdsp_stop(lua_State * L)
 {
         xwlua_thd_sp * thdsp;
-        xwer_t rc;
+        xwer_t rc, trc;
 
         thdsp = (xwlua_thd_sp *)luaL_checkudata(L, 1, "xwlua_thd_sp");
-        rc = xwos_thd_detach(*thdsp);
-        lua_pushinteger(L, (lua_Integer)rc);
-        return 1;
+        rc = xwos_thd_stop(*thdsp, &trc);
+        if (XWOK == rc) {
+                lua_pushinteger(L, (lua_Integer)rc);
+                lua_pushinteger(L, (lua_Integer)trc);
+        } else {
+                lua_pushinteger(L, (lua_Integer)rc);
+                lua_pushnil(L);
+        }
+        return 2;
 }
 
 int xwlua_thdsp_migrate(lua_State * L)
@@ -453,10 +464,11 @@ int xwlua_thdsp_migrate(lua_State * L)
 }
 
 const luaL_Reg xwlua_thdsp_indexmethod[] = {
-        {"stop", xwlua_thdsp_stop},
+        {"detach", xwlua_thdsp_detach},
+        {"intr", xwlua_thdsp_intr},
         {"quit", xwlua_thdsp_quit},
         {"join", xwlua_thdsp_join},
-        {"detach", xwlua_thdsp_detach},
+        {"stop", xwlua_thdsp_stop},
         {"migrate", xwlua_thdsp_migrate},
         {NULL, NULL},
 };

@@ -24,9 +24,9 @@ TARGET ?= XWOS
 
 MKCFG := ${XWOS}/xwbs/util/el/mkcfg.el
 
-all: $(WKSPC) cfg html rustdoc luadoc
+all: $(WKSPC) cfg capi rustdoc luadoc
 
-html: cfg
+capi: cfg
 	cd .. && doxygen -d Preprocessor xwxr/doxyfile
 
 rustdoc: cfg

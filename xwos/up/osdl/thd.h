@@ -74,6 +74,8 @@ xwer_t xwosdl_thd_release(struct xwosdl_thd * thd, xwsq_t tik)
         return xwup_thd_release(thd, tik);
 }
 
+xwer_t xwosdl_thd_intr(struct xwosdl_thd * thd, xwsq_t tik);
+
 xwer_t xwosdl_thd_quit(struct xwosdl_thd * thd, xwsq_t tik);
 
 xwer_t xwosdl_thd_join(struct xwosdl_thd * thd, xwsq_t tik, xwer_t * trc);
