@@ -760,7 +760,13 @@ xwer_t xwup_rtsem_trywait(struct xwup_rtsem * sem)
 }
 
 __xwup_api
-xwer_t xwup_rtsem_get_value(struct xwup_rtsem * sem, xwssq_t * sval)
+xwer_t xwup_rtsem_get_max(struct xwup_rtsem * sem, xwssq_t * max)
 {
-        return xwup_vsem_get_value(&sem->vsem, sval);
+        return xwup_vsem_get_max(&sem->vsem, max);
+}
+
+__xwup_api
+xwer_t xwup_rtsem_get_value(struct xwup_rtsem * sem, xwssq_t * val)
+{
+        return xwup_vsem_get_value(&sem->vsem, val);
 }

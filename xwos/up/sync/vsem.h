@@ -44,7 +44,8 @@ xwer_t xwup_vsem_bind(struct xwup_vsem * sem, struct xwup_evt * sel, xwsq_t pos)
 xwer_t xwup_vsem_unbind(struct xwup_vsem * sem, struct xwup_evt * sel);
 xwer_t xwup_vsem_freeze(struct xwup_vsem * sem);
 xwer_t xwup_vsem_thaw(struct xwup_vsem * sem);
-xwer_t xwup_vsem_get_value(struct xwup_vsem * sem, xwssq_t * sval);
+xwer_t xwup_vsem_get_max(struct xwup_vsem * sem, xwssq_t * max);
+xwer_t xwup_vsem_get_value(struct xwup_vsem * sem, xwssq_t * val);
 
 /*
 __xwup_api

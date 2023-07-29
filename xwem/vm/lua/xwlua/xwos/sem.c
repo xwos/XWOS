@@ -210,6 +210,17 @@ int xwlua_semsp_wait_to(lua_State * L)
         return 1;
 }
 
+int xwlua_semsp_get_max(lua_State * L)
+{
+        xwlua_sem_sp * semsp;
+        xwssq_t max;
+
+        semsp = (xwlua_sem_sp *)luaL_checkudata(L, 1, "xwlua_sem_sp");
+        xwos_sem_get_max(semsp->sem, &max);
+        lua_pushinteger(L, (lua_Integer)max);
+        return 1;
+}
+
 int xwlua_semsp_get_value(lua_State * L)
 {
         xwlua_sem_sp * semsp;
@@ -230,6 +241,7 @@ const luaL_Reg xwlua_semsp_indexmethod[] = {
         {"wait", xwlua_semsp_wait},
         {"trywait", xwlua_semsp_trywait},
         {"wait_to", xwlua_semsp_wait_to},
+        {"get_max", xwlua_semsp_get_max},
         {"get_value", xwlua_semsp_get_value},
         {NULL, NULL},
 };

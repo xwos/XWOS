@@ -757,7 +757,13 @@ xwer_t xwup_plsem_trywait(struct xwup_plsem * sem)
 }
 
 __xwup_api
-xwer_t xwup_plsem_get_value(struct xwup_plsem * sem, xwssq_t * sval)
+xwer_t xwup_plsem_get_max(struct xwup_plsem * sem, xwssq_t * max)
 {
-        return xwup_vsem_get_value(&sem->vsem, sval);
+        return xwup_vsem_get_max(&sem->vsem, max);
+}
+
+__xwup_api
+xwer_t xwup_plsem_get_value(struct xwup_plsem * sem, xwssq_t * val)
+{
+        return xwup_vsem_get_value(&sem->vsem, val);
 }

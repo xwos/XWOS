@@ -180,12 +180,21 @@ xwer_t xwosdl_sem_trywait(struct xwosdl_sem * sem)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sem_get_value(struct xwosdl_sem * sem, xwssq_t * sval)
+xwer_t xwosdl_sem_get_max(struct xwosdl_sem * sem, xwssq_t * max)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        XWOS_VALIDATE((sval), "nullptr", -EFAULT);
+        XWOS_VALIDATE((max), "nullptr", -EFAULT);
 
-        return xwup_rtsem_get_value(sem, sval);
+        return xwup_rtsem_get_max(sem, max);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sem_get_value(struct xwosdl_sem * sem, xwssq_t * val)
+{
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        XWOS_VALIDATE((val), "nullptr", -EFAULT);
+
+        return xwup_rtsem_get_value(sem, val);
 }
 
 #elif defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
@@ -352,12 +361,21 @@ xwer_t xwosdl_sem_trywait(struct xwosdl_sem * sem)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sem_get_value(struct xwosdl_sem * sem, xwssq_t * sval)
+xwer_t xwosdl_sem_get_max(struct xwosdl_sem * sem, xwssq_t * max)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        XWOS_VALIDATE((sval), "nullptr", -EFAULT);
+        XWOS_VALIDATE((max), "nullptr", -EFAULT);
 
-        return xwup_plsem_get_value(sem, sval);
+        return xwup_plsem_get_max(sem, max);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sem_get_value(struct xwosdl_sem * sem, xwssq_t * val)
+{
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        XWOS_VALIDATE((val), "nullptr", -EFAULT);
+
+        return xwup_plsem_get_value(sem, val);
 }
 
 #else

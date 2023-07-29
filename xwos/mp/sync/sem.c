@@ -1540,9 +1540,16 @@ xwer_t xwmp_rtsem_trywait(struct xwmp_sem * sem)
 #endif
 
 __xwmp_api
-xwer_t xwmp_sem_get_value(struct xwmp_sem * sem, xwssq_t * sval)
+xwer_t xwmp_sem_get_max(struct xwmp_sem * sem, xwssq_t * max)
 {
-        *sval = sem->count;
+        *max = sem->max;
+        return XWOK;
+}
+
+__xwmp_api
+xwer_t xwmp_sem_get_value(struct xwmp_sem * sem, xwssq_t * val)
+{
+        *val = sem->count;
         return XWOK;
 }
 

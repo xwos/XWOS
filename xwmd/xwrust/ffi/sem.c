@@ -101,7 +101,12 @@ xwer_t xwrustffi_sem_wait_unintr(struct xwos_sem * sem)
         return xwos_sem_wait_unintr(sem);
 }
 
-xwer_t xwrustffi_sem_get_value(struct xwos_sem * sem, xwssq_t * sval)
+xwer_t xwrustffi_sem_get_max(struct xwos_sem * sem, xwssq_t * max)
 {
-        return xwos_sem_get_value(sem, sval);
+        return xwos_sem_get_max(sem, max);
+}
+
+xwer_t xwrustffi_sem_get_value(struct xwos_sem * sem, xwssq_t * val)
+{
+        return xwos_sem_get_value(sem, val);
 }

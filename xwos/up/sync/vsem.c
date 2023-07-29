@@ -159,8 +159,15 @@ xwer_t xwup_vsem_thaw(struct xwup_vsem * vsem)
 }
 
 __xwup_code
-xwer_t xwup_vsem_get_value(struct xwup_vsem * vsem, xwssq_t * sval)
+xwer_t xwup_vsem_get_max(struct xwup_vsem * vsem, xwssq_t * max)
 {
-        *sval = vsem->count;
+        *max = vsem->max;
+        return XWOK;
+}
+
+__xwup_code
+xwer_t xwup_vsem_get_value(struct xwup_vsem * vsem, xwssq_t * val)
+{
+        *val = vsem->count;
         return XWOK;
 }

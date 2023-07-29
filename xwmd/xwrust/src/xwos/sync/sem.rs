@@ -56,8 +56,8 @@
 //!
 //! # 获取信号量
 //!
-//! 当信号量的值大于0时，可以直接取走一个，此时信号量的值减1；
-//! 当信号量的值等于0时，获取信号量的线程就只能阻塞等待，XWOS提供四种方式：
+//! 当信号量的值大于 **0** 时，可以直接取走一个，此时信号量的值减 **1** ；
+//! 当信号量的值等于 **0** 时，获取信号量的线程就只能阻塞等待，XWOS提供四种方式：
 //!
 //! ## 等待并获取信号量
 //!
@@ -103,7 +103,12 @@
 //! 可以通过 [`Sem::thaw()`] 方法将已经冻结的信号量 **解冻**，信号量 **解冻** 后，值被重置为0，此时可重新开始发布信号量。
 //!
 //!
-//! # 获取信号量值
+//! # 获取信号量的最大值
+//!
+//! 可以通过方法 [`Sem::get_max()`] 获取信号量的最大值。
+//!
+//!
+//! # 获取信号量的值
 //!
 //! 可以通过方法 [`Sem::get_value()`] 获取信号量的值，此方法只是读取值，不会 **消费** 信号量。
 //!
@@ -152,7 +157,8 @@ extern "C" {
     fn xwrustffi_sem_trywait(sem: *mut XwosSem) -> XwEr;
     fn xwrustffi_sem_wait_to(sem: *mut XwosSem, to: XwTm) -> XwEr;
     fn xwrustffi_sem_wait_unintr(sem: *mut XwosSem) -> XwEr;
-    fn xwrustffi_sem_get_value(sem: *mut XwosSem, sval: *mut XwSsq) -> XwEr;
+    fn xwrustffi_sem_get_max(sem: *mut XwosSem, max: *mut XwSsq) -> XwEr;
+    fn xwrustffi_sem_get_value(sem: *mut XwosSem, val: *mut XwSsq) -> XwEr;
 }
 
 /// 信号量的错误码
@@ -473,6 +479,53 @@ impl Sem {
                 }
             } else {
                 SemError::NotInit(rc)
+            }
+        }
+    }
+
+    /// 获取信号量对象计数器的最大值
+    ///
+    /// 成功将在 [`Ok()`] 中返回信号量对象计数器的值。
+    ///
+    /// # 错误码
+    ///
+    /// + Err([`SemError::NotInit`]) 信号量没有初始化
+    ///
+    /// # 示例
+    ///
+    /// ```rust
+    /// use xwrust::types::*;
+    /// use xwrust::errno::*;
+    /// use xwrust::xwos::sync::sem::*;
+    ///
+    /// pub fn xwrust_example_sem() {
+    ///     // ...省略...
+    ///     let sem: Sem = Sem::new();
+    ///     sem.init(0, XwSsq::MAX);
+    ///     // ...省略...
+    ///     let res = sem.get_max();
+    ///     match res {
+    ///         Ok(max) => {
+    ///             // 返回信号量的值
+    ///         },
+    ///         Err(e) => {
+    ///             // 返回错误码
+    ///         },
+    ///     };
+    /// }
+    /// ```
+    ///
+    /// [`Ok()`]: <https://doc.rust-lang.org/core/result/enum.Result.html#variant.Ok>
+    pub fn get_max(&self) -> Result<XwSsq, SemError> {
+        unsafe {
+            let rc = xwrustffi_sem_acquire(self.sem.get(), *self.tik.get());
+            if rc == 0 {
+                let mut max: XwSsq = 0;
+                xwrustffi_sem_get_max(self.sem.get(), &mut max);
+                xwrustffi_sem_put(self.sem.get());
+                Ok(max)
+            } else {
+                Err(SemError::NotInit(rc))
             }
         }
     }

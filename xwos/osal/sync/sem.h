@@ -49,11 +49,16 @@
  * + `xwos_sem_trywait()` ：仅测试信号量，可在 **任意** 上下文使用
  *
  *
+ * ## 获取信号量的状态
+ *
+ * + `xwos_sem_get_max()` ：获取信号量中计数器的最大值，可在 **任意** 上下文使用
+ * + `xwos_sem_get_value()` ：获取信号量中计数器的值，可在 **任意** 上下文使用
+ *
+ *
  * ## 冻结与解冻信号量
  *
  * + `xwos_sem_freeze()` ：冻结，可在 **任意** 上下文使用
  * + `xwos_sem_thaw()` ：解冻，可在 **任意** 上下文使用
- *
  *
  *
  * ## 使用信号选择器选择信号量
@@ -449,9 +454,9 @@ xwer_t xwos_sem_trywait(struct xwos_sem * sem)
 }
 
 /**
- * @brief XWOS API：读取信号量对象计数器的值
+ * @brief XWOS API：获取信号量对象计数器的最大值
  * @param[in] sem: 信号量对象的指针
- * @param[out] sval: 指向缓冲区的指针，通过此缓冲区返回信号量对象计数器的值
+ * @param[out] max: 指向缓冲区的指针，通过此缓冲区返回信号量对象计数器的最大值
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针
@@ -459,9 +464,25 @@ xwer_t xwos_sem_trywait(struct xwos_sem * sem)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwer_t xwos_sem_get_value(struct xwos_sem * sem, xwssq_t * sval)
+xwer_t xwos_sem_get_max(struct xwos_sem * sem, xwssq_t * max)
 {
-        return xwosdl_sem_get_value(&sem->ossem, sval);
+        return xwosdl_sem_get_max(&sem->ossem, max);
+}
+
+/**
+ * @brief XWOS API：获取信号量对象计数器的值
+ * @param[in] sem: 信号量对象的指针
+ * @param[out] val: 指向缓冲区的指针，通过此缓冲区返回信号量对象计数器的值
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EFAULT: 空指针
+ * @note
+ * + 上下文：任意
+ */
+static __xwos_inline_api
+xwer_t xwos_sem_get_value(struct xwos_sem * sem, xwssq_t * val)
+{
+        return xwosdl_sem_get_value(&sem->ossem, val);
 }
 
 /**

@@ -77,12 +77,21 @@ xwsq_t xwosdl_sem_gettik(struct xwosdl_sem * sem)
 }
 
 static __xwcc_inline
-xwer_t xwosdl_sem_get_value(struct xwosdl_sem * sem, xwssq_t * sval)
+xwer_t xwosdl_sem_get_max(struct xwosdl_sem * sem, xwssq_t * max)
 {
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        XWOS_VALIDATE((sval), "nullptr", -EFAULT);
+        XWOS_VALIDATE((max), "nullptr", -EFAULT);
 
-        return xwmp_sem_get_value(sem, sval);
+        return xwmp_sem_get_max(sem, max);
+}
+
+static __xwcc_inline
+xwer_t xwosdl_sem_get_value(struct xwosdl_sem * sem, xwssq_t * val)
+{
+        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
+        XWOS_VALIDATE((val), "nullptr", -EFAULT);
+
+        return xwmp_sem_get_value(sem, val);
 }
 
 static __xwcc_inline
