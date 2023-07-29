@@ -296,10 +296,6 @@ int xwlua_condsp_wait_to(lua_State * L)
                 lktype = XWOS_LK_NONE;
                 ulock.anon = NULL;
                 to = XWTM_MAX;
-        } else if (LUA_TNIL == lua_type(L, 2)) {
-                lktype = XWOS_LK_NONE;
-                ulock.anon = NULL;
-                to = XWTM_MAX;
         } else {
                 do {
                         ulualksp.ud = luaL_testudata(L, 2, "xwlua_mtx_sp");

@@ -208,7 +208,8 @@ end
 　● **splksp** 自旋锁<br>
 　● **sqlksp** 顺序锁<br>
 　● **mtxsp** 互斥锁<br>
-　● **nil** 或 **空** 无锁
+　● **nil** 无锁<br>
+　● **省略** 无锁
 
 @treturn number 错误码<br>
 　● **0** 没有错误<br>
@@ -259,13 +260,14 @@ end
 
 @tparam userdata condsp (**in**) 条件量对象强指针
 
-@tparam userdata lock (**in**) 锁对象的强引用指针<br>
+@tparam userdata lock (**optional**) (**in**) 锁对象的强引用指针<br>
 　● **splksp** 自旋锁<br>
 　● **sqlksp** 顺序锁<br>
 　● **mtxsp** 互斥锁<br>
-　● **nil** 无锁
+　● **nil** 无锁<br>
+　● **省略** 无锁，省略此参数时，后面一个参数也被省略
 
-@tparam number to (**in**) 期望的阻塞等待时间
+@tparam number to (**optional**) (**in**) 期望的阻塞等待时间，省略时表示最大时间
 
 @treturn number 错误码<br>
 　● **0** 没有错误<br>
@@ -273,6 +275,17 @@ end
 　● **-EINTR** 等待被中断<br>
 　● **-ENOTTHDCTX** 不在线程上下文中<br>
 　● **-ETIMEDOUT** 超时
+
+@usage
+mycond = xwos.cond.new()
+rc = mycond:wait_to() -- 不包括锁操作，无限等待
+if (rc == 0) then
+  -- 条件成立
+elseif (rc == -4) then
+  -- 等待被中断
+else
+  -- 其他错误发生
+end
 
 @usage
 mycond = xwos.cond.new()
@@ -325,7 +338,8 @@ end
 　● **splksp** 自旋锁<br>
 　● **sqlksp** 顺序锁<br>
 　● **mtxsp** 互斥锁<br>
-　● **nil** 或 **空** 无锁
+　● **nil** 无锁<br>
+　● **省略** 无锁
 
 @treturn number 错误码<br>
 　● **0** 没有错误<br>
