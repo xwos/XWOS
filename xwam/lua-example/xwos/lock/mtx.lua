@@ -30,7 +30,7 @@ function mtxthd_main()
     print("Wait mutex ... error:", rc)
   end
 end
-mtxthd = xwos.thd.call(mtxthd_main)
+mtxthd = xwos.thd.call(mtxthd_main, true)
 tstmtx:unlock()
 mtxthd:stop()
 xwxt.tstmtx = nil

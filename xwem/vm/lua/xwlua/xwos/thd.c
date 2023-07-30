@@ -33,15 +33,15 @@ void xwlua_os_init_thdsp(lua_State * L);
 xwer_t xwlua_thd_script_main(void * arg)
 {
         lua_State * L;
-        const char * script;
+        const char * name;
         xwer_t rc;
         int ret;
 
         L = arg;
-        script = lua_tolstring(L, -1, NULL);
+        name = lua_tolstring(L, -1, NULL);
         ret = lua_pcall(L, 1, LUA_MULTRET, 0);
         if (LUA_OK != ret) {
-                lua_writestringerror("Cannot run %s\n", script);
+                lua_writestringerror("Cannot run %s\n", name);
                 lua_error(L);
                 rc = -ENOEXEC;
         } else {
@@ -56,39 +56,102 @@ int xwlua_thd_dofile(lua_State * L)
         struct xwos_thd_attr attr;
         xwer_t rc;
         const char * arg;
+        const char * name;
         xwos_thd_d thdd;
         xwlua_thd_sp * thdsp;
         lua_State * thdl;
+        int top;
+        int luarc;
 
-        arg = luaL_checkstring(L, 1);
-        thdsp = lua_newuserdatauv(L, sizeof(xwlua_thd_sp), 0);
-        thdl = luaL_newstate();
-        if (thdl) {
-                xwlua_openlibs(thdl);
-                luaL_loadfile(thdl, arg);
-                arg = lua_pushstring(thdl, arg);
-                xwos_thd_attr_init(&attr);
-                attr.name = arg;
-                attr.stack = NULL;
-                attr.stack_size = XWLUA_THD_STACK_SIZE;
-                attr.priority = XWLUA_SCRIPT_PRIORITY;
-                attr.detached = false;
-                attr.privileged = true;
-                rc = xwos_thd_create(&thdd, &attr, xwlua_thd_script_main, thdl);
-                if (XWOK == rc) {
-                        *thdsp = thdd;
-                        xwos_thd_grab(thdd); /* 增加对象的强引用 */
-                        luaL_setmetatable(L, "xwlua_thd_sp");
-                } else {
-                        lua_pop(L, 1);
-                        lua_pushnil(L);
-                        lua_writestringerror("Cannot create thread: %d.", (int)rc);
-                }
-        } else {
-                lua_pop(L, 1);
-                lua_pushnil(L);
-                lua_writestringerror("%s", "Cannot create VM: not enough memory");
+        top = lua_gettop(L);
+        if (top < 1) {
+                lua_writestringerror("%s", "No script file !");
+                goto err_nofile;
         }
+        arg = luaL_checkstring(L, 1); // May throw an exception
+        thdsp = lua_newuserdatauv(L, sizeof(xwlua_thd_sp), 0); // May throw an exception
+        thdl = luaL_newstate();
+        if (NULL == thdl) {
+                lua_writestringerror("%s", "Create VM ... no memory");
+                goto err_new_vm;
+        }
+        xwlua_openlibs(thdl);
+        luarc = luaL_loadfile(thdl, arg);
+        if (LUA_ERRFILE == luarc) {
+                const char * msg = lua_tostring(thdl, -1);
+                lua_writestringerror("%s\n", msg);
+                lua_pop(thdl, 1);  /* remove error message */
+                goto err_loadfile;
+        }
+        xwos_thd_attr_init(&attr);
+        attr.stack = NULL;
+        attr.stack_size = XWLUA_THD_STACK_SIZE;
+        attr.priority = XWLUA_SCRIPT_PRIORITY;
+        do {
+                if (top >= 2) {
+                        if (lua_toboolean(L, 2)) {
+                                attr.detached = false;
+                        } else {
+                                attr.detached = true;
+                        }
+                } else {
+                        attr.detached = true;
+                        attr.name = lua_pushstring(thdl, arg);
+                        attr.privileged = true;
+                        break;
+                }
+                if (top >= 3) {
+                        if (lua_isstring(L, 3)) {
+                                name = lua_tostring(L, 3);
+                                if (NULL != name) {
+                                        name = lua_pushstring(thdl, name);
+                                } else {
+                                        name = lua_pushstring(thdl, arg);
+                                }
+                        } else {
+                                name = lua_pushstring(thdl, arg);
+                        }
+                        attr.name = name;
+                } else {
+                        attr.name = lua_pushstring(thdl, arg);
+                        attr.privileged = true;
+                        break;
+                }
+                if (top >= 4) {
+                        if (lua_toboolean(L, 4)) {
+                                attr.privileged = false;
+                        } else {
+                                attr.privileged = true;
+                        }
+                } else {
+                        attr.privileged = true;
+                        break;
+                }
+        } while (false);
+        rc = xwos_thd_create(&thdd, &attr, xwlua_thd_script_main, thdl);
+        if (rc < 0) {
+                lua_writestringerror("Create thread ... %d.", (int)rc);
+                goto err_thd_create;
+        }
+        *thdsp = thdd;
+        rc = xwos_thd_acquire(thdd); /* inc refcount */
+        if (XWOK == rc) {
+                luaL_setmetatable(L, "xwlua_thd_sp");
+        } else {
+                lua_pop(L, 1); // pop thdsp
+                lua_pushnil(L); // push result
+        }
+        return 1; // return xwlua_thd_sp;
+
+err_thd_create:
+        lua_pop(thdl, 1); // pop name
+        lua_pop(thdl, 1); // pop file
+err_loadfile:
+        lua_close(thdl);
+err_new_vm:
+        lua_pop(L, 1); // pop thdsp
+err_nofile:
+        lua_pushnil(L); // push result
         return 1;
 }
 
@@ -102,36 +165,101 @@ int xwlua_thd_dostring(lua_State * L)
         xwlua_thd_sp * thdsp;
         lua_State * thdl;
         size_t sl;
+        int top;
+        int luarc;
 
-        arg = luaL_checklstring(L, 1, &sl);
-        thdsp = lua_newuserdatauv(L, sizeof(xwlua_thd_sp), 0);
-        thdl = luaL_newstate();
-        if (thdl) {
-                xwlua_openlibs(thdl);
-                luaL_loadbufferx(thdl, arg, sl, "main", NULL);
-                name = lua_pushstring(thdl, "main");
-                xwos_thd_attr_init(&attr);
-                attr.name = name;
-                attr.stack = NULL;
-                attr.stack_size = XWLUA_THD_STACK_SIZE;
-                attr.priority = XWLUA_SCRIPT_PRIORITY;
-                attr.detached = false;
-                attr.privileged = true;
-                rc = xwos_thd_create(&thdd, &attr, xwlua_thd_script_main, thdl);
-                if (XWOK == rc) {
-                        *thdsp = thdd;
-                        xwos_thd_grab(thdd); /* 增加对象的强引用 */
-                        luaL_setmetatable(L, "xwlua_thd_sp");
-                } else {
-                        lua_pop(L, 1);
-                        lua_pushnil(L);
-                        lua_writestringerror("Cannot create thread: %d.", (int)rc);
-                }
-        } else {
-                lua_pop(L, 1);
-                lua_pushnil(L);
-                lua_writestringerror("%s", "Cannot create VM: not enough memory");
+        top = lua_gettop(L);
+        if (top < 1) {
+                lua_writestringerror("%s", "No script string !");
+                goto err_nostring;
         }
+
+        arg = luaL_checklstring(L, 1, &sl); // May throw an exception
+        thdsp = lua_newuserdatauv(L, sizeof(xwlua_thd_sp), 0); // May throw an exception
+        thdl = luaL_newstate();
+        if (NULL == thdl) {
+                lua_writestringerror("%s", "Create VM ... no memory");
+                goto err_new_vm;
+        }
+
+        xwlua_openlibs(thdl);
+        luarc = luaL_loadbufferx(thdl, arg, sl, "main", NULL);
+        if (LUA_OK != luarc) {
+                const char * msg = lua_tostring(thdl, -1);
+                lua_writestringerror("%s\n", msg);
+                lua_pop(thdl, 1);  /* remove error message */
+                goto err_loadstring;
+        }
+
+        xwos_thd_attr_init(&attr);
+        attr.stack = NULL;
+        attr.stack_size = XWLUA_THD_STACK_SIZE;
+        attr.priority = XWLUA_SCRIPT_PRIORITY;
+        do {
+                if (top >= 2) {
+                        if (lua_toboolean(L, 2)) {
+                                attr.detached = false;
+                        } else {
+                                attr.detached = true;
+                        }
+                } else {
+                        attr.detached = true;
+                        attr.name = lua_pushstring(thdl, "anon");
+                        attr.privileged = true;
+                        break;
+                }
+                if (top >= 3) {
+                        if (lua_isstring(L, 3)) {
+                                name = lua_tolstring(L, 3, NULL);
+                                if (NULL != name) {
+                                        name = lua_pushstring(thdl, name);
+                                } else {
+                                        name = lua_pushstring(thdl, "anon");
+                                }
+                        } else {
+                                name = lua_pushstring(thdl, "anon");
+                        }
+                        attr.name = name;
+                } else {
+                        attr.name = lua_pushstring(thdl, "anon");
+                        attr.privileged = true;
+                        break;
+                }
+                if (top >= 4) {
+                        if (lua_toboolean(L, 4)) {
+                                attr.privileged = false;
+                        } else {
+                                attr.privileged = true;
+                        }
+                } else {
+                        attr.privileged = true;
+                        break;
+                }
+        } while (false);
+        rc = xwos_thd_create(&thdd, &attr, xwlua_thd_script_main, thdl);
+        if (rc < XWOK) {
+                lua_writestringerror("Create thread ... %d.", (int)rc);
+                goto err_thd_create;
+        }
+        *thdsp = thdd;
+        rc = xwos_thd_acquire(thdd); /* inc refcount */
+        if (XWOK == rc) {
+                luaL_setmetatable(L, "xwlua_thd_sp");
+        } else {
+                lua_pop(L, 1); // pop thdsp
+                lua_pushnil(L); // push result
+        }
+        return 1; // return xwlua_thd_sp;
+
+err_thd_create:
+        lua_pop(thdl, 1); // pop name
+        lua_pop(thdl, 1); // pop string
+err_loadstring:
+        lua_close(thdl);
+err_new_vm:
+        lua_pop(L, 1); // pop thdsp
+err_nostring:
+        lua_pushnil(L);
         return 1;
 }
 
@@ -148,48 +276,115 @@ int xwlua_thd_call(lua_State * L)
         const char * name;
         const char * func;
         size_t fl;
+        int top;
+        int luarc;
 
-        luaL_checktype(L, 1, LUA_TFUNCTION);
+        top = lua_gettop(L);
+        if (top < 1) {
+                lua_writestringerror("%s", "No function !");
+                goto err_nofunc;
+        }
+
+        luaL_checktype(L, 1, LUA_TFUNCTION); // May throw an exception
+        thdsp = lua_newuserdatauv(L, sizeof(xwlua_thd_sp), 0); // May throw an exception
         luaL_buffinit(L, &lb);
         luaL_prepbuffer(&lb);
         lua_pushvalue(L, 1); /* Ensure that top is the function */
         rc = lua_dump(L, xwlua_xt_function_writer, &lb, true);
-        lua_pop(L, 1);
+        lua_pop(L, 1); // Pop top function
         if (0 != rc) {
-                luaL_error(L, "unable to dump given function");
+                lua_writestringerror("%s", "unable to dump given function");
+                goto err_dump;
         }
-        luaL_pushresult(&lb);
+        luaL_pushresult(&lb); // Push func
         func = lua_tolstring(L, -1, &fl);
-
-        thdsp = lua_newuserdatauv(L, sizeof(xwlua_thd_sp), 0);
         thdl = luaL_newstate();
-        if (thdl) {
-                xwlua_openlibs(thdl);
-                luaL_loadbufferx(thdl, func, fl, "main", "bt");
-                name = lua_pushstring(thdl, "main");
-                xwos_thd_attr_init(&attr);
-                attr.name = name;
-                attr.stack = NULL;
-                attr.stack_size = XWLUA_THD_STACK_SIZE;
-                attr.priority = XWLUA_SCRIPT_PRIORITY;
-                attr.detached = false;
-                attr.privileged = true;
-                rc = xwos_thd_create(&thdd, &attr, xwlua_thd_script_main, thdl);
-                if (XWOK == rc) {
-                        *thdsp = thdd;
-                        xwos_thd_grab(thdd); /* 增加对象的强引用 */
-                        luaL_setmetatable(L, "xwlua_thd_sp");
-                } else {
-                        lua_pop(L, 1);
-                        lua_pushnil(L);
-                        lua_writestringerror("Cannot create thread: %d.", (int)rc);
-                }
-        } else {
-                lua_pop(L, 1);
-                lua_pushnil(L);
-                lua_writestringerror("%s", "Cannot create VM: not enough memory");
+        if (NULL == thdl) {
+                lua_writestringerror("%s", "Create VM ... no memory");
+                goto err_new_vm;
         }
-        lua_remove(L, -2);
+
+        xwlua_openlibs(thdl);
+        luarc = luaL_loadbufferx(thdl, func, fl, "main", "bt");
+        if (LUA_OK != luarc) {
+                const char * msg = lua_tostring(thdl, -1);
+                lua_writestringerror("%s\n", msg);
+                lua_pop(thdl, 1);  /* remove error message */
+                goto err_loadfunc;
+        }
+        lua_pop(L, 1); // pop func
+
+        xwos_thd_attr_init(&attr);
+        attr.stack = NULL;
+        attr.stack_size = XWLUA_THD_STACK_SIZE;
+        attr.priority = XWLUA_SCRIPT_PRIORITY;
+        do {
+                if (top >= 2) {
+                        if (lua_toboolean(L, 2)) {
+                                attr.detached = false;
+                        } else {
+                                attr.detached = true;
+                        }
+                } else {
+                        attr.detached = true;
+                        attr.name = lua_pushstring(thdl, "anon");
+                        attr.privileged = true;
+                        break;
+                }
+                if (top >= 3) {
+                        if (lua_isstring(L, 3)) {
+                                name = lua_tolstring(L, 3, NULL);
+                                if (NULL != name) {
+                                        name = lua_pushstring(thdl, name);
+                                } else {
+                                        name = lua_pushstring(thdl, "anon");
+                                }
+                        } else {
+                                name = lua_pushstring(thdl, "anon");
+                        }
+                        attr.name = name;
+                } else {
+                        attr.name = lua_pushstring(thdl, "anon");
+                        attr.privileged = true;
+                        break;
+                }
+                if (top >= 4) {
+                        if (lua_toboolean(L, 4)) {
+                                attr.privileged = false;
+                        } else {
+                                attr.privileged = true;
+                        }
+                } else {
+                        attr.privileged = true;
+                        break;
+                }
+        } while (false);
+        rc = xwos_thd_create(&thdd, &attr, xwlua_thd_script_main, thdl);
+        if (rc < XWOK) {
+                lua_writestringerror("Create thread ... %d.", (int)rc);
+                goto err_thd_create;
+        }
+        *thdsp = thdd;
+        rc = xwos_thd_acquire(thdd); /* inc refcount */
+        if (XWOK == rc) {
+                luaL_setmetatable(L, "xwlua_thd_sp");
+        } else {
+                lua_pop(L, 1); // pop thdsp
+                lua_pushnil(L); // push result
+        }
+        return 1; // return xwlua_thd_sp;
+
+err_thd_create:
+        lua_pop(thdl, 1); // pop name
+        lua_pop(thdl, 1); // pop func
+err_loadfunc:
+        lua_close(thdl);
+err_new_vm:
+        lua_pop(L, 1); // pop func
+err_dump:
+        lua_pop(L, 1); // pop thdsp
+err_nofunc:
+        lua_pushnil(L);
         return 1;
 }
 
@@ -216,7 +411,7 @@ int xwlua_cthd_sp(lua_State * L)
         out = lua_newuserdatauv(L, sizeof(xwlua_thd_sp), 0);
         out->thd = thdd.thd;
         out->tik = thdd.tik;
-        xwos_thd_grab(thdd); /* 增加对象的强引用 */
+        xwos_thd_grab(thdd); /* inc refcount */
         luaL_setmetatable(L, "xwlua_thd_sp");
         return 1;
 }

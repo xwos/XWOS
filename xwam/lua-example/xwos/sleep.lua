@@ -19,15 +19,15 @@
 -- > limitations under the License.
 --
 
-print("XWOS Sleep() TEST!\n")
+print("Thread Sleep TEST!\n")
 mythdsp = xwos.cthd.sp()
-print("Thread strong pointer:", mythdsp)
-now = xwos.skd.now()
-print(string.format("Current timetick:%f ms", now / ms))
+print("Thread:", mythdsp)
+now = xwtm.now()
+print(string.format("Current Yimetick:%f ms", now / xwtm.ms(1)))
 print("sleep 1s...\n")
 xwos.cthd.sleep(xwtm.s(1))
-now = xwos.skd.now()
-print(string.format("Sleep 1s from %f ms\n", now / ms))
+now = xwtm.now()
+print(string.format("Sleep 1s from %f ms\n", now / xwtm.ms(1)))
 xwos.cthd.sleep_from(now, xwtm.s(1))
-now = xwos.skd.now()
-print(string.format("Current Timetick:%f ms", now /ms))
+now = xwtm.now()
+print(string.format("Current Timetick:%f ms", now /xwtm.ms(1)))

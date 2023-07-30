@@ -31,7 +31,7 @@ int xwlua_lib_dumpstack(lua_State * L)
 
         top = lua_gettop(L);
         printf("top:%d\n", top);
-        for (i = 1; i <= top; i++) {
+        for (i = top; i >= 1; i--) {
                 int t = lua_type(L, i);
                 switch (t) {
                 case LUA_TBOOLEAN:

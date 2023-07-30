@@ -34,7 +34,7 @@ function childthd_main()
   end
 end
 print("Main Thread:", xwos.cthd.sp())
-childthd = xwos.thd.call(childthd_main)
+childthd = xwos.thd.call(childthd_main, true)
 xwos.cthd.sleep(xwtm.ms(100))
 tstsem:post()
 childthd:stop()
@@ -59,7 +59,7 @@ function childthd_main()
   end
 end
 print("Main Thread:", xwos.cthd.sp())
-childthd = xwos.thd.call(childthd_main)
+childthd = xwos.thd.call(childthd_main, true)
 xwos.cthd.sleep(xwtm.ms(1000))
 tstsem:post()
 childthd:stop()
@@ -84,7 +84,7 @@ function childthd_main()
   end
 end
 print("Main Thread:", xwos.cthd.sp())
-childthd = xwos.thd.call(childthd_main)
+childthd = xwos.thd.call(childthd_main, true)
 xwos.cthd.sleep(xwtm.ms(1000))
 childthd:intr()
 childthd:stop()

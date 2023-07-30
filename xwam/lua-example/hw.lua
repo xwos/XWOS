@@ -66,3 +66,5 @@ t3 = t1 + t2
 for k, v in pairs(t3) do
   print(k, v);
 end
+
+return "OK"

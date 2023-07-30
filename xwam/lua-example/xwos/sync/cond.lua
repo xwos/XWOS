@@ -33,7 +33,7 @@ function childthd_main()
   end
 end
 print("Main Thread:", xwos.cthd.sp())
-childthd = xwos.thd.call(childthd_main)
+childthd = xwos.thd.call(childthd_main, true)
 print("[Main Thread] Broadcast")
 tstcond:broadcast()
 xwos.cthd.sleep(xwtm.ms(100))
@@ -66,7 +66,7 @@ function childthd_main()
   end
 end
 print("Main Thread:", xwos.cthd.sp())
-childthd = xwos.thd.call(childthd_main)
+childthd = xwos.thd.call(childthd_main, true)
 print("[Main Thread] Broadcast")
 tstmtx:lock()
 tstcond:broadcast()
@@ -103,7 +103,7 @@ function childthd_main()
   end
 end
 print("Main Thread:", xwos.cthd.sp())
-childthd = xwos.thd.call(childthd_main)
+childthd = xwos.thd.call(childthd_main, true)
 print("[Main Thread] Broadcast")
 xwos.cthd.sleep(xwtm.s(2))
 tstmtx:lock()

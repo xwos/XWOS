@@ -20,8 +20,9 @@
 --
 
 script = [[
-mythdsp = xwos.cthd.sp()
-print("String Thread Strong Pointer:", mythdsp)
+print("[Child Thread]:", xwos.cthd.sp())
+return "OK"
 ]]
+print("[Main Thread]:", xwos.cthd.sp())
 strthdsp = xwos.thd.dostring(script)
-strthdsp:stop()
+collectgarbage()
