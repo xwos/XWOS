@@ -515,6 +515,18 @@ void xwup_thd_attr_init(struct xwup_thd_attr * attr)
 }
 
 __xwup_api
+void xwup_thd_get_attr(struct xwup_thd * thd, struct xwup_thd_attr * attr)
+{
+        attr->name = thd->stack.name;
+        attr->stack = thd->stack.base;
+        attr->stack_size = thd->stack.size;
+        attr->stack_guard_size = thd->stack.guard;
+        attr->priority = thd->sprio;
+        attr->detached = !!(thd->state & (xwsq_t)XWUP_SKDOBJ_ST_DETACHED);
+        attr->privileged = !!(thd->stack.flag & (xwsq_t)XWUP_SKDOBJ_FLAG_PRIVILEGED);
+}
+
+__xwup_api
 xwer_t xwup_thd_init(struct xwup_thd * thd,
                      const struct xwup_thd_attr * inattr,
                      xwup_thd_f thdfunc, void * arg)

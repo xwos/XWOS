@@ -27,7 +27,13 @@
  * ## 线程属性
  *
  * 创建或初始化线程之前，需要先描述线程属性 @ref xwos_thd_attr 。
- * 线程属性需要先使用 `xwos_thd_attr_init()` 初始化后再描述。
+ * 线程属性需要先通过 `xwos_thd_attr_init()` 初始化后再描述。
+ *
+ *
+ * 已经创建或初始化的线程可以通过 `xwos_thd_get_attr()` 获取其属性。
+ *
+ *
+ * 线程可以通过 `xwos_cthd_get_attr()` 获取自身属性。
  *
  *
  * ## 静态初始化线程
@@ -365,6 +371,24 @@ xwer_t xwos_thd_release(xwos_thd_d thdd)
 }
 
 /**
+ * @brief XWOS API：获取线程的属性
+ * @param[in] thdd: 线程对象描述符
+ * @param[out] attr: 用于返回线程属性的缓冲区
+ * @return 错误码
+ * @retval XWOK: 没有错误
+ * @retval -EOBJDEAD: 线程对象无效
+ * @retval -EACCES: 对象标签检查失败
+ * @note
+ * + 上下文：任意
+ */
+static __xwos_inline_api
+xwer_t xwos_thd_get_attr(xwos_thd_d thdd, struct xwos_thd_attr * attr)
+{
+        return xwosdl_thd_get_attr(&thdd.thd->osthd, thdd.tik,
+                                   (struct xwosdl_thd_attr *)attr);
+}
+
+/**
  * @brief XWOS API：中断线程的阻塞态和睡眠态
  * @param[in] thdd: 线程对象描述符
  * @return 错误码
@@ -530,6 +554,19 @@ xwos_thd_d xwos_cthd_self(void)
 
         thdd = xwosdl_cthd_self();
         return (xwos_thd_d){(struct xwos_thd *)thdd.thd, thdd.tik};
+}
+
+/**
+ * @brief XWOS API：获取线程自身的属性
+ * @param[out] attr: 用于返回线程属性的缓冲区
+ * @note
+ * + 上下文：线程
+ */
+static __xwos_inline_api
+void xwos_cthd_get_attr(struct xwos_thd_attr * attr)
+{
+        // cppcheck-suppress [misra-c2012-17.7]
+        xwos_thd_get_attr(xwos_cthd_self(), attr);
 }
 
 /**

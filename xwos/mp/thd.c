@@ -546,6 +546,18 @@ void xwmp_thd_attr_init(struct xwmp_thd_attr * attr)
 }
 
 __xwmp_api
+void xwmp_thd_get_attr(struct xwmp_thd * thd, struct xwmp_thd_attr * attr)
+{
+        attr->name = thd->stack.name;
+        attr->stack = thd->stack.base;
+        attr->stack_size = thd->stack.size;
+        attr->stack_guard_size = thd->stack.guard;
+        attr->priority = thd->sprio;
+        attr->detached = !!(thd->state & (xwsq_t)XWMP_SKDOBJ_ST_DETACHED);
+        attr->privileged = !!(thd->stack.flag & (xwsq_t)XWMP_SKDOBJ_FLAG_PRIVILEGED);
+}
+
+__xwmp_api
 xwer_t xwmp_thd_init(struct xwmp_thd * thd,
                      const struct xwmp_thd_attr * inattr,
                      xwmp_thd_f thdfunc, void * arg)

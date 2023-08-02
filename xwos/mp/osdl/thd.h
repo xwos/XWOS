@@ -74,6 +74,8 @@ xwer_t xwosdl_thd_release(struct xwosdl_thd * thd, xwsq_t tik)
         return xwmp_thd_release(thd, tik);
 }
 
+xwer_t xwosdl_thd_get_attr(struct xwosdl_thd * thd, xwsq_t tik,
+                           struct xwosdl_thd_attr * attr);
 
 xwer_t xwosdl_thd_intr(struct xwosdl_thd * thd, xwsq_t tik);
 

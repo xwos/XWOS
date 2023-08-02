@@ -177,6 +177,7 @@ xwer_t xwup_thd_acquire(struct xwup_thd * thd, xwsq_t tik);
 xwer_t xwup_thd_release(struct xwup_thd * thd, xwsq_t tik);
 xwer_t xwup_thd_grab(struct xwup_thd * thd);
 xwer_t xwup_thd_put(struct xwup_thd * thd);
+void xwup_thd_get_attr(struct xwup_thd * thd, struct xwup_thd_attr * attr);
 void xwup_cthd_yield(void);
 void xwup_cthd_exit(xwer_t rc);
 void xwup_thd_quit(struct xwup_thd * thd);
