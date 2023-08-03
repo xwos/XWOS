@@ -19,10 +19,15 @@
 -- > limitations under the License.
 --
 
-script = [[
-print("[Child Thread]:", xwos.cthd.sp())
-return "OK"
-]]
-print("[Main Thread]:", xwos.cthd.sp())
-strthdsp = xwos.thd.dostring(script)
+
+-- Detached Thread
+xwos.thd.dofile("sd:/hw.lua")
+
+
+
+-- Joinable Thread
+childsp = xwos.thd.dofile("sd:/hw.lua", true)
+rc, rcmsg = childsp:join()
+print(rcmsg)
+childsp = nil
 collectgarbage()

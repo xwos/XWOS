@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：通用函数库
+ * @brief 玄武Lua库：XWLUA VM之间的数据交换
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,21 +18,16 @@
  * > limitations under the License.
  */
 
+#ifndef __xwem_vm_lua_xwlua_xwvm_dataxchg_h__
+#define __xwem_vm_lua_xwlua_xwvm_dataxchg_h__
+
 #include <xwos/standard.h>
-#include <stdio.h>
-#include "xwlua/port.h"
-#include "src/lauxlib.h"
-#include "xwlua/xwlib/bmp.h"
+#include "xwem/vm/lua/src/lua.h"
 
-const luaL_Reg xwlua_lib[] = {
-        {"bmp", NULL},
-        {NULL, NULL},
-};
+xwer_t xwlua_vm_copy_function(lua_State * src, int sidx, lua_State * dst);
+xwer_t xwlua_vm_copy_userdata(lua_State * src, int idx, lua_State * dst);
+xwer_t xwlua_vm_copy_table(lua_State * src, int sidx, lua_State * dst);
+xwer_t xwlua_vm_copy_element(lua_State * src, int sidx, lua_State * dst);
+xwer_t xwlua_vm_move_element(lua_State * src, int sidx, lua_State * dst);
 
-LUAMOD_API int xwlua_open_lib(lua_State * L)
-{
-        luaL_newlib(L, xwlua_lib);
-        xwlua_lib_open_bmp(L);
-        lua_setfield(L, -2, "bmp");
-        return 1;
-}
+#endif /* xwem/vm/lua/xwlua/xwvm/dataxchg.h */

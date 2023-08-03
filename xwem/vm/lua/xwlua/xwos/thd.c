@@ -21,9 +21,11 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/osal/thd.h>
-#include "src/lauxlib.h"
-#include "xwlua/port.h"
-#include "xwlua/xwos/thd.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/port.h"
+#include "xwem/vm/lua/xwlua/xwos/thd.h"
+#include "xwem/vm/lua/xwlua/xwvm/dataxchg.h"
+#include "xwem/vm/lua/xwlua/xwvm/debug.h"
 
 /******** xwos.thd ********/
 #define XWLUA_SCRIPT_PRIORITY XWOS_SKD_PRIORITY_RT_MIN
@@ -32,6 +34,7 @@ void xwlua_os_init_thdsp(lua_State * L);
 
 xwer_t xwlua_thd_script_main(void * arg)
 {
+        struct xwos_thd_attr attr;
         lua_State * L;
         const char * name;
         xwer_t rc;
@@ -47,7 +50,12 @@ xwer_t xwlua_thd_script_main(void * arg)
         } else {
                 rc = XWOK;
         }
-        lua_close(L);
+        xwos_cthd_get_attr(&attr);
+        if (attr.detached) {
+                lua_close(L);
+        } else {
+                rc = ptr_err(L);
+        }
         return rc;
 }
 
@@ -287,16 +295,16 @@ int xwlua_thd_call(lua_State * L)
 
         luaL_checktype(L, 1, LUA_TFUNCTION); // May throw an exception
         thdsp = lua_newuserdatauv(L, sizeof(xwlua_thd_sp), 0); // May throw an exception
-        luaL_buffinit(L, &lb);
+        luaL_buffinit(L, &lb); /* push buffer */
         luaL_prepbuffer(&lb);
         lua_pushvalue(L, 1); /* Ensure that top is the function */
         rc = lua_dump(L, xwlua_xt_function_writer, &lb, true);
-        lua_pop(L, 1); // Pop top function
+        lua_pop(L, 1); /* Pop top function */
         if (0 != rc) {
                 lua_writestringerror("%s", "unable to dump given function");
                 goto err_dump;
         }
-        luaL_pushresult(&lb); // Push func
+        luaL_pushresult(&lb); /* Pop buffer and Push function string */
         func = lua_tolstring(L, -1, &fl);
         thdl = luaL_newstate();
         if (NULL == thdl) {
@@ -440,7 +448,8 @@ int xwlua_cthd_sleep_to(lua_State * L)
 
 int xwlua_cthd_sleep_from(lua_State * L)
 {
-        xwtm_t origin, inc;
+        xwtm_t origin;
+        xwtm_t inc;
         xwer_t rc;
 
         origin = (xwtm_t)luaL_checknumber(L, 1);
@@ -553,7 +562,7 @@ int xwlua_thdsp_copy(lua_State * L)
 
         thdsp = (xwlua_thd_sp *)luaL_checkudata(L, 1, "xwlua_thd_sp");
         D = (lua_State *)luaL_checkudata(L, 2, "xwlua_vm");
-        if (D) {
+        if (NULL != D) {
                 xwer_t rc;
                 rc = xwos_thd_acquire(*thdsp);
                 if (XWOK == rc) {
@@ -613,36 +622,59 @@ int xwlua_thdsp_quit(lua_State * L)
 
 int xwlua_thdsp_join(lua_State * L)
 {
+        lua_State * childL;
         xwlua_thd_sp * thdsp;
-        xwer_t rc, trc;
+        xwer_t rc;
+        xwer_t trc;
+        int nres;
+        int i;
 
         thdsp = (xwlua_thd_sp *)luaL_checkudata(L, 1, "xwlua_thd_sp");
         rc = xwos_thd_join(*thdsp, &trc);
         if (XWOK == rc) {
                 lua_pushinteger(L, (lua_Integer)rc);
-                lua_pushinteger(L, (lua_Integer)trc);
+                childL = err_ptr(trc);
+                nres = lua_gettop(childL);
+                for (i = 1; i <= nres; i++) {
+                        xwlua_vm_copy_element(childL, i, L);
+                }
+                lua_close(childL);
+                nres += 1;
         } else {
                 lua_pushinteger(L, (lua_Integer)rc);
-                lua_pushnil(L);
+                nres = 1;
         }
-        return 2;
+        return nres;
 }
 
 int xwlua_thdsp_stop(lua_State * L)
 {
+        lua_State * childL;
         xwlua_thd_sp * thdsp;
-        xwer_t rc, trc;
+        xwer_t rc;
+        xwer_t trc;
+        int nres;
+        int i;
 
         thdsp = (xwlua_thd_sp *)luaL_checkudata(L, 1, "xwlua_thd_sp");
         rc = xwos_thd_stop(*thdsp, &trc);
         if (XWOK == rc) {
                 lua_pushinteger(L, (lua_Integer)rc);
-                lua_pushinteger(L, (lua_Integer)trc);
+                childL = err_ptr(trc);
+                xwlua_vm_dump_stack(childL);
+                xwlua_vm_dump_stack(L);
+                nres = lua_gettop(childL);
+                for (i = 1; i <= nres; i++) {
+                        xwlua_vm_move_element(childL, i, L);
+                }
+                xwlua_vm_dump_stack(L);
+                lua_close(childL);
+                nres += 1;
         } else {
                 lua_pushinteger(L, (lua_Integer)rc);
-                lua_pushnil(L);
+                nres = 1;
         }
-        return 2;
+        return nres;
 }
 
 int xwlua_thdsp_migrate(lua_State * L)

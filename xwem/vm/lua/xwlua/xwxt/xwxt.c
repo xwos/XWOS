@@ -47,7 +47,7 @@ int xwlua_xt_function_writer(lua_State * S, const void * b, size_t size, void * 
  * @param[in] S: 虚拟机S
  * @param[in] sidx: 函数在虚拟机S栈中的位置
  * @param[in] D: 虚拟机D
- * @return 目的虚拟机D的栈顶为拷贝的函数或nil
+ * @return 目的虚拟机D的栈顶为拷贝的函数或 `nil`
  */
 void xwlua_xt_copy_function(lua_State * S, int sidx, lua_State * D)
 {
@@ -79,7 +79,7 @@ void xwlua_xt_copy_function(lua_State * S, int sidx, lua_State * D)
  * @param[in] S: 源虚拟机
  * @param[in] idx: userdata在虚拟机S栈中的位置
  * @param[in] D: 目的虚拟机
- * @return 目的虚拟机D的栈顶为拷贝的userdata或nil
+ * @return 目的虚拟机D的栈顶为拷贝的 `userdata` 或 `nil`
  */
 void xwlua_xt_copy_ud(lua_State * S, int idx, lua_State * D)
 {

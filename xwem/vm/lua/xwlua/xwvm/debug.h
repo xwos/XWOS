@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：通用函数库
+ * @brief 玄武Lua库：XWLUA VM的调试库
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,21 +18,13 @@
  * > limitations under the License.
  */
 
+#ifndef __xwem_vm_lua_xwlua_xwvm_debug_h__
+#define __xwem_vm_lua_xwlua_xwvm_debug_h__
+
 #include <xwos/standard.h>
-#include <stdio.h>
-#include "xwlua/port.h"
-#include "src/lauxlib.h"
-#include "xwlua/xwlib/bmp.h"
+#include "xwem/vm/lua/src/lua.h"
 
-const luaL_Reg xwlua_lib[] = {
-        {"bmp", NULL},
-        {NULL, NULL},
-};
+void xwlua_vm_dump_table(lua_State * vm, int idx, int nest);
+void xwlua_vm_dump_stack(lua_State * vm);
 
-LUAMOD_API int xwlua_open_lib(lua_State * L)
-{
-        luaL_newlib(L, xwlua_lib);
-        xwlua_lib_open_bmp(L);
-        lua_setfield(L, -2, "bmp");
-        return 1;
-}
+#endif /* xwem/vm/lua/xwlua/xwvm/debug.h */
