@@ -19,19 +19,19 @@
  */
 
 #include <xwos/standard.h>
-#include "src/lauxlib.h"
-#include "xwlua/port.h"
-#include "xwlua/xwos/skd.h"
-#include "xwlua/xwos/thd.h"
-#include "xwlua/xwos/sem.h"
-#include "xwlua/xwos/cond.h"
-#include "xwlua/xwos/flg.h"
-#include "xwlua/xwos/br.h"
-#include "xwlua/xwos/sel.h"
-#include "xwlua/xwos/mtx.h"
-#include "xwlua/xwos/spinlock.h"
-#include "xwlua/xwos/seqlock.h"
-#include "xwlua/xwos/pm.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/port.h"
+#include "xwem/vm/lua/xwlua/xwos/skd.h"
+#include "xwem/vm/lua/xwlua/xwos/thd.h"
+#include "xwem/vm/lua/xwlua/xwos/sem.h"
+#include "xwem/vm/lua/xwlua/xwos/cond.h"
+#include "xwem/vm/lua/xwlua/xwos/flg.h"
+#include "xwem/vm/lua/xwlua/xwos/br.h"
+#include "xwem/vm/lua/xwlua/xwos/sel.h"
+#include "xwem/vm/lua/xwlua/xwos/mtx.h"
+#include "xwem/vm/lua/xwlua/xwos/spinlock.h"
+#include "xwem/vm/lua/xwlua/xwos/seqlock.h"
+#include "xwem/vm/lua/xwlua/xwos/pm.h"
 
 const luaL_Reg xwlua_os[] = {
         {"skd", NULL},

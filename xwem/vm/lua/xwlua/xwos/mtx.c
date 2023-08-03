@@ -20,9 +20,9 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/lock/mtx.h>
-#include "src/lauxlib.h"
-#include "xwlua/port.h"
-#include "xwlua/xwos/mtx.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/port.h"
+#include "xwem/vm/lua/xwlua/xwos/mtx.h"
 
 void xwlua_mtx_unlock(struct xwos_mtx * mtx)
 {

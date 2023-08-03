@@ -23,7 +23,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/sync/sem.h>
-#include "src/lauxlib.h"
+#include "xwem/vm/lua/src/lauxlib.h"
 
 typedef xwos_sem_d xwlua_sem_sp; /**< 信号量的强指针 */
 #define XWLUA_SEM_NULLSP XWOS_SEM_NILD

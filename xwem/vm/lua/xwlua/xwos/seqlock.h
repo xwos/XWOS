@@ -24,7 +24,7 @@
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
 #include <xwos/osal/lock/seqlock.h>
-#include "src/lauxlib.h"
+#include "xwem/vm/lua/src/lauxlib.h"
 
 enum xwlua_sqlk_lock_state_em {
         XWLUA_SQLK_LKST_UNLOCK,

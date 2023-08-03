@@ -20,13 +20,13 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/sync/cond.h>
-#include "src/lauxlib.h"
-#include "xwlua/port.h"
-#include "xwlua/xwos/mtx.h"
-#include "xwlua/xwos/spinlock.h"
-#include "xwlua/xwos/seqlock.h"
-#include "xwlua/xwos/sel.h"
-#include "xwlua/xwos/cond.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/port.h"
+#include "xwem/vm/lua/xwlua/xwos/mtx.h"
+#include "xwem/vm/lua/xwlua/xwos/spinlock.h"
+#include "xwem/vm/lua/xwlua/xwos/seqlock.h"
+#include "xwem/vm/lua/xwlua/xwos/sel.h"
+#include "xwem/vm/lua/xwlua/xwos/cond.h"
 
 int xwlua_cond_new(lua_State * L)
 {

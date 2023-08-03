@@ -51,6 +51,7 @@ format = 'discount'
 backtick_references = true
 file = {
 'xwtm.lua',
+'xwvm.lua',
 'xwxt.lua',
 'xwlib/bmp.lua',
 'xwos/skd.lua', 'xwos/thd.lua', 'xwos/cthd.lua', 'xwos/thdsp.lua',

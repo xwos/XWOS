@@ -24,10 +24,12 @@
 #include <xwos/standard.h>
 #include "xwem/vm/lua/src/lua.h"
 
+int xwlua_vm_function_writer(lua_State * src, const void * b, size_t size, void * ud);
 xwer_t xwlua_vm_copy_function(lua_State * src, int sidx, lua_State * dst);
 xwer_t xwlua_vm_copy_userdata(lua_State * src, int idx, lua_State * dst);
 xwer_t xwlua_vm_copy_table(lua_State * src, int sidx, lua_State * dst);
 xwer_t xwlua_vm_copy_element(lua_State * src, int sidx, lua_State * dst);
 xwer_t xwlua_vm_move_element(lua_State * src, int sidx, lua_State * dst);
+void xwlua_vm_copy_env(lua_State * src, int sidx, lua_State * dst);
 
 #endif /* xwem/vm/lua/xwlua/xwvm/dataxchg.h */

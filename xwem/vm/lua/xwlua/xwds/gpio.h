@@ -22,7 +22,7 @@
 #define __xwem_vm_lua_xwlua_xwds_gpio_h__
 
 #include <xwos/standard.h>
-#include "src/lauxlib.h"
+#include "xwem/vm/lua/src/lauxlib.h"
 
 int xwlua_gpio_req(lua_State * L);
 int xwlua_gpio_rls(lua_State * L);

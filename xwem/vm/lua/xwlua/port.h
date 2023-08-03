@@ -22,8 +22,8 @@
 #define __xwem_vm_lua_xwlua_port_h__
 
 #include <xwos/standard.h>
-#include "src/lua.h"
-#include "src/lauxlib.h"
+#include "xwem/vm/lua/src/lua.h"
+#include "xwem/vm/lua/src/lauxlib.h"
 
 struct xwlua_arg {
         int argc;
@@ -35,9 +35,9 @@ extern struct xwmm_mempool * xwlua_mempool;
 int xwlua_readline(lua_State * L, char buffer[], const char * prompt);
 void xwlua_openlibs(lua_State * L);
 void xwlua_xt_openlibs(lua_State * L);
-void xwlua_dump_stack(lua_State* L);
 xwer_t xwlua_task(void * arg);
 
+#define XWLUA_VM_NAME           "xwvm"
 #define XWLUA_XT_NAME           "xwxt"
 #define XWLUA_TM_NAME           "xwtm"
 #define XWLUA_LIB_NAME          "xwlib"
@@ -45,6 +45,7 @@ xwer_t xwlua_task(void * arg);
 #define XWLUA_DS_NAME           "xwds"
 #define XWLUA_THD_STACK_SIZE    XWEMCFG_vm_lua_THD_STACK_SIZE
 
+LUAMOD_API int xwlua_open_vm(lua_State * L);
 LUAMOD_API int xwlua_open_xt(lua_State * L);
 LUAMOD_API int xwlua_open_tm(lua_State * L);
 LUAMOD_API int xwlua_open_lib(lua_State * L);

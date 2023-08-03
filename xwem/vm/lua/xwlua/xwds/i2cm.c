@@ -21,9 +21,9 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwcd/ds/i2c/master.h>
-#include "src/lauxlib.h"
-#include "xwlua/port.h"
-#include "xwlua/xwds/i2cm.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/port.h"
+#include "xwem/vm/lua/xwlua/xwds/i2cm.h"
 
 void xwlua_i2cm_register(lua_State * L, const char * name, struct xwds_i2cm * i2cm)
 {

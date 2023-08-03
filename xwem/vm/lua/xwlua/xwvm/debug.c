@@ -114,7 +114,7 @@ void xwlua_vm_dump_stack(lua_State * vm)
         int type;
 
         num = lua_gettop(vm);
-        printf("num:%d\n", num);
+        printf("++++++++ stack depth: %d ++++++++\n", num);
         for (i = num; i >= 1; i--) {
                 type = lua_type(vm, i);
                 switch (type) {
@@ -143,5 +143,37 @@ void xwlua_vm_dump_stack(lua_State * vm)
                         break;
                 }
         }
-        printf("\n");
+        printf("-------- stack depth: %d --------\n", num);
+}
+
+int xwlua_vm_dump(lua_State * vm)
+{
+        int type;
+
+        type = lua_type(vm, -1);
+        switch (type) {
+        case LUA_TBOOLEAN:
+                printf("boolean: %s\n", lua_toboolean(vm, -1) ? "true" : "false");
+                break;
+        case LUA_TNUMBER:
+                printf("number: %g\n", lua_tonumber(vm, -1));
+                break;
+        case LUA_TSTRING:
+                printf("string: \"%s\"\n", lua_tostring(vm, -1));
+                break;
+        case LUA_TTABLE:
+                printf("table: ");
+                xwlua_vm_dump_table(vm, -1, 1);
+                printf("\n");
+                break;
+        case LUA_TFUNCTION:
+        case LUA_TUSERDATA:
+        case LUA_TLIGHTUSERDATA:
+                printf("%s\n", lua_typename(vm, type));
+                break;
+        default:
+                printf("%s\n", lua_typename(vm, type));
+                break;
+        }
+        return 0;
 }

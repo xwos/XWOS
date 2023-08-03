@@ -23,7 +23,7 @@
 
 #include <xwos/standard.h>
 #include <xwcd/ds/soc/chip.h>
-#include "src/lauxlib.h"
+#include "xwem/vm/lua/src/lauxlib.h"
 
 struct xwlua_soc {
         struct xwds_soc * soc;

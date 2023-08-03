@@ -21,16 +21,16 @@
 #define lua_c
 
 #include <xwos/standard.h>
-#include "lprefix.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
 
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
-#include "xwlua/port.h"
+#include "xwem/vm/lua/src/lprefix.h"
+#include "xwem/vm/lua/src/lua.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/src/lualib.h"
+#include "xwem/vm/lua/xwlua/port.h"
 
 /* vvvvvvvv ======== Copy from lua source ======== vvvvvvvv */
 #if !defined(LUA_PROGNAME)

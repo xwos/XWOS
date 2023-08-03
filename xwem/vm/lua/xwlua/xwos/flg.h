@@ -23,7 +23,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/sync/flg.h>
-#include "src/lauxlib.h"
+#include "xwem/vm/lua/src/lauxlib.h"
 
 typedef xwos_flg_d xwlua_flg_sp; /**< 信号量的强指针 */
 #define XWLUA_FLG_NULLSP XWOS_FLG_NILD

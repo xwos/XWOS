@@ -20,9 +20,9 @@
 
 #include <xwos/standard.h>
 #include <stdio.h>
-#include "xwlua/port.h"
-#include "src/lauxlib.h"
-#include "xwlua/xwlib/bmp.h"
+#include "xwem/vm/lua/xwlua/port.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/xwlib/bmp.h"
 
 const luaL_Reg xwlua_lib[] = {
         {"bmp", NULL},

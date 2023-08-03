@@ -21,10 +21,10 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwcd/ds/soc/chip.h>
-#include "src/lauxlib.h"
-#include "xwlua/port.h"
-#include "xwlua/xwds/gpio.h"
-#include "xwlua/xwds/soc.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/port.h"
+#include "xwem/vm/lua/xwlua/xwds/gpio.h"
+#include "xwem/vm/lua/xwlua/xwds/soc.h"
 
 void xwlua_soc_register(lua_State * L, const char * name, struct xwds_soc * soc)
 {

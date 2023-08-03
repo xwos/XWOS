@@ -24,7 +24,7 @@
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
 #include <xwos/osal/lock/spinlock.h>
-#include "src/lauxlib.h"
+#include "xwem/vm/lua/src/lauxlib.h"
 
 enum xwlua_splk_lock_state_em {
         XWLUA_SPLK_LKST_UNLOCK,

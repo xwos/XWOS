@@ -20,8 +20,8 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/time.h>
-#include "src/lauxlib.h"
-#include "xwlua/port.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/port.h"
 
 int xwlua_xwtm_now(lua_State * L)
 {

@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <xwos/osal/thd.h>
-#include "lua.h"
+#include "xwem/vm/lua/src/lua.h"
 
 #define LUA_MAXINPUT		512
 #define CTRL_BS          0x8 /**< BS '\b' */

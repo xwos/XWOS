@@ -23,7 +23,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/thd.h>
-#include "src/lauxlib.h"
+#include "xwem/vm/lua/src/lauxlib.h"
 
 typedef xwos_thd_d xwlua_thd_sp; /**< 线程的强指针 */
 #define XWLUA_THD_NULLSP XWOS_THD_NILD

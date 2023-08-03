@@ -21,9 +21,9 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/osal/skd.h>
-#include "src/lauxlib.h"
-#include "xwlua/port.h"
-#include "xwlua/xwos/skd.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/port.h"
+#include "xwem/vm/lua/xwlua/xwos/skd.h"
 
 /******** xwos.skd ********/
 int xwlua_skd_id_lc(lua_State * L)

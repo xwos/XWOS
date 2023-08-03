@@ -27,7 +27,10 @@ xwos.thd.dofile("sd:/hw.lua")
 
 -- Joinable Thread
 childsp = xwos.thd.dofile("sd:/hw.lua", true)
-rc, rcmsg = childsp:join()
-print(rcmsg)
+xwxt["childsp"] = childsp
 childsp = nil
+rc, rcmsg = xwxt.childsp:join()
+print(rcmsg)
 collectgarbage()
+xwxt.childsp = nil
+xwxt.gc()

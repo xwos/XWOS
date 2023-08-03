@@ -20,9 +20,9 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/pm.h>
-#include "src/lauxlib.h"
-#include "xwlua/port.h"
-#include "xwlua/xwos/pm.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/port.h"
+#include "xwem/vm/lua/xwlua/xwos/pm.h"
 
 int xwlua_pm_suspend(lua_State * L)
 {

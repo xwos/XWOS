@@ -23,7 +23,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/lock/mtx.h>
-#include "src/lauxlib.h"
+#include "xwem/vm/lua/src/lauxlib.h"
 
 typedef xwos_mtx_d xwlua_mtx_sp; /**< 互斥锁的强指针 */
 #define XWLUA_MTX_NULLSP XWOS_MTX_NILD

@@ -21,9 +21,9 @@
 #include <xwos/standard.h>
 #include <xwos/osal/lock/spinlock.h>
 #include <stdlib.h>
-#include "src/lauxlib.h"
-#include "xwlua/port.h"
-#include "xwlua/xwos/spinlock.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/port.h"
+#include "xwem/vm/lua/xwlua/xwos/spinlock.h"
 
 xwer_t xwlua_splk_gc(struct xwos_object * obj)
 {

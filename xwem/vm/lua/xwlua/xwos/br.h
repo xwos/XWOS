@@ -23,7 +23,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/sync/br.h>
-#include "src/lauxlib.h"
+#include "xwem/vm/lua/src/lauxlib.h"
 
 typedef xwos_br_d xwlua_br_sp; /**< 信号量的强指针 */
 #define XWLUA_BR_NULLSP XWOS_BR_NILD

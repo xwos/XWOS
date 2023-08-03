@@ -21,9 +21,9 @@
 #include <xwos/standard.h>
 #include <xwos/osal/lock/seqlock.h>
 #include <stdlib.h>
-#include "src/lauxlib.h"
-#include "xwlua/port.h"
-#include "xwlua/xwos/seqlock.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/port.h"
+#include "xwem/vm/lua/xwlua/xwos/seqlock.h"
 
 xwer_t xwlua_sqlk_gc(struct xwos_object * obj)
 {

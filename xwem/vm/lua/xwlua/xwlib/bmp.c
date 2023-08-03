@@ -21,9 +21,9 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwos/lib/xwbop.h>
-#include "src/lauxlib.h"
-#include "xwlua/port.h"
-#include "xwlua/xwlib/bmp.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/port.h"
+#include "xwem/vm/lua/xwlua/xwlib/bmp.h"
 
 int xwlua_bmp_new(lua_State * L)
 {

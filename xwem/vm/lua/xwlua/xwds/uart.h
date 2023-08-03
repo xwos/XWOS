@@ -23,7 +23,7 @@
 
 #include <xwos/standard.h>
 #include <xwcd/ds/uart/controller.h>
-#include "src/lauxlib.h"
+#include "xwem/vm/lua/src/lauxlib.h"
 
 struct xwlua_uart {
         struct xwds_uartc * uartc;

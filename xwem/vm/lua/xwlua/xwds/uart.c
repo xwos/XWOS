@@ -21,9 +21,9 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwcd/ds/uart/controller.h>
-#include "src/lauxlib.h"
-#include "xwlua/port.h"
-#include "xwlua/xwds/uart.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/port.h"
+#include "xwem/vm/lua/xwlua/xwds/uart.h"
 
 void xwlua_uart_register(lua_State * L, const char * name,
                          struct xwds_uartc * uartc)

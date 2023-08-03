@@ -26,5 +26,6 @@
 
 void xwlua_vm_dump_table(lua_State * vm, int idx, int nest);
 void xwlua_vm_dump_stack(lua_State * vm);
+int xwlua_vm_dump(lua_State * vm);
 
 #endif /* xwem/vm/lua/xwlua/xwvm/debug.h */

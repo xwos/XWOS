@@ -20,11 +20,11 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/sync/br.h>
-#include "src/lauxlib.h"
-#include "xwlua/port.h"
-#include "xwlua/xwlib/bmp.h"
-#include "xwlua/xwos/sel.h"
-#include "xwlua/xwos/br.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/port.h"
+#include "xwem/vm/lua/xwlua/xwlib/bmp.h"
+#include "xwem/vm/lua/xwlua/xwos/sel.h"
+#include "xwem/vm/lua/xwlua/xwos/br.h"
 
 int xwlua_br_new(lua_State * L)
 {

@@ -23,7 +23,7 @@
 
 #include <xwos/standard.h>
 #include <xwos/osal/sync/cond.h>
-#include "src/lauxlib.h"
+#include "xwem/vm/lua/src/lauxlib.h"
 
 typedef xwos_cond_d xwlua_cond_sp; /**< 信号量的强指针 */
 #define XWLUA_COND_NULLSP XWOS_COND_NILD

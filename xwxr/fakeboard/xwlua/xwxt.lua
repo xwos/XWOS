@@ -79,7 +79,7 @@ value = xwxt["key"]
 ]]
 
 --[[--------
-将表中的键值对批量导出到全局导出表 `xwxt` 中
+将源虚拟机中的表元素导出到全局导出表 `xwxt`
 
 
 
@@ -88,9 +88,9 @@ value = xwxt["key"]
 @tparam table table (**in**) 表
 
 @usage
-xwxt.setup(table)
+xwxt.append(table)
 ]]
-function setup(table)
+function append(table)
 end
 
 --[[--------

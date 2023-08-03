@@ -22,7 +22,7 @@
 #define __xwem_vm_lua_xwlua_xwos_pm_h__
 
 #include <xwos/standard.h>
-#include "src/lauxlib.h"
+#include "xwem/vm/lua/src/lauxlib.h"
 
 void xwlua_os_open_pm(lua_State * L);
 

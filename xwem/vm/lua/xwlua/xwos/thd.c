@@ -271,8 +271,6 @@ err_nostring:
         return 1;
 }
 
-int xwlua_xt_function_writer(lua_State * L, const void * b, size_t size, void * ud);
-
 int xwlua_thd_call(lua_State * L)
 {
         struct xwos_thd_attr attr;
@@ -298,7 +296,7 @@ int xwlua_thd_call(lua_State * L)
         luaL_buffinit(L, &lb); /* push buffer */
         luaL_prepbuffer(&lb);
         lua_pushvalue(L, 1); /* Ensure that top is the function */
-        rc = lua_dump(L, xwlua_xt_function_writer, &lb, true);
+        rc = lua_dump(L, xwlua_vm_function_writer, &lb, true);
         lua_pop(L, 1); /* Pop top function */
         if (0 != rc) {
                 lua_writestringerror("%s", "unable to dump given function");

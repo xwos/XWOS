@@ -21,10 +21,10 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwcd/ds/soc/gpio.h>
-#include "src/lauxlib.h"
-#include "xwlua/port.h"
-#include "xwlua/xwds/soc.h"
-#include "xwlua/xwds/gpio.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/port.h"
+#include "xwem/vm/lua/xwlua/xwds/soc.h"
+#include "xwem/vm/lua/xwlua/xwds/gpio.h"
 
 int xwlua_gpio_req(lua_State * L)
 {

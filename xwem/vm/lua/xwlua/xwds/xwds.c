@@ -19,19 +19,18 @@
  */
 
 #include <xwos/standard.h>
-#include "src/lauxlib.h"
-#include "xwlua/port.h"
-#include "xwlua/xwds/soc.h"
-#include "xwlua/xwds/uart.h"
-#include "xwlua/xwds/i2cm.h"
-#include "xwlua/xwds/spim.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/port.h"
+#include "xwem/vm/lua/xwlua/xwds/soc.h"
+#include "xwem/vm/lua/xwlua/xwds/uart.h"
+#include "xwem/vm/lua/xwlua/xwds/i2cm.h"
+#include "xwem/vm/lua/xwlua/xwds/spim.h"
 
 const luaL_Reg xwlua_ds[] = {
         {"soc", NULL},
         {"uart", NULL},
         {"i2cm", NULL},
         {"spim", NULL},
-        {"can", NULL},
         {NULL, NULL},
 };
 

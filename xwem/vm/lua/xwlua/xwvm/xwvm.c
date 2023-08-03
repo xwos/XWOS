@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：SPI master
+ * @brief 玄武Lua库：全局导出表
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -18,20 +18,21 @@
  * > limitations under the License.
  */
 
-#ifndef __xwem_vm_lua_xwlua_xwds_spim_h__
-#define __xwem_vm_lua_xwlua_xwds_spim_h__
-
 #include <xwos/standard.h>
-#include <xwcd/ds/spi/master.h>
+#include <stdio.h>
 #include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/xwvm/debug.h"
 
-struct xwlua_spim {
-        struct xwds_spim * spim;
-        xwsq_t tik;
+const luaL_Reg xwlua_xwvm_libconstructor[] = {
+        {"dump", xwlua_vm_dump},
+        {NULL, NULL},
 };
 
-void xwlua_spim_register(lua_State * L, const char * name, struct xwds_spim * spim);
-void xwlua_spim_unregister(lua_State * L, const char * name);
-void xwlua_ds_open_spim(lua_State * L);
+LUAMOD_API int xwlua_open_vm(lua_State * L)
+{
+        luaL_newmetatable(L, "xwlua_vm");
+        lua_pop(L, 1); /* pop metatable */
 
-#endif /* xwem/vm/lua/xwlua/xwds/spim.h */
+        luaL_newlib(L, xwlua_xwvm_libconstructor);
+        return 1;
+}

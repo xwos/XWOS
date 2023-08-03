@@ -21,9 +21,9 @@
 #include <xwos/standard.h>
 #include <string.h>
 #include <xwcd/ds/spi/master.h>
-#include "src/lauxlib.h"
-#include "xwlua/port.h"
-#include "xwlua/xwds/spim.h"
+#include "xwem/vm/lua/src/lauxlib.h"
+#include "xwem/vm/lua/xwlua/port.h"
+#include "xwem/vm/lua/xwlua/xwds/spim.h"
 
 void xwlua_spim_register(lua_State * L, const char * name, struct xwds_spim * spim)
 {

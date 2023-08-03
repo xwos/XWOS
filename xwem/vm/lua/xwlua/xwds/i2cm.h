@@ -23,7 +23,7 @@
 
 #include <xwos/standard.h>
 #include <xwcd/ds/i2c/master.h>
-#include "src/lauxlib.h"
+#include "xwem/vm/lua/src/lauxlib.h"
 
 struct xwlua_i2cm {
         struct xwds_i2cm * i2cm;

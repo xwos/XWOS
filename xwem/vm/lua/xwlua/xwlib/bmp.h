@@ -22,7 +22,7 @@
 #define __xwem_vm_lua_xwlua_xwlib_bmp_h__
 
 #include <xwos/standard.h>
-#include "src/lauxlib.h"
+#include "xwem/vm/lua/src/lauxlib.h"
 
 typedef struct {
         xwsz_t bits;

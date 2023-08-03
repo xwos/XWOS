@@ -187,8 +187,8 @@ xwer_t xwlua_vm_deepcopy_table(lua_State * src, int sidx, lua_State * dst, int d
  * @retval XWOK: 没有错误
  * @retval -EINVAL: 拷贝失败
  * @details
- * 此函数将源虚拟机栈 `src` 中索引为 `sidx` 的 **表**
- * 拷贝到目的虚拟机 `dst` 的 **栈顶** 。
+ * 此函数会在目的虚拟机 `dst` 的 **栈顶** 新建一个空表，
+ * 然后将源虚拟机栈 `src` 中索引为 `sidx` 的 **表** 拷贝到这个空表内。
  *
  * + 若拷贝成功，返回值为 `XWOK` ；
  * + 若拷贝失败，返回值小于 **0** ，目的虚拟机 `dst` 的栈顶会压入一个 `nil` 。
@@ -199,8 +199,8 @@ xwer_t xwlua_vm_copy_table(lua_State * src, int sidx, lua_State * dst)
         xwer_t rc;
 
         rc = XWOK;
-        lua_newtable(dst); /* Create an empty table on the top of dst */
         sidx = lua_absindex(src, sidx);
+        lua_newtable(dst); /* Create an empty table on the top of dst */
         hasmt = lua_getmetatable(src, sidx); /* Push metatable */
         if (hasmt) {
                 /* Copy metatable to the empty metatable at the top of dst  */
@@ -330,4 +330,31 @@ xwer_t xwlua_vm_move_element(lua_State * src, int sidx, lua_State * dst)
                 lua_remove(src, sidx);
         }
         return rc;
+}
+
+
+/**
+ * @brief 将源虚拟机中的表元素拷贝到目的虚拟机的环境 `_ENV` 中
+ * @param[in] src: 源虚拟机
+ * @param[in] sidx: 表在源虚拟机栈中的索引
+ * @param[in] dst: 目的虚拟机
+ * @note
+ * + 此函数只会将源虚拟机表中索引为 **字符串** 的键值对拷贝到目的虚拟机的 `_ENV` 中，
+ *   其他类型的索引会被忽略；
+ * + 拷贝失败不会中止拷贝过程，目的虚拟机 `_ENV` 中拷贝失败的索引会被设置为 `nil` 。
+ */
+void xwlua_vm_copy_env(lua_State * src, int sidx, lua_State * dst)
+{
+        const char * key;
+
+        sidx = lua_absindex(src, sidx);
+        lua_pushnil(src); /* first key */
+        while (0 != lua_next(src, sidx)) {
+                if (lua_type(src, -2) == LUA_TSTRING) { /* type(key) == "string" */
+                        key = lua_tostring(src, -2);
+                        xwlua_vm_copy_element(src, -1, dst);
+                        lua_setglobal(dst, key);
+                }
+                lua_pop(src, 1); /* Removes 'value'; keeps 'key' for next iteration */
+        }
 }
