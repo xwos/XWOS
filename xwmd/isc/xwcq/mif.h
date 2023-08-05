@@ -102,8 +102,8 @@
  *
  * ## 对象描述符和对象标签
  *
- * 已知循环队列对象的指针的情况下，可以通过 `xwcq_getd()` 获取 @ref xwcq_d ，
- * 或可以通过 `xwcq_gettik()` 获取对象标签。
+ * 已知循环队列对象的指针的情况下，可以通过 `xwcq_get_d()` 获取 @ref xwcq_d ，
+ * 或可以通过 `xwcq_get_tik()` 获取对象标签。
  *
  * @{
  */
@@ -183,7 +183,7 @@ xwer_t xwcq_fini(struct xwcq * cq);
  * @note
  * + 上下文：任意
  */
-xwsq_t xwcq_gettik(struct xwcq * cq);
+xwsq_t xwcq_get_tik(struct xwcq * cq);
 
 /**
  * @brief XWCQ API：获取循环队列对象描述符
@@ -193,12 +193,12 @@ xwsq_t xwcq_gettik(struct xwcq * cq);
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwcq_d xwcq_getd(struct xwcq * cq)
+xwcq_d xwcq_get_d(struct xwcq * cq)
 {
         xwcq_d cqd;
 
         cqd.cq = cq;
-        cqd.tik = xwcq_gettik(cq);
+        cqd.tik = xwcq_get_tik(cq);
         return cqd;
 }
 

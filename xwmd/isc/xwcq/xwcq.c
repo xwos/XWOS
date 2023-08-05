@@ -111,7 +111,7 @@ xwer_t xwcq_fini(struct xwcq * cq)
         return xwcq_put(cq);
 }
 
-xwsq_t xwcq_gettik(struct xwcq * cq)
+xwsq_t xwcq_get_tik(struct xwcq * cq)
 {
         xwsq_t tik;
 

@@ -316,7 +316,7 @@ extern "C" {
     fn xwmq_fini(mq: *mut XwmdXwmq) -> XwEr;
     fn xwmq_grab(mq: *mut XwmdXwmq) -> XwEr;
     fn xwmq_put(mq: *mut XwmdXwmq) -> XwEr;
-    fn xwmq_gettik(mq: *mut XwmdXwmq) -> XwSq;
+    fn xwmq_get_tik(mq: *mut XwmdXwmq) -> XwSq;
     fn xwrustffi_xwmq_acquire(mq: *mut XwmdXwmq, tik: XwSq) -> XwEr;
     fn xwrustffi_xwmq_release(mq: *mut XwmdXwmq, tik: XwSq) -> XwEr;
 
@@ -517,7 +517,7 @@ where
     pub fn init<'a>(&'a self) -> (XwmqTx<'a, N, T>, XwmqRx<'a, N, T>) {
         unsafe {
             xwmq_init(self.mq.get(), self.pool.get() as _, N);
-            *self.tik.get() = xwmq_gettik(self.mq.get());
+            *self.tik.get() = xwmq_get_tik(self.mq.get());
         }
         (XwmqTx {xwmq: &self}, XwmqRx {xwmq: &self})
     }

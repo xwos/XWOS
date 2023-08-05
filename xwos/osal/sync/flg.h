@@ -77,8 +77,8 @@
  *
  * ## 对象描述符和对象标签
  *
- * 已知事件标志对象的指针的情况下，可以通过 `xwos_flg_getd()` 获取 @ref xwos_flg_d ，
- * 或可以通过 `xwos_flg_gettik()` 获取对象标签。
+ * 已知事件标志对象的指针的情况下，可以通过 `xwos_flg_get_d()` 获取 @ref xwos_flg_d ，
+ * 或可以通过 `xwos_flg_get_tik()` 获取对象标签。
  *
  *
  * ## C++
@@ -312,9 +312,9 @@ xwer_t xwos_flg_release(xwos_flg_d flgd)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwsq_t xwos_flg_gettik(struct xwos_flg * flg)
+xwsq_t xwos_flg_get_tik(struct xwos_flg * flg)
 {
-        return xwosdl_flg_gettik(&flg->osflg);
+        return xwosdl_flg_get_tik(&flg->osflg);
 }
 
 /**
@@ -325,12 +325,12 @@ xwsq_t xwos_flg_gettik(struct xwos_flg * flg)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwos_flg_d xwos_flg_getd(struct xwos_flg * flg)
+xwos_flg_d xwos_flg_get_d(struct xwos_flg * flg)
 {
         xwos_flg_d flgd;
 
         flgd.flg = flg;
-        flgd.tik = xwosdl_flg_gettik(&flg->osflg);
+        flgd.tik = xwosdl_flg_get_tik(&flg->osflg);
         return flgd;
 }
 

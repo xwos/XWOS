@@ -79,7 +79,7 @@ xwer_t xwosdl_cond_release(struct xwosdl_cond * cond, xwsq_t tik)
 }
 
 static __xwcc_inline
-xwsq_t xwosdl_cond_gettik(struct xwosdl_cond * cond)
+xwsq_t xwosdl_cond_get_tik(struct xwosdl_cond * cond)
 {
         return (NULL != cond) ? cond->synobj.xwobj.tik : (xwsq_t)0;
 }

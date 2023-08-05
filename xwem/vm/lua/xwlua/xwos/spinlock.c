@@ -31,7 +31,7 @@ xwer_t xwlua_splk_gc(struct xwos_object * obj)
         return XWOK;
 }
 
-xwsq_t xwlua_splk_gettik(struct xwlua_splk * luasplk)
+xwsq_t xwlua_splk_get_tik(struct xwlua_splk * luasplk)
 {
         xwsq_t tik;
 
@@ -43,12 +43,12 @@ xwsq_t xwlua_splk_gettik(struct xwlua_splk * luasplk)
         return tik;
 }
 
-xwlua_splk_sp xwlua_splk_getd(struct xwlua_splk * luasplk)
+xwlua_splk_sp xwlua_splk_get_d(struct xwlua_splk * luasplk)
 {
         xwlua_splk_sp splksp;
 
         splksp.luasplk = luasplk;
-        splksp.tik = xwlua_splk_gettik(luasplk);
+        splksp.tik = xwlua_splk_get_tik(luasplk);
         return splksp;
 }
 
@@ -142,7 +142,7 @@ int xwlua_splk_new(lua_State * L)
                 xwos_splk_init(&luasplk->ossplk);
                 luasplk->lkst = XWLUA_SPLK_LKST_UNLOCK;
                 splksp->luasplk = luasplk;
-                splksp->tik = xwlua_splk_gettik(luasplk);
+                splksp->tik = xwlua_splk_get_tik(luasplk);
                 luaL_setmetatable(L, "xwlua_splk_sp");
         } else {
                 lua_pop(L, 1);

@@ -65,8 +65,8 @@
  *
  * ## 对象描述符和对象标签
  *
- * 已知信号选择器对象的指针的情况下，可以通过 `xwos_sel_getd()` 获取 @ref xwos_sel_d ，
- * 或可以通过 `xwos_sel_gettik()` 获取对象标签。
+ * 已知信号选择器对象的指针的情况下，可以通过 `xwos_sel_get_d()` 获取 @ref xwos_sel_d ，
+ * 或可以通过 `xwos_sel_get_tik()` 获取对象标签。
  *
  *
  * ## C++
@@ -241,9 +241,9 @@ xwer_t xwos_sel_release(xwos_sel_d seld)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwsq_t xwos_sel_gettik(struct xwos_sel * sel)
+xwsq_t xwos_sel_get_tik(struct xwos_sel * sel)
 {
-        return xwosdl_sel_gettik(&sel->ossel);
+        return xwosdl_sel_get_tik(&sel->ossel);
 }
 
 /**
@@ -254,12 +254,12 @@ xwsq_t xwos_sel_gettik(struct xwos_sel * sel)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwos_sel_d xwos_sel_getd(struct xwos_sel * sel)
+xwos_sel_d xwos_sel_get_d(struct xwos_sel * sel)
 {
         xwos_sel_d seld;
 
         seld.sel = sel;
-        seld.tik = xwosdl_sel_gettik(&sel->ossel);
+        seld.tik = xwosdl_sel_get_tik(&sel->ossel);
         return seld;
 }
 

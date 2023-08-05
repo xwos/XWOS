@@ -87,7 +87,7 @@ void __retarget_lock_close(_LOCK_T lock)
 
         if (NULL != lock) {
                 mtxd.mtx = &lock->xwmtx;
-                mtxd.tik = xwos_mtx_gettik(&lock->xwmtx);
+                mtxd.tik = xwos_mtx_get_tik(&lock->xwmtx);
                 xwos_mtx_delete(mtxd);
         }
 }

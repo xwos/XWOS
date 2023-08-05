@@ -74,8 +74,8 @@
  *
  * ## 对象描述符和对象标签
  *
- * 已知条件量对象的指针的情况下，可以通过 `xwos_cond_getd()` 获取 @ref xwos_cond_d ，
- * 或可以通过 `xwos_cond_gettik()` 获取对象标签。
+ * 已知条件量对象的指针的情况下，可以通过 `xwos_cond_get_d()` 获取 @ref xwos_cond_d ，
+ * 或可以通过 `xwos_cond_get_tik()` 获取对象标签。
  *
  *
  * ## C++
@@ -244,9 +244,9 @@ xwer_t xwos_cond_release(xwos_cond_d condd)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwsq_t xwos_cond_gettik(struct xwos_cond * cond)
+xwsq_t xwos_cond_get_tik(struct xwos_cond * cond)
 {
-        return xwosdl_cond_gettik(&cond->oscond);
+        return xwosdl_cond_get_tik(&cond->oscond);
 }
 
 /**
@@ -257,12 +257,12 @@ xwsq_t xwos_cond_gettik(struct xwos_cond * cond)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwos_cond_d xwos_cond_getd(struct xwos_cond * cond)
+xwos_cond_d xwos_cond_get_d(struct xwos_cond * cond)
 {
         xwos_cond_d condd;
 
         condd.cond = cond;
-        condd.tik = xwosdl_cond_gettik(&cond->oscond);
+        condd.tik = xwosdl_cond_get_tik(&cond->oscond);
         return condd;
 }
 

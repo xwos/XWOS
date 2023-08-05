@@ -33,9 +33,9 @@ xwer_t xwrustffi_mtx_put(struct xwos_mtx * mtx)
         return xwos_mtx_put(mtx);
 }
 
-xwsq_t xwrustffi_mtx_gettik(struct xwos_mtx * mtx)
+xwsq_t xwrustffi_mtx_get_tik(struct xwos_mtx * mtx)
 {
-        return xwos_mtx_gettik(mtx);
+        return xwos_mtx_get_tik(mtx);
 }
 
 xwer_t xwrustffi_mtx_acquire(struct xwos_mtx * mtx, xwsq_t tik)

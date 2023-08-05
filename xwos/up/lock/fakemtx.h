@@ -92,7 +92,7 @@ xwer_t xwup_mtx_release(struct xwup_mtx * mtx, xwsq_t tik)
 }
 
 static __xwup_inline_api
-xwsq_t xwup_mtx_gettik(struct xwup_mtx * mtx)
+xwsq_t xwup_mtx_get_tik(struct xwup_mtx * mtx)
 {
         return (NULL != mtx) ? mtx->fake.vsem.synobj.xwobj.tik : (xwsq_t)0;
 }

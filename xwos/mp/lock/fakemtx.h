@@ -90,7 +90,7 @@ xwer_t xwmp_mtx_release(struct xwmp_mtx * mtx, xwsq_t tik)
 }
 
 static __xwmp_inline_api
-xwsq_t xwmp_mtx_gettik(struct xwmp_mtx * mtx)
+xwsq_t xwmp_mtx_get_tik(struct xwmp_mtx * mtx)
 {
         return (NULL != mtx) ? mtx->fake.synobj.xwobj.tik : (xwsq_t)0;
 }

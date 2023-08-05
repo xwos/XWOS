@@ -148,7 +148,7 @@ extern "C" {
     pub(crate) fn xwrustffi_flg_fini(flg: *mut c_void) -> XwEr;
     pub(crate) fn xwrustffi_flg_grab(flg: *mut c_void) -> XwEr;
     pub(crate) fn xwrustffi_flg_put(flg: *mut c_void) -> XwEr;
-    pub(crate) fn xwrustffi_flg_gettik(flg: *mut c_void) -> XwSq;
+    pub(crate) fn xwrustffi_flg_get_tik(flg: *mut c_void) -> XwSq;
     pub(crate) fn xwrustffi_flg_acquire(flg: *mut c_void, tik: XwSq) -> XwEr;
     pub(crate) fn xwrustffi_flg_release(flg: *mut c_void, tik: XwSq) -> XwEr;
     pub(crate) fn xwrustffi_flg_bind(flg: *mut c_void, sel: *mut c_void, pos: XwSq) -> XwEr;
@@ -373,7 +373,7 @@ where
                                   N,
                                   &mut (*self.flg.get()).bmp as _,
                                   &mut (*self.flg.get()).msk as _);
-                *self.tik.get() = xwrustffi_flg_gettik(self.flg.get() as _);
+                *self.tik.get() = xwrustffi_flg_get_tik(self.flg.get() as _);
             }
         }
     }

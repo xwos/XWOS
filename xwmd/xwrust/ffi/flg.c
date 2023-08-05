@@ -34,9 +34,9 @@ xwer_t xwrustffi_flg_put(struct xwos_flg * flg)
         return xwos_flg_put(flg);
 }
 
-xwsq_t xwrustffi_flg_gettik(struct xwos_flg * flg)
+xwsq_t xwrustffi_flg_get_tik(struct xwos_flg * flg)
 {
-        return xwos_flg_gettik(flg);
+        return xwos_flg_get_tik(flg);
 }
 
 xwer_t xwrustffi_flg_acquire(struct xwos_flg * flg, xwsq_t tik)

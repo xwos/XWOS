@@ -25,7 +25,7 @@ xwer_t xwosdl_mtx_create(xwosdl_mtx_d * mtxd, xwpr_t sprio)
         rc = xwmp_mtx_create(&mtx, sprio);
         if (XWOK == rc) {
                 mtxd->mtx = mtx;
-                mtxd->tik = xwmp_mtx_gettik(mtx);
+                mtxd->tik = xwmp_mtx_get_tik(mtx);
         } else {
                 *mtxd = XWOSDL_MTX_NILD;
         }

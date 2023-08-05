@@ -34,9 +34,9 @@ xwer_t xwrustffi_sel_put(struct xwos_sel * sel)
         return xwos_sel_put(sel);
 }
 
-xwsq_t xwrustffi_sel_gettik(struct xwos_sel * sel)
+xwsq_t xwrustffi_sel_get_tik(struct xwos_sel * sel)
 {
-        return xwos_sel_gettik(sel);
+        return xwos_sel_get_tik(sel);
 }
 
 xwer_t xwrustffi_sel_acquire(struct xwos_sel * sel, xwsq_t tik)

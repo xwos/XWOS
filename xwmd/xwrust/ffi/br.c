@@ -34,9 +34,9 @@ xwer_t xwrustffi_br_put(struct xwos_br * br)
         return xwos_br_put(br);
 }
 
-xwsq_t xwrustffi_br_gettik(struct xwos_br * br)
+xwsq_t xwrustffi_br_get_tik(struct xwos_br * br)
 {
-        return xwos_br_gettik(br);
+        return xwos_br_get_tik(br);
 }
 
 xwer_t xwrustffi_br_acquire(struct xwos_br * br, xwsq_t tik)

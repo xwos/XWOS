@@ -33,9 +33,9 @@ xwer_t xwrustffi_cond_put(struct xwos_cond * cond)
         return xwos_cond_put(cond);
 }
 
-xwsq_t xwrustffi_cond_gettik(struct xwos_cond * cond)
+xwsq_t xwrustffi_cond_get_tik(struct xwos_cond * cond)
 {
-        return xwos_cond_gettik(cond);
+        return xwos_cond_get_tik(cond);
 }
 
 xwer_t xwrustffi_cond_acquire(struct xwos_cond * cond, xwsq_t tik)

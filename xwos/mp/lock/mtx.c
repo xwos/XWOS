@@ -329,7 +329,7 @@ xwer_t xwmp_mtx_fini(struct xwmp_mtx * mtx)
 }
 
 __xwmp_api
-xwsq_t xwmp_mtx_gettik(struct xwmp_mtx * mtx)
+xwsq_t xwmp_mtx_get_tik(struct xwmp_mtx * mtx)
 {
         return (NULL != mtx) ? mtx->xwobj.tik : (xwsq_t)0;
 }

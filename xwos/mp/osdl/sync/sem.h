@@ -71,7 +71,7 @@ xwer_t xwosdl_sem_release(struct xwosdl_sem * sem, xwsq_t tik)
 }
 
 static __xwcc_inline
-xwsq_t xwosdl_sem_gettik(struct xwosdl_sem * sem)
+xwsq_t xwosdl_sem_get_tik(struct xwosdl_sem * sem)
 {
         return (NULL != sem) ? sem->synobj.xwobj.tik : (xwsq_t)0;
 }

@@ -213,7 +213,7 @@ extern "C" {
     fn xwrustffi_mtx_fini(mtx: *mut XwosMtx) -> XwEr;
     fn xwrustffi_mtx_grab(mtx: *mut XwosMtx) -> XwEr;
     fn xwrustffi_mtx_put(mtx: *mut XwosMtx) -> XwEr;
-    fn xwrustffi_mtx_gettik(mtx: *mut XwosMtx) -> XwSq;
+    fn xwrustffi_mtx_get_tik(mtx: *mut XwosMtx) -> XwSq;
     fn xwrustffi_mtx_acquire(mtx: *mut XwosMtx, tik: XwSq) -> XwEr;
     fn xwrustffi_mtx_release(mtx: *mut XwosMtx, tik: XwSq) -> XwEr;
     fn xwrustffi_mtx_unlock(mtx: *mut XwosMtx) -> XwEr;
@@ -346,7 +346,7 @@ impl<T: ?Sized> Mutex<T> {
                 xwrustffi_mtx_put(self.mtx.get());
             } else {
                 xwrustffi_mtx_init(self.mtx.get());
-                *self.tik.get() = xwrustffi_mtx_gettik(self.mtx.get());
+                *self.tik.get() = xwrustffi_mtx_get_tik(self.mtx.get());
             }
         }
     }

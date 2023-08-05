@@ -65,8 +65,8 @@
  *
  * ## 对象描述符和对象标签
  *
- * 已知线程栅栏对象的指针的情况下，可以通过 `xwos_br_getd()` 获取 @ref xwos_br_d ，
- * 或可以通过 `xwos_br_gettik()` 获取对象标签。
+ * 已知线程栅栏对象的指针的情况下，可以通过 `xwos_br_get_d()` 获取 @ref xwos_br_d ，
+ * 或可以通过 `xwos_br_get_tik()` 获取对象标签。
  *
  *
  * ## C++
@@ -241,9 +241,9 @@ xwer_t xwos_br_release(xwos_br_d brd)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwsq_t xwos_br_gettik(struct xwos_br * br)
+xwsq_t xwos_br_get_tik(struct xwos_br * br)
 {
-        return xwosdl_br_gettik(&br->osbr);
+        return xwosdl_br_get_tik(&br->osbr);
 }
 
 /**
@@ -254,12 +254,12 @@ xwsq_t xwos_br_gettik(struct xwos_br * br)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwos_br_d xwos_br_getd(struct xwos_br * br)
+xwos_br_d xwos_br_get_d(struct xwos_br * br)
 {
         xwos_br_d brd;
 
         brd.br = br;
-        brd.tik = xwosdl_br_gettik(&br->osbr);
+        brd.tik = xwosdl_br_get_tik(&br->osbr);
         return brd;
 }
 

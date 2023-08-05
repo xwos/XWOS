@@ -47,8 +47,8 @@ typedef struct {
 
 void xwlua_os_open_sqlk(lua_State * L);
 
-xwsq_t xwlua_sqlk_gettik(struct xwlua_sqlk * luasqlk);
-xwlua_sqlk_sp xwlua_sqlk_getd(struct xwlua_sqlk * luasqlk);
+xwsq_t xwlua_sqlk_get_tik(struct xwlua_sqlk * luasqlk);
+xwlua_sqlk_sp xwlua_sqlk_get_d(struct xwlua_sqlk * luasqlk);
 xwer_t xwlua_sqlk_acquire(xwlua_sqlk_sp sqlksp);
 xwer_t xwlua_sqlk_release(xwlua_sqlk_sp sqlksp);
 xwer_t xwlua_sqlk_grab(struct xwlua_sqlk * luasqlk);

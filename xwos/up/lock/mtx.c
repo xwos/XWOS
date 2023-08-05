@@ -313,7 +313,7 @@ xwer_t xwup_mtx_fini(struct xwup_mtx * mtx)
 }
 
 __xwup_api
-xwsq_t xwup_mtx_gettik(struct xwup_mtx * mtx)
+xwsq_t xwup_mtx_get_tik(struct xwup_mtx * mtx)
 {
         return (NULL != mtx) ? mtx->xwobj.tik : (xwsq_t)0;
 }

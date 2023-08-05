@@ -50,7 +50,7 @@ struct xwds_object {
 
 void xwds_obj_construct(struct xwds_object * obj);
 void xwds_obj_destruct(struct xwds_object * obj);
-xwsq_t xwds_obj_gettik(struct xwds_object * obj);
+xwsq_t xwds_obj_get_tik(struct xwds_object * obj);
 xwer_t xwds_obj_probe(struct xwds_object * obj, xwobj_gc_f gcfunc);
 xwer_t xwds_obj_remove(struct xwds_object * obj);
 xwer_t xwds_obj_start(struct xwds_object * obj);

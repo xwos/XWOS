@@ -76,8 +76,8 @@
  *
  * ## 对象描述符和对象标签
  *
- * 已知消息队列对象的指针的情况下，可以通过 `xwmq_getd()` 获取 @ref xwmq_d ，
- * 或可以通过 `xwmq_gettik()` 获取对象标签。
+ * 已知消息队列对象的指针的情况下，可以通过 `xwmq_get_d()` 获取 @ref xwmq_d ，
+ * 或可以通过 `xwmq_get_tik()` 获取对象标签。
  * @{
  */
 
@@ -167,7 +167,7 @@ xwer_t xwmq_put(struct xwmq * mq);
  * @note
  * + 上下文：任意
  */
-xwsq_t xwmq_gettik(struct xwmq * mq);
+xwsq_t xwmq_get_tik(struct xwmq * mq);
 
 /**
  * @brief XWMQ API：获取消息队列对象描述符
@@ -177,12 +177,12 @@ xwsq_t xwmq_gettik(struct xwmq * mq);
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwmq_d xwmq_getd(struct xwmq * mq)
+xwmq_d xwmq_get_d(struct xwmq * mq)
 {
         xwmq_d mqd;
 
         mqd.mq = mq;
-        mqd.tik = xwmq_gettik(mq);
+        mqd.tik = xwmq_get_tik(mq);
         return mqd;
 }
 

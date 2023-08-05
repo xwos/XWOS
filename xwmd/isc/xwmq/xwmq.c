@@ -43,7 +43,7 @@ xwer_t xwmq_gc(struct xwos_object * obj)
 }
 
 __xwmd_api
-xwsq_t xwmq_gettik(struct xwmq * mq)
+xwsq_t xwmq_get_tik(struct xwmq * mq)
 {
         xwsq_t tik;
 

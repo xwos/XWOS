@@ -79,8 +79,8 @@
  *
  * ## 对象描述符和对象标签
  *
- * 已知信号量对象的指针的情况下，可以通过 `xwos_sem_getd()` 获取 @ref xwos_sem_d ，
- * 或可以通过 `xwos_sem_gettik()` 获取对象标签。
+ * 已知信号量对象的指针的情况下，可以通过 `xwos_sem_get_d()` 获取 @ref xwos_sem_d ，
+ * 或可以通过 `xwos_sem_get_tik()` 获取对象标签。
  *
  *
  * ## C++
@@ -256,9 +256,9 @@ xwer_t xwos_sem_release(xwos_sem_d semd)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwsq_t xwos_sem_gettik(struct xwos_sem * sem)
+xwsq_t xwos_sem_get_tik(struct xwos_sem * sem)
 {
-        return xwosdl_sem_gettik(&sem->ossem);
+        return xwosdl_sem_get_tik(&sem->ossem);
 }
 
 /**
@@ -269,12 +269,12 @@ xwsq_t xwos_sem_gettik(struct xwos_sem * sem)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwos_sem_d xwos_sem_getd(struct xwos_sem * sem)
+xwos_sem_d xwos_sem_get_d(struct xwos_sem * sem)
 {
         xwos_sem_d semd;
 
         semd.sem = sem;
-        semd.tik = xwosdl_sem_gettik(&sem->ossem);
+        semd.tik = xwosdl_sem_get_tik(&sem->ossem);
         return semd;
 }
 

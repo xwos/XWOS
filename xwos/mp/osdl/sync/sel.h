@@ -79,7 +79,7 @@ xwer_t xwosdl_sel_release(struct xwosdl_sel * sel, xwsq_t tik)
 }
 
 static __xwcc_inline
-xwsq_t xwosdl_sel_gettik(struct xwosdl_sel * sel)
+xwsq_t xwosdl_sel_get_tik(struct xwosdl_sel * sel)
 {
         return (NULL != sel) ? sel->cond.synobj.xwobj.tik : (xwsq_t)0;
 }

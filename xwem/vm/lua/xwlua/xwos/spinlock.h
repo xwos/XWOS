@@ -46,8 +46,8 @@ typedef struct {
 
 void xwlua_os_open_splk(lua_State * L);
 
-xwsq_t xwlua_splk_gettik(struct xwlua_splk * luasplk);
-xwlua_splk_sp xwlua_splk_getd(struct xwlua_splk * luasplk);
+xwsq_t xwlua_splk_get_tik(struct xwlua_splk * luasplk);
+xwlua_splk_sp xwlua_splk_get_d(struct xwlua_splk * luasplk);
 xwer_t xwlua_splk_acquire(xwlua_splk_sp splksp);
 xwer_t xwlua_splk_release(xwlua_splk_sp splksp);
 xwer_t xwlua_splk_grab(struct xwlua_splk * luasplk);

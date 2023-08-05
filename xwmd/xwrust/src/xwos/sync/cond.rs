@@ -166,7 +166,7 @@ extern "C" {
     pub(crate) fn xwrustffi_cond_fini(cond: *mut XwosCond) -> XwEr;
     pub(crate) fn xwrustffi_cond_grab(cond: *mut XwosCond) -> XwEr;
     pub(crate) fn xwrustffi_cond_put(cond: *mut XwosCond) -> XwEr;
-    pub(crate) fn xwrustffi_cond_gettik(cond: *mut XwosCond) -> XwSq;
+    pub(crate) fn xwrustffi_cond_get_tik(cond: *mut XwosCond) -> XwSq;
     pub(crate) fn xwrustffi_cond_acquire(cond: *mut XwosCond, tik: XwSq) -> XwEr;
     pub(crate) fn xwrustffi_cond_release(cond: *mut XwosCond, tik: XwSq) -> XwEr;
     pub(crate) fn xwrustffi_cond_bind(cond: *mut XwosCond, sel: *mut c_void, pos: XwSq) -> XwEr;
@@ -367,7 +367,7 @@ impl Cond {
                 xwrustffi_cond_put(self.cond.get());
             } else {
                 xwrustffi_cond_init(self.cond.get());
-                *self.tik.get() = xwrustffi_cond_gettik(self.cond.get());
+                *self.tik.get() = xwrustffi_cond_get_tik(self.cond.get());
             }
         }
     }

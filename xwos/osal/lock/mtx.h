@@ -66,8 +66,8 @@
  *
  * ## 对象描述符和对象标签
  *
- * 已知互斥锁对象的指针的情况下，可以通过 `xwos_mtx_getd()` 获取 @ref xwos_mtx_d ，
- * 或可以通过 `xwos_mtx_gettik()` 获取对象标签。
+ * 已知互斥锁对象的指针的情况下，可以通过 `xwos_mtx_get_d()` 获取 @ref xwos_mtx_d ，
+ * 或可以通过 `xwos_mtx_get_tik()` 获取对象标签。
  *
  *
  * ## C++
@@ -241,9 +241,9 @@ xwer_t xwos_mtx_release(xwos_mtx_d mtxd)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwsq_t xwos_mtx_gettik(struct xwos_mtx * mtx)
+xwsq_t xwos_mtx_get_tik(struct xwos_mtx * mtx)
 {
-        return xwosdl_mtx_gettik(&mtx->osmtx);
+        return xwosdl_mtx_get_tik(&mtx->osmtx);
 }
 
 /**
@@ -254,12 +254,12 @@ xwsq_t xwos_mtx_gettik(struct xwos_mtx * mtx)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwos_mtx_d xwos_mtx_getd(struct xwos_mtx * mtx)
+xwos_mtx_d xwos_mtx_get_d(struct xwos_mtx * mtx)
 {
         xwos_mtx_d mtxd;
 
         mtxd.mtx = mtx;
-        mtxd.tik = xwosdl_mtx_gettik(&mtx->osmtx);
+        mtxd.tik = xwosdl_mtx_get_tik(&mtx->osmtx);
         return mtxd;
 }
 

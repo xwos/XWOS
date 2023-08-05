@@ -50,9 +50,9 @@ xwer_t xwrustffi_swt_put(struct xwos_swt * swt)
         return xwos_swt_put(swt);
 }
 
-xwsq_t xwrustffi_swt_gettik(struct xwos_swt * swt)
+xwsq_t xwrustffi_swt_get_tik(struct xwos_swt * swt)
 {
-        return xwos_swt_gettik(swt);
+        return xwos_swt_get_tik(swt);
 }
 
 xwer_t xwrustffi_swt_acquire(struct xwos_swt * swt, xwsq_t tik)

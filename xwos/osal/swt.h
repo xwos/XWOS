@@ -57,8 +57,8 @@
  *
  * ## 对象描述符和对象标签
  *
- * 已知软件定时器对象的指针的情况下，可以通过 `xwos_swt_getd()` 获取 @ref xwos_swt_d ，
- * 或可以通过 `xwos_swt_gettik()` 获取对象标签。
+ * 已知软件定时器对象的指针的情况下，可以通过 `xwos_swt_get_d()` 获取 @ref xwos_swt_d ，
+ * 或可以通过 `xwos_swt_get_tik()` 获取对象标签。
  *
  *
  * ## C++
@@ -247,9 +247,9 @@ xwer_t xwos_swt_release(xwos_swt_d swtd)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwsq_t xwos_swt_gettik(struct xwos_swt * swt)
+xwsq_t xwos_swt_get_tik(struct xwos_swt * swt)
 {
-        return xwosdl_swt_gettik(&swt->osswt);
+        return xwosdl_swt_get_tik(&swt->osswt);
 }
 
 /**
@@ -260,12 +260,12 @@ xwsq_t xwos_swt_gettik(struct xwos_swt * swt)
  * + 上下文：任意
  */
 static __xwos_inline_api
-xwos_swt_d xwos_swt_getd(struct xwos_swt * swt)
+xwos_swt_d xwos_swt_get_d(struct xwos_swt * swt)
 {
         xwos_swt_d swtd;
 
         swtd.swt = swt;
-        swtd.tik = xwosdl_swt_gettik(&swt->osswt);
+        swtd.tik = xwosdl_swt_get_tik(&swt->osswt);
         return swtd;
 }
 

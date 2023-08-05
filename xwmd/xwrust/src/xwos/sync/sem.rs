@@ -145,7 +145,7 @@ extern "C" {
     fn xwrustffi_sem_fini(sem: *mut XwosSem) -> XwEr;
     fn xwrustffi_sem_grab(sem: *mut XwosSem) -> XwEr;
     fn xwrustffi_sem_put(sem: *mut XwosSem) -> XwEr;
-    fn xwrustffi_sem_gettik(sem: *mut XwosSem) -> XwSq;
+    fn xwrustffi_sem_get_tik(sem: *mut XwosSem) -> XwSq;
     fn xwrustffi_sem_acquire(sem: *mut XwosSem, tik: XwSq) -> XwEr;
     fn xwrustffi_sem_release(sem: *mut XwosSem, tik: XwSq) -> XwEr;
     fn xwrustffi_sem_bind(sem: *mut XwosSem, sel: *mut c_void, pos: XwSq) -> XwEr;
@@ -336,7 +336,7 @@ impl Sem {
                 xwrustffi_sem_put(self.sem.get());
             } else {
                 xwrustffi_sem_init(self.sem.get(), val, max);
-                *self.tik.get() = xwrustffi_sem_gettik(self.sem.get());
+                *self.tik.get() = xwrustffi_sem_get_tik(self.sem.get());
             }
         }
     }

@@ -151,7 +151,7 @@ extern "C" {
     fn xwcq_fini(cq: *mut XwmdXwcq) -> XwEr;
     fn xwcq_grab(cq: *mut XwmdXwcq) -> XwEr;
     fn xwcq_put(cq: *mut XwmdXwcq) -> XwEr;
-    fn xwcq_gettik(cq: *mut XwmdXwcq) -> XwSq;
+    fn xwcq_get_tik(cq: *mut XwmdXwcq) -> XwSq;
     fn xwrustffi_xwcq_acquire(cq: *mut XwmdXwcq, tik: XwSq) -> XwEr;
     fn xwrustffi_xwcq_release(cq: *mut XwmdXwcq, tik: XwSq) -> XwEr;
     fn xwcq_eq(cq: *mut XwmdXwcq, data: *const u8, size: *mut XwSz) -> XwEr;
@@ -349,7 +349,7 @@ where
         unsafe {
             let slotsize: XwSz = (S + XWCQ_MM_ALIGN - 1) & (!XWCQ_MM_MSK);
             let rc = xwcq_init(self.cq.get(), slotsize, N, self.pool.get() as _);
-            *self.tik.get() = xwcq_gettik(self.cq.get());
+            *self.tik.get() = xwcq_get_tik(self.cq.get());
             if rc == 0 {
                 XwcqError::Ok(rc)
             } else if rc == -ESIZE {

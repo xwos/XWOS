@@ -31,7 +31,7 @@ xwer_t xwlua_sqlk_gc(struct xwos_object * obj)
         return XWOK;
 }
 
-xwsq_t xwlua_sqlk_gettik(struct xwlua_sqlk * luasqlk)
+xwsq_t xwlua_sqlk_get_tik(struct xwlua_sqlk * luasqlk)
 {
         xwsq_t tik;
 
@@ -43,12 +43,12 @@ xwsq_t xwlua_sqlk_gettik(struct xwlua_sqlk * luasqlk)
         return tik;
 }
 
-xwlua_sqlk_sp xwlua_sqlk_getd(struct xwlua_sqlk * luasqlk)
+xwlua_sqlk_sp xwlua_sqlk_get_d(struct xwlua_sqlk * luasqlk)
 {
         xwlua_sqlk_sp sqlksp;
 
         sqlksp.luasqlk = luasqlk;
-        sqlksp.tik = xwlua_sqlk_gettik(luasqlk);
+        sqlksp.tik = xwlua_sqlk_get_tik(luasqlk);
         return sqlksp;
 }
 
@@ -163,7 +163,7 @@ int xwlua_sqlk_new(lua_State * L)
                 xwos_sqlk_init(&luasqlk->ossqlk);
                 luasqlk->lkst = XWLUA_SQLK_LKST_UNLOCK;
                 sqlksp->luasqlk = luasqlk;
-                sqlksp->tik = xwlua_sqlk_gettik(luasqlk);
+                sqlksp->tik = xwlua_sqlk_get_tik(luasqlk);
                 luaL_setmetatable(L, "xwlua_sqlk_sp");
         } else {
                 lua_pop(L, 1);

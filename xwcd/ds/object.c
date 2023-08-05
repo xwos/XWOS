@@ -42,7 +42,7 @@ void xwds_obj_destruct(struct xwds_object * obj)
 }
 
 __xwds_code
-xwsq_t xwds_obj_gettik(struct xwds_object * obj)
+xwsq_t xwds_obj_get_tik(struct xwds_object * obj)
 {
         xwsq_t tik;
 

@@ -164,9 +164,9 @@ xwer_t xwds_device_resume_all(struct xwds * ds, bool ign_err);
  * @return 标签
  */
 static __xwds_inline_api
-xwsq_t xwds_device_gettik(struct xwds_device * dev)
+xwsq_t xwds_device_get_tik(struct xwds_device * dev)
 {
-        return xwds_obj_gettik(&dev->obj);
+        return xwds_obj_get_tik(&dev->obj);
 }
 
 #if defined(XWCDCFG_ds_LITE) && (1 == XWCDCFG_ds_LITE)

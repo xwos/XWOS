@@ -33,9 +33,9 @@ xwer_t xwrustffi_sem_put(struct xwos_sem * sem)
         return xwos_sem_put(sem);
 }
 
-xwsq_t xwrustffi_sem_gettik(struct xwos_sem * sem)
+xwsq_t xwrustffi_sem_get_tik(struct xwos_sem * sem)
 {
-        return xwos_sem_gettik(sem);
+        return xwos_sem_get_tik(sem);
 }
 
 xwer_t xwrustffi_sem_acquire(struct xwos_sem * sem, xwsq_t tik)

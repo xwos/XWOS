@@ -66,7 +66,7 @@ xwer_t xwmp_mtx_acquire(struct xwmp_mtx * mtx, xwsq_t tik);
 xwer_t xwmp_mtx_release(struct xwmp_mtx * mtx, xwsq_t tik);
 xwer_t xwmp_mtx_grab(struct xwmp_mtx * mtx);
 xwer_t xwmp_mtx_put(struct xwmp_mtx * mtx);
-xwsq_t xwmp_mtx_gettik(struct xwmp_mtx * mtx);
+xwsq_t xwmp_mtx_get_tik(struct xwmp_mtx * mtx);
 
 xwer_t xwmp_mtx_unlock(struct xwmp_mtx * mtx);
 xwer_t xwmp_mtx_lock(struct xwmp_mtx * mtx);

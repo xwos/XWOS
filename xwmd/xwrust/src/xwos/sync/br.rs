@@ -99,7 +99,7 @@ extern "C" {
     pub(crate) fn xwrustffi_br_fini(br: *mut c_void) -> XwEr;
     pub(crate) fn xwrustffi_br_grab(br: *mut c_void) -> XwEr;
     pub(crate) fn xwrustffi_br_put(br: *mut c_void) -> XwEr;
-    pub(crate) fn xwrustffi_br_gettik(br: *mut c_void) -> XwSq;
+    pub(crate) fn xwrustffi_br_get_tik(br: *mut c_void) -> XwSq;
     pub(crate) fn xwrustffi_br_acquire(br: *mut c_void, tik: XwSq) -> XwEr;
     pub(crate) fn xwrustffi_br_release(br: *mut c_void, tik: XwSq) -> XwEr;
     pub(crate) fn xwrustffi_br_bind(br: *mut c_void, sel: *mut c_void, pos: XwSq) -> XwEr;
@@ -286,7 +286,7 @@ where
                                   N,
                                   &mut (*self.br.get()).bmp as _,
                                   &mut (*self.br.get()).msk as _);
-                *self.tik.get() = xwrustffi_br_gettik(self.br.get() as _);
+                *self.tik.get() = xwrustffi_br_get_tik(self.br.get() as _);
             }
         }
     }
