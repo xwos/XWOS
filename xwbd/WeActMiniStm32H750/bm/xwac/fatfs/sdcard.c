@@ -32,6 +32,10 @@ xwer_t sdcard_fatfs_mount(void)
         FRESULT frc;
 
         MX_SDMMC1_SD_Init();
+        rc = MX_SDMMC1_SD_TrimClk(10);
+        if (rc < 0) {
+                goto err_sd_init;
+        }
         frc = f_mount(&sdcard_fatfs, "sd:", 1);
         if (FR_OK != frc) {
                 rc = -EIO;
@@ -40,6 +44,7 @@ xwer_t sdcard_fatfs_mount(void)
         return XWOK;
 
 err_mount:
+err_sd_init:
         return rc;
 }
 
@@ -88,7 +93,7 @@ int MMC_disk_initialize(void)
         if (HAL_SD_STATE_READY == hsd1.State) {
                 rc = XWOK;
         } else {
-                rc = MX_SDMMC1_SD_TrimClk(10);
+                rc = -EIO;
         }
         return (int)rc;
 }

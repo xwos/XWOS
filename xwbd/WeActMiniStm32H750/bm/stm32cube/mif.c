@@ -19,6 +19,7 @@
  */
 
 #include "board/std.h"
+#include <xwos/lib/xwlog.h>
 #include <xwos/lib/xwbop.h>
 #include "bm/stm32cube/Core/Inc/main.h"
 #include "bm/xwac/xwlib/crc.h"
@@ -130,13 +131,10 @@ xwer_t stm32cube_start(void)
         /* fatfs */
         rc = sdcard_fatfs_mount();
         if (rc < 0) {
-                goto err_fatfs_mount;
+                xwlogf(ERR, "stm32cube", "Mount SDCard ... <rc:%d>\n", rc);
         }
         return XWOK;
 
-
-err_fatfs_mount:
-        stm32cube_xwds_stop();
 err_xwds_start:
         return rc;
 }

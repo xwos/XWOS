@@ -19,11 +19,4 @@
 -- > limitations under the License.
 --
 
-childsp = xwos.thd.dofile("sd:/hw.lua", true)
-xwxt["childsp"] = childsp
-childsp = nil
-rc, rcmsg = xwxt.childsp:join()
-print(rcmsg)
-collectgarbage()
-xwxt.childsp = nil
-xwxt.gc()
+xwos.thd.dofile("sd:/hw.lua")
