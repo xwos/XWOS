@@ -1,51 +1,12 @@
 --[[--------
 XWLUA模块：I2C主机模式控制器
 
+
+## CAPI
+
+[**CAPI**](../../capi/group__xwlua__xwds__i2cm.html)
+
 @classmod xwds.i2cm
-]]
-
-
---[[--------
-注册I2C主机模式控制器对象
-
-
-
-在C代码中为XWLUA注册I2C主机模式控制器对象。
-
-@within CAPI
-@function xwds.i2cm.xwlua_i2cm_register
-
-@param L **(lua_State *)** (**in**) 虚拟机指针（向哪个虚拟机注册）
-
-@param name **(const char *)** (**in**) 在Lua语言中的符号名
-
-@param i2cm **(struct xwds_i2cm *)** (**in**) I2C主机模式控制器对象
-
-@usage
-void xwlua_i2cm_register(lua_State * L, const char * name, struct xwds_i2cm * i2cm);
-
-@usage
-xwlua_i2cm_register(L, "i2cm2", &stm32cube_usart1_cb);
-]]
-
-
---[[--------
-删除I2C主机模式控制器对象
-
-
-
-在C代码中删除I2C主机模式控制器对象。
-
-
-@within CAPI
-@function xwds.i2cm.xwlua_i2cm_unregister
-
-@param L **(lua_State *)** (**in**) 虚拟机指针（从哪个虚拟机删除）
-
-@param name **(const char *)** (**in**) 在Lua语言中的符号名
-
-@usage
-void xwlua_i2cm_unregister(lua_State * L, const char * name);
 ]]
 
 

@@ -957,7 +957,14 @@ INPUT                  = xwxr/index.md \
                          xwmd/isc/xwssc/mif.h \
                          xwmd/isc/xwssc/protocol.h \
                          xwmd/isc/xwssc/hwifal.h \
-                         xwmd/isc/xwssc/hwif/uart.h
+                         xwmd/isc/xwssc/hwif/uart.h \
+                         xwem/vm/lua/group.dox \
+                         xwem/vm/lua/xwlua/xwds/soc.h \
+                         xwem/vm/lua/xwlua/xwds/uart.h \
+                         xwem/vm/lua/xwlua/xwds/i2cm.h \
+                         xwem/vm/lua/xwlua/xwds/spim.h \
+                         xwem/vm/lua/xwlua/xwvm/debug.h \
+                         xwem/vm/lua/xwlua/xwvm/dataxchg.h
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

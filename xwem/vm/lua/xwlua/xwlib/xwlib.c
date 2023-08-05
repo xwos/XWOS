@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：通用函数库
+ * @brief XWLUA库：通用函数库
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

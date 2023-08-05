@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：信号选择器
+ * @brief XWLUA库：信号选择器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

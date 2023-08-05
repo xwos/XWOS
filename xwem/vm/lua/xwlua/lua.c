@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Lua stand-alone interpreter
+ * @brief XWLUA Stand-alone Interpreter
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

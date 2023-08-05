@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：玄武设备栈
+ * @brief XWLUA库：玄武设备栈
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -21,7 +21,6 @@
 #include <xwos/standard.h>
 #include "xwem/vm/lua/src/lauxlib.h"
 #include "xwem/vm/lua/xwlua/port.h"
-#include "xwem/vm/lua/xwlua/xwds/soc.h"
 #include "xwem/vm/lua/xwlua/xwds/uart.h"
 #include "xwem/vm/lua/xwlua/xwds/i2cm.h"
 #include "xwem/vm/lua/xwlua/xwds/spim.h"
@@ -33,6 +32,11 @@ const luaL_Reg xwlua_ds[] = {
         {"spim", NULL},
         {NULL, NULL},
 };
+
+extern void xwlua_ds_open_soc(lua_State * L);
+extern void xwlua_ds_open_i2cm(lua_State * L);
+extern void xwlua_ds_open_spim(lua_State * L);
+extern void xwlua_ds_open_uart(lua_State * L);
 
 LUAMOD_API int xwlua_open_ds(lua_State * L)
 {

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：UART
+ * @brief XWLUA库：UART控制器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

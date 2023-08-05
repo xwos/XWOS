@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：全局导出表
+ * @brief XWLUA库：全局导出表
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -22,6 +22,8 @@
 #include <stdio.h>
 #include "xwem/vm/lua/src/lauxlib.h"
 #include "xwem/vm/lua/xwlua/xwvm/debug.h"
+
+extern int xwlua_vm_dump(lua_State * vm);
 
 const luaL_Reg xwlua_xwvm_libconstructor[] = {
         {"dump", xwlua_vm_dump},

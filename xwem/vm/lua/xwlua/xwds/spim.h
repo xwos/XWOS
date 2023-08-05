@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：SPI master
+ * @brief XWLUA库：SPI主机模式控制器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -25,13 +25,37 @@
 #include <xwcd/ds/spi/master.h>
 #include "xwem/vm/lua/src/lauxlib.h"
 
+/**
+ * @defgroup xwlua_xwds_spim SPI主机模式控制器
+ * @ingroup xwlua_xwds
+ * @{
+ */
+
+/**
+ * @brief XWLUA SPI主机模式控制器对象
+ */
 struct xwlua_spim {
-        struct xwds_spim * spim;
-        xwsq_t tik;
+        struct xwds_spim * spim; /**< XWDS的SPI主机模式控制器对象指针 */
+        xwsq_t tik; /**< 对象的标签 */
 };
 
+/**
+ * @brief 注册SPI主机模式控制器对象
+ * @param[in] L: 虚拟机指针
+ * @param[in] name: SPI主机模式控制器在Lua中的符号名
+ * @param[in] spim: SPI主机模式控制器对象的指针
+ */
 void xwlua_spim_register(lua_State * L, const char * name, struct xwds_spim * spim);
+
+/**
+ * @brief 删除SPI主机模式控制器对象
+ * @param[in] L: 虚拟机指针
+ * @param[in] name SPI主机模式控制器在Lua中的符号名
+ */
 void xwlua_spim_unregister(lua_State * L, const char * name);
-void xwlua_ds_open_spim(lua_State * L);
+
+/**
+ * @} xwlua_xwds_spim
+ */
 
 #endif /* xwem/vm/lua/xwlua/xwds/spim.h */

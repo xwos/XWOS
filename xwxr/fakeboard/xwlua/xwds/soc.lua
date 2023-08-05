@@ -1,50 +1,12 @@
 --[[--------
 XWLUA模块：SOC
 
+
+## CAPI
+
+[**CAPI**](../../capi/group__xwlua__xwds__i2cm.html)
+
 @classmod xwds.soc
-]]
-
-
---[[--------
-注册SOC对象
-
-
-
-在C代码中为XWLUA注册SOC对象。
-
-@within CAPI
-@function xwds.soc.xwlua_soc_register
-
-@param L **(lua_State *)** 虚拟机指针（向哪个虚拟机注册）
-
-@param name **(const char *)** 在Lua语言中的符号名
-
-@param soc **(struct xwds_soc *)** SOC对象
-
-@usage
-void xwlua_soc_register(lua_State * L, const char * name, struct xwds_soc * soc);
-
-@usage
-xwlua_soc_register(L, "stm32", &stm32cube_soc_cb);
-
-]]
-
---[[--------
-删除SOC对象
-
-
-
-在C代码中删除SOC对象。
-
-@within CAPI
-@function xwds.soc.xwlua_soc_unregister
-
-@param L **(lua_State *)** 虚拟机指针（从哪个虚拟机删除）
-
-@param name **(const char *)** 在Lua语言中的符号名
-
-@usage
-void xwlua_soc_unregister(lua_State * L, const char * name);
 ]]
 
 

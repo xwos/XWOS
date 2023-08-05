@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：GPIO
+ * @brief XWLUA库：GPIO
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

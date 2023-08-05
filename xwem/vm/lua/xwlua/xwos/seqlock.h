@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：顺序锁
+ * @brief XWLUA库：顺序锁
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：信号量
+ * @brief XWLUA库：信号量
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

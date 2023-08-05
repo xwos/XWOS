@@ -1,50 +1,12 @@
 --[[--------
 XWLUA模块：SPI主机模式控制器
 
+
+## CAPI
+
+[**CAPI**](../../capi/group__xwlua__xwds__i2cm.html)
+
 @classmod xwds.spim
-]]
-
-
---[[--------
-注册SPI主机模式控制器对象
-
-
-
-在C代码中为XWLUA注册SPI主机模式控制器对象。
-
-@within CAPI
-@function xwds.spim.xwlua_spim_register
-
-@param L **(lua_State *)** (**in**) 虚拟机指针（向哪个虚拟机注册）
-
-@param name **(const char *)** (**in**) 在Lua语言中的符号名
-
-@param spim **(struct xwds_spim *)** (**in**) SPI主机模式控制器对象
-
-@usage
-void xwlua_spim_register(lua_State * L, const char * name, struct xwds_spim * spim);
-
-@usage
-xwlua_spim_register(L, "spim1", &stm32cube_usart1_cb);
-
-]]
-
---[[--------
-删除SPI主机模式控制器对象
-
-
-
-在C代码中删除SPI主机模式控制器对象。
-
-@within CAPI
-@function xwds.spim.xwlua_spim_unregister
-
-@param L **(lua_State *)** (**in**) 虚拟机指针（从哪个虚拟机删除）
-
-@param name **(const char *)** (**in**) 在Lua语言中的符号名
-
-@usage
-void xwlua_spim_unregister(lua_State * L, const char * name);
 ]]
 
 

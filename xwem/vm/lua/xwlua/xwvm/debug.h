@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：XWLUA VM的调试库
+ * @brief XWLUA库：XWLUA VM的调试库
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -24,8 +24,33 @@
 #include <xwos/standard.h>
 #include "xwem/vm/lua/src/lua.h"
 
+/**
+ * @ingroup xwlua_xwvm
+ * @{
+ */
+
+/**
+ * @brief 显示表的内容
+ * @param[in] vm: 虚拟机
+ * @param[in] idx: 表在虚拟机栈中的索引
+ * @param[in] nest: 嵌套的层数
+ * @details
+ * 此函数可将索引为 `idx` 的表中的内容显示到终端上。
+ *
+ * 此函数是递归函数， `nest` 指明此函数递归了多少次。
+ */
 void xwlua_vm_dump_table(lua_State * vm, int idx, int nest);
+
+/**
+ * @brief 显示栈上的内容
+ * @param[in] vm: 虚拟机
+ * @details
+ * 此函数可将虚拟机栈上的内容显示到终端上。
+ */
 void xwlua_vm_dump_stack(lua_State * vm);
-int xwlua_vm_dump(lua_State * vm);
+
+/**
+ * @} xwlua_xwvm
+ */
 
 #endif /* xwem/vm/lua/xwlua/xwvm/debug.h */

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Readline for Lua
+ * @brief XWLUA Readline
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

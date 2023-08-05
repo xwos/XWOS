@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：I2C master
+ * @brief XWLUA库：I2C主机控制器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -25,13 +25,37 @@
 #include <xwcd/ds/i2c/master.h>
 #include "xwem/vm/lua/src/lauxlib.h"
 
+/**
+ * @defgroup xwlua_xwds_i2cm I2C主机控制器
+ * @ingroup xwlua_xwds
+ * @{
+ */
+
+/**
+ * @brief XWLUA I2C主机控制器对象
+ */
 struct xwlua_i2cm {
-        struct xwds_i2cm * i2cm;
-        xwsq_t tik;
+        struct xwds_i2cm * i2cm; /**< XWDS的I2C主机控制器对象指针 */
+        xwsq_t tik; /**< 对象的标签 */
 };
 
+/**
+ * @brief 注册I2C主机模式控制器对象
+ * @param[in] L: 虚拟机指针
+ * @param[in] name: I2C主机模式控制器在Lua中的符号名
+ * @param[in] i2cm: I2C主机模式控制器对象
+ */
 void xwlua_i2cm_register(lua_State * L, const char * name, struct xwds_i2cm * i2cm);
+
+/**
+ * @brief 删除I2C主机模式控制器对象
+ * @param[in] L: 虚拟机指针
+ * @param[in] name I2C主机模式控制器在Lua中的符号名
+ */
 void xwlua_i2cm_unregister(lua_State * L, const char * name);
-void xwlua_ds_open_i2cm(lua_State * L);
+
+/**
+ * @} xwlua_xwds_i2cm
+ */
 
 #endif /* xwem/vm/lua/xwlua/xwds/i2cm.h */

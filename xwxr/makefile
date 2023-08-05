@@ -26,7 +26,7 @@ MKCFG := ${XWOS}/xwbs/util/el/mkcfg.el
 
 all: $(WKSPC) cfg capi rustdoc luadoc
 
-capi: cfg
+cdoc: cfg
 	cd .. && doxygen -d Preprocessor xwxr/doxyfile
 
 rustdoc: cfg

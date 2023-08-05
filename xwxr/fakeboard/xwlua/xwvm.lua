@@ -5,6 +5,9 @@ XWLUA的虚拟机就是一个 **独立** 的 `struct Lua_State` ，是通过 `lu
 XWLUA的虚拟机 **不能** 是通过 `coroutine.create()` （对应的CAPI `luaB_cocreate()` ）创建的 `struct Lua_State` 。
 
 
+## CAPI
+
+[**CAPI**](../../capi/group__xwlua__xwvm.html)
 
 @module xwvm
 ]]

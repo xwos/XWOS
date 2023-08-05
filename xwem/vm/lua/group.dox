@@ -1,0 +1,13 @@
+/**
+ * @defgroup xwlua XWLUA
+ */
+
+/**
+ * @defgroup xwlua_xwds XWLUA设备栈的CAPI库
+ * @ingroup xwlua
+ */
+
+/**
+ * @defgroup xwlua_xwvm XWLUA虚拟机的CAPI库
+ * @ingroup xwlua
+ */

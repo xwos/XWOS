@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：位图
+ * @brief XWLUA库：位图
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

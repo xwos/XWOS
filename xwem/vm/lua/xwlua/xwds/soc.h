@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：SOC
+ * @brief XWLUA库：SOC
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -25,13 +25,37 @@
 #include <xwcd/ds/soc/chip.h>
 #include "xwem/vm/lua/src/lauxlib.h"
 
+/**
+ * @defgroup xwlua_xwds_soc SOC
+ * @ingroup xwlua_xwds
+ * @{
+ */
+
+/**
+ * @brief XWLUA SOC对象
+ */
 struct xwlua_soc {
-        struct xwds_soc * soc;
-        xwsq_t tik;
+        struct xwds_soc * soc; /**< XWDS的SOC对象指针 */
+        xwsq_t tik; /**< 对象的标签 */
 };
 
+/**
+ * @brief 注册SOC对象
+ * @param[in] L: 虚拟机指针
+ * @param[in] name: SOC在Lua中的符号名
+ * @param[in] soc: SOC对象的指针
+ */
 void xwlua_soc_register(lua_State * L, const char * name, struct xwds_soc * soc);
+
+/**
+ * @brief 删除SOC对象
+ * @param[in] L: 虚拟机指针
+ * @param[in] name SOC在Lua中的符号名
+ */
 void xwlua_soc_unregister(lua_State * L, const char * name);
-void xwlua_ds_open_soc(lua_State * L);
+
+/**
+ * @} xwlua_xwds_soc
+ */
 
 #endif /* xwem/vm/lua/xwlua/xwds/soc.h */

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：事件标志
+ * @brief XWLUA库：事件标志
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Prefix Include File for Lua in XWOS
+ * @brief XWLUA Prefix Include File
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

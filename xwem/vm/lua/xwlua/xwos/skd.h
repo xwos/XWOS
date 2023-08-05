@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：调度
+ * @brief XWLUA库：调度
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

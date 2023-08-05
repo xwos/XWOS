@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：调度
+ * @brief XWLUA库：调度
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -270,6 +270,11 @@ err_nostring:
         lua_pushnil(L);
         return 1;
 }
+
+extern int xwlua_vm_function_writer(lua_State * src,
+                                    const void * b,
+                                    size_t size,
+                                    void * ud);
 
 int xwlua_thd_call(lua_State * L)
 {

@@ -387,6 +387,9 @@
 //! [`MutexError::Interrupt`]: crate::xwos::lock::mtx::MutexError::Interrupt
 //! [`SemError::Interrupt`]: crate::xwos::sync::sem::SemError::Interrupt
 //! [`CondError::Interrupt`]: crate::xwos::sync::cond::CondError::Interrupt
+//! [`FlgError::Interrupt`]: crate::xwos::sync::flg::FlgError::Interrupt
+//! [`BrError::Interrupt`]: crate::xwos::sync::br::BrError::Interrupt
+//! [`SelError::Interrupt`]: crate::xwos::sync::sel::SelError::Interrupt
 //! [`cthd::i()`]: crate::xwos::cthd::i
 //! [`cthd::shld_stop()`]: crate::xwos::cthd::shld_stop
 //! [`xwrust::xwos::cthd`]: crate::xwos::cthd

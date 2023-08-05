@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 玄武Lua库：UART
+ * @brief XWLUA库：UART控制器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -25,14 +25,37 @@
 #include <xwcd/ds/uart/controller.h>
 #include "xwem/vm/lua/src/lauxlib.h"
 
+/**
+ * @defgroup xwlua_xwds_uart UART控制器
+ * @ingroup xwlua_xwds
+ * @{
+ */
+
+/**
+ * @brief XWLUA UART控制器对象
+ */
 struct xwlua_uart {
-        struct xwds_uartc * uartc;
-        xwsq_t tik;
+        struct xwds_uartc * uartc; /**< XWDS的UART控制器对象指针 */
+        xwsq_t tik; /**< 对象的标签 */
 };
 
-void xwlua_uart_register(lua_State * L, const char * name,
-                         struct xwds_uartc * uartc);
+/**
+ * @brief 注册UART控制器对象
+ * @param[in] L: 虚拟机指针
+ * @param[in] name: UART控制器在Lua中的符号名
+ * @param[in] spim: UART控制器对象的指针
+ */
+void xwlua_uart_register(lua_State * L, const char * name, struct xwds_uartc * uartc);
+
+/**
+ * @brief 删除UART控制器对象
+ * @param[in] L: 虚拟机指针
+ * @param[in] name UART控制器在Lua中的符号名
+ */
 void xwlua_uart_unregister(lua_State * L, const char * name);
-void xwlua_ds_open_uart(lua_State * L);
+
+/**
+ * @} xwlua_xwds_uart
+ */
 
 #endif /* xwem/vm/lua/xwlua/xwds/uart.h */
