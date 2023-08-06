@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWLUA库：电源管理
+ * @brief XWLUA库：XWOS内核：电源管理
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

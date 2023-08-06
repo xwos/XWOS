@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWLUA库：SOC
+ * @brief XWLUA库：设备栈：SOC
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

@@ -45,6 +45,15 @@ const luaL_Reg xwlua_loadedlibs[] = {
         {NULL, NULL},
 };
 
+const luaL_Reg xwlua_xt_loadedlibs[] = {
+        {XWLUA_VM_NAME, xwlua_open_vm},
+        {XWLUA_TM_NAME, xwlua_open_tm},
+        {XWLUA_LIB_NAME, xwlua_open_lib},
+        {XWLUA_OS_NAME, xwlua_open_os},
+        {XWLUA_DS_NAME, xwlua_open_ds},
+        {NULL, NULL},
+};
+
 #if defined(XWEMCFG_vm_lua_BRDLIBS) && (1 == XWEMCFG_vm_lua_BRDLIBS)
 extern void xwlua_open_brdlibs(lua_State * L);
 #endif
@@ -73,7 +82,7 @@ void xwlua_xt_openlibs(lua_State * L)
 {
         const luaL_Reg *lib;
 
-        for (lib = xwlua_loadedlibs; lib->func; lib++) {
+        for (lib = xwlua_xt_loadedlibs; lib->func; lib++) {
                 luaL_requiref(L, lib->name, lib->func, 1);
                 lua_pop(L, 1);
         }

@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWLUA库：位图
+ * @brief XWLUA库：通用函数库：位图
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

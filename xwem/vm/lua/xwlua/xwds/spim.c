@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWLUA库：SPI主机模式控制器
+ * @brief XWLUA库：设备栈：SPI主机模式控制器
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

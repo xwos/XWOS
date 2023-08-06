@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWLUA库：玄武设备栈
+ * @brief XWLUA库：设备栈
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

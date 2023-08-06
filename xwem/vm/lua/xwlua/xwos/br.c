@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWLUA库：线程栅栏
+ * @brief XWLUA库：XWOS内核：线程栅栏
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

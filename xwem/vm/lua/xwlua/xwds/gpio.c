@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWLUA库：GPIO
+ * @brief XWLUA库：设备栈：GPIO
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

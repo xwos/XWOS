@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWLUA库：XWLUA VM之间的数据交换
+ * @brief XWLUA库：虚拟机：数据交换
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

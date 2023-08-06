@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief 外部模块：Lua
+ * @brief XWLUA：模块接口
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright

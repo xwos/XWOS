@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief XWLUA库：XWLUA VM的调试库
+ * @brief XWLUA库：虚拟机：VM的调试库
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
