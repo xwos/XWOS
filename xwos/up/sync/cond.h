@@ -16,8 +16,8 @@
 #include <xwos/standard.h>
 #if defined(XWOSCFG_SYNC_COND_MEMPOOL) && (1 == XWOSCFG_SYNC_COND_MEMPOOL)
 #  include <xwos/mm/mempool/allocator.h>
-#elif defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
-#  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_SYNC_COND_SMA) && (1 == XWOSCFG_SYNC_COND_SMA)
+#  include <xwos/mm/sma.h>
 #endif
 #include <xwos/up/plwq.h>
 #include <xwos/up/sync/obj.h>
@@ -28,7 +28,7 @@ struct xwup_thd;
  * @brief 条件量对象
  */
 struct xwup_cond {
-        struct xwup_synobj synobj; /**< C语言面向对象：继承struct xwup_synobj */
+        struct xwup_synobj synobj; /**< C语言面向对象：继承 `struct xwup_synobj` */
         bool neg; /**< 是否为负 */
         struct xwup_plwq wq; /**< 等待队列 */
 };
@@ -43,6 +43,8 @@ xwer_t xwup_cond_intr_all(struct xwup_cond * cond);
 xwer_t xwup_cond_cache_init(struct xwmm_mempool * mp, xwsq_t page_order);
 #elif defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
 xwer_t xwup_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
+#elif defined(XWOSCFG_SYNC_COND_SMA) && (1 == XWOSCFG_SYNC_COND_SMA)
+void xwup_cond_cache_init(struct xwmm_sma * sma);
 #endif
 
 xwer_t xwup_cond_init(struct xwup_cond * cond);

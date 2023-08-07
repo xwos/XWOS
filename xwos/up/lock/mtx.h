@@ -20,8 +20,8 @@
 #include <xwos/lib/rbtree.h>
 #if defined(XWOSCFG_LOCK_MTX_MEMPOOL) && (1 == XWOSCFG_LOCK_MTX_MEMPOOL)
 #  include <xwos/mm/mempool/allocator.h>
-#elif defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
-#  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_LOCK_MTX_SMA) && (1 == XWOSCFG_LOCK_MTX_SMA)
+#  include <xwos/mm/sma.h>
 #endif
 #include <xwos/up/rtwq.h>
 
@@ -31,7 +31,7 @@ struct xwup_mtxtree;
  * @brief 互斥锁
  */
 struct xwup_mtx {
-        struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
+        struct xwos_object xwobj; /**< C语言面向对象：继承 `struct xwos_object` */
         struct xwup_mtxtree * ownertree; /**< 获得此互斥锁的线程的互斥锁树：
                                               如果为空(NULL)，互斥锁处于未加锁状态。
                                               此成员被锁rtwq.lock保护。*/
@@ -53,6 +53,8 @@ xwer_t xwup_mtx_intr(struct xwup_mtx * mtx, struct xwup_thd * thd);
 xwer_t xwup_mtx_cache_init(struct xwmm_mempool * mp, xwsq_t page_order);
 #elif defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
 xwer_t xwup_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
+#elif defined(XWOSCFG_LOCK_MTX_SMA) && (1 == XWOSCFG_LOCK_MTX_SMA)
+void xwup_mtx_cache_init(struct xwmm_sma * sma);
 #endif
 xwer_t xwup_mtx_init(struct xwup_mtx * mtx, xwpr_t sprio);
 xwer_t xwup_mtx_fini(struct xwup_mtx * mtx);

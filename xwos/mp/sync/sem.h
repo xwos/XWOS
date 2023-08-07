@@ -16,8 +16,8 @@
 #include <xwos/standard.h>
 #if defined(XWOSCFG_SYNC_SEM_MEMPOOL) && (1 == XWOSCFG_SYNC_SEM_MEMPOOL)
 #  include <xwos/mm/mempool/allocator.h>
-#elif defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
-#  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_SYNC_SEM_SMA) && (1 == XWOSCFG_SYNC_SEM_SMA)
+#  include <xwos/mm/sma.h>
 #endif
 #include <xwos/mp/rtwq.h>
 #include <xwos/mp/plwq.h>
@@ -55,7 +55,7 @@ enum xwmp_sem_type_em {
  * @brief 信号量对象
  */
 struct xwmp_sem {
-        struct xwmp_synobj synobj; /**< C语言面向对象：继承struct xwmp_synobj */
+        struct xwmp_synobj synobj; /**< C语言面向对象：继承 `struct xwmp_synobj` */
         xwsq_t type; /**< 类型 */
         xwssq_t count; /**< 信号量计数器：<0，信号量处于负状态 */
         xwssq_t max; /**< 信号量计数器的最大值 */
@@ -81,6 +81,8 @@ xwer_t xwmp_rtsem_intr(struct xwmp_sem * sem, struct xwmp_wqn * wqn);
 xwer_t xwmp_sem_cache_init(struct xwmm_mempool * mp, xwsq_t page_order);
 #elif defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
 xwer_t xwmp_sem_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
+#elif defined(XWOSCFG_SYNC_SEM_SMA) && (1 == XWOSCFG_SYNC_SEM_SMA)
+void xwmp_sem_cache_init(struct xwmm_sma * sma);
 #endif
 
 xwer_t xwmp_sem_fini(struct xwmp_sem * sem);

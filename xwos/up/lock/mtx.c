@@ -19,6 +19,8 @@
 #  include <xwos/mm/mempool/allocator.h>
 #elif defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
 #  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_LOCK_MTX_SMA) && (1 == XWOSCFG_LOCK_MTX_SMA)
+#  include <xwos/mm/sma.h>
 #elif defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
 #  include <stdlib.h>
 #endif
@@ -50,6 +52,8 @@ static __xwup_data struct xwmm_memslice xwup_mtx_cache;
  * @brief 结构体 `xwup_mtx` 的对象缓存的名字
  */
 const __xwup_rodata char xwup_mtx_cache_name[] = "xwup.lk.mtx.cache";
+#elif defined(XWOSCFG_LOCK_MTX_SMA) && (1 == XWOSCFG_LOCK_MTX_SMA)
+static __xwup_data struct xwmm_sma * xwup_mtx_cache;
 #endif
 
 static __xwup_code
@@ -151,6 +155,18 @@ xwer_t xwup_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                 (dtor_f)xwup_mtx_destruct);
         return rc;
 }
+#elif defined(XWOSCFG_LOCK_MTX_SMA) && (1 == XWOSCFG_LOCK_MTX_SMA)
+/**
+ * @brief XWUP INIT CODE：初始化 `struct xwup_mtx` 的对象缓存
+ * @param[in] sma: 简单内存分配器
+ * @note
+ * + 重入性：只可在系统初始化时使用一次
+ */
+__xwup_init_code
+void xwup_mtx_cache_init(struct xwmm_sma * sma)
+{
+        xwup_mtx_cache = sma;
+}
 #endif
 
 #if (1 == XWOSRULE_LOCK_MTX_CREATE_DELETE)
@@ -185,7 +201,23 @@ struct xwup_mtx * xwup_mtx_alloc(void)
                 mem.mtx = err_ptr(rc);
         }
         return mem.mtx;
-#  elif defined(XWOSCFG_SKD_MTX_STDC_MM) && (1 == XWOSCFG_SKD_MTX_STDC_MM)
+#  elif defined(XWOSCFG_LOCK_MTX_SMA) && (1 == XWOSCFG_LOCK_MTX_SMA)
+        union {
+                struct xwup_mtx * mtx;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = xwmm_sma_alloc(xwup_mtx_cache,
+                            sizeof(struct xwup_mtx), XWMM_ALIGNMENT,
+                            &mem.anon);
+        if (rc < 0) {
+                mem.mtx = err_ptr(rc);
+        } else {
+                xwup_mtx_construct(mem.mtx);
+        }
+        return mem.mtx;
+#  elif defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
         struct xwup_mtx * mtx;
 
         mtx = malloc(sizeof(struct xwup_mtx));
@@ -213,7 +245,9 @@ void xwup_mtx_free(struct xwup_mtx * mtx)
         xwmm_mempool_objcache_free(&xwup_mtx_cache, mtx);
 #  elif defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
         xwmm_memslice_free(&xwup_mtx_cache, mtx);
-#  elif defined(XWOSCFG_SKD_MTX_STDC_MM) && (1 == XWOSCFG_SKD_MTX_STDC_MM)
+#  elif defined(XWOSCFG_LOCK_MTX_SMA) && (1 == XWOSCFG_LOCK_MTX_SMA)
+        xwmm_sma_free(xwup_mtx_cache, mtx);
+#  elif defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
         xwup_mtx_destruct(mtx);
         free(mtx);
 #  else

@@ -95,7 +95,7 @@ struct xwmq_msg {
  * @brief 消息队列对象
  */
 struct xwmq {
-        struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
+        struct xwos_object xwobj; /**< C语言面向对象：继承 `struct xwos_object` */
         const char * name; /**< 名称 */
         struct xwmm_memslice txq; /**< 消息槽队列 */
         struct xwos_sem txqsem; /**< 消息槽的信号量 */

@@ -17,6 +17,8 @@
 #  include <xwos/mm/mempool/allocator.h>
 #elif defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
 #  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_SKD_SWT_SMA) && (1 == XWOSCFG_SKD_SWT_SMA)
+#  include <xwos/mm/sma.h>
 #elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
 #  include <stdlib.h>
 #endif
@@ -45,6 +47,8 @@ static __xwmp_data struct xwmm_memslice xwmp_swt_cache;
  * @brief 软件定时器对象缓存的名字
  */
 const __xwmp_rodata char xwmp_swt_cache_name[] = "xwmp.swt.cache";
+#elif defined(XWOSCFG_SKD_SWT_SMA) && (1 == XWOSCFG_SKD_SWT_SMA)
+static __xwmp_data struct xwmm_sma * xwmp_swt_cache;
 #endif
 
 #if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
@@ -121,6 +125,18 @@ xwer_t xwmp_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                 (dtor_f)xwmp_swt_destruct);
         return rc;
 }
+#elif defined(XWOSCFG_SKD_SWT_SMA) && (1 == XWOSCFG_SKD_SWT_SMA)
+/**
+ * @brief XWMP INIT CODE：初始化 `struct xwmp_swt` 的对象缓存
+ * @param[in] sma: 简单内存分配器
+ * @note
+ * + 重入性：只可在系统初始化时使用一次
+ */
+__xwmp_init_code
+void xwmp_swt_cache_init(struct xwmm_sma * sma)
+{
+        xwmp_swt_cache = sma;
+}
 #endif
 
 #if (1 == XWOSRULE_SKD_SWT_CREATE_DELETE)
@@ -155,6 +171,22 @@ struct xwmp_swt * xwmp_swt_alloc(void)
                 mem.swt = err_ptr(rc);
         }
         return mem.swt;
+#  elif defined(XWOSCFG_SKD_SWT_SMA) && (1 == XWOSCFG_SKD_SWT_SMA)
+        union {
+                struct xwmp_swt * swt;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = xwmm_sma_alloc(xwmp_swt_cache,
+                            sizeof(struct xwmp_swt), XWMM_ALIGNMENT,
+                            &mem.anon);
+        if (rc < 0) {
+                mem.swt = err_ptr(rc);
+        } else {
+                xwmp_swt_construct(mem.swt);
+        }
+        return mem.swt;
 #  elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
         struct xwmp_swt * swt;
 
@@ -183,6 +215,8 @@ void xwmp_swt_free(struct xwmp_swt * swt)
         xwmm_mempool_objcache_free(&xwmp_swt_cache, swt);
 #  elif defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
         xwmm_memslice_free(&xwmp_swt_cache, swt);
+#  elif defined(XWOSCFG_SKD_SWT_SMA) && (1 == XWOSCFG_SKD_SWT_SMA)
+        xwmm_sma_free(xwmp_swt_cache, swt);
 #  elif defined(XWOSCFG_SKD_SWT_STDC_MM) && (1 == XWOSCFG_SKD_SWT_STDC_MM)
         xwmp_swt_destruct(swt);
         free(swt);

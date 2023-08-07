@@ -19,6 +19,8 @@
 #  include <xwos/mm/mempool/allocator.h>
 #elif defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
 #  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_LOCK_MTX_SMA) && (1 == XWOSCFG_LOCK_MTX_SMA)
+#  include <xwos/mm/sma.h>
 #elif defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
 #  include <stdlib.h>
 #endif
@@ -51,6 +53,8 @@ static __xwmp_data struct xwmm_memslice xwmp_mtx_cache;
  * @brief 结构体 `xwmp_mtx` 的对象缓存的名字
  */
 const __xwmp_rodata char xwmp_mtx_cache_name[] = "xwmp.lk.mtx.cache";
+#elif defined(XWOSCFG_LOCK_MTX_SMA) && (1 == XWOSCFG_LOCK_MTX_SMA)
+static __xwmp_data struct xwmm_sma * xwmp_mtx_cache;
 #endif
 
 static __xwmp_code
@@ -159,6 +163,18 @@ xwer_t xwmp_mtx_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                 (dtor_f)xwmp_mtx_destruct);
         return rc;
 }
+#elif defined(XWOSCFG_LOCK_MTX_SMA) && (1 == XWOSCFG_LOCK_MTX_SMA)
+/**
+ * @brief XWMP INIT CODE：初始化 `struct xwmp_mtx` 的对象缓存
+ * @param[in] sma: 简单内存分配器
+ * @note
+ * + 重入性：只可在系统初始化时使用一次
+ */
+__xwmp_init_code
+void xwmp_mtx_cache_init(struct xwmm_sma * sma)
+{
+        xwmp_mtx_cache = sma;
+}
 #endif
 
 #if (1 == XWOSRULE_LOCK_MTX_CREATE_DELETE)
@@ -193,6 +209,22 @@ struct xwmp_mtx * xwmp_mtx_alloc(void)
                 mem.mtx = err_ptr(rc);
         }
         return mem.mtx;
+#  elif defined(XWOSCFG_LOCK_MTX_SMA) && (1 == XWOSCFG_LOCK_MTX_SMA)
+        union {
+                struct xwmp_mtx * mtx;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = xwmm_sma_alloc(xwmp_mtx_cache,
+                            sizeof(struct xwmp_mtx), XWMM_ALIGNMENT,
+                            &mem.anon);
+        if (rc < 0) {
+                mem.mtx = err_ptr(rc);
+        } else {
+                xwmp_mtx_construct(mem.mtx);
+        }
+        return mem.mtx;
 #  elif defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
         struct xwmp_mtx * mtx;
 
@@ -221,6 +253,8 @@ void xwmp_mtx_free(struct xwmp_mtx * mtx)
         xwmm_mempool_objcache_free(&xwmp_mtx_cache, mtx);
 #  elif defined(XWOSCFG_LOCK_MTX_MEMSLICE) && (1 == XWOSCFG_LOCK_MTX_MEMSLICE)
         xwmm_memslice_free(&xwmp_mtx_cache, mtx);
+#  elif defined(XWOSCFG_LOCK_MTX_SMA) && (1 == XWOSCFG_LOCK_MTX_SMA)
+        xwmm_sma_free(xwmp_mtx_cache, mtx);
 #  elif defined(XWOSCFG_LOCK_MTX_STDC_MM) && (1 == XWOSCFG_LOCK_MTX_STDC_MM)
         xwmp_mtx_destruct(mtx);
         free(mtx);

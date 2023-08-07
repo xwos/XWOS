@@ -16,8 +16,8 @@
 #include <xwos/standard.h>
 #if defined(XWOSCFG_SYNC_SEM_MEMPOOL) && (1 == XWOSCFG_SYNC_SEM_MEMPOOL)
 #  include <xwos/mm/mempool/allocator.h>
-#elif defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
-#  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_SYNC_SEM_SMA) && (1 == XWOSCFG_SYNC_SEM_SMA)
+#  include <xwos/mm/sma.h>
 #endif
 #include <xwos/up/rtwq.h>
 #include <xwos/up/sync/vsem.h>
@@ -26,7 +26,7 @@
  * @brief 实时信号量对象
  */
 struct xwup_rtsem {
-        struct xwup_vsem vsem; /**< C语言面向对象：继承struct xwup_vsem */
+        struct xwup_vsem vsem; /**< C语言面向对象：继承 `struct xwup_vsem` */
         struct xwup_rtwq rtwq; /**< 实时等待队列 */
 };
 
@@ -36,6 +36,8 @@ xwer_t xwup_rtsem_intr(struct xwup_rtsem * sem, struct xwup_wqn * wqn);
 xwer_t xwup_rtsem_cache_init(struct xwmm_mempool * mp, xwsq_t page_order);
 #elif defined(XWOSCFG_SYNC_SEM_MEMSLICE) && (1 == XWOSCFG_SYNC_SEM_MEMSLICE)
 xwer_t xwup_rtsem_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
+#elif defined(XWOSCFG_SYNC_SEM_SMA) && (1 == XWOSCFG_SYNC_SEM_SMA)
+void xwup_rtsem_cache_init(struct xwmm_sma * sma);
 #endif
 xwer_t xwup_rtsem_init(struct xwup_rtsem * sem, xwssq_t val, xwssq_t max);
 xwer_t xwup_rtsem_fini(struct xwup_rtsem * sem);

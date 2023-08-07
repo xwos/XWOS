@@ -21,6 +21,8 @@
 #  include <xwos/mm/mempool/allocator.h>
 #elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
 #  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
+#  include <xwos/mm/sma.h>
 #elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
 #  include <stdlib.h>
 #endif
@@ -68,6 +70,8 @@ static __xwmp_data struct xwmm_memslice xwmp_thd_cache;
  * @brief 结构体 `xwmp_thd` 的对象缓存的名字
  */
 const __xwmp_rodata char xwmp_thd_cache_name[] = "xwmp.thd.cache";
+#elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
+static __xwmp_data struct xwmm_sma * xwmp_thd_cache;
 #endif
 
 #if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
@@ -163,7 +167,7 @@ xwer_t xwmp_thd_cache_init(struct xwmm_mempool * mp, xwsq_t page_order)
 }
 #elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
 /**
- * @brief XWMP INIT CODE：初始化结构体xwmp_thd的对象缓存
+ * @brief XWMP INIT CODE：初始化 `struct xwmp_thd` 的对象缓存
  * @param[in] zone_origin: 内存区域的首地址
  * @param[in] zone_size: 内存区域的大小
  * @return 错误码
@@ -181,6 +185,18 @@ xwer_t xwmp_thd_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                 (ctor_f)xwmp_thd_construct,
                                 (dtor_f)xwmp_thd_destruct);
         return rc;
+}
+#elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
+/**
+ * @brief XWMP INIT CODE：初始化 `struct xwmp_thd` 的对象缓存
+ * @param[in] sma: 简单内存分配器
+ * @note
+ * + 重入性：只可在系统初始化时使用一次
+ */
+__xwmp_init_code
+void xwmp_thd_cache_init(struct xwmm_sma * sma)
+{
+        xwmp_thd_cache = sma;
 }
 #endif
 
@@ -216,6 +232,22 @@ struct xwmp_thd * xwmp_thd_alloc(void)
                 mem.thd = err_ptr(rc);
         }
         return mem.thd;
+#  elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
+        union {
+                struct xwmp_thd * thd;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = xwmm_sma_alloc(xwmp_thd_cache,
+                            sizeof(struct xwmp_thd), XWMM_ALIGNMENT,
+                            &mem.anon);
+        if (rc < 0) {
+                mem.thd = err_ptr(rc);
+        } else {
+                xwmp_thd_construct(mem.thd);
+        }
+        return mem.thd;
 #  elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         struct xwmp_thd * thd;
 
@@ -244,6 +276,8 @@ void xwmp_thd_free(struct xwmp_thd * thd)
         xwmm_mempool_objcache_free(&xwmp_thd_cache, thd);
 #  elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
         xwmm_memslice_free(&xwmp_thd_cache, thd);
+#  elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
+        xwmm_sma_free(xwmp_thd_cache, thd);
 #  elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         xwmp_thd_destruct(thd);
         free(thd);
@@ -274,6 +308,20 @@ xwstk_t * xwmp_thd_stack_alloc(xwsz_t stack_size)
                 mem.stkbase = err_ptr(rc);
         }
         return mem.stkbase;
+#  elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
+        union {
+                xwstk_t * stkbase;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = xwmm_sma_alloc(xwmp_thd_cache,
+                            stack_size, XWMM_ALIGNMENT,
+                            &mem.anon);
+        if (rc < 0) {
+                mem.stkbase = err_ptr(rc);
+        }
+        return mem.stkbase;
 #  elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         xwstk_t * stkbase;
 
@@ -300,6 +348,8 @@ xwer_t xwmp_thd_stack_free(xwstk_t * stk)
 {
 #  if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
         return board_thd_stack_pool_free(stk);
+#  elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
+        return xwmm_sma_free(xwmp_thd_cache, stk);
 #  elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         return free(stk);
 #  else

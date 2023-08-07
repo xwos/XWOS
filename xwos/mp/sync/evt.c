@@ -23,6 +23,8 @@
 #  include <xwos/mm/mempool/allocator.h>
 #elif defined(XWOSCFG_SYNC_EVT_MEMSLICE) && (1 == XWOSCFG_SYNC_EVT_MEMSLICE)
 #  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_SYNC_EVT_SMA) && (1 == XWOSCFG_SYNC_EVT_SMA)
+#  include <xwos/mm/sma.h>
 #elif defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
 #  include <stdlib.h>
 #endif
@@ -54,6 +56,8 @@ static __xwmp_data struct xwmm_memslice xwmp_evt_cache;
  * @brief 结构体 `xwmp_evt` 的对象缓存的名字
  */
 const __xwmp_rodata char xwmp_evt_cache_name[] = "xwmp.sync.evt.cache";
+#elif defined(XWOSCFG_SYNC_EVT_SMA) && (1 == XWOSCFG_SYNC_EVT_SMA)
+static __xwmp_data struct xwmm_sma * xwmp_evt_cache;
 #endif
 
 #if (1 == XWOSRULE_SYNC_EVT_CREATE_DELETE)
@@ -154,6 +158,18 @@ xwer_t xwmp_evt_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                 (dtor_f)xwmp_evt_destruct);
         return rc;
 }
+#elif defined(XWOSCFG_SYNC_EVT_SMA) && (1 == XWOSCFG_SYNC_EVT_SMA)
+/**
+ * @brief XWMP INIT CODE：初始化 `struct xwmp_evt` 的对象缓存
+ * @param[in] sma: 简单内存分配器
+ * @note
+ * + 重入性：只可在系统初始化时使用一次
+ */
+__xwmp_init_code
+void xwmp_evt_cache_init(struct xwmm_sma * sma)
+{
+        xwmp_evt_cache = sma;
+}
 #endif
 
 #if (1 == XWOSRULE_SYNC_EVT_CREATE_DELETE)
@@ -219,6 +235,32 @@ struct xwmp_evt * xwmp_evt_alloc(xwsz_t num)
                 }
         }
         return mem.evt;
+#  elif defined(XWOSCFG_SYNC_EVT_SMA) && (1 == XWOSCFG_SYNC_EVT_SMA)
+        union {
+                struct xwmp_evt * evt;
+                void * anon;
+        } mem;
+        xwbmp_t * bmp;
+        xwbmp_t * msk;
+        xwsz_t bmpnum;
+        xwsz_t bmpsize;
+        xwer_t rc;
+
+        bmpnum = BITS_TO_XWBMP_T(num);
+        bmpsize = bmpnum * sizeof(xwbmp_t);
+        rc = xwmm_sma_alloc(xwmp_evt_cache,
+                            sizeof(struct xwmp_evt) + bmpsize + bmpsize,
+                            XWMM_ALIGNMENT,
+                            &mem.anon);
+        if (rc < 0) {
+                mem.evt = err_ptr(rc);
+        } else {
+                bmp = (void *)&mem.evt[1];
+                msk = &bmp[bmpnum];
+                xwmp_evt_construct(mem.evt);
+                xwmp_evt_setup(mem.evt, num, bmp, msk);
+        }
+        return mem.evt;
 #  elif defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
         struct xwmp_evt * evt;
         xwbmp_t * bmp;
@@ -256,6 +298,8 @@ void xwmp_evt_free(struct xwmp_evt * evt)
         xwmm_mempool_objcache_free(&xwmp_evt_cache, evt);
 #  elif defined(XWOSCFG_SYNC_EVT_MEMSLICE) && (1 == XWOSCFG_SYNC_EVT_MEMSLICE)
         xwmm_memslice_free(&xwmp_evt_cache, evt);
+#  elif defined(XWOSCFG_SYNC_EVT_SMA) && (1 == XWOSCFG_SYNC_EVT_SMA)
+        xwmm_sma_free(xwmp_evt_cache, evt);
 #  elif defined(XWOSCFG_SYNC_EVT_STDC_MM) && (1 == XWOSCFG_SYNC_EVT_STDC_MM)
         xwmp_evt_destruct(evt);
         free(evt);

@@ -122,7 +122,7 @@
  * @brief 循环队列对象
  */
 struct xwcq {
-        struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
+        struct xwos_object xwobj; /**< C语言面向对象：继承 `struct xwos_object` */
         xwsz_t slotsize; /**< 队列中数据槽的大小 */
         xwsz_t slotnum; /**< 队列中数据槽的数量 */
         struct xwos_sem sem; /**< 队列中的可用数据信号量 */

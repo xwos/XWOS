@@ -21,8 +21,8 @@
 #include <xwos/mm/common.h>
 #if defined(XWOSCFG_SKD_THD_MEMPOOL) && (1 == XWOSCFG_SKD_THD_MEMPOOL)
 #  include <xwos/mm/mempool/allocator.h>
-#elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
-#  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
+#  include <xwos/mm/sma.h>
 #endif
 #include <xwos/up/skd.h>
 #include <xwos/up/wqn.h>
@@ -164,6 +164,8 @@ void xwup_thd_wakeup(struct xwup_thd * thd)
 xwer_t xwup_thd_cache_init(struct xwmm_mempool * mp, xwsq_t page_order);
 #elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
 xwer_t xwup_thd_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
+#elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
+void xwup_thd_cache_init(struct xwmm_sma * sma);
 #endif
 
 void xwup_thd_attr_init(struct xwup_thd_attr * attr);

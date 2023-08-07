@@ -157,7 +157,7 @@ struct xwssc_carrier {
  */
 struct xwssc {
         /* 基本信息 */
-        struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
+        struct xwos_object xwobj; /**< C语言面向对象：继承 `struct xwos_object` */
         const char * name;
         atomic_xwsq_t hwifst; /**< 硬件层状态 */
         const struct xwssc_hwifal_operation * hwifops; /**< 硬件接口抽象层操作函数 */

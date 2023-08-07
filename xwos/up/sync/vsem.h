@@ -22,7 +22,7 @@ struct xwup_evt;
  * @brief 信号量的虚基类
  */
 /* abstract */ struct xwup_vsem {
-        struct xwup_synobj synobj; /**< C语言面向对象：继承struct xwup_synobj */
+        struct xwup_synobj synobj; /**< C语言面向对象：继承 `struct xwup_synobj` */
         xwssq_t count; /**< 信号量计数器：如果这个成员的值<0，信号量处于负状态。*/
         xwssq_t max; /**< 信号量计数器的最大值 */
 };

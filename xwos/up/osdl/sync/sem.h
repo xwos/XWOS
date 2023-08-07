@@ -179,24 +179,6 @@ xwer_t xwosdl_sem_trywait(struct xwosdl_sem * sem)
         return xwup_rtsem_trywait(sem);
 }
 
-static __xwcc_inline
-xwer_t xwosdl_sem_get_max(struct xwosdl_sem * sem, xwssq_t * max)
-{
-        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        XWOS_VALIDATE((max), "nullptr", -EFAULT);
-
-        return xwup_rtsem_get_max(sem, max);
-}
-
-static __xwcc_inline
-xwer_t xwosdl_sem_get_value(struct xwosdl_sem * sem, xwssq_t * val)
-{
-        XWOS_VALIDATE((sem), "nullptr", -EFAULT);
-        XWOS_VALIDATE((val), "nullptr", -EFAULT);
-
-        return xwup_rtsem_get_value(sem, val);
-}
-
 #elif defined(XWOSCFG_SYNC_PLSEM) && (1 == XWOSCFG_SYNC_PLSEM)
 
 #  include <xwos/up/sync/plsem.h>
@@ -359,6 +341,9 @@ xwer_t xwosdl_sem_trywait(struct xwosdl_sem * sem)
 
         return xwup_plsem_trywait(sem);
 }
+#else
+#  error "Can't find the semaphore configuration !"
+#endif
 
 static __xwcc_inline
 xwer_t xwosdl_sem_get_max(struct xwosdl_sem * sem, xwssq_t * max)
@@ -366,7 +351,7 @@ xwer_t xwosdl_sem_get_max(struct xwosdl_sem * sem, xwssq_t * max)
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((max), "nullptr", -EFAULT);
 
-        return xwup_plsem_get_max(sem, max);
+        return xwup_vsem_get_max(&sem->vsem, max);
 }
 
 static __xwcc_inline
@@ -375,11 +360,7 @@ xwer_t xwosdl_sem_get_value(struct xwosdl_sem * sem, xwssq_t * val)
         XWOS_VALIDATE((sem), "nullptr", -EFAULT);
         XWOS_VALIDATE((val), "nullptr", -EFAULT);
 
-        return xwup_plsem_get_value(sem, val);
+        return xwup_vsem_get_value(&sem->vsem, val);
 }
-
-#else
-#  error "Can't find the semaphore configuration !"
-#endif
 
 #endif /* xwos/up/osdl/sync/sem.h */

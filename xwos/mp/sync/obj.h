@@ -22,7 +22,7 @@ struct xwmp_evt;
  * @brief 同步对象
  */
 struct xwmp_synobj {
-        struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
+        struct xwos_object xwobj; /**< C语言面向对象：继承 `struct xwos_object` */
 #if defined(XWOSCFG_SYNC_EVT) && (1 == XWOSCFG_SYNC_EVT)
         struct {
                 struct xwmp_evt * evt; /**< 事件对象 */

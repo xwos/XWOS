@@ -15,10 +15,10 @@
 
 #include <xwos/standard.h>
 #include <xwos/lib/object.h>
-#if defined(XWOSCFG_SKD_THD_MEMPOOL) && (1 == XWOSCFG_SKD_THD_MEMPOOL)
+#if defined(XWOSCFG_SKD_SWT_MEMPOOL) && (1 == XWOSCFG_SKD_SWT_MEMPOOL)
 #  include <xwos/mm/mempool/allocator.h>
-#elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
-#  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_SKD_SWT_SMA) && (1 == XWOSCFG_SKD_SWT_SMA)
+#  include <xwos/mm/sma.h>
 #endif
 #include <xwos/up/skd.h>
 #include <xwos/up/tt.h>
@@ -56,6 +56,8 @@ struct xwup_swt {
 xwer_t xwup_swt_cache_init(struct xwmm_mempool * mp, xwsq_t page_order);
 #elif defined(XWOSCFG_SKD_SWT_MEMSLICE) && (1 == XWOSCFG_SKD_SWT_MEMSLICE)
 xwer_t xwup_swt_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
+#elif defined(XWOSCFG_SKD_SWT_SMA) && (1 == XWOSCFG_SKD_SWT_SMA)
+void xwup_swt_cache_init(struct xwmm_sma * sma);
 #endif
 xwer_t xwup_swt_init(struct xwup_swt * swt, xwsq_t flag);
 xwer_t xwup_swt_fini(struct xwup_swt * swt);

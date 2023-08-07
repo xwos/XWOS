@@ -21,6 +21,8 @@
 #  include <xwos/mm/mempool/allocator.h>
 #elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
 #  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
+#  include <xwos/mm/sma.h>
 #elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
 #  include <stdlib.h>
 #endif
@@ -73,6 +75,8 @@ static __xwup_data struct xwmm_memslice xwup_thd_cache;
  * @brief 结构体 `xwup_thd` 的对象缓存的名字
  */
 const __xwup_rodata char xwup_thd_cache_name[] = "xwup.thd.cache";
+#elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
+static __xwup_data struct xwmm_sma * xwup_thd_cache;
 #endif
 
 static __xwup_code
@@ -181,6 +185,12 @@ xwer_t xwup_thd_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                 (dtor_f)xwup_thd_destruct);
         return rc;
 }
+#elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
+__xwup_init_code
+void xwup_thd_cache_init(struct xwmm_sma * sma)
+{
+        xwup_thd_cache = sma;
+}
 #endif
 
 
@@ -288,6 +298,22 @@ struct xwup_thd * xwup_thd_alloc(void)
                 mem.thd = err_ptr(rc);
         }
         return mem.thd;
+#  elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
+        union {
+                struct xwup_thd * thd;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = xwmm_sma_alloc(xwup_thd_cache,
+                            sizeof(struct xwup_thd), XWMM_ALIGNMENT,
+                            &mem.anon);
+        if (rc < 0) {
+                mem.thd = err_ptr(rc);
+        } else {
+                xwup_thd_construct(mem.thd);
+        }
+        return mem.thd;
 #  elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         struct xwup_thd * thd;
 
@@ -316,6 +342,8 @@ void xwup_thd_free(struct xwup_thd * thd)
         xwmm_mempool_objcache_free(&xwup_thd_cache, thd);
 #  elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
         xwmm_memslice_free(&xwup_thd_cache, thd);
+#  elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
+        xwmm_sma_free(xwup_thd_cache, thd);
 #  elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         free(thd);
 #  else
@@ -341,6 +369,20 @@ xwstk_t * xwup_thd_stack_alloc(xwsz_t stack_size)
         xwer_t rc;
 
         rc = board_thd_stack_pool_alloc(stack_size, &mem.stkbase);
+        if (rc < 0) {
+                mem.stkbase = err_ptr(rc);
+        }
+        return mem.stkbase;
+#  elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
+        union {
+                xwstk_t * stkbase;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = xwmm_sma_alloc(xwup_thd_cache,
+                            stack_size, XWMM_ALIGNMENT,
+                            &mem.anon);
         if (rc < 0) {
                 mem.stkbase = err_ptr(rc);
         }
@@ -371,6 +413,8 @@ xwer_t xwup_thd_stack_free(xwstk_t * stk)
 {
 #  if defined(BRDCFG_XWSKD_THD_STACK_POOL) && (1 == BRDCFG_XWSKD_THD_STACK_POOL)
         return board_thd_stack_pool_free(stk);
+#  elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
+        return xwmm_sma_free(xwup_thd_cache, stk);
 #  elif defined(XWOSCFG_SKD_THD_STDC_MM) && (1 == XWOSCFG_SKD_THD_STDC_MM)
         free(stk);
         return XWOK;
@@ -521,7 +565,7 @@ void xwup_thd_get_attr(struct xwup_thd * thd, struct xwup_thd_attr * attr)
         attr->stack = thd->stack.base;
         attr->stack_size = thd->stack.size;
         attr->stack_guard_size = thd->stack.guard;
-        attr->priority = thd->sprio;
+        attr->priority = thd->prio.s;
         attr->detached = !!(thd->state & (xwsq_t)XWUP_SKDOBJ_ST_DETACHED);
         attr->privileged = !!(thd->stack.flag & (xwsq_t)XWUP_SKDOBJ_FLAG_PRIVILEGED);
 }

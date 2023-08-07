@@ -19,6 +19,8 @@
 #  include <xwos/mm/mempool/allocator.h>
 #elif defined(XWOSCFG_SYNC_EVT_MEMSLICE) && (1 == XWOSCFG_SYNC_EVT_MEMSLICE)
 #  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_SYNC_EVT_SMA) && (1 == XWOSCFG_SYNC_EVT_SMA)
+#  include <xwos/mm/sma.h>
 #endif
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/sync/obj.h>
@@ -39,7 +41,7 @@ enum xwmp_evt_type_em {
  * @brief 事件对象
  */
 struct xwmp_evt {
-        struct xwmp_cond cond; /**< C语言面向对象：继承struct xwmp_cond */
+        struct xwmp_cond cond; /**< C语言面向对象：继承 `struct xwmp_cond` */
         xwsq_t type; /**< 类型 */
         xwsz_t num; /**< 事件的数量 */
         struct xwmp_splk lock; /**< 保护位图的锁 */
@@ -51,6 +53,8 @@ struct xwmp_evt {
 xwer_t xwmp_evt_cache_init(struct xwmm_mempool * mp, xwsq_t page_order);
 #elif defined(XWOSCFG_SYNC_EVT_MEMSLICE) && (1 == XWOSCFG_SYNC_EVT_MEMSLICE)
 xwer_t xwmp_evt_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
+#elif defined(XWOSCFG_SYNC_EVT_SMA) && (1 == XWOSCFG_SYNC_EVT_SMA)
+void xwmp_evt_cache_init(struct xwmm_sma * sma);
 #endif
 
 xwer_t xwmp_evt_intr_all(struct xwmp_evt * evt);

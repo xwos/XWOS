@@ -21,8 +21,8 @@
 #include <xwos/mm/common.h>
 #if defined(XWOSCFG_SKD_THD_MEMPOOL) && (1 == XWOSCFG_SKD_THD_MEMPOOL)
 #  include <xwos/mm/mempool/allocator.h>
-#elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
-#  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
+#  include <xwos/mm/sma.h>
 #endif
 #include <xwos/mp/lock/spinlock.h>
 #include <xwos/mp/skd.h>
@@ -71,7 +71,7 @@ struct xwmp_thd_attr {
  * ```
  */
 struct xwmp_thd {
-        struct xwos_object xwobj; /**< C语言面向对象：继承struct xwos_object */
+        struct xwos_object xwobj; /**< C语言面向对象：继承 `struct xwos_object` */
         struct xwmp_skd * xwskd; /**< 当前线程所属于的调度器 */
         struct xwmp_skdobj_stack stack; /**< 栈 */
         struct xwlib_bclst_node thdnode; /**< 调度器线程链表中的节点 */
@@ -158,6 +158,8 @@ xwer_t xwmp_thd_outmigrate_lic(struct xwmp_thd * thd, xwid_t dstcpu);
 xwer_t xwmp_thd_cache_init(struct xwmm_mempool * mp, xwsq_t page_order);
 #elif defined(XWOSCFG_SKD_THD_MEMSLICE) && (1 == XWOSCFG_SKD_THD_MEMSLICE)
 xwer_t xwmp_thd_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
+#elif defined(XWOSCFG_SKD_THD_SMA) && (1 == XWOSCFG_SKD_THD_SMA)
+void xwmp_thd_cache_init(struct xwmm_sma * sma);
 #endif
 
 void xwmp_thd_attr_init(struct xwmp_thd_attr * attr);

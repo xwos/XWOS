@@ -16,8 +16,8 @@
 #include <xwos/standard.h>
 #if defined(XWOSCFG_SYNC_COND_MEMPOOL) && (1 == XWOSCFG_SYNC_COND_MEMPOOL)
 #  include <xwos/mm/mempool/allocator.h>
-#elif defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
-#  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_SYNC_COND_SMA) && (1 == XWOSCFG_SYNC_COND_SMA)
+#  include <xwos/mm/sma.h>
 #endif
 #include <xwos/mp/sync/obj.h>
 #include <xwos/mp/plwq.h>
@@ -29,7 +29,7 @@ struct xwmp_evt;
  * @brief 条件量对象
  */
 struct xwmp_cond {
-        struct xwmp_synobj synobj; /**< C语言面向对象：继承struct xwmp_synobj */
+        struct xwmp_synobj synobj; /**< C语言面向对象：继承 `struct xwmp_synobj` */
         xwssq_t count; /**< 计数器：<0，条件量处于冻结状态；*/
         union {
                 struct xwmp_plwq pl; /**< 管道的等待队列 */
@@ -46,6 +46,8 @@ xwer_t xwmp_cond_intr_all(struct xwmp_cond * cond);
 xwer_t xwmp_cond_cache_init(struct xwmm_mempool * mp, xwsq_t page_order);
 #elif defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
 xwer_t xwmp_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size);
+#elif defined(XWOSCFG_SYNC_COND_SMA) && (1 == XWOSCFG_SYNC_COND_SMA)
+void xwmp_cond_cache_init(struct xwmm_sma * sma);
 #endif
 
 xwer_t xwmp_cond_init(struct xwmp_cond * cond);

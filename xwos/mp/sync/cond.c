@@ -22,6 +22,8 @@
 #  include <xwos/mm/mempool/allocator.h>
 #elif defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
 #  include <xwos/mm/memslice.h>
+#elif defined(XWOSCFG_SYNC_COND_SMA) && (1 == XWOSCFG_SYNC_COND_SMA)
+#  include <xwos/mm/sma.h>
 #elif defined(XWOSCFG_SYNC_COND_STDC_MM) && (1 == XWOSCFG_SYNC_COND_STDC_MM)
 #  include <stdlib.h>
 #endif
@@ -41,7 +43,7 @@
 #include <xwos/mp/sync/evt.h>
 #include <xwos/mp/sync/cond.h>
 
-#define XWMP_COND_NEGTIVE  (-1)
+#define XWMP_COND_NEGTIVE (-1)
 #define XWMP_COND_POSITIVE (1)
 
 #if defined(XWOSCFG_SYNC_COND_MEMPOOL) && (1 == XWOSCFG_SYNC_COND_MEMPOOL)
@@ -64,6 +66,8 @@ static __xwmp_data struct xwmm_memslice xwmp_cond_cache;
  * @brief 结构体 `xwmp_cond` 的对象缓存的名字
  */
 const __xwmp_rodata char xwmp_cond_cache_name[] = "xwmp.sync.cond.cache";
+#elif defined(XWOSCFG_SYNC_COND_SMA) && (1 == XWOSCFG_SYNC_COND_SMA)
+static __xwmp_data struct xwmm_sma * xwmp_cond_cache;
 #endif
 
 #if (1 == XWOSRULE_SYNC_COND_CREATE_DELETE)
@@ -171,6 +175,18 @@ xwer_t xwmp_cond_cache_init(xwptr_t zone_origin, xwsz_t zone_size)
                                 (dtor_f)xwmp_cond_destruct);
         return rc;
 }
+#elif defined(XWOSCFG_SYNC_COND_SMA) && (1 == XWOSCFG_SYNC_COND_SMA)
+/**
+ * @brief XWMP INIT CODE：初始化 `struct xwmp_cond` 的对象缓存
+ * @param[in] sma: 简单内存分配器
+ * @note
+ * + 重入性：只可在系统初始化时使用一次
+ */
+__xwmp_init_code
+void xwmp_cond_cache_init(struct xwmm_sma * sma)
+{
+        xwmp_cond_cache = sma;
+}
 #endif
 
 #if (1 == XWOSRULE_SYNC_COND_CREATE_DELETE)
@@ -203,6 +219,24 @@ struct xwmp_cond * xwmp_cond_alloc(void)
         rc = xwmm_memslice_alloc(&xwmp_cond_cache, &mem.anon);
         if (rc < 0) {
                 mem.cond = err_ptr(rc);
+        } else {
+                xwmp_cond_construct(cond);
+        }
+        return mem.cond;
+#  elif defined(XWOSCFG_SYNC_COND_SMA) && (1 == XWOSCFG_SYNC_COND_SMA)
+        union {
+                struct xwmp_cond * cond;
+                void * anon;
+        } mem;
+        xwer_t rc;
+
+        rc = xwmm_sma_alloc(xwmp_cond_cache,
+                            sizeof(struct xwmp_cond), XWMM_ALIGNMENT,
+                            &mem.anon);
+        if (rc < 0) {
+                mem.cond = err_ptr(rc);
+        } else {
+                xwmp_cond_construct(mem.cond);
         }
         return mem.cond;
 #  elif defined(XWOSCFG_SYNC_COND_STDC_MM) && (1 == XWOSCFG_SYNC_COND_STDC_MM)
@@ -233,6 +267,8 @@ void xwmp_cond_free(struct xwmp_cond * cond)
         xwmm_mempool_objcache_free(&xwmp_cond_cache, cond);
 #  elif defined(XWOSCFG_SYNC_COND_MEMSLICE) && (1 == XWOSCFG_SYNC_COND_MEMSLICE)
         xwmm_memslice_free(&xwmp_cond_cache, cond);
+#  elif defined(XWOSCFG_SYNC_COND_SMA) && (1 == XWOSCFG_SYNC_COND_SMA)
+        xwmm_sma_free(xwmp_cond_cache, cond);
 #  elif defined(XWOSCFG_SYNC_COND_STDC_MM) && (1 == XWOSCFG_SYNC_COND_STDC_MM)
         xwmp_cond_destruct(cond);
         free(cond);
