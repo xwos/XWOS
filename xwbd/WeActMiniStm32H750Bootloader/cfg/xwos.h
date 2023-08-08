@@ -95,12 +95,14 @@
 #define XWOSCFG_SKD_THD_PRIVILEGED_DEFAULT              1
 #define XWOSCFG_SKD_THD_MEMPOOL                         0
 #define XWOSCFG_SKD_THD_MEMSLICE                        0
+#define XWOSCFG_SKD_THD_SMA                             0
 #define XWOSCFG_SKD_THD_STDC_MM                         0
 #define XWOSCFG_SKD_THD_LOCAL_DATA_NUM                  (2U)
 #define XWOSCFG_SKD_THD_EXIT                            1
 #define XWOSCFG_SKD_SWT                                 1
 #define XWOSCFG_SKD_SWT_MEMPOOL                         0
 #define XWOSCFG_SKD_SWT_MEMSLICE                        0
+#define XWOSCFG_SKD_SWT_SMA                             0
 #define XWOSCFG_SKD_SWT_STDC_MM                         0
 
 /******** ******** ******** sync ******** ******** ********/
@@ -108,22 +110,26 @@
 #define XWOSCFG_SYNC_RTSEM                              1
 #define XWOSCFG_SYNC_SEM_MEMPOOL                        0
 #define XWOSCFG_SYNC_SEM_MEMSLICE                       0
+#define XWOSCFG_SYNC_SEM_SMA                            0
 #define XWOSCFG_SYNC_SEM_STDC_MM                        0
 
 #define XWOSCFG_SYNC_COND                               1
 #define XWOSCFG_SYNC_COND_MEMPOOL                       0
 #define XWOSCFG_SYNC_COND_MEMSLICE                      0
+#define XWOSCFG_SYNC_COND_SMA                           0
 #define XWOSCFG_SYNC_COND_STDC_MM                       0
 
 #define XWOSCFG_SYNC_EVT                                1
 #define XWOSCFG_SYNC_EVT_MEMPOOL                        0
 #define XWOSCFG_SYNC_EVT_MEMSLICE                       0
+#define XWOSCFG_SYNC_EVT_SMA                            0
 #define XWOSCFG_SYNC_EVT_STDC_MM                        0
 
 /******** ******** ******** lock ******** ******** ********/
 #define XWOSCFG_LOCK_MTX                                1
 #define XWOSCFG_LOCK_MTX_MEMPOOL                        0
 #define XWOSCFG_LOCK_MTX_MEMSLICE                       0
+#define XWOSCFG_LOCK_MTX_SMA                            0
 #define XWOSCFG_LOCK_MTX_STDC_MM                        0
 #define XWOSCFG_LOCK_FAKEMTX                            0
 

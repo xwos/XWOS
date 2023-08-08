@@ -239,7 +239,7 @@ struct xwup_cond * xwup_cond_alloc(void)
         if (NULL == cond) {
                 cond = err_ptr(-ENOMEM);
         } else {
-                xwup_cond_construct(mem.cond);
+                xwup_cond_construct(cond);
         }
         return cond;
 #  else

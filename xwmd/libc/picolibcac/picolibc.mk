@@ -15,9 +15,18 @@ XWMO_CSRCS += lock.c
 XWMO_CSRCS += sysconf.c
 XWMO_CSRCS += time.c
 XWMO_CSRCS += string.c
-XWMO_CSRCS += mem.c
-XWMO_CSRCS += setjmp.c
-XWMO_CSRCS += fops.c
+ifeq ($(XWMDCFG_libc_picolibcac_SPRINTF),y)
+  XWMO_CSRCS += sprintf.c
+endif
+ifeq ($(XWMDCFG_libc_picolibcac_MEM),y)
+  XWMO_CSRCS += mem.c
+endif
+ifeq ($(XWMDCFG_libc_picolibcac_SETJMP),y)
+  XWMO_CSRCS += setjmp.c
+endif
+ifeq ($(XWMDCFG_libc_picolibcac_FOPS),y)
+  XWMO_CSRCS += fops.c
+endif
 XWMO_CSRCS += isatty.c
 XWMO_CSRCS += getpid.c
 XWMO_CSRCS += kill.c

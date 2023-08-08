@@ -22,7 +22,6 @@
 #include <stdio.h>
 #include "xwem/vm/lua/src/lauxlib.h"
 #include "xwem/vm/lua/xwlua/xwvm/debug.h"
-#include "xwem/vm/lua/xwlua/xwvm/mq.h"
 
 extern int xwlua_vm_dump(lua_State * vm);
 

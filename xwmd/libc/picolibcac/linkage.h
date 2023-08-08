@@ -18,6 +18,7 @@ void picolibcac_lock_linkage_stub(void);
 void picolibcac_sysconf_linkage_stub(void);
 void picolibcac_time_linkage_stub(void);
 void picolibcac_string_linkage_stub(void);
+void picolibcac_sprintf_linkage_stub(void);
 void picolibcac_mem_linkage_stub(void);
 void picolibcac_setjmp_linkage_stub(void);
 void picolibcac_fops_linkage_stub(void);

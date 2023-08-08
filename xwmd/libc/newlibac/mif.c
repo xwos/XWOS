@@ -34,9 +34,18 @@ const newlibac_linkage_f newlibac_linkage_table[] = {
         newlibac_sysconf_linkage_stub,
         newlibac_time_linkage_stub,
         newlibac_string_linkage_stub,
+#if defined(XWMDCFG_libc_newlibac_SPRINTF) && (1 == XWMDCFG_libc_newlibac_SPRINTF)
+        newlibac_sprintf_linkage_stub,
+#endif
+#if defined(XWMDCFG_libc_newlibac_MEM) && (1 == XWMDCFG_libc_newlibac_MEM)
         newlibac_mem_linkage_stub,
+#endif
+#if defined(XWMDCFG_libc_newlibac_SETJMP) && (1 == XWMDCFG_libc_newlibac_SETJMP)
         newlibac_setjmp_linkage_stub,
+#endif
+#if defined(XWMDCFG_libc_newlibac_FOPS) && (1 == XWMDCFG_libc_newlibac_FOPS)
         newlibac_fops_linkage_stub,
+#endif
         newlibac_isatty_linkage_stub,
         newlibac_kill_linkage_stub,
         newlibac_getpid_linkage_stub,
@@ -68,6 +77,6 @@ xwer_t newlibac_init(void)
                 i++;
         }
         __libc_init_array();
-        atexit(__libc_fini_array); // cppcheck-suppress [misra-c2012-17.7]
+        /* atexit(__libc_fini_array); */ // cppcheck-suppress [misra-c2012-17.7]
         return XWOK;
 }

@@ -18,6 +18,7 @@ void newlibac_lock_linkage_stub(void);
 void newlibac_sysconf_linkage_stub(void);
 void newlibac_time_linkage_stub(void);
 void newlibac_string_linkage_stub(void);
+void newlibac_sprintf_linkage_stub(void);
 void newlibac_mem_linkage_stub(void);
 void newlibac_setjmp_linkage_stub(void);
 void newlibac_fops_linkage_stub(void);

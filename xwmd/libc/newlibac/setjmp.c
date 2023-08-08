@@ -36,5 +36,5 @@ void longjmp(jmp_buf jmpb, int rc)
 }
 #  endif /* XWLIBCFG_SETJMP */
 #else /* newlib version */
-#  warning "setjmp.h in newlib (<4.3.0) has bug!"
+#  warning "setjmp.h in newlib(<4.3.0) has bug! Use <xwos/lib/setjmp.h> instead!"
 #endif /* newlib version */

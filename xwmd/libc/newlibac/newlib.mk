@@ -15,13 +15,22 @@ XWMO_CSRCS += lock.c
 XWMO_CSRCS += sysconf.c
 XWMO_CSRCS += time.c
 XWMO_CSRCS += string.c
-XWMO_CSRCS += mem.c
-XWMO_CSRCS += setjmp.c
-XWMO_CSRCS += fops.c
+ifeq ($(XWMDCFG_libc_newlibac_SPRINTF),y)
+  XWMO_CSRCS += sprintf.c
+endif
+ifeq ($(XWMDCFG_libc_newlibac_MEM),y)
+  XWMO_CSRCS += mem.c
+endif
+ifeq ($(XWMDCFG_libc_newlibac_SETJMP),y)
+  XWMO_CSRCS += setjmp.c
+endif
+ifeq ($(XWMDCFG_libc_newlibac_FOPS),y)
+  XWMO_CSRCS += fops.c
+endif
 XWMO_CSRCS += isatty.c
 XWMO_CSRCS += getpid.c
 XWMO_CSRCS += kill.c
 XWMO_CSRCS += exit.c
 
-XWMO_CFLAGS := -Wno-unused-value -Wno-sign-conversion
+XWMO_CFLAGS := -Wno-unused-value -Wno-sign-conversion -Wno-error=cpp
 XWMO_INCDIRS :=

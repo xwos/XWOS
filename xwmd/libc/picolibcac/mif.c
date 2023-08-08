@@ -34,9 +34,18 @@ const picolibcac_linkage_f picolibcac_linkage_table[] = {
         picolibcac_sysconf_linkage_stub,
         picolibcac_time_linkage_stub,
         picolibcac_string_linkage_stub,
+#if defined(XWMDCFG_libc_picolibcac_SPRINTF) && (1 == XWMDCFG_libc_picolibcac_SPRINTF)
+        picolibcac_sprintf_linkage_stub,
+#endif
+#if defined(XWMDCFG_libc_picolibcac_MEM) && (1 == XWMDCFG_libc_picolibcac_MEM)
         picolibcac_mem_linkage_stub,
+#endif
+#if defined(XWMDCFG_libc_picolibcac_SETJMP) && (1 == XWMDCFG_libc_picolibcac_SETJMP)
         picolibcac_setjmp_linkage_stub,
+#endif
+#if defined(XWMDCFG_libc_picolibcac_FOPS) && (1 == XWMDCFG_libc_picolibcac_FOPS)
         picolibcac_fops_linkage_stub,
+#endif
         picolibcac_isatty_linkage_stub,
         picolibcac_kill_linkage_stub,
         picolibcac_getpid_linkage_stub,
@@ -66,6 +75,6 @@ xwer_t picolibcac_init(void)
                 i++;
         }
         __libc_init_array();
-        atexit(__libc_fini_array); // cppcheck-suppress [misra-c2012-17.7]
+        /* atexit(__libc_fini_array); */ // cppcheck-suppress [misra-c2012-17.7]
         return XWOK;
 }
