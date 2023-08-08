@@ -159,6 +159,11 @@ SECTIONS {
         } > code_mr AT> code_mr
         /* -------- Global Offset Table -------- */
 
+
+        .int_results (NOLOAD): ALIGN(4) {
+                KEEP(*(.int_results))
+        } > results_mr
+
         .data : ALIGN(8) {
                 *(.xwos.data)
                 *(.ramcode)
@@ -197,6 +202,12 @@ SECTIONS {
         firmware_tail_lma_base = LOADADDR(.firmware.tail);
         firmware_tail_lma_end = firmware_tail_lma_base + firmware_tail_size;
 
+        .acfls_code_ram : ALIGN(8) {
+                acfls_code_ram_start = .;
+                . += acfls_code_rom_end - acfls_code_rom_start;
+                acfls_code_ram_end = .;
+        } > data_mr
+
         .bss (NOLOAD) : ALIGN(8) {
                 *(.dynbss)
                 *(.bss .bss.* .gnu.linkonce.b.*)
@@ -204,24 +215,12 @@ SECTIONS {
                 *(.mcal_bss)
                 *(.mcal_bss_no_cacheable)
                 . = ALIGN(8);
+                PROVIDE(end = .); /* 被libc中的malloc()使用 */
+                PROVIDE(_end = .); /* 被libc中的malloc()使用 */
+                . += 0x1000;
                 bss_vma_end = .;
         } > data_mr
         bss_vma_base = ADDR(.bss);
-
-        .acfls_code_ram : ALIGN(8) {
-                acfls_code_ram_start = .;
-                . += acfls_code_rom_end - acfls_code_rom_start;
-                acfls_code_ram_end = .;
-        } > data_mr
-
-        .int_results (NOLOAD): ALIGN(4) {
-                KEEP(*(.int_results))
-        } > results_mr
-
-        .heap (NOLOAD): ALIGN(8) {
-                PROVIDE(end = .); /* 被libc中的malloc()使用 */
-                PROVIDE(_end = .); /* 被libc中的malloc()使用 */
-        } > heap_mr
 
         /* ++++++++ 以下与动态连接有关，不适用于MCU的ROM环境 ++++++++ */
         .rel.dyn : {
