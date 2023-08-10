@@ -230,7 +230,7 @@ xwer_t xwds_eeprom_wp_disable(struct xwds_eeprom * eeprom)
  * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwds_eeprom_putc(struct xwds_eeprom * eeprom,
-                        xwu8_t data, xwptr_t addr,
+                        xwu8_t data, xwsq_t addr,
                         xwtm_t to)
 {
         const struct xwds_eeprom_driver * drv;
@@ -265,7 +265,7 @@ xwer_t xwds_eeprom_putc(struct xwds_eeprom * eeprom,
  * 如果 ```to``` 是过去的时间点，将直接返回 `-ETIMEDOUT` 。
  */
 xwer_t xwds_eeprom_getc(struct xwds_eeprom * eeprom,
-                        xwu8_t * buf, xwptr_t addr,
+                        xwu8_t * buf, xwsq_t addr,
                         xwtm_t to)
 {
         const struct xwds_eeprom_driver * drv;

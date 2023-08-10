@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief ATMEL小密度EEPROM(AT24C01/02/04/08/16)驱动
+ * @brief 小密度(1Ki/2Ki/4Ki/8Ki/16Ki bits)EEPROM驱动
  * @author
  * + 隐星魂 (Roy Sun) <xwos@xwos.tech>
  * @copyright
@@ -27,10 +27,10 @@
 #include <xwcd/perpheral/i2c/eeprom/driver.h>
 
 static __xwbsp_code
-xwer_t at24sd_putc(struct xwds_eeprom * eeprom, xwu8_t data, xwptr_t addr, xwtm_t to);
+xwer_t at24sd_putc(struct xwds_eeprom * eeprom, xwu8_t data, xwsq_t addr, xwtm_t to);
 
 static __xwbsp_code
-xwer_t at24sd_getc(struct xwds_eeprom * eeprom, xwu8_t * buf, xwptr_t addr, xwtm_t to);
+xwer_t at24sd_getc(struct xwds_eeprom * eeprom, xwu8_t * buf, xwsq_t addr, xwtm_t to);
 
 static __xwbsp_code
 xwer_t at24sd_pgwrite(struct xwds_eeprom * eeprom, xwu8_t data[],
@@ -64,7 +64,7 @@ const struct xwds_eeprom_driver at24sd_drv = {
 };
 
 static
-xwer_t at24sd_putc(struct xwds_eeprom * eeprom, xwu8_t data, xwptr_t addr, xwtm_t to)
+xwer_t at24sd_putc(struct xwds_eeprom * eeprom, xwu8_t data, xwsq_t addr, xwtm_t to)
 {
         struct xwds_i2cm * bus;
         struct xwds_i2c_msg msg;
@@ -74,10 +74,13 @@ xwer_t at24sd_putc(struct xwds_eeprom * eeprom, xwu8_t data, xwptr_t addr, xwtm_
 
         i2cpaddr = eeprom->i2cp.addr;
         bus = eeprom->i2cp.bus;
-        txdata[0] = (xwu8_t)addr & 0xFF;
+        txdata[0] = (xwu8_t)(addr & (xwu8_t)0xFF);
         txdata[1] = data;
-        msg.addr = (xwu16_t)((i2cpaddr & 0x00F0) | (((addr >> 8) & 0x7) << 1));
-        msg.flag = XWDS_I2C_F_START | XWDS_I2C_F_WR | XWDS_I2C_F_STOP;
+        msg.addr = ((i2cpaddr & (xwu16_t)0x00F0) |
+                    (((addr >> (xwsq_t)8) & (xwu16_t)0x7) << (xwu16_t)1));
+        msg.flag = ((xwu16_t)XWDS_I2C_F_START |
+                    (xwu16_t)XWDS_I2C_F_WR |
+                    (xwu16_t)XWDS_I2C_F_STOP);
         msg.data = txdata;
         msg.size = sizeof(txdata);
         rc = xwds_i2cm_xfer(bus, &msg, to);
@@ -85,7 +88,7 @@ xwer_t at24sd_putc(struct xwds_eeprom * eeprom, xwu8_t data, xwptr_t addr, xwtm_
 }
 
 static
-xwer_t at24sd_getc(struct xwds_eeprom * eeprom, xwu8_t * buf, xwptr_t addr, xwtm_t to)
+xwer_t at24sd_getc(struct xwds_eeprom * eeprom, xwu8_t * buf, xwsq_t addr, xwtm_t to)
 {
         struct xwds_i2cm * bus;
         struct xwds_i2c_msg msg;
@@ -95,21 +98,23 @@ xwer_t at24sd_getc(struct xwds_eeprom * eeprom, xwu8_t * buf, xwptr_t addr, xwtm
 
         i2cpaddr = eeprom->i2cp.addr;
         bus = eeprom->i2cp.bus;
-        txdata = (xwu8_t)(addr & 0xFF);
-
-        msg.addr = (xwu16_t)((i2cpaddr & 0x00F0) | (((addr >> 8) & 0x7) << 1));
-        msg.flag = XWDS_I2C_F_START | XWDS_I2C_F_WR;
+        txdata = (xwu8_t)(addr & (xwu8_t)0xFF);
+        msg.addr = ((i2cpaddr & (xwu16_t)0x00F0) |
+                    (((addr >> (xwsq_t)8) & (xwu16_t)0x7) << (xwu16_t)1));
+        msg.flag = ((xwu16_t)XWDS_I2C_F_START | (xwu16_t)XWDS_I2C_F_WR);
         msg.data = &txdata;
         msg.size = 1;
         rc = xwds_i2cm_xfer(bus, &msg, to);
         if (XWOK == rc) {
-                msg.addr = (xwu16_t)((i2cpaddr & 0x00F0) |
-                                     (((addr >> 8) & 0x7) << 1));
-                msg.flag = XWDS_I2C_F_START | XWDS_I2C_F_RD | XWDS_I2C_F_STOP;
+                msg.addr = ((i2cpaddr & (xwu16_t)0x00F0) |
+                            (((addr >> (xwsq_t)8) & (xwu16_t)0x7) << (xwu16_t)1));
+                msg.flag = ((xwu16_t)XWDS_I2C_F_START |
+                            (xwu16_t)XWDS_I2C_F_RD |
+                            (xwu16_t)XWDS_I2C_F_STOP);
                 msg.data = buf;
                 msg.size = 1;
                 rc = xwds_i2cm_xfer(bus, &msg, to);
-        }/* else {} */
+        }
         return rc;
 }
 
@@ -123,19 +128,21 @@ xwer_t at24sd_pgwrite(struct xwds_eeprom * eeprom,
         struct xwds_i2c_msg msg;
         xwer_t rc;
         xwu16_t i2cpaddr;
-        xwu16_t addr;
+        xwsq_t addr;
         xwsz_t wrsz = *size;
         xwu8_t txdata[wrsz + 1];
 
         i2cpaddr = eeprom->i2cp.addr;
         bus = eeprom->i2cp.bus;
         parameter = &eeprom->parameter;
-
-        addr = (xwu16_t)((pgidx * parameter->page_size) & 0x0FFF);
-        txdata[0] = (xwu8_t)(addr & 0xFF);
+        addr = ((pgidx * parameter->page_size) & (xwsq_t)0x7FF);
+        txdata[0] = (xwu8_t)(addr & (xwu8_t)0xFF);
         memcpy(&txdata[1], data, wrsz);
-        msg.addr = (xwu16_t)((i2cpaddr & 0x00F0) | (((addr >> 8) & 0x7) << 1));
-        msg.flag = XWDS_I2C_F_START | XWDS_I2C_F_WR | XWDS_I2C_F_STOP;
+        msg.addr = ((i2cpaddr & (xwu16_t)0x00F0) |
+                    (((addr >> (xwsq_t)8) & (xwu16_t)0x7) << (xwu16_t)1));
+        msg.flag = ((xwu16_t)XWDS_I2C_F_START |
+                    (xwu16_t)XWDS_I2C_F_WR |
+                    (xwu16_t)XWDS_I2C_F_STOP);
         msg.data = txdata;
         msg.size = wrsz + 1;
         rc = xwds_i2cm_xfer(bus, &msg, to);
@@ -156,31 +163,32 @@ xwer_t at24sd_pgread(struct xwds_eeprom * eeprom,
         struct xwds_i2c_msg msg;
         xwer_t rc;
         xwu16_t i2cpaddr;
-        xwu16_t addr;
+        xwsq_t addr;
         xwu8_t txdata;
 
         i2cpaddr = eeprom->i2cp.addr;
         bus = eeprom->i2cp.bus;
         parameter = &eeprom->parameter;
-
-        addr = (xwu16_t)((pgidx * parameter->page_size) & 0x0FFF);
-        txdata = (xwu8_t)(addr & 0xFF);
-        msg.addr = (xwu16_t)((i2cpaddr & 0x00F0) |
-                             (((addr >> 8) & 0x7) << 1));
-        msg.flag = XWDS_I2C_F_START | XWDS_I2C_F_WR;
+        addr = ((pgidx * parameter->page_size) & (xwsq_t)0x7FF);
+        txdata = (xwu8_t)(addr & (xwu8_t)0xFF);
+        msg.addr = ((i2cpaddr & (xwu16_t)0x00F0) |
+                    (((addr >> (xwsq_t)8) & (xwu16_t)0x7) << (xwu16_t)1));
+        msg.flag = ((xwu16_t)XWDS_I2C_F_START | (xwu16_t)XWDS_I2C_F_WR);
         msg.data = &txdata;
         msg.size = 1;
         rc = xwds_i2cm_xfer(bus, &msg, to);
         if (XWOK == rc) {
-                msg.addr = (xwu16_t)((i2cpaddr & 0x00F0) |
-                                     (((addr >> 8) & 0x7) << 1));
-                msg.flag = XWDS_I2C_F_START | XWDS_I2C_F_RD | XWDS_I2C_F_STOP;
+                msg.addr = ((i2cpaddr & (xwu16_t)0x00F0) |
+                            (((addr >> (xwsq_t)8) & (xwu16_t)0x7) << (xwu16_t)1));
+                msg.flag = ((xwu16_t)XWDS_I2C_F_START |
+                            (xwu16_t)XWDS_I2C_F_RD |
+                            (xwu16_t)XWDS_I2C_F_STOP);
                 msg.data = buf;
                 msg.size = *size;
                 rc = xwds_i2cm_xfer(bus, &msg, to);
                 if (XWOK == rc) {
                         *size = msg.size;
-                }/* else {} */
-        }/* else {} */
+                }
+        }
         return rc;
 }

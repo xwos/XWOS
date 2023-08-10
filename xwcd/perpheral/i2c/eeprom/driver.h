@@ -63,10 +63,10 @@ xwer_t xwds_eeprom_power_off(struct xwds_eeprom * eeprom);
 xwer_t xwds_eeprom_wp_enable(struct xwds_eeprom * eeprom);
 xwer_t xwds_eeprom_wp_disable(struct xwds_eeprom * eeprom);
 xwer_t xwds_eeprom_putc(struct xwds_eeprom * eeprom,
-                        xwu8_t data, xwptr_t addr,
+                        xwu8_t data, xwsq_t addr,
                         xwtm_t to);
 xwer_t xwds_eeprom_getc(struct xwds_eeprom * eeprom,
-                        xwu8_t * buf, xwptr_t addr,
+                        xwu8_t * buf, xwsq_t addr,
                         xwtm_t to);
 xwer_t xwds_eeprom_pgwrite(struct xwds_eeprom * eeprom,
                            xwu8_t * data, xwsz_t * size, xwsq_t pgidx,
