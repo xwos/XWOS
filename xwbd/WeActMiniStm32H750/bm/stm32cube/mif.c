@@ -24,7 +24,7 @@
 #include "bm/stm32cube/Core/Inc/main.h"
 #include "bm/xwac/xwlib/crc.h"
 #include "bm/xwac/fatfs/sdcard.h"
-#include "bm/xwac/xwds/core.h"
+#include "bm/xwac/xwds/device.h"
 
 extern xwsz_t itcm_mr_origin[];
 extern xwsz_t itcm_mr_size[];
@@ -143,22 +143,13 @@ err_xwds_start:
  * @brief 停止STM32CUBE模块
  * + 上下文：线程
  */
-xwer_t stm32cube_stop(void)
+void stm32cube_stop(void)
 {
-        xwer_t rc;
-
         /* fatfs */
         sdcard_fatfs_unmount();
 
         /* xwds */
-        rc = stm32cube_xwds_stop();
-        if (rc < 0) {
-                goto err_xwds_stop;
-        }
-        return XWOK;
-
-err_xwds_stop:
-        return rc;
+        stm32cube_xwds_stop();
 }
 
 static

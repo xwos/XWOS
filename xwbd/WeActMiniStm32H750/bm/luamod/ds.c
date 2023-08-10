@@ -22,6 +22,7 @@
 #include <xwem/vm/lua/src/lauxlib.h>
 #include <xwem/vm/lua/xwlua/xwds/soc.h>
 #include <xwem/vm/lua/xwlua/xwds/uart.h>
+#include <xwem/vm/lua/xwlua/xwds/spim.h>
 #include "bm/xwac/xwds/device.h"
 
 void xwlua_open_brdlibs(lua_State * L)
@@ -29,4 +30,6 @@ void xwlua_open_brdlibs(lua_State * L)
         xwlua_soc_register(L, "stm32", &stm32soc);
         xwlua_uart_register(L, "usart1", &stm32usart1);
         xwlua_uart_register(L, "usart3", &stm32usart3);
+        xwlua_spim_register(L, "spi1", &stm32spi1m);
+        xwlua_spim_register(L, "spi4", &stm32spi4m);
 }

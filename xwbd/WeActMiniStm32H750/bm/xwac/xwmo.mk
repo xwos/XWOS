@@ -30,7 +30,6 @@ ifeq ($(BRDCFG_XWSKD_THD_STACK_POOL),y)
 endif
 XWMO_CSRCS += xwos/xwskd_hook.c
 
-XWMO_CSRCS += xwds/core.c
 XWMO_CSRCS += xwds/device.c
 XWMO_CSRCS += xwds/pm.c
 XWMO_CSRCS += xwds/soc.c

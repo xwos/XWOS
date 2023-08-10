@@ -22,6 +22,7 @@
 #define __bm_xwac_xwds_device_h__
 
 #include "board/std.h"
+#include <xwcd/ds/xwds.h>
 #include <xwcd/ds/device.h>
 #include <xwcd/ds/soc/chip.h>
 #include <xwcd/ds/uart/controller.h>
@@ -31,18 +32,32 @@
 
 /******** ******** ds ******** ********/
 extern struct xwds stm32xwds;
+xwer_t stm32cube_xwds_probe(void);
+void stm32cube_xwds_remove(void);
+xwer_t stm32cube_xwds_start(void);
+void stm32cube_xwds_stop(void);
 
 /******** ******** soc ******** ********/
 extern struct xwds_soc stm32soc;
+xwer_t stm32cube_xwds_soc_start(void);
+xwer_t stm32cube_xwds_soc_stop(void);
 
 /******** ******** uart ******** ********/
 extern struct xwds_uartc stm32usart1;
 extern struct xwds_uartc stm32usart3;
+xwer_t stm32cube_xwds_uart_start(void);
+xwer_t stm32cube_xwds_uart_stop(void);
 
 /******** ******** spi ******** ********/
 extern struct xwds_spim stm32spi1m;
 extern struct xwds_spim stm32spi4m;
 extern struct xwds_w25qxx w25q64jv;
 extern struct xwds_st7735 st7735;
+xwer_t stm32cube_xwds_spi_start(void);
+xwer_t stm32cube_xwds_spi_stop(void);
+xwer_t stm32cube_xwds_st7735_start(void);
+xwer_t stm32cube_xwds_st7735_stop(void);
+xwer_t stm32cube_xwds_w25q64jv_start(void);
+xwer_t stm32cube_xwds_w25q64jv_stop(void);
 
 #endif /* bm/xwac/xwds/device.h */
