@@ -269,6 +269,39 @@ xwer_t stm32cube_xwds_i2c_stop(void)
         return XWOK;
 }
 
+xwer_t stm32cube_xwds_eeprom_start(void)
+{
+        xwer_t rc;
+
+        xwds_eeprom_construct(&stm32eeprom_256k);
+        rc = xwds_device_probe(&stm32xwds,
+                               xwds_cast(struct xwds_device *, &stm32eeprom_256k),
+                               NULL);
+        if (rc < 0) {
+                goto err_dev_probe;
+        }
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32eeprom_256k));
+        if (rc < 0) {
+                goto err_dev_start;
+        }
+
+        return XWOK;
+
+err_dev_start:
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32eeprom_256k));
+err_dev_probe:
+        xwds_eeprom_destruct(&stm32eeprom_256k);
+        return rc;
+}
+
+xwer_t stm32cube_xwds_eeprom_stop(void)
+{
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32eeprom_256k));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32eeprom_256k));
+        xwds_eeprom_destruct(&stm32eeprom_256k);
+        return XWOK;
+}
+
 xwer_t stm32cube_xwds_probe(void)
 {
         xwer_t rc;
@@ -327,6 +360,10 @@ xwer_t stm32cube_xwds_start(void)
                 xwlogf(ERR, "stm32cube", "Start I2C ... <rc:%d>\n", rc);
                 goto err_i2c_start;
         }
+        rc = stm32cube_xwds_eeprom_start();
+        if (rc < 0) {
+                xwlogf(ERR, "stm32cube", "Start EEPROM ... <rc:%d>\n", rc);
+        }
         return XWOK;
 
 err_i2c_start:
@@ -343,6 +380,10 @@ void stm32cube_xwds_stop(void)
 {
         xwer_t rc;
 
+        rc = stm32cube_xwds_eeprom_stop();
+        if (rc < 0) {
+                xwlogf(ERR, "stm32cube", "Stop EEPROM ... <rc:%d>\n", rc);
+        }
         rc = stm32cube_xwds_i2c_stop();
         if (rc < 0) {
                 xwlogf(ERR, "stm32cube", "Stop I2C ... <rc:%d>\n", rc);
