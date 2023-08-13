@@ -29,6 +29,7 @@
 #include <xwcd/ds/spi/master.h>
 #include <xwcd/perpheral/spi/flash/w25qxx/device.h>
 #include <xwcd/perpheral/spi/lcd/st7735/device.h>
+#include <xwcd/ds/i2c/master.h>
 
 /******** ******** ds ******** ********/
 extern struct xwds stm32xwds;
@@ -59,5 +60,10 @@ xwer_t stm32cube_xwds_st7735_start(void);
 xwer_t stm32cube_xwds_st7735_stop(void);
 xwer_t stm32cube_xwds_w25q64jv_start(void);
 xwer_t stm32cube_xwds_w25q64jv_stop(void);
+
+/******** ******** i2c ******** ********/
+extern struct xwds_i2cm stm32i2c1m;
+xwer_t stm32cube_xwds_i2c_start(void);
+xwer_t stm32cube_xwds_i2c_stop(void);
 
 #endif /* bm/xwac/xwds/device.h */

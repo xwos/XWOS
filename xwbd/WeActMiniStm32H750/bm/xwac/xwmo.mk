@@ -37,6 +37,7 @@ XWMO_CSRCS += xwds/uart.c
 XWMO_CSRCS += xwds/spim.c
 XWMO_CSRCS += xwds/st7735.c
 XWMO_CSRCS += xwds/w25q64jv.c
+XWMO_CSRCS += xwds/i2cm.c
 
 XWMO_CSRCS += xwlib/log.c
 XWMO_CSRCS += xwlib/crc.c

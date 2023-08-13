@@ -234,6 +234,41 @@ xwer_t stm32cube_xwds_w25q64jv_stop(void)
         return XWOK;
 }
 
+xwer_t stm32cube_xwds_i2c_start(void)
+{
+        xwer_t rc;
+
+        /* I2C1 */
+        xwds_i2cm_construct(&stm32i2c1m);
+        rc = xwds_device_probe(&stm32xwds,
+                               xwds_cast(struct xwds_device *, &stm32i2c1m),
+                               NULL);
+        if (rc < 0) {
+                goto err_i2c1_probe;
+        }
+        rc = xwds_device_start(xwds_cast(struct xwds_device *, &stm32i2c1m));
+        if (rc < 0) {
+                goto err_i2c1_start;
+        }
+
+        return XWOK;
+
+err_i2c1_start:
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32i2c1m));
+err_i2c1_probe:
+        xwds_i2cm_destruct(&stm32i2c1m);
+        return rc;
+}
+
+xwer_t stm32cube_xwds_i2c_stop(void)
+{
+        /* I2C1 */
+        xwds_device_stop(xwds_cast(struct xwds_device *, &stm32i2c1m));
+        xwds_device_remove(xwds_cast(struct xwds_device *, &stm32i2c1m));
+        xwds_i2cm_destruct(&stm32i2c1m);
+        return XWOK;
+}
+
 xwer_t stm32cube_xwds_probe(void)
 {
         xwer_t rc;
@@ -287,8 +322,17 @@ xwer_t stm32cube_xwds_start(void)
         if (rc < 0) {
                 xwlogf(ERR, "stm32cube", "Start ST7735 ... <rc:%d>\n", rc);
         }
+        rc = stm32cube_xwds_i2c_start();
+        if (rc < 0) {
+                xwlogf(ERR, "stm32cube", "Start I2C ... <rc:%d>\n", rc);
+                goto err_i2c_start;
+        }
         return XWOK;
 
+err_i2c_start:
+        stm32cube_xwds_st7735_stop();
+        stm32cube_xwds_w25q64jv_stop();
+        stm32cube_xwds_spi_stop();
 err_spi_start:
         stm32cube_xwds_uart_stop();
 err_uart_start:
@@ -299,6 +343,10 @@ void stm32cube_xwds_stop(void)
 {
         xwer_t rc;
 
+        rc = stm32cube_xwds_i2c_stop();
+        if (rc < 0) {
+                xwlogf(ERR, "stm32cube", "Stop I2C ... <rc:%d>\n", rc);
+        }
         rc = stm32cube_xwds_st7735_stop();
         if (rc < 0) {
                 xwlogf(ERR, "stm32cube", "Stop ST7735 ... <rc:%d>\n", rc);
