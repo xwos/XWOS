@@ -397,7 +397,7 @@ xwer_t xwos_sem_wait(struct xwos_sem * sem)
 /**
  * @brief XWOS API：限时等待并获取信号量
  * @param[in] sem: 信号量对象的指针
- * @param[in] xwtm: 期望唤醒的时间点
+ * @param[in] to: 期望唤醒的时间点
  * @return 错误码
  * @retval XWOK: 没有错误
  * @retval -EFAULT: 空指针

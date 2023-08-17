@@ -62,16 +62,13 @@ static const char vsnprintf_digits[] = "0123456789ABCDEF";
 static const char vsnprintf_nullstr[] = "(null)";
 
 static inline
-int vsnprintf_skip_atoi(const unsigned char ** s)
+int vsnprintf_skip_atoi(const char ** s)
 {
         int i = 0;
 
-        while (isdigit(**s)) {
-                i = i * 10 + *((*s)++) - '0';
-                /* equal to this
+        while (isdigit((int)(**s))) {
                 i = i * 10 + **s - '0';
                 (*s)++;
-                */
         }
         return i;
 }
@@ -178,7 +175,7 @@ char * vsnprintf_format_number(char * buf, char * end,
         locase = (char)(spec.flags & VSNPRINTF_F_SMALL);
         if (spec.flags & VSNPRINTF_F_LEFT) {
                 spec.flags &= ~VSNPRINTF_F_ZEROPAD;
-        }/* else {} */
+        }
         sign = 0;
         if (spec.flags & VSNPRINTF_F_SIGN) {
                 if ((signed long long)num < 0) {
@@ -191,15 +188,15 @@ char * vsnprintf_format_number(char * buf, char * end,
                 } else if (spec.flags & VSNPRINTF_F_SPACE) {
                         sign = ' ';
                         spec.field_width--;
-                }/* else {} */
+                } else {}
         }
         if (need_pfx) {
                 if (16 == spec.base) {
                         spec.field_width -= 2;
                 } else if (!is_zero) {
                         spec.field_width--;
-                }/* else {} */
-        }/* else {} */
+                } else {}
+        }
 
         /* generate full string in tmp[], in reverse order */
         i = 0;
@@ -219,7 +216,7 @@ char * vsnprintf_format_number(char * buf, char * end,
                         shift = 4;
                 }
                 do {
-                        tmp[i++] = (vsnprintf_digits[((unsigned char)num) & mask] |
+                        tmp[i++] = (vsnprintf_digits[((char)num) & mask] |
                                     locase);
                         num >>= shift;
                 } while (num);
@@ -228,8 +225,9 @@ char * vsnprintf_format_number(char * buf, char * end,
         }
 
         /* printing 100 using %2d gives "100", not "00" */
-        if (i > spec.precision)
+        if (i > spec.precision) {
                 spec.precision = (xws16_t)i;
+        }
         /* leading space padding */
         spec.field_width -= spec.precision;
         if (!(spec.flags & (VSNPRINTF_F_ZEROPAD + VSNPRINTF_F_LEFT))) {
@@ -298,42 +296,87 @@ char * vsnprintf_format_number(char * buf, char * end,
 }
 
 static inline
-char * vsnprintf_format_string(char * buf, char * end, const char * s,
-                               struct vsnprintf_format_spec spec)
+void vsnprintf_format_move_right(char * buf, char * end, xwssz_t len, xwssz_t spaces)
 {
-        xwssz_t len, i;
+        xwssz_t size;
 
-        if ((unsigned long)s <= MAX_ERRNO) {
-                s = vsnprintf_nullstr;
+        if (buf >= end) {
+                return;
         }
-
-        len = (xwssz_t)strlen(s);
-        if (len > spec.precision) {
-                len = spec.precision;
+        size = (xwptr_t)end - (xwptr_t)buf;
+        if (size <= spaces) {
+                memset(buf, ' ', size);
+                return;
         }
-
-        if (!(spec.flags & VSNPRINTF_F_LEFT)) {
-                while (len < spec.field_width--) {
-                        if (buf < end)
-                                *buf = ' ';
-                        ++buf;
+        if (len > 0) {
+                if (len > size - spaces) {
+                        len = size - spaces;
                 }
+                memmove(buf + spaces, buf, len);
         }
-        for (i = 0; i < len; ++i) {
-                if (buf < end) {
-                        *buf = *s;
-                }
-                ++buf;
-                ++s;
+        memset(buf, ' ', spaces);
+}
+
+static inline
+char * vsnprintf_format_widen_string(char * buf, xwssz_t n, char * end,
+                                     struct vsnprintf_format_spec spec)
+{
+        xwssz_t spaces;
+
+        if (n >= (xwssz_t)spec.field_width) {
+                return buf;
         }
-        while (len < spec.field_width--) {
+        spaces = (xwssz_t)spec.field_width - n;
+        if (0 == (spec.flags & VSNPRINTF_F_LEFT)) {
+                vsnprintf_format_move_right(buf - n, end, n, spaces);
+                return buf + spaces;
+        }
+        while (spaces > 0) {
+                spaces--;
                 if (buf < end) {
                         *buf = ' ';
                 }
-                ++buf;
+                buf++;
         }
-
         return buf;
+}
+
+static inline
+char * vsnprintf_format_string_nocheck(char * buf, char * end,
+                                       const char * s,
+                                       struct vsnprintf_format_spec spec)
+{
+        xwssz_t len = 0;
+        xwssz_t limit = spec.precision;
+
+        while (limit) {
+                char c = *s;
+                s++;
+                if (0 == c) {
+                        break;
+                }
+                if (buf < end) {
+                        *buf = c;
+                }
+                buf++;
+                len++;
+                limit--;
+        }
+        return vsnprintf_format_widen_string(buf, len, end, spec);
+}
+
+static inline
+char * vsnprintf_format_string(char * buf, char * end, const char * s,
+                               struct vsnprintf_format_spec spec)
+{
+
+        if (NULL == s) {
+                s = vsnprintf_nullstr;
+                if (spec.precision == -1) {
+                        spec.precision = 2 * sizeof(void *);
+                }
+        }
+        return vsnprintf_format_string_nocheck(buf, end, s, spec);
 }
 
 static inline
@@ -356,10 +399,10 @@ char * vsnprintf_format_pointer(const char * fmt, char * buf, char * end, void *
 }
 
 static inline
-int vsnprintf_format_decode(const unsigned char * fmt,
+int vsnprintf_format_decode(const char * fmt,
                             struct vsnprintf_format_spec * spec)
 {
-        const unsigned char * start = fmt;
+        const char * start = fmt;
 
         /* we finished early by reading the field width */
         if (spec->type == VSNPRINTF_FT_WIDTH) {
@@ -373,16 +416,15 @@ int vsnprintf_format_decode(const unsigned char * fmt,
 
         /* we finished early by reading the precision */
         if (spec->type == VSNPRINTF_FT_PRECISION) {
-                if (spec->precision < 0)
+                if (spec->precision < 0) {
                         spec->precision = 0;
-
+                }
                 spec->type = VSNPRINTF_FT_NONE;
                 goto qualifier;
         }
 
         /* By default */
         spec->type = VSNPRINTF_FT_NONE;
-
         for (; *fmt ; fmt++) {
                 if ('%' == *fmt) {
                         break;
@@ -396,11 +438,8 @@ int vsnprintf_format_decode(const unsigned char * fmt,
 
         /* Process flags */
         spec->flags = 0;
-
         while (true) {
-                bool found;
-
-                found = true;
+                bool found = true;
                 fmt++;
                 switch (*fmt) {
                 case '-':
@@ -430,37 +469,36 @@ int vsnprintf_format_decode(const unsigned char * fmt,
 
         /* get field width */
         spec->field_width = -1;
-
-        if (isdigit(*fmt)) {
+        if (isdigit((int)(*fmt))) {
                 spec->field_width = (xws16_t)vsnprintf_skip_atoi(&fmt);
         } else if ('*' == *fmt) {
                 /* The next argument */
                 spec->type = VSNPRINTF_FT_WIDTH;
                 fmt++;
                 return fmt - start;
-        }/* else {} */
+        } else {}
 
 precision:
         /* get the precision */
         spec->precision = -1;
         if ('.' == (*fmt)) {
-                fmt++ ;
-                if (isdigit(*fmt)) {
+                fmt++;
+                if (isdigit((int)(*fmt))) {
                         spec->precision = (xws16_t)vsnprintf_skip_atoi(&fmt);
                         if (spec->precision < 0) {
                                 spec->precision = 0;
-                        }/* else {} */
+                        }
                 } else if (*fmt == '*') {
                         /* it's the next argument */
                         spec->type = VSNPRINTF_FT_PRECISION;
                         fmt++;
                         return fmt - start;
-                }
+                } else {}
         }
 
 qualifier:
         /* get the conversion qualifier */
-        spec->qualifier = (xwu8_t)(-1);
+        spec->qualifier = 0;
         if (('h' == *fmt) || ('l' == tolower(*fmt)) ||
             ('z' == tolower(*fmt)) || ('t' == *fmt)) {
                 spec->qualifier = *fmt++;
@@ -524,8 +562,7 @@ qualifier:
 
         if ('L' == spec->qualifier) {
                 spec->type = VSNPRINTF_FT_LONG_LONG;
-        }
-        else if ('l' == spec->qualifier) {
+        } else if ('l' == spec->qualifier) {
                 if (spec->flags & VSNPRINTF_F_SIGN) {
                         spec->type = VSNPRINTF_FT_LONG;
                 } else {
@@ -554,20 +591,21 @@ qualifier:
                         spec->type = VSNPRINTF_FT_UINT;
                 }
         }
-
         fmt++;
         return fmt - start;
 }
 
 int vsnprintf(char * buf, xwsz_t size, const char * fmt, va_list args)
 {
+        int rc;
         xwu64_t num;
         char * str, * end;
         struct vsnprintf_format_spec spec = {0};
 
-        /* Reject out-of-range values early. */
-        if ((xwssz_t)size < 0) {
-                return 0;
+        if (size > XWSSZ_MAX) {
+                /* Reject out-of-range values early. */
+                rc = 0;
+                goto err_oor;
         }
 
         str = buf;
@@ -580,18 +618,17 @@ int vsnprintf(char * buf, xwsz_t size, const char * fmt, va_list args)
         }
 
         while (*fmt) {
-                const char * old_fmt = fmt;
-                int read = vsnprintf_format_decode((const unsigned char *)fmt, &spec);
-
+                const char * oldfmt = fmt;
+                int read = vsnprintf_format_decode(fmt, &spec);
                 fmt += read;
-
                 switch (spec.type) {
                 case VSNPRINTF_FT_NONE: {
                         int copy = read;
                         if (str < end) {
-                                if (copy > end - str)
+                                if (copy > end - str) {
                                         copy = end - str;
-                                memcpy(str, old_fmt, (xwsz_t)copy);
+                                }
+                                memcpy(str, oldfmt, (xwsz_t)copy);
                         }
                         str += read;
                         break;
@@ -616,7 +653,7 @@ int vsnprintf(char * buf, xwsz_t size, const char * fmt, va_list args)
                                         ++str;
                                 }
                         }
-                        c = (unsigned char)va_arg(args, int);
+                        c = (char)va_arg(args, int);
                         if (str < end) {
                                 *str = c;
                         }
@@ -638,7 +675,7 @@ int vsnprintf(char * buf, xwsz_t size, const char * fmt, va_list args)
                 case VSNPRINTF_FT_PTR:
                         str = vsnprintf_format_pointer(fmt+1, str, end,
                                                        va_arg(args, void *), spec);
-                        while (isalnum(*((const unsigned char *)fmt))) {
+                        while (isalnum((int)(*fmt))) {
                                 fmt++;
                         }
                         break;
@@ -707,8 +744,9 @@ int vsnprintf(char * buf, xwsz_t size, const char * fmt, va_list args)
                         end[-1] = '\0';
                 }
         }
-
-        return str - buf;
+        rc = str - buf;
+err_oor:
+        return rc;
 }
 
 int snprintf(char * buf, xwsz_t size, const char * fmt, ...)
