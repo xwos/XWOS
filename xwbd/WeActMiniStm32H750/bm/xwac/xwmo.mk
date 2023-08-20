@@ -44,12 +44,10 @@ XWMO_CSRCS += xwlib/log.c
 XWMO_CSRCS += xwlib/crc.c
 
 ifeq ($(XWCFG_LIBC),newlib)
-  XWMO_CSRCS += newlib/stdio.c
-  XWMO_CSRCS += newlib/mem.c
+  XWMO_CSRCS += $(call XwmoWildcard,*.c,newlib)
 endif
 ifeq ($(XWCFG_LIBC),picolibc)
-  XWMO_CSRCS += picolibc/stdio.c
-  XWMO_CSRCS += picolibc/mem.c
+  XWMO_CSRCS += $(call XwmoWildcard,*.c,picolibc)
 endif
 
 XWMO_CSRCS += xwrust/allocator.c

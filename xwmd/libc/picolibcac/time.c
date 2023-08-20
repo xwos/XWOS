@@ -22,6 +22,9 @@ void picolibcac_time_linkage_stub(void)
 {
 }
 
+extern
+xwer_t picolibcac_rtc_get_datetime(struct tm * tm, suseconds_t * ms);
+
 // cppcheck-suppress [misra-c2012-8.14]
 int gettimeofday(struct timeval * restrict tv, void * restrict tz);
 clock_t times(struct tms * buf);
@@ -29,18 +32,24 @@ clock_t times(struct tms * buf);
 // cppcheck-suppress [misra-c2012-8.14]
 int gettimeofday(struct timeval * restrict tv, void * restrict tz)
 {
-        xwtm_t nowts;
+        struct tm tm;
+        suseconds_t ms;
+        xwer_t rc;
+        int ret;
 
-        XWOS_UNUSED(tv);
         XWOS_UNUSED(tz);
 
-        errno = 0;
-        nowts = xwtm_nowts();
-        // cppcheck-suppress [misra-c2012-10.7] 64bit to 32bit
-        tv->tv_sec = (time_t)(nowts / XWTM_MS(1000));
-        // cppcheck-suppress [misra-c2012-10.7] 64bit to 32bit
-        tv->tv_usec = (suseconds_t)((nowts % XWTM_MS(1000)) / XWTM_US(1000));
-        return 0;
+        rc = picolibcac_rtc_get_datetime(&tm, &ms);
+        if (XWOK == rc) {
+                errno = 0;
+                ret = 0;
+                tv->tv_sec = mktime(&tm);
+                tv->tv_usec = ms;
+        } else {
+                errno = -rc;
+                ret = -1;
+        }
+        return ret;
 }
 
 clock_t times(struct tms * buf)
