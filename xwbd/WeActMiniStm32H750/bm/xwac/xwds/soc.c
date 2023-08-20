@@ -27,6 +27,7 @@
 #include "bm/xwac/xwds/device.h"
 #include "bm/stm32cube/Core/Inc/dma.h"
 #include "bm/stm32cube/Core/Inc/gpio.h"
+#include "bm/stm32cube/Core/Inc/rtc.h"
 
 struct stm32cube_soc_cfg {
         struct {
@@ -246,6 +247,7 @@ xwer_t stm32cube_soc_drv_start(struct xwds_device * dev)
 
         MX_GPIO_Init();
         MX_DMA_Init();
+        MX_RTC_Init();
 
         return XWOK;
 }
