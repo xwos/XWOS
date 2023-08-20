@@ -27,7 +27,6 @@ XWMO_CSRCS :=
 
 XWMO_CSRCS += xwos/xwskd_hook.c
 
-XWMO_CSRCS += xwds/core.c
 XWMO_CSRCS += xwds/device.c
 XWMO_CSRCS += xwds/soc.c
 XWMO_CSRCS += xwds/uart.c

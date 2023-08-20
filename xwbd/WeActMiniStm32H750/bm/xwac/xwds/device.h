@@ -41,33 +41,33 @@ void stm32cube_xwds_stop(void);
 
 /******** ******** soc ******** ********/
 extern struct xwds_soc stm32soc;
-xwer_t stm32cube_xwds_soc_start(void);
-xwer_t stm32cube_xwds_soc_stop(void);
+xwer_t stm32cube_xwds_soc_init(void);
+xwer_t stm32cube_xwds_soc_fini(void);
 
 /******** ******** uart ******** ********/
 extern struct xwds_uartc stm32usart1;
 extern struct xwds_uartc stm32usart3;
-xwer_t stm32cube_xwds_uart_start(void);
-xwer_t stm32cube_xwds_uart_stop(void);
+xwer_t stm32cube_xwds_uart_init(void);
+xwer_t stm32cube_xwds_uart_fini(void);
 
 /******** ******** spi ******** ********/
 extern struct xwds_spim stm32spi1m;
 extern struct xwds_spim stm32spi4m;
 extern struct xwds_w25qxx w25q64jv;
 extern struct xwds_st7735 st7735;
-xwer_t stm32cube_xwds_spi_start(void);
-xwer_t stm32cube_xwds_spi_stop(void);
-xwer_t stm32cube_xwds_st7735_start(void);
-xwer_t stm32cube_xwds_st7735_stop(void);
-xwer_t stm32cube_xwds_w25q64jv_start(void);
-xwer_t stm32cube_xwds_w25q64jv_stop(void);
+xwer_t stm32cube_xwds_spi_init(void);
+xwer_t stm32cube_xwds_spi_fini(void);
+xwer_t stm32cube_xwds_st7735_init(void);
+xwer_t stm32cube_xwds_st7735_fini(void);
+xwer_t stm32cube_xwds_w25q64jv_init(void);
+xwer_t stm32cube_xwds_w25q64jv_fini(void);
 
 /******** ******** i2c ******** ********/
 extern struct xwds_i2cm stm32i2c1m;
 extern struct xwds_eeprom stm32eeprom_256k;
-xwer_t stm32cube_xwds_i2c_start(void);
-xwer_t stm32cube_xwds_i2c_stop(void);
-xwer_t stm32cube_xwds_eeprom_start(void);
-xwer_t stm32cube_xwds_eeprom_stop(void);
+xwer_t stm32cube_xwds_i2c_init(void);
+xwer_t stm32cube_xwds_i2c_fini(void);
+xwer_t stm32cube_xwds_eeprom_init(void);
+xwer_t stm32cube_xwds_eeprom_fini(void);
 
 #endif /* bm/xwac/xwds/device.h */

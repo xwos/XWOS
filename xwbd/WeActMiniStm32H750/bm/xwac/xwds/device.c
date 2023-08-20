@@ -26,7 +26,7 @@
 
 struct xwds stm32xwds;
 
-xwer_t stm32cube_xwds_soc_start(void)
+xwer_t stm32cube_xwds_soc_init(void)
 {
         xwer_t rc;
 
@@ -50,7 +50,7 @@ err_dev_probe:
         return rc;
 }
 
-xwer_t stm32cube_xwds_soc_stop(void)
+xwer_t stm32cube_xwds_soc_fini(void)
 {
         xwds_device_stop(xwds_cast(struct xwds_device *, &stm32soc));
         xwds_device_remove(xwds_cast(struct xwds_device *, &stm32soc));
@@ -58,7 +58,7 @@ xwer_t stm32cube_xwds_soc_stop(void)
         return XWOK;
 }
 
-xwer_t stm32cube_xwds_uart_start(void)
+xwer_t stm32cube_xwds_uart_init(void)
 {
         xwer_t rc;
 
@@ -99,7 +99,7 @@ err_usart1_probe:
         return rc;
 }
 
-xwer_t stm32cube_xwds_uart_stop(void)
+xwer_t stm32cube_xwds_uart_fini(void)
 {
         xwds_device_stop(xwds_cast(struct xwds_device *, &stm32usart3));
         xwds_device_remove(xwds_cast(struct xwds_device *, &stm32usart3));
@@ -111,7 +111,7 @@ xwer_t stm32cube_xwds_uart_stop(void)
         return XWOK;
 }
 
-xwer_t stm32cube_xwds_spi_start(void)
+xwer_t stm32cube_xwds_spi_init(void)
 {
         xwer_t rc;
 
@@ -155,7 +155,7 @@ err_spi1_probe:
         return rc;
 }
 
-xwer_t stm32cube_xwds_spi_stop(void)
+xwer_t stm32cube_xwds_spi_fini(void)
 {
         /* SPI4 */
         xwds_device_stop(xwds_cast(struct xwds_device *, &stm32spi4m));
@@ -169,7 +169,7 @@ xwer_t stm32cube_xwds_spi_stop(void)
         return XWOK;
 }
 
-xwer_t stm32cube_xwds_st7735_start(void)
+xwer_t stm32cube_xwds_st7735_init(void)
 {
         xwer_t rc;
 
@@ -194,7 +194,7 @@ err_st7735_probe:
         return rc;
 }
 
-xwer_t stm32cube_xwds_st7735_stop(void)
+xwer_t stm32cube_xwds_st7735_fini(void)
 {
         xwds_device_stop(xwds_cast(struct xwds_device *, &st7735));
         xwds_device_remove(xwds_cast(struct xwds_device *, &st7735));
@@ -202,7 +202,7 @@ xwer_t stm32cube_xwds_st7735_stop(void)
         return XWOK;
 }
 
-xwer_t stm32cube_xwds_w25q64jv_start(void)
+xwer_t stm32cube_xwds_w25q64jv_init(void)
 {
         xwer_t rc;
 
@@ -226,7 +226,7 @@ err_w25q64jv_probe:
         return rc;
 }
 
-xwer_t stm32cube_xwds_w25q64jv_stop(void)
+xwer_t stm32cube_xwds_w25q64jv_fini(void)
 {
         xwds_device_stop(xwds_cast(struct xwds_device *, &w25q64jv));
         xwds_device_remove(xwds_cast(struct xwds_device *, &w25q64jv));
@@ -234,7 +234,7 @@ xwer_t stm32cube_xwds_w25q64jv_stop(void)
         return XWOK;
 }
 
-xwer_t stm32cube_xwds_i2c_start(void)
+xwer_t stm32cube_xwds_i2c_init(void)
 {
         xwer_t rc;
 
@@ -260,7 +260,7 @@ err_i2c1_probe:
         return rc;
 }
 
-xwer_t stm32cube_xwds_i2c_stop(void)
+xwer_t stm32cube_xwds_i2c_fini(void)
 {
         /* I2C1 */
         xwds_device_stop(xwds_cast(struct xwds_device *, &stm32i2c1m));
@@ -269,7 +269,7 @@ xwer_t stm32cube_xwds_i2c_stop(void)
         return XWOK;
 }
 
-xwer_t stm32cube_xwds_eeprom_start(void)
+xwer_t stm32cube_xwds_eeprom_init(void)
 {
         xwer_t rc;
 
@@ -294,7 +294,7 @@ err_dev_probe:
         return rc;
 }
 
-xwer_t stm32cube_xwds_eeprom_stop(void)
+xwer_t stm32cube_xwds_eeprom_fini(void)
 {
         xwds_device_stop(xwds_cast(struct xwds_device *, &stm32eeprom_256k));
         xwds_device_remove(xwds_cast(struct xwds_device *, &stm32eeprom_256k));
@@ -307,10 +307,9 @@ xwer_t stm32cube_xwds_probe(void)
         xwer_t rc;
 
         xwds_init(&stm32xwds);
-        rc = stm32cube_xwds_soc_start();
+        rc = stm32cube_xwds_soc_init();
         if (rc < 0) {
-                xwlogf(ERR, "stm32cube", "Start SOC ... <rc:%d>\n", rc);
-                goto err_soc_start;
+                goto err_soc_init;
         }
         xwos_pm_set_cb(stm32cube_pm_resume,
                        stm32cube_pm_suspend,
@@ -319,7 +318,7 @@ xwer_t stm32cube_xwds_probe(void)
                        NULL);
         return XWOK;
 
-err_soc_start:
+err_soc_init:
         return rc;
 }
 
@@ -327,9 +326,8 @@ void stm32cube_xwds_remove(void)
 {
         xwer_t rc;
 
-        rc = stm32cube_xwds_soc_stop();
+        rc = stm32cube_xwds_soc_fini();
         if (rc < 0) {
-                xwlogf(ERR, "stm32cube", "Stop SOC ... <rc:%d>\n", rc);
         }
 }
 
@@ -337,42 +335,42 @@ xwer_t stm32cube_xwds_start(void)
 {
         xwer_t rc;
 
-        rc = stm32cube_xwds_uart_start();
+        rc = stm32cube_xwds_uart_init();
         if (rc < 0) {
-                xwlogf(ERR, "stm32cube", "Start UART ... <rc:%d>\n", rc);
-                goto err_uart_start;
+                xwlogf(ERR, "stm32cube", "Init UART ... <rc:%d>\n", rc);
+                goto err_uart_init;
         }
-        rc = stm32cube_xwds_spi_start();
+        rc = stm32cube_xwds_spi_init();
         if (rc < 0) {
-                xwlogf(ERR, "stm32cube", "Start SPI ... <rc:%d>\n", rc);
-                goto err_spi_start;
+                xwlogf(ERR, "stm32cube", "Init SPI ... <rc:%d>\n", rc);
+                goto err_spi_init;
         }
-        rc = stm32cube_xwds_w25q64jv_start();
+        rc = stm32cube_xwds_w25q64jv_init();
         if (rc < 0) {
-                xwlogf(ERR, "stm32cube", "Start W25Q64JV ... <rc:%d>\n", rc);
+                xwlogf(ERR, "stm32cube", "Init W25Q64JV ... <rc:%d>\n", rc);
         }
-        rc = stm32cube_xwds_st7735_start();
+        rc = stm32cube_xwds_st7735_init();
         if (rc < 0) {
-                xwlogf(ERR, "stm32cube", "Start ST7735 ... <rc:%d>\n", rc);
+                xwlogf(ERR, "stm32cube", "Init ST7735 ... <rc:%d>\n", rc);
         }
-        rc = stm32cube_xwds_i2c_start();
+        rc = stm32cube_xwds_i2c_init();
         if (rc < 0) {
-                xwlogf(ERR, "stm32cube", "Start I2C ... <rc:%d>\n", rc);
-                goto err_i2c_start;
+                xwlogf(ERR, "stm32cube", "Init I2C ... <rc:%d>\n", rc);
+                goto err_i2c_init;
         }
-        rc = stm32cube_xwds_eeprom_start();
+        rc = stm32cube_xwds_eeprom_init();
         if (rc < 0) {
-                xwlogf(ERR, "stm32cube", "Start EEPROM ... <rc:%d>\n", rc);
+                xwlogf(ERR, "stm32cube", "Init EEPROM ... <rc:%d>\n", rc);
         }
         return XWOK;
 
-err_i2c_start:
-        stm32cube_xwds_st7735_stop();
-        stm32cube_xwds_w25q64jv_stop();
-        stm32cube_xwds_spi_stop();
-err_spi_start:
-        stm32cube_xwds_uart_stop();
-err_uart_start:
+err_i2c_init:
+        stm32cube_xwds_st7735_fini();
+        stm32cube_xwds_w25q64jv_fini();
+        stm32cube_xwds_spi_fini();
+err_spi_init:
+        stm32cube_xwds_uart_fini();
+err_uart_init:
         return rc;
 }
 
@@ -380,28 +378,28 @@ void stm32cube_xwds_stop(void)
 {
         xwer_t rc;
 
-        rc = stm32cube_xwds_eeprom_stop();
+        rc = stm32cube_xwds_eeprom_fini();
         if (rc < 0) {
-                xwlogf(ERR, "stm32cube", "Stop EEPROM ... <rc:%d>\n", rc);
+                xwlogf(ERR, "stm32cube", "Fini EEPROM ... <rc:%d>\n", rc);
         }
-        rc = stm32cube_xwds_i2c_stop();
+        rc = stm32cube_xwds_i2c_fini();
         if (rc < 0) {
-                xwlogf(ERR, "stm32cube", "Stop I2C ... <rc:%d>\n", rc);
+                xwlogf(ERR, "stm32cube", "Fini I2C ... <rc:%d>\n", rc);
         }
-        rc = stm32cube_xwds_st7735_stop();
+        rc = stm32cube_xwds_st7735_fini();
         if (rc < 0) {
-                xwlogf(ERR, "stm32cube", "Stop ST7735 ... <rc:%d>\n", rc);
+                xwlogf(ERR, "stm32cube", "Fini ST7735 ... <rc:%d>\n", rc);
         }
-        rc = stm32cube_xwds_w25q64jv_stop();
+        rc = stm32cube_xwds_w25q64jv_fini();
         if (rc < 0) {
-                xwlogf(ERR, "stm32cube", "Stop W25Q64JV ... <rc:%d>\n", rc);
+                xwlogf(ERR, "stm32cube", "Fini W25Q64JV ... <rc:%d>\n", rc);
         }
-        rc = stm32cube_xwds_spi_stop();
+        rc = stm32cube_xwds_spi_fini();
         if (rc < 0) {
-                xwlogf(ERR, "stm32cube", "Stop SPI ... <rc:%d>\n", rc);
+                xwlogf(ERR, "stm32cube", "Fini SPI ... <rc:%d>\n", rc);
         }
-        rc = stm32cube_xwds_uart_stop();
+        rc = stm32cube_xwds_uart_fini();
         if (rc < 0) {
-                xwlogf(ERR, "stm32cube", "Stop UART ... <rc:%d>\n", rc);
+                xwlogf(ERR, "stm32cube", "Fini UART ... <rc:%d>\n", rc);
         }
 }

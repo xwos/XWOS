@@ -145,10 +145,7 @@ err_xwds_start:
  */
 void stm32cube_stop(void)
 {
-        /* fatfs */
         sdcard_fatfs_unmount();
-
-        /* xwds */
         stm32cube_xwds_stop();
 }
 
