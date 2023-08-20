@@ -23,11 +23,44 @@ void picolibcac_time_linkage_stub(void)
 }
 
 extern
+xwer_t picolibcac_rtc_set_datetime(struct tm * tm, suseconds_t ms);
+
+extern
 xwer_t picolibcac_rtc_get_datetime(struct tm * tm, suseconds_t * ms);
+
+// cppcheck-suppress [misra-c2012-8.14]
+int settimeofday(const struct timeval * tv, const struct timezone * tz);
 
 // cppcheck-suppress [misra-c2012-8.14]
 int gettimeofday(struct timeval * restrict tv, void * restrict tz);
 clock_t times(struct tms * buf);
+
+
+// cppcheck-suppress [misra-c2012-8.14]
+int settimeofday(const struct timeval * tv, const struct timezone * tz)
+{
+        struct tm tm;
+        xwer_t rc;
+        int ret;
+
+        XWOS_UNUSED(tz);
+
+        if (NULL == tv) {
+                errno = EFAULT;
+                ret = -1;
+        } else {
+                gmtime_r(&tv->tv_sec, &tm);
+                rc = picolibcac_rtc_set_datetime(&tm, tv->tv_usec);
+                if (XWOK == rc) {
+                        errno = 0;
+                        ret = 0;
+                } else {
+                        errno = -rc;
+                        ret = -1;
+                }
+        }
+        return ret;
+}
 
 // cppcheck-suppress [misra-c2012-8.14]
 int gettimeofday(struct timeval * restrict tv, void * restrict tz)
@@ -39,15 +72,20 @@ int gettimeofday(struct timeval * restrict tv, void * restrict tz)
 
         XWOS_UNUSED(tz);
 
-        rc = picolibcac_rtc_get_datetime(&tm, &ms);
-        if (XWOK == rc) {
-                errno = 0;
-                ret = 0;
-                tv->tv_sec = mktime(&tm);
-                tv->tv_usec = ms;
-        } else {
-                errno = -rc;
+        if (NULL == tv) {
+                errno = EFAULT;
                 ret = -1;
+        } else {
+                rc = picolibcac_rtc_get_datetime(&tm, &ms);
+                if (XWOK == rc) {
+                        errno = 0;
+                        ret = 0;
+                        tv->tv_sec = mktime(&tm);
+                        tv->tv_usec = ms;
+                } else {
+                        errno = -rc;
+                        ret = -1;
+                }
         }
         return ret;
 }

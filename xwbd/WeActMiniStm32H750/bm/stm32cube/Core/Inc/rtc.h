@@ -30,6 +30,7 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
+#include "stm32h7xx_ll_rtc.h"
 
 /* USER CODE END Includes */
 
@@ -50,4 +51,3 @@ void MX_RTC_Init(void);
 #endif
 
 #endif /* __RTC_H__ */
-
