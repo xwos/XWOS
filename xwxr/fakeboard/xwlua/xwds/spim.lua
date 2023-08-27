@@ -37,7 +37,7 @@ XWLUA模块：SPI主机模式控制器
 
 @tparam number size (**in**) 本次传输的数据大小
 
-@tparam number time (**optional**) (**in**) 期望的阻塞等待时间
+@tparam number time (**in** , **optional**) 期望的阻塞等待时间
 
 @treturn number 错误码<br>
 　● **0** 没有错误<br>

@@ -16,6 +16,18 @@ xwxt.f = nil -- 删除xwxt中的函数f
 xwxt.gc() -- 强制全局导出表做一次垃圾回收
 ```
 
+
+支持在全局导出表中传递的类型：
+
++ boolean
++ lightuserdata
++ userdata
++ number
++ string
++ function
++ table
+
+
 @module xwxt
 ]]
 

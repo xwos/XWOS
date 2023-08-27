@@ -204,7 +204,7 @@ end
 
 @tparam userdata condsp (**in**) 条件量对象强指针
 
-@tparam userdata lock (**optional**) (**in**) 锁对象的强引用指针<br>
+@tparam userdata lock (**in** , **optional**) 锁对象的强引用指针<br>
 　● **splksp** 自旋锁<br>
 　● **sqlksp** 顺序锁<br>
 　● **mtxsp** 互斥锁<br>
@@ -260,14 +260,14 @@ end
 
 @tparam userdata condsp (**in**) 条件量对象强指针
 
-@tparam userdata lock (**optional**) (**in**) 锁对象的强引用指针<br>
+@tparam userdata lock (**in** , **optional**) 锁对象的强引用指针<br>
 　● **splksp** 自旋锁<br>
 　● **sqlksp** 顺序锁<br>
 　● **mtxsp** 互斥锁<br>
 　● **nil** 无锁<br>
 　● **省略** 无锁，省略此参数时，后面一个参数也被省略
 
-@tparam number to (**optional**) (**in**) 期望的阻塞等待时间，省略时表示最大时间
+@tparam number to (**in** , **optional**) 期望的阻塞等待时间，省略时表示最大时间
 
 @treturn number 错误码<br>
 　● **0** 没有错误<br>
@@ -334,7 +334,7 @@ end
 
 @tparam userdata condsp (**in**) 条件量对象强指针
 
-@tparam userdata lock (**optional**) (**in**) 锁对象的强引用指针<br>
+@tparam userdata lock (**in** , **optional**) 锁对象的强引用指针<br>
 　● **splksp** 自旋锁<br>
 　● **sqlksp** 顺序锁<br>
 　● **mtxsp** 互斥锁<br>

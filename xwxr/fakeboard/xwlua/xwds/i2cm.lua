@@ -43,7 +43,7 @@ XWLUA模块：I2C主机模式控制器
 
 @tparam string txd (**in**) 待发送的数据
 
-@tparam number time (**optional**) (**in**) 期望的阻塞等待时间
+@tparam number time (**in** , **optional**) 期望的阻塞等待时间
 
 @treturn[1] number `rx` 为 `false` 时的错误码<br>
 　● **0** 没有错误<br>

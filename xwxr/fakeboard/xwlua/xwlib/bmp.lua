@@ -437,9 +437,9 @@ end
 
 @tparam userdata pos1 (**in**) 位的序号1
 
-@tparam userdata pos2 (**in**) (**optional**) 位的序号2
+@tparam userdata pos2 (**in** , **optional**) 位的序号2
 
-@tparam userdata ... (**in**) (**optional**) 位的序号n
+@tparam userdata ... (**in** , **optional**) 位的序号n
 
 @usage
 mybmp = xwlib.bmp.new(64) -- 创建一个包含64个位的位图
@@ -490,9 +490,9 @@ end
 
 @tparam userdata pos1 (**in**) 位的序号1
 
-@tparam userdata pos2 (**in**) (**optional**) 位的序号2
+@tparam userdata pos2 (**in** , **optional**) 位的序号2
 
-@tparam userdata ... (**in**) (**optional**) 位的序号n
+@tparam userdata ... (**in** , **optional**) 位的序号n
 
 @usage
 mybmp = xwlib.bmp.new(64) -- 创建一个包含64个位的位图
@@ -543,9 +543,9 @@ end
 
 @tparam userdata pos1 (**in**) 位的序号1
 
-@tparam userdata pos2 (**in**) (**optional**) 位的序号2
+@tparam userdata pos2 (**in** , **optional**) 位的序号2
 
-@tparam userdata ... (**in**) (**optional**) 位的序号n
+@tparam userdata ... (**in** , **optional**) 位的序号n
 
 @usage
 mybmp = xwlib.bmp.new(64) -- 创建一个包含64个位的位图

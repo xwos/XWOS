@@ -89,7 +89,7 @@ end
 
 @tparam string data (**in**) 待发送的数据
 
-@tparam number time (**optional**) (**in**) 期望的阻塞等待时间
+@tparam number time (**in** , **optional**) 期望的阻塞等待时间
 
 @treturn number 错误码<br>
 　● **0** 没有错误<br>
