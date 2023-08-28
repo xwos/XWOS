@@ -217,7 +217,7 @@ void stm32cube_usart1_cb_rxdma_restart(struct xwds_uartc * uartc)
 
 void stm32cube_usart1_cb_rxdma_halfcplt(struct xwds_uartc * uartc)
 {
-        xwds_uartc_drvcb_rxq_pub(uartc, XWDS_UART_RXQ_SIZE);
+        xwds_uartc_drvcb_rxq_pub(uartc, (sizeof(uartc->rxq.mem) >> (xwsq_t)1));
 }
 
 void stm32cube_usart1_cb_rxdma_cplt(struct xwds_uartc * uartc)
@@ -428,7 +428,7 @@ void stm32cube_usart3_cb_rxdma_restart(struct xwds_uartc * uartc)
 
 void stm32cube_usart3_cb_rxdma_halfcplt(struct xwds_uartc * uartc)
 {
-        xwds_uartc_drvcb_rxq_pub(uartc, XWDS_UART_RXQ_SIZE);
+        xwds_uartc_drvcb_rxq_pub(uartc, (sizeof(uartc->rxq.mem) >> (xwsq_t)1));
 }
 
 void stm32cube_usart3_cb_rxdma_cplt(struct xwds_uartc * uartc)

@@ -18,12 +18,12 @@
  * > limitations under the License.
  * @note
  * + 方案1：
- *   - 中断优先级：定时器中断的优先级 == DMA半完成与完成中断的优先级
- *   - 定时器中断函数与DMA半完成/完成中断函数运行在同一个CPU上
+ *   - 中断优先级：定时器中断的优先级 == DMA中断的优先级
+ *   - 定时器中断函数与DMA中断函数运行在同一个CPU上
  * + 方案2：
  *   - 中断优先级：定时器中断的优先级 < DMA半完成与完成中断的优先级
  *   - 定时器中断中，获取DMA剩余计数前关闭DMA中断或总中断开关
- *   - 定时器中断函数与DMA半完成/完成中断函数运行在同一个CPU上
+ *   - 定时器中断函数与DMA中断函数运行在同一个CPU上
  */
 
 #include <xwcd/ds/standard.h>
@@ -118,15 +118,15 @@ xwer_t xwds_uartc_vop_probe(struct xwds_uartc * uartc)
 
         xwos_splk_init(&uartc->rxq.lock);
         rc = xwos_sem_init(&uartc->rxq.sem, 0, 1);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_sem_init;
         }
         rc = xwos_mtx_init(&uartc->txmtx, XWOS_SKD_PRIORITY_RT_MIN);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_txmtx_init;
         }
         rc = xwds_device_vop_probe(&uartc->dev);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_probe;
         }
         return XWOK;
@@ -149,7 +149,7 @@ xwer_t xwds_uartc_vop_remove(struct xwds_uartc * uartc)
         xwer_t rc;
 
         rc = xwds_device_vop_remove(&uartc->dev);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_dev_vop_remove;
         }
 
@@ -257,25 +257,25 @@ xwer_t xwds_uartc_rx(struct xwds_uartc * uartc,
 
         pos = 0;
         rc = xwds_uartc_grab(uartc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_uartc_grab;
         }
         rest_buffer_size = *size;
         while (rest_buffer_size) {
                 rc = xwos_sem_wait_to(&uartc->rxq.sem, to);
-                if (__xwcc_unlikely(rc < 0)) {
+                if (rc < 0) {
                         goto err_sem_wait_to;
                 }
                 xwos_splk_lock_cpuirqsv(&uartc->rxq.lock, &cpuirq);
                 if (uartc->rxq.tail >= uartc->rxq.pos) {
                         available = uartc->rxq.tail - uartc->rxq.pos;
                 } else {
-                        available = (2 * XWDS_UART_RXQ_SIZE) - uartc->rxq.pos;
+                        available = sizeof(uartc->rxq.mem) - uartc->rxq.pos;
                         available += uartc->rxq.tail;
                 }
                 real = available > rest_buffer_size ? rest_buffer_size : available;
-                if ((real + uartc->rxq.pos) >= (2 * XWDS_UART_RXQ_SIZE)) {
-                        cp = (2 * XWDS_UART_RXQ_SIZE) - uartc->rxq.pos;
+                if ((real + uartc->rxq.pos) >= sizeof(uartc->rxq.mem)) {
+                        cp = sizeof(uartc->rxq.mem) - uartc->rxq.pos;
                         memcpy(&buf[pos], &uartc->rxq.mem[uartc->rxq.pos], cp);
                         memcpy(&buf[cp + pos], &uartc->rxq.mem[0], real - cp);
                         uartc->rxq.pos = real - cp;
@@ -330,25 +330,25 @@ xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc,
 
         pos = 0;
         rc = xwds_uartc_grab(uartc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_uartc_grab;
         }
         rest_buffer_size = *size;
         while (rest_buffer_size) {
                 rc = xwos_sem_trywait(&uartc->rxq.sem);
-                if (__xwcc_unlikely(rc < 0)) {
+                if (rc < 0) {
                         goto err_sem_trywait;
                 }
                 xwos_splk_lock_cpuirqsv(&uartc->rxq.lock, &cpuirq);
                 if (uartc->rxq.tail >= uartc->rxq.pos) {
                         available = uartc->rxq.tail - uartc->rxq.pos;
                 } else {
-                        available = (2 * XWDS_UART_RXQ_SIZE) - uartc->rxq.pos;
+                        available = sizeof(uartc->rxq.mem) - uartc->rxq.pos;
                         available += uartc->rxq.tail;
                 }
                 real = available > rest_buffer_size ? rest_buffer_size : available;
-                if ((real + uartc->rxq.pos) >= (2 * XWDS_UART_RXQ_SIZE)) {
-                        cp = (2 * XWDS_UART_RXQ_SIZE) - uartc->rxq.pos;
+                if ((real + uartc->rxq.pos) >= sizeof(uartc->rxq.mem)) {
+                        cp = sizeof(uartc->rxq.mem) - uartc->rxq.pos;
                         memcpy(&buf[pos], &uartc->rxq.mem[uartc->rxq.pos], cp);
                         memcpy(&buf[cp + pos], &uartc->rxq.mem[0], real - cp);
                         uartc->rxq.pos = real - cp;
@@ -361,7 +361,7 @@ xwer_t xwds_uartc_try_rx(struct xwds_uartc * uartc,
                 rest_buffer_size -= real;
                 if (available > real) {
                         xwos_sem_post(&uartc->rxq.sem);
-                }/* else {} */
+                }
         }
         xwds_uartc_put(uartc);
         *size = pos;
@@ -406,11 +406,11 @@ xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
         XWDS_VALIDATE(size, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_uartc_grab;
         }
         rc = xwos_mtx_lock_to(&uartc->txmtx, to);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_uartc_lock;
         }
         drv = xwds_cast(const struct xwds_uartc_driver *, uartc->dev.drv);
@@ -419,7 +419,7 @@ xwer_t xwds_uartc_tx(struct xwds_uartc * uartc,
         } else {
                 rc = -ENOSYS;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_tx;
         }
         xwos_mtx_unlock(&uartc->txmtx);
@@ -459,11 +459,11 @@ xwer_t xwds_uartc_putc(struct xwds_uartc * uartc,
         XWDS_VALIDATE(uartc, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_uartc_grab;
         }
         rc = xwos_mtx_lock_to(&uartc->txmtx, to);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_uartc_lock;
         }
         drv = xwds_cast(const struct xwds_uartc_driver *, uartc->dev.drv);
@@ -472,7 +472,7 @@ xwer_t xwds_uartc_putc(struct xwds_uartc * uartc,
         } else {
                 rc = -ENOSYS;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_putc;
         }
         xwos_mtx_unlock(&uartc->txmtx);
@@ -509,7 +509,7 @@ xwer_t xwds_uartc_cfg(struct xwds_uartc * uartc,
         XWDS_VALIDATE(cfg, "nullptr", -EFAULT);
 
         rc = xwds_uartc_grab(uartc);
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_uartc_grab;
         }
         drv = xwds_cast(const struct xwds_uartc_driver *, uartc->dev.drv);
@@ -518,7 +518,7 @@ xwer_t xwds_uartc_cfg(struct xwds_uartc * uartc,
         } else {
                 rc = -ENOSYS;
         }
-        if (__xwcc_unlikely(rc < 0)) {
+        if (rc < 0) {
                 goto err_drv_cfg;
         }
         xwds_uartc_put(uartc);
@@ -550,101 +550,48 @@ void xwds_uartc_drvcb_rxq_flush(struct xwds_uartc * uartc)
 /**
  * @brief XWDS Driver Callback：发布数据到接收队列
  * @param[in] uartc: UART控制器对象指针
- * @param[in] tail: 新的数据接收位置（有效数据结尾 + 1）
+ * @param[in] pub: 新的数据接收位置（有效数据结尾 + 1）
  */
 __xwds_code
-void xwds_uartc_drvcb_rxq_pub(struct xwds_uartc * uartc, xwsq_t tail)
+void xwds_uartc_drvcb_rxq_pub(struct xwds_uartc * uartc, xwsq_t pub)
 {
         xwsz_t pubsz;
         xwreg_t cpuirq;
 
-        pubsz = 0;
+        if (sizeof(uartc->rxq.mem) == pub) {
+                pub = 0;
+        }
         xwos_splk_lock_cpuirqsv(&uartc->rxq.lock, &cpuirq);
-        if (tail == uartc->rxq.tail) {
+        if (pub == uartc->rxq.tail) {
                 pubsz = 0;
-        } else if (0 == uartc->rxq.tail) {
-                if (tail > XWDS_UART_RXQ_SIZE) {
-                        /* Low buffer is overflow. Discard the oldest data. */
-                        pubsz = tail - XWDS_UART_RXQ_SIZE;
-                        uartc->rxq.tail = tail;
-                        uartc->rxq.pos = XWDS_UART_RXQ_SIZE;
-                } else {
-                        if (0 == uartc->rxq.pos) {
-                                pubsz = tail;
-                                uartc->rxq.tail = tail;
-                        } else {
-                                XWDS_BUG_ON(uartc->rxq.pos < XWDS_UART_RXQ_SIZE);
-                                if (XWDS_UART_RXQ_SIZE == tail) {
-                                        /* Low buffer is overflow.
-                                           Discard the oldest data */
-                                        pubsz = uartc->rxq.pos - tail;
-                                        uartc->rxq.tail = tail;
-                                        uartc->rxq.pos = 0;
-                                }/* else {} */
-                        }
-                }
-        } else if (uartc->rxq.tail < XWDS_UART_RXQ_SIZE) {
-                XWDS_BUG_ON(uartc->rxq.pos > uartc->rxq.tail);
-                if (tail > XWDS_UART_RXQ_SIZE) {
-                        /* Low buffer is overflow. Discard the oldest data. */
-                        uartc->rxq.tail = tail;
-                        uartc->rxq.pos = XWDS_UART_RXQ_SIZE;
-                        pubsz = tail - XWDS_UART_RXQ_SIZE;
-                } else if (tail < uartc->rxq.tail) {
-                        XWDS_BUG();
-                } else {
-                        pubsz = tail - uartc->rxq.tail;
-                        uartc->rxq.tail = tail;
-                }
-        } else if (XWDS_UART_RXQ_SIZE == uartc->rxq.tail) {
-                if ((tail < XWDS_UART_RXQ_SIZE) && (0 != tail)) {
-                        /* High buffer is overflow. Discard the oldest data. */
-                        pubsz = tail;
-                        uartc->rxq.tail = tail;
-                        uartc->rxq.pos = 0;
-                } else {
-                        if (XWDS_UART_RXQ_SIZE == uartc->rxq.pos) {
-                                if (0 == tail) {
-                                        pubsz = XWDS_UART_RXQ_SIZE;
-                                } else {
-                                        pubsz = tail - XWDS_UART_RXQ_SIZE;
-                                }
-                                uartc->rxq.tail = tail;
-                        } else {
-                                XWDS_BUG_ON(uartc->rxq.pos > XWDS_UART_RXQ_SIZE);
-                                if (0 == tail) {
-                                        /* High buffer is overflow.
-                                           Discard the oldest data */
-                                        pubsz = uartc->rxq.pos;
-                                        uartc->rxq.tail = 0;
-                                        uartc->rxq.pos = XWDS_UART_RXQ_SIZE;
-                                }/* else {} */
-                        }
-                }
-        } else {
-                XWDS_BUG_ON(uartc->rxq.pos < XWDS_UART_RXQ_SIZE);
-                XWDS_BUG_ON(uartc->rxq.pos > uartc->rxq.tail);
-                if ((tail < uartc->rxq.tail) && (0 != tail)) {
-                        /* High buffer is overflow. Discard the oldest data. */
-                        if (tail <= XWDS_UART_RXQ_SIZE) {
-                                pubsz = tail;
-                                uartc->rxq.tail = tail;
+        } else if (pub > uartc->rxq.tail) {
+                pubsz = pub - uartc->rxq.tail;
+                if (uartc->rxq.pos <= uartc->rxq.tail) {
+                } else if (uartc->rxq.pos <= pub) {
+                        /* Overflow! Discard the oldest data. */
+                        uartc->rxq.pos = pub + 1;
+                        if (sizeof(uartc->rxq.mem) == uartc->rxq.pos) {
                                 uartc->rxq.pos = 0;
-                        } else {
-                                XWDS_BUG();
                         }
                 } else {
-                        if (0 == tail) {
-                                pubsz = (2 * XWDS_UART_RXQ_SIZE) -
-                                                uartc->rxq.tail;
-                        } else {
-                                pubsz = tail - uartc->rxq.tail;
-                        }
-                        uartc->rxq.tail = tail;
                 }
+                uartc->rxq.tail = pub;
+        } else {
+                pubsz = sizeof(uartc->rxq.mem) - uartc->rxq.tail + pub;
+                if (uartc->rxq.pos <= pub) {
+                        /* Overflow! Discard the oldest data. */
+                        uartc->rxq.pos = pub + 1;
+                        /* `uartc->rxq.pos < sizeof(uartc->rxq.mem)` is always true. */
+                } else if (uartc->rxq.pos <= uartc->rxq.tail) {
+                } else {
+                        /* Overflow! Discard the oldest data. */
+                        uartc->rxq.pos = pub + 1;
+                        /* `uartc->rxq.pos < sizeof(uartc->rxq.mem)` is always true. */
+                }
+                uartc->rxq.tail = pub;
         }
         xwos_splk_unlock_cpuirqrs(&uartc->rxq.lock, cpuirq);
         if (pubsz > 0) {
                 xwos_sem_post(&uartc->rxq.sem);
-        }/* else {} */
+        }
 }

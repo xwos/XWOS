@@ -38,5 +38,7 @@ childsp = xwos.thd.call(childthd_main, true)
 rc, rctab = childsp:join()
 print(rctab.msg)
 rctab.func()
+mt = getmetatable(rctab)
+print(mt.__os)
 childsp = nil
 collectgarbage()
