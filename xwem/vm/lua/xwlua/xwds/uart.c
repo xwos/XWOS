@@ -34,8 +34,6 @@ void xwlua_uart_register(lua_State * L, const char * name,
         luart->uartc = uartc;
         luart->tik = uartc->dev.obj.xwobj.tik;
         luaL_setmetatable(L, "xwlua_uart");
-        lua_pushvalue(L, -1);
-        lua_setfield(L, LUA_REGISTRYINDEX, name);
         lua_setglobal(L, name);
 }
 

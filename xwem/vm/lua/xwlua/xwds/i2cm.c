@@ -33,8 +33,6 @@ void xwlua_i2cm_register(lua_State * L, const char * name, struct xwds_i2cm * i2
         luai2cm->i2cm = i2cm;
         luai2cm->tik = i2cm->dev.obj.xwobj.tik;
         luaL_setmetatable(L, "xwlua_i2cm");
-        lua_pushvalue(L, -1);
-        lua_setfield(L, LUA_REGISTRYINDEX, name);
         lua_setglobal(L, name);
 }
 

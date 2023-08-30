@@ -34,8 +34,6 @@ void xwlua_soc_register(lua_State * L, const char * name, struct xwds_soc * soc)
         luasoc->soc = soc;
         luasoc->tik = soc->dev.obj.xwobj.tik;
         luaL_setmetatable(L, "xwlua_soc");
-        lua_pushvalue(L, -1);
-        lua_setfield(L, LUA_REGISTRYINDEX, name);
         lua_setglobal(L, name);
 }
 

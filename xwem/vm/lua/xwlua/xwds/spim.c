@@ -33,8 +33,6 @@ void xwlua_spim_register(lua_State * L, const char * name, struct xwds_spim * sp
         luaspim->spim = spim;
         luaspim->tik = spim->dev.obj.xwobj.tik;
         luaL_setmetatable(L, "xwlua_spim");
-        lua_pushvalue(L, -1);
-        lua_setfield(L, LUA_REGISTRYINDEX, name);
         lua_setglobal(L, name);
 }
 
