@@ -24,6 +24,24 @@
 #include "xwem/vm/lua/xwlua/port.h"
 #include "xwem/vm/lua/xwlua/xwos/mtx.h"
 
+void xwlua_mtx_register(lua_State * L, const char * name,
+                        struct xwos_mtx * mtx)
+{
+        xwlua_mtx_sp * mtxsp;
+        xwer_t rc;
+
+        mtxsp = lua_newuserdatauv(L, sizeof(xwlua_mtx_sp), 0);
+        mtxsp->mtx = mtx;
+        mtxsp->tik = xwos_mtx_get_tik(mtx);
+        rc = xwos_mtx_acquire(*mtxsp);
+        if (XWOK == rc) {
+                luaL_setmetatable(L, "xwlua_mtx_sp");
+                lua_setglobal(L, name);
+        } else {
+                lua_pop(L, 1);
+        }
+}
+
 void xwlua_mtx_unlock(struct xwos_mtx * mtx)
 {
         xwer_t rc;

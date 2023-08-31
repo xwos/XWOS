@@ -25,6 +25,24 @@
 #include "xwem/vm/lua/xwlua/xwlib/bmp.h"
 #include "xwem/vm/lua/xwlua/xwos/sel.h"
 
+void xwlua_sel_register(lua_State * L, const char * name,
+                        struct xwos_sel * sel)
+{
+        xwlua_sel_sp * selsp;
+        xwer_t rc;
+
+        selsp = lua_newuserdatauv(L, sizeof(xwlua_sel_sp), 0);
+        selsp->sel = sel;
+        selsp->tik = xwos_sel_get_tik(sel);
+        rc = xwos_sel_acquire(*selsp);
+        if (XWOK == rc) {
+                luaL_setmetatable(L, "xwlua_sel_sp");
+                lua_setglobal(L, name);
+        } else {
+                lua_pop(L, 1);
+        }
+}
+
 int xwlua_sel_new(lua_State * L)
 {
         xwer_t rc;

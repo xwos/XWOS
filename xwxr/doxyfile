@@ -959,6 +959,7 @@ INPUT                  = xwxr/index.md \
                          xwmd/isc/xwssc/hwifal.h \
                          xwmd/isc/xwssc/hwif/uart.h \
                          xwem/vm/lua/group.dox \
+                         xwem/vm/lua/xwlua/xwos/xwos.h \
                          xwem/vm/lua/xwlua/xwds/soc.h \
                          xwem/vm/lua/xwlua/xwds/uart.h \
                          xwem/vm/lua/xwlua/xwds/i2cm.h \

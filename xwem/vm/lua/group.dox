@@ -3,6 +3,11 @@
  */
 
 /**
+ * @defgroup xwlua_xwos XWLUA操作系统的CAPI库
+ * @ingroup xwlua
+ */
+
+/**
  * @defgroup xwlua_xwds XWLUA设备栈的CAPI库
  * @ingroup xwlua
  */

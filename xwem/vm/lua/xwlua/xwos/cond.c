@@ -28,6 +28,24 @@
 #include "xwem/vm/lua/xwlua/xwos/sel.h"
 #include "xwem/vm/lua/xwlua/xwos/cond.h"
 
+void xwlua_cond_register(lua_State * L, const char * name,
+                         struct xwos_cond * cond)
+{
+        xwlua_cond_sp * condsp;
+        xwer_t rc;
+
+        condsp = lua_newuserdatauv(L, sizeof(xwlua_cond_sp), 0);
+        condsp->cond = cond;
+        condsp->tik = xwos_cond_get_tik(cond);
+        rc = xwos_cond_acquire(*condsp);
+        if (XWOK == rc) {
+                luaL_setmetatable(L, "xwlua_cond_sp");
+                lua_setglobal(L, name);
+        } else {
+                lua_pop(L, 1);
+        }
+}
+
 int xwlua_cond_new(lua_State * L)
 {
         xwer_t rc;

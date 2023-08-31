@@ -42,5 +42,6 @@
     + @subpage xwmd_isc_xwmq
     + @subpage xwmd_isc_xwssc
 + @subpage xwlua
+  + @subpage xwlua_xwos
   + @subpage xwlua_xwds
   + @subpage xwlua_xwvm

@@ -43,7 +43,7 @@ struct xwlua_uart {
  * @brief 注册UART控制器对象
  * @param[in] L: 虚拟机指针
  * @param[in] name: UART控制器在Lua中的符号名
- * @param[in] spim: UART控制器对象的指针
+ * @param[in] uartc: UART控制器对象的指针
  */
 void xwlua_uart_register(lua_State * L, const char * name, struct xwds_uartc * uartc);
 

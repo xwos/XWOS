@@ -25,6 +25,24 @@
 #include "xwem/vm/lua/xwlua/xwos/sel.h"
 #include "xwem/vm/lua/xwlua/xwos/sem.h"
 
+void xwlua_sem_register(lua_State * L, const char * name,
+                        struct xwos_sem * sem)
+{
+        xwlua_sem_sp * semsp;
+        xwer_t rc;
+
+        semsp = lua_newuserdatauv(L, sizeof(xwlua_sem_sp), 0);
+        semsp->sem = sem;
+        semsp->tik = xwos_sem_get_tik(sem);
+        rc = xwos_sem_acquire(*semsp);
+        if (XWOK == rc) {
+                luaL_setmetatable(L, "xwlua_sem_sp");
+                lua_setglobal(L, name);
+        } else {
+                lua_pop(L, 1);
+        }
+}
+
 int xwlua_sem_new(lua_State * L)
 {
         xwer_t rc;

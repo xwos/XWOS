@@ -26,6 +26,24 @@
 #include "xwem/vm/lua/xwlua/xwos/sel.h"
 #include "xwem/vm/lua/xwlua/xwos/flg.h"
 
+void xwlua_flg_register(lua_State * L, const char * name,
+                        struct xwos_flg * flg)
+{
+        xwlua_flg_sp * flgsp;
+        xwer_t rc;
+
+        flgsp = lua_newuserdatauv(L, sizeof(xwlua_flg_sp), 0);
+        flgsp->flg = flg;
+        flgsp->tik = xwos_flg_get_tik(flg);
+        rc = xwos_flg_acquire(*flgsp);
+        if (XWOK == rc) {
+                luaL_setmetatable(L, "xwlua_flg_sp");
+                lua_setglobal(L, name);
+        } else {
+                lua_pop(L, 1);
+        }
+}
+
 int xwlua_flg_new(lua_State * L)
 {
         xwer_t rc;

@@ -25,7 +25,7 @@
 #include <xwos/osal/sync/sel.h>
 #include "xwem/vm/lua/src/lauxlib.h"
 
-typedef xwos_sel_d xwlua_sel_sp; /**< 信号量的强指针 */
+typedef xwos_sel_d xwlua_sel_sp; /**< 信号选择器的强指针 */
 #define XWLUA_SEL_NULLSP XWOS_SEL_NILD
 
 void xwlua_os_open_sel(lua_State * L);

@@ -26,6 +26,24 @@
 #include "xwem/vm/lua/xwlua/xwos/sel.h"
 #include "xwem/vm/lua/xwlua/xwos/br.h"
 
+void xwlua_br_register(lua_State * L, const char * name,
+                       struct xwos_br * br)
+{
+        xwlua_br_sp * brsp;
+        xwer_t rc;
+
+        brsp = lua_newuserdatauv(L, sizeof(xwlua_br_sp), 0);
+        brsp->br = br;
+        brsp->tik = xwos_br_get_tik(br);
+        rc = xwos_br_acquire(*brsp);
+        if (XWOK == rc) {
+                luaL_setmetatable(L, "xwlua_br_sp");
+                lua_setglobal(L, name);
+        } else {
+                lua_pop(L, 1);
+        }
+}
+
 int xwlua_br_new(lua_State * L)
 {
         xwer_t rc;
