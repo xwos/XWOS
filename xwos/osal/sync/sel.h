@@ -20,7 +20,7 @@
 /**
  * @defgroup xwos_sync_sel 信号选择器
  * @ingroup xwos_sync
- * 参考文档： [信号选择器](../docs/UserManual/Sync/Sel)
+ * 技术参考手册： [信号选择器](../docs/TechRefManual/Sync/Sel)
  *
  *
   * ## 信号选择器的静态初始化、销毁

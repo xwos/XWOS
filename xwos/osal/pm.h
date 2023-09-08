@@ -19,7 +19,7 @@
 /**
  * @defgroup xwos_pm 电源管理
  * @ingroup xwos
- * 参考文档： [电源管理](../docs/UserManual/Pm)
+ * 技术参考手册： [电源管理](../docs/TechRefManual/Pm)
  *
  * ## 电源管理回调
  *

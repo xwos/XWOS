@@ -24,7 +24,7 @@
 /**
  * @defgroup xwmd_isc_xwmq 消息队列
  * @ingroup xwmd_isc
- * 参考文档： [消息队列](../docs/UserManual/Isc/Xwmq)
+ * 技术参考手册： [消息队列](../docs/TechRefManual/Isc/Xwmq)
  *
  *
  * ## 消息队列的静态初始化、销毁

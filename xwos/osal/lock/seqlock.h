@@ -20,7 +20,7 @@
 /**
  * @defgroup xwos_lock_seqlock 顺序锁
  * @ingroup xwos_lock
- * 参考文档： [顺序锁](../docs/UserManual/Lock/Seqlock)
+ * 技术参考手册： [顺序锁](../docs/TechRefManual/Lock/Seqlock)
  *
  *
  * ## 顺序锁的初始化

@@ -21,7 +21,7 @@
 /**
  * @defgroup xwos_sync_flg 事件标志
  * @ingroup xwos_sync
- * 参考文档： [事件标志](../docs/UserManual/Sync/Flg)
+ * 技术参考手册： [事件标志](../docs/TechRefManual/Sync/Flg)
  *
  *
  * ## 事件标志的静态初始化、销毁
@@ -61,8 +61,8 @@
  *
  * ## 使用信号选择器选择事件标志
  *
- * + `xwos_flg_bind()` ：将事件标志绑定到 [信号选择器](../docs/UserManual/Sync/Sel) 上
- * + `xwos_flg_unbind()` ：从 [信号选择器](../docs/UserManual/Sync/Sel) 上解绑
+ * + `xwos_flg_bind()` ：将事件标志绑定到 [信号选择器](../docs/TechRefManual/Sync/Sel) 上
+ * + `xwos_flg_unbind()` ：从 [信号选择器](../docs/TechRefManual/Sync/Sel) 上解绑
  *
  *
  * ## 事件标志对象的生命周期管理

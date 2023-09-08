@@ -1335,8 +1335,8 @@ xwer_t xwup_skd_suspend(void)
  * @param[in] xwskd: XWOS UP调度器的指针
  * @return 错误码
  * @note
- * - 此函数只可由xwup_skd_resume()调用。
- *   在MP架构中，SOC层xwospl_skd_resume会触发CPU自身的调度器服务中断来运行此
+ * - 此函数只可由 @ref xwup_skd_resume() 调用。
+ *   在MP架构中，SOC层 `xwospl_skd_resume()` 会触发CPU自身的调度器服务中断来运行此
  *   函数，UP架构中复用了同一份BSP的适配代码。因此，此函数仅仅是为了保证编译顺利。
  */
 __xwup_code

@@ -23,7 +23,7 @@
 /**
  * @defgroup xwmd_isc_xwcq 循环队列
  * @ingroup xwmd_isc
- * 参考文档： [循环队列](../docs/UserManual/Isc/Xwcq)
+ * 技术参考手册： [循环队列](../docs/TechRefManual/Isc/Xwcq)
  *
  *
  * ## 循环队列的静态初始化、销毁

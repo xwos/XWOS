@@ -19,7 +19,7 @@
 /**
  * @defgroup xwos_swt 软件定时器
  * @ingroup xwos
- * 参考文档： [软件定时器](../docs/UserManual/Swt)
+ * 技术参考手册： [软件定时器](../docs/TechRefManual/Swt)
  *
  *
  * ## 软件定时器的静态初始化、销毁

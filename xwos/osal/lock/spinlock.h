@@ -20,7 +20,7 @@
 /**
  * @defgroup xwos_lock_spinlock 自旋锁
  * @ingroup xwos_lock
- * 参考文档： [自旋锁](../docs/UserManual/Lock/Spinlock)
+ * 技术参考手册： [自旋锁](../docs/TechRefManual/Lock/Spinlock)
  *
  *
  * ## 自旋锁的初始化

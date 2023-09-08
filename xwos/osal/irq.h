@@ -19,7 +19,7 @@
 /**
  * @defgroup xwos_irq 中断
  * @ingroup xwos
- * 参考文档： [中断管理](../docs/UserManual/Irq)
+ * 技术参考手册： [中断管理](../docs/TechRefManual/Irq)
  *
  * ## CPU中断开关
  *
@@ -122,7 +122,7 @@ xwer_t xwos_irq_restore(xwirq_t irqn, xwreg_t flag)
  * + 返回结果仅当返回值为OK时有效
  * + 可为NULL，表示不需要返回中断号
  * @return 错误码
- * @retval OK: 当前上下文为中断
+ * @retval XWOK: 当前上下文为中断
  * @retval -ETHDCTX: 当前上下文为线程
  * @retval -EBHCTX: 当前上下文为中断底半部
  * @note
