@@ -19,8 +19,8 @@
  */
 
 #include "board/std.h"
+#include <xwos/osal/pm.h>
 #include <xwcd/soc/arm/v7m/armv7m_isa.h>
-#include <xwcd/ds/xwds.h>
 #include "bm/stm32cube/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_cortex.h"
 #include "bm/stm32cube/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_pwr.h"
 #include "bm/stm32cube/Core/Inc/main.h"
@@ -28,7 +28,7 @@
 
 extern void SystemClock_Config(void);
 
-void stm32cube_pm_resume(void * arg)
+void xwosac_pmcb_resume(void * arg)
 {
         __xwcc_unused xwer_t rc;
         xwirq_t irq;
@@ -38,7 +38,7 @@ void stm32cube_pm_resume(void * arg)
         xwds_pm_resume(&stm32xwds);
 }
 
-void stm32cube_pm_suspend(void * arg)
+void xwosac_pmcb_suspend(void * arg)
 {
         __xwcc_unused xwer_t rc;
         xwirq_t irq;
@@ -60,13 +60,23 @@ void stm32cube_pm_suspend(void * arg)
         LL_LPM_EnableDeepSleep();
 }
 
-void stm32cube_pm_wakeup(void * arg)
+void xwosac_pmcb_wakeup(void * arg)
 {
         LL_LPM_EnableSleep(); /* 清除DEEPSLEEP位 */
         SystemClock_Config(); /* 从STOP模式恢复后，需要重新配置时钟 */
 }
 
-void stm32cube_pm_sleep(void * arg)
+void xwosac_pmcb_sleep(void * arg)
 {
+        /* 通过 WFI 指令进入STOP模式 */
         cm_wfi();
+}
+
+void xwosac_pmcb_init(void)
+{
+        xwos_pm_set_cb(xwosac_pmcb_resume,
+                       xwosac_pmcb_suspend,
+                       xwosac_pmcb_wakeup,
+                       xwosac_pmcb_sleep,
+                       NULL);
 }

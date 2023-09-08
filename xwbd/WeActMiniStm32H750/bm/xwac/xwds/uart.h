@@ -23,16 +23,16 @@
 
 #include "board/std.h"
 
-void stm32cube_usart1_cb_txdma_cplt(struct xwds_uartc * uartc, xwer_t dmarc);
-void stm32cube_usart1_cb_rxdma_restart(struct xwds_uartc * uartc);
-void stm32cube_usart1_cb_rxdma_halfcplt(struct xwds_uartc * uartc);
-void stm32cube_usart1_cb_rxdma_cplt(struct xwds_uartc * uartc);
-void stm32cube_usart1_cb_rxdma_timer(struct xwds_uartc * uartc);
+void stm32xwds_usart1_cb_txdma_cplt(struct xwds_uartc * uartc, xwer_t dmarc);
+void stm32xwds_usart1_cb_rxdma_restart(struct xwds_uartc * uartc);
+void stm32xwds_usart1_cb_rxdma_halfcplt(struct xwds_uartc * uartc);
+void stm32xwds_usart1_cb_rxdma_cplt(struct xwds_uartc * uartc);
+void stm32xwds_usart1_cb_rxdma_timer(struct xwds_uartc * uartc);
 
-void stm32cube_usart3_cb_txdma_cplt(struct xwds_uartc * uartc, xwer_t dmarc);
-void stm32cube_usart3_cb_rxdma_restart(struct xwds_uartc * uartc);
-void stm32cube_usart3_cb_rxdma_halfcplt(struct xwds_uartc * uartc);
-void stm32cube_usart3_cb_rxdma_cplt(struct xwds_uartc * uartc);
-void stm32cube_usart3_cb_rxdma_timer(struct xwds_uartc * uartc);
+void stm32xwds_usart3_cb_txdma_cplt(struct xwds_uartc * uartc, xwer_t dmarc);
+void stm32xwds_usart3_cb_rxdma_restart(struct xwds_uartc * uartc);
+void stm32xwds_usart3_cb_rxdma_halfcplt(struct xwds_uartc * uartc);
+void stm32xwds_usart3_cb_rxdma_cplt(struct xwds_uartc * uartc);
+void stm32xwds_usart3_cb_rxdma_timer(struct xwds_uartc * uartc);
 
 #endif /* bm/xwac/xwds/uart.h */

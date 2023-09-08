@@ -23,5 +23,5 @@
 
 xwer_t board_log_write(const char * s, xwsz_t * n)
 {
-        return xwds_uartc_tx(&stm32usart1, (const xwu8_t *)s, n, XWTM_MAX);
+        return xwds_uartc_tx(&stm32xwds_usart1, (const xwu8_t *)s, n, XWTM_MAX);
 }

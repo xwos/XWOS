@@ -23,6 +23,6 @@
 
 #include "board/std.h"
 
-void stm32cube_crc_init(void);
+void xwlibac_crc_init(void);
 
 #endif /* board/xwac/xwlib/crc.h */

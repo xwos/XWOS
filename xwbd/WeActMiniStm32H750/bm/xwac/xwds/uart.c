@@ -28,62 +28,62 @@
 
 /******** USART1 ********/
 static
-xwer_t stm32cube_usart1_drv_start(struct xwds_device * dev);
+xwer_t stm32xwds_usart1_drv_start(struct xwds_device * dev);
 
 static
-xwer_t stm32cube_usart1_drv_stop(struct xwds_device * dev);
+xwer_t stm32xwds_usart1_drv_stop(struct xwds_device * dev);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
-xwer_t stm32cube_usart1_drv_suspend(struct xwds_device * dev);
+xwer_t stm32xwds_usart1_drv_suspend(struct xwds_device * dev);
 
 static
-xwer_t stm32cube_usart1_drv_resume(struct xwds_device * dev);
+xwer_t stm32xwds_usart1_drv_resume(struct xwds_device * dev);
 #endif
 
 static
-xwer_t stm32cube_usart1_drv_cfg(struct xwds_uartc * uartc,
+xwer_t stm32xwds_usart1_drv_cfg(struct xwds_uartc * uartc,
                                 const struct xwds_uart_cfg * cfg);
 static
-xwer_t stm32cube_usart1_drv_tx(struct xwds_uartc * uartc,
+xwer_t stm32xwds_usart1_drv_tx(struct xwds_uartc * uartc,
                                const xwu8_t * data, xwsz_t * size,
                                xwtm_t to);
 
 static
-xwer_t stm32cube_usart1_drv_putc(struct xwds_uartc * uartc,
+xwer_t stm32xwds_usart1_drv_putc(struct xwds_uartc * uartc,
                                  const xwu8_t byte);
 
-const struct xwds_uartc_driver stm32cube_usart1_drv = {
+const struct xwds_uartc_driver stm32xwds_usart1_drv = {
         .base = {
-                .name = "stm32cube.usart.1",
+                .name = "stm32xwds.usart1",
                 .probe = NULL,
                 .remove = NULL,
-                .start = stm32cube_usart1_drv_start,
-                .stop = stm32cube_usart1_drv_stop,
+                .start = stm32xwds_usart1_drv_start,
+                .stop = stm32xwds_usart1_drv_stop,
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-                .suspend = stm32cube_usart1_drv_suspend,
-                .resume =  stm32cube_usart1_drv_resume,
+                .suspend = stm32xwds_usart1_drv_suspend,
+                .resume =  stm32xwds_usart1_drv_resume,
 #endif
         },
-        .cfg = stm32cube_usart1_drv_cfg,
-        .tx = stm32cube_usart1_drv_tx,
-        .putc = stm32cube_usart1_drv_putc,
+        .cfg = stm32xwds_usart1_drv_cfg,
+        .tx = stm32xwds_usart1_drv_tx,
+        .putc = stm32xwds_usart1_drv_putc,
 };
 
-struct xwds_uartc stm32usart1 = {
+struct xwds_uartc stm32xwds_usart1 = {
         /* attributes */
         .dev = {
-                .name = "stm32cube.usart.1",
+                .name = "stm32xwds.usart1",
                 .id = 1,
                 .resources = NULL,
-                .drv = xwds_cast(struct xwds_driver *, &stm32cube_usart1_drv),
+                .drv = xwds_cast(struct xwds_driver *, &stm32xwds_usart1_drv),
                 .data = (void *)&huart1_drvdata,
         },
         .cfg = NULL,
 };
 
 static
-xwer_t stm32cube_usart1_drv_start(struct xwds_device * dev)
+xwer_t stm32xwds_usart1_drv_start(struct xwds_device * dev)
 {
         struct xwds_uartc * uartc;
         struct MX_UART_DriverData * drvdata;
@@ -107,7 +107,7 @@ err_rxdma_start:
 }
 
 static
-xwer_t stm32cube_usart1_drv_stop(struct xwds_device * dev)
+xwer_t stm32xwds_usart1_drv_stop(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
 
@@ -119,20 +119,20 @@ xwer_t stm32cube_usart1_drv_stop(struct xwds_device * dev)
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
-xwer_t stm32cube_usart1_drv_resume(struct xwds_device * dev)
+xwer_t stm32xwds_usart1_drv_resume(struct xwds_device * dev)
 {
-        return stm32cube_usart1_drv_start(dev);
+        return stm32xwds_usart1_drv_start(dev);
 }
 
 static
-xwer_t stm32cube_usart1_drv_suspend(struct xwds_device * dev)
+xwer_t stm32xwds_usart1_drv_suspend(struct xwds_device * dev)
 {
-        return stm32cube_usart1_drv_stop(dev);
+        return stm32xwds_usart1_drv_stop(dev);
 }
 #endif
 
 static
-xwer_t stm32cube_usart1_drv_cfg(struct xwds_uartc * uartc,
+xwer_t stm32xwds_usart1_drv_cfg(struct xwds_uartc * uartc,
                                 const struct xwds_uart_cfg * cfg)
 {
         XWOS_UNUSED(uartc);
@@ -141,7 +141,7 @@ xwer_t stm32cube_usart1_drv_cfg(struct xwds_uartc * uartc,
 }
 
 static
-xwer_t stm32cube_usart1_drv_tx(struct xwds_uartc * uartc,
+xwer_t stm32xwds_usart1_drv_tx(struct xwds_uartc * uartc,
                                const xwu8_t * data, xwsz_t * size,
                                xwtm_t to)
 {
@@ -186,7 +186,7 @@ xwer_t stm32cube_usart1_drv_tx(struct xwds_uartc * uartc,
         return rc;
 }
 
-void stm32cube_usart1_cb_txdma_cplt(struct xwds_uartc * uartc, xwer_t dmarc)
+void stm32xwds_usart1_cb_txdma_cplt(struct xwds_uartc * uartc, xwer_t dmarc)
 {
         struct MX_UART_DriverData * drvdata;
         xwreg_t cpuirq;
@@ -202,30 +202,30 @@ void stm32cube_usart1_cb_txdma_cplt(struct xwds_uartc * uartc, xwer_t dmarc)
 }
 
 static
-xwer_t stm32cube_usart1_drv_putc(struct xwds_uartc * uartc,
+xwer_t stm32xwds_usart1_drv_putc(struct xwds_uartc * uartc,
                                  const xwu8_t byte)
 {
         XWOS_UNUSED(uartc);
         return MX_USART1_Putc(byte);
 }
 
-void stm32cube_usart1_cb_rxdma_restart(struct xwds_uartc * uartc)
+void stm32xwds_usart1_cb_rxdma_restart(struct xwds_uartc * uartc)
 {
         xwds_uartc_drvcb_rxq_flush(uartc);
         MX_USART1_RXDMA_Start(uartc->rxq.mem, sizeof(uartc->rxq.mem));
 }
 
-void stm32cube_usart1_cb_rxdma_halfcplt(struct xwds_uartc * uartc)
+void stm32xwds_usart1_cb_rxdma_halfcplt(struct xwds_uartc * uartc)
 {
         xwds_uartc_drvcb_rxq_pub(uartc, (sizeof(uartc->rxq.mem) >> (xwsq_t)1));
 }
 
-void stm32cube_usart1_cb_rxdma_cplt(struct xwds_uartc * uartc)
+void stm32xwds_usart1_cb_rxdma_cplt(struct xwds_uartc * uartc)
 {
         xwds_uartc_drvcb_rxq_pub(uartc, 0);
 }
 
-void stm32cube_usart1_cb_rxdma_timer(struct xwds_uartc * uartc)
+void stm32xwds_usart1_cb_rxdma_timer(struct xwds_uartc * uartc)
 {
         xwsq_t tail;
 
@@ -239,62 +239,62 @@ void stm32cube_usart1_cb_rxdma_timer(struct xwds_uartc * uartc)
 
 /******** USART3 ********/
 static
-xwer_t stm32cube_usart3_drv_start(struct xwds_device * dev);
+xwer_t stm32xwds_usart3_drv_start(struct xwds_device * dev);
 
 static
-xwer_t stm32cube_usart3_drv_stop(struct xwds_device * dev);
+xwer_t stm32xwds_usart3_drv_stop(struct xwds_device * dev);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
-xwer_t stm32cube_usart3_drv_suspend(struct xwds_device * dev);
+xwer_t stm32xwds_usart3_drv_suspend(struct xwds_device * dev);
 
 static
-xwer_t stm32cube_usart3_drv_resume(struct xwds_device * dev);
+xwer_t stm32xwds_usart3_drv_resume(struct xwds_device * dev);
 #endif
 
 static
-xwer_t stm32cube_usart3_drv_cfg(struct xwds_uartc * uartc,
+xwer_t stm32xwds_usart3_drv_cfg(struct xwds_uartc * uartc,
                                 const struct xwds_uart_cfg * cfg);
 static
-xwer_t stm32cube_usart3_drv_tx(struct xwds_uartc * uartc,
+xwer_t stm32xwds_usart3_drv_tx(struct xwds_uartc * uartc,
                                const xwu8_t * data, xwsz_t * size,
                                xwtm_t to);
 
 static
-xwer_t stm32cube_usart3_drv_putc(struct xwds_uartc * uartc,
+xwer_t stm32xwds_usart3_drv_putc(struct xwds_uartc * uartc,
                                  const xwu8_t byte);
 
-const struct xwds_uartc_driver stm32cube_usart3_drv = {
+const struct xwds_uartc_driver stm32xwds_usart3_drv = {
         .base = {
-                .name = "stm32cube.usart.1",
+                .name = "stm32xwds.usart3",
                 .probe = NULL,
                 .remove = NULL,
-                .start = stm32cube_usart3_drv_start,
-                .stop = stm32cube_usart3_drv_stop,
+                .start = stm32xwds_usart3_drv_start,
+                .stop = stm32xwds_usart3_drv_stop,
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-                .suspend = stm32cube_usart3_drv_suspend,
-                .resume =  stm32cube_usart3_drv_resume,
+                .suspend = stm32xwds_usart3_drv_suspend,
+                .resume =  stm32xwds_usart3_drv_resume,
 #endif
         },
-        .cfg = stm32cube_usart3_drv_cfg,
-        .tx = stm32cube_usart3_drv_tx,
-        .putc = stm32cube_usart3_drv_putc,
+        .cfg = stm32xwds_usart3_drv_cfg,
+        .tx = stm32xwds_usart3_drv_tx,
+        .putc = stm32xwds_usart3_drv_putc,
 };
 
-struct xwds_uartc stm32usart3 = {
+struct xwds_uartc stm32xwds_usart3 = {
         /* attributes */
         .dev = {
-                .name = "stm32cube.usart.3",
+                .name = "stm32xwds.usart3",
                 .id = 3,
                 .resources = NULL,
-                .drv = xwds_cast(struct xwds_driver *, &stm32cube_usart3_drv),
+                .drv = xwds_cast(struct xwds_driver *, &stm32xwds_usart3_drv),
                 .data = (void *)&huart3_drvdata,
         },
         .cfg = NULL,
 };
 
 static
-xwer_t stm32cube_usart3_drv_start(struct xwds_device * dev)
+xwer_t stm32xwds_usart3_drv_start(struct xwds_device * dev)
 {
         struct xwds_uartc * uartc;
         struct MX_UART_DriverData * drvdata;
@@ -318,7 +318,7 @@ err_rxdma_start:
 }
 
 static
-xwer_t stm32cube_usart3_drv_stop(struct xwds_device * dev)
+xwer_t stm32xwds_usart3_drv_stop(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
 
@@ -330,20 +330,20 @@ xwer_t stm32cube_usart3_drv_stop(struct xwds_device * dev)
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
-xwer_t stm32cube_usart3_drv_resume(struct xwds_device * dev)
+xwer_t stm32xwds_usart3_drv_resume(struct xwds_device * dev)
 {
-        return stm32cube_usart3_drv_start(dev);
+        return stm32xwds_usart3_drv_start(dev);
 }
 
 static
-xwer_t stm32cube_usart3_drv_suspend(struct xwds_device * dev)
+xwer_t stm32xwds_usart3_drv_suspend(struct xwds_device * dev)
 {
-        return stm32cube_usart3_drv_stop(dev);
+        return stm32xwds_usart3_drv_stop(dev);
 }
 #endif
 
 static
-xwer_t stm32cube_usart3_drv_cfg(struct xwds_uartc * uartc,
+xwer_t stm32xwds_usart3_drv_cfg(struct xwds_uartc * uartc,
                                 const struct xwds_uart_cfg * cfg)
 {
         XWOS_UNUSED(uartc);
@@ -352,7 +352,7 @@ xwer_t stm32cube_usart3_drv_cfg(struct xwds_uartc * uartc,
 }
 
 static
-xwer_t stm32cube_usart3_drv_tx(struct xwds_uartc * uartc,
+xwer_t stm32xwds_usart3_drv_tx(struct xwds_uartc * uartc,
                                const xwu8_t * data, xwsz_t * size,
                                xwtm_t to)
 {
@@ -397,7 +397,7 @@ xwer_t stm32cube_usart3_drv_tx(struct xwds_uartc * uartc,
         return rc;
 }
 
-void stm32cube_usart3_cb_txdma_cplt(struct xwds_uartc * uartc, xwer_t dmarc)
+void stm32xwds_usart3_cb_txdma_cplt(struct xwds_uartc * uartc, xwer_t dmarc)
 {
         struct MX_UART_DriverData * drvdata;
         xwreg_t cpuirq;
@@ -413,30 +413,30 @@ void stm32cube_usart3_cb_txdma_cplt(struct xwds_uartc * uartc, xwer_t dmarc)
 }
 
 static
-xwer_t stm32cube_usart3_drv_putc(struct xwds_uartc * uartc,
+xwer_t stm32xwds_usart3_drv_putc(struct xwds_uartc * uartc,
                                  const xwu8_t byte)
 {
         XWOS_UNUSED(uartc);
         return MX_USART3_Putc(byte);
 }
 
-void stm32cube_usart3_cb_rxdma_restart(struct xwds_uartc * uartc)
+void stm32xwds_usart3_cb_rxdma_restart(struct xwds_uartc * uartc)
 {
         xwds_uartc_drvcb_rxq_flush(uartc);
         MX_USART3_RXDMA_Start(uartc->rxq.mem, sizeof(uartc->rxq.mem));
 }
 
-void stm32cube_usart3_cb_rxdma_halfcplt(struct xwds_uartc * uartc)
+void stm32xwds_usart3_cb_rxdma_halfcplt(struct xwds_uartc * uartc)
 {
         xwds_uartc_drvcb_rxq_pub(uartc, (sizeof(uartc->rxq.mem) >> (xwsq_t)1));
 }
 
-void stm32cube_usart3_cb_rxdma_cplt(struct xwds_uartc * uartc)
+void stm32xwds_usart3_cb_rxdma_cplt(struct xwds_uartc * uartc)
 {
         xwds_uartc_drvcb_rxq_pub(uartc, 0);
 }
 
-void stm32cube_usart3_cb_rxdma_timer(struct xwds_uartc * uartc)
+void stm32xwds_usart3_cb_rxdma_timer(struct xwds_uartc * uartc)
 {
         xwsq_t tail;
 

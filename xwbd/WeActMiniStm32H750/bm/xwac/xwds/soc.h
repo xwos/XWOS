@@ -23,6 +23,6 @@
 
 #include "board/std.h"
 
-void stm32cube_soc_cb_eirq_isr(xwid_t eiid);
+void stm32xwds_soc_cb_eirq_isr(xwid_t eiid);
 
 #endif /* bm/xwac/xwds/soc.h */

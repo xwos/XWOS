@@ -35,7 +35,7 @@ xwer_t board_xwssc_start(void)
         xwer_t rc;
 
         rc = xwssc_start(&board_xwssc, "board.xwssc",
-                         &xwsscif_uart_ops, &stm32usart3,
+                         &xwsscif_uart_ops, &stm32xwds_usart3,
                          board_xwssc_mem, sizeof(board_xwssc_mem));
         return rc;
 }

@@ -27,59 +27,59 @@
 #include "bm/xwac/xwds/i2cm.h"
 
 static
-xwer_t stm32cube_i2c1m_drv_start(struct xwds_device * dev);
+xwer_t stm32xwds_i2c1m_drv_start(struct xwds_device * dev);
 
 static
-xwer_t stm32cube_i2c1m_drv_stop(struct xwds_device * dev);
+xwer_t stm32xwds_i2c1m_drv_stop(struct xwds_device * dev);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
-xwer_t stm32cube_i2c1m_drv_suspend(struct xwds_device * dev);
+xwer_t stm32xwds_i2c1m_drv_suspend(struct xwds_device * dev);
 
 static
-xwer_t stm32cube_i2c1m_drv_resume(struct xwds_device * dev);
+xwer_t stm32xwds_i2c1m_drv_resume(struct xwds_device * dev);
 #endif
 
 static
-xwer_t stm32cube_i2c1m_drv_xfer(struct xwds_i2cm * i2cm,
+xwer_t stm32xwds_i2c1m_drv_xfer(struct xwds_i2cm * i2cm,
                                 struct xwds_i2c_msg * msg,
                                 xwtm_t to);
 
 static
-xwer_t stm32cube_i2c1m_drv_abort(struct xwds_i2cm * i2cm,
+xwer_t stm32xwds_i2c1m_drv_abort(struct xwds_i2cm * i2cm,
                                  xwu16_t address, xwu16_t addrmode,
                                  xwtm_t to);
 
-const struct xwds_i2cm_driver stm32cube_i2c1m_drv = {
+const struct xwds_i2cm_driver stm32xwds_i2c1m_drv = {
         .base = {
-                .name = "stm32cube.i2c1m",
+                .name = "stm32xwds.i2c1m",
                 .probe = NULL,
                 .remove = NULL,
-                .start = stm32cube_i2c1m_drv_start,
-                .stop = stm32cube_i2c1m_drv_stop,
+                .start = stm32xwds_i2c1m_drv_start,
+                .stop = stm32xwds_i2c1m_drv_stop,
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-                .suspend = stm32cube_i2c1m_drv_suspend,
-                .resume =  stm32cube_i2c1m_drv_resume,
+                .suspend = stm32xwds_i2c1m_drv_suspend,
+                .resume =  stm32xwds_i2c1m_drv_resume,
 #endif
         },
-        .xfer = stm32cube_i2c1m_drv_xfer,
-        .abort = stm32cube_i2c1m_drv_abort,
+        .xfer = stm32xwds_i2c1m_drv_xfer,
+        .abort = stm32xwds_i2c1m_drv_abort,
 };
 
-struct xwds_i2cm stm32i2c1m = {
+struct xwds_i2cm stm32xwds_i2c1m = {
         /* attributes */
         .dev = {
-                .name = "stm32cube.i2c1m",
+                .name = "stm32xwds.i2c1m",
                 .id = 1,
                 .resources = NULL,
-                .drv = xwds_cast(struct xwds_driver *, &stm32cube_i2c1m_drv),
+                .drv = xwds_cast(struct xwds_driver *, &stm32xwds_i2c1m_drv),
                 .data = (void *)&hi2c1_drvdata,
         },
         .xwccfg = NULL,
 };
 
 static
-xwer_t stm32cube_i2c1m_drv_start(struct xwds_device * dev)
+xwer_t stm32xwds_i2c1m_drv_start(struct xwds_device * dev)
 {
         struct xwds_i2cm * i2cm;
         struct MX_I2C_MasterDriverData * drvdata;
@@ -93,7 +93,7 @@ xwer_t stm32cube_i2c1m_drv_start(struct xwds_device * dev)
 }
 
 static
-xwer_t stm32cube_i2c1m_drv_stop(struct xwds_device * dev)
+xwer_t stm32xwds_i2c1m_drv_stop(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
 
@@ -103,20 +103,20 @@ xwer_t stm32cube_i2c1m_drv_stop(struct xwds_device * dev)
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
-xwer_t stm32cube_i2c1m_drv_resume(struct xwds_device * dev)
+xwer_t stm32xwds_i2c1m_drv_resume(struct xwds_device * dev)
 {
-        return stm32cube_i2c1m_drv_start(dev);
+        return stm32xwds_i2c1m_drv_start(dev);
 }
 
 static
-xwer_t stm32cube_i2c1m_drv_suspend(struct xwds_device * dev)
+xwer_t stm32xwds_i2c1m_drv_suspend(struct xwds_device * dev)
 {
-        return stm32cube_i2c1m_drv_stop(dev);
+        return stm32xwds_i2c1m_drv_stop(dev);
 }
 #endif
 
 static
-xwer_t stm32cube_i2c1m_drv_xfer(struct xwds_i2cm * i2cm,
+xwer_t stm32xwds_i2c1m_drv_xfer(struct xwds_i2cm * i2cm,
                                 struct xwds_i2c_msg * msg,
                                 xwtm_t to)
 {
@@ -160,7 +160,7 @@ xwer_t stm32cube_i2c1m_drv_xfer(struct xwds_i2cm * i2cm,
 }
 
 static
-xwer_t stm32cube_i2c1m_drv_abort(struct xwds_i2cm * i2cm,
+xwer_t stm32xwds_i2c1m_drv_abort(struct xwds_i2cm * i2cm,
                                  xwu16_t address, xwu16_t addrmode,
                                  xwtm_t to)
 {
@@ -177,7 +177,7 @@ xwer_t stm32cube_i2c1m_drv_abort(struct xwds_i2cm * i2cm,
         return rc;
 }
 
-void stm32cube_i2c1m_cb_xfercplt(struct xwds_i2cm * i2cm, xwer_t xrc)
+void stm32xwds_i2c1m_cb_xfercplt(struct xwds_i2cm * i2cm, xwer_t xrc)
 {
         struct MX_I2C_MasterDriverData * drvdata;
         xwreg_t cpuirq;

@@ -26,87 +26,86 @@
 #include "bm/xwac/xwds/device.h"
 #include "bm/stm32cube/Core/Inc/dma.h"
 #include "bm/stm32cube/Core/Inc/gpio.h"
-#include "bm/stm32cube/Core/Inc/quadspi.h"
 
-struct stm32cube_soc_cfg {
+struct stm32xwds_soc_cfg {
         struct {
                 GPIO_TypeDef * const register_map[11];
         } gpio;
 };
 
 static
-xwer_t stm32cube_soc_drv_start(struct xwds_device * dev);
+xwer_t stm32xwds_soc_drv_start(struct xwds_device * dev);
 
 static
-xwer_t stm32cube_soc_drv_stop(struct xwds_device * dev);
+xwer_t stm32xwds_soc_drv_stop(struct xwds_device * dev);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
-xwer_t stm32cube_soc_drv_suspend(struct xwds_device * dev);
+xwer_t stm32xwds_soc_drv_suspend(struct xwds_device * dev);
 
 static
-xwer_t stm32cube_soc_drv_resume(struct xwds_device * dev);
+xwer_t stm32xwds_soc_drv_resume(struct xwds_device * dev);
 #endif
 
 static
-xwer_t stm32cube_soc_drv_gpio_req(struct xwds_soc * soc,
+xwer_t stm32xwds_soc_drv_gpio_req(struct xwds_soc * soc,
                                   xwid_t port, xwsq_t pinmask);
 
 static
-xwer_t stm32cube_soc_drv_gpio_rls(struct xwds_soc * soc,
+xwer_t stm32xwds_soc_drv_gpio_rls(struct xwds_soc * soc,
                                   xwid_t port, xwsq_t pinmask);
 
 static
-xwer_t stm32cube_soc_drv_gpio_cfg(struct xwds_soc * soc,
+xwer_t stm32xwds_soc_drv_gpio_cfg(struct xwds_soc * soc,
                                   xwid_t port, xwsq_t pinmask,
                                   void * cfg);
 
 static
-xwer_t stm32cube_soc_drv_gpio_set(struct xwds_soc * soc,
+xwer_t stm32xwds_soc_drv_gpio_set(struct xwds_soc * soc,
                                   xwid_t port, xwsq_t pinmask);
 
 static
-xwer_t stm32cube_soc_drv_gpio_reset(struct xwds_soc * soc,
+xwer_t stm32xwds_soc_drv_gpio_reset(struct xwds_soc * soc,
                                     xwid_t port, xwsq_t pinmask);
 
 static
-xwer_t stm32cube_soc_drv_gpio_toggle(struct xwds_soc * soc,
+xwer_t stm32xwds_soc_drv_gpio_toggle(struct xwds_soc * soc,
                                      xwid_t port, xwsq_t pinmask);
 
 static
-xwer_t stm32cube_soc_drv_gpio_output(struct xwds_soc * soc,
+xwer_t stm32xwds_soc_drv_gpio_output(struct xwds_soc * soc,
                                      xwid_t port, xwsq_t pinmask,
                                      xwsq_t out);
 
 static
-xwer_t stm32cube_soc_drv_gpio_input(struct xwds_soc * soc,
+xwer_t stm32xwds_soc_drv_gpio_input(struct xwds_soc * soc,
                                     xwid_t port, xwsq_t pinmask,
                                     xwsq_t * in);
 
-const struct xwds_soc_driver stm32cube_soc_drv = {
+const struct xwds_soc_driver stm32xwds_soc_drv = {
         .base = {
                 .name = "stm32cube.soc",
                 .probe = NULL,
                 .remove = NULL,
-                .start = stm32cube_soc_drv_start,
-                .stop = stm32cube_soc_drv_stop,
+                .start = stm32xwds_soc_drv_start,
+                .stop = stm32xwds_soc_drv_stop,
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-                .suspend = stm32cube_soc_drv_suspend,
-                .resume = stm32cube_soc_drv_resume,
+                .suspend = stm32xwds_soc_drv_suspend,
+                .resume = stm32xwds_soc_drv_resume,
 #endif
         },
 
-        .gpio_req = stm32cube_soc_drv_gpio_req,
-        .gpio_rls = stm32cube_soc_drv_gpio_rls,
-        .gpio_cfg = stm32cube_soc_drv_gpio_cfg,
-        .gpio_set = stm32cube_soc_drv_gpio_set,
-        .gpio_reset = stm32cube_soc_drv_gpio_reset,
-        .gpio_toggle = stm32cube_soc_drv_gpio_toggle,
-        .gpio_output = stm32cube_soc_drv_gpio_output,
-        .gpio_input = stm32cube_soc_drv_gpio_input,
+        .gpio_req = stm32xwds_soc_drv_gpio_req,
+        .gpio_rls = stm32xwds_soc_drv_gpio_rls,
+        .gpio_cfg = stm32xwds_soc_drv_gpio_cfg,
+        .gpio_set = stm32xwds_soc_drv_gpio_set,
+        .gpio_reset = stm32xwds_soc_drv_gpio_reset,
+        .gpio_toggle = stm32xwds_soc_drv_gpio_toggle,
+        .gpio_output = stm32xwds_soc_drv_gpio_output,
+        .gpio_input = stm32xwds_soc_drv_gpio_input,
 };
 
-struct stm32cube_soc_cfg stm32cube_soc_cfg = {
+struct stm32xwds_soc_cfg stm32xwds_soc_cfg = {
         .gpio = {
                 .register_map = {
                         [XWDS_GPIO_PORT_A] = (GPIO_TypeDef *)GPIOA_BASE,
@@ -138,16 +137,16 @@ atomic_xwsq_t stm32cube_gpio_pin_state[] = {
         [XWDS_GPIO_PORT_K] = 0,
 };
 
-struct xwds_soc stm32soc = {
+struct xwds_soc stm32xwds_soc = {
         /* attributes */
         .dev = {
                 .name = "stm32cube.soc",
                 .id = 0,
                 .resources = NULL,
-                .drv = xwds_cast(struct xwds_driver *, &stm32cube_soc_drv),
+                .drv = xwds_cast(struct xwds_driver *, &stm32xwds_soc_drv),
                 .data = NULL,
         },
-        .xwccfg = (void *)&stm32cube_soc_cfg,
+        .xwccfg = (void *)&stm32xwds_soc_cfg,
         .gpio = {
                 .cfg = NULL,
                 .pins = stm32cube_gpio_pin_state,
@@ -158,24 +157,22 @@ struct xwds_soc stm32soc = {
 
 /******** ******** base driver ******** ********/
 static
-xwer_t stm32cube_soc_drv_start(struct xwds_device * dev)
+xwer_t stm32xwds_soc_drv_start(struct xwds_device * dev)
 {
 
         XWOS_UNUSED(dev);
 
         MX_GPIO_Init();
         MX_DMA_Init();
-        MX_W25Q_Init();
 
         return XWOK;
 }
 
 static
-xwer_t stm32cube_soc_drv_stop(struct xwds_device * dev)
+xwer_t stm32xwds_soc_drv_stop(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
 
-        MX_W25Q_DeInit();
         MX_DMA_DeInit();
         MX_GPIO_DeInit();
 
@@ -184,14 +181,14 @@ xwer_t stm32cube_soc_drv_stop(struct xwds_device * dev)
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
-xwer_t stm32cube_soc_drv_suspend(struct xwds_device * dev)
+xwer_t stm32xwds_soc_drv_suspend(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
         return XWOK;
 }
 
 static
-xwer_t stm32cube_soc_drv_resume(struct xwds_device * dev)
+xwer_t stm32xwds_soc_drv_resume(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
         return XWOK;
@@ -200,7 +197,7 @@ xwer_t stm32cube_soc_drv_resume(struct xwds_device * dev)
 
 /******** ******** gpio operation driver ******** ********/
 static
-xwer_t stm32cube_soc_drv_gpio_req(struct xwds_soc * soc,
+xwer_t stm32xwds_soc_drv_gpio_req(struct xwds_soc * soc,
                                   xwid_t port, xwsq_t pinmask)
 {
         XWOS_UNUSED(soc);
@@ -210,7 +207,7 @@ xwer_t stm32cube_soc_drv_gpio_req(struct xwds_soc * soc,
 }
 
 static
-xwer_t stm32cube_soc_drv_gpio_rls(struct xwds_soc * soc,
+xwer_t stm32xwds_soc_drv_gpio_rls(struct xwds_soc * soc,
                                   xwid_t port, xwsq_t pinmask)
 {
         XWOS_UNUSED(soc);
@@ -220,11 +217,11 @@ xwer_t stm32cube_soc_drv_gpio_rls(struct xwds_soc * soc,
 }
 
 static
-xwer_t stm32cube_soc_drv_gpio_cfg(struct xwds_soc * soc,
+xwer_t stm32xwds_soc_drv_gpio_cfg(struct xwds_soc * soc,
                                   xwid_t port, xwsq_t pinmask,
                                   void * cfg)
 {
-        const struct stm32cube_soc_cfg * xwccfg;
+        const struct stm32xwds_soc_cfg * xwccfg;
         LL_GPIO_InitTypeDef * llcfg;
         GPIO_TypeDef * gpio;
         xwreg_t cpuirq;
@@ -247,10 +244,10 @@ xwer_t stm32cube_soc_drv_gpio_cfg(struct xwds_soc * soc,
 }
 
 static
-xwer_t stm32cube_soc_drv_gpio_set(struct xwds_soc * soc,
+xwer_t stm32xwds_soc_drv_gpio_set(struct xwds_soc * soc,
                                   xwid_t port, xwsq_t pinmask)
 {
-        const struct stm32cube_soc_cfg * xwccfg;
+        const struct stm32xwds_soc_cfg * xwccfg;
         GPIO_TypeDef * gpio;
         xwreg_t cpuirq;
 
@@ -264,10 +261,10 @@ xwer_t stm32cube_soc_drv_gpio_set(struct xwds_soc * soc,
 }
 
 static
-xwer_t stm32cube_soc_drv_gpio_reset(struct xwds_soc * soc,
+xwer_t stm32xwds_soc_drv_gpio_reset(struct xwds_soc * soc,
                                     xwid_t port, xwsq_t pinmask)
 {
-        const struct stm32cube_soc_cfg * xwccfg;
+        const struct stm32xwds_soc_cfg * xwccfg;
         GPIO_TypeDef * gpio;
         xwreg_t cpuirq;
 
@@ -281,10 +278,10 @@ xwer_t stm32cube_soc_drv_gpio_reset(struct xwds_soc * soc,
 }
 
 static
-xwer_t stm32cube_soc_drv_gpio_toggle(struct xwds_soc * soc,
+xwer_t stm32xwds_soc_drv_gpio_toggle(struct xwds_soc * soc,
                                      xwid_t port, xwsq_t pinmask)
 {
-        const struct stm32cube_soc_cfg * xwccfg;
+        const struct stm32xwds_soc_cfg * xwccfg;
         GPIO_TypeDef * gpio;
         xwreg_t cpuirq;
 
@@ -298,11 +295,11 @@ xwer_t stm32cube_soc_drv_gpio_toggle(struct xwds_soc * soc,
 }
 
 static
-xwer_t stm32cube_soc_drv_gpio_output(struct xwds_soc * soc,
+xwer_t stm32xwds_soc_drv_gpio_output(struct xwds_soc * soc,
                                      xwid_t port, xwsq_t pinmask,
                                      xwsq_t out)
 {
-        const struct stm32cube_soc_cfg * xwccfg;
+        const struct stm32xwds_soc_cfg * xwccfg;
         GPIO_TypeDef * gpio;
         xwreg_t cpuirq;
         xwu32_t regval;
@@ -321,11 +318,11 @@ xwer_t stm32cube_soc_drv_gpio_output(struct xwds_soc * soc,
 }
 
 static
-xwer_t stm32cube_soc_drv_gpio_input(struct xwds_soc * soc,
+xwer_t stm32xwds_soc_drv_gpio_input(struct xwds_soc * soc,
                                     xwid_t port, xwsq_t pinmask,
                                     xwsq_t * in)
 {
-        const struct stm32cube_soc_cfg * xwccfg;
+        const struct stm32xwds_soc_cfg * xwccfg;
         GPIO_TypeDef * gpio;
         xwu32_t regval;
 

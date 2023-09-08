@@ -446,7 +446,7 @@ xwer_t MX_SPI1_Abort(void)
 
 void MX_SPI1_TxCpltCallback(SPI_HandleTypeDef * hspi)
 {
-  stm32cube_spi1m_cb_xfercplt(hspi1_drvdata.spim, XWOK);
+  stm32xwds_spi1m_cb_xfercplt(hspi1_drvdata.spim, XWOK);
 }
 
 void MX_SPI1_RxCpltCallback(SPI_HandleTypeDef * hspi)
@@ -455,7 +455,7 @@ void MX_SPI1_RxCpltCallback(SPI_HandleTypeDef * hspi)
   SCB_InvalidateDCache_by_Addr((uint32_t *)hspi1_drvdata.mem.rx, MX_SPI_MEM_MAXSIZE);
 #endif
   memcpy(hspi1_drvdata.rxb, hspi1_drvdata.mem.rx, hspi1_drvdata.size);
-  stm32cube_spi1m_cb_xfercplt(hspi1_drvdata.spim, XWOK);
+  stm32xwds_spi1m_cb_xfercplt(hspi1_drvdata.spim, XWOK);
 }
 
 void MX_SPI1_TxRxCpltCallback(SPI_HandleTypeDef * hspi)
@@ -464,7 +464,7 @@ void MX_SPI1_TxRxCpltCallback(SPI_HandleTypeDef * hspi)
   SCB_InvalidateDCache_by_Addr((uint32_t *)hspi1_drvdata.mem.rx, MX_SPI_MEM_MAXSIZE);
 #endif
   memcpy(hspi1_drvdata.rxb, hspi1_drvdata.mem.rx, hspi1_drvdata.size);
-  stm32cube_spi1m_cb_xfercplt(hspi1_drvdata.spim, XWOK);
+  stm32xwds_spi1m_cb_xfercplt(hspi1_drvdata.spim, XWOK);
 }
 
 void MX_SPI1_TxHalfCpltCallback(SPI_HandleTypeDef * hspi)
@@ -482,17 +482,17 @@ void MX_SPI1_TxRxHalfCpltCallback(SPI_HandleTypeDef * hspi)
 void MX_SPI1_ErrorCallback(SPI_HandleTypeDef * hspi)
 {
   if (hspi->ErrorCode & HAL_SPI_ERROR_TIMEOUT) {
-    stm32cube_spi1m_cb_xfercplt(hspi1_drvdata.spim, -ETIMEDOUT);
+    stm32xwds_spi1m_cb_xfercplt(hspi1_drvdata.spim, -ETIMEDOUT);
   } else if (HAL_SPI_ERROR_NONE != hspi->ErrorCode) {
-    stm32cube_spi1m_cb_xfercplt(hspi1_drvdata.spim, -EIO);
+    stm32xwds_spi1m_cb_xfercplt(hspi1_drvdata.spim, -EIO);
   } else {
-    stm32cube_spi1m_cb_xfercplt(hspi1_drvdata.spim, -EBUG);
+    stm32xwds_spi1m_cb_xfercplt(hspi1_drvdata.spim, -EBUG);
   }
 }
 
 void MX_SPI1_AbortCpltCallback(SPI_HandleTypeDef * hspi)
 {
-  stm32cube_spi1m_cb_xfercplt(hspi1_drvdata.spim, -ECONNABORTED);
+  stm32xwds_spi1m_cb_xfercplt(hspi1_drvdata.spim, -ECONNABORTED);
 }
 
 /* SPI4 */
@@ -574,7 +574,7 @@ xwer_t MX_SPI4_Abort(void)
 
 void MX_SPI4_TxCpltCallback(SPI_HandleTypeDef * hspi)
 {
-  stm32cube_spi4m_cb_xfercplt(hspi4_drvdata.spim, XWOK);
+  stm32xwds_spi4m_cb_xfercplt(hspi4_drvdata.spim, XWOK);
 }
 
 void MX_SPI4_RxCpltCallback(SPI_HandleTypeDef * hspi)
@@ -583,7 +583,7 @@ void MX_SPI4_RxCpltCallback(SPI_HandleTypeDef * hspi)
   SCB_InvalidateDCache_by_Addr((uint32_t *)hspi4_drvdata.mem.rx, MX_SPI_MEM_MAXSIZE);
 #endif
   memcpy(hspi4_drvdata.rxb, hspi4_drvdata.mem.rx, hspi4_drvdata.size);
-  stm32cube_spi4m_cb_xfercplt(hspi4_drvdata.spim, XWOK);
+  stm32xwds_spi4m_cb_xfercplt(hspi4_drvdata.spim, XWOK);
 }
 
 void MX_SPI4_TxRxCpltCallback(SPI_HandleTypeDef * hspi)
@@ -592,7 +592,7 @@ void MX_SPI4_TxRxCpltCallback(SPI_HandleTypeDef * hspi)
   SCB_InvalidateDCache_by_Addr((uint32_t *)hspi4_drvdata.mem.rx, MX_SPI_MEM_MAXSIZE);
 #endif
   memcpy(hspi4_drvdata.rxb, hspi4_drvdata.mem.rx, hspi4_drvdata.size);
-  stm32cube_spi4m_cb_xfercplt(hspi4_drvdata.spim, XWOK);
+  stm32xwds_spi4m_cb_xfercplt(hspi4_drvdata.spim, XWOK);
 }
 
 void MX_SPI4_TxHalfCpltCallback(SPI_HandleTypeDef * hspi)
@@ -610,17 +610,17 @@ void MX_SPI4_TxRxHalfCpltCallback(SPI_HandleTypeDef * hspi)
 void MX_SPI4_ErrorCallback(SPI_HandleTypeDef * hspi)
 {
   if (hspi->ErrorCode & HAL_SPI_ERROR_TIMEOUT) {
-    stm32cube_spi4m_cb_xfercplt(hspi4_drvdata.spim, -ETIMEDOUT);
+    stm32xwds_spi4m_cb_xfercplt(hspi4_drvdata.spim, -ETIMEDOUT);
   } else if (HAL_SPI_ERROR_NONE != hspi->ErrorCode) {
-    stm32cube_spi4m_cb_xfercplt(hspi4_drvdata.spim, -EIO);
+    stm32xwds_spi4m_cb_xfercplt(hspi4_drvdata.spim, -EIO);
   } else {
-    stm32cube_spi4m_cb_xfercplt(hspi4_drvdata.spim, -EBUG);
+    stm32xwds_spi4m_cb_xfercplt(hspi4_drvdata.spim, -EBUG);
   }
 }
 
 void MX_SPI4_AbortCpltCallback(SPI_HandleTypeDef * hspi)
 {
-  stm32cube_spi4m_cb_xfercplt(hspi4_drvdata.spim, -ECONNABORTED);
+  stm32xwds_spi4m_cb_xfercplt(hspi4_drvdata.spim, -ECONNABORTED);
 }
 
 /* Redefine HAL weak callback */

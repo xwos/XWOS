@@ -29,9 +29,9 @@ ifeq ($(BRDCFG_XWSKD_THD_STACK_POOL),y)
   XWMO_CSRCS += xwos/thd_stack_mempool.c
 endif
 XWMO_CSRCS += xwos/xwskd_hook.c
+XWMO_CSRCS += xwos/pm.c
 
 XWMO_CSRCS += xwds/device.c
-XWMO_CSRCS += xwds/pm.c
 XWMO_CSRCS += xwds/soc.c
 XWMO_CSRCS += xwds/uart.c
 XWMO_CSRCS += xwds/spim.c

@@ -22,6 +22,8 @@
 #include <xwcd/soc/arm/v7m/arch_init.h>
 #include <xwcd/soc/arm/v7m/m7/stm32/soc_init.h>
 #include "bm/stm32cube/mif.h"
+#include "bm/xwac/xwlib/crc.h"
+#include "bm/xwac/xwds/device.h"
 
 /**
  * @brief XWOS预初始化
@@ -43,4 +45,7 @@ __xwbsp_init_code
 void xwos_postinit(void)
 {
         stm32cube_init();
+        stm32xwds_init();
+        stm32xwds_soc_init();
+        xwlibac_crc_init();
 }

@@ -34,40 +34,41 @@
 
 /******** ******** ds ******** ********/
 extern struct xwds stm32xwds;
-xwer_t stm32cube_xwds_probe(void);
-void stm32cube_xwds_remove(void);
-xwer_t stm32cube_xwds_start(void);
-void stm32cube_xwds_stop(void);
+void stm32xwds_init(void);
+void stm32xwds_fini(void);
 
 /******** ******** soc ******** ********/
-extern struct xwds_soc stm32soc;
-xwer_t stm32cube_xwds_soc_init(void);
-xwer_t stm32cube_xwds_soc_fini(void);
+extern struct xwds_soc stm32xwds_soc;
+xwer_t stm32xwds_soc_init(void);
+xwer_t stm32xwds_soc_fini(void);
 
 /******** ******** uart ******** ********/
-extern struct xwds_uartc stm32usart1;
-extern struct xwds_uartc stm32usart3;
-xwer_t stm32cube_xwds_uart_init(void);
-xwer_t stm32cube_xwds_uart_fini(void);
+extern struct xwds_uartc stm32xwds_usart1;
+extern struct xwds_uartc stm32xwds_usart3;
+xwer_t stm32xwds_uart_init(void);
+xwer_t stm32xwds_uart_fini(void);
 
 /******** ******** spi ******** ********/
-extern struct xwds_spim stm32spi1m;
-extern struct xwds_spim stm32spi4m;
-extern struct xwds_w25qxx w25q64jv;
-extern struct xwds_st7735 st7735;
-xwer_t stm32cube_xwds_spi_init(void);
-xwer_t stm32cube_xwds_spi_fini(void);
-xwer_t stm32cube_xwds_st7735_init(void);
-xwer_t stm32cube_xwds_st7735_fini(void);
-xwer_t stm32cube_xwds_w25q64jv_init(void);
-xwer_t stm32cube_xwds_w25q64jv_fini(void);
+extern struct xwds_spim stm32xwds_spi1m;
+extern struct xwds_spim stm32xwds_spi4m;
+xwer_t stm32xwds_spi_init(void);
+xwer_t stm32xwds_spi_fini(void);
+
+extern struct xwds_st7735 stm32xwds_st7735;
+xwer_t stm32xwds_st7735_init(void);
+xwer_t stm32xwds_st7735_fini(void);
+
+extern struct xwds_w25qxx stm32xwds_w25q64jv;
+xwer_t stm32xwds_w25q64jv_init(void);
+xwer_t stm32xwds_w25q64jv_fini(void);
 
 /******** ******** i2c ******** ********/
-extern struct xwds_i2cm stm32i2c1m;
-extern struct xwds_eeprom stm32eeprom_256k;
-xwer_t stm32cube_xwds_i2c_init(void);
-xwer_t stm32cube_xwds_i2c_fini(void);
-xwer_t stm32cube_xwds_eeprom_init(void);
-xwer_t stm32cube_xwds_eeprom_fini(void);
+extern struct xwds_i2cm stm32xwds_i2c1m;
+xwer_t stm32xwds_i2c_init(void);
+xwer_t stm32xwds_i2c_fini(void);
+
+extern struct xwds_eeprom stm32xwds_eeprom256k;
+xwer_t stm32xwds_eeprom_init(void);
+xwer_t stm32xwds_eeprom_fini(void);
 
 #endif /* bm/xwac/xwds/device.h */

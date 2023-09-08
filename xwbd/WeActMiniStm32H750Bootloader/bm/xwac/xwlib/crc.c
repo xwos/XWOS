@@ -26,31 +26,31 @@
 #include <xwos/osal/lock/mtx.h>
 #include "bm/stm32cube/Core/Inc/crc.h"
 
-struct xwos_splk stm32cube_crc_splk;
-struct xwos_mtx stm32cube_crc_mtx;
+struct xwos_splk xwlibac_crc_splk;
+struct xwos_mtx xwlibac_crc_mtx;
 
-void stm32cube_crc_init(void)
+void xwlibac_crc_init(void)
 {
-        xwos_splk_init(&stm32cube_crc_splk);
-        xwos_mtx_init(&stm32cube_crc_mtx, XWOS_SKD_PRIORITY_RT_MAX);
+        xwos_splk_init(&xwlibac_crc_splk);
+        xwos_mtx_init(&xwlibac_crc_mtx, XWOS_SKD_PRIORITY_RT_MAX);
 }
 
-xwer_t stm32cube_crc_lock(xwreg_t * cpuirq)
+xwer_t xwlibac_crc_lock(xwreg_t * cpuirq)
 {
         xwsq_t ctx;
         xwer_t rc;
 
         xwos_skd_get_context_lc(&ctx, NULL);
         if (XWOS_SKD_CONTEXT_THD == ctx) {
-                rc = xwos_mtx_lock(&stm32cube_crc_mtx);
+                rc = xwos_mtx_lock(&xwlibac_crc_mtx);
         } else if (XWOS_SKD_CONTEXT_ISR == ctx) {
-                xwos_splk_lock_cpuirqsv(&stm32cube_crc_splk, cpuirq);
+                xwos_splk_lock_cpuirqsv(&xwlibac_crc_splk, cpuirq);
                 rc = XWOK;
         } else if (XWOS_SKD_CONTEXT_BH == ctx) {
-                xwos_splk_lock_cpuirq(&stm32cube_crc_splk);
+                xwos_splk_lock_cpuirq(&xwlibac_crc_splk);
                 rc = XWOK;
         } else if (XWOS_SKD_CONTEXT_IDLE == ctx) {
-                xwos_splk_lock_cpuirq(&stm32cube_crc_splk);
+                xwos_splk_lock_cpuirq(&xwlibac_crc_splk);
                 rc = XWOK;
         } else {
                 rc = XWOK;
@@ -58,22 +58,22 @@ xwer_t stm32cube_crc_lock(xwreg_t * cpuirq)
         return rc;
 }
 
-xwer_t stm32cube_crc_unlock(xwreg_t cpuirq)
+xwer_t xwlibac_crc_unlock(xwreg_t cpuirq)
 {
         xwsq_t ctx;
         xwer_t rc;
 
         xwos_skd_get_context_lc(&ctx, NULL);
         if (XWOS_SKD_CONTEXT_THD == ctx) {
-                rc = xwos_mtx_unlock(&stm32cube_crc_mtx);
+                rc = xwos_mtx_unlock(&xwlibac_crc_mtx);
         } else if (XWOS_SKD_CONTEXT_ISR == ctx) {
-                xwos_splk_unlock_cpuirqrs(&stm32cube_crc_splk, cpuirq);
+                xwos_splk_unlock_cpuirqrs(&xwlibac_crc_splk, cpuirq);
                 rc = XWOK;
         } else if (XWOS_SKD_CONTEXT_BH == ctx) {
-                xwos_splk_unlock_cpuirq(&stm32cube_crc_splk);
+                xwos_splk_unlock_cpuirq(&xwlibac_crc_splk);
                 rc = XWOK;
         } else if (XWOS_SKD_CONTEXT_IDLE == ctx) {
-                xwos_splk_unlock_cpuirq(&stm32cube_crc_splk);
+                xwos_splk_unlock_cpuirq(&xwlibac_crc_splk);
                 rc = XWOK;
         } else {
                 rc = XWOK;
@@ -109,7 +109,7 @@ xwer_t soc_crc32_cal(xwu32_t * crc32,
         xwreg_t cpuirq;
         xwer_t rc;
 
-        rc = stm32cube_crc_lock(&cpuirq);
+        rc = xwlibac_crc_lock(&cpuirq);
         if (rc < 0) {
                 goto err_crc_lock;
         }
@@ -177,7 +177,7 @@ xwer_t soc_crc32_cal(xwu32_t * crc32,
         *size = rest;
         *crc32 = seg;
 
-        stm32cube_crc_unlock(cpuirq);
+        xwlibac_crc_unlock(cpuirq);
 err_crc_lock:
         return rc;
 }
@@ -207,7 +207,7 @@ xwer_t soc_crc8_cal(xwu8_t * crc8,
         xwreg_t cpuirq;
         xwer_t rc;
 
-        rc = stm32cube_crc_lock(&cpuirq);
+        rc = xwlibac_crc_lock(&cpuirq);
         if (rc < 0) {
                 goto err_crc_lock;
         }
@@ -241,7 +241,7 @@ xwer_t soc_crc8_cal(xwu8_t * crc8,
         *size = rest;
         *crc8 = seg;
 
-        stm32cube_crc_unlock(cpuirq);
+        xwlibac_crc_unlock(cpuirq);
 err_crc_lock:
         return rc;
 }

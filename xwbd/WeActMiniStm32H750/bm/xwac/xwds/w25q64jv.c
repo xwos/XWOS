@@ -25,45 +25,45 @@
 #include <xwcd/perpheral/spi/flash/w25qxx/driver.h>
 #include "bm/xwac/xwds/device.h"
 
-xwer_t stm32cube_w25q64jv_drv_start(struct xwds_device * dev);
-xwer_t stm32cube_w25q64jv_drv_stop(struct xwds_device * dev);
+xwer_t stm32xwds_w25q64jv_drv_start(struct xwds_device * dev);
+xwer_t stm32xwds_w25q64jv_drv_stop(struct xwds_device * dev);
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-xwer_t stm32cube_w25q64jv_drv_resume(struct xwds_device * dev);
-xwer_t stm32cube_w25q64jv_drv_suspend(struct xwds_device * dev);
+xwer_t stm32xwds_w25q64jv_drv_resume(struct xwds_device * dev);
+xwer_t stm32xwds_w25q64jv_drv_suspend(struct xwds_device * dev);
 #endif
 
-xwer_t stm32cube_w25q64jv_drv_io(struct xwds_w25qxx * w25qxx,
+xwer_t stm32xwds_w25q64jv_drv_io(struct xwds_w25qxx * w25qxx,
                                  xwu8_t * txq, xwu8_t * rxq,
                                  xwsz_t * size, xwtm_t to);
 
-const struct xwds_w25qxx_driver stm32cube_w25q64jv_drv = {
+const struct xwds_w25qxx_driver stm32xwds_w25q64jv_drv = {
         .spip = {
                 .base = {
-                        .name = "stm32cube.w25q64jv.1",
+                        .name = "stm32xwds.w25q64jv",
                         .probe = NULL,
                         .remove = NULL,
-                        .start = stm32cube_w25q64jv_drv_start,
-                        .stop = stm32cube_w25q64jv_drv_stop,
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
-                        .suspend = stm32cube_w25q64jv_drv_suspend,
-                        .resume =  stm32cube_w25q64jv_drv_resume,
+                        .start = stm32xwds_w25q64jv_drv_start,
+                        .stop = stm32xwds_w25q64jv_drv_stop,
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
+                        .suspend = stm32xwds_w25q64jv_drv_suspend,
+                        .resume =  stm32xwds_w25q64jv_drv_resume,
 #endif
                 },
         },
-        .io = stm32cube_w25q64jv_drv_io,
+        .io = stm32xwds_w25q64jv_drv_io,
 };
 
-struct xwds_w25qxx w25q64jv = {
+struct xwds_w25qxx stm32xwds_w25q64jv = {
         /* attributes */
         .spip = {
                 .dev = {
-                        .name = "stm32cube.w25q64jv.1",
+                        .name = "stm32xwds.w25q64jv",
                         .id = 1,
                         .resources = NULL,
-                        .drv = xwds_cast(struct xwds_driver *, &stm32cube_w25q64jv_drv),
+                        .drv = xwds_cast(struct xwds_driver *, &stm32xwds_w25q64jv_drv),
                         .data = NULL,
                 },
-                .bus = &stm32spi1m,
+                .bus = &stm32xwds_spi1m,
                 .buscfgid = 0,
         },
         .parameter = {
@@ -75,22 +75,22 @@ struct xwds_w25qxx w25q64jv = {
         .cmdtbl = xwds_w25q64jv_cmd,
 };
 
-#define STM32CUBE_W25Q64JV_CS_PORT XWDS_GPIO_PORT_D
-#define STM32CUBE_W25Q64JV_CS_PIN XWDS_GPIO_PIN_6
+#define STM32XWDS_W25Q64JV_CS_PORT XWDS_GPIO_PORT_D
+#define STM32XWDS_W25Q64JV_CS_PIN XWDS_GPIO_PIN_6
 
-xwer_t stm32cube_w25q64jv_drv_start(struct xwds_device * dev)
+xwer_t stm32xwds_w25q64jv_drv_start(struct xwds_device * dev)
 {
         xwer_t rc;
 
-        rc = xwds_gpio_req(&stm32soc,
-                           STM32CUBE_W25Q64JV_CS_PORT,
-                           STM32CUBE_W25Q64JV_CS_PIN);
+        rc = xwds_gpio_req(&stm32xwds_soc,
+                           STM32XWDS_W25Q64JV_CS_PORT,
+                           STM32XWDS_W25Q64JV_CS_PIN);
         if (rc < 0) {
                 goto err_gpio;
         }
-        xwds_gpio_set(&stm32soc,
-                      STM32CUBE_W25Q64JV_CS_PORT,
-                      STM32CUBE_W25Q64JV_CS_PIN);
+        xwds_gpio_set(&stm32xwds_soc,
+                      STM32XWDS_W25Q64JV_CS_PORT,
+                      STM32XWDS_W25Q64JV_CS_PIN);
 
         rc = xwds_w25qxx_drv_start(dev);
         if (rc < 0) {
@@ -103,7 +103,7 @@ err_gpio:
         return rc;
 }
 
-xwer_t stm32cube_w25q64jv_drv_stop(struct xwds_device * dev)
+xwer_t stm32xwds_w25q64jv_drv_stop(struct xwds_device * dev)
 {
         xwer_t rc;
 
@@ -111,9 +111,9 @@ xwer_t stm32cube_w25q64jv_drv_stop(struct xwds_device * dev)
         if (rc < 0) {
                 goto err_w25q64jv_stop;
         }
-        xwds_gpio_rls(&stm32soc,
-                      STM32CUBE_W25Q64JV_CS_PORT,
-                      STM32CUBE_W25Q64JV_CS_PIN);
+        xwds_gpio_rls(&stm32xwds_soc,
+                      STM32XWDS_W25Q64JV_CS_PORT,
+                      STM32XWDS_W25Q64JV_CS_PIN);
         return XWOK;
 
 err_w25q64jv_stop:
@@ -121,26 +121,26 @@ err_w25q64jv_stop:
 }
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-xwer_t stm32cube_w25q64jv_drv_resume(struct xwds_device * dev)
+xwer_t stm32xwds_w25q64jv_drv_resume(struct xwds_device * dev)
 {
-        return stm32cube_w25q64jv_drv_stop(dev);
+        return stm32xwds_w25q64jv_drv_stop(dev);
 }
 
-xwer_t stm32cube_w25q64jv_drv_suspend(struct xwds_device * dev)
+xwer_t stm32xwds_w25q64jv_drv_suspend(struct xwds_device * dev)
 {
-        return stm32cube_w25q64jv_drv_start(dev);
+        return stm32xwds_w25q64jv_drv_start(dev);
 }
 #endif
 
-xwer_t stm32cube_w25q64jv_drv_io(struct xwds_w25qxx * w25qxx,
+xwer_t stm32xwds_w25q64jv_drv_io(struct xwds_w25qxx * w25qxx,
                                  xwu8_t * txq, xwu8_t * rxq,
                                  xwsz_t * size, xwtm_t to)
 {
         xwer_t rc;
         xwsz_t xfsz, rest, pos;
 
-        xwds_gpio_reset(&stm32soc,
-                        STM32CUBE_W25Q64JV_CS_PORT, STM32CUBE_W25Q64JV_CS_PIN);
+        xwds_gpio_reset(&stm32xwds_soc,
+                        STM32XWDS_W25Q64JV_CS_PORT, STM32XWDS_W25Q64JV_CS_PIN);
         rc = XWOK;
         xfsz = *size;
         pos = 0;
@@ -154,8 +154,8 @@ xwer_t stm32cube_w25q64jv_drv_io(struct xwds_w25qxx * w25qxx,
                 }
                 pos += rest;
         }
-        xwds_gpio_set(&stm32soc,
-                      STM32CUBE_W25Q64JV_CS_PORT, STM32CUBE_W25Q64JV_CS_PIN);
+        xwds_gpio_set(&stm32xwds_soc,
+                      STM32XWDS_W25Q64JV_CS_PORT, STM32XWDS_W25Q64JV_CS_PIN);
 err_write_data:
         *size = pos;
         return rc;

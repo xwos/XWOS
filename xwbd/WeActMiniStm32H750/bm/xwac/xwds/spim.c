@@ -26,52 +26,52 @@
 
 /******** ******** SPI1 ******** ********/
 static
-xwer_t stm32cube_spi1m_drv_start(struct xwds_device * dev);
+xwer_t stm32xwds_spi1m_drv_start(struct xwds_device * dev);
 
 static
-xwer_t stm32cube_spi1m_drv_stop(struct xwds_device * dev);
+xwer_t stm32xwds_spi1m_drv_stop(struct xwds_device * dev);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
-xwer_t stm32cube_spi1m_drv_suspend(struct xwds_device * dev);
+xwer_t stm32xwds_spi1m_drv_suspend(struct xwds_device * dev);
 
 static
-xwer_t stm32cube_spi1m_drv_resume(struct xwds_device * dev);
+xwer_t stm32xwds_spi1m_drv_resume(struct xwds_device * dev);
 #endif
 
 static
-xwer_t stm32cube_spi1m_drv_buscfg(struct xwds_spim * spim,
+xwer_t stm32xwds_spi1m_drv_buscfg(struct xwds_spim * spim,
                                   xwid_t cfgid,
                                   xwtm_t to);
 
 static
-xwer_t stm32cube_spi1m_drv_xfer(struct xwds_spim * spim,
+xwer_t stm32xwds_spi1m_drv_xfer(struct xwds_spim * spim,
                                 const xwu8_t txd[], xwu8_t * rxb,
                                 xwsz_t * size, xwtm_t to);
 
-const struct xwds_spim_driver stm32cube_spi1m_drv = {
+const struct xwds_spim_driver stm32xwds_spi1m_drv = {
         .base = {
-                .name = "stm32cube.spim.1",
+                .name = "stm32xwds.spim1",
                 .probe = NULL,
                 .remove = NULL,
-                .start = stm32cube_spi1m_drv_start,
-                .stop = stm32cube_spi1m_drv_stop,
+                .start = stm32xwds_spi1m_drv_start,
+                .stop = stm32xwds_spi1m_drv_stop,
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-                .suspend = stm32cube_spi1m_drv_suspend,
-                .resume =  stm32cube_spi1m_drv_resume,
+                .suspend = stm32xwds_spi1m_drv_suspend,
+                .resume =  stm32xwds_spi1m_drv_resume,
 #endif
         },
-        .buscfg = stm32cube_spi1m_drv_buscfg,
-        .xfer = stm32cube_spi1m_drv_xfer,
+        .buscfg = stm32xwds_spi1m_drv_buscfg,
+        .xfer = stm32xwds_spi1m_drv_xfer,
 };
 
-struct xwds_spim stm32spi1m = {
+struct xwds_spim stm32xwds_spi1m = {
         /* attributes */
         .dev = {
-                .name = "stm32cube.spim.1",
+                .name = "stm32xwds.spim1",
                 .id = 1,
                 .resources = NULL,
-                .drv = xwds_cast(struct xwds_driver *, &stm32cube_spi1m_drv),
+                .drv = xwds_cast(struct xwds_driver *, &stm32xwds_spi1m_drv),
                 .data = (void *)&hspi1_drvdata,
         },
         .buscfg = NULL,
@@ -79,7 +79,7 @@ struct xwds_spim stm32spi1m = {
 };
 
 static
-xwer_t stm32cube_spi1m_drv_start(struct xwds_device * dev)
+xwer_t stm32xwds_spi1m_drv_start(struct xwds_device * dev)
 {
         struct xwds_spim * spim;
         struct MX_SPI_MasterDriverData * drvdata;
@@ -92,7 +92,7 @@ xwer_t stm32cube_spi1m_drv_start(struct xwds_device * dev)
 }
 
 static
-xwer_t stm32cube_spi1m_drv_stop(struct xwds_device * dev)
+xwer_t stm32xwds_spi1m_drv_stop(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
 
@@ -102,20 +102,20 @@ xwer_t stm32cube_spi1m_drv_stop(struct xwds_device * dev)
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
-xwer_t stm32cube_spi1m_drv_resume(struct xwds_device * dev)
+xwer_t stm32xwds_spi1m_drv_resume(struct xwds_device * dev)
 {
-        return stm32cube_spi1m_drv_start(dev);
+        return stm32xwds_spi1m_drv_start(dev);
 }
 
 static
-xwer_t stm32cube_spi1m_drv_suspend(struct xwds_device * dev)
+xwer_t stm32xwds_spi1m_drv_suspend(struct xwds_device * dev)
 {
-        return stm32cube_spi1m_drv_stop(dev);
+        return stm32xwds_spi1m_drv_stop(dev);
 }
 #endif
 
 static
-xwer_t stm32cube_spi1m_drv_buscfg(struct xwds_spim * spim,
+xwer_t stm32xwds_spi1m_drv_buscfg(struct xwds_spim * spim,
                                   xwid_t cfgid,
                                   xwtm_t to)
 {
@@ -136,7 +136,7 @@ xwer_t stm32cube_spi1m_drv_buscfg(struct xwds_spim * spim,
 }
 
 static
-xwer_t stm32cube_spi1m_drv_xfer(struct xwds_spim * spim,
+xwer_t stm32xwds_spi1m_drv_xfer(struct xwds_spim * spim,
                                 const xwu8_t txd[], xwu8_t * rxb,
                                 xwsz_t * size, xwtm_t to)
 {
@@ -174,7 +174,7 @@ xwer_t stm32cube_spi1m_drv_xfer(struct xwds_spim * spim,
         return rc;
 }
 
-void stm32cube_spi1m_cb_xfercplt(struct xwds_spim * spim, xwer_t xrc)
+void stm32xwds_spi1m_cb_xfercplt(struct xwds_spim * spim, xwer_t xrc)
 {
         struct MX_SPI_MasterDriverData * drvdata;
         xwreg_t cpuirq;
@@ -191,52 +191,52 @@ void stm32cube_spi1m_cb_xfercplt(struct xwds_spim * spim, xwer_t xrc)
 
 /******** ******** SPI4 ******** ********/
 static
-xwer_t stm32cube_spi4m_drv_start(struct xwds_device * dev);
+xwer_t stm32xwds_spi4m_drv_start(struct xwds_device * dev);
 
 static
-xwer_t stm32cube_spi4m_drv_stop(struct xwds_device * dev);
+xwer_t stm32xwds_spi4m_drv_stop(struct xwds_device * dev);
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
-xwer_t stm32cube_spi4m_drv_suspend(struct xwds_device * dev);
+xwer_t stm32xwds_spi4m_drv_suspend(struct xwds_device * dev);
 
 static
-xwer_t stm32cube_spi4m_drv_resume(struct xwds_device * dev);
+xwer_t stm32xwds_spi4m_drv_resume(struct xwds_device * dev);
 #endif
 
 static
-xwer_t stm32cube_spi4m_drv_buscfg(struct xwds_spim * spim,
+xwer_t stm32xwds_spi4m_drv_buscfg(struct xwds_spim * spim,
                                   xwid_t cfgid,
                                   xwtm_t to);
 
 static
-xwer_t stm32cube_spi4m_drv_xfer(struct xwds_spim * spim,
+xwer_t stm32xwds_spi4m_drv_xfer(struct xwds_spim * spim,
                                 const xwu8_t txd[], xwu8_t * rxb,
                                 xwsz_t * size, xwtm_t to);
 
-const struct xwds_spim_driver stm32cube_spi4m_drv = {
+const struct xwds_spim_driver stm32xwds_spi4m_drv = {
         .base = {
-                .name = "stm32cube.spim.4",
+                .name = "stm32xwds.spim4",
                 .probe = NULL,
                 .remove = NULL,
-                .start = stm32cube_spi4m_drv_start,
-                .stop = stm32cube_spi4m_drv_stop,
+                .start = stm32xwds_spi4m_drv_start,
+                .stop = stm32xwds_spi4m_drv_stop,
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-                .suspend = stm32cube_spi4m_drv_suspend,
-                .resume =  stm32cube_spi4m_drv_resume,
+                .suspend = stm32xwds_spi4m_drv_suspend,
+                .resume =  stm32xwds_spi4m_drv_resume,
 #endif
         },
-        .buscfg = stm32cube_spi4m_drv_buscfg,
-        .xfer = stm32cube_spi4m_drv_xfer,
+        .buscfg = stm32xwds_spi4m_drv_buscfg,
+        .xfer = stm32xwds_spi4m_drv_xfer,
 };
 
-struct xwds_spim stm32spi4m = {
+struct xwds_spim stm32xwds_spi4m = {
         /* attributes */
         .dev = {
-                .name = "stm32cube.spim.4",
-                .id = 1,
+                .name = "stm32xwds.spim4",
+                .id = 4,
                 .resources = NULL,
-                .drv = xwds_cast(struct xwds_driver *, &stm32cube_spi4m_drv),
+                .drv = xwds_cast(struct xwds_driver *, &stm32xwds_spi4m_drv),
                 .data = (void *)&hspi4_drvdata,
         },
         .buscfg = NULL,
@@ -244,7 +244,7 @@ struct xwds_spim stm32spi4m = {
 };
 
 static
-xwer_t stm32cube_spi4m_drv_start(struct xwds_device * dev)
+xwer_t stm32xwds_spi4m_drv_start(struct xwds_device * dev)
 {
         struct xwds_spim * spim;
         struct MX_SPI_MasterDriverData * drvdata;
@@ -257,7 +257,7 @@ xwer_t stm32cube_spi4m_drv_start(struct xwds_device * dev)
 }
 
 static
-xwer_t stm32cube_spi4m_drv_stop(struct xwds_device * dev)
+xwer_t stm32xwds_spi4m_drv_stop(struct xwds_device * dev)
 {
         XWOS_UNUSED(dev);
 
@@ -267,20 +267,20 @@ xwer_t stm32cube_spi4m_drv_stop(struct xwds_device * dev)
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
 static
-xwer_t stm32cube_spi4m_drv_resume(struct xwds_device * dev)
+xwer_t stm32xwds_spi4m_drv_resume(struct xwds_device * dev)
 {
-        return stm32cube_spi4m_drv_start(dev);
+        return stm32xwds_spi4m_drv_start(dev);
 }
 
 static
-xwer_t stm32cube_spi4m_drv_suspend(struct xwds_device * dev)
+xwer_t stm32xwds_spi4m_drv_suspend(struct xwds_device * dev)
 {
-        return stm32cube_spi4m_drv_stop(dev);
+        return stm32xwds_spi4m_drv_stop(dev);
 }
 #endif
 
 static
-xwer_t stm32cube_spi4m_drv_buscfg(struct xwds_spim * spim,
+xwer_t stm32xwds_spi4m_drv_buscfg(struct xwds_spim * spim,
                                   xwid_t cfgid,
                                   xwtm_t to)
 {
@@ -301,7 +301,7 @@ xwer_t stm32cube_spi4m_drv_buscfg(struct xwds_spim * spim,
 }
 
 static
-xwer_t stm32cube_spi4m_drv_xfer(struct xwds_spim * spim,
+xwer_t stm32xwds_spi4m_drv_xfer(struct xwds_spim * spim,
                                 const xwu8_t txd[], xwu8_t * rxb,
                                 xwsz_t * size, xwtm_t to)
 {
@@ -339,7 +339,7 @@ xwer_t stm32cube_spi4m_drv_xfer(struct xwds_spim * spim,
         return rc;
 }
 
-void stm32cube_spi4m_cb_xfercplt(struct xwds_spim * spim, xwer_t xrc)
+void stm32xwds_spi4m_cb_xfercplt(struct xwds_spim * spim, xwer_t xrc)
 {
         struct MX_SPI_MasterDriverData * drvdata;
         xwreg_t cpuirq;

@@ -24,6 +24,9 @@
 #include <string.h>
 #include <xwos/mm/mempool/allocator.h>
 #include "bm/stm32cube/mif.h"
+#include "bm/xwac/xwos/pm.h"
+#include "bm/xwac/xwlib/crc.h"
+#include "bm/xwac/xwds/device.h"
 
 extern xwsz_t axisram_mr_origin[];
 extern xwsz_t axisram_mr_size[];
@@ -98,5 +101,9 @@ __xwbsp_init_code
 void xwos_postinit(void)
 {
         stm32cube_init();
+        stm32xwds_init();
+        xwosac_pmcb_init();
+        stm32xwds_soc_init();
+        xwlibac_crc_init();
         board_mm_init();
 }

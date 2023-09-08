@@ -31,7 +31,7 @@ xwssz_t picolibcac_fops_read_stdin(int fd, void * buf, size_t cnt)
         XWOS_UNUSED(fd);
         do {
                 cnt = bufsz;
-                rc = xwds_uartc_rx(&stm32usart1, buf, &cnt, xwtm_ft(xwtm_ms(20)));
+                rc = xwds_uartc_rx(&stm32xwds_usart1, buf, &cnt, xwtm_ft(xwtm_ms(20)));
                 if (-ETIMEDOUT == rc) {
                         rdsz = (xwssz_t)cnt;
                         errno = 0;
@@ -54,7 +54,7 @@ xwssz_t picolibcac_fops_write_stdout(int fd, const void * data, size_t cnt)
 
         XWOS_UNUSED(fd);
 
-        rc = xwds_uartc_tx(&stm32usart1, data, &cnt, XWTM_MAX);
+        rc = xwds_uartc_tx(&stm32xwds_usart1, data, &cnt, XWTM_MAX);
         errno = -rc;
         if (rc < 0) {
                 wrsz = -1;
@@ -71,7 +71,7 @@ xwssz_t picolibcac_fops_write_stderr(int fd, const void * data, size_t cnt)
 
         XWOS_UNUSED(fd);
 
-        rc = xwds_uartc_tx(&stm32usart1, data, &cnt, XWTM_MAX);
+        rc = xwds_uartc_tx(&stm32xwds_usart1, data, &cnt, XWTM_MAX);
         errno = -rc;
         if (rc < 0) {
                 wrsz = -1;

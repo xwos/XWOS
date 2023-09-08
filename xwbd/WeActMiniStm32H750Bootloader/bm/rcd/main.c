@@ -73,16 +73,16 @@ xwer_t xwos_main(void)
         xwer_t rc;
         xwsq_t key;
 
-        xwds_gpio_req(&stm32soc, KEY_GPIO_PORT, KEY_GPIO_PIN);
-        xwds_gpio_input(&stm32soc, KEY_GPIO_PORT, KEY_GPIO_PIN, &key);
+        xwds_gpio_req(&stm32xwds_soc, KEY_GPIO_PORT, KEY_GPIO_PIN);
+        xwds_gpio_input(&stm32xwds_soc, KEY_GPIO_PORT, KEY_GPIO_PIN, &key);
         if (0 == key) {
                 arch_boot_firmware((void *)qspiflash_mr_origin,
                                    (xwsz_t)firmware_info_offset,
                                    BRDCFG_FIRMWARE_TAILFLAG);
         }
 
-        xwds_gpio_req(&stm32soc, LED_GPIO_PORT, LED_GPIO_PIN);
-        xwds_gpio_set(&stm32soc, LED_GPIO_PORT, LED_GPIO_PIN);
+        xwds_gpio_req(&stm32xwds_soc, LED_GPIO_PORT, LED_GPIO_PIN);
+        xwds_gpio_set(&stm32xwds_soc, LED_GPIO_PORT, LED_GPIO_PIN);
 
         rc = xwos_thd_init(&main_thd, &main_thdd,
                            &main_thd_desc.attr,
@@ -115,6 +115,20 @@ xwer_t board_ramcode_load(struct ramcode * ramcode,
         return board_xwssc_rx(loadbuf, bufsize, to);
 }
 
+xwer_t board_init_devices(void)
+{
+        xwer_t rc;
+
+        rc = stm32xwds_uart_init();
+        if (rc < 0) {
+                goto err_uart_init;
+        }
+        return XWOK;
+
+err_uart_init:
+        return rc;
+}
+
 static
 xwer_t main_task(void * arg)
 {
@@ -123,9 +137,9 @@ xwer_t main_task(void * arg)
         XWOS_UNUSED(arg);
 
         /* Init devices */
-        rc = stm32cube_start();
+        rc = board_init_devices();
         if (rc < 0) {
-                goto err_stm32cube_start;
+                goto err_init_devices;
         }
 
         /* Init xwssc */
@@ -155,7 +169,7 @@ err_ramcode_load:
         BOARD_BUG();
 err_xwssc_start:
         BOARD_BUG();
-err_stm32cube_start:
+err_init_devices:
         BOARD_BUG();
         return rc;
 }

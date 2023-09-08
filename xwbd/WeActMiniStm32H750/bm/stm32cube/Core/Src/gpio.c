@@ -125,7 +125,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t pin)
   xwssq_t idx;
 
   idx = xwbop_ffs(xwu16_t, pin);
-  stm32cube_soc_cb_eirq_isr((xwid_t)idx);
+  stm32xwds_soc_cb_eirq_isr((xwid_t)idx);
 }
 
 /* USER CODE END 2 */

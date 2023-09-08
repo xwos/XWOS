@@ -23,7 +23,7 @@
 
 #include "board/std.h"
 
-void stm32cube_spi1m_cb_xfercplt(struct xwds_spim * spim, xwer_t xrc);
-void stm32cube_spi4m_cb_xfercplt(struct xwds_spim * spim, xwer_t xrc);
+void stm32xwds_spi1m_cb_xfercplt(struct xwds_spim * spim, xwer_t xrc);
+void stm32xwds_spi4m_cb_xfercplt(struct xwds_spim * spim, xwer_t xrc);
 
 #endif /* bm/xwac/xwds/spim.h */

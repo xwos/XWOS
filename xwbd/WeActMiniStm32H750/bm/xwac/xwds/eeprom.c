@@ -23,17 +23,17 @@
 #include <xwcd/perpheral/i2c/eeprom/driver.h>
 #include "bm/xwac/xwds/device.h"
 
-struct xwds_eeprom stm32eeprom_256k = {
+struct xwds_eeprom stm32xwds_eeprom256k = {
         /* attributes */
         .i2cp = {
                 .dev = {
-                        .name = "stm32cube.eeprom.256k",
+                        .name = "stm32xwds.eeprom.256k",
                         .id = 0,
                         .resources = NULL,
                         .drv = xwds_cast(struct xwds_driver *, &at24md_drv),
                         .data = NULL,
                 },
-                .bus = &stm32i2c1m,
+                .bus = &stm32xwds_i2c1m,
                 .addr = 0xA0,
         },
         .parameter = {

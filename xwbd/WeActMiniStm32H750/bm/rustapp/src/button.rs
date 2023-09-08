@@ -35,12 +35,12 @@ static BTNTHD: SThd<1024, XwEr> = SThd::new("BtnThd", true);
 static BTNSEM: Sem = Sem::new();
 
 extern "C" {
-    static stm32soc: Soc;
+    static stm32xwds_soc: Soc;
 }
 
 fn get_soc() -> &'static Soc {
     unsafe {
-        &stm32soc
+        &stm32xwds_soc
     }
 }
 

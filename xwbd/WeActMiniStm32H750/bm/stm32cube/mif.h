@@ -25,7 +25,5 @@
 
 void stm32cube_lowlevel_init(void);
 void stm32cube_init(void);
-xwer_t stm32cube_start(void);
-void stm32cube_stop(void);
 
 #endif /* bm/stm32cube/mif.h */

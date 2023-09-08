@@ -19,12 +19,8 @@
  */
 
 #include "board/std.h"
-#include <xwos/lib/xwlog.h>
 #include <xwos/lib/xwbop.h>
 #include "bm/stm32cube/Core/Inc/main.h"
-#include "bm/xwac/xwlib/crc.h"
-#include "bm/xwac/fatfs/sdcard.h"
-#include "bm/xwac/xwds/device.h"
 
 extern xwsz_t itcm_mr_origin[];
 extern xwsz_t itcm_mr_size[];
@@ -88,16 +84,10 @@ void stm32cube_lowlevel_init(void)
 __xwbsp_init_code
 void stm32cube_init(void)
 {
-        xwer_t rc;
-
         HAL_Init();
         SystemClock_Config();
         axisram_init();
         sram4_init();
-
-        rc = stm32cube_xwds_probe();
-        BOARD_BUG_ON(rc < 0);
-
         /*
            若SDRAM、QSPI Flash等可映射到内存地址上的器件未初始化完成，
            开启Cache可能会因为Cache的预取操作导致宕机。
@@ -110,43 +100,6 @@ void stm32cube_init(void)
         SCB_EnableDCache();
         SCB_CleanInvalidateDCache();
 #endif
-
-        stm32cube_crc_init();
-}
-
-/**
- * @brief 启动STM32CUBE模块
- * + 上下文：线程
- */
-xwer_t stm32cube_start(void)
-{
-        xwer_t rc;
-
-        /* xwds */
-        rc = stm32cube_xwds_start();
-        if (rc < 0) {
-                goto err_xwds_start;
-        }
-
-        /* fatfs */
-        rc = sdcard_fatfs_mount();
-        if (rc < 0) {
-                xwlogf(ERR, "stm32cube", "Mount SDCard ... <rc:%d>\n", rc);
-        }
-        return XWOK;
-
-err_xwds_start:
-        return rc;
-}
-
-/**
- * @brief 停止STM32CUBE模块
- * + 上下文：线程
- */
-void stm32cube_stop(void)
-{
-        sdcard_fatfs_unmount();
-        stm32cube_xwds_stop();
 }
 
 static

@@ -31,6 +31,7 @@
 #include <xwem/vm/lua/mif.h>
 #include <xwam/example/cxx/mif.h>
 #include "bm/xwac/xwds/device.h"
+#include "bm/xwac/fatfs/sdcard.h"
 #include "bm/stm32cube/mif.h"
 #include "bm/app/xwssc.h"
 #include "bm/app/thd.h"
@@ -74,6 +75,78 @@ err_thd_create:
         return rc;
 }
 
+xwer_t board_init_devices(void)
+{
+        xwer_t rc;
+
+        rc = stm32xwds_uart_init();
+        if (rc < 0) {
+                goto err_uart_init;
+        }
+        /* Can print log from here */
+        rc = stm32xwds_spi_init();
+        if (rc < 0) {
+                xwlogf(ERR, "main", "Init SPI ... <rc:%d>\n", rc);
+                goto err_spi_init;
+        }
+        rc = stm32xwds_w25q64jv_init();
+        if (rc < 0) {
+                xwlogf(ERR, "main", "Init W25Q64JV ... <rc:%d>\n", rc);
+        }
+        rc = stm32xwds_st7735_init();
+        if (rc < 0) {
+                xwlogf(ERR, "main", "Init ST7735 ... <rc:%d>\n", rc);
+        }
+        rc = stm32xwds_i2c_init();
+        if (rc < 0) {
+                xwlogf(ERR, "main", "Init I2C ... <rc:%d>\n", rc);
+                goto err_i2c_init;
+        }
+        rc = stm32xwds_eeprom_init();
+        if (rc < 0) {
+                xwlogf(ERR, "main", "Init EEPROM ... <rc:%d>\n", rc);
+        }
+        return XWOK;
+
+err_i2c_init:
+        stm32xwds_st7735_fini();
+        stm32xwds_w25q64jv_fini();
+        stm32xwds_spi_fini();
+err_spi_init:
+        stm32xwds_uart_fini();
+err_uart_init:
+        return rc;
+}
+
+void board_fini_devices(void)
+{
+        xwer_t rc;
+
+        rc = stm32xwds_eeprom_fini();
+        if (rc < 0) {
+                xwlogf(ERR, "main", "Fini EEPROM ... <rc:%d>\n", rc);
+        }
+        rc = stm32xwds_i2c_fini();
+        if (rc < 0) {
+                xwlogf(ERR, "main", "Fini I2C ... <rc:%d>\n", rc);
+        }
+        rc = stm32xwds_st7735_fini();
+        if (rc < 0) {
+                xwlogf(ERR, "main", "Fini ST7735 ... <rc:%d>\n", rc);
+        }
+        rc = stm32xwds_w25q64jv_fini();
+        if (rc < 0) {
+                xwlogf(ERR, "main", "Fini W25Q64JV ... <rc:%d>\n", rc);
+        }
+        rc = stm32xwds_spi_fini();
+        if (rc < 0) {
+                xwlogf(ERR, "main", "Fini SPI ... <rc:%d>\n", rc);
+        }
+        rc = stm32xwds_uart_fini();
+        if (rc < 0) {
+        }
+}
+
 extern const xwu8_t bootlogo[25600];
 extern void xwrust_main(void);
 
@@ -83,12 +156,20 @@ xwer_t main_task(void * arg)
 
         XWOS_UNUSED(arg);
 
-        rc = stm32cube_start();
+        /* Init devices */
+        rc = board_init_devices();
         if (rc < 0) {
-                goto err_stm32cube_start;
+                goto err_init_devices;
         }
 
-        xwds_st7735_draw(&st7735, 0, 0, 160, 80, bootlogo, XWTM_MAX);
+        /* Mount sdcard */
+        rc = sdcard_fatfs_mount();
+        if (rc < 0) {
+                xwlogf(ERR, "main", "Mount SDCard ... <rc:%d>\n", rc);
+        }
+
+        /* Draw Logo */
+        xwds_st7735_draw(&stm32xwds_st7735, 0, 0, 160, 80, bootlogo, XWTM_MAX);
 
 #ifdef XWCFG_LIBC__newlib
         rc = newlibac_init();
@@ -152,7 +233,7 @@ err_picolibcac_init:
 err_newlibac_init:
 #endif
         BOARD_BUG();
-err_stm32cube_start:
+err_init_devices:
         BOARD_BUG();
         return rc;
 }

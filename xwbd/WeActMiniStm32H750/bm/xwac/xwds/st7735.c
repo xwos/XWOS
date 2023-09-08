@@ -26,52 +26,52 @@
 #include "bm/stm32cube/Core/Inc/tim.h"
 #include "bm/xwac/xwds/device.h"
 
-xwer_t stm32cube_st7735_drv_start(struct xwds_device * dev);
-xwer_t stm32cube_st7735_drv_stop(struct xwds_device * dev);
+xwer_t stm32xwds_st7735_drv_start(struct xwds_device * dev);
+xwer_t stm32xwds_st7735_drv_stop(struct xwds_device * dev);
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-xwer_t stm32cube_st7735_drv_resume(struct xwds_device * dev);
-xwer_t stm32cube_st7735_drv_suspend(struct xwds_device * dev);
+xwer_t stm32xwds_st7735_drv_resume(struct xwds_device * dev);
+xwer_t stm32xwds_st7735_drv_suspend(struct xwds_device * dev);
 #endif
 
-xwer_t stm32cube_st7735_drv_write(struct xwds_st7735 * st7735, xwu8_t reg,
+xwer_t stm32xwds_st7735_drv_write(struct xwds_st7735 * st7735, xwu8_t reg,
                                   const xwu8_t * data, xwsz_t * size,
                                   xwtm_t to);
-xwer_t stm32cube_st7735_drv_read(struct xwds_st7735 * st7735, xwu8_t reg,
+xwer_t stm32xwds_st7735_drv_read(struct xwds_st7735 * st7735, xwu8_t reg,
                                  xwu8_t * buf, xwsz_t * size,
                                  xwtm_t to);
-xwer_t stm32cube_st7735_drv_set_brightness(struct xwds_st7735 * st7735,
+xwer_t stm32xwds_st7735_drv_set_brightness(struct xwds_st7735 * st7735,
                                            xwu32_t brightness);
 
-const struct xwds_st7735_driver stm32cube_st7735_drv = {
+const struct xwds_st7735_driver stm32xwds_st7735_drv = {
         .spip = {
                 .base = {
-                        .name = "stm32cube.st7735",
+                        .name = "stm32xwds.st7735",
                         .probe = NULL,
                         .remove = NULL,
-                        .start = stm32cube_st7735_drv_start,
-                        .stop = stm32cube_st7735_drv_stop,
-#if defined(XWMDCFG_ds_PM) && (1 == XWMDCFG_ds_PM)
-                        .suspend = stm32cube_st7735_drv_suspend,
-                        .resume =  stm32cube_st7735_drv_resume,
+                        .start = stm32xwds_st7735_drv_start,
+                        .stop = stm32xwds_st7735_drv_stop,
+#if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
+                        .suspend = stm32xwds_st7735_drv_suspend,
+                        .resume =  stm32xwds_st7735_drv_resume,
 #endif
                 },
         },
-        .write = stm32cube_st7735_drv_write,
-        .read = stm32cube_st7735_drv_read,
-        .set_brightness = stm32cube_st7735_drv_set_brightness,
+        .write = stm32xwds_st7735_drv_write,
+        .read = stm32xwds_st7735_drv_read,
+        .set_brightness = stm32xwds_st7735_drv_set_brightness,
 };
 
-struct xwds_st7735 st7735 = {
+struct xwds_st7735 stm32xwds_st7735 = {
         /* attributes */
         .spip = {
                 .dev = {
-                        .name = "stm32cube.st7735",
+                        .name = "stm32xwds.st7735",
                         .id = 1,
                         .resources = NULL,
-                        .drv = xwds_cast(struct xwds_driver *, &stm32cube_st7735_drv),
+                        .drv = xwds_cast(struct xwds_driver *, &stm32xwds_st7735_drv),
                         .data = NULL,
                 },
-                .bus = &stm32spi4m,
+                .bus = &stm32xwds_spi4m,
                 .buscfgid = 0,
         },
         .parameter = {
@@ -87,31 +87,31 @@ struct xwds_st7735 st7735 = {
         },
 };
 
-#define STM32CUBE_ST7735_CS_PORT XWDS_GPIO_PORT_E
-#define STM32CUBE_ST7735_CS_PIN XWDS_GPIO_PIN_11
-#define STM32CUBE_ST7735_DC_PORT XWDS_GPIO_PORT_E
-#define STM32CUBE_ST7735_DC_PIN XWDS_GPIO_PIN_13
+#define STM32XWDS_ST7735_CS_PORT XWDS_GPIO_PORT_E
+#define STM32XWDS_ST7735_CS_PIN XWDS_GPIO_PIN_11
+#define STM32XWDS_ST7735_DC_PORT XWDS_GPIO_PORT_E
+#define STM32XWDS_ST7735_DC_PIN XWDS_GPIO_PIN_13
 
-#define STM32CUBE_ST7735_BRIGHTNESS_TIMER &htim1
-#define STM32CUBE_ST7735_BRIGHTNESS_TIMER_CHANNEL TIM_CHANNEL_2
+#define STM32XWDS_ST7735_BRIGHTNESS_TIMER &htim1
+#define STM32XWDS_ST7735_BRIGHTNESS_TIMER_CHANNEL TIM_CHANNEL_2
 
-xwer_t stm32cube_st7735_drv_start(struct xwds_device * dev)
+xwer_t stm32xwds_st7735_drv_start(struct xwds_device * dev)
 {
         xwer_t rc;
 
-        rc = xwds_gpio_req(&stm32soc,
-                           STM32CUBE_ST7735_CS_PORT,
-                           STM32CUBE_ST7735_CS_PIN);
+        rc = xwds_gpio_req(&stm32xwds_soc,
+                           STM32XWDS_ST7735_CS_PORT,
+                           STM32XWDS_ST7735_CS_PIN);
         if (rc < 0) {
                 goto err_gpio;
         }
-        xwds_gpio_set(&stm32soc,
-                           STM32CUBE_ST7735_CS_PORT,
-                           STM32CUBE_ST7735_CS_PIN);
+        xwds_gpio_set(&stm32xwds_soc,
+                      STM32XWDS_ST7735_CS_PORT,
+                      STM32XWDS_ST7735_CS_PIN);
 
-        rc = xwds_gpio_req(&stm32soc,
-                           STM32CUBE_ST7735_DC_PORT,
-                           STM32CUBE_ST7735_DC_PIN);
+        rc = xwds_gpio_req(&stm32xwds_soc,
+                           STM32XWDS_ST7735_DC_PORT,
+                           STM32XWDS_ST7735_DC_PIN);
         if (rc < 0) {
                 goto err_gpio;
         }
@@ -120,8 +120,8 @@ xwer_t stm32cube_st7735_drv_start(struct xwds_device * dev)
         if (rc < 0) {
                 goto err_st7735_start;
         }
-	HAL_TIMEx_PWMN_Start(STM32CUBE_ST7735_BRIGHTNESS_TIMER,
-                             STM32CUBE_ST7735_BRIGHTNESS_TIMER_CHANNEL);
+	HAL_TIMEx_PWMN_Start(STM32XWDS_ST7735_BRIGHTNESS_TIMER,
+                             STM32XWDS_ST7735_BRIGHTNESS_TIMER_CHANNEL);
         return XWOK;
 
 err_st7735_start:
@@ -129,23 +129,23 @@ err_gpio:
         return rc;
 }
 
-xwer_t stm32cube_st7735_drv_stop(struct xwds_device * dev)
+xwer_t stm32xwds_st7735_drv_stop(struct xwds_device * dev)
 {
         xwer_t rc;
 
-	HAL_TIMEx_PWMN_Stop(STM32CUBE_ST7735_BRIGHTNESS_TIMER,
-                            STM32CUBE_ST7735_BRIGHTNESS_TIMER_CHANNEL);
+	HAL_TIMEx_PWMN_Stop(STM32XWDS_ST7735_BRIGHTNESS_TIMER,
+                            STM32XWDS_ST7735_BRIGHTNESS_TIMER_CHANNEL);
         rc = xwds_st7735_drv_stop(dev);
         if (rc < 0) {
                 goto err_st7735_stop;
         }
         MX_TIM1_DeInit();
-        xwds_gpio_rls(&stm32soc,
-                      STM32CUBE_ST7735_DC_PORT,
-                      STM32CUBE_ST7735_DC_PIN);
-        xwds_gpio_rls(&stm32soc,
-                      STM32CUBE_ST7735_CS_PORT,
-                      STM32CUBE_ST7735_CS_PIN);
+        xwds_gpio_rls(&stm32xwds_soc,
+                      STM32XWDS_ST7735_DC_PORT,
+                      STM32XWDS_ST7735_DC_PIN);
+        xwds_gpio_rls(&stm32xwds_soc,
+                      STM32XWDS_ST7735_CS_PORT,
+                      STM32XWDS_ST7735_CS_PIN);
         return XWOK;
 
 err_st7735_stop:
@@ -153,38 +153,38 @@ err_st7735_stop:
 }
 
 #if defined(XWCDCFG_ds_PM) && (1 == XWCDCFG_ds_PM)
-xwer_t stm32cube_st7735_drv_resume(struct xwds_device * dev)
+xwer_t stm32xwds_st7735_drv_resume(struct xwds_device * dev)
 {
-        return stm32cube_st7735_drv_start(dev);
+        return stm32xwds_st7735_drv_start(dev);
 }
 
-xwer_t stm32cube_st7735_drv_suspend(struct xwds_device * dev)
+xwer_t stm32xwds_st7735_drv_suspend(struct xwds_device * dev)
 {
-        return stm32cube_st7735_drv_stop(dev);
+        return stm32xwds_st7735_drv_stop(dev);
 }
 #endif
 
-xwer_t stm32cube_st7735_drv_write(struct xwds_st7735 * st7735, xwu8_t reg,
+xwer_t stm32xwds_st7735_drv_write(struct xwds_st7735 * st7735, xwu8_t reg,
                                   const xwu8_t * data, xwsz_t * size,
                                   xwtm_t to)
 {
         xwer_t rc;
         xwsz_t xfsz, rest, pos;
 
-        xwds_gpio_reset(&stm32soc,
-                        STM32CUBE_ST7735_CS_PORT,
-                        STM32CUBE_ST7735_CS_PIN);
+        xwds_gpio_reset(&stm32xwds_soc,
+                        STM32XWDS_ST7735_CS_PORT,
+                        STM32XWDS_ST7735_CS_PIN);
         xfsz = 1;
-        xwds_gpio_reset(&stm32soc,
-                        STM32CUBE_ST7735_DC_PORT,
-                        STM32CUBE_ST7735_DC_PIN);
+        xwds_gpio_reset(&stm32xwds_soc,
+                        STM32XWDS_ST7735_DC_PORT,
+                        STM32XWDS_ST7735_DC_PIN);
         rc = xwds_spim_xfer(st7735->spip.bus, &reg, NULL, &xfsz, to);
         if (rc < 0) {
                 goto err_write_cmd;
         }
-        xwds_gpio_set(&stm32soc,
-                      STM32CUBE_ST7735_DC_PORT,
-                      STM32CUBE_ST7735_DC_PIN);
+        xwds_gpio_set(&stm32xwds_soc,
+                      STM32XWDS_ST7735_DC_PORT,
+                      STM32XWDS_ST7735_DC_PIN);
         xfsz = *size;
         pos = 0;
         while (pos < xfsz) {
@@ -196,9 +196,9 @@ xwer_t stm32cube_st7735_drv_write(struct xwds_st7735 * st7735, xwu8_t reg,
                 pos += rest;
         }
         *size = pos;
-        xwds_gpio_set(&stm32soc,
-                      STM32CUBE_ST7735_CS_PORT,
-                      STM32CUBE_ST7735_CS_PIN);
+        xwds_gpio_set(&stm32xwds_soc,
+                      STM32XWDS_ST7735_CS_PORT,
+                      STM32XWDS_ST7735_CS_PIN);
         return XWOK;
 
 err_write_data:
@@ -206,27 +206,27 @@ err_write_cmd:
         return rc;
 }
 
-xwer_t stm32cube_st7735_drv_read(struct xwds_st7735 * st7735, xwu8_t reg,
+xwer_t stm32xwds_st7735_drv_read(struct xwds_st7735 * st7735, xwu8_t reg,
                                  xwu8_t * buf, xwsz_t * size,
                                  xwtm_t to)
 {
         xwer_t rc;
         xwsz_t xfsz, rest, pos;
 
-        xwds_gpio_reset(&stm32soc,
-                        STM32CUBE_ST7735_CS_PORT,
-                        STM32CUBE_ST7735_CS_PIN);
+        xwds_gpio_reset(&stm32xwds_soc,
+                        STM32XWDS_ST7735_CS_PORT,
+                        STM32XWDS_ST7735_CS_PIN);
         xfsz = 1;
-        xwds_gpio_reset(&stm32soc,
-                        STM32CUBE_ST7735_DC_PORT,
-                        STM32CUBE_ST7735_DC_PIN);
+        xwds_gpio_reset(&stm32xwds_soc,
+                        STM32XWDS_ST7735_DC_PORT,
+                        STM32XWDS_ST7735_DC_PIN);
         rc = xwds_spim_xfer(st7735->spip.bus, &reg, NULL, &xfsz, to);
         if (rc < 0) {
                 goto err_write_cmd;
         }
-        xwds_gpio_set(&stm32soc,
-                      STM32CUBE_ST7735_DC_PORT,
-                      STM32CUBE_ST7735_DC_PIN);
+        xwds_gpio_set(&stm32xwds_soc,
+                      STM32XWDS_ST7735_DC_PORT,
+                      STM32XWDS_ST7735_DC_PIN);
         xfsz = *size;
         pos = 0;
         while (pos < xfsz) {
@@ -238,9 +238,9 @@ xwer_t stm32cube_st7735_drv_read(struct xwds_st7735 * st7735, xwu8_t reg,
                 pos += rest;
         }
         *size = pos;
-        xwds_gpio_set(&stm32soc,
-                      STM32CUBE_ST7735_CS_PORT,
-                      STM32CUBE_ST7735_CS_PIN);
+        xwds_gpio_set(&stm32xwds_soc,
+                      STM32XWDS_ST7735_CS_PORT,
+                      STM32XWDS_ST7735_CS_PIN);
         return XWOK;
 
 err_read_data:
@@ -248,12 +248,12 @@ err_write_cmd:
         return rc;
 }
 
-xwer_t stm32cube_st7735_drv_set_brightness(struct xwds_st7735 * st7735,
+xwer_t stm32xwds_st7735_drv_set_brightness(struct xwds_st7735 * st7735,
                                            xwu32_t brightness)
 {
 
-	__HAL_TIM_SET_COMPARE(STM32CUBE_ST7735_BRIGHTNESS_TIMER,
-                              STM32CUBE_ST7735_BRIGHTNESS_TIMER_CHANNEL,
+	__HAL_TIM_SET_COMPARE(STM32XWDS_ST7735_BRIGHTNESS_TIMER,
+                              STM32XWDS_ST7735_BRIGHTNESS_TIMER_CHANNEL,
                               brightness);
         return XWOK;
 }

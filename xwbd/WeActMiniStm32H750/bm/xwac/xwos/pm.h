@@ -18,14 +18,11 @@
  * > limitations under the License.
  */
 
-#ifndef __bm_xwac_xwds_pm_h__
-#define __bm_xwac_xwds_pm_h__
+#ifndef __bm_xwac_xwos_pm_h__
+#define __bm_xwac_xwos_pm_h__
 
 #include "board/std.h"
 
-void stm32cube_pm_resume(void * arg);
-void stm32cube_pm_suspend(void * arg);
-void stm32cube_pm_wakeup(void * arg);
-void stm32cube_pm_sleep(void * arg);
+void xwosac_pmcb_init(void);
 
-#endif /* bm/xwac/xwds/pm.h */
+#endif /* bm/xwac/xwos/pm.h */
