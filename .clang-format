@@ -1,0 +1,45 @@
+---
+BasedOnStyle: Mozilla
+BinPackArguments: true
+BinPackParameters: true
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: false
+  AfterClass: true
+  AfterControlStatement: Never
+  AfterEnum: false
+  AfterExternBlock: false
+  AfterFunction: true
+  AfterNamespace: false
+  AfterObjCDeclaration: false
+  AfterStruct: false
+  AfterUnion: false
+  BeforeCatch: false
+  BeforeElse: false
+  BeforeLambdaBody: false
+  BeforeWhile: false
+  IndentBraces: false
+  SplitEmptyFunction: true
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: true
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
+BreakAfterAttributes: Leave
+BreakBeforeTernaryOperators: false
+
+Cpp11BracedListStyle: true
+IndentCaseLabels: false
+IndentExternBlock: NoIndent
+IndentGotoLabels: false
+IndentPPDirectives: AfterHash
+IndentWidth: 8
+InsertBraces: true
+PointerAlignment: Middle
+ReferenceAlignment: Pointer
+PPIndentWidth: 2
+SortIncludes: Never
+---
+Language: Cpp
+---
+Language: Proto
+...

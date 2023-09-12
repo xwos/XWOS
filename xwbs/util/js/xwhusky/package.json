@@ -1,7 +1,7 @@
 {
   "name": "xwhusky",
   "version": "1.0.0",
-  "description": "XWOS all git hooks",
+  "description": "XWOS git hooks",
   "main": "index.js",
   "scripts": {
     "prepare": "cd ../../../.. && husky install xwbs/util/js/xwhusky/.husky"

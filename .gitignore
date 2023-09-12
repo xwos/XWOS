@@ -23,5 +23,4 @@ GPATH
 compile_commands.json
 .cache
 *.~undo-tree~
-.vscode
 Cargo.lock
